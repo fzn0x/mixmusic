@@ -93,6 +93,9 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 		if mini != nil {
 			mini.Close()
 		}
+		// Spotify's hidden page goes with the main window: open, it would
+		// keep MixMusic running, and playing, with no window to show it.
+		a.here.close()
 	})
 	a.mu.Lock()
 	a.main = win

@@ -2,6 +2,7 @@ package native
 
 import (
 	"fmt"
+	"math"
 	"slices"
 	"strconv"
 	"strings"
@@ -110,6 +111,40 @@ func byteSize(n int64) string {
 		return strconv.FormatFloat(v, 'f', 1, 64) + " " + units[i]
 	}
 	return strconv.FormatFloat(v, 'f', 0, 64) + " " + units[i]
+}
+
+// compactCount writes a count as YouTube Music does, in three figures at
+// most: 148, 2.2K, 757K, 13M, 1.2B. It rounds down, as YouTube Music does:
+// 1,299 is 1.2K.
+func compactCount(n int64) string {
+	v, unit := float64(n), ""
+	for _, u := range []string{"K", "M", "B"} {
+		if v < 1000 {
+			break
+		}
+		v, unit = v/1000, u
+	}
+	if unit != "" && v < 10 {
+		return strconv.FormatFloat(math.Floor(v*10)/10, 'f', -1, 64) + unit
+	}
+	return strconv.FormatFloat(math.Floor(v), 'f', 0, 64) + unit
+}
+
+// playsLabel says how many times a track played, as "1.2B plays", or how
+// many views a video has, as "905M views", or "" where its service says
+// not.
+func playsLabel(t media.Track) string {
+	noun := "plays"
+	if t.Video {
+		noun = "views"
+	}
+	switch {
+	case t.Plays <= 0:
+		return ""
+	case t.Plays == 1:
+		noun = strings.TrimSuffix(noun, "s")
+	}
+	return compactCount(t.Plays) + " " + noun
 }
 
 // ms is v milliseconds.

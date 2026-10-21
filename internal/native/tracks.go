@@ -12,6 +12,9 @@ type trackListOptions struct {
 	art bool
 	// album shows the album column.
 	album bool
+	// plays shows how many times each track played, where its service
+	// says: in a search, to tell the original from the covers.
+	plays bool
 	// menu adds items to a track's menu, as removing it from a playlist.
 	menu  func(m *ui.Menu, i int, t media.Track)
 	empty string
@@ -127,6 +130,12 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 					ui.Text(c, t.Album.Name).FontSize(k.smallSize()).TextColor(sub).SingleLine().MinWidth(0)
 				})
 			})
+		}
+		if o.plays {
+			// Its column stays where none is said, to keep the others in
+			// line.
+			ui.Text(c, playsLabel(t)).FontSize(k.smallSize()).TextColor(sub).FontFeatures("tnum").
+				Width(88).TextAlign(ui.End).Shrink(0)
 		}
 		s.sourceMark(c, t.Source, current)
 		if hovered || s.a.IsLiked(t.ID) {

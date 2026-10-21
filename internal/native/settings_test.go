@@ -158,3 +158,13 @@ func TestCacheSizeLabel(t *testing.T) {
 		}
 	}
 }
+
+// TestThemeCards says who made each theme: MixMusic, or its author.
+func TestThemeCards(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 1600)
+	show(s, tt, "/settings/appearance")
+	if !tt.HasText("built in") {
+		t.Errorf("the built-in themes don't say so: %q", tt.Texts())
+	}
+}

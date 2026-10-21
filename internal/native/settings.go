@@ -190,7 +190,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 		ui.Row(c).Wrap().Gap(10).Padding(14, 0).Children(func() {
 			active := s.set.ActiveTheme(k.systemDark)
 			for _, t := range s.inv.Themes {
-				s.themeCard(c, t.ID, t.Name, active == t.ID)
+				s.themeCard(c, t, active == t.ID)
 			}
 		})
 		s.problems(c, addons.KindTheme)
@@ -271,10 +271,11 @@ func (s *shell) themeSelect(c *ui.Context, key, label string, id *string) {
 
 // themeCard shows a theme in its own ground and ink, with its four tiles;
 // the current one wears an accent outline.
-func (s *shell) themeCard(c *ui.Context, id, name string, current bool) {
+func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 	k := &s.lk
+	id, name := t.ID, t.Name
 	tk := newLook(settings.Settings{Theme: id, FontScale: 1}, s.inv.Themes, k.dark, "")
-	card := ui.ButtonBase(c.Key("theme-"+id)).Width(200).Height(110).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
+	card := ui.ButtonBase(c.Key("theme-"+id)).Width(200).Height(124).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 		Padding(14).Background(tk.bg).Border(1, tk.border).Label(name).Cursor(ui.CursorPointer)
 	if current {
 		card.Border(3, k.accent)
@@ -298,6 +299,11 @@ func (s *shell) themeCard(c *ui.Context, id, name string, current bool) {
 				ui.Box(c).Size(22, 22).Background(tk.tile(i))
 			}
 		})
+		by := "built in"
+		if !t.Builtin {
+			by = "by " + t.Author
+		}
+		ui.Text(c, by).FontSize(k.captionSize()).TextColor(tk.muted).SingleLine()
 	})
 }
 

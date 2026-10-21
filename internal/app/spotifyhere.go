@@ -171,11 +171,34 @@ func (d hereDevice) Play(ctx context.Context, t media.Track, at time.Duration) e
 	if err != nil {
 		return err
 	}
+	// The device plays at the player's volume, which the player sends it
+	// only while it plays: from its start, and again once it plays, as
+	// what the user set while the track loaded didn't reach it.
+	if _, err := page.EvalContext(ctx, "await mm.setVolume("+d.level()+")"); err != nil {
+		return err
+	}
 	id, err := eval[string](ctx, page, "return await mm.device()")
 	if err != nil {
 		return err
 	}
-	return (&Player{d.h.a}).PlayHere(ctx, id, t, int(at/time.Millisecond))
+	if err := (&Player{d.h.a}).PlayHere(ctx, id, t, int(at/time.Millisecond)); err != nil {
+		return err
+	}
+	_, err = page.EvalContext(ctx, "await mm.setVolume("+d.level()+")")
+	return err
+}
+
+// level is the player's volume, 0 when muted, for the page.
+func (d hereDevice) level() string {
+	v := 0.8
+	if p := d.h.a.goPlayer.Load(); p != nil {
+		st := p.State()
+		v = st.Volume
+		if st.Muted {
+			v = 0
+		}
+	}
+	return strconv.FormatFloat(min(max(v, 0), 1), 'f', -1, 64)
 }
 
 // do runs a command of the device in its page, if it's open.

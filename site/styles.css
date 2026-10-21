@@ -598,30 +598,28 @@ kbd {
 .upnext-list li + li.is-next-head { margin-top: 18px; }
 .upnext-end { margin: 22px 10px 0; color: var(--muted); font-size: 0.875rem; }
 
-/* Short windows: the whole queue, down to its end line, stays in view. */
-@media (max-height: 960px) {
-  .upnext { padding-top: 18px; }
-  .upnext-label { margin-top: 12px; }
-  .upnext-list a { grid-template-columns: 40px minmax(0, 1fr); padding: 4px 10px; }
-  .upnext-list .tile-thumb { width: 40px; height: 40px; }
-  .upnext-end { margin-top: 14px; }
-}
-@media (max-height: 820px) {
-  .upnext-title { font-size: 1.5rem; }
-  .upnext-list a { grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 3px 10px; }
-  .upnext-list .tile-thumb { width: 34px; height: 34px; }
-  .upnext-list .tile-thumb svg { width: 18px; height: 18px; }
-  .upnext-list strong { font-size: 0.9375rem; }
-  .upnext-list small { font-size: 0.75rem; }
-}
+/* Short windows: the whole queue, down to its end line, stays in view.
+   app.js steps the column down these levels, one at a time, until it fits;
+   a level keeps the ones before it. */
+.upnext.fit-1 { padding-top: 18px; }
+.fit-1 .upnext-label { margin-top: 12px; }
+.fit-1 .upnext-list a { grid-template-columns: 40px minmax(0, 1fr); padding: 4px 10px; }
+.fit-1 .upnext-list .tile-thumb { width: 40px; height: 40px; }
+.fit-1 .upnext-end { margin-top: 14px; }
+
+.fit-2 .upnext-title { font-size: 1.5rem; }
+.fit-2 .upnext-list a { grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 3px 10px; }
+.fit-2 .upnext-list .tile-thumb { width: 34px; height: 34px; }
+.fit-2 .upnext-list .tile-thumb svg { width: 18px; height: 18px; }
+.fit-2 .upnext-list strong { font-size: 0.9375rem; }
+.fit-2 .upnext-list small { font-size: 0.75rem; }
+
 /* Shorter still: the rows drop their captions, so every one stays in view. */
-@media (max-height: 780px) {
-  .upnext { padding-top: 14px; }
-  .upnext-list a { grid-template-columns: 28px minmax(0, 1fr); align-items: center; }
-  .upnext-list .tile-thumb { width: 28px; height: 28px; }
-  .upnext-list .tile-thumb svg { width: 16px; height: 16px; }
-  .upnext-list small { display: none; }
-}
+.upnext.fit-3 { padding-top: 14px; }
+.fit-3 .upnext-list a { grid-template-columns: 28px minmax(0, 1fr); align-items: center; }
+.fit-3 .upnext-list .tile-thumb { width: 28px; height: 28px; }
+.fit-3 .upnext-list .tile-thumb svg { width: 16px; height: 16px; }
+.fit-3 .upnext-list small { display: none; }
 
 .tile-thumb { display: grid; place-items: center; flex: none; }
 .tile-thumb::after { display: none; }

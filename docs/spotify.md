@@ -64,8 +64,9 @@ Settings › Playback chooses:
   Spotify app needs to be open: MixMusic shows among your Spotify devices
   while it plays. It needs Spotify Premium, and Windows, whose webview,
   WebView2, plays Spotify's protected audio: WebKitGTK on Linux does not,
-  and macOS's is not known to, as Settings › Playback says there. The equalizer, crossfade and visualizer leave Spotify's audio as
-  it is. Sign-ins made before MixMusic played Spotify itself do not allow it:
+  and macOS's is not known to, as Settings › Playback says there. The
+  equalizer and crossfade leave Spotify's audio as it is; the visualizer and
+  the plugins' analyser hear it, on Windows 10 build 20348 and later. Sign-ins made before MixMusic played Spotify itself do not allow it:
   Settings › Playback asks you to sign in again. When Spotify cannot play
   here, MixMusic plays the track from YouTube Music instead, and says why.
 - **On Spotify Connect** (the default elsewhere). A Spotify device plays the track: your
@@ -73,6 +74,9 @@ Settings › Playback chooses:
   Premium, and a device with Spotify open. The devices button of the player
   bar chooses which device plays; by default, the active one. When no device
   can play, MixMusic plays the track from YouTube Music instead, and says so.
+  On Windows, the visualizer and the plugins' analyser hear the Spotify app
+  on this computer, as it plays, never recording it; other devices they
+  can't hear, and the visualizer shows nothing then.
 - **Here, from YouTube Music.** MixMusic finds the track's recording on YouTube
   Music and plays it in its own player, with the equalizer, crossfade and the
   visualizer. It works without Premium. When a match is wrong, choose **Find

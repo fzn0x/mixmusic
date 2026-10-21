@@ -24,8 +24,9 @@ type hearing int
 
 const (
 	hearNothing hearing = iota
-	// hearMixMusic hears MixMusic's own process tree, whose webview plays
-	// Spotify in MixMusic.
+	// hearMixMusic hears the browser process of MixMusic's webview, whose
+	// children play Spotify in MixMusic: Windows hears a process and its
+	// children, but not theirs, so not WebView2's audio from MixMusic's own.
 	hearMixMusic
 	// hearSpotifyApp hears the Spotify app on this computer, which plays
 	// what plays on Spotify Connect when it is the device.
@@ -46,12 +47,12 @@ func heard(st player.State) hearing {
 	return hearNothing
 }
 
-// process returns the process whose tree plays what h hears, or 0 for
+// process returns the process whose children play what h hears, or 0 for
 // none, as while the Spotify app doesn't run.
 func (h hearing) process() uint32 {
 	switch h {
 	case hearMixMusic:
-		return uint32(os.Getpid())
+		return childNamed(processes(), uint32(os.Getpid()), "msedgewebview2.exe")
 	case hearSpotifyApp:
 		return rootNamed(processes(), "Spotify.exe")
 	}
@@ -62,6 +63,17 @@ func (h hearing) process() uint32 {
 type proc struct {
 	pid, parent uint32
 	name        string
+}
+
+// childNamed returns a child of the process parent named name, or 0 for
+// none.
+func childNamed(procs []proc, parent uint32, name string) uint32 {
+	for _, p := range procs {
+		if p.parent == parent && strings.EqualFold(p.name, name) {
+			return p.pid
+		}
+	}
+	return 0
 }
 
 // rootNamed returns a process named name whose parent is not, whose tree
@@ -91,6 +103,8 @@ type listener struct {
 	mu   sync.Mutex
 	want hearing
 
+	// find finds the process whose children play what is heard.
+	find func(hearing) uint32
 	// hearing is what capture hears, which run owns, as failed, set once a
 	// capture failed and said why.
 	hearing hearing
@@ -98,8 +112,11 @@ type listener struct {
 	failed  bool
 }
 
-func newListener() *listener {
-	l := &listener{tap: audio.NewTap(), wake: make(chan struct{}, 1)}
+func newListener() *listener { return listenFinding(hearing.process) }
+
+// listenFinding returns a listener that finds what it hears with find.
+func listenFinding(find func(hearing) uint32) *listener {
+	l := &listener{tap: audio.NewTap(), wake: make(chan struct{}, 1), find: find}
 	go l.run()
 	return l
 }
@@ -132,7 +149,7 @@ func (l *listener) run() {
 		}
 		l.tap.Silence()
 		l.hearing = want
-		pid := want.process()
+		pid := l.find(want)
 		if pid == 0 {
 			continue
 		}

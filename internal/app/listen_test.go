@@ -33,8 +33,22 @@ func TestListenerFollows(t *testing.T) {
 			t.Errorf("%s: hears %d, outside %v; want %d, %v", c.name, l.want, l.outside.Load(), c.want, c.outside)
 		}
 	}
-	if got := hearMixMusic.process(); got != uint32(os.Getpid()) {
-		t.Errorf("hearing MixMusic hears process %d, not its own", got)
+}
+
+// TestChildNamed finds the browser process of MixMusic's webview: its
+// child, whose own children play, as WebView2's audio service.
+func TestChildNamed(t *testing.T) {
+	own := uint32(os.Getpid())
+	procs := []proc{
+		{pid: 50, parent: 7, name: "msedgewebview2.exe"}, // another app's
+		{pid: 60, parent: own, name: "msedgewebview2.exe"},
+		{pid: 61, parent: 60, name: "msedgewebview2.exe"}, // its audio service
+	}
+	if got := childNamed(procs, own, "msedgewebview2.exe"); got != 60 {
+		t.Errorf("MixMusic's webview is process %d, want 60", got)
+	}
+	if got := childNamed(procs[:1], own, "msedgewebview2.exe"); got != 0 {
+		t.Errorf("without a webview of MixMusic's, found process %d", got)
 	}
 }
 

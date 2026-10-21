@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
@@ -166,5 +167,31 @@ func TestThemeCards(t *testing.T) {
 	show(s, tt, "/settings/appearance")
 	if !tt.HasText("built in") {
 		t.Errorf("the built-in themes don't say so: %q", tt.Texts())
+	}
+}
+
+// TestAppearance gives the title bar and the system's menus the light or
+// dark of the theme worn, and leaves them to the computer while the theme
+// follows it.
+func TestAppearance(t *testing.T) {
+	var got []mygo.ThemeSource
+	setAppearance = func(source mygo.ThemeSource) { got = append(got, source) }
+	defer func() { setAppearance = func(mygo.ThemeSource) {} }()
+	s := newTestShell(t)
+	for _, c := range []struct {
+		follow bool
+		theme  string
+		want   mygo.ThemeSource
+	}{
+		{false, "daylight", mygo.ThemeLight},
+		{false, "mix", mygo.ThemeDark},
+		{true, "daylight", mygo.ThemeSystem},
+	} {
+		got = nil
+		s.set.FollowSystem, s.set.Theme = c.follow, c.theme
+		s.restyle()
+		if len(got) != 1 || got[0] != c.want {
+			t.Errorf("wearing %s, following the computer %v, the appearance went %v, want %s", c.theme, c.follow, got, c.want)
+		}
 	}
 }

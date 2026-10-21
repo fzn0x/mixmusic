@@ -57,6 +57,9 @@ next track.
   About turns that off.
 - A Spotify track that plays from YouTube Music instead says why once, not
   at every track.
+- On Windows and Linux, the main window has the system's own title bar and
+  buttons, as asked in #6. On macOS, the traffic lights stay over the
+  window.
 
 ### Removed
 
@@ -86,6 +89,12 @@ next track.
   next one too.
 - Moving through a Spotify track before it plays, as after a restart, no
   longer starts it on your device behind MixMusic's back.
+- The title bar and its buttons are light or dark as the theme you wear
+  is: on a light theme while the computer was dark, the buttons showed
+  white on white.
+- On a screen smaller than the window, as a laptop's, the window opens
+  fitting it, where its title bar and buttons were above the screen, out
+  of reach (#6). A window the last run left there comes back within it.
 
 ## [0.4.0] - 2026-10-20
 

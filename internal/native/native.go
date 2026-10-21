@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -27,24 +28,65 @@ import (
 func Open(a *app.App, hidden bool) *mygo.Window {
 	registerFonts()
 	s := newShell(a, a.GoPlayer())
+	// A screen smaller than the window, as a laptop's, gets one that fits.
+	work := mygo.Screen.PrimaryDisplay().WorkArea
+	size := fitIn(mygo.Rectangle{X: work.X, Y: work.Y, Width: 1280, Height: 820}, work)
+	least := fitIn(mygo.Rectangle{X: work.X, Y: work.Y, Width: 940, Height: 600}, work)
 	s.attach(mygo.NewWindow(mygo.WindowOptions{
 		Title:           "MixMusic",
-		Width:           1280,
-		Height:          820,
-		MinWidth:        940,
-		MinHeight:       600,
+		Width:           size.Width,
+		Height:          size.Height,
+		MinWidth:        least.Width,
+		MinHeight:       least.Height,
 		BackgroundColor: hexColor(s.lk.bg),
 		StateKey:        "main",
-		TitleBarStyle:   mygo.TitleBarHidden,
-		TitleBarHeight:  48,
+		TitleBarStyle:   titleBarStyle(runtime.GOOS),
 		Hidden:          hidden,
 		Content:         ui.View(s.view),
 	}))
+	fitOnScreen(s.win)
 	s.start()
 	s.usePlugins()
 	s.offerCrashReport()
 	s.captureFromEnv()
 	return s.win
+}
+
+// fitOnScreen moves the window into the work area of its display, as the
+// place it had at the last run, which comes back, may leave its title bar
+// out of reach there.
+func fitOnScreen(w *mygo.Window) {
+	if w.IsMaximized() || w.IsFullScreen() {
+		return
+	}
+	b := w.Bounds()
+	if r := fitIn(b, mygo.Screen.DisplayMatching(b).WorkArea); r != b {
+		w.SetBounds(r)
+	}
+}
+
+// fitIn returns the bounds r of a window within work, the work area of its
+// display, where r is taller or wider than work or starts above it: as on
+// a screen smaller than the window, its title bar is out of reach then.
+// Other bounds stay as they are.
+func fitIn(r, work mygo.Rectangle) mygo.Rectangle {
+	if work.Width <= 0 || work.Height <= 0 || r.Y >= work.Y && r.Width <= work.Width && r.Height <= work.Height {
+		return r
+	}
+	r.Width, r.Height = min(r.Width, work.Width), min(r.Height, work.Height)
+	r.X = min(max(r.X, work.X), work.X+work.Width-r.Width)
+	r.Y = min(max(r.Y, work.Y), work.Y+work.Height-r.Height)
+	return r
+}
+
+// titleBarStyle is the main window's title bar on goos: the system's own,
+// whose buttons are drawn as the system draws them, but on macOS, where
+// the traffic lights sit over the window, as in the system's apps.
+func titleBarStyle(goos string) mygo.TitleBarStyle {
+	if goos == "darwin" {
+		return mygo.TitleBarHidden
+	}
+	return mygo.TitleBarDefault
 }
 
 // shell is the main window: its state, which belongs to the main thread
@@ -276,9 +318,21 @@ func (s *shell) refresh() {
 }
 
 // restyle makes the look again, of the settings, the computer's appearance
-// and the artwork playing.
+// and the artwork playing. The windows' own parts, as the title bar and
+// its buttons, take the theme's light or dark: the computer's while the
+// theme follows it, which it reads then.
 func (s *shell) restyle() {
+	if s.set.FollowSystem {
+		setAppearance(mygo.ThemeSystem)
+	}
 	s.lk = newLook(s.set, s.inv.Themes, isDark(), s.artColor)
+	switch {
+	case s.set.FollowSystem:
+	case s.lk.dark:
+		setAppearance(mygo.ThemeDark)
+	default:
+		setAppearance(mygo.ThemeLight)
+	}
 	s.art.phosphor = s.lk.fx.phosphor
 	s.plugins.SetTheme(pluginTheme(&s.lk))
 }
@@ -420,6 +474,15 @@ func (s *shell) offerCrashReport() {
 // isDark reports whether the computer is in dark mode. It asks MyGo's main
 // loop, which tests don't run.
 var isDark = func() bool { return mygo.Theme.IsDark() }
+
+// setAppearance gives the windows' own parts, their title bars and the
+// system's menus, a light or dark appearance, or the computer's. Once set,
+// isDark tells it.
+var setAppearance = func(source mygo.ThemeSource) {
+	if mygo.Theme.Source() != source {
+		mygo.Theme.SetSource(source)
+	}
+}
 
 // navigate shows the page at path.
 func (s *shell) navigate(path string) { s.router.Push(path) }

@@ -107,12 +107,16 @@ func (s *shell) rail(c *ui.Context) {
 	})
 }
 
-// brand is MixMusic's mark and name, where the window drags, and the
-// button that collapses the rail.
+// brand is MixMusic's mark and name, where the window drags under a
+// hidden title bar, and the button that collapses the rail.
 func (s *shell) brand(c *ui.Context, collapsed bool) {
 	k := &s.lk
 	bar := c.TitleBar()
-	ui.Row(c).Height(max(bar.Height, 48)).Shrink(0).Padding(0, 0, 0, bar.Left).Gap(12).DragWindow().Children(func() {
+	row := ui.Row(c).Height(max(bar.Height, 48)).Shrink(0).Padding(0, 0, 0, bar.Left).Gap(12)
+	if bar.Height > 0 {
+		row.DragWindow()
+	}
+	row.Children(func() {
 		if !collapsed {
 			ui.Box(c).Size(26, 26).Shrink(0).Draw(func(p *ui.Painter, r ui.Rect) {
 				var a, b ui.Path

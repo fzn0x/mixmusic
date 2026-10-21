@@ -74,6 +74,48 @@ download or keep in memory.
 - **Plugins.** Small ES modules that add pages, commands, track actions and
   widgets through a typed API, drawn in your theme.
 
+## A look around
+
+Every page, in the Mochi theme, playing anime songs from YouTube Music. The
+walkthrough goes through them in a minute.
+
+<p align="center">
+  <a href="https://fzn0x.github.io/mixmusic/assets/walkthrough.mp4"><img src="docs/walkthrough.webp" width="720" alt="Play the one-minute walkthrough of MixMusic in the Mochi theme" /></a>
+</p>
+
+<table>
+  <tr>
+    <td width="25%" valign="top"><img src="docs/shots/now-playing.webp" alt="The now playing page: アイドル by YOASOBI, its cover under the visualizer, and its synced lyrics" /><br /><b>Now playing</b><br /><sub>The cover, a visualizer and lyrics that follow the song.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/lyrics.webp" alt="The lyrics panel, following アイドル, beside the anime movie nights mix" /><br /><b>Lyrics</b><br /><sub>Synced lyrics beside any page, or as plain text.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/home.webp" alt="The home page's tiles and recently played, with up next beside them" /><br /><b>Home</b><br /><sub>Shelves of both services, and up next beside them.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/mini-player.webp" alt="The mini player, playing アイドル by YOASOBI" /><br /><b>Mini player</b><br /><sub>Stays on top of your other windows.</sub></td>
+  </tr>
+  <tr>
+    <td width="25%" valign="top"><img src="docs/shots/search.webp" alt="The search page, with the songs YouTube Music finds for yoasobi" /><br /><b>Search</b><br /><sub>YouTube Music and Spotify in one search.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/artist.webp" alt="YOASOBI's artist page and its top songs" /><br /><b>Artists</b><br /><sub>Their songs, albums, singles and related artists.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/album.webp" alt="YOASOBI's album THE BOOK 3 and its tracks" /><br /><b>Albums</b><br /><sub>Every track, to play or shuffle.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/explore.webp" alt="Explore's moods and genres, as tiles" /><br /><b>Explore</b><br /><sub>New releases, charts, moods and genres.</sub></td>
+  </tr>
+  <tr>
+    <td width="25%" valign="top"><img src="docs/shots/liked.webp" alt="The library's liked songs, アイドル playing at the top" /><br /><b>Liked songs</b><br /><sub>Liked across both services, searched and sorted.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/mixes.webp" alt="The library's mixes: opening themes, anime movie nights and band practice" /><br /><b>Mixes</b><br /><sub>Playlists that hold tracks of every service.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/mix.webp" alt="The opening themes mix and its tracks" /><br /><b>A mix</b><br /><sub>Search and sort inside it, play or shuffle it.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/history.webp" alt="The library's history, newest first" /><br /><b>History</b><br /><sub>What you played, newest first.</sub></td>
+  </tr>
+  <tr>
+    <td width="25%" valign="top"><img src="docs/shots/stats.webp" alt="The stats page: tracks and time played this week, and minutes listened each day" /><br /><b>Stats</b><br /><sub>Your listening, day by day.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/palette.webp" alt="The command palette over the home page" /><br /><b>Command palette</b><br /><sub><kbd>Ctrl</kbd> <kbd>K</kbd> reaches every command.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/shortcuts.webp" alt="Settings › Shortcuts, each command with its key and a change button" /><br /><b>Shortcuts</b><br /><sub>A key of your own for any command.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/accounts.webp" alt="Settings › Accounts, with the steps to sign in to Spotify" /><br /><b>Accounts</b><br /><sub>Spotify, YouTube Music, Last.fm and Discord.</sub></td>
+  </tr>
+  <tr>
+    <td width="25%" valign="top"><img src="docs/shots/themes.webp" alt="Settings › Appearance, the built-in themes with Mochi chosen" /><br /><b>Themes</b><br /><sub>Ten built in, and more from the community.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/equalizer.webp" alt="Settings › Playback, the equalizer's preamp and ten bands" /><br /><b>Equalizer</b><br /><sub>Ten bands, a preamp and presets.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/marketplace.webp" alt="The marketplace's community themes, Neon Nights and Paper Mint" /><br /><b>Marketplace</b><br /><sub>Community themes and plugins, one click away.</sub></td>
+    <td width="25%" valign="top"><img src="docs/shots/plugin.webp" alt="The page the Sleep Timer plugin adds, with its four timers as tiles" /><br /><b>Plugins</b><br /><sub>Pages, commands and widgets, like this sleep timer.</sub></td>
+  </tr>
+</table>
+
 ## Install
 
 Download the latest release for your system from

@@ -58,12 +58,13 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 	if row.DoubleClicked() {
 		play()
 	}
-	row.ContextMenu(func(m *ui.Menu) {
+	menu := func(m *ui.Menu) {
 		s.trackMenu(m, t)
 		if o.menu != nil {
 			o.menu(m, i, t)
 		}
-	})
+	}
+	row.ContextMenu(menu)
 	hovered := row.Hovered()
 	row.Children(func() {
 		lead := ui.ButtonBase(c.Key(key+"-lead-"+count(i))).Size(40, 40).Shrink(0).KeepFocus().Cursor(ui.CursorPointer)
@@ -138,6 +139,12 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 			duration = clock(ms(t.DurationMs))
 		}
 		ui.Text(c, duration).FontSize(k.smallSize()).TextColor(sub).FontFeatures("tnum").Width(48).TextAlign(ui.End)
+		// The menu, without a right click: shown on the row the pointer is
+		// on, and kept in its place on the others.
+		more := s.iconButton(c, key+"-more-"+count(i), "more", "More for "+t.Title, false, 18).Menu(menu)
+		if !hovered && !more.Focused() {
+			more.Opacity(0)
+		}
 	})
 }
 

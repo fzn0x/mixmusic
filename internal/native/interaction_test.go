@@ -2,6 +2,7 @@ package native
 
 import (
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -233,6 +234,18 @@ func TestAlbumArtistLinks(t *testing.T) {
 	click(t, s, tt, "Neil Davidge")
 	if got := s.router.Path(); got != artistPath("yt:UCneil") {
 		t.Errorf("the artist's link went to %q", got)
+	}
+}
+
+// TestTrackMoreButton opens a track's menu from its row's button.
+func TestTrackMoreButton(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	click(t, s, tt, "More for "+testTracks[1].Title)
+	if !slices.Contains(tt.Menu(), "Play next") {
+		t.Errorf("the button opened %q", tt.Menu())
 	}
 }
 

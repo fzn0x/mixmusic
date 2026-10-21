@@ -27,6 +27,10 @@ func testerOf(t *testing.T, s *shell, w, h int) *ui.Tester {
 	for _, key := range []string{"home", "explore", "charts"} {
 		s.loads[key] = &loaded[[]media.Shelf]{done: true}
 	}
+	// About asks GitHub for the newest release, unless the test tells it.
+	if _, ok := s.loads["release"]; !ok {
+		s.loads["release"] = &loaded[app.Release]{done: true}
+	}
 	tt := ui.NewTester(s.view, w, h)
 	tt.Frame()
 	return tt
@@ -786,5 +790,35 @@ func TestShortcutName(t *testing.T) {
 	}
 	if !sameShortcut("Mod+K", written) || sameShortcut("Mod+K", "Mod+J") {
 		t.Errorf("sameShortcut tells Mod+K from %s, or not from Mod+J", written)
+	}
+}
+
+// TestAboutRelease tells on About that a newer version is out, with what
+// it brings and its install or download, or that this is the newest.
+func TestAboutRelease(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["release"] = &loaded[app.Release]{done: true, value: app.Release{Version: "9.9.9", Newer: true, Date: "2026-10-12T09:00:00Z",
+		Page:     "https://github.com/fzn0x/mixmusic/releases/tag/v9.9.9",
+		Download: "https://github.com/fzn0x/mixmusic/releases/download/v9.9.9/mixmusic-9.9.9-linux-amd64.deb",
+		File:     "mixmusic-9.9.9-linux-amd64.deb"}}
+	tt := testerOf(t, s, 1280, 2400)
+	show(s, tt, "/settings/about")
+	u := s.svc.System.Updates()
+	act := downloadLabel(u.Kind)
+	if u.Enabled {
+		act = "install 9.9.9"
+	}
+	for _, text := range []string{"MixMusic 9.9.9 is out", "Out since 12 Oct 2026.", "what's new", "check again", act, "contribute"} {
+		if !tt.HasText(text) {
+			t.Errorf("About doesn't show %q: %q", text, tt.Texts())
+		}
+	}
+	if build := buildNames[u.Kind]; build != "" && !tt.HasText(build) {
+		t.Errorf("About doesn't say the copy is a %s", build)
+	}
+	s.loads["release"] = &loaded[app.Release]{done: true, value: app.Release{Version: "0.4.0"}}
+	tt.Frame()
+	if !tt.HasText("This is the newest version") || tt.HasText("is out") {
+		t.Errorf("the newest version shows as %q", tt.Texts())
 	}
 }

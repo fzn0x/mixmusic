@@ -630,21 +630,36 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 func (s *shell) aboutSettings(c *ui.Context) {
 	k := &s.lk
 	info := s.svc.System.Info()
+	u := s.svc.System.Updates()
 	s.group(c, "mixmusic", func() {
-		s.row(c, "Version", "MixMusic "+info.Version+" · "+info.Platform+" "+info.Arch, func() {})
-		s.row(c, "MixMusic", "Spotify and YouTube Music in one player, open source under the MIT license. Your data lives in "+info.DataDir+".", func() {
-			const repo = "https://github.com/fzn0x/mixmusic"
-			if s.button(c, "source", "source code", false).Clicked() {
-				go s.svc.System.OpenExternal(repo)
-			}
-			if s.button(c, "report", "report a problem", false).Clicked() {
-				go func() { _ = s.svc.System.OpenExternal(s.svc.System.ReportURL(context.Background())) }()
-			}
-			if s.button(c, "logs", "open logs folder", false).Clicked() {
-				if err := s.svc.System.OpenLogsFolder(); err != nil {
-					s.notes = append(s.notes, noticeOf(err))
+		version := "MixMusic " + info.Version + " · " + info.Platform + " " + info.Arch
+		if build, ok := buildNames[u.Kind]; ok {
+			version += " · " + build
+		}
+		s.row(c, "Version", version, func() {})
+		s.releaseRow(c, u)
+		// Its links go under it, as they are many.
+		ui.Column(c).Gap(4).Padding(14, 0).Children(func() {
+			ui.Text(c, "MixMusic").FontSize(k.bodySize())
+			ui.Text(c, "Spotify and YouTube Music in one player, open source under the MIT license. Your data lives in "+info.DataDir+".").
+				FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Row(c).Gap(8).Wrap().Margin(12, 0, 0).Children(func() {
+				const repo = "https://github.com/fzn0x/mixmusic"
+				if s.button(c, "source", "source code", false).Clicked() {
+					go s.svc.System.OpenExternal(repo)
 				}
-			}
+				if s.button(c, "contribute", "contribute", false).Clicked() {
+					go s.svc.System.OpenExternal(repo + "/blob/main/CONTRIBUTING.md")
+				}
+				if s.button(c, "report", "report a problem", false).Clicked() {
+					go func() { _ = s.svc.System.OpenExternal(s.svc.System.ReportURL(context.Background())) }()
+				}
+				if s.button(c, "logs", "open logs folder", false).Clicked() {
+					if err := s.svc.System.OpenLogsFolder(); err != nil {
+						s.notes = append(s.notes, noticeOf(err))
+					}
+				}
+			})
 		})
 	})
 	s.updateSettings(c)

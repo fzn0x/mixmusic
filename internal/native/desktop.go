@@ -1,10 +1,15 @@
 package native
 
 import (
+	"cmp"
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/internal/app"
 )
 
 func (s *shell) desktopSettings(c *ui.Context) {
@@ -211,14 +216,73 @@ func (s *shell) updateSettings(c *ui.Context) {
 				}
 			})
 		}
-		if u.Installed != "" {
-			s.row(c, "MixMusic "+u.Installed+" is installed", "It runs once MixMusic restarts.", func() {
-				if s.button(c, "restart", "restart now", true).Clicked() {
-					go s.svc.System.Restart()
-				}
-			})
-		}
 	})
+}
+
+// buildNames tell how a copy of each kind was installed, as
+// UpdateStatus.Kind says.
+var buildNames = map[string]string{
+	"installer": "installed with the setup", "portable": "portable", "app": "app", "archive": "installed with install.sh",
+	"deb": ".deb package", "rpm": ".rpm package", "appimage": "AppImage", "development": "development build",
+}
+
+// releaseRow tells whether a newer version is out, and installs it, or
+// offers its download where this copy can't replace itself; once one is
+// installed, it restarts MixMusic.
+func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
+	if installed := cmp.Or(s.updated, u.Installed); installed != "" {
+		s.row(c, "MixMusic "+installed+" is installed", "It runs once MixMusic restarts.", func() {
+			if s.button(c, "restart", "restart now", true).Clicked() {
+				go s.svc.System.Restart()
+			}
+		})
+		return
+	}
+	r := fetch(s, "release", s.svc.System.LatestRelease)
+	again := func() {
+		if !s.updating && s.link(c, "release-again", "check again") {
+			s.forget("release")
+		}
+	}
+	switch rel := r.value; {
+	case !r.done:
+		s.row(c, "Looking for a newer version…", "", func() {})
+	case r.err != nil:
+		s.row(c, "Couldn't look for a newer version", r.err.Error(), again)
+	case rel.Newer:
+		var describe []string
+		if t, err := time.Parse(time.RFC3339, rel.Date); err == nil {
+			describe = append(describe, "Out since "+t.Local().Format("2 Jan 2006")+".")
+		}
+		if !u.Enabled {
+			describe = append(describe, replacing(u.Kind, rel.File))
+		}
+		s.row(c, "MixMusic "+rel.Version+" is out", strings.Join(describe, " "), func() {
+			again()
+			if rel.Page != "" && s.button(c, "release-notes", "what's new", false).Clicked() {
+				go s.svc.System.OpenExternal(rel.Page)
+			}
+			switch {
+			case u.Enabled:
+				label := "install " + rel.Version
+				switch {
+				case s.updating && s.updateTotal > 0:
+					label = fmt.Sprintf("downloading %d%%", 100*s.updateDone/s.updateTotal)
+				case s.updating:
+					label = "downloading…"
+				}
+				if s.button(c, "release-install", label, true).Disabled(s.updating).Clicked() {
+					s.installUpdate()
+				}
+			case rel.Download != "":
+				if s.button(c, "release-download", downloadLabel(u.Kind), true).Clicked() {
+					go s.svc.System.OpenExternal(rel.Download)
+				}
+			}
+		})
+	default:
+		s.row(c, "This is the newest version", "", again)
+	}
 }
 
 // downloadLabels name the download of a release that replaces a copy of

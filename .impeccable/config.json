@@ -260,12 +260,6 @@
       },
       {
         "rule": "design-system-color",
-        "value": "#f5f5f7",
-        "createdAt": "2026-10-21T17:50:03.340Z",
-        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
-      },
-      {
-        "rule": "design-system-color",
         "value": "#e11d48",
         "createdAt": "2026-10-21T17:50:03.618Z",
         "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
@@ -358,6 +352,30 @@
         "rule": "design-system-color",
         "value": "#5b3653",
         "createdAt": "2026-10-21T17:50:07.823Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#0e1411",
+        "createdAt": "2026-10-21T18:15:40.001Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#f3f9f6",
+        "createdAt": "2026-10-21T18:15:40.263Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#f8f2f4",
+        "createdAt": "2026-10-21T18:15:40.523Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#1f191b",
+        "createdAt": "2026-10-21T18:15:40.772Z",
         "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
       }
     ]

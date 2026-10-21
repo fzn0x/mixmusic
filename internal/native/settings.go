@@ -664,7 +664,7 @@ func (s *shell) aboutSettings(c *ui.Context) {
 	})
 	s.updateSettings(c)
 	s.group(c, "licenses", func() {
-		for i, n := range s.svc.System.Notices() {
+		for i, n := range append(s.svc.System.Notices(), fontNotices()...) {
 			open := s.licenseOpen == i
 			s.row(c, n.Name, "", func() {
 				label := "show"

@@ -1,7 +1,7 @@
 package native
 
-// The effects of Greenroom, Glasshouse and Anime: the cover's colour on
-// the ground, speed lines and screentone.
+// The effects of Greenroom, Glasshouse, Anime and Mochi: the cover's
+// colour on the ground, speed lines and screentone, rising sparkles.
 
 import (
 	"image"
@@ -229,4 +229,82 @@ func screentone(w, h int, scale float32, ink color.NRGBA) *image.NRGBA {
 		}
 	}
 	return img
+}
+
+// sparkle is one of Mochi's sparkles or hearts: where it rises across the
+// window, as a share of its width, how far up it is at the start, how many
+// times a minute it rises through the window, its size and sway in DIPs,
+// and which of the inks it has.
+type sparkle struct {
+	x, start, rate, size, sway float32
+	heart                      bool
+	ink                        int
+}
+
+// sparkleStart is when Mochi's sparkles started rising.
+var sparkleStart = time.Now()
+
+// sparkles are Mochi's, the same at every frame.
+var sparkles = func() (out []sparkle) {
+	seed := uint32(0x9e3779b9)
+	const n = 22
+	for i := range n {
+		out = append(out, sparkle{
+			x:     (float32(i) + seeded(&seed)) / n,
+			start: seeded(&seed),
+			rate:  1.2 + 1.2*seeded(&seed),
+			size:  3.5 + 5*seeded(&seed),
+			sway:  6 + 14*seeded(&seed),
+			heart: i%5 == 2,
+			ink:   i % 4,
+		})
+	}
+	return out
+}()
+
+// sparkleInks are Mochi's tiles, deepened a quarter of the way to its
+// accent, to show on its ground.
+func sparkleInks(k *look) (inks [4]ui.Color) {
+	for i := range inks {
+		inks[i] = col(mix(nrgba(k.tile(i)), nrgba(k.accent), 0.25))
+	}
+	return inks
+}
+
+// paintSparkles draws Mochi's sparkles and hearts rising up the ground,
+// fading in at its foot and out at its head, swaying and twinkling on the
+// way, or holding still unless moving.
+func paintSparkles(p *ui.Painter, r ui.Rect, inks [4]ui.Color, moving bool) {
+	var t float64
+	if moving {
+		t = p.Now().Sub(sparkleStart).Seconds()
+		// They rise a pixel or so a frame: twenty frames a second will do.
+		p.After(50 * time.Millisecond)
+	}
+	for _, sp := range sparkles {
+		up := math.Mod(float64(sp.start)+t*float64(sp.rate)/60, 1)
+		x := r.X + sp.x*r.W + sp.sway*float32(math.Sin(2*math.Pi*(t/9+float64(sp.start))))
+		y := r.Y + r.H + 24 - float32(up)*(r.H+48)
+		size := sp.size
+		if moving {
+			size *= 0.78 + 0.22*float32(math.Sin(2*math.Pi*(0.7*t+5*float64(sp.start))))
+		}
+		ink := withAlpha(inks[sp.ink], 0.9*math.Sin(math.Pi*up))
+		var path ui.Path
+		if sp.heart {
+			s := 1.2 * size
+			path.MoveTo(x, y+0.85*s).
+				CubeTo(x-1.1*s, y+0.1*s, x-0.75*s, y-0.95*s, x, y-0.35*s).
+				CubeTo(x+0.75*s, y-0.95*s, x+1.1*s, y+0.1*s, x, y+0.85*s).Close()
+		} else {
+			// Four points on concave sides, as a sparkle is drawn.
+			c := 0.16 * size
+			path.MoveTo(x, y-size).
+				QuadTo(x+c, y-c, x+size, y).
+				QuadTo(x+c, y+c, x, y+size).
+				QuadTo(x-c, y+c, x-size, y).
+				QuadTo(x-c, y-c, x, y-size).Close()
+		}
+		p.FillPath(&path, ink)
+	}
 }

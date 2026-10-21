@@ -55,14 +55,15 @@ type shell struct {
 	p   *player.Player
 	win *mygo.Window
 
-	router *ui.Router
-	set    settings.Settings
-	inv    addons.Inventory
-	lk     look
-	art    *artworks
-	loads  map[string]any
-	notes  []player.Notice
-	stop   []func()
+	router       *ui.Router
+	set          settings.Settings
+	inv          addons.Inventory
+	lk           look
+	art          *artworks
+	loads        map[string]any
+	notes        []player.Notice
+	actionToasts []actionToast
+	stop         []func()
 	// pending holds what update ran without a window, which pendingMu
 	// guards with win while it's set.
 	pendingMu sync.Mutex

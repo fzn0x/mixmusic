@@ -426,6 +426,22 @@ func TestShelfArrows(t *testing.T) {
 	}
 }
 
+// TestActionToasts shows a toast with an action, which its button runs.
+func TestActionToasts(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	ran := false
+	s.actionToasts = append(s.actionToasts, actionToast{message: "Installed Neon Nights", action: "use it", run: func() { ran = true }})
+	tt.Frame()
+	if !tt.HasText("Installed Neon Nights") {
+		t.Fatalf("no toast: %q", tt.Texts())
+	}
+	click(t, s, tt, "use it")
+	if !ran {
+		t.Error("the toast's action didn't run")
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

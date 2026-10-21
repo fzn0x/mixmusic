@@ -189,7 +189,18 @@ func (s *shell) install(kind addons.Kind, e addons.Entry) {
 			if had {
 				verb = "Updated "
 			}
-			s.notes = append(s.notes, notice(verb+e.Name))
+			// What was installed is one click away from use.
+			id := e.ID
+			use := actionToast{message: verb + e.Name, action: "use it", run: func() { s.chooseTheme(id) }}
+			if kind == addons.KindPlugin {
+				use.action, use.run = "enable", func() {
+					if !slices.Contains(s.set.EnabledPlugins, id) {
+						s.set.EnabledPlugins = append(slices.Clone(s.set.EnabledPlugins), id)
+						s.save()
+					}
+				}
+			}
+			s.actionToasts = append(s.actionToasts, use)
 		})
 	}()
 }

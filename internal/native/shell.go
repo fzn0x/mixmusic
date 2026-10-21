@@ -120,6 +120,17 @@ func (s *shell) toasts(c *ui.Context) {
 		}
 	}
 	s.notes = s.notes[:0]
+	for _, a := range s.actionToasts {
+		c.ToastAction(a.message, a.action, a.run)
+	}
+	s.actionToasts = s.actionToasts[:0]
+}
+
+// actionToast is a toast with an action, as "use it" once a theme
+// installed.
+type actionToast struct {
+	message, action string
+	run             func()
 }
 
 // showMini shows the mini player.

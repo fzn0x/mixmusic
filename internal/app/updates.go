@@ -72,15 +72,6 @@ type UpdateStatus struct {
 	Installed string `json:"installed"`
 }
 
-var (
-	// UpdatesChanged tells every window the update preferences changed,
-	// after a check too.
-	UpdatesChanged = mygo.NewEvent[UpdateStatus]("updatesChanged")
-	// UpdateOffered tells the main window to offer a new version, which
-	// MixMusic found and does not install by itself.
-	UpdateOffered = mygo.NewEvent[Release]("updateOffered")
-)
-
 func (a *App) updateStatus() UpdateStatus {
 	p := a.updates.Get()
 	s := UpdateStatus{
@@ -173,7 +164,7 @@ func (a *App) lookForUpdate() time.Duration {
 	if err := a.updates.Update(func(p *updatePrefs) error { p.LastCheck = time.Now(); return nil }); err != nil {
 		log.Printf("mixmusic: keeping the update preferences: %v", err)
 	}
-	UpdatesChanged.Broadcast(a.updateStatus())
+	notify()
 	a.mu.Lock()
 	installed := a.installed
 	a.mu.Unlock()
@@ -202,7 +193,7 @@ func (a *App) offerUpdate(r Release) {
 	}
 	a.offer = &r
 	a.mu.Unlock()
-	UpdateOffered.Broadcast(r)
+	notify()
 }
 
 // Updates returns whether MixMusic updates itself, and how.
@@ -224,7 +215,7 @@ func (s *System) SetUpdates(automaticChecks, automaticDownloads bool) (UpdateSta
 		s.a.checkUpdatesNow()
 	}
 	status := s.a.updateStatus()
-	UpdatesChanged.Broadcast(status)
+	notify()
 	return status, nil
 }
 
@@ -286,15 +277,6 @@ func (s *System) LatestRelease(ctx context.Context) (Release, error) {
 	return latestRelease(ctx, http.DefaultClient, releasesAPI, installKind(), runtime.GOARCH, s.a.version())
 }
 
-// InstallUpdate downloads the newest version, checks its signature and
-// puts it in place of this one, reporting the download's progress. It
-// runs once MixMusic restarts. It returns the version installed.
-func (s *System) InstallUpdate(ctx context.Context, progress *mygo.Channel[InstallProgress]) (string, error) {
-	return s.a.installUpdate(ctx, func(done, total int64) {
-		progress.Send(InstallProgress{Done: done, Total: total})
-	})
-}
-
 // installUpdate installs the newest version, telling progress, when not
 // nil, how far its download went.
 func (a *App) installUpdate(ctx context.Context, progress func(done, total int64)) (string, error) {
@@ -321,7 +303,7 @@ func (a *App) installUpdate(ctx context.Context, progress func(done, total int64
 		a.offer = nil
 	}
 	a.mu.Unlock()
-	UpdatesChanged.Broadcast(a.updateStatus())
+	notify()
 	return up.Version, nil
 }
 

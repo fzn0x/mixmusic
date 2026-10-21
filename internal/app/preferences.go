@@ -25,7 +25,7 @@ func (p *Preferences) Set(s settings.Settings) (settings.Settings, error) {
 		p.a.signOutSpotify()
 	}
 	p.a.apply(s)
-	SettingsChanged.Broadcast(s)
+	notify()
 	return s, nil
 }
 

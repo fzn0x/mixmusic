@@ -3,7 +3,7 @@ package audio
 import "math"
 
 // Bands are the center frequencies of the equalizer's filters, in Hz: a low
-// shelf, eight peaks and a high shelf, as src/player/eq.ts has them.
+// shelf, eight peaks and a high shelf, as the web interface had them.
 var Bands = [10]float64{32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000}
 
 // bandQ is the quality of the peaking filters: 1.1, as the float an

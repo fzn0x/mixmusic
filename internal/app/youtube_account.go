@@ -178,7 +178,7 @@ func (a *App) openYouTube() {
 		a.mu.Lock()
 		a.youtubeMe = nil
 		a.mu.Unlock()
-		AccountsChanged.Broadcast(a.accountsStatus(context.Background()))
+		notify()
 	}
 	cookies, err := a.youtubeStore.Load()
 	if err != nil || len(cookies) == 0 {
@@ -213,6 +213,9 @@ func (a *App) youtubeAccount(ctx context.Context) YouTubeAccount {
 // YouTube Music. Nothing the user types passes through MixMusic: it reads
 // the cookies of the session the window ends with.
 func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
+	if err := needWebView("signing in to YouTube Music"); err != nil {
+		return AccountsStatus{}, err
+	}
 	ctx, cancel := context.WithTimeout(ctx, loginTimeout)
 	defer cancel()
 	done := make(chan []*http.Cookie, 1)
@@ -264,7 +267,7 @@ func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
 		return AccountsStatus{}, err
 	}
 	status := s.a.accountsStatus(ctx)
-	AccountsChanged.Broadcast(status)
+	notify()
 	return status, nil
 }
 
@@ -300,7 +303,7 @@ func (s *Accounts) YouTubeLogout(ctx context.Context) error {
 	if set := s.a.settings.Get(); set.YouTubeChannel != "" {
 		set.YouTubeChannel = ""
 		if serr := s.a.settings.Set(set); serr == nil {
-			SettingsChanged.Broadcast(set)
+			notify()
 		}
 	}
 	for _, domain := range []string{"youtube.com", "google.com"} {
@@ -314,6 +317,6 @@ func (s *Accounts) YouTubeLogout(ctx context.Context) error {
 			}
 		}
 	}
-	AccountsChanged.Broadcast(s.a.accountsStatus(ctx))
+	notify()
 	return err
 }

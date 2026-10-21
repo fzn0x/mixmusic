@@ -33,8 +33,9 @@ func (a *App) Start() {
 			log.Printf("mixmusic: registering %s links: %v", URLScheme, err)
 		}
 	}
-	win := a.openMain(mygo.App.WasOpenedAtLogin())
-	a.captureFromEnv(win)
+	if a.openMain(mygo.App.WasOpenedAtLogin()) == nil {
+		return
+	}
 	a.setupTray()
 	a.applyMediaKeys(a.settings.Get().MediaKeys)
 	a.watchUpdates()
@@ -61,35 +62,18 @@ func (a *App) keepYTDLPCurrent() {
 	}
 }
 
-// background returns the background color of the theme of the settings,
-// which windows show until their page paints.
-func (a *App) background() string {
-	theme := a.settings.Get().Clean().ActiveTheme(mygo.Theme.IsDark())
-	for _, t := range a.addons.List().Themes {
-		if t.ID == theme {
-			if bg := t.Colors["bg"]; strings.HasPrefix(bg, "#") {
-				return bg
-			}
-		}
-	}
-	return "#0e0f13"
-}
-
-// openMain opens the main window, hidden when MixMusic starts at login.
+// openMain opens the main window, with its player, hidden when MixMusic
+// starts at login. Where MixMusic can't play, it says why and quits, and
+// returns nil.
 func (a *App) openMain(hidden bool) *mygo.Window {
-	win := mygo.NewWindow(mygo.WindowOptions{
-		Title:           "MixMusic",
-		Width:           1280,
-		Height:          820,
-		MinWidth:        940,
-		MinHeight:       600,
-		BackgroundColor: a.background(),
-		StateKey:        "main",
-		TitleBarStyle:   mygo.TitleBarHidden,
-		TitleBarHeight:  48,
-		Hidden:          hidden,
-		URL:             "/",
-	})
+	if _, err := a.startGoPlayer(); err != nil {
+		log.Printf("mixmusic: can't play: %v", err)
+		_, _ = mygo.Dialog.Message(mygo.MessageOptions{Type: mygo.MessageError, Title: "MixMusic",
+			Message: "MixMusic can't play on this computer", Detail: err.Error()})
+		mygo.App.Quit()
+		return nil
+	}
+	win := a.opts.Interface(a, hidden)
 	win.OnClose(func(e *mygo.CloseEvent) {
 		a.mu.Lock()
 		tray := a.tray
@@ -110,24 +94,10 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 			mini.Close()
 		}
 	})
-	win.Page().OnWillNavigate(func(e *mygo.NavigateEvent) {
-		// Links to websites open in the browser, never in the app's window.
-		if u, err := url.Parse(e.URL); err == nil && (u.Scheme == "http" || u.Scheme == "https") && !isAppHost(u.Host) {
-			e.PreventDefault()
-			go mygo.Shell.OpenExternal(e.URL)
-		}
-	})
 	a.mu.Lock()
 	a.main = win
 	a.mu.Unlock()
 	return win
-}
-
-// isAppHost reports whether host serves the app's own pages: the dev
-// server or a scheme WebView2 serves at <scheme>.localhost.
-func isAppHost(host string) bool {
-	h := strings.Split(host, ":")[0]
-	return h == "localhost" || h == "127.0.0.1" || strings.HasSuffix(h, ".localhost")
 }
 
 // showMain shows the main window, opening it again if it was closed.
@@ -136,7 +106,9 @@ func (a *App) showMain() {
 	win := a.main
 	a.mu.Unlock()
 	if win == nil {
-		win = a.openMain(false)
+		if win = a.openMain(false); win == nil {
+			return
+		}
 	}
 	if win.IsMinimized() {
 		win.Restore()
@@ -155,19 +127,10 @@ func (a *App) showMini() {
 		mini.Focus()
 		return
 	}
-	mini = mygo.NewWindow(mygo.WindowOptions{
-		Title:           "MixMusic mini player",
-		Width:           420,
-		Height:          132,
-		MinWidth:        340,
-		MinHeight:       112,
-		MaxHeight:       180,
-		Frameless:       true,
-		AlwaysOnTop:     true,
-		BackgroundColor: a.background(),
-		StateKey:        "mini",
-		URL:             "/mini",
-	})
+	if a.goPlayer.Load() == nil {
+		return
+	}
+	mini = a.opts.Mini(a)
 	mini.OnClosed(func() {
 		a.mu.Lock()
 		if a.mini == mini {
@@ -263,17 +226,38 @@ func (a *App) HandleURL(raw string) {
 			return
 		}
 		a.showMain()
-		a.mu.Lock()
-		main := a.main
-		a.mu.Unlock()
-		if main != nil {
-			target := path
-			if q := u.Query().Encode(); q != "" {
-				target += "?" + q
-			}
-			NavigateRequested.Emit(main, target)
+		target := path
+		if q := u.Query().Encode(); q != "" {
+			target += "?" + q
 		}
+		a.navigateTo(target)
 	})
+}
+
+// navigateTo shows a page of the main window.
+func (a *App) navigateTo(target string) {
+	a.mu.Lock()
+	fn := a.onNavigate
+	a.mu.Unlock()
+	if fn != nil {
+		(*fn)(target)
+	}
+}
+
+// OnNavigate has fn show the pages that deep links ask for: the main
+// window's, until cancel.
+func (a *App) OnNavigate(fn func(target string)) (cancel func()) {
+	p := &fn
+	a.mu.Lock()
+	a.onNavigate = p
+	a.mu.Unlock()
+	return func() {
+		a.mu.Lock()
+		if a.onNavigate == p {
+			a.onNavigate = nil
+		}
+		a.mu.Unlock()
+	}
 }
 
 // SecondInstance shows the main window when the user starts MixMusic again.

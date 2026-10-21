@@ -1,6 +1,6 @@
-// Package app wires MixMusic together: the services its pages call, the
-// events it sends them, and its place on the desktop: windows, the tray,
-// media keys and notifications.
+// Package app wires MixMusic together: the services its windows call, the
+// player, and its place on the desktop: windows, the tray, media keys and
+// notifications.
 package app
 
 import (
@@ -22,6 +22,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/lyrics"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/store"
@@ -30,11 +31,9 @@ import (
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
-// Schemes the pages load from Go.
-const (
-	streamScheme = "stream"
-	addonsScheme = addons.Scheme
-)
+// streamScheme is the scheme of the addresses of the audio PrepareStream
+// finds, which the audio engine opens.
+const streamScheme = "stream"
 
 // Options configure the app.
 type Options struct {
@@ -52,6 +51,10 @@ type Options struct {
 	LogsDir string
 	// LastCrash is the crash report of the run before, when it crashed.
 	LastCrash string
+	// Interface opens the main window, hidden when asked, and Mini the
+	// mini player: windows that MyGo draws, of package native.
+	Interface func(a *App, hidden bool) *mygo.Window
+	Mini      func(a *App) *mygo.Window
 }
 
 // App is MixMusic.
@@ -88,6 +91,15 @@ type App struct {
 	nativeOnce sync.Once
 	// controls shows the engine's track in the system's media controls.
 	controls controls
+	// goPlayer is the player, once the main window opened, and queue its
+	// queue as kept between runs.
+	goPlayer atomic.Pointer[player.Player]
+	queue    *store.File[player.Saved]
+	// here is MixMusic's own Spotify device, which the player plays
+	// Spotify tracks on where it can.
+	here spotifyHere
+	// onNavigate shows the pages of the main window.
+	onNavigate *func(target string)
 	// updates keeps the user's choices of updates.
 	updates *store.File[updatePrefs]
 	// checkUpdates has MixMusic look for a new version at once.
@@ -117,6 +129,7 @@ type App struct {
 // New opens what the app keeps in opts.DataDir and opts.CacheDir.
 func New(opts Options) (*App, error) {
 	a := &App{opts: opts, lastCrash: opts.LastCrash}
+	a.here.a = a
 	var err error
 	if a.settings, err = store.Open(filepath.Join(opts.DataDir, "settings.json"), settings.Default()); err != nil {
 		return nil, fmt.Errorf("opening settings: %w", err)
@@ -161,7 +174,7 @@ func New(opts Options) (*App, error) {
 	a.related = newMemo[[]media.Shelf](100)
 	a.artwork = artwork.New()
 	a.colors = newMemo[string](500)
-	a.addons = addons.NewManager(filepath.Join(opts.DataDir, "addons"), opts.Builtin, schemeURL(addonsScheme))
+	a.addons = addons.NewManager(filepath.Join(opts.DataDir, "addons"), opts.Builtin)
 	a.storage = addons.NewStorage(filepath.Join(opts.DataDir, "addons", ".storage"))
 	a.apply(s)
 	return a, nil
@@ -181,31 +194,42 @@ func (a *App) apply(s settings.Settings) {
 	if !s.DiscordPresence {
 		a.presence.update(false, "", NowPlaying{})
 	}
+	if p := a.goPlayer.Load(); p != nil {
+		p.SettingsChanged(s)
+		a.applyEngine(s)
+	}
+	if s.SpotifyPlayback != settings.SpotifyPlaybackHere {
+		a.here.close()
+	}
 	if a.youtube.SignedIn() && a.youtube.Channel() != s.YouTubeChannel {
 		a.youtube.SetChannel(s.YouTubeChannel)
 	}
 }
 
-// Bind registers the services pages call and the schemes they load from.
-// It must run before mygo.App.Run.
-func (a *App) Bind() {
-	mygo.Bind(&Catalog{a})
-	mygo.Bind(&Player{a})
-	mygo.Bind(&Collection{a})
-	mygo.Bind(&Accounts{a})
-	mygo.Bind(&Preferences{a})
-	mygo.Bind(&Addons{a})
-	mygo.Bind(&System{a})
-	if err := mygo.Protocol.Handle(streamScheme, a.proxy); err != nil {
-		log.Fatal(err)
+// Bind registers what the page of MixMusic's own Spotify device calls. It
+// must run before mygo.App.Run.
+func (a *App) Bind() { mygo.Bind(&SpotifyPage{a}) }
+
+// needWebView tells why what, which takes a window showing a web page,
+// can't be done, or nil when it can: MixMusic's own windows need no
+// webview, so it runs on systems without one, where opening such a window
+// would panic.
+func needWebView(what string) error {
+	if mygo.WebViewAvailable() {
+		return nil
 	}
-	if err := mygo.Protocol.Handle(addonsScheme, a.addons); err != nil {
-		log.Fatal(err)
+	switch runtime.GOOS {
+	case "windows":
+		return fmt.Errorf("%s needs Microsoft's WebView2 Runtime, which this computer doesn't have: get it from https://go.microsoft.com/fwlink/p/?LinkId=2124703", what)
+	case "linux":
+		return fmt.Errorf("%s needs WebKitGTK, which this computer doesn't have: install libwebkit2gtk-4.1-0 on Debian and Ubuntu, webkit2gtk4.1 on Fedora", what)
 	}
+	return fmt.Errorf("%s needs the system's webview, which this computer doesn't have", what)
 }
 
-// schemeURL returns the base URL pages load a custom scheme from: WebView2
-// serves custom schemes at http://<scheme>.localhost.
+// schemeURL returns the base URL of a custom scheme, as WebView2 serves
+// custom schemes, at http://<scheme>.localhost: the stream addresses
+// PrepareStream gives keep that form.
 func schemeURL(scheme string) string {
 	if runtime.GOOS == "windows" {
 		return "http://" + scheme + ".localhost/"

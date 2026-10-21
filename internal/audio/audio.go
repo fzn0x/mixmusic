@@ -1,7 +1,7 @@
-// Package audio is MixMusic's own player outside the webview: it plays the
-// Opus audio of YouTube's WebM files on two decks, so that one track can
-// fade into the next, through the preamp, equalizer, levelling and
-// analyser of the web player, whose Web Audio nodes it reproduces.
+// Package audio is MixMusic's own audio engine: it plays the Opus audio of
+// YouTube's WebM files on two decks, so that one track can fade into the
+// next, through the preamp, equalizer, levelling and analyser of the web
+// player MixMusic had, whose Web Audio nodes it reproduces.
 package audio
 
 import (

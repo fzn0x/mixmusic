@@ -153,12 +153,12 @@ func (s *Accounts) SetYouTubeChannel(ctx context.Context, pageID string) (Accoun
 	if err := s.a.settings.Set(set); err != nil {
 		return AccountsStatus{}, err
 	}
-	SettingsChanged.Broadcast(set)
+	notify()
 	s.a.youtube.SetChannel(pageID)
 	s.a.mu.Lock()
 	s.a.youtubeMe = nil
 	s.a.mu.Unlock()
 	status := s.a.accountsStatus(ctx)
-	AccountsChanged.Broadcast(status)
+	notify()
 	return status, nil
 }

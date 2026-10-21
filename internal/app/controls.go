@@ -1,8 +1,7 @@
 package app
 
-// The system's media controls show what MixMusic's own audio engine plays.
-// The webview shows there what it plays itself, and a Spotify device what
-// it plays, but the engine plays outside the webview.
+// The system's media controls show what MixMusic's own audio engine plays,
+// which they control: a Spotify device shows there what it plays itself.
 
 import (
 	"errors"

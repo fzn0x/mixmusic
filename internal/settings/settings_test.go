@@ -49,44 +49,6 @@ func TestCleanClampsAndRepairs(t *testing.T) {
 	}
 }
 
-func TestDefaultAudioEngine(t *testing.T) {
-	for _, c := range []struct {
-		goos   string
-		native bool
-		want   AudioEngine
-	}{
-		{"darwin", true, AudioEngineNative},
-		{"linux", true, AudioEngineNative},
-		{"windows", true, AudioEngineWeb},
-		{"darwin", false, AudioEngineWeb},
-		{"linux", false, AudioEngineWeb},
-		{"freebsd", false, AudioEngineWeb},
-	} {
-		if got := defaultAudioEngine(c.goos, c.native); got != c.want {
-			t.Errorf("defaultAudioEngine(%q, %v) = %q, want %q", c.goos, c.native, got, c.want)
-		}
-	}
-}
-
-func TestAudioEngine(t *testing.T) {
-	// An install from before the setting, or a value no version wrote, gets
-	// the default; either engine chosen is kept where the native one plays.
-	d := Default().AudioEngine
-	for in, want := range map[AudioEngine]AudioEngine{
-		"":                d,
-		"nonsense":        d,
-		AudioEngineWeb:    AudioEngineWeb,
-		AudioEngineNative: AudioEngineNative,
-	} {
-		if !NativeAudio {
-			want = AudioEngineWeb
-		}
-		if got := (Settings{AudioEngine: in}).Clean().AudioEngine; got != want {
-			t.Errorf("Clean made %q of %q here, want %q", got, in, want)
-		}
-	}
-}
-
 func TestValidID(t *testing.T) {
 	for id, want := range map[string]bool{"mix": true, "sleep-timer": true, "a1": true, "": false, "-x": false, "Mix": false, "a/b": false, "a.b": false} {
 		if got := ValidID(id); got != want {
@@ -144,5 +106,34 @@ func TestDefaultSpotifyPlayback(t *testing.T) {
 	}
 	if c := (Settings{SpotifyPlayback: SpotifyPlaybackHere}).Clean(); c.SpotifyPlayback != SpotifyPlaybackHere {
 		t.Errorf("Clean dropped playback here: %q", c.SpotifyPlayback)
+	}
+}
+
+// TestCleanCopies changes what Clean returned: the settings it cleaned
+// stay as they were.
+func TestCleanCopies(t *testing.T) {
+	s := Default()
+	s.ThemeOptions = map[string]map[string]string{"mix": {"texture": "dots"}}
+	s.Shortcuts = map[string]string{"player.toggle": "Space"}
+	s.EnabledPlugins = []string{"spectrum"}
+	c := s.Clean()
+	c.Equalizer.Gains[0] = 6
+	c.ThemeOptions["mix"]["texture"] = "none"
+	c.Shortcuts["player.toggle"] = "K"
+	c.EnabledPlugins[0] = "other"
+	if s.Equalizer.Gains[0] != 0 || s.ThemeOptions["mix"]["texture"] != "dots" || s.Shortcuts["player.toggle"] != "Space" || s.EnabledPlugins[0] != "spectrum" {
+		t.Errorf("changing the cleaned settings changed the settings: %v %v %v %v", s.Equalizer.Gains, s.ThemeOptions, s.Shortcuts, s.EnabledPlugins)
+	}
+}
+
+// TestRegistryURL moves settings off the web interface's registry, which
+// earlier versions kept as theirs.
+func TestRegistryURL(t *testing.T) {
+	if got := (Settings{RegistryURL: WebRegistryURL}).Clean().RegistryURL; got != DefaultRegistryURL {
+		t.Errorf("the web interface's registry became %q", got)
+	}
+	const own = "https://example.com/my-registry.json"
+	if got := (Settings{RegistryURL: own}).Clean().RegistryURL; got != own {
+		t.Errorf("a registry of the user's became %q", got)
 	}
 }

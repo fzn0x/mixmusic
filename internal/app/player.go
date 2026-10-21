@@ -20,12 +20,12 @@ import (
 type PlaybackMode string
 
 const (
-	// PlaybackStream plays the track in the page, from Url.
+	// PlaybackStream plays the track in MixMusic's audio engine, from Url.
 	PlaybackStream PlaybackMode = "stream"
 	// PlaybackConnect plays the track on a Spotify Connect device.
 	PlaybackConnect PlaybackMode = "connect"
-	// PlaybackSpotify plays the track in the page, with Spotify's Web
-	// Playback SDK.
+	// PlaybackSpotify plays the track in MixMusic, as a Spotify device of
+	// its own, with Spotify's Web Playback SDK.
 	PlaybackSpotify PlaybackMode = "spotify"
 )
 
@@ -49,7 +49,7 @@ type Player struct{ a *App }
 
 // Prepare finds how to play a track: the URL of its audio, found ahead so
 // that errors such as a missing yt-dlp show before playback starts, a
-// Spotify Connect device, or Spotify in the page.
+// Spotify Connect device, or Spotify in MixMusic.
 func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource, error) {
 	if track.Source == media.SourceSpotify {
 		switch p.a.settings.Get().SpotifyPlayback {
@@ -62,10 +62,10 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 	return p.PrepareStream(ctx, track)
 }
 
-// PrepareStream finds the audio of a track to play in the page, whatever
+// PrepareStream finds the audio of a track to play in the engine, whatever
 // the settings say of Spotify tracks: those play from their recording on
-// YouTube Music. The player falls back to it when no Spotify Connect device
-// can play.
+// YouTube Music. The player falls back to it when no Spotify device can
+// play.
 func (p *Player) PrepareStream(ctx context.Context, track media.Track) (PlaybackSource, error) {
 	yt, err := p.a.matcher.Match(ctx, track)
 	if err != nil {
@@ -87,8 +87,8 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 }
 
 // StreamFailure tells why the audio of a track, the recording PrepareStream
-// returned, failed to load, which the audio element cannot: in plain words,
-// or "" when its audio arrived, and the page could not play it.
+// returned, failed to load: in plain words, or "" when its audio arrived,
+// and the engine could not play it.
 func (p *Player) StreamFailure(track media.Track) string {
 	_, videoID, err := media.ParseID(track.ID)
 	if err != nil {
@@ -103,8 +103,8 @@ func (p *Player) ForgetMatch(trackID string) error {
 	return p.a.matcher.Forget(trackID)
 }
 
-// Report tells the app what the main window's player plays, for the tray,
-// notifications and the mini player.
+// Report tells the app what the player plays, for the tray,
+// notifications, the system's media controls, Discord and Last.fm.
 func (p *Player) Report(np NowPlaying) {
 	p.a.mu.Lock()
 	prev := p.a.nowPlaying
@@ -112,7 +112,6 @@ func (p *Player) Report(np NowPlaying) {
 	tray := p.a.tray
 	main := p.a.main
 	p.a.mu.Unlock()
-	NowPlayingChanged.Broadcast(np)
 	s := p.a.settings.Get()
 	p.a.scrobble(np)
 	p.a.presence.update(s.DiscordPresence, s.DiscordAppID, np)
@@ -127,27 +126,11 @@ func (p *Player) Report(np NowPlaying) {
 	}
 }
 
-// NowPlaying returns what the player plays, for windows that open later.
-func (p *Player) NowPlaying() NowPlaying {
-	p.a.mu.Lock()
-	defer p.a.mu.Unlock()
-	return p.a.nowPlaying
-}
-
-// Command asks the main window's player to do something.
-func (p *Player) Command(cmd PlayerCommand) {
-	p.a.command(cmd)
-}
-
+// command has the player do what the tray, the media keys, the system's
+// media controls or a deep link ask.
 func (a *App) command(cmd PlayerCommand) {
-	a.mu.Lock()
-	main := a.main
-	a.mu.Unlock()
-	if main == nil {
-		return
-	}
-	if err := PlayerCommandSent.Emit(main, cmd); err != nil {
-		log.Printf("mixmusic: sending %s to the player: %v", cmd.Command, err)
+	if p := a.goPlayer.Load(); p != nil {
+		a.commandGoPlayer(p, cmd)
 	}
 }
 
@@ -208,12 +191,6 @@ func (p *Player) ConnectPlay(ctx context.Context, track media.Track, positionMs 
 		}
 	}
 	return err
-}
-
-// SpotifyToken returns an access token of the signed-in Spotify user, for
-// the Web Playback SDK, which plays Spotify in the page.
-func (p *Player) SpotifyToken(ctx context.Context) (string, error) {
-	return p.a.spotify.AccessToken(ctx)
 }
 
 // playHereRetry is how long PlayHere waits before asking Spotify again.

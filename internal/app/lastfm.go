@@ -170,7 +170,7 @@ func (a *App) scrobble(np NowPlaying) {
 			a.mu.Lock()
 			l.expired = true
 			a.mu.Unlock()
-			AccountsChanged.Broadcast(a.accountsStatus(ctx))
+			notify()
 		case err != nil && !lastfm.IsTemporary(err):
 			log.Printf("mixmusic: scrobbling: %v", err)
 		}
@@ -219,7 +219,7 @@ func (s *Accounts) LastfmLogin(ctx context.Context, apiKey, secret string) (Acco
 		w.Show() // back from the browser
 	}
 	status := s.a.accountsStatus(ctx)
-	AccountsChanged.Broadcast(status)
+	notify()
 	return status, nil
 }
 
@@ -232,6 +232,6 @@ func (s *Accounts) LastfmLogout(ctx context.Context) error {
 	if rmErr := os.Remove(filepath.Join(s.a.opts.DataDir, "lastfm-queue.json")); rmErr != nil && !errors.Is(rmErr, os.ErrNotExist) {
 		err = errors.Join(err, rmErr)
 	}
-	AccountsChanged.Broadcast(s.a.accountsStatus(ctx))
+	notify()
 	return err
 }

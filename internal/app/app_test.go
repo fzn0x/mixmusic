@@ -41,21 +41,6 @@ func TestTrayTip(t *testing.T) {
 	}
 }
 
-func TestIsAppHost(t *testing.T) {
-	for host, want := range map[string]bool{
-		"localhost:5173":    true,
-		"127.0.0.1":         true,
-		"mygo.localhost":    true,
-		"stream.localhost":  true,
-		"example.com":       false,
-		"localhost.evil.io": false,
-	} {
-		if got := isAppHost(host); got != want {
-			t.Errorf("isAppHost(%q) = %v", host, got)
-		}
-	}
-}
-
 func TestDeepLinkPaths(t *testing.T) {
 	for path, want := range map[string]bool{
 		"/search":                           true,
@@ -76,5 +61,24 @@ func TestSchemeURL(t *testing.T) {
 	got := schemeURL("stream")
 	if got != "http://stream.localhost/" && got != "stream://localhost/" {
 		t.Errorf("schemeURL = %q", got)
+	}
+}
+
+func TestOnNavigate(t *testing.T) {
+	a := &App{}
+	var got []string
+	cancel := a.OnNavigate(func(target string) { got = append(got, "first "+target) })
+	a.navigateTo("/stats")
+	// A window that takes over keeps the deep links when the first one
+	// lets go of them.
+	cancelSecond := a.OnNavigate(func(target string) { got = append(got, "second "+target) })
+	cancel()
+	a.navigateTo("/library")
+	if strings.Join(got, ", ") != "first /stats, second /library" {
+		t.Errorf("the pages went to %q", got)
+	}
+	cancelSecond()
+	if a.onNavigate != nil {
+		t.Error("deep links still go to a window that let go of them")
 	}
 }

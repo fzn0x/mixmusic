@@ -1,19 +1,19 @@
 package app
 
-// The native engine: MixMusic's own player outside the webview, which the
-// page drives through these methods of Player when the settings choose it,
-// as it drives its own AudioEngine.
+// The audio engine: MixMusic's own player, which plays the stream of each
+// track, and the player's view of it.
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"net/url"
+	"os"
 	"strings"
+	"sync"
 	"time"
-
-	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/audio/output"
@@ -21,43 +21,34 @@ import (
 	"github.com/fzn0x/mixmusic/internal/stream"
 )
 
-// NativeAudio is an event of the native engine: those of the web engine.
-type NativeAudio struct {
-	// Kind is "time", "ended", "error", "playing" or "buffering".
-	Kind       string  `json:"kind"`
-	PositionMs float64 `json:"positionMs"`
-	DurationMs float64 `json:"durationMs"`
-	Playing    bool    `json:"playing"`
-	Buffering  bool    `json:"buffering"`
-	Message    string  `json:"message"`
+// errNoNative is returned where the system has no audio engine.
+var errNoNative = errors.New("MixMusic's audio engine isn't available on this system")
+
+// engineEvents passes the engine's events to the player, once there is one.
+type engineEvents struct{ a *App }
+
+// to returns the events' destination: the player, or nowhere.
+func (e engineEvents) to() audio.Events {
+	if p := e.a.goPlayer.Load(); p != nil {
+		return p
+	}
+	return noEvents{}
 }
 
-// NativeAudioChanged tells the page what the native engine does.
-var NativeAudioChanged = mygo.NewEvent[NativeAudio]("nativeAudio")
+func (e engineEvents) Time(position, duration time.Duration) { e.to().Time(position, duration) }
+func (e engineEvents) Ended()                                { e.to().Ended() }
+func (e engineEvents) Error(message string)                  { e.to().Error(message) }
+func (e engineEvents) Playing(playing bool)                  { e.to().Playing(playing) }
+func (e engineEvents) Buffering(buffering bool)              { e.to().Buffering(buffering) }
 
-// errNoNative is returned where the system has no native engine.
-var errNoNative = errors.New("MixMusic's own audio engine isn't available on this system")
+// noEvents are the events of the engine before the player is.
+type noEvents struct{}
 
-// nativeEvents passes the native engine's events to the page.
-type nativeEvents struct{}
-
-func (nativeEvents) Time(position, duration time.Duration) {
-	NativeAudioChanged.Broadcast(NativeAudio{Kind: "time", PositionMs: ms(position), DurationMs: ms(duration)})
-}
-
-func (nativeEvents) Ended() { NativeAudioChanged.Broadcast(NativeAudio{Kind: "ended"}) }
-
-func (nativeEvents) Error(message string) {
-	NativeAudioChanged.Broadcast(NativeAudio{Kind: "error", Message: message})
-}
-
-func (nativeEvents) Playing(playing bool) {
-	NativeAudioChanged.Broadcast(NativeAudio{Kind: "playing", Playing: playing})
-}
-
-func (nativeEvents) Buffering(buffering bool) {
-	NativeAudioChanged.Broadcast(NativeAudio{Kind: "buffering", Buffering: buffering})
-}
+func (noEvents) Time(time.Duration, time.Duration) {}
+func (noEvents) Ended()                            {}
+func (noEvents) Error(string)                      {}
+func (noEvents) Playing(bool)                      {}
+func (noEvents) Buffering(bool)                    {}
 
 func ms(d time.Duration) float64 { return float64(d) / float64(time.Millisecond) }
 
@@ -75,10 +66,54 @@ func (a *App) nativeEngine() *audio.Engine {
 		return nil
 	}
 	a.nativeOnce.Do(func() {
-		a.native = audio.NewEngine(a.openNative, startNative, nativeEvents{})
+		start := startNative
+		if Silent() {
+			start = startSilent
+		}
+		a.native = audio.NewEngine(a.openNative, start, engineEvents{a})
 	})
 	return a.native
 }
+
+// Silent reports whether the engine plays into no device, as
+// MIXMUSIC_SILENT asks: for screenshots of what plays, its visualizer and
+// lyrics moving, without a sound.
+func Silent() bool { return os.Getenv("MIXMUSIC_SILENT") != "" }
+
+// startSilent starts an output that plays into no device: it renders at a
+// device's pace, and drops what it renders.
+func startSilent(render func([]float32), _ func(error)) (audio.Output, error) {
+	log.Print("mixmusic: the audio engine plays into no device (MIXMUSIC_SILENT)")
+	o := &silentOutput{stop: make(chan struct{}), done: make(chan struct{})}
+	go func() {
+		defer close(o.done)
+		period := make([]float32, 2*output.Rate/100) // 10 ms, in stereo
+		tick := time.NewTicker(10 * time.Millisecond)
+		defer tick.Stop()
+		for {
+			select {
+			case <-o.stop:
+				return
+			case <-tick.C:
+				render(period)
+			}
+		}
+	}()
+	return o, nil
+}
+
+// silentOutput is the output of startSilent.
+type silentOutput struct {
+	once       sync.Once
+	stop, done chan struct{}
+}
+
+func (o *silentOutput) Stop() {
+	o.once.Do(func() { close(o.stop) })
+	<-o.done
+}
+
+func (o *silentOutput) Delay() time.Duration { return 0 }
 
 // openNative opens, for the native engine, the audio at a URL PrepareStream
 // gave.
@@ -108,101 +143,6 @@ func startNative(render func([]float32), failed func(error)) (audio.Output, erro
 		return nil, fmt.Errorf("the audio device couldn't start (%v)", err)
 	}
 	return s, nil
-}
-
-// NativeLoad plays url, a stream URL PrepareStream gave, in the native
-// engine from startMs, or holds it there until NativePlay when autoplay is
-// false.
-func (p *Player) NativeLoad(url string, startMs float64, autoplay bool) error {
-	e := p.a.nativeEngine()
-	if e == nil {
-		return errNoNative
-	}
-	if err := e.Load(url, fromMs(startMs), autoplay); err != nil {
-		return err
-	}
-	p.a.setNative(true)
-	return nil
-}
-
-// NativePreload starts loading url in the native engine, for the next track.
-func (p *Player) NativePreload(url string) {
-	if e := p.a.nativeEngine(); e != nil {
-		e.Preload(url)
-	}
-}
-
-// NativeCrossfade plays url in the native engine while what plays fades
-// out, over seconds.
-func (p *Player) NativeCrossfade(url string, seconds float64) error {
-	e := p.a.nativeEngine()
-	if e == nil {
-		return errNoNative
-	}
-	if err := e.Crossfade(url, fromMs(seconds*1000)); err != nil {
-		return err
-	}
-	p.a.setNative(true)
-	return nil
-}
-
-// NativePlay plays the native engine's track.
-func (p *Player) NativePlay() error {
-	e := p.a.nativeEngine()
-	if e == nil {
-		return errNoNative
-	}
-	return e.Play()
-}
-
-// NativePause pauses the native engine.
-func (p *Player) NativePause() {
-	if e := p.a.nativeEngine(); e != nil {
-		e.Pause()
-	}
-}
-
-// NativeStop stops the native engine, which releases the audio device.
-func (p *Player) NativeStop() {
-	if e := p.a.nativeEngine(); e != nil {
-		e.Stop()
-	}
-	p.a.setNative(false)
-}
-
-// NativeSeek moves the native engine's track to ms.
-func (p *Player) NativeSeek(ms float64) {
-	if e := p.a.nativeEngine(); e != nil {
-		e.Seek(fromMs(ms))
-	}
-}
-
-// NativeSetVolume sets the native engine's volume, from 0 to 1.
-func (p *Player) NativeSetVolume(v float64) {
-	if e := p.a.nativeEngine(); e != nil {
-		e.SetVolume(min(max(v, 0), 1))
-	}
-}
-
-// NativeSetEqualizer sets the native engine's equalizer: the gains of the
-// bands and the preamp, in dB.
-func (p *Player) NativeSetEqualizer(enabled bool, gains []float64, preamp float64) {
-	e := p.a.nativeEngine()
-	if e == nil {
-		return
-	}
-	var g [len(audio.Bands)]float64
-	for i := range min(len(gains), len(g)) {
-		g[i] = min(max(gains[i], -12), 12)
-	}
-	e.SetEqualizer(enabled, g, min(max(preamp, -12), 12))
-}
-
-// NativeSetNormalize turns the native engine's levelling on or off.
-func (p *Player) NativeSetNormalize(on bool) {
-	if e := p.a.nativeEngine(); e != nil {
-		e.SetNormalize(on)
-	}
 }
 
 // NativeAnalysis is what the native engine's analyser gives, as an

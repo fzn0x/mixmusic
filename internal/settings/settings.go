@@ -2,6 +2,7 @@
 package settings
 
 import (
+	"maps"
 	"regexp"
 	"runtime"
 	"slices"
@@ -24,19 +25,8 @@ const (
 	SpotifyPlaybackHere SpotifyPlayback = "here"
 )
 
-// AudioEngine chooses what plays the audio of MixMusic's own player.
-type AudioEngine string
-
-const (
-	// AudioEngineWeb plays it in the page, with Web Audio.
-	AudioEngineWeb AudioEngine = "web"
-	// AudioEngineNative plays it outside the webview: MixMusic decodes the
-	// audio itself and plays it on the device. Only on 64-bit Windows, macOS
-	// and Linux.
-	AudioEngineNative AudioEngine = "native"
-)
-
-// NativeAudio reports whether this system can play with AudioEngineNative.
+// NativeAudio reports whether MixMusic's audio engine plays on this
+// system: 64-bit Windows, macOS and Linux.
 const NativeAudio = (runtime.GOOS == "windows" || runtime.GOOS == "darwin" || runtime.GOOS == "linux") &&
 	(runtime.GOARCH == "amd64" || runtime.GOARCH == "arm64")
 
@@ -85,7 +75,6 @@ type Settings struct {
 	Accent string `json:"accent"`
 	// DynamicAccent takes the accent color from the artwork playing.
 	DynamicAccent bool    `json:"dynamicAccent"`
-	CustomCSS     string  `json:"customCss"`
 	Density       Density `json:"density"`
 	// FontScale scales the text, from 0.85 to 1.3.
 	FontScale float64 `json:"fontScale"`
@@ -98,8 +87,6 @@ type Settings struct {
 	// one when empty.
 	SpotifyDevice string  `json:"spotifyDevice"`
 	Quality       Quality `json:"quality"`
-	// AudioEngine is what plays MixMusic's own player.
-	AudioEngine AudioEngine `json:"audioEngine"`
 	// Crossfade overlaps tracks by this many seconds, from 0 to 12.
 	Crossfade int `json:"crossfade"`
 	// Normalize evens out the loudness of tracks.
@@ -149,7 +136,12 @@ type Settings struct {
 }
 
 // DefaultRegistryURL is the community registry in MixMusic's repository.
-const DefaultRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry.json"
+const DefaultRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry-2.json"
+
+// WebRegistryURL is the registry of the add-ons of the web interface,
+// which the versions of MixMusic before its own interface read, and kept
+// in their settings.
+const WebRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry.json"
 
 // Default returns the settings of a new install.
 func Default() Settings {
@@ -163,7 +155,6 @@ func Default() Settings {
 		FontScale:       1,
 		SpotifyPlayback: defaultSpotifyPlayback(runtime.GOOS),
 		Quality:         QualityBest,
-		AudioEngine:     defaultAudioEngine(runtime.GOOS, NativeAudio),
 		Autoplay:        true,
 		Equalizer:       Equalizer{Preset: "flat", Gains: make([]float64, len(Bands))},
 		Volume:          0.8,
@@ -177,17 +168,6 @@ func Default() Settings {
 		EnabledPlugins:  []string{},
 		RegistryURL:     DefaultRegistryURL,
 	}
-}
-
-// defaultAudioEngine is what plays MixMusic's own player in a new install on
-// goos, and in one from before the setting: MixMusic's own engine on macOS
-// and Linux, where native reports that it can play, and the webview on
-// Windows.
-func defaultAudioEngine(goos string, native bool) AudioEngine {
-	if native && (goos == "darwin" || goos == "linux") {
-		return AudioEngineNative
-	}
-	return AudioEngineWeb
 }
 
 // defaultSpotifyPlayback is how Spotify tracks play in a new install on
@@ -227,7 +207,8 @@ func (s Settings) ActiveTheme(dark bool) string {
 }
 
 // Clean returns s with every value in its range, and the defaults in place
-// of values that are missing or invalid.
+// of values that are missing or invalid. Its maps and slices are its own,
+// which changing doesn't change s's.
 func (s Settings) Clean() Settings {
 	d := Default()
 	if !ValidID(s.Theme) {
@@ -239,9 +220,11 @@ func (s Settings) Clean() Settings {
 	if !ValidID(s.DarkTheme) {
 		s.DarkTheme = d.DarkTheme
 	}
-	if s.ThemeOptions == nil {
-		s.ThemeOptions = map[string]map[string]string{}
+	options := make(map[string]map[string]string, len(s.ThemeOptions))
+	for id, values := range s.ThemeOptions {
+		options[id] = maps.Clone(values)
 	}
+	s.ThemeOptions = options
 	if s.Accent != "" && !colorRe.MatchString(s.Accent) {
 		s.Accent = ""
 	}
@@ -259,16 +242,12 @@ func (s Settings) Clean() Settings {
 	if s.Quality != QualitySaver {
 		s.Quality = QualityBest
 	}
-	switch {
-	case !NativeAudio:
-		s.AudioEngine = AudioEngineWeb
-	case s.AudioEngine != AudioEngineWeb && s.AudioEngine != AudioEngineNative:
-		s.AudioEngine = d.AudioEngine
-	}
 	s.Crossfade = min(max(s.Crossfade, 0), 12)
 	s.Volume = min(max(s.Volume, 0), 1)
 	if len(s.Equalizer.Gains) != len(Bands) {
 		s.Equalizer.Gains = make([]float64, len(Bands))
+	} else {
+		s.Equalizer.Gains = slices.Clone(s.Equalizer.Gains)
 	}
 	for i, g := range s.Equalizer.Gains {
 		s.Equalizer.Gains[i] = min(max(g, -12), 12)
@@ -302,7 +281,7 @@ func (s Settings) Clean() Settings {
 		}
 	}
 	s.EnabledPlugins = plugins
-	if !strings.HasPrefix(s.RegistryURL, "https://") {
+	if !strings.HasPrefix(s.RegistryURL, "https://") || s.RegistryURL == WebRegistryURL {
 		s.RegistryURL = d.RegistryURL
 	}
 	return s

@@ -16,17 +16,13 @@ import (
 	"github.com/fzn0x/mixmusic/internal/tools"
 )
 
-// Info describes the app and where pages load from.
+// Info describes the app.
 type Info struct {
-	Name     string `json:"name"`
-	Version  string `json:"version"`
-	Platform string `json:"platform"`
-	Arch     string `json:"arch"`
-	Dev      bool   `json:"dev"`
-	// StreamURL is the base URL of the audio scheme.
-	StreamURL string `json:"streamUrl"`
-	// AddonsURL is the base URL of the add-ons scheme.
-	AddonsURL   string `json:"addonsUrl"`
+	Name        string `json:"name"`
+	Version     string `json:"version"`
+	Platform    string `json:"platform"`
+	Arch        string `json:"arch"`
+	Dev         bool   `json:"dev"`
 	DataDir     string `json:"dataDir"`
 	RedirectURI string `json:"redirectUri"`
 	// NativeAudio is set where MixMusic's own audio engine can play: on
@@ -34,7 +30,7 @@ type Info struct {
 	NativeAudio bool `json:"nativeAudio"`
 }
 
-// System gives pages what they need of the desktop and the app.
+// System is what the windows need of the desktop and the app.
 type System struct{ a *App }
 
 // Info describes the app.
@@ -45,8 +41,6 @@ func (s *System) Info() Info {
 		Platform:    runtime.GOOS,
 		Arch:        runtime.GOARCH,
 		Dev:         mygo.IsDev(),
-		StreamURL:   schemeURL(streamScheme),
-		AddonsURL:   schemeURL(addonsScheme),
 		DataDir:     s.a.opts.DataDir,
 		RedirectURI: spotify.RedirectURI,
 		NativeAudio: settings.NativeAudio && output.Available() == nil,
@@ -64,24 +58,6 @@ func (a *App) version() string {
 // Tools describes the tools MixMusic runs: yt-dlp and a JavaScript
 // runtime.
 func (s *System) Tools(ctx context.Context) tools.Status { return s.a.tools.Status(ctx) }
-
-// InstallProgress is how far a download went.
-type InstallProgress struct {
-	Done  int64 `json:"done"`
-	Total int64 `json:"total"`
-}
-
-// InstallYTDLP downloads the latest yt-dlp into the app's data, reporting
-// the download's progress.
-func (s *System) InstallYTDLP(ctx context.Context, progress *mygo.Channel[InstallProgress]) (tools.Status, error) {
-	err := s.a.tools.InstallYTDLP(ctx, func(done, total int64) {
-		progress.Send(InstallProgress{Done: done, Total: total})
-	})
-	if err != nil {
-		return tools.Status{}, err
-	}
-	return s.a.tools.Status(ctx), nil
-}
 
 // ArtworkColor returns the accent color of a piece of artwork, as
 // "#rrggbb", for themes that follow what plays.

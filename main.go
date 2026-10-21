@@ -7,16 +7,28 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/builtin"
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/diag"
+	"github.com/fzn0x/mixmusic/internal/native"
 )
 
 //go:embed resources/tray.png
 var trayIcon []byte
+
+// allowAudio lets pages play sound no click started: the hidden page of
+// MixMusic's own Spotify device gets none. WebView2 takes the arguments of
+// its browser from this variable, which must be set before its first page.
+func allowAudio() {
+	const name, arg = "WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--autoplay-policy=no-user-gesture-required"
+	if args := os.Getenv(name); !strings.Contains(args, "--autoplay-policy") {
+		os.Setenv(name, strings.TrimSpace(args+" "+arg))
+	}
+}
 
 // version is the version of builds made without the mygo CLI, which links
 // the version of mygo.config.ts into the app.
@@ -33,6 +45,7 @@ func main() {
 	if !mygo.App.RequestSingleInstanceLock() {
 		return // the running instance takes over
 	}
+	allowAudio()
 	// The log and the crash reports, once this is the instance that runs.
 	logsDir, err := mygo.App.Path(mygo.PathLogs)
 	if err != nil {
@@ -65,6 +78,8 @@ func main() {
 		Version:   version,
 		LogsDir:   logsDir,
 		LastCrash: lastCrash,
+		Interface: native.Open,
+		Mini:      native.OpenMini,
 	})
 	if err != nil {
 		log.Fatal(err)

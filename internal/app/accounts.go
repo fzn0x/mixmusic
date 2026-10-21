@@ -122,7 +122,9 @@ func (a *App) readProfiles() {
 	}
 	go func() {
 		defer a.readingProfiles.Store(false)
-		AccountsChanged.Broadcast(a.accountsStatus(context.Background()))
+		// Reading the status reads the profiles, and keeps them.
+		a.accountsStatus(context.Background())
+		notify()
 	}()
 }
 
@@ -197,6 +199,8 @@ func (s *Accounts) SpotifyLogin(ctx context.Context) (AccountsStatus, error) {
 	s.a.mu.Lock()
 	s.a.spotifyMe = nil
 	s.a.mu.Unlock()
+	// MixMusic's own device connects again, with the new sign-in.
+	s.a.here.close()
 	if err := s.a.tokens.Save(t); err != nil {
 		return AccountsStatus{}, err
 	}
@@ -204,7 +208,7 @@ func (s *Accounts) SpotifyLogin(ctx context.Context) (AccountsStatus, error) {
 		w.Show() // back from the browser
 	}
 	status := s.a.accountsStatus(ctx)
-	AccountsChanged.Broadcast(status)
+	notify()
 	return status, nil
 }
 
@@ -215,10 +219,11 @@ func (s *Accounts) SpotifyLogout() error {
 
 func (a *App) signOutSpotify() error {
 	a.spotify.SetToken(spotify.Token{})
+	a.here.close()
 	a.mu.Lock()
 	a.spotifyMe = nil
 	a.mu.Unlock()
 	err := a.tokens.Clear()
-	AccountsChanged.Broadcast(a.accountsStatus(context.Background()))
+	notify()
 	return err
 }

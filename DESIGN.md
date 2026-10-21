@@ -264,7 +264,7 @@ MixMusic is a wall of type and colour on true black. Every place in the player n
 
 Density is that of a tool kept open for hours: a 248px rail of outlined icon boxes, a main pane of giant words, tiles and shelves, a 340px queue column that always shows what plays next, and a 92px player bar. The pane is scrolled, the shell never is. Motion is short and directional: pages swing in from the right like a turnstile, pressed tiles tilt toward the pointer, the live tile in the rail flips over to show the next track.
 
-The system is a public contract. Themes set its colours, faces and radius, the tokens `docs/themes.md` lists, and the app draws everything else from them. The default theme (Mix) is the reference expression; Daylight, Midnight, Sakura, Terminal and Aurora are token variants of the same grammar (light ground, other accents, other radii, other faces), not separate designs.
+The system is a public contract. Themes set its colours, faces and radius, the tokens `docs/themes.md` lists, and the app draws everything else from them. The default theme (Mix) is the reference expression; Daylight, Midnight, Sakura, Terminal, Aurora, Greenroom, Glasshouse, Anime and Mochi are token variants of the same grammar (light ground, other accents, other radii, other faces), not separate designs.
 
 **Key Characteristics:**
 - Giant lowercase light-weight words as the primary navigation landmark, shrunk to fit the pane, never cropped.

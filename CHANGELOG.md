@@ -40,20 +40,28 @@ next track.
   made of elements MixMusic draws in your theme and of canvases the plugin
   draws on. The community's sleep timer and spectrum are updated for it,
   and docs/plugins.md tells how to move a plugin.
-- Settings › About shows the licenses of the code MixMusic includes, from
-  libopus and Chromium.
+- Settings › About shows the licenses of the code and the faces MixMusic
+  includes: libopus, Chromium, Selawik and Quicksand.
 - A new version asks to install in a pop-up, unless MixMusic installs
   updates without asking. Later asks again at the next start, skip this
   version at the next version. Copies that cannot replace themselves, the
   .deb, the .rpm and the AppImage, offer the new version's download there.
 - Copy link in the menus of albums, playlists and artists, on their pages
   and their tiles, as tracks have it.
+- Four new themes. Greenroom: charcoal and one jade light, its ground
+  washed down from the top in the colour of the cover playing (#8).
+  Glasshouse: white glass and a rose-red accent, the cover's colours
+  glowing under translucent panels (#7). Anime: summer-sky blues and cel
+  colours, speed lines that burst as each track starts, and manga
+  screentone (#7). Mochi: kawaii candy pastels in a round face, with
+  sparkles drifting up (#7).
 
 ### Changed
 
 - Themes set the colors, fonts and corners MixMusic draws everything with.
   Themes made for the web interface still load, without their stylesheet
-  and options, which nothing draws now.
+  and options, which nothing draws now. The labels of the sidebar take a
+  theme's own face too, as Terminal's monospaced one.
 - On Linux, MixMusic plays through PulseAudio, which PipeWire serves too,
   or ALSA, and no longer needs GStreamer; WebKitGTK is needed only to sign
   in to YouTube Music.

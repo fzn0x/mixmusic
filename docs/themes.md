@@ -92,17 +92,20 @@ the accent's ink itself, and keeps the accent readable on your `bg`.
 
 ### Fonts
 
-MixMusic ships Selawik; other families must be on the user's computer, so
-end each list with a family every system has: `system-ui` or `sans-serif`
-for the system's font, `monospace` for its monospaced one.
+MixMusic ships Selawik, and Quicksand, Mochi's round face; other families
+must be on the user's computer, so end each list with a family every
+system has: `system-ui` or `sans-serif` for the system's font, `monospace`
+for its monospaced one.
 
 ## Effects
 
 The themes MixMusic ships with add effects of their own, which MixMusic
 draws and the user tunes in Settings › Appearance: Mix's tile textures,
-Aurora's drifting lights and frosted glass, Sakura's petals, and Terminal's
-scanlines and glow. A theme of yours sets the tokens above, and MixMusic
-draws everything else with them.
+Aurora's drifting lights and frosted glass, Sakura's petals, Terminal's
+scanlines and glow, Greenroom's and Glasshouse's grounds in the colour of
+the cover playing, Anime's speed lines and screentone, and Mochi's rising
+sparkles. A theme of yours sets the tokens above, and MixMusic draws
+everything else with them.
 
 Themes made for the web interface of MixMusic 0.4 and before still load:
 MixMusic reads their colors, fonts and radius, and ignores their stylesheet

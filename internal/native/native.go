@@ -28,23 +28,55 @@ import (
 func Open(a *app.App, hidden bool) *mygo.Window {
 	registerFonts()
 	s := newShell(a, a.GoPlayer())
+	// A screen smaller than the window, as a laptop's, gets one that fits.
+	work := mygo.Screen.PrimaryDisplay().WorkArea
+	size := fitIn(mygo.Rectangle{X: work.X, Y: work.Y, Width: 1280, Height: 820}, work)
+	least := fitIn(mygo.Rectangle{X: work.X, Y: work.Y, Width: 940, Height: 600}, work)
 	s.attach(mygo.NewWindow(mygo.WindowOptions{
 		Title:           "MixMusic",
-		Width:           1280,
-		Height:          820,
-		MinWidth:        940,
-		MinHeight:       600,
+		Width:           size.Width,
+		Height:          size.Height,
+		MinWidth:        least.Width,
+		MinHeight:       least.Height,
 		BackgroundColor: hexColor(s.lk.bg),
 		StateKey:        "main",
 		TitleBarStyle:   titleBarStyle(runtime.GOOS),
 		Hidden:          hidden,
 		Content:         ui.View(s.view),
 	}))
+	fitOnScreen(s.win)
 	s.start()
 	s.usePlugins()
 	s.offerCrashReport()
 	s.captureFromEnv()
 	return s.win
+}
+
+// fitOnScreen moves the window into the work area of its display, as the
+// place it had at the last run, which comes back, may leave its title bar
+// out of reach there.
+func fitOnScreen(w *mygo.Window) {
+	if w.IsMaximized() || w.IsFullScreen() {
+		return
+	}
+	b := w.Bounds()
+	if r := fitIn(b, mygo.Screen.DisplayMatching(b).WorkArea); r != b {
+		w.SetBounds(r)
+	}
+}
+
+// fitIn returns the bounds r of a window within work, the work area of its
+// display, where r is taller or wider than work or starts above it: as on
+// a screen smaller than the window, its title bar is out of reach then.
+// Other bounds stay as they are.
+func fitIn(r, work mygo.Rectangle) mygo.Rectangle {
+	if work.Width <= 0 || work.Height <= 0 || r.Y >= work.Y && r.Width <= work.Width && r.Height <= work.Height {
+		return r
+	}
+	r.Width, r.Height = min(r.Width, work.Width), min(r.Height, work.Height)
+	r.X = min(max(r.X, work.X), work.X+work.Width-r.Width)
+	r.Y = min(max(r.Y, work.Y), work.Y+work.Height-r.Height)
+	return r
 }
 
 // titleBarStyle is the main window's title bar on goos: the system's own,

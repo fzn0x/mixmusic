@@ -980,3 +980,29 @@ func TestTitleBarStyle(t *testing.T) {
 		}
 	}
 }
+
+// TestFitIn brings a window taller or wider than its screen, or above it,
+// into the screen's work area, its title bar in reach, and leaves others
+// where they are.
+func TestFitIn(t *testing.T) {
+	laptop := mygo.Rectangle{X: 0, Y: 0, Width: 1366, Height: 728}
+	small := mygo.Rectangle{X: 0, Y: 0, Width: 1093, Height: 585}
+	wide := mygo.Rectangle{X: 0, Y: 0, Width: 1920, Height: 1040}
+	left := mygo.Rectangle{X: -1920, Y: 0, Width: 1920, Height: 1040}
+	for _, c := range []struct {
+		name    string
+		r, work mygo.Rectangle
+		want    mygo.Rectangle
+	}{
+		{"centered on a laptop", mygo.Rectangle{X: 43, Y: -46, Width: 1280, Height: 820}, laptop, mygo.Rectangle{X: 43, Y: 0, Width: 1280, Height: 728}},
+		{"wider and taller", mygo.Rectangle{X: -93, Y: -117, Width: 1280, Height: 820}, small, mygo.Rectangle{X: 0, Y: 0, Width: 1093, Height: 585}},
+		{"above a screen on the left", mygo.Rectangle{X: -1800, Y: -20, Width: 1280, Height: 820}, left, mygo.Rectangle{X: -1800, Y: 0, Width: 1280, Height: 820}},
+		{"fitting", mygo.Rectangle{X: 320, Y: 110, Width: 1280, Height: 820}, wide, mygo.Rectangle{X: 320, Y: 110, Width: 1280, Height: 820}},
+		{"below the bottom, its title bar in reach", mygo.Rectangle{X: 100, Y: 500, Width: 1280, Height: 820}, wide, mygo.Rectangle{X: 100, Y: 500, Width: 1280, Height: 820}},
+		{"no display known", mygo.Rectangle{X: 0, Y: -50, Width: 1280, Height: 820}, mygo.Rectangle{}, mygo.Rectangle{X: 0, Y: -50, Width: 1280, Height: 820}},
+	} {
+		if got := fitIn(c.r, c.work); got != c.want {
+			t.Errorf("%s: %+v in %+v went to %+v, want %+v", c.name, c.r, c.work, got, c.want)
+		}
+	}
+}

@@ -43,6 +43,8 @@ next track.
   updates without asking. Later asks again at the next start, skip this
   version at the next version. Copies that cannot replace themselves, the
   .deb, the .rpm and the AppImage, offer the new version's download there.
+- Copy link in the menus of albums, playlists and artists, on their pages
+  and their tiles, as tracks have it.
 
 ### Changed
 
@@ -95,6 +97,9 @@ next track.
 - On a screen smaller than the window, as a laptop's, the window opens
   fitting it, where its title bar and buttons were above the screen, out
   of reach (#6). A window the last run left there comes back within it.
+- A link you copy is no longer MixMusic's own address, as
+  mygo://localhost/…, which opens nothing: Copy link copies the link on
+  YouTube Music or Spotify, which anyone can open (#15).
 
 ## [0.4.0] - 2026-10-20
 

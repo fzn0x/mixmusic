@@ -373,7 +373,9 @@ func TestCopyIntoMix(t *testing.T) {
 	}
 }
 
-// TestCopyLink copies the link of a track on its service from its menu.
+// TestCopyLink copies the link of a track, an album, an artist and a
+// playlist on their service, from the menus of their pages and tiles, and
+// offers none for what has no link.
 func TestCopyLink(t *testing.T) {
 	var copied []string
 	was := copyText
@@ -382,9 +384,17 @@ func TestCopyLink(t *testing.T) {
 	s := newTestShell(t)
 	tr := testTracks[0]
 	tr.URL = "https://music.youtube.com/watch?v=midnight"
-	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Hurry Up, We're Dreaming",
-		Tracks: []media.Track{tr}}}
-	tt := tester(t, s)
+	album := media.Album{ID: "al-x", Title: "Hurry Up, We're Dreaming", Source: media.SourceYouTube,
+		URL: "https://music.youtube.com/browse/MPREb_hurry", Tracks: []media.Track{tr}}
+	artist := media.Artist{ID: "ar-x", Name: "M83", Source: media.SourceSpotify, URL: "https://open.spotify.com/artist/m83"}
+	list := media.Playlist{ID: "pl-x", Title: "Shoegaze", Source: media.SourceYouTube,
+		URL: "https://music.youtube.com/playlist?list=PLshoegaze"}
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: album}
+	s.loads["artist:ar-x"] = &loaded[media.Artist]{done: true, value: artist}
+	s.loads["search:m83"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{YouTube: media.SearchResults{
+		Albums: []media.Album{album}, Artists: []media.Artist{artist}, Playlists: []media.Playlist{list, {ID: "pl-y", Title: "Mixtape"}}}}}
+	// The search's shelves go below the fold of a window of the usual size.
+	tt := testerOf(t, s, 1280, 1800)
 	copyLink := func(open func() error, want string) {
 		t.Helper()
 		if err := open(); err != nil {
@@ -398,8 +408,23 @@ func TestCopyLink(t *testing.T) {
 			t.Errorf("copied %q, not %q", copied, want)
 		}
 	}
+	rightClick := func(label string) func() error { return func() error { return tt.RightClick(label) } }
+	more := func() error { return tt.Click("More") }
 	show(s, tt, "/album/al-x")
-	copyLink(func() error { return tt.RightClick(tr.Title) }, tr.URL)
+	copyLink(rightClick(tr.Title), tr.URL)
+	copyLink(more, album.URL)
+	show(s, tt, artistPath(artist.ID))
+	copyLink(more, artist.URL)
+	show(s, tt, searchPath("m83"))
+	copyLink(rightClick(album.Title), album.URL)
+	copyLink(rightClick(artist.Name), artist.URL)
+	copyLink(rightClick(list.Title), list.URL)
+	if err := tt.RightClick("Mixtape"); err != nil {
+		t.Fatal(err)
+	}
+	if got := tt.Menu(); !slices.Contains(got, "Open") || slices.Contains(got, "Copy link") {
+		t.Errorf("a playlist without a link has the menu %q", got)
+	}
 }
 
 // TestPivotCounts counts what the pivots of a search show.

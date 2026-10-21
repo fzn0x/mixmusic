@@ -168,13 +168,17 @@ type shell struct {
 
 func newShell(a *app.App, p *player.Player) *shell {
 	s := &shell{a: a, svc: a.Services(), p: p, router: ui.NewRouter("/"), loads: map[string]any{}, drafts: map[string]*draft{}, shelfScroll: map[string]*ui.ScrollState{},
-		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, panel: "queue", licenseOpen: -1,
+		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, licenseOpen: -1,
 		mountedViews: map[*plugins.View]bool{}, seenViews: map[*plugins.View]bool{}, pluginInputs: map[string]*string{},
 		canvasSizes: map[*plugins.Canvas][2]float32{}, cssColors: map[string]ui.Color{}, svgs: map[string]*ui.SVG{}}
 	s.queueList.Selected = new(int)
 	*s.queueList.Selected = -1
 	s.art = newArtworks(s.update)
 	s.refresh()
+	// The side panel the user left.
+	if s.panel = s.set.Panel; s.panel == "none" {
+		s.panel = ""
+	}
 	return s
 }
 
@@ -406,7 +410,7 @@ func (s *shell) navigate(path string) { s.router.Push(path) }
 // in the side panel. A search shows in the search box too.
 func (s *shell) open(target string) {
 	if target == "/lyrics" {
-		s.panel = "lyrics"
+		s.showPanel("lyrics")
 		return
 	}
 	if u, err := url.Parse(target); err == nil && u.Path == "/search" {

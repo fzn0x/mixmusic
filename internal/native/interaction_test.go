@@ -442,6 +442,22 @@ func TestActionToasts(t *testing.T) {
 	}
 }
 
+// TestPanelKept opens the side panel the user left, at the next start.
+func TestPanelKept(t *testing.T) {
+	s := newTestShell(t)
+	if s.panel != "queue" {
+		t.Fatalf("the first panel is %q", s.panel)
+	}
+	s.togglePanel("lyrics")
+	if again := newShell(s.a, s.p); again.panel != "lyrics" {
+		t.Errorf("the next start shows %q", again.panel)
+	}
+	s.togglePanel("lyrics")
+	if again := newShell(s.a, s.p); again.panel != "" {
+		t.Errorf("the next start shows %q, not none", again.panel)
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

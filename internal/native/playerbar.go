@@ -200,10 +200,18 @@ func (s *shell) playerSide(c *ui.Context) {
 
 func (s *shell) togglePanel(p string) {
 	if s.panel == p {
-		s.panel = ""
-	} else {
-		s.panel = p
+		p = ""
 	}
+	s.showPanel(p)
+}
+
+// showPanel shows the side panel p, "" for none, as the next start does.
+func (s *shell) showPanel(p string) {
+	s.panel, s.set.Panel = p, p
+	if p == "" {
+		s.set.Panel = "none"
+	}
+	s.save()
 }
 
 // volumeControl mutes, and sets the volume.

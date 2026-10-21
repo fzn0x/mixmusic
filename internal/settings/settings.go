@@ -80,6 +80,9 @@ type Settings struct {
 	FontScale float64 `json:"fontScale"`
 	// SidebarCollapsed shows the sidebar as icons only.
 	SidebarCollapsed bool `json:"sidebarCollapsed"`
+	// Panel is the side panel beside the pages: "queue", "lyrics" or
+	// "none". Settings from before it show the queue.
+	Panel string `json:"panel"`
 
 	// Playback.
 	SpotifyPlayback SpotifyPlayback `json:"spotifyPlayback"`
@@ -152,6 +155,7 @@ func Default() Settings {
 		ThemeOptions:    map[string]map[string]string{},
 		DynamicAccent:   true,
 		Density:         DensityComfortable,
+		Panel:           "queue",
 		FontScale:       1,
 		SpotifyPlayback: defaultSpotifyPlayback(runtime.GOOS),
 		Quality:         QualityBest,
@@ -227,6 +231,9 @@ func (s Settings) Clean() Settings {
 	s.ThemeOptions = options
 	if s.Accent != "" && !colorRe.MatchString(s.Accent) {
 		s.Accent = ""
+	}
+	if s.Panel != "lyrics" && s.Panel != "none" {
+		s.Panel = d.Panel
 	}
 	if s.Density != DensityCompact {
 		s.Density = DensityComfortable

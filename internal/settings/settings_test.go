@@ -137,3 +137,13 @@ func TestRegistryURL(t *testing.T) {
 		t.Errorf("a registry of the user's became %q", got)
 	}
 }
+
+// TestCleanPanel shows the queue for settings from before the panel, and
+// keeps the user's choice.
+func TestCleanPanel(t *testing.T) {
+	for in, want := range map[string]string{"": "queue", "bogus": "queue", "queue": "queue", "lyrics": "lyrics", "none": "none"} {
+		if got := (Settings{Panel: in}).Clean().Panel; got != want {
+			t.Errorf("Clean of the panel %q gives %q, not %q", in, got, want)
+		}
+	}
+}

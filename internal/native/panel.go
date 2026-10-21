@@ -36,7 +36,7 @@ func (s *shell) panelHead(c *ui.Context, title string, actions func()) {
 			actions()
 		}
 		if s.iconButton(c, "close-panel", "close", "Close "+title, false, 16).Clicked() {
-			s.panel = ""
+			s.showPanel("")
 		}
 	})
 }

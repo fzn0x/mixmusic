@@ -6,12 +6,21 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-22
+
 MixMusic draws its own interface, and plays through an audio engine of its
 own, without the webview it ran in: it takes far less memory. Spotify plays
 in MixMusic itself on Windows, with no Spotify app open, plugins move to a
 new API, and a new version asks to install in a pop-up. Spotify Connect no
 longer shows a track paused while your device plays it, and goes on to the
 next track.
+
+Four new themes join the others, a search says how many times each song
+played, and on Windows the media flyout and the taskbar's thumbnail control
+what plays. MixMusic 0.3.0 and later offer this version in Settings ›
+About. The queue of 0.4.0, which its webview kept, doesn't come along: the
+player starts on an empty queue once, and your library, mixes and settings
+stay.
 
 ### Added
 
@@ -297,7 +306,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/fzn0x/mixmusic/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/fzn0x/mixmusic/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/fzn0x/mixmusic/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/fzn0x/mixmusic/compare/v0.3.0...v0.3.1

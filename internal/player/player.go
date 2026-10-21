@@ -247,8 +247,10 @@ type Player struct {
 	// warned holds what fellBack told, to tell it once.
 	warned     map[string]bool
 	unshuffled []Item
-	// loaded is set while the stream engine has the current track.
+	// loaded is set while the stream engine has the current track, and
+	// atEnd when the queue ran out at its end, which the engine ended.
 	loaded      bool
+	atEnd       bool
 	uidSeq      int
 	lastToggle  time.Time
 	reporting   throttle

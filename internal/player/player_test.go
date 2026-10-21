@@ -449,6 +449,14 @@ func TestEnd(t *testing.T) {
 	// The end of the queue stops there.
 	h.p.Ended()
 	h.wait("stopping", func(p *Player) bool { return !p.s.Playing && p.s.Position == 0 && p.s.Index == 1 })
+	// Play then plays that track again, from its start, which the engine,
+	// having ended it, goes to once seeked.
+	h.p.Play()
+	h.wait("b again from its start", func(*Player) bool {
+		calls := h.stream.copy()
+		n := len(calls)
+		return n >= 2 && calls[n-2] == "seek 0s" && calls[n-1] == "play"
+	})
 
 	h.on(func(p *Player) { p.s.Repeat = RepeatAll })
 	h.p.Ended()

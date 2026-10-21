@@ -83,6 +83,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	entry := p.s.Queue[i]
 	p.loadToken++
 	token := p.loadToken
+	p.atEnd = false
 	p.s.Index = i
 	p.s.Position = start
 	p.s.Duration = ms(entry.Track.DurationMs)
@@ -332,6 +333,12 @@ func (p *Player) play() {
 		p.playAt(p.s.Index, p.s.Position, true)
 		return
 	}
+	if p.atEnd {
+		// The queue ran out at the end of this track: it plays again from
+		// its start, where the engine, which ended it, goes once seeked.
+		p.atEnd = false
+		p.stream.Seek(0)
+	}
 	_ = p.stream.Play()
 }
 
@@ -357,6 +364,7 @@ func (p *Player) seek(t time.Duration) {
 		t = min(t, p.s.Duration)
 	}
 	p.s.Position = t
+	p.atEnd = false
 	switch {
 	case p.connect.active():
 		p.connect.seek(t)
@@ -405,6 +413,7 @@ func (p *Player) stopAtEnd(ended bool) {
 	}
 	p.s.Playing = false
 	p.s.Position = 0
+	p.atEnd = true
 	p.report()
 	p.emit(StateChange)
 }

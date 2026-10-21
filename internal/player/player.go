@@ -177,6 +177,7 @@ type Stream interface {
 	Play() error
 	Pause()
 	Stop()
+	Unload()
 	Seek(t time.Duration)
 	SetVolume(v float64)
 }

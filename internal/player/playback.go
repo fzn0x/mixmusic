@@ -105,6 +105,10 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	p.s.Error = ""
 	p.s.Buffering = true
 	p.s.Source = nil
+	// What the engine played stops now: finding the track's stream may take
+	// a while, or fail.
+	p.loaded = false
+	p.stream.Unload()
 	p.emit(TrackChange)
 	p.report()
 	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, entry.Track) }, func(src Source, err error) {

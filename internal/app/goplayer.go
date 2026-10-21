@@ -188,6 +188,10 @@ func (s engineStream) Stop() {
 	s.a.setNative(false)
 }
 
+// Unload keeps the media controls: the engine gets the player's next
+// track.
+func (s engineStream) Unload() { s.e.Unload() }
+
 func (s engineStream) Preload(url string)   { s.e.Preload(url) }
 func (s engineStream) Play() error          { return s.e.Play() }
 func (s engineStream) Pause()               { s.e.Pause() }

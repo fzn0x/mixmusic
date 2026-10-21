@@ -309,6 +309,49 @@ func TestEngineLoadTakesThePreload(t *testing.T) {
 	}
 }
 
+func TestEngineUnload(t *testing.T) {
+	want := reference(t, speech)
+	e, dev, rec := newTestEngine(t)
+	e.Load(cuesFront, 0, true)
+	buffered(t, e, 0, ringFrames/2)
+	e.Preload(speech)
+	buffered(t, e, 1, ringFrames/2)
+	e.mu.Lock()
+	preloaded := e.decks[1]
+	e.mu.Unlock()
+	// A whole number of quanta: nothing rendered waits to play.
+	dev.play(t, 188*quantum)
+	e.Unload()
+	for i, s := range dev.play(t, 4800) {
+		if s != 0 {
+			t.Fatalf("frame %d after Unload: %v", i/2, s)
+		}
+	}
+	if rec.has("playing false") {
+		t.Error("Unload told that the engine paused")
+	}
+	if p := e.Position(); p != 0 {
+		t.Errorf("position %v after Unload", p)
+	}
+	// The preload stays, for the next track.
+	if err := e.Load(speech, 0, true); err != nil {
+		t.Fatal(err)
+	}
+	e.mu.Lock()
+	took := e.decks[e.active] == preloaded
+	pending := len(e.pending) / 2
+	e.mu.Unlock()
+	if !took {
+		t.Error("Load didn't take the preload")
+	}
+	got := dev.play(t, 4800)[2*pending:]
+	for i := 2 * fadeFrames; i < len(got); i++ {
+		if got[i] != want[i] {
+			t.Fatalf("frame %d: %v, want %v", i/2, got[i], want[i])
+		}
+	}
+}
+
 func TestEngineSeek(t *testing.T) {
 	want := reference(t, cuesFront)
 	e, dev, _ := newTestEngine(t)

@@ -34,7 +34,18 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 	}
 	s.pageScroll(c, func() {
 		before := selected
-		s.pageHeader(c, "library", labels, &selected)
+		counts := make([]int, len(ids))
+		for i, id := range ids {
+			switch id {
+			case "liked":
+				counts[i] = len(s.svc.Collection.LikedIDs())
+			case "mixes":
+				counts[i] = len(s.svc.Collection.Playlists())
+			default:
+				counts[i] = -1
+			}
+		}
+		s.pageHeaderCounts(c, "library", labels, counts, &selected)
 		if selected != before {
 			s.router.Replace("/library/" + ids[selected])
 		}

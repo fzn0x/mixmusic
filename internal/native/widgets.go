@@ -109,6 +109,12 @@ func (s *shell) button(c *ui.Context, key, label string, primary bool) ui.Elemen
 // never cut. Pivots under it switch the page's sections; selected is the
 // current one's index.
 func (s *shell) pageHeader(c *ui.Context, title string, pivots []string, selected *int) {
+	s.pageHeaderCounts(c, title, pivots, nil, selected)
+}
+
+// pageHeaderCounts is a page's header whose pivots count what they show:
+// counts[i], or nothing where it's below 0.
+func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, counts []int, selected *int) {
 	k := &s.lk
 	word := strings.ToLower(title)
 	// Terminal's titles are prompts.
@@ -185,6 +191,10 @@ func (s *shell) pageHeader(c *ui.Context, title string, pivots []string, selecte
 					b.Children(func() {
 						ui.Text(c, p).FontSize(k.pivotSize()).FontWeight(300).Font(k.display).
 							LetterSpacing(-0.02 * k.pivotSize()).TextColor(ink).SingleLine()
+						if i < len(counts) && counts[i] >= 0 {
+							ui.Text(c, count(counts[i])).FontSize(k.captionSize()).TextColor(ink).FontFeatures("tnum").
+								AlignSelf(ui.Start).Margin(6, 0, 0, 3)
+						}
 					})
 				}
 			})

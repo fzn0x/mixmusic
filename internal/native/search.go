@@ -57,7 +57,12 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 			return
 		}
 		res := fetch(s, "search:"+q, func(ctx context.Context) (app.SearchResponse, error) { return s.svc.Catalog.Search(ctx, q) })
-		s.pageHeader(c, q, searchPivots, &s.searchPivot)
+		var counts []int
+		if res.done && res.err == nil {
+			r := mergeResults(res.value, s.searchScope)
+			counts = []int{-1, len(r.Tracks), len(r.Albums), len(r.Artists), len(r.Playlists)}
+		}
+		s.pageHeaderCounts(c, q, searchPivots, counts, &s.searchPivot)
 		ui.Row(c).Margin(0, 0, 24).Children(func() {
 			s.segmented(c, "scope", "Services", &s.searchScope, searchScopes...)
 		})

@@ -364,6 +364,27 @@ func TestCopyIntoMix(t *testing.T) {
 	}
 }
 
+// TestPivotCounts counts what the pivots of a search show.
+func TestPivotCounts(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["search:lua"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{YouTube: media.SearchResults{
+		Tracks: testTracks[:4], Albums: []media.Album{{ID: "al-1", Title: "Lifted"}, {ID: "al-2", Title: "Fevers"}}}}}
+	tt := tester(t, s)
+	show(s, tt, searchPath("lua"))
+	texts := tt.Texts()
+	counted := func(pivot, n string) bool {
+		for i := range len(texts) - 1 {
+			if texts[i] == pivot && texts[i+1] == n {
+				return true
+			}
+		}
+		return false
+	}
+	if !counted("songs", "4") || !counted("albums", "2") {
+		t.Errorf("the pivots don't count the results: %q", texts)
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

@@ -19,7 +19,11 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 	reg := fetch(s, "registry", func(ctx context.Context) (addons.Registry, error) { return s.svc.Addons.Registry(ctx, false) })
 	s.pageScroll(c, func() {
 		before := selected
-		s.pageHeader(c, "marketplace", marketTabs, &selected)
+		var counts []int
+		if reg.done && reg.err == nil {
+			counts = []int{len(reg.value.Themes), len(reg.value.Plugins)}
+		}
+		s.pageHeaderCounts(c, "marketplace", marketTabs, counts, &selected)
 		if selected != before {
 			s.router.Replace("/marketplace/" + marketTabs[selected])
 		}

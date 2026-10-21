@@ -99,6 +99,11 @@ type shell struct {
 	libraryTab  int
 	settingsTab int
 	statsRange  int
+	// statsDay is the day the stats' chart tells of, and statsTable
+	// whether its days show as a table too, whose rows keep their place.
+	statsDay   dayTip
+	statsTable bool
+	statsRows  ui.ListState
 	// The command palette, what it searches, and its row chosen.
 	paletteOpen  bool
 	paletteQuery string

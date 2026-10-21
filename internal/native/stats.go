@@ -84,13 +84,44 @@ func niceCeil(v float64) float64 {
 	return 10 * p
 }
 
-// dayChart draws the minutes listened each day as columns in the accent.
+// dayTip is the day of the chart whose minutes show above it: the one the
+// pointer came on, or the arrow keys went to.
+type dayTip struct {
+	day            int
+	shown, pointer bool
+	// over is the column under the pointer, from 1, and focused whether
+	// the chart had the focus, in the last frame; told asks to read the
+	// day out, as the keys went to it.
+	over          int
+	focused, told bool
+}
+
+// dayLabel writes a date of the stats as "Tue 20 Oct".
+func dayLabel(date string) string {
+	t, err := time.ParseInLocation(time.DateOnly, date, time.Local)
+	if err != nil {
+		return date
+	}
+	return t.Format("Mon 2 Jan")
+}
+
+// describeDay tells a day's minutes and plays.
+func describeDay(d library.DayPlays) string {
+	return fmt.Sprintf("%s: %d min, %s", dayLabel(d.Date), d.Minutes, plural(d.Plays, "play"))
+}
+
+// dayChart draws the minutes listened each day as columns in the accent. A
+// day's minutes and plays show above it as the pointer comes on it, or the
+// arrow keys go to it while the chart has the focus; below, the days show
+// as a table, newest first.
 func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 	k := &s.lk
 	n := len(days)
 	if n == 0 {
 		return
 	}
+	tip := &s.statsDay
+	tip.day = min(tip.day, n-1)
 	peak, most := 0, 0
 	for i, d := range days {
 		if d.Minutes > most {
@@ -108,7 +139,19 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 	s.sectionTitle(c, "day by day")
 	ui.Text(c, "Minutes listened each day.").FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 12)
 	ui.Text(c, fmt.Sprintf("%.0f min", top)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
-	ui.Box(c).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).Label("Minutes listened each day").
+	plot := ui.Box(c).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).
+		Label("Minutes listened each day").Description("The arrow keys go from day to day.").Focusable().
+		HandleInput(func(ev ui.InputEvent) bool {
+			step, ok := map[ui.Key]int{ui.KeyLeft: -1, ui.KeyRight: 1, ui.KeyHome: -n, ui.KeyEnd: n}[ev.Key]
+			if ev.Kind != ui.InputKeyDown || !ok {
+				return false
+			}
+			if !tip.shown {
+				tip.day = n - 1
+			}
+			tip.day, tip.shown, tip.pointer, tip.told = min(max(tip.day+step, 0), n-1), true, false, true
+			return true
+		}).
 		Draw(func(p *ui.Painter, r ui.Rect) {
 			w := r.W / float32(n)
 			for i, d := range days {
@@ -117,14 +160,69 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 					h = float32(float64(d.Minutes)/top) * r.H
 				}
 				if h > 0 {
-					p.Fill(ui.Rect{X: r.X + float32(i)*w + max(1, w*0.15), Y: r.Y + r.H - h, W: max(1, w*0.7), H: h}, k.accent, 0)
+					fill := k.accent
+					if tip.shown && i == tip.day {
+						fill = k.accent.Mix(k.text, 0.28)
+					}
+					p.Fill(ui.Rect{X: r.X + float32(i)*w + max(1, w*0.15), Y: r.Y + r.H - h, W: max(1, w*0.7), H: h}, fill, 0)
 				}
 				if i == peak && d.Minutes > 0 {
 					p.Text(r.X+float32(i)*w, r.Y+r.H-h-16, fmt.Sprintf("%d min", d.Minutes), k.captionSize(), k.text)
 				}
 			}
 		})
-	ui.Row(c).FillWidth().Margin(4, 0, 48).Children(func() {
+	// A column of the plot for each day, which the pointer comes on and
+	// the tip goes above.
+	columns := make([]ui.Element, n)
+	over := 0
+	plot.Children(func() {
+		ui.Row(c).Absolute().Top(0).Right(0).Bottom(0).Left(0).AlignItems(ui.Stretch).Children(func() {
+			for i := range days {
+				columns[i] = ui.Box(c).Grow(1).Basis(0).MinWidth(0)
+				if columns[i].Hovered() {
+					over = i + 1
+				}
+			}
+		})
+	})
+	if over != tip.over {
+		switch {
+		case over > 0:
+			tip.day, tip.shown, tip.pointer = over-1, true, true
+		case tip.pointer:
+			tip.shown, tip.pointer = false, false
+		}
+		tip.over = over
+	}
+	switch focused := plot.Focused(); {
+	case focused && !tip.focused && !tip.shown:
+		tip.day, tip.shown = n-1, true
+	case !focused && tip.focused && !tip.pointer:
+		tip.shown = false
+	}
+	tip.focused = plot.Focused()
+	if tip.shown {
+		told := describeDay(days[tip.day])
+		if tip.told {
+			c.Announce(told)
+			tip.told = false
+		}
+		// The tip of a day at an end of the chart goes along it, not past.
+		at, self := ui.AnchorTop, ui.AnchorBottom
+		switch f := (float32(tip.day) + 0.5) / float32(n); {
+		case f < 0.1:
+			at, self = ui.AnchorTopLeft, ui.AnchorBottomLeft
+		case f > 0.9:
+			at, self = ui.AnchorTopRight, ui.AnchorBottomRight
+		}
+		ui.Overlay(c, func() {
+			ui.Box(c).AttachTo(columns[tip.day], at, self).MarginY(6).Padding(6, 10).Radius(k.radiusSm).
+				Background(k.text).TextColor(k.bg).PassThrough().Children(func() {
+				ui.Text(c, told).FontSize(k.smallSize()).FontFeatures("tnum").NoWrap()
+			})
+		})
+	}
+	ui.Row(c).FillWidth().Margin(4, 0, 12).Children(func() {
 		for i, d := range days {
 			label := ""
 			switch {
@@ -142,6 +240,22 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 			ui.Text(c, label).FontSize(k.captionSize()).TextColor(k.muted).Grow(1).Basis(0).MinWidth(0).NoWrap()
 		}
 	})
+	ui.Collapsible(c, "show as a table", &s.statsTable, func() {
+		columns := []ui.TableColumn{{Title: "day"}, {Title: "minutes", Width: 110, Align: ui.End}, {Title: "plays", Width: 90, Align: ui.End}}
+		// Ten rows show at once, under the header.
+		row := k.theme.Space(8)
+		ui.Table(c, &s.statsRows, columns, n, func(i, col int) {
+			d := days[n-1-i]
+			switch col {
+			case 0:
+				ui.Text(c, dayLabel(d.Date)).SingleLine()
+			case 1:
+				ui.Text(c, fmt.Sprint(d.Minutes)).FontFeatures("tnum")
+			case 2:
+				ui.Text(c, fmt.Sprint(d.Plays)).FontFeatures("tnum")
+			}
+		}).Height(row*float32(min(n, 10)+1)+1).MaxWidth(520).Margin(8, 0, 0)
+	}).Margin(0, 0, 48)
 }
 
 // venn draws the plays of each service as rings whose areas match,

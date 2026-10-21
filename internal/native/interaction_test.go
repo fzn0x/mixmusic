@@ -669,3 +669,50 @@ func TestQueueDrag(t *testing.T) {
 		t.Errorf("the entry it went before is now %s", got)
 	}
 }
+
+// TestDayChart tells a day's minutes as the pointer comes on its column,
+// and as the arrow keys go from day to day, and shows the days as a table,
+// newest first.
+func TestDayChart(t *testing.T) {
+	s := newTestShell(t)
+	for _, tr := range testTracks[:3] {
+		if err := s.svc.Collection.RecordPlay(tr); err != nil {
+			t.Fatal(err)
+		}
+	}
+	days := s.svc.Collection.Stats(statsRanges[0].days).Daily
+	n := len(days)
+	tt := testerOf(t, s, 1280, 1600)
+	show(s, tt, "/stats")
+	plot, ok := tt.Find("Minutes listened each day")
+	if !ok {
+		t.Fatalf("no chart: %q", tt.Texts())
+	}
+	today := describeDay(days[n-1])
+	tt.Move(plot.X+plot.W-4, plot.Y+plot.H/2)
+	tt.Frame()
+	if !tt.HasText(today) {
+		t.Fatalf("the pointer on today's column doesn't tell it: %q", tt.Texts())
+	}
+	tt.Move(plot.X+plot.W/2, plot.Y-80)
+	tt.Frame()
+	if tt.HasText(today) {
+		t.Error("the tip stays as the pointer leaves the chart")
+	}
+	tt.Click("Minutes listened each day")
+	tt.Move(plot.X+plot.W/2, plot.Y-80)
+	tt.Key(0, ui.KeyEnd)
+	tt.Key(0, ui.KeyLeft)
+	yesterday := describeDay(days[n-2])
+	if !tt.HasText(yesterday) || !slices.Contains(tt.Announcements(), yesterday) {
+		t.Fatalf("Left after End doesn't tell yesterday %q: %q, read out %q", yesterday, tt.Texts(), tt.Announcements())
+	}
+	tt.Click("show as a table")
+	tt.Advance(time.Second)
+	texts := tt.Texts()
+	first := slices.Index(texts, dayLabel(days[n-1].Date))
+	second := slices.Index(texts, dayLabel(days[n-2].Date))
+	if first < 0 || second < first {
+		t.Errorf("the table doesn't list the days newest first: %q", texts)
+	}
+}

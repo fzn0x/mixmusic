@@ -14,6 +14,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/tools"
 )
 
 // tester is a window of the shell, without one.
@@ -474,6 +475,25 @@ func TestLyricsPlainKept(t *testing.T) {
 	}
 	if again := newShell(s.a, s.p); !again.set.LyricsPlain {
 		t.Error("the next start shows the lyrics synced")
+	}
+}
+
+// TestYTDLPNotNow puts off an outdated yt-dlp's release, past restarts.
+func TestYTDLPNotNow(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	s.loads["tools"] = &loaded[tools.Status]{done: true, value: tools.Status{
+		YTDLP: tools.Tool{Found: true, Version: "2025.01.01", Latest: "2026.10.01"}}}
+	show(s, tt, "/")
+	if !tt.HasText("Your yt-dlp is out of date") {
+		t.Fatalf("no offer: %q", tt.Texts())
+	}
+	click(t, s, tt, "not now")
+	if got := s.svc.Preferences.Get().SkippedYTDLP; got != "2026.10.01" {
+		t.Errorf("put off %q", got)
+	}
+	if tt.HasText("Your yt-dlp is out of date") {
+		t.Error("the offer stays")
 	}
 }
 

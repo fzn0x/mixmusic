@@ -76,7 +76,7 @@ func (s *shell) toolProblems(c *ui.Context) {
 		panel("Playback needs yt-dlp",
 			"MixMusic finds the audio of YouTube Music tracks with yt-dlp. Install it once, and it stays up to date from Settings.",
 			func() { s.installButton(c, "install-ytdlp", "install yt-dlp") })
-	case outdated(y) && s.skippedYTDLP != y.Latest:
+	case outdated(y) && s.set.SkippedYTDLP != y.Latest:
 		how := "the way you installed it"
 		if y.UpdateCommand != "" {
 			how = "with " + y.UpdateCommand
@@ -86,7 +86,8 @@ func (s *shell) toolProblems(c *ui.Context) {
 			func() {
 				s.installButton(c, "use-ours", "use MixMusic's yt-dlp")
 				if s.button(c, "not-now", "not now", false).Clicked() {
-					s.skippedYTDLP = y.Latest
+					s.set.SkippedYTDLP = y.Latest
+					s.save()
 				}
 			})
 	}

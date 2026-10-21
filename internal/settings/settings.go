@@ -85,6 +85,9 @@ type Settings struct {
 	Panel string `json:"panel"`
 	// LyricsPlain shows synchronized lyrics as plain text.
 	LyricsPlain bool `json:"lyricsPlain"`
+	// SkippedYTDLP is the release of yt-dlp the home page told of, which
+	// the user put off: it doesn't tell of it again.
+	SkippedYTDLP string `json:"skippedYtdlp"`
 
 	// Playback.
 	SpotifyPlayback SpotifyPlayback `json:"spotifyPlayback"`

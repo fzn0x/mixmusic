@@ -143,11 +143,9 @@ type shell struct {
 	// licenseOpen is the license shown.
 	licenseOpen int
 	// installing is set while yt-dlp installs, which installDone of
-	// installTotal bytes came of; skippedYTDLP is the release the user put
-	// off.
+	// installTotal bytes came of.
 	installing                bool
 	installDone, installTotal int64
-	skippedYTDLP              string
 	// resetting asks to reset the settings; editingShortcut is the command
 	// whose shortcut the user writes, shortcutDraft what they wrote.
 	resetting       bool

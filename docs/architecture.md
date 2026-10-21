@@ -63,6 +63,10 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both
   called with purego, and the SystemMediaTransportControls of a hidden
   window on Windows, reached through WinRT without cgo.
+- **`internal/taskbar`** puts previous, play or pause, and next on the
+  thumbnail of the main window's taskbar button on Windows, through the
+  shell's ITaskbarList3, and takes their clicks in a window procedure in
+  front of MyGo's.
 - **`internal/player`** plays the queue: one goroutine owns the queue and
   what plays, and the network calls run beside it. It plays YouTube Music,
   and Spotify tracks matched to their recording, through the engine, and

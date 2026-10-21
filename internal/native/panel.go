@@ -370,6 +370,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 
 // startRadio plays track, then tracks like it.
 func (s *shell) startRadio(t media.Track) {
+	s.notes = append(s.notes, notice("Starting a radio of "+t.Title+"…"))
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()

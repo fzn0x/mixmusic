@@ -86,7 +86,7 @@ func (s *shell) searchField(c *ui.Context) {
 		cb.Popup(func(panel ui.Element) {
 			// A menu, below the box and as wide, rather than below the text.
 			panel.AttachTo(box, ui.AnchorBottomStart, ui.AnchorTopStart).MarginY(6).MinWidth(box.Bounds().W).Padding(4).
-				Radius(k.radiusSm).Background(k.surface2).Border(1, k.border).Shadow(0, 12, 32, -8, ui.RGBA(0, 0, 0, 0.55))
+				Radius(k.radiusSm).Background(k.raised).Border(1, k.border).Shadow(0, 12, 32, -8, ui.RGBA(0, 0, 0, 0.55))
 			for _, q := range options {
 				item := cb.Item(q).Height(36).PaddingX(12).Gap(12).AlignItems(ui.Center).Radius(k.radiusSm).Cursor(ui.CursorPointer)
 				ink, mark := k.text, k.muted

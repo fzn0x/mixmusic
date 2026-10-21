@@ -29,6 +29,10 @@ type look struct {
 	tileText                                ui.Color
 	// The tints DESIGN.md derives from the tokens.
 	hover, press, rule, outline, scrim ui.Color
+	// raised is the face of the menus that float over the page: surface-2
+	// over the ground, solid where the theme's surfaces show the page
+	// through, as Aurora's glass does.
+	raised ui.Color
 
 	radius, radiusSm float32
 	body, display    string
@@ -110,6 +114,7 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	k.rule = col(alpha(accent, 0.45))
 	k.outline = col(alpha(text, 0.85))
 	k.scrim = col(alpha(bg, 0.72))
+	k.raised = col(over(tok("surface-2"), bg))
 	k.radius = cssLength(th.Radius)
 	k.radiusSm = k.radius * 0.6
 	k.body = fontFamily(th.Fonts.Body)

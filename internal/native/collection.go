@@ -433,7 +433,30 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 	}
 	a := res.value
 	s.pageScroll(c, func() {
-		s.pageHeader(c, a.Name, nil, nil)
+		if s.artistOf != id {
+			s.artistOf, s.artistPivot = id, 0
+		}
+		pivots := []string{"songs"}
+		for _, p := range []struct {
+			name  string
+			shows bool
+		}{{"albums", len(a.Albums) > 0}, {"singles", len(a.Singles) > 0}, {"related", len(a.Related) > 0}} {
+			if p.shows {
+				pivots = append(pivots, p.name)
+			}
+		}
+		before := s.artistPivot
+		s.pageHeader(c, a.Name, pivots, &s.artistPivot)
+		// A pivot goes to its section, in the frame it is chosen.
+		jump := ""
+		if s.artistPivot != before {
+			jump = pivots[s.artistPivot]
+		}
+		section := func(name string, content func()) {
+			if el := ui.Column(c.Key("artist-" + name)).Children(content); name == jump {
+				el.ScrollIntoView()
+			}
+		}
 		h := headProps{art: a.Artwork, round: true, source: a.Source, facts: texts(a.Subtitle), description: a.Description,
 			playLabel: "play top songs",
 			menu: func(m *ui.Menu) {
@@ -456,42 +479,53 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 			}
 		}
 		s.collectionHead(c, h)
-		s.sectionTitle(c, "top songs")
-		ui.Column(c).Margin(0, 0, 48).Children(func() {
-			s.trackList(c, "top", a.TopTracks, trackListOptions{art: true, album: true, empty: "No songs listed for this artist."})
+		section("songs", func() {
+			s.sectionTitle(c, "top songs")
+			ui.Column(c).Margin(0, 0, 48).Children(func() {
+				s.trackList(c, "top", a.TopTracks, trackListOptions{art: true, album: true, empty: "No songs listed for this artist."})
+			})
 		})
 		if len(a.Albums) > 0 {
-			s.shelf(c, "albums", "albums", func() {
-				for i, al := range a.Albums {
-					s.albumTile(c, "album-"+count(i), al)
-				}
+			section("albums", func() {
+				s.shelf(c, "albums", "albums", func() {
+					for i, al := range a.Albums {
+						s.albumTile(c, "album-"+count(i), al)
+					}
+				})
 			})
 		}
 		if len(a.Singles) > 0 {
-			s.shelf(c, "singles", "singles & eps", func() {
-				for i, al := range a.Singles {
-					s.albumTile(c, "single-"+count(i), al)
-				}
+			section("singles", func() {
+				s.shelf(c, "singles", "singles & eps", func() {
+					for i, al := range a.Singles {
+						s.albumTile(c, "single-"+count(i), al)
+					}
+				})
 			})
 		}
 		if len(a.Related) > 0 {
-			s.sectionTitle(c, "fans also like")
-			ui.Row(c).Wrap().Gap(8).Children(func() {
-				for i, r := range a.Related {
-					if r.ID == "" {
-						continue
-					}
-					chip := ui.ButtonBase(c.Key("related-"+count(i))).Height(34).PaddingX(14).Border(2, s.lk.outline).
-						Radius(s.lk.radiusSm).Label(r.Name).Cursor(ui.CursorPointer)
-					if chip.Hovered() {
-						chip.Background(s.lk.hover)
-					}
-					if chip.Clicked() {
-						s.navigate(artistPath(r.ID))
-					}
-					chip.Children(func() { ui.Text(c, r.Name).FontSize(s.lk.smallSize()).SingleLine() })
-				}
-			})
+			section("related", func() { s.relatedArtists(c, a.Related) })
+		}
+	})
+}
+
+// relatedArtists are chips of the artists the fans of one also like.
+func (s *shell) relatedArtists(c *ui.Context, related []media.Ref) {
+	s.sectionTitle(c, "fans also like")
+	ui.Row(c).Wrap().Gap(8).Children(func() {
+		for i, r := range related {
+			if r.ID == "" {
+				continue
+			}
+			chip := ui.ButtonBase(c.Key("related-"+count(i))).Height(34).PaddingX(14).Border(2, s.lk.outline).
+				Radius(s.lk.radiusSm).Label(r.Name).Cursor(ui.CursorPointer)
+			if chip.Hovered() {
+				chip.Background(s.lk.hover)
+			}
+			if chip.Clicked() {
+				s.navigate(artistPath(r.ID))
+			}
+			chip.Children(func() { ui.Text(c, r.Name).FontSize(s.lk.smallSize()).SingleLine() })
 		}
 	})
 }

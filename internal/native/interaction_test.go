@@ -385,6 +385,28 @@ func TestPivotCounts(t *testing.T) {
 	}
 }
 
+// TestArtistPivots has an artist's page pivot to the sections it shows.
+func TestArtistPivots(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["artist:ar-x"] = &loaded[media.Artist]{done: true, value: media.Artist{ID: "ar-x", Name: "Bonobo",
+		TopTracks: testTracks[:3], Albums: []media.Album{{ID: "al-1", Title: "Migration"}},
+		Related: []media.Ref{{ID: "ar-y", Name: "Tycho"}}}}
+	tt := testerOf(t, s, 1280, 1800)
+	show(s, tt, "/artist/ar-x")
+	for _, p := range []string{"songs", "albums", "related"} {
+		if !tt.HasText(p) {
+			t.Errorf("no %s pivot: %q", p, tt.Texts())
+		}
+	}
+	if tt.HasText("singles") {
+		t.Error("a singles pivot for no singles")
+	}
+	click(t, s, tt, "related")
+	if s.artistPivot != 2 {
+		t.Errorf("the related pivot is %d", s.artistPivot)
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

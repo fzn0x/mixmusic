@@ -89,6 +89,9 @@ type shell struct {
 	// The pages' own state.
 	homeFilter  int
 	searchPivot int
+	// artistPivot is the pivot chosen on the page of the artist artistOf.
+	artistPivot int
+	artistOf    string
 	searchScope int
 	libraryTab  int
 	settingsTab int

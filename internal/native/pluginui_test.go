@@ -80,9 +80,9 @@ func TestSleepTimer(t *testing.T) {
 	until(t, s, tt, "the timer", func() bool {
 		return tt.HasText("The sleep timer is stops in 30:00.") || tt.HasText("The sleep timer is stops in 29:59.")
 	})
-	if !tt.HasText("Sleep timer: the music stops in 30 minutes") {
-		t.Errorf("starting the timer told nothing: %q", tt.Texts())
-	}
+	// The page draws what the plugin set at once, but its toast waits for
+	// the shell's update, which a frame can come before.
+	until(t, s, tt, "the timer's toast", func() bool { return tt.HasText("Sleep timer: the music stops in 30 minutes") })
 	click(t, s, tt, "cancel")
 	until(t, s, tt, "the cancel", func() bool { return tt.HasText("The sleep timer is off.") })
 

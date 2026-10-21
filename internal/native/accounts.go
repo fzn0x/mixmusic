@@ -46,7 +46,7 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 			func() {
 				ui.Text(c, "Create an app in the ")
 				ui.Link(c, "Spotify developer dashboard", "https://developer.spotify.com/dashboard")
-				ui.Text(c, ", with the Web API.")
+				ui.Text(c, ", with the Web API, signed in with a Spotify account that has Premium.")
 			},
 			func() {
 				ui.Text(c, "Add this redirect URI to it: ")
@@ -56,6 +56,9 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 					c.WriteClipboard(sp.RedirectURI)
 					s.notes = append(s.notes, notice("Copied the redirect URI"))
 				}
+			},
+			func() {
+				ui.Text(c, "In its settings, under Users Management, add your name and the email of the Spotify account you sign in with.")
 			},
 			func() { ui.Text(c, "Paste the app's Client ID here, and sign in.") },
 		)
@@ -87,7 +90,7 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 				})
 			}
 		})
-		s.hint(c, "Spotify lets apps in development mode serve their owner and a few people they add, and its owner needs Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.")
+		s.hint(c, "Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.")
 	})
 }
 

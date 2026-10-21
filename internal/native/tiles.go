@@ -115,11 +115,31 @@ func (s *shell) shelf(c *ui.Context, key, title string, tiles func()) {
 }
 
 // shelfWith is a shelf with links in its title's row, as to make what it
-// shows.
+// shows. Its arrows scroll it by most of its width.
 func (s *shell) shelfWith(c *ui.Context, key, title string, links, tiles func()) {
+	k := &s.lk
+	// A shelf of each page keeps its own place: two pages of a kind show
+	// at once as one slides in.
+	at := s.pagePath + " " + key
+	st := s.shelfScroll[at]
+	if st == nil {
+		st = &ui.ScrollState{}
+		s.shelfScroll[at] = st
+	}
+	step := 0.8 * (s.paneWidth(c) - 2*k.gutter)
 	ui.Column(c.Key(key)).Margin(0, 0, 48).Children(func() {
-		s.sectionHead(c, title, links)
-		ui.ScrollHorizontal(c).Gap(16).Padding(0, 0, 12).Children(tiles)
+		s.sectionHead(c, title, func() {
+			if links != nil {
+				links()
+			}
+			if s.iconButton(c, key+"-back", "back", "Scroll "+title+" back", false, 18).Clicked() {
+				st.ScrollTo(max(st.X-step, 0), 0, ui.Smooth)
+			}
+			if s.iconButton(c, key+"-on", "forward", "Scroll "+title+" on", false, 18).Clicked() {
+				st.ScrollTo(min(st.X+step, st.MaxX), 0, ui.Smooth)
+			}
+		})
+		ui.ScrollHorizontal(c).TrackScroll(st).Gap(16).Padding(0, 0, 12).Children(tiles)
 	})
 }
 

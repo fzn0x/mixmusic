@@ -407,6 +407,25 @@ func TestArtistPivots(t *testing.T) {
 	}
 }
 
+// TestShelfArrows scrolls a shelf on with its arrow.
+func TestShelfArrows(t *testing.T) {
+	s := newTestShell(t)
+	var items []media.Item
+	for i := range 20 {
+		items = append(items, media.Item{Kind: media.ItemAlbum, Album: &media.Album{ID: "al-" + count(i), Title: "Album " + count(i)}})
+	}
+	// The shelf is below the fold of a window of the usual size.
+	tt := testerOf(t, s, 1280, 1600)
+	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Albums for you", Source: media.SourceYouTube, Items: items}}}
+	show(s, tt, "/")
+	click(t, s, tt, "Scroll Albums for you on")
+	tt.Advance(time.Second)
+	tt.Frame()
+	if st := s.shelfScroll["/ home-0"]; st == nil || st.X <= 0 {
+		t.Errorf("the shelf didn't scroll on: %+v", st)
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

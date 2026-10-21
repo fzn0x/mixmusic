@@ -89,6 +89,8 @@ type shell struct {
 	// The pages' own state.
 	homeFilter  int
 	searchPivot int
+	// shelfScroll is where the shelves scrolled, by page and shelf.
+	shelfScroll map[string]*ui.ScrollState
 	// artistPivot is the pivot chosen on the page of the artist artistOf.
 	artistPivot int
 	artistOf    string
@@ -164,7 +166,7 @@ type shell struct {
 }
 
 func newShell(a *app.App, p *player.Player) *shell {
-	s := &shell{a: a, svc: a.Services(), p: p, router: ui.NewRouter("/"), loads: map[string]any{}, drafts: map[string]*draft{},
+	s := &shell{a: a, svc: a.Services(), p: p, router: ui.NewRouter("/"), loads: map[string]any{}, drafts: map[string]*draft{}, shelfScroll: map[string]*ui.ScrollState{},
 		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, panel: "queue", licenseOpen: -1,
 		mountedViews: map[*plugins.View]bool{}, seenViews: map[*plugins.View]bool{}, pluginInputs: map[string]*string{},
 		canvasSizes: map[*plugins.Canvas][2]float32{}, cssColors: map[string]ui.Color{}, svgs: map[string]*ui.SVG{}}

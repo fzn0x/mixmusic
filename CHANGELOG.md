@@ -120,6 +120,13 @@ next track.
   asks of apps in development mode since February 2026. The steps to
   connect Spotify ask for both beforehand, and a refused sign-in can be
   signed out of.
+- The visualizer of the now playing page, and the analyser plugins read,
+  as the spectrum, move for Spotify tracks too, on Windows: MixMusic hears
+  Spotify where it plays on this computer, in MixMusic or in the Spotify
+  app on Spotify Connect, through Windows' process loopback, which hears
+  one app's audio and never records it. Where MixMusic can't hear the
+  track, as on another device, the visualizer shows nothing, not a flat
+  line.
 
 ## [0.4.0] - 2026-10-20
 

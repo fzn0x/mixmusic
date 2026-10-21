@@ -1,9 +1,10 @@
 // Package nowplaying shows what MixMusic's own audio engine plays in the
 // system's media controls, and passes on what they ask: macOS's Now
-// Playing, which Control Center, the media keys and headphones reach, and
-// an MPRIS player on Linux, which desktops show and pass their media keys
-// to. The webview does this for the audio it plays itself; the engine plays
-// outside it.
+// Playing, which Control Center, the media keys and headphones reach, an
+// MPRIS player on Linux, which desktops show and pass their media keys to,
+// and Windows' media flyout, which the volume keys and Quick Settings
+// show. The webview does this for the audio it plays itself; the engine
+// plays outside it.
 package nowplaying
 
 import (

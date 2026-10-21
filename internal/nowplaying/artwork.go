@@ -1,9 +1,9 @@
-//go:build darwin && (amd64 || arm64)
+//go:build (darwin || windows) && (amd64 || arm64)
 
 package nowplaying
 
-// macOS shows the artwork MixMusic hands it, which it downloads: MPRIS
-// passes its address on.
+// macOS and Windows show the artwork MixMusic hands them, which it
+// downloads: MPRIS passes its address on.
 
 import (
 	"errors"

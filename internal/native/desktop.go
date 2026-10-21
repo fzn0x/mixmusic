@@ -22,7 +22,12 @@ func (s *shell) desktopSettings(c *ui.Context) {
 		toggle("notifications", "Notifications", "Tell what starts playing while MixMusic is in the background.", &s.set.Notifications)
 		toggle("discord", "Show what plays on Discord", "While Discord runs, your profile says what you listen to, with the artwork and the time left; pausing clears it.", &s.set.DiscordPresence)
 		if s.set.DiscordPresence {
-			s.row(c, "Discord application ID", "The ID of an application of yours in Discord's developer portal, whose name your profile shows.", func() {
+			describe := func() {
+				ui.Text(c, "Discord shows the name of an application: create one called MixMusic in the ")
+				ui.Link(c, "developer portal", "https://discord.com/developers/applications")
+				ui.Text(c, " and paste its application ID.")
+			}
+			s.rowWith(c, "Discord application ID", describe, func() {
 				in, _ := s.settingInput(c, "discord-app", s.set.DiscordAppID, func(id string) {
 					s.set.DiscordAppID = id
 					s.save()

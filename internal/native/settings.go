@@ -131,6 +131,18 @@ func (s *shell) settingInput(c *ui.Context, key, saved string, commit func(strin
 }
 
 // hint is a muted paragraph among a group's rows.
+// rowWith is a row whose description describe builds, with links say.
+func (s *shell) rowWith(c *ui.Context, title string, describe, control func()) {
+	k := &s.lk
+	ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
+		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
+			ui.Text(c, title).FontSize(k.bodySize())
+			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Children(describe)
+		})
+		ui.Row(c).Shrink(0).Gap(8).Children(control)
+	})
+}
+
 func (s *shell) hint(c *ui.Context, text string) {
 	ui.Text(c, text).FontSize(s.lk.smallSize()).TextColor(s.lk.muted).Padding(12, 0).MaxWidth(720)
 }

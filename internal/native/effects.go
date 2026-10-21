@@ -37,6 +37,10 @@ type effects struct {
 	// (Greenroom), and cover lights the ground with it, under translucent
 	// panels and dialogs frosted by blur (Glasshouse).
 	wash, cover bool
+	// speedlines draws an anime's speed lines toward a corner, which burst
+	// when the track changes, and screentone prints manga's dots in the
+	// corner across (Anime).
+	speedlines, screentone bool
 }
 
 // optionValue is the value of a theme's option: the user's, or its
@@ -84,6 +88,8 @@ func themeEffects(th addons.Theme, chosen map[string]string) effects {
 		fx.wash = opt("wash") == "true"
 	case "glasshouse":
 		fx.cover, fx.blur = opt("cover") == "true", num("blur")
+	case "anime":
+		fx.speedlines, fx.screentone = opt("speedlines") == "true", opt("screentone") == "true"
 	}
 	return fx
 }
@@ -119,6 +125,20 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 			paintCover(p, r, tint, accent, strength)
 			if changing {
 				p.AnimationFrame()
+			}
+		})
+	case k.fx.speedlines || k.fx.screentone:
+		lines, tone, ink := k.fx.speedlines, k.fx.screentone, k.text
+		burst := s.burst(c)
+		root.Draw(func(p *ui.Painter, r ui.Rect) {
+			if tone {
+				s.paintScreentone(p, r, ink)
+			}
+			if lines {
+				paintSpeedlines(p, r, ink, burst)
+				if burst > 0 {
+					p.AnimationFrame()
+				}
 			}
 		})
 	}

@@ -11,8 +11,8 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 )
 
-// TestThemeEffectsOptions turns the effects of Greenroom and Glasshouse
-// on and off with their options.
+// TestThemeEffectsOptions turns the effects of Greenroom, Glasshouse
+// and Anime on and off with their options.
 func TestThemeEffectsOptions(t *testing.T) {
 	s := newTestShell(t)
 	for _, c := range []struct {
@@ -24,6 +24,8 @@ func TestThemeEffectsOptions(t *testing.T) {
 		{"greenroom", map[string]string{"wash": "false"}, effects{}},
 		{"glasshouse", nil, effects{cover: true, blur: 20}},
 		{"glasshouse", map[string]string{"cover": "false", "blur": "0"}, effects{}},
+		{"anime", nil, effects{speedlines: true, screentone: true}},
+		{"anime", map[string]string{"speedlines": "false"}, effects{screentone: true}},
 	} {
 		found := false
 		for _, th := range s.inv.Themes {
@@ -133,5 +135,58 @@ func TestFollowArtworkForGround(t *testing.T) {
 		if s.artURL == "" {
 			t.Errorf("%+v didn't ask for the cover's colour", fx)
 		}
+	}
+}
+
+// TestBurst bursts Anime's speed lines as a track starts, and not again
+// until another does, nor while the computer asks for less motion.
+func TestBurst(t *testing.T) {
+	s := newTestShell(t)
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	var burst float32
+	tt := ui.NewTester(func(c *ui.Context) {
+		s.st = s.p.State()
+		burst = s.burst(c)
+	}, 10, 10)
+	tt.Frame()
+	if burst < 0.99 {
+		t.Errorf("as the track starts, the lines burst %.2f", burst)
+	}
+	tt.Advance(burstFor)
+	tt.Frame()
+	if burst != 0 {
+		t.Errorf("after %v, the lines still burst %.2f", burstFor, burst)
+	}
+	s.p.Next()
+	s.settle(t, func(st player.State) bool { return st.Index == 1 })
+	tt.Frame()
+	if burst < 0.99 {
+		t.Errorf("the next track bursts them %.2f", burst)
+	}
+	tt.SetPreferences(ui.Preferences{ReduceMotion: true})
+	s.p.Next()
+	s.settle(t, func(st player.State) bool { return st.Index == 2 })
+	tt.Frame()
+	if burst != 0 {
+		t.Errorf("with less motion, the lines burst %.2f", burst)
+	}
+}
+
+// TestScreentone prints its dots largest in the bottom left corner, and
+// none a width away from it.
+func TestScreentone(t *testing.T) {
+	img := screentone(200, 200, 1, color.NRGBA{A: 255})
+	ink := func(x0, y0, x1, y1 int) (sum int) {
+		for y := y0; y < y1; y++ {
+			for x := x0; x < x1; x++ {
+				sum += int(img.NRGBAAt(x, y).A)
+			}
+		}
+		return sum
+	}
+	near, middle, far := ink(0, 170, 30, 200), ink(85, 85, 115, 115), ink(170, 0, 200, 30)
+	if near == 0 || middle >= near || far != 0 {
+		t.Errorf("ink in the corner %d, the middle %d, the far corner %d", near, middle, far)
 	}
 }

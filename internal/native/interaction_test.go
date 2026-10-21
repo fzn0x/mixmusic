@@ -197,11 +197,24 @@ func TestPaletteRuns(t *testing.T) {
 	}
 	tt.Type("stats")
 	tt.Frame()
+	// Enter searches what was typed; Down reaches the command.
+	tt.Key(0, ui.KeyDown)
+	tt.Frame()
 	tt.Key(0, ui.KeyEnter)
 	s.drain()
 	tt.Frame()
 	if s.paletteOpen || s.router.Path() != "/stats" {
 		t.Errorf("the palette is open: %v; the page is %q", s.paletteOpen, s.router.Path())
+	}
+	tt.Key(ui.Cmd, ui.KeyK)
+	tt.Frame()
+	tt.Type("lua")
+	tt.Frame()
+	tt.Key(0, ui.KeyEnter)
+	s.drain()
+	tt.Frame()
+	if got := s.router.Location(); got != searchPath("lua") {
+		t.Errorf("Enter in the palette went to %q, not the search", got)
 	}
 	tt.Key(ui.Alt, ui.Key3)
 	tt.Frame()

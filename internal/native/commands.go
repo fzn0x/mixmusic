@@ -177,14 +177,18 @@ func (s *shell) palette(c *ui.Context) {
 			found = append(found, cmd)
 		}
 	}
-	if s.paletteQuery != "" {
-		query := strings.TrimSpace(s.paletteQuery)
-		found = append(found, command{"search", "Search for “" + query + "”", "", "search", func() { s.navigate(searchPath(query)) }})
+	if query := strings.TrimSpace(s.paletteQuery); query != "" {
+		// Enter searches what was typed; the arrows reach the commands.
+		search := command{"search", "Search for “" + query + "”", "", "search", func() { s.navigate(searchPath(query)) }}
+		found = append([]command{search}, found...)
 	}
 	s.paletteAt = min(max(s.paletteAt, 0), max(len(found)-1, 0))
 	panel := ui.Modal(c, &s.paletteOpen, func() {
 		in := ui.TextInputBase(c.Key("palette-input"), &s.paletteQuery).Placeholder("type a command or a search").AutoFocus().
 			Label("Command palette").FontSize(k.subtitleSize()).FontWeight(300).TextColor(k.accent).Padding(8, 0)
+		if in.Changed() {
+			s.paletteAt = 0
+		}
 		in.OnShortcut(0, ui.KeyDown, func() { s.paletteAt++ })
 		in.OnShortcut(0, ui.KeyUp, func() { s.paletteAt-- })
 		run := func(cmd command) {

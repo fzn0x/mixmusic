@@ -7,6 +7,19 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
+// TestEqualizerNote says the equalizer works only on YouTube Music, and
+// sends Spotify to the system's equalizer, linking Spotify's own note.
+func TestEqualizerNote(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 2400)
+	show(s, tt, "/settings/playback")
+	for _, want := range []string{"works only on YouTube Music", "use a system-wide equalizer", "Spotify notes"} {
+		if !tt.HasText(want) {
+			t.Errorf("the equalizer doesn't say %q", want)
+		}
+	}
+}
+
 // TestEqualizerPreset names the preset of the bands, and Custom once they
 // are the user's own, as after a slider moved: the box was empty.
 func TestEqualizerPreset(t *testing.T) {

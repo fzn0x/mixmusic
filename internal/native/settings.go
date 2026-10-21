@@ -573,7 +573,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 	k := &s.lk
 	eq := &s.set.Equalizer
 	s.group(c, "equalizer", func() {
-		s.row(c, "Equalizer", "Shape the sound with ten bands and a preamp.", func() {
+		s.row(c, "Equalizer", "Shape the sound of YouTube Music with ten bands and a preamp.", func() {
 			if ui.Switch(c.Key("eq-on"), &eq.Enabled).Label("Equalizer").Changed() {
 				s.save()
 			}
@@ -622,8 +622,19 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 				band("eq-"+count(i), label, &eq.Gains[i])
 			}
 		})
+		// Spotify's audio plays in Spotify's own player, which no app may
+		// change: only the system's equalizer reaches it.
+		ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
+			ui.Text(c, "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: ")
+			ui.Link(c, "Spotify notes", spotifyEqualizer)
+			ui.Text(c, " that its audio settings can't change while another device plays it.")
+		})
 	})
 }
+
+// spotifyEqualizer is Spotify's page on its equalizer, which says that its
+// audio settings can't change while Spotify Connect plays on another device.
+const spotifyEqualizer = "https://support.spotify.com/us/article/equalizer/"
 
 // bandSlider is the slider of an equalizer's band, which goes up from lo at
 // its foot to hi at its head, by half a decibel. SliderBase draws nothing

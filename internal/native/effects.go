@@ -33,6 +33,10 @@ type effects struct {
 	// tints the artwork green (Terminal).
 	scanlines, prompt, phosphor bool
 	glow                        float32
+	// wash washes the top of the ground down in the colour of the cover
+	// (Greenroom), and cover lights the ground with it, under translucent
+	// panels and dialogs frosted by blur (Glasshouse).
+	wash, cover bool
 }
 
 // optionValue is the value of a theme's option: the user's, or its
@@ -76,6 +80,10 @@ func themeEffects(th addons.Theme, chosen map[string]string) effects {
 	case "terminal":
 		fx.scanlines, fx.glow = opt("scanlines") == "true", num("glow")
 		fx.prompt, fx.phosphor = true, true
+	case "greenroom":
+		fx.wash = opt("wash") == "true"
+	case "glasshouse":
+		fx.cover, fx.blur = opt("cover") == "true", num("blur")
 	}
 	return fx
 }
@@ -91,17 +99,55 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 		root.Draw(func(p *ui.Painter, r ui.Rect) { paintAurora(p, r, tint, accent, drift) })
 	case k.fx.petals:
 		root.Draw(paintPetals)
+	case k.fx.wash:
+		tint, changing := s.coverTint(c, k.accent, washTone)
+		root.Draw(func(p *ui.Painter, r ui.Rect) {
+			paintWash(p, r, tint)
+			if changing {
+				p.AnimationFrame()
+			}
+		})
+	case k.fx.cover:
+		tint, changing := s.coverTint(c, k.accent, coverTone)
+		// Without a cover, the accent's light is half as strong: the
+		// glass stays white.
+		accent, strength := k.accent, 1.0
+		if s.artColor == "" {
+			strength = 0.5
+		}
+		root.Draw(func(p *ui.Painter, r ui.Rect) {
+			paintCover(p, r, tint, accent, strength)
+			if changing {
+				p.AnimationFrame()
+			}
+		})
 	}
 }
 
-// frosted fills a dialog's panel with the surface, or, in Aurora, with
-// frosted glass that what is under it shows through.
+// frosted fills a dialog's panel with the surface, or, in Aurora and
+// Glasshouse, with frosted glass that what is under it shows through:
+// Glasshouse's white, its raised surface over the blur.
 func (s *shell) frosted(panel ui.Element) ui.Element {
 	k := &s.lk
-	if k.fx.aurora && k.fx.blur > 0 {
+	switch {
+	case k.fx.blur > 0 && k.fx.cover:
+		return panel.Material(frost{glass.Blur{Radius: k.fx.blur}, k.surface2})
+	case k.fx.blur > 0:
 		return panel.Material(glass.Blur{Radius: k.fx.blur})
 	}
 	return panel.Background(k.surface)
+}
+
+// frost is frosted glass of a colour: what is under it blurred, under its
+// tint.
+type frost struct {
+	blur glass.Blur
+	tint ui.Color
+}
+
+func (f frost) PaintMaterial(p *ui.Painter, box ui.Rect, radii [4]float32) {
+	f.blur.PaintMaterial(p, box, radii)
+	p.Fill(box, f.tint, radii[0])
 }
 
 // overlay draws the theme's effects over the window's content, which the

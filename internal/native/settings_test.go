@@ -74,8 +74,9 @@ func TestAccentLink(t *testing.T) {
 		t.Fatal(err)
 	}
 	s.refresh()
-	// The link is under the fold of a window of the usual size.
-	tt := testerOf(t, s, 1280, 1600)
+	// The link is under the fold of a window of the usual size, past the
+	// themes' cards.
+	tt := testerOf(t, s, 1280, 2200)
 	show(s, tt, "/settings/appearance")
 	click(t, s, tt, "use the theme's")
 	if got := s.svc.Preferences.Get().Accent; got != "" {

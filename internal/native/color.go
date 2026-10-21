@@ -206,6 +206,41 @@ func oklabToRGB(L, a, b float64) (float64, float64, float64) {
 		gamma(-0.0041960863*l - 0.7034186147*m + 1.7076147010*s)
 }
 
+// rgbToHSL is hslToRGB's inverse: c's hue in degrees, and its saturation
+// and lightness from 0 to 1.
+func rgbToHSL(c color.NRGBA) (h, s, l float64) {
+	r, g, b := float64(c.R)/255, float64(c.G)/255, float64(c.B)/255
+	hi, lo := max(r, g, b), min(r, g, b)
+	l = (hi + lo) / 2
+	d := hi - lo
+	if d == 0 {
+		return 0, 0, l
+	}
+	s = d / (1 - math.Abs(2*l-1))
+	switch hi {
+	case r:
+		h = math.Mod((g-b)/d+6, 6)
+	case g:
+		h = (b-r)/d + 2
+	default:
+		h = (r-g)/d + 4
+	}
+	return 60 * h, clamp01(s), l
+}
+
+// toned is c with its hue, its lightness brought between lo and hi and
+// its saturation up to sat at least, unless c is a gray: the colour a
+// cover lends a ground, which a near-black or a washed-out cover would
+// leave unseen.
+func toned(c color.NRGBA, lo, hi, sat float64) color.NRGBA {
+	h, s, l := rgbToHSL(c)
+	if s > 0.08 {
+		s = max(s, sat)
+	}
+	r, g, b := hslToRGB(h, s, min(max(l, lo), hi))
+	return color.NRGBA{R: unit(r), G: unit(g), B: unit(b), A: 255}
+}
+
 func clamp01(v float64) float64 { return min(max(v, 0), 1) }
 
 func unit(v float64) uint8 { return uint8(math.Round(clamp01(v) * 255)) }

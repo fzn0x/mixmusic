@@ -7,6 +7,24 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
+// TestSegmentFloodKeepsCorners keeps the chosen segment's flood within the
+// track's rounded corners: in Mochi, of round corners, its square corner
+// stood out of them.
+func TestSegmentFloodKeepsCorners(t *testing.T) {
+	s := newTestShell(t)
+	wear(s, "mochi", nil)
+	tt := testerOf(t, s, 1280, 2400)
+	show(s, tt, "/settings/playback")
+	r, ok := tt.Find("best")
+	if !ok {
+		t.Fatalf("no segment best: %q", tt.Texts())
+	}
+	c, want := tt.Image().RGBAAt(int(r.X)+1, int(r.Y)+1), nrgba(s.lk.accent)
+	if c.R == want.R && c.G == want.G && c.B == want.B {
+		t.Errorf("the chosen segment floods its corner out of the track's: %v", c)
+	}
+}
+
 // TestSegmentLabelsWhole keeps a segment's label whole: in Mochi's face,
 // "best" laid out a hair wider than the box measured for it, and its
 // segment showed "be…". The ink of the label in its segment, on the

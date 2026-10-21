@@ -6,24 +6,48 @@ recording on YouTube Music.
 
 ## Sign in
 
-Spotify lets each app it does not review serve its owner and a few people
-they add, so you sign in with an app of your own. It takes two minutes:
+Spotify lets each app it does not review serve only up to five accounts its
+owner adds, and only while the owner has Spotify Premium, so you sign in with
+an app of your own. It takes two minutes:
 
-1. Open the [Spotify developer dashboard](https://developer.spotify.com/dashboard)
-   and create an app. Any name and description do; choose the **Web API**.
+1. Open the [Spotify developer dashboard](https://developer.spotify.com/dashboard),
+   signed in with a Spotify account that has Premium, and create an app. Any
+   name and description do; choose the **Web API**.
 2. In the app's settings, add this redirect URI exactly:
 
    ```
    http://127.0.0.1:47823/callback
    ```
 
-3. Copy the app's **Client ID**.
-4. In MixMusic, open Settings › Accounts, paste the Client ID and choose
+3. In the app's settings, under **Users Management**, add your name and the
+   e-mail address of the Spotify account you sign in to MixMusic with, as
+   your Spotify account page shows it.
+4. Copy the app's **Client ID**.
+5. In MixMusic, open Settings › Accounts, paste the Client ID and choose
    **sign in to spotify**. Your browser opens Spotify's sign-in page; once you
    agree, it sends you back to MixMusic.
 
-To let a friend sign in with your app, add their Spotify e-mail address
-under **User Management** in the dashboard.
+To let a friend sign in with your app, add their name and Spotify e-mail
+address under **Users Management** too.
+
+### When Spotify refuses the sign-in
+
+Spotify can let you sign in and then refuse the app the account's data.
+Settings › Accounts says which refusal it was:
+
+- **This Spotify account is not one of the app's users.** Add it under
+  **Users Management** in the app's settings, with the e-mail address of the
+  account you signed in with. Your browser may be signed in to Spotify with
+  another account than the app's: Spotify's sign-in page shows which, and
+  **Not you?** changes it.
+- **The app's owner has no Spotify Premium.** Subscribe with the account that
+  made the app, or make one with an account that has Premium. Spotify can take
+  a few hours to notice a new subscription.
+- **Spotify refused (HTTP 403)**, without a word of why: check both of the
+  above. Spotify can take a few minutes to let in an account just added.
+
+Then choose **sign in to spotify** again, or **sign out** to stop using
+Spotify.
 
 MixMusic never sees your password. It keeps the token Spotify gives it in
 your system's credential store: the Credential Manager on Windows, the Secret
@@ -59,6 +83,7 @@ Settings › Playback chooses:
 Apps in Spotify's development mode, as yours is, have limits:
 
 - The app's owner needs Spotify Premium.
+- Up to five accounts, added under **Users Management**, can use it.
 - A search returns at most ten results of each kind.
 - Apps see the tracks of the playlists you own or collaborate on, not of
   playlists others made. MixMusic tells you when a playlist is one of those.

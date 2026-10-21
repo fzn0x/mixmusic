@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
+	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -173,5 +176,143 @@ func TestSourceCloseStopsTheDownload(t *testing.T) {
 			t.Fatal("the download goes on after Close")
 		}
 		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+// heldUpstream serves size bytes of audio with range requests, holding the
+// first request from byte from until the test ends; holding closes once it
+// holds it.
+func heldUpstream(t *testing.T, size int, from int64) (srv *httptest.Server, data []byte, holding chan struct{}) {
+	t.Helper()
+	data = make([]byte, size)
+	rng := rand.New(rand.NewPCG(1, 2))
+	for i := range data {
+		data[i] = byte(rng.Uint32())
+	}
+	release := make(chan struct{})
+	holding = make(chan struct{})
+	var held atomic.Bool
+	srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.Header.Get("Range"), fmt.Sprintf("bytes=%d-", from)) && held.CompareAndSwap(false, true) {
+			close(holding)
+			select {
+			case <-release:
+			case <-r.Context().Done():
+				return
+			}
+		}
+		http.ServeContent(w, r, "", time.Time{}, bytes.NewReader(data))
+	}))
+	t.Cleanup(func() {
+		close(release)
+		srv.Close()
+	})
+	return srv, data, holding
+}
+
+// within fails the test unless read returns within a few seconds.
+func within(t *testing.T, what string, read func() error) {
+	t.Helper()
+	done := make(chan error, 1)
+	go func() { done <- read() }()
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatalf("%s: %v", what, err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatalf("%s waits for the download", what)
+	}
+}
+
+func TestSourceJumpsAhead(t *testing.T) {
+	size := 3*chunkSize + 5000
+	// The download's second chunk never comes.
+	srv, data, holding := heldUpstream(t, size, chunkSize)
+	s, err := testProxy(srv, size).Open(context.Background(), testID, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	select {
+	case <-holding:
+	case <-time.After(5 * time.Second):
+		t.Fatal("the download didn't ask for its second chunk")
+	}
+	readAt := func(at int64) {
+		t.Helper()
+		if _, err := s.Seek(at, io.SeekStart); err != nil {
+			t.Fatal(err)
+		}
+		buf := make([]byte, 1000)
+		within(t, fmt.Sprint("the read at ", at), func() error {
+			if _, err := io.ReadFull(s, buf); err != nil {
+				return err
+			}
+			if !bytes.Equal(buf, data[at:at+1000]) {
+				return errors.New("other bytes")
+			}
+			return nil
+		})
+	}
+	// Far ahead, the download starts again there, and goes on to the end.
+	readAt(2*chunkSize + 100)
+	readAt(int64(size) - 1000)
+	// The first download stopped: what it left out comes when read.
+	readAt(chunkSize + 10)
+	if _, err := s.Seek(0, io.SeekStart); err != nil {
+		t.Fatal(err)
+	}
+	within(t, "reading it whole", func() error {
+		got, err := io.ReadAll(s)
+		if err == nil && !bytes.Equal(got, data) {
+			err = fmt.Errorf("%d other bytes of %d", len(got), size)
+		}
+		return err
+	})
+}
+
+func TestSourcePutKeepsSpansApart(t *testing.T) {
+	const size = 1000
+	rng := rand.New(rand.NewPCG(3, 4))
+	data := make([]byte, size)
+	for i := range data {
+		data[i] = byte(rng.Uint32())
+	}
+	for round := range 500 {
+		s := &Source{}
+		have := make([]bool, size)
+		for range 1 + rng.IntN(12) {
+			off := rng.IntN(size)
+			n := rng.IntN(min(size-off, 200) + 1)
+			s.put(int64(off), data[off:off+n])
+			for i := off; i < off+n; i++ {
+				have[i] = true
+			}
+		}
+		got := make([]bool, size)
+		for i, sp := range s.spans {
+			if len(sp.data) == 0 || (i > 0 && s.spans[i-1].end() >= sp.off) {
+				t.Fatalf("round %d: span %d at %d of %d bytes, after one ending at %d", round, i, sp.off, len(sp.data), s.spans[max(i-1, 0)].end())
+			}
+			if !bytes.Equal(sp.data, data[sp.off:sp.end()]) {
+				t.Fatalf("round %d: span %d holds other bytes", round, i)
+			}
+			for j := sp.off; j < sp.end(); j++ {
+				got[j] = true
+			}
+		}
+		if !slices.Equal(got, have) {
+			t.Fatalf("round %d: the spans hold other bytes than those put", round)
+		}
+		for off := range size {
+			end := off
+			for end < size && have[end] {
+				end++
+			}
+			if r := s.reach(int64(off)); r != int64(end) {
+				t.Fatalf("round %d: reach(%d) = %d, want %d", round, off, r, end)
+			}
+		}
 	}
 }

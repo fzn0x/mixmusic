@@ -241,17 +241,6 @@ func nextSignal(t *testing.T, ch <-chan testSignal, name string) testSignal {
 	}
 }
 
-func request(t *testing.T, got <-chan Request) Request {
-	t.Helper()
-	select {
-	case r := <-got:
-		return r
-	case <-time.After(5 * time.Second):
-		t.Fatal("no request")
-	}
-	return Request{}
-}
-
 func TestMPRIS(t *testing.T) {
 	b := newTestBus(t)
 	got := make(chan Request, requests)

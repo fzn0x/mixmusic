@@ -22,6 +22,10 @@ const chunkSize = 4 << 20
 // maxFailures is how many videos the proxy remembers the failure of.
 const maxFailures = 64
 
+// maxAvailableWait bounds how long the proxy waits for YouTube to serve a
+// stream yt-dlp found, which takes a few seconds.
+const maxAvailableWait = 30 * time.Second
+
 // Proxy serves the audio of YouTube videos at /yt/<video id>, fetching it
 // from YouTube in chunks. It answers range requests, so the audio element
 // that plays it can seek.
@@ -57,7 +61,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if p.Cache != nil && p.Cache.Serve(w, r, videoID) {
 		return
 	}
-	s, err := p.Resolver.Resolve(r.Context(), videoID)
+	s, err := p.resolve(r.Context(), videoID)
 	if err != nil {
 		p.fail(w, videoID, err)
 		return
@@ -80,7 +84,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	first, err := p.fetch(r.Context(), s, start, min(start+chunkSize-1, end))
 	if errors.Is(err, errExpired) {
 		p.Resolver.Forget(videoID)
-		if s, err = p.Resolver.Resolve(r.Context(), videoID); err == nil {
+		if s, err = p.resolve(r.Context(), videoID); err == nil {
 			first, err = p.fetch(r.Context(), s, start, min(start+chunkSize-1, end))
 		}
 	}
@@ -134,6 +138,25 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if capture != nil {
 		capture.Commit()
 	}
+}
+
+// resolve returns the stream of a video once YouTube serves it: it refuses
+// a URL for a few seconds after yt-dlp found it.
+func (p *Proxy) resolve(ctx context.Context, videoID string) (Stream, error) {
+	s, err := p.Resolver.Resolve(ctx, videoID)
+	if err != nil {
+		return s, err
+	}
+	if wait := time.Until(s.Available); wait > 0 {
+		t := time.NewTimer(min(wait, maxAvailableWait))
+		defer t.Stop()
+		select {
+		case <-t.C:
+		case <-ctx.Done():
+			return Stream{}, ctx.Err()
+		}
+	}
+	return s, nil
 }
 
 // Failure returns why the last request of a video's audio failed, in plain

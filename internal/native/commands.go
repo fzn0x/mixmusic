@@ -106,6 +106,47 @@ func init() {
 	for i, k := range letters {
 		keyNames[string(rune('A'+i))] = k
 	}
+	for name, k := range keyNames {
+		keyNameOf[k] = name
+	}
+}
+
+// keyNameOf names the keys of shortcuts.
+var keyNameOf = map[ui.Key]string{}
+
+// shortcutName writes keys pressed as a shortcut, as "Mod+Shift+L", or ""
+// for a key that has no name in shortcuts, as a modifier alone.
+func shortcutName(mods ui.Modifiers, key ui.Key) string {
+	name, ok := keyNameOf[key]
+	if !ok {
+		return ""
+	}
+	var parts []string
+	if mods&ui.Cmd != 0 {
+		parts = append(parts, "Mod")
+	}
+	// Control on macOS, where Mod is Cmd, and the Windows key elsewhere.
+	if mods&ui.Ctrl != 0 && ui.Cmd != ui.Ctrl {
+		parts = append(parts, "Ctrl")
+	}
+	if mods&ui.Alt != 0 {
+		parts = append(parts, "Alt")
+	}
+	if mods&ui.Shift != 0 {
+		parts = append(parts, "Shift")
+	}
+	if mods&ui.Super != 0 && ui.Cmd != ui.Super {
+		parts = append(parts, "Meta")
+	}
+	return strings.Join(append(parts, name), "+")
+}
+
+// sameShortcut tells whether two shortcuts are the same keys, however
+// written, as Mod+K and Ctrl+K off macOS.
+func sameShortcut(a, b string) bool {
+	am, ak, aok := parseShortcut(a)
+	bm, bk, bok := parseShortcut(b)
+	return aok == bok && am == bm && ak == bk
 }
 
 // parseShortcut reads a shortcut as "Mod+Shift+L": Mod is Ctrl, or Cmd on
@@ -155,8 +196,12 @@ func shortcutLabel(s string) string {
 	return r.Replace(strings.ReplaceAll(s, "Mod+", "Ctrl+"))
 }
 
-// shortcuts run the commands whose shortcuts were pressed.
+// shortcuts run the commands whose shortcuts were pressed, but while the
+// user records one, whose keys are the shortcut's instead.
 func (s *shell) runShortcuts(c *ui.Context) {
+	if s.recording != "" {
+		return
+	}
 	for _, cmd := range s.commands() {
 		if mods, key, ok := parseShortcut(s.shortcutOf(cmd)); ok && c.Shortcut(mods, key) {
 			cmd.run()

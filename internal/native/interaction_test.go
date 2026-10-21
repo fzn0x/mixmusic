@@ -2,6 +2,7 @@ package native
 
 import (
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 	"testing"
@@ -714,5 +715,76 @@ func TestDayChart(t *testing.T) {
 	second := slices.Index(texts, dayLabel(days[n-2].Date))
 	if first < 0 || second < first {
 		t.Errorf("the table doesn't list the days newest first: %q", texts)
+	}
+}
+
+// TestShortcutRecorder records a command's shortcut from the keys pressed,
+// which the command that had them gives up, removes one with Backspace,
+// keeps one with Escape, and puts every command's own back.
+func TestShortcutRecorder(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 4000)
+	show(s, tt, "/settings/shortcuts")
+	tt.Click("change the shortcut of Mute")
+	if s.recording != "player.mute" || !tt.Focused("cancel the shortcut of Mute") {
+		t.Fatalf("change doesn't record the keys: recording %q", s.recording)
+	}
+	// The palette's keys name the shortcut, rather than open it.
+	tt.Key(ui.Cmd, ui.KeyK)
+	if s.paletteOpen || s.recording != "" || s.set.Shortcuts["player.mute"] != "Mod+K" {
+		t.Fatalf("Mod+K while recording: palette %v, recording %q, shortcuts %v", s.paletteOpen, s.recording, s.set.Shortcuts)
+	}
+	if keys, ok := s.set.Shortcuts["view.palette"]; !ok || keys != "" || !tt.HasText("Command palette has no shortcut now") {
+		t.Errorf("the palette keeps its keys: %q, %v", keys, ok)
+	}
+	tt.Click("change the shortcut of Next track")
+	tt.Key(0, ui.KeyBackspace)
+	if keys, ok := s.set.Shortcuts["player.next"]; !ok || keys != "" {
+		t.Errorf("Backspace leaves the shortcut %q, %v", keys, ok)
+	}
+	tt.Click("change the shortcut of Volume up")
+	tt.Key(0, ui.KeyEscape)
+	if keys, ok := s.set.Shortcuts["player.volumeUp"]; ok || s.recording != "" {
+		t.Errorf("Escape changes the shortcut to %q, or records still: %q", keys, s.recording)
+	}
+	tt.Click("change the shortcut of Mute")
+	tt.Key(0, ui.KeyM)
+	if keys, ok := s.set.Shortcuts["player.mute"]; ok {
+		t.Errorf("the command's own keys stay the user's: %q", keys)
+	}
+	tt.Click("reset all")
+	if len(s.set.Shortcuts) != 0 || s.shortcutOf(command{id: "view.palette", shortcut: "Mod+K"}) != "Mod+K" {
+		t.Errorf("reset all leaves %v", s.set.Shortcuts)
+	}
+}
+
+// TestShortcutName writes the keys pressed as shortcuts are written.
+func TestShortcutName(t *testing.T) {
+	for _, c := range []struct {
+		mods ui.Modifiers
+		key  ui.Key
+		want string
+	}{
+		{0, ui.KeySpace, "Space"},
+		{ui.Cmd | ui.Shift, ui.KeyL, "Mod+Shift+L"},
+		{ui.Alt, ui.Key1, "Alt+1"},
+		{ui.Cmd, ui.KeyComma, "Mod+,"},
+		{ui.Shift, ui.KeyRight, "Shift+ArrowRight"},
+		{ui.Shift, ui.KeyUnknown, ""},
+	} {
+		if got := shortcutName(c.mods, c.key); got != c.want {
+			t.Errorf("shortcutName(%v, %v) = %q, want %q", c.mods, c.key, got, c.want)
+		}
+		if c.want != "" && !sameShortcut(shortcutName(c.mods, c.key), c.want) {
+			t.Errorf("%q isn't the same as itself", c.want)
+		}
+	}
+	// Mod is Ctrl, or Cmd on macOS.
+	written := "Ctrl+K"
+	if runtime.GOOS == "darwin" {
+		written = "Cmd+K"
+	}
+	if !sameShortcut("Mod+K", written) || sameShortcut("Mod+K", "Mod+J") {
+		t.Errorf("sameShortcut tells Mod+K from %s, or not from Mod+J", written)
 	}
 }

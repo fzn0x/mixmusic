@@ -151,11 +151,12 @@ type shell struct {
 	// installTotal bytes came of.
 	installing                bool
 	installDone, installTotal int64
-	// resetting asks to reset the settings; editingShortcut is the command
-	// whose shortcut the user writes, shortcutDraft what they wrote.
-	resetting       bool
-	editingShortcut string
-	shortcutDraft   string
+	// resetting asks to reset the settings; recording is the command whose
+	// shortcut the user presses the keys of, recordingFocused whether its
+	// button had the focus in the last frame.
+	resetting        bool
+	recording        string
+	recordingFocused bool
 	// offer is the new version the window offers, until the user answers;
 	// updating is set while it downloads, updated once it is installed.
 	offer                   *app.Release

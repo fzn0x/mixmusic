@@ -2,7 +2,6 @@ package native
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/egoist/mygo/ui"
@@ -65,43 +64,64 @@ func (s *shell) desktopSettings(c *ui.Context) {
 	}
 }
 
-// shortcutSettings list the commands and their keys, which the user can
-// change: a shortcut is written as "Mod+Shift+L", Mod being Ctrl, or Cmd on
-// macOS.
+// shortcutSettings list the commands and their keys, which the user
+// records by pressing them: Escape cancels, Backspace removes the
+// shortcut, and a command that had the keys gives them up.
 func (s *shell) shortcutSettings(c *ui.Context) {
 	k := &s.lk
 	groups := []string{}
 	byGroup := map[string][]command{}
+	palette := "the command palette"
 	for _, cmd := range s.commands() {
 		if _, ok := byGroup[cmd.group]; !ok {
 			groups = append(groups, cmd.group)
 		}
 		byGroup[cmd.group] = append(byGroup[cmd.group], cmd)
+		if keys := shortcutLabel(s.shortcutOf(cmd)); cmd.id == "view.palette" && keys != "" {
+			palette += ", " + keys + ","
+		}
 	}
+	ui.Row(c).Gap(24).AlignItems(ui.Center).Margin(0, 0, 32).Children(func() {
+		ui.Text(c, "Shortcuts of a single key work while you are not typing; "+palette+" lists every command, those of plugins too.").
+			FontSize(k.smallSize()).TextColor(k.muted).Grow(1).MinWidth(0).MaxWidth(640)
+		if len(s.set.Shortcuts) > 0 && s.link(c, "shortcuts-reset", "reset all") {
+			s.set.Shortcuts, s.recording = nil, ""
+			s.save()
+		}
+	})
 	for _, g := range groups {
 		s.group(c, g, func() {
 			for _, cmd := range byGroup[g] {
 				current := s.shortcutOf(cmd)
+				recording := s.recording == cmd.id
 				s.row(c, cmd.title, "", func() {
-					if s.editingShortcut == cmd.id {
-						in := ui.TextInput(c.Key("shortcut-"+cmd.id), &s.shortcutDraft).Width(180).AutoFocus().Label("Shortcut of " + cmd.title)
-						if in.Submitted() {
-							s.setShortcut(cmd, strings.TrimSpace(s.shortcutDraft))
+					label, ink, action := shortcutLabel(current), k.muted, "change"
+					switch {
+					case recording:
+						label, ink, action = "press the keys · esc cancels · backspace removes", k.accent, "cancel"
+					case label == "":
+						label, action = "none", "set"
+					}
+					ui.Text(c, label).FontSize(k.smallSize()).TextColor(ink).MinWidth(120).TextAlign(ui.End).AlignSelf(ui.Center)
+					b := s.button(c, "shortcut-edit-"+cmd.id, action, false).Label(action + " the shortcut of " + cmd.title)
+					if recording {
+						// The keys pressed name the shortcut rather than run
+						// commands, until the button loses the focus.
+						b.HandleInput(func(ev ui.InputEvent) bool { return s.recordKey(cmd, ev) })
+						if !b.Focused() && s.recordingFocused {
+							s.recording = ""
 						}
-						if s.button(c, "shortcut-cancel-"+cmd.id, "cancel", false).Clicked() {
-							s.editingShortcut = ""
+						s.recordingFocused = b.Focused()
+					}
+					if b.Clicked() {
+						s.recording, s.recordingFocused = "", false
+						if !recording {
+							s.recording = cmd.id
+							c.Announce("Press the keys of the shortcut of " + cmd.title + ". Escape cancels, Backspace removes it.")
 						}
-						return
 					}
-					label := shortcutLabel(current)
-					if label == "" {
-						label = "none"
-					}
-					ui.Text(c, label).FontSize(k.smallSize()).TextColor(k.muted).Width(120).TextAlign(ui.End)
-					if s.button(c, "shortcut-edit-"+cmd.id, "change", false).Clicked() {
-						s.editingShortcut, s.shortcutDraft = cmd.id, current
-					}
-					if _, custom := s.set.Shortcuts[cmd.id]; custom && s.button(c, "shortcut-reset-"+cmd.id, "reset", false).Clicked() {
+					if _, custom := s.set.Shortcuts[cmd.id]; custom && !recording &&
+						s.button(c, "shortcut-reset-"+cmd.id, "reset", false).Label("reset the shortcut of "+cmd.title).Clicked() {
 						delete(s.set.Shortcuts, cmd.id)
 						s.save()
 					}
@@ -111,26 +131,48 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 	}
 }
 
-// setShortcut gives a command a shortcut of the user's, "" for none.
-func (s *shell) setShortcut(cmd command, shortcut string) {
-	if shortcut != "" {
-		if _, _, ok := parseShortcut(shortcut); !ok {
-			s.notes = append(s.notes, noticeOf(errShortcut(shortcut)))
-			return
+// recordKey takes a key pressed as the user records cmd's shortcut; Tab
+// goes on, as the focus leaves.
+func (s *shell) recordKey(cmd command, ev ui.InputEvent) bool {
+	if ev.Kind != ui.InputKeyDown || ev.Key == ui.KeyTab {
+		return false
+	}
+	switch {
+	case ev.Repeat:
+	case ev.Key == ui.KeyEscape:
+		s.recording = ""
+	case ev.Key == ui.KeyBackspace || ev.Key == ui.KeyDelete:
+		s.setShortcut(cmd, "")
+	default:
+		// A modifier alone waits for its key.
+		if keys := shortcutName(ev.Mods, ev.Key); keys != "" {
+			s.setShortcut(cmd, keys)
 		}
 	}
+	return true
+}
+
+// setShortcut gives a command the keys of a shortcut, "" for none; a
+// command that had them gives them up.
+func (s *shell) setShortcut(cmd command, keys string) {
+	s.recording = ""
 	if s.set.Shortcuts == nil {
 		s.set.Shortcuts = map[string]string{}
 	}
-	s.set.Shortcuts[cmd.id] = shortcut
-	s.editingShortcut = ""
+	if keys != "" {
+		for _, other := range s.commands() {
+			if other.id != cmd.id && sameShortcut(s.shortcutOf(other), keys) {
+				s.set.Shortcuts[other.id] = ""
+				s.notes = append(s.notes, notice(other.title+" has no shortcut now"))
+			}
+		}
+	}
+	if sameShortcut(keys, cmd.shortcut) {
+		delete(s.set.Shortcuts, cmd.id)
+	} else {
+		s.set.Shortcuts[cmd.id] = keys
+	}
 	s.save()
-}
-
-type errShortcut string
-
-func (e errShortcut) Error() string {
-	return "“" + string(e) + "” isn't a shortcut: write one as Mod+K, Shift+ArrowRight or Alt+1"
 }
 
 // updateSettings check for new versions, and install them without asking.

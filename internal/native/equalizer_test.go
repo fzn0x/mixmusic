@@ -7,6 +7,24 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
+// TestEqualizerPreset names the preset of the bands, and Custom once they
+// are the user's own, as after a slider moved: the box was empty.
+func TestEqualizerPreset(t *testing.T) {
+	for _, c := range []struct{ preset, shows string }{
+		{"treble", "Treble boost"},
+		{"custom", "Custom"},
+		{"gone", "Custom"},
+	} {
+		s := newTestShell(t)
+		s.set.Equalizer.Preset = c.preset
+		tt := testerOf(t, s, 1280, 2400)
+		show(s, tt, "/settings/playback")
+		if !tt.HasText(c.shows) {
+			t.Errorf("with the preset %q, the box doesn't show %q", c.preset, c.shows)
+		}
+	}
+}
+
 // TestEqualizerSliders draws each band's slider, which SliderBase leaves to
 // its caller: a flat band shows its track and knob, and the accent fills
 // up from the middle for a boost, down for a cut.

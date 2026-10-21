@@ -19,6 +19,21 @@ const toggleDebounce = 400 * time.Millisecond
 // PlayAt plays the queue's entry at i from its start.
 func (p *Player) PlayAt(i int) { p.do(func() { p.playAt(i, 0, true) }) }
 
+// PlayID plays the entry of the queue that holds the track id, as a deep
+// link asks: a track the queue doesn't hold can't play from its ID alone,
+// which the player tells.
+func (p *Player) PlayID(id string) {
+	p.do(func() {
+		for i, it := range p.s.Queue {
+			if it.Track.ID == id {
+				p.playAt(i, 0, true)
+				return
+			}
+		}
+		p.notify(Notice{Message: "Open the track's album or playlist to play it"})
+	})
+}
+
 // Play plays, or the queue from its start when nothing is current.
 func (p *Player) Play() { p.do(p.play) }
 

@@ -91,12 +91,7 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 			}()
 		}
 	case CommandPlayTrack:
-		for i, it := range p.State().Queue {
-			if it.Track.ID == cmd.TrackID {
-				p.PlayAt(i)
-				return
-			}
-		}
+		p.PlayID(cmd.TrackID)
 	}
 }
 

@@ -476,6 +476,21 @@ func TestEnd(t *testing.T) {
 	h.wait("b playing", playing("b"))
 }
 
+// TestPlayID plays the entry of the queue a deep link names, and tells
+// why one the queue doesn't hold doesn't play.
+func TestPlayID(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.PlayID("yt:b")
+	h.wait("b playing", playing("b"))
+	h.p.PlayID("yt:z")
+	h.wait("the notice", func(*Player) bool {
+		n := h.notices()
+		return len(n) == 1 && strings.Contains(n[0].Message, "album or playlist")
+	})
+}
+
 func TestRepeatAllPrevious(t *testing.T) {
 	h := newHarness(t, Saved{})
 	h.p.PlayTracks(tracks("a", "b", "c"), 0)

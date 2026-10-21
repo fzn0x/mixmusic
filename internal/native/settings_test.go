@@ -1,0 +1,129 @@
+package native
+
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"slices"
+	"testing"
+	"time"
+
+	"github.com/fzn0x/mixmusic/internal/settings"
+)
+
+// TestSettingsViewed shows every section of the settings, in both of the
+// ways the themes go, and in each way Spotify plays: showing them changes
+// nothing.
+func TestSettingsViewed(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	for _, follow := range []bool{false, true} {
+		for _, mode := range []settings.SpotifyPlayback{settings.SpotifyPlaybackHere, settings.SpotifyPlaybackConnect, settings.SpotifyPlaybackMatch} {
+			st := s.svc.Preferences.Get()
+			st.FollowSystem, st.SpotifyPlayback, st.Accent = follow, mode, "#123456"
+			if _, err := s.svc.Preferences.Set(st); err != nil {
+				t.Fatal(err)
+			}
+			s.refresh()
+			before, _ := json.Marshal(s.svc.Preferences.Get())
+			for _, tab := range settingsTabs {
+				s.navigate("/settings/" + tab)
+				s.drain()
+				tt.Frame()
+				tt.Advance(time.Second)
+			}
+			if after, _ := json.Marshal(s.svc.Preferences.Get()); string(after) != string(before) {
+				t.Errorf("showing the settings changed them, following the computer %v, Spotify %s:\n%s\n%s", follow, mode, before, after)
+			}
+		}
+	}
+}
+
+// TestThemeOptionsViewed shows the options of each built-in theme: showing
+// them changes nothing.
+func TestThemeOptionsViewed(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 1800)
+	for _, theme := range []string{"mix", "aurora", "sakura", "terminal"} {
+		st := s.svc.Preferences.Get()
+		st.FollowSystem, st.Theme = false, theme
+		if _, err := s.svc.Preferences.Set(st); err != nil {
+			t.Fatal(err)
+		}
+		s.refresh()
+		before, _ := json.Marshal(s.svc.Preferences.Get())
+		show(s, tt, "/settings/appearance")
+		if !tt.HasText(theme + " options") {
+			t.Errorf("the settings don't show the options of %s", theme)
+		}
+		if after, _ := json.Marshal(s.svc.Preferences.Get()); string(after) != string(before) {
+			t.Errorf("showing the options of %s changed the settings:\n%s\n%s", theme, before, after)
+		}
+		show(s, tt, "/")
+	}
+}
+
+func TestAccentLink(t *testing.T) {
+	s := newTestShell(t)
+	st := s.svc.Preferences.Get()
+	st.Accent = "#ff0000"
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+	// The link is under the fold of a window of the usual size.
+	tt := testerOf(t, s, 1280, 1600)
+	show(s, tt, "/settings/appearance")
+	click(t, s, tt, "use the theme's")
+	if got := s.svc.Preferences.Get().Accent; got != "" {
+		t.Errorf("the theme's accent left the accent %q", got)
+	}
+}
+
+// TestPluginSettings enables a plugin, which asks first, disables it, and
+// removes it, which asks too.
+func TestPluginSettings(t *testing.T) {
+	s := newTestShell(t)
+	dir := filepath.Join(s.svc.System.Info().DataDir, "addons", "plugins", "hello")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for name, data := range map[string]string{
+		"plugin.json": `{"id": "hello", "name": "Hello", "version": "1.0.0", "author": "A", "main": "index.js", "permissions": ["playback"]}`,
+		"index.js":    "export default () => {}",
+	} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(data), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	s.svc.Addons.Reload()
+	s.refresh()
+	enabled := func() bool { return slices.Contains(s.svc.Preferences.Get().EnabledPlugins, "hello") }
+	tt := tester(t, s)
+	show(s, tt, "/settings/plugins")
+
+	click(t, s, tt, "Enable Hello")
+	if enabled() {
+		t.Fatal("the plugin was enabled without asking")
+	}
+	if !tt.HasText("It asks for: playback.") {
+		t.Errorf("the question doesn't tell what the plugin asks for: %q", tt.Texts())
+	}
+	click(t, s, tt, "Enable")
+	if !enabled() {
+		t.Fatal("the plugin wasn't enabled")
+	}
+	click(t, s, tt, "Enable Hello")
+	if enabled() {
+		t.Fatal("the plugin wasn't disabled")
+	}
+
+	click(t, s, tt, "Remove Hello")
+	if len(s.svc.Addons.List().Plugins) != 1 {
+		t.Fatal("the plugin was removed without asking")
+	}
+	click(t, s, tt, "Remove")
+	if n := len(s.svc.Addons.List().Plugins); n != 0 {
+		t.Errorf("%d plugins are left", n)
+	}
+}

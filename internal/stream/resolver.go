@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -63,6 +64,10 @@ type Stream struct {
 	// Bitrate is in kbit/s.
 	Bitrate float64
 	Expires time.Time
+	// Available is when YouTube starts serving the stream, a few seconds
+	// after yt-dlp found it: it refuses the URL until then. It is zero
+	// when yt-dlp did not tell.
+	Available time.Time
 }
 
 // Resolver finds streams and remembers them until they expire.
@@ -256,6 +261,7 @@ type info struct {
 	FilesizeApprox int64             `json:"filesize_approx"`
 	Duration       float64           `json:"duration"`
 	Headers        map[string]string `json:"http_headers"`
+	AvailableAt    float64           `json:"available_at"` // Unix seconds
 }
 
 // parseInfo reads the stream of yt-dlp's -J output.
@@ -279,6 +285,9 @@ func parseInfo(out []byte) (Stream, error) {
 	}
 	for k, v := range in.Headers {
 		s.Header.Set(k, v)
+	}
+	if in.AvailableAt > 0 {
+		s.Available = time.UnixMilli(int64(math.Round(in.AvailableAt * 1000)))
 	}
 	return s, nil
 }

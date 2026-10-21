@@ -262,6 +262,25 @@ func (e *Engine) Stop() {
 	}
 }
 
+// Unload silences the active deck and forgets its track, as the player
+// moves to a track it must find first, which may take a while or fail. A
+// track that Preload loaded stays, for Load to take.
+func (e *Engine) Unload() {
+	e.mu.Lock()
+	stale := []*deck{e.decks[e.active]}
+	e.decks[e.active] = nil
+	if e.fading {
+		// The track fading out goes too.
+		other := 1 - e.active
+		stale = append(stale, e.decks[other])
+		e.decks[other] = nil
+		e.fading = false
+	}
+	e.levels = [2]ramp{}
+	e.mu.Unlock()
+	closeDecks(stale)
+}
+
 // Seek moves the active deck to t.
 func (e *Engine) Seek(t time.Duration) {
 	e.mu.Lock()

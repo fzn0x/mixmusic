@@ -29,9 +29,7 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 			}
 			s.row(c, who, "Search, your library and playback of Spotify.", func() {
 				if s.button(c, "spotify-out", "sign out", false).Clicked() {
-					s.ask("Sign out of Spotify", "MixMusic forgets your Spotify sign-in.", "Sign out", func() {
-						s.account("", "", func(context.Context) error { return s.svc.Accounts.SpotifyLogout() })
-					})
+					s.signOutOfSpotify()
 				}
 			})
 			return
@@ -76,7 +74,7 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 		if busy {
 			label = "waiting for the browser…"
 		}
-		ui.Row(c).Padding(12, 0).Children(func() {
+		ui.Row(c).Gap(8).Padding(12, 0).Children(func() {
 			id := strings.TrimSpace(clientID.text)
 			if s.button(c, "spotify-in", label, true).Disabled(busy || id == "").Clicked() {
 				if id != s.set.SpotifyClientID {
@@ -89,8 +87,20 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 					return err
 				})
 			}
+			// A sign-in Spotify refused stays until the user drops it: every
+			// request of Spotify fails meanwhile.
+			if sp.SignedIn && s.button(c, "spotify-out", "sign out", false).Disabled(busy).Clicked() {
+				s.signOutOfSpotify()
+			}
 		})
 		s.hint(c, "Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.")
+	})
+}
+
+// signOutOfSpotify asks, then has MixMusic forget the Spotify sign-in.
+func (s *shell) signOutOfSpotify() {
+	s.ask("Sign out of Spotify", "MixMusic forgets your Spotify sign-in.", "Sign out", func() {
+		s.account("", "", func(context.Context) error { return s.svc.Accounts.SpotifyLogout() })
 	})
 }
 

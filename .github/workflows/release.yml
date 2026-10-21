@@ -136,6 +136,41 @@ jobs:
               jq 'del(.deltas)' update-darwin-universal.json > "update-darwin-$arch.json"
             done
           fi
+      - name: Every app finds its update
+        working-directory: release
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          v="${TAG#v}"
+          manifests=(update-*.json)
+          if [ "${#manifests[@]}" -eq 0 ]; then
+            echo "No update files: the build was not signed"
+            exit 0
+          fi
+          # The target of each archive, as darwin-universal, has a manifest
+          # of this version, which names files of this release.
+          for archive in mixmusic-"$v"-*.tar.gz; do
+            target="${archive#mixmusic-"$v"-}"
+            if [ ! -f "update-${target%.tar.gz}.json" ]; then
+              echo "$archive has no update-${target%.tar.gz}.json" >&2
+              exit 1
+            fi
+          done
+          base="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/"
+          for m in "${manifests[@]}"; do
+            if [ "$(jq -r .version "$m")" != "$v" ]; then
+              echo "$m is of version $(jq -r .version "$m"), not $v" >&2
+              exit 1
+            fi
+            for url in $(jq -r '.url, (.deltas // [])[].url' "$m"); do
+              file="${url#"$base"}"
+              if [ "$file" = "$url" ] || [ ! -f "$file" ]; then
+                echo "$m names $url, which this release does not have" >&2
+                exit 1
+              fi
+            done
+          done
+          ls update-*.json
       - name: Checksums
         working-directory: release
         run: |

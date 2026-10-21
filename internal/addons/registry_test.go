@@ -42,7 +42,7 @@ func TestInstallFromRegistry(t *testing.T) {
 		"plugins/hello/plugin.json": strings.Replace(pluginJSON, `"main"`, `"files": ["plugin.json", "index.js"], "main"`, 1),
 		"plugins/hello/index.js":    "export default () => {}",
 	})
-	m := NewManager(t.TempDir(), nil, "addons://localhost/")
+	m := NewManager(t.TempDir(), nil)
 	m.HTTP = srv.Client()
 	r, err := m.FetchRegistry(context.Background(), srv.URL+"/community/registry.json")
 	if err != nil {
@@ -76,7 +76,7 @@ func TestInstallRejectsMismatchedManifest(t *testing.T) {
 		"themes/ocean/theme.json": themeJSON("someone-else"),
 		"themes/ocean/theme.css":  "body{}",
 	})
-	m := NewManager(t.TempDir(), nil, "addons://localhost/")
+	m := NewManager(t.TempDir(), nil)
 	m.HTTP = srv.Client()
 	r, err := m.FetchRegistry(context.Background(), srv.URL+"/community/registry.json")
 	if err != nil {
@@ -91,7 +91,7 @@ func TestInstallRejectsMismatchedManifest(t *testing.T) {
 }
 
 func TestFetchRegistryNeedsHTTPS(t *testing.T) {
-	m := NewManager(t.TempDir(), nil, "")
+	m := NewManager(t.TempDir(), nil)
 	if _, err := m.FetchRegistry(context.Background(), "http://example.com/registry.json"); err == nil {
 		t.Error("fetched a registry over plain HTTP")
 	}

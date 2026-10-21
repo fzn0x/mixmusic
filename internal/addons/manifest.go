@@ -3,9 +3,9 @@
 // in the add-ons folder themselves.
 //
 // A theme is a folder with a theme.json manifest, which sets the colors,
-// fonts and shapes of the interface, and optionally a stylesheet. A plugin
-// is a folder with a plugin.json manifest and an ES module whose default
-// export the app calls with its plugin API.
+// fonts and corners of the interface. A plugin is a folder with a
+// plugin.json manifest and an ES module, whose default export MixMusic
+// calls with its plugin API.
 package addons
 
 import (
@@ -27,9 +27,6 @@ const (
 	KindTheme  Kind = "theme"
 	KindPlugin Kind = "plugin"
 )
-
-// Scheme is the scheme the app's pages load add-on files from.
-const Scheme = "addons"
 
 // ColorKeys are the colors a theme sets. Every theme sets them all, so
 // that any theme works with any version of the interface.
@@ -56,8 +53,8 @@ type Choice struct {
 	Label string `json:"label"`
 }
 
-// Option is a setting a theme offers, which pages see as the attribute
-// data-opt-<id> and the CSS variable --opt-<id> of the root element.
+// Option is a setting a theme offers, which the effects of the themes
+// MixMusic ships with follow.
 type Option struct {
 	ID      string     `json:"id"`
 	Label   string     `json:"label"`
@@ -67,15 +64,15 @@ type Option struct {
 	Min     float64    `json:"min,omitempty"`
 	Max     float64    `json:"max,omitempty"`
 	Step    float64    `json:"step,omitempty"`
-	// Unit is appended to range values in the CSS variable, as "px".
+	// Unit follows range values where the settings show them, as "px".
 	Unit string `json:"unit,omitempty"`
 }
 
-// Fonts are the font families of a theme, as CSS font-family lists.
+// Fonts are the font families of a theme, as CSS font-family lists, of
+// which the interface uses the first the computer has.
 type Fonts struct {
 	Body    string `json:"body,omitempty"`
 	Display string `json:"display,omitempty"`
-	Mono    string `json:"mono,omitempty"`
 }
 
 // Theme is the manifest of a theme, theme.json.
@@ -85,15 +82,12 @@ type Theme struct {
 	Version     string `json:"version"`
 	Author      string `json:"author"`
 	Description string `json:"description,omitempty"`
-	// Scheme is "dark" or "light": what form controls and scrollbars
-	// follow.
+	// Scheme is "dark" or "light": what the controls follow.
 	Scheme string            `json:"scheme"`
 	Colors map[string]string `json:"colors"`
 	Fonts  Fonts             `json:"fonts"`
 	// Radius is the corner radius of cards and buttons, as "12px".
-	Radius string `json:"radius,omitempty"`
-	// Styles is the theme's stylesheet, a file of its folder.
-	Styles  string   `json:"styles,omitempty"`
+	Radius  string   `json:"radius,omitempty"`
 	Preview string   `json:"preview,omitempty"`
 	Options []Option `json:"options"`
 	// Files lists the files of the theme, for the registry to install.
@@ -101,8 +95,6 @@ type Theme struct {
 
 	// Set by the app, not the manifest.
 	Builtin bool `json:"builtin"`
-	// BaseURL is where the pages load the theme's files from.
-	BaseURL string `json:"baseUrl"`
 }
 
 // Plugin is the manifest of a plugin, plugin.json.
@@ -114,16 +106,20 @@ type Plugin struct {
 	Description string `json:"description,omitempty"`
 	// Main is the plugin's ES module, a file of its folder.
 	Main string `json:"main"`
-	// Styles is an optional stylesheet the app loads with the plugin.
-	Styles string `json:"styles,omitempty"`
 	// Permissions tell users what the plugin does that they should know
 	// of, such as "network" or "notifications".
 	Permissions []string `json:"permissions,omitempty"`
 	Files       []string `json:"files,omitempty"`
+	// API is the version of the plugin API the plugin was written for:
+	// 2, that of MixMusic's own interface, or 1, the web interface's,
+	// which MixMusic no longer runs.
+	API int `json:"api,omitempty"`
 
-	Builtin bool   `json:"builtin"`
-	BaseURL string `json:"baseUrl"`
+	Builtin bool `json:"builtin"`
 }
+
+// PluginAPI is the version of the plugin API MixMusic runs.
+const PluginAPI = 2
 
 var (
 	versionRe = regexp.MustCompile(`^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$`)
@@ -168,16 +164,13 @@ func (t Theme) Validate() error {
 			errs = append(errs, fmt.Errorf("colors.%s is not a color themes set", key))
 		}
 	}
-	for name, f := range map[string]string{"body": t.Fonts.Body, "display": t.Fonts.Display, "mono": t.Fonts.Mono} {
+	for name, f := range map[string]string{"body": t.Fonts.Body, "display": t.Fonts.Display} {
 		if f != "" && !fontRe.MatchString(f) {
 			errs = append(errs, fmt.Errorf("fonts.%s must be a font-family list", name))
 		}
 	}
 	if t.Radius != "" && !lengthRe.MatchString(t.Radius) {
 		errs = append(errs, errors.New(`radius must be a length, as "12px"`))
-	}
-	if t.Styles != "" && (!ValidFile(t.Styles) || !strings.HasSuffix(t.Styles, ".css")) {
-		errs = append(errs, errors.New("styles must be a .css file of the theme"))
 	}
 	if t.Preview != "" && !ValidFile(t.Preview) {
 		errs = append(errs, errors.New("preview must be a file of the theme"))
@@ -192,7 +185,7 @@ func (t Theme) Validate() error {
 		}
 		seen[o.ID] = true
 	}
-	errs = append(errs, validateFiles(t.Files, "theme.json", t.Styles, t.Preview))
+	errs = append(errs, validateFiles(t.Files, "theme.json", t.Preview))
 	return errors.Join(errs...)
 }
 
@@ -250,15 +243,15 @@ func (p Plugin) Validate() error {
 	if !ValidFile(p.Main) || !strings.HasSuffix(p.Main, ".js") {
 		errs = append(errs, errors.New("main must be a .js file of the plugin"))
 	}
-	if p.Styles != "" && (!ValidFile(p.Styles) || !strings.HasSuffix(p.Styles, ".css")) {
-		errs = append(errs, errors.New("styles must be a .css file of the plugin"))
-	}
 	for _, perm := range p.Permissions {
 		if !slices.Contains(permissions, perm) {
 			errs = append(errs, fmt.Errorf("permission %q is unknown; known ones: %s", perm, strings.Join(permissions, ", ")))
 		}
 	}
-	errs = append(errs, validateFiles(p.Files, "plugin.json", p.Main, p.Styles))
+	errs = append(errs, validateFiles(p.Files, "plugin.json", p.Main))
+	if p.API < 0 || p.API > PluginAPI {
+		errs = append(errs, fmt.Errorf("api %d is unknown: MixMusic runs plugins of api %d", p.API, PluginAPI))
+	}
 	return errors.Join(errs...)
 }
 

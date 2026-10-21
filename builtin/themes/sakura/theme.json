@@ -29,7 +29,6 @@
     "display": "Georgia, 'Noto Serif', 'DejaVu Serif', serif"
   },
   "radius": "20px",
-  "styles": "theme.css",
   "options": [
     {
       "id": "petals",

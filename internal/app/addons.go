@@ -1,13 +1,22 @@
 package app
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"io"
+	"io/fs"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // registryTTL is how long a fetched registry is reused.
@@ -32,7 +41,7 @@ func (s *Addons) List() addons.Inventory { return s.a.addons.List() }
 // folder, and tells every window.
 func (s *Addons) Reload() addons.Inventory {
 	inv := s.a.addons.List()
-	AddonsChanged.Broadcast(inv)
+	notify()
 	return inv
 }
 
@@ -80,6 +89,49 @@ func (s *Addons) OpenFolder(kind addons.Kind) error {
 		return err
 	}
 	return mygo.Shell.OpenPath(dir)
+}
+
+// AddonFiles returns the files of an add-on, for the native interface's
+// plugins.
+func (a *App) AddonFiles(kind addons.Kind, id string) (fs.FS, error) { return a.addons.Files(kind, id) }
+
+// ReadCommunityFrom has the marketplace read the community registry, and
+// the files of the add-ons it lists, from dir, a copy of the repository's
+// community folder, instead of from GitHub: for screenshots of add-ons not
+// published yet. Call it before the marketplace opens.
+func (a *App) ReadCommunityFrom(dir string) {
+	a.addons.HTTP.Transport = communityDir(dir)
+}
+
+// communityDir answers the requests for the community folder on GitHub
+// from a folder on disk, and passes the others on.
+type communityDir string
+
+func (d communityDir) RoundTrip(r *http.Request) (*http.Response, error) {
+	base := settings.DefaultRegistryURL[:strings.LastIndex(settings.DefaultRegistryURL, "/")+1]
+	name, ok := strings.CutPrefix(r.URL.String(), base)
+	if !ok {
+		return http.DefaultTransport.RoundTrip(r)
+	}
+	if !filepath.IsLocal(filepath.FromSlash(name)) {
+		return nil, fmt.Errorf("not a file of the community folder: %s", name)
+	}
+	data, err := os.ReadFile(filepath.Join(string(d), filepath.FromSlash(name)))
+	status := http.StatusOK
+	if err != nil {
+		status, data = http.StatusNotFound, nil
+	}
+	return &http.Response{
+		Status:        http.StatusText(status),
+		StatusCode:    status,
+		Proto:         "HTTP/1.1",
+		ProtoMajor:    1,
+		ProtoMinor:    1,
+		Header:        http.Header{},
+		Body:          io.NopCloser(bytes.NewReader(data)),
+		ContentLength: int64(len(data)),
+		Request:       r,
+	}, nil
 }
 
 // Storage returns every value a plugin keeps.

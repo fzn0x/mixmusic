@@ -23,9 +23,9 @@ tracks of both, and one library keeps liked songs and playlists that hold
 tracks of either service. Its whole look is a theme, and the community adds
 themes and plugins to it from a shared registry.
 
-It is a single small Go program built on [MyGo](https://github.com/egoist/mygo):
-the interface is a web page in the system's own webview, so there is no
-bundled browser to download or keep in memory.
+It is a single small Go program built on [MyGo](https://github.com/egoist/mygo),
+which draws its windows itself, on the GPU: there is no browser inside to
+download or keep in memory.
 
 ## Features
 
@@ -52,9 +52,9 @@ bundled browser to download or keep in memory.
 - **A real player.** Crossfade, volume levelling, a 10-band equalizer with
   presets, a visualizer, synced lyrics that follow the song or read as plain
   text, and an offline cache of tracks you played.
-- **At home on the desktop.** Media keys and the system's media controls,
-  tray controls, notifications of new tracks, a mini player that stays on
-  top, start at login, and `mixmusic://` links.
+- **At home on the desktop.** Media keys, the system's media controls on
+  macOS and Linux, tray controls, notifications of new tracks, a mini player
+  that stays on top, start at login, and `mixmusic://` links.
 - **Scrobbling and Discord.** Connect Last.fm and every track you hear
   joins your profile there, with scrobbles made offline sent once you are
   back. Your Discord profile shows what plays, with its artwork and the
@@ -67,11 +67,11 @@ bundled browser to download or keep in memory.
 - **Keyboard first.** Shortcuts for everything common, a key of your own for
   any command, plugins' too, and a command palette
   (<kbd>Ctrl</kbd> <kbd>K</kbd>) for the rest.
-- **Themes.** Six built in, options per theme, a theme for the computer's
-  light mode and one for its dark mode, an accent taken from the artwork
-  playing, your own CSS, and community themes one click away.
+- **Themes.** Six built in, with effects you tune, a theme for the
+  computer's light mode and one for its dark mode, an accent of your own or
+  taken from the artwork playing, and community themes one click away.
 - **Plugins.** Small ES modules that add pages, commands, track actions and
-  widgets through a typed API.
+  widgets through a typed API, drawn in your theme.
 
 ## Install
 
@@ -111,26 +111,27 @@ AppImage executable (`chmod +x`) and open it.
   ```sh
   xattr -dr com.apple.quarantine /Applications/MixMusic.app
   ```
-- **Windows:** the WebView2 Runtime, which Windows 11 includes. The
-  installer is not signed yet, so SmartScreen may warn about it: choose
+- **Windows:** nothing more. Signing in to YouTube Music and playing
+  Spotify in MixMusic take the WebView2 Runtime, which Windows 11 includes.
+  The installer is not signed yet, so SmartScreen may warn about it: choose
   More info, then Run anyway.
-- **Linux:** GTK 3, WebKitGTK 4.1 and the GStreamer plugins that play Opus
-  and AAC audio. On Debian and Ubuntu:
+- **Linux:** GTK 3, and PulseAudio, which PipeWire serves too, or ALSA.
+  Signing in to YouTube Music takes WebKitGTK 4.1. On Debian and Ubuntu:
 
   ```sh
-  sudo apt install libwebkit2gtk-4.1-0 gstreamer1.0-plugins-good gstreamer1.0-libav libayatana-appindicator3-1 libsecret-1-0
+  sudo apt install libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0 libayatana-appindicator3-1 libsecret-1-0
   ```
 
   On Fedora:
 
   ```sh
-  sudo dnf install webkit2gtk4.1 gstreamer1-plugins-good gstreamer1-plugin-libav libayatana-appindicator-gtk3 libsecret
+  sudo dnf install gtk3 pulseaudio-libs webkit2gtk4.1 libayatana-appindicator-gtk3 libsecret
   ```
 
   The tray icon needs `libayatana-appindicator3`, and keeping your sign-ins
   in the system's keyring needs `libsecret`. The `.deb` and the `.rpm`
   install both; MixMusic works without either. The AppImage holds MixMusic
-  alone, and uses the system's GTK and WebKitGTK like the other downloads.
+  alone, and uses the system's libraries like the other downloads.
 - **To play YouTube Music:** [yt-dlp](https://github.com/yt-dlp/yt-dlp), which
   MixMusic installs for you from Settings › Playback and keeps up to date,
   and a JavaScript runtime yt-dlp uses for YouTube: [Deno](https://deno.com),
@@ -174,8 +175,8 @@ application ID there. The Discord app has to be running.
 
 ## Make it yours
 
-- [Themes](docs/themes.md): the tokens, options and hooks themes style, and how
-  to make one.
+- [Themes](docs/themes.md): the colors, fonts and corners a theme sets, and
+  how to make one.
 - [Plugins](docs/plugins.md): the plugin API, with the
   [types](sdk/index.d.ts) for your editor.
 - [Share them](community/README.md): add yours to the community registry, and
@@ -208,16 +209,16 @@ time it starts.
   be secure". Google decides this; try again later, or from another
   network.
 - **Spotify plays from YouTube Music, not in MixMusic.** Spotify plays in
-  MixMusic with Premium, and with a sign-in made since MixMusic played
-  Spotify itself: Settings › Playback asks you to sign in again when yours
-  is older, and says when your system's webview cannot play Spotify.
+  MixMusic on Windows, with Premium, and with a sign-in made since MixMusic
+  played Spotify itself: Settings › Playback asks you to sign in again when
+  yours is older.
 - **Spotify says the app is not allowed.** In development mode a Spotify
   app serves only the users its owner added in the dashboard, by their
   Spotify email: see [docs/spotify.md](docs/spotify.md).
 - **No tray icon on Linux.** The tray needs `libayatana-appindicator3` and a
   desktop that shows AppIndicator icons; GNOME needs its AppIndicator
   extension. Without it, closing the window quits MixMusic.
-- **Linux does not start it.** Install GTK 3 and WebKitGTK 4.1, as above.
+- **Linux does not start it.** Install GTK 3, as above.
 - **macOS cannot check the app,** as it is not notarized yet: open it from
   System Settings › Privacy & Security › Open Anyway.
 
@@ -230,9 +231,11 @@ time it starts.
 - YouTube Music has no sign-in for other apps: MixMusic signs in with a
   browser session, which can do with your account what YouTube Music can.
   Treat it like a password; sign out in Settings › Accounts to delete it.
-- Spotify plays in MixMusic itself only where the system's webview plays
-  its protected audio: WebView2 on Windows does, WebKitGTK on Linux does not,
+- Spotify plays in MixMusic itself only on Windows, whose webview,
+  WebView2, plays Spotify's protected audio: WebKitGTK on Linux does not,
   and macOS's is not known to. Elsewhere, Spotify Connect plays it.
+- On Windows, the system's media controls do not show what MixMusic plays;
+  the media keys work.
 - Spotify allows apps in development mode a few users, and lets them read
   less: search shows ten results of each kind, and the tracks of playlists
   you do not own stay hidden.
@@ -276,16 +279,17 @@ its sign-in.
 
 ## Develop
 
-You need [Go](https://go.dev/dl/) 1.27 or later and [Bun](https://bun.sh) 1.2 or later.
+You need [Go](https://go.dev/dl/) 1.27 or later and [Bun](https://bun.sh) 1.2 or later,
+which runs MyGo's command line.
 
 ```sh
 bun install
-bun run dev        # the app, rebuilt as you edit Go, the frontend live
+bun run dev        # the app, rebuilt as you edit it
 ```
 
 ```sh
-go test ./...                  # the Go side
-bun run typecheck              # the frontend
+go test ./...                  # the app
+bun run typecheck              # the plugin SDK and the community's plugins
 bun run build                  # the packaged app of this system, in build/
 bun run build -- -platform windows/amd64,linux/amd64,linux/arm64
 go run ./tools/registry -check # the community registry
@@ -299,10 +303,14 @@ MyGo needs no C toolchain, so any machine builds MixMusic for every system.
 
 ```
 main.go              the app: windows, the tray, media keys, deep links
-internal/app         the services the interface calls, and the desktop integration
+internal/native      the windows: the pages, the player bar, the mini player
+internal/app         the services the windows call, and the desktop integration
+internal/player      the queue, played by the audio engine or on Spotify's devices
+internal/audio       MixMusic's audio engine, and the system's audio output
+internal/plugins     plugins, each in a JavaScript engine of its own
 internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
-internal/stream      audio streams, found by yt-dlp and served to the player
+internal/stream      audio streams, found by yt-dlp and opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
 internal/lyrics      synced lyrics
 internal/library     liked songs, mixes, history and stats
@@ -311,7 +319,7 @@ internal/discord     what plays, on your Discord profile
 internal/diag        the log, without secrets, and the reports of crashes
 internal/addons      themes and plugins, and the community registry
 builtin/themes       the themes MixMusic ships with
-src/                 the interface: Preact, TypeScript and CSS
+public/              the page of Spotify's player, on Windows
 sdk/                 the types of the plugin API
 community/           community themes and plugins, and their registry
 ```
@@ -325,5 +333,5 @@ Music are trademarks of their owners.
 
 ## License
 
-[MIT](LICENSE). The Selawik typeface in `src/assets/fonts` is under the
-[SIL Open Font License](src/assets/fonts/OFL.txt).
+[MIT](LICENSE). The Selawik typeface in `internal/native/fonts` is under the
+[SIL Open Font License](internal/native/fonts/OFL.txt).

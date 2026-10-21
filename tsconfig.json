@@ -3,15 +3,18 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact",
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noFallthroughCasesInSwitch": true,
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "allowJs": true,
+    "checkJs": true,
+    "strict": false,
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "sdk"]
+  "include": [
+    "sdk",
+    "community/plugins"
+  ]
 }

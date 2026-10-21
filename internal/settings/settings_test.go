@@ -108,3 +108,42 @@ func TestDefaultSpotifyPlayback(t *testing.T) {
 		t.Errorf("Clean dropped playback here: %q", c.SpotifyPlayback)
 	}
 }
+
+// TestCleanCopies changes what Clean returned: the settings it cleaned
+// stay as they were.
+func TestCleanCopies(t *testing.T) {
+	s := Default()
+	s.ThemeOptions = map[string]map[string]string{"mix": {"texture": "dots"}}
+	s.Shortcuts = map[string]string{"player.toggle": "Space"}
+	s.EnabledPlugins = []string{"spectrum"}
+	c := s.Clean()
+	c.Equalizer.Gains[0] = 6
+	c.ThemeOptions["mix"]["texture"] = "none"
+	c.Shortcuts["player.toggle"] = "K"
+	c.EnabledPlugins[0] = "other"
+	if s.Equalizer.Gains[0] != 0 || s.ThemeOptions["mix"]["texture"] != "dots" || s.Shortcuts["player.toggle"] != "Space" || s.EnabledPlugins[0] != "spectrum" {
+		t.Errorf("changing the cleaned settings changed the settings: %v %v %v %v", s.Equalizer.Gains, s.ThemeOptions, s.Shortcuts, s.EnabledPlugins)
+	}
+}
+
+// TestRegistryURL moves settings off the web interface's registry, which
+// earlier versions kept as theirs.
+func TestRegistryURL(t *testing.T) {
+	if got := (Settings{RegistryURL: WebRegistryURL}).Clean().RegistryURL; got != DefaultRegistryURL {
+		t.Errorf("the web interface's registry became %q", got)
+	}
+	const own = "https://example.com/my-registry.json"
+	if got := (Settings{RegistryURL: own}).Clean().RegistryURL; got != own {
+		t.Errorf("a registry of the user's became %q", got)
+	}
+}
+
+// TestCleanPanel shows the queue for settings from before the panel, and
+// keeps the user's choice.
+func TestCleanPanel(t *testing.T) {
+	for in, want := range map[string]string{"": "queue", "bogus": "queue", "queue": "queue", "lyrics": "lyrics", "none": "none"} {
+		if got := (Settings{Panel: in}).Clean().Panel; got != want {
+			t.Errorf("Clean of the panel %q gives %q, not %q", in, got, want)
+		}
+	}
+}

@@ -1,11 +1,10 @@
 package app
 
 import (
-	"github.com/egoist/mygo"
+	"slices"
+	"sync"
 
-	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/media"
-	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // Repeat is the repeat mode of the queue.
@@ -17,8 +16,8 @@ const (
 	RepeatOne Repeat = "one"
 )
 
-// NowPlaying is what the player plays, as the main window reports it to
-// the mini player, the tray and notifications.
+// NowPlaying is what the player plays, as it reports it to the tray,
+// notifications, the system's media controls, Discord and Last.fm.
 type NowPlaying struct {
 	Track      *media.Track `json:"track"`
 	Playing    bool         `json:"playing"`
@@ -30,8 +29,8 @@ type NowPlaying struct {
 	Liked      bool         `json:"liked"`
 }
 
-// Command is something the player is asked to do from outside the main
-// window: the tray, media keys, the mini player, a deep link.
+// Command is something the player is asked to do from outside its
+// window: the tray, media keys, the system's media controls, a deep link.
 type Command string
 
 const (
@@ -57,18 +56,33 @@ type PlayerCommand struct {
 	TrackID string  `json:"trackId,omitempty"`
 }
 
-var (
-	// NowPlayingChanged tells every window what plays.
-	NowPlayingChanged = mygo.NewEvent[NowPlaying]("nowPlaying")
-	// PlayerCommandSent asks the main window's player to do something.
-	PlayerCommandSent = mygo.NewEvent[PlayerCommand]("playerCommand")
-	// SettingsChanged tells every window the new settings.
-	SettingsChanged = mygo.NewEvent[settings.Settings]("settingsChanged")
-	// AddonsChanged tells every window the add-ons changed.
-	AddonsChanged = mygo.NewEvent[addons.Inventory]("addonsChanged")
-	// AccountsChanged tells every window the user signed in or out.
-	AccountsChanged = mygo.NewEvent[AccountsStatus]("accountsChanged")
-	// NavigateRequested asks the main window to show a page, such as
-	// "/search?q=daft%20punk".
-	NavigateRequested = mygo.NewEvent[string]("navigate")
-)
+// watchers are told when the settings, the accounts, the add-ons or the
+// updates change: the windows read them again then.
+var watchers struct {
+	mu  sync.Mutex
+	fns []*func()
+}
+
+// notify tells the watchers the app's state changed.
+func notify() {
+	watchers.mu.Lock()
+	fns := watchers.fns
+	watchers.mu.Unlock()
+	for _, fn := range fns {
+		(*fn)()
+	}
+}
+
+// Watch has fn told, from any goroutine, when the settings, the accounts,
+// the add-ons or the updates change, until cancel.
+func (a *App) Watch(fn func()) (cancel func()) {
+	f := &fn
+	watchers.mu.Lock()
+	watchers.fns = append(slices.Clone(watchers.fns), f)
+	watchers.mu.Unlock()
+	return func() {
+		watchers.mu.Lock()
+		watchers.fns = slices.DeleteFunc(slices.Clone(watchers.fns), func(g *func()) bool { return g == f })
+		watchers.mu.Unlock()
+	}
+}

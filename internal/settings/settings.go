@@ -2,6 +2,7 @@
 package settings
 
 import (
+	"maps"
 	"regexp"
 	"runtime"
 	"slices"
@@ -23,6 +24,11 @@ const (
 	// Spotify Premium, and no Spotify app.
 	SpotifyPlaybackHere SpotifyPlayback = "here"
 )
+
+// NativeAudio reports whether MixMusic's audio engine plays on this
+// system: 64-bit Windows, macOS and Linux.
+const NativeAudio = (runtime.GOOS == "windows" || runtime.GOOS == "darwin" || runtime.GOOS == "linux") &&
+	(runtime.GOARCH == "amd64" || runtime.GOARCH == "arm64")
 
 // Density chooses how much room the interface gives each element.
 type Density string
@@ -69,12 +75,19 @@ type Settings struct {
 	Accent string `json:"accent"`
 	// DynamicAccent takes the accent color from the artwork playing.
 	DynamicAccent bool    `json:"dynamicAccent"`
-	CustomCSS     string  `json:"customCss"`
 	Density       Density `json:"density"`
 	// FontScale scales the text, from 0.85 to 1.3.
 	FontScale float64 `json:"fontScale"`
 	// SidebarCollapsed shows the sidebar as icons only.
 	SidebarCollapsed bool `json:"sidebarCollapsed"`
+	// Panel is the side panel beside the pages: "queue", "lyrics" or
+	// "none". Settings from before it show the queue.
+	Panel string `json:"panel"`
+	// LyricsPlain shows synchronized lyrics as plain text.
+	LyricsPlain bool `json:"lyricsPlain"`
+	// SkippedYTDLP is the release of yt-dlp the home page told of, which
+	// the user put off: it doesn't tell of it again.
+	SkippedYTDLP string `json:"skippedYtdlp"`
 
 	// Playback.
 	SpotifyPlayback SpotifyPlayback `json:"spotifyPlayback"`
@@ -131,7 +144,12 @@ type Settings struct {
 }
 
 // DefaultRegistryURL is the community registry in MixMusic's repository.
-const DefaultRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry.json"
+const DefaultRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry-2.json"
+
+// WebRegistryURL is the registry of the add-ons of the web interface,
+// which the versions of MixMusic before its own interface read, and kept
+// in their settings.
+const WebRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry.json"
 
 // Default returns the settings of a new install.
 func Default() Settings {
@@ -142,6 +160,7 @@ func Default() Settings {
 		ThemeOptions:    map[string]map[string]string{},
 		DynamicAccent:   true,
 		Density:         DensityComfortable,
+		Panel:           "queue",
 		FontScale:       1,
 		SpotifyPlayback: defaultSpotifyPlayback(runtime.GOOS),
 		Quality:         QualityBest,
@@ -197,7 +216,8 @@ func (s Settings) ActiveTheme(dark bool) string {
 }
 
 // Clean returns s with every value in its range, and the defaults in place
-// of values that are missing or invalid.
+// of values that are missing or invalid. Its maps and slices are its own,
+// which changing doesn't change s's.
 func (s Settings) Clean() Settings {
 	d := Default()
 	if !ValidID(s.Theme) {
@@ -209,11 +229,16 @@ func (s Settings) Clean() Settings {
 	if !ValidID(s.DarkTheme) {
 		s.DarkTheme = d.DarkTheme
 	}
-	if s.ThemeOptions == nil {
-		s.ThemeOptions = map[string]map[string]string{}
+	options := make(map[string]map[string]string, len(s.ThemeOptions))
+	for id, values := range s.ThemeOptions {
+		options[id] = maps.Clone(values)
 	}
+	s.ThemeOptions = options
 	if s.Accent != "" && !colorRe.MatchString(s.Accent) {
 		s.Accent = ""
+	}
+	if s.Panel != "lyrics" && s.Panel != "none" {
+		s.Panel = d.Panel
 	}
 	if s.Density != DensityCompact {
 		s.Density = DensityComfortable
@@ -233,6 +258,8 @@ func (s Settings) Clean() Settings {
 	s.Volume = min(max(s.Volume, 0), 1)
 	if len(s.Equalizer.Gains) != len(Bands) {
 		s.Equalizer.Gains = make([]float64, len(Bands))
+	} else {
+		s.Equalizer.Gains = slices.Clone(s.Equalizer.Gains)
 	}
 	for i, g := range s.Equalizer.Gains {
 		s.Equalizer.Gains[i] = min(max(g, -12), 12)
@@ -266,7 +293,7 @@ func (s Settings) Clean() Settings {
 		}
 	}
 	s.EnabledPlugins = plugins
-	if !strings.HasPrefix(s.RegistryURL, "https://") {
+	if !strings.HasPrefix(s.RegistryURL, "https://") || s.RegistryURL == WebRegistryURL {
 		s.RegistryURL = d.RegistryURL
 	}
 	return s

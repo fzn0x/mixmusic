@@ -107,13 +107,13 @@ func activityOf(t media.Track, start time.Time, durationMs int) *discord.Activit
 	if t.Album != nil {
 		a.LargeText = t.Album.Name
 	}
-	a.LargeImage = presenceArtwork(t.Artwork)
+	a.LargeImage = largeArtwork(t.Artwork)
 	return a
 }
 
-// presenceArtwork picks the artwork Discord shows: an https image of about
-// 512 pixels.
-func presenceArtwork(images []media.Image) string {
+// largeArtwork picks the artwork Discord and the system's media controls
+// show: an https image of about 512 pixels.
+func largeArtwork(images []media.Image) string {
 	best := ""
 	bestWidth := 0
 	for _, img := range images {

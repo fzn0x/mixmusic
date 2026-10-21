@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "baseUrl": "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/",
+  "baseUrl": "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/web/",
   "themes": [
     {
       "id": "neon-nights",

@@ -27,11 +27,9 @@
   },
   "fonts": {
     "body": "'JetBrains Mono', 'Cascadia Code', Consolas, 'DejaVu Sans Mono', ui-monospace, monospace",
-    "display": "'JetBrains Mono', 'Cascadia Code', Consolas, 'DejaVu Sans Mono', ui-monospace, monospace",
-    "mono": "'JetBrains Mono', 'Cascadia Code', Consolas, 'DejaVu Sans Mono', ui-monospace, monospace"
+    "display": "'JetBrains Mono', 'Cascadia Code', Consolas, 'DejaVu Sans Mono', ui-monospace, monospace"
   },
   "radius": "2px",
-  "styles": "theme.css",
   "options": [
     {
       "id": "scanlines",

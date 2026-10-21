@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>MixMusic's Spotify player</title>
+    <!--
+      MixMusic as a Spotify device of its own: Spotify's Web Playback SDK
+      plays Spotify tracks in this page, in a hidden window, with no Spotify
+      app open, and MixMusic shows among the user's Spotify devices while it
+      plays. It needs Spotify Premium, a sign-in that grants streaming, and a
+      webview that decrypts Spotify's audio, as WebView2 does on Windows.
+      The Go side (internal/app/spotifyhere.go) plays tracks on the device
+      through the Web API, and calls window.mm to follow and control it.
+    -->
+    <script>
+      (() => {
+        const SDK_URL = "https://sdk.scdn.co/spotify-player.js";
+        /** NAME is the device's name among the user's Spotify devices. */
+        const NAME = "MixMusic";
+        /** READY_MS is how long the player may take to connect. */
+        const READY_MS = 20000;
+
+        /** problems say in plain words why Spotify can't play here. */
+        const problems = {
+          initialization_error: "this computer's webview can't play Spotify's protected audio",
+          authentication_error: "sign in to Spotify again in Settings › Accounts, for MixMusic to play it itself",
+          account_error: "Spotify plays in MixMusic with Spotify Premium only",
+        };
+
+        let supported = null;
+        /** canPlay tells whether the webview decrypts Spotify's audio, with Widevine or PlayReady. */
+        const canPlay = () =>
+          (supported ??= (async () => {
+            if (!isSecureContext || !navigator.requestMediaKeySystemAccess) return false;
+            const config = [{ initDataTypes: ["cenc"], audioCapabilities: [{ contentType: 'audio/mp4; codecs="mp4a.40.2"' }] }];
+            for (const system of ["com.widevine.alpha", "com.microsoft.playready.recommendation", "com.microsoft.playready"]) {
+              try {
+                await (await navigator.requestMediaKeySystemAccess(system, config)).createMediaKeys();
+                return true;
+              } catch {
+                // The next one, then.
+              }
+            }
+            return false;
+          })());
+
+        let sdk = null;
+        /** loadSDK loads Spotify's script, once. */
+        const loadSDK = () =>
+          (sdk ??= new Promise((resolve, reject) => {
+            if (window.Spotify) return resolve();
+            window.onSpotifyWebPlaybackSDKReady = () => resolve();
+            const script = document.createElement("script");
+            script.src = SDK_URL;
+            script.async = true;
+            script.onerror = () => {
+              script.remove();
+              sdk = null;
+              reject(new Error("Spotify's player did not load: is MixMusic online?"));
+            };
+            document.head.append(script);
+          }));
+
+        let player = null;
+        let deviceID = null;
+        let problem = null;
+        let volume = 0.8;
+
+        async function open() {
+          if (problem) throw new Error(problem);
+          if (!(await canPlay())) throw new Error((problem = problems.initialization_error));
+          await loadSDK();
+          const p = new window.Spotify.Player({
+            name: NAME,
+            volume: volume * volume,
+            getOAuthToken: (done) => void mygo.call("SpotifyPage.Token").then(done, (err) => console.error("spotify: token:", err)),
+          });
+          player = p;
+          return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => reject(new Error("Spotify's player did not connect")), READY_MS);
+            for (const kind of ["initialization_error", "authentication_error", "account_error"]) {
+              p.addListener(kind, ({ message }) => {
+                console.error(`spotify: ${kind}: ${message}`);
+                problem = problems[kind] ?? message;
+                clearTimeout(timer);
+                reject(new Error(problem));
+                if (player === p) close();
+              });
+            }
+            p.addListener("playback_error", ({ message }) => console.error(`spotify: playback_error: ${message}`));
+            p.addListener("ready", ({ device_id }) => {
+              clearTimeout(timer);
+              if (player === p) deviceID = Promise.resolve(device_id);
+              resolve(device_id);
+            });
+            // Offline, the SDK connects again by itself, and tells when ready.
+            p.addListener("not_ready", ({ device_id }) => console.warn(`spotify: device ${device_id} went offline`));
+            p.connect().then(
+              (ok) => ok || reject(new Error("Spotify's player did not connect")),
+              (err) => reject(err instanceof Error ? err : new Error(String(err))),
+            );
+          });
+        }
+
+        /** close disconnects the player: MixMusic leaves the user's devices. */
+        function close() {
+          player?.disconnect();
+          player = null;
+          deviceID = null;
+        }
+
+        window.mm = {
+          /** supported tells whether the webview decrypts Spotify's audio. */
+          supported: canPlay,
+          /** device connects the player, once, and returns its device ID. */
+          device: () =>
+            (deviceID ??= open().catch((err) => {
+              close();
+              throw err;
+            })),
+          pause: async () => void (await player?.pause()),
+          resume: async () => void (await player?.resume()),
+          seek: async (positionMs) => void (await player?.seek(positionMs)),
+          async setVolume(v) {
+            volume = v;
+            // The curve of MixMusic's own player, so that both sound alike.
+            await player?.setVolume(v * v);
+          },
+          /** state is what the player plays, or null. */
+          async state() {
+            const s = await player?.getCurrentState();
+            if (!s) return null;
+            const t = s.track_window.current_track;
+            return {
+              playing: !s.paused,
+              progressMs: s.position,
+              // A relinked copy keeps the ID MixMusic asked for in linked_from.
+              track: t && {
+                id: `sp:${t.linked_from?.id ?? t.id}`,
+                title: t.name,
+                artists: t.artists.map((a) => ({ name: a.name })),
+                durationMs: t.duration_ms,
+              },
+            };
+          },
+          close,
+        };
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

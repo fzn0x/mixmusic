@@ -1,13 +1,11 @@
 # Themes
 
-A theme sets the colors, the typefaces and the corners of MixMusic, and may
-add a stylesheet and options the user tunes in Settings › Appearance. A theme
-is a folder:
+A theme sets the colors, the typefaces and the corners of MixMusic, which
+draws everything with them. A theme is a folder:
 
 ```
 my-theme/
-├── theme.json   the manifest: colors, fonts, radius, options
-├── theme.css    optional: the theme's own styles
+├── theme.json   the manifest: colors, fonts, radius
 └── preview.png  optional: an image for the marketplace
 ```
 
@@ -15,16 +13,14 @@ my-theme/
 
 1. In Settings › Appearance, choose **open themes folder**.
 2. Copy a theme there, for example
-   [community/themes/neon-nights](../community/themes/neon-nights), into a folder
+   [community/themes/paper-mint](../community/themes/paper-mint), into a folder
    named after its new `id`.
 3. Change `id`, `name` and `author`, then the colors.
 4. Run **Reload add-ons** from the command palette (<kbd>Ctrl</kbd> <kbd>K</kbd>)
    and pick the theme in Settings › Appearance. Themes that fail to load are
    listed there, with the reason.
 
-Every change to `theme.css` shows after a reload. Development builds
-(`bun run dev`) have the web inspector: right-click the window and choose
-Inspect to try styles live.
+Every change to `theme.json` shows after a reload.
 
 ## theme.json
 
@@ -58,13 +54,10 @@ Inspect to try styles live.
   },
   "fonts": {
     "body": "Selawik, 'Segoe UI', system-ui, sans-serif",
-    "display": "Selawik, 'Segoe UI', system-ui, sans-serif",
-    "mono": "'Cascadia Mono', ui-monospace, monospace"
+    "display": "Selawik, 'Segoe UI', system-ui, sans-serif"
   },
   "radius": "0px",
-  "styles": "theme.css",
-  "options": [],
-  "files": ["theme.json", "theme.css"]
+  "files": ["theme.json"]
 }
 ```
 
@@ -72,13 +65,11 @@ Inspect to try styles live.
 |---|---|
 | `id` | lowercase letters, digits and dashes; the folder's name |
 | `version` | a semantic version, as `1.2.0`; raise it with every change you publish |
-| `scheme` | `dark` or `light`: what form controls and scrollbars follow |
-| `colors` | every color below, as `#rgb`, `#rrggbb`, `rgb()`, `rgba()`, `hsl()`, `oklch()` or `transparent` |
-| `fonts` | CSS font-family lists; MixMusic ships `Selawik`, the others must be on the user's system |
-| `radius` | the corner radius of tiles, cards and buttons, as `12px` |
-| `styles` | the theme's stylesheet, a `.css` file of its folder |
+| `scheme` | `dark` or `light`: the controls MixMusic draws, such as switches and sliders, follow it |
+| `colors` | every color below, as `#rgb`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`, `hsl()`, `oklch()` or `transparent` |
+| `fonts` | font-family lists, of which MixMusic uses the first the computer has: `body` for text, `display` for titles and the large lowercase words (the body's when left out) |
+| `radius` | the corner radius of tiles and cards, as `12px`; smaller things round by 60% of it |
 | `preview` | an image of the theme, for the marketplace |
-| `options` | settings the user tunes, below |
 | `files` | every file of the theme: the registry installs exactly these |
 
 ### Colors
@@ -96,97 +87,26 @@ Inspect to try styles live.
 
 Keep text readable: `text-muted` on `bg`, `accent-text` on `accent` and
 `tile-text` on every tile need a contrast of at least 4.5:1. When the user
-lets the accent follow the artwork, MixMusic picks the accent and its ink
-itself, readable on your `bg`.
+picks an accent of their own, or lets it follow the artwork, MixMusic picks
+the accent's ink itself, and keeps the accent readable on your `bg`.
 
-## Options
+### Fonts
 
-Options are settings of the theme the user tunes. Each sets an attribute,
-`data-opt-<id>`, and a variable, `--opt-<id>`, on the root element, which
-`theme.css` styles with:
+MixMusic ships Selawik; other families must be on the user's computer, so
+end each list with a family every system has: `system-ui` or `sans-serif`
+for the system's font, `monospace` for its monospaced one.
 
-```json
-"options": [
-  { "id": "glow", "label": "Glow on live items", "type": "toggle", "default": "true" },
-  { "id": "density", "label": "Rows", "type": "select", "default": "airy",
-    "choices": [{ "value": "airy", "label": "Airy" }, { "value": "tight", "label": "Tight" }] },
-  { "id": "blur", "label": "Blur", "type": "range", "default": "12", "min": 0, "max": 40, "step": 2, "unit": "px" },
-  { "id": "tint", "label": "Tint", "type": "color", "default": "#7b5cff" }
-]
-```
+## Effects
 
-```css
-:root[data-opt-glow="true"] .mm-track[data-playing] {
-  box-shadow: 0 0 var(--opt-blur) var(--opt-tint);
-}
-```
+The themes MixMusic ships with add effects of their own, which MixMusic
+draws and the user tunes in Settings › Appearance: Mix's tile textures,
+Aurora's drifting lights and frosted glass, Sakura's petals, and Terminal's
+scanlines and glow. A theme of yours sets the tokens above, and MixMusic
+draws everything else with them.
 
-| Type | Value |
-|---|---|
-| `toggle` | `"true"` or `"false"` |
-| `select` | one of `choices`, whose values are lowercase letters, digits and dashes |
-| `range` | a number from `min` to `max`; the variable carries `unit` |
-| `color` | a color |
-
-## What themes style
-
-MixMusic draws everything from the `--mm-*` variables, so the colors and fonts
-of the manifest already restyle the whole interface. `theme.css` goes
-further, through these hooks, which stay stable from one version of MixMusic
-to the next.
-
-### Variables
-
-The colors above as `--mm-<name>`, plus:
-
-| Variable | |
-|---|---|
-| `--mm-font-body`, `--mm-font-display`, `--mm-font-mono` | the theme's fonts |
-| `--mm-radius`, `--mm-radius-sm` | corner radii |
-| `--mm-hover`, `--mm-press` | tints of hovered and pressed things |
-| `--mm-rule` | the accent hairline under section titles |
-| `--mm-outline` | the 2px outline of secondary buttons and inputs |
-| `--mm-scrim` | the veil behind dialogs and the command palette |
-| `--mm-size-poster`, `--mm-size-pivots`, `--mm-size-hero`, `--mm-size-title`, `--mm-size-pivot`, `--mm-size-subtitle`, `--mm-size-body`, `--mm-size-small`, `--mm-size-caption` | the type scale; the page word (`poster`), its pivots and the empty-state titles (`hero`) follow the width of the main pane |
-| `--mm-row`, `--mm-sidebar-width`, `--mm-queue-width`, `--mm-player-height`, `--mm-page-gutter` | measures of the shell |
-| `--mm-ease-out`, `--mm-ease-in-out`, `--mm-fast`, `--mm-medium`, `--mm-slow` | motion, all 0 when the user asks for reduced motion |
-
-### Attributes of the root element
-
-| Attribute | |
-|---|---|
-| `data-theme` | the theme's `id` |
-| `data-scheme` | `dark` or `light` |
-| `data-density` | `comfortable` or `compact` |
-| `data-sidebar` | `expanded` or `collapsed` |
-| `data-platform` | `windows` or `linux` |
-| `data-opt-*` | the theme's options |
-
-### Classes
-
-| Class | What it is |
-|---|---|
-| `.mm-app` | the whole window |
-| `.mm-sidebar`, `.mm-brand`, `.mm-nav`, `.mm-nav-item`, `.mm-nav-box` | the sidebar and its navigation; the current item has `aria-current="page"` |
-| `.mm-live` | the live tile of what plays, in the sidebar |
-| `.mm-topbar`, `.mm-search` | the top bar and the search box |
-| `.mm-main`, `.mm-page` | the main pane and the page in it |
-| `.mm-page-header`, `.mm-page-title`, `.mm-pivots`, `.mm-pivot` | the page's giant word and its pivots; the active pivot has `aria-selected="true"`. The word and the pivot row shrink to fit the pane by `--mm-fit` (1 is full size), and wrap with `data-wrap` when they would get too small |
-| `.mm-section`, `.mm-section-title`, `.mm-shelf`, `.mm-shelf-row` | sections and shelves |
-| `.mm-tile` (`[data-tone="1"]` … `"4"`), `.mm-tile-title`, `.mm-tile-caption` | flat tiles |
-| `.mm-art-tile`, `.mm-art-frame`, `.mm-artwork` | artwork of albums, playlists, artists and tracks |
-| `.mm-collection`, `.mm-collection-art` | the head of an album, playlist or artist page |
-| `.mm-tracklist`, `.mm-track` (`[data-playing]`), `.mm-track-title` | track lists, and the row of what plays |
-| `.mm-source` (`[data-source="spotify"]`, `"youtube"`, `"local"`) | the mark telling where a track comes from |
-| `.mm-panel`, `.mm-queue-row`, `.mm-lyrics`, `.mm-lyric` (`[data-state="now"]`, `"past"`) | the side panel, the queue and the lyrics |
-| `.mm-player`, `.mm-transport`, `.mm-round`, `.mm-progress`, `.mm-volume` | the player bar |
-| `.mm-now-sleeve`, `.mm-visualizer`, `.mm-widget` | the now playing page |
-| `.mm-button` (`-primary`, `-outline`), `.mm-icon-button`, `.mm-chip`, `.mm-switch`, `.mm-slider`, `.mm-input`, `.mm-select` | controls |
-| `.mm-menu`, `.mm-menu-item`, `.mm-dialog`, `.mm-toast`, `.mm-palette` | menus, dialogs, toasts and the command palette |
-| `.mm-mini` | the mini player window |
-
-Other classes and the page's structure may change between versions: style
-what this table lists.
+Themes made for the web interface of MixMusic 0.4 and before still load:
+MixMusic reads their colors, fonts and radius, and ignores their stylesheet
+and their options.
 
 ## Share it
 

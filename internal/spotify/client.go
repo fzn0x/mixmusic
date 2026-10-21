@@ -60,6 +60,10 @@ type Client struct {
 
 	mu    sync.Mutex
 	token Token
+	// refreshing is held while a request gets its token, so that one
+	// refreshes it and the others wait for the new one; mu is not held
+	// meanwhile, so that SignedIn and Granted never wait for Spotify.
+	refreshing sync.Mutex
 }
 
 // NewClient returns a client that refreshes tokens with auth.
@@ -99,23 +103,35 @@ func (c *Client) AccessToken(ctx context.Context) (string, error) {
 // accessToken returns a valid access token, refreshing it when it expires
 // or when force is set.
 func (c *Client) accessToken(ctx context.Context, force bool) (string, error) {
+	c.refreshing.Lock()
+	defer c.refreshing.Unlock()
 	c.mu.Lock()
-	defer c.mu.Unlock()
-	if c.token.AccessToken == "" && c.token.RefreshToken == "" {
+	old := c.token
+	c.mu.Unlock()
+	if old.AccessToken == "" && old.RefreshToken == "" {
 		return "", ErrNotSignedIn
 	}
-	if c.token.Valid() && !force {
-		return c.token.AccessToken, nil
+	if old.Valid() && !force {
+		return old.AccessToken, nil
 	}
-	if c.token.RefreshToken == "" {
+	if old.RefreshToken == "" {
 		return "", ErrSignInExpired
 	}
-	t, err := c.Auth.Refresh(ctx, c.token.RefreshToken)
+	t, err := c.Auth.Refresh(ctx, old.RefreshToken)
 	if err != nil {
 		return "", err
 	}
 	if t.Scope == "" {
-		t.Scope = c.token.Scope // a refresh keeps the scopes granted
+		t.Scope = old.Scope // a refresh keeps the scopes granted
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.token.RefreshToken != old.RefreshToken {
+		// The user signed out, or in again, while it refreshed: that stands.
+		if c.token.AccessToken == "" {
+			return "", ErrNotSignedIn
+		}
+		return c.token.AccessToken, nil
 	}
 	c.token = t
 	if c.OnToken != nil {

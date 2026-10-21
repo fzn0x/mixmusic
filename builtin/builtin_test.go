@@ -8,7 +8,7 @@ import (
 
 // TestThemesAreValid loads the built-in themes as the app does.
 func TestThemesAreValid(t *testing.T) {
-	inv := addons.NewManager("", FS, "addons://localhost/").List()
+	inv := addons.NewManager("", FS).List()
 	for _, p := range inv.Problems {
 		t.Errorf("%s %s: %s", p.Kind, p.Folder, p.Error)
 	}

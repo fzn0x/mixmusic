@@ -13,13 +13,13 @@ const validTheme = `{
 		"tile-1": "#00bde3", "tile-2": "#e6007e", "tile-3": "#a4e600", "tile-4": "#ffb000", "tile-text": "#000"},
 	"fonts": {"body": "Inter, system-ui, sans-serif"},
 	"radius": "12px",
-	"styles": "theme.css",
+	"preview": "preview.png",
 	"options": [
 		{"id": "glass", "label": "Frosted panels", "type": "toggle", "default": "true"},
 		{"id": "layout", "label": "Layout", "type": "select", "default": "wide", "choices": [{"value": "wide", "label": "Wide"}, {"value": "narrow", "label": "Narrow"}]},
 		{"id": "blur", "label": "Blur", "type": "range", "default": "12", "min": 0, "max": 40, "unit": "px"}
 	],
-	"files": ["theme.json", "theme.css"]
+	"files": ["theme.json", "preview.png"]
 }`
 
 func TestParseThemeValid(t *testing.T) {
@@ -38,8 +38,8 @@ func TestParseThemeRejects(t *testing.T) {
 		"missing color":    {`"spotify": "#1db954"`, `"spotifyy": "#1db954"`},
 		"css injection":    {`"bg": "#000"`, `"bg": "#000; } body { display: none"`},
 		"bad font":         {`"Inter, system-ui, sans-serif"`, `"Inter; } * { color: red"`},
-		"styles escape":    {`"styles": "theme.css"`, `"styles": "../../theme.css"`},
-		"unlisted styles":  {`"files": ["theme.json", "theme.css"]`, `"files": ["theme.json"]`},
+		"preview escape":   {`"preview": "preview.png"`, `"preview": "../../preview.png"`},
+		"unlisted preview": {`"files": ["theme.json", "preview.png"]`, `"files": ["theme.json"]`},
 		"bad option type":  {`"type": "toggle"`, `"type": "slider"`},
 		"default not in":   {`"default": "wide"`, `"default": "huge"`},
 		"bad version":      {`"version": "1.0.0"`, `"version": "v1"`},

@@ -86,18 +86,62 @@ type AccountsStatus struct {
 // Accounts signs the user in and out of their music services.
 type Accounts struct{ a *App }
 
-// Status returns the state of the user's accounts.
+// Status returns the state of the user's accounts at once, without asking
+// the services: whether the user is signed in, and the profiles read
+// before. The main window waits for it before it shows anything, so the
+// profiles not read yet are read in the background, and AccountsChanged
+// brings them to every window.
 func (s *Accounts) Status(ctx context.Context) AccountsStatus {
-	return s.a.accountsStatus(ctx)
+	return s.a.knownAccountsStatus()
 }
 
-func (a *App) accountsStatus(ctx context.Context) AccountsStatus {
-	sp := SpotifyAccount{
+// knownAccountsStatus is the state of the accounts as MixMusic knows it,
+// without asking the services; it has the profiles it lacks read in the
+// background.
+func (a *App) knownAccountsStatus() AccountsStatus {
+	a.mu.Lock()
+	spotifyMe, youtubeMe := a.spotifyMe, a.youtubeMe
+	a.mu.Unlock()
+	status := AccountsStatus{
+		Spotify: a.spotifyAccount(),
+		YouTube: YouTubeAccount{SignedIn: a.youtube.SignedIn(), Account: youtubeMe},
+		Lastfm:  a.lastfmAccount(),
+	}
+	status.Spotify.Profile = spotifyMe
+	if status.Spotify.SignedIn && spotifyMe == nil || status.YouTube.SignedIn && youtubeMe == nil {
+		a.readProfiles()
+	}
+	return status
+}
+
+// readProfiles reads the profiles of the accounts in the background, one
+// reading at a time, and tells every window the accounts' state once read.
+func (a *App) readProfiles() {
+	if !a.readingProfiles.CompareAndSwap(false, true) {
+		return
+	}
+	go func() {
+		defer a.readingProfiles.Store(false)
+		// Reading the status reads the profiles, and keeps them.
+		a.accountsStatus(context.Background())
+		notify()
+	}()
+}
+
+// spotifyAccount is the state of the Spotify account, without its profile.
+func (a *App) spotifyAccount() SpotifyAccount {
+	return SpotifyAccount{
 		Configured:  a.auth.ClientID() != "",
 		SignedIn:    a.spotify.SignedIn(),
 		RedirectURI: spotify.RedirectURI,
 		Streaming:   a.spotify.Granted("streaming"),
 	}
+}
+
+// accountsStatus is the state of the accounts with their profiles, which it
+// asks the services for when it has not read them yet.
+func (a *App) accountsStatus(ctx context.Context) AccountsStatus {
+	sp := a.spotifyAccount()
 	if sp.SignedIn {
 		me, err := a.spotifyProfile(ctx)
 		if err != nil {
@@ -155,6 +199,8 @@ func (s *Accounts) SpotifyLogin(ctx context.Context) (AccountsStatus, error) {
 	s.a.mu.Lock()
 	s.a.spotifyMe = nil
 	s.a.mu.Unlock()
+	// MixMusic's own device connects again, with the new sign-in.
+	s.a.here.close()
 	if err := s.a.tokens.Save(t); err != nil {
 		return AccountsStatus{}, err
 	}
@@ -162,7 +208,7 @@ func (s *Accounts) SpotifyLogin(ctx context.Context) (AccountsStatus, error) {
 		w.Show() // back from the browser
 	}
 	status := s.a.accountsStatus(ctx)
-	AccountsChanged.Broadcast(status)
+	notify()
 	return status, nil
 }
 
@@ -173,10 +219,11 @@ func (s *Accounts) SpotifyLogout() error {
 
 func (a *App) signOutSpotify() error {
 	a.spotify.SetToken(spotify.Token{})
+	a.here.close()
 	a.mu.Lock()
 	a.spotifyMe = nil
 	a.mu.Unlock()
 	err := a.tokens.Clear()
-	AccountsChanged.Broadcast(a.accountsStatus(context.Background()))
+	notify()
 	return err
 }

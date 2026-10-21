@@ -1,4 +1,4 @@
 {
-  "prompt": "Origin: a real screenshot, not generated. Captured on 2026-10-19 from the MixMusic 0.1.0 Windows build (build/windows-amd64/MixMusic.exe) with PrintWindow at 125% webview zoom, from a throwaway profile holding a demo library of real YouTube Music tracks, then converted to WebP with ffmpeg. View: nowplaying.",
-  "createdAt": "2026-10-19T07:40:39.829Z"
+  "prompt": "Origin: a real screenshot, not generated. Captured on 2026-10-21 from a Windows build of the native-ui branch, ahead of the release after 0.4.0 (MixMusic Test.exe), by MixMusic's capture mode at 1536x900 (MIXMUSIC_CAPTURE, with MIXMUSIC_SILENT, so that what played went to no device), from a throwaway profile holding a demo library of real YouTube Music tracks, then converted to WebP with ffmpeg. View: now playing, with the lyrics panel open.",
+  "createdAt": "2026-10-21T11:06:17.572Z"
 }

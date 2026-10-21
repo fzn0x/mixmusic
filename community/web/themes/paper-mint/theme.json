@@ -1,0 +1,31 @@
+{
+  "id": "paper-mint",
+  "name": "Paper Mint",
+  "version": "1.0.0",
+  "author": "MixMusic community",
+  "description": "A quiet light theme: graphite ink, mint and coral tiles, rounded corners.",
+  "scheme": "light",
+  "colors": {
+    "bg": "#f3f7f5",
+    "surface": "#ffffff",
+    "surface-2": "#e8f0ec",
+    "surface-3": "#d7e4dd",
+    "border": "rgba(30, 50, 42, 0.12)",
+    "text": "#1d2a25",
+    "text-muted": "#55665e",
+    "accent": "#0c7a5d",
+    "accent-text": "#ffffff",
+    "danger": "#c4383e",
+    "success": "#0c7a5d",
+    "youtube": "#d02a2a",
+    "spotify": "#148a43",
+    "tile-1": "#0c7a5d",
+    "tile-2": "#c4473a",
+    "tile-3": "#3d6fb6",
+    "tile-4": "#8a6510",
+    "tile-text": "#ffffff"
+  },
+  "radius": "12px",
+  "options": [],
+  "files": ["theme.json"]
+}

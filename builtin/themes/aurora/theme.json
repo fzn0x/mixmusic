@@ -26,7 +26,6 @@
     "tile-text": "#04121e"
   },
   "radius": "18px",
-  "styles": "theme.css",
   "options": [
     {
       "id": "motion",

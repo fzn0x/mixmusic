@@ -31,24 +31,107 @@ jobs:
           GOOS=linux go vet ./...
           GOOS=windows go vet ./...
           GOOS=darwin go vet ./...
+      # The Opus decoder's conformance test decodes the test vectors of RFC
+      # 8251. They never change: download them once, and check them.
+      - name: Cache the Opus test vectors
+        if: runner.os == 'Linux'
+        id: opus-vectors
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/opus-vectors
+          key: opus-testvectors-rfc8251
+      - name: Download the Opus test vectors
+        if: runner.os == 'Linux' && steps.opus-vectors.outputs.cache-hit != 'true'
+        run: |
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/opus-vectors.tar.gz" https://opus-codec.org/static/testvectors/opus_testvectors-rfc8251.tar.gz
+          echo "6b26a22f9ba87b2b836906a9bb7afec5f8e54d49553b1200382520ee6fedfa55  $RUNNER_TEMP/opus-vectors.tar.gz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/opus-vectors"
+          tar -xzf "$RUNNER_TEMP/opus-vectors.tar.gz" -C "$RUNNER_TEMP/opus-vectors"
       - name: Test
         run: go test ./...
+        env:
+          OPUS_TESTVECTORS: ${{ runner.os == 'Linux' && format('{0}/opus-vectors/opus_newvectors', runner.temp) || '' }}
       - name: Community registry
         run: go run ./tools/registry -check
 
-  frontend:
-    name: Frontend
+  # MixMusic's own audio engine plays through each system's audio output:
+  # these play silence, and a track at volume 0, on Linux and macOS, whose
+  # runners have no sound card: a PulseAudio null sink, which keeps time as
+  # one does, and BlackHole, a virtual device, stand in for one.
+  audio:
+    name: Audio output (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: A sound server
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pulseaudio
+          pulseaudio --start --exit-idle-time=-1
+          pactl info
+      - name: An audio device
+        if: runner.os == 'macOS'
+        run: |
+          brew install --cask blackhole-2ch
+          sudo killall coreaudiod || true
+          sleep 5
+          system_profiler SPAudioDataType
+      # A test that skips found no device: here, that fails.
+      - name: Play through the device
+        shell: bash
+        env:
+          MIXMUSIC_AUDIO: "1"
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then
+            # An idle null sink wakes every 2 seconds, and starts a new
+            # stream at its next waking, as a sound card or PipeWire doesn't:
+            # silence played at a low latency keeps it awake.
+            pacat --latency-msec=10 --format=s16le --rate=48000 --channels=2 /dev/zero &
+            sleep 2
+          fi
+          go test ./internal/audio/... -run 'TestStream|TestStartStop|TestRenderPanic|TestEngineOnTheDevice' -count=1 -v | tee audio.log
+          if grep -q -- '--- SKIP' audio.log; then
+            echo "A test skipped: the runner has no audio device."
+            exit 1
+          fi
+      # The engine shows what it plays in the system's media controls: an
+      # MPRIS player that these call as a desktop does, on a session bus of
+      # their own, on Linux, and Now Playing on macOS.
+      - name: Show in the system's media controls
+        shell: bash
+        run: |
+          bus=""
+          if [ "$RUNNER_OS" = Linux ]; then
+            sudo apt-get install -y dbus
+            bus="dbus-run-session --"
+          fi
+          $bus go test ./internal/nowplaying/ -run 'TestMPRIS|TestNowPlaying' -count=1 -v | tee controls.log
+          if grep -q -- '--- SKIP' controls.log; then
+            echo "A test skipped."
+            exit 1
+          fi
+
+  # The plugin API's types, and the community's plugins against them.
+  sdk:
+    name: Plugin SDK
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
-      - run: bun run build:web
 
   build:
     name: Build ${{ matrix.platform }}
-    needs: [go, frontend]
+    needs: [go, sdk]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

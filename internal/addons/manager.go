@@ -2,9 +2,7 @@ package addons
 
 import (
 	"errors"
-	"io"
 	"io/fs"
-	"mime"
 	"net/http"
 	"os"
 	"path"
@@ -29,24 +27,20 @@ type Inventory struct {
 	Problems []Problem `json:"problems"`
 }
 
-// Manager finds add-ons, serves their files and installs them.
+// Manager finds add-ons and installs them.
 type Manager struct {
 	// Dir holds the add-ons the user installed: themes/<id> and
 	// plugins/<id>.
 	Dir string
 	// Builtin holds the add-ons MixMusic ships with, laid out as Dir.
 	Builtin fs.FS
-	// BaseURL is where pages load add-on files from, as
-	// "addons://localhost/".
-	BaseURL string
 	// HTTP fetches the community registry and the add-ons it lists.
 	HTTP *http.Client
 }
 
-// NewManager returns a manager of the add-ons in dir and builtin, whose
-// files pages load from baseURL.
-func NewManager(dir string, builtin fs.FS, baseURL string) *Manager {
-	return &Manager{Dir: dir, Builtin: builtin, BaseURL: baseURL, HTTP: &http.Client{Timeout: time.Minute}}
+// NewManager returns a manager of the add-ons in dir and builtin.
+func NewManager(dir string, builtin fs.FS) *Manager {
+	return &Manager{Dir: dir, Builtin: builtin, HTTP: &http.Client{Timeout: time.Minute}}
 }
 
 // folder returns the folder of a kind of add-on: "themes" or "plugins".
@@ -100,7 +94,7 @@ func (m *Manager) List() Inventory {
 						problem(msg)
 						continue
 					}
-					t.Builtin, t.BaseURL = src.builtin, m.fileURL(kind, t.ID)
+					t.Builtin = src.builtin
 					if t.Options == nil {
 						t.Options = []Option{}
 					}
@@ -111,7 +105,7 @@ func (m *Manager) List() Inventory {
 						problem(msg)
 						continue
 					}
-					p.Builtin, p.BaseURL = src.builtin, m.fileURL(kind, p.ID)
+					p.Builtin = src.builtin
 					c.Plugins = append(c.Plugins, p)
 				}
 			}
@@ -135,62 +129,6 @@ func check(err error, id, dir string, seen map[string]bool) string {
 	return ""
 }
 
-// fileURL returns the URL of an add-on's folder.
-func (m *Manager) fileURL(kind Kind, id string) string {
-	return m.BaseURL + folder(kind) + "/" + id + "/"
-}
-
-// ServeHTTP serves the files of add-ons, at /themes/<id>/<file> and
-// /plugins/<id>/<file>.
-func (m *Manager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	parts := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/"), "/", 3)
-	if len(parts) != 3 || (parts[0] != "themes" && parts[0] != "plugins") || !settings.ValidID(parts[1]) || !ValidFile(parts[2]) {
-		http.NotFound(w, r)
-		return
-	}
-	// The built-in add-on of an id wins over the user's, as List says.
-	fsys := m.Builtin
-	if !m.isBuiltin(parts[0], parts[1]) {
-		if m.Dir == "" {
-			http.NotFound(w, r)
-			return
-		}
-		fsys = os.DirFS(m.Dir)
-	}
-	name := path.Join(parts[0], parts[1], parts[2])
-	f, err := fsys.Open(name)
-	if err != nil {
-		http.NotFound(w, r)
-		return
-	}
-	defer f.Close()
-	info, err := f.Stat()
-	if err != nil || info.IsDir() {
-		http.NotFound(w, r)
-		return
-	}
-	ctype := mime.TypeByExtension(path.Ext(name))
-	switch path.Ext(name) {
-	case ".js", ".mjs":
-		ctype = "text/javascript; charset=utf-8"
-	case ".css":
-		ctype = "text/css; charset=utf-8"
-	case ".json":
-		ctype = "application/json"
-	}
-	if ctype == "" {
-		ctype = "application/octet-stream"
-	}
-	w.Header().Set("Content-Type", ctype)
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	if rs, ok := f.(io.ReadSeeker); ok {
-		http.ServeContent(w, r, "", info.ModTime(), rs)
-		return
-	}
-	io.Copy(w, f)
-}
-
 func (m *Manager) isBuiltin(kindFolder, id string) bool {
 	if m.Builtin == nil {
 		return false
@@ -211,6 +149,22 @@ func (m *Manager) Uninstall(kind Kind, id string) error {
 		return ErrBuiltin
 	}
 	return os.RemoveAll(filepath.Join(m.Dir, folder(kind), id))
+}
+
+// Files returns the files of an add-on, in its folder: that of the add-on
+// MixMusic ships with, when there is one of the id, as List chooses, or
+// the user's.
+func (m *Manager) Files(kind Kind, id string) (fs.FS, error) {
+	if !settings.ValidID(id) || (kind != KindTheme && kind != KindPlugin) {
+		return nil, errors.New("addons: bad add-on")
+	}
+	if m.isBuiltin(folder(kind), id) {
+		return fs.Sub(m.Builtin, path.Join(folder(kind), id))
+	}
+	if m.Dir == "" {
+		return nil, errors.New("addons: no folder of add-ons")
+	}
+	return os.DirFS(filepath.Join(m.Dir, folder(kind), id)), nil
 }
 
 // FolderOf returns the folder the user's add-ons of a kind are in,

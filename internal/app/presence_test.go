@@ -38,10 +38,10 @@ func TestActivityOf(t *testing.T) {
 }
 
 func TestPresenceArtwork(t *testing.T) {
-	if got := presenceArtwork([]media.Image{{URL: "http://plain.example/a.jpg", Width: 512}}); got != "" {
+	if got := largeArtwork([]media.Image{{URL: "http://plain.example/a.jpg", Width: 512}}); got != "" {
 		t.Errorf("plain http artwork used: %q", got)
 	}
-	got := presenceArtwork([]media.Image{{URL: "https://a/60", Width: 60}, {URL: "https://a/226", Width: 226}})
+	got := largeArtwork([]media.Image{{URL: "https://a/60", Width: 60}, {URL: "https://a/226", Width: 226}})
 	if got != "https://a/226" {
 		t.Errorf("small artwork: %q, want the largest", got)
 	}

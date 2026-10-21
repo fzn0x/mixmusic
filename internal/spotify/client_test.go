@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -105,5 +106,51 @@ func TestGranted(t *testing.T) {
 	c.SetToken(Token{})
 	if c.Granted("streaming") {
 		t.Error("a signed-out client grants streaming")
+	}
+}
+
+func TestRefreshWaitsForNoOne(t *testing.T) {
+	// The token server takes its time, as on a bad network.
+	started, answer := make(chan struct{}), make(chan struct{})
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(started)
+		<-answer
+		w.Write([]byte(`{"access_token": "NEW", "expires_in": 3600}`))
+	}))
+	t.Cleanup(srv.Close)
+	var once sync.Once
+	release := func() { once.Do(func() { close(answer) }) }
+	t.Cleanup(release) // before the server closes, which waits for its handlers
+
+	a := NewAuth("client")
+	a.TokenURL = srv.URL
+	c := NewClient(a)
+	c.SetToken(Token{AccessToken: "OLD", RefreshToken: "REFRESH", Expiry: time.Now().Add(-time.Hour), Scope: "streaming"})
+	got := make(chan error, 1)
+	go func() {
+		_, err := c.accessToken(context.Background(), false)
+		got <- err
+	}()
+	<-started
+
+	asked := make(chan bool, 1)
+	go func() { asked <- c.SignedIn() && c.Granted("streaming") }()
+	select {
+	case ok := <-asked:
+		if !ok {
+			t.Error("the user is not signed in with streaming while the token refreshes")
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("SignedIn waited for the token to refresh")
+	}
+
+	// Signing out while it refreshes stands.
+	c.SetToken(Token{})
+	release()
+	if err := <-got; !errors.Is(err, ErrNotSignedIn) {
+		t.Errorf("refresh after signing out = %v, want ErrNotSignedIn", err)
+	}
+	if c.SignedIn() {
+		t.Error("the refreshed token signed the user back in")
 	}
 }

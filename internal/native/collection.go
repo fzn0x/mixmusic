@@ -368,6 +368,21 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 			if m.Item("Start radio").Chosen() {
 				s.startRadio(tracks[0])
 			}
+			if m.Item("Save as a new mix").Chosen() {
+				s.promptName("New mix", "Name", title, "create", func(name string) {
+					p, err := s.svc.Collection.CreatePlaylist(name, "", tracks)
+					if err != nil {
+						s.notes = append(s.notes, noticeOf(err))
+						return
+					}
+					s.notes = append(s.notes, notice("Created "+p.Title))
+				})
+			}
+			if s.accounts().YouTube.SignedIn && m.Item("Save as a YouTube Music playlist").Chosen() {
+				s.promptName("New playlist on YouTube Music", "Name", title, "create", func(name string) {
+					s.createYouTubePlaylist(name, tracks, func(p media.Playlist) { s.navigate(playlistPath(p.ID)) })
+				})
+			}
 		}
 		if rawURL != "" {
 			if m.Item("Open on " + sourceName(source)).Chosen() {

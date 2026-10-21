@@ -313,6 +313,37 @@ func TestNewYouTubePlaylist(t *testing.T) {
 	}
 }
 
+// TestSaveAsMix saves an album's tracks as a new mix, named after it to
+// start with.
+func TestSaveAsMix(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	menu := s.collectionMenu("Mezzanine", testTracks[:2], "", media.SourceYouTube)
+	tt2 := ui.NewTester(func(c *ui.Context) {
+		ui.Button(c, "More").Menu(menu)
+	}, 200, 100)
+	if err := tt2.Click("More"); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt2.ChooseMenuItem("Save as a new mix"); err != nil {
+		t.Fatalf("%v: the menu holds %q", err, tt2.Menu())
+	}
+	tt2.Frame()
+	if s.naming == nil || s.naming.value != "Mezzanine" {
+		t.Fatalf("saving as a mix asks %+v", s.naming)
+	}
+	tt.Frame()
+	tt.Key(0, ui.KeyEnter)
+	s.drain()
+	tt.Frame()
+	mixes := s.svc.Collection.Playlists()
+	if len(mixes) != 1 || mixes[0].Title != "Mezzanine" || max(mixes[0].TrackCount, len(mixes[0].Tracks)) != 2 {
+		t.Errorf("the mixes are %+v", mixes)
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

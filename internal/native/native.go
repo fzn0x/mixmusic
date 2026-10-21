@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 
@@ -94,6 +95,8 @@ type shell struct {
 	statsRange  int
 	// The command palette, what it searches, and its row chosen.
 	paletteOpen  bool
+	// naming asks for a name, as a new mix's.
+	naming *namePrompt
 	paletteQuery string
 	paletteAt    int
 	lyricsView   lyricsState
@@ -321,6 +324,47 @@ func (s *shell) questionDialog(c *ui.Context) {
 		if q.cancel != nil {
 			q.cancel()
 		}
+	}
+}
+
+// namePrompt asks for a name, as a new mix's: what the dialog says, the
+// name so far, and what is done with it once confirmed.
+type namePrompt struct {
+	title, label, value, confirm string
+	done                         func(name string)
+}
+
+// promptName asks for a name, starting from value, and runs done with it
+// once the user confirms it.
+func (s *shell) promptName(title, label, value, confirm string, done func(name string)) {
+	s.naming = &namePrompt{title: title, label: label, value: value, confirm: confirm, done: done}
+}
+
+// promptDialog shows the name asked for, if any.
+func (s *shell) promptDialog(c *ui.Context) {
+	p := s.naming
+	if p == nil {
+		return
+	}
+	k := &s.lk
+	open := true
+	panel := ui.Modal(c, &open, func() {
+		ui.Text(c, strings.ToLower(p.title)).FontSize(k.titleSize()).FontWeight(300).Font(k.display)
+		in := ui.TextInput(c.Key("prompt"), &p.value).AutoFocus().Label(p.label).Width(360)
+		name := strings.TrimSpace(p.value)
+		ui.Row(c).Gap(8).Justify(ui.End).Children(func() {
+			if s.button(c, "prompt-cancel", "cancel", false).Clicked() {
+				s.naming = nil
+			}
+			if (s.button(c, "prompt-ok", p.confirm, true).Disabled(name == "").Clicked() || in.Submitted()) && name != "" {
+				s.naming = nil
+				p.done(name)
+			}
+		})
+	})
+	s.frosted(panel).Padding(32).Gap(16).Border(1, k.border)
+	if !open {
+		s.naming = nil
 	}
 }
 

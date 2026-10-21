@@ -173,28 +173,17 @@ func (s *shell) sideLink(c *ui.Context, key, title string, n int, to, path strin
 	})
 }
 
-// newMix makes a mix, named after the date until the user renames it.
+// newMix asks for the name of a mix, makes it and opens it.
 func (s *shell) newMix() {
-	p, err := s.svc.Collection.CreatePlaylist(s.nextMixName(), "", nil)
-	if err != nil {
-		s.notes = append(s.notes, noticeOf(err))
-		return
-	}
-	s.notes = append(s.notes, player.Notice{Message: "Created " + p.Title + ": add tracks of any service to it"})
-	s.navigate(playlistPath(p.ID))
-}
-
-// nextMixName is "new mix", or "new mix 2" and on when taken.
-func (s *shell) nextMixName() string {
-	taken := map[string]bool{}
-	for _, m := range s.svc.Collection.Playlists() {
-		taken[m.Title] = true
-	}
-	name := "new mix"
-	for i := 2; taken[name]; i++ {
-		name = "new mix " + count(i)
-	}
-	return name
+	s.promptName("New mix", "Name", "", "create", func(name string) {
+		p, err := s.svc.Collection.CreatePlaylist(name, "", nil)
+		if err != nil {
+			s.notes = append(s.notes, noticeOf(err))
+			return
+		}
+		s.notes = append(s.notes, player.Notice{Message: "Created " + p.Title + ": add tracks of any service to it"})
+		s.navigate(playlistPath(p.ID))
+	})
 }
 
 // liveTile shows what plays, and opens now playing.

@@ -249,6 +249,40 @@ func TestTrackMoreButton(t *testing.T) {
 	}
 }
 
+// TestNewMix asks for a new mix's name, and makes it; from a track's menu,
+// the track's title is the name to start from.
+func TestNewMix(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	click(t, s, tt, "New mix")
+	if s.naming == nil {
+		t.Fatal("New mix asked for no name")
+	}
+	tt.Type("late night drive")
+	tt.Frame()
+	tt.Key(0, ui.KeyEnter)
+	s.drain()
+	tt.Frame()
+	mixes := s.svc.Collection.Playlists()
+	if len(mixes) != 1 || mixes[0].Title != "late night drive" {
+		t.Fatalf("the mixes are %+v", mixes)
+	}
+	if got := s.router.Path(); got != playlistPath(mixes[0].ID) {
+		t.Errorf("the new mix didn't open: %q", got)
+	}
+	s.newMixOf(testTracks[:1])
+	tt.Frame()
+	if s.naming == nil || s.naming.value != testTracks[0].Title {
+		t.Fatalf("a track's new mix starts from %+v", s.naming)
+	}
+	tt.Key(0, ui.KeyEnter)
+	s.drain()
+	tt.Frame()
+	if mixes := s.svc.Collection.Playlists(); len(mixes) != 2 {
+		t.Errorf("the track's mix wasn't made: %+v", mixes)
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

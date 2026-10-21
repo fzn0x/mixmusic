@@ -194,13 +194,19 @@ func (s *shell) addToMix(p media.Playlist, tracks []media.Track) {
 	}()
 }
 
-// newMixOf makes a mix of tracks, and opens it to name it.
+// newMixOf asks for the name of a mix of tracks, the first's title to
+// start with, and makes it, staying where the user is.
 func (s *shell) newMixOf(tracks []media.Track) {
-	p, err := s.svc.Collection.CreatePlaylist(s.nextMixName(), "", tracks)
-	if err != nil {
-		s.notes = append(s.notes, noticeOf(err))
-		return
+	value := ""
+	if len(tracks) > 0 {
+		value = tracks[0].Title
 	}
-	s.navigate(playlistPath(p.ID))
-	s.renaming, s.renameTo, s.renameID = true, p.Title, p.ID
+	s.promptName("New mix", "Name", value, "create", func(name string) {
+		p, err := s.svc.Collection.CreatePlaylist(name, "", tracks)
+		if err != nil {
+			s.notes = append(s.notes, noticeOf(err))
+			return
+		}
+		s.notes = append(s.notes, notice("Created "+p.Title))
+	})
 }

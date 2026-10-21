@@ -39,6 +39,7 @@ func (s *shell) view(c *ui.Context) {
 	s.palette(c)
 	s.updateOffer(c)
 	s.questionDialog(c)
+	s.promptDialog(c)
 	s.sweepViews()
 }
 

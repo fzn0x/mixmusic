@@ -171,7 +171,13 @@ func (s *shell) navEntry(c *ui.Context, key, label string, svg *ui.SVG, path str
 			if current {
 				ink = k.accent
 			}
-			ui.Text(c, label).FontSize(17 * k.scale).Font(faceSemilight).TextColor(ink).SingleLine()
+			// Selawik's labels weigh 350, in a family of their own; a
+			// theme's face of its own sets them at its regular weight.
+			font := faceSemilight
+			if k.body != face {
+				font = k.body
+			}
+			ui.Text(c, label).FontSize(17 * k.scale).Font(font).TextColor(ink).SingleLine()
 		}
 	})
 }

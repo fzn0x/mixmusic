@@ -320,7 +320,7 @@ func TestSaveAsMix(t *testing.T) {
 	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
 	tt := tester(t, s)
 	show(s, tt, "/album/al-x")
-	menu := s.collectionMenu("Mezzanine", testTracks[:2], "", media.SourceYouTube)
+	menu := s.collectionMenu("Mezzanine", testTracks[:2], "", media.SourceYouTube, "")
 	tt2 := ui.NewTester(func(c *ui.Context) {
 		ui.Button(c, "More").Menu(menu)
 	}, 200, 100)
@@ -341,6 +341,26 @@ func TestSaveAsMix(t *testing.T) {
 	mixes := s.svc.Collection.Playlists()
 	if len(mixes) != 1 || mixes[0].Title != "Mezzanine" || max(mixes[0].TrackCount, len(mixes[0].Tracks)) != 2 {
 		t.Errorf("the mixes are %+v", mixes)
+	}
+}
+
+// TestCopyIntoMix offers to copy a service's playlist into a mix, and
+// only that.
+func TestCopyIntoMix(t *testing.T) {
+	s := newTestShell(t)
+	items := func(importID string) []string {
+		menu := s.collectionMenu("Chill", testTracks[:2], "", media.SourceYouTube, importID)
+		tt := ui.NewTester(func(c *ui.Context) { ui.Button(c, "More").Menu(menu) }, 200, 100)
+		if err := tt.Click("More"); err != nil {
+			t.Fatal(err)
+		}
+		return tt.Menu()
+	}
+	if got := items("yt:PLchill"); !slices.Contains(got, "Copy into a mix you can extend") {
+		t.Errorf("a playlist's menu holds %q", got)
+	}
+	if got := items(""); slices.Contains(got, "Copy into a mix you can extend") {
+		t.Errorf("an album's menu holds %q", got)
 	}
 }
 

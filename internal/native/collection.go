@@ -206,7 +206,7 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 		h := headProps{art: a.Artwork, source: a.Source, facts: facts,
 			play:    func() { s.p.PlayTracks(a.Tracks, 0) },
 			shuffle: func() { s.shuffled(a.Tracks) },
-			menu:    s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source),
+			menu:    s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""),
 		}
 		if s.signedIn(a.Source) {
 			saved := a.Saved
@@ -249,7 +249,11 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if len(p.Tracks) > 0 {
 			facts = append(facts, fact{text: longDuration(total(p.Tracks))})
 		}
-		menu := s.collectionMenu(p.Title, p.Tracks, p.URL, p.Source)
+		importID := p.ID
+		if local {
+			importID = ""
+		}
+		menu := s.collectionMenu(p.Title, p.Tracks, p.URL, p.Source, importID)
 		if local {
 			base := menu
 			menu = func(m *ui.Menu) {
@@ -353,8 +357,11 @@ func (s *shell) mixDialogs(c *ui.Context, key string) {
 }
 
 // collectionMenu is the menu of an album or a playlist: play it, queue
-// it, open it on its service.
-func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string, source media.Source) func(m *ui.Menu) {
+// it, save it as a mix or a playlist, open it on its service.
+//
+// importID is the ID of a service's playlist, which the menu copies into a
+// mix, or "".
+func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string, source media.Source, importID string) func(m *ui.Menu) {
 	return func(m *ui.Menu) {
 		if len(tracks) > 0 {
 			if m.Item("Play next").Chosen() {
@@ -384,12 +391,33 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 				})
 			}
 		}
+		if importID != "" && m.Item("Copy into a mix you can extend").Chosen() {
+			s.importPlaylist(importID)
+		}
 		if rawURL != "" {
 			if m.Item("Open on " + sourceName(source)).Chosen() {
 				go s.svc.System.OpenExternal(rawURL)
 			}
 		}
 	}
+}
+
+// importPlaylist copies a service's playlist into a mix, which tracks of
+// any service can join, and opens it.
+func (s *shell) importPlaylist(id string) {
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		defer cancel()
+		p, err := s.svc.Collection.ImportPlaylist(ctx, id)
+		s.update(func() {
+			if err != nil {
+				s.notes = append(s.notes, noticeOf(err))
+				return
+			}
+			s.notes = append(s.notes, notice("Copied into "+p.Title))
+			s.navigate(playlistPath(p.ID))
+		})
+	}()
 }
 
 func (s *shell) artistPage(c *ui.Context, id string) {

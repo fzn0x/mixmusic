@@ -68,7 +68,7 @@ download or keep in memory.
 - **Keyboard first.** Shortcuts for everything common, a key of your own for
   any command, plugins' too, and a command palette
   (<kbd>Ctrl</kbd> <kbd>K</kbd>) for the rest.
-- **Themes.** Six built in, with effects you tune, a theme for the
+- **Themes.** Ten built in, with effects you tune, a theme for the
   computer's light mode and one for its dark mode, an accent of your own or
   taken from the artwork playing, and community themes one click away.
 - **Plugins.** Small ES modules that add pages, commands, track actions and

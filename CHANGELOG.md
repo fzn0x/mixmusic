@@ -6,6 +6,14 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- A copy of MixMusic built on a Mac for that Mac's processor, as
+  `bun run build` makes it there, installs new versions again: it asked for
+  an update file that releases did not publish, and failed with a 404.
+  Releases publish it now, and check before they publish that every app
+  finds its update (#33, #34).
+
 ## [0.5.0] - 2026-10-22
 
 MixMusic draws its own interface, and plays through an audio engine of its

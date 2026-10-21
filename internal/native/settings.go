@@ -571,7 +571,8 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 			if ui.Select(c.Key("eq-preset"), &chosen, labels).Width(200).Label("Preset").Changed() {
 				i := slices.Index(labels, chosen)
 				if i >= 0 {
-					eq.Preset = eqPresets[i].id
+					// Choosing how it sounds turns the equalizer on.
+					eq.Enabled, eq.Preset = true, eqPresets[i].id
 					eq.Gains = slices.Clone(eqPresets[i].gains[:])
 					s.save()
 				}

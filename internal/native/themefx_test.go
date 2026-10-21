@@ -23,8 +23,8 @@ func TestThemeEffectsOptions(t *testing.T) {
 	}{
 		{"greenroom", nil, effects{wash: true}},
 		{"greenroom", map[string]string{"wash": "false"}, effects{}},
-		{"glasshouse", nil, effects{cover: true, blur: 20}},
-		{"glasshouse", map[string]string{"cover": "false", "blur": "0"}, effects{}},
+		{"glasshouse", nil, effects{cover: true, blur: 20, white: true}},
+		{"glasshouse", map[string]string{"cover": "false", "blur": "0"}, effects{white: true}},
 		{"anime", nil, effects{speedlines: true, screentone: true}},
 		{"anime", map[string]string{"speedlines": "false"}, effects{screentone: true}},
 		{"mochi", nil, effects{sparkles: true}},
@@ -296,6 +296,45 @@ func TestSparklesRise(t *testing.T) {
 	tt.Advance(time.Second)
 	if !bytes.Equal(still, frame()) {
 		t.Error("with less motion, the sparkles rose")
+	}
+}
+
+// TestDialogFace gives a dialog a face its ink reads on over a vivid
+// tile: Glasshouse's white glass whatever its options, and, without a
+// blur, a face that doesn't show the page through, though the theme's
+// surface would.
+func TestDialogFace(t *testing.T) {
+	s := newTestShell(t)
+	for _, c := range []struct {
+		theme   string
+		options map[string]string
+	}{
+		{"glasshouse", nil},
+		{"glasshouse", map[string]string{"cover": "false"}},
+		{"glasshouse", map[string]string{"blur": "0"}},
+		{"glasshouse", map[string]string{"cover": "false", "blur": "0"}},
+		{"aurora", map[string]string{"blur": "0"}},
+		{"mix", nil},
+	} {
+		wear(s, c.theme, c.options)
+		face := func(under ui.Color) color.NRGBA {
+			tt := ui.NewTester(func(ctx *ui.Context) {
+				ui.Column(ctx).Fill().Background(under).Children(func() {
+					s.frosted(ui.Column(ctx)).Width(120).Height(80)
+				})
+			}, 200, 120)
+			tt.Frame()
+			return color.NRGBAModel.Convert(tt.Image().At(60, 40)).(color.NRGBA)
+		}
+		magenta, blue := face(ui.RGB(0xe1, 0x1d, 0x48)), face(ui.RGB(0x2a, 0x4b, 0xb8))
+		for _, f := range []color.NRGBA{magenta, blue} {
+			if r := contrast(nrgba(s.lk.text), f); r < 4.5 {
+				t.Errorf("%s with %v: ink on the dialog's face %v reads at %.2f:1", c.theme, c.options, f, r)
+			}
+		}
+		if s.lk.fx.blur == 0 && magenta != blue {
+			t.Errorf("%s with %v: the dialog shows the page through: %v over one tile, %v over another", c.theme, c.options, magenta, blue)
+		}
 	}
 }
 

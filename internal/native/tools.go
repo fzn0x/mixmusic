@@ -162,6 +162,8 @@ func (s *shell) cacheSettings(c *ui.Context) {
 			if s.button(c, "clear-cache", "clear", false).Disabled(use.Tracks == 0).Clicked() {
 				if err := s.svc.System.ClearCache(); err != nil {
 					s.notes = append(s.notes, noticeOf(err))
+				} else {
+					s.notes = append(s.notes, notice("Cache cleared"))
 				}
 			}
 		})

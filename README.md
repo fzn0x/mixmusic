@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshot.png" alt="MixMusic on Windows in the Aurora theme: the home page, with AURORA's Runaway playing and up next beside it" />
+  <img src="docs/banner.webp" alt="MixMusic's pages in the Mochi theme, tilted in perspective: now playing アイドル by YOASOBI in the middle, with search, home, the library, explore, stats, settings and more around it" />
 </p>
 
 MixMusic is an open-source desktop music player for macOS, Windows and Linux. One

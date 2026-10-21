@@ -822,3 +822,45 @@ func TestAboutRelease(t *testing.T) {
 		t.Errorf("the newest version shows as %q", tt.Texts())
 	}
 }
+
+// TestSearchSuggestions suggests the recent searches in the empty box,
+// which a click searches, then what was typed and YouTube Music's
+// suggestions for it once the typing pauses, which the arrows and Enter
+// search.
+func TestSearchSuggestions(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["suggest:"] = &loaded[[]string]{done: true, value: []string{"boards of canada"}}
+	s.loads["suggest:daft"] = &loaded[[]string]{done: true, value: []string{"Daft", "daft punk", "daft punk get lucky"}}
+	for _, q := range []string{"daft punk", "boards of canada"} {
+		s.loads["search:"+q] = &loaded[app.SearchResponse]{done: true}
+	}
+	tt := tester(t, s)
+	tt.Click("Search")
+	if !tt.HasText("boards of canada") {
+		t.Fatalf("the empty box doesn't suggest the recent searches: %q", tt.Texts())
+	}
+	tt.Click("boards of canada")
+	if got := s.router.Location(); got != "/search?q=boards+of+canada" {
+		t.Errorf("a click on a recent search went to %q", got)
+	}
+	if _, ok := s.loads["suggest:"]; ok {
+		t.Error("the recent searches stay as they were before the search")
+	}
+	s.query = ""
+	tt.Frame()
+	tt.Type("daft")
+	if tt.HasText("daft punk") {
+		t.Error("the box suggests before the typing pauses")
+	}
+	tt.Advance(time.Second)
+	texts := tt.Texts()
+	at := slices.Index(texts, "daft")
+	if at < 0 || slices.Index(texts, "daft punk") < at || slices.Contains(texts, "Daft") || !slices.Contains(texts, "daft punk get lucky") {
+		t.Fatalf("the suggestions of daft are %q", texts)
+	}
+	tt.Key(0, ui.KeyDown)
+	tt.Key(0, ui.KeyEnter)
+	if got := s.router.Location(); got != "/search?q=daft+punk" || s.query != "daft punk" {
+		t.Errorf("choosing daft punk went to %q, with %q in the box", got, s.query)
+	}
+}

@@ -78,10 +78,14 @@ type shell struct {
 	asking *question
 	// panel is the side panel shown: "queue", "lyrics" or "".
 	panel string
-	// query is what the search box holds.
-	query     string
-	searchBox ui.Handle
-	queueList ui.ListState
+	// query is what the search box holds, typed last at queryAt; suggested
+	// are the searches it suggested for suggestedFor.
+	query        string
+	queryAt      time.Time
+	suggested    []string
+	suggestedFor string
+	searchBox    ui.Handle
+	queueList    ui.ListState
 	// seeking and seekTo are the seek bar while the user drags it.
 	seeking bool
 	seekTo  float64

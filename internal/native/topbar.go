@@ -1,7 +1,9 @@
 package native
 
 import (
+	"context"
 	"strings"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -35,7 +37,14 @@ func (s *shell) topBar(c *ui.Context) {
 	})
 }
 
-// searchField is the 36px outlined box that searches both services.
+// suggestPause is how long the typing pauses before the search box asks
+// for suggestions.
+const suggestPause = 180 * time.Millisecond
+
+// searchField is the 36px outlined box that searches both services. It
+// suggests searches below it: what was typed, which Enter searches, then
+// YouTube Music's suggestions for it, or the recent searches while it is
+// empty.
 func (s *shell) searchField(c *ui.Context) {
 	k := &s.lk
 	box := ui.Row(c).Height(36).MaxWidth(520).Grow(1).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).
@@ -51,14 +60,74 @@ func (s *shell) searchField(c *ui.Context) {
 	} else {
 		box.Border(2, k.outline)
 	}
+	search := func(q string) {
+		if q = strings.TrimSpace(q); q != "" {
+			s.query = q
+			s.forget("suggest:")
+			s.navigate(searchPath(q))
+		}
+	}
 	box.Children(func() {
 		ui.Icon(c, icon("search")).FontSize(18).TextColor(ink)
-		in := ui.TextInputBase(c.Key("search"), &s.query).Placeholder("search spotify and youtube music").
-			Grow(1).MinWidth(0).Bind(&s.searchBox).Label("Search").FontSize(k.bodySize())
-		if in.Submitted() {
-			if q := strings.TrimSpace(s.query); q != "" {
-				s.navigate(searchPath(q))
+		cb := ui.ComboboxBase(c.Key("search"), &s.query)
+		in := cb.Input.Placeholder("search spotify and youtube music").Grow(1).MinWidth(0).Bind(&s.searchBox).
+			Label("Search").FontSize(k.bodySize())
+		if in.Changed() {
+			s.queryAt = c.Now()
+		}
+		var options []string
+		if cb.Open() {
+			options = s.suggestions(c)
+		}
+		cb.Popup(func(panel ui.Element) {
+			// A menu, below the box and as wide, rather than below the text.
+			panel.AttachTo(box, ui.AnchorBottomStart, ui.AnchorTopStart).MarginY(6).MinWidth(box.Bounds().W).Padding(4).
+				Radius(k.radiusSm).Background(k.surface2).Border(1, k.border).Shadow(0, 12, 32, -8, ui.RGBA(0, 0, 0, 0.55))
+			for _, q := range options {
+				item := cb.Item(q).Height(36).PaddingX(12).Gap(12).AlignItems(ui.Center).Radius(k.radiusSm).Cursor(ui.CursorPointer)
+				ink, mark := k.text, k.muted
+				if item.Highlighted() {
+					item.Background(k.accent)
+					ink, mark = k.accentText, k.accentText
+				}
+				item.Children(func() {
+					ui.Icon(c, icon("search")).FontSize(14).TextColor(mark)
+					ui.Text(c, q).FontSize(k.bodySize()).TextColor(ink).SingleLine().MinWidth(0)
+				})
 			}
+		})
+		if q, ok := cb.Chosen(); ok {
+			search(q)
+		} else if in.Submitted() {
+			search(s.query)
 		}
 	})
+}
+
+// suggestions are the searches the box suggests: what was typed, then up
+// to seven of YouTube Music's suggestions for it, asked once the typing
+// pauses, or the recent searches while nothing is typed.
+func (s *shell) suggestions(c *ui.Context) []string {
+	q := strings.TrimSpace(s.query)
+	if wait := suggestPause - c.Now().Sub(s.queryAt); wait > 0 {
+		c.After(wait)
+	} else if l := fetch(s, "suggest:"+q, func(ctx context.Context) ([]string, error) { return s.svc.Catalog.Suggestions(ctx, q) }); l.done {
+		s.suggestedFor, s.suggested = q, l.value
+	}
+	var options []string
+	if q != "" {
+		options = append(options, q)
+	}
+	// Those of what was typed before show until those of the text come.
+	if s.suggestedFor == q || s.suggestedFor != "" && strings.HasPrefix(q, s.suggestedFor) {
+		for _, v := range s.suggested {
+			if len(options) == 8 {
+				break
+			}
+			if v = strings.TrimSpace(v); v != "" && !strings.EqualFold(v, q) {
+				options = append(options, v)
+			}
+		}
+	}
+	return options
 }

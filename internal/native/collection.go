@@ -17,7 +17,7 @@ type headProps struct {
 	art         []media.Image
 	round       bool
 	source      media.Source
-	facts       []string
+	facts       []fact
 	description string
 	playLabel   string
 	play        func()
@@ -28,6 +28,22 @@ type headProps struct {
 	keptLabel string
 	onKeep    func(on bool)
 	menu      func(m *ui.Menu)
+}
+
+// fact is one of the facts of a collection's head: a text, or artists,
+// each a link to its page.
+type fact struct {
+	text    string
+	artists []media.Ref
+}
+
+// texts are facts of texts alone.
+func texts(ts ...string) []fact {
+	out := make([]fact, len(ts))
+	for i, t := range ts {
+		out[i] = fact{text: t}
+	}
+	return out
 }
 
 // collectionHead pairs the artwork with the facts and the actions.
@@ -42,13 +58,27 @@ func (s *shell) collectionHead(c *ui.Context, h headProps) {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(12).Children(func() {
 			ui.Row(c).Gap(6).Wrap().Children(func() {
 				s.sourceMark(c, h.source, false)
-				var facts []string
-				for _, f := range h.facts {
-					if f != "" {
-						facts = append(facts, f)
+				ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Children(func() {
+					ui.Text(c, sourceName(h.source))
+					for _, f := range h.facts {
+						switch {
+						case len(f.artists) > 0:
+							ui.Text(c, " · ")
+							for j, a := range f.artists {
+								if j > 0 {
+									ui.Text(c, ", ")
+								}
+								if a.ID == "" {
+									ui.Text(c, a.Name)
+								} else {
+									ui.Link(c, a.Name, artistPath(a.ID))
+								}
+							}
+						case f.text != "":
+							ui.Text(c, " · "+f.text)
+						}
 					}
-				}
-				ui.Text(c, sourceName(h.source)+" · "+strings.Join(facts, " · ")).FontSize(k.smallSize()).TextColor(k.muted)
+				})
 			})
 			if h.description != "" {
 				d := h.description
@@ -169,9 +199,9 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 		if n == 0 {
 			n = len(a.Tracks)
 		}
-		facts := []string{kind, a.Year, names(a.Artists), plural(n, "track")}
+		facts := []fact{{text: kind}, {text: a.Year}, {artists: a.Artists}, {text: plural(n, "track")}}
 		if len(a.Tracks) > 0 {
-			facts = append(facts, longDuration(total(a.Tracks)))
+			facts = append(facts, fact{text: longDuration(total(a.Tracks))})
 		}
 		h := headProps{art: a.Artwork, source: a.Source, facts: facts,
 			play:    func() { s.p.PlayTracks(a.Tracks, 0) },
@@ -215,9 +245,9 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if n == 0 {
 			n = len(p.Tracks)
 		}
-		facts := []string{owner, plural(n, "track")}
+		facts := texts(owner, plural(n, "track"))
 		if len(p.Tracks) > 0 {
-			facts = append(facts, longDuration(total(p.Tracks)))
+			facts = append(facts, fact{text: longDuration(total(p.Tracks))})
 		}
 		menu := s.collectionMenu(p.Title, p.Tracks, p.URL, p.Source)
 		if local {
@@ -361,7 +391,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 	a := res.value
 	s.pageScroll(c, func() {
 		s.pageHeader(c, a.Name, nil, nil)
-		h := headProps{art: a.Artwork, round: true, source: a.Source, facts: []string{a.Subtitle}, description: a.Description,
+		h := headProps{art: a.Artwork, round: true, source: a.Source, facts: texts(a.Subtitle), description: a.Description,
 			playLabel: "play top songs",
 			menu: func(m *ui.Menu) {
 				if len(a.TopTracks) > 0 && m.Item("Start radio").Chosen() {

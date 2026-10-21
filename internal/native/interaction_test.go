@@ -223,6 +223,19 @@ func TestLyricsTwice(t *testing.T) {
 	}
 }
 
+// TestAlbumArtistLinks opens the page of an album's artist from its head.
+func TestAlbumArtistLinks(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine",
+		Artists: []media.Ref{{ID: "yt:UCneil", Name: "Neil Davidge"}}, Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	click(t, s, tt, "Neil Davidge")
+	if got := s.router.Path(); got != artistPath("yt:UCneil") {
+		t.Errorf("the artist's link went to %q", got)
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

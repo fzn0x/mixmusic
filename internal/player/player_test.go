@@ -183,6 +183,23 @@ func (s *fakeStream) Stop() {
 	}
 }
 
+func (s *fakeStream) Unload() {
+	s.record("unload")
+	s.mu.Lock()
+	s.url = ""
+	s.mu.Unlock()
+}
+
+// sounding is the URL the engine plays, or "".
+func (s *fakeStream) sounding() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.paused {
+		return ""
+	}
+	return s.url
+}
+
 func (s *fakeStream) Seek(t time.Duration) { s.record("seek %v", t) }
 func (s *fakeStream) SetVolume(v float64)  { s.record("volume %v", v) }
 func (s *fakeStream) lastLoad() string     { return s.last("load") }
@@ -369,8 +386,8 @@ func tracks(ids ...string) []media.Track {
 	return out
 }
 
-// playing is the track id playing, once loaded: until then the player
-// still plays the one before.
+// playing is the track id playing, once loaded: until then nothing
+// plays.
 func playing(id string) func(*Player) bool {
 	return func(p *Player) bool {
 		cur, ok := p.s.Current()
@@ -438,6 +455,41 @@ func TestTransport(t *testing.T) {
 			t.Error("the second toggle played again")
 		}
 	})
+}
+
+// TestSwitchSilences stops the track that played as soon as another is
+// chosen, while the other's stream is found, and when it can't be.
+func TestSwitchSilences(t *testing.T) {
+	found := make(chan struct{})
+	h := newHarness(t, Saved{}, func(f *fakeServices) {
+		f.prepare = func(t media.Track) (Source, error) {
+			if t.ID == "yt:b" {
+				<-found
+				return Source{}, errors.New("offline.")
+			}
+			return streamOf(t), nil
+		}
+	})
+	h.p.PlayTracks(tracks("a", "b", "c"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Time(42*time.Second, 200*time.Second)
+	h.p.Next()
+	h.wait("b chosen", func(p *Player) bool { return p.s.Index == 1 })
+	if got := h.stream.sounding(); got != "" {
+		close(found)
+		t.Fatalf("%s still plays while b is found", got)
+	}
+	h.on(func(p *Player) {
+		if !p.s.Buffering || p.s.Position != 0 {
+			t.Errorf("finding b: buffering %v, position %v", p.s.Buffering, p.s.Position)
+		}
+	})
+	close(found)
+	h.wait("b failing", func(p *Player) bool { return p.s.Error != "" })
+	if got := h.stream.sounding(); got != "" {
+		t.Errorf("%s plays under b's error", got)
+	}
+	h.wait("c playing", playing("c"))
 }
 
 func TestEnd(t *testing.T) {

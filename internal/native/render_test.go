@@ -79,6 +79,7 @@ func (s *testStream) Crossfade(string, time.Duration) error { return nil }
 func (s *testStream) Play() error                           { s.player().Playing(true); return nil }
 func (s *testStream) Pause()                                { s.player().Playing(false) }
 func (s *testStream) Stop()                                 {}
+func (s *testStream) Unload()                               {}
 func (s *testStream) Seek(time.Duration)                    {}
 func (s *testStream) SetVolume(float64)                     {}
 

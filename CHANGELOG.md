@@ -101,6 +101,10 @@ next track.
 - A link you copy is no longer MixMusic's own address, as
   mygo://localhost/…, which opens nothing: Copy link copies the link on
   YouTube Music or Spotify, which anyone can open (#15).
+- Choosing another track stops the one that plays at once. It played on
+  under the new track's title, artwork and lyrics while MixMusic found the
+  new track's audio, which can take a while on macOS, and for good when
+  that failed.
 
 ## [0.4.0] - 2026-10-20
 

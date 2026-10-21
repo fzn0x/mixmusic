@@ -106,10 +106,20 @@
       <!-- walkthrough -->
       <section class="track" id="walkthrough" data-track="walkthrough" data-caption="the player, in one minute" data-tone="2" data-icon="video">
         <div class="word-frame"><h2 class="word">walkthrough</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: home, now playing, search, library, explore, stats, palette, themes, plugins"><span class="pivot is-current">home</span><span class="pivot">now playing</span><span class="pivot">search</span><span class="pivot">library</span><span class="pivot">explore</span><span class="pivot">stats</span><span class="pivot">palette</span><span class="pivot">themes</span><span class="pivot">plugins</span></p>
+        <div class="pivots pivots-section chapters" role="group" aria-label="Chapters of the walkthrough" data-chapters>
+          <button class="pivot is-current" type="button" aria-current="true" data-at="0.4">home</button>
+          <button class="pivot" type="button" data-at="4.6">now playing</button>
+          <button class="pivot" type="button" data-at="14.4">search</button>
+          <button class="pivot" type="button" data-at="23.6">library</button>
+          <button class="pivot" type="button" data-at="32.8">explore</button>
+          <button class="pivot" type="button" data-at="35.8">stats</button>
+          <button class="pivot" type="button" data-at="38.9">palette</button>
+          <button class="pivot" type="button" data-at="45">themes</button>
+          <button class="pivot" type="button" data-at="56.8">plugins</button>
+        </div>
         <p class="lead lead-wide">A minute in the player, page by page, from home to the sleep timer.</p>
         <figure class="shot shot-wide">
-          <video src="assets/walkthrough.mp4" poster="assets/walkthrough.webp" width="1920" height="1080" controls muted playsinline preload="metadata" aria-label="The walkthrough: a minute in MixMusic, page by page, in the Mochi theme"></video>
+          <video src="assets/walkthrough.mp4" poster="assets/walkthrough.webp" width="1920" height="1080" controls muted playsinline preload="metadata" aria-label="The walkthrough: a minute in MixMusic, page by page, in the Mochi theme" data-walkthrough></video>
           <figcaption>The player in the Mochi theme, with a caption for each page. The recording has no sound.</figcaption>
         </figure>
       </section>

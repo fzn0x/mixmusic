@@ -208,6 +208,43 @@
     go(current + step);
   });
 
+  // The walkthrough: each chapter seeks the video to its page, and the
+  // chapter of the page playing lights up. Playing it ends the page's tour.
+  const video = $("[data-walkthrough]");
+  const chapterRow = $("[data-chapters]");
+  if (video && chapterRow) {
+    const chapters = $$("[data-at]", chapterRow);
+    const starts = chapters.map((c) => Number(c.dataset.at));
+    let chapter = 0;
+    const mark = () => {
+      let index = 0;
+      starts.forEach((t, i) => {
+        if (video.currentTime >= t) index = i;
+      });
+      if (index === chapter) return;
+      chapter = index;
+      chapters.forEach((c, i) => {
+        c.classList.toggle("is-current", i === index);
+        if (i === index) c.setAttribute("aria-current", "true");
+        else c.removeAttribute("aria-current");
+      });
+      // The row scrolls on narrow windows: bring the chapter into it.
+      const r = chapterRow.getBoundingClientRect();
+      const b = chapters[index].getBoundingClientRect();
+      const by = b.right > r.right ? b.right - r.right + 4 : b.left < r.left ? b.left - r.left - 4 : 0;
+      if (by) chapterRow.scrollBy({ left: by, behavior: reduced.matches ? "auto" : "smooth" });
+    };
+    chapters.forEach((c, i) =>
+      c.addEventListener("click", () => {
+        video.currentTime = starts[i];
+        video.play().catch(() => {});
+      }),
+    );
+    video.addEventListener("timeupdate", mark);
+    video.addEventListener("seeked", mark);
+    video.addEventListener("play", () => timer && stop());
+  }
+
   // Theme gallery: preview each theme's home page.
   const gallery = $("[data-gallery]");
   if (gallery) {

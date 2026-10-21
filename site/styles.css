@@ -230,6 +230,13 @@ a.pivot:hover { color: color-mix(in srgb, var(--ink) 70%, transparent); }
 .pivots-section .pivot { font-size: clamp(1.75rem, 2.6vw, 2.5rem); }
 .pivot.is-current { color: var(--ink); }
 
+/* The walkthrough's chapters: pivots that seek the video to their page. The
+   row keeps room for the focus ring, which its scrolling would clip. */
+.chapters { padding: 4px; margin-left: -4px; }
+.chapters .pivot { padding: 0; border: 0; background: none; font-family: inherit; cursor: pointer; }
+.chapters .pivot:hover { color: color-mix(in srgb, var(--ink) 70%, transparent); }
+.chapters .pivot.is-current { color: var(--ink); }
+
 .hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);

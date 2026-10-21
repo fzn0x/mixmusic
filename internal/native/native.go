@@ -286,9 +286,21 @@ func (s *shell) refresh() {
 }
 
 // restyle makes the look again, of the settings, the computer's appearance
-// and the artwork playing.
+// and the artwork playing. The windows' own parts, as the title bar and
+// its buttons, take the theme's light or dark: the computer's while the
+// theme follows it, which it reads then.
 func (s *shell) restyle() {
+	if s.set.FollowSystem {
+		setAppearance(mygo.ThemeSystem)
+	}
 	s.lk = newLook(s.set, s.inv.Themes, isDark(), s.artColor)
+	switch {
+	case s.set.FollowSystem:
+	case s.lk.dark:
+		setAppearance(mygo.ThemeDark)
+	default:
+		setAppearance(mygo.ThemeLight)
+	}
 	s.art.phosphor = s.lk.fx.phosphor
 	s.plugins.SetTheme(pluginTheme(&s.lk))
 }
@@ -430,6 +442,15 @@ func (s *shell) offerCrashReport() {
 // isDark reports whether the computer is in dark mode. It asks MyGo's main
 // loop, which tests don't run.
 var isDark = func() bool { return mygo.Theme.IsDark() }
+
+// setAppearance gives the windows' own parts, their title bars and the
+// system's menus, a light or dark appearance, or the computer's. Once set,
+// isDark tells it.
+var setAppearance = func(source mygo.ThemeSource) {
+	if mygo.Theme.Source() != source {
+		mygo.Theme.SetSource(source)
+	}
+}
 
 // navigate shows the page at path.
 func (s *shell) navigate(path string) { s.router.Push(path) }

@@ -89,6 +89,9 @@ next track.
   next one too.
 - Moving through a Spotify track before it plays, as after a restart, no
   longer starts it on your device behind MixMusic's back.
+- The title bar and its buttons are light or dark as the theme you wear
+  is: on a light theme while the computer was dark, the buttons showed
+  white on white.
 
 ## [0.4.0] - 2026-10-20
 

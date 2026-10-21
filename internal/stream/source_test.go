@@ -31,8 +31,14 @@ func TestSourceReadsWhole(t *testing.T) {
 	if err != nil || !bytes.Equal(got, data) {
 		t.Fatalf("%d bytes of %d, %v", len(got), size, err)
 	}
-	if !p.Cache.Has(testID) {
-		t.Error("the track read whole is not in the cache")
+	// The proxy keeps the track once it sent the end, which the reader may
+	// read first.
+	deadline := time.Now().Add(5 * time.Second)
+	for !p.Cache.Has(testID) {
+		if time.Now().After(deadline) {
+			t.Fatal("the track read whole is not in the cache")
+		}
+		time.Sleep(10 * time.Millisecond)
 	}
 	// From the cache, the same.
 	s2, err := p.Open(context.Background(), testID, nil)

@@ -95,8 +95,6 @@ type shell struct {
 	statsRange  int
 	// The command palette, what it searches, and its row chosen.
 	paletteOpen  bool
-	// naming asks for a name, as a new mix's.
-	naming *namePrompt
 	paletteQuery string
 	paletteAt    int
 	lyricsView   lyricsState
@@ -106,7 +104,8 @@ type shell struct {
 	// capBound tells whether a page took it in the build.
 	capScroll *ui.ScrollState
 	capBound  bool
-	// Dialogs, and their subjects.
+	// Dialogs, and their subjects; naming asks for a name, as a new mix's.
+	naming                              *namePrompt
 	renaming, deleting, clearingHistory bool
 	renameTo, renameID                  string
 	deleteID, deleteTitle               string

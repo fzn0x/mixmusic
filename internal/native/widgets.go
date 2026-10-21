@@ -100,7 +100,9 @@ func (s *shell) button(c *ui.Context, key, label string, primary bool) ui.Elemen
 	if b.Pressed() {
 		b.Scale(0.97, 0.97)
 	}
-	b.Children(func() { ui.Text(c, label).FontSize(k.bodySize()).TextColor(ink).SingleLine() })
+	// The label keeps its width: the button's, made of it, may round a
+	// fraction of a pixel short of it, and cut its last letter.
+	b.Children(func() { ui.Text(c, label).FontSize(k.bodySize()).TextColor(ink).SingleLine().Shrink(0) })
 	return b
 }
 

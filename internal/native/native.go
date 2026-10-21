@@ -118,11 +118,13 @@ type shell struct {
 	// too.
 	artURL, artColor string
 	// tint is the colour of the cover the ground takes, as it changes;
-	// impact is when the track changed, which Anime's speed lines burst
-	// at, and tone Anime's screentone, drawn once for the window's size.
+	// impact is the track that last burst Anime's speed lines as it
+	// started to play, tone Anime's screentone, drawn once for the
+	// window's size, and rise how long Mochi's sparkles have risen.
 	tint   tint
 	impact impact
 	tone   tone
+	rise   rise
 	// asking is the question a dialog asks before an action, if any.
 	asking *question
 	// panel is the side panel shown: "queue", "lyrics" or "".

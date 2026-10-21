@@ -257,8 +257,34 @@ type sparkle struct {
 	ink                        int
 }
 
-// sparkleStart is when Mochi's sparkles started rising.
-var sparkleStart = time.Now()
+// rise is how long Mochi's sparkles have risen for: they rise only while
+// something plays, and hold still where they are otherwise.
+type rise struct {
+	// before is how long they rose for until since, which is when they
+	// last started rising, or zero while they hold still.
+	before time.Duration
+	since  time.Time
+}
+
+// set has the sparkles rise from now, or hold still there.
+func (r *rise) set(now time.Time, moving bool) {
+	switch {
+	// A clock set back would hold them still.
+	case moving && (r.since.IsZero() || now.Before(r.since)):
+		r.since = now
+	case !moving && !r.since.IsZero():
+		r.before += max(now.Sub(r.since), 0)
+		r.since = time.Time{}
+	}
+}
+
+// at is how long the sparkles have risen for at now.
+func (r rise) at(now time.Time) time.Duration {
+	if r.since.IsZero() {
+		return r.before
+	}
+	return r.before + max(now.Sub(r.since), 0)
+}
 
 // sparkles are Mochi's, the same at every frame.
 var sparkles = func() (out []sparkle) {
@@ -289,22 +315,19 @@ func sparkleInks(k *look) (inks [4]ui.Color) {
 
 // paintSparkles draws Mochi's sparkles and hearts rising up the ground,
 // fading in at its foot and out at its head, swaying and twinkling on the
-// way, or holding still unless moving.
-func paintSparkles(p *ui.Painter, r ui.Rect, inks [4]ui.Color, moving bool) {
-	var t float64
-	if moving {
-		t = p.Now().Sub(sparkleStart).Seconds()
-		// They rise a pixel or so a frame: twenty frames a second will do.
+// way, as far as they rose.
+func paintSparkles(p *ui.Painter, r ui.Rect, inks [4]ui.Color, rise rise) {
+	t := rise.at(p.Now()).Seconds()
+	if !rise.since.IsZero() {
+		// They rise a pixel or so a frame, which ten frames a second would
+		// show in steps: twenty will do.
 		p.After(50 * time.Millisecond)
 	}
 	for _, sp := range sparkles {
 		up := math.Mod(float64(sp.start)+t*float64(sp.rate)/60, 1)
 		x := r.X + sp.x*r.W + sp.sway*float32(math.Sin(2*math.Pi*(t/9+float64(sp.start))))
 		y := r.Y + r.H + 24 - float32(up)*(r.H+48)
-		size := sp.size
-		if moving {
-			size *= 0.78 + 0.22*float32(math.Sin(2*math.Pi*(0.7*t+5*float64(sp.start))))
-		}
+		size := sp.size * (0.78 + 0.22*float32(math.Sin(2*math.Pi*(0.7*t+5*float64(sp.start)))))
 		ink := withAlpha(inks[sp.ink], 0.9*math.Sin(math.Pi*up))
 		var path ui.Path
 		if sp.heart {

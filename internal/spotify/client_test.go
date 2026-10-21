@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -106,6 +107,39 @@ func TestClientReadsPlainTextErrors(t *testing.T) {
 		var apiErr *APIError
 		if !errors.As(err, &apiErr) || apiErr.Status != http.StatusForbidden || apiErr.Message != c.want {
 			t.Errorf("%q: err = %#v, want the message %q", c.body, err, c.want)
+		}
+	}
+}
+
+// TestClientExplainsRefusals tells the refusals of an app in development
+// mode apart, as Spotify words them, and says what to do about them.
+func TestClientExplainsRefusals(t *testing.T) {
+	for _, c := range []struct {
+		body string
+		want error
+		says string
+	}{
+		{"Check settings on https://developer.spotify.com/dashboard, the user may not be registered.", ErrUnregistered, "Users Management"},
+		{`{"error": {"status": 403, "message": "User not registered in the Developer Dashboard"}}`, ErrUnregistered, "Users Management"},
+		{`{"error": {"status": 403, "message": "Active premium subscription required for the owner of the app. When the subscription status changes, it can take a few hours before requests are allowed again."}}`,
+			ErrOwnerWithoutPremium, "the app's owner has no Spotify Premium"},
+		{"Your application is blocked from accessing the Web API since you do not have a Spotify Premium subscription.", ErrOwnerWithoutPremium, "the app's owner has no Spotify Premium"},
+		{"", nil, "an app in development mode serves only an owner with Spotify Premium"},
+		{`{"error": {"status": 403, "message": "Insufficient client scope"}}`, nil, "spotify: Insufficient client scope (HTTP 403)"},
+	} {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte(c.body))
+		}))
+		err := testClient(t, srv).get(context.Background(), "/me", nil, nil)
+		srv.Close()
+		for _, refusal := range []error{ErrUnregistered, ErrOwnerWithoutPremium} {
+			if got := errors.Is(err, refusal); got != (refusal == c.want) {
+				t.Errorf("%q: errors.Is(err, %v) = %v", c.body, refusal, got)
+			}
+		}
+		if err == nil || !strings.Contains(err.Error(), c.says) {
+			t.Errorf("%q: err = %v, which doesn't say %q", c.body, err, c.says)
 		}
 	}
 }

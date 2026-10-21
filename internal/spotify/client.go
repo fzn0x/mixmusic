@@ -25,6 +25,15 @@ const maxRetryAfter = 5 * time.Second
 // ErrNotSignedIn is returned by calls made before the user signed in.
 var ErrNotSignedIn = errors.New("spotify: not signed in")
 
+// The refusals of an app in development mode, which an APIError is when
+// Spotify answers one: of a user the app does not count among its users,
+// who are added under Users Management in its settings in the developer
+// dashboard, and of every request while its owner has no Premium.
+var (
+	ErrUnregistered        = errors.New("spotify: this Spotify account is not one of the app's users")
+	ErrOwnerWithoutPremium = errors.New("spotify: the app's owner has no Spotify Premium")
+)
+
 // APIError is an error the Web API answered with.
 type APIError struct {
 	Status  int
@@ -42,10 +51,35 @@ func (e *APIError) Error() string {
 		return "spotify: no active device: open Spotify on one of your devices"
 	case e.Status == http.StatusTooManyRequests:
 		return "spotify: too many requests, try again in a moment"
+	case e.Is(ErrUnregistered):
+		return "spotify: this Spotify account is not one of the app's users: add it under Users Management, in the app's settings in the Spotify developer dashboard, then sign in again"
+	case e.Is(ErrOwnerWithoutPremium):
+		return "spotify: the app's owner has no Spotify Premium, which Spotify asks of apps in development mode: subscribe with the account that made the app, and sign in again in a few hours"
 	case e.Message != "":
 		return fmt.Sprintf("spotify: %s (HTTP %d)", e.Message, e.Status)
+	case e.Status == http.StatusForbidden:
+		// Spotify refuses so, without a word, the users of an app in
+		// development mode it does not let in.
+		return "spotify: Spotify refused (HTTP 403): an app in development mode serves only an owner with Spotify Premium, and the accounts added under Users Management in its settings"
 	}
 	return fmt.Sprintf("spotify: HTTP %d", e.Status)
+}
+
+// Is tells the refusals of an app in development mode by Spotify's words,
+// whether in its error object or in plain text.
+func (e *APIError) Is(target error) bool {
+	if e.Status != http.StatusForbidden {
+		return false
+	}
+	m := strings.ToLower(e.Message)
+	switch target {
+	case ErrUnregistered:
+		return strings.Contains(m, "may not be registered") || strings.Contains(m, "not registered in the developer dashboard") ||
+			strings.Contains(m, "not approved for app")
+	case ErrOwnerWithoutPremium:
+		return strings.Contains(m, "premium subscription required for the owner") || strings.Contains(m, "do not have a spotify premium subscription")
+	}
+	return false
 }
 
 // Client calls the Web API on behalf of the signed-in user, refreshing the

@@ -6,12 +6,32 @@ import (
 	"errors"
 	"math"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/audio/output"
+	"github.com/fzn0x/mixmusic/internal/player"
 )
+
+// TestProcesses finds this process among those that run, by its name.
+func TestProcesses(t *testing.T) {
+	exe, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range processes() {
+		if p.pid == uint32(os.Getpid()) {
+			if !strings.EqualFold(p.name, filepath.Base(exe)) {
+				t.Errorf("this process is named %q, not %q", p.name, filepath.Base(exe))
+			}
+			return
+		}
+	}
+	t.Errorf("this process, %d, isn't among those that run", os.Getpid())
+}
 
 // TestListenerHears has the listener hear this process play a tone at
 // -100 dB, which no one hears, into its tap, and stop when it hears
@@ -36,7 +56,7 @@ func TestListenerHears(t *testing.T) {
 	}
 	defer s.Stop()
 	l := newListener()
-	l.hear(uint32(os.Getpid()))
+	l.follow(player.State{Playing: true, Source: &player.Source{Mode: player.ModeSpotify}})
 	heard := false
 	var a audio.Analysis
 	for deadline := time.Now().Add(3 * time.Second); !heard && time.Now().Before(deadline); time.Sleep(50 * time.Millisecond) {
@@ -51,14 +71,9 @@ func TestListenerHears(t *testing.T) {
 	if l.failed {
 		t.Error("a capture failed")
 	}
-	l.hear(0)
-	for deadline := time.Now().Add(3 * time.Second); time.Now().Before(deadline); time.Sleep(20 * time.Millisecond) {
-		l.mu.Lock()
-		want := l.want
-		l.mu.Unlock()
-		if want == 0 && len(l.wake) == 0 {
-			break
-		}
+	l.follow(player.State{Source: &player.Source{Mode: player.ModeSpotify}}) // paused
+	for deadline := time.Now().Add(3 * time.Second); len(l.wake) > 0 && time.Now().Before(deadline); {
+		time.Sleep(20 * time.Millisecond)
 	}
 	time.Sleep(100 * time.Millisecond) // the worker stops the capture
 	n := a

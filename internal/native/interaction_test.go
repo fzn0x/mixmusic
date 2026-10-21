@@ -936,3 +936,36 @@ func TestKeepAtOnce(t *testing.T) {
 		t.Errorf("the refused save stays, or the page loaded again: told %v, saved %v", refused, page.value.Saved)
 	}
 }
+
+// TestLiveTileTurns turns the live tile's artwork over to what plays next
+// now and then while a track plays, and not while it is paused.
+func TestLiveTileTurns(t *testing.T) {
+	s := newTestShell(t)
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	s.panel = ""
+	tt := tester(t, s)
+	// The card's own texts; the player bar tells what plays next too.
+	turned := func() bool {
+		texts := tt.Texts()
+		return slices.Contains(texts, "up next") && slices.Contains(texts, testTracks[1].Title)
+	}
+	if turned() {
+		t.Fatalf("the tile shows what plays next at once: %q", tt.Texts())
+	}
+	tt.Advance(liveRest + liveTurn)
+	if !turned() {
+		t.Fatalf("the tile doesn't turn over to what plays next: %q", tt.Texts())
+	}
+	tt.Advance(liveRest + liveTurn)
+	if turned() {
+		t.Error("the tile doesn't turn back to the artwork")
+	}
+	s.p.Toggle()
+	s.settle(t, func(st player.State) bool { return !st.Playing })
+	tt.Frame()
+	tt.Advance(liveRest + liveTurn)
+	if turned() {
+		t.Error("the tile turns over while the track is paused")
+	}
+}

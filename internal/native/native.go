@@ -95,6 +95,9 @@ type shell struct {
 	// folds the rail; narrowFold is the fold the user gave it there.
 	narrow     bool
 	narrowFold *bool
+	// liveSince is when the live tile began turning over to what plays
+	// next, zero while it doesn't.
+	liveSince time.Time
 	// The pages' own state.
 	homeFilter  int
 	searchPivot int

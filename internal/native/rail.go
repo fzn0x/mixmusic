@@ -1,10 +1,13 @@
 package native
 
 import (
+	"math"
 	"strings"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 )
 
@@ -234,18 +237,74 @@ func (s *shell) liveTile(c *ui.Context, collapsed bool) {
 		size = 42
 	}
 	t := cur.Track
+	// While a track plays with another up next, the artwork turns over to
+	// it now and then.
+	next, flips := s.st.UpNext()
+	flips = flips && s.st.Playing && next.Track.ID != t.ID && !collapsed && !c.Preferences().ReduceMotion
+	switch {
+	case !flips:
+		s.liveSince = time.Time{}
+	case s.liveSince.IsZero():
+		s.liveSince = c.Now()
+	}
 	tile := ui.ButtonBase(c.Key("live")).Gap(12).Justify(ui.Start).Shrink(0).Label("Open now playing").Cursor(ui.CursorPointer)
 	if tile.Clicked() {
 		s.navigate("/now-playing")
 	}
 	tile.Children(func() {
-		s.cover(c, "live-cover", t.Artwork, size, false)
+		if !flips {
+			s.cover(c, "live-cover", t.Artwork, size, false)
+		} else {
+			s.liveCard(c, t, next.Track, size)
+		}
 		if !collapsed {
 			ui.Column(c).Grow(1).MinWidth(0).Children(func() {
 				ui.Text(c, t.Title).FontSize(k.bodySize()).SingleLine()
 				ui.Text(c, names(t.Artists)).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 			})
 		}
+	})
+}
+
+// The live tile's card shows the artwork for liveRest, turns over in
+// liveTurn to what plays next, which shows as long, and turns back.
+const (
+	liveRest = 5040 * time.Millisecond
+	liveTurn = 960 * time.Millisecond
+)
+
+// liveCard is the live tile's artwork, which turns over to what plays
+// next, a tile of the accent, and back, since liveSince.
+func (s *shell) liveCard(c *ui.Context, t, next media.Track, size float32) {
+	k := &s.lk
+	// The card turns half over at the end of each rest, and the next turn
+	// wakes the window.
+	half := liveRest + liveTurn
+	at := c.Now().Sub(s.liveSince)
+	turns := int(at / half)
+	if at%half >= liveRest {
+		turns++
+	} else {
+		c.After(liveRest - at%half)
+	}
+	card := ui.Box(c.Key("live-card")).Size(size, size).Shrink(0).Radius(k.radiusSm).Clip()
+	// A new run of turns starts from the artwork.
+	angle := card.AnimateWith(s.liveSince, 180*float32(turns), liveTurn, ui.EaseInOut)
+	turned := math.Mod(float64(angle), 360)
+	back := turned > 90 && turned < 270
+	if back {
+		turned -= 180
+	}
+	card.RotateX(float32(turned)).Perspective(600)
+	card.Children(func() {
+		if !back {
+			s.cover(c, "live-cover", t.Artwork, size, false)
+			return
+		}
+		ui.Column(c).Fill().Justify(ui.SpaceBetween).Padding(6, 7).Background(k.tile(0)).Children(func() {
+			ui.Text(c, "up next").FontSize(11).LineHeight(1).TextColor(k.tileText)
+			ui.Text(c, next.Title).FontSize(12).LineHeight(1.15).MaxLines(3).TextColor(k.tileText)
+		})
 	})
 }
 

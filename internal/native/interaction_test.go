@@ -497,6 +497,30 @@ func TestYTDLPNotNow(t *testing.T) {
 	}
 }
 
+// TestLyricsScrolledStay keeps lyrics the user scrolls from following the
+// song for a while.
+func TestLyricsScrolledStay(t *testing.T) {
+	s := newTestShell(t)
+	var lines []lyrics.Line
+	for i := range 40 {
+		lines = append(lines, lyrics.Line{TimeMs: i * 1000, Text: "line " + count(i)})
+	}
+	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB", Lines: lines}}
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	s.showPanel("lyrics")
+	tt := tester(t, s)
+	r, ok := tt.Find("line 2")
+	if !ok {
+		t.Fatalf("no lyrics: %q", tt.Texts())
+	}
+	tt.Scroll(r.X+r.W/2, r.Y+r.H/2, 0, 120)
+	tt.Frame()
+	if time.Since(s.lyricsView.panel.userAt) > time.Second {
+		t.Error("scrolling the lyrics wasn't noticed")
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

@@ -177,12 +177,16 @@ type lyricsState struct {
 	panel, page lyricsScroll
 }
 
-// lyricsScroll is where a lyrics view scrolled, and the line it last
-// scrolled to.
+// lyricsScroll is where a lyrics view scrolled, the line it last scrolled
+// to, and when the user last scrolled it.
 type lyricsScroll struct {
 	list     ui.ListState
 	scrolled int
+	userAt   time.Time
 }
+
+// lyricsPause is how long lyrics the user scrolled don't follow the song.
+const lyricsPause = 4 * time.Second
 
 // lyrics follows the track playing: synchronized lines light up as they
 // are sung. large sets them at the size of the now playing page.
@@ -269,8 +273,15 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 			}
 		}
 	}).Grow(1).MinHeight(0)
-	_ = list
-	if synced && active >= 0 && active != view.scrolled {
+	// Lyrics the user scrolls, to read back say, stop following the song
+	// for a while.
+	list.HandleInput(func(ev ui.InputEvent) bool {
+		if ev.Kind == ui.InputScroll || ev.Kind == ui.InputPointerMove && ev.Button >= 0 {
+			view.userAt = time.Now()
+		}
+		return false
+	})
+	if synced && active >= 0 && active != view.scrolled && time.Since(view.userAt) > lyricsPause {
 		view.scrolled = active
 		view.list.ScrollTo(active, ui.Center)
 	}

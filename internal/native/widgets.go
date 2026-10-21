@@ -417,7 +417,10 @@ func (s *shell) segmented(c *ui.Context, key, label string, selected *int, label
 			if part.Clicked() {
 				clicked = true
 			}
-			part.Children(func() { ui.Text(c, l).FontSize(k.smallSize()).TextColor(ink).SingleLine() })
+			// A label stays whole, without an ellipsis: a single line of
+			// some faces lays out a hair wider than the box measured for
+			// it, as Quicksand cut "best" to "be…".
+			part.Children(func() { ui.Text(c, l).FontSize(k.smallSize()).TextColor(ink).NoWrap() })
 		}
 	})
 	// With none chosen, MyGo's segmented control takes the first of its

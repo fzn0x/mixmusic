@@ -1,0 +1,40 @@
+{
+  "id": "mochi",
+  "name": "Mochi",
+  "version": "1.0.0",
+  "author": "MixMusic",
+  "description": "Kawaii candy pastels, round as mochi, with sparkles drifting up.",
+  "scheme": "light",
+  "colors": {
+    "bg": "#fff6fa",
+    "surface": "#ffffff",
+    "surface-2": "#ffeef5",
+    "surface-3": "#ffd6e7",
+    "border": "#f8d1e2",
+    "text": "#5b3653",
+    "text-muted": "#8a5f81",
+    "accent": "#cc3d82",
+    "accent-text": "#ffffff",
+    "danger": "#d8402f",
+    "success": "#2f9e7a",
+    "youtube": "#e8455a",
+    "spotify": "#1c9458",
+    "tile-1": "#ffb5d3",
+    "tile-2": "#cdb9ff",
+    "tile-3": "#a9ead5",
+    "tile-4": "#ffe08a",
+    "tile-text": "#4a2a44"
+  },
+  "fonts": {
+    "body": "Quicksand, 'Hiragino Maru Gothic ProN', sans-serif"
+  },
+  "radius": "26px",
+  "options": [
+    {
+      "id": "sparkles",
+      "label": "Drifting sparkles",
+      "type": "toggle",
+      "default": "true"
+    }
+  ]
+}

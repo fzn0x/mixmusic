@@ -11,8 +11,8 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 )
 
-// TestThemeEffectsOptions turns the effects of Greenroom, Glasshouse
-// and Anime on and off with their options.
+// TestThemeEffectsOptions turns the effects of Greenroom, Glasshouse,
+// Anime and Mochi on and off with their options.
 func TestThemeEffectsOptions(t *testing.T) {
 	s := newTestShell(t)
 	for _, c := range []struct {
@@ -26,6 +26,8 @@ func TestThemeEffectsOptions(t *testing.T) {
 		{"glasshouse", map[string]string{"cover": "false", "blur": "0"}, effects{}},
 		{"anime", nil, effects{speedlines: true, screentone: true}},
 		{"anime", map[string]string{"speedlines": "false"}, effects{screentone: true}},
+		{"mochi", nil, effects{sparkles: true}},
+		{"mochi", map[string]string{"sparkles": "false"}, effects{}},
 	} {
 		found := false
 		for _, th := range s.inv.Themes {

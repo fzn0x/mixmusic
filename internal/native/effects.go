@@ -41,6 +41,8 @@ type effects struct {
 	// when the track changes, and screentone prints manga's dots in the
 	// corner across (Anime).
 	speedlines, screentone bool
+	// sparkles drift up the ground, twinkling (Mochi).
+	sparkles bool
 }
 
 // optionValue is the value of a theme's option: the user's, or its
@@ -90,6 +92,8 @@ func themeEffects(th addons.Theme, chosen map[string]string) effects {
 		fx.cover, fx.blur = opt("cover") == "true", num("blur")
 	case "anime":
 		fx.speedlines, fx.screentone = opt("speedlines") == "true", opt("screentone") == "true"
+	case "mochi":
+		fx.sparkles = opt("sparkles") == "true"
 	}
 	return fx
 }
@@ -141,6 +145,9 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 				}
 			}
 		})
+	case k.fx.sparkles:
+		inks, moving := sparkleInks(k), !c.Preferences().ReduceMotion
+		root.Draw(func(p *ui.Painter, r ui.Rect) { paintSparkles(p, r, inks, moving) })
 	}
 }
 

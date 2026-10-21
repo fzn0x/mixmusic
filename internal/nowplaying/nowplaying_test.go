@@ -102,6 +102,17 @@ func eventually(t *testing.T, what string, ok func() bool) {
 	}
 }
 
+func request(t *testing.T, got <-chan Request) Request {
+	t.Helper()
+	select {
+	case r := <-got:
+		return r
+	case <-time.After(5 * time.Second):
+		t.Fatal("no request")
+	}
+	return Request{}
+}
+
 func TestControls(t *testing.T) {
 	f := &fakePlatform{wait: make(chan struct{})}
 	got := make(chan Request, requests)

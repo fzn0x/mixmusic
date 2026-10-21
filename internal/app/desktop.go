@@ -74,6 +74,7 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 		return nil
 	}
 	win := a.opts.Interface(a, hidden)
+	a.attachTaskbar(win)
 	win.OnClose(func(e *mygo.CloseEvent) {
 		a.mu.Lock()
 		tray := a.tray
@@ -86,7 +87,8 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 	win.OnClosed(func() {
 		a.mu.Lock()
 		if a.main == win {
-			a.main = nil
+			// The thumbnail's buttons go with their window.
+			a.main, a.taskbar = nil, nil
 		}
 		mini := a.mini
 		a.mu.Unlock()

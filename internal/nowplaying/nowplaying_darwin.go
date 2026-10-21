@@ -9,12 +9,8 @@ package nowplaying
 // thread, which also calls the commands' handlers.
 
 import (
-	"errors"
 	"fmt"
-	"io"
 	"math"
-	"net/http"
-	"net/url"
 	"runtime"
 	"strings"
 	"sync"
@@ -35,8 +31,6 @@ const (
 	// MPNowPlayingInfoMediaTypeAudio.
 	mpMediaTypeAudio     = 1
 	nsUTF8StringEncoding = 4
-	// artworkMax bounds the artwork downloaded, in bytes.
-	artworkMax = 8 << 20
 )
 
 // cgSize is CGSize.
@@ -382,23 +376,4 @@ func (m *macControls) fetchArtwork(id, rawURL string) {
 			m.update()
 		})
 	})
-}
-
-// artworkClient downloads artwork.
-var artworkClient = &http.Client{Timeout: 15 * time.Second}
-
-func download(rawURL string) ([]byte, error) {
-	u, err := url.Parse(rawURL)
-	if err != nil || u.Scheme != "https" {
-		return nil, errors.New("nowplaying: only https artwork is read")
-	}
-	res, err := artworkClient.Get(u.String())
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("nowplaying: artwork: HTTP %d", res.StatusCode)
-	}
-	return io.ReadAll(io.LimitReader(res.Body, artworkMax))
 }

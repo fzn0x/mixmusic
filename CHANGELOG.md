@@ -23,9 +23,12 @@ next track.
 - MixMusic's own audio engine: it decodes the audio of YouTube Music itself
   and plays it on your audio device, with the sound the webview gave it:
   the equalizer, crossfades, volume levelling and the visualizer work as
-  before. On macOS and Linux it shows what plays in the system's media
-  controls, Now Playing and the desktop's player controls, which the media
-  keys and headphones reach as before.
+  before. It shows what plays in the system's media controls, which the
+  media keys and headphones reach as before: Windows' media flyout, with
+  the artwork, the buttons and the seek bar, Now Playing on macOS, and the
+  desktop's player controls on Linux.
+- On Windows, the thumbnail of MixMusic's taskbar button has previous, play
+  or pause, and next buttons, as other music players have (#13).
 - Spotify plays in MixMusic itself, on Windows: choose in mixmusic, from
   spotify in Settings › Playback. MixMusic plays at Spotify's own quality,
   with no Spotify app open, and shows among your Spotify devices while it
@@ -70,8 +73,6 @@ next track.
 - Your own CSS, in Settings › Appearance.
 - Plugins made for the web interface: they no longer run, as Settings ›
   Plugins says, until their authors move them to the new API.
-- On Windows, the system's media controls, which showed what the webview
-  played. The media keys still work.
 - A track YouTube serves without Opus audio, which is rare, no longer plays:
   the webview played those.
 

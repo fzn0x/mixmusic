@@ -93,7 +93,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 				tracks = tracks[:min(len(tracks), 10)]
 			}
 			ui.Column(c).Margin(0, 0, 48).Children(func() {
-				s.trackList(c, "results", tracks, trackListOptions{art: true, album: true, empty: "No songs match."})
+				s.trackList(c, "results", tracks, trackListOptions{art: true, album: true, plays: true, empty: "No songs match."})
 			})
 		}
 		switch pivot {

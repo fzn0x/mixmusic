@@ -51,3 +51,29 @@ func TestFormat(t *testing.T) {
 		t.Errorf("names: %q", got)
 	}
 }
+
+// TestPlaysLabel writes counts as YouTube Music does, rounded down to three
+// figures at most, plays for a song, views for a video.
+func TestPlaysLabel(t *testing.T) {
+	for n, want := range map[int64]string{
+		148: "148", 1000: "1K", 1299: "1.2K", 2200: "2.2K", 2300: "2.3K", 21000: "21K", 757_000: "757K", 999_999: "999K",
+		1_000_000: "1M", 13_000_000: "13M", 905_000_000: "905M", 1_200_000_000: "1.2B", 1_900_000_000: "1.9B",
+	} {
+		if got := compactCount(n); got != want {
+			t.Errorf("compactCount(%d) = %q, want %q", n, got, want)
+		}
+	}
+	for _, c := range []struct {
+		t    media.Track
+		want string
+	}{
+		{media.Track{Plays: 1_200_000_000}, "1.2B plays"},
+		{media.Track{Plays: 905_000_000, Video: true}, "905M views"},
+		{media.Track{Plays: 1}, "1 play"},
+		{media.Track{}, ""},
+	} {
+		if got := playsLabel(c.t); got != c.want {
+			t.Errorf("playsLabel(%+v) = %q, want %q", c.t, got, c.want)
+		}
+	}
+}

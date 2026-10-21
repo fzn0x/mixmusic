@@ -57,7 +57,12 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   MixMusic had, ported from Chromium's Web Audio, which they match sample
   for sample. `internal/audio/output` plays it on the system's output,
   without cgo: through WASAPI on Windows, an Audio Queue on macOS, and
-  PulseAudio, which PipeWire serves too, or ALSA on Linux.
+  PulseAudio, which PipeWire serves too, or ALSA on Linux. On Windows it
+  also hears what a process and its children play, through WASAPI's
+  process loopback: `internal/app`'s listener hears Spotify there, in
+  MixMusic's webview or the Spotify app, into a `Tap`, the analyser of
+  the engine for audio outside it, which the visualizer and the plugins'
+  analyser read while Spotify plays.
 - **`internal/nowplaying`** shows what the engine plays in the system's media
   controls, and passes on what they ask: Now Playing on macOS, through
   MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both

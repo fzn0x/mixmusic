@@ -96,6 +96,9 @@ type App struct {
 	// queue as kept between runs.
 	goPlayer atomic.Pointer[player.Player]
 	queue    *store.File[player.Saved]
+	// listen hears what the player plays outside the engine, with the
+	// player.
+	listen atomic.Pointer[listener]
 	// here is MixMusic's own Spotify device, which the player plays
 	// Spotify tracks on where it can.
 	here spotifyHere

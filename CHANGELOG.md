@@ -55,6 +55,9 @@ next track.
   colours, speed lines that burst as each track starts, and manga
   screentone (#7). Mochi: kawaii candy pastels in a round face, with
   sparkles drifting up (#7).
+- A search's songs say how many times each played on YouTube Music, or
+  how many views a video has: "1.2B plays", "905M views", so that the
+  original stands out of the covers. Spotify gives apps no such count.
 
 ### Changed
 

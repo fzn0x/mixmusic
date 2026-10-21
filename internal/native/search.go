@@ -70,8 +70,11 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 			return
 		}
 		if !res.value.SpotifySignedIn && s.searchScope != 2 {
-			ui.Text(c, "Searching YouTube Music only. Sign in to Spotify in Settings › Accounts to search it too.").
-				FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16)
+			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).Children(func() {
+				ui.Text(c, "Searching YouTube Music only. ")
+				ui.Link(c, "Sign in to Spotify", "/settings/accounts")
+				ui.Text(c, " to search it too.")
+			})
 		}
 		if len(res.value.Errors) > 0 {
 			ui.Text(c, strings.Join(res.value.Errors, " · ")).FontSize(k.smallSize()).TextColor(k.danger).Margin(0, 0, 16)

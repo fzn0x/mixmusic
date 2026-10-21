@@ -33,9 +33,10 @@ func TestProcesses(t *testing.T) {
 	t.Errorf("this process, %d, isn't among those that run", os.Getpid())
 }
 
-// TestListenerHears has the listener hear this process play a tone at
-// -100 dB, which no one hears, into its tap, and stop when it hears
-// nothing. It opens the audio device, so it runs only with MIXMUSIC_AUDIO=1.
+// TestListenerHears has the listener hear this process, in the place of
+// MixMusic's webview, play a tone at -100 dB, which no one hears, into its
+// tap, and stop when it hears nothing. It opens the audio device, so it
+// runs only with MIXMUSIC_AUDIO=1.
 func TestListenerHears(t *testing.T) {
 	if os.Getenv("MIXMUSIC_AUDIO") != "1" {
 		t.Skip("MIXMUSIC_AUDIO=1 runs the tests that open the audio device")
@@ -55,7 +56,12 @@ func TestListenerHears(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer s.Stop()
-	l := newListener()
+	l := listenFinding(func(h hearing) uint32 {
+		if h == hearMixMusic {
+			return uint32(os.Getpid())
+		}
+		return 0
+	})
 	l.follow(player.State{Playing: true, Source: &player.Source{Mode: player.ModeSpotify}})
 	heard := false
 	var a audio.Analysis

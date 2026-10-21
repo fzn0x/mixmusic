@@ -144,25 +144,44 @@ func TestFollowArtworkForGround(t *testing.T) {
 	}
 }
 
-// TestBurst bursts Anime's speed lines as a track starts, and not again
-// until another does, nor while the computer asks for less motion.
+// TestBurst bursts Anime's speed lines as a track starts to play, not as
+// the window opens on one paused, and not again until another does, nor
+// while the computer asks for less motion.
 func TestBurst(t *testing.T) {
 	s := newTestShell(t)
 	s.p.PlayTracks(testTracks, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing })
+	s.p.Pause()
+	s.settle(t, func(st player.State) bool { return !st.Playing })
 	var b float32
 	tt := ui.NewTester(func(c *ui.Context) {
 		s.st = s.p.State()
 		b = burst(s.burstAt(c), c.Now())
 	}, 10, 10)
 	tt.Frame()
+	if b != 0 {
+		t.Errorf("as the window opens on a paused track, the lines burst %.2f", b)
+	}
+	tt.Advance(time.Second)
+	s.p.Play()
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	tt.Frame()
 	if b < 0.99 {
-		t.Errorf("as the track starts, the lines burst %.2f", b)
+		t.Errorf("as the track starts to play, the lines burst %.2f", b)
 	}
 	tt.Advance(burstFor)
 	tt.Frame()
 	if b != 0 {
 		t.Errorf("after %v, the lines still burst %.2f", burstFor, b)
+	}
+	s.p.Pause()
+	s.settle(t, func(st player.State) bool { return !st.Playing })
+	tt.Frame()
+	s.p.Play()
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	tt.Frame()
+	if b != 0 {
+		t.Errorf("playing the same track again bursts the lines %.2f", b)
 	}
 	s.p.Next()
 	s.settle(t, func(st player.State) bool { return st.Index == 1 })

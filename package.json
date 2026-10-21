@@ -9,19 +9,10 @@
   "scripts": {
     "dev": "mygo dev",
     "build": "mygo build",
-    "generate": "mygo generate",
-    "dev:web": "vite",
-    "build:web": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@preact/signals": "^2.11.0",
-    "mygo-runtime": "^0.5.5",
-    "preact": "^11.0.0"
   },
   "devDependencies": {
     "mygo-cli": "^0.5.5",
-    "typescript": "^7.0.0",
-    "vite": "^8.3.0"
+    "typescript": "^7.0.0"
   }
 }

@@ -6,13 +6,12 @@ export default defineConfig({
   identifier: "app.mixmusic.desktop",
   version: pkg.version,
   copyright: "© 2026 MixMusic contributors",
-  // `mygo dev` runs devCommand and loads devUrl; `mygo build` runs
-  // buildCommand and embeds frontendDist into the app.
-  devUrl: "http://localhost:5173",
-  devCommand: "bun run dev:web",
-  buildCommand: "bun run build:web",
-  frontendDist: "dist",
-  bindings: "src/mygo.ts",
+  // MyGo draws the windows itself, in Go (internal/native): the only page
+  // is that of MixMusic's own Spotify device, public/spotify.html, which
+  // `mygo build` embeds as it is. It calls Go without a generated client,
+  // so `mygo dev` writes it out of the way.
+  frontendDist: "public",
+  bindings: ".mygo/bindings.ts",
   out: "build",
   urlSchemes: ["mixmusic"],
   // Apps update themselves from the releases of the repository, signed with
@@ -26,9 +25,10 @@ export default defineConfig({
     comment: "Spotify and YouTube Music in one customizable player",
     categories: ["AudioVideo", "Audio", "Player"],
     command: "mixmusic",
-    // WebKitGTK plays audio through GStreamer: Opus in WebM, and AAC. The
-    // tray icon needs AppIndicator, and keeping sign-ins in the keyring
-    // libsecret.
-    depends: ["gstreamer1.0-plugins-good", "gstreamer1.0-libav", "libayatana-appindicator3-1", "libsecret-1-0"],
+    // MixMusic plays through PulseAudio, which PipeWire serves too, or
+    // ALSA. The tray icon needs AppIndicator, and keeping sign-ins in the
+    // keyring libsecret. WebKitGTK, which MyGo depends on, shows Google's
+    // sign-in to YouTube Music.
+    depends: ["libpulse0 | libasound2 | libasound2t64", "libayatana-appindicator3-1", "libsecret-1-0"],
   },
 });

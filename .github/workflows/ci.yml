@@ -119,19 +119,19 @@ jobs:
             exit 1
           fi
 
-  frontend:
-    name: Frontend
+  # The plugin API's types, and the community's plugins against them.
+  sdk:
+    name: Plugin SDK
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
-      - run: bun run build:web
 
   build:
     name: Build ${{ matrix.platform }}
-    needs: [go, frontend]
+    needs: [go, sdk]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

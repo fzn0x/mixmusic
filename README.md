@@ -30,7 +30,9 @@ download or keep in memory.
 ## Features
 
 - **One search, two services.** Results of YouTube Music and Spotify side by
-  side, every track marked with where it comes from.
+  side, every track marked with where it comes from, and YouTube Music's
+  with how many times each played, so the original stands out of the
+  covers.
 - **One queue.** Play a Spotify track after a YouTube Music one, shuffle and
   repeat across both, and let a radio carry on when the queue runs out.
 - **Your mixes.** Playlists that hold tracks of every service, liked songs
@@ -321,6 +323,11 @@ in files only your user can read, the YouTube Music session encrypted;
 and the log, without your sign-ins. The library's history clears what you
 played, Settings › Playback the cache, and signing out of a service deletes
 its sign-in.
+
+On Windows, the visualizer hears the audio of Spotify playing on this
+computer, in MixMusic or in the Spotify app, through Windows' process
+loopback, which hears that one app: it analyses it in memory, and never
+records or sends it.
 
 ## Develop
 

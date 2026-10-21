@@ -148,8 +148,11 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 			}
 		})
 	case k.fx.sparkles:
-		inks, moving := sparkleInks(k), !c.Preferences().ReduceMotion
-		root.Draw(func(p *ui.Painter, r ui.Rect) { paintSparkles(p, r, inks, moving) })
+		// They rise while something plays, and hold still where they are
+		// otherwise, as while the computer asks for less motion.
+		s.rise.set(c.Now(), s.st.Playing && !c.Preferences().ReduceMotion)
+		inks, rise := sparkleInks(k), s.rise
+		root.Draw(func(p *ui.Painter, r ui.Rect) { paintSparkles(p, r, inks, rise) })
 	}
 }
 

@@ -250,6 +250,55 @@ func TestGroundSettles(t *testing.T) {
 	}
 }
 
+// TestSparklesRise has Mochi's sparkles rise while something plays, hold
+// still where they are while nothing does, or while the computer asks for
+// less motion, and go on from there.
+func TestSparklesRise(t *testing.T) {
+	s := newTestShell(t)
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	wear(s, "mochi", nil)
+	tt := ui.NewTester(func(ctx *ui.Context) {
+		s.st = s.p.State()
+		s.ground(ctx, ui.Column(ctx).Fill())
+	}, 200, 160)
+	frame := func() []byte { return append([]byte(nil), tt.Image().Pix...) }
+	tt.Frame()
+	start := frame()
+	tt.Advance(time.Second)
+	risen := frame()
+	if bytes.Equal(start, risen) {
+		t.Fatal("while something plays, the sparkles stood still")
+	}
+	s.p.Pause()
+	s.settle(t, func(st player.State) bool { return !st.Playing })
+	tt.Frame()
+	if !bytes.Equal(risen, frame()) {
+		t.Error("pausing moved the sparkles")
+	}
+	tt.Advance(time.Second)
+	if !bytes.Equal(risen, frame()) {
+		t.Error("while nothing plays, the sparkles rose")
+	}
+	s.p.Play()
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	tt.Frame()
+	if !bytes.Equal(risen, frame()) {
+		t.Error("playing again, the sparkles didn't go on from where they were")
+	}
+	tt.Advance(time.Second)
+	if bytes.Equal(risen, frame()) {
+		t.Error("playing again, the sparkles stood still")
+	}
+	tt.SetPreferences(ui.Preferences{ReduceMotion: true})
+	tt.Frame()
+	still := frame()
+	tt.Advance(time.Second)
+	if !bytes.Equal(still, frame()) {
+		t.Error("with less motion, the sparkles rose")
+	}
+}
+
 // TestScreentone prints its dots largest in the bottom left corner, and
 // none a width away from it.
 func TestScreentone(t *testing.T) {

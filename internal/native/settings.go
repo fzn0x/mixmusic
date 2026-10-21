@@ -605,7 +605,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 			band := func(key, label string, v *float64) {
 				ui.Column(c).Gap(6).AlignItems(ui.Center).Children(func() {
 					ui.Text(c, fmt.Sprintf("%+.0f", *v)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
-					if ui.SliderBase(c.Key(key), v, -12, 12).Step(0.5).Vertical().Height(140).Width(28).Label(label + " dB").Changed() {
+					if s.bandSlider(c, key, label+" dB", v, -12, 12).Changed() {
 						if key != "eq-preamp" {
 							eq.Preset = "custom"
 						}
@@ -625,6 +625,43 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 			}
 		})
 	})
+}
+
+// bandSlider is the slider of an equalizer's band, which goes up from lo at
+// its foot to hi at its head, by half a decibel. SliderBase draws nothing
+// of itself: it is drawn as the theme draws its sliders across, standing
+// up, a track of the border's colour, the accent filling it from 0 dB to
+// the value, either way, and the theme's white knob.
+func (s *shell) bandSlider(c *ui.Context, key, label string, v *float64, lo, hi float64) ui.Element {
+	t := &s.lk.theme
+	kw, kh := t.Space(5), t.Space(4)
+	// Half the knob's height pads it, to keep the knob on the track.
+	sl := ui.SliderBase(c.Key(key), v, lo, hi).Step(0.5).Vertical().Height(140).Width(28).PaddingY(kh / 2).Label(label)
+	focused := sl.FocusVisible()
+	sl.Draw(func(p *ui.Painter, r ui.Rect) {
+		at := func(x float64) float32 {
+			f := float32(max(0, min(1, (x-lo)/(hi-lo))))
+			return r.Y + kh/2 + (r.H-kh)*(1-f)
+		}
+		w, cx := t.Space(1.5), r.X+r.W/2
+		y, zero := at(*v), at(0)
+		p.Fill(ui.Rect{X: cx - w/2, Y: r.Y, W: w, H: r.H}, t.Border, w/2)
+		p.Fill(ui.Rect{X: cx - w/2, Y: min(y, zero), W: w, H: max(y, zero) - min(y, zero)}, t.Accent, w/2)
+		knob, rad := ui.Rect{X: cx - kw/2, Y: y - kh/2, W: kw, H: kh}, kh/2
+		face := ui.RGB(255, 255, 255)
+		if t.Dark {
+			face = ui.RGB(224, 225, 225)
+		}
+		// A tight shadow edges the knob, a soft one lifts it, as the
+		// theme's do.
+		p.Shadow(knob, rad, 0, 0.5, 1, 0, ui.RGBA(0, 0, 0, 0.08))
+		p.Shadow(knob, rad, 0, 1.5, 7, 0, ui.RGBA(0, 0, 0, 0.1))
+		p.Fill(knob, face, rad)
+		if focused {
+			p.FocusRing(knob, [4]float32{rad, rad, rad, rad})
+		}
+	})
+	return sl
 }
 
 func (s *shell) aboutSettings(c *ui.Context) {

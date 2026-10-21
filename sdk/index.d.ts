@@ -1,4 +1,6 @@
-// Types of the MixMusic plugin API, for plugin authors.
+// Types of the MixMusic plugin API, version 2, for plugin authors: that of
+// MixMusic's own interface, which a plugin declares with "api": 2 in its
+// plugin.json.
 //
 // A plugin's module exports a default function that MixMusic calls with the
 // API when the user enables the plugin. It may return a function, which
@@ -11,8 +13,8 @@
 //   }
 //
 // Everything a plugin adds through the API (sidebar items, pages, track
-// actions, widgets, styles, commands and listeners) is removed for it when
-// it stops. See docs/plugins.md.
+// actions, widgets, commands and listeners) is removed for it when it
+// stops, and its timers stop. See docs/plugins.md.
 
 /** A service tracks come from; "local" is a mix made in MixMusic. */
 export type Source = "youtube" | "spotify" | "local";
@@ -125,6 +127,87 @@ export type PlayerEvent = "trackchange" | "statechange" | "progress" | "queuecha
 /** Plugins' render functions may return a cleanup function. */
 export type Cleanup = void | (() => void);
 
+/** What pages and widgets show: elements, which api.ui's functions make, or plain objects of their shape. null, undefined and false show nothing, and arrays are flattened. */
+export type Element =
+  | { type: "text"; text: string; tone?: "muted" | "accent" | "danger"; size?: "small" | "body" | "subtitle" | "title" }
+  | { type: "heading"; text: string }
+  | { type: "button"; label: string; onClick?: () => void; primary?: boolean }
+  | { type: "link"; label: string; onClick?: () => void; path?: string }
+  | { type: "tiles"; children: Children }
+  | { type: "tile"; title: string; onClick?: () => void; tone?: number; caption?: string }
+  | { type: "row" | "column"; children: Children; gap?: number }
+  | { type: "toggle"; label: string; on: boolean; onChange?: (on: boolean) => void }
+  | { type: "input"; placeholder?: string; value?: string; onSubmit?: (text: string) => void }
+  | { type: "image"; url: string; size?: number; round?: boolean }
+  | { type: "spacer"; size: number }
+  | { type: "canvas"; width?: number; height?: number; animate?: boolean; draw(ctx: Context2D, width: number, height: number): void };
+
+export type Children = Element | string | null | undefined | false | Children[];
+
+/** The view a page or a widget renders into: set replaces what it shows. */
+export interface View {
+  set(...elements: Children[]): void;
+  clear(): void;
+}
+
+/** The part of the web's CanvasRenderingContext2D a canvas draws with; sizes are in the interface's units, as CSS pixels. */
+export interface Context2D {
+  readonly canvas: { readonly width: number; readonly height: number };
+  fillStyle: string;
+  strokeStyle: string;
+  lineWidth: number;
+  lineCap: string;
+  globalAlpha: number;
+  save(): void;
+  restore(): void;
+  translate(x: number, y: number): void;
+  rotate(angle: number): void;
+  scale(x: number, y: number): void;
+  transform(a: number, b: number, c: number, d: number, e: number, f: number): void;
+  setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void;
+  resetTransform(): void;
+  beginPath(): void;
+  moveTo(x: number, y: number): void;
+  lineTo(x: number, y: number): void;
+  arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, counterclockwise?: boolean): void;
+  rect(x: number, y: number, width: number, height: number): void;
+  quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void;
+  bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void;
+  closePath(): void;
+  stroke(): void;
+  fill(): void;
+  fillRect(x: number, y: number, width: number, height: number): void;
+  strokeRect(x: number, y: number, width: number, height: number): void;
+  /** Clearing the whole canvas drops what was drawn before; every frame starts clear. */
+  clearRect(x: number, y: number, width: number, height: number): void;
+}
+
+/** The reading methods and properties of the web's AnalyserNode, of what MixMusic's own player plays. */
+export interface Analyser {
+  readonly fftSize: number;
+  readonly frequencyBinCount: number;
+  readonly minDecibels: number;
+  readonly maxDecibels: number;
+  readonly smoothingTimeConstant: number;
+  getByteFrequencyData(array: Uint8Array): void;
+  getFloatFrequencyData(array: Float32Array): void;
+  getByteTimeDomainData(array: Uint8Array): void;
+  getFloatTimeDomainData(array: Float32Array): void;
+}
+
+/** The colours of the theme, as CSS hex. */
+export interface Theme {
+  accent: string;
+  accentText: string;
+  text: string;
+  muted: string;
+  background: string;
+  surface: string;
+  tiles: [string, string, string, string];
+  tileText: string;
+  dark: boolean;
+}
+
 export interface MixMusicAPI {
   /** MixMusic's version. */
   readonly version: string;
@@ -149,8 +232,8 @@ export interface MixMusicAPI {
     enqueue(tracks: Track[]): void;
     /** Listens to the player; returns the function that stops listening. */
     on(event: PlayerEvent, listener: () => void): () => void;
-    /** The Web Audio analyser of MixMusic's own player, null until it played. Spotify's audio, played in MixMusic or on a Spotify Connect device, does not reach it. With MixMusic's own audio engine (Settings › Playback), an object with the analyser's reading methods and properties, of fftSize 256, which gives the same data, and no Web Audio connections. */
-    analyser(): AnalyserNode | null;
+    /** The analyser of MixMusic's own player, of fftSize 256: silence while it plays nothing. Spotify's audio, played on a Spotify Connect device, does not reach it. */
+    analyser(): Analyser;
   };
 
   catalog: {
@@ -179,13 +262,29 @@ export interface MixMusicAPI {
     /** Adds an item to the sidebar, opening one of the plugin's pages. icon is an SVG string of a 24×24 icon drawn in currentColor. */
     addSidebarItem(item: { id: string; label: string; icon?: string; page: string }): () => void;
     /** Adds a page at /plugin/<plugin id>/<name>, rendered into a container. */
-    addPage(page: { name: string; title: string; render(container: HTMLElement): Cleanup }): () => void;
+    addPage(page: { name: string; title: string; render(view: View): Cleanup }): () => void;
     /** Adds an item to the menu of every track. */
     addTrackAction(action: { id: string; label: string; run(track: Track): void }): () => void;
     /** Adds a section to the now playing page. */
-    addWidget(widget: { id: string; title: string; render(container: HTMLElement): Cleanup }): () => void;
-    /** Adds CSS to the page, under the user's own CSS. */
-    addStyle(css: string): () => void;
+    addWidget(widget: { id: string; title: string; render(view: View): Cleanup }): () => void;
+    /** The colours of the theme, which pages and canvases draw in. */
+    theme(): Theme;
+    text(text: string, options?: { tone?: "muted" | "accent" | "danger"; size?: "small" | "body" | "subtitle" | "title" }): Element;
+    heading(text: string): Element;
+    button(label: string, onClick: () => void, options?: { primary?: boolean }): Element;
+    /** A link that does something, or shows a page of the app, as "/search?q=jazz". */
+    link(label: string, target: (() => void) | string): Element;
+    tiles(tiles: Children): Element;
+    tile(title: string, onClick: () => void, options?: { tone?: number; caption?: string }): Element;
+    row(children: Children, options?: { gap?: number }): Element;
+    column(children: Children, options?: { gap?: number }): Element;
+    /** A switch, which shows on: onChange gets what the user chose, which shows once the view is set again. */
+    toggle(label: string, on: boolean, onChange: (on: boolean) => void): Element;
+    input(options: { placeholder?: string; value?: string; onSubmit(text: string): void }): Element;
+    image(url: string, options?: { size?: number; round?: boolean }): Element;
+    spacer(size: number): Element;
+    /** A drawing, which draw makes, at every frame while animate is set, unless the computer asks for less motion. */
+    canvas(options: { width?: number; height?: number; animate?: boolean; draw(ctx: Context2D, width: number, height: number): void }): Element;
   };
 
   commands: {

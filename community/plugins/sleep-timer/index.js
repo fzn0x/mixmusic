@@ -8,6 +8,7 @@ const FADE_MS = 30_000;
 const icon =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10Z"/></svg>';
 
+/** @param {import("../../../sdk").MixMusicAPI} api */
 export default function activate(api) {
   let deadline = 0; // when the music pauses, or 0
   let atTrackEnd = false;
@@ -83,27 +84,14 @@ export default function activate(api) {
   api.ui.addPage({
     name: "timer",
     title: "sleep timer",
-    render(el) {
-      el.innerHTML = `
-        <p class="mm-stats-line" data-status></p>
-        <div class="mm-tile-grid" style="margin-top: 32px; max-width: 640px">
-          ${[15, 30, 60, 90]
-            .map((m, i) => `<button type="button" class="mm-tile" data-tone="${(i % 4) + 1}" data-minutes="${m}"><span class="mm-tile-title">${m} min</span></button>`)
-            .join("")}
-        </div>
-        <div class="mm-actions" style="margin-top: 24px">
-          <button type="button" class="mm-button mm-button-outline" data-track>at the end of this track</button>
-          <button type="button" class="mm-button mm-button-outline" data-cancel>cancel</button>
-        </div>`;
-      const status = el.querySelector("[data-status]");
-      const render = () => (status.textContent = `The sleep timer is ${describe()}.`);
-      el.addEventListener("click", (e) => {
-        const button = e.target.closest("button");
-        if (!button) return;
-        if (button.dataset.minutes) startMinutes(Number(button.dataset.minutes));
-        else if ("track" in button.dataset) startAtTrackEnd();
-        else if ("cancel" in button.dataset) clear();
-      });
+    render(view) {
+      const { text, tiles, tile, row, button } = api.ui;
+      const render = () =>
+        view.set(
+          text(`The sleep timer is ${describe()}.`, { size: "subtitle" }),
+          tiles([15, 30, 60, 90].map((m, i) => tile(`${m} min`, () => startMinutes(m), { tone: (i % 4) + 1 }))),
+          row([button("at the end of this track", startAtTrackEnd), button("cancel", clear)]),
+        );
       listeners.add(render);
       const refresh = setInterval(render, 1000);
       render();

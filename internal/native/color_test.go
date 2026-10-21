@@ -80,6 +80,32 @@ func TestReadableOn(t *testing.T) {
 	}
 }
 
+// TestRaised gives every built-in theme a solid face for the menus that
+// float over the page: its surface-2 where that's solid, and Aurora's glass
+// over its ground.
+func TestRaised(t *testing.T) {
+	s := newTestShell(t)
+	n := 0
+	for _, th := range s.inv.Themes {
+		if !th.Builtin {
+			continue
+		}
+		n++
+		set := s.set
+		set.FollowSystem, set.Theme = false, th.ID
+		k := newLook(set, s.inv.Themes, true, "")
+		if k.raised.A != 255 {
+			t.Errorf("%s: the menus' face %+v shows the page through", th.ID, k.raised)
+		}
+		if c, ok := parseColor(th.Colors["surface-2"]); ok && c.A == 255 && k.raised != col(c) {
+			t.Errorf("%s: the menus' face is %+v, not surface-2's %+v", th.ID, k.raised, c)
+		}
+	}
+	if n == 0 {
+		t.Fatal("no built-in themes")
+	}
+}
+
 func TestCSSLength(t *testing.T) {
 	for in, want := range map[string]float32{
 		"12px": 12, "0": 0, "0px": 0, " 4px ": 4, "0.75rem": 12, "1em": 16, "1.5": 1.5, "": 0, "-2px": 0, "big": 0,

@@ -11,8 +11,9 @@ import (
 
 // TestEngineOnTheDevice plays a 3-second track through the device, at
 // volume 0, so silently: the time must pass as the clock's, and the track
-// end when it should. It opens the device, so it runs only with
-// MIXMUSIC_AUDIO=1, where the device is WASAPI's.
+// end when it should, 3 seconds after it started to play. It opens the
+// device, so it runs only with MIXMUSIC_AUDIO=1, as CI's audio jobs on
+// Linux and macOS set it.
 func TestEngineOnTheDevice(t *testing.T) {
 	if os.Getenv("MIXMUSIC_AUDIO") != "1" {
 		t.Skip("MIXMUSIC_AUDIO=1 runs the tests that open the audio device")
@@ -25,7 +26,6 @@ func TestEngineOnTheDevice(t *testing.T) {
 	defer e.Close()
 	e.SetVolume(0)
 	e.master = newSmoother(0, glide)
-	began := time.Now()
 	err := e.Load(cuesFront, 0, true)
 	if errors.Is(err, output.ErrNoDevice) || errors.Is(err, output.ErrUnsupported) {
 		t.Skip(err)
@@ -33,6 +33,10 @@ func TestEngineOnTheDevice(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// The track plays once Load returns, which starts the device first: on
+	// a slow machine, as CI's macOS runners, that alone took 0.7 seconds,
+	// which aren't the track's.
+	began := time.Now()
 	time.Sleep(time.Second)
 	if p := e.Position(); p < 800*time.Millisecond || p > 1200*time.Millisecond {
 		t.Errorf("position %v after a second", p)

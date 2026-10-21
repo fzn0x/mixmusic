@@ -1,13 +1,16 @@
 package app
 
 // The analyser hears MixMusic's own engine. Spotify, when it plays in
-// MixMusic, plays in the page of a webview, which the engine never hears:
-// on Windows, the listener hears it there, through process loopback, for
-// the visualizer and the plugins' analyser.
+// MixMusic, plays in the page of a webview, which the engine never hears,
+// and on Spotify Connect in a Spotify app: on Windows, the listener hears
+// them there, through process loopback, for the visualizer and the plugins'
+// analyser. It hears the Spotify app only on this computer; other devices
+// MixMusic can't hear.
 
 import (
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -15,6 +18,66 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio/output"
 	"github.com/fzn0x/mixmusic/internal/player"
 )
+
+// hearing is what the listener hears.
+type hearing int
+
+const (
+	hearNothing hearing = iota
+	// hearMixMusic hears MixMusic's own process tree, whose webview plays
+	// Spotify in MixMusic.
+	hearMixMusic
+	// hearSpotifyApp hears the Spotify app on this computer, which plays
+	// what plays on Spotify Connect when it is the device.
+	hearSpotifyApp
+)
+
+// heard is what the listener hears of what st plays outside the engine.
+func heard(st player.State) hearing {
+	if !st.Playing || st.Source == nil {
+		return hearNothing
+	}
+	switch st.Source.Mode {
+	case player.ModeSpotify:
+		return hearMixMusic
+	case player.ModeConnect:
+		return hearSpotifyApp
+	}
+	return hearNothing
+}
+
+// process returns the process whose tree plays what h hears, or 0 for
+// none, as while the Spotify app doesn't run.
+func (h hearing) process() uint32 {
+	switch h {
+	case hearMixMusic:
+		return uint32(os.Getpid())
+	case hearSpotifyApp:
+		return rootNamed(processes(), "Spotify.exe")
+	}
+	return 0
+}
+
+// proc is a process that runs.
+type proc struct {
+	pid, parent uint32
+	name        string
+}
+
+// rootNamed returns a process named name whose parent is not, whose tree
+// holds the others, or 0 for none.
+func rootNamed(procs []proc, name string) uint32 {
+	names := make(map[uint32]string, len(procs))
+	for _, p := range procs {
+		names[p.pid] = p.name
+	}
+	for _, p := range procs {
+		if strings.EqualFold(p.name, name) && !strings.EqualFold(names[p.parent], name) {
+			return p.pid
+		}
+	}
+	return 0
+}
 
 // listener hears, into its tap, the processes that play what the engine
 // doesn't.
@@ -26,11 +89,11 @@ type listener struct {
 
 	wake chan struct{}
 	mu   sync.Mutex
-	want uint32 // the process whose tree to hear, 0 for none
+	want hearing
 
-	// pid is the process whose tree capture hears, which run owns, as
-	// failed, set once a capture failed and said why.
-	pid     uint32
+	// hearing is what capture hears, which run owns, as failed, set once a
+	// capture failed and said why.
+	hearing hearing
 	capture *output.Capture
 	failed  bool
 }
@@ -42,32 +105,12 @@ func newListener() *listener {
 }
 
 // follow has the listener hear what the player's state plays outside the
-// engine. It returns at once.
+// engine. It returns at once: the listener starts and stops captures on
+// its own goroutine.
 func (l *listener) follow(st player.State) {
 	l.outside.Store(st.Source != nil && st.Source.Mode != player.ModeStream)
-	l.hear(heardProcess(st))
-}
-
-// heardProcess is the process whose tree plays what st plays outside the
-// engine, as far as MixMusic can hear it, or 0: MixMusic's own, whose
-// webview plays Spotify, while Spotify plays in MixMusic.
-func heardProcess(st player.State) uint32 {
-	if !st.Playing || st.Source == nil {
-		return 0
-	}
-	switch st.Source.Mode {
-	case player.ModeSpotify:
-		return uint32(os.Getpid())
-	}
-	return 0
-}
-
-// hear has the listener hear the tree of the process pid, or nothing for 0.
-// It returns at once: the listener starts and stops captures on its own
-// goroutine.
-func (l *listener) hear(pid uint32) {
 	l.mu.Lock()
-	l.want = pid
+	l.want = heard(st)
 	l.mu.Unlock()
 	select {
 	case l.wake <- struct{}{}:
@@ -78,9 +121,9 @@ func (l *listener) hear(pid uint32) {
 func (l *listener) run() {
 	for range l.wake {
 		l.mu.Lock()
-		pid := l.want
+		want := l.want
 		l.mu.Unlock()
-		if pid == l.pid {
+		if want == l.hearing {
 			continue
 		}
 		if l.capture != nil {
@@ -88,7 +131,8 @@ func (l *listener) run() {
 			l.capture = nil
 		}
 		l.tap.Silence()
-		l.pid = pid
+		l.hearing = want
+		pid := want.process()
 		if pid == 0 {
 			continue
 		}

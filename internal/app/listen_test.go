@@ -10,21 +10,21 @@ import (
 )
 
 // TestListenerFollows hears MixMusic's own process tree, whose webview
-// plays Spotify, while Spotify plays in MixMusic, and nothing otherwise,
-// and has the analyser read the tap while the track plays outside the
-// engine.
+// plays Spotify, while Spotify plays in MixMusic, the Spotify app while it
+// plays on Spotify Connect, and nothing otherwise, and has the analyser
+// read the tap while the track plays outside the engine.
 func TestListenerFollows(t *testing.T) {
-	own := uint32(os.Getpid())
 	for _, c := range []struct {
 		name    string
 		st      player.State
-		want    uint32
+		want    hearing
 		outside bool
 	}{
-		{"spotify in mixmusic", player.State{Playing: true, Source: &player.Source{Mode: player.ModeSpotify}}, own, true},
-		{"paused", player.State{Source: &player.Source{Mode: player.ModeSpotify}}, 0, true},
-		{"the engine", player.State{Playing: true, Source: &player.Source{Mode: player.ModeStream}}, 0, false},
-		{"not prepared yet", player.State{Playing: true}, 0, false},
+		{"spotify in mixmusic", player.State{Playing: true, Source: &player.Source{Mode: player.ModeSpotify}}, hearMixMusic, true},
+		{"spotify connect", player.State{Playing: true, Source: &player.Source{Mode: player.ModeConnect}}, hearSpotifyApp, true},
+		{"paused", player.State{Source: &player.Source{Mode: player.ModeSpotify}}, hearNothing, true},
+		{"the engine", player.State{Playing: true, Source: &player.Source{Mode: player.ModeStream}}, hearNothing, false},
+		{"not prepared yet", player.State{Playing: true}, hearNothing, false},
 	} {
 		// No goroutine: the listener only decides what to hear.
 		l := &listener{tap: audio.NewTap(), wake: make(chan struct{}, 1)}
@@ -32,6 +32,27 @@ func TestListenerFollows(t *testing.T) {
 		if l.want != c.want || l.outside.Load() != c.outside {
 			t.Errorf("%s: hears %d, outside %v; want %d, %v", c.name, l.want, l.outside.Load(), c.want, c.outside)
 		}
+	}
+	if got := hearMixMusic.process(); got != uint32(os.Getpid()) {
+		t.Errorf("hearing MixMusic hears process %d, not its own", got)
+	}
+}
+
+// TestRootNamed finds the process of an app whose parent isn't the app,
+// whose tree holds the app's other processes.
+func TestRootNamed(t *testing.T) {
+	procs := []proc{
+		{pid: 4, parent: 0, name: "System"},
+		{pid: 30, parent: 20, name: "Spotify.exe"},
+		{pid: 20, parent: 10, name: "Spotify.exe"},
+		{pid: 10, parent: 4, name: "explorer.exe"},
+		{pid: 31, parent: 20, name: "spotify.exe"},
+	}
+	if got := rootNamed(procs, "Spotify.exe"); got != 20 {
+		t.Errorf("the Spotify app is process %d, want 20", got)
+	}
+	if got := rootNamed(procs[:1], "Spotify.exe"); got != 0 {
+		t.Errorf("without the Spotify app, found process %d", got)
 	}
 }
 

@@ -37,11 +37,11 @@ var (
 	coverTone = toning{0.68, 0.82, 0.55}
 )
 
-// coverTint returns the colour of the cover of what plays, toned for the
-// ground, or the fallback's without a cover, and whether it is still
-// changing from the last: over tintFade, at once while the computer asks
-// for less motion.
-func (s *shell) coverTint(c *ui.Context, fallback ui.Color, tone toning) (ui.Color, bool) {
+// coverTint returns the ground's tint: the colour of the cover of what
+// plays, toned for the ground, or the fallback's without a cover, changing
+// from the last over tintFade, at once while the computer asks for less
+// motion.
+func (s *shell) coverTint(c *ui.Context, fallback ui.Color, tone toning) tint {
 	from := nrgba(fallback)
 	if art, ok := parseColor(s.artColor); ok && s.artColor != "" {
 		from = art
@@ -55,11 +55,17 @@ func (s *shell) coverTint(c *ui.Context, fallback ui.Color, tone toning) (ui.Col
 	case want != t.to:
 		t.from, t.to, t.at = t.color(now), want, now
 	}
-	return t.color(now), now.Sub(t.at) < tintFade
+	return *t
+}
+
+// changing tells whether the tint is still changing at now.
+func (t tint) changing(now time.Time) bool {
+	d := now.Sub(t.at)
+	return d >= 0 && d < tintFade
 }
 
 // color is the tint's colour at now.
-func (t *tint) color(now time.Time) ui.Color {
+func (t tint) color(now time.Time) ui.Color {
 	f := float32(now.Sub(t.at)) / float32(tintFade)
 	if f >= 1 {
 		return t.to
@@ -96,10 +102,10 @@ type impact struct {
 	at    time.Time
 }
 
-// burst is how far Anime's speed lines burst now: 1 as a track starts,
-// easing to 0 over burstFor, and 0 while the computer asks for less
-// motion.
-func (s *shell) burst(c *ui.Context) float32 {
+// burstAt returns when Anime's speed lines last burst, as a track
+// started, or the zero time for none: while nothing plays, and while the
+// computer asks for less motion.
+func (s *shell) burstAt(c *ui.Context) time.Time {
 	id := ""
 	if cur, ok := s.st.Current(); ok {
 		id = cur.Track.ID
@@ -112,11 +118,20 @@ func (s *shell) burst(c *ui.Context) float32 {
 		// A clock set back would hold the burst.
 		s.impact.at = now.Add(-burstFor)
 	}
-	f := float32(now.Sub(s.impact.at)) / float32(burstFor)
-	if id == "" || f >= 1 || c.Preferences().ReduceMotion {
+	if id == "" || c.Preferences().ReduceMotion {
+		return time.Time{}
+	}
+	return s.impact.at
+}
+
+// burst is how far Anime's speed lines burst at now, after a burst at at:
+// 1 at first, easing to 0 over burstFor.
+func burst(at, now time.Time) float32 {
+	f := float32(now.Sub(at)) / float32(burstFor)
+	if at.IsZero() || f < 0 || f >= 1 {
 		return 0
 	}
-	return 1 - ui.EaseOut(max(f, 0))
+	return 1 - ui.EaseOut(f)
 }
 
 // speedline is one of Anime's speed lines: where it crosses the window,

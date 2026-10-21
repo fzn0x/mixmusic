@@ -1,6 +1,7 @@
 package native
 
 import (
+	"bytes"
 	"image/color"
 	"testing"
 	"time"
@@ -54,7 +55,10 @@ func TestCoverTint(t *testing.T) {
 	tone := func(c color.NRGBA) ui.Color { return col(toned(c, washTone.lo, washTone.hi, washTone.sat)) }
 	var got ui.Color
 	var changing bool
-	tt := ui.NewTester(func(c *ui.Context) { got, changing = s.coverTint(c, jade, washTone) }, 10, 10)
+	tt := ui.NewTester(func(c *ui.Context) {
+		tn := s.coverTint(c, jade, washTone)
+		got, changing = tn.color(c.Now()), tn.changing(c.Now())
+	}, 10, 10)
 	tt.Frame()
 	if want := tone(nrgba(jade)); got != want || changing {
 		t.Fatalf("without a cover: %v, changing %v; want %v", got, changing, want)
@@ -146,32 +150,84 @@ func TestBurst(t *testing.T) {
 	s := newTestShell(t)
 	s.p.PlayTracks(testTracks, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing })
-	var burst float32
+	var b float32
 	tt := ui.NewTester(func(c *ui.Context) {
 		s.st = s.p.State()
-		burst = s.burst(c)
+		b = burst(s.burstAt(c), c.Now())
 	}, 10, 10)
 	tt.Frame()
-	if burst < 0.99 {
-		t.Errorf("as the track starts, the lines burst %.2f", burst)
+	if b < 0.99 {
+		t.Errorf("as the track starts, the lines burst %.2f", b)
 	}
 	tt.Advance(burstFor)
 	tt.Frame()
-	if burst != 0 {
-		t.Errorf("after %v, the lines still burst %.2f", burstFor, burst)
+	if b != 0 {
+		t.Errorf("after %v, the lines still burst %.2f", burstFor, b)
 	}
 	s.p.Next()
 	s.settle(t, func(st player.State) bool { return st.Index == 1 })
 	tt.Frame()
-	if burst < 0.99 {
-		t.Errorf("the next track bursts them %.2f", burst)
+	if b < 0.99 {
+		t.Errorf("the next track bursts them %.2f", b)
 	}
 	tt.SetPreferences(ui.Preferences{ReduceMotion: true})
 	s.p.Next()
 	s.settle(t, func(st player.State) bool { return st.Index == 2 })
 	tt.Frame()
-	if burst != 0 {
-		t.Errorf("with less motion, the lines burst %.2f", burst)
+	if b != 0 {
+		t.Errorf("with less motion, the lines burst %.2f", b)
+	}
+}
+
+// wear dresses s in the built-in theme id, with options.
+func wear(s *shell, id string, options map[string]string) {
+	s.set.FollowSystem, s.set.Theme = false, id
+	s.set.ThemeOptions = map[string]map[string]string{id: options}
+	s.restyle()
+}
+
+// TestGroundSettles moves the grounds of Greenroom, Glasshouse and Anime
+// in the frames they ask for, which paint again without building the
+// view, and has them ask for none once they are still.
+func TestGroundSettles(t *testing.T) {
+	s := newTestShell(t)
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	for _, c := range []struct {
+		theme string
+		move  func()
+		long  time.Duration
+	}{
+		{"greenroom", func() { s.artColor = "#d8572a" }, tintFade},
+		{"glasshouse", func() { s.artColor = "#2a6fd8" }, tintFade},
+		{"anime", func() {
+			i := s.p.State().Index
+			s.p.Next()
+			s.settle(t, func(st player.State) bool { return st.Index == i+1 })
+		}, burstFor},
+	} {
+		wear(s, c.theme, nil)
+		s.artColor = ""
+		tt := ui.NewTester(func(ctx *ui.Context) {
+			s.st = s.p.State()
+			s.ground(ctx, ui.Column(ctx).Fill())
+		}, 200, 120)
+		tt.Frame()
+		tt.Advance(c.long + time.Second)
+		if tt.FramePending() {
+			t.Fatalf("%s: the ground still asks for frames before anything moves", c.theme)
+		}
+		c.move()
+		tt.Frame()
+		before := append([]byte(nil), tt.Image().Pix...)
+		tt.Advance(c.long / 2)
+		if bytes.Equal(before, tt.Image().Pix) {
+			t.Errorf("%s: the ground stood still halfway through", c.theme)
+		}
+		tt.Advance(c.long)
+		if tt.FramePending() {
+			t.Errorf("%s: the ground still asks for frames %v after it moved", c.theme, c.long)
+		}
 	}
 }
 

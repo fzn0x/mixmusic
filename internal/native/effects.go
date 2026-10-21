@@ -100,7 +100,9 @@ func themeEffects(th addons.Theme, chosen map[string]string) effects {
 
 // ground paints the theme's ground on root, under the window's content:
 // the lights of Aurora, which keep still while the computer asks for less
-// motion, or the petals of Sakura.
+// motion, or the petals of Sakura. What moves is computed as it is
+// painted: the frames an animation asks for paint again without building
+// the view.
 func (s *shell) ground(c *ui.Context, root ui.Element) {
 	k := &s.lk
 	switch {
@@ -110,15 +112,15 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 	case k.fx.petals:
 		root.Draw(paintPetals)
 	case k.fx.wash:
-		tint, changing := s.coverTint(c, k.accent, washTone)
+		t := s.coverTint(c, k.accent, washTone)
 		root.Draw(func(p *ui.Painter, r ui.Rect) {
-			paintWash(p, r, tint)
-			if changing {
+			paintWash(p, r, t.color(p.Now()))
+			if t.changing(p.Now()) {
 				p.AnimationFrame()
 			}
 		})
 	case k.fx.cover:
-		tint, changing := s.coverTint(c, k.accent, coverTone)
+		t := s.coverTint(c, k.accent, coverTone)
 		// Without a cover, the accent's light is half as strong: the
 		// glass stays white.
 		accent, strength := k.accent, 1.0
@@ -126,21 +128,21 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 			strength = 0.5
 		}
 		root.Draw(func(p *ui.Painter, r ui.Rect) {
-			paintCover(p, r, tint, accent, strength)
-			if changing {
+			paintCover(p, r, t.color(p.Now()), accent, strength)
+			if t.changing(p.Now()) {
 				p.AnimationFrame()
 			}
 		})
 	case k.fx.speedlines || k.fx.screentone:
-		lines, tone, ink := k.fx.speedlines, k.fx.screentone, k.text
-		burst := s.burst(c)
+		lines, tone, ink, at := k.fx.speedlines, k.fx.screentone, k.text, s.burstAt(c)
 		root.Draw(func(p *ui.Painter, r ui.Rect) {
 			if tone {
 				s.paintScreentone(p, r, ink)
 			}
 			if lines {
-				paintSpeedlines(p, r, ink, burst)
-				if burst > 0 {
+				b := burst(at, p.Now())
+				paintSpeedlines(p, r, ink, b)
+				if b > 0 {
 					p.AnimationFrame()
 				}
 			}

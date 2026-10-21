@@ -44,8 +44,10 @@ func TestMini(t *testing.T) {
 	}
 	s.drain()
 	tt.Frame()
-	if err := tt.Click("Remove from liked songs"); err != nil {
-		t.Errorf("the like button doesn't show the track is liked: %v", err)
+	// Found, not clicked: a click would unlike the track in the background,
+	// writing to the test's folder as it goes.
+	if _, ok := tt.Find("Remove from liked songs"); !ok {
+		t.Errorf("the like button doesn't show the track is liked: %q", tt.Texts())
 	}
 }
 

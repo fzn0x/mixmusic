@@ -94,6 +94,9 @@ func TestSleepTimer(t *testing.T) {
 	if !tt.HasText("Sleep timer: 45 minutes") {
 		t.Errorf("the palette doesn't find the plugin's command: %q", tt.Texts())
 	}
+	// Enter searches what was typed; Down reaches the command.
+	tt.Key(0, ui.KeyDown)
+	tt.Frame()
 	tt.Key(0, ui.KeyEnter)
 	until(t, s, tt, "the command", func() bool { return tt.HasText("Sleep timer: the music stops in 45 minutes") })
 

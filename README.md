@@ -141,12 +141,14 @@ AppImage executable (`chmod +x`) and open it.
 
 ### Spotify
 
-Spotify lets each app serve a few users of its owner's choosing, so you sign
-in with an app of your own: create one in the
-[Spotify developer dashboard](https://developer.spotify.com/dashboard), add the
-redirect URI `http://127.0.0.1:47823/callback`, and paste its Client ID in
-Settings › Accounts. [docs/spotify.md](docs/spotify.md) walks through it, and
-through what Spotify allows apps to do.
+Spotify lets each app serve up to five users of its owner's choosing, while
+the owner has Premium, so you sign in with an app of your own: create one in
+the [Spotify developer dashboard](https://developer.spotify.com/dashboard) with
+a Spotify account that has Premium, add the redirect URI
+`http://127.0.0.1:47823/callback`, add your account under Users Management,
+and paste its Client ID in Settings › Accounts.
+[docs/spotify.md](docs/spotify.md) walks through it, and through what Spotify
+allows apps to do.
 
 ### YouTube Music
 
@@ -213,9 +215,11 @@ time it starts.
   MixMusic on Windows, with Premium, and with a sign-in made since MixMusic
   played Spotify itself: Settings › Playback asks you to sign in again when
   yours is older.
-- **Spotify says the app is not allowed.** In development mode a Spotify
-  app serves only the users its owner added in the dashboard, by their
-  Spotify email: see [docs/spotify.md](docs/spotify.md).
+- **Spotify refuses the sign-in.** A Spotify app in development mode serves
+  only while its owner has Premium, and only the accounts added under Users
+  Management in its settings, by their Spotify email. Settings › Accounts
+  says which it was: see
+  [docs/spotify.md](docs/spotify.md#when-spotify-refuses-the-sign-in).
 - **No tray icon on Linux.** The tray needs `libayatana-appindicator3` and a
   desktop that shows AppIndicator icons; GNOME needs its AppIndicator
   extension. Without it, closing the window quits MixMusic.
@@ -235,9 +239,9 @@ time it starts.
 - Spotify plays in MixMusic itself only on Windows, whose webview,
   WebView2, plays Spotify's protected audio: WebKitGTK on Linux does not,
   and macOS's is not known to. Elsewhere, Spotify Connect plays it.
-- Spotify allows apps in development mode a few users, and lets them read
-  less: search shows ten results of each kind, and the tracks of playlists
-  you do not own stay hidden.
+- Spotify allows apps in development mode up to five users, while their
+  owner has Premium, and lets them read less: search shows ten results of
+  each kind, and the tracks of playlists you do not own stay hidden.
 - Tracks YouTube restricts to some countries, to signed-in adults or to a
   channel's members do not play, as streams are found signed out.
 - The macOS app is not notarized and the Windows installer is not signed

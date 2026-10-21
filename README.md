@@ -53,8 +53,8 @@ download or keep in memory.
   presets, a visualizer, synced lyrics that follow the song or read as plain
   text, and an offline cache of tracks you played.
 - **At home on the desktop.** Media keys, the system's media controls on
-  macOS and Linux, tray controls, notifications of new tracks, a mini player
-  that stays on top, start at login, and `mixmusic://` links.
+  Windows, macOS and Linux, tray controls, notifications of new tracks, a
+  mini player that stays on top, start at login, and `mixmusic://` links.
 - **Scrobbling and Discord.** Connect Last.fm and every track you hear
   joins your profile there, with scrobbles made offline sent once you are
   back. Your Discord profile shows what plays, with its artwork and the
@@ -234,8 +234,6 @@ time it starts.
 - Spotify plays in MixMusic itself only on Windows, whose webview,
   WebView2, plays Spotify's protected audio: WebKitGTK on Linux does not,
   and macOS's is not known to. Elsewhere, Spotify Connect plays it.
-- On Windows, the system's media controls do not show what MixMusic plays;
-  the media keys work.
 - Spotify allows apps in development mode a few users, and lets them read
   less: search shows ten results of each kind, and the tracks of playlists
   you do not own stay hidden.

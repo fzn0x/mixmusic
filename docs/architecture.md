@@ -61,7 +61,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/nowplaying`** shows what the engine plays in the system's media
   controls, and passes on what they ask: Now Playing on macOS, through
   MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both
-  called with purego.
+  called with purego, and the SystemMediaTransportControls of a hidden
+  window on Windows, reached through WinRT without cgo.
 - **`internal/player`** plays the queue: one goroutine owns the queue and
   what plays, and the network calls run beside it. It plays YouTube Music,
   and Spotify tracks matched to their recording, through the engine, and

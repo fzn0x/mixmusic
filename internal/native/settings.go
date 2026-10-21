@@ -579,16 +579,14 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 			}
 		})
 		labels := make([]string, len(eqPresets))
-		preset := -1
+		// Bands of the user's own, as once a slider moved, show as Custom,
+		// which is no preset to choose.
+		chosen := "Custom"
 		for i, p := range eqPresets {
 			labels[i] = p.label
 			if p.id == eq.Preset {
-				preset = i
+				chosen = p.label
 			}
-		}
-		chosen := ""
-		if preset >= 0 {
-			chosen = labels[preset]
 		}
 		s.row(c, "Preset", "", func() {
 			if ui.Select(c.Key("eq-preset"), &chosen, labels).Width(200).Label("Preset").Changed() {

@@ -37,6 +37,20 @@
     return a;
   });
 
+  // Short windows: the column steps down its rows, captions last, until the
+  // whole queue, down to its end line, is in view.
+  const column = list.closest(".upnext");
+  function fit() {
+    if (column.offsetParent === null) return;
+    for (let level = 0; level <= 3; level++) {
+      for (let n = 1; n <= 3; n++) column.classList.toggle(`fit-${n}`, n <= level);
+      if (column.scrollHeight <= column.clientHeight) return;
+    }
+  }
+  fit();
+  addEventListener("resize", fit);
+  document.fonts?.ready.then(fit);
+
   let current = -1;
 
   function setCurrent(index) {

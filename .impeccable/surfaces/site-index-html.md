@@ -9,7 +9,7 @@ related_targets: ["site"]
 
 The MixMusic landing page on GitHub Pages (`site/`), published at fzn0x.github.io/mixmusic. Visitor mode: Persuade.
 
-Audience and job: listeners who use Spotify and YouTube Music, and theme and plugin authors, arriving from GitHub, search and links. Action: download the app for their system from the latest release; starring the repository is the second action. Proof: real screenshots captured from the built app, the real registry (six built-in themes, the community themes Neon Nights and Paper Mint, the plugins Sleep Timer and Spectrum), the MIT license, the release's files. Constraints: no testimonials, user counts or benchmarks; no other project named as a reference; Spotify and YouTube Music named, never imitated; a static site deployed by GitHub Actions; the app's own Selawik font.
+Audience and job: listeners who use Spotify and YouTube Music, and theme and plugin authors, arriving from GitHub, search and links. Action: download the app for their system from the latest release; starring the repository is the second action. Proof: real screenshots captured from the built app, the real registry (ten built-in themes, the community themes Neon Nights and Paper Mint, the plugins Sleep Timer and Spectrum), the MIT license, the release's files. Constraints: no testimonials, user counts or benchmarks; no other project named as a reference; Spotify and YouTube Music named, never imitated; a static site deployed by GitHub Actions; the app's own Selawik font.
 
 ## Direction contract
 

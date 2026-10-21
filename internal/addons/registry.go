@@ -36,8 +36,10 @@ type Entry struct {
 	Preview string `json:"preview,omitempty"`
 	// Colors are a theme's colors, which the app shows as swatches.
 	Colors map[string]string `json:"colors,omitempty"`
-	// Permissions are those a plugin declares.
+	// Permissions are those a plugin declares, and API the version of the
+	// plugin API it was written for.
 	Permissions []string `json:"permissions,omitempty"`
+	API         int      `json:"api,omitempty"`
 }
 
 // Registry is the community registry of themes and plugins.

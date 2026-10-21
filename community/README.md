@@ -2,8 +2,14 @@
 
 Everything here can be installed by every MixMusic user from the
 marketplace (the store icon of the sidebar). The app reads
-[registry.json](registry.json), which lists the themes in `themes/` and the
-plugins in `plugins/`, and downloads the files of what the user installs.
+[registry-2.json](registry-2.json), which lists the themes in `themes/` and
+the plugins in `plugins/`, and downloads the files of what the user
+installs. Plugins here are made for MixMusic's own interface: their
+`plugin.json` says `"api": 2`.
+
+MixMusic 0.4 and before read [registry.json](registry.json) instead, the
+registry of their web interface: it lists the add-ons of `web/`, as they
+were when MixMusic moved to its own interface, and stays as it is.
 
 ## Share yours
 
@@ -34,12 +40,13 @@ marketplace.
   dashes; `tools/registry -check` passes.
 - The `description` says what it is in one sentence, and `author` is you.
 - Themes: every color reads on its ground (text on `bg`, `accent-text` on
-  `accent`, `tile-text` on each tile: 4.5:1 at least), options work, and the
-  stylesheet styles the hooks of [docs/themes.md](../docs/themes.md).
+  `accent`, `tile-text` on each tile: 4.5:1 at least), and each font list
+  ends with a family every system has.
 - Plugins: the code is readable (no minified or obfuscated code), loads
   nothing from other servers unless its `permissions` say `network` and the
-  description says why, and cleans up after itself. Plugins run with
-  everything MixMusic can do, so reviewers read every line.
+  description says why, and cleans up after itself. Plugins can use the
+  whole plugin API whatever their permissions say, so reviewers read every
+  line.
 - No add-on uses the logos or the look of other brands, or presents itself as
   official.
 - An add-on's folder stays under 4 MB.

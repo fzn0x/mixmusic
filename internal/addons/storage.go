@@ -16,8 +16,7 @@ const maxStorage = 1 << 20
 var ErrStorageFull = errors.New("addons: the plugin's storage is full (1 MB)")
 
 // Storage keeps the values of plugins, a file of strings per plugin, so
-// that what a plugin keeps survives reinstalls and is apart from the
-// webview's storage, which development builds do not share.
+// that what a plugin keeps survives reinstalls.
 type Storage struct {
 	Dir string
 

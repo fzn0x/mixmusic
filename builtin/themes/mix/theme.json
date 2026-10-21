@@ -30,7 +30,6 @@
     "display": "Selawik, 'Segoe UI', 'Noto Sans', 'DejaVu Sans', system-ui, sans-serif"
   },
   "radius": "0px",
-  "styles": "theme.css",
   "options": [
     {
       "id": "texture",

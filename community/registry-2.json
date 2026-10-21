@@ -1,0 +1,103 @@
+{
+  "version": 2,
+  "baseUrl": "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/",
+  "themes": [
+    {
+      "id": "neon-nights",
+      "name": "Neon Nights",
+      "version": "1.1.0",
+      "author": "MixMusic community",
+      "description": "Electric magenta and violet tiles on deep indigo.",
+      "path": "themes/neon-nights",
+      "files": [
+        "theme.json"
+      ],
+      "colors": {
+        "accent": "#ff3ea5",
+        "accent-text": "#14000b",
+        "bg": "#0b0618",
+        "border": "rgba(214, 160, 255, 0.16)",
+        "danger": "#ff5b6e",
+        "spotify": "#5cf2a0",
+        "success": "#5cf2c5",
+        "surface": "#120a24",
+        "surface-2": "#1b1033",
+        "surface-3": "#281847",
+        "text": "#f6efff",
+        "text-muted": "#b4a3d6",
+        "tile-1": "#ff3ea5",
+        "tile-2": "#8a5cff",
+        "tile-3": "#22d3ee",
+        "tile-4": "#ffd23e",
+        "tile-text": "#0b0618",
+        "youtube": "#ff5b6e"
+      }
+    },
+    {
+      "id": "paper-mint",
+      "name": "Paper Mint",
+      "version": "1.0.0",
+      "author": "MixMusic community",
+      "description": "A quiet light theme: graphite ink, mint and coral tiles, rounded corners.",
+      "path": "themes/paper-mint",
+      "files": [
+        "theme.json"
+      ],
+      "colors": {
+        "accent": "#0c7a5d",
+        "accent-text": "#ffffff",
+        "bg": "#f3f7f5",
+        "border": "rgba(30, 50, 42, 0.12)",
+        "danger": "#c4383e",
+        "spotify": "#148a43",
+        "success": "#0c7a5d",
+        "surface": "#ffffff",
+        "surface-2": "#e8f0ec",
+        "surface-3": "#d7e4dd",
+        "text": "#1d2a25",
+        "text-muted": "#55665e",
+        "tile-1": "#0c7a5d",
+        "tile-2": "#c4473a",
+        "tile-3": "#3d6fb6",
+        "tile-4": "#8a6510",
+        "tile-text": "#ffffff",
+        "youtube": "#d02a2a"
+      }
+    }
+  ],
+  "plugins": [
+    {
+      "id": "sleep-timer",
+      "name": "Sleep Timer",
+      "version": "2.0.0",
+      "author": "MixMusic community",
+      "description": "Fades the music out and pauses it after a while, or at the end of the track.",
+      "path": "plugins/sleep-timer",
+      "files": [
+        "index.js",
+        "plugin.json"
+      ],
+      "permissions": [
+        "playback",
+        "storage"
+      ],
+      "api": 2
+    },
+    {
+      "id": "spectrum",
+      "name": "Spectrum",
+      "version": "2.0.0",
+      "author": "MixMusic community",
+      "description": "A radial spectrum of what plays, drawn in the accent colour on the now playing page.",
+      "path": "plugins/spectrum",
+      "files": [
+        "index.js",
+        "plugin.json"
+      ],
+      "permissions": [
+        "playback"
+      ],
+      "api": 2
+    }
+  ]
+}

@@ -1,9 +1,12 @@
-// Command registry builds community/registry.json, the index of the
-// community's themes and plugins that MixMusic's marketplace reads, and
-// checks every add-on on the way.
+// Command registry builds the indexes of the community's themes and
+// plugins that MixMusic's marketplace reads, and checks every add-on on
+// the way: community/registry-2.json, of community/themes and
+// community/plugins, for MixMusic's own interface, and
+// community/registry.json, of community/web, for the web interface of the
+// versions before it, which keep reading it there.
 //
-//	go run ./tools/registry          # write community/registry.json
-//	go run ./tools/registry -check   # fail when it is out of date or an add-on is invalid
+//	go run ./tools/registry          # write the registries
+//	go run ./tools/registry -check   # fail when one is out of date or an add-on is invalid
 package main
 
 import (
@@ -29,49 +32,60 @@ const baseURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community
 // maxAddonSize bounds the files of one add-on, in bytes.
 const maxAddonSize = 4 << 20
 
+// registries are those the command writes: their file, their version, the
+// folder of their add-ons under community, and the plugin API their
+// plugins are made for.
+var registries = []struct {
+	file    string
+	version int
+	folder  string
+	api     int
+}{
+	{"registry-2.json", 2, "", addons.PluginAPI},
+	{"registry.json", 1, "web", 1},
+}
+
 func main() {
-	check := flag.Bool("check", false, "check that community/registry.json is up to date instead of writing it")
+	check := flag.Bool("check", false, "check that the registries are up to date instead of writing them")
 	root := flag.String("root", ".", "the repository's root")
 	flag.Parse()
-
 	community := filepath.Join(*root, "community")
 	builtin, err := builtinIDs(filepath.Join(*root, "builtin"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	reg := addons.Registry{Version: 1, BaseURL: baseURL, Themes: []addons.Entry{}, Plugins: []addons.Entry{}}
-	var errs []error
-	for _, kind := range []addons.Kind{addons.KindTheme, addons.KindPlugin} {
-		entries, err := collect(community, kind, builtin)
-		errs = append(errs, err)
-		if kind == addons.KindTheme {
-			reg.Themes = entries
-		} else {
-			reg.Plugins = entries
+	for _, r := range registries {
+		dir := filepath.Join(community, r.folder)
+		base := baseURL
+		if r.folder != "" {
+			base += r.folder + "/"
 		}
-	}
-	errs = append(errs, reg.Validate())
-	if err := errors.Join(errs...); err != nil {
-		log.Fatalf("invalid add-ons:\n%v", err)
-	}
-	data, err := json.MarshalIndent(reg, "", "  ")
-	if err != nil {
-		log.Fatal(err)
-	}
-	data = append(data, '\n')
-	out := filepath.Join(community, "registry.json")
-	if *check {
-		current, _ := os.ReadFile(out)
-		if !bytes.Equal(bytes.ReplaceAll(current, []byte("\r\n"), []byte("\n")), data) {
-			log.Fatal("community/registry.json is out of date: run go run ./tools/registry")
+		reg := addons.Registry{Version: r.version, BaseURL: base}
+		themes, err := collect(dir, addons.KindTheme, builtin, 0)
+		plugins, err2 := collect(dir, addons.KindPlugin, builtin, r.api)
+		reg.Themes, reg.Plugins = themes, plugins
+		if err := errors.Join(err, err2, reg.Validate()); err != nil {
+			log.Fatalf("invalid add-ons:\n%v", err)
 		}
-		fmt.Printf("ok: %d themes, %d plugins\n", len(reg.Themes), len(reg.Plugins))
-		return
+		data, err := json.MarshalIndent(reg, "", "  ")
+		if err != nil {
+			log.Fatal(err)
+		}
+		data = append(data, '\n')
+		out := filepath.Join(community, r.file)
+		if *check {
+			current, _ := os.ReadFile(out)
+			if !bytes.Equal(bytes.ReplaceAll(current, []byte("\r\n"), []byte("\n")), data) {
+				log.Fatalf("community/%s is out of date: run go run ./tools/registry", r.file)
+			}
+			fmt.Printf("ok: %s, %d themes, %d plugins\n", r.file, len(reg.Themes), len(reg.Plugins))
+			continue
+		}
+		if err := os.WriteFile(out, data, 0o644); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("wrote %s: %d themes, %d plugins\n", out, len(reg.Themes), len(reg.Plugins))
 	}
-	if err := os.WriteFile(out, data, 0o644); err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("wrote %s: %d themes, %d plugins\n", out, len(reg.Themes), len(reg.Plugins))
 }
 
 // builtinIDs returns the IDs of the themes MixMusic ships with, which
@@ -90,8 +104,9 @@ func builtinIDs(dir string) (map[string]bool, error) {
 	return ids, nil
 }
 
-// collect reads and checks the add-ons of a kind.
-func collect(community string, kind addons.Kind, builtin map[string]bool) ([]addons.Entry, error) {
+// collect reads and checks the add-ons of a kind in a folder of the
+// community's; plugins must be made for the plugin API api.
+func collect(community string, kind addons.Kind, builtin map[string]bool, api int) ([]addons.Entry, error) {
 	folder := string(kind) + "s"
 	dirs, err := os.ReadDir(filepath.Join(community, folder))
 	if errors.Is(err, fs.ErrNotExist) {
@@ -108,8 +123,12 @@ func collect(community string, kind addons.Kind, builtin map[string]bool) ([]add
 		}
 		dir := filepath.Join(community, folder, d.Name())
 		e, err := entry(dir, kind, d.Name())
-		if err == nil && kind == addons.KindTheme && builtin[e.ID] {
+		switch {
+		case err != nil:
+		case kind == addons.KindTheme && builtin[e.ID]:
 			err = errors.New("a theme MixMusic ships with has this id")
+		case kind == addons.KindPlugin && max(e.API, 1) != api:
+			err = fmt.Errorf(`plugins here are made for the plugin API %d: "api": %d`, api, api)
 		}
 		if err != nil {
 			errs = append(errs, fmt.Errorf("%s/%s: %w", folder, d.Name(), err))
@@ -142,7 +161,7 @@ func entry(dir string, kind addons.Kind, name string) (addons.Entry, error) {
 		if err != nil {
 			return e, err
 		}
-		e = addons.Entry{ID: p.ID, Name: p.Name, Version: p.Version, Author: p.Author, Description: p.Description, Permissions: p.Permissions}
+		e = addons.Entry{ID: p.ID, Name: p.Name, Version: p.Version, Author: p.Author, Description: p.Description, Permissions: p.Permissions, API: p.API}
 		files = p.Files
 	}
 	if e.ID != name {

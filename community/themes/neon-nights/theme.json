@@ -1,9 +1,9 @@
 {
   "id": "neon-nights",
   "name": "Neon Nights",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "MixMusic community",
-  "description": "Electric magenta and violet tiles on deep indigo, with an optional neon edge on what is live.",
+  "description": "Electric magenta and violet tiles on deep indigo.",
   "scheme": "dark",
   "colors": {
     "bg": "#0b0618",
@@ -30,10 +30,5 @@
     "display": "Selawik, 'Segoe UI', 'Noto Sans', system-ui, sans-serif"
   },
   "radius": "4px",
-  "styles": "theme.css",
-  "options": [
-    { "id": "edge", "label": "Neon edge on live items", "type": "toggle", "default": "true" },
-    { "id": "edge-size", "label": "Edge size", "type": "range", "default": "10", "min": 0, "max": 24, "step": 2, "unit": "px" }
-  ],
-  "files": ["theme.json", "theme.css"]
+  "files": ["theme.json"]
 }

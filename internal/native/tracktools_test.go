@@ -85,13 +85,11 @@ func TestLikedSearch(t *testing.T) {
 		cur, ok := st.Current()
 		return ok && cur.Track.ID == testTracks[3].ID && len(st.Queue) == 1
 	})
-	// Clearing the box shows them all again.
+	// Escape clears the box, which shows them all again.
 	if err := tt.Click("Search this list"); err != nil {
 		t.Fatal(err)
 	}
-	for range len("aphex") {
-		tt.Key(0, ui.KeyBackspace)
-	}
+	tt.Key(0, ui.KeyEscape)
 	tt.Frame()
 	if tt.HasText("1 of 4") || !tt.HasText(testTracks[0].Title) {
 		t.Errorf("clearing the search shows %q", tt.Texts())

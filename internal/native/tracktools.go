@@ -54,6 +54,10 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 			ui.Icon(c, icon("search")).FontSize(16).TextColor(k.muted)
 			search = ui.TextInputBase(c.Key(key+"-search"), &tool.query).Placeholder("search this " + noun).Grow(1).MinWidth(0).
 				Label("Search this " + noun).FontSize(k.bodySize())
+			if tool.query != "" {
+				// Escape clears the search, and goes on once it's clear.
+				search.OnShortcut(0, ui.KeyEscape, func() { tool.query = "" })
+			}
 		})
 		if search.Focused() {
 			box.Border(2, k.accent)

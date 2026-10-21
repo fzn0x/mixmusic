@@ -386,7 +386,8 @@ func (s *shell) mixDialogs(c *ui.Context, key string) {
 }
 
 // collectionMenu is the menu of an album or a playlist: play it, queue
-// it, save it as a mix or a playlist, open it on its service.
+// it, save it as a mix or a playlist, open it on its service or copy its
+// link there.
 //
 // importID is the ID of a service's playlist, which the menu copies into a
 // mix, or "".
@@ -427,6 +428,7 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 			if m.Item("Open on " + sourceName(source)).Chosen() {
 				go s.svc.System.OpenExternal(rawURL)
 			}
+			s.copyLinkItem(m, rawURL)
 		}
 	}
 }
@@ -495,6 +497,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 				if a.URL != "" && m.Item("Open on "+sourceName(a.Source)).Chosen() {
 					go s.svc.System.OpenExternal(a.URL)
 				}
+				s.copyLinkItem(m, a.URL)
 			},
 		}
 		if len(a.TopTracks) > 0 {

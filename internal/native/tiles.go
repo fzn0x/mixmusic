@@ -176,6 +176,7 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 		if m.Item("Play").Chosen() {
 			s.playAlbum(a.ID)
 		}
+		s.copyLinkItem(m, a.URL)
 	})
 	switch {
 	case play:
@@ -200,6 +201,7 @@ func (s *shell) playlistTile(c *ui.Context, key string, p media.Playlist) {
 		if m.Item("Play").Chosen() {
 			s.playPlaylist(p.ID)
 		}
+		s.copyLinkItem(m, p.URL)
 	})
 	switch {
 	case play:
@@ -214,7 +216,13 @@ func (s *shell) artistTile(c *ui.Context, key string, a media.Artist) {
 	if sub == "" {
 		sub = "Artist"
 	}
-	if open, _ := s.artTile(c, key, a.Artwork, a.Name, sub, a.Source, true, false, false, nil); open {
+	open, _ := s.artTile(c, key, a.Artwork, a.Name, sub, a.Source, true, false, false, func(m *ui.Menu) {
+		if m.Item("Open").Chosen() {
+			s.navigate(artistPath(a.ID))
+		}
+		s.copyLinkItem(m, a.URL)
+	})
+	if open {
 		s.navigate(artistPath(a.ID))
 	}
 }

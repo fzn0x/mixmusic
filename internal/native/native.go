@@ -484,6 +484,10 @@ var setAppearance = func(source mygo.ThemeSource) {
 	}
 }
 
+// copyText puts text on the computer's clipboard. It asks MyGo's main
+// loop, which tests don't run.
+var copyText = func(text string) { mygo.Clipboard.WriteText(text) }
+
 // navigate shows the page at path.
 func (s *shell) navigate(path string) { s.router.Push(path) }
 

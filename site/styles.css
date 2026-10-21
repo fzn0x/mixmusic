@@ -82,7 +82,7 @@ body {
 a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 a:hover { color: var(--accent); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-img { display: block; max-width: 100%; height: auto; }
+img, video { display: block; max-width: 100%; height: auto; }
 code { font-family: var(--mono); font-size: 0.875em; padding: 0.1em 0.35em; background: var(--raised); }
 p { margin: 0; }
 h1, h2, h3 { margin: 0; font-weight: 300; }
@@ -255,7 +255,8 @@ a.pivot:hover { color: color-mix(in srgb, var(--ink) 70%, transparent); }
 .meta { margin-top: 14px; color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
 
 .shot { margin: 0; }
-.shot img { width: 100%; background: var(--panel); outline: 1px solid var(--hair); outline-offset: 0; }
+.shot img, .shot video { width: 100%; background: var(--panel); outline: 1px solid var(--hair); outline-offset: 0; }
+.shot video { aspect-ratio: 16 / 9; }
 .shot figcaption { margin-top: 10px; color: var(--muted); font-size: 0.8125rem; }
 
 /* ---------- sections ---------- */

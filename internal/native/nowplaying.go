@@ -89,8 +89,9 @@ func (s *shell) related(c *ui.Context, t media.Track) {
 	ui.Column(c).Margin(48, 0, 0).Children(func() { s.shelves(c, "now-related", res.value) })
 }
 
-// visualizer draws the engine's spectrum over the foot of the sleeve, in
-// the accent, at every frame while it plays.
+// visualizer draws the spectrum of what plays over the foot of the sleeve,
+// in the accent, at every frame while it plays. Where MixMusic hears
+// nothing, as of a Spotify device elsewhere, it draws nothing.
 func (s *shell) visualizer(c *ui.Context, size float32) {
 	k := &s.lk
 	ui.Box(c).Absolute().Left(0).Bottom(0).Size(size, size/3).PassThrough().Label("Visualizer").Draw(func(p *ui.Painter, r ui.Rect) {
@@ -104,6 +105,10 @@ func (s *shell) visualizer(c *ui.Context, size float32) {
 		for i := range bars {
 			// The lower bins carry the music: spread them over the bars.
 			v := float32(bins[i*len(bins)/(bars*2)]) / 255
+			if v == 0 {
+				// Silence: a flat line of bars would look broken.
+				continue
+			}
 			h := max(2, v*r.H)
 			p.Fill(ui.Rect{X: r.X + float32(i)*w + 1, Y: r.Y + r.H - h, W: w - 2, H: h}, k.accent.Alpha(0.85), 0)
 		}

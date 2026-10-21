@@ -87,6 +87,29 @@ func TestClientReportsAPIErrors(t *testing.T) {
 	}
 }
 
+// TestClientReadsPlainTextErrors keeps the words of the refusals Spotify
+// answers in plain text, and none of an HTML page.
+func TestClientReadsPlainTextErrors(t *testing.T) {
+	for _, c := range []struct{ body, want string }{
+		{"Check settings on https://developer.spotify.com/dashboard, the user may not be registered.\n",
+			"Check settings on https://developer.spotify.com/dashboard, the user may not be registered."},
+		{"<html><body><h1>403 Forbidden</h1></body></html>", ""},
+		{"", ""},
+	} {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/plain")
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte(c.body))
+		}))
+		err := testClient(t, srv).get(context.Background(), "/me", nil, nil)
+		srv.Close()
+		var apiErr *APIError
+		if !errors.As(err, &apiErr) || apiErr.Status != http.StatusForbidden || apiErr.Message != c.want {
+			t.Errorf("%q: err = %#v, want the message %q", c.body, err, c.want)
+		}
+	}
+}
+
 func TestClientNotSignedIn(t *testing.T) {
 	c := NewClient(NewAuth("client"))
 	if err := c.get(context.Background(), "/me", nil, nil); !errors.Is(err, ErrNotSignedIn) {

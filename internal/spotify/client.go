@@ -221,7 +221,9 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 	}
 }
 
-// apiError reads the error object of a failed response.
+// apiError reads the error of a failed response: the Web API's error
+// object, or the plain text some of its refusals are, as that of a user an
+// app in development mode does not count among its users.
 func apiError(status int, data []byte) error {
 	var body struct {
 		Error struct {
@@ -233,7 +235,9 @@ func apiError(status int, data []byte) error {
 		Message string `json:"message"`
 		Reason  string `json:"reason"`
 	}
-	json.Unmarshal(data, &body)
+	if err := json.Unmarshal(data, &body); err != nil {
+		return &APIError{Status: status, Message: plainText(data)}
+	}
 	e := &APIError{Status: status, Message: body.Error.Message, Reason: body.Error.Reason}
 	if e.Message == "" {
 		e.Message = body.Message
@@ -242,4 +246,17 @@ func apiError(status int, data []byte) error {
 		e.Reason = body.Reason
 	}
 	return e
+}
+
+// plainText is the text of a body that is not JSON, on one line and cut to
+// a sentence's length, or "" for a page of HTML, which is no message.
+func plainText(data []byte) string {
+	s := strings.Join(strings.Fields(strings.ToValidUTF8(string(data), "")), " ")
+	if strings.HasPrefix(s, "<") {
+		return ""
+	}
+	if r := []rune(s); len(r) > 200 {
+		s = string(r[:200]) + "…"
+	}
+	return s
 }

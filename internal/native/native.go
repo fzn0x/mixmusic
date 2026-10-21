@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -35,8 +36,7 @@ func Open(a *app.App, hidden bool) *mygo.Window {
 		MinHeight:       600,
 		BackgroundColor: hexColor(s.lk.bg),
 		StateKey:        "main",
-		TitleBarStyle:   mygo.TitleBarHidden,
-		TitleBarHeight:  48,
+		TitleBarStyle:   titleBarStyle(runtime.GOOS),
 		Hidden:          hidden,
 		Content:         ui.View(s.view),
 	}))
@@ -45,6 +45,16 @@ func Open(a *app.App, hidden bool) *mygo.Window {
 	s.offerCrashReport()
 	s.captureFromEnv()
 	return s.win
+}
+
+// titleBarStyle is the main window's title bar on goos: the system's own,
+// whose buttons are drawn as the system draws them, but on macOS, where
+// the traffic lights sit over the window, as in the system's apps.
+func titleBarStyle(goos string) mygo.TitleBarStyle {
+	if goos == "darwin" {
+		return mygo.TitleBarHidden
+	}
+	return mygo.TitleBarDefault
 }
 
 // shell is the main window: its state, which belongs to the main thread

@@ -57,6 +57,9 @@ next track.
   About turns that off.
 - A Spotify track that plays from YouTube Music instead says why once, not
   at every track.
+- On Windows and Linux, the main window has the system's own title bar and
+  buttons, as asked in #6. On macOS, the traffic lights stay over the
+  window.
 
 ### Removed
 

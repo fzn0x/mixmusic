@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
@@ -967,5 +968,15 @@ func TestLiveTileTurns(t *testing.T) {
 	tt.Advance(liveRest + liveTurn)
 	if turned() {
 		t.Error("the tile turns over while the track is paused")
+	}
+}
+
+// TestTitleBarStyle gives the main window the system's own title bar, but
+// on macOS, whose traffic lights sit over the window.
+func TestTitleBarStyle(t *testing.T) {
+	for goos, want := range map[string]mygo.TitleBarStyle{"windows": mygo.TitleBarDefault, "linux": mygo.TitleBarDefault, "darwin": mygo.TitleBarHidden} {
+		if got := titleBarStyle(goos); got != want {
+			t.Errorf("the title bar on %s is %q, want %q", goos, got, want)
+		}
 	}
 }

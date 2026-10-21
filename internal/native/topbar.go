@@ -8,12 +8,16 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// topBar holds the history arrows and the search box, under the window's
-// own controls, and drags the window.
+// topBar holds the history arrows and the search box. Under a hidden
+// title bar, it keeps clear of the window's controls and drags the window.
 func (s *shell) topBar(c *ui.Context) {
 	k := &s.lk
 	bar := c.TitleBar()
-	ui.Row(c).Height(max(bar.Height, 48)).Shrink(0).Padding(0, bar.Right+16, 0, k.gutter).Gap(16).DragWindow().Children(func() {
+	row := ui.Row(c).Height(max(bar.Height, 48)).Shrink(0).Padding(0, bar.Right+16, 0, k.gutter).Gap(16)
+	if bar.Height > 0 {
+		row.DragWindow()
+	}
+	row.Children(func() {
 		ui.Row(c).Gap(4).Children(func() {
 			if s.iconButton(c, "back", "back", "Back", false, 18).Disabled(!s.router.CanGoBack()).Clicked() {
 				s.router.Back()

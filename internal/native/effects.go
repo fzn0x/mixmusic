@@ -34,9 +34,10 @@ type effects struct {
 	scanlines, prompt, phosphor bool
 	glow                        float32
 	// wash washes the top of the ground down in the colour of the cover
-	// (Greenroom), and cover lights the ground with it, under translucent
-	// panels and dialogs frosted by blur (Glasshouse).
-	wash, cover bool
+	// (Greenroom), cover lights the ground with it under translucent
+	// panels, and white makes the dialogs white glass, frosted by blur,
+	// whatever shows under them (Glasshouse).
+	wash, cover, white bool
 	// speedlines draws an anime's speed lines toward a corner, which burst
 	// when the track changes, and screentone prints manga's dots in the
 	// corner across (Anime).
@@ -89,7 +90,7 @@ func themeEffects(th addons.Theme, chosen map[string]string) effects {
 	case "greenroom":
 		fx.wash = opt("wash") == "true"
 	case "glasshouse":
-		fx.cover, fx.blur = opt("cover") == "true", num("blur")
+		fx.cover, fx.blur, fx.white = opt("cover") == "true", num("blur"), true
 	case "anime":
 		fx.speedlines, fx.screentone = opt("speedlines") == "true", opt("screentone") == "true"
 	case "mochi":
@@ -156,18 +157,19 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 	}
 }
 
-// frosted fills a dialog's panel with the surface, or, in Aurora and
+// frosted fills a dialog's panel with the surface, laid over the ground
+// where the theme's would show the page through, or, in Aurora and
 // Glasshouse, with frosted glass that what is under it shows through:
 // Glasshouse's white, its raised surface over the blur.
 func (s *shell) frosted(panel ui.Element) ui.Element {
 	k := &s.lk
 	switch {
-	case k.fx.blur > 0 && k.fx.cover:
+	case k.fx.blur > 0 && k.fx.white:
 		return panel.Material(frost{glass.Blur{Radius: k.fx.blur}, k.surface2})
 	case k.fx.blur > 0:
 		return panel.Material(glass.Blur{Radius: k.fx.blur})
 	}
-	return panel.Background(k.surface)
+	return panel.Background(col(over(nrgba(k.surface), nrgba(k.bg))))
 }
 
 // frost is frosted glass of a colour: what is under it blurred, under its

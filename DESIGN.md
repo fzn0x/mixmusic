@@ -264,7 +264,7 @@ MixMusic is a wall of type and colour on true black. Every place in the player n
 
 Density is that of a tool kept open for hours: a 248px rail of outlined icon boxes, a main pane of giant words, tiles and shelves, a 340px queue column that always shows what plays next, and a 92px player bar. The pane is scrolled, the shell never is. Motion is short and directional: pages swing in from the right like a turnstile, pressed tiles tilt toward the pointer, the live tile in the rail flips over to show the next track.
 
-The system is a public contract. Themes set its colours, faces and radius, the tokens `docs/themes.md` lists, and the app draws everything else from them. The default theme (Mix) is the reference expression; Daylight, Midnight, Sakura, Terminal, Aurora, Greenroom, Glasshouse, Anime and Mochi are token variants of the same grammar (light ground, other accents, other radii, other faces), not separate designs.
+The system is a public contract. Themes set its colours, faces and radius, the tokens `docs/themes.md` lists, and the app draws everything else from them. The default theme (Mix) is the reference expression; Daylight, Midnight, Sakura, Terminal, Aurora, Greenroom, Glasshouse, Anime and Mochi are token variants of the same grammar (light ground, other accents, other radii, other faces), not separate designs. The effects a built-in theme adds are its own, not house style: they live on the ground under the content (Aurora's lights, Sakura's petals, Greenroom's and Glasshouse's cover colours, Anime's speed lines and screentone, Mochi's sparkles), in the frosted glass of dialogs (Aurora, Glasshouse), in the page titles (Sakura's italics, Terminal's glow) or over the window (Terminal's scanlines), while tiles, rows and controls keep the flat grammar.
 
 **Key Characteristics:**
 - Giant lowercase light-weight words as the primary navigation landmark, shrunk to fit the pane, never cropped.
@@ -300,7 +300,7 @@ A true-black ground, white ink, four saturated tile colours and one accent that 
 - **White Ink** (ink-white): all primary text, outlines (at 85%), the main transport button and toasts.
 - **Muted Ink** (ink-muted): artists, albums, durations, hints, placeholders.
 
-Derived tints, computed from the above so every theme inherits them: hover is ink at 7%, press ink at 13%, the section rule the accent at 45%, the dialog scrim the ground at 72%. Inactive pivots are ink at 38%, hovered pivots 70%.
+Derived tints, computed from the above so every theme inherits them: hover is ink at 7%, press ink at 13%, the section rule the accent at 45%, the dialog scrim the ground at 72%, and the search suggestions are raised grey laid over the ground, solid even where a theme's surfaces show the page through. Inactive pivots are ink at 38%, hovered pivots 70%.
 
 ### Named Rules
 **The One Live Colour Rule.** Only the accent marks what is current, selected or playing, and it marks it by flooding the whole row, box or chip with the accent and switching the ink to accent ink. No second highlight colour, no tinted half-states for selection.
@@ -309,7 +309,7 @@ Derived tints, computed from the above so every theme inherits them: hover is in
 
 ## Typography
 
-**Display Font:** Selawik (with Segoe UI, Noto Sans, DejaVu Sans, system-ui), shipped with the app in weights 300, 350, 400, 600 and 700.
+**Display Font:** Selawik (with Segoe UI, Noto Sans, DejaVu Sans, system-ui), shipped with the app in weights 300, 350, 400, 600 and 700. Quicksand, Mochi's round face, ships beside it in weights 300, 400 and 700, under the OFL as Selawik is.
 **Body Font:** the same family; a theme's display face defaults to its body face.
 **Mono Font:** the system's monospaced face (Consolas, Menlo, DejaVu Sans Mono), only for addresses and license texts.
 
@@ -322,7 +322,7 @@ Derived tints, computed from the above so every theme inherits them: hover is in
 - **Title** (300, 2.125rem, 1.1): section titles over shelves and lists, and dialog titles; the queue column's title is the smaller 1.75rem pivot token.
 - **Tile title** (300, clamp(1.5rem, 3.4cqi, 2.375rem), 0.95; clamp(2rem, 5.6cqi, 3.75rem) on large tiles): lowercase words on tiles; a word too long for its tile breaks.
 - **Subtitle** (300, 1.375rem, 1.3): now-playing artists, the stats sentence, choice and marketplace card names, the palette input, lyrics in the side panel (2rem on the lyrics page).
-- **Body** (400, 0.9375rem, 1.45): track titles, nav labels (17px at weight 350), list items, buttons. Prose is capped at 56 to 72ch.
+- **Body** (400, 0.9375rem, 1.45): track titles, nav labels (17px at weight 350, or at the regular weight of a theme's own body face), list items, buttons. Prose is capped at 56 to 72ch.
 - **Label** (400, 0.8125rem): artists, albums, durations, captions on tiles, chips, field labels, hints.
 - **Caption** (400, 0.75rem): times, shortcuts, palette groups, marketplace meta.
 

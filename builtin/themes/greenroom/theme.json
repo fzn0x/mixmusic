@@ -1,0 +1,40 @@
+{
+  "id": "greenroom",
+  "name": "Greenroom",
+  "version": "1.0.0",
+  "author": "MixMusic",
+  "description": "A charcoal backstage lit by one jade light, the cover's colour washing down from the top.",
+  "scheme": "dark",
+  "colors": {
+    "bg": "#121212",
+    "surface": "#181818",
+    "surface-2": "#232323",
+    "surface-3": "#333333",
+    "border": "rgba(255, 255, 255, 0.1)",
+    "text": "#ffffff",
+    "text-muted": "#a7a7a7",
+    "accent": "#2be09c",
+    "accent-text": "#00261a",
+    "danger": "#ff5c6a",
+    "success": "#2be09c",
+    "youtube": "#ff4b4b",
+    "spotify": "#1ed760",
+    "tile-1": "#0e7c58",
+    "tile-2": "#8b2a73",
+    "tile-3": "#2a4bb8",
+    "tile-4": "#b9461a",
+    "tile-text": "#ffffff"
+  },
+  "fonts": {
+    "body": "'Avenir Next', 'Segoe UI Variable Display', 'Segoe UI', 'Noto Sans', sans-serif"
+  },
+  "radius": "8px",
+  "options": [
+    {
+      "id": "wash",
+      "label": "Colour of the cover",
+      "type": "toggle",
+      "default": "true"
+    }
+  ]
+}

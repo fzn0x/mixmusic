@@ -114,8 +114,11 @@ type shell struct {
 	// st is what the player does, as the frame shows it.
 	st player.State
 	// artURL is the artwork the accent follows, and artColor its colour,
-	// once known.
+	// once known: the colour Greenroom's and Glasshouse's grounds take
+	// too.
 	artURL, artColor string
+	// tint is the colour of the cover the ground takes, as it changes.
+	tint tint
 	// asking is the question a dialog asks before an action, if any.
 	asking *question
 	// panel is the side panel shown: "queue", "lyrics" or "".
@@ -338,8 +341,9 @@ func (s *shell) restyle() {
 }
 
 // followArtwork takes the accent from the artwork of what plays, as the
-// settings ask: once a track with other artwork starts, it asks for the
-// artwork's colour, beside the main thread.
+// settings ask, or the theme's ground does: once a track with other
+// artwork starts, it asks for the artwork's colour, beside the main
+// thread.
 func (s *shell) followArtwork() {
 	url := ""
 	if cur, ok := s.st.Current(); ok {
@@ -353,7 +357,7 @@ func (s *shell) followArtwork() {
 			s.restyle()
 		}
 		return
-	case !s.set.DynamicAccent || url == s.artURL:
+	case !s.set.DynamicAccent && !s.lk.fx.wash && !s.lk.fx.cover, url == s.artURL:
 		return
 	}
 	s.artURL = url

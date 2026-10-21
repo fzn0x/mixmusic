@@ -458,6 +458,25 @@ func TestPanelKept(t *testing.T) {
 	}
 }
 
+// TestLyricsPlainKept shows lyrics as plain text at the next start, once
+// the user chose it.
+func TestLyricsPlainKept(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB",
+		Lines: []lyrics.Line{{TimeMs: 0, Text: "Waiting in a car"}}}}
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	s.showPanel("lyrics")
+	tt := tester(t, s)
+	click(t, s, tt, "plain text")
+	if !s.svc.Preferences.Get().LyricsPlain {
+		t.Fatal("plain text wasn't kept")
+	}
+	if again := newShell(s.a, s.p); !again.set.LyricsPlain {
+		t.Error("the next start shows the lyrics synced")
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

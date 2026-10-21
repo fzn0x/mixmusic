@@ -169,11 +169,10 @@ func (s *shell) lyricsPanel(c *ui.Context) {
 	s.lyrics(c, false)
 }
 
-// lyricsState is the lyrics views' own: whether synced lyrics show as
-// plain text, the track they show, and where the panel's and the now
-// playing page's lyrics scrolled, which show at once.
+// lyricsState is the lyrics views' own: the track they show, and where
+// the panel's and the now playing page's lyrics scrolled, which show at
+// once. Whether synced lyrics show as plain text is a setting.
 type lyricsState struct {
-	plain       bool
 	track       string
 	panel, page lyricsScroll
 }
@@ -216,15 +215,16 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 	if ls.track != t.ID {
 		ls.track, ls.panel.scrolled, ls.page.scrolled = t.ID, -1, -1
 	}
-	synced := ly.Synced && !ls.plain
+	synced := ly.Synced && !s.set.LyricsPlain
 	if ly.Synced {
 		ui.Row(c).Padding(0, 24, 8).Shrink(0).Children(func() {
 			mode := 0
-			if ls.plain {
+			if s.set.LyricsPlain {
 				mode = 1
 			}
 			if s.segmented(c, "lyrics-mode-"+where, "Show lyrics as", &mode, "synced", "plain text") {
-				ls.plain = mode == 1
+				s.set.LyricsPlain = mode == 1
+				s.save()
 			}
 		})
 	}

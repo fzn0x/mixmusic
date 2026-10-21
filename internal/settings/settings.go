@@ -83,6 +83,8 @@ type Settings struct {
 	// Panel is the side panel beside the pages: "queue", "lyrics" or
 	// "none". Settings from before it show the queue.
 	Panel string `json:"panel"`
+	// LyricsPlain shows synchronized lyrics as plain text.
+	LyricsPlain bool `json:"lyricsPlain"`
 
 	// Playback.
 	SpotifyPlayback SpotifyPlayback `json:"spotifyPlayback"`

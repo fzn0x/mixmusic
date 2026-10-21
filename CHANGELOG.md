@@ -113,6 +113,13 @@ next track.
   under the new track's title, artwork and lyrics while MixMusic found the
   new track's audio, which can take a while on macOS, and for good when
   that failed.
+- When Spotify refuses the account after you sign in, Settings › Accounts
+  says why and what to do, where it showed only "spotify: HTTP 403": the
+  account isn't one of your app's users, to add under Users Management in
+  its settings, or the app's owner has no Spotify Premium, which Spotify
+  asks of apps in development mode since February 2026. The steps to
+  connect Spotify ask for both beforehand, and a refused sign-in can be
+  signed out of.
 
 ## [0.4.0] - 2026-10-20
 

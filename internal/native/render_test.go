@@ -26,6 +26,7 @@ import (
 func TestMain(m *testing.M) {
 	isDark = func() bool { return true }
 	setAppearance = func(mygo.ThemeSource) {}
+	copyText = func(string) {}
 	// The tests show what they give the pages: a request that reaches for
 	// the network goes to a closed port, and fails.
 	for _, v := range []string{"HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy"} {

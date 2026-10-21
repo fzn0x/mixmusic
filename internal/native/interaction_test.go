@@ -373,6 +373,35 @@ func TestCopyIntoMix(t *testing.T) {
 	}
 }
 
+// TestCopyLink copies the link of a track on its service from its menu.
+func TestCopyLink(t *testing.T) {
+	var copied []string
+	was := copyText
+	copyText = func(text string) { copied = append(copied, text) }
+	t.Cleanup(func() { copyText = was })
+	s := newTestShell(t)
+	tr := testTracks[0]
+	tr.URL = "https://music.youtube.com/watch?v=midnight"
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Hurry Up, We're Dreaming",
+		Tracks: []media.Track{tr}}}
+	tt := tester(t, s)
+	copyLink := func(open func() error, want string) {
+		t.Helper()
+		if err := open(); err != nil {
+			t.Fatal(err)
+		}
+		if err := tt.ChooseMenuItem("Copy link"); err != nil {
+			t.Fatalf("%v: the menu holds %q", err, tt.Menu())
+		}
+		tt.Frame()
+		if len(copied) == 0 || copied[len(copied)-1] != want {
+			t.Errorf("copied %q, not %q", copied, want)
+		}
+	}
+	show(s, tt, "/album/al-x")
+	copyLink(func() error { return tt.RightClick(tr.Title) }, tr.URL)
+}
+
 // TestPivotCounts counts what the pivots of a search show.
 func TestPivotCounts(t *testing.T) {
 	s := newTestShell(t)

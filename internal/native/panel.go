@@ -5,7 +5,6 @@ import (
 	"slices"
 	"time"
 
-	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/lyrics"
@@ -354,10 +353,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		if m.Item("Open in " + sourceName(t.Source)).Chosen() {
 			go s.svc.System.OpenExternal(u)
 		}
-		if m.Item("Copy link").Chosen() {
-			mygo.Clipboard.WriteText(u)
-			s.notes = append(s.notes, notice("Copied the link"))
-		}
+		s.copyLinkItem(m, u)
 	}
 	if t.Source == media.SourceSpotify {
 		if m.Item("Find another YouTube Music match").Chosen() {
@@ -376,6 +372,16 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 				a.Run(t)
 			}
 		}
+	}
+}
+
+// copyLinkItem is a menu's way to share what has a page on its service, at
+// rawURL: it copies that link, which anyone can open. Without a link, the
+// menu has no such item.
+func (s *shell) copyLinkItem(m *ui.Menu, rawURL string) {
+	if rawURL != "" && m.Item("Copy link").Chosen() {
+		copyText(rawURL)
+		s.notes = append(s.notes, notice("Copied the link"))
 	}
 }
 

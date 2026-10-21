@@ -210,8 +210,9 @@ func TestWebPlugins(t *testing.T) {
 	h.install("old", `{"id": "old", "name": "Old", "version": "1.0.0", "author": "A", "main": "index.js"}`,
 		map[string]string{"index.js": `export default function activate(api) {}`})
 	h.enable("old")
-	h.wait("the failure", func() bool { return h.Failure("old") != "" })
-	if !strings.Contains(h.Failure("old"), "web interface") || !h.ui.said("failed to start") {
+	// The host keeps the failure, then tells it.
+	h.wait("the failure", func() bool { return h.Failure("old") != "" && h.ui.said("failed to start") })
+	if !strings.Contains(h.Failure("old"), "web interface") {
 		t.Errorf("the failure says %q", h.Failure("old"))
 	}
 	// It isn't tried again until it changes.

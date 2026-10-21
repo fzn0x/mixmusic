@@ -264,7 +264,7 @@ MixMusic is a wall of type and colour on true black. Every place in the player n
 
 Density is that of a tool kept open for hours: a 248px rail of outlined icon boxes, a main pane of giant words, tiles and shelves, a 340px queue column that always shows what plays next, and a 92px player bar. The pane is scrolled, the shell never is. Motion is short and directional: pages swing in from the right like a turnstile, pressed tiles tilt toward the pointer, the live tile in the rail flips over to show the next track.
 
-The system is a public contract. Every colour, face, radius and measure is a `--mm-*` variable that a theme sets, and the `mm-*` class hooks and root attributes listed in `docs/themes.md` are stable. The default theme (Mix) is the reference expression; Daylight, Midnight, Sakura, Terminal and Aurora are token variants of the same grammar (light ground, other accents, other radii, other faces), not separate designs.
+The system is a public contract. Themes set its colours, faces and radius, the tokens `docs/themes.md` lists, and the app draws everything else from them. The default theme (Mix) is the reference expression; Daylight, Midnight, Sakura, Terminal and Aurora are token variants of the same grammar (light ground, other accents, other radii, other faces), not separate designs.
 
 **Key Characteristics:**
 - Giant lowercase light-weight words as the primary navigation landmark, shrunk to fit the pane, never cropped.
@@ -297,7 +297,7 @@ A true-black ground, white ink, four saturated tile colours and one accent that 
 - **Raised Grey** (surface-raised): menus, empty artwork frames, skeletons, code.
 - **Pressed Grey** (surface-pressed): the unfilled part of sliders and scrollbar thumbs.
 - **Hairline** (hairline): 1px dividers between panels, rows of settings, menu separators.
-- **White Ink** (ink-white): all primary text, outlines (at 85% as `--mm-outline`), the main transport button and toasts.
+- **White Ink** (ink-white): all primary text, outlines (at 85%), the main transport button and toasts.
 - **Muted Ink** (ink-muted): artists, albums, durations, hints, placeholders.
 
 Derived tints, computed from the above so every theme inherits them: hover is ink at 7%, press ink at 13%, the section rule the accent at 45%, the dialog scrim the ground at 72%. Inactive pivots are ink at 38%, hovered pivots 70%.
@@ -310,8 +310,8 @@ Derived tints, computed from the above so every theme inherits them: hover is in
 ## Typography
 
 **Display Font:** Selawik (with Segoe UI, Noto Sans, DejaVu Sans, system-ui), shipped with the app in weights 300, 350, 400, 600 and 700.
-**Body Font:** the same family; `--mm-font-display` defaults to `--mm-font-body`.
-**Label/Mono Font:** Cascadia Mono (with Consolas, DejaVu Sans Mono), only for the CSS editor and code.
+**Body Font:** the same family; a theme's display face defaults to its body face.
+**Mono Font:** the system's monospaced face (Consolas, Menlo, DejaVu Sans Mono), only for addresses and license texts.
 
 **Character:** one humanist sans carries the whole interface, with the hierarchy made by size and weight alone: enormous and light at the top, plain and regular at reading size. Large type is always light (300) and tightly tracked.
 
@@ -326,7 +326,7 @@ Derived tints, computed from the above so every theme inherits them: hover is in
 - **Label** (400, 0.8125rem): artists, albums, durations, captions on tiles, chips, field labels, hints.
 - **Caption** (400, 0.75rem): times, shortcuts, palette groups, marketplace meta.
 
-The scale is multiplied by `--mm-font-scale`, the user's text size. Sizes in `cqi` follow the width of the main pane, not of the window, so they shrink as the rail and the side panel take room. Numbers that change in place (times, counts) use tabular figures.
+The scale is multiplied by the user's text size. Sizes in `cqi` follow the width of the main pane, not of the window, so they shrink as the rail and the side panel take room. Numbers that change in place (times, counts) use tabular figures.
 
 ### Named Rules
 **The Lowercase Voice Rule.** Page words, pivots, tile titles, section titles and nav labels are lowercase. Names of tracks, artists, albums and services keep their own capitalisation.
@@ -380,7 +380,7 @@ Only things that float over the interface cast a shadow, a soft dark one with no
 
 ## Shapes
 
-Corners are a theme token: `--mm-radius` (0px in Mix and Daylight) for tiles, artwork, dialogs, choice and marketplace cards, and `--mm-radius-sm` (60% of it) for buttons, inputs, chips, rows and small art. In the default theme everything is square.
+Corners are a theme token: the radius (0px in Mix and Daylight) for tiles, artwork, dialogs, choice and marketplace cards, and 60% of it for buttons, inputs, chips, rows and small art. In the default theme everything is square.
 
 Circles are the one other form, and they carry meaning: transport buttons, the floating play button on artwork, artist portraits, the stats circles (whose radius grows with the square root of plays, from 14 to 60px) and the overlapping rings of the service share.
 
@@ -459,10 +459,10 @@ Ease-out `cubic-bezier(0.16, 1, 0.3, 1)` with 120, 260 and 520ms steps; ease-in-
 ### Do:
 - **Do** open every page with its name in one lowercase display word, weight 300, letting it run past the pane's right edge.
 - **Do** mark every current, selected or playing thing by flooding it with the accent and switching to accent ink.
-- **Do** draw secondary buttons, inputs, chips and nav boxes as 2px outlines in `--mm-outline`, inverting to solid ink when pressed.
+- **Do** draw secondary buttons, inputs, chips and nav boxes as 2px outlines in the outline ink, inverting to solid ink when pressed.
 - **Do** put destinations on flat tiles in the four tile tones, with lowercase light titles in tile ink.
 - **Do** tag every track with its source mark, a shape first and a colour second.
-- **Do** take every colour, face, radius, size and measure from a `--mm-*` variable, and style through the hooks and attributes in `docs/themes.md` without renaming them.
+- **Do** take every colour, face and radius from the theme's tokens, and every size and measure from the scale here.
 - **Do** keep the next track in view: the queue column, the player bar's "next" line and the live tile's back face.
 - **Do** let the site's player bar play the page: its progress is the scroll position, its title the section in view, and its primary action is always the download.
 
@@ -470,6 +470,6 @@ Ease-out `cubic-bezier(0.16, 1, 0.3, 1)` with 120, 260 and 520ms steps; ease-in-
 - **Don't** fill a tile with a gradient, or give tiles, artwork, rows or panels a shadow or bevel; shadows are for menus and toasts only.
 - **Don't** introduce a second highlight colour; the service colours tag sources and nothing else.
 - **Don't** set display, pivot, title or tile type in a heavy weight, or capitalise page words, pivots and tile titles.
-- **Don't** round corners with a literal value; corners come from `--mm-radius` and `--mm-radius-sm`, and circles are reserved for transport, play buttons, artists and stats.
+- **Don't** round corners with a literal value; corners come from the theme's radius, or 60% of it, and circles are reserved for transport, play buttons, artists and stats.
 - **Don't** crop or ellipsis-truncate the page word or the pivots; they shrink to fit the pane, then wrap.
 - **Don't** print tile textures outside tiles.

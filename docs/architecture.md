@@ -1,22 +1,25 @@
 # Architecture
 
-MixMusic is one Go program. Its window shows a web page, the interface,
-in the webview the system already has (WebView2 on Windows, WebKitGTK on
-Linux), through [MyGo](https://github.com/egoist/mygo). The Go side owns the
-catalogs, the accounts, the library, the audio streams and the desktop; the
-page owns the interface and the player.
+MixMusic is one Go program. [MyGo](https://github.com/egoist/mygo) draws its
+windows in Go, with its `ui` package: immediate-mode views, which the GPU
+draws, without a webview. The windows show the catalogs, the accounts and
+the library of the services of `internal/app`, and the player in Go plays
+the queue through MixMusic's own audio engine, or on Spotify's devices.
 
 ```
-┌────────────────────────── the page (src/) ───────────────────────────┐
-│ pages, shell, theme engine, plugin host, player (two audio decks)   │
-└──────┬────────────────────────┬───────────────────────────┬─────────┘
-       │ typed calls (mygo.ts)  │ stream://  (audio)        │ addons:// (themes, plugins)
-┌──────┴────────────────────────┴───────────────────────────┴─────────┐
-│ internal/app: Catalog, Player, Collection, Accounts, Preferences,   │
-│ Addons, System; the tray, media keys, notifications, mini player    │
-├───────────┬──────────┬──────────┬────────┬─────────┬────────┬───────┤
-│ youtube   │ spotify  │ stream   │ match  │ lyrics  │library │addons │
-└───────────┴──────────┴──────────┴────────┴─────────┴────────┴───────┘
+┌──────────────────── the windows (internal/native) ──────────────────┐
+│ pages, shell, player bar, queue, lyrics, mini player, themes,       │
+│ plugins' pages and widgets                                          │
+└──────┬──────────────────────────┬────────────────────────┬──────────┘
+       │ App.Services             │ the queue              │ plugins
+┌──────┴──────────────────┐ ┌─────┴──────────────┐ ┌───────┴──────────┐
+│ internal/app: Catalog,  │ │ internal/player    │ │ internal/plugins │
+│ Collection, Accounts,   │ │ ├ internal/audio   │ │ (sobek, a JS     │
+│ Preferences, Addons,    │ │ └ Spotify devices  │ │ engine in Go)    │
+│ System; the desktop     │ └────────────────────┘ └──────────────────┘
+├─────────┬─────────┬────────┬───────┬────────┬─────────┬─────────────┤
+│ youtube │ spotify │ stream │ match │ lyrics │ library │ addons  ... │
+└─────────┴─────────┴────────┴───────┴────────┴─────────┴─────────────┘
 ```
 
 ## The Go side
@@ -35,35 +38,40 @@ page owns the interface and the player.
   Live` (`MIXMUSIC_YT_COOKIES` adds a signed-in account).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
-  library), controls Spotify Connect devices, and hands the page the token of
-  Spotify's player.
+  library), and controls Spotify Connect devices.
 - **`internal/stream`** finds the audio of a YouTube video with yt-dlp, keeps
-  it until its URL expires, and serves it at `stream://localhost/yt/<id>`:
-  range requests, chunked fetches from YouTube, a new URL when YouTube
-  refuses the old one, and an on-disk cache of tracks played to their end.
-  `Proxy.Open` reads the same audio for the native engine, in the background.
+  it until its URL expires, and opens it for the audio engine
+  (`Proxy.Open`): chunked fetches from YouTube in the background, a new URL
+  when YouTube refuses the old one, and an on-disk cache of tracks played to
+  their end.
 - **`internal/webm`** reads the audio of WebM files, as YouTube serves it:
   the packets of the first audio track with their times, and seeking by the
   Cues, reading a file played from its start straight through.
 - **`internal/opus`** decodes Opus: a pure Go port of libopus 1.6.1's decoder
   (`celt`, `silk` and the range decoder `rangedec`), which decodes the test
   vectors of RFC 8251 as libopus does, bit for bit.
-- **`internal/audio`** is the native engine, MixMusic's own player outside
-  the webview: two decks, each a goroutine that reads a track with
-  `internal/webm` and decodes it with `internal/opus` into a ring the audio
-  thread plays from, and the web player's preamp, equalizer, levelling
-  compressor, volume and analyser, ported from Chromium's Web Audio, which
-  they match sample for sample. `internal/audio/output` plays it on the
-  system's output, without cgo: through WASAPI on Windows, an Audio Queue on
-  macOS, and PulseAudio, which PipeWire serves too, or ALSA on Linux.
-- **`internal/nowplaying`** shows what the native engine plays in the
-  system's media controls, which the webview does for what it plays, and
-  passes on what they ask: Now Playing on macOS, through MediaPlayer, and an
-  MPRIS player on Linux, served by GIO's GDBus, both called with purego.
+- **`internal/audio`** is MixMusic's audio engine: two decks, each a
+  goroutine that reads a track with `internal/webm` and decodes it with
+  `internal/opus` into a ring the audio thread plays from, and the preamp,
+  equalizer, levelling compressor, volume and analyser of the web player
+  MixMusic had, ported from Chromium's Web Audio, which they match sample
+  for sample. `internal/audio/output` plays it on the system's output,
+  without cgo: through WASAPI on Windows, an Audio Queue on macOS, and
+  PulseAudio, which PipeWire serves too, or ALSA on Linux.
+- **`internal/nowplaying`** shows what the engine plays in the system's media
+  controls, and passes on what they ask: Now Playing on macOS, through
+  MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both
+  called with purego.
+- **`internal/player`** plays the queue: one goroutine owns the queue and
+  what plays, and the network calls run beside it. It plays YouTube Music,
+  and Spotify tracks matched to their recording, through the engine, and
+  Spotify tracks on a Spotify device: a Spotify Connect device, or MixMusic
+  itself, as below. It shuffles, repeats, crossfades, starts radios when the
+  queue runs out, counts plays and keeps the queue in `queue.json`.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
-  title, artists and duration, for playback without Spotify Connect.
+  title, artists and duration, for playback without a Spotify device.
 - **`internal/lyrics`** finds synced lyrics on LRCLIB and reads LRC.
 - **`internal/library`** keeps liked songs, mixes, the history and stats in
   `library.json`.
@@ -76,61 +84,91 @@ page owns the interface and the player.
   may hold, and has Go write a crash to `crash.log` there, which the next
   start keeps as `crash-<time>.log` and offers to report.
 - **`internal/addons`** validates theme and plugin manifests, lists the
-  built-in and installed add-ons, serves their files at `addons://`, and
-  installs add-ons from the community registry.
+  built-in and installed add-ons, and installs add-ons from the community
+  registry.
+- **`internal/plugins`** runs the plugins the user enabled, each in a
+  JavaScript runtime of its own, [sobek](https://github.com/grafana/sobek)
+  (a fork of goja with ES modules), on a goroutine of its own: their
+  modules, `console`, timers and `fetch`, and the API of
+  [plugins.md](plugins.md), built in `api.js` over Go natives. What they add
+  to the interface the windows show: pages and widgets as views of
+  elements, which the windows draw in their own styles, and canvases, whose
+  drawing calls the plugin records and the window paints.
 - **`internal/store`** writes JSON files atomically; **`internal/settings`**
   defines the settings and keeps them in range.
-- **`internal/app`** binds the services the page calls, emits events to the
-  page (`nowPlaying`, `playerCommand`, `settingsChanged`, `addonsChanged`,
-  `accountsChanged`, `navigate`, `nativeAudio`), and puts MixMusic on the
-  desktop.
+- **`internal/app`** gives the windows the services (`App.Services`), tells
+  them when the settings, the accounts, the add-ons or the updates change
+  (`App.Watch`), makes the player, and puts MixMusic on the desktop: the
+  tray, media keys, deep links, notifications, updates.
 
-`mygo generate` writes `src/mygo.ts`, the typed client of the services,
-from the Go code; `bun run dev` and `bun run build` keep it current.
+## The windows
 
-## The page
+`internal/native` draws the main window and the mini player. Pages fetch
+what they show beside the main thread (`fetch`), and a window's state
+belongs to its main thread: what finishes elsewhere comes back through
+`update`.
 
-- **`src/player`** plays the queue. Tracks of YouTube Music, and Spotify
-  tracks matched to their recording, play in `AudioEngine`: two `<audio>`
-  elements routed through Web Audio (preamp, ten bands, an optional compressor
-  that levels loudness, an analyser), the idle one preloading the next track
-  and fading it in for crossfades. With MixMusic's own audio engine on, as it
-  is by default on macOS and Linux, `NativeEngine` (`native.ts`) plays them
-  instead, where the app can play it (`Info.nativeAudio`), through the native
-  engine of the Go side, and gives, for the AnalyserNode, an object with its
-  reading methods; tracks without Opus fall back to `AudioEngine`. Spotify
-  tracks play on a Spotify device through `ConnectEngine`, which sends it
-  commands and polls what it plays: a Spotify Connect device, through the Web
-  API, or MixMusic itself, whose page Spotify's Web Playback SDK makes a
-  device of its own (`spotify.ts`). The player reports what plays to the Go
-  side, which feeds the tray, notifications and the mini player.
-- **`src/theme`** applies the theme's manifest as `--mm-*` variables, its options
-  as `data-opt-*` attributes, its stylesheet, and the accent of the artwork.
-- **`src/plugins`** starts the plugins the user enabled, with the API of
-  `api.ts`, typed for authors in `sdk/index.d.ts`.
-- **`src/app`**, **`src/pages`** and **`src/components`** are the interface:
-  Preact with signals, and plain CSS in `src/styles`.
+- **Artwork** downloads only for what shows in the window, scaled to the
+  size it shows at, and the images shown most recently are kept, up to 48
+  MB of pixels (`artwork.go`).
+- **Themes** give their tokens: colours, fonts, radius (`theme.go`), and
+  the accent follows the artwork of what plays. The windows draw the
+  effects of the built-in themes, as their options say (`effects.go`):
+  Mix's textures, Aurora's drifting lights and frosted dialogs, Sakura's
+  petals, Terminal's scanlines, glow and phosphor artwork.
+- **Deep links** and second launches open their pages in the main window
+  (`App.OnNavigate`).
+
+## Webviews
+
+Two windows still show a web page, and only while they're needed:
+
+- **Spotify in MixMusic itself** (`internal/app/spotifyhere.go`): Spotify's
+  Web Playback SDK, which decrypts Spotify's protected audio, in the hidden
+  window of `public/spotify.html`, the only page of the app, which it embeds.
+  It opens at the first Spotify track that plays in MixMusic, and makes
+  MixMusic a Spotify device of its own, which the player plays tracks on
+  through the Web API and follows by asking the page (`Page.Eval`); the page
+  gets its token from `SpotifyPage.Token`. Only WebView2, on Windows,
+  decrypts Spotify's audio.
+- **Google's sign-in to YouTube Music**, whose cookies MixMusic keeps.
 
 ## Data
 
 Everything lives in the user's data folder (`%AppData%\MixMusic` on
 Windows, `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
-`addons/`, `bin/` (yt-dlp), the YouTube session (`youtube-session.bin`,
-encrypted with a key of the system's credential store, which also keeps the
-Spotify token and the Last.fm connection), the scrobbles still to send, and
-`updater.json`, the update preferences. The cache folder holds audio, matches and
-yt-dlp's cache, and the logs folder the log and the crash reports.
-`MIXMUSIC_DATA_DIR` moves all three into one folder, for a portable copy or
-a test run.
+`queue.json`, `addons/`, `bin/` (yt-dlp), the YouTube session
+(`youtube-session.bin`, encrypted with a key of the system's credential
+store, which also keeps the Spotify token and the Last.fm connection), the
+scrobbles still to send, and `updater.json`, the update preferences. The
+cache folder holds audio, matches and yt-dlp's cache, and the logs folder
+the log and the crash reports. `MIXMUSIC_DATA_DIR` moves all three into one
+folder, for a portable copy or a test run.
 
 ## Capture mode
 
-`MIXMUSIC_CAPTURE=<dir>` screenshots routes of the main window, then quits:
+`MIXMUSIC_CAPTURE=<dir>` screenshots pages of the main window, and
+`MIXMUSIC_CAPTURE_QUIT=1` quits once they are saved:
 
 ```sh
-MIXMUSIC_CAPTURE=shots MIXMUSIC_CAPTURE_ROUTES="/|/search?q=jazz|/settings" MIXMUSIC_CAPTURE_SIZE=1440x900 ./MixMusic
+MIXMUSIC_CAPTURE=shots MIXMUSIC_CAPTURE_QUIT=1 MIXMUSIC_CAPTURE_ROUTES="/|/search?q=jazz|/settings" MIXMUSIC_CAPTURE_SIZE=1440x900 ./MixMusic
 ```
 
-A route starting with `js:` runs a script in the page instead, as clicking
-a button; `MIXMUSIC_CAPTURE_WAIT` sets how long each step gets (`5s`), and
-`MIXMUSIC_CAPTURE_ZOOM` zooms the page (`1.25`) for sharper screenshots.
+`MIXMUSIC_CAPTURE_WAIT` sets how long each step gets (`5s`). Steps that
+aren't pages act: `act:shot:<name>` saves the window as it is,
+`act:mute` mutes the player, `act:play:<search>` plays what a search
+finds, `act:resume` plays the queue kept in the data folder,
+`act:wait:<duration>` waits, `act:palette` opens the command palette,
+`act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
+scrolls the page, `act:theme:<id>` wears a theme, `act:mini` opens the
+mini player, which saves `mini.png`, `act:spotify` logs whether MixMusic's
+own Spotify device could play, and `act:memory` and `act:heap` log the Go
+heap and save a profile of it. Nothing plays unless the player is muted,
+or `MIXMUSIC_SILENT=1` has the audio engine play into no device, which
+keeps the visualizer and the lyrics moving without a sound.
+`MIXMUSIC_CAPTURE_COMMUNITY=<dir>` has the marketplace read the community
+registry from a copy of `community/`, for add-ons not on GitHub yet. The
+site's screenshots are made this way, from a throwaway profile, at
+1536x900 (`MIXMUSIC_CAPTURE_SIZE=1552x909`: the size includes the
+window's invisible borders). `go test ./internal/native -run Render` with
+`MIXMUSIC_RENDER=<dir>` draws the pages and themes without a window.

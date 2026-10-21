@@ -6,7 +6,7 @@
 
 web
 
-The interface is a web page shown in the system webview of a desktop app (WebView2 on Windows, WebKitGTK on Linux), built with MyGo. It is a desktop app first: a resizable window from about 940×600 upward, mouse and keyboard, a tray icon, media keys, and a frameless mini player window.
+The interface is drawn by the desktop app itself, on the GPU, with MyGo's native UI: no web page. It is a desktop app first: a resizable window from about 940×600 upward, mouse and keyboard, a tray icon, media keys, and a frameless mini player window.
 
 ## Users
 
@@ -33,8 +33,8 @@ One queue and one library across Spotify and YouTube Music, in an open-source de
 - Search across both services; home shelves from both plus the user's own; album, artist and playlist pages; radio continuation when the queue ends.
 - Unified queue, shuffle, repeat, crossfade, volume levelling, a 10-band equalizer, synced lyrics, listening stats, history.
 - Local library: liked tracks and playlists mixing both services; Spotify library pages when signed in; import of a service playlist into a mixed one.
-- Themes: a manifest of 18 color tokens (four of them tile colors and their ink), fonts, a corner radius, optional stylesheet and options (toggle, select, color, range). Six built-in themes: Mix (default), Daylight, Midnight, Sakura, Terminal, Aurora. Themes reach the interface only through `--mm-*` CSS variables, `data-opt-*` attributes and documented `mm-*` class hooks, which are a public contract for theme authors.
-- Plugins: ES modules given a plugin API (player, queue, UI slots, commands, settings, storage). They run with the app's privileges; the app tells users so before enabling a community plugin.
+- Themes: a manifest of 18 color tokens (four of them tile colors and their ink), fonts and a corner radius, a public contract for theme authors: the app draws everything with them. Six built-in themes: Mix (default), Daylight, Midnight, Sakura, Terminal, Aurora; four add effects the app draws (Mix's tile textures, Aurora's drifting lights and frosted glass, Sakura's petals, Terminal's scanlines and glow), tuned with options (toggle, select, color, range).
+- Plugins: ES modules given a plugin API (player, queue, catalog, library, commands, settings, storage, and pages, widgets and track actions made of elements and canvases the app draws), each in a JavaScript engine of the app's own. Every plugin can use the whole API, whatever its permissions say; the app tells users so before enabling a plugin.
 - Community registry: themes and plugins live in the repository's `community/` folder and are installed from it over HTTPS.
 - macOS, Windows and Linux are the supported platforms.
 
@@ -42,7 +42,7 @@ One queue and one library across Spotify and YouTube Music, in an open-source de
 
 - Name: MixMusic. The icon is two overlapping rings with a play triangle where they meet, on a violet-to-coral gradient (`resources/icon.png`, drawn by `tools/genicon`).
 - The project never names other projects as references or inspirations in its code, docs or interface.
-- Spotify and YouTube Music are named as the services MixMusic plays, never imitated: no use of their logos or brand layouts. Each service has a theme token (`--mm-spotify`, `--mm-youtube`) used only to tag where a track comes from.
+- Spotify and YouTube Music are named as the services MixMusic plays, never imitated: no use of their logos or brand layouts. Each service has a theme token (`spotify`, `youtube`) used only to tag where a track comes from.
 
 ## Evidence on Hand
 

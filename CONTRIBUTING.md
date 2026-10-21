@@ -20,9 +20,9 @@ bun install
 bun run dev
 ```
 
-`bun run dev` builds the app, starts it, and rebuilds it as you edit the Go
-code; the interface reloads as you edit `src/`. Development builds keep their
-data apart from an installed MixMusic, under the name `MixMusic Dev`.
+`bun run dev` builds the app, starts it, and rebuilds it as you edit it.
+Development builds keep their data apart from an installed MixMusic, under
+the name `MixMusic Dev`.
 
 Before you open a pull request:
 
@@ -38,12 +38,13 @@ go run ./tools/registry -check
 rules keep the project healthy:
 
 - **Every system.** Changes must build for macOS, Windows and Linux; `GOOS=linux go vet ./...` and `GOOS=darwin go vet ./...` check them from Windows.
-- **The theme contract is public.** Community themes style the `--mm-*`
-  variables, root attributes and `mm-*` classes of
-  [docs/themes.md](docs/themes.md): rename or remove one only with a plan
-  for the themes that use it, and document new ones there.
-- **The plugin API is public.** Change `src/plugins/api.ts` and
-  `sdk/index.d.ts` together; the typecheck fails when they differ.
+- **The theme contract is public.** Community themes set the tokens of
+  [docs/themes.md](docs/themes.md): colors, fonts and a radius. Rename or
+  remove one only with a plan for the themes that set it, and document new
+  ones there.
+- **The plugin API is public.** Change `internal/plugins/api.js`,
+  `sdk/index.d.ts` and [docs/plugins.md](docs/plugins.md) together; the
+  typecheck checks the community's plugins against the types.
 - **Tests do not need the network.** Parsers are tested on recorded
   responses in `testdata/`; live tests run only with `MIXMUSIC_LIVE=1`.
   The Opus decoder's conformance test runs when `OPUS_TESTVECTORS` names

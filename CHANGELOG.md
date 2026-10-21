@@ -6,30 +6,37 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
-Spotify plays in MixMusic itself, with no Spotify app open, and a new
-version asks to install in a pop-up. MixMusic can play YouTube Music with
-an audio engine of its own, outside the webview. Spotify Connect
-no longer shows a track paused while your device plays it, and goes on to
-the next track.
+MixMusic draws its own interface, and plays through an audio engine of its
+own, without the webview it ran in: it takes far less memory. Spotify plays
+in MixMusic itself on Windows, with no Spotify app open, plugins move to a
+new API, and a new version asks to install in a pop-up. Spotify Connect no
+longer shows a track paused while your device plays it, and goes on to the
+next track.
 
 ### Added
 
-- Spotify plays in MixMusic itself: choose here, from spotify in Settings ›
-  Playback. MixMusic plays at Spotify's own quality, with no Spotify app
-  open, and shows among your Spotify devices while it plays. It needs
-  Spotify Premium, and a webview that plays Spotify's protected audio, as
-  that of Windows does; new installs on Windows play Spotify tracks this
-  way. Sign in to Spotify again once, for Spotify to let MixMusic play.
-- MixMusic's own audio engine, a beta: MixMusic decodes the audio of YouTube
-  Music itself and plays it on your audio device, outside the webview, with
-  the sound of the webview: the equalizer, crossfades, volume levelling and
-  visualizer work as before, computed as the webview computes them. It is on
-  by default on macOS and Linux, and off on Windows: Settings › Playback
-  turns it on or off. On macOS and Linux it shows what plays in the
-  system's media controls, Now Playing and the desktop's player controls,
-  which the media keys and headphones reach as before. A track YouTube
-  serves without Opus plays in the webview. It is the first step toward a
-  native interface (#4).
+- MixMusic draws its interface itself, on the GPU: every page, the player
+  bar, the queue and lyrics, the mini player and the command palette, in
+  every theme. The built-in themes' effects come along: Mix's tile
+  textures, Aurora's drifting lights and frosted glass, Sakura's petals,
+  and Terminal's scanlines, glow and phosphor-green artwork (#4).
+- MixMusic's own audio engine: it decodes the audio of YouTube Music itself
+  and plays it on your audio device, with the sound the webview gave it:
+  the equalizer, crossfades, volume levelling and the visualizer work as
+  before. On macOS and Linux it shows what plays in the system's media
+  controls, Now Playing and the desktop's player controls, which the media
+  keys and headphones reach as before.
+- Spotify plays in MixMusic itself, on Windows: choose in mixmusic, from
+  spotify in Settings › Playback. MixMusic plays at Spotify's own quality,
+  with no Spotify app open, and shows among your Spotify devices while it
+  plays. It needs Spotify Premium; new installs on Windows play Spotify
+  tracks this way. Sign in to Spotify again once, for Spotify to let
+  MixMusic play.
+- Plugins of a new API, 2: each runs in a JavaScript engine of MixMusic's
+  own, and adds pages, widgets, sidebar items, track actions and commands,
+  made of elements MixMusic draws in your theme and of canvases the plugin
+  draws on. The community's sleep timer and spectrum are updated for it,
+  and docs/plugins.md tells how to move a plugin.
 - Settings › About shows the licenses of the code MixMusic includes, from
   libopus and Chromium.
 - A new version asks to install in a pop-up, unless MixMusic installs
@@ -39,11 +46,29 @@ the next track.
 
 ### Changed
 
+- Themes set the colors, fonts and corners MixMusic draws everything with.
+  Themes made for the web interface still load, without their stylesheet
+  and options, which nothing draws now.
+- On Linux, MixMusic plays through PulseAudio, which PipeWire serves too,
+  or ALSA, and no longer needs GStreamer; WebKitGTK is needed only to sign
+  in to YouTube Music.
 - MixMusic looks for a new version at start and every few hours, no longer
   once a day. Copies that cannot replace themselves look too, and Settings ›
   About turns that off.
 - A Spotify track that plays from YouTube Music instead says why once, not
   at every track.
+
+### Removed
+
+- The web interface. MixMusic opens a webview only for Google's sign-in to
+  YouTube Music and, on Windows, for Spotify's player.
+- Your own CSS, in Settings › Appearance.
+- Plugins made for the web interface: they no longer run, as Settings ›
+  Plugins says, until their authors move them to the new API.
+- On Windows, the system's media controls, which showed what the webview
+  played. The media keys still work.
+- A track YouTube serves without Opus audio, which is rare, no longer plays:
+  the webview played those.
 
 ### Fixed
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"slices"
+	"strconv"
 	"time"
 
 	"github.com/egoist/mygo/ui"
@@ -164,13 +165,43 @@ func (s *shell) cacheSettings(c *ui.Context) {
 				}
 			}
 		})
-		s.row(c, "Size", byteSize(int64(s.set.CacheSizeMB)<<20)+" at most.", func() {
-			v := float64(s.set.CacheSizeMB)
-			if ui.StepSlider(c.Key("cache-size"), &v, 256, 10240, 256).Width(200).Label("Cache size").Changed() {
-				s.set.CacheSizeMB = int(v)
-				s.save()
+		// The sizes the web interface offered, and one of the user's own.
+		sizes := cacheSizes
+		if !slices.Contains(sizes, s.set.CacheSizeMB) {
+			sizes = append(slices.Clone(cacheSizes), s.set.CacheSizeMB)
+			slices.Sort(sizes)
+		}
+		labels := make([]string, len(sizes))
+		for i, mb := range sizes {
+			labels[i] = cacheSizeLabel(mb)
+		}
+		chosen := cacheSizeLabel(s.set.CacheSizeMB)
+		what := "Off: MixMusic keeps no tracks."
+		if s.set.CacheSizeMB > 0 {
+			what = chosen + " at most."
+		}
+		s.row(c, "Size", what, func() {
+			if ui.Select(c.Key("cache-size"), &chosen, labels).Width(160).Label("Cache size").Changed() {
+				if i := slices.Index(labels, chosen); i >= 0 {
+					s.set.CacheSizeMB = sizes[i]
+					s.save()
+				}
 			}
 		})
 	})
 	_ = k
+}
+
+// cacheSizes are the sizes the offline cache takes, in MB: 0 turns it off.
+var cacheSizes = []int{0, 512, 1024, 4096, 16384}
+
+// cacheSizeLabel names a size of the cache.
+func cacheSizeLabel(mb int) string {
+	switch {
+	case mb == 0:
+		return "Off"
+	case mb%1024 == 0:
+		return strconv.Itoa(mb/1024) + " GB"
+	}
+	return strconv.Itoa(mb) + " MB"
 }

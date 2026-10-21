@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/egoist/mygo/ui"
+
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -125,5 +127,34 @@ func TestPluginSettings(t *testing.T) {
 	click(t, s, tt, "Remove")
 	if n := len(s.svc.Addons.List().Plugins); n != 0 {
 		t.Errorf("%d plugins are left", n)
+	}
+}
+
+// TestCacheOff turns the offline cache off, which its sizes start with.
+func TestCacheOff(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 3200)
+	show(s, tt, "/settings/playback")
+	if !tt.HasText("1 GB at most.") {
+		t.Fatalf("the cache's size isn't shown: %q", tt.Texts())
+	}
+	click(t, s, tt, "Cache size")
+	tt.Key(0, ui.KeyHome)
+	tt.Key(0, ui.KeyEnter)
+	s.drain()
+	tt.Frame()
+	if got := s.svc.Preferences.Get().CacheSizeMB; got != 0 {
+		t.Errorf("the cache keeps %d MB, not none", got)
+	}
+	if !tt.HasText("Off: MixMusic keeps no tracks.") {
+		t.Errorf("the cache doesn't say it's off: %q", tt.Texts())
+	}
+}
+
+func TestCacheSizeLabel(t *testing.T) {
+	for mb, want := range map[int]string{0: "Off", 512: "512 MB", 1024: "1 GB", 16384: "16 GB", 1536: "1536 MB"} {
+		if got := cacheSizeLabel(mb); got != want {
+			t.Errorf("cacheSizeLabel(%d) = %q, not %q", mb, got, want)
+		}
 	}
 }

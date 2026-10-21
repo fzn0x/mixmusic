@@ -93,15 +93,7 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 	case row.Hovered():
 		row.Background(k.hover)
 	}
-	row.ContextMenu(func(m *ui.Menu) {
-		s.trackMenu(m, t)
-		if !current {
-			m.Separator()
-			if m.Item("Remove from the queue").Chosen() {
-				s.p.RemoveAt(i)
-			}
-		}
-	})
+	row.ContextMenu(func(m *ui.Menu) { s.trackMenuAt(m, t, i) })
 	if row.DoubleClicked() && !current {
 		s.p.PlayAt(i)
 	}
@@ -291,18 +283,33 @@ func (s *shell) emptyIn(c *ui.Context, text string) {
 // trackMenu is the menu of a track: play it, queue it, start its radio,
 // like it, keep it in a mix, go to its artist or album, open it on its
 // service.
-func (s *shell) trackMenu(m *ui.Menu, t media.Track) {
+func (s *shell) trackMenu(m *ui.Menu, t media.Track) { s.trackMenuAt(m, t, -1) }
+
+// trackMenuAt is the menu of a track of the queue, the entry at queued, or
+// of another track when queued is -1: in the queue, Play plays that entry,
+// and the entry can be taken out, but the current one.
+func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	one := []media.Track{t}
-	if m.Item("Play").Chosen() {
-		s.p.PlayTracks(one, 0)
-	}
-	if m.Item("Play next").Chosen() {
-		s.p.PlayNext(one)
-		s.notes = append(s.notes, notice(t.Title+" plays next"))
-	}
-	if m.Item("Add to queue").Chosen() {
-		s.p.Enqueue(one)
-		s.notes = append(s.notes, notice("Added "+t.Title+" to the queue"))
+	switch {
+	case queued >= 0:
+		if m.Item("Play").Chosen() {
+			s.p.PlayAt(queued)
+		}
+		if queued != s.st.Index && m.Item("Remove from the queue").Chosen() {
+			s.p.RemoveAt(queued)
+		}
+	default:
+		if m.Item("Play").Chosen() {
+			s.p.PlayTracks(one, 0)
+		}
+		if m.Item("Play next").Chosen() {
+			s.p.PlayNext(one)
+			s.notes = append(s.notes, notice(t.Title+" plays next"))
+		}
+		if m.Item("Add to queue").Chosen() {
+			s.p.Enqueue(one)
+			s.notes = append(s.notes, notice("Added "+t.Title+" to the queue"))
+		}
 	}
 	if m.Item("Start radio").Chosen() {
 		s.startRadio(t)

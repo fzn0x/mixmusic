@@ -110,6 +110,33 @@ func TestQueuePanel(t *testing.T) {
 	}
 }
 
+// TestQueueMenu plays an entry of the queue from its menu, keeping the
+// queue, as a double click does, and takes one out.
+func TestQueueMenu(t *testing.T) {
+	s := newTestShell(t)
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	tt := tester(t, s)
+	choose := func(title string, item ...string) {
+		t.Helper()
+		if err := tt.RightClick(title); err != nil {
+			t.Fatal(err)
+		}
+		if err := tt.ChooseMenuItem(item...); err != nil {
+			t.Fatalf("%v: the menu holds %q", err, tt.Menu())
+		}
+		tt.Frame()
+	}
+	choose(testTracks[3].Title, "Play")
+	s.settle(t, func(st player.State) bool { return st.Index == 3 })
+	if n := len(s.p.State().Queue); n != len(testTracks) {
+		t.Errorf("playing from the menu left %d tracks in the queue, of %d", n, len(testTracks))
+	}
+	tt.Frame()
+	choose(testTracks[5].Title, "Remove from the queue")
+	s.settle(t, func(st player.State) bool { return len(st.Queue) == len(testTracks)-1 })
+}
+
 // TestNowPlayingRelated shows what YouTube Music relates to the track
 // under the player, and nothing for a track it relates nothing to.
 func TestNowPlayingRelated(t *testing.T) {

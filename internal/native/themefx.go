@@ -102,9 +102,10 @@ type impact struct {
 	at    time.Time
 }
 
-// burstAt returns when Anime's speed lines last burst, as a track
-// started, or the zero time for none: while nothing plays, and while the
-// computer asks for less motion.
+// burstAt returns when Anime's speed lines last burst, as a track started
+// to play, or the zero time for none: while there's no track, and while
+// the computer asks for less motion. A track the window opens on, or one
+// that comes while paused, bursts them when it plays.
 func (s *shell) burstAt(c *ui.Context) time.Time {
 	id := ""
 	if cur, ok := s.st.Current(); ok {
@@ -112,7 +113,7 @@ func (s *shell) burstAt(c *ui.Context) time.Time {
 	}
 	now := c.Now()
 	switch {
-	case id != s.impact.track:
+	case s.st.Playing && id != s.impact.track:
 		s.impact = impact{track: id, at: now}
 	case now.Before(s.impact.at):
 		// A clock set back would hold the burst.

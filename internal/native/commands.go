@@ -201,7 +201,7 @@ func (s *shell) palette(c *ui.Context) {
 		ui.Column(c).MaxHeight(420).Children(func() {
 			ui.Scroll(c).MaxHeight(420).Children(func() {
 				for i, cmd := range found {
-					row := ui.ButtonBase(c.Key("palette-" + cmd.id)).Height(36).PaddingX(12).Justify(ui.SpaceBetween).Label(cmd.title).Cursor(ui.CursorPointer)
+					row := ui.ButtonBase(c.Key("palette-" + cmd.id)).Height(36).PaddingX(12).Gap(12).Justify(ui.SpaceBetween).Label(cmd.title).Cursor(ui.CursorPointer)
 					ink := k.text
 					if i == s.paletteAt {
 						row.Background(k.accent)
@@ -213,7 +213,8 @@ func (s *shell) palette(c *ui.Context) {
 						run(cmd)
 					}
 					row.Children(func() {
-						ui.Text(c, cmd.title).FontSize(k.bodySize()).TextColor(ink).SingleLine()
+						ui.Text(c, cmd.group).FontSize(k.captionSize()).TextColor(ink.Alpha(0.6)).Width(72).Shrink(0).SingleLine()
+						ui.Text(c, cmd.title).FontSize(k.bodySize()).TextColor(ink).SingleLine().Grow(1).MinWidth(0)
 						ui.Text(c, shortcutLabel(s.shortcutOf(cmd))).FontSize(k.captionSize()).TextColor(ink.Alpha(0.7))
 					})
 				}

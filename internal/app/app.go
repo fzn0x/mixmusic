@@ -27,6 +27,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/internal/taskbar"
 	"github.com/fzn0x/mixmusic/internal/tools"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
@@ -118,7 +119,10 @@ type App struct {
 	nowPlaying NowPlaying
 	main, mini *mygo.Window
 	tray       *mygo.Tray
-	mediaKeys  bool
+	// taskbar is the buttons on the thumbnail of the main window's
+	// taskbar button, on Windows.
+	taskbar   *taskbar.Bar
+	mediaKeys bool
 	// offer is the new version the main window offers, until the user
 	// answers; putOff the one they put off until putOffUntil.
 	offer       *Release

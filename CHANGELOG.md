@@ -25,8 +25,10 @@ next track.
   the equalizer, crossfades, volume levelling and the visualizer work as
   before. It shows what plays in the system's media controls, which the
   media keys and headphones reach as before: Windows' media flyout, with
-  the artwork, the buttons and the seek bar (#13), Now Playing on macOS,
-  and the desktop's player controls on Linux.
+  the artwork, the buttons and the seek bar, Now Playing on macOS, and the
+  desktop's player controls on Linux.
+- On Windows, the thumbnail of MixMusic's taskbar button has previous, play
+  or pause, and next buttons, as other music players have (#13).
 - Spotify plays in MixMusic itself, on Windows: choose in mixmusic, from
   spotify in Settings › Playback. MixMusic plays at Spotify's own quality,
   with no Spotify app open, and shows among your Spotify devices while it

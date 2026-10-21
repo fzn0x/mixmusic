@@ -111,11 +111,15 @@ func (p *Player) Report(np NowPlaying) {
 	p.a.nowPlaying = np
 	tray := p.a.tray
 	main := p.a.main
+	bar := p.a.taskbar
 	p.a.mu.Unlock()
 	s := p.a.settings.Get()
 	p.a.scrobble(np)
 	p.a.presence.update(s.DiscordPresence, s.DiscordAppID, np)
 	p.a.reportControls(np)
+	if bar != nil {
+		bar.Show(np.Playing, np.Track != nil)
+	}
 
 	changed := np.Track != nil && (prev.Track == nil || prev.Track.ID != np.Track.ID)
 	if tray != nil && (changed || prev.Playing != np.Playing) {

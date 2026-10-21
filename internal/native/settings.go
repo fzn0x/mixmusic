@@ -131,6 +131,20 @@ func (s *shell) settingInput(c *ui.Context, key, saved string, commit func(strin
 }
 
 // hint is a muted paragraph among a group's rows.
+// chooseTheme wears the theme id: following the computer, as the theme
+// of the mode it's in.
+func (s *shell) chooseTheme(id string) {
+	switch {
+	case !s.set.FollowSystem:
+		s.set.Theme = id
+	case s.lk.systemDark:
+		s.set.DarkTheme = id
+	default:
+		s.set.LightTheme = id
+	}
+	s.save()
+}
+
 // rowWith is a row whose description describe builds, with links say.
 func (s *shell) rowWith(c *ui.Context, title string, describe, control func()) {
 	k := &s.lk
@@ -281,16 +295,7 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 		card.Border(3, k.accent)
 	}
 	if card.Clicked() {
-		// Following the computer, the theme is the one of the mode it's in.
-		switch {
-		case !s.set.FollowSystem:
-			s.set.Theme = id
-		case k.systemDark:
-			s.set.DarkTheme = id
-		default:
-			s.set.LightTheme = id
-		}
-		s.save()
+		s.chooseTheme(id)
 	}
 	card.Children(func() {
 		ui.Text(c, name).FontSize(k.size(1.5)).FontWeight(300).Font(tk.display).TextColor(tk.text).SingleLine()

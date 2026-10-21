@@ -223,6 +223,24 @@ func TestLyricsTwice(t *testing.T) {
 	}
 }
 
+// TestPaletteThemes wears a theme from the palette.
+func TestPaletteThemes(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	tt.Key(ui.Cmd, ui.KeyK)
+	tt.Frame()
+	tt.Type("theme: aurora")
+	tt.Frame()
+	tt.Key(0, ui.KeyDown)
+	tt.Frame()
+	tt.Key(0, ui.KeyEnter)
+	s.drain()
+	tt.Frame()
+	if got := s.svc.Preferences.Get().ActiveTheme(s.lk.systemDark); got != "aurora" {
+		t.Errorf("the theme is %q, not aurora", got)
+	}
+}
+
 func TestPaletteRuns(t *testing.T) {
 	s := newTestShell(t)
 	tt := tester(t, s)

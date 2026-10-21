@@ -41,6 +41,9 @@ func (a *App) startGoPlayer() (*player.Player, error) {
 	if spotifyPlaysHere {
 		p.SpotifyHere(hereDevice{&a.here})
 	}
+	l := newListener()
+	a.listen.Store(l)
+	p.Subscribe(func(player.Event) { l.follow(p.State()) })
 	a.goPlayer.Store(p)
 	a.applyEngine(a.settings.Get().Clean())
 	return p, nil

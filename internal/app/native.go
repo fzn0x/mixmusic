@@ -155,14 +155,20 @@ type NativeAnalysis struct {
 	Waveform []float64 `json:"waveform"`
 }
 
-// NativeAnalyser returns what the native engine's analyser gives now.
+// NativeAnalyser returns what the analyser gives now: the native engine's,
+// or, while the track plays outside the engine, the listener's, which hears
+// Spotify where MixMusic can.
 func (p *Player) NativeAnalyser(decibels, waveform bool) NativeAnalysis {
-	e := p.a.nativeEngine()
-	if e == nil {
-		return NativeAnalysis{}
-	}
 	var a audio.Analysis
-	e.Analyse(&a)
+	if l := p.a.listen.Load(); l != nil && l.outside.Load() {
+		l.tap.Analyse(&a)
+	} else {
+		e := p.a.nativeEngine()
+		if e == nil {
+			return NativeAnalysis{}
+		}
+		e.Analyse(&a)
+	}
 	out := NativeAnalysis{Bytes: make([]int, len(a.Bytes))}
 	for i, b := range a.Bytes {
 		out.Bytes[i] = int(b)

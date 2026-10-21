@@ -2,6 +2,7 @@ package native
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -107,6 +108,41 @@ func TestQueuePanel(t *testing.T) {
 	click(t, s, tt, "Close up next")
 	if s.panel != "" {
 		t.Error("the queue didn't close")
+	}
+}
+
+// TestUpdateOffer offers what this copy can do with a new version, install
+// it or download what replaces it, and what's new.
+func TestUpdateOffer(t *testing.T) {
+	s := newTestShell(t)
+	s.offer = &app.Release{Version: "9.9.9", Newer: true, Page: "https://github.com/fzn0x/mixmusic/releases/tag/v9.9.9",
+		Download: "https://github.com/fzn0x/mixmusic/releases/download/v9.9.9/mixmusic-9.9.9-linux-amd64.deb",
+		File:     "mixmusic-9.9.9-linux-amd64.deb"}
+	tt := tester(t, s)
+	u := s.svc.System.Updates()
+	act := downloadLabel(u.Kind)
+	if u.Enabled {
+		act = "install 9.9.9"
+	}
+	for _, text := range []string{"mixmusic 9.9.9 is out", "what's new", "later", "skip this version", act} {
+		if !tt.HasText(text) {
+			t.Errorf("the offer doesn't show %q: %q", text, tt.Texts())
+		}
+	}
+	if !u.Enabled && tt.HasText("install 9.9.9") {
+		t.Error("a copy that can't replace itself offers to install")
+	}
+}
+
+func TestReplacing(t *testing.T) {
+	if got := replacing("deb", "m.deb"); !strings.Contains(got, "sudo apt install ./m.deb") {
+		t.Errorf("the .deb says %q", got)
+	}
+	if got := downloadLabel("appimage"); got != "download the AppImage" {
+		t.Errorf("the AppImage's download is %q", got)
+	}
+	if got := downloadLabel("unknown"); got != "download it" {
+		t.Errorf("an unknown kind's download is %q", got)
 	}
 }
 

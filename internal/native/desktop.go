@@ -174,51 +174,105 @@ func (s *shell) updateSettings(c *ui.Context) {
 	})
 }
 
-// updateOffer asks to install a new version, as the web interface's
-// pop-up does.
+// downloadLabels name the download of a release that replaces a copy of
+// each kind, as UpdateStatus.Kind says.
+var downloadLabels = map[string]string{
+	"installer": "download the installer", "portable": "download the portable zip", "app": "download the disk image",
+	"archive": "download the archive", "deb": "download the .deb", "rpm": "download the .rpm", "appimage": "download the AppImage",
+}
+
+// downloadLabel names the download that replaces a copy of kind.
+func downloadLabel(kind string) string {
+	if l, ok := downloadLabels[kind]; ok {
+		return l
+	}
+	return "download it"
+}
+
+// replacing tells how file, a release's download, takes the place of a
+// copy of kind, which can't replace itself.
+func replacing(kind, file string) string {
+	switch kind {
+	case "deb":
+		return "Open " + file + " with your software center, or run sudo apt install ./" + file + ". Your library and settings stay."
+	case "rpm":
+		return "Open " + file + " with your software center, or run sudo dnf install ./" + file + ". Your library and settings stay."
+	case "appimage":
+		return "Make " + file + " executable and use it in place of this AppImage. Your library and settings stay."
+	case "development":
+		return "Development builds don't update themselves."
+	}
+	if file == "" {
+		return ""
+	}
+	return "MixMusic can't write where it is installed, so it can't replace itself: run " + file + ". Your library and settings stay."
+}
+
+// updateOffer offers a new version: to install it, where this copy
+// replaces itself, or else to download the file that replaces it.
 func (s *shell) updateOffer(c *ui.Context) {
 	k := &s.lk
 	offer := s.offer
 	if offer == nil {
 		return
 	}
+	u := s.svc.System.Updates()
 	open := true
 	panel := ui.Modal(c, &open, func() {
-		ui.Text(c, "mixmusic "+offer.Version).FontSize(k.titleSize()).FontWeight(300).Font(k.display)
-		if offer.Notes != "" {
-			ui.Text(c, offer.Notes).FontSize(k.bodySize()).MaxLines(8).MaxWidth(520)
-		}
-		switch {
-		case s.updated != "":
+		ui.Text(c, "mixmusic "+offer.Version+" is out").FontSize(k.titleSize()).FontWeight(300).Font(k.display)
+		if s.updated != "" {
 			ui.Text(c, "MixMusic "+s.updated+" is installed. It runs once MixMusic restarts.").FontSize(k.bodySize())
-			ui.Row(c).Gap(8).Justify(ui.End).Children(func() {
-				if s.button(c, "offer-later", "later", false).Clicked() {
-					s.offer = nil
-				}
-				if s.button(c, "offer-restart", "restart now", true).Clicked() {
-					go s.svc.System.Restart()
-				}
-			})
-		case s.updating:
+		} else {
+			if offer.Notes != "" {
+				ui.Text(c, offer.Notes).FontSize(k.bodySize()).MaxLines(8).MaxWidth(520)
+			}
+			hint := "You have " + s.svc.System.Info().Version + ". "
+			if u.Enabled {
+				hint += "To install new versions without this question, turn on install updates without asking in Settings › About."
+			} else {
+				hint += replacing(u.Kind, offer.File)
+			}
+			ui.Text(c, hint).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(520)
+		}
+		if s.updating {
 			v := -1.0
 			if s.updateTotal > 0 {
 				v = float64(s.updateDone) / float64(s.updateTotal)
 			}
 			ui.Progress(c, v).Width(320)
 			ui.Text(c, "Downloading…").FontSize(k.smallSize()).TextColor(k.muted)
-		default:
-			ui.Row(c).Gap(8).Justify(ui.End).Children(func() {
-				if s.button(c, "offer-skip", "skip this version", false).Clicked() {
-					s.dismissOffer(true)
-				}
+			return
+		}
+		ui.Row(c).Gap(8).Justify(ui.End).Wrap().Children(func() {
+			if s.updated != "" {
 				if s.button(c, "offer-later", "later", false).Clicked() {
-					s.dismissOffer(false)
+					s.offer = nil
 				}
-				if s.button(c, "offer-install", "install now", true).Clicked() {
+				if s.button(c, "offer-restart", "restart now", true).Clicked() {
+					go s.svc.System.Restart()
+				}
+				return
+			}
+			if s.button(c, "offer-skip", "skip this version", false).Clicked() {
+				s.dismissOffer(true)
+			}
+			if offer.Page != "" && s.button(c, "offer-notes", "what's new", false).Clicked() {
+				go s.svc.System.OpenExternal(offer.Page)
+			}
+			if s.button(c, "offer-later", "later", false).Clicked() {
+				s.dismissOffer(false)
+			}
+			switch {
+			case u.Enabled:
+				if s.button(c, "offer-install", "install "+offer.Version, true).Clicked() {
 					s.installUpdate()
 				}
-			})
-		}
+			case offer.Download != "":
+				if s.button(c, "offer-download", downloadLabel(u.Kind), true).Clicked() {
+					go s.svc.System.OpenExternal(offer.Download)
+				}
+			}
+		})
 	})
 	s.frosted(panel).Width(560).Padding(32).Gap(16).Border(1, k.border)
 	if !open && !s.updating {

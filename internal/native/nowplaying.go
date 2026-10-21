@@ -25,7 +25,7 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 		s.pageHeader(c, t.Title, nil, nil)
 		pane := s.paneWidth(c) - 2*k.gutter
 		sleeve := min(max(260, pane*0.4), 420)
-		stack := pane < 1100-k.rail
+		stack := pane < 1100-s.railWidth()
 		grid := ui.Row(c).Gap(48).AlignItems(ui.Start)
 		if stack {
 			grid.Column()

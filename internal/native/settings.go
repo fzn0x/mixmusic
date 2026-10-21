@@ -243,7 +243,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 				s.save()
 			}
 		})
-		s.row(c, "Icons only in the sidebar", "The sidebar shows its pages as icons.", func() {
+		s.row(c, "Icons only in the sidebar", "The sidebar shows its pages as icons. It does in narrow windows too, until you unfold it there.", func() {
 			if ui.Switch(c.Key("collapsed"), &s.set.SidebarCollapsed).Label("Icons only in the sidebar").Changed() {
 				s.save()
 			}

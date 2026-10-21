@@ -336,7 +336,7 @@ func (s *shell) emptyLine(c *ui.Context, text string) {
 // and the side panel's.
 func (s *shell) paneWidth(c *ui.Context) float32 {
 	w, _ := c.Size()
-	w -= s.lk.rail
+	w -= s.railWidth()
 	if s.panel != "" {
 		w -= s.panelWidth(c)
 	}

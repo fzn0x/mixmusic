@@ -36,18 +36,53 @@ func section(path string) string {
 	return first
 }
 
+// narrowWidth is the widest window whose rail folds to its icons.
+const narrowWidth = 1180
+
+// railFolded tells whether the rail shows its icons only: as the user
+// chose, or in a narrow window, unless the user unfolded it there.
+func (s *shell) railFolded() bool {
+	if s.narrowFold != nil {
+		return *s.narrowFold
+	}
+	return s.set.SidebarCollapsed || s.narrow
+}
+
+// railWidth is the rail's width, folded or not.
+func (s *shell) railWidth() float32 {
+	if s.railFolded() {
+		return 76
+	}
+	return s.lk.rail
+}
+
+// toggleRail folds or unfolds the rail: in the settings, or in a narrow
+// window until it widens.
+func (s *shell) toggleRail() {
+	folded := !s.railFolded()
+	if s.narrow {
+		s.narrowFold = &folded
+		return
+	}
+	st := s.svc.Preferences.Get()
+	st.SidebarCollapsed = folded
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		s.notes = append(s.notes, noticeOf(err))
+	}
+}
+
 // rail is the sidebar: where to go, the user's mixes, and a live tile of
 // what plays.
 func (s *shell) rail(c *ui.Context) {
 	k := &s.lk
-	collapsed := s.set.SidebarCollapsed
+	collapsed := s.railFolded()
 	path := s.router.Path()
 	current := section(path)
 	pad := float32(16)
 	if collapsed {
 		pad = 17
 	}
-	ui.Column(c).Width(k.rail).Shrink(0).Padding(0, pad, 16).Gap(24).Background(k.bg).Clip().Children(func() {
+	ui.Column(c).Width(s.railWidth()).Shrink(0).Padding(0, pad, 16).Gap(24).Background(k.bg).Clip().Children(func() {
 		s.brand(c, collapsed)
 		ui.Column(c).Gap(4).Shrink(0).Children(func() {
 			for _, n := range nav {
@@ -91,11 +126,7 @@ func (s *shell) brand(c *ui.Context, collapsed bool) {
 			label = "Expand the sidebar"
 		}
 		if s.iconButton(c, "collapse", "sidebar", label, false, 18).Clicked() {
-			st := s.svc.Preferences.Get()
-			st.SidebarCollapsed = !collapsed
-			if _, err := s.svc.Preferences.Set(st); err != nil {
-				s.notes = append(s.notes, noticeOf(err))
-			}
+			s.toggleRail()
 		}
 	})
 }
@@ -105,7 +136,7 @@ func (s *shell) brand(c *ui.Context, collapsed bool) {
 func (s *shell) navEntry(c *ui.Context, key, label string, svg *ui.SVG, path string, current bool) {
 	k := &s.lk
 	row := ui.ButtonBase(c.Key(key)).Gap(12).Justify(ui.Start).Label(label).KeepFocus().Cursor(ui.CursorPointer)
-	if s.set.SidebarCollapsed {
+	if s.railFolded() {
 		row.Tooltip(label)
 	}
 	if row.Clicked() {
@@ -128,7 +159,7 @@ func (s *shell) navEntry(c *ui.Context, key, label string, svg *ui.SVG, path str
 			box.Border(2, k.outline)
 		}
 		box.Children(func() { ui.Icon(c, svg).FontSize(20).TextColor(ink) })
-		if !s.set.SidebarCollapsed {
+		if !s.railFolded() {
 			ink := k.text
 			if current {
 				ink = k.accent

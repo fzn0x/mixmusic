@@ -91,6 +91,10 @@ type shell struct {
 	seekTo  float64
 	volume  float64
 
+	// narrow is set while the window is at most narrowWidth wide, which
+	// folds the rail; narrowFold is the fold the user gave it there.
+	narrow     bool
+	narrowFold *bool
 	// The pages' own state.
 	homeFilter  int
 	searchPivot int

@@ -54,13 +54,7 @@ func (s *shell) commands() []command {
 		{"view.lyrics", "Show or hide the lyrics", "Mod+Shift+L", "view", func() { s.togglePanel("lyrics") }},
 		{"view.palette", "Command palette", "Mod+K", "view", func() { s.paletteOpen = !s.paletteOpen }},
 		{"view.mini", "Mini player", "Mod+M", "view", s.showMini},
-		{"view.sidebar", "Collapse or expand the sidebar", "Mod+B", "view", func() {
-			st := s.svc.Preferences.Get()
-			st.SidebarCollapsed = !st.SidebarCollapsed
-			if _, err := s.svc.Preferences.Set(st); err != nil {
-				s.notes = append(s.notes, noticeOf(err))
-			}
-		}},
+		{"view.sidebar", "Collapse or expand the sidebar", "Mod+B", "view", s.toggleRail},
 		{"addons.reload", "Reload add-ons", "", "add-ons", func() {
 			s.plugins.Retry()
 			s.svc.Addons.Reload()

@@ -37,7 +37,7 @@ type look struct {
 	// fx are the effects of the built-in themes.
 	fx effects
 
-	// The shell's measures.
+	// The shell's measures; rail is the unfolded rail's width.
 	row, rail, panel, player, gutter float32
 }
 
@@ -120,9 +120,6 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	k.row, k.rail, k.panel, k.player, k.gutter = 52, 248, 340, 92, 40
 	if k.compact {
 		k.row, k.rail, k.player, k.gutter = 40, 224, 80, 28
-	}
-	if s.SidebarCollapsed {
-		k.rail = 76
 	}
 
 	t := *ui.DarkTheme()

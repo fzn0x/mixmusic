@@ -864,3 +864,34 @@ func TestSearchSuggestions(t *testing.T) {
 		t.Errorf("choosing daft punk went to %q, with %q in the box", got, s.query)
 	}
 }
+
+// TestNarrowRail folds the rail of a narrow window to its icons, which the
+// user unfolds there without changing the settings, until the window
+// widens; a wide window's button folds it in the settings.
+func TestNarrowRail(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1100, 820)
+	if !s.railFolded() || !tt.HasText("Expand the sidebar") {
+		t.Fatal("the narrow window's rail isn't folded")
+	}
+	tt.Click("Expand the sidebar")
+	if s.railFolded() || s.svc.Preferences.Get().SidebarCollapsed {
+		t.Fatalf("unfolding in a narrow window: folded %v, in the settings %v", s.railFolded(), s.svc.Preferences.Get().SidebarCollapsed)
+	}
+	tt.SetSize(1280, 820)
+	tt.SetSize(1100, 820)
+	if !s.railFolded() {
+		t.Error("the rail stays unfolded as the window turns narrow again")
+	}
+	tt.SetSize(1280, 820)
+	if s.railFolded() {
+		t.Fatal("the wide window's rail is folded")
+	}
+	tt.Click("Collapse the sidebar")
+	// As the app tells the window of the settings it saved.
+	s.refresh()
+	tt.Frame()
+	if !s.svc.Preferences.Get().SidebarCollapsed || !s.railFolded() {
+		t.Error("folding the wide window's rail doesn't keep it in the settings")
+	}
+}

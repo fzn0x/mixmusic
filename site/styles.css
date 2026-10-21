@@ -8,6 +8,8 @@
 @font-face { font-family: Selawik; src: url("assets/fonts/selawksl.woff2") format("woff2"); font-weight: 350; font-display: swap; }
 @font-face { font-family: Selawik; src: url("assets/fonts/selawk.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: Selawik; src: url("assets/fonts/selawksb.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+/* Mochi's round face, for its name in the theme gallery: Latin only. */
+@font-face { font-family: Quicksand; src: url("assets/fonts/quicksand-light.woff2") format("woff2"); font-weight: 300; font-display: swap; }
 
 :root {
   color-scheme: dark;
@@ -449,9 +451,11 @@ kbd {
 .swatches { display: flex; gap: 6px; margin-bottom: 14px; }
 .swatches i { width: 22px; height: 22px; }
 .theme-name { font-size: 1.5rem; font-weight: 300; letter-spacing: -0.02em; line-height: 1; }
-/* The two built-in themes that set their own display face, as their manifests name it. */
+/* The built-in themes whose own faces stand apart from Selawik, as their manifests name them. */
 .theme-name-serif { font-family: Georgia, "Noto Serif", "DejaVu Serif", serif; }
 .theme-name-mono { font-family: "JetBrains Mono", "Cascadia Code", Consolas, "DejaVu Sans Mono", ui-monospace, monospace; font-size: 1.25rem; }
+.theme-name-gothic { font-family: "Yu Gothic UI", "Hiragino Sans", "Noto Sans CJK JP", "Noto Sans JP", sans-serif; }
+.theme-name-round { font-family: Quicksand, "Hiragino Maru Gothic ProN", sans-serif; }
 .theme-meta { font-size: 0.75rem; opacity: 0.7; }
 
 /* ---------- code ---------- */

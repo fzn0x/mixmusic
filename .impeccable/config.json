@@ -221,6 +221,144 @@
         ],
         "createdAt": "2026-10-19T07:51:54.191Z",
         "reason": "finish reviewer accepted: 1.12-1.18 leading on display-size Selawik Light lead and hook paragraphs (1.5rem and up) reads clean in every capture"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "quicksand",
+        "createdAt": "2026-10-21T17:47:21.037Z",
+        "reason": "DESIGN.md (Marketing Site, Theme gallery): a theme that sets its own face shows its name in that face, as a specimen; Quicksand is Mochi's face"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "yu gothic ui",
+        "createdAt": "2026-10-21T17:47:21.329Z",
+        "reason": "DESIGN.md (Marketing Site, Theme gallery): a theme that sets its own face shows its name in that face, as a specimen; Yu Gothic UI is Anime's face"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#0e7c58",
+        "createdAt": "2026-10-21T17:50:02.240Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#8b2a73",
+        "createdAt": "2026-10-21T17:50:02.534Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#2a4bb8",
+        "createdAt": "2026-10-21T17:50:02.812Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#b9461a",
+        "createdAt": "2026-10-21T17:50:03.091Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#f5f5f7",
+        "createdAt": "2026-10-21T17:50:03.340Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#e11d48",
+        "createdAt": "2026-10-21T17:50:03.618Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#7c3aed",
+        "createdAt": "2026-10-21T17:50:03.896Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#0369a1",
+        "createdAt": "2026-10-21T17:50:04.205Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#0f766e",
+        "createdAt": "2026-10-21T17:50:04.529Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#eaf6ff",
+        "createdAt": "2026-10-21T17:50:04.806Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#5cc8ff",
+        "createdAt": "2026-10-21T17:50:05.054Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ffa040",
+        "createdAt": "2026-10-21T17:50:05.334Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ff8fcf",
+        "createdAt": "2026-10-21T17:50:05.629Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#63d98b",
+        "createdAt": "2026-10-21T17:50:05.895Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#10203f",
+        "createdAt": "2026-10-21T17:50:06.156Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#fff6fa",
+        "createdAt": "2026-10-21T17:50:06.464Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ffb5d3",
+        "createdAt": "2026-10-21T17:50:06.769Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#cdb9ff",
+        "createdAt": "2026-10-21T17:50:07.018Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#a9ead5",
+        "createdAt": "2026-10-21T17:50:07.311Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ffe08a",
+        "createdAt": "2026-10-21T17:50:07.556Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#5b3653",
+        "createdAt": "2026-10-21T17:50:07.823Z",
+        "reason": "agent decided: the theme cards show each built-in and community theme's own palette, read from builtin/themes and community/themes"
       }
     ]
   }

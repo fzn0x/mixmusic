@@ -6,17 +6,17 @@
   "description": "White glass and a rose-red accent, frosted over the colours of the cover.",
   "scheme": "light",
   "colors": {
-    "bg": "#f5f5f7",
+    "bg": "#f8f2f4",
     "surface": "rgba(255, 255, 255, 0.62)",
     "surface-2": "rgba(255, 255, 255, 0.86)",
-    "surface-3": "#e2e2e7",
-    "border": "rgba(0, 0, 0, 0.08)",
-    "text": "#1d1d1f",
-    "text-muted": "#6e6e73",
+    "surface-3": "#e7dfe2",
+    "border": "rgba(60, 20, 35, 0.09)",
+    "text": "#1f191b",
+    "text-muted": "#6a6064",
     "accent": "#e11d48",
     "accent-text": "#ffffff",
-    "danger": "#d70015",
-    "success": "#248a3d",
+    "danger": "#c5371b",
+    "success": "#1b794a",
     "youtube": "#e5332a",
     "spotify": "#18a148",
     "tile-1": "#e11d48",
@@ -26,8 +26,8 @@
     "tile-text": "#ffffff"
   },
   "fonts": {
-    "body": "'SF Pro Text', 'Segoe UI Variable Text', -apple-system, 'Segoe UI', sans-serif",
-    "display": "'SF Pro Display', 'Segoe UI Variable Display', -apple-system, 'Segoe UI', sans-serif"
+    "body": "'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif",
+    "display": "'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif"
   },
   "radius": "14px",
   "options": [

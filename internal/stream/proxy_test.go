@@ -112,6 +112,26 @@ func TestProxyResolvesExpiredURLsAgain(t *testing.T) {
 	}
 }
 
+func TestProxyWaitsUntilYouTubeServesTheStream(t *testing.T) {
+	available := time.Now().Add(300 * time.Millisecond)
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if time.Now().Before(available) {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+		http.ServeContent(w, r, "", time.Time{}, strings.NewReader("audio"))
+	}))
+	t.Cleanup(srv.Close)
+	r := NewResolver(nil, "")
+	r.Run = func(context.Context, ...string) ([]byte, error) {
+		return fmt.Appendf(nil, `{"url": "%s/a", "ext": "webm", "filesize": 5, "available_at": %.3f}`,
+			srv.URL, float64(available.UnixMilli()+1)/1000), nil
+	}
+	if rec := get(t, NewProxy(r), ""); rec.Code != 200 || rec.Body.String() != "audio" {
+		t.Errorf("%d %q", rec.Code, rec.Body.String())
+	}
+}
+
 func TestProxyCachesWholePlays(t *testing.T) {
 	var minGen atomic.Int32
 	srv, data := upstream(t, 2000, &minGen)

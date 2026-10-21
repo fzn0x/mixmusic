@@ -22,7 +22,8 @@ func fakeYTDLP(streamURL string, runs *atomic.Int32) func(context.Context, ...st
 		}
 		expire := time.Now().Add(6 * time.Hour).Unix()
 		return fmt.Appendf(nil, `{"url": "%s?expire=%d", "ext": "webm", "acodec": "opus", "abr": 139.3,
-			"filesize": 1000, "duration": 207.5, "http_headers": {"User-Agent": "test"}}`, streamURL, expire), nil
+			"filesize": 1000, "duration": 207.5, "http_headers": {"User-Agent": "test"},
+			"available_at": 1792626003}`, streamURL, expire), nil
 	}
 }
 
@@ -44,6 +45,9 @@ func TestResolveParsesAndCaches(t *testing.T) {
 			}
 			if s.Duration != 207500*time.Millisecond {
 				t.Errorf("duration = %s", s.Duration)
+			}
+			if !s.Available.Equal(time.Unix(1792626003, 0)) {
+				t.Errorf("available at %s", s.Available)
 			}
 		})
 	}

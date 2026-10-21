@@ -1,6 +1,6 @@
 {
   "name": "mixmusic",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "type": "module",
   "description": "Spotify and YouTube Music in one customizable desktop player",

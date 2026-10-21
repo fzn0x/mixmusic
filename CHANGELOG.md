@@ -6,8 +6,21 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-22
+
+A track no longer fails now and then with "YouTube refused to send its
+audio", only to play when you try it again, and a copy built on a Mac for
+its own processor installs new versions again. MixMusic 0.3.0 and later
+offer this version in Settings › About.
+
 ### Fixed
 
+- A track no longer fails now and then with "YouTube refused to send its
+  audio". YouTube sends a track's audio only a few seconds after it gave
+  out its address, and MixMusic asked at once, then again at a new
+  address, refused as well. It now waits until the moment yt-dlp tells, so
+  a track MixMusic hadn't looked up ahead starts a few seconds later
+  instead.
 - A copy of MixMusic built on a Mac for that Mac's processor, as
   `bun run build` makes it there, installs new versions again: it asked for
   an update file that releases did not publish, and failed with a 404.
@@ -314,7 +327,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/fzn0x/mixmusic/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/fzn0x/mixmusic/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/fzn0x/mixmusic/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/fzn0x/mixmusic/compare/v0.3.1...v0.3.2

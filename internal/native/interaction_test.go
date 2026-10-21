@@ -1,6 +1,8 @@
 package native
 
 import (
+	"context"
+	"errors"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -893,5 +895,44 @@ func TestNarrowRail(t *testing.T) {
 	tt.Frame()
 	if !s.svc.Preferences.Get().SidebarCollapsed || !s.railFolded() {
 		t.Error("folding the wide window's rail doesn't keep it in the settings")
+	}
+}
+
+// TestKeepAtOnce saves an album at once, telling so once its service did
+// and showing it in the library then, puts back what the service refuses,
+// and saves from the album's page without loading it again.
+func TestKeepAtOnce(t *testing.T) {
+	s := newTestShell(t)
+	const key = "album:yt:al-1"
+	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true}
+	answer := make(chan error)
+	kept := false
+	s.keep(key, "youtube:albums", "Untrue", "saved", &kept, true, func(context.Context) error { return <-answer })
+	if !kept || !s.keeping[key] {
+		t.Fatalf("saving waits for the service: kept %v, waiting %v", kept, s.keeping[key])
+	}
+	answer <- nil
+	s.settle(t, func(player.State) bool { return !s.keeping[key] })
+	if _, ok := s.loads["youtube:albums"]; !kept || ok || !slices.ContainsFunc(s.notes, func(n player.Notice) bool { return n.Message == "Untrue: saved" }) {
+		t.Errorf("once saved: kept %v, the library's albums kept %v, notes %+v", kept, ok, s.notes)
+	}
+	s.keep(key, "youtube:albums", "Untrue", "saved", &kept, false, func(context.Context) error { return errors.New("the service refused") })
+	s.settle(t, func(player.State) bool { return !s.keeping[key] })
+	if !kept {
+		t.Error("what the service refused stays")
+	}
+
+	// The page saves in its own data, which isn't loaded again.
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	page := &loaded[media.Album]{done: true, value: media.Album{ID: "yt:al-1", PlaylistID: "OLAK5uy", Source: media.SourceYouTube, Title: "Untrue", Tracks: testTracks[4:5]}}
+	s.loads[key] = page
+	tt := tester(t, s)
+	show(s, tt, albumPath("yt:al-1"))
+	tt.Click("save")
+	// This app isn't signed in to YouTube Music, which refuses.
+	s.settle(t, func(player.State) bool { return !s.keeping[key] })
+	refused := slices.ContainsFunc(s.notes, func(n player.Notice) bool { return n.Error })
+	if !refused || s.loads[key] != page || page.value.Saved {
+		t.Errorf("the refused save stays, or the page loaded again: told %v, saved %v", refused, page.value.Saved)
 	}
 }

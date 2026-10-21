@@ -132,6 +132,9 @@ type shell struct {
 	// page.
 	spotifyMore []media.Track
 	loadingMore bool
+	// keeping holds the pages whose saving or following waits for the
+	// service, by their keys.
+	keeping map[string]bool
 	// drafts are the texts of the settings' inputs, by key; the Last.fm
 	// sign-in's fields; and the service whose sign-in waits.
 	drafts                  map[string]*draft
@@ -180,7 +183,7 @@ type shell struct {
 
 func newShell(a *app.App, p *player.Player) *shell {
 	s := &shell{a: a, svc: a.Services(), p: p, router: ui.NewRouter("/"), loads: map[string]any{}, drafts: map[string]*draft{}, shelfScroll: map[string]*ui.ScrollState{},
-		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, licenseOpen: -1,
+		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, keeping: map[string]bool{}, licenseOpen: -1,
 		mountedViews: map[*plugins.View]bool{}, seenViews: map[*plugins.View]bool{}, pluginInputs: map[string]*string{},
 		canvasSizes: map[*plugins.Canvas][2]float32{}, cssColors: map[string]ui.Color{}, svgs: map[string]*ui.SVG{}}
 	s.queueList.Selected = new(int)

@@ -22,11 +22,13 @@ type headProps struct {
 	playLabel   string
 	play        func()
 	shuffle     func()
-	// keep is a save or follow toggle, with its labels.
+	// keep is a save or follow toggle, with its labels; keeping is set
+	// while its service answers.
 	keep      *bool
 	keepLabel string
 	keptLabel string
 	onKeep    func(on bool)
+	keeping   bool
 	menu      func(m *ui.Menu)
 }
 
@@ -105,7 +107,7 @@ func (s *shell) collectionHead(c *ui.Context, h headProps) {
 					if *h.keep {
 						label = h.keptLabel
 					}
-					if s.button(c, "head-keep", label, *h.keep).Clicked() {
+					if s.button(c, "head-keep", label, *h.keep).Disabled(h.keeping).Clicked() {
 						h.onKeep(!*h.keep)
 					}
 				}
@@ -161,9 +163,9 @@ func (s *shell) signedIn(source media.Source) bool {
 	return false
 }
 
-// keep saves or follows something on its service, then shows the page
+// edit changes something on its service, then shows the page of key
 // again.
-func (s *shell) keep(key string, do func(ctx context.Context) error) {
+func (s *shell) edit(key string, do func(ctx context.Context) error) {
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
@@ -173,6 +175,33 @@ func (s *shell) keep(key string, do func(ctx context.Context) error) {
 				s.notes = append(s.notes, noticeOf(err))
 			}
 			s.forget(key)
+		})
+	}()
+}
+
+// keep saves or follows what the page of key shows, what, on its service:
+// kept, the page's own, tells so at once, and goes back if the service
+// refuses. Once it did, the library's list, of list, shows it.
+func (s *shell) keep(key, list, what, label string, kept *bool, on bool, do func(ctx context.Context) error) {
+	*kept = on
+	s.keeping[key] = true
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		err := do(ctx)
+		s.update(func() {
+			delete(s.keeping, key)
+			if err != nil {
+				*kept = !on
+				s.notes = append(s.notes, noticeOf(err))
+				return
+			}
+			s.forget(list)
+			if on {
+				s.notes = append(s.notes, notice(what+": "+label))
+			} else {
+				s.notes = append(s.notes, notice(what+": no longer "+label))
+			}
 		})
 	}()
 }
@@ -209,10 +238,9 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 			menu:    s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""),
 		}
 		if s.signedIn(a.Source) {
-			saved := a.Saved
-			h.keep, h.keepLabel, h.keptLabel = &saved, "save", "saved"
+			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, "save", "saved", s.keeping[key]
 			h.onKeep = func(on bool) {
-				s.keep(key, func(ctx context.Context) error {
+				s.keep(key, string(a.Source)+":albums", a.Title, "saved", &res.value.Saved, on, func(ctx context.Context) error {
 					return s.svc.Collection.SetSaved(ctx, "album", a.ID, a.PlaylistID, on)
 				})
 			}
@@ -273,10 +301,11 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 			h.shuffle = func() { s.shuffled(p.Tracks) }
 		}
 		if !local && !p.Editable && s.signedIn(p.Source) {
-			saved := p.Saved
-			h.keep, h.keepLabel, h.keptLabel = &saved, "save", "saved"
+			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, "save", "saved", s.keeping[key]
 			h.onKeep = func(on bool) {
-				s.keep(key, func(ctx context.Context) error { return s.svc.Collection.SetSaved(ctx, "playlist", p.ID, "", on) })
+				s.keep(key, string(p.Source)+":playlists", p.Title, "saved", &res.value.Saved, on, func(ctx context.Context) error {
+					return s.svc.Collection.SetSaved(ctx, "playlist", p.ID, "", on)
+				})
 			}
 		}
 		s.collectionHead(c, h)
@@ -310,7 +339,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 			o.menu = func(m *ui.Menu, i int, t media.Track) {
 				m.Separator()
 				if m.Item("Remove from this playlist").Chosen() {
-					s.keep(key, func(ctx context.Context) error {
+					s.edit(key, func(ctx context.Context) error {
 						if err := s.svc.Collection.RemoveFromYouTubePlaylist(ctx, p.ID, t); err != nil {
 							return err
 						}
@@ -472,10 +501,11 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 			h.play = func() { s.p.PlayTracks(a.TopTracks, 0) }
 		}
 		if s.signedIn(a.Source) {
-			following := a.Following
-			h.keep, h.keepLabel, h.keptLabel = &following, "follow", "following"
+			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Following, "follow", "following", s.keeping[key]
 			h.onKeep = func(on bool) {
-				s.keep(key, func(ctx context.Context) error { return s.svc.Collection.SetFollowing(ctx, a.ID, on) })
+				s.keep(key, string(a.Source)+":artists", a.Name, "following", &res.value.Following, on, func(ctx context.Context) error {
+					return s.svc.Collection.SetFollowing(ctx, a.ID, on)
+				})
 			}
 		}
 		s.collectionHead(c, h)

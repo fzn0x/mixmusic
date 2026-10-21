@@ -403,7 +403,9 @@ func (s *shell) segmented(c *ui.Context, key, label string, selected *int, label
 	before := *selected
 	clicked := false
 	seg := ui.SegmentedBase(c.Key(key), selected, len(labels))
-	seg.Track.Height(34).Border(2, k.outline).Radius(k.radiusSm).Label(label).Shrink(0).Children(func() {
+	// The track clips its segments, so that the chosen one's flood keeps
+	// to its rounded corners.
+	seg.Track.Height(34).Border(2, k.outline).Radius(k.radiusSm).Clip().Label(label).Shrink(0).Children(func() {
 		for i, l := range labels {
 			part := seg.Segment(i).PaddingX(14).FillHeight().Label(l).Cursor(ui.CursorPointer)
 			ink := k.text

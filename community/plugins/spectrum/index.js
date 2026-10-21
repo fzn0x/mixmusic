@@ -1,6 +1,7 @@
 // Spectrum: a radial spectrum of what plays, as a widget of the now playing
-// page. It reads the analyser of MixMusic's own player, so it moves for
-// tracks that play in MixMusic, not on Spotify Connect devices.
+// page. It reads MixMusic's analyser, so it moves for what MixMusic hears:
+// tracks that play in MixMusic, and on Windows Spotify in the Spotify app on
+// this computer, not on other devices.
 
 /** @param {import("../../../sdk").MixMusicAPI} api */
 export default function activate(api) {

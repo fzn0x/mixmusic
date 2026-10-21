@@ -81,7 +81,7 @@ it with a JSDoc `@param` as above, or copy it next to your plugin.
 
 | | |
 |---|---|
-| `api.player` | the state of the player (`state()`), the transport, the queue (`playTracks`, `playNext`, `enqueue`), events (`on("trackchange" \| "statechange" \| "progress" \| "queuechange")`) and the `analyser()` of MixMusic's own player, which has the reading methods of the web's AnalyserNode |
+| `api.player` | the state of the player (`state()`), the transport, the queue (`playTracks`, `playNext`, `enqueue`), events (`on("trackchange" \| "statechange" \| "progress" \| "queuechange")`) and the `analyser()` of what plays, which has the reading methods of the web's AnalyserNode: MixMusic's own player, and on Windows Spotify too, in MixMusic or the Spotify app on this computer |
 | `api.catalog` | search both services, and read albums, artists, playlists, radios and lyrics |
 | `api.library` | liked songs and the user's mixes |
 | `api.ui` | `toast`, `navigate`, `theme`, `addSidebarItem`, `addPage`, `addTrackAction`, `addWidget`, and the elements pages show |

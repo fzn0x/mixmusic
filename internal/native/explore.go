@@ -5,11 +5,13 @@ import (
 	"net/url"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
@@ -148,12 +150,20 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 	}
 	t := tracks[0]
 	m.Submenu("Add to YouTube Music playlist", func(m *ui.Menu) {
+		if m.Item("New playlist…").Chosen() {
+			s.promptName("New playlist on YouTube Music", "Name", t.Title, "create", func(name string) {
+				s.createYouTubePlaylist(name, []media.Track{t}, nil)
+			})
+		}
 		own := fetch(s, "youtube:playlists", s.svc.Collection.YouTubePlaylists)
 		if !own.done {
 			m.Item("Loading your playlists…").Disabled(true)
 			return
 		}
 		editable := slices.DeleteFunc(slices.Clone(own.value), func(p media.Playlist) bool { return !p.Editable })
+		if len(editable) > 0 {
+			m.Separator()
+		}
 		for _, p := range editable {
 			if m.Item(p.Title).Chosen() {
 				go func() {
@@ -190,6 +200,30 @@ func (s *shell) addToMix(p media.Playlist, tracks []media.Track) {
 			}
 			s.notes = append(s.notes, notice("Added "+what+" to "+p.Title))
 			s.forget("playlist:" + p.ID)
+		})
+	}()
+}
+
+// createYouTubePlaylist makes a playlist of tracks on YouTube Music, named
+// title, and runs done with it, if any.
+func (s *shell) createYouTubePlaylist(title string, tracks []media.Track, done func(media.Playlist)) {
+	if slices.ContainsFunc(tracks, func(t media.Track) bool { return t.Source != media.SourceYouTube }) {
+		s.notes = append(s.notes, notice("Finding the tracks on YouTube Music…"))
+	}
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		defer cancel()
+		p, err := s.svc.Collection.CreateYouTubePlaylist(ctx, title, tracks)
+		s.update(func() {
+			if err != nil {
+				s.notes = append(s.notes, player.Notice{Message: "Couldn't create " + title + ": " + err.Error(), Error: true})
+				return
+			}
+			s.forget("youtube:playlists")
+			s.notes = append(s.notes, notice("Created "+p.Title+" on YouTube Music"))
+			if done != nil {
+				done(p)
+			}
 		})
 	}()
 }

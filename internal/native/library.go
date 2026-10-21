@@ -132,8 +132,19 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 	if !playlists.done || !albums.done || !artists.done {
 		s.loading(c)
 	}
-	if len(playlists.value) > 0 {
-		s.shelf(c, key+"-playlists", "playlists", func() {
+	// The user makes playlists on YouTube Music: theirs show, if none yet.
+	var links func()
+	if key == "youtube" && playlists.done && playlists.err == nil {
+		links = func() {
+			if s.link(c, "new-youtube-playlist", "new playlist") {
+				s.promptName("New playlist on YouTube Music", "Name", "", "create", func(name string) {
+					s.createYouTubePlaylist(name, nil, func(p media.Playlist) { s.navigate(playlistPath(p.ID)) })
+				})
+			}
+		}
+	}
+	if len(playlists.value) > 0 || links != nil {
+		s.shelfWith(c, key+"-playlists", "playlists", links, func() {
 			for i, p := range playlists.value {
 				s.playlistTile(c, key+"-playlist-"+count(i), p)
 			}

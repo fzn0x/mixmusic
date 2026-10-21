@@ -283,6 +283,36 @@ func TestNewMix(t *testing.T) {
 	}
 }
 
+// TestNewYouTubePlaylist asks for a new YouTube Music playlist's name,
+// from a track's menu, its title to start from, and from the library.
+func TestNewYouTubePlaylist(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	s.loads["youtube:playlists"] = &loaded[[]media.Playlist]{done: true}
+	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true}
+	s.loads["youtube:artists"] = &loaded[[]media.Artist]{done: true}
+	s.loads["youtube:liked"] = &loaded[[]media.Track]{done: true}
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	if err := tt.RightClick(testTracks[0].Title); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt.ChooseMenuItem("Add to YouTube Music playlist", "New playlist…"); err != nil {
+		t.Fatalf("%v: the menu holds %q", err, tt.Menu())
+	}
+	tt.Frame()
+	if s.naming == nil || s.naming.value != testTracks[0].Title || !strings.Contains(s.naming.title, "YouTube Music") {
+		t.Fatalf("the new playlist asks %+v", s.naming)
+	}
+	s.naming = nil
+	show(s, tt, "/library/youtube")
+	click(t, s, tt, "new playlist")
+	if s.naming == nil || s.naming.value != "" {
+		t.Errorf("the library's new playlist asks %+v", s.naming)
+	}
+}
+
 // TestPaletteThemes wears a theme from the palette.
 func TestPaletteThemes(t *testing.T) {
 	s := newTestShell(t)

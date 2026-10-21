@@ -110,9 +110,13 @@ func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, sub
 }
 
 // shelf is a titled row of tiles that scrolls sideways.
-func (s *shell) shelf(c *ui.Context, key, title string, tiles func()) {
+func (s *shell) shelf(c *ui.Context, key, title string, tiles func()) { s.shelfWith(c, key, title, nil, tiles) }
+
+// shelfWith is a shelf with links in its title's row, as to make what it
+// shows.
+func (s *shell) shelfWith(c *ui.Context, key, title string, links, tiles func()) {
 	ui.Column(c.Key(key)).Margin(0, 0, 48).Children(func() {
-		s.sectionTitle(c, title)
+		s.sectionHead(c, title, links)
 		ui.ScrollHorizontal(c).Gap(16).Padding(0, 0, 12).Children(tiles)
 	})
 }

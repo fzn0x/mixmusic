@@ -582,7 +582,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 			band := func(key, label string, v *float64) {
 				ui.Column(c).Gap(6).AlignItems(ui.Center).Children(func() {
 					ui.Text(c, fmt.Sprintf("%+.0f", *v)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
-					if ui.SliderBase(c.Key(key), v, -12, 12).Step(1).Vertical().Height(140).Width(28).Label(label + " dB").Changed() {
+					if ui.SliderBase(c.Key(key), v, -12, 12).Step(0.5).Vertical().Height(140).Width(28).Label(label + " dB").Changed() {
 						if key != "eq-preamp" {
 							eq.Preset = "custom"
 						}

@@ -117,8 +117,12 @@ type shell struct {
 	// once known: the colour Greenroom's and Glasshouse's grounds take
 	// too.
 	artURL, artColor string
-	// tint is the colour of the cover the ground takes, as it changes.
-	tint tint
+	// tint is the colour of the cover the ground takes, as it changes;
+	// impact is when the track changed, which Anime's speed lines burst
+	// at, and tone Anime's screentone, drawn once for the window's size.
+	tint   tint
+	impact impact
+	tone   tone
 	// asking is the question a dialog asks before an action, if any.
 	asking *question
 	// panel is the side panel shown: "queue", "lyrics" or "".

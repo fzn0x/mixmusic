@@ -1,0 +1,46 @@
+{
+  "id": "anime",
+  "name": "Anime",
+  "version": "1.0.0",
+  "author": "MixMusic",
+  "description": "Summer-sky blues and cel colours, with speed lines that streak when the track changes.",
+  "scheme": "light",
+  "colors": {
+    "bg": "#eaf6ff",
+    "surface": "#ffffff",
+    "surface-2": "#f7fbff",
+    "surface-3": "#cfe5f6",
+    "border": "#c2dcf0",
+    "text": "#10203f",
+    "text-muted": "#4a5f80",
+    "accent": "#f0501f",
+    "accent-text": "#10203f",
+    "danger": "#d61f3a",
+    "success": "#12906a",
+    "youtube": "#e8232a",
+    "spotify": "#139a4c",
+    "tile-1": "#5cc8ff",
+    "tile-2": "#ffa040",
+    "tile-3": "#ff8fcf",
+    "tile-4": "#63d98b",
+    "tile-text": "#10203f"
+  },
+  "fonts": {
+    "body": "'Yu Gothic UI', 'Hiragino Sans', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif"
+  },
+  "radius": "6px",
+  "options": [
+    {
+      "id": "speedlines",
+      "label": "Speed lines",
+      "type": "toggle",
+      "default": "true"
+    },
+    {
+      "id": "screentone",
+      "label": "Screentone",
+      "type": "toggle",
+      "default": "true"
+    }
+  ]
+}

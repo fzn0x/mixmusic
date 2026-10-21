@@ -77,6 +77,10 @@ type Track struct {
 	Explicit   bool    `json:"explicit,omitempty"`
 	// Video is set for music videos, rather than audio tracks.
 	Video bool `json:"video,omitempty"`
+	// Plays is how many times the track played, as its service counts
+	// them: a song's plays on YouTube Music, a video's views. 0 is unknown,
+	// as for Spotify, which gives apps no such count.
+	Plays int64 `json:"plays,omitempty"`
 	// URL opens the track on the service's website.
 	URL string `json:"url,omitempty"`
 	// EntryID names the track's place in the playlist it was read from,

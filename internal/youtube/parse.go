@@ -1,6 +1,7 @@
 package youtube
 
 import (
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -158,6 +159,41 @@ func (b byline) fallbackArtists() []media.Ref {
 	return []media.Ref{}
 }
 
+// plays returns how many times the byline's track played, as a song's
+// "1.2B plays" or a video's "905M views" say, or 0 when it says not.
+func (b byline) plays() int64 {
+	for _, s := range b.plain {
+		if n, ok := parsePlays(s); ok {
+			return n
+		}
+	}
+	return 0
+}
+
+// parsePlays reads a count of plays or views as YouTube Music abbreviates
+// it in English, as "1.2B plays", "2.2K plays" or "148 views".
+func parsePlays(s string) (int64, bool) {
+	num := ""
+	for _, noun := range []string{" plays", " play", " views", " view"} {
+		if n, ok := strings.CutSuffix(s, noun); ok {
+			num = n
+			break
+		}
+	}
+	scale := 1.0
+	for suffix, v := range map[string]float64{"K": 1e3, "M": 1e6, "B": 1e9} {
+		if n, ok := strings.CutSuffix(num, suffix); ok {
+			num, scale = n, v
+			break
+		}
+	}
+	v, err := strconv.ParseFloat(strings.ReplaceAll(num, ",", ""), 64)
+	if num == "" || err != nil || v < 0 {
+		return 0, false
+	}
+	return int64(math.Round(v * scale)), true
+}
+
 // looksLikeCount reports whether s counts something, as "5.9M views" or
 // "21K plays" do, rather than naming someone.
 func looksLikeCount(s string) bool {
@@ -197,6 +233,7 @@ func newTrack(videoID, title string, watch node, b byline, thumbs []media.Image,
 		Artwork:    thumbs,
 		Explicit:   explicit,
 		Video:      videoType != "" && videoType != videoTypeAudio,
+		Plays:      b.plays(),
 		URL:        "https://music.youtube.com/watch?v=" + videoID,
 	}
 }

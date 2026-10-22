@@ -13,9 +13,43 @@ import (
 )
 
 var (
-	kernel32         = syscall.NewLazyDLL("kernel32.dll")
-	procCreateEventW = kernel32.NewProc("CreateEventW")
+	kernel32              = syscall.NewLazyDLL("kernel32.dll")
+	procCreateEventW      = kernel32.NewProc("CreateEventW")
+	procGetCurrentThread  = kernel32.NewProc("GetCurrentThread")
+	procSetThreadPriority = kernel32.NewProc("SetThreadPriority")
+
+	avrt                                = syscall.NewLazyDLL("avrt.dll")
+	procAvSetMmThreadCharacteristicsW   = avrt.NewProc("AvSetMmThreadCharacteristicsW")
+	procAvRevertMmThreadCharacteristics = avrt.NewProc("AvRevertMmThreadCharacteristics")
 )
+
+const (
+	threadPriorityNormal       = 0
+	threadPriorityTimeCritical = 15
+)
+
+// boostThread has Windows run the calling thread ahead of other programs'
+// threads, as it does audio threads: the stream renders only
+// bufferDuration ahead, and a game or a busy browser kept a thread of
+// normal priority waiting for longer, which the user heard as stutters.
+// It registers the thread with the multimedia scheduler (MMCSS) as Pro
+// Audio, or, without MMCSS, raises its priority. It returns how to undo
+// it.
+func boostThread() (undo func()) {
+	if procAvSetMmThreadCharacteristicsW.Find() == nil {
+		task, _ := syscall.UTF16PtrFromString("Pro Audio")
+		var index uint32
+		h, _, _ := procAvSetMmThreadCharacteristicsW.Call(uintptr(unsafe.Pointer(task)), uintptr(unsafe.Pointer(&index)))
+		if h != 0 {
+			return func() { procAvRevertMmThreadCharacteristics.Call(h) }
+		}
+	}
+	thread, _, _ := procGetCurrentThread.Call()
+	if ok, _, _ := procSetThreadPriority.Call(thread, threadPriorityTimeCritical); ok == 0 {
+		return func() {}
+	}
+	return func() { procSetThreadPriority.Call(thread, threadPriorityNormal) }
+}
 
 // device is an opened output device.
 type device struct {
@@ -161,6 +195,7 @@ func (s *Stream) Delay() time.Duration {
 func (s *Stream) run(ready chan<- error) error {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
+	defer boostThread()()
 	r, _, _ := syscall.SyscallN(procCoInitializeEx.Addr(), 0, coinitMultithreaded)
 	switch r {
 	case sOK, sFalse:

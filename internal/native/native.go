@@ -315,10 +315,13 @@ func (s *shell) drain() {
 }
 
 // refresh reads the settings and the add-ons again, and the look they make.
+// It asks for the accounts again too, which show as they were until the
+// answer comes: forgotten, they read as signed out meanwhile, and Spotify
+// blinked out of the pages each time the app told of a change (#50).
 func (s *shell) refresh() {
 	s.set = s.svc.Preferences.Get()
 	s.inv = s.svc.Addons.List()
-	s.forget("accounts")
+	s.refetch("accounts")
 	if s.offer == nil {
 		s.offer = s.svc.System.UpdateOffer()
 	}
@@ -519,26 +522,52 @@ type loaded[T any] struct {
 	value T
 	err   error
 	done  bool
+	// again has fetch ask once more; asks counts the times it asked.
+	again bool
+	asks  int
 }
 
 // fetch returns what get gives for key, which it asks for once, beside the
-// main thread: until it comes, the result isn't done.
+// main thread: until it comes, the result isn't done. Asked to ask again,
+// by refetch, it keeps what it got until the new answer comes.
 func fetch[T any](s *shell, key string, get func(ctx context.Context) (T, error)) *loaded[T] {
-	if l, ok := s.loads[key].(*loaded[T]); ok {
+	l, ok := s.loads[key].(*loaded[T])
+	if ok && !l.again {
 		return l
 	}
-	l := &loaded[T]{}
-	s.loads[key] = l
+	if !ok {
+		l = &loaded[T]{}
+		s.loads[key] = l
+	}
+	l.again = false
+	l.asks++
+	ask := l.asks
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 		v, err := get(ctx)
-		s.update(func() { l.value, l.err, l.done = v, err, true })
+		s.update(func() {
+			// An answer to an older ask that comes last is older too.
+			if l.asks == ask {
+				l.value, l.err, l.done = v, err, true
+			}
+		})
 	}()
 	return l
 }
 
 // forget drops what fetch got for key, so that the page asks again.
 func (s *shell) forget(key string) { delete(s.loads, key) }
+
+// refetch has fetch ask again for key, while the page goes on showing what
+// it got: forgotten, it would show nothing, or what a zero value means,
+// until the answer comes.
+func (s *shell) refetch(key string) {
+	if l, ok := s.loads[key].(interface{ askAgain() }); ok {
+		l.askAgain()
+	}
+}
+
+func (l *loaded[T]) askAgain() { l.again = true }
 
 func hexColor(c ui.Color) string { return fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B) }

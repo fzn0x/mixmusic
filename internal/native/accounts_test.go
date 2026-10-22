@@ -3,9 +3,39 @@ package native
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/fzn0x/mixmusic/internal/app"
 )
+
+// TestRefreshKeepsAccounts goes on showing the accounts while the shell
+// asks for them again, as it does each time the app tells of a change:
+// forgotten, they read as signed out until the answer came, and the
+// library's Spotify tab blinked away (#50).
+func TestRefreshKeepsAccounts(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{Spotify: app.SpotifyAccount{SignedIn: true}}}
+	tt := tester(t, s)
+	show(s, tt, "/library")
+	if !tt.HasText("spotify") {
+		t.Fatalf("the library has no Spotify tab: %q", tt.Texts())
+	}
+	s.refresh()
+	tt.Frame()
+	if !tt.HasText("spotify") {
+		t.Errorf("asking for the accounts again hides the Spotify tab: %q", tt.Texts())
+	}
+	// The answer replaces them: the test's app has no Spotify sign-in.
+	deadline := time.Now().Add(5 * time.Second)
+	for tt.HasText("spotify") {
+		if time.Now().After(deadline) {
+			t.Fatal("the accounts' answer never showed")
+		}
+		time.Sleep(10 * time.Millisecond)
+		s.drain()
+		tt.Frame()
+	}
+}
 
 // TestRefusedSpotifySignOut offers to sign out of a sign-in Spotify
 // refused, which would fail every request of Spotify meanwhile, and asks

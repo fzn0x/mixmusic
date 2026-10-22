@@ -98,6 +98,47 @@ func TestTransportClicks(t *testing.T) {
 	}
 }
 
+// TestArrowKeys changes the volume with up and down and seeks with left
+// and right, without a shortcut set, but not while the search box has the
+// keys for its caret, nor in the mini player (#38).
+func TestArrowKeys(t *testing.T) {
+	s := newTestShell(t)
+	s.p.PlayTracks(testTracks, 0)
+	s.p.SetVolume(0.5)
+	s.settle(t, func(st player.State) bool { return st.Playing && st.Volume == 0.5 })
+	tt := tester(t, s)
+	press := func(key ui.Key, ok func(player.State) bool) {
+		t.Helper()
+		tt.Key(0, key)
+		s.settle(t, ok)
+		tt.Frame()
+	}
+	press(ui.KeyUp, func(st player.State) bool { return st.Volume > 0.54 })
+	press(ui.KeyDown, func(st player.State) bool { return st.Volume < 0.51 })
+	press(ui.KeyRight, func(st player.State) bool { return st.Position >= 10*time.Second })
+	press(ui.KeyLeft, func(st player.State) bool { return st.Position < 10*time.Second })
+
+	before := s.p.State()
+	tt.Click("Search")
+	for _, key := range []ui.Key{ui.KeyUp, ui.KeyDown, ui.KeyLeft, ui.KeyRight} {
+		tt.Key(0, key)
+	}
+	s.drain()
+	if st := s.p.State(); st.Volume != before.Volume || st.Position != before.Position {
+		t.Errorf("the arrows in the search box changed the volume to %v and the position to %v", st.Volume, st.Position)
+	}
+
+	mini := ui.NewTester(s.miniView, 420, 132)
+	mini.Frame()
+	for _, key := range []ui.Key{ui.KeyUp, ui.KeyDown, ui.KeyLeft, ui.KeyRight} {
+		mini.Key(0, key)
+	}
+	s.drain()
+	if st := s.p.State(); st.Volume != before.Volume || st.Position != before.Position {
+		t.Errorf("the arrows in the mini player changed the volume to %v and the position to %v", st.Volume, st.Position)
+	}
+}
+
 func TestQueuePanel(t *testing.T) {
 	s := newTestShell(t)
 	s.p.PlayTracks(testTracks, 0)

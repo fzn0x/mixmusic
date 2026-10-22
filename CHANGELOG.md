@@ -15,6 +15,13 @@ All notable changes to MixMusic are documented here. The format follows
   keeps the arrows for its cursor, and the mini player takes no shortcuts
   (#38).
 
+### Fixed
+
+- On Linux, closing the mini player, with its close button or with Open
+  MixMusic, no longer crashes MixMusic (#37).
+- The settings icon in the sidebar is a gear again, centred and as large as
+  the icons beside it, where it looked like a light bulb (#40).
+
 ## [0.5.1] - 2026-10-22
 
 A track no longer fails now and then with "YouTube refused to send its

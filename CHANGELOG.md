@@ -6,6 +6,17 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- After signing in to Spotify, the library, Settings › Accounts and
+  Settings › Playback no longer flicker between signed in and signed out
+  (#50). When Spotify refuses the sign-in, Settings › Accounts now says
+  why and offers to sign out, and MixMusic asks Spotify again a minute
+  later, not several times a second.
+- On Linux, signing in to YouTube Music no longer closes MixMusic (#51).
+  MixMusic now uses MyGo 0.6.2, which no longer damages memory as the
+  first window opens on computers with a GPU.
+
 ## [0.5.2] - 2026-10-22
 
 The arrow keys seek and change the volume with nothing to set first. On

@@ -176,7 +176,7 @@ func (a *App) openYouTube() {
 	// again.
 	a.youtube.OnRejected = func() {
 		a.mu.Lock()
-		a.youtubeMe = nil
+		a.youtubeMe, a.profileErrs.youtube = nil, ""
 		a.mu.Unlock()
 		notify()
 	}
@@ -257,7 +257,7 @@ func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
 	}
 	s.a.youtube.SetCookies(cookies)
 	s.a.mu.Lock()
-	s.a.youtubeMe = nil
+	s.a.youtubeMe, s.a.profileErrs.youtube = nil, ""
 	s.a.mu.Unlock()
 	if _, err := s.a.youtube.Account(ctx); err != nil {
 		s.a.youtube.SetCookies(nil)
@@ -297,7 +297,7 @@ func youtubeSession() ([]*http.Cookie, error) {
 func (s *Accounts) YouTubeLogout(ctx context.Context) error {
 	s.a.youtube.SetCookies(nil)
 	s.a.mu.Lock()
-	s.a.youtubeMe = nil
+	s.a.youtubeMe, s.a.profileErrs.youtube = nil, ""
 	s.a.mu.Unlock()
 	err := s.a.youtubeStore.Clear()
 	if set := s.a.settings.Get(); set.YouTubeChannel != "" {

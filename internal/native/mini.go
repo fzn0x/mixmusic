@@ -98,12 +98,14 @@ func (s *shell) miniView(c *ui.Context) {
 			s.miniControls(c)
 		})
 		ui.Column(c).Shrink(0).AlignSelf(ui.Start).Padding(4).Children(func() {
+			// Both close this window once this frame is drawn: on Linux the
+			// frame draws in the window's GL area, and GTK crashed finishing
+			// it once the window was gone (#37).
 			if s.iconButton(c, "mini-open", "mini", "Open MixMusic", false, 16).Clicked() {
-				// It closes this window.
-				s.svc.System.ShowMainWindow()
+				go s.svc.System.ShowMainWindow()
 			}
 			if s.iconButton(c, "mini-close", "close", "Close the mini player", false, 16).Clicked() {
-				s.win.Close()
+				go s.win.Close()
 			}
 		})
 	})

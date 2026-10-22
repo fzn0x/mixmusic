@@ -24,6 +24,12 @@ All notable changes to MixMusic are documented here. The format follows
 - The settings icon in the sidebar is a gear again, centred and as large as
   the icons beside it, where it looked like a light bulb (#40).
 
+### Fixed
+
+- On Windows, the music no longer stutters while a game or a browser keeps
+  the computer busy: MixMusic's audio now goes ahead of other programs, as
+  the audio of browsers and other players does.
+
 ## [0.5.1] - 2026-10-22
 
 A track no longer fails now and then with "YouTube refused to send its

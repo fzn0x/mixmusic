@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "mygo-cli": "^0.5.5",
+    "mygo-cli": "^0.6.2",
     "typescript": "^7.0.0"
   }
 }

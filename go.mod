@@ -4,7 +4,7 @@ go 1.27.1
 
 require (
 	github.com/ebitengine/purego v0.11.1
-	github.com/egoist/mygo v0.5.5
+	github.com/egoist/mygo v0.6.2
 	github.com/grafana/sobek v0.0.0-20261020081906-048a54a9653b
 	golang.org/x/image v0.46.0
 	golang.org/x/text v0.43.0

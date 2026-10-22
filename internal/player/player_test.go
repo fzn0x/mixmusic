@@ -460,6 +460,12 @@ func TestTransport(t *testing.T) {
 // TestSwitchSilences stops the track that played as soon as another is
 // chosen, while the other's stream is found, and when it can't be.
 func TestSwitchSilences(t *testing.T) {
+	// b shows its error for failDelay before c plays: 20 ms, less than
+	// wait can take between two looks on a busy runner. Restored after the
+	// player closes, as cleanups run last registered first.
+	delay := failDelay
+	failDelay = 500 * time.Millisecond
+	t.Cleanup(func() { failDelay = delay })
 	found := make(chan struct{})
 	h := newHarness(t, Saved{}, func(f *fakeServices) {
 		f.prepare = func(t media.Track) (Source, error) {

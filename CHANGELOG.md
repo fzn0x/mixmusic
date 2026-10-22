@@ -6,6 +6,15 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The arrow keys seek and change the volume with no shortcut to set first:
+  left and right go back and forward 10 seconds, up and down turn the
+  volume up and down. They took Shift and Ctrl (⌘ on macOS) before, and a
+  shortcut you set in Settings › Shortcuts stays yours. The search box
+  keeps the arrows for its cursor, and the mini player takes no shortcuts
+  (#38).
+
 ## [0.5.1] - 2026-10-22
 
 A track no longer fails now and then with "YouTube refused to send its

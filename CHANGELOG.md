@@ -15,6 +15,12 @@ All notable changes to MixMusic are documented here. The format follows
   keeps the arrows for its cursor, and the mini player takes no shortcuts
   (#38).
 
+### Fixed
+
+- On Windows, the music no longer stutters while a game or a browser keeps
+  the computer busy: MixMusic's audio now goes ahead of other programs, as
+  the audio of browsers and other players does.
+
 ## [0.5.1] - 2026-10-22
 
 A track no longer fails now and then with "YouTube refused to send its

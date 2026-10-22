@@ -86,11 +86,32 @@ type AccountsStatus struct {
 // Accounts signs the user in and out of their music services.
 type Accounts struct{ a *App }
 
+// profileRetry is how long a profile that could not be read waits before
+// it is read again. Every window asks for the accounts' state again once a
+// reading tells it, so a profile read again at once would be read again
+// and again, as when Spotify refuses the sign-in, and the windows told
+// again and again (#50).
+const profileRetry = time.Minute
+
+// profileErrors is why the profiles read in the background could not be
+// read, and when they were.
+type profileErrors struct {
+	spotify, youtube string
+	at               time.Time
+}
+
+// waits reports whether a profile that could not be read, for err, waits
+// before it is read again.
+func (e profileErrors) waits(err string) bool {
+	return err != "" && time.Since(e.at) < profileRetry
+}
+
 // Status returns the state of the user's accounts at once, without asking
 // the services: whether the user is signed in, and the profiles read
 // before. The main window waits for it before it shows anything, so the
 // profiles not read yet are read in the background, and AccountsChanged
-// brings them to every window.
+// brings them to every window. A profile that could not be read comes with
+// why, and is read again after profileRetry.
 func (s *Accounts) Status(ctx context.Context) AccountsStatus {
 	return s.a.knownAccountsStatus()
 }
@@ -100,7 +121,7 @@ func (s *Accounts) Status(ctx context.Context) AccountsStatus {
 // background.
 func (a *App) knownAccountsStatus() AccountsStatus {
 	a.mu.Lock()
-	spotifyMe, youtubeMe := a.spotifyMe, a.youtubeMe
+	spotifyMe, youtubeMe, errs := a.spotifyMe, a.youtubeMe, a.profileErrs
 	a.mu.Unlock()
 	status := AccountsStatus{
 		Spotify: a.spotifyAccount(),
@@ -108,7 +129,16 @@ func (a *App) knownAccountsStatus() AccountsStatus {
 		Lastfm:  a.lastfmAccount(),
 	}
 	status.Spotify.Profile = spotifyMe
-	if status.Spotify.SignedIn && spotifyMe == nil || status.YouTube.SignedIn && youtubeMe == nil {
+	read := false
+	if status.Spotify.SignedIn && spotifyMe == nil {
+		status.Spotify.Error = errs.spotify
+		read = !errs.waits(errs.spotify)
+	}
+	if status.YouTube.SignedIn && youtubeMe == nil {
+		status.YouTube.Error = errs.youtube
+		read = read || !errs.waits(errs.youtube)
+	}
+	if read {
 		a.readProfiles()
 	}
 	return status
@@ -122,8 +152,12 @@ func (a *App) readProfiles() {
 	}
 	go func() {
 		defer a.readingProfiles.Store(false)
-		// Reading the status reads the profiles, and keeps them.
-		a.accountsStatus(context.Background())
+		// Reading the status reads the profiles, and keeps them; it says
+		// why of those it could not read.
+		status := a.accountsStatus(context.Background())
+		a.mu.Lock()
+		a.profileErrs = profileErrors{spotify: status.Spotify.Error, youtube: status.YouTube.Error, at: time.Now()}
+		a.mu.Unlock()
 		notify()
 	}()
 }
@@ -197,7 +231,7 @@ func (s *Accounts) SpotifyLogin(ctx context.Context) (AccountsStatus, error) {
 	}
 	s.a.spotify.SetToken(t)
 	s.a.mu.Lock()
-	s.a.spotifyMe = nil
+	s.a.spotifyMe, s.a.profileErrs.spotify = nil, ""
 	s.a.mu.Unlock()
 	// MixMusic's own device connects again, with the new sign-in.
 	s.a.here.close()
@@ -221,7 +255,7 @@ func (a *App) signOutSpotify() error {
 	a.spotify.SetToken(spotify.Token{})
 	a.here.close()
 	a.mu.Lock()
-	a.spotifyMe = nil
+	a.spotifyMe, a.profileErrs.spotify = nil, ""
 	a.mu.Unlock()
 	err := a.tokens.Clear()
 	notify()

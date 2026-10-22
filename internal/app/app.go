@@ -131,6 +131,9 @@ type App struct {
 	offer       *Release
 	putOff      string
 	putOffUntil time.Time
+	// profileErrs is why the accounts' profiles could not be read, until
+	// they are, or the user signs in or out.
+	profileErrs profileErrors
 }
 
 // New opens what the app keeps in opts.DataDir and opts.CacheDir.

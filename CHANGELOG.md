@@ -6,6 +6,13 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-10-22
+
+The arrow keys seek and change the volume with nothing to set first. On
+Windows the music no longer stutters while a game or a browser keeps the
+computer busy, and on Linux closing the mini player no longer crashes
+MixMusic. MixMusic 0.3.0 and later offer this version in Settings › About.
+
 ### Changed
 
 - The arrow keys seek and change the volume with no shortcut to set first:
@@ -23,9 +30,6 @@ All notable changes to MixMusic are documented here. The format follows
   MixMusic, no longer crashes MixMusic (#37).
 - The settings icon in the sidebar is a gear again, centred and as large as
   the icons beside it, where it looked like a light bulb (#40).
-
-### Fixed
-
 - On Windows, the music no longer stutters while a game or a browser keeps
   the computer busy: MixMusic's audio now goes ahead of other programs, as
   the audio of browsers and other players does.
@@ -351,7 +355,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/fzn0x/mixmusic/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/fzn0x/mixmusic/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/fzn0x/mixmusic/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/fzn0x/mixmusic/compare/v0.3.2...v0.4.0

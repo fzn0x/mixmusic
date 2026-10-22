@@ -141,17 +141,6 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 	ui.Text(c, fmt.Sprintf("%.0f min", top)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
 	plot := ui.Box(c).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).
 		Label("Minutes listened each day").Description("The arrow keys go from day to day.").Focusable().
-		HandleInput(func(ev ui.InputEvent) bool {
-			step, ok := map[ui.Key]int{ui.KeyLeft: -1, ui.KeyRight: 1, ui.KeyHome: -n, ui.KeyEnd: n}[ev.Key]
-			if ev.Kind != ui.InputKeyDown || !ok {
-				return false
-			}
-			if !tip.shown {
-				tip.day = n - 1
-			}
-			tip.day, tip.shown, tip.pointer, tip.told = min(max(tip.day+step, 0), n-1), true, false, true
-			return true
-		}).
 		Draw(func(p *ui.Painter, r ui.Rect) {
 			w := r.W / float32(n)
 			for i, d := range days {
@@ -171,6 +160,18 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 				}
 			}
 		})
+	// The chart's own shortcuts, which go before the window's arrows.
+	for _, nav := range []struct {
+		key  ui.Key
+		step int
+	}{{ui.KeyLeft, -1}, {ui.KeyRight, 1}, {ui.KeyHome, -n}, {ui.KeyEnd, n}} {
+		if plot.Shortcut(0, nav.key) {
+			if !tip.shown {
+				tip.day = n - 1
+			}
+			tip.day, tip.shown, tip.pointer, tip.told = min(max(tip.day+nav.step, 0), n-1), true, false, true
+		}
+	}
 	// A column of the plot for each day, which the pointer comes on and
 	// the tip goes above.
 	columns := make([]ui.Element, n)

@@ -12,8 +12,10 @@ All notable changes to MixMusic are documented here. The format follows
   left and right go back and forward 10 seconds, up and down turn the
   volume up and down. They took Shift and Ctrl (⌘ on macOS) before, and a
   shortcut you set in Settings › Shortcuts stays yours. The search box
-  keeps the arrows for its cursor, and the mini player takes no shortcuts
-  (#38).
+  keeps the arrows for its cursor, and sliders, lists and the stats page's
+  chart keep them while they have the focus. Up and down no longer scroll
+  a page line by line: the mouse wheel, Page Up and Page Down, and Home
+  and End do. The mini player takes no shortcuts (#38).
 
 ### Fixed
 

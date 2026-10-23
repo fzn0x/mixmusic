@@ -42,7 +42,12 @@ Settings › Accounts says which refusal it was:
   **Not you?** changes it.
 - **The app's owner has no Spotify Premium.** Subscribe with the account that
   made the app, or make one with an account that has Premium. Spotify can take
-  a few hours to notice a new subscription.
+  a few hours to notice a new subscription. The developer dashboard says so
+  too: the app's page reads "Your application is blocked from accessing the
+  Web API since you do not have a Spotify Premium subscription", and the
+  **Web API** box can't be ticked when you create an app. A new app of the
+  same account doesn't help: Spotify blocks them all. Without Premium,
+  MixMusic still searches and plays YouTube Music, with no account at all.
 - **Spotify refused (HTTP 403)**, without a word of why: check both of the
   above. Spotify can take a few minutes to let in an account just added.
 

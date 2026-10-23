@@ -97,6 +97,38 @@ func TestRefusedProfile(t *testing.T) {
 	waitProfiles(t, a, func() bool { return reads.Load() == 2 })
 }
 
+// TestRefusedSpotifySignIn fails a sign-in Spotify refuses, as it refuses
+// every app whose owner has no Premium, rather than say it signed in, and
+// the accounts say why at once.
+func TestRefusedSpotifySignIn(t *testing.T) {
+	var reads atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		reads.Add(1)
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("Active premium subscription required for the owner of the app. When the subscription status changes, it can take a few hours to be applied."))
+	}))
+	t.Cleanup(srv.Close)
+	c := spotify.NewClient(spotify.NewAuth("client"))
+	c.BaseURL = srv.URL
+	c.SetToken(spotify.Token{AccessToken: "ACCESS", Expiry: time.Now().Add(time.Hour)})
+	a := &App{auth: spotify.NewAuth("client"), spotify: c, youtube: youtube.New()}
+
+	status, err := a.spotifySignedIn(context.Background())
+	if err == nil || !strings.Contains(err.Error(), "Premium") {
+		t.Errorf("signing in = %v, want the refusal", err)
+	}
+	if !status.Spotify.SignedIn || status.Spotify.Error == "" {
+		t.Errorf("status after the refusal = %+v", status.Spotify)
+	}
+	s := (&Accounts{a: a}).Status(context.Background())
+	if s.Spotify.Error == "" || a.readingProfiles.Load() {
+		t.Errorf("the accounts don't say why at once: %+v, reading again %v", s.Spotify, a.readingProfiles.Load())
+	}
+	if n := reads.Load(); n != 1 {
+		t.Errorf("the profile was read %d times", n)
+	}
+}
+
 // waitProfiles waits for the reading of the profiles in the background to
 // end with done.
 func waitProfiles(t *testing.T, a *App, done func() bool) {

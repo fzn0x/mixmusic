@@ -241,9 +241,26 @@ func (s *Accounts) SpotifyLogin(ctx context.Context) (AccountsStatus, error) {
 	if w := mygo.CallerWindow(ctx); w != nil {
 		w.Show() // back from the browser
 	}
-	status := s.a.accountsStatus(ctx)
+	return s.a.spotifySignedIn(ctx)
+}
+
+// spotifySignedIn reads the profile of a new Spotify sign-in, and returns
+// the accounts' state. Spotify gives a token, then may refuse what it is
+// for, as it does every app whose owner has no Premium: the sign-in then
+// stays, for the accounts to say why and offer to sign out, and signing in
+// fails with the refusal, rather than telling the user they signed in.
+func (a *App) spotifySignedIn(ctx context.Context) (AccountsStatus, error) {
+	status := a.accountsStatus(ctx)
+	var err error
+	if status.Spotify.Error != "" {
+		err = errors.New(status.Spotify.Error)
+		// The accounts say so at once, rather than read the profile again.
+		a.mu.Lock()
+		a.profileErrs.spotify, a.profileErrs.at = status.Spotify.Error, time.Now()
+		a.mu.Unlock()
+	}
 	notify()
-	return status, nil
+	return status, err
 }
 
 // SpotifyLogout signs the user out of Spotify.

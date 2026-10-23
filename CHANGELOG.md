@@ -6,6 +6,15 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-10-23
+
+Signed in to Spotify, MixMusic no longer flickers between signed in and
+signed out, and when Spotify refuses the sign-in, MixMusic says why
+rather than that you signed in. On Linux, MixMusic no longer damages its
+own memory as its first window opens. Signing in to YouTube Music can
+still close MixMusic on Linux (#51): that fix is planned for 0.5.4.
+MixMusic 0.3.0 and later offer this version in Settings › About.
+
 ### Fixed
 
 - After signing in to Spotify, the library, Settings › Accounts and
@@ -16,9 +25,9 @@ All notable changes to MixMusic are documented here. The format follows
 - A Spotify sign-in that Spotify refuses, as it refuses every app whose
   owner has no Premium, no longer says "Signed in to Spotify": it tells
   Spotify's reason instead.
-- On Linux, signing in to YouTube Music no longer closes MixMusic (#51).
-  MixMusic now uses MyGo 0.6.2, which no longer damages memory as the
-  first window opens on computers with a GPU.
+- On Linux, on computers with a GPU, MixMusic no longer damages its own
+  memory as its first window opens, which could crash it later: it now
+  uses MyGo 0.6.2.
 
 ## [0.5.2] - 2026-10-22
 
@@ -369,7 +378,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.3...HEAD
+[0.5.3]: https://github.com/fzn0x/mixmusic/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/fzn0x/mixmusic/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/fzn0x/mixmusic/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/fzn0x/mixmusic/compare/v0.4.0...v0.5.0

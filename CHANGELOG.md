@@ -13,6 +13,9 @@ All notable changes to MixMusic are documented here. The format follows
   (#50). When Spotify refuses the sign-in, Settings › Accounts now says
   why and offers to sign out, and MixMusic asks Spotify again a minute
   later, not several times a second.
+- A Spotify sign-in that Spotify refuses, as it refuses every app whose
+  owner has no Premium, no longer says "Signed in to Spotify": it tells
+  Spotify's reason instead.
 - On Linux, signing in to YouTube Music no longer closes MixMusic (#51).
   MixMusic now uses MyGo 0.6.2, which no longer damages memory as the
   first window opens on computers with a GPU.

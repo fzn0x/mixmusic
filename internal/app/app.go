@@ -225,7 +225,7 @@ func (a *App) Bind() { mygo.Bind(&SpotifyPage{a}) }
 // webview, so it runs on systems without one, where opening such a window
 // would panic.
 func needWebView(what string) error {
-	if mygo.WebViewAvailable() {
+	if webViewAvailable() {
 		return nil
 	}
 	switch runtime.GOOS {
@@ -235,6 +235,17 @@ func needWebView(what string) error {
 		return fmt.Errorf("%s needs WebKitGTK, which this computer doesn't have: install libwebkit2gtk-4.1-0 on Debian and Ubuntu, webkit2gtk4.1 on Fedora", what)
 	}
 	return fmt.Errorf("%s needs the system's webview, which this computer doesn't have", what)
+}
+
+// webViewAvailable is mygo.WebViewAvailable, asked on the main thread. On
+// Linux the first call loads WebKitGTK and keeps its cookies in a file,
+// which creates WebKit's default web context on the calling thread. Created
+// on another thread than GTK's, the context makes the web view of the next
+// window abort as GTK's thread creates it (#51).
+func webViewAvailable() bool {
+	var available bool
+	mygo.RunOnMain(func() { available = mygo.WebViewAvailable() })
+	return available
 }
 
 // schemeURL returns the base URL of a custom scheme, as WebView2 serves

@@ -6,6 +6,11 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-10-24
+
+On Linux, signing in to YouTube Music no longer closes MixMusic (#51).
+MixMusic 0.3.0 and later offer this version in Settings › About.
+
 ### Fixed
 
 - On Linux, signing in to YouTube Music no longer closes MixMusic as the
@@ -384,7 +389,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.3...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.4...HEAD
+[0.5.4]: https://github.com/fzn0x/mixmusic/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/fzn0x/mixmusic/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/fzn0x/mixmusic/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/fzn0x/mixmusic/compare/v0.5.0...v0.5.1

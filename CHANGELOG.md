@@ -6,6 +6,12 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- On Linux, signing in to YouTube Music no longer closes MixMusic as the
+  sign-in window opens (#51). MixMusic now asks whether WebKitGTK is
+  there on the thread that opens windows, where WebKit has to start.
+
 ## [0.5.3] - 2026-10-23
 
 Signed in to Spotify, MixMusic no longer flickers between signed in and

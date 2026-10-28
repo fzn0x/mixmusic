@@ -58,7 +58,7 @@ func (s *shell) homePage(c *ui.Context) {
 					s.navigate("/settings/accounts")
 				}
 			}
-			if s.flatTile(c, "tile-liked", 1, span, columns, "liked songs", plural(len(s.svc.Collection.LikedIDs()), "track"), "Liked songs", nil) {
+			if s.flatTile(c, "tile-liked", 1, span, columns, "liked songs", plural(len(s.svc.Collection.Liked()), "track"), "Liked songs", nil) {
 				s.navigate("/library/liked")
 			}
 			if s.flatTile(c, "tile-mixes", 2, span, columns, "your mixes", plural(len(s.svc.Collection.Playlists()), "mix", "mixes"), "Your mixes", nil) {

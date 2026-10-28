@@ -108,10 +108,10 @@ var testTracks = []media.Track{
 
 // newTestShell is the main window of an app in a folder of its own, whose
 // player plays nothing, and whose pages show what the test gives them.
-func newTestShell(t *testing.T) *shell { return newTestShellOf(t, nil) }
+func newTestShell(t testing.TB) *shell { return newTestShellOf(t, nil) }
 
 // newTestShellOf is newTestShell of an app whose options set changes.
-func newTestShellOf(t *testing.T, set func(o *app.Options)) *shell {
+func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 	t.Helper()
 	dir := t.TempDir()
 	for _, d := range []string{"data", "cache", "logs"} {

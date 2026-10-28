@@ -25,7 +25,7 @@ import (
 func tester(t *testing.T, s *shell) *ui.Tester { return testerOf(t, s, 1280, 820) }
 
 // testerOf is a window of the shell of a size.
-func testerOf(t *testing.T, s *shell, w, h int) *ui.Tester {
+func testerOf(t testing.TB, s *shell, w, h int) *ui.Tester {
 	t.Helper()
 	for _, key := range []string{"home", "explore", "charts"} {
 		s.loads[key] = &loaded[[]media.Shelf]{done: true}

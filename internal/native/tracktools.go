@@ -24,6 +24,24 @@ var trackSortLabels = []string{"", "Title", "Artist", "Length"}
 type trackTool struct {
 	sort  string
 	query string
+	// view is the view made last: of the tracks of, sorted by viewSort and
+	// searched for viewQuery. A list of thousands of tracks sorts once, not
+	// in every frame.
+	view                trackView
+	of                  []media.Track
+	viewSort, viewQuery string
+}
+
+// viewOf returns the view of tracks the user's sort and search make, made
+// again only when one of them changed. Lists of tracks are replaced when
+// they change, not changed in place: the same slice holds the same tracks.
+func (t *trackTool) viewOf(tracks []media.Track) trackView {
+	same := len(t.of) == len(tracks) && (len(tracks) == 0 || &t.of[0] == &tracks[0])
+	if !same || t.viewSort != t.sort || t.viewQuery != t.query {
+		t.view = viewTracks(tracks, t.sort, t.query)
+		t.of, t.viewSort, t.viewQuery = tracks, t.sort, t.query
+	}
+	return t.view
 }
 
 // trackView is a list of tracks as the user sorted and searched it: its
@@ -46,7 +64,7 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 	if len(tracks) < 2 {
 		return viewTracks(tracks, "order", "")
 	}
-	view := viewTracks(tracks, tool.sort, tool.query)
+	view := tool.viewOf(tracks)
 	ui.Row(c).Gap(12).Margin(0, 0, 16).Children(func() {
 		box := ui.Row(c).Height(36).Width(320).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).Radius(k.radiusSm).Cursor(ui.CursorText)
 		var search ui.Element

@@ -6,6 +6,13 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-10-28
+
+Pages scroll smoothly on every system, even with thousands of liked songs
+(#59). A song that loads plays rather than pausing, and Exit in the tray
+menu quits MixMusic with "Close to the tray" on. MixMusic 0.3.0 and later
+offer this version in Settings › About.
+
 ### Fixed
 
 - Pages scroll smoothly (#59): liked songs, playlists, the history and
@@ -405,7 +412,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.4...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.5...HEAD
+[0.5.5]: https://github.com/fzn0x/mixmusic/compare/v0.5.4...v0.5.5
 [0.5.4]: https://github.com/fzn0x/mixmusic/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/fzn0x/mixmusic/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/fzn0x/mixmusic/compare/v0.5.1...v0.5.2

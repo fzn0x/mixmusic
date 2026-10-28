@@ -307,6 +307,36 @@ func (s *shell) inView(c *ui.Context, e ui.Element) bool {
 	return false
 }
 
+// nearView reports whether e showed in the window in the frame before, or
+// within a window's height of it: the rows of a long list build their
+// content only there, so that a frame of a list of thousands takes about
+// as long as of a few. An element new to the window is near when at, how
+// far down its list it lays out, is.
+func (s *shell) nearView(c *ui.Context, e ui.Element, at float32) bool {
+	_, h := c.Size()
+	b := e.Bounds()
+	if b == (ui.Rect{}) {
+		if at < 2*h {
+			return true
+		}
+		c.Invalidate() // to tell once it laid out
+		return false
+	}
+	return b.Y+b.H >= -h && b.Y <= 2*h
+}
+
+// followMoves asks for another frame when the list e, keyed key, moved
+// since the frame before, as when its page scrolls: its rows tell whether
+// they are near the view from where they were, which a jump, as to the
+// page's end, leaves behind.
+func (s *shell) followMoves(c *ui.Context, key string, e ui.Element) {
+	y := e.Bounds().Y
+	if was, ok := s.listTops[key]; ok && was != y {
+		c.Invalidate()
+	}
+	s.listTops[key] = y
+}
+
 // artPixels is how many pixels artwork of size DIPs takes, at the scale of
 // most displays.
 func artPixels(size float32) int { return int(size * 1.5) }

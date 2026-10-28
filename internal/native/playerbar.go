@@ -130,10 +130,13 @@ func (s *shell) transport(c *ui.Context) {
 			s.p.Previous()
 		}
 		name, label := "play", "Play"
-		if s.st.Playing {
+		switch {
+		case s.st.Loading:
+			label = "Loading" // a track loading can't be paused
+		case s.st.Playing:
 			name, label = "pause", "Pause"
 		}
-		main := s.roundButton(c, "toggle", name, label, true, !hasTrack && len(s.st.Queue) == 0)
+		main := s.roundButton(c, "toggle", name, label, true, s.st.Loading || !hasTrack && len(s.st.Queue) == 0)
 		if s.st.Buffering {
 			main.Opacity(0.55 + 0.45*main.Loop("busy", 900*time.Millisecond, ui.EaseInOut))
 		}

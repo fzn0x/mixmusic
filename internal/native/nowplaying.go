@@ -57,10 +57,13 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 				s.progress(c)
 				ui.Row(c).Gap(12).Children(func() {
 					name, label := "play", "Play"
-					if s.st.Playing {
+					switch {
+					case s.st.Loading:
+						label = "Loading"
+					case s.st.Playing:
 						name, label = "pause", "Pause"
 					}
-					if s.roundButton(c, "now-toggle", name, label, true, false).Clicked() {
+					if s.roundButton(c, "now-toggle", name, label, true, s.st.Loading).Clicked() {
 						s.p.Toggle()
 					}
 					if s.roundButton(c, "now-next", "next", "Next", false, false).Clicked() {

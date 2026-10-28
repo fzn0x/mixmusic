@@ -8,11 +8,13 @@ All notable changes to MixMusic are documented here. The format follows
 
 ### Fixed
 
-- Long lists of songs scroll smoothly: liked songs, playlists, the
-  history and the libraries of Spotify and YouTube Music. A frame of a
-  list of a thousand songs took about as long as fifteen of a hundred;
-  MixMusic now builds only the rows near the window, and sorts and
-  searches a list when it changes, not in every frame.
+- Pages scroll smoothly (#59): liked songs, playlists, the history and
+  the libraries of Spotify and YouTube Music, and the shelves of Home,
+  Explore and the artists' pages. Every frame built every row and tile of
+  the page, so that a list of a thousand songs scrolled at a few frames a
+  second; MixMusic now builds only what is near the window, as fast for
+  five thousand songs as for a hundred, and sorts and searches a list
+  when it changes, not in every frame.
 - A song that loads can no longer be paused, from the play button, the
   media keys or the tray: it plays once it loaded. Choosing another song
   still leaves it. The play button shows that the song loads.

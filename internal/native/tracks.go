@@ -34,10 +34,18 @@ func (s *shell) trackList(c *ui.Context, key string, tracks []media.Track, o tra
 	}
 	cur, hasCur := s.st.Current()
 	list := ui.Column(c.Key(key))
-	s.followMoves(c, key, list)
+	from, to := s.nearRows(c, key, list, len(tracks), s.lk.row)
 	list.Children(func() {
-		for i, t := range tracks {
+		// The rows far from the view take their room, and build nothing.
+		if from > 0 {
+			ui.Box(c).Height(float32(from) * s.lk.row)
+		}
+		for i := from; i < to; i++ {
+			t := tracks[i]
 			s.trackRow(c, key, i, t, tracks, hasCur && cur.Track.ID == t.ID, o)
+		}
+		if to < len(tracks) {
+			ui.Box(c).Height(float32(len(tracks)-to) * s.lk.row)
 		}
 	})
 }
@@ -45,10 +53,6 @@ func (s *shell) trackList(c *ui.Context, key string, tracks []media.Track, o tra
 func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks []media.Track, current bool, o trackListOptions) {
 	k := &s.lk
 	row := ui.Row(c.Key(key+"-"+count(i)+"-"+t.ID)).Height(k.row).Padding(0, 8).Gap(16).Radius(k.radiusSm)
-	// Rows far from the view keep their height, and build nothing in it.
-	if !s.nearView(c, row, float32(i)*k.row) {
-		return
-	}
 	ink, sub := k.text, k.muted
 	switch {
 	case current:

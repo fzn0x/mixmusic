@@ -116,4 +116,59 @@ func TestFarRowsBuildNothing(t *testing.T) {
 	if !shown {
 		t.Errorf("no row in view shows its track: %q", tt.Texts())
 	}
+	settled(t, tt)
+}
+
+// settled fails when the window, still, asks for frames: what tells the
+// rows near the view asks for one once what it follows moved, not again.
+func settled(t *testing.T, tt *ui.Tester) {
+	t.Helper()
+	tt.Frame()
+	if tt.FramePending() {
+		t.Error("the window, still, asks for frames")
+	}
+}
+
+// TestFarShelvesBuildNothing scrolls the home page of many shelves to its
+// end: the shelves there show, and the first builds nothing.
+func TestFarShelvesBuildNothing(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 820)
+	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: shelves(12, 6)}
+	show(s, tt, "/")
+	if !tt.HasText("Shelf 0") || tt.HasText("Shelf 11") {
+		t.Fatalf("at the top, the window shows %q", tt.Texts())
+	}
+	for range 40 {
+		tt.Wheel(640, 400, 0, 400)
+		tt.Advance(16 * time.Millisecond)
+	}
+	tt.Advance(time.Second)
+	if !tt.HasText("Shelf 11") || tt.HasText("Shelf 0") {
+		t.Errorf("at the end, the window shows %q", tt.Texts())
+	}
+	settled(t, tt)
+}
+
+// TestFarTilesBuildNothing scrolls a shelf of many tiles to its end: the
+// tiles there show, and the first builds nothing.
+func TestFarTilesBuildNothing(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 820)
+	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 40)}
+	show(s, tt, "/")
+	if !tt.HasText("Album 0") || tt.HasText("Album 39") {
+		t.Fatalf("at the start, the shelf shows %q", tt.Texts())
+	}
+	// Its arrows, under the home's tiles, come into view.
+	tt.Wheel(640, 400, 0, 2000)
+	tt.Advance(time.Second)
+	for range 24 {
+		click(t, s, tt, "Scroll Shelf 0 on")
+		tt.Advance(time.Second)
+	}
+	if !tt.HasText("Album 39") || tt.HasText("Album 0") {
+		t.Errorf("at the end, the shelf shows %q", tt.Texts())
+	}
+	settled(t, tt)
 }

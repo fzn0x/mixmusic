@@ -75,6 +75,9 @@ type State struct {
 	// Volume is from 0 to 1, without Muted.
 	Volume float64
 	Muted  bool
+	// Loading is set from when a track is asked to play until it plays or
+	// fails: it can't be paused meanwhile, only left for another track.
+	Loading bool
 	// Error is why the current track couldn't play.
 	Error string
 	// Source is how the current track plays, once prepared.

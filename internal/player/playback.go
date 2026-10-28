@@ -104,6 +104,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	p.s.Duration = ms(entry.Track.DurationMs)
 	p.s.Error = ""
 	p.s.Buffering = true
+	p.s.Loading = autoplay
 	p.s.Source = nil
 	// What the engine played stops now: finding the track's stream may take
 	// a while, or fail.
@@ -214,6 +215,7 @@ func (p *Player) fail(message string) {
 	cur, ok := p.s.Current()
 	p.s.Error = message
 	p.s.Buffering = false
+	p.s.Loading = false
 	p.s.Playing = false
 	p.emit(StateChange)
 	p.failures++
@@ -338,6 +340,9 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 }
 
 func (p *Player) play() {
+	if p.s.Loading {
+		return // it plays once loaded
+	}
 	if _, ok := p.s.Current(); !ok {
 		if len(p.s.Queue) > 0 {
 			p.playAt(0, 0, true)
@@ -362,6 +367,9 @@ func (p *Player) play() {
 }
 
 func (p *Player) pause() {
+	if p.s.Loading {
+		return // a track loading plays: only another track stops it
+	}
 	if p.connect.active() {
 		p.connect.pause()
 		return
@@ -391,7 +399,8 @@ func (p *Player) seek(t time.Duration) {
 		p.stream.Seek(t)
 	default:
 		if _, ok := p.s.Current(); ok {
-			p.playAt(p.s.Index, t, false)
+			// A track loading goes on to play, from t.
+			p.playAt(p.s.Index, t, p.s.Loading)
 		}
 	}
 	p.emit(Progress)
@@ -557,6 +566,7 @@ func (p *Player) onPlaying(playing bool) {
 	p.s.Playing = playing
 	if playing {
 		p.s.Buffering = false
+		p.s.Loading = false
 	}
 	p.report()
 	p.emit(StateChange)

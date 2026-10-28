@@ -498,6 +498,81 @@ func TestSwitchSilences(t *testing.T) {
 	h.wait("c playing", playing("c"))
 }
 
+// TestLoadingPlays has a track that loads play: it can't be paused
+// meanwhile, only left for another track.
+func TestLoadingPlays(t *testing.T) {
+	// a is found once released.
+	loading := func(t *testing.T) (*harness, func()) {
+		found := make(chan struct{})
+		release := sync.OnceFunc(func() { close(found) })
+		h := newHarness(t, Saved{}, func(f *fakeServices) {
+			f.prepare = func(t media.Track) (Source, error) {
+				if t.ID == "yt:a" {
+					<-found
+				}
+				return streamOf(t), nil
+			}
+		})
+		t.Cleanup(release)
+		h.p.PlayTracks(tracks("a", "b"), 0)
+		h.wait("a loading", func(p *Player) bool { return p.s.Index == 0 && p.s.Loading })
+		return h, release
+	}
+
+	t.Run("no pause", func(t *testing.T) {
+		h, release := loading(t)
+		h.p.Toggle()
+		h.p.Pause()
+		h.p.Play()
+		h.p.ToggleOnce()
+		// A seek moves where it plays from, and it still plays.
+		h.p.Seek(30 * time.Second)
+		h.on(func(p *Player) {
+			if !p.s.Loading || p.s.Index != 0 {
+				t.Errorf("after the presses: loading %v, index %d", p.s.Loading, p.s.Index)
+			}
+		})
+		if h.stream.has("pause") {
+			t.Errorf("the load was paused: %q", h.stream.copy())
+		}
+		release()
+		h.wait("a playing", playing("a"))
+		if got := h.stream.lastLoad(); got != "load url:yt:a 30s true" {
+			t.Errorf("loaded %q", got)
+		}
+		if h.p.State().Loading {
+			t.Error("still loading once it plays")
+		}
+		// Once it plays, it pauses.
+		h.p.Toggle()
+		h.wait("pausing", func(p *Player) bool { return !p.s.Playing })
+	})
+
+	t.Run("another track", func(t *testing.T) {
+		h, release := loading(t)
+		h.p.Next()
+		h.wait("b playing", playing("b"))
+		release()
+		time.Sleep(20 * time.Millisecond)
+		h.on(func(p *Player) {
+			if cur, _ := p.s.Current(); cur.Track.ID != "yt:b" || h.stream.lastLoad() != "load url:yt:b 0s true" {
+				t.Errorf("a, found late, took over: %q", h.stream.copy())
+			}
+		})
+	})
+
+	t.Run("failing", func(t *testing.T) {
+		h := newHarness(t, Saved{}, func(f *fakeServices) {
+			f.prepare = func(media.Track) (Source, error) { return Source{}, errors.New("offline.") }
+		})
+		h.p.PlayTracks(tracks("a"), 0)
+		h.wait("a failing", func(p *Player) bool { return p.s.Error != "" })
+		if h.p.State().Loading {
+			t.Error("still loading once it failed")
+		}
+	})
+}
+
 func TestEnd(t *testing.T) {
 	h := newHarness(t, Saved{})
 	h.p.PlayTracks(tracks("a", "b"), 0)

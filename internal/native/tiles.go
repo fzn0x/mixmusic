@@ -2,6 +2,7 @@ package native
 
 import (
 	"context"
+	"math"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
@@ -70,12 +71,19 @@ func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, col
 	return t.Clicked()
 }
 
+// artTileSize is the width of an art tile, and shelfGap the gap between the
+// tiles of a shelf.
+const (
+	artTileSize = 172
+	shelfGap    = 16
+)
+
 // artTile is a square frame of artwork with its title and a subtitle that
 // starts with the source mark; round for artists. Hovering shows a play
 // circle. It tells whether it was opened or its play circle clicked.
 func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, subtitle string, source media.Source, round, active, playable bool, menu func(m *ui.Menu)) (open, play bool) {
 	k := &s.lk
-	const size = 172
+	const size = artTileSize
 	tile := ui.ButtonBase(c.Key(key)).Width(size).Shrink(0).Column().AlignItems(ui.Start).Gap(8).Label(title).Cursor(ui.CursorPointer)
 	if menu != nil {
 		tile.ContextMenu(menu)
@@ -127,7 +135,12 @@ func (s *shell) shelfWith(c *ui.Context, key, title string, links, tiles func())
 		s.shelfScroll[at] = st
 	}
 	step := 0.8 * (s.paneWidth(c) - 2*k.gutter)
-	ui.Column(c.Key(key)).Margin(0, 0, 48).Children(func() {
+	col := ui.Column(c.Key(key)).Margin(0, 0, 48)
+	if h, far := s.farFromView(c, "shelf "+at, col); far {
+		col.Height(h) // its tiles build once it nears the view
+		return
+	}
+	col.Children(func() {
 		s.sectionHead(c, title, func() {
 			if links != nil {
 				links()
@@ -139,7 +152,7 @@ func (s *shell) shelfWith(c *ui.Context, key, title string, links, tiles func())
 				st.ScrollTo(min(st.X+step, st.MaxX), 0, ui.Smooth)
 			}
 		})
-		ui.ScrollHorizontal(c).TrackScroll(st).Gap(16).Padding(0, 0, 12).Children(tiles)
+		ui.ScrollHorizontal(c).TrackScroll(st).Gap(shelfGap).Padding(0, 0, 12).Children(tiles)
 	})
 }
 
@@ -294,9 +307,35 @@ func (s *shell) shelves(c *ui.Context, key string, shelves []media.Shelf) {
 			}
 		}
 		s.shelf(c, key+"-"+count(i), sh.Title, func() {
-			for j, it := range sh.Items {
-				s.itemTile(c, key+"-"+count(i)+"-"+count(j), it, tracks)
+			// The tiles far to either side take their room, and build
+			// nothing.
+			n := len(sh.Items)
+			from, to := s.nearTiles(c, key+"-"+count(i), n)
+			if from > 0 {
+				ui.Box(c).Width(float32(from)*(artTileSize+shelfGap) - shelfGap).Shrink(0)
+			}
+			for j := from; j < to; j++ {
+				s.itemTile(c, key+"-"+count(i)+"-"+count(j), sh.Items[j], tracks)
+			}
+			if to < n {
+				ui.Box(c).Width(float32(n-to)*(artTileSize+shelfGap) - shelfGap).Shrink(0)
 			}
 		})
 	}
+}
+
+// nearTiles returns the tiles, of the n art tiles of the shelf keyed key,
+// that showed in the frame before, or within the pane's width of them. A
+// shelf that scrolled since asks for another frame, as followMoves does.
+func (s *shell) nearTiles(c *ui.Context, key string, n int) (from, to int) {
+	at := s.pagePath + " " + key
+	x := float32(0)
+	if st := s.shelfScroll[at]; st != nil {
+		x = st.X
+	}
+	s.moved(c, "tiles "+at, x)
+	w, step := s.paneWidth(c), float32(artTileSize+shelfGap)
+	from = min(max(int((x-w)/step), 0), n)
+	to = min(max(int(math.Ceil(float64((x+2*w)/step))), from), n)
+	return from, to
 }

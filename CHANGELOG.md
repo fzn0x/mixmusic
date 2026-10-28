@@ -6,6 +6,20 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Long lists of songs scroll smoothly: liked songs, playlists, the
+  history and the libraries of Spotify and YouTube Music. A frame of a
+  list of a thousand songs took about as long as fifteen of a hundred;
+  MixMusic now builds only the rows near the window, and sorts and
+  searches a list when it changes, not in every frame.
+- A song that loads can no longer be paused, from the play button, the
+  media keys or the tray: it plays once it loaded. Choosing another song
+  still leaves it. The play button shows that the song loads.
+- Exit, in the tray icon's menu, quits MixMusic again with "Close to the
+  tray" on: it closed the window to the tray instead, and MixMusic kept
+  running. Quit (Cmd+Q) on macOS did the same.
+
 ## [0.5.4] - 2026-10-24
 
 On Linux, signing in to YouTube Music no longer closes MixMusic (#51).

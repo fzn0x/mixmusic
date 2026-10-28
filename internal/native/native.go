@@ -198,7 +198,8 @@ type shell struct {
 	// sorted and searched the lists of tracks, by key.
 	wells map[string]*colorWell
 	tools map[string]*trackTool
-	// listTops are where the track lists were in the frame before, by key.
+	// listTops are where the track lists and the shelves were in the frame
+	// before, by key.
 	listTops map[string]float32
 
 	// plugins runs the app's plugins, for the main window; nil in others.

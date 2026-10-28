@@ -1,6 +1,7 @@
 package native
 
 import (
+	"math"
 	"strings"
 	"unicode/utf8"
 
@@ -307,34 +308,52 @@ func (s *shell) inView(c *ui.Context, e ui.Element) bool {
 	return false
 }
 
-// nearView reports whether e showed in the window in the frame before, or
-// within a window's height of it: the rows of a long list build their
-// content only there, so that a frame of a list of thousands takes about
-// as long as of a few. An element new to the window is near when at, how
-// far down its list it lays out, is.
-func (s *shell) nearView(c *ui.Context, e ui.Element, at float32) bool {
+// nearRows returns the rows, of the n rows of height row of the list e
+// keyed key, that showed in the window in the frame before, or within a
+// window's height of it: a long list builds only those, and takes their
+// room with the others, so that a frame of a list of thousands takes about
+// as long as of a few. A list new to the window starts at its top.
+//
+// The rows near are told from where the list was, as followMoves says.
+func (s *shell) nearRows(c *ui.Context, key string, e ui.Element, n int, row float32) (from, to int) {
 	_, h := c.Size()
-	b := e.Bounds()
-	if b == (ui.Rect{}) {
-		if at < 2*h {
-			return true
-		}
-		c.Invalidate() // to tell once it laid out
-		return false
-	}
-	return b.Y+b.H >= -h && b.Y <= 2*h
+	top := s.followMoves(c, key, e)
+	from = min(max(int((-h-top)/row), 0), n)
+	to = min(max(int(math.Ceil(float64((2*h-top)/row))), from), n)
+	return from, to
 }
 
-// followMoves asks for another frame when the list e, keyed key, moved
-// since the frame before, as when its page scrolls: its rows tell whether
-// they are near the view from where they were, which a jump, as to the
-// page's end, leaves behind.
-func (s *shell) followMoves(c *ui.Context, key string, e ui.Element) {
-	y := e.Bounds().Y
-	if was, ok := s.listTops[key]; ok && was != y {
+// farFromView reports whether e, keyed key, lay more than a window's
+// height from the window in the frame before, and its height then: a
+// shelf far from the view keeps its room, and builds nothing. It is told
+// from where e was, as followMoves says.
+func (s *shell) farFromView(c *ui.Context, key string, e ui.Element) (height float32, far bool) {
+	_, h := c.Size()
+	s.followMoves(c, key, e)
+	b := e.Bounds()
+	if b == (ui.Rect{}) {
+		return 0, false
+	}
+	return e.LayoutBounds().H, b.Y+b.H < -h || b.Y > 2*h
+}
+
+// followMoves returns the top of e, keyed key, in the frame before. What
+// is near the view is told from there: when e moved since the frame
+// before, as when its page scrolls, followMoves asks for another frame,
+// for what a jump, as to the page's end, brought into view.
+func (s *shell) followMoves(c *ui.Context, key string, e ui.Element) float32 {
+	top := e.Bounds().Y
+	s.moved(c, key, top)
+	return top
+}
+
+// moved keeps where what is keyed key is, at, and asks for another frame
+// when it moved since the frame before.
+func (s *shell) moved(c *ui.Context, key string, at float32) {
+	if was, ok := s.listTops[key]; ok && was != at {
 		c.Invalidate()
 	}
-	s.listTops[key] = y
+	s.listTops[key] = at
 }
 
 // artPixels is how many pixels artwork of size DIPs takes, at the scale of

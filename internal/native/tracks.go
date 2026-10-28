@@ -33,7 +33,9 @@ func (s *shell) trackList(c *ui.Context, key string, tracks []media.Track, o tra
 		return
 	}
 	cur, hasCur := s.st.Current()
-	ui.Column(c.Key(key)).Children(func() {
+	list := ui.Column(c.Key(key))
+	s.followMoves(c, key, list)
+	list.Children(func() {
 		for i, t := range tracks {
 			s.trackRow(c, key, i, t, tracks, hasCur && cur.Track.ID == t.ID, o)
 		}
@@ -43,6 +45,10 @@ func (s *shell) trackList(c *ui.Context, key string, tracks []media.Track, o tra
 func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks []media.Track, current bool, o trackListOptions) {
 	k := &s.lk
 	row := ui.Row(c.Key(key+"-"+count(i)+"-"+t.ID)).Height(k.row).Padding(0, 8).Gap(16).Radius(k.radiusSm)
+	// Rows far from the view keep their height, and build nothing in it.
+	if !s.nearView(c, row, float32(i)*k.row) {
+		return
+	}
 	ink, sub := k.text, k.muted
 	switch {
 	case current:

@@ -198,6 +198,8 @@ type shell struct {
 	// sorted and searched the lists of tracks, by key.
 	wells map[string]*colorWell
 	tools map[string]*trackTool
+	// listTops are where the track lists were in the frame before, by key.
+	listTops map[string]float32
 
 	// plugins runs the app's plugins, for the main window; nil in others.
 	plugins *plugins.Host
@@ -237,7 +239,7 @@ type shell struct {
 
 func newShell(a *app.App, p *player.Player) *shell {
 	s := &shell{a: a, svc: a.Services(), p: p, router: ui.NewRouter("/"), loads: map[string]any{}, drafts: map[string]*draft{}, shelfScroll: map[string]*ui.ScrollState{},
-		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, keeping: map[string]bool{}, licenseOpen: -1,
+		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, listTops: map[string]float32{}, keeping: map[string]bool{}, licenseOpen: -1,
 		mountedViews: map[*plugins.View]bool{}, seenViews: map[*plugins.View]bool{}, pluginInputs: map[string]*string{},
 		canvasSizes: map[*plugins.Canvas][2]float32{}, cssColors: map[string]ui.Color{}, svgs: map[string]*ui.SVG{}}
 	s.queueList.Selected = new(int)

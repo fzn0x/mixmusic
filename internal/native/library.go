@@ -38,7 +38,7 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 		for i, id := range ids {
 			switch id {
 			case "liked":
-				counts[i] = len(s.svc.Collection.LikedIDs())
+				counts[i] = len(s.svc.Collection.Liked())
 			case "mixes":
 				counts[i] = len(s.svc.Collection.Playlists())
 			default:

@@ -28,6 +28,9 @@ var mediaKeys = map[string]Command{
 // icon, the media keys, the deep links of portable copies. It runs once the
 // app is ready.
 func (a *App) Start() {
+	// Quitting closes every window; the main window must close then, not
+	// hide in the tray, or the quit stops there.
+	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) { a.quitting.Store(true) })
 	if runtime.GOOS != "darwin" && !mygo.App.IsPackaged() {
 		if err := mygo.App.RegisterURLScheme(URLScheme); err != nil {
 			log.Printf("mixmusic: registering %s links: %v", URLScheme, err)
@@ -79,7 +82,7 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 		a.mu.Lock()
 		tray := a.tray
 		a.mu.Unlock()
-		if tray != nil && a.settings.Get().CloseToTray {
+		if tray != nil && a.settings.Get().CloseToTray && !a.quitting.Load() {
 			e.PreventDefault()
 			win.Hide() // keep playing in the tray
 		}

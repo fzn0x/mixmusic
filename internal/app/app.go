@@ -113,6 +113,9 @@ type App struct {
 	readingProfiles atomic.Bool
 	// updating is held while an update installs.
 	updating sync.Mutex
+	// quitting is set once MixMusic starts to quit: its windows close then,
+	// even with close to the tray on.
+	quitting atomic.Bool
 
 	mu         sync.Mutex
 	installed  string // the version installed to run at the next start

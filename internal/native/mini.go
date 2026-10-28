@@ -123,10 +123,13 @@ func (s *shell) miniControls(c *ui.Context) {
 			s.p.Previous()
 		}
 		name, label := "play", "Play"
-		if s.st.Playing {
+		switch {
+		case s.st.Loading:
+			label = "Loading"
+		case s.st.Playing:
 			name, label = "pause", "Pause"
 		}
-		toggle := s.round(c, "mini-toggle", name, label, true, !ok && len(s.st.Queue) == 0, 40, 18)
+		toggle := s.round(c, "mini-toggle", name, label, true, s.st.Loading || !ok && len(s.st.Queue) == 0, 40, 18)
 		if s.st.Buffering {
 			toggle.Opacity(0.55 + 0.45*toggle.Loop("busy", 900*time.Millisecond, ui.EaseInOut))
 		}

@@ -3,7 +3,7 @@
   "version": "0.5.5",
   "private": true,
   "type": "module",
-  "description": "Spotify and YouTube Music in one customizable desktop player",
+  "description": "YouTube Music and Spotify client for macOS, Windows and Linux. YouTube Music works with no account. One search, one queue, mixed playlists, synced lyrics, themes and plugins.",
   "license": "MIT",
   "author": "MixMusic contributors",
   "scripts": {

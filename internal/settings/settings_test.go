@@ -138,6 +138,39 @@ func TestRegistryURL(t *testing.T) {
 	}
 }
 
+// TestDiscordPresence shows what plays on Discord in new installs and in
+// the settings of earlier versions, where it was off until the user set it
+// up, unless they set it up and turned it off.
+func TestDiscordPresence(t *testing.T) {
+	if d := Default(); !d.DiscordPresence || d.DiscordApp() != DefaultDiscordAppID {
+		t.Errorf("a new install shows on Discord %v, as %q", d.DiscordPresence, d.DiscordApp())
+	}
+	const own = "123456789012345678"
+	for _, c := range []struct {
+		file string
+		want bool
+	}{
+		{`{}`, true},
+		{`{"discordPresence":false}`, true},
+		{`{"discordPresence":false,"discordAppId":"  "}`, true},
+		{`{"discordPresence":true,"discordAppId":"` + own + `"}`, true},
+		{`{"discordPresence":false,"discordAppId":"` + own + `"}`, false},
+		{`{"showOnDiscord":false}`, false},
+		{`{"showOnDiscord":true,"discordPresence":false,"discordAppId":"` + own + `"}`, true},
+	} {
+		s := Default()
+		if err := json.Unmarshal([]byte(c.file), &s); err != nil {
+			t.Fatal(err)
+		}
+		if s.DiscordPresence != c.want {
+			t.Errorf("%s shows on Discord %v, not %v", c.file, s.DiscordPresence, c.want)
+		}
+	}
+	if got := (Settings{DiscordAppID: own}).DiscordApp(); got != own {
+		t.Errorf("the user's application became %q", got)
+	}
+}
+
 // TestCleanPanel shows the queue for settings from before the panel, and
 // keeps the user's choice.
 func TestCleanPanel(t *testing.T) {

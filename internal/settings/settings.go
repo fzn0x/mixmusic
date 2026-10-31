@@ -2,6 +2,8 @@
 package settings
 
 import (
+	"cmp"
+	"encoding/json"
 	"maps"
 	"regexp"
 	"runtime"
@@ -124,8 +126,9 @@ type Settings struct {
 	Notifications bool `json:"notifications"`
 	MediaKeys     bool `json:"mediaKeys"`
 	// DiscordPresence shows what plays on the user's Discord profile, as
-	// the Discord application of DiscordAppID.
-	DiscordPresence bool   `json:"discordPresence"`
+	// the Discord application of DiscordAppID, or MixMusic's own when it
+	// is empty.
+	DiscordPresence bool   `json:"showOnDiscord"`
 	DiscordAppID    string `json:"discordAppId"`
 
 	// Tools.
@@ -151,6 +154,10 @@ const DefaultRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/mai
 // in their settings.
 const WebRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry.json"
 
+// DefaultDiscordAppID is MixMusic's own Discord application, whose name
+// Discord shows beside what plays when the user set no other.
+const DefaultDiscordAppID = "1562074343691788378"
+
 // Default returns the settings of a new install.
 func Default() Settings {
 	return Settings{
@@ -173,6 +180,7 @@ func Default() Settings {
 		CloseToTray:     false,
 		Notifications:   true,
 		MediaKeys:       true,
+		DiscordPresence: true,
 		Shortcuts:       map[string]string{},
 		EnabledPlugins:  []string{},
 		RegistryURL:     DefaultRegistryURL,
@@ -197,6 +205,29 @@ var (
 	// pageIDRe matches the page ID of a YouTube brand channel, a number.
 	pageIDRe = regexp.MustCompile(`^[0-9]{1,32}$`)
 )
+
+// UnmarshalJSON reads settings, those of the versions before 0.5.6 too,
+// where Discord showed nothing until the user turned it on and pasted the
+// ID of an application of theirs. Those settings show what plays now,
+// unless the user had pasted an ID and turned it off.
+func (s *Settings) UnmarshalJSON(data []byte) error {
+	type plain Settings
+	if err := json.Unmarshal(data, (*plain)(s)); err != nil {
+		return err
+	}
+	var keys struct {
+		Before *bool `json:"discordPresence"`
+		Now    *bool `json:"showOnDiscord"`
+	}
+	if json.Unmarshal(data, &keys) == nil && keys.Now == nil && keys.Before != nil {
+		s.DiscordPresence = *keys.Before || strings.TrimSpace(s.DiscordAppID) == ""
+	}
+	return nil
+}
+
+// DiscordApp returns the ID of the Discord application that shows what
+// plays: the user's, or MixMusic's own.
+func (s Settings) DiscordApp() string { return cmp.Or(s.DiscordAppID, DefaultDiscordAppID) }
 
 // ValidID reports whether id can name a theme or a plugin: lowercase
 // letters, digits and dashes.

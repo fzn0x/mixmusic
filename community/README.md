@@ -52,4 +52,6 @@ marketplace.
 - An add-on's folder stays under 4 MB.
 
 By opening the pull request, you agree that your add-on is published under
-the [MIT license](../LICENSE), as the rest of the repository.
+the [MIT license](../LICENSE-MIT) or the
+[GNU General Public License, version 3](../LICENSE-GPL), as the rest of the
+repository.

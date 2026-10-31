@@ -687,7 +687,7 @@ func (s *shell) aboutSettings(c *ui.Context) {
 		// Its links go under it, as they are many.
 		ui.Column(c).Gap(4).Padding(14, 0).Children(func() {
 			ui.Text(c, "MixMusic").FontSize(k.bodySize())
-			ui.Text(c, "Spotify and YouTube Music in one player, open source under the MIT license. Your data lives in "+info.DataDir+".").
+			ui.Text(c, "Spotify and YouTube Music in one player, open source under the MIT license or the GNU GPL, version 3. Your data lives in "+info.DataDir+".").
 				FontSize(k.smallSize()).TextColor(k.muted)
 			ui.Row(c).Gap(8).Wrap().Margin(12, 0, 0).Children(func() {
 				const repo = "https://github.com/fzn0x/mixmusic"

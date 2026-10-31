@@ -366,5 +366,7 @@ Music are trademarks of their owners.
 
 ## License
 
-[MIT](LICENSE). The Selawik typeface in `internal/native/fonts` is under the
+MixMusic is dual-licensed: use it under the [MIT license](LICENSE-MIT) or
+the [GNU General Public License, version 3](LICENSE-GPL), whichever you
+prefer. Contributions are accepted under both. The Selawik typeface in `internal/native/fonts` is under the
 [SIL Open Font License](internal/native/fonts/OFL.txt).

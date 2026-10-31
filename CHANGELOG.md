@@ -10,9 +10,9 @@ All notable changes to MixMusic are documented here. The format follows
 
 - A new icon: two pink rings and a play button on black, in the app, the
   tray, the website and the README.
-
-### Changed
-
+- MixMusic is dual-licensed: use it under the MIT license, as before, or
+  under the GNU General Public License, version 3, whichever you prefer.
+  Settings › About says so.
 - Your Discord profile shows what plays without setting anything up:
   MixMusic has its own Discord application now, so you no longer create
   one and paste its ID. It is on unless you turn off Show what plays on

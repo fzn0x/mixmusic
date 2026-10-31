@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "YouTube Music and Spotify client for macOS, Windows and Linux. YouTube Music works with no account. One search, one queue, mixed playlists, synced lyrics, themes and plugins.",
-  "license": "MIT",
+  "license": "MIT OR GPL-3.0-only",
   "author": "MixMusic contributors",
   "scripts": {
     "dev": "mygo dev",

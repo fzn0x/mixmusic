@@ -40,7 +40,7 @@ One queue and one library across Spotify and YouTube Music, in an open-source de
 
 ## Brand Commitments
 
-- Name: MixMusic. The icon is two overlapping rings with a play triangle where they meet, on a violet-to-coral gradient (`resources/icon.png`, drawn by `tools/genicon`).
+- Name: MixMusic. The icon is two overlapping pink line rings with a play triangle where they meet, on a black rounded tile (`resources/icon.svg`; the mark alone is `resources/mark.svg`, which the site's header uses).
 - The project never names other projects as references or inspirations in its code, docs or interface.
 - Spotify and YouTube Music are named as the services MixMusic plays, never imitated: no use of their logos or brand layouts. Each service has a theme token (`spotify`, `youtube`) used only to tag where a track comes from.
 

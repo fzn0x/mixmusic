@@ -8,6 +8,11 @@ All notable changes to MixMusic are documented here. The format follows
 
 ### Changed
 
+- A new icon: two pink rings and a play button on black, in the app, the
+  tray, the website and the README.
+
+### Changed
+
 - Your Discord profile shows what plays without setting anything up:
   MixMusic has its own Discord application now, so you no longer create
   one and paste its ID. It is on unless you turn off Show what plays on

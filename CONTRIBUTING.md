@@ -99,11 +99,10 @@ CHANGELOG.md, the downloads of
 [.github/release-notes.md](.github/release-notes.md) and `SHA256SUMS`. To
 build a tag again, run the workflow from the Actions tab with the tag.
 
-Once the release is published, move the [website](site/index.html) to it:
-its download links and sizes, the two `data-version` spans and the installer
-size in the open source section. Take out the `data-soon` marks of what the
-release brought; the page hides them anyway once a newer release is out, but
-only where GitHub's API answers.
+The [website](site/index.html)'s download buttons open the latest release,
+and the page reads the latest version from GitHub's API. Once the release is
+published, set the two `data-version` spans to it, for when the API does not
+answer.
 
 Installed apps update themselves from the latest release. Its update files are
 signed with the key whose public half is `updates.publicKey` in

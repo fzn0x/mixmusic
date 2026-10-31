@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MixMusic: Spotify and YouTube Music in one player</title>
   <meta name="description" content="MixMusic is a free, open-source desktop player for macOS, Windows and Linux: one search, one queue and one library across Spotify and YouTube Music, with themes and plugins from the community." />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#121212" />
   <link rel="icon" type="image/png" href="assets/icon.png" />
   <link rel="canonical" href="https://fzn0x.github.io/mixmusic/" />
   <meta property="og:type" content="website" />
@@ -14,564 +14,288 @@
   <meta property="og:url" content="https://fzn0x.github.io/mixmusic/" />
   <meta property="og:image" content="https://fzn0x.github.io/mixmusic/assets/og.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="preload" href="assets/fonts/selawkl.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="assets/fonts/selawk.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <a class="skip" href="#search">Skip to the features</a>
+  <a class="skip" href="#features">Skip to the features</a>
 
   <svg width="0" height="0" class="defs" aria-hidden="true" focusable="false">
     <symbol id="i-rings" viewBox="416.4 417.5 1214.7 1214.7"><path fill="#e6007e" fill-rule="evenodd" d="M 1023.05 643.34 C 1069.36 622.322 1119.06 609.778 1169.8 606.305 C 1281.1 599.879 1390.48 637.459 1474.32 710.939 C 1555.29 782.742 1609.37 886.982 1615.81 995.486 C 1623.14 1106.84 1585.49 1216.47 1511.28 1299.82 C 1438.83 1381.18 1334.39 1434.53 1225.25 1440.94 C 1150.01 1444.49 1093.99 1433.53 1024.8 1403.78 C 978.102 1423.87 936.402 1436.45 885.121 1440.69 C 775.431 1449.89 666.545 1415.43 582.115 1344.8 C 495.602 1272.68 441.774 1168.76 432.777 1056.49 C 424.394 947.506 459.052 839.581 529.315 755.856 C 606.886 665.23 707.132 615.705 825.55 606.411 C 832.418 605.575 848.738 605.64 855.828 605.718 C 913.598 606.333 970.585 619.154 1023.05 643.34 z M 830.747 656.435 C 875.519 653.066 921.756 661.355 964.684 673.299 C 911.331 707.198 865.916 752.206 831.538 805.253 C 772.933 896.09 753.502 1006.75 777.654 1112.12 C 801.747 1222.23 872.326 1313.17 966.205 1373.46 C 924.451 1388.07 862.325 1395.21 818.774 1390.36 C 741.933 1383.44 669.211 1352.55 610.895 1302.03 C 536.456 1238.57 490.706 1147.8 483.963 1050.21 C 476.687 953.555 508.335 857.996 571.868 784.788 C 638.702 707.398 729.286 663.909 830.747 656.435 z M 1181.91 656.436 C 1256.78 653.627 1330.74 673.675 1393.93 713.915 C 1478.25 767.195 1537.38 852.356 1557.84 949.97 C 1577.53 1043.84 1559.13 1141.69 1506.69 1222 C 1450.72 1308.36 1366.28 1363.77 1266.22 1385.01 C 1203.75 1395.77 1144.14 1393.91 1083.74 1373.03 C 1132.58 1345.13 1182.83 1294.65 1213.38 1247.71 C 1273.38 1156.46 1294.11 1044.89 1270.9 938.177 C 1246.7 824.879 1180.36 735.685 1083.83 673.158 C 1119.26 662.663 1145.55 658.482 1181.91 656.436 z M 1023.93 697.024 C 1036.84 702.862 1053.68 713.47 1065.3 721.443 C 1116.93 756.264 1159.21 803.232 1188.44 858.219 C 1232.02 942.089 1240.79 1039.75 1212.84 1130.04 C 1182.62 1228.35 1115.05 1302.21 1025.01 1349.84 C 956.341 1312.14 901.632 1263.59 863.324 1194.43 C 818.071 1112.61 807.045 1016.21 832.658 926.296 C 862.612 822.696 930.716 748.369 1023.93 697.024 z M 947.525 869.19 C 953.516 868.522 959.572 868.694 965.516 869.7 C 982.271 872.651 999.613 886.033 1013.79 895.232 L 1058.91 924.082 C 1088.46 943.004 1118.5 961.659 1147.45 981.477 C 1163.52 992.474 1171.9 1014.97 1167.89 1034 C 1165.79 1043.55 1161.09 1052.34 1154.32 1059.4 C 1145.89 1068.28 1126.65 1079.52 1115.7 1086.49 L 1063.51 1119.63 C 1042.4 1133.14 989.182 1170.69 968.968 1175.54 C 953.364 1179.28 937.004 1175.76 923.644 1167.1 C 911.507 1159.24 901.191 1145.77 898.317 1131.47 C 894.657 1113.26 896.072 1093.77 896.171 1075.26 L 896.153 1013.77 L 896.002 957.106 C 895.938 926.656 893.559 898.33 922.289 878.965 C 930.872 873.18 937.504 871.207 947.525 869.19 z M 954.862 921.814 C 962.503 921.865 975.539 931.666 982.278 935.908 L 1025.88 963.665 C 1053.72 981.474 1092.67 1004.74 1118.6 1023.56 C 1102.97 1035.36 1071.2 1054.19 1053.5 1065.34 C 1041.53 1073.05 965.413 1123.45 958.739 1123.3 C 956.112 1123.24 953.112 1122.24 951.358 1120.25 C 949.767 1118.44 949.163 1116.76 948.976 1114.4 C 948.175 1104.31 948.834 1093.7 948.84 1083.56 L 948.855 1020.95 L 948.792 961.699 C 948.789 951.35 948.606 940.555 949.085 930.222 C 949.286 925.903 951.519 924.63 954.862 921.814 z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3.5v12M7 10.5l5 5 5-5M4 20.5h16" /></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3.1-5.4 3.1 1.2-6L3.3 9.8l6.1-.7z" /></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M13.5 4h6.5v6.5M20 4l-9 9M17.5 14v6h-14V6.5h6" /></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM15.2 15.2 20.5 20.5" /></symbol>
     <symbol id="i-queue" viewBox="0 0 24 24"><path d="M3.5 6h11M3.5 11h11M3.5 16h7M17 13.5v7l4.5-3.5z" /></symbol>
     <symbol id="i-library" viewBox="0 0 24 24"><path d="M4 20V4M8 20V4M12.5 20 11 4.5M16 20l3.5-15" /></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17ZM15.5 8.5l-2 5-5 2 2-5z" /></symbol>
     <symbol id="i-lyrics" viewBox="0 0 24 24"><path d="M4.5 5h15v10.5H11l-4.5 4v-4h-2zM8 9h8M8 12h5" /></symbol>
     <symbol id="i-keyboard" viewBox="0 0 24 24"><path d="M3 6.5h18v11H3zM6.5 10h.01M10 10h.01M13.5 10h.01M17 10h.01M7.5 14h9" /></symbol>
-    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.4-1.2-1.7-1.2-3 0-1 .8-1.6 1.8-1.6H17a3.5 3.5 0 0 0 3.5-3.5c0-4-3.8-7.2-8.5-7.2ZM7.5 11.5h.01M9.5 7.5h.01M14.5 7.5h.01" /></symbol>
+    <symbol id="i-account" viewBox="0 0 24 24"><path d="M12 11.5a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5ZM4.5 20.5c.9-3.6 3.9-5.8 7.5-5.8s6.6 2.2 7.5 5.8" /></symbol>
     <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M9.5 4.5a2 2 0 1 1 4 0V6H18v4.5h-1.5a2 2 0 1 0 0 4H18V19h-4.5v-1.5a2 2 0 1 0-4 0V19H5v-4.5h1.5a2 2 0 1 0 0-4H5V6h4.5z" /></symbol>
-    <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.5 6.5 3 12l5.5 5.5M15.5 6.5 21 12l-5.5 5.5M13.5 4.5l-3 15" /></symbol>
-    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3.5v12M7 10.5l5 5 5-5M4 20.5h16" /></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.4-1.2-1.7-1.2-3 0-1 .8-1.6 1.8-1.6H17a3.5 3.5 0 0 0 3.5-3.5c0-4-3.8-7.2-8.5-7.2ZM7.5 11.5h.01M9.5 7.5h.01M14.5 7.5h.01" /></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor" /></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 4.5v15M17 4.5v15" /></symbol>
-    <symbol id="i-next" viewBox="0 0 24 24"><path d="M5.5 5v14l10-7zM18.5 5v14" /></symbol>
-    <symbol id="i-previous" viewBox="0 0 24 24"><path d="M18.5 5v14l-10-7zM5.5 5v14" /></symbol>
-    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3.1-5.4 3.1 1.2-6L3.3 9.8l6.1-.7z" /></symbol>
-    <symbol id="i-external" viewBox="0 0 24 24"><path d="M13.5 4h6.5v6.5M20 4l-9 9M17.5 14v6h-14V6.5h6" /></symbol>
-    <symbol id="i-equalizer" viewBox="0 0 24 24"><path d="M5 4v16M12 4v16M19 4v16M2.5 14h5M9.5 8h5M16.5 16h5" /></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5 9.5 17.5 19.5 6.5" /></symbol>
-    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19.5 6.5v5.5c0 4.4-3.2 7.7-7.5 9-4.3-1.3-7.5-4.6-7.5-9V6.5zM8.8 12.2l2.3 2.3 4.3-4.6" /></symbol>
-    <symbol id="i-terminal" viewBox="0 0 24 24"><path d="M3.5 5h17v14h-17zM7 9.5l3 2.5-3 2.5M12 15h5" /></symbol>
-    <symbol id="i-compass" viewBox="0 0 24 24"><path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17ZM15.5 8.5l-2 5-5 2 2-5z" /></symbol>
-    <symbol id="i-account" viewBox="0 0 24 24"><path d="M12 11.5a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5ZM4.5 20.5c.9-3.6 3.9-5.8 7.5-5.8s6.6 2.2 7.5 5.8" /></symbol>
-    <symbol id="i-disc" viewBox="0 0 24 24"><path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17ZM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" /></symbol>
-    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3.5 20.5h17M6.5 17v-5M10.5 17V6.5M14.5 17v-8M18.5 17v-3.5" /></symbol>
-    <symbol id="i-grid" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" /></symbol>
-    <symbol id="i-related" viewBox="0 0 24 24"><path d="M6.5 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM17.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM17.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM8.7 10.8l6.6-3.6M8.7 13.2l6.6 3.6" /></symbol>
-    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2.5 12h4l2.5-6.5 4 13 3-8.5 1.5 2h4" /></symbol>
-    <symbol id="i-video" viewBox="0 0 24 24"><path d="M3.5 5h17v14h-17zM10 9v6l5-3z" /></symbol>
-    <symbol id="i-status" viewBox="0 0 24 24"><path d="M3.5 5h17v14h-17zM8 11.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM5.5 16c.5-1.5 1.5-2.2 2.5-2.2s2 .7 2.5 2.2M13 9.5h4.5M13 13h3" /></symbol>
   </svg>
 
-  <header class="top">
-    <a class="brand" href="#now-playing" aria-label="MixMusic, back to the top">
-      <svg class="brand-mark" width="26" height="26" aria-hidden="true"><use href="#i-rings" /></svg>
-      <span>mixmusic</span>
-    </a>
-    <nav class="top-nav" aria-label="Sections">
-      <a href="#search">features</a>
-      <a href="#themes">themes</a>
-      <a href="#plugins">plugins</a>
-      <a href="#download">download</a>
-      <a href="https://github.com/fzn0x/mixmusic#readme">docs</a>
-    </nav>
-    <a class="btn btn-outline btn-small" href="https://github.com/fzn0x/mixmusic">
-      <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg>
-      <span>star on github</span>
-    </a>
-  </header>
-
-  <div class="shell">
-    <main id="main">
-      <!-- now playing -->
-      <section class="hero" id="now-playing" data-track="mixmusic" data-caption="two services, one player" data-tone="0" data-icon="rings">
-        <div class="word-frame"><h1 class="word word-hero">mixmusic</h1></div>
-        <nav class="pivots" aria-label="What it does">
-          <a class="pivot is-current" href="#search">one search</a>
-          <a class="pivot" href="#queue">one queue</a>
-          <a class="pivot" href="#library">one library</a>
-          <a class="pivot" href="#themes">your look</a>
-        </nav>
-
-        <div class="hero-grid">
-          <div class="hero-copy">
-            <p class="hook">Spotify and YouTube Music in one free, open&#8209;source desktop player.</p>
-            <div class="actions">
-              <a class="btn btn-primary btn-large" data-download href="#download">
-                <svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-download" /></svg>
-                <span data-download-label>download</span>
-              </a>
-            </div>
-            <p class="meta"><span data-download-meta>Version <span data-version>0.5.5</span></span> · MIT · macOS, Windows, Linux · <a href="#download">other systems</a></p>
-            <p class="hook-sub">One search across both services, one queue that mixes them, one library that keeps them, in a player whose whole look you can change. <a href="https://github.com/fzn0x/mixmusic">Source on GitHub</a>.</p>
-          </div>
-
-          <figure class="shot shot-hero">
-            <img src="assets/banner.webp" width="2560" height="1280" alt="MixMusic's pages in the Mochi theme, tilted in perspective: now playing アイドル by YOASOBI in the middle, with search, home, the library, explore, stats, settings and more around it." fetchpriority="high" />
-            <figcaption>Now playing: <span lang="ja">アイドル</span> by YOASOBI, among the player's pages in the Mochi theme.</figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <!-- walkthrough -->
-      <section class="track" id="walkthrough" data-track="walkthrough" data-caption="the player, in one minute" data-tone="2" data-icon="video">
-        <div class="word-frame"><h2 class="word">walkthrough</h2></div>
-        <div class="pivots pivots-section chapters" role="group" aria-label="Chapters of the walkthrough" data-chapters>
-          <button class="pivot is-current" type="button" aria-current="true" data-at="0.4">home</button>
-          <button class="pivot" type="button" data-at="4.6">now playing</button>
-          <button class="pivot" type="button" data-at="14.4">search</button>
-          <button class="pivot" type="button" data-at="23.6">library</button>
-          <button class="pivot" type="button" data-at="32.8">explore</button>
-          <button class="pivot" type="button" data-at="35.8">stats</button>
-          <button class="pivot" type="button" data-at="38.9">palette</button>
-          <button class="pivot" type="button" data-at="45">themes</button>
-          <button class="pivot" type="button" data-at="56.8">plugins</button>
-        </div>
-        <p class="lead lead-wide">A minute in the player, page by page, from home to the sleep timer.</p>
-        <figure class="shot shot-wide">
-          <video src="assets/walkthrough.mp4" poster="assets/walkthrough.webp" width="1920" height="1080" controls muted playsinline preload="metadata" aria-label="The walkthrough: a minute in MixMusic, page by page, in the Mochi theme" data-walkthrough></video>
-          <figcaption>The player in the Mochi theme, with a caption for each page. The recording has no sound.</figcaption>
-        </figure>
-      </section>
-
-      <!-- one search -->
-      <section class="track" id="search" data-track="one search" data-caption="both services, one box" data-tone="1" data-icon="search">
-        <div class="word-frame"><h2 class="word">search</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: all, songs, albums, artists, playlists"><span class="pivot is-current">all</span><span class="pivot">songs</span><span class="pivot">albums</span><span class="pivot">artists</span><span class="pivot">playlists</span></p>
-        <div class="split">
-          <div class="copy">
-            <p class="lead">One search box looks through Spotify and YouTube Music at once.</p>
-            <p>Suggestions come as you type, and songs, albums, artists and playlists of both services land in the same lists. Every result carries a mark of where it comes from, so you always know which service plays it.</p>
-            <div class="segment" role="img" aria-label="The search filter: both, spotify, youtube music">
-              <span class="is-on">both</span><span>spotify</span><span>youtube music</span>
-            </div>
-            <ul class="marks">
-              <li><span class="mark mark-spotify" aria-hidden="true"></span>a disc for Spotify</li>
-              <li><span class="mark mark-youtube" aria-hidden="true"></span>a square for YouTube Music</li>
-              <li><span class="mark mark-mix" aria-hidden="true"></span>two rings for your own mixes</li>
-            </ul>
-            <p class="note">YouTube Music needs no account. Spotify joins the same search once you sign in with an app of your own from Spotify's developer dashboard; <a href="https://github.com/fzn0x/mixmusic/blob/main/docs/spotify.md">the guide</a> takes two minutes.</p>
-          </div>
-          <figure class="shot">
-            <img src="assets/shots/search.webp" width="1536" height="900" loading="lazy" alt="Searching for Tame Impala: the both, spotify and youtube music filter, pivots for all, songs, albums, artists and playlists, and a list of songs each tagged with its source mark." />
-            <figcaption>Without a Spotify sign-in, YouTube Music's results fill the lists.</figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <!-- one queue -->
-      <section class="track" id="queue" data-track="one queue" data-caption="tracks of both, in one line" data-tone="2" data-icon="queue">
-        <div class="word-frame"><h2 class="word">queue</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: up next, shuffle, repeat, radio"><span class="pivot is-current">up next</span><span class="pivot">shuffle</span><span class="pivot">repeat</span><span class="pivot">radio</span></p>
-        <div class="split split-flip">
-          <figure class="shot">
-            <img src="assets/shots/album.webp" width="1536" height="900" loading="lazy" alt="The Rumours album page by Fleetwood Mac with play and shuffle, its track list, and the up next queue beside it." />
-            <figcaption>An album page, with what plays next always in view.</figcaption>
-          </figure>
-          <div class="copy">
-            <p class="lead">Tracks of both services, in one queue that keeps going.</p>
-            <ul class="rows">
-              <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-queue" /></svg></span><div><strong>Queue from anywhere</strong><span>Play next or add to the queue from any track, album or playlist, then drag to reorder.</span></div></li>
-              <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-equalizer" /></svg></span><div><strong>Shuffle, repeat, crossfade</strong><span>And a radio of what you played that carries on when the queue runs out.</span></div></li>
-              <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-play" /></svg></span><div><strong>Spotify, with or without Premium</strong><span>Spotify tracks play on a Spotify Connect device, or from their recording on YouTube Music in MixMusic's own player; on Windows, in MixMusic itself too.</span></div></li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <!-- one library -->
-      <section class="track" id="library" data-track="one library" data-caption="liked songs and mixes of both" data-tone="3" data-icon="library">
-        <div class="word-frame"><h2 class="word">library</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: liked, mixes, history, stats"><span class="pivot is-current">liked</span><span class="pivot">mixes</span><span class="pivot">history</span><span class="pivot">stats</span></p>
-        <p class="lead lead-wide">Liked songs and mixes that hold tracks of any service, with your history and stats beside them.</p>
-        <div class="mosaic">
-          <figure class="shot mosaic-a">
-            <img src="assets/shots/library.webp" width="1536" height="900" loading="lazy" alt="The library page with liked, mixes and history pivots, a search box and a sort for the list, and liked songs from Random Access Memories, Rumours and Currents." />
-            <figcaption>Liked songs, your mixes and history in one place.</figcaption>
-          </figure>
-          <figure class="shot mosaic-b">
-            <img src="assets/shots/mix.webp" width="1536" height="900" loading="lazy" alt="A mix called late night drive, 9 tracks and 46 minutes, with tracks by Tame Impala, Daft Punk, Radiohead and Lorde." />
-            <figcaption>A mix you named, ordered your way.</figcaption>
-          </figure>
-          <figure class="shot mosaic-c">
-            <img src="assets/shots/stats.webp" width="1536" height="900" loading="lazy" alt="The stats page for this week: 59 tracks for 4 hours 17 minutes, all from YouTube Music, and a day by day chart of cyan bars for the minutes listened from Thursday to today, 52 minutes today." />
-            <figcaption>Your week in minutes, day by day, with a table view too.</figcaption>
-          </figure>
-        </div>
-        <p class="note">Import a Spotify or YouTube Music playlist into a mix and keep adding to it from either service. Search inside a playlist, a mix or your liked songs, and sort them by title, artist or length. The screenshots show a demo library.</p>
-      </section>
-
-      <!-- explore -->
-      <section class="track" id="explore" data-track="explore" data-caption="new, charts, moods" data-tone="4" data-icon="compass">
-        <div class="word-frame"><h2 class="word">explore</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: new, charts, moods and genres, related"><span class="pivot is-current">new</span><span class="pivot">charts</span><span class="pivot">moods &amp; genres</span><span class="pivot">related</span></p>
-        <div class="split">
-          <div class="copy">
-            <p class="lead">Somewhere to find what you have not heard yet.</p>
-            <ul class="rows">
-              <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-disc" /></svg></span><div><strong>New albums and singles</strong><span>What came out lately, and the songs trending now.</span></div></li>
-              <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-chart" /></svg></span><div><strong>The charts</strong><span>The top videos and artists of your country.</span></div></li>
-              <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-grid" /></svg></span><div><strong>Moods and genres</strong><span>Chill, focus, workout and dozens more, each a tile that opens its playlists.</span></div></li>
-              <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-related" /></svg></span><div><strong>Related</strong><span>Under now playing: songs, playlists and artists like what you hear.</span></div></li>
-            </ul>
-            <p class="note">Explore comes from YouTube Music, so it needs no account.</p>
-          </div>
-          <figure class="shot">
-            <img src="assets/shots/explore.webp" width="1536" height="900" loading="lazy" alt="The explore page on moods and genres: the pivots new, charts and moods and genres, and flat cyan, magenta, lime and amber tiles for chill, commute, energize, feel good, focus, gaming, party, romance, sad, sleep and workout." />
-            <figcaption>Moods and genres, each tile a door to its playlists.</figcaption>
-          </figure>
-        </div>
-        <figure class="shot shot-wide">
-          <img src="assets/shots/related.webp" width="1536" height="900" loading="lazy" alt="The foot of the now playing page for Let It Happen by Tame Impala: a shelf of similar artists, MGMT, Foster The People, Midnight Juggernauts, Men I Trust and The Strokes, and a shelf of Tame Impala albums from Deadbeat to InnerSpeaker." />
-          <figcaption>Related, at the foot of now playing: artists like this one, and the rest of its albums.</figcaption>
-        </figure>
-      </section>
-
-      <!-- accounts -->
-      <section class="track" id="accounts" data-track="your accounts" data-caption="your feed and library, in sync" data-tone="2" data-icon="account">
-        <div class="word-frame"><h2 class="word">accounts</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: youtube music, spotify, last.fm, discord"><span class="pivot is-current">youtube music</span><span class="pivot">spotify</span><span class="pivot">last.fm</span><span class="pivot">discord</span></p>
-        <div class="split split-flip">
-          <figure class="shot">
-            <img src="assets/shots/accounts.webp" width="1536" height="900" loading="lazy" alt="Settings, accounts: the youtube music group with its sign in to youtube music button and a note that MixMusic never sees your password, and the last.fm group with three steps and fields for the API key and the shared secret." />
-            <figcaption>Settings › Accounts, where you sign in to YouTube Music and connect Last.fm.</figcaption>
-          </figure>
-          <div class="copy">
-            <p class="lead">Sign in, and your own music comes along.</p>
-            <ul class="rows">
-              <li><span class="box" aria-hidden="true"><span class="mark mark-youtube mark-big"></span></span><div><strong>YouTube Music</strong><span>Your home feed, and your liked songs, playlists, albums and artists. You sign in on Google's own page, so MixMusic never sees your password.</span></div></li>
-              <li><span class="box" aria-hidden="true"><span class="mark mark-spotify mark-big"></span></span><div><strong>Spotify</strong><span>Your library there, once you sign in with an app of your own from Spotify's developer dashboard.</span></div></li>
-              <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-pulse" /></svg></span><div><strong>Last.fm</strong><span>Every track you hear joins your profile, and plays made offline go out once you are back. It takes an API account of your own from Last.fm.</span></div></li>
-              <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-status" /></svg></span><div><strong>Discord</strong><span>Your profile shows what plays, with its artwork and the time left, as soon as Discord runs.</span></div></li>
-            </ul>
-            <p class="note">Like a song, save an album or a playlist, or follow an artist, and it reaches YouTube Music or Spotify too.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- lyrics & sound -->
-      <section class="track" id="sound" data-track="lyrics and sound" data-caption="synced lines, tuned sound" data-tone="4" data-icon="lyrics">
-        <div class="word-frame"><h2 class="word">lyrics</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: synced, equalizer, levelling, crossfade"><span class="pivot is-current">synced</span><span class="pivot">equalizer</span><span class="pivot">levelling</span><span class="pivot">crossfade</span></p>
-        <div class="split">
-          <div class="copy">
-            <p class="lead">Lyrics that follow the song, and a sound you tune.</p>
-            <p>Synced lyrics from LRCLIB and YouTube Music light up line by line on the now playing page, or beside whatever page you are on. To read them whole, show them as plain text.</p>
-          </div>
-          <figure class="shot">
-            <img src="assets/shots/nowplaying.webp" width="1536" height="900" loading="lazy" alt="The now playing page for Instant Crush by Daft Punk and Julian Casablancas: the album sleeve with a visualizer, the current lyric lines, and the lyrics panel on the right." />
-            <figcaption>Now playing, with the lyrics panel open.</figcaption>
-          </figure>
-        </div>
-        <ul class="tiles" aria-label="Sound features">
-          <li class="tile" data-tone="1"><span class="tile-title">10-band equalizer</span><span class="tile-caption">with presets and a preamp</span></li>
-          <li class="tile" data-tone="2"><span class="tile-title">volume levelling</span><span class="tile-caption">quiet and loud tracks meet in the middle</span></li>
-          <li class="tile" data-tone="3"><span class="tile-title">crossfade</span><span class="tile-caption">between tracks, as long as you like</span></li>
-          <li class="tile" data-tone="4"><span class="tile-title">offline cache</span><span class="tile-caption">what you played, kept for next time</span></li>
-        </ul>
-      </section>
-
-      <!-- desktop -->
-      <section class="track" id="desktop" data-track="at the keyboard" data-caption="fast hands, quiet background" data-tone="1" data-icon="keyboard">
-        <div class="word-frame"><h2 class="word">keyboard</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: palette, shortcuts, tray, mini player"><span class="pivot is-current">palette</span><span class="pivot">shortcuts</span><span class="pivot">tray</span><span class="pivot">mini player</span></p>
-        <div class="split split-flip">
-          <figure class="shot">
-            <img src="assets/shots/palette.webp" width="1536" height="900" loading="lazy" alt="The command palette open over the home page, listing commands such as play or pause, next and previous track, forward and back 10 seconds, volume up and down, mute, shuffle, repeat and like what plays, with their shortcuts." />
-            <figcaption>The command palette reaches everything else.</figcaption>
-          </figure>
-          <div class="copy">
-            <p class="lead">Fast for hands on the keyboard, quiet in the background.</p>
-            <dl class="keys">
-              <div><dt><kbd data-mod>Ctrl</kbd><kbd>K</kbd></dt><dd>command palette</dd></div>
-              <div><dt><kbd>Space</kbd></dt><dd>play or pause</dd></div>
-              <div><dt><kbd data-mod>Ctrl</kbd><kbd>→</kbd></dt><dd>next track</dd></div>
-              <div><dt><kbd data-mod>Ctrl</kbd><kbd>F</kbd></dt><dd>search</dd></div>
-              <div><dt><kbd data-mod>Ctrl</kbd><kbd>J</kbd></dt><dd>show the queue</dd></div>
-              <div><dt><kbd data-mod>Ctrl</kbd><kbd>M</kbd></dt><dd>mini player</dd></div>
-            </dl>
-            <p>Every key is yours to change in Settings › Shortcuts, plugins' commands too.</p>
-            <p>The tray, media keys, desktop notifications, a mini player, start at login and <code>mixmusic://</code> links do the everyday work while the window stays closed. MixMusic looks for a new version at start and every few hours, checks its signature, and installs it when you agree, or by itself if you choose.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- themes -->
-      <section class="track" id="themes" data-track="themes" data-caption="the whole look, yours" data-tone="2" data-icon="palette">
-        <div class="word-frame"><h2 class="word">themes</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: built in, community, make one"><span class="pivot is-current">built in</span><span class="pivot">community</span><span class="pivot">make one</span></p>
-        <p class="lead lead-wide">The whole look is a theme. Ten ship with the app, and the community makes more.</p>
-        <div class="gallery" data-gallery>
-          <figure class="shot gallery-stage">
-            <img class="gallery-img is-shown" src="assets/shots/theme-mix.webp" width="1440" height="844" loading="lazy" alt="The home page in the Mix theme." />
-            <figcaption><span data-gallery-name>Mix</span>: <span data-gallery-desc>the default, flat colour tiles and giant lowercase on true black.</span></figcaption>
-          </figure>
-          <div class="gallery-cards" role="group" aria-label="Choose a theme to preview">
-            <button class="theme-card is-current" type="button" aria-pressed="true" data-theme="mix" data-name="Mix" data-desc="the default, flat colour tiles and giant lowercase on true black." style="--card-bg:#000;--card-ink:#fff">
-              <span class="swatches"><i style="background:#00bde3"></i><i style="background:#e6007e"></i><i style="background:#a4e600"></i><i style="background:#ffb000"></i></span>
-              <span class="theme-name">mix</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="aurora" data-name="Aurora" data-desc="frosted glass panels over slowly drifting northern lights." style="--card-bg:#070a16;--card-ink:#eef2ff">
-              <span class="swatches"><i style="background:#4ee6c0"></i><i style="background:#7b5cff"></i><i style="background:#3fa9ff"></i><i style="background:#ff6b9a"></i></span>
-              <span class="theme-name">aurora</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="daylight" data-name="Daylight" data-desc="black ink and deep tiles on white, for bright rooms." style="--card-bg:#fff;--card-ink:#000">
-              <span class="swatches"><i style="background:#0078d7"></i><i style="background:#c30052"></i><i style="background:#107c10"></i><i style="background:#ca5010"></i></span>
-              <span class="theme-name">daylight</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="midnight" data-name="Midnight" data-desc="true black for OLED screens, with a coral accent." style="--card-bg:#000;--card-ink:#fff">
-              <span class="swatches"><i style="background:#ff5a7a"></i><i style="background:#7b5cff"></i><i style="background:#00c2a8"></i><i style="background:#ffb000"></i></span>
-              <span class="theme-name">midnight</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="sakura" data-name="Sakura" data-desc="cherry blossom pinks on paper white." style="--card-bg:#fff5f7;--card-ink:#3a1f28">
-              <span class="swatches"><i style="background:#e0457b"></i><i style="background:#f7a8c4"></i><i style="background:#9fd6c2"></i><i style="background:#f9c784"></i></span>
-              <span class="theme-name theme-name-serif">sakura</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="terminal" data-name="Terminal" data-desc="green phosphor on black, in a monospaced font." style="--card-bg:#030603;--card-ink:#39ff14">
-              <span class="swatches"><i style="background:#39ff14"></i><i style="background:#1f8f1f"></i><i style="background:#b8ffb0"></i><i style="background:#ffb000"></i></span>
-              <span class="theme-name theme-name-mono">terminal</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="greenroom" data-name="Greenroom" data-desc="a charcoal backstage lit by one jade light, washed in the colour of the cover playing." style="--card-bg:#0e1411;--card-ink:#f3f9f6">
-              <span class="swatches"><i style="background:#0e7c58"></i><i style="background:#8b2a73"></i><i style="background:#2a4bb8"></i><i style="background:#b9461a"></i></span>
-              <span class="theme-name">greenroom</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="glasshouse" data-name="Glasshouse" data-desc="white glass and a rose-red accent, frosted over the colours of the cover." style="--card-bg:#f8f2f4;--card-ink:#1f191b">
-              <span class="swatches"><i style="background:#e11d48"></i><i style="background:#7c3aed"></i><i style="background:#0369a1"></i><i style="background:#0f766e"></i></span>
-              <span class="theme-name">glasshouse</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="anime" data-name="Anime" data-desc="summer-sky blues and cel colours, with speed lines that burst as each track starts." style="--card-bg:#eaf6ff;--card-ink:#10203f">
-              <span class="swatches"><i style="background:#5cc8ff"></i><i style="background:#ffa040"></i><i style="background:#ff8fcf"></i><i style="background:#63d98b"></i></span>
-              <span class="theme-name theme-name-gothic">anime</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="mochi" data-name="Mochi" data-desc="kawaii candy pastels, round as mochi, with sparkles drifting up." style="--card-bg:#fff6fa;--card-ink:#5b3653">
-              <span class="swatches"><i style="background:#ffb5d3"></i><i style="background:#cdb9ff"></i><i style="background:#a9ead5"></i><i style="background:#ffe08a"></i></span>
-              <span class="theme-name theme-name-round">mochi</span><span class="theme-meta">built in</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="neon-nights" data-name="Neon Nights" data-desc="electric magenta and violet tiles on deep indigo, from the community." style="--card-bg:#0b0618;--card-ink:#f6efff">
-              <span class="swatches"><i style="background:#ff3ea5"></i><i style="background:#8a5cff"></i><i style="background:#22d3ee"></i><i style="background:#ffd23e"></i></span>
-              <span class="theme-name">neon nights</span><span class="theme-meta">community</span>
-            </button>
-            <button class="theme-card" type="button" aria-pressed="false" data-theme="paper-mint" data-name="Paper Mint" data-desc="a quiet light theme of graphite ink, mint and coral tiles, from the community." style="--card-bg:#f3f7f5;--card-ink:#1d2a25">
-              <span class="swatches"><i style="background:#0c7a5d"></i><i style="background:#c4473a"></i><i style="background:#3d6fb6"></i><i style="background:#8a6510"></i></span>
-              <span class="theme-name">paper mint</span><span class="theme-meta">community</span>
-            </button>
-          </div>
-        </div>
-
-        <p class="note">Follow the computer: choose a theme for its light mode and one for its dark mode, and MixMusic switches with it.</p>
-
-        <div class="split split-code">
-          <div class="copy">
-            <h3 class="sub">make one</h3>
-            <p>A theme is a folder with a <code>theme.json</code>: eighteen colors, the fonts and a corner radius, which MixMusic draws everything with, so a theme keeps working as the app changes.</p>
-            <p><a class="link" href="https://github.com/fzn0x/mixmusic/blob/main/docs/themes.md">Read the theme guide <svg width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a></p>
-          </div>
-          <pre class="code" tabindex="0" aria-label="An example theme.json"><code><span class="c-key">"id"</span>: <span class="c-str">"aurora"</span>,
-<span class="c-key">"name"</span>: <span class="c-str">"Aurora"</span>,
-<span class="c-key">"scheme"</span>: <span class="c-str">"dark"</span>,
-<span class="c-key">"colors"</span>: {
-  <span class="c-key">"bg"</span>: <span class="c-str">"#070a16"</span>,
-  <span class="c-key">"text"</span>: <span class="c-str">"#eef2ff"</span>,
-  <span class="c-key">"accent"</span>: <span class="c-str">"#4ee6c0"</span>,
-  <span class="c-key">"tile-1"</span>: <span class="c-str">"#4ee6c0"</span>,
-  <span class="c-key">"tile-2"</span>: <span class="c-str">"#7b5cff"</span>,
-  <span class="c-com">…</span>
-},
-<span class="c-key">"radius"</span>: <span class="c-str">"18px"</span></code></pre>
-        </div>
-      </section>
-
-      <!-- plugins -->
-      <section class="track" id="plugins" data-track="plugins" data-caption="pages, commands, widgets" data-tone="3" data-icon="puzzle">
-        <div class="word-frame"><h2 class="word">plugins</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: registry, the api, share yours"><span class="pivot is-current">registry</span><span class="pivot">the api</span><span class="pivot">share yours</span></p>
-        <div class="split split-code">
-          <div class="copy">
-            <p class="lead">Plugins add pages, commands, track actions and widgets through a typed API.</p>
-            <p>A plugin is an ES module and a manifest. It gets the player, the queue, the catalog, your library, commands, settings and storage, and adds pages, widgets and track actions that MixMusic draws in your theme, with types in the SDK. Every plugin can use the whole API, so MixMusic asks before it enables one.</p>
-            <p><a class="link" href="https://github.com/fzn0x/mixmusic/blob/main/docs/plugins.md">Read the plugin guide <svg width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a></p>
-          </div>
-          <pre class="code" tabindex="0" aria-label="An example plugin"><code><span class="c-com">// api is the SDK's MixMusicAPI:</span>
-<span class="c-com">// import("mixmusic-sdk").MixMusicAPI</span>
-<span class="c-kw">export default function</span> activate(api) {
-  api.commands.register({
-    id: <span class="c-str">"shout"</span>,
-    title: <span class="c-str">"Shout what plays"</span>,
-    shortcut: <span class="c-str">"Mod+Shift+S"</span>,
-    run: () =&gt; {
-      <span class="c-kw">const</span> { track } =
-        api.player.state();
-      api.ui.toast(track
-        ? <span class="c-str">`Now: ${track.title}`</span>
-        : <span class="c-str">"Nothing plays"</span>);
-    },
-  });
-}</code></pre>
-        </div>
-
-        <h3 class="sub">in the registry</h3>
-        <ul class="registry">
-          <li>
-            <span class="tile tile-mini" data-tone="4" aria-hidden="true"><svg width="22" height="22"><use href="#i-puzzle" /></svg></span>
-            <div><strong>Sleep Timer</strong><span>Fades the music out and pauses it after a while, or at the end of the track.</span></div>
-            <span class="chips"><span class="chip">playback</span><span class="chip">storage</span></span>
-          </li>
-          <li>
-            <span class="tile tile-mini" data-tone="1" aria-hidden="true"><svg width="22" height="22"><use href="#i-puzzle" /></svg></span>
-            <div><strong>Spectrum</strong><span>A radial spectrum of what plays, drawn in the accent colour on the now playing page.</span></div>
-            <span class="chips"><span class="chip">playback</span></span>
-          </li>
-          <li>
-            <span class="tile tile-mini" data-tone="2" aria-hidden="true"><svg width="22" height="22"><use href="#i-palette" /></svg></span>
-            <div><strong>Neon Nights</strong><span>Electric magenta and violet tiles on deep indigo.</span></div>
-            <span class="chips"><span class="chip">theme</span></span>
-          </li>
-          <li>
-            <span class="tile tile-mini" data-tone="3" aria-hidden="true"><svg width="22" height="22"><use href="#i-palette" /></svg></span>
-            <div><strong>Paper Mint</strong><span>A quiet light theme: graphite ink, mint and coral tiles, rounded corners.</span></div>
-            <span class="chips"><span class="chip">theme</span></span>
-          </li>
-        </ul>
-
-        <div class="split split-flip share">
-          <figure class="shot">
-            <img src="assets/shots/plugins.webp" width="1536" height="900" loading="lazy" alt="The marketplace's plugins tab with Sleep Timer and Spectrum, each with its permissions and an install button." />
-            <figcaption>The marketplace installs from the registry in one click.</figcaption>
-          </figure>
-          <div class="copy">
-            <h3 class="sub">share yours</h3>
-            <ol class="steps">
-              <li>Make it, and try it from your add-ons folder.</li>
-              <li>Add its folder to <code>community/</code> in a fork, and run the registry tool.</li>
-              <li>Open a pull request with a screenshot. Once it is merged, everyone sees it in the marketplace.</li>
-            </ol>
-            <p><a class="link" href="https://github.com/fzn0x/mixmusic/tree/main/community">Browse the community folder <svg width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a></p>
-          </div>
-        </div>
-      </section>
-
-      <!-- in the open -->
-      <section class="track" id="open" data-track="in the open" data-caption="MIT, on GitHub" data-tone="4" data-icon="code">
-        <div class="word-frame"><h2 class="word">open source</h2></div>
-        <p class="pivots pivots-section" aria-label="In this section: contributing, issues, changelog"><span class="pivot is-current">contributing</span><span class="pivot">issues</span><span class="pivot">changelog</span></p>
-        <div class="split">
-          <div class="copy">
-            <p class="lead">MIT licensed, and built in the open.</p>
-            <p>MixMusic is one small Go program built on MyGo, which draws its windows itself, on the GPU: there is no browser inside to download or keep in memory, and the Windows installer is about 8 MB.</p>
-            <p>Fixes, features, themes, plugins and reports of what does not work are all welcome.</p>
-            <div class="actions">
-              <a class="btn btn-outline" href="https://github.com/fzn0x/mixmusic">
-                <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg><span>star on github</span>
-              </a>
-            </div>
-          </div>
-          <ul class="links">
-            <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CONTRIBUTING.md"><strong>contributing</strong><span>build it, check it, open a pull request</span></a></li>
-            <li><a href="https://github.com/fzn0x/mixmusic/issues"><strong>issues</strong><span>report a bug or ask for a feature</span></a></li>
-            <li><a href="https://github.com/fzn0x/mixmusic/blob/main/docs/architecture.md"><strong>architecture</strong><span>where everything lives</span></a></li>
-            <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md"><strong>changelog</strong><span>what changed in each release</span></a></li>
-            <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CODE_OF_CONDUCT.md"><strong>code of conduct</strong><span>how we work together</span></a></li>
-            <li><a href="https://github.com/fzn0x/mixmusic/blob/main/SECURITY.md"><strong>security</strong><span>report a vulnerability privately</span></a></li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- download -->
-      <section class="track" id="download" data-track="download" data-caption="macOS, Windows, Linux" data-tone="1" data-icon="download">
-        <div class="word-frame"><h2 class="word">download</h2></div>
-        <nav class="pivots pivots-section" aria-label="Download for"><a class="pivot is-current" href="#dl-mac">macos</a><a class="pivot" href="#dl-windows">windows</a><a class="pivot" href="#dl-linux">linux</a></nav>
-        <p class="lead lead-wide">Free for macOS, Windows and Linux. <span class="muted">Version <span data-version>0.5.5</span>, <a href="https://github.com/fzn0x/mixmusic/releases/latest">release notes</a>.</span></p>
-
-        <ul class="downloads">
-          <li class="tile dl" id="dl-mac" data-tone="1" data-os="mac">
-            <span class="tile-title">macos</span>
-            <span class="dl-for">for your system</span>
-            <span class="tile-caption">macOS 12 and later, Apple silicon and Intel</span>
-            <a class="dl-file" data-asset="macos-universal.dmg" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-macos-universal.dmg"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>.dmg</span><span class="size">15.6 MB</span></a>
-          </li>
-          <li class="tile dl" id="dl-windows" data-tone="2" data-os="windows">
-            <span class="tile-title">windows</span>
-            <span class="dl-for">for your system</span>
-            <span class="tile-caption">Windows 10 and 11</span>
-            <a class="dl-file" data-asset="windows-amd64-setup.exe" data-arch="x64" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-windows-amd64-setup.exe"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>x64 installer</span><span class="size">8.2 MB</span></a>
-            <a class="dl-file" data-asset="windows-arm64-setup.exe" data-arch="arm" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-windows-arm64-setup.exe"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>Arm installer</span><span class="size">6.9 MB</span></a>
-            <a class="dl-file" data-asset="windows-amd64-portable.zip" data-arch="x64" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-windows-amd64-portable.zip"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>x64 portable zip</span><span class="size">10.6 MB</span></a>
-            <a class="dl-file" data-asset="windows-arm64-portable.zip" data-arch="arm" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-windows-arm64-portable.zip"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>Arm portable zip</span><span class="size">9.5 MB</span></a>
-          </li>
-          <li class="tile dl" id="dl-linux" data-tone="3" data-os="linux">
-            <span class="tile-title">debian, fedora</span>
-            <span class="dl-for">for your system</span>
-            <span class="tile-caption">a .deb for Debian and Ubuntu, an .rpm for Fedora and openSUSE</span>
-            <a class="dl-file" data-asset="linux-amd64.deb" data-arch="x64" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-linux-amd64.deb"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>x64 .deb</span><span class="size">10.7 MB</span></a>
-            <a class="dl-file" data-asset="linux-arm64.deb" data-arch="arm" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-linux-arm64.deb"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>Arm64 .deb</span><span class="size">9.7 MB</span></a>
-            <a class="dl-file" data-asset="linux-amd64.rpm" data-arch="x64" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-linux-amd64.rpm"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>x64 .rpm</span><span class="size">9.5 MB</span></a>
-            <a class="dl-file" data-asset="linux-arm64.rpm" data-arch="arm" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-linux-arm64.rpm"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>Arm64 .rpm</span><span class="size">8.2 MB</span></a>
-          </li>
-          <li class="tile dl" data-tone="4" data-os="linux-any">
-            <span class="tile-title">any linux</span>
-            <span class="tile-caption">an AppImage, or an archive and an install script into ~/.local</span>
-            <a class="dl-file" data-asset="linux-amd64.AppImage" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-linux-amd64.AppImage"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>x64 AppImage</span><span class="size">10.4 MB</span></a>
-            <a class="dl-file" data-asset="linux-arm64.AppImage" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-linux-arm64.AppImage"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>Arm64 AppImage</span><span class="size">9.4 MB</span></a>
-            <a class="dl-file" data-asset="linux-amd64.tar.gz" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-linux-amd64.tar.gz"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>x64 .tar.gz</span><span class="size">10.7 MB</span></a>
-            <a class="dl-file" data-asset="linux-arm64.tar.gz" href="https://github.com/fzn0x/mixmusic/releases/download/v0.5.5/mixmusic-0.5.5-linux-arm64.tar.gz"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>Arm64 .tar.gz</span><span class="size">9.7 MB</span></a>
-            <a class="dl-file" data-asset="install.sh" href="https://github.com/fzn0x/mixmusic/releases/download/v0.4.0/install.sh"><svg width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>install.sh</span><span class="size">9 KB</span></a>
-          </li>
-        </ul>
-
-        <div class="needs">
-          <h3 class="sub">what it needs</h3>
-          <ul class="rows">
-            <li><span class="box" aria-hidden="true"><span class="mark mark-youtube mark-big"></span></span><div><strong>YouTube Music</strong><span>yt-dlp, which MixMusic installs for you from Settings › Playback, and a JavaScript runtime on your PATH: Deno, Node.js, Bun or QuickJS.</span></div></li>
-            <li><span class="box" aria-hidden="true"><span class="mark mark-spotify mark-big"></span></span><div><strong>Spotify</strong><span>An app of your own from the Spotify developer dashboard, made with a Spotify account that has Premium, whose Client ID you paste in Settings › Accounts. <a href="https://github.com/fzn0x/mixmusic/blob/main/docs/spotify.md">The guide</a> walks through it.</span></div></li>
-            <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-shield" /></svg></span><div><strong>First launch</strong><span>The macOS app is not notarized yet: open it once from System Settings › Privacy &amp; Security › Open Anyway. The Windows installer is not signed yet: if SmartScreen warns, choose More info › Run anyway.</span></div></li>
-            <li><span class="box" aria-hidden="true"><svg width="20" height="20"><use href="#i-terminal" /></svg></span><div><strong>Linux</strong><span>GTK 3, and PulseAudio, which PipeWire serves too, or ALSA; signing in to YouTube Music takes WebKitGTK 4.1. On Debian and Ubuntu:</span><pre class="code code-inline" tabindex="0"><code>sudo apt install libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0</code></pre></div></li>
-          </ul>
-          <p class="note">Verify every download against <a href="https://github.com/fzn0x/mixmusic/releases/latest">SHA256SUMS</a> in the release. All versions are on the <a href="https://github.com/fzn0x/mixmusic/releases">releases page</a>.</p>
-        </div>
-      </section>
-
-      <footer class="close">
-        <p class="close-line">one player.<br />both services.<br />yours to shape.</p>
-        <div class="actions">
-          <a class="btn btn-primary btn-large" data-download href="#download">
-            <svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-download" /></svg>
-            <span data-download-label>download</span>
-          </a>
-          <a class="btn btn-outline btn-large" href="https://github.com/fzn0x/mixmusic">
-            <svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-star" /></svg><span>star on github</span>
-          </a>
-        </div>
-        <div class="fine">
-          <p>MixMusic is free software under the <a href="https://github.com/fzn0x/mixmusic/blob/main/LICENSE">MIT license</a>, made by MixMusic contributors. The screenshots show MixMusic on Windows with a demo library.</p>
-          <p>Spotify is a trademark of Spotify AB, and YouTube Music a trademark of Google LLC. MixMusic is not affiliated with, endorsed by or sponsored by either.</p>
-        </div>
-      </footer>
-    </main>
-
-    <aside class="upnext" aria-label="On this page">
-      <div class="upnext-head">
-        <h2 class="upnext-title">up next</h2>
-      </div>
-      <p class="upnext-label">now playing</p>
-      <ol class="upnext-list" data-upnext></ol>
-      <p class="upnext-end">The queue ends at the download.</p>
-    </aside>
-  </div>
-
-  <div class="player" role="region" aria-label="Page player">
-    <div class="player-track">
-      <span class="tile tile-thumb" data-player-thumb data-tone="0" aria-hidden="true"><svg width="22" height="22"><use href="#i-rings" /></svg></span>
-      <div class="player-text" aria-live="polite">
-        <span class="player-title" data-player-title>mixmusic</span>
-        <span class="player-sub"><span class="mark mark-mix" aria-hidden="true"></span><span data-player-sub>next: one search</span></span>
-      </div>
-    </div>
-    <div class="player-center">
-      <div class="transport">
-        <button class="round" type="button" data-prev aria-label="Previous section"><svg width="20" height="20" aria-hidden="true"><use href="#i-previous" /></svg></button>
-        <button class="round round-main" type="button" data-play aria-label="Play the page, one section after another" aria-pressed="false"><svg class="i-play" width="22" height="22" aria-hidden="true"><use href="#i-play" /></svg><svg class="i-pause" width="22" height="22" aria-hidden="true"><use href="#i-pause" /></svg></button>
-        <button class="round" type="button" data-next aria-label="Next section"><svg width="20" height="20" aria-hidden="true"><use href="#i-next" /></svg></button>
-      </div>
-      <div class="progress" data-progress role="slider" tabindex="0" aria-label="Position on the page" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="progress-fill" data-progress-fill></span></div>
-    </div>
-    <div class="player-actions">
-      <a class="btn btn-outline btn-small player-other" href="#download">other systems</a>
-      <a class="btn btn-primary" data-download href="#download">
-        <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg>
-        <span data-download-label>download</span>
+  <header class="appbar" data-appbar>
+    <div class="appbar-inner">
+      <a class="brand" href="#top" aria-label="MixMusic, back to the top">
+        <svg class="brand-mark" width="28" height="28" aria-hidden="true"><use href="#i-rings" /></svg>
+        <span>MixMusic</span>
+      </a>
+      <nav class="appbar-nav" aria-label="Sections">
+        <a href="#features">Features</a>
+        <a href="#customize">Themes and plugins</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/fzn0x/mixmusic#readme">Docs</a>
+      </nav>
+      <a class="btn btn-outlined btn-small" href="https://github.com/fzn0x/mixmusic">
+        <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg>
+        <span>Star on GitHub</span>
       </a>
     </div>
-  </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title">Spotify and YouTube&nbsp;Music <br class="hero-break" />in one player.</h1>
+        <p class="hero-sub">One search across both services, one queue that mixes them and one library that keeps them, in a free, open-source desktop player you can theme and extend.</p>
+        <div class="actions">
+          <a class="btn btn-filled btn-large" data-download href="https://github.com/fzn0x/mixmusic/releases/latest">
+            <svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-download" /></svg>
+            <span data-download-label>Download</span>
+          </a>
+          <a class="btn btn-outlined btn-large" href="https://github.com/fzn0x/mixmusic">
+            <svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-star" /></svg>
+            <span>Star on GitHub</span>
+          </a>
+        </div>
+        <p class="meta">Version <span data-version>0.5.5</span> · MIT · macOS, Windows and Linux · YouTube Music needs no account</p>
+      </div>
+      <figure class="stage stage-hero" style="--glow: #717ed6">
+        <img src="assets/shots/now-playing.webp" width="1536" height="870" fetchpriority="high" alt="The now playing page in the Mochi theme: アイドル by YOASOBI, its cover under the visualizer, and its synced lyrics beside it." />
+      </figure>
+    </section>
+
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="section-head">
+        <h2 id="features-title">One player for both services</h2>
+        <p class="lead">Every page of MixMusic works across Spotify and YouTube Music. Pick one to see it.</p>
+      </div>
+
+      <div class="tabs" data-tabs style="--glow: #d671a1">
+        <div class="tab-list" role="tablist" aria-label="Features">
+          <button class="tab" role="tab" id="tab-search" aria-controls="panel-search" aria-selected="true" data-accent="#d671a1"><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-search" /></svg>Search</button>
+          <button class="tab" role="tab" id="tab-queue" aria-controls="panel-queue" aria-selected="false" tabindex="-1" data-accent="#edc45a"><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-queue" /></svg>Queue</button>
+          <button class="tab" role="tab" id="tab-library" aria-controls="panel-library" aria-selected="false" tabindex="-1" data-accent="#d86ea1"><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-library" /></svg>Library</button>
+          <button class="tab" role="tab" id="tab-explore" aria-controls="panel-explore" aria-selected="false" tabindex="-1" data-accent="#edc55a"><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-compass" /></svg>Explore</button>
+          <button class="tab" role="tab" id="tab-lyrics" aria-controls="panel-lyrics" aria-selected="false" tabindex="-1" data-accent="#5ebde8"><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-lyrics" /></svg>Lyrics and sound</button>
+          <button class="tab" role="tab" id="tab-keyboard" aria-controls="panel-keyboard" aria-selected="false" tabindex="-1" data-accent="#d671a1"><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-keyboard" /></svg>Keyboard</button>
+          <button class="tab" role="tab" id="tab-accounts" aria-controls="panel-accounts" aria-selected="false" tabindex="-1" data-accent="#d671a1"><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-account" /></svg>Accounts</button>
+        </div>
+
+        <div class="tab-body">
+          <figure class="stage stage-tab" data-stage>
+            <img class="stage-img is-shown" data-stage-img src="assets/shots/search.webp" width="1536" height="870" loading="lazy" alt="The search page, with the songs YouTube Music finds for yoasobi, each marked with where it comes from." />
+          </figure>
+
+          <div class="panel" role="tabpanel" id="panel-search" aria-labelledby="tab-search" data-shot="search" data-alt="The search page, with the songs YouTube Music finds for yoasobi, each marked with where it comes from.">
+            <h3>One search box for both services</h3>
+            <p>Suggestions come as you type, and the songs, albums, artists and playlists of Spotify and YouTube Music land in the same lists, each with a mark of where it comes from.</p>
+            <ul class="marks">
+              <li><span class="mark mark-spotify" aria-hidden="true"></span>A disc for Spotify</li>
+              <li><span class="mark mark-youtube" aria-hidden="true"></span>A square for YouTube Music</li>
+            </ul>
+            <p class="note">YouTube Music needs no account. Spotify joins the same search once you sign in with an app of your own; <a href="https://github.com/fzn0x/mixmusic/blob/main/docs/spotify.md">the guide</a> takes two minutes.</p>
+          </div>
+
+          <div class="panel" role="tabpanel" id="panel-queue" aria-labelledby="tab-queue" data-shot="home" data-alt="The home page's tiles and recently played, with up next beside them." hidden>
+            <h3>Tracks of both, in one queue</h3>
+            <p>Play next or add to the queue from any track, album or playlist, then drag to reorder. Shuffle, repeat and crossfade work across both services, and a radio carries on when the queue runs out.</p>
+            <p class="note">With Premium, Spotify tracks play in MixMusic or on a Spotify Connect device. Without it, MixMusic plays their recording from YouTube Music.</p>
+          </div>
+
+          <div class="panel" role="tabpanel" id="panel-library" aria-labelledby="tab-library" data-shot="liked" data-alt="The library's liked songs, アイドル playing at the top." hidden>
+            <h3>Liked songs and mixes of every service</h3>
+            <p>Like songs from either service and keep them together. Mixes hold tracks of both, a Spotify or YouTube Music playlist imports into one, and you can search and sort inside any of them.</p>
+            <p class="note">Your history and listening stats, day by day, sit beside them.</p>
+          </div>
+
+          <div class="panel" role="tabpanel" id="panel-explore" aria-labelledby="tab-explore" data-shot="explore" data-alt="Explore's moods and genres, as tiles." hidden>
+            <h3>Find what you have not heard yet</h3>
+            <p>New albums and singles, the charts of your country, and dozens of moods and genres, each opening its playlists. Under now playing, songs, playlists and artists like what you hear.</p>
+            <p class="note">Explore comes from YouTube Music, so it needs no account.</p>
+          </div>
+
+          <div class="panel" role="tabpanel" id="panel-lyrics" aria-labelledby="tab-lyrics" data-shot="lyrics" data-alt="The lyrics panel, following アイドル, beside the anime movie nights mix." hidden>
+            <h3>Lyrics that follow the song</h3>
+            <p>Synced lyrics from LRCLIB and YouTube Music light up line by line, on now playing or beside any page, or read them whole as plain text.</p>
+            <p class="note">Tune the sound with a 10-band equalizer and its presets, volume levelling and crossfade. What you played is cached for next time.</p>
+          </div>
+
+          <div class="panel" role="tabpanel" id="panel-keyboard" aria-labelledby="tab-keyboard" data-shot="palette" data-alt="The command palette over the home page." hidden>
+            <h3>Fast at the keyboard, quiet in the background</h3>
+            <dl class="keys">
+              <div><dt><kbd data-mod>Ctrl</kbd><kbd>K</kbd></dt><dd>Command palette</dd></div>
+              <div><dt><kbd>Space</kbd></dt><dd>Play or pause</dd></div>
+              <div><dt><kbd data-mod>Ctrl</kbd><kbd>→</kbd></dt><dd>Next track</dd></div>
+              <div><dt><kbd data-mod>Ctrl</kbd><kbd>F</kbd></dt><dd>Search</dd></div>
+            </dl>
+            <p class="note">Every key is yours to change. The tray, media keys, notifications, a mini player and start at login do the everyday work while the window stays closed.</p>
+          </div>
+
+          <div class="panel" role="tabpanel" id="panel-accounts" aria-labelledby="tab-accounts" data-shot="accounts" data-alt="Settings › Accounts, with the steps to sign in to Spotify." hidden>
+            <h3>Your own music comes along</h3>
+            <p>Sign in to YouTube Music on Google's own page for your home feed and library, or to Spotify with an app of your own. Likes and saves reach the service too.</p>
+            <p class="note">Last.fm gets every track you hear, and Discord shows what plays on your profile.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section walkthrough" id="walkthrough" aria-labelledby="walkthrough-title" style="--glow: #717ed6">
+      <div class="section-head">
+        <h2 id="walkthrough-title">A minute in the player</h2>
+        <p class="lead">Page by page, from home to the sleep timer, in the Mochi theme. The recording has no sound.</p>
+      </div>
+      <figure class="video">
+        <video src="assets/walkthrough.mp4" poster="assets/walkthrough.webp" width="1920" height="1080" muted playsinline preload="metadata" aria-label="The walkthrough: a minute in MixMusic, page by page, in the Mochi theme" data-walkthrough></video>
+      </figure>
+      <div class="player">
+        <button class="play" type="button" aria-label="Play the walkthrough" data-play><svg class="icon i-play" width="22" height="22" aria-hidden="true"><use href="#i-play" /></svg><svg class="icon i-pause" width="22" height="22" aria-hidden="true"><use href="#i-pause" /></svg></button>
+        <div class="scrub" role="slider" tabindex="0" aria-label="Position in the walkthrough" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" aria-valuetext="0:00 of 1:00" data-scrub><span class="scrub-fill" data-scrub-fill></span></div>
+        <span class="time" data-time>0:00 / 1:00</span>
+      </div>
+      <div class="chips" role="group" aria-label="Chapters of the walkthrough" data-chapters>
+        <button class="chip is-current" type="button" aria-current="true" data-at="0.4">Home</button>
+        <button class="chip" type="button" data-at="4.6">Now playing</button>
+        <button class="chip" type="button" data-at="14.4">Search</button>
+        <button class="chip" type="button" data-at="23.6">Library</button>
+        <button class="chip" type="button" data-at="32.8">Explore</button>
+        <button class="chip" type="button" data-at="35.8">Stats</button>
+        <button class="chip" type="button" data-at="38.9">Palette</button>
+        <button class="chip" type="button" data-at="45">Themes</button>
+        <button class="chip" type="button" data-at="56.8">Plugins</button>
+      </div>
+    </section>
+
+    <section class="section" id="customize" aria-labelledby="customize-title">
+      <div class="section-head">
+        <h2 id="customize-title">Make it yours</h2>
+        <p class="lead">The whole look is a theme. Ten ship with the app, and the community makes more.</p>
+      </div>
+
+      <div class="gallery" data-gallery style="--glow: #00bde3">
+        <figure class="stage stage-gallery">
+          <img class="gallery-img is-shown" src="assets/shots/theme-mix.webp" width="1440" height="844" loading="lazy" alt="The home page in the Mix theme." />
+        </figure>
+        <div class="gallery-side">
+          <p class="gallery-caption"><strong data-gallery-name>Mix</strong> <span data-gallery-desc>The default: flat colour tiles and giant lowercase on true black.</span></p>
+          <div class="chips chips-themes" role="group" aria-label="Choose a theme to preview">
+            <button class="chip chip-theme is-current" type="button" aria-pressed="true" data-theme="mix" data-name="Mix" data-desc="The default, flat colour tiles and giant lowercase on true black." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#00bde3"></i><i style="background:#e6007e"></i><i style="background:#a4e600"></i><i style="background:#ffb000"></i></span>Mix</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="aurora" data-name="Aurora" data-desc="Frosted glass panels over slowly drifting northern lights." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#4ee6c0"></i><i style="background:#7b5cff"></i><i style="background:#3fa9ff"></i><i style="background:#ff6b9a"></i></span>Aurora</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="daylight" data-name="Daylight" data-desc="Black ink and deep tiles on white, for bright rooms." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#0078d7"></i><i style="background:#c30052"></i><i style="background:#107c10"></i><i style="background:#ca5010"></i></span>Daylight</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="midnight" data-name="Midnight" data-desc="True black for OLED screens, with a coral accent." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#ff5a7a"></i><i style="background:#7b5cff"></i><i style="background:#00c2a8"></i><i style="background:#ffb000"></i></span>Midnight</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="sakura" data-name="Sakura" data-desc="Cherry blossom pinks on paper white." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#e0457b"></i><i style="background:#f7a8c4"></i><i style="background:#9fd6c2"></i><i style="background:#f9c784"></i></span>Sakura</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="terminal" data-name="Terminal" data-desc="Green phosphor on black, in a monospaced font." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#39ff14"></i><i style="background:#1f8f1f"></i><i style="background:#b8ffb0"></i><i style="background:#ffb000"></i></span>Terminal</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="greenroom" data-name="Greenroom" data-desc="A charcoal backstage lit by one jade light, washed in the colour of the cover playing." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#0e7c58"></i><i style="background:#8b2a73"></i><i style="background:#2a4bb8"></i><i style="background:#b9461a"></i></span>Greenroom</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="glasshouse" data-name="Glasshouse" data-desc="White glass and a rose-red accent, frosted over the colours of the cover." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#e11d48"></i><i style="background:#7c3aed"></i><i style="background:#0369a1"></i><i style="background:#0f766e"></i></span>Glasshouse</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="anime" data-name="Anime" data-desc="Summer-sky blues and cel colours, with speed lines that burst as each track starts." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#5cc8ff"></i><i style="background:#ffa040"></i><i style="background:#ff8fcf"></i><i style="background:#63d98b"></i></span>Anime</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="mochi" data-name="Mochi" data-desc="Kawaii candy pastels, round as mochi, with sparkles drifting up." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#ffb5d3"></i><i style="background:#cdb9ff"></i><i style="background:#a9ead5"></i><i style="background:#ffe08a"></i></span>Mochi</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="neon-nights" data-name="Neon Nights" data-desc="Electric magenta and violet tiles on deep indigo, from the community." data-meta="community"><span class="dots" aria-hidden="true"><i style="background:#ff3ea5"></i><i style="background:#8a5cff"></i><i style="background:#22d3ee"></i><i style="background:#ffd23e"></i></span>Neon Nights</button>
+            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="paper-mint" data-name="Paper Mint" data-desc="A quiet light theme of graphite ink, mint and coral tiles, from the community." data-meta="community"><span class="dots" aria-hidden="true"><i style="background:#0c7a5d"></i><i style="background:#c4473a"></i><i style="background:#3d6fb6"></i><i style="background:#8a6510"></i></span>Paper Mint</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-palette" /></svg>Make a theme</h3>
+          <p>A theme is a folder with a <code>theme.json</code>: eighteen colours, the fonts and a corner radius. MixMusic draws everything with them, so a theme keeps working as the app changes. Let it follow your computer, with one theme for light mode and one for dark.</p>
+          <a class="link" href="https://github.com/fzn0x/mixmusic/blob/main/docs/themes.md">Theme guide<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
+        </div>
+        <div class="column">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-puzzle" /></svg>Add a plugin</h3>
+          <p>Plugins are ES modules that add pages, commands, track actions and widgets through a typed API, and install from the marketplace in one click, like a sleep timer or a spectrum on now playing. Every plugin can use the whole API, and MixMusic tells you so before you enable one.</p>
+          <a class="link" href="https://github.com/fzn0x/mixmusic/blob/main/docs/plugins.md">Plugin guide<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
+          <a class="link" href="https://github.com/fzn0x/mixmusic/tree/main/community">Community themes and plugins<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="download" aria-labelledby="download-title">
+      <div class="section-head">
+        <h2 id="download-title">Download MixMusic</h2>
+        <p class="lead">Free for macOS, Windows and Linux. Version <span data-version>0.5.5</span>; every file is on the GitHub releases page.</p>
+      </div>
+
+      <ul class="systems">
+        <li class="system" data-os="mac">
+          <span class="system-yours">Your system</span>
+          <h3>macOS</h3>
+          <p>macOS 12 and later, Apple silicon and Intel.</p>
+          <p class="system-files">.dmg</p>
+          <a class="btn btn-tonal" href="https://github.com/fzn0x/mixmusic/releases/latest"><svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>Get it on GitHub</span></a>
+        </li>
+        <li class="system" data-os="windows">
+          <span class="system-yours">Your system</span>
+          <h3>Windows</h3>
+          <p>Windows 10 and 11, x64 and Arm.</p>
+          <p class="system-files">Installer · portable zip</p>
+          <a class="btn btn-tonal" href="https://github.com/fzn0x/mixmusic/releases/latest"><svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>Get it on GitHub</span></a>
+        </li>
+        <li class="system" data-os="linux">
+          <span class="system-yours">Your system</span>
+          <h3>Linux</h3>
+          <p>x64 and Arm64, for Debian, Ubuntu, Fedora, openSUSE and the rest.</p>
+          <p class="system-files">.deb · .rpm · AppImage · .tar.gz with an install script</p>
+          <a class="btn btn-tonal" href="https://github.com/fzn0x/mixmusic/releases/latest"><svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg><span>Get it on GitHub</span></a>
+        </li>
+      </ul>
+
+      <div class="needs">
+        <h3>What it needs</h3>
+        <dl>
+          <div><dt>YouTube Music</dt><dd>yt-dlp, which MixMusic installs for you from Settings › Playback, and a JavaScript runtime on your PATH: Deno, Node.js, Bun or QuickJS.</dd></div>
+          <div><dt>Spotify</dt><dd>An app of your own from the Spotify developer dashboard, made with a Spotify account that has Premium. <a href="https://github.com/fzn0x/mixmusic/blob/main/docs/spotify.md">The guide</a> walks through it.</dd></div>
+          <div><dt>First launch</dt><dd>The macOS app is not notarized yet: open it once from System Settings › Privacy &amp; Security › Open Anyway. The Windows installer is not signed yet: if SmartScreen warns, choose More info › Run anyway.</dd></div>
+          <div><dt>Linux</dt><dd>GTK 3, and PulseAudio (which PipeWire serves too) or ALSA; signing in to YouTube Music takes WebKitGTK 4.1. On Debian and Ubuntu: <code>sudo apt install libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0</code></dd></div>
+        </dl>
+        <p class="note">Check each file against <code>SHA256SUMS</code> in the release. Older versions are on the <a href="https://github.com/fzn0x/mixmusic/releases">releases page</a> too.</p>
+      </div>
+    </section>
+
+    <section class="section section-open" id="open-source" aria-labelledby="open-title">
+      <div class="open-copy">
+        <h2 id="open-title">Built in the open</h2>
+        <p>MixMusic is MIT licensed: one small Go program built on MyGo, which draws its windows itself on the GPU, with no browser inside. Fixes, features, themes, plugins and reports of what does not work are all welcome.</p>
+      </div>
+      <ul class="links">
+        <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CONTRIBUTING.md"><strong>Contributing</strong><span>Build it, check it, open a pull request</span></a></li>
+        <li><a href="https://github.com/fzn0x/mixmusic/issues"><strong>Issues</strong><span>Report a bug or ask for a feature</span></a></li>
+        <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md"><strong>Changelog</strong><span>What changed in each release</span></a></li>
+        <li><a href="https://github.com/fzn0x/mixmusic/blob/main/docs/architecture.md"><strong>Architecture</strong><span>Where everything lives</span></a></li>
+        <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CODE_OF_CONDUCT.md"><strong>Code of conduct</strong><span>How we work together</span></a></li>
+        <li><a href="https://github.com/fzn0x/mixmusic/blob/main/SECURITY.md"><strong>Security</strong><span>Report a vulnerability privately</span></a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <a class="brand brand-small" href="#top" aria-label="MixMusic, back to the top">
+        <svg class="brand-mark" width="22" height="22" aria-hidden="true"><use href="#i-rings" /></svg>
+        <span>MixMusic</span>
+      </a>
+      <p>Free and open source under the MIT license. Spotify and YouTube Music are trademarks of their owners; MixMusic is not made by either.</p>
+      <a class="btn btn-filled" data-download href="https://github.com/fzn0x/mixmusic/releases/latest">
+        <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg>
+        <span data-download-label>Download</span>
+      </a>
+    </div>
+  </footer>
 
   <script src="app.js" defer></script>
 </body>

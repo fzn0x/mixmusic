@@ -115,7 +115,7 @@ func (p *Player) Report(np NowPlaying) {
 	p.a.mu.Unlock()
 	s := p.a.settings.Get()
 	p.a.scrobble(np)
-	p.a.presence.update(s.DiscordPresence, s.DiscordAppID, np)
+	p.a.presence.update(s.DiscordPresence, s.DiscordApp(), np)
 	p.a.reportControls(np)
 	if bar != nil {
 		bar.Show(np.Playing, np.Track != nil)

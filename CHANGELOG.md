@@ -14,6 +14,12 @@ All notable changes to MixMusic are documented here. The format follows
   Discord in Settings › Desktop, where you can still paste the ID of an
   application of yours to show its name. If you had set up your own
   application and turned it off, it stays off.
+- Discord's member list says "Listening to MixMusic" rather than the
+  artists, for Spotify and YouTube Music tracks alike; your profile still
+  shows the title, the artists and the artwork. Discord's own Spotify
+  status comes from your Discord account's link to Spotify: to show only
+  MixMusic, turn off Display Spotify as your status in Discord's
+  Connections.
 
 ## [0.5.5] - 2026-10-28
 

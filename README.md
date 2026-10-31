@@ -214,11 +214,11 @@ minutes.
 
 ### Discord
 
-Discord shows the name of an application beside what you listen to. Create
-one called MixMusic in the
-[Discord developer portal](https://discord.com/developers/applications),
-turn on Show what plays on Discord in Settings › Desktop, and paste its
-application ID there. The Discord app has to be running.
+While the Discord app runs, your profile shows what you listen to, as
+MixMusic. Turn it off with Show what plays on Discord in Settings ›
+Desktop. To show another name, create an application in the
+[Discord developer portal](https://discord.com/developers/applications)
+and paste its application ID there.
 
 ## Make it yours
 
@@ -311,8 +311,8 @@ talks to:
   which you can turn off in Settings › About, and each time you open that
   page; the community registry when you open the marketplace, and the
   downloads of yt-dlp.
-- **Last.fm,** once you connect it: what you play. **Discord**, once you
-  turn it on: what plays, to the Discord app on your computer, which shows
+- **Last.fm,** once you connect it: what you play. **Discord**, unless you
+  turn it off: what plays, to the Discord app on your computer, which shows
   it on your profile.
 
 What it keeps on your computer: your settings and library (liked songs,

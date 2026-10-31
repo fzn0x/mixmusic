@@ -6,6 +6,15 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Your Discord profile shows what plays without setting anything up:
+  MixMusic has its own Discord application now, so you no longer create
+  one and paste its ID. It is on unless you turn off Show what plays on
+  Discord in Settings › Desktop, where you can still paste the ID of an
+  application of yours to show its name. If you had set up your own
+  application and turned it off, it stays off.
+
 ## [0.5.5] - 2026-10-28
 
 Pages scroll smoothly on every system, even with thousands of liked songs

@@ -26,7 +26,7 @@ One queue and one library across Spotify and YouTube Music, in an open-source de
 - YouTube Music needs no account. Its audio streams are found by yt-dlp, which MixMusic installs on request, with a JavaScript runtime (Deno, Node, Bun or QuickJS) found on the system. Signing in to YouTube Music, optional, happens on Google's own page in a window of MixMusic; MixMusic keeps the session's cookies encrypted, and YouTube does not offer this to apps officially.
 - Spotify sign-in uses each user's own Client ID from the Spotify developer dashboard, with the redirect URI `http://127.0.0.1:47823/callback`. Spotify's development mode limits apps: an owner with Premium, up to five users added under Users Management (refused otherwise with a 403 that Settings › Accounts explains), ten search results per kind, no access to the tracks of playlists the user does not own, no artist top-tracks endpoint.
 - Lyrics come from LRCLIB (synchronized when available) and YouTube Music.
-- The app runs for hours in the background: the tray, media keys and the system's media controls, desktop notifications, the mini player. It can scrobble to Last.fm (with the user's own API account), show what plays on Discord (with the user's Discord application), and update itself from signed releases.
+- The app runs for hours in the background: the tray, media keys and the system's media controls, desktop notifications, the mini player. It can scrobble to Last.fm (with the user's own API account), show what plays on Discord (as MixMusic's Discord application, or the user's), and update itself from signed releases.
 
 ## Capabilities and Constraints
 

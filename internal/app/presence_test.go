@@ -23,7 +23,7 @@ func TestActivityOf(t *testing.T) {
 		},
 	}
 	a := activityOf(track, start, 0)
-	if a.Type != discord.Listening || a.Details != "Let It Happen" || a.State != "Tame Impala" || a.LargeText != "Currents" || a.StatusDisplay != discord.ShowState {
+	if a.Type != discord.Listening || a.Details != "Let It Happen" || a.State != "Tame Impala" || a.LargeText != "Currents" || a.StatusDisplay != discord.ShowName {
 		t.Errorf("activity = %+v", a)
 	}
 	if !a.Start.Equal(start) || !a.End.Equal(start.Add(467*time.Second)) {

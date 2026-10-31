@@ -95,8 +95,9 @@ func activityOf(t media.Track, start time.Time, durationMs int) *discord.Activit
 		Details: t.Title,
 		State:   t.ArtistNames(),
 		Start:   start,
-		// The member list says who plays, not "MixMusic".
-		StatusDisplay: discord.ShowState,
+		// The member list says "Listening to MixMusic", whether the track
+		// is Spotify's or YouTube Music's.
+		StatusDisplay: discord.ShowName,
 	}
 	if durationMs == 0 {
 		durationMs = t.DurationMs

@@ -27,7 +27,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 		toggle("discord", "Show what plays on Discord", "While Discord runs, your profile says what you listen to, with the artwork and the time left; pausing clears it.", &s.set.DiscordPresence)
 		if s.set.DiscordPresence {
 			describe := func() {
-				ui.Text(c, "Discord shows the name of an application: create one called MixMusic in the ")
+				ui.Text(c, "Discord shows the name of MixMusic's application. To show another, create one in the ")
 				ui.Link(c, "developer portal", "https://discord.com/developers/applications")
 				ui.Text(c, " and paste its application ID.")
 			}
@@ -36,7 +36,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 					s.set.DiscordAppID = id
 					s.save()
 				})
-				in.Width(260).Label("Discord application ID")
+				in.Placeholder("MixMusic's").Width(260).Label("Discord application ID")
 			})
 		}
 		s.row(c, "Start at login", "", func() {

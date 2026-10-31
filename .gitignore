@@ -27,5 +27,4 @@ Thumbs.db
 .env
 .env.*
 !.env.example
-.impeccable/questions/
-.impeccable/review/
+.impeccable/

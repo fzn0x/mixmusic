@@ -119,6 +119,9 @@ type App struct {
 	// readingProfiles is set while the accounts' profiles are read in the
 	// background.
 	readingProfiles atomic.Bool
+	// youtubeChecking is set while a new YouTube session waits for YouTube
+	// Music to take it: the cookies YouTube changes meanwhile aren't kept.
+	youtubeChecking atomic.Bool
 	// updating is held while an update installs.
 	updating sync.Mutex
 	// quitting is set once MixMusic starts to quit: its windows close then,

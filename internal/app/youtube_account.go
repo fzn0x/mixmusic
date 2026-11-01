@@ -247,8 +247,25 @@ func (a *App) openYouTube() {
 	// Version 0.2.0 gave yt-dlp the session in this file. Streams are
 	// found signed out now, so the copy goes.
 	os.Remove(filepath.Join(a.opts.CacheDir, "youtube-cookies.txt"))
-	// The account the session uses stays with the cookies YouTube changes.
+	removeCookieExports()
+	a.watchYouTube()
+	session, err := a.youtubeStore.Load()
+	if err != nil || len(session.cookies) == 0 {
+		return
+	}
+	a.youtube.SetCookies(session.cookies)
+	a.youtube.SetAuthUser(session.authUser)
+	a.youtube.SetChannel(a.settings.Get().YouTubeChannel)
+}
+
+// watchYouTube keeps the cookies YouTube changes, with the account the
+// session uses, and has the accounts tell when YouTube ends the session.
+func (a *App) watchYouTube() {
 	a.youtube.OnCookies = func(cookies []*http.Cookie) {
+		// A session YouTube Music hasn't taken yet is not kept.
+		if a.youtubeChecking.Load() {
+			return
+		}
 		if err := a.youtubeStore.Save(youtubeSession{cookies, a.youtube.AuthUser()}); err != nil {
 			log.Printf("mixmusic: keeping the YouTube session: %v", err)
 		}
@@ -261,13 +278,6 @@ func (a *App) openYouTube() {
 		a.mu.Unlock()
 		notify()
 	}
-	session, err := a.youtubeStore.Load()
-	if err != nil || len(session.cookies) == 0 {
-		return
-	}
-	a.youtube.SetCookies(session.cookies)
-	a.youtube.SetAuthUser(session.authUser)
-	a.youtube.SetChannel(a.settings.Get().YouTubeChannel)
 }
 
 func (a *App) youtubeAccount(ctx context.Context) YouTubeAccount {
@@ -337,21 +347,58 @@ func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
 	case <-ctx.Done():
 		return AccountsStatus{}, errors.New("signing in to YouTube Music took too long; try again")
 	}
-	s.a.youtube.SetCookies(cookies)
-	s.a.mu.Lock()
-	s.a.youtubeMe, s.a.profileErrs.youtube = nil, ""
-	s.a.mu.Unlock()
-	if _, err := s.a.youtube.Account(ctx); err != nil {
-		s.a.youtube.SetCookies(nil)
+	return s.a.youtubeSignIn(ctx, cookies)
+}
+
+// youtubeSignIn signs MixMusic in to YouTube Music with the cookies of a
+// session, as the first Google account of it and that account itself,
+// once one signed-in request shows that YouTube Music takes them; then it
+// keeps them. Every way of signing in ends here. Nothing is kept of a
+// session YouTube Music did not take.
+func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (AccountsStatus, error) {
+	a.youtubeChecking.Store(true)
+	defer a.youtubeChecking.Store(false)
+	a.youtube.SetCookies(nil) // no account or channel of a session before
+	a.youtube.SetCookies(cookies)
+	a.mu.Lock()
+	a.youtubeMe, a.profileErrs.youtube = nil, ""
+	a.mu.Unlock()
+	me, err := a.youtube.Account(ctx)
+	if err != nil {
+		a.youtube.SetCookies(nil)
+		if errors.Is(err, youtube.ErrSessionRejected) {
+			return AccountsStatus{}, worded("YouTube Music did not accept the session: it may have ended, as when you sign out of Google. Sign in to YouTube Music again, then try again", err)
+		}
 		return AccountsStatus{}, fmt.Errorf("YouTube Music did not accept the sign-in: %w", err)
 	}
-	if err := s.a.youtubeStore.Save(youtubeSession{cookies: cookies}); err != nil {
+	if set := a.settings.Get(); set.YouTubeChannel != "" {
+		set.YouTubeChannel = ""
+		if err := a.settings.Set(set); err != nil {
+			log.Printf("mixmusic: forgetting the YouTube Music channel: %v", err)
+		}
+	}
+	if err := a.youtubeStore.Save(youtubeSession{cookies: a.youtube.Cookies()}); err != nil {
+		a.youtube.SetCookies(nil)
 		return AccountsStatus{}, err
 	}
-	status := s.a.accountsStatus(ctx)
+	a.mu.Lock()
+	a.youtubeMe = &me
+	a.mu.Unlock()
+	status := a.accountsStatus(ctx)
 	notify()
 	return status, nil
 }
+
+// wordedError is an error in the words of the interface, wrapping the
+// error it tells of.
+type wordedError struct {
+	text string
+	err  error
+}
+
+func worded(text string, err error) error { return &wordedError{text, err} }
+func (e *wordedError) Error() string      { return e.text }
+func (e *wordedError) Unwrap() error      { return e.err }
 
 // windowSession returns the cookies of the sign-in window that a request to
 // YouTube Music sends, when they hold a signed-in session.

@@ -258,7 +258,7 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 	n := len(ly.Lines) + 1
 	list := ui.List(c.Key("lyrics-"+where+"-"+t.ID), &view.list, n, func(i int) {
 		if i == len(ly.Lines) {
-			ui.Text(c, "lyrics from "+ly.Source).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24)
+			s.lyricsCredit(c, ly)
 			return
 		}
 		line := ly.Lines[i]
@@ -293,6 +293,22 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		view.scrolled = active
 		view.list.ScrollTo(active, ui.Center)
 	}
+}
+
+// lyricsCredit names where lyrics come from, with the link to it their
+// licence asks for, as Unison's does: "lyrics from Unison
+// (https://unison.boidu.dev)".
+func (s *shell) lyricsCredit(c *ui.Context, ly lyrics.Lyrics) {
+	k := &s.lk
+	if ly.SourceURL == "" {
+		ui.Text(c, "lyrics from "+ly.Source).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24)
+		return
+	}
+	ui.RichText(c).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24).Children(func() {
+		ui.Text(c, "lyrics from "+ly.Source+" (")
+		s.linkOf(c, ly.SourceURL, ly.SourceURL)
+		ui.Text(c, ")")
+	})
 }
 
 func (s *shell) emptyIn(c *ui.Context, text string) {

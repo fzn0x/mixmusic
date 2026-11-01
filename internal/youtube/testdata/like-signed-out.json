@@ -1,0 +1,14 @@
+{
+  "error": {
+    "code": 401,
+    "message": "You must be signed in to perform this operation.",
+    "errors": [
+      {
+        "message": "You must be signed in to perform this operation.",
+        "domain": "global",
+        "reason": "unauthorized"
+      }
+    ],
+    "status": "UNAUTHENTICATED"
+  }
+}

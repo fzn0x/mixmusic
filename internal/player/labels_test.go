@@ -125,11 +125,18 @@ func newLabeled(t *testing.T, saved Saved, ai []string, setup ...func(*fakeServi
 	return h, l
 }
 
-// marked is the IDs of the entries marked as made with AI.
+// The notices of passing over what YouTube labels as made with AI.
+const (
+	restLabeled   = "The rest of the queue is songs YouTube labels as made with AI"
+	radiosLabeled = "Autoplay stopped: three radios in a row held only songs YouTube labels as made with AI"
+	radioLabeled  = "Autoplay stopped: the radio held nothing new but songs YouTube labels as made with AI"
+)
+
+// marked is the IDs of the entries the queue passes over as made with AI.
 func marked(s State) []string {
 	var out []string
 	for _, it := range s.Queue {
-		if it.MadeWithAI {
+		if it.Skip == SkipMadeWithAI {
 			out = append(out, it.Track.ID)
 		}
 	}
@@ -159,7 +166,7 @@ func (h *harness) noticed(message string) {
 // tells of it once the next one plays, without an error.
 func TestSkipAI(t *testing.T) {
 	h, l := newLabeled(t, Saved{}, []string{"b"})
-	h.p.PlayTracks(tracks("a", "b", "c"), 0)
+	h.p.PlayAll(tracks("a", "b", "c"), false)
 	h.wait("a playing", playing("a"))
 	h.p.Ended()
 	h.wait("c playing", playing("c"))
@@ -191,6 +198,41 @@ func TestSkipAI(t *testing.T) {
 	}
 }
 
+// TestSkipBothReasons passes over, in one move, a track the user dislikes
+// and one YouTube labels as made with AI, checked as it's reached, to the
+// one that plays, and tells of both in one notice.
+func TestSkipBothReasons(t *testing.T) {
+	h, l := newLabeled(t, Saved{}, []string{"c"}, disliking("b"))
+	h.p.PlayTracks(tracks("a", "b", "c", "d"), 0)
+	h.wait("a playing", playing("a"))
+	if got := skips(h.p.State()); !slices.Equal(got, []string{"b"}) {
+		t.Errorf("the queue passes over %v", got)
+	}
+	h.p.Next()
+	h.wait("d playing", playing("d"))
+	h.noticed("Skipped 2 songs you dislike or YouTube labels as made with AI")
+	if n := h.notices(); len(n) != 1 {
+		t.Errorf("notices %+v", n)
+	}
+	s := h.p.State()
+	if s.Queue[1].Skip != SkipDisliked || s.Queue[2].Skip != SkipMadeWithAI {
+		t.Errorf("b passed over as %q, c as %q", s.Queue[1].Skip, s.Queue[2].Skip)
+	}
+	// The disliked track needed no check; neither track was told of, nor
+	// loaded.
+	if got := l.checks(); !slices.Equal(got, []string{"yt:c", "yt:d"}) {
+		t.Errorf("checked %v", got)
+	}
+	for _, id := range []string{"b", "c"} {
+		if h.reported("yt:"+id) || slices.Contains(h.loads(), id) {
+			t.Errorf("%s was told of or loaded", id)
+		}
+	}
+	// Back again, past both, to a.
+	h.p.Previous()
+	h.wait("a playing", playing("a"))
+}
+
 // TestSkipAIOff plays what YouTube labels, without a check, while the
 // settings don't skip it.
 func TestSkipAIOff(t *testing.T) {
@@ -209,7 +251,7 @@ func TestSkipAIOff(t *testing.T) {
 // TestSkipAIChosen plays a track the user chose, labeled or not.
 func TestSkipAIChosen(t *testing.T) {
 	h, l := newLabeled(t, Saved{}, []string{"b"})
-	h.p.PlayChosen(tracks("b", "c"), 0)
+	h.p.PlayTracks(tracks("b", "c"), 0)
 	h.wait("b playing", playing("b"))
 	if got := l.checks(); len(got) != 0 {
 		t.Errorf("checked %v", got)
@@ -225,21 +267,32 @@ func TestSkipAIChosen(t *testing.T) {
 	h.wait("b playing again", func(p *Player) bool { return playing("b")(p) && h.stream.count("load url:yt:b") == 3 })
 }
 
-// TestSkipAIPlayTracks passes over the labeled tracks at the start of a
-// list played, and stops, telling why, when all of them are.
-func TestSkipAIPlayTracks(t *testing.T) {
-	h, _ := newLabeled(t, Saved{}, []string{"a", "b"})
-	h.p.PlayTracks(tracks("a", "b", "c"), 0)
+// TestSkipAIPlayAll passes over the labeled tracks at the start of a list
+// played, checked first; tells, and changes nothing, when it knows them all
+// labeled; and stops, telling why, when it finds them so.
+func TestSkipAIPlayAll(t *testing.T) {
+	h, l := newLabeled(t, Saved{}, []string{"a", "b", "e", "f"})
+	h.p.PlayAll(tracks("a", "b", "c"), false)
 	h.wait("c playing", playing("c"))
 	h.noticed("Skipped 2 songs YouTube labels as made with AI")
 	if h.reported("yt:a") || h.reported("yt:b") {
 		t.Error("a skipped track was told of")
 	}
-	h.p.PlayTracks(tracks("a", "b"), 0)
-	h.noticed(restLabeled)
+	h.p.PlayAll(tracks("a", "b"), false)
+	h.noticed("YouTube labels every song here as made with AI")
+	h.on(func(p *Player) {
+		if !playing("c")(p) || len(p.s.Queue) != 3 {
+			t.Errorf("a list known labeled changed the queue to %v", queueIDs(p.s))
+		}
+	})
+	h.p.PlayAll(tracks("e", "f"), false)
+	h.noticed("The rest of the queue is songs YouTube labels as made with AI")
 	h.wait("stopping", func(p *Player) bool { return p.s.Index == -1 && !p.s.Loading && !p.s.Playing })
 	if got := h.stream.sounding(); got != "" {
 		t.Errorf("%s plays on", got)
+	}
+	if got := l.checks(); !slices.Equal(got, []string{"yt:a", "yt:b", "yt:c", "yt:e", "yt:f"}) {
+		t.Errorf("checked %v", got)
 	}
 }
 
@@ -247,13 +300,13 @@ func TestSkipAIPlayTracks(t *testing.T) {
 // current one over when only labeled ones come before it.
 func TestSkipAIPrevious(t *testing.T) {
 	h, _ := newLabeled(t, Saved{}, []string{"b"})
-	h.p.PlayChosen(tracks("a", "b", "c"), 2)
+	h.p.PlayTracks(tracks("a", "b", "c"), 2)
 	h.wait("c playing", playing("c"))
 	h.p.Previous()
 	h.wait("a playing", playing("a"))
 	h.noticed("Skipped Song b, which YouTube labels as made with AI")
 
-	h.p.PlayChosen(tracks("b", "c"), 1)
+	h.p.PlayTracks(tracks("b", "c"), 1)
 	h.wait("c playing", func(p *Player) bool { return playing("c")(p) && h.stream.count("load url:yt:c") == 2 })
 	h.p.Previous()
 	h.wait("c from its start", func(*Player) bool { return h.stream.has("seek 0s") })
@@ -271,7 +324,7 @@ func TestSkipAISlowCheck(t *testing.T) {
 	labelWait = 50 * time.Millisecond
 	t.Cleanup(func() { labelWait = wait })
 	h, l := newLabeled(t, Saved{}, []string{"b"})
-	h.p.PlayChosen(tracks("a", "b"), 0)
+	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing", playing("a"))
 	l.with(func(l *labeled) { l.delay = 5 * time.Second })
 	h.p.Next()
@@ -291,7 +344,7 @@ func TestSkipAINotAnnounced(t *testing.T) {
 			mu.Unlock()
 		}
 	})
-	h.p.PlayChosen(tracks("a", "b", "c"), 0)
+	h.p.PlayTracks(tracks("a", "b", "c"), 0)
 	h.wait("a playing", playing("a"))
 	gate := make(chan struct{})
 	l.with(func(l *labeled) { l.gate = gate })
@@ -321,7 +374,7 @@ func TestSkipAINotAnnounced(t *testing.T) {
 // instead; one whose check failed isn't, and is checked again in turn.
 func TestSkipAIPrefetch(t *testing.T) {
 	h, l := newLabeled(t, Saved{}, []string{"b"}, func(f *fakeServices) { f.settings.Crossfade = 5 })
-	h.p.PlayChosen(tracks("a", "b", "c", "d"), 0)
+	h.p.PlayTracks(tracks("a", "b", "c", "d"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Time(11*time.Second, 200*time.Second)
 	h.wait("b marked", func(p *Player) bool { return slices.Equal(marked(p.s), []string{"yt:b"}) })
@@ -371,7 +424,7 @@ func TestSkipAIAhead(t *testing.T) {
 		ids = append(ids, "x"+strconv.Itoa(i))
 	}
 	h, l := newLabeled(t, Saved{}, ids[1:])
-	h.p.PlayChosen(tracks(ids...), 0)
+	h.p.PlayTracks(tracks(ids...), 0)
 	h.wait("a playing", playing("a"))
 	// Each progress past the check of the one before checks the next.
 	for i := range labelAhead {
@@ -391,7 +444,7 @@ func TestSkipAIAhead(t *testing.T) {
 // TestSkipAIRun tells of a run of skips in one notice.
 func TestSkipAIRun(t *testing.T) {
 	h, _ := newLabeled(t, Saved{}, []string{"b", "c", "d"})
-	h.p.PlayChosen(tracks("a", "b", "c", "d", "e"), 0)
+	h.p.PlayTracks(tracks("a", "b", "c", "d", "e"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Ended()
 	h.wait("e playing", playing("e"))
@@ -412,13 +465,13 @@ func TestSkipAIRun(t *testing.T) {
 // had to check.
 func TestSkipAIEnd(t *testing.T) {
 	h, _ := newLabeled(t, Saved{}, []string{"b"})
-	h.p.PlayChosen(tracks("a", "b"), 0)
+	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Next()
 	h.noticed(restLabeled)
 	h.wait("a stopped", func(p *Player) bool { return p.s.Index == 0 && !p.s.Playing && !p.s.Loading })
 
-	h.p.PlayChosen(tracks("a", "b"), 0)
+	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing again", func(p *Player) bool { return playing("a")(p) && h.stream.count("load url:yt:a") == 2 })
 	h.p.Next()
 	time.Sleep(20 * time.Millisecond)
@@ -433,15 +486,13 @@ func TestSkipAIEnd(t *testing.T) {
 }
 
 // TestSkipAIRepeatAll stops, rather than going round the queue, when all
-// it holds but the current track is labeled, which is too.
+// it holds is labeled.
 func TestSkipAIRepeatAll(t *testing.T) {
 	h, l := newLabeled(t, Saved{}, []string{"a", "b", "c"})
-	h.p.PlayChosen(tracks("a", "b", "c"), 0)
-	h.wait("a playing", playing("a"))
-	h.p.CycleRepeat()
-	h.p.Ended()
+	h.on(func(p *Player) { p.s.Repeat = RepeatAll })
+	h.p.PlayAll(tracks("a", "b", "c"), false)
 	h.noticed(restLabeled)
-	h.wait("stopping", func(p *Player) bool { return !p.s.Playing && !p.s.Loading && p.s.Index == 0 })
+	h.wait("stopping", func(p *Player) bool { return !p.s.Playing && !p.s.Loading && p.s.Index == -1 })
 	if got := l.checks(); len(got) != 3 {
 		t.Errorf("checked %v", got)
 	}
@@ -462,7 +513,7 @@ func TestSkipAIAutoplay(t *testing.T) {
 			return tracks("r"+strconv.Itoa(n)+"0", "r"+strconv.Itoa(n)+"1", "r"+strconv.Itoa(n)+"2")
 		}
 	})
-	h.p.PlayChosen(tracks("a"), 0)
+	h.p.PlayTracks(tracks("a"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Ended()
 	h.noticed(radiosLabeled)
@@ -475,12 +526,12 @@ func TestSkipAIAutoplay(t *testing.T) {
 	if got := len(h.p.State().Queue); got != 1+3*maxEmptyRadios {
 		t.Errorf("%d entries", got)
 	}
-	// The radios' tracks were checked as they came, after the tracks about
+	// The radios' tracks are checked as they come, after the tracks about
 	// to play.
-	l.with(func(l *labeled) {
-		if !slices.Contains(l.soon, false) {
-			t.Error("no radio's check was later than the others")
-		}
+	h.wait("a radio's later checks", func(*Player) bool {
+		later := false
+		l.with(func(l *labeled) { later = slices.Contains(l.soon, false) })
+		return later
 	})
 }
 
@@ -492,7 +543,7 @@ func TestSkipAIRadioKnown(t *testing.T) {
 		f.radio = tracks("x", "y")
 	})
 	l.with(func(l *labeled) { l.known["yt:x"], l.known["yt:y"] = LabelAI, LabelAI })
-	h.p.PlayChosen(tracks("a"), 0)
+	h.p.PlayTracks(tracks("a"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Ended()
 	h.noticed(radioLabeled)
@@ -529,7 +580,7 @@ func TestSkipAIPaused(t *testing.T) {
 // again; on, the current track plays on.
 func TestSkipAISettings(t *testing.T) {
 	h, _ := newLabeled(t, Saved{}, []string{"b"})
-	h.p.PlayChosen(tracks("a", "b", "c"), 0)
+	h.p.PlayTracks(tracks("a", "b", "c"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Time(11*time.Second, 200*time.Second)
 	h.wait("b marked", func(p *Player) bool { return slices.Equal(marked(p.s), []string{"yt:b"}) })
@@ -539,12 +590,12 @@ func TestSkipAISettings(t *testing.T) {
 	off := settings.Default()
 	off.SkipAI = false
 	h.p.SettingsChanged(off)
-	h.wait("skipping off", func(p *Player) bool { return !p.s.SkipAI })
+	h.wait("skipping off", func(p *Player) bool { return !p.skipAI && len(marked(p.s)) == 0 })
 	if next, _ := h.p.State().UpNext(); next.Track.ID != "yt:b" {
 		t.Errorf("up next %s", next.Track.ID)
 	}
 	h.p.SettingsChanged(settings.Settings{SkipAI: true, SpotifyPlayback: off.SpotifyPlayback})
-	h.wait("skipping on", func(p *Player) bool { return p.s.SkipAI })
+	h.wait("skipping on", func(p *Player) bool { return p.skipAI && slices.Equal(marked(p.s), []string{"yt:b"}) })
 	h.on(func(p *Player) {
 		if !playing("a")(p) {
 			t.Error("a stopped")
@@ -572,10 +623,11 @@ func TestSkipAIRestored(t *testing.T) {
 func TestSkipAIQueuedKnown(t *testing.T) {
 	h, l := newLabeled(t, Saved{}, []string{"x", "y"})
 	l.with(func(l *labeled) { l.known["yt:x"], l.known["yt:y"] = LabelAI, LabelAI })
-	h.p.PlayChosen(tracks("a"), 0)
+	h.p.PlayTracks(tracks("a"), 0)
 	h.wait("a playing", playing("a"))
-	h.p.Enqueue(tracks("x"))
-	h.p.PlayNext(tracks("y"))
+	// Not by themselves: a track queued alone is one the user chose.
+	h.p.Enqueue(tracks("x", "c"))
+	h.p.PlayNext(tracks("y", "d"))
 	h.wait("x and y marked", func(p *Player) bool { return slices.Equal(marked(p.s), []string{"yt:y", "yt:x"}) })
 	if got := l.checks(); len(got) != 0 {
 		t.Errorf("checked %v", got)
@@ -585,7 +637,7 @@ func TestSkipAIQueuedKnown(t *testing.T) {
 // TestForgetLabel plays the entries of a track whose label was forgotten.
 func TestForgetLabel(t *testing.T) {
 	h, l := newLabeled(t, Saved{}, []string{"b"})
-	h.p.PlayChosen(tracks("a", "b"), 0)
+	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Time(11*time.Second, 200*time.Second)
 	h.wait("b marked", func(p *Player) bool { return slices.Equal(marked(p.s), []string{"yt:b"}) })
@@ -608,7 +660,7 @@ func TestSkipAIFallback(t *testing.T) {
 	})
 	l.with(func(l *labeled) { l.ai["spotify:2"] = true })
 	h.device.playErr = errors.New("no Spotify device is active.")
-	h.p.PlayChosen([]media.Track{spotifyTrack("1"), spotifyTrack("2"), spotifyTrack("3")}, 0)
+	h.p.PlayTracks([]media.Track{spotifyTrack("1"), spotifyTrack("2"), spotifyTrack("3")}, 0)
 	h.wait("1 from its recording", func(*Player) bool { return h.stream.lastLoad() == "load url:spotify:1 0s true" })
 	if got := l.checks(); len(got) != 0 {
 		t.Errorf("a track chosen was checked: %v", got)

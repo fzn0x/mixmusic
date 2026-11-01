@@ -254,15 +254,15 @@ func (s *shell) trackTile(c *ui.Context, key string, t media.Track, queue []medi
 	}
 }
 
-// playFrom plays tracks from t, which the user chose.
+// playFrom plays tracks from t.
 func (s *shell) playFrom(tracks []media.Track, t media.Track) {
 	for i, tr := range tracks {
 		if tr.ID == t.ID {
-			s.p.PlayChosen(tracks, i)
+			s.p.PlayTracks(tracks, i)
 			return
 		}
 	}
-	s.p.PlayChosen([]media.Track{t}, 0)
+	s.p.PlayTracks([]media.Track{t}, 0)
 }
 
 // playAlbum and playPlaylist fetch what a collection holds, and play it.
@@ -290,7 +290,7 @@ func (s *shell) playCollection(load func(ctx context.Context) ([]media.Track, er
 			case len(tracks) == 0:
 				s.notes = append(s.notes, player.Notice{Message: "Nothing to play here"})
 			default:
-				s.p.PlayTracks(tracks, 0)
+				s.p.PlayAll(tracks, false)
 			}
 		})
 	}()

@@ -80,24 +80,22 @@ func (s *shell) queuePanel(c *ui.Context) {
 }
 
 // queueRow is an entry of the queue; the current one floods with the
-// accent.
+// accent, and one the queue passes over is muted.
 func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 	k := &s.lk
 	t := it.Track
 	row := ui.Row(c.Key("q-"+it.UID)).Height(56).Padding(0, 8).Gap(10).Radius(k.radiusSm).Cursor(ui.CursorDefault)
 	ink, sub := k.text, k.muted
+	skipped := it.Skip != "" && !current
+	if skipped {
+		ink = k.muted
+	}
 	switch {
 	case current:
 		row.Background(k.accent)
 		ink, sub = k.accentText, k.accentText.Alpha(0.78)
 	case row.Hovered():
 		row.Background(k.hover)
-	}
-	// An entry the player passes over, as YouTube labels it as made with
-	// AI, shows dimmed; a click still plays it.
-	skipped := s.st.Skips(it)
-	if skipped && !current {
-		row.Opacity(0.45)
 	}
 	row.ContextMenu(func(m *ui.Menu) { s.trackMenuAt(m, t, i) })
 	if row.DoubleClicked() && !current {
@@ -132,8 +130,12 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 				if it.Radio {
 					line += " · radio"
 				}
-				if skipped {
+				switch {
+				case skipped && it.Skip == player.SkipMadeWithAI:
+					// A click still plays it.
 					line += " · made with AI"
+				case skipped:
+					line += " · skipped"
 				}
 				ui.Text(c, line).FontSize(k.smallSize()).TextColor(sub).SingleLine().MinWidth(0)
 			})
@@ -328,7 +330,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		}
 	default:
 		if m.Item("Play").Chosen() {
-			s.p.PlayChosen(one, 0)
+			s.p.PlayTracks(one, 0)
 		}
 		if m.Item("Play next").Chosen() {
 			s.p.PlayNext(one)
@@ -350,6 +352,14 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	}
 	if m.Item(label).Chosen() {
 		s.setLiked(t, !liked)
+	}
+	disliked := s.a.IsDisliked(t.ID)
+	label = "Dislike"
+	if disliked {
+		label = "Remove the dislike"
+	}
+	if m.Item(label).Chosen() {
+		s.setDisliked(t, !disliked)
 	}
 	s.addToMenus(m, one)
 	m.Separator()
@@ -415,7 +425,7 @@ func (s *shell) startRadio(t media.Track) {
 				s.notes = append(s.notes, noticeOf(err))
 				return
 			}
-			s.p.PlayChosen(append([]media.Track{t}, player.RadioTracks(found, []media.Track{t})...), 0)
+			s.p.PlayTracks(append([]media.Track{t}, player.RadioTracks(found, []media.Track{t})...), 0)
 		})
 	}()
 }

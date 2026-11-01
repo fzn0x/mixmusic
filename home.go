@@ -45,7 +45,7 @@ func (s *shell) homePage(c *ui.Context) {
 			}
 			if s.flatTile(c, "tile-last", 0, tileLarge, columns, title, caption, label, art) {
 				if last != nil {
-					s.p.PlayChosen([]media.Track{*last}, 0)
+					s.p.PlayTracks([]media.Track{*last}, 0)
 				} else {
 					s.navigate("/search")
 				}

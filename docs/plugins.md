@@ -103,9 +103,9 @@ editor at it with a JSDoc `@param {import("./sdk").MixMusicAPI} api`.
 
 | | |
 |---|---|
-| `api.player` | the state of the player (`state()`), the transport, the queue (`playTracks`, `playNext`, `enqueue`), events (`on("trackchange" \| "statechange" \| "progress" \| "queuechange")`) and the `analyser()` of what plays, which has the reading methods of the web's AnalyserNode: MixMusic's own player, and on Windows Spotify too, in MixMusic or the Spotify app on this computer. While the user has Skip songs made with AI on, the player passes over the tracks YouTube labels so in what plugins queue too, the first of `playTracks` included |
-| `api.catalog` | search both services, and read albums, artists, playlists, radios and lyrics |
-| `api.library` | liked songs and the user's mixes |
+| `api.player` | the state of the player (`state()`), the transport, the queue (`playTracks`, `playNext`, `enqueue`), events (`on("trackchange" \| "statechange" \| "progress" \| "queuechange")`) and the `analyser()` of what plays, which has the reading methods of the web's AnalyserNode: MixMusic's own player, and on Windows Spotify too, in MixMusic or the Spotify app on this computer. While Settings › Playback skips the songs YouTube labels as made with AI, the player passes over them in what plugins queue too, but the track `playTracks` starts from, and one queued by itself |
+| `api.catalog` | search both services, and read albums, artists, playlists, radios and lyrics; while Settings › Playback skips the songs the user dislikes, radios leave them out |
+| `api.library` | liked and disliked songs (`isLiked`, `setLiked`, `isDisliked`, `setDisliked`), and the user's mixes; while Settings › Playback skips disliked songs, `api.player.next()` passes over them as Next does, and they never fire `trackchange` |
 | `api.ui` | `toast`, `navigate`, `theme`, `addSidebarItem`, `addPage`, `addTrackAction`, `addWidget`, and the elements pages show |
 | `api.commands` | `register` a command of the command palette, with an optional shortcut |
 | `api.settings` | the user's settings, read only |

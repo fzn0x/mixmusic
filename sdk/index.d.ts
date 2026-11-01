@@ -221,6 +221,7 @@ export interface MixMusicAPI {
     play(): Promise<void>;
     pause(): Promise<void>;
     toggle(): Promise<void>;
+    /** Skips to the next track, as Next does: past the songs the user dislikes, while Settings › Playback skips them. */
     next(): Promise<void>;
     previous(): Promise<void>;
     seek(positionMs: number): Promise<void>;
@@ -244,14 +245,18 @@ export interface MixMusicAPI {
     album(id: string): Promise<Album>;
     artist(id: string): Promise<Artist>;
     playlist(id: string): Promise<Playlist>;
-    /** Tracks like the one given. */
+    /** Tracks like the one given. While Settings › Playback skips the songs the user dislikes, it leaves them out. */
     radio(track: Track): Promise<Track[]>;
     lyrics(track: Track): Promise<Lyrics>;
   };
 
   library: {
     isLiked(trackId: string): boolean;
+    /** Liking a disliked track takes the dislike back. */
     setLiked(track: Track, liked: boolean): Promise<void>;
+    isDisliked(trackId: string): boolean;
+    /** Dislikes a track, or takes the dislike back: a track is liked or disliked, not both. MixMusic keeps the dislike, and sends a YouTube Music track's there when the user signed in. While Settings › Playback skips the songs the user dislikes, the queue passes over the track, and moves on from it at once when it plays. */
+    setDisliked(track: Track, disliked: boolean): Promise<void>;
     /** The playlists made in MixMusic. */
     mixes(): Playlist[];
     createMix(title: string, tracks?: Track[]): Promise<Playlist>;

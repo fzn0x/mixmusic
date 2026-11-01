@@ -54,6 +54,10 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 	k := &s.lk
 	row := ui.Row(c.Key(key+"-"+count(i)+"-"+t.ID)).Height(k.row).Padding(0, 8).Gap(16).Radius(k.radiusSm)
 	ink, sub := k.text, k.muted
+	disliked := s.a.IsDisliked(t.ID)
+	if disliked {
+		ink = k.muted
+	}
 	switch {
 	case current:
 		row.Background(k.accent)
@@ -65,7 +69,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 		if current {
 			s.p.Toggle()
 		} else {
-			s.p.PlayChosen(tracks, i)
+			s.p.PlayTracks(tracks, i)
 		}
 	}
 	if row.DoubleClicked() {
@@ -148,9 +152,13 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 				Width(88).TextAlign(ui.End).Shrink(0)
 		}
 		s.sourceMark(c, t.Source, current)
-		if hovered || s.a.IsLiked(t.ID) {
+		// The thumb takes the heart's place on a disliked song.
+		switch {
+		case disliked:
+			s.dislikeButton(c, key+"-dislike-"+count(i), t, 16)
+		case hovered || s.a.IsLiked(t.ID):
 			s.likeButton(c, key+"-like-"+count(i), t, 16)
-		} else {
+		default:
 			ui.Box(c).Size(32, 32).Shrink(0)
 		}
 		duration := ""

@@ -37,8 +37,9 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// testPlayer is the app as a player's services, playing nothing.
-type testPlayer struct{}
+// testPlayer is the app as a player's services, playing nothing: it
+// passes over the tracks the app's library dislikes, when it has the app.
+type testPlayer struct{ a *app.App }
 
 func (testPlayer) Prepare(_ context.Context, t media.Track) (player.Source, error) {
 	return player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t}, nil
@@ -51,6 +52,12 @@ func (testPlayer) StreamFailure(media.Track) string { return "" }
 func (testPlayer) RecordPlay(media.Track)           {}
 func (testPlayer) Radio(context.Context, media.Track) ([]media.Track, error) {
 	return nil, nil
+}
+func (p testPlayer) Skip(t media.Track) string {
+	if p.a != nil && p.a.IsDisliked(t.ID) {
+		return player.SkipDisliked
+	}
+	return ""
 }
 func (testPlayer) Settings() settings.Settings { return settings.Default() }
 func (testPlayer) SaveVolume(float64)          {}
@@ -113,12 +120,12 @@ func newTestShell(t testing.TB) *shell { return newTestShellOf(t, nil) }
 // newTestShellOf is newTestShell of an app whose options set changes.
 func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 	t.Helper()
-	return newTestShellWith(t, set, testPlayer{}, player.Saved{})
+	return newTestShellWith(t, set, func(a *app.App) player.Services { return testPlayer{a} }, player.Saved{})
 }
 
-// newTestShellWith is newTestShellOf whose player has the services svc,
-// and the queue saved.
-func newTestShellWith(t testing.TB, set func(o *app.Options), svc player.Services, saved player.Saved) *shell {
+// newTestShellWith is newTestShellOf whose player has the services svc
+// makes of the app, and the queue saved.
+func newTestShellWith(t testing.TB, set func(o *app.Options), svc func(a *app.App) player.Services, saved player.Saved) *shell {
 	t.Helper()
 	dir := t.TempDir()
 	for _, d := range []string{"data", "cache", "logs"} {
@@ -138,7 +145,7 @@ func newTestShellWith(t testing.TB, set func(o *app.Options), svc player.Service
 	// The covers' downloads end before the folder goes.
 	t.Cleanup(a.Services().System.Artwork().Close)
 	stream := &testStream{}
-	p := player.New(svc, stream, testDevice{}, saved)
+	p := player.New(svc(a), stream, testDevice{}, saved)
 	stream.mu.Lock()
 	stream.p = p
 	stream.mu.Unlock()
@@ -247,6 +254,13 @@ func TestRender(t *testing.T) {
 	renderTo(t, s, tt, dir, "stats")
 	s.navigate("/library/liked")
 	renderTo(t, s, tt, dir, "library-liked")
+	// A song the user dislikes, muted in the queue and in its own pivot.
+	s.setDisliked(testTracks[3], true)
+	eventually(t, s, "the dislike", func() bool { return s.a.IsDisliked(testTracks[3].ID) })
+	s.navigate("/library/disliked")
+	s.panel = "queue"
+	renderTo(t, s, tt, dir, "library-disliked")
+	s.panel = ""
 
 	s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
 		YouTube: media.SearchResults{Tracks: testTracks[:3], Albums: []media.Album{album}, Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube}}},
@@ -263,6 +277,7 @@ func TestRender(t *testing.T) {
 
 	s.navigate("/settings/playback")
 	renderTo(t, s, tt, dir, "settings-playback")
+	renderTo(t, s, ui.NewTester(s.view, 1280, 1700), dir, "settings-playback-tall")
 	s.navigate("/settings/appearance")
 	renderTo(t, s, tt, dir, "settings-appearance")
 	s.navigate("/settings/accounts")

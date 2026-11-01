@@ -73,7 +73,10 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 			}
 		}
 	})
-	s.likeButton(c, "player-like", t, 18)
+	ui.Row(c).Shrink(0).Children(func() {
+		s.likeButton(c, "player-like", t, 18)
+		s.dislikeButton(c, "player-dislike", t, 18)
+	})
 }
 
 // likeButton likes a track, or no longer.
@@ -83,6 +86,27 @@ func (s *shell) likeButton(c *ui.Context, key string, t media.Track, size float3
 	if on {
 		label = "Remove from liked songs"
 	}
+	if s.ratingButton(c, key, "heart", label, on, size) {
+		s.setLiked(t, !on)
+	}
+}
+
+// dislikeButton dislikes a track, or no longer.
+func (s *shell) dislikeButton(c *ui.Context, key string, t media.Track, size float32) {
+	on := s.a.IsDisliked(t.ID)
+	label := "Dislike"
+	if on {
+		label = "Remove the dislike"
+	}
+	if s.ratingButton(c, key, "dislike", label, on, size) {
+		s.setDisliked(t, !on)
+	}
+}
+
+// ratingButton is a 32px button of the icon name, which tells whether the
+// user rates the track so: muted, in ink under the pointer, and filled
+// with the accent when on. It reports whether it was clicked.
+func (s *shell) ratingButton(c *ui.Context, key, name, label string, on bool, size float32) bool {
 	k := &s.lk
 	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
 	ink := k.muted
@@ -95,21 +119,24 @@ func (s *shell) likeButton(c *ui.Context, key string, t media.Track, size float3
 	if b.Hovered() {
 		b.Background(k.hover)
 	}
-	if b.Clicked() {
-		s.setLiked(t, !on)
-	}
+	clicked := b.Clicked()
 	b.Children(func() {
-		svg := icons["heart"]
+		svg := icons[name]
 		if on {
-			svg = solidIcons["heart"]
+			svg = solidIcons[name]
 		}
 		ui.Icon(c, svg).FontSize(size).TextColor(ink)
 	})
+	return clicked
 }
 
 // setLiked likes a track or no longer, beside the main thread: liking a
-// Spotify track asks Spotify.
+// Spotify track asks Spotify. Liking a disliked track takes the dislike
+// back, which the player hears of at once.
 func (s *shell) setLiked(t media.Track, on bool) {
+	if on && s.a.IsDisliked(t.ID) {
+		s.p.Disliked(t.ID, false)
+	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
@@ -120,6 +147,47 @@ func (s *shell) setLiked(t media.Track, on bool) {
 			}
 		})
 	}()
+}
+
+// setDisliked dislikes a track or no longer. The player hears of it at
+// once, and moves on from the track if it plays, while the settings skip
+// disliked songs; the library keeps it, and YouTube Music hears of it,
+// beside the main thread. A dislike says so at once, in a toast whose undo
+// takes it back, likes the track again if it was liked, and goes back to
+// it where it was if it played.
+func (s *shell) setDisliked(t media.Track, on bool) {
+	s.p.Disliked(t.ID, on)
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		err := s.svc.Collection.SetDisliked(ctx, t, on)
+		s.update(func() {
+			if err != nil {
+				// The library keeps what it had: the player too.
+				s.p.Disliked(t.ID, !on)
+				s.notes = append(s.notes, noticeOf(err))
+			}
+		})
+	}()
+	if !on {
+		return
+	}
+	liked := s.a.IsLiked(t.ID)
+	back := func() {}
+	if cur, ok := s.st.Current(); ok && cur.Track.ID == t.ID && s.set.SkipDisliked {
+		uid, at := cur.UID, s.st.Position
+		playing := s.st.Playing || s.st.Loading || s.st.Waiting && s.st.WillPlay
+		back = func() { s.p.Return(uid, at, playing) }
+	}
+	s.actionToasts = append(s.actionToasts, actionToast{"Disliked " + t.Title, "undo", func() {
+		s.p.Disliked(t.ID, false)
+		if liked {
+			s.setLiked(t, true)
+		} else {
+			s.setDisliked(t, false)
+		}
+		back()
+	}})
 }
 
 func (s *shell) transport(c *ui.Context) {

@@ -187,20 +187,26 @@ func (p aiPlayer) Label(_ context.Context, t media.Track, _ bool) player.Label {
 	return p.KnownLabel(t)
 }
 
-// TestQueueMadeWithAI dims the entries of the queue the player skips, as
-// YouTube labels them as made with AI, says so after their artists, and
-// names the track that plays next; a click still plays one (#97).
+// TestQueueMadeWithAI mutes the entries of the queue the player passes
+// over, and says why after their artists: one YouTube labels as made with
+// AI, one the user dislikes. It names the track that plays next; a click
+// still plays one (#97).
 func TestQueueMadeWithAI(t *testing.T) {
-	s := newTestShellWith(t, nil, aiPlayer{ai: map[string]bool{"yt:3": true}}, player.Saved{Tracks: testTracks, Index: 1})
-	s.settle(t, func(st player.State) bool { return st.SkipAI && len(st.Queue) > 2 && st.Queue[2].MadeWithAI })
+	s := newTestShellWith(t, nil, func(a *app.App) player.Services {
+		return aiPlayer{testPlayer: testPlayer{a}, ai: map[string]bool{"yt:3": true}}
+	}, player.Saved{Tracks: testTracks, Index: 1})
+	s.settle(t, func(st player.State) bool { return len(st.Queue) > 2 && st.Queue[2].Skip == player.SkipMadeWithAI })
+	s.p.Disliked(testTracks[4].ID, true)
 	s.p.Play()
-	s.settle(t, func(st player.State) bool { return st.Playing && st.Index == 1 })
+	s.settle(t, func(st player.State) bool {
+		return st.Playing && st.Index == 1 && st.Queue[4].Skip == player.SkipDisliked
+	})
 	tt := tester(t, s)
-	if !tt.HasText("deadmau5 · made with AI") {
-		t.Errorf("the queue doesn't say Strobe is made with AI: %q", tt.Texts())
+	if !tt.HasText("deadmau5 · made with AI") || !tt.HasText("Burial · skipped") {
+		t.Errorf("the queue doesn't say why it passes over Strobe and Archangel: %q", tt.Texts())
 	}
-	if tt.HasText("Aphex Twin · made with AI") {
-		t.Error("a track not labeled says it is")
+	if tt.HasText("Aphex Twin · made with AI") || tt.HasText("Aphex Twin · skipped") {
+		t.Error("a track it plays says it's passed over")
 	}
 	s.panel = ""
 	tt.Frame()
@@ -216,7 +222,9 @@ func TestQueueMadeWithAI(t *testing.T) {
 // TestAlbumPlayPastAI has an album's play button pass over its first
 // track, which YouTube labels as made with AI, and its row play it (#97).
 func TestAlbumPlayPastAI(t *testing.T) {
-	s := newTestShellWith(t, nil, aiPlayer{ai: map[string]bool{"yt:1": true}}, player.Saved{})
+	s := newTestShellWith(t, nil, func(a *app.App) player.Services {
+		return aiPlayer{testPlayer: testPlayer{a}, ai: map[string]bool{"yt:1": true}}
+	}, player.Saved{})
 	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:3]}}
 	tt := tester(t, s)
 	show(s, tt, "/album/al-x")

@@ -33,6 +33,8 @@ interface Natives {
   lyrics(track: Track): ReturnType<API["catalog"]["lyrics"]>;
   isLiked(id: string): boolean;
   setLiked(track: Track, liked: boolean): Promise<void>;
+  isDisliked(id: string): boolean;
+  setDisliked(track: Track, disliked: boolean): Promise<void>;
   mixes(): ReturnType<API["library"]["mixes"]>;
   createMix(title: string, tracks: Track[]): ReturnType<API["library"]["createMix"]>;
   toast(message: string, tone: string): void;
@@ -115,6 +117,8 @@ interface Natives {
     library: Object.freeze({
       isLiked: (id: string) => native.isLiked(String(id)),
       setLiked: (track: Track, liked: boolean) => native.setLiked(track, Boolean(liked)),
+      isDisliked: (id: string) => native.isDisliked(String(id)),
+      setDisliked: (track: Track, disliked: boolean) => native.setDisliked(track, Boolean(disliked)),
       mixes: () => native.mixes(),
       createMix: (title: string, tracks?: Track[]) => native.createMix(String(title), tracks ?? []),
     }),

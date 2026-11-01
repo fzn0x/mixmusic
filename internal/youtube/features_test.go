@@ -199,6 +199,40 @@ func TestChannelRequests(t *testing.T) {
 	}
 }
 
+// TestAuthUser names, in each signed request, the Google account of the
+// session the client uses, and forgets it on signing out.
+func TestAuthUser(t *testing.T) {
+	c, requests, _ := fakeYouTube(t, func(string) any { return map[string]any{} })
+	c.SetCookies(session)
+	c.Home(context.Background())
+	c.SetAuthUser(2)
+	c.Home(context.Background())
+	got := requests()
+	if a, b := got[0].header.Get("X-Goog-AuthUser"), got[1].header.Get("X-Goog-AuthUser"); a != "0" || b != "2" {
+		t.Errorf("X-Goog-AuthUser = %q, then %q", a, b)
+	}
+	c.SetAuthUser(-1)
+	if c.AuthUser() != 0 {
+		t.Errorf("a negative index gave %d", c.AuthUser())
+	}
+	c.SetAuthUser(1)
+	c.SetCookies(nil)
+	if c.AuthUser() != 0 {
+		t.Error("signing out kept the account")
+	}
+}
+
+func TestHasSigningCookie(t *testing.T) {
+	if !HasSigningCookie(session) {
+		t.Error("a session has no signing cookie")
+	}
+	for _, cookies := range [][]*http.Cookie{nil, session[:1], {{Name: "SAPISID"}}, {{Name: "__Secure-3PAPISID", Value: "x"}}} {
+		if got := HasSigningCookie(cookies); got != (len(cookies) == 1 && cookies[0].Value == "x") {
+			t.Errorf("HasSigningCookie(%v) = %v", cookies, got)
+		}
+	}
+}
+
 func TestReportPlay(t *testing.T) {
 	var srv *httptest.Server
 	c, requests, srv := fakeYouTube(t, func(path string) any {

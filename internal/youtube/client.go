@@ -48,6 +48,10 @@ type Client struct {
 	cookies  []*http.Cookie // the signed-in session, if any
 	rejected bool           // YouTube answered the session as a visitor
 	pageID   string         // the brand channel the session acts as, if any
+	// authUser is the Google account the session acts as, by its index
+	// among those it is signed in to: a browser signed in to several
+	// numbers them from 0.
+	authUser int
 }
 
 // New returns a client for YouTube Music in English, for the US.

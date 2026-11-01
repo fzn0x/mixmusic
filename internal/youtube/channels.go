@@ -102,3 +102,20 @@ func (c *Client) Channel() string {
 	defer c.mu.Unlock()
 	return c.pageID
 }
+
+// SetAuthUser makes the client use YouTube Music as the Google account of
+// index i among those the session is signed in to: a browser signed in to
+// several Google accounts numbers them from 0, in its X-Goog-AuthUser
+// header. A brand channel belongs to one of them: SetChannel names it.
+func (c *Client) SetAuthUser(i int) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.authUser = max(i, 0)
+}
+
+// AuthUser returns the index of the Google account the client uses.
+func (c *Client) AuthUser() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.authUser
+}

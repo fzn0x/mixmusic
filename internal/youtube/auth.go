@@ -24,7 +24,8 @@ func (c *Client) SetCookies(cookies []*http.Cookie) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if len(cookies) == 0 {
-		c.pageID = "" // signed out: no channel of the account any more
+		// Signed out: no account or channel of the session any more.
+		c.pageID, c.authUser = "", 0
 	}
 	c.cookies = nil
 	c.rejected = false
@@ -89,6 +90,11 @@ func (c *Client) session() error {
 	return nil
 }
 
+// HasSigningCookie reports whether cookies hold one that signs requests,
+// such as SAPISID: whether they can be a signed-in session at all, before
+// YouTube Music is asked whether it takes them.
+func HasSigningCookie(cookies []*http.Cookie) bool { return signingCookie(cookies) != "" }
+
 // signingCookie returns the value of the cookie that signs requests.
 func signingCookie(cookies []*http.Cookie) string {
 	for _, h := range authHashes {
@@ -136,14 +142,14 @@ func cookieHeader(cookies []*http.Cookie, now time.Time) string {
 // client is signed in, and reports whether it did.
 func (c *Client) signRequest(req *http.Request, now time.Time) bool {
 	c.mu.Lock()
-	cookies, page := c.cookies, c.pageID
+	cookies, page, user := c.cookies, c.pageID, c.authUser
 	c.mu.Unlock()
 	if signingCookie(cookies) == "" {
 		return false
 	}
 	req.Header.Set("Cookie", cookieHeader(cookies, now))
 	req.Header.Set("Authorization", authorization(cookies, now, defaultBaseURL))
-	req.Header.Set("X-Goog-AuthUser", "0")
+	req.Header.Set("X-Goog-AuthUser", strconv.Itoa(user))
 	req.Header.Set("X-Origin", defaultBaseURL)
 	if page != "" {
 		req.Header.Set("X-Goog-PageId", page)

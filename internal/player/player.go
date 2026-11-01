@@ -156,6 +156,12 @@ type Saved struct {
 	Repeat   Repeat `json:"repeat"`
 	// Radio holds the indexes in Tracks of the entries a radio added.
 	Radio []int `json:"radio,omitempty"`
+	// Order is the queue's own order while it is shuffled, which turning
+	// shuffle off puts back: the indexes in Tracks of its entries.
+	Order []int `json:"order,omitempty"`
+	// Unplayed holds the indexes of the entries before Index that haven't
+	// played, as a list started in its middle leaves them.
+	Unplayed []int `json:"unplayed,omitempty"`
 }
 
 // Services are what the player asks of the app.
@@ -262,8 +268,12 @@ type Player struct {
 	noticed []*func(Notice)
 	wake    chan struct{}
 	done    chan struct{}
-	// version counts the states published, of which snap is the last.
-	version uint64
+	// version counts the states published, of which snap is the last;
+	// snapOrder and snapPlayed are the player's unshuffled and played as
+	// they were then, which the queue keeps with it.
+	version    uint64
+	snapOrder  []Item
+	snapPlayed map[string]bool
 
 	// writing orders the writes of the queue: written is the version of
 	// the state the last of them kept.
@@ -288,7 +298,8 @@ type Player struct {
 	warned map[string]bool
 	// unshuffled is the queue in its own order while it is shuffled, and
 	// played the entries that became current since the queue was filled,
-	// by UID.
+	// by UID. Neither is changed in place, as what is published shares
+	// them.
 	unshuffled []Item
 	played     map[string]bool
 	// loaded is set while the stream engine has the current track, and
@@ -341,10 +352,17 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 		if saved.Repeat == RepeatAll || saved.Repeat == RepeatOne {
 			p.s.Repeat = saved.Repeat
 		}
-		// What comes before the current entry played.
+		// What comes before the current entry played, unless the queue
+		// says otherwise.
+		unplayed := marks(saved.Unplayed, len(p.s.Queue))
 		p.played = map[string]bool{}
-		for _, it := range p.s.Queue[:p.s.Index+1] {
-			p.played[it.UID] = true
+		for i, it := range p.s.Queue[:p.s.Index+1] {
+			if !unplayed[i] {
+				p.played[it.UID] = true
+			}
+		}
+		if p.s.Shuffle && len(saved.Order) > 0 {
+			p.unshuffled = ordered(p.s.Queue, saved.Order)
 		}
 	}
 	p.snap = p.s
@@ -462,6 +480,7 @@ func (p *Player) publish() {
 	p.events, p.notices = nil, nil
 	p.mu.Lock()
 	p.snap = p.s
+	p.snapOrder, p.snapPlayed = p.unshuffled, p.played
 	p.version++
 	subs, noticed := p.subs, p.noticed
 	p.mu.Unlock()
@@ -539,6 +558,25 @@ func marks(indexes []int, n int) []bool {
 	for _, i := range indexes {
 		if i >= 0 && i < n {
 			out[i] = true
+		}
+	}
+	return out
+}
+
+// ordered is q in the order of a saved queue's Order: the entries it names,
+// once each, then those it leaves out.
+func ordered(q []Item, order []int) []Item {
+	out := make([]Item, 0, len(q))
+	seen := make([]bool, len(q))
+	for _, i := range order {
+		if i >= 0 && i < len(q) && !seen[i] {
+			seen[i] = true
+			out = append(out, q[i])
+		}
+	}
+	for i, it := range q {
+		if !seen[i] {
+			out = append(out, it)
 		}
 	}
 	return out

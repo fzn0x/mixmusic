@@ -2,6 +2,7 @@ package player
 
 import (
 	"context"
+	"maps"
 	"math/rand/v2"
 	"regexp"
 	"slices"
@@ -237,12 +238,18 @@ func shuffle(items []Item) {
 	rand.Shuffle(len(items), func(i, j int) { items[i], items[j] = items[j], items[i] })
 }
 
-// markPlayed notes that the entry uid became current.
+// markPlayed notes that the entry uid became current. It replaces the
+// marks rather than change them, as what is published shares them.
 func (p *Player) markPlayed(uid string) {
-	if p.played == nil {
-		p.played = map[string]bool{}
+	if p.played[uid] {
+		return
 	}
-	p.played[uid] = true
+	played := maps.Clone(p.played)
+	if played == nil {
+		played = map[string]bool{}
+	}
+	played[uid] = true
+	p.played = played
 }
 
 // extendWithRadio adds tracks like the current one to the queue, and then

@@ -1050,7 +1050,7 @@ func TestRestoreLongQueue(t *testing.T) {
 	// The engine tells where the track is, which saves the queue.
 	h.p.Time(95*time.Second, 200*time.Second)
 	var got Saved
-	h.on(func(p *Player) { got = savedOf(p.s) })
+	h.on(func(p *Player) { got = savedOf(p.s, p.unshuffled, p.played) })
 	if len(got.Tracks) != savedMax || got.Index != 350 || got.Tracks[got.Index].ID != "yt:t650" ||
 		got.Tracks[0].ID != "yt:t300" || got.Tracks[len(got.Tracks)-1].ID != "yt:t799" || got.Position != 95000 {
 		t.Fatalf("saved %d tracks from %s, index %d, position %d", len(got.Tracks), got.Tracks[0].ID, got.Index, got.Position)

@@ -12,10 +12,10 @@ import (
 	"time"
 )
 
-// UnisonURL is the address of Unison, the open, crowdsourced database of
-// lyrics of Better Lyrics, most of them synchronized word by word. Its
-// lyrics are under the ODbL, which asks apps that show them to credit
-// them: "Lyrics from Unison (https://unison.boidu.dev)".
+// UnisonURL is the address of Unison, an open, crowdsourced database of
+// lyrics, most of them synchronized word by word. Its lyrics are under the
+// ODbL, which asks apps that show them to credit them: "Lyrics from Unison
+// (https://unison.boidu.dev)".
 const UnisonURL = "https://unison.boidu.dev"
 
 // unisonTimeout bounds a lookup on Unison, which answers in a fraction of

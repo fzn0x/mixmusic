@@ -36,7 +36,8 @@ const (
 	// motionStandard moves nothing on its own: Mix's presses and hovers
 	// show at once.
 	motionStandard motionStyle = iota
-	// motionSmooth moves them on springs that settle without overshooting.
+	// motionSmooth moves them on Material's standard springs, which hardly
+	// overshoot.
 	motionSmooth
 	// motionExpressive moves them on Material's expressive springs, which
 	// overshoot a little, and morphs the shapes of the buttons pressed.

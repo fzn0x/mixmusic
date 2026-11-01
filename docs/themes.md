@@ -128,8 +128,8 @@ themes did before them.
 | `player` | `docked` or `floating` | `docked` | the player bar across the window's foot, or floating over it as a raised card rounded by `radius`; the side panel floats beside it then |
 | `controls` | `outline` or `tonal` | `outline` | Mix's 2px outlines, flooded with the accent where chosen, or filled controls: the current page, the playing track and the chosen chip in a quieter fill, inked in the accent |
 | `headings` | `light`, `regular` or `bold` | `light` | Mix's giant light lowercase words, or titles as written, at a regular weight and Material's sizes, or heavy; pivots become chips, and the interface's words take capitals |
-| `cards` | `none` or `filled` | `none` | covers bare, or in filled cards that hovering raises; the settings' groups take cards too |
-| `motion` | `standard`, `smooth` or `expressive` | `standard` | presses and hovers at once, or on springs that settle without overshooting, or on Material's expressive springs, which overshoot a little and morph the play button's shape |
+| `cards` | `none` or `filled` | `none` | covers bare, or in filled cards, a step lighter while hovered; the settings' groups take cards too |
+| `motion` | `standard`, `smooth` or `expressive` | `standard` | presses and hovers at once, or on Material's standard springs, which hardly overshoot, or on its expressive ones, which overshoot a little and morph the play button's shape |
 
 Lengths are in `px`, or `rem` and `em` of 16 pixels. The compact density,
 in Settings › Appearance, takes off a theme's `row`, `rail`,

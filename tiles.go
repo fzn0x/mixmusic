@@ -100,7 +100,7 @@ func (k *look) sections() float32 { return 3 * k.gap }
 // artTile is a square frame of artwork with its title and a subtitle that
 // starts with the source mark; round for artists. Hovering shows a play
 // circle. It tells whether it was opened or its play circle clicked. In a
-// theme of filled cards, it is a card, which hovering raises.
+// theme of filled cards, it is a card, a step lighter while hovered.
 func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, subtitle string, source media.Source, round, active, playable bool, menu func(m *ui.Menu)) (open, play bool) {
 	k := &s.lk
 	size := k.cover

@@ -382,17 +382,24 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 	if _, ok := s.kept.Collection(s.downloadsOf); !ok {
 		s.downloadsOf = ""
 	}
+	problem := func() {
+		if st.Problem != "" {
+			s.alert(c, "Your downloads can't be reached", st.Problem+". Tracks stream as before meanwhile.", nil).Margin(0, 0, 32)
+		}
+	}
 	if st.Tracks == 0 && st.Waiting == 0 && st.Failed == 0 {
-		ui.Text(c, "nothing downloaded yet").FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
-		ui.Text(c, "Choose Download in the menu of a track, an album or a playlist, and it plays here without the network.").
-			FontSize(k.subtitleSize()).FontWeight(300).MaxWidth(640).Margin(0, 0, 24)
+		// A folder that can't be reached tells nothing of what it holds.
+		if st.Problem == "" {
+			ui.Text(c, "nothing downloaded yet").FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
+			ui.Text(c, "Choose Download in the menu of a track, an album or a playlist, and it plays here without the network.").
+				FontSize(k.subtitleSize()).FontWeight(300).MaxWidth(640).Margin(0, 0, 24)
+		}
 		s.downloadsFolderLine(c, st)
+		problem()
 		return
 	}
 	s.downloadsFolderLine(c, st)
-	if st.Problem != "" {
-		s.alert(c, "Your downloads can't be reached", st.Problem+". Tracks stream as before meanwhile.", nil).Margin(0, 0, 32)
-	}
+	problem()
 	if st.Waiting > 0 || st.Failed > 0 {
 		s.downloadQueue(c, st)
 	}

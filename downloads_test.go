@@ -305,3 +305,18 @@ func TestRenderDownloads(t *testing.T) {
 	s.navigate("/settings/playback")
 	renderTo(t, s, tall, dir, "settings-downloads")
 }
+
+// TestDownloadsUnreachable tells that the folder of the downloads can't
+// be reached, rather than that nothing is downloaded.
+func TestDownloadsUnreachable(t *testing.T) {
+	file := filepath.Join(t.TempDir(), "file")
+	if err := os.WriteFile(file, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	s := newTestShellOf(t, func(o *app.Options) { o.DownloadsDir = filepath.Join(file, "downloads") })
+	tt := tester(t, s)
+	show(s, tt, "/library/downloads")
+	if !tt.HasText("Your downloads can't be reached") || tt.HasText("nothing downloaded yet") {
+		t.Errorf("the page shows %q", tt.Texts())
+	}
+}

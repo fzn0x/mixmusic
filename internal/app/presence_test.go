@@ -22,7 +22,7 @@ func TestActivityOf(t *testing.T) {
 			{URL: "https://example.com/1200.jpg", Width: 1200},
 		},
 	}
-	a := activityOf(track, start, 0)
+	a := activityOf(track, start, 0, false)
 	if a.Type != discord.Listening || a.Details != "Let It Happen" || a.State != "Tame Impala" || a.LargeText != "Currents" || a.StatusDisplay != discord.ShowName {
 		t.Errorf("activity = %+v", a)
 	}
@@ -32,8 +32,12 @@ func TestActivityOf(t *testing.T) {
 	if a.LargeImage != "https://example.com/544.jpg" {
 		t.Errorf("artwork = %q, want the one of about 512 pixels", a.LargeImage)
 	}
-	if b := activityOf(media.Track{Title: "Live"}, start, 0); !b.End.IsZero() {
+	if b := activityOf(media.Track{Title: "Live"}, start, 0, false); !b.End.IsZero() {
 		t.Errorf("a track of unknown length has an end: %v", b.End)
+	}
+	// A live stream, whatever its catalog says, tells how long it played.
+	if b := activityOf(track, start, 0, true); !b.End.IsZero() || !b.Start.Equal(start) {
+		t.Errorf("a live stream from %v to %v", b.Start, b.End)
 	}
 }
 

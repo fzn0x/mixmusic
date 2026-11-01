@@ -296,7 +296,7 @@ func (s *shell) artistCircles(c *ui.Context, artists []library.ArtistPlays) {
 	ui.Row(c).Wrap().Gap(8).AlignItems(ui.Center).Children(func() {
 		for i, a := range artists {
 			r := float32(14 + 46*math.Sqrt(float64(a.Plays)/top))
-			b := ui.ButtonBase(c.Key("stat-artist-"+count(i))).Size(2*r, 2*r).Radius(r).Background(k.tile(i)).Column().Center().
+			b := s.buttonBase(c.Key("stat-artist-"+count(i))).Size(2*r, 2*r).Radius(r).Background(k.tile(i)).Column().Center().
 				Padding(4).Label(fmt.Sprintf("%s: %s", a.Artist.Name, plural(a.Plays, "play"))).Tooltip(a.Artist.Name).
 				Disabled(a.Artist.ID == "")
 			if a.Artist.ID != "" {

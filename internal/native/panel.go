@@ -50,7 +50,7 @@ func (s *shell) queuePanel(c *ui.Context) {
 	}
 	s.panelHead(c, "up next", func() {
 		if upcoming > 0 {
-			clear := ui.ButtonBase(c.Key("clear-queue")).Label("Clear the queue").Cursor(ui.CursorPointer)
+			clear := s.buttonBase(c.Key("clear-queue")).Label("Clear the queue").Cursor(ui.CursorPointer)
 			if clear.Clicked() {
 				s.p.ClearUpcoming()
 			}
@@ -101,7 +101,7 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 	}
 	hovered := row.Hovered()
 	row.Children(func() {
-		art := ui.ButtonBase(c.Key("q-art-"+it.UID)).Size(40, 40).Shrink(0).Label("Play " + t.Title).KeepFocus().Cursor(ui.CursorPointer)
+		art := s.buttonBase(c.Key("q-art-"+it.UID)).Size(40, 40).Shrink(0).Label("Play " + t.Title).KeepFocus().Cursor(ui.CursorPointer)
 		if art.Clicked() {
 			if current {
 				s.p.Toggle()

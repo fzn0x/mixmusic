@@ -51,6 +51,9 @@ func OpenMini(a *app.App) *mygo.Window {
 // anywhere but its buttons moves the window.
 func (s *shell) miniView(c *ui.Context) {
 	s.st = s.p.State()
+	// The mini player runs no shortcuts (#38): pointerKeys leaves its
+	// controls no keys.
+	s.plainKeys = s.plainKeys[:0]
 	s.followArtwork()
 	c.SetTheme(&s.lk.theme)
 	s.toasts(c)

@@ -80,7 +80,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 	row.ContextMenu(menu)
 	hovered := row.Hovered()
 	row.Children(func() {
-		lead := ui.ButtonBase(c.Key(key+"-lead-"+count(i))).Size(40, 40).Shrink(0).KeepFocus().Cursor(ui.CursorPointer)
+		lead := s.buttonBase(c.Key(key+"-lead-"+count(i))).Size(40, 40).Shrink(0).KeepFocus().Cursor(ui.CursorPointer)
 		label := "Play " + t.Title
 		if current && s.st.Playing {
 			label = "Pause " + t.Title
@@ -132,7 +132,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 					return
 				}
 				// A button keeps its width; the link gives way, as its name.
-				link := ui.ButtonBase(c.Key(key + "-album-" + count(i))).Shrink(1).MinWidth(0).Justify(ui.Start).Label(t.Album.Name).KeepFocus().Cursor(ui.CursorPointer)
+				link := s.buttonBase(c.Key(key + "-album-" + count(i))).Shrink(1).MinWidth(0).Justify(ui.Start).Label(t.Album.Name).KeepFocus().Cursor(ui.CursorPointer)
 				if link.Clicked() {
 					s.navigate(albumPath(t.Album.ID))
 				}
@@ -181,7 +181,7 @@ func (s *shell) artistLinks(c *ui.Context, key string, artists []media.Ref, ink 
 				ui.Text(c, name).FontSize(k.smallSize()).TextColor(ink).SingleLine().Shrink(0)
 				continue
 			}
-			link := ui.ButtonBase(c.Key(key + "-" + count(j))).Shrink(0).Label(a.Name).KeepFocus().Cursor(ui.CursorPointer)
+			link := s.buttonBase(c.Key(key + "-" + count(j))).Shrink(0).Label(a.Name).KeepFocus().Cursor(ui.CursorPointer)
 			if link.Clicked() {
 				s.navigate(artistPath(a.ID))
 			}

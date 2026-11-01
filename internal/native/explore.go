@@ -96,7 +96,7 @@ func (s *shell) moodColumns(c *ui.Context) int {
 
 func (s *shell) moodTile(c *ui.Context, key string, tone int, m youtube.Mood) bool {
 	k := &s.lk
-	t := ui.ButtonBase(c.Key(key)).Height(96).Padding(12).AlignItems(ui.Start).Justify(ui.Start).Background(k.tile(tone)).
+	t := s.buttonBase(c.Key(key)).Height(96).Padding(12).AlignItems(ui.Start).Justify(ui.Start).Background(k.tile(tone)).
 		Radius(k.radius).Label("Playlists for " + m.Title).Cursor(ui.CursorPointer)
 	if t.Pressed() {
 		t.Scale(0.97, 0.97)

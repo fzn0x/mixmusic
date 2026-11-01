@@ -39,7 +39,7 @@ func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, col
 	if columns < 4 && span.cols > 1 {
 		span.cols = min(span.cols, columns)
 	}
-	t := ui.ButtonBase(c.Key(key)).ColumnSpan(span.cols).RowSpan(span.rows).MinHeight(150).Padding(16).
+	t := s.buttonBase(c.Key(key)).ColumnSpan(span.cols).RowSpan(span.rows).MinHeight(150).Padding(16).
 		AlignItems(ui.Start).Justify(ui.SpaceBetween).Column().Background(k.tile(tone)).Radius(k.radius).
 		Label(label).Cursor(ui.CursorPointer).Clip()
 	if t.Pressed() {
@@ -84,7 +84,7 @@ const (
 func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, subtitle string, source media.Source, round, active, playable bool, menu func(m *ui.Menu)) (open, play bool) {
 	k := &s.lk
 	const size = artTileSize
-	tile := ui.ButtonBase(c.Key(key)).Width(size).Shrink(0).Column().AlignItems(ui.Start).Gap(8).Label(title).Cursor(ui.CursorPointer)
+	tile := s.buttonBase(c.Key(key)).Width(size).Shrink(0).Column().AlignItems(ui.Start).Gap(8).Label(title).Cursor(ui.CursorPointer)
 	if menu != nil {
 		tile.ContextMenu(menu)
 	}
@@ -98,7 +98,7 @@ func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, sub
 				ui.Box(c).Absolute().Top(0).Left(0).Size(size, size).InsetShadow(0, 0, 0, 3, k.accent).Radius(k.radiusSm)
 			}
 			if playable && hovered {
-				p := ui.ButtonBase(c.Key(key+"-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().Right(8).Bottom(8).
+				p := s.buttonBase(c.Key(key+"-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().Right(8).Bottom(8).
 					Label("Play " + title).Cursor(ui.CursorPointer)
 				if p.Clicked() {
 					play = true

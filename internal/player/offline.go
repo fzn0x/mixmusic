@@ -8,6 +8,7 @@ package player
 import (
 	"context"
 	"errors"
+	"time"
 )
 
 // network returns the app's Network, if its services have it.
@@ -16,14 +17,14 @@ func (p *Player) network() (Network, bool) {
 	return n, ok
 }
 
-// offline has the current track wait for the network when err, why it
-// couldn't play, is ErrOffline, and tells whether it does. It plays once
-// the network answers when willPlay, from where it is.
-func (p *Player) offline(err error, willPlay bool) bool {
+// offline has the current track wait for the network at at when err, why
+// it couldn't play, is ErrOffline, and tells whether it does. It plays
+// once the network answers when willPlay.
+func (p *Player) offline(err error, at time.Duration, willPlay bool) bool {
 	if _, ok := p.network(); !ok || !errors.Is(err, ErrOffline) {
 		return false
 	}
-	p.wait(willPlay)
+	p.wait(at, willPlay)
 	return true
 }
 
@@ -56,12 +57,15 @@ func (p *Player) checkOnline(offline, online func()) {
 	})
 }
 
-// wait has the current track wait for the network where it is, and play
-// from there once it answers when willPlay. The engine lets go of it
-// meanwhile.
-func (p *Player) wait(willPlay bool) {
+// wait has the current track wait for the network at at, and play from
+// there once it answers when willPlay. The engine lets go of it
+// meanwhile, and a Spotify device the player left for it pauses: what the
+// device tells of its own track would move this one, or end it.
+func (p *Player) wait(at time.Duration, willPlay bool) {
 	p.loaded = false
 	p.stream.Unload()
+	p.connect.stop(true)
+	p.s.Position = at
 	p.s.Playing, p.s.Loading, p.s.Buffering = false, false, false
 	p.waitFor(willPlay, false, func(play bool) { p.playAt(p.s.Index, p.s.Position, play) })
 }
@@ -140,7 +144,7 @@ func (p *Player) watchStall(buffering bool) {
 		if stalled() {
 			p.checkOnline(func() {
 				if stalled() {
-					p.wait(!p.paused)
+					p.wait(p.s.Position, !p.paused)
 				}
 			}, func() {})
 		}

@@ -189,10 +189,11 @@ func entry(dir string, kind addons.Kind, name string) (addons.Entry, error) {
 	return e, nil
 }
 
-// walk lists the files of a folder, as slash paths, and their total size.
+// walk lists the files of a folder, as slash paths, and their total size:
+// the files the add-on ships, without the TypeScript a plugin is written
+// in, which compiles to the JavaScript beside it.
 func walk(dir string) ([]string, int64, error) {
-	var files []string
-	var size int64
+	sizes := map[string]int64{}
 	err := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return err
@@ -205,10 +206,18 @@ func walk(dir string) ([]string, int64, error) {
 		if err != nil {
 			return err
 		}
-		size += info.Size()
-		files = append(files, path.Clean(filepath.ToSlash(rel)))
+		sizes[path.Clean(filepath.ToSlash(rel))] = info.Size()
 		return nil
 	})
+	var files []string
+	var size int64
+	for f, n := range sizes {
+		if _, compiled := sizes[strings.TrimSuffix(f, ".ts")+".js"]; compiled && strings.HasSuffix(f, ".ts") && !strings.HasSuffix(f, ".d.ts") {
+			continue
+		}
+		files = append(files, f)
+		size += n
+	}
 	slices.Sort(files)
 	return files, size, err
 }

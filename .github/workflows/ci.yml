@@ -130,6 +130,15 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
+      # The plugins and the plugin API are written in TypeScript, and ship
+      # the JavaScript they compile to.
+      - name: The plugins' JavaScript is compiled from their TypeScript
+        run: |
+          bun run build:plugins
+          if ! git diff --exit-code -- community/plugins internal/plugins/api.js; then
+            echo "Run bun run build:plugins, and commit the JavaScript it writes" >&2
+            exit 1
+          fi
 
   # The release's builds, in the Nix shell release.yml builds them in.
   build:

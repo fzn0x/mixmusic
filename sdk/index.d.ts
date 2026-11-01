@@ -6,12 +6,14 @@
 // API when the user enables the plugin. It may return a function, which
 // MixMusic calls when the plugin is disabled, updated or removed:
 //
-//   /** @param {import("mixmusic-sdk").MixMusicAPI} api */
-//   export default function activate(api) {
+//   import type { MixMusicAPI } from "./sdk";
+//
+//   export default function activate(api: MixMusicAPI) {
 //     const off = api.player.on("trackchange", () => console.log(api.player.state().track?.title));
 //     return off;
 //   }
 //
+// MixMusic runs the JavaScript a plugin's TypeScript compiles to.
 // Everything a plugin adds through the API (sidebar items, pages, track
 // actions, widgets, commands and listeners) is removed for it when it
 // stops, and its timers stop. See docs/plugins.md.

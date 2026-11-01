@@ -2,12 +2,14 @@
 
 A plugin adds to MixMusic: a page, a command, an item in the menu of every
 track, a widget on the now playing page. It is a folder holding a manifest
-and an ES module:
+and an ES module, written in TypeScript and compiled to the JavaScript
+MixMusic runs:
 
 ```
 my-plugin/
 ├── plugin.json
-└── index.js
+├── index.ts    the plugin
+└── index.js    what it compiles to, which MixMusic runs
 ```
 
 ```json
@@ -41,9 +43,10 @@ enabling it.
 The module's default export is called with the API when the user enables
 the plugin, and may return a function MixMusic calls when it stops it:
 
-```js
-/** @param {import("../../sdk").MixMusicAPI} api */
-export default function activate(api) {
+```ts
+import type { MixMusicAPI } from "./sdk"; // sdk/index.d.ts, copied beside it
+
+export default function activate(api: MixMusicAPI) {
   api.commands.register({
     id: "shout",
     title: "Shout what plays",
@@ -74,10 +77,28 @@ are `console`, `setTimeout`, `setInterval`, `queueMicrotask`,
 `import { helper } from "./helper.js"`, and nothing else. `console.log`
 writes to MixMusic's log, `mixmusic.log` in its logs folder.
 
+### From TypeScript to JavaScript
+
+MixMusic runs JavaScript, so a plugin ships what its TypeScript compiles
+to: `"main"` and `"files"` name `index.js`, and `index.ts` stays with its
+source, as the registry leaves it out. Any compiler that keeps the module an
+ES module does; with TypeScript's own:
+
+```sh
+tsc --target ES2022 --module ESNext --moduleResolution bundler --strict index.ts
+```
+
+The plugins of this repository's `community/plugins` are written so:
+`bun run build:plugins` compiles them, as it does the plugin API's own
+`internal/plugins/api.ts`, and CI checks that their JavaScript is what their
+TypeScript compiles to. A plugin may be written in JavaScript straight
+away too: the same module, without the types.
+
 ## The API
 
-[sdk/index.d.ts](../sdk/index.d.ts) types the whole API; point your editor at
-it with a JSDoc `@param` as above, or copy it next to your plugin.
+[sdk/index.d.ts](../sdk/index.d.ts) types the whole API; copy it next to your
+plugin and import its types, as above, or in a JavaScript plugin point your
+editor at it with a JSDoc `@param {import("./sdk").MixMusicAPI} api`.
 
 | | |
 |---|---|

@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "mygo dev",
     "build": "mygo build",
+    "build:plugins": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

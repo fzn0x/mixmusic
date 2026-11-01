@@ -481,6 +481,12 @@ func (p *Player) play() {
 		p.playAt(p.s.Index, p.s.Position, true)
 		return
 	}
+	if p.atEnd && p.s.Live {
+		// The queue ran out as this live stream's broadcast ended: it is
+		// found again, as the broadcast, or its recording.
+		p.playAt(p.s.Index, 0, true)
+		return
+	}
 	if p.atEnd {
 		// The queue ran out at the end of this track: it plays again from
 		// its start, where the engine, which ended it, goes once seeked.

@@ -104,6 +104,25 @@ func TestLiveTrackEnds(t *testing.T) {
 	h.wait("b playing", playing("b"))
 }
 
+// TestLiveTrackEndsTheQueue plays a live stream that ended the queue
+// again when asked to play: it is found again, rather than played from a
+// start it doesn't have.
+func TestLiveTrackEndsTheQueue(t *testing.T) {
+	h := newLiveHarness(t)
+	h.p.PlayTracks([]media.Track{liveTrack("liveRadio01")}, 0)
+	h.wait("the live stream playing", playing("liveRadio01"))
+	h.p.Time(time.Minute, 0)
+	h.p.Ended()
+	h.wait("the end of the queue", func(p *Player) bool { return p.atEnd })
+	h.stream.Pause() // as the engine does at the end
+	h.wait("stopped", func(p *Player) bool { return !p.s.Playing })
+	h.p.Play()
+	h.wait("the live stream playing again", func(p *Player) bool { return h.stream.count("load") == 2 && playing("liveRadio01")(p) })
+	if h.stream.count("seek") != 0 {
+		t.Errorf("seeked a live stream: %q", h.stream.copy())
+	}
+}
+
 // TestNextLiveTrackNotPreloaded finds the stream of a live track that
 // comes next, but holds none of its audio ahead, which would be behind
 // its live edge once it plays.

@@ -527,12 +527,12 @@ func (p *Player) writeQueue() {
 	p.writing.Lock()
 	defer p.writing.Unlock()
 	p.mu.Lock()
-	st, version := p.snap, p.version
+	st, order, played, version := p.snap, p.snapOrder, p.snapPlayed, p.version
 	p.mu.Unlock()
 	if version <= p.written {
 		return
 	}
-	p.svc.SaveQueue(savedOf(st))
+	p.svc.SaveQueue(savedOf(st, order, played))
 	p.written = version
 }
 
@@ -553,9 +553,10 @@ func (p *Player) Flush() {
 }
 
 // savedOf is the queue of st as it survives a restart: the part of it
-// savedWindow keeps, with the current entry's index in that part, and
-// which of its entries the radio added.
-func savedOf(st State) Saved {
+// savedWindow keeps, with the current entry's index in that part, which of
+// its entries the radio added, which before the current one aren't among
+// those played, and their own order, while shuffled, from unshuffled.
+func savedOf(st State, unshuffled []Item, played map[string]bool) Saved {
 	from, to := savedWindow(len(st.Queue), st.Index)
 	kept := st.Queue[from:to]
 	saved := Saved{
@@ -565,10 +566,20 @@ func savedOf(st State) Saved {
 		Shuffle:  st.Shuffle,
 		Repeat:   st.Repeat,
 	}
+	at := make(map[string]int, len(kept))
 	for i, it := range kept {
 		saved.Tracks[i] = it.Track
+		at[it.UID] = i
 		if it.Radio {
 			saved.Radio = append(saved.Radio, i)
+		}
+		if i < saved.Index && !played[it.UID] {
+			saved.Unplayed = append(saved.Unplayed, i)
+		}
+	}
+	for _, it := range unshuffled {
+		if i, ok := at[it.UID]; ok {
+			saved.Order = append(saved.Order, i)
 		}
 	}
 	return saved

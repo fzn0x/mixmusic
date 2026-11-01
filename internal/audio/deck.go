@@ -17,9 +17,9 @@ import (
 )
 
 // Source is the file of a track, WebM or MP4, or the packed audio of a live
-// stream, as a deck reads it: its bytes as they arrive. A Read that waits for bytes returns an error once the
-// interrupted function its Opener got returns true; Wake makes such a Read
-// check it again.
+// stream, as a deck reads it: its bytes as they arrive. A Read that waits
+// for bytes returns an error once the interrupted function its Opener got
+// returns true; Wake makes such a Read check it again.
 type Source interface {
 	io.ReadSeeker
 	Wake()

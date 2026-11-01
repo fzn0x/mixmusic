@@ -1,7 +1,13 @@
 package native
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
+	"image"
+	"image/png"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"slices"
@@ -202,6 +208,43 @@ func TestTitleSwitch(t *testing.T) {
 		if got := s.svc.Preferences.Get().ShowInTitle; got != want {
 			t.Errorf("the switch left the title showing what plays %v, not %v", got, want)
 		}
+	}
+}
+
+// TestCoversKept tells how many covers are kept on disk, and clears them.
+func TestCoversKept(t *testing.T) {
+	var cover bytes.Buffer
+	if err := png.Encode(&cover, image.NewRGBA(image.Rect(0, 0, 4, 4))); err != nil {
+		t.Fatal(err)
+	}
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.Write(cover.Bytes()) }))
+	t.Cleanup(srv.Close)
+	s := newTestShell(t)
+	store := s.svc.System.Artwork()
+	store.HTTP = srv.Client()
+	if _, err := store.Bytes(context.Background(), srv.URL+"/a.png"); err != nil {
+		t.Fatal(err)
+	}
+	store.Close()
+	tt := testerOf(t, s, 1280, 3200)
+	show(s, tt, "/settings/playback")
+	if !tt.HasText("1 cover in ") {
+		t.Fatalf("the covers kept aren't shown: %q", tt.Texts())
+	}
+	click(t, s, tt, "Clear covers")
+	for deadline := time.Now().Add(5 * time.Second); !tt.HasText("Covers cleared"); {
+		if time.Now().After(deadline) {
+			t.Fatalf("clearing doesn't say so: %q", tt.Texts())
+		}
+		time.Sleep(10 * time.Millisecond)
+		s.drain()
+		tt.Frame()
+	}
+	if use := s.svc.System.ArtworkUsage(); use.Images != 0 || use.Bytes != 0 {
+		t.Errorf("%d covers left, %d bytes", use.Images, use.Bytes)
+	}
+	if !tt.HasText("0 covers in 0 B") {
+		t.Errorf("the row doesn't say the covers went: %q", tt.Texts())
 	}
 }
 

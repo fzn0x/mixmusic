@@ -128,6 +128,8 @@ func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// The covers' downloads end before the folder goes.
+	t.Cleanup(a.Services().System.Artwork().Close)
 	stream := &testStream{}
 	p := player.New(testPlayer{}, stream, testDevice{}, player.Saved{})
 	stream.mu.Lock()

@@ -14,13 +14,13 @@ import (
 // made-up translation and romaji.
 var (
 	kiteLines       = []lyrics.Line{{TimeMs: 0, Text: "紙の凧"}, {TimeMs: 60000, Text: "空へ"}}
-	kiteTranslation = lyrics.Translation{From: "ja", To: "en", Lines: []lyrics.TranslatedLine{
-		{Text: "Paper kite", Romanized: "kami no tako"}, {Text: "To the sky", Romanized: "sora e"}}}
+	kiteTranslation = translated{lyrics.Translation{From: "ja", To: "en", Lines: []lyrics.TranslatedLine{
+		{Text: "Paper kite", Romanized: "kami no tako"}, {Text: "To the sky", Romanized: "sora e"}}}, true}
 )
 
 // lyricsIn shows made-up lyrics in the language lang in the lyrics panel,
 // with their translation into English when it is given.
-func lyricsIn(t *testing.T, lang string, tr *loaded[lyrics.Translation]) (*shell, func() []string) {
+func lyricsIn(t *testing.T, lang string, tr *loaded[translated]) (*shell, func() []string) {
 	t.Helper()
 	s := newTestShell(t)
 	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "Unison", Language: lang, Lines: kiteLines}}
@@ -41,14 +41,18 @@ func lyricsIn(t *testing.T, lang string, tr *loaded[lyrics.Translation]) (*shell
 
 // TestLyricsSwitches offers to translate lyrics in another language than
 // the one they translate to, and to show those in another script in Latin
-// letters: romaji for Japanese.
+// letters, where Unison romanizes them.
 func TestLyricsSwitches(t *testing.T) {
 	for _, c := range []struct {
 		lang                string
 		translate, romanize string
 	}{
-		{"ja", "translate", "romaji"},
 		{"ko", "translate", "romanize"},
+		{"ru", "translate", "romanize"},
+		// Unison romanized no Japanese or Ukrainian when checked: their
+		// switch waits for a translation that brings some.
+		{"ja", "translate", ""},
+		{"uk", "translate", ""},
 		{"es", "translate", ""},
 		{"en", "", ""},
 		// A language MixMusic couldn't tell may be another.
@@ -71,7 +75,7 @@ func TestLyricsSwitches(t *testing.T) {
 // TestLyricsTranslated shows each line's translation under it, and its
 // romaji, under it or in its place, as the user chose for Japanese.
 func TestLyricsTranslated(t *testing.T) {
-	s, texts := lyricsIn(t, "ja", &loaded[lyrics.Translation]{done: true, value: kiteTranslation})
+	s, texts := lyricsIn(t, "ja", &loaded[translated]{done: true, value: kiteTranslation})
 	if got := texts(); slices.Contains(got, "Paper kite") || slices.Contains(got, "kami no tako") {
 		t.Errorf("translated while off: %q", got)
 	}
@@ -97,16 +101,41 @@ func TestLyricsTranslated(t *testing.T) {
 	}
 
 	// Translations of other lyrics of the track don't show on these.
-	s.loads["lyrics-translation:"+testTracks[0].ID+":en"] = &loaded[lyrics.Translation]{done: true, value: lyrics.Translation{Lines: kiteTranslation.Lines[:1]}}
+	s.loads["lyrics-translation:"+testTracks[0].ID+":en"] = &loaded[translated]{done: true, value: translated{lyrics.Translation{Lines: kiteTranslation.Lines[:1]}, true}}
 	if got := texts(); !slices.Contains(got, "紙の凧") || slices.Contains(got, "Paper kite") {
 		t.Errorf("a translation of other lyrics: %q", got)
+	}
+}
+
+// TestLyricsRomajiWithTranslation offers romaji of Japanese lyrics once
+// their translation brought some, and not when it brought none, as
+// Unison's translations of Japanese do now.
+func TestLyricsRomajiWithTranslation(t *testing.T) {
+	none := kiteTranslation
+	none.Lines = []lyrics.TranslatedLine{{Text: "Paper kite"}, {Text: "To the sky"}}
+	none.romanized = false
+	s, texts := lyricsIn(t, "ja", &loaded[translated]{done: true, value: none})
+	s.set.LyricsTranslate = []string{"ja"}
+	s.set.LyricsRomanize = map[string]string{"ja": settings.RomanizeOnly}
+	if got := texts(); slices.Contains(got, "romaji") || !slices.Contains(got, "Paper kite") || !slices.Contains(got, "紙の凧") {
+		t.Errorf("a translation without romaji: %q", got)
+	}
+	s.loads["lyrics-translation:"+testTracks[0].ID+":en"] = &loaded[translated]{done: true, value: kiteTranslation}
+	if got := texts(); !slices.Contains(got, "romaji") || !slices.Contains(got, "kami no tako") || slices.Contains(got, "紙の凧") {
+		t.Errorf("a translation with romaji: %q", got)
+	}
+	// Romaji of Japanese alone asks for nothing.
+	s.set.LyricsTranslate = nil
+	delete(s.loads, "lyrics-translation:"+testTracks[0].ID+":en")
+	if got := texts(); slices.Contains(got, "romaji") || s.loads["lyrics-translation:"+testTracks[0].ID+":en"] != nil {
+		t.Errorf("romaji alone: %q", got)
 	}
 }
 
 // TestLyricsTranslateRemembered remembers the translate switch, and the
 // romaji one, for the next song in the same language.
 func TestLyricsTranslateRemembered(t *testing.T) {
-	s, texts := lyricsIn(t, "ja", &loaded[lyrics.Translation]{done: true, value: kiteTranslation})
+	s, texts := lyricsIn(t, "ja", &loaded[translated]{done: true, value: kiteTranslation})
 	texts()
 	tt := testerOf(t, s, 1280, 900)
 	tt.Frame()
@@ -132,7 +161,7 @@ func TestLyricsTranslateRemembered(t *testing.T) {
 // TestLyricsTranslationFails shows the lyrics untranslated when their
 // translation fails, says so in one line, and offers to try again.
 func TestLyricsTranslationFails(t *testing.T) {
-	failed := &loaded[lyrics.Translation]{done: true, err: fmt.Errorf("Translation isn't available right now: %w", lyrics.ErrRateLimited)}
+	failed := &loaded[translated]{done: true, err: fmt.Errorf("Translation isn't available right now: %w", lyrics.ErrRateLimited)}
 	s, texts := lyricsIn(t, "ja", failed)
 	s.set.LyricsTranslate = []string{"ja"}
 	got := texts()
@@ -145,11 +174,11 @@ func TestLyricsTranslationFails(t *testing.T) {
 	if s.loads["lyrics-translation:"+testTracks[0].ID+":en"] == failed {
 		t.Error("try again didn't ask for the translation again")
 	}
-	// Romaji alone says so of romaji.
-	s, texts = lyricsIn(t, "ja", failed)
-	s.set.LyricsRomanize = map[string]string{"ja": settings.RomanizeUnder}
+	// Romanization alone says so of romanization.
+	s, texts = lyricsIn(t, "ko", failed)
+	s.set.LyricsRomanize = map[string]string{"ko": settings.RomanizeUnder}
 	if got := texts(); !slices.Contains(got, "Romanization isn't available right now.") {
-		t.Errorf("failed romaji: %q", got)
+		t.Errorf("failed romanization: %q", got)
 	}
 }
 

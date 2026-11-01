@@ -763,6 +763,7 @@ html.js .demo-fallback { display: none; }
 .app-nav { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .app-nav li { display: flex; align-items: center; gap: 12px; height: 42px; font-size: 18px; }
 .app-box { display: grid; place-items: center; width: 42px; height: 42px; box-shadow: inset 0 0 0 2px var(--m-ink); }
+.app-nav .is-on { color: var(--m-accent); }
 .app-nav .is-on .app-box { background: var(--m-accent); box-shadow: none; color: var(--m-accent-ink); }
 .app-mixes-head { display: flex; align-items: center; justify-content: space-between; margin: 28px 0 10px; color: var(--m-accent); }
 .app-mixes-head svg { color: var(--m-ink); }

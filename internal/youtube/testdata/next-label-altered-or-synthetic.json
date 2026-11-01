@@ -1,0 +1,84 @@
+{
+ "currentVideoEndpoint": {
+  "watchEndpoint": {
+   "videoId": "altered0001"
+  }
+ },
+ "engagementPanels": [
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {}
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {
+     "structuredDescriptionContentRenderer": {
+      "items": [
+       {},
+       {},
+       {
+        "howThisWasMadeSectionViewModel": {
+         "bodyText": {
+          "content": "Sound or visuals were significantly edited or digitally generated. Learn more",
+          "commandRuns": [
+           {
+            "startIndex": 67,
+            "length": 10,
+            "onTap": {
+             "innertubeCommand": {
+              "commandMetadata": {
+               "webCommandMetadata": {
+                "url": "//support.google.com/youtube/answer/15447836?hl=en",
+                "webPageType": "WEB_PAGE_TYPE_UNKNOWN",
+                "rootVe": 83769
+               }
+              },
+              "urlEndpoint": {
+               "url": "//support.google.com/youtube/answer/15447836?hl=en",
+               "target": "TARGET_NEW_WINDOW"
+              }
+             }
+            }
+           }
+          ],
+          "styleRuns": [
+           {
+            "startIndex": 67,
+            "length": 10,
+            "fontColor": 4278607828
+           }
+          ]
+         },
+         "bodyHeader": {
+          "content": "Altered or synthetic content"
+         }
+        }
+       },
+       {},
+       {}
+      ]
+     }
+    }
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  }
+ ]
+}

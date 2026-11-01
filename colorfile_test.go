@@ -286,3 +286,22 @@ func TestAppearanceOfColorFile(t *testing.T) {
 		}
 	}
 }
+
+// TestGroundTone tones the cover's colour on Greenroom's and Glasshouse's
+// grounds as their own grounds have it, and as a colour file's ground does.
+func TestGroundTone(t *testing.T) {
+	s := newTestShell(t)
+	for theme, want := range map[string]toning{"greenroom": washTone, "glasshouse": coverTone} {
+		set := s.set
+		set.FollowSystem, set.Theme = false, theme
+		if got := groundTone(newLook(set, s.inv.Themes, true, "", colorfile.Colors{}).dark); got != want {
+			t.Errorf("%s's own ground is toned %v, want %v", theme, got, want)
+		}
+	}
+	if got := groundTone(fileLook(s, "greenroom", testColors(t, "pywal-light.json")).dark); got != coverTone {
+		t.Errorf("Greenroom on pywal's light ground is toned %v", got)
+	}
+	if got := groundTone(fileLook(s, "glasshouse", testColors(t, "pywal-3.8.json")).dark); got != washTone {
+		t.Errorf("Glasshouse on pywal's dark ground is toned %v", got)
+	}
+}

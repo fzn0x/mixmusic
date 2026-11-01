@@ -160,3 +160,16 @@ func TestParseSuggestions(t *testing.T) {
 		t.Errorf("suggestions = %q", got)
 	}
 }
+
+// TestParseSongsOfAVideo reads what a search of YouTube Music's songs
+// finds for the music video of Instant Crush: the song, then covers and
+// other songs beside it.
+func TestParseSongsOfAVideo(t *testing.T) {
+	items := parseSearch(fixture(t, "search-songs-of-video"))
+	if len(items) != 8 || items[0].Track == nil || items[0].Track.ID != "yt:khnokW3Mw24" || items[0].Track.Video {
+		t.Fatalf("items = %+v", items)
+	}
+	if got := items[0].Track.ArtistNames(); got != "Daft Punk, Julian Casablancas" {
+		t.Errorf("artists = %q", got)
+	}
+}

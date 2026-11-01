@@ -29,3 +29,34 @@ func TestParseLyrics(t *testing.T) {
 		t.Errorf("lyrics = %q, %q", text, source)
 	}
 }
+
+// TestParseVideoRadio reads the radio of a music video, which YouTube
+// Music makes of music videos and other uploads, and no song.
+func TestParseVideoRadio(t *testing.T) {
+	tracks := parseQueue(fixture(t, "next-video"))
+	if len(tracks) != 5 || tracks[0].ID != "yt:a5uQMwRMHcs" {
+		t.Fatalf("tracks = %+v", tracks)
+	}
+	for _, tr := range tracks {
+		if !tr.Video {
+			t.Errorf("%s (%s) is not a video", tr.Title, tr.ID)
+		}
+	}
+	if up := tracks[4]; up.ID != "yt:GPZ5fnYFI4Q" || len(up.Artists) != 1 || up.Artists[0].Name != "MyDriveThru" {
+		t.Errorf("upload = %+v", up)
+	}
+}
+
+// TestParseSongRadio reads the radio of that video's song: songs, and an
+// upload YouTube Music suggests beside them.
+func TestParseSongRadio(t *testing.T) {
+	tracks := parseQueue(fixture(t, "next-song"))
+	if len(tracks) != 5 || tracks[0].ID != "yt:khnokW3Mw24" {
+		t.Fatalf("tracks = %+v", tracks)
+	}
+	for i, tr := range tracks {
+		if tr.Video != (i == 4) {
+			t.Errorf("%s (%s): video = %v", tr.Title, tr.ID, tr.Video)
+		}
+	}
+}

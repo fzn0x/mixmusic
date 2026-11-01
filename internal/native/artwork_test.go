@@ -173,6 +173,25 @@ func TestArtworkJitter(t *testing.T) {
 	}
 }
 
+// TestArtColorWait has the accent ask again for the colour of artwork that
+// couldn't load as soon as a cover would: a while after, as long as the
+// host asks, and half an hour after for an address that gives no image.
+func TestArtColorWait(t *testing.T) {
+	for _, c := range []struct {
+		err  error
+		want time.Duration
+	}{
+		{context.DeadlineExceeded, artColorRetry},
+		{errOffline, artColorRetry},
+		{&artwork.Error{Host: "i.ytimg.com", Status: 503, Temporary: true, RetryAfter: time.Minute, Err: errors.New("HTTP 503")}, time.Minute},
+		{&artwork.Error{Host: "i.ytimg.com", Status: 404, Err: errors.New("HTTP 404")}, artMissingRetry},
+	} {
+		if got := artColorWait(c.err); got != c.want {
+			t.Errorf("after %v, the accent waits %v, not %v", c.err, got, c.want)
+		}
+	}
+}
+
 func TestBucket(t *testing.T) {
 	for px, want := range map[int]int{1: 64, 64: 64, 65: 96, 120: 128, 600: 768, 2000: 1024} {
 		if got := bucket(px); got != want {

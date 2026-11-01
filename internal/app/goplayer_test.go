@@ -39,7 +39,12 @@ func newQuietApp(t *testing.T, set func(o *Options)) *App {
 	p := player.New(offlineServices{playerServices{a}}, stream, connectDevice{a}, player.Saved{})
 	stream.p.Store(p)
 	a.goPlayer.Store(p)
-	t.Cleanup(p.Close)
+	// The player writes the queue beside its goroutine, which Close doesn't
+	// wait for: Flush does, before the folder goes.
+	t.Cleanup(func() {
+		p.Close()
+		p.Flush()
+	})
 	return a
 }
 

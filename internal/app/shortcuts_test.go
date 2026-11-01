@@ -95,18 +95,29 @@ func (f *fakeHotkeys) press(t *testing.T, acc string) {
 }
 
 // newShortcutApp is an app in a folder of its own whose global shortcuts
-// register with a fake, and whose presses the test sees in ran.
+// register with a fake, and whose presses the test sees in ran. Presses
+// come as fast as the test makes them, on Linux too, where the presses of
+// a key held repeat.
 func newShortcutApp(t *testing.T) (*App, *fakeHotkeys, *[]string) {
 	t.Helper()
-	dir := t.TempDir()
 	hk := newFakeHotkeys()
+	a := newPlainApp(t, hk)
+	a.global.repeats = false
+	ran := &[]string{}
+	a.global.run = func(id string) { *ran = append(*ran, id) }
+	return a, hk, ran
+}
+
+// newPlainApp is an app in a folder of its own, without a player, whose
+// global shortcuts register with hk, or MyGo when nil.
+func newPlainApp(t *testing.T, hk Hotkeys) *App {
+	t.Helper()
+	dir := t.TempDir()
 	a, err := New(Options{DataDir: filepath.Join(dir, "data"), CacheDir: filepath.Join(dir, "cache"), Builtin: builtin.FS, Version: "test", Hotkeys: hk})
 	if err != nil {
 		t.Fatal(err)
 	}
-	ran := &[]string{}
-	a.global.run = func(id string) { *ran = append(*ran, id) }
-	return a, hk, ran
+	return a
 }
 
 // setGlobal saves the settings with these global shortcuts.
@@ -451,7 +462,7 @@ func TestGlobalCommands(t *testing.T) {
 // TestGlobalShortcutsWaitForMyGo registers nothing before MyGo runs, the
 // app's real registrar, which would panic.
 func TestGlobalShortcutsWaitForMyGo(t *testing.T) {
-	a := newQuietApp(t, nil)
+	a := newPlainApp(t, nil)
 	p := &Preferences{a}
 	s := p.Get()
 	s.GlobalShortcuts = map[string]string{"player.toggle": "Mod+Alt+P"}

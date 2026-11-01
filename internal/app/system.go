@@ -8,6 +8,7 @@ import (
 
 	"github.com/egoist/mygo"
 
+	"github.com/fzn0x/mixmusic/internal/aac"
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/audio/output"
@@ -93,7 +94,8 @@ type Notice struct {
 // projects, which its copies must reproduce.
 func (s *System) Notices() []Notice {
 	return []Notice{
-		{Name: "libopus, which decodes the audio", Text: opus.License},
+		{Name: "libopus, which decodes Opus audio", Text: opus.License},
+		{Name: "SharpJaad, which decodes AAC audio", Text: aac.License},
 		{Name: "Chromium's Web Audio, which shapes the sound", Text: audio.License},
 	}
 }

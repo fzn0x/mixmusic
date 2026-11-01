@@ -334,7 +334,7 @@ func TestDeckAACAgainstFFmpeg(t *testing.T) {
 	}
 	for _, path := range aacFiles {
 		got := playAll(t, path)
-		want := ffmpegDecode(t, path)
+		want := ffmpegDecode(t, path, path == aacMono48)
 		// ffmpeg keeps the padding of the last packet.
 		if len(want) < len(got) {
 			t.Fatalf("%s: %d frames, ffmpeg's %d", path, len(got)/2, len(want)/2)
@@ -361,7 +361,7 @@ func playAll(t *testing.T, path string) []float32 {
 
 // ffmpegDecode decodes a file with ffmpeg into stereo at Rate, a mono
 // file's in both channels.
-func ffmpegDecode(t *testing.T, path string) []float32 {
+func ffmpegDecode(t *testing.T, path string, mono bool) []float32 {
 	t.Helper()
 	out, err := exec.Command("ffmpeg", "-v", "error", "-i", path,
 		"-af", "aresample=48000:filter_type=kaiser:kaiser_beta=12:filter_size=256:cutoff=0.95:phase_shift=14",
@@ -371,16 +371,7 @@ func ffmpegDecode(t *testing.T, path string) []float32 {
 	}
 	pcm := make([]float32, len(out)/4)
 	binary.Read(bytes.NewReader(out), binary.LittleEndian, pcm)
-	f, err := os.Open(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
-	r, err := mp4.NewReader(f)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if r.Track().Channels == 1 {
+	if mono {
 		stereo := make([]float32, 2*len(pcm))
 		for i, v := range pcm {
 			stereo[2*i], stereo[2*i+1] = v, v

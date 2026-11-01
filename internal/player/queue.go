@@ -179,24 +179,30 @@ func (p *Player) setShuffle(on bool) {
 // shuffledFrom is q shuffled around its entry at, or -1: the entries
 // before it that played stay before it, in their order, and the rest of q
 // follows it in random order, the entries before it that haven't played
-// included, as a list started in its middle leaves them.
+// included, as a list started in its middle leaves them. The user's own
+// entries come first, then the radio's, so that what they add still goes
+// before the radio's.
 func (p *Player) shuffledFrom(q []Item, at int) []Item {
 	out := make([]Item, 0, len(q))
-	var rest []Item
+	var own, radio []Item
 	for i, it := range q {
 		switch {
 		case i == at:
 		case i < at && p.played[it.UID]:
 			out = append(out, it)
+		case it.Radio:
+			radio = append(radio, it)
 		default:
-			rest = append(rest, it)
+			own = append(own, it)
 		}
 	}
 	if at >= 0 && at < len(q) {
 		out = append(out, q[at])
 	}
-	shuffle(rest)
-	return append(out, rest...)
+	shuffle(own)
+	shuffle(radio)
+	out = append(out, own...)
+	return append(out, radio...)
 }
 
 func shuffle(items []Item) {

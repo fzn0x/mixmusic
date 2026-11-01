@@ -49,6 +49,19 @@ All notable changes to MixMusic are documented here. The format follows
   on no longer leaves an empty, black Space: the window leaves full
   screen, then hides in the tray, and comes back in full screen (#84).
 
+### Fixed
+
+- A song whose audio stops arriving partway through, as when the
+  connection drops or is slow, loads again where it was up to three
+  times, waiting a little longer each time, rather than skipping to the
+  next song the second time it happens. The play button shows that it
+  loads meanwhile, a song paused stays paused, and the song has all its
+  tries again once it plays on for ten seconds, or when it plays again
+  with Repeat: one or Previous (#101).
+- When three songs in a row can't play, as when the network is down,
+  MixMusic stops again rather than stepping through the rest of the
+  queue (#101).
+
 ## [0.5.5] - 2026-10-28
 
 Pages scroll smoothly on every system, even with thousands of liked songs

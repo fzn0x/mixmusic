@@ -77,7 +77,12 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   track louder than -14 LKFS down to it, from the loudness its `Measured`
   source tells (Even loudness), and the preamp, equalizer, levelling
   compressor, volume and analyser of the web player MixMusic had, ported
-  from Chromium's Web Audio, which they match sample for sample.
+  from Chromium's Web Audio, which they match sample for sample. A deck
+  plays its track faster or slower at its own pitch by WSOLA
+  (`stretch.go`), the waveform-similarity overlap-add of Verhelst and
+  Roelands, between its ring and the mix; at 1× it plays the ring as it
+  is. `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio -run
+  StretchListen` writes the test files at each speed, to listen to.
   `MIXMUSIC_LIVE=1 go test ./internal/audio -run Live` plays songs of both
   codecs as the app finds them on YouTube, against ffmpeg's decode.
   `internal/audio/output` plays it on the system's output, without cgo:

@@ -245,7 +245,7 @@ func newShell(a *app.App, p *player.Player) *shell {
 		canvasSizes: map[*plugins.Canvas][2]float32{}, cssColors: map[string]ui.Color{}, svgs: map[string]*ui.SVG{}}
 	s.queueList.Selected = new(int)
 	*s.queueList.Selected = -1
-	s.art = newArtworks(s.update)
+	s.art = newArtworks(s.update, s.svc.System.Artwork())
 	s.refresh()
 	// The side panel the user left.
 	if s.panel = s.set.Panel; s.panel == "none" {

@@ -111,8 +111,11 @@ func (s *shell) marketCard(c *ui.Context, kind addons.Kind, e addons.Entry, base
 			case kind == addons.KindPlugin:
 				ui.Icon(c, icon("puzzle")).FontSize(40).TextColor(k.muted)
 			case e.Preview != "":
-				if b := s.art.get(baseURL+e.Path+"/"+e.Preview, 600); shows && b != nil {
-					ui.Image(c, b).Fill().Fit(ui.Cover)
+				// Only a preview in view downloads, and tries again.
+				if shows {
+					if b := s.art.get(c, baseURL+e.Path+"/"+e.Preview, 600); b != nil {
+						ui.Image(c, b).Fill().Fit(ui.Cover)
+					}
 				}
 			default:
 				ui.Row(c).Gap(4).Children(func() {

@@ -55,7 +55,7 @@ func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, col
 	t.Children(func() {
 		if !shows {
 			// Nothing to print under the words.
-		} else if b := s.art.get(artworkURL(art, 600), 600); b != nil {
+		} else if b := s.art.get(c, artworkURL(art, 600), 600); b != nil {
 			ui.Image(c, b).Absolute().Top(0).Right(0).Bottom(0).Left(0).Fit(ui.Cover).Grayscale().Opacity(0.22)
 		}
 		if texture, ink := k.fx.texture, k.tileText; texture != "" {

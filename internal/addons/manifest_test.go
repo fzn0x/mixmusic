@@ -13,6 +13,7 @@ const validTheme = `{
 		"tile-1": "#00bde3", "tile-2": "#e6007e", "tile-3": "#a4e600", "tile-4": "#ffb000", "tile-text": "#000"},
 	"fonts": {"body": "Inter, system-ui, sans-serif"},
 	"radius": "12px",
+	"layout": {"radius-small": "0.5rem", "shape": "pill", "row": "56px", "cover": "200px", "headings": "bold", "motion": "smooth"},
 	"preview": "preview.png",
 	"options": [
 		{"id": "glass", "label": "Frosted panels", "type": "toggle", "default": "true"},
@@ -27,8 +28,35 @@ func TestParseThemeValid(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if th.ID != "test-theme" || len(th.Options) != 3 {
+	if th.ID != "test-theme" || len(th.Options) != 3 || th.Layout["shape"] != "pill" {
 		t.Errorf("theme = %+v", th)
+	}
+}
+
+func TestPixels(t *testing.T) {
+	for in, want := range map[string]float64{"12px": 12, "0.5rem": 8, "2em": 32, "0px": 0} {
+		if got, ok := Pixels(in); !ok || got != want {
+			t.Errorf("Pixels(%q) = %v, %v; want %v", in, got, ok, want)
+		}
+	}
+	for _, in := range []string{"12", "px", "-4px", "1e3px", "12px; x"} {
+		if _, ok := Pixels(in); ok {
+			t.Errorf("Pixels(%q) read a length", in)
+		}
+	}
+}
+
+// TestLayoutErrorsSayWhy checks that a theme's layout token that fails
+// says what it takes.
+func TestLayoutErrorsSayWhy(t *testing.T) {
+	bad := strings.Replace(validTheme, `"headings": "bold"`, `"headings": "heavy"`, 1)
+	_, err := ParseTheme([]byte(bad))
+	if err == nil || !strings.Contains(err.Error(), `layout.headings must be "light", "regular" or "bold"`) {
+		t.Errorf("err = %v", err)
+	}
+	bad = strings.Replace(validTheme, `"row": "56px"`, `"row": "200px"`, 1)
+	if _, err = ParseTheme([]byte(bad)); err == nil || !strings.Contains(err.Error(), "layout.row must be from 40px to 96px") {
+		t.Errorf("err = %v", err)
 	}
 }
 
@@ -46,6 +74,12 @@ func TestParseThemeRejects(t *testing.T) {
 		"bad scheme":       {`"scheme": "dark"`, `"scheme": "dim"`},
 		"unknown unit":     {`"unit": "px"`, `"unit": "vw; x"`},
 		"radius injection": {`"radius": "12px"`, `"radius": "12px; color: red"`},
+		"unknown token":    {`"shape": "pill"`, `"shapes": "pill"`},
+		"unknown style":    {`"headings": "bold"`, `"headings": "heavy"`},
+		"length as style":  {`"shape": "pill"`, `"shape": "12px"`},
+		"style as length":  {`"row": "56px"`, `"row": "tall"`},
+		"length too small": {`"row": "56px"`, `"row": "12px"`},
+		"length too large": {`"cover": "200px"`, `"cover": "40rem"`},
 	} {
 		bad := strings.Replace(validTheme, edit[0], edit[1], 1)
 		if bad == validTheme {

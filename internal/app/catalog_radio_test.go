@@ -1,0 +1,260 @@
+package app
+
+import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/fzn0x/mixmusic/internal/match"
+	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/youtube"
+)
+
+// fakeMusic is YouTube Music as the radio tests need it. search answers
+// a search of its songs, and radio the radio of a video, with a recorded
+// answer, or nil for HTTP 500. It notes the searches and the radios asked.
+type fakeMusic struct {
+	search func(r *http.Request, query string) []byte
+	radio  func(videoID string) []byte
+
+	mu       sync.Mutex
+	searches []string
+	radios   []string
+}
+
+// newFakeMusic answers as YouTube Music did, signed out: a search that
+// names Instant Crush finds its song first, and other searches nothing;
+// the radio of its song is of songs, and every other radio is the radio
+// of its music video, of videos.
+func newFakeMusic(t *testing.T) *fakeMusic {
+	return &fakeMusic{
+		search: func(_ *http.Request, query string) []byte {
+			if strings.Contains(query, "Instant Crush") {
+				return recorded(t, "search-songs-of-video")
+			}
+			return nothing
+		},
+		radio: func(videoID string) []byte {
+			if videoID == "khnokW3Mw24" {
+				return recorded(t, "next-song")
+			}
+			return recorded(t, "next-video")
+		},
+	}
+}
+
+var nothing = []byte(`{}`)
+
+// recorded returns an answer recorded in ../youtube/testdata.
+func recorded(t *testing.T, name string) []byte {
+	t.Helper()
+	data, err := os.ReadFile(filepath.Join("..", "youtube", "testdata", name+".json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return data
+}
+
+// catalog returns a catalog that asks m.
+func (m *fakeMusic) catalog(t *testing.T) *Catalog {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body struct {
+			VideoID string `json:"videoId"`
+			Query   string `json:"query"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		var answer []byte
+		switch r.URL.Path {
+		case "/youtubei/v1/search":
+			m.note(&m.searches, body.Query)
+			answer = m.search(r, body.Query)
+		case "/youtubei/v1/next":
+			m.note(&m.radios, body.VideoID)
+			answer = m.radio(body.VideoID)
+		default:
+			http.NotFound(w, r)
+			return
+		}
+		if answer == nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(answer)
+	}))
+	t.Cleanup(srv.Close)
+	yt := youtube.New()
+	yt.BaseURL = srv.URL
+	return &Catalog{&App{youtube: yt, matcher: match.New(yt, nil)}}
+}
+
+func (m *fakeMusic) note(asked *[]string, what string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	*asked = append(*asked, what)
+}
+
+// asked returns the searches and the radios asked so far.
+func (m *fakeMusic) asked() (searches, radios []string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return slices.Clone(m.searches), slices.Clone(m.radios)
+}
+
+func trackIDs(tracks []media.Track) []string {
+	out := make([]string, len(tracks))
+	for i, t := range tracks {
+		out[i] = t.ID
+	}
+	return out
+}
+
+var (
+	instantCrushVideo = media.Track{ID: "yt:a5uQMwRMHcs", Source: media.SourceYouTube, Title: "Instant Crush (feat. Julian Casablancas)", Artists: []media.Ref{{Name: "Daft Punk"}}, Video: true}
+	instantCrushSong  = media.Track{ID: "yt:khnokW3Mw24", Source: media.SourceYouTube, Title: "Instant Crush (feat. Julian Casablancas)", Artists: []media.Ref{{Name: "Daft Punk"}, {Name: "Julian Casablancas"}}}
+	// driveThru is an upload that has no song on YouTube Music.
+	driveThru = media.Track{ID: "yt:GPZ5fnYFI4Q", Source: media.SourceYouTube, Title: "My Drive Thru - Santogold, Julian Casablancas, N.E.R.D produced by Pharrell", Artists: []media.Ref{{Name: "MyDriveThru"}}, Video: true}
+
+	// The radio of the song of Instant Crush, but the song, and of its
+	// video, but the video.
+	songRadio  = []string{"yt:Rgrt_8mXrK8", "yt:RmYCOm4ehKs", "yt:nujn6wbr-e8", "yt:DkKB4KNKr10"}
+	videoRadio = []string{"yt:qFLhGq0060w", "yt:H5v3kku4y6Q", "yt:1G4isv_Fylg", "yt:GPZ5fnYFI4Q"}
+)
+
+func TestRadioOfASong(t *testing.T) {
+	m := newFakeMusic(t)
+	found, err := m.catalog(t).Radio(t.Context(), instantCrushSong)
+	searches, radios := m.asked()
+	if err != nil || !slices.Equal(trackIDs(found), songRadio) {
+		t.Errorf("found %v, %v", trackIDs(found), err)
+	}
+	if len(searches) != 0 || !slices.Equal(radios, []string{"khnokW3Mw24"}) {
+		t.Errorf("searched %q, asked the radios of %v", searches, radios)
+	}
+}
+
+// TestRadioOfAVideoIsOfItsSong: the radio of a music video is the radio
+// of its song, without the song, which plays as the video.
+func TestRadioOfAVideoIsOfItsSong(t *testing.T) {
+	m := newFakeMusic(t)
+	found, err := m.catalog(t).Radio(t.Context(), instantCrushVideo)
+	searches, radios := m.asked()
+	if err != nil || !slices.Equal(trackIDs(found), songRadio) {
+		t.Errorf("found %v, %v", trackIDs(found), err)
+	}
+	if !slices.Equal(searches, []string{"Instant Crush Daft Punk"}) || !slices.Equal(radios, []string{"khnokW3Mw24"}) {
+		t.Errorf("searched %q, asked the radios of %v", searches, radios)
+	}
+}
+
+func TestRadioOfAVideoWhoseSongHasNone(t *testing.T) {
+	m := newFakeMusic(t)
+	radio := m.radio
+	m.radio = func(videoID string) []byte {
+		if videoID == "khnokW3Mw24" {
+			return nothing
+		}
+		return radio(videoID)
+	}
+	found, err := m.catalog(t).Radio(t.Context(), instantCrushVideo)
+	_, radios := m.asked()
+	// The video's own radio, as before, rather than nothing.
+	if err != nil || !slices.Equal(trackIDs(found), videoRadio) {
+		t.Errorf("found %v, %v", trackIDs(found), err)
+	}
+	if !slices.Equal(radios, []string{"khnokW3Mw24", "a5uQMwRMHcs"}) {
+		t.Errorf("asked the radios of %v", radios)
+	}
+}
+
+func TestRadioOfAVideoWhoseSongsRadioFails(t *testing.T) {
+	m := newFakeMusic(t)
+	m.radio = func(string) []byte { return nil }
+	_, err := m.catalog(t).Radio(t.Context(), instantCrushVideo)
+	_, radios := m.asked()
+	if err == nil || !slices.Equal(radios, []string{"khnokW3Mw24"}) {
+		t.Errorf("asked the radios of %v: %v", radios, err)
+	}
+}
+
+// TestRadioOfAVideoWhoseSongIsSlow: a search that doesn't answer in time
+// doesn't hold the radio up for long, and the video's own radio plays.
+func TestRadioOfAVideoWhoseSongIsSlow(t *testing.T) {
+	defer func(d time.Duration) { songWait = d }(songWait)
+	songWait = 50 * time.Millisecond
+	m := newFakeMusic(t)
+	m.search = func(r *http.Request, _ string) []byte {
+		select {
+		case <-r.Context().Done():
+		case <-time.After(5 * time.Second):
+		}
+		return nothing
+	}
+	start := time.Now()
+	found, err := m.catalog(t).Radio(t.Context(), instantCrushVideo)
+	took := time.Since(start)
+	searches, radios := m.asked()
+	if err != nil || !slices.Equal(trackIDs(found), videoRadio) {
+		t.Errorf("found %v, %v", trackIDs(found), err)
+	}
+	if len(searches) != 1 || !slices.Equal(radios, []string{"a5uQMwRMHcs"}) || took > 3*time.Second {
+		t.Errorf("searched %q, asked the radios of %v, in %v", searches, radios, took)
+	}
+}
+
+// TestRadioOfAnUploadCarriesOnFromASong: an upload with no song carries
+// on from the song of the first video its radio suggests that has one.
+func TestRadioOfAnUploadCarriesOnFromASong(t *testing.T) {
+	m := newFakeMusic(t)
+	found, err := m.catalog(t).Radio(t.Context(), driveThru)
+	searches, radios := m.asked()
+	if err != nil || !slices.Equal(trackIDs(found), append([]string{instantCrushSong.ID}, songRadio...)) {
+		t.Errorf("found %v, %v", trackIDs(found), err)
+	}
+	if len(searches) != 2 || !slices.Equal(radios, []string{"GPZ5fnYFI4Q", "khnokW3Mw24"}) {
+		t.Errorf("searched %q, asked the radios of %v", searches, radios)
+	}
+}
+
+// TestRadioOfVideosWithoutSongs: when none of the first videos has a song
+// either, the upload's radio of videos stands.
+func TestRadioOfVideosWithoutSongs(t *testing.T) {
+	m := newFakeMusic(t)
+	m.search = func(*http.Request, string) []byte { return nothing }
+	found, err := m.catalog(t).Radio(t.Context(), driveThru)
+	searches, radios := m.asked()
+	want := []string{"yt:a5uQMwRMHcs", "yt:qFLhGq0060w", "yt:H5v3kku4y6Q", "yt:1G4isv_Fylg"}
+	if err != nil || !slices.Equal(trackIDs(found), want) {
+		t.Errorf("found %v, %v", trackIDs(found), err)
+	}
+	// The upload's song, then those of three of its radio's videos.
+	if len(searches) != 1+relayTries || !slices.Equal(radios, []string{"GPZ5fnYFI4Q"}) {
+		t.Errorf("searched %q, asked the radios of %v", searches, radios)
+	}
+}
+
+// TestRadioOfAnUploadWhenSearchesFail: once YouTube Music fails a search,
+// the upload's radio stands, without more searches.
+func TestRadioOfAnUploadWhenSearchesFail(t *testing.T) {
+	m := newFakeMusic(t)
+	m.search = func(_ *http.Request, query string) []byte {
+		if strings.HasPrefix(query, "My Drive Thru") {
+			return nothing
+		}
+		return nil
+	}
+	found, err := m.catalog(t).Radio(t.Context(), driveThru)
+	searches, radios := m.asked()
+	if err != nil || len(found) != 4 {
+		t.Errorf("found %v, %v", trackIDs(found), err)
+	}
+	if len(searches) != 2 || !slices.Equal(radios, []string{"GPZ5fnYFI4Q"}) {
+		t.Errorf("searched %q, asked the radios of %v", searches, radios)
+	}
+}

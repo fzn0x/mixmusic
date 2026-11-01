@@ -98,17 +98,19 @@ func (p *Player) disliked(id string, disliked bool) {
 		if it.Track.ID != id {
 			continue
 		}
+		was := it
 		switch {
-		case disliked && p.skipDisliked:
-			it.Chosen, it.Skip = false, SkipDisliked
 		case disliked:
 			it.Chosen = false
+			if p.skipDisliked {
+				it.Skip = SkipDisliked
+			}
 		case it.Skip == SkipDisliked:
 			it.Skip = ""
-		default:
-			continue
 		}
-		q[i], changed = it, true
+		if it.Chosen != was.Chosen || it.Skip != was.Skip {
+			q[i], changed = it, true
+		}
 	}
 	if !changed {
 		return

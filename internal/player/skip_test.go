@@ -451,3 +451,29 @@ func TestSkipRestore(t *testing.T) {
 		}
 	}
 }
+
+// TestDislikeChangesOnce changes the queue only when a dislike changes
+// how it plays an entry: not for a track it doesn't hold, nor twice.
+func TestDislikeChangesOnce(t *testing.T) {
+	h := newHarness(t, Saved{}, disliking())
+	h.p.PlayTracks(tracks("a", "b", "c"), 0)
+	h.wait("a playing", playing("a"))
+	var mu sync.Mutex
+	changes := 0
+	h.p.Subscribe(func(e Event) {
+		if e == QueueChange {
+			mu.Lock()
+			changes++
+			mu.Unlock()
+		}
+	})
+	h.p.Disliked("yt:z", true)
+	h.p.Disliked("yt:c", true)
+	h.p.Disliked("yt:c", true)
+	h.on(func(*Player) {})
+	mu.Lock()
+	defer mu.Unlock()
+	if changes != 1 {
+		t.Errorf("the queue changed %d times, not once", changes)
+	}
+}

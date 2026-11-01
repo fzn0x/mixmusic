@@ -74,11 +74,13 @@ type player struct {
 	track   Track
 	playing bool
 	pos     time.Duration
+	// rate is the speed it plays at.
+	rate float64
 }
 
-func newPlayer(s *Scrobbler) *player { return &player{s: s, now: t0} }
+func newPlayer(s *Scrobbler) *player { return &player{s: s, now: t0, rate: 1} }
 
-func (p *player) observe() bool { return p.s.Observe(p.now, p.id, p.track, p.playing, p.pos) }
+func (p *player) observe() bool { return p.s.Observe(p.now, p.id, p.track, p.playing, p.pos, p.rate) }
 
 // load plays id from its beginning.
 func (p *player) load(id string, t Track) bool {
@@ -96,7 +98,7 @@ func (p *player) run(d time.Duration) {
 	for range d / time.Second {
 		p.now = p.now.Add(time.Second)
 		if p.playing {
-			p.pos += time.Second
+			p.pos += time.Duration(float64(time.Second) * p.rate)
 		}
 		p.observe()
 	}
@@ -398,4 +400,42 @@ func TestScrobblerStopsWhenTheSessionExpires(t *testing.T) {
 	}
 	api.wantCalls(t, "nowPlaying SK A", "scrobble SK 1", "scrobble SK2 1", "nowPlaying SK2 B")
 	wantQueue(t, s)
+}
+
+// TestScrobblerCountsAtSpeed counts how much of the track was heard: half
+// of a song of 4 minutes is heard in a minute at 2×, and in four at 0.5×.
+func TestScrobblerCountsAtSpeed(t *testing.T) {
+	a := song("A", 4*time.Minute)
+	for _, c := range []struct {
+		rate  float64
+		after time.Duration
+	}{{2, time.Minute}, {3, 40 * time.Second}, {0.5, 4 * time.Minute}} {
+		s := NewScrobbler(&fakeAPI{}, "SK")
+		p := newPlayer(s)
+		p.rate = c.rate
+		p.load("a", a)
+		p.run(c.after - time.Second)
+		wantQueue(t, s)
+		p.run(time.Second)
+		wantQueue(t, s, Play{a, t0})
+	}
+	// Played from a minute in at 2×, it started half a minute before.
+	s := NewScrobbler(&fakeAPI{}, "SK")
+	p := newPlayer(s)
+	p.rate = 2
+	p.id, p.track, p.playing, p.pos = "a", a, true, time.Minute
+	p.observe()
+	p.run(time.Minute)
+	wantQueue(t, s, Play{a, t0.Add(-30 * time.Second)})
+	// Half a minute at 1×, then at 3×: what each played counts.
+	s = NewScrobbler(&fakeAPI{}, "SK")
+	p = newPlayer(s)
+	p.load("a", a)
+	p.run(30 * time.Second)
+	p.rate = 3
+	p.observe()
+	p.run(29 * time.Second)
+	wantQueue(t, s)
+	p.run(time.Second)
+	wantQueue(t, s, Play{a, t0})
 }

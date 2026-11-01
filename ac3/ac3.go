@@ -1,14 +1,28 @@
 // Package ac3 decodes AC-3 audio, of ATSC A/52, such as the 5.1 surround
 // YouTube serves in MP4 (format 380): a pure Go decoder written from the
-// published standard.
+// published standard, ATSC A/52:2012.
 //
 // A Decoder decodes the syncframes of a stream into six channels of float32
 // samples, interleaved in the order of Left, Right, Center, LFE,
 // LeftSurround and RightSurround, those the stream lacks silent, and tells
-// the stereo downmix the stream's own levels ask for.
+// the stereo downmix the stream's own mix levels ask for.
 //
-// The decoder checks what it reads against the bounds of the standard, so
-// that malformed frames make errors, never panics.
+// It decodes every audio coding mode, from 1/0 to 3/2, with or without the
+// LFE, at 48, 44.1 and 32 kHz, of bsid 8 and below, with all of the tools
+// of the standard: the exponent strategies, the parametric bit allocation
+// and its delta bit allocation, coupling and its phase flags, rematrixing,
+// block switching, and dither. It applies the dynamic range gains of the
+// blocks, as the standard asks a decoder to by default, and leaves the
+// dialogue level, dialnorm, to the player. It reads the Lo/Ro mix levels
+// of the alternate syntax of Annex D (bsid 6) for the downmix. A 1+1
+// stream's Ch1 is Left and its Ch2 Right. It checks both CRCs of each
+// syncframe.
+//
+// The bit allocation and the unpacking follow the standard to the bit;
+// the transform is computed in float32, with an FFT, to about 140 dB of
+// the standard's equations. The decoder checks what it reads against the
+// bounds of the standard, so that malformed frames make errors, never
+// panics.
 package ac3
 
 import (

@@ -128,7 +128,7 @@ func (f *File[T]) Update(fn func(v *T) error) error {
 	if f.decode != nil {
 		from := f.value
 		data, err := os.ReadFile(f.path)
-		if err == nil && !bytes.Equal(data, f.disk) {
+		if err == nil && !f.unchanged(data) {
 			if _, err := f.take(data); err != nil {
 				return err
 			}
@@ -183,7 +183,7 @@ func (f *File[T]) Reload() (Change[T], error) {
 		return c, nil
 	case err != nil:
 		return c, err
-	case bytes.Equal(data, f.disk):
+	case f.unchanged(data):
 		return c, f.held
 	}
 	unsaved, err := f.take(data)
@@ -196,6 +196,12 @@ func (f *File[T]) Reload() (Change[T], error) {
 	c.Value, c.Data = f.value, data
 	c.Changed = !same(c.Prev, f.value)
 	return c, err
+}
+
+// unchanged tells whether data, the file's bytes, are those this process
+// last read or wrote: no edit. An empty file where there was none is one.
+func (f *File[T]) unchanged(data []byte) bool {
+	return f.disk != nil && bytes.Equal(data, f.disk)
 }
 
 // take takes in data, an edit of the file: when it decodes, what it
@@ -247,7 +253,7 @@ func (f *File[T]) Flush() error {
 		return f.save(f.value)
 	case err != nil:
 		return err
-	case !bytes.Equal(data, f.disk):
+	case !f.unchanged(data):
 		unsaved, err := f.take(data)
 		switch {
 		case err != nil:

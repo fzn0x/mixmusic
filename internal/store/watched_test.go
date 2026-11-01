@@ -172,6 +172,20 @@ func TestReloadMissingFile(t *testing.T) {
 	}
 }
 
+// TestReloadEmptyFile reads an empty file where there was none, as an
+// editor leaves one for a moment as it saves: it doesn't decode.
+func TestReloadEmptyFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "settings.json")
+	f := openCfg(t, path)
+	writeText(t, path, "")
+	if _, err := f.Reload(); err == nil || f.Held() == nil {
+		t.Errorf("an empty file read: held %v", f.Held())
+	}
+	if err := f.Update(setTheme("aurora")); err != nil || readText(t, path) != "" {
+		t.Errorf("Update over an empty file: %v, the file %q", err, readText(t, path))
+	}
+}
+
 func TestUpdateMergesAnUnreadEdit(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "settings.json")
 	f := openCfg(t, path)

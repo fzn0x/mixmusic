@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/egoist/mygo/ui"
@@ -59,7 +60,7 @@ func TestHomeYoursAlone(t *testing.T) {
 		t.Fatal(err)
 	}
 	tt := tester(t, s)
-	s.loads["home"] = &loaded[[]media.Shelf]{}
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{}
 	s.homeFilter = 1
 	show(s, tt, "/")
 	if !shelfShows(tt, "Recently played") {
@@ -67,6 +68,27 @@ func TestHomeYoursAlone(t *testing.T) {
 	}
 	if _, ok := tt.Find("Loading"); ok {
 		t.Error("yours waits for the services")
+	}
+}
+
+// TestHomeServiceFails shows the shelves of the service that answered, and
+// why the other's didn't, which try again asks for alone.
+func TestHomeServiceFails(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 1600)
+	youtube := &loaded[[]media.Shelf]{done: true, value: shelves(1, 3)}
+	s.loads["home:spotify"] = &loaded[[]media.Shelf]{done: true, err: errors.New("spotify: the service is down")}
+	s.loads["home:youtube"] = youtube
+	show(s, tt, "/")
+	if !tt.HasText("spotify: the service is down") || !shelfShows(tt, "Shelf 0") {
+		t.Fatalf("Home with Spotify down: %q", tt.Texts())
+	}
+	click(t, s, tt, "try again")
+	if l, ok := s.loads["home:spotify"].(*loaded[[]media.Shelf]); !ok || l.err != nil && l.done {
+		t.Errorf("try again didn't ask Spotify again: %+v", s.loads["home:spotify"])
+	}
+	if s.loads["home:youtube"] != youtube {
+		t.Error("try again asked YouTube Music again too")
 	}
 }
 

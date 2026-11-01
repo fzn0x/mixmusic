@@ -197,7 +197,7 @@ func TestRender(t *testing.T) {
 	for i := range testTracks {
 		trackItems = append(trackItems, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
 	}
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
 		{Title: "Listen again", Source: media.SourceYouTube, Items: trackItems},
 		{Title: "Albums for you", Source: media.SourceYouTube, Items: items},
 	}}
@@ -284,7 +284,7 @@ func TestRenderThemes(t *testing.T) {
 	for i := range testTracks {
 		items = append(items, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
 	}
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
 	s.p.PlayTracks(testTracks, 1)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	for _, theme := range []struct {

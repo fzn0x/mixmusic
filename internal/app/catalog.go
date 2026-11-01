@@ -75,28 +75,29 @@ func (c *Catalog) Suggestions(ctx context.Context, input string) ([]string, erro
 	return c.a.youtube.Suggestions(ctx, input)
 }
 
-// Home returns the services' shelves of the home page: Spotify's when the
-// user signed in, then YouTube Music's. The user's own come first there,
-// from LocalShelves.
-func (c *Catalog) Home(ctx context.Context) ([]media.Shelf, error) {
+// SpotifyHome returns Spotify's shelves of the home page, made of the
+// user's library there, or none while they aren't signed in. The home
+// page shows the user's own first, from LocalShelves, then these, then
+// YouTube Music's.
+func (c *Catalog) SpotifyHome(ctx context.Context) ([]media.Shelf, error) {
+	if !c.a.spotify.SignedIn() {
+		return nil, nil
+	}
 	ctx, cancel := context.WithTimeout(ctx, shelfTimeout)
 	defer cancel()
-	var (
-		wg     sync.WaitGroup
-		sp, yt []media.Shelf
-		ytErr  error
-		userID = c.a.spotifyUserID(ctx)
-	)
-	if userID != "" {
-		wg.Go(func() { sp = c.a.spotify.Home(ctx, userID) })
+	me, err := c.a.spotifyProfile(ctx)
+	if err != nil {
+		return nil, err
 	}
-	wg.Go(func() { yt, ytErr = c.a.youtube.Home(ctx) })
-	wg.Wait()
-	shelves := append(sp, yt...)
-	if len(shelves) == 0 && ytErr != nil {
-		return nil, ytErr
-	}
-	return shelves, nil
+	return c.a.spotify.Home(ctx, me.ID)
+}
+
+// YouTubeHome returns YouTube Music's shelves of the home page: the
+// user's own there once they signed in.
+func (c *Catalog) YouTubeHome(ctx context.Context) ([]media.Shelf, error) {
+	ctx, cancel := context.WithTimeout(ctx, shelfTimeout)
+	defer cancel()
+	return c.a.youtube.Home(ctx)
 }
 
 // LocalShelves returns the shelves of what the user played and made, as

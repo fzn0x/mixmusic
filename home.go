@@ -25,7 +25,16 @@ func (s *shell) homePage(c *ui.Context) {
 		}
 		s.pageHeader(c, "home", labels, &s.homeFilter)
 		s.toolProblems(c)
-		home := fetch(s, "home", s.svc.Catalog.Home)
+		// Each service's shelves come on their own: one that fails leaves
+		// the others, and keeps its own of before on a refresh.
+		services := []struct {
+			source  media.Source
+			key     string
+			shelves *loaded[[]media.Shelf]
+		}{
+			{media.SourceSpotify, "home:spotify", fetch(s, "home:spotify", s.svc.Catalog.SpotifyHome)},
+			{media.SourceYouTube, "home:youtube", fetch(s, "home:youtube", s.svc.Catalog.YouTubeHome)},
+		}
 		accounts := fetch(s, "accounts", func(ctx context.Context) (app.AccountsStatus, error) { return s.svc.Accounts.Status(ctx), nil })
 
 		// The track played last, as the library has it now.
@@ -64,11 +73,12 @@ func (s *shell) homePage(c *ui.Context) {
 				s.navigate("/library/mixes")
 			}
 		})
-		// The user's own shelves show at once, those of the services once
-		// they came. Each keep their own keys, which shelves coming or
-		// going in the other don't move.
+		// The user's own shelves show at once, then those of each service
+		// once they came: one that still loads holds back those after it,
+		// which would move once it came. Each keep their own keys, which
+		// shelves coming or going in the others don't move.
 		source := homeFilters[s.homeFilter].source
-		shown := 0
+		shown, failed := 0, false
 		put := func(key string, of []media.Shelf) {
 			var shelves []media.Shelf
 			for _, sh := range of {
@@ -80,18 +90,21 @@ func (s *shell) homePage(c *ui.Context) {
 			shown += len(shelves)
 		}
 		put("home-yours", s.localShelves())
-		if source != media.SourceLocal {
-			put("home", home.value)
-			switch {
-			case !home.done:
+		for _, sv := range services {
+			if source != "" && source != sv.source {
+				continue
+			}
+			put(sv.key, sv.shelves.value)
+			switch key := sv.key; {
+			case !sv.shelves.done:
 				s.loading(c)
 				return
-			case home.err != nil:
-				s.problem(c, home.err, func() { s.forget("home") })
-				return
+			case sv.shelves.err != nil:
+				failed = true
+				s.problem(c, sv.shelves.err, func() { s.forget(key) })
 			}
 		}
-		if shown == 0 {
+		if shown == 0 && !failed {
 			switch source {
 			case media.SourceSpotify:
 				s.emptyLine(c, "Sign in to Spotify in Settings › Accounts to see your playlists and recent tracks here.")

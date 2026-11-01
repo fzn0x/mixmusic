@@ -131,6 +131,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
 
+  # The release's builds, in the Nix shell release.yml builds them in.
   build:
     name: Build ${{ matrix.platform }}
     needs: [go, sdk]
@@ -141,15 +142,12 @@ jobs:
         platform: [windows/amd64, linux/amd64, darwin/universal]
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-go@v6
+      # The tools of flake.nix's shell, at the versions of flake.lock.
+      - uses: cachix/install-nix-action@v31
         with:
-          go-version-file: go.mod
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
-      - name: Install NSIS, for the Windows installer
-        if: startsWith(matrix.platform, 'windows/')
-        run: sudo apt-get update && sudo apt-get install -y nsis
-      - run: bun run build -- -platform "${{ matrix.platform }}"
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - run: nix develop --command bun install --frozen-lockfile
+      - run: nix develop --command bun run build -- -platform "${{ matrix.platform }}"
       # release.yml finds the installer by this name.
       - name: The installer has the name the release looks for
         if: startsWith(matrix.platform, 'windows/')
@@ -158,5 +156,29 @@ jobs:
       - name: Package the portable zip, the RPM and the AppImage
         if: ${{ !startsWith(matrix.platform, 'darwin/') }}
         run: |
-          bash .github/scripts/package.sh "$(jq -r .version package.json)" packages
+          nix develop --command bash .github/scripts/package.sh "$(jq -r .version package.json)" packages
           ls -l packages
+
+  # flake.nix: its lock, MixMusic for Linux built from source, and the
+  # configuration GoReleaser publishes releases with.
+  nix:
+    name: Nix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: flake.lock is committed, and locks every input
+        run: |
+          nix flake lock
+          if [ -n "$(git status --porcelain -- flake.lock)" ]; then
+            cat flake.lock
+            echo "flake.lock is missing or out of date: run nix flake lock" >&2
+            exit 1
+          fi
+      - run: nix flake check --print-build-logs
+      - name: MixMusic for Linux, from source
+        run: nix build --print-build-logs
+      - name: GoReleaser's configuration
+        run: nix develop --command goreleaser check

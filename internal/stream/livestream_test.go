@@ -405,6 +405,14 @@ func TestLiveFailures(t *testing.T) {
 		"HTTP 500": {func(f *fakeLive) {
 			f.segment = func(w http.ResponseWriter, r *http.Request, seq int64) bool { w.WriteHeader(500); return true }
 		}, "YouTube answered HTTP 500"},
+		// The playlist plays, its segments are refused, also once the stream
+		// was found again.
+		"refused segments": {func(f *fakeLive) {
+			f.segment = func(w http.ResponseWriter, r *http.Request, seq int64) bool {
+				w.WriteHeader(http.StatusForbidden)
+				return true
+			}
+		}, "YouTube refused to send its audio"},
 	} {
 		f := newFakeLive(t, 100, 110)
 		f.mu.Lock()

@@ -160,7 +160,9 @@ func (l *Live) follow() error {
 	}
 	next := int64(-1) // the media sequence number of the next segment
 	misses := 0
-	refresh := false
+	// refresh is set to find the stream again, after the media server
+	// refused a segment; refreshes counts the times in a row.
+	refresh, refreshes := false, 0
 	for {
 		if !l.waitRoom() {
 			return l.ctx.Err()
@@ -190,7 +192,12 @@ func (l *Live) follow() error {
 			var status statusError
 			switch {
 			case errors.Is(err, errExpired):
-				refresh = true // the stream is found again
+				// The stream is found again, once: a segment refused after
+				// that fails it.
+				if refreshes++; refreshes > 1 {
+					return err
+				}
+				refresh = true
 			case errors.As(err, &status) && status == http.StatusNotFound:
 				// Gone from the media server, as from a playlist loaded
 				// late: once it stays gone, the stream goes on without it.
@@ -204,7 +211,7 @@ func (l *Live) follow() error {
 			if err != nil {
 				break
 			}
-			misses = 0
+			misses, refreshes = 0, 0
 			l.put(b)
 			next, came = seg.seq+1, true
 		}

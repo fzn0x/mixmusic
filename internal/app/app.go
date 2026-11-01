@@ -163,7 +163,7 @@ func New(opts Options) (*App, error) {
 	a.youtube = youtube.New()
 	a.auth = spotify.NewAuth(s.SpotifyClientID)
 	a.spotify = spotify.NewClient(a.auth)
-	a.tokens = tokenStore{file: filepath.Join(opts.DataDir, "spotify-token.json")}
+	a.tokens = tokenStore{newSecretStore(opts.DataDir, tokenSecret, "spotify-token.json", "spotify-token.dpapi")}
 	a.spotify.OnToken = func(t spotify.Token) {
 		if err := a.tokens.Save(t); err != nil {
 			log.Printf("mixmusic: keeping the Spotify token: %v", err)
@@ -172,7 +172,7 @@ func New(opts Options) (*App, error) {
 	if t, err := a.tokens.Load(); err == nil {
 		a.spotify.SetToken(t)
 	}
-	a.lastfmStore = lastfmStore{file: filepath.Join(opts.DataDir, "lastfm.json")}
+	a.lastfmStore = lastfmStore{newSecretStore(opts.DataDir, lastfmSecret, "lastfm.json", "lastfm.dpapi")}
 	a.openLastfm()
 	a.tools = tools.New(filepath.Join(opts.DataDir, "bin"))
 	a.resolver = stream.NewResolver(a.tools, filepath.Join(opts.CacheDir, "yt-dlp"))

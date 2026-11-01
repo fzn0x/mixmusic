@@ -32,45 +32,10 @@ type lastfmCredentials struct {
 }
 
 // lastfmStore keeps the credentials like the Spotify token: in the
-// system's credential store, or in a file readable by the user alone.
-type lastfmStore struct{ file string }
-
-func (s lastfmStore) Load() (lastfmCredentials, error) {
-	data, err := mygo.Secrets.Get(lastfmSecret)
-	if errors.Is(err, errors.ErrUnsupported) || errors.Is(err, mygo.ErrSecretNotFound) {
-		data, err = os.ReadFile(s.file)
-	}
-	if err != nil {
-		return lastfmCredentials{}, err
-	}
-	var c lastfmCredentials
-	return c, json.Unmarshal(data, &c)
-}
-
-func (s lastfmStore) Save(c lastfmCredentials) error {
-	data, err := json.Marshal(c)
-	if err != nil {
-		return err
-	}
-	if err := mygo.Secrets.Set(lastfmSecret, data); !errors.Is(err, errors.ErrUnsupported) {
-		return err
-	}
-	if err := store.WriteFile(s.file, data); err != nil {
-		return err
-	}
-	return os.Chmod(s.file, 0o600)
-}
-
-func (s lastfmStore) Clear() error {
-	err := mygo.Secrets.Delete(lastfmSecret)
-	if errors.Is(err, errors.ErrUnsupported) || errors.Is(err, mygo.ErrSecretNotFound) {
-		err = nil
-	}
-	if rmErr := os.Remove(s.file); rmErr != nil && !errors.Is(rmErr, os.ErrNotExist) {
-		err = errors.Join(err, rmErr)
-	}
-	return err
-}
+// system's credential store, sealed for the Windows user where the
+// Credential Manager isn't available, or in a file readable by the user
+// alone where there is no store.
+type lastfmStore = jsonSecret[lastfmCredentials]
 
 // LastfmAccount is the state of the Last.fm connection.
 type LastfmAccount struct {

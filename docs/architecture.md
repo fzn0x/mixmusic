@@ -44,8 +44,9 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   with yt-dlp, keeps it until its URL expires, and opens it for the audio
   engine (`Proxy.Open`): chunked fetches from YouTube in the background, a
   new URL when YouTube refuses the old one, and an on-disk cache of tracks
-  played to their end. The player API's answers are tested against
-  recorded ones in `testdata/`, and against YouTube with
+  played to their end. The player API also tells how loud YouTube measured
+  each video (`Stream.Loudness`, `Direct.Loudness`). Its answers are
+  tested against recorded ones in `testdata/`, and against YouTube with
   `MIXMUSIC_LIVE=1 go test ./internal/stream -run Live`.
 - **`internal/webm`** reads the audio of WebM files, as YouTube serves it:
   the packets of the first audio track with their times, and seeking by the
@@ -55,13 +56,15 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   vectors of RFC 8251 as libopus does, bit for bit.
 - **`internal/audio`** is MixMusic's audio engine: two decks, each a
   goroutine that reads a track with `internal/webm` and decodes it with
-  `internal/opus` into a ring the audio thread plays from, and the preamp,
-  equalizer, levelling compressor, volume and analyser of the web player
-  MixMusic had, ported from Chromium's Web Audio, which they match sample
-  for sample. `internal/audio/output` plays it on the system's output,
-  without cgo: through WASAPI on Windows, an Audio Queue on macOS, and
-  PulseAudio, which PipeWire serves too, or ALSA on Linux. On Windows it
-  also hears what a process and its children play, through WASAPI's
+  `internal/opus` into a ring the audio thread plays from, each turning a
+  track louder than -14 LKFS down to it, from the loudness its `Measured`
+  source tells (Even loudness), and the preamp, equalizer, levelling
+  compressor, volume and analyser of the web player MixMusic had, ported
+  from Chromium's Web Audio, which they match sample for sample.
+  `internal/audio/output` plays it on the system's output, without cgo:
+  through WASAPI on Windows, an Audio Queue on macOS, and PulseAudio,
+  which PipeWire serves too, or ALSA on Linux. On Windows it also hears
+  what a process and its children play, through WASAPI's
   process loopback: `internal/app`'s listener hears Spotify there, in
   MixMusic's webview or the Spotify app, into a `Tap`, the analyser of
   the engine for audio outside it, which the visualizer and the plugins'
@@ -154,7 +157,8 @@ Windows, `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the
 scrobbles still to send, and `updater.json`, the update preferences. The
-cache folder holds audio, matches and yt-dlp's cache, and the logs folder
+cache folder holds audio, matches, how loud YouTube measured the tracks
+played (`loudness.json`), and yt-dlp's cache, and the logs folder
 the log and the crash reports. `MIXMUSIC_DATA_DIR` moves all three into one
 folder, for a portable copy or a test run. `MIXMUSIC_YTDLP_ONLY=1` has
 yt-dlp find every stream, as before MixMusic asked YouTube's player API,

@@ -53,9 +53,10 @@ download or keep in memory.
   quality, with no Spotify app open (Premium, on Windows), on Spotify
   Connect (your Spotify app, your phone, a speaker), or here, from their
   recording on YouTube Music, with no Premium needed.
-- **A real player.** Crossfade, volume levelling, a 10-band equalizer with
-  presets, a visualizer, synced lyrics that follow the song or read as plain
-  text, and an offline cache of tracks you played.
+- **A real player.** Crossfade, even loudness across tracks, volume
+  levelling, a 10-band equalizer with presets, a visualizer, synced lyrics
+  that follow the song or read as plain text, and an offline cache of tracks
+  you played.
 - **At home on the desktop.** Media keys, the system's media controls on
   Windows, macOS and Linux, the player's buttons on the taskbar thumbnail
   on Windows, tray controls, notifications of new tracks, a mini player

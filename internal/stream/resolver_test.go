@@ -174,3 +174,22 @@ func TestResolveSaysWhyWithoutYTDLP(t *testing.T) {
 		t.Errorf("made for children, without yt-dlp: %v", err)
 	}
 }
+
+func TestYTDLPSkipsStableVolume(t *testing.T) {
+	for _, q := range []Quality{QualityBest, QualitySaver} {
+		r := NewResolver(nil, "")
+		r.SetQuality(q)
+		var format string
+		r.Run = func(_ context.Context, args ...string) ([]byte, error) {
+			if i := slices.Index(args, "-f"); i >= 0 {
+				format = args[i+1]
+			}
+			return nil, errors.New("no yt-dlp here")
+		}
+		r.Resolve(context.Background(), testID)
+		first, rest, _ := strings.Cut(format, "/")
+		if plain, ok := strings.CutSuffix(first, "[format_id!*=drc]"); !ok || !strings.HasPrefix(rest, plain+"/") {
+			t.Errorf("%s: -f %s", q, format)
+		}
+	}
+}

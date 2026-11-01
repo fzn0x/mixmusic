@@ -33,9 +33,12 @@ const (
 
 // formats are yt-dlp's format selectors for each quality. Opus in WebM
 // plays in every webview MixMusic runs in; AAC in MP4 is the fallback.
+// YouTube's stable-volume formats, whose IDs end in -drc, come only when a
+// video has no other Opus: their dynamics are squeezed, and the loudness
+// YouTube measured is of the original audio.
 var formats = map[Quality]string{
-	QualityBest:  "bestaudio[acodec=opus]/bestaudio[ext=m4a]/bestaudio",
-	QualitySaver: "worstaudio[acodec=opus]/worstaudio[ext=m4a]/worstaudio",
+	QualityBest:  "bestaudio[acodec=opus][format_id!*=drc]/bestaudio[acodec=opus]/bestaudio[ext=m4a]/bestaudio",
+	QualitySaver: "worstaudio[acodec=opus][format_id!*=drc]/worstaudio[acodec=opus]/worstaudio[ext=m4a]/worstaudio",
 }
 
 // resolveTimeout bounds one run of yt-dlp.

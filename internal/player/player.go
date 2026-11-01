@@ -61,6 +61,9 @@ type Item struct {
 	Track media.Track
 	// Radio is set for tracks autoplay added after the queue ran out.
 	Radio bool
+	// MadeWithAI is set once the player learned that YouTube labels the
+	// track as made with AI: it passes over the entry while State.SkipAI.
+	MadeWithAI bool
 }
 
 // State is what the player does. Its Queue is shared: don't change it.
@@ -90,6 +93,9 @@ type State struct {
 	// change meanwhile.
 	Waiting  bool
 	WillPlay bool
+	// SkipAI is set while the player passes over the tracks YouTube labels
+	// as made with AI, as the settings say, when it moves on by itself.
+	SkipAI bool
 }
 
 // Current returns the current entry.
@@ -100,16 +106,28 @@ func (s State) Current() (Item, bool) {
 	return s.Queue[s.Index], true
 }
 
-// UpNext returns the entry that plays after the current one.
+// Skips reports whether the player passes over the entry it as it moves
+// on by itself: YouTube labels it as made with AI, and the settings skip
+// those.
+func (s State) Skips(it Item) bool { return s.SkipAI && it.MadeWithAI }
+
+// UpNext returns the entry that plays after the current one, past those
+// the player skips.
 func (s State) UpNext() (Item, bool) {
 	if s.Repeat == RepeatOne {
 		return s.Current()
 	}
-	if s.Index+1 >= 0 && s.Index+1 < len(s.Queue) {
-		return s.Queue[s.Index+1], true
+	for i := max(s.Index+1, 0); i < len(s.Queue); i++ {
+		if !s.Skips(s.Queue[i]) {
+			return s.Queue[i], true
+		}
 	}
-	if s.Repeat == RepeatAll && len(s.Queue) > 0 {
-		return s.Queue[0], true
+	if s.Repeat == RepeatAll {
+		for i := 0; i <= s.Index && i < len(s.Queue); i++ {
+			if !s.Skips(s.Queue[i]) {
+				return s.Queue[i], true
+			}
+		}
 	}
 	return Item{}, false
 }
@@ -393,6 +411,9 @@ type Player struct {
 	// spotifyMode is the settings' Spotify playback the current track
 	// started with.
 	spotifyMode settings.SpotifyPlayback
+	// ai is what the player keeps of skipping what YouTube labels as made
+	// with AI.
+	ai skipState
 }
 
 // New returns a player of the queue saved, which plays through stream and
@@ -411,7 +432,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.connect = &connectEngine{p: p, device: device, tickEvery: connectTick, askEvery: connectAskEvery, askDefault: connectAskEvery,
 		settle: connectSettle}
 	st := svc.Settings()
-	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume)}
+	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume), SkipAI: st.SkipAI}
 	p.spotifyMode = st.SpotifyPlayback
 	if len(saved.Tracks) > 0 {
 		radio := marks(saved.Radio, len(saved.Tracks))
@@ -447,13 +468,21 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.snap = p.s
 	go p.run()
 	p.do(p.apply)
+	// What the app knows of the labels of the queue kept shows before
+	// the entries' turns.
+	p.do(p.markKnown)
 	return p
 }
 
 // SpotifyHere has the player play the Spotify tracks that play in
 // MixMusic itself on d, MixMusic's own Spotify device; nil, as at first,
 // has them play from YouTube Music.
-func (p *Player) SpotifyHere(d Device) { p.do(func() { p.here = d }) }
+func (p *Player) SpotifyHere(d Device) {
+	p.do(func() {
+		p.here = d
+		p.remark()
+	})
+}
 
 // Close stops the player's goroutine and its following of a Spotify
 // device. The engines stay as they are.

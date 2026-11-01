@@ -84,10 +84,12 @@ func (p *Player) ToggleMute() {
 // it was in the way of playing Spotify tracks they choose.
 func (p *Player) SettingsChanged(s settings.Settings) {
 	p.do(func() {
+		p.setSkipAI(s.SkipAI)
 		if s.SpotifyPlayback == p.spotifyMode {
 			return
 		}
 		p.spotifyMode = s.SpotifyPlayback
+		p.remark()
 		if cur, ok := p.s.Current(); ok && cur.Track.Source == media.SourceSpotify && p.s.Source != nil {
 			p.playAt(p.s.Index, p.s.Position, p.s.Playing)
 		}
@@ -180,19 +182,22 @@ func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Dura
 	})
 }
 
-// streamInstead plays a Spotify track from YouTube Music.
+// streamInstead plays a Spotify track from YouTube Music, once its
+// recording there is checked, when the player skips what YouTube labels.
 func (p *Player) streamInstead(token int, entry Item, start time.Duration, autoplay bool) {
-	await(p, func(ctx context.Context) (Source, error) { return p.svc.PrepareStream(ctx, entry.Track) }, func(src Source, err error) {
-		if token != p.loadToken {
-			return
-		}
-		if err != nil {
-			if !p.offline(err, start, autoplay) {
-				p.fail(err.Error())
+	p.checkFallback(token, entry, func() {
+		await(p, func(ctx context.Context) (Source, error) { return p.svc.PrepareStream(ctx, entry.Track) }, func(src Source, err error) {
+			if token != p.loadToken {
+				return
 			}
-			return
-		}
-		p.loadStream(src, start, autoplay)
+			if err != nil {
+				if !p.offline(err, start, autoplay) {
+					p.fail(err.Error())
+				}
+				return
+			}
+			p.loadStream(src, start, autoplay)
+		})
 	})
 }
 
@@ -375,23 +380,29 @@ func (p *Player) onProgress() {
 	}
 	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter && p.retry.n == 0 {
 		p.prefetched = next.UID
-		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
-			if err == nil && src.Mode == ModeStream && src.URL != "" {
-				p.stream.Preload(src.URL)
-			}
-			if errors.Is(err, ErrOffline) {
-				p.prefetchOnline(next.UID)
-			}
-		})
+		p.prefetch(entry, next)
 	}
 	fade := time.Duration(p.svc.Settings().Crossfade) * time.Second
 	if fade > 0 && !p.crossfading && p.s.Source != nil && p.s.Source.Mode == ModeStream &&
-		hasNext && next.UID != entry.UID && dur > 0 && dur-pos <= fade && dur > 3*fade {
+		hasNext && next.UID != entry.UID && dur > 0 && dur-pos <= fade && dur > 3*fade && p.mayStart(next) {
 		p.crossfadeTo(next, fade)
 	}
 	p.reporting.call(p, func() {
 		p.svc.Report(p.now())
 		p.save()
+	})
+}
+
+// preload downloads the audio of next, which plays after the current
+// track, so that it plays at once.
+func (p *Player) preload(next Item) {
+	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
+		if err == nil && src.Mode == ModeStream && src.URL != "" {
+			p.stream.Preload(src.URL)
+		}
+		if errors.Is(err, ErrOffline) {
+			p.prefetchOnline(next.UID)
+		}
 	})
 }
 
@@ -407,9 +418,10 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 			return
 		}
 		i := p.indexOf(next.UID)
-		if i < 0 {
-			return
+		if i < 0 || p.s.Skips(p.s.Queue[i]) {
+			return // gone, or labeled meanwhile: it's passed over in turn
 		}
+		p.fadingInto(next)
 		p.loadToken++
 		p.retry = retryState{}
 		p.endWait()
@@ -520,33 +532,18 @@ func (p *Player) seek(t time.Duration) {
 }
 
 // advance moves on from the current track: ended tells an end from a skip.
+// It goes to the next entry, round to the first on repeat all, or to a
+// radio with autoplay, past the entries the player skips.
 func (p *Player) advance(ended bool) {
-	q := p.s.Queue
-	if len(q) == 0 {
+	if len(p.s.Queue) == 0 {
 		return
 	}
-	switch {
-	case ended && p.s.Repeat == RepeatOne:
+	if ended && p.s.Repeat == RepeatOne {
 		p.playAt(p.s.Index, 0, true)
-	case p.s.Index < len(q)-1:
-		p.playAt(p.s.Index+1, 0, true)
-	case p.s.Repeat == RepeatAll:
-		p.playAt(0, 0, true)
-	case p.svc.Settings().Autoplay:
-		token := p.loadToken
-		p.extendWithRadio(func(added bool, err error) {
-			switch {
-			case added && token == p.loadToken:
-				p.playAt(p.s.Index+1, 0, true)
-			case !added && ended && token == p.loadToken && p.radioOffline(err):
-				p.waitRadio()
-			case !added:
-				p.stopAtEnd(ended)
-			}
-		})
-	default:
-		p.stopAtEnd(ended)
+		return
 	}
+	m, at := p.moveOn(ended)
+	p.step(m, at+1)
 }
 
 // stopAtEnd stops at the end of the queue.
@@ -561,17 +558,22 @@ func (p *Player) stopAtEnd(ended bool) {
 	p.emit(StateChange)
 }
 
+// previous goes back to the start of the track, or to the entry before it,
+// past those the player skips, early in it.
 func (p *Player) previous() {
 	pos, i := p.s.Position, p.s.Index
-	if pos > restartAfter || i <= 0 {
-		if i <= 0 && p.s.Repeat == RepeatAll && len(p.s.Queue) > 1 && pos <= restartAfter {
-			p.playAt(len(p.s.Queue)-1, 0, true)
-			return
-		}
+	switch {
+	case pos > restartAfter:
 		p.seek(0)
-		return
+	case i > 0:
+		p.step(p.moveBack(), i-1)
+	case p.s.Repeat == RepeatAll && len(p.s.Queue) > 1:
+		m := p.moveBack()
+		m.wrapped = true
+		p.step(m, len(p.s.Queue)-1)
+	default:
+		p.seek(0)
 	}
-	p.playAt(i-1, 0, true)
 }
 
 func (p *Player) setVolume(v float64) {
@@ -756,6 +758,7 @@ func (p *Player) onPlaying(playing bool) {
 	if playing {
 		p.s.Buffering = false
 		p.s.Loading = false
+		p.sounded()
 	}
 	p.report()
 	p.emit(StateChange)

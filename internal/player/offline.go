@@ -79,6 +79,10 @@ func (p *Player) waitRadio() {
 		p.extendWithRadio(func(added bool, err error) {
 			switch {
 			case token != p.loadToken:
+			case added && play && p.skipping():
+				// Past what YouTube labels as made with AI.
+				m, at := p.moveOn(true)
+				p.step(m, at+1)
 			case added:
 				p.playAt(p.s.Index+1, 0, play)
 			case errors.Is(err, ErrOffline):

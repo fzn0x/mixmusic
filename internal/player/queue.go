@@ -14,10 +14,19 @@ import (
 
 // The queue's slice is never changed in place: State shares it.
 
-// PlayTracks replaces the queue with tracks, and plays the one at start.
+// PlayTracks replaces the queue with tracks, and plays the one at start,
+// or the first after it the player doesn't skip, as the play button of a
+// list does.
 func (p *Player) PlayTracks(tracks []media.Track, start int) {
 	tracks = slices.Clone(tracks)
-	p.do(func() { p.playTracks(tracks, start) })
+	p.do(func() { p.playTracks(tracks, start, false) })
+}
+
+// PlayChosen is PlayTracks of a track the user chose, the one at start,
+// which plays even when YouTube labels it as made with AI.
+func (p *Player) PlayChosen(tracks []media.Track, start int) {
+	tracks = slices.Clone(tracks)
+	p.do(func() { p.playTracks(tracks, start, true) })
 }
 
 // PlayNext puts tracks right after the current one.
@@ -149,7 +158,7 @@ func (p *Player) items(tracks []media.Track) []Item {
 	return items
 }
 
-func (p *Player) playTracks(tracks []media.Track, start int) {
+func (p *Player) playTracks(tracks []media.Track, start int, chosen bool) {
 	if len(tracks) == 0 {
 		return
 	}
@@ -164,7 +173,16 @@ func (p *Player) playTracks(tracks []media.Track, start int) {
 	}
 	p.s.Queue = items
 	p.emit(QueueChange)
-	p.playAt(first, 0, true)
+	if chosen || !p.skipping() {
+		p.playAt(first, 0, true)
+		return
+	}
+	// What played stops, and nothing of the new queue is current, until its
+	// first track to play is found.
+	p.s.Index = -1
+	p.hold()
+	p.markKnown()
+	p.step(&move{dir: 1, held: true}, first)
 }
 
 func (p *Player) setShuffle(on bool) {
@@ -256,6 +274,10 @@ func (p *Player) markPlayed(uid string) {
 // tells whether it added any, or why it couldn't find them.
 func (p *Player) extendWithRadio(then func(added bool, err error)) {
 	seed, ok := p.s.Current()
+	if !ok && p.skipping() && p.ai.lastPlayed != nil {
+		// What played last, before a list whose tracks were all skipped.
+		seed, ok = Item{Track: *p.ai.lastPlayed}, true
+	}
 	if !ok {
 		then(false, nil)
 		return
@@ -269,10 +291,13 @@ func (p *Player) extendWithRadio(then func(added bool, err error)) {
 		for i, it := range p.s.Queue {
 			queued[i] = it.Track
 		}
-		tracks := RadioTracks(found, queued)
+		tracks, labeled := p.withoutLabeled(RadioTracks(found, queued))
 		tracks = tracks[:min(len(tracks), radioMax)]
 		if len(tracks) == 0 {
-			then(false, nil)
+			if labeled {
+				err = errOnlyLabeled
+			}
+			then(false, err)
 			return
 		}
 		items := make([]Item, len(tracks))
@@ -284,6 +309,7 @@ func (p *Player) extendWithRadio(then func(added bool, err error)) {
 			p.unshuffled = append(slices.Clone(p.unshuffled), items...)
 		}
 		p.emit(QueueChange)
+		p.checkRadio(items)
 		then(true, nil)
 	})
 }

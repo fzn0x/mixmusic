@@ -6,7 +6,6 @@ package app
 
 import (
 	"context"
-	"errors"
 	"log"
 	"maps"
 	"slices"
@@ -16,7 +15,6 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/store"
-	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
 // These are the label cache's times and bounds; tests shorten some.
@@ -192,11 +190,12 @@ func (c *labelCache) run(videoID string, call *labelCall) {
 		c.fails = 0
 		c.keepClean(videoID, now)
 		call.label = player.LabelNone
-	case errors.Is(err, youtube.ErrNotFound):
-		// Removed or private: it plays, unchecked.
-		c.fails = 0
-		call.label = player.LabelUnknown
 	default:
+		// A video removed or private (youtube.ErrNotFound) plays unchecked,
+		// as one YouTube didn't answer for. Either counts towards the pause:
+		// many in a row tell that YouTube changed its answer, and until the
+		// pause, the next tracks, unchecked, are neither preloaded nor
+		// crossfaded into.
 		call.label = player.LabelUnknown
 		if c.fails++; c.fails >= labelFails && !now.Before(c.paused) {
 			c.fails = 0

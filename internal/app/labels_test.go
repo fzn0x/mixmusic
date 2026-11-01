@@ -264,7 +264,8 @@ func TestLabelCacheSavesLater(t *testing.T) {
 }
 
 // TestLabelCacheFails plays a video YouTube has none of, unchecked, and
-// stops asking for labelPause once labelFails lookups failed in a row.
+// stops asking for labelPause once labelFails lookups in a row failed, or
+// found no video; an answer starts the count again.
 func TestLabelCacheFails(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "ai-labels.json")
 	f := newFakeLabels()
@@ -272,17 +273,20 @@ func TestLabelCacheFails(t *testing.T) {
 	now := &clock{t: time.Unix(1_800_000_000, 0)}
 	c := openLabels(t, path, f, now)
 	ctx := context.Background()
-	for range labelFails + 1 {
+	for range labelFails - 1 {
 		if l := c.Get(ctx, "removed0001", true); l != player.LabelUnknown {
 			t.Errorf("a removed video gave %v", l)
 		}
 	}
-	if n := f.count("removed0001"); n != labelFails+1 {
-		t.Errorf("a removed video was asked %d times", n)
+	if l := c.Get(ctx, "answered001", true); l != player.LabelNone {
+		t.Errorf("an answer gave %v", l)
 	}
 	for i := range labelFails {
 		id := "failing000" + string(rune('1'+i))
 		f.errs[id] = errors.New("HTTP 503")
+		if i == labelFails-1 {
+			f.errs[id] = youtube.ErrNotFound
+		}
 		if l := c.Get(ctx, id, true); l != player.LabelUnknown {
 			t.Errorf("a failed lookup gave %v", l)
 		}

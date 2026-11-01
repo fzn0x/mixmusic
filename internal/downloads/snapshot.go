@@ -92,11 +92,13 @@ const maxJobs = 50
 // read it in each frame, which costs a map lookup a track. A nil Snapshot
 // holds nothing.
 type Snapshot struct {
-	// Version changes with what the downloads hold, and their state.
-	Version uint64
+	// version changes with what the downloads hold, and their state.
+	version uint64
 	states  map[string]TrackState
 	running map[string]*job
 	kept    map[string]Kept
+	// originals are the tracks downloaded, as they were asked for.
+	originals map[string]media.Track
 	// files are the downloaded audio by video ID, and art the covers kept
 	// by their addresses: absolute paths.
 	files       map[string]string
@@ -113,6 +115,25 @@ func (m *Manager) Snapshot() *Snapshot {
 		return nil
 	}
 	return m.snap.Load()
+}
+
+// Version changes with what the downloads hold, and their state, not with
+// the progress of those under way.
+func (s *Snapshot) Version() uint64 {
+	if s == nil {
+		return 0
+	}
+	return s.version
+}
+
+// Track returns a track downloaded, as it was asked for: a Spotify track
+// as Spotify's.
+func (s *Snapshot) Track(id string) (media.Track, bool) {
+	if s == nil {
+		return media.Track{}, false
+	}
+	t, ok := s.originals[id]
+	return t, ok
 }
 
 // Any reports whether the downloads hold or wait for anything.
@@ -226,7 +247,7 @@ func (m *Manager) Status() Status { return m.Snapshot().Status() }
 // caller holds mu.
 func (m *Manager) publish() {
 	m.seq++
-	s := &Snapshot{Version: m.seq, states: make(map[string]TrackState, len(m.idx.Tracks)), running: make(map[string]*job, len(m.jobs)),
+	s := &Snapshot{version: m.seq, originals: map[string]media.Track{}, states: make(map[string]TrackState, len(m.idx.Tracks)), running: make(map[string]*job, len(m.jobs)),
 		kept: map[string]Kept{}, files: make(map[string]string, len(m.idx.Files)), art: make(map[string]string, len(m.idx.Art)),
 		byID: map[string]int{}}
 	for video, f := range m.idx.Files {
@@ -261,6 +282,7 @@ func (m *Manager) publish() {
 				t = *e.Recording
 			}
 			s.kept[id] = Kept{Video: e.video(), Track: t, Path: s.files[e.video()]}
+			s.originals[id] = e.Track
 			st.Tracks++
 			done = append(done, e)
 		case e.Failed != "":

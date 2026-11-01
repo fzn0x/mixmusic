@@ -11,6 +11,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/store"
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // offlineServices are the app's, but for finding streams: a track plays
@@ -110,8 +111,8 @@ func TestFlush(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if v := s.Get().Volume; v != 0.4 {
-		t.Errorf("settings.json keeps the volume %v, want 0.4", v)
+	if v := s.Get().Volume; v != volume.Saved(0.4) {
+		t.Errorf("settings.json keeps the volume %v, want %v", v, volume.Saved(0.4))
 	}
 	if windows != 1 {
 		t.Errorf("the windows' savers ran %d times, want once", windows)

@@ -15,6 +15,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 func init() {
@@ -1336,6 +1337,21 @@ func TestVolume(t *testing.T) {
 	}
 }
 
+// TestVolumeKept starts from the volume settings.json keeps, on volume's
+// curve, and keeps it there as it was kept: as loud for every version.
+func TestVolumeKept(t *testing.T) {
+	h := newHarness(t, Saved{}, func(f *fakeServices) { f.settings.Volume = 0.5 })
+	if got, want := h.p.State().Volume, volume.Of(0.5); got != want {
+		t.Errorf("started at %v, want %v", got, want)
+	}
+	h.p.SetVolume(0.9)
+	h.wait("the volume saved", func(*Player) bool {
+		var v []float64
+		h.svc.with(func(f *fakeServices) { v = slices.Clone(f.volumes) })
+		return slices.Equal(v, []float64{volume.Saved(0.9)})
+	})
+}
+
 func TestRestore(t *testing.T) {
 	saved := Saved{Tracks: tracks("a", "b"), Index: 1, Position: 42000, Shuffle: true, Repeat: RepeatOne}
 	h := newHarness(t, saved)
@@ -1534,9 +1550,9 @@ func TestQueueEditsSaved(t *testing.T) {
 // TestFlush keeps at once what the throttle and the volume's delay hold
 // back, and writes the queue again only once the player changed.
 func TestFlush(t *testing.T) {
-	save, volume := saveEvery, saveVolumeAfter
+	save, still := saveEvery, saveVolumeAfter
 	saveEvery, saveVolumeAfter = time.Hour, time.Hour
-	t.Cleanup(func() { saveEvery, saveVolumeAfter = save, volume })
+	t.Cleanup(func() { saveEvery, saveVolumeAfter = save, still })
 	h := newHarness(t, Saved{})
 	h.wait("the first save", func(*Player) bool { return h.saves() == 1 })
 	h.p.PlayTracks(tracks("a", "b"), 0)
@@ -1554,8 +1570,8 @@ func TestFlush(t *testing.T) {
 	}
 	var volumes []float64
 	h.svc.with(func(f *fakeServices) { volumes = slices.Clone(f.volumes) })
-	if !slices.Equal(volumes, []float64{0.3}) {
-		t.Errorf("volumes kept %v, want [0.3]", volumes)
+	if !slices.Equal(volumes, []float64{volume.Saved(0.3)}) {
+		t.Errorf("volumes kept %v, want [%v]", volumes, volume.Saved(0.3))
 	}
 	h.p.Flush()
 	if n := h.saves(); n != 2 {

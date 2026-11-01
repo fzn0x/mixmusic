@@ -11,6 +11,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // toggleDebounce is how soon a second toggle is taken as the same press:
@@ -579,11 +580,14 @@ func (p *Player) setVolume(v float64) {
 	if p.volumeTimer != nil {
 		p.volumeTimer.Stop()
 	}
-	p.volumeTimer = p.after(saveVolumeAfter, func() {
-		if p.svc.Settings().Volume != v {
-			p.svc.SaveVolume(v)
-		}
-	})
+	p.volumeTimer = p.after(saveVolumeAfter, func() { p.saveVolume(v) })
+}
+
+// saveVolume keeps the volume v in the settings, unless they keep it.
+func (p *Player) saveVolume(v float64) {
+	if saved := volume.Saved(v); p.svc.Settings().Volume != saved {
+		p.svc.SaveVolume(saved)
+	}
 }
 
 // apply gives the engines the volume.
@@ -655,9 +659,7 @@ func (p *Player) Flush() {
 	p.mu.Lock()
 	v := p.snap.Volume
 	p.mu.Unlock()
-	if p.svc.Settings().Volume != v {
-		p.svc.SaveVolume(v)
-	}
+	p.saveVolume(v)
 }
 
 // savedOf is the queue of st as it survives a restart: the part of it

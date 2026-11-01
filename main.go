@@ -31,7 +31,7 @@ func allowAudio() {
 
 // version is the version of builds made without the mygo CLI, which links
 // the version of mygo.config.ts into the app.
-const version = "0.5.5"
+const version = "0.5.6"
 
 func main() {
 	// MIXMUSIC_DATA_DIR keeps everything in one folder: a portable copy,

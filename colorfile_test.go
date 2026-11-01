@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"image/color"
+	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
@@ -303,5 +306,150 @@ func TestGroundTone(t *testing.T) {
 	}
 	if got := groundTone(fileLook(s, "glasshouse", testColors(t, "pywal-3.8.json")).dark); got != washTone {
 		t.Errorf("Glasshouse on pywal's dark ground is toned %v", got)
+	}
+}
+
+// setColors has the settings take the colours from source, and file.
+func setColors(t *testing.T, s *shell, source settings.ColorSource, file string) {
+	t.Helper()
+	st := s.svc.Preferences.Get()
+	st.ColorSource, st.ColorFile = source, file
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+}
+
+// TestColorFileSettings shows each source of the colours, with what
+// MixMusic read of its file, or why it couldn't, and copies the matugen
+// template.
+func TestColorFileSettings(t *testing.T) {
+	t.Setenv("PYWAL_CACHE_DIR", t.TempDir())
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 3000)
+	show(s, tt, "/settings/appearance")
+	if !tt.HasText("Colours from a file") || tt.HasText("Colour file") {
+		t.Errorf("with the theme's colours: %q", tt.Texts())
+	}
+	good := filepath.Join(t.TempDir(), "colors.json")
+	broken := filepath.Join(t.TempDir(), "broken.json")
+	if err := os.WriteFile(broken, []byte(`{"special": {`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(filepath.Join("internal", "colorfile", "testdata", "pywal-3.8.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(good, data, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct {
+		source settings.ColorSource
+		file   string
+		says   string
+	}{
+		{settings.ColorsPywal, "", "It isn't there yet: pywal writes it when you run wal."},
+		{settings.ColorsMatugen, "", "It isn't there yet: add MixMusic's template to matugen's config.toml, and run matugen."},
+		{settings.ColorsFile, "", "Choose a file: pywal's colors.json, what matugen --json prints, or a theme.json."},
+		{settings.ColorsFile, "colors.json", "It can't be read: it isn't a full path"},
+		{settings.ColorsFile, broken, "It can't be read: it ends partway through. The theme's colours show."},
+		{settings.ColorsFile, good, ", and followed as it changes."},
+	} {
+		setColors(t, s, c.source, c.file)
+		show(s, tt, "/settings/appearance")
+		if !tt.HasText(c.says) {
+			t.Errorf("%s %q doesn't say %q: %q", c.source, c.file, c.says, tt.Texts())
+		}
+		if worn := c.file == good; tt.HasText("Your colour file sets the colours.") != worn {
+			t.Errorf("%s %q: the theme cards' hint shows %v", c.source, c.file, !worn)
+		}
+	}
+	if !tt.HasText(good) || !tt.HasText("over your colour file's") {
+		t.Errorf("the file read isn't named, or the accent's rows don't tell of it: %q", tt.Texts())
+	}
+	setColors(t, s, settings.ColorsMatugen, "")
+	show(s, tt, "/settings/appearance")
+	var copied string
+	copyText = func(text string) { copied = text }
+	defer func() { copyText = func(string) {} }()
+	click(t, s, tt, "copy the template")
+	if copied != colorfile.MatugenTemplate {
+		t.Errorf("copied %q", copied)
+	}
+}
+
+// TestChooseColorFile reads the file the user chooses.
+func TestChooseColorFile(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 3000)
+	path := filepath.Join(t.TempDir(), "colors.json")
+	chose := make(chan mygo.OpenDialogOptions, 1)
+	dialog := openFileDialog
+	openFileDialog = func(opts mygo.OpenDialogOptions) ([]string, error) {
+		chose <- opts
+		return []string{path}, nil
+	}
+	defer func() { openFileDialog = dialog }()
+	setColors(t, s, settings.ColorsFile, "")
+	show(s, tt, "/settings/appearance")
+	click(t, s, tt, "Choose a colour file")
+	opts := <-chose
+	if opts.Title != "Choose a colour file" || len(opts.Filters) == 0 {
+		t.Errorf("the dialog: %+v", opts)
+	}
+	for deadline := time.Now().Add(5 * time.Second); s.svc.Preferences.Get().ColorFile != path && time.Now().Before(deadline); {
+		time.Sleep(5 * time.Millisecond)
+		s.drain()
+	}
+	if got := s.svc.Preferences.Get().ColorFile; got != path {
+		t.Errorf("the colour file chosen is %q", got)
+	}
+}
+
+// TestColorFileNote tells when the colours were read, with the day once
+// it's another.
+func TestColorFileNote(t *testing.T) {
+	now := time.Date(2026, 11, 2, 14, 30, 0, 0, time.Local)
+	set := settings.Settings{ColorSource: settings.ColorsPywal}
+	read := app.ColorFileStatus{Source: settings.ColorsPywal, Path: "/x", Colors: testColors(t, "pywal-3.8.json"), ReadAt: now.Add(-time.Hour)}
+	if got, bad := colorFileNote(read, set, now); got != "Read at 13:30, and followed as it changes." || bad {
+		t.Errorf("%q, %v", got, bad)
+	}
+	read.ReadAt, read.Err = now.AddDate(0, 0, -1), "it's empty"
+	if got, bad := colorFileNote(read, set, now); got != "It can't be read: it's empty. MixMusic keeps the colours it read at 1 Nov 14:30." || !bad {
+		t.Errorf("%q, %v", got, bad)
+	}
+	if got, _ := colorFileNote(app.ColorFileStatus{Source: settings.ColorsMatugen}, set, now); got != "Reading it…" {
+		t.Errorf("before the file of the settings is read: %q", got)
+	}
+}
+
+// TestColorFileSettingsViewed shows the appearance settings with each
+// source of the colours, following the computer or not: showing them
+// changes nothing.
+func TestColorFileSettingsViewed(t *testing.T) {
+	t.Setenv("PYWAL_CACHE_DIR", t.TempDir())
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 3000)
+	file := filepath.Join("internal", "colorfile", "testdata", "pywal-light.json")
+	abs, err := filepath.Abs(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, follow := range []bool{false, true} {
+		for _, c := range colorSources {
+			st := s.svc.Preferences.Get()
+			st.FollowSystem, st.ColorSource, st.ColorFile, st.Accent = follow, c.source, abs, "#123456"
+			if _, err := s.svc.Preferences.Set(st); err != nil {
+				t.Fatal(err)
+			}
+			s.refresh()
+			before, _ := json.Marshal(s.svc.Preferences.Get())
+			show(s, tt, "/settings/appearance")
+			show(s, tt, "/")
+			if after, _ := json.Marshal(s.svc.Preferences.Get()); string(after) != string(before) {
+				t.Errorf("showing the settings with %s, following the computer %v, changed them:\n%s\n%s", c.label, follow, before, after)
+			}
+		}
 	}
 }

@@ -84,6 +84,10 @@ func (p *Player) ToggleMute() {
 // it was in the way of playing Spotify tracks they choose.
 func (p *Player) SettingsChanged(s settings.Settings) {
 	p.do(func() {
+		if s.Surround != p.surround {
+			p.surround = s.Surround
+			p.switchAudio()
+		}
 		if s.SpotifyPlayback == p.spotifyMode {
 			return
 		}
@@ -92,6 +96,20 @@ func (p *Player) SettingsChanged(s settings.Settings) {
 			p.playAt(p.s.Index, p.s.Position, p.s.Playing)
 		}
 	})
+}
+
+// switchAudio plays the current stream's 5.1 surround audio, or its stereo
+// audio, as p.surround now asks, from where the other was, playing or
+// paused as it was: a track of no 5.1 audio plays on. One that loads, or
+// waits for the network, takes it when its stream loads. The next track
+// downloads again in the audio asked for.
+func (p *Player) switchAudio() {
+	src := p.s.Source
+	p.prefetched = ""
+	if src == nil || src.Mode != ModeStream || src.SurroundURL == "" || !p.loaded {
+		return
+	}
+	_ = p.stream.Load(src.audio(p.surround), p.s.Position, !p.paused)
 }
 
 // playAt plays the queue's entry at i from start, or holds it there when
@@ -204,7 +222,7 @@ func (p *Player) loadStream(src Source, start time.Duration, autoplay bool) {
 	p.s.Source = &src
 	p.loaded = true
 	p.paused = !autoplay
-	_ = p.stream.Load(src.URL, start, autoplay)
+	_ = p.stream.Load(src.audio(p.surround), start, autoplay)
 }
 
 func (p *Player) stopStream() {
@@ -339,7 +357,7 @@ func (p *Player) retryStream(why string) {
 			p.s.Source = &src
 			p.loaded = true
 			p.paused = !autoplay
-			_ = p.stream.Load(src.URL+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, autoplay)
+			_ = p.stream.Load(src.audio(p.surround)+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, autoplay)
 		})
 	})
 }
@@ -377,7 +395,7 @@ func (p *Player) onProgress() {
 		p.prefetched = next.UID
 		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
 			if err == nil && src.Mode == ModeStream && src.URL != "" {
-				p.stream.Preload(src.URL)
+				p.stream.Preload(src.audio(p.surround))
 			}
 			if errors.Is(err, ErrOffline) {
 				p.prefetchOnline(next.UID)
@@ -424,7 +442,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		p.report()
 		p.loaded = true
 		p.paused = false
-		_ = p.stream.Crossfade(src.URL, fade)
+		_ = p.stream.Crossfade(src.audio(p.surround), fade)
 	})
 }
 

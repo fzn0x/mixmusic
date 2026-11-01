@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -67,7 +68,8 @@ func (p *Player) Next() { p.do(func() { p.advance(false) }) }
 // early in it.
 func (p *Player) Previous() { p.do(p.previous) }
 
-// SetVolume sets the volume, from 0 to 1, and unmutes.
+// SetVolume sets the volume, from 0 to 1, and unmutes. A volume that
+// isn't a number changes nothing.
 func (p *Player) SetVolume(v float64) { p.do(func() { p.setVolume(v) }) }
 
 // ToggleMute mutes or unmutes.
@@ -573,6 +575,9 @@ func (p *Player) previous() {
 }
 
 func (p *Player) setVolume(v float64) {
+	if math.IsNaN(v) {
+		return
+	}
 	v = min(max(v, 0), 1)
 	p.s.Volume = v
 	p.s.Muted = false

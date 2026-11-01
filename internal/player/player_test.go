@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"slices"
 	"strings"
@@ -1350,6 +1351,13 @@ func TestVolumeKept(t *testing.T) {
 		h.svc.with(func(f *fakeServices) { v = slices.Clone(f.volumes) })
 		return slices.Equal(v, []float64{volume.Saved(0.9)})
 	})
+	// A volume that isn't a number changes nothing.
+	h.p.SetVolume(math.NaN())
+	h.p.SetVolume(0.7)
+	h.wait("0.7", func(p *Player) bool { return p.s.Volume == 0.7 })
+	if got := h.stream.last("volume"); got != "volume 0.7" {
+		t.Errorf("after NaN: %q", got)
+	}
 }
 
 func TestRestore(t *testing.T) {

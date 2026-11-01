@@ -161,15 +161,69 @@ func TestParseChannels(t *testing.T) {
 			account("Gone", map[string]any{"isDisabled": true}),
 		}}}}}},
 		}}}}}}}}
-	got := parseChannels(n)
+	got := parseChannels(n, 0)
 	if len(got) != 2 {
 		t.Fatalf("channels = %+v", got)
 	}
-	if me := got[0]; me.Name != "Me" || me.Handle != "@me" || me.PageID != "" || !me.Current || me.Photo != "https://a/l" {
+	if me := got[0]; me.Name != "Me" || me.Handle != "@me" || me.PageID != "" || !me.Current || me.Photo != "https://a/l" || me.AuthUser != 0 {
 		t.Errorf("the account = %+v", me)
 	}
 	if band := got[1]; band.Name != "My Band" || band.PageID != "1234" || band.Current {
 		t.Errorf("the brand channel = %+v", band)
+	}
+}
+
+// TestParseChannelsOfAccounts reads the channels of a session signed in to
+// two Google accounts: each section is an account, headed by its address,
+// and the sign-in links of its items name its index.
+func TestParseChannelsOfAccounts(t *testing.T) {
+	item := func(name, link, page string) any {
+		var tokens []any
+		if page != "" {
+			tokens = append(tokens, map[string]any{"pageIdToken": map[string]any{"pageId": page}})
+		}
+		if link != "" {
+			tokens = append(tokens, map[string]any{"accountSigninToken": map[string]any{"signinUrl": link}})
+		}
+		return map[string]any{"accountItem": map[string]any{
+			"accountName":     map[string]any{"runs": []any{map[string]any{"text": name}}},
+			"serviceEndpoint": map[string]any{"selectActiveIdentityEndpoint": map[string]any{"supportedTokens": tokens}},
+		}}
+	}
+	section := func(email string, items ...any) any {
+		return map[string]any{"accountSectionListRenderer": map[string]any{
+			"header":   map[string]any{"googleAccountHeaderRenderer": map[string]any{"email": map[string]any{"simpleText": email}}},
+			"contents": []any{map[string]any{"accountItemSectionRenderer": map[string]any{"contents": items}}},
+		}}
+	}
+	n := node{map[string]any{"actions": []any{map[string]any{"getMultiPageMenuAction": map[string]any{"menu": map[string]any{"multiPageMenuRenderer": map[string]any{
+		"sections": []any{
+			section("ada@example.com",
+				item("Ada", "https://www.youtube.com/signin?action_handle_signin=true&authuser=0&next=%2F%3Fauthuser%3D3", ""),
+				item("Ada Records", "", "111")),
+			section("bob@example.com",
+				item("Bob", "/signin?authuser=1&next=%2F", ""),
+				item("Bob's Band", "/signin?pageid=222&authuser=1", "222")),
+			// The same name and channel, in another account, is another
+			// channel.
+			section("carol@example.com", item("Ada Records", "", "111")),
+		},
+	}}}}}}}
+	got := parseChannels(n, 2)
+	want := []AccountChannel{
+		{Name: "Ada", AuthUser: 0, Email: "ada@example.com"},
+		{Name: "Ada Records", PageID: "111", AuthUser: 0, Email: "ada@example.com"},
+		{Name: "Bob", AuthUser: 1, Email: "bob@example.com"},
+		{Name: "Bob's Band", PageID: "222", AuthUser: 1, Email: "bob@example.com"},
+		{Name: "Ada Records", PageID: "111", AuthUser: 2, Email: "carol@example.com"},
+	}
+	if len(got) != len(want) {
+		t.Fatalf("channels = %+v", got)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("channel %d = %+v, want %+v", i, got[i], want[i])
+		}
 	}
 }
 

@@ -2,6 +2,8 @@ package youtube
 
 import (
 	"context"
+	"net/url"
+	"strconv"
 )
 
 // AccountChannel is an identity the account can use YouTube Music as: the
@@ -13,6 +15,11 @@ type AccountChannel struct {
 	Photo  string `json:"photo,omitempty"`
 	// PageID names a brand channel; it is empty for the account itself.
 	PageID string `json:"pageId,omitempty"`
+	// AuthUser is the index of the Google account the channel belongs to,
+	// among those the session is signed in to (SetAuthUser), and Email
+	// that account's address, when the list tells it.
+	AuthUser int    `json:"authUser,omitempty"`
+	Email    string `json:"email,omitempty"`
 	// Current is set for the channel the session uses.
 	Current bool `json:"current,omitempty"`
 }
@@ -33,58 +40,110 @@ func (c *Client) Channels(ctx context.Context) ([]AccountChannel, error) {
 	if err != nil {
 		return nil, err
 	}
-	return parseChannels(n), nil
+	return parseChannels(n, c.AuthUser()), nil
 }
 
 // parseChannels reads the account items of an accounts list, wherever the
-// list puts them, leaving out the ones it shows disabled.
-func parseChannels(n node) []AccountChannel {
+// list puts them, leaving out the ones it shows disabled. A session signed
+// in to several Google accounts lists the channels of each in a section
+// headed by its address; an item's sign-in link names the index of its
+// account. An item without one is of the account of the other items of its
+// section, else of asked, the account the list was asked as.
+func parseChannels(n node, asked int) []AccountChannel {
 	var channels []AccountChannel
+	var known []bool // whether the item named its account
 	seen := map[string]bool{}
-	var walk func(v any)
-	walk = func(v any) {
+	var walk func(v any, email string)
+	walk = func(v any, email string) {
 		switch v := v.(type) {
 		case []any:
 			for _, x := range v {
-				walk(x)
+				walk(x, email)
 			}
 		case map[string]any:
+			if e := (node{v}).get("header", "googleAccountHeaderRenderer", "email").text(); e != "" {
+				email = e
+			}
 			for key, x := range v {
 				if key != "accountItem" && key != "accountItemRenderer" {
-					walk(x)
+					walk(x, email)
 					continue
 				}
 				item := node{x}
+				user, named := channelAuthUser(item)
 				ch := AccountChannel{
-					Name:    item.get("accountName").text(),
-					Handle:  item.get("channelHandle").text(),
-					PageID:  channelPageID(item),
-					Current: item.get("isSelected").boolean(),
+					Name:     item.get("accountName").text(),
+					Handle:   item.get("channelHandle").text(),
+					PageID:   channelPageID(item),
+					AuthUser: user,
+					Email:    email,
+					Current:  item.get("isSelected").boolean(),
 				}
 				if thumbs := item.get("accountPhoto", "thumbnails").list(); len(thumbs) > 0 {
 					ch.Photo = thumbs[len(thumbs)-1].get("url").str()
 				}
-				if ch.Name == "" || item.get("isDisabled").boolean() || seen[ch.PageID+"|"+ch.Name] {
+				id := email + "|" + ch.PageID + "|" + ch.Name
+				if ch.Name == "" || item.get("isDisabled").boolean() || seen[id] {
 					continue
 				}
-				seen[ch.PageID+"|"+ch.Name] = true
+				seen[id] = true
 				channels = append(channels, ch)
+				known = append(known, named)
 			}
 		}
 	}
-	walk(n.v)
+	walk(n.v, "")
+	sections := map[string]int{}
+	for i, ch := range channels {
+		if known[i] && ch.Email != "" {
+			sections[ch.Email] = ch.AuthUser
+		}
+	}
+	for i := range channels {
+		if !known[i] {
+			user, ok := sections[channels[i].Email]
+			if !ok || channels[i].Email == "" {
+				user = asked
+			}
+			channels[i].AuthUser = user
+		}
+	}
 	return channels
 }
 
 // channelPageID returns the page ID of a brand channel's account item, in
 // the tokens its switching endpoint carries; the account itself has none.
 func channelPageID(item node) string {
-	for _, t := range item.get("serviceEndpoint", "selectActiveIdentityEndpoint", "supportedTokens").list() {
+	for _, t := range channelTokens(item) {
 		if id := t.get("pageIdToken", "pageId").str(); id != "" {
 			return id
 		}
 	}
 	return ""
+}
+
+// channelAuthUser returns the index of the Google account of an account
+// item, from the authuser of the sign-in link its switching endpoint
+// carries, and whether the item had one.
+func channelAuthUser(item node) (int, bool) {
+	for _, t := range channelTokens(item) {
+		link := t.get("accountSigninToken", "signinUrl").str()
+		if link == "" {
+			continue
+		}
+		u, err := url.Parse(link)
+		if err != nil {
+			continue
+		}
+		if i, err := strconv.Atoi(u.Query().Get("authuser")); err == nil && i >= 0 {
+			return i, true
+		}
+	}
+	return 0, false
+}
+
+func channelTokens(item node) []node {
+	return item.get("serviceEndpoint", "selectActiveIdentityEndpoint", "supportedTokens").list()
 }
 
 // SetChannel makes the client use YouTube Music as the brand channel of

@@ -154,7 +154,7 @@ func (s *shell) lyricsChoices(c *ui.Context, t media.Track, ly lyrics.Lyrics, wh
 			ui.Text(c, what+" isn't available right now.").FontSize(k.smallSize()).TextColor(k.muted)
 			if s.link(c, "lyrics-translate-again-"+where, "try again") {
 				s.svc.Catalog.TranslateAgain()
-				s.forget(translationKey(t, ly, to, x.translate))
+				s.forget(translationKey(t, translationInto(ly, to, x.translate)))
 			}
 		})
 	}
@@ -162,25 +162,30 @@ func (s *shell) lyricsChoices(c *ui.Context, t media.Track, ly lyrics.Lyrics, wh
 }
 
 // translation fetches the translation of a track's lyrics into the
-// language to, or, for their romanization alone, translate false, into
-// English when to is their own language, as Unison translates nothing
-// into the language lyrics are in.
+// language to, as translationInto has it.
 func (s *shell) translation(t media.Track, ly lyrics.Lyrics, to string, translate bool) *loaded[translated] {
-	if !translate && ly.Language == to {
-		to = "en"
-	}
-	return fetch(s, translationKey(t, ly, to, translate), func(ctx context.Context) (translated, error) {
+	to = translationInto(ly, to, translate)
+	return fetch(s, translationKey(t, to), func(ctx context.Context) (translated, error) {
 		tr, err := s.svc.Catalog.TranslateLyrics(ctx, t, ly, to)
 		return translated{tr, slices.ContainsFunc(tr.Lines, func(l lyrics.TranslatedLine) bool { return l.Romanized != "" })}, err
 	})
 }
 
-// translationKey is the key translation fetches under.
-func translationKey(t media.Track, ly lyrics.Lyrics, to string, translate bool) string {
+// translationInto is the language to ask a translation of lyrics into,
+// for their translation into to: to, but, for their romanization alone,
+// translate false, English when to is their own language, as Unison
+// translates nothing into the language lyrics are in.
+func translationInto(ly lyrics.Lyrics, to string, translate bool) string {
 	if !translate && ly.Language == to {
-		to = "en"
+		return "en"
 	}
-	return "lyrics-translation:" + t.ID + ":" + to
+	return to
+}
+
+// translationKey is the key translation fetches the translation of a
+// track's lyrics into the language into under.
+func translationKey(t media.Track, into string) string {
+	return "lyrics-translation:" + t.ID + ":" + into
 }
 
 // lyricsSwitches shows the choices above lyrics in the language lang:

@@ -5,12 +5,13 @@ import (
 	"errors"
 	"math"
 	"os"
+	"slices"
 	"testing"
 	"time"
 )
 
-// FuzzTrack opens any bytes as a deck does, as a WebM or an MP4 file, and
-// seeks, reads and decodes their track: it never panics, fails only with
+// FuzzTrack opens any bytes as a deck does, as a WebM or an MP4 file, or
+// HLS packed audio, and seeks, reads and decodes their track: it never panics, fails only with
 // the deck's words, and makes finite frames, as many as it says, of which
 // those to play are within them.
 func FuzzTrack(f *testing.F) {
@@ -22,6 +23,9 @@ func FuzzTrack(f *testing.F) {
 		f.Add(b, int64(0))
 		f.Add(b[:len(b)/2], int64(time.Second))
 	}
+	packed := slices.Concat(packedSegments(f, 4, adtsMono22, adtsClicks)...)
+	f.Add(packed, int64(0))
+	f.Add(packed[:len(packed)/3], int64(time.Second))
 	f.Fuzz(func(t *testing.T, b []byte, at int64) {
 		worded := func(err error) bool {
 			return errors.Is(err, errUnsupported) || errors.Is(err, errNetwork) || errors.Is(err, errDecode)
@@ -33,7 +37,7 @@ func FuzzTrack(f *testing.F) {
 			}
 			return
 		}
-		if tm.delay < 0 || tm.preRoll <= 0 {
+		if tm.delay < 0 || tm.preRoll <= 0 && !tm.live {
 			t.Fatalf("timing %+v", tm)
 		}
 		check := func(pcm []float32, from, to int) {

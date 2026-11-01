@@ -59,6 +59,9 @@ type Proxy struct {
 	// stall, reconnect and backoff are stallTimeout, reconnectTimeout and
 	// reconnectWait, unless a test shortens them.
 	stall, reconnect, backoff time.Duration
+	// liveReload, when a test sets it, is what a live stream's playlist
+	// reloads after, in place of its target duration.
+	liveReload time.Duration
 }
 
 // NewProxy returns a proxy of the streams r resolves. Its requests have no
@@ -92,6 +95,10 @@ func (p *Proxy) timing() (stall, reconnect, backoff time.Duration) {
 
 // Path returns the path the proxy serves a video's audio at.
 func Path(videoID string) string { return "/yt/" + videoID }
+
+// LivePath returns the path of the live stream of a video, which OpenLive
+// opens, as the engine's opener reads it.
+func LivePath(videoID string) string { return "/live/" + videoID }
 
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	videoID, ok := strings.CutPrefix(r.URL.Path, "/yt/")
@@ -375,6 +382,14 @@ func stalled(ctx context.Context, err error) error {
 // stallTimeout of its request going out, and its body gives it up when a
 // read waits as long for bytes; connecting has the transport's own limits.
 func (p *Proxy) fetch(ctx context.Context, s Stream, start, end int64) (*stallingBody, error) {
+	return p.request(ctx, s.URL, s.Header, start, end)
+}
+
+// request requests bytes start to end of what is at rawURL, with header,
+// as fetch does, or all of it when end is below 0: the playlists and
+// segments of a live stream, which the transport may then have come
+// compressed.
+func (p *Proxy) request(ctx context.Context, rawURL string, header http.Header, start, end int64) (*stallingBody, error) {
 	stall, _, _ := p.timing()
 	ctx, cancel := context.WithCancelCause(ctx)
 	timer := time.AfterFunc(stall, func() { cancel(errStalled) })
@@ -400,15 +415,17 @@ func (p *Proxy) fetch(ctx context.Context, s Stream, start, end int64) (*stallin
 		WroteRequest:         func(httptrace.WroteRequestInfo) { waiting(true) },
 		GotFirstResponseByte: func() { waiting(false) },
 	})
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
 		cancel(nil)
 		return nil, err
 	}
-	for k, v := range s.Header {
+	for k, v := range header {
 		req.Header[k] = v
 	}
-	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", start, end))
+	if end >= 0 {
+		req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", start, end))
+	}
 	res, err := p.HTTP.Do(req)
 	mu.Lock()
 	answered = true

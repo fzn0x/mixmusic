@@ -63,7 +63,7 @@ func (p *presence) update(on bool, appID string, np NowPlaying) {
 	client := p.client
 	var activity *discord.Activity
 	if playing {
-		activity = activityOf(*np.Track, start, np.DurationMs)
+		activity = activityOf(*np.Track, start, np.DurationMs, np.Live)
 	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -88,8 +88,10 @@ func (p *presence) update(on bool, appID string, np NowPlaying) {
 	}()
 }
 
-// activityOf is the presence of a track that started at start.
-func activityOf(t media.Track, start time.Time, durationMs int) *discord.Activity {
+// activityOf is the presence of a track that started at start, of
+// durationMs, or the catalog's length when 0. A live stream has none:
+// Discord tells how long it played.
+func activityOf(t media.Track, start time.Time, durationMs int, live bool) *discord.Activity {
 	a := &discord.Activity{
 		Type:    discord.Listening,
 		Details: t.Title,
@@ -99,7 +101,10 @@ func activityOf(t media.Track, start time.Time, durationMs int) *discord.Activit
 		// is Spotify's or YouTube Music's.
 		StatusDisplay: discord.ShowName,
 	}
-	if durationMs == 0 {
+	switch {
+	case live:
+		durationMs = 0
+	case durationMs == 0:
 		durationMs = t.DurationMs
 	}
 	if durationMs > 0 {

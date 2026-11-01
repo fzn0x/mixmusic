@@ -141,6 +141,40 @@ func TestExpiry(t *testing.T) {
 	if got := expiry("https://example.com/a"); time.Until(got) < 5*time.Hour {
 		t.Errorf("default expiry = %v", got)
 	}
+	// An HLS playlist's, in its path.
+	if got := expiry("https://manifest.googlevideo.com/api/manifest/hls_playlist/expire/1793600000/ei/x/itag/234/playlist/index.m3u8"); got.Unix() != 1793600000 {
+		t.Errorf("expiry of a playlist = %v", got)
+	}
+	if got := expiry("https://manifest.googlevideo.com/api/manifest/hls_playlist/expire/soon/index.m3u8"); time.Until(got) < 5*time.Hour {
+		t.Errorf("expiry of a playlist without one = %v", got)
+	}
+}
+
+// TestResolveLive reads what yt-dlp prints of a live video: the HLS media
+// playlist of its audio, of no size and no length.
+func TestResolveLive(t *testing.T) {
+	r := NewResolver(nil, "")
+	out := `{"url": "https://manifest.googlevideo.com/api/manifest/hls_playlist/expire/1793600000/itag/234/playlist/index.m3u8",
+		"ext": "mp4", "acodec": null, "protocol": "m3u8_native", "live_status": "is_live", "is_live": true, "duration": null,
+		"format_id": "234", "http_headers": {"User-Agent": "test"}}`
+	r.Run = func(context.Context, ...string) ([]byte, error) { return []byte(out), nil }
+	s, err := r.Resolve(context.Background(), testID)
+	if err != nil || !s.Live || s.Codec != "mp4a.40.2" || s.Size != 0 || s.Duration != 0 || s.Expires.Unix() != 1793600000 ||
+		s.Header.Get("User-Agent") != "test" || s.Measured {
+		t.Errorf("stream %+v, %v", s, err)
+	}
+	if !r.Live(testID) || !r.Fresh(testID) || r.Live("dQw4w9WgXcQ") {
+		t.Errorf("live %v, fresh %v", r.Live(testID), r.Fresh(testID))
+	}
+
+	// The HLS of a video that isn't live, which yt-dlp lists for some: the
+	// engine doesn't play it.
+	r = NewResolver(nil, "")
+	out = strings.Replace(out, `"is_live"`, `"was_live"`, 1)
+	r.Run = func(context.Context, ...string) ([]byte, error) { return []byte(out), nil }
+	if s, err := r.Resolve(context.Background(), testID); err == nil || r.Live(testID) {
+		t.Errorf("HLS of a video no longer live: %+v, %v", s, err)
+	}
 }
 
 func TestMimeType(t *testing.T) {
@@ -236,6 +270,13 @@ func selectFormat(t *testing.T, selector string, formats []ytdlpFormat) string {
 	t.Helper()
 	for _, alt := range strings.Split(selector, "/") {
 		which, filters, _ := strings.Cut(alt, "[")
+		if which != "bestaudio" && which != "worstaudio" && filters == "" {
+			// A format's ID.
+			if i := slices.IndexFunc(formats, func(f ytdlpFormat) bool { return f.id == which }); i >= 0 {
+				return which
+			}
+			continue
+		}
 		var picked *ytdlpFormat
 		for i, f := range formats {
 			ok := true
@@ -290,6 +331,9 @@ func TestYTDLPFormats(t *testing.T) {
 		{"only stable volume", []ytdlpFormat{aac[0], aac[2]}, "140-drc", "140-drc"},
 		// Any audio last, which the engine refuses, naming its format.
 		{"only HE-AAC", aac[:1], "139", "139"},
+		// A live stream, of AAC-LC in HLS, whose codec yt-dlp doesn't tell.
+		{"live", []ytdlpFormat{{"233", "", 0, 0}, {"234", "", 0, 0}}, "234", "233"},
+		{"live, of 233 alone", []ytdlpFormat{{"233", "", 0, 0}}, "233", "233"},
 	} {
 		if got := selectFormat(t, formats[QualityBest], c.formats); got != c.best {
 			t.Errorf("%s: the best is %s, want %s", c.name, got, c.best)

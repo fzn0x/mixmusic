@@ -12,9 +12,6 @@ All notable changes to MixMusic are documented here. The format follows
   the window switcher and screen readers, and starts with "Paused:" while
   it's paused. Turn off "Show what plays in the window title" in
   Settings › Desktop to keep it to MixMusic's name (#105).
-- Covers you saw are kept on disk, up to 256 MB, so they show at once at
-  the next start, even offline. Settings › Playback says how many are
-  kept, under the offline cache, and clears them (#73).
 
 ### Changed
 
@@ -75,11 +72,6 @@ All notable changes to MixMusic are documented here. The format follows
   and runs yt-dlp only for the tracks YouTube won't give it that way, such
   as those made for children. The next track is found a second into the
   one playing, so skipping ahead is quick too (#69).
-- A cover that fails to load on a flaky connection tries again within
-  seconds, rather than staying grey for a minute, and the others of its
-  service follow as soon as one loads. A connection that went silent is
-  dropped in about half a minute. The log now says which service's
-  covers failed and why (#73).
 
 ## [0.5.5] - 2026-10-28
 

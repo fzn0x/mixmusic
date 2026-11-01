@@ -161,16 +161,22 @@ func (s *shell) toolSettings(c *ui.Context) {
 func (s *shell) cacheSettings(c *ui.Context) {
 	k := &s.lk
 	s.group(c, "offline cache", func() {
-		use := s.svc.System.CacheUsage()
-		s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. Tracks you played play again without the network.", plural(use.Tracks, "track"), byteSize(use.Bytes)), func() {
-			if s.button(c, "clear-cache", "clear", false).Label("Clear tracks").Disabled(use.Tracks == 0).Clicked() {
-				if err := s.svc.System.ClearCache(); err != nil {
-					s.notes = append(s.notes, noticeOf(err))
-				} else {
-					s.notes = append(s.notes, notice("Cache cleared"))
+		// The cache's folder is read for what it holds in every frame the
+		// row shows: the search of the settings finds the row by what it
+		// always says, without reading it.
+		const kept = "Tracks you played play again without the network."
+		if s.findable("Tracks kept", kept) {
+			use := s.svc.System.CacheUsage()
+			s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. "+kept, plural(use.Tracks, "track"), byteSize(use.Bytes)), func() {
+				if s.button(c, "clear-cache", "clear", false).Label("Clear tracks").Disabled(use.Tracks == 0).Clicked() {
+					if err := s.svc.System.ClearCache(); err != nil {
+						s.notes = append(s.notes, noticeOf(err))
+					} else {
+						s.notes = append(s.notes, notice("Cache cleared"))
+					}
 				}
-			}
-		})
+			})
+		}
 		covers := s.svc.System.ArtworkUsage()
 		s.row(c, "Covers kept", fmt.Sprintf("%s in %s. Covers you saw show again without the network.", plural(covers.Images, "cover"), byteSize(covers.Bytes)), func() {
 			if s.button(c, "clear-covers", "clear", false).Label("Clear covers").Disabled(covers.Images == 0 || s.clearingCovers).Clicked() {

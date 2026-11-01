@@ -426,3 +426,22 @@ func TestSettingsFindTells(t *testing.T) {
 		settled(t, tt)
 	}
 }
+
+// TestSettingsFindAsksNothing searches the settings for what neither the
+// newest version nor the account's channels hold: the search asks GitHub
+// and YouTube for neither.
+func TestSettingsFindAsksNothing(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	tt := testerOf(t, s, 1280, 6000)
+	s.forget("release")
+	show(s, tt, settingsPath("", "tray"))
+	if !tt.HasText("Close to the tray") {
+		t.Fatalf("the search shows %q", tt.Texts())
+	}
+	for _, key := range []string{"release", "channels"} {
+		if _, asked := s.loads[key]; asked {
+			t.Errorf("the search asked for the %s", key)
+		}
+	}
+}

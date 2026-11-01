@@ -248,6 +248,12 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 		})
 		return
 	}
+	// The search of the settings finds the newest version by these words,
+	// without asking GitHub for it.
+	const words = "newest newer version update release"
+	if _, asked := s.loads["release"]; !asked && !s.findable("", words) {
+		return
+	}
 	r := fetch(s, "release", s.svc.System.LatestRelease)
 	again := func() {
 		if !s.updating && s.link(c, "release-again", "check again") {
@@ -256,9 +262,9 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 	}
 	switch rel := r.value; {
 	case !r.done:
-		s.row(c, "Looking for a newer version…", "", func() {})
+		s.row(c, "Looking for a newer version…", "", func() {}, words)
 	case r.err != nil:
-		s.row(c, "Couldn't look for a newer version", r.err.Error(), again)
+		s.row(c, "Couldn't look for a newer version", r.err.Error(), again, words)
 	case rel.Newer:
 		var describe []string
 		if t, err := time.Parse(time.RFC3339, rel.Date); err == nil {
@@ -289,9 +295,9 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 					go s.svc.System.OpenExternal(rel.Download)
 				}
 			}
-		})
+		}, words)
 	default:
-		s.row(c, "This is the newest version", "", again)
+		s.row(c, "This is the newest version", "", again, words)
 	}
 }
 

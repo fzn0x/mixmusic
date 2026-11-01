@@ -185,6 +185,12 @@ func (s *shell) youtubeAccount(c *ui.Context, yt app.YouTubeAccount) {
 // youtubeChannels chooses the channel of the account YouTube Music is used
 // as, when it has more than one.
 func (s *shell) youtubeChannels(c *ui.Context) {
+	// The search of the settings finds the row by what it says, without
+	// asking YouTube for the account's channels.
+	const title, description = "Channel", "Brand channels of your account have their own home feed, library and likes."
+	if _, asked := s.loads["channels"]; !asked && !s.findable(title, description) {
+		return
+	}
 	list := fetch(s, "channels", s.svc.Accounts.YouTubeChannels).value
 	if len(list) < 2 {
 		return
@@ -200,7 +206,7 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 			chosen = labels[i]
 		}
 	}
-	s.row(c, "Channel", "Brand channels of your account have their own home feed, library and likes.", func() {
+	s.row(c, title, description, func() {
 		if s.selectOf(c.Key("channel"), &chosen, labels).Width(260).Label("Channel").Changed() {
 			if i := slices.Index(labels, chosen); i >= 0 {
 				ch := list[i]

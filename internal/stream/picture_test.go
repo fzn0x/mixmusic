@@ -166,6 +166,16 @@ func TestPictureReadsTheIndex(t *testing.T) {
 	if !errors.Is(err, errNoVideo) {
 		t.Errorf("no codec the page plays: %v", err)
 	}
+	// YouTube gone: the error names no stream URL.
+	url := pt.srv.URL
+	pt.srv.Close()
+	p.HTTP.CloseIdleConnections()
+	_, err = p.Picture(context.Background(), musicVideoID, func(vs []Video) (Video, bool) {
+		return PickVideo(vs, []string{"vp9"}, 630, 354, false)
+	})
+	if err == nil || strings.Contains(err.Error(), url) || strings.Contains(err.Error(), "videoplayback") || strings.Contains(err.Error(), "/v?") {
+		t.Errorf("YouTube gone: %v", err)
+	}
 }
 
 func TestServeVideoRanges(t *testing.T) {

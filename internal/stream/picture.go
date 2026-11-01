@@ -33,8 +33,17 @@ type Picture struct {
 // Picture finds the stream of a video's picture that pick chooses of
 // those YouTube serves, and reads where its parts are from its first
 // bytes. Finding it runs yt-dlp for a track whose audio came from the
-// cache; for others, the stream was found with the audio.
+// cache; for others, the stream was found with the audio. Its errors
+// quote no stream URL, which carries the user's IP address.
 func (p *Proxy) Picture(ctx context.Context, videoID string, pick func([]Video) (Video, bool)) (Picture, error) {
+	pic, err := p.picture(ctx, videoID, pick)
+	if err != nil {
+		err = loggable(err)
+	}
+	return pic, err
+}
+
+func (p *Proxy) picture(ctx context.Context, videoID string, pick func([]Video) (Video, bool)) (Picture, error) {
 	if !ValidVideoID(videoID) {
 		return Picture{}, ErrBadVideoID
 	}

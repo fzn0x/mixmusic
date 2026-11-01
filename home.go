@@ -75,8 +75,8 @@ func (s *shell) homePage(c *ui.Context) {
 		})
 		// The user's own shelves show at once, then those of each service
 		// once they came: one that still loads holds back those after it,
-		// which would move once it came. Each keep their own keys, which
-		// shelves coming or going in the others don't move.
+		// which would move once it came. Each group keeps keys of its own,
+		// which shelves coming or going in another don't move.
 		source := homeFilters[s.homeFilter].source
 		shown, failed := 0, false
 		put := func(key string, of []media.Shelf) {

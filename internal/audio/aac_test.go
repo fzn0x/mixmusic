@@ -422,3 +422,56 @@ func TestDeckPlaysAACThroughTheProxy(t *testing.T) {
 		media.Close()
 	}
 }
+
+// TestEngineCrossfadesIntoAAC fades an Opus track into an AAC one, each at
+// its own loudness, as two Opus tracks fade, and plays the AAC track to its
+// end, which it tells, with its time.
+func TestEngineCrossfadesIntoAAC(t *testing.T) {
+	a, b := reference(t, cuesFront), aacReference(t, aacFragments)
+	dev := &fakeDevice{}
+	rec := newRecorder()
+	e := NewEngine(measuredOpener, dev.start, rec)
+	dev.e = e
+	e.master = newSmoother(1, glide)
+	e.SetLoudness(true)
+	t.Cleanup(e.Close)
+	e.Load(cuesFront+"#-8", 0, false)
+	buffered(t, e, 0, ringFrames/2)
+	e.Play()
+	at := 188 * quantum
+	dev.play(t, at)
+	e.Preload(aacFragments + "#-11")
+	buffered(t, e, 1, ringFrames/2)
+	const fade = 300 * time.Millisecond
+	if err := e.Crossfade(aacFragments+"#-11", fade); err != nil {
+		t.Fatal(err)
+	}
+	got := dev.play(t, len(b)/2+4800)
+	ta, tb := math.Pow(10, -6.0/20), math.Pow(10, -3.0/20)
+	ga, gb := ramp{value: 1, target: 1}, ramp{}
+	ga.to(0, fade)
+	gb.to(1, fade)
+	for f := range len(b) / 2 {
+		wa, wb := float32(ga.next()*ta), float32(gb.next()*tb)
+		for c := range 2 {
+			want := b[2*f+c] * wb
+			if f < int(frames(fade)) {
+				want = float32(0) + a[2*(at+f)+c]*wa + want
+			}
+			// The reference converts the AAC track's first frames from
+			// silence, where the deck has the codec delay.
+			if d := math.Abs(float64(got[2*f+c] - want)); d != 0 && (f >= 64 || d > 1e-5) {
+				t.Fatalf("frame %d: %v, want %v", f, got[2*f+c], want)
+			}
+		}
+	}
+	for i := len(b); i < len(got); i++ {
+		if got[i] != 0 {
+			t.Fatalf("frame %d after the end: %v", i/2, got[i])
+		}
+	}
+	rec.waitFor(t, "ended")
+	if p := e.Position(); p < 3*time.Second-time.Millisecond {
+		t.Errorf("position %v at the end", p)
+	}
+}

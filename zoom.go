@@ -182,10 +182,11 @@ func (s *shell) zoomRow(c *ui.Context) {
 }
 
 // useMenuBar gives macOS's menu bar the system's menus, but a View menu
-// whose zoom items zoom MixMusic. It leaves out Reload and Force Reload,
-// which do nothing in a window of native interface and took ⌘R from
-// Repeat. The items have no keys of their own, so that the zoom's keys
-// reach the window, where the user may change them, as elsewhere.
+// whose items refresh the page and zoom MixMusic. It leaves out Reload
+// and Force Reload, which do nothing in a window of native interface and
+// took ⌘R from Repeat and ⇧⌘R from Refresh this page. The items have no
+// keys of their own, so that the keys reach the window, where the user
+// may change them, as elsewhere.
 func (s *shell) useMenuBar() {
 	if runtime.GOOS != "darwin" {
 		return
@@ -198,6 +199,7 @@ func (s *shell) useMenuBar() {
 		{Role: mygo.RoleFileMenu},
 		{Role: mygo.RoleEditMenu},
 		{Label: "View", Submenu: []*mygo.MenuItem{
+			{Label: "Refresh This Page", Click: run(s.refreshPage)},
 			{Role: mygo.RoleToggleDevTools},
 			mygo.Separator(),
 			{Label: "Actual Size", Click: run(func() { s.setZoom(1) })},

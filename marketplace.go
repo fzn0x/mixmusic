@@ -16,7 +16,10 @@ var marketTabs = []string{"themes", "plugins"}
 func (s *shell) marketplacePage(c *ui.Context, tab string) {
 	k := &s.lk
 	selected := max(slices.Index(marketTabs, tab), 0)
-	reg := fetch(s, "registry", func(ctx context.Context) (addons.Registry, error) { return s.svc.Addons.Registry(ctx, false) })
+	// A refresh asks the registry itself, past the answer the app keeps
+	// for ten minutes.
+	fresh := s.refreshingKey("registry")
+	reg := fetch(s, "registry", func(ctx context.Context) (addons.Registry, error) { return s.svc.Addons.Registry(ctx, fresh) })
 	s.pageScroll(c, func() {
 		before := selected
 		var counts []int

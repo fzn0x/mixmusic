@@ -34,7 +34,10 @@ func (s *shell) view(c *ui.Context) {
 				ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Children(func() {
 					s.mainPane(c)
 					if s.panel != "" {
+						// The panel's lyrics refresh with the page.
+						s.collecting = true
 						s.sidePanel(c)
+						s.collecting = false
 					}
 				})
 			})
@@ -48,6 +51,7 @@ func (s *shell) view(c *ui.Context) {
 	s.promptDialog(c)
 	s.sweepDialogs()
 	s.sweepViews()
+	s.keepShown(c)
 }
 
 // mainPane shows the page of the router's path. Pages scroll themselves,
@@ -59,6 +63,9 @@ func (s *shell) mainPane(c *ui.Context) {
 // page builds the page of a route.
 func (s *shell) page(c *ui.Context, r *ui.Route) {
 	s.pagePath = r.Path()
+	// The page shown, not one that slides away, is what a refresh asks
+	// again for.
+	s.collecting = r.Path() == s.router.Path()
 	switch {
 	case r.Match("/"):
 		r.Title("Home")
@@ -99,6 +106,7 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 	default:
 		s.lost(c, "This page isn't one of MixMusic's.")
 	}
+	s.collecting = false
 }
 
 // lost stands for a page there is none of, saying why.

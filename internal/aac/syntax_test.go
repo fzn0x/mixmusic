@@ -183,7 +183,7 @@ func TestPulse(t *testing.T) {
 			if err := os.WriteFile(path, adts(mono44, pulsed, pulsed), 0o644); err != nil {
 				t.Fatal(err)
 			}
-			snr, _, _ := compare(ffmpegDecode(t, path), 1, got)
+			snr, _, _ := compare(ffmpegDecode(t, path), 1, got, nil)
 			t.Logf("SNR %.1f dB against ffmpeg's decode", snr)
 			if snr < 90 {
 				t.Errorf("SNR %.1f dB", snr)

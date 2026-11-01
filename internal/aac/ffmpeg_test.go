@@ -70,8 +70,9 @@ func (u toolUse) String() string {
 	return strings.Join(parts, ", ")
 }
 
-// note counts the tools the frame d decoded last used.
-func (u toolUse) note(d *Decoder) {
+// note counts the tools the frame d decoded last used, and reports whether
+// its channels shared their noise, as ffmpeg's decoder doesn't.
+func (u toolUse) note(d *Decoder) bool {
 	seen := map[string]bool{}
 	for c := range d.cfg.Channels {
 		s := &d.ch[c].ics
@@ -129,11 +130,13 @@ func (u toolUse) note(d *Decoder) {
 	for k := range seen {
 		u[k]++
 	}
+	return seen["pns-ms"]
 }
 
 // decodeFile decodes the frames of an ADTS file with a new Decoder into
-// interleaved stereo, and counts the tools they use.
-func decodeFile(t testing.TB, data []byte, channels int) ([]float32, toolUse) {
+// interleaved stereo, counts the tools they use, and tells those whose
+// channels shared their noise.
+func decodeFile(t testing.TB, data []byte, channels int) ([]float32, toolUse, []bool) {
 	t.Helper()
 	cfg, frames, err := readADTS(data)
 	if err != nil {
@@ -148,22 +151,29 @@ func decodeFile(t testing.TB, data []byte, channels int) ([]float32, toolUse) {
 	}
 	use := toolUse{}
 	pcm := make([]float32, 2*FrameLength*len(frames))
+	shared := make([]bool, len(frames))
 	for i, f := range frames {
 		if _, err := d.Decode(f, pcm[2*FrameLength*i:]); err != nil {
 			t.Fatalf("frame %d: %v", i, err)
 		}
-		use.note(d)
+		shared[i] = use.note(d)
 	}
-	return pcm, use
+	return pcm, use, shared
 }
 
 // compare returns the SNR, in dB, of ours, interleaved stereo, against
 // ref, of channels interleaved, and the frame whose own SNR is the worst.
-func compare(ref []float32, channels int, ours []float32) (snr float64, worst int, worstSNR float64) {
+// It leaves out the frames that skip tells, those whose channels share
+// their noise where ffmpeg's decoder gives each noise of its own, and the
+// frame after each, which the second half of their windows reaches.
+func compare(ref []float32, channels int, ours []float32, skip []bool) (snr float64, worst int, worstSNR float64) {
 	n := min(len(ref)/channels, len(ours)/2)
 	var sig, noise float64
 	worstSNR = math.Inf(1)
 	for f := 0; f*FrameLength < n; f++ {
+		if f < len(skip) && skip[f] || f > 0 && f <= len(skip) && skip[f-1] {
+			continue
+		}
 		var fs, fn float64
 		for i := f * FrameLength; i < min(n, (f+1)*FrameLength); i++ {
 			for c := range channels {
@@ -201,11 +211,11 @@ func TestFiles(t *testing.T) {
 				t.Fatal(err)
 			}
 			ref := ffmpegDecode(t, path)
-			ours, use := decodeFile(t, data, cfg.Channels)
+			ours, use, shared := decodeFile(t, data, cfg.Channels)
 			if len(ref)/cfg.Channels != len(ours)/2 {
 				t.Errorf("ffmpeg decodes %d samples, the decoder %d", len(ref)/cfg.Channels, len(ours)/2)
 			}
-			snr, worst, worstSNR := compare(ref, cfg.Channels, ours)
+			snr, worst, worstSNR := compare(ref, cfg.Channels, ours, shared)
 			t.Logf("%+v: SNR %.1f dB, worst frame %d at %.1f dB; %d frames; %v", cfg, snr, worst, worstSNR, len(ours)/2/FrameLength, use)
 			if snr < 90 {
 				t.Errorf("SNR %.1f dB", snr)
@@ -265,11 +275,11 @@ func TestFFmpeg(t *testing.T) {
 				t.Fatal(err)
 			}
 			ref := ffmpegDecode(t, path)
-			ours, use := decodeFile(t, data, e.channels)
+			ours, use, shared := decodeFile(t, data, e.channels)
 			if len(ref)/e.channels != len(ours)/2 {
 				t.Errorf("ffmpeg decodes %d samples, the decoder %d", len(ref)/e.channels, len(ours)/2)
 			}
-			snr, worst, worstSNR := compare(ref, e.channels, ours)
+			snr, worst, worstSNR := compare(ref, e.channels, ours, shared)
 			t.Logf("SNR %.1f dB, worst frame %d at %.1f dB; %d bytes; %v", snr, worst, worstSNR, len(data), use)
 			if snr < 90 {
 				t.Errorf("SNR %.1f dB", snr)

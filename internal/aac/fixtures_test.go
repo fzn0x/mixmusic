@@ -113,14 +113,14 @@ func TestFixtures(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			ours, use := decodeFile(t, data, e.channels)
+			ours, use, shared := decodeFile(t, data, e.channels)
 			if *update {
 				ref := ffmpegDecode(t, file)
 				var energy float64
 				for _, v := range ref {
 					energy += float64(v) * float64(v)
 				}
-				snr, _, _ := compare(ref, e.channels, ours)
+				snr, _, _ := compare(ref, e.channels, ours, shared)
 				want[e.name] = &fixture{len(ours) / 2 / FrameLength, energy, sketch(ref, e.channels, false), math.Round(snr*10) / 10, use}
 			}
 			w := want[e.name]

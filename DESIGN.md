@@ -20,6 +20,17 @@ colors:
   success-lime: "#a4e600"
   source-youtube: "#ff4040"
   source-spotify: "#1ed760"
+  site-ground: "#121212"
+  site-surface-1: "#181818"
+  site-surface-2: "#1f1f1f"
+  site-surface-3: "#2a2a2a"
+  site-outline: "rgba(255, 255, 255, 0.1)"
+  site-outline-strong: "rgba(255, 255, 255, 0.26)"
+  site-ink: "#ffffff"
+  site-ink-muted: "#adadad"
+  site-brand: "#e6007e"
+  site-brand-text: "#ff8cc6"
+  site-on-brand: "#ffffff"
 typography:
   display:
     fontFamily: "Selawik, Segoe UI, Noto Sans, DejaVu Sans, system-ui, sans-serif"
@@ -76,53 +87,78 @@ typography:
     fontSize: "0.8125rem"
     fontWeight: 400
     lineHeight: 1.5
-  site-hero-word:
-    fontFamily: "Selawik, Segoe UI, Noto Sans, DejaVu Sans, system-ui, sans-serif"
-    fontSize: "clamp(7rem, 21vw, 21rem)"
-    fontWeight: 300
-    lineHeight: 0.8
-    letterSpacing: "-0.045em"
-  site-section-word:
-    fontFamily: "Selawik, Segoe UI, Noto Sans, DejaVu Sans, system-ui, sans-serif"
-    fontSize: "clamp(5.5rem, 13vw, 13rem)"
-    fontWeight: 300
-    lineHeight: 0.86
-    letterSpacing: "-0.045em"
-  site-hook:
-    fontFamily: "Selawik, Segoe UI, Noto Sans, DejaVu Sans, system-ui, sans-serif"
-    fontSize: "clamp(1.625rem, 2.3vw, 2.375rem)"
-    fontWeight: 300
-    lineHeight: 1.12
-    letterSpacing: "-0.025em"
-  site-lead:
-    fontFamily: "Selawik, Segoe UI, Noto Sans, DejaVu Sans, system-ui, sans-serif"
-    fontSize: "clamp(1.5rem, 2.3vw, 2.125rem)"
-    fontWeight: 300
-    lineHeight: 1.18
+  site-display:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
+    fontSize: "clamp(2.5rem, 5.6vw, 4.5rem)"
+    fontWeight: 850
+    lineHeight: 1.02
+    letterSpacing: "-0.038em"
+  site-headline:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
+    fontSize: "clamp(1.875rem, 3.2vw, 2.625rem)"
+    fontWeight: 800
+    lineHeight: 1.08
+    letterSpacing: "-0.03em"
+  site-title:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 750
+    lineHeight: 1.25
     letterSpacing: "-0.02em"
-  site-body:
-    fontFamily: "Selawik, Segoe UI, Noto Sans, DejaVu Sans, system-ui, sans-serif"
-    fontSize: "1.0625rem"
+  site-title-small:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
+    fontSize: "1.3125rem"
+    fontWeight: 700
+    lineHeight: 1.25
+    letterSpacing: "-0.015em"
+  site-wordmark:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
+    fontSize: "1.1875rem"
+    fontWeight: 800
+    lineHeight: 1.55
+    letterSpacing: "-0.02em"
+  site-subhead:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
+    fontSize: "clamp(1.0625rem, 1.5vw, 1.25rem)"
     fontWeight: 400
-    lineHeight: 1.5
-  site-row-title:
-    fontFamily: "Selawik, Segoe UI, Noto Sans, DejaVu Sans, system-ui, sans-serif"
+    lineHeight: 1.55
+  site-lead:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
     fontSize: "1.125rem"
     fontWeight: 400
-    lineHeight: 1.5
-  site-row-line:
-    fontFamily: "Selawik, Segoe UI, Noto Sans, DejaVu Sans, system-ui, sans-serif"
-    fontSize: "0.9375rem"
+    lineHeight: 1.55
+  site-body:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
+    fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.5
+    lineHeight: 1.55
+  site-label:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
+    fontSize: "0.9375rem"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "0.005em"
+  site-label-small:
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 600
+    lineHeight: 1
   site-small:
-    fontFamily: "Selawik, Segoe UI, Noto Sans, DejaVu Sans, system-ui, sans-serif"
+    fontFamily: "Figtree, Segoe UI, system-ui, -apple-system, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
+    lineHeight: 1.55
+  site-mono:
+    fontFamily: "Cascadia Mono, Consolas, SFMono-Regular, ui-monospace, monospace"
+    fontSize: "0.875em"
+    fontWeight: 500
     lineHeight: 1.4
 rounded:
   square: "0px"
   round: "50%"
+  site-card: "12px"
+  site-chip: "8px"
+  site-pill: "999px"
 spacing:
   "1": "4px"
   "2": "8px"
@@ -134,8 +170,10 @@ spacing:
   "8": "64px"
   row: "52px"
   page-gutter: "40px"
-  site-gutter: "clamp(20px, 3.4vw, 56px)"
-  site-section-gap: "clamp(112px, 12vw, 200px)"
+  site-max: "1200px"
+  site-gutter: "clamp(16px, 4vw, 40px)"
+  site-section: "clamp(80px, 10vw, 128px)"
+  site-split-gap: "clamp(28px, 4vw, 56px)"
 components:
   button-primary:
     backgroundColor: "{colors.accent-cyan}"
@@ -219,39 +257,99 @@ components:
     typography: "{typography.label}"
     rounded: "{rounded.square}"
     padding: "12px 12px 12px 16px"
-  site-button-large:
-    backgroundColor: "{colors.accent-cyan}"
-    textColor: "{colors.accent-ink}"
-    typography: "{typography.site-body}"
-    rounded: "{rounded.square}"
-    padding: "0 28px"
+  site-button-filled:
+    backgroundColor: "{colors.site-brand}"
+    textColor: "{colors.site-on-brand}"
+    typography: "{typography.site-label}"
+    rounded: "{rounded.site-pill}"
+    padding: "0 20px 0 16px"
+    height: "40px"
+  site-button-filled-large:
+    backgroundColor: "{colors.site-brand}"
+    textColor: "{colors.site-on-brand}"
+    rounded: "{rounded.site-pill}"
+    padding: "0 28px 0 22px"
     height: "52px"
-  site-upnext-row:
+  site-button-outlined:
     backgroundColor: "transparent"
-    textColor: "{colors.ink-white}"
-    typography: "{typography.body}"
-    rounded: "{rounded.square}"
-    padding: "6px 10px"
-  site-upnext-row-playing:
-    backgroundColor: "{colors.accent-cyan}"
-    textColor: "{colors.accent-ink}"
-  site-player-bar:
-    backgroundColor: "{colors.surface-panel}"
-    textColor: "{colors.ink-white}"
-    height: "92px"
-  site-download-tile:
-    backgroundColor: "{colors.tile-cyan}"
-    textColor: "{colors.tile-ink}"
-    typography: "{typography.tile-title}"
-    rounded: "{rounded.square}"
-    padding: "18px 20px 20px"
-    height: "300px"
-  site-theme-card:
+    textColor: "{colors.site-ink}"
+    typography: "{typography.site-label}"
+    rounded: "{rounded.site-pill}"
+    padding: "0 20px 0 16px"
+    height: "40px"
+  site-button-outlined-small:
     backgroundColor: "transparent"
-    textColor: "{colors.ink-white}"
-    rounded: "{rounded.square}"
-    padding: "16px"
-    height: "132px"
+    textColor: "{colors.site-ink}"
+    rounded: "{rounded.site-pill}"
+    padding: "0 16px 0 12px"
+    height: "36px"
+  site-button-tonal:
+    backgroundColor: "{colors.site-surface-3}"
+    textColor: "{colors.site-ink}"
+    typography: "{typography.site-label}"
+    rounded: "{rounded.site-pill}"
+    padding: "0 20px 0 16px"
+    height: "40px"
+  site-app-bar:
+    backgroundColor: "{colors.site-ground}"
+    textColor: "{colors.site-ink}"
+    height: "64px"
+  site-app-bar-raised:
+    backgroundColor: "{colors.site-surface-1}"
+  site-nav-link:
+    backgroundColor: "transparent"
+    textColor: "{colors.site-ink-muted}"
+    typography: "{typography.site-label}"
+    rounded: "{rounded.site-chip}"
+    padding: "8px 12px"
+  site-nav-link-current:
+    textColor: "{colors.site-ink}"
+  site-tab:
+    backgroundColor: "transparent"
+    textColor: "{colors.site-ink-muted}"
+    typography: "{typography.site-label}"
+    rounded: "{rounded.site-chip}"
+    padding: "0 16px"
+    height: "52px"
+  site-tab-selected:
+    textColor: "{colors.site-ink}"
+  site-chip:
+    backgroundColor: "transparent"
+    textColor: "{colors.site-ink}"
+    typography: "{typography.site-label-small}"
+    rounded: "{rounded.site-chip}"
+    padding: "0 14px"
+    height: "34px"
+  site-screenshot-frame:
+    backgroundColor: "{colors.site-surface-2}"
+    rounded: "{rounded.site-card}"
+  site-system-card:
+    backgroundColor: "{colors.site-surface-1}"
+    textColor: "{colors.site-ink}"
+    rounded: "{rounded.site-card}"
+    padding: "28px 24px 24px"
+  site-system-tag:
+    backgroundColor: "{colors.site-surface-3}"
+    textColor: "{colors.site-ink}"
+    rounded: "{rounded.site-pill}"
+    padding: "4px 10px"
+  site-info-panel:
+    backgroundColor: "{colors.site-surface-1}"
+    textColor: "{colors.site-ink}"
+    rounded: "{rounded.site-card}"
+    padding: "32px"
+  site-link-row:
+    backgroundColor: "transparent"
+    textColor: "{colors.site-ink}"
+    rounded: "{rounded.site-chip}"
+    padding: "14px 16px"
+  site-link-row-hover:
+    backgroundColor: "{colors.site-surface-2}"
+  site-play-button:
+    backgroundColor: "{colors.site-ink}"
+    textColor: "{colors.site-ground}"
+    rounded: "{rounded.round}"
+    size: "48px"
 ---
 
 # Design System: MixMusic
@@ -333,20 +431,6 @@ The scale is multiplied by the user's text size. Sizes in `cqi` follow the width
 
 **The Light At Size Rule.** Everything at subtitle size and above is weight 300 with negative tracking (from -0.02em at pivots to -0.045em at the page word). Weight 600 appears only on the action inside a toast.
 
-### Marketing Site Ramp
-The landing page in `site/` reads at a larger size than the app, because it is read once rather than used for hours. Same family, same weights, same rules:
-- **Hero word** (300, clamp(7rem, 21vw, 21rem), 0.8): the single "mixmusic" that opens the page, cropped by the main column.
-- **Section word** (300, clamp(5.5rem, 13vw, 13rem), 0.86): one lowercase word per section, cropped by the column and sliding left as it scrolls; it swings in 44px from the right the first time it arrives. Under a 720px viewport the hero and section words become clamp(6rem, 30vw, 9rem) and clamp(4.5rem, 24vw, 7rem).
-- **Hook** (300, clamp(1.625rem, 2.3vw, 2.375rem), 1.12): the one line under the hero that says what the player is.
-- **Lead** (300, clamp(1.5rem, 2.3vw, 2.125rem), 1.18): the opening sentence of each section, capped at 26ch (34ch when wide) and balanced.
-- **Body** (400, 1.0625rem, 1.5): marketing prose, capped at 60ch and set in ink at 80%; 1rem under a 720px viewport.
-- **Row title over row line** (400, 1.125rem over 0.9375rem in muted ink): feature rows, registry entries; the player bar's title is the row title.
-- **Small** (400, 0.875rem): meta lines, notes, download captions and labels; screenshot captions, file sizes and the fine print use the app's label size (0.8125rem).
-
-Pivots under the hero word follow the app's pivot at up to 3.25rem; under section words they step down to clamp(1.75rem, 2.6vw, 2.5rem). Subsections (such as "what it needs") use the title size, clamp(1.75rem, 2.2vw, 2.125rem), on the app's 1px accent rule.
-
-**The Reading Size Rule.** On the site, reading copy steps up one size from the app (body 1.0625rem, leads at weight 300 from 1.5 to 2.125rem with 1.12 to 1.18 leading); everything at lead size and above stays weight 300 with negative tracking, as the Light At Size Rule says.
-
 ## Layout
 
 A fixed shell grid: rail (248px, 224px compact, 76px collapsed) and a top bar of 48px across the top; the main pane, then the side panel (340px, 300px under 1100px wide) when the queue or lyrics are open; the player bar (92px, 80px compact) across the bottom. The shell clips; only the pane, the rail's library list and the panel scroll.
@@ -358,9 +442,6 @@ Spacing steps are 4, 8, 12, 16, 24, 32, 48 and 64px. Sections and shelves are 48
 Tiles live on a four-column grid capped at 1040px with an 8px gap and rows of at least 150px; tiles span 1x1, 2x1 (wide), 1x2 (tall) or 2x2 (large), packed densely. Under a 640px pane the grid becomes two columns. Shelves are rows of 172px artwork tiles with 16px gaps, snapping at the start; grids fill 164px columns. Collection heads pair a 208px cover (128px under a 720px pane) with facts aligned to its foot. Now playing pairs a 260 to 420px sleeve with the info column and stacks under 1100px.
 
 Density is a root attribute (`data-density`), the rail's state is another (`data-sidebar`); both change measures through the same variables.
-
-### Marketing Site
-The site keeps the app's shell as its layout: a top bar, a main column, a 340px "up next" column in panel black (300px under 1180px) and a fixed 92px player bar (72px under 720px). The main column sits in a fluid gutter (site-gutter); sections are separated by one generous gap (site-section-gap), never by bands or alternating backgrounds. Inside a section, copy and screenshot share an asymmetric split (5 to 7, flipped to 7 to 5 on alternate sections, 6 to 6 beside code). Tiles, download tiles and theme cards use the app's four-column grid with an 8px gap (10px between theme cards). Under 1040px the up next column goes away, splits stack and four-column grids become two; under 720px the downloads stack to one column.
 
 ## Elevation & Depth
 
@@ -441,17 +522,6 @@ A 10px shape before every track's artists: a filled disc for Spotify, a filled s
 ### Overlays
 Menus are raised grey with a hairline and the menu float shadow; items are 36px and flood with the accent on hover or focus. Toasts are inverted (an ink block with ground-coloured text) above the player bar; error toasts are coral, success toasts take the accent.
 
-### Marketing Site
-The landing page in `site/` is the player playing its own story. These patterns belong to it and are built from the app's parts.
-- **Up next column:** panel black, sticky beside the main column, titled "up next" at the 1.75rem pivot size with an accent "now playing" label, as in the app's queue column. One queue row per section: a 48px square thumb (a tile in the section's tone with its stroked icon, unprinted), a body-size title and a small muted line led by the two-rings mark. The section in view floods with the accent; sections above it drop to 74% opacity as played. The column ends on a muted line saying where the queue ends. On short windows the column steps down, as far as the whole queue needs to stay in view: 40px thumbs, then 34px with smaller type, then 28px rows without their lines.
-- **Player bar (signature):** the app's player bar, panel black over a hairline, and it plays the page. Its thumb and title turn (a 28px turnstile, 520ms) to the section in view, its sub line names what is next, its 2px accent progress line is the scroll position (click or arrow keys to seek), the round transport steps through sections and plays them in turn, and its right end always holds the primary action: the cyan "download for <your system>" block beside an "other systems" outline.
-- **Buttons:** the app's primary and outline buttons at 44px (52px large in the hero and the close, 36px small in the top bar), the outline drawn as a 2px inset rule in outline ink.
-- **Download tiles:** flat tiles in the four tones, 300px tall: the lowercase system name as the tile title, a small caption, then one row per file (download icon, name, size) on 30% tile-ink rules. They carry no printed texture, so the file rows stay legible. The visitor's own system gets a small "for your system" tag in tile ink on the tile's tone.
-- **Theme gallery:** a large screenshot that crossfades (260ms) to the chosen theme, over a four-column row of theme cards. Each card is filled with its theme's own ground and ink, with a 1px hairline, four 22px swatches and the theme name at 1.5rem, weight 300; the current card wears the 3px accent outline offset 2px. A theme that sets its own face shows its name in that face, as a specimen of the theme, not as a face of the site.
-- **Screenshots:** real captures, full width of their column on panel black with a 1px hairline, captioned in small muted type. The hero's is the README's banner: the player's pages in Mochi, in perspective around now playing.
-- **Walkthrough:** the one-minute recording of the player, full width under its section's lead, framed and captioned as a screenshot, with the browser's own controls, muted, from a still of the recording. The section's pivots are its chapters: each seeks the video to its page, and the pivot of the page playing turns to ink.
-- **Next release mark:** what main has and the latest release lacks carries a small chip reading "next release", in the registry chip's 1px outline and ink, after the sentence or caption it qualifies (a whole new section says it once, under its lead). The page drops every mark when GitHub's latest release is newer than the version it was built with.
-
 ### Motion
 Ease-out `cubic-bezier(0.16, 1, 0.3, 1)` with 120, 260 and 520ms steps; ease-in-out for loops. Pages enter as a turnstile: each child slides 44px in from the right, the title first and the rest 50 to 120ms behind. All durations become 0 under reduced motion, and the live tile and the equaliser bars stop.
 
@@ -465,7 +535,6 @@ Ease-out `cubic-bezier(0.16, 1, 0.3, 1)` with 120, 260 and 520ms steps; ease-in-
 - **Do** tag every track with its source mark, a shape first and a colour second.
 - **Do** take every colour, face and radius from the theme's tokens, and every size and measure from the scale here.
 - **Do** keep the next track in view: the queue column, the player bar's "next" line and the live tile's back face.
-- **Do** let the site's player bar play the page: its progress is the scroll position, its title the section in view, and its primary action is always the download.
 
 ### Don't:
 - **Don't** fill a tile with a gradient, or give tiles, artwork, rows or panels a shadow or bevel; shadows are for menus and toasts only.
@@ -474,3 +543,87 @@ Ease-out `cubic-bezier(0.16, 1, 0.3, 1)` with 120, 260 and 520ms steps; ease-in-
 - **Don't** round corners with a literal value; corners come from the theme's radius, or 60% of it, and circles are reserved for transport, play buttons, artists and stats.
 - **Don't** crop or ellipsis-truncate the page word or the pivots; they shrink to fit the pane, then wrap.
 - **Don't** print tile textures outside tiles.
+
+## Website
+
+**Creative North Star: "The Screens Do The Talking"**
+
+The site in `site/` is a world of its own, not the app's tile wall: Material 3 components on neutral near-black greys, set in Figtree, bold and compact. The page is calm so the app's real screens can persuade. Colour comes from two places only: the brand pink of the MixMusic mark and the download action, and the artwork inside each screenshot, which tints the soft glow behind its frame and the controls that choose it. The app's own look (giant lowercase words, flat tiles, the ten themes) appears on the site only inside screenshots and in the theme chips' swatches. Every token below is site-prefixed; none of it changes the app.
+
+**Key Characteristics:**
+- Neutral greys layered by tone (ground, then three surfaces), drawn with hairline outlines.
+- White ink and one muted grey; no other text colour except the links' light pink.
+- Figtree at weights 700 to 850 with negative tracking for headings, 600 for labels, 400 for reading copy.
+- 12px frames and cards, 8px chips and tabs, fully round buttons.
+- Each screenshot sits on a blurred glow of its own artwork colour, and that colour follows the tab or chip that picks it.
+
+### Colors
+- **Near-Black Ground** (site-ground): the page and the app bar at rest; also the browser's theme colour.
+- **Surface One** (site-surface-1): the raised app bar, the download cards and the "what it needs" panel.
+- **Surface Two** (site-surface-2): the screenshot frame's fill while it loads, hovered link rows, and the base the current chip's tint mixes into.
+- **Surface Three** (site-surface-3): tonal buttons, the "your system" tag, keycaps, inline code and the unplayed part of the walkthrough's progress bar.
+- **Hairline** (site-outline) and **Strong Outline** (site-outline-strong): the hairline draws frames, cards, the tab row's baseline, dividers and the footer rule; the strong outline draws outlined buttons, chips and the visitor's own system card (2px).
+- **White Ink** (site-ink) and **Muted Grey** (site-ink-muted): headings, labels and selected states in white; leads, panel copy, notes, meta lines and unselected tabs and nav links in the muted grey.
+- **Brand Pink** (site-brand) with **On Pink** (site-on-brand): the filled download button (hero, footer, and the button on the visitor's own system card), text selection and the caret. The mark is the same pink, drawn in the SVG itself.
+- **Light Pink** (site-brand-text): inline links in copy, and the hover of arrow links; links turn white on hover.
+- **Service colours** (source-spotify, source-youtube): only in the 12px source marks, a disc for Spotify and a square with 2px corners for YouTube Music.
+- **Artwork colour** (`--glow`): not a token, a value each screen carries in the markup, sampled from the artwork in its screenshot (the theme gallery uses the theme's first swatch). It fills the glow, the selected tab's 3px indicator and icon, the walkthrough's progress fill, and the current chip (30% into surface two, outlined at 60%).
+
+**The Two Sources Rule.** The site's chrome is grey, white and muted grey. Pink belongs to the mark and the download action; every other colour comes from a screenshot's artwork, through the glow variable, and changes when the screenshot changes.
+
+**The Pink Is The Download Rule.** A filled pink button always means "download", and always opens the latest release on GitHub; other actions are outlined or tonal.
+
+### Typography
+**Font:** Figtree (variable, 300 to 900, shipped in `site/assets/fonts` as latin and latin-ext subsets, preloaded), falling back to Segoe UI and the system face. **Mono:** Cascadia Mono, Consolas, SFMono-Regular, for inline code only.
+
+- **Display** (850, clamp(2.5rem, 5.6vw, 4.5rem), 1.02, -0.038em): the hero headline only, left aligned over two lines.
+- **Headline** (800, clamp(1.875rem, 3.2vw, 2.625rem), 1.08, -0.03em): one per section.
+- **Title** (750, 1.5rem, -0.02em): the feature panel's heading; the download cards set the system name at the same size in 800.
+- **Small title** (700, 1.3125rem, -0.015em): subheads such as "make a theme" and "what it needs", and the gallery's theme name (750).
+- **Wordmark** (800, 1.1875rem, -0.02em): "MixMusic" beside the mark; 1rem in the footer.
+- **Subhead** (400, clamp(1.0625rem, 1.5vw, 1.25rem)) and **Lead** (400, 1.125rem): the hero's supporting sentence and each section's opening line, in muted grey, capped at 60 to 62ch. Panel copy reads at 1.0625rem.
+- **Body** (400, 1rem, 1.55): reading copy; prose is capped at 52 to 70ch.
+- **Label** (600, 0.9375rem, 0.005em on buttons) and **Small label** (600, 0.875rem): buttons, tabs, nav links and chips.
+- **Small** (400, 0.875rem): meta lines, the footer, link-row descriptions; the walkthrough's time is the small size at 600 in tabular figures.
+
+Headings balance their lines; paragraphs wrap pretty. Sentence case throughout; the site does not use the app's lowercase voice.
+
+**The Bold And Compact Rule.** Everything at small-title size and above is weight 700 or more with negative tracking; reading copy stays at 400 with open 1.55 leading, so the contrast is in weight, not in face.
+
+### Layout
+One centred column, 1200px (site-max) inside a fluid gutter (site-gutter), under a sticky 64px app bar. Sections are separated by top padding alone (site-section), never by bands or alternating backgrounds; each opens with a section head capped at 720px, 12px between headline and lead and 40px (28px under 760px) before content. The hero is left aligned: headline, subhead, the two large buttons 12px apart, the version line, then the now playing screenshot at full content width 40 to 64px below.
+
+Feature tabs, the theme gallery and the open-source block split on site-split-gap: screenshot and panel at 7 to 4, the open-source copy and links at 5 to 7. Downloads are three cards 16px apart; the two-column blocks (theme and plugin columns, what it needs, link rows) sit on 1px hairline rules. Under 960px every split and the download row stack to one column; under 760px the app bar's links go away (the GitHub button stays), two-column blocks stack, and the footer stacks. The page scrolls smoothly to anchors with 80px of room for the bar.
+
+### Elevation & Depth
+Depth is tone and hairline first: ground, then surface one, two and three, with 1px inset outlines on frames and cards. Shadows are few and dark, never coloured, and the one coloured depth is the artwork glow: a radial gradient of the artwork colour (64% at the centre, 42% at 58%, then clear), blurred 48px and extended 12% past the frame's sides and 20% below it.
+
+- **Frame** (`box-shadow: 0 0 0 1px outline, 0 18px 40px -28px rgba(0, 0, 0, 0.7)`): screenshots, over their glow.
+- **Filled button** (`box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4)`, on hover `0 4px 12px -4px rgba(0, 0, 0, 0.7)`): the pink download button only.
+- **Raised app bar** (surface one with `box-shadow: 0 1px 0 outline`): once the page scrolls 8px.
+- **Keycap** (`box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.35)`): keys in the keyboard panel, drawn as keys.
+
+**The One Glow Rule.** The glow is the site's only gradient and only colour of light; it sits behind a screenshot frame and nowhere else.
+
+### Shapes
+Frames, the video, download cards and the info panel take 12px corners (site-card); chips, tabs (top corners only), nav links and link rows take 8px (site-chip); buttons and the "your system" tag are fully round (site-pill); the play button and the progress thumb are circles. Inline code and keycaps use 6px, the focus ring 4px. Lines are 1px hairlines, with 2px for the selected system card and 3px for the tab indicator (round at its top corners).
+
+### Components
+- **Buttons:** fully round with Material's state layer, a layer of the text colour at 8% on hover and 14% while pressed (the pink button's layer is black, 10% on hover). Filled pink for the download (52px large in the hero, 40px in the footer); outlined (1px strong inset outline) for GitHub, 52px in the hero and 36px small in the app bar; tonal (surface three) for each download card, which turns pink on the visitor's own system. A leading 18 to 20px stroked icon sits 8px before the label.
+- **App bar:** mark and wordmark, four muted nav links (hover to white on a 6% white layer), the outlined GitHub button at the right. Flat on the ground at the top, raised to surface one with a hairline once scrolled.
+- **Feature tabs (signature):** a scrolling row of 52px tabs over a hairline baseline, each with a stroked icon and a label in muted grey. The selected tab turns white, its icon takes the artwork colour, and a 3px artwork-colour indicator scales in under it. Choosing a tab crossfades the screenshot (the next image fades in over the shown one once it has loaded, so the frame never flashes empty) and moves the glow to that screen's artwork colour. Arrow keys, Home and End move between tabs.
+- **Chips:** 34px, 8px corners, a 1px strong inset outline, hover on a 6% white layer. The current chip is tinted with the artwork colour. They choose walkthrough chapters and themes; theme chips lead with four overlapping 12px swatch dots.
+- **Walkthrough player:** the recording in a 12px frame on black, under a 48px white play button (scales to 1.04 on hover, 0.98 pressed), a 4px progress bar filled in the artwork colour with a 12px white thumb on hover or focus, and the time. Click, drag or arrow keys seek; chapter chips seek to each page.
+- **Download cards:** surface one, hairline, 12px corners: the system name, its requirement, its file types in white 600, and a tonal "Get it on GitHub" button at the foot. The visitor's own system gets a 2px strong outline, a "your system" tag at the top right and a pink button. Every download button, whatever its label ("Download for <system>"), opens the latest release on GitHub; the site never links a file directly.
+- **Info panel and link rows:** "what it needs" on surface one with 32px padding (24px by 20px on small windows); open-source links as 8px rows of a 700 title over a small muted line, hovering to surface two.
+- **Focus:** a 2px white outline offset 3px on everything focusable.
+
+**Motion.** Standard easing `cubic-bezier(0.2, 0, 0, 1)` at two steps: 150ms for state layers, colours and small transforms, 200ms for the glow, the screenshot crossfade, the tab indicator and the app bar. The glow fades between colours because `--glow` is a registered colour property. Under reduced motion every transition drops to 1ms and anchor scrolling is instant.
+
+### Do's and Don'ts
+- **Do** put every screenshot in a 12px frame on a glow of its own artwork colour, and let the control that changes it move the glow, 200ms, standard easing.
+- **Do** keep the chrome in the greys, white ink and muted grey.
+- **Do** send every download to the latest release on GitHub, with the button named for the visitor's system.
+- **Don't** use the brand pink for anything but the mark, the download action, links, selection and the caret.
+- **Don't** colour a surface, a heading or a button with a service colour; they mark sources only.
+- **Don't** draw the site's own chrome in the app's tile grammar; the app's look is shown in screenshots, not worn by the page.

@@ -6,9 +6,11 @@ import (
 	"encoding/binary"
 	"errors"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/fzn0x/mixmusic/aac"
 	"github.com/fzn0x/mixmusic/resample"
@@ -250,4 +252,29 @@ func TestDeckPackedAudioFailures(t *testing.T) {
 	if _, d := playPacked(t, b[:len(b)-100]); d.failure() != nil {
 		t.Errorf("cut short: %v", d.failure())
 	}
+}
+
+// TestEngineDoesNotSeekLive leaves a live stream where it plays when asked
+// to seek: it has no time to seek to.
+func TestEngineDoesNotSeekLive(t *testing.T) {
+	want := packedReference(t, adtsClicks)
+	path := filepath.Join(t.TempDir(), "live.aac")
+	if err := os.WriteFile(path, slices.Concat(packedSegments(t, 8, adtsClicks)...), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	e, dev, rec := newTestEngine(t)
+	e.Load(path, 0, true)
+	buffered(t, e, 0, 4800)
+	got := dev.play(t, 4800)
+	e.Seek(2 * time.Second)
+	if p := e.Position(); p > time.Second {
+		t.Errorf("position %v after a seek", p)
+	}
+	got = append(got, dev.play(t, len(want)/2-4800)...)
+	for i := 2 * fadeFrames; i < len(want); i++ {
+		if got[i] != want[i] {
+			t.Fatalf("frame %d: %v, want %v", i/2, got[i], want[i])
+		}
+	}
+	rec.waitFor(t, "ended")
 }

@@ -140,8 +140,11 @@ func (d *deck) close() {
 }
 
 // seek moves the deck to t: a new ring starts there, which the deck's
-// goroutine fills.
+// goroutine fills. A live stream stays where it is.
 func (d *deck) seek(t time.Duration) {
+	if d.live.Load() {
+		return
+	}
 	t = max(0, t)
 	d.mu.Lock()
 	d.seekTo = t

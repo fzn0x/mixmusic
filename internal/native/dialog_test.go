@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/internal/app"
 )
 
 // shows fails unless the element labelled label shows whole in a window
@@ -72,4 +74,31 @@ func TestPaletteFollowsArrows(t *testing.T) {
 	tt.Frame()
 	tt.Frame()
 	shows(t, tt, h, themes[len(themes)-1], 36)
+}
+
+// TestOfferFirstFocus opens the update offer with the focus on later, not
+// on skip this version, which a Space pressed for the music, or typed in
+// the search box the offer takes the focus from, would press.
+func TestOfferFirstFocus(t *testing.T) {
+	offer := &app.Release{Version: "9.9.9", Newer: true, Page: "https://example.invalid/notes",
+		Download: "https://example.invalid/m.deb", File: "mixmusic-9.9.9-linux-amd64.deb"}
+	s := newTestShell(t)
+	tt := tester(t, s)
+	s.offer = offer
+	tt.Frame()
+	if !tt.Focused("later") || tt.Focused("skip this version") {
+		t.Error("the offer opens with the focus elsewhere than on later")
+	}
+
+	s = newTestShell(t)
+	tt = tester(t, s)
+	tt.Key(ui.Cmd, ui.KeyF)
+	tt.Frame()
+	tt.Type("lua")
+	tt.Frame()
+	s.offer = offer
+	tt.Frame()
+	if !tt.Focused("later") {
+		t.Error("the offer, opening over the search box, leaves the focus elsewhere than on later")
+	}
 }

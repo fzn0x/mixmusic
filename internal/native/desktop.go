@@ -355,9 +355,12 @@ func (s *shell) updateOffer(c *ui.Context) {
 			ui.Text(c, "Downloading…").FontSize(k.smallSize()).TextColor(k.muted)
 			return
 		}
+		// The offer comes unasked, and takes the focus from where it was:
+		// later has it, which only puts the offer off, so that a Space
+		// pressed for the music or typed in a search skips nothing.
 		ui.Row(c).Gap(8).Justify(ui.End).Wrap().Children(func() {
 			if s.updated != "" {
-				if s.button(c, "offer-later", "later", false).Clicked() {
+				if s.button(c, "offer-later", "later", false).AutoFocus().Clicked() {
 					s.offer = nil
 				}
 				if s.button(c, "offer-restart", "restart now", true).Clicked() {
@@ -371,7 +374,7 @@ func (s *shell) updateOffer(c *ui.Context) {
 			if offer.Page != "" && s.button(c, "offer-notes", "what's new", false).Clicked() {
 				go s.svc.System.OpenExternal(offer.Page)
 			}
-			if s.button(c, "offer-later", "later", false).Clicked() {
+			if s.button(c, "offer-later", "later", false).AutoFocus().Clicked() {
 				s.dismissOffer(false)
 			}
 			switch {

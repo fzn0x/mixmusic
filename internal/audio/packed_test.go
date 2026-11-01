@@ -5,14 +5,19 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/fzn0x/mixmusic/aac"
+	"github.com/fzn0x/mixmusic/internal/stream"
 	"github.com/fzn0x/mixmusic/resample"
 )
 
@@ -277,4 +282,46 @@ func TestEngineDoesNotSeekLive(t *testing.T) {
 		}
 	}
 	rec.waitFor(t, "ended")
+}
+
+// TestDeckPlaysALiveStream plays a live stream as the app does: from the
+// stream package's live route, of the HLS playlist yt-dlp found, whose
+// segments' packed audio the deck decodes as they come, to the end of the
+// broadcast.
+func TestDeckPlaysALiveStream(t *testing.T) {
+	segs := packedSegments(t, (len(adtsFrames(t, adtsClicks))+2)/3, adtsClicks)
+	want := packedReference(t, adtsClicks)
+	media := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/live/index.m3u8" {
+			var b strings.Builder
+			b.WriteString("#EXTM3U\n#EXT-X-TARGETDURATION:1\n#EXT-X-MEDIA-SEQUENCE:40\n")
+			for i := range segs {
+				fmt.Fprintf(&b, "#EXTINF:0.2,\nseg/%d.ts\n", i)
+			}
+			b.WriteString("#EXT-X-ENDLIST\n")
+			w.Write([]byte(b.String()))
+			return
+		}
+		i, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/live/seg/"), ".ts"))
+		if err != nil || i < 0 || i >= len(segs) {
+			http.NotFound(w, r)
+			return
+		}
+		w.Write(segs[i])
+	}))
+	defer media.Close()
+	r := stream.NewResolver(nil, "")
+	r.Run = func(context.Context, ...string) ([]byte, error) {
+		return fmt.Appendf(nil, `{"url": "%s/live/index.m3u8", "protocol": "m3u8_native", "live_status": "is_live"}`, media.URL), nil
+	}
+	p := stream.NewProxy(r)
+	open := func(ctx context.Context, videoID string, interrupted func() bool) (Source, error) {
+		return p.OpenLive(ctx, videoID, interrupted)
+	}
+	d := newDeck("dpgUTslQkFs", 0, open, func() {})
+	defer d.close()
+	got := drain(t, d)
+	if err := d.failure(); err != nil || !d.live.Load() || !slices.Equal(got, want) {
+		t.Fatalf("%d frames of %d, %.1f dB from the decode, live %v, %v", len(got)/2, len(want)/2, snr(got, want), d.live.Load(), err)
+	}
 }

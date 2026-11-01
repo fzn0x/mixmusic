@@ -277,11 +277,18 @@ func TestDialogsInShortWindows(t *testing.T) {
 					if body, ok := tt.Find("more of " + d.title); ok {
 						tt.Scroll(body.X+body.W/2, body.Y+body.H/2, 0, 1e4)
 						tt.Frame()
-						if r, ok := tt.Find(textStarting(tt, d.last)); d.last != "" && (!ok || r.H < 10 || r.Y+r.H > top+0.5) {
-							t.Errorf("the body's end doesn't show over the buttons: %v (found %v), buttons from %v", r, ok, top)
-						}
-					} else if (d.name == "update offer" || d.name == "question") && h <= 360 {
+					} else if h <= 360 && (d.name == "update offer" || d.name == "question" && scale > 1) {
+						// Where the text wraps can differ by system and from
+						// one run to the next: with text at its usual size,
+						// the question is only about 40 DIPs too tall for
+						// this window here, and fit it in one of two runs on
+						// Linux. These are too tall in any: the offer by its
+						// eight lines of notes, and the question with text
+						// at its largest, by a third of the room.
 						t.Error("the body doesn't scroll in a window too short for it")
+					}
+					if r, ok := tt.Find(textStarting(tt, d.last)); d.last != "" && (!ok || r.H < 10 || r.Y+r.H > top+0.5) {
+						t.Errorf("the body's end doesn't show over the buttons: %v (found %v), buttons from %v", r, ok, top)
 					}
 					if d.press == "" {
 						tt.Key(0, ui.KeyEnter)

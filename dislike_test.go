@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"slices"
 	"testing"
 	"time"
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 )
 
@@ -57,6 +59,9 @@ func TestDislike(t *testing.T) {
 	eventually(t, s, "the dislike of "+aphex.Title, func() bool { return s.a.IsDisliked(aphex.ID) })
 	s.settle(t, func(st player.State) bool { return st.Queue[3].Skip == player.SkipDisliked })
 	tt.Frame()
+	if !tt.HasText("Aphex Twin · skipped") {
+		t.Errorf("the queue doesn't show %s is passed over: %q", aphex.Title, tt.Texts())
+	}
 	if err := tt.RightClick(aphex.Title); err != nil {
 		t.Fatal(err)
 	}
@@ -139,4 +144,114 @@ func TestDislikeMini(t *testing.T) {
 	if !okLike || !okDislike || dislike.X+dislike.W > 340 || dislike.X < like.X+like.W {
 		t.Errorf("narrow, the heart is at %+v (%v), the thumb at %+v (%v)", like, okLike, dislike, okDislike)
 	}
+}
+
+// TestDislikedPivot shows the library's disliked pivot once the user
+// dislikes a song, with its count, until they take the last dislike back
+// from its menu.
+func TestDislikedPivot(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	show(s, tt, "/library/disliked")
+	if tt.HasText("disliked") {
+		t.Fatalf("the library shows a disliked pivot without dislikes: %q", tt.Texts())
+	}
+	strobe := testTracks[2]
+	if err := s.svc.Collection.SetDisliked(context.Background(), strobe, true); err != nil {
+		t.Fatal(err)
+	}
+	show(s, tt, "/library/disliked")
+	texts := tt.Texts()
+	counted := false
+	for i := range len(texts) - 1 {
+		counted = counted || texts[i] == "disliked" && texts[i+1] == "1"
+	}
+	if !counted {
+		t.Errorf("no disliked pivot of one song: %q", texts)
+	}
+	if !tt.HasText(strobe.Title) {
+		t.Fatalf("the pivot doesn't list %s: %q", strobe.Title, texts)
+	}
+	if _, ok := tt.Find("Remove the dislike"); !ok {
+		t.Errorf("the disliked song has no thumb: %q", texts)
+	}
+	if err := tt.RightClick(strobe.Title); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt.ChooseMenuItem("Remove the dislike"); err != nil {
+		t.Fatalf("%v: the menu holds %q", err, tt.Menu())
+	}
+	eventually(t, s, "the dislike taken back", func() bool { return !s.a.IsDisliked(strobe.ID) })
+	show(s, tt, "/library/disliked")
+	if tt.HasText("disliked") {
+		t.Errorf("the pivot stayed once nothing was disliked: %q", tt.Texts())
+	}
+}
+
+// TestSkipSwitch turns skipping disliked songs off and on in Settings ›
+// Playback, which says where dislikes go, and links to them.
+func TestSkipSwitch(t *testing.T) {
+	s := newTestShell(t)
+	if err := s.svc.Collection.SetDisliked(context.Background(), testTracks[0], true); err != nil {
+		t.Fatal(err)
+	}
+	tt := testerOf(t, s, 1280, 3200)
+	show(s, tt, "/settings/playback")
+	for _, want := range []string{"Skip songs you dislike", "Songs you dislike don't play when the queue moves on, and radios leave them out.",
+		"See the songs you dislike"} {
+		if !tt.HasText(want) {
+			t.Errorf("Settings › Playback doesn't show %q: %q", want, tt.Texts())
+		}
+	}
+	if !s.svc.Preferences.Get().SkipDisliked {
+		t.Fatal("skipping is off at first")
+	}
+	// The row's title carries the switch's words too: the keyboard reaches
+	// the switch, which has them, and the description doesn't.
+	const label = "Skip songs you dislike"
+	focused := func() bool {
+		return tt.Focused(label) && !tt.Focused("Songs you dislike don't play when the queue moves on, and radios leave them out.")
+	}
+	for i := 0; i < 200 && !focused(); i++ {
+		tt.Key(0, ui.KeyTab)
+	}
+	if !focused() {
+		t.Fatalf("Tab doesn't reach the switch: %q", tt.Texts())
+	}
+	for _, want := range []bool{false, true} {
+		tt.Key(0, ui.KeySpace)
+		s.drain()
+		tt.Frame()
+		if got := s.svc.Preferences.Get().SkipDisliked; got != want {
+			t.Errorf("the switch left skipping %v, not %v", got, want)
+		}
+	}
+}
+
+// TestPlayButtonSkips starts an album's play button at its first song the
+// user doesn't dislike, and its shuffle at one of those.
+func TestPlayButtonSkips(t *testing.T) {
+	s := newTestShell(t)
+	album := media.Album{ID: "al-1", Source: media.SourceYouTube, Title: "Mix", Tracks: testTracks[:3]}
+	s.loads["album:al-1"] = &loaded[media.Album]{done: true, value: album}
+	for _, tr := range testTracks[:2] {
+		if err := s.svc.Collection.SetDisliked(context.Background(), tr, true); err != nil {
+			t.Fatal(err)
+		}
+	}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-1")
+	click(t, s, tt, "play")
+	s.settle(t, func(st player.State) bool { return st.Index == 2 && st.Playing })
+	click(t, s, tt, "shuffle")
+	s.settle(t, func(st player.State) bool {
+		cur, ok := st.Current()
+		return ok && st.Shuffle && st.Index == 0 && cur.Track.ID == testTracks[2].ID && st.Playing
+	})
+	// A song the user picks plays, disliked or not.
+	s.p.PlayTracks(testTracks[:3], 0)
+	s.settle(t, func(st player.State) bool {
+		cur, ok := st.Current()
+		return ok && cur.Track.ID == testTracks[0].ID && st.Playing
+	})
 }

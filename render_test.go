@@ -247,6 +247,13 @@ func TestRender(t *testing.T) {
 	renderTo(t, s, tt, dir, "stats")
 	s.navigate("/library/liked")
 	renderTo(t, s, tt, dir, "library-liked")
+	// A song the user dislikes, muted in the queue and in its own pivot.
+	s.setDisliked(testTracks[3], true)
+	eventually(t, s, "the dislike", func() bool { return s.a.IsDisliked(testTracks[3].ID) })
+	s.navigate("/library/disliked")
+	s.panel = "queue"
+	renderTo(t, s, tt, dir, "library-disliked")
+	s.panel = ""
 
 	s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
 		YouTube: media.SearchResults{Tracks: testTracks[:3], Albums: []media.Album{album}, Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube}}},
@@ -263,6 +270,7 @@ func TestRender(t *testing.T) {
 
 	s.navigate("/settings/playback")
 	renderTo(t, s, tt, dir, "settings-playback")
+	renderTo(t, s, ui.NewTester(s.view, 1280, 1700), dir, "settings-playback-tall")
 	s.navigate("/settings/appearance")
 	renderTo(t, s, tt, dir, "settings-appearance")
 	s.navigate("/settings/accounts")

@@ -116,6 +116,9 @@ type App struct {
 	// quitting is set once MixMusic starts to quit: its windows close then,
 	// even with close to the tray on.
 	quitting atomic.Bool
+	// trayHide hides the main window in the tray, out of full screen first
+	// on macOS (#84).
+	trayHide trayHide
 
 	mu         sync.Mutex
 	installed  string // the version installed to run at the next start

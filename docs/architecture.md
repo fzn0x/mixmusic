@@ -130,6 +130,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/addons`** validates theme and plugin manifests, lists the
   built-in and installed add-ons, and installs add-ons from the community
   registry.
+- **`internal/colorfile`** reads the colours of pywal's `colors.json`,
+  matugen's JSON, MixMusic's matugen template and a `theme.json`, telling
+  them apart by what they hold; `internal/app/colorfile.go` follows the
+  file the settings name with MyGo's file watch, and keeps the colours it
+  read last while the file is half written.
 - **`internal/plugins`** runs the plugins the user enabled, each in a
   JavaScript runtime of its own, [sobek](https://github.com/grafana/sobek)
   (a fork of goja with ES modules), on a goroutine of its own: their
@@ -162,7 +167,8 @@ belongs to its main thread: what finishes elsewhere comes back through
   once, keeps it on disk as it came, up to 256 MB, and logs a host's
   failures at most once a minute, without the addresses.
 - **Themes** give their tokens: colours, fonts, radius (`theme.go`), and
-  the accent follows the artwork of what plays. The windows draw the
+  the accent follows the artwork of what plays. A colour file's colours
+  replace the theme's, kept readable (`colorfile.go`). The windows draw the
   effects of the built-in themes, as their options say (`effects.go`):
   Mix's textures, Aurora's drifting lights and frosted dialogs, Sakura's
   petals, Terminal's scanlines, glow and phosphor artwork.
@@ -222,11 +228,13 @@ aren't pages act: `act:shot:<name>` saves the window as it is,
 finds, `act:resume` plays the queue kept in the data folder,
 `act:wait:<duration>` waits, `act:palette` opens the command palette,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
-scrolls the page, `act:theme:<id>` wears a theme, `act:mini` opens the
-mini player, which saves `mini.png`, `act:spotify` logs whether MixMusic's
-own Spotify device could play, `act:title` logs the window's title, which
-the screenshots leave out, and `act:memory` and `act:heap` log the Go
-heap and save a profile of it. Nothing plays unless the player is muted,
+scrolls the page, `act:theme:<id>` wears a theme,
+`act:colors:<off|pywal|matugen|path>` takes the colours from a file, as
+Settings › Appearance does, `act:mini` opens the mini player, which saves
+`mini.png`, `act:spotify` logs whether MixMusic's own Spotify device
+could play, `act:title` logs the window's title, which the screenshots
+leave out, and `act:memory` and `act:heap` log the Go heap and save a
+profile of it. Nothing plays unless the player is muted,
 or `MIXMUSIC_SILENT=1` has the audio engine play into no device, which
 keeps the visualizer and the lyrics moving without a sound.
 `MIXMUSIC_CAPTURE_COMMUNITY=<dir>` has the marketplace read the community

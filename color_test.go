@@ -3,6 +3,8 @@ package main
 import (
 	"image/color"
 	"testing"
+
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 )
 
 func TestParseColor(t *testing.T) {
@@ -80,6 +82,67 @@ func TestReadableOn(t *testing.T) {
 	}
 }
 
+// TestReadableAt reaches its ratio on any ground: on grounds of a middle
+// tone too, where white reads less than black, and from a colour on
+// either side of the ground.
+func TestReadableAt(t *testing.T) {
+	black, white := color.NRGBA{A: 255}, color.NRGBA{255, 255, 255, 255}
+	grey77, grey95 := color.NRGBA{0x77, 0x77, 0x77, 255}, color.NRGBA{0x95, 0x95, 0x95, 255}
+	coral := color.NRGBA{0xd0, 0x60, 0x60, 255}
+	for _, c := range []struct {
+		c, ground color.NRGBA
+		ratio     float64
+	}{
+		{coral, grey95, 3}, {coral, grey77, 4.5}, {white, grey77, 4.5}, {black, grey77, 4.5},
+		{color.NRGBA{0xff, 0xf0, 0x60, 255}, color.NRGBA{0x40, 0x40, 0x40, 255}, 4.5},
+		{color.NRGBA{0x30, 0x30, 0x80, 255}, color.NRGBA{0x20, 0x20, 0x20, 255}, 4.5},
+		{grey95, grey95, 4.5}, {white, white, 4.5}, {black, black, 4.5},
+		// A translucent colour reads as it shows on the ground.
+		{color.NRGBA{255, 255, 255, 40}, black, 4.5},
+	} {
+		got := readableAt(c.c, c.ground, c.ratio)
+		if got.A != 255 || contrast(got, c.ground) < c.ratio {
+			t.Errorf("%v on %v at %.1f:1 gave %v, at %.2f:1", c.c, c.ground, c.ratio, got, contrast(got, c.ground))
+		}
+	}
+	// A light colour on a mid-tone ground that white reads on stays light.
+	if got := readableAt(color.NRGBA{0xf0, 0xe0, 0x90, 255}, color.NRGBA{0x60, 0x60, 0x60, 255}, 3); luminance(got) < 0.5 {
+		t.Errorf("a light yellow on grey went dark: %v", got)
+	}
+}
+
+// TestReadableOnThemes gives the accents the same colours on the grounds of
+// the built-in themes as readableOn did before it reached any ground.
+func TestReadableOnThemes(t *testing.T) {
+	before := func(accent, ground color.NRGBA) color.NRGBA {
+		toward := color.NRGBA{A: 255}
+		if luminance(ground) < 0.5 {
+			toward = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
+		}
+		c := accent
+		c.A = 255
+		for i := 0; i < 10 && contrast(c, ground) < 3; i++ {
+			c = mix(c, toward, 0.15)
+		}
+		return c
+	}
+	s := newTestShell(t)
+	for _, th := range s.inv.Themes {
+		bg, _ := parseColor(th.Colors["bg"])
+		bg.A = 255
+		for r := 0; r < 256; r += 17 {
+			for g := 0; g < 256; g += 51 {
+				for b := 0; b < 256; b += 51 {
+					a := color.NRGBA{uint8(r), uint8(g), uint8(b), 255}
+					if got, want := readableOn(a, bg), before(a, bg); got != want {
+						t.Fatalf("%s: %v became %v, not %v", th.ID, a, got, want)
+					}
+				}
+			}
+		}
+	}
+}
+
 // TestRaised gives every built-in theme a solid face for the menus that
 // float over the page: its surface-2 where that's solid, and Aurora's glass
 // over its ground.
@@ -93,7 +156,7 @@ func TestRaised(t *testing.T) {
 		n++
 		set := s.set
 		set.FollowSystem, set.Theme = false, th.ID
-		k := newLook(set, s.inv.Themes, true, "")
+		k := newLook(set, s.inv.Themes, true, "", colorfile.Colors{})
 		if k.raised.A != 255 {
 			t.Errorf("%s: the menus' face %+v shows the page through", th.ID, k.raised)
 		}

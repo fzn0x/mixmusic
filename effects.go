@@ -113,7 +113,7 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 	case k.fx.petals:
 		root.Draw(paintPetals)
 	case k.fx.wash:
-		t := s.coverTint(c, k.accent, washTone)
+		t := s.coverTint(c, k.accent, groundTone(k.dark))
 		root.Draw(func(p *ui.Painter, r ui.Rect) {
 			paintWash(p, r, t.color(p.Now()))
 			if t.changing(p.Now()) {
@@ -121,7 +121,7 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 			}
 		})
 	case k.fx.cover:
-		t := s.coverTint(c, k.accent, coverTone)
+		t := s.coverTint(c, k.accent, groundTone(k.dark))
 		// Without a cover, the accent's light is half as strong: the
 		// glass stays white.
 		accent, strength := k.accent, 1.0

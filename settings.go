@@ -10,9 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -192,7 +195,11 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			s.openFolder(addons.KindTheme)
 		}
 	}, func() {
-		s.row(c, "Follow the computer", "Show one theme while the computer is in light mode and another in dark mode. The theme you pick below is the one for the mode it is in now.", func() {
+		follow := "Show one theme while the computer is in light mode and another in dark mode. The theme you pick below is the one for the mode it is in now."
+		if s.oneMode {
+			follow = "Show one theme in light mode and another in dark mode. Your colour file's colours are light or dark, so the theme of their mode shows."
+		}
+		s.row(c, "Follow the computer", follow, func() {
 			if s.switchOf(c.Key("follow"), &s.set.FollowSystem).Label("Follow the computer").Changed() {
 				s.save()
 			}
@@ -200,6 +207,9 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 		if s.set.FollowSystem {
 			s.row(c, "In light mode", "", func() { s.themeSelect(c, "light-theme", "Theme in light mode", &s.set.LightTheme) })
 			s.row(c, "In dark mode", "", func() { s.themeSelect(c, "dark-theme", "Theme in dark mode", &s.set.DarkTheme) })
+		}
+		if !s.wornColors().Empty() {
+			s.hint(c, "Your colour file sets the colours. The theme sets the type, corners and effects.")
 		}
 		ui.Row(c).Wrap().Gap(10).Padding(14, 0).Children(func() {
 			active := s.set.ActiveTheme(k.systemDark)
@@ -219,12 +229,18 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 		})
 	}
 	s.group(c, "colour and type", func() {
-		s.row(c, "Follow the artwork", "Take the accent colour from the artwork of what plays.", func() {
+		s.colorFileSettings(c)
+		artwork, accent := "Take the accent colour from the artwork of what plays.", "Replaces the theme's accent when the artwork does not set it."
+		if s.set.ColorSource != settings.ColorsTheme {
+			artwork = "Take the accent colour from the artwork of what plays, over your colour file's."
+			accent = "Replaces your colour file's accent when the artwork does not set it."
+		}
+		s.row(c, "Follow the artwork", artwork, func() {
 			if s.switchOf(c.Key("dynamic-accent"), &s.set.DynamicAccent).Label("Follow the artwork").Changed() {
 				s.save()
 			}
 		})
-		s.row(c, "Accent colour", "Replaces the theme's accent when the artwork does not set it.", func() { s.accentControl(c) })
+		s.row(c, "Accent colour", accent, func() { s.accentControl(c) })
 		s.zoomRow(c)
 		s.row(c, "Text size", fmt.Sprintf("%d%%", int(s.set.FontScale*100+0.5)), func() {
 			if ui.StepSlider(c.Key("font-scale"), &s.set.FontScale, 0.85, 1.3, 0.05).Width(200).Label("Text size").Changed() {
@@ -289,7 +305,7 @@ func (s *shell) themeSelect(c *ui.Context, key, label string, id *string) {
 func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 	k := &s.lk
 	id, name := t.ID, t.Name
-	tk := newLook(settings.Settings{Theme: id, FontScale: 1}, s.inv.Themes, k.dark, "")
+	tk := newLook(settings.Settings{Theme: id, FontScale: 1}, s.inv.Themes, k.dark, "", colorfile.Colors{})
 	card := s.buttonBase(c.Key("theme-"+id)).Width(200).Height(124).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 		Padding(14).Background(tk.bg).Border(1, tk.border).Label(name).Cursor(ui.CursorPointer)
 	if current {
@@ -316,7 +332,11 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 // accentControl chooses the accent colour.
 func (s *shell) accentControl(c *ui.Context) {
 	s.colorControl(c, "accent", "Accent colour", s.chosenAccent(), func(hex string) { s.set.Accent = hex })
-	if s.set.Accent != "" && s.link(c, "accent-theme", "use the theme's") {
+	whose := "use the theme's"
+	if !s.wornColors().Empty() {
+		whose = "use the file's"
+	}
+	if s.set.Accent != "" && s.link(c, "accent-theme", whose) {
 		s.set.Accent = ""
 		s.wells["accent"].edits = 0
 		s.save()
@@ -457,19 +477,152 @@ func (s *shell) setThemeOption(theme, id, value string) {
 	s.set.ThemeOptions = options
 }
 
-// chosenAccent is the accent the user chose, or the active theme's.
+// chosenAccent is the accent the user chose, or the active theme's, or
+// the colour file's.
 func (s *shell) chosenAccent() ui.Color {
 	if a, ok := parseColor(s.set.Accent); ok && s.set.Accent != "" {
 		return col(a)
 	}
-	id := s.set.ActiveTheme(s.lk.systemDark)
-	for _, t := range s.inv.Themes {
-		if a, ok := parseColor(t.Colors["accent"]); ok && t.ID == id {
-			return col(a)
+	return s.lk.themeAccent
+}
+
+// wornColors are the colour file's colours the look wears, none while the
+// theme's show.
+func (s *shell) wornColors() colorfile.Colors {
+	if s.set.ColorSource == settings.ColorsTheme {
+		return colorfile.Colors{}
+	}
+	return s.colorFile.Colors
+}
+
+// colorSources are the choices of Colours from a file.
+var colorSources = []struct {
+	source settings.ColorSource
+	label  string
+}{
+	{settings.ColorsTheme, "Off"},
+	{settings.ColorsPywal, "pywal"},
+	{settings.ColorsMatugen, "matugen"},
+	{settings.ColorsFile, "A file of your own"},
+}
+
+// colorFileHelp is where docs/themes.md tells how to set up a colour file.
+const colorFileHelp = "https://fzn0x.github.io/mixmusic/docs/themes/#colours-from-a-file"
+
+// colorFileSettings chooses where the colours come from, and tells what
+// MixMusic read of the file.
+func (s *shell) colorFileSettings(c *ui.Context) {
+	k := &s.lk
+	labels := make([]string, len(colorSources))
+	chosen := labels[0]
+	for i, cs := range colorSources {
+		labels[i] = cs.label
+		if cs.source == s.set.ColorSource {
+			chosen = cs.label
 		}
 	}
-	a, _ := parseColor(fallbackTheme["accent"])
-	return col(a)
+	s.row(c, "Colours from a file", "Take the colours from pywal or matugen, and follow them as they change. The theme keeps its type, corners and effects.", func() {
+		if s.selectOf(c.Key("color-source"), &chosen, labels).Width(200).Label("Colours from a file").Changed() {
+			if i := slices.Index(labels, chosen); i >= 0 && colorSources[i].source != s.set.ColorSource {
+				s.set.ColorSource = colorSources[i].source
+				s.save()
+			}
+		}
+	})
+	source := s.set.ColorSource
+	if source == settings.ColorsTheme {
+		return
+	}
+	note, bad := colorFileNote(s.colorFile, s.set, time.Now())
+	ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
+		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
+			ui.Text(c, "Colour file").FontSize(k.bodySize())
+			if p := s.colorFile.Path; p != "" && s.colorFile.Source == source {
+				ui.Text(c, p).FontSize(k.smallSize()).TextColor(k.muted)
+			}
+			ink := k.muted
+			if bad {
+				ink = k.danger
+			}
+			ui.Text(c, note).FontSize(k.smallSize()).TextColor(ink)
+			ui.Row(c).Gap(16).Padding(4, 0, 0).Children(func() {
+				if s.link(c, "color-file-help", "how to set it up") {
+					go s.svc.System.OpenExternal(colorFileHelp)
+				}
+				if source == settings.ColorsMatugen && s.link(c, "copy-template", "copy the template") {
+					copyText(colorfile.MatugenTemplate)
+					s.notes = append(s.notes, notice("Template copied"))
+				}
+			})
+		})
+		if source != settings.ColorsFile {
+			return
+		}
+		ui.Row(c).Shrink(0).Gap(8).Children(func() {
+			in, _ := s.settingInput(c, "color-file", s.set.ColorFile, func(path string) {
+				s.set.ColorFile = settings.CleanPath(path)
+				s.save()
+			})
+			in.Placeholder("path to a colour file").Width(260).Label("Colour file")
+			if s.button(c, "choose-color-file", "choose", false).Label("Choose a colour file").Clicked() {
+				s.chooseColorFile()
+			}
+		})
+	})
+}
+
+// colorFileNote tells what MixMusic read of the colour file the settings
+// name, as of now, and whether that's a problem.
+func colorFileNote(st app.ColorFileStatus, set settings.Settings, now time.Time) (string, bool) {
+	source := set.ColorSource
+	switch {
+	case source == settings.ColorsFile && set.ColorFile == "":
+		return "Choose a file: pywal's colors.json, what matugen --json prints, or a theme.json.", false
+	case st.Source != source || st.Path == "" && st.Err == "":
+		return "Reading it…", false
+	case st.Missing && source == settings.ColorsPywal:
+		return "It isn't there yet: pywal writes it when you run wal.", true
+	case st.Missing && source == settings.ColorsMatugen:
+		return "It isn't there yet: add MixMusic's template to matugen's config.toml, and run matugen.", true
+	case st.Missing:
+		return "It isn't there. The theme's colours show until it is.", true
+	case st.Err != "" && !st.Colors.Empty():
+		return "It can't be read: " + strings.TrimSuffix(st.Err, ".") + ". MixMusic keeps the colours it read at " + clockOf(st.ReadAt, now) + ".", true
+	case st.Err != "":
+		return "It can't be read: " + strings.TrimSuffix(st.Err, ".") + ". The theme's colours show.", true
+	}
+	return "Read at " + clockOf(st.ReadAt, now) + ", and followed as it changes.", false
+}
+
+// clockOf is the time of t, with its day unless it is now's.
+func clockOf(t, now time.Time) string {
+	if y, m, d := t.Date(); y == now.Year() && m == now.Month() && d == now.Day() {
+		return t.Format("15:04")
+	}
+	return t.Format("2 Jan 15:04")
+}
+
+// openFileDialog asks the user for files, as MyGo's dialog does; tests
+// replace it.
+var openFileDialog = func(opts mygo.OpenDialogOptions) ([]string, error) { return mygo.Dialog.Open(opts) }
+
+// chooseColorFile asks the user for a colour file, beside the main thread,
+// and reads the one they choose.
+func (s *shell) chooseColorFile() {
+	win := s.win
+	go func() {
+		paths, err := openFileDialog(mygo.OpenDialogOptions{Parent: win, Title: "Choose a colour file", ShowHiddenFiles: true,
+			Filters: []mygo.FileFilter{{Name: "Colour files", Extensions: []string{"json"}}, {Name: "All files", Extensions: []string{"*"}}}})
+		s.update(func() {
+			switch {
+			case err != nil:
+				s.notes = append(s.notes, noticeOf(err))
+			case len(paths) > 0 && paths[0] != s.set.ColorFile:
+				s.set.ColorFile = paths[0]
+				s.save()
+			}
+		})
+	}()
 }
 
 // spotifyPlaysHere tells whether MixMusic plays Spotify itself: where its

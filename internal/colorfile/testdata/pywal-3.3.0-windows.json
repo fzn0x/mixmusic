@@ -1,0 +1,28 @@
+{
+    "wallpaper": "C:\Users\me\Pictures\harbour.jpg",
+    "alpha": "100",
+
+    "special": {
+        "background": "#0d1117",
+        "foreground": "#c5c8cc",
+        "cursor": "#c5c8cc"
+    },
+    "colors": {
+        "color0": "#0d1117",
+        "color1": "#3e6a8a",
+        "color2": "#5b7c99",
+        "color3": "#7a8fa3",
+        "color4": "#c2734b",
+        "color5": "#d68a5c",
+        "color6": "#8fa9bf",
+        "color7": "#c5c8cc",
+        "color8": "#5d6064",
+        "color9": "#3e6a8a",
+        "color10": "#5b7c99",
+        "color11": "#7a8fa3",
+        "color12": "#c2734b",
+        "color13": "#d68a5c",
+        "color14": "#8fa9bf",
+        "color15": "#c5c8cc"
+    }
+}

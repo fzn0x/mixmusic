@@ -1,0 +1,29 @@
+{
+    "checksum": "1b2c3d4e5f60718293a4b5c6d7e8f901",
+    "wallpaper": "/home/me/Pictures/dunes.jpg",
+    "alpha": "100",
+
+    "special": {
+        "background": "#eee9e3",
+        "foreground": "#2b2622",
+        "cursor": "#2b2622"
+    },
+    "colors": {
+        "color0": "#eee9e3",
+        "color1": "#b5643a",
+        "color2": "#c98a52",
+        "color3": "#d9a760",
+        "color4": "#7f8a6a",
+        "color5": "#9c7b62",
+        "color6": "#c4b29a",
+        "color7": "#2b2622",
+        "color8": "#8d847b",
+        "color9": "#b5643a",
+        "color10": "#c98a52",
+        "color11": "#d9a760",
+        "color12": "#7f8a6a",
+        "color13": "#9c7b62",
+        "color14": "#c4b29a",
+        "color15": "#2b2622"
+    }
+}

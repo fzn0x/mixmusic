@@ -61,6 +61,9 @@ type Options struct {
 	// mini player: windows that MyGo draws, of the root package.
 	Interface func(a *App, hidden bool) *mygo.Window
 	Mini      func(a *App) *mygo.Window
+	// Hotkeys registers the user's global shortcuts: mygo.GlobalShortcut
+	// when nil, once the app is ready.
+	Hotkeys Hotkeys
 }
 
 // App is MixMusic.
@@ -127,6 +130,8 @@ type App struct {
 	// trayHide hides the main window in the tray, out of full screen first
 	// on macOS (#84).
 	trayHide trayHide
+	// global holds the user's global shortcuts as registered (#80).
+	global globalShortcuts
 
 	mu         sync.Mutex
 	installed  string // the version installed to run at the next start
@@ -158,6 +163,7 @@ type App struct {
 func New(opts Options) (*App, error) {
 	a := &App{opts: opts, lastCrash: opts.LastCrash}
 	a.here.a = a
+	a.global.repeats = runtime.GOOS == "linux"
 	var err error
 	if a.settings, err = store.Open(filepath.Join(opts.DataDir, "settings.json"), settings.Default()); err != nil {
 		return nil, fmt.Errorf("opening settings: %w", err)
@@ -239,6 +245,9 @@ func (a *App) apply(s settings.Settings) {
 	if mygo.App.IsReady() {
 		a.applyMediaKeys(s.MediaKeys)
 	}
+	// Whether they can register yet, hotkeys tells, which tests give
+	// their own. The settings' save tells the windows of the problems.
+	a.applyGlobalShortcuts(false)
 	if !s.DiscordPresence {
 		a.presence.update(false, "", NowPlaying{})
 	}

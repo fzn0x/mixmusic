@@ -2,6 +2,7 @@ package youtube
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"os"
 	"testing"
@@ -64,6 +65,29 @@ func TestLive(t *testing.T) {
 	suggestions, err := c.Suggestions(ctx, "daft p")
 	if err != nil || len(suggestions) == 0 {
 		t.Fatalf("suggestions: %v, %v", suggestions, err)
+	}
+}
+
+// TestLiveLabels reads the label of AI of videos YouTube labels, an upload
+// and an art track, and of one it doesn't. It runs with MIXMUSIC_LIVE=1. A
+// video YouTube no longer has is passed over.
+func TestLiveLabels(t *testing.T) {
+	if os.Getenv("MIXMUSIC_LIVE") == "" {
+		t.Skip("set MIXMUSIC_LIVE=1 to test against YouTube")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	c := New()
+	for id, want := range map[string]bool{"NWuajLluF_E": true, "_d9BrC8DEcs": true, "dQw4w9WgXcQ": false} {
+		ai, err := c.MadeWithAI(ctx, id)
+		switch {
+		case errors.Is(err, ErrNotFound):
+			t.Logf("YouTube has no video %s any more", id)
+		case err != nil:
+			t.Errorf("label of %s: %v", id, err)
+		case ai != want:
+			t.Errorf("label of %s = %v, want %v", id, ai, want)
+		}
 	}
 }
 

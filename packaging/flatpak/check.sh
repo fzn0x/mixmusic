@@ -60,16 +60,34 @@ runtime_dir="$(mktemp -d)"
 chmod 700 "$runtime_dir"
 # The sandbox sees its own folder of the home folder, at the same path.
 inside="$HOME/.var/app/$id/capture"
+# GTK loads images through glycin, whose loaders run in sandboxes of their
+# own that flatpak-spawn asks the Flatpak portal for, as on a desktop: the
+# session bus gets flatpak's portal, which nothing starts here.
+portal="$(command -v flatpak-portal || ls /app/libexec/flatpak-portal /usr/libexec/flatpak-portal 2>/dev/null | head -n 1 || true)"
+if [ -z "$portal" ]; then
+	echo "No flatpak-portal: images won't load" >&2
+fi
+export PORTAL="$portal" ID="$id" INSIDE="$inside"
 status=0
-XDG_RUNTIME_DIR="$runtime_dir" timeout 300 dbus-run-session -- xvfb-run --auto-servernum -s "-screen 0 1600x1000x24" \
-	flatpak run --user \
-	--env=MIXMUSIC_CAPTURE="$inside" \
-	--env=MIXMUSIC_CAPTURE_ROUTES="/|/settings/about|/settings/playback" \
-	--env=MIXMUSIC_CAPTURE_WAIT=15s \
-	--env=MIXMUSIC_CAPTURE_SIZE=1440x900 \
-	--env=MIXMUSIC_CAPTURE_QUIT=1 \
-	--env=MIXMUSIC_SILENT=1 \
-	"$id" || status=$?
+XDG_RUNTIME_DIR="$runtime_dir" timeout 300 dbus-run-session -- bash -c '
+	if [ -n "$PORTAL" ]; then
+		"$PORTAL" --replace &
+		for _ in $(seq 50); do
+			gdbus call --session --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus \
+				--method org.freedesktop.DBus.NameHasOwner org.freedesktop.portal.Flatpak 2>/dev/null | grep -q true && break
+			sleep 0.1
+		done
+	fi
+	xvfb-run --auto-servernum -s "-screen 0 1600x1000x24" \
+		flatpak run --user \
+		--env=MIXMUSIC_CAPTURE="$INSIDE" \
+		--env=MIXMUSIC_CAPTURE_ROUTES="/|/settings/about|/settings/playback" \
+		--env=MIXMUSIC_CAPTURE_WAIT=15s \
+		--env=MIXMUSIC_CAPTURE_SIZE=1440x900 \
+		--env=MIXMUSIC_CAPTURE_QUIT=1 \
+		--env=MIXMUSIC_SILENT=1 \
+		"$ID"
+' || status=$?
 cp -r "$inside/." "$shots/" 2>/dev/null || true
 while IFS= read -r log; do
 	echo "-- $log"

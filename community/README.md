@@ -4,12 +4,16 @@ Everything here can be installed by every MixMusic user from the
 marketplace (the store icon of the sidebar). The app reads
 [registry-2.json](registry-2.json), which lists the themes in `themes/` and
 the plugins in `plugins/`, and downloads the files of what the user
-installs. Plugins here are made for MixMusic's own interface: their
-`plugin.json` says `"api": 2`.
+installs from the [registry branch](https://github.com/fzn0x/mixmusic/tree/registry),
+where the Registry workflow publishes them on every change here. Plugins
+here are made for MixMusic's own interface: their `plugin.json` says
+`"api": 2`, and they are written in TypeScript. main keeps their
+TypeScript; the registry branch, the JavaScript it compiles to.
 
 MixMusic 0.4 and before read [registry.json](registry.json) instead, the
-registry of their web interface: it lists the add-ons of `web/`, as they
-were when MixMusic moved to its own interface, and stays as it is.
+registry of their web interface: it lists the add-ons of `web/` on the
+registry branch, as they were when MixMusic moved to its own interface,
+and stays as it is.
 
 ## Share yours
 
@@ -17,12 +21,16 @@ were when MixMusic moved to its own interface, and stays as it is.
    [docs/plugins.md](../docs/plugins.md), and try it from your add-ons folder.
 2. Fork this repository and add its folder:
    - a theme: `community/themes/<id>/`, with `theme.json` and its other files;
-   - a plugin: `community/plugins/<id>/`, with `plugin.json` and its other
-     files.
-3. List every file of the folder in the manifest's `files`.
-4. Update the registry, and check it:
+   - a plugin: `community/plugins/<id>/`, with `plugin.json` and its
+     TypeScript, as `index.ts`.
+3. List every file of the folder in the manifest's `files`: for a plugin,
+   the JavaScript its TypeScript compiles to (`index.js`), not the
+   TypeScript itself. Git leaves the JavaScript out: don't commit it.
+4. Compile the plugins, update the registry, and check it:
 
    ```sh
+   bun install
+   bun run build:plugins
    go run ./tools/registry
    go run ./tools/registry -check
    ```

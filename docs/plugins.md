@@ -88,11 +88,12 @@ ES module does; with TypeScript's own:
 tsc --target ES2022 --module ESNext --moduleResolution bundler --strict index.ts
 ```
 
-The plugins of this repository's `community/plugins` are written so:
-`bun run build:plugins` compiles them, as it does the plugin API's own
-`internal/plugins/api.ts`, and CI checks that their JavaScript is what their
-TypeScript compiles to. A plugin may be written in JavaScript straight
-away too: the same module, without the types.
+The plugins of this repository's `community/plugins` are written so, and
+keep only their TypeScript: `bun run build:plugins` compiles them, as it
+does the plugin API's own `internal/plugins/api.ts`, and the Registry
+workflow publishes their JavaScript to the registry branch, where the
+marketplace downloads it. A plugin of your own may be written in
+JavaScript straight away too: the same module, without the types.
 
 ## The API
 

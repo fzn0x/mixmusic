@@ -331,6 +331,7 @@ bun run dev        # the app, rebuilt as you edit it
 ```
 
 ```sh
+bun run build:plugins          # the plugins' JavaScript, from their TypeScript
 go test ./...                  # the app
 bun run typecheck              # the plugin SDK and the community's plugins
 bun run build                  # the packaged app of this system, in build/

@@ -222,14 +222,20 @@ func shortcutLabel(s string) string {
 	if s == "" {
 		return ""
 	}
-	r := strings.NewReplacer("ArrowLeft", "←", "ArrowRight", "→", "ArrowUp", "↑", "ArrowDown", "↓")
 	if runtime.GOOS == "darwin" {
-		r = strings.NewReplacer("Mod+", "⌘", "Shift+", "⇧", "Alt+", "⌥", "Ctrl+", "⌃",
-			"ArrowLeft", "←", "ArrowRight", "→", "ArrowUp", "↑", "ArrowDown", "↓")
-		return r.Replace(s)
+		return macKeyLabels.Replace(s)
 	}
-	return r.Replace(strings.ReplaceAll(s, "Mod+", "Ctrl+"))
+	return arrowLabels.Replace(strings.ReplaceAll(s, "Mod+", "Ctrl+"))
 }
+
+// arrowLabels write the arrows of shortcuts as arrows, and macKeyLabels
+// the modifiers too, as macOS does. Shortcuts' labels show in every frame
+// of Settings › Shortcuts and the palette: the replacers are made once.
+var (
+	arrowLabels  = strings.NewReplacer("ArrowLeft", "←", "ArrowRight", "→", "ArrowUp", "↑", "ArrowDown", "↓")
+	macKeyLabels = strings.NewReplacer("Mod+", "⌘", "Shift+", "⇧", "Alt+", "⌥", "Ctrl+", "⌃",
+		"ArrowLeft", "←", "ArrowRight", "→", "ArrowUp", "↑", "ArrowDown", "↓")
+)
 
 // shortcuts run the commands whose shortcuts were pressed, but while the
 // user records one, whose keys are the shortcut's instead.

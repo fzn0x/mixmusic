@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/mp4"
 	"github.com/fzn0x/mixmusic/internal/stream"
 	"github.com/fzn0x/mixmusic/internal/tools"
+	"github.com/fzn0x/mixmusic/mp4"
 )
 
 // liveSongs are the songs TestLivePlays plays: two that YouTube has only

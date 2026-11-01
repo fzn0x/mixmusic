@@ -7,7 +7,7 @@ the library of the services of `internal/app`, and the player in Go plays
 the queue through MixMusic's own audio engine, or on Spotify's devices.
 
 ```
-┌──────────────────── the windows (internal/native) ──────────────────┐
+┌────────────────── the windows (the root package) ───────────────────┐
 │ pages, shell, player bar, queue, lyrics, mini player, themes,       │
 │ plugins' pages and widgets                                          │
 └──────┬──────────────────────────┬────────────────────────┬──────────┘
@@ -52,28 +52,27 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   (`Stream.Loudness`, `Direct.Loudness`). Its answers are tested against
   recorded ones in `testdata/`, and against YouTube with
   `MIXMUSIC_LIVE=1 go test ./internal/stream -run Live`.
-- **`internal/webm`** reads the audio of WebM files, as YouTube serves it:
+- **`webm`** reads the audio of WebM files, as YouTube serves it:
   the packets of the first audio track with their times, and seeking by the
   Cues, reading a file played from its start straight through.
-- **`internal/opus`** decodes Opus: a pure Go port of libopus 1.6.1's decoder
-  (`celt`, `silk` and the range decoder `rangedec`), which decodes the test
+- **`opus`** decodes Opus: a pure Go port of libopus 1.6.1's decoder
+  (`celt`, `silk` and the range decoder `rangedec`, in `opus/internal`), which decodes the test
   vectors of RFC 8251 as libopus does, bit for bit.
-- **`internal/mp4`** reads the audio of MP4 files, as YouTube serves its
+- **`mp4`** reads the audio of MP4 files, as YouTube serves its
   AAC: the packets of the first audio track with their times, and the
   codec delay of the edit list, from progressive files and fragmented
   ones, seeking by the sample table, the `sidx` or the `moof` boxes.
-- **`internal/aac`** decodes AAC-LC, in mono or stereo, with all of its
+- **`aac`** decodes AAC-LC, in mono or stereo, with all of its
   tools: a pure Go decoder derived from SharpJaad, the C# port of JAAD,
   under SharpJaad's MIT license, which decodes YouTube's AAC within about
   136 dB of ffmpeg's decoder, but for the few frames whose channels share
   their noise, as the standard has it and ffmpeg's decoder doesn't.
-  **`internal/audio/resample`** converts it from its rate, 44.1 kHz for
+  **`resample`** converts it from its rate, 44.1 kHz for
   YouTube, to the engine's 48 kHz, with a polyphase filter of
   Kaiser-windowed sincs.
 - **`internal/audio`** is MixMusic's audio engine: two decks, each a
-  goroutine that reads a track, Opus in WebM with `internal/webm` and
-  `internal/opus`, or AAC in MP4 with `internal/mp4`, `internal/aac` and
-  `internal/audio/resample`, as its first bytes tell, and decodes it into
+  goroutine that reads a track, Opus in WebM with `webm` and `opus`, or AAC
+  in MP4 with `mp4`, `aac` and `resample`, as its first bytes tell, and decodes it into
   a ring the audio thread plays from, at 48 kHz, each turning a
   track louder than -14 LKFS down to it, from the loudness its `Measured`
   source tells (Even loudness), and the preamp, equalizer, levelling
@@ -117,7 +116,7 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
   title, artists and duration, for playback without a Spotify device.
-- **`internal/lyrics`** finds synced lyrics on LRCLIB and reads LRC.
+- **`lyrics`** finds synced lyrics on LRCLIB and reads LRC.
 - **`internal/library`** keeps liked songs, mixes, the history and stats in
   `library.json`.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
@@ -148,7 +147,7 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 
 ## The windows
 
-`internal/native` draws the main window and the mini player. Pages fetch
+The root package draws the main window and the mini player. Pages fetch
 what they show beside the main thread (`fetch`), and a window's state
 belongs to its main thread: what finishes elsewhere comes back through
 `update`.
@@ -234,5 +233,5 @@ keeps the visualizer and the lyrics moving without a sound.
 registry from a copy of `community/`, for add-ons not on GitHub yet. The
 site's screenshots are made this way, from a throwaway profile, at
 1536x900 (`MIXMUSIC_CAPTURE_SIZE=1552x909`: the size includes the
-window's invisible borders). `go test ./internal/native -run Render` with
+window's invisible borders). `go test . -run Render` with
 `MIXMUSIC_RENDER=<dir>` draws the pages and themes without a window.

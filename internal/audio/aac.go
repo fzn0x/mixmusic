@@ -6,9 +6,9 @@ import (
 	"io"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/aac"
-	"github.com/fzn0x/mixmusic/internal/audio/resample"
-	"github.com/fzn0x/mixmusic/internal/mp4"
+	"github.com/fzn0x/mixmusic/aac"
+	"github.com/fzn0x/mixmusic/mp4"
+	"github.com/fzn0x/mixmusic/resample"
 )
 
 // aacTrack is the AAC-LC track of an MP4 file, as YouTube serves it at

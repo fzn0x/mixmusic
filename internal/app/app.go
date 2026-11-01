@@ -20,7 +20,6 @@ import (
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/library"
-	"github.com/fzn0x/mixmusic/internal/lyrics"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/online"
@@ -32,6 +31,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/taskbar"
 	"github.com/fzn0x/mixmusic/internal/tools"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/lyrics"
 )
 
 // artworkLimit bounds the artwork kept on disk, in bytes.
@@ -58,7 +58,7 @@ type Options struct {
 	// LastCrash is the crash report of the run before, when it crashed.
 	LastCrash string
 	// Interface opens the main window, hidden when asked, and Mini the
-	// mini player: windows that MyGo draws, of package native.
+	// mini player: windows that MyGo draws, of the root package.
 	Interface func(a *App, hidden bool) *mygo.Window
 	Mini      func(a *App) *mygo.Window
 }

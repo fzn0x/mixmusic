@@ -10,7 +10,7 @@ export default defineConfig({
   identifier: "app.mixmusic.desktop",
   version: pkg.version,
   copyright: "© 2026 MixMusic contributors",
-  // MyGo draws the windows itself, in Go (internal/native): the only page
+  // MyGo draws the windows itself, in Go (the root package): the only page
   // is that of MixMusic's own Spotify device, public/spotify.html, which
   // `mygo build` embeds as it is. It calls Go without a generated client,
   // so `mygo dev` writes it out of the way.

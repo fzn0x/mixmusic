@@ -215,3 +215,18 @@ func TestLyricsByVideo(t *testing.T) {
 		t.Errorf("a Spotify track matched: query %q", got)
 	}
 }
+
+// TestLyricsLanguage keeps the language Unison tells of its lyrics, and
+// guesses that of others from their words.
+func TestLyricsLanguage(t *testing.T) {
+	ls := newLyricsSources(t)
+	ls.unison = status(http.StatusOK, `{"success":true,"data":{"format":"plain","language":"ja","lyrics":"Kami no tako"}}`)
+	if l, err := ls.c.Lyrics(context.Background(), aSong); err != nil || l.Language != "ja" {
+		t.Errorf("Unison's: %+v, %v", l, err)
+	}
+	ls = newLyricsSources(t)
+	ls.lrclib = status(http.StatusOK, `{"syncedLyrics":"[00:01.00]Las cometas de papel sobre la bahía\n[00:02.00]Y yo te espero en la noche"}`)
+	if l, err := ls.c.Lyrics(context.Background(), aSong); err != nil || l.Language != "es" {
+		t.Errorf("LRCLIB's: %+v, %v", l, err)
+	}
+}

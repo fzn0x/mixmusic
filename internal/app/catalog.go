@@ -249,6 +249,9 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 		log.Printf("mixmusic: the lyrics of %s: %v", track.ID, err)
 		return lyrics.Lyrics{}, lyricsError{"Lyrics can't be loaded right now. Check your connection, or try again in a moment.", err}
 	}
+	if l.Language == "" {
+		l.Language = lyrics.GuessLanguage(l.Lines)
+	}
 	c.a.lyricsMemo.put(track.ID, l)
 	return l, nil
 }

@@ -311,6 +311,48 @@ func TestRenderThemes(t *testing.T) {
 	}
 }
 
+// TestRenderColorFiles draws the home page and the mini player of themes
+// in the colours of pywal's and matugen's files to MIXMUSIC_RENDER, and the
+// appearance settings that read them.
+func TestRenderColorFiles(t *testing.T) {
+	dir := os.Getenv("MIXMUSIC_RENDER")
+	if dir == "" {
+		t.Skip("MIXMUSIC_RENDER names no folder")
+	}
+	s := newTestShell(t)
+	var items []media.Item
+	for i := range testTracks {
+		items = append(items, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
+	}
+	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
+	s.p.PlayTracks(testTracks, 1)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	for _, c := range []struct{ name, file, theme string }{
+		{"pywal", "pywal-3.8.json", "mix"}, {"pywal-light", "pywal-light.json", "daylight"},
+		{"pywal-aurora", "pywal-3.8.json", "aurora"}, {"pywal-light-greenroom", "pywal-light.json", "greenroom"},
+		{"matugen-mochi", "matugen-4.2.json", "mochi"}, {"matugen-terminal", "matugen-4.2.json", "terminal"},
+	} {
+		path, err := filepath.Abs(filepath.Join("internal", "colorfile", "testdata", c.file))
+		if err != nil {
+			t.Fatal(err)
+		}
+		st := s.svc.Preferences.Get()
+		st.FollowSystem, st.Theme, st.DynamicAccent = false, c.theme, false
+		st.ColorSource, st.ColorFile = settings.ColorsFile, path
+		if _, err := s.svc.Preferences.Set(st); err != nil {
+			t.Fatal(err)
+		}
+		s.refresh()
+		s.navigate("/")
+		renderTo(t, s, ui.NewTester(s.view, 1280, 820), dir, "colors-"+c.name)
+		renderTo(t, s, ui.NewTester(s.miniView, 420, 132), dir, "colors-"+c.name+"-mini")
+		if c.name == "pywal" {
+			s.navigate("/settings/appearance")
+			renderTo(t, s, ui.NewTester(s.view, 1280, 2200), dir, "colors-pywal-settings")
+		}
+	}
+}
+
 // TestRenderDialogs draws the dialogs to MIXMUSIC_RENDER, in a window as
 // tall as usual and in one too short for them, at the largest text size,
 // and the update offer in the themes whose panels differ.

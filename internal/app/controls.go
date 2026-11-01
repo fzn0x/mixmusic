@@ -12,6 +12,7 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/nowplaying"
+	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // controls shows what MixMusic's own audio engine plays in the system's
@@ -95,6 +96,7 @@ func controlsInfo(np NowPlaying, at time.Time) *nowplaying.Info {
 		At:       at,
 		Playing:  np.Playing,
 		Volume:   np.Volume,
+		Rate:     np.speed(),
 	}
 	if info.Duration <= 0 {
 		info.Duration = time.Duration(t.DurationMs) * time.Millisecond
@@ -108,6 +110,20 @@ func controlsInfo(np NowPlaying, at time.Time) *nowplaying.Info {
 	return info
 }
 
+// setSongSpeed keeps speed, as the system's controls ask it, as the speed
+// of songs, which the player takes in: the speed of the kind of track that
+// plays, as no other kind plays yet.
+func (a *App) setSongSpeed(speed float64) {
+	st := a.settings.Get()
+	if speed = settings.CleanSpeed(speed); speed == st.SongSpeed {
+		return
+	}
+	st.SongSpeed = speed
+	if _, err := (&Preferences{a}).Set(st); err != nil {
+		log.Printf("mixmusic: keeping the speed: %v", err)
+	}
+}
+
 // controlsAsked does what the system's controls ask.
 func (a *App) controlsAsked(r nowplaying.Request) {
 	switch r.Command {
@@ -117,6 +133,8 @@ func (a *App) controlsAsked(r nowplaying.Request) {
 		a.command(PlayerCommand{Command: CommandSeek, Value: ms(r.Position)})
 	case nowplaying.SetVolume:
 		a.command(PlayerCommand{Command: CommandVolume, Value: r.Volume})
+	case nowplaying.SetRate:
+		a.setSongSpeed(r.Rate)
 	default:
 		if c, ok := controlCommands[r.Command]; ok {
 			a.command(PlayerCommand{Command: c})

@@ -158,6 +158,7 @@ func (s playerServices) Report(now player.Now) {
 		Volume:     now.Volume,
 		Shuffle:    now.Shuffle,
 		Repeat:     Repeat(now.Repeat),
+		Speed:      now.Speed,
 	}
 	if now.Track != nil {
 		np.Liked = s.a.library.IsLiked(now.Track.ID)

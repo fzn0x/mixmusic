@@ -17,6 +17,16 @@ All notable changes to MixMusic are documented here. The format follows
 
 - A new icon: two pink rings and a play button on black, in the app, the
   tray, the website and the README.
+- When the network drops, a song waits for it and plays on from where it
+  stopped once it's back, rather than MixMusic skipping songs until three
+  in a row failed. The player bar says that it waits for the network,
+  and the play button chooses whether the song plays then. Songs whose
+  audio MixMusic holds, in the offline cache or found shortly before,
+  still play meanwhile, and at the end of the queue the radio waits too
+  (#91).
+- MixMusic pauses as the computer goes to sleep, and stays paused when it
+  wakes, ready where it was; a Spotify Connect device elsewhere plays on
+  (#91).
 - MixMusic is dual-licensed: use it under the MIT license, as before, or
   under the GNU General Public License, version 3, whichever you prefer.
   Settings › About says so.

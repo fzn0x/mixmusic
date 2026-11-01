@@ -103,7 +103,7 @@ editor at it with a JSDoc `@param {import("./sdk").MixMusicAPI} api`.
 
 | | |
 |---|---|
-| `api.player` | the state of the player (`state()`), the transport, the queue (`playTracks`, `playNext`, `enqueue`), events (`on("trackchange" \| "statechange" \| "progress" \| "queuechange")`) and the `analyser()` of what plays, which has the reading methods of the web's AnalyserNode: MixMusic's own player, and on Windows Spotify too, in MixMusic or the Spotify app on this computer |
+| `api.player` | the state of the player (`state()`), the transport, the queue (`playTracks`, `playNext`, `enqueue`), events (`on("trackchange" \| "statechange" \| "progress" \| "queuechange")`) and the `analyser()` of what plays, which has the reading methods of the web's AnalyserNode: MixMusic's own player, and on Windows Spotify too, in MixMusic or the Spotify app on this computer. While the user has Skip songs made with AI on, the player passes over the tracks YouTube labels so in what plugins queue too, the first of `playTracks` included |
 | `api.catalog` | search both services, and read albums, artists, playlists, radios and lyrics |
 | `api.library` | liked songs and the user's mixes |
 | `api.ui` | `toast`, `navigate`, `theme`, `addSidebarItem`, `addPage`, `addTrackAction`, `addWidget`, and the elements pages show |

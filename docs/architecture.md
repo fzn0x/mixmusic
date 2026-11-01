@@ -32,7 +32,10 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   albums, artists, playlists, related tracks, radios and plain lyrics.
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
-  liked songs, playlists, albums, subscriptions, likes and saves. Its
+  liked songs, playlists, albums, subscriptions, likes and saves. It also
+  reads whether YouTube labels a video as made with AI, from the answer of
+  YouTube's own website, asked signed out with a field mask
+  (`MadeWithAI`): nothing of YouTube Music carries the label. Its
   parsers are tested against recorded responses in `testdata/`, and against
   the live service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run
   Live` (`MIXMUSIC_YT_COOKIES` adds a signed-in account).
@@ -106,7 +109,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   around the one playing, in `queue.json`, as it changes and as MixMusic
   quits. A track that can't play for want of the network waits for it
   where it was, and plays on once it answers; the player pauses as the
-  computer sleeps.
+  computer sleeps. While Skip songs made with AI is on, it passes over the
+  tracks YouTube labels so as it moves on by itself, but not those the user
+  picks (`labels.go`): a track whose label the app doesn't know is checked
+  before it's announced, beside the search for its stream, and the next
+  track before it's preloaded or crossfaded into.
 - **`internal/online`** tells the player whether the network answers: a
   check of YouTube's and Spotify's addresses over HTTPS, shared by its
   callers, which audio coming from YouTube answers too, and a wait for the
@@ -199,7 +206,8 @@ files only the user can read (`spotify-token.json`, `lastfm.json`,
 `youtube-session.json`). `secretStore` (`internal/app/secrets.go`) moves a
 secret found in a file into the credential store once it can keep it. The
 cache folder holds audio, the covers shown (`artwork/`), matches, how loud
-YouTube measured the tracks played (`loudness.json`), and yt-dlp's cache,
+YouTube measured the tracks played (`loudness.json`), the videos YouTube
+labels as made with AI, for 30 days (`ai-labels.json`), and yt-dlp's cache,
 and the logs folder the log and the crash reports. `MIXMUSIC_DATA_DIR`
 moves all three into one folder, for a portable copy or a test run.
 `MIXMUSIC_YTDLP_ONLY=1` has yt-dlp find every stream, as before MixMusic

@@ -49,8 +49,8 @@ func (a *App) startGoPlayer() (*player.Player, error) {
 	return p, nil
 }
 
-// applyEngine gives the engine the sound of the settings: the equalizer
-// and the levelling.
+// applyEngine gives the engine the sound of the settings: the equalizer,
+// the levelling and Even loudness.
 func (a *App) applyEngine(s settings.Settings) {
 	e := a.nativeEngine()
 	if e == nil {
@@ -60,6 +60,7 @@ func (a *App) applyEngine(s settings.Settings) {
 	copy(gains[:], s.Equalizer.Gains)
 	e.SetEqualizer(s.Equalizer.Enabled, gains, s.Equalizer.Preamp)
 	e.SetNormalize(s.Normalize)
+	e.SetLoudness(s.Loudness)
 }
 
 // commandGoPlayer has the native interface's player do what the tray, the

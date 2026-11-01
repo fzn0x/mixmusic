@@ -269,9 +269,12 @@ func TestAuthUser(t *testing.T) {
 	if c.AuthUser() != 0 {
 		t.Errorf("a negative index gave %d", c.AuthUser())
 	}
-	c.SetAuthUser(1)
+	c.SetAccount(1, "1234")
+	if c.AuthUser() != 1 || c.Channel() != "1234" {
+		t.Errorf("SetAccount gave %d, %q", c.AuthUser(), c.Channel())
+	}
 	c.SetCookies(nil)
-	if c.AuthUser() != 0 {
+	if c.AuthUser() != 0 || c.Channel() != "" {
 		t.Error("signing out kept the account")
 	}
 }

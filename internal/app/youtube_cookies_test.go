@@ -392,3 +392,68 @@ func TestRemoveCookieExports(t *testing.T) {
 		t.Error("another file went")
 	}
 }
+
+// TestChooseAccountAndChannel uses YouTube Music as a channel of another
+// Google account of the session, and keeps the account beside the
+// session, through the cookies YouTube changes.
+func TestChooseAccountAndChannel(t *testing.T) {
+	var last atomic.Pointer[http.Request]
+	accounts := `{"actions":[{"getMultiPageMenuAction":{"menu":{"multiPageMenuRenderer":{"sections":[
+		{"accountSectionListRenderer":{"header":{"googleAccountHeaderRenderer":{"email":{"simpleText":"ada@example.com"}}},
+			"contents":[{"accountItemSectionRenderer":{"contents":[{"accountItem":{"accountName":{"simpleText":"Ada"},
+				"serviceEndpoint":{"selectActiveIdentityEndpoint":{"supportedTokens":[{"accountSigninToken":{"signinUrl":"/signin?authuser=0"}}]}}}}]}}]}},
+		{"accountSectionListRenderer":{"header":{"googleAccountHeaderRenderer":{"email":{"simpleText":"bob@example.com"}}},
+			"contents":[{"accountItemSectionRenderer":{"contents":[{"accountItem":{"accountName":{"simpleText":"Bob's Band"},
+				"serviceEndpoint":{"selectActiveIdentityEndpoint":{"supportedTokens":[{"pageIdToken":{"pageId":"222222222222222222222"}},
+					{"accountSigninToken":{"signinUrl":"/signin?pageid=222222222222222222222&authuser=1"}}]}}}}]}}]}}
+	]}}}}]}`
+	menu := signedIn(true)
+	a, _ := cookieApp(t, func(w http.ResponseWriter, r *http.Request) {
+		last.Store(r)
+		if strings.HasSuffix(r.URL.Path, "/accounts_list") {
+			http.SetCookie(w, &http.Cookie{Name: "SIDCC", Value: "rotated", Path: "/"})
+			w.Write([]byte(accounts))
+			return
+		}
+		menu(w, r)
+	})
+	s := &Accounts{a}
+	ctx := context.Background()
+	if _, err := s.YouTubePasteCookies(ctx, "SAPISID=pasted"); err != nil {
+		t.Fatal(err)
+	}
+	list, err := s.YouTubeChannels(ctx)
+	if err != nil || len(list) != 2 || !list[0].Current || list[1].Current || list[1].AuthUser != 1 || list[1].Email != "bob@example.com" {
+		t.Fatalf("channels = %+v, %v", list, err)
+	}
+
+	band := list[1]
+	if _, err := s.SetYouTubeChannel(ctx, band.AuthUser, band.PageID); err != nil {
+		t.Fatal(err)
+	}
+	if r := last.Load(); r.Header.Get("X-Goog-AuthUser") != "1" || r.Header.Get("X-Goog-PageId") != band.PageID {
+		t.Errorf("the account was read as %q, %q", r.Header.Get("X-Goog-AuthUser"), r.Header.Get("X-Goog-PageId"))
+	}
+	if a.settings.Get().YouTubeChannel != band.PageID {
+		t.Errorf("the channel kept is %q", a.settings.Get().YouTubeChannel)
+	}
+	if list, _ := s.YouTubeChannels(ctx); list[0].Current || !list[1].Current {
+		t.Errorf("after choosing: %+v", list)
+	}
+	// YouTube changed a cookie meanwhile: the account stays with it.
+	kept, err := a.youtubeStore.Load()
+	if err != nil || kept.authUser != 1 || !slices.Contains(cookieNames(kept.cookies), "SIDCC=rotated") {
+		t.Errorf("kept account %d with %q, %v", kept.authUser, cookieNames(kept.cookies), err)
+	}
+
+	// A channel that isn't one of the session any more is none of the list.
+	if _, err := s.SetYouTubeChannel(ctx, 1, "333333333333333333333"); err != nil {
+		t.Fatal(err)
+	}
+	if list, _ := s.YouTubeChannels(ctx); list[0].Current || list[1].Current {
+		t.Errorf("a channel gone is current: %+v", list)
+	}
+	if _, err := s.SetYouTubeChannel(ctx, -1, ""); err == nil {
+		t.Error("chose an account that can't be")
+	}
+}

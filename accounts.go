@@ -168,7 +168,7 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 			if i := slices.Index(labels, chosen); i >= 0 {
 				ch := list[i]
 				s.account("", "Using YouTube Music as "+ch.Name, func(ctx context.Context) error {
-					_, err := s.svc.Accounts.SetYouTubeChannel(ctx, ch.PageID)
+					_, err := s.svc.Accounts.SetYouTubeChannel(ctx, ch.AuthUser, ch.PageID)
 					return err
 				})
 			}

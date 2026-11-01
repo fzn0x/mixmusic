@@ -172,6 +172,15 @@ func (c *Client) SetAuthUser(i int) {
 	c.authUser = max(i, 0)
 }
 
+// SetAccount makes the client use YouTube Music as the Google account of
+// index authUser and, with pageID, as its brand channel, both at once: a
+// brand channel goes with its own account alone.
+func (c *Client) SetAccount(authUser int, pageID string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.authUser, c.pageID = max(authUser, 0), pageID
+}
+
 // AuthUser returns the index of the Google account the client uses.
 func (c *Client) AuthUser() int {
 	c.mu.Lock()

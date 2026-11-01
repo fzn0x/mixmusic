@@ -2,6 +2,10 @@ package native
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -353,4 +357,53 @@ func TestRecordSpace(t *testing.T) {
 	if s.set.Shortcuts["player.mute"] != "Space" || s.set.Shortcuts["player.toggle"] != "" {
 		t.Errorf("Space wasn't recorded: %v", s.set.Shortcuts)
 	}
+}
+
+// TestControlsLeaveSpace keeps the window's controls built on pointerKeys:
+// MyGo's own controls, made in internal/native, would take Space after a
+// click, and buttons keeping the focus where it was would leave it in the
+// search box. The palette's rows and the dialogs' buttons are in dialogs,
+// where the window's shortcuts wait; the sliders keep the focus for their
+// arrows (#38), and the mini player runs no shortcuts.
+func TestControlsLeaveSpace(t *testing.T) {
+	raw := regexp.MustCompile(`ui\.(ButtonBase|Switch|Select|Link|ColorWell|SegmentedBase|CollapsibleBase|Collapsible)\(`)
+	files, err := filepath.Glob("*.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range files {
+		if strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		data, err := os.ReadFile(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for i, line := range strings.Split(string(data), "\n") {
+			at := name + ":" + count(i+1)
+			switch {
+			case raw.MatchString(line) && !allowedRaw(name, line):
+				t.Errorf("%s builds a control without pointerKeys: %s", at, strings.TrimSpace(line))
+			case strings.Contains(line, ".KeepFocus()") && name != "mini.go" && !strings.Contains(line, "ui.Slider("):
+				t.Errorf("%s keeps the focus off a control: %s", at, strings.TrimSpace(line))
+			}
+		}
+	}
+}
+
+// allowedRaw tells the lines that may build MyGo's controls as they come.
+func allowedRaw(name, line string) bool {
+	switch {
+	case name == "widgets.go" && strings.Contains(line, "s.pointerKeys(ui."):
+		return true
+	case name == "widgets.go" && strings.Contains(line, "s.styledButton(ui.ButtonBase("):
+		return true
+	case name == "widgets.go" && strings.Contains(line, "ui.SegmentedBase("):
+		return true
+	case name == "stats.go" && strings.Contains(line, "ui.CollapsibleBase("):
+		return true
+	case name == "commands.go" && strings.Contains(line, `c.Key("palette-" + cmd.id)`):
+		return true
+	}
+	return false
 }

@@ -55,6 +55,9 @@ func (s *shell) commands() []command {
 		{"view.palette", "Command palette", "Mod+K", "view", func() { s.paletteOpen = !s.paletteOpen }},
 		{"view.mini", "Mini player", "Mod+M", "view", s.showMini},
 		{"view.sidebar", "Collapse or expand the sidebar", "Mod+B", "view", s.toggleRail},
+		{"view.zoomIn", "Zoom in", "Mod+=", "view", func() { s.zoomBy(1) }},
+		{"view.zoomOut", "Zoom out", "Mod+-", "view", func() { s.zoomBy(-1) }},
+		{"view.zoomReset", "Reset zoom", "Mod+0", "view", func() { s.setZoom(1) }},
 		{"addons.reload", "Reload add-ons", "", "add-ons", func() {
 			s.plugins.Retry()
 			s.svc.Addons.Reload()
@@ -71,12 +74,49 @@ func (s *shell) commands() []command {
 	return cmds
 }
 
-// shortcutOf is a command's shortcut: the user's, or its own.
+// shortcutOf is a command's shortcut: the user's, or its own, unless
+// the user gave those keys to another command, which keeps them.
 func (s *shell) shortcutOf(cmd command) string {
 	if v, ok := s.set.Shortcuts[cmd.id]; ok {
 		return v
 	}
+	if s.givenAway(cmd.id, cmd.shortcut) {
+		return ""
+	}
 	return cmd.shortcut
+}
+
+// givenAway tells whether the user gave the keys of a shortcut to a
+// command other than id.
+func (s *shell) givenAway(id, keys string) bool {
+	if keys == "" {
+		return false
+	}
+	for other, v := range s.set.Shortcuts {
+		if other != id && sameShortcut(v, keys) {
+			return true
+		}
+	}
+	return false
+}
+
+// alsoKeys are more shortcuts of commands, which work while a command
+// keeps its own: Mod+Shift+= zooms in too, the keys of + on many
+// layouts.
+var alsoKeys = map[string][]string{"view.zoomIn": {"Mod+Shift+="}}
+
+// shortcutsOf are all the shortcuts of a command.
+func (s *shell) shortcutsOf(cmd command) []string {
+	keys := s.shortcutOf(cmd)
+	all := []string{keys}
+	if _, custom := s.set.Shortcuts[cmd.id]; !custom && keys == cmd.shortcut {
+		for _, more := range alsoKeys[cmd.id] {
+			if !s.givenAway(cmd.id, more) {
+				all = append(all, more)
+			}
+		}
+	}
+	return all
 }
 
 // keyNames are the keys of shortcuts, as the web interface names them.
@@ -198,18 +238,35 @@ func (s *shell) runShortcuts(c *ui.Context) {
 		return
 	}
 	for _, cmd := range s.commands() {
-		mods, key, ok := parseShortcut(s.shortcutOf(cmd))
-		if !ok {
+		for _, keys := range s.shortcutsOf(cmd) {
+			mods, key, ok := parseShortcut(keys)
+			if !ok {
+				continue
+			}
+			if c.Shortcut(mods, key) {
+				cmd.run()
+			}
+			// The keys a focused control takes, which pointerKeys leaves
+			// to the command while the control's focus shows no ring, as
+			// after a click.
+			if mods == 0 && (key == ui.KeySpace || key == ui.KeyEnter) {
+				s.plainKeys = append(s.plainKeys, plainKey{key, cmd.run})
+			}
+		}
+	}
+}
+
+// runZoomShortcuts runs the zoom's commands whose shortcuts were pressed,
+// the only shortcuts of the mini player.
+func (s *shell) runZoomShortcuts(c *ui.Context) {
+	for _, cmd := range s.commands() {
+		if !isZoom(cmd.id) {
 			continue
 		}
-		if c.Shortcut(mods, key) {
-			cmd.run()
-		}
-		// The keys a focused control takes, which pointerKeys leaves to
-		// the command while the control's focus shows no ring, as after
-		// a click.
-		if mods == 0 && (key == ui.KeySpace || key == ui.KeyEnter) {
-			s.plainKeys = append(s.plainKeys, plainKey{key, cmd.run})
+		for _, keys := range s.shortcutsOf(cmd) {
+			if mods, key, ok := parseShortcut(keys); ok && c.Shortcut(mods, key) {
+				cmd.run()
+			}
 		}
 	}
 }

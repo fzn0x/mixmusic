@@ -13,6 +13,7 @@ import (
 // and the side panel, and the player bar across the bottom.
 func (s *shell) view(c *ui.Context) {
 	s.st, s.capBound = s.p.State(), false
+	s.applyZoom(c)
 	// A window that turns narrow or wide drops the fold the user gave
 	// its rail.
 	if w, _ := c.Size(); (w <= narrowWidth) != s.narrow {

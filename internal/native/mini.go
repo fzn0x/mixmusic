@@ -16,6 +16,10 @@ const (
 	// miniRoom is the width the mini player keeps beside its artwork: the
 	// window's buttons, and the transport with the like button.
 	miniRoom = 232
+	// The mini player's window at 100%: the size it opens at, and the
+	// least it takes.
+	miniWidth, miniHeight       = 420, 132
+	miniMinWidth, miniMinHeight = 340, 112
 )
 
 // OpenMini opens the native interface's mini player: a small window over
@@ -26,10 +30,10 @@ func OpenMini(a *app.App) *mygo.Window {
 	s := newShell(a, a.GoPlayer())
 	s.attach(mygo.NewWindow(mygo.WindowOptions{
 		Title:       "MixMusic mini player",
-		Width:       420,
-		Height:      132,
-		MinWidth:    340,
-		MinHeight:   112,
+		Width:       miniWidth,
+		Height:      miniHeight,
+		MinWidth:    miniMinWidth,
+		MinHeight:   miniMinHeight,
 		MaxHeight:   miniArt,
 		Frameless:   true,
 		AlwaysOnTop: true,
@@ -51,9 +55,11 @@ func OpenMini(a *app.App) *mygo.Window {
 // anywhere but its buttons moves the window.
 func (s *shell) miniView(c *ui.Context) {
 	s.st = s.p.State()
-	// The mini player runs no shortcuts (#38): pointerKeys leaves its
-	// controls no keys.
+	s.applyMiniZoom(c)
+	// The mini player runs no shortcuts (#38) but the zoom's: pointerKeys
+	// leaves its controls no keys.
 	s.plainKeys = s.plainKeys[:0]
+	s.runZoomShortcuts(c)
 	s.followArtwork()
 	c.SetTheme(&s.lk.theme)
 	s.toasts(c)
@@ -71,7 +77,7 @@ func (s *shell) miniView(c *ui.Context) {
 		art := ui.Box(c.Key("mini-art")).Size(side, h).Shrink(0).Clip()
 		var b *ui.Bitmap
 		if ok {
-			b = s.art.get(c, artworkURL(cur.Track.Artwork, miniArt), artPixels(miniArt))
+			b = s.art.get(c, artworkURL(cur.Track.Artwork, int(miniArt*s.zoomOf())), s.artPixels(miniArt))
 		}
 		if b == nil {
 			art.Background(k.surface3)
@@ -171,4 +177,40 @@ func (s *shell) miniProgress(c *ui.Context) {
 		Draw(func(p *ui.Painter, r ui.Rect) {
 			p.Fill(ui.Rect{X: r.X, Y: r.Y, W: r.W * done, H: r.H}, k.accent, 0)
 		})
+}
+
+// applyMiniZoom zooms the mini player by the zoom chosen, and its window
+// with it, so that it looks as at 100%, only larger or smaller. A change
+// made in the mini player is read out rather than told in a toast, which
+// would cover its controls: the window growing or shrinking shows it.
+func (s *shell) applyMiniZoom(c *ui.Context) {
+	z, was := s.set.Zoom, s.zoom
+	s.zoom = z
+	c.SetZoom(float32(z))
+	if s.zoomToast {
+		s.zoomToast = false
+		c.Announce("Zoom " + percent(z))
+	}
+	if z == was || s.win == nil {
+		return
+	}
+	// After the frame, as closing it is (#37).
+	go fitMini(s.win, was, z)
+}
+
+// fitMini sizes the mini player's window for the zoom z, from the zoom
+// was, 0 when it just opened: at the size its last run left it.
+func fitMini(win *mygo.Window, was, z float64) {
+	scale := func(n int) int { return int(float64(n)*z + 0.5) }
+	win.SetMinimumSize(scale(miniMinWidth), scale(miniMinHeight))
+	win.SetMaximumSize(0, scale(miniArt))
+	w, h := win.ContentSize()
+	if was > 0 {
+		w, h = int(float64(w)*z/was+0.5), int(float64(h)*z/was+0.5)
+	}
+	w = max(w, scale(miniMinWidth))
+	h = min(max(h, scale(miniMinHeight)), scale(miniArt))
+	if cw, ch := win.ContentSize(); cw != w || ch != h {
+		win.SetContentSize(w, h)
+	}
 }

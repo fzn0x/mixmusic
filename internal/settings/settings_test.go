@@ -2,6 +2,7 @@ package settings
 
 import (
 	"encoding/json"
+	"math"
 	"strings"
 	"testing"
 )
@@ -210,6 +211,21 @@ func TestLoudness(t *testing.T) {
 		}
 		if s = s.Clean(); s.Loudness != want {
 			t.Errorf("%s: Even loudness %v, not %v", file, s.Loudness, want)
+		}
+	}
+}
+
+// TestZoom keeps a zoom of the steps, takes the nearest step for another
+// in range, and 100% for one outside them, as settings from before it.
+func TestZoom(t *testing.T) {
+	for _, c := range []struct{ in, want float64 }{
+		{1.25, 1.25}, {2, 2}, {0.8, 0.8}, {1.3, 1.25}, {1.2, 1.25}, {0.85, 0.8},
+		{0, 1}, {0.5, 1}, {3, 1}, {math.NaN(), 1},
+	} {
+		s := Default()
+		s.Zoom = c.in
+		if got := s.Clean().Zoom; got != c.want {
+			t.Errorf("a zoom of %v reads as %v, want %v", c.in, got, c.want)
 		}
 	}
 }

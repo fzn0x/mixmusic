@@ -46,6 +46,7 @@ func Open(a *app.App, hidden bool) *mygo.Window {
 	}))
 	fitOnScreen(s.win)
 	s.start()
+	s.useMenuBar()
 	s.usePlugins()
 	s.offerCrashReport()
 	s.captureFromEnv()
@@ -148,6 +149,10 @@ type shell struct {
 	// folds the rail; narrowFold is the fold the user gave it there.
 	narrow     bool
 	narrowFold *bool
+	// zoom is the zoom the window shows, zoomRoom the largest it has room
+	// for, and zoomToast set when the next frame tells of a new zoom.
+	zoom, zoomRoom float64
+	zoomToast      bool
 	// liveSince is when the live tile began turning over to what plays
 	// next, zero while it doesn't.
 	liveSince time.Time

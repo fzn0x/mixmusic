@@ -217,7 +217,7 @@ func (s *shell) pluginNode(c *ui.Context, key string, v *plugins.View, n plugins
 		if n.Round {
 			frame.Radius(size / 2)
 		}
-		if b := s.art.get(c, n.URL, artPixels(size)); b != nil {
+		if b := s.art.get(c, n.URL, s.artPixels(size)); b != nil {
 			frame.Children(func() { ui.Image(c, b).Size(size, size).Fit(ui.Cover) })
 		}
 	case "spacer":

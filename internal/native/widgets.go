@@ -329,7 +329,7 @@ func (s *shell) cover(c *ui.Context, key string, images []media.Image, size floa
 	frame := ui.Box(c.Key(key)).Size(size, size).Radius(r).Shrink(0).Clip()
 	var b *ui.Bitmap
 	if s.inView(c, frame) {
-		b = s.art.get(c, artworkURL(images, int(size)), artPixels(size))
+		b = s.art.get(c, artworkURL(images, int(size*s.zoomOf())), s.artPixels(size))
 	}
 	if b == nil {
 		frame.Background(k.surface3)
@@ -403,8 +403,16 @@ func (s *shell) moved(c *ui.Context, key string, at float32) {
 }
 
 // artPixels is how many pixels artwork of size DIPs takes, at the scale of
-// most displays.
-func artPixels(size float32) int { return int(size * 1.5) }
+// most displays and the window's zoom.
+func (s *shell) artPixels(size float32) int { return int(size * 1.5 * s.zoomOf()) }
+
+// zoomOf is the zoom the window shows, 1 before its first frame.
+func (s *shell) zoomOf() float32 {
+	if s.zoom <= 0 {
+		return 1
+	}
+	return float32(s.zoom)
+}
 
 // loading shows that a page waits for what it shows.
 func (s *shell) loading(c *ui.Context) {

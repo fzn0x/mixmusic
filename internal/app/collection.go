@@ -12,8 +12,8 @@ import (
 
 var errSpotifyOnly = errors.New("only Spotify tracks can be added to a Spotify playlist")
 
-// Collection is the user's library: liked tracks and playlists mixing
-// every service, the history, and their Spotify library.
+// Collection is the user's library: liked and disliked tracks and
+// playlists mixing every service, the history, and their Spotify library.
 type Collection struct{ a *App }
 
 // Liked returns the liked tracks, the last liked first.
@@ -31,24 +31,52 @@ func (c *Collection) LikedIDs() []string {
 
 // SetLiked likes or unlikes a track. Spotify tracks are also saved to, or
 // removed from, the user's Spotify library when they signed in, and YouTube
-// Music tracks liked or unliked on YouTube Music.
+// Music tracks liked or unliked on YouTube Music. Liking a disliked track
+// takes the dislike back; the player hears of that from the caller.
 func (c *Collection) SetLiked(ctx context.Context, track media.Track, liked bool) error {
 	if err := c.a.library.SetLiked(track, liked); err != nil {
 		return err
 	}
 	c.a.syncYouTubeLike(ctx, track, liked)
-	if track.Source == media.SourceSpotify && c.a.spotify.SignedIn() {
-		_, id, _ := media.ParseID(track.ID)
-		uri := spotify.URI("track", id)
-		var err error
-		if liked {
-			err = c.a.spotify.Save(ctx, uri)
-		} else {
-			err = c.a.spotify.Remove(ctx, uri)
-		}
-		if err != nil {
-			log.Printf("mixmusic: syncing a like with Spotify: %v", err)
-		}
+	c.a.syncSpotifyLike(ctx, track, liked)
+	return nil
+}
+
+// syncSpotifyLike saves a Spotify track to the user's Spotify library, or
+// removes it, when they signed in.
+func (a *App) syncSpotifyLike(ctx context.Context, track media.Track, liked bool) {
+	if track.Source != media.SourceSpotify || !a.spotify.SignedIn() {
+		return
+	}
+	_, id, _ := media.ParseID(track.ID)
+	uri := spotify.URI("track", id)
+	var err error
+	if liked {
+		err = a.spotify.Save(ctx, uri)
+	} else {
+		err = a.spotify.Remove(ctx, uri)
+	}
+	if err != nil {
+		log.Printf("mixmusic: syncing a like with Spotify: %v", err)
+	}
+}
+
+// Disliked returns the disliked tracks, the last disliked first.
+func (c *Collection) Disliked() []media.Track { return c.a.library.Disliked() }
+
+// SetDisliked dislikes a track, or takes the dislike back, in MixMusic's
+// library, and on YouTube Music for its tracks when the user signed in.
+// Spotify takes no dislikes: a Spotify track the dislike unliked leaves
+// the user's Spotify library, as an unlike does. The player hears of the
+// dislike from the caller, which tells it as the user asks.
+func (c *Collection) SetDisliked(ctx context.Context, track media.Track, disliked bool) error {
+	unliked, err := c.a.library.SetDisliked(track, disliked)
+	if err != nil {
+		return err
+	}
+	c.a.syncYouTubeDislike(ctx, track, disliked)
+	if unliked {
+		c.a.syncSpotifyLike(ctx, track, false)
 	}
 	return nil
 }

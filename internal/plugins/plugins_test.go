@@ -32,6 +32,7 @@ func (s testServices) PrepareStream(ctx context.Context, t media.Track) (player.
 func (testServices) StreamFailure(media.Track) string                          { return "" }
 func (testServices) RecordPlay(media.Track)                                    {}
 func (testServices) Radio(context.Context, media.Track) ([]media.Track, error) { return nil, nil }
+func (testServices) Skip(media.Track) string                                   { return "" }
 func (testServices) Settings() settings.Settings                               { return settings.Default() }
 func (testServices) SaveVolume(float64)                                        {}
 func (testServices) Report(player.Now)                                         {}

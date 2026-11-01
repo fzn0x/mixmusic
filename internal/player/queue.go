@@ -14,17 +14,51 @@ import (
 
 // The queue's slice is never changed in place: State shares it.
 
-// PlayTracks replaces the queue with tracks, and plays the one at start.
+// PlayTracks replaces the queue with tracks, and plays the one at start,
+// which the user chose: though the queue would pass over it.
 func (p *Player) PlayTracks(tracks []media.Track, start int) {
 	tracks = slices.Clone(tracks)
 	p.do(func() { p.playTracks(tracks, start) })
 }
 
-// PlayNext puts tracks right after the current one.
+// PlayAll replaces the queue with tracks, and plays them from the first
+// the queue doesn't pass over, as a collection's play button does;
+// shuffled, from one of those at random, shuffle on. When it would pass
+// over all of them, nothing changes, and the user is told why. One whose
+// label of AI the app doesn't know yet is checked first.
+func (p *Player) PlayAll(tracks []media.Track, shuffled bool) {
+	tracks = slices.Clone(tracks)
+	p.do(func() {
+		if len(tracks) == 0 {
+			return
+		}
+		items := p.items(tracks)
+		var open []int
+		for i, it := range items {
+			if it.Skip == "" {
+				open = append(open, i)
+			}
+		}
+		if len(open) == 0 {
+			p.notify(Notice{Message: allPassedOver(items), Settings: true})
+			return
+		}
+		first := open[0]
+		if shuffled {
+			first = open[rand.IntN(len(open))]
+			p.s.Shuffle = true
+		}
+		p.playItems(items, first, true)
+	})
+}
+
+// PlayNext puts tracks right after the current one. A track put there by
+// itself is one the user chose, which plays though the queue would pass
+// over it.
 func (p *Player) PlayNext(tracks []media.Track) {
 	tracks = slices.Clone(tracks)
 	p.do(func() {
-		items := p.items(tracks)
+		items := p.chosenItems(tracks)
 		if p.unshuffled != nil {
 			// In the queue's own order too, they follow the current entry.
 			at := 0
@@ -36,17 +70,19 @@ func (p *Player) PlayNext(tracks []media.Track) {
 		p.s.Queue = slices.Insert(slices.Clone(p.s.Queue), p.s.Index+1, items...)
 		p.emit(QueueChange)
 		if p.s.Index < 0 {
-			p.playAt(0, 0, true)
+			if i := p.s.nextIndex(); i >= 0 {
+				p.playAt(i, 0, true)
+			}
 		}
 	})
 }
 
 // Enqueue adds tracks at the end of the queue, before the tracks of the
-// radio.
+// radio. A track added by itself is one the user chose, as for PlayNext.
 func (p *Player) Enqueue(tracks []media.Track) {
 	tracks = slices.Clone(tracks)
 	p.do(func() {
-		items := p.items(tracks)
+		items := p.chosenItems(tracks)
 		if u := p.unshuffled; u != nil {
 			// In the queue's own order too.
 			cur, _ := p.s.Current()
@@ -149,14 +185,32 @@ func (p *Player) items(tracks []media.Track) []Item {
 	return items
 }
 
+// chosenItems are the entries of tracks the user queued: one queued by
+// itself is chosen.
+func (p *Player) chosenItems(tracks []media.Track) []Item {
+	items := p.items(tracks)
+	if len(items) == 1 {
+		items[0].Chosen, items[0].Skip = true, ""
+	}
+	return items
+}
+
 func (p *Player) playTracks(tracks []media.Track, start int) {
 	if len(tracks) == 0 {
 		return
 	}
-	p.unshuffled = nil
-	p.played = nil
 	items := p.items(tracks)
 	first := min(max(start, 0), len(items)-1)
+	items[first].Chosen, items[first].Skip = true, ""
+	p.playItems(items, first, false)
+}
+
+// playItems replaces the queue with items, and plays the one at first, or,
+// for a list played, the first from there that it doesn't pass over, once
+// checked.
+func (p *Player) playItems(items []Item, first int, list bool) {
+	p.unshuffled = nil
+	p.played = nil
 	if p.s.Shuffle {
 		p.unshuffled = items
 		items = p.shuffledFrom(items, first)
@@ -164,7 +218,15 @@ func (p *Player) playTracks(tracks []media.Track, start int) {
 	}
 	p.s.Queue = items
 	p.emit(QueueChange)
-	p.playAt(first, 0, true)
+	if !list || !p.skipsAI() {
+		p.playAt(first, 0, true)
+		return
+	}
+	// What played stops, and nothing of the new queue is current, until its
+	// first track to play is found.
+	p.s.Index, p.s.Position, p.s.Duration = -1, 0, 0
+	p.hold()
+	p.step(&move{dir: 1, held: true}, first)
 }
 
 func (p *Player) setShuffle(on bool) {
@@ -177,20 +239,21 @@ func (p *Player) setShuffle(on bool) {
 		p.unshuffled = q
 		p.s.Queue = p.shuffledFrom(q, p.s.Index)
 	} else if p.unshuffled != nil {
-		present := map[string]bool{}
+		// The entries come back in their own order as the queue has them
+		// now, chosen or passed over since they were shuffled.
+		live := make(map[string]Item, len(q))
 		for _, it := range q {
-			present[it.UID] = true
+			live[it.UID] = it
 		}
-		var order []Item
-		known := map[string]bool{}
+		order := make([]Item, 0, len(q))
 		for _, it := range p.unshuffled {
-			if present[it.UID] {
-				order = append(order, it)
-				known[it.UID] = true
+			if l, ok := live[it.UID]; ok {
+				order = append(order, l)
+				delete(live, it.UID)
 			}
 		}
 		for _, it := range q {
-			if !known[it.UID] {
+			if _, ok := live[it.UID]; ok {
 				order = append(order, it)
 			}
 		}
@@ -252,14 +315,21 @@ func (p *Player) markPlayed(uid string) {
 	p.played = played
 }
 
-// extendWithRadio adds tracks like the current one to the queue, and then
-// tells whether it added any, or why it couldn't find them.
-func (p *Player) extendWithRadio(then func(added bool, err error)) {
-	seed, ok := p.s.Current()
-	if !ok {
-		then(false, nil)
-		return
+// radioSeed is the entry the radio at the end of the queue starts from:
+// the current one, or when the queue passes over it, as one the user just
+// disliked, the last before it that it doesn't.
+func (p *Player) radioSeed() (Item, bool) {
+	for i := min(p.s.Index, len(p.s.Queue)-1); i >= 0; i-- {
+		if p.s.Queue[i].Skip == "" {
+			return p.s.Queue[i], true
+		}
 	}
+	return Item{}, false
+}
+
+// extendWithRadio adds tracks like seed's to the queue, and then tells
+// whether it added any, or why it couldn't find them.
+func (p *Player) extendWithRadio(seed Item, then func(added bool, err error)) {
 	await(p, func(ctx context.Context) ([]media.Track, error) { return p.svc.Radio(ctx, seed.Track) }, func(found []media.Track, err error) {
 		if err != nil {
 			then(false, err)
@@ -269,10 +339,13 @@ func (p *Player) extendWithRadio(then func(added bool, err error)) {
 		for i, it := range p.s.Queue {
 			queued[i] = it.Track
 		}
-		tracks := RadioTracks(found, queued)
+		tracks, labeled := p.withoutLabeled(RadioTracks(found, queued))
 		tracks = tracks[:min(len(tracks), radioMax)]
 		if len(tracks) == 0 {
-			then(false, nil)
+			if labeled {
+				err = errOnlyLabeled
+			}
+			then(false, err)
 			return
 		}
 		items := make([]Item, len(tracks))
@@ -284,6 +357,8 @@ func (p *Player) extendWithRadio(then func(added bool, err error)) {
 			p.unshuffled = append(slices.Clone(p.unshuffled), items...)
 		}
 		p.emit(QueueChange)
+		p.passing.radios++
+		p.checkRadio(items)
 		then(true, nil)
 	})
 }

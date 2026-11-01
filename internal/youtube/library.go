@@ -199,13 +199,31 @@ func (c *Client) SetSaved(ctx context.Context, playlistID string, saved bool) er
 	return c.rate(ctx, map[string]any{"playlistId": playlistID}, saved)
 }
 
-func (c *Client) rate(ctx context.Context, target map[string]any, on bool) error {
-	if err := c.session(); err != nil {
-		return err
+// SetDisliked dislikes a track on YouTube Music, by its video ID, or takes
+// the dislike back, which leaves it neither liked nor disliked.
+func (c *Client) SetDisliked(ctx context.Context, videoID string, disliked bool) error {
+	endpoint := "like/removelike"
+	if disliked {
+		endpoint = "like/dislike"
 	}
+	return c.rateAt(ctx, endpoint, map[string]any{"videoId": videoID})
+}
+
+// rate likes target, a video or a playlist, or takes the like back.
+func (c *Client) rate(ctx context.Context, target map[string]any, on bool) error {
 	endpoint := "like/removelike"
 	if on {
 		endpoint = "like/like"
+	}
+	return c.rateAt(ctx, endpoint, target)
+}
+
+// rateAt rates target at one of the endpoints that rate: like/like,
+// like/dislike, or like/removelike, which takes either back. They take the
+// same target, and answer 401 to a visitor.
+func (c *Client) rateAt(ctx context.Context, endpoint string, target map[string]any) error {
+	if err := c.session(); err != nil {
+		return err
 	}
 	_, err := c.call(ctx, endpoint, map[string]any{"target": target}, nil)
 	return err

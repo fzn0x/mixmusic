@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -20,8 +21,14 @@ import (
 // system's media controls.
 const toggleDebounce = 400 * time.Millisecond
 
-// PlayAt plays the queue's entry at i from its start.
-func (p *Player) PlayAt(i int) { p.do(func() { p.playAt(i, 0, true) }) }
+// PlayAt plays the queue's entry at i from its start, as one the user
+// chose: though the queue would pass over it.
+func (p *Player) PlayAt(i int) {
+	p.do(func() {
+		p.choose(i)
+		p.playAt(i, 0, true)
+	})
+}
 
 // PlayID plays the entry of the queue that holds the track id, as a deep
 // link asks: a track the queue doesn't hold can't play from its ID alone,
@@ -30,12 +37,102 @@ func (p *Player) PlayID(id string) {
 	p.do(func() {
 		for i, it := range p.s.Queue {
 			if it.Track.ID == id {
+				p.choose(i)
 				p.playAt(i, 0, true)
 				return
 			}
 		}
 		p.notify(Notice{Message: "Open the track's album or playlist to play it"})
 	})
+}
+
+// Return plays the entry uid again from at, or holds it there paused
+// unless playing, as one the user chose: as undoing a dislike that moved
+// on from it. An entry still current only plays on, and one the queue no
+// longer holds changes nothing.
+func (p *Player) Return(uid string, at time.Duration, playing bool) {
+	p.do(func() {
+		i := p.indexOf(uid)
+		if i < 0 {
+			return
+		}
+		p.choose(i)
+		if i != p.s.Index || !p.holds() {
+			p.playAt(i, at, playing)
+		}
+	})
+}
+
+// holds reports whether the player has the current entry: plays it,
+// holds it paused, loads it, or waits for the network to.
+func (p *Player) holds() bool {
+	return p.loaded || p.s.Loading || p.s.Waiting || p.connect.active()
+}
+
+// choose marks the entry at i as one the user chose to play, which plays
+// though the queue would pass over it.
+func (p *Player) choose(i int) {
+	if i < 0 || i >= len(p.s.Queue) || p.s.Queue[i].Chosen {
+		return
+	}
+	q := slices.Clone(p.s.Queue)
+	skipped := q[i].Skip != ""
+	q[i].Chosen, q[i].Skip = true, ""
+	p.s.Queue = q
+	if skipped {
+		p.emit(QueueChange)
+	}
+}
+
+// Disliked takes in that the user disliked the track id, or no longer, as
+// they do it: the library may keep it a moment later. While the settings
+// skip disliked tracks, the queue passes over its entries from then on,
+// those the user chose too, and moves on from the current one, playing or
+// paused as it was.
+func (p *Player) Disliked(id string, disliked bool) { p.do(func() { p.disliked(id, disliked) }) }
+
+func (p *Player) disliked(id string, disliked bool) {
+	q := slices.Clone(p.s.Queue)
+	changed := false
+	for i, it := range q {
+		if it.Track.ID != id {
+			continue
+		}
+		was := it
+		switch {
+		case disliked:
+			it.Chosen = false
+			if p.skipDisliked {
+				it.Skip = SkipDisliked
+			}
+		case it.Skip == SkipDisliked:
+			// The queue may pass over it still, for its label of AI.
+			it.Skip = p.labelSkip(it.Track)
+		}
+		if it.Chosen != was.Chosen || it.Skip != was.Skip {
+			q[i], changed = it, true
+		}
+	}
+	if !changed {
+		return
+	}
+	p.s.Queue = q
+	p.emit(QueueChange)
+	if cur, ok := p.s.Current(); ok && cur.Track.ID == id && cur.Skip != "" {
+		p.leave()
+	}
+}
+
+// halt stops the current track at its start, as the end of the queue
+// does: Play plays it from there.
+func (p *Player) halt() {
+	p.loadToken++
+	p.endWait()
+	p.loaded = false
+	p.stream.Unload()
+	p.connect.stop(true)
+	p.s.Loading, p.s.Buffering, p.s.Source = false, false, nil
+	p.stopAtEnd(true)
 }
 
 // Play plays, or the queue from its start when nothing is current.
@@ -81,17 +178,43 @@ func (p *Player) ToggleMute() {
 }
 
 // SettingsChanged takes in new settings: a Spotify track goes on from where
-// it was in the way of playing Spotify tracks they choose.
+// it was in the way of playing Spotify tracks they choose, and the queue
+// passes over the tracks the user disliked, and those YouTube labels as made
+// with AI, or no longer, as they say.
 func (p *Player) SettingsChanged(s settings.Settings) {
 	p.do(func() {
-		if s.SpotifyPlayback == p.spotifyMode {
+		moved := s.SpotifyPlayback != p.spotifyMode
+		if moved || s.SkipDisliked != p.skipDisliked || s.SkipAI != p.skipAI {
+			// A Spotify track that plays on a device isn't passed over for
+			// the label of its recording on YouTube Music.
+			p.spotifyMode, p.skipDisliked, p.skipAI = s.SpotifyPlayback, s.SkipDisliked, s.SkipAI
+			p.reflag()
+		}
+		if !moved {
 			return
 		}
-		p.spotifyMode = s.SpotifyPlayback
 		if cur, ok := p.s.Current(); ok && cur.Track.Source == media.SourceSpotify && p.s.Source != nil {
 			p.playAt(p.s.Index, p.s.Position, p.s.Playing)
 		}
 	})
+}
+
+// reflag finds again which entries the queue passes over, as the settings
+// changed: never those the user chose. The current entry plays on, and is
+// only ever let off.
+func (p *Player) reflag() {
+	q := make([]Item, len(p.s.Queue))
+	for i, it := range p.s.Queue {
+		switch {
+		case it.Chosen:
+			it.Skip = ""
+		case i != p.s.Index || it.Skip != "":
+			it.Skip = p.skipOf(it.Track)
+		}
+		q[i] = it
+	}
+	p.s.Queue = q
+	p.emit(QueueChange)
 }
 
 // playAt plays the queue's entry at i from start, or holds it there when
@@ -180,19 +303,22 @@ func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Dura
 	})
 }
 
-// streamInstead plays a Spotify track from YouTube Music.
+// streamInstead plays a Spotify track from YouTube Music, once its
+// recording there is checked, when the player skips what YouTube labels.
 func (p *Player) streamInstead(token int, entry Item, start time.Duration, autoplay bool) {
-	await(p, func(ctx context.Context) (Source, error) { return p.svc.PrepareStream(ctx, entry.Track) }, func(src Source, err error) {
-		if token != p.loadToken {
-			return
-		}
-		if err != nil {
-			if !p.offline(err, start, autoplay) {
-				p.fail(err.Error())
+	p.checkFallback(token, entry, func() {
+		await(p, func(ctx context.Context) (Source, error) { return p.svc.PrepareStream(ctx, entry.Track) }, func(src Source, err error) {
+			if token != p.loadToken {
+				return
 			}
-			return
-		}
-		p.loadStream(src, start, autoplay)
+			if err != nil {
+				if !p.offline(err, start, autoplay) {
+					p.fail(err.Error())
+				}
+				return
+			}
+			p.loadStream(src, start, autoplay)
+		})
 	})
 }
 
@@ -375,23 +501,29 @@ func (p *Player) onProgress() {
 	}
 	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter && p.retry.n == 0 {
 		p.prefetched = next.UID
-		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
-			if err == nil && src.Mode == ModeStream && src.URL != "" {
-				p.stream.Preload(src.URL)
-			}
-			if errors.Is(err, ErrOffline) {
-				p.prefetchOnline(next.UID)
-			}
-		})
+		p.prefetch(entry, next)
 	}
 	fade := time.Duration(p.svc.Settings().Crossfade) * time.Second
 	if fade > 0 && !p.crossfading && p.s.Source != nil && p.s.Source.Mode == ModeStream &&
-		hasNext && next.UID != entry.UID && dur > 0 && dur-pos <= fade && dur > 3*fade {
+		hasNext && next.UID != entry.UID && dur > 0 && dur-pos <= fade && dur > 3*fade && p.mayStart(next) {
 		p.crossfadeTo(next, fade)
 	}
 	p.reporting.call(p, func() {
 		p.svc.Report(p.now())
 		p.save()
+	})
+}
+
+// preload downloads the audio of next, which plays after the current
+// track, so that it plays at once.
+func (p *Player) preload(next Item) {
+	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
+		if err == nil && src.Mode == ModeStream && src.URL != "" {
+			p.stream.Preload(src.URL)
+		}
+		if errors.Is(err, ErrOffline) {
+			p.prefetchOnline(next.UID)
+		}
 	})
 }
 
@@ -407,9 +539,10 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 			return
 		}
 		i := p.indexOf(next.UID)
-		if i < 0 {
-			return
+		if i < 0 || p.s.Queue[i].Skip != "" {
+			return // gone, or labeled meanwhile: it's passed over in turn
 		}
+		p.fadingInto(next)
 		p.loadToken++
 		p.retry = retryState{}
 		p.endWait()
@@ -442,8 +575,8 @@ func (p *Player) play() {
 		return // it plays once loaded
 	}
 	if _, ok := p.s.Current(); !ok {
-		if len(p.s.Queue) > 0 {
-			p.playAt(0, 0, true)
+		if i := p.s.nextIndex(); i >= 0 {
+			p.playAt(i, 0, true)
 		}
 		return
 	}
@@ -520,33 +653,18 @@ func (p *Player) seek(t time.Duration) {
 }
 
 // advance moves on from the current track: ended tells an end from a skip.
+// It goes to the next entry, round to the first on repeat all, or to a
+// radio with autoplay, past the entries the queue passes over.
 func (p *Player) advance(ended bool) {
-	q := p.s.Queue
-	if len(q) == 0 {
+	if len(p.s.Queue) == 0 {
 		return
 	}
-	switch {
-	case ended && p.s.Repeat == RepeatOne:
+	if ended && p.s.Repeat == RepeatOne {
 		p.playAt(p.s.Index, 0, true)
-	case p.s.Index < len(q)-1:
-		p.playAt(p.s.Index+1, 0, true)
-	case p.s.Repeat == RepeatAll:
-		p.playAt(0, 0, true)
-	case p.svc.Settings().Autoplay:
-		token := p.loadToken
-		p.extendWithRadio(func(added bool, err error) {
-			switch {
-			case added && token == p.loadToken:
-				p.playAt(p.s.Index+1, 0, true)
-			case !added && ended && token == p.loadToken && p.radioOffline(err):
-				p.waitRadio()
-			case !added:
-				p.stopAtEnd(ended)
-			}
-		})
-	default:
-		p.stopAtEnd(ended)
+		return
 	}
+	m, at := p.moveOn(ended)
+	p.step(m, at+1)
 }
 
 // stopAtEnd stops at the end of the queue.
@@ -561,17 +679,22 @@ func (p *Player) stopAtEnd(ended bool) {
 	p.emit(StateChange)
 }
 
+// previous goes back to the start of the track, or to the entry before it,
+// past those the queue passes over, early in it.
 func (p *Player) previous() {
 	pos, i := p.s.Position, p.s.Index
-	if pos > restartAfter || i <= 0 {
-		if i <= 0 && p.s.Repeat == RepeatAll && len(p.s.Queue) > 1 && pos <= restartAfter {
-			p.playAt(len(p.s.Queue)-1, 0, true)
-			return
-		}
+	switch {
+	case pos > restartAfter:
 		p.seek(0)
-		return
+	case i > 0:
+		p.step(p.moveBack(), i-1)
+	case p.s.Repeat == RepeatAll && len(p.s.Queue) > 1:
+		m := p.moveBack()
+		m.wrapped = true
+		p.step(m, len(p.s.Queue)-1)
+	default:
+		p.seek(0)
 	}
-	p.playAt(i-1, 0, true)
 }
 
 func (p *Player) setVolume(v float64) {
@@ -688,6 +811,9 @@ func savedOf(st State, unshuffled []Item, played map[string]bool) Saved {
 		if it.Radio {
 			saved.Radio = append(saved.Radio, i)
 		}
+		if it.Chosen {
+			saved.Chosen = append(saved.Chosen, i)
+		}
 		if i < saved.Index && !played[it.UID] {
 			saved.Unplayed = append(saved.Unplayed, i)
 		}
@@ -756,6 +882,7 @@ func (p *Player) onPlaying(playing bool) {
 	if playing {
 		p.s.Buffering = false
 		p.s.Loading = false
+		p.sounded()
 	}
 	p.report()
 	p.emit(StateChange)

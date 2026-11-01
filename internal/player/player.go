@@ -61,7 +61,22 @@ type Item struct {
 	Track media.Track
 	// Radio is set for tracks autoplay added after the queue ran out.
 	Radio bool
+	// Skip tells why the queue passes over the entry as it moves on, as
+	// SkipDisliked or SkipMadeWithAI, or is "" for one that plays.
+	Skip string
+	// Chosen is set for an entry the user chose to play, as a track they
+	// played or queued by itself: it plays, though the queue would pass
+	// over it otherwise.
+	Chosen bool
 }
+
+// Why the queue passes over an entry, while the settings skip those:
+// SkipDisliked a track the user disliked, SkipMadeWithAI one YouTube labels
+// as made with AI.
+const (
+	SkipDisliked   = "disliked"
+	SkipMadeWithAI = "made with AI"
+)
 
 // State is what the player does. Its Queue is shared: don't change it.
 type State struct {
@@ -100,18 +115,35 @@ func (s State) Current() (Item, bool) {
 	return s.Queue[s.Index], true
 }
 
-// UpNext returns the entry that plays after the current one.
+// UpNext returns the entry that plays after the current one, past those
+// the queue passes over.
 func (s State) UpNext() (Item, bool) {
 	if s.Repeat == RepeatOne {
 		return s.Current()
 	}
-	if s.Index+1 >= 0 && s.Index+1 < len(s.Queue) {
-		return s.Queue[s.Index+1], true
-	}
-	if s.Repeat == RepeatAll && len(s.Queue) > 0 {
-		return s.Queue[0], true
+	if i := s.nextIndex(); i >= 0 {
+		return s.Queue[i], true
 	}
 	return Item{}, false
+}
+
+// nextIndex is the index of the entry the queue moves on to from the
+// current one, or -1: the first after it that the queue doesn't pass over,
+// or when it repeats, the first from its start, the current one included.
+func (s State) nextIndex() int {
+	for i := max(s.Index+1, 0); i < len(s.Queue); i++ {
+		if s.Queue[i].Skip == "" {
+			return i
+		}
+	}
+	if s.Repeat == RepeatAll {
+		for i := 0; i <= s.Index && i < len(s.Queue); i++ {
+			if s.Queue[i].Skip == "" {
+				return i
+			}
+		}
+	}
+	return -1
 }
 
 // Event is what changed.
@@ -170,6 +202,8 @@ type Saved struct {
 	// Unplayed holds the indexes of the entries before Index that haven't
 	// played, as a list started in its middle leaves them.
 	Unplayed []int `json:"unplayed,omitempty"`
+	// Chosen holds the indexes of the entries the user chose to play.
+	Chosen []int `json:"chosen,omitempty"`
 }
 
 // ErrOffline is why a track can't play while the network is gone. The
@@ -200,6 +234,10 @@ type Services interface {
 	RecordPlay(track media.Track)
 	// Radio returns tracks like track.
 	Radio(ctx context.Context, track media.Track) ([]media.Track, error)
+	// Skip tells why the queue passes over track as it moves on, as the
+	// settings ask: SkipDisliked for a track the user disliked while they
+	// skip those, or "" for one that plays.
+	Skip(track media.Track) string
 	Settings() settings.Settings
 	// SaveVolume keeps the volume in the settings, as volume.Saved gives
 	// it.
@@ -391,8 +429,14 @@ type Player struct {
 	saving      throttle
 	volumeTimer *time.Timer
 	// spotifyMode is the settings' Spotify playback the current track
-	// started with.
-	spotifyMode settings.SpotifyPlayback
+	// started with; skipDisliked and skipAI whether the settings skip the
+	// tracks the user disliked, and those YouTube labels as made with AI.
+	spotifyMode  settings.SpotifyPlayback
+	skipDisliked bool
+	skipAI       bool
+	// passing is what the player keeps of passing over entries as it moves
+	// on.
+	passing passState
 }
 
 // New returns a player of the queue saved, which plays through stream and
@@ -412,14 +456,21 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 		settle: connectSettle}
 	st := svc.Settings()
 	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume)}
-	p.spotifyMode = st.SpotifyPlayback
+	p.spotifyMode, p.skipDisliked, p.skipAI = st.SpotifyPlayback, st.SkipDisliked, st.SkipAI
 	if len(saved.Tracks) > 0 {
 		radio := marks(saved.Radio, len(saved.Tracks))
+		chosen := marks(saved.Chosen, len(saved.Tracks))
 		p.s.Queue = make([]Item, len(saved.Tracks))
 		for i, t := range saved.Tracks {
 			p.s.Queue[i] = p.item(t, radio[i])
+			if chosen[i] {
+				p.s.Queue[i].Chosen, p.s.Queue[i].Skip = true, ""
+			}
 		}
 		p.s.Index = min(max(saved.Index, 0), len(p.s.Queue)-1)
+		// The current entry plays on, as it was: the queue passes over a
+		// track disliked meanwhile only as it moves on.
+		p.s.Queue[p.s.Index].Chosen, p.s.Queue[p.s.Index].Skip = true, ""
 		// The position is the saved current track's. A queue kept before
 		// the index was kept within its tracks may name one past them: the
 		// track held instead starts from its start.
@@ -453,7 +504,14 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 // SpotifyHere has the player play the Spotify tracks that play in
 // MixMusic itself on d, MixMusic's own Spotify device; nil, as at first,
 // has them play from YouTube Music.
-func (p *Player) SpotifyHere(d Device) { p.do(func() { p.here = d }) }
+func (p *Player) SpotifyHere(d Device) {
+	p.do(func() {
+		p.here = d
+		// A Spotify track that plays on the device isn't passed over for
+		// the label of its recording on YouTube Music.
+		p.reflag()
+	})
+}
 
 // Close stops the player's goroutine and its following of a Spotify
 // device. The engines stay as they are.
@@ -627,7 +685,8 @@ func (t *throttle) call(p *Player, fn func()) {
 
 func (p *Player) item(t media.Track, radio bool) Item {
 	p.uidSeq++
-	return Item{UID: strconv.FormatInt(time.Now().UnixMilli(), 36) + "-" + strconv.Itoa(p.uidSeq), Track: t, Radio: radio}
+	return Item{UID: strconv.FormatInt(time.Now().UnixMilli(), 36) + "-" + strconv.Itoa(p.uidSeq), Track: t, Radio: radio,
+		Skip: p.skipOf(t)}
 }
 
 // marks is which of n entries a saved queue's indexes name; it leaves out

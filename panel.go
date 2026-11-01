@@ -80,12 +80,16 @@ func (s *shell) queuePanel(c *ui.Context) {
 }
 
 // queueRow is an entry of the queue; the current one floods with the
-// accent.
+// accent, and one the queue passes over is muted.
 func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 	k := &s.lk
 	t := it.Track
 	row := ui.Row(c.Key("q-"+it.UID)).Height(56).Padding(0, 8).Gap(10).Radius(k.radiusSm).Cursor(ui.CursorDefault)
 	ink, sub := k.text, k.muted
+	skipped := it.Skip != "" && !current
+	if skipped {
+		ink = k.muted
+	}
 	switch {
 	case current:
 		row.Background(k.accent)
@@ -125,6 +129,13 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 				line := names(t.Artists)
 				if it.Radio {
 					line += " · radio"
+				}
+				switch {
+				case skipped && it.Skip == player.SkipMadeWithAI:
+					// A click still plays it.
+					line += " · made with AI"
+				case skipped:
+					line += " · skipped"
 				}
 				ui.Text(c, line).FontSize(k.smallSize()).TextColor(sub).SingleLine().MinWidth(0)
 			})
@@ -341,6 +352,14 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	}
 	if m.Item(label).Chosen() {
 		s.setLiked(t, !liked)
+	}
+	disliked := s.a.IsDisliked(t.ID)
+	label = "Dislike"
+	if disliked {
+		label = "Remove the dislike"
+	}
+	if m.Item(label).Chosen() {
+		s.setDisliked(t, !disliked)
 	}
 	s.addToMenus(m, one)
 	m.Separator()

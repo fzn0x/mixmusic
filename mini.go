@@ -14,8 +14,9 @@ const (
 	// the window grows, so that resizing it loads no other image.
 	miniArt = 180
 	// miniRoom is the width the mini player keeps beside its artwork: the
-	// window's buttons, and the transport with the like button.
-	miniRoom = 232
+	// window's buttons, and the transport with the like and dislike
+	// buttons.
+	miniRoom = 272
 	// The mini player's window at 100%: the size it opens at, and the
 	// least it takes.
 	miniWidth, miniHeight       = 420, 132
@@ -129,7 +130,8 @@ func (s *shell) miniView(c *ui.Context) {
 	s.overlay(c)
 }
 
-// miniControls are the mini player's transport, and its like button.
+// miniControls are the mini player's transport, and its like and dislike
+// buttons.
 func (s *shell) miniControls(c *ui.Context) {
 	cur, ok := s.st.Current()
 	ui.Row(c).Gap(8).Children(func() {
@@ -148,7 +150,10 @@ func (s *shell) miniControls(c *ui.Context) {
 			s.p.Next()
 		}
 		if ok {
-			s.likeButton(c, "mini-like", cur.Track, 16)
+			ui.Row(c).Children(func() {
+				s.likeButton(c, "mini-like", cur.Track, 16)
+				s.dislikeButton(c, "mini-dislike", cur.Track, 16)
+			})
 		}
 	})
 }

@@ -32,4 +32,5 @@ func (a *App) flush() {
 	if p := a.goPlayer.Load(); p != nil {
 		p.Flush()
 	}
+	a.labels.save()
 }

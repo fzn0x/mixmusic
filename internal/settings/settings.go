@@ -110,7 +110,13 @@ type Settings struct {
 	// measure of each: Even loudness.
 	Loudness bool `json:"loudness"`
 	// Autoplay continues with similar tracks when the queue ends.
-	Autoplay  bool      `json:"autoplay"`
+	Autoplay bool `json:"autoplay"`
+	// SkipDisliked passes over the tracks the user disliked as the queue
+	// moves on, and leaves them out of radios.
+	SkipDisliked bool `json:"skipDisliked"`
+	// SkipAI passes over the tracks YouTube labels as made with AI, as the
+	// player moves on by itself.
+	SkipAI    bool      `json:"skipAi"`
 	Equalizer Equalizer `json:"equalizer"`
 	// Volume is from 0 to 1.
 	Volume float64 `json:"volume"`
@@ -184,6 +190,7 @@ func Default() Settings {
 		Quality:         QualityBest,
 		Loudness:        true,
 		Autoplay:        true,
+		SkipDisliked:    true,
 		Equalizer:       Equalizer{Preset: "flat", Gains: make([]float64, len(Bands))},
 		Volume:          0.8,
 		CacheSizeMB:     1024,

@@ -2,6 +2,7 @@ package youtube
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"os"
 	"testing"
@@ -67,6 +68,29 @@ func TestLive(t *testing.T) {
 	}
 }
 
+// TestLiveLabels reads the label of AI of videos YouTube labels, an upload
+// and an art track, and of one it doesn't. It runs with MIXMUSIC_LIVE=1. A
+// video YouTube no longer has is passed over.
+func TestLiveLabels(t *testing.T) {
+	if os.Getenv("MIXMUSIC_LIVE") == "" {
+		t.Skip("set MIXMUSIC_LIVE=1 to test against YouTube")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	c := New()
+	for id, want := range map[string]bool{"NWuajLluF_E": true, "_d9BrC8DEcs": true, "dQw4w9WgXcQ": false} {
+		ai, err := c.MadeWithAI(ctx, id)
+		switch {
+		case errors.Is(err, ErrNotFound):
+			t.Logf("YouTube has no video %s any more", id)
+		case err != nil:
+			t.Errorf("label of %s: %v", id, err)
+		case ai != want:
+			t.Errorf("label of %s = %v, want %v", id, ai, want)
+		}
+	}
+}
+
 // TestLiveSignedIn reads the library of a real account. It runs with the
 // Cookie header of a signed-in music.youtube.com tab, from the browser's
 // developer tools:
@@ -110,5 +134,75 @@ func TestLiveSignedIn(t *testing.T) {
 	home, err := c.Home(ctx)
 	if err != nil || len(home) == 0 {
 		t.Fatalf("home: %d shelves, %v", len(home), err)
+	}
+}
+
+// TestLiveDislike dislikes a song on a real account, reads its rating back
+// as YouTube Music's player does, and takes the dislike back. It changes
+// the account, so it runs only with MIXMUSIC_YT_WRITE=1 too, best with an
+// account kept for tests:
+//
+//	MIXMUSIC_LIVE=1 MIXMUSIC_YT_WRITE=1 MIXMUSIC_YT_COOKIES='SAPISID=…; …' go test ./internal/youtube -run LiveDislike -v
+//
+// It rates only a song the account neither likes nor dislikes, and leaves
+// it so: liking a song again would move it to the top of the account's
+// liked songs. It checks what the tests here can't know signed out: that
+// YouTube takes a dislike without the website's dislikeParams, and that
+// like/removelike takes it back.
+func TestLiveDislike(t *testing.T) {
+	header := os.Getenv("MIXMUSIC_YT_COOKIES")
+	if os.Getenv("MIXMUSIC_LIVE") == "" || os.Getenv("MIXMUSIC_YT_WRITE") == "" || header == "" {
+		t.Skip("set MIXMUSIC_LIVE=1, MIXMUSIC_YT_WRITE=1 and MIXMUSIC_YT_COOKIES to dislike a song of a signed-in account")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	c := New()
+	cookies, err := http.ParseCookie(header)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.SetCookies(cookies)
+	status := func(videoID string) string {
+		t.Helper()
+		n, err := c.call(ctx, "next", map[string]any{"videoId": videoID, "isAudioOnly": true}, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return n.get("playerOverlays", "playerOverlayRenderer", "actions", 0, "likeButtonRenderer", "likeStatus").str()
+	}
+	results, err := c.SearchAll(ctx, "daft punk")
+	if err != nil {
+		t.Fatal(err)
+	}
+	videoID := ""
+	for _, tr := range results.Tracks {
+		_, id, _ := media.ParseID(tr.ID)
+		if status(id) == "INDIFFERENT" {
+			videoID = id
+			break
+		}
+	}
+	if videoID == "" {
+		t.Skip("the account rates every song the search found")
+	}
+	if err := c.SetDisliked(ctx, videoID, true); err != nil {
+		t.Fatalf("disliking %s: %v", videoID, err)
+	}
+	t.Cleanup(func() {
+		if err := c.SetDisliked(context.Background(), videoID, false); err != nil {
+			t.Errorf("taking the dislike of %s back at the end: %v", videoID, err)
+		}
+	})
+	if c.Rejected() {
+		t.Fatal("YouTube rejected the session after the dislike")
+	}
+	if got := status(videoID); got != "DISLIKE" {
+		t.Errorf("after the dislike, %s is %s", videoID, got)
+	}
+	if err := c.SetDisliked(ctx, videoID, false); err != nil {
+		t.Fatalf("taking the dislike of %s back: %v", videoID, err)
+	}
+	if got := status(videoID); got != "INDIFFERENT" {
+		t.Errorf("after taking the dislike back, %s is %s", videoID, got)
 	}
 }

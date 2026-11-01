@@ -1,0 +1,130 @@
+{
+ "responseContext": {
+  "serviceTrackingParams": [
+   {
+    "service": "GFEEDBACK",
+    "params": [
+     {
+      "key": "logged_in",
+      "value": "0"
+     }
+    ]
+   }
+  ]
+ },
+ "contents": {
+  "twoColumnWatchNextResults": {
+   "results": {
+    "results": {
+     "contents": [
+      {
+       "videoPrimaryInfoRenderer": {
+        "title": {
+         "runs": [
+          {
+           "text": "A song"
+          }
+         ]
+        }
+       }
+      }
+     ]
+    }
+   }
+  }
+ },
+ "currentVideoEndpoint": {
+  "commandMetadata": {
+   "webCommandMetadata": {
+    "webPageType": "WEB_PAGE_TYPE_WATCH",
+    "rootVe": 3832
+   }
+  },
+  "watchEndpoint": {
+   "videoId": "wholeAnswer"
+  }
+ },
+ "engagementPanels": [
+  {
+   "engagementPanelSectionListRenderer": {
+    "panelIdentifier": "engagement-panel-comments-section",
+    "header": {
+     "engagementPanelTitleHeaderRenderer": {
+      "title": {
+       "runs": [
+        {
+         "text": "Comments"
+        }
+       ]
+      }
+     }
+    },
+    "content": {
+     "sectionListRenderer": {
+      "contents": []
+     }
+    }
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "panelIdentifier": "engagement-panel-structured-description",
+    "content": {
+     "structuredDescriptionContentRenderer": {
+      "items": [
+       {
+        "videoDescriptionHeaderRenderer": {
+         "title": {
+          "runs": [
+           {
+            "text": "A song"
+           }
+          ]
+         },
+         "channel": {
+          "simpleText": "A channel"
+         }
+        }
+       },
+       {
+        "expandableVideoDescriptionBodyRenderer": {
+         "attributedDescriptionBodyText": {
+          "content": "Made in a bedroom."
+         }
+        }
+       },
+       {
+        "howThisWasMadeSectionViewModel": {
+         "sectionTitle": {
+          "content": "Comment ce contenu a été créé"
+         },
+         "bodyText": {
+          "content": "Les sons ou les visuels ont été modifiés ou générés entièrement. En savoir plus",
+          "commandRuns": [
+           {
+            "startIndex": 67,
+            "length": 12,
+            "onTap": {
+             "innertubeCommand": {
+              "urlEndpoint": {
+               "url": "//support.google.com/youtube/answer/15447836?hl=fr",
+               "target": "TARGET_NEW_WINDOW"
+              }
+             }
+            }
+           }
+          ]
+         },
+         "bodyHeader": {
+          "content": "Créé avec l'IA"
+         },
+         "attributionText": {}
+        }
+       }
+      ]
+     }
+    }
+   }
+  }
+ ]
+}

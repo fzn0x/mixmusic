@@ -32,10 +32,13 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   albums, artists, playlists, related tracks, radios and plain lyrics.
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
-  liked songs, playlists, albums, subscriptions, likes and saves. Its
-  parsers are tested against recorded responses in `testdata/`, and against
-  the live service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run
-  Live` (`MIXMUSIC_YT_COOKIES` adds a signed-in account).
+  liked songs, playlists, albums, subscriptions, likes, dislikes and
+  saves. It also reads whether YouTube labels a video as made with AI, from
+  the answer of YouTube's own website, asked signed out with a field mask
+  (`MadeWithAI`): nothing of YouTube Music carries the label. Its parsers
+  are tested against recorded responses in `testdata/`, and against the
+  live service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run Live`
+  (`MIXMUSIC_YT_COOKIES` adds a signed-in account).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
   library), and controls Spotify Connect devices.
@@ -102,11 +105,17 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   and Spotify tracks matched to their recording, through the engine, and
   Spotify tracks on a Spotify device: a Spotify Connect device, or MixMusic
   itself, as below. It shuffles, repeats, crossfades, starts radios when the
-  queue runs out, counts plays and keeps up to 500 tracks of the queue,
+  queue runs out, passes over the songs the user dislikes but those they
+  pick, counts plays and keeps up to 500 tracks of the queue,
   around the one playing, in `queue.json`, as it changes and as MixMusic
   quits. A track that can't play for want of the network waits for it
   where it was, and plays on once it answers; the player pauses as the
-  computer sleeps.
+  computer sleeps. As it moves on by itself it passes over, on one path
+  (`skip.go`), the entries the settings skip, but those the user picks:
+  songs the user dislikes, and songs YouTube labels as made with AI
+  (`labels.go`). A track whose label the app doesn't know is checked
+  before it's announced, beside the search for its stream, and the next
+  track before it's preloaded or crossfaded into.
 - **`internal/online`** tells the player whether the network answers: a
   check of YouTube's and Spotify's addresses over HTTPS, shared by its
   callers, which audio coming from YouTube answers too, and a wait for the
@@ -117,8 +126,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
   title, artists and duration, for playback without a Spotify device.
 - **`lyrics`** finds synced lyrics on LRCLIB and reads LRC.
-- **`internal/library`** keeps liked songs, mixes, the history and stats in
-  `library.json`.
+- **`internal/library`** keeps liked and disliked songs, mixes, the history
+  and stats in `library.json`.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
   scrobbles by Last.fm's rules, keeping what fails offline for later.
 - **`internal/discord`** shows what plays on the user's Discord profile, over
@@ -199,7 +208,8 @@ files only the user can read (`spotify-token.json`, `lastfm.json`,
 `youtube-session.json`). `secretStore` (`internal/app/secrets.go`) moves a
 secret found in a file into the credential store once it can keep it. The
 cache folder holds audio, the covers shown (`artwork/`), matches, how loud
-YouTube measured the tracks played (`loudness.json`), and yt-dlp's cache,
+YouTube measured the tracks played (`loudness.json`), the videos YouTube
+labels as made with AI, for 30 days (`ai-labels.json`), and yt-dlp's cache,
 and the logs folder the log and the crash reports. `MIXMUSIC_DATA_DIR`
 moves all three into one folder, for a portable copy or a test run.
 `MIXMUSIC_YTDLP_ONLY=1` has yt-dlp find every stream, as before MixMusic

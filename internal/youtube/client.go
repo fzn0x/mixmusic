@@ -98,9 +98,24 @@ func (c *Client) call(ctx context.Context, endpoint string, body map[string]any,
 
 // callAs is call, speaking as another client of InnerTube.
 func (c *Client) callAs(ctx context.Context, ic innerClient, endpoint string, body map[string]any, query url.Values) (node, error) {
+	return c.callWith(ctx, ic, endpoint, body, query, callOptions{})
+}
+
+// callOptions change how callWith asks.
+type callOptions struct {
+	// header holds headers sent besides the fixed ones.
+	header http.Header
+	// anonymous asks as a visitor YouTube doesn't know: signed out, without
+	// the visitor ID, and keeping neither the cookies nor the visitor ID of
+	// the answer, as yt-dlp finds streams.
+	anonymous bool
+}
+
+// callWith is callAs, asking as o says.
+func (c *Client) callWith(ctx context.Context, ic innerClient, endpoint string, body map[string]any, query url.Values, o callOptions) (node, error) {
 	version := ic.version(time.Now())
 	user := map[string]any{}
-	if page := c.Channel(); page != "" && c.SignedIn() {
+	if page := c.Channel(); page != "" && c.SignedIn() && !o.anonymous {
 		user["onBehalfOfUser"] = page
 	}
 	payload := map[string]any{
@@ -136,17 +151,22 @@ func (c *Client) callAs(ctx context.Context, ic innerClient, endpoint string, bo
 	req.Header.Set("Referer", defaultBaseURL+"/")
 	req.Header.Set("X-YouTube-Client-Name", ic.id)
 	req.Header.Set("X-YouTube-Client-Version", version)
-	if v := c.visitorID(); v != "" {
+	for k, vs := range o.header {
+		req.Header[http.CanonicalHeaderKey(k)] = vs
+	}
+	if v := c.visitorID(); v != "" && !o.anonymous {
 		req.Header.Set("X-Goog-Visitor-Id", v)
 	}
 	now := time.Now()
-	signed := c.signRequest(req, now)
+	signed := !o.anonymous && c.signRequest(req, now)
 	res, err := c.HTTP.Do(req)
 	if err != nil {
 		return node{}, fmt.Errorf("youtube music: %w", err)
 	}
 	defer res.Body.Close()
-	c.keepCookies(res.Cookies(), now)
+	if !o.anonymous {
+		c.keepCookies(res.Cookies(), now)
+	}
 	if signed && (res.StatusCode == http.StatusUnauthorized || res.StatusCode == http.StatusForbidden) {
 		c.reject()
 	}
@@ -165,7 +185,7 @@ func (c *Client) callAs(ctx context.Context, ic innerClient, endpoint string, bo
 	if res.StatusCode != http.StatusOK {
 		return node{}, &APIError{Status: res.StatusCode, Message: n.get("error", "message").str()}
 	}
-	if v := n.get("responseContext", "visitorData").str(); v != "" {
+	if v := n.get("responseContext", "visitorData").str(); v != "" && !o.anonymous {
 		c.setVisitorID(v)
 	}
 	if signed && accountEndpoints[endpoint] && loggedOut(n) {

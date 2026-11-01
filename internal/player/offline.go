@@ -76,11 +76,20 @@ func (p *Player) waitRadio() {
 	p.stopAtEnd(true)
 	p.waitFor(true, true, func(play bool) {
 		token := p.loadToken
-		p.extendWithRadio(func(added bool, err error) {
-			switch {
+		seed, ok := p.radioSeed()
+		if !ok {
+			return
+		}
+		p.extendWithRadio(seed, func(added bool, err error) {
+			switch i := p.s.nextIndex(); {
 			case token != p.loadToken:
-			case added:
-				p.playAt(p.s.Index+1, 0, play)
+			case added && play && p.skipsAI():
+				// Past what the queue passes over, and what YouTube labels as
+				// made with AI, checked.
+				m, at := p.moveOn(true)
+				p.step(m, at+1)
+			case added && i > p.s.Index:
+				p.playAt(i, 0, play)
 			case errors.Is(err, ErrOffline):
 				p.waitRadio() // gone again
 			}

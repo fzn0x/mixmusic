@@ -215,6 +215,20 @@ func TestLoudness(t *testing.T) {
 	}
 }
 
+// TestSkipAI has new installs and the settings of earlier versions play
+// what YouTube labels as made with AI, until the user says otherwise.
+func TestSkipAI(t *testing.T) {
+	for file, want := range map[string]bool{`{}`: false, `{"skipAi":true}`: true, `{"skipAi":false}`: false} {
+		s := Default()
+		if err := json.Unmarshal([]byte(file), &s); err != nil {
+			t.Fatal(err)
+		}
+		if s = s.Clean(); s.SkipAI != want {
+			t.Errorf("%s: SkipAI %v, not %v", file, s.SkipAI, want)
+		}
+	}
+}
+
 // TestZoom keeps a zoom of the steps, takes the nearest step for another
 // in range, and 100% for one outside them, as settings from before it.
 func TestZoom(t *testing.T) {
@@ -226,6 +240,21 @@ func TestZoom(t *testing.T) {
 		s.Zoom = c.in
 		if got := s.Clean().Zoom; got != c.want {
 			t.Errorf("a zoom of %v reads as %v, want %v", c.in, got, c.want)
+		}
+	}
+}
+
+// TestSkipDisliked passes over disliked songs in new installs, and in the
+// settings of earlier versions, which don't have it, until the user turns
+// it off.
+func TestSkipDisliked(t *testing.T) {
+	for file, want := range map[string]bool{`{}`: true, `{"autoplay":false}`: true, `{"skipDisliked":false}`: false, `{"skipDisliked":true}`: true} {
+		s := Default()
+		if err := json.Unmarshal([]byte(file), &s); err != nil {
+			t.Fatal(err)
+		}
+		if s.Clean().SkipDisliked != want {
+			t.Errorf("%s skips disliked songs %v, not %v", file, s.SkipDisliked, want)
 		}
 	}
 }

@@ -163,6 +163,78 @@ func TestQueuePanel(t *testing.T) {
 	}
 }
 
+// aiPlayer is testPlayer whose app knows the labels of YouTube: it labels
+// the tracks of ai as made with AI, and its settings skip them.
+type aiPlayer struct {
+	testPlayer
+	ai map[string]bool
+}
+
+func (p aiPlayer) Settings() settings.Settings {
+	s := settings.Default()
+	s.SkipAI = true
+	return s
+}
+
+func (p aiPlayer) KnownLabel(t media.Track) player.Label {
+	if p.ai[t.ID] {
+		return player.LabelAI
+	}
+	return player.LabelNone
+}
+
+func (p aiPlayer) Label(_ context.Context, t media.Track, _ bool) player.Label {
+	return p.KnownLabel(t)
+}
+
+// TestQueueMadeWithAI mutes the entries of the queue the player passes
+// over, and says why after their artists: one YouTube labels as made with
+// AI, one the user dislikes. It names the track that plays next; a click
+// still plays one (#97).
+func TestQueueMadeWithAI(t *testing.T) {
+	s := newTestShellWith(t, nil, func(a *app.App) player.Services {
+		return aiPlayer{testPlayer: testPlayer{a}, ai: map[string]bool{"yt:3": true}}
+	}, player.Saved{Tracks: testTracks, Index: 1})
+	s.settle(t, func(st player.State) bool { return len(st.Queue) > 2 && st.Queue[2].Skip == player.SkipMadeWithAI })
+	s.p.Disliked(testTracks[4].ID, true)
+	s.p.Play()
+	s.settle(t, func(st player.State) bool {
+		return st.Playing && st.Index == 1 && st.Queue[4].Skip == player.SkipDisliked
+	})
+	tt := tester(t, s)
+	if !tt.HasText("deadmau5 · made with AI") || !tt.HasText("Burial · skipped") {
+		t.Errorf("the queue doesn't say why it passes over Strobe and Archangel: %q", tt.Texts())
+	}
+	if tt.HasText("Aphex Twin · made with AI") || tt.HasText("Aphex Twin · skipped") {
+		t.Error("a track it plays says it's passed over")
+	}
+	s.panel = ""
+	tt.Frame()
+	if !tt.HasText("next · Windowlicker — Aphex Twin") {
+		t.Errorf("the player bar doesn't name what plays next: %q", tt.Texts())
+	}
+	s.panel = "queue"
+	tt.Frame()
+	click(t, s, tt, "Play "+testTracks[2].Title)
+	s.settle(t, func(st player.State) bool { return st.Playing && st.Index == 2 })
+}
+
+// TestAlbumPlayPastAI has an album's play button pass over its first
+// track, which YouTube labels as made with AI, and its row play it (#97).
+func TestAlbumPlayPastAI(t *testing.T) {
+	s := newTestShellWith(t, nil, func(a *app.App) player.Services {
+		return aiPlayer{testPlayer: testPlayer{a}, ai: map[string]bool{"yt:1": true}}
+	}, player.Saved{})
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:3]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	click(t, s, tt, "play")
+	s.settle(t, func(st player.State) bool { return st.Playing && st.Index == 1 })
+	tt.Frame()
+	click(t, s, tt, "Play "+testTracks[0].Title)
+	s.settle(t, func(st player.State) bool { return st.Playing && st.Index == 0 && st.Queue[0].Track.ID == "yt:1" })
+}
+
 // TestUpdateOffer offers what this copy can do with a new version, install
 // it or download what replaces it, and what's new.
 func TestUpdateOffer(t *testing.T) {

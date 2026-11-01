@@ -565,6 +565,24 @@ func (s *shell) playbackSettings(c *ui.Context) {
 				s.save()
 			}
 		})
+		s.row(c, "Skip songs made with AI", "Skips the tracks YouTube labels as made with AI. YouTube labels only some of them, so others still play.", func() {
+			if s.switchOf(c.Key("skip-ai"), &s.set.SkipAI).Label("Skip songs made with AI").Changed() {
+				s.save()
+			}
+		})
+		s.row(c, "Skip songs you dislike", "Songs you dislike don't play when the queue moves on, and radios leave them out.", func() {
+			if s.switchOf(c.Key("skip-disliked"), &s.set.SkipDisliked).Label("Skip songs you dislike").Changed() {
+				s.save()
+			}
+		})
+		ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
+			ui.Text(c, "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic.")
+			if len(s.svc.Collection.Disliked()) > 0 {
+				ui.Text(c, " ")
+				s.linkOf(c, "See the songs you dislike", "/library/disliked")
+				ui.Text(c, ".")
+			}
+		})
 	})
 	s.equalizerSettings(c)
 	s.cacheSettings(c)

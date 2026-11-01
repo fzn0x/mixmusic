@@ -217,6 +217,8 @@ type shell struct {
 	// made for the themes cardThemes.
 	cardLooks  map[string]*look
 	cardThemes []addons.Theme
+	// find is the search of the settings.
+	find settingsFind
 
 	// plugins runs the app's plugins, for the main window; nil in others.
 	plugins *plugins.Host

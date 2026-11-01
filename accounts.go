@@ -75,7 +75,15 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 			label = "waiting for the browser…"
 		}
 		ui.Row(c).Gap(8).Padding(12, 0).Children(func() {
-			id := strings.TrimSpace(clientID.text)
+			// The Client ID's draft, which its row's control made, unless
+			// the search of the settings left the row out.
+			id := s.set.SpotifyClientID
+			if clientID == nil {
+				clientID = s.drafts["client-id"]
+			}
+			if clientID != nil {
+				id = strings.TrimSpace(clientID.text)
+			}
 			if s.button(c, "spotify-in", label, true).Disabled(busy || id == "").Clicked() {
 				if id != s.set.SpotifyClientID {
 					s.set.SpotifyClientID = id

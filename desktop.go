@@ -38,7 +38,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 					s.save()
 				})
 				in.Placeholder("MixMusic's").Width(260).Label("Discord application ID")
-			})
+			}, "Discord shows the name of MixMusic's application. To show another, create one in the developer portal and paste its application ID.")
 		}
 		s.row(c, "Start at login", "", func() {
 			// The system says, beside the main thread.

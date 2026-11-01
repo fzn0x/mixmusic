@@ -39,34 +39,68 @@ var eqPresets = []struct {
 // it, to be saved.
 var colorSaveAfter = 500 * time.Millisecond
 
-// settingsPage shows the settings, by section.
-func (s *shell) settingsPage(c *ui.Context, tab string) {
+// settingsPage shows the settings, by section, or, searched for q, what
+// every section holds of it.
+func (s *shell) settingsPage(c *ui.Context, tab, q string) {
+	f := &s.find
+	// The page the router shows takes the search its location holds, as a
+	// link, Back or the palette set it. The one it leaves, which shows
+	// beside it a moment, shows its own.
+	current := s.pagePath == s.router.Path() && q == s.router.Query("q")
+	if current && q != f.route {
+		f.query, f.route = q, q
+	}
 	selected := max(slices.Index(settingsTabs, tab), 0)
 	s.pageScroll(c, func() {
-		before := selected
-		s.pageHeader(c, "settings", settingsTabs, &selected)
-		if selected != before {
-			s.router.Replace("/settings/" + settingsTabs[selected])
+		f.begin(q, current)
+		defer f.end()
+		// While the user searches, no section is chosen; choosing one
+		// leaves the search.
+		pick := selected
+		if f.on() {
+			pick = -1
 		}
+		before := pick
+		s.pageHeader(c, "settings", settingsTabs, &pick)
+		if pick != before {
+			s.router.Replace(settingsPath(settingsTabs[pick], ""))
+		}
+		s.findBox(c, tab, q, current)
 		ui.Column(c).MaxWidth(880).Children(func() {
-			switch settingsTabs[selected] {
-			case "appearance":
-				s.appearanceSettings(c)
-			case "playback":
-				s.playbackSettings(c)
-			case "accounts":
-				s.accountSettings(c)
-			case "plugins":
-				s.pluginSettings(c)
-			case "desktop":
-				s.desktopSettings(c)
-			case "shortcuts":
-				s.shortcutSettings(c)
-			case "about":
-				s.aboutSettings(c)
+			if !f.on() {
+				s.settingsSection(c, settingsTabs[selected])
+				return
+			}
+			for _, t := range settingsTabs {
+				f.section = t
+				s.settingsSection(c, t)
+			}
+			f.section = ""
+			if f.found == 0 {
+				s.emptyLine(c, "No setting matches “"+strings.TrimSpace(q)+"”.")
 			}
 		})
 	})
+}
+
+// settingsSection builds the section of the settings tab names.
+func (s *shell) settingsSection(c *ui.Context, tab string) {
+	switch tab {
+	case "appearance":
+		s.appearanceSettings(c)
+	case "playback":
+		s.playbackSettings(c)
+	case "accounts":
+		s.accountSettings(c)
+	case "plugins":
+		s.pluginSettings(c)
+	case "desktop":
+		s.desktopSettings(c)
+	case "shortcuts":
+		s.shortcutSettings(c)
+	case "about":
+		s.aboutSettings(c)
+	}
 }
 
 // save keeps the settings as the controls changed them.
@@ -80,15 +114,33 @@ func (s *shell) save() {
 func (s *shell) group(c *ui.Context, title string, rows func()) { s.groupWith(c, title, nil, rows) }
 
 // groupWith titles a set of rows, with links to what relates to them.
+// While the user searches the settings, it shows what the search finds of
+// them (findGroup).
 func (s *shell) groupWith(c *ui.Context, title string, links, rows func()) {
+	if s.find.on() {
+		s.findGroup(c, title, links, rows)
+		return
+	}
 	ui.Column(c).Margin(0, 0, 48).Children(func() {
 		s.sectionHead(c, title, links)
 		ui.Column(c).Dividers(1, s.lk.border).Children(rows)
 	})
 }
 
-// row is a setting: its title and description, and its control.
-func (s *shell) row(c *ui.Context, title, description string, control func()) {
+// row is a setting: its title and description, and its control. The
+// search of the settings finds it by them, and by words.
+func (s *shell) row(c *ui.Context, title, description string, control func(), words ...string) {
+	if !s.find.on() {
+		s.rowOf(c, title, description, control)
+		return
+	}
+	if s.findable(title, description, words...) {
+		s.show(c, func() { s.rowOf(c, title, description, control) })
+	}
+}
+
+// rowOf builds a setting's row.
+func (s *shell) rowOf(c *ui.Context, title, description string, control func()) {
 	k := &s.lk
 	ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
@@ -146,19 +198,29 @@ func (s *shell) chooseTheme(id string) {
 }
 
 // rowWith is a row whose description describe builds, with links say.
-func (s *shell) rowWith(c *ui.Context, title string, describe, control func()) {
+// The search of the settings finds it by its title, and by words, which
+// say what describe does.
+func (s *shell) rowWith(c *ui.Context, title string, describe, control func(), words ...string) {
+	if !s.findable(title, "", words...) {
+		return
+	}
 	k := &s.lk
-	ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
-		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
-			ui.Text(c, title).FontSize(k.bodySize())
-			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Children(describe)
+	s.show(c, func() {
+		ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
+			ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
+				ui.Text(c, title).FontSize(k.bodySize())
+				ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Children(describe)
+			})
+			ui.Row(c).Shrink(0).Gap(8).Children(control)
 		})
-		ui.Row(c).Shrink(0).Gap(8).Children(control)
 	})
 }
 
+// hint is a muted paragraph among a group's rows.
 func (s *shell) hint(c *ui.Context, text string) {
-	ui.Text(c, text).FontSize(s.lk.smallSize()).TextColor(s.lk.muted).Padding(12, 0).MaxWidth(720)
+	s.found(c, "", text, func() {
+		ui.Text(c, text).FontSize(s.lk.smallSize()).TextColor(s.lk.muted).Padding(12, 0).MaxWidth(720)
+	})
 }
 
 // problems tells of the add-ons of a kind that didn't load.
@@ -169,8 +231,10 @@ func (s *shell) problems(c *ui.Context, kind addons.Kind) {
 	}
 	for _, p := range s.inv.Problems {
 		if p.Kind == kind {
-			ui.Text(c, "The "+what+" in “"+p.Folder+"” did not load: "+p.Error).FontSize(s.lk.smallSize()).
-				TextColor(s.lk.danger).Padding(8, 0)
+			text := "The " + what + " in “" + p.Folder + "” did not load: " + p.Error
+			s.found(c, "", text, func() {
+				ui.Text(c, text).FontSize(s.lk.smallSize()).TextColor(s.lk.danger).Padding(8, 0)
+			})
 		}
 	}
 }
@@ -201,12 +265,27 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			s.row(c, "In light mode", "", func() { s.themeSelect(c, "light-theme", "Theme in light mode", &s.set.LightTheme) })
 			s.row(c, "In dark mode", "", func() { s.themeSelect(c, "dark-theme", "Theme in dark mode", &s.set.DarkTheme) })
 		}
-		ui.Row(c).Wrap().Gap(10).Padding(14, 0).Children(func() {
-			active := s.set.ActiveTheme(k.systemDark)
+		// The search finds a theme's card by the theme's name, who made it,
+		// and whether it is light or dark.
+		cards := s.inv.Themes
+		if s.find.sifting() {
+			cards = nil
 			for _, t := range s.inv.Themes {
-				s.themeCard(c, t, active == t.ID)
+				if s.findable(t.Name, themeBy(t)+" "+t.Scheme) {
+					cards = append(cards, t)
+				}
 			}
-		})
+		}
+		if len(cards) > 0 {
+			s.show(c, func() {
+				ui.Row(c).Wrap().Gap(10).Padding(14, 0).Children(func() {
+					active := s.set.ActiveTheme(k.systemDark)
+					for _, t := range cards {
+						s.themeCard(c, t, active == t.ID)
+					}
+				})
+			})
+		}
 		s.problems(c, addons.KindTheme)
 	})
 	// The options of the built-in themes, whose effects the native
@@ -305,12 +384,16 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 				ui.Box(c).Size(22, 22).Background(tk.tile(i))
 			}
 		})
-		by := "built in"
-		if !t.Builtin {
-			by = "by " + t.Author
-		}
-		ui.Text(c, by).FontSize(k.captionSize()).TextColor(tk.muted).SingleLine()
+		ui.Text(c, themeBy(t)).FontSize(k.captionSize()).TextColor(tk.muted).SingleLine()
 	})
+}
+
+// themeBy tells who made a theme: "built in", or "by" its author.
+func themeBy(t addons.Theme) string {
+	if t.Builtin {
+		return "built in"
+	}
+	return "by " + t.Author
 }
 
 // cardLook is the look of theme id's card, made once for the themes

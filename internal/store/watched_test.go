@@ -277,7 +277,7 @@ func TestFlush(t *testing.T) {
 		if err := f.Flush(); err != nil {
 			t.Fatal(err)
 		}
-		if got := readText(t, path + ".broken"); got != broken {
+		if got := readText(t, path+".broken"); got != broken {
 			t.Errorf("settings.json.broken holds %q, want the text as saved", got)
 		}
 		if got := onDisk(t, path); got.Theme != "aurora" || got.Volume != 0.3 {
@@ -340,7 +340,7 @@ func TestReplaceMovesBrokenAside(t *testing.T) {
 	if err := f.Replace(defCfg); err != nil {
 		t.Fatal(err)
 	}
-	if got := readText(t, path + ".broken"); got != broken {
+	if got := readText(t, path+".broken"); got != broken {
 		t.Errorf("settings.json.broken holds %q", got)
 	}
 	if got := onDisk(t, path); !reflect.DeepEqual(got, defCfg) || f.Held() != nil {
@@ -356,7 +356,7 @@ func TestOpenWithAside(t *testing.T) {
 	if f.Aside() == nil || !reflect.DeepEqual(f.Get(), defCfg) {
 		t.Errorf("Aside = %v, Get = %+v", f.Aside(), f.Get())
 	}
-	if got := readText(t, path + ".broken"); got != broken {
+	if got := readText(t, path+".broken"); got != broken {
 		t.Errorf("settings.json.broken holds %q", got)
 	}
 	// The defaults take its place, which read at the next start.

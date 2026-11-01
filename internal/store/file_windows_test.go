@@ -91,6 +91,11 @@ func TestReadLetsAnEditorSave(t *testing.T) {
 			t.Errorf("%s while MixMusic reads the file: %v", c.name, err)
 		}
 	}
+	// As editors that write the file in place save: os.Open shares writes
+	// too.
+	if err := try(openShared, func() error { return os.WriteFile(path, []byte(`{"theme": "aurora"}`), 0o644) }); err != nil {
+		t.Errorf("writing in place while MixMusic reads the file: %v", err)
+	}
 	if err := try(openShared, func() error { return os.Rename(saved, path) }); err != nil {
 		t.Logf("MoveFileEx over a file open to read: %v", err)
 	}

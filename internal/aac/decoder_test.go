@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math"
 	"math/rand/v2"
+	"slices"
 	"testing"
 )
 
@@ -57,5 +58,101 @@ func TestIMDCT(t *testing.T) {
 		if snr := 10 * math.Log10(sig/noise); snr < 120 {
 			t.Errorf("inverse MDCT of %d: SNR %.1f dB", n, snr)
 		}
+	}
+}
+
+// TestReset checks that a decoder decodes after Reset as a new one does.
+func TestReset(t *testing.T) {
+	cfg, frames := fixtureFrames(t, "stereo-44k-clicks")
+	fresh, err := decodeFrames(t, cfg, frames[10:20]...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	d, err := NewDecoder(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pcm := make([]float32, 2*FrameLength)
+	for _, f := range frames[:10] {
+		if _, err := d.Decode(f, pcm); err != nil {
+			t.Fatal(err)
+		}
+	}
+	d.Reset()
+	var got []float32
+	for _, f := range frames[10:20] {
+		if _, err := d.Decode(f, pcm); err != nil {
+			t.Fatal(err)
+		}
+		got = append(got, pcm...)
+	}
+	if !slices.Equal(got, fresh) {
+		t.Error("the decoder decodes after Reset unlike a new one")
+	}
+}
+
+// TestMono checks that a mono stream decodes into both channels.
+func TestMono(t *testing.T) {
+	cfg, frames := fixtureFrames(t, "mono-22k")
+	pcm, err := decodeFrames(t, cfg, frames...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var energy float64
+	for i := 0; i < len(pcm); i += 2 {
+		if pcm[i] != pcm[i+1] {
+			t.Fatalf("sample %d: %v and %v", i/2, pcm[i], pcm[i+1])
+		}
+		energy += float64(pcm[i]) * float64(pcm[i])
+	}
+	if energy == 0 {
+		t.Error("silence")
+	}
+}
+
+// TestAllocs checks that Decode allocates nothing.
+func TestAllocs(t *testing.T) {
+	for _, name := range []string{"stereo-44k-clicks", "mono-48k-bursts", "stereo-44k-tns"} {
+		cfg, frames := fixtureFrames(t, name)
+		d, err := NewDecoder(cfg)
+		if err != nil {
+			t.Fatal(err)
+		}
+		pcm := make([]float32, 2*FrameLength)
+		i := 0
+		allocs := testing.AllocsPerRun(len(frames), func() {
+			if _, err := d.Decode(frames[i%len(frames)], pcm); err != nil {
+				t.Fatal(err)
+			}
+			i++
+		})
+		if allocs != 0 {
+			t.Errorf("%s: %v allocations a frame", name, allocs)
+		}
+	}
+}
+
+// BenchmarkDecode decodes fixtures, stereo at 44.1 kHz with short and long
+// windows and the stereo tools, and mono at 48 kHz, and reports how many
+// times faster than real time.
+func BenchmarkDecode(b *testing.B) {
+	for _, name := range []string{"stereo-44k-clicks", "stereo-44k-tns", "mono-48k-bursts"} {
+		b.Run(name, func(b *testing.B) {
+			cfg, frames := fixtureFrames(b, name)
+			d, err := NewDecoder(cfg)
+			if err != nil {
+				b.Fatal(err)
+			}
+			pcm := make([]float32, 2*FrameLength)
+			n := 0
+			for b.Loop() {
+				if _, err := d.Decode(frames[n%len(frames)], pcm); err != nil {
+					b.Fatal(err)
+				}
+				n++
+			}
+			seconds := float64(n) * FrameLength / float64(cfg.SampleRate)
+			b.ReportMetric(seconds/b.Elapsed().Seconds(), "x-realtime")
+		})
 	}
 }

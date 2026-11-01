@@ -174,9 +174,28 @@ func (d *Direct) count(err error) {
 }
 
 func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream, error) {
+	ans, err := d.answer(ctx, videoID)
+	if err != nil {
+		return Stream{}, err
+	}
+	length := time.Duration(ans.VideoDetails.LengthSeconds) * time.Second
+	f, err := pickAudio(ans.StreamingData.AdaptiveFormats, q, length)
+	if err != nil {
+		return Stream{}, err
+	}
+	st := f.stream()
+	if err := d.check(ctx, &st); err != nil {
+		return Stream{}, err
+	}
+	return st, nil
+}
+
+// answer returns the answer of YouTube's player API about a video, when it
+// gave the video's streams.
+func (d *Direct) answer(ctx context.Context, videoID string) (playerAnswer, error) {
 	visitor, err := d.visitorID(ctx)
 	if err != nil && ctx.Err() != nil {
-		return Stream{}, err
+		return playerAnswer{}, err
 	}
 	// Without a visitor ID it trusts, YouTube asks to confirm this is not
 	// a bot. Its answer carries a new one, which passes; else the route
@@ -194,28 +213,19 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 		}
 	}
 	if err != nil {
-		return Stream{}, err
+		return playerAnswer{}, err
 	}
 	s := ans.status()
 	if !s.botCheck() {
 		d.keepVisitor(cmp.Or(ans.ResponseContext.VisitorData, visitor))
 	}
 	if s.Status != "OK" {
-		return Stream{}, s
+		return playerAnswer{}, s
 	}
 	if ans.VideoDetails.VideoID != videoID {
-		return Stream{}, fmt.Errorf("%w: the streams of another video", errBadAnswer)
+		return playerAnswer{}, fmt.Errorf("%w: the streams of another video", errBadAnswer)
 	}
-	length := time.Duration(ans.VideoDetails.LengthSeconds) * time.Second
-	f, err := pickAudio(ans.StreamingData.AdaptiveFormats, q, length)
-	if err != nil {
-		return Stream{}, err
-	}
-	st := f.stream()
-	if err := d.check(ctx, &st); err != nil {
-		return Stream{}, err
-	}
-	return st, nil
+	return ans, nil
 }
 
 // visitorID returns the route's visitor ID, asking YouTube for one when it

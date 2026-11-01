@@ -779,6 +779,28 @@ func TestFailuresStop(t *testing.T) {
 	h.wait("c playing", playing("c"))
 }
 
+// TestFailuresStopInTheEngine stops after maxFailures tracks whose streams
+// failed in the engine, which tells the time while a stream opens.
+func TestFailuresStopInTheEngine(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks("a", "b", "c", "d"), 0)
+	for i, id := range []string{"a", "b", "c"} {
+		h.wait(id+" loaded", func(p *Player) bool { return p.s.Index == i && p.loaded && p.s.Error == "" })
+		h.p.Time(0, 0)
+		h.p.Error("the stream failed")
+		h.wait(id+" tried", func(p *Player) bool { return h.stream.count("load url:yt:"+id+"?retry=") == 1 && p.loaded })
+		h.p.Time(0, 0)
+		h.p.Error("the stream failed")
+	}
+	h.wait("three failures", func(p *Player) bool { return p.failures == maxFailures })
+	time.Sleep(10 * failDelay)
+	h.on(func(p *Player) {
+		if p.s.Index != 2 || p.s.Playing {
+			t.Errorf("after three failures: index %d, playing %v", p.s.Index, p.s.Playing)
+		}
+	})
+}
+
 func TestProgress(t *testing.T) {
 	h := newHarness(t, Saved{}, func(f *fakeServices) { f.settings.Crossfade = 5 })
 	h.p.PlayTracks(tracks("a", "b"), 0)

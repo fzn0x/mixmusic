@@ -283,7 +283,6 @@ func (p *Player) onProgress() {
 	if !ok {
 		return
 	}
-	p.failures = 0
 	pos := p.s.Position
 	dur := p.s.Duration
 	if dur == 0 {
@@ -557,6 +556,12 @@ func (p *Player) Buffering(buffering bool) {
 }
 
 func (p *Player) onTime(position, duration time.Duration) {
+	if position > p.s.Position {
+		// The track plays on, which a Time alone doesn't tell: the engine
+		// also tells the time while a stream opens, and just before it tells
+		// that one failed.
+		p.failures = 0
+	}
 	p.s.Position = position
 	if duration > 0 {
 		p.s.Duration = duration

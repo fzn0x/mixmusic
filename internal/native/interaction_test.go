@@ -600,6 +600,22 @@ func TestYTDLPNotNow(t *testing.T) {
 	}
 }
 
+// TestYTDLPMissing offers yt-dlp for the tracks MixMusic can't find
+// itself, without saying nothing plays.
+func TestYTDLPMissing(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	s.loads["tools"] = &loaded[tools.Status]{done: true, value: tools.Status{}}
+	show(s, tt, "/")
+	if !tt.HasText("Some tracks need yt-dlp") || !tt.HasText("install yt-dlp") {
+		t.Fatalf("no offer: %q", tt.Texts())
+	}
+	show(s, tt, "/settings/playback")
+	if !tt.HasText("Not found. Some YouTube Music tracks play only with it.") {
+		t.Errorf("settings say %q", tt.Texts())
+	}
+}
+
 // TestLyricsScrolledStay keeps lyrics the user scrolls from following the
 // song for a while.
 func TestLyricsScrolledStay(t *testing.T) {

@@ -1,6 +1,7 @@
 // Package tools finds and installs the programs MixMusic runs: yt-dlp,
-// which finds the audio streams of YouTube, and a JavaScript runtime, which
-// yt-dlp needs to solve the challenges YouTube sends.
+// which finds the audio streams YouTube's player API won't give MixMusic
+// itself, and a JavaScript runtime, which yt-dlp needs to solve the
+// challenges YouTube sends.
 package tools
 
 import (

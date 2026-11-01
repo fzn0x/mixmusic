@@ -61,6 +61,10 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 					line += " · on Spotify"
 				}
 			}
+			// While MixMusic plays it at another speed than its own.
+			if sp := s.st.Speed; sp > 0 && sp != 1 && s.st.Source != nil {
+				line += " · " + speedLabel(sp)
+			}
 			if s.st.Waiting {
 				line += " · waiting for the network"
 			}

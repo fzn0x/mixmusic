@@ -47,6 +47,13 @@ jobs:
           echo "6b26a22f9ba87b2b836906a9bb7afec5f8e54d49553b1200382520ee6fedfa55  $RUNNER_TEMP/opus-vectors.tar.gz" | sha256sum -c -
           mkdir -p "$RUNNER_TEMP/opus-vectors"
           tar -xzf "$RUNNER_TEMP/opus-vectors.tar.gz" -C "$RUNNER_TEMP/opus-vectors"
+      # The community plugins' JavaScript, which tests run, and the
+      # registry check reads: main keeps their TypeScript only.
+      - uses: oven-sh/setup-bun@v2
+      - name: Compile the community plugins
+        run: |
+          bun install --frozen-lockfile
+          bun run build:plugins
       - name: Test
         run: go test ./...
         env:
@@ -130,13 +137,16 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
-      # The plugins and the plugin API are written in TypeScript, and ship
-      # the JavaScript they compile to.
-      - name: The plugins' JavaScript is compiled from their TypeScript
+      # The plugin API is written in TypeScript, and ships the JavaScript it
+      # compiles to, which the Go side embeds: main keeps it, and it must be
+      # what its TypeScript compiles to. The community plugins compile too,
+      # into JavaScript the Registry workflow publishes, which main doesn't
+      # keep.
+      - name: The plugins compile, and api.js is what api.ts compiles to
         run: |
           bun run build:plugins
-          if ! git diff --exit-code -- community/plugins internal/plugins/api.js; then
-            echo "Run bun run build:plugins, and commit the JavaScript it writes" >&2
+          if ! git diff --exit-code -- internal/plugins/api.js; then
+            echo "Run bun run build:plugins, and commit internal/plugins/api.js" >&2
             exit 1
           fi
 

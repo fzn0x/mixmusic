@@ -1,0 +1,61 @@
+name: Registry
+
+# Publishes the community's add-ons to the registry branch, where MixMusic
+# downloads them (the baseUrl of community/registry-2.json): their files,
+# as their manifests list them, with the plugins' JavaScript compiled from
+# their TypeScript, which main doesn't keep. The branch's web/, the
+# add-ons of registry.json for MixMusic 0.4 and before, stays as it is.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "community/**"
+      - "sdk/**"
+      - "tsconfig*.json"
+      - "package.json"
+      - "bun.lock"
+      - "tools/registry/**"
+      - ".github/workflows/registry.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write # pushes the registry branch
+
+concurrency:
+  group: registry
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish the add-ons
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # The tools of flake.nix's shell, at the versions of flake.lock.
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Compile the plugins, and check the registry
+        run: |
+          nix develop --command bun install --frozen-lockfile
+          nix develop --command bun run build:plugins
+          nix develop --command go run ./tools/registry -check
+      - name: Stage the files apps download
+        run: nix develop --command go run ./tools/registry -publish "$RUNNER_TEMP/addons"
+      - name: Publish them to the registry branch
+        run: |
+          set -euo pipefail
+          git fetch --depth 1 origin registry
+          git worktree add --detach "$RUNNER_TEMP/branch" origin/registry
+          cd "$RUNNER_TEMP/branch"
+          rm -rf plugins themes
+          cp -r "$RUNNER_TEMP/addons/plugins" "$RUNNER_TEMP/addons/themes" .
+          git add -A plugins themes
+          if git diff --cached --quiet; then
+            echo "The registry branch has these add-ons already."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Publish the add-ons of ${GITHUB_SHA::7}"
+          git push origin HEAD:registry
+          git show --stat --format="%h %s" HEAD

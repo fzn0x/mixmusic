@@ -103,13 +103,18 @@ func (a *App) ReadCommunityFrom(dir string) {
 	a.addons.HTTP.Transport = communityDir(dir)
 }
 
-// communityDir answers the requests for the community folder on GitHub
-// from a folder on disk, and passes the others on.
+// communityDir answers the requests for the community folder on GitHub,
+// and for the add-ons the registry branch publishes from it, from a folder
+// on disk, and passes the others on. The folder's plugins must be compiled
+// (`bun run build:plugins`), as the registry branch's are.
 type communityDir string
 
 func (d communityDir) RoundTrip(r *http.Request) (*http.Response, error) {
 	base := settings.DefaultRegistryURL[:strings.LastIndex(settings.DefaultRegistryURL, "/")+1]
 	name, ok := strings.CutPrefix(r.URL.String(), base)
+	if !ok {
+		name, ok = strings.CutPrefix(r.URL.String(), addons.CommunityFilesURL)
+	}
 	if !ok {
 		return http.DefaultTransport.RoundTrip(r)
 	}

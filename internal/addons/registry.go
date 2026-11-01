@@ -42,6 +42,11 @@ type Entry struct {
 	API         int      `json:"api,omitempty"`
 }
 
+// CommunityFilesURL is where the community's add-ons are downloaded from,
+// the baseUrl of its registries: the registry branch, where the Registry
+// workflow publishes them, with the plugins compiled from their TypeScript.
+const CommunityFilesURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/registry/"
+
 // Registry is the community registry of themes and plugins.
 type Registry struct {
 	Version int `json:"version"`

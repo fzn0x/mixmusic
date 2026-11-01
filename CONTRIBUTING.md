@@ -29,6 +29,7 @@ Before you open a pull request:
 ```sh
 gofmt -l .                      # prints nothing
 go vet ./... && GOOS=linux go vet ./... && GOOS=darwin go vet ./...
+bun run build:plugins           # the community plugins' JavaScript, which tests run
 go test ./...
 bun run typecheck
 go run ./tools/registry -check

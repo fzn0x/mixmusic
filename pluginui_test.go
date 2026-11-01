@@ -13,11 +13,19 @@ import (
 )
 
 // withCommunityPlugins installs the community's plugins in the shell's app
-// and runs them, as the main window does.
+// and runs them, as the main window does. They run as the JavaScript their
+// TypeScript compiles to, which `bun run build:plugins` writes: without
+// it, the test skips, but fails in CI, which builds it first.
 func withCommunityPlugins(t *testing.T, s *shell, ids ...string) {
 	t.Helper()
 	for _, id := range ids {
 		src := filepath.Join("community", "plugins", id)
+		if _, err := os.Stat(filepath.Join(src, "index.js")); err != nil {
+			if os.Getenv("CI") != "" {
+				t.Fatalf("the %s plugin isn't compiled: CI runs bun run build:plugins before the tests", id)
+			}
+			t.Skipf("the %s plugin isn't compiled: run bun run build:plugins", id)
+		}
 		dst := filepath.Join(s.svc.System.Info().DataDir, "addons", "plugins", id)
 		if err := os.MkdirAll(dst, 0o755); err != nil {
 			t.Fatal(err)

@@ -2,6 +2,7 @@ package stream
 
 import (
 	"errors"
+	"io"
 	"io/fs"
 	"net/http"
 	"os"
@@ -65,6 +66,55 @@ func (c *Cache) find(videoID string) (string, string, bool) {
 func (c *Cache) Has(videoID string) bool {
 	_, _, ok := c.find(videoID)
 	return ok
+}
+
+// Find returns the cached file of a video, and its content type, if the
+// cache holds one.
+func (c *Cache) Find(videoID string) (path, mime string, ok bool) { return c.find(videoID) }
+
+// Take moves the cached audio of a video to dst, out of the cache, and
+// reports whether the cache held it: a download of a track the cache holds
+// costs no network. A file it can't move, as on another volume, or open on
+// Windows, it copies, leaving the cached one to the cache.
+func (c *Cache) Take(videoID, dst string) (bool, error) {
+	path, _, ok := c.find(videoID)
+	if !ok {
+		return false, nil
+	}
+	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
+		return true, err
+	}
+	if os.Rename(path, dst) == nil {
+		return true, nil
+	}
+	return true, copyFile(path, dst)
+}
+
+// copyFile copies src to dst, through a file beside dst that takes its
+// name once whole.
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	out, err := os.CreateTemp(filepath.Dir(dst), "."+filepath.Base(dst)+".*.tmp")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(out.Name()) // a no-op once renamed
+	if _, err := io.Copy(out, in); err != nil {
+		out.Close()
+		return err
+	}
+	if err := out.Sync(); err != nil {
+		out.Close()
+		return err
+	}
+	if err := out.Close(); err != nil {
+		return err
+	}
+	return os.Rename(out.Name(), dst)
 }
 
 // Serve answers r with the cached audio of a video, and reports whether it

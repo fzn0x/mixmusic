@@ -8,6 +8,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // fakeDevice starts outputs that the test renders, frame for frame.
@@ -458,10 +460,11 @@ func TestEngineVolume(t *testing.T) {
 	e.Load(cuesFront, 0, true)
 	buffered(t, e, 0, ringFrames/2)
 	got := dev.play(t, Rate)
-	// After the glide, a quarter.
+	// After the glide, the gain of the middle of the slider, about -30 dB.
+	g := volume.Gain(0.5)
 	for i := Rate; i < 2*Rate; i++ {
-		if d := float64(got[i]) - float64(want[i])*0.25; d > 1e-6 || d < -1e-6 {
-			t.Fatalf("frame %d: %v, want %v", i/2, got[i], want[i]*0.25)
+		if d := float64(got[i]) - float64(want[i])*g; d > 1e-6 || d < -1e-6 {
+			t.Fatalf("frame %d: %v, want %v", i/2, got[i], float64(want[i])*g)
 		}
 	}
 }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,6 +16,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
+  <script>document.documentElement.className = "js";</script>
 </head>
 <body>
   <a class="skip" href="#features">Skip to the features</a>
@@ -36,6 +37,11 @@
     <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.4-1.2-1.7-1.2-3 0-1 .8-1.6 1.8-1.6H17a3.5 3.5 0 0 0 3.5-3.5c0-4-3.8-7.2-8.5-7.2ZM7.5 11.5h.01M9.5 7.5h.01M14.5 7.5h.01" /></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor" /></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 4.5v15M17 4.5v15" /></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M5.5 5v14l10-7zM18.5 5v14" /></symbol>
+    <symbol id="i-previous" viewBox="0 0 24 24"><path d="M18.5 5v14l-10-7zM5.5 5v14" /></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M3.5 7h2.8c2.4 0 3.7 1.3 5 3.5l1.4 2.4c1.3 2.2 2.6 3.6 5 3.6h2.8M17.8 4.4l2.7 2.6-2.7 2.6M3.5 16.5h2.8c1.5 0 2.5-.5 3.4-1.4M14.3 8.4c.9-.9 1.9-1.4 3.4-1.4h2.8M17.8 13.9l2.7 2.6-2.7 2.6" /></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M4.5 11.5V10A3 3 0 0 1 7.5 7h12M16.8 4.3 19.5 7l-2.7 2.7M19.5 12.5V14a3 3 0 0 1-3 3h-12M7.2 19.7 4.5 17l2.7-2.7" /></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13" /></symbol>
   </svg>
 
   <header class="appbar" data-appbar>
@@ -74,9 +80,80 @@
         </div>
         <p class="meta">Version <span data-version>0.5.5</span> · MIT or GPLv3 · macOS, Windows and Linux · YouTube Music needs no account</p>
       </div>
-      <figure class="stage stage-hero" style="--glow: #717ed6">
+      <figure class="stage stage-hero demo-fallback" style="--glow: #717ed6">
         <img src="assets/shots/now-playing.webp" width="1536" height="870" fetchpriority="high" alt="The now playing page in the Mochi theme: アイドル by YOASOBI, its cover under the visualizer, and its synced lyrics beside it." />
       </figure>
+
+      <div class="demo-wrap" data-demo-wrap>
+        <section class="demo" aria-label="A demo of the MixMusic player" data-demo>
+          <div class="demo-top">
+            <span class="demo-brand"><svg class="brand-mark" width="20" height="20" aria-hidden="true"><use href="#i-rings" /></svg>MixMusic</span>
+            <label class="demo-search">
+              <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-search" /></svg>
+              <input type="search" placeholder="Search Spotify and YouTube Music" autocomplete="off" spellcheck="false" aria-label="Search the demo's tracks on both services" data-demo-search />
+            </label>
+          </div>
+          <div class="demo-body">
+            <div class="demo-now">
+              <img class="demo-cover" src="assets/covers/cover-2.webp" width="480" height="480" alt="The cover of Paper Planets, made up for this demo" data-demo-cover />
+              <div class="demo-meta">
+                <p class="demo-title" data-demo-title></p>
+                <p class="demo-artist"><span class="mark" data-demo-mark></span><span data-demo-artist></span></p>
+              </div>
+              <div class="demo-progress">
+                <span data-demo-elapsed>0:00</span>
+                <div class="demo-bar" role="slider" tabindex="0" aria-label="Position in the track" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-demo-bar><span class="demo-fill" data-demo-fill></span></div>
+                <span data-demo-total>0:00</span>
+              </div>
+              <div class="demo-transport">
+                <button class="demo-icon" type="button" aria-label="Shuffle" aria-pressed="false" data-demo-shuffle><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-shuffle" /></svg></button>
+                <button class="demo-icon" type="button" aria-label="Previous track" data-demo-prev><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-previous" /></svg></button>
+                <button class="play play-demo" type="button" aria-label="Play" data-demo-play><svg class="icon i-play" width="24" height="24" aria-hidden="true"><use href="#i-play" /></svg><svg class="icon i-pause" width="24" height="24" aria-hidden="true"><use href="#i-pause" /></svg></button>
+                <button class="demo-icon" type="button" aria-label="Next track" data-demo-next><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-next" /></svg></button>
+                <button class="demo-icon" type="button" aria-label="Repeat the queue" aria-pressed="false" data-demo-repeat><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-repeat" /></svg></button>
+              </div>
+            </div>
+            <div class="demo-side">
+              <div class="demo-side-head">
+                <h2 class="demo-heading" data-demo-heading>Up next</h2>
+                <div class="demo-filter" role="group" aria-label="Search on" data-demo-filter hidden>
+                  <button type="button" class="is-on" aria-pressed="true" data-src="both">Both</button>
+                  <button type="button" aria-pressed="false" data-src="spotify">Spotify</button>
+                  <button type="button" aria-pressed="false" data-src="youtube">YouTube Music</button>
+                </div>
+              </div>
+              <ol class="demo-list" data-demo-list></ol>
+              <p class="demo-status" aria-live="polite" data-demo-status></p>
+            </div>
+          </div>
+        </section>
+        <p class="demo-note">A working demo of the player: play, skip, pick from the queue, or search both services and add to it. The tracks and covers are made up for this page, and it makes no sound.</p>
+      </div>
+    </section>
+
+    <section class="merge" id="one-queue" aria-labelledby="merge-title" data-merge>
+      <div class="merge-sticky">
+        <div class="merge-head">
+          <h2 id="merge-title">Two services, one queue</h2>
+          <p class="lead">Your Spotify tracks and your YouTube Music tracks no longer need two apps. They line up in one queue, in the order you choose.</p>
+          <p class="merge-note">The tracks and covers here are made up for this page.</p>
+        </div>
+        <div class="merge-stage" data-merge-stage>
+          <p class="merge-label merge-label-spotify" aria-hidden="true"><span class="mark mark-spotify"></span>Spotify</p>
+          <p class="merge-label merge-label-youtube" aria-hidden="true"><span class="mark mark-youtube"></span>YouTube Music</p>
+          <p class="merge-label merge-label-queue" aria-hidden="true"><svg class="icon" width="16" height="16"><use href="#i-queue" /></svg>Up next in MixMusic</p>
+          <ol class="merge-list" aria-label="One queue of Spotify and YouTube Music tracks (made up for this page)">
+            <li class="merge-row" data-src="spotify" style="--row-art: #ec8051"><img src="assets/covers/cover-2.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Paper Planets</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Velvet Ferries</span></span></li>
+            <li class="merge-row" data-src="youtube" style="--row-art: #52e4ea"><img src="assets/covers/cover-1.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Neon Tide</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Kaori Ume</span></span></li>
+            <li class="merge-row" data-src="spotify" style="--row-art: #7769d3"><img src="assets/covers/cover-3.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Slow Static</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Mira Vale</span></span></li>
+            <li class="merge-row" data-src="youtube" style="--row-art: #d96472"><img src="assets/covers/cover-4.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Kitsune Run</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Hoshino Club</span></span></li>
+            <li class="merge-row" data-src="spotify" style="--row-art: #92d369"><img src="assets/covers/cover-5.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Glass Garden</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Juniper Lane</span></span></li>
+            <li class="merge-row" data-src="youtube" style="--row-art: #e99453"><img src="assets/covers/cover-6.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Afterglow Avenue</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Oriel Bloom</span></span></li>
+            <li class="merge-row" data-src="spotify" style="--row-art: #5181ec"><img src="assets/covers/cover-7.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Little Satellites</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Coral &amp; the Comets</span></span></li>
+            <li class="merge-row" data-src="youtube" style="--row-art: #51a8ec"><img src="assets/covers/cover-8.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Summer Signal</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Aoi Kanata</span></span></li>
+          </ol>
+        </div>
+      </div>
     </section>
 
     <section class="section" id="features" aria-labelledby="features-title">

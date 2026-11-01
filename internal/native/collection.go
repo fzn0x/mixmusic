@@ -356,25 +356,23 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 
 // mixDialogs rename and delete mixes.
 func (s *shell) mixDialogs(c *ui.Context, key string) {
-	k := &s.lk
-	ui.Modal(c, &s.renaming, func() {
-		ui.Text(c, "rename mix").FontSize(k.titleSize()).FontWeight(300).Font(k.display)
-		in := ui.TextInput(c.Key("rename"), &s.renameTo).AutoFocus().Label("Name").Width(360)
-		ui.Row(c).Gap(8).Justify(ui.End).Children(func() {
-			if s.button(c, "rename-cancel", "cancel", false).Clicked() {
-				s.renaming = false
-			}
-			if s.button(c, "rename-ok", "rename", true).Clicked() || in.Submitted() {
-				if t := strings.TrimSpace(s.renameTo); t != "" {
-					if err := s.svc.Collection.UpdatePlaylist(s.renameID, t, ""); err != nil {
-						s.notes = append(s.notes, noticeOf(err))
-					}
-					s.forget(key)
+	var in ui.Element
+	s.dialog(c, &s.renaming, dialogOptions{key: "rename", title: "rename mix"}, func() {
+		in = ui.TextInput(c.Key("rename"), &s.renameTo).AutoFocus().Label("Name").Width(360)
+	}, func() {
+		if s.button(c, "rename-cancel", "cancel", false).Clicked() {
+			s.renaming = false
+		}
+		if s.button(c, "rename-ok", "rename", true).Clicked() || in.Submitted() {
+			if t := strings.TrimSpace(s.renameTo); t != "" {
+				if err := s.svc.Collection.UpdatePlaylist(s.renameID, t, ""); err != nil {
+					s.notes = append(s.notes, noticeOf(err))
 				}
-				s.renaming = false
+				s.forget(key)
 			}
-		})
-	}).Padding(32).Gap(16)
+			s.renaming = false
+		}
+	})
 	if ui.AlertDialog(c, &s.deleting, "Delete mix", "Delete "+s.deleteTitle+"? Its tracks stay where they came from.", "Cancel", "Delete") == 1 {
 		if err := s.svc.Collection.DeletePlaylist(s.deleteID); err != nil {
 			s.notes = append(s.notes, noticeOf(err))

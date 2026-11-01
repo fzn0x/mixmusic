@@ -45,6 +45,7 @@ func (s *shell) view(c *ui.Context) {
 	s.updateOffer(c)
 	s.questionDialog(c)
 	s.promptDialog(c)
+	s.sweepDialogs()
 	s.sweepViews()
 }
 

@@ -180,7 +180,11 @@ jobs:
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - run: nix develop --command bun install --frozen-lockfile
-      - run: nix develop --command bun run build -- -platform "${{ matrix.platform }}"
+      - run: nix develop --command bash .github/scripts/build.sh "${{ matrix.platform }}"
+      # Nix's own loader would keep it from starting outside NixOS (#166).
+      - name: The Linux build asks for the system's loader
+        if: startsWith(matrix.platform, 'linux/')
+        run: nix develop --command go run ./tools/elfloader build/linux-amd64
       # release.yml finds the installer by this name.
       - name: The installer has the name the release looks for
         if: startsWith(matrix.platform, 'windows/')

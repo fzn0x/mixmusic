@@ -75,7 +75,12 @@ jobs:
         env:
           # Signs the update files; without it the build skips them.
           MYGO_UPDATER_PRIVATE_KEY: ${{ secrets.MYGO_UPDATER_PRIVATE_KEY }}
-        run: nix develop --command bun run build -- -platform "${{ matrix.platform }}"
+        # A build per platform, each Linux one asking for the system's loader.
+        run: nix develop --command bash .github/scripts/build.sh "${{ matrix.platform }}"
+      # Nix's own loader would keep them from starting outside NixOS (#166).
+      - name: The Linux builds ask for the system's loader
+        if: matrix.name == 'Linux'
+        run: nix develop --command go run ./tools/elfloader build/linux-amd64 build/linux-arm64
       - name: Package the portable zips, the RPMs and the AppImages
         if: matrix.name != 'macOS'
         run: nix develop --command bash .github/scripts/package.sh "${TAG#v}" release

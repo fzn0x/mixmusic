@@ -142,7 +142,7 @@ func (s *shell) brand(c *ui.Context, collapsed bool) {
 // current page floods its box with the accent.
 func (s *shell) navEntry(c *ui.Context, key, label string, svg *ui.SVG, path string, current bool) {
 	k := &s.lk
-	row := s.buttonBase(c.Key(key)).Gap(12).Justify(ui.Start).Label(label).KeepFocus().Cursor(ui.CursorPointer)
+	row := s.buttonBase(c.Key(key)).Gap(12).Justify(ui.Start).Label(label).Cursor(ui.CursorPointer)
 	if s.railFolded() {
 		row.Tooltip(label)
 	}
@@ -203,7 +203,7 @@ func (s *shell) mixes(c *ui.Context, path string) {
 
 func (s *shell) sideLink(c *ui.Context, key, title string, n int, to, path string) {
 	k := &s.lk
-	link := s.buttonBase(c.Key(key)).Justify(ui.SpaceBetween).Gap(12).Padding(7, 0).Label(title).KeepFocus().Cursor(ui.CursorPointer)
+	link := s.buttonBase(c.Key(key)).Justify(ui.SpaceBetween).Gap(12).Padding(7, 0).Label(title).Cursor(ui.CursorPointer)
 	if link.Clicked() {
 		s.navigate(to)
 	}

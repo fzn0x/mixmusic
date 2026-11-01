@@ -14,7 +14,7 @@ import (
 // over a tint on hover, and to the accent when on.
 func (s *shell) iconButton(c *ui.Context, key, name, label string, on bool, size float32) ui.Element {
 	k := &s.lk
-	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).KeepFocus().Cursor(ui.CursorPointer)
+	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
 	ink := k.muted
 	switch {
 	case on:
@@ -44,7 +44,7 @@ func (s *shell) roundButton(c *ui.Context, key, name, label string, main, disabl
 // round is a round button of size, with a glyph of the size given.
 func (s *shell) round(c *ui.Context, key, name, label string, main, disabled bool, size, glyph float32) ui.Element {
 	k := &s.lk
-	b := s.buttonBase(c.Key(key)).Size(size, size).Radius(size / 2).Label(label).Tooltip(label).KeepFocus().
+	b := s.buttonBase(c.Key(key)).Size(size, size).Radius(size / 2).Label(label).Tooltip(label).
 		Cursor(ui.CursorPointer).Disabled(disabled)
 	ink := k.text
 	switch {

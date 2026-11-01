@@ -1,11 +1,14 @@
 package native
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 )
 
@@ -237,6 +240,53 @@ func TestSpaceAfterClicks(t *testing.T) {
 	})
 }
 
+// TestSpaceAfterSearch takes the keyboard from a search with a click on
+// the player's buttons or a track's, for Space to play or pause, and the
+// one-key shortcuts, as M mutes.
+func TestSpaceAfterSearch(t *testing.T) {
+	s := playing(t)
+	s.loads["search:lua"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
+		YouTube: media.SearchResults{Tracks: testTracks[:3]}}}
+	tt := testerOf(t, s, 1600, 1000)
+	tt.Key(ui.Cmd, ui.KeyF)
+	tt.Frame()
+	tt.Type("lua")
+	tt.Key(0, ui.KeyEnter)
+	s.drain()
+	tt.Frame()
+	tt.Advance(time.Second)
+	click(t, s, tt, "Pause")
+	s.settle(t, func(st player.State) bool { return !st.Playing })
+	tt.Frame()
+	spacePlays(t, s, tt, "searching, then a click on Pause")
+	if s.query != "lua" {
+		t.Errorf("Space went into the search box: %q", s.query)
+	}
+
+	s = playing(t)
+	for _, tr := range testTracks[:3] {
+		if err := s.svc.Collection.SetLiked(context.Background(), tr, true); err != nil {
+			t.Fatal(err)
+		}
+	}
+	tt = testerOf(t, s, 1600, 1000)
+	show(s, tt, "/library/liked")
+	if err := tt.Click("Search this list"); err != nil {
+		t.Fatal(err)
+	}
+	tt.Type("m")
+	tt.Frame()
+	click(t, s, tt, "Pause "+testTracks[0].Title)
+	s.settle(t, func(st player.State) bool { return !st.Playing })
+	tt.Frame()
+	spacePlays(t, s, tt, "searching a list, then a click on a track's Pause")
+	tt.TypeKey(0, ui.KeyM, "m")
+	s.settle(t, func(st player.State) bool { return st.Muted })
+	if q := s.tools["liked"].query; q != "m" {
+		t.Errorf("the keys went into the list's search: %q", q)
+	}
+}
+
 // TestSpaceAfterTab leaves Space to a tile Tab reached, which opens it.
 func TestSpaceAfterTab(t *testing.T) {
 	s := playing(t)
@@ -246,6 +296,19 @@ func TestSpaceAfterTab(t *testing.T) {
 	tt.Advance(time.Second)
 	if got := s.router.Path(); got != "/library/liked" {
 		t.Errorf("Space on the tile Tab reached went to %q", got)
+	}
+}
+
+// TestTabAfterClick goes on from what was clicked: from a sidebar entry to
+// the next.
+func TestTabAfterClick(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	click(t, s, tt, "library")
+	tt.Key(0, ui.KeyTab)
+	tt.Frame()
+	if !tt.Focused("stats") {
+		t.Error("Tab after a click on library doesn't go on to stats")
 	}
 }
 

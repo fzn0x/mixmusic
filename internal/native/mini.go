@@ -63,7 +63,9 @@ func (s *shell) miniView(c *ui.Context) {
 	// leaves the transport.
 	side := min(h, max(w-miniRoom, 0))
 	cur, ok := s.st.Current()
-	root := ui.Row(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body).DragWindow()
+	// A click in it leaves the focus where it was: the mini player runs no
+	// shortcuts (#38), and Space would press the button clicked last again.
+	root := ui.Row(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body).DragWindow().KeepFocus()
 	s.ground(c, root)
 	root.Children(func() {
 		art := ui.Box(c.Key("mini-art")).Size(side, h).Shrink(0).Clip()

@@ -1,9 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"context"
+	"slices"
+	"strconv"
 	"testing"
 
+	"github.com/egoist/mygo/ui"
+
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -78,5 +86,83 @@ func TestWords(t *testing.T) {
 	k = lookOf(themeWith(map[string]string{"headings": "regular"}), settings.DensityComfortable)
 	if got := k.words("Liked songs on YouTube Music"); got != "Liked songs on YouTube Music" {
 		t.Errorf("regular: %q", got)
+	}
+}
+
+// defaultLayout are the layout tokens at the values a theme without them
+// has, for a theme of the radius given.
+func defaultLayout(radius float64) map[string]string {
+	return map[string]string{
+		"radius-small": strconv.FormatFloat(radius*0.6, 'f', -1, 32) + "px", "shape": "box", "row": "52px",
+		"gutter": "40px", "gap": "16px", "rail": "248px", "cover": "172px", "player-height": "92px",
+		"player": "docked", "controls": "outline", "headings": "light", "cards": "none", "motion": "standard",
+	}
+}
+
+// pagesOf draws the main pages of a shell in theme, at a density, with
+// the layout tokens given, nil for none, as images, by name.
+func pagesOf(t *testing.T, theme string, density settings.Density, layout map[string]string) map[string][]byte {
+	t.Helper()
+	s := newTestShell(t)
+	st := s.svc.Preferences.Get()
+	st.FollowSystem, st.Theme, st.Density = false, theme, density
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+	for i := range s.inv.Themes {
+		if s.inv.Themes[i].ID == theme {
+			s.inv.Themes[i].Layout = layout
+		}
+	}
+	s.restyle()
+	album := media.Album{ID: "al-1", Source: media.SourceYouTube, Title: "Hurry Up, We're Dreaming",
+		Artists: []media.Ref{{ID: "ar-m83", Name: "M83"}}, Year: "2011", Tracks: testTracks}
+	var items []media.Item
+	for i := range testTracks {
+		items = append(items, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
+	}
+	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+		{Title: "Listen again", Source: media.SourceYouTube, Items: items}, {Title: "Albums for you", Source: media.SourceYouTube,
+			Items: []media.Item{{Kind: media.ItemAlbum, Album: &album}}}}}
+	s.loads["album:al-1"] = &loaded[media.Album]{done: true, value: album}
+	for _, tr := range testTracks[:3] {
+		if err := s.svc.Collection.SetLiked(context.Background(), tr, true); err != nil {
+			t.Fatal(err)
+		}
+	}
+	tt := testerOf(t, s, 1280, 820)
+	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+		{Title: "Listen again", Source: media.SourceYouTube, Items: items}, {Title: "Albums for you", Source: media.SourceYouTube,
+			Items: []media.Item{{Kind: media.ItemAlbum, Album: &album}}}}}
+	s.p.PlayTracks(testTracks, 1)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	pages := map[string][]byte{}
+	for _, path := range []string{"/", "/album/al-1", "/now-playing", "/library/liked", "/settings/appearance"} {
+		show(s, tt, path)
+		pages[path] = slices.Clone(tt.Image().Pix)
+	}
+	mini := ui.NewTester(s.miniView, 420, 132)
+	mini.Frame()
+	pages["mini"] = slices.Clone(mini.Image().Pix)
+	return pages
+}
+
+// TestDefaultLayoutDrawsAsBefore draws the main pages of themes without
+// layout tokens, then with every token set to the value a theme without
+// it has: the pages are the same to the pixel, at both densities.
+func TestDefaultLayoutDrawsAsBefore(t *testing.T) {
+	for _, c := range []struct {
+		theme   string
+		radius  float64
+		density settings.Density
+	}{{"mix", 0, settings.DensityComfortable}, {"mix", 0, settings.DensityCompact}, {"sakura", 20, settings.DensityComfortable}} {
+		before := pagesOf(t, c.theme, c.density, nil)
+		after := pagesOf(t, c.theme, c.density, defaultLayout(c.radius))
+		for name, img := range before {
+			if !bytes.Equal(img, after[name]) {
+				t.Errorf("%s, %s: %s differs with the default layout tokens", c.theme, c.density, name)
+			}
+		}
 	}
 }

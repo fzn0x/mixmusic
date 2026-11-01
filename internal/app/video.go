@@ -129,9 +129,5 @@ func (s *System) WebViewProblem() string {
 }
 
 // MiniPlayerOpen reports whether the mini player is open: the main window
-// shows no music video meanwhile.
-func (s *System) MiniPlayerOpen() bool {
-	s.a.mu.Lock()
-	defer s.a.mu.Unlock()
-	return s.a.mini != nil
-}
+// shows no music video meanwhile. Frames ask it.
+func (s *System) MiniPlayerOpen() bool { return s.a.miniOpen.Load() }

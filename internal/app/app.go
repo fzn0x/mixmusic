@@ -114,6 +114,9 @@ type App struct {
 	// videoPage is the page of the main window that plays the picture of
 	// music videos, while it is open.
 	videoPage atomic.Pointer[mygo.Page]
+	// miniOpen is set while the mini player is open, which the main
+	// window's frames ask without taking mu.
+	miniOpen atomic.Bool
 	// onNavigate shows the pages of the main window.
 	onNavigate *func(target string)
 	// updates keeps the user's choices of updates.

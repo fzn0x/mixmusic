@@ -266,6 +266,29 @@ func TestThemeCards(t *testing.T) {
 	}
 }
 
+// TestThemeCardLooks makes each theme card's look once, not in every
+// frame, until the themes installed change.
+func TestThemeCardLooks(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 1600)
+	show(s, tt, "/settings/appearance")
+	if len(s.cardLooks) != len(s.inv.Themes) || len(s.cardLooks) == 0 {
+		t.Fatalf("%d looks of cards for %d themes", len(s.cardLooks), len(s.inv.Themes))
+	}
+	first := s.cardLook("aurora")
+	tt.Frame()
+	if s.cardLook("aurora") != first {
+		t.Error("a frame made the card's look again")
+	}
+	if first.bg == s.cardLook("daylight").bg {
+		t.Error("two themes' cards have one ground")
+	}
+	s.refresh()
+	if s.cardLook("aurora") == first {
+		t.Error("the themes read again kept the card's look")
+	}
+}
+
 // TestAppearance gives the title bar and the system's menus the light or
 // dark of the theme worn, and leaves them to the computer while the theme
 // follows it.

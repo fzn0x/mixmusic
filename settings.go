@@ -289,7 +289,7 @@ func (s *shell) themeSelect(c *ui.Context, key, label string, id *string) {
 func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 	k := &s.lk
 	id, name := t.ID, t.Name
-	tk := newLook(settings.Settings{Theme: id, FontScale: 1}, s.inv.Themes, k.dark, "")
+	tk := s.cardLook(id)
 	card := s.buttonBase(c.Key("theme-"+id)).Width(200).Height(124).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 		Padding(14).Background(tk.bg).Border(1, tk.border).Label(name).Cursor(ui.CursorPointer)
 	if current {
@@ -311,6 +311,24 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 		}
 		ui.Text(c, by).FontSize(k.captionSize()).TextColor(tk.muted).SingleLine()
 	})
+}
+
+// cardLook is the look of theme id's card, made once for the themes
+// installed: a look lists the system's fonts, which takes a while, and the
+// cards show every theme in every frame. A card's look is the theme's own,
+// whatever the settings and the computer's light or dark.
+func (s *shell) cardLook(id string) *look {
+	themes := s.inv.Themes
+	if s.cardLooks == nil || len(themes) != len(s.cardThemes) || len(themes) > 0 && &themes[0] != &s.cardThemes[0] {
+		s.cardLooks, s.cardThemes = map[string]*look{}, themes
+	}
+	tk, ok := s.cardLooks[id]
+	if !ok {
+		l := newLook(settings.Settings{Theme: id, FontScale: 1}, themes, false, "")
+		tk = &l
+		s.cardLooks[id] = tk
+	}
+	return tk
 }
 
 // accentControl chooses the accent colour.

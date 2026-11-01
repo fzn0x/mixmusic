@@ -86,6 +86,13 @@ func BenchmarkScroll(b *testing.B) {
 		show(s, tt, "/settings/playback")
 		scrollFrames(b, tt)
 	})
+	// The themes' cards, each in its theme's look.
+	b.Run("settings-appearance", func(b *testing.B) {
+		s := newTestShell(b)
+		tt := testerOf(b, s, 1280, 820)
+		show(s, tt, "/settings/appearance")
+		scrollFrames(b, tt)
+	})
 }
 
 // TestFarRowsBuildNothing scrolls a long list: the rows in view show their

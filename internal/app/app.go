@@ -33,6 +33,9 @@ import (
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
+// artworkLimit bounds the artwork kept on disk, in bytes.
+const artworkLimit = 256 << 20
+
 // streamScheme is the scheme of the addresses of the audio PrepareStream
 // finds, which the audio engine opens.
 const streamScheme = "stream"
@@ -85,6 +88,7 @@ type App struct {
 	lyricsMemo   *memo[lyrics.Lyrics]
 	related      *memo[[]media.Shelf]
 	artwork      *artwork.Client
+	artStore     *artwork.Store
 	colors       *memo[string]
 
 	presence presence
@@ -201,7 +205,9 @@ func New(opts Options) (*App, error) {
 	a.lyrics = lyrics.New("MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)")
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
 	a.related = newMemo[[]media.Shelf](100)
+	a.artStore = artwork.NewStore(filepath.Join(opts.CacheDir, "artwork"), artworkLimit)
 	a.artwork = artwork.New()
+	a.artwork.Store = a.artStore
 	a.colors = newMemo[string](500)
 	a.addons = addons.NewManager(filepath.Join(opts.DataDir, "addons"), opts.Builtin)
 	a.storage = addons.NewStorage(filepath.Join(opts.DataDir, "addons", ".storage"))

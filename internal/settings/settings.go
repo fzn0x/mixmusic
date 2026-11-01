@@ -5,6 +5,7 @@ import (
 	"cmp"
 	"encoding/json"
 	"maps"
+	"math"
 	"regexp"
 	"runtime"
 	"slices"
@@ -80,6 +81,9 @@ type Settings struct {
 	Density       Density `json:"density"`
 	// FontScale scales the text, from 0.85 to 1.3.
 	FontScale float64 `json:"fontScale"`
+	// Zoom scales the whole interface, one of ZoomSteps: the text, which
+	// FontScale scales too, and everything else.
+	Zoom float64 `json:"zoom"`
 	// SidebarCollapsed shows the sidebar as icons only.
 	SidebarCollapsed bool `json:"sidebarCollapsed"`
 	// Panel is the side panel beside the pages: "queue", "lyrics" or
@@ -175,6 +179,7 @@ func Default() Settings {
 		Density:         DensityComfortable,
 		Panel:           "queue",
 		FontScale:       1,
+		Zoom:            1,
 		SpotifyPlayback: defaultSpotifyPlayback(runtime.GOOS),
 		Quality:         QualityBest,
 		Loudness:        true,
@@ -285,6 +290,7 @@ func (s Settings) Clean() Settings {
 	if s.FontScale < 0.85 || s.FontScale > 1.3 {
 		s.FontScale = d.FontScale
 	}
+	s.Zoom = zoomStep(s.Zoom, d.Zoom)
 	switch s.SpotifyPlayback {
 	case SpotifyPlaybackMatch, SpotifyPlaybackConnect, SpotifyPlaybackHere:
 	default:
@@ -336,4 +342,22 @@ func (s Settings) Clean() Settings {
 		s.RegistryURL = d.RegistryURL
 	}
 	return s
+}
+
+// ZoomSteps are the zooms of the interface, from 80% to 200%.
+var ZoomSteps = []float64{0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2}
+
+// zoomStep is the step of ZoomSteps nearest z, or def when z is outside
+// them, as in settings from before the zoom.
+func zoomStep(z, def float64) float64 {
+	if !(z >= ZoomSteps[0] && z <= ZoomSteps[len(ZoomSteps)-1]) {
+		return def
+	}
+	near := ZoomSteps[0]
+	for _, step := range ZoomSteps {
+		if math.Abs(step-z) < math.Abs(near-z) {
+			near = step
+		}
+	}
+	return near
 }

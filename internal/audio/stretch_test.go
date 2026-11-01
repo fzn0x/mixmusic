@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 )
 
@@ -100,18 +101,18 @@ func zeroCrossHz(buf []float32, f0, f1 int) float64 {
 }
 
 // maxStep is the largest step from a sample to the next of buf's left
-// channel, into the silence after it too.
+// channel.
 func maxStep(buf []float32) float64 {
 	m := 0.0
-	for f := 1; f <= len(buf)/2; f++ {
-		next := float32(0)
-		if f < len(buf)/2 {
-			next = buf[2*f]
-		}
-		m = max(m, math.Abs(float64(next-buf[2*(f-1)])))
+	for f := 1; f < len(buf)/2; f++ {
+		m = max(m, math.Abs(float64(buf[2*f]-buf[2*(f-1)])))
 	}
 	return m
 }
+
+// endStep is maxStep of a track that ends, into the silence after it too:
+// a tone that stops abruptly ends in a step of its own.
+func endStep(buf []float32) float64 { return maxStep(append(slices.Clone(buf), 0, 0)) }
 
 // lengthSlack is how far from the length of the input over the speed the
 // stretch of a track may end: its windows start within stretchSearch of
@@ -192,9 +193,9 @@ func TestStretchNoClicks(t *testing.T) {
 		two[i] = 0.6*two[i] + 0.4*v
 	}
 	for name, in := range map[string][]float32{"440 Hz": sine(440, 6), "97.3 Hz": sine(97.3, 6), "two tones": two} {
-		own := maxStep(in)
+		own := endStep(in)
 		for _, speed := range speeds {
-			if got := maxStep(stretch(t, in, at(speed)).out); got > own*1.02 {
+			if got := endStep(stretch(t, in, at(speed)).out); got > own*1.02 {
 				t.Errorf("%s at %v×: a step of %.5f, the signal's largest is %.5f", name, speed, got, own)
 			}
 		}
@@ -243,7 +244,7 @@ func TestStretchSpeedChange(t *testing.T) {
 		return 1
 	}
 	st := stretch(t, in, speedAt)
-	if got, own := maxStep(st.out), maxStep(in); got > own*1.02 {
+	if got, own := endStep(st.out), endStep(in); got > own*1.02 {
 		t.Errorf("a step of %.5f, the tone's largest is %.5f", got, own)
 	}
 	if d := float64(len(st.out)/2 - 5*Rate); math.Abs(d) > lengthSlack(1.5) {
@@ -267,7 +268,7 @@ func TestStretchSpeedChange(t *testing.T) {
 	}
 	// Speeds a step apart, at every quantum, splice as well.
 	wobble := func(q int) float64 { return []float64{1, 1.05, 1.5, 1, 3, 0.5, 2.25}[q/7%7] }
-	if got, own := maxStep(stretch(t, in, wobble).out), maxStep(in); got > own*1.02 {
+	if got, own := endStep(stretch(t, in, wobble).out), endStep(in); got > own*1.02 {
 		t.Errorf("changing the speed often: a step of %.5f, the tone's largest is %.5f", got, own)
 	}
 }
@@ -423,4 +424,43 @@ func writeWAV(path string, pcm []float32) error {
 		binary.LittleEndian.PutUint16(data[44+2*i:], uint16(int16(max(-1, min(1, v))*32767)))
 	}
 	return os.WriteFile(path, data, 0o644)
+}
+
+// TestStretchStartsOnceFilled plays what the ring holds as it is while it
+// holds less than the stretch's windows need, as when a track starts, and
+// stretches once it holds them, without a seam.
+func TestStretchStartsOnceFilled(t *testing.T) {
+	in := sine(440, 1)
+	never := func(<-chan struct{}) bool { return false }
+	r := newRing(0)
+	r.writeFrom(in[:2*1000], never)
+	var s stretcher
+	buf := make([]float32, 2*quantum)
+	var out []float32
+	for range 4 {
+		n := s.read(r, buf, 2)
+		out = append(out, buf[:2*n]...)
+	}
+	if len(out) != 2*4*quantum || s.mode != bypassed {
+		t.Fatalf("%d frames played, as the mode %d", len(out)/2, s.mode)
+	}
+	for i := range out {
+		if out[i] != in[i] {
+			t.Fatalf("frame %d: %v, want %v", i/2, out[i], in[i])
+		}
+	}
+	r.writeFrom(in[2*1000:2*20000], never)
+	for range 40 {
+		n := s.read(r, buf, 2)
+		out = append(out, buf[:2*n]...)
+	}
+	if s.mode != stretching {
+		t.Errorf("the mode %d once the ring filled", s.mode)
+	}
+	if got, own := maxStep(out), maxStep(in); got > own*1.02 {
+		t.Errorf("a step of %.5f, the tone's largest is %.5f", got, own)
+	}
+	if p := s.position(r); p < 4*quantum+2*36*quantum-stretchSearch || p > 4*quantum+2*36*quantum+stretchSearch {
+		t.Errorf("at frame %d after 4 quanta at 1× and 36 at 2×", p)
+	}
 }

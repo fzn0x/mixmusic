@@ -140,7 +140,11 @@ func (s *stretcher) read(r *ring, out []float32, speed float64) int {
 	for got < want {
 		switch s.mode {
 		case bypassed:
-			if speed != 1 {
+			// The stretch starts once the ring holds what its first windows
+			// need, or the whole track. Until then, as when a track starts
+			// or after a seek, what the ring holds plays as it is, rather
+			// than nothing: the stretch starts from anywhere without a seam.
+			if speed != 1 && (r.readable() >= stretchHeld || r.done.Load()) {
 				s.start(r, speed)
 				continue
 			}

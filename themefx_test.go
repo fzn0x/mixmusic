@@ -18,7 +18,8 @@ import (
 )
 
 // TestThemeEffectsOptions turns the effects of Greenroom, Glasshouse,
-// Anime and Mochi on and off with their options.
+// Anime and Mochi on and off with their options; the Material themes make
+// their colours of a seed.
 func TestThemeEffectsOptions(t *testing.T) {
 	s := newTestShell(t)
 	for _, c := range []struct {
@@ -34,6 +35,8 @@ func TestThemeEffectsOptions(t *testing.T) {
 		{"anime", map[string]string{"speedlines": "false"}, effects{screentone: true}},
 		{"mochi", nil, effects{sparkles: true}},
 		{"mochi", map[string]string{"sparkles": "false"}, effects{}},
+		{"material", nil, effects{material: true}},
+		{"material-dark", nil, effects{material: true}},
 	} {
 		found := false
 		for _, th := range s.inv.Themes {

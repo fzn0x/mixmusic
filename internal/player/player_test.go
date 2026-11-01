@@ -2,6 +2,7 @@ package player
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"slices"
@@ -930,6 +931,280 @@ func TestShuffle(t *testing.T) {
 	if got := order(); !slices.Equal(got, ids) {
 		t.Errorf("unshuffled %v", got)
 	}
+}
+
+// queueIDs is the ids of the queue, without "yt:"; the radio's end in "*".
+func queueIDs(s State) []string {
+	var out []string
+	for _, it := range s.Queue {
+		id := strings.TrimPrefix(it.Track.ID, "yt:")
+		if it.Radio {
+			id += "*"
+		}
+		out = append(out, id)
+	}
+	return out
+}
+
+// current is the id of the current track, without "yt:".
+func current(s State) string {
+	cur, _ := s.Current()
+	return strings.TrimPrefix(cur.Track.ID, "yt:")
+}
+
+// next skips to the next track and waits for it to play.
+func (h *harness) next() {
+	h.t.Helper()
+	h.p.Next()
+	h.on(func(*Player) {})
+	h.wait("the next track playing", playing(current(h.p.State())))
+}
+
+// TestShuffleMidList shuffles a list started in its middle: what comes
+// before the chosen track hasn't played, and is shuffled in.
+func TestShuffleMidList(t *testing.T) {
+	h := newHarness(t, Saved{})
+	ids := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}
+	h.p.PlayTracks(tracks(ids...), 5)
+	h.wait("f playing", playing("f"))
+	h.p.SetShuffle(true)
+	h.on(func(*Player) {})
+	s := h.p.State()
+	got := queueIDs(s)
+	if s.Index != 0 || got[0] != "f" || !sameSet(got[1:], []string{"a", "b", "c", "d", "e", "g", "h", "i", "j"}) {
+		t.Fatalf("shuffled %v at %d", got, s.Index)
+	}
+	// The current track comes first now: Previous starts it again, where it
+	// played the list's track before it.
+	h.p.Previous()
+	h.on(func(p *Player) {
+		if current(p.s) != "f" || !h.stream.has("seek 0s") {
+			t.Errorf("Previous went to %s: %q", current(p.s), h.stream.copy())
+		}
+	})
+	// Played to its end, the queue plays every track once.
+	heard := []string{"f"}
+	for range 9 {
+		h.next()
+		heard = append(heard, current(h.p.State()))
+	}
+	if !sameSet(heard, ids) {
+		t.Errorf("heard %v", heard)
+	}
+	h.p.SetShuffle(false)
+	h.on(func(*Player) {})
+	if s := h.p.State(); !slices.Equal(queueIDs(s), ids) || current(s) != heard[9] {
+		t.Errorf("unshuffled %v, on %s", queueIDs(s), current(s))
+	}
+}
+
+// TestShuffleKeepsWhatPlayed keeps what played before the current track,
+// for Previous, and shuffles the rest after it.
+func TestShuffleKeepsWhatPlayed(t *testing.T) {
+	h := newHarness(t, Saved{})
+	ids := []string{"a", "b", "c", "d", "e", "f", "g", "h"}
+	h.p.PlayTracks(tracks(ids...), 0)
+	h.wait("a playing", playing("a"))
+	h.next()
+	h.next()
+	h.p.SetShuffle(true)
+	h.on(func(*Player) {})
+	s := h.p.State()
+	got := queueIDs(s)
+	if s.Index != 2 || !slices.Equal(got[:3], []string{"a", "b", "c"}) || !sameSet(got[3:], ids[3:]) {
+		t.Fatalf("shuffled %v at %d", got, s.Index)
+	}
+	h.p.Previous()
+	h.wait("b playing", playing("b"))
+}
+
+// TestShuffleRadioLast shuffles the user's own tracks before the radio's,
+// keeps what they add while shuffled before the radio's too, and puts it
+// all back where it was added when shuffle turns off.
+func TestShuffleRadioLast(t *testing.T) {
+	radio := []string{"r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"}
+	h := newHarness(t, Saved{}, func(f *fakeServices) {
+		f.settings.Autoplay = true
+		for _, id := range radio {
+			f.radio = append(f.radio, track(id, "Radio "+id))
+		}
+	})
+	h.p.PlayTracks(tracks("a"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Ended()
+	h.wait("r1 playing", playing("r1"))
+	h.p.Enqueue(tracks("e1", "e2", "e3"))
+	h.p.SetShuffle(true)
+	h.on(func(*Player) {})
+	got := queueIDs(h.p.State())
+	if !slices.Equal(got[:2], []string{"a", "r1*"}) || !sameSet(got[2:5], []string{"e1", "e2", "e3"}) ||
+		!sameSet(got[5:], []string{"r2*", "r3*", "r4*", "r5*", "r6*", "r7*", "r8*"}) {
+		t.Fatalf("shuffled %v", got)
+	}
+	h.p.Enqueue(tracks("z"))
+	h.p.PlayNext(tracks("n"))
+	h.on(func(*Player) {})
+	got = queueIDs(h.p.State())
+	if got[2] != "n" || got[6] != "z" {
+		t.Errorf("added while shuffled: %v", got)
+	}
+	h.p.SetShuffle(false)
+	h.on(func(*Player) {})
+	want := []string{"a", "r1*", "n", "e1", "e2", "e3", "z", "r2*", "r3*", "r4*", "r5*", "r6*", "r7*", "r8*"}
+	if s := h.p.State(); !slices.Equal(queueIDs(s), want) || current(s) != "r1" {
+		t.Errorf("unshuffled %v, on %s", queueIDs(s), current(s))
+	}
+}
+
+// TestShuffleRepeatAll repeats a list started in its middle and shuffled:
+// all of it plays in that order, pass after pass, and what came before the
+// chosen track doesn't come back in the list's order.
+func TestShuffleRepeatAll(t *testing.T) {
+	h := newHarness(t, Saved{})
+	ids := []string{"a", "b", "c", "d", "e", "f"}
+	h.p.PlayTracks(tracks(ids...), 3)
+	h.wait("d playing", playing("d"))
+	h.p.CycleRepeat()
+	h.p.SetShuffle(true)
+	h.on(func(*Player) {})
+	order := queueIDs(h.p.State())
+	var heard []string
+	for range 2 * len(ids) {
+		heard = append(heard, current(h.p.State()))
+		h.p.Ended()
+		h.on(func(*Player) {})
+		h.wait("the next track playing", playing(current(h.p.State())))
+	}
+	if order[0] != "d" || !slices.Equal(heard[:6], order) || !slices.Equal(heard[6:], order) {
+		t.Errorf("queue %v, heard %v", order, heard)
+	}
+}
+
+// TestShuffleRestart keeps the order to put back, the radio's tracks and
+// what hasn't played across a restart.
+func TestShuffleRestart(t *testing.T) {
+	h := newHarness(t, Saved{})
+	ids := []string{"a", "b", "c", "d", "e", "f"}
+	h.p.PlayTracks(tracks(ids...), 3)
+	h.wait("d playing", playing("d"))
+	h.p.SetShuffle(true)
+	var saved Saved
+	h.wait("the queue saved shuffled", func(*Player) bool {
+		saved = h.lastSaved()
+		return saved.Shuffle && len(saved.Order) == len(ids)
+	})
+	// Through queue.json.
+	data, err := json.Marshal(saved)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var back Saved
+	if err := json.Unmarshal(data, &back); err != nil {
+		t.Fatal(err)
+	}
+	back.Radio = []int{len(back.Tracks) - 1} // as if the last were the radio's
+	r := newHarness(t, back)
+	s := r.p.State()
+	if !s.Shuffle || current(s) != "d" || !s.Queue[len(s.Queue)-1].Radio {
+		t.Fatalf("restored %v, shuffle %v", queueIDs(s), s.Shuffle)
+	}
+	r.p.SetShuffle(false)
+	r.on(func(*Player) {})
+	s = r.p.State()
+	plain := make([]string, len(s.Queue))
+	for i, it := range s.Queue {
+		plain[i] = strings.TrimPrefix(it.Track.ID, "yt:")
+	}
+	if !slices.Equal(plain, ids) || current(s) != "d" {
+		t.Errorf("unshuffled after a restart: %v, on %s", queueIDs(s), current(s))
+	}
+
+	// A list started in its middle and kept unshuffled: what came before
+	// its track hasn't played, after a restart too.
+	u := newHarness(t, Saved{})
+	u.p.PlayTracks(tracks(ids...), 3)
+	u.wait("d playing", playing("d"))
+	var kept Saved
+	u.wait("the queue saved", func(*Player) bool {
+		kept = u.lastSaved()
+		return kept.Index == 3
+	})
+	if !slices.Equal(kept.Unplayed, []int{0, 1, 2}) || kept.Order != nil {
+		t.Fatalf("unplayed %v, order %v", kept.Unplayed, kept.Order)
+	}
+	v := newHarness(t, kept)
+	v.p.SetShuffle(true)
+	v.on(func(*Player) {})
+	if got := queueIDs(v.p.State()); got[0] != "d" || !sameSet(got[1:], []string{"a", "b", "c", "e", "f"}) {
+		t.Errorf("shuffled after a restart: %v", got)
+	}
+}
+
+// TestShuffleLongQueue keeps the own order of what a queue past savedMax
+// keeps, around its current track.
+func TestShuffleLongQueue(t *testing.T) {
+	ids := longQueue(800)
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks(ids...), 650)
+	h.wait("t650 playing", playing("t650"))
+	var kept Saved
+	h.wait("the queue saved", func(*Player) bool {
+		kept = h.lastSaved()
+		return kept.Index == 350 && len(kept.Unplayed) == 350
+	})
+	h.p.SetShuffle(true)
+	h.wait("the queue saved shuffled", func(*Player) bool {
+		kept = h.lastSaved()
+		return kept.Shuffle && len(kept.Order) == savedMax
+	})
+	if kept.Index != 0 || kept.Tracks[0].ID != "yt:t650" || kept.Unplayed != nil {
+		t.Fatalf("saved shuffled from %s at %d, unplayed %v", kept.Tracks[0].ID, kept.Index, kept.Unplayed)
+	}
+	r := newHarness(t, kept)
+	r.p.SetShuffle(false)
+	r.on(func(*Player) {})
+	s := r.p.State()
+	got := queueIDs(s)
+	if len(got) != savedMax || current(s) != "t650" || !slices.IsSorted(got) {
+		t.Errorf("unshuffled %d tracks, on %s, sorted %v", len(got), current(s), slices.IsSorted(got))
+	}
+}
+
+// TestShuffleOldQueue restores a queue.json of an earlier version: what
+// comes before the current track played, and turning shuffle off keeps the
+// order, as before.
+func TestShuffleOldQueue(t *testing.T) {
+	var old Saved
+	raw := `{"tracks":[{"id":"yt:a"},{"id":"yt:b"},{"id":"yt:c"},{"id":"yt:d"}],"index":2,"position":0,"shuffle":true,"repeat":"off"}`
+	if err := json.Unmarshal([]byte(raw), &old); err != nil {
+		t.Fatal(err)
+	}
+	h := newHarness(t, old)
+	h.p.SetShuffle(false)
+	h.on(func(*Player) {})
+	if got := queueIDs(h.p.State()); !slices.Equal(got, []string{"a", "b", "c", "d"}) {
+		t.Errorf("unshuffled %v", got)
+	}
+	h.p.SetShuffle(true)
+	h.on(func(*Player) {})
+	if got := queueIDs(h.p.State()); !slices.Equal(got[:3], []string{"a", "b", "c"}) {
+		t.Errorf("shuffled %v", got)
+	}
+}
+
+// TestRestoreRadio keeps the radio's marks across a restart: Add to queue
+// still goes before the radio's tracks.
+func TestRestoreRadio(t *testing.T) {
+	h := newHarness(t, Saved{Tracks: tracks("a", "r1", "r2"), Index: 1, Radio: []int{1, 2}})
+	h.p.Enqueue(tracks("z"))
+	h.on(func(*Player) {})
+	if got := queueIDs(h.p.State()); !slices.Equal(got, []string{"a", "r1*", "z", "r2*"}) {
+		t.Errorf("enqueued after a restart: %v", got)
+	}
+	h.wait("the queue saved", func(*Player) bool {
+		last := h.lastSaved()
+		return len(last.Tracks) == 4 && slices.Equal(last.Radio, []int{1, 3})
+	})
 }
 
 func TestVolume(t *testing.T) {

@@ -257,6 +257,13 @@ func TestDeckPackedAudioFailures(t *testing.T) {
 	if _, d := playPacked(t, b[:len(b)-100]); d.failure() != nil {
 		t.Errorf("cut short: %v", d.failure())
 	}
+	// Bytes that tell an ID3 tag of 256 MB are no tag: the frames after them
+	// play.
+	want := packedReference(t, adtsClicks)
+	b = append([]byte("ID3\x04\x00\x00\x7f\x7f\x7f\x7f"), slices.Concat(clicks...)...)
+	if got, d := playPacked(t, b); d.failure() != nil || !slices.Equal(got, want) {
+		t.Errorf("after a tag too large: %d frames, %.1f dB from the decode, %v", len(got)/2, snr(got, want), d.failure())
+	}
 }
 
 // TestEngineDoesNotSeekLive leaves a live stream where it plays when asked

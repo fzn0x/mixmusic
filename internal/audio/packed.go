@@ -22,6 +22,10 @@ const (
 	maxBadFrames = 8
 	// id3Header is the size of an ID3v2 tag's header, and of its footer.
 	id3Header = 10
+	// maxID3 bounds the tags a packed track passes over, where an ID3 tag
+	// may be of 256 MB: those of HLS packed audio hold a timestamp, of 73
+	// bytes for YouTube's. Bytes that tell a larger one are no tag.
+	maxID3 = 1 << 20
 )
 
 // packedTrack is the AAC-LC of HLS packed audio (RFC 8216, section 3.4),
@@ -142,7 +146,7 @@ func id3Size(b []byte) (int, bool) {
 	if b[3] == 4 && b[5]&0x10 != 0 {
 		n += id3Header
 	}
-	return n, true
+	return n, n <= maxID3
 }
 
 // seek tells where the stream is: a live one can't move, but the frames

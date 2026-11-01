@@ -148,6 +148,10 @@ jobs:
         if: startsWith(matrix.platform, 'windows/')
         run: sudo apt-get update && sudo apt-get install -y nsis
       - run: bun run build -- -platform "${{ matrix.platform }}"
+      # release.yml finds the installer by this name.
+      - name: The installer has the name the release looks for
+        if: startsWith(matrix.platform, 'windows/')
+        run: ls build/windows-*/*-setup-*.exe
       # The release makes these from the builds too: try it on every change.
       - name: Package the portable zip, the RPM and the AppImage
         if: ${{ !startsWith(matrix.platform, 'darwin/') }}

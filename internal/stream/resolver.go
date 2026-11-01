@@ -1,7 +1,8 @@
 // Package stream finds the audio streams of YouTube videos, through
 // YouTube's player API as YouTube's visionOS app, else with yt-dlp, and
 // serves them to the player's audio element through a local scheme, with
-// range requests, so it can seek.
+// range requests, so it can seek. The stream of a live video is an HLS
+// playlist, which OpenLive follows as the broadcast goes on.
 package stream
 
 import (

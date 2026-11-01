@@ -32,6 +32,7 @@ func TestLiveDirect(t *testing.T) {
 	_, videoID, _ := media.ParseID(songs[0].Track.ID)
 
 	d := NewDirect()
+	var s0 Stream
 	for _, q := range []Quality{QualityBest, QualitySaver} {
 		start := time.Now()
 		s, err := d.Stream(ctx, videoID, q)
@@ -39,10 +40,10 @@ func TestLiveDirect(t *testing.T) {
 			t.Fatalf("%s of %s: %v", q, videoID, err)
 		}
 		// Never the URL: it carries this machine's IP address.
-		t.Logf("%s of %s (%s): found in %s, %d bytes at %.0f kbit/s", q, videoID, songs[0].Track.Title,
-			time.Since(start).Round(time.Millisecond), s.Size, s.Bitrate)
-		if s.Size <= 0 || s.Codec != "opus" {
-			t.Fatalf("stream of %d bytes in %s", s.Size, s.Codec)
+		t.Logf("%s of %s (%s): found in %s, %d bytes at %.0f kbit/s, %.2f LKFS", q, videoID, songs[0].Track.Title,
+			time.Since(start).Round(time.Millisecond), s.Size, s.Bitrate, s.Loudness)
+		if s.Size <= 0 || s.Codec != "opus" || !s.Measured {
+			t.Fatalf("stream of %d bytes in %s, measured %v", s.Size, s.Codec, s.Measured)
 		}
 
 		start = time.Now()
@@ -58,6 +59,9 @@ func TestLiveDirect(t *testing.T) {
 			t.Fatalf("read %d of %d bytes", read, s.Size)
 		}
 		t.Logf("read whole in %s", time.Since(start).Round(time.Millisecond))
+		if q == QualityBest {
+			s0 = s
+		}
 	}
 
 	// YouTube gives the route no stream of a video made for children, which
@@ -66,6 +70,13 @@ func TestLiveDirect(t *testing.T) {
 		t.Log("YouTube's player API now gives the streams of videos made for children")
 	} else {
 		t.Logf("made for children: %v", err)
+	}
+
+	// The loudness of a stream yt-dlp found, from a route that has no
+	// visitor ID yet.
+	v, err := NewDirect().Loudness(ctx, videoID)
+	if err != nil || v != s0.Loudness {
+		t.Errorf("loudness of %s: %v, %v; the stream said %v", videoID, v, err, s0.Loudness)
 	}
 }
 

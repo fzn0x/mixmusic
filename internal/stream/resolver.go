@@ -69,6 +69,11 @@ type Stream struct {
 	// after yt-dlp found it: it refuses the URL until then. It is zero
 	// when yt-dlp did not tell.
 	Available time.Time
+	// Loudness is the integrated loudness of the stream's audio, in LKFS,
+	// as YouTube measured it, when Measured: YouTube's player API tells
+	// it, and yt-dlp doesn't.
+	Loudness float64
+	Measured bool
 }
 
 // slowResolve is how long finding a stream takes before the log tells.

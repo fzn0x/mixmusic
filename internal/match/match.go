@@ -105,6 +105,16 @@ func (m *Matcher) Forget(trackID string) error {
 	})
 }
 
+// Matched returns the YouTube Music track matched to t without searching:
+// t itself for a YouTube Music track, the match found before for others,
+// if any.
+func (m *Matcher) Matched(t media.Track) (media.Track, bool) {
+	if t.Source == media.SourceYouTube {
+		return t, true
+	}
+	return m.known(t.ID)
+}
+
 func (m *Matcher) known(id string) (media.Track, bool) {
 	if m.Known == nil {
 		return media.Track{}, false

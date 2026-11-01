@@ -567,6 +567,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 		})
 	})
 	s.equalizerSettings(c)
+	s.lyricsSettings(c)
 	s.cacheSettings(c)
 	s.toolSettings(c)
 }

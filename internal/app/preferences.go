@@ -20,6 +20,9 @@ func (p *Preferences) Set(s settings.Settings) (settings.Settings, error) {
 	if err := p.a.settings.Set(s); err != nil {
 		return prev, err
 	}
+	if s.CloseToTray && !prev.CloseToTray {
+		runInBackground()
+	}
 	if prev.SpotifyClientID != s.SpotifyClientID && p.a.spotify.SignedIn() {
 		// The token belongs to the former app.
 		p.a.signOutSpotify()
@@ -43,5 +46,6 @@ func (p *Preferences) Reset() (settings.Settings, error) {
 // OpenAtLogin reports whether MixMusic starts when the user logs in.
 func (p *Preferences) OpenAtLogin() bool { return mygo.App.OpenAtLogin() }
 
-// SetOpenAtLogin makes MixMusic start when the user logs in, or not.
-func (p *Preferences) SetOpenAtLogin(open bool) error { return mygo.App.SetOpenAtLogin(open) }
+// SetOpenAtLogin makes MixMusic start when the user logs in, or not. In a
+// Flatpak, it waits for the desktop's answer, which may be the user's.
+func (p *Preferences) SetOpenAtLogin(open bool) error { return setLogin(open) }

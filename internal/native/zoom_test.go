@@ -11,6 +11,22 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
+// newZoomShell is a test shell that plays Spotify tracks from their
+// YouTube Music recordings, as on every system, so that the player bar
+// has no Spotify Connect devices button, whose room it leaves out: Linux
+// and macOS play them on Spotify Connect by default.
+func newZoomShell(t *testing.T) *shell {
+	s := newTestShell(t)
+	set := s.svc.Preferences.Get()
+	set.SpotifyPlayback = settings.SpotifyPlaybackMatch
+	if _, err := s.svc.Preferences.Set(set); err != nil {
+		t.Fatal(err)
+	}
+	s.drain()
+	s.set = set
+	return s
+}
+
 // zoomed presses keys, and returns the zoom chosen and the zoom the window
 // shows after the frames that follow.
 func zoomed(s *shell, tt *ui.Tester, mods ui.Modifiers, key ui.Key) (chosen, shown float64) {
@@ -25,7 +41,7 @@ func zoomed(s *shell, tt *ui.Tester, mods ui.Modifiers, key ui.Key) (chosen, sho
 // and back to 100% with Mod+0, from the search box as well, and tells
 // each change in a toast.
 func TestZoomKeys(t *testing.T) {
-	s := newTestShell(t)
+	s := newZoomShell(t)
 	tt := tester(t, s)
 	steps := []struct {
 		mods ui.Modifiers
@@ -63,7 +79,7 @@ func TestZoomKeys(t *testing.T) {
 // TestZoomInDialogs leaves the zoom as it is while the command palette is
 // open, as the other shortcuts do.
 func TestZoomInDialogs(t *testing.T) {
-	s := newTestShell(t)
+	s := newZoomShell(t)
 	tt := tester(t, s)
 	s.paletteOpen = true
 	tt.Frame()
@@ -75,7 +91,7 @@ func TestZoomInDialogs(t *testing.T) {
 // TestZoomRoom zooms a window that has no room for the zoom chosen as far
 // as it has room for, says so, and zooms out from what it shows.
 func TestZoomRoom(t *testing.T) {
-	s := newTestShell(t)
+	s := newZoomShell(t)
 	tt := tester(t, s)
 	s.setZoom(2)
 	s.drain()
@@ -106,7 +122,7 @@ func TestZoomRoom(t *testing.T) {
 // TestZoomKeysGivenAway leaves a key the user gave another command with
 // that command, and the zoom's command without it.
 func TestZoomKeysGivenAway(t *testing.T) {
-	s := newTestShell(t)
+	s := newZoomShell(t)
 	s.set.Shortcuts = map[string]string{"player.mute": "Mod+0"}
 	tt := tester(t, s)
 	s.setZoom(1.25)
@@ -128,7 +144,7 @@ func TestZoomKeysGivenAway(t *testing.T) {
 // TestZoomSetting chooses the zoom in Settings › Appearance, whose row
 // names the keys.
 func TestZoomSetting(t *testing.T) {
-	s := newTestShell(t)
+	s := newZoomShell(t)
 	tt := tester(t, s)
 	show(s, tt, "/settings/appearance")
 	keys := strings.ReplaceAll(s.zoomKeys(), wordJoiner, "")
@@ -143,7 +159,7 @@ func TestZoomSetting(t *testing.T) {
 // TestMiniZoom zooms the mini player with the zoom's keys, its only
 // shortcuts.
 func TestMiniZoom(t *testing.T) {
-	s := newTestShell(t)
+	s := newZoomShell(t)
 	mini := ui.NewTester(s.miniView, miniWidth, miniHeight)
 	mini.Frame()
 	mini.Key(ui.Cmd, ui.KeyEqual)
@@ -166,7 +182,7 @@ func TestRenderZoom(t *testing.T) {
 	if dir == "" {
 		t.Skip("MIXMUSIC_RENDER names no folder")
 	}
-	s := newTestShell(t)
+	s := newZoomShell(t)
 	s.p.PlayTracks(testTracks, 0)
 	tt := tester(t, s)
 	show(s, tt, "/settings/appearance")

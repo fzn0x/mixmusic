@@ -100,6 +100,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	p.loadToken++
 	token := p.loadToken
 	p.atEnd = false
+	p.markPlayed(entry.UID)
 	p.s.Index = i
 	p.s.Position = start
 	p.s.Duration = ms(entry.Track.DurationMs)
@@ -223,6 +224,8 @@ func (p *Player) fail(message string) {
 	p.s.Buffering = false
 	p.s.Loading = false
 	p.s.Playing = false
+	// The app last heard of the track as loading: it hears it stopped.
+	p.report()
 	p.emit(StateChange)
 	p.failures++
 	stop := p.failures >= maxFailures
@@ -340,6 +343,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 			return
 		}
 		p.loadToken++
+		p.markPlayed(next.UID)
 		p.askedAt = time.Time{}
 		p.s.Index = i
 		p.s.Position = 0
@@ -503,6 +507,7 @@ func (p *Player) apply() {
 func (p *Player) now() Now {
 	n := Now{
 		Playing:  p.s.Playing,
+		Loading:  p.s.Loading,
 		Position: p.s.Position,
 		Duration: p.s.Duration,
 		Volume:   p.s.Volume,
@@ -524,23 +529,74 @@ func (p *Player) report() {
 	p.save()
 }
 
-// save keeps the queue, every saveEvery at most.
+// save keeps the queue, every saveEvery at most, as the task publishes it.
 func (p *Player) save() {
-	p.saving.call(p, func() {
-		q := p.s.Queue[:min(len(p.s.Queue), savedMax)]
-		tracks := make([]media.Track, len(q))
-		for i, it := range q {
-			tracks[i] = it.Track
+	p.saveAsked = true
+	p.saving.call(p, func() { p.saveDue = true })
+}
+
+// writeQueue keeps the state last published, unless a write kept it, or a
+// later one, already: a write started earlier never lands over it.
+func (p *Player) writeQueue() {
+	p.writing.Lock()
+	defer p.writing.Unlock()
+	p.mu.Lock()
+	st, order, played, version := p.snap, p.snapOrder, p.snapPlayed, p.version
+	p.mu.Unlock()
+	if version <= p.written {
+		return
+	}
+	p.svc.SaveQueue(savedOf(st, order, played))
+	p.written = version
+}
+
+// Flush keeps the queue and the volume as the player last published them,
+// before it returns, for the app to call as it quits, on the main thread.
+// It writes the queue again only if the player published since the last
+// write. It never waits on the player's goroutine, which may itself wait
+// on the main thread, as the app's Report does for the tray: a flush that
+// waited for it, or a call of Close in its place, would hang the quit.
+func (p *Player) Flush() {
+	p.writeQueue()
+	p.mu.Lock()
+	v := p.snap.Volume
+	p.mu.Unlock()
+	if p.svc.Settings().Volume != v {
+		p.svc.SaveVolume(v)
+	}
+}
+
+// savedOf is the queue of st as it survives a restart: the part of it
+// savedWindow keeps, with the current entry's index in that part, which of
+// its entries the radio added, which before the current one aren't among
+// those played, and their own order, while shuffled, from unshuffled.
+func savedOf(st State, unshuffled []Item, played map[string]bool) Saved {
+	from, to := savedWindow(len(st.Queue), st.Index)
+	kept := st.Queue[from:to]
+	saved := Saved{
+		Tracks:   make([]media.Track, len(kept)),
+		Index:    st.Index - from,
+		Position: int(st.Position / time.Millisecond),
+		Shuffle:  st.Shuffle,
+		Repeat:   st.Repeat,
+	}
+	at := make(map[string]int, len(kept))
+	for i, it := range kept {
+		saved.Tracks[i] = it.Track
+		at[it.UID] = i
+		if it.Radio {
+			saved.Radio = append(saved.Radio, i)
 		}
-		saved := Saved{
-			Tracks:   tracks,
-			Index:    p.s.Index,
-			Position: int(p.s.Position / time.Millisecond),
-			Shuffle:  p.s.Shuffle,
-			Repeat:   p.s.Repeat,
+		if i < saved.Index && !played[it.UID] {
+			saved.Unplayed = append(saved.Unplayed, i)
 		}
-		go p.svc.SaveQueue(saved)
-	})
+	}
+	for _, it := range unshuffled {
+		if i, ok := at[it.UID]; ok {
+			saved.Order = append(saved.Order, i)
+		}
+	}
+	return saved
 }
 
 // The stream engine's events, as audio.Events.

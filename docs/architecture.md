@@ -83,7 +83,9 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   and Spotify tracks matched to their recording, through the engine, and
   Spotify tracks on a Spotify device: a Spotify Connect device, or MixMusic
   itself, as below. It shuffles, repeats, crossfades, starts radios when the
-  queue runs out, counts plays and keeps the queue in `queue.json`.
+  queue runs out, counts plays and keeps up to 500 tracks of the queue,
+  around the one playing, in `queue.json`, as it changes and as MixMusic
+  quits.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
@@ -182,7 +184,8 @@ finds, `act:resume` plays the queue kept in the data folder,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
 scrolls the page, `act:theme:<id>` wears a theme, `act:mini` opens the
 mini player, which saves `mini.png`, `act:spotify` logs whether MixMusic's
-own Spotify device could play, and `act:memory` and `act:heap` log the Go
+own Spotify device could play, `act:title` logs the window's title, which
+the screenshots leave out, and `act:memory` and `act:heap` log the Go
 heap and save a profile of it. Nothing plays unless the player is muted,
 or `MIXMUSIC_SILENT=1` has the audio engine play into no device, which
 keeps the visualizer and the lyrics moving without a sound.

@@ -118,6 +118,9 @@ type App struct {
 	// quitting is set once MixMusic starts to quit: its windows close then,
 	// even with close to the tray on.
 	quitting atomic.Bool
+	// trayHide hides the main window in the tray, out of full screen first
+	// on macOS (#84).
+	trayHide trayHide
 
 	mu         sync.Mutex
 	installed  string // the version installed to run at the next start
@@ -126,7 +129,9 @@ type App struct {
 	spotifyMe  *spotify.Profile
 	nowPlaying NowPlaying
 	main, mini *mygo.Window
-	tray       *mygo.Tray
+	// retitling is set while the main window's title waits to change.
+	retitling bool
+	tray      *mygo.Tray
 	// taskbar is the buttons on the thumbnail of the main window's
 	// taskbar button, on Windows.
 	taskbar   *taskbar.Bar
@@ -139,6 +144,8 @@ type App struct {
 	// profileErrs is why the accounts' profiles could not be read, until
 	// they are, or the user signs in or out.
 	profileErrs profileErrors
+	// flushers save what the windows hold back, as MixMusic quits.
+	flushers []*func()
 }
 
 // New opens what the app keeps in opts.DataDir and opts.CacheDir.
@@ -233,6 +240,7 @@ func (a *App) apply(s settings.Settings) {
 	if a.youtube.SignedIn() && a.youtube.Channel() != s.YouTubeChannel {
 		a.youtube.SetChannel(s.YouTubeChannel)
 	}
+	a.retitle()
 }
 
 // Bind registers what the page of MixMusic's own Spotify device calls. It

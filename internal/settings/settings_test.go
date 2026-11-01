@@ -171,6 +171,20 @@ func TestDiscordPresence(t *testing.T) {
 	}
 }
 
+// TestShowInTitle names what plays in the window's title in new installs
+// and in the settings of earlier versions, which don't have the key.
+func TestShowInTitle(t *testing.T) {
+	for file, want := range map[string]bool{`{}`: true, `{"theme":"mix"}`: true, `{"showInTitle":false}`: false, `{"showInTitle":true}`: true} {
+		s := Default()
+		if err := json.Unmarshal([]byte(file), &s); err != nil {
+			t.Fatal(err)
+		}
+		if s.Clean().ShowInTitle != want {
+			t.Errorf("%s shows what plays in the title %v, not %v", file, s.ShowInTitle, want)
+		}
+	}
+}
+
 // TestCleanPanel shows the queue for settings from before the panel, and
 // keeps the user's choice.
 func TestCleanPanel(t *testing.T) {

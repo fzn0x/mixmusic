@@ -67,8 +67,9 @@ const (
 	bypassed stretchMode = iota
 	// stretching plays the windows.
 	stretching
-	// unwinding plays the input held as it is, on the way back to 1×: it
-	// continues the last window as the next one would at 1×.
+	// unwinding plays the input held as it is, on the way back to 1×, or
+	// while the ring holds too little to stretch: it continues the last
+	// window as the next one would at 1×.
 	unwinding
 )
 
@@ -129,9 +130,25 @@ func (s *stretcher) start(r *ring, speed float64) {
 	s.outAt, s.from, s.to = stretchHop, q, q
 }
 
+// ready reports whether the stretch has the input its first windows need,
+// from the frame it plays next: what it holds and what the ring holds, or
+// the whole track.
+func (s *stretcher) ready(r *ring) bool {
+	held := int64(0)
+	if s.mode == unwinding {
+		held = int64(s.have)
+	}
+	return held+r.readable() >= stretchHeld || r.done.Load()
+}
+
 // read moves up to len(out)/2 frames of r, played at speed, into out, and
-// returns how many: fewer while the ring waits for the decoder, and at the
-// end of the track.
+// returns how many: fewer when the ring has nothing to play, as while it
+// waits for the decoder, and at the end of the track.
+//
+// The stretch starts once it is ready. Until then, as when a track starts
+// or after a seek, and whenever the ring runs short, as when the network
+// is slow, what there is plays as it is rather than nothing: the stretch
+// stops and starts from anywhere without a seam.
 func (s *stretcher) read(r *ring, out []float32, speed float64) int {
 	if r != s.src {
 		s.reset(r)
@@ -140,17 +157,13 @@ func (s *stretcher) read(r *ring, out []float32, speed float64) int {
 	for got < want {
 		switch s.mode {
 		case bypassed:
-			// The stretch starts once the ring holds what its first windows
-			// need, or the whole track. Until then, as when a track starts
-			// or after a seek, what the ring holds plays as it is, rather
-			// than nothing: the stretch starts from anywhere without a seam.
-			if speed != 1 && (r.readable() >= stretchHeld || r.done.Load()) {
+			if speed != 1 && s.ready(r) {
 				s.start(r, speed)
 				continue
 			}
 			return got + r.readTo(out[2*got:2*want])
 		case unwinding:
-			if speed != 1 {
+			if speed != 1 && s.ready(r) {
 				s.start(r, speed)
 				continue
 			}
@@ -179,16 +192,14 @@ func (s *stretcher) read(r *ring, out []float32, speed float64) int {
 				s.done = true
 				return got
 			}
-			if speed == 1 {
+			// The first hop after start always has its input: ready.
+			if speed == 1 || !s.step(r, speed) {
 				// At 1× the next window would start where the last one
 				// goes on, whose falling half and the next's rising half
 				// add up to the input as it is: it plays from there.
 				s.drop(s.prev + stretchHop)
 				s.mode = unwinding
 				continue
-			}
-			if !s.step(r, speed) {
-				return got
 			}
 		}
 	}

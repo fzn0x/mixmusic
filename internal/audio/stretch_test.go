@@ -464,3 +464,42 @@ func TestStretchStartsOnceFilled(t *testing.T) {
 		t.Errorf("at frame %d after 4 quanta at 1× and 36 at 2×", p)
 	}
 }
+
+// TestStretchShortOfInput plays what there is as it is when the ring runs
+// short, as when the network is slow, rather than nothing, and stretches
+// again once the ring holds enough.
+func TestStretchShortOfInput(t *testing.T) {
+	in := sine(440, 2)
+	never := func(<-chan struct{}) bool { return false }
+	r := newRing(0)
+	r.writeFrom(in[:2*20000], never)
+	var s stretcher
+	buf := make([]float32, 2*quantum)
+	var out []float32
+	stretched := false
+	for range 1000 {
+		n := s.read(r, buf, 2)
+		out = append(out, buf[:2*n]...)
+		stretched = stretched || s.mode == stretching
+		if n < quantum {
+			break
+		}
+	}
+	// It stops only once all the ring held played.
+	if p := s.position(r); !stretched || p != 20000 || r.readable() != 0 {
+		t.Fatalf("stretched %v, stopped at frame %d with %d left", stretched, p, r.readable())
+	}
+	r.writeFrom(in[2*20000:2*60000], never)
+	stretched = false
+	for range 40 {
+		n := s.read(r, buf, 2)
+		out = append(out, buf[:2*n]...)
+		stretched = stretched || s.mode == stretching
+	}
+	if !stretched {
+		t.Error("it didn't stretch again once the ring filled")
+	}
+	if got, own := maxStep(out), maxStep(in); got > own*1.02 {
+		t.Errorf("a step of %.5f, the tone's largest is %.5f", got, own)
+	}
+}

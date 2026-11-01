@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"sync"
 	"time"
@@ -225,13 +226,25 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 	}
 	if err != nil {
 		if errors.Is(err, lyrics.ErrNotFound) {
-			return lyrics.Lyrics{}, errors.New("no lyrics found for this track")
+			return lyrics.Lyrics{}, lyricsError{"No lyrics found for this track.", err}
 		}
-		return lyrics.Lyrics{}, err
+		log.Printf("mixmusic: the lyrics of %s: %v", track.ID, err)
+		return lyrics.Lyrics{}, lyricsError{"Lyrics can't be loaded right now. Check your connection, or try again in a moment.", err}
 	}
 	c.a.lyricsMemo.put(track.ID, l)
 	return l, nil
 }
+
+// lyricsError is why a track's lyrics don't show, in the words the lyrics
+// panel shows; what it wraps tells a track without lyrics from a failure
+// worth trying again.
+type lyricsError struct {
+	text string
+	err  error
+}
+
+func (e lyricsError) Error() string { return e.text }
+func (e lyricsError) Unwrap() error { return e.err }
 
 // youtubeLyrics returns YouTube Music's lyrics of a track, or of its
 // recording there.

@@ -1,0 +1,249 @@
+{
+  "colors": {
+    "background": {
+      "dark": "141218",
+      "default": "fef7ff",
+      "light": "fef7ff"
+    },
+    "error": {
+      "dark": "f2b8b5",
+      "default": "b3261e",
+      "light": "b3261e"
+    },
+    "error_container": {
+      "dark": "8c1d18",
+      "default": "f9dedc",
+      "light": "f9dedc"
+    },
+    "inverse_on_surface": {
+      "dark": "322f35",
+      "default": "f5eff7",
+      "light": "f5eff7"
+    },
+    "inverse_primary": {
+      "dark": "6750a4",
+      "default": "d0bcff",
+      "light": "d0bcff"
+    },
+    "inverse_surface": {
+      "dark": "e6e0e9",
+      "default": "322f35",
+      "light": "322f35"
+    },
+    "on_background": {
+      "dark": "e6e0e9",
+      "default": "1d1b20",
+      "light": "1d1b20"
+    },
+    "on_error": {
+      "dark": "601410",
+      "default": "ffffff",
+      "light": "ffffff"
+    },
+    "on_error_container": {
+      "dark": "f9dedc",
+      "default": "410e0b",
+      "light": "410e0b"
+    },
+    "on_primary": {
+      "dark": "381e72",
+      "default": "ffffff",
+      "light": "ffffff"
+    },
+    "on_primary_container": {
+      "dark": "eaddff",
+      "default": "21005d",
+      "light": "21005d"
+    },
+    "on_red": {
+      "dark": "690005",
+      "default": "ffffff",
+      "light": "ffffff"
+    },
+    "on_secondary": {
+      "dark": "332d41",
+      "default": "ffffff",
+      "light": "ffffff"
+    },
+    "on_secondary_container": {
+      "dark": "e8def8",
+      "default": "1d192b",
+      "light": "1d192b"
+    },
+    "on_surface": {
+      "dark": "e6e0e9",
+      "default": "1d1b20",
+      "light": "1d1b20"
+    },
+    "on_surface_variant": {
+      "dark": "cac4d0",
+      "default": "49454f",
+      "light": "49454f"
+    },
+    "on_tertiary": {
+      "dark": "492532",
+      "default": "ffffff",
+      "light": "ffffff"
+    },
+    "on_tertiary_container": {
+      "dark": "ffd8e4",
+      "default": "31111d",
+      "light": "31111d"
+    },
+    "outline": {
+      "dark": "938f99",
+      "default": "79747e",
+      "light": "79747e"
+    },
+    "outline_variant": {
+      "dark": "49454f",
+      "default": "cac4d0",
+      "light": "cac4d0"
+    },
+    "primary": {
+      "dark": "d0bcff",
+      "default": "6750a4",
+      "light": "6750a4"
+    },
+    "primary_container": {
+      "dark": "4f378b",
+      "default": "eaddff",
+      "light": "eaddff"
+    },
+    "red": {
+      "dark": "ffb4ab",
+      "default": "ba1a1a",
+      "light": "ba1a1a"
+    },
+    "scrim": {
+      "dark": "000000",
+      "default": "000000",
+      "light": "000000"
+    },
+    "secondary": {
+      "dark": "ccc2dc",
+      "default": "625b71",
+      "light": "625b71"
+    },
+    "secondary_container": {
+      "dark": "4a4458",
+      "default": "e8def8",
+      "light": "e8def8"
+    },
+    "shadow": {
+      "dark": "000000",
+      "default": "000000",
+      "light": "000000"
+    },
+    "source_color": {
+      "dark": "6750a4",
+      "default": "6750a4",
+      "light": "6750a4"
+    },
+    "surface": {
+      "dark": "141218",
+      "default": "fef7ff",
+      "light": "fef7ff"
+    },
+    "surface_bright": {
+      "dark": "3b383e",
+      "default": "fef7ff",
+      "light": "fef7ff"
+    },
+    "surface_container": {
+      "dark": "211f26",
+      "default": "f3edf7",
+      "light": "f3edf7"
+    },
+    "surface_container_high": {
+      "dark": "2b2930",
+      "default": "ece6f0",
+      "light": "ece6f0"
+    },
+    "surface_container_highest": {
+      "dark": "36343b",
+      "default": "e6e0e9",
+      "light": "e6e0e9"
+    },
+    "surface_container_low": {
+      "dark": "1d1b20",
+      "default": "f7f2fa",
+      "light": "f7f2fa"
+    },
+    "surface_container_lowest": {
+      "dark": "0f0d13",
+      "default": "ffffff",
+      "light": "ffffff"
+    },
+    "surface_dim": {
+      "dark": "141218",
+      "default": "ded8e1",
+      "light": "ded8e1"
+    },
+    "surface_tint": {
+      "dark": "d0bcff",
+      "default": "6750a4",
+      "light": "6750a4"
+    },
+    "surface_variant": {
+      "dark": "49454f",
+      "default": "e7e0ec",
+      "light": "e7e0ec"
+    },
+    "tertiary": {
+      "dark": "efb8c8",
+      "default": "7d5260",
+      "light": "7d5260"
+    },
+    "tertiary_container": {
+      "dark": "633b48",
+      "default": "ffd8e4",
+      "light": "ffd8e4"
+    }
+  },
+  "image": "/home/me/Pictures/harbour.jpg",
+  "is_dark_mode": false,
+  "mode": "light",
+  "palettes": {
+    "primary": {
+      "0": "000000",
+      "5": "0d0d0d",
+      "10": "1a1a1a",
+      "15": "262626",
+      "20": "333333",
+      "25": "404040",
+      "30": "4c4c4c",
+      "35": "595959",
+      "40": "666666",
+      "50": "7f7f7f",
+      "60": "999999",
+      "70": "b2b2b2",
+      "80": "cccccc",
+      "90": "e5e5e5",
+      "95": "f2f2f2",
+      "98": "fafafa",
+      "99": "fcfcfc",
+      "100": "ffffff"
+    },
+    "neutral": {
+      "0": "000000",
+      "5": "0d0d0d",
+      "10": "1a1a1a",
+      "15": "262626",
+      "20": "333333",
+      "25": "404040",
+      "30": "4c4c4c",
+      "35": "595959",
+      "40": "666666",
+      "50": "7f7f7f",
+      "60": "999999",
+      "70": "b2b2b2",
+      "80": "cccccc",
+      "90": "e5e5e5",
+      "95": "f2f2f2",
+      "98": "fafafa",
+      "99": "fcfcfc",
+      "100": "ffffff"
+    }
+  }
+}

@@ -32,10 +32,13 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   albums, artists, playlists, related tracks, radios and plain lyrics.
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
-  liked songs, playlists, albums, subscriptions, likes and saves. Its
-  parsers are tested against recorded responses in `testdata/`, and against
-  the live service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run
-  Live` (`MIXMUSIC_YT_COOKIES` adds a signed-in account).
+  liked songs, playlists, albums, subscriptions, likes and saves, and it
+  deletes the playlists the user made, which it tells from those they
+  saved by the menus YouTube sends with them. Its parsers are tested
+  against recorded responses in `testdata/`, and against the live service
+  with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run Live`
+  (`MIXMUSIC_YT_COOKIES` adds a signed-in account, and
+  `MIXMUSIC_YT_WRITE=1` lets it make and delete a playlist there).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
   library), and controls Spotify Connect devices.

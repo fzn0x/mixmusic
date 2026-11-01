@@ -62,7 +62,7 @@ func (s *shell) installButton(c *ui.Context, key, label string) {
 	}
 }
 
-// toolProblems tells, on the home page, that playback needs yt-dlp, or
+// toolProblems tells, on the home page, that some tracks need yt-dlp, or
 // that the user's own is too old.
 func (s *shell) toolProblems(c *ui.Context) {
 	st := s.toolStatus()
@@ -73,8 +73,8 @@ func (s *shell) toolProblems(c *ui.Context) {
 	panel := func(title, message string, actions func()) { s.alert(c, title, message, actions).Margin(0, 0, 32) }
 	switch {
 	case !y.Found:
-		panel("Playback needs yt-dlp",
-			"MixMusic finds the audio of YouTube Music tracks with yt-dlp. Install it once, and it stays up to date from Settings.",
+		panel("Some tracks need yt-dlp",
+			"MixMusic finds the audio of most tracks itself, and asks yt-dlp for the rest, such as tracks made for children. Install it once, and it stays up to date from Settings.",
 			func() { s.installButton(c, "install-ytdlp", "install yt-dlp") })
 	case outdated(y) && s.set.SkippedYTDLP != y.Latest:
 		how := "the way you installed it"
@@ -82,7 +82,7 @@ func (s *shell) toolProblems(c *ui.Context) {
 			how = "with " + y.UpdateCommand
 		}
 		panel("Your yt-dlp is out of date",
-			fmt.Sprintf("yt-dlp %s finds the audio of your tracks, and %s is out. As YouTube changes, an old yt-dlp stops finding it. Update it %s, or use MixMusic's own, which it keeps up to date.", y.Version, y.Latest, how),
+			fmt.Sprintf("yt-dlp %s finds the audio of the tracks YouTube won't give MixMusic itself, and %s is out. As YouTube changes, an old yt-dlp stops finding it. Update it %s, or use MixMusic's own, which it keeps up to date.", y.Version, y.Latest, how),
 			func() {
 				s.installButton(c, "use-ours", "use MixMusic's yt-dlp")
 				if s.button(c, "not-now", "not now", false).Clicked() {
@@ -103,7 +103,7 @@ func (s *shell) toolSettings(c *ui.Context) {
 			return
 		}
 		y, js := st.value.YTDLP, st.value.JSRuntime
-		desc := "Not found. MixMusic needs it to play YouTube Music."
+		desc := "Not found. Some YouTube Music tracks play only with it."
 		if y.Found {
 			desc = "yt-dlp " + y.Version + " at " + y.Path
 			if y.Managed {

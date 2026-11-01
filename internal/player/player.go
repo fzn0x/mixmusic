@@ -244,6 +244,8 @@ var (
 	// wakeRefresh bounds how long, after the computer woke, the player
 	// waits for the network to find the current track's stream again.
 	wakeRefresh = 2 * time.Minute
+	// slowStart is how long a stream takes to sound before the log tells.
+	slowStart = 2 * time.Second
 )
 
 const (
@@ -253,7 +255,10 @@ const (
 	// countAfter is how long a track plays before it counts as played, or
 	// half of a shorter one.
 	countAfter = 30 * time.Second
-	// prefetchAfter is how long a track plays before the next is prepared.
+	// prepareAfter is how long a track plays before the next one's stream
+	// is found, so that skipping to it is quick, and prefetchAfter how long
+	// before its audio is downloaded too.
+	prepareAfter  = time.Second
 	prefetchAfter = 10 * time.Second
 	// restartAfter is how far into a track Previous goes back to its start.
 	restartAfter = 3 * time.Second
@@ -344,6 +349,7 @@ type Player struct {
 	loadToken   int
 	retry       retryState
 	counted     string
+	prepared    string
 	prefetched  string
 	crossfading bool
 	failures    int
@@ -372,7 +378,11 @@ type Player struct {
 	toldOffline bool
 	// stalls counts the stream's Buffering events, so that a check of the
 	// network after one tells it is the last.
-	stalls      int
+	stalls int
+	// askedAt is when the current track was asked to play, from askedFrom,
+	// until it sounds: the log tells when that took long.
+	askedAt     time.Time
+	askedFrom   time.Duration
 	uidSeq      int
 	lastToggle  time.Time
 	reporting   throttle

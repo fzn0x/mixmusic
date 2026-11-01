@@ -39,12 +39,16 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
   library), and controls Spotify Connect devices.
-- **`internal/stream`** finds the audio of a YouTube video with yt-dlp, keeps
-  it until its URL expires, and opens it for the audio engine
-  (`Proxy.Open`): chunked fetches from YouTube in the background, a new URL
-  when YouTube refuses the old one, a new connection, from the byte it
-  reached, when a download gets no bytes for 15 seconds or its connection
-  drops, and an on-disk cache of tracks played to their end.
+- **`internal/stream`** finds the audio of a YouTube video through YouTube's
+  player API, asked signed out as YouTube's visionOS app (`Direct`), else
+  with yt-dlp, keeps it until its URL expires, and opens it for the audio
+  engine (`Proxy.Open`): chunked fetches from YouTube in the background, a
+  new URL when YouTube refuses the old one, a new connection, from the byte
+  it reached, when a download gets no bytes for 15 seconds or its
+  connection drops, and an on-disk cache of tracks played to their end.
+  The player API's answers are tested against recorded ones in
+  `testdata/`, and against YouTube with
+  `MIXMUSIC_LIVE=1 go test ./internal/stream -run Live`.
 - **`internal/webm`** reads the audio of WebM files, as YouTube serves it:
   the packets of the first audio track with their times, and seeking by the
   Cues, reading a file played from its start straight through.
@@ -163,7 +167,10 @@ store, which also keeps the Spotify token and the Last.fm connection), the
 scrobbles still to send, and `updater.json`, the update preferences. The
 cache folder holds audio, matches and yt-dlp's cache, and the logs folder
 the log and the crash reports. `MIXMUSIC_DATA_DIR` moves all three into one
-folder, for a portable copy or a test run.
+folder, for a portable copy or a test run. `MIXMUSIC_YTDLP_ONLY=1` has
+yt-dlp find every stream, as before MixMusic asked YouTube's player API,
+to time one against the other or tell which fails: the log tells which
+streams took over a second to find, and which tracks over two to start.
 
 ## Capture mode
 

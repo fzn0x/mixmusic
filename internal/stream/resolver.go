@@ -1,6 +1,7 @@
-// Package stream finds the audio streams of YouTube videos with yt-dlp,
-// and serves them to the player's audio element through a local scheme,
-// with range requests, so it can seek.
+// Package stream finds the audio streams of YouTube videos, through
+// YouTube's player API as YouTube's visionOS app, else with yt-dlp, and
+// serves them to the player's audio element through a local scheme, with
+// range requests, so it can seek.
 package stream
 
 import (
@@ -70,11 +71,17 @@ type Stream struct {
 	Available time.Time
 }
 
+// slowResolve is how long finding a stream takes before the log tells.
+const slowResolve = time.Second
+
 // Resolver finds streams and remembers them until they expire.
 type Resolver struct {
 	Tools *tools.Manager
 	// CacheDir is where yt-dlp caches what it learns of YouTube's player.
 	CacheDir string
+	// Direct, when set, finds streams first, in a fraction of the time
+	// yt-dlp takes; yt-dlp finds those it can't.
+	Direct *Direct
 	// Run runs yt-dlp with args and returns what it printed; tests replace
 	// it.
 	Run func(ctx context.Context, args ...string) ([]byte, error)
@@ -187,11 +194,52 @@ func (r *Resolver) Forget(videoID string) {
 	}
 }
 
-// resolve asks yt-dlp for the stream of a video. It asks signed out, also
+// resolve finds the stream of a video through the direct route, when the
+// resolver has it, else with yt-dlp. The log tells when it took a while,
+// and why yt-dlp found it, never the stream's URL, which carries the
+// user's IP address.
+func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality) (Stream, error) {
+	start := time.Now()
+	var direct error
+	if r.Direct != nil {
+		dctx, cancel := context.WithTimeout(ctx, directTimeout)
+		s, err := r.Direct.Stream(dctx, videoID, quality)
+		cancel()
+		if err == nil {
+			if took := time.Since(start); took > slowResolve {
+				log.Printf("mixmusic: found the stream of %s in %s, through YouTube's player API", videoID, took.Round(10*time.Millisecond))
+			}
+			return s, nil
+		}
+		direct = err
+	}
+	s, err := r.ytdlp(ctx, videoID, quality)
+	if err != nil {
+		// Without yt-dlp, why YouTube gave the direct route no stream is
+		// the better answer, when it is a plain one.
+		var refused playabilityError
+		if errors.Is(err, tools.ErrNoYTDLP) && errors.As(direct, &refused) {
+			if plain := plainError(refused.Reason); plain != "" {
+				return Stream{}, errors.New(plain)
+			}
+		}
+		return Stream{}, err
+	}
+	took := time.Since(start).Round(10 * time.Millisecond)
+	switch {
+	case direct != nil:
+		log.Printf("mixmusic: found the stream of %s in %s with yt-dlp (%s)", videoID, took, strings.TrimPrefix(direct.Error(), "stream: "))
+	case took > slowResolve:
+		log.Printf("mixmusic: found the stream of %s in %s with yt-dlp", videoID, took)
+	}
+	return s, nil
+}
+
+// ytdlp asks yt-dlp for the stream of a video. It asks signed out, also
 // when the user signed in to YouTube Music: with an account's cookies,
 // YouTube answers yt-dlp with fewer streams, often none it can play, and
 // it may flag the account for using yt-dlp.
-func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality) (Stream, error) {
+func (r *Resolver) ytdlp(ctx context.Context, videoID string, quality Quality) (Stream, error) {
 	args := []string{"-J", "--no-playlist", "-f", formats[quality]}
 	if r.Tools != nil {
 		args = append(args, r.Tools.YTDLPArgs(r.CacheDir)...)

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"os"
 	"slices"
 	"strings"
 	"sync"
@@ -859,6 +861,77 @@ func TestProgress(t *testing.T) {
 		t.Errorf("%d loads", got)
 	}
 }
+
+func TestNextTrackFoundAtStart(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	prepared := func() []string {
+		var out []string
+		h.svc.with(func(f *fakeServices) { out = slices.Clone(f.prepared) })
+		return out
+	}
+	h.p.Time(1500*time.Millisecond, 200*time.Second)
+	h.wait("b prepared", func(*Player) bool { return slices.Contains(prepared(), "yt:b") })
+	// Once, and without its audio yet.
+	h.p.Time(2500*time.Millisecond, 200*time.Second)
+	h.on(func(*Player) {})
+	if got := prepared(); !slices.Equal(got, []string{"yt:a", "yt:b"}) || h.stream.count("preload") != 0 {
+		t.Errorf("prepared %v, %d preloads", got, h.stream.count("preload"))
+	}
+	h.p.Time(11*time.Second, 200*time.Second)
+	h.wait("b preloaded", func(*Player) bool { return h.stream.has("preload url:yt:b") })
+}
+
+func TestSlowStartLogged(t *testing.T) {
+	var logs strings.Builder
+	var mu sync.Mutex
+	log.SetOutput(writerFunc(func(b []byte) (int, error) {
+		mu.Lock()
+		defer mu.Unlock()
+		return logs.Write(b)
+	}))
+	saved := slowStart
+	slowStart = 50 * time.Millisecond
+	t.Cleanup(func() {
+		log.SetOutput(os.Stderr)
+		slowStart = saved
+	})
+	logged := func() string {
+		mu.Lock()
+		defer mu.Unlock()
+		return logs.String()
+	}
+
+	h := newHarness(t, Saved{}, func(f *fakeServices) {
+		f.prepare = func(t media.Track) (Source, error) {
+			if t.ID == "yt:a" {
+				time.Sleep(100 * time.Millisecond)
+			}
+			return streamOf(t), nil
+		}
+	})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Time(250*time.Millisecond, 200*time.Second)
+	h.p.Time(500*time.Millisecond, 200*time.Second)
+	h.on(func(*Player) {})
+	if got := logged(); strings.Count(got, "yt:a started") != 1 || !strings.Contains(got, "after it was asked to play") {
+		t.Errorf("log:\n%s", got)
+	}
+	h.p.Next()
+	h.wait("b playing", playing("b"))
+	h.p.Time(250*time.Millisecond, 200*time.Second)
+	h.on(func(*Player) {})
+	if got := logged(); strings.Contains(got, "yt:b") {
+		t.Errorf("a quick start logged:\n%s", got)
+	}
+}
+
+// writerFunc is an io.Writer of a function.
+type writerFunc func([]byte) (int, error)
+
+func (f writerFunc) Write(b []byte) (int, error) { return f(b) }
 
 func TestShortTrackCounts(t *testing.T) {
 	h := newHarness(t, Saved{})

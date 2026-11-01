@@ -250,14 +250,17 @@ func (p *Proxy) relay(ctx context.Context, out io.Writer, videoID string, s Stre
 }
 
 // resolve returns the stream of a video once YouTube serves it: it refuses
-// a URL for a few seconds after yt-dlp found it.
+// a URL yt-dlp found for a few seconds, while it would show an ad. Streams
+// of the direct route play at once.
 func (p *Proxy) resolve(ctx context.Context, videoID string) (Stream, error) {
 	s, err := p.Resolver.Resolve(ctx, videoID)
 	if err != nil {
 		return s, err
 	}
 	if wait := time.Until(s.Available); wait > 0 {
-		t := time.NewTimer(min(wait, maxAvailableWait))
+		wait = min(wait, maxAvailableWait)
+		log.Printf("mixmusic: waiting %.1fs for YouTube to serve the stream of %s", wait.Seconds(), videoID)
+		t := time.NewTimer(wait)
 		defer t.Stop()
 		select {
 		case <-t.C:

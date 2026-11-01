@@ -4,12 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/fzn0x/mixmusic/internal/tools"
 )
 
 // fakeYTDLP returns a Run function printing what yt-dlp prints for a
@@ -143,5 +146,57 @@ func TestExpiry(t *testing.T) {
 func TestMimeType(t *testing.T) {
 	if got := mimeType("m4a", "mp4a.40.2"); !strings.HasPrefix(got, "audio/mp4") {
 		t.Errorf("m4a = %q", got)
+	}
+}
+
+func TestResolveTriesTheDirectRouteFirst(t *testing.T) {
+	f := newFakeTube(t)
+	r := NewResolver(nil, "")
+	r.Direct = f.direct()
+	r.Run = func(context.Context, ...string) ([]byte, error) {
+		t.Error("yt-dlp ran for a stream the direct route found")
+		return nil, errors.New("no yt-dlp here")
+	}
+	s, err := r.Resolve(context.Background(), songID)
+	if err != nil || s.Size != song251 || !s.Available.IsZero() {
+		t.Errorf("stream of %d bytes, available %v: %v", s.Size, s.Available, err)
+	}
+}
+
+func TestResolveFallsBackToYTDLP(t *testing.T) {
+	for name, fail := range map[string]func(f *fakeTube){
+		"age":           func(f *fakeTube) { f.answersWith("-age") },
+		"made for kids": func(f *fakeTube) { f.answersWith("-unplayable") },
+		"bot check":     func(f *fakeTube) { f.answersWith("-bot-check") },
+		"HTTP 500":      func(f *fakeTube) { f.answers(func(playerRequest) []byte { return nil }) },
+		"refused":       func(f *fakeTube) { f.refuses(http.StatusForbidden) },
+	} {
+		f := newFakeTube(t)
+		fail(f)
+		var runs atomic.Int32
+		r := NewResolver(nil, "")
+		r.Direct = f.direct()
+		r.Run = fakeYTDLP("https://example.com/audio", &runs)
+		s, err := r.Resolve(context.Background(), songID)
+		if err != nil || runs.Load() != 1 || s.Header.Get("User-Agent") != "test" {
+			t.Errorf("%s: %d runs of yt-dlp, stream %+v, %v", name, runs.Load(), s, err)
+		}
+	}
+}
+
+func TestResolveSaysWhyWithoutYTDLP(t *testing.T) {
+	f := newFakeTube(t)
+	r := NewResolver(nil, "")
+	r.Direct = f.direct()
+	r.Run = func(context.Context, ...string) ([]byte, error) { return nil, tools.ErrNoYTDLP }
+	f.answersWith("-age")
+	if _, err := r.Resolve(context.Background(), songID); err == nil || err.Error() != "YouTube plays this track only to signed-in adults, on its own website" {
+		t.Errorf("age-restricted, without yt-dlp: %v", err)
+	}
+	// YouTube gives the direct route nothing of a video made for children,
+	// which yt-dlp would play.
+	f.answersWith("-unplayable")
+	if _, err := r.Resolve(context.Background(), "XqZsoesa55w"); !errors.Is(err, tools.ErrNoYTDLP) {
+		t.Errorf("made for children, without yt-dlp: %v", err)
 	}
 }

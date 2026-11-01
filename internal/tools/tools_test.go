@@ -61,6 +61,11 @@ func TestYTDLPPrefersChosenThenManaged(t *testing.T) {
 	if got, err := m.YTDLP(); err != nil || got != chosen {
 		t.Errorf("YTDLP() = %q, %v; want the chosen path", got, err)
 	}
+	gone := filepath.Join(dir, "gone-yt-dlp")
+	m.Configure(gone, "")
+	if _, err := m.YTDLP(); !errors.Is(err, ErrNoYTDLP) || err.Error() != "yt-dlp not found at "+gone {
+		t.Errorf("YTDLP() error = %v, want ErrNoYTDLP saying where", err)
+	}
 }
 
 // noToolDirs keeps a test to the PATH and the folders it makes.

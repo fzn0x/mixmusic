@@ -63,7 +63,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 			}
 		})
 	})
-	if ui.AlertDialog(c, &s.resetting, "Reset settings", "Put back every setting as it was on a new install?", "Cancel", "Reset") == 1 {
+	if s.confirm(c, "reset-settings", &s.resetting, "Reset settings", "Put back every setting as it was on a new install?", "Reset") {
 		if _, err := s.svc.Preferences.Reset(); err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 		}

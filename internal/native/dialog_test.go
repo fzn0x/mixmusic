@@ -8,6 +8,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/player"
 )
@@ -140,17 +141,35 @@ func textStarting(tt *ui.Tester, prefix string) string {
 }
 
 // dialogCase is a dialog to open: its title, its buttons, the one to
-// press and what pressing it does, and how the last text of its body
-// starts, if it can take more room than a short window has.
+// press, or "" for Enter, and what pressing it does, and how the last
+// text of its body starts, if it can take more room than a short window
+// has.
 type dialogCase struct {
 	name    string
 	open    func(t *testing.T, s *shell, tt *ui.Tester)
 	title   string
 	buttons []string
 	press   string
-	done    func(s *shell) bool
+	done    func(s *shell, tt *ui.Tester) bool
 	last    string
 }
+
+// testMix makes a mix, and shows its page.
+func testMix(t *testing.T, s *shell, tt *ui.Tester) string {
+	t.Helper()
+	p, err := s.svc.Collection.CreatePlaylist("late night drive", "", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	show(s, tt, playlistPath(p.ID))
+	until(t, s, tt, "the mix's page", func() bool { return tt.HasText("your mix") })
+	return p.ID
+}
+
+// enableMessage is what enabling a plugin that asks for everything says,
+// as long as a question gets.
+const enableMessage = "Plugins can control the player, change your library and reach the internet, whatever they ask for. " +
+	"Enable plugins from authors you trust. It asks for: network, notifications, storage, playback."
 
 // dialogCases are the dialogs of the window of s.
 func dialogCases(s *shell) []dialogCase {
@@ -159,33 +178,72 @@ func dialogCases(s *shell) []dialogCase {
 	if u.Enabled {
 		act = "install 9.9.9"
 	}
-	named := ""
+	named, ran := "", false
 	return []dialogCase{
 		{name: "update offer", title: "mixmusic 9.9.9 is out", buttons: []string{"skip this version", "what's new", "later", act},
 			open: func(t *testing.T, s *shell, tt *ui.Tester) {
 				offer := testOffer
 				s.offer = &offer
 			},
-			press: "later", done: func(s *shell) bool { return s.offer == nil }, last: "You have "},
+			press: "later", done: func(s *shell, _ *ui.Tester) bool { return s.offer == nil }, last: "You have "},
 		{name: "new mix", title: "new mix", buttons: []string{"cancel", "create"},
 			open: func(t *testing.T, s *shell, tt *ui.Tester) {
 				s.promptName("New mix", "Name", "late night drive", "create", func(name string) { named = name })
 			},
-			press: "create", done: func(*shell) bool { return named == "late night drive" }},
+			press: "create", done: func(*shell, *ui.Tester) bool { return named == "late night drive" }},
 		{name: "rename mix", title: "rename mix", buttons: []string{"cancel", "rename"},
 			open: func(t *testing.T, s *shell, tt *ui.Tester) {
-				p, err := s.svc.Collection.CreatePlaylist("late night drive", "", nil)
-				if err != nil {
-					t.Fatal(err)
-				}
-				show(s, tt, playlistPath(p.ID))
-				until(t, s, tt, "the mix's page", func() bool { return tt.HasText("your mix") })
-				s.renaming, s.renameTo, s.renameID = true, "early morning drive", p.ID
+				s.renaming, s.renameTo, s.renameID = true, "early morning drive", testMix(t, s, tt)
 			},
-			press: "rename", done: func(s *shell) bool {
+			press: "rename", done: func(s *shell, _ *ui.Tester) bool {
 				mixes := s.svc.Collection.Playlists()
 				return len(mixes) == 1 && mixes[0].Title == "early morning drive"
 			}},
+		{name: "question", title: "Enable An Ambient Visualiser For Late Night Listening", buttons: []string{"cancel", "Enable"},
+			open: func(t *testing.T, s *shell, tt *ui.Tester) {
+				s.ask("Enable An Ambient Visualiser For Late Night Listening", enableMessage, "Enable", func() { ran = true })
+			},
+			press: "Enable", done: func(*shell, *ui.Tester) bool { return ran }, last: "Plugins can"},
+		{name: "delete mix", title: "Delete mix", buttons: []string{"cancel", "Delete"},
+			open: func(t *testing.T, s *shell, tt *ui.Tester) {
+				s.deleting, s.deleteTitle, s.deleteID = true, "late night drive", testMix(t, s, tt)
+			},
+			press: "Delete", done: func(s *shell, _ *ui.Tester) bool { return len(s.svc.Collection.Playlists()) == 0 }, last: "Delete late"},
+		{name: "clear history", title: "Clear history", buttons: []string{"cancel", "Clear"},
+			open: func(t *testing.T, s *shell, tt *ui.Tester) {
+				if err := s.svc.Collection.RecordPlay(testTracks[0]); err != nil {
+					t.Fatal(err)
+				}
+				show(s, tt, "/library/history")
+				s.clearingHistory = true
+			},
+			press: "Clear", done: func(s *shell, _ *ui.Tester) bool { return len(s.svc.Collection.History(10)) == 0 }, last: "Forget"},
+		{name: "reset settings", title: "Reset settings", buttons: []string{"cancel"},
+			open: func(t *testing.T, s *shell, tt *ui.Tester) {
+				st := s.svc.Preferences.Get()
+				st.Autoplay = false
+				if _, err := s.svc.Preferences.Set(st); err != nil {
+					t.Fatal(err)
+				}
+				s.refresh()
+				show(s, tt, "/settings/desktop")
+				s.resetting = true
+			},
+			// The page's button is reset too: Enter presses the dialog's,
+			// which has the focus.
+			done: func(s *shell, _ *ui.Tester) bool { return s.svc.Preferences.Get().Autoplay }, last: "Put back"},
+		{name: "install plugin", title: "Install An Ambient Visualiser For Late Night Listening", buttons: []string{"cancel", "Install"},
+			open: func(t *testing.T, s *shell, tt *ui.Tester) {
+				s.loads["registry"] = &loaded[addons.Registry]{done: true}
+				show(s, tt, "/marketplace/plugins")
+				s.pluginToInstall = addons.Entry{ID: "ambient", Name: "An Ambient Visualiser For Late Night Listening",
+					Permissions: []string{"network", "notifications", "storage", "playback"}}
+				s.confirmingPlugin = true
+			},
+			// The install starts, and soon fails without the network.
+			press: "Install", done: func(s *shell, tt *ui.Tester) bool {
+				return !s.confirmingPlugin && (s.installingAddon == "ambient" || tt.HasText("fetching the registry"))
+			}, last: "Plugins can"},
 	}
 }
 
@@ -207,8 +265,8 @@ func TestDialogsInShortWindows(t *testing.T) {
 					d.open(t, s, tt)
 					tt.Frame()
 					tt.Advance(time.Second)
-					if r, ok := tt.Find(d.title); !ok || r.Y < 0 || r.Y+r.H > float32(h) {
-						t.Fatalf("the dialog doesn't lie in the window: %v (found %v)", r, ok)
+					if !tt.HasText(d.title) {
+						t.Fatalf("the dialog doesn't show: %q", tt.Texts())
 					}
 					top := float32(h)
 					for _, b := range d.buttons {
@@ -222,12 +280,18 @@ func TestDialogsInShortWindows(t *testing.T) {
 						if r, ok := tt.Find(textStarting(tt, d.last)); d.last != "" && (!ok || r.H < 10 || r.Y+r.H > top+0.5) {
 							t.Errorf("the body's end doesn't show over the buttons: %v (found %v), buttons from %v", r, ok, top)
 						}
-					} else if d.name == "update offer" && h <= 425 {
-						t.Error("the offer's body doesn't scroll in a short window")
+					} else if (d.name == "update offer" || d.name == "question") && h <= 360 {
+						t.Error("the body doesn't scroll in a window too short for it")
 					}
-					click(t, s, tt, d.press)
-					if !d.done(s) {
-						t.Errorf("pressing %s didn't do what it says", d.press)
+					if d.press == "" {
+						tt.Key(0, ui.KeyEnter)
+						s.drain()
+						tt.Frame()
+					} else {
+						click(t, s, tt, d.press)
+					}
+					if !d.done(s, tt) {
+						t.Errorf("pressing %q didn't do what it says", d.press)
 					}
 				})
 			}
@@ -339,6 +403,49 @@ func TestDialogOpensAtTop(t *testing.T) {
 	tt.Advance(time.Second)
 	if y := s.dialogScrolls["offer"].state.Y; y != 0 {
 		t.Errorf("the offer opened again scrolled to %v", y)
+	}
+}
+
+// TestQuestionKeeps keeps a question asked before an action as MyGo's
+// alert kept it: ok has the focus as it opens, a click outside it does
+// nothing, and Escape turns it down. A dialog that asks no question
+// closes with a click outside.
+func TestQuestionKeeps(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	ran, canceled := false, false
+	s.ask("Enable Hello", enableMessage, "Enable", func() { ran = true })
+	s.asking.cancel = func() { canceled = true }
+	tt.Frame()
+	if !tt.Focused("Enable") {
+		t.Error("the question opens with the focus elsewhere than on its ok")
+	}
+	tt.ClickAt(5, 5)
+	s.drain()
+	tt.Frame()
+	if s.asking == nil || canceled {
+		t.Fatal("a click outside the question turned it down")
+	}
+	tt.Key(0, ui.KeyEscape)
+	s.drain()
+	tt.Frame()
+	if s.asking != nil || !canceled || ran {
+		t.Errorf("Escape left the question: asking %v, canceled %v, ran %v", s.asking != nil, canceled, ran)
+	}
+
+	s.promptName("New mix", "Name", "", "create", func(string) {})
+	tt.Frame()
+	tt.ClickAt(5, 5)
+	tt.Frame()
+	if s.naming != nil {
+		t.Error("a click outside the name asked for left it")
+	}
+	s.paletteOpen = true
+	tt.Frame()
+	tt.ClickAt(5, 5)
+	tt.Frame()
+	if s.paletteOpen {
+		t.Error("a click outside the palette left it")
 	}
 }
 

@@ -421,7 +421,7 @@ func (s *shell) questionDialog(c *ui.Context) {
 		return
 	}
 	open := true
-	if ui.AlertDialog(c, &open, q.title, q.message, "Cancel", q.ok) == 1 {
+	if s.confirm(c, "question", &open, q.title, q.message, q.ok) {
 		s.asking = nil
 		q.run()
 		return

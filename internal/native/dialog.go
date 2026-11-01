@@ -142,6 +142,25 @@ func (s *shell) dialog(c *ui.Context, open *bool, o dialogOptions, body, actions
 	})
 }
 
+// confirm asks before an action while *open is true, in a dialog that is
+// an alert: title, message, cancel, and ok, which has the focus as the
+// dialog opens, for Enter to press it. It reports whether the user chose
+// ok, in the frame they did. Choosing either, or Escape, closes the
+// dialog, setting *open to false; a click outside it does nothing.
+func (s *shell) confirm(c *ui.Context, key string, open *bool, title, message, ok string) (chosen bool) {
+	s.dialog(c, open, dialogOptions{key: key, title: title, width: 480, alert: true, message: message}, func() {
+		ui.Text(c, message).FontSize(s.lk.bodySize())
+	}, func() {
+		if s.button(c, key+"-cancel", "cancel", false).Clicked() {
+			*open = false
+		}
+		if s.button(c, key+"-ok", ok, true).AutoFocus().Clicked() {
+			*open, chosen = false, true
+		}
+	})
+	return chosen
+}
+
 // sweepDialogs forgets where the bodies of the dialogs the frame didn't
 // show were scrolled: a dialog opens again at the top of its body.
 func (s *shell) sweepDialogs() {

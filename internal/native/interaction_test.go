@@ -758,7 +758,7 @@ func TestCrashReport(t *testing.T) {
 	if !tt.HasText("crash-20261021.log") {
 		t.Fatalf("the offer doesn't name the report: %q", tt.Texts())
 	}
-	click(t, s, tt, "Cancel")
+	click(t, s, tt, "cancel")
 	if s.asking != nil || s.svc.System.LastCrash() != "" {
 		t.Errorf("turning the offer down left it: asking %v, crash %q", s.asking != nil, s.svc.System.LastCrash())
 	}

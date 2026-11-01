@@ -124,7 +124,8 @@ func livePlay(t *testing.T, ctx context.Context, p *stream.Proxy, videoID string
 	if err != nil {
 		t.Fatal(err)
 	}
-	isMP4, _ := sniffMP4(bytes.NewReader(file))
+	kind, _ := sniff(bytes.NewReader(file))
+	isMP4 := kind == mp4File
 	t.Logf("a file of %d bytes, MP4 %v", len(file), isMP4)
 	if isMP4 {
 		// YouTube's edit list skips the encoder's priming: the deck needs

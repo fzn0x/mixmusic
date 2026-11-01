@@ -49,6 +49,25 @@ const (
 	QualitySaver Quality = "saver"
 )
 
+// ColorSource chooses where the colours come from: the theme, or a file
+// that pywal or matugen make of the wallpaper, or one of the user's.
+type ColorSource string
+
+const (
+	// ColorsTheme wears the theme's own colours.
+	ColorsTheme ColorSource = ""
+	// ColorsPywal reads pywal's colors.json, in pywal's cache folder.
+	ColorsPywal ColorSource = "pywal"
+	// ColorsMatugen reads matugen.json in the data folder, which
+	// MixMusic's matugen template writes.
+	ColorsMatugen ColorSource = "matugen"
+	// ColorsFile reads the file of Settings.ColorFile.
+	ColorsFile ColorSource = "file"
+)
+
+// maxColorFile bounds the length of Settings.ColorFile, in bytes.
+const maxColorFile = 4096
+
 // Bands are the center frequencies of the equalizer's bands, in hertz.
 var Bands = []int{32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000}
 
@@ -77,8 +96,13 @@ type Settings struct {
 	// Accent replaces the theme's accent color, unless empty.
 	Accent string `json:"accent"`
 	// DynamicAccent takes the accent color from the artwork playing.
-	DynamicAccent bool    `json:"dynamicAccent"`
-	Density       Density `json:"density"`
+	DynamicAccent bool `json:"dynamicAccent"`
+	// ColorSource takes the colours from a file, over the theme's, which
+	// keeps its type, corners and effects. ColorFile is the file of
+	// ColorsFile: a full path, or one that starts with ~.
+	ColorSource ColorSource `json:"colorSource"`
+	ColorFile   string      `json:"colorFile"`
+	Density     Density     `json:"density"`
 	// FontScale scales the text, from 0.85 to 1.3.
 	FontScale float64 `json:"fontScale"`
 	// Zoom scales the whole interface, one of ZoomSteps: the text, which
@@ -246,6 +270,16 @@ func (s Settings) DiscordApp() string { return cmp.Or(s.DiscordAppID, DefaultDis
 // letters, digits and dashes.
 func ValidID(id string) bool { return idRe.MatchString(id) }
 
+// CleanPath is a path the user typed or pasted, without the spaces around
+// it, or the double quotes Windows Explorer's Copy as path puts around it.
+func CleanPath(p string) string {
+	p = strings.TrimSpace(p)
+	if len(p) >= 2 && p[0] == '"' && p[len(p)-1] == '"' {
+		p = strings.TrimSpace(p[1 : len(p)-1])
+	}
+	return p
+}
+
 // ActiveTheme returns the ID of the theme to show: Theme, or the light or
 // dark one of the computer's appearance when the theme follows it.
 func (s Settings) ActiveTheme(dark bool) string {
@@ -280,6 +314,15 @@ func (s Settings) Clean() Settings {
 	s.ThemeOptions = options
 	if s.Accent != "" && !colorRe.MatchString(s.Accent) {
 		s.Accent = ""
+	}
+	switch s.ColorSource {
+	case ColorsTheme, ColorsPywal, ColorsMatugen, ColorsFile:
+	default:
+		s.ColorSource = ColorsTheme
+	}
+	s.ColorFile = CleanPath(s.ColorFile)
+	if len(s.ColorFile) > maxColorFile {
+		s.ColorFile = ""
 	}
 	if s.Panel != "lyrics" && s.Panel != "none" {
 		s.Panel = d.Panel

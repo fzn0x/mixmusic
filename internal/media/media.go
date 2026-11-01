@@ -77,6 +77,10 @@ type Track struct {
 	Explicit   bool    `json:"explicit,omitempty"`
 	// Video is set for music videos, rather than audio tracks.
 	Video bool `json:"video,omitempty"`
+	// VideoType is the kind of video YouTube Music says a Video is, as
+	// VideoOfficial or VideoUser, or another, as a podcast's episode. It is
+	// empty for tracks kept before MixMusic read it.
+	VideoType string `json:"videoType,omitempty"`
 	// Plays is how many times the track played, as its service counts
 	// them: a song's plays on YouTube Music, a video's views. 0 is unknown,
 	// as for Spotify, which gives apps no such count.
@@ -86,6 +90,30 @@ type Track struct {
 	// EntryID names the track's place in the playlist it was read from,
 	// which taking it out of the playlist names; only YouTube Music sets it.
 	EntryID string `json:"entryId,omitempty"`
+}
+
+// The kinds of video of YouTube Music that MusicVideo takes, as VideoType
+// holds them.
+const (
+	// VideoOfficial is an artist's official music video.
+	VideoOfficial = "MUSIC_VIDEO_TYPE_OMV"
+	// VideoUser is a video someone uploaded, as a live take or a cover.
+	VideoUser = "MUSIC_VIDEO_TYPE_UGC"
+)
+
+// MusicVideo reports whether the track is a music video whose picture is
+// worth showing: an official one, or one someone uploaded. A song is none,
+// whose video is a still of its cover, nor is a podcast's episode. A video
+// kept before MixMusic read their kinds counts as one: songs were never
+// videos.
+func (t Track) MusicVideo() bool {
+	switch t.VideoType {
+	case VideoOfficial, VideoUser:
+		return true
+	case "":
+		return t.Video
+	}
+	return false
 }
 
 // ArtistNames returns the names of the track's artists, joined by commas.

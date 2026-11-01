@@ -223,6 +223,10 @@ func isExplicit(r node) bool {
 // newTrack makes the track a watch endpoint plays.
 func newTrack(videoID, title string, watch node, b byline, thumbs []media.Image, explicit bool) *media.Track {
 	videoType := watch.get("watchEndpointMusicSupportedConfigs", "watchEndpointMusicConfig", "musicVideoType").str()
+	video := videoType != "" && videoType != videoTypeAudio
+	if !video {
+		videoType = ""
+	}
 	return &media.Track{
 		ID:         media.ID(media.SourceYouTube, videoID),
 		Source:     media.SourceYouTube,
@@ -232,7 +236,8 @@ func newTrack(videoID, title string, watch node, b byline, thumbs []media.Image,
 		DurationMs: b.duration,
 		Artwork:    thumbs,
 		Explicit:   explicit,
-		Video:      videoType != "" && videoType != videoTypeAudio,
+		Video:      video,
+		VideoType:  videoType,
 		Plays:      b.plays(),
 		URL:        "https://music.youtube.com/watch?v=" + videoID,
 	}

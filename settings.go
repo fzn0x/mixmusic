@@ -566,6 +566,18 @@ func (s *shell) playbackSettings(c *ui.Context) {
 			}
 		})
 	})
+	s.group(c, "music videos", func() {
+		desc := "On the now playing page, a music video plays its picture in place of the cover, muted and in time with the sound. The picture takes about 3 MB a minute more, under 1 MB with data saver."
+		problem := s.videoProblem()
+		if problem != "" {
+			desc = problem
+		}
+		s.row(c, "Show the video of music videos", desc, func() {
+			if s.switchOf(c.Key("music-videos"), &s.set.MusicVideos).Label("Show the video of music videos").Disabled(problem != "").Changed() {
+				s.save()
+			}
+		})
+	})
 	s.equalizerSettings(c)
 	s.cacheSettings(c)
 	s.toolSettings(c)

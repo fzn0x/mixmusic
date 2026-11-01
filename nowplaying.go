@@ -9,8 +9,8 @@ import (
 )
 
 // nowPlayingPage gives the track playing the whole pane: its sleeve under
-// a visualizer, its credits, the transport, its lyrics, and what relates
-// to it.
+// a visualizer, or the picture of a music video, its credits, the
+// transport, its lyrics, and what relates to it.
 func (s *shell) nowPlayingPage(c *ui.Context) {
 	k := &s.lk
 	cur, ok := s.st.Current()
@@ -31,12 +31,7 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 			grid.Column()
 		}
 		grid.Children(func() {
-			ui.Box(c).Size(sleeve, sleeve).Shrink(0).Children(func() {
-				s.cover(c, "sleeve", t.Artwork, sleeve, false)
-				if s.st.Playing {
-					s.visualizer(c, sleeve)
-				}
-			})
+			s.sleeve(c, t, sleeve)
 			ui.Column(c).Grow(1).MinWidth(0).Gap(24).Children(func() {
 				ui.Row(c).Gap(8).Wrap().Children(func() {
 					s.sourceMark(c, t.Source, false)
@@ -68,6 +63,7 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 						s.p.Next()
 					}
 					s.likeButton(c, "now-like", t, 18)
+					s.videoToggle(c)
 				})
 				ui.Column(c).Height(420).Children(func() { s.lyrics(c, true) })
 				s.pluginWidgets(c)

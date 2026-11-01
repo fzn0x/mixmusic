@@ -54,6 +54,7 @@ func (s *shell) commands() []command {
 		{"view.lyrics", "Show or hide the lyrics", "Mod+Shift+L", "view", func() { s.togglePanel("lyrics") }},
 		{"view.palette", "Command palette", "Mod+K", "view", func() { s.paletteOpen = !s.paletteOpen }},
 		{"view.mini", "Mini player", "Mod+M", "view", s.showMini},
+		{"view.video", "Show or hide the video of music videos", "", "view", s.toggleVideos},
 		{"view.sidebar", "Collapse or expand the sidebar", "Mod+B", "view", s.toggleRail},
 		{"view.zoomIn", "Zoom in", "Mod+=", "view", func() { s.zoomBy(1) }},
 		{"view.zoomOut", "Zoom out", "Mod+-", "view", func() { s.zoomBy(-1) }},

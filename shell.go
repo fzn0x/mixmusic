@@ -48,6 +48,7 @@ func (s *shell) view(c *ui.Context) {
 	s.promptDialog(c)
 	s.sweepDialogs()
 	s.sweepViews()
+	s.followVideo()
 }
 
 // mainPane shows the page of the router's path. Pages scroll themselves,

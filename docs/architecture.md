@@ -49,8 +49,14 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   it reached, when a download gets no bytes for 15 seconds or its
   connection drops, and an on-disk cache of tracks played to their end.
   The player API also tells how loud YouTube measured each video
-  (`Stream.Loudness`, `Direct.Loudness`). Its answers are tested against
-  recorded ones in `testdata/`, and against YouTube with
+  (`Stream.Loudness`, `Direct.Loudness`). Both list the streams of a
+  video's picture beside its audio (`Stream.Videos`), which the now
+  playing page plays (`Proxy.Picture`, `Proxy.ServeVideo`): a cluster or
+  fragment at a time, as the index at the start of YouTube's DASH
+  streams tells (`parseIndex`), since WebView2 hands a page a custom
+  scheme's response only once it is whole, and WebKitGTK plays no media
+  from a custom scheme. Its answers are tested against recorded ones in
+  `testdata/`, and against YouTube with
   `MIXMUSIC_LIVE=1 go test ./internal/stream -run Live`.
 - **`webm`** reads the audio of WebM files, as YouTube serves it:
   the packets of the first audio track with their times, and seeking by the
@@ -171,17 +177,28 @@ belongs to its main thread: what finishes elsewhere comes back through
 
 ## Webviews
 
-Two windows still show a web page, and only while they're needed:
+Three web pages still show, and only while they're needed:
 
 - **Spotify in MixMusic itself** (`internal/app/spotifyhere.go`): Spotify's
   Web Playback SDK, which decrypts Spotify's protected audio, in the hidden
-  window of `public/spotify.html`, the only page of the app, which it embeds.
+  window of `public/spotify.html`, one of the app's two pages, which it
+  embeds.
   It opens at the first Spotify track that plays in MixMusic, and makes
   MixMusic a Spotify device of its own, which the player plays tracks on
   through the Web API and follows by asking the page (`Page.Eval`); the page
   gets its token from `SpotifyPage.Token`. Only WebView2, on Windows,
   decrypts Spotify's audio.
 - **Google's sign-in to YouTube Music**, whose cookies MixMusic keeps.
+- **The picture of music videos** (`video.go`, `internal/app/video.go`),
+  with "Show the video of music videos" on in Settings › Playback: a web
+  view of the main window, on the now playing page, in place of the
+  cover, of `public/video.html`, the other page of the app. It is made
+  when a picture first shows, and closed a minute after the last one. The
+  page plays the picture, muted, through Media Source Extensions, fetching
+  it from the proxy at the stream scheme, which serves that page alone,
+  and follows the engine's time (`Player.Clock`), which the window sends
+  it four times a second with the moment it read it. A box over the web
+  view keeps the pointer and the keyboard in the native interface.
 
 ## Data
 

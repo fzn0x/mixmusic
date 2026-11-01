@@ -188,6 +188,7 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 	}
 	st := f.stream()
 	st.Loudness, st.Measured = ans.loudness(&f)
+	st.Videos = directVideos(ans.StreamingData.AdaptiveFormats, length)
 	if err := d.check(ctx, &st); err != nil {
 		return Stream{}, err
 	}
@@ -515,6 +516,9 @@ type playerFormat struct {
 	URL               string            `json:"url"`
 	SignatureCipher   string            `json:"signatureCipher"`
 	MimeType          string            `json:"mimeType"`
+	Width             number            `json:"width"`
+	Height            number            `json:"height"`
+	FPS               number            `json:"fps"`
 	Bitrate           number            `json:"bitrate"`
 	AverageBitrate    number            `json:"averageBitrate"`
 	ContentLength     number            `json:"contentLength"`

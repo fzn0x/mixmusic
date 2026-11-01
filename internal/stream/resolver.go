@@ -86,6 +86,9 @@ type Stream struct {
 	// it, and yt-dlp doesn't.
 	Loudness float64
 	Measured bool
+	// Videos are the streams of the video's picture, which yt-dlp and
+	// YouTube's player API list beside the audio, for the now playing page.
+	Videos []Video
 }
 
 // slowResolve is how long finding a stream takes before the log tells.
@@ -350,6 +353,7 @@ type info struct {
 	Duration       float64           `json:"duration"`
 	Headers        map[string]string `json:"http_headers"`
 	AvailableAt    float64           `json:"available_at"` // Unix seconds
+	Formats        []infoFormat      `json:"formats"`
 }
 
 // parseInfo reads the stream of yt-dlp's -J output.
@@ -370,6 +374,7 @@ func parseInfo(out []byte) (Stream, error) {
 		Codec:    in.ACodec,
 		Bitrate:  in.ABR,
 		Expires:  expiry(in.URL),
+		Videos:   ytdlpVideos(in.Formats),
 	}
 	for k, v := range in.Headers {
 		s.Header.Set(k, v)

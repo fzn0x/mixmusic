@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"testing"
@@ -73,9 +74,10 @@ func TestLiveDirect(t *testing.T) {
 	}
 
 	// The loudness of a stream yt-dlp found, from a route that has no
-	// visitor ID yet.
+	// visitor ID yet. It is the video's, which YouTube may round apart from
+	// its formats' by a hundredth of a dB.
 	v, err := NewDirect().Loudness(ctx, videoID)
-	if err != nil || v != s0.Loudness {
+	if err != nil || math.Abs(v-s0.Loudness) > 0.05 {
 		t.Errorf("loudness of %s: %v, %v; the stream said %v", videoID, v, err, s0.Loudness)
 	}
 }

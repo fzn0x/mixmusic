@@ -285,10 +285,11 @@ time it starts.
 MixMusic has no account, server, analytics or telemetry of its own. It
 talks to:
 
-- **YouTube and Google:** YouTube Music's catalog, its streams, asked for
-  signed out, and through yt-dlp for some, and the artwork. Signed in, your
-  library there, and, unless you turn it off in Settings › Accounts, the
-  tracks you play, which join your YouTube Music history.
+- **YouTube and Google:** YouTube Music's catalog, its streams and how loud
+  each track is, asked for signed out, the streams through yt-dlp for some,
+  and the artwork. Signed in, your library there, and, unless you turn it
+  off in Settings › Accounts, the tracks you play, which join your YouTube
+  Music history.
 - **Spotify,** once you sign in: your library, your devices with Spotify
   Connect, and Spotify's player, loaded from `sdk.scdn.co`, when Spotify
   plays in MixMusic.
@@ -305,7 +306,8 @@ talks to:
 What it keeps on your computer: your settings and library (liked songs,
 mixes, history and recent searches) in the folder Settings › About names;
 the tracks you played in the cache, as much as you allow in Settings ›
-Playback; your sign-ins in the system's keyring, or, where there is none,
+Playback, and how loud YouTube measured them, which stays when the cache
+is cleared; your sign-ins in the system's keyring, or, where there is none,
 in files only your user can read, the YouTube Music session encrypted;
 and the log, without your sign-ins. The library's history clears what you
 played, Settings › Playback the cache, and signing out of a service deletes

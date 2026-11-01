@@ -312,7 +312,12 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 			p.s.Queue[i] = p.item(t, false)
 		}
 		p.s.Index = min(max(saved.Index, 0), len(p.s.Queue)-1)
-		p.s.Position = time.Duration(saved.Position) * time.Millisecond
+		// The position is the saved current track's. A queue kept before
+		// the index was kept within its tracks may name one past them: the
+		// track held instead starts from its start.
+		if saved.Index >= 0 && saved.Index < len(saved.Tracks) {
+			p.s.Position = time.Duration(saved.Position) * time.Millisecond
+		}
 		p.s.Duration = ms(p.s.Queue[p.s.Index].Track.DurationMs)
 		p.s.Shuffle = saved.Shuffle
 		if saved.Repeat == RepeatAll || saved.Repeat == RepeatOne {

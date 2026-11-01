@@ -221,6 +221,7 @@ aren't pages act: `act:shot:<name>` saves the window as it is,
 `act:mute` mutes the player, `act:play:<search>` plays what a search
 finds, `act:resume` plays the queue kept in the data folder,
 `act:wait:<duration>` waits, `act:palette` opens the command palette,
+`act:refresh` refreshes the page, as F5 does,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
 scrolls the page, `act:theme:<id>` wears a theme, `act:mini` opens the
 mini player, which saves `mini.png`, `act:spotify` logs whether MixMusic's

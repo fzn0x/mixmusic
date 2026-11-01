@@ -86,6 +86,24 @@ func BenchmarkScroll(b *testing.B) {
 		show(s, tt, "/settings/playback")
 		scrollFrames(b, tt)
 	})
+	// The design languages, whose controls are drawn their own way.
+	for _, theme := range []string{"material", "crate"} {
+		b.Run("liked-1000-"+theme, func(b *testing.B) {
+			s := likedShell(b, 1000)
+			wear(s, theme, nil)
+			tt := testerOf(b, s, 1280, 820)
+			show(s, tt, "/library/liked")
+			scrollFrames(b, tt)
+		})
+		b.Run("home-"+theme, func(b *testing.B) {
+			s := newTestShell(b)
+			wear(s, theme, nil)
+			tt := testerOf(b, s, 1280, 820)
+			s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
+			show(s, tt, "/")
+			scrollFrames(b, tt)
+		})
+	}
 }
 
 // TestFarRowsBuildNothing scrolls a long list: the rows in view show their

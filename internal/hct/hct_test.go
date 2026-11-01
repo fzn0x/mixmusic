@@ -154,3 +154,11 @@ func TestSchemeContrast(t *testing.T) {
 		}
 	}
 }
+
+// BenchmarkScheme times a scheme of a seed, as the Material themes make
+// one for each cover that plays.
+func BenchmarkScheme(b *testing.B) {
+	for i := range b.N {
+		Core(ARGB(0xff000000 | uint32(i*2654435761)&0xffffff)).Scheme(i%2 == 0)
+	}
+}

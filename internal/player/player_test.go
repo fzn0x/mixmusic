@@ -39,18 +39,18 @@ type fakeServices struct {
 	failure   string
 	radio     []media.Track
 	radioErr  error
-	// disliked holds the tracks the user dislikes, by ID.
-	disliked map[string]bool
-	played   []string
-	reports  []Now
-	volumes  []float64
-	saved    []Saved
-	prepared []string
+	played    []string
+	reports   []Now
+	volumes   []float64
+	saved     []Saved
+	prepared  []string
 	// reportHook, when set, runs in Report, outside the lock, as the app's
 	// waits on the main thread; saveHook runs in SaveQueue before it keeps
 	// the queue, as a slow disk.
 	reportHook func()
 	saveHook   func(Saved)
+	// disliked holds the tracks the user dislikes, by ID.
+	disliked map[string]bool
 }
 
 func newServices() *fakeServices {

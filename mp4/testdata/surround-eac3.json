@@ -1,0 +1,49 @@
+{
+    "packets": [
+        { "pts": -256, "duration": 1536, "size": "768" },
+        { "pts": 1280, "duration": 1536, "size": "768" },
+        { "pts": 2816, "duration": 1536, "size": "768" },
+        { "pts": 4352, "duration": 1536, "size": "768" },
+        { "pts": 5888, "duration": 1536, "size": "768" },
+        { "pts": 7424, "duration": 1536, "size": "768" },
+        { "pts": 8960, "duration": 1536, "size": "768" },
+        { "pts": 10496, "duration": 1536, "size": "768" },
+        { "pts": 12032, "duration": 1536, "size": "768" },
+        { "pts": 13568, "duration": 1536, "size": "768" },
+        { "pts": 15104, "duration": 1536, "size": "768" },
+        { "pts": 16640, "duration": 1536, "size": "768" },
+        { "pts": 18176, "duration": 1536, "size": "768" },
+        { "pts": 19712, "duration": 1536, "size": "768" },
+        { "pts": 21248, "duration": 1536, "size": "768" },
+        { "pts": 22784, "duration": 1536, "size": "768" },
+        { "pts": 24320, "duration": 1536, "size": "768" },
+        { "pts": 25856, "duration": 1536, "size": "768" },
+        { "pts": 27392, "duration": 1536, "size": "768" },
+        { "pts": 28928, "duration": 1536, "size": "768" },
+        { "pts": 30464, "duration": 1536, "size": "768" },
+        { "pts": 32000, "duration": 1536, "size": "768" },
+        { "pts": 33536, "duration": 1536, "size": "768" },
+        { "pts": 35072, "duration": 1536, "size": "768" },
+        { "pts": 36608, "duration": 1536, "size": "768" },
+        { "pts": 38144, "duration": 1536, "size": "768" },
+        { "pts": 39680, "duration": 1536, "size": "768" },
+        { "pts": 41216, "duration": 1536, "size": "768" },
+        { "pts": 42752, "duration": 1536, "size": "768" },
+        { "pts": 44288, "duration": 1536, "size": "768" },
+        { "pts": 45824, "duration": 1536, "size": "768" },
+        { "pts": 47360, "duration": 1536, "size": "768" }
+    ],
+    "programs": [
+
+    ],
+    "stream_groups": [
+
+    ],
+    "streams": [
+        { "codec_name": "eac3", "sample_rate": "48000", "channels": 6, "time_base": "1/48000", "extradata": "\n",
+            "side_data_list": [
+                {  }
+            ] }
+    ],
+    "format": { "duration": "0.994667" }
+}

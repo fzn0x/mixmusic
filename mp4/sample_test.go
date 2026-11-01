@@ -166,7 +166,15 @@ func checkProbe(t *testing.T, r *Reader, p probe) {
 		t.Fatalf("ffprobe reports %d audio streams", len(p.Streams))
 	}
 	s := p.Streams[0]
-	if s.CodecName != "aac" || s.Profile != "LC" || track.Codec != "mp4a.40.2" {
+	// ffprobe gives no extradata of AC-3 and E-AC-3, whose dac3 and dec3
+	// TestSurround checks.
+	surround := map[string]string{"ac3": "ac-3", "eac3": "ec-3"}[s.CodecName]
+	switch {
+	case surround != "":
+		if track.Codec != surround {
+			t.Errorf("codec %q, ffprobe says %q", track.Codec, s.CodecName)
+		}
+	case s.CodecName != "aac" || s.Profile != "LC" || track.Codec != "mp4a.40.2":
 		t.Errorf("codec %q, ffprobe says %q, %q", track.Codec, s.CodecName, s.Profile)
 	}
 	if fmt.Sprint(track.SampleRate) != s.SampleRate || track.Channels != s.Channels {
@@ -175,7 +183,7 @@ func checkProbe(t *testing.T, r *Reader, p probe) {
 	if want := fmt.Sprintf("1/%d", track.Timescale); s.TimeBase != want {
 		t.Errorf("timescale %d, ffprobe says a time base of %s", track.Timescale, s.TimeBase)
 	}
-	if b, err := unhex(s.Extradata); err != nil || !bytes.Equal(b, track.Config) {
+	if b, err := unhex(s.Extradata); surround == "" && (err != nil || !bytes.Equal(b, track.Config)) {
 		t.Errorf("AudioSpecificConfig % x, ffprobe says % x (%v)", track.Config, b, err)
 	}
 	// ffmpeg starts the stream at the edit, so that the first packet is at
@@ -200,8 +208,9 @@ func checkProbe(t *testing.T, r *Reader, p probe) {
 	for i := range min(len(got), len(want)) {
 		g, w := got[i], want[i]
 		// ffmpeg gives the last packet of a fragmented file the duration of
-		// an AAC frame, rather than its trun's.
-		known := w.duration >= 0 && !(r.fragmented && i == len(want)-1)
+		// an AAC frame, rather than its trun's, and that of AC-3 the
+		// duration of a syncframe, rather than its stts's.
+		known := w.duration >= 0 && !((r.fragmented || surround != "") && i == len(want)-1)
 		if g.Time != w.time || len(g.Data) != w.size || known && g.Duration != w.duration {
 			t.Fatalf("packet %d: %v, %d bytes, %v long; ffprobe reports %v, %d bytes, %v long",
 				i, g.Time, len(g.Data), g.Duration, w.time, w.size, w.duration)

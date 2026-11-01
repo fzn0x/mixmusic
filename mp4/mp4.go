@@ -1,7 +1,8 @@
 // Package mp4 reads the audio of MP4 files, of the ISO base media file
 // format (ISO/IEC 14496-12 and 14496-14), such as the AAC audio YouTube
-// serves (itags 139 and 140): the packets of their first audio track, with
-// their times, and seeking by their sample tables or segment indexes.
+// serves (itags 139 and 140), and its 5.1 surround in AC-3 and E-AC-3
+// (380 and 328): the packets of their first audio track, with their
+// times, and seeking by their sample tables or segment indexes.
 //
 // It reads progressive files, whose moov describes every sample, whether
 // it comes before the media data or after, and fragmented ones, whose moof
@@ -41,10 +42,11 @@ type Track struct {
 	// "mp4a.40." and the audio object type of the AudioSpecificConfig, as
 	// "mp4a.40.2" for AAC-LC; for another object type of the esds, "mp4a."
 	// and its number in hexadecimal; for another sample entry, its four
-	// characters, as "Opus".
+	// characters, as "Opus", or "ac-3" and "ec-3" for AC-3 and E-AC-3.
 	Codec string
 	// Config is the decoder's configuration: for MPEG-4 audio, the
-	// AudioSpecificConfig, the DecoderSpecificInfo of the esds.
+	// AudioSpecificConfig, the DecoderSpecificInfo of the esds; for AC-3
+	// and E-AC-3, the payload of the dac3 or dec3 box.
 	Config []byte
 	// CodecDelay is the media to drop at the start of the stream, the
 	// encoder's priming, which the edit list skips: the audio of a packet
@@ -53,6 +55,8 @@ type Track struct {
 	// SampleRate and Channels are those of the AudioSpecificConfig, or of
 	// the sample entry when it does not give them. For HE-AAC signalled
 	// explicitly, the rate is that of the decoded audio, twice the core's.
+	// For AC-3 and E-AC-3, they are those of the dac3 or dec3, the LFE
+	// among the channels: 6 for 5.1.
 	SampleRate int
 	Channels   int
 	Timescale  uint32 // the ticks per second of the media's times, of its mdhd

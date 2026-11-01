@@ -67,7 +67,8 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 // PrepareStream finds the audio of a track to play in the engine, whatever
 // the settings say of Spotify tracks: those play from their recording on
 // YouTube Music. The player falls back to it when no Spotify device can
-// play.
+// play. It keeps how loud YouTube measured the track, or asks, for the
+// engine to play it at an even loudness.
 func (p *Player) PrepareStream(ctx context.Context, track media.Track) (PlaybackSource, error) {
 	yt, err := p.a.matcher.Match(ctx, track)
 	if err != nil {
@@ -80,18 +81,30 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	src := PlaybackSource{Mode: PlaybackStream, URL: schemeURL(streamScheme) + strings.TrimPrefix(stream.Path(videoID), "/"), Track: yt}
 	if p.a.cache.Has(videoID) {
 		src.Cached = true
+		// A track cached before MixMusic kept measures gets one now.
+		p.a.loudness.learn(videoID)
 		return src, nil
 	}
 	// A stream found before plays without the network, as the engine may
 	// hold its audio already; yt-dlp needs the network to find one.
 	if p.a.resolver.Fresh(videoID) {
+		// Its measure was kept as it was found, else it is asked for now.
+		p.a.loudness.learn(videoID)
 		return src, nil
 	}
 	if p.a.online != nil && p.a.online.Offline() {
 		return PlaybackSource{}, player.ErrOffline
 	}
-	if err := p.a.resolveStream(ctx, videoID); err != nil {
+	s, err := p.a.resolveStream(ctx, videoID)
+	if err != nil {
 		return PlaybackSource{}, err
+	}
+	if s.Measured {
+		p.a.loudness.keep(videoID, s.Loudness)
+	} else {
+		// yt-dlp tells no loudness: YouTube's player API does, while
+		// YouTube holds yt-dlp's stream back.
+		p.a.loudness.learn(videoID)
 	}
 	return src, nil
 }

@@ -53,9 +53,10 @@ download or keep in memory.
   quality, with no Spotify app open (Premium, on Windows), on Spotify
   Connect (your Spotify app, your phone, a speaker), or here, from their
   recording on YouTube Music, with no Premium needed.
-- **A real player.** Crossfade, volume levelling, a 10-band equalizer with
-  presets, a visualizer, synced lyrics that follow the song or read as plain
-  text, and an offline cache of tracks you played.
+- **A real player.** Crossfade, even loudness across tracks, volume
+  levelling, a 10-band equalizer with presets, a visualizer, synced lyrics
+  that follow the song or read as plain text, and an offline cache of tracks
+  you played.
 - **At home on the desktop.** Media keys, the system's media controls on
   Windows, macOS and Linux, the player's buttons on the taskbar thumbnail
   on Windows, tray controls, notifications of new tracks, what plays in
@@ -284,10 +285,11 @@ time it starts.
 MixMusic has no account, server, analytics or telemetry of its own. It
 talks to:
 
-- **YouTube and Google:** YouTube Music's catalog, its streams, asked for
-  signed out, and through yt-dlp for some, and the artwork. Signed in, your
-  library there, and, unless you turn it off in Settings › Accounts, the
-  tracks you play, which join your YouTube Music history.
+- **YouTube and Google:** YouTube Music's catalog, its streams and how loud
+  each track is, asked for signed out, the streams through yt-dlp for some,
+  and the artwork. Signed in, your library there, and, unless you turn it
+  off in Settings › Accounts, the tracks you play, which join your YouTube
+  Music history.
 - **Spotify,** once you sign in: your library, your devices with Spotify
   Connect, and Spotify's player, loaded from `sdk.scdn.co`, when Spotify
   plays in MixMusic.
@@ -304,12 +306,13 @@ talks to:
 What it keeps on your computer: your settings and library (liked songs,
 mixes, history and recent searches) in the folder Settings › About names;
 the tracks you played in the cache, as much as you allow in Settings ›
-Playback; your sign-ins in the system's keyring, or, on Windows where the
+Playback, and how loud YouTube measured them, which stays when the cache is
+cleared; your sign-ins in the system's keyring, or, on Windows where the
 Credential Manager can't keep one, in a file encrypted for your Windows
 account, and on Linux without a keyring in files only your user can read,
-the YouTube Music session included; and the log, without your sign-ins. The library's history clears what you
-played, Settings › Playback the cache, and signing out of a service deletes
-its sign-in.
+the YouTube Music session included; and the log, without your sign-ins. The
+library's history clears what you played, Settings › Playback the cache,
+and signing out of a service deletes its sign-in.
 
 On Windows, the visualizer hears the audio of Spotify playing on this
 computer, in MixMusic or in the Spotify app, through Windows' process

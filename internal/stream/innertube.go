@@ -62,6 +62,8 @@ var (
 	errNoDirectURL = errors.New("stream: YouTube's player API gave no Opus stream that plays as given")
 	// errBadAnswer is returned for an answer the direct route can't read.
 	errBadAnswer = errors.New("stream: unexpected answer of YouTube's player API")
+	// ErrNoLoudness is returned when YouTube tells no loudness of a video.
+	ErrNoLoudness = errors.New("stream: YouTube tells no loudness of this video")
 )
 
 // apiStatusError is returned when YouTube's player API answers with an
@@ -174,9 +176,48 @@ func (d *Direct) count(err error) {
 }
 
 func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream, error) {
+	ans, err := d.answer(ctx, videoID)
+	if err != nil {
+		return Stream{}, err
+	}
+	length := time.Duration(ans.VideoDetails.LengthSeconds) * time.Second
+	f, err := pickAudio(ans.StreamingData.AdaptiveFormats, q, length)
+	if err != nil {
+		return Stream{}, err
+	}
+	st := f.stream()
+	st.Loudness, st.Measured = ans.loudness(&f)
+	if err := d.check(ctx, &st); err != nil {
+		return Stream{}, err
+	}
+	return st, nil
+}
+
+// Loudness asks YouTube how loud a video is: the integrated loudness of its
+// audio, in LKFS, as YouTube measured it. Streams of the direct route carry
+// it already; this is for those yt-dlp found. It returns ErrNoLoudness when
+// YouTube gave no measure, as of videos it gives the route no streams of.
+func (d *Direct) Loudness(ctx context.Context, videoID string) (float64, error) {
+	ans, err := d.answer(ctx, videoID)
+	var refused playabilityError
+	if errors.As(err, &refused) {
+		return 0, ErrNoLoudness
+	}
+	if err != nil {
+		return 0, err
+	}
+	if v, ok := ans.loudness(nil); ok {
+		return v, nil
+	}
+	return 0, ErrNoLoudness
+}
+
+// answer returns the answer of YouTube's player API about a video, when it
+// gave the video's streams.
+func (d *Direct) answer(ctx context.Context, videoID string) (playerAnswer, error) {
 	visitor, err := d.visitorID(ctx)
 	if err != nil && ctx.Err() != nil {
-		return Stream{}, err
+		return playerAnswer{}, err
 	}
 	// Without a visitor ID it trusts, YouTube asks to confirm this is not
 	// a bot. Its answer carries a new one, which passes; else the route
@@ -194,28 +235,19 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 		}
 	}
 	if err != nil {
-		return Stream{}, err
+		return playerAnswer{}, err
 	}
 	s := ans.status()
 	if !s.botCheck() {
 		d.keepVisitor(cmp.Or(ans.ResponseContext.VisitorData, visitor))
 	}
 	if s.Status != "OK" {
-		return Stream{}, s
+		return playerAnswer{}, s
 	}
 	if ans.VideoDetails.VideoID != videoID {
-		return Stream{}, fmt.Errorf("%w: the streams of another video", errBadAnswer)
+		return playerAnswer{}, fmt.Errorf("%w: the streams of another video", errBadAnswer)
 	}
-	length := time.Duration(ans.VideoDetails.LengthSeconds) * time.Second
-	f, err := pickAudio(ans.StreamingData.AdaptiveFormats, q, length)
-	if err != nil {
-		return Stream{}, err
-	}
-	st := f.stream()
-	if err := d.check(ctx, &st); err != nil {
-		return Stream{}, err
-	}
-	return st, nil
+	return ans, nil
 }
 
 // visitorID returns the route's visitor ID, asking YouTube for one when it
@@ -419,9 +451,57 @@ type playerAnswer struct {
 		VideoID       string `json:"videoId"`
 		LengthSeconds number `json:"lengthSeconds"`
 	} `json:"videoDetails"`
+	PlayerConfig struct {
+		// AudioConfig tells how loud the video is, as YouTube measured it
+		// with ITU-R BS.1770, and the level its apps play it at.
+		AudioConfig struct {
+			TrackAbsoluteLoudnessLkfs *float64 `json:"trackAbsoluteLoudnessLkfs"`
+			PerceptualLoudnessDb      *float64 `json:"perceptualLoudnessDb"`
+			LoudnessTargetLkfs        *float64 `json:"loudnessTargetLkfs"`
+			// LoudnessDb is how far above the target the video is.
+			LoudnessDb *float64 `json:"loudnessDb"`
+		} `json:"audioConfig"`
+	} `json:"playerConfig"`
 	StreamingData struct {
 		AdaptiveFormats []playerFormat `json:"adaptiveFormats"`
 	} `json:"streamingData"`
+}
+
+// loudness returns the integrated loudness of a video's audio, in LKFS, as
+// YouTube measured it: of format f, when it is not nil and YouTube measured
+// it, else of the video, else of its first audio format of the original
+// dynamics. A measure is taken only in [-70, 0]: anything else is no
+// loudness a track can have.
+func (a playerAnswer) loudness(f *playerFormat) (float64, bool) {
+	ac := a.PlayerConfig.AudioConfig
+	target := -14.0
+	if ac.LoudnessTargetLkfs != nil {
+		target = *ac.LoudnessTargetLkfs
+	}
+	above := func(db *float64) *float64 {
+		if db == nil {
+			return nil
+		}
+		v := target + *db
+		return &v
+	}
+	var measures []*float64
+	if f != nil {
+		measures = append(measures, f.TrackAbsoluteLoudnessLkfs, above(f.LoudnessDb))
+	}
+	measures = append(measures, ac.TrackAbsoluteLoudnessLkfs, ac.PerceptualLoudnessDb, above(ac.LoudnessDb))
+	for _, af := range a.StreamingData.AdaptiveFormats {
+		if strings.HasPrefix(af.MimeType, "audio/") && !af.IsDrc {
+			measures = append(measures, af.TrackAbsoluteLoudnessLkfs, above(af.LoudnessDb))
+			break
+		}
+	}
+	for _, v := range measures {
+		if v != nil && *v >= -70 && *v <= 0 {
+			return *v, true
+		}
+	}
+	return 0, false
 }
 
 func (a playerAnswer) status() playabilityError {
@@ -444,7 +524,11 @@ type playerFormat struct {
 	Type              string            `json:"type"`
 	TargetDurationSec number            `json:"targetDurationSec"`
 	DrmFamilies       []json.RawMessage `json:"drmFamilies"`
-	AudioTrack        *struct {
+	// TrackAbsoluteLoudnessLkfs is how loud the format's audio is, and
+	// LoudnessDb how far above the video's loudness target.
+	TrackAbsoluteLoudnessLkfs *float64 `json:"trackAbsoluteLoudnessLkfs"`
+	LoudnessDb                *float64 `json:"loudnessDb"`
+	AudioTrack                *struct {
 		DisplayName    string `json:"displayName"`
 		AudioIsDefault bool   `json:"audioIsDefault"`
 	} `json:"audioTrack"`

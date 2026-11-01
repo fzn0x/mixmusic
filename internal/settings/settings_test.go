@@ -194,3 +194,22 @@ func TestCleanPanel(t *testing.T) {
 		}
 	}
 }
+
+// TestLoudness has Even loudness on in new installs, and in the settings of
+// earlier versions, which don't have it, until the user turns it off.
+func TestLoudness(t *testing.T) {
+	for file, want := range map[string]bool{
+		`{}`:                                  true,
+		`{"normalize":true}`:                  true,
+		`{"loudness":false}`:                  false,
+		`{"loudness":false,"normalize":true}`: false,
+	} {
+		s := Default()
+		if err := json.Unmarshal([]byte(file), &s); err != nil {
+			t.Fatal(err)
+		}
+		if s = s.Clean(); s.Loudness != want {
+			t.Errorf("%s: Even loudness %v, not %v", file, s.Loudness, want)
+		}
+	}
+}

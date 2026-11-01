@@ -116,7 +116,8 @@ func (o *silentOutput) Stop() {
 func (o *silentOutput) Delay() time.Duration { return 0 }
 
 // openNative opens, for the native engine, the audio at a URL PrepareStream
-// gave.
+// gave: with its loudness, when MixMusic knows it, for the engine to play
+// it at an even loudness.
 func (a *App) openNative(ctx context.Context, rawURL string, interrupted func() bool) (audio.Source, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
@@ -129,6 +130,9 @@ func (a *App) openNative(ctx context.Context, rawURL string, interrupted func() 
 	src, err := a.proxy.Open(ctx, videoID, interrupted)
 	if err != nil {
 		return nil, err
+	}
+	if lkfs, ok := a.loudness.soon(ctx, videoID, loudnessGrace); ok {
+		return measured{src, lkfs}, nil
 	}
 	return src, nil
 }

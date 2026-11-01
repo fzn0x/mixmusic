@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"os"
 	"slices"
 	"strings"
 	"sync"
@@ -784,6 +786,56 @@ func TestNextTrackFoundAtStart(t *testing.T) {
 	h.p.Time(11*time.Second, 200*time.Second)
 	h.wait("b preloaded", func(*Player) bool { return h.stream.has("preload url:yt:b") })
 }
+
+func TestSlowStartLogged(t *testing.T) {
+	var logs strings.Builder
+	var mu sync.Mutex
+	log.SetOutput(writerFunc(func(b []byte) (int, error) {
+		mu.Lock()
+		defer mu.Unlock()
+		return logs.Write(b)
+	}))
+	saved := slowStart
+	slowStart = 50 * time.Millisecond
+	t.Cleanup(func() {
+		log.SetOutput(os.Stderr)
+		slowStart = saved
+	})
+	logged := func() string {
+		mu.Lock()
+		defer mu.Unlock()
+		return logs.String()
+	}
+
+	h := newHarness(t, Saved{}, func(f *fakeServices) {
+		f.prepare = func(t media.Track) (Source, error) {
+			if t.ID == "yt:a" {
+				time.Sleep(100 * time.Millisecond)
+			}
+			return streamOf(t), nil
+		}
+	})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Time(250*time.Millisecond, 200*time.Second)
+	h.p.Time(500*time.Millisecond, 200*time.Second)
+	h.on(func(*Player) {})
+	if got := logged(); strings.Count(got, "yt:a started") != 1 || !strings.Contains(got, "after it was asked to play") {
+		t.Errorf("log:\n%s", got)
+	}
+	h.p.Next()
+	h.wait("b playing", playing("b"))
+	h.p.Time(250*time.Millisecond, 200*time.Second)
+	h.on(func(*Player) {})
+	if got := logged(); strings.Contains(got, "yt:b") {
+		t.Errorf("a quick start logged:\n%s", got)
+	}
+}
+
+// writerFunc is an io.Writer of a function.
+type writerFunc func([]byte) (int, error)
+
+func (f writerFunc) Write(b []byte) (int, error) { return f(b) }
 
 func TestShortTrackCounts(t *testing.T) {
 	h := newHarness(t, Saved{})

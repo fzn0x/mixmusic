@@ -3,6 +3,7 @@ package player
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -110,6 +111,10 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	// a while, or fail.
 	p.loaded = false
 	p.stream.Unload()
+	p.askedAt, p.askedFrom = time.Time{}, start
+	if autoplay {
+		p.askedAt = time.Now()
+	}
 	p.emit(TrackChange)
 	p.report()
 	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, entry.Track) }, func(src Source, err error) {
@@ -213,6 +218,7 @@ func (p *Player) fellBack(why string) {
 // row it stops, as nothing seems to play.
 func (p *Player) fail(message string) {
 	cur, ok := p.s.Current()
+	p.askedAt = time.Time{}
 	p.s.Error = message
 	p.s.Buffering = false
 	p.s.Loading = false
@@ -334,6 +340,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 			return
 		}
 		p.loadToken++
+		p.askedAt = time.Time{}
 		p.s.Index = i
 		p.s.Position = 0
 		p.s.Duration = ms(next.Track.DurationMs)
@@ -564,6 +571,16 @@ func (p *Player) onTime(position, duration time.Duration) {
 	p.s.Position = position
 	if duration > 0 {
 		p.s.Duration = duration
+	}
+	// The engine's time moves once it sounds: the log tells how long a
+	// stream took, when long, to tell why tracks start late. A time of the
+	// track before comes before the engine has this one.
+	if !p.askedAt.IsZero() && p.loaded && position > p.askedFrom {
+		took := time.Since(p.askedAt)
+		if src := p.s.Source; took > slowStart && src != nil && src.Mode == ModeStream {
+			log.Printf("mixmusic: %s started %.1fs after it was asked to play", src.Track.ID, took.Seconds())
+		}
+		p.askedAt = time.Time{}
 	}
 	p.emit(Progress)
 	p.onProgress()

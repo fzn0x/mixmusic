@@ -275,6 +275,8 @@ func (p *Player) onStreamError(message string) {
 	autoplay := !p.paused
 	p.loaded = false
 	p.s.Loading, p.s.Buffering = autoplay, autoplay
+	// The app heard of the track as paused, as the engine paused it.
+	p.report()
 	p.emit(StateChange)
 	p.checkOnline(func() { p.wait(autoplay) }, func() { p.retryStream(why) })
 }

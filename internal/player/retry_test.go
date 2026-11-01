@@ -144,6 +144,11 @@ func TestStreamRetryWaits(t *testing.T) {
 		if got := h.stream.count("play"); got != plays {
 			t.Errorf("the toggle played the stream that failed: %q", h.stream.copy())
 		}
+		h.svc.with(func(f *fakeServices) {
+			if last := f.reports[len(f.reports)-1]; last.Playing || !last.Loading {
+				t.Errorf("reported as %+v", last)
+			}
+		})
 	})
 	t.Run("seek", func(t *testing.T) {
 		h := broken(t)

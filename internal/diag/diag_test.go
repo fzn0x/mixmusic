@@ -18,6 +18,12 @@ func TestRedact(t *testing.T) {
 		`{"access_token":"BQD","refresh_token":"AQB","expires_in":3600}`:     `{"access_token":"…","refresh_token":"…","expires_in":3600}`,
 		"Authorization: Bearer BQDxyz.abc-123":                               "Authorization: Bearer …",
 		"mixmusic: playing Let It Happen by Tame Impala":                     "mixmusic: playing Let It Happen by Tame Impala",
+		// The computer's own address goes from socket errors; the host's
+		// stays, and so does a dial's, which has no address of its own.
+		"read tcp 192.168.1.5:50123->142.250.74.118:443: wsarecv: reset":      "read tcp …->142.250.74.118:443: wsarecv: reset",
+		"read tcp [fe80::1%eth0-a_b]:50123->[2a00:1450::5]:443: reset":        "read tcp …->[2a00:1450::5]:443: reset",
+		"read tcp [2001:db8::7]:61000->[2a00:1450:4001::5]:443: i/o timeout":  "read tcp …->[2a00:1450:4001::5]:443: i/o timeout",
+		"dial tcp 142.250.74.118:443: connectex: No connection could be made": "dial tcp 142.250.74.118:443: connectex: No connection could be made",
 	} {
 		if got := Redact(in); got != want {
 			t.Errorf("Redact(%q)\n got %q\nwant %q", in, got, want)

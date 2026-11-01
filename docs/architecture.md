@@ -137,7 +137,13 @@ belongs to its main thread: what finishes elsewhere comes back through
 
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
-  MB of pixels (`artwork.go`).
+  MB of pixels (`artwork.go`). An image that couldn't load tries again
+  after 1 to 2 seconds, then less often, up to every 2 minutes, and at once
+  when another of its host loads; one whose address gives no image waits
+  half an hour. Both windows, the accent and Terminal's tint read the
+  images through `artwork.Store` (`internal/artwork`), which downloads each
+  once, keeps it on disk as it came, up to 256 MB, and logs a host's
+  failures at most once a minute, without the addresses.
 - **Themes** give their tokens: colours, fonts, radius (`theme.go`), and
   the accent follows the artwork of what plays. The windows draw the
   effects of the built-in themes, as their options say (`effects.go`):
@@ -175,13 +181,14 @@ Linux without a Secret Service, the secrets and the session are in plain
 files only the user can read (`spotify-token.json`, `lastfm.json`,
 `youtube-session.json`). `secretStore` (`internal/app/secrets.go`) moves a
 secret found in a file into the credential store once it can keep it. The
-cache folder holds audio, matches, how loud YouTube measured the tracks
-played (`loudness.json`), and yt-dlp's cache, and the logs folder the log
-and the crash reports. `MIXMUSIC_DATA_DIR` moves all three into one
-folder, for a portable copy or a test run. `MIXMUSIC_YTDLP_ONLY=1` has
-yt-dlp find every stream, as before MixMusic asked YouTube's player API,
-to time one against the other or tell which fails: the log tells which
-streams took over a second to find, and which tracks over two to start.
+cache folder holds audio, the covers shown (`artwork/`), matches, how loud
+YouTube measured the tracks played (`loudness.json`), and yt-dlp's cache,
+and the logs folder the log and the crash reports. `MIXMUSIC_DATA_DIR`
+moves all three into one folder, for a portable copy or a test run.
+`MIXMUSIC_YTDLP_ONLY=1` has yt-dlp find every stream, as before MixMusic
+asked YouTube's player API, to time one against the other or tell which
+fails: the log tells which streams took over a second to find, and which
+tracks over two to start.
 
 ## Capture mode
 

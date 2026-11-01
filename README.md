@@ -306,13 +306,14 @@ talks to:
 What it keeps on your computer: your settings and library (liked songs,
 mixes, history and recent searches) in the folder Settings › About names;
 the tracks you played in the cache, as much as you allow in Settings ›
-Playback, and how loud YouTube measured them, which stays when the cache is
-cleared; your sign-ins in the system's keyring, or, on Windows where the
-Credential Manager can't keep one, in a file encrypted for your Windows
-account, and on Linux without a keyring in files only your user can read,
-the YouTube Music session included; and the log, without your sign-ins. The
-library's history clears what you played, Settings › Playback the cache,
-and signing out of a service deletes its sign-in.
+Playback, and how loud YouTube measured them, which stays when the cache
+is cleared, and the covers you saw, up to 256 MB; your sign-ins in the
+system's keyring, or, on Windows where the Credential Manager can't keep
+one, in a file encrypted for your Windows account, and on Linux without a
+keyring in files only your user can read, the YouTube Music session
+included; and the log, without your sign-ins. The library's history clears
+what you played, Settings › Playback the cache and the covers, and signing
+out of a service deletes its sign-in.
 
 On Windows, the visualizer hears the audio of Spotify playing on this
 computer, in MixMusic or in the Spotify app, through Windows' process

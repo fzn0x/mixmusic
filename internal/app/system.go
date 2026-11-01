@@ -8,6 +8,7 @@ import (
 
 	"github.com/egoist/mygo"
 
+	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/audio/output"
 	"github.com/fzn0x/mixmusic/internal/opus"
@@ -111,6 +112,24 @@ func (s *System) CacheUsage() CacheUsage {
 
 // ClearCache empties the audio cache.
 func (s *System) ClearCache() error { return s.a.cache.Clear() }
+
+// Artwork downloads the artwork the windows show, and keeps it on disk.
+func (s *System) Artwork() *artwork.Store { return s.a.artStore }
+
+// ArtworkUsage is what the artwork kept on disk holds.
+type ArtworkUsage struct {
+	Bytes  int64 `json:"bytes"`
+	Images int   `json:"images"`
+}
+
+// ArtworkUsage returns what the artwork kept on disk holds.
+func (s *System) ArtworkUsage() ArtworkUsage {
+	b, n := s.a.artStore.Usage()
+	return ArtworkUsage{Bytes: b, Images: n}
+}
+
+// ClearArtwork removes the artwork kept on disk.
+func (s *System) ClearArtwork() error { return s.a.artStore.Clear() }
 
 // ShowMiniPlayer shows the mini player, a small window over the others.
 func (s *System) ShowMiniPlayer() { s.a.showMini() }

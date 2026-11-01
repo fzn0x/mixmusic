@@ -329,7 +329,7 @@ func (s *shell) cover(c *ui.Context, key string, images []media.Image, size floa
 	frame := ui.Box(c.Key(key)).Size(size, size).Radius(r).Shrink(0).Clip()
 	var b *ui.Bitmap
 	if s.inView(c, frame) {
-		b = s.art.get(artworkURL(images, int(size)), artPixels(size))
+		b = s.art.get(c, artworkURL(images, int(size)), artPixels(size))
 	}
 	if b == nil {
 		frame.Background(k.surface3)

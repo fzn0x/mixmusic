@@ -60,3 +60,20 @@ func TestColorFetches(t *testing.T) {
 		t.Error("read artwork over plain HTTP")
 	}
 }
+
+// TestColorReadsTheStore takes the color of the artwork the store keeps,
+// downloaded once for the window and the accent alike.
+func TestColorReadsTheStore(t *testing.T) {
+	h := newHost(t)
+	s, _, _ := testStore(t, t.TempDir(), 1<<20, h.srv)
+	c := New()
+	c.Store = s
+	mustBytes(t, s, h.srv.URL+"/a.png")
+	got, err := c.Color(context.Background(), h.srv.URL+"/a.png")
+	if err != nil || got != "#2060e0" {
+		t.Errorf("Color = %q, %v", got, err)
+	}
+	if n := h.hits.Load(); n != 1 {
+		t.Errorf("the host was asked %d times", n)
+	}
+}

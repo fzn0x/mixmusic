@@ -160,12 +160,30 @@ func (s *shell) cacheSettings(c *ui.Context) {
 	s.group(c, "offline cache", func() {
 		use := s.svc.System.CacheUsage()
 		s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. Tracks you played play again without the network.", plural(use.Tracks, "track"), byteSize(use.Bytes)), func() {
-			if s.button(c, "clear-cache", "clear", false).Disabled(use.Tracks == 0).Clicked() {
+			if s.button(c, "clear-cache", "clear", false).Label("Clear tracks").Disabled(use.Tracks == 0).Clicked() {
 				if err := s.svc.System.ClearCache(); err != nil {
 					s.notes = append(s.notes, noticeOf(err))
 				} else {
 					s.notes = append(s.notes, notice("Cache cleared"))
 				}
+			}
+		})
+		covers := s.svc.System.ArtworkUsage()
+		s.row(c, "Covers kept", fmt.Sprintf("%s in %s. Covers you saw show again without the network.", plural(covers.Images, "cover"), byteSize(covers.Bytes)), func() {
+			if s.button(c, "clear-covers", "clear", false).Label("Clear covers").Disabled(covers.Images == 0 || s.clearingCovers).Clicked() {
+				// Thousands of files may go: beside the main thread.
+				s.clearingCovers = true
+				go func() {
+					err := s.svc.System.ClearArtwork()
+					s.update(func() {
+						s.clearingCovers = false
+						if err != nil {
+							s.notes = append(s.notes, noticeOf(err))
+						} else {
+							s.notes = append(s.notes, notice("Covers cleared"))
+						}
+					})
+				}()
 			}
 		})
 		// The sizes the web interface offered, and one of the user's own.

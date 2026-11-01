@@ -106,6 +106,8 @@ type shell struct {
 	notes        []player.Notice
 	actionToasts []actionToast
 	stop         []func()
+	// clearingCovers is set while the covers kept on disk are removed.
+	clearingCovers bool
 	// pending holds what update ran without a window, which pendingMu
 	// guards with win while it's set.
 	pendingMu sync.Mutex
@@ -254,7 +256,7 @@ func newShell(a *app.App, p *player.Player) *shell {
 		dialogScrolls: map[string]*dialogScroll{}}
 	s.queueList.Selected = new(int)
 	*s.queueList.Selected = -1
-	s.art = newArtworks(s.update)
+	s.art = newArtworks(s.update, s.svc.System.Artwork())
 	s.refresh()
 	// The side panel the user left.
 	if s.panel = s.set.Panel; s.panel == "none" {
@@ -365,10 +367,14 @@ func (s *shell) restyle() {
 	s.plugins.SetTheme(pluginTheme(&s.lk))
 }
 
+// artColorRetry is how long the accent waits to ask for the colour of
+// artwork that couldn't load again.
+const artColorRetry = 10 * time.Second
+
 // followArtwork takes the accent from the artwork of what plays, as the
 // settings ask, or the theme's ground does: once a track with other
 // artwork starts, it asks for the artwork's colour, beside the main
-// thread.
+// thread, and again a while after it couldn't.
 func (s *shell) followArtwork() {
 	url := ""
 	if cur, ok := s.st.Current(); ok {
@@ -396,6 +402,13 @@ func (s *shell) followArtwork() {
 			}
 			if err != nil {
 				color = ""
+				time.AfterFunc(artColorRetry, func() {
+					s.update(func() {
+						if s.artURL == url {
+							s.artURL = "" // the next frame asks again
+						}
+					})
+				})
 			}
 			if color != s.artColor {
 				s.artColor = color

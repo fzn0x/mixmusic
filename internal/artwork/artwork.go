@@ -1,5 +1,5 @@
-// Package artwork picks the color of a piece of artwork, which themes use
-// as the accent of what plays.
+// Package artwork downloads artwork, keeps it on disk, and picks its
+// color, which themes use as the accent of what plays.
 package artwork
 
 import (
@@ -23,9 +23,10 @@ import (
 // maxSize bounds the artwork downloaded, in bytes.
 const maxSize = 8 << 20
 
-// Client fetches artwork.
+// Client fetches artwork: from Store when it is set, which keeps it.
 type Client struct {
-	HTTP *http.Client
+	HTTP  *http.Client
+	Store *Store
 }
 
 // New returns a client.
@@ -36,6 +37,13 @@ func (c *Client) Color(ctx context.Context, rawURL string) (string, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil || u.Scheme != "https" {
 		return "", errors.New("artwork: only https artwork is read")
+	}
+	if c.Store != nil {
+		img, err := c.Store.Image(ctx, u.String())
+		if err != nil {
+			return "", err
+		}
+		return Hex(Pick(img)), nil
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {

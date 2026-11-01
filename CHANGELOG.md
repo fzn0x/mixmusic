@@ -66,6 +66,9 @@ All notable changes to MixMusic are documented here. The format follows
   keeps trying for two minutes, playing on as soon as the network
   answers. A slow connection no longer cuts off a long song's download
   every two minutes (#100).
+- A song whose audio stops coming in its last second ends there, rather
+  than pausing to load that moment again, or showing an error for a song
+  that had all but finished, and Repeat: one plays it again (#94).
 
 ## [0.5.5] - 2026-10-28
 

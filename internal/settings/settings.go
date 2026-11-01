@@ -124,7 +124,9 @@ type Settings struct {
 	// The desktop.
 	CloseToTray   bool `json:"closeToTray"`
 	Notifications bool `json:"notifications"`
-	MediaKeys     bool `json:"mediaKeys"`
+	// ShowInTitle names what plays in the main window's title.
+	ShowInTitle bool `json:"showInTitle"`
+	MediaKeys   bool `json:"mediaKeys"`
 	// DiscordPresence shows what plays on the user's Discord profile, as
 	// the Discord application of DiscordAppID, or MixMusic's own when it
 	// is empty.
@@ -179,6 +181,7 @@ func Default() Settings {
 		YouTubeHistory:  true,
 		CloseToTray:     false,
 		Notifications:   true,
+		ShowInTitle:     true,
 		MediaKeys:       true,
 		DiscordPresence: true,
 		Shortcuts:       map[string]string{},

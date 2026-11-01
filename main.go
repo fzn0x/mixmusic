@@ -14,7 +14,6 @@ import (
 	"github.com/fzn0x/mixmusic/builtin"
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/diag"
-	"github.com/fzn0x/mixmusic/internal/native"
 )
 
 //go:embed resources/tray.png
@@ -78,8 +77,8 @@ func main() {
 		Version:   version,
 		LogsDir:   logsDir,
 		LastCrash: lastCrash,
-		Interface: native.Open,
-		Mini:      native.OpenMini,
+		Interface: Open,
+		Mini:      OpenMini,
 	})
 	if err != nil {
 		log.Fatal(err)

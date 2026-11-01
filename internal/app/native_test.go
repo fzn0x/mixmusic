@@ -51,7 +51,7 @@ func TestOpenNativeTakesStreamURLs(t *testing.T) {
 // TestOpenNativeMeasures gives the engine the loudness of the tracks
 // MixMusic knows, from the cache too.
 func TestOpenNativeMeasures(t *testing.T) {
-	webm, err := os.ReadFile("../webm/testdata/stereo-cues-front.webm")
+	webm, err := os.ReadFile("../../webm/testdata/stereo-cues-front.webm")
 	if err != nil {
 		t.Fatal(err)
 	}

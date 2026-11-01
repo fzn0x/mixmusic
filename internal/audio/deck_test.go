@@ -11,17 +11,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/opus"
-	"github.com/fzn0x/mixmusic/internal/webm"
+	"github.com/fzn0x/mixmusic/opus"
+	"github.com/fzn0x/mixmusic/webm"
 )
 
 // Test files: Opus in WebM, as ffmpeg and libopus make them. stereo-cues-
 // front is laid out as YouTube's files are; fec-stereo-40 is speech coded
 // with SILK, with in-band FEC; mono-stream is mono, without Cues.
 var (
-	cuesFront  = "../webm/testdata/stereo-cues-front.webm"
-	speech     = "../opus/testdata/fec-stereo-40.webm"
-	monoStream = "../webm/testdata/mono-stream.webm"
+	cuesFront  = "../../webm/testdata/stereo-cues-front.webm"
+	speech     = "../../opus/testdata/fec-stereo-40.webm"
+	monoStream = "../../webm/testdata/mono-stream.webm"
 )
 
 // memSource is a Source of bytes all there.

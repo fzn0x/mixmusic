@@ -344,9 +344,14 @@ MyGo needs no C toolchain, so any machine builds MixMusic for every system.
 
 ### Layout
 
+The app is the root package, with the packages of `internal/` under it. The
+packages outside `internal/` are for anyone to import, and documented on
+[pkg.go.dev](https://pkg.go.dev/github.com/fzn0x/mixmusic).
+
 ```
-main.go              the app: windows, the tray, media keys, deep links
-internal/native      the windows: the pages, the player bar, the mini player
+*.go                 the app and its windows: the pages, the player bar, the
+                     mini player, the tray, media keys, deep links
+fonts/               the typefaces the windows draw with
 internal/app         the services the windows call, and the desktop integration
 internal/player      the queue, played by the audio engine or on Spotify's devices
 internal/audio       MixMusic's audio engine, and the system's audio output
@@ -355,7 +360,6 @@ internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
 internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
-internal/lyrics      synced lyrics
 internal/library     liked songs, mixes, history and stats
 internal/lastfm      scrobbling to Last.fm
 internal/discord     what plays, on your Discord profile
@@ -365,6 +369,18 @@ builtin/themes       the themes MixMusic ships with
 public/              the page of Spotify's player, on Windows
 sdk/                 the types of the plugin API
 community/           community themes and plugins, and their registry
+```
+
+The packages to import:
+
+```
+opus/                an Opus decoder in pure Go, a port of libopus's
+aac/                 an AAC-LC decoder in pure Go
+webm/                the audio of WebM files: packets, times and seeking
+mp4/                 the audio of MP4 files: packets, times and seeking
+resample/            sample rate conversion, with Kaiser-windowed sincs
+lyrics/              synced lyrics from LRCLIB, and the LRC format
+resources/           MixMusic's logo, for code that draws it
 ```
 
 ## Good to know
@@ -378,5 +394,7 @@ Music are trademarks of their owners.
 
 MixMusic is dual-licensed: use it under the [MIT license](LICENSE-MIT) or
 the [GNU General Public License, version 3](LICENSE-GPL), whichever you
-prefer. Contributions are accepted under both. The Selawik typeface in `internal/native/fonts` is under the
-[SIL Open Font License](internal/native/fonts/OFL.txt).
+prefer. Contributions are accepted under both. The Selawik typeface in `fonts` is under the
+[SIL Open Font License](fonts/OFL.txt). The Opus decoder is a port of libopus,
+under [its BSD license](opus/LICENSE.libopus), and the AAC decoder derives
+from SharpJaad, under [its MIT license](aac/LICENSE.sharpjaad).

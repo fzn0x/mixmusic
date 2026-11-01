@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/lyrics"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/lyrics"
 )
 
 // shelfTimeout bounds how long the home page waits for each service.
@@ -214,9 +214,7 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 	if l, ok := c.a.lyricsMemo.get(track.ID); ok {
 		return l, nil
 	}
-	clean := track
-	clean.Title = match.CleanTitle(track.Title)
-	l, err := c.a.lyrics.Get(ctx, clean)
+	l, err := c.a.lyrics.Get(ctx, lyricsQuery(track))
 	// YouTube Music fills in when LRCLIB has nothing, or is down, and
 	// when its plain lyrics are longer than LRCLIB's.
 	if err != nil || (!l.Synced && !l.Instrumental) {
@@ -235,6 +233,19 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 	}
 	c.a.lyricsMemo.put(track.ID, l)
 	return l, nil
+}
+
+// lyricsQuery asks LRCLIB for a track: its title without what YouTube
+// adds, as "(Official Video)", and its first artist.
+func lyricsQuery(t media.Track) lyrics.Query {
+	q := lyrics.Query{Title: match.CleanTitle(t.Title), Duration: time.Duration(t.DurationMs) * time.Millisecond}
+	if len(t.Artists) > 0 {
+		q.Artist = t.Artists[0].Name
+	}
+	if t.Album != nil {
+		q.Album = t.Album.Name
+	}
+	return q
 }
 
 // lyricsError is why a track's lyrics don't show, in the words the lyrics

@@ -8,14 +8,14 @@ import (
 
 	"github.com/egoist/mygo"
 
-	"github.com/fzn0x/mixmusic/internal/aac"
+	"github.com/fzn0x/mixmusic/aac"
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/audio/output"
-	"github.com/fzn0x/mixmusic/internal/opus"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/tools"
+	"github.com/fzn0x/mixmusic/opus"
 )
 
 // Info describes the app.

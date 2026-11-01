@@ -858,8 +858,10 @@ func TestSlowStartLogged(t *testing.T) {
 		defer mu.Unlock()
 		return logs.Write(b)
 	}))
+	// The quick start takes the harness's polls too, which can last a tenth
+	// of a second on a busy machine: slowStart leaves it room.
 	saved := slowStart
-	slowStart = 50 * time.Millisecond
+	slowStart = 500 * time.Millisecond
 	t.Cleanup(func() {
 		log.SetOutput(os.Stderr)
 		slowStart = saved
@@ -873,7 +875,7 @@ func TestSlowStartLogged(t *testing.T) {
 	h := newHarness(t, Saved{}, func(f *fakeServices) {
 		f.prepare = func(t media.Track) (Source, error) {
 			if t.ID == "yt:a" {
-				time.Sleep(100 * time.Millisecond)
+				time.Sleep(600 * time.Millisecond)
 			}
 			return streamOf(t), nil
 		}

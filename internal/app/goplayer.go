@@ -125,8 +125,17 @@ func (s playerServices) RecordPlay(t media.Track) {
 }
 
 func (s playerServices) Radio(ctx context.Context, t media.Track) ([]media.Track, error) {
-	return (&Catalog{s.a}).Radio(ctx, t)
+	tracks, err := (&Catalog{s.a}).Radio(ctx, t)
+	return tracks, s.a.offlineErr(ctx, err)
 }
+
+var _ player.Network = playerServices{}
+
+// Online, WaitOnline and KickOnline are the network, as the player waits
+// for it.
+func (s playerServices) Online(ctx context.Context) bool      { return s.a.online.Check(ctx) }
+func (s playerServices) WaitOnline(ctx context.Context) error { return s.a.online.Wait(ctx) }
+func (s playerServices) KickOnline()                          { s.a.online.Kick() }
 
 func (s playerServices) Settings() settings.Settings { return s.a.settings.Get().Clean() }
 

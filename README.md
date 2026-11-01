@@ -233,7 +233,10 @@ AppImage, make it executable (`chmod +x`) and open it.
 - **YouTube Music:** choose Sign in to YouTube Music in Settings › Accounts
   and sign in to Google in the window that opens. What you type goes to
   Google only. MixMusic keeps the session encrypted, with a key in your
-  system's keyring where there is one.
+  system's keyring where there is one. Where that window can't open, or
+  Google refuses it, import the session of a browser you signed in with
+  (MixMusic reads it with its yt-dlp, and keeps YouTube's cookies alone),
+  or paste the Cookie header of a signed-in music.youtube.com tab.
 - **Spotify:** Spotify lets an app serve up to five users, and only while
   its owner has Premium, so you sign in with a Spotify app of your own. It
   takes two minutes: [docs/spotify.md](docs/spotify.md) walks you through

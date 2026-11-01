@@ -26,7 +26,17 @@ time it starts.
   change your password. Sign out there, then sign in again.
 - **Google refuses the sign-in window** with "This browser or app may not
   be secure". Google decides this; try again later, or from another
-  network.
+  network. Or sign in with a browser instead, in Settings › Accounts:
+  import the session of a browser you signed in to YouTube Music with, or
+  paste the Cookie header of a request of a signed-in music.youtube.com
+  tab.
+- **Importing a browser's session fails.** Close the browser first: while
+  it runs, it may hold its cookies, or not have saved a new sign-in yet.
+  Recent Chrome on Windows seals its cookies against other programs:
+  import from Firefox there, or paste a cookie header. On macOS, reading
+  Safari's cookies takes Full Disk Access for MixMusic, in System
+  Settings › Privacy & Security. Zen and Helium are read from their
+  profile folders: give the folder when MixMusic doesn't find it.
 - **Spotify plays from YouTube Music, not in MixMusic.** Spotify plays in
   MixMusic on Windows, with Premium, and with a sign-in made since MixMusic
   played Spotify itself: Settings › Playback asks you to sign in again when

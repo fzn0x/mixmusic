@@ -84,6 +84,31 @@ func TestAccentLink(t *testing.T) {
 	}
 }
 
+// TestColoursKept closes the window, or quits, before a colour well saves
+// the accent it changed: the settings keep it at once.
+func TestColoursKept(t *testing.T) {
+	s := newTestShell(t)
+	s.wells["accent"] = &colorWell{edits: 1}
+	s.set.Accent = "#123456"
+	s.keepColors()
+	if got := s.svc.Preferences.Get().Accent; got != "#123456" {
+		t.Fatalf("the settings keep the accent %q", got)
+	}
+	if s.wells["accent"].edits != 0 {
+		t.Error("the well still waits to save")
+	}
+	// With nothing waiting, nothing is saved.
+	st := s.svc.Preferences.Get()
+	st.Accent = "#abcdef"
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.keepColors()
+	if got := s.svc.Preferences.Get().Accent; got != "#abcdef" {
+		t.Errorf("keeping with nothing waiting saved the accent %q", got)
+	}
+}
+
 // TestPluginSettings enables a plugin, which asks first, disables it, and
 // removes it, which asks too.
 func TestPluginSettings(t *testing.T) {

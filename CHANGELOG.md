@@ -58,6 +58,25 @@ All notable changes to MixMusic are documented here. The format follows
 - On macOS, closing the window in full screen with "Close to the tray"
   on no longer leaves an empty, black Space: the window leaves full
   screen, then hides in the tray, and comes back in full screen (#84).
+- After a restart, a queue of more than 500 tracks comes back on the
+  track that was playing, where it was, with what comes up after it.
+  MixMusic kept the queue's first 500 tracks, and when the track playing
+  was past them it came back on the 500th, at the other track's place;
+  it now keeps the 500 tracks around the one playing (#88).
+- Changes to the queue made while a song is paused, or before anything
+  plays after a start, are kept when MixMusic quits, as are the changes
+  made right before quitting: the queue, where the song was, the volume
+  and the colours of Settings › Appearance. This holds when Windows
+  shuts down, restarts or signs out too (#89).
+- Shuffle mixes in the tracks before the one playing that haven't played
+  yet, as when you start an album or a playlist from one of its tracks:
+  it left them out, and with Repeat all they played in the list's order.
+  The track playing then comes first, so Previous starts it again. Your
+  own tracks stay ahead of the radio's when you shuffle, and turning
+  shuffle off puts the tracks you added with Play next or Add to queue
+  back where you added them, after a restart too (#95).
+- After a restart, the radio's tracks keep their "radio" mark in up
+  next, and Add to queue still puts tracks before them (#95).
 - A song whose audio stops arriving partway through, as when the
   connection drops or is slow, loads again where it was up to three
   times, waiting a little longer each time, rather than skipping to the

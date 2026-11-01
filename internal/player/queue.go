@@ -2,6 +2,7 @@ package player
 
 import (
 	"context"
+	"maps"
 	"math/rand/v2"
 	"regexp"
 	"slices"
@@ -23,8 +24,16 @@ func (p *Player) PlayTracks(tracks []media.Track, start int) {
 func (p *Player) PlayNext(tracks []media.Track) {
 	tracks = slices.Clone(tracks)
 	p.do(func() {
-		at := p.s.Index + 1
-		p.s.Queue = slices.Insert(slices.Clone(p.s.Queue), at, p.items(tracks)...)
+		items := p.items(tracks)
+		if p.unshuffled != nil {
+			// In the queue's own order too, they follow the current entry.
+			at := 0
+			if cur, ok := p.s.Current(); ok {
+				at = indexIn(p.unshuffled, cur.UID) + 1
+			}
+			p.unshuffled = slices.Insert(slices.Clone(p.unshuffled), at, items...)
+		}
+		p.s.Queue = slices.Insert(slices.Clone(p.s.Queue), p.s.Index+1, items...)
 		p.emit(QueueChange)
 		if p.s.Index < 0 {
 			p.playAt(0, 0, true)
@@ -37,14 +46,34 @@ func (p *Player) PlayNext(tracks []media.Track) {
 func (p *Player) Enqueue(tracks []media.Track) {
 	tracks = slices.Clone(tracks)
 	p.do(func() {
-		q := p.s.Queue
-		at := len(q)
-		for at > p.s.Index+1 && q[at-1].Radio {
-			at--
+		items := p.items(tracks)
+		if u := p.unshuffled; u != nil {
+			// In the queue's own order too.
+			cur, _ := p.s.Current()
+			p.unshuffled = slices.Insert(slices.Clone(u), enqueueAt(u, indexIn(u, cur.UID)), items...)
 		}
-		p.s.Queue = slices.Insert(slices.Clone(q), at, p.items(tracks)...)
+		q := p.s.Queue
+		p.s.Queue = slices.Insert(slices.Clone(q), enqueueAt(q, p.s.Index), items...)
 		p.emit(QueueChange)
 	})
+}
+
+// enqueueAt is where tracks added to q go: at its end, before the entries
+// of the radio after the one at cur.
+func enqueueAt(q []Item, cur int) int {
+	at := len(q)
+	for at > cur+1 && q[at-1].Radio {
+		at--
+	}
+	return at
+}
+
+// indexIn is the index in q of the entry uid, or -1.
+func indexIn(q []Item, uid string) int {
+	if uid == "" {
+		return -1
+	}
+	return slices.IndexFunc(q, func(it Item) bool { return it.UID == uid })
 }
 
 // RemoveAt takes the entry at i out of the queue, but the current one.
@@ -88,8 +117,9 @@ func (p *Player) ClearUpcoming() {
 	})
 }
 
-// SetShuffle shuffles the tracks after the current one, or puts them back
-// in their order.
+// SetShuffle keeps the current track and what played before it, and
+// shuffles the rest of the queue after it; off, it puts the queue back in
+// its own order.
 func (p *Player) SetShuffle(on bool) { p.do(func() { p.setShuffle(on) }) }
 
 // ToggleShuffle shuffles or unshuffles.
@@ -124,14 +154,12 @@ func (p *Player) playTracks(tracks []media.Track, start int) {
 		return
 	}
 	p.unshuffled = nil
+	p.played = nil
 	items := p.items(tracks)
 	first := min(max(start, 0), len(items)-1)
 	if p.s.Shuffle {
-		p.unshuffled = slices.Clone(items)
-		chosen := items[first]
-		rest := slices.Delete(items, first, first+1)
-		shuffle(rest)
-		items = append([]Item{chosen}, rest...)
+		p.unshuffled = items
+		items = p.shuffledFrom(items, first)
 		first = 0
 	}
 	p.s.Queue = items
@@ -147,9 +175,7 @@ func (p *Player) setShuffle(on bool) {
 	q := p.s.Queue
 	if on {
 		p.unshuffled = q
-		rest := slices.Clone(q[p.s.Index+1:])
-		shuffle(rest)
-		p.s.Queue = append(slices.Clone(q[:p.s.Index+1]), rest...)
+		p.s.Queue = p.shuffledFrom(q, p.s.Index)
 	} else if p.unshuffled != nil {
 		present := map[string]bool{}
 		for _, it := range q {
@@ -179,8 +205,51 @@ func (p *Player) setShuffle(on bool) {
 	p.report()
 }
 
+// shuffledFrom is q shuffled around its entry at, or -1: the entries
+// before it that played stay before it, in their order, and the rest of q
+// follows it in random order, the entries before it that haven't played
+// included, as a list started in its middle leaves them. The user's own
+// entries come first, then the radio's, so that what they add still goes
+// before the radio's.
+func (p *Player) shuffledFrom(q []Item, at int) []Item {
+	out := make([]Item, 0, len(q))
+	var own, radio []Item
+	for i, it := range q {
+		switch {
+		case i == at:
+		case i < at && p.played[it.UID]:
+			out = append(out, it)
+		case it.Radio:
+			radio = append(radio, it)
+		default:
+			own = append(own, it)
+		}
+	}
+	if at >= 0 && at < len(q) {
+		out = append(out, q[at])
+	}
+	shuffle(own)
+	shuffle(radio)
+	out = append(out, own...)
+	return append(out, radio...)
+}
+
 func shuffle(items []Item) {
 	rand.Shuffle(len(items), func(i, j int) { items[i], items[j] = items[j], items[i] })
+}
+
+// markPlayed notes that the entry uid became current. It replaces the
+// marks rather than change them, as what is published shares them.
+func (p *Player) markPlayed(uid string) {
+	if p.played[uid] {
+		return
+	}
+	played := maps.Clone(p.played)
+	if played == nil {
+		played = map[string]bool{}
+	}
+	played[uid] = true
+	p.played = played
 }
 
 // extendWithRadio adds tracks like the current one to the queue, and then
@@ -211,6 +280,9 @@ func (p *Player) extendWithRadio(then func(added bool, err error)) {
 			items[i] = p.item(t, true)
 		}
 		p.s.Queue = append(slices.Clone(p.s.Queue), items...)
+		if p.unshuffled != nil {
+			p.unshuffled = append(slices.Clone(p.unshuffled), items...)
+		}
 		p.emit(QueueChange)
 		then(true, nil)
 	})

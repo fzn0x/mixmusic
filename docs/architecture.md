@@ -78,9 +78,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   and Spotify tracks matched to their recording, through the engine, and
   Spotify tracks on a Spotify device: a Spotify Connect device, or MixMusic
   itself, as below. It shuffles, repeats, crossfades, starts radios when the
-  queue runs out, counts plays and keeps the queue in `queue.json`. A track
-  that can't play for want of the network waits for it where it was, and
-  plays on once it answers; the player pauses as the computer sleeps.
+  queue runs out, counts plays and keeps up to 500 tracks of the queue,
+  around the one playing, in `queue.json`, as it changes and as MixMusic
+  quits. A track that can't play for want of the network waits for it
+  where it was, and plays on once it answers; the player pauses as the
+  computer sleeps.
 - **`internal/online`** tells the player whether the network answers: a
   check of YouTube's and Spotify's addresses over HTTPS, shared by its
   callers, which audio coming from YouTube answers too, and a wait for the

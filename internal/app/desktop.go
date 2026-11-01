@@ -31,6 +31,15 @@ func (a *App) Start() {
 	// Quitting closes every window; the main window must close then, not
 	// hide in the tray, or the quit stops there.
 	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) { a.quitting.Store(true) })
+	// What waits a moment to be saved is saved as MixMusic quits: once its
+	// windows closed, before the single instance lock is released and an
+	// update's restart starts the new copy, and again once the loop
+	// stopped, which is all that runs when Windows ends the session. The
+	// second writes the queue again only if the player changed since.
+	// Nothing after mygo.App.Run in main would do: Windows ends the
+	// process before it returns.
+	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { a.flush() })
+	mygo.App.OnQuit(a.flush)
 	if runtime.GOOS != "darwin" && !mygo.App.IsPackaged() {
 		if err := mygo.App.RegisterURLScheme(URLScheme); err != nil {
 			log.Printf("mixmusic: registering %s links: %v", URLScheme, err)

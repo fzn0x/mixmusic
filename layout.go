@@ -8,6 +8,8 @@ package main
 import (
 	"math"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/egoist/mygo/ui"
 
@@ -94,6 +96,29 @@ func (k *look) words(s string) string {
 	return s
 }
 
+// sentence is a label of the interface's, as "sign out": as it is in the
+// light style, whose words are lowercase, and with its first letter in
+// capitals otherwise.
+func (k *look) sentence(s string) string {
+	if k.headings == headingsLight || s == "" {
+		return s
+	}
+	r, n := utf8.DecodeRuneInString(s)
+	return string(unicode.ToUpper(r)) + s[n:]
+}
+
+// labelWeight sets the weight of the labels of buttons and chips: the
+// face's regular one in the light style, as before, and heavier in the
+// others, as Material's labels are.
+func (k *look) labelWeight(t ui.Element) {
+	switch k.headings {
+	case headingsRegular:
+		t.FontWeight(500)
+	case headingsBold:
+		t.FontWeight(600)
+	}
+}
+
 // displayWeight is the weight of the largest words, as the pages' titles;
 // titleWeight that of the sections' titles, the tiles' and the panels';
 // and leadWeight that of the sentences set large under them.
@@ -162,3 +187,21 @@ func springOf(stiffness, ratio float64) ui.Animation {
 
 // moves reports whether presses, hovers and choices move on springs.
 func (k *look) moves() bool { return k.motion != motionStandard }
+
+// scrimRadius rounds the scrim over a row's artwork as the artwork is, in
+// the themes of tonal controls; others keep the square one they had.
+func (k *look) scrimRadius() float32 {
+	if k.tonal {
+		return k.radiusSm
+	}
+	return 0
+}
+
+// bigSize is the size of the large words of an empty page, as "nothing
+// playing": Mix's 3.5rem, or Material's display small.
+func (k *look) bigSize() float32 {
+	if k.headings == headingsLight {
+		return k.size(3.5)
+	}
+	return k.size(2.25)
+}

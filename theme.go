@@ -54,8 +54,10 @@ type look struct {
 	motion                       motionStyle
 	// selected fills what is chosen, as the current page and the track
 	// that plays, and selectedText and selectedSub ink it: the accent, or,
-	// with tonal controls, a quieter fill.
+	// with tonal controls, a quieter fill. tonalFill fills the secondary
+	// buttons of tonal controls, and tonalInk inks them.
 	selected, selectedText, selectedSub ui.Color
+	tonalFill, tonalInk                 ui.Color
 }
 
 // fallbackTheme is the Mix theme's tokens, for a theme that lacks some.
@@ -111,9 +113,15 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	bg.A = 255
 	text, accent := tok("text"), tok("accent")
 	accentText := tok("accent-text")
-	// Other themes take it as it reads on the ground.
+	// Other themes take it as it reads on the ground: at 3:1, or, where
+	// controls are tonal, which set it as small text on their fills, at
+	// 4.5:1 on the panels' surface, which has less contrast with it.
 	if a, ok := parseColor(pick); ok && pick != "" && mat == nil {
-		a = readableOn(a, bg)
+		if th.Layout["controls"] == "tonal" {
+			a = legibleOn(a, over(tok("surface"), bg), 4.5)
+		} else {
+			a = readableOn(a, bg)
+		}
 		accent, accentText = a, inkOn(a)
 	}
 	k := look{dark: th.Scheme != "light", systemDark: dark, scale: float32(s.FontScale), compact: s.Density == settings.DensityCompact}
@@ -152,13 +160,15 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	}
 	k.layoutOf(th)
 	k.selected, k.selectedText, k.selectedSub = k.accent, k.accentText, k.accentText.Alpha(0.78)
+	k.tonalFill, k.tonalInk = col(over(tok("surface-3"), bg)), k.text
 	switch {
 	case k.tonal && mat != nil:
 		// Material's secondary container.
 		k.selected, k.selectedText, k.selectedSub = col(mat.selected), col(mat.selectedText), col(mat.selectedText)
+		k.tonalFill, k.tonalInk = k.selected, k.selectedText
 	case k.tonal:
-		// The highest surface, with the accent's ink.
-		k.selected, k.selectedText, k.selectedSub = col(over(tok("surface-3"), bg)), k.accent, k.muted
+		// The highest surface, with the accent's ink, as it reads there.
+		k.selected, k.selectedText, k.selectedSub = k.tonalFill, col(legibleOn(nrgba(k.accent), nrgba(k.tonalFill), 4.5)), k.muted
 	}
 
 	t := *ui.DarkTheme()

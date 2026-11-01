@@ -294,14 +294,17 @@ func contrast(a, b color.NRGBA) float64 {
 // readableOn shifts an accent toward white on a dark ground, or black on a
 // light one, until it reads on it at 3:1, as large text and controls need,
 // keeping its hue, as the web interface did.
-func readableOn(accent, ground color.NRGBA) color.NRGBA {
+func readableOn(accent, ground color.NRGBA) color.NRGBA { return legibleOn(accent, ground, 3) }
+
+// legibleOn shifts c toward white on a dark ground, or black on a light
+// one, until it reads on it at ratio: 4.5:1 for text.
+func legibleOn(c, ground color.NRGBA, ratio float64) color.NRGBA {
 	toward := color.NRGBA{A: 255}
 	if luminance(ground) < 0.5 {
 		toward = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	}
-	c := accent
 	c.A = 255
-	for i := 0; i < 10 && contrast(c, ground) < 3; i++ {
+	for i := 0; i < 10 && contrast(c, ground) < ratio; i++ {
 		c = mix(c, toward, 0.15)
 	}
 	return c

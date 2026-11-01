@@ -28,7 +28,7 @@ func (s *shell) topBar(c *ui.Context) {
 		})
 		s.searchField(c)
 		ui.Spacer(c)
-		palette := s.buttonBase(c.Key("palette")).Height(32).PaddingX(8).Radius(k.radiusSm).Label("Open the command palette").Cursor(ui.CursorPointer)
+		palette := s.buttonBase(c.Key("palette")).Height(32).PaddingX(8).Radius(k.round(32)).Label("Open the command palette").Cursor(ui.CursorPointer)
 		ink := k.muted
 		if palette.Hovered() {
 			palette.Background(k.hover)
@@ -45,24 +45,34 @@ func (s *shell) topBar(c *ui.Context) {
 // for suggestions.
 const suggestPause = 180 * time.Millisecond
 
-// searchField is the 36px outlined box that searches both services. It
+// searchField is the 36px outlined box that searches both services, or,
+// with tonal controls, a filled one, outlined in the accent while focused. It
 // suggests searches below it: what was typed, which Enter searches, then
 // YouTube Music's suggestions for it, or the recent searches while it is
 // empty.
 func (s *shell) searchField(c *ui.Context) {
 	k := &s.lk
 	box := ui.Row(c).Height(36).MaxWidth(520).Grow(1).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).
-		Radius(k.radiusSm).Background(k.bg).Cursor(ui.CursorText)
+		Radius(k.round(36)).Background(k.bg).Cursor(ui.CursorText)
+	if k.pill {
+		box.PaddingX(16)
+	}
 	if box.Clicked() {
 		s.searchBox.Focus()
 	}
 	focused := s.searchBox.Focused(c)
 	ink := k.muted
-	if focused {
+	switch {
+	case focused:
 		box.Border(2, k.accent)
 		ink = k.text
-	} else {
+	case k.tonal:
+		box.Background(k.surface2)
+	default:
 		box.Border(2, k.outline)
+	}
+	if focused && k.tonal {
+		box.Background(k.surface2)
 	}
 	search := func(q string) {
 		if q = strings.TrimSpace(q); q != "" {
@@ -74,7 +84,7 @@ func (s *shell) searchField(c *ui.Context) {
 	box.Children(func() {
 		ui.Icon(c, icon("search")).FontSize(18).TextColor(ink)
 		cb := ui.ComboboxBase(c.Key("search"), &s.query)
-		in := cb.Input.Placeholder("search spotify and youtube music").Grow(1).MinWidth(0).Bind(&s.searchBox).
+		in := cb.Input.Placeholder(k.words("Search Spotify and YouTube Music")).Grow(1).MinWidth(0).Bind(&s.searchBox).
 			Label("Search").FontSize(k.bodySize())
 		if in.Changed() {
 			s.queryAt = c.Now()

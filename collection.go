@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"math"
 	"math/rand/v2"
 	"strings"
 	"time"
@@ -51,9 +52,9 @@ func texts(ts ...string) []fact {
 // collectionHead pairs the artwork with the facts and the actions.
 func (s *shell) collectionHead(c *ui.Context, h headProps) {
 	k := &s.lk
-	size := float32(208)
+	size := float32(math.Round(float64(k.cover * 208 / 172)))
 	if s.paneWidth(c) < 720 {
-		size = 128
+		size = float32(math.Round(float64(k.cover * 128 / 172)))
 	}
 	ui.Row(c).Gap(24).AlignItems(ui.End).Margin(0, 0, 32).Children(func() {
 		s.cover(c, "head-cover", h.art, size, h.round)
@@ -511,14 +512,14 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 		}
 		s.collectionHead(c, h)
 		section("songs", func() {
-			s.sectionTitle(c, "top songs")
+			s.sectionTitle(c, "Top songs")
 			ui.Column(c).Margin(0, 0, 48).Children(func() {
 				s.trackList(c, "top", a.TopTracks, trackListOptions{art: true, album: true, empty: "No songs listed for this artist."})
 			})
 		})
 		if len(a.Albums) > 0 {
 			section("albums", func() {
-				s.shelf(c, "albums", "albums", func() {
+				s.shelf(c, "albums", "Albums", func() {
 					for i, al := range a.Albums {
 						s.albumTile(c, "album-"+count(i), al)
 					}
@@ -527,7 +528,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 		}
 		if len(a.Singles) > 0 {
 			section("singles", func() {
-				s.shelf(c, "singles", "singles & eps", func() {
+				s.shelf(c, "singles", "Singles & EPs", func() {
 					for i, al := range a.Singles {
 						s.albumTile(c, "single-"+count(i), al)
 					}
@@ -542,16 +543,23 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 
 // relatedArtists are chips of the artists the fans of one also like.
 func (s *shell) relatedArtists(c *ui.Context, related []media.Ref) {
-	s.sectionTitle(c, "fans also like")
+	s.sectionTitle(c, "Fans also like")
 	ui.Row(c).Wrap().Gap(8).Children(func() {
 		for i, r := range related {
 			if r.ID == "" {
 				continue
 			}
-			chip := s.buttonBase(c.Key("related-"+count(i))).Height(34).PaddingX(14).Border(2, s.lk.outline).
-				Radius(s.lk.radiusSm).Label(r.Name).Cursor(ui.CursorPointer)
-			if chip.Hovered() {
-				chip.Background(s.lk.hover)
+			chip := s.buttonBase(c.Key("related-" + count(i))).Height(34).PaddingX(14).
+				Radius(s.lk.round(34)).Label(r.Name).Cursor(ui.CursorPointer)
+			switch {
+			case s.lk.tonal && chip.Hovered():
+				chip.Background(s.lk.surface3)
+			case s.lk.tonal:
+				chip.Background(s.lk.surface2)
+			case chip.Hovered():
+				chip.Background(s.lk.hover).Border(2, s.lk.outline)
+			default:
+				chip.Border(2, s.lk.outline)
 			}
 			if chip.Clicked() {
 				s.navigate(artistPath(r.ID))

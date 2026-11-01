@@ -46,7 +46,11 @@ func (s *shell) dialogFrame(c *ui.Context, open *bool, o dialogOptions, fn func(
 		if o.width > 0 {
 			panel.Width(o.width)
 		}
-		s.frosted(panel).MaxWidth(max(w-2*dialogMargin, 0)).MaxHeight(max(h-2*dialogMargin, 0)).Radius(10).
+		radius := float32(10)
+		if k.tonal {
+			radius = k.radius
+		}
+		s.frosted(panel).MaxWidth(max(w-2*dialogMargin, 0)).MaxHeight(max(h-2*dialogMargin, 0)).Radius(radius).
 			Border(1, k.border).Shadow(0, 10, 30, 0, ui.RGBA(0, 0, 0, 0.3)).Clip().Label(o.title)
 		if o.alert {
 			panel.Role(ui.RoleAlertDialog).Description(o.message)
@@ -103,7 +107,12 @@ func (s *shell) dialog(c *ui.Context, open *bool, o dialogOptions, body, actions
 	}
 	// The title is as tall in the head as in the body, which are as wide.
 	title := func() {
-		measure(ui.Text(c.Key(o.key+"-title"), o.title).FontSize(k.titleSize()).FontWeight(300).Font(k.display), &ds.title)
+		size := k.titleSize()
+		if k.headings != headingsLight {
+			// Material's headline small: a dialog's title.
+			size = k.size(1.5)
+		}
+		measure(ui.Text(c.Key(o.key+"-title"), k.sentence(o.title)).FontSize(size).FontWeight(k.titleWeight()).Font(k.display), &ds.title)
 	}
 	s.dialogFrame(c, open, o, func(panel ui.Element) {
 		top := float32(32)

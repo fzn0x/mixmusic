@@ -17,7 +17,13 @@ import (
 // lyrics.
 func (s *shell) sidePanel(c *ui.Context) {
 	k := &s.lk
-	ui.Column(c).Width(s.panelWidth(c)).Shrink(0).Background(k.surface).BorderWidth(0, 0, 0, 1).BorderColor(k.border).Children(func() {
+	panel := ui.Column(c).Width(s.panelWidth(c)).Shrink(0).Background(k.surface)
+	if k.floating {
+		panel.Margin(0, 12, 12, 0).Radius(k.radius).Clip()
+	} else {
+		panel.BorderWidth(0, 0, 0, 1).BorderColor(k.border)
+	}
+	panel.Children(func() {
 		if s.panel == "queue" {
 			s.queuePanel(c)
 		} else {
@@ -29,8 +35,13 @@ func (s *shell) sidePanel(c *ui.Context) {
 // panelHead titles the panel, with its actions and a close button.
 func (s *shell) panelHead(c *ui.Context, title string, actions func()) {
 	k := &s.lk
+	title = k.words(title)
+	size := k.pivotSize()
+	if k.headings != headingsLight {
+		size = 22 * k.scale
+	}
 	ui.Row(c).Padding(16, 16, 12, 24).Gap(8).Shrink(0).Children(func() {
-		ui.Text(c, title).FontSize(k.pivotSize()).FontWeight(300).Font(k.display).LetterSpacing(-0.02 * k.pivotSize()).
+		ui.Text(c, title).FontSize(size).FontWeight(k.titleWeight()).Font(k.display).LetterSpacing(k.tracking(-0.02, size)).
 			SingleLine().Grow(1).MinWidth(0)
 		if actions != nil {
 			actions()
@@ -49,18 +60,18 @@ func (s *shell) queuePanel(c *ui.Context) {
 	if at+1 < len(q) {
 		upcoming = len(q) - at - 1
 	}
-	s.panelHead(c, "up next", func() {
+	s.panelHead(c, "Up next", func() {
 		if upcoming > 0 {
 			clear := s.buttonBase(c.Key("clear-queue")).Label("Clear the queue").Cursor(ui.CursorPointer)
 			if clear.Clicked() {
 				s.p.ClearUpcoming()
 			}
-			clear.Children(func() { ui.Text(c, "clear").FontSize(k.smallSize()).TextColor(k.accent) })
+			clear.Children(func() { ui.Text(c, k.words("Clear")).FontSize(k.smallSize()).TextColor(k.accent) })
 		}
 	})
 	ui.Scroll(c).Grow(1).MinHeight(0).Padding(0, 12, 24).Children(func() {
 		if cur, ok := s.st.Current(); ok {
-			ui.Text(c, "now playing").FontSize(k.smallSize()).TextColor(k.accent).Padding(0, 8, 6)
+			ui.Text(c, k.words("Now playing")).FontSize(k.smallSize()).TextColor(k.accent).Padding(0, 8, 6)
 			s.queueRow(c, at, cur, true)
 		}
 		if upcoming == 0 {
@@ -88,8 +99,8 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 	ink, sub := k.text, k.muted
 	switch {
 	case current:
-		row.Background(k.accent)
-		ink, sub = k.accentText, k.accentText.Alpha(0.78)
+		row.Background(k.selected)
+		ink, sub = k.selectedText, k.selectedSub
 	case row.Hovered():
 		row.Background(k.hover)
 	}
@@ -113,7 +124,7 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 		art.Children(func() {
 			s.cover(c, "q-cover-"+it.UID, t.Artwork, 40, false)
 			if hovered && !current {
-				ui.Box(c).Absolute().Top(0).Left(0).Size(40, 40).Background(k.scrim).Center().Children(func() {
+				ui.Box(c).Absolute().Top(0).Left(0).Size(40, 40).Background(k.scrim).Radius(k.scrimRadius()).Center().Children(func() {
 					ui.Icon(c, icon("play")).FontSize(14).TextColor(k.text)
 				})
 			}
@@ -165,7 +176,7 @@ func (s *shell) reorderable(row ui.Element, uid string, i int) {
 
 // lyricsPanel shows the lyrics of the track playing.
 func (s *shell) lyricsPanel(c *ui.Context) {
-	s.panelHead(c, "lyrics", nil)
+	s.panelHead(c, "Lyrics", nil)
 	s.lyrics(c, false)
 }
 
@@ -273,7 +284,7 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		case synced && i < active:
 			ink = k.muted
 		}
-		p := ui.Text(c, text).FontSize(size).FontWeight(300).TextColor(ink).Padding(4, 24)
+		p := ui.Text(c, text).FontSize(size).FontWeight(k.leadWeight()).TextColor(ink).Padding(4, 24)
 		if synced {
 			p.Cursor(ui.CursorPointer)
 			if p.Clicked() {

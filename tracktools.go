@@ -66,21 +66,27 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 	}
 	view := tool.viewOf(tracks)
 	ui.Row(c).Gap(12).Margin(0, 0, 16).Children(func() {
-		box := ui.Row(c).Height(36).Width(320).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).Radius(k.radiusSm).Cursor(ui.CursorText)
+		box := ui.Row(c).Height(36).Width(320).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).Radius(k.round(36)).Cursor(ui.CursorText)
 		var search ui.Element
 		box.Children(func() {
 			ui.Icon(c, icon("search")).FontSize(16).TextColor(k.muted)
-			search = ui.TextInputBase(c.Key(key+"-search"), &tool.query).Placeholder("search this " + noun).Grow(1).MinWidth(0).
+			search = ui.TextInputBase(c.Key(key+"-search"), &tool.query).Placeholder(k.sentence("search this " + noun)).Grow(1).MinWidth(0).
 				Label("Search this " + noun).FontSize(k.bodySize())
 			if tool.query != "" {
 				// Escape clears the search, and goes on once it's clear.
 				search.OnShortcut(0, ui.KeyEscape, func() { tool.query = "" })
 			}
 		})
-		if search.Focused() {
+		switch {
+		case search.Focused():
 			box.Border(2, k.accent)
-		} else {
+		case k.tonal:
+			box.Background(k.surface2)
+		default:
 			box.Border(2, k.outline)
+		}
+		if search.Focused() && k.tonal {
+			box.Background(k.surface2)
 		}
 		labels := slices.Clone(trackSortLabels)
 		labels[0] = strings.ToUpper(noun[:1]) + noun[1:] + " order"

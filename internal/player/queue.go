@@ -88,8 +88,9 @@ func (p *Player) ClearUpcoming() {
 	})
 }
 
-// SetShuffle shuffles the tracks after the current one, or puts them back
-// in their order.
+// SetShuffle keeps the current track and what played before it, and
+// shuffles the rest of the queue after it; off, it puts the queue back in
+// its own order.
 func (p *Player) SetShuffle(on bool) { p.do(func() { p.setShuffle(on) }) }
 
 // ToggleShuffle shuffles or unshuffles.
@@ -124,14 +125,12 @@ func (p *Player) playTracks(tracks []media.Track, start int) {
 		return
 	}
 	p.unshuffled = nil
+	p.played = nil
 	items := p.items(tracks)
 	first := min(max(start, 0), len(items)-1)
 	if p.s.Shuffle {
-		p.unshuffled = slices.Clone(items)
-		chosen := items[first]
-		rest := slices.Delete(items, first, first+1)
-		shuffle(rest)
-		items = append([]Item{chosen}, rest...)
+		p.unshuffled = items
+		items = p.shuffledFrom(items, first)
 		first = 0
 	}
 	p.s.Queue = items
@@ -147,9 +146,7 @@ func (p *Player) setShuffle(on bool) {
 	q := p.s.Queue
 	if on {
 		p.unshuffled = q
-		rest := slices.Clone(q[p.s.Index+1:])
-		shuffle(rest)
-		p.s.Queue = append(slices.Clone(q[:p.s.Index+1]), rest...)
+		p.s.Queue = p.shuffledFrom(q, p.s.Index)
 	} else if p.unshuffled != nil {
 		present := map[string]bool{}
 		for _, it := range q {
@@ -179,8 +176,39 @@ func (p *Player) setShuffle(on bool) {
 	p.report()
 }
 
+// shuffledFrom is q shuffled around its entry at, or -1: the entries
+// before it that played stay before it, in their order, and the rest of q
+// follows it in random order, the entries before it that haven't played
+// included, as a list started in its middle leaves them.
+func (p *Player) shuffledFrom(q []Item, at int) []Item {
+	out := make([]Item, 0, len(q))
+	var rest []Item
+	for i, it := range q {
+		switch {
+		case i == at:
+		case i < at && p.played[it.UID]:
+			out = append(out, it)
+		default:
+			rest = append(rest, it)
+		}
+	}
+	if at >= 0 && at < len(q) {
+		out = append(out, q[at])
+	}
+	shuffle(rest)
+	return append(out, rest...)
+}
+
 func shuffle(items []Item) {
 	rand.Shuffle(len(items), func(i, j int) { items[i], items[j] = items[j], items[i] })
+}
+
+// markPlayed notes that the entry uid became current.
+func (p *Player) markPlayed(uid string) {
+	if p.played == nil {
+		p.played = map[string]bool{}
+	}
+	p.played[uid] = true
 }
 
 // extendWithRadio adds tracks like the current one to the queue, and then

@@ -283,8 +283,12 @@ type Player struct {
 	crossfading bool
 	failures    int
 	// warned holds what fellBack told, to tell it once.
-	warned     map[string]bool
+	warned map[string]bool
+	// unshuffled is the queue in its own order while it is shuffled, and
+	// played the entries that became current since the queue was filled,
+	// by UID.
 	unshuffled []Item
+	played     map[string]bool
 	// loaded is set while the stream engine has the current track, and
 	// atEnd when the queue ran out at its end, which the engine ended.
 	loaded      bool
@@ -333,6 +337,11 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 		p.s.Shuffle = saved.Shuffle
 		if saved.Repeat == RepeatAll || saved.Repeat == RepeatOne {
 			p.s.Repeat = saved.Repeat
+		}
+		// What comes before the current entry played.
+		p.played = map[string]bool{}
+		for _, it := range p.s.Queue[:p.s.Index+1] {
+			p.played[it.UID] = true
 		}
 	}
 	p.snap = p.s

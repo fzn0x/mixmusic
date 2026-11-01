@@ -99,6 +99,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	p.loadToken++
 	token := p.loadToken
 	p.atEnd = false
+	p.markPlayed(entry.UID)
 	p.s.Index = i
 	p.s.Position = start
 	p.s.Duration = ms(entry.Track.DurationMs)
@@ -329,6 +330,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 			return
 		}
 		p.loadToken++
+		p.markPlayed(next.UID)
 		p.s.Index = i
 		p.s.Position = 0
 		p.s.Duration = ms(next.Track.DurationMs)

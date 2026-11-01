@@ -71,7 +71,7 @@ func (s *shell) miniView(c *ui.Context) {
 		art := ui.Box(c.Key("mini-art")).Size(side, h).Shrink(0).Clip()
 		var b *ui.Bitmap
 		if ok {
-			b = s.art.get(c, artworkURL(cur.Track.Artwork, miniArt), artPixels(miniArt))
+			b = s.art.get(c, artworkURL(cur.Track.Artwork, miniArt), s.artPixels(miniArt))
 		}
 		if b == nil {
 			art.Background(k.surface3)

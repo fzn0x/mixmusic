@@ -225,6 +225,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			}
 		})
 		s.row(c, "Accent colour", "Replaces the theme's accent when the artwork does not set it.", func() { s.accentControl(c) })
+		s.zoomRow(c)
 		s.row(c, "Text size", fmt.Sprintf("%d%%", int(s.set.FontScale*100+0.5)), func() {
 			if ui.StepSlider(c.Key("font-scale"), &s.set.FontScale, 0.85, 1.3, 0.05).Width(200).Label("Text size").Changed() {
 				s.save()

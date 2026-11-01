@@ -148,6 +148,10 @@ type Settings struct {
 	// Shortcuts replaces the keys of commands, by command ID; an empty
 	// value takes a command's shortcut away.
 	Shortcuts map[string]string `json:"shortcuts"`
+	// GlobalShortcuts are the keys that run commands whichever window is
+	// in front, by command ID, written as Shortcuts are: "Mod+Alt+P".
+	// A new install has none.
+	GlobalShortcuts map[string]string `json:"globalShortcuts"`
 
 	// Add-ons.
 	EnabledPlugins []string `json:"enabledPlugins"`
@@ -195,6 +199,7 @@ func Default() Settings {
 		MediaKeys:       true,
 		DiscordPresence: true,
 		Shortcuts:       map[string]string{},
+		GlobalShortcuts: map[string]string{},
 		EnabledPlugins:  []string{},
 		RegistryURL:     DefaultRegistryURL,
 	}
@@ -331,6 +336,14 @@ func (s Settings) Clean() Settings {
 		}
 	}
 	s.Shortcuts = shortcuts
+	// IDs this version doesn't know stay, for a version that does.
+	global := map[string]string{}
+	for id, keys := range s.GlobalShortcuts {
+		if id != "" && len(id) <= 128 && keys != "" && len(keys) <= 64 && len(global) < 32 {
+			global[id] = keys
+		}
+	}
+	s.GlobalShortcuts = global
 	plugins := []string{}
 	for _, id := range s.EnabledPlugins {
 		if ValidID(id) && !slices.Contains(plugins, id) {

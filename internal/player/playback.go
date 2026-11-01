@@ -3,6 +3,7 @@ package player
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -98,6 +99,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	entry := p.s.Queue[i]
 	p.loadToken++
 	token := p.loadToken
+	p.retry = retryState{}
 	p.atEnd = false
 	p.s.Index = i
 	p.s.Position = start
@@ -183,6 +185,7 @@ func (p *Player) loadStream(src Source, start time.Duration, autoplay bool) {
 	p.connect.stop(true)
 	p.s.Source = &src
 	p.loaded = true
+	p.paused = !autoplay
 	_ = p.stream.Load(src.URL, start, autoplay)
 }
 
@@ -241,39 +244,73 @@ func (p *Player) fail(message string) {
 	})
 }
 
-// onStreamError plays a stream once more, freshly found, before failing.
+// onStreamError takes in a stream the engine can't play on, and tries it
+// again where it stopped.
 func (p *Player) onStreamError(message string) {
-	entry, ok := p.s.Current()
-	if !ok {
-		return
+	if _, ok := p.s.Current(); !ok || !p.loaded {
+		return // of a stream a load, or a try, took over from
 	}
-	token := p.loadToken
-	if p.retried == entry.UID {
-		// The engine tells that the stream can't play; the stream tells why,
-		// as when YouTube refused it.
-		why := ""
-		if src := p.s.Source; src != nil && src.Mode == ModeStream {
-			why = p.svc.StreamFailure(src.Track)
-		}
-		if why == "" {
-			why = message
-		}
+	// The engine tells that the stream can't play; the stream tells why, as
+	// when YouTube refused it.
+	why := ""
+	if src := p.s.Source; src != nil && src.Mode == ModeStream {
+		why = p.svc.StreamFailure(src.Track)
+	}
+	if why == "" {
+		why = message
+	}
+	p.retryStream(why)
+}
+
+// retryStream plays the current track's stream again from where it was,
+// after the next of retryWaits for a stream that played, or at once for
+// one that never did; once its tries ran out, it fails with why the last
+// one did. A try that finds no stream, as while the network is down,
+// counts as one.
+func (p *Player) retryStream(why string) {
+	entry, _ := p.s.Current()
+	r := &p.retry
+	tries, wait := 1, time.Duration(0)
+	if r.played {
+		tries = len(retryWaits)
+	}
+	if r.n >= tries {
 		p.fail(why)
 		return
 	}
-	p.retried = entry.UID
-	at := p.s.Position
-	await(p, func(ctx context.Context) (Source, error) { return p.svc.PrepareStream(ctx, entry.Track) }, func(src Source, err error) {
+	if r.played {
+		wait = retryWaits[r.n]
+	}
+	r.n++
+	token, at, autoplay := p.loadToken, p.s.Position, !p.paused
+	r.from = at
+	log.Printf("mixmusic: the audio of %s stopped at %s: %s; trying again in %s, %d of %d",
+		entry.Track.ID, at.Round(time.Second), why, wait, r.n, tries)
+	// Meanwhile the track loads again, as one chosen does: it can't be
+	// paused, and a seek, Next or another track takes over.
+	p.loaded = false
+	p.s.Loading, p.s.Buffering = autoplay, autoplay
+	p.emit(StateChange)
+	p.after(wait, func() {
 		if token != p.loadToken {
 			return
 		}
-		if err != nil {
-			p.fail(err.Error())
-			return
-		}
-		p.s.Source = &src
-		p.loaded = true
-		_ = p.stream.Load(src.URL+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, true)
+		await(p, func(ctx context.Context) (Source, error) { return p.svc.PrepareStream(ctx, entry.Track) }, func(src Source, err error) {
+			if token != p.loadToken {
+				return
+			}
+			if err != nil {
+				p.retryStream(err.Error())
+				return
+			}
+			// The engine lets go of the next track it preloaded, which loads
+			// again once this stream holds: on a slow network, its download
+			// would slow this one's.
+			p.s.Source = &src
+			p.loaded = true
+			p.paused = !autoplay
+			_ = p.stream.Load(src.URL+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, autoplay)
+		})
 	})
 }
 
@@ -288,12 +325,18 @@ func (p *Player) onProgress() {
 	if dur == 0 {
 		dur = ms(entry.Track.DurationMs)
 	}
+	if p.retry.n > 0 && p.loaded && pos >= p.retry.from+retryHold {
+		// The stream tried again holds: a later break has all its tries, and
+		// the next track, which the engine let go of, is prepared again.
+		p.retry.n = 0
+		p.prefetched = ""
+	}
 	if p.counted != entry.UID && pos >= min(countAfter, dur/2) {
 		p.counted = entry.UID
 		go p.svc.RecordPlay(entry.Track)
 	}
 	next, hasNext := p.s.UpNext()
-	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter {
+	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter && p.retry.n == 0 {
 		p.prefetched = next.UID
 		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
 			if err == nil && src.Mode == ModeStream && src.URL != "" {
@@ -328,6 +371,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 			return
 		}
 		p.loadToken++
+		p.retry = retryState{}
 		p.s.Index = i
 		p.s.Position = 0
 		p.s.Duration = ms(next.Track.DurationMs)
@@ -336,6 +380,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		p.emit(TrackChange)
 		p.report()
 		p.loaded = true
+		p.paused = false
 		_ = p.stream.Crossfade(src.URL, fade)
 	})
 }
@@ -364,6 +409,7 @@ func (p *Player) play() {
 		p.atEnd = false
 		p.stream.Seek(0)
 	}
+	p.paused = false
 	_ = p.stream.Play()
 }
 
@@ -375,6 +421,7 @@ func (p *Player) pause() {
 		p.connect.pause()
 		return
 	}
+	p.paused = true
 	p.stream.Pause()
 }
 
@@ -393,6 +440,7 @@ func (p *Player) seek(t time.Duration) {
 	}
 	p.s.Position = t
 	p.atEnd = false
+	p.retry.from = t
 	switch {
 	case p.connect.active():
 		p.connect.seek(t)
@@ -560,6 +608,7 @@ func (p *Player) onTime(position, duration time.Duration) {
 		// The track plays on, which a Time alone doesn't tell: the engine
 		// also tells the time while a stream opens, and just before it tells
 		// that one failed.
+		p.retry.played = true
 		p.failures = 0
 	}
 	p.s.Position = position

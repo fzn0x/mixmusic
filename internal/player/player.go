@@ -200,6 +200,10 @@ var (
 	// saveVolumeAfter is how long the volume stays still before the
 	// settings keep it.
 	saveVolumeAfter = 600 * time.Millisecond
+	// retryWaits are how long the player waits before each try of a stream
+	// that broke off after it played, as when the network dropped, in
+	// turn: once they ran out, the track fails.
+	retryWaits = []time.Duration{time.Second, 3 * time.Second, 9 * time.Second}
 )
 
 const (
@@ -217,7 +221,27 @@ const (
 	radioMax = 25
 	// savedMax is how many tracks of the queue are kept, at most.
 	savedMax = 500
+	// retryHold is how far a stream that was tried again plays on before a
+	// later break has all of retryWaits again.
+	retryHold = 10 * time.Second
 )
+
+// retryState is how the current load tries its stream again after it
+// broke off: playAt and crossfadeTo start it over, so that each play of
+// an entry has all its tries.
+type retryState struct {
+	// played is set once the stream played in the load. One that breaks
+	// off then is tried len(retryWaits) times, after a longer wait each
+	// time; one that never played is tried once, at once, as a stream
+	// YouTube refused, or that can't be decoded, seldom plays a moment
+	// later.
+	played bool
+	// n is the tries since the stream last held.
+	n int
+	// from is where the last try resumed, or where the user seeked to
+	// since: the stream holds once it played on to retryHold past it.
+	from time.Duration
+}
 
 // Player plays the queue. Its methods are safe for concurrent use, and
 // return at once: the player does what they ask on its own goroutine.
@@ -246,7 +270,7 @@ type Player struct {
 	events      []Event
 	notices     []Notice
 	loadToken   int
-	retried     string
+	retry       retryState
 	counted     string
 	prefetched  string
 	crossfading bool
@@ -256,8 +280,12 @@ type Player struct {
 	unshuffled []Item
 	// loaded is set while the stream engine has the current track, and
 	// atEnd when the queue ran out at its end, which the engine ended.
-	loaded      bool
-	atEnd       bool
+	loaded bool
+	atEnd  bool
+	// paused is set while the engine holds the current track paused, as
+	// the user paused it or it loaded paused: a stream that breaks off then
+	// stays paused once tried again.
+	paused      bool
 	uidSeq      int
 	lastToggle  time.Time
 	reporting   throttle

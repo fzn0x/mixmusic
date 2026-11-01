@@ -19,6 +19,7 @@ func init() {
 	reportEvery = 10 * time.Millisecond
 	saveEvery = 10 * time.Millisecond
 	saveVolumeAfter = 20 * time.Millisecond
+	retryWaits = []time.Duration{time.Millisecond, 2 * time.Millisecond, 3 * time.Millisecond}
 }
 
 // fakeServices is the app, with YouTube tracks that play as streams.
@@ -27,8 +28,9 @@ type fakeServices struct {
 	settings settings.Settings
 	// prepare, when set, finds how a track plays.
 	prepare func(media.Track) (Source, error)
-	// streamErr fails PrepareStream.
+	// streamErr fails PrepareStream, which streamed counts.
 	streamErr error
+	streamed  int
 	failure   string
 	radio     []media.Track
 	played    []string
@@ -61,6 +63,7 @@ func (f *fakeServices) Prepare(_ context.Context, t media.Track) (Source, error)
 func (f *fakeServices) PrepareStream(_ context.Context, t media.Track) (Source, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	f.streamed++
 	if f.streamErr != nil {
 		return Source{}, f.streamErr
 	}
@@ -742,13 +745,13 @@ func TestStreamError(t *testing.T) {
 	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Time(42*time.Second, 200*time.Second)
-	// The first error plays the stream again, freshly found, where it was.
-	h.p.Error("the stream failed")
-	h.wait("a retried", func(p *Player) bool { return strings.HasPrefix(h.stream.lastLoad(), "load url:yt:a?retry=") })
+	// Each error plays the stream again where it was, as many times as
+	// there are waits, while it doesn't hold.
+	useRetries(t, h, "a", 0)
 	if got := h.stream.lastLoad(); !strings.HasSuffix(got, " 42s true") {
 		t.Errorf("retried with %q", got)
 	}
-	// The second fails, with why the stream tells, and moves on.
+	// The next fails, with why the stream tells, and moves on.
 	h.p.Error("the stream failed")
 	h.wait("b playing", playing("b"))
 	n := h.notices()

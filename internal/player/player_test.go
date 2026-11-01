@@ -49,6 +49,8 @@ type fakeServices struct {
 	// the queue, as a slow disk.
 	reportHook func()
 	saveHook   func(Saved)
+	// disliked holds the tracks the user dislikes, by ID.
+	disliked map[string]bool
 }
 
 func newServices() *fakeServices {
@@ -97,6 +99,17 @@ func (f *fakeServices) Radio(context.Context, media.Track) ([]media.Track, error
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return f.radio, f.radioErr
+}
+
+// Skip passes over the tracks the user dislikes, while the settings say so,
+// as the app's does.
+func (f *fakeServices) Skip(t media.Track) string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.settings.SkipDisliked && f.disliked[t.ID] {
+		return SkipDisliked
+	}
+	return ""
 }
 
 func (f *fakeServices) Settings() settings.Settings {

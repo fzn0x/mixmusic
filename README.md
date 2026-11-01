@@ -358,7 +358,7 @@ internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
 internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
-internal/library     liked songs, mixes, history and stats
+internal/library     liked and disliked songs, mixes, history and stats
 internal/lastfm      scrobbling to Last.fm
 internal/discord     what plays, on your Discord profile
 internal/diag        the log, without secrets, and the reports of crashes
@@ -441,8 +441,8 @@ talks to:
 
 What it keeps on your computer:
 
-- Your settings and library (liked songs, mixes, history and recent
-  searches), in the folder Settings › About names.
+- Your settings and library (liked and disliked songs, mixes, history and
+  recent searches), in the folder Settings › About names.
 - The tracks you played, in the cache, as much as you allow in Settings ›
   Playback, and how loud YouTube measured them.
 - The covers you saw, up to 256 MB.

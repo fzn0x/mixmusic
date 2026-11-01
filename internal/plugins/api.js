@@ -68,6 +68,8 @@
         library: Object.freeze({
             isLiked: (id) => native.isLiked(String(id)),
             setLiked: (track, liked) => native.setLiked(track, Boolean(liked)),
+            isDisliked: (id) => native.isDisliked(String(id)),
+            setDisliked: (track, disliked) => native.setDisliked(track, Boolean(disliked)),
             mixes: () => native.mixes(),
             createMix: (title, tracks) => native.createMix(String(title), tracks ?? []),
         }),

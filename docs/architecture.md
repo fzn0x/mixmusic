@@ -32,10 +32,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   albums, artists, playlists, related tracks, radios and plain lyrics.
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
-  liked songs, playlists, albums, subscriptions, likes and saves. Its
-  parsers are tested against recorded responses in `testdata/`, and against
-  the live service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run
-  Live` (`MIXMUSIC_YT_COOKIES` adds a signed-in account).
+  liked songs, playlists, albums, subscriptions, likes, dislikes and
+  saves. Its parsers are tested against recorded responses in `testdata/`,
+  and against the live service with `MIXMUSIC_LIVE=1 go test
+  ./internal/youtube -run Live` (`MIXMUSIC_YT_COOKIES` adds a signed-in
+  account).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
   library), and controls Spotify Connect devices.
@@ -102,7 +103,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   and Spotify tracks matched to their recording, through the engine, and
   Spotify tracks on a Spotify device: a Spotify Connect device, or MixMusic
   itself, as below. It shuffles, repeats, crossfades, starts radios when the
-  queue runs out, counts plays and keeps up to 500 tracks of the queue,
+  queue runs out, passes over the songs the user dislikes but those they
+  pick, counts plays and keeps up to 500 tracks of the queue,
   around the one playing, in `queue.json`, as it changes and as MixMusic
   quits. A track that can't play for want of the network waits for it
   where it was, and plays on once it answers; the player pauses as the
@@ -117,8 +119,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
   title, artists and duration, for playback without a Spotify device.
 - **`lyrics`** finds synced lyrics on LRCLIB and reads LRC.
-- **`internal/library`** keeps liked songs, mixes, the history and stats in
-  `library.json`.
+- **`internal/library`** keeps liked and disliked songs, mixes, the history
+  and stats in `library.json`.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
   scrobbles by Last.fm's rules, keeping what fails offline for later.
 - **`internal/discord`** shows what plays on the user's Discord profile, over

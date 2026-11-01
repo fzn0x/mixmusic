@@ -34,6 +34,11 @@ func (s *shell) commands() []command {
 				s.setLiked(cur.Track, !s.a.IsLiked(cur.Track.ID))
 			}
 		}},
+		{"player.dislike", "Dislike what plays", "Mod+D", "playback", func() {
+			if playing {
+				s.setDisliked(cur.Track, !s.a.IsDisliked(cur.Track.ID))
+			}
+		}},
 		{"player.radio", "Start a radio of what plays", "", "playback", func() {
 			if playing {
 				s.startRadio(cur.Track)

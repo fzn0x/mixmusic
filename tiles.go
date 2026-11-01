@@ -290,7 +290,7 @@ func (s *shell) playCollection(load func(ctx context.Context) ([]media.Track, er
 			case len(tracks) == 0:
 				s.notes = append(s.notes, player.Notice{Message: "Nothing to play here"})
 			default:
-				s.p.PlayTracks(tracks, 0)
+				s.p.PlayAll(tracks, false)
 			}
 		})
 	}()

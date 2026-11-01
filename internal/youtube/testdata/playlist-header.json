@@ -1,0 +1,228 @@
+{
+ "contents": {
+  "twoColumnBrowseResultsRenderer": {
+   "tabs": [
+    {
+     "tabRenderer": {
+      "content": {
+       "sectionListRenderer": {
+        "contents": [
+         {
+          "musicResponsiveHeaderRenderer": {
+           "title": {
+            "runs": [
+             {
+              "text": "lofi hip hop radio - beats to relax/study to "
+             },
+             {
+              "text": "#LoFi",
+              "navigationEndpoint": {
+               "searchEndpoint": {
+                "query": "#lofi",
+                "params": "agIoAQ%3D%3D"
+               }
+              }
+             },
+             {
+              "text": " "
+             },
+             {
+              "text": "#ChillOut",
+              "navigationEndpoint": {
+               "searchEndpoint": {
+                "query": "#chillout",
+                "params": "agIoAQ%3D%3D"
+               }
+              }
+             }
+            ]
+           },
+           "subtitle": {
+            "runs": [
+             {
+              "text": "Playlist"
+             },
+             {
+              "text": " • "
+             },
+             {
+              "text": "2022"
+             }
+            ]
+           },
+           "secondSubtitle": {
+            "runs": [
+             {
+              "text": "1.4K views"
+             },
+             {
+              "text": " • "
+             },
+             {
+              "text": "26 tracks"
+             },
+             {
+              "text": " • "
+             },
+             {
+              "text": "16+ hours"
+             }
+            ]
+           },
+           "buttons": [
+            {
+             "toggleButtonRenderer": {
+              "isToggled": false,
+              "isDisabled": false,
+              "defaultIcon": {
+               "iconType": "BOOKMARK_BORDER"
+              },
+              "toggledIcon": {
+               "iconType": "BOOKMARK"
+              },
+              "defaultNavigationEndpoint": {
+               "modalEndpoint": {
+                "modal": {
+                 "modalWithTitleAndButtonRenderer": {
+                  "title": {
+                   "runs": [
+                    {
+                     "text": "Save this for later"
+                    }
+                   ]
+                  },
+                  "content": {
+                   "runs": [
+                    {
+                     "text": "Save favorites to your library after signing in"
+                    }
+                   ]
+                  },
+                  "button": {
+                   "buttonRenderer": {
+                    "style": "STYLE_BLUE_TEXT",
+                    "isDisabled": false,
+                    "text": {
+                     "runs": [
+                      {
+                       "text": "Sign in"
+                      }
+                     ]
+                    },
+                    "navigationEndpoint": {
+                     "signInEndpoint": {
+                      "hack": true
+                     }
+                    }
+                   }
+                  }
+                 }
+                }
+               }
+              }
+             }
+            },
+            {
+             "musicPlayButtonRenderer": {
+              "playNavigationEndpoint": {
+               "watchEndpoint": {
+                "videoId": "testVideo01",
+                "playlistId": "PLtestAAAAAAAAAAAA",
+                "params": "wAEB",
+                "watchEndpointMusicSupportedConfigs": {
+                 "watchEndpointMusicConfig": {
+                  "musicVideoType": "MUSIC_VIDEO_TYPE_UGC"
+                 }
+                }
+               }
+              },
+              "playIcon": {
+               "iconType": "PLAY_ARROW"
+              },
+              "pauseIcon": {
+               "iconType": "PAUSE"
+              },
+              "iconColor": 4278387459,
+              "backgroundColor": 0,
+              "activeBackgroundColor": 0,
+              "loadingIndicatorColor": 14745645,
+              "playingIcon": {
+               "iconType": "PAUSE"
+              },
+              "iconLoadingColor": 0,
+              "activeScaleFactor": 1
+             }
+            },
+            {
+             "menuRenderer": {
+              "items": [
+               {
+                "menuServiceItemRenderer": {
+                 "text": {
+                  "runs": [
+                   {
+                    "text": "Play next"
+                   }
+                  ]
+                 },
+                 "icon": {
+                  "iconType": "QUEUE_PLAY_NEXT"
+                 },
+                 "serviceEndpoint": {
+                  "queueAddEndpoint": {
+                   "queueTarget": {
+                    "playlistId": "PLtestAAAAAAAAAAAA",
+                    "onEmptyQueue": {
+                     "watchEndpoint": {
+                      "playlistId": "PLtestAAAAAAAAAAAA"
+                     }
+                    }
+                   },
+                   "queueInsertPosition": "INSERT_AFTER_CURRENT_VIDEO",
+                   "commands": [
+                    {
+                     "addToToastAction": {
+                      "item": {
+                       "notificationTextRenderer": {
+                        "successResponseText": {
+                         "runs": [
+                          {
+                           "text": "Playlist will play next"
+                          }
+                         ]
+                        }
+                       }
+                      }
+                     }
+                    }
+                   ]
+                  }
+                 }
+                }
+               }
+              ]
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "secondaryContents": {
+    "sectionListRenderer": {
+     "contents": [
+      {
+       "musicPlaylistShelfRenderer": {
+        "contents": []
+       }
+      }
+     ]
+    }
+   }
+  }
+ }
+}

@@ -92,6 +92,37 @@ func TestAlbumPlaylistAndSaved(t *testing.T) {
 	}
 }
 
+// TestSaveToggle reads the save button of a playlist's header as YouTube
+// Music draws it now, with bookmarks, on and off.
+func TestSaveToggle(t *testing.T) {
+	n := fixture(t, "playlist-header")
+	h := responsiveHeader(n)
+	toggle := saveToggle(h)
+	if !toggle.exists() || toggle.get("toggledIcon", "iconType").str() != "BOOKMARK" {
+		t.Fatalf("no save button in %v", h.get("buttons").v)
+	}
+	if savedInLibrary(h) {
+		t.Error("a page read signed out says the playlist is saved")
+	}
+	toggle.v.(map[string]any)["isToggled"] = true
+	if !savedInLibrary(h) {
+		t.Error("the save button, on, doesn't read as saved")
+	}
+	if p, _, err := parsePlaylist(n, "PLx"); err != nil || !p.Saved {
+		t.Errorf("the playlist's page: saved %v, %v", p.Saved, err)
+	}
+	// Signed in, the button likes the playlist, whatever its icon.
+	var liked any
+	json.Unmarshal([]byte(`{"buttons":[{"toggleButtonRenderer":{"isToggled":true,"defaultIcon":{"iconType":"ADD"},
+		"defaultServiceEndpoint":{"likeEndpoint":{"status":"LIKE","target":{"playlistId":"PLx"}}}}}]}`), &liked)
+	if !savedInLibrary(node{liked}) {
+		t.Error("a save button that likes the playlist doesn't read")
+	}
+	if saveToggle(node{map[string]any{"buttons": []any{map[string]any{"toggleButtonRenderer": map[string]any{}}}}}).exists() {
+		t.Error("a toggle that saves nothing reads as the save button")
+	}
+}
+
 func TestLibraryActions(t *testing.T) {
 	type request struct {
 		path string

@@ -49,6 +49,12 @@ func TestLive(t *testing.T) {
 	if err != nil || len(playlist.Tracks) == 0 {
 		t.Fatalf("playlist %s: %d tracks, %v", playlistID, len(playlist.Tracks), err)
 	}
+	// The save button is how a page tells a saved playlist, whose icons
+	// YouTube Music renames now and then.
+	page, err := c.browse(ctx, "VL"+playlistID)
+	if err != nil || !saveToggle(responsiveHeader(page)).exists() {
+		t.Fatalf("playlist %s: no save button in its header, %v", playlistID, err)
+	}
 
 	_, videoID, _ := media.ParseID(results.Tracks[0].ID)
 	radio, err := c.Radio(ctx, videoID)

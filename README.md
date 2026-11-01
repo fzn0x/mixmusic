@@ -123,6 +123,8 @@ both services in one player:
 ### On your desktop
 
 - Media keys and the system's media controls on Windows, macOS and Linux.
+- Global shortcuts of your own to play, pause, skip, change the volume,
+  mute, like what plays or show MixMusic, whichever window is in front.
 - The player's buttons on the taskbar thumbnail on Windows.
 - Tray controls, notifications of new tracks, and start at login.
 - `mixmusic://` links.
@@ -143,8 +145,9 @@ both services in one player:
 - **Plugins** add pages, commands, track actions and widgets through a
   typed API, drawn in your theme.
 - **Keyboard first.** Shortcuts for everything common, a key of your own for
-  any command, plugins' commands included, and a command palette
-  (<kbd>Ctrl</kbd> <kbd>K</kbd>) for the rest.
+  any command, plugins' commands included, keys that control the music
+  from any app, and a command palette (<kbd>Ctrl</kbd> <kbd>K</kbd>) for
+  the rest.
 
 ## A look around
 

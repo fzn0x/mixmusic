@@ -143,7 +143,7 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/app`** gives the windows the services (`App.Services`), tells
   them when the settings, the accounts, the add-ons or the updates change
   (`App.Watch`), makes the player, and puts MixMusic on the desktop: the
-  tray, media keys, deep links, notifications, updates.
+  tray, media keys, global shortcuts, deep links, notifications, updates.
 
 ## The windows
 

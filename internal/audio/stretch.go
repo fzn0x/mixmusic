@@ -39,6 +39,9 @@ const (
 	stretchFrames = 4096
 )
 
+// The input held fits in its room: the length would be negative else.
+var _ [stretchFrames - stretchHeld]struct{}
+
 // stretchHann is a periodic Hann window: w[i] + w[i+stretchHop] is 1.
 var stretchHann = func() (w [stretchWindow]float32) {
 	for i := range w {

@@ -124,7 +124,16 @@ func (d *Decoder) Decode(frame []byte, pcm []float32) (int, error) {
 		d.applyIS()
 	}
 	for c := range channels {
-		d.synthesize(&d.ch[c], &d.ch[c].ics.info, d.out[c][:])
+		ch := &d.ch[c]
+		info := &ch.ics.info
+		if ch.ics.tns.present {
+			maxBands := d.tables.tnsLong
+			if info.seq == eightShortSequence {
+				maxBands = d.tables.tnsShort
+			}
+			ch.ics.tns.apply(ch.spec[:], info, maxBands)
+		}
+		d.synthesize(ch, info, d.out[c][:])
 	}
 	left, right := &d.out[0], &d.out[channels-1]
 	for i := range FrameLength {

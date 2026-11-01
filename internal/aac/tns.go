@@ -1,6 +1,8 @@
 package aac
 
-// Port of Tools/TNS.cs, which reads tns_data.
+// Port of Tools/TNS.cs, which reads tns_data. SharpJaad leaves the
+// filtering undone: apply follows the decoding process the standard gives
+// for it instead.
 
 // tnsMaxOrder is TNS_MAX_ORDER of AAC-LC: the highest order of a filter
 // of a long window. A short window's order is coded in 3 bits, at most 7,
@@ -53,6 +55,59 @@ func (t *tns) parse(r *bitReader, info *icsInfo) {
 				if i < tnsMaxOrder {
 					t.coef[w][f][i] = c
 				}
+			}
+		}
+	}
+}
+
+// apply filters the spectrum of each window of info with the filters of
+// t, in place. maxBands is TNS_MAX_BANDS, which bounds the bands they
+// filter.
+func (t *tns) apply(spec []float32, info *icsInfo, maxBands int) {
+	var lpc, tmp [tnsMaxOrder + 1]float32
+	bands := len(info.swb) - 1
+	for w := range info.windows {
+		x := spec[128*w:]
+		bottom := bands
+		for f := range t.filters[w] {
+			top := bottom
+			bottom = max(top-t.length[w][f], 0)
+			order := min(t.order[w][f], tnsMaxOrder)
+			if order == 0 {
+				continue
+			}
+
+			// The coefficients of the filter, from its reflection
+			// coefficients.
+			lpc[0] = 1
+			for m := 1; m <= order; m++ {
+				k := t.coef[w][f][m-1]
+				for i := 1; i < m; i++ {
+					tmp[i] = lpc[i] + k*lpc[m-i]
+				}
+				copy(lpc[1:m], tmp[1:m])
+				lpc[m] = k
+			}
+
+			start := int(info.swb[min(bottom, maxBands, info.maxSFB)])
+			end := int(info.swb[min(top, maxBands, info.maxSFB)])
+			size := end - start
+			if size <= 0 {
+				continue
+			}
+			inc := 1
+			if t.direction[w][f] {
+				inc, start = -1, end-1
+			}
+			// The all-pole filter y(n) = x(n) - lpc[1] y(n-1) - ... -
+			// lpc[order] y(n-order), from a state of zeros, in place.
+			for n := range size {
+				p := start + n*inc
+				y := x[p]
+				for i := 1; i <= min(n, order); i++ {
+					y -= lpc[i] * x[p-i*inc]
+				}
+				x[p] = y
 			}
 		}
 	}

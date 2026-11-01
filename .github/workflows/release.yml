@@ -90,7 +90,8 @@ jobs:
               darwin-*)
                 for f in "$dir"*.dmg; do cp "$f" "release/mixmusic-$v-macos-$arch.dmg"; done ;;
               windows-*)
-                for f in "$dir"*Setup*.exe; do cp "$f" "release/mixmusic-$v-windows-$arch-setup.exe"; done ;;
+                # mygo build names it mixmusic-setup-<version>-<arch>.exe.
+                for f in "$dir"*-setup-*.exe; do cp "$f" "release/mixmusic-$v-windows-$arch-setup.exe"; done ;;
               linux-*)
                 for f in "$dir"*.deb; do cp "$f" "release/mixmusic-$v-linux-$arch.deb"; done
                 # install.sh finds the archive next to it by this name.

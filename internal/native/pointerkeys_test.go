@@ -238,6 +238,20 @@ func TestSpaceAfterClicks(t *testing.T) {
 			spacePlays(t, s, tt, "a click on what plays")
 		}
 	})
+	t.Run("stats table", func(t *testing.T) {
+		s := playing(t)
+		if err := s.svc.Collection.RecordPlay(testTracks[0]); err != nil {
+			t.Fatal(err)
+		}
+		tt := testerOf(t, s, 1280, 1600)
+		show(s, tt, "/stats")
+		click(t, s, tt, "show as a table")
+		tt.Advance(time.Second)
+		spacePlays(t, s, tt, "a click on show as a table")
+		if !s.statsTable {
+			t.Error("Space closed the table")
+		}
+	})
 }
 
 // TestSpaceAfterSearch takes the keyboard from a search with a click on

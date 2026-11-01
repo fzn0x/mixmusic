@@ -241,22 +241,52 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 			ui.Text(c, label).FontSize(k.captionSize()).TextColor(k.muted).Grow(1).Basis(0).MinWidth(0).NoWrap()
 		}
 	})
-	ui.Collapsible(c, "show as a table", &s.statsTable, func() {
-		columns := []ui.TableColumn{{Title: "day"}, {Title: "minutes", Width: 110, Align: ui.End}, {Title: "plays", Width: 90, Align: ui.End}}
-		// Ten rows show at once, under the header.
-		row := k.theme.Space(8)
-		ui.Table(c, &s.statsRows, columns, n, func(i, col int) {
-			d := days[n-1-i]
-			switch col {
-			case 0:
-				ui.Text(c, dayLabel(d.Date)).SingleLine()
-			case 1:
-				ui.Text(c, fmt.Sprint(d.Minutes)).FontFeatures("tnum")
-			case 2:
-				ui.Text(c, fmt.Sprint(d.Plays)).FontFeatures("tnum")
-			}
-		}).Height(row*float32(min(n, 10)+1)+1).MaxWidth(520).Margin(8, 0, 0)
-	}).Margin(0, 0, 48)
+	// MyGo's Collapsible, built of its parts for pointerKeys to reach its
+	// trigger: a click on it leaves Space to play or pause.
+	ui.Column(c).Shrink(0).Margin(0, 0, 48).Children(func() {
+		t := &k.theme
+		table := ui.CollapsibleBase(c, &s.statsTable)
+		trigger := s.pointerKeys(table.Trigger).AlignSelf(ui.Start).AlignItems(ui.Center).Gap(t.Space(1)).
+			Padding(t.Space(1), 0).PaddingStart(t.Space(0.5)).PaddingEnd(t.Space(2)).Radius(t.Radius)
+		if trigger.Hovered() {
+			trigger.Background(t.SurfaceHover)
+		}
+		trigger.Children(func() {
+			disclosure(c, 90*table.Progress(), t.TextMuted)
+			ui.Text(c, "show as a table").SingleLine()
+		})
+		table.Panel(func() {
+			columns := []ui.TableColumn{{Title: "day"}, {Title: "minutes", Width: 110, Align: ui.End}, {Title: "plays", Width: 90, Align: ui.End}}
+			// Ten rows show at once, under the header.
+			row := k.theme.Space(8)
+			ui.Table(c, &s.statsRows, columns, n, func(i, col int) {
+				d := days[n-1-i]
+				switch col {
+				case 0:
+					ui.Text(c, dayLabel(d.Date)).SingleLine()
+				case 1:
+					ui.Text(c, fmt.Sprint(d.Minutes)).FontFeatures("tnum")
+				case 2:
+					ui.Text(c, fmt.Sprint(d.Plays)).FontFeatures("tnum")
+				}
+			}).Height(row*float32(min(n, 10)+1)+1).MaxWidth(520).Margin(8, 0, 0)
+		}).Padding(t.Space(1), 0).PaddingStart(t.Space(5.5)).Gap(t.Space(2))
+	})
+}
+
+// disclosure draws the arrow of a disclosure as MyGo's Collapsible draws
+// its own: pointing right, turned by deg degrees clockwise.
+func disclosure(c *ui.Context, deg float32, ink ui.Color) {
+	ui.Box(c).Size(16, 16).Shrink(0).Draw(func(p *ui.Painter, r ui.Rect) {
+		cx, cy, d := r.X+r.W/2, r.Y+r.H/2, r.W/8
+		sin, cos := math.Sincos(float64(deg) * math.Pi / 180)
+		at := func(x, y float32) (float32, float32) {
+			return cx + x*float32(cos) - y*float32(sin), cy + x*float32(sin) + y*float32(cos)
+		}
+		var path ui.Path
+		path.MoveTo(at(-d, -2*d)).LineTo(at(d, 0)).LineTo(at(-d, 2*d))
+		p.StrokePath(&path, 1.5, ink)
+	})
 }
 
 // venn draws the plays of each service as rings whose areas match,

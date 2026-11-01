@@ -398,6 +398,41 @@ func TestNewYouTubePlaylist(t *testing.T) {
 	}
 }
 
+// TestAddToYouTubePlaylistListsYours lists the user's playlists on YouTube
+// Music in a track's menu, for the track to go into one, and not those
+// they saved.
+func TestAddToYouTubePlaylistListsYours(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	s.loads["youtube:playlists"] = &loaded[[]media.Playlist]{done: true, value: []media.Playlist{
+		{ID: "yt:PLmine", Title: "Late night", Source: media.SourceYouTube, Editable: true},
+		{ID: "yt:PLtheirs", Title: "Chill", Source: media.SourceYouTube, Saved: true},
+	}}
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	open := func() {
+		t.Helper()
+		if err := tt.RightClick(testTracks[0].Title); err != nil {
+			t.Fatal(err)
+		}
+	}
+	open()
+	if err := tt.ChooseMenuItem("Add to YouTube Music playlist", "Chill"); err == nil {
+		t.Error("a playlist the user saved takes tracks")
+	}
+	tt.CloseMenu()
+	open()
+	if err := tt.ChooseMenuItem("Add to YouTube Music playlist", "No playlists of yours"); err == nil || !strings.Contains(err.Error(), "no item") {
+		t.Errorf("the submenu says the user has no playlists: %v", err)
+	}
+	tt.CloseMenu()
+	open()
+	if err := tt.ChooseMenuItem("Add to YouTube Music playlist", "Late night"); err != nil {
+		t.Errorf("%v: the menu holds %q", err, tt.Menu())
+	}
+}
+
 // TestSaveAsMix saves an album's tracks as a new mix, named after it to
 // start with.
 func TestSaveAsMix(t *testing.T) {

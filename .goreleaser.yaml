@@ -32,5 +32,7 @@ release:
   extra_files:
     - glob: ./release/*
 
-changelog:
-  disable: true
+# GoReleaser writes no changelog of its own: release.yml always passes the
+# notes it takes from CHANGELOG.md with --release-notes. Don't set
+# changelog.disable: it drops those notes too, and the release is
+# published with none, as v0.5.6 was.

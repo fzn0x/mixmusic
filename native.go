@@ -393,7 +393,7 @@ func (s *shell) followArtwork() {
 			s.restyle()
 		}
 		return
-	case !s.set.DynamicAccent && !s.lk.fx.wash && !s.lk.fx.cover, url == s.artURL:
+	case !s.set.DynamicAccent && !s.lk.fx.wash && !s.lk.fx.cover && !s.lk.fx.dynamic, url == s.artURL:
 		return
 	}
 	s.artURL = url

@@ -41,8 +41,10 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   library), and controls Spotify Connect devices.
 - **`internal/stream`** finds the audio of a YouTube video through YouTube's
   player API, asked signed out as YouTube's visionOS app (`Direct`), else
-  with yt-dlp, keeps it until its URL expires, and opens it for the audio
-  engine (`Proxy.Open`): chunked fetches from YouTube in the background, a
+  with yt-dlp: its Opus stream, else, of a video YouTube has only in AAC,
+  its AAC-LC one (itag 140), never HE-AAC (itag 139). It keeps the stream
+  until its URL expires, and opens it for the audio engine
+  (`Proxy.Open`): chunked fetches from YouTube in the background, a
   new URL when YouTube refuses the old one, a new connection, from the byte
   it reached, when a download gets no bytes for 15 seconds or its
   connection drops, and an on-disk cache of tracks played to their end.
@@ -56,13 +58,27 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/opus`** decodes Opus: a pure Go port of libopus 1.6.1's decoder
   (`celt`, `silk` and the range decoder `rangedec`), which decodes the test
   vectors of RFC 8251 as libopus does, bit for bit.
+- **`internal/mp4`** reads the audio of MP4 files, as YouTube serves its
+  AAC: the packets of the first audio track with their times, and the
+  codec delay of the edit list, from progressive files and fragmented
+  ones, seeking by the sample table, the `sidx` or the `moof` boxes.
+- **`internal/aac`** decodes AAC-LC, in mono or stereo, with all of its
+  tools: a pure Go decoder derived from SharpJaad, the C# port of JAAD,
+  under SharpJaad's MIT license, which decodes YouTube's AAC within about
+  136 dB of ffmpeg's decoder. **`internal/audio/resample`** converts it
+  from its rate, 44.1 kHz for YouTube, to the engine's 48 kHz, with a
+  polyphase filter of Kaiser-windowed sincs.
 - **`internal/audio`** is MixMusic's audio engine: two decks, each a
-  goroutine that reads a track with `internal/webm` and decodes it with
-  `internal/opus` into a ring the audio thread plays from, each turning a
+  goroutine that reads a track, Opus in WebM with `internal/webm` and
+  `internal/opus`, or AAC in MP4 with `internal/mp4`, `internal/aac` and
+  `internal/audio/resample`, as its first bytes tell, and decodes it into
+  a ring the audio thread plays from, at 48 kHz, each turning a
   track louder than -14 LKFS down to it, from the loudness its `Measured`
   source tells (Even loudness), and the preamp, equalizer, levelling
   compressor, volume and analyser of the web player MixMusic had, ported
   from Chromium's Web Audio, which they match sample for sample.
+  `MIXMUSIC_LIVE=1 go test ./internal/audio -run Live` plays songs of both
+  codecs as the app finds them on YouTube, against ffmpeg's decode.
   `internal/audio/output` plays it on the system's output, without cgo:
   through WASAPI on Windows, an Audio Queue on macOS, and PulseAudio,
   which PipeWire serves too, or ALSA on Linux. On Windows it also hears

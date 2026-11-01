@@ -72,7 +72,7 @@ type App struct {
 	spotify      *spotify.Client
 	tokens       tokenStore
 	lastfmStore  lastfmStore
-	youtubeStore youtubeStore
+	youtubeStore *youtubeStore
 	tools        *tools.Manager
 	resolver     *stream.Resolver
 	proxy        *stream.Proxy
@@ -178,7 +178,7 @@ func New(opts Options) (*App, error) {
 	a.resolver = stream.NewResolver(a.tools, filepath.Join(opts.CacheDir, "yt-dlp"))
 	a.cache = stream.NewCache(filepath.Join(opts.CacheDir, "audio"), 0)
 	a.proxy = stream.NewProxy(a.resolver)
-	a.youtubeStore = youtubeStore{dir: opts.DataDir}
+	a.youtubeStore = newYouTubeStore(opts.DataDir)
 	a.openYouTube()
 	a.proxy.Cache = a.cache
 	a.matcher = match.New(a.youtube, matches)

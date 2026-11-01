@@ -15,7 +15,9 @@ func TestSurroundButton(t *testing.T) {
 	s := newTestShell(t)
 	tt := tester(t, s)
 	s.p.PlayTracks(testTracks, 0)
-	s.settle(t, func(st player.State) bool { return st.Playing && st.Source != nil && st.Source.Track.ID == testTracks[0].ID })
+	s.settle(t, func(st player.State) bool {
+		return st.Playing && st.Source != nil && st.Source.Track.ID == testTracks[0].ID
+	})
 	tt.Frame()
 	if tt.HasText("5.1") {
 		t.Fatal("the 5.1 button shows for a track of no 5.1 audio")

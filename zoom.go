@@ -178,7 +178,7 @@ func (s *shell) zoomRow(c *ui.Context) {
 				}
 			}
 		}
-	})
+	}, "scale")
 }
 
 // useMenuBar gives macOS's menu bar the system's menus, but a View menu

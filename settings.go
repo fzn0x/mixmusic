@@ -309,7 +309,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			if ui.StepSlider(c.Key("font-scale"), &s.set.FontScale, 0.85, 1.3, 0.05).Width(200).Label("Text size").Changed() {
 				s.save()
 			}
-		})
+		}, "font")
 		s.row(c, "Density", "Compact fits more rows on the screen.", func() {
 			compact := 0
 			if s.set.Density == settings.DensityCompact {
@@ -322,12 +322,12 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 				}
 				s.save()
 			}
-		})
+		}, "comfortable spacing")
 		s.row(c, "Icons only in the sidebar", "The sidebar shows its pages as icons. It does in narrow windows too, until you unfold it there.", func() {
 			if s.switchOf(c.Key("collapsed"), &s.set.SidebarCollapsed).Label("Icons only in the sidebar").Changed() {
 				s.save()
 			}
-		})
+		}, "collapse")
 	})
 }
 
@@ -598,10 +598,12 @@ func (s *shell) playbackSettings(c *ui.Context) {
 		}
 		switch {
 		case !signedIn:
-			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).Children(func() {
-				ui.Text(c, "Sign in to Spotify in ")
-				s.linkOf(c, "accounts", "/settings/accounts")
-				ui.Text(c, " to play your Spotify library.")
+			s.found(c, "", "Sign in to Spotify in accounts to play your Spotify library.", func() {
+				ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).Children(func() {
+					ui.Text(c, "Sign in to Spotify in ")
+					s.linkOf(c, "accounts", "/settings/accounts")
+					ui.Text(c, " to play your Spotify library.")
+				})
 			})
 		case s.set.SpotifyPlayback == settings.SpotifyPlaybackHere && spotifyPlaysHere && !sp.Streaming:
 			busy := s.signingIn == "spotify"
@@ -609,15 +611,18 @@ func (s *shell) playbackSettings(c *ui.Context) {
 			if busy {
 				label = "waiting for the browser…"
 			}
-			s.alert(c, "Sign in to Spotify again", "You signed in before MixMusic played Spotify itself, which your sign-in doesn't allow yet. Until you sign in again, Spotify tracks play from YouTube Music.", func() {
-				if s.button(c, "spotify-again", label, true).Disabled(busy).Clicked() {
-					s.notes = append(s.notes, notice("Finish signing in in your browser"))
-					s.account("spotify", "Signed in to Spotify", func(ctx context.Context) error {
-						_, err := s.svc.Accounts.SpotifyLogin(ctx)
-						return err
-					})
-				}
-			}).Margin(12, 0)
+			const title, again = "Sign in to Spotify again", "You signed in before MixMusic played Spotify itself, which your sign-in doesn't allow yet. Until you sign in again, Spotify tracks play from YouTube Music."
+			s.found(c, title, again, func() {
+				s.alert(c, title, again, func() {
+					if s.button(c, "spotify-again", label, true).Disabled(busy).Clicked() {
+						s.notes = append(s.notes, notice("Finish signing in in your browser"))
+						s.account("spotify", "Signed in to Spotify", func(ctx context.Context) error {
+							_, err := s.svc.Accounts.SpotifyLogin(ctx)
+							return err
+						})
+					}
+				}).Margin(12, 0)
+			})
 		case s.set.SpotifyPlayback == settings.SpotifyPlaybackConnect:
 			s.deviceRow(c)
 		}
@@ -635,7 +640,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 				}
 				s.save()
 			}
-		})
+		}, "best bitrate")
 		desc := "Off: tracks follow each other."
 		if s.set.Crossfade > 0 {
 			desc = fmt.Sprintf("Tracks overlap by %d seconds.", s.set.Crossfade)
@@ -660,7 +665,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 			if s.switchOf(c.Key("normalize"), &s.set.Normalize).Label("Volume levelling").Changed() {
 				s.save()
 			}
-		})
+		}, "normalize loudness")
 		s.row(c, "Autoplay", "When the queue runs out, a radio of what you played carries on.", func() {
 			if s.switchOf(c.Key("autoplay"), &s.set.Autoplay).Label("Autoplay").Changed() {
 				s.save()
@@ -714,6 +719,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 				chosen = p.label
 			}
 		}
+		// A preset's name finds it, as "bass".
 		s.row(c, "Preset", "", func() {
 			if s.selectOf(c.Key("eq-preset"), &chosen, labels).Width(200).Label("Preset").Changed() {
 				i := slices.Index(labels, chosen)
@@ -724,39 +730,46 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 					s.save()
 				}
 			}
-		})
-		ui.Row(c).Gap(12).Padding(16, 0).Children(func() {
-			band := func(key, label string, v *float64) {
-				ui.Column(c).Gap(6).AlignItems(ui.Center).Children(func() {
-					ui.Text(c, fmt.Sprintf("%+.0f", *v)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
-					if s.bandSlider(c, key, label+" dB", v, -12, 12).Changed() {
-						if key != "eq-preamp" {
-							eq.Preset = "custom"
+		}, labels...)
+		s.found(c, "Bands", "The ten bands of the equalizer and its preamp, in dB: pre 32 64 125 250 500 1k 2k 4k 8k 16k Hz.", func() {
+			ui.Row(c).Gap(12).Padding(16, 0).Children(func() {
+				band := func(key, label string, v *float64) {
+					ui.Column(c).Gap(6).AlignItems(ui.Center).Children(func() {
+						ui.Text(c, fmt.Sprintf("%+.0f", *v)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
+						if s.bandSlider(c, key, label+" dB", v, -12, 12).Changed() {
+							if key != "eq-preamp" {
+								eq.Preset = "custom"
+							}
+							s.save()
 						}
-						s.save()
-					}
-					ui.Text(c, label).FontSize(k.captionSize()).TextColor(k.muted)
-				})
-			}
-			band("eq-preamp", "pre", &eq.Preamp)
-			for i := range eq.Gains {
-				hz := settings.Bands[i]
-				label := fmt.Sprint(hz)
-				if hz >= 1000 {
-					label = fmt.Sprintf("%dk", hz/1000)
+						ui.Text(c, label).FontSize(k.captionSize()).TextColor(k.muted)
+					})
 				}
-				band("eq-"+count(i), label, &eq.Gains[i])
-			}
+				band("eq-preamp", "pre", &eq.Preamp)
+				for i := range eq.Gains {
+					hz := settings.Bands[i]
+					label := fmt.Sprint(hz)
+					if hz >= 1000 {
+						label = fmt.Sprintf("%dk", hz/1000)
+					}
+					band("eq-"+count(i), label, &eq.Gains[i])
+				}
+			})
 		})
 		// Spotify's audio plays in Spotify's own player, which no app may
 		// change: only the system's equalizer reaches it.
-		ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
-			ui.Text(c, "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: ")
-			s.linkOf(c, "Spotify notes", spotifyEqualizer)
-			ui.Text(c, " that its audio settings can't change while another device plays it.")
+		s.found(c, "", spotifyEqualizerNote, func() {
+			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
+				ui.Text(c, "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: ")
+				s.linkOf(c, "Spotify notes", spotifyEqualizer)
+				ui.Text(c, " that its audio settings can't change while another device plays it.")
+			})
 		})
 	})
 }
+
+// spotifyEqualizerNote is what the equalizer's note on Spotify says.
+const spotifyEqualizerNote = "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: Spotify notes that its audio settings can't change while another device plays it."
 
 // spotifyEqualizer is Spotify's page on its equalizer, which says that its
 // audio settings can't change while Spotify Connect plays on another device.
@@ -811,26 +824,28 @@ func (s *shell) aboutSettings(c *ui.Context) {
 		s.row(c, "Version", version, func() {})
 		s.releaseRow(c, u)
 		// Its links go under it, as they are many.
-		ui.Column(c).Gap(4).Padding(14, 0).Children(func() {
-			ui.Text(c, "MixMusic").FontSize(k.bodySize())
-			ui.Text(c, "Spotify and YouTube Music in one player, open source under the MIT license or the GNU GPL, version 3. Your data lives in "+info.DataDir+".").
-				FontSize(k.smallSize()).TextColor(k.muted)
-			ui.Row(c).Gap(8).Wrap().Margin(12, 0, 0).Children(func() {
-				const repo = "https://github.com/fzn0x/mixmusic"
-				if s.button(c, "source", "source code", false).Clicked() {
-					go s.svc.System.OpenExternal(repo)
-				}
-				if s.button(c, "contribute", "contribute", false).Clicked() {
-					go s.svc.System.OpenExternal(repo + "/blob/main/CONTRIBUTING.md")
-				}
-				if s.button(c, "report", "report a problem", false).Clicked() {
-					go func() { _ = s.svc.System.OpenExternal(s.svc.System.ReportURL(context.Background())) }()
-				}
-				if s.button(c, "logs", "open logs folder", false).Clicked() {
-					if err := s.svc.System.OpenLogsFolder(); err != nil {
-						s.notes = append(s.notes, noticeOf(err))
+		about := "Spotify and YouTube Music in one player, open source under the MIT license or the GNU GPL, version 3. Your data lives in " + info.DataDir + "."
+		s.found(c, "MixMusic", about+" source code, contribute, report a problem, a bug, open logs folder", func() {
+			ui.Column(c).Gap(4).Padding(14, 0).Children(func() {
+				ui.Text(c, "MixMusic").FontSize(k.bodySize())
+				ui.Text(c, about).FontSize(k.smallSize()).TextColor(k.muted)
+				ui.Row(c).Gap(8).Wrap().Margin(12, 0, 0).Children(func() {
+					const repo = "https://github.com/fzn0x/mixmusic"
+					if s.button(c, "source", "source code", false).Clicked() {
+						go s.svc.System.OpenExternal(repo)
 					}
-				}
+					if s.button(c, "contribute", "contribute", false).Clicked() {
+						go s.svc.System.OpenExternal(repo + "/blob/main/CONTRIBUTING.md")
+					}
+					if s.button(c, "report", "report a problem", false).Clicked() {
+						go func() { _ = s.svc.System.OpenExternal(s.svc.System.ReportURL(context.Background())) }()
+					}
+					if s.button(c, "logs", "open logs folder", false).Clicked() {
+						if err := s.svc.System.OpenLogsFolder(); err != nil {
+							s.notes = append(s.notes, noticeOf(err))
+						}
+					}
+				})
 			})
 		})
 	})
@@ -838,22 +853,25 @@ func (s *shell) aboutSettings(c *ui.Context) {
 	s.group(c, "licenses", func() {
 		for i, n := range append(s.svc.System.Notices(), fontNotices()...) {
 			open := s.licenseOpen == i
-			s.row(c, n.Name, "", func() {
-				label := "show"
-				if open {
-					label = "hide"
-				}
-				if s.button(c, "license-"+count(i), label, false).Clicked() {
+			// A license's text shows with its row.
+			s.found(c, n.Name, "", func() {
+				s.row(c, n.Name, "", func() {
+					label := "show"
 					if open {
-						s.licenseOpen = -1
-					} else {
-						s.licenseOpen = i
+						label = "hide"
 					}
+					if s.button(c, "license-"+count(i), label, false).Clicked() {
+						if open {
+							s.licenseOpen = -1
+						} else {
+							s.licenseOpen = i
+						}
+					}
+				})
+				if open {
+					ui.Text(c, n.Text).FontSize(k.captionSize()).Font(monospace()).TextColor(k.muted).Padding(8, 0).Selectable()
 				}
 			})
-			if open {
-				ui.Text(c, n.Text).FontSize(k.captionSize()).Font(monospace()).TextColor(k.muted).Padding(8, 0).Selectable()
-			}
 		}
 	})
 }

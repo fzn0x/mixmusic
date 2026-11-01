@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/url"
+	"runtime"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
@@ -115,7 +116,7 @@ func (s *shell) found(c *ui.Context, title, text string, build func()) {
 
 // show builds a thing the search found: under its group's title, the
 // first, and over a hairline, the others, as the rows of a group divide.
-// What it builds shows whole.
+// What it builds shows whole, its parts divided as the group's rows are.
 func (s *shell) show(c *ui.Context, build func()) {
 	f := &s.find
 	if !f.on() || f.inside {
@@ -125,7 +126,7 @@ func (s *shell) show(c *ui.Context, build func()) {
 	s.findHead(c)
 	f.inGroup++
 	f.found++
-	item := ui.Column(c)
+	item := ui.Column(c).Dividers(1, s.lk.border)
 	if f.inGroup > 1 {
 		item.BorderWidth(1, 0, 0, 0).BorderColor(s.lk.border)
 	}
@@ -198,4 +199,18 @@ func (s *shell) findBox(c *ui.Context, tab, q string, current bool) {
 			s.router.Replace(settingsPath(tab, f.query))
 		}
 	})
+}
+
+// shortcutWords are the words the search of the settings finds a command's
+// shortcut by: as Settings shows it, and with Mod spelled as the key's
+// name, "ctrl+k", or "cmd+k" on macOS.
+func shortcutWords(keys string) string {
+	if keys == "" {
+		return ""
+	}
+	mod := "Ctrl+"
+	if runtime.GOOS == "darwin" {
+		mod = "Cmd+"
+	}
+	return shortcutLabel(keys) + " " + strings.ReplaceAll(keys, "Mod+", mod)
 }

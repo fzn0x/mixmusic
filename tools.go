@@ -99,7 +99,10 @@ func (s *shell) toolSettings(c *ui.Context) {
 	s.group(c, "tools", func() {
 		st := s.toolStatus()
 		if !st.done {
-			s.loading(c)
+			// The search of the settings finds the tools once known.
+			if !s.find.on() {
+				s.loading(c)
+			}
 			return
 		}
 		y, js := st.value.YTDLP, st.value.JSRuntime
@@ -141,7 +144,7 @@ func (s *shell) toolSettings(c *ui.Context) {
 					s.forget("tools")
 				}
 			}
-		})
+		}, "Deno Node.js Bun QuickJS")
 		s.row(c, "Own yt-dlp", "Use a yt-dlp of your own, such as your package manager's, instead.", func() {
 			in, _ := s.settingInput(c, "ytdlp-path", s.set.YTDLPPath, func(path string) {
 				s.set.YTDLPPath = path
@@ -149,7 +152,7 @@ func (s *shell) toolSettings(c *ui.Context) {
 				s.forget("tools")
 			})
 			in.Placeholder("path to yt-dlp").Width(260).Label("Own yt-dlp")
-		})
+		}, "path to yt-dlp")
 		_ = k
 	})
 }
@@ -208,7 +211,7 @@ func (s *shell) cacheSettings(c *ui.Context) {
 					s.save()
 				}
 			}
-		})
+		}, "storage disk")
 	})
 	_ = k
 }

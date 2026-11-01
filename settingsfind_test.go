@@ -3,10 +3,18 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"slices"
 	"testing"
 	"time"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/spotify"
+	"github.com/fzn0x/mixmusic/internal/tools"
+	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
 // typeKeys types text into the focused input a letter at a time, a frame
@@ -81,11 +89,22 @@ func TestSettingsFind(t *testing.T) {
 func TestSettingsFindMatches(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 6000)
+	// The palette's keys, as the user would type them.
+	palette := "ctrl+k"
+	if runtime.GOOS == "darwin" {
+		palette = "cmd+k"
+	}
 	for _, c := range []struct {
 		q         string
 		want, not []string
 	}{
-		{"equalizer", []string{"Equalizer", "Preset"}, []string{"Crossfade"}},
+		{"equalizer", []string{"Equalizer", "Preset", "pre dB", "Spotify notes"}, []string{"Crossfade"}},
+		{"bass", []string{"Preset"}, []string{"Crossfade", "pre dB"}},
+		{"preamp", []string{"Equalizer", "pre dB"}, []string{"Preset", "Crossfade"}},
+		{palette, []string{"Command palette"}, []string{"Like what plays"}},
+		{"normalize", []string{"Volume levelling"}, []string{"Crossfade"}},
+		{"startup", []string{"Start at login"}, []string{"Close to the tray"}},
+		{"version", []string{"Version", "This is the newest version"}, []string{"Crossfade"}},
 		{"desktop", []string{"Close to the tray", "Reset settings", "Start at login"}, []string{"Crossfade"}},
 		{"TRAY", []string{"Close to the tray"}, []string{"Media keys", "Crossfade"}},
 		{"aurora", []string{"Aurora", "Theme: Aurora"}, []string{"Mochi", "Crossfade"}},
@@ -197,5 +216,102 @@ func TestSettingsFindEverything(t *testing.T) {
 		if !tt.HasText("Hello 1.0.0") {
 			t.Errorf("searching %q doesn't find the plugin: %q", q, tt.Texts())
 		}
+	}
+}
+
+// paneTexts are the texts the settings at path show but those the home
+// page shows too: the rail's, the top bar's, the queue's and the player
+// bar's.
+func paneTexts(t *testing.T, s *shell, path string) []string {
+	t.Helper()
+	tt := testerOf(t, s, 1280, 9000)
+	show(s, tt, "/")
+	base := tt.Texts()
+	show(s, tt, path)
+	var out []string
+	for _, x := range tt.Texts() {
+		if i := slices.Index(base, x); i >= 0 {
+			base = slices.Delete(base, i, i+1)
+			continue
+		}
+		out = append(out, x)
+	}
+	return out
+}
+
+// TestSettingsFindNothingElse searches the settings for what nothing holds,
+// in every state of the accounts, the tools and the add-ons that shows
+// something more: nothing shows but the empty line, as every block of the
+// sections goes through the search. A block that doesn't shows here.
+func TestSettingsFindNothingElse(t *testing.T) {
+	for _, c := range []struct {
+		name string
+		set  func(s *shell)
+	}{
+		{"signed out", func(s *shell) {}},
+		{"refused", func(s *shell) {
+			s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{
+				Spotify: app.SpotifyAccount{SignedIn: true, Error: "refused"},
+				YouTube: app.YouTubeAccount{SignedIn: true, Error: "expired"},
+				Lastfm:  app.LastfmAccount{Connected: true, Expired: true, Name: "someone"},
+			}}
+		}},
+		{"signed in", func(s *shell) {
+			s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{
+				Spotify: app.SpotifyAccount{SignedIn: true},
+				YouTube: app.YouTubeAccount{SignedIn: true},
+				Lastfm:  app.LastfmAccount{Connected: true, Name: "someone"},
+			}}
+			s.loads["channels"] = &loaded[[]youtube.AccountChannel]{done: true, value: []youtube.AccountChannel{
+				{Name: "Me", Current: true}, {Name: "My band", PageID: "b"},
+			}}
+			s.set.SpotifyPlayback = settings.SpotifyPlaybackHere
+		}},
+		{"on spotify connect", func(s *shell) {
+			s.set.SpotifyPlayback, s.set.FollowSystem, s.set.DiscordPresence = settings.SpotifyPlaybackConnect, true, true
+			s.loads["devices"] = &loaded[[]spotify.Device]{done: true}
+			s.licenseOpen = 0
+		}},
+		{"looking for the tools", func(s *shell) { s.loads["tools"] = &loaded[tools.Status]{} }},
+		{"add-ons that didn't load", func(s *shell) {
+			for _, kind := range []string{"themes", "plugins"} {
+				if err := os.MkdirAll(filepath.Join(s.svc.System.Info().DataDir, "addons", kind, "broken"), 0o755); err != nil {
+					t.Fatal(err)
+				}
+			}
+			s.svc.Addons.Reload()
+			s.refresh()
+			if len(s.inv.Problems) != 2 {
+				t.Fatalf("the add-ons' problems are %+v", s.inv.Problems)
+			}
+		}},
+	} {
+		s := newTestShell(t)
+		c.set(s)
+		for _, x := range paneTexts(t, s, settingsPath("", "zzzz")) {
+			switch {
+			case x == "settings", x == "Search the settings", x == "zzzz", x == "No setting matches “zzzz”.", slices.Contains(settingsTabs, x):
+			default:
+				t.Errorf("%s, a search that found nothing shows %q", c.name, x)
+			}
+		}
+	}
+}
+
+// TestSettingsFindForms searches for a sign-in's button, which shows with
+// the fields it needs.
+func TestSettingsFindForms(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 6000)
+	show(s, tt, settingsPath("", "sign in"))
+	showsOnly(t, tt, "searching sign in", []string{"Client ID", "sign in to spotify", "sign in to youtube music"}, nil)
+	show(s, tt, settingsPath("", "connect"))
+	showsOnly(t, tt, "searching connect", []string{"API key", "Shared secret", "connect to last.fm"}, nil)
+
+	// The button reads the Client ID's draft, which its row made.
+	s.drafts["client-id"] = &draft{text: "0123456789abcdef0123456789abcdef"}
+	show(s, tt, settingsPath("", "redirect uri"))
+	if !tt.HasText("Client ID") || !tt.HasText("sign in to spotify") {
+		t.Errorf("searching redirect uri shows %q", tt.Texts())
 	}
 }

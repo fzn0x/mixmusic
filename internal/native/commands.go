@@ -193,14 +193,32 @@ func shortcutLabel(s string) string {
 // shortcuts run the commands whose shortcuts were pressed, but while the
 // user records one, whose keys are the shortcut's instead.
 func (s *shell) runShortcuts(c *ui.Context) {
+	s.plainKeys = s.plainKeys[:0]
 	if s.recording != "" {
 		return
 	}
 	for _, cmd := range s.commands() {
-		if mods, key, ok := parseShortcut(s.shortcutOf(cmd)); ok && c.Shortcut(mods, key) {
+		mods, key, ok := parseShortcut(s.shortcutOf(cmd))
+		if !ok {
+			continue
+		}
+		if c.Shortcut(mods, key) {
 			cmd.run()
 		}
+		// The keys a focused control takes, which pointerKeys leaves to
+		// the command while the control's focus shows no ring, as after
+		// a click.
+		if mods == 0 && (key == ui.KeySpace || key == ui.KeyEnter) {
+			s.plainKeys = append(s.plainKeys, plainKey{key, cmd.run})
+		}
 	}
+}
+
+// plainKey is a key without modifiers that runs a command, as Space plays
+// or pauses.
+type plainKey struct {
+	key ui.Key
+	run func()
 }
 
 // palette finds and runs commands, and goes to pages.

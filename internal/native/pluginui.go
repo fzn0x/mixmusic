@@ -227,7 +227,7 @@ func (s *shell) pluginNode(c *ui.Context, key string, v *plugins.View, n plugins
 		// plugin set last, which its onChange sets again.
 		on := n.On
 		ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
-			if ui.Switch(c.Key(key), &on).Label(n.Text).Changed() && n.Handler != 0 {
+			if s.switchOf(c.Key(key), &on).Label(n.Text).Changed() && n.Handler != 0 {
 				v.Toggle(n.Handler, on)
 			}
 			ui.Text(c, n.Text).FontSize(k.bodySize())
@@ -254,7 +254,7 @@ func (s *shell) pluginTile(c *ui.Context, key string, v *plugins.View, n plugins
 	if len(n.Tone) == 1 && n.Tone[0] >= '1' && n.Tone[0] <= '4' {
 		tone = int(n.Tone[0] - '1')
 	}
-	t := ui.ButtonBase(c.Key(key)).Size(172, 120).Padding(16).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
+	t := s.buttonBase(c.Key(key)).Size(172, 120).Padding(16).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 		Background(k.tile(tone)).Radius(k.radius).Label(n.Text).Cursor(ui.CursorPointer).Clip()
 	if t.Pressed() {
 		t.Scale(0.97, 0.97)

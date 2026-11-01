@@ -77,7 +77,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		if !res.value.SpotifySignedIn && s.searchScope != 2 {
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).Children(func() {
 				ui.Text(c, "Searching YouTube Music only. ")
-				ui.Link(c, "Sign in to Spotify", "/settings/accounts")
+				s.linkOf(c, "Sign in to Spotify", "/settings/accounts")
 				ui.Text(c, " to search it too.")
 			})
 		}
@@ -167,7 +167,7 @@ func (s *shell) recentSearches(c *ui.Context) {
 	})
 	ui.Row(c).Wrap().Gap(8).Children(func() {
 		for i, q := range searches {
-			chip := ui.ButtonBase(c.Key("recent-"+count(i))).Height(34).PaddingX(14).Border(2, k.outline).
+			chip := s.buttonBase(c.Key("recent-"+count(i))).Height(34).PaddingX(14).Border(2, k.outline).
 				Radius(k.radiusSm).Label(q).Cursor(ui.CursorPointer)
 			if chip.Hovered() {
 				chip.Background(k.hover)
@@ -179,7 +179,7 @@ func (s *shell) recentSearches(c *ui.Context) {
 			chip.Children(func() { ui.Text(c, q).FontSize(k.smallSize()).SingleLine() })
 		}
 	})
-	clear := ui.ButtonBase(c.Key("clear-searches")).Margin(16, 0, 0).AlignSelf(ui.Start).Label("Clear the recent searches").Cursor(ui.CursorPointer)
+	clear := s.buttonBase(c.Key("clear-searches")).Margin(16, 0, 0).AlignSelf(ui.Start).Label("Clear the recent searches").Cursor(ui.CursorPointer)
 	if clear.Clicked() {
 		if err := s.svc.Collection.ClearSearches(); err != nil {
 			s.notes = append(s.notes, noticeOf(err))

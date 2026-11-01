@@ -85,7 +85,7 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 		labels := slices.Clone(trackSortLabels)
 		labels[0] = strings.ToUpper(noun[:1]) + noun[1:] + " order"
 		chosen := labels[max(slices.Index(trackSorts, tool.sort), 0)]
-		if ui.Select(c.Key(key+"-sort"), &chosen, labels).Width(180).Label("Sort by").Changed() {
+		if s.selectOf(c.Key(key+"-sort"), &chosen, labels).Width(180).Label("Sort by").Changed() {
 			if i := slices.Index(labels, chosen); i >= 0 {
 				tool.sort = trackSorts[i]
 			}

@@ -20,9 +20,9 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
-// TestSettingsViewed shows every section of the settings, in both of the
-// ways the themes go, and in each way Spotify plays: showing them changes
-// nothing.
+// TestSettingsViewed shows every section of the settings, and searched, in
+// both of the ways the themes go, and in each way Spotify plays: showing
+// them changes nothing.
 func TestSettingsViewed(t *testing.T) {
 	s := newTestShell(t)
 	tt := tester(t, s)
@@ -36,10 +36,12 @@ func TestSettingsViewed(t *testing.T) {
 			s.refresh()
 			before, _ := json.Marshal(s.svc.Preferences.Get())
 			for _, tab := range settingsTabs {
-				s.navigate("/settings/" + tab)
-				s.drain()
-				tt.Frame()
-				tt.Advance(time.Second)
+				for _, q := range []string{"", "a"} {
+					s.navigate(settingsPath(tab, q))
+					s.drain()
+					tt.Frame()
+					tt.Advance(time.Second)
+				}
 			}
 			if after, _ := json.Marshal(s.svc.Preferences.Get()); string(after) != string(before) {
 				t.Errorf("showing the settings changed them, following the computer %v, Spotify %s:\n%s\n%s", follow, mode, before, after)

@@ -93,6 +93,13 @@ func BenchmarkScroll(b *testing.B) {
 		show(s, tt, "/settings/appearance")
 		scrollFrames(b, tt)
 	})
+	// Searched for what most settings hold, every section builds.
+	b.Run("settings-find", func(b *testing.B) {
+		s := newTestShell(b)
+		tt := testerOf(b, s, 1280, 820)
+		show(s, tt, settingsPath("playback", "a"))
+		scrollFrames(b, tt)
+	})
 }
 
 // TestFarRowsBuildNothing scrolls a long list: the rows in view show their

@@ -407,7 +407,9 @@ func marshal(v any) ([]byte, error) {
 	return append(data, '\n'), nil
 }
 
-// WriteFile writes data to path atomically, creating its directory.
+// WriteFile writes data to path atomically, creating its directory. On
+// Windows, it waits a moment for a program that has the file open, such as
+// an editor, to close it.
 func WriteFile(path string, data []byte) error {
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
@@ -429,5 +431,5 @@ func WriteFile(path string, data []byte) error {
 	if err := tmp.Close(); err != nil {
 		return err
 	}
-	return os.Rename(tmp.Name(), path)
+	return rename(tmp.Name(), path)
 }

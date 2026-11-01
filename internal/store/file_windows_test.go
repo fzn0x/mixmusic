@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"syscall"
 	"testing"
+	"time"
 	"unsafe"
 )
 
@@ -110,5 +111,68 @@ func TestReadFile(t *testing.T) {
 	}
 	if _, err := ReadFile(dir); err == nil {
 		t.Error("a folder read as a file")
+	}
+}
+
+// TestWriteWaitsForAnEditor saves settings.json while another program has
+// it open without sharing deletes, for a moment: the save goes through
+// once it closes it.
+func TestWriteWaitsForAnEditor(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "settings.json")
+	writeText(t, path, `{"theme": "mix"}`)
+	held, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// What MixMusic's write did before: it fails while the file is open.
+	other := filepath.Join(dir, "other.tmp")
+	writeText(t, other, "{}")
+	if err := os.Rename(other, path); err == nil {
+		held.Close()
+		t.Skip("os.Open shares deletes here: a save never waits")
+	} else if !busy(err) {
+		t.Fatalf("replacing an open file: %v, want a sharing error", err)
+	}
+	closed := make(chan struct{})
+	go func() {
+		time.Sleep(40 * time.Millisecond)
+		held.Close()
+		close(closed)
+	}()
+	if err := WriteFile(path, []byte(`{"theme": "aurora"}`)); err != nil {
+		t.Fatalf("WriteFile while the file was open a moment: %v", err)
+	}
+	<-closed
+	if got := readText(t, path); got != `{"theme": "aurora"}` {
+		t.Errorf("the file holds %q", got)
+	}
+}
+
+// TestWriteGivesUp saves while another program keeps the file open: the
+// save fails after a moment, and leaves no temporary file.
+func TestWriteGivesUp(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "settings.json")
+	writeText(t, path, `{"theme": "mix"}`)
+	held, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer held.Close()
+	start := time.Now()
+	err = WriteFile(path, []byte(`{"theme": "aurora"}`))
+	if err == nil {
+		t.Skip("os.Open shares deletes here: a save never waits")
+	}
+	if !busy(err) {
+		t.Errorf("WriteFile = %v, want a sharing error", err)
+	}
+	if took := time.Since(start); took < 80*time.Millisecond || took > 2*time.Second {
+		t.Errorf("WriteFile gave up after %v, want about 100 ms", took)
+	}
+	entries, _ := os.ReadDir(dir)
+	if len(entries) != 1 {
+		t.Errorf("the folder holds %d files, want settings.json alone", len(entries))
 	}
 }

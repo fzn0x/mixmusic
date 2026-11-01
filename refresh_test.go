@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"image/png"
 	"os"
 	"path/filepath"
 	"slices"
@@ -409,4 +410,33 @@ func TestSpotifyLikedStartsAgain(t *testing.T) {
 	if tt.HasText(testTracks[4].Title) || !tt.HasText(testTracks[5].Title) {
 		t.Errorf("another first page didn't start the list again: %q", tt.Texts())
 	}
+}
+
+// TestRenderRefresh draws the top bar's refresh button, idle, as a spinner
+// while a refresh is out, and the toast of one that failed, to
+// MIXMUSIC_RENDER, for a look.
+func TestRenderRefresh(t *testing.T) {
+	dir := os.Getenv("MIXMUSIC_RENDER")
+	if dir == "" {
+		t.Skip("MIXMUSIC_RENDER names no folder")
+	}
+	s := newTestShell(t)
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Source: media.SourceSpotify,
+		Artists: []media.Ref{{Name: "Massive Attack"}}, Year: "1998", Tracks: testTracks[:3]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	renderTo(t, s, tt, dir, "refresh-idle")
+	tt.Key(0, ui.KeyF5)
+	tt.Frame()
+	img := tt.Image()
+	f, err := os.Create(filepath.Join(dir, "refresh-busy.png"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if err := png.Encode(f, img); err != nil {
+		t.Fatal(err)
+	}
+	waitRefreshed(t, s, tt)
+	renderTo(t, s, tt, dir, "refresh-failed")
 }

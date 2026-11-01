@@ -57,7 +57,7 @@ type UpdateStatus struct {
 	Enabled bool `json:"enabled"`
 	// Kind is how this copy was installed, which decides the download of
 	// a release that replaces it: "installer", "portable", "app",
-	// "archive", "deb", "rpm", "appimage" or "development".
+	// "archive", "deb", "rpm", "appimage", "flatpak" or "development".
 	Kind string `json:"kind"`
 	// AutomaticChecks looks for a new version at start and every few
 	// hours.
@@ -395,6 +395,8 @@ func releaseFile(kind, version, arch string) string {
 		return fmt.Sprintf("mixmusic-%s-linux-%s.rpm", version, arch)
 	case "appimage":
 		return fmt.Sprintf("mixmusic-%s-linux-%s.AppImage", version, arch)
+	case "flatpak":
+		return fmt.Sprintf("mixmusic-%s-linux-%s.flatpak", version, arch)
 	}
 	return ""
 }
@@ -418,9 +420,9 @@ func installKind() string {
 }
 
 // kindOf tells how a copy whose executable is in dir was installed on
-// goos: the Windows installer leaves its uninstaller beside it, and the
-// .deb and the .rpm put it in /opt/mixmusic, which dpkg keeps a list of
-// for the .deb.
+// goos: the Windows installer leaves its uninstaller beside it, a Flatpak
+// has /.flatpak-info at the root of its sandbox, and the .deb and the
+// .rpm put it in /opt/mixmusic, which dpkg keeps a list of for the .deb.
 func kindOf(goos, dir string, appImage bool, exists func(string) bool) string {
 	switch goos {
 	case "windows":
@@ -432,6 +434,8 @@ func kindOf(goos, dir string, appImage bool, exists func(string) bool) string {
 		return "app"
 	}
 	switch {
+	case exists("/.flatpak-info"):
+		return "flatpak"
 	case appImage:
 		return "appimage"
 	case dir == "/opt/mixmusic" && exists("/var/lib/dpkg/info/mixmusic.list"):

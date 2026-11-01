@@ -3,6 +3,10 @@ import pkg from "./package.json" with { type: "json" };
 
 export default defineConfig({
   name: "MixMusic",
+  // The slug names the update archives, the Windows installer and the disk
+  // image, which release.yml and .github/scripts/package.sh look for by
+  // name. It is MyGo's default for "MixMusic": pinned so it can't move.
+  slug: "mixmusic",
   identifier: "app.mixmusic.desktop",
   version: pkg.version,
   copyright: "© 2026 MixMusic contributors",

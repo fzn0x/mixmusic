@@ -44,10 +44,11 @@ var testCookies = []*http.Cookie{{Name: "SAPISID", Value: "x", Domain: ".youtube
 
 func loadCookies(t *testing.T, s *youtubeStore) []*http.Cookie {
 	t.Helper()
-	got, err := s.Load()
+	session, err := s.Load()
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
+	got := session.cookies
 	if len(got) != 1 || got[0].Name != "SAPISID" || got[0].Value != "x" {
 		t.Fatalf("loaded %v", got)
 	}
@@ -61,10 +62,10 @@ func TestYouTubeStore(t *testing.T) {
 	t.Run("store", func(t *testing.T) {
 		k := newKeeper()
 		s := testYouTube(t, k, fakeSealer{})
-		if err := s.Save(testCookies); err != nil {
+		if err := s.Save(youtubeSession{cookies: testCookies}); err != nil {
 			t.Fatal(err)
 		}
-		if err := s.Save(testCookies); err != nil {
+		if err := s.Save(youtubeSession{cookies: testCookies}); err != nil {
 			t.Fatal(err)
 		}
 		if len(k.kept[youtubeKeySecret]) != 32 || !exists(s.sealed()) || exists(s.plain()) {
@@ -78,7 +79,7 @@ func TestYouTubeStore(t *testing.T) {
 	})
 	t.Run("sealed key", func(t *testing.T) {
 		s := testYouTube(t, unavailableKeeper(), fakeSealer{})
-		if err := s.Save(testCookies); err != nil {
+		if err := s.Save(youtubeSession{cookies: testCookies}); err != nil {
 			t.Fatal(err)
 		}
 		if !exists(s.key.sealed) || !exists(s.sealed()) || exists(s.plain()) {
@@ -89,7 +90,7 @@ func TestYouTubeStore(t *testing.T) {
 	})
 	t.Run("no store", func(t *testing.T) {
 		s := testYouTube(t, unavailableKeeper(), nil)
-		if err := s.Save(testCookies); err != nil {
+		if err := s.Save(youtubeSession{cookies: testCookies}); err != nil {
 			t.Fatal(err)
 		}
 		if !exists(s.plain()) || exists(s.sealed()) {
@@ -116,10 +117,31 @@ func TestYouTubeStore(t *testing.T) {
 			loadCookies(t, s)
 		}
 	})
+	// The account the session uses stays beside its cookies; the first
+	// account's session is kept as its cookies alone, as before.
+	t.Run("account", func(t *testing.T) {
+		s := testYouTube(t, newKeeper(), nil)
+		if err := s.Save(youtubeSession{cookies: testCookies, authUser: 2}); err != nil {
+			t.Fatal(err)
+		}
+		s.cached = nil
+		if got, err := s.Load(); err != nil || got.authUser != 2 {
+			t.Fatalf("loaded the account %d, %v", got.authUser, err)
+		}
+		loadCookies(t, s)
+		s.Save(youtubeSession{cookies: testCookies})
+		data, err := s.load()
+		if err != nil || !bytes.HasPrefix(data, []byte(`[{"name":"SAPISID"`)) {
+			t.Errorf("the first account's session is kept as %s, %v", data, err)
+		}
+		if got := loadCookies(t, s); got[0].Domain != ".youtube.com" {
+			t.Errorf("loaded %+v", got[0])
+		}
+	})
 	t.Run("clear", func(t *testing.T) {
 		k := newKeeper()
 		s := testYouTube(t, k, fakeSealer{})
-		if err := s.Save(testCookies); err != nil {
+		if err := s.Save(youtubeSession{cookies: testCookies}); err != nil {
 			t.Fatal(err)
 		}
 		if err := s.Clear(); err != nil {

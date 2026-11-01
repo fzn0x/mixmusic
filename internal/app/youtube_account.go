@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bytes"
 	"context"
 	"crypto/aes"
 	"crypto/cipher"
@@ -65,22 +66,43 @@ func newYouTubeStore(dir string) *youtubeStore {
 func (s *youtubeStore) sealed() string { return filepath.Join(s.dir, "youtube-session.bin") }
 func (s *youtubeStore) plain() string  { return filepath.Join(s.dir, "youtube-session.json") }
 
-func (s *youtubeStore) Load() ([]*http.Cookie, error) {
+// youtubeSession is the YouTube session as kept: its cookies, and the
+// Google account of the session MixMusic uses, by its index among those
+// the session is signed in to (Client.SetAuthUser).
+type youtubeSession struct {
+	cookies  []*http.Cookie
+	authUser int
+}
+
+// sessionFile is a youtubeSession on disk. The session of the first
+// account is kept as its cookies alone, as MixMusic kept every session
+// before it could use another account, and still reads it.
+type sessionFile struct {
+	Cookies  []youtubeCookie `json:"cookies"`
+	AuthUser int             `json:"authUser,omitempty"`
+}
+
+func (s *youtubeStore) Load() (youtubeSession, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	data, err := s.load()
 	if err != nil {
-		return nil, err
+		return youtubeSession{}, err
 	}
-	var kept []youtubeCookie
-	if err := json.Unmarshal(data, &kept); err != nil {
-		return nil, err
+	var kept sessionFile
+	if trimmed := bytes.TrimSpace(data); len(trimmed) > 0 && trimmed[0] == '[' {
+		err = json.Unmarshal(data, &kept.Cookies)
+	} else {
+		err = json.Unmarshal(data, &kept)
 	}
-	cookies := make([]*http.Cookie, len(kept))
-	for i, k := range kept {
+	if err != nil {
+		return youtubeSession{}, err
+	}
+	cookies := make([]*http.Cookie, len(kept.Cookies))
+	for i, k := range kept.Cookies {
 		cookies[i] = &http.Cookie{Name: k.Name, Value: k.Value, Domain: k.Domain, Path: k.Path, Expires: k.Expires, Secure: k.Secure, HttpOnly: k.HTTPOnly}
 	}
-	return cookies, nil
+	return youtubeSession{cookies: cookies, authUser: max(kept.AuthUser, 0)}, nil
 }
 
 // load reads the cookies' JSON: from youtube-session.bin, or from the plain
@@ -118,12 +140,18 @@ func (s *youtubeStore) load() ([]byte, error) {
 	return data, nil
 }
 
-func (s *youtubeStore) Save(cookies []*http.Cookie) error {
-	kept := make([]youtubeCookie, len(cookies))
-	for i, c := range cookies {
-		kept[i] = youtubeCookie{Name: c.Name, Value: c.Value, Domain: c.Domain, Path: c.Path, Expires: c.Expires, Secure: c.Secure, HTTPOnly: c.HttpOnly}
+func (s *youtubeStore) Save(session youtubeSession) error {
+	kept := sessionFile{Cookies: make([]youtubeCookie, len(session.cookies)), AuthUser: session.authUser}
+	for i, c := range session.cookies {
+		kept.Cookies[i] = youtubeCookie{Name: c.Name, Value: c.Value, Domain: c.Domain, Path: c.Path, Expires: c.Expires, Secure: c.Secure, HTTPOnly: c.HttpOnly}
 	}
-	data, err := json.Marshal(kept)
+	var data []byte
+	var err error
+	if kept.AuthUser > 0 {
+		data, err = json.Marshal(kept)
+	} else {
+		data, err = json.Marshal(kept.Cookies)
+	}
 	if err != nil {
 		return err
 	}
@@ -219,8 +247,9 @@ func (a *App) openYouTube() {
 	// Version 0.2.0 gave yt-dlp the session in this file. Streams are
 	// found signed out now, so the copy goes.
 	os.Remove(filepath.Join(a.opts.CacheDir, "youtube-cookies.txt"))
+	// The account the session uses stays with the cookies YouTube changes.
 	a.youtube.OnCookies = func(cookies []*http.Cookie) {
-		if err := a.youtubeStore.Save(cookies); err != nil {
+		if err := a.youtubeStore.Save(youtubeSession{cookies, a.youtube.AuthUser()}); err != nil {
 			log.Printf("mixmusic: keeping the YouTube session: %v", err)
 		}
 	}
@@ -232,11 +261,12 @@ func (a *App) openYouTube() {
 		a.mu.Unlock()
 		notify()
 	}
-	cookies, err := a.youtubeStore.Load()
-	if err != nil || len(cookies) == 0 {
+	session, err := a.youtubeStore.Load()
+	if err != nil || len(session.cookies) == 0 {
 		return
 	}
-	a.youtube.SetCookies(cookies)
+	a.youtube.SetCookies(session.cookies)
+	a.youtube.SetAuthUser(session.authUser)
 	a.youtube.SetChannel(a.settings.Get().YouTubeChannel)
 }
 
@@ -282,7 +312,7 @@ func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
 		if !strings.HasPrefix(url, "https://music.youtube.com") {
 			return
 		}
-		cookies, err := youtubeSession()
+		cookies, err := windowSession()
 		if err == nil && len(cookies) > 0 {
 			select {
 			case done <- cookies:
@@ -315,7 +345,7 @@ func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
 		s.a.youtube.SetCookies(nil)
 		return AccountsStatus{}, fmt.Errorf("YouTube Music did not accept the sign-in: %w", err)
 	}
-	if err := s.a.youtubeStore.Save(cookies); err != nil {
+	if err := s.a.youtubeStore.Save(youtubeSession{cookies: cookies}); err != nil {
 		return AccountsStatus{}, err
 	}
 	status := s.a.accountsStatus(ctx)
@@ -323,9 +353,9 @@ func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
 	return status, nil
 }
 
-// youtubeSession returns the cookies a request to YouTube Music sends, when
-// they hold a signed-in session.
-func youtubeSession() ([]*http.Cookie, error) {
+// windowSession returns the cookies of the sign-in window that a request to
+// YouTube Music sends, when they hold a signed-in session.
+func windowSession() ([]*http.Cookie, error) {
 	list, err := mygo.Cookies.List(mygo.CookieFilter{URL: "https://music.youtube.com/"})
 	if err != nil {
 		return nil, err

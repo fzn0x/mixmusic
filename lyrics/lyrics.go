@@ -52,6 +52,9 @@ type Lyrics struct {
 	// licence asks apps to credit them with it, as Unison's does; "" for
 	// the others.
 	SourceURL string `json:"sourceUrl,omitempty"`
+	// Language is the language of the lyrics, a code of ISO 639-1 as "ja",
+	// when their source tells it or GuessLanguage could; "" when unknown.
+	Language string `json:"language,omitempty"`
 }
 
 // Plain makes lyrics of text without times.

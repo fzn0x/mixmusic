@@ -42,13 +42,16 @@ type unisonAnswer struct {
 		Lyrics string `json:"lyrics"`
 		// Format is "ttml", "lrc" or "plain".
 		Format string `json:"format"`
+		// Language is the lyrics' language, as "ja".
+		Language string `json:"language"`
 	} `json:"data"`
 }
 
 // Get returns Unison's lyrics of a track: by its video ID when the query
 // has one, else by its title, artist, album and duration, which Unison
-// matches within two seconds. Their Source is "Unison", and their
-// SourceURL Unison's address, to credit them with.
+// matches within two seconds. Their Source is "Unison", their SourceURL
+// Unison's address, to credit them with, and their Language the one Unison
+// tells.
 //
 // A track Unison has no lyrics of is ErrNotFound; Unison down, out of
 // reach or slower than a few seconds is ErrUnavailable.
@@ -101,6 +104,7 @@ func (u *Unison) Get(ctx context.Context, t Query) (Lyrics, error) {
 		return Lyrics{}, ErrNotFound
 	}
 	l.Source, l.SourceURL = "Unison", UnisonURL
+	l.Language = strings.TrimSpace(ans.Data.Language)
 	return l, nil
 }
 

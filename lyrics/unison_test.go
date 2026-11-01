@@ -48,6 +48,9 @@ func TestUnisonByVideo(t *testing.T) {
 	if l.Source != "Unison" || l.SourceURL != "https://unison.boidu.dev" {
 		t.Errorf("credit = %q, %q", l.Source, l.SourceURL)
 	}
+	if l.Language != "en" {
+		t.Errorf("language = %q", l.Language)
+	}
 }
 
 // TestUnisonBySong looks a track without a video ID up by its title,

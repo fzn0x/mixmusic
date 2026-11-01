@@ -47,6 +47,11 @@ func (s *shell) translateTarget() string {
 	if s.set.LyricsTranslateTo != "" {
 		return s.set.LyricsTranslateTo
 	}
+	return s.systemLanguage()
+}
+
+// systemLanguage is the system's language, asked for once.
+func (s *shell) systemLanguage() string {
 	ls := &s.lyricsView
 	if ls.system == "" {
 		ls.system = s.svc.System.Language()
@@ -224,10 +229,9 @@ func (s *shell) lyricsNote(c *ui.Context, text string) {
 func (s *shell) translateOptions() []string {
 	ls := &s.lyricsView
 	if ls.languages == nil {
-		s.translateTarget()
-		system := ls.system
+		system := s.systemLanguage()
 		for _, l := range translateLanguages {
-			if l.code == ls.system {
+			if l.code == system {
 				system = l.name
 			}
 		}

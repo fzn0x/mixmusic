@@ -157,6 +157,12 @@ func TestLyricsTranslationFails(t *testing.T) {
 // Playback, the system's by default.
 func TestTranslateTo(t *testing.T) {
 	s := newTestShell(t)
+	// Another language chosen, the system's still names the first choice.
+	s.set.LyricsTranslateTo = "ja"
+	if options := s.translateOptions(); options[0] != "System language (English)" {
+		t.Errorf("first option %q", options[0])
+	}
+	s.set.LyricsTranslateTo = ""
 	if got := s.translateTarget(); got != "en" {
 		t.Errorf("translate to %q by default", got)
 	}

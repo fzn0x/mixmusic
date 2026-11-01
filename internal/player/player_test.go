@@ -880,6 +880,14 @@ func TestQueue(t *testing.T) {
 	}
 }
 
+// sameSet reports whether a and b hold the same ids, in any order.
+func sameSet(a, b []string) bool {
+	a, b = slices.Clone(a), slices.Clone(b)
+	slices.Sort(a)
+	slices.Sort(b)
+	return slices.Equal(a, b)
+}
+
 func TestShuffle(t *testing.T) {
 	h := newHarness(t, Saved{})
 	ids := []string{"a", "b", "c", "d", "e", "f", "g", "h"}
@@ -894,9 +902,10 @@ func TestShuffle(t *testing.T) {
 	}
 	h.p.SetShuffle(true)
 	h.on(func(*Player) {})
+	// a and b haven't played: they are shuffled in after c.
 	got := order()
-	if !slices.Equal(got[:3], ids[:3]) || len(got) != len(ids) {
-		t.Errorf("shuffling moved what played: %v", got)
+	if got[0] != "c" || !sameSet(got[1:], []string{"a", "b", "d", "e", "f", "g", "h"}) {
+		t.Errorf("shuffled %v", got)
 	}
 	h.p.Enqueue(tracks("z"))
 	h.p.SetShuffle(false)

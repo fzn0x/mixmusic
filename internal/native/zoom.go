@@ -3,8 +3,10 @@ package native
 import (
 	"fmt"
 	"math"
+	"runtime"
 	"strings"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
@@ -179,3 +181,31 @@ func (s *shell) zoomRow(c *ui.Context) {
 	})
 }
 
+// useMenuBar gives macOS's menu bar the system's menus, but a View menu
+// whose zoom items zoom MixMusic. It leaves out Reload and Force Reload,
+// which do nothing in a window of native interface and took ⌘R from
+// Repeat. The items have no keys of their own, so that the zoom's keys
+// reach the window, where the user may change them, as elsewhere.
+func (s *shell) useMenuBar() {
+	if runtime.GOOS != "darwin" {
+		return
+	}
+	run := func(fn func()) func(*mygo.MenuItem, *mygo.Window) {
+		return func(*mygo.MenuItem, *mygo.Window) { s.update(fn) }
+	}
+	mygo.App.SetMenu(mygo.NewMenu([]*mygo.MenuItem{
+		{Role: mygo.RoleAppMenu},
+		{Role: mygo.RoleFileMenu},
+		{Role: mygo.RoleEditMenu},
+		{Label: "View", Submenu: []*mygo.MenuItem{
+			{Role: mygo.RoleToggleDevTools},
+			mygo.Separator(),
+			{Label: "Actual Size", Click: run(func() { s.setZoom(1) })},
+			{Label: "Zoom In", Click: run(func() { s.zoomBy(1) })},
+			{Label: "Zoom Out", Click: run(func() { s.zoomBy(-1) })},
+			mygo.Separator(),
+			{Role: mygo.RoleToggleFullScreen},
+		}},
+		{Role: mygo.RoleWindowMenu},
+	}))
+}

@@ -46,6 +46,7 @@ func Open(a *app.App, hidden bool) *mygo.Window {
 	}))
 	fitOnScreen(s.win)
 	s.start()
+	s.useMenuBar()
 	s.usePlugins()
 	s.offerCrashReport()
 	s.captureFromEnv()

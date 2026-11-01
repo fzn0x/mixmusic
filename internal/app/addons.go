@@ -38,9 +38,10 @@ type Addons struct{ a *App }
 func (s *Addons) List() addons.Inventory { return s.a.addons.List() }
 
 // Reload finds the add-ons again, after the user changed the add-ons
-// folder, and tells every window.
+// folder, reads the colour file again, and tells every window.
 func (s *Addons) Reload() addons.Inventory {
 	inv := s.a.addons.List()
+	s.a.rereadColorFile()
 	notify()
 	return inv
 }

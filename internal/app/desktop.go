@@ -50,6 +50,8 @@ func (a *App) Start() {
 	}
 	a.setupTray()
 	a.applyMediaKeys(a.settings.Get().MediaKeys)
+	// The colour file New read: from now on, as it changes.
+	a.followColorFile(a.settings.Get().Clean())
 	a.watchUpdates()
 	a.watchNetwork()
 	go a.keepYTDLPCurrent()

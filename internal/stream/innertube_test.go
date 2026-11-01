@@ -57,7 +57,10 @@ type fakeTube struct {
 	visitorStatus int
 	// media serves the streams: by default, the bytes asked for of a
 	// stream of the size its URL tells.
-	media         http.HandlerFunc
+	media http.HandlerFunc
+	// hls serves the HLS playlists of live streams, under /media/hls/: by
+	// default those of serveHLS.
+	hls           http.HandlerFunc
 	visitorAsks   int
 	visitorHeader http.Header
 	visitorBody   map[string]any
@@ -70,6 +73,7 @@ func newFakeTube(t *testing.T) *fakeTube {
 	f := &fakeTube{t: t}
 	f.answer = func(playerRequest) []byte { return f.recorded("") }
 	f.media = serveClen
+	f.hls = f.serveHLS
 	f.srv = httptest.NewServer(http.HandlerFunc(f.serve))
 	t.Cleanup(f.srv.Close)
 	return f
@@ -168,8 +172,40 @@ func (f *fakeTube) serve(w http.ResponseWriter, r *http.Request) {
 		f.mu.Unlock()
 		media(w, r)
 	default:
+		if strings.HasPrefix(r.URL.Path, "/media/hls/") {
+			f.mu.Lock()
+			hls := f.hls
+			f.mu.Unlock()
+			hls(w, r)
+			return
+		}
 		http.NotFound(w, r)
 	}
+}
+
+// serveHLS serves the playlists of the live stream of
+// visionos-player-live.json, as YouTube's media server does: its master
+// playlist, and a media playlist of each of its audio renditions, 233
+// and 234, whose URIs expire with the master's.
+func (f *fakeTube) serveHLS(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimPrefix(r.URL.Path, "/media/hls/")
+	switch {
+	case strings.HasPrefix(path, "hls_variant/") && strings.HasSuffix(path, "/master.m3u8"):
+		expire := strings.TrimSuffix(strings.TrimPrefix(path, "hls_variant/expire/"), "/master.m3u8")
+		fmt.Fprint(w, masterPlaylist(f.srv.URL+"/media/hls/hls_playlist/expire/"+expire))
+	case strings.HasPrefix(path, "hls_playlist/") && strings.HasSuffix(path, "/index.m3u8"):
+		fmt.Fprint(w, livePlaylist(f.srv.URL+"/media/hls/segments", 100, 5))
+	default:
+		http.NotFound(w, r)
+	}
+}
+
+// servesHLS has the media server answer for the playlists of live streams
+// with fn.
+func (f *fakeTube) servesHLS(fn http.HandlerFunc) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.hls = fn
 }
 
 // locked runs fn with what f keeps.
@@ -206,6 +242,102 @@ type offline struct{}
 
 func (offline) RoundTrip(*http.Request) (*http.Response, error) {
 	return nil, errors.New("no network")
+}
+
+// TestDirectLiveStream finds the stream of a live video: the HLS media
+// playlist of its audio of 234, or of 233 with data saver, of no loudness
+// YouTube measured, once the media server served it.
+func TestDirectLiveStream(t *testing.T) {
+	const liveID = "liveRadio01"
+	f := newFakeTube(t)
+	f.answersWith("-live")
+	var playlists []string
+	f.servesHLS(func(w http.ResponseWriter, r *http.Request) {
+		f.mu.Lock()
+		playlists = append(playlists, r.URL.Path)
+		f.mu.Unlock()
+		if r.Header.Get("User-Agent") != visionAgent {
+			t.Errorf("a playlist asked for as %q", r.Header.Get("User-Agent"))
+		}
+		f.serveHLS(w, r)
+	})
+	for q, itag := range map[Quality]string{QualityBest: "234", QualitySaver: "233"} {
+		s, err := f.direct().Stream(context.Background(), liveID, q)
+		if err != nil {
+			t.Fatalf("%s: %v", q, err)
+		}
+		var expires int64
+		f.locked(func() { expires = f.expires })
+		if !s.Live || !strings.HasSuffix(s.URL, "/expire/"+strconv.FormatInt(expires, 10)+"/itag/"+itag+"/index.m3u8") ||
+			s.Codec != "mp4a.40.2" || s.Size != 0 || s.Duration != 0 || s.Measured || s.Expires.Unix() != expires ||
+			s.Header.Get("User-Agent") != visionAgent {
+			t.Errorf("%s: stream %+v", q, s)
+		}
+	}
+	// The master playlist, then the media playlist of the stream, each time.
+	f.locked(func() {
+		if len(playlists) != 4 || !strings.HasSuffix(playlists[0], "/master.m3u8") || !strings.HasSuffix(playlists[1], "/index.m3u8") {
+			t.Errorf("playlists asked for: %q", playlists)
+		}
+	})
+
+	// A master playlist of 233 alone.
+	f.servesHLS(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/master.m3u8") {
+			fmt.Fprint(w, strings.ReplaceAll(masterPlaylist(f.srv.URL+"/media/hls/hls_playlist"), "234", "299"))
+			return
+		}
+		f.serveHLS(w, r)
+	})
+	if s, err := f.direct().Stream(context.Background(), liveID, QualityBest); err != nil || !strings.Contains(s.URL, "/itag/233/") {
+		t.Errorf("of 233 alone: %+v, %v", s, err)
+	}
+
+	// media answers for the media playlists, and the fake for the master.
+	media := func(f *fakeTube, media http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasSuffix(r.URL.Path, "/index.m3u8") {
+				media(w, r)
+				return
+			}
+			f.serveHLS(w, r)
+		}
+	}
+	for name, c := range map[string]struct {
+		answer func([]byte) []byte
+		hls    func(f *fakeTube) http.HandlerFunc
+		want   error
+	}{
+		"no master playlist": {answer: func(b []byte) []byte { return bytes.ReplaceAll(b, []byte(`"hlsManifestUrl"`), []byte(`"x"`)) },
+			want: errNoLiveStream},
+		"no audio renditions": {hls: func(*fakeTube) http.HandlerFunc {
+			return func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "#EXTM3U\n") }
+		}, want: errNoLiveStream},
+		"a refused master playlist": {hls: func(*fakeTube) http.HandlerFunc {
+			return func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusForbidden) }
+		}, want: errRefused},
+		"a refused media playlist": {hls: func(f *fakeTube) http.HandlerFunc {
+			return media(f, func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusForbidden) })
+		}, want: errRefused},
+		"a media playlist that isn't one": {hls: func(f *fakeTube) http.HandlerFunc {
+			return media(f, func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "<html>") })
+		}, want: errBadAnswer},
+	} {
+		f := newFakeTube(t)
+		f.answers(func(playerRequest) []byte {
+			b := f.recorded("-live")
+			if c.answer != nil {
+				b = c.answer(b)
+			}
+			return b
+		})
+		if c.hls != nil {
+			f.servesHLS(c.hls(f))
+		}
+		if s, err := f.direct().Stream(context.Background(), liveID, QualityBest); !errors.Is(err, c.want) {
+			t.Errorf("%s: %+v, %v; want %v", name, s, err, c.want)
+		}
+	}
 }
 
 func TestDirectStream(t *testing.T) {

@@ -41,13 +41,27 @@ const (
 // engine plays two channels, so a video's surround formats (AC-3 and
 // E-AC-3 in 5.1, or Opus or AAC of more channels) never come before them,
 // though the 5.1 ones are its best; a format whose channels yt-dlp doesn't
-// know passes. Any other audio comes last, which the engine then refuses,
-// naming its format.
+// know passes. A live video has the AAC-LC of formats 234 and 233 in HLS,
+// whose codec yt-dlp doesn't tell: data saver takes 233 before 234, as
+// liveFormats has it. Any other audio comes last, which the engine then
+// refuses, naming its format.
 var formats = map[Quality]string{
 	QualityBest: "bestaudio[acodec=opus][audio_channels<=?2][format_id!*=drc]/bestaudio[acodec=opus][audio_channels<=?2]/" +
-		"bestaudio[acodec=mp4a.40.2][audio_channels<=?2][format_id!*=drc]/bestaudio[acodec=mp4a.40.2][audio_channels<=?2]/bestaudio",
+		"bestaudio[acodec=mp4a.40.2][audio_channels<=?2][format_id!*=drc]/bestaudio[acodec=mp4a.40.2][audio_channels<=?2]/" +
+		"234/233/bestaudio",
 	QualitySaver: "worstaudio[acodec=opus][audio_channels<=?2][format_id!*=drc]/worstaudio[acodec=opus][audio_channels<=?2]/" +
-		"worstaudio[acodec=mp4a.40.2][audio_channels<=?2][format_id!*=drc]/worstaudio[acodec=mp4a.40.2][audio_channels<=?2]/worstaudio",
+		"worstaudio[acodec=mp4a.40.2][audio_channels<=?2][format_id!*=drc]/worstaudio[acodec=mp4a.40.2][audio_channels<=?2]/" +
+		"233/234/worstaudio",
+}
+
+// liveFormats are the itags of the audio of a live video, in the order
+// each quality takes them: AAC-LC at 44.1 kHz in stereo, of about 128
+// kbit/s (234), or, with data saver, at 22.05 kHz (233), which is HE-AAC,
+// whose AAC-LC core the engine plays. YouTube serves both in HLS, as
+// packed audio.
+var liveFormats = map[Quality][]string{
+	QualityBest:  {"234", "233"},
+	QualitySaver: {"233", "234"},
 }
 
 // resolveTimeout bounds one run of yt-dlp.
@@ -67,6 +81,8 @@ func ValidVideoID(id string) bool { return videoIDRe.MatchString(id) }
 
 // Stream is the audio stream of a video.
 type Stream struct {
+	// URL is the stream's: of its file, or of the HLS media playlist of a
+	// live stream.
 	URL      string
 	Header   http.Header
 	MimeType string
@@ -86,6 +102,10 @@ type Stream struct {
 	// it, and yt-dlp doesn't.
 	Loudness float64
 	Measured bool
+	// Live is set for the stream of a live video, as it goes on: the
+	// packed audio of the segments of an HLS media playlist, which has no
+	// size, nor a length.
+	Live bool
 }
 
 // slowResolve is how long finding a stream takes before the log tells.
@@ -192,6 +212,23 @@ func (r *Resolver) Fresh(videoID string) bool {
 	select {
 	case <-res.done:
 		return res.fresh()
+	default:
+		return false
+	}
+}
+
+// Live reports whether the resolver holds a stream of a video that is a
+// live one.
+func (r *Resolver) Live(videoID string) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	res := r.calls[videoID]
+	if res == nil {
+		return false
+	}
+	select {
+	case <-res.done:
+		return res.err == nil && res.stream.Live
 	default:
 		return false
 	}
@@ -350,6 +387,10 @@ type info struct {
 	Duration       float64           `json:"duration"`
 	Headers        map[string]string `json:"http_headers"`
 	AvailableAt    float64           `json:"available_at"` // Unix seconds
+	// LiveStatus is "is_live" for a live video, as it goes on, whose
+	// stream comes over Protocol "m3u8_native": an HLS media playlist.
+	LiveStatus string `json:"live_status"`
+	Protocol   string `json:"protocol"`
 }
 
 // parseInfo reads the stream of yt-dlp's -J output.
@@ -360,6 +401,17 @@ func parseInfo(out []byte) (Stream, error) {
 	}
 	if in.URL == "" {
 		return Stream{}, errors.New("yt-dlp found no audio stream")
+	}
+	if strings.HasPrefix(in.Protocol, "m3u8") {
+		// The engine plays HLS only as a live stream goes on.
+		if in.LiveStatus != "is_live" {
+			return Stream{}, errors.New("YouTube gave no audio for this track that MixMusic plays")
+		}
+		s := Stream{URL: in.URL, Header: http.Header{}, MimeType: "audio/aac", Codec: "mp4a.40.2", Expires: expiry(in.URL), Live: true}
+		for k, v := range in.Headers {
+			s.Header.Set(k, v)
+		}
+		return s, nil
 	}
 	s := Stream{
 		URL:      in.URL,
@@ -395,12 +447,19 @@ func mimeType(ext, codec string) string {
 	return "application/octet-stream"
 }
 
-// expiry reads when a googlevideo URL expires, from its expire parameter;
-// in six hours when it has none.
+// expiry reads when a googlevideo URL expires, from its expire parameter,
+// or, in the URL of an HLS playlist, its path's expire segment; in six
+// hours when it has neither.
 func expiry(raw string) time.Time {
 	if u, err := url.Parse(raw); err == nil {
 		if sec, err := strconv.ParseInt(u.Query().Get("expire"), 10, 64); err == nil {
 			return time.Unix(sec, 0)
+		}
+		if _, rest, ok := strings.Cut(u.Path, "/expire/"); ok {
+			v, _, _ := strings.Cut(rest, "/")
+			if sec, err := strconv.ParseInt(v, 10, 64); err == nil {
+				return time.Unix(sec, 0)
+			}
 		}
 	}
 	return time.Now().Add(6 * time.Hour)

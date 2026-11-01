@@ -255,3 +255,34 @@ func TestPlayButtonSkips(t *testing.T) {
 		return ok && cur.Track.ID == testTracks[0].ID && st.Playing
 	})
 }
+
+// TestUndoNotSkipping takes a dislike back without going back to the song,
+// which played on while the settings don't skip disliked songs.
+func TestUndoNotSkipping(t *testing.T) {
+	s := newTestShell(t)
+	st := s.svc.Preferences.Get()
+	st.SkipDisliked = false
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+	s.p.SettingsChanged(st)
+	s.p.PlayTracks(testTracks[:3], 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	tt := tester(t, s)
+	click(t, s, tt, "Dislike")
+	eventually(t, s, "the dislike", func() bool { return s.a.IsDisliked(testTracks[0].ID) })
+	if st := s.p.State(); st.Index != 0 {
+		t.Fatalf("not skipping, the dislike moved to %d", st.Index)
+	}
+	s.p.Next()
+	s.settle(t, func(st player.State) bool { return st.Index == 1 && st.Playing })
+	tt.Frame()
+	click(t, s, tt, "undo")
+	eventually(t, s, "the dislike taken back", func() bool { return !s.a.IsDisliked(testTracks[0].ID) })
+	s.p.Pause()
+	s.settle(t, func(st player.State) bool { return !st.Playing })
+	if st := s.p.State(); st.Index != 1 {
+		t.Errorf("undo went back to %d", st.Index)
+	}
+}

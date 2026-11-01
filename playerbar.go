@@ -174,7 +174,7 @@ func (s *shell) setDisliked(t media.Track, on bool) {
 	}
 	liked := s.a.IsLiked(t.ID)
 	back := func() {}
-	if cur, ok := s.st.Current(); ok && cur.Track.ID == t.ID {
+	if cur, ok := s.st.Current(); ok && cur.Track.ID == t.ID && s.set.SkipDisliked {
 		uid, at := cur.UID, s.st.Position
 		playing := s.st.Playing || s.st.Loading || s.st.Waiting && s.st.WillPlay
 		back = func() { s.p.Return(uid, at, playing) }

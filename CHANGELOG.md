@@ -34,6 +34,16 @@ All notable changes to MixMusic are documented here. The format follows
   Connections.
 - The Windows installer offers to close a running MixMusic before it
   upgrades it, and stops one that keeps running in the tray.
+- When the network drops, a song waits for it and plays on from where it
+  stopped once it's back, rather than MixMusic skipping songs until three
+  in a row failed. The player bar says that it waits for the network,
+  and the play button chooses whether the song plays then. Songs whose
+  audio MixMusic holds, in the offline cache or found shortly before,
+  still play meanwhile, and at the end of the queue the radio waits too
+  (#91).
+- MixMusic pauses as the computer goes to sleep, and stays paused when it
+  wakes, ready where it was; a Spotify Connect device elsewhere plays on
+  (#91).
 
 ### Fixed
 
@@ -72,6 +82,23 @@ All notable changes to MixMusic are documented here. The format follows
   and runs yt-dlp only for the tracks YouTube won't give it that way, such
   as those made for children. The next track is found a second into the
   one playing, so skipping ahead is quick too (#69).
+- A song whose audio stops arriving partway through, as when the
+  connection drops or is slow, loads again where it was up to three
+  times, waiting a little longer each time, rather than skipping to the
+  next song the second time it happens. The play button shows that it
+  loads meanwhile, a song paused stays paused, and the song has all its
+  tries again once it plays on for ten seconds, or when it plays again
+  with Repeat: one or Previous (#101).
+- When three songs in a row can't play, MixMusic stops again rather than
+  stepping through the rest of the queue (#101).
+- A song whose audio stops coming, as when the connection drops, connects
+  again after 15 seconds without a byte rather than two minutes, and
+  keeps trying for two minutes, playing on as soon as the network
+  answers. A slow connection no longer cuts off a long song's download
+  every two minutes (#100).
+- A song whose audio stops coming in its last second ends there, rather
+  than pausing to load that moment again, or showing an error for a song
+  that had all but finished, and Repeat: one plays it again (#94).
 
 ## [0.5.5] - 2026-10-28
 

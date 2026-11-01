@@ -289,13 +289,20 @@ func TestDeckFailures(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	mono, err := os.ReadFile(monoStream)
+	if err != nil {
+		t.Fatal(err)
+	}
 	for _, c := range []struct {
 		name string
 		data []byte
 		want error
 	}{
 		{"not WebM", []byte("hello, this is not a WebM file at all"), errUnsupported},
+		// About 1.5 s before its end: farther than endSlack.
 		{"cut short", b[:len(b)/2], errNetwork},
+		// A file that doesn't tell its duration has no end to be near.
+		{"cut short without a duration", mono[:len(mono)-300], errNetwork},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			open := func(ctx context.Context, url string, interrupted func() bool) (Source, error) {
@@ -321,6 +328,71 @@ func TestDeckFailures(t *testing.T) {
 			t.Errorf("failure %v, want %v", err, why)
 		}
 	})
+}
+
+// brokenSource is the bytes of a file up to n, past which it fails with
+// why, as a stream.Source whose download broke off does; at io.EOF when why
+// is nil, as a file cut short.
+type brokenSource struct {
+	*bytes.Reader
+	n   int64
+	why error
+}
+
+func (s *brokenSource) Read(p []byte) (int, error) {
+	pos, _ := s.Seek(0, io.SeekCurrent)
+	if pos >= s.n {
+		if s.why == nil {
+			return 0, io.EOF
+		}
+		return 0, s.why
+	}
+	return s.Reader.Read(p[:min(int64(len(p)), s.n-pos)])
+}
+
+func (*brokenSource) Wake()        {}
+func (*brokenSource) Close() error { return nil }
+
+// cutOpener opens a file whose last cut bytes never come.
+func cutOpener(t *testing.T, path string, cut int, why error) Opener {
+	t.Helper()
+	b, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return func(ctx context.Context, url string, interrupted func() bool) (Source, error) {
+		return &brokenSource{Reader: bytes.NewReader(b), n: int64(len(b) - cut), why: why}, nil
+	}
+}
+
+// TestDeckEndsAStreamCutInItsLastMoment ends a track whose stream breaks
+// off within endSlack of its end, as at its end: loading it again would
+// cost more than what is left.
+func TestDeckEndsAStreamCutInItsLastMoment(t *testing.T) {
+	want := reference(t, cuesFront)
+	for _, why := range []error{nil, errors.New("the network failed while loading the audio")} {
+		// The file's last 1000 bytes are its last 66.5 ms.
+		d := newDeck("x", 0, cutOpener(t, cuesFront, 1000, why), func() {})
+		defer d.close()
+		got := drain(t, d)
+		if err := d.failure(); err != nil {
+			t.Fatalf("%v: the deck failed: %v", why, err)
+		}
+		if lost := len(want)/2 - len(got)/2; lost <= 0 || int64(lost) > frames(endSlack) {
+			t.Errorf("%v: %d frames short of the end", why, lost)
+		}
+		for i := range got {
+			if got[i] != want[i] {
+				t.Fatalf("%v: frame %d differs", why, i/2)
+			}
+		}
+		// It waits at its end, as a track that ended does: a seek plays it
+		// again.
+		d.seek(0)
+		if again := drain(t, d); len(again) != len(got) || d.failure() != nil {
+			t.Errorf("%v: %d frames from the start again, want %d; %v", why, len(again)/2, len(got)/2, d.failure())
+		}
+	}
 }
 
 func TestParseOpusHead(t *testing.T) {

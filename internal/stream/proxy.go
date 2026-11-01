@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/http/httptrace"
 	"net/url"
 	"strconv"
 	"strings"
@@ -26,6 +27,20 @@ const maxFailures = 64
 // stream yt-dlp found, which takes a few seconds.
 const maxAvailableWait = 30 * time.Second
 
+const (
+	// stallTimeout is how long a request of a stream waits for YouTube
+	// without a byte once it went out: YouTube answers in a fraction of a
+	// second, and a connection the network dropped sends nothing until the
+	// system gives up on it, minutes later.
+	stallTimeout = 15 * time.Second
+	// reconnectTimeout is how long a download that stalled, or whose
+	// connection dropped, keeps connecting again before the proxy gives it
+	// up, the first wait being reconnectWait, doubled each time up to
+	// stallTimeout.
+	reconnectTimeout = 2 * time.Minute
+	reconnectWait    = time.Second
+)
+
 // Proxy serves the audio of YouTube videos at /yt/<video id>, fetching it
 // from YouTube in chunks. It answers range requests, so the audio element
 // that plays it can seek.
@@ -34,14 +49,44 @@ type Proxy struct {
 	HTTP     *http.Client
 	// Cache keeps the audio of tracks played to their end, if set.
 	Cache *Cache
+	// Seen, if set, is called when YouTube answers with audio, which tells
+	// that the network answers.
+	Seen func()
 
 	mu       sync.Mutex
 	failures map[string]string // why the last request of a video failed
+	// stall, reconnect and backoff are stallTimeout, reconnectTimeout and
+	// reconnectWait, unless a test shortens them.
+	stall, reconnect, backoff time.Duration
 }
 
-// NewProxy returns a proxy of the streams r resolves.
+// NewProxy returns a proxy of the streams r resolves. Its requests have no
+// overall deadline, which would cut off a slow download that still comes:
+// one that gets no bytes for stallTimeout connects again instead. Its
+// connections are its own, so that it can drop them after a stall.
 func NewProxy(r *Resolver) *Proxy {
-	return &Proxy{Resolver: r, HTTP: &http.Client{Timeout: 2 * time.Minute}}
+	client := &http.Client{}
+	if t, ok := http.DefaultTransport.(*http.Transport); ok {
+		client.Transport = t.Clone()
+	}
+	return &Proxy{Resolver: r, HTTP: client}
+}
+
+// timing returns how long a request waits without a byte, how long a
+// download that broke keeps connecting again, and the first wait before it
+// does.
+func (p *Proxy) timing() (stall, reconnect, backoff time.Duration) {
+	stall, reconnect, backoff = stallTimeout, reconnectTimeout, reconnectWait
+	if p.stall > 0 {
+		stall = p.stall
+	}
+	if p.reconnect > 0 {
+		reconnect = p.reconnect
+	}
+	if p.backoff > 0 {
+		backoff = p.backoff
+	}
+	return stall, reconnect, backoff
 }
 
 // Path returns the path the proxy serves a video's audio at.
@@ -120,23 +165,87 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	flusher, _ := w.(http.Flusher)
 	body := first
 	for off := start; off <= end; off += chunkSize {
-		if off > start {
-			if body, err = p.fetch(r.Context(), s, off, min(off+chunkSize-1, end)); err != nil {
-				p.fail(nil, videoID, err) // the response has started: all we can do is stop
-				return
-			}
+		// Once the response started, all a failure can do is stop it.
+		if !p.relay(r.Context(), out, videoID, s, off, min(off+chunkSize-1, end), body) {
+			return
 		}
-		_, err := io.Copy(out, body)
-		body.Close()
-		if err != nil {
-			return // the player went away, or YouTube did
-		}
+		body = nil
 		if flusher != nil {
 			flusher.Flush()
 		}
 	}
 	if capture != nil {
 		capture.Commit()
+	}
+}
+
+// relay copies bytes from to to of a stream to out, reading body first when
+// it is not nil. A download that stalls, or whose connection drops,
+// connects again from the byte it reached, after a wait that doubles each
+// time: the track waits meanwhile, and plays on as soon as the network
+// answers. It gives up once the download stayed broken for reconnect. It
+// returns whether all came, and tells why not, unless the player went
+// away.
+func (p *Proxy) relay(ctx context.Context, out io.Writer, videoID string, s Stream, from, to int64, body *stallingBody) bool {
+	stall, reconnect, backoff := p.timing()
+	wait := backoff
+	var broke time.Time // when the download broke, while it stays broken
+	for {
+		var err error
+		if body == nil {
+			body, err = p.fetch(ctx, s, from, to)
+		}
+		// lost is set when the network lost the download, rather than YouTube
+		// turning it down: the proxy connects again then.
+		lost := false
+		if err == nil {
+			n, cerr := io.Copy(out, body)
+			body.Close()
+			rerr := body.err
+			body = nil
+			from += n
+			if n > 0 && !broke.IsZero() {
+				log.Printf("mixmusic: the audio of %s comes again", videoID)
+				broke, wait = time.Time{}, backoff
+			}
+			switch {
+			case from > to:
+				return true
+			case rerr != nil:
+				err, lost = rerr, true
+			case cerr != nil:
+				return false // the player went away
+			default:
+				err, lost = io.ErrUnexpectedEOF, true // the answer ended early
+			}
+		} else {
+			var ue *url.Error
+			lost = errors.Is(err, errStalled) || errors.As(err, &ue)
+		}
+		switch {
+		case ctx.Err() != nil:
+			return false
+		case !lost:
+			p.fail(nil, videoID, err)
+			return false
+		case broke.IsZero():
+			broke = time.Now()
+			log.Printf("mixmusic: the audio of %s broke off at byte %d of %d: %v; connecting again", videoID, from, s.Size, loggable(err))
+		case time.Since(broke)+wait > reconnect:
+			p.fail(nil, videoID, errStalled)
+			return false
+		}
+		// The connections kept for reuse may have died with this one: the next
+		// request dials anew.
+		p.HTTP.CloseIdleConnections()
+		t := time.NewTimer(wait)
+		select {
+		case <-t.C:
+		case <-ctx.Done():
+			t.Stop()
+			return false
+		}
+		wait = min(2*wait, stall)
 	}
 }
 
@@ -196,15 +305,18 @@ func (p *Proxy) fail(w http.ResponseWriter, videoID string, err error) {
 	if errors.Is(err, context.Canceled) {
 		return
 	}
-	// A request's error quotes the stream URL, which carries the user's IP
-	// address: the log keeps what went wrong, without it.
-	logged := err
+	log.Printf("mixmusic: the audio of %s: %v", videoID, loggable(err))
+	p.setFailure(videoID, plainFailure(err))
+}
+
+// loggable returns err without the stream URL a request's error quotes,
+// which carries the user's IP address: what went wrong, for the log.
+func loggable(err error) error {
 	var ue *url.Error
 	if errors.As(err, &ue) {
-		logged = ue.Err
+		return ue.Err
 	}
-	log.Printf("mixmusic: the audio of %s: %v", videoID, logged)
-	p.setFailure(videoID, plainFailure(err))
+	return err
 }
 
 // plainFailure says in plain words why the audio of a video could not be
@@ -219,6 +331,8 @@ func plainFailure(err error) string {
 		return "YouTube is turning down requests from this network for now; try again in a while"
 	case errors.As(err, &status):
 		return fmt.Sprintf("YouTube answered HTTP %d for its audio", int(status))
+	case errors.Is(err, errStalled):
+		return "YouTube stopped sending the audio, as happens when the connection drops; check the connection and play the track again"
 	case errors.As(err, &ue):
 		return "MixMusic could not reach YouTube's audio servers, which a firewall, a VPN or a DNS filter may block"
 	}
@@ -235,10 +349,49 @@ type statusError int
 
 func (e statusError) Error() string { return fmt.Sprintf("stream: YouTube answered HTTP %d", int(e)) }
 
-// fetch requests bytes start to end of a stream.
-func (p *Proxy) fetch(ctx context.Context, s Stream, start, end int64) (io.ReadCloser, error) {
+// errStalled is returned when a request of a stream waited stallTimeout
+// for YouTube without a byte.
+var errStalled = errors.New("stream: YouTube stopped sending the audio")
+
+// stalled returns errStalled in place of err when ctx, a request's, was
+// canceled for a stall. Go's HTTP/1 client tells the cause itself; its
+// HTTP/2 client only that the request was canceled.
+func stalled(ctx context.Context, err error) error {
+	if errors.Is(context.Cause(ctx), errStalled) {
+		return errStalled
+	}
+	return err
+}
+
+// fetch requests bytes start to end of a stream. The request is given up
+// for a stall when an answer, a redirect's too, doesn't come within
+// stallTimeout of its request going out, and its body gives it up when a
+// read waits as long for bytes; connecting has the transport's own limits.
+func (p *Proxy) fetch(ctx context.Context, s Stream, start, end int64) (*stallingBody, error) {
+	stall, _, _ := p.timing()
+	ctx, cancel := context.WithCancelCause(ctx)
+	timer := time.AfterFunc(stall, func() { cancel(errStalled) })
+	timer.Stop()
+	// The transport tells when each request went out, and when its answer
+	// came, until Do returns.
+	var mu sync.Mutex
+	answered := false
+	waiting := func(on bool) {
+		mu.Lock()
+		defer mu.Unlock()
+		if on && !answered {
+			timer.Reset(stall)
+		} else {
+			timer.Stop()
+		}
+	}
+	ctx = httptrace.WithClientTrace(ctx, &httptrace.ClientTrace{
+		WroteRequest:         func(httptrace.WroteRequestInfo) { waiting(true) },
+		GotFirstResponseByte: func() { waiting(false) },
+	})
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL, nil)
 	if err != nil {
+		cancel(nil)
 		return nil, err
 	}
 	for k, v := range s.Header {
@@ -246,26 +399,75 @@ func (p *Proxy) fetch(ctx context.Context, s Stream, start, end int64) (io.ReadC
 	}
 	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", start, end))
 	res, err := p.HTTP.Do(req)
+	mu.Lock()
+	answered = true
+	timer.Stop()
+	mu.Unlock()
 	if err != nil {
+		err = stalled(ctx, err)
+		cancel(nil)
 		return nil, err
 	}
 	switch res.StatusCode {
 	case http.StatusPartialContent, http.StatusOK:
 		if res.StatusCode == http.StatusOK && start > 0 {
 			res.Body.Close()
+			cancel(nil)
 			return nil, errors.New("stream: YouTube ignored the range")
 		}
-		return res.Body, nil
+		if p.Seen != nil {
+			p.Seen()
+		}
+		return &stallingBody{body: res.Body, ctx: ctx, cancel: cancel, timer: timer, stall: stall}, nil
 	case http.StatusForbidden, http.StatusGone:
 		res.Body.Close()
+		cancel(nil)
 		return nil, errExpired
 	}
 	res.Body.Close()
+	cancel(nil)
 	return nil, statusError(res.StatusCode)
+}
+
+// stallingBody is the body of a stream request, which gives the request up
+// when a read waits stall for bytes. Only the wait for YouTube counts, not
+// the time its reader takes with what came.
+type stallingBody struct {
+	body   io.ReadCloser
+	ctx    context.Context
+	cancel context.CancelCauseFunc
+	timer  *time.Timer
+	stall  time.Duration
+	// err is why a read failed, other than at the end: a stall, or a
+	// connection that dropped.
+	err error
+}
+
+func (b *stallingBody) Read(p []byte) (int, error) {
+	b.timer.Reset(b.stall)
+	n, err := b.body.Read(p)
+	b.timer.Stop()
+	if err != nil && err != io.EOF {
+		err = stalled(b.ctx, err)
+		if b.err == nil {
+			b.err = err
+		}
+	}
+	return n, err
+}
+
+func (b *stallingBody) Close() error {
+	b.timer.Stop()
+	err := b.body.Close()
+	b.cancel(nil)
+	return err
 }
 
 // probeSize asks YouTube for the length of a stream yt-dlp did not know.
 func (p *Proxy) probeSize(ctx context.Context, s Stream) (int64, error) {
+	stall, _, _ := p.timing()
+	ctx, cancel := context.WithTimeoutCause(ctx, stall, errStalled)
+	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL, nil)
 	if err != nil {
 		return 0, err
@@ -276,7 +478,7 @@ func (p *Proxy) probeSize(ctx context.Context, s Stream) (int64, error) {
 	req.Header.Set("Range", "bytes=0-0")
 	res, err := p.HTTP.Do(req)
 	if err != nil {
-		return 0, err
+		return 0, stalled(ctx, err)
 	}
 	res.Body.Close()
 	_, total, ok := strings.Cut(res.Header.Get("Content-Range"), "/")

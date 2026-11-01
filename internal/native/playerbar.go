@@ -61,6 +61,9 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 					line += " · on Spotify"
 				}
 			}
+			if s.st.Waiting {
+				line += " · waiting for the network"
+			}
 			ui.Text(c, line).FontSize(k.smallSize()).TextColor(k.muted).SingleLine().MinWidth(0)
 		})
 		if next, ok := s.st.UpNext(); ok && next.Track.ID != t.ID && s.panel != "queue" {
@@ -129,15 +132,9 @@ func (s *shell) transport(c *ui.Context) {
 		if s.roundButton(c, "previous", "previous", "Previous", false, false).Clicked() {
 			s.p.Previous()
 		}
-		name, label := "play", "Play"
-		switch {
-		case s.st.Loading:
-			label = "Loading" // a track loading can't be paused
-		case s.st.Playing:
-			name, label = "pause", "Pause"
-		}
+		name, label := toggleOf(s.st)
 		main := s.roundButton(c, "toggle", name, label, true, s.st.Loading || !hasTrack && len(s.st.Queue) == 0)
-		if s.st.Buffering {
+		if pulses(s.st) {
 			main.Opacity(0.55 + 0.45*main.Loop("busy", 900*time.Millisecond, ui.EaseInOut))
 		}
 		if main.Clicked() {
@@ -159,6 +156,27 @@ func (s *shell) transport(c *ui.Context) {
 	})
 	_ = k
 }
+
+// toggleOf is the icon and the label of the play button, which tells
+// what it does: a track that loads can't be paused, and one that waits for
+// the network plays once it's back unless paused.
+func toggleOf(st player.State) (name, label string) {
+	switch {
+	case st.Waiting && st.WillPlay:
+		return "pause", "Pause, waiting for the network"
+	case st.Waiting:
+		return "play", "Play once the network is back"
+	case st.Loading:
+		return "play", "Loading"
+	case st.Playing:
+		return "pause", "Pause"
+	}
+	return "play", "Play"
+}
+
+// pulses reports whether the play button pulses: while the track buffers,
+// or waits for the network to play.
+func pulses(st player.State) bool { return st.Buffering || st.Waiting && st.WillPlay }
 
 // progress shows where the track is, and seeks once the user lets go.
 func (s *shell) progress(c *ui.Context) {

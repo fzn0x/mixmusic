@@ -38,6 +38,12 @@ jobs:
             echo "CHANGELOG.md has no \"## [$version] - <date>\" section" >&2
             exit 1
           fi
+          # The release notes come from CHANGELOG.md alone.
+          if ls changelog.d/*/*.md >/dev/null 2>&1; then
+            echo "changelog.d has entries CHANGELOG.md lacks: run go run ./tools/changelog" >&2
+            ls changelog.d/*/*.md >&2
+            exit 1
+          fi
 
   build:
     needs: check

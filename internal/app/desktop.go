@@ -51,6 +51,7 @@ func (a *App) Start() {
 	a.setupTray()
 	a.applyMediaKeys(a.settings.Get().MediaKeys)
 	a.watchUpdates()
+	a.watchNetwork()
 	go a.keepYTDLPCurrent()
 }
 

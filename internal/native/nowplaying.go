@@ -53,16 +53,14 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 							link.Children(func() { ui.Text(c, t.Album.Name).FontSize(k.smallSize()).TextColor(k.muted) })
 						}
 					}
+					if s.st.Waiting {
+						ui.Text(c, "·").FontSize(k.smallSize()).TextColor(k.muted)
+						ui.Text(c, "waiting for the network").FontSize(k.smallSize()).TextColor(k.muted)
+					}
 				})
 				s.progress(c)
 				ui.Row(c).Gap(12).Children(func() {
-					name, label := "play", "Play"
-					switch {
-					case s.st.Loading:
-						label = "Loading"
-					case s.st.Playing:
-						name, label = "pause", "Pause"
-					}
+					name, label := toggleOf(s.st)
 					if s.roundButton(c, "now-toggle", name, label, true, s.st.Loading).Clicked() {
 						s.p.Toggle()
 					}

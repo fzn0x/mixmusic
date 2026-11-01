@@ -188,6 +188,26 @@ func TestProxyTellsWhyItFailed(t *testing.T) {
 	}
 }
 
+// TestProxyTellsAudioCame calls Seen when YouTube answers with audio, and
+// not when it refuses it or can't be reached.
+func TestProxyTellsAudioCame(t *testing.T) {
+	var minGen atomic.Int32
+	srv, _ := upstream(t, 1000, &minGen)
+	p := testProxy(srv, 1000)
+	var seen atomic.Int32
+	p.Seen = func() { seen.Add(1) }
+	if rec := get(t, p, ""); rec.Code != 200 || seen.Load() != 1 {
+		t.Errorf("served: %d, seen %d times", rec.Code, seen.Load())
+	}
+	minGen.Store(100)
+	get(t, p, "")
+	srv.Close()
+	get(t, p, "")
+	if seen.Load() != 1 {
+		t.Errorf("seen %d times", seen.Load())
+	}
+}
+
 func TestProxyRejectsBadPaths(t *testing.T) {
 	p := NewProxy(NewResolver(nil, ""))
 	for _, path := range []string{"/yt/bad", "/other/" + testID, "/yt/"} {

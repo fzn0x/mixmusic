@@ -262,6 +262,90 @@ func TestRadioOfAnUploadWhenSearchesFail(t *testing.T) {
 	}
 }
 
+// withASong returns radio, a recorded radio of videos, with the first
+// track of songRadio, a song, put in fourth.
+func withASong(t *testing.T, radio, songRadio []byte) []byte {
+	t.Helper()
+	var r, s any
+	if err := json.Unmarshal(radio, &r); err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(songRadio, &s); err != nil {
+		t.Fatal(err)
+	}
+	panel := func(v any) map[string]any {
+		for _, k := range []any{"contents", "singleColumnMusicWatchNextResultsRenderer", "tabbedRenderer", "watchNextTabbedResultsRenderer", "tabs", 0, "tabRenderer", "content", "musicQueueRenderer", "content", "playlistPanelRenderer"} {
+			if i, ok := k.(int); ok {
+				v = v.([]any)[i]
+			} else {
+				v = v.(map[string]any)[k.(string)]
+			}
+		}
+		return v.(map[string]any)
+	}
+	items := panel(r)["contents"].([]any)
+	panel(r)["contents"] = slices.Insert(slices.Clone(items), 3, panel(s)["contents"].([]any)[0])
+	out, err := json.Marshal(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return out
+}
+
+// uploadWithASong is newFakeMusic, where the radio of driveThru suggests
+// the song of Instant Crush among its videos.
+func uploadWithASong(t *testing.T) *fakeMusic {
+	m := newFakeMusic(t)
+	upload := withASong(t, recorded(t, "next-video"), recorded(t, "next-song"))
+	radio := m.radio
+	m.radio = func(videoID string) []byte {
+		if videoID == "GPZ5fnYFI4Q" {
+			return upload
+		}
+		return radio(videoID)
+	}
+	return m
+}
+
+// TestRadioOfAnUploadWithASong: an upload whose radio suggests a song
+// among its videos carries on from the radio of that song, with no search
+// beyond its own, and Start radio queues that radio rather than one song.
+func TestRadioOfAnUploadWithASong(t *testing.T) {
+	m := uploadWithASong(t)
+	found, err := m.catalog(t).Radio(t.Context(), driveThru)
+	searches, radios := m.asked()
+	if err != nil || !slices.Equal(trackIDs(found), append([]string{instantCrushSong.ID}, songRadio...)) {
+		t.Errorf("found %v, %v", trackIDs(found), err)
+	}
+	if len(searches) != 1 || !slices.Equal(radios, []string{"GPZ5fnYFI4Q", "khnokW3Mw24"}) {
+		t.Errorf("searched %q, asked the radios of %v", searches, radios)
+	}
+	if got := trackIDs(player.RadioTracks(found, []media.Track{driveThru})); !slices.Equal(got, append([]string{instantCrushSong.ID}, songRadio[:3]...)) {
+		t.Errorf("Start radio queues %v", got)
+	}
+}
+
+// TestRadioOfAnUploadWithASongWhoseRadioFails: when the radio of that song
+// fails or is empty, the upload's own radio stands.
+func TestRadioOfAnUploadWithASongWhoseRadioFails(t *testing.T) {
+	for _, answer := range [][]byte{nil, nothing} {
+		m := uploadWithASong(t)
+		radio := m.radio
+		m.radio = func(videoID string) []byte {
+			if videoID == "khnokW3Mw24" {
+				return answer
+			}
+			return radio(videoID)
+		}
+		found, err := m.catalog(t).Radio(t.Context(), driveThru)
+		_, radios := m.asked()
+		want := []string{"yt:a5uQMwRMHcs", "yt:qFLhGq0060w", "yt:H5v3kku4y6Q", "yt:khnokW3Mw24", "yt:1G4isv_Fylg"}
+		if err != nil || !slices.Equal(trackIDs(found), want) || !slices.Equal(radios, []string{"GPZ5fnYFI4Q", "khnokW3Mw24"}) {
+			t.Errorf("song's radio %q: found %v, %v, asked the radios of %v", answer, trackIDs(found), err, radios)
+		}
+	}
+}
+
 // TestRadioQueuesSongs is what Autoplay and Start radio queue of those
 // radios: songs, without the upload the song's radio suggests beside
 // them, or the videos of a radio that has nothing else.

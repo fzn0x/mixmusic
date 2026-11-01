@@ -197,11 +197,12 @@ const relayTries = 3
 // tracks start the radio of their YouTube Music recording.
 //
 // YouTube Music makes the radio of a music video out of videos, so a video
-// starts the radio of its song, and an upload without a song, such as a
-// cover, the radio of the song of one of the first videos its own radio
-// suggests. When none of them has a song, or YouTube Music doesn't answer,
-// the video's own radio stands. The song of the video that plays is left
-// out, so that it isn't heard twice.
+// starts the radio of its song. An upload without a song, such as a
+// cover, starts the radio of the first song its own radio suggests, or
+// when it suggests none, of the song of one of its first videos. When
+// there is no such song, or YouTube Music doesn't answer, the video's own
+// radio stands. The song of the video that plays is left out, so that it
+// isn't heard twice.
 func (c *Catalog) Radio(ctx context.Context, track media.Track) ([]media.Track, error) {
 	seed, err := c.a.matcher.Match(ctx, track)
 	if err != nil {
@@ -218,8 +219,8 @@ func (c *Catalog) Radio(ctx context.Context, track media.Track) ([]media.Track, 
 			}
 		case errors.Is(err, match.ErrNoMatch):
 			tracks, err := c.radio(ctx, seed, skip)
-			if err != nil || slices.ContainsFunc(tracks, isSong) {
-				return tracks, err
+			if err != nil {
+				return nil, err
 			}
 			return c.relay(ctx, tracks, skip), nil
 		}
@@ -249,11 +250,19 @@ func (c *Catalog) radio(ctx context.Context, seed media.Track, skip []string) ([
 	return out, nil
 }
 
-// relay carries on from videos, the radio of an upload without a song:
-// it returns the radio of the song of one of its first videos, or videos
-// when none of them has a song or YouTube Music doesn't answer.
-func (c *Catalog) relay(ctx context.Context, videos []media.Track, skip []string) []media.Track {
-	for _, v := range videos[:min(len(videos), relayTries)] {
+// relay carries on from tracks, the radio of an upload without a song,
+// with a radio of songs: the radio of the first song in it, or when it
+// has none, of the song of one of its first videos. It returns tracks
+// when there is no such song, or that radio is empty, or YouTube Music
+// doesn't answer.
+func (c *Catalog) relay(ctx context.Context, tracks []media.Track, skip []string) []media.Track {
+	if i := slices.IndexFunc(tracks, isSong); i >= 0 {
+		if found, err := c.radio(ctx, tracks[i], skip); err == nil && len(found) > 0 {
+			return found
+		}
+		return tracks
+	}
+	for _, v := range tracks[:min(len(tracks), relayTries)] {
 		song, err := c.songOf(ctx, v)
 		if errors.Is(err, match.ErrNoMatch) {
 			continue
@@ -261,15 +270,15 @@ func (c *Catalog) relay(ctx context.Context, videos []media.Track, skip []string
 		if err != nil {
 			break // no more waits on a YouTube Music that doesn't answer
 		}
-		tracks, err := c.radio(ctx, song, skip)
+		found, err := c.radio(ctx, song, skip)
 		if err != nil {
 			break
 		}
-		if len(tracks) > 0 {
-			return tracks
+		if len(found) > 0 {
+			return found
 		}
 	}
-	return videos
+	return tracks
 }
 
 // songOf returns the song of a music video, as Matcher.Song finds it,

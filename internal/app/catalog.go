@@ -11,6 +11,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 	"github.com/fzn0x/mixmusic/lyrics"
@@ -185,8 +186,41 @@ func (a *App) playlist(ctx context.Context, id string) (media.Playlist, error) {
 }
 
 // Radio returns tracks like the one given, to play after it. Spotify
-// tracks start the radio of their YouTube Music recording.
+// tracks start the radio of their YouTube Music recording. While the
+// settings skip the songs the user disliked, the radio leaves them out.
 func (c *Catalog) Radio(ctx context.Context, track media.Track) ([]media.Track, error) {
+	tracks, err := c.radioOf(ctx, track)
+	if err != nil || !c.a.settings.Get().SkipDisliked {
+		return tracks, err
+	}
+	return withoutDisliked(tracks, c.a.library.Disliked()), nil
+}
+
+// withoutDisliked leaves out of tracks the songs of disliked: the same
+// uploads, and the other uploads of the same songs, which radios take for
+// one song.
+func withoutDisliked(tracks, disliked []media.Track) []media.Track {
+	if len(disliked) == 0 {
+		return tracks
+	}
+	ids := make(map[string]bool, len(disliked))
+	songs := make(map[string]bool, len(disliked))
+	for _, t := range disliked {
+		ids[t.ID] = true
+		songs[player.SongKey(t)] = true
+	}
+	out := make([]media.Track, 0, len(tracks))
+	for _, t := range tracks {
+		if !ids[t.ID] && !songs[player.SongKey(t)] {
+			out = append(out, t)
+		}
+	}
+	return out
+}
+
+// radioOf returns YouTube Music's radio of track, or of its recording
+// there.
+func (c *Catalog) radioOf(ctx context.Context, track media.Track) ([]media.Track, error) {
 	seed, err := c.a.matcher.Match(ctx, track)
 	if err != nil {
 		return nil, err

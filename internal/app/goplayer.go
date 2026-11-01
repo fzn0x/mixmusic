@@ -88,6 +88,10 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 	case CommandLike:
 		if cur, ok := p.State().Current(); ok {
 			liked := a.library.IsLiked(cur.Track.ID)
+			if !liked && a.library.IsDisliked(cur.Track.ID) {
+				// The like takes the dislike back.
+				p.Disliked(cur.Track.ID, false)
+			}
 			go func() {
 				if err := (&Collection{a}).SetLiked(context.Background(), cur.Track, !liked); err != nil {
 					log.Printf("mixmusic: liking %s: %v", cur.Track.ID, err)
@@ -278,6 +282,9 @@ func (a *App) Services() Services {
 
 // IsLiked reports whether a track is among the liked songs.
 func (a *App) IsLiked(id string) bool { return a.library.IsLiked(id) }
+
+// IsDisliked reports whether the user dislikes a track.
+func (a *App) IsDisliked(id string) bool { return a.library.IsDisliked(id) }
 
 // InstallYTDLP downloads the latest yt-dlp into the app's data, telling
 // progress how much came, for the native interface.

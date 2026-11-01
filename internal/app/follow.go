@@ -52,6 +52,19 @@ func (a *App) syncYouTubeLike(ctx context.Context, track media.Track, liked bool
 	}
 }
 
+// syncYouTubeDislike dislikes a YouTube Music track on YouTube Music too,
+// or takes the dislike back, when the user signed in. A Spotify track's
+// recording isn't disliked there: the match may be wrong.
+func (a *App) syncYouTubeDislike(ctx context.Context, track media.Track, disliked bool) {
+	if track.Source != media.SourceYouTube || !a.youtube.SignedIn() {
+		return
+	}
+	_, id, _ := media.ParseID(track.ID)
+	if err := a.youtube.SetDisliked(ctx, id, disliked); err != nil {
+		log.Printf("mixmusic: syncing a dislike with YouTube Music: %v", err)
+	}
+}
+
 // SetFollowing follows or unfollows an artist on its service: subscribes
 // on YouTube Music, follows on Spotify.
 func (c *Collection) SetFollowing(ctx context.Context, artistID string, on bool) error {

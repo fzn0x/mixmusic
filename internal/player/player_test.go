@@ -33,6 +33,7 @@ type fakeServices struct {
 	streamed  int
 	failure   string
 	radio     []media.Track
+	radioErr  error
 	played    []string
 	reports   []Now
 	volumes   []float64
@@ -85,7 +86,7 @@ func (f *fakeServices) RecordPlay(t media.Track) {
 func (f *fakeServices) Radio(context.Context, media.Track) ([]media.Track, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	return f.radio, nil
+	return f.radio, f.radioErr
 }
 
 func (f *fakeServices) Settings() settings.Settings {
@@ -322,11 +323,18 @@ type harness struct {
 
 func newHarness(t *testing.T, saved Saved, setup ...func(*fakeServices)) *harness {
 	t.Helper()
+	return newHarnessWith(t, saved, func(f *fakeServices) Services { return f }, setup...)
+}
+
+// newHarnessWith is newHarness, whose player has the services svc makes of
+// the fake ones.
+func newHarnessWith(t *testing.T, saved Saved, svc func(*fakeServices) Services, setup ...func(*fakeServices)) *harness {
+	t.Helper()
 	h := &harness{t: t, svc: newServices(), stream: &fakeStream{}, device: &fakeDevice{}}
 	for _, fn := range setup {
 		fn(h.svc)
 	}
-	h.p = New(h.svc, h.stream, h.device, saved)
+	h.p = New(svc(h.svc), h.stream, h.device, saved)
 	h.stream.p = h.p
 	h.p.Notices(func(n Notice) {
 		h.mu.Lock()

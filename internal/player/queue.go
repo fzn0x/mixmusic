@@ -184,16 +184,16 @@ func shuffle(items []Item) {
 }
 
 // extendWithRadio adds tracks like the current one to the queue, and then
-// tells whether it added any.
-func (p *Player) extendWithRadio(then func(added bool)) {
+// tells whether it added any, or why it couldn't find them.
+func (p *Player) extendWithRadio(then func(added bool, err error)) {
 	seed, ok := p.s.Current()
 	if !ok {
-		then(false)
+		then(false, nil)
 		return
 	}
 	await(p, func(ctx context.Context) ([]media.Track, error) { return p.svc.Radio(ctx, seed.Track) }, func(found []media.Track, err error) {
 		if err != nil {
-			then(false)
+			then(false, err)
 			return
 		}
 		queued := make([]media.Track, len(p.s.Queue))
@@ -203,7 +203,7 @@ func (p *Player) extendWithRadio(then func(added bool)) {
 		tracks := RadioTracks(found, queued)
 		tracks = tracks[:min(len(tracks), radioMax)]
 		if len(tracks) == 0 {
-			then(false)
+			then(false, nil)
 			return
 		}
 		items := make([]Item, len(tracks))
@@ -212,7 +212,7 @@ func (p *Player) extendWithRadio(then func(added bool)) {
 		}
 		p.s.Queue = append(slices.Clone(p.s.Queue), items...)
 		p.emit(QueueChange)
-		then(true)
+		then(true, nil)
 	})
 }
 

@@ -2,6 +2,7 @@ package player
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -100,6 +101,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	p.loadToken++
 	token := p.loadToken
 	p.retry = retryState{}
+	p.endWait()
 	p.atEnd = false
 	p.s.Index = i
 	p.s.Position = start
@@ -119,7 +121,9 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 			return
 		}
 		if err != nil {
-			p.fail(err.Error())
+			if !p.offline(err, autoplay) {
+				p.fail(err.Error())
+			}
 			return
 		}
 		switch {
@@ -159,8 +163,12 @@ func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Dura
 			p.failures = 0
 			return
 		}
-		p.fellBack(err.Error())
-		p.streamInstead(token, entry, start, autoplay)
+		// A device that can't be reached for want of the network waits for
+		// it: YouTube Music needs it too.
+		p.checkOnline(func() { p.wait(autoplay) }, func() {
+			p.fellBack(err.Error())
+			p.streamInstead(token, entry, start, autoplay)
+		})
 	})
 }
 
@@ -171,7 +179,9 @@ func (p *Player) streamInstead(token int, entry Item, start time.Duration, autop
 			return
 		}
 		if err != nil {
-			p.fail(err.Error())
+			if !p.offline(err, autoplay) {
+				p.fail(err.Error())
+			}
 			return
 		}
 		p.loadStream(src, start, autoplay)
@@ -259,7 +269,14 @@ func (p *Player) onStreamError(message string) {
 	if why == "" {
 		why = message
 	}
-	p.retryStream(why)
+	// The stream may have broken off for want of the network: the track
+	// waits for it then, rather than spending its tries. It loads
+	// meanwhile.
+	autoplay := !p.paused
+	p.loaded = false
+	p.s.Loading, p.s.Buffering = autoplay, autoplay
+	p.emit(StateChange)
+	p.checkOnline(func() { p.wait(autoplay) }, func() { p.retryStream(why) })
 }
 
 // retryStream plays the current track's stream again from where it was,
@@ -300,7 +317,9 @@ func (p *Player) retryStream(why string) {
 				return
 			}
 			if err != nil {
-				p.retryStream(err.Error())
+				if !p.offline(err, autoplay) {
+					p.retryStream(err.Error())
+				}
 				return
 			}
 			// The engine lets go of the next track it preloaded, which loads
@@ -342,6 +361,9 @@ func (p *Player) onProgress() {
 			if err == nil && src.Mode == ModeStream && src.URL != "" {
 				p.stream.Preload(src.URL)
 			}
+			if errors.Is(err, ErrOffline) {
+				p.prefetchOnline(next.UID)
+			}
 		})
 	}
 	fade := time.Duration(p.svc.Settings().Crossfade) * time.Second
@@ -372,6 +394,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		}
 		p.loadToken++
 		p.retry = retryState{}
+		p.endWait()
 		p.s.Index = i
 		p.s.Position = 0
 		p.s.Duration = ms(next.Track.DurationMs)
@@ -386,6 +409,15 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 }
 
 func (p *Player) play() {
+	if p.s.Waiting {
+		// It plays once the network answers, which is asked again now.
+		p.s.WillPlay = true
+		if n, ok := p.network(); ok {
+			n.KickOnline()
+		}
+		p.emit(StateChange)
+		return
+	}
 	if p.s.Loading {
 		return // it plays once loaded
 	}
@@ -414,6 +446,11 @@ func (p *Player) play() {
 }
 
 func (p *Player) pause() {
+	if p.s.Waiting {
+		p.s.WillPlay = false
+		p.emit(StateChange)
+		return
+	}
 	if p.s.Loading {
 		return // a track loading plays: only another track stops it
 	}
@@ -426,7 +463,7 @@ func (p *Player) pause() {
 }
 
 func (p *Player) toggle() {
-	if p.s.Playing {
+	if p.s.Playing || p.s.Waiting && p.s.WillPlay {
 		p.pause()
 	} else {
 		p.play()
@@ -438,6 +475,13 @@ func (p *Player) seek(t time.Duration) {
 	if p.s.Duration > 0 {
 		t = min(t, p.s.Duration)
 	}
+	if p.s.Waiting && !p.radioWaits {
+		// The track plays from there once the network answers.
+		p.s.Position = t
+		p.emit(Progress)
+		return
+	}
+	p.endWait()
 	p.s.Position = t
 	p.atEnd = false
 	p.retry.from = t
@@ -470,10 +514,12 @@ func (p *Player) advance(ended bool) {
 		p.playAt(0, 0, true)
 	case p.svc.Settings().Autoplay:
 		token := p.loadToken
-		p.extendWithRadio(func(added bool) {
+		p.extendWithRadio(func(added bool, err error) {
 			switch {
 			case added && token == p.loadToken:
 				p.playAt(p.s.Index+1, 0, true)
+			case !added && ended && token == p.loadToken && p.radioOffline(err):
+				p.waitRadio()
 			case !added:
 				p.stopAtEnd(ended)
 			}
@@ -600,6 +646,7 @@ func (p *Player) Buffering(buffering bool) {
 	p.do(func() {
 		p.s.Buffering = buffering
 		p.emit(StateChange)
+		p.watchStall(buffering)
 	})
 }
 

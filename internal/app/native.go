@@ -81,8 +81,8 @@ func (a *App) nativeEngine() *audio.Engine {
 func Silent() bool { return os.Getenv("MIXMUSIC_SILENT") != "" }
 
 // startSilent starts an output that plays into no device: it renders at a
-// device's pace, and drops what it renders.
-func startSilent(render func([]float32), _ func(error)) (audio.Output, error) {
+// device's pace, in stereo, and drops what it renders.
+func startSilent(_ int, render func([]float32, int), _ func(error)) (audio.Output, error) {
 	log.Print("mixmusic: the audio engine plays into no device (MIXMUSIC_SILENT)")
 	o := &silentOutput{stop: make(chan struct{}), done: make(chan struct{})}
 	go func() {
@@ -95,7 +95,7 @@ func startSilent(render func([]float32), _ func(error)) (audio.Output, error) {
 			case <-o.stop:
 				return
 			case <-tick.C:
-				render(period)
+				render(period, 2)
 			}
 		}
 	}()
@@ -124,10 +124,15 @@ func (a *App) openNative(ctx context.Context, rawURL string, interrupted func() 
 		return nil, err
 	}
 	videoID, ok := strings.CutPrefix(u.Path, "/yt/")
+	videoID, surround := strings.CutSuffix(videoID, stream.SurroundSuffix)
 	if !ok || !stream.ValidVideoID(videoID) {
 		return nil, fmt.Errorf("not the audio of a video: %s", rawURL)
 	}
-	src, err := a.proxy.Open(ctx, videoID, interrupted)
+	open := a.proxy.Open
+	if surround {
+		open = a.proxy.OpenSurround
+	}
+	src, err := open(ctx, videoID, interrupted)
 	if err != nil {
 		return nil, err
 	}
@@ -137,9 +142,10 @@ func (a *App) openNative(ctx context.Context, rawURL string, interrupted func() 
 	return src, nil
 }
 
-// startNative starts the output of the native engine.
-func startNative(render func([]float32), failed func(error)) (audio.Output, error) {
-	s, err := output.Start(render, failed)
+// startNative starts the output of the native engine, of channels: 2, or
+// 6 for 5.1 surround where the device has it.
+func startNative(channels int, render func([]float32, int), failed func(error)) (audio.Output, error) {
+	s, err := output.Start(channels, render, failed)
 	switch {
 	case errors.Is(err, output.ErrNoDevice):
 		return nil, errors.New("no audio output device")

@@ -11,7 +11,7 @@ type Stream struct{}
 func Available() error { return ErrUnsupported }
 
 // Start returns ErrUnsupported.
-func Start(render func(out []float32), failed func(error)) (*Stream, error) {
+func Start(channels int, render func(out []float32, channels int), failed func(error)) (*Stream, error) {
 	return nil, ErrUnsupported
 }
 

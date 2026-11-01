@@ -2,7 +2,7 @@ package audio
 
 // The shelving and peaking filters of BiquadFilterNode, as Blink computes
 // and runs them (third_party/blink/renderer/platform/audio/biquad.cc, under
-// the BSD license of LICENSE.blink), for stereo.
+// the BSD license of LICENSE.blink), for stereo and 5.1.
 
 import "math"
 
@@ -14,11 +14,11 @@ const (
 	peaking
 )
 
-// biquad is a second-order filter of two channels.
+// biquad is a second-order filter of up to maxChannels channels.
 type biquad struct {
 	b0, b1, b2, a1, a2 float64
 	// The filter's memory, by channel: its last inputs and outputs.
-	x1, x2, y1, y2 [2]float64
+	x1, x2, y1, y2 [maxChannels]float64
 }
 
 // set computes the coefficients of a filter at frequency hz, of quality q
@@ -79,13 +79,13 @@ func (f *biquad) normalize(b0, b1, b2, a0, a1, a2 float64) {
 	f.b0, f.b1, f.b2, f.a1, f.a2 = b0*inv, b1*inv, b2*inv, a1*inv, a2*inv
 }
 
-// process filters interleaved stereo frames in place. As in Blink, the
-// filter computes in double precision, and remembers its outputs as the
-// floats it gives.
-func (f *biquad) process(buf []float32) {
-	for c := range 2 {
+// process filters frames of ch channels interleaved in place. As in Blink,
+// the filter computes in double precision, and remembers its outputs as
+// the floats it gives.
+func (f *biquad) process(buf []float32, ch int) {
+	for c := range ch {
 		x1, x2, y1, y2 := f.x1[c], f.x2[c], f.y1[c], f.y2[c]
-		for i := c; i < len(buf); i += 2 {
+		for i := c; i < len(buf); i += ch {
 			x := buf[i]
 			y := float32(f.b0*float64(x) + f.b1*x1 + f.b2*x2 - f.a1*y1 - f.a2*y2)
 			buf[i] = y
@@ -98,14 +98,21 @@ func (f *biquad) process(buf []float32) {
 
 // pass lets frames through a filter that is the identity, as a filter at 0
 // dB is, keeping its memory as processing them would.
-func (f *biquad) pass(buf []float32) {
-	if len(buf) < 4 {
-		f.process(buf)
+func (f *biquad) pass(buf []float32, ch int) {
+	if len(buf) < 2*ch {
+		f.process(buf, ch)
 		return
 	}
-	for c := range 2 {
-		last, before := float64(buf[len(buf)-2+c]), float64(buf[len(buf)-4+c])
+	for c := range ch {
+		last, before := float64(buf[len(buf)-ch+c]), float64(buf[len(buf)-2*ch+c])
 		f.x1[c], f.x2[c], f.y1[c], f.y2[c] = last, before, last, before
+	}
+}
+
+// forget clears the memory of the channels from from on.
+func (f *biquad) forget(from int) {
+	for c := from; c < maxChannels; c++ {
+		f.x1[c], f.x2[c], f.y1[c], f.y2[c] = 0, 0, 0, 0
 	}
 }
 

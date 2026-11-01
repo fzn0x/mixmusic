@@ -42,7 +42,7 @@ func TestListenerHears(t *testing.T) {
 		t.Skip("MIXMUSIC_AUDIO=1 runs the tests that open the audio device")
 	}
 	phase := 0
-	s, err := output.Start(func(out []float32) {
+	s, err := output.Start(2, func(out []float32, _ int) {
 		for i := 0; i < len(out); i += 2 {
 			v := float32(1e-5 * math.Sin(2*math.Pi*1500*float64(phase)/output.Rate))
 			out[i], out[i+1] = v, v

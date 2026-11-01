@@ -19,8 +19,14 @@ type Output interface {
 }
 
 // OutputStarter starts an output that calls render for each period of the
-// device, and failed when it stops of itself.
-type OutputStarter func(render func([]float32), failed func(error)) (Output, error)
+// device, and failed when it stops of itself. channels is what the engine
+// asks for: 6 for 5.1 surround, which the output plays where the device has
+// six channels, else 2. render gets the channels of its frames,
+// interleaved: 2 or 6, which may change as the default device does.
+type OutputStarter func(channels int, render func(out []float32, channels int), failed func(error)) (Output, error)
+
+// maxChannels is the most channels the engine renders: 5.1 surround's.
+const maxChannels = 6
 
 // Events are what the engine tells the player, as the web player's engine
 // does. They are called from several goroutines, at times at once.
@@ -69,14 +75,21 @@ type Engine struct {
 	paused    bool
 	normalize bool
 	loudness  bool
-	eq        *equalizer
-	comp      *compressor
-	master    smoother
+	// surround is whether the output plays six channels where the device
+	// has them, for 5.1 surround tracks, rather than two; outChannels is
+	// what the output that plays was asked for.
+	surround    bool
+	outChannels int
+	eq          *equalizer
+	comp        *compressor
+	master      smoother
 	// The audio thread's buffers: a quantum, the rest of the last one, and
-	// a deck's frames.
-	quantumBuf [2 * quantum]float32
+	// a deck's frames. bus is the channels of the quantum, as the output
+	// asked for them last.
+	quantumBuf [maxChannels * quantum]float32
 	pending    []float32
-	deckBuf    [2 * quantum]float32
+	deckBuf    [maxChannels * quantum]float32
+	bus        int
 	silentFor  int64 // the frames rendered since a deck last played
 	// What the audio thread saw, for the event loop.
 	underrun   bool
@@ -106,6 +119,7 @@ func NewEngine(open Opener, start OutputStarter, events Events) *Engine {
 		comp:   newCompressor(),
 		master: newSmoother(0.64, glide), // the gain of the volume 0.8 saved
 		an:     newAnalyser(),
+		bus:    2,
 		notify: make(chan struct{}, 1),
 		closed: make(chan struct{}),
 	}
@@ -334,6 +348,28 @@ func (e *Engine) SetLoudness(on bool) {
 	e.mu.Unlock()
 }
 
+// SetSurround has the output play six channels where the device has them,
+// for 5.1 surround tracks, or two: an output that plays starts again with
+// them. Surround tracks are mixed down to stereo, as their streams ask, on
+// two channels; stereo tracks play on the front left and right of six.
+func (e *Engine) SetSurround(on bool) {
+	e.mu.Lock()
+	changed := e.surround != on
+	e.surround = on
+	e.mu.Unlock()
+	if changed {
+		e.restartOutput()
+	}
+}
+
+// outputChannels is the channels the engine asks an output for.
+func (e *Engine) outputChannels() int {
+	if e.surround {
+		return maxChannels
+	}
+	return 2
+}
+
 // trimOf returns the trim of deck d, toward its target: the gain that
 // turns its track down to an even loudness, while Even loudness is on and
 // the track's loudness is known, else 1. A deck takes its trim at once with
@@ -399,14 +435,42 @@ func (e *Engine) ensureOutput() error {
 	if running {
 		return nil
 	}
-	out, err := e.start(e.render, e.outputFailed)
+	e.mu.Lock()
+	channels := e.outputChannels()
+	e.mu.Unlock()
+	out, err := e.start(channels, e.render, e.outputFailed)
 	if err != nil {
 		return err
 	}
 	e.mu.Lock()
-	e.out = out
+	e.out, e.outChannels = out, channels
 	e.mu.Unlock()
 	return nil
+}
+
+// restartOutput starts the output that plays again, when it was asked for
+// other channels than the engine asks for now. One that fails to start
+// fails as one that stops of itself does.
+func (e *Engine) restartOutput() {
+	e.outMu.Lock()
+	defer e.outMu.Unlock()
+	e.mu.Lock()
+	out, channels := e.out, e.outputChannels()
+	if out == nil || e.outChannels == channels {
+		e.mu.Unlock()
+		return
+	}
+	e.out = nil
+	e.mu.Unlock()
+	out.Stop()
+	next, err := e.start(channels, e.render, e.outputFailed)
+	if err != nil {
+		e.outputFailed(err)
+		return
+	}
+	e.mu.Lock()
+	e.out, e.outChannels = next, channels
+	e.mu.Unlock()
 }
 
 // stopOutput stops the output, if it plays.
@@ -430,15 +494,27 @@ func (e *Engine) outputFailed(err error) {
 	e.wake()
 }
 
-// render fills out, interleaved stereo, with what the decks play: the
-// output's callback, on the audio thread.
-func (e *Engine) render(out []float32) {
+// render fills out, of frames of channels interleaved, 2 or 6, with what
+// the decks play: the output's callback, on the audio thread.
+func (e *Engine) render(out []float32, channels int) {
+	if channels != maxChannels {
+		channels = 2
+	}
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	if channels != e.bus {
+		// The device changed: the rest of the last quantum, of the other
+		// channels, is dropped, and the filters forget the channels it
+		// had beyond those both have.
+		e.pending = nil
+		e.eq.forget(min(e.bus, channels))
+		e.comp.forget(min(e.bus, channels))
+		e.bus = channels
+	}
 	for len(out) > 0 {
 		if len(e.pending) == 0 {
 			e.renderQuantum()
-			e.pending = e.quantumBuf[:]
+			e.pending = e.quantumBuf[:channels*quantum]
 		}
 		n := copy(out, e.pending)
 		out = out[n:]
@@ -446,11 +522,14 @@ func (e *Engine) render(out []float32) {
 	}
 }
 
-// renderQuantum renders a quantum into quantumBuf: the decks mixed, each at
-// its loudness, through the equalizer, the compressor, the volume, and into
-// the analyser.
+// renderQuantum renders a quantum of the bus's channels into quantumBuf:
+// the decks mixed, each at its loudness, through the equalizer, the
+// compressor, the volume, and into the analyser. A stereo deck plays on
+// the front left and right of six channels; a surround deck is mixed down
+// to two as its stream asks.
 func (e *Engine) renderQuantum() {
-	buf := e.quantumBuf[:]
+	ch := e.bus
+	buf := e.quantumBuf[:ch*quantum]
 	clear(buf)
 	sounding := false
 	for i, d := range e.decks {
@@ -460,13 +539,37 @@ func (e *Engine) renderQuantum() {
 		}
 		sounding = true
 		r := d.ring.Load()
-		n := r.readTo(e.deckBuf[:])
+		dch := r.channels
+		n := r.readTo(e.deckBuf[:dch*quantum])
 		trim := e.trimOf(d, n > 0)
+		var m *[2][6]float32
+		if dch > ch {
+			if m = d.downmix.Load(); m == nil {
+				m = &defaultDownmix
+			}
+		}
 		for f := range quantum {
 			g := float32(d.gain.next() * level.next() * trim.next())
-			if f < n {
-				buf[2*f] += e.deckBuf[2*f] * g
-				buf[2*f+1] += e.deckBuf[2*f+1] * g
+			if f >= n {
+				continue
+			}
+			src, dst := e.deckBuf[dch*f:dch*f+dch], buf[ch*f:ch*f+ch]
+			switch {
+			case dch == ch:
+				for c, v := range src {
+					dst[c] += v * g
+				}
+			case m != nil:
+				var l, r float32
+				for c, v := range src {
+					l += m[0][c] * v
+					r += m[1][c] * v
+				}
+				dst[0] += l * g
+				dst[1] += r * g
+			default:
+				dst[0] += src[0] * g
+				dst[1] += src[1] * g
 			}
 		}
 		if i == e.active {
@@ -481,17 +584,31 @@ func (e *Engine) renderQuantum() {
 	} else {
 		e.silentFor += quantum
 	}
-	e.eq.process(buf)
+	e.eq.process(buf, ch)
 	if e.normalize {
-		e.comp.process(buf, levelThreshold, levelKnee, levelRatio, levelAttack, levelRelease)
+		e.comp.process(buf, ch, levelThreshold, levelKnee, levelRatio, levelAttack, levelRelease)
 	}
-	for i := 0; i < len(buf); i += 2 {
+	for i := 0; i < len(buf); i += ch {
 		g := float32(e.master.next())
-		buf[i] *= g
-		buf[i+1] *= g
+		for c := range ch {
+			buf[i+c] *= g
+		}
 	}
-	e.an.writeInput(buf)
+	e.an.writeInput(buf, ch)
 }
+
+// defaultDownmix mixes 5.1 down to stereo as the standard does at its
+// default levels, the center and surrounds at -3 dB, scaled down so that
+// neither side can overload: for a surround deck whose stream told no
+// downmix yet.
+var defaultDownmix = func() [2][6]float32 {
+	const c = 0.70710677
+	const scale = 1 / (1 + 2*c)
+	return [2][6]float32{
+		{scale, 0, c * scale, 0, c * scale, 0},
+		{0, scale, c * scale, 0, 0, c * scale},
+	}
+}()
 
 // loop reports the engine's state to events, and stops the output when it
 // has played silence for idleTime.

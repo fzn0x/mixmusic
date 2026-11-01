@@ -308,3 +308,51 @@ func TestRenderThemes(t *testing.T) {
 		}
 	}
 }
+
+// TestRenderDialogs draws the dialogs to MIXMUSIC_RENDER, in a window as
+// tall as usual and in one too short for them, at the largest text size,
+// and the update offer in the themes whose panels differ.
+func TestRenderDialogs(t *testing.T) {
+	dir := os.Getenv("MIXMUSIC_RENDER")
+	if dir == "" {
+		t.Skip("MIXMUSIC_RENDER names no folder")
+	}
+	shell := func(theme string, scale float64) *shell {
+		s := newTestShell(t)
+		st := s.svc.Preferences.Get()
+		st.FollowSystem, st.Theme, st.FontScale = false, theme, scale
+		if _, err := s.svc.Preferences.Set(st); err != nil {
+			t.Fatal(err)
+		}
+		s.refresh()
+		return s
+	}
+	offer := testOffer
+	for _, size := range []struct {
+		name  string
+		w, h  int
+		scale float64
+	}{{"", 1280, 820, 1}, {"-short", 911, 425, 1.3}, {"-shorter", 640, 360, 1.3}} {
+		s := shell("mix", size.scale)
+		s.offer = &offer
+		renderTo(t, s, testerOf(t, s, size.w, size.h), dir, "dialog-offer"+size.name)
+
+		s = shell("mix", size.scale)
+		s.ask("enable Hello", enableMessage, "enable", func() {})
+		renderTo(t, s, testerOf(t, s, size.w, size.h), dir, "dialog-question"+size.name)
+
+		s = shell("mix", size.scale)
+		s.promptName("New mix", "Name", "late night drive", "create", func(string) {})
+		renderTo(t, s, testerOf(t, s, size.w, size.h), dir, "dialog-prompt"+size.name)
+
+		s = shell("mix", size.scale)
+		tt := testerOf(t, s, size.w, size.h)
+		s.paletteOpen = true
+		renderTo(t, s, tt, dir, "dialog-palette"+size.name)
+	}
+	for _, theme := range []string{"aurora", "glasshouse", "mochi"} {
+		s := shell(theme, 1)
+		s.offer = &offer
+		renderTo(t, s, testerOf(t, s, 1280, 820), dir, "dialog-offer-"+theme)
+	}
+}

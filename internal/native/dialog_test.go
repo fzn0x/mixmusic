@@ -341,3 +341,34 @@ func TestDialogOpensAtTop(t *testing.T) {
 		t.Errorf("the offer opened again scrolled to %v", y)
 	}
 }
+
+// TestDialogLongTitle scrolls a title that would leave the body too little
+// room with the body, in a short window, and keeps it over the body in a
+// window with room for both.
+func TestDialogLongTitle(t *testing.T) {
+	const title = "New playlist on YouTube Music for the late night listening sessions"
+	field := func(w, h int) (*shell, *ui.Tester, ui.Rect) {
+		s := newTestShell(t)
+		atTextSize(t, s, 1.3)
+		tt := testerOf(t, s, w, h)
+		s.promptName(title, "Name", "late night drive", "create", func(string) {})
+		tt.Frame()
+		tt.Advance(time.Second)
+		r, _ := tt.Find("Name")
+		return s, tt, r
+	}
+	_, _, whole := field(1280, 820)
+	if whole.H < 30 {
+		t.Fatalf("the name's field doesn't show in a tall window: %v", whole)
+	}
+	_, tt, _ := field(640, 360)
+	body, ok := tt.Find("more of " + strings.ToLower(title))
+	if !ok {
+		t.Fatal("the body doesn't scroll in a short window")
+	}
+	tt.Scroll(body.X+body.W/2, body.Y+body.H/2, 0, 1e4)
+	tt.Frame()
+	if r, _ := tt.Find("Name"); r.H < whole.H-0.5 {
+		t.Errorf("the name's field doesn't show whole at the body's end: %v, of %v", r, whole)
+	}
+}

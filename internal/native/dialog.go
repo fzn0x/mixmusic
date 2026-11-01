@@ -19,11 +19,13 @@ type dialogOptions struct {
 	message    string
 }
 
-// dialogScroll is where the body of a dialog is scrolled, and shown
+// dialogScroll is where the body of a dialog is scrolled; how tall its
+// title and its actions were, as a frame before laid them out; and shown,
 // whether the frame showed the dialog.
 type dialogScroll struct {
-	state ui.ScrollState
-	shown bool
+	state       ui.ScrollState
+	title, foot float32
+	shown       bool
 }
 
 // dialogFrame shows a dialog's panel over the dimmed window while *open is
@@ -55,10 +57,12 @@ func (s *shell) dialogFrame(c *ui.Context, open *bool, o dialogOptions, fn func(
 
 // dialog shows a dialog over the window while *open is true: its title at
 // the top, its actions, if any, at its foot, and its body between them.
-// In a window too short for all of it, the title and the actions stay in
-// view and the body scrolls. A hairline then parts the body from the title
-// or the actions where it hides some of itself, and the body takes the
-// focus with Tab, for the arrows, Page Up, Page Down, Home and End to
+// In a window too short for all of it, the actions stay in view and the
+// body scrolls, under the title, which stays in view too unless it would
+// leave the body less than a third of the room: a long title in a short
+// window scrolls with the body. A hairline then parts the body from the
+// title or the actions where it hides some of itself, and the body takes
+// the focus with Tab, for the arrows, Page Up, Page Down, Home and End to
 // scroll it. What should have the focus as the dialog opens asks for it,
 // with AutoFocus: else the body could take it.
 func (s *shell) dialog(c *ui.Context, open *bool, o dialogOptions, body, actions func()) {
@@ -77,6 +81,9 @@ func (s *shell) dialog(c *ui.Context, open *bool, o dialogOptions, body, actions
 	ds.shown = true
 	sc := &ds.state
 	over := sc.MaxY > 0.5
+	_, h := c.Size()
+	// The head is the title and 48 DIPs around it.
+	pinned := ds.title+48+ds.foot <= max(h-2*dialogMargin, 0)*2/3
 	// A hairline keeps its width, and shows only while the body hides
 	// some of itself on its side: the body's height stays as it scrolls.
 	hairline := func(shows bool) ui.Color {
@@ -85,10 +92,25 @@ func (s *shell) dialog(c *ui.Context, open *bool, o dialogOptions, body, actions
 		}
 		return ui.Color{}
 	}
+	// measure keeps how tall e showed in the frame before, if it did, in
+	// *at, and asks for another frame when that changed where the title
+	// goes.
+	measure := func(e ui.Element, at *float32) {
+		if v := e.Bounds().H; v > 0 && v != *at {
+			*at = v
+			c.Invalidate()
+		}
+	}
+	// The title is as tall in the head as in the body, which are as wide.
+	title := func() {
+		measure(ui.Text(c.Key(o.key+"-title"), o.title).FontSize(k.titleSize()).FontWeight(300).Font(k.display), &ds.title)
+	}
 	s.dialogFrame(c, open, o, func(panel ui.Element) {
-		ui.Column(c).Shrink(0).Padding(32, 32, 15).BorderWidth(0, 0, 1, 0).BorderColor(hairline(over && sc.Y > 0.5)).Children(func() {
-			ui.Text(c, o.title).FontSize(k.titleSize()).FontWeight(300).Font(k.display)
-		})
+		top := float32(32)
+		if pinned {
+			ui.Column(c).Shrink(0).Padding(32, 32, 15).BorderWidth(0, 0, 1, 0).BorderColor(hairline(over && sc.Y > 0.5)).Children(title)
+			top = 0
+		}
 		// The body keeps room for the focus ring, drawn outside it, which
 		// the panel would cut.
 		b := ui.Scroll(c.Key(o.key + "-body")).MarginX(4).TrackScroll(sc)
@@ -99,11 +121,24 @@ func (s *shell) dialog(c *ui.Context, open *bool, o dialogOptions, body, actions
 		if actions != nil {
 			bottom = 0
 		}
-		b.Children(func() { ui.Column(c).Padding(0, 28, bottom).Gap(16).Children(body) })
-		if actions != nil {
-			ui.Row(c).Shrink(0).Padding(15, 32, 32).Gap(8).Justify(ui.End).Wrap().
-				BorderWidth(1, 0, 0, 0).BorderColor(hairline(over && sc.Y < sc.MaxY-0.5)).Children(actions)
+		b.Children(func() {
+			ui.Column(c).Padding(top, 28, bottom).Gap(16).Children(func() {
+				if !pinned {
+					title()
+				}
+				body()
+			})
+		})
+		if actions == nil {
+			if ds.foot != 0 {
+				ds.foot = 0
+				c.Invalidate()
+			}
+			return
 		}
+		foot := ui.Row(c.Key(o.key+"-foot")).Shrink(0).Padding(15, 32, 32).Gap(8).Justify(ui.End).Wrap().
+			BorderWidth(1, 0, 0, 0).BorderColor(hairline(over && sc.Y < sc.MaxY-0.5)).Children(actions)
+		measure(foot, &ds.foot)
 	})
 }
 

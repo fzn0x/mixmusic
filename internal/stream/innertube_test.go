@@ -397,22 +397,33 @@ func (a playerAnswer) original(t *testing.T, itag int) number {
 }
 
 func TestPickAudioTellsWhyNone(t *testing.T) {
-	aac := playerFormat{Itag: 140, MimeType: `audio/mp4; codecs="mp4a.40.2"`, URL: "https://media/a?itag=140"}
+	heAAC := playerFormat{Itag: 139, MimeType: `audio/mp4; codecs="mp4a.40.5"`, URL: "https://media/a?itag=139"}
+	ps := playerFormat{Itag: 600, MimeType: `audio/mp4; codecs="mp4a.40.29"`, URL: "https://media/a?itag=600"}
+	vorbis := playerFormat{Itag: 171, MimeType: `audio/webm; codecs="vorbis"`, URL: "https://media/a?itag=171"}
 	ciphered := playerFormat{Itag: 251, MimeType: `audio/webm; codecs="opus"`, SignatureCipher: "s=AAAA&sp=sig&url=x"}
 	challenged := playerFormat{Itag: 251, MimeType: `audio/webm; codecs="opus"`, URL: "https://media/a?itag=251&n=abc"}
 	sabr := playerFormat{Itag: 251, MimeType: `audio/webm; codecs="opus"`}
-	if _, err := pickAudio([]playerFormat{aac}, QualityBest, 0); !errors.Is(err, errNoOpus) {
-		t.Errorf("AAC alone: %v", err)
+	cipheredAAC := playerFormat{Itag: 140, MimeType: `audio/mp4; codecs="mp4a.40.2"`, SignatureCipher: "s=AAAA&sp=sig&url=x"}
+	// HE-AAC, and HE-AAC v2, whose codec starts as AAC-LC's does, are no
+	// AAC-LC.
+	if _, err := pickAudio([]playerFormat{heAAC, ps, vorbis}, QualityBest, 0); !errors.Is(err, errNoStream) {
+		t.Errorf("HE-AAC alone: %v", err)
 	}
-	for _, f := range []playerFormat{ciphered, challenged, sabr} {
-		if _, err := pickAudio([]playerFormat{aac, f}, QualityBest, 0); !errors.Is(err, errNoDirectURL) {
+	for _, f := range []playerFormat{ciphered, challenged, sabr, cipheredAAC} {
+		if _, err := pickAudio([]playerFormat{heAAC, f}, QualityBest, 0); !errors.Is(err, errNoDirectURL) {
 			t.Errorf("%+v: %v", f, err)
 		}
 	}
 	short := playerFormat{Itag: 251, MimeType: `audio/webm; codecs="opus"`, URL: "https://media/a?itag=251", ApproxDurationMs: 30000}
-	if _, err := pickAudio([]playerFormat{short}, QualityBest, 200*time.Second); !errors.Is(err, errNoOpus) {
+	if _, err := pickAudio([]playerFormat{short}, QualityBest, 200*time.Second); !errors.Is(err, errNoStream) {
 		t.Errorf("a stream cut short: %v", err)
 	}
+}
+
+// withoutOpus returns a recorded answer whose Opus streams are Vorbis, which
+// the engine doesn't play: a video YouTube has only in AAC, but for that.
+func withoutOpus(answer []byte) []byte {
+	return []byte(strings.ReplaceAll(string(answer), `codecs=\"opus\"`, `codecs=\"vorbis\"`))
 }
 
 func TestDirectChecksTheMediaServer(t *testing.T) {
@@ -494,11 +505,11 @@ func TestDirectPausesAfterRefusals(t *testing.T) {
 		}
 	}
 	f.answers(func(playerRequest) []byte {
-		return []byte(strings.ReplaceAll(string(f.recorded("")), `codecs=\"opus\"`, `codecs=\"vorbis\"`))
+		return []byte(strings.ReplaceAll(string(withoutOpus(f.recorded(""))), `codecs=\"mp4a.40.2\"`, `codecs=\"mp4a.40.5\"`))
 	})
 	for range pauseAfter + 1 {
-		if err := stream(); !errors.Is(err, errNoOpus) {
-			t.Fatalf("no Opus: %v", err)
+		if err := stream(); !errors.Is(err, errNoStream) {
+			t.Fatalf("no Opus and no AAC-LC: %v", err)
 		}
 	}
 	down := &Direct{HTTP: &http.Client{Transport: offline{}}, BaseURL: f.srv.URL, now: d.now}

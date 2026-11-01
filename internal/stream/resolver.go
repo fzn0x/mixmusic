@@ -99,6 +99,12 @@ type resolution struct {
 	err    error
 }
 
+// fresh reports whether a resolution that ended found a stream that isn't
+// about to expire.
+func (res *resolution) fresh() bool {
+	return res.err == nil && time.Until(res.stream.Expires) >= expiryMargin
+}
+
 // NewResolver returns a resolver that runs the yt-dlp of t.
 func NewResolver(t *tools.Manager, cacheDir string) *Resolver {
 	r := &Resolver{Tools: t, CacheDir: cacheDir, quality: QualityBest, calls: map[string]*resolution{}}
@@ -129,7 +135,7 @@ func (r *Resolver) Resolve(ctx context.Context, videoID string) (Stream, error) 
 	if res != nil {
 		select {
 		case <-res.done:
-			if res.err != nil || time.Until(res.stream.Expires) < expiryMargin {
+			if !res.fresh() {
 				res = nil // failed or about to expire: resolve again
 			}
 		default: // running: wait for it below
@@ -154,6 +160,23 @@ func (r *Resolver) Resolve(ctx context.Context, videoID string) (Stream, error) 
 		return res.stream, res.err
 	case <-ctx.Done():
 		return Stream{}, ctx.Err()
+	}
+}
+
+// Fresh reports whether the resolver holds a stream of a video that isn't
+// about to expire, which Resolve returns without running yt-dlp.
+func (r *Resolver) Fresh(videoID string) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	res := r.calls[videoID]
+	if res == nil {
+		return false
+	}
+	select {
+	case <-res.done:
+		return res.fresh()
+	default:
+		return false
 	}
 }
 

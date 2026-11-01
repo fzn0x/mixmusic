@@ -312,6 +312,9 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 			}
 		}
 		p, err := r.ReadPacket()
+		if err != nil && err != io.EOF && !interrupted() && d.brokeNearEnd(err, next, skip, delay) {
+			err = io.EOF // what's left is less than loading it again costs
+		}
 		if err == io.EOF {
 			(*cur).done.Store(true)
 			notify()
@@ -355,6 +358,28 @@ func readError(err error) error {
 		return fmt.Errorf("%w (%v)", errUnsupported, err)
 	}
 	return errNetwork
+}
+
+// endSlack is how close to its end a track whose stream breaks off ends
+// there, rather than failing: loading it again for the moment left costs
+// more silence than the moment holds.
+const endSlack = time.Second
+
+// brokeNearEnd reports whether err, a read that failed with the track
+// decoded up to frame next of the stream (codec delay included), or from
+// frame skip on before the first packet after a seek, is the stream
+// breaking off within endSlack of the track's end. A track whose duration
+// the file doesn't tell has no end to be near.
+func (d *deck) brokeNearEnd(err error, next, skip int64, delay time.Duration) bool {
+	if readError(err) != errNetwork {
+		return false // a file it can't read, not a break
+	}
+	total, _ := d.info()
+	at := next
+	if at < 0 {
+		at = skip
+	}
+	return total > 0 && duration(at)-delay >= total-endSlack
 }
 
 // ramp moves a gain linearly, as linearRampToValueAtTime does.

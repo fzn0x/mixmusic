@@ -10,6 +10,7 @@ package player
 
 import (
 	"context"
+	"errors"
 	"slices"
 	"strconv"
 	"sync"
@@ -82,6 +83,12 @@ type State struct {
 	Error string
 	// Source is how the current track plays, once prepared.
 	Source *Source
+	// Waiting is set while the current track waits for the network, at
+	// Position, or at the end of the queue the radio does; WillPlay tells
+	// whether it plays once the network answers, which play and pause
+	// change meanwhile.
+	Waiting  bool
+	WillPlay bool
 }
 
 // Current returns the current entry.
@@ -164,6 +171,22 @@ type Saved struct {
 	Unplayed []int `json:"unplayed,omitempty"`
 }
 
+// ErrOffline is why a track can't play while the network is gone. The
+// services wrap the error they met with it, as fmt.Errorf("%w: %v",
+// ErrOffline, err): the track waits for the network then.
+var ErrOffline = errors.New("no network")
+
+// Network is what the player asks of the app of the network, when its
+// Services have it too: without, a track never waits for the network.
+type Network interface {
+	// Online reports whether the network answers.
+	Online(ctx context.Context) bool
+	// WaitOnline returns once the network answers, or ctx ends.
+	WaitOnline(ctx context.Context) error
+	// KickOnline has a WaitOnline check the network at once.
+	KickOnline()
+}
+
 // Services are what the player asks of the app.
 type Services interface {
 	// Prepare finds how track plays; PrepareStream how it plays from
@@ -211,6 +234,16 @@ var (
 	// saveVolumeAfter is how long the volume stays still before the
 	// settings keep it.
 	saveVolumeAfter = 600 * time.Millisecond
+	// retryWaits are how long the player waits before each try of a stream
+	// that broke off after it played, as when the network dropped, in
+	// turn: once they ran out, the track fails.
+	retryWaits = []time.Duration{time.Second, 3 * time.Second, 9 * time.Second}
+	// stallCheck is how long a stream buffers before the player asks
+	// whether the network answers.
+	stallCheck = 8 * time.Second
+	// wakeRefresh bounds how long, after the computer woke, the player
+	// waits for the network to find the current track's stream again.
+	wakeRefresh = 2 * time.Minute
 	// slowStart is how long a stream takes to sound before the log tells.
 	slowStart = 2 * time.Second
 )
@@ -234,10 +267,30 @@ const (
 	// savedMax is how many tracks of the queue are kept, at most: the
 	// current one and those around it.
 	savedMax = 500
+	// retryHold is how far a stream that was tried again plays on before a
+	// later break has all of retryWaits again.
+	retryHold = 10 * time.Second
 	// savedBefore is how many of the tracks before the current one are
 	// kept when those after it would fill what is kept.
 	savedBefore = 50
 )
+
+// retryState is how the current load tries its stream again after it
+// broke off: playAt and crossfadeTo start it over, so that each play of
+// an entry has all its tries.
+type retryState struct {
+	// played is set once the stream played in the load. One that breaks
+	// off then is tried len(retryWaits) times, after a longer wait each
+	// time; one that never played is tried once, at once, as a stream
+	// YouTube refused, or that can't be decoded, seldom plays a moment
+	// later.
+	played bool
+	// n is the tries since the stream last held.
+	n int
+	// from is where the last try resumed, or where the user seeked to
+	// since: the stream holds once it played on to retryHold past it.
+	from time.Duration
+}
 
 // savedWindow returns the entries kept of a queue of n, whose current
 // entry is at index, or -1: all of them up to savedMax, else savedMax
@@ -294,7 +347,7 @@ type Player struct {
 	saveAsked   bool
 	saveDue     bool
 	loadToken   int
-	retried     string
+	retry       retryState
 	counted     string
 	prepared    string
 	prefetched  string
@@ -312,6 +365,20 @@ type Player struct {
 	// atEnd when the queue ran out at its end, which the engine ended.
 	loaded bool
 	atEnd  bool
+	// paused is set while the engine holds the current track paused, as
+	// the user paused it or it loaded paused: a stream that breaks off then
+	// stays paused once tried again.
+	paused bool
+	// stopWait stops the wait for the network under way, if any; radioWaits
+	// is set when the radio waits, at the end of the queue, rather than the
+	// current track. toldOffline is set once the user was told that the
+	// network is gone, until it answers.
+	stopWait    context.CancelFunc
+	radioWaits  bool
+	toldOffline bool
+	// stalls counts the stream's Buffering events, so that a check of the
+	// network after one tells it is the last.
+	stalls int
 	// askedAt is when the current track was asked to play, from askedFrom,
 	// until it sounds: the log tells when that took long.
 	askedAt     time.Time

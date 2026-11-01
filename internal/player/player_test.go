@@ -22,6 +22,7 @@ func init() {
 	reportEvery = 10 * time.Millisecond
 	saveEvery = 10 * time.Millisecond
 	saveVolumeAfter = 20 * time.Millisecond
+	retryWaits = []time.Duration{time.Millisecond, 2 * time.Millisecond, 3 * time.Millisecond}
 }
 
 // fakeServices is the app, with YouTube tracks that play as streams.
@@ -30,10 +31,12 @@ type fakeServices struct {
 	settings settings.Settings
 	// prepare, when set, finds how a track plays.
 	prepare func(media.Track) (Source, error)
-	// streamErr fails PrepareStream.
+	// streamErr fails PrepareStream, which streamed counts.
 	streamErr error
+	streamed  int
 	failure   string
 	radio     []media.Track
+	radioErr  error
 	played    []string
 	reports   []Now
 	volumes   []float64
@@ -69,6 +72,7 @@ func (f *fakeServices) Prepare(_ context.Context, t media.Track) (Source, error)
 func (f *fakeServices) PrepareStream(_ context.Context, t media.Track) (Source, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	f.streamed++
 	if f.streamErr != nil {
 		return Source{}, f.streamErr
 	}
@@ -90,7 +94,7 @@ func (f *fakeServices) RecordPlay(t media.Track) {
 func (f *fakeServices) Radio(context.Context, media.Track) ([]media.Track, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	return f.radio, nil
+	return f.radio, f.radioErr
 }
 
 func (f *fakeServices) Settings() settings.Settings {
@@ -339,11 +343,18 @@ type harness struct {
 
 func newHarness(t *testing.T, saved Saved, setup ...func(*fakeServices)) *harness {
 	t.Helper()
+	return newHarnessWith(t, saved, func(f *fakeServices) Services { return f }, setup...)
+}
+
+// newHarnessWith is newHarness, whose player has the services svc makes of
+// the fake ones.
+func newHarnessWith(t *testing.T, saved Saved, svc func(*fakeServices) Services, setup ...func(*fakeServices)) *harness {
+	t.Helper()
 	h := &harness{t: t, svc: newServices(), stream: &fakeStream{}, device: &fakeDevice{}}
 	for _, fn := range setup {
 		fn(h.svc)
 	}
-	h.p = New(h.svc, h.stream, h.device, saved)
+	h.p = New(svc(h.svc), h.stream, h.device, saved)
 	h.stream.p = h.p
 	h.p.Notices(func(n Notice) {
 		h.mu.Lock()
@@ -762,13 +773,13 @@ func TestStreamError(t *testing.T) {
 	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Time(42*time.Second, 200*time.Second)
-	// The first error plays the stream again, freshly found, where it was.
-	h.p.Error("the stream failed")
-	h.wait("a retried", func(p *Player) bool { return strings.HasPrefix(h.stream.lastLoad(), "load url:yt:a?retry=") })
+	// Each error plays the stream again where it was, as many times as
+	// there are waits, while it doesn't hold.
+	useRetries(t, h, "a", 0)
 	if got := h.stream.lastLoad(); !strings.HasSuffix(got, " 42s true") {
 		t.Errorf("retried with %q", got)
 	}
-	// The second fails, with why the stream tells, and moves on.
+	// The next fails, with why the stream tells, and moves on.
 	h.p.Error("the stream failed")
 	h.wait("b playing", playing("b"))
 	n := h.notices()
@@ -797,6 +808,28 @@ func TestFailuresStop(t *testing.T) {
 	h.svc.with(func(f *fakeServices) { f.prepare = nil })
 	h.p.Play()
 	h.wait("c playing", playing("c"))
+}
+
+// TestFailuresStopInTheEngine stops after maxFailures tracks whose streams
+// failed in the engine, which tells the time while a stream opens.
+func TestFailuresStopInTheEngine(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks("a", "b", "c", "d"), 0)
+	for i, id := range []string{"a", "b", "c"} {
+		h.wait(id+" loaded", func(p *Player) bool { return p.s.Index == i && p.loaded && p.s.Error == "" })
+		h.p.Time(0, 0)
+		h.p.Error("the stream failed")
+		h.wait(id+" tried", func(p *Player) bool { return h.stream.count("load url:yt:"+id+"?retry=") == 1 && p.loaded })
+		h.p.Time(0, 0)
+		h.p.Error("the stream failed")
+	}
+	h.wait("three failures", func(p *Player) bool { return p.failures == maxFailures })
+	time.Sleep(10 * failDelay)
+	h.on(func(p *Player) {
+		if p.s.Index != 2 || p.s.Playing {
+			t.Errorf("after three failures: index %d, playing %v", p.s.Index, p.s.Playing)
+		}
+	})
 }
 
 func TestProgress(t *testing.T) {

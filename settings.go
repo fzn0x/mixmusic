@@ -44,7 +44,7 @@ func (s *shell) settingsPage(c *ui.Context, tab string) {
 	selected := max(slices.Index(settingsTabs, tab), 0)
 	s.pageScroll(c, func() {
 		before := selected
-		s.pageHeader(c, "settings", settingsTabs, &selected)
+		s.pageHeader(c, "Settings", settingsTabs, &selected)
 		if selected != before {
 			s.router.Replace("/settings/" + settingsTabs[selected])
 		}
@@ -81,9 +81,14 @@ func (s *shell) group(c *ui.Context, title string, rows func()) { s.groupWith(c,
 
 // groupWith titles a set of rows, with links to what relates to them.
 func (s *shell) groupWith(c *ui.Context, title string, links, rows func()) {
-	ui.Column(c).Margin(0, 0, 48).Children(func() {
+	k := &s.lk
+	ui.Column(c).Margin(0, 0, k.sections()).Children(func() {
 		s.sectionHead(c, title, links)
-		ui.Column(c).Dividers(1, s.lk.border).Children(rows)
+		group := ui.Column(c).Dividers(1, k.border)
+		if k.cards {
+			group.Background(k.surface).Radius(k.radiusSm+k.cardPad()).Padding(4, 2*k.cardPad())
+		}
+		group.Children(rows)
 	})
 }
 
@@ -184,7 +189,7 @@ func (s *shell) openFolder(kind addons.Kind) {
 
 func (s *shell) appearanceSettings(c *ui.Context) {
 	k := &s.lk
-	s.groupWith(c, "theme", func() {
+	s.groupWith(c, "Theme", func() {
 		if s.link(c, "more-themes", "get more themes") {
 			s.navigate("/marketplace/themes")
 		}
@@ -218,7 +223,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			}
 		})
 	}
-	s.group(c, "colour and type", func() {
+	s.group(c, "Colour and type", func() {
 		s.row(c, "Follow the artwork", "Take the accent colour from the artwork of what plays.", func() {
 			if s.switchOf(c.Key("dynamic-accent"), &s.set.DynamicAccent).Label("Follow the artwork").Changed() {
 				s.save()
@@ -299,7 +304,7 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 		s.chooseTheme(id)
 	}
 	card.Children(func() {
-		ui.Text(c, name).FontSize(k.size(1.5)).FontWeight(300).Font(tk.display).TextColor(tk.text).SingleLine()
+		ui.Text(c, name).FontSize(k.size(1.5)).FontWeight(tk.titleWeight()).Font(tk.display).TextColor(tk.text).SingleLine()
 		ui.Row(c).Gap(4).Children(func() {
 			for i := range 4 {
 				ui.Box(c).Size(22, 22).Background(tk.tile(i))
@@ -480,7 +485,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 	k := &s.lk
 	sp := s.accounts().Spotify
 	signedIn := sp.SignedIn
-	s.group(c, "spotify tracks", func() {
+	s.group(c, "Spotify tracks", func() {
 		here := "MixMusic plays them itself, at Spotify's own quality, and shows among your Spotify devices. Needs Spotify Premium, and no Spotify app."
 		if !spotifyPlaysHere {
 			here = "This computer's webview can't play Spotify's protected audio, so MixMusic can't play Spotify itself."
@@ -488,9 +493,9 @@ func (s *shell) playbackSettings(c *ui.Context) {
 		modes := []settings.SpotifyPlayback{settings.SpotifyPlaybackHere, settings.SpotifyPlaybackConnect, settings.SpotifyPlaybackMatch}
 		mode := slices.Index(modes, s.set.SpotifyPlayback)
 		if s.choices(c, "spotify-mode", "How Spotify tracks play", &mode, []choice{
-			{"in mixmusic, from spotify", here, !spotifyPlaysHere},
-			{"on spotify connect", "Your Spotify app, or another Spotify device, plays them, at Spotify's own quality. Needs Spotify Premium and a device with Spotify open.", false},
-			{"in mixmusic, from youtube music", "MixMusic plays their recording on YouTube Music, with the equalizer, crossfade and visualizer. Works without Premium.", false},
+			{k.words("In MixMusic, from Spotify"), here, !spotifyPlaysHere},
+			{k.words("On Spotify Connect"), "Your Spotify app, or another Spotify device, plays them, at Spotify's own quality. Needs Spotify Premium and a device with Spotify open.", false},
+			{k.words("In MixMusic, from YouTube Music"), "MixMusic plays their recording on YouTube Music, with the equalizer, crossfade and visualizer. Works without Premium.", false},
 		}) {
 			s.set.SpotifyPlayback = modes[mode]
 			s.save()
@@ -521,7 +526,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 			s.deviceRow(c)
 		}
 	})
-	s.group(c, "sound", func() {
+	s.group(c, "Sound", func() {
 		s.row(c, "Quality", "Data saver streams smaller files of YouTube Music.", func() {
 			saver := 0
 			if s.set.Quality == settings.QualitySaver {
@@ -597,7 +602,7 @@ func (s *shell) deviceRow(c *ui.Context) {
 func (s *shell) equalizerSettings(c *ui.Context) {
 	k := &s.lk
 	eq := &s.set.Equalizer
-	s.group(c, "equalizer", func() {
+	s.group(c, "Equalizer", func() {
 		s.row(c, "Equalizer", "Shape the sound of YouTube Music with ten bands and a preamp.", func() {
 			if s.switchOf(c.Key("eq-on"), &eq.Enabled).Label("Equalizer").Changed() {
 				s.save()
@@ -702,7 +707,7 @@ func (s *shell) aboutSettings(c *ui.Context) {
 	k := &s.lk
 	info := s.svc.System.Info()
 	u := s.svc.System.Updates()
-	s.group(c, "mixmusic", func() {
+	s.group(c, "MixMusic", func() {
 		version := "MixMusic " + info.Version + " · " + info.Platform + " " + info.Arch
 		if build, ok := buildNames[u.Kind]; ok {
 			version += " · " + build
@@ -734,7 +739,7 @@ func (s *shell) aboutSettings(c *ui.Context) {
 		})
 	})
 	s.updateSettings(c)
-	s.group(c, "licenses", func() {
+	s.group(c, "Licenses", func() {
 		for i, n := range append(s.svc.System.Notices(), fontNotices()...) {
 			open := s.licenseOpen == i
 			s.row(c, n.Name, "", func() {

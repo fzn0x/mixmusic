@@ -289,7 +289,8 @@ func TestRenderThemes(t *testing.T) {
 		id      string
 		options map[string]string
 	}{{"mix", nil}, {"mix", map[string]string{"texture": "slashes", "white-tiles": "true"}}, {"aurora", nil}, {"sakura", nil}, {"terminal", nil}, {"daylight", nil},
-		{"greenroom", nil}, {"glasshouse", nil}, {"anime", nil}, {"mochi", nil}} {
+		{"greenroom", nil}, {"glasshouse", nil}, {"anime", nil}, {"mochi", nil}, {"material", nil}, {"material-dark", nil},
+		{"crate", nil}, {"crate-light", nil}} {
 		st := s.svc.Preferences.Get()
 		st.FollowSystem, st.Theme = false, theme.id
 		st.ThemeOptions = map[string]map[string]string{theme.id: theme.options}

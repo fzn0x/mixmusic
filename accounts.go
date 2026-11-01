@@ -21,7 +21,7 @@ func (s *shell) accountSettings(c *ui.Context) {
 }
 
 func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
-	s.group(c, "spotify", func() {
+	s.group(c, "Spotify", func() {
 		if sp.SignedIn && sp.Error == "" {
 			who := "Signed in"
 			if sp.Profile != nil {
@@ -105,7 +105,7 @@ func (s *shell) signOutOfSpotify() {
 }
 
 func (s *shell) youtubeAccount(c *ui.Context, yt app.YouTubeAccount) {
-	s.group(c, "youtube music", func() {
+	s.group(c, "YouTube Music", func() {
 		if !yt.SignedIn {
 			s.hint(c, "YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out: your session never goes to yt-dlp.")
 			busy := s.signingIn == "youtube"
@@ -177,7 +177,7 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 }
 
 func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
-	s.group(c, "last.fm", func() {
+	s.group(c, "Last.fm", func() {
 		if lf.Connected {
 			if lf.Expired {
 				s.alert(c, "Last.fm no longer accepts this connection", "Disconnect, then connect again to go on scrobbling.", nil).Margin(12, 0)

@@ -14,7 +14,7 @@ import (
 var statsRanges = []struct {
 	label string
 	days  int
-}{{"this week", 7}, {"this month", 30}, {"all time", 0}}
+}{{"This week", 7}, {"This month", 30}, {"All time", 0}}
 
 // statsPage shows what the user listened to: artists rank as circles on
 // one fixed size ramp, and each service's share shows as two rings.
@@ -25,11 +25,11 @@ func (s *shell) statsPage(c *ui.Context) {
 		labels[i] = r.label
 	}
 	s.pageScroll(c, func() {
-		s.pageHeader(c, "stats", labels, &s.statsRange)
+		s.pageHeader(c, "Stats", labels, &s.statsRange)
 		st := s.svc.Collection.Stats(statsRanges[s.statsRange].days)
 		if st.Plays == 0 {
-			ui.Text(c, "nothing counted yet").FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
-			ui.Text(c, "Tracks count once they played for thirty seconds.").FontSize(k.subtitleSize()).FontWeight(300)
+			ui.Text(c, k.words("Nothing counted yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+			ui.Text(c, "Tracks count once they played for thirty seconds.").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 			return
 		}
 		hours := st.Minutes / 60
@@ -52,15 +52,15 @@ func (s *shell) statsPage(c *ui.Context) {
 		s.dayChart(c, st.Daily)
 		ui.Row(c).Gap(48).Wrap().AlignItems(ui.Start).Margin(0, 0, 48).Children(func() {
 			ui.Column(c).Width(320).Children(func() {
-				s.sectionTitle(c, "the mix")
+				s.sectionTitle(c, "The mix")
 				s.venn(c, st.Spotify, st.YouTube)
 			})
 			ui.Column(c).Grow(1).Basis(320).Children(func() {
-				s.sectionTitle(c, "top artists")
+				s.sectionTitle(c, "Top artists")
 				s.artistCircles(c, st.TopArtists)
 			})
 		})
-		s.sectionTitle(c, "top tracks")
+		s.sectionTitle(c, "Top tracks")
 		tracks := make([]media.Track, len(st.TopTracks))
 		for i, t := range st.TopTracks {
 			tracks[i] = t.Track
@@ -136,7 +136,7 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 	case n > 7:
 		every = 7
 	}
-	s.sectionTitle(c, "day by day")
+	s.sectionTitle(c, "Day by day")
 	ui.Text(c, "Minutes listened each day.").FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 12)
 	ui.Text(c, fmt.Sprintf("%.0f min", top)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
 	plot := ui.Box(c).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).
@@ -253,7 +253,7 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 		}
 		trigger.Children(func() {
 			disclosure(c, 90*table.Progress(), t.TextMuted)
-			ui.Text(c, "show as a table").SingleLine()
+			ui.Text(c, k.words("Show as a table")).SingleLine()
 		})
 		table.Panel(func() {
 			columns := []ui.TableColumn{{Title: "day"}, {Title: "minutes", Width: 110, Align: ui.End}, {Title: "plays", Width: 90, Align: ui.End}}

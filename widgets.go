@@ -14,7 +14,7 @@ import (
 // over a tint on hover, and to the accent when on.
 func (s *shell) iconButton(c *ui.Context, key, name, label string, on bool, size float32) ui.Element {
 	k := &s.lk
-	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
+	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.round(32)).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
 	ink := k.muted
 	switch {
 	case on:
@@ -27,13 +27,15 @@ func (s *shell) iconButton(c *ui.Context, key, name, label string, on bool, size
 	} else if b.Hovered() {
 		b.Background(k.hover)
 	}
+	s.pressMotion(b, 0.9)
 	b.Children(func() { ui.Icon(c, icon(name)).FontSize(size).TextColor(ink) })
 	return b
 }
 
 // roundButton is a transport button: a 38px circle with a 2px outline, or,
 // as the main button, a 48px solid ink circle that turns to the accent on
-// hover.
+// hover. With tonal controls, the main one is the accent's, and the
+// others an icon on a tint while hovered.
 func (s *shell) roundButton(c *ui.Context, key, name, label string, main, disabled bool) ui.Element {
 	if main {
 		return s.round(c, key, name, label, true, disabled, 48, 22)
@@ -48,6 +50,8 @@ func (s *shell) round(c *ui.Context, key, name, label string, main, disabled boo
 		Cursor(ui.CursorPointer).Disabled(disabled)
 	ink := k.text
 	switch {
+	case k.tonal:
+		ink = s.tonalRound(b, main, disabled)
 	case disabled:
 		b.Opacity(0.45)
 		if main {
@@ -70,11 +74,75 @@ func (s *shell) round(c *ui.Context, key, name, label string, main, disabled boo
 	default:
 		b.Border(2, k.outline)
 	}
-	if !disabled && b.Pressed() {
+	switch {
+	case k.motion == motionExpressive:
+		// The shape follows what the button does: the play button, round
+		// while paused, squares off while it plays, as Material's toggles
+		// do once on, and squeezes as it is pressed.
+		r := size / 2
+		if main && name == "pause" {
+			r = 0.3 * size
+		}
+		if !disabled && b.Pressed() {
+			r *= 0.6
+		}
+		b.Radius(b.AnimateTo("shape", r, k.spring(true)))
+		s.pressMotion(b, 0.92)
+	case k.moves():
+		s.pressMotion(b, 0.94)
+	case !disabled && b.Pressed():
 		b.Scale(0.97, 0.97)
 	}
 	b.Children(func() { ui.Icon(c, icon(name)).FontSize(glyph).TextColor(ink) })
 	return b
+}
+
+// tonalRound fills a transport button b as tonal controls do, and
+// returns its ink.
+func (s *shell) tonalRound(b ui.Element, main, disabled bool) ui.Color {
+	k := &s.lk
+	switch {
+	case main && disabled:
+		b.Background(k.accent).Opacity(0.45)
+	case main && b.Pressed():
+		b.Background(k.accent.Mix(k.bg, 0.14))
+	case main && b.Hovered():
+		b.Background(k.accent.Mix(k.text, 0.14))
+	case main:
+		b.Background(k.accent)
+	case disabled:
+		b.Opacity(0.45)
+		return k.text
+	case b.Pressed():
+		b.Background(k.press)
+	case b.Hovered():
+		b.Background(k.hover)
+	default:
+		return k.text
+	}
+	if main {
+		return k.accentText
+	}
+	return k.text
+}
+
+// pressMotion squeezes b to scale while pressed, on the theme's spring,
+// and lets it go back: themes whose motion is standard press at once,
+// where the button does.
+func (s *shell) pressMotion(b ui.Element, scale float32) {
+	k := &s.lk
+	if !k.moves() {
+		return
+	}
+	target := float32(1)
+	if b.Pressed() {
+		target = scale
+	}
+	// A button at rest, and one that never moved, keeps no spring going.
+	if target != 1 || !b.Settled("press") {
+		v := b.AnimateTo("press", target, k.spring(true))
+		b.Scale(v, v)
+	}
 }
 
 // pointerKeys leaves the keys without modifiers that run commands, as
@@ -119,7 +187,8 @@ func (s *shell) dialogButton(c *ui.Context, key, label string, primary bool) ui.
 }
 
 // button is a 40px button with a label: a filled accent block when
-// primary, else a 2px outline that inverts to solid ink when pressed.
+// primary, else a 2px outline that inverts to solid ink when pressed, or,
+// with tonal controls, a tonal fill.
 func (s *shell) button(c *ui.Context, key, label string, primary bool) ui.Element {
 	return s.styledButton(s.buttonBase(c.Key(key)), c, label, primary)
 }
@@ -127,9 +196,18 @@ func (s *shell) button(c *ui.Context, key, label string, primary bool) ui.Elemen
 // styledButton gives b, a button's base, the look of button.
 func (s *shell) styledButton(b ui.Element, c *ui.Context, label string, primary bool) ui.Element {
 	k := &s.lk
-	b.Height(40).PaddingX(24).Radius(k.radiusSm).Label(label).Cursor(ui.CursorPointer).AlignSelf(ui.Start)
+	b.Height(40).PaddingX(24).Radius(k.round(40)).Label(label).Cursor(ui.CursorPointer).AlignSelf(ui.Start)
 	ink := k.text
 	switch {
+	case k.tonal && !primary && b.Pressed():
+		b.Background(k.tonalFill.Mix(k.tonalInk, 0.18))
+		ink = k.tonalInk
+	case k.tonal && !primary && b.Hovered():
+		b.Background(k.tonalFill.Mix(k.tonalInk, 0.1))
+		ink = k.tonalInk
+	case k.tonal && !primary:
+		b.Background(k.tonalFill)
+		ink = k.tonalInk
 	case primary && b.Hovered():
 		b.Background(k.accent.Mix(k.text, 0.14))
 		ink = k.accentText
@@ -144,19 +222,25 @@ func (s *shell) styledButton(b ui.Element, c *ui.Context, label string, primary 
 	default:
 		b.Border(2, k.outline)
 	}
-	if b.Pressed() {
+	if k.moves() {
+		s.pressMotion(b, 0.94)
+	} else if b.Pressed() {
 		b.Scale(0.97, 0.97)
 	}
 	// The label keeps its width: the button's, made of it, may round a
 	// fraction of a pixel short of it, and cut its last letter.
-	b.Children(func() { ui.Text(c, label).FontSize(k.bodySize()).TextColor(ink).SingleLine().Shrink(0) })
+	b.Children(func() {
+		t := ui.Text(c, k.sentence(label)).FontSize(k.bodySize()).TextColor(ink).SingleLine().Shrink(0)
+		k.labelWeight(t)
+	})
 	return b
 }
 
 // pageHeader names the page in one giant light lowercase word, which
 // shrinks to fit the pane on one line, and wraps under 45% of its size,
 // never cut. Pivots under it switch the page's sections; selected is the
-// current one's index.
+// current one's index. Themes of other headings name it as written, at
+// their sizes, over chips (plainHeader).
 func (s *shell) pageHeader(c *ui.Context, title string, pivots []string, selected *int) {
 	s.pageHeaderCounts(c, title, pivots, nil, selected)
 }
@@ -165,7 +249,11 @@ func (s *shell) pageHeader(c *ui.Context, title string, pivots []string, selecte
 // counts[i], or nothing where it's below 0.
 func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, counts []int, selected *int) {
 	k := &s.lk
-	word := strings.ToLower(title)
+	if k.headings != headingsLight {
+		s.plainHeader(c, title, pivots, counts, selected)
+		return
+	}
+	word := k.words(title)
 	// Terminal's titles are prompts.
 	prompt := ""
 	if k.fx.prompt {
@@ -226,6 +314,7 @@ func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, c
 		if len(pivots) > 0 && selected != nil {
 			ui.Row(c).Gap(0.66 * k.pivotSize()).Wrap().Children(func() {
 				for i, p := range pivots {
+					p := k.words(p)
 					b := s.buttonBase(c.Key("pivot-" + p)).Label(p).Cursor(ui.CursorPointer)
 					ink := k.text.Alpha(0.38)
 					switch {
@@ -251,15 +340,98 @@ func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, c
 	})
 }
 
+// plainHeader names the page as written, at the sizes of the theme's
+// headings: Material's display sizes, or larger and heavier for bold
+// ones, as the pane widens. It shrinks to fit the pane on one line, down
+// to 60% of its size, and wraps under that. Chips under it switch the
+// page's sections.
+func (s *shell) plainHeader(c *ui.Context, title string, pivots []string, counts []int, selected *int) {
+	k := &s.lk
+	pane := s.paneWidth(c) - 2*k.gutter
+	window := pane + 2*k.gutter
+	size, letter, leading := min(max(36, 0.045*window), 57), float32(0.5), float32(1.12)
+	if k.headings == headingsBold {
+		size, letter, leading = min(max(40, 0.06*window), 76), 0.52, 1.0
+	}
+	size *= k.scale
+	natural := letter * size * float32(utf8.RuneCountInString(title))
+	fit := float32(1)
+	if natural > pane && natural > 0 {
+		fit = pane / natural
+	}
+	wrap := fit < 0.6
+	if wrap {
+		fit = 0.6
+	}
+	ui.Column(c).Padding(16, 0, 28).Gap(20).Children(func() {
+		t := ui.Text(c, title).FontSize(size * fit).FontWeight(k.displayWeight()).Font(k.display).
+			LetterSpacing(k.tracking(-0.02, size*fit)).LineHeight(leading).TextColor(k.text).MinWidth(0)
+		if !wrap {
+			t.SingleLine()
+		}
+		if len(pivots) > 0 && selected != nil {
+			s.chips(c, pivots, counts, selected)
+		}
+	})
+}
+
+// chips switch a page's sections: filled pills, or boxes, the chosen one
+// in the fill of what is chosen; counts[i] counts what one shows, unless
+// it's below 0.
+func (s *shell) chips(c *ui.Context, pivots []string, counts []int, selected *int) {
+	k := &s.lk
+	ui.Row(c).Gap(8).Wrap().Children(func() {
+		for i, p := range pivots {
+			b := s.buttonBase(c.Key("pivot-" + p)).Height(32).PaddingX(16).Gap(6).Radius(k.round(32)).Label(p).Cursor(ui.CursorPointer)
+			fill, ink := k.surface2, k.text
+			switch {
+			case i == *selected:
+				fill, ink = k.selected, k.selectedText
+			case b.Pressed():
+				fill = k.surface3
+			case b.Hovered():
+				fill = k.surface2.Mix(k.text, 0.08)
+			}
+			b.Background(fill)
+			if b.Clicked() {
+				*selected = i
+			}
+			s.pressMotion(b, 0.95)
+			b.Children(func() {
+				t := ui.Text(c, k.sentence(p)).FontSize(k.smallSize()).TextColor(ink).SingleLine()
+				k.labelWeight(t)
+				if i < len(counts) && counts[i] >= 0 {
+					ui.Text(c, count(counts[i])).FontSize(k.captionSize()).TextColor(ink.Alpha(0.8)).FontFeatures("tnum")
+				}
+			})
+		}
+	})
+}
+
 // sectionTitle titles a section over its content, on a 1px accent rule.
 func (s *shell) sectionTitle(c *ui.Context, title string) { s.sectionHead(c, title, nil) }
 
 // sectionHead is a section's title, with links to what relates to it at
-// its end.
+// its end: on a rule in the light headings, as written and heavier,
+// without one, in the others.
 func (s *shell) sectionHead(c *ui.Context, title string, links func()) {
 	k := &s.lk
+	if k.headings != headingsLight {
+		size := 22 * k.scale
+		if k.headings == headingsBold {
+			size = 24 * k.scale
+		}
+		ui.Row(c).Margin(0, 0, 12).Gap(16).Children(func() {
+			ui.Text(c, title).FontSize(size).FontWeight(k.titleWeight()).Font(k.display).
+				LetterSpacing(k.tracking(-0.02, size)).TextColor(k.text).SingleLine().Grow(1).MinWidth(0)
+			if links != nil {
+				ui.Row(c).Gap(16).Shrink(0).Children(links)
+			}
+		})
+		return
+	}
 	ui.Row(c).Margin(0, 0, 16).Padding(0, 0, 8).Gap(16).AlignItems(ui.End).BorderWidth(0, 0, 1, 0).BorderColor(k.rule).Children(func() {
-		ui.Text(c, strings.ToLower(title)).FontSize(k.titleSize()).FontWeight(300).Font(k.display).
+		ui.Text(c, k.words(title)).FontSize(k.titleSize()).FontWeight(300).Font(k.display).
 			LetterSpacing(-0.02 * k.titleSize()).TextColor(k.text).SingleLine().Grow(1).MinWidth(0)
 		if links != nil {
 			ui.Row(c).Gap(16).Shrink(0).Padding(0, 0, 4).Children(links)
@@ -269,7 +441,7 @@ func (s *shell) sectionHead(c *ui.Context, title string, links func()) {
 
 // link is a small text in the accent that does something when clicked.
 func (s *shell) link(c *ui.Context, key, label string) bool {
-	return s.linkOf(c.Key(key), label, "").FontSize(s.lk.smallSize()).Clicked()
+	return s.linkOf(c.Key(key), s.lk.sentence(label), "").FontSize(s.lk.smallSize()).Clicked()
 }
 
 // alert tells of a problem in a coral panel, with what to do about it.
@@ -277,7 +449,7 @@ func (s *shell) alert(c *ui.Context, title, message string, actions func()) ui.E
 	k := &s.lk
 	return ui.Column(c).Padding(16).Gap(12).Background(k.danger.Alpha(0.12).Over(k.bg)).Border(1, k.danger.Alpha(0.45)).
 		Radius(k.radiusSm).Children(func() {
-		ui.Text(c, title).FontSize(k.subtitleSize()).FontWeight(300)
+		ui.Text(c, title).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		if message != "" {
 			ui.Text(c, message).FontSize(k.bodySize()).MaxWidth(720)
 		}
@@ -293,6 +465,8 @@ func (s *shell) sourceMark(c *ui.Context, source media.Source, on bool) {
 	k := &s.lk
 	ink := k.muted
 	switch {
+	case on && k.tonal:
+		ink = k.selectedSub
 	case on:
 		ink = k.accentText
 	case source == media.SourceSpotify:
@@ -444,6 +618,9 @@ func (s *shell) paneWidth(c *ui.Context) float32 {
 	w -= s.railWidth()
 	if s.panel != "" {
 		w -= s.panelWidth(c)
+		if s.lk.floating {
+			w -= floatMargin
+		}
 	}
 	return max(w, 200)
 }
@@ -508,16 +685,26 @@ func (s *shell) segmented(c *ui.Context, key, label string, selected *int, label
 	seg := ui.SegmentedBase(c.Key(key), selected, len(labels))
 	// The track clips its segments, so that the chosen one's flood keeps
 	// to its rounded corners.
-	seg.Track.Height(34).Border(2, k.outline).Radius(k.radiusSm).Clip().Label(label).Shrink(0).Children(func() {
+	seg.Track.Height(34).Radius(k.round(34)).Clip().Label(label).Shrink(0)
+	if k.tonal {
+		seg.Track.Background(k.surface2)
+	} else {
+		seg.Track.Border(2, k.outline)
+	}
+	seg.Track.Children(func() {
 		for i, l := range labels {
+			l := k.words(l)
 			part := s.pointerKeys(seg.Segment(i)).PaddingX(14).FillHeight().Label(l).Cursor(ui.CursorPointer)
 			ink := k.text
 			switch {
 			case i == *selected:
-				part.Background(k.accent)
-				ink = k.accentText
+				part.Background(k.selected)
+				ink = k.selectedText
 			case part.Hovered():
 				part.Background(k.hover)
+			}
+			if k.pill {
+				part.Radius(17)
 			}
 			if part.Clicked() {
 				clicked = true
@@ -525,7 +712,7 @@ func (s *shell) segmented(c *ui.Context, key, label string, selected *int, label
 			// A label stays whole, without an ellipsis: a single line of
 			// some faces lays out a hair wider than the box measured for
 			// it, as Quicksand cut "best" to "be…".
-			part.Children(func() { ui.Text(c, l).FontSize(k.smallSize()).TextColor(ink).NoWrap() })
+			part.Children(func() { ui.Text(c, k.sentence(l)).FontSize(k.smallSize()).TextColor(ink).NoWrap() })
 		}
 	})
 	// With none chosen, MyGo's segmented control takes the first of its

@@ -18,13 +18,13 @@ type navItem struct {
 }
 
 var nav = []navItem{
-	{"home", "home", "home", "/"},
-	{"search", "search", "search", "/search"},
-	{"explore", "explore", "compass", "/explore"},
-	{"library", "library", "library", "/library"},
-	{"stats", "stats", "stats", "/stats"},
-	{"marketplace", "marketplace", "store", "/marketplace"},
-	{"settings", "settings", "settings", "/settings"},
+	{"home", "Home", "home", "/"},
+	{"search", "Search", "search", "/search"},
+	{"explore", "Explore", "compass", "/explore"},
+	{"library", "Library", "library", "/library"},
+	{"stats", "Stats", "stats", "/stats"},
+	{"marketplace", "Marketplace", "store", "/marketplace"},
+	{"settings", "Settings", "settings", "/settings"},
 }
 
 // section is the rail's item of path: its first part, with a mood's page
@@ -90,10 +90,10 @@ func (s *shell) rail(c *ui.Context) {
 		s.brand(c, collapsed)
 		ui.Column(c).Gap(4).Shrink(0).Children(func() {
 			for _, n := range nav {
-				s.navEntry(c, "nav-"+n.id, n.label, icon(n.icon), n.path, n.id == current)
+				s.navEntry(c, "nav-"+n.id, k.words(n.label), icon(n.icon), n.path, n.id == current)
 			}
 			for _, it := range s.plugins.SidebarItems() {
-				s.navEntry(c, "plugin-"+it.ID, strings.ToLower(it.Label), s.svgOf(it.Icon), it.Path, path == it.Path)
+				s.navEntry(c, "plugin-"+it.ID, k.words(it.Label), s.svgOf(it.Icon), it.Path, path == it.Path)
 			}
 		})
 		if !collapsed {
@@ -138,7 +138,7 @@ func (s *shell) brand(c *ui.Context, collapsed bool) {
 			// The mark keeps its pink in every theme, as the app's icon
 			// does.
 			ui.Icon(c, brandMark).Size(26, 26).Shrink(0).TextColor(brandPink)
-			ui.Text(c, "mixmusic").FontSize(24).FontWeight(300).Font(k.display).LetterSpacing(-0.03 * 24).
+			ui.Text(c, "mixmusic").FontSize(24).FontWeight(k.displayWeight()).Font(k.display).LetterSpacing(k.tracking(-0.03, 24)).
 				SingleLine().Grow(1).MinWidth(0)
 		}
 		label := "Collapse the sidebar"
@@ -152,9 +152,14 @@ func (s *shell) brand(c *ui.Context, collapsed bool) {
 }
 
 // navEntry is an outlined box of an icon with its lowercase label; the
-// current page floods its box with the accent.
+// current page floods its box with the accent. Tonal controls show it as
+// an icon and its label on an indicator (tonalNav).
 func (s *shell) navEntry(c *ui.Context, key, label string, svg *ui.SVG, path string, current bool) {
 	k := &s.lk
+	if k.tonal {
+		s.tonalNav(c, key, label, svg, path, current)
+		return
+	}
 	row := s.buttonBase(c.Key(key)).Gap(12).Justify(ui.Start).Label(label).Cursor(ui.CursorPointer)
 	if s.railFolded() {
 		row.Tooltip(label)
@@ -195,18 +200,65 @@ func (s *shell) navEntry(c *ui.Context, key, label string, svg *ui.SVG, path str
 	})
 }
 
+// tonalNav is a page of the rail as tonal controls show it: its icon and
+// label, the current one on an indicator in the fill of what is chosen,
+// which grows from the middle on the theme's spring as it becomes current.
+func (s *shell) tonalNav(c *ui.Context, key, label string, svg *ui.SVG, path string, current bool) {
+	k := &s.lk
+	folded := s.railFolded()
+	h := min(56, k.row-8)
+	row := s.buttonBase(c.Key(key)).Height(h).Gap(14).Padding(0, 16).Justify(ui.Start).Label(label).Cursor(ui.CursorPointer)
+	if folded {
+		row.Tooltip(label).Padding(0).Justify(ui.Center)
+	}
+	if row.Clicked() {
+		s.navigate(path)
+	}
+	switch {
+	case row.Pressed() && !current:
+		row.Background(k.press).Radius(k.round(h))
+	case row.Hovered() && !current:
+		row.Background(k.hover).Radius(k.round(h))
+	}
+	grown := float32(0)
+	if current {
+		grown = 1
+	}
+	if k.moves() {
+		grown = row.AnimateTo("indicator", grown, k.spring(true))
+	}
+	if grown > 0.01 {
+		fill, radius := k.selected, k.round(h)
+		row.Draw(func(p *ui.Painter, r ui.Rect) {
+			w := r.W * (0.5 + 0.5*grown)
+			p.Fill(ui.Rect{X: r.X + (r.W-w)/2, Y: r.Y, W: w, H: r.H}, withAlpha(fill, float64(min(1, 2*grown))), min(radius, w/2))
+		})
+	}
+	ink := k.text
+	if current {
+		ink = k.selectedText
+	}
+	row.Children(func() {
+		ui.Icon(c, svg).FontSize(22).TextColor(ink)
+		if !folded {
+			t := ui.Text(c, label).FontSize(k.size(0.875)).TextColor(ink).SingleLine()
+			k.labelWeight(t)
+		}
+	})
+}
+
 // mixes lists liked songs and the user's mixes, with their counts.
 func (s *shell) mixes(c *ui.Context, path string) {
 	k := &s.lk
 	ui.Column(c).Grow(1).MinHeight(88).Children(func() {
 		ui.Row(c).Justify(ui.SpaceBetween).Margin(0, 0, 8).Children(func() {
-			ui.Text(c, "your mixes").FontSize(k.bodySize()).TextColor(k.accent)
+			ui.Text(c, k.words("Your mixes")).FontSize(k.bodySize()).TextColor(k.accent)
 			if s.iconButton(c, "new-mix", "plus", "New mix", false, 18).Clicked() {
 				s.newMix()
 			}
 		})
 		ui.Scroll(c).Grow(1).MinHeight(0).Children(func() {
-			s.sideLink(c, "liked", "liked songs", len(s.svc.Collection.Liked()), "/library/liked", path)
+			s.sideLink(c, "liked", k.words("Liked songs"), len(s.svc.Collection.Liked()), "/library/liked", path)
 			for _, m := range s.svc.Collection.Playlists() {
 				s.sideLink(c, "mix-"+m.ID, m.Title, m.TrackCount, playlistPath(m.ID), path)
 			}
@@ -250,7 +302,7 @@ func (s *shell) liveTile(c *ui.Context, collapsed bool) {
 	if !ok {
 		if !collapsed {
 			ui.Column(c).Padding(12, 0).BorderWidth(1, 0, 0, 0).BorderColor(k.rule).Shrink(0).Children(func() {
-				ui.Text(c, "nothing playing yet").FontSize(k.smallSize()).TextColor(k.muted)
+				ui.Text(c, k.words("Nothing playing yet")).FontSize(k.smallSize()).TextColor(k.muted)
 			})
 		}
 		return

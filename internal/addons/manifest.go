@@ -3,7 +3,8 @@
 // in the add-ons folder themselves.
 //
 // A theme is a folder with a theme.json manifest, which sets the colors,
-// fonts and corners of the interface. A plugin is a folder with a
+// fonts and corners of the interface, and may set its layout: its shapes,
+// its density and the style of its parts. A plugin is a folder with a
 // plugin.json manifest and an ES module, whose default export MixMusic
 // calls with its plugin API.
 package addons
@@ -12,9 +13,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"path"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
@@ -35,6 +38,83 @@ var ColorKeys = []string{
 	"text", "text-muted", "accent", "accent-text",
 	"danger", "success", "youtube", "spotify",
 	"tile-1", "tile-2", "tile-3", "tile-4", "tile-text",
+}
+
+// LayoutToken is a layout token a theme may set: a length, from Min to
+// Max pixels, or one of Values.
+type LayoutToken struct {
+	Key      string
+	Min, Max float64
+	Values   []string
+}
+
+// LayoutTokens are the layout tokens, each of them optional: a theme
+// that leaves one out has MixMusic's own measure or style for it, so that
+// a theme that sets none looks as themes did before them.
+var LayoutTokens = []LayoutToken{
+	{Key: "radius-small", Max: 999},
+	{Key: "shape", Values: []string{"box", "pill"}},
+	{Key: "row", Min: 40, Max: 96},
+	{Key: "gutter", Min: 8, Max: 96},
+	{Key: "gap", Max: 48},
+	{Key: "rail", Min: 160, Max: 360},
+	{Key: "cover", Min: 120, Max: 320},
+	{Key: "player-height", Min: 64, Max: 128},
+	{Key: "player", Values: []string{"docked", "floating"}},
+	{Key: "controls", Values: []string{"outline", "tonal"}},
+	{Key: "headings", Values: []string{"light", "regular", "bold"}},
+	{Key: "cards", Values: []string{"none", "filled"}},
+	{Key: "motion", Values: []string{"standard", "smooth", "expressive"}},
+}
+
+// Pixels reads a length as themes write it, "12px", "0.75rem" or "1em",
+// in pixels: a rem or an em is 16.
+func Pixels(s string) (float64, bool) {
+	if !lengthRe.MatchString(s) {
+		return 0, false
+	}
+	unit := 1.0
+	for _, u := range []string{"rem", "em", "px"} {
+		if v, ok := strings.CutSuffix(s, u); ok {
+			s = v
+			if u != "px" {
+				unit = 16
+			}
+			break
+		}
+	}
+	v, err := strconv.ParseFloat(s, 64)
+	return v * unit, err == nil
+}
+
+// validate checks the value of a layout token.
+func (lt LayoutToken) validate(v string) error {
+	if lt.Values != nil {
+		if !slices.Contains(lt.Values, v) {
+			return fmt.Errorf("layout.%s must be %s", lt.Key, orList(lt.Values))
+		}
+		return nil
+	}
+	px, ok := Pixels(v)
+	if !ok {
+		return fmt.Errorf(`layout.%s must be a length, as "%gpx"`, lt.Key, max(lt.Min, 12))
+	}
+	if px < lt.Min || px > lt.Max {
+		return fmt.Errorf("layout.%s must be from %gpx to %gpx", lt.Key, lt.Min, lt.Max)
+	}
+	return nil
+}
+
+// orList is values as "a, b or c", quoted.
+func orList(values []string) string {
+	q := make([]string, len(values))
+	for i, v := range values {
+		q[i] = strconv.Quote(v)
+	}
+	if len(q) == 1 {
+		return q[0]
+	}
+	return strings.Join(q[:len(q)-1], ", ") + " or " + q[len(q)-1]
 }
 
 // OptionType is the kind of control a theme option shows.
@@ -87,9 +167,11 @@ type Theme struct {
 	Colors map[string]string `json:"colors"`
 	Fonts  Fonts             `json:"fonts"`
 	// Radius is the corner radius of cards and buttons, as "12px".
-	Radius  string   `json:"radius,omitempty"`
-	Preview string   `json:"preview,omitempty"`
-	Options []Option `json:"options"`
+	Radius string `json:"radius,omitempty"`
+	// Layout sets layout tokens, by their keys (LayoutTokens).
+	Layout  map[string]string `json:"layout,omitempty"`
+	Preview string            `json:"preview,omitempty"`
+	Options []Option          `json:"options"`
 	// Files lists the files of the theme, for the registry to install.
 	Files []string `json:"files,omitempty"`
 
@@ -171,6 +253,16 @@ func (t Theme) Validate() error {
 	}
 	if t.Radius != "" && !lengthRe.MatchString(t.Radius) {
 		errs = append(errs, errors.New(`radius must be a length, as "12px"`))
+	}
+	for _, key := range slices.Sorted(maps.Keys(t.Layout)) {
+		i := slices.IndexFunc(LayoutTokens, func(lt LayoutToken) bool { return lt.Key == key })
+		if i < 0 {
+			errs = append(errs, fmt.Errorf("layout.%s is not a layout token themes set", key))
+			continue
+		}
+		if err := LayoutTokens[i].validate(t.Layout[key]); err != nil {
+			errs = append(errs, err)
+		}
 	}
 	if t.Preview != "" && !ValidFile(t.Preview) {
 		errs = append(errs, errors.New("preview must be a file of the theme"))

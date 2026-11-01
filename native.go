@@ -238,8 +238,10 @@ type shell struct {
 	recording        string
 	recordingFocused bool
 	// plainKeys are the commands' keys without modifiers that a focused
-	// control takes, as the frame's runShortcuts found them.
-	plainKeys []plainKey
+	// control takes, as the frame's runShortcuts found them;
+	// themeCommands choose the themes, made once for the add-ons.
+	plainKeys     []plainKey
+	themeCommands []command
 	// offer is the new version the window offers, until the user answers;
 	// updating is set while it downloads, updated once it is installed.
 	offer                   *app.Release
@@ -344,6 +346,12 @@ func (s *shell) drain() {
 func (s *shell) refresh() {
 	s.set = s.svc.Preferences.Get()
 	s.inv = s.svc.Addons.List()
+	// A command to choose each theme, which the frames list.
+	s.themeCommands = s.themeCommands[:0]
+	for _, t := range s.inv.Themes {
+		id := t.ID
+		s.themeCommands = append(s.themeCommands, command{"theme." + id, "Theme: " + t.Name, "", "themes", func() { s.chooseTheme(id) }})
+	}
 	s.refetch("accounts")
 	if s.offer == nil {
 		s.offer = s.svc.System.UpdateOffer()
@@ -476,7 +484,7 @@ func (s *shell) promptDialog(c *ui.Context) {
 	}
 	open := true
 	var in ui.Element
-	s.dialog(c, &open, dialogOptions{key: "prompt", title: strings.ToLower(p.title)}, func() {
+	s.dialog(c, &open, dialogOptions{key: "prompt", title: s.lk.words(p.title)}, func() {
 		in = ui.TextInput(c.Key("prompt"), &p.value).AutoFocus().Label(p.label).Width(360)
 	}, func() {
 		name := strings.TrimSpace(p.value)

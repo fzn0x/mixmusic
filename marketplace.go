@@ -23,7 +23,7 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 		if reg.done && reg.err == nil {
 			counts = []int{len(reg.value.Themes), len(reg.value.Plugins)}
 		}
-		s.pageHeaderCounts(c, "marketplace", marketTabs, counts, &selected)
+		s.pageHeaderCounts(c, "Marketplace", marketTabs, counts, &selected)
 		if selected != before {
 			s.router.Replace("/marketplace/" + marketTabs[selected])
 		}
@@ -128,7 +128,7 @@ func (s *shell) marketCard(c *ui.Context, kind addons.Kind, e addons.Entry, base
 			}
 		})
 		ui.Column(c).Padding(16).Gap(6).Children(func() {
-			ui.Text(c, strings.ToLower(e.Name)).FontSize(k.size(1.5)).FontWeight(300).Font(k.display).SingleLine()
+			ui.Text(c, k.words(e.Name)).FontSize(k.size(1.5)).FontWeight(k.titleWeight()).Font(k.display).SingleLine()
 			ui.Text(c, e.Version+" · by "+e.Author).FontSize(k.captionSize()).TextColor(k.muted)
 			if e.Description != "" {
 				ui.Text(c, e.Description).FontSize(k.smallSize()).MaxLines(3)

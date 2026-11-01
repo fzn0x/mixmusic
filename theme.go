@@ -41,8 +41,25 @@ type look struct {
 	// fx are the effects of the built-in themes.
 	fx effects
 
-	// The shell's measures; rail is the unfolded rail's width.
+	// The shell's measures; rail is the unfolded rail's width, gap the gap
+	// between covers, and cover their size on the shelves.
 	row, rail, panel, player, gutter float32
+	gap, cover                       float32
+	// The layout tokens' styles (layout.go): pill rounds buttons, chips
+	// and the search box fully; tonal fills controls rather than outlining
+	// them; cards sets covers in filled cards; floating floats the player
+	// bar over the window's foot.
+	pill, tonal, cards, floating bool
+	headings                     headingStyle
+	motion                       motionStyle
+	// selected fills what is chosen, as the current page and the track
+	// that plays, and selectedText and selectedSub ink it: the accent, or,
+	// with tonal controls, a quieter fill. tonalFill fills the secondary
+	// buttons of tonal controls, and tonalInk inks them.
+	selected, selectedText, selectedSub ui.Color
+	tonalFill, tonalInk                 ui.Color
+	// lowered are the words the light headings lowered, by the words.
+	lowered map[string]string
 }
 
 // fallbackTheme is the Mix theme's tokens, for a theme that lacks some.
@@ -66,7 +83,28 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 			break
 		}
 	}
+	var fx effects
+	if th.Builtin {
+		fx = themeEffects(th, s.ThemeOptions[th.ID])
+	}
+	// The accent: the artwork's, the user's, or the theme's.
+	pick := s.Accent
+	if s.DynamicAccent && artwork != "" {
+		pick = artwork
+	}
+	// The Material themes make all their colours of it, as their seed.
+	var mat *materialColors
+	if fx.material {
+		seed := materialSeed
+		if a, ok := parseColor(pick); ok && pick != "" {
+			seed = a
+		}
+		mat = materialOf(seed, th.Scheme != "light")
+	}
 	tok := func(name string) color.NRGBA {
+		if c, ok := mat.token(name); ok {
+			return c
+		}
 		if c, ok := parseColor(th.Colors[name]); ok {
 			return c
 		}
@@ -77,14 +115,15 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	bg.A = 255
 	text, accent := tok("text"), tok("accent")
 	accentText := tok("accent-text")
-	// The accent: the artwork's, the user's, or the theme's, as it reads on
-	// the ground.
-	pick := s.Accent
-	if s.DynamicAccent && artwork != "" {
-		pick = artwork
-	}
-	if a, ok := parseColor(pick); ok && pick != "" {
-		a = readableOn(a, bg)
+	// Other themes take it as it reads on the ground: at 3:1, or, where
+	// controls are tonal, which set it as small text on their fills, at
+	// 4.5:1 on the panels' surface, which has less contrast with it.
+	if a, ok := parseColor(pick); ok && pick != "" && mat == nil {
+		if th.Layout["controls"] == "tonal" {
+			a = legibleOn(a, over(tok("surface"), bg), 4.5)
+		} else {
+			a = readableOn(a, bg)
+		}
 		accent, accentText = a, inkOn(a)
 	}
 	k := look{dark: th.Scheme != "light", systemDark: dark, scale: float32(s.FontScale), compact: s.Density == settings.DensityCompact}
@@ -103,7 +142,7 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	}
 	k.tileText = col(tok("tile-text"))
 	if th.Builtin {
-		k.fx = themeEffects(th, s.ThemeOptions[th.ID])
+		k.fx = fx
 		if th.ID == "mix" && optionValue(th, s.ThemeOptions[th.ID], "white-tiles") == "true" {
 			// Classic white ink on tiles, for those who prefer it to contrast.
 			k.tileText = ui.RGB(255, 255, 255)
@@ -116,15 +155,22 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	k.scrim = col(alpha(bg, 0.72))
 	k.raised = col(over(tok("surface-2"), bg))
 	k.radius = cssLength(th.Radius)
-	k.radiusSm = k.radius * 0.6
 	k.body = fontFamily(th.Fonts.Body)
 	k.display = fontFamily(th.Fonts.Display)
 	if th.Fonts.Display == "" {
 		k.display = k.body
 	}
-	k.row, k.rail, k.panel, k.player, k.gutter = 52, 248, 340, 92, 40
-	if k.compact {
-		k.row, k.rail, k.player, k.gutter = 40, 224, 80, 28
+	k.layoutOf(th)
+	k.selected, k.selectedText, k.selectedSub = k.accent, k.accentText, k.accentText.Alpha(0.78)
+	k.tonalFill, k.tonalInk = col(over(tok("surface-3"), bg)), k.text
+	switch {
+	case k.tonal && mat != nil:
+		// Material's secondary container.
+		k.selected, k.selectedText, k.selectedSub = col(mat.selected), col(mat.selectedText), col(mat.selectedText)
+		k.tonalFill, k.tonalInk = k.selected, k.selectedText
+	case k.tonal:
+		// The highest surface, with the accent's ink, as it reads there.
+		k.selected, k.selectedText, k.selectedSub = k.tonalFill, col(legibleOn(nrgba(k.accent), nrgba(k.tonalFill), 4.5)), k.muted
 	}
 
 	t := *ui.DarkTheme()

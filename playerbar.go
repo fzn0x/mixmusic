@@ -12,11 +12,22 @@ import (
 )
 
 // playerBar shows what plays, the transport and where it is in the track,
-// and the volume; the next track waits in view under the current one.
+// and the volume; the next track waits in view under the current one. It
+// runs across the window's foot, or floats over it as a raised card.
 func (s *shell) playerBar(c *ui.Context) {
 	k := &s.lk
-	ui.Row(c).Height(k.player).Shrink(0).Padding(0, 24, 0, 16).Gap(24).Background(k.surface).
-		BorderWidth(1, 0, 0, 0).BorderColor(k.border).Children(func() {
+	bar := ui.Row(c).Height(k.player).Shrink(0).Padding(0, 24, 0, 16).Gap(24)
+	if k.floating {
+		shade := 0.16
+		if k.dark {
+			shade = 0.4
+		}
+		bar.Margin(0, floatMargin, floatMargin).Padding(0, 20, 0, 9).Radius(k.radius).Background(col(over(nrgba(k.surface2), nrgba(k.bg)))).
+			Shadow(0, 6, 20, -6, ui.RGBA(0, 0, 0, float32(shade)))
+	} else {
+		bar.Background(k.surface).BorderWidth(1, 0, 0, 0).BorderColor(k.border)
+	}
+	bar.Children(func() {
 		ui.Row(c).Grow(1).Basis(0).MinWidth(220).Gap(12).Children(func() { s.nowPlayingInfo(c) })
 		ui.Column(c).Grow(1.6).Basis(0).MinWidth(320).Gap(6).AlignItems(ui.Center).Children(func() {
 			s.transport(c)
@@ -30,16 +41,21 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 	k := &s.lk
 	cur, ok := s.st.Current()
 	if !ok {
-		ui.Text(c, "pick something to play").FontSize(k.smallSize()).TextColor(k.muted)
+		ui.Text(c, k.words("Pick something to play")).FontSize(k.smallSize()).TextColor(k.muted)
 		return
 	}
 	t := cur.Track
-	art := s.buttonBase(c.Key("player-art")).Size(62, 62).Shrink(0).Label("Open now playing").Cursor(ui.CursorPointer)
+	// The artwork fills a short bar, but its margins.
+	size := float32(62)
+	if k.player < 80 {
+		size = k.player - 16
+	}
+	art := s.buttonBase(c.Key("player-art")).Size(size, size).Shrink(0).Label("Open now playing").Cursor(ui.CursorPointer)
 	art.ContextMenu(func(m *ui.Menu) { s.trackMenu(m, t) })
 	if art.Clicked() {
 		s.navigate("/now-playing")
 	}
-	art.Children(func() { s.cover(c, "player-cover", t.Artwork, 62, false) })
+	art.Children(func() { s.cover(c, "player-cover", t.Artwork, size, false) })
 	ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 		if t.Album != nil && t.Album.ID != "" {
 			link := s.buttonBase(c.Key("player-title")).Justify(ui.Start).MinWidth(0).Label(t.Title).Cursor(ui.CursorPointer)
@@ -84,7 +100,7 @@ func (s *shell) likeButton(c *ui.Context, key string, t media.Track, size float3
 		label = "Remove from liked songs"
 	}
 	k := &s.lk
-	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
+	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.round(32)).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
 	ink := k.muted
 	switch {
 	case on:

@@ -16,9 +16,9 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 	cur, ok := s.st.Current()
 	s.pageScroll(c, func() {
 		if !ok {
-			s.pageHeader(c, "now playing", nil, nil)
-			ui.Text(c, "nothing playing").FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
-			ui.Text(c, "Play a track and it fills this page, with its lyrics.").FontSize(k.subtitleSize()).FontWeight(300)
+			s.pageHeader(c, "Now playing", nil, nil)
+			ui.Text(c, k.words("Nothing playing")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+			ui.Text(c, "Play a track and it fills this page, with its lyrics.").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 			return
 		}
 		t := cur.Track

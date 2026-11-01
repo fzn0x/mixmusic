@@ -96,7 +96,7 @@ func (s *shell) toolProblems(c *ui.Context) {
 // toolSettings show the tools MixMusic runs, and install yt-dlp.
 func (s *shell) toolSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, "tools", func() {
+	s.group(c, "Tools", func() {
 		st := s.toolStatus()
 		if !st.done {
 			s.loading(c)
@@ -157,7 +157,7 @@ func (s *shell) toolSettings(c *ui.Context) {
 // cacheSettings show what the offline cache holds, and bound it.
 func (s *shell) cacheSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, "offline cache", func() {
+	s.group(c, "Offline cache", func() {
 		use := s.svc.System.CacheUsage()
 		s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. Tracks you played play again without the network.", plural(use.Tracks, "track"), byteSize(use.Bytes)), func() {
 			if s.button(c, "clear-cache", "clear", false).Label("Clear tracks").Disabled(use.Tracks == 0).Clicked() {

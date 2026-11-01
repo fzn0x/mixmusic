@@ -1,0 +1,49 @@
+{
+  "id": "material",
+  "name": "Material",
+  "version": "1.0.0",
+  "author": "MixMusic",
+  "description": "Material 3 Expressive: tonal colours made of the cover's, pill buttons, rounded cards and a floating player, on springs.",
+  "scheme": "light",
+  "colors": {
+    "bg": "#fff8f8",
+    "surface": "#f7ebec",
+    "surface-2": "#f1e5e7",
+    "surface-3": "#ebe0e1",
+    "border": "#d5c2c6",
+    "text": "#201a1b",
+    "text-muted": "#514347",
+    "accent": "#b90064",
+    "accent-text": "#ffffff",
+    "danger": "#ba1a1a",
+    "success": "#2e712e",
+    "youtube": "#be281c",
+    "spotify": "#1f7314",
+    "tile-1": "#ffd9e2",
+    "tile-2": "#ffdcc2",
+    "tile-3": "#ffb0c9",
+    "tile-4": "#efbd94",
+    "tile-text": "#201a1b"
+  },
+  "fonts": {
+    "body": "'Roboto Flex', Roboto, 'Segoe UI', 'Noto Sans', system-ui, sans-serif",
+    "display": "'Roboto Flex', Roboto, 'Segoe UI', 'Noto Sans', system-ui, sans-serif"
+  },
+  "radius": "28px",
+  "layout": {
+    "radius-small": "12px",
+    "shape": "pill",
+    "row": "64px",
+    "gutter": "32px",
+    "gap": "16px",
+    "rail": "256px",
+    "cover": "176px",
+    "player-height": "80px",
+    "player": "floating",
+    "controls": "tonal",
+    "headings": "regular",
+    "cards": "filled",
+    "motion": "expressive"
+  },
+  "options": []
+}

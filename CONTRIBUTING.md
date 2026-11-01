@@ -40,7 +40,8 @@ rules keep the project healthy:
 
 - **Every system.** Changes must build for macOS, Windows and Linux; `GOOS=linux go vet ./...` and `GOOS=darwin go vet ./...` check them from Windows.
 - **The theme contract is public.** Community themes set the tokens of
-  [docs/themes.md](docs/themes.md): colors, fonts and a radius. Rename or
+  [docs/themes.md](docs/themes.md): colors, fonts, a radius and layout
+  tokens, whose defaults keep Mix's look. Rename or
   remove one only with a plan for the themes that set it, and document new
   ones there.
 - **The plugin API is public.** Change `internal/plugins/api.js`,

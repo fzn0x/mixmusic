@@ -553,20 +553,25 @@ func (p *Player) Flush() {
 }
 
 // savedOf is the queue of st as it survives a restart: the part of it
-// savedWindow keeps, with the current entry's index in that part.
+// savedWindow keeps, with the current entry's index in that part, and
+// which of its entries the radio added.
 func savedOf(st State) Saved {
 	from, to := savedWindow(len(st.Queue), st.Index)
-	tracks := make([]media.Track, 0, to-from)
-	for _, it := range st.Queue[from:to] {
-		tracks = append(tracks, it.Track)
-	}
-	return Saved{
-		Tracks:   tracks,
+	kept := st.Queue[from:to]
+	saved := Saved{
+		Tracks:   make([]media.Track, len(kept)),
 		Index:    st.Index - from,
 		Position: int(st.Position / time.Millisecond),
 		Shuffle:  st.Shuffle,
 		Repeat:   st.Repeat,
 	}
+	for i, it := range kept {
+		saved.Tracks[i] = it.Track
+		if it.Radio {
+			saved.Radio = append(saved.Radio, i)
+		}
+	}
+	return saved
 }
 
 // The stream engine's events, as audio.Events.

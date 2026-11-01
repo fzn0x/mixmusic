@@ -154,6 +154,8 @@ type Saved struct {
 	Position int    `json:"position"` // in milliseconds
 	Shuffle  bool   `json:"shuffle"`
 	Repeat   Repeat `json:"repeat"`
+	// Radio holds the indexes in Tracks of the entries a radio added.
+	Radio []int `json:"radio,omitempty"`
 }
 
 // Services are what the player asks of the app.
@@ -322,9 +324,10 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.s = State{Index: -1, Repeat: RepeatOff, Volume: st.Volume}
 	p.spotifyMode = st.SpotifyPlayback
 	if len(saved.Tracks) > 0 {
+		radio := marks(saved.Radio, len(saved.Tracks))
 		p.s.Queue = make([]Item, len(saved.Tracks))
 		for i, t := range saved.Tracks {
-			p.s.Queue[i] = p.item(t, false)
+			p.s.Queue[i] = p.item(t, radio[i])
 		}
 		p.s.Index = min(max(saved.Index, 0), len(p.s.Queue)-1)
 		// The position is the saved current track's. A queue kept before
@@ -527,6 +530,18 @@ func (t *throttle) call(p *Player, fn func()) {
 func (p *Player) item(t media.Track, radio bool) Item {
 	p.uidSeq++
 	return Item{UID: strconv.FormatInt(time.Now().UnixMilli(), 36) + "-" + strconv.Itoa(p.uidSeq), Track: t, Radio: radio}
+}
+
+// marks is which of n entries a saved queue's indexes name; it leaves out
+// those past them.
+func marks(indexes []int, n int) []bool {
+	out := make([]bool, n)
+	for _, i := range indexes {
+		if i >= 0 && i < n {
+			out[i] = true
+		}
+	}
+	return out
 }
 
 func ms(v int) time.Duration { return time.Duration(v) * time.Millisecond }

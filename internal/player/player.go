@@ -90,6 +90,10 @@ type State struct {
 	// change meanwhile.
 	Waiting  bool
 	WillPlay bool
+	// Speed is the speed the current track plays at, at its own pitch: 1 is
+	// its own speed. What MixMusic's own engine plays takes the settings'
+	// speed of its kind; Spotify plays its own tracks at their own.
+	Speed float64
 }
 
 // Current returns the current entry.
@@ -150,6 +154,9 @@ type Now struct {
 	Volume  float64
 	Shuffle bool
 	Repeat  Repeat
+	// Speed is the speed the track plays at, 1 its own: Position and
+	// Duration are the track's own time, which moves on at Speed.
+	Speed float64
 }
 
 // Saved is the queue as it survives a restart.
@@ -211,17 +218,20 @@ type Services interface {
 }
 
 // Stream is MixMusic's own audio engine, as *audio.Engine, whose events
-// the player takes as an audio.Events.
+// the player takes as an audio.Events. Its speeds keep the pitch: 1 plays
+// a track at its own speed.
 type Stream interface {
-	Load(url string, start time.Duration, autoplay bool) error
+	Load(url string, start time.Duration, autoplay bool, speed float64) error
 	Preload(url string)
-	Crossfade(url string, d time.Duration) error
+	Crossfade(url string, d time.Duration, speed float64) error
 	Play() error
 	Pause()
 	Stop()
 	Unload()
 	Seek(t time.Duration)
 	SetVolume(v float64)
+	// SetSpeed plays the track loaded at speed.
+	SetSpeed(speed float64)
 }
 
 // These are the times the player keeps; tests shorten them.
@@ -262,7 +272,8 @@ const (
 	// before its audio is downloaded too.
 	prepareAfter  = time.Second
 	prefetchAfter = 10 * time.Second
-	// restartAfter is how far into a track Previous goes back to its start.
+	// restartAfter is how long into a track, heard at its speed, Previous
+	// goes back to its start.
 	restartAfter = 3 * time.Second
 	// radioMax is how many tracks a radio adds at most.
 	radioMax = 25
@@ -411,7 +422,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.connect = &connectEngine{p: p, device: device, tickEvery: connectTick, askEvery: connectAskEvery, askDefault: connectAskEvery,
 		settle: connectSettle}
 	st := svc.Settings()
-	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume)}
+	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume), Speed: 1}
 	p.spotifyMode = st.SpotifyPlayback
 	if len(saved.Tracks) > 0 {
 		radio := marks(saved.Radio, len(saved.Tracks))
@@ -427,6 +438,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 			p.s.Position = time.Duration(saved.Position) * time.Millisecond
 		}
 		p.s.Duration = ms(p.s.Queue[p.s.Index].Track.DurationMs)
+		p.s.Speed = speedOf(st, p.s.Queue[p.s.Index].Track)
 		p.s.Shuffle = saved.Shuffle
 		if saved.Repeat == RepeatAll || saved.Repeat == RepeatOne {
 			p.s.Repeat = saved.Repeat

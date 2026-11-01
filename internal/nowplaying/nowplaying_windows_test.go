@@ -62,6 +62,8 @@ const (
 	slotAlbumTitle           = 10 // media properties
 	slotThumbnail            = 15 // media properties
 	slotPlaybackStatus       = 7  // playback info
+	slotPlaybackRate         = 10 // playback info
+	slotReferenceValue       = 6  // IReference
 	slotTimelineEndTime      = 7  // timeline properties
 	slotTimelineMaxSeekTime  = 9  // timeline properties
 	slotTimelinePosition     = 10 // timeline properties
@@ -143,8 +145,10 @@ type flyout struct {
 	title, artist, album string
 	thumbnail            bool
 	status               int32
-	end, maxSeek, at     time.Duration
-	updated              time.Time
+	// rate is the playback rate, or 0 when there is none.
+	rate             float64
+	end, maxSeek, at time.Duration
+	updated          time.Time
 }
 
 // read returns what the flyout shows of the session s.
@@ -170,6 +174,12 @@ func read(t *testing.T, s unsafe.Pointer) flyout {
 	syscall.SyscallN(method(s, slotGetPlaybackInfo), uintptr(s), uintptr(unsafe.Pointer(&info)))
 	if info != nil {
 		syscall.SyscallN(method(info, slotPlaybackStatus), uintptr(info), uintptr(unsafe.Pointer(&f.status)))
+		var rate unsafe.Pointer
+		syscall.SyscallN(method(info, slotPlaybackRate), uintptr(info), uintptr(unsafe.Pointer(&rate)))
+		if rate != nil {
+			syscall.SyscallN(method(rate, slotReferenceValue), uintptr(rate), uintptr(unsafe.Pointer(&f.rate)))
+			release(rate)
+		}
 		release(info)
 	}
 	var timeline unsafe.Pointer
@@ -330,6 +340,24 @@ func TestMediaFlyout(t *testing.T) {
 		t.Errorf("position %v at %v, want about 10 s at %v", f.at, f.updated, info.At)
 	}
 	eventually(t, "the artwork", func() bool { return read(t, s).thumbnail })
+
+	// At 2×, from 20 s: the controls are told the rate where Windows lets
+	// them, on x64, and where the track is.
+	faster := info
+	faster.Rate, faster.Position, faster.At = 2, 20*time.Second, time.Now()
+	c.Show(&faster)
+	eventually(t, "the position at 2×", func() bool {
+		f := read(t, s)
+		return f.at >= 19*time.Second && f.at <= 22*time.Second
+	})
+	if f := read(t, s); runtime.GOARCH == "amd64" && f.rate != 2 {
+		t.Errorf("the flyout's rate %v at 2×", f.rate)
+	}
+	c.Show(&info)
+	eventually(t, "the position at 1×", func() bool {
+		f := read(t, s)
+		return f.at < 19*time.Second && (runtime.GOARCH != "amd64" || f.rate == 1)
+	})
 
 	// The buttons ask the player, which shows what it does: the flyout
 	// offers only what changes it.

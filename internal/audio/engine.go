@@ -47,9 +47,10 @@ const (
 var ErrNoOutput = errors.New("no audio output device")
 
 // Engine plays tracks on two decks, so that one can fade into the next,
-// each turned down to an even loudness when its track is loud, through the
-// preamp, equalizer, levelling, volume and analyser of the web player: the
-// API of its AudioEngine. Its methods are safe for concurrent use.
+// each at its speed and turned down to an even loudness when its track is
+// loud, through the preamp, equalizer, levelling, volume and analyser of
+// the web player: the API of its AudioEngine. Its methods are safe for
+// concurrent use.
 type Engine struct {
 	open   Opener
 	start  OutputStarter
@@ -128,9 +129,10 @@ func (e *Engine) wake() {
 	}
 }
 
-// Load plays url on the active deck from start, or holds it there until
-// Play when autoplay is false. A track that Preload loaded starts at once.
-func (e *Engine) Load(url string, start time.Duration, autoplay bool) error {
+// Load plays url on the active deck from start, at speed, or holds it there
+// until Play when autoplay is false. A track that Preload loaded starts at
+// once.
+func (e *Engine) Load(url string, start time.Duration, autoplay bool, speed float64) error {
 	e.mu.Lock()
 	var stale []*deck
 	e.fading = false
@@ -147,6 +149,7 @@ func (e *Engine) Load(url string, start time.Duration, autoplay bool) error {
 	}
 	d := e.decks[e.active]
 	d.gain = ramp{value: 1, target: 1}
+	d.speed = clampSpeed(speed)
 	e.levels[e.active] = ramp{}
 	e.levels[1-e.active] = ramp{}
 	e.reported.ended, e.reported.failed = nil, nil
@@ -175,9 +178,9 @@ func (e *Engine) Preload(url string) {
 	closeDecks([]*deck{stale})
 }
 
-// Crossfade plays url on the idle deck while the active one fades out,
-// over d: the idle deck becomes the active one.
-func (e *Engine) Crossfade(url string, d time.Duration) error {
+// Crossfade plays url on the idle deck at speed while the active one fades
+// out at its own, over d: the idle deck becomes the active one.
+func (e *Engine) Crossfade(url string, d time.Duration, speed float64) error {
 	e.mu.Lock()
 	from, to := e.active, 1-e.active
 	var stale []*deck
@@ -192,6 +195,7 @@ func (e *Engine) Crossfade(url string, d time.Duration) error {
 	}
 	e.decks[to].gain = ramp{}
 	e.decks[to].gain.to(1, d)
+	e.decks[to].speed = clampSpeed(speed)
 	e.levels[to] = ramp{value: 1, target: 1}
 	e.fading = true
 	e.fadeEnd = time.Now().Add(d + 50*time.Millisecond)
@@ -300,6 +304,17 @@ func (e *Engine) Seek(t time.Duration) {
 	}
 }
 
+// SetSpeed plays the active deck's track at speed, from MinSpeed to
+// MaxSpeed, at its own pitch: 1 is its own speed. A track fading out keeps
+// its speed.
+func (e *Engine) SetSpeed(speed float64) {
+	e.mu.Lock()
+	if d := e.decks[e.active]; d != nil {
+		d.speed = clampSpeed(speed)
+	}
+	e.mu.Unlock()
+}
+
 // SetVolume sets the volume, from 0 to 1, on volume's curve: each tenth of
 // it is 6 dB.
 func (e *Engine) SetVolume(v float64) {
@@ -372,9 +387,10 @@ func (e *Engine) position() time.Duration {
 	if d == nil {
 		return 0
 	}
-	pos := duration(d.position())
+	pos := duration(d.heard())
 	if e.out != nil && !e.paused {
-		pos -= e.out.Delay()
+		// What waits to be heard plays the track at the deck's speed.
+		pos -= time.Duration(float64(e.out.Delay()) * d.speed)
 	}
 	return max(0, pos)
 }
@@ -460,7 +476,9 @@ func (e *Engine) renderQuantum() {
 		}
 		sounding = true
 		r := d.ring.Load()
-		n := r.readTo(e.deckBuf[:])
+		// At the deck's speed: what follows, the equalizer and the analyser
+		// too, takes what is heard.
+		n := d.read(r, e.deckBuf[:])
 		trim := e.trimOf(d, n > 0)
 		for f := range quantum {
 			g := float32(d.gain.next() * level.next() * trim.next())
@@ -534,7 +552,8 @@ func (e *Engine) report() {
 		position = e.position()
 		total, _ = d.info()
 		r := d.ring.Load()
-		if r.done.Load() && r.readable() == 0 {
+		// A stretch plays what it holds after the ring ran out.
+		if r.done.Load() && r.readable() == 0 && !d.pending(r) {
 			if failure = d.failure(); failure != nil {
 				failed = e.reported.failed != r
 				e.reported.failed = r

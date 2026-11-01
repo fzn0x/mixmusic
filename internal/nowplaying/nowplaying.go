@@ -34,13 +34,30 @@ type Info struct {
 	Playing  bool
 	// Volume is from 0 to 1.
 	Volume float64
+	// Rate is the speed the track plays at, from MinRate to MaxRate, at
+	// which the position moves on: 1 is its own, as is 0.
+	Rate float64
+}
+
+// The speeds MixMusic plays at, which the system's controls may ask.
+const (
+	MinRate = 0.5
+	MaxRate = 3
+)
+
+// rate returns the speed the track plays at.
+func (i *Info) rate() float64 {
+	if i.Rate > 0 {
+		return i.Rate
+	}
+	return 1
 }
 
 // position returns where the track is at now.
 func (i *Info) position(now time.Time) time.Duration {
 	p := i.Position
 	if i.Playing && !i.At.IsZero() {
-		p += now.Sub(i.At)
+		p += time.Duration(float64(now.Sub(i.At)) * i.rate())
 	}
 	if i.Duration > 0 {
 		p = min(p, i.Duration)
@@ -61,9 +78,11 @@ type change struct {
 	// seeked is set when the position jumped in the same track.
 	seeked bool
 	volume bool
+	// rate is set when the track plays at another speed.
+	rate bool
 }
 
-func (c change) any() bool { return c.track || c.playing || c.seeked || c.volume }
+func (c change) any() bool { return c.track || c.playing || c.seeked || c.volume || c.rate }
 
 // diff returns what changed from prev, what the system's controls go on
 // from, to next.
@@ -80,6 +99,7 @@ func diff(prev, next *Info) change {
 		c.seeked = d > seekSkew || d < -seekSkew
 	}
 	c.volume = prev.Volume != next.Volume
+	c.rate = prev.rate() != next.rate()
 	return c
 }
 
@@ -112,6 +132,9 @@ const (
 	SetVolume
 	// Raise shows the player's window. MPRIS asks it.
 	Raise
+	// SetRate plays at the Request's Rate, from MinRate to MaxRate. MPRIS
+	// asks it.
+	SetRate
 )
 
 // Request is a Command with what it needs.
@@ -119,6 +142,7 @@ type Request struct {
 	Command  Command
 	Position time.Duration
 	Volume   float64
+	Rate     float64
 }
 
 // requests is how many requests wait for the handler before more are

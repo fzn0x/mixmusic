@@ -157,8 +157,17 @@ func (s *fakeStream) record(format string, args ...any) {
 	s.calls = append(s.calls, fmt.Sprintf(format, args...))
 }
 
-func (s *fakeStream) Load(url string, start time.Duration, autoplay bool) error {
-	s.record("load %s %v %v", url, start, autoplay)
+// atSpeed is how the calls of the fake stream tell a speed: by nothing at
+// a track's own.
+func atSpeed(speed float64) string {
+	if speed == 1 {
+		return ""
+	}
+	return fmt.Sprintf(" speed %v", speed)
+}
+
+func (s *fakeStream) Load(url string, start time.Duration, autoplay bool, speed float64) error {
+	s.record("load %s %v %v%s", url, start, autoplay, atSpeed(speed))
 	s.mu.Lock()
 	s.url, s.paused = url, true
 	s.mu.Unlock()
@@ -170,10 +179,12 @@ func (s *fakeStream) Load(url string, start time.Duration, autoplay bool) error 
 
 func (s *fakeStream) Preload(url string) { s.record("preload %s", url) }
 
-func (s *fakeStream) Crossfade(url string, d time.Duration) error {
-	s.record("crossfade %s %v", url, d)
+func (s *fakeStream) Crossfade(url string, d time.Duration, speed float64) error {
+	s.record("crossfade %s %v%s", url, d, atSpeed(speed))
 	return nil
 }
+
+func (s *fakeStream) SetSpeed(speed float64) { s.record("set speed %v", speed) }
 
 func (s *fakeStream) Play() error {
 	s.record("play")

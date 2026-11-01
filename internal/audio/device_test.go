@@ -26,7 +26,7 @@ func TestEngineOnTheDevice(t *testing.T) {
 	defer e.Close()
 	e.SetVolume(0)
 	e.master = newSmoother(0, glide)
-	err := e.Load(cuesFront, 0, true)
+	err := e.Load(cuesFront, 0, true, 1)
 	if errors.Is(err, output.ErrNoDevice) || errors.Is(err, output.ErrUnsupported) {
 		t.Skip(err)
 	}
@@ -51,6 +51,56 @@ func TestEngineOnTheDevice(t *testing.T) {
 	}
 	took := time.Since(began)
 	if !rec.has("ended") || took < 2800*time.Millisecond || took > 3600*time.Millisecond {
+		t.Errorf("ended %v after %v (events %q)", rec.has("ended"), took, rec.events)
+	}
+	if rec.has("buffering true") {
+		t.Errorf("it buffered: %q", rec.events)
+	}
+	t.Logf("ended after %v; events %q", took.Round(time.Millisecond), rec.events)
+}
+
+// TestEngineOnTheDeviceAtSpeed plays the 3-second track at 2× through the
+// device, silently: its time moves on at twice the clock's, what waits in
+// the device included, and it ends 1.5 seconds after it started. The track
+// plays once the deck has it: after the test before, the output starts at
+// once, which on macOS asks for its first buffers before the deck decoded
+// a frame, at any speed.
+func TestEngineOnTheDeviceAtSpeed(t *testing.T) {
+	if os.Getenv("MIXMUSIC_AUDIO") != "1" {
+		t.Skip("MIXMUSIC_AUDIO=1 runs the tests that open the audio device")
+	}
+	start := func(render func([]float32), failed func(error)) (Output, error) {
+		return output.Start(render, failed)
+	}
+	rec := newRecorder()
+	e := NewEngine(fileOpener, start, rec)
+	defer e.Close()
+	e.SetVolume(0)
+	e.master = newSmoother(0, glide)
+	if err := e.Load(cuesFront, 0, false, 2); err != nil {
+		t.Fatal(err)
+	}
+	buffered(t, e, 0, ringFrames/2)
+	err := e.Play()
+	if errors.Is(err, output.ErrNoDevice) || errors.Is(err, output.ErrUnsupported) {
+		t.Skip(err)
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	began := time.Now()
+	time.Sleep(500 * time.Millisecond)
+	if p := e.Position(); p < 800*time.Millisecond || p > 1200*time.Millisecond {
+		t.Errorf("position %v after half a second at 2×", p)
+	}
+	ended := make(chan struct{})
+	go func() { rec.waitFor(t, "ended"); close(ended) }()
+	select {
+	case <-time.After(5 * time.Second):
+	case <-ended:
+	}
+	took := time.Since(began)
+	if !rec.has("ended") || took < 1300*time.Millisecond || took > 2100*time.Millisecond {
 		t.Errorf("ended %v after %v (events %q)", rec.has("ended"), took, rec.events)
 	}
 	if rec.has("buffering true") {

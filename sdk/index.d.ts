@@ -121,6 +121,8 @@ export interface PlayerSnapshot {
   queue: Track[];
   /** The position of the current track in the queue, or -1. */
   index: number;
+  /** The speed the current track plays at, at its own pitch: 1 is its own speed, 1.25 a quarter faster. positionMs and durationMs are the track's own time, which moves on at this speed. Tracks Spotify plays are always at 1. */
+  speed: number;
 }
 
 /** What plugins may hear of the player. */

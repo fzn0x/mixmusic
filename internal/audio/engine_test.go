@@ -3,6 +3,7 @@ package audio
 import (
 	"errors"
 	"fmt"
+	"math"
 	"slices"
 	"strings"
 	"sync"
@@ -63,8 +64,9 @@ func (f *fakeDevice) play(t *testing.T, n int) []float32 {
 	return out
 }
 
-// waitDecks waits for the decks that play to hold n frames, or their whole
-// track.
+// waitDecks waits for the decks that play to hold n frames of what they
+// play, or their whole track: at a speed, the frames those take, and the
+// stretch's windows and search beyond them.
 func (f *fakeDevice) waitDecks(t *testing.T, n int) {
 	t.Helper()
 	deadline := time.Now().Add(5 * time.Second)
@@ -76,8 +78,12 @@ func (f *fakeDevice) waitDecks(t *testing.T, n int) {
 			if d == nil || l.value == 0 && l.target == 0 {
 				continue
 			}
+			need := int64(n)
+			if d.speed != 1 {
+				need = int64(math.Ceil(float64(n)*d.speed)) + stretchWindow + 2*stretchSearch
+			}
 			r := d.ring.Load()
-			ready = ready && (r.readable() >= int64(n) || r.done.Load())
+			ready = ready && (r.readable() >= need || r.done.Load())
 		}
 		f.e.mu.Unlock()
 		if ready {
@@ -192,7 +198,7 @@ var fadeFrames = int(frames(pauseFade))
 func TestEnginePlaysTrack(t *testing.T) {
 	want := reference(t, cuesFront)
 	e, dev, rec := newTestEngine(t)
-	if err := e.Load(cuesFront, 0, false); err != nil {
+	if err := e.Load(cuesFront, 0, false, 1); err != nil {
 		t.Fatal(err)
 	}
 	buffered(t, e, 0, ringFrames/2)
@@ -229,7 +235,7 @@ func TestEngineEndsAStreamCutInItsLastMoment(t *testing.T) {
 	e := NewEngine(cutOpener(t, cuesFront, 1000, errors.New("the network failed while loading the audio")), dev.start, rec)
 	dev.e = e
 	t.Cleanup(e.Close)
-	if err := e.Load("x", 0, true); err != nil {
+	if err := e.Load("x", 0, true, 1); err != nil {
 		t.Fatal(err)
 	}
 	dev.play(t, 4*Rate)
@@ -254,7 +260,7 @@ func TestEngineEndsAStreamCutInItsLastMoment(t *testing.T) {
 func TestEnginePauseHolds(t *testing.T) {
 	want := reference(t, cuesFront)
 	e, dev, rec := newTestEngine(t)
-	e.Load(cuesFront, 0, false)
+	e.Load(cuesFront, 0, false, 1)
 	buffered(t, e, 0, ringFrames/2)
 	e.Play()
 	dev.play(t, 9600)
@@ -286,7 +292,7 @@ func TestEnginePauseHolds(t *testing.T) {
 func TestEngineCrossfade(t *testing.T) {
 	a, b := reference(t, cuesFront), reference(t, speech)
 	e, dev, rec := newTestEngine(t)
-	e.Load(cuesFront, 0, false)
+	e.Load(cuesFront, 0, false, 1)
 	buffered(t, e, 0, ringFrames/2)
 	e.Play()
 	// A whole number of quanta: the fade starts with the next one.
@@ -295,7 +301,7 @@ func TestEngineCrossfade(t *testing.T) {
 	e.Preload(speech)
 	buffered(t, e, 1, ringFrames/2)
 	const fade = 300 * time.Millisecond
-	if err := e.Crossfade(speech, fade); err != nil {
+	if err := e.Crossfade(speech, fade, 1); err != nil {
 		t.Fatal(err)
 	}
 	n := int(frames(fade)) + 4800
@@ -327,10 +333,10 @@ func TestEngineCrossfade(t *testing.T) {
 func TestEngineLoadTakesThePreload(t *testing.T) {
 	want := reference(t, speech)
 	e, dev, _ := newTestEngine(t)
-	e.Load(cuesFront, 0, false)
+	e.Load(cuesFront, 0, false, 1)
 	e.Preload(speech)
 	buffered(t, e, 1, ringFrames/2)
-	if err := e.Load(speech, 0, true); err != nil {
+	if err := e.Load(speech, 0, true, 1); err != nil {
 		t.Fatal(err)
 	}
 	// No waiting: the preload is there.
@@ -345,7 +351,7 @@ func TestEngineLoadTakesThePreload(t *testing.T) {
 func TestEngineUnload(t *testing.T) {
 	want := reference(t, speech)
 	e, dev, rec := newTestEngine(t)
-	e.Load(cuesFront, 0, true)
+	e.Load(cuesFront, 0, true, 1)
 	buffered(t, e, 0, ringFrames/2)
 	e.Preload(speech)
 	buffered(t, e, 1, ringFrames/2)
@@ -367,7 +373,7 @@ func TestEngineUnload(t *testing.T) {
 		t.Errorf("position %v after Unload", p)
 	}
 	// The preload stays, for the next track.
-	if err := e.Load(speech, 0, true); err != nil {
+	if err := e.Load(speech, 0, true, 1); err != nil {
 		t.Fatal(err)
 	}
 	e.mu.Lock()
@@ -388,7 +394,7 @@ func TestEngineUnload(t *testing.T) {
 func TestEngineSeek(t *testing.T) {
 	want := reference(t, cuesFront)
 	e, dev, _ := newTestEngine(t)
-	e.Load(cuesFront, 0, true)
+	e.Load(cuesFront, 0, true, 1)
 	buffered(t, e, 0, ringFrames/2)
 	dev.play(t, 4800)
 	e.Seek(2 * time.Second)
@@ -411,7 +417,7 @@ func TestEngineOutputFailures(t *testing.T) {
 	t.Run("can't start", func(t *testing.T) {
 		e, dev, rec := newTestEngine(t)
 		dev.fail = errors.New("no audio output device")
-		e.Load(cuesFront, 0, false)
+		e.Load(cuesFront, 0, false, 1)
 		if err := e.Play(); err == nil {
 			t.Fatal("Play played without an output")
 		}
@@ -419,7 +425,7 @@ func TestEngineOutputFailures(t *testing.T) {
 	})
 	t.Run("stops", func(t *testing.T) {
 		e, dev, rec := newTestEngine(t)
-		e.Load(cuesFront, 0, true)
+		e.Load(cuesFront, 0, true, 1)
 		buffered(t, e, 0, 4800)
 		dev.play(t, 4800)
 		dev.failed(errors.New("the device went away"))
@@ -432,7 +438,7 @@ func TestEngineOutputFailures(t *testing.T) {
 
 func TestEngineReleasesIdleOutput(t *testing.T) {
 	e, dev, _ := newTestEngine(t)
-	e.Load(cuesFront, 0, true)
+	e.Load(cuesFront, 0, true, 1)
 	buffered(t, e, 0, 4800)
 	dev.play(t, 4800)
 	e.Pause()
@@ -457,7 +463,7 @@ func TestEngineVolume(t *testing.T) {
 	want := reference(t, cuesFront)
 	e, dev, _ := newTestEngine(t)
 	e.SetVolume(0.5)
-	e.Load(cuesFront, 0, true)
+	e.Load(cuesFront, 0, true, 1)
 	buffered(t, e, 0, ringFrames/2)
 	got := dev.play(t, Rate)
 	// After the glide, the gain of the middle of the slider, about -30 dB.
@@ -471,7 +477,7 @@ func TestEngineVolume(t *testing.T) {
 
 func TestEngineStop(t *testing.T) {
 	e, dev, rec := newTestEngine(t)
-	e.Load(cuesFront, 0, true)
+	e.Load(cuesFront, 0, true, 1)
 	buffered(t, e, 0, 4800)
 	dev.play(t, 4800)
 	e.Stop()

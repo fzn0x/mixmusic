@@ -24,6 +24,7 @@ type presence struct {
 	trackID string
 	playing bool
 	start   time.Time // when the track would have started, at its position
+	speed   float64
 	warned  bool
 	busy    bool
 }
@@ -47,23 +48,26 @@ func (p *presence) update(on bool, appID string, np NowPlaying) {
 		p.client, p.appID, p.trackID, p.playing = discord.New(appID), appID, "", false
 	}
 	playing := np.Track != nil && np.Playing
-	start := time.Now().Add(-time.Duration(np.PositionMs) * time.Millisecond)
+	// Discord's times are the clock's: at 2×, a track 1 minute in started
+	// half a minute ago, and ends in half the time left.
+	speed := np.speed()
+	start := time.Now().Add(-time.Duration(float64(np.PositionMs) * float64(time.Millisecond) / speed))
 	trackID := ""
 	if np.Track != nil {
 		trackID = np.Track.ID
 	}
 	drift := start.Sub(p.start)
-	if trackID == p.trackID && playing == p.playing && (!playing || (drift < presenceSkew && drift > -presenceSkew)) {
+	if trackID == p.trackID && playing == p.playing && (!playing || (speed == p.speed && drift < presenceSkew && drift > -presenceSkew)) {
 		return
 	}
 	if p.busy {
 		return // the next report tries again
 	}
-	p.trackID, p.playing, p.start, p.busy = trackID, playing, start, true
+	p.trackID, p.playing, p.start, p.speed, p.busy = trackID, playing, start, speed, true
 	client := p.client
 	var activity *discord.Activity
 	if playing {
-		activity = activityOf(*np.Track, start, np.DurationMs)
+		activity = activityOf(*np.Track, start, np.DurationMs, speed)
 	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -88,8 +92,9 @@ func (p *presence) update(on bool, appID string, np NowPlaying) {
 	}()
 }
 
-// activityOf is the presence of a track that started at start.
-func activityOf(t media.Track, start time.Time, durationMs int) *discord.Activity {
+// activityOf is the presence of a track that started at start, which
+// plays at speed: it ends after its duration over the speed.
+func activityOf(t media.Track, start time.Time, durationMs int, speed float64) *discord.Activity {
 	a := &discord.Activity{
 		Type:    discord.Listening,
 		Details: t.Title,
@@ -103,7 +108,7 @@ func activityOf(t media.Track, start time.Time, durationMs int) *discord.Activit
 		durationMs = t.DurationMs
 	}
 	if durationMs > 0 {
-		a.End = start.Add(time.Duration(durationMs) * time.Millisecond)
+		a.End = start.Add(time.Duration(float64(durationMs) * float64(time.Millisecond) / speed))
 	}
 	if t.Album != nil {
 		a.LargeText = t.Album.Name

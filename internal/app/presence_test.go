@@ -22,7 +22,7 @@ func TestActivityOf(t *testing.T) {
 			{URL: "https://example.com/1200.jpg", Width: 1200},
 		},
 	}
-	a := activityOf(track, start, 0)
+	a := activityOf(track, start, 0, 1)
 	if a.Type != discord.Listening || a.Details != "Let It Happen" || a.State != "Tame Impala" || a.LargeText != "Currents" || a.StatusDisplay != discord.ShowName {
 		t.Errorf("activity = %+v", a)
 	}
@@ -32,7 +32,7 @@ func TestActivityOf(t *testing.T) {
 	if a.LargeImage != "https://example.com/544.jpg" {
 		t.Errorf("artwork = %q, want the one of about 512 pixels", a.LargeImage)
 	}
-	if b := activityOf(media.Track{Title: "Live"}, start, 0); !b.End.IsZero() {
+	if b := activityOf(media.Track{Title: "Live"}, start, 0, 1); !b.End.IsZero() {
 		t.Errorf("a track of unknown length has an end: %v", b.End)
 	}
 }
@@ -44,5 +44,15 @@ func TestPresenceArtwork(t *testing.T) {
 	got := largeArtwork([]media.Image{{URL: "https://a/60", Width: 60}, {URL: "https://a/226", Width: 226}})
 	if got != "https://a/226" {
 		t.Errorf("small artwork: %q, want the largest", got)
+	}
+}
+
+// TestActivityAtSpeed gives Discord the clock's times of a track at 2×: one
+// a minute in started half a minute ago, and ends in half its length.
+func TestActivityAtSpeed(t *testing.T) {
+	start := time.Date(2026, 10, 19, 20, 0, 0, 0, time.UTC)
+	a := activityOf(media.Track{Title: "Song", DurationMs: 240000}, start, 0, 2)
+	if !a.Start.Equal(start) || !a.End.Equal(start.Add(2*time.Minute)) {
+		t.Errorf("times = %v to %v", a.Start, a.End)
 	}
 }

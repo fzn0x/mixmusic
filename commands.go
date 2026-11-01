@@ -1,10 +1,14 @@
 package main
 
 import (
+	"math"
 	"runtime"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // command is something the user can do from anywhere: by its shortcut, or
@@ -27,6 +31,9 @@ func (s *shell) commands() []command {
 		{"player.volumeUp", "Volume up", "ArrowUp", "playback", func() { s.p.SetVolume(s.st.Volume + 0.05) }},
 		{"player.volumeDown", "Volume down", "ArrowDown", "playback", func() { s.p.SetVolume(s.st.Volume - 0.05) }},
 		{"player.mute", "Mute", "M", "playback", s.p.ToggleMute},
+		{"player.faster", "Speed up", "", "playback", func() { s.stepSpeed(1) }},
+		{"player.slower", "Slow down", "", "playback", func() { s.stepSpeed(-1) }},
+		{"player.normalSpeed", "Normal speed", "", "playback", func() { s.setSongSpeed(1) }},
 		{"player.shuffle", "Shuffle", "Mod+S", "playback", s.p.ToggleShuffle},
 		{"player.repeat", "Repeat", "Mod+R", "playback", s.p.CycleRepeat},
 		{"player.like", "Like what plays", "Mod+L", "playback", func() {
@@ -72,6 +79,34 @@ func (s *shell) commands() []command {
 		cmds = append(cmds, command{pc.ID, pc.Title, pc.Shortcut, "plugins", pc.Run})
 	}
 	return cmds
+}
+
+// stepSpeed moves the speed of songs a quarter up, or down for a negative
+// dir, to the next quarter: 1.1× goes up to 1.25×, then 1.5×, and down to
+// 1×.
+func (s *shell) stepSpeed(dir int) {
+	v := s.set.SongSpeed
+	if dir > 0 {
+		v = (math.Floor(4*v) + 1) / 4
+	} else {
+		v = (math.Ceil(4*v) - 1) / 4
+	}
+	s.setSongSpeed(v)
+}
+
+// setSongSpeed sets the speed of songs, the kind of track that plays, and
+// tells it: a Spotify device plays its track at its own.
+func (s *shell) setSongSpeed(v float64) {
+	s.set.SongSpeed = settings.CleanSpeed(v)
+	s.save()
+	msg := "Songs play at their own speed"
+	if s.set.SongSpeed != 1 {
+		msg = "Songs play at " + speedLabel(s.set.SongSpeed)
+	}
+	if src := s.st.Source; src != nil && src.Mode != player.ModeStream {
+		msg += " — Spotify plays this one at its own speed"
+	}
+	s.notes = append(s.notes, notice(msg))
 }
 
 // shortcutOf is a command's shortcut: the user's, or its own, unless

@@ -48,20 +48,21 @@ func (s *testStream) get() *player.Player {
 	defer s.mu.Unlock()
 	return s.p
 }
-func (s *testStream) Load(_ string, _ time.Duration, autoplay bool) error {
+func (s *testStream) Load(_ string, _ time.Duration, autoplay bool, _ float64) error {
 	if autoplay {
 		s.get().Playing(true)
 	}
 	return nil
 }
-func (s *testStream) Preload(string)                        {}
-func (s *testStream) Crossfade(string, time.Duration) error { return nil }
-func (s *testStream) Play() error                           { s.get().Playing(true); return nil }
-func (s *testStream) Pause()                                { s.get().Playing(false) }
-func (s *testStream) Stop()                                 {}
-func (s *testStream) Unload()                               {}
-func (s *testStream) Seek(time.Duration)                    {}
-func (s *testStream) SetVolume(float64)                     {}
+func (s *testStream) Preload(string)                                 {}
+func (s *testStream) Crossfade(string, time.Duration, float64) error { return nil }
+func (s *testStream) Play() error                                    { s.get().Playing(true); return nil }
+func (s *testStream) Pause()                                         { s.get().Playing(false) }
+func (s *testStream) Stop()                                          {}
+func (s *testStream) Unload()                                        {}
+func (s *testStream) Seek(time.Duration)                             {}
+func (s *testStream) SetVolume(float64)                              {}
+func (s *testStream) SetSpeed(float64)                               {}
 
 type testDevice struct{}
 
@@ -264,9 +265,10 @@ export default function activate(api) {
     { id: "yt:2", source: "youtube", title: "Teardrop", artists: [{ name: "Massive Attack" }], durationMs: 1000, artwork: [] },
   ], 1) });
   api.commands.register({ id: "bad", title: "Bad", run: () => api.player.on("nothing", () => {}) });
+  api.commands.register({ id: "speed", title: "Speed", run: () => api.ui.toast("at " + api.player.state().speed + "x") });
 }`})
 	h.enable("listen")
-	h.wait("the commands", func() bool { return len(h.Commands()) == 2 })
+	h.wait("the commands", func() bool { return len(h.Commands()) == 3 })
 	h.Commands()[0].Run()
 	h.wait("the track change", func() bool { return h.ui.said("now Teardrop at 1 of 2") })
 	if cur, ok := h.p.State().Current(); !ok || cur.Track.ID != "yt:2" {
@@ -276,6 +278,19 @@ export default function activate(api) {
 	h.Commands()[1].Run()
 	h.Commands()[0].Run()
 	h.wait("the plugin to go on", func() bool { return h.Running("listen") })
+	// The speed the track plays at.
+	h.Commands()[2].Run()
+	h.wait("the speed", func() bool { return h.ui.said("at 1x") })
+	st := settings.Default()
+	st.SongSpeed = 1.5
+	h.p.SettingsChanged(st)
+	for deadline := time.Now().Add(5 * time.Second); h.p.State().Speed != 1.5; time.Sleep(time.Millisecond) {
+		if time.Now().After(deadline) {
+			t.Fatal("the track doesn't play at 1.5x")
+		}
+	}
+	h.Commands()[2].Run()
+	h.wait("the speed at 1.5x", func() bool { return h.ui.said("at 1.5x") })
 }
 
 func TestViews(t *testing.T) {

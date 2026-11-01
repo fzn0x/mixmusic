@@ -158,6 +158,7 @@ func (s playerServices) Report(now player.Now) {
 		Volume:     now.Volume,
 		Shuffle:    now.Shuffle,
 		Repeat:     Repeat(now.Repeat),
+		Speed:      now.Speed,
 	}
 	if now.Track != nil {
 		np.Liked = s.a.library.IsLiked(now.Track.ID)
@@ -181,16 +182,16 @@ type engineStream struct {
 	e *audio.Engine
 }
 
-func (s engineStream) Load(url string, start time.Duration, autoplay bool) error {
-	if err := s.e.Load(url, start, autoplay); err != nil {
+func (s engineStream) Load(url string, start time.Duration, autoplay bool, speed float64) error {
+	if err := s.e.Load(url, start, autoplay, speed); err != nil {
 		return err
 	}
 	s.a.setNative(true)
 	return nil
 }
 
-func (s engineStream) Crossfade(url string, d time.Duration) error {
-	if err := s.e.Crossfade(url, d); err != nil {
+func (s engineStream) Crossfade(url string, d time.Duration, speed float64) error {
+	if err := s.e.Crossfade(url, d, speed); err != nil {
 		return err
 	}
 	s.a.setNative(true)
@@ -206,11 +207,12 @@ func (s engineStream) Stop() {
 // track.
 func (s engineStream) Unload() { s.e.Unload() }
 
-func (s engineStream) Preload(url string)   { s.e.Preload(url) }
-func (s engineStream) Play() error          { return s.e.Play() }
-func (s engineStream) Pause()               { s.e.Pause() }
-func (s engineStream) Seek(t time.Duration) { s.e.Seek(t) }
-func (s engineStream) SetVolume(v float64)  { s.e.SetVolume(v) }
+func (s engineStream) Preload(url string)     { s.e.Preload(url) }
+func (s engineStream) Play() error            { return s.e.Play() }
+func (s engineStream) Pause()                 { s.e.Pause() }
+func (s engineStream) Seek(t time.Duration)   { s.e.Seek(t) }
+func (s engineStream) SetVolume(v float64)    { s.e.SetVolume(v) }
+func (s engineStream) SetSpeed(speed float64) { s.e.SetSpeed(speed) }
 
 // connectDevice is the Spotify Connect device of the settings, or the
 // active one, as the device of the native interface's player.

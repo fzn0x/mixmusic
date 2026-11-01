@@ -29,6 +29,17 @@ type NowPlaying struct {
 	Shuffle    bool    `json:"shuffle"`
 	Repeat     Repeat  `json:"repeat"`
 	Liked      bool    `json:"liked"`
+	// Speed is the speed the track plays at, 1 its own, as is 0: the
+	// position is the track's own time, which moves on at it.
+	Speed float64 `json:"speed,omitempty"`
+}
+
+// speed returns the speed the track plays at.
+func (np NowPlaying) speed() float64 {
+	if np.Speed > 0 {
+		return np.Speed
+	}
+	return 1
 }
 
 // Command is something the player is asked to do from outside its

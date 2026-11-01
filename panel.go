@@ -171,10 +171,15 @@ func (s *shell) lyricsPanel(c *ui.Context) {
 
 // lyricsState is the lyrics views' own: the track they show, and where
 // the panel's and the now playing page's lyrics scrolled, which show at
-// once. Whether synced lyrics show as plain text is a setting.
+// once. Whether synced lyrics show as plain text is a setting, as are
+// their translation and romanization.
 type lyricsState struct {
 	track       string
 	panel, page lyricsScroll
+	// system is the system's language, and languages the choices of the
+	// language lyrics translate to, once asked for.
+	system    string
+	languages []string
 }
 
 // lyricsScroll is where a lyrics view scrolled, the line it last scrolled
@@ -228,18 +233,7 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		ls.track, ls.panel.scrolled, ls.page.scrolled = t.ID, -1, -1
 	}
 	synced := ly.Synced && !s.set.LyricsPlain
-	if ly.Synced {
-		ui.Row(c).Padding(0, 24, 8).Shrink(0).Children(func() {
-			mode := 0
-			if s.set.LyricsPlain {
-				mode = 1
-			}
-			if s.segmented(c, "lyrics-mode-"+where, "Show lyrics as", &mode, "synced", "plain text") {
-				s.set.LyricsPlain = mode == 1
-				s.save()
-			}
-		})
-	}
+	x := s.lyricsChoices(c, t, ly, where)
 	active := -1
 	if synced {
 		pos := s.st.Position + 250*time.Millisecond
@@ -251,18 +245,18 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 			}
 		}
 	}
-	size := k.bodySize()
+	size, sub := k.bodySize(), k.smallSize()
 	if large {
-		size = k.size(2)
+		size, sub = k.size(2), k.bodySize()
 	}
 	n := len(ly.Lines) + 1
 	list := ui.List(c.Key("lyrics-"+where+"-"+t.ID), &view.list, n, func(i int) {
 		if i == len(ly.Lines) {
-			ui.Text(c, "lyrics from "+ly.Source).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24)
+			s.lyricsCredit(c, ly)
 			return
 		}
 		line := ly.Lines[i]
-		text := line.Text
+		text, roman, meaning := x.line(i, line.Text)
 		if text == "" {
 			text = "♪"
 		}
@@ -273,7 +267,22 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		case synced && i < active:
 			ink = k.muted
 		}
-		p := ui.Text(c, text).FontSize(size).FontWeight(300).TextColor(ink).Padding(4, 24)
+		var p ui.Element
+		if roman == "" && meaning == "" {
+			p = ui.Text(c, text).FontSize(size).FontWeight(300).TextColor(ink).Padding(4, 24)
+		} else {
+			// The line, then in Latin letters, then its translation, which
+			// screen readers read in this order too.
+			p = ui.Column(c).Padding(4, 24).Gap(2).Children(func() {
+				ui.Text(c, text).FontSize(size).FontWeight(300).TextColor(ink)
+				if roman != "" {
+					ui.Text(c, roman).FontSize(sub).TextColor(k.muted)
+				}
+				if meaning != "" {
+					ui.Text(c, meaning).FontSize(sub).TextColor(k.muted)
+				}
+			})
+		}
 		if synced {
 			p.Cursor(ui.CursorPointer)
 			if p.Clicked() {
@@ -293,6 +302,22 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		view.scrolled = active
 		view.list.ScrollTo(active, ui.Center)
 	}
+}
+
+// lyricsCredit names where lyrics come from, with the link to it their
+// licence asks for, as Unison's does: "lyrics from Unison
+// (https://unison.boidu.dev)".
+func (s *shell) lyricsCredit(c *ui.Context, ly lyrics.Lyrics) {
+	k := &s.lk
+	if ly.SourceURL == "" {
+		ui.Text(c, "lyrics from "+ly.Source).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24)
+		return
+	}
+	ui.RichText(c).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24).Children(func() {
+		ui.Text(c, "lyrics from "+ly.Source+" (")
+		s.linkOf(c, ly.SourceURL, ly.SourceURL)
+		ui.Text(c, ")")
+	})
 }
 
 func (s *shell) emptyIn(c *ui.Context, text string) {

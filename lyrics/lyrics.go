@@ -1,5 +1,6 @@
-// Package lyrics finds the lyrics of tracks on LRCLIB, an open database of
-// lyrics synchronized to the music, and reads the LRC format they come in.
+// Package lyrics finds the lyrics of tracks on Unison and LRCLIB, open
+// databases of lyrics synchronized to the music, and reads the TTML and
+// LRC formats they come in.
 package lyrics
 
 import (
@@ -22,9 +23,9 @@ const defaultBaseURL = "https://lrclib.net/api"
 var (
 	// ErrNotFound is returned for tracks without lyrics.
 	ErrNotFound = errors.New("lyrics: not found")
-	// ErrUnavailable is returned when LRCLIB can't be reached, or answers
-	// with an error of its own, as when it is down: the track may have
-	// lyrics all the same.
+	// ErrUnavailable is returned when LRCLIB, or Unison, can't be reached,
+	// or answers with an error of its own, as when it is down: the track
+	// may have lyrics all the same.
 	ErrUnavailable = errors.New("lyrics: LRCLIB isn't answering")
 	// ErrNotFoundYet is returned for a track LRCLIB's own database has no
 	// lyrics of, while LRCLIB was too busy to search it or to look on
@@ -47,6 +48,13 @@ type Lyrics struct {
 	Lines        []Line `json:"lines"`
 	// Source names where the lyrics come from.
 	Source string `json:"source"`
+	// SourceURL is the address of where they come from, for sources whose
+	// licence asks apps to credit them with it, as Unison's does; "" for
+	// the others.
+	SourceURL string `json:"sourceUrl,omitempty"`
+	// Language is the language of the lyrics, a code of ISO 639-1 as "ja",
+	// when their source tells it or GuessLanguage could; "" when unknown.
+	Language string `json:"language,omitempty"`
 }
 
 // Plain makes lyrics of text without times.
@@ -89,6 +97,10 @@ type Query struct {
 	Album string
 	// Duration is the track's length, 0 when unknown.
 	Duration time.Duration
+	// VideoID is the ID of the track's recording on YouTube, "" when
+	// unknown. Unison looks lyrics up by it when given; LRCLIB doesn't
+	// use it.
+	VideoID string
 }
 
 // Get returns the lyrics of a track: the exact track when LRCLIB has it,

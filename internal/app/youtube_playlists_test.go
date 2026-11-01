@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"slices"
@@ -131,5 +132,28 @@ func TestYouTubePlaylistsYours(t *testing.T) {
 	}
 	if !slices.Equal(mine, []string{"Late night", "Untitled"}) {
 		t.Errorf("the user's playlists are %q, of %+v", mine, playlists)
+	}
+}
+
+// TestDeleteYouTubePlaylist deletes a playlist of YouTube Music by its
+// MixMusic ID, and nothing of another service or signed out.
+func TestDeleteYouTubePlaylist(t *testing.T) {
+	ctx := context.Background()
+	if err := (&Collection{a: &App{youtube: youtube.New()}}).DeleteYouTubePlaylist(ctx, "yt:PLmine"); !errors.Is(err, errNotSignedIn) {
+		t.Errorf("signed out: %v", err)
+	}
+	a, f := signedInYouTube(t, func(string) (int, any) { return http.StatusOK, map[string]any{} })
+	col := &Collection{a: a}
+	for _, id := range []string{"mx:1", "sp:37i9", "PLmine"} {
+		if err := col.DeleteYouTubePlaylist(ctx, id); err == nil {
+			t.Errorf("deleted %q", id)
+		}
+	}
+	if err := col.DeleteYouTubePlaylist(ctx, "yt:PLmine"); err != nil {
+		t.Fatal(err)
+	}
+	asks := f.asked()
+	if len(asks) != 1 || asks[0].endpoint != "playlist/delete" || asks[0].body["playlistId"] != "PLmine" {
+		t.Errorf("asked %+v", asks)
 	}
 }

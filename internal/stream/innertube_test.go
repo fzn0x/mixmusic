@@ -420,10 +420,63 @@ func TestPickAudioTellsWhyNone(t *testing.T) {
 	}
 }
 
+func TestPickAudioFallsBackToAAC(t *testing.T) {
+	aac := playerFormat{Itag: 140, MimeType: `audio/mp4; codecs="mp4a.40.2"`, URL: "https://media/a?itag=140", Bitrate: 130000}
+	heAAC := playerFormat{Itag: 139, MimeType: `audio/mp4; codecs="mp4a.40.5"`, URL: "https://media/a?itag=139", Bitrate: 50000}
+	opus := playerFormat{Itag: 251, MimeType: `audio/webm; codecs="opus"`, URL: "https://media/a?itag=251", Bitrate: 150000}
+	ciphered := playerFormat{Itag: 251, MimeType: `audio/webm; codecs="opus"`, SignatureCipher: "s=AAAA&sp=sig&url=x"}
+	for _, q := range []Quality{QualityBest, QualitySaver} {
+		// AAC-LC in either quality, never the smaller HE-AAC.
+		if got, err := pickAudio([]playerFormat{heAAC, aac}, q, 0); err != nil || got.Itag != 140 {
+			t.Errorf("%s, AAC alone: %d, %v", q, got.Itag, err)
+		}
+		// Opus first, even when yt-dlp must find it.
+		if got, err := pickAudio([]playerFormat{heAAC, aac, opus}, q, 0); err != nil || got.Itag != 251 {
+			t.Errorf("%s, with Opus: %d, %v", q, got.Itag, err)
+		}
+		if _, err := pickAudio([]playerFormat{heAAC, aac, ciphered}, q, 0); !errors.Is(err, errNoDirectURL) {
+			t.Errorf("%s, with Opus that needs yt-dlp: %v", q, err)
+		}
+	}
+
+	// Of a video YouTube has only in AAC, the original track's AAC-LC of
+	// the original dynamics, as of Opus.
+	f := newFakeTube(t)
+	for _, suffix := range []string{"-dubbed", "-drc"} {
+		var ans playerAnswer
+		if err := json.Unmarshal(withoutOpus(f.recorded(suffix)), &ans); err != nil {
+			t.Fatal(err)
+		}
+		length := time.Duration(ans.VideoDetails.LengthSeconds) * time.Second
+		for _, q := range []Quality{QualityBest, QualitySaver} {
+			got, err := pickAudio(ans.StreamingData.AdaptiveFormats, q, length)
+			if err != nil || got.Itag != 140 || got.IsDrc || !got.direct() ||
+				got.AudioTrack != nil && got.AudioTrack.DisplayName != "English (US) original" {
+				t.Errorf("%s, %s: picked %d of %+v, drc %v: %v", suffix, q, got.Itag, got.AudioTrack, got.IsDrc, err)
+			}
+		}
+	}
+}
+
 // withoutOpus returns a recorded answer whose Opus streams are Vorbis, which
 // the engine doesn't play: a video YouTube has only in AAC, but for that.
 func withoutOpus(answer []byte) []byte {
 	return []byte(strings.ReplaceAll(string(answer), `codecs=\"opus\"`, `codecs=\"vorbis\"`))
+}
+
+func TestDirectStreamOfAVideoOnlyInAAC(t *testing.T) {
+	f := newFakeTube(t)
+	f.answers(func(playerRequest) []byte { return withoutOpus(f.recorded("")) })
+	for _, q := range []Quality{QualityBest, QualitySaver} {
+		s, err := f.direct().Stream(context.Background(), songID, q)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if s.MimeType != `audio/mp4; codecs="mp4a.40.2"` || s.Codec != "mp4a.40.2" || s.Size != 3244833 ||
+			!strings.Contains(s.URL, "itag=140") || s.Bitrate != 129.547 || !s.Measured || s.Loudness != -7.93 {
+			t.Errorf("%s: stream %s of %d bytes at %v kbit/s, %v LKFS (measured %v)", q, s.Codec, s.Size, s.Bitrate, s.Loudness, s.Measured)
+		}
+	}
 }
 
 func TestDirectChecksTheMediaServer(t *testing.T) {

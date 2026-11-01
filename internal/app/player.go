@@ -219,7 +219,8 @@ func oneLine(s string) string {
 		switch {
 		case unicode.IsControl(r):
 			return ' '
-		case r >= '‪' && r <= '‮', r >= '⁦' && r <= '⁩':
+		// The embeddings and overrides, then the isolates.
+		case r >= '\u202a' && r <= '\u202e', r >= '\u2066' && r <= '\u2069':
 			return -1
 		}
 		return r

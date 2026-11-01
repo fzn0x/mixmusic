@@ -72,7 +72,7 @@
         <a href="#features">Features</a>
         <a href="#customize">Themes and plugins</a>
         <a href="#download">Download</a>
-        <a href="https://github.com/fzn0x/mixmusic#readme">Docs</a>
+        <a href="{{ get_url(path='@/docs/_index.md') }}">Docs</a>
       </nav>
       <a class="btn btn-outlined btn-small" href="https://github.com/fzn0x/mixmusic">
         <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg>
@@ -301,7 +301,7 @@
               <li><span class="mark mark-spotify" aria-hidden="true"></span>A disc for Spotify</li>
               <li><span class="mark mark-youtube" aria-hidden="true"></span>A square for YouTube Music</li>
             </ul>
-            <p class="note">YouTube Music needs no account. Spotify joins the same search once you sign in with an app of your own; <a href="https://github.com/fzn0x/mixmusic/blob/main/docs/spotify.md">the guide</a> takes two minutes.</p>
+            <p class="note">YouTube Music needs no account. Spotify joins the same search once you sign in with an app of your own; <a href="{{ get_url(path='@/docs/spotify/index.md') }}">the guide</a> takes two minutes.</p>
           </div>
 
           <div class="panel" role="tabpanel" id="panel-queue" aria-labelledby="tab-queue" data-shot="home" data-alt="The home page's tiles and recently played, with up next beside them." hidden>
@@ -407,12 +407,12 @@
         <div class="column">
           <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-palette" /></svg>Make a theme</h3>
           <p>A theme is a folder with a <code>theme.json</code>: eighteen colours, the fonts and a corner radius. MixMusic draws everything with them, so a theme keeps working as the app changes. Let it follow your computer, with one theme for light mode and one for dark.</p>
-          <a class="link" href="https://github.com/fzn0x/mixmusic/blob/main/docs/themes.md">Theme guide<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
+          <a class="link" href="{{ get_url(path='@/docs/themes/index.md') }}">Theme guide<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
         </div>
         <div class="column">
           <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-puzzle" /></svg>Add a plugin</h3>
           <p>Plugins are ES modules that add pages, commands, track actions and widgets through a typed API, and install from the marketplace in one click, like a sleep timer or a spectrum on now playing. Every plugin can use the whole API, and MixMusic tells you so before you enable one.</p>
-          <a class="link" href="https://github.com/fzn0x/mixmusic/blob/main/docs/plugins.md">Plugin guide<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
+          <a class="link" href="{{ get_url(path='@/docs/plugins/index.md') }}">Plugin guide<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
           <a class="link" href="https://github.com/fzn0x/mixmusic/tree/main/community">Community themes and plugins<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
         </div>
       </div>
@@ -452,7 +452,7 @@
         <h3>What it needs</h3>
         <dl>
           <div><dt>YouTube Music</dt><dd>yt-dlp, which MixMusic installs for you from Settings › Playback, and a JavaScript runtime on your PATH: Deno, Node.js, Bun or QuickJS.</dd></div>
-          <div><dt>Spotify</dt><dd>An app of your own from the Spotify developer dashboard, made with a Spotify account that has Premium. <a href="https://github.com/fzn0x/mixmusic/blob/main/docs/spotify.md">The guide</a> walks through it.</dd></div>
+          <div><dt>Spotify</dt><dd>An app of your own from the Spotify developer dashboard, made with a Spotify account that has Premium. <a href="{{ get_url(path='@/docs/spotify/index.md') }}">The guide</a> walks through it.</dd></div>
           <div><dt>First launch</dt><dd>The macOS app is not notarized yet: open it once from System Settings › Privacy &amp; Security › Open Anyway. The Windows installer is not signed yet: if SmartScreen warns, choose More info › Run anyway.</dd></div>
           <div><dt>Linux</dt><dd>GTK 3, and PulseAudio (which PipeWire serves too) or ALSA; signing in to YouTube Music takes WebKitGTK 4.1. On Debian and Ubuntu: <code>sudo apt install libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0</code></dd></div>
         </dl>
@@ -469,7 +469,7 @@
         <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CONTRIBUTING.md"><strong>Contributing</strong><span>Build it, check it, open a pull request</span></a></li>
         <li><a href="https://github.com/fzn0x/mixmusic/issues"><strong>Issues</strong><span>Report a bug or ask for a feature</span></a></li>
         <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md"><strong>Changelog</strong><span>What changed in each release</span></a></li>
-        <li><a href="https://github.com/fzn0x/mixmusic/blob/main/docs/architecture.md"><strong>Architecture</strong><span>Where everything lives</span></a></li>
+        <li><a href="{{ get_url(path='@/docs/architecture/index.md') }}"><strong>Architecture</strong><span>Where everything lives</span></a></li>
         <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CODE_OF_CONDUCT.md"><strong>Code of conduct</strong><span>How we work together</span></a></li>
         <li><a href="https://github.com/fzn0x/mixmusic/blob/main/SECURITY.md"><strong>Security</strong><span>Report a vulnerability privately</span></a></li>
       </ul>

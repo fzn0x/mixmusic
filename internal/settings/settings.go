@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"maps"
 	"math"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"slices"
@@ -116,6 +117,12 @@ type Settings struct {
 	Volume float64 `json:"volume"`
 	// CacheSizeMB bounds the audio cache; 0 turns it off.
 	CacheSizeMB int `json:"cacheSizeMb"`
+	// DownloadsFolder is where the downloads are kept, an absolute path;
+	// "" is the default folder of the system.
+	DownloadsFolder string `json:"downloadsFolder"`
+	// DownloadOnMetered lets downloads go on over a metered connection, as
+	// a phone's hotspot: they wait without it.
+	DownloadOnMetered bool `json:"downloadOnMetered"`
 
 	// Accounts.
 	SpotifyClientID string `json:"spotifyClientId"`
@@ -314,6 +321,13 @@ func (s Settings) Clean() Settings {
 		s.Equalizer.Preset = "custom"
 	}
 	s.CacheSizeMB = min(max(s.CacheSizeMB, 0), 64*1024)
+	if s.DownloadsFolder = strings.TrimSpace(s.DownloadsFolder); s.DownloadsFolder != "" {
+		if filepath.IsAbs(s.DownloadsFolder) {
+			s.DownloadsFolder = filepath.Clean(s.DownloadsFolder)
+		} else {
+			s.DownloadsFolder = ""
+		}
+	}
 	s.SpotifyClientID = strings.TrimSpace(s.SpotifyClientID)
 	if s.DiscordAppID = strings.TrimSpace(s.DiscordAppID); !discordIDRe.MatchString(s.DiscordAppID) {
 		s.DiscordAppID = ""

@@ -29,14 +29,15 @@ func (p *Preferences) Set(s settings.Settings) (settings.Settings, error) {
 	return s, nil
 }
 
-// Reset puts back the settings of a new install, keeping the accounts and
-// the tools set up.
+// Reset puts back the settings of a new install, keeping the accounts, the
+// tools set up, and the folder the downloads are in.
 func (p *Preferences) Reset() (settings.Settings, error) {
 	cur := p.a.settings.Get()
 	d := settings.Default()
 	d.SpotifyClientID = cur.SpotifyClientID
 	d.YouTubeChannel = cur.YouTubeChannel
 	d.YTDLPPath, d.JSRuntime = cur.YTDLPPath, cur.JSRuntime
+	d.DownloadsFolder = cur.DownloadsFolder
 	return p.Set(d)
 }
 

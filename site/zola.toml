@@ -1,0 +1,13 @@
+# The MixMusic website, built with Zola: `zola --root site serve` to
+# preview it, `zola --root site build` to build it into site/public.
+#
+# templates/index.html is the landing page; static/ holds its stylesheet,
+# script and assets, copied as they are.
+
+base_url = "https://fzn0x.github.io/mixmusic"
+title = "MixMusic"
+description = "Spotify and YouTube Music in one free, open-source desktop player for macOS, Windows and Linux."
+default_language = "en"
+
+# robots.txt is only read at a domain's root, which the site is not.
+generate_robots_txt = false

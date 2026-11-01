@@ -8,6 +8,7 @@ node_modules/
 /result
 /result-*
 /.mygo/
+/site/public/
 mygo_windows_*.syso
 *.exe
 !resources/**/*.exe

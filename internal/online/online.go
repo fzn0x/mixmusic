@@ -6,6 +6,7 @@ package online
 
 import (
 	"context"
+	"slices"
 	"sync"
 	"time"
 )
@@ -44,6 +45,8 @@ type Watch struct {
 	check *check
 	// kick is closed, and replaced, when a Wait should check at once.
 	kick chan struct{}
+	// told are told when the answer turns.
+	told []*func(ok bool)
 }
 
 // check is a check of the network, and its answer once done closes.
@@ -95,9 +98,31 @@ func (w *Watch) run(c *check) {
 	// Audio that came meanwhile answers too.
 	c.ok = err == nil || w.seen.After(started)
 	w.check = nil
+	turned := w.at.IsZero() && !c.ok || !w.at.IsZero() && w.ok != c.ok
 	w.ok, w.at, w.stale = c.ok, time.Now(), false
+	told := w.told
 	w.mu.Unlock()
 	close(c.done)
+	if turned {
+		for _, fn := range told {
+			(*fn)(c.ok)
+		}
+	}
+}
+
+// OnChange has fn told when the answer turns, from any goroutine: that the
+// network went, or came back. The first answer is told when it's that the
+// network doesn't answer.
+func (w *Watch) OnChange(fn func(ok bool)) (cancel func()) {
+	f := &fn
+	w.mu.Lock()
+	w.told = append(slices.Clone(w.told), f)
+	w.mu.Unlock()
+	return func() {
+		w.mu.Lock()
+		defer w.mu.Unlock()
+		w.told = slices.DeleteFunc(slices.Clone(w.told), func(g *func(bool)) bool { return g == f })
+	}
 }
 
 // Offline reports whether the last answer, within offlineFor, was that the
@@ -111,12 +136,18 @@ func (w *Watch) Offline() bool {
 // Seen takes in audio that came from YouTube: the network answers.
 func (w *Watch) Seen() {
 	w.mu.Lock()
-	defer w.mu.Unlock()
 	now := time.Now()
 	back := !w.at.IsZero() && !w.ok
 	w.ok, w.at, w.seen, w.stale = true, now, now, false
+	told := w.told
 	if back {
 		w.wake()
+	}
+	w.mu.Unlock()
+	if back {
+		for _, fn := range told {
+			(*fn)(true)
+		}
 	}
 }
 

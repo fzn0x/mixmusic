@@ -950,6 +950,126 @@ func TestRestore(t *testing.T) {
 	})
 }
 
+// lastSaved is the queue kept last.
+func (h *harness) lastSaved() Saved {
+	var last Saved
+	h.svc.with(func(f *fakeServices) {
+		if len(f.saved) > 0 {
+			last = f.saved[len(f.saved)-1]
+		}
+	})
+	return last
+}
+
+// longQueue is the ids of a queue of n tracks, t000 on.
+func longQueue(n int) []string {
+	ids := make([]string, n)
+	for i := range ids {
+		ids[i] = fmt.Sprintf("t%03d", i)
+	}
+	return ids
+}
+
+func TestSavedWindow(t *testing.T) {
+	for _, c := range []struct{ n, index, from, to int }{
+		{0, -1, 0, 0},
+		{10, 3, 0, 10},
+		{500, 499, 0, 500},
+		{501, -1, 0, 500},
+		{501, 0, 0, 500},
+		{501, 500, 1, 501},
+		{800, 10, 0, 500},
+		{800, 650, 300, 800},
+		{5000, 100, 50, 550},
+		{5000, 4999, 4500, 5000},
+	} {
+		if from, to := savedWindow(c.n, c.index); from != c.from || to != c.to {
+			t.Errorf("savedWindow(%d, %d) = %d, %d; want %d, %d", c.n, c.index, from, to, c.from, c.to)
+		}
+	}
+	// Whatever the queue, what is kept holds the current entry, and as many
+	// after it as fit beside savedBefore before it.
+	for _, n := range []int{1, 499, 500, 501, 549, 550, 551, 1000, 3000} {
+		for index := -1; index < n; index++ {
+			from, to := savedWindow(n, index)
+			if to-from != min(n, savedMax) {
+				t.Fatalf("savedWindow(%d, %d) keeps %d", n, index, to-from)
+			}
+			if index < 0 {
+				if from != 0 {
+					t.Fatalf("savedWindow(%d, -1) starts at %d", n, from)
+				}
+				continue
+			}
+			if index < from || index >= to {
+				t.Fatalf("savedWindow(%d, %d) = %d, %d leaves out the current entry", n, index, from, to)
+			}
+			before, after := index-from, to-index-1
+			if want := min(n-index-1, savedMax-1-min(index, savedBefore)); after < want {
+				t.Fatalf("savedWindow(%d, %d) keeps %d after, not %d", n, index, after, want)
+			}
+			if before < min(index, savedBefore) {
+				t.Fatalf("savedWindow(%d, %d) keeps %d before", n, index, before)
+			}
+		}
+	}
+}
+
+// TestRestoreLongQueue keeps a queue past savedMax around its current
+// track, which plays where it was after a restart.
+func TestRestoreLongQueue(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks(longQueue(800)...), 650)
+	h.wait("t650 playing", playing("t650"))
+	// The engine tells where the track is, which saves the queue.
+	h.p.Time(95*time.Second, 200*time.Second)
+	var got Saved
+	h.on(func(p *Player) { got = savedOf(p.s) })
+	if len(got.Tracks) != savedMax || got.Index != 350 || got.Tracks[got.Index].ID != "yt:t650" ||
+		got.Tracks[0].ID != "yt:t300" || got.Tracks[len(got.Tracks)-1].ID != "yt:t799" || got.Position != 95000 {
+		t.Fatalf("saved %d tracks from %s, index %d, position %d", len(got.Tracks), got.Tracks[0].ID, got.Index, got.Position)
+	}
+	h.wait("the queue saved", func(*Player) bool {
+		last := h.lastSaved()
+		return len(last.Tracks) == savedMax && last.Index == 350 && last.Position == 95000
+	})
+
+	r := newHarness(t, got)
+	if s := r.p.State(); s.Index != 350 || s.Position != 95*time.Second {
+		t.Fatalf("restored %d at %v", s.Index, s.Position)
+	}
+	// Starting saves the queue at once, as it was.
+	r.wait("the queue saved again", func(*Player) bool { return len(r.lastSaved().Tracks) > 0 })
+	if last := r.lastSaved(); len(last.Tracks) != savedMax || last.Index != 350 || last.Tracks[350].ID != "yt:t650" || last.Position != 95000 {
+		t.Errorf("saved %d tracks again, index %d, position %d", len(last.Tracks), last.Index, last.Position)
+	}
+	r.p.Play()
+	r.wait("t650 playing", playing("t650"))
+	if got := r.stream.lastLoad(); got != "load url:yt:t650 1m35s true" {
+		t.Errorf("played %q", got)
+	}
+}
+
+// TestRestorePastSavedTracks restores a queue kept by an earlier version,
+// whose index is past its tracks: it holds its last track from its start,
+// as the position was another track's.
+func TestRestorePastSavedTracks(t *testing.T) {
+	h := newHarness(t, Saved{Tracks: tracks(longQueue(savedMax)...), Index: 650, Position: 95000})
+	s := h.p.State()
+	if cur, _ := s.Current(); cur.Track.ID != "yt:t499" || s.Position != 0 {
+		t.Fatalf("restored %s at %v", cur.Track.ID, s.Position)
+	}
+	h.wait("the queue saved", func(*Player) bool {
+		last := h.lastSaved()
+		return len(last.Tracks) == savedMax && last.Index == 499 && last.Position == 0
+	})
+	// A queue with nothing current has no position either.
+	h = newHarness(t, Saved{Tracks: tracks("a", "b"), Index: -1, Position: 42000})
+	if s := h.p.State(); s.Index != 0 || s.Position != 0 {
+		t.Errorf("restored %d at %v", s.Index, s.Position)
+	}
+}
+
 func spotifyTrack(id string) media.Track {
 	return media.Track{ID: "spotify:" + id, Source: media.SourceSpotify, Title: "Spotify " + id,
 		Artists: []media.Ref{{Name: "Sp"}}, DurationMs: 200000}

@@ -11,11 +11,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/fzn0x/mixmusic/internal/mp4"
 	"github.com/fzn0x/mixmusic/internal/webm"
 )
 
-// Source is the WebM file of a track, as a deck reads it: its bytes as they
-// arrive. A Read that waits for bytes returns an error once the
+// Source is the file of a track, WebM or MP4, as a deck reads it: its bytes
+// as they arrive. A Read that waits for bytes returns an error once the
 // interrupted function its Opener got returns true; Wake makes such a Read
 // check it again.
 type Source interface {
@@ -351,7 +352,8 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 
 // readError words a failure of the reader for the player.
 func readError(err error) error {
-	if errors.Is(err, webm.ErrFormat) || errors.Is(err, errors.ErrUnsupported) || errors.Is(err, webm.ErrNoAudio) {
+	if errors.Is(err, webm.ErrFormat) || errors.Is(err, errors.ErrUnsupported) || errors.Is(err, webm.ErrNoAudio) ||
+		errors.Is(err, mp4.ErrFormat) || errors.Is(err, mp4.ErrNoAudio) {
 		return fmt.Errorf("%w (%v)", errUnsupported, err)
 	}
 	return errNetwork

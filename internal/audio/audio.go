@@ -1,8 +1,8 @@
-// Package audio is MixMusic's own audio engine: it plays the Opus audio of
-// YouTube's WebM files on two decks, so that one track can fade into the
-// next, each loud track turned down to an even loudness, through the
-// preamp, equalizer, levelling and analyser of the web player MixMusic
-// had, whose Web Audio nodes it reproduces.
+// Package audio is MixMusic's own audio engine: it plays the audio YouTube
+// serves, Opus in WebM files and AAC-LC in MP4 ones, on two decks, so that
+// one track can fade into the next, each loud track turned down to an even
+// loudness, through the preamp, equalizer, levelling and analyser of the
+// web player MixMusic had, whose Web Audio nodes it reproduces.
 package audio
 
 import (
@@ -18,7 +18,7 @@ var License string
 
 const (
 	// Rate is the sample rate of everything the engine plays, in Hz: Opus
-	// decodes to it, and the device plays it.
+	// decodes to it, AAC is converted to it, and the device plays it.
 	Rate = 48000
 	// quantum is the frames the engine processes at a time, as Web Audio
 	// does: its parameters move from one to the next.

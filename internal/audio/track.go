@@ -51,14 +51,44 @@ type timing struct {
 	total time.Duration
 }
 
-// openTrack reads the headers of a file and returns its audio track, and
-// when it plays. Its errors are worded for the player.
+// openTrack reads the headers of a file, from its start, and returns its
+// audio track, and when it plays: the AAC of an MP4 file, else the Opus of
+// a WebM one. Its errors are worded for the player.
 func openTrack(src io.ReadSeeker) (track, timing, error) {
+	isMP4, err := sniffMP4(src)
+	if err != nil {
+		return nil, timing{}, readError(err)
+	}
+	if isMP4 {
+		return openAAC(src)
+	}
 	r, err := webm.NewReader(src)
 	if err != nil {
 		return nil, timing{}, readError(err)
 	}
 	return openOpus(r)
+}
+
+// sniffMP4 tells whether a file is an MP4 one, by the type of its first
+// box, at byte 4, and goes back to its start. A WebM file starts with
+// EBML's magic number, 1A 45 DF A3, instead.
+func sniffMP4(src io.ReadSeeker) (bool, error) {
+	var head [8]byte
+	n, err := io.ReadFull(src, head[:])
+	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
+		return false, err
+	}
+	if _, err := src.Seek(0, io.SeekStart); err != nil {
+		return false, err
+	}
+	if n < len(head) {
+		return false, nil // the WebM reader tells what is wrong
+	}
+	switch string(head[4:]) {
+	case "ftyp", "styp", "moov", "mdat", "free", "skip", "wide", "pdin", "uuid":
+		return true, nil
+	}
+	return false, nil
 }
 
 // opusTrack is the Opus track of a WebM file.

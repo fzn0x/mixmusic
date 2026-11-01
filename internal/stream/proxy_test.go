@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -283,5 +284,42 @@ func TestProxyServesDirectStreamsAtOnce(t *testing.T) {
 	}
 	if n := len(f.players()); n != 2 {
 		t.Errorf("%d player requests: an expired stream is found again through the direct route", n)
+	}
+}
+
+// TestProxyServesAndCachesAAC serves the AAC-LC stream of a video YouTube
+// has only in AAC, as its type, and keeps it in the cache, which serves it
+// as that type without the network, and evicts it as any other.
+func TestProxyServesAndCachesAAC(t *testing.T) {
+	f := newFakeTube(t)
+	f.answers(func(playerRequest) []byte { return withoutOpus(f.recorded("")) })
+	r := NewResolver(nil, "")
+	r.Direct = f.direct()
+	r.Run = func(context.Context, ...string) ([]byte, error) { return nil, errors.New("no yt-dlp here") }
+	p := NewProxy(r)
+	dir := t.TempDir()
+	p.Cache = NewCache(dir, 1<<30)
+	get := func(header string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest("GET", Path(songID), nil)
+		if header != "" {
+			req.Header.Set("Range", header)
+		}
+		rec := httptest.NewRecorder()
+		p.ServeHTTP(rec, req)
+		return rec
+	}
+	if rec := get(""); rec.Code != 200 || rec.Body.Len() != 3244833 || rec.Header().Get("Content-Type") != `audio/mp4; codecs="mp4a.40.2"` {
+		t.Fatalf("%d, %d bytes of %q", rec.Code, rec.Body.Len(), rec.Header().Get("Content-Type"))
+	}
+	if _, err := os.Stat(filepath.Join(dir, songID+".m4a")); err != nil || !p.Cache.Has(songID) {
+		t.Fatalf("not cached as .m4a: %v", err)
+	}
+	f.srv.Close() // from now on only the cache can answer
+	if rec := get("bytes=100-199"); rec.Code != 206 || rec.Body.Len() != 100 || rec.Header().Get("Content-Type") != "audio/mp4" {
+		t.Errorf("from the cache: %d, %d bytes of %q", rec.Code, rec.Body.Len(), rec.Header().Get("Content-Type"))
+	}
+	p.Cache.SetLimit(1 << 20)
+	if p.Cache.Has(songID) {
+		t.Error("a cached AAC stream outlived a limit it no longer fits")
 	}
 }

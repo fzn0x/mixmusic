@@ -52,6 +52,7 @@ func (testPlayer) RecordPlay(media.Track)           {}
 func (testPlayer) Radio(context.Context, media.Track) ([]media.Track, error) {
 	return nil, nil
 }
+func (testPlayer) Skip(media.Track) string     { return "" }
 func (testPlayer) Settings() settings.Settings { return settings.Default() }
 func (testPlayer) SaveVolume(float64)          {}
 func (testPlayer) Report(player.Now)           {}

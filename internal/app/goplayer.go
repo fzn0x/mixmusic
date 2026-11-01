@@ -130,6 +130,15 @@ func (s playerServices) Radio(ctx context.Context, t media.Track) ([]media.Track
 	return tracks, s.a.offlineErr(ctx, err)
 }
 
+// Skip passes over the tracks the user disliked, while the settings skip
+// those.
+func (s playerServices) Skip(t media.Track) string {
+	if s.a.settings.Get().SkipDisliked && s.a.library.IsDisliked(t.ID) {
+		return player.SkipDisliked
+	}
+	return ""
+}
+
 var _ player.Network = playerServices{}
 
 // Online, WaitOnline and KickOnline are the network, as the player waits

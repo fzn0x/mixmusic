@@ -39,11 +39,13 @@ type fakeServices struct {
 	failure   string
 	radio     []media.Track
 	radioErr  error
-	played    []string
-	reports   []Now
-	volumes   []float64
-	saved     []Saved
-	prepared  []string
+	// disliked holds the tracks the user dislikes, by ID.
+	disliked map[string]bool
+	played   []string
+	reports  []Now
+	volumes  []float64
+	saved    []Saved
+	prepared []string
 	// reportHook, when set, runs in Report, outside the lock, as the app's
 	// waits on the main thread; saveHook runs in SaveQueue before it keeps
 	// the queue, as a slow disk.
@@ -97,6 +99,17 @@ func (f *fakeServices) Radio(context.Context, media.Track) ([]media.Track, error
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return f.radio, f.radioErr
+}
+
+// Skip passes over the tracks the user dislikes, while the settings say so,
+// as the app's does.
+func (f *fakeServices) Skip(t media.Track) string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.settings.SkipDisliked && f.disliked[t.ID] {
+		return SkipDisliked
+	}
+	return ""
 }
 
 func (f *fakeServices) Settings() settings.Settings {

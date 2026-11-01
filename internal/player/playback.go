@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -20,8 +21,14 @@ import (
 // system's media controls.
 const toggleDebounce = 400 * time.Millisecond
 
-// PlayAt plays the queue's entry at i from its start.
-func (p *Player) PlayAt(i int) { p.do(func() { p.playAt(i, 0, true) }) }
+// PlayAt plays the queue's entry at i from its start, as one the user
+// chose: though the queue would pass over it.
+func (p *Player) PlayAt(i int) {
+	p.do(func() {
+		p.choose(i)
+		p.playAt(i, 0, true)
+	})
+}
 
 // PlayID plays the entry of the queue that holds the track id, as a deep
 // link asks: a track the queue doesn't hold can't play from its ID alone,
@@ -30,12 +37,113 @@ func (p *Player) PlayID(id string) {
 	p.do(func() {
 		for i, it := range p.s.Queue {
 			if it.Track.ID == id {
+				p.choose(i)
 				p.playAt(i, 0, true)
 				return
 			}
 		}
 		p.notify(Notice{Message: "Open the track's album or playlist to play it"})
 	})
+}
+
+// Return plays the entry uid again from at, or holds it there paused
+// unless playing, as one the user chose: as undoing a dislike that moved
+// on from it. An entry still current only plays on, and one the queue no
+// longer holds changes nothing.
+func (p *Player) Return(uid string, at time.Duration, playing bool) {
+	p.do(func() {
+		i := p.indexOf(uid)
+		if i < 0 {
+			return
+		}
+		p.choose(i)
+		if i != p.s.Index || !p.holds() {
+			p.playAt(i, at, playing)
+		}
+	})
+}
+
+// holds reports whether the player has the current entry: plays it,
+// holds it paused, loads it, or waits for the network to.
+func (p *Player) holds() bool {
+	return p.loaded || p.s.Loading || p.s.Waiting || p.connect.active()
+}
+
+// choose marks the entry at i as one the user chose to play, which plays
+// though the queue would pass over it.
+func (p *Player) choose(i int) {
+	if i < 0 || i >= len(p.s.Queue) || p.s.Queue[i].Chosen {
+		return
+	}
+	q := slices.Clone(p.s.Queue)
+	skipped := q[i].Skip != ""
+	q[i].Chosen, q[i].Skip = true, ""
+	p.s.Queue = q
+	if skipped {
+		p.emit(QueueChange)
+	}
+}
+
+// Disliked takes in that the user disliked the track id, or no longer, as
+// they do it: the library may keep it a moment later. While the settings
+// skip disliked tracks, the queue passes over its entries from then on,
+// those the user chose too, and moves on from the current one, playing or
+// paused as it was.
+func (p *Player) Disliked(id string, disliked bool) { p.do(func() { p.disliked(id, disliked) }) }
+
+func (p *Player) disliked(id string, disliked bool) {
+	q := slices.Clone(p.s.Queue)
+	changed := false
+	for i, it := range q {
+		if it.Track.ID != id {
+			continue
+		}
+		switch {
+		case disliked && p.skipDisliked:
+			it.Chosen, it.Skip = false, SkipDisliked
+		case disliked:
+			it.Chosen = false
+		case it.Skip == SkipDisliked:
+			it.Skip = ""
+		default:
+			continue
+		}
+		q[i], changed = it, true
+	}
+	if !changed {
+		return
+	}
+	p.s.Queue = q
+	p.emit(QueueChange)
+	if cur, ok := p.s.Current(); ok && cur.Track.ID == id && cur.Skip != "" {
+		p.leave()
+	}
+}
+
+// leave moves on from the current entry, which the queue now passes over,
+// to the next it doesn't, playing or paused as the current one was. At the
+// end of the queue the current track stops, and the radio autoplay adds,
+// from the last entry the queue doesn't pass over, carries on.
+func (p *Player) leave() {
+	play := p.s.Playing || p.s.Loading || p.s.Waiting && p.s.WillPlay
+	if i := p.s.nextIndex(); i >= 0 {
+		p.playAt(i, 0, play)
+		return
+	}
+	p.halt()
+	p.radioAtEnd(play, false, func() {})
+}
+
+// halt stops the current track at its start, as the end of the queue
+// does: Play plays it from there.
+func (p *Player) halt() {
+	p.loadToken++
+	p.endWait()
+	p.loaded = false
+	p.stream.Unload()
+	p.connect.stop(true)
+	p.s.Loading, p.s.Buffering, p.s.Source = false, false, nil
+	p.stopAtEnd(true)
 }
 
 // Play plays, or the queue from its start when nothing is current.
@@ -81,9 +189,14 @@ func (p *Player) ToggleMute() {
 }
 
 // SettingsChanged takes in new settings: a Spotify track goes on from where
-// it was in the way of playing Spotify tracks they choose.
+// it was in the way of playing Spotify tracks they choose, and the queue
+// passes over disliked tracks, or no longer, as they say.
 func (p *Player) SettingsChanged(s settings.Settings) {
 	p.do(func() {
+		if s.SkipDisliked != p.skipDisliked {
+			p.skipDisliked = s.SkipDisliked
+			p.reflag()
+		}
 		if s.SpotifyPlayback == p.spotifyMode {
 			return
 		}
@@ -92,6 +205,24 @@ func (p *Player) SettingsChanged(s settings.Settings) {
 			p.playAt(p.s.Index, p.s.Position, p.s.Playing)
 		}
 	})
+}
+
+// reflag finds again which entries the queue passes over, as the settings
+// changed: never those the user chose. The current entry plays on, and is
+// only ever let off.
+func (p *Player) reflag() {
+	q := make([]Item, len(p.s.Queue))
+	for i, it := range p.s.Queue {
+		switch {
+		case it.Chosen:
+			it.Skip = ""
+		case i != p.s.Index || it.Skip != "":
+			it.Skip = p.svc.Skip(it.Track)
+		}
+		q[i] = it
+	}
+	p.s.Queue = q
+	p.emit(QueueChange)
 }
 
 // playAt plays the queue's entry at i from start, or holds it there when
@@ -442,8 +573,8 @@ func (p *Player) play() {
 		return // it plays once loaded
 	}
 	if _, ok := p.s.Current(); !ok {
-		if len(p.s.Queue) > 0 {
-			p.playAt(0, 0, true)
+		if i := p.s.nextIndex(); i >= 0 {
+			p.playAt(i, 0, true)
 		}
 		return
 	}
@@ -520,33 +651,44 @@ func (p *Player) seek(t time.Duration) {
 }
 
 // advance moves on from the current track: ended tells an end from a skip.
+// It passes over the entries the queue skips.
 func (p *Player) advance(ended bool) {
-	q := p.s.Queue
-	if len(q) == 0 {
+	if len(p.s.Queue) == 0 {
 		return
 	}
-	switch {
+	switch i := p.s.nextIndex(); {
 	case ended && p.s.Repeat == RepeatOne:
 		p.playAt(p.s.Index, 0, true)
-	case p.s.Index < len(q)-1:
-		p.playAt(p.s.Index+1, 0, true)
-	case p.s.Repeat == RepeatAll:
-		p.playAt(0, 0, true)
-	case p.svc.Settings().Autoplay:
-		token := p.loadToken
-		p.extendWithRadio(func(added bool, err error) {
-			switch {
-			case added && token == p.loadToken:
-				p.playAt(p.s.Index+1, 0, true)
-			case !added && ended && token == p.loadToken && p.radioOffline(err):
-				p.waitRadio()
-			case !added:
-				p.stopAtEnd(ended)
-			}
-		})
+	case i >= 0:
+		p.playAt(i, 0, true)
 	default:
-		p.stopAtEnd(ended)
+		p.radioAtEnd(true, ended, func() { p.stopAtEnd(ended) })
 	}
+}
+
+// radioAtEnd has autoplay carry on at the end of the queue with a radio of
+// the last entry it doesn't pass over, which plays, or waits paused unless
+// play. Without autoplay, or a radio of tracks it doesn't pass over, stop
+// runs. The radio waits for a network gone at the end of a track, as ended
+// tells.
+func (p *Player) radioAtEnd(play, ended bool, stop func()) {
+	seed, ok := p.radioSeed()
+	if !ok || !p.svc.Settings().Autoplay {
+		stop()
+		return
+	}
+	token := p.loadToken
+	p.extendWithRadio(seed, func(added bool, err error) {
+		switch i := p.s.nextIndex(); {
+		case token != p.loadToken:
+		case added && i > p.s.Index:
+			p.playAt(i, 0, play)
+		case !added && ended && p.radioOffline(err):
+			p.waitRadio()
+		default:
+			stop()
+		}
+	})
 }
 
 // stopAtEnd stops at the end of the queue.
@@ -561,17 +703,16 @@ func (p *Player) stopAtEnd(ended bool) {
 	p.emit(StateChange)
 }
 
+// previous goes back to the start of the track, or to the entry before
+// early in it, passing over those the queue skips.
 func (p *Player) previous() {
-	pos, i := p.s.Position, p.s.Index
-	if pos > restartAfter || i <= 0 {
-		if i <= 0 && p.s.Repeat == RepeatAll && len(p.s.Queue) > 1 && pos <= restartAfter {
-			p.playAt(len(p.s.Queue)-1, 0, true)
+	if p.s.Position <= restartAfter {
+		if i := p.s.prevIndex(); i >= 0 {
+			p.playAt(i, 0, true)
 			return
 		}
-		p.seek(0)
-		return
 	}
-	p.playAt(i-1, 0, true)
+	p.seek(0)
 }
 
 func (p *Player) setVolume(v float64) {
@@ -687,6 +828,9 @@ func savedOf(st State, unshuffled []Item, played map[string]bool) Saved {
 		at[it.UID] = i
 		if it.Radio {
 			saved.Radio = append(saved.Radio, i)
+		}
+		if it.Chosen {
+			saved.Chosen = append(saved.Chosen, i)
 		}
 		if i < saved.Index && !played[it.UID] {
 			saved.Unplayed = append(saved.Unplayed, i)

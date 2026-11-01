@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/http/httptrace"
 	"net/url"
@@ -310,11 +311,17 @@ func (p *Proxy) fail(w http.ResponseWriter, videoID string, err error) {
 }
 
 // loggable returns err without the stream URL a request's error quotes,
-// which carries the user's IP address: what went wrong, for the log.
+// which carries the user's IP address, and without the addresses a
+// connection's error names, the computer's among them, which over IPv6 is
+// its address on the internet: what went wrong, for the log.
 func loggable(err error) error {
 	var ue *url.Error
 	if errors.As(err, &ue) {
-		return ue.Err
+		err = ue.Err
+	}
+	var oe *net.OpError
+	if errors.As(err, &oe) {
+		return fmt.Errorf("%s: %w", oe.Op, oe.Err)
 	}
 	return err
 }
@@ -373,15 +380,19 @@ func (p *Proxy) fetch(ctx context.Context, s Stream, start, end int64) (*stallin
 	timer := time.AfterFunc(stall, func() { cancel(errStalled) })
 	timer.Stop()
 	// The transport tells when each request went out, and when its answer
-	// came, until Do returns.
+	// came, until Do returns. It may tell that the last request went out
+	// after Do returned its answer, as it writes requests on a goroutine of
+	// its own: the timer times the body's reads by then.
 	var mu sync.Mutex
 	answered := false
 	waiting := func(on bool) {
 		mu.Lock()
 		defer mu.Unlock()
-		if on && !answered {
+		switch {
+		case answered:
+		case on:
 			timer.Reset(stall)
-		} else {
+		default:
 			timer.Stop()
 		}
 	}

@@ -12,6 +12,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/stream"
 )
@@ -179,5 +180,61 @@ func TestPrepareStreamLearnsTheLoudness(t *testing.T) {
 	}
 	if asked.Load() != 2 {
 		t.Errorf("%d asks", asked.Load())
+	}
+}
+
+// TestPrepareStreamAsksOnline asks how loud a track MixMusic holds is, from
+// the cache or found before, only while the network answers: offline, the
+// engine would wait for the ask in vain.
+func TestPrepareStreamAsksOnline(t *testing.T) {
+	n := newNetTest(t)
+	ctx := context.Background()
+	var asks atomic.Int32
+	n.p.a.loudness = openBook(t, filepath.Join(n.dir, "loudness.json"), func(context.Context, string) (float64, error) {
+		asks.Add(1)
+		return -9, nil
+	})
+	// A stream found without PrepareStream, as a run of yt-dlp that went on
+	// once the network had gone, and a track in the cache.
+	n.ytdlp.Store(true)
+	n.net.Store(true)
+	if _, err := n.p.a.resolver.Resolve(ctx, "bbbbbbbbbbb"); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(n.dir, "audio"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(n.dir, "audio", "ddddddddddd.webm"), []byte("audio"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	held := []string{"bbbbbbbbbbb", "ddddddddddd"}
+
+	n.ytdlp.Store(false)
+	n.net.Store(false)
+	if _, err := n.p.PrepareStream(ctx, ytTrack("w3XzgjlKFjc")); !errors.Is(err, player.ErrOffline) {
+		t.Fatalf("without the network: %v", err)
+	}
+	for _, id := range held {
+		if _, err := n.p.PrepareStream(ctx, ytTrack(id)); err != nil {
+			t.Fatalf("%s offline: %v", id, err)
+		}
+		// soon waits for an ask under way, which ends with the measure.
+		if _, ok := n.p.a.loudness.soon(ctx, id, 5*time.Second); ok || asks.Load() != 0 {
+			t.Errorf("%s asked about offline", id)
+		}
+	}
+
+	n.net.Store(true)
+	n.p.a.online.Seen()
+	for _, id := range held {
+		if _, err := n.p.PrepareStream(ctx, ytTrack(id)); err != nil {
+			t.Fatal(err)
+		}
+		if v, ok := n.p.a.loudness.soon(ctx, id, 5*time.Second); !ok || v != -9 {
+			t.Errorf("%s back online: %v, %v", id, v, ok)
+		}
+	}
+	if asks.Load() != 2 {
+		t.Errorf("%d asks back online", asks.Load())
 	}
 }

@@ -2,7 +2,12 @@ package native
 
 import (
 	"bytes"
+	"image"
 	"image/color"
+	"image/png"
+	"net/http"
+	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -141,6 +146,78 @@ func TestFollowArtworkForGround(t *testing.T) {
 		if s.artURL == "" {
 			t.Errorf("%+v didn't ask for the cover's colour", fx)
 		}
+	}
+}
+
+// TestFollowArtworkAsksAgain asks again for the colour of a cover that
+// couldn't load, a while after, and takes it once it loads; a cover whose
+// address gives no image isn't asked for again so soon (#73).
+func TestFollowArtworkAsksAgain(t *testing.T) {
+	was := artColorRetry
+	artColorRetry = 20 * time.Millisecond
+	t.Cleanup(func() { artColorRetry = was })
+	img := image.NewRGBA(image.Rect(0, 0, 8, 8))
+	for i := range img.Pix {
+		img.Pix[i] = []byte{0x20, 0x60, 0xe0, 0xff}[i%4]
+	}
+	var cover bytes.Buffer
+	if err := png.Encode(&cover, img); err != nil {
+		t.Fatal(err)
+	}
+	var busy atomic.Bool
+	var asked, gone atomic.Int32
+	busy.Store(true)
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/gone.png":
+			gone.Add(1)
+			w.WriteHeader(http.StatusNotFound)
+		case busy.Swap(false):
+			asked.Add(1)
+			w.WriteHeader(http.StatusServiceUnavailable)
+		default:
+			asked.Add(1)
+			w.Write(cover.Bytes())
+		}
+	}))
+	t.Cleanup(srv.Close)
+	s := newTestShell(t)
+	s.svc.System.Artwork().HTTP = srv.Client()
+	s.set.DynamicAccent = true
+	play := func(path string) {
+		tr := testTracks[0]
+		tr.ID = "yt:" + path
+		tr.Artwork = []media.Image{{URL: srv.URL + path, Width: 544, Height: 544}}
+		s.p.PlayTracks([]media.Track{tr}, 0)
+		s.settle(t, func(st player.State) bool {
+			cur, ok := st.Current()
+			return ok && cur.Track.ID == tr.ID && st.Playing
+		})
+		s.st = s.p.State()
+	}
+	// frame asks for the colour as each frame does.
+	frame := func() {
+		s.followArtwork()
+		time.Sleep(5 * time.Millisecond)
+		s.drain()
+	}
+
+	play("/cover.png")
+	for deadline := time.Now().Add(5 * time.Second); s.artColor == ""; frame() {
+		if time.Now().After(deadline) {
+			t.Fatalf("the accent didn't take the cover's colour once it loaded: asked %d times", asked.Load())
+		}
+	}
+	if n := asked.Load(); n != 2 {
+		t.Errorf("the cover was asked for %d times", n)
+	}
+
+	play("/gone.png")
+	for end := time.Now().Add(10 * artColorRetry); time.Now().Before(end); {
+		frame()
+	}
+	if n := gone.Load(); n != 1 || s.artColor != "" {
+		t.Errorf("a cover that isn't there was asked for %d times, the accent %q", n, s.artColor)
 	}
 }
 

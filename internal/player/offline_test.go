@@ -144,6 +144,26 @@ func TestWaitForTheNetwork(t *testing.T) {
 	}
 }
 
+// TestToldOfEachLoss tells once that the network is gone, and again once
+// it came back and went: also when the user left the wait for a track
+// that plays without the network.
+func TestToldOfEachLoss(t *testing.T) {
+	net := newNet(false)
+	h := newNetHarness(t, net, func(f *fakeServices) { f.prepare = onDevice })
+	h.p.PlayTracks([]media.Track{track("a"), spotifyTrack("1"), track("b")}, 0)
+	h.wait("a waiting", waiting("a", true))
+	h.p.Next()
+	h.wait("the device playing", func(p *Player) bool { return p.connect.active() && p.s.Playing })
+	net.set(true)
+	h.wait("the network back", func(p *Player) bool { return !p.toldOffline })
+	net.set(false)
+	h.p.Next()
+	h.wait("b waiting", waiting("b", true))
+	if n := h.notices(); len(n) != 2 || n[0].Message != offlineNotice || n[1].Message != offlineNotice {
+		t.Errorf("notices %+v", n)
+	}
+}
+
 // TestWaitMidTrack has a stream that broke off for want of the network
 // wait for it where it was, rather than spending its tries.
 func TestWaitMidTrack(t *testing.T) {
@@ -253,6 +273,47 @@ func TestConnectWaitsForTheNetwork(t *testing.T) {
 	h.device.mu.Unlock()
 	net.set(true)
 	h.wait("the device playing", func(p *Player) bool { return p.connect.active() && p.s.Playing })
+}
+
+// TestWaitLeavesTheDevice has a track that waits for the network after a
+// Spotify device's track wait at its start: the device pauses, and what it
+// tells of its own track neither moves the track that waits nor ends it.
+func TestWaitLeavesTheDevice(t *testing.T) {
+	connectTick, connectAskEvery, connectSettle = 5*time.Millisecond, 10*time.Millisecond, 0
+	t.Cleanup(func() { connectTick, connectAskEvery, connectSettle = time.Second, 3*time.Second, 5*time.Second })
+	found := make(chan struct{})
+	release := sync.OnceFunc(func() { close(found) })
+	net := newNet(true)
+	h := newNetHarness(t, net, func(f *fakeServices) {
+		f.prepare = func(t media.Track) (Source, error) {
+			if t.ID == "yt:b" {
+				<-found
+			}
+			return onDevice(t)
+		}
+	})
+	t.Cleanup(release)
+	sp := spotifyTrack("1")
+	h.p.PlayTracks([]media.Track{sp, track("b"), track("c")}, 0)
+	h.wait("the device playing", func(p *Player) bool { return p.connect.active() && p.s.Playing })
+	net.set(false)
+	h.p.Next()
+	// While b loads, the device plays on, and tells it nears its end.
+	h.device.set(&DeviceState{Playing: true, Progress: 197 * time.Second, Track: &sp})
+	h.wait("the device near its end", func(p *Player) bool { return p.s.Index == 1 && p.s.Position >= 197*time.Second })
+	release()
+	h.wait("b waiting at its start", func(p *Player) bool { return waiting("b", true)(p) && p.s.Position == 0 })
+	h.wait("the device paused", func(p *Player) bool { return h.device.has("pause") && !p.connect.active() })
+	// The device's track ends, as Spotify plays it again from its start.
+	h.device.set(&DeviceState{Playing: true, Progress: time.Second, Track: &sp})
+	time.Sleep(50 * time.Millisecond)
+	h.on(func(p *Player) {
+		if !waiting("b", true)(p) || p.s.Position != 0 {
+			t.Errorf("index %d, waiting %v, position %v", p.s.Index, p.s.Waiting, p.s.Position)
+		}
+	})
+	net.set(true)
+	h.wait("b playing from its start", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:b 0s true" && playing("b")(p) })
 }
 
 // TestRadioWaits has the radio, once the queue ran out, wait for the

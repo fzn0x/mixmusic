@@ -71,7 +71,7 @@ func TestWindowTitle(t *testing.T) {
 		{"lines and bytes", NowPlaying{Track: &media.Track{Title: "One\nMore\x00Time\xff"}, Playing: true}, false, "One More Time�"},
 		{"spaces", NowPlaying{Track: &media.Track{Title: "  One \t More ", Artists: []media.Ref{{Name: "\r\n"}}}, Playing: true}, false, "One More"},
 		// An override left open would turn " — Daft Punk" around.
-		{"direction", NowPlaying{Track: &media.Track{Title: "One‮More⁦", Artists: []media.Ref{{Name: "Daft Punk"}}}, Playing: true}, false, "OneMore — Daft Punk"},
+		{"direction", NowPlaying{Track: &media.Track{Title: "One\u202eMore\u2066", Artists: []media.Ref{{Name: "Daft Punk"}}}, Playing: true}, false, "OneMore — Daft Punk"},
 	} {
 		got := windowTitle(c.np, !c.hide)
 		if got != c.want {

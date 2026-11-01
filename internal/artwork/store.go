@@ -68,8 +68,12 @@ type Store struct {
 	// now and logf are time.Now and log.Printf, which tests replace.
 	now  func() time.Time
 	logf func(format string, args ...any)
-	// wg counts the goroutines, for Close.
-	wg      sync.WaitGroup
+	// busy counts the goroutines under way, which Close waits for: idle
+	// tells when none is left. A sync.WaitGroup won't do, as a caller may
+	// start one while Close waits, as when a test ends.
+	busyMu  sync.Mutex
+	busy    int
+	idle    *sync.Cond
 	counted sync.Once
 	// counting is held while the folder is counted.
 	counting sync.Mutex
@@ -110,7 +114,7 @@ type hostLog struct {
 func NewStore(dir string, limit int64) *Store {
 	t := http.DefaultTransport.(*http.Transport).Clone()
 	t.HTTP2 = &http.HTTP2Config{SendPingTimeout: pingAfter, PingTimeout: pingAfter}
-	return &Store{
+	s := &Store{
 		HTTP:    &http.Client{Timeout: fetchTimeout, Transport: t},
 		dir:     dir,
 		limit:   limit,
@@ -122,6 +126,8 @@ func NewStore(dir string, limit int64) *Store {
 		checked: map[string]time.Time{},
 		hosts:   map[string]*hostLog{},
 	}
+	s.idle = sync.NewCond(&s.busyMu)
+	return s
 }
 
 // Error is why an image didn't load.
@@ -204,8 +210,33 @@ func (s *Store) Clear() error {
 	return errors.Join(errs...)
 }
 
-// Close waits for the store's downloads, checks and counts to end.
-func (s *Store) Close() { s.wg.Wait() }
+// Close waits for the store's downloads, checks and counts to end. The
+// store still works after: what starts then, Close doesn't wait for.
+func (s *Store) Close() {
+	s.busyMu.Lock()
+	defer s.busyMu.Unlock()
+	for s.busy > 0 {
+		s.idle.Wait()
+	}
+}
+
+// spawn runs fn beside the caller, as one of the goroutines Close waits
+// for.
+func (s *Store) spawn(fn func()) {
+	s.busyMu.Lock()
+	s.busy++
+	s.busyMu.Unlock()
+	go func() {
+		defer func() {
+			s.busyMu.Lock()
+			if s.busy--; s.busy == 0 {
+				s.idle.Broadcast()
+			}
+			s.busyMu.Unlock()
+		}()
+		fn()
+	}()
+}
 
 // file is an image kept on disk: one line of JSON, its header, then the
 // image as it came.
@@ -262,9 +293,7 @@ func (s *Store) download(ctx context.Context, rawURL string) ([]byte, error) {
 	if !ok {
 		c = &call{done: make(chan struct{})}
 		s.calls[rawURL] = c
-		s.wg.Add(1)
-		go func() {
-			defer s.wg.Done()
+		s.spawn(func() {
 			s.slots <- struct{}{}
 			c.data, c.err = s.fetch(rawURL, nil)
 			<-s.slots
@@ -272,7 +301,7 @@ func (s *Store) download(ctx context.Context, rawURL string) ([]byte, error) {
 			delete(s.calls, rawURL)
 			s.mu.Unlock()
 			close(c.done)
-		}()
+		})
 	}
 	s.mu.Unlock()
 	select {
@@ -292,9 +321,7 @@ func (s *Store) check(rawURL string, f *file) {
 		return
 	}
 	s.checks[rawURL] = true
-	s.wg.Add(1)
-	go func() {
-		defer s.wg.Done()
+	s.spawn(func() {
 		s.slots <- struct{}{}
 		_, err := s.fetch(rawURL, f)
 		<-s.slots
@@ -306,7 +333,7 @@ func (s *Store) check(rawURL string, f *file) {
 			delete(s.checked, rawURL)
 		}
 		s.mu.Unlock()
-	}()
+	})
 }
 
 // fetch downloads the image at rawURL, and keeps it. With stale, the
@@ -521,13 +548,7 @@ func (s *Store) remove(rawURL string) {
 
 // count counts what the folder holds, once, beside the caller.
 func (s *Store) count() {
-	s.counted.Do(func() {
-		s.wg.Add(1)
-		go func() {
-			defer s.wg.Done()
-			s.recount()
-		}()
-	})
+	s.counted.Do(func() { s.spawn(s.recount) })
 }
 
 // recount counts what the folder holds, removes what writes left

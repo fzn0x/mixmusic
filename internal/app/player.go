@@ -82,14 +82,14 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	if p.a.cache.Has(videoID) {
 		src.Cached = true
 		// A track cached before MixMusic kept measures gets one now.
-		p.a.loudness.learn(videoID)
+		p.learnLoudness(videoID)
 		return src, nil
 	}
 	// A stream found before plays without the network, as the engine may
 	// hold its audio already; yt-dlp needs the network to find one.
 	if p.a.resolver.Fresh(videoID) {
 		// Its measure was kept as it was found, else it is asked for now.
-		p.a.loudness.learn(videoID)
+		p.learnLoudness(videoID)
 		return src, nil
 	}
 	if p.a.online != nil && p.a.online.Offline() {
@@ -107,6 +107,16 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 		p.a.loudness.learn(videoID)
 	}
 	return src, nil
+}
+
+// learnLoudness asks YouTube how loud a video MixMusic holds the audio of
+// is, unless the book knows, or the network is gone: the engine would wait
+// for an answer that can't come.
+func (p *Player) learnLoudness(videoID string) {
+	if p.a.online != nil && p.a.online.Offline() {
+		return
+	}
+	p.a.loudness.learn(videoID)
 }
 
 // StreamFailure tells why the audio of a track, the recording PrepareStream
@@ -209,7 +219,8 @@ func oneLine(s string) string {
 		switch {
 		case unicode.IsControl(r):
 			return ' '
-		case r >= '‪' && r <= '‮', r >= '⁦' && r <= '⁩':
+		// The embeddings and overrides, then the isolates.
+		case r >= '\u202a' && r <= '\u202e', r >= '\u2066' && r <= '\u2069':
 			return -1
 		}
 		return r

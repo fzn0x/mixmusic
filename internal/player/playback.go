@@ -126,7 +126,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 			return
 		}
 		if err != nil {
-			if !p.offline(err, autoplay) {
+			if !p.offline(err, start, autoplay) {
 				p.fail(err.Error())
 			}
 			return
@@ -170,7 +170,7 @@ func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Dura
 		}
 		// A device that can't be reached for want of the network waits for
 		// it: YouTube Music needs it too.
-		p.checkOnline(func() { p.wait(autoplay) }, func() {
+		p.checkOnline(func() { p.wait(start, autoplay) }, func() {
 			p.fellBack(err.Error())
 			p.streamInstead(token, entry, start, autoplay)
 		})
@@ -184,7 +184,7 @@ func (p *Player) streamInstead(token int, entry Item, start time.Duration, autop
 			return
 		}
 		if err != nil {
-			if !p.offline(err, autoplay) {
+			if !p.offline(err, start, autoplay) {
 				p.fail(err.Error())
 			}
 			return
@@ -284,7 +284,7 @@ func (p *Player) onStreamError(message string) {
 	// The app heard of the track as paused, as the engine paused it.
 	p.report()
 	p.emit(StateChange)
-	p.checkOnline(func() { p.wait(autoplay) }, func() { p.retryStream(why) })
+	p.checkOnline(func() { p.wait(p.s.Position, autoplay) }, func() { p.retryStream(why) })
 }
 
 // retryStream plays the current track's stream again from where it was,
@@ -325,7 +325,7 @@ func (p *Player) retryStream(why string) {
 				return
 			}
 			if err != nil {
-				if !p.offline(err, autoplay) {
+				if !p.offline(err, at, autoplay) {
 					p.retryStream(err.Error())
 				}
 				return

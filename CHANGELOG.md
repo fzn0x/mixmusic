@@ -38,6 +38,11 @@ All notable changes to MixMusic are documented here. The format follows
   version's code.
 - On Windows, a frame the screen never takes no longer holds up MixMusic
   for a second (#87).
+- YouTube Music tracks start in a moment, rather than several seconds
+  after you press play: MixMusic asks YouTube for a track's audio itself,
+  and runs yt-dlp only for the tracks YouTube won't give it that way, such
+  as those made for children. The next track is found a second into the
+  one playing, so skipping ahead is quick too (#69).
 
 ## [0.5.5] - 2026-10-28
 

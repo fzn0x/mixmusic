@@ -175,6 +175,22 @@ func byWords(lines []Line) string {
 	return best
 }
 
+// languageCode returns the code of ISO 639-1 of a language tag, as
+// GuessLanguage returns them: its language alone, as "pt" for "pt-BR",
+// but Chinese in traditional characters, "zh-Hant"; "" for what isn't a
+// tag.
+func languageCode(tag string) string {
+	parts := strings.Split(strings.ReplaceAll(strings.TrimSpace(tag), "_", "-"), "-")
+	lang := strings.ToLower(parts[0])
+	if len(lang) < 2 || len(lang) > 3 || strings.Trim(lang, "abcdefghijklmnopqrstuvwxyz") != "" {
+		return ""
+	}
+	if lang == "zh" && len(parts) > 1 && strings.EqualFold(parts[1], "Hant") {
+		return "zh-Hant"
+	}
+	return lang
+}
+
 // nonLatin are the languages written in another script than Latin
 // letters, which lyrics can be romanized from.
 var nonLatin = map[string]bool{}

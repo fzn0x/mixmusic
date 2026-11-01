@@ -104,7 +104,7 @@ func (u *Unison) Get(ctx context.Context, t Query) (Lyrics, error) {
 		return Lyrics{}, ErrNotFound
 	}
 	l.Source, l.SourceURL = "Unison", UnisonURL
-	l.Language = strings.TrimSpace(ans.Data.Language)
+	l.Language = languageCode(ans.Data.Language)
 	return l, nil
 }
 

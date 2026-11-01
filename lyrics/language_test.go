@@ -47,6 +47,14 @@ func TestGuessLanguage(t *testing.T) {
 	}
 }
 
+func TestLanguageCode(t *testing.T) {
+	for tag, want := range map[string]string{"ja": "ja", " EN ": "en", "pt-BR": "pt", "zh-Hant": "zh-Hant", "zh_hant_TW": "zh-Hant", "zh-Hans": "zh", "": "", "not a tag": "", "日本語": ""} {
+		if got := languageCode(tag); got != want {
+			t.Errorf("%q: %q, want %q", tag, got, want)
+		}
+	}
+}
+
 func TestRomanizable(t *testing.T) {
 	for _, lang := range []string{"ja", "ko", "zh", "zh-Hant", "ru", "uk", "el", "ar", "th", "hi"} {
 		if !Romanizable(lang) {

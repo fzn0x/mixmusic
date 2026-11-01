@@ -144,7 +144,7 @@ func (u *Unison) translate(ctx context.Context, lines []string, to, from, videoI
 			out[i].Romanized = strings.TrimSpace(*a.Romanization)
 		}
 	}
-	return out, strings.TrimSpace(ans.DetectedLang), nil
+	return out, languageCode(ans.DetectedLang), nil
 }
 
 // same tells whether a translation or a romanization is the line itself.

@@ -72,6 +72,11 @@ func (p *Player) Previous() { p.do(p.previous) }
 // isn't a number changes nothing.
 func (p *Player) SetVolume(v float64) { p.do(func() { p.setVolume(v) }) }
 
+// ChangeVolume turns the volume up or down by, from the volume the player
+// has as it takes the change, and unmutes: presses that come at once each
+// count.
+func (p *Player) ChangeVolume(by float64) { p.do(func() { p.setVolume(p.s.Volume + by) }) }
+
 // ToggleMute mutes or unmutes.
 func (p *Player) ToggleMute() {
 	p.do(func() {

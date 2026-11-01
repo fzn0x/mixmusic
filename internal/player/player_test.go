@@ -1338,6 +1338,25 @@ func TestVolume(t *testing.T) {
 	}
 }
 
+// TestChangeVolume steps the volume from where the player has it, within
+// its range, and unmutes; steps that come at once each count.
+func TestChangeVolume(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.SetVolume(0.98)
+	h.p.ToggleMute()
+	h.p.ChangeVolume(0.05)
+	h.wait("the volume up", func(p *Player) bool { return p.s.Volume == 1 && !p.s.Muted })
+	h.p.SetVolume(0.02)
+	h.p.ChangeVolume(-0.05)
+	h.wait("the volume down", func(p *Player) bool { return p.s.Volume == 0 })
+	h.p.SetVolume(0.5)
+	h.p.ChangeVolume(0.1)
+	h.p.ChangeVolume(0.1)
+	h.wait("two steps", func(p *Player) bool { return math.Abs(p.s.Volume-0.7) < 1e-9 })
+	h.p.ChangeVolume(math.NaN())
+	h.wait("a step that isn't a number", func(p *Player) bool { return math.Abs(p.s.Volume-0.7) < 1e-9 })
+}
+
 // TestVolumeKept starts from the volume settings.json keeps, on volume's
 // curve, and keeps it there as it was kept: as loud for every version.
 func TestVolumeKept(t *testing.T) {

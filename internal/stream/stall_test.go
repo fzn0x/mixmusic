@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/http/httptrace"
+	"net/url"
 	"os"
 	"strings"
 	"sync"
@@ -261,6 +263,23 @@ func TestProxyGivesUpTheSizeWithoutAnAnswer(t *testing.T) {
 	}
 	if why := p.Failure(testID); !strings.HasPrefix(why, "YouTube stopped sending the audio") {
 		t.Errorf("Failure = %q", why)
+	}
+}
+
+// TestLogNamesNoAddress logs why a stream's connection failed without the
+// request's URL, and without the connection's addresses: over IPv6, the
+// computer's is its address on the internet.
+func TestLogNamesNoAddress(t *testing.T) {
+	err := &url.Error{Op: "Get", URL: "https://example.com/audio?ip=203.0.113.7", Err: &net.OpError{
+		Op:     "read",
+		Net:    "tcp",
+		Source: &net.TCPAddr{IP: net.ParseIP("2001:db8::7"), Port: 51234},
+		Addr:   &net.TCPAddr{IP: net.ParseIP("2001:db8::1"), Port: 443},
+		Err:    errors.New("connection reset by peer"),
+	}}
+	got := loggable(err).Error()
+	if strings.Contains(got, "203.0.113.7") || strings.Contains(got, "2001:db8") || !strings.Contains(got, "connection reset by peer") {
+		t.Errorf("logged %q", got)
 	}
 }
 

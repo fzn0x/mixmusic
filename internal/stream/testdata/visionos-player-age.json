@@ -1,0 +1,15 @@
+{
+  "playabilityStatus": {
+    "reason": "Sign in to confirm your age",
+    "status": "LOGIN_REQUIRED"
+  },
+  "responseContext": {
+    "visitorData": "CgtUZXN0VmlzaXRvcijAgICABjIKCgJVUxIEGgAgAA%3D%3D"
+  },
+  "videoDetails": {
+    "author": "The Witcher",
+    "lengthSeconds": "142",
+    "title": "The Witcher 3: Wild Hunt - The Sword Of Destiny Trailer",
+    "videoId": "HtVdAasjOgU"
+  }
+}

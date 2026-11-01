@@ -271,6 +271,34 @@ func TestRefreshShown(t *testing.T) {
 	}
 }
 
+// TestRefreshButtonFollows dims the button, or turns it to a spinner, as
+// the page shown needs, once the frames after a change settled: the
+// button is built before the page, from what the frame before found.
+func TestRefreshButtonFollows(t *testing.T) {
+	s := newTestShell(t)
+	tt := tester(t, s)
+	tt.SetPreferences(ui.Preferences{ReduceMotion: true})
+	badAlbum(s)
+	show(s, tt, "/stats")
+	if !s.refreshOff {
+		t.Fatal("the button isn't dimmed on the stats")
+	}
+	s.navigate("/album/al-x")
+	tt.Frame()
+	if s.refreshOff {
+		t.Error("the button stays dimmed on the album")
+	}
+	tt.Click("Refresh this page")
+	tt.Frame()
+	if !s.refreshBusy {
+		t.Error("the button isn't a spinner while the refresh is out")
+	}
+	waitRefreshed(t, s, tt)
+	if s.refreshBusy {
+		t.Error("the spinner stays")
+	}
+}
+
 // TestRefreshShownPageOnly refreshes the page shown, not the one that
 // slides away as it comes.
 func TestRefreshShownPageOnly(t *testing.T) {

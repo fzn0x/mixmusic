@@ -57,12 +57,8 @@ func (s *shell) refreshPage() {
 		v.Remount()
 		asked = true
 	}
-	if !asked {
-		return
-	}
-	s.refreshAt, s.refreshTold = s.router.Location(), false
-	if s.win != nil {
-		s.win.Invalidate()
+	if asked {
+		s.refreshAt, s.refreshTold = s.router.Location(), false
 	}
 }
 
@@ -92,13 +88,21 @@ func (s *shell) refreshFailed(err error) {
 	s.notes = append(s.notes, player.Notice{Message: "Couldn't refresh: " + err.Error(), Error: true})
 }
 
+// nothingToRefresh tells whether the page shows only what is always
+// current: it fetched nothing, and shows no plugin's view.
+func (s *shell) nothingToRefresh() bool { return len(s.shown) == 0 && len(s.mountedViews) == 0 }
+
 // keepShown keeps what the page shown and the side panel fetched in the
 // frame, which a refresh asks again for, and tells screen readers that a
 // refresh ended: not one whose toast told it failed, which they hear, nor
-// one of a page the user left meanwhile.
+// one of a page the user left meanwhile. The refresh button, built before
+// the page, shows what this frame found in the next, which it asks for.
 func (s *shell) keepShown(c *ui.Context) {
 	s.shown, s.showing = s.showing, s.shown
 	clear(s.showing)
+	if s.nothingToRefresh() != s.refreshOff || s.refreshing() != s.refreshBusy {
+		c.Invalidate()
+	}
 	if s.refreshAt == "" || s.refreshing() {
 		return
 	}
@@ -114,13 +118,14 @@ func (s *shell) keepShown(c *ui.Context) {
 // songs: there, it keeps its place.
 func (s *shell) refreshButton(c *ui.Context) {
 	k := &s.lk
-	busy := s.refreshing()
+	busy, off := s.refreshing(), s.nothingToRefresh()
+	s.refreshBusy, s.refreshOff = busy, off
 	label, tip := "Refresh this page", "Refresh this page"
 	if keys := shortcutLabel(s.shortcutOf(command{id: "view.refresh", shortcut: refreshKeys})); keys != "" {
 		tip += " (" + keys + ")"
 	}
 	b := s.buttonBase(c.Key("refresh")).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(tip).Cursor(ui.CursorPointer).
-		Disabled(len(s.shown) == 0 && len(s.mountedViews) == 0)
+		Disabled(off)
 	ink := k.muted
 	switch {
 	case busy:

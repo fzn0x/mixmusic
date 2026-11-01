@@ -247,6 +247,8 @@ func (m *Manager) download(j *job, dir, video string) error {
 		m.mu.Unlock()
 		if n := info.Size(); n > 0 && n <= s.Size && was == s.Version() {
 			_, err := f.Seek(0, io.SeekEnd)
+			j.from.Store(n)
+			j.done.Store(n)
 			return n, err
 		}
 		if err := f.Truncate(0); err != nil {
@@ -356,6 +358,12 @@ func (m *Manager) finish(j *job, err error) {
 	case errors.Is(err, errBusy):
 		m.nextAt[j.id] = time.Now().Add(busyWait)
 	default:
+		if j.progressed() {
+			// It came on before it failed, as on a slow, flaky network: its
+			// tries start over, from what came.
+			delete(m.tries, j.id)
+			m.failing = 0
+		}
 		m.failed(j.id, e, err)
 	}
 	if !m.waiting() {

@@ -364,7 +364,12 @@ type job struct {
 	// what it does, which mu guards.
 	done, size atomic.Int64
 	phase      string
+	// from is where the download went on from, in its part.
+	from atomic.Int64
 }
+
+// progressed reports whether bytes came in the job.
+func (j *job) progressed() bool { return j.done.Load() > j.from.Load() }
 
 // progress is how far the job came, from 0 to 1, or -1 before its size is
 // known.

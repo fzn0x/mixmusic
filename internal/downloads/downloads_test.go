@@ -71,6 +71,9 @@ type fetcher struct {
 	cutErr  error
 	hold    int64
 	holding chan string
+	// step stops each download step bytes after where it went on from,
+	// with cutErr, as a slow, flaky network does.
+	step int64
 }
 
 func (f *fetcher) Download(ctx context.Context, video string, resume func(s stream.Stream) (int64, error), w io.Writer, progress func(done, size int64)) (stream.Stream, error) {
@@ -104,10 +107,14 @@ func (f *fetcher) Download(ctx context.Context, video string, resume func(s stre
 	}
 	f.record(video, from)
 	end := int64(len(data))
-	cut, hold := f.cut > from, f.hold > from
+	at := f.cut
+	if f.step > 0 && from+f.step < end {
+		at = from + f.step
+	}
+	cut, hold := at > from, f.hold > from
 	switch {
 	case cut:
-		end = f.cut
+		end = at
 	case hold:
 		end = f.hold
 	}
@@ -816,5 +823,25 @@ func TestWatchAsksBack(t *testing.T) {
 	case <-told:
 	case <-time.After(5 * time.Second):
 		t.Fatal("the watcher wasn't told, or waits for the manager")
+	}
+}
+
+// TestFlakyProgress goes on with a download that keeps breaking off on a
+// slow network, as long as each try brings more of it: its tries start
+// over each time.
+func TestFlakyProgress(t *testing.T) {
+	was := retryWaits
+	retryWaits = []time.Duration{time.Millisecond}
+	t.Cleanup(func() { retryWaits = was })
+	f := &fetcher{step: 10000, cutErr: errors.New("stream: YouTube answered HTTP 500")}
+	m := open(t, t.TempDir(), Options{Fetcher: f})
+	m.Add([]media.Track{yt("acacacacaca", "Slow")}, "best")
+	m.Start()
+	until(t, "the download", func() bool { return kind(m, "yt:acacacacaca") != Waiting && kind(m, "yt:acacacacaca") != Downloading })
+	if k := kind(m, "yt:acacacacaca"); k != Done {
+		t.Fatalf("it is %v: %s", k, m.State("yt:acacacacaca").Why)
+	}
+	if got := f.asked(); len(got) != 4 || got[3].from != 30000 {
+		t.Errorf("downloads %+v", got)
 	}
 }

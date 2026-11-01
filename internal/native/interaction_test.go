@@ -300,6 +300,13 @@ func TestLyricsTryAgain(t *testing.T) {
 	if !tt.HasText("No lyrics found for this track: lyrics: not found") || tt.HasText("try again") {
 		t.Errorf("a track without lyrics shows %q", tt.Texts())
 	}
+
+	// LRCLIB was too busy to look everywhere: trying again may find some.
+	s.loads[key] = &loaded[lyrics.Lyrics]{done: true, err: fmt.Errorf("No lyrics found for this track: %w", lyrics.ErrNotFoundYet)}
+	tt.Frame()
+	if !tt.HasText("try again") {
+		t.Errorf("a track LRCLIB was too busy for shows %q", tt.Texts())
+	}
 }
 
 // TestAlbumArtistLinks opens the page of an album's artist from its head.

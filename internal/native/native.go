@@ -106,6 +106,8 @@ type shell struct {
 	notes        []player.Notice
 	actionToasts []actionToast
 	stop         []func()
+	// clearingCovers is set while the covers kept on disk are removed.
+	clearingCovers bool
 	// pending holds what update ran without a window, which pendingMu
 	// guards with win while it's set.
 	pendingMu sync.Mutex

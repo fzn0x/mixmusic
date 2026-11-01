@@ -255,11 +255,15 @@ func newShell(a *app.App, p *player.Player) *shell {
 }
 
 // start follows the player and the app, until the window closes, and
-// shows the player's notices and the pages that deep links ask for.
+// shows the player's notices and the pages that deep links ask for. The
+// colours the settings' wells hold back are saved as the window closes,
+// and as MixMusic quits, as Windows ending the session doesn't close it.
 func (s *shell) start() {
 	s.follow(
 		s.p.Notices(func(n player.Notice) { s.update(func() { s.notes = append(s.notes, n) }) }),
 		s.a.OnNavigate(func(target string) { s.update(func() { s.open(target) }) }),
+		s.a.OnFlush(s.keepColors),
+		s.keepColors,
 	)
 }
 

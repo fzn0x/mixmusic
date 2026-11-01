@@ -291,18 +291,36 @@ func contrast(a, b color.NRGBA) float64 {
 	return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
 }
 
-// readableOn shifts an accent toward white on a dark ground, or black on a
-// light one, until it reads on it at 3:1, as large text and controls need,
-// keeping its hue, as the web interface did.
-func readableOn(accent, ground color.NRGBA) color.NRGBA {
-	toward := color.NRGBA{A: 255}
-	if luminance(ground) < 0.5 {
-		toward = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
+// readableOn shifts an accent toward white or black until it reads on the
+// ground at 3:1, as large text and controls need, keeping its hue, as the
+// web interface did.
+func readableOn(accent, ground color.NRGBA) color.NRGBA { return readableAt(accent, ground, 3) }
+
+// readableAt shifts c toward white or black, keeping its hue, until it
+// reads on the ground at ratio, which can be at most 4.5: on its own side
+// of the ground, lighter or darker, where that side's extreme reaches the
+// ratio, else across the ground to the other, which always does. A colour
+// that reads already stays; one that is translucent is taken as it shows
+// on the ground.
+func readableAt(c, ground color.NRGBA, ratio float64) color.NRGBA {
+	black, white := color.NRGBA{A: 255}, color.NRGBA{R: 255, G: 255, B: 255, A: 255}
+	ground = over(ground, black)
+	c = over(c, ground)
+	if contrast(c, ground) >= ratio {
+		return c
 	}
-	c := accent
-	c.A = 255
-	for i := 0; i < 10 && contrast(c, ground) < 3; i++ {
-		c = mix(c, toward, 0.15)
+	toward, other := white, black
+	if luminance(c) < luminance(ground) {
+		toward, other = black, white
 	}
-	return c
+	if contrast(toward, ground) < ratio {
+		toward = other
+	}
+	for range 40 {
+		if c = mix(c, toward, 0.15); contrast(c, ground) >= ratio {
+			return c
+		}
+	}
+	// The steps round short of the extreme, which reads.
+	return toward
 }

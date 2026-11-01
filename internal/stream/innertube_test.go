@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -556,5 +557,78 @@ func TestDirectPausesAfterRefusals(t *testing.T) {
 	pauses := strings.Count(logs.String(), "YouTube's player API refused 3 streams in a row; yt-dlp alone finds them for 30 minutes")
 	if pauses != 4 || strings.Contains(logs.String(), "videoplayback") || strings.Contains(logs.String(), testVisitor) {
 		t.Errorf("%d pauses logged, or a stream URL or the visitor ID:\n%s", pauses, logs.String())
+	}
+}
+
+func TestDirectStreamsCarryTheirLoudness(t *testing.T) {
+	f := newFakeTube(t)
+	s, err := f.direct().Stream(context.Background(), songID, QualityBest)
+	if err != nil || !s.Measured || s.Loudness != -7.93 {
+		t.Errorf("the song at %v LKFS (measured %v), %v", s.Loudness, s.Measured, err)
+	}
+	// The stable-volume twins measure louder than the audio that plays.
+	f.answersWith("-drc")
+	for _, q := range []Quality{QualityBest, QualitySaver} {
+		s, err := f.direct().Stream(context.Background(), "jNQXAC9IVRw", q)
+		if err != nil || !s.Measured || s.Loudness != -23.67 {
+			t.Errorf("%s: at %v LKFS (measured %v), %v", q, s.Loudness, s.Measured, err)
+		}
+	}
+}
+
+func TestDirectLoudness(t *testing.T) {
+	f := newFakeTube(t)
+	f.refuses(http.StatusForbidden) // the media server is never asked
+	if v, err := f.direct().Loudness(context.Background(), songID); err != nil || v != -7.93 {
+		t.Errorf("the song: %v, %v", v, err)
+	}
+	for _, suffix := range []string{"-unplayable", "-age", "-bot-check"} {
+		f.answersWith(suffix)
+		if _, err := f.direct().Loudness(context.Background(), songID); !errors.Is(err, ErrNoLoudness) {
+			t.Errorf("%s: %v", suffix, err)
+		}
+	}
+	f.answers(func(playerRequest) []byte { return nil })
+	if _, err := f.direct().Loudness(context.Background(), songID); err == nil || errors.Is(err, ErrNoLoudness) {
+		t.Errorf("HTTP 500: %v", err)
+	}
+}
+
+func TestPlayerAnswerLoudness(t *testing.T) {
+	for _, tc := range []struct {
+		name, answer string
+		picked       string // the format the stream plays, if any
+		want         float64
+		ok           bool
+	}{
+		{"the track", `{"playerConfig": {"audioConfig": {"trackAbsoluteLoudnessLkfs": -11.93, "perceptualLoudnessDb": -12}}}`, "", -11.93, true},
+		{"perceptual", `{"playerConfig": {"audioConfig": {"perceptualLoudnessDb": -9}}}`, "", -9, true},
+		{"above the target", `{"playerConfig": {"audioConfig": {"loudnessTargetLkfs": -14, "loudnessDb": 6.07}}}`, "", -7.93, true},
+		{"above no target", `{"playerConfig": {"audioConfig": {"loudnessDb": 6.07}}}`, "", -7.93, true},
+		{"the formats", `{"streamingData": {"adaptiveFormats": [
+			{"mimeType": "video/webm", "trackAbsoluteLoudnessLkfs": -5},
+			{"mimeType": "audio/webm", "isDrc": true, "trackAbsoluteLoudnessLkfs": -16.92},
+			{"mimeType": "audio/webm", "trackAbsoluteLoudnessLkfs": -23.67}]}}`, "", -23.67, true},
+		{"a format above the target", `{"streamingData": {"adaptiveFormats": [{"mimeType": "audio/webm", "loudnessDb": -9.67}]}}`, "", -23.67, true},
+		{"the stream's own", `{"playerConfig": {"audioConfig": {"trackAbsoluteLoudnessLkfs": -13.01}}}`, `{"trackAbsoluteLoudnessLkfs": -13.02}`, -13.02, true},
+		{"too loud", `{"playerConfig": {"audioConfig": {"trackAbsoluteLoudnessLkfs": 3}}}`, "", 0, false},
+		{"too quiet", `{"playerConfig": {"audioConfig": {"trackAbsoluteLoudnessLkfs": -90}}}`, "", 0, false},
+		{"none", `{"playabilityStatus": {"status": "UNPLAYABLE"}}`, "", 0, false},
+	} {
+		var ans playerAnswer
+		if err := json.Unmarshal([]byte(tc.answer), &ans); err != nil {
+			t.Fatal(err)
+		}
+		var picked *playerFormat
+		if tc.picked != "" {
+			picked = new(playerFormat)
+			if err := json.Unmarshal([]byte(tc.picked), picked); err != nil {
+				t.Fatal(err)
+			}
+		}
+		got, ok := ans.loudness(picked)
+		if ok != tc.ok || math.Abs(got-tc.want) > 1e-9 {
+			t.Errorf("%s: %v, %v; want %v", tc.name, got, ok, tc.want)
+		}
 	}
 }

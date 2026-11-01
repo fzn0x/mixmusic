@@ -83,6 +83,7 @@ type App struct {
 	proxy        *stream.Proxy
 	online       *online.Watch
 	cache        *stream.Cache
+	loudness     *loudnessBook
 	matcher      *match.Matcher
 	lyrics       *lyrics.Client
 	addons       *addons.Manager
@@ -172,6 +173,10 @@ func New(opts Options) (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("opening matches: %w", err)
 	}
+	loudness, err := store.Open(filepath.Join(opts.CacheDir, "loudness.json"), map[string]float64{})
+	if err != nil {
+		return nil, fmt.Errorf("opening loudness: %w", err)
+	}
 	s := a.settings.Get().Clean()
 
 	a.youtube = youtube.New()
@@ -192,12 +197,14 @@ func New(opts Options) (*App, error) {
 	a.resolver = stream.NewResolver(a.tools, filepath.Join(opts.CacheDir, "yt-dlp"))
 	// MIXMUSIC_YTDLP_ONLY has yt-dlp find every stream, as before MixMusic
 	// asked YouTube's player API: to time one against the other, or to
-	// tell which fails.
+	// tell which fails. The API still tells how loud tracks are.
+	direct := stream.NewDirect()
 	if os.Getenv("MIXMUSIC_YTDLP_ONLY") == "" {
-		a.resolver.Direct = stream.NewDirect()
+		a.resolver.Direct = direct
 	} else {
 		log.Print("mixmusic: yt-dlp alone finds the streams (MIXMUSIC_YTDLP_ONLY)")
 	}
+	a.loudness = newLoudnessBook(direct.Loudness, loudness)
 	a.cache = stream.NewCache(filepath.Join(opts.CacheDir, "audio"), 0)
 	a.proxy = stream.NewProxy(a.resolver)
 	// The player asks whether the network answers, which audio coming

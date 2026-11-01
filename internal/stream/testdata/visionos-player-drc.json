@@ -1,0 +1,178 @@
+{
+  "playabilityStatus": {
+    "status": "OK"
+  },
+  "playerConfig": {
+    "audioConfig": {
+      "enablePerFormatLoudness": true,
+      "loudnessNormalizationConfig": {
+        "applyStatefulNormalization": false,
+        "maxStatefulTimeThresholdSec": 300,
+        "minimumLoudnessTargetLkfs": -31,
+        "preserveStatefulLoudnessTarget": true
+      },
+      "loudnessTargetLkfs": -14,
+      "perceptualLoudnessDb": -23.67,
+      "trackAbsoluteLoudnessLkfs": -23.67
+    }
+  },
+  "responseContext": {
+    "visitorData": "CgtUZXN0VmlzaXRvcijAgICABjIKCgJVUxIEGgAgAA%3D%3D"
+  },
+  "streamingData": {
+    "adaptiveFormats": [
+      {
+        "approxDurationMs": "19133",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "averageBitrate": 49140,
+        "bitrate": 49594,
+        "contentLength": "117526",
+        "itag": 139,
+        "loudnessDb": -9.67,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "trackAbsoluteLoudnessLkfs": -23.67,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=117526&dur=19.133&itag=139&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "19133",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "averageBitrate": 49127,
+        "bitrate": 49518,
+        "contentLength": "117495",
+        "isDrc": true,
+        "itag": 139,
+        "loudnessDb": -2.92,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "trackAbsoluteLoudnessLkfs": -16.92,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=117495&dur=19.133&itag=139&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "19063",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "averageBitrate": 129796,
+        "bitrate": 130171,
+        "contentLength": "309288",
+        "itag": 140,
+        "loudnessDb": -9.67,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -23.67,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=309288&dur=19.063&itag=140&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "19063",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "averageBitrate": 129757,
+        "bitrate": 130072,
+        "contentLength": "309197",
+        "isDrc": true,
+        "itag": 140,
+        "loudnessDb": -2.92,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -16.92,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=309197&dur=19.063&itag=140&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "19021",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 47356,
+        "bitrate": 48248,
+        "contentLength": "112596",
+        "itag": 249,
+        "loudnessDb": -9.67,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -23.67,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=112596&dur=19.021&itag=249&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "19021",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 50012,
+        "bitrate": 50981,
+        "contentLength": "118912",
+        "isDrc": true,
+        "itag": 249,
+        "loudnessDb": -2.92,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -16.92,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=118912&dur=19.021&itag=249&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "19021",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 60478,
+        "bitrate": 61101,
+        "contentLength": "143795",
+        "itag": 250,
+        "loudnessDb": -9.67,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -23.67,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=143795&dur=19.021&itag=250&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "19021",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 63755,
+        "bitrate": 64072,
+        "contentLength": "151586",
+        "isDrc": true,
+        "itag": 250,
+        "loudnessDb": -2.92,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -16.92,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=151586&dur=19.021&itag=250&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "19021",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "averageBitrate": 106064,
+        "bitrate": 106944,
+        "contentLength": "252182",
+        "itag": 251,
+        "loudnessDb": -9.67,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -23.67,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=252182&dur=19.021&itag=251&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "19021",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "averageBitrate": 107429,
+        "bitrate": 108013,
+        "contentLength": "255427",
+        "isDrc": true,
+        "itag": 251,
+        "loudnessDb": -2.92,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -16.92,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=255427&dur=19.021&itag=251&mime=audio%2Fwebm&expire={{expire}}"
+      }
+    ],
+    "expiresInSeconds": "21540"
+  },
+  "videoDetails": {
+    "author": "jawed",
+    "lengthSeconds": "19",
+    "title": "Me at the zoo",
+    "videoId": "jNQXAC9IVRw"
+  }
+}

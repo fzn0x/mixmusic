@@ -99,8 +99,12 @@ type Settings struct {
 	Quality       Quality `json:"quality"`
 	// Crossfade overlaps tracks by this many seconds, from 0 to 12.
 	Crossfade int `json:"crossfade"`
-	// Normalize evens out the loudness of tracks.
+	// Normalize runs Volume levelling, a compressor that squeezes loud and
+	// quiet moments closer together as they play.
 	Normalize bool `json:"normalize"`
+	// Loudness turns tracks louder than -14 LKFS down to it, from YouTube's
+	// measure of each: Even loudness.
+	Loudness bool `json:"loudness"`
 	// Autoplay continues with similar tracks when the queue ends.
 	Autoplay  bool      `json:"autoplay"`
 	Equalizer Equalizer `json:"equalizer"`
@@ -173,6 +177,7 @@ func Default() Settings {
 		FontScale:       1,
 		SpotifyPlayback: defaultSpotifyPlayback(runtime.GOOS),
 		Quality:         QualityBest,
+		Loudness:        true,
 		Autoplay:        true,
 		Equalizer:       Equalizer{Preset: "flat", Gains: make([]float64, len(Bands))},
 		Volume:          0.8,

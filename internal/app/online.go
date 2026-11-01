@@ -12,6 +12,7 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/stream"
 )
 
 // resolveCheck is how long yt-dlp looks for a stream before MixMusic
@@ -58,26 +59,31 @@ func (a *App) offlineErr(ctx context.Context, err error) error {
 	return fmt.Errorf("%w: %v", player.ErrOffline, err)
 }
 
-// resolveStream has yt-dlp find the stream of a video. Once it took
-// resolveCheck, the network is checked beside it, and when it doesn't
-// answer, resolveStream returns player.ErrOffline at once: yt-dlp's run
-// goes on, and what it finds stays for the next try.
-func (a *App) resolveStream(ctx context.Context, videoID string) error {
+// resolveStream has yt-dlp find the stream of a video, and returns it. Once
+// it took resolveCheck, the network is checked beside it, and when it
+// doesn't answer, resolveStream returns player.ErrOffline at once: yt-dlp's
+// run goes on, and what it finds stays for the next try.
+func (a *App) resolveStream(ctx context.Context, videoID string) (stream.Stream, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	done := make(chan error, 1)
+	type found struct {
+		s   stream.Stream
+		err error
+	}
+	done := make(chan found, 1)
 	go func() {
-		_, err := a.resolver.Resolve(ctx, videoID)
-		done <- err
+		s, err := a.resolver.Resolve(ctx, videoID)
+		done <- found{s, err}
 	}()
 	if a.online == nil {
-		return <-done
+		f := <-done
+		return f.s, f.err
 	}
 	t := time.NewTimer(resolveCheck)
 	defer t.Stop()
 	select {
-	case err := <-done:
-		return a.offlineErr(ctx, err)
+	case f := <-done:
+		return f.s, a.offlineErr(ctx, f.err)
 	case <-t.C:
 	}
 	gone := make(chan struct{})
@@ -87,9 +93,9 @@ func (a *App) resolveStream(ctx context.Context, videoID string) error {
 		}
 	}()
 	select {
-	case err := <-done:
-		return a.offlineErr(ctx, err)
+	case f := <-done:
+		return f.s, a.offlineErr(ctx, f.err)
 	case <-gone:
-		return player.ErrOffline
+		return stream.Stream{}, player.ErrOffline
 	}
 }

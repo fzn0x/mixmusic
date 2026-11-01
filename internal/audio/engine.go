@@ -2,6 +2,7 @@ package audio
 
 import (
 	"errors"
+	"math"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -44,9 +45,9 @@ const (
 var ErrNoOutput = errors.New("no audio output device")
 
 // Engine plays tracks on two decks, so that one can fade into the next,
-// through the preamp, equalizer, levelling, volume and analyser of the web
-// player: the API of its AudioEngine. Its methods are safe for concurrent
-// use.
+// each turned down to an even loudness when its track is loud, through the
+// preamp, equalizer, levelling, volume and analyser of the web player: the
+// API of its AudioEngine. Its methods are safe for concurrent use.
 type Engine struct {
 	open   Opener
 	start  OutputStarter
@@ -65,6 +66,7 @@ type Engine struct {
 	fadeEnd   time.Time
 	paused    bool
 	normalize bool
+	loudness  bool
 	eq        *equalizer
 	comp      *compressor
 	master    smoother
@@ -322,6 +324,35 @@ func (e *Engine) SetNormalize(on bool) {
 	e.mu.Unlock()
 }
 
+// SetLoudness turns Even loudness on or off: each track louder than
+// loudnessTarget plays turned down to it, as its Measured source tells.
+func (e *Engine) SetLoudness(on bool) {
+	e.mu.Lock()
+	e.loudness = on
+	e.mu.Unlock()
+}
+
+// trimOf returns the trim of deck d, toward its target: the gain that
+// turns its track down to an even loudness, while Even loudness is on and
+// the track's loudness is known, else 1. A deck takes its trim at once with
+// its first frames, so a track starts at its level; after, the trim glides
+// to a new target, as the volume does. On the audio thread.
+func (e *Engine) trimOf(d *deck, frames bool) *smoother {
+	target := 1.0
+	if lkfs := math.Float64frombits(d.lkfs.Load()); e.loudness && !math.IsNaN(lkfs) {
+		target = math.Pow(10, loudnessTrim(lkfs)/20)
+	}
+	switch {
+	case d.trimmed:
+		d.trim.target = target
+		d.trim.settled()
+	case frames:
+		d.trim = newSmoother(target, glide)
+		d.trimmed = true
+	}
+	return &d.trim
+}
+
 // Analyse writes what the analyser gives now into out.
 func (e *Engine) Analyse(out *Analysis) {
 	e.an.analyse(out)
@@ -413,8 +444,9 @@ func (e *Engine) render(out []float32) {
 	}
 }
 
-// renderQuantum renders a quantum into quantumBuf: the decks mixed, through
-// the equalizer, the compressor, the volume, and into the analyser.
+// renderQuantum renders a quantum into quantumBuf: the decks mixed, each at
+// its loudness, through the equalizer, the compressor, the volume, and into
+// the analyser.
 func (e *Engine) renderQuantum() {
 	buf := e.quantumBuf[:]
 	clear(buf)
@@ -427,8 +459,9 @@ func (e *Engine) renderQuantum() {
 		sounding = true
 		r := d.ring.Load()
 		n := r.readTo(e.deckBuf[:])
+		trim := e.trimOf(d, n > 0)
 		for f := range quantum {
-			g := float32(d.gain.next() * level.next())
+			g := float32(d.gain.next() * level.next() * trim.next())
 			if f < n {
 				buf[2*f] += e.deckBuf[2*f] * g
 				buf[2*f+1] += e.deckBuf[2*f+1] * g

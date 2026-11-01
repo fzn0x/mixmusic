@@ -99,7 +99,7 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 
 // signOutOfSpotify asks, then has MixMusic forget the Spotify sign-in.
 func (s *shell) signOutOfSpotify() {
-	s.ask("Sign out of Spotify", "MixMusic forgets your Spotify sign-in.", "Sign out", func() {
+	s.ask("sign out of Spotify", "MixMusic forgets your Spotify sign-in.", "sign out", func() {
 		s.account("", "", func(context.Context) error { return s.svc.Accounts.SpotifyLogout() })
 	})
 }
@@ -131,7 +131,7 @@ func (s *shell) youtubeAccount(c *ui.Context, yt app.YouTubeAccount) {
 		}
 		s.row(c, who, "Your home feed, your library, and likes that reach YouTube Music.", func() {
 			if s.button(c, "youtube-out", "sign out", false).Clicked() {
-				s.ask("Sign out of YouTube Music", "MixMusic forgets your YouTube Music session; your library stays on YouTube Music.", "Sign out", func() {
+				s.ask("sign out of YouTube Music", "MixMusic forgets your YouTube Music session; your library stays on YouTube Music.", "sign out", func() {
 					s.account("", "", func(ctx context.Context) error { return s.svc.Accounts.YouTubeLogout(ctx) })
 				})
 			}
@@ -189,7 +189,7 @@ func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
 			})
 			ui.Row(c).Padding(12, 0).Children(func() {
 				if s.button(c, "lastfm-out", "disconnect", false).Clicked() {
-					s.ask("Disconnect Last.fm", "MixMusic forgets your Last.fm connection; your scrobbles stay on Last.fm.", "Disconnect", func() {
+					s.ask("disconnect Last.fm", "MixMusic forgets your Last.fm connection; your scrobbles stay on Last.fm.", "disconnect", func() {
 						s.account("", "", func(ctx context.Context) error { return s.svc.Accounts.LastfmLogout(ctx) })
 					})
 				}

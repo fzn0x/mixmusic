@@ -58,9 +58,9 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 			}
 		})
 	})
-	if ui.AlertDialog(c, &s.confirmingPlugin, "Install "+s.pluginToInstall.Name,
+	if s.confirm(c, "install-plugin", &s.confirmingPlugin, "install "+s.pluginToInstall.Name,
 		"Plugins can control the player, change your library and reach the internet, whatever they ask for. Install plugins from authors you trust."+permissions(s.pluginToInstall),
-		"Cancel", "Install") == 1 {
+		"install") {
 		s.install(addons.KindPlugin, s.pluginToInstall)
 	}
 }

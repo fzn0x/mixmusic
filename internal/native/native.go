@@ -166,10 +166,12 @@ type shell struct {
 	statsDay   dayTip
 	statsTable bool
 	statsRows  ui.ListState
-	// The command palette, what it searches, and its row chosen.
+	// The command palette, what it searches, and its row chosen;
+	// paletteMoved is set in the frame the keys move the choice.
 	paletteOpen  bool
 	paletteQuery string
 	paletteAt    int
+	paletteMoved bool
 	lyricsView   lyricsState
 	// pagePath is the path of the page being built.
 	pagePath string
@@ -178,6 +180,9 @@ type shell struct {
 	capScroll *ui.ScrollState
 	capBound  bool
 	// Dialogs, and their subjects; naming asks for a name, as a new mix's.
+	// dialogScrolls are where the bodies of the dialogs shown are
+	// scrolled, by their keys.
+	dialogScrolls                       map[string]*dialogScroll
 	naming                              *namePrompt
 	renaming, deleting, clearingHistory bool
 	renameTo, renameID                  string
@@ -245,7 +250,8 @@ func newShell(a *app.App, p *player.Player) *shell {
 	s := &shell{a: a, svc: a.Services(), p: p, router: ui.NewRouter("/"), loads: map[string]any{}, drafts: map[string]*draft{}, shelfScroll: map[string]*ui.ScrollState{},
 		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, listTops: map[string]float32{}, keeping: map[string]bool{}, licenseOpen: -1,
 		mountedViews: map[*plugins.View]bool{}, seenViews: map[*plugins.View]bool{}, pluginInputs: map[string]*string{},
-		canvasSizes: map[*plugins.Canvas][2]float32{}, cssColors: map[string]ui.Color{}, svgs: map[string]*ui.SVG{}}
+		canvasSizes: map[*plugins.Canvas][2]float32{}, cssColors: map[string]ui.Color{}, svgs: map[string]*ui.SVG{},
+		dialogScrolls: map[string]*dialogScroll{}}
 	s.queueList.Selected = new(int)
 	*s.queueList.Selected = -1
 	s.art = newArtworks(s.update)
@@ -418,7 +424,7 @@ func (s *shell) questionDialog(c *ui.Context) {
 		return
 	}
 	open := true
-	if ui.AlertDialog(c, &open, q.title, q.message, "Cancel", q.ok) == 1 {
+	if s.confirm(c, "question", &open, q.title, q.message, q.ok) {
 		s.asking = nil
 		q.run()
 		return
@@ -450,23 +456,20 @@ func (s *shell) promptDialog(c *ui.Context) {
 	if p == nil {
 		return
 	}
-	k := &s.lk
 	open := true
-	panel := ui.Modal(c, &open, func() {
-		ui.Text(c, strings.ToLower(p.title)).FontSize(k.titleSize()).FontWeight(300).Font(k.display)
-		in := ui.TextInput(c.Key("prompt"), &p.value).AutoFocus().Label(p.label).Width(360)
+	var in ui.Element
+	s.dialog(c, &open, dialogOptions{key: "prompt", title: strings.ToLower(p.title)}, func() {
+		in = ui.TextInput(c.Key("prompt"), &p.value).AutoFocus().Label(p.label).Width(360)
+	}, func() {
 		name := strings.TrimSpace(p.value)
-		ui.Row(c).Gap(8).Justify(ui.End).Children(func() {
-			if s.dialogButton(c, "prompt-cancel", "cancel", false).Clicked() {
-				s.naming = nil
-			}
-			if (s.dialogButton(c, "prompt-ok", p.confirm, true).Disabled(name == "").Clicked() || in.Submitted()) && name != "" {
-				s.naming = nil
-				p.done(name)
-			}
-		})
+		if s.dialogButton(c, "prompt-cancel", "cancel", false).Clicked() {
+			s.naming = nil
+		}
+		if (s.dialogButton(c, "prompt-ok", p.confirm, true).Disabled(name == "").Clicked() || in.Submitted()) && name != "" {
+			s.naming = nil
+			p.done(name)
+		}
 	})
-	s.frosted(panel).Padding(32).Gap(16).Border(1, k.border)
 	if !open {
 		s.naming = nil
 	}
@@ -480,9 +483,9 @@ func (s *shell) offerCrashReport() {
 		return
 	}
 	s.asking = &question{
-		title:   "MixMusic quit unexpectedly",
+		title:   "mixmusic quit unexpectedly",
 		message: "It kept a report of what happened, " + report + ", in its logs folder. Reporting it on GitHub, with that file attached, helps fix it.",
-		ok:      "Report it",
+		ok:      "report it",
 		run: func() {
 			s.svc.System.DismissCrash()
 			go func() {

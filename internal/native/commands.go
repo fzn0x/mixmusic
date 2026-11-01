@@ -225,7 +225,7 @@ type plainKey struct {
 func (s *shell) palette(c *ui.Context) {
 	k := &s.lk
 	if !s.paletteOpen {
-		s.paletteQuery, s.paletteAt = "", 0
+		s.paletteQuery, s.paletteAt, s.paletteMoved = "", 0, false
 		return
 	}
 	var found []command
@@ -244,14 +244,15 @@ func (s *shell) palette(c *ui.Context) {
 		found = append([]command{search}, found...)
 	}
 	s.paletteAt = min(max(s.paletteAt, 0), max(len(found)-1, 0))
-	panel := ui.Modal(c, &s.paletteOpen, func() {
+	s.dialogFrame(c, &s.paletteOpen, dialogOptions{key: "palette", title: "Command palette", width: 640}, func(panel ui.Element) {
+		panel.Padding(24).Gap(12)
 		in := ui.TextInputBase(c.Key("palette-input"), &s.paletteQuery).Placeholder("type a command or a search").AutoFocus().
-			Label("Command palette").FontSize(k.subtitleSize()).FontWeight(300).TextColor(k.accent).Padding(8, 0)
+			Label("Command palette").FontSize(k.subtitleSize()).FontWeight(300).TextColor(k.accent).Padding(8, 0).Shrink(0)
 		if in.Changed() {
-			s.paletteAt = 0
+			s.paletteAt, s.paletteMoved = 0, true
 		}
-		in.OnShortcut(0, ui.KeyDown, func() { s.paletteAt++ })
-		in.OnShortcut(0, ui.KeyUp, func() { s.paletteAt-- })
+		in.OnShortcut(0, ui.KeyDown, func() { s.paletteAt, s.paletteMoved = s.paletteAt+1, true })
+		in.OnShortcut(0, ui.KeyUp, func() { s.paletteAt, s.paletteMoved = s.paletteAt-1, true })
 		run := func(cmd command) {
 			s.paletteOpen = false
 			cmd.run()
@@ -259,7 +260,9 @@ func (s *shell) palette(c *ui.Context) {
 		if in.Submitted() && len(found) > 0 {
 			run(found[s.paletteAt])
 		}
-		ui.Column(c).MaxHeight(420).Children(func() {
+		// The list gives up room in a window too short for it, and
+		// scrolls: a column keeps its content's height, but for this.
+		ui.Column(c).MaxHeight(420).MinHeight(0).Children(func() {
 			ui.Scroll(c).MaxHeight(420).Children(func() {
 				for i, cmd := range found {
 					row := ui.ButtonBase(c.Key("palette-" + cmd.id)).Height(36).PaddingX(12).Gap(12).Justify(ui.SpaceBetween).Label(cmd.title).Cursor(ui.CursorPointer)
@@ -267,6 +270,12 @@ func (s *shell) palette(c *ui.Context) {
 					if i == s.paletteAt {
 						row.Background(k.accent)
 						ink = k.accentText
+						// The row chosen comes into view in the frame the keys
+						// chose it: in every frame, the wheel couldn't scroll
+						// it away.
+						if s.paletteMoved {
+							row.ScrollIntoView()
+						}
 					} else if row.Hovered() {
 						row.Background(k.hover)
 					}
@@ -279,8 +288,8 @@ func (s *shell) palette(c *ui.Context) {
 						ui.Text(c, shortcutLabel(s.shortcutOf(cmd))).FontSize(k.captionSize()).TextColor(ink.Alpha(0.7))
 					})
 				}
+				s.paletteMoved = false
 			})
 		})
 	})
-	s.frosted(panel).Width(640).Padding(24).Gap(12).Border(1, k.border)
 }

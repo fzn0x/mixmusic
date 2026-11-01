@@ -63,7 +63,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 			}
 		})
 	})
-	if ui.AlertDialog(c, &s.resetting, "Reset settings", "Put back every setting as it was on a new install?", "Cancel", "Reset") == 1 {
+	if s.confirm(c, "reset-settings", &s.resetting, "reset settings", "Put back every setting as it was on a new install?", "reset") {
 		if _, err := s.svc.Preferences.Reset(); err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 		}
@@ -330,8 +330,7 @@ func (s *shell) updateOffer(c *ui.Context) {
 	}
 	u := s.svc.System.Updates()
 	open := true
-	panel := ui.Modal(c, &open, func() {
-		ui.Text(c, "mixmusic "+offer.Version+" is out").FontSize(k.titleSize()).FontWeight(300).Font(k.display)
+	body := func() {
 		if s.updated != "" {
 			ui.Text(c, "MixMusic "+s.updated+" is installed. It runs once MixMusic restarts.").FontSize(k.bodySize())
 		} else {
@@ -353,40 +352,45 @@ func (s *shell) updateOffer(c *ui.Context) {
 			}
 			ui.Progress(c, v).Width(320)
 			ui.Text(c, "Downloading…").FontSize(k.smallSize()).TextColor(k.muted)
+		}
+	}
+	// The offer comes unasked, and takes the focus from where it was:
+	// later has it, which only puts the offer off, so that a Space
+	// pressed for the music or typed in a search skips nothing.
+	actions := func() {
+		if s.updated != "" {
+			if s.dialogButton(c, "offer-later", "later", false).AutoFocus().Clicked() {
+				s.offer = nil
+			}
+			if s.dialogButton(c, "offer-restart", "restart now", true).Clicked() {
+				go s.svc.System.Restart()
+			}
 			return
 		}
-		ui.Row(c).Gap(8).Justify(ui.End).Wrap().Children(func() {
-			if s.updated != "" {
-				if s.dialogButton(c, "offer-later", "later", false).Clicked() {
-					s.offer = nil
-				}
-				if s.dialogButton(c, "offer-restart", "restart now", true).Clicked() {
-					go s.svc.System.Restart()
-				}
-				return
+		if s.dialogButton(c, "offer-skip", "skip this version", false).Clicked() {
+			s.dismissOffer(true)
+		}
+		if offer.Page != "" && s.dialogButton(c, "offer-notes", "what's new", false).Clicked() {
+			go s.svc.System.OpenExternal(offer.Page)
+		}
+		if s.dialogButton(c, "offer-later", "later", false).AutoFocus().Clicked() {
+			s.dismissOffer(false)
+		}
+		switch {
+		case u.Enabled:
+			if s.dialogButton(c, "offer-install", "install "+offer.Version, true).Clicked() {
+				s.installUpdate()
 			}
-			if s.dialogButton(c, "offer-skip", "skip this version", false).Clicked() {
-				s.dismissOffer(true)
+		case offer.Download != "":
+			if s.dialogButton(c, "offer-download", downloadLabel(u.Kind), true).Clicked() {
+				go s.svc.System.OpenExternal(offer.Download)
 			}
-			if offer.Page != "" && s.dialogButton(c, "offer-notes", "what's new", false).Clicked() {
-				go s.svc.System.OpenExternal(offer.Page)
-			}
-			if s.dialogButton(c, "offer-later", "later", false).Clicked() {
-				s.dismissOffer(false)
-			}
-			switch {
-			case u.Enabled:
-				if s.dialogButton(c, "offer-install", "install "+offer.Version, true).Clicked() {
-					s.installUpdate()
-				}
-			case offer.Download != "":
-				if s.dialogButton(c, "offer-download", downloadLabel(u.Kind), true).Clicked() {
-					go s.svc.System.OpenExternal(offer.Download)
-				}
-			}
-		})
-	})
-	s.frosted(panel).Width(560).Padding(32).Gap(16).Border(1, k.border)
+		}
+	}
+	if s.updating {
+		actions = nil
+	}
+	s.dialog(c, &open, dialogOptions{key: "offer", title: "mixmusic " + offer.Version + " is out", width: 560}, body, actions)
 	if !open && !s.updating {
 		s.dismissOffer(false)
 	}

@@ -687,6 +687,30 @@ func TestRemoveFromLibrary(t *testing.T) {
 	}
 }
 
+// TestDropPlaylist takes a playlist out of a list fetched, in a copy, and
+// has a list still on its way asked for again; a list never fetched stays
+// so.
+func TestDropPlaylist(t *testing.T) {
+	s := newTestShell(t)
+	s.dropPlaylist("youtube:playlists", ownPlaylist.ID)
+	if _, ok := s.loads["youtube:playlists"]; ok {
+		t.Error("a list never fetched was made")
+	}
+	shown := []media.Playlist{ownPlaylist, plainPlaylist}
+	done := &loaded[[]media.Playlist]{done: true, value: shown}
+	s.loads["youtube:playlists"] = done
+	s.dropPlaylist("youtube:playlists", ownPlaylist.ID)
+	if len(done.value) != 1 || done.value[0].ID != plainPlaylist.ID || shown[0].ID != ownPlaylist.ID || done.again {
+		t.Errorf("the list holds %+v, the one shown before %+v, asks again %v", done.value, shown, done.again)
+	}
+	coming := &loaded[[]media.Playlist]{}
+	s.loads["youtube:playlists"] = coming
+	s.dropPlaylist("youtube:playlists", ownPlaylist.ID)
+	if !coming.again {
+		t.Error("a list on its way isn't asked for again")
+	}
+}
+
 // TestSaveAsMix saves an album's tracks as a new mix, named after it to
 // start with.
 func TestSaveAsMix(t *testing.T) {

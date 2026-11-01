@@ -185,293 +185,346 @@
     });
   }
 
-  // The demo player: a small copy of MixMusic's player with made-up
-  // tracks of both services. It plays its queue silently, in real time.
-  const demo = $("[data-demo]");
-  if (demo) {
-    const CATALOG = [
-      { title: "Paper Planets", artist: "Velvet Ferries", src: "spotify", dur: 187, cover: 2, art: "#ec8051" },
-      { title: "Neon Tide", artist: "Kaori Ume", src: "youtube", dur: 214, cover: 1, art: "#52e4ea" },
-      { title: "Slow Static", artist: "Mira Vale", src: "spotify", dur: 243, cover: 3, art: "#7769d3" },
-      { title: "Kitsune Run", artist: "Hoshino Club", src: "youtube", dur: 198, cover: 4, art: "#d96472" },
-      { title: "Glass Garden", artist: "Juniper Lane", src: "spotify", dur: 226, cover: 5, art: "#92d369" },
-      { title: "Afterglow Avenue", artist: "Oriel Bloom", src: "youtube", dur: 261, cover: 6, art: "#e99453" },
-      { title: "Little Satellites", artist: "Coral & the Comets", src: "spotify", dur: 175, cover: 7, art: "#5181ec" },
-      { title: "Summer Signal", artist: "Aoi Kanata", src: "youtube", dur: 232, cover: 8, art: "#51a8ec" },
-      // Only in search: the same artists on the other service.
-      { title: "Tidewater", artist: "Kaori Ume", src: "spotify", dur: 201, cover: 9, art: "#8cc0bd" },
-      { title: "Paper Moon Radio", artist: "Velvet Ferries", src: "youtube", dur: 219, cover: 10, art: "#cf6e74" },
-      { title: "Static Bloom", artist: "Mira Vale", src: "youtube", dur: 236, cover: 11, art: "#d864a4" },
-      { title: "Fox Lantern", artist: "Hoshino Club", src: "spotify", dur: 207, cover: 12, art: "#d5b168" },
+  // The player in the hero: a working copy of MixMusic's window in its
+  // default theme, playing Creative Commons songs from this site, with its
+  // mini player for narrow screens and for the mini player button.
+  const wrap = $("[data-demo-wrap]");
+  if (wrap) {
+    const SONGS = [
+      { title: "Local Forecast - Elevator", file: "local-forecast-elevator", dur: 189, cover: 10, art: "#cf6e74" },
+      { title: "Carefree", file: "carefree", dur: 205, cover: 14, art: "#51b4ec" },
+      { title: "Wallpaper", file: "wallpaper", dur: 220, cover: 11, art: "#d864a4" },
+      { title: "Inspired", file: "inspired", dur: 286, cover: 13, art: "#df6d5d" },
+      { title: "Fluffing a Duck", file: "fluffing-a-duck", dur: 67, cover: 9, art: "#8cc0bd" },
+      { title: "Monkeys Spinning Monkeys", file: "monkeys-spinning-monkeys", dur: 125, cover: 15, art: "#db9361" },
     ];
-    const SERVICE = { spotify: "Spotify", youtube: "YouTube Music" };
-    const wrap = demo.closest("[data-demo-wrap]");
-    const ui = {
-      cover: $("[data-demo-cover]", demo),
-      title: $("[data-demo-title]", demo),
-      artist: $("[data-demo-artist]", demo),
-      mark: $("[data-demo-mark]", demo),
-      elapsed: $("[data-demo-elapsed]", demo),
-      total: $("[data-demo-total]", demo),
-      bar: $("[data-demo-bar]", demo),
-      fill: $("[data-demo-fill]", demo),
-      play: $("[data-demo-play]", demo),
-      shuffle: $("[data-demo-shuffle]", demo),
-      repeat: $("[data-demo-repeat]", demo),
-      list: $("[data-demo-list]", demo),
-      heading: $("[data-demo-heading]", demo),
-      filter: $("[data-demo-filter]", demo),
-      search: $("[data-demo-search]", demo),
-      status: $("[data-demo-status]", demo),
-    };
+    const ARTIST = "Kevin MacLeod";
+    const audio = $("[data-audio]", wrap);
+    const all = (sel) => $$(sel, wrap);
     const clock = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
-    const st = { queue: [0, 1, 2, 3, 4, 5, 6, 7], ordered: null, pos: 0, elapsed: 0, playing: false, repeat: false, query: "", source: "both" };
-    const track = () => CATALOG[st.queue[st.pos]];
-
-    const mark = (src) => {
-      const m = document.createElement("span");
-      m.className = "mark";
-      m.dataset.src = src;
-      m.setAttribute("role", "img");
-      m.setAttribute("aria-label", SERVICE[src]);
-      return m;
-    };
-    const say = (text) => (ui.status.textContent = text);
+    const st = { order: SONGS.map((_, i) => i), ordered: null, pos: 0, repeat: "off", liked: new Set(), panel: "queue", query: "" };
+    const song = () => SONGS[st.order[st.pos]];
+    const duration = () => (Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : song().dur);
+    let loaded = -1;
 
     function drawTime() {
-      const t = track();
-      const ratio = Math.min(st.elapsed / t.dur, 1);
-      ui.fill.style.width = `${ratio * 100}%`;
-      ui.elapsed.textContent = clock(st.elapsed);
-      ui.bar.setAttribute("aria-valuenow", String(Math.round(ratio * 100)));
-      ui.bar.setAttribute("aria-valuetext", `${clock(st.elapsed)} of ${clock(t.dur)}`);
+      const total = duration();
+      const ratio = Math.min(audio.currentTime / total, 1) || 0;
+      all("[data-fill]").forEach((f) => (f.style.width = `${ratio * 100}%`));
+      all("[data-fill-line]").forEach((f) => (f.style.width = `${ratio * 100}%`));
+      all("[data-elapsed]").forEach((e) => (e.textContent = clock(audio.currentTime)));
+      all("[data-total]").forEach((e) => (e.textContent = clock(total)));
+      all("[data-seek]").forEach((s) => {
+        s.setAttribute("aria-valuenow", String(Math.round(ratio * 100)));
+        s.setAttribute("aria-valuetext", `${clock(audio.currentTime)} of ${clock(total)}`);
+      });
     }
 
-    function drawNow() {
-      const t = track();
-      ui.cover.src = `assets/covers/cover-${t.cover}.webp`;
-      ui.cover.alt = `The cover of ${t.title}, made up for this demo`;
-      ui.title.textContent = t.title;
-      ui.artist.textContent = t.artist;
-      ui.mark.dataset.src = t.src;
-      ui.mark.setAttribute("role", "img");
-      ui.mark.setAttribute("aria-label", SERVICE[t.src]);
-      ui.total.textContent = clock(t.dur);
+    function drawSong() {
+      const t = song();
+      const cover = `assets/covers/cover-${t.cover}.webp`;
+      all("[data-cover]").forEach((img) => (img.src = cover));
+      all("[data-cover-alt]").forEach((img) => (img.alt = `A cover made for ${t.title} on this page`));
+      all("[data-title]").forEach((e) => (e.textContent = t.title));
+      all("[data-title-lower]").forEach((e) => (e.textContent = t.title.toLowerCase()));
+      all("[data-artist]").forEach((e) => (e.textContent = ARTIST));
+      const next = st.pos < st.order.length - 1 ? SONGS[st.order[st.pos + 1]] : st.repeat === "all" ? SONGS[st.order[0]] : null;
+      all("[data-next-up]").forEach((e) => (e.textContent = next ? `next · ${next.title} — ${ARTIST}` : ""));
+      all("[data-like]").forEach((b) => {
+        const on = st.liked.has(t.file);
+        b.setAttribute("aria-pressed", String(on));
+        b.setAttribute("aria-label", on ? "Remove from liked songs" : "Like");
+      });
       wrap.style.setProperty("--art", t.art);
       drawTime();
     }
 
     function drawPlay() {
-      demo.classList.toggle("is-playing", st.playing);
-      ui.play.classList.toggle("is-playing", st.playing);
-      ui.play.setAttribute("aria-label", st.playing ? "Pause" : "Play");
+      const playing = !audio.paused;
+      all("[data-play]").forEach((b) => {
+        b.classList.toggle("is-playing", playing);
+        b.setAttribute("aria-label", playing ? "Pause" : "Play");
+      });
     }
 
-    function row(i, current, addable) {
-      const t = CATALOG[i];
+    function row(i, current, onPick) {
+      const t = SONGS[i];
       const li = document.createElement("li");
       if (current) li.classList.add("is-current");
       const b = document.createElement("button");
       b.type = "button";
-      b.className = "demo-row";
-      const img = document.createElement("img");
-      img.src = `assets/covers/cover-${t.cover}.webp`;
-      img.alt = "";
-      img.width = img.height = 44;
-      const text = document.createElement("span");
-      text.className = "demo-row-text";
-      const strong = document.createElement("strong");
-      strong.textContent = t.title;
-      const sub = document.createElement("span");
-      sub.append(mark(t.src), document.createTextNode(t.artist));
-      text.append(strong, sub);
-      const time = document.createElement("span");
-      time.className = "demo-row-time";
-      if (current) {
-        time.innerHTML = '<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>';
-        b.setAttribute("aria-current", "true");
-      } else {
-        time.textContent = clock(t.dur);
-      }
-      b.append(img, text, time);
-      b.setAttribute("aria-label", `${current ? "Playing: " : "Play "}${t.title} by ${t.artist}, on ${SERVICE[t.src]}`);
+      b.innerHTML = `<img alt="" width="40" height="40" /><span class="r-text"><b></b><small></small></span><span class="r-time"></span>`;
+      $("img", b).src = `assets/covers/cover-${t.cover}.webp`;
+      $("b", b).textContent = t.title;
+      $("small", b).textContent = ARTIST;
+      $(".r-time", b).textContent = clock(t.dur);
+      b.setAttribute("aria-label", `${current ? "Playing: " : "Play "}${t.title} by ${ARTIST}`);
+      if (current) b.setAttribute("aria-current", "true");
+      b.addEventListener("click", onPick);
       li.append(b);
-      if (addable) {
-        const add = document.createElement("button");
-        add.type = "button";
-        add.className = "demo-icon demo-add";
-        add.setAttribute("aria-label", `Play ${t.title} next`);
-        add.innerHTML = '<svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-plus" /></svg>';
-        add.addEventListener("click", () => playNext(i));
-        li.append(add);
-      }
-      return { li, b };
+      return li;
     }
 
-    function drawList() {
-      ui.list.replaceChildren();
-      const q = st.query.trim().toLowerCase();
-      ui.filter.hidden = !q;
-      if (!q) {
-        ui.heading.textContent = "Up next";
-        st.queue.forEach((i, at) => {
+    function drawLists() {
+      all("[data-queue]").forEach((list) => {
+        list.replaceChildren();
+        st.order.forEach((i, at) => {
           if (at < st.pos) return;
-          const { li, b } = row(i, at === st.pos, false);
-          b.addEventListener("click", () => jump(at));
-          ui.list.append(li);
+          list.append(row(i, at === st.pos, () => play(at)));
         });
-        return;
-      }
-      ui.heading.textContent = `Results for “${st.query.trim()}”`;
-      const found = CATALOG.map((t, i) => [t, i]).filter(([t]) =>
-        (st.source === "both" || t.src === st.source) &&
-        (t.title.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q)));
+      });
+      const q = st.query.trim().toLowerCase();
+      $("[data-page='now']", wrap).hidden = !!q;
+      $("[data-page='search']", wrap).hidden = !q;
+      if (!q) return;
+      $("[data-query]", wrap).textContent = q;
+      const results = $("[data-results]", wrap);
+      results.replaceChildren();
+      const found = SONGS.map((t, i) => [t, i]).filter(([t]) => `${t.title} ${ARTIST}`.toLowerCase().includes(q));
       if (!found.length) {
         const li = document.createElement("li");
-        li.className = "demo-empty";
-        li.textContent = `Nothing in this demo matches “${st.query.trim()}”. Try “paper”, “mira” or “fox”.`;
-        ui.list.append(li);
+        li.className = "app-empty";
+        li.textContent = `Nothing here matches “${st.query.trim()}”. These six songs are all by Kevin MacLeod.`;
+        results.append(li);
         return;
       }
       for (const [, i] of found) {
-        const { li, b } = row(i, i === st.queue[st.pos], true);
-        b.addEventListener("click", () => playNow(i));
-        ui.list.append(li);
+        results.append(row(i, i === st.order[st.pos], () => {
+          const at = st.order.indexOf(i);
+          play(at);
+        }));
       }
     }
 
-    function jump(at) {
-      st.pos = at;
-      st.elapsed = 0;
-      st.playing = true;
-      drawNow();
-      drawPlay();
-      drawList();
+    function load() {
+      if (loaded === st.order[st.pos]) return;
+      loaded = st.order[st.pos];
+      audio.src = `assets/music/${song().file}.m4a`;
     }
-    function playNext(i) {
-      st.queue.splice(st.pos + 1, 0, i);
-      if (st.ordered) st.ordered.push(i);
-      say(`${CATALOG[i].title} plays next, from ${SERVICE[CATALOG[i].src]}.`);
-      drawList();
+    function play(at) {
+      if (at !== undefined) {
+        st.pos = at;
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      load();
+      listen();
+      audio.play().catch(() => {});
+      drawSong();
+      drawLists();
     }
-    function playNow(i) {
-      st.queue.splice(st.pos + 1, 0, i);
-      jump(st.pos + 1);
-      say(`Playing ${CATALOG[i].title}, from ${SERVICE[CATALOG[i].src]}.`);
+    function toggle() {
+      if (audio.paused) play();
+      else audio.pause();
     }
     function next(auto) {
-      if (st.pos < st.queue.length - 1) return jump(st.pos + 1);
-      if (st.repeat) return jump(0);
-      if (auto) {
-        st.playing = false;
-        st.elapsed = 0;
-        drawTime();
-        drawPlay();
-        say("The end of the queue.");
-      }
+      if (auto && st.repeat === "one") return play(st.pos);
+      if (st.pos < st.order.length - 1) return play(st.pos + 1);
+      if (st.repeat === "all" || !auto) return play(0);
+      audio.pause();
     }
     function prev() {
-      if (st.elapsed > 3 || st.pos === 0) {
-        st.elapsed = 0;
-        drawTime();
-        return;
+      if (audio.currentTime > 3 || st.pos === 0) {
+        audio.currentTime = 0;
+        return drawTime();
       }
-      jump(st.pos - 1);
+      play(st.pos - 1);
     }
 
-    ui.play.addEventListener("click", () => {
-      st.playing = !st.playing;
-      drawPlay();
+    all("[data-play]").forEach((b) => b.addEventListener("click", toggle));
+    all("[data-next]").forEach((b) => b.addEventListener("click", () => next(false)));
+    all("[data-prev]").forEach((b) => b.addEventListener("click", prev));
+    all("[data-like]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const f = song().file;
+        st.liked.has(f) ? st.liked.delete(f) : st.liked.add(f);
+        drawSong();
+      }),
+    );
+    const repeat = $("[data-repeat]", wrap);
+    repeat.addEventListener("click", () => {
+      st.repeat = { off: "all", all: "one", one: "off" }[st.repeat];
+      repeat.dataset.mode = st.repeat;
+      repeat.setAttribute("aria-pressed", String(st.repeat !== "off"));
+      repeat.setAttribute("aria-label", `Repeat: ${st.repeat}`);
+      drawSong();
     });
-    $("[data-demo-next]", demo).addEventListener("click", () => next(false));
-    $("[data-demo-prev]", demo).addEventListener("click", prev);
-    ui.repeat.addEventListener("click", () => {
-      st.repeat = !st.repeat;
-      ui.repeat.setAttribute("aria-pressed", String(st.repeat));
-    });
-    ui.shuffle.addEventListener("click", () => {
-      const head = st.queue.slice(0, st.pos + 1);
+    const shuffle = $("[data-shuffle]", wrap);
+    shuffle.addEventListener("click", () => {
+      const head = st.order.slice(0, st.pos + 1);
       if (!st.ordered) {
         // Shuffle what is still to come; turning it off puts it back.
-        st.ordered = st.queue.slice(st.pos + 1);
+        st.ordered = st.order.slice(st.pos + 1);
         const rest = st.ordered.slice();
         for (let k = rest.length - 1; k > 0; k--) {
           const j = Math.floor(Math.random() * (k + 1));
           [rest[k], rest[j]] = [rest[j], rest[k]];
         }
-        st.queue = head.concat(rest);
+        st.order = head.concat(rest);
       } else {
-        st.queue = head.concat(st.ordered.filter((i) => !head.includes(i)));
+        st.order = head.concat(st.ordered);
         st.ordered = null;
       }
-      ui.shuffle.setAttribute("aria-pressed", String(!!st.ordered));
-      drawList();
+      shuffle.setAttribute("aria-pressed", String(!!st.ordered));
+      drawSong();
+      drawLists();
     });
 
-    const seek = (x) => {
-      const r = ui.bar.getBoundingClientRect();
-      st.elapsed = Math.min(Math.max((x - r.left) / r.width, 0), 1) * track().dur;
-      drawTime();
-    };
-    ui.bar.addEventListener("pointerdown", (e) => {
-      ui.bar.setPointerCapture(e.pointerId);
-      seek(e.clientX);
-      const move = (ev) => seek(ev.clientX);
-      ui.bar.addEventListener("pointermove", move);
-      ui.bar.addEventListener("pointerup", () => ui.bar.removeEventListener("pointermove", move), { once: true });
-    });
-    ui.bar.addEventListener("keydown", (e) => {
-      const step = { ArrowRight: 5, ArrowUp: 5, ArrowLeft: -5, ArrowDown: -5 }[e.key];
-      if (step === undefined) return;
-      e.preventDefault();
-      st.elapsed = Math.min(Math.max(st.elapsed + step, 0), track().dur);
-      drawTime();
-    });
-
-    const narrow = matchMedia("(max-width: 520px)");
-    const placeholder = () => (ui.search.placeholder = narrow.matches ? "Search both services" : "Search Spotify and YouTube Music");
-    narrow.addEventListener("change", placeholder);
-    placeholder();
-
-    ui.search.addEventListener("input", () => {
-      st.query = ui.search.value;
-      drawList();
-    });
-    $$("button", ui.filter).forEach((b) =>
-      b.addEventListener("click", () => {
-        st.source = b.dataset.src;
-        $$("button", ui.filter).forEach((o) => {
-          o.classList.toggle("is-on", o === b);
-          o.setAttribute("aria-pressed", String(o === b));
-        });
-        drawList();
+    // Seeking and the volume: a click or a drag on the slider, or the arrows.
+    function slider(el, set, step) {
+      const at = (x) => {
+        const r = el.getBoundingClientRect();
+        return Math.min(Math.max((x - r.left) / r.width, 0), 1);
+      };
+      el.addEventListener("pointerdown", (e) => {
+        el.setPointerCapture(e.pointerId);
+        set(at(e.clientX));
+        const move = (ev) => set(at(ev.clientX));
+        el.addEventListener("pointermove", move);
+        el.addEventListener("pointerup", () => el.removeEventListener("pointermove", move), { once: true });
+      });
+      el.addEventListener("keydown", (e) => {
+        const d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+        if (!d) return;
+        e.preventDefault();
+        step(d);
+      });
+    }
+    all("[data-seek]").forEach((el) =>
+      slider(el, (r) => {
+        load();
+        audio.currentTime = r * duration();
+        drawTime();
+      }, (d) => {
+        audio.currentTime = Math.min(Math.max(audio.currentTime + d * 5, 0), duration());
+        drawTime();
       }),
     );
+    const vol = $("[data-volume]", wrap);
+    const mute = $("[data-mute]", wrap);
+    const setVolume = (v) => {
+      audio.volume = v;
+      audio.muted = false;
+      drawVolume();
+    };
+    const drawVolume = () => {
+      const v = audio.muted ? 0 : audio.volume;
+      $(".a-fill", vol).style.width = `${v * 100}%`;
+      vol.setAttribute("aria-valuenow", String(Math.round(v * 100)));
+      mute.classList.toggle("is-muted", v === 0);
+      mute.setAttribute("aria-label", audio.muted ? "Unmute" : "Mute");
+    };
+    audio.volume = 0.8;
+    slider(vol, setVolume, (d) => setVolume(Math.min(Math.max(audio.volume + d * 0.05, 0), 1)));
+    mute.addEventListener("click", () => {
+      audio.muted = !audio.muted;
+      drawVolume();
+    });
 
-    let last = performance.now();
-    setInterval(() => {
-      const now = performance.now();
-      const dt = (now - last) / 1000;
-      last = now;
-      if (!st.playing) return;
-      st.elapsed += dt;
-      if (st.elapsed >= track().dur) next(true);
-      else drawTime();
-    }, 250);
+    // The side panel shows up next or the lyrics; these songs have none.
+    const showPanel = (p) => {
+      st.panel = p;
+      $("[data-panel-title]", wrap).textContent = p === "lyrics" ? "lyrics" : "up next";
+      $("[data-panel-queue]", wrap).hidden = p !== "queue";
+      $("[data-panel-lyrics]", wrap).hidden = p !== "lyrics";
+      all("[data-show]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.show === p)));
+    };
+    all("[data-show]").forEach((b) => b.addEventListener("click", () => showPanel(b.dataset.show)));
 
-    drawNow();
-    drawPlay();
-    drawList();
+    // Search: typing turns the pane into the search page, as in the app.
+    const search = $("[data-search]", wrap);
+    search.addEventListener("input", () => {
+      st.query = search.value;
+      drawLists();
+    });
+    search.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      search.value = st.query = "";
+      drawLists();
+    });
+    $("[data-back]", wrap).addEventListener("click", () => {
+      search.value = st.query = "";
+      drawLists();
+    });
 
-    // The player lies down flat as it scrolls up to the middle.
+    // The mini player, and back.
+    all("[data-to-mini]").forEach((b) => b.addEventListener("click", () => setView("mini")));
+    all("[data-to-full]").forEach((b) => b.addEventListener("click", () => setView("full")));
+    function setView(v) {
+      wrap.dataset.view = v;
+      fit();
+    }
+
+    audio.addEventListener("timeupdate", drawTime);
+    audio.addEventListener("loadedmetadata", drawTime);
+    audio.addEventListener("play", drawPlay);
+    audio.addEventListener("pause", drawPlay);
+    audio.addEventListener("ended", () => next(true));
+
+    // The visualizer: the spectrum of what plays over the foot of the
+    // sleeve, 48 bars in the accent, as the app draws it.
+    const canvas = $("[data-viz]", wrap);
+    const ctx = canvas.getContext("2d");
+    let analyser = null;
+    let bins = null;
+    function listen() {
+      if (analyser || reduced.matches) return;
+      try {
+        const ac = new (window.AudioContext || window.webkitAudioContext)();
+        const source = ac.createMediaElementSource(audio);
+        analyser = ac.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.8;
+        source.connect(analyser);
+        analyser.connect(ac.destination);
+        bins = new Uint8Array(analyser.frequencyBinCount);
+        audio.addEventListener("play", () => ac.resume());
+        requestAnimationFrame(frame);
+      } catch {
+        analyser = null;
+      }
+    }
+    function frame() {
+      requestAnimationFrame(frame);
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      if (audio.paused) return;
+      analyser.getByteFrequencyData(bins);
+      const bars = 48;
+      const bw = w / bars;
+      ctx.fillStyle = getComputedStyle(wrap).getPropertyValue("--art").trim() || "#00bde3";
+      ctx.globalAlpha = 0.85;
+      for (let i = 0; i < bars; i++) {
+        // The lower bins carry the music: spread them over the bars.
+        const v = bins[Math.floor((i * bins.length) / (bars * 2))] / 255;
+        if (!v) continue;
+        const bh = Math.max(2, v * h);
+        ctx.fillRect(i * bw + 1, h - bh, bw - 2, bh);
+      }
+    }
+
+    // The window is drawn at the app's 1280x760 and scaled to the column;
+    // it lies down flat as it scrolls up to the middle.
+    const frameEl = $("[data-app-frame]", wrap);
+    const mini = $("[data-mini]", wrap);
+    function fit() {
+      const w = wrap.clientWidth;
+      frameEl.style.setProperty("--fit", (w / 1280).toFixed(4));
+      const narrow = w <= 700;
+      mini.style.setProperty("--mfit", (narrow ? w / 420 : Math.min(1.5, w / 420)).toFixed(4));
+    }
+    addEventListener("resize", fit);
+    fit();
     if (!reduced.matches) {
+      const app = $("[data-app]", wrap);
       let ticking = false;
       const tilt = () => {
         ticking = false;
-        const top = demo.getBoundingClientRect().top;
+        const top = wrap.getBoundingClientRect().top;
         const t = Math.min(Math.max((top - innerHeight * 0.12) / (innerHeight * 0.6), 0), 1);
-        demo.style.setProperty("--tilt", `${(t * 12).toFixed(2)}deg`);
-        demo.style.setProperty("--tilt-scale", (1 - t * 0.04).toFixed(4));
+        app.style.setProperty("--tilt", `${(t * 10).toFixed(2)}deg`);
+        app.style.setProperty("--tilt-scale", (1 - t * 0.03).toFixed(4));
       };
       addEventListener("scroll", () => {
         if (!ticking) {
@@ -479,9 +532,13 @@
           requestAnimationFrame(tilt);
         }
       }, { passive: true });
-      addEventListener("resize", tilt);
       tilt();
     }
+
+    drawSong();
+    drawPlay();
+    drawLists();
+    drawVolume();
   }
 
   // Two services, one queue: the columns of each service slide together

@@ -1,0 +1,17 @@
+<nav class="docs-nav" aria-label="Docs">
+      <ul>
+        <li><a href="{{ docs.permalink }}"{% if current == docs.permalink %} aria-current="page"{% endif %}>Overview</a></li>
+        {%- for p in docs.pages %}
+        <li>
+          <a href="{{ p.permalink }}"{% if current == p.permalink %} aria-current="page"{% endif %}>{{ p.title }}</a>
+          {%- if current == p.permalink and toc %}
+          <ul class="docs-toc">
+            {%- for h in toc %}
+            <li><a href="#{{ h.id }}">{{ h.title }}</a></li>
+            {%- endfor %}
+          </ul>
+          {%- endif %}
+        </li>
+        {%- endfor %}
+      </ul>
+    </nav>

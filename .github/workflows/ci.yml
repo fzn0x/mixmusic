@@ -140,6 +140,20 @@ jobs:
             exit 1
           fi
 
+  # The website, as pages.yml builds it: the docs' pages made from
+  # docs/*.md, which fails on a link to a file the repository lacks, and
+  # the site built with Zola, which fails on a broken link between them.
+  site:
+    name: Website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - run: nix develop --command go run ./tools/sitedocs
+      - run: nix develop --command zola --root site build
+
   # The release's builds, in the Nix shell release.yml builds them in.
   build:
     name: Build ${{ matrix.platform }}

@@ -1,0 +1,30 @@
+# The MixMusic website, built with Zola: `zola --root site serve` to
+# preview it, `zola --root site build` to build it into site/public, after
+# `go run ./tools/sitedocs`, which makes the docs' pages from docs/*.md.
+#
+# templates/index.html is the landing page; static/ holds its stylesheet,
+# script and assets, copied as they are. The docs are content/docs, shown
+# by templates/docs and styled by static/docs.css.
+
+base_url = "https://fzn0x.github.io/mixmusic"
+title = "MixMusic"
+description = "Spotify and YouTube Music in one free, open-source desktop player for macOS, Windows and Linux."
+default_language = "en"
+
+# robots.txt is only read at a domain's root, which the site is not.
+generate_robots_txt = false
+
+# The docs are Markdown for GitHub as much as for the site: what looks like
+# a template in them is text.
+skip_content_templating = ["docs/**"]
+
+[markdown]
+# Headings link to themselves (templates/anchor-link.html).
+insert_anchor_links = "heading"
+# > [!NOTE] blocks, as GitHub shows them.
+github_alerts = true
+
+[link_checker]
+# GitHub's pages make their anchors with a script, which `zola check` does
+# not run.
+skip_anchor_prefixes = ["https://github.com/"]

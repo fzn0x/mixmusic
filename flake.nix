@@ -30,8 +30,9 @@
 
       # The tools releases are built and published with, at the versions
       # flake.lock pins: Go, Bun for `mygo build`, NSIS for the Windows
-      # installers, and GoReleaser. release.yml and ci.yml run in it, as
-      # `nix develop` does here.
+      # installers, and GoReleaser; and Zola, which builds the website.
+      # release.yml, ci.yml and pages.yml run in it, as `nix develop` does
+      # here.
       devShells = each systems (pkgs: {
         default = pkgs.mkShell {
           packages =
@@ -42,6 +43,7 @@
               goreleaser
               jq
               zip
+              zola
             ]
             ++ lib.optionals stdenv.hostPlatform.isLinux [
               nsis

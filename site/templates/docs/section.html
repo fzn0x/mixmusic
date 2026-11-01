@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{%- block title %}MixMusic docs{% endblock title %}
+{%- block description %}{{ section.description }}{% endblock description %}
+{%- block meta %}
+  <link rel="canonical" href="{{ section.permalink }}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MixMusic docs" />
+  <meta property="og:description" content="{{ section.description }}" />
+  <meta property="og:url" content="{{ section.permalink }}" />
+  <meta property="og:image" content="{{ get_url(path='assets/og.jpg') }}" />
+  <meta name="twitter:card" content="summary_large_image" />
+{%- endblock meta %}
+{%- block docs_current %} aria-current="true"{% endblock docs_current %}
+
+{%- block content %}
+  {%- set docs = section %}
+  {%- set current = section.permalink %}
+  {%- set toc = [] %}
+  <div class="docs">
+    {% include "partials/docs-nav.html" %}
+
+    <article class="prose">
+      <h1>{{ section.title }}</h1>
+      <div class="docs-intro">
+        {{ section.content | safe }}
+      </div>
+      <ul class="docs-list">
+        {%- for p in section.pages %}
+        <li><a href="{{ p.permalink }}"><strong>{{ p.title }}</strong><span>{{ p.description }}</span></a></li>
+        {%- endfor %}
+      </ul>
+    </article>
+  </div>
+{%- endblock content %}

@@ -1,10 +1,19 @@
 name: Pages
 
-# Publishes the site in site/ to GitHub Pages whenever it changes on main.
+# Builds the site in site/ with Zola, in flake.nix's shell, and publishes it
+# to GitHub Pages whenever what it is built from changes on main: the site,
+# and the docs, which tools/sitedocs makes its /docs/ pages of.
 on:
   push:
     branches: [main]
-    paths: ["site/**", ".github/workflows/pages.yml"]
+    paths:
+      - "site/**"
+      - "docs/**"
+      - "tools/sitedocs/**"
+      - "go.mod"
+      - "flake.nix"
+      - "flake.lock"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -24,9 +33,17 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
+      # Go and Zola, at the versions flake.lock pins.
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/configure-pages@v6
+      - name: The docs' pages, from docs/*.md
+        run: nix develop --command go run ./tools/sitedocs
+      - name: Build the site
+        run: nix develop --command zola --root site build
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: site
+          path: site/public
       - id: deployment
         uses: actions/deploy-pages@v5

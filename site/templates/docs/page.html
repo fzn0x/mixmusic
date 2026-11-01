@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{%- block title %}{{ page.title }} · MixMusic docs{% endblock title %}
+{%- block description %}{{ page.description }}{% endblock description %}
+{%- block meta %}
+  <link rel="canonical" href="{{ page.permalink }}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="{{ page.title }} · MixMusic docs" />
+  <meta property="og:description" content="{{ page.description }}" />
+  <meta property="og:url" content="{{ page.permalink }}" />
+  <meta property="og:image" content="{{ get_url(path='assets/og.jpg') }}" />
+  <meta name="twitter:card" content="summary_large_image" />
+{%- endblock meta %}
+{%- block docs_current %} aria-current="true"{% endblock docs_current %}
+
+{%- block content %}
+  {%- set docs = get_section(path="docs/_index.md") %}
+  {%- set current = page.permalink %}
+  {%- set toc = page.toc %}
+  <div class="docs">
+    {% include "partials/docs-nav.html" %}
+
+    <article class="prose">
+      <h1>{{ page.title }}</h1>
+      {{ page.content | safe }}
+
+      <footer class="docs-foot">
+        {%- if page.lower or page.higher %}
+        <nav class="docs-pager" aria-label="Previous and next doc">
+          {%- if page.lower %}
+          <a class="docs-prev" href="{{ page.lower.permalink }}"><span>Previous</span><strong>{{ page.lower.title }}</strong></a>
+          {%- endif %}
+          {%- if page.higher %}
+          <a class="docs-next" href="{{ page.higher.permalink }}"><span>Next</span><strong>{{ page.higher.title }}</strong></a>
+          {%- endif %}
+        </nav>
+        {%- endif %}
+        <p class="docs-source">Made from <a href="https://github.com/fzn0x/mixmusic/blob/main/{{ page.extra.source }}">{{ page.extra.source }}</a> in the repository. <a href="https://github.com/fzn0x/mixmusic/edit/main/{{ page.extra.source }}">Edit it on GitHub</a>.</p>
+      </footer>
+    </article>
+  </div>
+{%- endblock content %}

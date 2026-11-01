@@ -341,10 +341,14 @@ go run ./tools/registry -check # the community registry
 MyGo needs no C toolchain, so any machine builds MixMusic for every system.
 
 With [Nix](https://nixos.org), `nix develop` gives the tools releases are
-built with, at the versions `flake.lock` pins: Go, Bun, NSIS and GoReleaser.
-`nix build` builds MixMusic for Linux from source, into `result/`. Releases
-are built in that shell, and [GoReleaser](https://goreleaser.com) publishes
-them (`.goreleaser.yaml`).
+built with, at the versions `flake.lock` pins: Go, Bun, NSIS, GoReleaser and
+Zola. `nix build` builds MixMusic for Linux from source, into `result/`.
+Releases are built in that shell, and [GoReleaser](https://goreleaser.com)
+publishes them (`.goreleaser.yaml`).
+
+The [website](https://fzn0x.github.io/mixmusic/) is `site/`, built with
+[Zola](https://www.getzola.org); the guides of `docs/` are its `/docs/`
+pages. `go run ./tools/sitedocs && zola --root site serve` previews it.
 
 [docs/architecture.md](docs/architecture.md) tells how the parts fit, and
 [CONTRIBUTING.md](CONTRIBUTING.md) how to send a change.

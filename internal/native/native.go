@@ -356,10 +356,14 @@ func (s *shell) restyle() {
 	s.plugins.SetTheme(pluginTheme(&s.lk))
 }
 
+// artColorRetry is how long the accent waits to ask for the colour of
+// artwork that couldn't load again.
+const artColorRetry = 10 * time.Second
+
 // followArtwork takes the accent from the artwork of what plays, as the
 // settings ask, or the theme's ground does: once a track with other
 // artwork starts, it asks for the artwork's colour, beside the main
-// thread.
+// thread, and again a while after it couldn't.
 func (s *shell) followArtwork() {
 	url := ""
 	if cur, ok := s.st.Current(); ok {
@@ -387,6 +391,13 @@ func (s *shell) followArtwork() {
 			}
 			if err != nil {
 				color = ""
+				time.AfterFunc(artColorRetry, func() {
+					s.update(func() {
+						if s.artURL == url {
+							s.artURL = "" // the next frame asks again
+						}
+					})
+				})
 			}
 			if color != s.artColor {
 				s.artColor = color

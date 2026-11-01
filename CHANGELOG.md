@@ -58,6 +58,15 @@ All notable changes to MixMusic are documented here. The format follows
   made right before quitting: the queue, where the song was, the volume
   and the colours of Settings › Appearance. This holds when Windows
   shuts down, restarts or signs out too (#89).
+- Shuffle mixes in the tracks before the one playing that haven't played
+  yet, as when you start an album or a playlist from one of its tracks:
+  it left them out, and with Repeat all they played in the list's order.
+  The track playing then comes first, so Previous starts it again. Your
+  own tracks stay ahead of the radio's when you shuffle, and turning
+  shuffle off puts the tracks you added with Play next or Add to queue
+  back where you added them, after a restart too (#95).
+- After a restart, the radio's tracks keep their "radio" mark in up
+  next, and Add to queue still puts tracks before them (#95).
 
 ## [0.5.5] - 2026-10-28
 

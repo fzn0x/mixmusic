@@ -33,7 +33,7 @@ import (
 
 // order is the docs' order on the site: what users set up, what they make,
 // then how MixMusic is made. Docs it does not list follow, by name.
-var order = []string{"spotify", "themes", "plugins", "architecture"}
+var order = []string{"spotify", "themes", "plugins", "troubleshooting", "architecture"}
 
 // marker starts the second line of every page the command writes: a page
 // with it is the command's to replace, and any other is left alone.

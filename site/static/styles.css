@@ -276,6 +276,7 @@ h3 { font-size: 1.3125rem; font-weight: 700; line-height: 1.25; letter-spacing: 
 .tabs,
 .gallery,
 .walkthrough { transition: --glow var(--medium) var(--ease); }
+.walkthrough .note { margin-top: 20px; max-width: 72ch; }
 .tab-list {
   display: flex;
   gap: 4px;

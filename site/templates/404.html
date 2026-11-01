@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{%- block title %}Not found · MixMusic{% endblock title %}
+
+{%- block content %}
+  <div class="docs docs-missing">
+    <article class="prose">
+      <h1>This page isn't here</h1>
+      <p>It may have moved. The <a href="{{ config.base_url | trim_end(pat='/') ~ '/' }}">home page</a> and the <a href="{{ get_url(path='@/docs/_index.md') }}">docs</a> have the rest.</p>
+    </article>
+  </div>
+{%- endblock content %}

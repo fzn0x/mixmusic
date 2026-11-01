@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}MixMusic{% endblock title %}</title>
+  <meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}" />
+  <meta name="theme-color" content="#121212" />
+  <link rel="icon" type="image/png" href="{{ get_url(path='assets/icon.png') }}" />
+  {%- block meta %}{% endblock meta %}
+  <link rel="preload" href="{{ get_url(path='assets/fonts/figtree-latin.woff2') }}" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="{{ get_url(path='styles.css') }}" />
+  <link rel="stylesheet" href="{{ get_url(path='docs.css') }}" />
+</head>
+<body>
+  <a class="skip" href="#content">Skip to the content</a>
+
+  <svg width="0" height="0" class="defs" aria-hidden="true" focusable="false">
+    {% include "partials/symbols.html" %}
+  </svg>
+
+  {%- set home = config.base_url | trim_end(pat='/') ~ '/' %}
+  <header class="appbar" data-appbar>
+    <div class="appbar-inner">
+      <a class="brand" href="{{ home }}" aria-label="MixMusic, the home page">
+        <svg class="brand-mark" width="28" height="28" aria-hidden="true"><use href="#i-rings" /></svg>
+        <span>MixMusic</span>
+      </a>
+      <nav class="appbar-nav" aria-label="Sections">
+        <a href="{{ home }}#features">Features</a>
+        <a href="{{ home }}#customize">Themes and plugins</a>
+        <a href="{{ home }}#download">Download</a>
+        <a href="{{ get_url(path='@/docs/_index.md') }}"{% block docs_current %}{% endblock docs_current %}>Docs</a>
+      </nav>
+      <a class="btn btn-outlined btn-small" href="https://github.com/fzn0x/mixmusic">
+        <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg>
+        <span>Star on GitHub</span>
+      </a>
+    </div>
+  </header>
+
+  <main id="content">
+    {%- block content %}{% endblock content %}
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <a class="brand brand-small" href="{{ home }}" aria-label="MixMusic, the home page">
+        <svg class="brand-mark" width="22" height="22" aria-hidden="true"><use href="#i-rings" /></svg>
+        <span>MixMusic</span>
+      </a>
+      <p>Free and open source under the <a href="https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT">MIT license</a> or the <a href="https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL">GNU GPL, version 3</a>. Spotify and YouTube Music are trademarks of their owners; MixMusic is not made by either.</p>
+      <a class="btn btn-filled" href="https://github.com/fzn0x/mixmusic/releases/latest">
+        <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-download" /></svg>
+        <span>Download</span>
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    // The app bar rises once the page scrolls under it, as on the home page.
+    (() => {
+      const appbar = document.querySelector("[data-appbar]");
+      const raise = () => appbar.classList.toggle("is-raised", scrollY > 8);
+      addEventListener("scroll", raise, { passive: true });
+      raise();
+    })();
+  </script>
+</body>
+</html>

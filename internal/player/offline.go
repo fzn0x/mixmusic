@@ -102,6 +102,13 @@ func (p *Player) waitFor(willPlay, radio bool, resume func(play bool)) {
 	if !p.toldOffline {
 		p.toldOffline = true
 		p.notify(Notice{Message: "No network. MixMusic plays on from here once it's back"})
+		// Once the network answers, the next loss is told too, also when the
+		// user left this wait for a track that plays without the network.
+		await(p, func(ctx context.Context) (struct{}, error) { return struct{}{}, n.WaitOnline(ctx) }, func(_ struct{}, err error) {
+			if err == nil {
+				p.toldOffline = false
+			}
+		})
 	}
 	token := p.loadToken
 	ctx, cancel := context.WithCancel(p.ctx)
@@ -113,7 +120,6 @@ func (p *Player) waitFor(willPlay, radio bool, resume func(play bool)) {
 		play := p.s.WillPlay
 		p.endWait()
 		p.failures = 0
-		p.toldOffline = false
 		resume(play)
 	})
 }

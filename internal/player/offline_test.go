@@ -144,6 +144,26 @@ func TestWaitForTheNetwork(t *testing.T) {
 	}
 }
 
+// TestToldOfEachLoss tells once that the network is gone, and again once
+// it came back and went: also when the user left the wait for a track
+// that plays without the network.
+func TestToldOfEachLoss(t *testing.T) {
+	net := newNet(false)
+	h := newNetHarness(t, net, func(f *fakeServices) { f.prepare = onDevice })
+	h.p.PlayTracks([]media.Track{track("a"), spotifyTrack("1"), track("b")}, 0)
+	h.wait("a waiting", waiting("a", true))
+	h.p.Next()
+	h.wait("the device playing", func(p *Player) bool { return p.connect.active() && p.s.Playing })
+	net.set(true)
+	h.wait("the network back", func(p *Player) bool { return !p.toldOffline })
+	net.set(false)
+	h.p.Next()
+	h.wait("b waiting", waiting("b", true))
+	if n := h.notices(); len(n) != 2 || n[0].Message != offlineNotice || n[1].Message != offlineNotice {
+		t.Errorf("notices %+v", n)
+	}
+}
+
 // TestWaitMidTrack has a stream that broke off for want of the network
 // wait for it where it was, rather than spending its tries.
 func TestWaitMidTrack(t *testing.T) {

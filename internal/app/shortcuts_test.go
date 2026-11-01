@@ -112,12 +112,19 @@ func newShortcutApp(t *testing.T) (*App, *fakeHotkeys, *[]string) {
 // setGlobal saves the settings with these global shortcuts.
 func setGlobal(t *testing.T, a *App, global map[string]string) {
 	t.Helper()
+	if err := saveGlobal(a, global); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// saveGlobal saves the settings with these global shortcuts, from any
+// goroutine.
+func saveGlobal(a *App, global map[string]string) error {
 	p := &Preferences{a}
 	s := p.Get()
 	s.GlobalShortcuts = global
-	if _, err := p.Set(s); err != nil {
-		t.Fatal(err)
-	}
+	_, err := p.Set(s)
+	return err
 }
 
 // acc is the accelerator keys register as here.
@@ -314,7 +321,9 @@ func TestApplyGlobalShortcutsAtOnce(t *testing.T) {
 			if i%2 == 1 {
 				keys = map[string]string{"player.next": "Mod+Alt+P", "player.toggle": fmt.Sprintf("Mod+Alt+%d", i)}
 			}
-			setGlobal(t, a, keys)
+			if err := saveGlobal(a, keys); err != nil {
+				t.Error(err)
+			}
 		}()
 		wg.Add(1)
 		go func() {
@@ -356,7 +365,9 @@ func TestGlobalShortcutsBackMeanwhile(t *testing.T) {
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		setGlobal(t, a, map[string]string{"player.toggle": "Mod+Alt+P"})
+		if err := saveGlobal(a, map[string]string{"player.toggle": "Mod+Alt+P"}); err != nil {
+			t.Error(err)
+		}
 	}()
 	<-entered
 	setGlobal(t, a, map[string]string{})

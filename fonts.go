@@ -14,7 +14,11 @@ import (
 // TrueType, which MyGo reads: the WOFF2 files of the web interface
 // unpacked. OFL.txt is their license. Mochi's round face, Quicksand, which
 // no system has, comes along in its static weights, as MyGo reads no
-// variable font; quicksand-OFL.txt is theirs.
+// variable font; quicksand-OFL.txt is theirs. Roboto Flex, the Material
+// themes' face, comes as static instances of its variable font, at the
+// weights of Material's type scale, and Archivo SemiCondensed ExtraBold
+// sets the Crate themes' headings; robotoflex-OFL.txt and archivo-OFL.txt
+// are their licenses.
 //
 //go:embed fonts/*.ttf fonts/*.txt
 var fontFiles embed.FS
@@ -28,6 +32,10 @@ const (
 	faceSemilight = "Selawik Semilight"
 	// faceRound is Quicksand, Mochi's face.
 	faceRound = "Quicksand"
+	// faceMaterial is Roboto Flex, the Material themes' face, and
+	// faceCrate Archivo SemiCondensed, the Crate themes' headings'.
+	faceMaterial = "Roboto Flex"
+	faceCrate    = "Archivo SemiCondensed"
 )
 
 var fontsOnce sync.Once
@@ -36,14 +44,18 @@ var fontsOnce sync.Once
 func registerFonts() {
 	fontsOnce.Do(func() {
 		for file, family := range map[string]string{
-			"fonts/selawkl.ttf":           face,
-			"fonts/selawk.ttf":            face,
-			"fonts/selawksb.ttf":          face,
-			"fonts/selawkb.ttf":           face,
-			"fonts/selawksl.ttf":          faceSemilight,
-			"fonts/quicksand-light.ttf":   faceRound,
-			"fonts/quicksand-regular.ttf": faceRound,
-			"fonts/quicksand-bold.ttf":    faceRound,
+			"fonts/selawkl.ttf":                         face,
+			"fonts/selawk.ttf":                          face,
+			"fonts/selawksb.ttf":                        face,
+			"fonts/selawkb.ttf":                         face,
+			"fonts/selawksl.ttf":                        faceSemilight,
+			"fonts/quicksand-light.ttf":                 faceRound,
+			"fonts/quicksand-regular.ttf":               faceRound,
+			"fonts/quicksand-bold.ttf":                  faceRound,
+			"fonts/robotoflex-regular.ttf":              faceMaterial,
+			"fonts/robotoflex-medium.ttf":               faceMaterial,
+			"fonts/robotoflex-bold.ttf":                 faceMaterial,
+			"fonts/archivo-semicondensed-extrabold.ttf": faceCrate,
 		} {
 			data, err := fontFiles.ReadFile(file)
 			if err == nil {
@@ -63,6 +75,8 @@ func fontNotices() []app.Notice {
 	for _, f := range []struct{ name, file string }{
 		{"Selawik, the interface's face", "fonts/OFL.txt"},
 		{"Quicksand, Mochi's face", "fonts/quicksand-OFL.txt"},
+		{"Roboto Flex, the Material themes' face", "fonts/robotoflex-OFL.txt"},
+		{"Archivo, the Crate themes' headings' face", "fonts/archivo-OFL.txt"},
 	} {
 		if text, err := fontFiles.ReadFile(f.file); err == nil {
 			notices = append(notices, app.Notice{Name: f.name, Text: string(text)})

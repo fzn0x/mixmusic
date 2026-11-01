@@ -26,7 +26,7 @@ func TestEngineOnTheDevice(t *testing.T) {
 	defer e.Close()
 	e.SetVolume(0)
 	e.master = newSmoother(0, glide)
-	err := e.Load(cuesFront, 0, true)
+	err := e.Load(cuesFront, 0, true, 1)
 	if errors.Is(err, output.ErrNoDevice) || errors.Is(err, output.ErrUnsupported) {
 		t.Skip(err)
 	}

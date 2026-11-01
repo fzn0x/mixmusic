@@ -82,6 +82,11 @@ type deck struct {
 	// thread's.
 	trim    smoother
 	trimmed bool
+	// speed is the speed the deck plays at, from MinSpeed to MaxSpeed, at
+	// its track's own pitch, and stretch what plays it so: the audio
+	// thread's.
+	speed   float64
+	stretch stretcher
 
 	cancel context.CancelFunc
 	done   chan struct{}
@@ -104,6 +109,7 @@ func newDeck(url string, start time.Duration, open Opener, notify func()) *deck 
 		url:     url,
 		gain:    ramp{value: 1, target: 1},
 		trim:    newSmoother(1, glide),
+		speed:   1,
 		cancel:  cancel,
 		done:    make(chan struct{}),
 		changed: make(chan struct{}, 1),
@@ -179,8 +185,23 @@ func (d *deck) takeSeek() (time.Duration, *ring, bool) {
 	return t, d.ring.Load(), true
 }
 
-// position returns the frame of the track the deck plays from.
+// position returns the frame of the track the deck reads from its ring.
 func (d *deck) position() int64 { return d.ring.Load().position() }
+
+// read moves up to len(out)/2 frames of r, at the deck's speed, into out,
+// and returns how many: on the audio thread.
+func (d *deck) read(r *ring, out []float32) int { return d.stretch.read(r, out, d.speed) }
+
+// heard returns the frame of the track the deck plays next, which the
+// stretch may hold back from what it read: on the audio thread.
+func (d *deck) heard() int64 {
+	r := d.ring.Load()
+	return r.start + d.stretch.position(r)
+}
+
+// pending reports whether the deck has more of r to play than r holds: on
+// the audio thread.
+func (d *deck) pending(r *ring) bool { return d.stretch.pending(r) }
 
 // failure returns why the deck failed, or nil.
 func (d *deck) failure() error {

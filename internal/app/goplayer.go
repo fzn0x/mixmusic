@@ -182,7 +182,7 @@ type engineStream struct {
 }
 
 func (s engineStream) Load(url string, start time.Duration, autoplay bool) error {
-	if err := s.e.Load(url, start, autoplay); err != nil {
+	if err := s.e.Load(url, start, autoplay, 1); err != nil {
 		return err
 	}
 	s.a.setNative(true)
@@ -190,7 +190,7 @@ func (s engineStream) Load(url string, start time.Duration, autoplay bool) error
 }
 
 func (s engineStream) Crossfade(url string, d time.Duration) error {
-	if err := s.e.Crossfade(url, d); err != nil {
+	if err := s.e.Crossfade(url, d, 1); err != nil {
 		return err
 	}
 	s.a.setNative(true)

@@ -5,8 +5,9 @@ import (
 	"time"
 )
 
-// ringFrames is the capacity of a ring, a power of two: 0.68 s at Rate.
-const ringFrames = 1 << 15
+// ringFrames is the capacity of a ring, a power of two: 1.37 s at Rate,
+// which a deck at MaxSpeed plays in 0.46 s.
+const ringFrames = 1 << 16
 
 // ring passes decoded frames from a deck's decoder, its only writer, to the
 // audio thread, its only reader, without locks: the counters say what each

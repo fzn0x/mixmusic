@@ -16,7 +16,8 @@ var update = flag.Bool("update", false, "encode the fixtures of testdata again w
 // signals, as ffmpeg 7.0's aac encoder encodes them, which exercise the
 // tools of AAC-LC between them. The one of M/S in every band leaves PNS
 // off: ffmpeg's decoder gives each channel noise of its own where the
-// standard has them share it. They were made with
+// standard has them share it, as TestCorrelatedNoise checks. They were
+// made with
 //
 //	ffmpeg -f lavfi -i "aevalsrc=0.2*sin(2*PI*330*t)+0.8*lt(mod(t\,0.2)\,0.002)*sin(2*PI*3000*t)|0.2*sin(2*PI*495*t)+0.7*lt(mod(t+0.1\,0.2)\,0.002):s=44100:d=0.6" -c:a aac -b:a 128k -f adts stereo-44k-clicks.aac
 //	ffmpeg -f lavfi -i "aevalsrc=0.6*(random(0)*2-1)*gt(mod(t\,0.25)\,0.15)+0.1*sin(2*PI*220*t):s=48000:d=0.6" -c:a aac -b:a 96k -f adts mono-48k-bursts.aac

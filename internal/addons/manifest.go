@@ -132,6 +132,11 @@ var (
 // permissions are the permissions plugins may declare.
 var permissions = []string{"network", "notifications", "storage", "playback"}
 
+// ValidColor reports whether s is a colour a theme may set: #rgb, #rgba,
+// #rrggbb, #rrggbbaa, rgb(), rgba(), hsl(), hsla(), oklch(), oklab() or
+// transparent.
+func ValidColor(s string) bool { return colorRe.MatchString(s) }
+
 // ValidFile reports whether name may name a file of an add-on: a relative
 // path inside its folder, without dot directories.
 func ValidFile(name string) bool {
@@ -155,7 +160,7 @@ func (t Theme) Validate() error {
 		errs = append(errs, errors.New(`scheme must be "dark" or "light"`))
 	}
 	for _, key := range ColorKeys {
-		if !colorRe.MatchString(t.Colors[key]) {
+		if !ValidColor(t.Colors[key]) {
 			errs = append(errs, fmt.Errorf("colors.%s must be a color", key))
 		}
 	}
@@ -211,7 +216,7 @@ func (o Option) validate() error {
 			}
 		}
 	case OptionColor:
-		if !colorRe.MatchString(o.Default) {
+		if !ValidColor(o.Default) {
 			return errors.New("a color's default must be a color")
 		}
 	case OptionRange:

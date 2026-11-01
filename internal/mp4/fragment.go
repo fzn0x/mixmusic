@@ -81,6 +81,36 @@ func (u *run) next() (sample, bool) {
 	return s, true
 }
 
+// seek moves the cursor to the last sample at or before tick t, or to the
+// first.
+func (u *run) seek(t int64) {
+	u.rewind()
+	if u.count == 0 || t < u.time {
+		return
+	}
+	if u.durAt < 0 && u.sizeAt < 0 {
+		// Every sample has the default duration and size: no need to walk
+		// them, which may be many.
+		k := uint64(u.count - 1)
+		if u.duration > 0 {
+			k = min(k, uint64(t-u.time)/uint64(u.duration))
+		}
+		u.n = uint32(k)
+		u.at += int64(k) * int64(u.size)
+		u.t += int64(k) * int64(u.duration)
+		return
+	}
+	for u.n+1 < u.count {
+		d, size := u.fields(u.n)
+		if u.t+int64(d) > t {
+			break
+		}
+		u.n++
+		u.at += int64(size)
+		u.t += int64(d)
+	}
+}
+
 // next returns the sample at the cursor, and moves the cursor to the
 // next.
 func (f *fragment) next() (sample, bool) {
@@ -90,6 +120,32 @@ func (f *fragment) next() (sample, bool) {
 		}
 	}
 	return sample{}, false
+}
+
+// seek moves the cursor to the last sample at or before tick t, or to the
+// first.
+func (f *fragment) seek(t int64) {
+	f.ri = 0
+	for i, u := range f.runs {
+		if u.count > 0 && u.time <= t {
+			f.ri = i
+		}
+	}
+	for i := f.ri; i < len(f.runs); i++ {
+		f.runs[i].rewind()
+	}
+	if f.ri < len(f.runs) {
+		f.runs[f.ri].seek(t)
+	}
+}
+
+// count returns the samples of the fragment.
+func (f *fragment) count() int64 {
+	n := int64(0)
+	for _, u := range f.runs {
+		n += int64(u.count)
+	}
+	return n
 }
 
 // parseMoof reads the samples of the track in the moof at offset at, of
@@ -258,8 +314,10 @@ func (u *run) totals() (size int64, duration uint64) {
 // before it, and returns the samples of the track it describes, starting
 // at tick start without a tfdt, and the offset of the box after its mdat.
 // It returns false at the end of the fragments: at the end of the file, or
-// of a file chained after.
-func (r *Reader) readFragment(at, start int64) (fragment, int64, bool, error) {
+// of a file chained after. From where the sidx says a fragment starts, it
+// skips only the boxes that may start a segment of DASH, so that a sidx
+// that is off makes an error rather than another fragment.
+func (r *Reader) readFragment(at, start int64, indexed bool) (fragment, int64, bool, error) {
 	if at < 0 {
 		return fragment{}, -1, false, nil
 	}
@@ -294,6 +352,11 @@ func (r *Reader) readFragment(at, start int64) (fragment, int64, bool, error) {
 			return f, after, true, nil
 		case typeFtyp, typeMoov:
 			return fragment{}, -1, false, nil
+		case typeStyp, typeSidx, typeSsix, typePrft, typeEmsg, typeFree, typeSkip:
+		default:
+			if indexed {
+				return fragment{}, -1, false, fmt.Errorf("%w: no moof at byte %d, where the sidx says", ErrFormat, at)
+			}
 		}
 		if h.size == toEnd {
 			return fragment{}, -1, false, nil
@@ -304,7 +367,11 @@ func (r *Reader) readFragment(at, start int64) (fragment, int64, bool, error) {
 
 // nextFragment reads the fragment after the one read.
 func (r *Reader) nextFragment() error {
-	f, after, ok, err := r.readFragment(r.after, r.frag.end)
+	at := r.after
+	f, after, ok, err := r.readFragment(at, r.frag.end, false)
+	if at == r.scanAt && !r.scanned && (err == nil || isDataError(err)) {
+		r.addScanned(f, after, ok && err == nil)
+	}
 	if err != nil {
 		return err
 	}

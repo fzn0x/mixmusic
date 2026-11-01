@@ -96,10 +96,15 @@ type Reader struct {
 	fragmented bool
 	trex       map[uint32]trex // the defaults of each track's fragments
 	fragStart  int64           // where the fragments start: after the moov and its mdat
+	frags      []fragPoint     // the fragments known, by time: from the sidx, then a scan
+	indexed    int             // those of r.frags the sidx gives, which come first
+	known      int64           // when the fragments known end, in ticks
+	scanAt     int64           // where the next fragment to scan starts, or -1
+	scanned    bool            // whether the scan reached the end
 
 	frag  fragment // the fragment being read
 	after int64    // the offset of the box after it and its mdat, or -1 at the end
-	err   error    // returned by ReadPacket after an error
+	err   error    // returned by ReadPacket until the next Seek
 }
 
 // NewReader reads the headers of a file, from its start up to its media
@@ -110,7 +115,7 @@ type Reader struct {
 // A file without an audio track returns ErrNoAudio, and one whose audio
 // is encrypted an error wrapping errors.ErrUnsupported.
 func NewReader(r io.ReadSeeker) (*Reader, error) {
-	rd := &Reader{src: newSource(r), trex: map[uint32]trex{}, after: -1}
+	rd := &Reader{src: newSource(r), trex: map[uint32]trex{}, after: -1, scanAt: -1}
 	if err := rd.readHeaders(); err != nil {
 		return nil, err
 	}
@@ -122,9 +127,9 @@ func (r *Reader) Track() Track { return r.track }
 
 // Duration returns when the track ends, in the timeline of the packets'
 // Times, as the file says: by its edit list, which starts at CodecDelay,
-// or else by its media header or its movie header. It is 0 when the file
-// does not say, as fragmented files may not. The audio of the last packet
-// after it is the encoder's padding.
+// or else by its media header, its movie header or its sidx. It is 0 when
+// the file does not say, as fragmented files may not. The audio of the
+// last packet after it is the encoder's padding.
 func (r *Reader) Duration() time.Duration { return r.duration }
 
 func (r *Reader) readHeaders() error {
@@ -164,7 +169,7 @@ func (r *Reader) readHeaders() error {
 		}
 	}
 	if !r.fragmented || r.fragStart < 0 {
-		r.fragStart = -1
+		r.fragStart, r.scanAt, r.scanned = -1, -1, true
 	}
 	r.setDuration(m)
 	r.inTable = true
@@ -173,32 +178,50 @@ func (r *Reader) readHeaders() error {
 }
 
 // readAfterMoov reads the boxes after the moov of a fragmented file up
-// to the first moof, to find where the fragments start: after the mdat of
-// the samples of the moov, if any.
+// to the first moof: the sidx of the track, which it keeps, and the mdat
+// of the samples of the moov, if any, after which the fragments start.
 func (r *Reader) readAfterMoov() error {
 	s := r.src
+	r.known = r.table.end
+	// start sets where the fragments start, which a scan starts at without
+	// a sidx.
+	start := func(at int64) error {
+		r.fragStart = at
+		if r.indexed == 0 {
+			r.scanAt = at
+		}
+		return nil
+	}
 	for {
 		at := s.offset()
 		h, err := s.readHeader()
 		if err != nil {
 			if isDataError(err) {
 				// No fragments, or a corrupt one, which ReadPacket finds.
-				r.fragStart = at
-				return nil
+				return start(at)
 			}
 			return err
 		}
 		switch h.typ {
 		case typeMoof:
-			r.fragStart = h.start
-			return nil
+			return start(h.start)
 		case typeMdat:
-			r.fragStart = h.end()
-			return nil
+			return start(h.end())
+		case typeSidx:
+			if r.indexed > 0 {
+				break
+			}
+			b, err := s.readBody(h)
+			switch {
+			case err == nil:
+				r.setIndex(b, s.offset())
+				continue
+			case !isDataError(err):
+				return err
+			}
 		}
 		if h.size == toEnd {
-			r.fragStart = -1
-			return nil
+			return start(-1)
 		}
 		s.seekTo(h.end())
 	}
@@ -206,7 +229,9 @@ func (r *Reader) readAfterMoov() error {
 
 // setDuration sets the duration of the track, in the packets' timeline,
 // from the first of the durations the file gives: of the edit list, of
-// the fragments, of the media, of the movie, or of the sample table.
+// the fragments, of the media, of the movie, of the sidx when it indexes
+// the file to its end, or of the sample table. Only the sidx may cost a
+// read, at the end of what it indexes.
 func (r *Reader) setDuration(m movie) {
 	// movie returns when the track ends after a duration of the movie,
 	// which counts from the edit.
@@ -224,6 +249,9 @@ func (r *Reader) setDuration(m movie) {
 	if !ok {
 		ticks, ok = movie(m.duration)
 	}
+	if !ok && r.indexed > 0 && r.indexesAll() {
+		ticks, ok = r.known, true
+	}
 	if !ok && r.table.end > 0 {
 		ticks, ok = r.table.end, true
 	}
@@ -234,8 +262,8 @@ func (r *Reader) setDuration(m movie) {
 
 // ReadPacket returns the next packet of the track, or io.EOF after the
 // last. A file that ends within a sample, or within the moof of one,
-// returns io.ErrUnexpectedEOF. After an error, ReadPacket returns it
-// again. In a fragmented file, a file chained after the first, which
+// returns io.ErrUnexpectedEOF. After an error, ReadPacket returns it again
+// until a Seek. In a fragmented file, a file chained after the first, which
 // starts with an ftyp or a moov, ends the stream.
 func (r *Reader) ReadPacket() (Packet, error) {
 	if r.err != nil {

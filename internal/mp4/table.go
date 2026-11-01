@@ -235,3 +235,53 @@ func (tb *table) next() (sample, bool) {
 	}
 	return s, true
 }
+
+// seek moves the cursor to the last sample at or before tick t, or to the
+// first.
+func (tb *table) seek(t int64) {
+	tb.rewind()
+	if tb.count == 0 {
+		return
+	}
+	// The sample, by the stts.
+	for i, run := range tb.times {
+		end := tb.t + int64(run.count)*int64(run.delta)
+		if end <= t && i+1 < len(tb.times) {
+			tb.n, tb.t = tb.n+run.count, end // the next sample is at or before t
+			continue
+		}
+		k := run.count - 1
+		switch {
+		case t < tb.t:
+			k = 0
+		case run.delta > 0 && t < end:
+			k = uint32((t - tb.t) / int64(run.delta))
+		}
+		tb.ti, tb.tk = i, k
+		tb.n, tb.t = tb.n+k, tb.t+int64(k)*int64(run.delta)
+		break
+	}
+
+	// Its chunk, by the stsc, and its offset there.
+	first := uint64(0) // the first sample of the entry
+	for i, run := range tb.chunks {
+		last := tb.nchunks
+		if i+1 < len(tb.chunks) {
+			last = tb.chunks[i+1].first
+		}
+		samples := uint64(last-run.first) * uint64(run.samples)
+		if off := uint64(tb.n) - first; off < samples {
+			tb.ci, tb.c, tb.k = i, run.first+uint32(off/uint64(run.samples)), uint32(off%uint64(run.samples))
+			break
+		}
+		first += samples
+	}
+	tb.at = tb.offset(tb.c)
+	if tb.sizeBits == 0 {
+		tb.at += int64(tb.k) * int64(tb.size)
+		return
+	}
+	for n := tb.n - tb.k; n < tb.n; n++ {
+		tb.at += int64(tb.sizeOf(n))
+	}
+}

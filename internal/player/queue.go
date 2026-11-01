@@ -23,8 +23,16 @@ func (p *Player) PlayTracks(tracks []media.Track, start int) {
 func (p *Player) PlayNext(tracks []media.Track) {
 	tracks = slices.Clone(tracks)
 	p.do(func() {
-		at := p.s.Index + 1
-		p.s.Queue = slices.Insert(slices.Clone(p.s.Queue), at, p.items(tracks)...)
+		items := p.items(tracks)
+		if p.unshuffled != nil {
+			// In the queue's own order too, they follow the current entry.
+			at := 0
+			if cur, ok := p.s.Current(); ok {
+				at = indexIn(p.unshuffled, cur.UID) + 1
+			}
+			p.unshuffled = slices.Insert(slices.Clone(p.unshuffled), at, items...)
+		}
+		p.s.Queue = slices.Insert(slices.Clone(p.s.Queue), p.s.Index+1, items...)
 		p.emit(QueueChange)
 		if p.s.Index < 0 {
 			p.playAt(0, 0, true)
@@ -37,14 +45,34 @@ func (p *Player) PlayNext(tracks []media.Track) {
 func (p *Player) Enqueue(tracks []media.Track) {
 	tracks = slices.Clone(tracks)
 	p.do(func() {
-		q := p.s.Queue
-		at := len(q)
-		for at > p.s.Index+1 && q[at-1].Radio {
-			at--
+		items := p.items(tracks)
+		if u := p.unshuffled; u != nil {
+			// In the queue's own order too.
+			cur, _ := p.s.Current()
+			p.unshuffled = slices.Insert(slices.Clone(u), enqueueAt(u, indexIn(u, cur.UID)), items...)
 		}
-		p.s.Queue = slices.Insert(slices.Clone(q), at, p.items(tracks)...)
+		q := p.s.Queue
+		p.s.Queue = slices.Insert(slices.Clone(q), enqueueAt(q, p.s.Index), items...)
 		p.emit(QueueChange)
 	})
+}
+
+// enqueueAt is where tracks added to q go: at its end, before the entries
+// of the radio after the one at cur.
+func enqueueAt(q []Item, cur int) int {
+	at := len(q)
+	for at > cur+1 && q[at-1].Radio {
+		at--
+	}
+	return at
+}
+
+// indexIn is the index in q of the entry uid, or -1.
+func indexIn(q []Item, uid string) int {
+	if uid == "" {
+		return -1
+	}
+	return slices.IndexFunc(q, func(it Item) bool { return it.UID == uid })
 }
 
 // RemoveAt takes the entry at i out of the queue, but the current one.
@@ -245,6 +273,9 @@ func (p *Player) extendWithRadio(then func(added bool)) {
 			items[i] = p.item(t, true)
 		}
 		p.s.Queue = append(slices.Clone(p.s.Queue), items...)
+		if p.unshuffled != nil {
+			p.unshuffled = append(slices.Clone(p.unshuffled), items...)
+		}
 		p.emit(QueueChange)
 		then(true)
 	})

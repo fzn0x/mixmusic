@@ -312,7 +312,7 @@ records or sends it.
 
 ## Develop
 
-You need [Go](https://go.dev/dl/) 1.27 or later and [Bun](https://bun.sh) 1.2 or later,
+You need [Go](https://go.dev/dl/) 1.27.3 or later and [Bun](https://bun.sh) 1.2 or later,
 which runs MyGo's command line.
 
 ```sh

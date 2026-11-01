@@ -9,6 +9,8 @@ node_modules/
 /result-*
 /.mygo/
 /site/public/
+# The docs' pages, which go run ./tools/sitedocs makes from docs/*.md.
+/site/content/docs/*/
 mygo_windows_*.syso
 *.exe
 !resources/**/*.exe

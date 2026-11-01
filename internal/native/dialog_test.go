@@ -90,6 +90,8 @@ func TestOfferFirstFocus(t *testing.T) {
 	tt := tester(t, s)
 	s.offer = offer
 	tt.Frame()
+	// Focused holds for an element holding the focus too, as the dialog's
+	// panel would: skip this version has it then.
 	if !tt.Focused("later") || tt.Focused("skip this version") {
 		t.Error("the offer opens with the focus elsewhere than on later")
 	}
@@ -102,7 +104,7 @@ func TestOfferFirstFocus(t *testing.T) {
 	tt.Frame()
 	s.offer = offer
 	tt.Frame()
-	if !tt.Focused("later") {
+	if !tt.Focused("later") || tt.Focused("skip this version") {
 		t.Error("the offer, opening over the search box, leaves the focus elsewhere than on later")
 	}
 }
@@ -381,7 +383,7 @@ func TestDialogsInTallWindows(t *testing.T) {
 	s.offer = nil
 	s.promptName("New mix", "Name", "", "create", func(string) {})
 	tt.Frame()
-	if !tt.Focused("Name") {
+	if !tt.Focused("Name") || tt.Focused("cancel") {
 		t.Error("the name asked for doesn't have the focus as the dialog opens")
 	}
 }
@@ -424,7 +426,7 @@ func TestQuestionKeeps(t *testing.T) {
 	s.ask("enable Hello", enableMessage, "enable", func() { ran = true })
 	s.asking.cancel = func() { canceled = true }
 	tt.Frame()
-	if !tt.Focused("enable") {
+	if !tt.Focused("enable") || tt.Focused("cancel") {
 		t.Error("the question opens with the focus elsewhere than on its ok")
 	}
 	tt.ClickAt(5, 5)

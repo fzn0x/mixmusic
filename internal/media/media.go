@@ -159,8 +159,12 @@ type Playlist struct {
 	Editable bool   `json:"editable,omitempty"`
 	URL      string `json:"url,omitempty"`
 	// Saved is set when the user saved or follows the playlist on its
-	// service; only a playlist page says so.
+	// service: a playlist page says so, and a list of YouTube Music read
+	// with the playlists' menus.
 	Saved bool `json:"saved,omitempty"`
+	// Deletable is set for playlists the user may delete on their
+	// service: those YouTube Music offers to delete, the user's own.
+	Deletable bool `json:"deletable,omitempty"`
 }
 
 // ItemKind is the kind of an Item.

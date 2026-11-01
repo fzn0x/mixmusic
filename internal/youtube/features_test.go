@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"sync"
 	"testing"
+
+	"github.com/fzn0x/mixmusic/internal/media"
 )
 
 // recorded is a request a fake YouTube received.
@@ -193,8 +195,153 @@ func TestParsePlaylistEditable(t *testing.T) {
 	section := n.get("contents", "twoColumnBrowseResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer", "contents").v.([]any)
 	header := section[0].(map[string]any)["musicResponsiveHeaderRenderer"]
 	section[0] = map[string]any{"musicEditablePlaylistDetailHeaderRenderer": map[string]any{"header": map[string]any{"musicResponsiveHeaderRenderer": header}}}
-	if p, _, err := parsePlaylist(n, "PLx"); err != nil || !p.Editable || p.Title == "" {
-		t.Errorf("the owner's playlist: editable %v, title %q, %v", p.Editable, p.Title, err)
+	if p, _, err := parsePlaylist(n, "PLx"); err != nil || !p.Editable || p.Title == "" || p.Deletable {
+		t.Errorf("the owner's playlist: editable %v, title %q, deletable %v, %v", p.Editable, p.Title, p.Deletable, err)
+	}
+}
+
+// deleteItem is a menu item that deletes playlist id once a dialog asks,
+// as YouTube Music's website reads a deletePlaylistEndpoint. No answer
+// signed in has shown where YouTube puts the endpoint: playlistMenu finds
+// it at any depth.
+func deleteItem(id string) map[string]any {
+	return map[string]any{"menuNavigationItemRenderer": map[string]any{
+		"text": map[string]any{"runs": []any{map[string]any{"text": "Delete playlist"}}},
+		"icon": map[string]any{"iconType": "DELETE"},
+		"navigationEndpoint": map[string]any{"confirmDialogEndpoint": map[string]any{"content": map[string]any{"confirmDialogRenderer": map[string]any{
+			"confirmButton": map[string]any{"buttonRenderer": map[string]any{
+				"text":    map[string]any{"runs": []any{map[string]any{"text": "Delete"}}},
+				"command": map[string]any{"deletePlaylistEndpoint": map[string]any{"playlistId": id}},
+			}},
+		}}}},
+	}}
+}
+
+// menuItems returns the raw items of a renderer's menu, for a test to
+// change, and a function that puts them back changed.
+func menuItems(t *testing.T, r node) ([]any, func([]any)) {
+	t.Helper()
+	m, ok := r.get("menu", "menuRenderer").v.(map[string]any)
+	if !ok {
+		t.Fatalf("no menu in %v", r.v)
+	}
+	return m["items"].([]any), func(items []any) { m["items"] = items }
+}
+
+// saveToggleOf returns the raw "Save playlist to library" toggle of a
+// renderer's menu.
+func saveToggleOf(t *testing.T, r node) map[string]any {
+	t.Helper()
+	items, _ := menuItems(t, r)
+	for _, it := range items {
+		if toggle, ok := it.(map[string]any)["toggleMenuServiceItemRenderer"].(map[string]any); ok {
+			return toggle
+		}
+	}
+	t.Fatalf("no save toggle in %v", items)
+	return nil
+}
+
+// TestParsePlaylistMenus reads from playlists' menus which the user made,
+// to delete, and which they saved, to take out of the library: on the
+// cards of a grid, as the library's page lays them, and on the rows of a
+// search.
+func TestParsePlaylistMenus(t *testing.T) {
+	type flags struct{ deletable, saved, editable bool }
+	of := func(p *media.Playlist) flags { return flags{p.Deletable, p.Saved, p.Editable} }
+
+	cards := carouselItems(t, fixture(t, "mood-playlist-menus"), "Coffee shop blends")
+	if len(cards) != 2 {
+		t.Fatalf("%d cards", len(cards))
+	}
+	saved, owned := node{cards[0]}.get("musicTwoRowItemRenderer"), node{cards[1]}.get("musicTwoRowItemRenderer")
+	library := func() []media.Item {
+		shelves := parseShelves(libraryPage(map[string]any{"gridRenderer": map[string]any{"items": cards}}))
+		if len(shelves) != 1 || len(shelves[0].Items) != 2 {
+			t.Fatalf("library = %+v", shelves)
+		}
+		return shelves[0].Items
+	}
+	// Signed out, as recorded: neither.
+	for _, it := range library() {
+		if got := of(it.Playlist); got != (flags{}) {
+			t.Errorf("%s read signed out: %+v", it.Playlist.Title, got)
+		}
+	}
+	saveToggleOf(t, saved)["isToggled"] = true
+	items, set := menuItems(t, owned)
+	set(append(items, deleteItem("PLowned")))
+	got := library()
+	if f := of(got[0].Playlist); f != (flags{saved: true}) {
+		t.Errorf("the saved playlist: %+v", f)
+	}
+	if f := of(got[1].Playlist); f != (flags{deletable: true, editable: true}) {
+		t.Errorf("the playlist of the user: %+v", f)
+	}
+
+	// The rows of a search say the same in the same menus.
+	n := fixture(t, "search-playlist-menus")
+	rows := n.get("contents", "tabbedSearchResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer", "contents", 0, "musicShelfRenderer", "contents").list()
+	saveToggleOf(t, rows[0].get("musicResponsiveListItemRenderer"))["isToggled"] = true
+	items, set = menuItems(t, rows[1].get("musicResponsiveListItemRenderer"))
+	set(append(items, deleteItem("PLtestBBBBBBBBBBBB")))
+	found := parseSearch(n)
+	if len(found) != 2 || found[0].Playlist == nil || found[1].Playlist == nil {
+		t.Fatalf("search = %+v", found)
+	}
+	if f := of(found[0].Playlist); f != (flags{saved: true}) {
+		t.Errorf("the saved row: %+v", f)
+	}
+	if f := of(found[1].Playlist); f != (flags{deletable: true, editable: true}) {
+		t.Errorf("the row of the user's playlist: %+v", f)
+	}
+
+	// A toggle that's on but saves no playlist, and a remove without a
+	// target, say nothing.
+	if _, s := playlistMenu(parse(t, `{"menuRenderer":{"items":[
+		{"toggleMenuServiceItemRenderer":{"isToggled":true,"toggledServiceEndpoint":{"likeEndpoint":{"status":"LIKE","target":{"playlistId":"PLx"}}}}},
+		{"menuServiceItemRenderer":{"serviceEndpoint":{"likeEndpoint":{"status":"INDIFFERENT","target":{}}}}}]}}`)); s {
+		t.Error("read as saved")
+	}
+	// A plain item that takes the playlist out says it's saved.
+	if _, s := playlistMenu(parse(t, `{"menuRenderer":{"items":[
+		{"menuServiceItemRenderer":{"serviceEndpoint":{"likeEndpoint":{"status":"INDIFFERENT","target":{"playlistId":"PLx"}}}}}]}}`)); !s {
+		t.Error("a plain Remove from library doesn't read as saved")
+	}
+}
+
+// TestParsePlaylistDeletable reads from a playlist page's header whether
+// YouTube Music offers to delete the playlist, as it does its owner.
+func TestParsePlaylistDeletable(t *testing.T) {
+	n := fixture(t, "playlist-header")
+	if p, _, err := parsePlaylist(n, "PLx"); err != nil || p.Deletable || p.Editable {
+		t.Fatalf("a playlist of someone else: deletable %v, editable %v, %v", p.Deletable, p.Editable, err)
+	}
+	section := n.get("contents", "twoColumnBrowseResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer", "contents").v.([]any)
+	header := section[0].(map[string]any)["musicResponsiveHeaderRenderer"]
+	section[0] = map[string]any{"musicEditablePlaylistDetailHeaderRenderer": map[string]any{"header": map[string]any{"musicResponsiveHeaderRenderer": header}}}
+	var menu map[string]any
+	for _, b := range header.(map[string]any)["buttons"].([]any) {
+		if m, ok := b.(map[string]any)["menuRenderer"].(map[string]any); ok {
+			menu = m
+		}
+	}
+	if menu == nil {
+		t.Fatal("the header has no menu")
+	}
+	menu["items"] = append(menu["items"].([]any), deleteItem("PLx"))
+	if p, _, err := parsePlaylist(n, "PLx"); err != nil || !p.Deletable || !p.Editable {
+		t.Errorf("the owner's playlist: deletable %v, editable %v, %v", p.Deletable, p.Editable, err)
+	}
+	// A track's menu, in the other column, doesn't make the playlist one
+	// to delete.
+	n = fixture(t, "playlist")
+	shelf := n.get("contents", "twoColumnBrowseResultsRenderer", "secondaryContents", "sectionListRenderer", "contents", 0, "musicPlaylistShelfRenderer").v.(map[string]any)
+	shelf["contents"] = append(shelf["contents"].([]any), map[string]any{"musicResponsiveListItemRenderer": map[string]any{
+		"menu": map[string]any{"menuRenderer": map[string]any{"items": []any{deleteItem("PLx")}}},
+	}})
+	if p, _, err := parsePlaylist(n, "PLx"); err != nil || p.Deletable {
+		t.Errorf("a track's menu: deletable %v, %v", p.Deletable, err)
 	}
 }
 

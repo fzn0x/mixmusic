@@ -40,6 +40,39 @@ func (n node) get(path ...any) node {
 	return node{cur}
 }
 
+// maxFindDepth bounds how deep find looks, in objects and arrays.
+const maxFindDepth = 32
+
+// find returns a value under key anywhere in the node, looking through its
+// objects and arrays depth first, or the zero node: for what YouTube nests
+// at a depth it changes now and then, as an endpoint inside a dialog's
+// button inside a menu. Of several, which it returns is not fixed.
+func (n node) find(key string) node { return findIn(n.v, key, maxFindDepth) }
+
+func findIn(v any, key string, depth int) node {
+	if depth <= 0 {
+		return node{}
+	}
+	switch v := v.(type) {
+	case map[string]any:
+		if x, ok := v[key]; ok && x != nil {
+			return node{x}
+		}
+		for _, x := range v {
+			if f := findIn(x, key, depth-1); f.exists() {
+				return f
+			}
+		}
+	case []any:
+		for _, x := range v {
+			if f := findIn(x, key, depth-1); f.exists() {
+				return f
+			}
+		}
+	}
+	return node{}
+}
+
 // exists reports whether the node holds a value.
 func (n node) exists() bool { return n.v != nil }
 

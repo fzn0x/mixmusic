@@ -5,10 +5,14 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"math"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -16,6 +20,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/aac"
 	"github.com/fzn0x/mixmusic/internal/audio/resample"
 	"github.com/fzn0x/mixmusic/internal/mp4"
+	"github.com/fzn0x/mixmusic/internal/stream"
 )
 
 // Test files: AAC-LC in MP4, as ffmpeg makes it, from internal/mp4's
@@ -383,4 +388,46 @@ func ffmpegDecode(t *testing.T, path string) []float32 {
 		pcm = stereo
 	}
 	return pcm
+}
+
+// TestDeckPlaysAACThroughTheProxy plays an MP4 file as the app does: from
+// the stream package's proxy, which yt-dlp found it for, and which keeps it
+// in its cache, from which it plays again with the network gone.
+func TestDeckPlaysAACThroughTheProxy(t *testing.T) {
+	b, err := os.ReadFile(aacFragments)
+	if err != nil {
+		t.Fatal(err)
+	}
+	media := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeContent(w, r, "", time.Time{}, bytes.NewReader(b))
+	}))
+	defer media.Close()
+	r := stream.NewResolver(nil, "")
+	r.Run = func(context.Context, ...string) ([]byte, error) {
+		return fmt.Appendf(nil, `{"url": "%s/a?expire=%d", "ext": "m4a", "acodec": "mp4a.40.2", "filesize": %d}`,
+			media.URL, time.Now().Add(6*time.Hour).Unix(), len(b)), nil
+	}
+	p := stream.NewProxy(r)
+	p.Cache = stream.NewCache(t.TempDir(), 1<<20)
+	open := func(ctx context.Context, videoID string, interrupted func() bool) (Source, error) {
+		return p.Open(ctx, videoID, interrupted)
+	}
+	const videoID = "dpgUTslQkFs"
+	want := aacReference(t, aacFragments)
+	for _, from := range []string{"YouTube", "the cache"} {
+		d := newDeck(videoID, 0, open, func() {})
+		got := drain(t, d)
+		d.close()
+		// As the file plays, past the converter's window of its first frame.
+		if err := d.failure(); err != nil || len(got) != len(want) || !slices.Equal(got[2*64:], want[2*64:]) {
+			t.Fatalf("from %s: %d frames of %d, %.1f dB from the whole decode, %v", from, len(got)/2, len(want)/2, snr(got, want), err)
+		}
+		for deadline := time.Now().Add(5 * time.Second); !p.Cache.Has(videoID); {
+			if time.Now().After(deadline) {
+				t.Fatal("the stream played whole is not in the cache")
+			}
+			time.Sleep(time.Millisecond)
+		}
+		media.Close()
+	}
 }

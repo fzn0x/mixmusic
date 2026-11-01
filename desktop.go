@@ -22,7 +22,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 			})
 		}
 		toggle("tray", "Close to the tray", "Closing the window keeps the music playing; quit from the tray icon.", &s.set.CloseToTray)
-		toggle("media-keys", "Media keys", "The keyboard's play, next and previous keys control MixMusic.", &s.set.MediaKeys)
+		toggle("media-keys", "Media keys", "The keyboard's play, next and previous keys control MixMusic. Keys of your own that work everywhere are in Settings › Shortcuts.", &s.set.MediaKeys)
 		toggle("notifications", "Notifications", "Tell what starts playing while MixMusic is in the background.", &s.set.Notifications)
 		toggle("title", "Show what plays in the window title", "The window's title names the track that plays, for the taskbar, the window switcher and screen readers.", &s.set.ShowInTitle)
 		toggle("discord", "Show what plays on Discord", "While Discord runs, your profile says what you listen to, with the artwork and the time left; pausing clears it.", &s.set.DiscordPresence)
@@ -90,11 +90,12 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 	ui.Row(c).Gap(24).AlignItems(ui.Center).Margin(0, 0, 32).Children(func() {
 		ui.Text(c, "Shortcuts of a single key work while you are not typing; "+palette+" lists every command, those of plugins too.").
 			FontSize(k.smallSize()).TextColor(k.muted).Grow(1).MinWidth(0).MaxWidth(640)
-		if len(s.set.Shortcuts) > 0 && s.link(c, "shortcuts-reset", "reset all") {
-			s.set.Shortcuts, s.recording = nil, ""
+		if (len(s.set.Shortcuts) > 0 || len(s.set.GlobalShortcuts) > 0) && s.link(c, "shortcuts-reset", "reset all") {
+			s.set.Shortcuts, s.set.GlobalShortcuts, s.recording = nil, nil, ""
 			s.save()
 		}
 	})
+	s.globalShortcutSettings(c)
 	for _, g := range groups {
 		s.group(c, g, func() {
 			for _, cmd := range byGroup[g] {
@@ -166,6 +167,7 @@ func (s *shell) setShortcut(cmd command, keys string) {
 		s.set.Shortcuts = map[string]string{}
 	}
 	if keys != "" {
+		s.giveUpGlobal(cmd.id, keys)
 		for _, other := range s.commands() {
 			if other.id != cmd.id && sameShortcut(s.shortcutOf(other), keys) {
 				s.set.Shortcuts[other.id] = ""

@@ -35,18 +35,20 @@ type fakeMusic struct {
 // the radio of its song is of songs, and every other radio is the radio
 // of its music video, of videos.
 func newFakeMusic(t *testing.T) *fakeMusic {
+	songs := recorded(t, "search-songs-of-video")
+	ofSong, ofVideo := recorded(t, "next-song"), recorded(t, "next-video")
 	return &fakeMusic{
 		search: func(_ *http.Request, query string) []byte {
 			if strings.Contains(query, "Instant Crush") {
-				return recorded(t, "search-songs-of-video")
+				return songs
 			}
 			return nothing
 		},
 		radio: func(videoID string) []byte {
 			if videoID == "khnokW3Mw24" {
-				return recorded(t, "next-song")
+				return ofSong
 			}
-			return recorded(t, "next-video")
+			return ofVideo
 		},
 	}
 }

@@ -146,11 +146,14 @@ type Now struct {
 
 // Saved is the queue as it survives a restart.
 type Saved struct {
-	Tracks   []media.Track `json:"tracks"`
-	Index    int           `json:"index"`
-	Position int           `json:"position"` // in milliseconds
-	Shuffle  bool          `json:"shuffle"`
-	Repeat   Repeat        `json:"repeat"`
+	// Tracks is the part of the queue kept: the whole queue up to savedMax
+	// tracks, else the savedMax around the current one.
+	Tracks []media.Track `json:"tracks"`
+	// Index is the current track's place in Tracks, or -1.
+	Index    int    `json:"index"`
+	Position int    `json:"position"` // in milliseconds
+	Shuffle  bool   `json:"shuffle"`
+	Repeat   Repeat `json:"repeat"`
 }
 
 // Services are what the player asks of the app.
@@ -215,9 +218,26 @@ const (
 	restartAfter = 3 * time.Second
 	// radioMax is how many tracks a radio adds at most.
 	radioMax = 25
-	// savedMax is how many tracks of the queue are kept, at most.
+	// savedMax is how many tracks of the queue are kept, at most: the
+	// current one and those around it.
 	savedMax = 500
+	// savedBefore is how many of the tracks before the current one are
+	// kept when those after it would fill what is kept.
+	savedBefore = 50
 )
+
+// savedWindow returns the entries kept of a queue of n, whose current
+// entry is at index, or -1: all of them up to savedMax, else savedMax
+// around the current one, savedBefore of them before it and the rest
+// after it, or more before it when fewer come after.
+func savedWindow(n, index int) (from, to int) {
+	if n <= savedMax {
+		return 0, n
+	}
+	from = max(index-savedBefore, 0)
+	to = min(from+savedMax, n)
+	return max(to-savedMax, 0), to
+}
 
 // Player plays the queue. Its methods are safe for concurrent use, and
 // return at once: the player does what they ask on its own goroutine.

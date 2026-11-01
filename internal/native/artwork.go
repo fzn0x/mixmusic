@@ -185,6 +185,21 @@ func (a *artworks) retryIn(fails int, err error) time.Duration {
 	return d
 }
 
+// artColorWait is how long the accent waits to ask again for the colour
+// of artwork whose image couldn't load with err: artColorRetry, at least
+// what the host asked for, and half an hour, as a cover, for an address
+// that gives no image.
+func artColorWait(err error) time.Duration {
+	var ae *artwork.Error
+	switch {
+	case !errors.As(err, &ae):
+		return artColorRetry
+	case !ae.Temporary:
+		return artMissingRetry
+	}
+	return max(artColorRetry, ae.RetryAfter)
+}
+
 // load gets an image and scales it down to k's size.
 func (a *artworks) load(k artKey) (image.Image, error) {
 	src, err := a.src.Image(context.Background(), k.url)

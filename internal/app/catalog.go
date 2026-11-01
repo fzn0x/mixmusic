@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/lyrics"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/lyrics"
 )
 
 // shelfTimeout bounds how long the home page waits for each service.

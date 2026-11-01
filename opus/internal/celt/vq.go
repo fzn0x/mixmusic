@@ -3,7 +3,7 @@ package celt
 // Port of celt/vq.c, decoder side: the shape of a band from its pulses,
 // spread by rotations.
 
-import "github.com/fzn0x/mixmusic/internal/opus/rangedec"
+import "github.com/fzn0x/mixmusic/opus/internal/rangedec"
 
 var spreadFactor = [3]int{15, 10, 5}
 

@@ -3,7 +3,7 @@ package celt
 // Port of celt/rate.h and celt/rate.c: the allocation of bits to bands,
 // decoder side.
 
-import "github.com/fzn0x/mixmusic/internal/opus/rangedec"
+import "github.com/fzn0x/mixmusic/opus/internal/rangedec"
 
 const (
 	bitRes                = rangedec.BitRes

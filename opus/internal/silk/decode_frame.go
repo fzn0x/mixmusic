@@ -2,7 +2,7 @@
 
 package silk
 
-import "github.com/fzn0x/mixmusic/internal/opus/rangedec"
+import "github.com/fzn0x/mixmusic/opus/internal/rangedec"
 
 // decodeFrame is silk_decode_frame: decodes one frame into pOut, or conceals
 // it, and returns its length (*pN in C) and an error code.

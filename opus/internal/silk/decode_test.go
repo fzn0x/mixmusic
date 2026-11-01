@@ -5,8 +5,8 @@ import (
 	"math/rand/v2"
 	"testing"
 
-	"github.com/fzn0x/mixmusic/internal/opus/opustest"
-	"github.com/fzn0x/mixmusic/internal/opus/rangedec"
+	"github.com/fzn0x/mixmusic/opus/internal/opustest"
+	"github.com/fzn0x/mixmusic/opus/internal/rangedec"
 )
 
 // TestRandomPackets decodes random payloads in every configuration, with

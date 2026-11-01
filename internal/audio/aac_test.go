@@ -17,10 +17,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/aac"
-	"github.com/fzn0x/mixmusic/internal/audio/resample"
-	"github.com/fzn0x/mixmusic/internal/mp4"
+	"github.com/fzn0x/mixmusic/aac"
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/mp4"
+	"github.com/fzn0x/mixmusic/resample"
 )
 
 // Test files: AAC-LC in MP4, as ffmpeg makes it, from internal/mp4's
@@ -31,9 +31,9 @@ import (
 // at full scale, at 44.1 kHz. faststart is a mono 440 Hz at 48 kHz, at 1/8
 // of full scale, which plays unconverted.
 var (
-	aacFragments   = "../mp4/testdata/sidx.m4a"
-	aacProgressive = "../mp4/testdata/progressive.m4a"
-	aacMono48      = "../mp4/testdata/faststart.m4a"
+	aacFragments   = "../../mp4/testdata/sidx.m4a"
+	aacProgressive = "../../mp4/testdata/progressive.m4a"
+	aacMono48      = "../../mp4/testdata/faststart.m4a"
 	aacFiles       = []string{aacFragments, aacProgressive, aacMono48}
 )
 

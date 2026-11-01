@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/opus"
-	"github.com/fzn0x/mixmusic/internal/opus/opustest"
-	"github.com/fzn0x/mixmusic/internal/webm"
+	"github.com/fzn0x/mixmusic/opus"
+	"github.com/fzn0x/mixmusic/opus/internal/opustest"
+	"github.com/fzn0x/mixmusic/webm"
 )
 
 // hasLBRR is opus_packet_has_lbrr: whether the first SILK frame of a

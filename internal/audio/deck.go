@@ -11,8 +11,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/mp4"
-	"github.com/fzn0x/mixmusic/internal/webm"
+	"github.com/fzn0x/mixmusic/mp4"
+	"github.com/fzn0x/mixmusic/webm"
 )
 
 // Source is the file of a track, WebM or MP4, as a deck reads it: its bytes

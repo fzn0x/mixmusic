@@ -3,7 +3,7 @@ package celt
 // Port of celt/quant_bands.c, decoder side: the band energies, in log2
 // units, coarse then fine.
 
-import "github.com/fzn0x/mixmusic/internal/opus/rangedec"
+import "github.com/fzn0x/mixmusic/opus/internal/rangedec"
 
 var (
 	// predCoef and betaCoef are the time and frequency prediction of the

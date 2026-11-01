@@ -2,7 +2,7 @@
 
 package silk
 
-import "github.com/fzn0x/mixmusic/internal/opus/rangedec"
+import "github.com/fzn0x/mixmusic/opus/internal/rangedec"
 
 // decodeSplit is decode_split: splits the p pulses of a subframe between its
 // two child subframes.

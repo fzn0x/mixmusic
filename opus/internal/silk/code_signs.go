@@ -2,7 +2,7 @@
 
 package silk
 
-import "github.com/fzn0x/mixmusic/internal/opus/rangedec"
+import "github.com/fzn0x/mixmusic/opus/internal/rangedec"
 
 // decMap is silk_dec_map: shifting avoids if-statement.
 func decMap(a int32) int32 {

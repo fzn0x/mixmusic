@@ -2,7 +2,7 @@
 
 package silk
 
-import "github.com/fzn0x/mixmusic/internal/opus/rangedec"
+import "github.com/fzn0x/mixmusic/opus/internal/rangedec"
 
 // stereoDecodePred is silk_stereo_decode_pred: decodes the mid/side
 // predictors.

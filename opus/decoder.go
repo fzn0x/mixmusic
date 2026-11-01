@@ -7,9 +7,9 @@ import (
 	"errors"
 	"math"
 
-	"github.com/fzn0x/mixmusic/internal/opus/celt"
-	"github.com/fzn0x/mixmusic/internal/opus/rangedec"
-	"github.com/fzn0x/mixmusic/internal/opus/silk"
+	"github.com/fzn0x/mixmusic/opus/internal/celt"
+	"github.com/fzn0x/mixmusic/opus/internal/rangedec"
+	"github.com/fzn0x/mixmusic/opus/internal/silk"
 )
 
 var (

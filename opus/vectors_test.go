@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/fzn0x/mixmusic/internal/opus"
-	"github.com/fzn0x/mixmusic/internal/opus/opustest"
+	"github.com/fzn0x/mixmusic/opus"
+	"github.com/fzn0x/mixmusic/opus/internal/opustest"
 )
 
 // libopusFloat is, for each test vector, the SHA-256 of what libopus 1.6.1

@@ -2,7 +2,7 @@
 
 package silk
 
-import "github.com/fzn0x/mixmusic/internal/opus/rangedec"
+import "github.com/fzn0x/mixmusic/opus/internal/rangedec"
 
 // decodePulses is silk_decode_pulses: decodes the quantization indices of the
 // excitation; pulses must hold frameLength samples rounded up to a multiple

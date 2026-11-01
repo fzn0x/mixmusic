@@ -3,10 +3,10 @@ package celt_test
 import (
 	"testing"
 
-	"github.com/fzn0x/mixmusic/internal/opus"
-	"github.com/fzn0x/mixmusic/internal/opus/celt"
-	"github.com/fzn0x/mixmusic/internal/opus/opustest"
-	"github.com/fzn0x/mixmusic/internal/opus/rangedec"
+	"github.com/fzn0x/mixmusic/opus"
+	"github.com/fzn0x/mixmusic/opus/internal/celt"
+	"github.com/fzn0x/mixmusic/opus/internal/opustest"
+	"github.com/fzn0x/mixmusic/opus/internal/rangedec"
 )
 
 // endBand is the last CELT band of a bandwidth.

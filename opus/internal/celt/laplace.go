@@ -3,7 +3,7 @@ package celt
 // Port of celt/laplace.c: ec_laplace_decode, the Laplace-like distribution
 // of the coarse energies.
 
-import "github.com/fzn0x/mixmusic/internal/opus/rangedec"
+import "github.com/fzn0x/mixmusic/opus/internal/rangedec"
 
 const (
 	laplaceLogMinP = 0

@@ -4,8 +4,8 @@ import (
 	"math"
 	"testing"
 
-	"github.com/fzn0x/mixmusic/internal/opus"
-	"github.com/fzn0x/mixmusic/internal/opus/opustest"
+	"github.com/fzn0x/mixmusic/opus"
+	"github.com/fzn0x/mixmusic/opus/internal/opustest"
 )
 
 // fuzzPacket is a packet of an input of FuzzDecode, and how to decode it:

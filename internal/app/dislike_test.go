@@ -21,13 +21,13 @@ import (
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
-// asked notes the requests a fake service took, as "METHOD path?query".
-type asked struct {
+// requestLog notes the requests a fake service took, as "METHOD path?query".
+type requestLog struct {
 	mu   sync.Mutex
 	reqs []string
 }
 
-func (a *asked) note(r *http.Request) {
+func (a *requestLog) note(r *http.Request) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	line := r.Method + " " + r.URL.Path
@@ -38,7 +38,7 @@ func (a *asked) note(r *http.Request) {
 }
 
 // take returns the requests noted since the last take.
-func (a *asked) take() []string {
+func (a *requestLog) take() []string {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	out := a.reqs
@@ -76,7 +76,7 @@ func dislikeApp(t *testing.T, yt, sp http.HandlerFunc) *App {
 // YouTube Music tracks there, signed in. A dislike that takes the like of
 // a Spotify track back takes it out of the user's Spotify library.
 func TestSetDisliked(t *testing.T) {
-	var yt, sp asked
+	var yt, sp requestLog
 	a := dislikeApp(t, func(w http.ResponseWriter, r *http.Request) {
 		yt.note(r)
 		w.Write([]byte(`{"responseContext":{}}`))

@@ -212,6 +212,28 @@ func TestReplacing(t *testing.T) {
 	}
 }
 
+// A Flatpak's sandbox has Node.js for yt-dlp, and sees nothing of the
+// system's: the tools' rows say so.
+func TestToolsInFlatpak(t *testing.T) {
+	none := tools.Tool{}
+	if got := jsRuntimeHelp(none, false); !strings.Contains(got, "Install one") {
+		t.Errorf("without a runtime: %q", got)
+	}
+	if got := jsRuntimeHelp(none, true); !strings.Contains(got, "choose Find one") || strings.Contains(got, "Install one") {
+		t.Errorf("in a Flatpak, without the chosen runtime: %q", got)
+	}
+	node := tools.Tool{Found: true, Name: "node", Version: "v24.22.2"}
+	if got := jsRuntimeHelp(node, true); !strings.HasPrefix(got, "node v24.22.2 · ") {
+		t.Errorf("in a Flatpak, with its Node.js: %q", got)
+	}
+	if got := ownYTDLPHelp(true); !strings.Contains(got, "~/.var/app/io.github.fzn0x.mixmusic") {
+		t.Errorf("in a Flatpak, Own yt-dlp says %q", got)
+	}
+	if got := ownYTDLPHelp(false); strings.Contains(got, "Flatpak") {
+		t.Errorf("outside a Flatpak, Own yt-dlp says %q", got)
+	}
+}
+
 // TestQueueMenu plays an entry of the queue from its menu, keeping the
 // queue, as a double click does, and takes one out.
 func TestQueueMenu(t *testing.T) {

@@ -609,6 +609,51 @@ func TestEnd(t *testing.T) {
 	h.wait("b playing", playing("b"))
 }
 
+// TestEndReportsLoading tells the app of the next track as loading, not
+// paused, when one ends: the engine pauses at the end of a track before it
+// tells of the end.
+func TestEndReportsLoading(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Playing(false)
+	h.p.Ended()
+	h.wait("b playing", playing("b"))
+	h.svc.with(func(f *fakeServices) {
+		var b []Now
+		for _, r := range f.reports {
+			if r.Track != nil && r.Track.ID == "yt:b" {
+				b = append(b, r)
+			}
+		}
+		if len(b) < 2 || b[0].Playing || !b[0].Loading {
+			t.Fatalf("b was reported as %+v", b)
+		}
+		if last := b[len(b)-1]; !last.Playing || last.Loading {
+			t.Errorf("b playing was reported as %+v", last)
+		}
+	})
+}
+
+// TestFailureReports tells the app that a track that failed doesn't load
+// any more.
+func TestFailureReports(t *testing.T) {
+	h := newHarness(t, Saved{}, func(f *fakeServices) {
+		f.prepare = func(media.Track) (Source, error) { return Source{}, errors.New("offline.") }
+	})
+	h.p.PlayTracks(tracks("a"), 0)
+	h.wait("a failing", func(p *Player) bool { return p.s.Error != "" })
+	h.svc.with(func(f *fakeServices) {
+		n := len(f.reports)
+		if n < 2 || !f.reports[n-2].Loading {
+			t.Fatalf("a loading wasn't reported: %+v", f.reports)
+		}
+		if last := f.reports[n-1]; last.Track == nil || last.Track.ID != "yt:a" || last.Playing || last.Loading {
+			t.Errorf("a failing was reported as %+v", last)
+		}
+	})
+}
+
 // TestPlayID plays the entry of the queue a deep link names, and tells
 // why one the queue doesn't hold doesn't play.
 func TestPlayID(t *testing.T) {

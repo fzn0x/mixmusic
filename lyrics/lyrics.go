@@ -15,8 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/fzn0x/mixmusic/internal/media"
 )
 
 const defaultBaseURL = "https://lrclib.net/api"
@@ -83,6 +81,16 @@ type record struct {
 	SyncedLyrics string  `json:"syncedLyrics"`
 }
 
+// Query names the track whose lyrics to find.
+type Query struct {
+	Title, Artist string
+	// Album is the track's album, "" when unknown; LRCLIB matches it
+	// exactly when given.
+	Album string
+	// Duration is the track's length, 0 when unknown.
+	Duration time.Duration
+}
+
 // Get returns the lyrics of a track: the exact track when LRCLIB has it,
 // else the search result closest in duration.
 //
@@ -90,17 +98,13 @@ type record struct {
 // other sites, with HTTP 503, but still answers from its own database:
 // the exact track is then looked up there, and a track it doesn't have
 // is ErrNotFoundYet rather than ErrUnavailable.
-func (c *Client) Get(ctx context.Context, t media.Track) (Lyrics, error) {
-	artist := ""
-	if len(t.Artists) > 0 {
-		artist = t.Artists[0].Name
+func (c *Client) Get(ctx context.Context, t Query) (Lyrics, error) {
+	q := url.Values{"track_name": {t.Title}, "artist_name": {t.Artist}}
+	if t.Album != "" {
+		q.Set("album_name", t.Album)
 	}
-	q := url.Values{"track_name": {t.Title}, "artist_name": {artist}}
-	if t.Album != nil && t.Album.Name != "" {
-		q.Set("album_name", t.Album.Name)
-	}
-	if t.DurationMs > 0 {
-		q.Set("duration", strconv.Itoa(int(math.Round(float64(t.DurationMs)/1000))))
+	if t.Duration > 0 {
+		q.Set("duration", strconv.Itoa(int(math.Round(t.Duration.Seconds()))))
 	}
 	var rec record
 	busy := false
@@ -112,13 +116,13 @@ func (c *Client) Get(ctx context.Context, t media.Track) (Lyrics, error) {
 	}
 	if errors.Is(err, ErrNotFound) {
 		var found []record
-		switch err := c.get(ctx, "/search", url.Values{"track_name": {t.Title}, "artist_name": {artist}}, &found); {
+		switch err := c.get(ctx, "/search", url.Values{"track_name": {t.Title}, "artist_name": {t.Artist}}, &found); {
 		case errors.Is(err, ErrUnavailable):
 			busy = true
 		case err != nil:
 			return Lyrics{}, err
 		}
-		best, ok := closest(found, t.DurationMs)
+		best, ok := closest(found, int(t.Duration.Milliseconds()))
 		if !ok {
 			if busy {
 				return Lyrics{}, ErrNotFoundYet

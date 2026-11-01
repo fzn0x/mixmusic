@@ -7,8 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/fzn0x/mixmusic/internal/media"
+	"time"
 )
 
 func TestParseLRC(t *testing.T) {
@@ -39,7 +38,7 @@ func TestPlain(t *testing.T) {
 	}
 }
 
-var song = media.Track{Title: "Song", Artists: []media.Ref{{Name: "Artist"}}, Album: &media.Ref{Name: "Album"}, DurationMs: 200400}
+var song = Query{Title: "Song", Artist: "Artist", Album: "Album", Duration: 200400 * time.Millisecond}
 
 func TestGetExact(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

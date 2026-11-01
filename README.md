@@ -53,7 +53,7 @@ both services in one player:
 
 ## Features
 
-### New since 0.5.5
+### New in 0.5.6
 
 - **Zoom.** <kbd>Ctrl</kbd> <kbd>=</kbd> and <kbd>Ctrl</kbd> <kbd>-</kbd>
   make everything larger or smaller, from 80% to 200%, and

@@ -6,12 +6,52 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.6] - 2026-11-02
+
+Zoom makes the whole interface larger or smaller, from 80% to 200%
+(#106). YouTube Music tracks start in a moment (#69), play at an even
+loudness (#83), and play when YouTube has them only in AAC (#120). When
+the network drops, a song waits for it rather than MixMusic skipping
+songs (#91). MixMusic has a new icon, shows what plays on Discord with
+nothing to set up, and is under the MIT license or the GPL 3.0.
+MixMusic 0.3.0 and later offer this version in Settings › About.
+
 ### Added
 
 - The main window's title names the track that plays, for the taskbar,
   the window switcher and screen readers, and starts with "Paused:" while
   it's paused. Turn off "Show what plays in the window title" in
   Settings › Desktop to keep it to MixMusic's name (#105).
+- Covers you saw are kept on disk, up to 256 MB, so they show at once at
+  the next start, even offline. Settings › Playback says how many are
+  kept, under the offline cache, and clears them (#73).
+- Even loudness, in Settings › Playback and on by default: loud YouTube
+  Music tracks are turned down to one level from their first note, from
+  YouTube's own measure of each, so none jumps out. Quiet recordings keep
+  their level. Loud masters are common, and play 4 to 7 dB quieter than
+  before: turn up your system's volume, or turn Even loudness off, if they
+  sound too quiet now. Once measured, tracks keep their level offline too,
+  from the cache. Spotify tracks that Spotify plays keep Spotify's own
+  loudness (#83).
+- Zoom makes everything in MixMusic larger or smaller at once, from 80% to
+  200%: text, icons, buttons, rows and artwork, drawn sharp at the new size.
+  Ctrl+= (or Ctrl+Shift+=) zooms in, Ctrl+- zooms out and Ctrl+0 goes back
+  to 100%, or ⌘ on macOS. The keys are in the command palette and Settings ›
+  Shortcuts, where you can change them, and macOS's View menu has Zoom In,
+  Zoom Out and Actual Size. Settings › Appearance has a Zoom select above
+  Text size. Each change shows a toast with a reset button. The mini player
+  zooms too, and its window grows and shrinks with it. A window too small
+  for the zoom you chose zooms only as far as it has room for, and says so
+  (#106).
+- For developers: MixMusic's audio code is in Go packages anyone can
+  import, documented on pkg.go.dev: an Opus decoder (`opus`), an AAC-LC
+  decoder (`aac`), the audio of WebM and MP4 files (`webm`, `mp4`),
+  sample rate conversion (`resample`), synced lyrics from LRCLIB
+  (`lyrics`) and MixMusic's logo (`resources`).
+- For developers: with Nix, `nix build` builds MixMusic for Linux from
+  source, and `nix develop` gives the tools releases are built with, at
+  the versions `flake.lock` pins. Releases are built that way and
+  published with GoReleaser.
 
 ### Changed
 
@@ -44,6 +84,22 @@ All notable changes to MixMusic are documented here. The format follows
 - MixMusic pauses as the computer goes to sleep, and stays paused when it
   wakes, ready where it was; a Spotify Connect device elsewhere plays on
   (#91).
+- The volume slider has even steps of loudness: each tenth of it is 6 dB,
+  and one press of up or down is about 3 dB at every level down to -40 dB,
+  where it used to jump 6 dB or more near the quiet end. Your volume sounds
+  as before; the slider shows it further right. Spotify played in MixMusic
+  follows the same curve, and Spotify Connect devices get the same
+  percentage as before for the same loudness. A plugin that sets a fixed
+  volume with `api.player.setVolume()` gets that position's new loudness
+  (#82).
+- Data saver plays the original audio of the few videos that also come in
+  YouTube's stable-volume version, which is no smaller and squeezes the
+  sound (#83).
+- Plugins are written in TypeScript: the community's sleep timer and
+  spectrum, and the plugin API itself, which the type checker now holds to
+  the types of `sdk/index.d.ts`. MixMusic still runs the JavaScript they
+  compile to, so every plugin, and every installed version, works as
+  before. The plugin docs show how to write and compile one.
 
 ### Fixed
 
@@ -99,6 +155,47 @@ All notable changes to MixMusic are documented here. The format follows
 - A song whose audio stops coming in its last second ends there, rather
   than pausing to load that moment again, or showing an error for a song
   that had all but finished, and Repeat: one plays it again (#94).
+- A cover that fails to load on a flaky connection tries again within
+  seconds, rather than staying grey for a minute, and the others of its
+  service follow as soon as one loads. A connection that went silent is
+  dropped in about half a minute. The log now says which service's
+  covers failed and why (#73).
+- Dialogs fit a window shorter than they are, as on a small screen at a
+  large scale or with a tiling window manager: their title and buttons
+  stay in view, and what lies between them scrolls. This covers the
+  command palette, the update offer, and the questions MixMusic asks
+  before an action, which now look like its other dialogs. The palette's
+  list follows Up and Down, and the update offer opens with the focus on
+  later, so a Space pressed while it shows puts it off rather than
+  skipping that version (#76).
+- A volume that isn't a number, from a plugin or MPRIS, is ignored. It
+  used to silence MixMusic's own player until a restart, and break every
+  plugin's `api.player.state()` (#82).
+- Space plays or pauses after you click a tile, a switch, a chip, a link,
+  the player's buttons or a track's buttons. It no longer presses what you
+  clicked again, and after a search it no longer types a space into the
+  search box: a one-key shortcut such as M for mute runs instead. A
+  control you reach with Tab still takes Space and Enter (#98).
+- On Windows, a sign-in the Credential Manager can't keep is kept
+  encrypted for your Windows account, so you stay signed in after a
+  restart. Sign-in files in plain text found in MixMusic's data folder,
+  such as from a copy made on Linux, move into the system's credential
+  store and are deleted, on Linux too once a keyring is there (#104).
+- On macOS, ⌘R reaches Repeat. The View menu's Reload and Force Reload,
+  which did nothing in MixMusic's windows, held the key; MixMusic's own
+  View menu leaves them out (#106).
+- Tracks YouTube Music has only in AAC play now. They used to load for a
+  few seconds and fail, saying the audio format is not supported; the
+  audio engine plays AAC itself now, as it plays every other track. Other
+  tracks play as before (#120).
+- The lyrics panel says "No lyrics found for this track." when a track has
+  none, even while the lyrics service is too busy to look beyond its own
+  database, when trying again may still find some. It says lyrics can't be
+  loaded right now, with a button to try again, only when the service is
+  down or out of reach, rather than an error such as "lyrics: LRCLIB
+  answered HTTP 503".
+- A video that also comes in 5.1 surround plays its stereo audio: MixMusic
+  never picks a surround version, which it can't play yet, before it.
 
 ## [0.5.5] - 2026-10-28
 
@@ -506,7 +603,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.5...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.6...HEAD
+[0.5.6]: https://github.com/fzn0x/mixmusic/compare/v0.5.5...v0.5.6
 [0.5.5]: https://github.com/fzn0x/mixmusic/compare/v0.5.4...v0.5.5
 [0.5.4]: https://github.com/fzn0x/mixmusic/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/fzn0x/mixmusic/compare/v0.5.2...v0.5.3

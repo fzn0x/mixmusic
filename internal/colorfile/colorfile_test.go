@@ -288,3 +288,16 @@ func TestMatugenTemplate(t *testing.T) {
 		}
 	}
 }
+
+// TestMatugenTemplateDocs finds the template in docs/themes.md as
+// MatugenTemplate has it, which Settings copies.
+func TestMatugenTemplateDocs(t *testing.T) {
+	doc, err := os.ReadFile(filepath.Join("..", "..", "docs", "themes.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc = bytes.ReplaceAll(doc, []byte("\r\n"), []byte("\n"))
+	if !bytes.Contains(doc, []byte("```json\n"+MatugenTemplate+"```\n")) {
+		t.Error("docs/themes.md doesn't give the template as MatugenTemplate has it")
+	}
+}

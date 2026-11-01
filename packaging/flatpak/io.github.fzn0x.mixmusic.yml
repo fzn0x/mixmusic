@@ -72,9 +72,14 @@ modules:
       - type: file
         path: mixmusic.sh
       - type: file
+        path: system-loader.py
+      - type: file
         path: ../../resources/icon.svg
     build-commands:
-      # The app keeps everything it needs inside itself.
+      # The app keeps everything it needs inside itself. Built in Nix's
+      # shell, it names Nix's dynamic loader, which the runtime lacks:
+      # it runs on the runtime's.
+      - python3 system-loader.py app/mixmusic
       - install -Dm755 app/mixmusic /app/lib/mixmusic/mixmusic
       - install -Dm755 mixmusic.sh /app/bin/mixmusic
       # mygo build's entry, which opens mixmusic:// links, named after the

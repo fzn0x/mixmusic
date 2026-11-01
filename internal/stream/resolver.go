@@ -37,13 +37,17 @@ const (
 // saver takes the smallest Opus, else AAC-LC too. YouTube's stable-volume
 // formats, whose IDs end in -drc, come only when a video has no other of
 // their codec: their dynamics are squeezed, and the loudness YouTube
-// measured is of the original audio. Any other audio comes last, which
-// the engine then refuses, naming its format.
+// measured is of the original audio. Both are stereo, or mono: the
+// engine plays two channels, so a video's surround formats (AC-3 and
+// E-AC-3 in 5.1, or Opus or AAC of more channels) never come before them,
+// though the 5.1 ones are its best; a format whose channels yt-dlp doesn't
+// know passes. Any other audio comes last, which the engine then refuses,
+// naming its format.
 var formats = map[Quality]string{
-	QualityBest: "bestaudio[acodec=opus][format_id!*=drc]/bestaudio[acodec=opus]/" +
-		"bestaudio[acodec=mp4a.40.2][format_id!*=drc]/bestaudio[acodec=mp4a.40.2]/bestaudio",
-	QualitySaver: "worstaudio[acodec=opus][format_id!*=drc]/worstaudio[acodec=opus]/" +
-		"worstaudio[acodec=mp4a.40.2][format_id!*=drc]/worstaudio[acodec=mp4a.40.2]/worstaudio",
+	QualityBest: "bestaudio[acodec=opus][audio_channels<=?2][format_id!*=drc]/bestaudio[acodec=opus][audio_channels<=?2]/" +
+		"bestaudio[acodec=mp4a.40.2][audio_channels<=?2][format_id!*=drc]/bestaudio[acodec=mp4a.40.2][audio_channels<=?2]/bestaudio",
+	QualitySaver: "worstaudio[acodec=opus][audio_channels<=?2][format_id!*=drc]/worstaudio[acodec=opus][audio_channels<=?2]/" +
+		"worstaudio[acodec=mp4a.40.2][audio_channels<=?2][format_id!*=drc]/worstaudio[acodec=mp4a.40.2][audio_channels<=?2]/worstaudio",
 }
 
 // resolveTimeout bounds one run of yt-dlp.

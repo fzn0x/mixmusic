@@ -196,6 +196,20 @@ func TestReplacing(t *testing.T) {
 	if got := downloadLabel("unknown"); got != "download it" {
 		t.Errorf("an unknown kind's download is %q", got)
 	}
+	// A Flatpak installs the next bundle over itself, where the release
+	// has one for its processor.
+	if got := replacing("flatpak", "m.flatpak"); !strings.Contains(got, "flatpak install ./m.flatpak") {
+		t.Errorf("the Flatpak says %q", got)
+	}
+	if got := replacing("flatpak", ""); got != "" {
+		t.Errorf("a Flatpak without a bundle to install says %q", got)
+	}
+	if got := downloadLabel("flatpak"); got != "download the Flatpak" {
+		t.Errorf("the Flatpak's download is %q", got)
+	}
+	if got := buildNames["flatpak"]; got != "Flatpak" {
+		t.Errorf("About calls a Flatpak %q", got)
+	}
 }
 
 // TestQueueMenu plays an entry of the queue from its menu, keeping the

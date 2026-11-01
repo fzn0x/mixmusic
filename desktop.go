@@ -224,7 +224,7 @@ func (s *shell) updateSettings(c *ui.Context) {
 // UpdateStatus.Kind says.
 var buildNames = map[string]string{
 	"installer": "installed with the setup", "portable": "portable", "app": "app", "archive": "installed with install.sh",
-	"deb": ".deb package", "rpm": ".rpm package", "appimage": "AppImage", "development": "development build",
+	"deb": ".deb package", "rpm": ".rpm package", "appimage": "AppImage", "flatpak": "Flatpak", "development": "development build",
 }
 
 // releaseRow tells whether a newer version is out, and installs it, or
@@ -291,6 +291,7 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 var downloadLabels = map[string]string{
 	"installer": "download the installer", "portable": "download the portable zip", "app": "download the disk image",
 	"archive": "download the archive", "deb": "download the .deb", "rpm": "download the .rpm", "appimage": "download the AppImage",
+	"flatpak": "download the Flatpak",
 }
 
 // downloadLabel names the download that replaces a copy of kind.
@@ -311,6 +312,13 @@ func replacing(kind, file string) string {
 		return "Open " + file + " with your software center, or run sudo dnf install ./" + file + ". Your library and settings stay."
 	case "appimage":
 		return "Make " + file + " executable and use it in place of this AppImage. Your library and settings stay."
+	case "flatpak":
+		// A bundle's copy updates only from the next bundle: flatpak
+		// update doesn't know where it came from.
+		if file == "" {
+			return ""
+		}
+		return "Open " + file + " with your software center, or run flatpak install ./" + file + ". Your library and settings stay."
 	case "development":
 		return "Development builds don't update themselves."
 	}

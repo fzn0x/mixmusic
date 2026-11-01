@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/egoist/mygo"
 
@@ -103,8 +104,9 @@ func (p *Player) ForgetMatch(trackID string) error {
 	return p.a.matcher.Forget(trackID)
 }
 
-// Report tells the app what the player plays, for the tray,
-// notifications, the system's media controls, Discord and Last.fm.
+// Report tells the app what the player plays, for the tray, the main
+// window's title, notifications, the system's media controls, Discord and
+// Last.fm.
 func (p *Player) Report(np NowPlaying) {
 	p.a.mu.Lock()
 	prev := p.a.nowPlaying
@@ -122,8 +124,11 @@ func (p *Player) Report(np NowPlaying) {
 	}
 
 	changed := np.Track != nil && (prev.Track == nil || prev.Track.ID != np.Track.ID)
-	if tray != nil && (changed || prev.Playing != np.Playing) {
-		tray.SetToolTip(trayTip(np))
+	if tip := trayTip(np); tray != nil && tip != trayTip(prev) {
+		tray.SetToolTip(tip)
+	}
+	if windowTitle(np, s.ShowInTitle) != windowTitle(prev, s.ShowInTitle) {
+		p.a.retitle()
 	}
 	if changed && np.Playing && p.a.settings.Get().Notifications && (main == nil || !main.IsFocused()) {
 		go p.a.notifyTrack(*np.Track)
@@ -138,20 +143,64 @@ func (a *App) command(cmd PlayerCommand) {
 	}
 }
 
-// trayTip is the tray's tooltip for what plays.
-func trayTip(np NowPlaying) string {
+// trayTip is the tray's tooltip for what plays. Windows cuts tooltips at
+// 127 characters.
+func trayTip(np NowPlaying) string { return cut(playingLine(np), 120) }
+
+// windowTitle is the main window's title: what plays, unless the settings
+// keep it to MixMusic's name.
+func windowTitle(np NowPlaying, show bool) string {
+	if !show {
+		return "MixMusic"
+	}
+	return cut(playingLine(np), 256)
+}
+
+// playingLine names what plays, as the tray's tooltip and the main
+// window's title show it: "One More Time — Daft Punk", after "Paused: "
+// while it's paused, or "MixMusic" with nothing to play.
+func playingLine(np NowPlaying) string {
 	if np.Track == nil {
 		return "MixMusic"
 	}
-	tip := np.Track.Title + " — " + np.Track.ArtistNames()
-	if !np.Playing {
-		tip = "Paused: " + tip
+	line := oneLine(np.Track.Title)
+	if line == "" {
+		return "MixMusic"
 	}
-	// Windows cuts tooltips at 127 characters.
-	if r := []rune(tip); len(r) > 120 {
-		tip = string(r[:119]) + "…"
+	if artists := oneLine(np.Track.ArtistNames()); artists != "" {
+		line += " — " + artists
 	}
-	return tip
+	// A track that loads plays once loaded. As one track ends, the next
+	// loads with the player paused: it isn't a pause.
+	if !np.Playing && !np.Loading {
+		line = "Paused: " + line
+	}
+	return line
+}
+
+// oneLine is s as a title shows it, on one line: valid UTF-8, macOS taking
+// no title that isn't, with control characters, line breaks among them, as
+// spaces, and no runs of spaces. The marks that turn the direction of the
+// text after them go, so that a title can't turn its artists around.
+func oneLine(s string) string {
+	s = strings.Map(func(r rune) rune {
+		switch {
+		case unicode.IsControl(r):
+			return ' '
+		case r >= '‪' && r <= '‮', r >= '⁦' && r <= '⁩':
+			return -1
+		}
+		return r
+	}, strings.ToValidUTF8(s, "�"))
+	return strings.Join(strings.Fields(s), " ")
+}
+
+// cut cuts s to n characters at most, the last of them an ellipsis.
+func cut(s string, n int) string {
+	if r := []rune(s); len(r) > n {
+		return string(r[:n-1]) + "…"
+	}
+	return s
 }
 
 // notifyTrack shows a notification of the track that started.

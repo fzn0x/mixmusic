@@ -19,14 +19,16 @@ const (
 // NowPlaying is what the player plays, as it reports it to the tray,
 // notifications, the system's media controls, Discord and Last.fm.
 type NowPlaying struct {
-	Track      *media.Track `json:"track"`
-	Playing    bool         `json:"playing"`
-	PositionMs int          `json:"positionMs"`
-	DurationMs int          `json:"durationMs"`
-	Volume     float64      `json:"volume"`
-	Shuffle    bool         `json:"shuffle"`
-	Repeat     Repeat       `json:"repeat"`
-	Liked      bool         `json:"liked"`
+	Track   *media.Track `json:"track"`
+	Playing bool         `json:"playing"`
+	// Loading is set while the track is asked to play and doesn't yet.
+	Loading    bool    `json:"loading"`
+	PositionMs int     `json:"positionMs"`
+	DurationMs int     `json:"durationMs"`
+	Volume     float64 `json:"volume"`
+	Shuffle    bool    `json:"shuffle"`
+	Repeat     Repeat  `json:"repeat"`
+	Liked      bool    `json:"liked"`
 }
 
 // Command is something the player is asked to do from outside its

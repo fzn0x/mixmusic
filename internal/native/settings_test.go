@@ -153,6 +153,33 @@ func TestCacheOff(t *testing.T) {
 	}
 }
 
+// TestTitleSwitch turns what plays in the window's title off and on again
+// from Settings › Desktop (#105). Its row's title carries the switch's
+// words too, so the keyboard reaches the switch: focused, it has them, and
+// the row's description doesn't.
+func TestTitleSwitch(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 1800)
+	show(s, tt, "/settings/desktop")
+	const label = "Show what plays in the window title"
+	const description = "The window's title names the track that plays, for the taskbar, the window switcher and screen readers."
+	focused := func() bool { return tt.Focused(label) && !tt.Focused(description) }
+	for i := 0; i < 100 && !focused(); i++ {
+		tt.Key(0, ui.KeyTab)
+	}
+	if !focused() {
+		t.Fatalf("Tab doesn't reach the switch: %q", tt.Texts())
+	}
+	for _, want := range []bool{false, true} {
+		tt.Key(0, ui.KeySpace)
+		s.drain()
+		tt.Frame()
+		if got := s.svc.Preferences.Get().ShowInTitle; got != want {
+			t.Errorf("the switch left the title showing what plays %v, not %v", got, want)
+		}
+	}
+}
+
 func TestCacheSizeLabel(t *testing.T) {
 	for mb, want := range map[int]string{0: "Off", 512: "512 MB", 1024: "1 GB", 16384: "16 GB", 1536: "1536 MB"} {
 		if got := cacheSizeLabel(mb); got != want {

@@ -6,6 +6,13 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The main window's title names the track that plays, for the taskbar,
+  the window switcher and screen readers, and starts with "Paused:" while
+  it's paused. Turn off "Show what plays in the window title" in
+  Settings › Desktop to keep it to MixMusic's name (#105).
+
 ### Changed
 
 - A new icon: two pink rings and a play button on black, in the app, the
@@ -38,6 +45,9 @@ All notable changes to MixMusic are documented here. The format follows
   version's code.
 - On Windows, a frame the screen never takes no longer holds up MixMusic
   for a second (#87).
+- On macOS, closing the window in full screen with "Close to the tray"
+  on no longer leaves an empty, black Space: the window leaves full
+  screen, then hides in the tray, and comes back in full screen (#84).
 - YouTube Music tracks start in a moment, rather than several seconds
   after you press play: MixMusic asks YouTube for a track's audio itself,
   and runs yt-dlp only for the tracks YouTube won't give it that way, such

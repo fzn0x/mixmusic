@@ -223,6 +223,8 @@ func (p *Player) fail(message string) {
 	p.s.Buffering = false
 	p.s.Loading = false
 	p.s.Playing = false
+	// The app last heard of the track as loading: it hears it stopped.
+	p.report()
 	p.emit(StateChange)
 	p.failures++
 	stop := p.failures >= maxFailures
@@ -503,6 +505,7 @@ func (p *Player) apply() {
 func (p *Player) now() Now {
 	n := Now{
 		Playing:  p.s.Playing,
+		Loading:  p.s.Loading,
 		Position: p.s.Position,
 		Duration: p.s.Duration,
 		Volume:   p.s.Volume,

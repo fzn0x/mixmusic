@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"slices"
 
 	"github.com/egoist/mygo/ui"
 
@@ -195,26 +196,38 @@ func (s *shell) spotifyLibrary(c *ui.Context) {
 				s.problem(c, first.err, func() { s.forget("spotify:liked") })
 				return
 			}
-			tracks := append(first.value.Tracks, s.spotifyMore...)
+			// The pages loaded past the first follow the first page that
+			// came last: one of a refresh, a try again or another account
+			// starts the list again.
+			if s.spotifyLikedOf != first || s.spotifyLikedAt != first.answers {
+				s.spotifyLiked, s.spotifyLikedOf, s.spotifyLikedAt = slices.Clip(first.value.Tracks), first, first.answers
+			}
+			tracks := s.spotifyLiked
 			s.trackList(c, "spotify-liked", tracks, trackListOptions{art: true, album: true, empty: "No liked songs on Spotify."})
 			if len(tracks) < first.value.Total {
 				label := "load more · " + count(len(tracks)) + " of " + count(first.value.Total)
 				if s.button(c, "spotify-more", label, false).Disabled(s.loadingMore).Clicked() {
 					s.loadingMore = true
-					go func(offset int) {
+					go func(at, offset int) {
 						page, err := col.SpotifyLikedTracks(context.Background(), offset)
-						s.update(func() {
-							s.loadingMore = false
-							if err != nil {
-								s.notes = append(s.notes, noticeOf(err))
-								return
-							}
-							s.spotifyMore = append(s.spotifyMore, page.Tracks...)
-						})
-					}(len(tracks))
+						s.update(func() { s.tookSpotifyLiked(first, at, page, err) })
+					}(first.answers, len(tracks))
 				}
 			}
 		})
+}
+
+// tookSpotifyLiked adds a page of liked songs on Spotify that load more
+// brought, unless the first page it came after is gone: answer at of
+// first.
+func (s *shell) tookSpotifyLiked(first *loaded[app.TrackPage], at int, page app.TrackPage, err error) {
+	s.loadingMore = false
+	switch {
+	case err != nil:
+		s.notes = append(s.notes, noticeOf(err))
+	case s.spotifyLikedOf == first && s.spotifyLikedAt == at:
+		s.spotifyLiked = append(s.spotifyLiked, page.Tracks...)
+	}
 }
 
 func (s *shell) youtubeLibrary(c *ui.Context) {

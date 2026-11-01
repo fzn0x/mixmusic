@@ -207,10 +207,13 @@ type shell struct {
 	renaming, deleting, clearingHistory bool
 	renameTo, renameID                  string
 	deleteID, deleteTitle               string
-	// spotifyMore holds the liked songs on Spotify loaded past the first
-	// page.
-	spotifyMore []media.Track
-	loadingMore bool
+	// spotifyLiked are the liked songs on Spotify the library shows: the
+	// first page, of answer spotifyLikedAt of spotifyLikedOf, then those
+	// loaded past it, while loadingMore.
+	spotifyLiked   []media.Track
+	spotifyLikedOf *loaded[app.TrackPage]
+	spotifyLikedAt int
+	loadingMore    bool
 	// keeping holds the pages whose saving or following waits for the
 	// service, by their keys.
 	keeping map[string]bool

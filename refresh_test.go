@@ -12,6 +12,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/plugins"
@@ -363,5 +364,49 @@ func TestRefreshRegistry(t *testing.T) {
 	waitRefreshed(t, s, tt)
 	if !tt.HasText("paper mint") {
 		t.Errorf("the refresh didn't ask the registry: %q", tt.Texts())
+	}
+}
+
+// TestSpotifyLikedStartsAgain starts the liked songs on Spotify again at
+// the first page that came last, of a refresh, a try again or another
+// account, rather than keep the pages load more brought after the one
+// before; a page of load more that comes after it is dropped.
+func TestSpotifyLikedStartsAgain(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{Spotify: app.SpotifyAccount{SignedIn: true}}}
+	s.loads["spotify:playlists"] = &loaded[[]media.Playlist]{done: true}
+	s.loads["spotify:albums"] = &loaded[[]media.Album]{done: true}
+	s.loads["spotify:artists"] = &loaded[[]media.Artist]{done: true}
+	first := &loaded[app.TrackPage]{done: true, value: app.TrackPage{Tracks: testTracks[:2], Total: 4}}
+	s.loads["spotify:liked"] = first
+	tt := testerOf(t, s, 1280, 2000)
+	show(s, tt, "/library/spotify")
+	if !tt.HasText("load more · 2 of 4") {
+		t.Fatalf("the liked songs on Spotify: %q", tt.Texts())
+	}
+	// The second page, as load more brings it.
+	s.tookSpotifyLiked(first, first.answers, app.TrackPage{Tracks: testTracks[2:4], Total: 4}, nil)
+	tt.Frame()
+	if !tt.HasText(testTracks[3].Title) || tt.HasText("load more") {
+		t.Fatalf("load more didn't add the second page: %q", tt.Texts())
+	}
+
+	// A refresh's first page.
+	first.value, first.answers = app.TrackPage{Tracks: testTracks[4:5], Total: 4}, first.answers+1
+	tt.Frame()
+	if tt.HasText(testTracks[3].Title) || !tt.HasText(testTracks[4].Title) || !tt.HasText("load more · 1 of 4") {
+		t.Errorf("the refresh's first page didn't start the list again: %q", tt.Texts())
+	}
+	s.tookSpotifyLiked(first, first.answers-1, app.TrackPage{Tracks: testTracks[2:4], Total: 4}, nil)
+	tt.Frame()
+	if tt.HasText(testTracks[3].Title) {
+		t.Errorf("a page of load more of the first page before stayed: %q", tt.Texts())
+	}
+
+	// Another account's, after signing in, as clear(s.loads) leaves it.
+	s.loads["spotify:liked"] = &loaded[app.TrackPage]{done: true, value: app.TrackPage{Tracks: testTracks[5:6], Total: 1}}
+	tt.Frame()
+	if tt.HasText(testTracks[4].Title) || !tt.HasText(testTracks[5].Title) {
+		t.Errorf("another first page didn't start the list again: %q", tt.Texts())
 	}
 }

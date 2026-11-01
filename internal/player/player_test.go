@@ -36,6 +36,11 @@ type fakeServices struct {
 	volumes   []float64
 	saved     []Saved
 	prepared  []string
+	// reportHook, when set, runs in Report, outside the lock, as the app's
+	// waits on the main thread; saveHook runs in SaveQueue before it keeps
+	// the queue, as a slow disk.
+	reportHook func()
+	saveHook   func(Saved)
 }
 
 func newServices() *fakeServices {
@@ -91,19 +96,31 @@ func (f *fakeServices) Settings() settings.Settings {
 	return f.settings
 }
 
+// SaveVolume keeps the volume in the settings, as the app's does.
 func (f *fakeServices) SaveVolume(v float64) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.volumes = append(f.volumes, v)
+	f.settings.Volume = v
 }
 
 func (f *fakeServices) Report(now Now) {
 	f.mu.Lock()
-	defer f.mu.Unlock()
 	f.reports = append(f.reports, now)
+	hook := f.reportHook
+	f.mu.Unlock()
+	if hook != nil {
+		hook()
+	}
 }
 
 func (f *fakeServices) SaveQueue(s Saved) {
+	f.mu.Lock()
+	hook := f.saveHook
+	f.mu.Unlock()
+	if hook != nil {
+		hook(s)
+	}
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.saved = append(f.saved, s)
@@ -1067,6 +1084,171 @@ func TestRestorePastSavedTracks(t *testing.T) {
 	h = newHarness(t, Saved{Tracks: tracks("a", "b"), Index: -1, Position: 42000})
 	if s := h.p.State(); s.Index != 0 || s.Position != 0 {
 		t.Errorf("restored %d at %v", s.Index, s.Position)
+	}
+}
+
+// savedIDs is the ids of the tracks a queue kept, without "yt:".
+func savedIDs(s Saved) []string {
+	ids := make([]string, len(s.Tracks))
+	for i, t := range s.Tracks {
+		ids[i] = strings.TrimPrefix(t.ID, "yt:")
+	}
+	return ids
+}
+
+// kept is whether the queue kept last holds the tracks ids.
+func (h *harness) kept(ids ...string) func(*Player) bool {
+	return func(*Player) bool { return slices.Equal(savedIDs(h.lastSaved()), ids) }
+}
+
+// saves is how many times the queue was kept.
+func (h *harness) saves() int {
+	n := 0
+	h.svc.with(func(f *fakeServices) { n = len(f.saved) })
+	return n
+}
+
+// TestQueueEditsSaved edits the queue while paused, when nothing plays to
+// report it: each edit is kept.
+func TestQueueEditsSaved(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Pause()
+	h.wait("paused", func(p *Player) bool { return !p.s.Playing })
+	// Past the save the pause asked for, which would keep an edit made
+	// right after it.
+	time.Sleep(10 * saveEvery)
+	h.p.Enqueue(tracks("c"))
+	h.wait("c kept", h.kept("a", "b", "c"))
+	h.p.PlayNext(tracks("d"))
+	h.wait("d kept", h.kept("a", "d", "b", "c"))
+	h.p.Move(3, 1)
+	h.wait("the move kept", h.kept("a", "c", "d", "b"))
+	h.p.RemoveAt(2)
+	h.wait("the removal kept", h.kept("a", "c", "b"))
+	h.p.ClearUpcoming()
+	h.wait("the clearing kept", h.kept("a"))
+
+	// A queue kept from the last run is kept as it is edited before it
+	// plays.
+	r := newHarness(t, Saved{Tracks: tracks("a", "b"), Index: 0})
+	r.wait("the queue saved at start", r.kept("a", "b"))
+	time.Sleep(10 * saveEvery)
+	r.p.Enqueue(tracks("c"))
+	r.wait("c kept", r.kept("a", "b", "c"))
+}
+
+// TestFlush keeps at once what the throttle and the volume's delay hold
+// back, and writes the queue again only once the player changed.
+func TestFlush(t *testing.T) {
+	save, volume := saveEvery, saveVolumeAfter
+	saveEvery, saveVolumeAfter = time.Hour, time.Hour
+	t.Cleanup(func() { saveEvery, saveVolumeAfter = save, volume })
+	h := newHarness(t, Saved{})
+	h.wait("the first save", func(*Player) bool { return h.saves() == 1 })
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Enqueue(tracks("c"))
+	h.p.CycleRepeat()
+	h.p.SetVolume(0.3)
+	h.on(func(*Player) {})
+	if n := h.saves(); n != 1 {
+		t.Fatalf("%d saves before Flush, want the throttle to hold them", n)
+	}
+	h.p.Flush()
+	if last := h.lastSaved(); !slices.Equal(savedIDs(last), []string{"a", "b", "c"}) || last.Index != 0 || last.Repeat != RepeatAll {
+		t.Errorf("flushed %v %+v", savedIDs(last), last)
+	}
+	var volumes []float64
+	h.svc.with(func(f *fakeServices) { volumes = slices.Clone(f.volumes) })
+	if !slices.Equal(volumes, []float64{0.3}) {
+		t.Errorf("volumes kept %v, want [0.3]", volumes)
+	}
+	h.p.Flush()
+	if n := h.saves(); n != 2 {
+		t.Errorf("%d saves after a second Flush, want 2", n)
+	}
+	h.p.Next()
+	h.wait("b playing", playing("b"))
+	h.p.Flush()
+	if last := h.lastSaved(); h.saves() != 3 || last.Index != 1 {
+		t.Errorf("%d saves, the last at %d, after Next and Flush", h.saves(), last.Index)
+	}
+}
+
+// TestFlushWhileReportWaits flushes while the player's goroutine waits in
+// Report, as the app's waits on the main thread for the tray: Flush keeps
+// the state last published, without waiting.
+func TestFlushWhileReportWaits(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Enqueue(tracks("c"))
+	h.wait("c published", func(p *Player) bool { return len(p.s.Queue) == 3 })
+	release, waiting := make(chan struct{}), make(chan struct{})
+	var once sync.Once
+	h.svc.with(func(f *fakeServices) {
+		f.reportHook = func() {
+			once.Do(func() { close(waiting) })
+			<-release
+		}
+	})
+	h.p.Next()
+	<-waiting
+	done := make(chan struct{})
+	go func() {
+		h.p.Flush()
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Error("Flush waited on the player's goroutine")
+	}
+	h.svc.with(func(f *fakeServices) { f.reportHook = nil })
+	close(release)
+	<-done
+	if got := savedIDs(h.lastSaved()); !slices.Equal(got, []string{"a", "b", "c"}) {
+		t.Errorf("flushed %v", got)
+	}
+}
+
+// TestFlushAfterSlowWrite flushes while a write started before waits on
+// the disk: the older queue doesn't land over the newer one.
+func TestFlushAfterSlowWrite(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks("a"), 0)
+	h.wait("a playing", playing("a"))
+	h.wait("a kept", h.kept("a"))
+	time.Sleep(2 * saveEvery) // the next save starts at once
+	release, slow := make(chan struct{}), make(chan struct{})
+	var once sync.Once
+	h.svc.with(func(f *fakeServices) {
+		f.saveHook = func(Saved) {
+			once.Do(func() {
+				close(slow)
+				<-release
+			})
+		}
+	})
+	h.p.CycleRepeat()
+	<-slow
+	h.p.Enqueue(tracks("b"))
+	h.wait("b published", func(p *Player) bool { return len(p.s.Queue) == 2 })
+	done := make(chan struct{})
+	go func() {
+		h.p.Flush()
+		close(done)
+	}()
+	close(release)
+	<-done
+	if last := h.lastSaved(); !slices.Equal(savedIDs(last), []string{"a", "b"}) || last.Repeat != RepeatAll {
+		t.Errorf("flushed %v %+v", savedIDs(last), last)
+	}
+	time.Sleep(10 * saveEvery) // the saves held meanwhile land
+	if last := h.lastSaved(); !slices.Equal(savedIDs(last), []string{"a", "b"}) || last.Repeat != RepeatAll {
+		t.Errorf("kept last %v %+v", savedIDs(last), last)
 	}
 }
 

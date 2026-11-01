@@ -193,6 +193,15 @@ func (s *Snapshot) Missing(id string, tracks []media.Track) int {
 	return n
 }
 
+// HasVideo reports whether the downloads hold the audio of a video.
+func (s *Snapshot) HasVideo(video string) bool {
+	if s == nil {
+		return false
+	}
+	_, ok := s.files[video]
+	return ok
+}
+
 // ArtworkFile returns the file that keeps the cover at url, if a download
 // keeps it.
 func (s *Snapshot) ArtworkFile(url string) (string, bool) {

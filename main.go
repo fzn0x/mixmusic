@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/egoist/mygo"
@@ -36,7 +37,8 @@ const version = "0.5.6"
 func main() {
 	// MIXMUSIC_DATA_DIR keeps everything in one folder: a portable copy,
 	// or a test run apart from the user's own data.
-	if dir := os.Getenv("MIXMUSIC_DATA_DIR"); dir != "" {
+	portable := os.Getenv("MIXMUSIC_DATA_DIR")
+	if dir := portable; dir != "" {
 		mygo.App.SetPath(mygo.PathUserData, filepath.Join(dir, "data"))
 		mygo.App.SetPath(mygo.PathCache, filepath.Join(dir, "cache"))
 		mygo.App.SetPath(mygo.PathLogs, filepath.Join(dir, "logs"))
@@ -69,16 +71,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	home, _ := os.UserHomeDir()
 	a, err := app.New(app.Options{
-		DataDir:   dataDir,
-		CacheDir:  cacheDir,
-		Builtin:   builtin.FS,
-		TrayIcon:  trayIcon,
-		Version:   version,
-		LogsDir:   logsDir,
-		LastCrash: lastCrash,
-		Interface: Open,
-		Mini:      OpenMini,
+		DataDir:      dataDir,
+		CacheDir:     cacheDir,
+		DownloadsDir: defaultDownloadsDir(runtime.GOOS, portable, dataDir, cacheDir, home, os.Getenv("XDG_DATA_HOME")),
+		Builtin:      builtin.FS,
+		TrayIcon:     trayIcon,
+		Version:      version,
+		LogsDir:      logsDir,
+		LastCrash:    lastCrash,
+		Interface:    Open,
+		Mini:         OpenMini,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -91,4 +95,30 @@ func main() {
 	if err := mygo.App.Run(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// defaultDownloadsDir is the folder the downloads are in on goos, unless
+// the user chose another: in the folder of the app's data that the system
+// keeps, never its cache, whose files may go, nor the Windows folder that
+// roams. A portable copy keeps them in its own folder.
+//
+//   - Windows: %LocalAppData%\MixMusic\downloads, beside the cache
+//   - macOS: ~/Library/Application Support/MixMusic/downloads
+//   - Linux and others: $XDG_DATA_HOME/MixMusic/downloads, of
+//     ~/.local/share without it; a relative XDG_DATA_HOME doesn't count,
+//     as the XDG specification says.
+func defaultDownloadsDir(goos, portable, dataDir, cacheDir, home, xdgDataHome string) string {
+	switch {
+	case portable != "":
+		return filepath.Join(portable, "downloads")
+	case goos == "windows":
+		return filepath.Join(cacheDir, "downloads")
+	case goos == "darwin":
+		return filepath.Join(dataDir, "downloads")
+	}
+	base := xdgDataHome
+	if !filepath.IsAbs(base) {
+		base = filepath.Join(home, ".local", "share")
+	}
+	return filepath.Join(base, filepath.Base(dataDir), "downloads")
 }

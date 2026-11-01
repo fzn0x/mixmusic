@@ -134,6 +134,13 @@ var _ player.Network = playerServices{}
 
 // Online, WaitOnline and KickOnline are the network, as the player waits
 // for it.
+var _ player.Offline = playerServices{}
+
+// Offline and PlaysOffline tell the player which tracks play while the
+// network is gone.
+func (s playerServices) Offline() bool                   { return s.a.offline() }
+func (s playerServices) PlaysOffline(t media.Track) bool { return s.a.playsOffline(t) }
+
 func (s playerServices) Online(ctx context.Context) bool      { return s.a.online.Check(ctx) }
 func (s playerServices) WaitOnline(ctx context.Context) error { return s.a.online.Wait(ctx) }
 func (s playerServices) KickOnline()                          { s.a.online.Kick() }
@@ -252,6 +259,7 @@ type Services struct {
 	Preferences *Preferences
 	Addons      *Addons
 	System      *System
+	Downloads   *Downloads
 }
 
 // Services returns the app's services.
@@ -264,6 +272,7 @@ func (a *App) Services() Services {
 		Preferences: &Preferences{a},
 		Addons:      &Addons{a},
 		System:      &System{a},
+		Downloads:   &Downloads{a},
 	}
 }
 
@@ -276,6 +285,8 @@ func (a *App) InstallYTDLP(ctx context.Context, progress func(done, total int64)
 	if err := a.tools.InstallYTDLP(ctx, progress); err != nil {
 		return tools.Status{}, err
 	}
+	// The downloads that needed it, or a newer one, try again.
+	a.downloads.RetryFailed()
 	return a.tools.Status(ctx), nil
 }
 

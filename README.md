@@ -432,9 +432,8 @@ talks to:
   MixMusic.
 - **Unison:** the video ID of the track that plays, or, without one, its
   title, artists, album and length, to find its lyrics. Only while you
-  turn on translate or romaji beside the lyrics, the lyrics of the track
-  that plays, with its video ID, which Unison has Google translate or
-  romanize.
+  turn on translate, or romanize, beside the lyrics, the lyrics of the
+  track that plays, with its video ID, which Unison has Google translate.
 - **LRCLIB:** the title, artists, album and length of the track that plays,
   to find its lyrics.
 - **GitHub:** a check for a new version at start and every few hours,

@@ -1,0 +1,36 @@
+# GoReleaser publishes a release of what Nix built: release.yml builds the
+# apps with `mygo build` in the Nix shell of flake.nix, into release/,
+# which .gitignore leaves out, then runs GoReleaser in that shell too. It
+# uploads every file of release/ with SHA256SUMS, under the notes
+# release.yml takes from CHANGELOG.md (--release-notes), and builds nothing
+# itself.
+version: 2
+project_name: mixmusic
+
+builds:
+  - skip: true
+
+archives:
+  - formats: [none]
+
+checksum:
+  name_template: SHA256SUMS
+  algorithm: sha256
+  extra_files:
+    - glob: ./release/*
+
+release:
+  github:
+    owner: fzn0x
+    name: mixmusic
+  name_template: "MixMusic {{ .Tag }}"
+  make_latest: true
+  # release.yml run by hand builds an existing tag again: its release
+  # takes the new notes and files.
+  mode: replace
+  replace_existing_artifacts: true
+  extra_files:
+    - glob: ./release/*
+
+changelog:
+  disable: true

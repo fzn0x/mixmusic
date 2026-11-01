@@ -4,6 +4,7 @@ node_modules/
 # Builds
 /dist/
 /build/
+/release/
 /result
 /result-*
 /.mygo/

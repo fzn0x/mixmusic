@@ -3,7 +3,9 @@ name: Release
 # Pushing a tag such as v0.2.0 builds MixMusic for macOS, Windows and Linux
 # and publishes the release: the version's section of CHANGELOG.md, the
 # downloads of .github/release-notes.md, the installers and SHA256SUMS.
-# Run it by hand to build an existing tag again.
+# Nix builds: every job runs in the shell of flake.nix, whose tools
+# flake.lock pins. GoReleaser publishes, with .goreleaser.yaml. Run it by
+# hand to build an existing tag again.
 on:
   push:
     tags: ["v*"]
@@ -64,22 +66,19 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ env.TAG }}
-      - uses: actions/setup-go@v7
+      # The tools of flake.nix's shell, at the versions of flake.lock.
+      - uses: cachix/install-nix-action@v31
         with:
-          go-version-file: go.mod
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
-      - name: Install NSIS, for the Windows installers
-        if: matrix.name == 'Windows'
-        run: sudo apt-get update && sudo apt-get install -y nsis
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - run: nix develop --command bun install --frozen-lockfile
       - name: Build
         env:
           # Signs the update files; without it the build skips them.
           MYGO_UPDATER_PRIVATE_KEY: ${{ secrets.MYGO_UPDATER_PRIVATE_KEY }}
-        run: bun run build -- -platform "${{ matrix.platform }}"
+        run: nix develop --command bun run build -- -platform "${{ matrix.platform }}"
       - name: Package the portable zips, the RPMs and the AppImages
         if: matrix.name != 'macOS'
-        run: bash .github/scripts/package.sh "${TAG#v}" release
+        run: nix develop --command bash .github/scripts/package.sh "${TAG#v}" release
       - name: Name the downloads
         shell: bash
         run: |
@@ -178,11 +177,6 @@ jobs:
             done
           done
           ls update-*.json
-      - name: Checksums
-        working-directory: release
-        run: |
-          sha256sum * > SHA256SUMS
-          cat SHA256SUMS
       - name: Release notes
         run: |
           set -euo pipefail
@@ -216,13 +210,16 @@ jobs:
               .github/release-notes.md
             echo
             echo "**Full Changelog**: $link"
-          } | awk 'NF { p = 1 } p' | cat -s > notes.md
-          cat notes.md
-      - uses: softprops/action-gh-release@v3
+          } | awk 'NF { p = 1 } p' | cat -s > "$RUNNER_TEMP/notes.md"
+          cat "$RUNNER_TEMP/notes.md"
+      # The tools of flake.nix's shell, at the versions of flake.lock.
+      - uses: cachix/install-nix-action@v31
         with:
-          tag_name: ${{ env.TAG }}
-          name: MixMusic ${{ env.TAG }}
-          body_path: notes.md
-          files: release/*
-          fail_on_unmatched_files: true
-          make_latest: true
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      # Every file of release/, which .gitignore leaves out, and their
+      # SHA256SUMS, under these notes.
+      - name: Publish the release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ env.TAG }}
+        run: nix develop --command goreleaser release --clean --release-notes "$RUNNER_TEMP/notes.md"

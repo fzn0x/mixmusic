@@ -116,10 +116,9 @@ func (d *Decoder) Decode(frame []byte, pcm []float32) (int, error) {
 		return 0, err
 	}
 	channels := d.cfg.Channels
-	for c := range channels {
-		d.dequantize(&d.ch[c])
-	}
+	d.dequantize(&d.ch[0], nil)
 	if channels == 2 {
+		d.dequantize(&d.ch[1], &d.ch[0])
 		d.applyMS()
 		d.applyIS()
 	}
@@ -261,8 +260,9 @@ func (d *Decoder) parseCPE() error {
 
 // dequantize turns the quantized spectrum of c into c.spec: the inverse
 // quantization of each value, scaled by the gain of its band's
-// scalefactor, and noise in the bands PNS substitutes.
-func (d *Decoder) dequantize(c *channel) {
+// scalefactor, and noise in the bands PNS substitutes. left is, when c is
+// the right channel of a pair, its left channel, whose spectrum is done.
+func (d *Decoder) dequantize(c, left *channel) {
 	s := &c.ics
 	info := &s.info
 	clear(c.spec[:])
@@ -290,6 +290,21 @@ func (d *Decoder) dequantize(c *channel) {
 					scale := float32(float64(gain) / math.Sqrt(float64(energy)))
 					for k := range x {
 						x[k] *= scale
+					}
+				}
+				if left != nil && d.msMask != 0 && d.msUsed[i] && left.ics.bandType[i] == noiseBook {
+					// Both channels substitute noise, and ms_used is set:
+					// the standard has them share the left channel's, each
+					// at its own energy, rather than M/S code the band.
+					// The generator moved on all the same, so that the
+					// noise of the bands after doesn't depend on which
+					// bands share theirs.
+					ratio := pow2q[s.sf[i]+100] / pow2q[left.ics.sf[i]+100]
+					for w := range info.groupLen[g] {
+						off := groupOff + 128*w
+						for k := lo; k < hi; k++ {
+							c.spec[off+k] = left.spec[off+k] * ratio
+						}
 					}
 				}
 			default:

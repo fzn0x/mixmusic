@@ -93,6 +93,20 @@ func TestWaitChecksAgain(t *testing.T) {
 	}
 }
 
+func TestOfflineForAWhile(t *testing.T) {
+	w := New((&fakeProbe{}).probe)
+	if w.Offline() || w.Check(context.Background()) || !w.Offline() {
+		t.Fatal("not offline after a failed check")
+	}
+	// An old answer isn't trusted.
+	w.mu.Lock()
+	w.at = w.at.Add(-offlineFor)
+	w.mu.Unlock()
+	if w.Offline() {
+		t.Error("offline after an old check")
+	}
+}
+
 func TestKickChecksAtOnce(t *testing.T) {
 	f := &fakeProbe{}
 	backoff, every := backoff, every

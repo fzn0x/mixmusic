@@ -22,6 +22,9 @@ var (
 	slow      = time.Minute
 	// checkTimeout bounds a check.
 	checkTimeout = 10 * time.Second
+	// offlineFor is how long Offline trusts a check that failed: a Wait
+	// checks more often than that.
+	offlineFor = 2 * time.Minute
 )
 
 // Watch tells whether the network answers, checking with its probe when
@@ -97,12 +100,12 @@ func (w *Watch) run(c *check) {
 	close(c.done)
 }
 
-// Offline reports whether the last answer was that the network doesn't
-// answer, without checking: true until a check or audio says otherwise.
+// Offline reports whether the last answer, within offlineFor, was that the
+// network doesn't answer, without checking.
 func (w *Watch) Offline() bool {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	return !w.at.IsZero() && !w.ok
+	return !w.at.IsZero() && !w.ok && time.Since(w.at) < offlineFor
 }
 
 // Seen takes in audio that came from YouTube: the network answers.

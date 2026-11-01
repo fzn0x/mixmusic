@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -30,6 +31,10 @@ type settingsFind struct {
 	// reveal is the group a link to it in its section scrolls into view,
 	// once the section shows.
 	reveal string
+	// typedAt is when the query changed, and told the query whose matches
+	// screen readers heard of.
+	typedAt time.Time
+	told    string
 
 	// As a page builds: whether it is the page the router shows, the query
 	// it searches and its words; the section and the group that build;
@@ -233,7 +238,7 @@ func (s *shell) findBox(c *ui.Context, tab, q string, current bool) {
 			s.router.Replace(settingsPath(tab, ""))
 		})
 		if current && in.Changed() {
-			f.route = f.query
+			f.route, f.typedAt = f.query, c.Now()
 			// A shortcut being recorded stops: its row may go.
 			s.recording = ""
 			s.router.Replace(settingsPath(tab, f.query))
@@ -253,4 +258,31 @@ func shortcutWords(keys string) string {
 		mod = "Cmd+"
 	}
 	return shortcutLabel(keys) + " " + strings.ReplaceAll(keys, "Mod+", mod)
+}
+
+// tellAfter is how long the typing pauses before screen readers hear what
+// the search of the settings found.
+const tellAfter = 600 * time.Millisecond
+
+// findTell tells screen readers how many things the search of the page
+// found, once the typing pauses: "3 matches", or "No setting matches
+// crossfade".
+func (s *shell) findTell(c *ui.Context) {
+	f := &s.find
+	q := strings.TrimSpace(f.q)
+	if f.told == q {
+		return
+	}
+	if wait := tellAfter - c.Now().Sub(f.typedAt); wait > 0 {
+		c.After(wait)
+		return
+	}
+	f.told = q
+	switch {
+	case !f.on():
+	case f.found == 0:
+		c.Announce("No setting matches " + q)
+	default:
+		c.Announce(plural(f.found, "match", "matches"))
+	}
 }

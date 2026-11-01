@@ -395,3 +395,34 @@ func TestSettingsFindReveal(t *testing.T) {
 		settled(t, tt)
 	}
 }
+
+// TestSettingsFindTells tells screen readers how many settings the search
+// found, once, after the typing pauses.
+func TestSettingsFindTells(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 2400)
+	show(s, tt, "/settings")
+	click(t, s, tt, "Search the settings")
+	tt.Announcements()
+	for _, c := range []struct {
+		typed string
+		heard []string
+	}{
+		{"tray", []string{"1 match"}},
+		{" zz", []string{"No setting matches tray zz"}},
+	} {
+		typeKeys(s, tt, c.typed)
+		if got := tt.Announcements(); len(got) != 0 {
+			t.Errorf("typing %q, screen readers heard %q at once", c.typed, got)
+		}
+		tt.Advance(2 * time.Second)
+		if got := tt.Announcements(); !slices.Equal(got, c.heard) {
+			t.Errorf("typing %q, screen readers heard %q", c.typed, got)
+		}
+		tt.Advance(2 * time.Second)
+		if again := tt.Announcements(); len(again) != 0 {
+			t.Errorf("typing %q, screen readers heard %q again", c.typed, again)
+		}
+		settled(t, tt)
+	}
+}

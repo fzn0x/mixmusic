@@ -48,7 +48,7 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 	// beside it a moment, shows its own.
 	current := s.pagePath == s.router.Path() && q == s.router.Query("q")
 	if current && q != f.route {
-		f.query, f.route = q, q
+		f.query, f.route, f.typedAt = q, q, c.Now()
 	}
 	selected := max(slices.Index(settingsTabs, tab), 0)
 	s.pageScroll(c, func() {
@@ -83,6 +83,9 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 				s.emptyLine(c, "No setting matches “"+strings.TrimSpace(q)+"”.")
 			}
 		})
+		if current {
+			s.findTell(c)
+		}
 	})
 }
 

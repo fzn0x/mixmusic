@@ -68,9 +68,8 @@ All notable changes to MixMusic are documented here. The format follows
   loads meanwhile, a song paused stays paused, and the song has all its
   tries again once it plays on for ten seconds, or when it plays again
   with Repeat: one or Previous (#101).
-- When three songs in a row can't play, as when the network is down,
-  MixMusic stops again rather than stepping through the rest of the
-  queue (#101).
+- When three songs in a row can't play, MixMusic stops again rather than
+  stepping through the rest of the queue (#101).
 - A song whose audio stops coming, as when the connection drops, connects
   again after 15 seconds without a byte rather than two minutes, and
   keeps trying for two minutes, playing on as soon as the network

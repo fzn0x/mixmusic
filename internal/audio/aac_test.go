@@ -23,7 +23,7 @@ import (
 	"github.com/fzn0x/mixmusic/resample"
 )
 
-// Test files: AAC-LC in MP4, as ffmpeg makes it, from internal/mp4's
+// Test files: AAC-LC in MP4, as ffmpeg makes it, from mp4's
 // testdata, where the commands that made them are. Each holds 3 seconds of
 // sine waves. sidx is laid out as YouTube's files are: fragments, after a
 // sidx and a moov with an edit list; progressive has the same audio, and
@@ -369,7 +369,7 @@ func TestAACConverterRoom(t *testing.T) {
 }
 
 // TestDeckAACAgainstFFmpeg plays the test files as ffmpeg decodes them and
-// converts them to 48 kHz, with the long filter internal/audio/resample
+// converts them to 48 kHz, with the long filter resample
 // compares with: the two agree, frame for frame, in time and level. It
 // skips without ffmpeg.
 func TestDeckAACAgainstFFmpeg(t *testing.T) {

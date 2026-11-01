@@ -1,6 +1,6 @@
-// Package resample converts the sample rate of audio, so that the engine,
-// which plays everything at 48 kHz, plays the 44.1 kHz of YouTube's AAC and
-// the other rates AAC has.
+// Package resample converts the sample rate of audio, as MixMusic's audio
+// engine, which plays everything at 48 kHz, converts the 44.1 kHz of
+// YouTube's AAC and the other rates AAC has.
 //
 // A Converter is a polyphase filter of Kaiser-windowed sincs. The frames of
 // its output fall between those of its input at a few phases, as many as

@@ -3,7 +3,7 @@
 // entcode.c of libopus.
 //
 // Copyright (c) 2001-2011 Timothy B. Terriberry. The libopus code it is
-// ported from is under the BSD license of LICENSE.libopus in internal/opus.
+// ported from is under the BSD license of opus/LICENSE.libopus.
 package rangedec
 
 import "math/bits"

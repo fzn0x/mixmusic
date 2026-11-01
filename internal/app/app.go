@@ -58,7 +58,7 @@ type Options struct {
 	// LastCrash is the crash report of the run before, when it crashed.
 	LastCrash string
 	// Interface opens the main window, hidden when asked, and Mini the
-	// mini player: windows that MyGo draws, of package native.
+	// mini player: windows that MyGo draws, of the root package.
 	Interface func(a *App, hidden bool) *mygo.Window
 	Mini      func(a *App) *mygo.Window
 }

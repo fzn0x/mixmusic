@@ -1,7 +1,6 @@
 // Package celt is the CELT decoder of Opus (RFC 6716, section 4.3), the
 // codec of music and of the high band of hybrid frames: a port of libopus
-// 1.6.1's float build, under the BSD license of LICENSE.libopus in
-// internal/opus.
+// 1.6.1's float build, under the BSD license of opus/LICENSE.libopus.
 package celt
 
 // Port of celt/modes.h, celt/modes.c and celt/static_modes_float.h: the one

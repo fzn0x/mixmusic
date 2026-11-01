@@ -2,8 +2,8 @@
 
 // Package silk is the SILK decoder of Opus (RFC 6716, section 4.2): a port
 // of the SILK decoder of libopus 1.6.1 as its default float build compiles it
-// (no deep PLC, OSCE, DRED or QEXT), under the BSD license of LICENSE.libopus
-// in internal/opus. SILK is fixed-point code even in that build, and the port
+// (no deep PLC, OSCE, DRED or QEXT), under the BSD license of
+// opus/LICENSE.libopus. SILK is fixed-point code even in that build, and the port
 // is bit-exact with it.
 //
 // Copyright (c) 2006-2011, Skype Limited. All rights reserved.

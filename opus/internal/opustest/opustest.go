@@ -2,7 +2,7 @@
 // 8251: their files, and the quality metric of libopus's opus_compare,
 // which decides whether a decoder conforms. It is for tests only. Its
 // ports of opus_compare and of libopus's soft clipping are under the BSD
-// license of LICENSE.libopus in internal/opus.
+// license of opus/LICENSE.libopus.
 package opustest
 
 import (

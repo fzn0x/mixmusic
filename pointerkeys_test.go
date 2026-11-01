@@ -360,7 +360,7 @@ func TestRecordSpace(t *testing.T) {
 }
 
 // TestControlsLeaveSpace keeps the window's controls built on pointerKeys:
-// MyGo's own controls, made in internal/native, would take Space after a
+// MyGo's own controls, made in the root package, would take Space after a
 // click, and buttons keeping the focus where it was would leave it in the
 // search box. The palette's rows and the dialogs' buttons are in dialogs,
 // where the window's shortcuts wait; the sliders keep the focus for their

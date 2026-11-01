@@ -21,7 +21,7 @@ import (
 // with ffprobe on the PATH:
 //
 //	yt-dlp -f 140 --fixup never -o zoo.m4a -- jNQXAC9IVRw
-//	MIXMUSIC_MP4_SAMPLE=zoo.m4a go test ./internal/mp4 -run Sample -v
+//	MIXMUSIC_MP4_SAMPLE=zoo.m4a go test ./mp4 -run Sample -v
 //
 // yt-dlp's --fixup never keeps the file as YouTube serves it, which it
 // would otherwise remux.

@@ -18,7 +18,7 @@ import (
 // with ffprobe on the PATH:
 //
 //	yt-dlp -f 251 -o zoo.webm https://www.youtube.com/watch?v=jNQXAC9IVRw
-//	MIXMUSIC_WEBM_SAMPLE=zoo.webm go test ./internal/webm -run Sample -v
+//	MIXMUSIC_WEBM_SAMPLE=zoo.webm go test ./webm -run Sample -v
 func TestSample(t *testing.T) {
 	path := os.Getenv("MIXMUSIC_WEBM_SAMPLE")
 	if path == "" {

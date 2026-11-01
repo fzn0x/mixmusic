@@ -1,6 +1,6 @@
 // Package library keeps what the user collects in MixMusic itself, across
-// services: liked tracks, playlists that mix tracks of every service, the
-// history of what they played and their recent searches.
+// services: liked and disliked tracks, playlists that mix tracks of every
+// service, the history of what they played and their recent searches.
 package library
 
 import (
@@ -9,6 +9,8 @@ import (
 	"errors"
 	"slices"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -42,7 +44,10 @@ type Play struct {
 
 // Data is everything the library keeps.
 type Data struct {
-	Liked     []media.Track `json:"liked"`
+	Liked []media.Track `json:"liked"`
+	// Disliked are the tracks the user dislikes, the last disliked first:
+	// a track is liked or disliked, not both.
+	Disliked  []media.Track `json:"disliked,omitempty"`
 	Playlists []Playlist    `json:"playlists"`
 	History   []Play        `json:"history"`
 	Searches  []string      `json:"searches"`
@@ -52,6 +57,10 @@ type Data struct {
 type Library struct {
 	file *store.File[Data]
 	now  func() time.Time
+	// disliked holds the IDs of the disliked tracks, for lists to ask of
+	// each of their rows as they draw; indexing orders its changes.
+	disliked atomic.Pointer[map[string]bool]
+	indexing sync.Mutex
 }
 
 // Open opens the library kept at path.
@@ -60,7 +69,9 @@ func Open(path string) (*Library, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Library{file: f, now: time.Now}, nil
+	l := &Library{file: f, now: time.Now}
+	l.indexDisliked()
+	return l, nil
 }
 
 // Liked returns the liked tracks, the last liked first.
@@ -73,15 +84,63 @@ func (l *Library) IsLiked(id string) bool {
 	return slices.ContainsFunc(l.file.Get().Liked, func(t media.Track) bool { return t.ID == id })
 }
 
-// SetLiked likes or unlikes a track.
+// SetLiked likes or unlikes a track. Liking a disliked track takes the
+// dislike back.
 func (l *Library) SetLiked(t media.Track, liked bool) error {
-	return l.file.Update(func(d *Data) error {
+	err := l.file.Update(func(d *Data) error {
 		d.Liked = slices.DeleteFunc(d.Liked, func(x media.Track) bool { return x.ID == t.ID })
 		if liked {
 			d.Liked = slices.Insert(d.Liked, 0, t)
+			d.Disliked = slices.DeleteFunc(d.Disliked, func(x media.Track) bool { return x.ID == t.ID })
 		}
 		return nil
 	})
+	l.indexDisliked()
+	return err
+}
+
+// Disliked returns the disliked tracks, the last disliked first.
+func (l *Library) Disliked() []media.Track {
+	return orEmpty(l.file.Get().Disliked)
+}
+
+// IsDisliked reports whether a track is disliked.
+func (l *Library) IsDisliked(id string) bool {
+	if ids := l.disliked.Load(); ids != nil {
+		return (*ids)[id]
+	}
+	return false
+}
+
+// SetDisliked dislikes a track, or takes the dislike back. Disliking a
+// liked track takes the like back, which unliked tells.
+func (l *Library) SetDisliked(t media.Track, disliked bool) (unliked bool, err error) {
+	err = l.file.Update(func(d *Data) error {
+		unliked = false
+		d.Disliked = slices.DeleteFunc(d.Disliked, func(x media.Track) bool { return x.ID == t.ID })
+		if disliked {
+			d.Disliked = slices.Insert(d.Disliked, 0, t)
+			n := len(d.Liked)
+			d.Liked = slices.DeleteFunc(d.Liked, func(x media.Track) bool { return x.ID == t.ID })
+			unliked = len(d.Liked) < n
+		}
+		return nil
+	})
+	l.indexDisliked()
+	return unliked && err == nil, err
+}
+
+// indexDisliked notes the IDs of the disliked tracks, as the file has
+// them: after a change, the latest of them, also when another change ends
+// meanwhile.
+func (l *Library) indexDisliked() {
+	l.indexing.Lock()
+	defer l.indexing.Unlock()
+	ids := map[string]bool{}
+	for _, t := range l.file.Get().Disliked {
+		ids[t.ID] = true
+	}
+	l.disliked.Store(&ids)
 }
 
 // Playlists returns the playlists, without their tracks, the last changed

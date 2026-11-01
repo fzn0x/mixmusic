@@ -72,11 +72,6 @@ All notable changes to MixMusic are documented here. The format follows
   and runs yt-dlp only for the tracks YouTube won't give it that way, such
   as those made for children. The next track is found a second into the
   one playing, so skipping ahead is quick too (#69).
-- On Windows, a sign-in the Credential Manager can't keep is kept
-  encrypted for your Windows account, so you stay signed in after a
-  restart. Sign-in files in plain text found in MixMusic's data folder,
-  such as from a copy made on Linux, move into the system's credential
-  store and are deleted, on Linux too once a keyring is there (#104).
 
 ## [0.5.5] - 2026-10-28
 

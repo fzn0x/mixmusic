@@ -16,6 +16,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // PlaybackMode is how a track plays.
@@ -319,9 +320,12 @@ func (p *Player) ConnectSeek(ctx context.Context, positionMs int) error {
 	return p.a.spotify.Seek(ctx, p.a.settings.Get().SpotifyDevice, positionMs)
 }
 
-// ConnectVolume sets the volume of the Spotify Connect device, from 0 to 1.
-func (p *Player) ConnectVolume(ctx context.Context, volume float64) error {
-	return p.a.spotify.SetVolume(ctx, p.a.settings.Get().SpotifyDevice, int(volume*100+0.5))
+// ConnectVolume sets the volume of the Spotify Connect device to the
+// player's volume v, from 0 to 1: the percentage earlier versions sent for
+// the same loudness of MixMusic's own player, so that a Spotify track on a
+// device keeps its balance against a YouTube Music one.
+func (p *Player) ConnectVolume(ctx context.Context, v float64) error {
+	return p.a.spotify.SetVolume(ctx, p.a.settings.Get().SpotifyDevice, int(volume.Saved(v)*100+0.5))
 }
 
 // ConnectState returns what the Spotify Connect device plays, or nil when

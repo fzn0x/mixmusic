@@ -6,6 +6,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // Output is a device stream the engine renders into, as output.Stream.
@@ -102,7 +104,7 @@ func NewEngine(open Opener, start OutputStarter, events Events) *Engine {
 		paused: true,
 		eq:     newEqualizer(),
 		comp:   newCompressor(),
-		master: newSmoother(0.64, glide), // the volume 0.8, squared
+		master: newSmoother(0.64, glide), // the gain of the volume 0.8 saved
 		an:     newAnalyser(),
 		notify: make(chan struct{}, 1),
 		closed: make(chan struct{}),
@@ -298,11 +300,11 @@ func (e *Engine) Seek(t time.Duration) {
 	}
 }
 
-// SetVolume sets the volume, from 0 to 1, on a curve: halfway sounds half
-// as loud.
+// SetVolume sets the volume, from 0 to 1, on volume's curve: each tenth of
+// it is 6 dB.
 func (e *Engine) SetVolume(v float64) {
 	e.mu.Lock()
-	e.master.target = v * v
+	e.master.target = volume.Gain(v)
 	e.mu.Unlock()
 }
 

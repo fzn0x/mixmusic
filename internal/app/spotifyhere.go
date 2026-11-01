@@ -14,6 +14,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // hereLoad is how long the page of MixMusic's own Spotify device may take
@@ -188,9 +189,9 @@ func (d hereDevice) Play(ctx context.Context, t media.Track, at time.Duration) e
 	return err
 }
 
-// level is the player's volume, 0 when muted, for the page.
+// level is the gain of the player's volume, 0 when muted, for the page.
 func (d hereDevice) level() string {
-	v := 0.8
+	v := volume.Of(0.8)
 	if p := d.h.a.goPlayer.Load(); p != nil {
 		st := p.State()
 		v = st.Volume
@@ -198,8 +199,12 @@ func (d hereDevice) level() string {
 			v = 0
 		}
 	}
-	return strconv.FormatFloat(min(max(v, 0), 1), 'f', -1, 64)
+	return gain(v)
 }
+
+// gain is the gain of the volume v for the page, the gain MixMusic's own
+// player plays it at, so that both sound alike.
+func gain(v float64) string { return strconv.FormatFloat(volume.Gain(v), 'f', -1, 64) }
 
 // do runs a command of the device in its page, if it's open.
 func (d hereDevice) do(ctx context.Context, code string) error {
@@ -219,7 +224,7 @@ func (d hereDevice) Seek(ctx context.Context, at time.Duration) error {
 }
 
 func (d hereDevice) SetVolume(ctx context.Context, v float64) error {
-	return d.do(ctx, "await mm.setVolume("+strconv.FormatFloat(min(max(v, 0), 1), 'f', -1, 64)+")")
+	return d.do(ctx, "await mm.setVolume("+gain(v)+")")
 }
 
 // hereState is what the page tells the device plays.

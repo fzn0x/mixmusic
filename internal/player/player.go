@@ -18,6 +18,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // Repeat is how the queue repeats.
@@ -200,7 +201,8 @@ type Services interface {
 	// Radio returns tracks like track.
 	Radio(ctx context.Context, track media.Track) ([]media.Track, error)
 	Settings() settings.Settings
-	// SaveVolume keeps the volume in the settings.
+	// SaveVolume keeps the volume in the settings, as volume.Saved gives
+	// it.
 	SaveVolume(v float64)
 	// Report tells the app what plays.
 	Report(now Now)
@@ -409,7 +411,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.connect = &connectEngine{p: p, device: device, tickEvery: connectTick, askEvery: connectAskEvery, askDefault: connectAskEvery,
 		settle: connectSettle}
 	st := svc.Settings()
-	p.s = State{Index: -1, Repeat: RepeatOff, Volume: st.Volume}
+	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume)}
 	p.spotifyMode = st.SpotifyPlayback
 	if len(saved.Tracks) > 0 {
 		radio := marks(saved.Radio, len(saved.Tracks))

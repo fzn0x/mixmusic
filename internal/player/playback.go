@@ -5,12 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // toggleDebounce is how soon a second toggle is taken as the same press:
@@ -66,7 +68,8 @@ func (p *Player) Next() { p.do(func() { p.advance(false) }) }
 // early in it.
 func (p *Player) Previous() { p.do(p.previous) }
 
-// SetVolume sets the volume, from 0 to 1, and unmutes.
+// SetVolume sets the volume, from 0 to 1, and unmutes. A volume that
+// isn't a number changes nothing.
 func (p *Player) SetVolume(v float64) { p.do(func() { p.setVolume(v) }) }
 
 // ToggleMute mutes or unmutes.
@@ -572,6 +575,9 @@ func (p *Player) previous() {
 }
 
 func (p *Player) setVolume(v float64) {
+	if math.IsNaN(v) {
+		return
+	}
 	v = min(max(v, 0), 1)
 	p.s.Volume = v
 	p.s.Muted = false
@@ -579,11 +585,14 @@ func (p *Player) setVolume(v float64) {
 	if p.volumeTimer != nil {
 		p.volumeTimer.Stop()
 	}
-	p.volumeTimer = p.after(saveVolumeAfter, func() {
-		if p.svc.Settings().Volume != v {
-			p.svc.SaveVolume(v)
-		}
-	})
+	p.volumeTimer = p.after(saveVolumeAfter, func() { p.saveVolume(v) })
+}
+
+// saveVolume keeps the volume v in the settings, unless they keep it.
+func (p *Player) saveVolume(v float64) {
+	if saved := volume.Saved(v); p.svc.Settings().Volume != saved {
+		p.svc.SaveVolume(saved)
+	}
 }
 
 // apply gives the engines the volume.
@@ -655,9 +664,7 @@ func (p *Player) Flush() {
 	p.mu.Lock()
 	v := p.snap.Volume
 	p.mu.Unlock()
-	if p.svc.Settings().Volume != v {
-		p.svc.SaveVolume(v)
-	}
+	p.saveVolume(v)
 }
 
 // savedOf is the queue of st as it survives a restart: the part of it

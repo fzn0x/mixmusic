@@ -64,7 +64,7 @@
         let player = null;
         let deviceID = null;
         let problem = null;
-        let volume = 0.8;
+        let gain = 0.64;
 
         async function open() {
           if (problem) throw new Error(problem);
@@ -72,7 +72,7 @@
           await loadSDK();
           const p = new window.Spotify.Player({
             name: NAME,
-            volume: volume * volume,
+            volume: gain,
             getOAuthToken: (done) => void mygo.call("SpotifyPage.Token").then(done, (err) => console.error("spotify: token:", err)),
           });
           player = p;
@@ -121,10 +121,10 @@
           pause: async () => void (await player?.pause()),
           resume: async () => void (await player?.resume()),
           seek: async (positionMs) => void (await player?.seek(positionMs)),
-          async setVolume(v) {
-            volume = v;
-            // The curve of MixMusic's own player, so that both sound alike.
-            await player?.setVolume(v * v);
+          /** setVolume sets the gain, which MixMusic works out on its own player's curve. */
+          async setVolume(g) {
+            gain = g;
+            await player?.setVolume(g);
           },
           /** state is what the player plays, or null. */
           async state() {

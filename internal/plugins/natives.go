@@ -9,6 +9,7 @@ import (
 	"github.com/grafana/sobek"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // nameRe matches the names of pages, which are parts of their paths, and
@@ -167,7 +168,11 @@ func (pl *plugin) natives() *sobek.Object {
 
 	// Settings, storage and the desktop.
 	set("settings", func() sobek.Value {
-		v, err := pl.freeze(sobek.Undefined(), pl.fromGo(svc.Preferences.Get()))
+		// The volume the player's state gives, not the number
+		// settings.json keeps.
+		st := svc.Preferences.Get()
+		st.Volume = volume.Of(st.Volume)
+		v, err := pl.freeze(sobek.Undefined(), pl.fromGo(st))
 		if err != nil {
 			panic(err)
 		}

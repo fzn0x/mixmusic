@@ -13,7 +13,7 @@ import (
 )
 
 // look is how the interface looks: a theme's tokens, which themes keep in
-// the native interface, and the measures of DESIGN.md, scaled by the text
+// the native interface, and the design's measures, scaled by the text
 // size and the density of the settings.
 type look struct {
 	theme ui.Theme
@@ -27,7 +27,7 @@ type look struct {
 	danger, success, youtube, spotify       ui.Color
 	tiles                                   [4]ui.Color
 	tileText                                ui.Color
-	// The tints DESIGN.md derives from the tokens.
+	// The tints derived from the tokens.
 	hover, press, rule, outline, scrim ui.Color
 	// raised is the face of the menus that float over the page: surface-2
 	// over the ground, solid where the theme's surfaces show the page
@@ -153,7 +153,7 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 // size is rem rem of text, scaled by the text size.
 func (k *look) size(rem float32) float32 { return rem * 16 * k.scale }
 
-// The type scale of DESIGN.md.
+// The type scale.
 func (k *look) bodySize() float32     { return k.size(0.9375) }
 func (k *look) smallSize() float32    { return k.size(0.8125) }
 func (k *look) captionSize() float32  { return k.size(0.75) }

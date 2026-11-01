@@ -34,7 +34,7 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 		return
 	}
 	t := cur.Track
-	art := ui.ButtonBase(c.Key("player-art")).Size(62, 62).Shrink(0).Label("Open now playing").Cursor(ui.CursorPointer)
+	art := s.buttonBase(c.Key("player-art")).Size(62, 62).Shrink(0).Label("Open now playing").Cursor(ui.CursorPointer)
 	art.ContextMenu(func(m *ui.Menu) { s.trackMenu(m, t) })
 	if art.Clicked() {
 		s.navigate("/now-playing")
@@ -42,7 +42,7 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 	art.Children(func() { s.cover(c, "player-cover", t.Artwork, 62, false) })
 	ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 		if t.Album != nil && t.Album.ID != "" {
-			link := ui.ButtonBase(c.Key("player-title")).Justify(ui.Start).MinWidth(0).Label(t.Title).KeepFocus().Cursor(ui.CursorPointer)
+			link := s.buttonBase(c.Key("player-title")).Justify(ui.Start).MinWidth(0).Label(t.Title).Cursor(ui.CursorPointer)
 			if link.Clicked() {
 				s.navigate(albumPath(t.Album.ID))
 			}
@@ -84,7 +84,7 @@ func (s *shell) likeButton(c *ui.Context, key string, t media.Track, size float3
 		label = "Remove from liked songs"
 	}
 	k := &s.lk
-	b := ui.ButtonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).KeepFocus().Cursor(ui.CursorPointer)
+	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
 	ink := k.muted
 	switch {
 	case on:

@@ -134,7 +134,7 @@ func (s *shell) toolSettings(c *ui.Context) {
 			if i := slices.Index(ids, s.set.JSRuntime); i >= 0 {
 				chosen = labels[i]
 			}
-			if ui.Select(c.Key("js-runtime"), &chosen, labels).Width(160).Label("JavaScript runtime").Changed() {
+			if s.selectOf(c.Key("js-runtime"), &chosen, labels).Width(160).Label("JavaScript runtime").Changed() {
 				if i := slices.Index(labels, chosen); i >= 0 {
 					s.set.JSRuntime = ids[i]
 					s.save()
@@ -184,7 +184,7 @@ func (s *shell) cacheSettings(c *ui.Context) {
 			what = chosen + " at most."
 		}
 		s.row(c, "Size", what, func() {
-			if ui.Select(c.Key("cache-size"), &chosen, labels).Width(160).Label("Cache size").Changed() {
+			if s.selectOf(c.Key("cache-size"), &chosen, labels).Width(160).Label("Cache size").Changed() {
 				if i := slices.Index(labels, chosen); i >= 0 {
 					s.set.CacheSizeMB = sizes[i]
 					s.save()

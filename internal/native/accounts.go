@@ -43,14 +43,14 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 		s.steps(c,
 			func() {
 				ui.Text(c, "Create an app in the ")
-				ui.Link(c, "Spotify developer dashboard", "https://developer.spotify.com/dashboard")
+				s.linkOf(c, "Spotify developer dashboard", "https://developer.spotify.com/dashboard")
 				ui.Text(c, ", with the Web API, signed in with a Spotify account that has Premium.")
 			},
 			func() {
 				ui.Text(c, "Add this redirect URI to it: ")
 				ui.Text(c, sp.RedirectURI).Font(monospace())
 				ui.Text(c, " ")
-				if ui.Link(c, "copy", "").Clicked() {
+				if s.linkOf(c, "copy", "").Clicked() {
 					c.WriteClipboard(sp.RedirectURI)
 					s.notes = append(s.notes, notice("Copied the redirect URI"))
 				}
@@ -138,7 +138,7 @@ func (s *shell) youtubeAccount(c *ui.Context, yt app.YouTubeAccount) {
 		})
 		s.youtubeChannels(c)
 		s.row(c, "Add what you play to your history", "YouTube Music makes its home and its radios of your history. Tracks join it once they played a while, as they do on Last.fm.", func() {
-			if ui.Switch(c.Key("youtube-history"), &s.set.YouTubeHistory).Label("Add what you play to your YouTube Music history").Changed() {
+			if s.switchOf(c.Key("youtube-history"), &s.set.YouTubeHistory).Label("Add what you play to your YouTube Music history").Changed() {
 				s.save()
 			}
 		})
@@ -164,7 +164,7 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 		}
 	}
 	s.row(c, "Channel", "Brand channels of your account have their own home feed, library and likes.", func() {
-		if ui.Select(c.Key("channel"), &chosen, labels).Width(260).Label("Channel").Changed() {
+		if s.selectOf(c.Key("channel"), &chosen, labels).Width(260).Label("Channel").Changed() {
 			if i := slices.Index(labels, chosen); i >= 0 {
 				ch := list[i]
 				s.account("", "Using YouTube Music as "+ch.Name, func(ctx context.Context) error {
@@ -183,7 +183,7 @@ func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
 				s.alert(c, "Last.fm no longer accepts this connection", "Disconnect, then connect again to go on scrobbling.", nil).Margin(12, 0)
 			}
 			s.row(c, "Scrobbling as "+lf.Name, "What you listen to joins your Last.fm profile: a track counts once half of it played, or four minutes.", func() {
-				if ui.Switch(c.Key("scrobbling"), &s.set.Scrobbling).Label("Scrobble to Last.fm").Changed() {
+				if s.switchOf(c.Key("scrobbling"), &s.set.Scrobbling).Label("Scrobble to Last.fm").Changed() {
 					s.save()
 				}
 			})
@@ -199,7 +199,7 @@ func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
 		s.steps(c,
 			func() {
 				ui.Text(c, "Create an API account on ")
-				ui.Link(c, "Last.fm", "https://www.last.fm/api/account/create")
+				s.linkOf(c, "Last.fm", "https://www.last.fm/api/account/create")
 				ui.Text(c, "; any name and description will do, and the callback URL can stay empty.")
 			},
 			func() { ui.Text(c, "Paste its API key and shared secret here, and connect.") },

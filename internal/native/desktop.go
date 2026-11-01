@@ -16,7 +16,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 	s.group(c, "on the desktop", func() {
 		toggle := func(key, title, description string, v *bool) {
 			s.row(c, title, description, func() {
-				if ui.Switch(c.Key(key), v).Label(title).Changed() {
+				if s.switchOf(c.Key(key), v).Label(title).Changed() {
 					s.save()
 				}
 			})
@@ -29,7 +29,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 		if s.set.DiscordPresence {
 			describe := func() {
 				ui.Text(c, "Discord shows the name of MixMusic's application. To show another, create one in the ")
-				ui.Link(c, "developer portal", "https://discord.com/developers/applications")
+				s.linkOf(c, "developer portal", "https://discord.com/developers/applications")
 				ui.Text(c, " and paste its application ID.")
 			}
 			s.rowWith(c, "Discord application ID", describe, func() {
@@ -44,7 +44,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 			// The system says, beside the main thread.
 			login := fetch(s, "openAtLogin", func(context.Context) (bool, error) { return s.svc.Preferences.OpenAtLogin(), nil })
 			on := login.value
-			if ui.Switch(c.Key("login"), &on).Label("Start at login").Disabled(!login.done).Changed() {
+			if s.switchOf(c.Key("login"), &on).Label("Start at login").Disabled(!login.done).Changed() {
 				login.value = on
 				go func() {
 					err := s.svc.Preferences.SetOpenAtLogin(on)
@@ -206,13 +206,13 @@ func (s *shell) updateSettings(c *ui.Context) {
 			}
 		}
 		s.row(c, "Check for updates", "At start and every few hours, from the releases on GitHub."+asks+last, func() {
-			if ui.Switch(c.Key("update-checks"), &checks).Label("Check for updates").Changed() {
+			if s.switchOf(c.Key("update-checks"), &checks).Label("Check for updates").Changed() {
 				set(checks, u.AutomaticDownloads)
 			}
 		})
 		if u.Enabled {
 			s.row(c, "Install updates without asking", "New versions download in the background and run at the next launch.", func() {
-				if ui.Switch(c.Key("update-downloads"), &downloads).Label("Install updates without asking").Changed() {
+				if s.switchOf(c.Key("update-downloads"), &downloads).Label("Install updates without asking").Changed() {
 					set(u.AutomaticChecks || downloads, downloads)
 				}
 			})
@@ -357,30 +357,30 @@ func (s *shell) updateOffer(c *ui.Context) {
 		}
 		ui.Row(c).Gap(8).Justify(ui.End).Wrap().Children(func() {
 			if s.updated != "" {
-				if s.button(c, "offer-later", "later", false).Clicked() {
+				if s.dialogButton(c, "offer-later", "later", false).Clicked() {
 					s.offer = nil
 				}
-				if s.button(c, "offer-restart", "restart now", true).Clicked() {
+				if s.dialogButton(c, "offer-restart", "restart now", true).Clicked() {
 					go s.svc.System.Restart()
 				}
 				return
 			}
-			if s.button(c, "offer-skip", "skip this version", false).Clicked() {
+			if s.dialogButton(c, "offer-skip", "skip this version", false).Clicked() {
 				s.dismissOffer(true)
 			}
-			if offer.Page != "" && s.button(c, "offer-notes", "what's new", false).Clicked() {
+			if offer.Page != "" && s.dialogButton(c, "offer-notes", "what's new", false).Clicked() {
 				go s.svc.System.OpenExternal(offer.Page)
 			}
-			if s.button(c, "offer-later", "later", false).Clicked() {
+			if s.dialogButton(c, "offer-later", "later", false).Clicked() {
 				s.dismissOffer(false)
 			}
 			switch {
 			case u.Enabled:
-				if s.button(c, "offer-install", "install "+offer.Version, true).Clicked() {
+				if s.dialogButton(c, "offer-install", "install "+offer.Version, true).Clicked() {
 					s.installUpdate()
 				}
 			case offer.Download != "":
-				if s.button(c, "offer-download", downloadLabel(u.Kind), true).Clicked() {
+				if s.dialogButton(c, "offer-download", downloadLabel(u.Kind), true).Clicked() {
 					go s.svc.System.OpenExternal(offer.Download)
 				}
 			}

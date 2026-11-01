@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
@@ -150,14 +151,11 @@ func (s *Accounts) SetYouTubeChannel(ctx context.Context, pageID string) (Accoun
 	if set = set.Clean(); set.YouTubeChannel != pageID {
 		return AccountsStatus{}, errors.New("that is not a channel of the account")
 	}
-	if err := s.a.settings.Set(set); err != nil {
+	// As an edit of settings.json would: the client uses the channel, and
+	// forgets the profile of the former one.
+	if _, err := (&Preferences{s.a}).Update(func(set *settings.Settings) { set.YouTubeChannel = pageID }); err != nil {
 		return AccountsStatus{}, err
 	}
-	notify()
-	s.a.youtube.SetChannel(pageID)
-	s.a.mu.Lock()
-	s.a.youtubeMe, s.a.profileErrs.youtube = nil, ""
-	s.a.mu.Unlock()
 	status := s.a.accountsStatus(ctx)
 	notify()
 	return status, nil

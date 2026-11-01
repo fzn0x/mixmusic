@@ -141,9 +141,7 @@ func (s playerServices) KickOnline()                          { s.a.online.Kick(
 func (s playerServices) Settings() settings.Settings { return s.a.settings.Get().Clean() }
 
 func (s playerServices) SaveVolume(v float64) {
-	st := s.a.settings.Get()
-	st.Volume = v
-	if _, err := (&Preferences{s.a}).Set(st); err != nil {
+	if _, err := (&Preferences{s.a}).Update(func(st *settings.Settings) { st.Volume = v }); err != nil {
 		log.Printf("mixmusic: keeping the volume: %v", err)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -72,6 +73,15 @@ type deck struct {
 	gain ramp
 	// playing is whether the deck plays, or holds at its position.
 	playing atomic.Bool
+	// lkfs is the loudness of the track, in LKFS, as the bits of a
+	// float64: NaN until the deck opened a Measured source, which it does
+	// before it decodes a frame.
+	lkfs atomic.Uint64
+	// trim turns a loud track down to an even loudness, and trimmed tells
+	// that it took its level, with the deck's first frames: the audio
+	// thread's.
+	trim    smoother
+	trimmed bool
 
 	cancel context.CancelFunc
 	done   chan struct{}
@@ -93,11 +103,13 @@ func newDeck(url string, start time.Duration, open Opener, notify func()) *deck 
 	d := &deck{
 		url:     url,
 		gain:    ramp{value: 1, target: 1},
+		trim:    newSmoother(1, glide),
 		cancel:  cancel,
 		done:    make(chan struct{}),
 		changed: make(chan struct{}, 1),
 		seekTo:  -1,
 	}
+	d.lkfs.Store(math.Float64bits(math.NaN()))
 	d.ring.Store(newRing(frames(start)))
 	go func() {
 		defer close(d.done)
@@ -195,6 +207,13 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 			return nil
 		}
 		return err
+	}
+	// Before any frame: the audio thread sees the loudness with the first
+	// frames the ring gives it.
+	if m, ok := src.(Measured); ok {
+		if lkfs, ok := m.Loudness(); ok {
+			d.lkfs.Store(math.Float64bits(lkfs))
+		}
 	}
 	d.mu.Lock()
 	d.src = src

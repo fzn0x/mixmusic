@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"slices"
 	"strings"
 	"sync"
@@ -73,7 +74,8 @@ func TestVideoShape(t *testing.T) {
 }
 
 // fakePage is the page of the picture as a videoLink talks to it: it keeps
-// the scripts it runs, and answers with status.
+// the scripts it runs, and answers with status, which plays the picture
+// loaded last, as the page's does.
 type fakePage struct {
 	mu      sync.Mutex
 	scripts []string
@@ -87,6 +89,15 @@ func newFakePage() *fakePage { return &fakePage{ran: make(chan string, 100)} }
 func (f *fakePage) call(_ context.Context, js string) (videoStatus, error) {
 	f.mu.Lock()
 	f.scripts = append(f.scripts, js)
+	if desc, ok := strings.CutPrefix(js, "return mv.load("); ok {
+		var src app.VideoSource
+		if json.Unmarshal([]byte(strings.TrimSuffix(desc, ")")), &src) == nil {
+			f.status = videoStatus{Src: src.Src}
+		}
+	}
+	if js == "return mv.clear()" {
+		f.status = videoStatus{}
+	}
 	st, err := f.status, f.err
 	f.err = nil
 	f.mu.Unlock()
@@ -141,11 +152,7 @@ func TestVideoLink(t *testing.T) {
 	if st := <-reports; st.Src != src.Src || st.Shown {
 		t.Errorf("reported %+v", st)
 	}
-	// The same picture loads once; a status that changed but for its
-	// drift isn't told again.
-	page.mu.Lock()
-	page.status.Drift.Max = 12
-	page.mu.Unlock()
+	// The same picture loads once, and the same status isn't told again.
 	l.post(videoCmd{src: src, active: true})
 	if js := page.next(t); !strings.Contains(js, "playing: false, active: true") {
 		t.Errorf("pauses with %s", js)
@@ -174,6 +181,9 @@ func TestVideoLink(t *testing.T) {
 		t.Errorf("after no answer, %s", js)
 	}
 	page.next(t)
+	if st := <-reports; st.Src != src.Src || st.Shown {
+		t.Errorf("reported %+v after loading it again", st)
+	}
 	// So is one that lost it, as when it loaded again.
 	page.mu.Lock()
 	page.status = videoStatus{}
@@ -183,9 +193,6 @@ func TestVideoLink(t *testing.T) {
 	if st := <-reports; st.Src != "" {
 		t.Errorf("reported %+v", st)
 	}
-	page.mu.Lock()
-	page.status = videoStatus{Src: src.Src}
-	page.mu.Unlock()
 	l.post(videoCmd{src: src, active: true, playing: true})
 	if js := page.next(t); !strings.HasPrefix(js, "return mv.load(") {
 		t.Errorf("after a page that lost the picture, %s", js)
@@ -317,6 +324,17 @@ func TestNowPlayingVideo(t *testing.T) {
 	s.settle(t, func(st player.State) bool { return !st.Playing })
 	tt.Frame()
 	waitScript(t, s, page, "playing: false, active: true")
+
+	// A song after it drops the picture.
+	s.p.PlayTracks([]media.Track{testTracks[0]}, 0)
+	s.settle(t, func(st player.State) bool {
+		return st.Playing && st.Source != nil && st.Source.Track.ID == testTracks[0].ID
+	})
+	tt.Frame()
+	waitScript(t, s, page, "mv.clear()")
+	if _, ok := tt.Find("Visualizer"); !ok {
+		t.Error("the song has no visualizer")
+	}
 }
 
 // TestNowPlayingVideoOff keeps the cover and the visualizer of songs, of

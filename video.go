@@ -59,20 +59,11 @@ type videoStatus struct {
 	Src    string `json:"src"`
 	Shown  bool   `json:"shown"`
 	Failed string `json:"failed"`
-	Drift  struct {
-		Max    int `json:"max"`
-		Mean   int `json:"mean"`
-		Frames int `json:"frames"`
-	} `json:"drift"`
-}
-
-// same reports whether a and b tell the same, but for the drift.
-func (a videoStatus) same(b videoStatus) bool {
-	return a.Src == b.Src && a.Shown == b.Shown && a.Failed == b.Failed
 }
 
 // videoWant is what a frame wants the page to do: play the picture of
-// src, while active and playing, at pos, the player's position.
+// src, of the recording track, while active and playing, at pos, the
+// player's position.
 type videoWant struct {
 	src     *app.VideoSource
 	track   string
@@ -223,7 +214,7 @@ func (l *videoLink) send(cmd videoCmd) {
 		l.loaded = unknownPicture
 		return
 	}
-	if !st.same(l.last) {
+	if st != l.last {
 		l.last = st
 		l.report(st)
 	}
@@ -283,13 +274,15 @@ type videoView struct {
 	broken, played map[string]bool
 	// want is what the frame built wants the page to do, built whether it
 	// built the picture, and shown whether the frame before did; sent is
-	// what the page was told last, and lastSrc the picture it plays, which
-	// it keeps while none shows, to go on with when it shows again.
-	want    videoWant
-	built   bool
-	shown   bool
-	sent    videoSent
-	lastSrc *app.VideoSource
+	// what the page was told last, and lastSrc the picture it plays, of
+	// lastTrack, which it keeps while none shows, to go on with when it
+	// shows again.
+	want      videoWant
+	built     bool
+	shown     bool
+	sent      videoSent
+	lastSrc   *app.VideoSource
+	lastTrack string
 	// keep closes the web view once no picture showed for videoKeep.
 	keep *time.Timer
 }
@@ -562,7 +555,12 @@ func (s *shell) followVideo() {
 		}
 	}
 	if !built {
-		want = videoWant{src: v.lastSrc, filter: v.sent.filter}
+		// The picture of what still plays waits to show again, where it
+		// was; another track's goes.
+		want = videoWant{}
+		if cur := s.st.Source; cur != nil && cur.Track.ID == v.lastTrack {
+			want = videoWant{src: v.lastSrc, track: v.lastTrack, filter: v.sent.filter}
+		}
 	}
 	now := time.Now()
 	if !videoSend(v.sent, want, now) {
@@ -573,7 +571,7 @@ func (s *shell) followVideo() {
 		src = want.src.Src
 	}
 	v.sent = videoSent{src: src, active: want.active, playing: want.playing, pos: want.pos, filter: want.filter, at: now}
-	v.lastSrc = want.src
+	v.lastSrc, v.lastTrack = want.src, want.track
 	v.link.post(videoCmd{src: want.src, active: want.active, playing: want.playing, filter: want.filter})
 }
 
@@ -624,7 +622,7 @@ func (s *shell) closeVideo() {
 		go web.Destroy()
 	}
 	v.web, v.view, v.link, v.families = nil, nil, nil, nil
-	v.status, v.sent, v.lastSrc, v.shown = videoStatus{}, videoSent{}, nil, false
+	v.status, v.sent, v.lastSrc, v.lastTrack, v.shown = videoStatus{}, videoSent{}, nil, "", false
 }
 
 // videoToggle shows or hides the picture of music videos, beside the

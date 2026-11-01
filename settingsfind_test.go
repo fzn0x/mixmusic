@@ -315,3 +315,39 @@ func TestSettingsFindForms(t *testing.T) {
 		t.Errorf("searching redirect uri shows %q", tt.Texts())
 	}
 }
+
+// TestSettingsFindSpellings finds the settings spelled either way, at every
+// letter typed.
+func TestSettingsFindSpellings(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 6000)
+	for _, c := range []struct{ word, finds string }{
+		{"colour", "Accent colour"}, {"color", "Accent colour"},
+		{"equaliser", "Shape the sound of YouTube Music with ten bands and a preamp."},
+		{"equalizer", "Shape the sound of YouTube Music with ten bands and a preamp."},
+		{"leveling", "Volume levelling"}, {"levelling", "Volume levelling"},
+		{"licence", "libopus, which decodes Opus audio"},
+		{"normalise", "Volume levelling"},
+	} {
+		for n := 4; n <= len(c.word); n++ {
+			q := c.word[:n]
+			show(s, tt, settingsPath("", q))
+			if !tt.HasText(c.finds) {
+				t.Errorf("%q doesn't find %q: %q", q, c.finds, tt.Texts())
+			}
+		}
+	}
+}
+
+func TestSearchFold(t *testing.T) {
+	for in, want := range map[string]string{
+		"Accent colour":    "accent colour accent color",
+		"Équalizer":        "equalizer equaliser",
+		"Volume levelling": "volume levelling volume leveling",
+		"Crossfade":        "crossfade",
+	} {
+		if got := searchFold(in); got != want {
+			t.Errorf("searchFold(%q) = %q, not %q", in, got, want)
+		}
+	}
+}

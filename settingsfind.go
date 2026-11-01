@@ -86,10 +86,33 @@ func (f *settingsFind) holds(title, text, more string) bool {
 	k := findKey{f.q, f.section, f.group, title, text, more}
 	m, ok := f.seen[k]
 	if !ok {
-		m = allIn(f.cur, fold(k.section+" "+k.group+" "+title+" "+text+" "+more))
+		m = allIn(f.cur, searchFold(k.section+" "+k.group+" "+title+" "+text+" "+more))
 		f.seen[k] = m
 	}
 	return m
+}
+
+// spellings turn the words the settings spell one way, and users may spell
+// another, into their other spelling, both ways: colour and color,
+// equaliser and equalizer, levelling and leveling, licence and license,
+// normalise and normalize.
+var spellings = strings.NewReplacer(
+	"colour", "color", "color", "colour",
+	"equalis", "equaliz", "equaliz", "equalis",
+	"levell", "level", "level", "levell",
+	"licenc", "licens", "licens", "licenc",
+	"normalis", "normaliz", "normaliz", "normalis",
+)
+
+// searchFold folds a text the search of the settings looks through as fold
+// does, and adds it spelled the other way: either spelling then finds it,
+// at every letter typed. The query is only folded.
+func searchFold(text string) string {
+	text = fold(text)
+	if other := spellings.Replace(text); other != text {
+		return text + " " + other
+	}
+	return text
 }
 
 // findable tells whether the thing title and text name shows, which words

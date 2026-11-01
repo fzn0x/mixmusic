@@ -152,6 +152,13 @@ what they show beside the main thread (`fetch`), and a window's state
 belongs to its main thread: what finishes elsewhere comes back through
 `update`.
 
+- **Refresh** (F5, ⇧⌘R on macOS, `refresh.go`) asks again for the keys
+  the page shown and the side panel fetched in the frame before, as
+  `fetch` collects them, and renders the plugins' views again
+  (`View.Remount`). The page keeps its answers until the new ones come,
+  and keeps them when a refresh fails, which one toast tells. Home's own
+  tile and shelves read the library as it is, and need no refresh.
+
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
   MB of pixels (`artwork.go`). An image that couldn't load tries again

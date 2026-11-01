@@ -81,6 +81,10 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 		p.Seek(fromMs(cmd.Value))
 	case CommandVolume:
 		p.SetVolume(cmd.Value)
+	case CommandVolumeBy:
+		p.ChangeVolume(min(max(cmd.Value, -1), 1))
+	case CommandMute:
+		p.ToggleMute()
 	case CommandShuffle:
 		p.ToggleShuffle()
 	case CommandRepeat:
@@ -91,7 +95,9 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 			go func() {
 				if err := (&Collection{a}).SetLiked(context.Background(), cur.Track, !liked); err != nil {
 					log.Printf("mixmusic: liking %s: %v", cur.Track.ID, err)
+					return
 				}
+				a.notifyLiked(cur.Track, !liked)
 			}()
 		}
 	case CommandPlayTrack:

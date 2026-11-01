@@ -44,9 +44,9 @@ type effects struct {
 	speedlines, screentone bool
 	// sparkles drift up the ground, twinkling (Mochi).
 	sparkles bool
-	// material makes the colours of Material's scheme of a seed, and
-	// dynamic takes the seed from the artwork playing (Material).
-	material, dynamic bool
+	// material makes the colours of Material's scheme of a seed: the
+	// artwork's, as the accent follows it, or the accent (Material).
+	material bool
 }
 
 // optionValue is the value of a theme's option: the user's, or its
@@ -99,7 +99,7 @@ func themeEffects(th addons.Theme, chosen map[string]string) effects {
 	case "mochi":
 		fx.sparkles = opt("sparkles") == "true"
 	case "material", "material-dark":
-		fx.material, fx.dynamic = true, opt("dynamic") == "true"
+		fx.material = true
 	}
 	return fx
 }

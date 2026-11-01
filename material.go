@@ -1,7 +1,7 @@
 package main
 
-// The Material themes' colours: Material's tonal-spot scheme of a seed
-// colour, made in HCT (internal/hct). The seed is the artwork's colour
+// The Material themes' colours: the scheme of Material's core palettes of
+// a seed colour, made in HCT (internal/hct). The seed is the artwork's colour
 // while it plays, as Material's dynamic colour takes the wallpaper's, the
 // accent the user chose, or MixMusic's pink.
 
@@ -63,7 +63,7 @@ func (m *materialColors) token(name string) (color.NRGBA, bool) {
 }
 
 func makeMaterial(seed hct.ARGB, dark bool) *materialColors {
-	p := hct.TonalSpot(seed)
+	p := hct.Core(seed)
 	s := p.Scheme(dark)
 	c := func(a hct.ARGB) color.NRGBA {
 		r, g, b := a.RGB()
@@ -86,8 +86,11 @@ func makeMaterial(seed hct.ARGB, dark bool) *materialColors {
 			"accent": c(s.Primary), "accent-text": c(s.OnPrimary),
 			"danger": c(s.Error), "success": fixed(145, 48),
 			"youtube": fixed(27, 80), "spotify": fixed(142, 60),
-			"tile-1": c(s.PrimaryContainer), "tile-2": c(s.SecondaryContainer), "tile-3": c(s.TertiaryContainer),
-			"tile-4": c(s.InversePrimary), "tile-text": c(s.OnSurface),
+			// The tiles: the primary's and the tertiary's containers, and
+			// both a step stronger. A light seed's containers lack chroma:
+			// the secondary's would match the primary's.
+			"tile-1": c(s.PrimaryContainer), "tile-2": c(s.TertiaryContainer), "tile-3": c(s.InversePrimary),
+			"tile-4": c(p.Tertiary.Tone(tone(80, 40))), "tile-text": c(s.OnSurface),
 		},
 		selected: c(s.SecondaryContainer), selectedText: c(s.OnSecondaryContainer),
 	}

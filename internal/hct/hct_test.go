@@ -91,6 +91,22 @@ func TestSolver(t *testing.T) {
 	}
 }
 
+// TestCore checks the core palettes of blue against Material Color
+// Utilities' own: its primary is blue's own, its secondary blue at 16.
+func TestCore(t *testing.T) {
+	p := Core(0xff0000ff)
+	for tone, want := range map[float64]ARGB{90: 0xffe0e0ff, 40: 0xff343dff, 10: 0xff00006e} {
+		if got := p.Primary.Tone(tone); got != want {
+			t.Errorf("primary %v = %08x, want %08x", tone, uint32(got), uint32(want))
+		}
+	}
+	for tone, want := range map[float64]ARGB{90: 0xffe1e0f9, 40: 0xff5c5d72, 10: 0xff191a2c} {
+		if got := p.Secondary.Tone(tone); got != want {
+			t.Errorf("secondary %v = %08x, want %08x", tone, uint32(got), uint32(want))
+		}
+	}
+}
+
 func TestPalette(t *testing.T) {
 	blue := PaletteOf(0xff0000ff)
 	for tone, want := range map[float64]ARGB{
@@ -114,7 +130,7 @@ func contrast(a, b ARGB) float64 {
 func TestSchemeContrast(t *testing.T) {
 	for _, seed := range []ARGB{0xffe6007e, 0xff6750a4, 0xff0000ff, 0xffffff00, 0xff00ff00, 0xff00bde3, 0xff808080, 0xffff8000} {
 		for _, dark := range []bool{false, true} {
-			s := TonalSpot(seed).Scheme(dark)
+			s := Core(seed).Scheme(dark)
 			for _, p := range []struct {
 				name     string
 				ink, bg  ARGB

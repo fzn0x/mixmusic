@@ -6,18 +6,18 @@ type Palettes struct {
 	Primary, Secondary, Tertiary, Neutral, NeutralVariant, Error Palette
 }
 
-// TonalSpot is the palettes of Material's default scheme, tonal spot, of
-// a seed colour: its hue at a moderate chroma for the primary, a calmer
-// one for the secondary, the hue turned 60° for the tertiary, and neutrals
-// barely tinted with it.
-func TonalSpot(seed ARGB) Palettes {
-	h := FromARGB(seed).Hue
+// Core is the palettes Material's core palette makes of a seed colour
+// (CorePalette.of): the primary of its hue and chroma, 48 at least, so
+// that a dull seed still makes a colourful scheme; a calmer secondary; a
+// tertiary of the hue turned 60°; and neutrals barely tinted with it.
+func Core(seed ARGB) Palettes {
+	c := FromARGB(seed)
 	return Palettes{
-		Primary:        Palette{h, 36},
-		Secondary:      Palette{h, 16},
-		Tertiary:       Palette{sanitizeDegrees(h + 60), 24},
-		Neutral:        Palette{h, 6},
-		NeutralVariant: Palette{h, 8},
+		Primary:        Palette{c.Hue, max(48, c.Chroma)},
+		Secondary:      Palette{c.Hue, 16},
+		Tertiary:       Palette{sanitizeDegrees(c.Hue + 60), 24},
+		Neutral:        Palette{c.Hue, 4},
+		NeutralVariant: Palette{c.Hue, 8},
 		Error:          Palette{25, 84},
 	}
 }

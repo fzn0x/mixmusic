@@ -85,7 +85,7 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	}
 	// The accent: the artwork's, the user's, or the theme's.
 	pick := s.Accent
-	if (s.DynamicAccent || fx.dynamic) && artwork != "" {
+	if s.DynamicAccent && artwork != "" {
 		pick = artwork
 	}
 	// The Material themes make all their colours of it, as their seed.

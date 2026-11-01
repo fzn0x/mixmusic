@@ -9,6 +9,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/resources"
 )
 
 // navItem is a page of the rail.
@@ -107,6 +108,22 @@ func (s *shell) rail(c *ui.Context) {
 	})
 }
 
+// brandMark is MixMusic's mark, the pink rings with a play button of its
+// icon, and brandPink their colour.
+var (
+	brandMark = mustSVG(resources.Mark)
+	brandPink = ui.RGB(0xe6, 0x00, 0x7e)
+)
+
+// mustSVG parses an SVG MixMusic ships.
+func mustSVG(data []byte) *ui.SVG {
+	svg, err := ui.ParseSVG(data)
+	if err != nil {
+		panic(err)
+	}
+	return svg
+}
+
 // brand is MixMusic's mark and name, where the window drags under a
 // hidden title bar, and the button that collapses the rail.
 func (s *shell) brand(c *ui.Context, collapsed bool) {
@@ -118,13 +135,9 @@ func (s *shell) brand(c *ui.Context, collapsed bool) {
 	}
 	row.Children(func() {
 		if !collapsed {
-			ui.Box(c).Size(26, 26).Shrink(0).Draw(func(p *ui.Painter, r ui.Rect) {
-				var a, b ui.Path
-				a.Circle(r.X+r.W*12/32, r.Y+r.H/2, r.W*8.5/32)
-				b.Circle(r.X+r.W*20/32, r.Y+r.H/2, r.W*8.5/32)
-				p.StrokePath(&a, r.W*2.4/32, k.text)
-				p.StrokePath(&b, r.W*2.4/32, k.accent)
-			})
+			// The mark keeps its pink in every theme, as the app's icon
+			// does.
+			ui.Icon(c, brandMark).Size(26, 26).Shrink(0).TextColor(brandPink)
 			ui.Text(c, "mixmusic").FontSize(24).FontWeight(300).Font(k.display).LetterSpacing(-0.03 * 24).
 				SingleLine().Grow(1).MinWidth(0)
 		}

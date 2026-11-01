@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"slices"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -430,6 +431,259 @@ func TestAddToYouTubePlaylistListsYours(t *testing.T) {
 	open()
 	if err := tt.ChooseMenuItem("Add to YouTube Music playlist", "Late night"); err != nil {
 		t.Errorf("%v: the menu holds %q", err, tt.Menu())
+	}
+}
+
+// Playlists of a library on YouTube Music: one the user made, one they
+// saved, and one that's neither.
+var (
+	ownPlaylist = media.Playlist{ID: "yt:PLmine", Source: media.SourceYouTube, Title: "Late night", Owner: "Ada",
+		Deletable: true, Editable: true, Tracks: testTracks[:2], URL: "https://music.youtube.com/playlist?list=PLmine"}
+	savedPlaylist = media.Playlist{ID: "yt:PLsaved", Source: media.SourceYouTube, Title: "Chill", Owner: "Lofi Girl", Saved: true}
+	plainPlaylist = media.Playlist{ID: "yt:PLplain", Source: media.SourceYouTube, Title: "Shoegaze", Owner: "Someone"}
+)
+
+// youtubeLibraryOf signs the shell in to YouTube Music, whose library
+// holds playlists, and nothing else.
+func youtubeLibraryOf(s *shell, playlists ...media.Playlist) *loaded[[]media.Playlist] {
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	l := &loaded[[]media.Playlist]{done: true, value: playlists}
+	s.loads["youtube:playlists"] = l
+	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true}
+	s.loads["youtube:artists"] = &loaded[[]media.Artist]{done: true}
+	s.loads["youtube:liked"] = &loaded[[]media.Track]{done: true}
+	return l
+}
+
+// answerFor has YouTube answer the deletes (or the removals from the
+// library, with unsave) of the test with what answer gives, and returns
+// the IDs asked.
+func answerFor(t *testing.T, unsave bool, answer func() error) func() []string {
+	var (
+		mu    sync.Mutex
+		asked []string
+	)
+	seam := &deleteOnYouTube
+	if unsave {
+		seam = &unsaveOnYouTube
+	}
+	was := *seam
+	*seam = func(_ *shell, _ context.Context, id string) error {
+		mu.Lock()
+		asked = append(asked, id)
+		mu.Unlock()
+		return answer()
+	}
+	t.Cleanup(func() { *seam = was })
+	return func() []string {
+		mu.Lock()
+		defer mu.Unlock()
+		return slices.Clone(asked)
+	}
+}
+
+// menuOf returns the items of the menu a right click on label opens.
+func menuOf(t *testing.T, tt *ui.Tester, label string) []string {
+	t.Helper()
+	if err := tt.RightClick(label); err != nil {
+		t.Fatalf("%v: the window shows %q", err, tt.Texts())
+	}
+	defer tt.CloseMenu()
+	return tt.Menu()
+}
+
+// told reports whether a toast says message, an error's if error is set.
+func told(s *shell, message string, error bool) bool {
+	return slices.ContainsFunc(s.notes, func(n player.Notice) bool { return n.Message == message && n.Error == error })
+}
+
+// TestYouTubePlaylistMenus offers to delete the playlists the user made on
+// YouTube Music, and to take out of the library those they saved, from
+// their tiles in the library, and the first from its page: only signed
+// in, and nowhere else.
+func TestYouTubePlaylistMenus(t *testing.T) {
+	const deleteItem, removeItem = "Delete from YouTube Music…", "Remove from library"
+	s := newTestShell(t)
+	youtubeLibraryOf(s, ownPlaylist, savedPlaylist, plainPlaylist)
+	s.loads["playlist:"+ownPlaylist.ID] = &loaded[media.Playlist]{done: true, value: ownPlaylist}
+	s.loads["search:mine"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{YouTube: media.SearchResults{
+		Playlists: []media.Playlist{ownPlaylist, savedPlaylist}}}}
+	tt := testerOf(t, s, 1280, 1800)
+	show(s, tt, "/library/youtube")
+	for _, tc := range []struct {
+		title          string
+		delete, remove bool
+	}{{ownPlaylist.Title, true, false}, {savedPlaylist.Title, false, true}, {plainPlaylist.Title, false, false}} {
+		items := menuOf(t, tt, tc.title)
+		if slices.Contains(items, deleteItem) != tc.delete || slices.Contains(items, removeItem) != tc.remove {
+			t.Errorf("the tile of %s has the menu %q", tc.title, items)
+		}
+		if tc.delete || tc.remove {
+			if len(items) < 2 || items[len(items)-2] != "-" {
+				t.Errorf("no separator before the last item of %q", items)
+			}
+		}
+	}
+	more := func() []string {
+		t.Helper()
+		if err := tt.Click("More"); err != nil {
+			t.Fatal(err)
+		}
+		defer tt.CloseMenu()
+		return tt.Menu()
+	}
+	show(s, tt, playlistPath(ownPlaylist.ID))
+	if items := more(); len(items) < 2 || items[len(items)-1] != deleteItem || items[len(items)-2] != "-" {
+		t.Errorf("the page's More menu is %q", items)
+	}
+	show(s, tt, searchPath("mine"))
+	for _, title := range []string{ownPlaylist.Title, savedPlaylist.Title} {
+		if items := menuOf(t, tt, title); slices.Contains(items, deleteItem) || slices.Contains(items, removeItem) {
+			t.Errorf("a search's tile of %s has the menu %q", title, items)
+		}
+	}
+	// Signed out: neither.
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true}
+	show(s, tt, playlistPath(ownPlaylist.ID))
+	if items := more(); slices.Contains(items, deleteItem) {
+		t.Errorf("signed out, the page's More menu is %q", items)
+	}
+}
+
+// TestDeleteYouTubePlaylist asks before it deletes a playlist the user
+// made on YouTube Music, greys the item out until YouTube answers, and
+// then shows the library without it, in place of its page; refused, it
+// stays, and the library reads its playlists again.
+func TestDeleteYouTubePlaylist(t *testing.T) {
+	answer := make(chan error)
+	asked := answerFor(t, false, func() error { return <-answer })
+	key := "delete:" + ownPlaylist.ID
+	setUp := func() (*shell, *ui.Tester, *loaded[[]media.Playlist]) {
+		s := newTestShell(t)
+		lib := youtubeLibraryOf(s, ownPlaylist, plainPlaylist)
+		s.loads["playlist:"+ownPlaylist.ID] = &loaded[media.Playlist]{done: true, value: ownPlaylist}
+		tt := tester(t, s)
+		show(s, tt, "/library/youtube")
+		show(s, tt, playlistPath(ownPlaylist.ID))
+		return s, tt, lib
+	}
+	more := func(tt *ui.Tester) error {
+		t.Helper()
+		if err := tt.Click("More"); err != nil {
+			t.Fatal(err)
+		}
+		return tt.ChooseMenuItem("Delete from YouTube Music…")
+	}
+
+	s, tt, lib := setUp()
+	if err := more(tt); err != nil {
+		t.Fatal(err)
+	}
+	tt.Frame()
+	if q := s.asking; q == nil || q.title != "delete playlist" || q.ok != "delete" ||
+		!strings.Contains(q.message, "Delete Late night from YouTube Music?") || !strings.Contains(q.message, "can't undo") {
+		t.Fatalf("deleting asks %+v", q)
+	}
+	if !tt.HasText("delete playlist") {
+		t.Errorf("no dialog shows: %q", tt.Texts())
+	}
+	click(t, s, tt, "delete")
+	if err := more(tt); err == nil || !strings.Contains(err.Error(), "disabled") {
+		t.Errorf("while YouTube answers, the item: %v", err)
+	}
+	tt.CloseMenu()
+	answer <- nil
+	s.settle(t, func(player.State) bool { return !s.keeping[key] })
+	if !told(s, "Deleted Late night from YouTube Music", false) {
+		t.Errorf("the toasts say %+v", s.notes)
+	}
+	if _, kept := s.loads["playlist:"+ownPlaylist.ID]; kept || len(lib.value) != 1 || lib.value[0].ID != plainPlaylist.ID {
+		t.Errorf("the page kept %v, the library holds %+v", kept, lib.value)
+	}
+	tt.Frame()
+	tt.Advance(time.Second)
+	if got := s.router.Path(); got != "/library/youtube" {
+		t.Errorf("once deleted, the window shows %q", got)
+	}
+	if slices.Contains(tt.Texts(), ownPlaylist.Title) {
+		t.Errorf("the library still shows it: %q", tt.Texts())
+	}
+	s.router.Back()
+	tt.Frame()
+	if got := s.router.Path(); got == playlistPath(ownPlaylist.ID) {
+		t.Error("Back leads to the playlist deleted")
+	}
+
+	// Refused, the page stays, and the library reads its list again.
+	s, tt, lib = setUp()
+	if err := more(tt); err != nil {
+		t.Fatal(err)
+	}
+	tt.Frame()
+	click(t, s, tt, "delete")
+	answer <- errors.New("YouTube Music refused")
+	s.settle(t, func(player.State) bool { return !s.keeping[key] })
+	if !told(s, "Couldn't delete Late night: YouTube Music refused", true) {
+		t.Errorf("the toasts say %+v", s.notes)
+	}
+	if _, kept := s.loads["playlist:"+ownPlaylist.ID]; !kept || len(lib.value) != 2 || !lib.again {
+		t.Errorf("refused: the page kept %v, the library holds %+v, asks again %v", kept, lib.value, lib.again)
+	}
+	tt.Frame()
+	tt.Advance(time.Second)
+	if got := s.router.Path(); got != playlistPath(ownPlaylist.ID) {
+		t.Errorf("refused, the window shows %q", got)
+	}
+
+	// From its tile, the library stays, without it.
+	s, tt, lib = setUp()
+	show(s, tt, "/library/youtube")
+	if err := tt.RightClick(ownPlaylist.Title); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt.ChooseMenuItem("Delete from YouTube Music…"); err != nil {
+		t.Fatal(err)
+	}
+	tt.Frame()
+	click(t, s, tt, "delete")
+	answer <- nil
+	s.settle(t, func(player.State) bool { return !s.keeping[key] })
+	tt.Frame()
+	if got := s.router.Path(); got != "/library/youtube" || len(lib.value) != 1 || slices.Contains(tt.Texts(), ownPlaylist.Title) {
+		t.Errorf("deleted from its tile: the window shows %q, the library %+v", got, lib.value)
+	}
+	if got := asked(); !slices.Equal(got, []string{ownPlaylist.ID, ownPlaylist.ID, ownPlaylist.ID}) {
+		t.Errorf("deleted %q", got)
+	}
+}
+
+// TestRemoveFromLibrary takes a playlist the user saved out of their
+// library on YouTube Music from its tile, without asking.
+func TestRemoveFromLibrary(t *testing.T) {
+	asked := answerFor(t, true, func() error { return nil })
+	s := newTestShell(t)
+	lib := youtubeLibraryOf(s, ownPlaylist, savedPlaylist)
+	tt := tester(t, s)
+	show(s, tt, "/library/youtube")
+	if err := tt.RightClick(savedPlaylist.Title); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt.ChooseMenuItem("Remove from library"); err != nil {
+		t.Fatal(err)
+	}
+	if s.asking != nil {
+		t.Errorf("removing asks %+v", s.asking)
+	}
+	s.settle(t, func(player.State) bool { return !s.keeping["remove:"+savedPlaylist.ID] })
+	if !told(s, "Chill: no longer saved", false) || len(lib.value) != 1 || lib.value[0].ID != ownPlaylist.ID {
+		t.Errorf("the toasts say %+v, the library holds %+v", s.notes, lib.value)
+	}
+	if got := asked(); !slices.Equal(got, []string{savedPlaylist.ID}) {
+		t.Errorf("took %q out of the library", got)
+	}
+	tt.Frame()
+	if slices.Contains(tt.Texts(), savedPlaylist.Title) {
+		t.Errorf("the library still shows it: %q", tt.Texts())
 	}
 }
 

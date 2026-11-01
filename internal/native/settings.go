@@ -530,7 +530,16 @@ func (s *shell) playbackSettings(c *ui.Context) {
 				s.save()
 			}
 		})
-		s.row(c, "Volume levelling", "Evens out loud and quiet tracks.", func() {
+		even := "Turns loud tracks down to one level, from YouTube's measure of each, so none jumps out. Quiet recordings keep their level."
+		if s.set.SpotifyPlayback == settings.SpotifyPlaybackConnect || s.set.SpotifyPlayback == settings.SpotifyPlaybackHere && spotifyPlaysHere {
+			even += " Spotify plays its own tracks at its own loudness."
+		}
+		s.row(c, "Even loudness", even, func() {
+			if ui.Switch(c.Key("loudness"), &s.set.Loudness).Label("Even loudness").Changed() {
+				s.save()
+			}
+		})
+		s.row(c, "Volume levelling", "Squeezes loud and quiet moments closer together as they play, and lifts quiet recordings.", func() {
 			if ui.Switch(c.Key("normalize"), &s.set.Normalize).Label("Volume levelling").Changed() {
 				s.save()
 			}

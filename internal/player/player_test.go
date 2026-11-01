@@ -1360,6 +1360,21 @@ func TestVolumeKept(t *testing.T) {
 	}
 }
 
+// TestVolumeFromSettings sets the volume settings.json keeps, as an edit
+// of it does: back from its position a hair off, it isn't saved again.
+func TestVolumeFromSettings(t *testing.T) {
+	h := newHarness(t, Saved{}, func(f *fakeServices) { f.settings.Volume = 0.8 })
+	h.svc.with(func(f *fakeServices) { f.settings.Volume = 0.37 })
+	h.p.SetVolume(volume.Of(0.37))
+	h.wait("the volume set", func(p *Player) bool { return p.s.Volume == volume.Of(0.37) })
+	h.p.Flush()
+	var v []float64
+	h.svc.with(func(f *fakeServices) { v = slices.Clone(f.volumes) })
+	if len(v) != 0 {
+		t.Errorf("saved %v, want nothing", v)
+	}
+}
+
 func TestRestore(t *testing.T) {
 	saved := Saved{Tracks: tracks("a", "b"), Index: 1, Position: 42000, Shuffle: true, Repeat: RepeatOne}
 	h := newHarness(t, saved)

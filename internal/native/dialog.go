@@ -151,10 +151,10 @@ func (s *shell) confirm(c *ui.Context, key string, open *bool, title, message, o
 	s.dialog(c, open, dialogOptions{key: key, title: title, width: 480, alert: true, message: message}, func() {
 		ui.Text(c, message).FontSize(s.lk.bodySize())
 	}, func() {
-		if s.button(c, key+"-cancel", "cancel", false).Clicked() {
+		if s.dialogButton(c, key+"-cancel", "cancel", false).Clicked() {
 			*open = false
 		}
-		if s.button(c, key+"-ok", ok, true).AutoFocus().Clicked() {
+		if s.dialogButton(c, key+"-ok", ok, true).AutoFocus().Clicked() {
 			*open, chosen = false, true
 		}
 	})

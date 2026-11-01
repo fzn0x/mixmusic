@@ -85,7 +85,7 @@ func (s *shell) likedSongs(c *ui.Context) {
 
 func (s *shell) mixTiles(c *ui.Context) {
 	s.tileWrap(c, func() {
-		new := ui.ButtonBase(c.Key("new-mix-tile")).Size(172, 172).Shrink(0).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
+		new := s.buttonBase(c.Key("new-mix-tile")).Size(172, 172).Shrink(0).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 			Padding(16).Background(s.lk.tile(2)).Radius(s.lk.radius).Label("New mix").Cursor(ui.CursorPointer)
 		if new.Clicked() {
 			s.newMix()

@@ -34,7 +34,7 @@ func (s *shell) pluginSettings(c *ui.Context) {
 			}
 			s.row(c, p.Name+" "+p.Version, desc, func() {
 				on := slices.Contains(s.set.EnabledPlugins, p.ID)
-				if ui.Switch(c.Key("plugin-"+p.ID), &on).Label("Enable " + p.Name).Changed() {
+				if s.switchOf(c.Key("plugin-"+p.ID), &on).Label("Enable " + p.Name).Changed() {
 					s.enablePlugin(p, on)
 				}
 				if !p.Builtin && s.iconButton(c, "remove-plugin-"+p.ID, "trash", "Remove "+p.Name, false, 16).Clicked() {

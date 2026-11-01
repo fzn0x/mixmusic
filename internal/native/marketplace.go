@@ -33,7 +33,7 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 		}
 		ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 24).Children(func() {
 			ui.Text(c, "Made by the community, reviewed in the open. ")
-			ui.Link(c, "Share yours", "https://github.com/fzn0x/mixmusic/blob/main/community/README.md")
+			s.linkOf(c, "Share yours", "https://github.com/fzn0x/mixmusic/blob/main/community/README.md")
 			ui.Text(c, ".")
 		})
 		switch {
@@ -161,7 +161,7 @@ func (s *shell) marketCard(c *ui.Context, kind addons.Kind, e addons.Entry, base
 					}
 				}
 				if has && kind == addons.KindTheme && s.set.Theme != e.ID {
-					use := ui.ButtonBase(c.Key("use-" + e.ID)).Label("Use " + e.Name).Cursor(ui.CursorPointer)
+					use := s.buttonBase(c.Key("use-" + e.ID)).Label("Use " + e.Name).Cursor(ui.CursorPointer)
 					if use.Clicked() {
 						s.set.Theme = e.ID
 						s.save()

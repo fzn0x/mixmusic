@@ -73,7 +73,7 @@ func (s *shell) collectionHead(c *ui.Context, h headProps) {
 								if a.ID == "" {
 									ui.Text(c, a.Name)
 								} else {
-									ui.Link(c, a.Name, artistPath(a.ID))
+									s.linkOf(c, a.Name, artistPath(a.ID))
 								}
 							}
 						case f.text != "":
@@ -360,10 +360,10 @@ func (s *shell) mixDialogs(c *ui.Context, key string) {
 	s.dialog(c, &s.renaming, dialogOptions{key: "rename", title: "rename mix"}, func() {
 		in = ui.TextInput(c.Key("rename"), &s.renameTo).AutoFocus().Label("Name").Width(360)
 	}, func() {
-		if s.button(c, "rename-cancel", "cancel", false).Clicked() {
+		if s.dialogButton(c, "rename-cancel", "cancel", false).Clicked() {
 			s.renaming = false
 		}
-		if s.button(c, "rename-ok", "rename", true).Clicked() || in.Submitted() {
+		if s.dialogButton(c, "rename-ok", "rename", true).Clicked() || in.Submitted() {
 			if t := strings.TrimSpace(s.renameTo); t != "" {
 				if err := s.svc.Collection.UpdatePlaylist(s.renameID, t, ""); err != nil {
 					s.notes = append(s.notes, noticeOf(err))
@@ -548,7 +548,7 @@ func (s *shell) relatedArtists(c *ui.Context, related []media.Ref) {
 			if r.ID == "" {
 				continue
 			}
-			chip := ui.ButtonBase(c.Key("related-"+count(i))).Height(34).PaddingX(14).Border(2, s.lk.outline).
+			chip := s.buttonBase(c.Key("related-"+count(i))).Height(34).PaddingX(14).Border(2, s.lk.outline).
 				Radius(s.lk.radiusSm).Label(r.Name).Cursor(ui.CursorPointer)
 			if chip.Hovered() {
 				chip.Background(s.lk.hover)

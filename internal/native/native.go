@@ -230,6 +230,9 @@ type shell struct {
 	resetting        bool
 	recording        string
 	recordingFocused bool
+	// plainKeys are the commands' keys without modifiers that a focused
+	// control takes, as the frame's runShortcuts found them.
+	plainKeys []plainKey
 	// offer is the new version the window offers, until the user answers;
 	// updating is set while it downloads, updated once it is installed.
 	offer                   *app.Release
@@ -459,10 +462,10 @@ func (s *shell) promptDialog(c *ui.Context) {
 		in = ui.TextInput(c.Key("prompt"), &p.value).AutoFocus().Label(p.label).Width(360)
 	}, func() {
 		name := strings.TrimSpace(p.value)
-		if s.button(c, "prompt-cancel", "cancel", false).Clicked() {
+		if s.dialogButton(c, "prompt-cancel", "cancel", false).Clicked() {
 			s.naming = nil
 		}
-		if (s.button(c, "prompt-ok", p.confirm, true).Disabled(name == "").Clicked() || in.Submitted()) && name != "" {
+		if (s.dialogButton(c, "prompt-ok", p.confirm, true).Disabled(name == "").Clicked() || in.Submitted()) && name != "" {
 			s.naming = nil
 			p.done(name)
 		}

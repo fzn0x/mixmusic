@@ -193,7 +193,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 		}
 	}, func() {
 		s.row(c, "Follow the computer", "Show one theme while the computer is in light mode and another in dark mode. The theme you pick below is the one for the mode it is in now.", func() {
-			if ui.Switch(c.Key("follow"), &s.set.FollowSystem).Label("Follow the computer").Changed() {
+			if s.switchOf(c.Key("follow"), &s.set.FollowSystem).Label("Follow the computer").Changed() {
 				s.save()
 			}
 		})
@@ -220,7 +220,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 	}
 	s.group(c, "colour and type", func() {
 		s.row(c, "Follow the artwork", "Take the accent colour from the artwork of what plays.", func() {
-			if ui.Switch(c.Key("dynamic-accent"), &s.set.DynamicAccent).Label("Follow the artwork").Changed() {
+			if s.switchOf(c.Key("dynamic-accent"), &s.set.DynamicAccent).Label("Follow the artwork").Changed() {
 				s.save()
 			}
 		})
@@ -244,7 +244,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			}
 		})
 		s.row(c, "Icons only in the sidebar", "The sidebar shows its pages as icons. It does in narrow windows too, until you unfold it there.", func() {
-			if ui.Switch(c.Key("collapsed"), &s.set.SidebarCollapsed).Label("Icons only in the sidebar").Changed() {
+			if s.switchOf(c.Key("collapsed"), &s.set.SidebarCollapsed).Label("Icons only in the sidebar").Changed() {
 				s.save()
 			}
 		})
@@ -275,7 +275,7 @@ func (s *shell) themeSelect(c *ui.Context, key, label string, id *string) {
 			chosen = labels[i]
 		}
 	}
-	if ui.Select(c.Key(key), &chosen, labels).Width(220).Label(label).Changed() {
+	if s.selectOf(c.Key(key), &chosen, labels).Width(220).Label(label).Changed() {
 		if i := slices.Index(labels, chosen); i >= 0 {
 			*id = themes[i].ID
 			s.save()
@@ -289,7 +289,7 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 	k := &s.lk
 	id, name := t.ID, t.Name
 	tk := newLook(settings.Settings{Theme: id, FontScale: 1}, s.inv.Themes, k.dark, "")
-	card := ui.ButtonBase(c.Key("theme-"+id)).Width(200).Height(124).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
+	card := s.buttonBase(c.Key("theme-"+id)).Width(200).Height(124).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 		Padding(14).Background(tk.bg).Border(1, tk.border).Label(name).Cursor(ui.CursorPointer)
 	if current {
 		card.Border(3, k.accent)
@@ -342,7 +342,7 @@ func (s *shell) colorControl(c *ui.Context, key, label string, current ui.Color,
 	if w.edits == 0 {
 		w.color = current
 	}
-	if !ui.ColorWell(c.Key(key), &w.color).Label(label).Changed() {
+	if !s.colorWellOf(c.Key(key), &w.color).Label(label).Changed() {
 		return
 	}
 	set(hexColor(w.color))
@@ -401,7 +401,7 @@ func (s *shell) themeOption(c *ui.Context, th addons.Theme, o addons.Option) {
 		switch o.Type {
 		case addons.OptionToggle:
 			on := value == "true"
-			if ui.Switch(c.Key(key), &on).Label(o.Label).Changed() {
+			if s.switchOf(c.Key(key), &on).Label(o.Label).Changed() {
 				set(strconv.FormatBool(on))
 			}
 		case addons.OptionSelect:
@@ -413,7 +413,7 @@ func (s *shell) themeOption(c *ui.Context, th addons.Theme, o addons.Option) {
 					chosen = ch.Label
 				}
 			}
-			if ui.Select(c.Key(key), &chosen, labels).Width(200).Label(o.Label).Changed() {
+			if s.selectOf(c.Key(key), &chosen, labels).Width(200).Label(o.Label).Changed() {
 				if i := slices.Index(labels, chosen); i >= 0 {
 					set(o.Choices[i].Value)
 				}
@@ -498,7 +498,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 		case !signedIn:
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).Children(func() {
 				ui.Text(c, "Sign in to Spotify in ")
-				ui.Link(c, "accounts", "/settings/accounts")
+				s.linkOf(c, "accounts", "/settings/accounts")
 				ui.Text(c, " to play your Spotify library.")
 			})
 		case s.set.SpotifyPlayback == settings.SpotifyPlaybackHere && spotifyPlaysHere && !sp.Streaming:
@@ -546,12 +546,12 @@ func (s *shell) playbackSettings(c *ui.Context) {
 			}
 		})
 		s.row(c, "Volume levelling", "Evens out loud and quiet tracks.", func() {
-			if ui.Switch(c.Key("normalize"), &s.set.Normalize).Label("Volume levelling").Changed() {
+			if s.switchOf(c.Key("normalize"), &s.set.Normalize).Label("Volume levelling").Changed() {
 				s.save()
 			}
 		})
 		s.row(c, "Autoplay", "When the queue runs out, a radio of what you played carries on.", func() {
-			if ui.Switch(c.Key("autoplay"), &s.set.Autoplay).Label("Autoplay").Changed() {
+			if s.switchOf(c.Key("autoplay"), &s.set.Autoplay).Label("Autoplay").Changed() {
 				s.save()
 			}
 		})
@@ -573,7 +573,7 @@ func (s *shell) deviceRow(c *ui.Context) {
 		if i := slices.Index(ids, s.set.SpotifyDevice); i >= 0 {
 			chosen = labels[i]
 		}
-		if ui.Select(c.Key("device"), &chosen, labels).Width(220).Label("Device").Changed() {
+		if s.selectOf(c.Key("device"), &chosen, labels).Width(220).Label("Device").Changed() {
 			if i := slices.Index(labels, chosen); i >= 0 {
 				s.setDevice(ids[i])
 			}
@@ -589,7 +589,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 	eq := &s.set.Equalizer
 	s.group(c, "equalizer", func() {
 		s.row(c, "Equalizer", "Shape the sound of YouTube Music with ten bands and a preamp.", func() {
-			if ui.Switch(c.Key("eq-on"), &eq.Enabled).Label("Equalizer").Changed() {
+			if s.switchOf(c.Key("eq-on"), &eq.Enabled).Label("Equalizer").Changed() {
 				s.save()
 			}
 		})
@@ -604,7 +604,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 			}
 		}
 		s.row(c, "Preset", "", func() {
-			if ui.Select(c.Key("eq-preset"), &chosen, labels).Width(200).Label("Preset").Changed() {
+			if s.selectOf(c.Key("eq-preset"), &chosen, labels).Width(200).Label("Preset").Changed() {
 				i := slices.Index(labels, chosen)
 				if i >= 0 {
 					// Choosing how it sounds turns the equalizer on.
@@ -641,7 +641,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 		// change: only the system's equalizer reaches it.
 		ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
 			ui.Text(c, "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: ")
-			ui.Link(c, "Spotify notes", spotifyEqualizer)
+			s.linkOf(c, "Spotify notes", spotifyEqualizer)
 			ui.Text(c, " that its audio settings can't change while another device plays it.")
 		})
 	})

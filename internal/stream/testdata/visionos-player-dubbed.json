@@ -1,0 +1,396 @@
+{
+  "playabilityStatus": {
+    "status": "OK"
+  },
+  "playerConfig": {
+    "audioConfig": {
+      "enablePerFormatLoudness": true,
+      "loudnessNormalizationConfig": {
+        "applyStatefulNormalization": false,
+        "maxStatefulTimeThresholdSec": 300,
+        "minimumLoudnessTargetLkfs": -31,
+        "preserveStatefulLoudnessTarget": true
+      },
+      "loudnessTargetLkfs": -14,
+      "perceptualLoudnessDb": -12.34,
+      "trackAbsoluteLoudnessLkfs": -12.34
+    }
+  },
+  "responseContext": {
+    "visitorData": "CgtUZXN0VmlzaXRvcijAgICABjIKCgJVUxIEGgAgAA%3D%3D"
+  },
+  "streamingData": {
+    "adaptiveFormats": [
+      {
+        "approxDurationMs": "1541340",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Spanish",
+          "id": "es.3"
+        },
+        "averageBitrate": 48788,
+        "bitrate": 51127,
+        "contentLength": "9399949",
+        "itag": 139,
+        "loudnessDb": 0,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "trackAbsoluteLoudnessLkfs": -14,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=9399949&dur=1541.340&itag=139&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541386",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Hindi",
+          "id": "hi.3"
+        },
+        "averageBitrate": 48788,
+        "bitrate": 51135,
+        "contentLength": "9400257",
+        "itag": 139,
+        "loudnessDb": 0.03999996,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "trackAbsoluteLoudnessLkfs": -13.96,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=9400257&dur=1541.386&itag=139&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541340",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "audioTrack": {
+          "audioIsDefault": true,
+          "displayName": "English (US) original",
+          "id": "en-US.4"
+        },
+        "averageBitrate": 48788,
+        "bitrate": 51136,
+        "contentLength": "9399983",
+        "itag": 139,
+        "loudnessDb": 1.6599998,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "trackAbsoluteLoudnessLkfs": -12.34,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=9399983&dur=1541.340&itag=139&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541247",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Spanish",
+          "id": "es.3"
+        },
+        "averageBitrate": 129478,
+        "bitrate": 131684,
+        "contentLength": "24944734",
+        "itag": 140,
+        "loudnessDb": 0,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -14,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=24944734&dur=1541.247&itag=140&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541294",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Hindi",
+          "id": "hi.3"
+        },
+        "averageBitrate": 129477,
+        "bitrate": 131797,
+        "contentLength": "24945452",
+        "itag": 140,
+        "loudnessDb": 0.03999996,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -13.96,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=24945452&dur=1541.294&itag=140&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541270",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "audioTrack": {
+          "audioIsDefault": true,
+          "displayName": "English (US) original",
+          "id": "en-US.4"
+        },
+        "averageBitrate": 129475,
+        "bitrate": 131818,
+        "contentLength": "24944676",
+        "itag": 140,
+        "loudnessDb": 1.6599998,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -12.34,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=24944676&dur=1541.270&itag=140&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541221",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Spanish",
+          "id": "es.3"
+        },
+        "averageBitrate": 50831,
+        "bitrate": 56927,
+        "contentLength": "9792858",
+        "itag": 249,
+        "loudnessDb": 0,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -14,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=9792858&dur=1541.221&itag=249&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541261",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Hindi",
+          "id": "hi.3"
+        },
+        "averageBitrate": 51747,
+        "bitrate": 61255,
+        "contentLength": "9969461",
+        "itag": 249,
+        "loudnessDb": 0.03999996,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -13.96,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=9969461&dur=1541.261&itag=249&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541241",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": true,
+          "displayName": "English (US) original",
+          "id": "en-US.4"
+        },
+        "averageBitrate": 49394,
+        "bitrate": 59602,
+        "contentLength": "9516131",
+        "itag": 249,
+        "loudnessDb": 1.6599998,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -12.34,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=9516131&dur=1541.241&itag=249&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541221",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Spanish",
+          "id": "es.3"
+        },
+        "averageBitrate": 66388,
+        "bitrate": 76065,
+        "contentLength": "12789987",
+        "itag": 250,
+        "loudnessDb": 0,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -14,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=12789987&dur=1541.221&itag=250&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541261",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Hindi",
+          "id": "hi.3"
+        },
+        "averageBitrate": 67580,
+        "bitrate": 80336,
+        "contentLength": "13019823",
+        "itag": 250,
+        "loudnessDb": 0.03999996,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -13.96,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=13019823&dur=1541.261&itag=250&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541241",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": true,
+          "displayName": "English (US) original",
+          "id": "en-US.4"
+        },
+        "averageBitrate": 64315,
+        "bitrate": 76885,
+        "contentLength": "12390630",
+        "itag": 250,
+        "loudnessDb": 1.6599998,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -12.34,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=12390630&dur=1541.241&itag=250&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541221",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Spanish",
+          "id": "es.3"
+        },
+        "averageBitrate": 128339,
+        "bitrate": 149818,
+        "contentLength": "24725023",
+        "itag": 251,
+        "loudnessDb": 0,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -14,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=24725023&dur=1541.221&itag=251&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541261",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": false,
+          "displayName": "Hindi",
+          "id": "hi.3"
+        },
+        "averageBitrate": 130545,
+        "bitrate": 155984,
+        "contentLength": "25150525",
+        "itag": 251,
+        "loudnessDb": 0.03999996,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -13.96,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=25150525&dur=1541.261&itag=251&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541241",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": true,
+          "displayName": "English (US) original",
+          "id": "en-US.4"
+        },
+        "averageBitrate": 125304,
+        "bitrate": 144266,
+        "contentLength": "24140597",
+        "itag": 251,
+        "loudnessDb": 1.6599998,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -12.34,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=24140597&dur=1541.241&itag=251&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541241",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": true,
+          "displayName": "English (US) original",
+          "id": "en-US.4"
+        },
+        "averageBitrate": 125304,
+        "bitrate": 184266,
+        "contentLength": "24140597",
+        "itag": 251,
+        "loudnessDb": 1.6599998,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -12.34,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=24140597&dur=1541.241&itag=251&xtags=drc%3D1&mime=audio%2Fwebm&expire={{expire}}",
+        "isDrc": true
+      },
+      {
+        "approxDurationMs": "1541241",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": true,
+          "displayName": "English (US) original",
+          "id": "en-US.4"
+        },
+        "averageBitrate": 125304,
+        "bitrate": 184267,
+        "contentLength": "24140597",
+        "itag": 251,
+        "loudnessDb": 1.6599998,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -12.34,
+        "signatureCipher": "s=AAAA&sp=sig&url=%7B%7Bmedia%7D%7D%2Fvideoplayback%3Fitag%3D251"
+      },
+      {
+        "approxDurationMs": "1541241",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": true,
+          "displayName": "English (US) original",
+          "id": "en-US.4"
+        },
+        "averageBitrate": 125304,
+        "bitrate": 184268,
+        "contentLength": "24140597",
+        "itag": 251,
+        "loudnessDb": 1.6599998,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -12.34,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=24140597&dur=1541.241&itag=251&n=AbCdEfGhIjKl&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "1541241",
+        "audioChannels": 6,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "audioTrack": {
+          "audioIsDefault": true,
+          "displayName": "English (US) original",
+          "id": "en-US.4"
+        },
+        "averageBitrate": 125304,
+        "bitrate": 184269,
+        "contentLength": "24140597",
+        "itag": 251,
+        "loudnessDb": 1.6599998,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -12.34,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=24140597&dur=1541.241&itag=251&mime=audio%2Fwebm&expire={{expire}}",
+        "spatialAudioType": "SPATIAL_AUDIO_TYPE_FOA"
+      }
+    ],
+    "expiresInSeconds": "21540"
+  },
+  "videoDetails": {
+    "author": "MrBeast",
+    "lengthSeconds": "1541",
+    "title": "$456,000 Squid Game In Real Life!",
+    "videoId": "0e3GPea1Tyg"
+  }
+}

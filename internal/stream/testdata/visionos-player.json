@@ -1,0 +1,103 @@
+{
+  "playabilityStatus": {
+    "status": "OK"
+  },
+  "playerConfig": {
+    "audioConfig": {
+      "enablePerFormatLoudness": true,
+      "loudnessNormalizationConfig": {
+        "applyStatefulNormalization": false,
+        "maxStatefulTimeThresholdSec": 300,
+        "minimumLoudnessTargetLkfs": -31,
+        "preserveStatefulLoudnessTarget": true
+      },
+      "loudnessTargetLkfs": -14,
+      "perceptualLoudnessDb": -7.93,
+      "trackAbsoluteLoudnessLkfs": -7.93
+    }
+  },
+  "responseContext": {
+    "visitorData": "CgtUZXN0VmlzaXRvcijAgICABjIKCgJVUxIEGgAgAA%3D%3D"
+  },
+  "streamingData": {
+    "adaptiveFormats": [
+      {
+        "approxDurationMs": "200379",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "averageBitrate": 48872,
+        "bitrate": 53259,
+        "contentLength": "1224122",
+        "itag": 139,
+        "loudnessDb": 6.07,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "trackAbsoluteLoudnessLkfs": -7.93,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=1224122&dur=200.379&itag=139&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "200379",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "averageBitrate": 129547,
+        "bitrate": 131966,
+        "contentLength": "3244833",
+        "itag": 140,
+        "loudnessDb": 6.07,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -7.93,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=3244833&dur=200.379&itag=140&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "200401",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 55702,
+        "bitrate": 62944,
+        "contentLength": "1395364",
+        "itag": 249,
+        "loudnessDb": 6.07,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -7.93,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=1395364&dur=200.401&itag=249&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "200401",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 72486,
+        "bitrate": 81199,
+        "contentLength": "1815793",
+        "itag": 250,
+        "loudnessDb": 6.07,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -7.93,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=1815793&dur=200.401&itag=250&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "200401",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "averageBitrate": 138713,
+        "bitrate": 152057,
+        "contentLength": "3474783",
+        "itag": 251,
+        "loudnessDb": 6.07,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -7.93,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=3474783&dur=200.401&itag=251&mime=audio%2Fwebm&expire={{expire}}"
+      }
+    ],
+    "expiresInSeconds": "21540"
+  },
+  "videoDetails": {
+    "author": "Billie Eilish - Topic",
+    "lengthSeconds": "200",
+    "title": "ocean eyes",
+    "videoId": "3IUqoyTxEU8"
+  }
+}

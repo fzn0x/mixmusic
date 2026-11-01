@@ -15,6 +15,6 @@
 
 **First launch.** The macOS app is not notarized yet: open it once from System Settings › Privacy & Security › Open Anyway, or run `xattr -dr com.apple.quarantine /Applications/MixMusic.app`. The Windows installer is not signed yet: if SmartScreen warns, choose More info › Run anyway.
 
-**Playing music.** YouTube Music needs yt-dlp, which MixMusic installs for you from Settings › Playback. Spotify needs an app of your own, which the [setup guide](https://github.com/{repo}/blob/{tag}/docs/spotify.md) walks through. The [README](https://github.com/{repo}/blob/{tag}/README.md#install) lists what each system needs.
+**Playing music.** YouTube Music plays without anything else, apart from a few tracks, such as those made for children, which need yt-dlp: MixMusic installs it for you from Settings › Playback. Spotify needs an app of your own, which the [setup guide](https://github.com/{repo}/blob/{tag}/docs/spotify.md) walks through. The [README](https://github.com/{repo}/blob/{tag}/README.md#install) lists what each system needs.
 
 Verify downloads with `SHA256SUMS`.

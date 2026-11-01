@@ -3,11 +3,13 @@ package stream
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -215,5 +217,51 @@ func TestParseRange(t *testing.T) {
 		if start != tc.start || end != tc.end || partial != tc.partial || ok != tc.satisfied {
 			t.Errorf("parseRange(%q) = %d, %d, %v, %v", tc.header, start, end, partial, ok)
 		}
+	}
+}
+
+func TestProxyServesDirectStreamsAtOnce(t *testing.T) {
+	f := newFakeTube(t)
+	// The media server refuses the URLs that expired, by their expire.
+	var expired atomic.Int64
+	f.serves(func(w http.ResponseWriter, r *http.Request) {
+		if exp, _ := strconv.ParseInt(r.URL.Query().Get("expire"), 10, 64); exp <= expired.Load() {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+		serveClen(w, r)
+	})
+	r := NewResolver(nil, "")
+	r.Direct = f.direct()
+	r.Run = func(context.Context, ...string) ([]byte, error) {
+		t.Error("yt-dlp ran for streams the direct route finds")
+		return nil, errors.New("no yt-dlp here")
+	}
+	p := NewProxy(r)
+	get := func(header string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest("GET", Path(songID), nil)
+		if header != "" {
+			req.Header.Set("Range", header)
+		}
+		rec := httptest.NewRecorder()
+		p.ServeHTTP(rec, req)
+		return rec
+	}
+
+	start := time.Now()
+	if rec := get(""); rec.Code != 200 || rec.Body.Len() != song251 {
+		t.Fatalf("first play: %d, %d bytes", rec.Code, rec.Body.Len())
+	}
+	if took := time.Since(start); took > 2*time.Second {
+		t.Errorf("served in %s", took)
+	}
+	var first int64
+	f.locked(func() { first = f.expires })
+	expired.Store(first)
+	if rec := get("bytes=0-99"); rec.Code != 206 || rec.Body.Len() != 100 {
+		t.Errorf("after expiry: %d, %d bytes", rec.Code, rec.Body.Len())
+	}
+	if n := len(f.players()); n != 2 {
+		t.Errorf("%d player requests: an expired stream is found again through the direct route", n)
 	}
 }

@@ -211,6 +211,8 @@ var (
 	// saveVolumeAfter is how long the volume stays still before the
 	// settings keep it.
 	saveVolumeAfter = 600 * time.Millisecond
+	// slowStart is how long a stream takes to sound before the log tells.
+	slowStart = 2 * time.Second
 )
 
 const (
@@ -220,7 +222,10 @@ const (
 	// countAfter is how long a track plays before it counts as played, or
 	// half of a shorter one.
 	countAfter = 30 * time.Second
-	// prefetchAfter is how long a track plays before the next is prepared.
+	// prepareAfter is how long a track plays before the next one's stream
+	// is found, so that skipping to it is quick, and prefetchAfter how long
+	// before its audio is downloaded too.
+	prepareAfter  = time.Second
 	prefetchAfter = 10 * time.Second
 	// restartAfter is how far into a track Previous goes back to its start.
 	restartAfter = 3 * time.Second
@@ -291,6 +296,7 @@ type Player struct {
 	loadToken   int
 	retried     string
 	counted     string
+	prepared    string
 	prefetched  string
 	crossfading bool
 	failures    int
@@ -304,8 +310,12 @@ type Player struct {
 	played     map[string]bool
 	// loaded is set while the stream engine has the current track, and
 	// atEnd when the queue ran out at its end, which the engine ended.
-	loaded      bool
-	atEnd       bool
+	loaded bool
+	atEnd  bool
+	// askedAt is when the current track was asked to play, from askedFrom,
+	// until it sounds: the log tells when that took long.
+	askedAt     time.Time
+	askedFrom   time.Duration
 	uidSeq      int
 	lastToggle  time.Time
 	reporting   throttle

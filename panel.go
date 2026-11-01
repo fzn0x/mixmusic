@@ -342,6 +342,14 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	if m.Item(label).Chosen() {
 		s.setLiked(t, !liked)
 	}
+	disliked := s.a.IsDisliked(t.ID)
+	label = "Dislike"
+	if disliked {
+		label = "Remove the dislike"
+	}
+	if m.Item(label).Chosen() {
+		s.setDisliked(t, !disliked)
+	}
 	s.addToMenus(m, one)
 	m.Separator()
 	for _, a := range t.Artists {

@@ -132,9 +132,16 @@ func (p *Player) StreamFailure(track media.Track) string {
 }
 
 // ForgetMatch drops the YouTube Music recording found for a Spotify track,
-// so that the next play searches again.
+// so that the next play searches again. The player no longer skips the
+// track for the label of the recording it drops.
 func (p *Player) ForgetMatch(trackID string) error {
-	return p.a.matcher.Forget(trackID)
+	if err := p.a.matcher.Forget(trackID); err != nil {
+		return err
+	}
+	if gp := p.a.goPlayer.Load(); gp != nil {
+		gp.ForgetLabel(trackID)
+	}
+	return nil
 }
 
 // Report tells the app what the player plays, for the tray, the main

@@ -85,6 +85,7 @@ type App struct {
 	cache        *stream.Cache
 	loudness     *loudnessBook
 	matcher      *match.Matcher
+	labels       *labelCache
 	lyrics       *lyrics.Client
 	addons       *addons.Manager
 	storage      *addons.Storage
@@ -177,6 +178,10 @@ func New(opts Options) (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("opening loudness: %w", err)
 	}
+	aiLabels, err := store.Open(filepath.Join(opts.CacheDir, "ai-labels.json"), map[string]int64{})
+	if err != nil {
+		return nil, fmt.Errorf("opening AI labels: %w", err)
+	}
 	s := a.settings.Get().Clean()
 
 	a.youtube = youtube.New()
@@ -215,6 +220,7 @@ func New(opts Options) (*App, error) {
 	a.openYouTube()
 	a.proxy.Cache = a.cache
 	a.matcher = match.New(a.youtube, matches)
+	a.labels = newLabelCache(a.youtube.MadeWithAI, aiLabels, time.Now)
 	a.lyrics = lyrics.New("MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)")
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
 	a.related = newMemo[[]media.Shelf](100)

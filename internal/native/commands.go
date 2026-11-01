@@ -241,7 +241,9 @@ func (s *shell) palette(c *ui.Context) {
 		if in.Submitted() && len(found) > 0 {
 			run(found[s.paletteAt])
 		}
-		ui.Column(c).MaxHeight(420).Children(func() {
+		// The list gives up room in a window too short for it, and
+		// scrolls: a column keeps its content's height, but for this.
+		ui.Column(c).MaxHeight(420).MinHeight(0).Children(func() {
 			ui.Scroll(c).MaxHeight(420).Children(func() {
 				for i, cmd := range found {
 					row := ui.ButtonBase(c.Key("palette-" + cmd.id)).Height(36).PaddingX(12).Gap(12).Justify(ui.SpaceBetween).Label(cmd.title).Cursor(ui.CursorPointer)

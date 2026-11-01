@@ -14,6 +14,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
@@ -256,5 +257,30 @@ func TestRadioOfAnUploadWhenSearchesFail(t *testing.T) {
 	}
 	if len(searches) != 2 || !slices.Equal(radios, []string{"GPZ5fnYFI4Q"}) {
 		t.Errorf("searched %q, asked the radios of %v", searches, radios)
+	}
+}
+
+// TestRadioQueuesSongs is what Autoplay and Start radio queue of those
+// radios: songs, without the upload the song's radio suggests beside
+// them, or the videos of a radio that has nothing else.
+func TestRadioQueuesSongs(t *testing.T) {
+	for _, c := range []struct {
+		name    string
+		seed    media.Track
+		noSongs bool
+		want    []string
+	}{
+		{"a music video", instantCrushVideo, false, songRadio[:3]},
+		{"an upload", driveThru, false, append([]string{instantCrushSong.ID}, songRadio[:3]...)},
+		{"an upload whose radio has no songs", driveThru, true, []string{"yt:a5uQMwRMHcs", "yt:qFLhGq0060w", "yt:H5v3kku4y6Q", "yt:1G4isv_Fylg"}},
+	} {
+		m := newFakeMusic(t)
+		if c.noSongs {
+			m.search = func(*http.Request, string) []byte { return nothing }
+		}
+		found, err := m.catalog(t).Radio(t.Context(), c.seed)
+		if got := trackIDs(player.RadioTracks(found, []media.Track{c.seed})); err != nil || !slices.Equal(got, c.want) {
+			t.Errorf("after %s, queued %v, %v", c.name, got, err)
+		}
 	}
 }

@@ -49,6 +49,9 @@ type Proxy struct {
 	HTTP     *http.Client
 	// Cache keeps the audio of tracks played to their end, if set.
 	Cache *Cache
+	// Seen, if set, is called when YouTube answers with audio, which tells
+	// that the network answers.
+	Seen func()
 
 	mu       sync.Mutex
 	failures map[string]string // why the last request of a video failed
@@ -408,6 +411,9 @@ func (p *Proxy) fetch(ctx context.Context, s Stream, start, end int64) (*stallin
 			res.Body.Close()
 			cancel(nil)
 			return nil, errors.New("stream: YouTube ignored the range")
+		}
+		if p.Seen != nil {
+			p.Seen()
 		}
 		return &stallingBody{body: res.Body, ctx: ctx, cancel: cancel, timer: timer, stall: stall}, nil
 	case http.StatusForbidden, http.StatusGone:

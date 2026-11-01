@@ -59,6 +59,9 @@ type Proxy struct {
 	// stall, reconnect and backoff are stallTimeout, reconnectTimeout and
 	// reconnectWait, unless a test shortens them.
 	stall, reconnect, backoff time.Duration
+	// liveReload, when a test sets it, is what a live stream's playlist
+	// reloads after, in place of its target duration.
+	liveReload time.Duration
 }
 
 // NewProxy returns a proxy of the streams r resolves. Its requests have no

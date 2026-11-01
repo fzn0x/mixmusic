@@ -445,3 +445,108 @@ func TestSettingsFindAsksNothing(t *testing.T) {
 		}
 	}
 }
+
+// runCommand runs the command id, as its shortcut does.
+func runCommand(t *testing.T, s *shell, tt *ui.Tester, id string) {
+	t.Helper()
+	for _, cmd := range s.commands() {
+		if cmd.id == id {
+			cmd.run()
+			s.drain()
+			tt.Frame()
+			tt.Advance(time.Second)
+			return
+		}
+	}
+	t.Fatalf("no command %s", id)
+}
+
+// TestPaletteSearchesSettings searches the settings from the command
+// palette, whose last entry does: with no command found, it is the second.
+// The box has the focus then, which Tab leaves for what it found.
+func TestPaletteSearchesSettings(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 2400)
+	tt.Key(ui.Cmd, ui.KeyK)
+	tt.Frame()
+	tt.Type("crossfade")
+	tt.Frame()
+	if !tt.HasText("Search the settings for “crossfade”") {
+		t.Fatalf("the palette shows %q", tt.Texts())
+	}
+	tt.Key(0, ui.KeyDown)
+	tt.Frame()
+	tt.Key(0, ui.KeyEnter)
+	s.drain()
+	tt.Frame()
+	tt.Advance(time.Second)
+	if got := s.router.Location(); got != "/settings?q=crossfade" {
+		t.Errorf("the palette went to %q", got)
+	}
+	if !tt.HasText("Crossfade") || s.find.query != "crossfade" {
+		t.Errorf("the settings show %q, the box %q", tt.Texts(), s.find.query)
+	}
+	if !boxFocused(tt) {
+		t.Error("the box hasn't the focus")
+	}
+
+	// A command found comes before the search of the settings.
+	tt.Key(ui.Cmd, ui.KeyK)
+	tt.Frame()
+	tt.Type("lyrics")
+	tt.Frame()
+	texts := tt.Texts()
+	if a, b := slices.Index(texts, "Show or hide the lyrics"), slices.Index(texts, "Search the settings for “lyrics”"); a < 0 || b < a {
+		t.Errorf("the palette shows %q", texts)
+	}
+}
+
+// TestSettingsSearchCommand focuses the box from anywhere: from another
+// page, the settings open unsearched; on the settings, the search stays.
+func TestSettingsSearchCommand(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 2400)
+	show(s, tt, settingsPath("", "tray"))
+	show(s, tt, "/explore")
+	runCommand(t, s, tt, "go.settingsSearch")
+	if got := s.router.Location(); got != "/settings" || s.find.query != "" {
+		t.Errorf("the command went to %q, the box holding %q", got, s.find.query)
+	}
+	if !boxFocused(tt) {
+		t.Fatal("the box hasn't the focus")
+	}
+	// Space types in the box, rather than playing.
+	typeKeys(s, tt, "media keys")
+	if got := s.router.Location(); got != "/settings?q=media+keys" {
+		t.Errorf("typing went to %q", got)
+	}
+	if s.p.State().Playing {
+		t.Error("Space played")
+	}
+
+	show(s, tt, settingsPath("desktop", "tray"))
+	runCommand(t, s, tt, "go.settingsSearch")
+	if got := s.router.Location(); got != "/settings/desktop?q=tray" || s.find.query != "tray" || !boxFocused(tt) {
+		t.Errorf("on the settings, the command went to %q, the box holding %q, focused %v", got, s.find.query, boxFocused(tt))
+	}
+}
+
+// TestSettingsSearchSliding runs the command as one page of the settings
+// slides in over another: the box shown takes the focus, not the one
+// leaving.
+func TestSettingsSearchSliding(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 2400)
+	show(s, tt, "/settings")
+	s.navigate("/settings/playback")
+	s.drain()
+	tt.Frame()
+	runCommand(t, s, tt, "go.settingsSearch")
+	if !boxFocused(tt) {
+		t.Fatal("the box shown hasn't the focus")
+	}
+	typeKeys(s, tt, "tray")
+	if got := s.router.Location(); got != "/settings/playback?q=tray" {
+		t.Errorf("typing went to %q", got)
+	}
+}

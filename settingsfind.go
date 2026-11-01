@@ -35,6 +35,8 @@ type settingsFind struct {
 	// screen readers heard of.
 	typedAt time.Time
 	told    string
+	// focus has the box take the keyboard focus once it shows.
+	focus bool
 
 	// As a page builds: whether it is the page the router shows, the query
 	// it searches and its words; the section and the group that build;
@@ -209,6 +211,18 @@ func (s *shell) findGroup(c *ui.Context, title string, links, rows func()) {
 	f.group, f.links, f.head, f.whole, f.inGroup = group, before, head, whole, inGroup
 }
 
+// searchSettings opens the settings with their search box focused: on a
+// page of the settings, the search it shows stays; from another page, the
+// settings open unsearched.
+func (s *shell) searchSettings() {
+	tab, q := "", ""
+	if p := s.router.Path(); p == "/settings" || strings.HasPrefix(p, "/settings/") {
+		tab, q = strings.TrimPrefix(strings.TrimPrefix(p, "/settings"), "/"), s.router.Query("q")
+	}
+	s.navigate(settingsPath(tab, q))
+	s.find.focus = true
+}
+
 // settingsPath is the location of the settings' section tab, or of the
 // first, searched for query, if any.
 func settingsPath(tab, query string) string {
@@ -233,7 +247,12 @@ func (s *shell) findBox(c *ui.Context, tab, q string, current bool) {
 		query = &f.query
 	}
 	ui.Row(c).Margin(0, 0, 32).Children(func() {
-		in := s.filterBox(c, "settings-find", "search the settings", "Search the settings", query, false, func() {
+		// The page that slides in takes the focus, not the one leaving.
+		focus := current && f.focus
+		if focus {
+			f.focus = false
+		}
+		in := s.filterBox(c, "settings-find", "search the settings", "Search the settings", query, focus, func() {
 			f.query, f.route = "", ""
 			s.router.Replace(settingsPath(tab, ""))
 		})

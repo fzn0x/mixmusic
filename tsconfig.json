@@ -7,14 +7,14 @@
       "ES2022",
       "DOM"
     ],
-    "allowJs": true,
-    "checkJs": true,
-    "strict": false,
+    "strict": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "newLine": "lf"
   },
   "include": [
     "sdk",
-    "community/plugins"
+    "community/plugins/**/*.ts",
+    "internal/plugins/*.ts"
   ]
 }

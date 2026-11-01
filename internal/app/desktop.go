@@ -105,7 +105,41 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 	a.mu.Lock()
 	a.main = win
 	a.mu.Unlock()
+	// The player may have told what plays before the window opened.
+	a.retitle()
 	return win
+}
+
+// titleWait is how long the main window's title waits to change. As one
+// track ends and the next loads, the player tells of a pause a moment
+// before it tells of the next track: the title goes from one track to the
+// other.
+var titleWait = 200 * time.Millisecond
+
+// retitle names what plays in the main window's title, a moment later,
+// with what changes meanwhile (#105). It changes while the window is
+// minimized too, when it draws no frames, for the taskbar and the window
+// switcher show the title then.
+func (a *App) retitle() {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.main == nil || a.retitling {
+		return
+	}
+	a.retitling = true
+	time.AfterFunc(titleWait, func() {
+		mygo.App.WhenReady(func() {
+			a.mu.Lock()
+			a.retitling = false
+			win, np := a.main, a.nowPlaying
+			a.mu.Unlock()
+			// On the main thread, where SetTitle doesn't wait, and never
+			// with a.mu held, which the main thread takes too.
+			if t := windowTitle(np, a.settings.Get().ShowInTitle); win != nil && win.Title() != t {
+				win.SetTitle(t)
+			}
+		})
+	})
 }
 
 // showMain shows the main window, opening it again if it was closed.

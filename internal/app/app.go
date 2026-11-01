@@ -124,7 +124,9 @@ type App struct {
 	spotifyMe  *spotify.Profile
 	nowPlaying NowPlaying
 	main, mini *mygo.Window
-	tray       *mygo.Tray
+	// retitling is set while the main window's title waits to change.
+	retitling bool
+	tray      *mygo.Tray
 	// taskbar is the buttons on the thumbnail of the main window's
 	// taskbar button, on Windows.
 	taskbar   *taskbar.Bar
@@ -217,6 +219,7 @@ func (a *App) apply(s settings.Settings) {
 	if a.youtube.SignedIn() && a.youtube.Channel() != s.YouTubeChannel {
 		a.youtube.SetChannel(s.YouTubeChannel)
 	}
+	a.retitle()
 }
 
 // Bind registers what the page of MixMusic's own Spotify device calls. It

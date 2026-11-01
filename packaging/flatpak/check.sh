@@ -9,7 +9,7 @@
 # MyGo load, and runs Node.js on the runtime's OpenSSL, zlib and ICU. With
 # shots, it starts MixMusic in the sandbox too, under a virtual X server
 # and a session bus of its own, which saves screenshots of home, Settings ›
-# About and Settings › Playback into shots, then quits.
+# About and Settings › Playback, with its tools, into shots, then quits.
 set -euo pipefail
 
 bundle="${1:?usage: check.sh <bundle> [shots]}"
@@ -81,7 +81,7 @@ XDG_RUNTIME_DIR="$runtime_dir" timeout 300 dbus-run-session -- bash -c '
 	xvfb-run --auto-servernum -s "-screen 0 1600x1000x24" \
 		flatpak run --user \
 		--env=MIXMUSIC_CAPTURE="$INSIDE" \
-		--env=MIXMUSIC_CAPTURE_ROUTES="/|/settings/about|/settings/playback" \
+		--env=MIXMUSIC_CAPTURE_ROUTES="/|/settings/about|/settings/playback|act:scroll:end|act:shot:settings-playback-tools" \
 		--env=MIXMUSIC_CAPTURE_WAIT=15s \
 		--env=MIXMUSIC_CAPTURE_SIZE=1440x900 \
 		--env=MIXMUSIC_CAPTURE_QUIT=1 \
@@ -99,7 +99,7 @@ if [ "$status" -ne 0 ]; then
 	echo "MixMusic exited with $status" >&2
 	exit "$status"
 fi
-for shot in 01-home 02-settings-about 03-settings-playback; do
+for shot in 01-home 02-settings-about 03-settings-playback 04-settings-playback-tools; do
 	if [ ! -s "$shots/$shot.png" ]; then
 		echo "MixMusic saved no $shot.png" >&2
 		exit 1

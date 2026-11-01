@@ -93,6 +93,12 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 	case row.Hovered():
 		row.Background(k.hover)
 	}
+	// An entry the player passes over, as YouTube labels it as made with
+	// AI, shows dimmed; a click still plays it.
+	skipped := s.st.Skips(it)
+	if skipped && !current {
+		row.Opacity(0.45)
+	}
 	row.ContextMenu(func(m *ui.Menu) { s.trackMenuAt(m, t, i) })
 	if row.DoubleClicked() && !current {
 		s.p.PlayAt(i)
@@ -125,6 +131,9 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 				line := names(t.Artists)
 				if it.Radio {
 					line += " · radio"
+				}
+				if skipped {
+					line += " · made with AI"
 				}
 				ui.Text(c, line).FontSize(k.smallSize()).TextColor(sub).SingleLine().MinWidth(0)
 			})
@@ -319,7 +328,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		}
 	default:
 		if m.Item("Play").Chosen() {
-			s.p.PlayTracks(one, 0)
+			s.p.PlayChosen(one, 0)
 		}
 		if m.Item("Play next").Chosen() {
 			s.p.PlayNext(one)
@@ -406,7 +415,7 @@ func (s *shell) startRadio(t media.Track) {
 				s.notes = append(s.notes, noticeOf(err))
 				return
 			}
-			s.p.PlayTracks(append([]media.Track{t}, player.RadioTracks(found, []media.Track{t})...), 0)
+			s.p.PlayChosen(append([]media.Track{t}, player.RadioTracks(found, []media.Track{t})...), 0)
 		})
 	}()
 }

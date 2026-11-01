@@ -65,7 +65,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 		if current {
 			s.p.Toggle()
 		} else {
-			s.p.PlayTracks(tracks, i)
+			s.p.PlayChosen(tracks, i)
 		}
 	}
 	if row.DoubleClicked() {

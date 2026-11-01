@@ -254,15 +254,15 @@ func (s *shell) trackTile(c *ui.Context, key string, t media.Track, queue []medi
 	}
 }
 
-// playFrom plays tracks from t.
+// playFrom plays tracks from t, which the user chose.
 func (s *shell) playFrom(tracks []media.Track, t media.Track) {
 	for i, tr := range tracks {
 		if tr.ID == t.ID {
-			s.p.PlayTracks(tracks, i)
+			s.p.PlayChosen(tracks, i)
 			return
 		}
 	}
-	s.p.PlayTracks([]media.Track{t}, 0)
+	s.p.PlayChosen([]media.Track{t}, 0)
 }
 
 // playAlbum and playPlaylist fetch what a collection holds, and play it.

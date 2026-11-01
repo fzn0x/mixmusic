@@ -135,8 +135,10 @@ func (b cookieBrowser) problem(err error, folder bool) error {
 		return worded(b.name+" is open, and keeps its cookies to itself while it is: close it, then import again", err)
 	case errors.Is(err, tools.ErrCookiesSealed):
 		return worded(b.name+" seals its cookies so that other programs can't read them, as recent Chrome does on Windows: import from Firefox, or paste a cookie header", err)
-	case errors.Is(err, tools.ErrNoBrowserCookies) && (folder || b.dirs != nil):
+	case errors.Is(err, tools.ErrNoBrowserCookies) && folder:
 		return worded("MixMusic found no cookies of "+b.name+" in that folder: give the folder of one of its profiles", err)
+	case errors.Is(err, tools.ErrNoBrowserCookies) && b.dirs != nil:
+		return worded("MixMusic found no cookies of "+b.name+" in its folder: give the folder of one of its profiles", err)
 	case errors.Is(err, tools.ErrNoBrowserCookies):
 		return worded("MixMusic found no cookies of "+b.name+": is it installed? For a profile kept elsewhere, give its folder", err)
 	case errors.Is(err, tools.ErrCookiesDenied) && b.engine == "safari":
@@ -178,23 +180,25 @@ func (s *Accounts) YouTubeImportCookies(ctx context.Context, browser, profile st
 	if err != nil {
 		return AccountsStatus{}, err
 	}
+	// yt-dlp tells of problems it goes on after, as with the key of some
+	// cookies: what it wrote tells whether it worked.
 	cookies, undecrypted, err := s.a.browserCookies(ctx, spec)
-	if err != nil {
+	switch {
+	case youtube.HasSigningCookie(cookies):
+		return s.a.youtubeSignIn(ctx, cookies)
+	case err != nil:
 		return AccountsStatus{}, b.problem(err, strings.TrimSpace(profile) != "")
+	case undecrypted:
+		return AccountsStatus{}, b.problem(tools.ErrCookiesSealed, false)
 	}
-	if !youtube.HasSigningCookie(cookies) {
-		if undecrypted {
-			return AccountsStatus{}, b.problem(tools.ErrCookiesSealed, false)
-		}
-		return AccountsStatus{}, fmt.Errorf("%s has no signed-in YouTube Music session: sign in to music.youtube.com in it, close it, then import again", b.name)
-	}
-	return s.a.youtubeSignIn(ctx, cookies)
+	return AccountsStatus{}, fmt.Errorf("%s has no signed-in YouTube Music session: sign in to music.youtube.com in it, close it, then import again", b.name)
 }
 
 // browserCookies has yt-dlp copy the cookies of a browser, as yt-dlp
-// names it, and returns those of YouTube Music, and whether yt-dlp could
-// not decrypt some. The copy holds every cookie of the browser: it is a
-// file of the user's alone, which goes as soon as it is read.
+// names it, and returns those of YouTube Music it wrote, whether it could
+// not decrypt some, and the problem it told of, if any. The copy holds
+// every cookie of the browser: it is a file of the user's alone, which
+// goes as soon as it is read.
 func (a *App) browserCookies(ctx context.Context, browser string) ([]*http.Cookie, bool, error) {
 	f, err := os.CreateTemp("", cookieExportPrefix+"*.txt") // readable by the user alone
 	if err != nil {
@@ -213,18 +217,15 @@ func (a *App) browserCookies(ctx context.Context, browser string) ([]*http.Cooki
 	}
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
-	undecrypted, err := exportCookies(ctx, a.tools, browser, file)
-	if err != nil {
-		return nil, false, err
-	}
+	undecrypted, problem := exportCookies(ctx, a.tools, browser, file)
 	data, err := os.ReadFile(file)
 	os.Remove(file)
 	if err != nil {
-		return nil, false, err
+		return nil, false, errors.Join(problem, err)
 	}
 	cookies := youtubeCookies(data, time.Now())
 	clear(data)
-	return cookies, undecrypted, nil
+	return cookies, undecrypted, problem
 }
 
 // removeCookieExports deletes the copies of browsers' cookies a MixMusic

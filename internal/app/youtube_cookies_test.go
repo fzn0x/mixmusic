@@ -457,3 +457,22 @@ func TestChooseAccountAndChannel(t *testing.T) {
 		t.Error("chose an account that can't be")
 	}
 }
+
+// TestImportDespiteProblems signs in with what yt-dlp wrote, though it
+// told of a problem it went on after, as when it can't reach a keyring
+// some cookies don't need.
+func TestImportDespiteProblems(t *testing.T) {
+	a, _ := cookieApp(t, signedIn(true))
+	saved := exportCookies
+	exportCookies = func(_ context.Context, _ *tools.Manager, _, file string) (bool, error) {
+		os.WriteFile(file, []byte(tools.NetscapeHeader+".youtube.com\tTRUE\t/\tTRUE\t0\tSAPISID\tx\n"), 0o600)
+		return true, tools.ErrCookiesSealed
+	}
+	t.Cleanup(func() { exportCookies = saved })
+	if status, err := (&Accounts{a}).YouTubeImportCookies(context.Background(), "chromium", ""); err != nil || !status.YouTube.SignedIn {
+		t.Errorf("importing what yt-dlp wrote: %+v, %v", status.YouTube, err)
+	}
+	if left := leftExports(t); len(left) != 0 {
+		t.Errorf("the browser's cookies were left in %q", left)
+	}
+}

@@ -373,15 +373,19 @@ func (p *Proxy) fetch(ctx context.Context, s Stream, start, end int64) (*stallin
 	timer := time.AfterFunc(stall, func() { cancel(errStalled) })
 	timer.Stop()
 	// The transport tells when each request went out, and when its answer
-	// came, until Do returns.
+	// came, until Do returns. It may tell that the last request went out
+	// after Do returned its answer, as it writes requests on a goroutine of
+	// its own: the timer times the body's reads by then.
 	var mu sync.Mutex
 	answered := false
 	waiting := func(on bool) {
 		mu.Lock()
 		defer mu.Unlock()
-		if on && !answered {
+		switch {
+		case answered:
+		case on:
 			timer.Reset(stall)
-		} else {
+		default:
 			timer.Stop()
 		}
 	}

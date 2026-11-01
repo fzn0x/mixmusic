@@ -3,11 +3,13 @@ package stream
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"net/http/httptrace"
 	"os"
 	"strings"
 	"sync"
@@ -259,6 +261,62 @@ func TestProxyGivesUpTheSizeWithoutAnAnswer(t *testing.T) {
 	}
 	if why := p.Failure(testID); !strings.HasPrefix(why, "YouTube stopped sending the audio") {
 		t.Errorf("Failure = %q", why)
+	}
+}
+
+// lateWrite is a transport whose answer sends nothing, and which tells
+// that the request went out only once the body's first read waits, as
+// the HTTP/1 transport may, writing requests on a goroutine of its own.
+type lateWrite struct{}
+
+func (lateWrite) RoundTrip(r *http.Request) (*http.Response, error) {
+	reading := make(chan struct{})
+	go func() {
+		<-reading
+		httptrace.ContextClientTrace(r.Context()).WroteRequest(httptrace.WroteRequestInfo{})
+	}()
+	return &http.Response{StatusCode: http.StatusPartialContent, Header: http.Header{}, Body: &heldBody{ctx: r.Context(), reading: reading}}, nil
+}
+
+// heldBody is a body that sends nothing until its request ends, and
+// closes reading as its first read waits.
+type heldBody struct {
+	ctx     context.Context
+	reading chan struct{}
+	once    sync.Once
+}
+
+func (b *heldBody) Read([]byte) (int, error) {
+	b.once.Do(func() { close(b.reading) })
+	<-b.ctx.Done()
+	return 0, b.ctx.Err()
+}
+
+func (*heldBody) Close() error { return nil }
+
+// TestStallOutlastsALateWrite gives up a body that sends nothing, though
+// the transport told that its request went out after the answer came.
+func TestStallOutlastsALateWrite(t *testing.T) {
+	p := NewProxy(NewResolver(nil, ""))
+	p.HTTP = &http.Client{Transport: lateWrite{}}
+	p.stall = 200 * time.Millisecond
+	body, err := p.fetch(context.Background(), Stream{URL: "http://example.com/audio"}, 0, 999)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer body.Close()
+	read := make(chan error, 1)
+	go func() {
+		_, err := body.Read(make([]byte, 1000))
+		read <- err
+	}()
+	select {
+	case err := <-read:
+		if !errors.Is(err, errStalled) {
+			t.Errorf("Read = %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("the read waits on")
 	}
 }
 

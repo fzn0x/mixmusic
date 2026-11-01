@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -183,6 +184,14 @@ func New(opts Options) (*App, error) {
 	a.openLastfm()
 	a.tools = tools.New(filepath.Join(opts.DataDir, "bin"))
 	a.resolver = stream.NewResolver(a.tools, filepath.Join(opts.CacheDir, "yt-dlp"))
+	// MIXMUSIC_YTDLP_ONLY has yt-dlp find every stream, as before MixMusic
+	// asked YouTube's player API: to time one against the other, or to
+	// tell which fails.
+	if os.Getenv("MIXMUSIC_YTDLP_ONLY") == "" {
+		a.resolver.Direct = stream.NewDirect()
+	} else {
+		log.Print("mixmusic: yt-dlp alone finds the streams (MIXMUSIC_YTDLP_ONLY)")
+	}
 	a.cache = stream.NewCache(filepath.Join(opts.CacheDir, "audio"), 0)
 	a.proxy = stream.NewProxy(a.resolver)
 	a.youtubeStore = newYouTubeStore(opts.DataDir)

@@ -67,6 +67,11 @@ All notable changes to MixMusic are documented here. The format follows
   back where you added them, after a restart too (#95).
 - After a restart, the radio's tracks keep their "radio" mark in up
   next, and Add to queue still puts tracks before them (#95).
+- YouTube Music tracks start in a moment, rather than several seconds
+  after you press play: MixMusic asks YouTube for a track's audio itself,
+  and runs yt-dlp only for the tracks YouTube won't give it that way, such
+  as those made for children. The next track is found a second into the
+  one playing, so skipping ahead is quick too (#69).
 - On Windows, a sign-in the Credential Manager can't keep is kept
   encrypted for your Windows account, so you stay signed in after a
   restart. Sign-in files in plain text found in MixMusic's data folder,

@@ -49,7 +49,7 @@ type PlaybackSource struct {
 type Player struct{ a *App }
 
 // Prepare finds how to play a track: the URL of its audio, found ahead so
-// that errors such as a missing yt-dlp show before playback starts, a
+// that errors such as YouTube refusing it show before playback starts, a
 // Spotify Connect device, or Spotify in MixMusic.
 func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource, error) {
 	if track.Source == media.SourceSpotify {

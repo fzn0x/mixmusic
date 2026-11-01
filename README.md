@@ -159,11 +159,13 @@ AppImage executable (`chmod +x`) and open it.
   in the system's keyring needs `libsecret`. The `.deb` and the `.rpm`
   install both; MixMusic works without either. The AppImage holds MixMusic
   alone, and uses the system's libraries like the other downloads.
-- **To play YouTube Music:** [yt-dlp](https://github.com/yt-dlp/yt-dlp), which
-  MixMusic installs for you from Settings › Playback and keeps up to date,
-  and a JavaScript runtime yt-dlp uses for YouTube: [Deno](https://deno.com),
-  Node.js, Bun or QuickJS. MixMusic finds it on your `PATH`, and in the
-  folders of Homebrew, Deno and Bun.
+- **To play every YouTube Music track:** MixMusic finds the audio of most
+  tracks itself, and the rest, such as tracks made for children, with
+  [yt-dlp](https://github.com/yt-dlp/yt-dlp), which MixMusic installs for
+  you from Settings › Playback and keeps up to date. yt-dlp uses a
+  JavaScript runtime for YouTube: [Deno](https://deno.com), Node.js, Bun or
+  QuickJS. MixMusic finds it on your `PATH`, and in the folders of
+  Homebrew, Deno and Bun.
 
 ### Spotify
 
@@ -183,7 +185,8 @@ library, choose Sign in to YouTube Music in Settings › Accounts and sign in
 to Google in the window that opens. What you type goes to Google alone:
 MixMusic keeps the session the window ends with, encrypted with a key in the
 system's keyring where there is one. Tracks still play as they do signed
-out: the session never goes to yt-dlp.
+out: the session never goes with the requests of their audio, nor to
+yt-dlp.
 
 ### Last.fm
 
@@ -220,13 +223,14 @@ your version, system, tools, theme and plugins filled in; attach the log
 after reading it. After a crash, MixMusic offers to report it the next
 time it starts.
 
-- **Nothing plays from YouTube Music.** Check Settings › Playback: yt-dlp
-  has to be installed, and a JavaScript runtime found. MixMusic updates the
-  yt-dlp it installed every day, as an old one stops finding streams; one of
-  your own, chosen there, you keep up to date yourself (`yt-dlp -U`, or your
-  package manager). A track that cannot play says why: some are not
+- **A YouTube Music track doesn't play.** It says why: some are not
   available in your country, or only to signed-in adults on YouTube's own
-  website.
+  website. The tracks MixMusic can't find the audio of itself, such as those
+  made for children, need yt-dlp: check Settings › Playback that it is
+  installed, and a JavaScript runtime found. MixMusic updates the yt-dlp it
+  installed every day, as an old one stops finding streams; one of your
+  own, chosen there, you keep up to date yourself (`yt-dlp -U`, or your
+  package manager).
 - **The JavaScript runtime is not found.** Opened from the Finder, the Dock
   or a desktop menu, MixMusic does not get the `PATH` of your terminal. It
   also looks where Homebrew, Deno, Bun, Volta, Scoop and WinGet install;
@@ -256,9 +260,9 @@ time it starts.
 ## Known issues
 
 - MixMusic reads YouTube Music through the interfaces of its own website,
-  and plays it through yt-dlp. When YouTube changes them, searching,
-  playing or signing in can stop working until MixMusic or yt-dlp catches
-  up.
+  and plays it through YouTube's player API and yt-dlp. When YouTube
+  changes them, searching, playing or signing in can stop working until
+  MixMusic or yt-dlp catches up.
 - YouTube Music has no sign-in for other apps: MixMusic signs in with a
   browser session, which can do with your account what YouTube Music can.
   Treat it like a password; sign out in Settings › Accounts to delete it.
@@ -280,10 +284,10 @@ time it starts.
 MixMusic has no account, server, analytics or telemetry of its own. It
 talks to:
 
-- **YouTube and Google:** YouTube Music's catalog, its streams through
-  yt-dlp, and the artwork. Signed in, your library there, and, unless you
-  turn it off in Settings › Accounts, the tracks you play, which join your
-  YouTube Music history.
+- **YouTube and Google:** YouTube Music's catalog, its streams, asked for
+  signed out, and through yt-dlp for some, and the artwork. Signed in, your
+  library there, and, unless you turn it off in Settings › Accounts, the
+  tracks you play, which join your YouTube Music history.
 - **Spotify,** once you sign in: your library, your devices with Spotify
   Connect, and Spotify's player, loaded from `sdk.scdn.co`, when Spotify
   plays in MixMusic.
@@ -345,7 +349,7 @@ internal/audio       MixMusic's audio engine, and the system's audio output
 internal/plugins     plugins, each in a JavaScript engine of its own
 internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
-internal/stream      audio streams, found by yt-dlp and opened for the engine
+internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
 internal/lyrics      synced lyrics
 internal/library     liked songs, mixes, history and stats

@@ -1,6 +1,7 @@
 // Package tools finds and installs the programs MixMusic runs: yt-dlp,
-// which finds the audio streams of YouTube, and a JavaScript runtime, which
-// yt-dlp needs to solve the challenges YouTube sends.
+// which finds the audio streams YouTube's player API won't give MixMusic
+// itself, and a JavaScript runtime, which yt-dlp needs to solve the
+// challenges YouTube sends.
 package tools
 
 import (
@@ -35,6 +36,13 @@ var latestURL = "https://github.com/yt-dlp/yt-dlp/releases/latest"
 
 // ErrNoYTDLP is returned when yt-dlp is not installed.
 var ErrNoYTDLP = errors.New("yt-dlp is not installed: install it from Settings › Playback")
+
+// missingError is returned when the yt-dlp the user chose is not where they
+// said. It tells where, and is ErrNoYTDLP to errors.Is.
+type missingError struct{ path string }
+
+func (e missingError) Error() string        { return "yt-dlp not found at " + e.path }
+func (e missingError) Is(target error) bool { return target == ErrNoYTDLP }
 
 // latestTTL is how long the latest yt-dlp release found is trusted before
 // GitHub is asked again, and retryTTL how long a failure to find it is.
@@ -136,7 +144,7 @@ func (m *Manager) YTDLP() (string, error) {
 		if isFile(chosen) {
 			return chosen, nil
 		}
-		return "", fmt.Errorf("yt-dlp not found at %s", chosen)
+		return "", missingError{chosen}
 	}
 	if p := m.managedPath(); isFile(p) {
 		return p, nil

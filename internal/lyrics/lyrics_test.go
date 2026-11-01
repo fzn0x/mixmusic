@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -90,5 +91,22 @@ func TestGetNotFound(t *testing.T) {
 	c.BaseURL = srv.URL
 	if _, err := c.Get(context.Background(), song); !errors.Is(err, ErrNotFound) {
 		t.Errorf("err = %v", err)
+	}
+}
+
+// LRCLIB down, or out of reach, is not a track without lyrics.
+func TestGetUnavailable(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	c := New("test")
+	c.BaseURL = srv.URL
+	_, err := c.Get(context.Background(), song)
+	if !errors.Is(err, ErrUnavailable) || errors.Is(err, ErrNotFound) || !strings.Contains(err.Error(), "HTTP 503") {
+		t.Errorf("LRCLIB down: err = %v", err)
+	}
+	srv.Close()
+	if _, err := c.Get(context.Background(), song); !errors.Is(err, ErrUnavailable) {
+		t.Errorf("LRCLIB out of reach: err = %v", err)
 	}
 }

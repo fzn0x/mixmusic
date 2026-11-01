@@ -21,8 +21,14 @@ import (
 
 const defaultBaseURL = "https://lrclib.net/api"
 
-// ErrNotFound is returned for tracks without lyrics.
-var ErrNotFound = errors.New("lyrics: not found")
+var (
+	// ErrNotFound is returned for tracks without lyrics.
+	ErrNotFound = errors.New("lyrics: not found")
+	// ErrUnavailable is returned when LRCLIB can't be reached, or answers
+	// with an error of its own, as when it is down: the track may have
+	// lyrics all the same.
+	ErrUnavailable = errors.New("lyrics: LRCLIB isn't answering")
+)
 
 // Line is a line of lyrics, with the time it is sung at when the lyrics
 // are synchronized.
@@ -149,16 +155,19 @@ func (c *Client) get(ctx context.Context, path string, q url.Values, out any) er
 	req.Header.Set("User-Agent", c.UserAgent)
 	res, err := c.HTTP.Do(req)
 	if err != nil {
-		return fmt.Errorf("lyrics: %w", err)
+		return fmt.Errorf("%w: %w", ErrUnavailable, err)
 	}
 	defer res.Body.Close()
 	switch res.StatusCode {
 	case http.StatusOK:
-		return json.NewDecoder(res.Body).Decode(out)
+		if err := json.NewDecoder(res.Body).Decode(out); err != nil {
+			return fmt.Errorf("%w: %w", ErrUnavailable, err)
+		}
+		return nil
 	case http.StatusNotFound:
 		return ErrNotFound
 	}
-	return fmt.Errorf("lyrics: LRCLIB answered HTTP %d", res.StatusCode)
+	return fmt.Errorf("%w: HTTP %d", ErrUnavailable, res.StatusCode)
 }
 
 var (

@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/egoist/mygo"
@@ -41,31 +42,34 @@ type youtubeCookie struct {
 	HTTPOnly bool      `json:"httpOnly"`
 }
 
-// youtubeStore keeps the cookies of the user's YouTube session, encrypted
-// with a key of the system's credential store, or readable by the user
-// alone where there is no credential store.
-type youtubeStore struct{ dir string }
+// youtubeStore keeps the cookies of the user's YouTube session in
+// youtube-session.bin, encrypted with a key that key keeps in the system's
+// credential store, or sealed for the Windows user where the Credential
+// Manager isn't available. Where there is no credential store, as on Linux
+// without a Secret Service, they are in youtube-session.json, readable by
+// the user alone; once a store has their key, they move into
+// youtube-session.bin (#104).
+type youtubeStore struct {
+	dir string
+	key *secretStore
 
-func (s youtubeStore) sealed() string { return filepath.Join(s.dir, "youtube-session.bin") }
-func (s youtubeStore) plain() string  { return filepath.Join(s.dir, "youtube-session.json") }
+	mu sync.Mutex
+	// cached is the key, once read or made: the cookies change often.
+	cached []byte
+}
 
-func (s youtubeStore) Load() ([]*http.Cookie, error) {
-	var data []byte
-	key, err := mygo.Secrets.Get(youtubeKeySecret)
-	switch {
-	case err == nil:
-		sealed, err := os.ReadFile(s.sealed())
-		if err != nil {
-			return nil, err
-		}
-		if data, err = open(key, sealed); err != nil {
-			return nil, err
-		}
-	case errors.Is(err, errors.ErrUnsupported):
-		if data, err = os.ReadFile(s.plain()); err != nil {
-			return nil, err
-		}
-	default:
+func newYouTubeStore(dir string) *youtubeStore {
+	return &youtubeStore{dir: dir, key: newSecretStore(dir, youtubeKeySecret, "", "youtube-session-key.dpapi")}
+}
+
+func (s *youtubeStore) sealed() string { return filepath.Join(s.dir, "youtube-session.bin") }
+func (s *youtubeStore) plain() string  { return filepath.Join(s.dir, "youtube-session.json") }
+
+func (s *youtubeStore) Load() ([]*http.Cookie, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	data, err := s.load()
+	if err != nil {
 		return nil, err
 	}
 	var kept []youtubeCookie
@@ -79,7 +83,42 @@ func (s youtubeStore) Load() ([]*http.Cookie, error) {
 	return cookies, nil
 }
 
-func (s youtubeStore) Save(cookies []*http.Cookie) error {
+// load reads the cookies' JSON: from youtube-session.bin, or from the plain
+// file, which moves into youtube-session.bin once a store has a key.
+func (s *youtubeStore) load() ([]byte, error) {
+	key, err := s.key.Load()
+	if err == nil {
+		sealed, err := os.ReadFile(s.sealed())
+		if err == nil {
+			data, err := open(key, sealed)
+			if err != nil {
+				return nil, err
+			}
+			s.cached = key
+			removeFile(s.plain()) // left by a run without a store
+			return data, nil
+		}
+		if !errors.Is(err, os.ErrNotExist) {
+			return nil, err
+		}
+	} else if !errors.Is(err, mygo.ErrSecretNotFound) && !unavailable(err) {
+		return nil, err
+	}
+	data, rerr := os.ReadFile(s.plain())
+	if rerr != nil {
+		return nil, rerr
+	}
+	if !unavailable(err) {
+		if err := s.save(data); err != nil {
+			log.Printf("mixmusic: moving %s: %v", filepath.Base(s.plain()), err)
+		} else {
+			log.Printf("mixmusic: moved the YouTube Music session out of %s, in plain text", filepath.Base(s.plain()))
+		}
+	}
+	return data, nil
+}
+
+func (s *youtubeStore) Save(cookies []*http.Cookie) error {
 	kept := make([]youtubeCookie, len(cookies))
 	for i, c := range cookies {
 		kept[i] = youtubeCookie{Name: c.Name, Value: c.Value, Domain: c.Domain, Path: c.Path, Expires: c.Expires, Secure: c.Secure, HTTPOnly: c.HttpOnly}
@@ -88,33 +127,46 @@ func (s youtubeStore) Save(cookies []*http.Cookie) error {
 	if err != nil {
 		return err
 	}
-	key, err := mygo.Secrets.Get(youtubeKeySecret)
-	if errors.Is(err, mygo.ErrSecretNotFound) {
-		key = make([]byte, 32)
-		rand.Read(key)
-		err = mygo.Secrets.Set(youtubeKeySecret, key)
-	}
-	if errors.Is(err, errors.ErrUnsupported) {
-		if err := store.WriteFile(s.plain(), data); err != nil {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.save(data)
+}
+
+func (s *youtubeStore) save(data []byte) error {
+	key := s.cached
+	if key == nil {
+		k, err := s.key.Load()
+		if errors.Is(err, mygo.ErrSecretNotFound) {
+			k = make([]byte, 32)
+			rand.Read(k)
+			err = s.key.Save(k)
+		}
+		switch {
+		case err != nil && unavailable(err) && s.key.seal == nil:
+			// No store to keep a key: os.CreateTemp makes the file
+			// readable by the user alone.
+			return store.WriteFile(s.plain(), data)
+		case err != nil:
 			return err
 		}
-		return os.Chmod(s.plain(), 0o600)
-	}
-	if err != nil {
-		return err
+		key, s.cached = k, k
 	}
 	sealed, err := seal(key, data)
 	if err != nil {
 		return err
 	}
-	return store.WriteFile(s.sealed(), sealed)
+	if err := store.WriteFile(s.sealed(), sealed); err != nil {
+		return err
+	}
+	removeFile(s.plain())
+	return nil
 }
 
-func (s youtubeStore) Clear() error {
-	err := mygo.Secrets.Delete(youtubeKeySecret)
-	if errors.Is(err, errors.ErrUnsupported) || errors.Is(err, mygo.ErrSecretNotFound) {
-		err = nil
-	}
+func (s *youtubeStore) Clear() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cached = nil
+	err := s.key.Clear()
 	for _, f := range []string{s.sealed(), s.plain()} {
 		if rmErr := os.Remove(f); rmErr != nil && !errors.Is(rmErr, os.ErrNotExist) {
 			err = errors.Join(err, rmErr)

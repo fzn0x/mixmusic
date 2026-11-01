@@ -104,7 +104,7 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 type playerServices struct{ a *App }
 
 func playerSource(src PlaybackSource) player.Source {
-	return player.Source{Mode: player.Mode(src.Mode), URL: src.URL, Track: src.Track}
+	return player.Source{Mode: player.Mode(src.Mode), URL: src.URL, Track: src.Track, Live: src.Live}
 }
 
 func (s playerServices) Prepare(ctx context.Context, t media.Track) (player.Source, error) {

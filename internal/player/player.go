@@ -52,6 +52,9 @@ type Source struct {
 	// Track is the track that plays: for a Spotify track played from
 	// YouTube Music, its recording there.
 	Track media.Track
+	// Live is set for the stream of a live video, as it goes on: it has no
+	// length, and can't seek.
+	Live bool
 }
 
 // Item is an entry of the queue.

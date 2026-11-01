@@ -96,6 +96,10 @@ func (p *Proxy) timing() (stall, reconnect, backoff time.Duration) {
 // Path returns the path the proxy serves a video's audio at.
 func Path(videoID string) string { return "/yt/" + videoID }
 
+// LivePath returns the path of the live stream of a video, which OpenLive
+// opens, as the engine's opener reads it.
+func LivePath(videoID string) string { return "/live/" + videoID }
+
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	videoID, ok := strings.CutPrefix(r.URL.Path, "/yt/")
 	if !ok || !ValidVideoID(videoID) {

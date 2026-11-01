@@ -48,6 +48,11 @@ All notable changes to MixMusic are documented here. The format follows
 - On macOS, closing the window in full screen with "Close to the tray"
   on no longer leaves an empty, black Space: the window leaves full
   screen, then hides in the tray, and comes back in full screen (#84).
+- After a restart, a queue of more than 500 tracks comes back on the
+  track that was playing, where it was, with what comes up after it.
+  MixMusic kept the queue's first 500 tracks, and when the track playing
+  was past them it came back on the 500th, at the other track's place;
+  it now keeps the 500 tracks around the one playing (#88).
 
 ## [0.5.5] - 2026-10-28
 

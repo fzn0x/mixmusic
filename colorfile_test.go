@@ -364,8 +364,8 @@ func TestColorFileSettings(t *testing.T) {
 			t.Errorf("%s %q: the theme cards' hint shows %v", c.source, c.file, !worn)
 		}
 	}
-	if !tt.HasText(good) || !tt.HasText("over your colour file's") {
-		t.Errorf("the file read isn't named, or the accent's rows don't tell of it: %q", tt.Texts())
+	if !tt.HasText(good) || !tt.HasText("over your colour file's") || !tt.HasText("Your colour file's colours are light or dark") {
+		t.Errorf("the file read isn't named, or the rows of the accent and of Follow the computer don't tell of it: %q", tt.Texts())
 	}
 	setColors(t, s, settings.ColorsMatugen, "")
 	show(s, tt, "/settings/appearance")

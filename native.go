@@ -104,8 +104,10 @@ type shell struct {
 	inv    addons.Inventory
 	lk     look
 	// colorFile is what the app read of the colour file the settings
-	// name.
+	// name, and oneMode is set while the look wears a file with one set of
+	// colours, which decides light or dark.
 	colorFile    app.ColorFileStatus
+	oneMode      bool
 	art          *artworks
 	loads        map[string]any
 	notes        []player.Notice
@@ -370,7 +372,8 @@ func (s *shell) restyle() {
 	if s.set.ColorSource != settings.ColorsTheme {
 		file = s.colorFile.Colors
 	}
-	if dark, one := fileMode(file); one {
+	dark, one := fileMode(file)
+	if s.oneMode = one; one {
 		s.lk = newLook(s.set, s.inv.Themes, dark, s.artColor, file)
 		if s.lk.dark {
 			setAppearance(mygo.ThemeDark)

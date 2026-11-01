@@ -196,7 +196,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 		}
 	}, func() {
 		follow := "Show one theme while the computer is in light mode and another in dark mode. The theme you pick below is the one for the mode it is in now."
-		if _, one := fileMode(s.wornColors()); one {
+		if s.oneMode {
 			follow = "Show one theme in light mode and another in dark mode. Your colour file's colours are light or dark, so the theme of their mode shows."
 		}
 		s.row(c, "Follow the computer", follow, func() {

@@ -53,6 +53,11 @@ All notable changes to MixMusic are documented here. The format follows
   MixMusic kept the queue's first 500 tracks, and when the track playing
   was past them it came back on the 500th, at the other track's place;
   it now keeps the 500 tracks around the one playing (#88).
+- Changes to the queue made while a song is paused, or before anything
+  plays after a start, are kept when MixMusic quits, as are the changes
+  made right before quitting: the queue, where the song was, the volume
+  and the colours of Settings › Appearance. This holds when Windows
+  shuts down, restarts or signs out too (#89).
 
 ## [0.5.5] - 2026-10-28
 

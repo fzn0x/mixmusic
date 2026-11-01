@@ -510,7 +510,7 @@
       const xEnd = 0;
       const gap = Math.min(96, w * 0.08);
       // Phones have no room for two columns: the services start as two
-      // stacks, one kept left and one kept right, then interleave.
+      // lanes, one kept left and one kept right.
       const stacked = (w - gap) / 2 < 220;
       const colW = stacked ? endW * 0.84 : Math.min(380, (w - gap) / 2);
       const x0 = 0;
@@ -524,8 +524,10 @@
         const src = row.dataset.src;
         const i = seen[src]++;
         const sx = src === "spotify" ? x0 : x1;
-        const sy = startTop + (stacked && src === "youtube" ? rows.length / 2 + i : i) * step;
         const ey = top + k * step;
+        // On phones each row keeps its place in the queue and only moves
+        // sideways, out of its service's lane, so no two rows ever cross.
+        const sy = stacked ? ey : startTop + i * step;
         const e = ease(clamp(q * 1.35 - k * 0.05));
         const x = sx + (xEnd - sx) * e;
         const y = sy + (ey - sy) * e;

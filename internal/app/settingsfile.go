@@ -11,6 +11,7 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
@@ -295,7 +296,7 @@ func (a *App) tellStart() {
 	n := FileNotice{}
 	if aside := a.settings.Aside(); aside != nil {
 		n = FileNotice{Kind: NoticeAside, Problem: aside.Error()}
-	} else if data, err := os.ReadFile(a.settings.Path()); err == nil {
+	} else if data, err := store.ReadFile(a.settings.Path()); err == nil {
 		if _, ok := settings.Text(data); !ok {
 			n = FileNotice{Kind: NoticeStart, Report: settings.Report{NotUTF8: true}}
 		}

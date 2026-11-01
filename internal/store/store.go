@@ -43,7 +43,7 @@ type File[T any] struct {
 // so a corrupt file never keeps the app from starting.
 func Open[T any](path string, def T) (*File[T], error) {
 	f := &File[T]{path: path, value: def}
-	data, err := os.ReadFile(path)
+	data, err := ReadFile(path)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		return f, nil
@@ -66,7 +66,7 @@ func Open[T any](path string, def T) (*File[T], error) {
 // link stays one: writes go to the file it links to.
 func OpenWith[T any](path string, def T, decode func([]byte) (T, error)) (*File[T], error) {
 	f := &File[T]{path: path, decode: decode, value: def, synced: def}
-	data, err := os.ReadFile(path)
+	data, err := ReadFile(path)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		return f, nil
@@ -127,7 +127,7 @@ func (f *File[T]) Update(fn func(v *T) error) error {
 	}
 	if f.decode != nil {
 		from := f.value
-		data, err := os.ReadFile(f.path)
+		data, err := ReadFile(f.path)
 		if err == nil && !f.unchanged(data) {
 			if _, err := f.take(data); err != nil {
 				return err
@@ -176,7 +176,7 @@ func (f *File[T]) Reload() (Change[T], error) {
 	if f.decode == nil {
 		return c, nil
 	}
-	data, err := os.ReadFile(f.path)
+	data, err := ReadFile(f.path)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		f.disk, f.held = nil, nil
@@ -247,7 +247,7 @@ func (f *File[T]) Flush() error {
 	}
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	data, err := os.ReadFile(f.path)
+	data, err := ReadFile(f.path)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		return f.save(f.value)
@@ -277,7 +277,7 @@ func (f *File[T]) Replace(v T) error {
 	}
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	if data, err := os.ReadFile(f.path); err == nil {
+	if data, err := ReadFile(f.path); err == nil {
 		if _, err := f.decode(data); err != nil {
 			f.value = v
 			return f.moveAside(data)

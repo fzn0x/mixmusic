@@ -473,6 +473,28 @@ func TestStoreImageDropsBadFile(t *testing.T) {
 	}
 }
 
+// TestStoreCloseWhileOthersStart waits in Close while callers go on
+// starting downloads, as when a test ends with its window still asking for
+// covers. Run it with -race.
+func TestStoreCloseWhileOthersStart(t *testing.T) {
+	h := newHost(t)
+	s, _, _ := testStore(t, t.TempDir(), 1<<20, h.srv)
+	var wg sync.WaitGroup
+	for i := range 8 {
+		wg.Go(func() {
+			for j := range 40 {
+				if _, err := s.Bytes(context.Background(), fmt.Sprintf("%s/%d-%d.png", h.srv.URL, i, j)); err != nil {
+					t.Error(err)
+				}
+			}
+		})
+	}
+	for range 200 {
+		s.Close()
+	}
+	wg.Wait()
+}
+
 // silencer is a dialer whose connections it can make go silent, as a
 // network change can leave a connection: nothing arrives, and nothing it
 // is sent goes anywhere, but it doesn't close.

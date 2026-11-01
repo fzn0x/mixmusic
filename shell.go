@@ -105,9 +105,9 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 func (s *shell) lost(c *ui.Context, why string) {
 	k := &s.lk
 	s.pageScroll(c, func() {
-		s.pageHeader(c, "lost", nil, nil)
-		ui.Text(c, "nothing lives here").FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
-		ui.Text(c, why).FontSize(k.subtitleSize()).FontWeight(300).Margin(0, 0, 24)
+		s.pageHeader(c, "Lost", nil, nil)
+		ui.Text(c, k.words("Nothing lives here")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+		ui.Text(c, why).FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).Margin(0, 0, 24)
 		if s.button(c, "go-home", "go home", true).Clicked() {
 			s.navigate("/")
 		}

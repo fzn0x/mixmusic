@@ -303,8 +303,8 @@ func (s *shell) palette(c *ui.Context) {
 	s.paletteAt = min(max(s.paletteAt, 0), max(len(found)-1, 0))
 	s.dialogFrame(c, &s.paletteOpen, dialogOptions{key: "palette", title: "Command palette", width: 640}, func(panel ui.Element) {
 		panel.Padding(24).Gap(12)
-		in := ui.TextInputBase(c.Key("palette-input"), &s.paletteQuery).Placeholder("type a command or a search").AutoFocus().
-			Label("Command palette").FontSize(k.subtitleSize()).FontWeight(300).TextColor(k.accent).Padding(8, 0).Shrink(0)
+		in := ui.TextInputBase(c.Key("palette-input"), &s.paletteQuery).Placeholder(k.sentence("type a command or a search")).AutoFocus().
+			Label("Command palette").FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).TextColor(k.accent).Padding(8, 0).Shrink(0)
 		if in.Changed() {
 			s.paletteAt, s.paletteMoved = 0, true
 		}

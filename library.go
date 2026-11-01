@@ -11,7 +11,7 @@ import (
 
 // librarySections are the library's pivots, by their paths' last part.
 var librarySections = []struct{ id, label string }{
-	{"liked", "liked"}, {"mixes", "mixes"}, {"history", "history"}, {"spotify", "spotify"}, {"youtube", "youtube music"},
+	{"liked", "Liked"}, {"mixes", "Mixes"}, {"history", "History"}, {"spotify", "Spotify"}, {"youtube", "YouTube Music"},
 }
 
 // libraryPage shows liked songs, the user's mixes, the history, and the
@@ -45,7 +45,7 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 				counts[i] = -1
 			}
 		}
-		s.pageHeaderCounts(c, "library", labels, counts, &selected)
+		s.pageHeaderCounts(c, "Library", labels, counts, &selected)
 		if selected != before {
 			s.router.Replace("/library/" + ids[selected])
 		}
@@ -73,9 +73,9 @@ func (s *shell) likedSongs(c *ui.Context) {
 	k := &s.lk
 	liked := s.svc.Collection.Liked()
 	if len(liked) == 0 {
-		ui.Text(c, "nothing liked yet").FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
+		ui.Text(c, k.words("Nothing liked yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
 		ui.Text(c, "Tap the heart on any track, from Spotify or YouTube Music: they all gather here, in one list.").
-			FontSize(k.subtitleSize()).FontWeight(300).MaxWidth(640)
+			FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640)
 		return
 	}
 	view := s.trackTools(c, "liked", "list", liked)
@@ -85,13 +85,13 @@ func (s *shell) likedSongs(c *ui.Context) {
 
 func (s *shell) mixTiles(c *ui.Context) {
 	s.tileWrap(c, func() {
-		new := s.buttonBase(c.Key("new-mix-tile")).Size(172, 172).Shrink(0).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
+		new := s.buttonBase(c.Key("new-mix-tile")).Size(s.lk.tileWidth(), s.lk.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 			Padding(16).Background(s.lk.tile(2)).Radius(s.lk.radius).Label("New mix").Cursor(ui.CursorPointer)
 		if new.Clicked() {
 			s.newMix()
 		}
 		new.Children(func() {
-			ui.Text(c, "new mix").FontSize(s.lk.size(1.5)).FontWeight(300).Font(s.lk.display).TextColor(s.lk.tileText)
+			ui.Text(c, s.lk.words("New mix")).FontSize(s.lk.size(1.5)).FontWeight(s.lk.titleWeight()).Font(s.lk.display).TextColor(s.lk.tileText)
 			ui.Text(c, "tracks of every service, together").FontSize(s.lk.smallSize()).TextColor(s.lk.tileText)
 		})
 		for i, p := range s.svc.Collection.Playlists() {
@@ -104,8 +104,8 @@ func (s *shell) history(c *ui.Context) {
 	k := &s.lk
 	plays := s.svc.Collection.History(300)
 	if len(plays) == 0 {
-		ui.Text(c, "no history yet").FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
-		ui.Text(c, "Tracks count once they played for thirty seconds.").FontSize(k.subtitleSize()).FontWeight(300)
+		ui.Text(c, k.words("No history yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+		ui.Text(c, "Tracks count once they played for thirty seconds.").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		return
 	}
 	tracks := make([]media.Track, len(plays))
@@ -155,21 +155,21 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 		}
 	}
 	if len(playlists.value) > 0 || links != nil {
-		s.shelfWith(c, key+"-playlists", "playlists", links, func() {
+		s.shelfWith(c, key+"-playlists", "Playlists", links, func() {
 			for i, p := range playlists.value {
 				s.playlistTile(c, key+"-playlist-"+count(i), p)
 			}
 		})
 	}
 	if len(albums.value) > 0 {
-		s.shelf(c, key+"-albums", "albums", func() {
+		s.shelf(c, key+"-albums", "Albums", func() {
 			for i, a := range albums.value {
 				s.albumTile(c, key+"-album-"+count(i), a)
 			}
 		})
 	}
 	if len(artists.value) > 0 {
-		s.shelf(c, key+"-artists", "artists you follow", func() {
+		s.shelf(c, key+"-artists", "Artists you follow", func() {
 			for i, a := range artists.value {
 				s.artistTile(c, key+"-artist-"+count(i), a)
 			}
@@ -185,7 +185,7 @@ func (s *shell) spotifyLibrary(c *ui.Context) {
 		fetch(s, "spotify:albums", col.SpotifyAlbums),
 		fetch(s, "spotify:artists", col.SpotifyArtists),
 		func(c *ui.Context) {
-			s.sectionTitle(c, "liked on spotify")
+			s.sectionTitle(c, "Liked on Spotify")
 			first := fetch(s, "spotify:liked", func(ctx context.Context) (app.TrackPage, error) { return col.SpotifyLikedTracks(ctx, 0) })
 			switch {
 			case !first.done:
@@ -224,7 +224,7 @@ func (s *shell) youtubeLibrary(c *ui.Context) {
 		fetch(s, "youtube:albums", col.YouTubeAlbums),
 		fetch(s, "youtube:artists", col.YouTubeArtists),
 		func(c *ui.Context) {
-			s.sectionTitle(c, "liked on youtube music")
+			s.sectionTitle(c, "Liked on YouTube Music")
 			liked := fetch(s, "youtube:liked", col.YouTubeLikedTracks)
 			switch {
 			case !liked.done:

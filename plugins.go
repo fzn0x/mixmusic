@@ -12,7 +12,7 @@ import (
 // pluginSettings list the plugins installed, which the user enables or
 // removes. The web interface runs them, for now.
 func (s *shell) pluginSettings(c *ui.Context) {
-	s.groupWith(c, "installed plugins", func() {
+	s.groupWith(c, "Installed plugins", func() {
 		if s.link(c, "get-plugins", "get plugins") {
 			s.navigate("/marketplace/plugins")
 		}

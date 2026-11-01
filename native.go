@@ -476,7 +476,7 @@ func (s *shell) promptDialog(c *ui.Context) {
 	}
 	open := true
 	var in ui.Element
-	s.dialog(c, &open, dialogOptions{key: "prompt", title: strings.ToLower(p.title)}, func() {
+	s.dialog(c, &open, dialogOptions{key: "prompt", title: s.lk.words(p.title)}, func() {
 		in = ui.TextInput(c.Key("prompt"), &p.value).AutoFocus().Label(p.label).Width(360)
 	}, func() {
 		name := strings.TrimSpace(p.value)

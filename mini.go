@@ -88,7 +88,7 @@ func (s *shell) miniView(c *ui.Context) {
 			}
 		})
 		ui.Column(c).Grow(1).MinWidth(0).Padding(0, 12).Gap(8).Justify(ui.Center).Children(func() {
-			title, line := "nothing playing", "play something in MixMusic"
+			title, line := k.words("Nothing playing"), "play something in MixMusic"
 			if ok {
 				title, line = cur.Track.Title, names(cur.Track.Artists)
 			}
@@ -96,8 +96,8 @@ func (s *shell) miniView(c *ui.Context) {
 				line += " · waiting for the network"
 			}
 			ui.Column(c).MinWidth(0).Children(func() {
-				ui.Text(c, title).FontSize(k.size(1.25)).FontWeight(300).Font(k.display).
-					LetterSpacing(-0.02 * k.size(1.25)).SingleLine().MinWidth(0)
+				ui.Text(c, title).FontSize(k.size(1.25)).FontWeight(k.titleWeight()).Font(k.display).
+					LetterSpacing(k.tracking(-0.02, k.size(1.25))).SingleLine().MinWidth(0)
 				ui.Row(c).Gap(6).MinWidth(0).Children(func() {
 					if ok {
 						s.sourceMark(c, cur.Track.Source, false)

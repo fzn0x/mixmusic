@@ -172,9 +172,9 @@ func (s *shell) pluginNode(c *ui.Context, key string, v *plugins.View, n plugins
 		case "small":
 			t.FontSize(k.smallSize())
 		case "subtitle":
-			t.FontSize(k.subtitleSize()).FontWeight(300)
+			t.FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		case "title":
-			t.FontSize(k.titleSize()).FontWeight(300).Font(k.display)
+			t.FontSize(k.titleSize()).FontWeight(k.displayWeight()).Font(k.display)
 		}
 		switch n.Tone {
 		case "muted":
@@ -267,7 +267,7 @@ func (s *shell) pluginTile(c *ui.Context, key string, v *plugins.View, n plugins
 			ui.Box(c).Absolute().Top(0).Right(0).Bottom(0).Left(0).PassThrough().
 				Draw(func(p *ui.Painter, r ui.Rect) { paintTexture(p, r, texture, ink) })
 		}
-		ui.Text(c, n.Text).FontSize(k.size(1.5)).FontWeight(300).Font(k.display).TextColor(k.tileText).LineHeight(0.95)
+		ui.Text(c, n.Text).FontSize(k.size(1.5)).FontWeight(k.titleWeight()).Font(k.display).TextColor(k.tileText).LineHeight(0.95)
 		if n.Caption != "" {
 			ui.Text(c, n.Caption).FontSize(k.smallSize()).TextColor(k.tileText).MaxLines(2)
 		}

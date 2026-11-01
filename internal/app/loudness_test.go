@@ -124,15 +124,20 @@ func TestLoudnessBookKeepsOnlyMeasures(t *testing.T) {
 }
 
 func TestLoudnessBookKeepsWhatItCantSave(t *testing.T) {
-	// The cache folder is a file: nothing saves there.
+	// The cache folder is a file once the book is open: nothing saves
+	// there. Opening a file in it fails on Linux and macOS, as not a
+	// folder, while Windows finds no file there.
 	dir := filepath.Join(t.TempDir(), "cache")
+	b := openBook(t, filepath.Join(dir, "loudness.json"), nil)
 	if err := os.WriteFile(dir, nil, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	b := openBook(t, filepath.Join(dir, "loudness.json"), nil)
 	b.keep("3IUqoyTxEU8", -7.93)
 	if v, ok := b.lkfs("3IUqoyTxEU8"); !ok || v != -7.93 {
 		t.Errorf("%v, %v", v, ok)
+	}
+	if _, ok := b.known.Get()["3IUqoyTxEU8"]; ok {
+		t.Error("the loudness was saved")
 	}
 }
 

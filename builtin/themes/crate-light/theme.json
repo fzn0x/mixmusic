@@ -1,0 +1,49 @@
+{
+  "id": "crate-light",
+  "name": "Crate Light",
+  "version": "1.0.0",
+  "author": "MixMusic",
+  "description": "Crate by day: big covers in card grids and heavy headings on warm paper.",
+  "scheme": "light",
+  "colors": {
+    "bg": "#f9f2e9",
+    "surface": "#f0e8dd",
+    "surface-2": "#e8ded1",
+    "surface-3": "#dcd1c2",
+    "border": "rgba(70, 40, 10, 0.14)",
+    "text": "#26170b",
+    "text-muted": "#5e4a3b",
+    "accent": "#973900",
+    "accent-text": "#ffffff",
+    "danger": "#b42d1c",
+    "success": "#2f6f2c",
+    "youtube": "#c22618",
+    "spotify": "#1b7a43",
+    "tile-1": "#a3420f",
+    "tile-2": "#6b3584",
+    "tile-3": "#17655f",
+    "tile-4": "#982a46",
+    "tile-text": "#ffffff"
+  },
+  "fonts": {
+    "body": "'Segoe UI', 'Helvetica Neue', 'Noto Sans', 'DejaVu Sans', system-ui, sans-serif",
+    "display": "'Archivo SemiCondensed', 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif"
+  },
+  "radius": "8px",
+  "layout": {
+    "radius-small": "4px",
+    "shape": "box",
+    "row": "48px",
+    "gutter": "24px",
+    "gap": "12px",
+    "rail": "220px",
+    "cover": "196px",
+    "player-height": "76px",
+    "player": "docked",
+    "controls": "tonal",
+    "headings": "bold",
+    "cards": "filled",
+    "motion": "smooth"
+  },
+  "options": []
+}

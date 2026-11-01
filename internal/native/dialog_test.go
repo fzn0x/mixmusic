@@ -36,3 +36,40 @@ func TestPaletteInShortWindow(t *testing.T) {
 	tt.Frame()
 	shows(t, tt, h, last, 36)
 }
+
+// TestPaletteFollowsArrows brings the row the arrows choose into view.
+func TestPaletteFollowsArrows(t *testing.T) {
+	const w, h = 924, 425
+	s := newTestShell(t)
+	tt := testerOf(t, s, w, h)
+	tt.Key(ui.Cmd, ui.KeyK)
+	tt.Frame()
+	tt.Type("theme")
+	tt.Frame()
+	var themes []string
+	for _, cmd := range s.commands() {
+		if cmd.group == "themes" {
+			themes = append(themes, cmd.title)
+		}
+	}
+	if len(themes) < 8 {
+		t.Fatalf("only %d themes to choose", len(themes))
+	}
+	// The search for what was typed comes first, then the themes.
+	for _, title := range themes {
+		tt.Key(0, ui.KeyDown)
+		tt.Frame()
+		shows(t, tt, h, title, 36)
+	}
+	for range themes {
+		tt.Key(0, ui.KeyUp)
+		tt.Frame()
+	}
+	shows(t, tt, h, "Search for “theme”", 36)
+	// The row chosen doesn't keep the list from scrolling away from it.
+	r, _ := tt.Find("Search for “theme”")
+	tt.Scroll(r.X+r.W/2, r.Y+r.H/2, 0, 1e4)
+	tt.Frame()
+	tt.Frame()
+	shows(t, tt, h, themes[len(themes)-1], 36)
+}

@@ -166,10 +166,12 @@ type shell struct {
 	statsDay   dayTip
 	statsTable bool
 	statsRows  ui.ListState
-	// The command palette, what it searches, and its row chosen.
+	// The command palette, what it searches, and its row chosen;
+	// paletteMoved is set in the frame the keys move the choice.
 	paletteOpen  bool
 	paletteQuery string
 	paletteAt    int
+	paletteMoved bool
 	lyricsView   lyricsState
 	// pagePath is the path of the page being built.
 	pagePath string

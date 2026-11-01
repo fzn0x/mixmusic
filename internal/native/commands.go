@@ -207,7 +207,7 @@ func (s *shell) runShortcuts(c *ui.Context) {
 func (s *shell) palette(c *ui.Context) {
 	k := &s.lk
 	if !s.paletteOpen {
-		s.paletteQuery, s.paletteAt = "", 0
+		s.paletteQuery, s.paletteAt, s.paletteMoved = "", 0, false
 		return
 	}
 	var found []command
@@ -230,10 +230,10 @@ func (s *shell) palette(c *ui.Context) {
 		in := ui.TextInputBase(c.Key("palette-input"), &s.paletteQuery).Placeholder("type a command or a search").AutoFocus().
 			Label("Command palette").FontSize(k.subtitleSize()).FontWeight(300).TextColor(k.accent).Padding(8, 0)
 		if in.Changed() {
-			s.paletteAt = 0
+			s.paletteAt, s.paletteMoved = 0, true
 		}
-		in.OnShortcut(0, ui.KeyDown, func() { s.paletteAt++ })
-		in.OnShortcut(0, ui.KeyUp, func() { s.paletteAt-- })
+		in.OnShortcut(0, ui.KeyDown, func() { s.paletteAt, s.paletteMoved = s.paletteAt+1, true })
+		in.OnShortcut(0, ui.KeyUp, func() { s.paletteAt, s.paletteMoved = s.paletteAt-1, true })
 		run := func(cmd command) {
 			s.paletteOpen = false
 			cmd.run()
@@ -251,6 +251,12 @@ func (s *shell) palette(c *ui.Context) {
 					if i == s.paletteAt {
 						row.Background(k.accent)
 						ink = k.accentText
+						// The row chosen comes into view in the frame the keys
+						// chose it: in every frame, the wheel couldn't scroll
+						// it away.
+						if s.paletteMoved {
+							row.ScrollIntoView()
+						}
 					} else if row.Hovered() {
 						row.Background(k.hover)
 					}
@@ -263,6 +269,7 @@ func (s *shell) palette(c *ui.Context) {
 						ui.Text(c, shortcutLabel(s.shortcutOf(cmd))).FontSize(k.captionSize()).TextColor(ink.Alpha(0.7))
 					})
 				}
+				s.paletteMoved = false
 			})
 		})
 	})

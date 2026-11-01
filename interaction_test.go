@@ -911,6 +911,24 @@ func TestShortcutRecorder(t *testing.T) {
 	}
 }
 
+// TestShortcutResetTakesKeys resets a command's shortcut to its own keys,
+// which the command the user gave them to gives up: rather than leave the
+// command with none, its reset gone.
+func TestShortcutResetTakesKeys(t *testing.T) {
+	s := newTestShell(t)
+	s.set.Shortcuts = map[string]string{"player.mute": "Mod+K", "view.palette": "Mod+P"}
+	tt := testerOf(t, s, 1280, 4000)
+	show(s, tt, "/settings/shortcuts")
+	click(t, s, tt, "reset the shortcut of Command palette")
+	palette := command{id: "view.palette", shortcut: "Mod+K"}
+	if keys := s.shortcutOf(palette); keys != "Mod+K" {
+		t.Errorf("reset gave the palette %q", keys)
+	}
+	if keys, ok := s.set.Shortcuts["player.mute"]; !ok || keys != "" || !tt.HasText("Mute has no shortcut now") {
+		t.Errorf("Mute keeps %q, %v", keys, ok)
+	}
+}
+
 // TestShortcutName writes the keys pressed as shortcuts are written.
 func TestShortcutName(t *testing.T) {
 	for _, c := range []struct {

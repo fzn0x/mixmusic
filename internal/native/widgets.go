@@ -14,7 +14,7 @@ import (
 // over a tint on hover, and to the accent when on.
 func (s *shell) iconButton(c *ui.Context, key, name, label string, on bool, size float32) ui.Element {
 	k := &s.lk
-	b := ui.ButtonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).KeepFocus().Cursor(ui.CursorPointer)
+	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
 	ink := k.muted
 	switch {
 	case on:
@@ -44,7 +44,7 @@ func (s *shell) roundButton(c *ui.Context, key, name, label string, main, disabl
 // round is a round button of size, with a glyph of the size given.
 func (s *shell) round(c *ui.Context, key, name, label string, main, disabled bool, size, glyph float32) ui.Element {
 	k := &s.lk
-	b := ui.ButtonBase(c.Key(key)).Size(size, size).Radius(size / 2).Label(label).Tooltip(label).KeepFocus().
+	b := s.buttonBase(c.Key(key)).Size(size, size).Radius(size / 2).Label(label).Tooltip(label).
 		Cursor(ui.CursorPointer).Disabled(disabled)
 	ink := k.text
 	switch {
@@ -77,11 +77,57 @@ func (s *shell) round(c *ui.Context, key, name, label string, main, disabled boo
 	return b
 }
 
+// pointerKeys leaves the keys without modifiers that run commands, as
+// Space plays or pauses, to those commands while e has the focus and shows
+// no ring for it, as after a click: MyGo gives a focused control Space and
+// Enter before the window's shortcuts, and the control would act again. A
+// focus that shows its ring keeps them, as one that Tab gave, for Space and
+// Enter to press what Tab reached; so does one whose ring a press of Space
+// or Enter showed. It does nothing while a shortcut is being recorded.
+func (s *shell) pointerKeys(e ui.Element) ui.Element {
+	if len(s.plainKeys) == 0 || !e.Focused() || e.FocusVisible() {
+		return e
+	}
+	for _, k := range s.plainKeys {
+		if e.Shortcut(0, k.key) {
+			k.run()
+		}
+	}
+	return e
+}
+
+// buttonBase, switchOf, selectOf, linkOf and colorWellOf are MyGo's
+// controls, whose focus after a click leaves Space to play or pause
+// (pointerKeys).
+func (s *shell) buttonBase(c *ui.Context) ui.Element         { return s.pointerKeys(ui.ButtonBase(c)) }
+func (s *shell) switchOf(c *ui.Context, on *bool) ui.Element { return s.pointerKeys(ui.Switch(c, on)) }
+func (s *shell) selectOf(c *ui.Context, chosen *string, options []string) ui.Element {
+	return s.pointerKeys(ui.Select(c, chosen, options))
+}
+func (s *shell) linkOf(c *ui.Context, label, url string) ui.Element {
+	return s.pointerKeys(ui.Link(c, label, url))
+}
+func (s *shell) colorWellOf(c *ui.Context, color *ui.Color) ui.Element {
+	return s.pointerKeys(ui.ColorWell(c, color))
+}
+
+// dialogButton is button for a dialog, where the window's shortcuts wait:
+// Space and Enter press it after a click too, as they press the buttons of
+// MyGo's own dialogs.
+func (s *shell) dialogButton(c *ui.Context, key, label string, primary bool) ui.Element {
+	return s.styledButton(ui.ButtonBase(c.Key(key)), c, label, primary)
+}
+
 // button is a 40px button with a label: a filled accent block when
 // primary, else a 2px outline that inverts to solid ink when pressed.
 func (s *shell) button(c *ui.Context, key, label string, primary bool) ui.Element {
+	return s.styledButton(s.buttonBase(c.Key(key)), c, label, primary)
+}
+
+// styledButton gives b, a button's base, the look of button.
+func (s *shell) styledButton(b ui.Element, c *ui.Context, label string, primary bool) ui.Element {
 	k := &s.lk
-	b := ui.ButtonBase(c.Key(key)).Height(40).PaddingX(24).Radius(k.radiusSm).Label(label).Cursor(ui.CursorPointer).AlignSelf(ui.Start)
+	b.Height(40).PaddingX(24).Radius(k.radiusSm).Label(label).Cursor(ui.CursorPointer).AlignSelf(ui.Start)
 	ink := k.text
 	switch {
 	case primary && b.Hovered():
@@ -180,7 +226,7 @@ func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, c
 		if len(pivots) > 0 && selected != nil {
 			ui.Row(c).Gap(0.66 * k.pivotSize()).Wrap().Children(func() {
 				for i, p := range pivots {
-					b := ui.ButtonBase(c.Key("pivot-" + p)).Label(p).Cursor(ui.CursorPointer)
+					b := s.buttonBase(c.Key("pivot-" + p)).Label(p).Cursor(ui.CursorPointer)
 					ink := k.text.Alpha(0.38)
 					switch {
 					case i == *selected:
@@ -223,7 +269,7 @@ func (s *shell) sectionHead(c *ui.Context, title string, links func()) {
 
 // link is a small text in the accent that does something when clicked.
 func (s *shell) link(c *ui.Context, key, label string) bool {
-	return ui.Link(c.Key(key), label, "").FontSize(s.lk.smallSize()).Clicked()
+	return s.linkOf(c.Key(key), label, "").FontSize(s.lk.smallSize()).Clicked()
 }
 
 // alert tells of a problem in a coral panel, with what to do about it.
@@ -417,7 +463,7 @@ func (s *shell) choices(c *ui.Context, key, label string, selected *int, options
 	changed := false
 	ui.Column(c.Key(key)).Gap(4).Padding(14, 0).Label(label).Children(func() {
 		for i, o := range options {
-			b := ui.ButtonBase(c.Key(key+"-"+count(i))).Gap(14).Padding(10, 12).Radius(k.radiusSm).Justify(ui.Start).
+			b := s.buttonBase(c.Key(key+"-"+count(i))).Gap(14).Padding(10, 12).Radius(k.radiusSm).Justify(ui.Start).
 				AlignItems(ui.Start).Label(o.title).Disabled(o.disabled).Cursor(ui.CursorPointer)
 			on := i == *selected
 			if o.disabled {
@@ -456,7 +502,7 @@ func (s *shell) segmented(c *ui.Context, key, label string, selected *int, label
 	// to its rounded corners.
 	seg.Track.Height(34).Border(2, k.outline).Radius(k.radiusSm).Clip().Label(label).Shrink(0).Children(func() {
 		for i, l := range labels {
-			part := seg.Segment(i).PaddingX(14).FillHeight().Label(l).Cursor(ui.CursorPointer)
+			part := s.pointerKeys(seg.Segment(i)).PaddingX(14).FillHeight().Label(l).Cursor(ui.CursorPointer)
 			ink := k.text
 			switch {
 			case i == *selected:

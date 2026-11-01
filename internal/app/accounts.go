@@ -2,15 +2,12 @@ package app
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"os"
 	"time"
 
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/spotify"
-	"github.com/fzn0x/mixmusic/internal/store"
 )
 
 // loginTimeout is how long signing in waits for the user in the browser.
@@ -20,46 +17,11 @@ const loginTimeout = 5 * time.Minute
 // store.
 const tokenSecret = "spotify-token"
 
-// tokenStore keeps the Spotify token in the system's credential store, or
-// in a file readable by the user alone where there is none.
-type tokenStore struct{ file string }
-
-func (s tokenStore) Load() (spotify.Token, error) {
-	data, err := mygo.Secrets.Get(tokenSecret)
-	if errors.Is(err, errors.ErrUnsupported) || errors.Is(err, mygo.ErrSecretNotFound) {
-		data, err = os.ReadFile(s.file)
-	}
-	if err != nil {
-		return spotify.Token{}, err
-	}
-	var t spotify.Token
-	return t, json.Unmarshal(data, &t)
-}
-
-func (s tokenStore) Save(t spotify.Token) error {
-	data, err := json.Marshal(t)
-	if err != nil {
-		return err
-	}
-	if err := mygo.Secrets.Set(tokenSecret, data); !errors.Is(err, errors.ErrUnsupported) {
-		return err
-	}
-	if err := store.WriteFile(s.file, data); err != nil {
-		return err
-	}
-	return os.Chmod(s.file, 0o600)
-}
-
-func (s tokenStore) Clear() error {
-	err := mygo.Secrets.Delete(tokenSecret)
-	if errors.Is(err, errors.ErrUnsupported) {
-		err = nil
-	}
-	if rmErr := os.Remove(s.file); rmErr != nil && !errors.Is(rmErr, os.ErrNotExist) {
-		err = errors.Join(err, rmErr)
-	}
-	return err
-}
+// tokenStore keeps the Spotify token in the system's credential store:
+// sealed for the Windows user where the Credential Manager isn't
+// available, or in a file readable by the user alone where there is no
+// store (secretStore).
+type tokenStore = jsonSecret[spotify.Token]
 
 // SpotifyAccount is the state of the Spotify account.
 type SpotifyAccount struct {

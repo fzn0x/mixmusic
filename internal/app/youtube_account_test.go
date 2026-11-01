@@ -2,6 +2,8 @@ package app
 
 import (
 	"bytes"
+	"net/http"
+	"path/filepath"
 	"testing"
 )
 
@@ -25,4 +27,109 @@ func TestSealOpen(t *testing.T) {
 	if _, err := open(key, sealed[:4]); err == nil {
 		t.Error("a damaged file opened")
 	}
+}
+
+// testYouTube is a youtubeStore in a folder of its own.
+func testYouTube(t *testing.T, keep keeper, seal sealer) *youtubeStore {
+	t.Helper()
+	dir := t.TempDir()
+	key := &secretStore{key: youtubeKeySecret, keep: keep, seal: seal}
+	if seal != nil {
+		key.sealed = filepath.Join(dir, "youtube-session-key.dpapi")
+	}
+	return &youtubeStore{dir: dir, key: key}
+}
+
+var testCookies = []*http.Cookie{{Name: "SAPISID", Value: "x", Domain: ".youtube.com", Path: "/", Secure: true}}
+
+func loadCookies(t *testing.T, s *youtubeStore) []*http.Cookie {
+	t.Helper()
+	got, err := s.Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if len(got) != 1 || got[0].Name != "SAPISID" || got[0].Value != "x" {
+		t.Fatalf("loaded %v", got)
+	}
+	return got
+}
+
+// TestYouTubeStore keeps the session in youtube-session.bin, with its key
+// in the store, or sealed where the store isn't available, and in a plain
+// file only where there's neither.
+func TestYouTubeStore(t *testing.T) {
+	t.Run("store", func(t *testing.T) {
+		k := newKeeper()
+		s := testYouTube(t, k, fakeSealer{})
+		if err := s.Save(testCookies); err != nil {
+			t.Fatal(err)
+		}
+		if err := s.Save(testCookies); err != nil {
+			t.Fatal(err)
+		}
+		if len(k.kept[youtubeKeySecret]) != 32 || !exists(s.sealed()) || exists(s.plain()) {
+			t.Errorf("the key has %d bytes, the session files: sealed %v, plain %v", len(k.kept[youtubeKeySecret]), exists(s.sealed()), exists(s.plain()))
+		}
+		if k.gets != 1 {
+			t.Errorf("the key was read %d times for two saves", k.gets)
+		}
+		s.cached = nil // the next start
+		loadCookies(t, s)
+	})
+	t.Run("sealed key", func(t *testing.T) {
+		s := testYouTube(t, unavailableKeeper(), fakeSealer{})
+		if err := s.Save(testCookies); err != nil {
+			t.Fatal(err)
+		}
+		if !exists(s.key.sealed) || !exists(s.sealed()) || exists(s.plain()) {
+			t.Errorf("sealed key %v, session sealed %v, plain %v", exists(s.key.sealed), exists(s.sealed()), exists(s.plain()))
+		}
+		s.cached = nil
+		loadCookies(t, s)
+	})
+	t.Run("no store", func(t *testing.T) {
+		s := testYouTube(t, unavailableKeeper(), nil)
+		if err := s.Save(testCookies); err != nil {
+			t.Fatal(err)
+		}
+		if !exists(s.plain()) || exists(s.sealed()) {
+			t.Errorf("plain %v, sealed %v", exists(s.plain()), exists(s.sealed()))
+		}
+		loadCookies(t, s)
+		if !exists(s.plain()) {
+			t.Error("the plain file went with no store to move to")
+		}
+	})
+	t.Run("moves", func(t *testing.T) {
+		for _, c := range []struct {
+			name string
+			keep *fakeKeeper
+			seal sealer
+		}{{"into the store", newKeeper(), nil}, {"into the sealed key", unavailableKeeper(), fakeSealer{}}} {
+			s := testYouTube(t, c.keep, c.seal)
+			write(t, s.plain(), []byte(`[{"name":"SAPISID","value":"x","domain":".youtube.com","path":"/","secure":true,"httpOnly":false}]`))
+			loadCookies(t, s)
+			if exists(s.plain()) || !exists(s.sealed()) {
+				t.Errorf("%s: plain %v, sealed %v", c.name, exists(s.plain()), exists(s.sealed()))
+			}
+			s.cached = nil
+			loadCookies(t, s)
+		}
+	})
+	t.Run("clear", func(t *testing.T) {
+		k := newKeeper()
+		s := testYouTube(t, k, fakeSealer{})
+		if err := s.Save(testCookies); err != nil {
+			t.Fatal(err)
+		}
+		if err := s.Clear(); err != nil {
+			t.Fatal(err)
+		}
+		if len(k.kept) != 0 || exists(s.sealed()) || s.cached != nil {
+			t.Errorf("left %d secrets, sealed %v, a cached key %v", len(k.kept), exists(s.sealed()), s.cached != nil)
+		}
+		if _, err := s.Load(); err == nil {
+			t.Error("a session was loaded after clearing")
+		}
+	})
 }

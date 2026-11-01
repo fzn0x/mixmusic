@@ -46,7 +46,7 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 						if t.Album.ID == "" {
 							ui.Text(c, t.Album.Name).FontSize(k.smallSize()).TextColor(k.muted)
 						} else {
-							link := ui.ButtonBase(c.Key("now-album")).Label(t.Album.Name).Cursor(ui.CursorPointer)
+							link := s.buttonBase(c.Key("now-album")).Label(t.Album.Name).Cursor(ui.CursorPointer)
 							if link.Clicked() {
 								s.navigate(albumPath(t.Album.ID))
 							}

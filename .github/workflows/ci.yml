@@ -53,6 +53,8 @@ jobs:
           OPUS_TESTVECTORS: ${{ runner.os == 'Linux' && format('{0}/opus-vectors/opus_newvectors', runner.temp) || '' }}
       - name: Community registry
         run: go run ./tools/registry -check
+      - name: Changelog fragments
+        run: go run ./tools/changelog -check
 
   # MixMusic's own audio engine plays through each system's audio output:
   # these play silence, and a track at volume 0, on Linux and macOS, whose

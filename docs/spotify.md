@@ -55,10 +55,13 @@ Then choose **sign in to spotify** again, or **sign out** to stop using
 Spotify.
 
 MixMusic never sees your password. It keeps the token Spotify gives it in
-your system's credential store: the Credential Manager on Windows, the Secret
-Service (GNOME Keyring, KWallet…) on Linux. Where there is none, it keeps it
-in a file only your user can read, `spotify-token.json` in MixMusic's data
-folder.
+your system's credential store: the Keychain on macOS, the Credential Manager
+on Windows, the Secret Service (GNOME Keyring, KWallet…) on Linux. On Windows,
+where the Credential Manager can't keep it, it is encrypted for your Windows
+account in `spotify-token.dpapi`, in MixMusic's data folder. On Linux without
+a Secret Service, it is in a file only your user can read,
+`spotify-token.json` in the data folder; once a Secret Service is there, the
+token moves into it and the file goes.
 
 ## How Spotify tracks play
 

@@ -28,7 +28,7 @@ func (s *shell) topBar(c *ui.Context) {
 		})
 		s.searchField(c)
 		ui.Spacer(c)
-		palette := ui.ButtonBase(c.Key("palette")).Height(32).PaddingX(8).Radius(k.radiusSm).Label("Open the command palette").Cursor(ui.CursorPointer)
+		palette := s.buttonBase(c.Key("palette")).Height(32).PaddingX(8).Radius(k.radiusSm).Label("Open the command palette").Cursor(ui.CursorPointer)
 		ink := k.muted
 		if palette.Hovered() {
 			palette.Background(k.hover)

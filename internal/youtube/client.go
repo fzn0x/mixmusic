@@ -180,10 +180,10 @@ func (c *Client) callAs(ctx context.Context, ic innerClient, endpoint string, bo
 var accountEndpoints = map[string]bool{"browse": true, "account/account_menu": true}
 
 // refusable are the endpoints whose 401 or 403 may refuse the request
-// alone, as YouTube refuses an edit of another account's playlist, with
-// the session as good as before. Their callers ask for the account, with
-// refusedOrEnded, before they count the session ended.
-var refusable = map[string]bool{"browse/edit_playlist": true}
+// alone, as YouTube refuses an edit or a delete of another account's
+// playlist, with the session as good as before. Their callers ask for the
+// account, with refusedOrEnded, before they count the session ended.
+var refusable = map[string]bool{"browse/edit_playlist": true, "playlist/delete": true}
 
 // deniedStatus reports whether YouTube answered a request with a status
 // that ends a session, for most endpoints.

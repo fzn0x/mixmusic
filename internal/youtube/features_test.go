@@ -185,6 +185,72 @@ func TestRefusedEdit(t *testing.T) {
 	}
 }
 
+// TestDeletePlaylist deletes a playlist of the user's with playlist/delete,
+// as the website does, and nothing that isn't one; a refusal keeps the
+// session unless the account's menu says YouTube ended it.
+func TestDeletePlaylist(t *testing.T) {
+	ctx := context.Background()
+	deleted := map[string]any{"command": map[string]any{"handlePlaylistDeletionCommand": map[string]any{"playlistId": "PLtestOwn"}}}
+	c, requests, _ := fakeYouTube(t, func(string) any { return deleted })
+	if err := c.DeletePlaylist(ctx, "PLtestOwn"); !errors.Is(err, ErrSignedOut) {
+		t.Errorf("signed out: %v", err)
+	}
+	c.SetCookies(session)
+	for _, id := range []string{"", "VL", "PL", "LM", "VLLM", "SE", "RDCLAK5uy_test", "OLAK5uy_test", "RDAMPLPLtest"} {
+		if err := c.DeletePlaylist(ctx, id); err == nil {
+			t.Errorf("deleted %q", id)
+		}
+	}
+	if got := requests(); len(got) != 0 {
+		t.Fatalf("asked YouTube %+v", got)
+	}
+	if err := c.DeletePlaylist(ctx, "VLPLtestOwn"); err != nil {
+		t.Fatal(err)
+	}
+	got := requests()
+	if len(got) != 1 || got[0].path != "/youtubei/v1/playlist/delete" || got[0].body["playlistId"] != "PLtestOwn" {
+		t.Fatalf("requests = %+v", got)
+	}
+	if client := got[0].body["context"].(map[string]any)["client"].(map[string]any); client["clientName"] != "WEB_REMIX" {
+		t.Errorf("as client %v", client)
+	}
+
+	for _, tc := range []struct {
+		name            string
+		status, account int
+		want            error
+		asksAccount     bool
+	}{
+		{"403, the account reads", http.StatusForbidden, http.StatusOK, errDeleteRefused, true},
+		{"401, the account reads", http.StatusUnauthorized, http.StatusOK, errDeleteRefused, true},
+		{"401, the account doesn't", http.StatusUnauthorized, http.StatusUnauthorized, ErrSessionRejected, true},
+		{"404", http.StatusNotFound, http.StatusOK, errDeleteRefused, false},
+		{"400", http.StatusBadRequest, http.StatusOK, errDeleteRefused, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c, requests, _ := statusYouTube(t, func(path string) (int, any) {
+				if path == "/youtubei/v1/account/account_menu" {
+					if tc.account != http.StatusOK {
+						return tc.account, denied(tc.account)
+					}
+					return http.StatusOK, accountMenu("1")
+				}
+				return tc.status, map[string]any{"error": map[string]any{"code": tc.status, "status": "PERMISSION_DENIED"}}
+			})
+			c.SetCookies(session)
+			if err := c.DeletePlaylist(ctx, "PLtestTheirs"); !errors.Is(err, tc.want) {
+				t.Errorf("DeletePlaylist = %v, want %v", err, tc.want)
+			}
+			if got, ended := c.Rejected(), tc.want == ErrSessionRejected; got != ended {
+				t.Errorf("rejected %v, want %v", got, ended)
+			}
+			if got := len(requests()); got != map[bool]int{false: 1, true: 2}[tc.asksAccount] {
+				t.Errorf("%d requests", got)
+			}
+		})
+	}
+}
+
 func TestParsePlaylistEditable(t *testing.T) {
 	n := fixture(t, "playlist")
 	p, _, err := parsePlaylist(n, "PLx")

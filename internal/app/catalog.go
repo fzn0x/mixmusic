@@ -208,23 +208,41 @@ func (c *Catalog) Radio(ctx context.Context, track media.Track) ([]media.Track, 
 	return out, nil
 }
 
-// Lyrics returns the lyrics of a track: synchronized ones from LRCLIB
-// when it has them, else YouTube Music's.
+// Lyrics returns the lyrics of a track: Unison's, else LRCLIB's, else
+// YouTube Music's. Synchronized lyrics of a later source win over plain
+// ones of an earlier, and YouTube Music's plain lyrics over shorter ones.
 func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, error) {
 	if l, ok := c.a.lyricsMemo.get(track.ID); ok {
 		return l, nil
 	}
-	l, err := c.a.lyrics.Get(ctx, lyricsQuery(track))
-	// YouTube Music fills in when LRCLIB has nothing, or is down, and
-	// when its plain lyrics are longer than LRCLIB's.
+	q := lyricsQuery(track)
+	q.VideoID = c.videoID(track)
+	l, err := c.a.unison.Get(ctx, q)
+	if errors.Is(err, lyrics.ErrUnavailable) {
+		log.Printf("mixmusic: the lyrics of %s, on Unison: %v", track.ID, err)
+	}
+	// LRCLIB fills in when Unison has nothing, or is down, and when it
+	// has synchronized lyrics where Unison has plain ones.
+	if err != nil || !l.Synced {
+		lr, lrErr := c.a.lyrics.Get(ctx, q)
+		switch {
+		case lrErr == nil && (err != nil || lr.Synced):
+			l, err = lr, nil
+		case err != nil:
+			err = missed(err, lrErr)
+		}
+	}
+	// YouTube Music fills in when neither has anything, or both are down,
+	// and when its plain lyrics are longer than theirs.
 	if err != nil || (!l.Synced && !l.Instrumental) {
 		if yt, ytErr := c.youtubeLyrics(ctx, track); ytErr == nil && (err != nil || len(yt.Lines) > len(l.Lines)) {
 			l, err = yt, nil
 		}
 	}
 	if err != nil {
-		// A track LRCLIB was too busy to look everywhere for reads the
-		// same, but the lyrics panel offers to try again.
+		// A track LRCLIB was too busy to look everywhere for, or that a
+		// source out of reach may have, reads the same, but the lyrics
+		// panel offers to try again.
 		if errors.Is(err, lyrics.ErrNotFound) || errors.Is(err, lyrics.ErrNotFoundYet) {
 			return lyrics.Lyrics{}, lyricsError{"No lyrics found for this track.", err}
 		}
@@ -235,8 +253,36 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 	return l, nil
 }
 
-// lyricsQuery asks LRCLIB for a track: its title without what YouTube
-// adds, as "(Official Video)", and its first artist.
+// missed is why neither Unison nor LRCLIB has the lyrics of a track: none
+// found when both looked, and none found yet when one of them couldn't be
+// reached, which may have some; LRCLIB's failure when neither could be.
+func missed(unison, lrclib error) error {
+	down, lrclibDown := errors.Is(unison, lyrics.ErrUnavailable), errors.Is(lrclib, lyrics.ErrUnavailable)
+	if down != lrclibDown {
+		return fmt.Errorf("%w (%v; %v)", lyrics.ErrNotFoundYet, unison, lrclib)
+	}
+	return lrclib
+}
+
+// videoID returns the ID of a track's recording on YouTube, to look its
+// lyrics up by: its own, or that of the YouTube Music recording matched
+// to it before; "" when there is none yet.
+func (c *Catalog) videoID(t media.Track) string {
+	yt, ok := t, t.Source == media.SourceYouTube
+	if !ok && c.a.matcher != nil {
+		yt, ok = c.a.matcher.Matched(t)
+	}
+	if !ok {
+		return ""
+	}
+	if source, id, err := media.ParseID(yt.ID); err == nil && source == media.SourceYouTube {
+		return id
+	}
+	return ""
+}
+
+// lyricsQuery asks for a track: its title without what YouTube adds, as
+// "(Official Video)", and its first artist.
 func lyricsQuery(t media.Track) lyrics.Query {
 	q := lyrics.Query{Title: match.CleanTitle(t.Title), Duration: time.Duration(t.DurationMs) * time.Millisecond}
 	if len(t.Artists) > 0 {

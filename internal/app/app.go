@@ -86,6 +86,7 @@ type App struct {
 	loudness     *loudnessBook
 	matcher      *match.Matcher
 	lyrics       *lyrics.Client
+	unison       *lyrics.Unison
 	addons       *addons.Manager
 	storage      *addons.Storage
 	lyricsMemo   *memo[lyrics.Lyrics]
@@ -215,7 +216,9 @@ func New(opts Options) (*App, error) {
 	a.openYouTube()
 	a.proxy.Cache = a.cache
 	a.matcher = match.New(a.youtube, matches)
-	a.lyrics = lyrics.New("MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)")
+	userAgent := "MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)"
+	a.lyrics = lyrics.New(userAgent)
+	a.unison = lyrics.NewUnison(userAgent)
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
 	a.related = newMemo[[]media.Shelf](100)
 	a.artStore = artwork.NewStore(filepath.Join(opts.CacheDir, "artwork"), artworkLimit)

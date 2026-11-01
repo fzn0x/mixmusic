@@ -275,6 +275,28 @@ func TestLyricsTwice(t *testing.T) {
 	}
 }
 
+// TestLyricsCredit credits Unison's lyrics with Unison's address, as their
+// licence asks, and LRCLIB's by name.
+func TestLyricsCredit(t *testing.T) {
+	s := newTestShell(t)
+	key := "lyrics:" + testTracks[0].ID
+	s.loads[key] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "Unison", SourceURL: "https://unison.boidu.dev",
+		Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper kites"}}}}
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	tt := testerOf(t, s, 1280, 900)
+	s.open("/lyrics")
+	tt.Frame()
+	if !tt.HasText("lyrics from Unison (") || !tt.HasText("https://unison.boidu.dev") {
+		t.Errorf("Unison's credit: %q", tt.Texts())
+	}
+	s.loads[key] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB", Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper kites"}}}}
+	tt.Frame()
+	if !tt.HasText("lyrics from LRCLIB") || tt.HasText("https://unison.boidu.dev") {
+		t.Errorf("LRCLIB's credit: %q", tt.Texts())
+	}
+}
+
 // TestLyricsTryAgain asks for lyrics that failed to load again, and offers
 // nothing to try again for a track without lyrics.
 func TestLyricsTryAgain(t *testing.T) {

@@ -58,6 +58,8 @@ type look struct {
 	// buttons of tonal controls, and tonalInk inks them.
 	selected, selectedText, selectedSub ui.Color
 	tonalFill, tonalInk                 ui.Color
+	// lowered are the words the light headings lowered, by the words.
+	lowered map[string]string
 }
 
 // fallbackTheme is the Mix theme's tokens, for a theme that lacks some.

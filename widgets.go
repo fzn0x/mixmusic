@@ -253,7 +253,7 @@ func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, c
 		s.plainHeader(c, title, pivots, counts, selected)
 		return
 	}
-	word := strings.ToLower(title)
+	word := k.words(title)
 	// Terminal's titles are prompts.
 	prompt := ""
 	if k.fx.prompt {
@@ -431,7 +431,7 @@ func (s *shell) sectionHead(c *ui.Context, title string, links func()) {
 		return
 	}
 	ui.Row(c).Margin(0, 0, 16).Padding(0, 0, 8).Gap(16).AlignItems(ui.End).BorderWidth(0, 0, 1, 0).BorderColor(k.rule).Children(func() {
-		ui.Text(c, strings.ToLower(title)).FontSize(k.titleSize()).FontWeight(300).Font(k.display).
+		ui.Text(c, k.words(title)).FontSize(k.titleSize()).FontWeight(300).Font(k.display).
 			LetterSpacing(-0.02 * k.titleSize()).TextColor(k.text).SingleLine().Grow(1).MinWidth(0)
 		if links != nil {
 			ui.Row(c).Gap(16).Shrink(0).Padding(0, 0, 4).Children(links)

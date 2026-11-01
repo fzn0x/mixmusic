@@ -146,10 +146,7 @@ func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, sub
 			}
 		})
 		ui.Column(c).Width(size).Gap(2).Children(func() {
-			t := ui.Text(c, title).FontSize(k.bodySize()).SingleLine()
-			if k.headings != headingsLight {
-				k.labelWeight(t)
-			}
+			k.labelWeight(ui.Text(c, title).FontSize(k.bodySize()).SingleLine())
 			ui.Row(c).Gap(6).MinWidth(0).Children(func() {
 				s.sourceMark(c, source, false)
 				ui.Text(c, subtitle).FontSize(k.smallSize()).TextColor(k.muted).SingleLine().MinWidth(0)

@@ -64,10 +64,7 @@ func (s *shell) commands() []command {
 			s.notes = append(s.notes, notice("Add-ons reloaded"))
 		}},
 	}
-	for _, t := range s.inv.Themes {
-		id := t.ID
-		cmds = append(cmds, command{"theme." + id, "Theme: " + t.Name, "", "themes", func() { s.chooseTheme(id) }})
-	}
+	cmds = append(cmds, s.themeCommands...)
 	for _, pc := range s.plugins.Commands() {
 		cmds = append(cmds, command{pc.ID, pc.Title, pc.Shortcut, "plugins", pc.Run})
 	}

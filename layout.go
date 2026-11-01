@@ -88,12 +88,25 @@ func (k *look) round(h float32) float32 {
 }
 
 // words are the interface's own words, and the titles, as the headings
-// set them: lowercase in Mix's light style, as written otherwise.
+// set them: lowercase in Mix's light style, as written otherwise. The
+// lowercase words are kept, so that a frame lowers none twice: the
+// interface's own are a few dozen.
 func (k *look) words(s string) string {
-	if k.headings == headingsLight {
-		return strings.ToLower(s)
+	if k.headings != headingsLight {
+		return s
 	}
-	return s
+	if l, ok := k.lowered[s]; ok {
+		return l
+	}
+	l := strings.ToLower(s)
+	if l == s {
+		return s // lowered without a copy
+	}
+	if k.lowered == nil || len(k.lowered) >= 256 {
+		k.lowered = map[string]string{}
+	}
+	k.lowered[s] = l
+	return l
 }
 
 // sentence is a label of the interface's, as "sign out": as it is in the

@@ -77,11 +77,15 @@ func TestLayoutTokens(t *testing.T) {
 }
 
 // TestWords checks that the light headings set the interface's words in
-// lowercase, and the others as written.
+// lowercase, once for each, and the others as written.
 func TestWords(t *testing.T) {
 	k := lookOf(themeWith(nil), settings.DensityComfortable)
 	if got := k.words("Liked songs on YouTube Music"); got != "liked songs on youtube music" {
 		t.Errorf("light: %q", got)
+	}
+	// The frames lower the same words: once lowered, they cost nothing.
+	if n := testing.AllocsPerRun(10, func() { k.words("Liked songs on YouTube Music") }); n != 0 {
+		t.Errorf("lowering words again allocates %v times", n)
 	}
 	k = lookOf(themeWith(map[string]string{"headings": "regular"}), settings.DensityComfortable)
 	if got := k.words("Liked songs on YouTube Music"); got != "Liked songs on YouTube Music" {
@@ -164,5 +168,28 @@ func TestDefaultLayoutDrawsAsBefore(t *testing.T) {
 				t.Errorf("%s, %s: %s differs with the default layout tokens", c.theme, c.density, name)
 			}
 		}
+	}
+}
+
+// TestThemeCommands checks that the palette has a command for each theme,
+// made once for the add-ons rather than at each frame, which chooses it.
+func TestThemeCommands(t *testing.T) {
+	s := newTestShell(t)
+	var themes []command
+	for _, cmd := range s.commands() {
+		if cmd.group == "themes" {
+			themes = append(themes, cmd)
+		}
+	}
+	if len(themes) != len(s.inv.Themes) {
+		t.Fatalf("%d theme commands for %d themes", len(themes), len(s.inv.Themes))
+	}
+	for _, cmd := range themes {
+		if cmd.id == "theme.crate" {
+			cmd.run()
+		}
+	}
+	if got := s.svc.Preferences.Get().ActiveTheme(true); got != "crate" {
+		t.Errorf("the theme is %q, not crate", got)
 	}
 }

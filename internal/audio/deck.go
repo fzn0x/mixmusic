@@ -11,12 +11,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/opus"
+	"github.com/fzn0x/mixmusic/internal/mp4"
 	"github.com/fzn0x/mixmusic/internal/webm"
 )
 
-// Source is the WebM file of a track, as a deck reads it: its bytes as they
-// arrive. A Read that waits for bytes returns an error once the
+// Source is the file of a track, WebM or MP4, as a deck reads it: its bytes
+// as they arrive. A Read that waits for bytes returns an error once the
 // interrupted function its Opener got returns true; Wake makes such a Read
 // check it again.
 type Source interface {
@@ -225,9 +225,10 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		src.Close()
 	}()
 
-	var r *webm.Reader
+	var tr track
+	var tm timing
 	for {
-		r, err = webm.NewReader(src)
+		tr, tm, err = openTrack(src)
 		if err == nil || !interrupted() {
 			break
 		}
@@ -242,49 +243,25 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		}
 	}
 	if err != nil {
-		return readError(err)
-	}
-	track := r.Track()
-	if track.Codec != "A_OPUS" {
-		return errUnsupported
-	}
-	head, err := parseOpusHead(track.CodecPrivate)
-	if err != nil {
 		return err
 	}
-	dec, err := opus.NewDecoder(Rate, 2)
-	if err != nil {
-		return errDecode
-	}
-	dec.SetGain(head.gain)
-	// The audio of a packet plays at its time less the codec delay, which
-	// is the pre-skip of the OpusHead when the file doesn't give it.
-	delay := track.CodecDelay
-	if delay == 0 {
-		delay = time.Duration(head.preSkip) * time.Second / Rate
-	}
-	preRoll := track.SeekPreRoll
-	if preRoll == 0 {
-		preRoll = 80 * time.Millisecond
-	}
+	delay := tm.delay
 	d.mu.Lock()
-	if total := r.Duration(); total > delay {
-		d.duration = total - delay
+	if tm.total > delay {
+		d.duration = tm.total - delay
 	}
 	d.ready = true
 	d.mu.Unlock()
 	notify()
 
-	pcm := make([]float32, 2*5760)
 	// next is the frame of the stream, codec delay included, of the next
 	// sample decoded, once known; skip is the frame to play from.
 	var next, skip int64
 	seekTo := func(t time.Duration) error {
 		target := t + delay
-		if err := r.Seek(max(0, target-preRoll)); err != nil {
+		if err := tr.seek(max(0, target-tm.preRoll)); err != nil {
 			return err
 		}
-		dec.Reset()
 		next, skip = -1, frames(target)
 		return nil
 	}
@@ -311,6 +288,17 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		}
 		return ctx.Err() == nil
 	}
+	// write plays the frames of pcm, which follow those decoded before,
+	// from from to to and from skip on.
+	write := func(pcm []float32, from, to int64) {
+		if next < skip {
+			from = max(from, min(skip-next, to))
+		}
+		next += int64(len(pcm) / 2)
+		if from < to {
+			(*cur).writeFrom(pcm[2*from:2*to], wait)
+		}
+	}
 	if err := seekTo(start); err != nil {
 		if !interrupted() {
 			return readError(err)
@@ -330,11 +318,14 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 				return readError(err)
 			}
 		}
-		p, err := r.ReadPacket()
+		err := tr.read()
 		if err != nil && err != io.EOF && !interrupted() && d.brokeNearEnd(err, next, skip, delay) {
 			err = io.EOF // what's left is less than loading it again costs
 		}
 		if err == io.EOF {
+			if pcm := tr.end(); len(pcm) > 0 {
+				write(pcm, 0, int64(len(pcm)/2))
+			}
 			(*cur).done.Store(true)
 			notify()
 			if !atEnd() {
@@ -348,32 +339,21 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 			}
 			return readError(err)
 		}
-		n, err := dec.Decode(p.Data, pcm, false)
+		p, err := tr.decode()
 		if err != nil {
-			return errDecode
+			return err
 		}
 		if next < 0 {
-			next = frames(p.Time)
+			next = p.at
 		}
-		from, to := int64(0), int64(n)
-		if next < skip {
-			from = min(skip-next, to)
-		}
-		if p.DiscardPadding > 0 {
-			to = max(from, to-frames(p.DiscardPadding))
-		} else if p.DiscardPadding < 0 {
-			from = max(from, min(frames(-p.DiscardPadding), to))
-		}
-		next += int64(n)
-		if from < to {
-			(*cur).writeFrom(pcm[2*from:2*to], wait)
-		}
+		write(p.pcm, int64(p.from), int64(p.to))
 	}
 }
 
 // readError words a failure of the reader for the player.
 func readError(err error) error {
-	if errors.Is(err, webm.ErrFormat) || errors.Is(err, errors.ErrUnsupported) || errors.Is(err, webm.ErrNoAudio) {
+	if errors.Is(err, webm.ErrFormat) || errors.Is(err, errors.ErrUnsupported) || errors.Is(err, webm.ErrNoAudio) ||
+		errors.Is(err, mp4.ErrFormat) || errors.Is(err, mp4.ErrNoAudio) {
 		return fmt.Errorf("%w (%v)", errUnsupported, err)
 	}
 	return errNetwork

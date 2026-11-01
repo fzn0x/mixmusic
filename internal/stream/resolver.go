@@ -31,14 +31,19 @@ const (
 	QualitySaver Quality = "saver"
 )
 
-// formats are yt-dlp's format selectors for each quality. Opus in WebM
-// plays in every webview MixMusic runs in; AAC in MP4 is the fallback.
-// YouTube's stable-volume formats, whose IDs end in -drc, come only when a
-// video has no other Opus: their dynamics are squeezed, and the loudness
-// YouTube measured is of the original audio.
+// formats are yt-dlp's format selectors for each quality: Opus in WebM
+// first, else AAC-LC in MP4, of itag 140, for a video YouTube has only in
+// AAC, never the HE-AAC of itag 139, which the engine doesn't play. Data
+// saver takes the smallest Opus, else AAC-LC too. YouTube's stable-volume
+// formats, whose IDs end in -drc, come only when a video has no other of
+// their codec: their dynamics are squeezed, and the loudness YouTube
+// measured is of the original audio. Any other audio comes last, which
+// the engine then refuses, naming its format.
 var formats = map[Quality]string{
-	QualityBest:  "bestaudio[acodec=opus][format_id!*=drc]/bestaudio[acodec=opus]/bestaudio[ext=m4a]/bestaudio",
-	QualitySaver: "worstaudio[acodec=opus][format_id!*=drc]/worstaudio[acodec=opus]/worstaudio[ext=m4a]/worstaudio",
+	QualityBest: "bestaudio[acodec=opus][format_id!*=drc]/bestaudio[acodec=opus]/" +
+		"bestaudio[acodec=mp4a.40.2][format_id!*=drc]/bestaudio[acodec=mp4a.40.2]/bestaudio",
+	QualitySaver: "worstaudio[acodec=opus][format_id!*=drc]/worstaudio[acodec=opus]/" +
+		"worstaudio[acodec=mp4a.40.2][format_id!*=drc]/worstaudio[acodec=mp4a.40.2]/worstaudio",
 }
 
 // resolveTimeout bounds one run of yt-dlp.

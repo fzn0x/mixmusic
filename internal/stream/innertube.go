@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -55,11 +56,11 @@ var (
 	// errRefused is returned when the media server refuses a stream URL
 	// YouTube's player API just gave.
 	errRefused = errors.New("stream: YouTube's media server refused the stream")
-	// errNoOpus is returned for a video with no Opus stream the engine
-	// plays, and errNoDirectURL for one whose Opus streams all need what
-	// only yt-dlp does: a signature or a challenge solved.
-	errNoOpus      = errors.New("stream: YouTube's player API gave no Opus stream")
-	errNoDirectURL = errors.New("stream: YouTube's player API gave no Opus stream that plays as given")
+	// errNoStream is returned for a video with no Opus or AAC-LC stream
+	// the engine plays, and errNoDirectURL for one whose streams of them
+	// all need what only yt-dlp does: a signature or a challenge solved.
+	errNoStream    = errors.New("stream: YouTube's player API gave no Opus or AAC-LC stream")
+	errNoDirectURL = errors.New("stream: YouTube's player API gave no Opus or AAC-LC stream that plays as given")
 	// errBadAnswer is returned for an answer the direct route can't read.
 	errBadAnswer = errors.New("stream: unexpected answer of YouTube's player API")
 	// ErrNoLoudness is returned when YouTube tells no loudness of a video.
@@ -552,8 +553,25 @@ func (n *number) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// codec returns the codec of f's stream, as its MIME type's codecs
+// parameter names it: "opus", or "mp4a.40.2" for AAC-LC.
+func (f playerFormat) codec() string {
+	_, params, err := mime.ParseMediaType(f.MimeType)
+	if err != nil {
+		return ""
+	}
+	return params["codecs"]
+}
+
 func (f playerFormat) opus() bool {
 	return strings.HasPrefix(f.MimeType, "audio/webm") && strings.Contains(f.MimeType, "opus")
+}
+
+// aacLC tells whether f is AAC-LC in MP4, as itag 140 is, which the engine
+// plays when a video has no Opus. It doesn't play HE-AAC, mp4a.40.5, as
+// itag 139 is.
+func (f playerFormat) aacLC() bool {
+	return strings.HasPrefix(f.MimeType, "audio/mp4") && f.codec() == "mp4a.40.2"
 }
 
 // plain tells whether f is a stream the engine plays as YouTube's apps
@@ -609,7 +627,7 @@ func (f playerFormat) stream() Stream {
 		MimeType: f.MimeType,
 		Size:     int64(f.ContentLength),
 		Duration: time.Duration(f.ApproxDurationMs) * time.Millisecond,
-		Codec:    "opus",
+		Codec:    f.codec(),
 		Bitrate:  float64(bitrate) / 1000,
 		Expires:  expiry(f.URL),
 	}
@@ -617,14 +635,32 @@ func (f playerFormat) stream() Stream {
 	return s
 }
 
-// pickAudio picks the Opus stream of a video in quality q: the best or the
-// smallest of its original audio track, as the engine plays only Opus.
-// length is the video's, 0 when unknown.
+// pickAudio picks the stream of a video in quality q that the engine plays:
+// the best or the smallest Opus stream of its original audio track, else,
+// for a video YouTube has only in AAC, its AAC-LC stream. A video whose
+// Opus streams need yt-dlp goes to yt-dlp, which finds them. length is the
+// video's, 0 when unknown.
 func pickAudio(formats []playerFormat, q Quality, length time.Duration) (playerFormat, error) {
-	var best playerFormat
-	found, rank, ciphered := false, 0, false
+	best, found, ciphered := pickOf(formats, q, length, playerFormat.opus)
+	if !found && !ciphered {
+		best, found, ciphered = pickOf(formats, q, length, playerFormat.aacLC)
+	}
+	switch {
+	case found:
+		return best, nil
+	case ciphered:
+		return playerFormat{}, errNoDirectURL
+	}
+	return playerFormat{}, errNoStream
+}
+
+// pickOf picks, of the formats of a codec, which of tells, the best or the
+// smallest stream in quality q of the original audio track, and tells
+// whether it passed over one that needs yt-dlp.
+func pickOf(formats []playerFormat, q Quality, length time.Duration, of func(playerFormat) bool) (best playerFormat, found, ciphered bool) {
+	rank := 0
 	for _, f := range formats {
-		if !f.opus() || !f.plain(length) {
+		if !of(f) || !f.plain(length) {
 			continue
 		}
 		if !f.direct() {
@@ -641,11 +677,5 @@ func pickAudio(formats []playerFormat, q Quality, length time.Duration) (playerF
 		}
 		best, rank, found = f, r, true
 	}
-	switch {
-	case found:
-		return best, nil
-	case ciphered:
-		return playerFormat{}, errNoDirectURL
-	}
-	return playerFormat{}, errNoOpus
+	return best, found, ciphered
 }

@@ -140,8 +140,27 @@ func TestZoomSetting(t *testing.T) {
 	}
 }
 
-// TestRenderZoom draws Settings › Appearance zoomed to MIXMUSIC_RENDER,
-// for a look.
+// TestMiniZoom zooms the mini player with the zoom's keys, its only
+// shortcuts.
+func TestMiniZoom(t *testing.T) {
+	s := newTestShell(t)
+	mini := ui.NewTester(s.miniView, miniWidth, miniHeight)
+	mini.Frame()
+	mini.Key(ui.Cmd, ui.KeyEqual)
+	s.drain()
+	mini.Frame()
+	if s.set.Zoom != 1.1 || s.zoom != 1.1 {
+		t.Errorf("Mod+= in the mini player: zoom %v, shown %v", s.set.Zoom, s.zoom)
+	}
+	mini.Key(ui.Cmd, ui.KeyS)
+	s.drain()
+	if s.p.State().Shuffle {
+		t.Error("Mod+S shuffled in the mini player")
+	}
+}
+
+// TestRenderZoom draws Settings › Appearance and the mini player zoomed
+// to MIXMUSIC_RENDER, for a look.
 func TestRenderZoom(t *testing.T) {
 	dir := os.Getenv("MIXMUSIC_RENDER")
 	if dir == "" {
@@ -159,4 +178,7 @@ func TestRenderZoom(t *testing.T) {
 	show(s, tall, "/settings/appearance")
 	s.setZoom(1)
 	renderTo(t, s, tall, dir, "zoom-setting")
+	s.setZoom(1.5)
+	mini := ui.NewTester(s.miniView, int(miniWidth*1.5), int(miniHeight*1.5))
+	renderTo(t, s, mini, dir, "zoom-mini-150")
 }

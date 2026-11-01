@@ -42,8 +42,9 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/stream`** finds the audio of a YouTube video with yt-dlp, keeps
   it until its URL expires, and opens it for the audio engine
   (`Proxy.Open`): chunked fetches from YouTube in the background, a new URL
-  when YouTube refuses the old one, and an on-disk cache of tracks played to
-  their end.
+  when YouTube refuses the old one, a new connection, from the byte it
+  reached, when a download gets no bytes for 15 seconds or its connection
+  drops, and an on-disk cache of tracks played to their end.
 - **`internal/webm`** reads the audio of WebM files, as YouTube serves it:
   the packets of the first audio track with their times, and seeking by the
   Cues, reading a file played from its start straight through.

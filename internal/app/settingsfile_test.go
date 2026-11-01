@@ -82,7 +82,7 @@ func TestReloadSettingsApplies(t *testing.T) {
 	n := told(t, a)
 	prefs := &Preferences{a}
 	writeSettings(t, a.settings.Path(), `{"theme": "aurora", "spotifyClientId": "abc", "crosfade": 6, "fontScale": 2}`)
-	a.reloadSettings()
+	a.ReloadSettings()
 	if got := prefs.Get(); got.Theme != "aurora" || got.SpotifyClientID != "abc" {
 		t.Errorf("Get = %q, %q", got.Theme, got.SpotifyClientID)
 	}
@@ -111,7 +111,7 @@ func TestReloadSettingsIgnoresOwnSave(t *testing.T) {
 		t.Fatal(err)
 	}
 	n := told(t, a)
-	a.reloadSettings()
+	a.ReloadSettings()
 	if n.Load() != 0 || prefs.File().Seq != 0 {
 		t.Errorf("MixMusic's own save told the windows %d times, File %+v", n.Load(), prefs.File())
 	}
@@ -124,7 +124,7 @@ func TestReloadSettingsBroken(t *testing.T) {
 	path := a.settings.Path()
 	const broken = "{\n  \"theme\": \"daylight\",\n}"
 	writeSettings(t, path, broken)
-	a.reloadSettings()
+	a.ReloadSettings()
 	// A file caught in the middle of a save isn't told of at once.
 	if f := prefs.File(); f.Problem != "" {
 		t.Errorf("told at once: %+v", f)
@@ -153,7 +153,7 @@ func TestReloadSettingsBroken(t *testing.T) {
 	// Fixed, it applies, with what changed meanwhile.
 	seq := prefs.File().Seq
 	writeSettings(t, path, `{"theme": "daylight"}`)
-	a.reloadSettings()
+	a.ReloadSettings()
 	f = prefs.File()
 	if f.Problem != "" || f.Seq != seq+1 || f.Notice.Kind != NoticeApplied {
 		t.Errorf("File after the fix = %+v", f)
@@ -173,7 +173,7 @@ func TestBrokenAtQuit(t *testing.T) {
 	a := fileApp(t, `{"theme": "aurora"}`)
 	path := a.settings.Path()
 	writeSettings(t, path, `{"theme": `)
-	a.reloadSettings()
+	a.ReloadSettings()
 	if _, err := (&Preferences{a}).Update(func(s *settings.Settings) { s.Crossfade = 3 }); err != nil {
 		t.Fatal(err)
 	}
@@ -198,7 +198,7 @@ func TestResetWhileBroken(t *testing.T) {
 	prefs := &Preferences{a}
 	path := a.settings.Path()
 	writeSettings(t, path, `{"theme": "daylight",}`)
-	a.reloadSettings()
+	a.ReloadSettings()
 	until(t, "the mistake told", func() bool { return prefs.File().Problem != "" })
 	s, err := prefs.Reset()
 	if err != nil {
@@ -237,7 +237,7 @@ func TestChangeKeepsAReload(t *testing.T) {
 	prefs := &Preferences{a}
 	base := prefs.Get()
 	writeSettings(t, a.settings.Path(), `{"theme": "aurora", "crossfade": 6}`)
-	a.reloadSettings()
+	a.ReloadSettings()
 	next := base
 	next.Density = settings.DensityCompact
 	s, err := prefs.Change(base, next)
@@ -256,7 +256,7 @@ func TestReloadSettingsSignsOutOnNewClientID(t *testing.T) {
 		t.Fatal("not signed in")
 	}
 	writeSettings(t, a.settings.Path(), `{"spotifyClientId": "another"}`)
-	a.reloadSettings()
+	a.ReloadSettings()
 	if a.spotify.SignedIn() || a.auth.ClientID() != "another" {
 		t.Errorf("signed in %v, client ID %q", a.spotify.SignedIn(), a.auth.ClientID())
 	}
@@ -266,7 +266,7 @@ func TestReloadSettingsForgetsTheChannelsProfile(t *testing.T) {
 	a := fileApp(t, `{"youtubeChannel": "111"}`)
 	a.youtubeMe = &youtube.Account{Name: "The former channel"}
 	writeSettings(t, a.settings.Path(), `{"youtubeChannel": "222"}`)
-	a.reloadSettings()
+	a.ReloadSettings()
 	a.mu.Lock()
 	me := a.youtubeMe
 	a.mu.Unlock()
@@ -287,7 +287,7 @@ func TestReloadSettingsFollowsVolume(t *testing.T) {
 	a.goPlayer.Store(p)
 	t.Cleanup(p.Close)
 	writeSettings(t, a.settings.Path(), `{"volume": 0.37}`)
-	a.reloadSettings()
+	a.ReloadSettings()
 	until(t, "the player at 0.37", func() bool { return p.State().Volume == volume.Of(0.37) })
 	// Nothing saves over the edit: the player saves no volume it got from
 	// the settings.

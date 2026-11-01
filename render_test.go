@@ -27,6 +27,9 @@ func TestMain(m *testing.M) {
 	isDark = func() bool { return true }
 	setAppearance = func(mygo.ThemeSource) {}
 	copyText = func(string) {}
+	// The tests never open settings.json on the desktop.
+	openSettings = func(*app.System) error { opened <- "open"; return nil }
+	showSettings = func(*app.System) error { opened <- "show"; return nil }
 	// The tests show what they give the pages: a request that reaches for
 	// the network goes to a closed port, and fails.
 	for _, v := range []string{"HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy"} {
@@ -186,7 +189,7 @@ func TestRender(t *testing.T) {
 	if dir == "" {
 		t.Skip("MIXMUSIC_RENDER names no folder")
 	}
-	s := newTestShell(t)
+	s := newTestShellOf(t, func(o *app.Options) { o.ProblemWait = -1 })
 	album := media.Album{ID: "al-1", Source: media.SourceYouTube, Title: "Hurry Up, We're Dreaming", Artists: []media.Ref{{ID: "ar-m83", Name: "M83"}},
 		Year: "2011", Tracks: testTracks}
 	var items []media.Item
@@ -265,6 +268,11 @@ func TestRender(t *testing.T) {
 	tall := ui.NewTester(s.view, 1280, 1500)
 	s.navigate("/settings/appearance")
 	renderTo(t, s, tall, dir, "settings-appearance-tall")
+	s.navigate("/settings/desktop")
+	renderTo(t, s, tt, dir, "settings-desktop")
+	s.main = true // which tells of settings.json in a toast too
+	brokenSettings(t, s, "{\n  \"theme\": \"aurora\",\n}")
+	renderTo(t, s, tt, dir, "settings-desktop-file-problem")
 
 	renderTo(t, s, ui.NewTester(s.miniView, 420, 132), dir, "mini")
 	renderTo(t, s, ui.NewTester(s.miniView, 340, 180), dir, "mini-narrow")

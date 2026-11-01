@@ -57,6 +57,14 @@ func (s *shell) desktopSettings(c *ui.Context) {
 				}()
 			}
 		})
+		s.row(c, "Settings file", "Your settings, as settings.json in your data folder. Save it while MixMusic runs, and they apply at once.", func() {
+			if s.button(c, "settings-file-open", "open", false).Clicked() {
+				s.openSettingsFile()
+			}
+			if s.button(c, "settings-file-show", "show in folder", false).Clicked() {
+				s.showSettingsFile()
+			}
+		})
 		s.row(c, "Reset settings", "Puts back the settings of a new install; your accounts, library and add-ons stay.", func() {
 			if s.button(c, "reset", "reset", false).Clicked() {
 				s.resetting = true

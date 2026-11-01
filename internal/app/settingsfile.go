@@ -118,12 +118,12 @@ func (a *App) watchSettings(ctx context.Context) {
 		}
 		a.watcher.Store(w)
 		// What changed since MixMusic read it, or since the watch before.
-		a.reloadSettings()
+		a.ReloadSettings()
 		for {
 			if _, err := w.Next(ctx); err != nil {
 				break
 			}
-			a.reloadSettings()
+			a.ReloadSettings()
 			if moved(path, w.Root()) {
 				break
 			}
@@ -171,7 +171,7 @@ func sleep(ctx context.Context, d time.Duration) bool {
 // is done, and reads it again when it changed.
 func (a *App) pollSettings(ctx context.Context, d time.Duration) {
 	path := a.settings.Path()
-	a.reloadSettings()
+	a.ReloadSettings()
 	last, _ := os.Stat(path)
 	tick := time.NewTicker(pollEvery)
 	defer tick.Stop()
@@ -187,7 +187,7 @@ func (a *App) pollSettings(ctx context.Context, d time.Duration) {
 		}
 		fi, _ := os.Stat(path)
 		if statChanged(last, fi) {
-			a.reloadSettings()
+			a.ReloadSettings()
 		}
 		last = fi
 	}
@@ -202,11 +202,12 @@ func statChanged(was, now os.FileInfo) bool {
 	return was.Size() != now.Size() || !was.ModTime().Equal(now.ModTime()) || !os.SameFile(was, now)
 }
 
-// reloadSettings reads settings.json again, and applies what changed, as
+// ReloadSettings reads settings.json again, and applies what changed, as
 // Settings applies a change: MixMusic's own saves change nothing. A file
 // that doesn't read is told of once it has had a mistake for problemWait;
-// the settings stay as they were meanwhile.
-func (a *App) reloadSettings() {
+// the settings stay as they were meanwhile. The watch of the file calls it
+// as the file changes.
+func (a *App) ReloadSettings() {
 	c, err := a.settings.Reload()
 	if held := a.settings.Held(); held != nil {
 		a.settingsBroken(held)

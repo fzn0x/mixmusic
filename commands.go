@@ -63,6 +63,7 @@ func (s *shell) commands() []command {
 			s.svc.Addons.Reload()
 			s.notes = append(s.notes, notice("Add-ons reloaded"))
 		}},
+		{"settings.openFile", "Open the settings file", "", "settings", s.openSettingsFile},
 	}
 	for _, t := range s.inv.Themes {
 		id := t.ID

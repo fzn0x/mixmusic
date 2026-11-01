@@ -28,6 +28,7 @@ import (
 func Open(a *app.App, hidden bool) *mygo.Window {
 	registerFonts()
 	s := newShell(a, a.GoPlayer())
+	s.main = true
 	// A screen smaller than the window, as a laptop's, gets one that fits.
 	work := mygo.Screen.PrimaryDisplay().WorkArea
 	size := fitIn(mygo.Rectangle{X: work.X, Y: work.Y, Width: 1280, Height: 820}, work)
@@ -98,8 +99,10 @@ type shell struct {
 	p   *player.Player
 	win *mygo.Window
 
-	router       *ui.Router
-	set          settings.Settings
+	router *ui.Router
+	// set is the settings, as the window's controls change them, and base
+	// what refresh read last, which save tells the changes from.
+	set, base    settings.Settings
 	inv          addons.Inventory
 	lk           look
 	art          *artworks
@@ -251,6 +254,15 @@ type shell struct {
 	installingAddon  string
 	pluginToInstall  addons.Entry
 	confirmingPlugin bool
+
+	// main is set in the main window, which alone tells of settings.json.
+	// file is settings.json as refresh read it last, toldFile the last of
+	// its notices the window told or let go, and fileNotice the one the
+	// next frame tells.
+	main       bool
+	file       app.SettingsFile
+	toldFile   int
+	fileNotice *app.FileNotice
 }
 
 func newShell(a *app.App, p *player.Player) *shell {
@@ -264,10 +276,19 @@ func newShell(a *app.App, p *player.Player) *shell {
 	s.art = newArtworks(s.update, s.svc.System.Artwork())
 	s.refresh()
 	// The side panel the user left.
-	if s.panel = s.set.Panel; s.panel == "none" {
-		s.panel = ""
-	}
+	s.panel = shownPanel(s.set.Panel)
+	// What became of settings.json before the window opened, as the tray
+	// opens it again, it doesn't tell.
+	s.toldFile = s.file.Seq
 	return s
+}
+
+// shownPanel is the side panel shown for the setting panel: "" for none.
+func shownPanel(panel string) string {
+	if panel == "none" {
+		return ""
+	}
+	return panel
 }
 
 // start follows the player and the app, until the window closes, and
@@ -342,7 +363,21 @@ func (s *shell) drain() {
 // answer comes: forgotten, they read as signed out meanwhile, and Spotify
 // blinked out of the pages each time the app told of a change (#50).
 func (s *shell) refresh() {
+	// Before the first, base is the zero value, whose theme no settings
+	// read have.
+	old, first := s.set, s.base.Theme == ""
 	s.set = s.svc.Preferences.Get()
+	// A copy of its own, as the controls change s.set's maps and slices.
+	s.base = s.set.Clean()
+	s.file = s.svc.Preferences.File()
+	if !first {
+		s.followSettings(old)
+	}
+	if s.main && s.file.Seq > s.toldFile {
+		s.toldFile = s.file.Seq
+		n := s.file.Notice
+		s.fileNotice = &n
+	}
 	s.inv = s.svc.Addons.List()
 	s.refetch("accounts")
 	if s.offer == nil {

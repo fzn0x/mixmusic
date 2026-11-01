@@ -49,6 +49,7 @@ func (s *shell) settingsPage(c *ui.Context, tab string) {
 			s.router.Replace("/settings/" + settingsTabs[selected])
 		}
 		ui.Column(c).MaxWidth(880).Children(func() {
+			s.settingsFileProblem(c)
 			switch settingsTabs[selected] {
 			case "appearance":
 				s.appearanceSettings(c)
@@ -69,11 +70,16 @@ func (s *shell) settingsPage(c *ui.Context, tab string) {
 	})
 }
 
-// save keeps the settings as the controls changed them.
+// save keeps what the controls changed of the settings: only that, so
+// that an edit of settings.json that applied since refresh read them, which
+// the window doesn't show until its refresh runs, stays.
 func (s *shell) save() {
-	if _, err := s.svc.Preferences.Set(s.set); err != nil {
+	next := s.set.Clean()
+	if _, err := s.svc.Preferences.Change(s.base, next); err != nil {
 		s.notes = append(s.notes, noticeOf(err))
+		return
 	}
+	s.base = next
 }
 
 // group titles a set of rows.

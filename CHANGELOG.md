@@ -38,6 +38,9 @@ All notable changes to MixMusic are documented here. The format follows
   version's code.
 - On Windows, a frame the screen never takes no longer holds up MixMusic
   for a second (#87).
+- On macOS, closing the window in full screen with "Close to the tray"
+  on no longer leaves an empty, black Space: the window leaves full
+  screen, then hides in the tray, and comes back in full screen (#84).
 
 ## [0.5.5] - 2026-10-28
 

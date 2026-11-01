@@ -61,7 +61,10 @@ func TestEngineOnTheDevice(t *testing.T) {
 
 // TestEngineOnTheDeviceAtSpeed plays the 3-second track at 2× through the
 // device, silently: its time moves on at twice the clock's, what waits in
-// the device included, and it ends 1.5 seconds after it started.
+// the device included, and it ends 1.5 seconds after it started. The track
+// plays once the deck has it: after the test before, the output starts at
+// once, which on macOS asks for its first buffers before the deck decoded
+// a frame, at any speed.
 func TestEngineOnTheDeviceAtSpeed(t *testing.T) {
 	if os.Getenv("MIXMUSIC_AUDIO") != "1" {
 		t.Skip("MIXMUSIC_AUDIO=1 runs the tests that open the audio device")
@@ -74,7 +77,11 @@ func TestEngineOnTheDeviceAtSpeed(t *testing.T) {
 	defer e.Close()
 	e.SetVolume(0)
 	e.master = newSmoother(0, glide)
-	err := e.Load(cuesFront, 0, true, 2)
+	if err := e.Load(cuesFront, 0, false, 2); err != nil {
+		t.Fatal(err)
+	}
+	buffered(t, e, 0, ringFrames/2)
+	err := e.Play()
 	if errors.Is(err, output.ErrNoDevice) || errors.Is(err, output.ErrUnsupported) {
 		t.Skip(err)
 	}

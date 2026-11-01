@@ -58,7 +58,9 @@ func (c *Client) RemoveFromPlaylist(ctx context.Context, playlistID, entryID, vi
 }
 
 // editPlaylist applies one action to a playlist. YouTube answers a refused
-// edit with a status that does not say it succeeded, and refused.
+// edit with a status that does not say it succeeded, and refused; an edit
+// of a playlist that isn't the account's, with 401 or 403, which leaves
+// the session as it was.
 func (c *Client) editPlaylist(ctx context.Context, playlistID string, action map[string]any, refused error) error {
 	if err := c.session(); err != nil {
 		return err
@@ -69,7 +71,7 @@ func (c *Client) editPlaylist(ctx context.Context, playlistID string, action map
 	}
 	n, err := c.call(ctx, "browse/edit_playlist", map[string]any{"playlistId": playlistID, "actions": []any{action}}, nil)
 	if err != nil {
-		return err
+		return c.refusedOrEnded(ctx, err, errNotYours)
 	}
 	if !strings.Contains(n.get("status").str(), "SUCCEEDED") {
 		return refused
@@ -80,6 +82,10 @@ func (c *Client) editPlaylist(ctx context.Context, playlistID string, action map
 // errRefused is a write YouTube answered without making it, as it does for
 // an account that must first set up a channel.
 var errRefused = errors.New("YouTube Music refused: the account may need a channel first, on youtube.com")
+
+// errNotYours is an edit of a playlist YouTube refused, while the session
+// still works.
+var errNotYours = errors.New("YouTube Music refused: the playlist may be another account's")
 
 // uniqueIDs returns ids without the empty ones and the repeats.
 func uniqueIDs(ids []string) []string {

@@ -23,6 +23,12 @@ type recorded struct {
 // fakeYouTube answers each request with answer(path), and records them.
 func fakeYouTube(t *testing.T, answer func(path string) any) (*Client, func() []recorded, *httptest.Server) {
 	t.Helper()
+	return statusYouTube(t, func(path string) (int, any) { return http.StatusOK, answer(path) })
+}
+
+// statusYouTube is fakeYouTube answering with the status answer gives too.
+func statusYouTube(t *testing.T, answer func(path string) (int, any)) (*Client, func() []recorded, *httptest.Server) {
+	t.Helper()
 	var (
 		mu  sync.Mutex
 		got []recorded
@@ -34,7 +40,9 @@ func fakeYouTube(t *testing.T, answer func(path string) any) (*Client, func() []
 		mu.Lock()
 		got = append(got, recorded{r.URL.Path, r.URL.Query(), r.Header.Clone(), body})
 		mu.Unlock()
-		json.NewEncoder(w).Encode(answer(r.URL.Path))
+		status, v := answer(r.URL.Path)
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(v)
 	}))
 	t.Cleanup(srv.Close)
 	c := New()
@@ -107,6 +115,71 @@ func TestEditPlaylist(t *testing.T) {
 	}
 	if a := remove["actions"].([]any)[0].(map[string]any); a["action"] != "ACTION_REMOVE_VIDEO" || a["setVideoId"] != "set1" || a["removedVideoId"] != "v1" {
 		t.Errorf("remove action = %v", a)
+	}
+}
+
+// accountMenu is the account's menu, as YouTube answers a session it
+// takes, with logged_in 1, or one it ended, with 0.
+func accountMenu(loggedInValue string) map[string]any {
+	menu := loggedIn(loggedInValue)
+	menu["actions"] = []any{map[string]any{"openPopupAction": map[string]any{"popup": map[string]any{"multiPageMenuRenderer": map[string]any{
+		"header": map[string]any{"activeAccountHeaderRenderer": map[string]any{"accountName": map[string]any{"runs": []any{map[string]any{"text": "Ada"}}}}},
+	}}}}}
+	return menu
+}
+
+// denied is how YouTube answers what it doesn't let a request do.
+func denied(status int) map[string]any {
+	return map[string]any{"error": map[string]any{"code": status, "message": "You are not authorized to edit this playlist.", "status": "UNAUTHENTICATED"}}
+}
+
+// TestRefusedEdit keeps the session through a refused edit of a playlist,
+// which YouTube answers with 401 or 403 as it does a session it ended:
+// the account's menu tells which it is.
+func TestRefusedEdit(t *testing.T) {
+	for _, tc := range []struct {
+		name          string
+		edit, account int
+		menu          string
+		ended         bool
+	}{
+		{"401, the account reads", http.StatusUnauthorized, http.StatusOK, "1", false},
+		{"403, the account reads", http.StatusForbidden, http.StatusOK, "1", false},
+		{"401, the account doesn't", http.StatusUnauthorized, http.StatusUnauthorized, "1", true},
+		{"403, the account reads signed out", http.StatusForbidden, http.StatusOK, "0", true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c, requests, _ := statusYouTube(t, func(path string) (int, any) {
+				if path == "/youtubei/v1/account/account_menu" {
+					if tc.account != http.StatusOK {
+						return tc.account, denied(tc.account)
+					}
+					return http.StatusOK, accountMenu(tc.menu)
+				}
+				return tc.edit, denied(tc.edit)
+			})
+			c.SetCookies(session)
+			err := c.AddToPlaylist(context.Background(), "PLx", "v1")
+			if got := c.Rejected(); got != tc.ended {
+				t.Errorf("rejected %v, want %v", got, tc.ended)
+			}
+			want := errNotYours
+			if tc.ended {
+				want = ErrSessionRejected
+			}
+			if !errors.Is(err, want) {
+				t.Errorf("AddToPlaylist = %v, want %v", err, want)
+			}
+			if got := requests(); len(got) != 2 || got[1].path != "/youtubei/v1/account/account_menu" {
+				t.Errorf("requests = %+v", got)
+			}
+		})
+	}
+	// Any other endpoint's 401 ends the session at once, as before.
+	c, _, _ := statusYouTube(t, func(string) (int, any) { return http.StatusUnauthorized, denied(http.StatusUnauthorized) })
+	c.SetCookies(session)
+	if err := c.SetSaved(context.Background(), "PLx", false); err == nil || !c.Rejected() {
+		t.Errorf("a 401 to removelike: %v, rejected %v", err, c.Rejected())
 	}
 }
 

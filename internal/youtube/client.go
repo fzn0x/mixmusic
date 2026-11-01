@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -147,7 +148,7 @@ func (c *Client) callAs(ctx context.Context, ic innerClient, endpoint string, bo
 	}
 	defer res.Body.Close()
 	c.keepCookies(res.Cookies(), now)
-	if signed && (res.StatusCode == http.StatusUnauthorized || res.StatusCode == http.StatusForbidden) {
+	if signed && deniedStatus(res.StatusCode) && !refusable[endpoint] {
 		c.reject()
 	}
 	raw, err := io.ReadAll(io.LimitReader(res.Body, 32<<20))
@@ -177,6 +178,35 @@ func (c *Client) callAs(ctx context.Context, ic innerClient, endpoint string, bo
 // accountEndpoints are those whose answer says whether YouTube took the
 // session: the account's menu and the pages of its library.
 var accountEndpoints = map[string]bool{"browse": true, "account/account_menu": true}
+
+// refusable are the endpoints whose 401 or 403 may refuse the request
+// alone, as YouTube refuses an edit of another account's playlist, with
+// the session as good as before. Their callers ask for the account, with
+// refusedOrEnded, before they count the session ended.
+var refusable = map[string]bool{"browse/edit_playlist": true}
+
+// deniedStatus reports whether YouTube answered a request with a status
+// that ends a session, for most endpoints.
+func deniedStatus(status int) bool {
+	return status == http.StatusUnauthorized || status == http.StatusForbidden
+}
+
+// refusedOrEnded tells which err, the answer to a request of a refusable
+// endpoint, is: a refusal of that request, which it returns as refused,
+// or the session ended, which the account's menu then says too. Other
+// errors stay as they are.
+func (c *Client) refusedOrEnded(ctx context.Context, err, refused error) error {
+	var api *APIError
+	if !errors.As(err, &api) || !deniedStatus(api.Status) {
+		return err
+	}
+	// The account's menu rejects the session as YouTube ended it.
+	c.Account(ctx)
+	if c.Rejected() {
+		return ErrSessionRejected
+	}
+	return refused
+}
 
 // loggedOut reports whether YouTube answered as to a visitor, signed out.
 func loggedOut(n node) bool {

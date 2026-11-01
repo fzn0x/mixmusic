@@ -272,8 +272,9 @@ type Player struct {
 	s       State
 	events  []Event
 	notices []Notice
-	// saveDue is set once the throttle lets the queue be written, as the
-	// task publishes it.
+	// saveAsked is set once a task asked to save the queue, and saveDue
+	// once the throttle lets it be written, as the task publishes it.
+	saveAsked   bool
 	saveDue     bool
 	loadToken   int
 	retried     string
@@ -427,7 +428,13 @@ func (p *Player) run() {
 			continue
 		}
 		for _, fn := range tasks {
+			p.saveAsked = false
 			fn()
+			if !p.saveAsked && slices.Contains(p.events, QueueChange) {
+				// An edit of the queue is kept, also while nothing plays to
+				// report it.
+				p.save()
+			}
 			p.publish()
 			if p.saveDue {
 				p.saveDue = false

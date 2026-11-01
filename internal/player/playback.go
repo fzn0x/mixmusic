@@ -515,6 +515,7 @@ func (p *Player) report() {
 
 // save keeps the queue, every saveEvery at most, as the task publishes it.
 func (p *Player) save() {
+	p.saveAsked = true
 	p.saving.call(p, func() { p.saveDue = true })
 }
 

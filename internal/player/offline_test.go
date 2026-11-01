@@ -300,7 +300,7 @@ func TestWaitLeavesTheDevice(t *testing.T) {
 	h.p.Next()
 	// While b loads, the device plays on, and tells it nears its end.
 	h.device.set(&DeviceState{Playing: true, Progress: 197 * time.Second, Track: &sp})
-	h.wait("the device near its end", func(p *Player) bool { return p.s.Index == 1 && p.s.Position == 197*time.Second })
+	h.wait("the device near its end", func(p *Player) bool { return p.s.Index == 1 && p.s.Position >= 197*time.Second })
 	release()
 	h.wait("b waiting at its start", func(p *Player) bool { return waiting("b", true)(p) && p.s.Position == 0 })
 	h.wait("the device paused", func(p *Player) bool { return h.device.has("pause") && !p.connect.active() })

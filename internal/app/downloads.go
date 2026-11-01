@@ -20,11 +20,14 @@ type Downloads struct{ a *App }
 // openDownloads opens the downloads in the folder of the settings, else
 // opts.DownloadsDir, else the data folder's.
 func (a *App) openDownloads(folder string) {
-	if folder == "" {
+	// A folder the user chose must be there: it may be on a drive that
+	// isn't plugged in.
+	chosen := folder != ""
+	if !chosen {
 		folder = a.defaultDownloads()
 	}
 	o := downloads.Options{Fetcher: a.proxy, Matcher: a.matcher, Cache: a.cache, Network: a.online, Art: a.artStore.Bytes,
-		Avoid: []string{filepath.Join(a.opts.CacheDir, "audio"), filepath.Join(a.opts.CacheDir, "artwork")}}
+		Avoid: []string{filepath.Join(a.opts.CacheDir, "audio"), filepath.Join(a.opts.CacheDir, "artwork")}, Exists: chosen}
 	a.downloads = downloads.Open(folder, o)
 	a.proxy.Kept = a.downloads
 }

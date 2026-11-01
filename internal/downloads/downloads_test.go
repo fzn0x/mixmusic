@@ -715,6 +715,15 @@ func TestFolderUnreachable(t *testing.T) {
 	if m.Serve(httptest.NewRecorder(), httptest.NewRequest("GET", "/yt/a", nil), "aaaaaaaaaaa") {
 		t.Error("served from a folder that isn't there")
 	}
+	// A folder the user chose, gone, as with its drive, isn't made again.
+	gone := filepath.Join(t.TempDir(), "unplugged", "MixMusic downloads")
+	m = open(t, gone, Options{Fetcher: &fetcher{}, Exists: true})
+	if st := m.Status(); !strings.Contains(st.Problem, "can't be reached") {
+		t.Errorf("status %+v", st)
+	}
+	if _, err := os.Stat(gone); !errors.Is(err, os.ErrNotExist) {
+		t.Errorf("the folder was made: %v", err)
+	}
 }
 
 // TestFileGoneMissing downloads a track again whose file went.

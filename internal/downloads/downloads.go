@@ -61,6 +61,9 @@ type Options struct {
 	Art func(ctx context.Context, url string) ([]byte, error)
 	// Avoid are folders the downloads never move into, as the cache's.
 	Avoid []string
+	// Exists is set for a folder the user chose, which Open doesn't make
+	// when it's missing: it waits for it, as for a drive plugged in again.
+	Exists bool
 }
 
 // These are the times the manager keeps; tests shorten them.
@@ -161,15 +164,28 @@ type Manager struct {
 	telling  bool
 }
 
-// Open opens the downloads kept in dir, making it when it doesn't exist. A
-// folder that can't be used, as on a drive unplugged, holds the downloads,
-// and Status tells why; tracks stream as before meanwhile.
+// Open opens the downloads kept in dir, making it when it doesn't exist,
+// unless opts.Exists. A folder that can't be used, as on a drive
+// unplugged, holds the downloads, and Status tells why; tracks stream as
+// before meanwhile.
 func Open(dir string, opts Options) *Manager {
 	m := &Manager{opts: opts, dir: dir, holds: map[string]hold{}, jobs: map[string]*job{}, busy: map[string]bool{},
 		tries: map[string]int{}, nextAt: map[string]time.Time{}, kick: make(chan struct{})}
 	m.ctx, m.cancel = context.WithCancel(context.Background())
 	m.idx = newIndex()
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	var err error
+	if opts.Exists {
+		// A drive unplugged leaves its folder's name behind it: on macOS,
+		// /Volumes/<name>, which making it again would put on the startup
+		// disk.
+		var info os.FileInfo
+		if info, err = os.Stat(dir); err == nil && !info.IsDir() {
+			err = errors.New("not a folder")
+		}
+	} else {
+		err = os.MkdirAll(dir, 0o755)
+	}
+	if err != nil {
 		m.err = err
 		m.holds[holdFolder] = hold{why: "The folder of your downloads can't be reached: " + dir}
 	} else if idx, _, err := readIndex(dir); err != nil {

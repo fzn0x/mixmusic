@@ -6,6 +6,13 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The main window's title names the track that plays, for the taskbar,
+  the window switcher and screen readers, and starts with "Paused:" while
+  it's paused. Turn off "Show what plays in the window title" in
+  Settings › Desktop to keep it to MixMusic's name (#105).
+
 ### Changed
 
 - A new icon: two pink rings and a play button on black, in the app, the

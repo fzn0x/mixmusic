@@ -764,6 +764,27 @@ func TestProgress(t *testing.T) {
 	}
 }
 
+func TestNextTrackFoundAtStart(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	prepared := func() []string {
+		var out []string
+		h.svc.with(func(f *fakeServices) { out = slices.Clone(f.prepared) })
+		return out
+	}
+	h.p.Time(1500*time.Millisecond, 200*time.Second)
+	h.wait("b prepared", func(*Player) bool { return slices.Contains(prepared(), "yt:b") })
+	// Once, and without its audio yet.
+	h.p.Time(2500*time.Millisecond, 200*time.Second)
+	h.on(func(*Player) {})
+	if got := prepared(); !slices.Equal(got, []string{"yt:a", "yt:b"}) || h.stream.count("preload") != 0 {
+		t.Errorf("prepared %v, %d preloads", got, h.stream.count("preload"))
+	}
+	h.p.Time(11*time.Second, 200*time.Second)
+	h.wait("b preloaded", func(*Player) bool { return h.stream.has("preload url:yt:b") })
+}
+
 func TestShortTrackCounts(t *testing.T) {
 	h := newHarness(t, Saved{})
 	short := track("s", "S")

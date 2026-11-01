@@ -206,7 +206,10 @@ const (
 	// countAfter is how long a track plays before it counts as played, or
 	// half of a shorter one.
 	countAfter = 30 * time.Second
-	// prefetchAfter is how long a track plays before the next is prepared.
+	// prepareAfter is how long a track plays before the next one's stream
+	// is found, so that skipping to it is quick, and prefetchAfter how long
+	// before its audio is downloaded too.
+	prepareAfter  = time.Second
 	prefetchAfter = 10 * time.Second
 	// restartAfter is how far into a track Previous goes back to its start.
 	restartAfter = 3 * time.Second
@@ -245,6 +248,7 @@ type Player struct {
 	loadToken   int
 	retried     string
 	counted     string
+	prepared    string
 	prefetched  string
 	crossfading bool
 	failures    int

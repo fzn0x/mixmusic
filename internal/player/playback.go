@@ -292,6 +292,13 @@ func (p *Player) onProgress() {
 		go p.svc.RecordPlay(entry.Track)
 	}
 	next, hasNext := p.s.UpNext()
+	if hasNext && next.UID != entry.UID && p.prepared != next.UID && pos > prepareAfter {
+		// Finding the next track's stream costs a request; downloading its
+		// audio waits until this track has played a while, so that skipping
+		// through a queue doesn't download every track.
+		p.prepared = next.UID
+		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(Source, error) {})
+	}
 	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter {
 		p.prefetched = next.UID
 		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {

@@ -218,6 +218,37 @@ func TestEnginePlaysTrack(t *testing.T) {
 	}
 }
 
+// TestEngineEndsAStreamCutInItsLastMoment tells a track whose stream broke
+// off in its last moment ended, not failed, and plays it again from its
+// start.
+func TestEngineEndsAStreamCutInItsLastMoment(t *testing.T) {
+	dev := &fakeDevice{}
+	rec := newRecorder()
+	e := NewEngine(cutOpener(t, cuesFront, 1000, errors.New("the network failed while loading the audio")), dev.start, rec)
+	dev.e = e
+	t.Cleanup(e.Close)
+	if err := e.Load("x", 0, true); err != nil {
+		t.Fatal(err)
+	}
+	dev.play(t, 4*Rate)
+	rec.waitFor(t, "ended")
+	rec.mu.Lock()
+	for _, ev := range rec.events {
+		if strings.HasPrefix(ev, "error: ") {
+			t.Errorf("events %q", rec.events)
+			break
+		}
+	}
+	rec.mu.Unlock()
+	e.Seek(0)
+	if err := e.Play(); err != nil {
+		t.Fatal(err)
+	}
+	if out := dev.play(t, Rate); !slices.ContainsFunc(out, func(s float32) bool { return s != 0 }) {
+		t.Error("nothing sounds from the start again")
+	}
+}
+
 func TestEnginePauseHolds(t *testing.T) {
 	want := reference(t, cuesFront)
 	e, dev, rec := newTestEngine(t)

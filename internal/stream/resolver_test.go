@@ -67,6 +67,32 @@ func TestResolveParsesAndCaches(t *testing.T) {
 	}
 }
 
+func TestResolverFresh(t *testing.T) {
+	var runs atomic.Int32
+	r := NewResolver(nil, "")
+	r.Run = fakeYTDLP("https://example.com/audio", &runs)
+	if r.Fresh("w3XzgjlKFjc") {
+		t.Error("fresh before it was resolved")
+	}
+	if _, err := r.Resolve(context.Background(), "w3XzgjlKFjc"); err != nil {
+		t.Fatal(err)
+	}
+	if !r.Fresh("w3XzgjlKFjc") {
+		t.Error("not fresh once resolved")
+	}
+	// A stream about to expire is resolved again.
+	r.Run = func(context.Context, ...string) ([]byte, error) {
+		return fmt.Appendf(nil, `{"url": "https://example.com/audio?expire=%d", "ext": "webm"}`, time.Now().Add(time.Minute).Unix()), nil
+	}
+	r.Forget("w3XzgjlKFjc")
+	if _, err := r.Resolve(context.Background(), "w3XzgjlKFjc"); err != nil {
+		t.Fatal(err)
+	}
+	if r.Fresh("w3XzgjlKFjc") {
+		t.Error("fresh though about to expire")
+	}
+}
+
 func TestResolveRejectsBadIDs(t *testing.T) {
 	r := NewResolver(nil, "")
 	r.Run = func(context.Context, ...string) ([]byte, error) {

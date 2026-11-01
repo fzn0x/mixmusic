@@ -81,6 +81,9 @@ func (s *shell) miniView(c *ui.Context) {
 			if ok {
 				title, line = cur.Track.Title, names(cur.Track.Artists)
 			}
+			if ok && s.st.Waiting {
+				line += " · waiting for the network"
+			}
 			ui.Column(c).MinWidth(0).Children(func() {
 				ui.Text(c, title).FontSize(k.size(1.25)).FontWeight(300).Font(k.display).
 					LetterSpacing(-0.02 * k.size(1.25)).SingleLine().MinWidth(0)
@@ -122,15 +125,9 @@ func (s *shell) miniControls(c *ui.Context) {
 		if s.iconButton(c, "mini-previous", "previous", "Previous", false, 18).Clicked() {
 			s.p.Previous()
 		}
-		name, label := "play", "Play"
-		switch {
-		case s.st.Loading:
-			label = "Loading"
-		case s.st.Playing:
-			name, label = "pause", "Pause"
-		}
+		name, label := toggleOf(s.st)
 		toggle := s.round(c, "mini-toggle", name, label, true, s.st.Loading || !ok && len(s.st.Queue) == 0, 40, 18)
-		if s.st.Buffering {
+		if pulses(s.st) {
 			toggle.Opacity(0.55 + 0.45*toggle.Loop("busy", 900*time.Millisecond, ui.EaseInOut))
 		}
 		if toggle.Clicked() {

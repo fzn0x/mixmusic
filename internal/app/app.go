@@ -23,6 +23,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/lyrics"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/online"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/spotify"
@@ -80,6 +81,7 @@ type App struct {
 	tools        *tools.Manager
 	resolver     *stream.Resolver
 	proxy        *stream.Proxy
+	online       *online.Watch
 	cache        *stream.Cache
 	matcher      *match.Matcher
 	lyrics       *lyrics.Client
@@ -198,6 +200,10 @@ func New(opts Options) (*App, error) {
 	}
 	a.cache = stream.NewCache(filepath.Join(opts.CacheDir, "audio"), 0)
 	a.proxy = stream.NewProxy(a.resolver)
+	// The player asks whether the network answers, which audio coming
+	// tells too.
+	a.online = online.New(online.Probe)
+	a.proxy.Seen = a.online.Seen
 	a.youtubeStore = youtubeStore{dir: opts.DataDir}
 	a.openYouTube()
 	a.proxy.Cache = a.cache

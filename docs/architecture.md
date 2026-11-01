@@ -43,9 +43,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   player API, asked signed out as YouTube's visionOS app (`Direct`), else
   with yt-dlp, keeps it until its URL expires, and opens it for the audio
   engine (`Proxy.Open`): chunked fetches from YouTube in the background, a
-  new URL when YouTube refuses the old one, and an on-disk cache of tracks
-  played to their end. The player API's answers are tested against
-  recorded ones in `testdata/`, and against YouTube with
+  new URL when YouTube refuses the old one, a new connection, from the byte
+  it reached, when a download gets no bytes for 15 seconds or its
+  connection drops, and an on-disk cache of tracks played to their end.
+  The player API's answers are tested against recorded ones in
+  `testdata/`, and against YouTube with
   `MIXMUSIC_LIVE=1 go test ./internal/stream -run Live`.
 - **`internal/webm`** reads the audio of WebM files, as YouTube serves it:
   the packets of the first audio track with their times, and seeking by the
@@ -82,7 +84,14 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   itself, as below. It shuffles, repeats, crossfades, starts radios when the
   queue runs out, counts plays and keeps up to 500 tracks of the queue,
   around the one playing, in `queue.json`, as it changes and as MixMusic
-  quits.
+  quits. A track that can't play for want of the network waits for it
+  where it was, and plays on once it answers; the player pauses as the
+  computer sleeps.
+- **`internal/online`** tells the player whether the network answers: a
+  check of YouTube's and Spotify's addresses over HTTPS, shared by its
+  callers, which audio coming from YouTube answers too, and a wait for the
+  network, with checks further apart the longer it lasts. The system's
+  word on the network, through MyGo, only has it check at once.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by

@@ -183,32 +183,36 @@ func TestColorFileFollows(t *testing.T) {
 	if err := os.WriteFile(path, []byte(pywalFile("#101820")), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	// Each read that finds new colours tells the windows once, just after
+	// the status changes: count from before the watch.
+	told := c.told.Load()
+	waitTold := func(n int32) {
+		t.Helper()
+		for deadline := time.Now().Add(5 * time.Second); c.told.Load()-told < n && time.Now().Before(deadline); {
+			time.Sleep(2 * time.Millisecond)
+		}
+		time.Sleep(20 * time.Millisecond)
+		if got := c.told.Load() - told; got != n {
+			t.Errorf("the windows were told %d times, want %d", got, n)
+		}
+	}
 	c.run()
 	w := c.watch()
 	if w.path != path {
 		t.Errorf("watching %q", w.path)
 	}
 	c.until("the write before the watch", func(st ColorFileStatus) bool { return background(st) == "#101820" })
-	told := c.told.Load()
+	waitTold(1)
 	if err := os.WriteFile(path, []byte(pywalFile("#202830")), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	w.changes <- nil
 	c.until("a write", func(st ColorFileStatus) bool { return background(st) == "#202830" })
-	for deadline := time.Now().Add(5 * time.Second); c.told.Load() == told && time.Now().Before(deadline); {
-		time.Sleep(2 * time.Millisecond)
-	}
-	time.Sleep(20 * time.Millisecond)
-	if n := c.told.Load() - told; n != 1 {
-		t.Errorf("a write told the windows %d times", n)
-	}
-	told = c.told.Load()
+	waitTold(2)
 	w.changes <- nil // the same colours, written again
 	w.changes <- nil
 	time.Sleep(50 * time.Millisecond)
-	if n := c.told.Load() - told; n != 0 {
-		t.Errorf("writing the same colours told the windows %d times", n)
-	}
+	waitTold(2)
 }
 
 // TestColorFileHalfWritten reads a file that pywal emptied, then wrote,

@@ -351,3 +351,47 @@ func TestSearchFold(t *testing.T) {
 		}
 	}
 }
+
+// TestSettingsFindShowIn opens a found group's section, which Back leaves
+// for the search again. The link names the group to screen readers.
+func TestSettingsFindShowIn(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 2400)
+	show(s, tt, settingsPath("appearance", "crossfade"))
+	click(t, s, tt, "Show sound in playback")
+	tt.Advance(time.Second)
+	if got := s.router.Location(); got != "/settings/playback" {
+		t.Errorf("show in went to %q", got)
+	}
+	showsOnly(t, tt, "the section shown", []string{"Volume levelling", "Crossfade"}, []string{"Show sound in playback"})
+	click(t, s, tt, "Back")
+	tt.Advance(time.Second)
+	if got := s.router.Location(); got != "/settings/appearance?q=crossfade" || s.find.query != "crossfade" {
+		t.Errorf("Back went to %q, the box holding %q", got, s.find.query)
+	}
+	showsOnly(t, tt, "Back", []string{"Crossfade"}, []string{"Volume levelling"})
+}
+
+// TestSettingsFindReveal shows a found group in its section, scrolled to
+// it, from the search in another section and in its own.
+func TestSettingsFindReveal(t *testing.T) {
+	for _, from := range []string{"appearance", "playback"} {
+		s := newTestShell(t)
+		tt := testerOf(t, s, 1280, 820)
+		show(s, tt, settingsPath(from, "tracks kept"))
+		click(t, s, tt, "Show offline cache in playback")
+		tt.Advance(time.Second)
+		s.drain()
+		tt.Frame()
+		if got := s.router.Location(); got != "/settings/playback" {
+			t.Errorf("from %s, show in went to %q", from, got)
+		}
+		if r, ok := tt.Find("offline cache"); !ok || r.Y < 0 || r.Y > 820 {
+			t.Errorf("from %s, the group isn't in view: %v %v", from, r, ok)
+		}
+		if s.find.reveal != "" {
+			t.Errorf("from %s, the group to show stays %q", from, s.find.reveal)
+		}
+		settled(t, tt)
+	}
+}

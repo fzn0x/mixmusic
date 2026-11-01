@@ -27,6 +27,9 @@ type settingsFind struct {
 	// what was searched held them all, by query.
 	words map[string][]string
 	seen  map[findKey]bool
+	// reveal is the group a link to it in its section scrolls into view,
+	// once the section shows.
+	reveal string
 
 	// As a page builds: whether it is the page the router shows, the query
 	// it searches and its words; the section and the group that build;
@@ -160,7 +163,8 @@ func (s *shell) show(c *ui.Context, build func()) {
 	})
 }
 
-// findHead titles the group of the first thing found in it, with its
+// findHead titles the group of the first thing found in it, with a link to
+// the group in its section, which Back returns from, and the group's own
 // links.
 func (s *shell) findHead(c *ui.Context) {
 	f := &s.find
@@ -168,7 +172,20 @@ func (s *shell) findHead(c *ui.Context) {
 		return
 	}
 	f.head = false
-	s.sectionHead(c, f.group, f.links)
+	section, group, links := f.section, f.group, f.links
+	s.sectionHead(c, group, func() {
+		// Screen readers hear the group in the link's name, as the
+		// groups of a section show a link each.
+		in := s.linkOf(c.Key("find-in-"+section), "show in "+section, "").FontSize(s.lk.smallSize()).
+			Label("Show " + group + " in " + section)
+		if in.Clicked() {
+			f.reveal = group
+			s.navigate(settingsPath(section, ""))
+		}
+		if links != nil {
+			links()
+		}
+	})
 }
 
 // findGroup builds the rows of a group of the settings searched: under the

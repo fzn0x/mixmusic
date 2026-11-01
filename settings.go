@@ -69,6 +69,9 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 		ui.Column(c).MaxWidth(880).Children(func() {
 			if !f.on() {
 				s.settingsSection(c, settingsTabs[selected])
+				if current {
+					f.reveal = "" // a group the section doesn't show
+				}
 				return
 			}
 			for _, t := range settingsTabs {
@@ -117,11 +120,18 @@ func (s *shell) group(c *ui.Context, title string, rows func()) { s.groupWith(c,
 // While the user searches the settings, it shows what the search finds of
 // them (findGroup).
 func (s *shell) groupWith(c *ui.Context, title string, links, rows func()) {
-	if s.find.on() {
+	f := &s.find
+	if f.on() {
 		s.findGroup(c, title, links, rows)
 		return
 	}
-	ui.Column(c).Margin(0, 0, 48).Children(func() {
+	g := ui.Column(c).Margin(0, 0, 48)
+	// The group a search's link showed in its section comes into view.
+	if f.reveal != "" && f.reveal == title && f.current {
+		f.reveal = ""
+		g.ScrollIntoView()
+	}
+	g.Children(func() {
 		s.sectionHead(c, title, links)
 		ui.Column(c).Dividers(1, s.lk.border).Children(rows)
 	})

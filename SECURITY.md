@@ -10,9 +10,18 @@ prefer not to.
 
 ## What MixMusic protects
 
-- **Your Spotify sign-in.** The token lives in the system's credential store,
-  or in a file only your user can read where there is none. MixMusic never
-  sees your password.
+- **Your sign-ins.** The Spotify token, the Last.fm connection and the key
+  of the YouTube Music session live in the system's credential store: the
+  Keychain on macOS, the Credential Manager on Windows, the Secret Service
+  on Linux. On Windows, a sign-in the Credential Manager can't keep, as in
+  a logon session without credentials, is encrypted for your Windows
+  account (DPAPI) in MixMusic's data folder instead. Where an
+  administrator's policy stops the Credential Manager from keeping
+  credentials for the session, that file may keep them all the same. On Linux
+  without a Secret Service, the sign-ins and the YouTube Music session are
+  in files only your user can read. Like the credential store, this keeps
+  them from the computer's other users, not from programs you run.
+  MixMusic never sees your passwords.
 - **Its windows.** MixMusic draws its own windows. Its one web page,
   Spotify's player on Windows, may call one Go service, for the Spotify
   token that player needs; other pages, as Google's sign-in, call none.

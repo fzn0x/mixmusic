@@ -150,7 +150,14 @@ Windows, `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
 `queue.json`, `addons/`, `bin/` (yt-dlp), the YouTube session
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the
-scrobbles still to send, and `updater.json`, the update preferences. The
+scrobbles still to send, and `updater.json`, the update preferences. On
+Windows, a secret the Credential Manager can't keep, as in a logon session
+without credentials, is sealed for the user with DPAPI in
+`spotify-token.dpapi`, `lastfm.dpapi` or `youtube-session-key.dpapi`; on
+Linux without a Secret Service, the secrets and the session are in plain
+files only the user can read (`spotify-token.json`, `lastfm.json`,
+`youtube-session.json`). `secretStore` (`internal/app/secrets.go`) moves a
+secret found in a file into the credential store once it can keep it. The
 cache folder holds audio, matches and yt-dlp's cache, and the logs folder
 the log and the crash reports. `MIXMUSIC_DATA_DIR` moves all three into one
 folder, for a portable copy or a test run.

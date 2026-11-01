@@ -75,33 +75,33 @@ func (c *Catalog) Suggestions(ctx context.Context, input string) ([]string, erro
 	return c.a.youtube.Suggestions(ctx, input)
 }
 
-// Home returns the shelves of the home page: the user's own, then
-// Spotify's when they signed in, then YouTube Music's.
+// Home returns the services' shelves of the home page: Spotify's when the
+// user signed in, then YouTube Music's. The user's own come first there,
+// from LocalShelves.
 func (c *Catalog) Home(ctx context.Context) ([]media.Shelf, error) {
 	ctx, cancel := context.WithTimeout(ctx, shelfTimeout)
 	defer cancel()
 	var (
-		wg      sync.WaitGroup
-		sp, yt  []media.Shelf
-		ytErr   error
-		userID  = c.a.spotifyUserID(ctx)
-		shelves = c.localShelves()
+		wg     sync.WaitGroup
+		sp, yt []media.Shelf
+		ytErr  error
+		userID = c.a.spotifyUserID(ctx)
 	)
 	if userID != "" {
 		wg.Go(func() { sp = c.a.spotify.Home(ctx, userID) })
 	}
 	wg.Go(func() { yt, ytErr = c.a.youtube.Home(ctx) })
 	wg.Wait()
-	shelves = append(shelves, sp...)
-	shelves = append(shelves, yt...)
+	shelves := append(sp, yt...)
 	if len(shelves) == 0 && ytErr != nil {
 		return nil, ytErr
 	}
 	return shelves, nil
 }
 
-// localShelves returns the shelves of what the user played and made.
-func (c *Catalog) localShelves() []media.Shelf {
+// LocalShelves returns the shelves of what the user played and made, as
+// the library has them now: the home page shows them first.
+func (c *Catalog) LocalShelves() []media.Shelf {
 	var shelves []media.Shelf
 	if recent := c.a.library.RecentTracks(16); len(recent) > 0 {
 		items := make([]media.Item, len(recent))

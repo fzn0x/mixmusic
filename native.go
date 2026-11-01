@@ -156,9 +156,13 @@ type shell struct {
 	// liveSince is when the live tile began turning over to what plays
 	// next, zero while it doesn't.
 	liveSince time.Time
-	// The pages' own state.
-	homeFilter  int
-	searchPivot int
+	// The pages' own state. local are the home page's own shelves, of the
+	// library at localVersion once localBuilt.
+	homeFilter   int
+	local        []media.Shelf
+	localVersion uint64
+	localBuilt   bool
+	searchPivot  int
 	// shelfScroll is where the shelves scrolled, by page and shelf.
 	shelfScroll map[string]*ui.ScrollState
 	// artistPivot is the pivot chosen on the page of the artist artistOf.

@@ -516,20 +516,26 @@ func (p *Player) report() {
 // save keeps the queue, every saveEvery at most.
 func (p *Player) save() {
 	p.saving.call(p, func() {
-		q := p.s.Queue[:min(len(p.s.Queue), savedMax)]
-		tracks := make([]media.Track, len(q))
-		for i, it := range q {
-			tracks[i] = it.Track
-		}
-		saved := Saved{
-			Tracks:   tracks,
-			Index:    p.s.Index,
-			Position: int(p.s.Position / time.Millisecond),
-			Shuffle:  p.s.Shuffle,
-			Repeat:   p.s.Repeat,
-		}
+		saved := savedOf(p.s)
 		go p.svc.SaveQueue(saved)
 	})
+}
+
+// savedOf is the queue of st as it survives a restart: the part of it
+// savedWindow keeps, with the current entry's index in that part.
+func savedOf(st State) Saved {
+	from, to := savedWindow(len(st.Queue), st.Index)
+	tracks := make([]media.Track, 0, to-from)
+	for _, it := range st.Queue[from:to] {
+		tracks = append(tracks, it.Track)
+	}
+	return Saved{
+		Tracks:   tracks,
+		Index:    st.Index - from,
+		Position: int(st.Position / time.Millisecond),
+		Shuffle:  st.Shuffle,
+		Repeat:   st.Repeat,
+	}
 }
 
 // The stream engine's events, as audio.Events.

@@ -84,6 +84,31 @@ func TestAccentLink(t *testing.T) {
 	}
 }
 
+// TestColoursKept closes the window, or quits, before a colour well saves
+// the accent it changed: the settings keep it at once.
+func TestColoursKept(t *testing.T) {
+	s := newTestShell(t)
+	s.wells["accent"] = &colorWell{edits: 1}
+	s.set.Accent = "#123456"
+	s.keepColors()
+	if got := s.svc.Preferences.Get().Accent; got != "#123456" {
+		t.Fatalf("the settings keep the accent %q", got)
+	}
+	if s.wells["accent"].edits != 0 {
+		t.Error("the well still waits to save")
+	}
+	// With nothing waiting, nothing is saved.
+	st := s.svc.Preferences.Get()
+	st.Accent = "#abcdef"
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.keepColors()
+	if got := s.svc.Preferences.Get().Accent; got != "#abcdef" {
+		t.Errorf("keeping with nothing waiting saved the accent %q", got)
+	}
+}
+
 // TestPluginSettings enables a plugin, which asks first, disables it, and
 // removes it, which asks too.
 func TestPluginSettings(t *testing.T) {
@@ -150,6 +175,33 @@ func TestCacheOff(t *testing.T) {
 	}
 	if !tt.HasText("Off: MixMusic keeps no tracks.") {
 		t.Errorf("the cache doesn't say it's off: %q", tt.Texts())
+	}
+}
+
+// TestTitleSwitch turns what plays in the window's title off and on again
+// from Settings › Desktop (#105). Its row's title carries the switch's
+// words too, so the keyboard reaches the switch: focused, it has them, and
+// the row's description doesn't.
+func TestTitleSwitch(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 1800)
+	show(s, tt, "/settings/desktop")
+	const label = "Show what plays in the window title"
+	const description = "The window's title names the track that plays, for the taskbar, the window switcher and screen readers."
+	focused := func() bool { return tt.Focused(label) && !tt.Focused(description) }
+	for i := 0; i < 100 && !focused(); i++ {
+		tt.Key(0, ui.KeyTab)
+	}
+	if !focused() {
+		t.Fatalf("Tab doesn't reach the switch: %q", tt.Texts())
+	}
+	for _, want := range []bool{false, true} {
+		tt.Key(0, ui.KeySpace)
+		s.drain()
+		tt.Frame()
+		if got := s.svc.Preferences.Get().ShowInTitle; got != want {
+			t.Errorf("the switch left the title showing what plays %v, not %v", got, want)
+		}
 	}
 }
 

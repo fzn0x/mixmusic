@@ -6,6 +6,13 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The main window's title names the track that plays, for the taskbar,
+  the window switcher and screen readers, and starts with "Paused:" while
+  it's paused. Turn off "Show what plays in the window title" in
+  Settings › Desktop to keep it to MixMusic's name (#105).
+
 ### Changed
 
 - A new icon: two pink rings and a play button on black, in the app, the
@@ -38,6 +45,28 @@ All notable changes to MixMusic are documented here. The format follows
   version's code.
 - On Windows, a frame the screen never takes no longer holds up MixMusic
   for a second (#87).
+- On macOS, closing the window in full screen with "Close to the tray"
+  on no longer leaves an empty, black Space: the window leaves full
+  screen, then hides in the tray, and comes back in full screen (#84).
+- After a restart, a queue of more than 500 tracks comes back on the
+  track that was playing, where it was, with what comes up after it.
+  MixMusic kept the queue's first 500 tracks, and when the track playing
+  was past them it came back on the 500th, at the other track's place;
+  it now keeps the 500 tracks around the one playing (#88).
+- Changes to the queue made while a song is paused, or before anything
+  plays after a start, are kept when MixMusic quits, as are the changes
+  made right before quitting: the queue, where the song was, the volume
+  and the colours of Settings › Appearance. This holds when Windows
+  shuts down, restarts or signs out too (#89).
+- Shuffle mixes in the tracks before the one playing that haven't played
+  yet, as when you start an album or a playlist from one of its tracks:
+  it left them out, and with Repeat all they played in the list's order.
+  The track playing then comes first, so Previous starts it again. Your
+  own tracks stay ahead of the radio's when you shuffle, and turning
+  shuffle off puts the tracks you added with Play next or Add to queue
+  back where you added them, after a restart too (#95).
+- After a restart, the radio's tracks keep their "radio" mark in up
+  next, and Add to queue still puts tracks before them (#95).
 - On Windows, a sign-in the Credential Manager can't keep is kept
   encrypted for your Windows account, so you stay signed in after a
   restart. Sign-in files in plain text found in MixMusic's data folder,

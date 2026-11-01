@@ -359,6 +359,21 @@ func (s *shell) colorControl(c *ui.Context, key, label string, current ui.Color,
 	})
 }
 
+// keepColors saves at once the colours whose wells wait for the user to
+// stop a moment, as the window closes or MixMusic quits first. The wells'
+// own saves, once due, then find nothing to save.
+func (s *shell) keepColors() {
+	waiting := false
+	for _, w := range s.wells {
+		if w.edits > 0 {
+			w.edits, waiting = 0, true
+		}
+	}
+	if waiting {
+		s.save()
+	}
+}
+
 // activeTheme is the theme the look shows.
 func (s *shell) activeTheme() (addons.Theme, bool) {
 	id := s.set.ActiveTheme(s.lk.systemDark)

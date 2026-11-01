@@ -58,8 +58,9 @@ download or keep in memory.
   text, and an offline cache of tracks you played.
 - **At home on the desktop.** Media keys, the system's media controls on
   Windows, macOS and Linux, the player's buttons on the taskbar thumbnail
-  on Windows, tray controls, notifications of new tracks, a mini player
-  that stays on top, start at login, and `mixmusic://` links.
+  on Windows, tray controls, notifications of new tracks, what plays in
+  the window's title, a mini player that stays on top, start at login, and
+  `mixmusic://` links.
 - **Scrobbling and Discord.** Connect Last.fm and every track you hear
   joins your profile there, with scrobbles made offline sent once you are
   back. Your Discord profile shows what plays, with its artwork and the

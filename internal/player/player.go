@@ -131,8 +131,11 @@ type Notice struct {
 // Now is what plays, as the app tells the tray, notifications and the
 // system's media controls.
 type Now struct {
-	Track    *media.Track
-	Playing  bool
+	Track   *media.Track
+	Playing bool
+	// Loading is set while the track is asked to play and doesn't yet: as
+	// one track ends and the next loads, it is set and Playing isn't.
+	Loading  bool
 	Position time.Duration
 	Duration time.Duration
 	// Volume is 0 when muted.
@@ -143,11 +146,22 @@ type Now struct {
 
 // Saved is the queue as it survives a restart.
 type Saved struct {
-	Tracks   []media.Track `json:"tracks"`
-	Index    int           `json:"index"`
-	Position int           `json:"position"` // in milliseconds
-	Shuffle  bool          `json:"shuffle"`
-	Repeat   Repeat        `json:"repeat"`
+	// Tracks is the part of the queue kept: the whole queue up to savedMax
+	// tracks, else the savedMax around the current one.
+	Tracks []media.Track `json:"tracks"`
+	// Index is the current track's place in Tracks, or -1.
+	Index    int    `json:"index"`
+	Position int    `json:"position"` // in milliseconds
+	Shuffle  bool   `json:"shuffle"`
+	Repeat   Repeat `json:"repeat"`
+	// Radio holds the indexes in Tracks of the entries a radio added.
+	Radio []int `json:"radio,omitempty"`
+	// Order is the queue's own order while it is shuffled, which turning
+	// shuffle off puts back: the indexes in Tracks of its entries.
+	Order []int `json:"order,omitempty"`
+	// Unplayed holds the indexes of the entries before Index that haven't
+	// played, as a list started in its middle leaves them.
+	Unplayed []int `json:"unplayed,omitempty"`
 }
 
 // Services are what the player asks of the app.
@@ -212,9 +226,26 @@ const (
 	restartAfter = 3 * time.Second
 	// radioMax is how many tracks a radio adds at most.
 	radioMax = 25
-	// savedMax is how many tracks of the queue are kept, at most.
+	// savedMax is how many tracks of the queue are kept, at most: the
+	// current one and those around it.
 	savedMax = 500
+	// savedBefore is how many of the tracks before the current one are
+	// kept when those after it would fill what is kept.
+	savedBefore = 50
 )
+
+// savedWindow returns the entries kept of a queue of n, whose current
+// entry is at index, or -1: all of them up to savedMax, else savedMax
+// around the current one, savedBefore of them before it and the rest
+// after it, or more before it when fewer come after.
+func savedWindow(n, index int) (from, to int) {
+	if n <= savedMax {
+		return 0, n
+	}
+	from = max(index-savedBefore, 0)
+	to = min(from+savedMax, n)
+	return max(to-savedMax, 0), to
+}
 
 // Player plays the queue. Its methods are safe for concurrent use, and
 // return at once: the player does what they ask on its own goroutine.
@@ -237,11 +268,26 @@ type Player struct {
 	noticed []*func(Notice)
 	wake    chan struct{}
 	done    chan struct{}
+	// version counts the states published, of which snap is the last;
+	// snapOrder and snapPlayed are the player's unshuffled and played as
+	// they were then, which the queue keeps with it.
+	version    uint64
+	snapOrder  []Item
+	snapPlayed map[string]bool
+
+	// writing orders the writes of the queue: written is the version of
+	// the state the last of them kept.
+	writing sync.Mutex
+	written uint64
 
 	// What follows belongs to the player's goroutine.
-	s           State
-	events      []Event
-	notices     []Notice
+	s       State
+	events  []Event
+	notices []Notice
+	// saveAsked is set once a task asked to save the queue, and saveDue
+	// once the throttle lets it be written, as the task publishes it.
+	saveAsked   bool
+	saveDue     bool
 	loadToken   int
 	retried     string
 	counted     string
@@ -249,8 +295,13 @@ type Player struct {
 	crossfading bool
 	failures    int
 	// warned holds what fellBack told, to tell it once.
-	warned     map[string]bool
+	warned map[string]bool
+	// unshuffled is the queue in its own order while it is shuffled, and
+	// played the entries that became current since the queue was filled,
+	// by UID. Neither is changed in place, as what is published shares
+	// them.
 	unshuffled []Item
+	played     map[string]bool
 	// loaded is set while the stream engine has the current track, and
 	// atEnd when the queue ran out at its end, which the engine ended.
 	loaded      bool
@@ -284,16 +335,34 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.s = State{Index: -1, Repeat: RepeatOff, Volume: st.Volume}
 	p.spotifyMode = st.SpotifyPlayback
 	if len(saved.Tracks) > 0 {
+		radio := marks(saved.Radio, len(saved.Tracks))
 		p.s.Queue = make([]Item, len(saved.Tracks))
 		for i, t := range saved.Tracks {
-			p.s.Queue[i] = p.item(t, false)
+			p.s.Queue[i] = p.item(t, radio[i])
 		}
 		p.s.Index = min(max(saved.Index, 0), len(p.s.Queue)-1)
-		p.s.Position = time.Duration(saved.Position) * time.Millisecond
+		// The position is the saved current track's. A queue kept before
+		// the index was kept within its tracks may name one past them: the
+		// track held instead starts from its start.
+		if saved.Index >= 0 && saved.Index < len(saved.Tracks) {
+			p.s.Position = time.Duration(saved.Position) * time.Millisecond
+		}
 		p.s.Duration = ms(p.s.Queue[p.s.Index].Track.DurationMs)
 		p.s.Shuffle = saved.Shuffle
 		if saved.Repeat == RepeatAll || saved.Repeat == RepeatOne {
 			p.s.Repeat = saved.Repeat
+		}
+		// What comes before the current entry played, unless the queue
+		// says otherwise.
+		unplayed := marks(saved.Unplayed, len(p.s.Queue))
+		p.played = map[string]bool{}
+		for i, it := range p.s.Queue[:p.s.Index+1] {
+			if !unplayed[i] {
+				p.played[it.UID] = true
+			}
+		}
+		if p.s.Shuffle && len(saved.Order) > 0 {
+			p.unshuffled = ordered(p.s.Queue, saved.Order)
 		}
 	}
 	p.snap = p.s
@@ -389,8 +458,18 @@ func (p *Player) run() {
 			continue
 		}
 		for _, fn := range tasks {
+			p.saveAsked = false
 			fn()
+			if !p.saveAsked && slices.Contains(p.events, QueueChange) {
+				// An edit of the queue is kept, also while nothing plays to
+				// report it.
+				p.save()
+			}
 			p.publish()
+			if p.saveDue {
+				p.saveDue = false
+				go p.writeQueue()
+			}
 		}
 	}
 }
@@ -401,6 +480,8 @@ func (p *Player) publish() {
 	p.events, p.notices = nil, nil
 	p.mu.Lock()
 	p.snap = p.s
+	p.snapOrder, p.snapPlayed = p.unshuffled, p.played
+	p.version++
 	subs, noticed := p.subs, p.noticed
 	p.mu.Unlock()
 	for _, e := range events {
@@ -468,6 +549,37 @@ func (t *throttle) call(p *Player, fn func()) {
 func (p *Player) item(t media.Track, radio bool) Item {
 	p.uidSeq++
 	return Item{UID: strconv.FormatInt(time.Now().UnixMilli(), 36) + "-" + strconv.Itoa(p.uidSeq), Track: t, Radio: radio}
+}
+
+// marks is which of n entries a saved queue's indexes name; it leaves out
+// those past them.
+func marks(indexes []int, n int) []bool {
+	out := make([]bool, n)
+	for _, i := range indexes {
+		if i >= 0 && i < n {
+			out[i] = true
+		}
+	}
+	return out
+}
+
+// ordered is q in the order of a saved queue's Order: the entries it names,
+// once each, then those it leaves out.
+func ordered(q []Item, order []int) []Item {
+	out := make([]Item, 0, len(q))
+	seen := make([]bool, len(q))
+	for _, i := range order {
+		if i >= 0 && i < len(q) && !seen[i] {
+			seen[i] = true
+			out = append(out, q[i])
+		}
+	}
+	for i, it := range q {
+		if !seen[i] {
+			out = append(out, it)
+		}
+	}
+	return out
 }
 
 func ms(v int) time.Duration { return time.Duration(v) * time.Millisecond }

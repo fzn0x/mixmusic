@@ -31,6 +31,15 @@ func (a *App) Start() {
 	// Quitting closes every window; the main window must close then, not
 	// hide in the tray, or the quit stops there.
 	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) { a.quitting.Store(true) })
+	// What waits a moment to be saved is saved as MixMusic quits: once its
+	// windows closed, before the single instance lock is released and an
+	// update's restart starts the new copy, and again once the loop
+	// stopped, which is all that runs when Windows ends the session. The
+	// second writes the queue again only if the player changed since.
+	// Nothing after mygo.App.Run in main would do: Windows ends the
+	// process before it returns.
+	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { a.flush() })
+	mygo.App.OnQuit(a.flush)
 	if runtime.GOOS != "darwin" && !mygo.App.IsPackaged() {
 		if err := mygo.App.RegisterURLScheme(URLScheme); err != nil {
 			log.Printf("mixmusic: registering %s links: %v", URLScheme, err)
@@ -67,7 +76,8 @@ func (a *App) keepYTDLPCurrent() {
 
 // openMain opens the main window, with its player, hidden when MixMusic
 // starts at login. Where MixMusic can't play, it says why and quits, and
-// returns nil.
+// returns nil. With close to the tray on, closing it hides it, on macOS
+// out of full screen first.
 func (a *App) openMain(hidden bool) *mygo.Window {
 	if _, err := a.startGoPlayer(); err != nil {
 		log.Printf("mixmusic: can't play: %v", err)
@@ -84,14 +94,17 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 		a.mu.Unlock()
 		if tray != nil && a.settings.Get().CloseToTray && !a.quitting.Load() {
 			e.PreventDefault()
-			win.Hide() // keep playing in the tray
+			a.trayHide.hide(win) // keep playing in the tray
 		}
 	})
+	win.OnEnterFullScreen(func() { a.trayHide.entered(win) })
+	win.OnLeaveFullScreen(func() { a.trayHide.left(win) })
 	win.OnClosed(func() {
 		a.mu.Lock()
 		if a.main == win {
 			// The thumbnail's buttons go with their window.
 			a.main, a.taskbar = nil, nil
+			a.trayHide.forget()
 		}
 		mini := a.mini
 		a.mu.Unlock()
@@ -105,7 +118,41 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 	a.mu.Lock()
 	a.main = win
 	a.mu.Unlock()
+	// The player may have told what plays before the window opened.
+	a.retitle()
 	return win
+}
+
+// titleWait is how long the main window's title waits to change. As one
+// track ends and the next loads, the player tells of a pause a moment
+// before it tells of the next track: the title goes from one track to the
+// other.
+var titleWait = 200 * time.Millisecond
+
+// retitle names what plays in the main window's title, a moment later,
+// with what changes meanwhile (#105). It changes while the window is
+// minimized too, when it draws no frames, for the taskbar and the window
+// switcher show the title then.
+func (a *App) retitle() {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.main == nil || a.retitling {
+		return
+	}
+	a.retitling = true
+	time.AfterFunc(titleWait, func() {
+		mygo.App.WhenReady(func() {
+			a.mu.Lock()
+			a.retitling = false
+			win, np := a.main, a.nowPlaying
+			a.mu.Unlock()
+			// On the main thread, where SetTitle doesn't wait, and never
+			// with a.mu held, which the main thread takes too.
+			if t := windowTitle(np, a.settings.Get().ShowInTitle); win != nil && win.Title() != t {
+				win.SetTitle(t)
+			}
+		})
+	})
 }
 
 // showMain shows the main window, opening it again if it was closed.
@@ -121,8 +168,14 @@ func (a *App) showMain() {
 	if win.IsMinimized() {
 		win.Restore()
 	}
+	// Hidden in the tray out of full screen, it goes back in. A hide on its
+	// way out of full screen is called off.
+	fullScreen := a.trayHide.shown(win.IsVisible())
 	win.Show()
 	win.Focus()
+	if fullScreen {
+		win.SetFullScreen(true)
+	}
 }
 
 // showMini shows the mini player.
@@ -272,12 +325,13 @@ func (a *App) OnNavigate(fn func(target string)) (cancel func()) {
 func (a *App) SecondInstance([]string, string) { a.showMain() }
 
 // Activate shows the main window when the app is activated without it in
-// view, as by a click on its Dock icon after it was closed to the tray.
+// view, as by a click on its Dock icon after it was closed to the tray, or
+// while it leaves full screen to hide there.
 func (a *App) Activate(bool) {
 	a.mu.Lock()
 	win := a.main
 	a.mu.Unlock()
-	if win == nil || !win.IsVisible() || win.IsMinimized() {
+	if win == nil || !win.IsVisible() || win.IsMinimized() || a.trayHide.pending() {
 		a.showMain()
 	}
 }

@@ -110,8 +110,12 @@ type Settings struct {
 	// measure of each: Even loudness.
 	Loudness bool `json:"loudness"`
 	// Autoplay continues with similar tracks when the queue ends.
-	Autoplay  bool      `json:"autoplay"`
-	Equalizer Equalizer `json:"equalizer"`
+	Autoplay bool `json:"autoplay"`
+	// MusicVideos shows the picture of music videos on the now playing
+	// page, in place of their cover. It is off at first: it fetches more
+	// than the sound, and shows a web page there.
+	MusicVideos bool      `json:"musicVideos"`
+	Equalizer   Equalizer `json:"equalizer"`
 	// Volume is from 0 to 1.
 	Volume float64 `json:"volume"`
 	// CacheSizeMB bounds the audio cache; 0 turns it off.

@@ -38,7 +38,8 @@ import (
 const artworkLimit = 256 << 20
 
 // streamScheme is the scheme of the addresses of the audio PrepareStream
-// finds, which the audio engine opens.
+// finds, which the audio engine opens, and of the picture of music videos,
+// which their page fetches.
 const streamScheme = "stream"
 
 // Options configure the app.
@@ -110,6 +111,12 @@ type App struct {
 	// here is MixMusic's own Spotify device, which the player plays
 	// Spotify tracks on where it can.
 	here spotifyHere
+	// videoPage is the page of the main window that plays the picture of
+	// music videos, while it is open.
+	videoPage atomic.Pointer[mygo.Page]
+	// miniOpen is set while the mini player is open, which the main
+	// window's frames ask without taking mu.
+	miniOpen atomic.Bool
 	// onNavigate shows the pages of the main window.
 	onNavigate *func(target string)
 	// updates keeps the user's choices of updates.
@@ -255,9 +262,13 @@ func (a *App) apply(s settings.Settings) {
 	a.retitle()
 }
 
-// Bind registers what the page of MixMusic's own Spotify device calls. It
-// must run before mygo.App.Run.
-func (a *App) Bind() { mygo.Bind(&SpotifyPage{a}) }
+// Bind registers what the page of MixMusic's own Spotify device calls, and
+// the stream scheme, at which the page of the picture of music videos
+// fetches it. It must run before mygo.App.Run.
+func (a *App) Bind() {
+	mygo.Bind(&SpotifyPage{a})
+	a.handleVideo()
+}
 
 // needWebView tells why what, which takes a window showing a web page,
 // can't be done, or nil when it can: MixMusic's own windows need no

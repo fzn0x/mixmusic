@@ -1,0 +1,17 @@
+{
+  "id": "sleep-timer",
+  "name": "Sleep Timer",
+  "version": "2.0.0",
+  "author": "MixMusic community",
+  "description": "Fades the music out and pauses it after a while, or at the end of the track.",
+  "main": "index.js",
+  "api": 2,
+  "permissions": [
+    "playback",
+    "storage"
+  ],
+  "files": [
+    "plugin.json",
+    "index.js"
+  ]
+}

@@ -1,0 +1,11 @@
+/* Neon Nights: a soft neon edge on what is live. */
+:root[data-opt-edge="true"] .mm-track[data-playing],
+:root[data-opt-edge="true"] .mm-queue-row[data-playing],
+:root[data-opt-edge="true"] .mm-nav-item[aria-current="page"] .mm-nav-box,
+:root[data-opt-edge="true"] .mm-round-main:hover {
+  box-shadow: 0 0 var(--opt-edge-size, 10px) 0 color-mix(in srgb, var(--mm-accent) 70%, transparent);
+}
+
+.mm-page-title {
+  color: color-mix(in srgb, var(--mm-text) 92%, var(--mm-accent));
+}

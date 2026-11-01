@@ -61,6 +61,11 @@ All notable changes to MixMusic are documented here. The format follows
 - When three songs in a row can't play, as when the network is down,
   MixMusic stops again rather than stepping through the rest of the
   queue (#101).
+- A song whose audio stops coming, as when the connection drops, connects
+  again after 15 seconds without a byte rather than two minutes, and
+  keeps trying for two minutes, playing on as soon as the network
+  answers. A slow connection no longer cuts off a long song's download
+  every two minutes (#100).
 
 ## [0.5.5] - 2026-10-28
 

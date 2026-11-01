@@ -339,6 +339,13 @@ go run ./tools/registry -check # the community registry
 ```
 
 MyGo needs no C toolchain, so any machine builds MixMusic for every system.
+
+With [Nix](https://nixos.org), `nix develop` gives the tools releases are
+built with, at the versions `flake.lock` pins: Go, Bun, NSIS and GoReleaser.
+`nix build` builds MixMusic for Linux from source, into `result/`. Releases
+are built in that shell, and [GoReleaser](https://goreleaser.com) publishes
+them (`.goreleaser.yaml`).
+
 [docs/architecture.md](docs/architecture.md) tells how the parts fit, and
 [CONTRIBUTING.md](CONTRIBUTING.md) how to send a change.
 
@@ -366,6 +373,42 @@ public/              the page of Spotify's player, on Windows
 sdk/                 the types of the plugin API
 community/           community themes and plugins, and their registry
 ```
+
+## Credits
+
+MixMusic stands on these projects:
+
+- **[MyGo](https://github.com/egoist/mygo)**, the desktop framework MixMusic
+  is built with. MixMusic uses MyGo's native UI: MyGo draws every window
+  itself, in Go, without a webview, from the pages and the player bar to the
+  mini player. Its command line packages the app, with its installers and
+  the signed updates it updates itself from.
+- **[Go](https://go.dev)**, the language of the app, with
+  [purego](https://github.com/ebitengine/purego), which calls the system's
+  libraries without cgo, and [golang.org/x/image](https://pkg.go.dev/golang.org/x/image)
+  and [golang.org/x/text](https://pkg.go.dev/golang.org/x/text).
+- **[Sobek](https://github.com/grafana/sobek)**, the JavaScript engine each
+  plugin runs in.
+- **[Nix](https://nixos.org)**, which pins the tools releases are built
+  with, and builds MixMusic for Linux from source.
+- **[GoReleaser](https://goreleaser.com)**, which publishes the releases, and
+  its [nFPM](https://nfpm.goreleaser.com), which makes the RPM packages.
+- **[Bun](https://bun.sh)**, which runs the build and checks the plugin SDK's
+  [TypeScript](https://www.typescriptlang.org) types.
+- **[NSIS](https://nsis.sourceforge.io)**, which makes the Windows
+  installers, and [appimagetool](https://github.com/AppImage/appimagetool),
+  the AppImages.
+- **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, which finds the audio of
+  the tracks MixMusic can't find itself.
+- **[LRCLIB](https://lrclib.net)**, the open database of synced lyrics.
+- **[libopus](https://opus-codec.org)**, whose decoder the Opus decoder is a
+  port of, and **[SharpJaad](https://github.com/jimm98y/SharpJaad)**, the C#
+  port of [JAAD](https://sourceforge.net/projects/jaadec/) the AAC decoder
+  derives from.
+- **[FFmpeg](https://ffmpeg.org)**, which the decoders' tests compare with.
+- **[Selawik](https://github.com/microsoft/Selawik)** and
+  **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**, the
+  typefaces of the windows.
 
 ## Good to know
 

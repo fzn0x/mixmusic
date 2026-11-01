@@ -373,7 +373,7 @@ func (s *shell) mixDialogs(c *ui.Context, key string) {
 			s.renaming = false
 		}
 	})
-	if s.confirm(c, "delete-mix", &s.deleting, "Delete mix", "Delete "+s.deleteTitle+"? Its tracks stay where they came from.", "Delete") {
+	if s.confirm(c, "delete-mix", &s.deleting, "delete mix", "Delete "+s.deleteTitle+"? Its tracks stay where they came from.", "delete") {
 		if err := s.svc.Collection.DeletePlaylist(s.deleteID); err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 		} else {

@@ -38,7 +38,7 @@ func (s *shell) pluginSettings(c *ui.Context) {
 					s.enablePlugin(p, on)
 				}
 				if !p.Builtin && s.iconButton(c, "remove-plugin-"+p.ID, "trash", "Remove "+p.Name, false, 16).Clicked() {
-					s.ask("Remove "+p.Name, "The plugin and its files are deleted; what it stored stays.", "Remove", func() {
+					s.ask("remove "+p.Name, "The plugin and its files are deleted; what it stored stays.", "remove", func() {
 						s.uninstall(addons.KindPlugin, addons.Entry{ID: p.ID, Name: p.Name})
 					})
 				}
@@ -67,5 +67,5 @@ func (s *shell) enablePlugin(p addons.Plugin, on bool) {
 	if len(p.Permissions) > 0 {
 		perms = " It asks for: " + strings.Join(p.Permissions, ", ") + "."
 	}
-	s.ask("Enable "+p.Name, "Plugins can control the player, change your library and reach the internet, whatever they ask for. Enable plugins from authors you trust."+perms, "Enable", set)
+	s.ask("enable "+p.Name, "Plugins can control the player, change your library and reach the internet, whatever they ask for. Enable plugins from authors you trust."+perms, "enable", set)
 }

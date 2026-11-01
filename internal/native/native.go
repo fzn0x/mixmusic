@@ -480,9 +480,9 @@ func (s *shell) offerCrashReport() {
 		return
 	}
 	s.asking = &question{
-		title:   "MixMusic quit unexpectedly",
+		title:   "mixmusic quit unexpectedly",
 		message: "It kept a report of what happened, " + report + ", in its logs folder. Reporting it on GitHub, with that file attached, helps fix it.",
-		ok:      "Report it",
+		ok:      "report it",
 		run: func() {
 			s.svc.System.DismissCrash()
 			go func() {

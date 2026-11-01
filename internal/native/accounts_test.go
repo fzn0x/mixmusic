@@ -51,7 +51,7 @@ func TestRefusedSpotifySignOut(t *testing.T) {
 		t.Fatalf("the refusal isn't shown: %q", tt.Texts())
 	}
 	click(t, s, tt, "sign out")
-	if s.asking == nil || s.asking.title != "Sign out of Spotify" {
+	if s.asking == nil || s.asking.title != "sign out of Spotify" {
 		t.Errorf("signing out asks %+v", s.asking)
 	}
 }

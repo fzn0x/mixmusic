@@ -117,7 +117,7 @@ func (s *shell) history(c *ui.Context) {
 			s.clearingHistory = true
 		}
 	})
-	if s.confirm(c, "clear-history", &s.clearingHistory, "Clear history", "Forget every track you played? Your stats start over.", "Clear") {
+	if s.confirm(c, "clear-history", &s.clearingHistory, "clear history", "Forget every track you played? Your stats start over.", "clear") {
 		if err := s.svc.Collection.ClearHistory(); err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 		}

@@ -199,17 +199,17 @@ func dialogCases(s *shell) []dialogCase {
 				mixes := s.svc.Collection.Playlists()
 				return len(mixes) == 1 && mixes[0].Title == "early morning drive"
 			}},
-		{name: "question", title: "Enable An Ambient Visualiser For Late Night Listening", buttons: []string{"cancel", "Enable"},
+		{name: "question", title: "enable An Ambient Visualiser For Late Night Listening", buttons: []string{"cancel", "enable"},
 			open: func(t *testing.T, s *shell, tt *ui.Tester) {
-				s.ask("Enable An Ambient Visualiser For Late Night Listening", enableMessage, "Enable", func() { ran = true })
+				s.ask("enable An Ambient Visualiser For Late Night Listening", enableMessage, "enable", func() { ran = true })
 			},
-			press: "Enable", done: func(*shell, *ui.Tester) bool { return ran }, last: "Plugins can"},
-		{name: "delete mix", title: "Delete mix", buttons: []string{"cancel", "Delete"},
+			press: "enable", done: func(*shell, *ui.Tester) bool { return ran }, last: "Plugins can"},
+		{name: "delete mix", title: "delete mix", buttons: []string{"cancel", "delete"},
 			open: func(t *testing.T, s *shell, tt *ui.Tester) {
 				s.deleting, s.deleteTitle, s.deleteID = true, "late night drive", testMix(t, s, tt)
 			},
-			press: "Delete", done: func(s *shell, _ *ui.Tester) bool { return len(s.svc.Collection.Playlists()) == 0 }, last: "Delete late"},
-		{name: "clear history", title: "Clear history", buttons: []string{"cancel", "Clear"},
+			press: "delete", done: func(s *shell, _ *ui.Tester) bool { return len(s.svc.Collection.Playlists()) == 0 }, last: "Delete late"},
+		{name: "clear history", title: "clear history", buttons: []string{"cancel", "clear"},
 			open: func(t *testing.T, s *shell, tt *ui.Tester) {
 				if err := s.svc.Collection.RecordPlay(testTracks[0]); err != nil {
 					t.Fatal(err)
@@ -217,8 +217,8 @@ func dialogCases(s *shell) []dialogCase {
 				show(s, tt, "/library/history")
 				s.clearingHistory = true
 			},
-			press: "Clear", done: func(s *shell, _ *ui.Tester) bool { return len(s.svc.Collection.History(10)) == 0 }, last: "Forget"},
-		{name: "reset settings", title: "Reset settings", buttons: []string{"cancel"},
+			press: "clear", done: func(s *shell, _ *ui.Tester) bool { return len(s.svc.Collection.History(10)) == 0 }, last: "Forget"},
+		{name: "reset settings", title: "reset settings", buttons: []string{"cancel"},
 			open: func(t *testing.T, s *shell, tt *ui.Tester) {
 				st := s.svc.Preferences.Get()
 				st.Autoplay = false
@@ -232,7 +232,7 @@ func dialogCases(s *shell) []dialogCase {
 			// The page's button is reset too: Enter presses the dialog's,
 			// which has the focus.
 			done: func(s *shell, _ *ui.Tester) bool { return s.svc.Preferences.Get().Autoplay }, last: "Put back"},
-		{name: "install plugin", title: "Install An Ambient Visualiser For Late Night Listening", buttons: []string{"cancel", "Install"},
+		{name: "install plugin", title: "install An Ambient Visualiser For Late Night Listening", buttons: []string{"cancel", "install"},
 			open: func(t *testing.T, s *shell, tt *ui.Tester) {
 				s.loads["registry"] = &loaded[addons.Registry]{done: true}
 				show(s, tt, "/marketplace/plugins")
@@ -241,7 +241,7 @@ func dialogCases(s *shell) []dialogCase {
 				s.confirmingPlugin = true
 			},
 			// The install starts, and soon fails without the network.
-			press: "Install", done: func(s *shell, tt *ui.Tester) bool {
+			press: "install", done: func(s *shell, tt *ui.Tester) bool {
 				return !s.confirmingPlugin && (s.installingAddon == "ambient" || tt.HasText("fetching the registry"))
 			}, last: "Plugins can"},
 	}
@@ -414,10 +414,10 @@ func TestQuestionKeeps(t *testing.T) {
 	s := newTestShell(t)
 	tt := tester(t, s)
 	ran, canceled := false, false
-	s.ask("Enable Hello", enableMessage, "Enable", func() { ran = true })
+	s.ask("enable Hello", enableMessage, "enable", func() { ran = true })
 	s.asking.cancel = func() { canceled = true }
 	tt.Frame()
-	if !tt.Focused("Enable") {
+	if !tt.Focused("enable") {
 		t.Error("the question opens with the focus elsewhere than on its ok")
 	}
 	tt.ClickAt(5, 5)

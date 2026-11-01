@@ -138,7 +138,7 @@ func TestPluginSettings(t *testing.T) {
 	if !tt.HasText("It asks for: playback.") {
 		t.Errorf("the question doesn't tell what the plugin asks for: %q", tt.Texts())
 	}
-	click(t, s, tt, "Enable")
+	click(t, s, tt, "enable")
 	if !enabled() {
 		t.Fatal("the plugin wasn't enabled")
 	}
@@ -151,7 +151,7 @@ func TestPluginSettings(t *testing.T) {
 	if len(s.svc.Addons.List().Plugins) != 1 {
 		t.Fatal("the plugin was removed without asking")
 	}
-	click(t, s, tt, "Remove")
+	click(t, s, tt, "remove")
 	if n := len(s.svc.Addons.List().Plugins); n != 0 {
 		t.Errorf("%d plugins are left", n)
 	}

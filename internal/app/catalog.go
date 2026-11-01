@@ -225,7 +225,9 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 		}
 	}
 	if err != nil {
-		if errors.Is(err, lyrics.ErrNotFound) {
+		// A track LRCLIB was too busy to look everywhere for reads the
+		// same, but the lyrics panel offers to try again.
+		if errors.Is(err, lyrics.ErrNotFound) || errors.Is(err, lyrics.ErrNotFoundYet) {
 			return lyrics.Lyrics{}, lyricsError{"No lyrics found for this track.", err}
 		}
 		log.Printf("mixmusic: the lyrics of %s: %v", track.ID, err)

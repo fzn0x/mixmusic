@@ -110,7 +110,10 @@ type Settings struct {
 	// measure of each: Even loudness.
 	Loudness bool `json:"loudness"`
 	// Autoplay continues with similar tracks when the queue ends.
-	Autoplay  bool      `json:"autoplay"`
+	Autoplay bool `json:"autoplay"`
+	// SkipAI passes over the tracks YouTube labels as made with AI, as the
+	// player moves on by itself.
+	SkipAI    bool      `json:"skipAi"`
 	Equalizer Equalizer `json:"equalizer"`
 	// Volume is from 0 to 1.
 	Volume float64 `json:"volume"`

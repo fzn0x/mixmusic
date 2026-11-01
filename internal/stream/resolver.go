@@ -37,12 +37,13 @@ const (
 // saver takes the smallest Opus, else AAC-LC too. YouTube's stable-volume
 // formats, whose IDs end in -drc, come only when a video has no other of
 // their codec: their dynamics are squeezed, and the loudness YouTube
-// measured is of the original audio. Both are stereo, or mono: the
-// engine plays two channels, so a video's surround formats (AC-3 and
-// E-AC-3 in 5.1, or Opus or AAC of more channels) never come before them,
-// though the 5.1 ones are its best; a format whose channels yt-dlp doesn't
-// know passes. Any other audio comes last, which the engine then refuses,
-// naming its format.
+// measured is of the original audio. Both are stereo, or mono: a video's
+// surround formats (AC-3 and E-AC-3 in 5.1, or Opus or AAC of more
+// channels) never come before them, though the 5.1 ones are its best; a
+// format whose channels yt-dlp doesn't know passes. Any other audio comes
+// last, which the engine then refuses, naming its format. The 5.1 one the
+// engine plays comes beside the stereo one, as the Stream's Surround,
+// from the formats yt-dlp lists.
 var formats = map[Quality]string{
 	QualityBest: "bestaudio[acodec=opus][audio_channels<=?2][format_id!*=drc]/bestaudio[acodec=opus][audio_channels<=?2]/" +
 		"bestaudio[acodec=mp4a.40.2][audio_channels<=?2][format_id!*=drc]/bestaudio[acodec=mp4a.40.2][audio_channels<=?2]/bestaudio",
@@ -86,6 +87,10 @@ type Stream struct {
 	// it, and yt-dlp doesn't.
 	Loudness float64
 	Measured bool
+	// Surround is the video's 5.1 surround audio, AC-3 or E-AC-3 in MP4,
+	// beside the stereo audio of the Stream, when YouTube has one the
+	// engine plays: nil otherwise, and in the Surround stream itself.
+	Surround *Stream
 }
 
 // slowResolve is how long finding a stream takes before the log tells.
@@ -339,17 +344,73 @@ func plainError(msg string) string {
 	return ""
 }
 
-// info is what yt-dlp prints of a video with one format selected.
+// info is what yt-dlp prints of a video with one format selected: the
+// fields of that format, and the formats of the video.
 type info struct {
+	ytFormat
+	Duration float64    `json:"duration"`
+	Formats  []ytFormat `json:"formats"`
+}
+
+// ytFormat is what yt-dlp prints of a format.
+type ytFormat struct {
+	FormatID       string            `json:"format_id"`
 	URL            string            `json:"url"`
 	Ext            string            `json:"ext"`
+	Protocol       string            `json:"protocol"`
 	ACodec         string            `json:"acodec"`
+	VCodec         string            `json:"vcodec"`
 	ABR            float64           `json:"abr"`
+	AudioChannels  int               `json:"audio_channels"`
 	Filesize       int64             `json:"filesize"`
 	FilesizeApprox int64             `json:"filesize_approx"`
-	Duration       float64           `json:"duration"`
 	Headers        map[string]string `json:"http_headers"`
 	AvailableAt    float64           `json:"available_at"` // Unix seconds
+	// HasDRM is true, false or "maybe".
+	HasDRM any `json:"has_drm"`
+}
+
+// surroundRank ranks the codecs of the 5.1 surround formats the engine
+// plays, as they are named: AC-3 first, whose decoding the tests check
+// whole, then E-AC-3; 0 for any other.
+func surroundRank(codec string) int {
+	switch strings.ToLower(codec) {
+	case "ac-3", "ac3":
+		return 2
+	case "ec-3", "eac3":
+		return 1
+	}
+	return 0
+}
+
+// surround reports whether f is a 5.1 surround format the engine plays:
+// AC-3 or E-AC-3 in MP4, of six channels, of the original dynamics,
+// unencrypted, whole, over plain HTTPS.
+func (f ytFormat) surround() bool {
+	return surroundRank(f.ACodec) > 0 && f.AudioChannels == 6 && (f.VCodec == "" || f.VCodec == "none") &&
+		(f.Ext == "m4a" || f.Ext == "mp4") && (f.Protocol == "" || f.Protocol == "https") &&
+		f.URL != "" && f.HasDRM != true && f.HasDRM != "maybe" && !strings.Contains(f.FormatID, "drc")
+}
+
+// stream returns the Stream of f, of a video of duration seconds.
+func (f ytFormat) stream(duration float64) Stream {
+	s := Stream{
+		URL:      f.URL,
+		Header:   http.Header{},
+		MimeType: mimeType(f.Ext, f.ACodec),
+		Size:     f.Filesize,
+		Duration: time.Duration(duration * float64(time.Second)),
+		Codec:    f.ACodec,
+		Bitrate:  f.ABR,
+		Expires:  expiry(f.URL),
+	}
+	for k, v := range f.Headers {
+		s.Header.Set(k, v)
+	}
+	if f.AvailableAt > 0 {
+		s.Available = time.UnixMilli(int64(math.Round(f.AvailableAt * 1000)))
+	}
+	return s
 }
 
 // parseInfo reads the stream of yt-dlp's -J output.
@@ -361,21 +422,21 @@ func parseInfo(out []byte) (Stream, error) {
 	if in.URL == "" {
 		return Stream{}, errors.New("yt-dlp found no audio stream")
 	}
-	s := Stream{
-		URL:      in.URL,
-		Header:   http.Header{},
-		MimeType: mimeType(in.Ext, in.ACodec),
-		Size:     in.Filesize,
-		Duration: time.Duration(in.Duration * float64(time.Second)),
-		Codec:    in.ACodec,
-		Bitrate:  in.ABR,
-		Expires:  expiry(in.URL),
+	s := in.ytFormat.stream(in.Duration)
+	// The 5.1 surround beside it, of the best codec, then the most bits.
+	var best *ytFormat
+	for i, f := range in.Formats {
+		if !f.surround() {
+			continue
+		}
+		if best == nil || surroundRank(f.ACodec) > surroundRank(best.ACodec) ||
+			surroundRank(f.ACodec) == surroundRank(best.ACodec) && f.ABR > best.ABR {
+			best = &in.Formats[i]
+		}
 	}
-	for k, v := range in.Headers {
-		s.Header.Set(k, v)
-	}
-	if in.AvailableAt > 0 {
-		s.Available = time.UnixMilli(int64(math.Round(in.AvailableAt * 1000)))
+	if best != nil {
+		sur := best.stream(in.Duration)
+		s.Surround = &sur
 	}
 	return s, nil
 }

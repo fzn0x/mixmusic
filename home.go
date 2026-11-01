@@ -69,6 +69,13 @@ func (s *shell) homePage(c *ui.Context) {
 		case home.err != nil && !home.done:
 		case home.err != nil:
 			s.problem(c, home.err, func() { s.forget("home") })
+			if !s.svc.Downloads.Online() && s.kept.Status().Tracks > 0 {
+				ui.Row(c).Margin(16, 0, 0).Children(func() {
+					if s.button(c, "home-downloads", "open downloads", true).Clicked() {
+						s.navigate("/library/downloads")
+					}
+				})
+			}
 			return
 		case !home.done:
 			s.loading(c)

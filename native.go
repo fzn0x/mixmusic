@@ -18,6 +18,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/plugins"
@@ -114,8 +115,10 @@ type shell struct {
 	pendingMu sync.Mutex
 	pending   []func()
 
-	// st is what the player does, as the frame shows it.
-	st player.State
+	// st is what the player does, as the frame shows it, and kept what the
+	// downloads hold and do.
+	st   player.State
+	kept *downloads.Snapshot
 	// artURL is the artwork the accent follows, and artColor its colour,
 	// once known: the colour Greenroom's and Glasshouse's grounds take
 	// too.
@@ -251,6 +254,15 @@ type shell struct {
 	installingAddon  string
 	pluginToInstall  addons.Entry
 	confirmingPlugin bool
+	// The downloads: what the pages miss of their collections, the
+	// collection the downloads page shows, the tracks it lists, and the
+	// move of their folder under way, which moveDone of moveTotal bytes
+	// came of.
+	missingMemos        map[string]missingMemo
+	downloadsOf         string
+	downloadsList       downloadsView
+	movingDownloads     bool
+	moveDone, moveTotal int64
 }
 
 func newShell(a *app.App, p *player.Player) *shell {
@@ -258,10 +270,12 @@ func newShell(a *app.App, p *player.Player) *shell {
 		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, listTops: map[string]float32{}, keeping: map[string]bool{}, licenseOpen: -1,
 		mountedViews: map[*plugins.View]bool{}, seenViews: map[*plugins.View]bool{}, pluginInputs: map[string]*string{},
 		canvasSizes: map[*plugins.Canvas][2]float32{}, cssColors: map[string]ui.Color{}, svgs: map[string]*ui.SVG{},
-		dialogScrolls: map[string]*dialogScroll{}}
+		dialogScrolls: map[string]*dialogScroll{}, missingMemos: map[string]missingMemo{}}
 	s.queueList.Selected = new(int)
 	*s.queueList.Selected = -1
-	s.art = newArtworks(s.update, s.svc.System.Artwork())
+	// The covers the downloads keep show without the network.
+	s.art = newArtworks(s.update, keptArt{s.svc.Downloads.ArtworkFile, s.svc.System.Artwork()})
+	s.kept = s.svc.Downloads.Snapshot()
 	s.refresh()
 	// The side panel the user left.
 	if s.panel = s.set.Panel; s.panel == "none" {
@@ -289,6 +303,8 @@ func (s *shell) follow(stop ...func()) {
 	s.stop = append(s.stop,
 		s.p.Subscribe(func(player.Event) { s.win.Invalidate() }),
 		s.a.Watch(func() { s.update(s.refresh) }),
+		s.svc.Downloads.Watch(func() { s.win.Invalidate() }),
+		s.svc.Downloads.OnNetwork(func(online bool) { s.update(func() { s.followNetwork(online) }) }),
 		mygo.Theme.OnUpdated(func() { s.update(s.restyle) }),
 	)
 	s.stop = append(s.stop, stop...)

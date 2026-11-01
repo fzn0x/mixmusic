@@ -46,6 +46,7 @@ func (s *shell) commands() []command {
 		{"go.explore", "Explore", "Alt+5", "go to", func() { s.navigate("/explore") }},
 		{"go.library", "Library", "Alt+2", "go to", func() { s.navigate("/library") }},
 		{"go.liked", "Liked songs", "Alt+3", "go to", func() { s.navigate("/library/liked") }},
+		{"go.downloads", "Downloads", "", "go to", func() { s.navigate("/library/downloads") }},
 		{"go.nowPlaying", "Now playing", "Alt+4", "go to", func() { s.navigate("/now-playing") }},
 		{"go.stats", "Stats", "", "go to", func() { s.navigate("/stats") }},
 		{"go.marketplace", "Marketplace", "", "go to", func() { s.navigate("/marketplace") }},

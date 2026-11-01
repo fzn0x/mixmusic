@@ -94,6 +94,15 @@ func (m *Matcher) Match(ctx context.Context, t media.Track) (media.Track, error)
 	return found, nil
 }
 
+// Matched returns the YouTube Music track of the same recording as t, as
+// Match does, when it needs no search: t itself, or the match found before.
+func (m *Matcher) Matched(t media.Track) (media.Track, bool) {
+	if t.Source == media.SourceYouTube {
+		return t, true
+	}
+	return m.known(t.ID)
+}
+
 // Forget drops the match of a track, for when the user says it is wrong.
 func (m *Matcher) Forget(trackID string) error {
 	if m.Known == nil {

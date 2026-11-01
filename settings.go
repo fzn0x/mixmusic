@@ -13,6 +13,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -289,7 +290,7 @@ func (s *shell) themeSelect(c *ui.Context, key, label string, id *string) {
 func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 	k := &s.lk
 	id, name := t.ID, t.Name
-	tk := newLook(settings.Settings{Theme: id, FontScale: 1}, s.inv.Themes, k.dark, "")
+	tk := newLook(settings.Settings{Theme: id, FontScale: 1}, s.inv.Themes, k.dark, "", colorfile.Colors{})
 	card := s.buttonBase(c.Key("theme-"+id)).Width(200).Height(124).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 		Padding(14).Background(tk.bg).Border(1, tk.border).Label(name).Cursor(ui.CursorPointer)
 	if current {

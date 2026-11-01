@@ -303,7 +303,6 @@ func readableOn(accent, ground color.NRGBA) color.NRGBA { return readableAt(acce
 // that reads already stays; one that is translucent is taken as it shows
 // on the ground.
 func readableAt(c, ground color.NRGBA, ratio float64) color.NRGBA {
-	black, white := color.NRGBA{A: 255}, color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	ground = over(ground, black)
 	c = over(c, ground)
 	if contrast(c, ground) >= ratio {

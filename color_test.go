@@ -3,6 +3,8 @@ package main
 import (
 	"image/color"
 	"testing"
+
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 )
 
 func TestParseColor(t *testing.T) {
@@ -154,7 +156,7 @@ func TestRaised(t *testing.T) {
 		n++
 		set := s.set
 		set.FollowSystem, set.Theme = false, th.ID
-		k := newLook(set, s.inv.Themes, true, "")
+		k := newLook(set, s.inv.Themes, true, "", colorfile.Colors{})
 		if k.raised.A != 255 {
 			t.Errorf("%s: the menus' face %+v shows the page through", th.ID, k.raised)
 		}

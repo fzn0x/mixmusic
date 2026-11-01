@@ -260,11 +260,21 @@ type Player struct {
 	noticed []*func(Notice)
 	wake    chan struct{}
 	done    chan struct{}
+	// version counts the states published, of which snap is the last.
+	version uint64
+
+	// writing orders the writes of the queue: written is the version of
+	// the state the last of them kept.
+	writing sync.Mutex
+	written uint64
 
 	// What follows belongs to the player's goroutine.
-	s           State
-	events      []Event
-	notices     []Notice
+	s       State
+	events  []Event
+	notices []Notice
+	// saveDue is set once the throttle lets the queue be written, as the
+	// task publishes it.
+	saveDue     bool
 	loadToken   int
 	retried     string
 	counted     string
@@ -419,6 +429,10 @@ func (p *Player) run() {
 		for _, fn := range tasks {
 			fn()
 			p.publish()
+			if p.saveDue {
+				p.saveDue = false
+				go p.writeQueue()
+			}
 		}
 	}
 }
@@ -429,6 +443,7 @@ func (p *Player) publish() {
 	p.events, p.notices = nil, nil
 	p.mu.Lock()
 	p.snap = p.s
+	p.version++
 	subs, noticed := p.subs, p.noticed
 	p.mu.Unlock()
 	for _, e := range events {

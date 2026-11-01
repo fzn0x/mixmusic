@@ -513,12 +513,24 @@ func (p *Player) report() {
 	p.save()
 }
 
-// save keeps the queue, every saveEvery at most.
+// save keeps the queue, every saveEvery at most, as the task publishes it.
 func (p *Player) save() {
-	p.saving.call(p, func() {
-		saved := savedOf(p.s)
-		go p.svc.SaveQueue(saved)
-	})
+	p.saving.call(p, func() { p.saveDue = true })
+}
+
+// writeQueue keeps the state last published, unless a write kept it, or a
+// later one, already: a write started earlier never lands over it.
+func (p *Player) writeQueue() {
+	p.writing.Lock()
+	defer p.writing.Unlock()
+	p.mu.Lock()
+	st, version := p.snap, p.version
+	p.mu.Unlock()
+	if version <= p.written {
+		return
+	}
+	p.svc.SaveQueue(savedOf(st))
+	p.written = version
 }
 
 // savedOf is the queue of st as it survives a restart: the part of it

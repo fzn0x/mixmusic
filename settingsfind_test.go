@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -548,5 +549,33 @@ func TestSettingsSearchSliding(t *testing.T) {
 	typeKeys(s, tt, "tray")
 	if got := s.router.Location(); got != "/settings/playback?q=tray" {
 		t.Errorf("typing went to %q", got)
+	}
+}
+
+// TestSettingsFindSlides opens a section from the search of every section,
+// whose page slides in over the search's: both build at once a while,
+// each with its own search, and the one leaving neither takes the box's
+// text nor tells screen readers anything.
+func TestSettingsFindSlides(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 2400)
+	show(s, tt, settingsPath("", "desktop"))
+	tt.Announcements()
+	click(t, s, tt, "Show on the desktop in desktop")
+	for range 5 {
+		tt.Advance(16 * time.Millisecond)
+		if s.find.query != "" {
+			t.Fatalf("as the section slides in, the box holds %q", s.find.query)
+		}
+	}
+	tt.Advance(time.Second)
+	if got := s.router.Location(); got != "/settings/desktop" {
+		t.Errorf("show in went to %q", got)
+	}
+	showsOnly(t, tt, "the section", []string{"Close to the tray", "Search the settings"}, []string{"Show on the desktop in desktop"})
+	for _, a := range tt.Announcements() {
+		if strings.Contains(a, "match") {
+			t.Errorf("screen readers heard %q", a)
+		}
 	}
 }

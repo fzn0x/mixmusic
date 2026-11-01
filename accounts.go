@@ -50,7 +50,7 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 				if s.button(c, "spotify-out", "sign out", false).Clicked() {
 					s.signOutOfSpotify()
 				}
-			})
+			}, "sign out, log out")
 			return
 		}
 		if sp.Error != "" {
@@ -172,7 +172,7 @@ func (s *shell) youtubeAccount(c *ui.Context, yt app.YouTubeAccount) {
 					s.account("", "", func(ctx context.Context) error { return s.svc.Accounts.YouTubeLogout(ctx) })
 				})
 			}
-		})
+		}, "sign out, log out")
 		s.youtubeChannels(c)
 		s.row(c, "Add what you play to your history", "YouTube Music makes its home and its radios of your history. Tracks join it once they played a while, as they do on Last.fm.", func() {
 			if s.switchOf(c.Key("youtube-history"), &s.set.YouTubeHistory).Label("Add what you play to your YouTube Music history").Changed() {

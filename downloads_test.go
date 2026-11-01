@@ -272,15 +272,27 @@ func TestDownloadMarks(t *testing.T) {
 func TestOfflineToast(t *testing.T) {
 	s, _ := newKeptShell(t, keptTracks...)
 	tt := tester(t, s)
+	s.followNetwork(true) // back: nothing to tell
+	if len(s.actionToasts) != 0 {
+		t.Errorf("toasts %+v", s.actionToasts)
+	}
 	s.followNetwork(false)
+	if len(s.actionToasts) != 1 || s.actionToasts[0].action != "downloads" {
+		t.Fatalf("toasts %+v", s.actionToasts)
+	}
+	s.actionToasts[0].run()
+	if got := s.router.Path(); got != "/library/downloads" {
+		t.Errorf("the toast goes to %q", got)
+	}
 	tt.Frame()
 	if !tt.HasText("You're offline: your downloads still play") {
-		t.Fatalf("the window shows %q", tt.Texts())
+		t.Errorf("the window shows %q", tt.Texts())
 	}
-	click(t, s, tt, "downloads")
-	tt.Advance(time.Second)
-	if got := s.router.Path(); got != "/library/downloads" {
-		t.Errorf("the toast went to %q", got)
+	// Without downloads, it tells nothing.
+	empty := newTestShell(t)
+	empty.followNetwork(false)
+	if len(empty.actionToasts) != 0 {
+		t.Errorf("toasts without downloads %+v", empty.actionToasts)
 	}
 }
 

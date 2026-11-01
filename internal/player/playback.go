@@ -534,6 +534,22 @@ func (p *Player) writeQueue() {
 	p.written = version
 }
 
+// Flush keeps the queue and the volume as the player last published them,
+// before it returns, for the app to call as it quits, on the main thread.
+// It writes the queue again only if the player published since the last
+// write. It never waits on the player's goroutine, which may itself wait
+// on the main thread, as the app's Report does for the tray: a flush that
+// waited for it, or a call of Close in its place, would hang the quit.
+func (p *Player) Flush() {
+	p.writeQueue()
+	p.mu.Lock()
+	v := p.snap.Volume
+	p.mu.Unlock()
+	if p.svc.Settings().Volume != v {
+		p.svc.SaveVolume(v)
+	}
+}
+
 // savedOf is the queue of st as it survives a restart: the part of it
 // savedWindow keeps, with the current entry's index in that part.
 func savedOf(st State) Saved {

@@ -183,7 +183,7 @@ func TestPulse(t *testing.T) {
 			if err := os.WriteFile(path, adts(mono44, pulsed, pulsed), 0o644); err != nil {
 				t.Fatal(err)
 			}
-			snr, _, _ := compare(ffmpegDecode(t, path), 1, got)
+			snr, _, _ := compare(ffmpegDecode(t, path), 1, got, nil)
 			t.Logf("SNR %.1f dB against ffmpeg's decode", snr)
 			if snr < 90 {
 				t.Errorf("SNR %.1f dB", snr)
@@ -422,6 +422,76 @@ func TestAfterError(t *testing.T) {
 	}
 	if !slices.Equal(got, want) {
 		t.Error("a refused frame changes the frames after it")
+	}
+}
+
+// noisePair writes a channel pair element of a common long window whose
+// two bands are noise in both channels, the right's 6 dB above the left's,
+// with an M/S mask of mask, and the ms_used flags used when it is 1.
+func (w *frameWriter) noisePair(mask int, used ...int) *frameWriter {
+	w.bits(elemCPE, 3).bits(0, 4).bits(1, 1) // common_window
+	w.bits(0, 1).bits(onlyLongSequence, 2).bits(0, 1).bits(2, 6).bits(0, 1)
+	w.bits(mask, 2)
+	if mask == 1 {
+		for _, u := range used {
+			w.bits(u, 1)
+		}
+	}
+	// A global gain of 100 starts the noise energies at 10; the first is
+	// coded in 9 bits, plus 256: 48 on the left, 52 on the right.
+	for _, energy := range []int{48, 52} {
+		w.bits(100, 8)
+		w.bits(noiseBook, 4).bits(2, 5)
+		w.bits(energy-10+256, 9)
+		w.codeword(0, 60) // the second band's, the same
+		w.bits(0, 3)      // pulse, TNS, gain control
+	}
+	return w
+}
+
+// TestCorrelatedNoise checks that the channels of a pair share their noise
+// where both substitute noise in a band whose ms_used is set, each at its
+// own energy, as the standard has it, and have noise of their own
+// otherwise. ffmpeg's decoder gives them noise of their own either way.
+func TestCorrelatedNoise(t *testing.T) {
+	stereo44 := Config{ObjectType: ObjectTypeLC, SampleRate: 44100, Channels: 2}
+	var first []float32
+	for _, c := range []struct {
+		name   string
+		mask   int
+		used   []int
+		shared bool
+	}{
+		{"no M/S", 0, nil, false},
+		{"M/S in no band", 1, []int{0, 0}, false},
+		{"M/S in both bands", 1, []int{1, 1}, true},
+		{"M/S in every band", 2, nil, true},
+	} {
+		var w frameWriter
+		pcm, err := decodeFrames(t, stereo44, w.noisePair(c.mask, c.used...).end())
+		if err != nil {
+			t.Fatalf("%s: %v", c.name, err)
+		}
+		// The right channel's gain is twice the left's, 2^(4/4): the
+		// same noise doubles, sample for sample.
+		shared, silent := true, true
+		for i := 0; i < len(pcm); i += 2 {
+			shared = shared && pcm[i+1] == 2*pcm[i]
+			silent = silent && pcm[i] == 0
+		}
+		if silent || shared != c.shared {
+			t.Errorf("%s: the channels share their noise: %v, want %v (silent %v)", c.name, shared, c.shared, silent)
+		}
+		// The left channel's noise is the same whatever the right's.
+		left := make([]float32, 0, len(pcm)/2)
+		for i := 0; i < len(pcm); i += 2 {
+			left = append(left, pcm[i])
+		}
+		if first == nil {
+			first = left
+		} else if !slices.Equal(left, first) {
+			t.Errorf("%s: the left channel's noise changed", c.name)
+		}
 	}
 }
 

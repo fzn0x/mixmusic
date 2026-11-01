@@ -217,6 +217,50 @@ func TestDeckEndsAnAACStreamCutInItsLastMoment(t *testing.T) {
 	}
 }
 
+// TestDeckPlaysAACOfAnotherTimescale plays a track whose times are in a
+// timescale other than its rate: progressive's, at 44.1 kHz, whose times
+// are made ticks of 48 kHz, its frames of 1024 samples 1114 ticks long,
+// rounded down. The deck plays its frames whole all the same, as the file
+// in its rate's timescale, and its last one up to its end.
+func TestDeckPlaysAACOfAnotherTimescale(t *testing.T) {
+	b, err := os.ReadFile(aacProgressive)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// field returns the 4 bytes at offset off of the data of the box of
+	// type typ, after its version and flags, which must be 0.
+	field := func(typ string, off int) []byte {
+		i := bytes.Index(b, []byte(typ))
+		if i < 0 || b[i+4] != 0 {
+			t.Fatalf("no %s of version 0", typ)
+		}
+		return b[i+8+off : i+12+off]
+	}
+	set := func(f []byte, from, to uint32) {
+		if got := binary.BigEndian.Uint32(f); got != from {
+			t.Fatalf("a field of %d, want %d", got, from)
+		}
+		binary.BigEndian.PutUint32(f, to)
+	}
+	set(field("mdhd", 8), 44100, 48000)    // timescale
+	set(field("mdhd", 12), 133324, 145114) // duration
+	set(field("stts", 8), 1024, 1114)      // the delta of the first 130 samples
+	set(field("stts", 16), 204, 222)       // of the last one
+	set(field("elst", 8), 1024, 1115)      // media_time, the codec delay
+	open := func(ctx context.Context, url string, interrupted func() bool) (Source, error) {
+		return memSource{bytes.NewReader(b)}, nil
+	}
+	d := newDeck("x", 0, open, func() {})
+	defer d.close()
+	got := drain(t, d)
+	if err := d.failure(); err != nil {
+		t.Fatal(err)
+	}
+	if want := playAll(t, aacProgressive); !slices.Equal(got, want) {
+		t.Errorf("%d frames, %.1f dB from the file in its rate's timescale, of %d frames", len(got)/2, snr(got, want), len(want)/2)
+	}
+}
+
 // withConfig returns the bytes of an MP4 file whose AudioSpecificConfig
 // edit changed.
 func withConfig(t *testing.T, path string, edit func(asc []byte)) []byte {

@@ -65,9 +65,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/aac`** decodes AAC-LC, in mono or stereo, with all of its
   tools: a pure Go decoder derived from SharpJaad, the C# port of JAAD,
   under SharpJaad's MIT license, which decodes YouTube's AAC within about
-  136 dB of ffmpeg's decoder. **`internal/audio/resample`** converts it
-  from its rate, 44.1 kHz for YouTube, to the engine's 48 kHz, with a
-  polyphase filter of Kaiser-windowed sincs.
+  136 dB of ffmpeg's decoder, but for the few frames whose channels share
+  their noise, as the standard has it and ffmpeg's decoder doesn't.
+  **`internal/audio/resample`** converts it from its rate, 44.1 kHz for
+  YouTube, to the engine's 48 kHz, with a polyphase filter of
+  Kaiser-windowed sincs.
 - **`internal/audio`** is MixMusic's audio engine: two decks, each a
   goroutine that reads a track, Opus in WebM with `internal/webm` and
   `internal/opus`, or AAC in MP4 with `internal/mp4`, `internal/aac` and

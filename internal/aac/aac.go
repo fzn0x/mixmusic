@@ -15,8 +15,9 @@
 // streams of more than two channels, are errors.ErrUnsupported.
 //
 // SharpJaad, like JAAD, leaves temporal noise shaping undone and the
-// pulse data unapplied: this package does both as the decoding process
-// of the standard describes them.
+// pulse data unapplied, and gives the channels of a pair noise of their
+// own where the standard has them share it: this package does all three
+// as the decoding process of the standard describes them.
 //
 // The decoder checks what it reads against the bounds of the standard,
 // so that malformed frames make errors, never panics.

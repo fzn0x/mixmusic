@@ -23,6 +23,10 @@ type aacTrack struct {
 	// greatest common divisor.
 	rate     int64
 	up, down int64
+	// slack is how many frames short of its frame a packet's duration may
+	// fall with the packet whole: none in a timescale of rate, else the
+	// frames of a tick, which the durations are rounded to.
+	slack int64
 	// origin is the track's first frame that plays, after the codec delay,
 	// at its rate, and originAt the frame of the stream that plays it, the
 	// codec delay at Rate. The converter's output falls on the frames at
@@ -83,6 +87,9 @@ func openAAC(src io.ReadSeeker) (track, timing, error) {
 		// those of a frame, or at the end.
 		pcm: make([]float32, 2*(rs.MaxOutput(aac.FrameLength)+rs.Latency())),
 	}
+	if scale := int64(t.Timescale); scale != rate {
+		tr.slack = (rate + scale - 1) / scale
+	}
 	return tr, tm, nil
 }
 
@@ -111,10 +118,14 @@ func (t *aacTrack) decode() (decoded, error) {
 		return decoded{}, fmt.Errorf("%w (%v)", errDecode, err)
 	}
 	// A packet's duration tells how much of its frame is audio: the last
-	// one's ends early, the rest being the encoder's padding.
+	// one's ends early, the rest being the encoder's padding. Another's
+	// falls short only by the rounding of a timescale other than the
+	// track's rate, which the slack allows for.
 	keep := int64(n)
 	if d := t.p.Duration; d > 0 {
-		keep = min(keep, framesAt(d, t.rate))
+		if k := framesAt(d, t.rate); k < keep-t.slack {
+			keep = k
+		}
 	}
 	if !t.started {
 		first := framesAt(t.p.Time, t.rate)

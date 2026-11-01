@@ -154,12 +154,18 @@ var secrets = []*regexp.Regexp{
 	regexp.MustCompile(`(?i)\b(Bearer )[0-9A-Za-z._~+/-]+=*`),
 }
 
-// Redact returns s with the values of secrets replaced by "…".
+// localAddr matches the computer's own address and port, which the error
+// of a socket gives before the address it was connected to, as in "read
+// tcp 192.168.1.5:50123->142.250.74.118:443".
+var localAddr = regexp.MustCompile(`(?:\[[^\]\s]+\]|\b\d{1,3}(?:\.\d{1,3}){3}):\d{1,5}->`)
+
+// Redact returns s with the values of secrets replaced by "…", and the
+// computer's own address in socket errors too.
 func Redact(s string) string {
 	for _, re := range secrets {
 		s = re.ReplaceAllString(s, "${1}…")
 	}
-	return s
+	return localAddr.ReplaceAllString(s, "…->")
 }
 
 // keepCrash keeps the report of a crash of the run before, if it wrote one,

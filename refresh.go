@@ -120,12 +120,15 @@ func (s *shell) refreshButton(c *ui.Context) {
 	k := &s.lk
 	busy, off := s.refreshing(), s.nothingToRefresh()
 	s.refreshBusy, s.refreshOff = busy, off
-	label, tip := "Refresh this page", "Refresh this page"
-	if keys := shortcutLabel(s.shortcutOf(command{id: "view.refresh", shortcut: refreshKeys})); keys != "" {
-		tip += " (" + keys + ")"
+	// The tooltip names the keys, written again once they changed.
+	if keys := s.shortcutOf(command{id: "view.refresh", shortcut: refreshKeys}); keys != s.refreshTipOf || s.refreshTip == "" {
+		s.refreshTip, s.refreshTipOf = "Refresh this page", keys
+		if label := shortcutLabel(keys); label != "" {
+			s.refreshTip += " (" + label + ")"
+		}
 	}
-	b := s.buttonBase(c.Key("refresh")).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(tip).Cursor(ui.CursorPointer).
-		Disabled(off)
+	b := s.buttonBase(c.Key("refresh")).Size(32, 32).Radius(k.radiusSm).Label("Refresh this page").Tooltip(s.refreshTip).
+		Cursor(ui.CursorPointer).Disabled(off)
 	ink := k.muted
 	switch {
 	case busy:

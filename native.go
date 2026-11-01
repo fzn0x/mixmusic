@@ -192,12 +192,14 @@ type shell struct {
 	// page a refresh asked again for, until it ended, and refreshTold is
 	// set once one of its answers failed, which a toast told. refreshOff
 	// and refreshBusy are what the refresh button showed in the frame:
-	// dimmed, or a spinner.
-	shown, showing          map[string]bool
-	collecting              bool
-	refreshAt               string
-	refreshTold             bool
-	refreshOff, refreshBusy bool
+	// dimmed, or a spinner; refreshTip its tooltip, of the keys
+	// refreshTipOf.
+	shown, showing           map[string]bool
+	collecting               bool
+	refreshAt                string
+	refreshTold              bool
+	refreshOff, refreshBusy  bool
+	refreshTip, refreshTipOf string
 	// capScroll scrolls the pages in capture mode, nil otherwise, and
 	// capBound tells whether a page took it in the build.
 	capScroll *ui.ScrollState

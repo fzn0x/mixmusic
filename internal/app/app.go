@@ -143,6 +143,8 @@ type App struct {
 	// profileErrs is why the accounts' profiles could not be read, until
 	// they are, or the user signs in or out.
 	profileErrs profileErrors
+	// flushers save what the windows hold back, as MixMusic quits.
+	flushers []*func()
 }
 
 // New opens what the app keeps in opts.DataDir and opts.CacheDir.

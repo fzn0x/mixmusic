@@ -73,16 +73,21 @@ Types: `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `ci`,
 `themes`, `plugins`, `youtube`, `spotify`, `stream`, `match`, `lyrics`,
 `library`, `addons`, `community`, `sdk`, `tools`.
 
-A change people will notice also gets a line under `## [Unreleased]` in
-[CHANGELOG.md](CHANGELOG.md), in its `### Added`, `### Changed`,
-`### Fixed` or `### Removed` section, as
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) has them.
+A change people will notice also gets an entry in the changelog: a file in
+[changelog.d](changelog.d/README.md), in the folder of its section as
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) has them (`added`,
+`changed`, `removed`, `fixed` and so on), named after its issue, such as
+`changelog.d/fixed/101-stream-retry.md`. It holds the entry as
+[CHANGELOG.md](CHANGELOG.md) has them, a Markdown list item. Pull requests
+don't edit CHANGELOG.md itself, so they never conflict over it;
+`go run ./tools/changelog -print` shows the entries of the next release.
 
 ## Releases
 
-1. Rename `## [Unreleased]` in CHANGELOG.md to `## [x.y.z] - YYYY-MM-DD`,
-   add an empty `## [Unreleased]` above it, and update the links at the
-   foot of the file.
+1. Run `go run ./tools/changelog`, which folds the entries of changelog.d
+   into `## [Unreleased]` in CHANGELOG.md and deletes them. Rename
+   `## [Unreleased]` to `## [x.y.z] - YYYY-MM-DD`, add an empty
+   `## [Unreleased]` above it, and update the links at the foot of the file.
 2. Set `version` in package.json to `x.y.z`, and commit both as
    `chore: release vx.y.z`.
 3. Tag the commit and push it with the tag:

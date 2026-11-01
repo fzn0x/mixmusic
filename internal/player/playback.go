@@ -129,6 +129,9 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 			return
 		}
 		if err != nil {
+			if errors.Is(err, ErrOffline) && p.skipOffline(i, autoplay) {
+				return
+			}
 			if !p.offline(err, start, autoplay) {
 				p.fail(err.Error())
 			}
@@ -187,6 +190,9 @@ func (p *Player) streamInstead(token int, entry Item, start time.Duration, autop
 			return
 		}
 		if err != nil {
+			if errors.Is(err, ErrOffline) && p.skipOffline(p.s.Index, autoplay) {
+				return
+			}
 			if !p.offline(err, start, autoplay) {
 				p.fail(err.Error())
 			}
@@ -529,9 +535,9 @@ func (p *Player) advance(ended bool) {
 	case ended && p.s.Repeat == RepeatOne:
 		p.playAt(p.s.Index, 0, true)
 	case p.s.Index < len(q)-1:
-		p.playAt(p.s.Index+1, 0, true)
+		p.playNext(p.s.Index + 1)
 	case p.s.Repeat == RepeatAll:
-		p.playAt(0, 0, true)
+		p.playNext(0)
 	case p.svc.Settings().Autoplay:
 		token := p.loadToken
 		p.extendWithRadio(func(added bool, err error) {
@@ -732,6 +738,7 @@ func (p *Player) onTime(position, duration time.Duration) {
 		// that one failed.
 		p.retry.played = true
 		p.failures = 0
+		p.offlineSkips = 0
 	}
 	p.s.Position = position
 	if duration > 0 {

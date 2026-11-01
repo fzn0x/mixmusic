@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -414,4 +415,111 @@ func TestStallWaits(t *testing.T) {
 	h.wait("a waiting", waiting("a", true))
 	net.set(true)
 	h.wait("a playing on", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 42s true" && playing("a")(p) })
+}
+
+// keptServices are netServices where the tracks of kept play without the
+// network, as downloads do.
+type keptServices struct {
+	netServices
+	kept map[string]bool
+}
+
+func (s keptServices) Offline() bool                   { return !s.net.Online(context.Background()) }
+func (s keptServices) PlaysOffline(t media.Track) bool { return s.kept[t.ID] }
+
+func (s keptServices) Prepare(ctx context.Context, t media.Track) (Source, error) {
+	if s.kept[t.ID] {
+		return s.fakeServices.Prepare(ctx, t)
+	}
+	return s.netServices.Prepare(ctx, t)
+}
+
+func newKeptHarness(t *testing.T, net *fakeNet, kept ...string) *harness {
+	t.Helper()
+	set := map[string]bool{}
+	for _, id := range kept {
+		set["yt:"+id] = true
+	}
+	return newHarnessWith(t, Saved{}, func(f *fakeServices) Services { return keptServices{netServices{f, net}, set} })
+}
+
+// reported are the tracks the app was told of as what plays, from the
+// report from on.
+func (h *harness) reported(from int) []string {
+	var ids []string
+	h.svc.with(func(f *fakeServices) {
+		for _, r := range f.reports[min(from, len(f.reports)):] {
+			if r.Track != nil && (len(ids) == 0 || ids[len(ids)-1] != r.Track.ID) {
+				ids = append(ids, r.Track.ID)
+			}
+		}
+	})
+	return ids
+}
+
+func (h *harness) reports() int {
+	n := 0
+	h.svc.with(func(f *fakeServices) { n = len(f.reports) })
+	return n
+}
+
+// TestOfflineSkipsToDownloaded skips, while the network is gone, the
+// tracks that can't play without it, at once and without an error, to the
+// next that plays, and waits once none is left.
+func TestOfflineSkipsToDownloaded(t *testing.T) {
+	net := newNet(false)
+	h := newKeptHarness(t, net, "c")
+	h.p.PlayTracks(tracks("a", "b", "c", "d"), 0)
+	h.wait("c playing", playing("c"))
+	h.on(func(p *Player) {
+		if p.failures != 0 || p.s.Error != "" || p.s.Waiting {
+			t.Errorf("skipping: %d failures, error %q, waiting %v", p.failures, p.s.Error, p.s.Waiting)
+		}
+	})
+	if n := h.notices(); len(n) != 0 {
+		t.Errorf("notices %+v", n)
+	}
+	if got := h.stream.with("load "); len(got) != 1 || got[0] != "load url:yt:c 0s true" {
+		t.Errorf("loads %q", got)
+	}
+	// The app knows the network is gone by now: going on, the queue loads
+	// none that can't play, and tells of none.
+	from := h.reports()
+	h.p.Ended()
+	h.wait("d waiting", waiting("d", true))
+	if got := h.reported(from); !slices.Equal(got, []string{"yt:d"}) {
+		t.Errorf("told of %q", got)
+	}
+	if n := h.notices(); len(n) != 1 || n[0].Message != offlineNotice {
+		t.Errorf("notices %+v", n)
+	}
+}
+
+// TestOfflineAroundTheQueue goes around a queue that repeats, to the one
+// track that plays, and from it to itself, without telling of the others.
+func TestOfflineAroundTheQueue(t *testing.T) {
+	net := newNet(false)
+	h := newKeptHarness(t, net, "b")
+	h.p.PlayTracks(tracks("a", "b", "c", "d"), 2)
+	h.p.CycleRepeat() // all
+	h.wait("b playing", playing("b"))
+	from := h.reports()
+	h.p.Ended()
+	h.wait("b again", func(p *Player) bool { return playing("b")(p) && h.stream.count("load url:yt:b 0s true") == 2 })
+	if got := h.reported(from); !slices.Equal(got, []string{"yt:b"}) {
+		t.Errorf("told of %q", got)
+	}
+}
+
+// TestOfflineNothingKept waits for the network, as before, when no track
+// of the queue plays without it, without skipping around.
+func TestOfflineNothingKept(t *testing.T) {
+	net := newNet(false)
+	h := newKeptHarness(t, net)
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.p.CycleRepeat()
+	h.wait("a waiting", waiting("a", true))
+	if got := h.stream.with("load "); len(got) != 0 {
+		t.Errorf("loads %q", got)
+	}
 }

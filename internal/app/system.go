@@ -12,6 +12,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/audio/output"
+	"github.com/fzn0x/mixmusic/internal/hct"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/tools"
@@ -97,6 +98,7 @@ func (s *System) Notices() []Notice {
 		{Name: "libopus, which decodes Opus audio", Text: opus.License},
 		{Name: "SharpJaad, which decodes AAC audio", Text: aac.License},
 		{Name: "Chromium's Web Audio, which shapes the sound", Text: audio.License},
+		{Name: "Material Color Utilities, which make the Material themes' colours", Text: hct.License},
 	}
 }
 

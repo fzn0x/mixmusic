@@ -122,8 +122,8 @@ func (s *Scrobbler) SetQueue(plays []Play) {
 
 // Observe tells the Scrobbler what the player does at now: id identifies the
 // loaded track and is empty when none is, t describes it, playing reports
-// whether it plays, position is how far into the track it is, and rate the
-// speed it plays at, 1 its own, as does 0. The time between two
+// whether it plays, position is how far into the track it is, and rate is
+// the speed it plays at, where 1, or 0, is its own. The time between two
 // observations while the track plays counts as listening, up to 5
 // seconds, to as much of the track as it played at the rate of the first:
 // at 2×, a second plays two of the track. The track plays again when the

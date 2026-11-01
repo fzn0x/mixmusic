@@ -145,6 +145,11 @@ both services in one player:
 - **Keyboard first.** Shortcuts for everything common, a key of your own for
   any command, plugins' commands included, and a command palette
   (<kbd>Ctrl</kbd> <kbd>K</kbd>) for the rest.
+- **A settings file.** Your settings are `settings.json` in your data folder
+  (`%AppData%\MixMusic` on Windows, `~/Library/Application Support/MixMusic`
+  on macOS, `~/.config/MixMusic` on Linux), which you can keep with your
+  dotfiles. Save it while MixMusic runs, and it applies at once; Settings ›
+  Desktop › Settings file opens it.
 
 ## A look around
 

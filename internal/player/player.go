@@ -131,8 +131,11 @@ type Notice struct {
 // Now is what plays, as the app tells the tray, notifications and the
 // system's media controls.
 type Now struct {
-	Track    *media.Track
-	Playing  bool
+	Track   *media.Track
+	Playing bool
+	// Loading is set while the track is asked to play and doesn't yet: as
+	// one track ends and the next loads, it is set and Playing isn't.
+	Loading  bool
 	Position time.Duration
 	Duration time.Duration
 	// Volume is 0 when muted.

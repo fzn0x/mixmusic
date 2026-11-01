@@ -81,17 +81,57 @@ func (p *Player) ToggleMute() {
 }
 
 // SettingsChanged takes in new settings: a Spotify track goes on from where
-// it was in the way of playing Spotify tracks they choose.
+// it was in the way of playing Spotify tracks they choose, and the track
+// playing takes the speed of its kind.
 func (p *Player) SettingsChanged(s settings.Settings) {
 	p.do(func() {
-		if s.SpotifyPlayback == p.spotifyMode {
-			return
+		if s.SpotifyPlayback != p.spotifyMode {
+			p.spotifyMode = s.SpotifyPlayback
+			if cur, ok := p.s.Current(); ok && cur.Track.Source == media.SourceSpotify && p.s.Source != nil {
+				// It loads again, at the speed of the settings.
+				p.playAt(p.s.Index, p.s.Position, p.s.Playing)
+				return
+			}
 		}
-		p.spotifyMode = s.SpotifyPlayback
-		if cur, ok := p.s.Current(); ok && cur.Track.Source == media.SourceSpotify && p.s.Source != nil {
-			p.playAt(p.s.Index, p.s.Position, p.s.Playing)
-		}
+		p.applySpeed(s)
 	})
+}
+
+// speedOf is the speed the settings s play t at in MixMusic's own engine:
+// a song's, of which a Spotify track played from YouTube Music is one.
+func speedOf(s settings.Settings, t media.Track) float64 {
+	return settings.CleanSpeed(s.SongSpeed)
+}
+
+// onDevice reports whether a Spotify device plays the current track, at
+// its own speed.
+func (p *Player) onDevice() bool { return p.s.Source != nil && p.s.Source.Mode != ModeStream }
+
+// applySpeed plays the current track at the speed s gives its kind, unless
+// a Spotify device plays it.
+func (p *Player) applySpeed(s settings.Settings) {
+	cur, ok := p.s.Current()
+	if !ok || p.onDevice() {
+		return
+	}
+	speed := speedOf(s, cur.Track)
+	if speed == p.s.Speed {
+		return
+	}
+	p.s.Speed = speed
+	if p.loaded {
+		p.stream.SetSpeed(speed)
+	}
+	p.emit(StateChange)
+	p.report()
+}
+
+// heard is how long d of the current track takes to hear, at its speed.
+func (p *Player) heard(d time.Duration) time.Duration {
+	if p.s.Speed <= 0 {
+		return d
+	}
+	return time.Duration(float64(d) / p.s.Speed)
 }
 
 // playAt plays the queue's entry at i from start, or holds it there when
@@ -153,6 +193,8 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Duration, autoplay bool, d Device) {
 	p.stopStream()
 	p.connect.use(d)
+	// Spotify's players have no speed but the track's own.
+	p.s.Speed = 1
 	if !autoplay {
 		// A device can't wait paused on a track: it starts from here on
 		// play.
@@ -196,15 +238,17 @@ func (p *Player) streamInstead(token int, entry Item, start time.Duration, autop
 	})
 }
 
-// loadStream plays a stream in the engine. Its failures come back as its
-// Error events.
+// loadStream plays a stream of the current entry in the engine, at the
+// speed of its kind. Its failures come back as its Error events.
 func (p *Player) loadStream(src Source, start time.Duration, autoplay bool) {
 	// A Spotify device left in the middle of its track pauses.
 	p.connect.stop(true)
 	p.s.Source = &src
 	p.loaded = true
 	p.paused = !autoplay
-	_ = p.stream.Load(src.URL, start, autoplay)
+	cur, _ := p.s.Current()
+	p.s.Speed = speedOf(p.svc.Settings(), cur.Track)
+	_ = p.stream.Load(src.URL, start, autoplay, p.s.Speed)
 }
 
 func (p *Player) stopStream() {
@@ -339,7 +383,8 @@ func (p *Player) retryStream(why string) {
 			p.s.Source = &src
 			p.loaded = true
 			p.paused = !autoplay
-			_ = p.stream.Load(src.URL+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, autoplay)
+			p.s.Speed = speedOf(p.svc.Settings(), entry.Track)
+			_ = p.stream.Load(src.URL+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, autoplay, p.s.Speed)
 		})
 	})
 }
@@ -384,9 +429,11 @@ func (p *Player) onProgress() {
 			}
 		})
 	}
+	// The crossfade's seconds are those heard: at 2×, a fade of 5 s starts
+	// 10 s of the track before its end.
 	fade := time.Duration(p.svc.Settings().Crossfade) * time.Second
 	if fade > 0 && !p.crossfading && p.s.Source != nil && p.s.Source.Mode == ModeStream &&
-		hasNext && next.UID != entry.UID && dur > 0 && dur-pos <= fade && dur > 3*fade {
+		hasNext && next.UID != entry.UID && dur > 0 && p.heard(dur-pos) <= fade && p.heard(dur) > 3*fade {
 		p.crossfadeTo(next, fade)
 	}
 	p.reporting.call(p, func() {
@@ -420,11 +467,13 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		p.s.Duration = ms(next.Track.DurationMs)
 		p.s.Source = &src
 		p.s.Error = ""
+		// The track fading out keeps its speed, and next plays at its own.
+		p.s.Speed = speedOf(p.svc.Settings(), next.Track)
 		p.emit(TrackChange)
 		p.report()
 		p.loaded = true
 		p.paused = false
-		_ = p.stream.Crossfade(src.URL, fade)
+		_ = p.stream.Crossfade(src.URL, fade, p.s.Speed)
 	})
 }
 
@@ -562,9 +611,9 @@ func (p *Player) stopAtEnd(ended bool) {
 }
 
 func (p *Player) previous() {
-	pos, i := p.s.Position, p.s.Index
-	if pos > restartAfter || i <= 0 {
-		if i <= 0 && p.s.Repeat == RepeatAll && len(p.s.Queue) > 1 && pos <= restartAfter {
+	heard, i := p.heard(p.s.Position), p.s.Index
+	if heard > restartAfter || i <= 0 {
+		if i <= 0 && p.s.Repeat == RepeatAll && len(p.s.Queue) > 1 && heard <= restartAfter {
 			p.playAt(len(p.s.Queue)-1, 0, true)
 			return
 		}
@@ -616,6 +665,7 @@ func (p *Player) now() Now {
 		Volume:   p.s.Volume,
 		Shuffle:  p.s.Shuffle,
 		Repeat:   p.s.Repeat,
+		Speed:    p.s.Speed,
 	}
 	if p.s.Muted {
 		n.Volume = 0

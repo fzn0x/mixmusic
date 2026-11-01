@@ -48,20 +48,21 @@ func (s *testStream) get() *player.Player {
 	defer s.mu.Unlock()
 	return s.p
 }
-func (s *testStream) Load(_ string, _ time.Duration, autoplay bool) error {
+func (s *testStream) Load(_ string, _ time.Duration, autoplay bool, _ float64) error {
 	if autoplay {
 		s.get().Playing(true)
 	}
 	return nil
 }
-func (s *testStream) Preload(string)                        {}
-func (s *testStream) Crossfade(string, time.Duration) error { return nil }
-func (s *testStream) Play() error                           { s.get().Playing(true); return nil }
-func (s *testStream) Pause()                                { s.get().Playing(false) }
-func (s *testStream) Stop()                                 {}
-func (s *testStream) Unload()                               {}
-func (s *testStream) Seek(time.Duration)                    {}
-func (s *testStream) SetVolume(float64)                     {}
+func (s *testStream) Preload(string)                                 {}
+func (s *testStream) Crossfade(string, time.Duration, float64) error { return nil }
+func (s *testStream) Play() error                                    { s.get().Playing(true); return nil }
+func (s *testStream) Pause()                                         { s.get().Playing(false) }
+func (s *testStream) Stop()                                          {}
+func (s *testStream) Unload()                                        {}
+func (s *testStream) Seek(time.Duration)                             {}
+func (s *testStream) SetVolume(float64)                              {}
+func (s *testStream) SetSpeed(float64)                               {}
 
 type testDevice struct{}
 

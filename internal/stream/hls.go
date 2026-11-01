@@ -40,9 +40,6 @@ type segment struct {
 	// uri is where it is, resolved against the playlist's URL.
 	uri      string
 	duration time.Duration
-	// discontinuity is set when it doesn't follow on from the segment
-	// before: EXT-X-DISCONTINUITY.
-	discontinuity bool
 }
 
 // end is the media sequence number after the playlist's last segment.
@@ -50,8 +47,9 @@ func (m mediaPlaylist) end() int64 { return m.sequence + int64(len(m.segments)) 
 
 // parseMediaPlaylist reads an HLS media playlist, whose URIs are relative
 // to base. It reads what the live route needs and passes over the tags it
-// doesn't, as clients must: among them EXT-X-PROGRAM-DATE-TIME, and the ad
-// cues of EXT-X-DATERANGE and EXT-X-CUEPOINT. Segments it can't fetch whole
+// doesn't, as clients must: among them EXT-X-PROGRAM-DATE-TIME, the ad
+// cues of EXT-X-DATERANGE and EXT-X-CUEPOINT, and EXT-X-DISCONTINUITY,
+// after which the engine plays the frames of another config, if they are. Segments it can't fetch whole
 // and play as they come are errors: encrypted ones, those of fragmented
 // MP4, and byte ranges.
 func parseMediaPlaylist(text string, base *url.URL) (mediaPlaylist, error) {
@@ -60,10 +58,7 @@ func parseMediaPlaylist(text string, base *url.URL) (mediaPlaylist, error) {
 	if !ok {
 		return m, fmt.Errorf("%w: no #EXTM3U", errPlaylist)
 	}
-	var (
-		duration      time.Duration
-		discontinuity bool
-	)
+	var duration time.Duration
 	for text != "" {
 		var line string
 		line, text, _ = strings.Cut(text, "\n")
@@ -92,8 +87,6 @@ func parseMediaPlaylist(text string, base *url.URL) (mediaPlaylist, error) {
 					return m, fmt.Errorf("%w: a segment of %q seconds", errPlaylist, d)
 				}
 				duration = time.Duration(s * float64(time.Second))
-			case "#EXT-X-DISCONTINUITY":
-				discontinuity = true
 			case "#EXT-X-ENDLIST":
 				m.ended = true
 			case "#EXT-X-KEY":
@@ -113,8 +106,8 @@ func parseMediaPlaylist(text string, base *url.URL) (mediaPlaylist, error) {
 			if err != nil {
 				return m, err
 			}
-			m.segments = append(m.segments, segment{uri: uri, duration: duration, discontinuity: discontinuity})
-			duration, discontinuity = 0, false
+			m.segments = append(m.segments, segment{uri: uri, duration: duration})
+			duration = 0
 		}
 	}
 	if m.target <= 0 {

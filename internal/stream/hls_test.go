@@ -37,7 +37,7 @@ func TestParseMediaPlaylist(t *testing.T) {
 	}
 	want := mediaPlaylist{target: 5 * time.Second, sequence: 1287944, segments: []segment{
 		{seq: 1287944, uri: "https://media.test/videoplayback/sq/1287944/segment.ts", duration: 5 * time.Second},
-		{seq: 1287945, uri: "https://media.test/videoplayback/sq/1287945/segment.ts", duration: 5 * time.Second, discontinuity: true},
+		{seq: 1287945, uri: "https://media.test/videoplayback/sq/1287945/segment.ts", duration: 5 * time.Second},
 		{seq: 1287946, uri: "https://media.test/videoplayback/sq/1287946/segment.ts", duration: 5 * time.Second},
 	}}
 	if !reflect.DeepEqual(m, want) || m.end() != 1287947 {

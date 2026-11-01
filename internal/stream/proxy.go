@@ -39,9 +39,14 @@ type Proxy struct {
 	failures map[string]string // why the last request of a video failed
 }
 
-// NewProxy returns a proxy of the streams r resolves.
+// NewProxy returns a proxy of the streams r resolves. Its connections are
+// its own, so that dropping them leaves other clients' alone.
 func NewProxy(r *Resolver) *Proxy {
-	return &Proxy{Resolver: r, HTTP: &http.Client{Timeout: 2 * time.Minute}}
+	client := &http.Client{Timeout: 2 * time.Minute}
+	if t, ok := http.DefaultTransport.(*http.Transport); ok {
+		client.Transport = t.Clone()
+	}
+	return &Proxy{Resolver: r, HTTP: client}
 }
 
 // Path returns the path the proxy serves a video's audio at.

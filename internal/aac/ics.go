@@ -93,6 +93,18 @@ func (p *pulse) parse(r *bitReader, info *icsInfo) error {
 	return nil
 }
 
+// apply adds the pulses to the quantized spectrum q, away from zero, as
+// the standard decodes them before the inverse quantization.
+func (p *pulse) apply(q []int32) {
+	for i := range p.count {
+		if k := p.offset[i]; q[k] > 0 {
+			q[k] += p.amp[i]
+		} else {
+			q[k] -= p.amp[i]
+		}
+	}
+}
+
 // ics is individual_channel_stream, what it codes of a channel's spectrum.
 type ics struct {
 	info       icsInfo
@@ -139,7 +151,13 @@ func (s *ics) parse(r *bitReader, t *rateTables, commonWindow bool) error {
 	if r.flag() {
 		return fmt.Errorf("aac: gain control, of AAC SSR: %w", errors.ErrUnsupported)
 	}
-	return s.parseSpectralData(r)
+	if err := s.parseSpectralData(r); err != nil {
+		return err
+	}
+	if s.pulse.present {
+		s.pulse.apply(s.quant[:])
+	}
+	return nil
 }
 
 // parseSections reads section_data: the codebook of each band.

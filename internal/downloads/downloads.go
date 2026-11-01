@@ -331,19 +331,15 @@ func (m *Manager) tell() {
 	}
 }
 
-// tellSoon tells the watchers of progress, tellEvery at most.
+// tellSoon tells the watchers, tellEvery at most, beside its caller, which
+// may hold mu: a watcher may ask the manager what changed.
 func (m *Manager) tellSoon() {
 	m.watchMu.Lock()
 	if m.telling {
 		m.watchMu.Unlock()
 		return
 	}
-	wait := tellEvery - time.Since(m.toldAt)
-	if wait <= 0 {
-		m.watchMu.Unlock()
-		m.tell()
-		return
-	}
+	wait := max(tellEvery-time.Since(m.toldAt), 0)
 	m.telling = true
 	m.watchMu.Unlock()
 	time.AfterFunc(wait, func() {

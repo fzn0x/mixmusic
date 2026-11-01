@@ -795,3 +795,17 @@ func TestNilManager(t *testing.T) {
 	m.Remove("yt:a")
 	m.Close()
 }
+
+// TestWatchAsksBack tells the watchers beside the manager's lock, so that
+// they may ask it what changed.
+func TestWatchAsksBack(t *testing.T) {
+	m := open(t, t.TempDir(), Options{Fetcher: &fetcher{}})
+	told := make(chan string, 100)
+	defer m.Watch(func() { told <- m.Folder() })()
+	m.Add([]media.Track{yt("abababababa", "Asked")}, "best")
+	select {
+	case <-told:
+	case <-time.After(5 * time.Second):
+		t.Fatal("the watcher wasn't told, or waits for the manager")
+	}
+}

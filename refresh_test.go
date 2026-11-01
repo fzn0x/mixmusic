@@ -11,6 +11,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/plugins"
@@ -320,4 +321,47 @@ export default function activate(api) {
 	until(t, s, tt, "the first render", func() bool { return tt.HasText("rendered 1") })
 	tt.Key(0, ui.KeyF5)
 	until(t, s, tt, "the render of the refresh", func() bool { return tt.HasText("rendered 2") })
+}
+
+// TestRefreshRegistry asks the community registry itself on a refresh of
+// the marketplace, past the answer the app keeps for ten minutes, which
+// coming back to the page shows.
+func TestRefreshRegistry(t *testing.T) {
+	s := newTestShell(t)
+	community := t.TempDir()
+	s.a.ReadCommunityFrom(community)
+	theme := func(id, name string) string {
+		return `{"id": "` + id + `", "name": "` + name + `", "version": "1.0.0", "author": "A", "path": "themes/` + id + `", "files": ["theme.json"]}`
+	}
+	publish := func(themes ...string) {
+		t.Helper()
+		data := `{"version": 2, "baseUrl": "https://raw.githubusercontent.com/fzn0x/mixmusic/registry/", "themes": [` + strings.Join(themes, ", ") + `], "plugins": []}`
+		if err := os.WriteFile(filepath.Join(community, "registry-2.json"), []byte(data), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	publish(theme("neon-nights", "Neon Nights"))
+	tt := tester(t, s)
+	show(s, tt, "/marketplace")
+	came := func() bool { return s.loads["registry"].(*loaded[addons.Registry]).done }
+	until(t, s, tt, "the registry", came)
+	// What another test kept of the registry goes.
+	s.refreshPage()
+	waitRefreshed(t, s, tt)
+	if !tt.HasText("neon nights") {
+		t.Fatalf("the marketplace doesn't show the registry: %q", tt.Texts())
+	}
+
+	publish(theme("neon-nights", "Neon Nights"), theme("paper-mint", "Paper Mint"))
+	s.forget("registry") // as the page's try again
+	tt.Frame()
+	until(t, s, tt, "the registry again", came)
+	if tt.HasText("paper mint") {
+		t.Fatal("the registry kept for ten minutes didn't keep")
+	}
+	tt.Key(0, ui.KeyF5)
+	waitRefreshed(t, s, tt)
+	if !tt.HasText("paper mint") {
+		t.Errorf("the refresh didn't ask the registry: %q", tt.Texts())
+	}
 }

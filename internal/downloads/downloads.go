@@ -283,6 +283,16 @@ func (m *Manager) check() {
 	if m.dir != dir {
 		return // moved meanwhile
 	}
+	// What failed to go meanwhile stays to go.
+	tried := map[string]bool{}
+	for _, p := range pending {
+		tried[p] = true
+	}
+	for _, p := range m.idx.Pending {
+		if !tried[p] {
+			left = append(left, p)
+		}
+	}
 	m.idx.Pending = left
 	for _, video := range gone {
 		log.Printf("mixmusic: the download of %s went missing; downloading it again", video)

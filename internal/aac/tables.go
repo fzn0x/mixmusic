@@ -1,8 +1,13 @@
 package aac
 
-// Port of Syntax/ScaleFactorBands.cs.
+// Port of Syntax/ScaleFactorBands.cs, Syntax/IQTable.cs and
+// Syntax/ScaleFactorTable.cs, whose tables of powers this package
+// computes rather than holds.
 
-import "sync"
+import (
+	"math"
+	"sync"
+)
 
 // rateTables are the tables of a sampling frequency index.
 type rateTables struct {
@@ -38,7 +43,47 @@ var (
 	shortWindows = [2]*[128]float32{&sine128, &kbd128}
 )
 
+// outScale scales the spectrum, whose samples come in the range of 16
+// bits, to [-1, 1].
+const outScale = 1.0 / 32768
+
+var (
+	// iqTable is the inverse quantization: |q|^(4/3) of each quantized
+	// value |q| up to 8191, the most an escape codes.
+	iqTable [8192]float32
+	// pow2q is the gain of each scalefactor and noise energy x, and the
+	// inverse of each intensity position: 2^((x-100)/4).
+	pow2q [256]float32
+)
+
 // initTables builds the tables a Decoder needs, once.
 var initTables = sync.OnceFunc(func() {
 	initBooks()
+	for i := range iqTable {
+		iqTable[i] = float32(float64(i) * math.Cbrt(float64(i)))
+	}
+	for i := range pow2q {
+		pow2q[i] = float32(math.Exp2(float64(i-100) / 4))
+	}
+	mdctLong.init(2048)
+	mdctShort.init(256)
 })
+
+// dequantize is the inverse quantization of q: sign(q) |q|^(4/3).
+func dequantize(q int32) float32 {
+	a := q
+	if a < 0 {
+		a = -a
+	}
+	var v float32
+	if a < int32(len(iqTable)) {
+		v = iqTable[a]
+	} else {
+		// Pulses may add up to 60 to an escaped value.
+		v = float32(float64(a) * math.Cbrt(float64(a)))
+	}
+	if q < 0 {
+		return -v
+	}
+	return v
+}

@@ -142,6 +142,7 @@ func (s playerServices) Report(now player.Now) {
 	np := NowPlaying{
 		Track:      now.Track,
 		Playing:    now.Playing,
+		Loading:    now.Loading,
 		PositionMs: int(now.Position / time.Millisecond),
 		DurationMs: int(now.Duration / time.Millisecond),
 		Volume:     now.Volume,

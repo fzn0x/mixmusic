@@ -207,12 +207,21 @@ func (l *videoLink) send(cmd videoCmd) {
 		st, err = l.call(ctx, fmt.Sprintf("return mv.sync({at: %s, sentAt: %s, playing: %t, active: %t, filter: %s})",
 			strconv.FormatFloat(at.Seconds(), 'f', 4, 64), strconv.FormatFloat(sentAt, 'f', 3, 64), cmd.playing, cmd.active, filter))
 	}
-	if err != nil {
-		if cmd.src == nil || errors.Is(err, context.Canceled) {
-			return
+	var thrown pageError
+	switch {
+	case err == nil:
+		if cmd.src != nil && st.Src != cmd.src.Src {
+			// The page lost the picture, as when it loaded again: the next
+			// command loads it.
+			l.loaded = ""
 		}
-		st = videoStatus{Src: cmd.src.Src, Failed: err.Error()}
-		l.loaded = ""
+	case cmd.src != nil && errors.As(err, &thrown):
+		st = videoStatus{Src: cmd.src.Src, Failed: thrown.msg}
+	default:
+		// No answer in time, or no page: what the page holds isn't known,
+		// so the next command loads the picture anew, or clears it.
+		l.loaded = unknownPicture
+		return
 	}
 	if !st.same(l.last) {
 		l.last = st
@@ -220,8 +229,18 @@ func (l *videoLink) send(cmd videoCmd) {
 	}
 }
 
+// unknownPicture is what a videoLink takes the page to play when it
+// didn't answer: no picture's stream.
+const unknownPicture = "?"
+
+// pageError is what the page threw, as it words it.
+type pageError struct{ msg string }
+
+func (e pageError) Error() string { return e.msg }
+
 // pageCall returns the call of a videoLink to page: it runs js there and
-// reads what it returns as a videoStatus.
+// reads what it returns as a videoStatus. What the page throws is a
+// pageError.
 func pageCall(page *mygo.Page) func(context.Context, string) (videoStatus, error) {
 	return func(ctx context.Context, js string) (videoStatus, error) {
 		var st videoStatus
@@ -229,7 +248,7 @@ func pageCall(page *mygo.Page) func(context.Context, string) (videoStatus, error
 		if err != nil {
 			var evalErr *mygo.EvalError
 			if errors.As(err, &evalErr) {
-				return st, errors.New(strings.TrimPrefix(evalErr.Message, "Error: "))
+				return st, pageError{strings.TrimPrefix(evalErr.Message, "Error: ")}
 			}
 			return st, err
 		}

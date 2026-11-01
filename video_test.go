@@ -78,6 +78,7 @@ type fakePage struct {
 	mu      sync.Mutex
 	scripts []string
 	status  videoStatus
+	err     error // what the next call fails with
 	ran     chan string
 }
 
@@ -86,10 +87,18 @@ func newFakePage() *fakePage { return &fakePage{ran: make(chan string, 100)} }
 func (f *fakePage) call(_ context.Context, js string) (videoStatus, error) {
 	f.mu.Lock()
 	f.scripts = append(f.scripts, js)
-	st := f.status
+	st, err := f.status, f.err
+	f.err = nil
 	f.mu.Unlock()
 	f.ran <- js
-	return st, nil
+	return st, err
+}
+
+// fails has the next call fail with err.
+func (f *fakePage) fails(err error) {
+	f.mu.Lock()
+	f.err = err
+	f.mu.Unlock()
 }
 
 // next returns the next script the page runs.
@@ -156,6 +165,41 @@ func TestVideoLink(t *testing.T) {
 		t.Errorf("reported %+v more", st)
 	default:
 	}
+	// A page that doesn't answer in time is told the picture again.
+	page.fails(context.DeadlineExceeded)
+	l.post(videoCmd{src: src, active: true, playing: true})
+	page.next(t)
+	l.post(videoCmd{src: src, active: true, playing: true})
+	if js := page.next(t); !strings.HasPrefix(js, "return mv.load(") {
+		t.Errorf("after no answer, %s", js)
+	}
+	page.next(t)
+	// So is one that lost it, as when it loaded again.
+	page.mu.Lock()
+	page.status = videoStatus{}
+	page.mu.Unlock()
+	l.post(videoCmd{src: src, active: true, playing: true})
+	page.next(t)
+	if st := <-reports; st.Src != "" {
+		t.Errorf("reported %+v", st)
+	}
+	page.mu.Lock()
+	page.status = videoStatus{Src: src.Src}
+	page.mu.Unlock()
+	l.post(videoCmd{src: src, active: true, playing: true})
+	if js := page.next(t); !strings.HasPrefix(js, "return mv.load(") {
+		t.Errorf("after a page that lost the picture, %s", js)
+	}
+	page.next(t)
+	<-reports
+	// What the page throws is why the picture failed.
+	page.fails(pageError{"mv is not defined"})
+	l.post(videoCmd{src: src, active: true, playing: true})
+	page.next(t)
+	if st := <-reports; st.Src != src.Src || st.Failed != "mv is not defined" {
+		t.Errorf("reported %+v", st)
+	}
+
 	l.post(videoCmd{})
 	if js := page.next(t); js != "return mv.clear()" {
 		t.Errorf("clears with %s", js)

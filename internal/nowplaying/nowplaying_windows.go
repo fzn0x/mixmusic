@@ -236,7 +236,10 @@ type winControls struct {
 	// with the tokens that remove them.
 	buttons, seeks           *delegate
 	buttonsToken, seeksToken int64
-	shown                    *Info
+	// shown is what shows, as the flyout may move it on: at 1×.
+	shown *Info
+	// rate is the rate the controls were told last, or 0.
+	rate float64
 	// artwork is the address of the artwork shown, fetching that of the
 	// artwork that downloads.
 	artwork, fetching string
@@ -448,20 +451,34 @@ func (w *winControls) show(next *Info) { w.do(func() { w.update(next) }) }
 
 // update shows next, or nothing for nil, on the thread.
 func (w *winControls) update(next *Info) {
-	c := diff(w.shown, next)
-	if next != nil && w.shown != nil && !c.track && !c.playing && !c.seeked {
+	// The controls are told the rate where they can be, but whether the
+	// flyout moves the position on at it, rather than at 1×, it doesn't
+	// say: where the track is shows again whenever it drifts from 1×.
+	var shown *Info
+	if next != nil {
+		at1 := *next
+		at1.Rate = 0
+		shown = &at1
+	}
+	c := diff(w.shown, shown)
+	rate := next != nil && next.rate() != w.rate
+	if next != nil && w.shown != nil && !c.track && !c.playing && !c.seeked && !rate {
 		// The flyout has no volume, and moves the position on itself.
 		return
 	}
-	w.shown = next
+	w.shown = shown
 	defer w.settle()
 	if next == nil {
 		w.clear()
-		w.cleared = time.Now()
+		w.cleared, w.rate = time.Now(), 0
 		return
 	}
 	if c.track {
 		w.describe(next)
+	}
+	if rate {
+		w.setRate(next.rate())
+		w.rate = next.rate()
 	}
 	status := uintptr(statusPaused)
 	if next.Playing {

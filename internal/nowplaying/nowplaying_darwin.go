@@ -252,8 +252,9 @@ func (m *macControls) close() {
 func (m *macControls) show(next *Info) {
 	m.mu.Lock()
 	if next != nil && m.shown != nil {
-		if c := diff(m.shown, next); !c.track && !c.playing && !c.seeked {
-			// Now Playing has no volume, and moves the position on itself.
+		if c := diff(m.shown, next); !c.track && !c.playing && !c.seeked && !c.rate {
+			// Now Playing has no volume, and moves the position on itself,
+			// at the rate it was told.
 			m.mu.Unlock()
 			return
 		}
@@ -314,7 +315,7 @@ func (m *macControls) update() {
 	set(keyElapsed, nsNumber(info.position(time.Now()).Seconds()))
 	rate, state := 0.0, uint(mpPlaybackStatePaused)
 	if info.Playing {
-		rate, state = 1, mpPlaybackStatePlaying
+		rate, state = info.rate(), mpPlaybackStatePlaying
 	}
 	set(keyRate, nsNumber(rate))
 	set(keyDefaultRate, nsNumber(1))

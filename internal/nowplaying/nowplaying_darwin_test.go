@@ -136,6 +136,13 @@ func TestNowPlaying(t *testing.T) {
 	if s.elapsed < 10 || s.elapsed > 12 {
 		t.Errorf("elapsed %v s, want about 10", s.elapsed)
 	}
+	faster := info
+	faster.Rate, faster.At = 1.5, time.Now()
+	c.Show(&faster)
+	eventually(t, "Now Playing at 1.5×", func() bool {
+		s = nowPlaying()
+		return s.rate == 1.5
+	})
 	if s.state != mpPlaybackStatePlaying {
 		t.Errorf("playback state %d", s.state)
 	}

@@ -335,6 +335,9 @@ func (l *linuxControls) show(next *Info) {
 	if c.volume {
 		props = append(props, "Volume")
 	}
+	if c.rate {
+		props = append(props, "Rate")
+	}
 	if len(props) > 0 {
 		entries := make([]uintptr, len(props))
 		for i, p := range props {
@@ -343,7 +346,9 @@ func (l *linuxControls) show(next *Info) {
 		l.emit("org.freedesktop.DBus.Properties", "PropertiesChanged",
 			tuple(gVariantNewString(playerInterface), array("{sv}", entries), array("s", nil)))
 	}
-	if c.seeked {
+	// Clients move the position on at the rate: at another, they go on
+	// from where it is now.
+	if c.seeked || c.rate {
 		l.emit(playerInterface, "Seeked", tuple(gVariantNewInt64(micro(next.position(time.Now())))))
 	}
 }
@@ -436,8 +441,15 @@ func (l *linuxControls) property(name string) uintptr {
 			return gVariantNewString("Playing")
 		}
 		return gVariantNewString("Paused")
-	case "Rate", "MinimumRate", "MaximumRate":
-		return gVariantNewDouble(1)
+	case "Rate":
+		if info == nil {
+			return gVariantNewDouble(1)
+		}
+		return gVariantNewDouble(info.rate())
+	case "MinimumRate":
+		return gVariantNewDouble(MinRate)
+	case "MaximumRate":
+		return gVariantNewDouble(MaxRate)
 	case "Metadata":
 		return metadata(info)
 	case "Volume":
@@ -525,9 +537,20 @@ func mprisGet(_ uintptr, _, _, _, prop *byte, _, _ uintptr) uintptr {
 }
 
 func mprisSet(_ uintptr, _, _, _, prop *byte, value, _, _ uintptr) bool {
-	// Rate stays 1, as MinimumRate and MaximumRate tell.
-	if l := mprisCurrent.Load(); l != nil && goString(prop) == "Volume" {
+	l := mprisCurrent.Load()
+	if l == nil {
+		return true
+	}
+	switch goString(prop) {
+	case "Volume":
 		l.ask(Request{Command: SetVolume, Volume: min(max(gVariantGetDouble(value), 0), 1)})
+	case "Rate":
+		// A rate of 0 pauses, as MPRIS has it.
+		if v := gVariantGetDouble(value); v > 0 {
+			l.ask(Request{Command: SetRate, Rate: min(max(v, MinRate), MaxRate)})
+		} else if v == 0 {
+			l.ask(Request{Command: Pause})
+		}
 	}
 	return true
 }

@@ -25,6 +25,19 @@ All notable changes to MixMusic are documented here. The format follows
   status comes from your Discord account's link to Spotify: to show only
   MixMusic, turn off Display Spotify as your status in Discord's
   Connections.
+- The Windows installer offers to close a running MixMusic before it
+  upgrades it, and stops one that keeps running in the tray.
+
+### Fixed
+
+- On macOS 26 and 27, macOS no longer runs an AutoFill helper for
+  MixMusic's windows, which took CPU and could stall scrolling (#85).
+- On macOS, Cmd+Q, the Dock's Quit and the tray menu's Quit end MixMusic
+  even when a restart, as after an update, left it running without a
+  window (#86). The restart that installs this version still runs the old
+  version's code.
+- On Windows, a frame the screen never takes no longer holds up MixMusic
+  for a second (#87).
 
 ## [0.5.5] - 2026-10-28
 

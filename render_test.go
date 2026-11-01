@@ -5,6 +5,7 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -40,8 +41,10 @@ func TestMain(m *testing.M) {
 // testPlayer is the app as a player's services, playing nothing.
 type testPlayer struct{}
 
+// Prepare finds the stream of a track: a live one of the IDs that start
+// with "yt:live".
 func (testPlayer) Prepare(_ context.Context, t media.Track) (player.Source, error) {
-	return player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t}, nil
+	return player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t, Live: strings.HasPrefix(t.ID, "yt:live")}, nil
 }
 
 func (p testPlayer) PrepareStream(ctx context.Context, t media.Track) (player.Source, error) {

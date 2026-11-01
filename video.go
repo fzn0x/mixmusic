@@ -338,8 +338,14 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 	if len(art) == 0 {
 		art = t.Artwork
 	}
-	res := s.videoSource(rec)
+	// While the system asks for less motion, nothing loads until the user
+	// asks for the picture.
+	asked := !c.Preferences().ReduceMotion || v.played[rec.ID]
+	var res *loaded[app.VideoSource]
 	var src *app.VideoSource
+	if asked {
+		res = s.videoSource(rec)
+	}
 	if res != nil && res.done && res.err == nil {
 		src = &res.value
 	}
@@ -347,7 +353,7 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 	ui.Box(c.Key("sleeve-video")).Size(w, h).Shrink(0).Radius(k.radiusSm).Clip().Children(func() {
 		s.videoCover(c, art, w, h)
 		switch {
-		case c.Preferences().ReduceMotion && !v.played[rec.ID]:
+		case !asked:
 			// No motion the user didn't ask for: a play button asks.
 			b := s.buttonBase(c.Key("sleeve-video-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().
 				Right(8).Bottom(8).Label("Play the video").Tooltip("Play the video").Cursor(ui.CursorPointer)

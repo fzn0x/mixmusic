@@ -17,6 +17,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // captureFromEnv saves screenshots of the window, for development.
@@ -26,7 +27,8 @@ import (
 // the songs a search finds, act:resume plays the queue, act:wait:<duration>
 // waits, act:palette opens the command palette, act:panel:<queue|lyrics|none>
 // shows a side panel, act:scroll:<y|end> scrolls the page, act:theme:<id>
-// wears a theme, act:mini opens the mini player, which saves itself,
+// wears a theme, act:colors:<off|pywal|matugen|path> takes the colours
+// from a file, act:mini opens the mini player, which saves itself,
 // act:spotify logs whether MixMusic's own Spotify device could play,
 // act:title logs the window's title, which screenshots leave out,
 // act:memory logs the Go heap, and act:heap saves a profile of it. Nothing
@@ -151,6 +153,11 @@ func (s *shell) captureFromEnv() {
 					s.set.Theme, s.set.FollowSystem = arg, false
 					s.save()
 				})
+			case "colors":
+				s.win.Update(func() {
+					colorsStep(&s.set, arg)
+					s.save()
+				})
 			case "shot":
 				time.Sleep(wait)
 				save(arg)
@@ -171,6 +178,21 @@ func (s *shell) captureFromEnv() {
 			mygo.App.Quit()
 		}
 	}()
+}
+
+// colorsStep takes the colours from where act:colors:<arg> says: off,
+// pywal, matugen, or the path of a file.
+func colorsStep(set *settings.Settings, arg string) {
+	switch arg {
+	case "off", "":
+		set.ColorSource = settings.ColorsTheme
+	case "pywal":
+		set.ColorSource = settings.ColorsPywal
+	case "matugen":
+		set.ColorSource = settings.ColorsMatugen
+	default:
+		set.ColorSource, set.ColorFile = settings.ColorsFile, arg
+	}
 }
 
 // captureWait is how long a page gets before its screenshot.

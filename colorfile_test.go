@@ -453,3 +453,21 @@ func TestColorFileSettingsViewed(t *testing.T) {
 		}
 	}
 }
+
+// TestColorsStep takes the colours from where capture mode's act:colors
+// says.
+func TestColorsStep(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "colors.json")
+	for arg, want := range map[string]settings.Settings{
+		"pywal":   {ColorSource: settings.ColorsPywal},
+		"matugen": {ColorSource: settings.ColorsMatugen},
+		path:      {ColorSource: settings.ColorsFile, ColorFile: path},
+		"off":     {ColorSource: settings.ColorsTheme},
+	} {
+		var set settings.Settings
+		colorsStep(&set, arg)
+		if set.ColorSource != want.ColorSource || set.ColorFile != want.ColorFile {
+			t.Errorf("act:colors:%s gave %q %q", arg, set.ColorSource, set.ColorFile)
+		}
+	}
+}

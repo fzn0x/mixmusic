@@ -206,6 +206,17 @@ type shell struct {
 	drafts                  map[string]*draft
 	lastfmKey, lastfmSecret string
 	signingIn               string
+	// youtubeCookies is the YouTube Music sign-in with a browser's cookies:
+	// the browsers to import from, the one chosen and its profile, the
+	// header pasted, and why the last try failed; youtubePick asks for the
+	// account and channel of the session it signed in with.
+	youtubeCookies struct {
+		browsers         []app.YouTubeBrowser
+		names            []string
+		browser, profile string
+		pasted, problem  string
+	}
+	youtubePick bool
 	// wells are the colour wells' colours, by key; tools are how the user
 	// sorted and searched the lists of tracks, by key.
 	wells map[string]*colorWell

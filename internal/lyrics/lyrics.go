@@ -28,6 +28,10 @@ var (
 	// with an error of its own, as when it is down: the track may have
 	// lyrics all the same.
 	ErrUnavailable = errors.New("lyrics: LRCLIB isn't answering")
+	// ErrNotFoundYet is returned for a track LRCLIB's own database has no
+	// lyrics of, while LRCLIB was too busy to search it or to look on
+	// other sites, which may find some later.
+	ErrNotFoundYet = errors.New("lyrics: not found, though LRCLIB was too busy to look everywhere")
 )
 
 // Line is a line of lyrics, with the time it is sung at when the lyrics
@@ -81,6 +85,11 @@ type record struct {
 
 // Get returns the lyrics of a track: the exact track when LRCLIB has it,
 // else the search result closest in duration.
+//
+// When LRCLIB is busy, it refuses its search and the lookups it makes on
+// other sites, with HTTP 503, but still answers from its own database:
+// the exact track is then looked up there, and a track it doesn't have
+// is ErrNotFoundYet rather than ErrUnavailable.
 func (c *Client) Get(ctx context.Context, t media.Track) (Lyrics, error) {
 	artist := ""
 	if len(t.Artists) > 0 {
@@ -94,14 +103,26 @@ func (c *Client) Get(ctx context.Context, t media.Track) (Lyrics, error) {
 		q.Set("duration", strconv.Itoa(int(math.Round(float64(t.DurationMs)/1000))))
 	}
 	var rec record
+	busy := false
 	err := c.get(ctx, "/get", q, &rec)
+	if errors.Is(err, ErrUnavailable) {
+		if cached := c.get(ctx, "/get-cached", q, &rec); !errors.Is(cached, ErrUnavailable) {
+			err, busy = cached, true
+		}
+	}
 	if errors.Is(err, ErrNotFound) {
 		var found []record
-		if err := c.get(ctx, "/search", url.Values{"track_name": {t.Title}, "artist_name": {artist}}, &found); err != nil {
+		switch err := c.get(ctx, "/search", url.Values{"track_name": {t.Title}, "artist_name": {artist}}, &found); {
+		case errors.Is(err, ErrUnavailable):
+			busy = true
+		case err != nil:
 			return Lyrics{}, err
 		}
 		best, ok := closest(found, t.DurationMs)
 		if !ok {
+			if busy {
+				return Lyrics{}, ErrNotFoundYet
+			}
 			return Lyrics{}, ErrNotFound
 		}
 		rec = best

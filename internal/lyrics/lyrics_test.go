@@ -94,6 +94,58 @@ func TestGetNotFound(t *testing.T) {
 	}
 }
 
+// busy is LRCLIB too busy for its search and the lookups it makes on
+// other sites, as it answered on 2026-11-01, whose own database answers
+// with cached for the exact track.
+func busy(cached func(w http.ResponseWriter)) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/get-cached" {
+			cached(w)
+			return
+		}
+		w.WriteHeader(http.StatusServiceUnavailable)
+		w.Write([]byte(`{"message":"The server is busy, please retry in a moment","name":"ServerOverloaded","statusCode":503}`))
+	}))
+}
+
+// TestGetBusy takes the lyrics LRCLIB's database has while LRCLIB is busy,
+// and tells a track it hasn't from LRCLIB out of reach.
+func TestGetBusy(t *testing.T) {
+	srv := busy(func(w http.ResponseWriter) { w.Write([]byte(`{"duration": 200, "syncedLyrics": "[00:01.00]Cached"}`)) })
+	defer srv.Close()
+	c := New("test")
+	c.BaseURL = srv.URL
+	if l, err := c.Get(context.Background(), song); err != nil || l.Lines[0].Text != "Cached" {
+		t.Errorf("busy, in the database: lyrics = %+v, %v", l, err)
+	}
+
+	missing := busy(func(w http.ResponseWriter) { w.WriteHeader(http.StatusNotFound) })
+	defer missing.Close()
+	c.BaseURL = missing.URL
+	_, err := c.Get(context.Background(), song)
+	if !errors.Is(err, ErrNotFoundYet) || errors.Is(err, ErrNotFound) || errors.Is(err, ErrUnavailable) {
+		t.Errorf("busy, not in the database: err = %v", err)
+	}
+}
+
+// TestGetSearchBusy tells a track LRCLIB found no exact lyrics of, and
+// was too busy to search for, as not found yet.
+func TestGetSearchBusy(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/get" {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	defer srv.Close()
+	c := New("test")
+	c.BaseURL = srv.URL
+	if _, err := c.Get(context.Background(), song); !errors.Is(err, ErrNotFoundYet) {
+		t.Errorf("err = %v", err)
+	}
+}
+
 // LRCLIB down, or out of reach, is not a track without lyrics.
 func TestGetUnavailable(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

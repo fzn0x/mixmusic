@@ -4,6 +4,8 @@ node_modules/
 # Builds
 /dist/
 /build/
+/result
+/result-*
 /.mygo/
 mygo_windows_*.syso
 *.exe

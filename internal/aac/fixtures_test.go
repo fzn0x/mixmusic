@@ -14,11 +14,13 @@ var update = flag.Bool("update", false, "encode the fixtures of testdata again w
 
 // fixtures are the files of testdata: half a second or so of synthesized
 // signals, as ffmpeg 7.0's aac encoder encodes them, which exercise the
-// tools of AAC-LC between them. They were made with
+// tools of AAC-LC between them. The one of M/S in every band leaves PNS
+// off: ffmpeg's decoder gives each channel noise of its own where the
+// standard has them share it. They were made with
 //
 //	ffmpeg -f lavfi -i "aevalsrc=0.2*sin(2*PI*330*t)+0.8*lt(mod(t\,0.2)\,0.002)*sin(2*PI*3000*t)|0.2*sin(2*PI*495*t)+0.7*lt(mod(t+0.1\,0.2)\,0.002):s=44100:d=0.6" -c:a aac -b:a 128k -f adts stereo-44k-clicks.aac
 //	ffmpeg -f lavfi -i "aevalsrc=0.6*(random(0)*2-1)*gt(mod(t\,0.25)\,0.15)+0.1*sin(2*PI*220*t):s=48000:d=0.6" -c:a aac -b:a 96k -f adts mono-48k-bursts.aac
-//	ffmpeg -f lavfi -i "aevalsrc=0.4*sin(2*PI*440*t)+0.3*lt(mod(t\,0.2)\,0.002)+0.05*(random(0)*2-1)|0.38*sin(2*PI*440*t)+0.3*lt(mod(t\,0.2)\,0.002)+0.05*(random(0)*2-1):s=48000:d=0.6" -c:a aac -b:a 96k -aac_ms 1 -f adts stereo-48k-ms.aac
+//	ffmpeg -f lavfi -i "aevalsrc=0.4*sin(2*PI*440*t)+0.3*lt(mod(t\,0.2)\,0.002)+0.05*(random(0)*2-1)|0.38*sin(2*PI*440*t)+0.3*lt(mod(t\,0.2)\,0.002)+0.05*(random(0)*2-1):s=48000:d=0.6" -c:a aac -b:a 96k -aac_ms 1 -aac_pns 0 -f adts stereo-48k-ms.aac
 //	ffmpeg -f lavfi -i "aevalsrc=(0.5*sin(2*PI*1000*t)+0.3*sin(2*PI*2500*t))*exp(-30*mod(t\,0.25))|(0.4*sin(2*PI*800*t))*exp(-40*mod(t+0.1\,0.25)):s=44100:d=2" -c:a aac -b:a 128k -aac_tns 1 -f adts stereo-44k-tns.aac
 //	ffmpeg -f lavfi -i "aevalsrc=0.3*(random(0)*2-1)+0.2*sin(2*PI*300*t)|-0.15*(random(0)*2-1)+0.2*sin(2*PI*450*t):s=44100:d=0.6" -c:a aac -b:a 48k -aac_is 1 -f adts stereo-44k-is.aac
 //	ffmpeg -f lavfi -i "aevalsrc=0.4*sin(2*PI*300*t)+0.3*lt(mod(t\,0.3)\,0.003):s=22050:d=0.6" -c:a aac -b:a 48k -f adts mono-22k.aac
@@ -31,7 +33,7 @@ var update = flag.Bool("update", false, "encode the fixtures of testdata again w
 var fixtures = []encoding{
 	{"stereo-44k-clicks", 2, "aevalsrc=0.2*sin(2*PI*330*t)+0.8*lt(mod(t\\,0.2)\\,0.002)*sin(2*PI*3000*t)|0.2*sin(2*PI*495*t)+0.7*lt(mod(t+0.1\\,0.2)\\,0.002):s=44100:d=0.6", []string{"-b:a", "128k"}},
 	{"mono-48k-bursts", 1, "aevalsrc=0.6*(random(0)*2-1)*gt(mod(t\\,0.25)\\,0.15)+0.1*sin(2*PI*220*t):s=48000:d=0.6", []string{"-b:a", "96k"}},
-	{"stereo-48k-ms", 2, "aevalsrc=0.4*sin(2*PI*440*t)+0.3*lt(mod(t\\,0.2)\\,0.002)+0.05*(random(0)*2-1)|0.38*sin(2*PI*440*t)+0.3*lt(mod(t\\,0.2)\\,0.002)+0.05*(random(0)*2-1):s=48000:d=0.6", []string{"-b:a", "96k", "-aac_ms", "1"}},
+	{"stereo-48k-ms", 2, "aevalsrc=0.4*sin(2*PI*440*t)+0.3*lt(mod(t\\,0.2)\\,0.002)+0.05*(random(0)*2-1)|0.38*sin(2*PI*440*t)+0.3*lt(mod(t\\,0.2)\\,0.002)+0.05*(random(0)*2-1):s=48000:d=0.6", []string{"-b:a", "96k", "-aac_ms", "1", "-aac_pns", "0"}},
 	{"stereo-44k-tns", 2, "aevalsrc=(0.5*sin(2*PI*1000*t)+0.3*sin(2*PI*2500*t))*exp(-30*mod(t\\,0.25))|(0.4*sin(2*PI*800*t))*exp(-40*mod(t+0.1\\,0.25)):s=44100:d=2", []string{"-b:a", "128k", "-aac_tns", "1"}},
 	{"stereo-44k-is", 2, "aevalsrc=0.3*(random(0)*2-1)+0.2*sin(2*PI*300*t)|-0.15*(random(0)*2-1)+0.2*sin(2*PI*450*t):s=44100:d=0.6", []string{"-b:a", "48k", "-aac_is", "1"}},
 	{"mono-22k", 1, "aevalsrc=0.4*sin(2*PI*300*t)+0.3*lt(mod(t\\,0.3)\\,0.003):s=22050:d=0.6", []string{"-b:a", "48k"}},

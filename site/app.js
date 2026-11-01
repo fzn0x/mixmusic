@@ -233,7 +233,6 @@
       all("[data-like]").forEach((b) => {
         const on = st.liked.has(t.file);
         b.setAttribute("aria-pressed", String(on));
-        b.setAttribute("aria-label", on ? "Remove from liked songs" : "Like");
       });
       wrap.style.setProperty("--art", t.art);
       drawTime();
@@ -260,7 +259,11 @@
       $(".r-time", b).textContent = clock(t.dur);
       b.setAttribute("aria-label", `${current ? "Playing: " : "Play "}${t.title} by ${ARTIST}`);
       if (current) b.setAttribute("aria-current", "true");
-      b.addEventListener("click", onPick);
+      b.addEventListener("click", () => {
+        const list = li.parentElement;
+        onPick();
+        $("[aria-current]", list)?.focus();
+      });
       li.append(b);
       return li;
     }
@@ -276,6 +279,7 @@
       const q = st.query.trim().toLowerCase();
       $("[data-page='now']", wrap).hidden = !!q;
       $("[data-page='search']", wrap).hidden = !q;
+      $("[data-rail-search]", wrap).classList.toggle("is-on", !!q);
       if (!q) return;
       $("[data-query]", wrap).textContent = q;
       const results = $("[data-results]", wrap);
@@ -427,6 +431,7 @@
       $("[data-panel-title]", wrap).textContent = p === "lyrics" ? "lyrics" : "up next";
       $("[data-panel-queue]", wrap).hidden = p !== "queue";
       $("[data-panel-lyrics]", wrap).hidden = p !== "lyrics";
+      $("[data-panel-clear]", wrap).hidden = p !== "queue";
       all("[data-show]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.show === p)));
     };
     all("[data-show]").forEach((b) => b.addEventListener("click", () => showPanel(b.dataset.show)));
@@ -453,6 +458,7 @@
     function setView(v) {
       wrap.dataset.view = v;
       fit();
+      if (!audio.paused) listen();
     }
 
     audio.addEventListener("timeupdate", drawTime);
@@ -468,7 +474,7 @@
     let analyser = null;
     let bins = null;
     function listen() {
-      if (analyser || reduced.matches) return;
+      if (analyser || reduced.matches || !canvas.offsetParent) return;
       try {
         const ac = new (window.AudioContext || window.webkitAudioContext)();
         const source = ac.createMediaElementSource(audio);

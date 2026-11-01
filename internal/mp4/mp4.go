@@ -88,18 +88,29 @@ type Reader struct {
 	delay    int64 // the CodecDelay, in ticks
 	duration time.Duration
 
-	table table // the samples of the moov's sample table
-	err   error // returned by ReadPacket after an error
+	// The samples of the moov's sample table, which come first.
+	table   table
+	inTable bool // whether the next sample is of the table
+
+	// The fragments, when the moov has an mvex.
+	fragmented bool
+	trex       map[uint32]trex // the defaults of each track's fragments
+	fragStart  int64           // where the fragments start: after the moov and its mdat
+
+	frag  fragment // the fragment being read
+	after int64    // the offset of the box after it and its mdat, or -1 at the end
+	err   error    // returned by ReadPacket after an error
 }
 
 // NewReader reads the headers of a file, from its start up to its media
-// data: the moov. A moov after the media data is found by skipping them,
-// which costs a seek of the file, and another back to the first sample.
+// data: the moov, and in a fragmented file the sidx after it. A moov after
+// the media data is found by skipping them, which costs a seek of the
+// file, and another back to the first sample.
 //
 // A file without an audio track returns ErrNoAudio, and one whose audio
 // is encrypted an error wrapping errors.ErrUnsupported.
 func NewReader(r io.ReadSeeker) (*Reader, error) {
-	rd := &Reader{src: newSource(r)}
+	rd := &Reader{src: newSource(r), trex: map[uint32]trex{}, after: -1}
 	if err := rd.readHeaders(); err != nil {
 		return nil, err
 	}
@@ -146,13 +157,56 @@ func (r *Reader) readHeaders() error {
 	if err != nil {
 		return err
 	}
+	r.fragStart = h.end()
+	if r.fragmented && r.fragStart >= 0 {
+		if err := r.readAfterMoov(); err != nil {
+			return err
+		}
+	}
+	if !r.fragmented || r.fragStart < 0 {
+		r.fragStart = -1
+	}
 	r.setDuration(m)
+	r.inTable = true
+	r.frag, r.after = fragment{start: r.table.end, end: r.table.end}, r.fragStart
 	return nil
+}
+
+// readAfterMoov reads the boxes after the moov of a fragmented file up
+// to the first moof, to find where the fragments start: after the mdat of
+// the samples of the moov, if any.
+func (r *Reader) readAfterMoov() error {
+	s := r.src
+	for {
+		at := s.offset()
+		h, err := s.readHeader()
+		if err != nil {
+			if isDataError(err) {
+				// No fragments, or a corrupt one, which ReadPacket finds.
+				r.fragStart = at
+				return nil
+			}
+			return err
+		}
+		switch h.typ {
+		case typeMoof:
+			r.fragStart = h.start
+			return nil
+		case typeMdat:
+			r.fragStart = h.end()
+			return nil
+		}
+		if h.size == toEnd {
+			r.fragStart = -1
+			return nil
+		}
+		s.seekTo(h.end())
+	}
 }
 
 // setDuration sets the duration of the track, in the packets' timeline,
 // from the first of the durations the file gives: of the edit list, of
-// the media, of the movie, or of the sample table.
+// the fragments, of the media, of the movie, or of the sample table.
 func (r *Reader) setDuration(m movie) {
 	// movie returns when the track ends after a duration of the movie,
 	// which counts from the edit.
@@ -161,6 +215,9 @@ func (r *Reader) setDuration(m movie) {
 		return r.delay + t, ok && v > 0
 	}
 	ticks, ok := movie(m.edits)
+	if !ok {
+		ticks, ok = movie(m.fragments)
+	}
 	if !ok && m.media > 0 && m.media <= uint64(r.maxTicks) {
 		ticks, ok = int64(m.media), true
 	}
@@ -176,8 +233,10 @@ func (r *Reader) setDuration(m movie) {
 }
 
 // ReadPacket returns the next packet of the track, or io.EOF after the
-// last. A file that ends within a sample returns io.ErrUnexpectedEOF.
-// After an error, ReadPacket returns it again.
+// last. A file that ends within a sample, or within the moof of one,
+// returns io.ErrUnexpectedEOF. After an error, ReadPacket returns it
+// again. In a fragmented file, a file chained after the first, which
+// starts with an ftyp or a moov, ends the stream.
 func (r *Reader) ReadPacket() (Packet, error) {
 	if r.err != nil {
 		return Packet{}, r.err
@@ -194,12 +253,26 @@ func (r *Reader) ReadPacket() (Packet, error) {
 	return Packet{Data: data, Time: r.time(s.time), Duration: r.time(int64(s.duration))}, nil
 }
 
-// nextSample returns where the next sample is, by the sample table.
+// nextSample returns where the next sample is: in the sample table, then
+// in the fragments.
 func (r *Reader) nextSample() (sample, error) {
-	if s, ok := r.table.next(); ok {
-		return s, nil
+	if r.inTable {
+		if s, ok := r.table.next(); ok {
+			return s, nil
+		}
+		r.inTable = false
+		if !r.fragmented {
+			return sample{}, io.EOF
+		}
 	}
-	return sample{}, io.EOF
+	for {
+		if s, ok := r.frag.next(); ok {
+			return s, nil
+		}
+		if err := r.nextFragment(); err != nil {
+			return sample{}, err
+		}
+	}
 }
 
 // readSample reads the data of sample s.

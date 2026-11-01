@@ -12,14 +12,20 @@ import (
 // movie is what the moov says of the durations of the movie and of the
 // track.
 type movie struct {
-	scale    uint32 // the timescale of the movie, of its mvhd
-	duration uint64 // of the mvhd, in the movie's timescale
-	media    uint64 // of the track's mdhd, in the media's timescale
-	edits    uint64 // of the edits of the track's edit list, in the movie's timescale
+	scale     uint32 // the timescale of the movie, of its mvhd
+	duration  uint64 // of the mvhd, in the movie's timescale
+	fragments uint64 // of the mehd, with the fragments, likewise
+	media     uint64 // of the track's mdhd, in the media's timescale
+	edits     uint64 // of the edits of the track's edit list, in the movie's timescale
 }
 
-// parseMoov reads the moov: the movie's header and its first audio
-// track.
+// trex is the defaults of the samples of a track's fragments.
+type trex struct {
+	duration, size uint32
+}
+
+// parseMoov reads the moov: the movie's header, its first audio track,
+// and the defaults of the fragments, when its mvex says fragments follow.
 func (r *Reader) parseMoov(b []byte) (movie, error) {
 	var m movie
 	var trak []byte
@@ -44,6 +50,9 @@ func (r *Reader) parseMoov(b []byte) (movie, error) {
 				trak = data
 			}
 			return err
+		case typeMvex:
+			r.fragmented = true
+			return r.parseMvex(data, &m)
 		}
 		return nil
 	})
@@ -70,6 +79,31 @@ func isAudio(b []byte) (bool, error) {
 	_, _, f := fullBox(hdlr)
 	f.skip(4) // pre_defined
 	return f.u32() == handlerSound, f.check(typeHdlr)
+}
+
+// parseMvex reads the defaults of the fragments of each track, and the
+// duration of the fragmented movie.
+func (r *Reader) parseMvex(b []byte, m *movie) error {
+	return eachBox(b, func(typ uint32, data []byte) error {
+		switch typ {
+		case typeMehd:
+			v, _, f := fullBox(data)
+			m.fragments = f.duration(v == 1)
+			return f.check(typ)
+		case typeTrex:
+			_, _, f := fullBox(data)
+			id := f.u32()
+			f.skip(4) // default_sample_description_index
+			t := trex{duration: f.u32(), size: f.u32()}
+			if err := f.check(typ); err != nil {
+				return err
+			}
+			if _, dup := r.trex[id]; !dup {
+				r.trex[id] = t
+			}
+		}
+		return nil
+	})
 }
 
 // parseTrak reads the audio trak of data b: its header, edit list, media

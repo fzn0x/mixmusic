@@ -155,7 +155,7 @@
   async function get(c, from, to) {
     c.fetching = new AbortController();
     try {
-      const res = await fetch(c.desc.src + "&range=" + from + "-" + to, { signal: c.fetching.signal, cache: "no-store" });
+      const res = await fetch(c.desc.src + "&range=" + from + "-" + to, { signal: c.fetching.signal });
       if (!res.ok) throw new Error("MixMusic's proxy answered HTTP " + res.status);
       return await res.arrayBuffer();
     } finally {

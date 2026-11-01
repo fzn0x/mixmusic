@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -116,5 +117,115 @@ func TestLiveSignedIn(t *testing.T) {
 	home, err := c.Home(ctx)
 	if err != nil || len(home) == 0 {
 		t.Fatalf("home: %d shelves, %v", len(home), err)
+	}
+}
+
+// TestLiveDeletePlaylist makes a playlist on a real account, finds YouTube
+// offering to delete it, on its page and in the library, and deletes it.
+// It changes the account, so it runs only with MIXMUSIC_YT_WRITE=1 too,
+// best with an account kept for tests:
+//
+//	MIXMUSIC_LIVE=1 MIXMUSIC_YT_WRITE=1 MIXMUSIC_YT_COOKIES='SAPISID=…; …' go test ./internal/youtube -run LiveDeletePlaylist -v
+//
+// It logs what the tests here can't know from answers read signed out:
+// where the delete endpoint sits, what YouTube answers a delete, and a
+// delete of a playlist that's gone.
+func TestLiveDeletePlaylist(t *testing.T) {
+	header := os.Getenv("MIXMUSIC_YT_COOKIES")
+	if os.Getenv("MIXMUSIC_LIVE") == "" || os.Getenv("MIXMUSIC_YT_WRITE") == "" || header == "" {
+		t.Skip("set MIXMUSIC_LIVE=1, MIXMUSIC_YT_WRITE=1 and MIXMUSIC_YT_COOKIES to delete a playlist of a signed-in account")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	c := New()
+	cookies, err := http.ParseCookie(header)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.SetCookies(cookies)
+	id, err := c.CreatePlaylist(ctx, "MixMusic live test "+time.Now().Format("2006-01-02 15:04:05"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.HasPrefix(id, "PL") {
+		t.Fatalf("the new playlist's ID is %q", id)
+	}
+	deleted := false
+	t.Cleanup(func() {
+		if !deleted {
+			if err := c.DeletePlaylist(context.Background(), id); err != nil {
+				t.Errorf("deleting %s at the end: %v", id, err)
+			}
+		}
+	})
+	// eventually tries for a few seconds, as YouTube's lists catch up, and
+	// tells whether try came true; last tells what the last try saw.
+	var last any
+	eventually := func(what string, try func() bool) {
+		t.Helper()
+		for start := time.Now(); !try(); time.Sleep(time.Second) {
+			if time.Since(start) > 20*time.Second {
+				t.Fatalf("%s: not after 20 s; the last answer: %v", what, last)
+			}
+		}
+	}
+
+	eventually("its page offers to delete it", func() bool {
+		n, err := c.browse(ctx, "VL"+id)
+		if err != nil {
+			last = err
+			return false
+		}
+		head := n.get("contents", "twoColumnBrowseResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer", "contents", 0)
+		last = head.v
+		p, _, err := parsePlaylist(n, id)
+		if err != nil || !p.Deletable {
+			return false
+		}
+		endpoint := head.find("deletePlaylistEndpoint")
+		t.Logf("the page's delete endpoint: %v; editable %v, saved %v", endpoint.v, p.Editable, p.Saved)
+		if endpoint.get("deletePlaylistContext").exists() {
+			t.Errorf("the endpoint has a deletePlaylistContext, which DeletePlaylist doesn't send: %v", endpoint.v)
+		}
+		return true
+	})
+	eventually("the library offers to delete it", func() bool {
+		n, err := c.browse(ctx, "FEmusic_liked_playlists")
+		if err != nil {
+			last = err
+			return false
+		}
+		for _, s := range parseShelves(n) {
+			for _, it := range s.Items {
+				if p := it.Playlist; p != nil && p.ID == media.ID(media.SourceYouTube, id) {
+					last = p
+					return p.Deletable && p.Editable && !p.Saved
+				}
+			}
+		}
+		last = "no tile of it"
+		return false
+	})
+	t.Logf("in the library: %+v", last)
+
+	answer, err := c.deletePlaylist(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	deleted = true
+	t.Logf("deleted: %v", answer.v)
+	if got := answer.find("handlePlaylistDeletionCommand").get("playlistId").str(); got != id {
+		t.Errorf("the answer's handlePlaylistDeletionCommand names %q", got)
+	}
+	eventually("its page goes", func() bool {
+		_, err := c.Playlist(ctx, id)
+		return err != nil
+	})
+	// Deleting it again is what a delete of a playlist that's gone gets:
+	// errDeleteRefused takes its status.
+	_, again := c.call(ctx, "playlist/delete", map[string]any{"playlistId": id}, nil)
+	t.Logf("deleting it again: %v", again)
+	if _, err := c.Account(ctx); err != nil || c.Rejected() {
+		t.Errorf("the session after a refused delete: %v, rejected %v", err, c.Rejected())
 	}
 }

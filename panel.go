@@ -122,6 +122,7 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 			ui.Text(c, t.Title).FontSize(k.bodySize()).TextColor(ink).SingleLine()
 			ui.Row(c).Gap(6).MinWidth(0).Children(func() {
 				s.sourceMark(c, t.Source, current)
+				s.downloadMark(c, "q-dl-"+it.UID, t, current)
 				line := names(t.Artists)
 				if it.Radio {
 					line += " · radio"
@@ -343,6 +344,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		s.setLiked(t, !liked)
 	}
 	s.addToMenus(m, one)
+	s.downloadItems(m, t)
 	m.Separator()
 	for _, a := range t.Artists {
 		if a.ID != "" {

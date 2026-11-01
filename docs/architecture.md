@@ -104,14 +104,35 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   itself, as below. It shuffles, repeats, crossfades, starts radios when the
   queue runs out, counts plays and keeps up to 500 tracks of the queue,
   around the one playing, in `queue.json`, as it changes and as MixMusic
-  quits. A track that can't play for want of the network waits for it
-  where it was, and plays on once it answers; the player pauses as the
-  computer sleeps.
+  quits. A track that can't play for want of the network gives way at once
+  to the next that plays without it, a download or a track the offline
+  cache holds, as the app tells; once none is left, it waits for the
+  network where it was, and plays on once it answers. The player pauses as
+  the computer sleeps.
 - **`internal/online`** tells the player whether the network answers: a
   check of YouTube's and Spotify's addresses over HTTPS, shared by its
   callers, which audio coming from YouTube answers too, and a wait for the
   network, with checks further apart the longer it lasts. The system's
   word on the network, through MyGo, only has it check at once.
+- **`internal/downloads`** keeps the tracks the user downloads, apart from
+  the offline cache: a folder of their audio (`audio/<video id>.webm`, or
+  `.m4a` for a track YouTube has only in AAC) and covers (`art/`), with
+  an `index.json` of what it holds, its paths relative to the folder, so
+  that it moves whole. A Spotify track downloads as its recording on
+  YouTube Music, and tracks of one recording share a file. Two workers
+  download what waits, oldest first, a few seconds apart, through
+  `Proxy.Download`: the stream's chunks, its URL found again when YouTube
+  refuses it, connecting again from the byte it reached, into a `.part`
+  file that a later run goes on from when YouTube sends the same file
+  (its itag, length and last change). A track the offline cache holds
+  comes from the cache. Each file is read as the engine reads it, Opus in
+  WebM or AAC-LC in MP4, before it's kept. Downloads wait while paused,
+  while the network is gone, on a metered connection unless the settings
+  allow it, for 15 minutes once YouTube turns one down, and on a full
+  disk; a track YouTube won't send fails with why, and others try again
+  after 30 seconds, 2 minutes and 10. The proxy serves downloads before the
+  cache (`stream.Store`), and the windows read a snapshot of what they hold
+  in each frame, a map lookup a track row.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
@@ -200,8 +221,16 @@ files only the user can read (`spotify-token.json`, `lastfm.json`,
 secret found in a file into the credential store once it can keep it. The
 cache folder holds audio, the covers shown (`artwork/`), matches, how loud
 YouTube measured the tracks played (`loudness.json`), and yt-dlp's cache,
-and the logs folder the log and the crash reports. `MIXMUSIC_DATA_DIR`
-moves all three into one folder, for a portable copy or a test run.
+and the logs folder the log and the crash reports. The downloads are in a
+folder of their own, which the user can move in Settings › Playback
+(`downloadsFolder` in `settings.json`): by default
+`%LocalAppData%\MixMusic\downloads` on Windows,
+`~/Library/Application Support/MixMusic/downloads` on macOS, and
+`$XDG_DATA_HOME/MixMusic/downloads` (`~/.local/share/MixMusic/downloads`)
+on Linux: never a folder the system treats as a cache (`~/Library/Caches`,
+`~/.cache`), whose files cleaning tools delete, nor the Windows folder
+that roams. `MIXMUSIC_DATA_DIR` moves all four into one folder,
+for a portable copy or a test run.
 `MIXMUSIC_YTDLP_ONLY=1` has yt-dlp find every stream, as before MixMusic
 asked YouTube's player API, to time one against the other or tell which
 fails: the log tells which streams took over a second to find, and which

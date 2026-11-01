@@ -159,7 +159,8 @@ func (s *shell) cacheSettings(c *ui.Context) {
 	k := &s.lk
 	s.group(c, "offline cache", func() {
 		use := s.svc.System.CacheUsage()
-		s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. Tracks you played play again without the network.", plural(use.Tracks, "track"), byteSize(use.Bytes)), func() {
+		s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. Tracks you played play again without the network.", plural(use.Tracks, "track"), byteSize(use.Bytes))+
+			" Downloads are kept apart, and clearing the cache leaves them.", func() {
 			if s.button(c, "clear-cache", "clear", false).Label("Clear tracks").Disabled(use.Tracks == 0).Clicked() {
 				if err := s.svc.System.ClearCache(); err != nil {
 					s.notes = append(s.notes, noticeOf(err))

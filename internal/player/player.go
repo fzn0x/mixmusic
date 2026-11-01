@@ -188,6 +188,18 @@ type Network interface {
 	KickOnline()
 }
 
+// Offline is what the player asks of the app of the tracks that play
+// without the network, when its Services have it too: without, every
+// track that can't play for want of the network waits for it.
+type Offline interface {
+	// Offline reports, without asking the network, whether it was found
+	// gone.
+	Offline() bool
+	// PlaysOffline reports whether track plays without the network: it is
+	// downloaded, or the offline cache holds it.
+	PlaysOffline(track media.Track) bool
+}
+
 // Services are what the player asks of the app.
 type Services interface {
 	// Prepare finds how track plays; PrepareStream how it plays from
@@ -381,6 +393,9 @@ type Player struct {
 	// stalls counts the stream's Buffering events, so that a check of the
 	// network after one tells it is the last.
 	stalls int
+	// offlineSkips counts the entries skipped for want of the network
+	// since a track last played: no more than the queue holds are.
+	offlineSkips int
 	// askedAt is when the current track was asked to play, from askedFrom,
 	// until it sounds: the log tells when that took long.
 	askedAt     time.Time

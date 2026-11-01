@@ -11,7 +11,8 @@ import (
 
 // librarySections are the library's pivots, by their paths' last part.
 var librarySections = []struct{ id, label string }{
-	{"liked", "liked"}, {"mixes", "mixes"}, {"history", "history"}, {"spotify", "spotify"}, {"youtube", "youtube music"},
+	{"liked", "liked"}, {"mixes", "mixes"}, {"downloads", "downloads"}, {"history", "history"}, {"spotify", "spotify"},
+	{"youtube", "youtube music"},
 }
 
 // libraryPage shows liked songs, the user's mixes, the history, and the
@@ -41,6 +42,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 				counts[i] = len(s.svc.Collection.Liked())
 			case "mixes":
 				counts[i] = len(s.svc.Collection.Playlists())
+			case "downloads":
+				counts[i] = s.kept.Status().Tracks
 			default:
 				counts[i] = -1
 			}
@@ -54,6 +57,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 			s.likedSongs(c)
 		case "mixes":
 			s.mixTiles(c)
+		case "downloads":
+			s.downloadsLibrary(c)
 		case "history":
 			s.history(c)
 		case "spotify":
@@ -78,6 +83,7 @@ func (s *shell) likedSongs(c *ui.Context) {
 			FontSize(k.subtitleSize()).FontWeight(300).MaxWidth(640)
 		return
 	}
+	ui.Row(c).Gap(8).Margin(0, 0, 16).Children(func() { s.downloadButton(c, likedDownload(liked)) })
 	view := s.trackTools(c, "liked", "list", liked)
 	s.trackList(c, "liked", view.tracks, trackListOptions{art: true, album: true,
 		empty: "No liked song matches “" + s.searching("liked") + "”."})

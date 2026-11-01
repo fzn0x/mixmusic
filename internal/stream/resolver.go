@@ -236,8 +236,8 @@ func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality)
 		// the better answer, when it is a plain one.
 		var refused playabilityError
 		if errors.Is(err, tools.ErrNoYTDLP) && errors.As(direct, &refused) {
-			if plain := plainError(refused.Reason); plain != "" {
-				return Stream{}, errors.New(plain)
+			if plain, kind := plainError(refused.Reason); plain != "" {
+				return Stream{}, failure{plain, kind}
 			}
 		}
 		return Stream{}, err
@@ -280,16 +280,26 @@ func (r *Resolver) runYTDLP(ctx context.Context, args ...string) ([]byte, error)
 	cmd.Stderr = &stderr
 	out, err := cmd.Output()
 	if err != nil {
-		if msg := ytdlpError(stderr.String()); msg != "" {
-			if plain := plainError(msg); plain != "" {
-				log.Printf("mixmusic: %s", msg)
-				return nil, errors.New(plain)
-			}
-			return nil, errors.New(msg)
+		if f := ytdlpFailure(stderr.String()); f != nil {
+			return nil, f
 		}
 		return nil, fmt.Errorf("yt-dlp: %w", err)
 	}
 	return out, nil
+}
+
+// ytdlpFailure is the error yt-dlp printed last, in plain words when it is
+// one of plainErrors, with its kind; nil when it printed none.
+func ytdlpFailure(stderr string) error {
+	msg := ytdlpError(stderr)
+	if msg == "" {
+		return nil
+	}
+	if plain, kind := plainError(msg); plain != "" {
+		log.Printf("mixmusic: %s", msg)
+		return failure{plain, kind}
+	}
+	return failure{msg, networkKind(msg)}
 }
 
 // ytdlpError returns the last error line yt-dlp printed, without its
@@ -309,35 +319,65 @@ func ytdlpError(stderr string) string {
 }
 
 // plainErrors say in plain words why yt-dlp found no stream, for the
-// errors it reports most, by a part of yt-dlp's message: the first that
-// matches applies.
-var plainErrors = []struct{ match, plain string }{
-	{"not a bot", "YouTube asks to confirm this is not a bot; try again in a while"},
-	{"try again later", "YouTube is turning down requests from this network for now; try again in a while"},
-	{"confirm your age", "YouTube plays this track only to signed-in adults, on its own website"},
-	{"age-restricted", "YouTube plays this track only to signed-in adults, on its own website"},
-	{"inappropriate for some users", "YouTube plays this track only to signed-in adults, on its own website"},
-	{"in your country", "this track is not available in your country"},
-	{"private video", "this track is private"},
-	{"members-only", "only the members of its channel can play this track"},
-	{"join this channel", "only the members of its channel can play this track"},
-	{"premium", "only YouTube Music Premium members can play this track"},
-	{"requested format is not available", "YouTube gave no audio for this track; updating yt-dlp in Settings › Playback often fixes it"},
-	{"video unavailable", "this track is no longer on YouTube Music"},
-	{"this video is unavailable", "this track is no longer on YouTube Music"},
+// errors it reports most, by a part of yt-dlp's message, with their kind:
+// the first that matches applies.
+var plainErrors = []struct {
+	match, plain string
+	kind         error
+}{
+	{"not a bot", "YouTube asks to confirm this is not a bot; try again in a while", ErrThrottled},
+	{"try again later", "YouTube is turning down requests from this network for now; try again in a while", ErrThrottled},
+	{"confirm your age", "YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
+	{"age-restricted", "YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
+	{"inappropriate for some users", "YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
+	{"in your country", "this track is not available in your country", ErrUnavailable},
+	{"private video", "this track is private", ErrUnavailable},
+	{"members-only", "only the members of its channel can play this track", ErrUnavailable},
+	{"join this channel", "only the members of its channel can play this track", ErrUnavailable},
+	{"premium", "only YouTube Music Premium members can play this track", ErrUnavailable},
+	{"requested format is not available", "YouTube gave no audio for this track; updating yt-dlp in Settings › Playback often fixes it", nil},
+	{"video unavailable", "this track is no longer on YouTube Music", ErrUnavailable},
+	{"this video is unavailable", "this track is no longer on YouTube Music", ErrUnavailable},
 }
 
-// plainError returns msg, an error of yt-dlp, in plain words, or "" when it
-// is not one of plainErrors.
-func plainError(msg string) string {
+// plainError returns msg, an error of yt-dlp, in plain words, with its
+// kind, or "" when it is not one of plainErrors.
+func plainError(msg string) (string, error) {
 	lower := strings.ToLower(msg)
 	for _, e := range plainErrors {
 		if strings.Contains(lower, e.match) {
-			return e.plain
+			return e.plain, e.kind
 		}
 	}
-	return ""
+	return "", nil
 }
+
+// networkErrors are parts of yt-dlp's messages when it couldn't reach
+// YouTube, or YouTube didn't answer it.
+var networkErrors = []string{"unable to download", "urlopen error", "timed out", "connection reset", "connection refused",
+	"getaddrinfo", "name resolution", "network is unreachable"}
+
+// networkKind is ErrNetwork when msg, an error of yt-dlp, tells that it
+// couldn't reach YouTube, else nil.
+func networkKind(msg string) error {
+	lower := strings.ToLower(msg)
+	for _, m := range networkErrors {
+		if strings.Contains(lower, m) {
+			return ErrNetwork
+		}
+	}
+	return nil
+}
+
+// failure is why no stream was found, in the words the player shows, and
+// its kind, if known.
+type failure struct {
+	msg  string
+	kind error
+}
+
+func (f failure) Error() string { return f.msg }
+func (f failure) Unwrap() error { return f.kind }
 
 // info is what yt-dlp prints of a video with one format selected.
 type info struct {

@@ -66,6 +66,14 @@ func BenchmarkScroll(b *testing.B) {
 			scrollFrames(b, tt)
 		})
 	}
+	// Each row marks where its download is: a lookup a row.
+	b.Run("liked-5000-downloading", func(b *testing.B) {
+		s := likedShell(b, 5000)
+		s.svc.Downloads.Add(s.svc.Collection.Liked())
+		tt := testerOf(b, s, 1280, 820)
+		show(s, tt, "/library/liked")
+		scrollFrames(b, tt)
+	})
 	b.Run("liked-1000-by-title", func(b *testing.B) {
 		s := likedShell(b, 1000)
 		s.tools["liked"] = &trackTool{sort: "title"}

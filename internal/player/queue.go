@@ -44,6 +44,7 @@ func (p *Player) PlayNext(tracks []media.Track) {
 		}
 		p.s.Queue = slices.Insert(slices.Clone(p.s.Queue), p.s.Index+1, items...)
 		p.emit(QueueChange)
+		p.markKnownOf(items)
 		if p.s.Index < 0 {
 			p.playAt(0, 0, true)
 		}
@@ -64,6 +65,7 @@ func (p *Player) Enqueue(tracks []media.Track) {
 		q := p.s.Queue
 		p.s.Queue = slices.Insert(slices.Clone(q), enqueueAt(q, p.s.Index), items...)
 		p.emit(QueueChange)
+		p.markKnownOf(items)
 	})
 }
 
@@ -173,15 +175,15 @@ func (p *Player) playTracks(tracks []media.Track, start int, chosen bool) {
 	}
 	p.s.Queue = items
 	p.emit(QueueChange)
+	p.markKnown()
 	if chosen || !p.skipping() {
 		p.playAt(first, 0, true)
 		return
 	}
 	// What played stops, and nothing of the new queue is current, until its
 	// first track to play is found.
-	p.s.Index = -1
+	p.s.Index, p.s.Position, p.s.Duration = -1, 0, 0
 	p.hold()
-	p.markKnown()
 	p.step(&move{dir: 1, held: true}, first)
 }
 

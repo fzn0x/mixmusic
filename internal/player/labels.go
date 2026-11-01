@@ -487,11 +487,15 @@ func (p *Player) setMark(id string, on bool) {
 	}
 }
 
-// markKnown marks the entries whose label the app knows without asking
-// YouTube, as those of a queue kept from the last run.
-func (p *Player) markKnown() {
+// markKnown marks the entries of the queue whose label the app knows
+// without asking YouTube, as those of a queue kept from the last run.
+func (p *Player) markKnown() { p.markKnownOf(p.s.Queue) }
+
+// markKnownOf marks the entries of items, of the queue, whose label the app
+// knows without asking YouTube, so that they show before their turn.
+func (p *Player) markKnownOf(items []Item) {
 	seen := map[string]bool{}
-	for _, it := range p.s.Queue {
+	for _, it := range items {
 		if it.MadeWithAI || seen[it.Track.ID] || !p.checks(it.Track) {
 			continue
 		}

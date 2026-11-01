@@ -567,6 +567,21 @@ func TestSkipAIRestored(t *testing.T) {
 	}
 }
 
+// TestSkipAIQueuedKnown marks the tracks queued whose label the app knows,
+// as they're queued, without a check.
+func TestSkipAIQueuedKnown(t *testing.T) {
+	h, l := newLabeled(t, Saved{}, []string{"x", "y"})
+	l.with(func(l *labeled) { l.known["yt:x"], l.known["yt:y"] = LabelAI, LabelAI })
+	h.p.PlayChosen(tracks("a"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Enqueue(tracks("x"))
+	h.p.PlayNext(tracks("y"))
+	h.wait("x and y marked", func(p *Player) bool { return slices.Equal(marked(p.s), []string{"yt:y", "yt:x"}) })
+	if got := l.checks(); len(got) != 0 {
+		t.Errorf("checked %v", got)
+	}
+}
+
 // TestForgetLabel plays the entries of a track whose label was forgotten.
 func TestForgetLabel(t *testing.T) {
 	h, l := newLabeled(t, Saved{}, []string{"b"})

@@ -164,3 +164,26 @@ func TestSpringsSettle(t *testing.T) {
 		})
 	}
 }
+
+// TestFloatingPanelRoom checks that the main pane's width, which the
+// pages' titles and shelves fit, leaves room for the margin of a floating
+// side panel.
+func TestFloatingPanelRoom(t *testing.T) {
+	for _, c := range []struct {
+		theme  string
+		margin float32
+	}{{"mix", 0}, {"material", floatMargin}} {
+		s, tt := themed(t, c.theme)
+		s.panel = "queue"
+		var got, want float32
+		tt = ui.NewTester(func(ctx *ui.Context) {
+			s.view(ctx)
+			got = s.paneWidth(ctx)
+			want = 1280 - s.railWidth() - s.panelWidth(ctx) - c.margin
+		}, 1280, 820)
+		tt.Frame()
+		if got != want {
+			t.Errorf("%s: the pane is %v wide, want %v", c.theme, got, want)
+		}
+	}
+}

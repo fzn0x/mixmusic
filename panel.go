@@ -19,7 +19,7 @@ func (s *shell) sidePanel(c *ui.Context) {
 	k := &s.lk
 	panel := ui.Column(c).Width(s.panelWidth(c)).Shrink(0).Background(k.surface)
 	if k.floating {
-		panel.Margin(0, 12, 12, 0).Radius(k.radius).Clip()
+		panel.Margin(0, floatMargin, floatMargin, 0).Radius(k.radius).Clip()
 	} else {
 		panel.BorderWidth(0, 0, 0, 1).BorderColor(k.border)
 	}

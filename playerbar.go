@@ -22,7 +22,7 @@ func (s *shell) playerBar(c *ui.Context) {
 		if k.dark {
 			shade = 0.4
 		}
-		bar.Margin(0, 12, 12).Padding(0, 20, 0, 9).Radius(k.radius).Background(col(over(nrgba(k.surface2), nrgba(k.bg)))).
+		bar.Margin(0, floatMargin, floatMargin).Padding(0, 20, 0, 9).Radius(k.radius).Background(col(over(nrgba(k.surface2), nrgba(k.bg)))).
 			Shadow(0, 6, 20, -6, ui.RGBA(0, 0, 0, float32(shade)))
 	} else {
 		bar.Background(k.surface).BorderWidth(1, 0, 0, 0).BorderColor(k.border)

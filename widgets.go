@@ -618,6 +618,9 @@ func (s *shell) paneWidth(c *ui.Context) float32 {
 	w -= s.railWidth()
 	if s.panel != "" {
 		w -= s.panelWidth(c)
+		if s.lk.floating {
+			w -= floatMargin
+		}
 	}
 	return max(w, 200)
 }

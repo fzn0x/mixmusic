@@ -43,6 +43,10 @@ const (
 	motionExpressive
 )
 
+// floatMargin is the room around what floats, as a floating player bar
+// and the side panel beside it.
+const floatMargin = 12
+
 // layoutOf reads the layout tokens of th into k, scaled by the density.
 func (k *look) layoutOf(th addons.Theme) {
 	px := func(key string, def float32) float32 {

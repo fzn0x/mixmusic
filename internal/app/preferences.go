@@ -35,8 +35,11 @@ func (p *Preferences) Update(fn func(s *settings.Settings)) (settings.Settings, 
 		return prev, err
 	}
 	// The file has a mistake: the change applies, and waits to be saved.
+	// Or it was saved, over a file with a mistake that went away.
 	if held := a.settings.Held(); held != nil {
 		a.settingsBroken(held)
+	} else {
+		a.settingsRead()
 	}
 	s := a.settings.Get().Clean()
 	a.settingsChanged(prev, s, false)

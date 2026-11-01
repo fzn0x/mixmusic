@@ -193,6 +193,30 @@ func TestBrokenAtQuit(t *testing.T) {
 	}
 }
 
+// TestBrokenFileRemoved removes a settings.json with a mistake: the next
+// change saves the file again, and the mistake is no more.
+func TestBrokenFileRemoved(t *testing.T) {
+	a := fileApp(t, `{"theme": "aurora"}`)
+	prefs := &Preferences{a}
+	path := a.settings.Path()
+	writeSettings(t, path, `{"theme": `)
+	a.ReloadSettings()
+	until(t, "the mistake told", func() bool { return prefs.File().Problem != "" })
+	if err := os.Remove(path); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := prefs.Update(func(s *settings.Settings) { s.Crossfade = 3 }); err != nil {
+		t.Fatal(err)
+	}
+	if f := prefs.File(); f.Problem != "" {
+		t.Errorf("the mistake stays: %+v", f)
+	}
+	s, err := settings.Decode([]byte(readSettings(t, path)))
+	if err != nil || s.Theme != "aurora" || s.Crossfade != 3 {
+		t.Errorf("settings.json holds %q, %d: %v", s.Theme, s.Crossfade, err)
+	}
+}
+
 func TestResetWhileBroken(t *testing.T) {
 	a := fileApp(t, `{"theme": "aurora", "ytdlpPath": "/opt/yt-dlp"}`)
 	prefs := &Preferences{a}

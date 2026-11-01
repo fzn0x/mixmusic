@@ -45,8 +45,9 @@ both services in one player:
 - **A small program.** MixMusic is one Go program that draws its own
   windows on the GPU. There is no browser inside it to download or keep in
   memory.
-- **Yours to change.** Ten themes come with it, the community adds more
-  themes and plugins, and any command can have a key of your own.
+- **Yours to change.** Fourteen themes come with it, in three design
+  languages, the community adds more themes and plugins, and any command
+  can have a key of your own.
 - **Private.** MixMusic has no account, server, analytics or telemetry of
   its own.
 - **Free and open source,** under the MIT license or the GPL 3.0.
@@ -136,9 +137,12 @@ both services in one player:
 
 ### Make it yours
 
-- **Themes.** Ten built in, with effects you can tune, one theme for light
-  mode and one for dark mode, and an accent color of your own or taken
-  from the artwork that plays.
+- **Themes.** Fourteen built in, with effects you can tune, one theme for
+  light mode and one for dark mode, and an accent color of your own or
+  taken from the artwork that plays. Beside MixMusic's own flat tiles and
+  giant lowercase words, Material and Material Dark follow Material 3
+  Expressive, with colors made of the cover's, and Crate and Crate Light
+  pack big covers into dense card grids under heavy headings.
 - **Community themes and plugins,** one click away in the marketplace.
 - **Plugins** add pages, commands, track actions and widgets through a
   typed API, drawn in your theme.
@@ -388,7 +392,8 @@ store icon in the sidebar, and you can add yours.
 
 ### Make a theme
 
-A theme is a `theme.json` file that sets colors, fonts and corners.
+A theme is a `theme.json` file that sets colors, fonts and corners, and
+may set its layout: shapes, density, covers and headings.
 [docs/themes.md](docs/themes.md) lists every token and shows a complete
 theme. To try yours, put its folder in the themes folder (Settings ›
 Appearance › open themes folder) and choose it in Settings › Appearance.
@@ -495,9 +500,13 @@ MixMusic is built on these projects:
   port of [JAAD](https://sourceforge.net/projects/jaadec/) the AAC decoder
   derives from.
 - **[FFmpeg](https://ffmpeg.org)**, which the decoders' tests compare with.
-- **[Selawik](https://github.com/microsoft/Selawik)** and
-  **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**, the
-  typefaces of the windows.
+- **[Selawik](https://github.com/microsoft/Selawik)**,
+  **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**,
+  **[Roboto Flex](https://github.com/googlefonts/roboto-flex)** and
+  **[Archivo](https://github.com/Omnibus-Type/Archivo)**, the typefaces of
+  the windows.
+- **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
+  whose HCT color science the Material themes' colors are a port of.
 - **[Kevin MacLeod](https://incompetech.com)**, whose music, under
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), plays in the
   walkthrough and on the website.
@@ -519,10 +528,14 @@ Fixes, features, themes, plugins and bug reports are all welcome.
 MixMusic is dual-licensed: use it under the [MIT license](LICENSE-MIT) or
 the [GNU General Public License, version 3](LICENSE-GPL), whichever you
 prefer. Contributions are accepted under both. The typefaces in `fonts` are
-under the SIL Open Font License: [Selawik's](fonts/OFL.txt) and
-[Quicksand's](fonts/quicksand-OFL.txt). The Opus decoder is a port of
-libopus, under [its BSD license](opus/LICENSE.libopus), and the AAC decoder
-derives from SharpJaad, under [its MIT license](aac/LICENSE.sharpjaad).
+under the SIL Open Font License: [Selawik's](fonts/OFL.txt),
+[Quicksand's](fonts/quicksand-OFL.txt),
+[Roboto Flex's](fonts/robotoflex-OFL.txt) and
+[Archivo's](fonts/archivo-OFL.txt). The Opus decoder is a port of
+libopus, under [its BSD license](opus/LICENSE.libopus), the AAC decoder
+derives from SharpJaad, under [its MIT license](aac/LICENSE.sharpjaad), and
+the HCT color science is a port of Material Color Utilities, under
+[its Apache license](internal/hct/LICENSE.material-color-utilities).
 
 MixMusic is not affiliated with, endorsed by or sponsored by Spotify or
 Google. It plays what these services offer their users, through the

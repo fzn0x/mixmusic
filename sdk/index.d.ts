@@ -113,6 +113,8 @@ export interface Lyrics {
    * from Unison (https://unison.boidu.dev)".
    */
   sourceUrl?: string;
+  /** The language of the lyrics, as "ja", when known. */
+  language?: string;
 }
 
 export interface PlayerSnapshot {

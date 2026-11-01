@@ -4,8 +4,9 @@ name: Release
 # and publishes the release: the version's section of CHANGELOG.md, the
 # downloads of .github/release-notes.md, the installers and SHA256SUMS.
 # Nix builds: every job runs in the shell of flake.nix, whose tools
-# flake.lock pins. GoReleaser publishes, with .goreleaser.yaml. Run it by
-# hand to build an existing tag again.
+# flake.lock pins, but the Flatpak's, which packs the Linux build in
+# Flathub's container with flatpak-builder. GoReleaser publishes, with
+# .goreleaser.yaml. Run it by hand to build an existing tag again.
 on:
   push:
     tags: ["v*"]
@@ -117,8 +118,59 @@ jobs:
           path: release/*
           if-no-files-found: error
 
-  release:
+  # The Flatpak of the Linux build's x64 archive, in Flathub's container
+  # with the GNOME runtime and flatpak-builder, installed and checked
+  # there.
+  flatpak:
     needs: build
+    name: Flatpak
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+          submodules: true # Flathub's shared modules
+      # For the metadata's releases, which tools/metainfo writes.
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: Linux
+          path: linux
+      - name: The app and its metadata
+        id: v
+        run: |
+          v="${TAG#v}"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          mkdir -p packaging/flatpak/dist
+          cp "linux/mixmusic-$v-linux-amd64.tar.gz" packaging/flatpak/dist/mixmusic-linux-amd64.tar.gz
+          go run ./tools/metainfo -o packaging/flatpak/dist/io.github.fzn0x.mixmusic.metainfo.xml
+          appstreamcli validate --no-net --explain packaging/flatpak/dist/io.github.fzn0x.mixmusic.metainfo.xml
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.8
+        with:
+          manifest-path: packaging/flatpak/io.github.fzn0x.mixmusic.yml
+          bundle: mixmusic-${{ steps.v.outputs.version }}-linux-amd64.flatpak
+          branch: stable
+          upload-artifact: false
+      - name: Install it
+        run: bash packaging/flatpak/check.sh "mixmusic-${{ steps.v.outputs.version }}-linux-amd64.flatpak"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Flatpak
+          path: mixmusic-${{ steps.v.outputs.version }}-linux-amd64.flatpak
+          if-no-files-found: error
+
+  # The release waits for the Flatpak, but goes out without it when it
+  # failed: an outage of Flathub, or of a library's source, then holds
+  # back no other download. Run the failed jobs again to add it.
+  release:
+    needs: [build, flatpak]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     name: Publish the release
     runs-on: ubuntu-latest
     steps:
@@ -187,6 +239,14 @@ jobs:
           else
             link="https://github.com/$GITHUB_REPOSITORY/commits/$TAG"
           fi
+          # The downloads, without the Flatpak's when its job failed.
+          downloads="$RUNNER_TEMP/downloads.md"
+          if [ -f "release/mixmusic-$v-linux-amd64.flatpak" ]; then
+            cp .github/release-notes.md "$downloads"
+          else
+            echo "::warning::The release has no Flatpak: its job failed"
+            grep -v -F '.flatpak' .github/release-notes.md > "$downloads"
+          fi
           {
             # The version's section of CHANGELOG.md, without its link
             # references, with each wrapped paragraph and bullet on one line:
@@ -207,7 +267,7 @@ jobs:
               '
             echo
             sed -e "s|{version}|$v|g" -e "s|{tag}|$TAG|g" -e "s|{repo}|$GITHUB_REPOSITORY|g" \
-              .github/release-notes.md
+              "$downloads"
             echo
             echo "**Full Changelog**: $link"
           } | awk 'NF { p = 1 } p' | cat -s > "$RUNNER_TEMP/notes.md"

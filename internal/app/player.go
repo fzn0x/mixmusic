@@ -12,6 +12,7 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/stream"
@@ -70,7 +71,7 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 func (p *Player) PrepareStream(ctx context.Context, track media.Track) (PlaybackSource, error) {
 	yt, err := p.a.matcher.Match(ctx, track)
 	if err != nil {
-		return PlaybackSource{}, err
+		return PlaybackSource{}, p.a.offlineErr(ctx, err)
 	}
 	_, videoID, err := media.ParseID(yt.ID)
 	if err != nil {
@@ -81,7 +82,15 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 		src.Cached = true
 		return src, nil
 	}
-	if _, err := p.a.resolver.Resolve(ctx, videoID); err != nil {
+	// A stream found before plays without the network, as the engine may
+	// hold its audio already; yt-dlp needs the network to find one.
+	if p.a.resolver.Fresh(videoID) {
+		return src, nil
+	}
+	if p.a.online != nil && p.a.online.Offline() {
+		return PlaybackSource{}, player.ErrOffline
+	}
+	if err := p.a.resolveStream(ctx, videoID); err != nil {
 		return PlaybackSource{}, err
 	}
 	return src, nil

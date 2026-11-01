@@ -28,3 +28,5 @@ Thumbs.db
 .env.*
 !.env.example
 .impeccable/
+PRODUCT.md
+DESIGN.md

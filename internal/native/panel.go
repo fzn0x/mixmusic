@@ -2,6 +2,7 @@ package native
 
 import (
 	"context"
+	"errors"
 	"slices"
 	"time"
 
@@ -209,6 +210,14 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		return
 	case l.err != nil:
 		s.emptyIn(c, l.err.Error())
+		// A track without lyrics stays so; a failure may pass.
+		if !errors.Is(l.err, lyrics.ErrNotFound) {
+			ui.Row(c).Padding(0, 24, 8).Children(func() {
+				if s.button(c, "lyrics-retry-"+where, "try again", false).Clicked() {
+					s.forget("lyrics:" + t.ID)
+				}
+			})
+		}
 		return
 	case l.value.Instrumental:
 		s.emptyIn(c, "This track is instrumental.")

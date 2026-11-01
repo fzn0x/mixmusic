@@ -3,6 +3,7 @@ package native
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -271,6 +272,33 @@ func TestLyricsTwice(t *testing.T) {
 	}
 	if n != 2 {
 		t.Errorf("the lyrics show %d times, not on the page and in the panel", n)
+	}
+}
+
+// TestLyricsTryAgain asks for lyrics that failed to load again, and offers
+// nothing to try again for a track without lyrics.
+func TestLyricsTryAgain(t *testing.T) {
+	s := newTestShell(t)
+	key := "lyrics:" + testTracks[0].ID
+	failed := &loaded[lyrics.Lyrics]{done: true, err: fmt.Errorf("Lyrics can't be loaded right now: %w", lyrics.ErrUnavailable)}
+	s.loads[key] = failed
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	tt := testerOf(t, s, 1280, 900)
+	s.open("/lyrics")
+	tt.Frame()
+	if !tt.HasText("Lyrics can't be loaded right now: lyrics: LRCLIB isn't answering") || !tt.HasText("try again") {
+		t.Fatalf("the failure shows %q", tt.Texts())
+	}
+	click(t, s, tt, "try again")
+	if s.loads[key] == failed {
+		t.Error("try again didn't ask for the lyrics again")
+	}
+
+	s.loads[key] = &loaded[lyrics.Lyrics]{done: true, err: fmt.Errorf("No lyrics found for this track: %w", lyrics.ErrNotFound)}
+	tt.Frame()
+	if !tt.HasText("No lyrics found for this track: lyrics: not found") || tt.HasText("try again") {
+		t.Errorf("a track without lyrics shows %q", tt.Texts())
 	}
 }
 

@@ -220,16 +220,18 @@ func TestYTDLPSkipsStableVolume(t *testing.T) {
 	}
 }
 
-// ytdlpFormat is a format of a video, as yt-dlp lists it.
+// ytdlpFormat is a format of a video, as yt-dlp lists it: channels is 0
+// when yt-dlp doesn't know them.
 type ytdlpFormat struct {
 	id, acodec string
 	abr        float64
+	channels   int
 }
 
 // selectFormat picks a format of formats as yt-dlp does with selector, of
 // the few forms formats uses: best or worst audio, by bitrate, of an
-// acodec or not, and of an ID with or without a part, the first
-// alternative that picks one.
+// acodec or not, of at most two channels or unknown ones, and of an ID
+// with or without a part, the first alternative that picks one.
 func selectFormat(t *testing.T, selector string, formats []ytdlpFormat) string {
 	t.Helper()
 	for _, alt := range strings.Split(selector, "/") {
@@ -242,6 +244,8 @@ func selectFormat(t *testing.T, selector string, formats []ytdlpFormat) string {
 				case filter == "":
 				case strings.HasPrefix(filter, "acodec="):
 					ok = ok && f.acodec == strings.TrimPrefix(filter, "acodec=")
+				case filter == "audio_channels<=?2":
+					ok = ok && f.channels <= 2
 				case strings.HasPrefix(filter, "format_id!*="):
 					ok = ok && !strings.Contains(f.id, strings.TrimPrefix(filter, "format_id!*="))
 				default:
@@ -264,14 +268,23 @@ func selectFormat(t *testing.T, selector string, formats []ytdlpFormat) string {
 }
 
 func TestYTDLPFormats(t *testing.T) {
-	opus := []ytdlpFormat{{"249", "opus", 55}, {"250", "opus", 72}, {"251", "opus", 138}, {"251-drc", "opus", 140}}
-	aac := []ytdlpFormat{{"139", "mp4a.40.5", 49}, {"140", "mp4a.40.2", 129}, {"140-drc", "mp4a.40.2", 130}}
+	opus := []ytdlpFormat{{"249", "opus", 55, 2}, {"250", "opus", 72, 2}, {"251", "opus", 138, 2}, {"251-drc", "opus", 140, 2}}
+	aac := []ytdlpFormat{{"139", "mp4a.40.5", 49, 2}, {"140", "mp4a.40.2", 129, 2}, {"140-drc", "mp4a.40.2", 130, 2}}
+	// What a 5.1 video adds, as YouTube served it on 2026-11-01, and the
+	// surround Opus and AAC the engine couldn't play either.
+	dolby := []ytdlpFormat{{"380", "ac-3", 384, 6}, {"328", "ec-3", 384, 6}}
+	surround := []ytdlpFormat{{"338", "opus", 480, 4}, {"256", "mp4a.40.2", 384, 6}}
+	all := func(lists ...[]ytdlpFormat) []ytdlpFormat { return slices.Concat(lists...) }
 	for _, c := range []struct {
 		name        string
 		formats     []ytdlpFormat
 		best, saver string
 	}{
-		{"Opus and AAC", append(append([]ytdlpFormat(nil), aac...), opus...), "251", "249"},
+		{"Opus and AAC", all(aac, opus), "251", "249"},
+		// Stereo before any surround, though the 5.1 formats are the best.
+		{"5.1 too", all(aac, opus, dolby, surround), "251", "249"},
+		{"AAC in stereo and 5.1", all(aac, surround[1:]), "140", "140"},
+		{"channels unknown", []ytdlpFormat{{"251", "opus", 138, 0}}, "251", "251"},
 		// AAC-LC in either quality, never the smaller HE-AAC.
 		{"only AAC", aac, "140", "140"},
 		{"only stable volume", []ytdlpFormat{aac[0], aac[2]}, "140-drc", "140-drc"},

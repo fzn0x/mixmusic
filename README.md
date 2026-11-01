@@ -304,11 +304,11 @@ talks to:
 What it keeps on your computer: your settings and library (liked songs,
 mixes, history and recent searches) in the folder Settings › About names;
 the tracks you played in the cache, as much as you allow in Settings ›
-Playback; your sign-ins in the system's keyring, or, where there is none,
+Playback, and the covers you saw, up to 256 MB; your sign-ins in the system's keyring, or, where there is none,
 in files only your user can read, the YouTube Music session encrypted;
 and the log, without your sign-ins. The library's history clears what you
-played, Settings › Playback the cache, and signing out of a service deletes
-its sign-in.
+played, Settings › Playback the cache and the covers, and signing out of a
+service deletes its sign-in.
 
 On Windows, the visualizer hears the audio of Spotify playing on this
 computer, in MixMusic or in the Spotify app, through Windows' process

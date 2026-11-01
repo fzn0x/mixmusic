@@ -125,7 +125,13 @@ belongs to its main thread: what finishes elsewhere comes back through
 
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
-  MB of pixels (`artwork.go`).
+  MB of pixels (`artwork.go`). An image that couldn't load tries again
+  after 1 to 2 seconds, then less often, up to every 2 minutes, and at once
+  when another of its host loads; one whose address gives no image waits
+  half an hour. Both windows, the accent and Terminal's tint read the
+  images through `artwork.Store` (`internal/artwork`), which downloads each
+  once, keeps it on disk as it came, up to 256 MB, and logs a host's
+  failures at most once a minute, without the addresses.
 - **Themes** give their tokens: colours, fonts, radius (`theme.go`), and
   the accent follows the artwork of what plays. The windows draw the
   effects of the built-in themes, as their options say (`effects.go`):
@@ -156,7 +162,8 @@ Windows, `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the
 scrobbles still to send, and `updater.json`, the update preferences. The
-cache folder holds audio, matches and yt-dlp's cache, and the logs folder
+cache folder holds audio, the covers shown (`artwork/`), matches and
+yt-dlp's cache, and the logs folder
 the log and the crash reports. `MIXMUSIC_DATA_DIR` moves all three into one
 folder, for a portable copy or a test run. `MIXMUSIC_YTDLP_ONLY=1` has
 yt-dlp find every stream, as before MixMusic asked YouTube's player API,

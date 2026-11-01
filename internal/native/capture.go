@@ -28,6 +28,7 @@ import (
 // shows a side panel, act:scroll:<y|end> scrolls the page, act:theme:<id>
 // wears a theme, act:mini opens the mini player, which saves itself,
 // act:spotify logs whether MixMusic's own Spotify device could play,
+// act:title logs the window's title, which screenshots leave out,
 // act:memory logs the Go heap, and act:heap saves a profile of it. Nothing
 // plays unless the player is muted, or plays into no device
 // (MIXMUSIC_SILENT).
@@ -102,6 +103,8 @@ func (s *shell) captureFromEnv() {
 				result, err := s.a.SpotifyHereCheck(ctx)
 				cancel()
 				log.Printf("mixmusic: capture: MixMusic's own Spotify device: %s %v", result, err)
+			case "title":
+				log.Printf("mixmusic: capture: the window's title is %q", s.win.Title())
 			case "memory":
 				var m runtime.MemStats
 				runtime.ReadMemStats(&m)

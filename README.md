@@ -377,7 +377,7 @@ aac/                 an AAC-LC decoder in pure Go
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
-lyrics/              synced lyrics from Unison and LRCLIB, in TTML and LRC
+lyrics/              synced lyrics from Unison and LRCLIB, and translations
 resources/           MixMusic's logo, for code that draws it
 ```
 
@@ -431,7 +431,10 @@ talks to:
   and Spotify's player, loaded from `sdk.scdn.co`, when Spotify plays in
   MixMusic.
 - **Unison:** the video ID of the track that plays, or, without one, its
-  title, artists, album and length, to find its lyrics.
+  title, artists, album and length, to find its lyrics. Only while you
+  turn on translate or romaji beside the lyrics, the lyrics of the track
+  that plays, with its video ID, which Unison has Google translate or
+  romanize.
 - **LRCLIB:** the title, artists, album and length of the track that plays,
   to find its lyrics.
 - **GitHub:** a check for a new version at start and every few hours,
@@ -448,6 +451,7 @@ What it keeps on your computer:
 - The tracks you played, in the cache, as much as you allow in Settings ›
   Playback, and how loud YouTube measured them.
 - The covers you saw, up to 256 MB.
+- The translations of lyrics you turned on, by track and language.
 - Your sign-ins, the YouTube Music session included, in the system's
   keyring. On Windows, when the Credential Manager can't keep one, it goes
   in a file encrypted for your Windows account; on Linux without a

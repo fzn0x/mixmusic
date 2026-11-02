@@ -939,6 +939,7 @@ func (p *Player) onTime(position, duration time.Duration) {
 		p.unsounded = false
 		if p.s.Playing {
 			p.s.Buffering, p.s.Loading = false, false
+			p.sounded()
 			p.report()
 			p.emit(StateChange)
 		}

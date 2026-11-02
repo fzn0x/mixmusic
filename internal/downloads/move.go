@@ -361,6 +361,9 @@ func merge(theirs, ours *index) *index {
 			x.Art[u] = p
 		}
 	}
+	for video := range ours.Live {
+		x.Live[video] = true
+	}
 	// Ours's pending deletes are of the old folder's files, which the move
 	// takes care of.
 	return x

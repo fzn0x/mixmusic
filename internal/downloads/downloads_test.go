@@ -804,12 +804,103 @@ func TestArtworkKept(t *testing.T) {
 // TestNilManager holds nothing, as the app's downloads before they open.
 func TestNilManager(t *testing.T) {
 	var m *Manager
-	if _, ok := m.Lookup("yt:a"); ok || m.State("yt:a").Kind != None || m.Snapshot().Any() || m.Serve(nil, nil, "a") {
+	if _, ok := m.Lookup("yt:a"); ok || m.State("yt:a").Kind != None || m.Snapshot().Any() || m.Serve(nil, nil, "a") ||
+		m.Snapshot().Live("yt:a") {
 		t.Error("a nil manager holds something")
 	}
 	m.Add(nil, "best")
 	m.Remove("yt:a")
+	m.SetLive("a", true)
 	m.Close()
+}
+
+// TestLiveLeftOut leaves a live stream out of a playlist's download, which
+// downloads the rest, and refuses it once it's known, also after a
+// restart.
+func TestLiveLeftOut(t *testing.T) {
+	dir := t.TempDir()
+	f := &fetcher{fail: func(video string, _ int) error {
+		if video == "lllllllllll" {
+			return stream.ErrLive
+		}
+		return nil
+	}}
+	m := Open(dir, Options{Fetcher: f})
+	a, live, b := yt("aaaaaaaaaaa", "A"), yt("lllllllllll", "Radio"), yt("bbbbbbbbbbb", "B")
+	tracks := []media.Track{a, live, b}
+	p := Collection{ID: "playlist:p", Kind: "playlist", Title: "P"}
+	m.AddCollection(p, tracks, "best")
+	m.Start()
+	until(t, "the downloads", func() bool { return m.Status().Tracks == 2 && m.Status().Waiting == 0 })
+	s := m.Snapshot()
+	if c, ok := s.Collection(p.ID); !ok || !slices.Equal(c.Tracks, []string{a.ID, b.ID}) || c.Kept != 2 {
+		t.Errorf("the playlist: %+v, %v", c, ok)
+	}
+	if st := s.Status(); kind(m, live.ID) != None || st.Failed != 0 || !s.Live(live.ID) || s.Live(a.ID) {
+		t.Errorf("the live stream is %v, live %v, with %d failed", kind(m, live.ID), s.Live(live.ID), st.Failed)
+	}
+	if n := s.Missing(p.ID, tracks); n != 0 {
+		t.Errorf("the playlist misses %d", n)
+	}
+	// Known live, it's refused, on its own and with the playlist again.
+	if n := m.Add([]media.Track{live}, "best"); n != 0 || kind(m, live.ID) != None {
+		t.Errorf("Add added %d: %v", n, kind(m, live.ID))
+	}
+	m.AddCollection(p, tracks, "best")
+	if c, _ := m.Snapshot().Collection(p.ID); !slices.Equal(c.Tracks, []string{a.ID, b.ID}) {
+		t.Errorf("the playlist again: %v", c.Tracks)
+	}
+	asked := 0
+	for _, c := range f.asked() {
+		if c.video == "lllllllllll" {
+			asked++
+		}
+	}
+	if asked != 1 {
+		t.Errorf("the live stream was asked for %d times", asked)
+	}
+	if _, err := os.Stat(m.partPath("lllllllllll")); !errors.Is(err, os.ErrNotExist) {
+		t.Errorf("its part stays: %v", err)
+	}
+	m.Close()
+	m = open(t, dir, Options{Fetcher: f})
+	if !m.Snapshot().Live(live.ID) || m.Add([]media.Track{live}, "best") != 0 {
+		t.Error("after a restart, the live stream isn't known")
+	}
+}
+
+// TestSetLive leaves out a track waiting to download once playback finds
+// its video live, and downloads it once it plays as a video again.
+func TestSetLive(t *testing.T) {
+	m := open(t, t.TempDir(), Options{Fetcher: &fetcher{}})
+	a, live := yt("aaaaaaaaaaa", "A"), yt("lllllllllll", "Radio")
+	m.AddCollection(Collection{ID: "album:x", Kind: "album", Title: "X"}, []media.Track{live, a}, "best")
+	m.SetLive("lllllllllll", true)
+	if c, _ := m.Snapshot().Collection("album:x"); kind(m, live.ID) != None || !slices.Equal(c.Tracks, []string{a.ID}) {
+		t.Errorf("the live stream is %v, in %v", kind(m, live.ID), c.Tracks)
+	}
+	v := m.Snapshot().Version()
+	m.SetLive("lllllllllll", true)
+	if m.Snapshot().Version() != v {
+		t.Error("the downloads changed with nothing new")
+	}
+	m.SetLive("lllllllllll", false)
+	if m.Snapshot().Live(live.ID) || m.Add([]media.Track{live}, "best") != 1 {
+		t.Error("a video no longer live doesn't download")
+	}
+	m.Start()
+	until(t, "the downloads", func() bool { return kind(m, live.ID) == Done && kind(m, a.ID) == Done })
+}
+
+// TestMoveKeepsLive keeps the videos found live, moved into a folder that
+// held downloads already.
+func TestMoveKeepsLive(t *testing.T) {
+	theirs, ours := newIndex(), newIndex()
+	theirs.Live["aaaaaaaaaaa"] = true
+	ours.Live["lllllllllll"] = true
+	if x := merge(theirs, ours); !x.Live["aaaaaaaaaaa"] || !x.Live["lllllllllll"] {
+		t.Errorf("merged %v", x.Live)
+	}
 }
 
 // TestWatchAsksBack tells the watchers beside the manager's lock, so that

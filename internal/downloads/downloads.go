@@ -430,9 +430,11 @@ func (m *Manager) Add(tracks []media.Track, quality string) int {
 }
 
 // pin keeps t for pin, adding it in quality when it's new, and tells
-// whether it was. A track that failed is tried again. Its caller holds mu.
+// whether it was. A track that failed is tried again. A track of a video
+// found live is refused: a live stream has no file to keep. Its caller
+// holds mu.
 func (m *Manager) pin(t media.Track, pin, quality string) bool {
-	if t.ID == "" {
+	if t.ID == "" || m.idx.Live[videoOf(t)] {
 		return false
 	}
 	if e, ok := m.idx.Tracks[t.ID]; ok {
@@ -453,7 +455,8 @@ func (m *Manager) pin(t media.Track, pin, quality string) bool {
 
 // AddCollection downloads the tracks of an album, a playlist, a mix or the
 // liked songs, as c. A collection downloaded before takes the tracks it
-// holds now. It returns how many tracks it added.
+// holds now, but a live stream, which it leaves out. It returns how many
+// tracks it added.
 func (m *Manager) AddCollection(c Collection, tracks []media.Track, quality string) int {
 	if m == nil || c.ID == "" {
 		return 0
@@ -471,9 +474,11 @@ func (m *Manager) AddCollection(c Collection, tracks []media.Track, quality stri
 		if t.ID == "" {
 			continue
 		}
-		c.Tracks = append(c.Tracks, t.ID)
 		if m.pin(t, c.ID, quality) {
 			n++
+		}
+		if _, ok := m.idx.Tracks[t.ID]; ok {
+			c.Tracks = append(c.Tracks, t.ID)
 		}
 	}
 	if c.Total <= len(c.Tracks) {
@@ -693,6 +698,47 @@ func (m *Manager) Rematch(id string) {
 	}
 	m.wake()
 	m.changed()
+}
+
+// SetLive tells whether a video is live, as its broadcast goes on, as
+// playback finds out. A live stream has no file to keep: the tracks of one
+// waiting to download are left out, of their collections too, and refused
+// until it plays as a video again.
+func (m *Manager) SetLive(video string, live bool) {
+	if m == nil || video == "" {
+		return
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.idx.Live[video] == live {
+		return
+	}
+	if live {
+		m.leaveOut(video)
+	} else {
+		delete(m.idx.Live, video)
+	}
+	m.changed()
+}
+
+// leaveOut keeps video as live, and leaves the tracks waiting for its
+// audio out of the downloads, and of their collections. Its caller holds
+// mu, and takes in the change.
+func (m *Manager) leaveOut(video string) {
+	m.idx.Live[video] = true
+	for id, e := range m.idx.Tracks {
+		if e.video() != video || m.done(e) {
+			continue
+		}
+		log.Printf("mixmusic: %s is a live stream, which doesn't download; leaving it out", id)
+		m.drop(id)
+		for _, c := range m.idx.Collections {
+			// A snapshot shares the collection's tracks.
+			if i := slices.Index(c.Tracks, id); i >= 0 {
+				c.Tracks = slices.Delete(slices.Clone(c.Tracks), i, i+1)
+			}
+		}
+	}
 }
 
 // SetPaused pauses the downloads, the user's way: those under way stop,

@@ -357,6 +357,8 @@ func (m *Manager) finish(j *job, err error) {
 		// It waits, and goes on from its part.
 	case errors.Is(err, errBusy):
 		m.nextAt[j.id] = time.Now().Add(busyWait)
+	case errors.Is(err, stream.ErrLive):
+		m.leaveOut(j.video)
 	default:
 		if j.progressed() {
 			// It came on before it failed, as on a slow, flaky network: its

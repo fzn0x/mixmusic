@@ -38,6 +38,10 @@ type index struct {
 	// Pending are the files that couldn't be deleted, as one open on
 	// Windows, which go at the next start.
 	Pending []string `json:"pending,omitempty"`
+	// Live are the videos found live, as their broadcast went on, by ID:
+	// their streams have no file to keep, so their tracks don't download
+	// until one plays as a video again.
+	Live map[string]bool `json:"live,omitempty"`
 }
 
 // entry is a track downloaded, or waiting to be.
@@ -104,7 +108,7 @@ type Collection struct {
 
 func newIndex() *index {
 	return &index{Version: indexVersion, Tracks: map[string]*entry{}, Files: map[string]*file{}, Parts: map[string]string{},
-		Collections: map[string]*Collection{}, Art: map[string]string{}}
+		Collections: map[string]*Collection{}, Art: map[string]string{}, Live: map[string]bool{}}
 }
 
 // readIndex reads the index of the folder dir: an empty one when it has
@@ -152,6 +156,9 @@ func (x *index) fill() {
 	if x.Art == nil {
 		x.Art = map[string]string{}
 	}
+	if x.Live == nil {
+		x.Live = map[string]bool{}
+	}
 	for id, e := range x.Tracks {
 		if e == nil {
 			delete(x.Tracks, id)
@@ -194,10 +201,14 @@ func safePath(p string) bool {
 
 // video returns the ID of the video whose audio plays for e, once known.
 func (e *entry) video() string {
-	t := e.Track
 	if e.Recording != nil {
-		t = *e.Recording
+		return videoOf(*e.Recording)
 	}
+	return videoOf(e.Track)
+}
+
+// videoOf returns the ID of the video of a track of YouTube Music, or "".
+func videoOf(t media.Track) string {
 	if t.Source != media.SourceYouTube {
 		return ""
 	}

@@ -3,6 +3,7 @@ package downloads
 import (
 	"cmp"
 	"context"
+	"maps"
 	"path/filepath"
 	"slices"
 	"sync/atomic"
@@ -100,9 +101,11 @@ type Snapshot struct {
 	// originals are the tracks downloaded, as they were asked for.
 	originals map[string]media.Track
 	// files are the downloaded audio by video ID, and art the covers kept
-	// by their addresses: absolute paths.
+	// by their addresses: absolute paths. live are the videos found live,
+	// by ID.
 	files       map[string]string
 	art         map[string]string
+	live        map[string]bool
 	status      Status
 	tracks      []media.Track
 	collections []CollectionView
@@ -198,13 +201,17 @@ func (s *Snapshot) Collection(id string) (CollectionView, bool) {
 }
 
 // Missing counts the tracks, of those a collection holds now, that its
-// download doesn't hold: those added to it since.
+// download doesn't hold: those added to it since, but live streams, which
+// it leaves out.
 func (s *Snapshot) Missing(id string, tracks []media.Track) int {
 	if _, ok := s.Collection(id); !ok {
 		return len(tracks)
 	}
 	n := 0
 	for _, t := range tracks {
+		if s.Live(t.ID) {
+			continue
+		}
 		if st, ok := s.states[t.ID]; !ok || st.Kind == None {
 			if _, running := s.running[t.ID]; !running {
 				n++
@@ -212,6 +219,16 @@ func (s *Snapshot) Missing(id string, tracks []media.Track) int {
 		}
 	}
 	return n
+}
+
+// Live reports whether a track is of a video found live, as its broadcast
+// went on: it doesn't download, as a live stream has no file to keep.
+func (s *Snapshot) Live(trackID string) bool {
+	if s == nil || len(s.live) == 0 {
+		return false
+	}
+	source, video, err := media.ParseID(trackID)
+	return err == nil && source == media.SourceYouTube && s.live[video]
 }
 
 // HasVideo reports whether the downloads hold the audio of a video.
@@ -255,6 +272,9 @@ func (m *Manager) publish() {
 	}
 	for u, p := range m.idx.Art {
 		s.art[u] = filepath.Join(m.dir, filepath.FromSlash(p))
+	}
+	if len(m.idx.Live) > 0 {
+		s.live = maps.Clone(m.idx.Live)
 	}
 	st := &s.status
 	st.Folder, st.Paused = m.dir, m.idx.Paused

@@ -160,6 +160,9 @@ type Settings struct {
 	Loudness bool `json:"loudness"`
 	// Autoplay continues with similar tracks when the queue ends.
 	Autoplay bool `json:"autoplay"`
+	// SkipDisliked passes over the tracks the user disliked as the queue
+	// moves on, and leaves them out of radios.
+	SkipDisliked bool `json:"skipDisliked"`
 	// MusicVideos shows the picture of music videos on the now playing
 	// page, in place of their cover. It is off at first: it fetches more
 	// than the sound, and shows a web page there.
@@ -242,6 +245,7 @@ func Default() Settings {
 		Quality:         QualityBest,
 		Loudness:        true,
 		Autoplay:        true,
+		SkipDisliked:    true,
 		Equalizer:       Equalizer{Preset: "flat", Gains: make([]float64, len(Bands))},
 		Volume:          0.8,
 		CacheSizeMB:     1024,

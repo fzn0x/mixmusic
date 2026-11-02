@@ -127,7 +127,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   also finds the song of a music video, by its title and artists, which
   the video's radio starts from: YouTube Music makes the radio of a video
   out of videos.
-- **`lyrics`** finds synced lyrics on LRCLIB and reads LRC.
+- **`lyrics`** finds synced lyrics on Unison and LRCLIB, and reads TTML and
+  LRC.
 - **`internal/library`** keeps liked songs, mixes, the history and stats in
   `library.json`.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and

@@ -115,15 +115,22 @@ func controlsInfo(np NowPlaying, at time.Time) *nowplaying.Info {
 	return info
 }
 
-// setSongSpeed keeps speed, as the system's controls ask it, as the speed
-// of songs, which the player takes in: the speed of the kind of track that
-// plays, as no other kind plays yet.
-func (a *App) setSongSpeed(speed float64) {
+// setSpeed keeps speed, as the system's controls ask it, as the speed of
+// the kind of track they show, which the player takes in: the podcasts'
+// for an episode, else the songs'.
+func (a *App) setSpeed(speed float64) {
+	a.controls.mu.Lock()
+	episode := a.controls.np.Track != nil && a.controls.np.Track.IsEpisode()
+	a.controls.mu.Unlock()
 	st := a.settings.Get()
-	if speed = settings.CleanSpeed(speed); speed == st.SongSpeed {
+	kept := &st.SongSpeed
+	if episode {
+		kept = &st.PodcastSpeed
+	}
+	if speed = settings.CleanSpeed(speed); speed == *kept {
 		return
 	}
-	st.SongSpeed = speed
+	*kept = speed
 	if _, err := (&Preferences{a}).Set(st); err != nil {
 		log.Printf("mixmusic: keeping the speed: %v", err)
 	}
@@ -139,7 +146,7 @@ func (a *App) controlsAsked(r nowplaying.Request) {
 	case nowplaying.SetVolume:
 		a.command(PlayerCommand{Command: CommandVolume, Value: r.Volume})
 	case nowplaying.SetRate:
-		a.setSongSpeed(r.Rate)
+		a.setSpeed(r.Rate)
 	default:
 		if c, ok := controlCommands[r.Command]; ok {
 			a.command(PlayerCommand{Command: c})

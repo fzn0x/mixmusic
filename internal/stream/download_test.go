@@ -179,6 +179,22 @@ func TestDownloadRefusesOtherAudio(t *testing.T) {
 	}
 }
 
+// TestDownloadRefusesLive tells a live stream, which has no file to keep,
+// from audio that doesn't play, before a byte comes.
+func TestDownloadRefusesLive(t *testing.T) {
+	r := NewResolver(nil, "")
+	r.Run = func(context.Context, ...string) ([]byte, error) {
+		return []byte(`{"url": "https://example.com/live/index.m3u8", "protocol": "m3u8_native", "live_status": "is_live"}`), nil
+	}
+	_, err := NewProxy(r).Download(context.Background(), testID, func(Stream) (int64, error) {
+		t.Error("resume was asked of a live stream")
+		return 0, nil
+	}, &bytes.Buffer{}, nil)
+	if !errors.Is(err, ErrLive) || errors.Is(err, ErrNoAudio) {
+		t.Errorf("a live stream: %v", err)
+	}
+}
+
 // TestDownloadThrottled tells YouTube turning requests down by its kind,
 // in words that never quote the stream's URL.
 func TestDownloadThrottled(t *testing.T) {

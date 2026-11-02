@@ -33,6 +33,9 @@ var (
 	// ErrNoAudio: YouTube gave a stream of a format the engine doesn't
 	// play.
 	ErrNoAudio = errors.New("YouTube has no audio of this track that MixMusic plays")
+	// ErrLive: the video is live, as its broadcast goes on: its stream is
+	// a playlist of what comes next, with no file to keep.
+	ErrLive = errors.New("it's a live stream, which doesn't download")
 )
 
 // IsNetwork reports whether err tells that the network failed, rather than
@@ -112,7 +115,8 @@ func (s Stream) Container() string {
 // the stream found, and returns how many of its bytes w holds already,
 // from an earlier download that stopped: Download goes on from there. The
 // stream must be of a container the engine plays. progress, if set, is
-// told how many bytes of the stream w holds as they come.
+// told how many bytes of the stream w holds as they come. A live stream
+// ends it with ErrLive.
 //
 // Its errors never quote the stream's URL, which carries the user's IP
 // address. A writer that fails ends it with the writer's error, as of a
@@ -121,6 +125,9 @@ func (p *Proxy) Download(ctx context.Context, videoID string, resume func(s Stre
 	s, err := p.resolve(ctx, videoID)
 	if err != nil {
 		return s, err
+	}
+	if s.Live {
+		return s, ErrLive
 	}
 	if s.Container() == "" {
 		return s, ErrNoAudio

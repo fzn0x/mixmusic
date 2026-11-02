@@ -58,6 +58,37 @@ rules keep the project healthy:
 - **Honest errors.** When a service refuses something, say what and how to
   get past it, in the words of the interface.
 
+## Keeping changes apart
+
+Many pull requests are open at once, and one that merges shouldn't make the
+others conflict. So a feature lives in files of its own: adding one touches
+those files and a few new ones, not a shared list or a shared struct.
+
+- **Settings.** A setting lives in its section's struct in
+  `internal/settings`, in that section's file, such as
+  `internal/settings/playback.go`, with its default and its clean-up beside
+  it. Each field has a doc comment of its own, so a new field never makes
+  gofmt re-align the ones beside it. `settings.json` stays flat: the
+  sections are embedded.
+- **The settings page.** A setting's row lives in its feature's file, and
+  registers itself from `init()` with an order number, spaced by 10.
+  Nothing edits a central list or switch.
+- **Options, not arguments.** When a function or an interface method would
+  take one more argument, give it an options struct whose zero value keeps
+  what it does today, and add a field. Don't add bool or positional
+  arguments to interfaces that tests fake.
+- **Test fakes.** Fakes embed the do-nothing doubles of
+  `internal/player/playertest`, and override only what the test needs.
+- **Tests.** A feature's tests go in a test file of their own, named after
+  the feature, such as `speed_test.go`, not at the end of a shared one.
+- **Docs.** Each part's docs are a file of their own in
+  [docs/architecture](docs/architecture/README.md).
+- **The changelog.** A change people will notice adds a file of its own to
+  changelog.d, as [Commits](#commits) tells.
+- **Small files.** Keep files small, and name them after what they hold.
+  Split a file when two features that have nothing to do with each other
+  keep editing it.
+
 ## Commits
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org),

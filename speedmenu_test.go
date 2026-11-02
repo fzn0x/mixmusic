@@ -129,6 +129,31 @@ func TestSpeedMenuSlider(t *testing.T) {
 		}
 	}
 	takeSettings(t, s, 1.75)
+
+	// The button's tip, which would cover the menu, waits for it to close.
+	b, ok := tt.Find("Speed: 1.75×")
+	if !ok {
+		t.Fatalf("the button doesn't show 1.75×: %q", tt.Texts())
+	}
+	tips := func() int {
+		tt.Move(0, 0)
+		tt.Frame()
+		tt.Move(b.X+b.W/2, b.Y+b.H/2)
+		tt.Advance(time.Second)
+		tt.Frame()
+		return textCount(tt, "Speed: 1.75×")
+	}
+	if n := tips(); n != 1 {
+		t.Errorf("with the menu open, the button shows its tip: %d of it", n)
+	}
+	tt.Key(0, ui.KeyEscape)
+	tt.Frame()
+	if showsExactly(tt, "speed of songs") {
+		t.Fatal("Escape leaves the menu open")
+	}
+	if n := tips(); n != 2 {
+		t.Errorf("with the menu closed, the button doesn't show its tip: %d of it", n)
+	}
 }
 
 // savedSettings are testPlayer's, whose settings are those the app keeps,

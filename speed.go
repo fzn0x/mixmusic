@@ -44,8 +44,8 @@ func (s *shell) setSpeed(v float64) {
 // speedLocked tells why the speed of what plays can't change, or "" when
 // it can: Spotify's players, in MixMusic or on Spotify Connect, play its
 // tracks and episodes at their own speed, as a live stream plays as it's
-// broadcast. A Spotify track that isn't on its device yet, as it loads,
-// goes there, but in the mode that plays it from YouTube Music.
+// broadcast. A Spotify track not on its device yet, as it loads, goes
+// there, unless Spotify tracks play from YouTube Music.
 func (s *shell) speedLocked() string {
 	const spotify = "Spotify plays this one at its own speed"
 	src := s.st.Source
@@ -77,14 +77,18 @@ func (s *shell) speedButton(c *ui.Context) {
 	case *speed != 1:
 		label += ": " + speedLabel(*speed)
 	}
-	ui.Box(c.Key("speed-tip")).Shrink(0).Tooltip(label).Children(func() {
+	tip := ui.Box(c.Key("speed-tip")).Shrink(0)
+	open := ui.Local(tip, "open", func() bool { return false })
+	if why != "" {
+		*open = false
+	}
+	// The tip would cover the menu.
+	if !*open {
+		tip.Tooltip(label)
+	}
+	tip.Children(func() {
 		b := s.buttonBase(c.Key("speed")).Height(32).MinWidth(32).PaddingX(6).Radius(k.round(32)).Label(label).
-			Cursor(ui.CursorPointer).Disabled(why != "")
-		open := ui.Local(b, "open", func() bool { return false })
-		if why != "" {
-			*open = false
-		}
-		b.Expanded(*open)
+			Cursor(ui.CursorPointer).Disabled(why != "").Expanded(*open)
 		ink := k.muted
 		switch {
 		case why != "":

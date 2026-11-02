@@ -113,7 +113,9 @@ jobs:
           fi
       # The engine shows what it plays in the system's media controls: an
       # MPRIS player that these call as a desktop does, on a session bus of
-      # their own, on Linux, and Now Playing on macOS.
+      # their own, on Linux, and Now Playing on macOS. On Linux, a portal
+      # of the test's own answers the Flatpak's requests to run in the
+      # background and start at login.
       - name: Show in the system's media controls
         shell: bash
         run: |
@@ -122,7 +124,7 @@ jobs:
             sudo apt-get install -y dbus
             bus="dbus-run-session --"
           fi
-          $bus go test ./internal/nowplaying/ -run 'TestMPRIS|TestNowPlaying' -count=1 -v | tee controls.log
+          $bus go test ./internal/nowplaying/ ./internal/portal/ -run 'TestMPRIS|TestNowPlaying|TestBackgroundPortal' -count=1 -v | tee controls.log
           if grep -q -- '--- SKIP' controls.log; then
             echo "A test skipped."
             exit 1
@@ -195,6 +197,65 @@ jobs:
         run: |
           nix develop --command bash .github/scripts/package.sh "$(jq -r .version package.json)" packages
           ls -l packages
+      # The Flatpak job packs the app of this archive.
+      - name: Keep the Linux archive for the Flatpak
+        if: matrix.platform == 'linux/amd64'
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-amd64
+          path: build/linux-amd64/mixmusic-*-linux-amd64.tar.gz
+          if-no-files-found: error
+          retention-days: 3
+
+  # The Flatpak, as release.yml makes it, of the Linux build above, in
+  # Flathub's container with the GNOME runtime and flatpak-builder:
+  # installed and started in its sandbox. Linux users can try a change
+  # from its flatpak artifact.
+  flatpak:
+    name: Flatpak
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true # Flathub's shared modules
+      # For the metadata's releases, which tools/metainfo writes.
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: linux-amd64
+          path: linux
+      - name: The app and its metadata
+        run: |
+          mkdir -p packaging/flatpak/dist
+          cp linux/mixmusic-*-linux-amd64.tar.gz packaging/flatpak/dist/mixmusic-linux-amd64.tar.gz
+          go run ./tools/metainfo -o packaging/flatpak/dist/io.github.fzn0x.mixmusic.metainfo.xml
+          appstreamcli validate --no-net --explain packaging/flatpak/dist/io.github.fzn0x.mixmusic.metainfo.xml
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.8
+        with:
+          manifest-path: packaging/flatpak/io.github.fzn0x.mixmusic.yml
+          bundle: mixmusic-linux-amd64.flatpak
+          branch: stable
+          upload-artifact: false
+      - name: Install it, and start MixMusic in its sandbox
+        run: bash packaging/flatpak/check.sh mixmusic-linux-amd64.flatpak shots
+      - uses: actions/upload-artifact@v7
+        with:
+          name: flatpak
+          path: mixmusic-linux-amd64.flatpak
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: flatpak-screenshots
+          path: shots/
+          if-no-files-found: ignore
 
   # flake.nix: its lock, MixMusic for Linux built from source, and the
   # configuration GoReleaser publishes releases with.

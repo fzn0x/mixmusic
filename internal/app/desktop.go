@@ -49,6 +49,9 @@ func (a *App) Start() {
 		return
 	}
 	a.setupTray()
+	if a.settings.Get().CloseToTray {
+		runInBackground()
+	}
 	a.applyMediaKeys(a.settings.Get().MediaKeys)
 	a.watchUpdates()
 	a.watchNetwork()

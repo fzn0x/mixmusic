@@ -23,8 +23,12 @@ import (
 	"github.com/ebitengine/purego"
 )
 
+// busName is the player's name on the bus, and desktopEntry the name of
+// MixMusic's desktop entry, which desktops take its name and icon from:
+// those of its Flatpak inside one.
+var busName, desktopEntry = mprisNames(os.Getenv("FLATPAK_ID"))
+
 const (
-	busName         = "org.mpris.MediaPlayer2.mixmusic"
 	objectPath      = "/org/mpris/MediaPlayer2"
 	rootInterface   = "org.mpris.MediaPlayer2"
 	playerInterface = "org.mpris.MediaPlayer2.Player"
@@ -425,7 +429,7 @@ func (l *linuxControls) property(name string) uintptr {
 	case "Identity":
 		return gVariantNewString("MixMusic")
 	case "DesktopEntry":
-		return gVariantNewString("mixmusic")
+		return gVariantNewString(desktopEntry)
 	case "SupportedUriSchemes", "SupportedMimeTypes":
 		return array("s", nil)
 	case "PlaybackStatus":

@@ -373,12 +373,12 @@ func (r *Report) compare(path string, file, kept any, t reflect.Type) {
 }
 
 // field finds the field of the struct type t that encoding/json decodes
-// key into: by its name in JSON, exactly or else ignoring case.
+// key into: by its name in JSON, exactly or else ignoring case. The fields
+// of the structs t embeds count as its own, as they do for encoding/json.
 func field(t reflect.Type, key string) (name string, ft reflect.Type, ok bool) {
 	var folded reflect.StructField
 	found := false
-	for i := range t.NumField() {
-		f := t.Field(i)
+	for _, f := range reflect.VisibleFields(t) {
 		tag, _, _ := strings.Cut(f.Tag.Get("json"), ",")
 		if tag == "" || tag == "-" {
 			continue

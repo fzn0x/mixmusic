@@ -205,6 +205,41 @@ func TestProxyServesSurround(t *testing.T) {
 	}
 }
 
+// TestProxyKeepsStereoOnly serves the stereo audio of a video kept, as one
+// downloaded, from what is kept, and its 5.1 surround audio, which no
+// download holds, from YouTube: once the network is gone, that fails, for
+// the player to play the stereo audio kept instead.
+func TestProxyKeepsStereoOnly(t *testing.T) {
+	var minGen atomic.Int32
+	srv, data := upstream(t, 3000, &minGen)
+	srv5, data5 := upstream(t, 5000, &minGen)
+	for i := range data5 {
+		data5[i] ^= 0x55 // not the stereo audio
+	}
+	p, _ := surroundProxy(srv, srv5, len(data), len(data5), true)
+	kept := []byte("the stereo audio downloaded")
+	p.Kept = keptStore{testID: string(kept)}
+	get := func(path string) *httptest.ResponseRecorder {
+		rec := httptest.NewRecorder()
+		p.ServeHTTP(rec, httptest.NewRequest("GET", path, nil))
+		return rec
+	}
+	if rec := get(Path(testID)); rec.Code != 200 || !bytes.Equal(rec.Body.Bytes(), kept) {
+		t.Fatalf("stereo: %d, %q", rec.Code, rec.Body.Bytes())
+	}
+	if rec := get(SurroundPath(testID)); rec.Code != 200 || !bytes.Equal(rec.Body.Bytes(), data5) {
+		t.Fatalf("5.1: %d, %d bytes", rec.Code, rec.Body.Len())
+	}
+	srv.Close()
+	srv5.Close() // the network is gone
+	if rec := get(SurroundPath(testID)); rec.Code == 200 {
+		t.Errorf("5.1 without the network: %d, %d bytes", rec.Code, rec.Body.Len())
+	}
+	if rec := get(Path(testID)); rec.Code != 200 || !bytes.Equal(rec.Body.Bytes(), kept) {
+		t.Errorf("stereo without the network: %d, %q", rec.Code, rec.Body.Bytes())
+	}
+}
+
 func TestProxySaysThereIsNoSurround(t *testing.T) {
 	var minGen atomic.Int32
 	srv, _ := upstream(t, 3000, &minGen)

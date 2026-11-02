@@ -6,6 +6,8 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
+func init() { addSettings("playback", 30, (*shell).speedSettings) }
+
 // speedSettings sets the speed of what MixMusic plays itself, at its own
 // pitch: songs, for now.
 func (s *shell) speedSettings(c *ui.Context) {

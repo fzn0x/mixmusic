@@ -93,6 +93,8 @@ func (s *shell) toolProblems(c *ui.Context) {
 	}
 }
 
+func init() { addSettings("playback", 90, (*shell).toolSettings) }
+
 // toolSettings show the tools MixMusic runs, and install yt-dlp.
 func (s *shell) toolSettings(c *ui.Context) {
 	k := &s.lk
@@ -175,6 +177,8 @@ func ownYTDLPHelp(flatpak bool) string {
 	}
 	return "Use a yt-dlp of your own, such as your package manager's, instead."
 }
+
+func init() { addSettings("playback", 70, (*shell).cacheSettings) }
 
 // cacheSettings show what the offline cache holds, and bound it.
 func (s *shell) cacheSettings(c *ui.Context) {

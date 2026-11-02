@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"runtime"
 	"slices"
 
@@ -11,11 +10,17 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
+// The groups of Settings › Playback: the Spotify tracks and the sound
+// here, the others in their features' files.
+
 // spotifyPlaysHere tells whether MixMusic plays Spotify itself: where its
 // webview, WebView2, decrypts Spotify's audio.
 var spotifyPlaysHere = runtime.GOOS == "windows"
 
-func (s *shell) playbackSettings(c *ui.Context) {
+func init() { addSettings("playback", 10, (*shell).spotifyTrackSettings) }
+
+// spotifyTrackSettings choose how Spotify tracks play, and where.
+func (s *shell) spotifyTrackSettings(c *ui.Context) {
 	k := &s.lk
 	sp := s.accounts().Spotify
 	signedIn := sp.SignedIn
@@ -65,108 +70,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 			s.deviceRow(c)
 		}
 	})
-	s.group(c, "Sound", func() {
-		s.row(c, "Quality", "Data saver streams smaller files of YouTube Music.", func() {
-			saver := 0
-			if s.set.Quality == settings.QualitySaver {
-				saver = 1
-			}
-			if s.segmented(c, "quality", "Quality", &saver, "best", "data saver") {
-				s.set.Quality = settings.QualityBest
-				if saver == 1 {
-					s.set.Quality = settings.QualitySaver
-				}
-				s.save()
-			}
-		}, "best bitrate")
-		desc := "Off: tracks follow each other."
-		if s.set.Crossfade > 0 {
-			desc = fmt.Sprintf("Tracks overlap by %d seconds.", s.set.Crossfade)
-		}
-		s.row(c, "Crossfade", desc, func() {
-			v := float64(s.set.Crossfade)
-			if ui.StepSlider(c.Key("crossfade"), &v, 0, 12, 1).Width(200).Label("Crossfade").Changed() {
-				s.set.Crossfade = int(v + 0.5)
-				s.save()
-			}
-		})
-		even := "Turns loud tracks down to one level, from YouTube's measure of each, so none jumps out. Quiet recordings keep their level."
-		if s.set.SpotifyPlayback == settings.SpotifyPlaybackConnect || s.set.SpotifyPlayback == settings.SpotifyPlaybackHere && spotifyPlaysHere {
-			even += " Spotify plays its own tracks at its own loudness."
-		}
-		s.row(c, "Even loudness", even, func() {
-			if s.switchOf(c.Key("loudness"), &s.set.Loudness).Label("Even loudness").Changed() {
-				s.save()
-			}
-		})
-		s.row(c, "Volume levelling", "Squeezes loud and quiet moments closer together as they play, and lifts quiet recordings.", func() {
-			if s.switchOf(c.Key("normalize"), &s.set.Normalize).Label("Volume levelling").Changed() {
-				s.save()
-			}
-		}, "normalize loudness")
-		s.row(c, "Play 5.1 surround when a track has it", surroundDescription, func() {
-			if s.switchOf(c.Key("surround"), &s.set.Surround).Label("Play 5.1 surround when a track has it").Changed() {
-				s.save()
-			}
-		})
-		s.row(c, "Autoplay", "When the queue runs out, a radio of what you played carries on.", func() {
-			if s.switchOf(c.Key("autoplay"), &s.set.Autoplay).Label("Autoplay").Changed() {
-				s.save()
-			}
-		})
-		s.row(c, "Skip songs made with AI", "Skips the tracks YouTube labels as made with AI. YouTube labels only some of them, so others still play.", func() {
-			if s.switchOf(c.Key("skip-ai"), &s.set.SkipAI).Label("Skip songs made with AI").Changed() {
-				s.save()
-			}
-		})
-		s.row(c, "Skip songs you dislike", "Songs you dislike don't play when the queue moves on, and radios leave them out.", func() {
-			if s.switchOf(c.Key("skip-disliked"), &s.set.SkipDisliked).Label("Skip songs you dislike").Changed() {
-				s.save()
-			}
-		})
-		// Where dislikes go, and, once there are any, a link to them.
-		note, see := dislikesNote, len(s.svc.Collection.Disliked()) > 0
-		if see {
-			note += " See the songs you dislike."
-		}
-		s.found(c, "", note, func() {
-			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
-				ui.Text(c, dislikesNote)
-				if see {
-					ui.Text(c, " ")
-					s.linkOf(c, "See the songs you dislike", "/library/disliked")
-					ui.Text(c, ".")
-				}
-			})
-		})
-	})
-	s.speedSettings(c)
-	s.group(c, "Music videos", func() {
-		desc := "On the now playing page, a music video plays its picture in place of the cover, muted and in time with the sound. The picture takes about 3 MB a minute more, under 1 MB with data saver."
-		problem := s.videoProblem()
-		if problem != "" {
-			desc = problem
-		}
-		s.row(c, "Show the video of music videos", desc, func() {
-			if s.switchOf(c.Key("music-videos"), &s.set.MusicVideos).Label("Show the video of music videos").Disabled(problem != "").Changed() {
-				s.save()
-			}
-		})
-	})
-	s.equalizerSettings(c)
-	s.lyricsSettings(c)
-	s.cacheSettings(c)
-	s.downloadSettings(c)
-	s.toolSettings(c)
 }
-
-// surroundDescription tells what 5.1 surround does, in Settings › Playback.
-const surroundDescription = "Some tracks have a 5.1 surround mix beside their stereo one. It plays on six speakers where your output has them, " +
-	"else mixed down to stereo. The 5.1 button by the player turns it on and off too."
-
-// dislikesNote is what the note under Skip songs you dislike says of where
-// dislikes go.
-const dislikesNote = "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic."
 
 // deviceRow chooses the Spotify Connect device that plays Spotify tracks.
 func (s *shell) deviceRow(c *ui.Context) {
@@ -187,6 +91,47 @@ func (s *shell) deviceRow(c *ui.Context) {
 		}
 		if s.iconButton(c, "devices-again", "refresh", "Look for devices again", false, 16).Clicked() {
 			s.forget("devices")
+		}
+	})
+}
+
+// soundRows are the rows of Settings › Playback › Sound, which register
+// from their features' files.
+const soundRows = "playback › Sound"
+
+func init() { addSettings("playback", 20, (*shell).soundSettings) }
+
+// soundSettings show the rows of the sound.
+func (s *shell) soundSettings(c *ui.Context) {
+	s.group(c, "Sound", func() { s.settingsOf(c, soundRows) })
+}
+
+func init() { addSettings(soundRows, 10, (*shell).qualityRow) }
+
+// qualityRow chooses between the best audio and smaller streams.
+func (s *shell) qualityRow(c *ui.Context) {
+	s.row(c, "Quality", "Data saver streams smaller files of YouTube Music.", func() {
+		saver := 0
+		if s.set.Quality == settings.QualitySaver {
+			saver = 1
+		}
+		if s.segmented(c, "quality", "Quality", &saver, "best", "data saver") {
+			s.set.Quality = settings.QualityBest
+			if saver == 1 {
+				s.set.Quality = settings.QualitySaver
+			}
+			s.save()
+		}
+	}, "best bitrate")
+}
+
+func init() { addSettings(soundRows, 60, (*shell).autoplayRow) }
+
+// autoplayRow carries on with a radio as the queue runs out.
+func (s *shell) autoplayRow(c *ui.Context) {
+	s.row(c, "Autoplay", "When the queue runs out, a radio of what you played carries on.", func() {
+		if s.switchOf(c.Key("autoplay"), &s.set.Autoplay).Label("Autoplay").Changed() {
+			s.save()
 		}
 	})
 }

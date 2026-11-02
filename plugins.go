@@ -9,6 +9,8 @@ import (
 	"github.com/fzn0x/mixmusic/internal/addons"
 )
 
+func init() { addSettings("plugins", 10, (*shell).pluginSettings) }
+
 // pluginSettings list the plugins installed, which the user enables or
 // removes. The web interface runs them, for now.
 func (s *shell) pluginSettings(c *ui.Context) {

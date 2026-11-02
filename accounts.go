@@ -13,6 +13,8 @@ import (
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
+func init() { addSettings("accounts", 10, (*shell).accountSettings) }
+
 // accountSettings sign in and out of Spotify, YouTube Music and Last.fm.
 func (s *shell) accountSettings(c *ui.Context) {
 	st := s.accounts()

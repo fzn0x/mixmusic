@@ -25,6 +25,9 @@ var eqPresets = []struct {
 	{"lofi", "Lo-fi", [10]float64{-3, 0, 3, 4, 2, 0, -2, -4, -6, -8}},
 }
 
+func init() { addSettings("playback", 50, (*shell).equalizerSettings) }
+
+// equalizerSettings shape the sound of what MixMusic plays itself.
 func (s *shell) equalizerSettings(c *ui.Context) {
 	k := &s.lk
 	eq := &s.set.Equalizer

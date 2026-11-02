@@ -6,7 +6,13 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-func (s *shell) aboutSettings(c *ui.Context) {
+// The groups of Settings › About: this copy of MixMusic and its licenses
+// here, the updates in desktop.go.
+
+func init() { addSettings("about", 10, (*shell).mixmusicSettings) }
+
+// mixmusicSettings tell of this copy of MixMusic, and of a newer one.
+func (s *shell) mixmusicSettings(c *ui.Context) {
 	k := &s.lk
 	info := s.svc.System.Info()
 	u := s.svc.System.Updates()
@@ -43,7 +49,13 @@ func (s *shell) aboutSettings(c *ui.Context) {
 			})
 		})
 	})
-	s.updateSettings(c)
+}
+
+func init() { addSettings("about", 30, (*shell).licenseSettings) }
+
+// licenseSettings show the licenses of what MixMusic is made of.
+func (s *shell) licenseSettings(c *ui.Context) {
+	k := &s.lk
 	s.group(c, "Licenses", func() {
 		for i, n := range append(s.svc.System.Notices(), fontNotices()...) {
 			open := s.licenseOpen == i

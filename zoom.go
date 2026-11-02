@@ -153,6 +153,8 @@ func isZoom(id string) bool {
 	return id == "view.zoomIn" || id == "view.zoomOut" || id == "view.zoomReset"
 }
 
+func init() { addSettings(colorTypeRows, 30, (*shell).zoomRow) }
+
 // zoomRow is the setting of the zoom, in Settings › Appearance.
 func (s *shell) zoomRow(c *ui.Context) {
 	description := "Makes everything larger or smaller: text, buttons and artwork."

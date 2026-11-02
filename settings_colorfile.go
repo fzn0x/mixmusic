@@ -29,6 +29,8 @@ var colorSources = []struct {
 // colorFileHelp is where docs/themes.md tells how to set up a colour file.
 const colorFileHelp = "https://fzn0x.github.io/mixmusic/docs/themes/#colours-from-a-file"
 
+func init() { addSettings(colorTypeRows, 10, (*shell).colorFileSettings) }
+
 // colorFileSettings chooses where the colours come from, and tells what
 // MixMusic read of the file.
 func (s *shell) colorFileSettings(c *ui.Context) {

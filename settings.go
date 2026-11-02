@@ -1,6 +1,8 @@
 package main
 
 import (
+	"cmp"
+	"fmt"
 	"slices"
 	"strings"
 
@@ -42,7 +44,7 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 		ui.Column(c).MaxWidth(880).Children(func() {
 			s.settingsFileProblem(c)
 			if !f.on() {
-				s.settingsSection(c, settingsTabs[selected])
+				s.settingsOf(c, settingsTabs[selected])
 				if current {
 					f.reveal = "" // a group the section doesn't show
 				}
@@ -50,7 +52,7 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 			}
 			for _, t := range settingsTabs {
 				f.section = t
-				s.settingsSection(c, t)
+				s.settingsOf(c, t)
 			}
 			f.section = ""
 			if f.found == 0 {
@@ -63,23 +65,47 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 	})
 }
 
-// settingsSection builds the section of the settings tab names.
-func (s *shell) settingsSection(c *ui.Context, tab string) {
-	switch tab {
-	case "appearance":
-		s.appearanceSettings(c)
-	case "playback":
-		s.playbackSettings(c)
-	case "accounts":
-		s.accountSettings(c)
-	case "plugins":
-		s.pluginSettings(c)
-	case "desktop":
-		s.desktopSettings(c)
-	case "shortcuts":
-		s.shortcutSettings(c)
-	case "about":
-		s.aboutSettings(c)
+// A settingsPart is a part of a place of the settings page, which builds
+// from its feature's file: a group of a section, or a row of a group whose
+// rows register.
+type settingsPart struct {
+	order int
+	build func(*shell, *ui.Context)
+}
+
+// settingsParts are the parts of each place of the settings page, in their
+// order, as addSettings registered them.
+var settingsParts = map[string][]settingsPart{}
+
+// addSettings registers build as a part of place on the settings page, at
+// order among place's parts. A place is a section, by its tab's name in
+// settingsTabs, as "playback", or a group whose rows register, which names
+// its section first, as soundRows: "playback › Sound". Each part registers
+// from its feature's own file, in an init function, so that a new setting
+// edits only that file: orders go by tens, for a new part to slot in
+// between, and two parts of a place can't share one.
+func addSettings(place string, order int, build func(*shell, *ui.Context)) {
+	if section, _, _ := strings.Cut(place, " › "); !slices.Contains(settingsTabs, section) {
+		panic("settings: " + place + " is in no section")
+	}
+	settingsParts[place] = withPart(settingsParts[place], place, order, build)
+}
+
+// withPart is parts, the parts of place in their order, with build at
+// order among them.
+func withPart(parts []settingsPart, place string, order int, build func(*shell, *ui.Context)) []settingsPart {
+	i, taken := slices.BinarySearchFunc(parts, order, func(p settingsPart, order int) int { return cmp.Compare(p.order, order) })
+	if taken {
+		panic(fmt.Sprintf("settings: two parts of %s at %d", place, order))
+	}
+	return slices.Insert(parts, i, settingsPart{order, build})
+}
+
+// settingsOf builds the parts of place, in their order: a section of the
+// settings, or the rows of a group.
+func (s *shell) settingsOf(c *ui.Context, place string) {
+	for _, p := range settingsParts[place] {
+		p.build(s, c)
 	}
 }
 

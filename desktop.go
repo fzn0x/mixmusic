@@ -12,6 +12,8 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 )
 
+func init() { addSettings("desktop", 10, (*shell).desktopSettings) }
+
 func (s *shell) desktopSettings(c *ui.Context) {
 	s.group(c, "On the desktop", func() {
 		toggle := func(key, title, description string, v *bool, words ...string) {
@@ -77,6 +79,8 @@ func (s *shell) desktopSettings(c *ui.Context) {
 		}
 	}
 }
+
+func init() { addSettings("shortcuts", 10, (*shell).shortcutSettings) }
 
 // shortcutSettings list the commands and their keys, which the user
 // records by pressing them: Escape cancels, Backspace removes the
@@ -200,6 +204,8 @@ func (s *shell) setShortcut(cmd command, keys string) {
 	}
 	s.save()
 }
+
+func init() { addSettings("about", 20, (*shell).updateSettings) }
 
 // updateSettings check for new versions, and install them without asking.
 func (s *shell) updateSettings(c *ui.Context) {

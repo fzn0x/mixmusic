@@ -15,6 +15,8 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
+// The groups of Settings › Appearance.
+
 // layoutChoices are the layout designs, in the order of settings.Layouts,
 // as Settings › Appearance offers them.
 var layoutChoices = []choice{
@@ -24,7 +26,10 @@ var layoutChoices = []choice{
 	{"Tiles", "Flat tiles, giant light lowercase words and outlined boxes, as MixMusic first was.", false},
 }
 
-func (s *shell) appearanceSettings(c *ui.Context) {
+func init() { addSettings("appearance", 10, (*shell).layoutSettings) }
+
+// layoutSettings choose the layout design.
+func (s *shell) layoutSettings(c *ui.Context) {
 	k := &s.lk
 	s.group(c, "Layout", func() {
 		layout := slices.Index(settings.Layouts, s.set.Layout)
@@ -43,6 +48,13 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			s.save()
 		}
 	})
+}
+
+func init() { addSettings("appearance", 20, (*shell).themeSettings) }
+
+// themeSettings choose the theme, or one for each mode of the computer.
+func (s *shell) themeSettings(c *ui.Context) {
+	k := &s.lk
 	s.groupWith(c, "Theme", func() {
 		if s.link(c, "more-themes", "get more themes") {
 			s.navigate("/marketplace/themes")
@@ -90,8 +102,13 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 		}
 		s.problems(c, addons.KindTheme)
 	})
-	// The options of the built-in themes, whose effects the native
-	// interface draws itself.
+}
+
+func init() { addSettings("appearance", 30, (*shell).themeOptionSettings) }
+
+// themeOptionSettings show the options of the built-in themes, whose
+// effects the native interface draws itself.
+func (s *shell) themeOptionSettings(c *ui.Context) {
 	if th, ok := s.activeTheme(); ok && th.Builtin && len(th.Options) > 0 {
 		s.group(c, th.Name+" options", func() {
 			for _, o := range th.Options {
@@ -99,44 +116,75 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			}
 		})
 	}
-	s.group(c, "Colour and type", func() {
-		s.colorFileSettings(c)
-		artwork, accent := "Take the accent colour from the artwork of what plays.", "Replaces the theme's accent when the artwork does not set it."
-		if s.set.ColorSource != settings.ColorsTheme {
-			artwork = "Take the accent colour from the artwork of what plays, over your colour file's."
-			accent = "Replaces your colour file's accent when the artwork does not set it."
+}
+
+// colorTypeRows are the rows of Settings › Appearance › Colour and type,
+// which register from their features' files.
+const colorTypeRows = "appearance › Colour and type"
+
+func init() { addSettings("appearance", 40, (*shell).colorTypeSettings) }
+
+// colorTypeSettings show the rows of colour and type.
+func (s *shell) colorTypeSettings(c *ui.Context) {
+	s.group(c, "Colour and type", func() { s.settingsOf(c, colorTypeRows) })
+}
+
+func init() { addSettings(colorTypeRows, 20, (*shell).accentRows) }
+
+// accentRows choose where the accent colour comes from.
+func (s *shell) accentRows(c *ui.Context) {
+	artwork, accent := "Take the accent colour from the artwork of what plays.", "Replaces the theme's accent when the artwork does not set it."
+	if s.set.ColorSource != settings.ColorsTheme {
+		artwork = "Take the accent colour from the artwork of what plays, over your colour file's."
+		accent = "Replaces your colour file's accent when the artwork does not set it."
+	}
+	s.row(c, "Follow the artwork", artwork, func() {
+		if s.switchOf(c.Key("dynamic-accent"), &s.set.DynamicAccent).Label("Follow the artwork").Changed() {
+			s.save()
 		}
-		s.row(c, "Follow the artwork", artwork, func() {
-			if s.switchOf(c.Key("dynamic-accent"), &s.set.DynamicAccent).Label("Follow the artwork").Changed() {
-				s.save()
-			}
-		})
-		s.row(c, "Accent colour", accent, func() { s.accentControl(c) })
-		s.zoomRow(c)
-		s.row(c, "Text size", fmt.Sprintf("%d%%", int(s.set.FontScale*100+0.5)), func() {
-			if ui.StepSlider(c.Key("font-scale"), &s.set.FontScale, 0.85, 1.3, 0.05).Width(200).Label("Text size").Changed() {
-				s.save()
-			}
-		}, "font")
-		s.row(c, "Density", "Compact fits more rows on the screen.", func() {
-			compact := 0
-			if s.set.Density == settings.DensityCompact {
-				compact = 1
-			}
-			if s.segmented(c, "density", "Density", &compact, "comfortable", "compact") {
-				s.set.Density = settings.DensityComfortable
-				if compact == 1 {
-					s.set.Density = settings.DensityCompact
-				}
-				s.save()
-			}
-		}, "comfortable spacing")
-		s.row(c, "Icons only in the sidebar", "The sidebar shows its pages as icons. It does in narrow windows too, until you unfold it there.", func() {
-			if s.switchOf(c.Key("collapsed"), &s.set.SidebarCollapsed).Label("Icons only in the sidebar").Changed() {
-				s.save()
-			}
-		}, "collapse")
 	})
+	s.row(c, "Accent colour", accent, func() { s.accentControl(c) })
+}
+
+func init() { addSettings(colorTypeRows, 40, (*shell).textSizeRow) }
+
+// textSizeRow scales the text.
+func (s *shell) textSizeRow(c *ui.Context) {
+	s.row(c, "Text size", fmt.Sprintf("%d%%", int(s.set.FontScale*100+0.5)), func() {
+		if ui.StepSlider(c.Key("font-scale"), &s.set.FontScale, 0.85, 1.3, 0.05).Width(200).Label("Text size").Changed() {
+			s.save()
+		}
+	}, "font")
+}
+
+func init() { addSettings(colorTypeRows, 50, (*shell).densityRow) }
+
+// densityRow chooses how much room the interface gives each element.
+func (s *shell) densityRow(c *ui.Context) {
+	s.row(c, "Density", "Compact fits more rows on the screen.", func() {
+		compact := 0
+		if s.set.Density == settings.DensityCompact {
+			compact = 1
+		}
+		if s.segmented(c, "density", "Density", &compact, "comfortable", "compact") {
+			s.set.Density = settings.DensityComfortable
+			if compact == 1 {
+				s.set.Density = settings.DensityCompact
+			}
+			s.save()
+		}
+	}, "comfortable spacing")
+}
+
+func init() { addSettings(colorTypeRows, 60, (*shell).sidebarRow) }
+
+// sidebarRow shows the sidebar as icons only.
+func (s *shell) sidebarRow(c *ui.Context) {
+	s.row(c, "Icons only in the sidebar", "The sidebar shows its pages as icons. It does in narrow windows too, until you unfold it there.", func() {
+		if s.switchOf(c.Key("collapsed"), &s.set.SidebarCollapsed).Label("Icons only in the sidebar").Changed() {
+			s.save()
+		}
+	}, "collapse")
 }
 
 // chooseTheme wears the theme id: following the computer, as the theme

@@ -120,7 +120,7 @@ func sameColor(a, b color.Color) bool {
 
 // TestPinnedSearch keeps the search and the sort of a playlist's tracks
 // under the top bar once the page scrolled past them, in every layout
-// design. What the user types there keeps the focus, and shows the
+// design, the box keeping the focus. What the user types there shows the
 // tracks found under them, however few.
 func TestPinnedSearch(t *testing.T) {
 	const label = "Search this playlist"
@@ -132,10 +132,15 @@ func TestPinnedSearch(t *testing.T) {
 		tt := tester(t, s)
 		show(s, tt, playlistPath(p.ID))
 		before, _ := tt.Find(label)
+		// The box given the focus in its place keeps it pinned.
+		click(t, s, tt, label)
 		scrollBy(tt, 1500)
 		pinned, ok := tt.Find(label)
 		if !ok || pinned.Y < 48+pinPad || pinned.Y > 48+pinPad+40 {
 			t.Fatalf("%s: scrolled, the search is at %v (%v), at %v before", layout, pinned, ok, before)
+		}
+		if !tt.Focused(label) {
+			t.Errorf("%s: pinned, the search lost the focus", layout)
 		}
 		scrollBy(tt, 600)
 		if r, _ := tt.Find(label); r.Y != pinned.Y {
@@ -144,7 +149,6 @@ func TestPinnedSearch(t *testing.T) {
 		if _, ok := tt.Find("Midnight City 0"); ok {
 			t.Errorf("%s: the list's start shows, scrolled far", layout)
 		}
-		click(t, s, tt, label)
 		tt.Type("teardrop 7")
 		s.drain()
 		tt.Frame()

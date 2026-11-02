@@ -118,11 +118,29 @@ func (pl *plugin) natives() *sobek.Object {
 		return pl.async(func(ctx context.Context) (any, error) { return svc.Catalog.Lyrics(ctx, t) })
 	})
 
-	// The library.
+	// The library. The player hears of a dislike at once, as the
+	// interface's own buttons tell it: liking a disliked track takes the
+	// dislike back.
 	set("isLiked", func(id string) bool { return h.a.IsLiked(id) })
 	set("setLiked", func(v sobek.Value, liked bool) sobek.Value {
 		t := track(v)
+		if liked && h.a.IsDisliked(t.ID) {
+			h.p.Disliked(t.ID, false)
+		}
 		return pl.async(func(ctx context.Context) (any, error) { return none{}, svc.Collection.SetLiked(ctx, t, liked) })
+	})
+	set("isDisliked", func(id string) bool { return h.a.IsDisliked(id) })
+	set("setDisliked", func(v sobek.Value, disliked bool) sobek.Value {
+		t := track(v)
+		h.p.Disliked(t.ID, disliked)
+		return pl.async(func(ctx context.Context) (any, error) {
+			err := svc.Collection.SetDisliked(ctx, t, disliked)
+			if err != nil {
+				// The library keeps what it had: the player too.
+				h.p.Disliked(t.ID, !disliked)
+			}
+			return none{}, err
+		})
 	})
 	set("mixes", func() sobek.Value { return pl.fromGo(svc.Collection.Playlists()) })
 	set("createMix", func(title string, v sobek.Value) sobek.Value {

@@ -115,6 +115,8 @@ func TestSettingsFindMatches(t *testing.T) {
 		{"config", []string{"Settings file"}, []string{"Crossfade"}},
 		{"music video", []string{"Show the video of music videos", "Show or hide the video of music videos"}, []string{"Crossfade", "Autoplay"}},
 		{"3 mb a minute", []string{"Show the video of music videos"}, []string{"Crossfade"}},
+		{"translate", []string{"lyrics", "Translate lyrics to"}, []string{"Crossfade", "Preset"}},
+		{"unison", []string{"Translate lyrics to"}, []string{"Crossfade"}},
 		{"wallpaper", []string{"Colours from a file"}, []string{"Follow the artwork", "Crossfade"}},
 		{"pywal", []string{"Colours from a file"}, []string{"Follow the artwork", "Crossfade"}},
 		{"zzzz", []string{"No setting matches “zzzz”."}, []string{"Crossfade", "Close to the tray"}},

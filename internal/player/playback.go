@@ -106,7 +106,8 @@ func (p *Player) disliked(id string, disliked bool) {
 				it.Skip = SkipDisliked
 			}
 		case it.Skip == SkipDisliked:
-			it.Skip = ""
+			// The queue may pass over it still, for its label of AI.
+			it.Skip = p.labelSkip(it.Track)
 		}
 		if it.Chosen != was.Chosen || it.Skip != was.Skip {
 			q[i], changed = it, true
@@ -120,20 +121,6 @@ func (p *Player) disliked(id string, disliked bool) {
 	if cur, ok := p.s.Current(); ok && cur.Track.ID == id && cur.Skip != "" {
 		p.leave()
 	}
-}
-
-// leave moves on from the current entry, which the queue now passes over,
-// to the next it doesn't, playing or paused as the current one was. At the
-// end of the queue the current track stops, and the radio autoplay adds,
-// from the last entry the queue doesn't pass over, carries on.
-func (p *Player) leave() {
-	play := p.s.Playing || p.s.Loading || p.s.Waiting && p.s.WillPlay
-	if i := p.s.nextIndex(); i >= 0 {
-		p.playAt(i, 0, play)
-		return
-	}
-	p.halt()
-	p.radioAtEnd(play, false, func() {})
 }
 
 // halt stops the current track at its start, as the end of the queue
@@ -197,17 +184,20 @@ func (p *Player) ToggleMute() {
 
 // SettingsChanged takes in new settings: a Spotify track goes on from where
 // it was in the way of playing Spotify tracks they choose, and the queue
-// passes over disliked tracks, or no longer, as they say.
+// passes over the tracks the user disliked, and those YouTube labels as made
+// with AI, or no longer, as they say.
 func (p *Player) SettingsChanged(s settings.Settings) {
 	p.do(func() {
-		if s.SkipDisliked != p.skipDisliked {
-			p.skipDisliked = s.SkipDisliked
+		moved := s.SpotifyPlayback != p.spotifyMode
+		if moved || s.SkipDisliked != p.skipDisliked || s.SkipAI != p.skipAI {
+			// A Spotify track that plays on a device isn't passed over for
+			// the label of its recording on YouTube Music.
+			p.spotifyMode, p.skipDisliked, p.skipAI = s.SpotifyPlayback, s.SkipDisliked, s.SkipAI
 			p.reflag()
 		}
-		if s.SpotifyPlayback == p.spotifyMode {
+		if !moved {
 			return
 		}
-		p.spotifyMode = s.SpotifyPlayback
 		if cur, ok := p.s.Current(); ok && cur.Track.Source == media.SourceSpotify && p.s.Source != nil {
 			p.playAt(p.s.Index, p.s.Position, p.s.Playing)
 		}
@@ -224,7 +214,7 @@ func (p *Player) reflag() {
 		case it.Chosen:
 			it.Skip = ""
 		case i != p.s.Index || it.Skip != "":
-			it.Skip = p.svc.Skip(it.Track)
+			it.Skip = p.skipOf(it.Track)
 		}
 		q[i] = it
 	}
@@ -325,19 +315,22 @@ func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Dura
 	})
 }
 
-// streamInstead plays a Spotify track from YouTube Music.
+// streamInstead plays a Spotify track from YouTube Music, once its
+// recording there is checked, when the player skips what YouTube labels.
 func (p *Player) streamInstead(token int, entry Item, start time.Duration, autoplay bool) {
-	await(p, func(ctx context.Context) (Source, error) { return p.svc.PrepareStream(ctx, entry.Track) }, func(src Source, err error) {
-		if token != p.loadToken {
-			return
-		}
-		if err != nil {
-			if !p.offline(err, start, autoplay) {
-				p.fail(err.Error())
+	p.checkFallback(token, entry, func() {
+		await(p, func(ctx context.Context) (Source, error) { return p.svc.PrepareStream(ctx, entry.Track) }, func(src Source, err error) {
+			if token != p.loadToken {
+				return
 			}
-			return
-		}
-		p.loadStream(src, start, autoplay)
+			if err != nil {
+				if !p.offline(err, start, autoplay) {
+					p.fail(err.Error())
+				}
+				return
+			}
+			p.loadStream(src, start, autoplay)
+		})
 	})
 }
 
@@ -536,25 +529,31 @@ func (p *Player) onProgress() {
 	}
 	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter && p.retry.n == 0 {
 		p.prefetched = next.UID
-		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
-			// A live stream isn't: what the engine would hold of it would be
-			// behind its live edge by then.
-			if err == nil && src.Mode == ModeStream && src.URL != "" && !src.Live {
-				p.stream.Preload(src.URL)
-			}
-			if errors.Is(err, ErrOffline) {
-				p.prefetchOnline(next.UID)
-			}
-		})
+		p.prefetch(entry, next)
 	}
 	fade := time.Duration(p.svc.Settings().Crossfade) * time.Second
 	if fade > 0 && !p.crossfading && p.s.Source != nil && p.s.Source.Mode == ModeStream &&
-		hasNext && next.UID != entry.UID && dur > 0 && dur-pos <= fade && dur > 3*fade {
+		hasNext && next.UID != entry.UID && dur > 0 && dur-pos <= fade && dur > 3*fade && p.mayStart(next) {
 		p.crossfadeTo(next, fade)
 	}
 	p.reporting.call(p, func() {
 		p.svc.Report(p.now())
 		p.save()
+	})
+}
+
+// preload downloads the audio of next, which plays after the current
+// track, so that it plays at once.
+func (p *Player) preload(next Item) {
+	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
+		// A live stream isn't: what the engine would hold of it would be
+		// behind its live edge by then.
+		if err == nil && src.Mode == ModeStream && src.URL != "" && !src.Live {
+			p.stream.Preload(src.URL)
+		}
+		if errors.Is(err, ErrOffline) {
+			p.prefetchOnline(next.UID)
+		}
 	})
 }
 
@@ -570,9 +569,10 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 			return
 		}
 		i := p.indexOf(next.UID)
-		if i < 0 {
-			return
+		if i < 0 || p.s.Queue[i].Skip != "" {
+			return // gone, or labeled meanwhile: it's passed over in turn
 		}
+		p.fadingInto(next)
 		p.loadToken++
 		p.retry = retryState{}
 		p.endWait()
@@ -693,44 +693,18 @@ func (p *Player) seek(t time.Duration) {
 }
 
 // advance moves on from the current track: ended tells an end from a skip.
-// It passes over the entries the queue skips.
+// It goes to the next entry, round to the first on repeat all, or to a
+// radio with autoplay, past the entries the queue passes over.
 func (p *Player) advance(ended bool) {
 	if len(p.s.Queue) == 0 {
 		return
 	}
-	switch i := p.s.nextIndex(); {
-	case ended && p.s.Repeat == RepeatOne:
+	if ended && p.s.Repeat == RepeatOne {
 		p.playAt(p.s.Index, 0, true)
-	case i >= 0:
-		p.playAt(i, 0, true)
-	default:
-		p.radioAtEnd(true, ended, func() { p.stopAtEnd(ended) })
-	}
-}
-
-// radioAtEnd has autoplay carry on at the end of the queue with a radio of
-// the last entry it doesn't pass over, which plays, or waits paused unless
-// play. Without autoplay, or a radio of tracks it doesn't pass over, stop
-// runs. The radio waits for a network gone at the end of a track, as ended
-// tells.
-func (p *Player) radioAtEnd(play, ended bool, stop func()) {
-	seed, ok := p.radioSeed()
-	if !ok || !p.svc.Settings().Autoplay {
-		stop()
 		return
 	}
-	token := p.loadToken
-	p.extendWithRadio(seed, func(added bool, err error) {
-		switch i := p.s.nextIndex(); {
-		case token != p.loadToken:
-		case added && i > p.s.Index:
-			p.playAt(i, 0, play)
-		case !added && ended && p.radioOffline(err):
-			p.waitRadio()
-		default:
-			stop()
-		}
-	})
+	m, at := p.moveOn(ended)
+	p.step(m, at+1)
 }
 
 // stopAtEnd stops at the end of the queue.
@@ -745,22 +719,27 @@ func (p *Player) stopAtEnd(ended bool) {
 	p.emit(StateChange)
 }
 
-// previous goes back to the start of the track, or to the entry before
-// early in it, passing over those the queue skips.
+// previous goes back to the start of the track, or to the entry before it,
+// past those the queue passes over, early in it.
 func (p *Player) previous() {
-	pos := p.s.Position
+	pos, i := p.s.Position, p.s.Index
 	if p.s.Live {
 		// A live stream has no start to go back to: the track before
 		// plays.
 		pos = 0
 	}
-	if pos <= restartAfter {
-		if i := p.s.prevIndex(); i >= 0 {
-			p.playAt(i, 0, true)
-			return
-		}
+	switch {
+	case pos > restartAfter:
+		p.seek(0)
+	case i > 0:
+		p.step(p.moveBack(), i-1)
+	case p.s.Repeat == RepeatAll && len(p.s.Queue) > 1:
+		m := p.moveBack()
+		m.wrapped = true
+		p.step(m, len(p.s.Queue)-1)
+	default:
+		p.seek(0)
 	}
-	p.seek(0)
 }
 
 func (p *Player) setVolume(v float64) {
@@ -951,6 +930,7 @@ func (p *Player) onPlaying(playing bool) {
 	if playing {
 		p.s.Buffering = false
 		p.s.Loading = false
+		p.sounded()
 	}
 	p.report()
 	p.emit(StateChange)

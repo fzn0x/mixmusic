@@ -1,0 +1,84 @@
+{
+ "currentVideoEndpoint": {
+  "watchEndpoint": {
+   "videoId": "NWuajLluF_E"
+  }
+ },
+ "engagementPanels": [
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {}
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {
+     "structuredDescriptionContentRenderer": {
+      "items": [
+       {},
+       {},
+       {
+        "howThisWasMadeSectionViewModel": {
+         "bodyText": {
+          "content": "Sounds or visuals were altered or fully generated. Learn more",
+          "commandRuns": [
+           {
+            "startIndex": 51,
+            "length": 10,
+            "onTap": {
+             "innertubeCommand": {
+              "commandMetadata": {
+               "webCommandMetadata": {
+                "url": "//support.google.com/youtube/answer/15447836?hl=en",
+                "webPageType": "WEB_PAGE_TYPE_UNKNOWN",
+                "rootVe": 83769
+               }
+              },
+              "urlEndpoint": {
+               "url": "//support.google.com/youtube/answer/15447836?hl=en",
+               "target": "TARGET_NEW_WINDOW"
+              }
+             }
+            }
+           }
+          ],
+          "styleRuns": [
+           {
+            "startIndex": 51,
+            "length": 10,
+            "fontColor": 4278607828
+           }
+          ]
+         },
+         "bodyHeader": {
+          "content": "Made with AI"
+         }
+        }
+       },
+       {},
+       {}
+      ]
+     }
+    }
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  }
+ ]
+}

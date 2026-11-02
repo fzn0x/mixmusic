@@ -911,7 +911,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 // speedSettings sets the speed of what MixMusic plays itself, at its own
 // pitch: songs, for now.
 func (s *shell) speedSettings(c *ui.Context) {
-	s.group(c, "speed", func() {
+	s.group(c, "Speed", func() {
 		s.speedRow(c, "song-speed", "Songs", "Speed of songs", &s.set.SongSpeed)
 		// Spotify's players have no speed to set, and a live stream has
 		// nothing ahead of its live edge to play faster.

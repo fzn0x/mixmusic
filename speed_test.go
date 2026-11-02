@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -49,6 +50,31 @@ func TestSpeedSettings(t *testing.T) {
 	}
 	if !tt.HasText("Their own speed.") || tt.HasText("normal") {
 		t.Errorf("at 1×, the row shows %q", tt.Texts())
+	}
+}
+
+// TestSpeedSettingsCaptions titles the speed's settings, and offers normal,
+// in capitals in a layout other than Tiles.
+func TestSpeedSettingsCaptions(t *testing.T) {
+	s := newTestShell(t)
+	st := s.svc.Preferences.Get()
+	st.Layout, st.SongSpeed = settings.LayoutBlend, 1.5
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+	tt := testerOf(t, s, 1280, 3200)
+	show(s, tt, "/settings/playback")
+	texts := tt.Texts()
+	for _, want := range []string{"Speed", "Normal"} {
+		if !slices.Contains(texts, want) {
+			t.Errorf("Blend's settings don't say %q: %q", want, texts)
+		}
+	}
+	for _, lower := range []string{"speed", "normal"} {
+		if slices.Contains(texts, lower) {
+			t.Errorf("Blend's settings say Tiles' %q: %q", lower, texts)
+		}
 	}
 }
 

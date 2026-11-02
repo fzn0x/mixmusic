@@ -316,6 +316,9 @@ func (a *App) tellStart() {
 // window or, outside, from an edit of settings.json. Then it tells the
 // windows.
 func (a *App) settingsChanged(prev, s settings.Settings, outside bool) {
+	if s.CloseToTray && !prev.CloseToTray {
+		runInBackground()
+	}
 	if prev.SpotifyClientID != s.SpotifyClientID && a.spotify.SignedIn() {
 		// The token belongs to the former app.
 		a.signOutSpotify()

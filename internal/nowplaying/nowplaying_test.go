@@ -171,3 +171,16 @@ func TestCloseShowsNothing(t *testing.T) {
 		t.Errorf("closing what shows: %d calls, closed %v", len(calls), f.closed)
 	}
 }
+
+// In a Flatpak, the player takes a name under the Flatpak's ID, the only
+// names its sandbox lets it own, and gives the Flatpak's desktop entry.
+func TestMPRISNames(t *testing.T) {
+	for _, c := range []struct{ id, bus, entry string }{
+		{"", "org.mpris.MediaPlayer2.mixmusic", "mixmusic"},
+		{"io.github.fzn0x.mixmusic", "org.mpris.MediaPlayer2.io.github.fzn0x.mixmusic", "io.github.fzn0x.mixmusic"},
+	} {
+		if bus, entry := mprisNames(c.id); bus != c.bus || entry != c.entry {
+			t.Errorf("mprisNames(%q) = %q, %q, want %q, %q", c.id, bus, entry, c.bus, c.entry)
+		}
+	}
+}

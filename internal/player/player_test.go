@@ -756,17 +756,36 @@ func TestRadioTracks(t *testing.T) {
 		{ID: "yt:3v", Title: "Red (Official Video)", Artists: []media.Ref{{Name: "Bo"}}, Video: true},
 		{ID: "yt:3", Title: "Red", Artists: []media.Ref{{Name: "Bo"}}},
 		{ID: "yt:4", Title: "Green (Live)", Artists: []media.Ref{{Name: "Cy"}}},
+		// An upload with no song, as a type beat or a cover.
+		{ID: "yt:5v", Title: `Indie Pop Type Beat - "Nighttime"`, Artists: []media.Ref{{Name: "Pacific"}}, Video: true},
 	}
-	var ids []string
-	for _, tr := range RadioTracks(found, queued) {
-		ids = append(ids, tr.ID)
+	ids := func(ts []media.Track) []string {
+		var out []string
+		for _, tr := range ts {
+			out = append(out, tr.ID)
+		}
+		return out
 	}
-	// The song over its video, in the radio's order; a live version stays.
-	if !slices.Equal(ids, []string{"yt:3", "yt:4"}) {
-		t.Errorf("kept %v", ids)
+	// The song over its video, in the radio's order; a live version stays,
+	// and no video does.
+	if got := ids(RadioTracks(found, queued)); !slices.Equal(got, []string{"yt:3", "yt:4"}) {
+		t.Errorf("kept %v", got)
 	}
 	if a, b := SongKey(found[0]), SongKey(found[1]); a != b {
 		t.Errorf("song keys %q and %q", a, b)
+	}
+	// A radio of videos only: its videos, but those of songs queued.
+	videos := []media.Track{
+		{ID: "yt:6v", Title: "Blue (Official Video)", Artists: []media.Ref{{Name: "Ann"}}, Video: true},
+		{ID: "yt:7v", Title: "Grey (Official Video)", Artists: []media.Ref{{Name: "Di"}}, Video: true},
+		{ID: "yt:7w", Title: "Grey (Lyric Video)", Artists: []media.Ref{{Name: "Di"}}, Video: true},
+	}
+	if got := ids(RadioTracks(videos, queued)); !slices.Equal(got, []string{"yt:7v"}) {
+		t.Errorf("of videos only, kept %v", got)
+	}
+	// A radio whose songs are all queued: its videos, rather than nothing.
+	if got := ids(RadioTracks(append(found[:2:2], videos...), queued)); !slices.Equal(got, []string{"yt:7v"}) {
+		t.Errorf("with its songs queued, kept %v", got)
 	}
 }
 

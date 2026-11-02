@@ -299,19 +299,24 @@ func (c *Client) TopTracks(ctx context.Context) ([]media.Track, error) {
 
 // Home returns shelves made of the user's Spotify library: their
 // playlists, recent and top tracks, and saved albums. Shelves whose
-// requests fail are left out.
-func (c *Client) Home(ctx context.Context, userID string) []media.Shelf {
+// requests fail are left out; once all of them failed, the error tells
+// why.
+func (c *Client) Home(ctx context.Context, userID string) ([]media.Shelf, error) {
 	var (
 		playlists   []media.Playlist
 		recent, top []media.Track
 		albums      []media.Album
+		errs        [4]error
 		wg          sync.WaitGroup
 	)
-	wg.Go(func() { playlists, _ = c.MyPlaylists(ctx, userID) })
-	wg.Go(func() { recent, _ = c.RecentlyPlayed(ctx) })
-	wg.Go(func() { top, _ = c.TopTracks(ctx) })
-	wg.Go(func() { albums, _ = c.SavedAlbums(ctx) })
+	wg.Go(func() { playlists, errs[0] = c.MyPlaylists(ctx, userID) })
+	wg.Go(func() { recent, errs[1] = c.RecentlyPlayed(ctx) })
+	wg.Go(func() { top, errs[2] = c.TopTracks(ctx) })
+	wg.Go(func() { albums, errs[3] = c.SavedAlbums(ctx) })
 	wg.Wait()
+	if errs[0] != nil && errs[1] != nil && errs[2] != nil && errs[3] != nil {
+		return nil, errs[0]
+	}
 
 	shelves := []media.Shelf{}
 	add := func(title string, items []media.Item) {
@@ -331,7 +336,7 @@ func (c *Client) Home(ctx context.Context, userID string) []media.Shelf {
 		items = append(items, media.Item{Kind: media.ItemAlbum, Album: &albums[i]})
 	}
 	add("Saved albums", items)
-	return shelves
+	return shelves, nil
 }
 
 func trackItems(tracks []media.Track) []media.Item {

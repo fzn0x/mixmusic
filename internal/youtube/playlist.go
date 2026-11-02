@@ -65,8 +65,11 @@ func parsePlaylist(n node, playlistID string) (media.Playlist, string, error) {
 	}
 	p.Saved = savedInLibrary(h)
 	// YouTube Music shows the header of a playlist the user owns with the
-	// tools to edit it.
-	p.Editable = n.get("contents", "twoColumnBrowseResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer", "contents", 0, "musicEditablePlaylistDetailHeaderRenderer").exists()
+	// tools to edit it, and offers to delete it, in the header's menu or
+	// its tools: the tracks, in the other column, have menus of their own.
+	head := n.get("contents", "twoColumnBrowseResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer", "contents", 0)
+	p.Editable = head.get("musicEditablePlaylistDetailHeaderRenderer").exists()
+	p.Deletable = head.find("deletePlaylistEndpoint").exists()
 	_, shelf := secondaryShelf(n)
 	contents := shelf.get("contents").list()
 	p.Tracks = tracksOf(parseItems(contents))

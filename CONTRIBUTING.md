@@ -110,11 +110,43 @@ release, and the page reads the latest version from GitHub's API. Once the
 release is published, set the two `data-version` spans to it, for when the
 API does not answer.
 
+The release has a Flatpak too, which the workflow packs from the Linux
+build's x64 archive (see [The Flatpak](#the-flatpak)). Its releases come
+from CHANGELOG.md's headings, so it needs no step of its own; when its job
+fails, the release goes out without it, and running the failed jobs again
+adds it.
+
 Installed apps update themselves from the latest release. Its update files are
 signed with the key whose public half is `updates.publicKey` in
 [mygo.config.ts](mygo.config.ts); the secret half is the repository's
 `MYGO_UPDATER_PRIVATE_KEY` secret, which the workflow signs with. Without it, the
 release has no update files and apps stay on the version they have.
+
+## The Flatpak
+
+[packaging/flatpak](packaging/flatpak) packs the app of the Linux build
+into a Flatpak, `io.github.fzn0x.mixmusic`, on the GNOME runtime, with the
+tray's library from Flathub's shared modules (a git submodule) and Node.js
+from the SDK's extension. CI builds it on every pull request, installs it
+and starts MixMusic in it; its `flatpak` artifact is the bundle. To build
+it on Linux, with [Flatpak](https://flatpak.org/setup/) and
+`flatpak install flathub org.flatpak.Builder`:
+
+```sh
+git submodule update --init
+bun run build -- -platform linux/amd64
+mkdir -p packaging/flatpak/dist
+cp build/linux-amd64/mixmusic-*-linux-amd64.tar.gz packaging/flatpak/dist/mixmusic-linux-amd64.tar.gz
+go run ./tools/metainfo -o packaging/flatpak/dist/io.github.fzn0x.mixmusic.metainfo.xml
+flatpak run org.flatpak.Builder --user --install --install-deps-from=flathub --force-clean \
+  build/flatpak packaging/flatpak/io.github.fzn0x.mixmusic.yml
+flatpak run io.github.fzn0x.mixmusic
+```
+
+`flatpak run --log-session-bus io.github.fzn0x.mixmusic` shows what the
+sandbox refuses on the session bus. GNOME runtimes get about a year of
+support: the manifest's `runtime-version`, the `gnome-<version>` image of
+ci.yml and release.yml, and the Node.js extension's branch move together.
 
 ## Reports
 

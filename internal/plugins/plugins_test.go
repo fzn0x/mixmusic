@@ -341,6 +341,59 @@ export default function activate(api) {
 	h.wait("the page to close", func() bool { return h.ui.said("closed") })
 }
 
+// TestViewRemount renders a plugin's page again, as a refresh does: its
+// cleanup runs, then its render, and what it showed stays until the
+// render sets anew.
+func TestViewRemount(t *testing.T) {
+	h := newTestHost(t)
+	h.install("again", manifest("again"), map[string]string{"index.js": `
+export default function activate(api) {
+  let renders = 0;
+  api.ui.addPage({
+    name: "home",
+    title: "again",
+    render(view) {
+      const n = ++renders;
+      api.ui.toast("rendering " + n);
+      // The second render sets nothing: the first one's nodes stay.
+      if (n !== 2) view.set(api.ui.text("rendered " + n));
+      return () => api.ui.toast("cleaned " + n);
+    },
+  });
+}`})
+	h.enable("again")
+	h.wait("the page", func() bool { return h.Page("/plugin/again/home") != nil })
+	v := h.Page("/plugin/again/home").View
+	shows := func(text string) func() bool {
+		return func() bool { n := v.Nodes(); return len(n) == 1 && n[0].Text == text }
+	}
+	v.Mount()
+	h.wait("the first render", shows("rendered 1"))
+	v.Remount()
+	h.wait("the second render", func() bool { return h.ui.said("rendering 2") })
+	if !h.ui.said("cleaned 1") {
+		t.Error("the first render's cleanup didn't run")
+	}
+	if !shows("rendered 1")() {
+		t.Errorf("the page dropped what it showed before the render set anew: %+v", v.Nodes())
+	}
+	v.Remount()
+	h.wait("the third render", shows("rendered 3"))
+	if !h.ui.said("cleaned 2") {
+		t.Error("the second render's cleanup didn't run")
+	}
+
+	// A view no window shows doesn't render.
+	v.Unmount()
+	h.wait("the page to close", func() bool { return h.ui.said("cleaned 3") })
+	v.Remount()
+	v.Mount()
+	h.wait("the page to open again", func() bool { return len(v.Nodes()) == 1 })
+	if n := v.Nodes(); n[0].Text != "rendered 4" {
+		t.Errorf("Remount rendered a view no window showed: the page shows %q", n[0].Text)
+	}
+}
+
 func TestTimersAndStorage(t *testing.T) {
 	h := newTestHost(t)
 	h.install("timers", manifest("timers"), map[string]string{"index.js": `

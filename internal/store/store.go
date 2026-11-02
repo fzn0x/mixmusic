@@ -27,6 +27,9 @@ type File[T any] struct {
 	decode func([]byte) (T, error)
 	mu     sync.RWMutex
 	value  T
+	// version counts the changes made to value, by this process or, for
+	// a File OpenWith opened, read from the file.
+	version uint64
 	// Of a File OpenWith opened: disk is the file's bytes as this process
 	// last read or wrote them, nil when it had none; synced is what they
 	// last decoded to, the base that edits are merged from; held is why
@@ -141,10 +144,19 @@ func (f *File[T]) Update(fn func(v *T) error) error {
 		// can't be read for a moment while it doesn't, waits.
 		if f.held != nil && !errors.Is(err, fs.ErrNotExist) {
 			f.value = next
+			f.version++
 			return nil
 		}
 	}
 	return f.save(next)
+}
+
+// Version counts the changes made to the value since the file opened, so
+// that what a reader made of the value can be kept until it changes.
+func (f *File[T]) Version() uint64 {
+	f.mu.RLock()
+	defer f.mu.RUnlock()
+	return f.version
 }
 
 // Set replaces the value and saves it.
@@ -219,6 +231,7 @@ func (f *File[T]) take(data []byte) (unsaved bool, err error) {
 		return false, err
 	}
 	f.disk, f.held, f.synced, f.value = data, nil, theirs, merged
+	f.version++
 	return !same(merged, theirs), nil
 }
 
@@ -306,6 +319,7 @@ func (f *File[T]) save(v T) error {
 		return err
 	}
 	f.value = v
+	f.version++
 	if f.decode != nil {
 		f.disk, f.synced, f.held = data, v, nil
 	}

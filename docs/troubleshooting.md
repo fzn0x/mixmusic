@@ -72,3 +72,10 @@ time it starts.
   yet, so the first launch asks you to allow it.
 - The portable zip does not register `mixmusic://` links, and Windows on Arm
   is less tested than the rest.
+- The Flatpak is for x64 only, and new: it sees none of your home folder,
+  so a yt-dlp of your own must be in `~/.var/app/io.github.fzn0x.mixmusic`,
+  and a Discord app that isn't a Flatpak shows what plays only if it was
+  running when MixMusic started. Its settings and library are apart from
+  another copy's: the
+  [README](https://github.com/fzn0x/mixmusic#the-flatpak) tells how to
+  bring them over.

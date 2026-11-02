@@ -63,6 +63,10 @@ func Open(path string) (*Library, error) {
 	return &Library{file: f, now: time.Now}, nil
 }
 
+// Version counts the library's changes: what was made of it holds until
+// the version changes.
+func (l *Library) Version() uint64 { return l.file.Version() }
+
 // Liked returns the liked tracks, the last liked first.
 func (l *Library) Liked() []media.Track {
 	return orEmpty(l.file.Get().Liked)

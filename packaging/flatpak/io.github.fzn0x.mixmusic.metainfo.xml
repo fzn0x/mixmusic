@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 MixMusic contributors -->
+<!--
+  The Flatpak's AppStream metadata, which software centers show. Its empty
+  releases element is a placeholder: go run ./tools/metainfo writes this
+  file with the releases of CHANGELOG.md in its place, as both Flatpak
+  builds of the workflows do before flatpak-builder.
+-->
+<component type="desktop-application">
+  <id>io.github.fzn0x.mixmusic</id>
+
+  <name>MixMusic</name>
+  <summary>Play YouTube Music and Spotify</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT OR GPL-3.0-only</project_license>
+
+  <developer id="io.github.fzn0x">
+    <name>MixMusic contributors</name>
+  </developer>
+
+  <description>
+    <p>
+      MixMusic plays YouTube Music and Spotify in one player, with one
+      search, one queue and one library for both.
+    </p>
+    <ul>
+      <li>YouTube Music plays with no account; sign in for your own library</li>
+      <li>Spotify through a Spotify app of your own, on Spotify Connect, or its tracks played from YouTube Music</li>
+      <li>Mixes: playlists that hold tracks of both services</li>
+      <li>Synced lyrics, an equalizer, crossfade and even loudness</li>
+      <li>Ten themes, and community themes and plugins</li>
+      <li>Media keys, the desktop's media controls, Last.fm and Discord</li>
+    </ul>
+    <p>
+      MixMusic has no account, server, analytics or telemetry of its own.
+      It is not affiliated with, endorsed by or sponsored by Spotify or
+      Google.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.fzn0x.mixmusic.desktop</launchable>
+
+  <url type="homepage">https://fzn0x.github.io/mixmusic/</url>
+  <url type="bugtracker">https://github.com/fzn0x/mixmusic/issues</url>
+  <url type="vcs-browser">https://github.com/fzn0x/mixmusic</url>
+  <url type="contribute">https://github.com/fzn0x/mixmusic/blob/main/CONTRIBUTING.md</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/fzn0x/mixmusic/main/packaging/flatpak/screenshots/now-playing.png</image>
+      <caption>Now playing, with synced lyrics and the queue</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/fzn0x/mixmusic/main/packaging/flatpak/screenshots/home.png</image>
+      <caption>Home</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/fzn0x/mixmusic/main/packaging/flatpak/screenshots/search.png</image>
+      <caption>One search across both services</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/fzn0x/mixmusic/main/packaging/flatpak/screenshots/themes.png</image>
+      <caption>Themes</caption>
+    </screenshot>
+  </screenshots>
+
+  <!-- Discord shows what plays on the user's profile, by default. -->
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-info">intense</content_attribute>
+  </content_rating>
+
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </supports>
+
+  <keywords>
+    <keyword>YouTube Music</keyword>
+    <keyword>Spotify</keyword>
+    <keyword>music</keyword>
+    <keyword>player</keyword>
+    <keyword>lyrics</keyword>
+  </keywords>
+
+  <releases/>
+</component>

@@ -115,6 +115,8 @@ func TestSettingsFindMatches(t *testing.T) {
 		{"config", []string{"Settings file"}, []string{"Crossfade"}},
 		{"music video", []string{"Show the video of music videos", "Show or hide the video of music videos"}, []string{"Crossfade", "Autoplay"}},
 		{"3 mb a minute", []string{"Show the video of music videos"}, []string{"Crossfade"}},
+		{"wallpaper", []string{"Colours from a file"}, []string{"Follow the artwork", "Crossfade"}},
+		{"pywal", []string{"Colours from a file"}, []string{"Follow the artwork", "Crossfade"}},
 		{"zzzz", []string{"No setting matches “zzzz”."}, []string{"Crossfade", "Close to the tray"}},
 	} {
 		show(s, tt, settingsPath("", c.q))
@@ -278,6 +280,10 @@ func TestSettingsFindNothingElse(t *testing.T) {
 			s.licenseOpen = 0
 		}},
 		{"looking for the tools", func(s *shell) { s.loads["tools"] = &loaded[tools.Status]{} }},
+		{"colours from matugen", func(s *shell) { s.set.ColorSource = settings.ColorsMatugen }},
+		{"colours from a file of one's own", func(s *shell) {
+			s.set.ColorSource, s.set.ColorFile = settings.ColorsFile, filepath.Join(t.TempDir(), "colors.json")
+		}},
 		{"add-ons that didn't load", func(s *shell) {
 			for _, kind := range []string{"themes", "plugins"} {
 				if err := os.MkdirAll(filepath.Join(s.svc.System.Info().DataDir, "addons", kind, "broken"), 0o755); err != nil {
@@ -300,6 +306,30 @@ func TestSettingsFindNothingElse(t *testing.T) {
 				t.Errorf("%s, a search that found nothing shows %q", c.name, x)
 			}
 		}
+	}
+}
+
+// TestSettingsFindColorFile searches for the colour file's row, which
+// shows while the colours come from a file, by its title, its links and
+// the file it reads.
+func TestSettingsFindColorFile(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 6000)
+	show(s, tt, settingsPath("", "template"))
+	showsOnly(t, tt, "searching template with no colour file", nil, []string{"Colour file", "copy the template"})
+	s.set.ColorSource = settings.ColorsMatugen
+	s.save()
+	s.refresh()
+	for _, q := range []string{"colour file", "color file", "template", "matugen"} {
+		show(s, tt, settingsPath("", q))
+		showsOnly(t, tt, "searching "+q, []string{"Colour file", "how to set it up", "copy the template"}, []string{"Text size", "Crossfade"})
+	}
+	s.set.ColorSource, s.set.ColorFile = settings.ColorsFile, filepath.Join(t.TempDir(), "mine.json")
+	s.save()
+	s.refresh()
+	for _, q := range []string{"mine.json", "choose"} {
+		show(s, tt, settingsPath("", q))
+		showsOnly(t, tt, "searching "+q, []string{"Colour file", "Choose a colour file"}, []string{"copy the template", "Crossfade"})
 	}
 }
 

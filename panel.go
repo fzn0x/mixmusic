@@ -290,14 +290,20 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		case synced && i < active:
 			ink = k.muted
 		}
+		// The line sung now lights word by word, when its words have times
+		// and show as they are written (lyricswords.go).
+		var words []lyrics.Word
+		if synced && i == active && text == line.Text {
+			words = line.Words
+		}
 		var p ui.Element
 		if roman == "" && meaning == "" {
-			p = ui.Text(c, text).FontSize(size).FontWeight(k.leadWeight()).TextColor(ink).Padding(4, 24)
+			p = s.lyricsText(c, text, size, ink, words, 24, 4)
 		} else {
 			// The line, then in Latin letters, then its translation, which
 			// screen readers read in this order too.
 			p = ui.Column(c).Padding(4, 24).Gap(2).Children(func() {
-				ui.Text(c, text).FontSize(size).FontWeight(k.leadWeight()).TextColor(ink)
+				s.lyricsText(c, text, size, ink, words, 0, 0)
 				if roman != "" {
 					ui.Text(c, roman).FontSize(sub).TextColor(k.muted)
 				}

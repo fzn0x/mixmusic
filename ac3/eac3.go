@@ -160,7 +160,6 @@ type audioFrame struct {
 	firstspxcos, firstcplcos                   [maxFull]bool
 	firstcplleak                               bool
 	dithflageAt                                int // for tests: where dithflage is, in bits
-	cplblocks                                  int // the blocks of coupling so far
 }
 
 // frameStrategies are the exponent strategies of the six blocks of each
@@ -332,7 +331,6 @@ func (d *Decoder) parseAudioFrame() error {
 		f.firstcplcos[c] = true
 	}
 	f.firstcplleak = true
-	f.cplblocks = 0
 	if r.over() {
 		return fmt.Errorf("%w: syncframe too short", ErrFormat)
 	}

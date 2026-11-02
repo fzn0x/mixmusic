@@ -51,14 +51,13 @@ type spectralExtension struct {
 	// Of each channel: whether it uses spectral extension, whether its
 	// coordinates come next (the first of a frame always do), and its
 	// coordinates and blending factors of each band.
-	in           [maxFull]bool
-	co           [maxFull][maxSpxBands]float32
-	nblend       [maxFull][maxSpxBands]float32
-	sblend       [maxFull][maxSpxBands]float32
-	rms          [maxSpxBands]float32
-	wrap         [maxSpxBands]bool
-	noise        uint32 // the state of the generator of its noise
-	inspxAtStart int    // for tests: where spxstre is, in bits
+	in     [maxFull]bool
+	co     [maxFull][maxSpxBands]float32
+	nblend [maxFull][maxSpxBands]float32
+	sblend [maxFull][maxSpxBands]float32
+	rms    [maxSpxBands]float32
+	wrap   [maxSpxBands]bool
+	noise  uint32 // the state of the generator of its noise
 }
 
 // parseSpectralExtension reads the spectral extension strategy and the
@@ -69,7 +68,6 @@ func (d *Decoder) parseSpectralExtension(blk int) error {
 	f := &d.frm
 	x := &d.spx
 	nf := h.nfchans
-	x.inspxAtStart = r.pos
 	if blk == 0 || r.flag() { // spxstre
 		x.inu = r.flag()
 		if x.inu {

@@ -96,6 +96,7 @@ type App struct {
 	labels       *labelCache
 	lyrics       *lyrics.Client
 	unison       *lyrics.Unison
+	translations *translations
 	addons       *addons.Manager
 	storage      *addons.Storage
 	lyricsMemo   *memo[lyrics.Lyrics]
@@ -252,6 +253,7 @@ func New(opts Options) (*App, error) {
 	userAgent := "MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)"
 	a.lyrics = lyrics.New(userAgent)
 	a.unison = lyrics.NewUnison(userAgent)
+	a.translations = newTranslations(filepath.Join(opts.CacheDir, "lyrics-translations"))
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
 	a.related = newMemo[[]media.Shelf](100)
 	a.artStore = artwork.NewStore(filepath.Join(opts.CacheDir, "artwork"), artworkLimit)

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"slices"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -58,5 +59,23 @@ func TestLyricsRomaji(t *testing.T) {
 	}
 	if d := newRomaji(Options{CacheDir: dir}, "test"); d.URL != romaji.DictionaryURL {
 		t.Errorf("downloads from %s", d.URL)
+	}
+}
+
+// TestRomajiNotices shows the license of kagome, and the notice of the
+// dictionary romaji downloads.
+func TestRomajiNotices(t *testing.T) {
+	notices := (&System{}).Notices()
+	for _, want := range []struct{ name, text string }{
+		{"kagome", "Copyright (c) 2020 ikawaha"},
+		{"kagome", "Copyright (c) 2021 ikawaha"},
+		{"The IPA dictionary", "Nara Institute of Science and Technology (NAIST)"},
+		{"The IPA dictionary", "ICOT Free Software"},
+	} {
+		if !slices.ContainsFunc(notices, func(n Notice) bool {
+			return strings.HasPrefix(n.Name, want.name) && strings.Contains(n.Text, want.text)
+		}) {
+			t.Errorf("no notice of %s with %q", want.name, want.text)
+		}
 	}
 }

@@ -85,6 +85,8 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 // YouTube Music. The player falls back to it when no Spotify device can
 // play. It keeps how loud YouTube measured the track, or asks, for the
 // engine to play it at an even loudness: a live stream has no measure.
+// The downloads are told whether the video it found is live, as one
+// doesn't download.
 //
 // A track downloaded plays from its download, without the network, also
 // while it answers. While the network is known to be gone, a Spotify
@@ -124,7 +126,9 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	// A stream found before plays without the network, as the engine may
 	// hold its audio already; yt-dlp needs the network to find one.
 	if p.a.resolver.Fresh(videoID) {
-		if p.a.resolver.Live(videoID) {
+		live := p.a.resolver.Live(videoID)
+		p.a.downloads.SetLive(videoID, live)
+		if live {
 			return liveSource(src, videoID), nil
 		}
 		// Its measure was kept as it was found, else it is asked for now.
@@ -138,6 +142,7 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	if err != nil {
 		return PlaybackSource{}, err
 	}
+	p.a.downloads.SetLive(videoID, s.Live)
 	if s.Live {
 		return liveSource(src, videoID), nil
 	}

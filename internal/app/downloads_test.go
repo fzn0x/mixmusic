@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -95,6 +96,42 @@ func TestPrepareStreamPlaysDownload(t *testing.T) {
 	head := make([]byte, 4)
 	if _, err := io.ReadFull(s, head); err != nil || string(head) != "\x1a\x45\xdf\xa3" {
 		t.Errorf("served %q, %v", head, err)
+	}
+}
+
+// TestPrepareStreamTellsDownloadsLive tells the downloads of a video that
+// plays live, from yt-dlp's stream and from the one the resolver holds,
+// which they then refuse, and of one that plays as a video again.
+func TestPrepareStreamTellsDownloadsLive(t *testing.T) {
+	var live atomic.Bool
+	live.Store(true)
+	r := stream.NewResolver(nil, "")
+	r.Run = func(context.Context, ...string) ([]byte, error) {
+		if live.Load() {
+			return []byte(`{"url": "https://example.com/live/index.m3u8", "protocol": "m3u8_native", "live_status": "is_live"}`), nil
+		}
+		return []byte(`{"url": "https://example.com/a?itag=251", "ext": "webm", "acodec": "opus", "filesize": 100}`), nil
+	}
+	a := &App{resolver: r, cache: stream.NewCache(t.TempDir(), 1<<20), matcher: match.New(nil, nil), proxy: stream.NewProxy(r)}
+	a.downloads = downloads.Open(filepath.Join(t.TempDir(), "downloads"), downloads.Options{Fetcher: a.proxy})
+	t.Cleanup(a.downloads.Close)
+	p := &Player{a: a}
+	radio := ytTrack("liveRadio01")
+	for range 2 {
+		if src, err := p.PrepareStream(context.Background(), radio); err != nil || !src.Live {
+			t.Fatalf("source %+v, %v", src, err)
+		}
+		if !a.downloads.Snapshot().Live(radio.ID) || a.downloads.Add([]media.Track{radio}, "best") != 0 {
+			t.Error("the downloads take a live stream")
+		}
+	}
+	live.Store(false)
+	r.Forget("liveRadio01")
+	if src, err := p.PrepareStream(context.Background(), radio); err != nil || src.Live {
+		t.Fatalf("source %+v, %v", src, err)
+	}
+	if a.downloads.Snapshot().Live(radio.ID) {
+		t.Error("a video no longer live is still taken for a live stream")
 	}
 }
 

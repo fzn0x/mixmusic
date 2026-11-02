@@ -166,11 +166,12 @@ func (s *shell) marketCard(c *ui.Context, kind addons.Kind, e addons.Entry, base
 						}
 					}
 				}
-				if has && kind == addons.KindTheme && s.set.Theme != e.ID {
+				// The theme shown, which, while the themes follow the system,
+				// is the light or the dark one.
+				if has && kind == addons.KindTheme && s.set.ActiveTheme(s.lk.systemDark) != e.ID {
 					use := s.buttonBase(c.Key("use-" + e.ID)).Label("Use " + e.Name).Cursor(ui.CursorPointer)
 					if use.Clicked() {
-						s.set.Theme = e.ID
-						s.save()
+						s.chooseTheme(e.ID)
 					}
 					use.Children(func() { ui.Text(c, "use it").FontSize(k.smallSize()).TextColor(k.accent) })
 				}

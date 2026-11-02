@@ -901,6 +901,11 @@ func (s *shell) playbackSettings(c *ui.Context) {
 				s.save()
 			}
 		})
+		s.row(c, "Skip songs made with AI", "Skips the tracks YouTube labels as made with AI. YouTube labels only some of them, so others still play.", func() {
+			if s.switchOf(c.Key("skip-ai"), &s.set.SkipAI).Label("Skip songs made with AI").Changed() {
+				s.save()
+			}
+		})
 		s.row(c, "Skip songs you dislike", "Songs you dislike don't play when the queue moves on, and radios leave them out.", func() {
 			if s.switchOf(c.Key("skip-disliked"), &s.set.SkipDisliked).Label("Skip songs you dislike").Changed() {
 				s.save()

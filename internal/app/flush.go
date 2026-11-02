@@ -40,6 +40,7 @@ func (a *App) flush() {
 	if p := a.goPlayer.Load(); p != nil {
 		p.Flush()
 	}
+	a.labels.save()
 	if err := a.settings.Flush(); err != nil {
 		log.Printf("mixmusic: saving settings.json: %v", err)
 	}

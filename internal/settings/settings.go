@@ -162,8 +162,11 @@ type Settings struct {
 	Autoplay bool `json:"autoplay"`
 	// SkipDisliked passes over the tracks the user disliked as the queue
 	// moves on, and leaves them out of radios.
-	SkipDisliked bool      `json:"skipDisliked"`
-	Equalizer    Equalizer `json:"equalizer"`
+	SkipDisliked bool `json:"skipDisliked"`
+	// SkipAI passes over the tracks YouTube labels as made with AI, as the
+	// player moves on by itself.
+	SkipAI    bool      `json:"skipAi"`
+	Equalizer Equalizer `json:"equalizer"`
 	// Volume is from 0 to 1.
 	Volume float64 `json:"volume"`
 	// CacheSizeMB bounds the audio cache; 0 turns it off.

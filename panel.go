@@ -141,7 +141,11 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 				if it.Radio {
 					line += " · radio"
 				}
-				if skipped {
+				switch {
+				case skipped && it.Skip == player.SkipMadeWithAI:
+					// A click still plays it.
+					line += " · made with AI"
+				case skipped:
 					line += " · skipped"
 				}
 				ui.Text(c, line).FontSize(k.smallSize()).TextColor(sub).SingleLine().MinWidth(0)

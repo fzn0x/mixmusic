@@ -40,3 +40,20 @@ func TestFollowPodcasts(t *testing.T) {
 		t.Errorf("after a restart: %+v", again.Podcasts())
 	}
 }
+
+// TestStatsLeaveOutEpisodes counts music in the stats: an episode of hours
+// stays in the history, but not in the plays, the minutes or the tops.
+func TestStatsLeaveOutEpisodes(t *testing.T) {
+	l := open(t)
+	song := tr("yt:a", media.SourceYouTube, "A")
+	ep := episode("yt:e")
+	l.RecordPlay(song)
+	l.RecordPlay(ep)
+	s := l.Stats(0)
+	if s.Plays != 1 || s.Minutes != 3 || len(s.TopTracks) != 1 || len(s.TopArtists) != 1 {
+		t.Errorf("stats = %+v", s)
+	}
+	if h := l.History(0); len(h) != 2 || h[0].Track.ID != ep.ID {
+		t.Errorf("history = %+v", h)
+	}
+}

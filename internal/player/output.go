@@ -15,44 +15,53 @@ import (
 )
 
 // Output is where the player's streams play, as the app tells it. The zero
-// Output is the computer, whose volume the settings keep.
+// Output is the computer: the engine the player was made with, whose
+// volume the settings keep.
 type Output struct {
-	// Remote is set for a device away from the computer, as a cast device.
-	// Tracks don't crossfade there, as it plays one stream at a time, and
-	// the volume is the device's own, Volume and Muted, which the player
-	// shows and sets while it plays there, without keeping it in the
-	// settings.
-	Remote bool
+	// Stream plays the streams on a device away from the computer, in the
+	// engine's place, as a cast device does. Tracks don't crossfade there,
+	// as it plays one stream at a time, and the volume is the device's
+	// own, Volume and Muted, which the player shows and sets while it plays
+	// there, without keeping it in the settings.
+	Stream Stream
 	Volume float64
 	Muted  bool
+	// Paused has the track that plays wait paused on the output, as when
+	// the device it played on went away.
+	Paused bool
 }
 
-// SetOutput tells the player that its streams play on o from now on: the
-// stream of the current track loads again there, where it was, playing or
-// paused as it was. A track that loads, or waits for the network, plays
-// there once it does. Back on the computer, the volume is the computer's
-// again.
+// SetOutput has the player's streams play on o from now on: the stream of
+// the current track loads again there, where it was, playing or paused as
+// it was, and stops on the output it left. A track that loads, or waits
+// for the network, plays there once it does. Back on the computer, the
+// volume is the computer's again.
 func (p *Player) SetOutput(o Output) { p.do(func() { p.setOutput(o) }) }
 
 func (p *Player) setOutput(o Output) {
-	if !o.Remote && !p.out.Remote {
+	if o.Stream == p.out.Stream {
 		return
 	}
-	if !p.out.Remote {
+	if p.out.Stream == nil {
 		p.home = homeVolume{volume: p.s.Volume, muted: p.s.Muted}
+		p.engine = p.stream
 	}
+	left := p.stream
 	p.out = o
-	p.s.Remote = o.Remote
-	if o.Remote {
+	p.s.Remote = o.Stream != nil
+	if o.Stream != nil {
+		p.stream = o.Stream
 		p.s.Volume, p.s.Muted = clampVolume(o.Volume, p.s.Volume), o.Muted
 	} else {
+		p.stream = p.engine
 		p.s.Volume, p.s.Muted = p.home.volume, p.home.muted
 		// The engine gets the computer's volume again.
 		p.stream.SetVolume(p.heardVolume())
 	}
+	left.Unload()
 	p.emit(StateChange)
 	p.report()
-	p.moveStream()
+	p.moveStream(o.Paused)
 }
 
 // OutputVolume takes in the remote output's volume changing by itself, as
@@ -60,7 +69,7 @@ func (p *Player) setOutput(o Output) {
 // computer, it changes nothing.
 func (p *Player) OutputVolume(v float64, muted bool) {
 	p.do(func() {
-		if !p.out.Remote {
+		if p.out.Stream == nil {
 			return
 		}
 		p.s.Volume, p.s.Muted = clampVolume(v, p.s.Volume), muted
@@ -103,15 +112,18 @@ func (p *Player) keptVolume(st State) float64 {
 
 // moveStream loads the current track's stream again, on the output it
 // plays on now, where it was: playing, or loading to play, or paused, as
-// it was. It sounds there once its time moves past where it started, and
-// loads until then.
-func (p *Player) moveStream() {
+// it was, or paused when asked. It sounds there once its time moves past
+// where it started, and loads until then.
+func (p *Player) moveStream(paused bool) {
 	src := p.s.Source
 	if !p.loaded || src == nil || src.Mode != ModeStream || p.s.Error != "" {
 		return
 	}
-	autoplay := !p.paused && (p.s.Playing || p.s.Loading)
+	autoplay := !paused && !p.paused && (p.s.Playing || p.s.Loading)
 	p.paused = !autoplay
+	if !autoplay {
+		p.s.Playing, p.s.Loading, p.s.Buffering = false, false, false
+	}
 	p.retry = retryState{played: p.retry.played, from: p.s.Position}
 	p.unsounded, p.soundFrom = autoplay, p.s.Position
 	if autoplay {

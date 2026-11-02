@@ -695,7 +695,7 @@ func (p *Player) preload(next Item) {
 // remote output plays one stream at a time: next starts there as the
 // current track ends.
 func (p *Player) crossfadeTo(next Item, fade time.Duration) {
-	if p.out.Remote {
+	if p.out.Stream != nil {
 		return
 	}
 	p.crossfading = true
@@ -893,7 +893,7 @@ func (p *Player) setVolume(v float64) {
 	p.s.Volume = v
 	p.s.Muted = false
 	p.apply()
-	if p.out.Remote {
+	if p.out.Stream != nil {
 		return // the device's own, which the settings don't keep
 	}
 	if p.volumeTimer != nil {

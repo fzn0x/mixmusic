@@ -508,9 +508,11 @@ type Player struct {
 	surround   bool
 	stereoOnly bool
 	// out is where the streams play, and home the computer's volume while
-	// they play on a remote output.
-	out  Output
-	home homeVolume
+	// they play on a remote output; engine is the stream the player was
+	// made with, which stream is again back on the computer.
+	out    Output
+	home   homeVolume
+	engine Stream
 }
 
 // New returns a player of the queue saved, which plays through stream and

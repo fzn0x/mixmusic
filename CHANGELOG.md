@@ -6,6 +6,90 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.8] - 2026-11-02
+
+Delete the playlists you made on YouTube Music, and take saved ones out of
+your library (#75). F5 (⇧⌘R on macOS) refreshes a page without restarting
+MixMusic (#92). A box on the Settings page finds a setting as you type its
+name (#93), and what you save to `settings.json` applies while MixMusic
+runs (#81). "Add to YouTube Music playlist" lists your playlists again
+(#75), and "use it" on a marketplace theme works while the themes follow
+the system (#174). MixMusic 0.3.0 and later offer this version in
+Settings › About, except the Linux x64 copies of 0.5.6, which don't start:
+install it from the release page.
+
+### Added
+
+- Signed in to YouTube Music, delete a playlist you made there from the
+  More menu of its page, or from its tile in Library › youtube music:
+  "Delete from YouTube Music…" asks first, since it goes from YouTube too
+  and can't be undone. The tile of a playlist you saved has "Remove from
+  library" instead. Either leaves the library at once; mixes copied from
+  the playlist, and the queue, keep their tracks (#75).
+- What you save to `settings.json` applies while MixMusic runs, as if
+  changed in Settings, and MixMusic reads the file again before it saves,
+  so it doesn't write over an edit it hasn't read. A key you take out goes
+  back to its default, as at start: taking out `spotifyClientId` signs you
+  out of Spotify, and plugins enabled in the file start without asking. A
+  mistake is told with its line and column, and the file stays as you
+  saved it until you fix it; if MixMusic quits first, it keeps your text
+  as `settings.json.broken`. A file with a byte order mark, or in UTF-16 as
+  Windows PowerShell 5.1 writes it, reads now, a `settings.json` that links
+  to your dotfiles stays a link, and a file that didn't read at start is
+  told of. Settings › Desktop and the command palette open the file (#81).
+- Refresh this page asks the services again for what the page shows,
+  without restarting MixMusic: press F5 (⇧⌘R on macOS), or the new
+  button after the back and forward arrows. The page keeps showing what
+  it has until the answers come, with a spinner in the button meanwhile;
+  if the refresh fails, as offline, it keeps what it showed and one
+  toast says why. Home, searches, albums, artists, playlists, Explore,
+  your Spotify and YouTube Music libraries, the lyrics, the marketplace
+  (past the ten minutes MixMusic keeps the registry) and Settings' checks
+  refresh; plugin pages and widgets render again, running their cleanup
+  first. Ctrl+R (⌘R on macOS) stays Repeat. The command is in the
+  command palette, Settings › Shortcuts and macOS's View menu; if you
+  gave F5 or ⇧⌘R to another command, it keeps it and Refresh starts with
+  no key. The button is dimmed on pages that always show what is
+  current, as liked songs and stats (#92).
+- Search the settings: a box on the Settings page finds a setting by its
+  name, its description, its group or its section, regardless of case,
+  accents or spelling ("color" finds Accent colour), and keeps its
+  control, so it can be changed right there. The search is part of the
+  page's location, so Back returns to it, and each group found links to
+  its section. Whenever something is typed, the command palette ends its
+  list with "Search the settings for …", and a new command, "Search the
+  settings", opens the box; Settings › Shortcuts can give it a key. The
+  box sits under the sections' names, and doesn't take the focus when
+  Settings opens. Settings › Appearance draws faster too: its theme
+  cards no longer remake every theme's look in every frame (#93).
+
+### Fixed
+
+- A track's "Add to YouTube Music playlist" lists your playlists again,
+  where it said "No playlists of yours" since 0.5.0. When YouTube Music
+  won't let a track into a playlist, the toast says so, and you stay
+  signed in: a refused edit no longer asks you to sign in again (#75).
+- The save button of an album or a playlist you saved on YouTube Music
+  says "saved" again, and pressing it takes it out of your library.
+  YouTube Music draws that button with new icons now: MixMusic said
+  "save", and pressing it saved it again (#75).
+- Home's jump back in tile, recently played and your mixes follow what
+  you play and the mixes you make or delete, rather than keep what they
+  held when Home first showed. When Spotify or YouTube Music can't load
+  its shelves, Home now says so under the others, with try again, rather
+  than leaving them out unsaid (#92).
+- After try again, signing in to another Spotify account or a refresh,
+  your liked songs on Spotify start again at the first page, rather than
+  keep the pages load more brought before (#92).
+- Resetting a shortcut in Settings › Shortcuts gives the command its own
+  keys back, from the command you gave them to, rather than leave it
+  with none (#92).
+- "use it" on a theme's card in the marketplace works while the themes
+  follow the computer's light or dark mode: the theme becomes the one of
+  the mode the computer is in, as the "use it" of the toast after an
+  install already did. It changed a setting that nothing showed, then
+  went away as if the theme were in use (#174).
+
 ## [0.5.7] - 2026-11-02
 
 MixMusic starts again on Linux x64: 0.5.6's x64 downloads asked for a
@@ -645,7 +729,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.7...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.8...HEAD
+[0.5.8]: https://github.com/fzn0x/mixmusic/compare/v0.5.7...v0.5.8
 [0.5.7]: https://github.com/fzn0x/mixmusic/compare/v0.5.6...v0.5.7
 [0.5.6]: https://github.com/fzn0x/mixmusic/compare/v0.5.5...v0.5.6
 [0.5.5]: https://github.com/fzn0x/mixmusic/compare/v0.5.4...v0.5.5

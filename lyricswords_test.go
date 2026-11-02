@@ -3,6 +3,7 @@ package main
 import (
 	"image"
 	"image/color"
+	"strings"
 	"testing"
 	"time"
 
@@ -209,29 +210,47 @@ func TestSungWordsSettle(t *testing.T) {
 }
 
 // TestSungWordsAsLines shows a line whose words are all sung as a line
-// synced line by line shows, glyph for glyph, and lyrics synced line by
-// line as they did: the line sung now lit whole.
+// synced line by line shows, glyph for glyph, on one row or wrapped on
+// several; and lyrics synced line by line as they did: the line sung now
+// lit whole.
 func TestSungWordsAsLines(t *testing.T) {
-	sub := func(img *image.RGBA, r ui.Rect) *image.RGBA {
-		return img.SubImage(image.Rect(int(r.X), int(r.Y), int(r.X+r.W), int(r.Y+r.H))).(*image.RGBA)
-	}
 	s, tt := sungIn(t, "en", lanternLines, 2500*time.Millisecond)
-	r, _ := tt.Find("Lanterns drifting home")
-	whole := sub(tt.Image(), r)
 	at := wordsAt(t, s, tt, "Lanterns drifting home", "Lanterns", "drifting", "home")
 	if img := tt.Image(); !lit(t, s, img, at[0], "Lanterns") || !lit(t, s, img, at[2], "home") {
 		t.Error("the line sung now isn't lit whole")
 	}
 
-	_, tt = sungIn(t, "en", lanterns, 4500*time.Millisecond)
-	if r2, _ := tt.Find("Lanterns drifting home"); r2 != r {
-		t.Fatalf("the line moved: %v, %v", r2, r)
+	long := "Lanterns drifting home across the quiet harbour, while the long night comes down"
+	var words []lyrics.Word
+	for i, w := range strings.Fields(long) {
+		words = append(words, word(w, 1000+100*i, 1100+100*i))
 	}
-	sung := sub(tt.Image(), r)
-	for py := whole.Rect.Min.Y; py < whole.Rect.Max.Y; py++ {
-		for px := whole.Rect.Min.X; px < whole.Rect.Max.X; px++ {
-			if a, b := whole.RGBAAt(px, py), sung.RGBAAt(px, py); a != b {
-				t.Fatalf("the line sung word by word differs at (%d, %d): %v, %v", px, py, b, a)
+	for _, line := range []lyrics.Line{lanterns[0], {TimeMs: 1000, Text: long, Words: words}} {
+		shown := func(lines []lyrics.Line) (*image.RGBA, ui.Rect) {
+			_, tt := sungIn(t, "en", lines, 4500*time.Millisecond)
+			r, ok := tt.Find(line.Text)
+			if !ok {
+				t.Fatalf("%q doesn't show: %q", line.Text, tt.Texts())
+			}
+			return tt.Image().SubImage(image.Rect(int(r.X), int(r.Y), int(r.X+r.W), int(r.Y+r.H))).(*image.RGBA), r
+		}
+		plain := line
+		plain.Words = nil
+		whole, r := shown([]lyrics.Line{plain, lanterns[1]})
+		sung, r2 := shown([]lyrics.Line{line, lanterns[1]})
+		if r != r2 {
+			t.Fatalf("%q moved: %v, %v", line.Text, r2, r)
+		}
+		if r.H < 2*s.lk.bodySize() && line.Text == long {
+			t.Fatalf("%q doesn't wrap: %v", line.Text, r)
+		}
+	pixels:
+		for py := whole.Rect.Min.Y; py < whole.Rect.Max.Y; py++ {
+			for px := whole.Rect.Min.X; px < whole.Rect.Max.X; px++ {
+				if a, b := whole.RGBAAt(px, py), sung.RGBAAt(px, py); a != b {
+					t.Errorf("%q sung word by word differs at (%d, %d): %v, %v", line.Text, px, py, b, a)
+					break pixels
+				}
 			}
 		}
 	}

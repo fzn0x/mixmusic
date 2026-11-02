@@ -100,6 +100,34 @@ func TestTransportClicks(t *testing.T) {
 	}
 }
 
+// TestLoadingControls can't pause or move a track that loads: the engine
+// holds its stream, but its audio hasn't come yet. Once it sounds, they
+// work again.
+func TestLoadingControls(t *testing.T) {
+	s := newTestShell(t)
+	held := testTrack("yt:quiet1", "Held back", "M83", "Hurry Up, We're Dreaming", media.SourceYouTube)
+	s.p.PlayTracks([]media.Track{held}, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing && st.Loading })
+	tt := tester(t, s)
+	// The play button tells it loads; it and the position take no click,
+	// in the middle of the track, and the keys do nothing either.
+	click(t, s, tt, "Loading")
+	click(t, s, tt, "Seek")
+	tt.Key(0, ui.KeyRight)
+	tt.Key(0, ui.KeySpace)
+	s.drain()
+	time.Sleep(20 * time.Millisecond)
+	s.drain()
+	if st := s.p.State(); !st.Playing || !st.Loading || st.Position != 0 {
+		t.Errorf("the track that loads was paused or moved: playing %v, loading %v, at %v", st.Playing, st.Loading, st.Position)
+	}
+	s.p.Time(250*time.Millisecond, 200*time.Second)
+	s.settle(t, func(st player.State) bool { return !st.Loading })
+	tt.Frame()
+	click(t, s, tt, "Pause")
+	s.settle(t, func(st player.State) bool { return !st.Playing })
+}
+
 // TestArrowKeys changes the volume with up and down and seeks with left
 // and right, without a shortcut set, but not while the search box has the
 // keys for its caret, nor in the mini player (#38).

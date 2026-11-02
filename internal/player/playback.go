@@ -155,8 +155,15 @@ func (p *Player) ToggleOnce() {
 	})
 }
 
-// Seek moves the current track to t.
-func (p *Player) Seek(t time.Duration) { p.do(func() { p.seek(t) }) }
+// Seek moves the current track to t. A track that loads isn't moved: it
+// plays from where it was asked to, as it can't be paused either.
+func (p *Player) Seek(t time.Duration) {
+	p.do(func() {
+		if !p.s.Loading {
+			p.seek(t)
+		}
+	})
+}
 
 // Next skips to the next track.
 func (p *Player) Next() { p.do(func() { p.advance(false) }) }
@@ -302,6 +309,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	if autoplay {
 		p.askedAt = time.Now()
 	}
+	p.unsounded = false
 	p.emit(TrackChange)
 	p.report()
 	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, entry.Track) }, func(src Source, err error) {
@@ -399,6 +407,7 @@ func (p *Player) loadStream(src Source, start time.Duration, autoplay bool) {
 	p.paused = !autoplay
 	cur, _ := p.s.Current()
 	p.s.Speed = speedOf(p.svc.Settings(), cur.Track, p.s.Live)
+	p.unsounded, p.soundFrom = autoplay, start
 	_ = p.stream.Load(src.URL, start, autoplay, p.s.Speed)
 }
 
@@ -413,6 +422,7 @@ func (p *Player) setLive(live bool) {
 
 func (p *Player) stopStream() {
 	p.loaded = false
+	p.unsounded = false
 	p.stream.Stop()
 }
 
@@ -439,6 +449,7 @@ func (p *Player) fellBack(why string) {
 func (p *Player) fail(message string) {
 	cur, ok := p.s.Current()
 	p.askedAt = time.Time{}
+	p.unsounded = false
 	p.s.Error = message
 	p.s.Buffering = false
 	p.s.Loading = false
@@ -519,7 +530,7 @@ func (p *Player) retryStream(why string) {
 	log.Printf("mixmusic: the audio of %s stopped at %s: %s; trying again in %s, %d of %d",
 		entry.Track.ID, at.Round(time.Second), why, wait, r.n, tries)
 	// Meanwhile the track loads again, as one chosen does: it can't be
-	// paused, and a seek, Next or another track takes over.
+	// paused or moved, and Next or another track takes over.
 	p.loaded = false
 	p.s.Loading, p.s.Buffering = autoplay, autoplay
 	p.emit(StateChange)
@@ -545,6 +556,7 @@ func (p *Player) retryStream(why string) {
 			p.loaded = true
 			p.paused = !autoplay
 			p.s.Speed = speedOf(p.svc.Settings(), entry.Track, p.s.Live)
+			p.unsounded, p.soundFrom = autoplay, at
 			_ = p.stream.Load(src.URL+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, autoplay, p.s.Speed)
 		})
 	})
@@ -637,6 +649,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		p.endWait()
 		p.markPlayed(next.UID)
 		p.askedAt = time.Time{}
+		p.unsounded = false // it fades in under the track that ends
 		p.s.Index = i
 		p.s.Position = 0
 		p.s.Duration = ms(next.Track.DurationMs)
@@ -985,12 +998,22 @@ func (p *Player) onTime(position, duration time.Duration) {
 		p.askedAt = time.Time{}
 	}
 	p.emit(Progress)
+	if p.unsounded && p.loaded && position > p.soundFrom {
+		p.unsounded = false
+		if p.s.Playing {
+			p.s.Buffering, p.s.Loading = false, false
+			p.sounded()
+			p.report()
+			p.emit(StateChange)
+		}
+	}
 	p.onProgress()
 }
 
 func (p *Player) onPlaying(playing bool) {
 	p.s.Playing = playing
-	if playing {
+	// A stream not heard yet still loads, until its time moves (onTime).
+	if playing && !p.unsounded {
 		p.s.Buffering = false
 		p.s.Loading = false
 		p.sounded()

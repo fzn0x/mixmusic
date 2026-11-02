@@ -158,3 +158,35 @@ func TestYouTubeAccountPicker(t *testing.T) {
 		t.Errorf("a session of one channel offers a choice: %q", tt.Texts())
 	}
 }
+
+// TestSettingsFindCookieSignIn finds the sign-in with a browser's cookies
+// by typing, whole, with why the last try failed; and the account picker
+// by what it says, whichever it says.
+func TestSettingsFindCookieSignIn(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 6000)
+	form := []string{"Import from a browser", "Profile", "import", "Paste a cookie header", "sign in with it"}
+	for _, q := range []string{"cookie", "firefox", "import"} {
+		show(s, tt, settingsPath("", q))
+		showsOnly(t, tt, "searching "+q, form, nil)
+	}
+	s.youtubeCookies.problem = "Firefox has no signed-in YouTube Music session"
+	show(s, tt, settingsPath("", "paste"))
+	showsOnly(t, tt, "searching paste after a failure", append([]string{"MixMusic didn't sign in to YouTube Music", s.youtubeCookies.problem}, form...), nil)
+	show(s, tt, settingsPath("", "crossfade"))
+	showsOnly(t, tt, "searching crossfade", nil, form)
+
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	s.loads["channels"] = &loaded[[]youtube.AccountChannel]{done: true, value: []youtube.AccountChannel{
+		{Name: "Ada", Email: "ada@example.com", Current: true},
+		{Name: "Bob's Band", PageID: "222", AuthUser: 1, Email: "bob@example.com"},
+	}}
+	for _, q := range []string{"account and channel", "brand channels", "google account"} {
+		show(s, tt, settingsPath("", q))
+		showsOnly(t, tt, "searching "+q, []string{"Account and channel", "Ada · ada@example.com"}, nil)
+	}
+	// The channel used is gone, which the row says instead.
+	s.loads["channels"] = &loaded[[]youtube.AccountChannel]{done: true, value: []youtube.AccountChannel{{Name: "Ada"}, {Name: "My band", PageID: "b"}}}
+	show(s, tt, settingsPath("", "brand channels"))
+	showsOnly(t, tt, "a channel gone, searching brand channels", []string{"Channel", "The account or channel MixMusic used is no longer one of this session: choose one."}, nil)
+}

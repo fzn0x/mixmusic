@@ -129,6 +129,8 @@ type App struct {
 	// here is MixMusic's own Spotify device, which the player plays
 	// Spotify tracks on where it can.
 	here spotifyHere
+	// cast is the cast devices found, and the one the player plays on.
+	cast castState
 	// videoPage is the page of the main window that plays the picture of
 	// music videos, while it is open.
 	videoPage atomic.Pointer[mygo.Page]

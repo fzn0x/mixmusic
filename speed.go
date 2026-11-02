@@ -158,8 +158,8 @@ func (s *shell) speedMenu(c *ui.Context, anchor ui.Element, open *bool, speed *f
 			ui.Row(c).Gap(10).AlignItems(ui.Center).Padding(4, 10).Children(func() {
 				// The window's arrows keep seeking and setting the volume.
 				x := *speed
-				if ui.Slider(c.Key("speed-slider"), &x, settings.MinSpeed, settings.MaxSpeed).Step(settings.SpeedStep).
-					Grow(1).MinWidth(0).KeepFocus().Label(title).Changed() {
+				slider := ui.Slider(c.Key("speed-slider"), &x, settings.MinSpeed, settings.MaxSpeed).KeepFocus()
+				if slider.Step(settings.SpeedStep).Grow(1).MinWidth(0).Label(title).Changed() {
 					s.setSpeed(x)
 				}
 				ui.Text(c, speedLabel(*speed)).FontSize(k.smallSize()).FontFeatures("tnum").TextColor(k.muted).

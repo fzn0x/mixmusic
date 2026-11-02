@@ -83,6 +83,7 @@ func main() {
 		LastCrash:    lastCrash,
 		Interface:    Open,
 		Mini:         OpenMini,
+		Notch:        OpenNotch,
 	})
 	if err != nil {
 		log.Fatal(err)

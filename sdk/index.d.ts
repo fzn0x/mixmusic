@@ -45,6 +45,19 @@ export interface Track {
   explicit?: boolean;
   video?: boolean;
   url?: string;
+  /** Set for a podcast's episode; its artists then name its show. */
+  episode?: Episode;
+}
+
+/** What a podcast's episode has besides a track's. */
+export interface Episode {
+  /** The show; id is set when the service has a page for it. */
+  show: Ref;
+  /** The day it came out, as 2026-10-30, or its month or year alone. */
+  released?: string;
+  /** Where the user left it on Spotify, and whether they heard it all. */
+  resumeMs?: number;
+  played?: boolean;
 }
 
 export interface Album {

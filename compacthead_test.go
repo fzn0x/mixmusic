@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"image/color"
 	"math"
@@ -195,9 +196,9 @@ func TestBarHeadNarrow(t *testing.T) {
 	tt.CloseMenu()
 }
 
-// TestBarHeadOfPages shows the heads of albums and artists in the top
-// bar too, once they scrolled away: an artist's plays its top songs, and
-// has no shuffle.
+// TestBarHeadOfPages shows the heads of albums, artists and the liked
+// songs in the top bar too, once they scrolled away: an artist's plays
+// its top songs, and has no shuffle.
 func TestBarHeadOfPages(t *testing.T) {
 	s := newTestShell(t)
 	pl := longPlaylist(s, "yt:PLlong", "Late night drive", 40)
@@ -209,6 +210,11 @@ func TestBarHeadOfPages(t *testing.T) {
 	}
 	s.loads["artist:ar-m83"] = &loaded[media.Artist]{done: true, value: media.Artist{ID: "ar-m83", Source: media.SourceYouTube,
 		Name: "M83", TopTracks: testTracks[:5], Albums: albums, Singles: albums}}
+	for _, tr := range pl.Tracks {
+		if err := s.svc.Collection.SetLiked(context.Background(), tr, true); err != nil {
+			t.Fatal(err)
+		}
+	}
 	tt := testerOf(t, s, 1280, 600)
 	for _, c := range []struct {
 		path, title       string
@@ -217,6 +223,7 @@ func TestBarHeadOfPages(t *testing.T) {
 	}{
 		{albumPath("al-long"), "Hurry Up, We're Dreaming", true, true, pl.Tracks[0].ID},
 		{artistPath("ar-m83"), "M83", false, false, testTracks[0].ID},
+		{"/library/liked", "Liked songs", true, true, pl.Tracks[len(pl.Tracks)-1].ID},
 	} {
 		show(s, tt, c.path)
 		if _, ok := tt.Find("Play " + c.title); ok {
@@ -235,6 +242,21 @@ func TestBarHeadOfPages(t *testing.T) {
 		})
 	}
 	settled(t, tt)
+}
+
+// TestLikedSongsPlay plays and shuffles the liked songs from their page.
+func TestLikedSongsPlay(t *testing.T) {
+	s := likedShell(t, 3)
+	tt := tester(t, s)
+	show(s, tt, "/library/liked")
+	liked := s.svc.Collection.Liked()
+	click(t, s, tt, "play")
+	s.settle(t, func(st player.State) bool {
+		cur, ok := st.Current()
+		return ok && st.Playing && !st.Shuffle && cur.Track.ID == liked[0].ID
+	})
+	click(t, s, tt, "shuffle")
+	s.settle(t, func(st player.State) bool { return st.Shuffle && st.Playing })
 }
 
 // TestBarHeadOtherPage shows no head of the page left in the top bar of

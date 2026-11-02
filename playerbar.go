@@ -328,7 +328,7 @@ func hasSurround(st player.State) bool {
 // surroundButton turns 5.1 surround on and off, as the setting of Settings
 // › Playback does, for a track that has some: a 32px button of "5.1", in
 // muted ink, which turns to ink over a tint on hover, and to the accent
-// when on, as iconButton.
+// when on, of the layout's shape and press, as iconButton.
 func (s *shell) surroundButton(c *ui.Context) {
 	k := &s.lk
 	on := s.set.Surround
@@ -336,7 +336,7 @@ func (s *shell) surroundButton(c *ui.Context) {
 	if on {
 		label = "5.1 surround: on"
 	}
-	b := s.buttonBase(c.Key("surround")).Height(32).PaddingX(6).Radius(k.radiusSm).Label(label).Tooltip(label).
+	b := s.buttonBase(c.Key("surround")).Height(32).PaddingX(6).Radius(k.round(32)).Label(label).Tooltip(label).
 		Cursor(ui.CursorPointer)
 	ink := k.muted
 	switch {
@@ -350,6 +350,7 @@ func (s *shell) surroundButton(c *ui.Context) {
 	} else if b.Hovered() {
 		b.Background(k.hover)
 	}
+	s.pressMotion(b, 0.9)
 	b.Children(func() {
 		ui.Text(c, "5.1").FontSize(k.smallSize()).FontWeight(600).FontFeatures("tnum").TextColor(ink).SingleLine().Shrink(0)
 	})

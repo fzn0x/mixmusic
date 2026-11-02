@@ -36,7 +36,7 @@ func TestMessageBytes(t *testing.T) {
 // every wire type, and turns down a message cut short.
 func TestMessageUnknownFields(t *testing.T) {
 	b := message{Source: "s", Destination: "d", Namespace: "n", Payload: []byte("{}")}.marshal()
-	b = append(b, 8<<3|wireVarint, 0x96, 0x01)        // field 8, varint 150
+	b = append(b, 8<<3|wireVarint, 0x96, 0x01)         // field 8, varint 150
 	b = append(b, 9<<3|wire64, 1, 2, 3, 4, 5, 6, 7, 8) // field 9, fixed64
 	b = append(b, 10<<3|wire32, 1, 2, 3, 4)            // field 10, fixed32
 	b = append(b, 11<<3|wireBytes, 2, 'h', 'i')        // field 11, bytes

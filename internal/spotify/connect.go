@@ -122,24 +122,26 @@ func (c *Client) Transfer(ctx context.Context, deviceID string, play bool) error
 	return c.do(ctx, http.MethodPut, "/me/player", nil, map[string]any{"device_ids": []string{deviceID}, "play": play}, nil)
 }
 
-// State returns what the user's active device plays, or nil when no device
-// is active.
+// State returns what the user's active device plays, a track or a
+// podcast's episode, or nil when no device is active.
 func (c *Client) State(ctx context.Context) (*PlaybackState, error) {
 	var res struct {
-		Device     *device `json:"device"`
-		IsPlaying  bool    `json:"is_playing"`
-		ProgressMs int     `json:"progress_ms"`
-		Item       *track  `json:"item"`
+		Device     *device      `json:"device"`
+		IsPlaying  bool         `json:"is_playing"`
+		ProgressMs int          `json:"progress_ms"`
+		Item       *playingItem `json:"item"`
 	}
-	if err := c.get(ctx, "/me/player", nil, &res); err != nil {
+	// Without additional_types, Spotify tells no item while an episode
+	// plays.
+	if err := c.get(ctx, "/me/player", url.Values{"additional_types": {"track,episode"}}, &res); err != nil {
 		return nil, err
 	}
 	if res.Device == nil {
 		return nil, nil // 204: nothing is playing anywhere
 	}
 	s := &PlaybackState{Device: res.Device.convert(), Playing: res.IsPlaying, ProgressMs: res.ProgressMs}
-	if t, ok := toTrack(res.Item, nil); ok {
-		s.Track = &t
+	if res.Item != nil {
+		s.Track = res.Item.t
 	}
 	return s, nil
 }

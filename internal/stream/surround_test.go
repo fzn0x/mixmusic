@@ -246,3 +246,16 @@ func TestSourceOpensSurround(t *testing.T) {
 		t.Errorf("%d bytes from a seek, %v", len(b), err)
 	}
 }
+
+// TestLiveHasNoSurround reads what yt-dlp prints of a live video whose
+// formats list a 5.1 one: the live stream plays in stereo, with no 5.1
+// audio beside it, which would have a length and seeking it hasn't.
+func TestLiveHasNoSurround(t *testing.T) {
+	out := fmt.Appendf(nil, `{"format_id": "234", "url": "https://example.com/hls_playlist/expire/%d/itag/234/index.m3u8",
+		"ext": "mp4", "acodec": null, "protocol": "m3u8_native", "live_status": "is_live", "duration": null, "formats": [%s]}`,
+		time.Now().Add(6*time.Hour).Unix(), ytSurround("380", "ac-3", 384, ""))
+	s, err := parseInfo(out)
+	if err != nil || !s.Live || s.Surround != nil {
+		t.Errorf("stream %+v, %v", s, err)
+	}
+}

@@ -274,15 +274,3 @@ func (a *App) rereadColorFile() {
 		}
 	}()
 }
-
-// sleep waits for d, and tells whether ctx is still going after it.
-func sleep(ctx context.Context, d time.Duration) bool {
-	t := time.NewTimer(d)
-	defer t.Stop()
-	select {
-	case <-ctx.Done():
-		return false
-	case <-t.C:
-		return true
-	}
-}

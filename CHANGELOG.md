@@ -6,6 +6,48 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.7] - 2026-11-02
+
+MixMusic starts again on Linux x64: 0.5.6's x64 downloads asked for a
+system loader only NixOS has, so they didn't start elsewhere (#166). If
+yours updated itself to 0.5.6, it can't update on its own: install 0.5.7
+from the release page, or run install.sh again. After a music video,
+Autoplay and Start radio carry on with songs (#90). Linux on x64 also gets
+a Flatpak (#79). MixMusic 0.3.0 and later offer this version in
+Settings › About, except the Linux x64 copies of 0.5.6.
+
+### Added
+
+- A Flatpak for Linux on x64, `mixmusic-<version>-linux-amd64.flatpak`,
+  which brings GTK, WebKitGTK, the tray's library and Node.js for yt-dlp
+  with it: `flatpak install ./mixmusic-<version>-linux-amd64.flatpak`
+  installs it, and fetches the GNOME runtime from Flathub the first time.
+  Settings › About calls it a Flatpak and offers each new version's
+  file. Inside it, MixMusic shows in the desktop's media controls under
+  its Flatpak's name, starts at login through the desktop's Background
+  portal, and asks that portal to play on with close to the tray on. Its
+  settings and library are its own, in
+  `~/.var/app/io.github.fzn0x.mixmusic`, apart from a .deb or AppImage
+  copy's: the README tells how to bring them over. Report a problem now
+  says how MixMusic was installed (#79).
+
+### Fixed
+
+- After a music video, Autoplay and Start radio carry on with songs.
+  YouTube Music makes the radio of a video out of videos, so Autoplay
+  queued 25 more music videos, Start radio 49, and Autoplay kept to videos
+  from then on. A video's radio now starts from its song, and a cover or
+  other upload without one from a song its radio suggests, or else the
+  song of one of its videos. That takes about half a second longer, and a
+  second for an upload. A radio of songs no longer adds the covers,
+  mashups and other uploads it suggests beside them, unless it has
+  nothing else left (#90).
+- MixMusic starts again on Linux x64. 0.5.6's x64 downloads, the .deb, the
+  .rpm, the AppImage and the archive, asked for a system loader that only
+  NixOS has, so they didn't start on other systems. A copy that updated
+  itself to 0.5.6 can't update on its own: install 0.5.7 from the release
+  page, or run install.sh again. Your settings and library are kept (#166).
+
 ## [0.5.6] - 2026-11-02
 
 Zoom makes the whole interface larger or smaller, from 80% to 200%
@@ -603,7 +645,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.6...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.7...HEAD
+[0.5.7]: https://github.com/fzn0x/mixmusic/compare/v0.5.6...v0.5.7
 [0.5.6]: https://github.com/fzn0x/mixmusic/compare/v0.5.5...v0.5.6
 [0.5.5]: https://github.com/fzn0x/mixmusic/compare/v0.5.4...v0.5.5
 [0.5.4]: https://github.com/fzn0x/mixmusic/compare/v0.5.3...v0.5.4

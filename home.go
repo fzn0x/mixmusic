@@ -6,7 +6,6 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
-	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/media"
 )
 
@@ -26,13 +25,22 @@ func (s *shell) homePage(c *ui.Context) {
 		}
 		s.pageHeader(c, "home", labels, &s.homeFilter)
 		s.toolProblems(c)
-		home := fetch(s, "home", s.svc.Catalog.Home)
-		recent := fetch(s, "history", func(context.Context) ([]library.Play, error) { return s.svc.Collection.History(1), nil })
+		// Each service's shelves come on their own: one that fails leaves
+		// the others, and keeps its own of before on a refresh.
+		services := []struct {
+			source  media.Source
+			key     string
+			shelves *loaded[[]media.Shelf]
+		}{
+			{media.SourceSpotify, "home:spotify", fetch(s, "home:spotify", s.svc.Catalog.SpotifyHome)},
+			{media.SourceYouTube, "home:youtube", fetch(s, "home:youtube", s.svc.Catalog.YouTubeHome)},
+		}
 		accounts := fetch(s, "accounts", func(ctx context.Context) (app.AccountsStatus, error) { return s.svc.Accounts.Status(ctx), nil })
 
+		// The track played last, as the library has it now.
 		var last *media.Track
-		if len(recent.value) > 0 {
-			last = &recent.value[0].Track
+		if recent := s.svc.Collection.History(1); len(recent) > 0 {
+			last = &recent[0].Track
 		} else if cur, ok := s.st.Current(); ok {
 			last = &cur.Track
 		}
@@ -65,23 +73,38 @@ func (s *shell) homePage(c *ui.Context) {
 				s.navigate("/library/mixes")
 			}
 		})
-		switch {
-		case home.err != nil && !home.done:
-		case home.err != nil:
-			s.problem(c, home.err, func() { s.forget("home") })
-			return
-		case !home.done:
-			s.loading(c)
-			return
-		}
+		// The user's own shelves show at once, then those of each service
+		// once they came: one that still loads holds back those after it,
+		// which would move once it came. Each group keeps keys of its own,
+		// which shelves coming or going in another don't move.
 		source := homeFilters[s.homeFilter].source
-		var shelves []media.Shelf
-		for _, sh := range home.value {
-			if source == "" || sh.Source == source {
-				shelves = append(shelves, sh)
+		shown, failed := 0, false
+		put := func(key string, of []media.Shelf) {
+			var shelves []media.Shelf
+			for _, sh := range of {
+				if source == "" || sh.Source == source {
+					shelves = append(shelves, sh)
+				}
+			}
+			s.shelves(c, key, shelves)
+			shown += len(shelves)
+		}
+		put("home-yours", s.localShelves())
+		for _, sv := range services {
+			if source != "" && source != sv.source {
+				continue
+			}
+			put(sv.key, sv.shelves.value)
+			switch key := sv.key; {
+			case !sv.shelves.done:
+				s.loading(c)
+				return
+			case sv.shelves.err != nil:
+				failed = true
+				s.problem(c, sv.shelves.err, func() { s.forget(key) })
 			}
 		}
-		if len(shelves) == 0 {
+		if shown == 0 && !failed {
 			switch source {
 			case media.SourceSpotify:
 				s.emptyLine(c, "Sign in to Spotify in Settings › Accounts to see your playlists and recent tracks here.")
@@ -90,11 +113,18 @@ func (s *shell) homePage(c *ui.Context) {
 			default:
 				s.emptyLine(c, "Nothing here yet.")
 			}
-			return
 		}
-		s.shelves(c, "home", shelves)
 		_ = k
 	})
+}
+
+// localShelves are the home page's shelves of what the user played and
+// made, built again only once the library changed.
+func (s *shell) localShelves() []media.Shelf {
+	if v := s.svc.Collection.Version(); !s.localBuilt || v != s.localVersion {
+		s.local, s.localVersion, s.localBuilt = s.svc.Catalog.LocalShelves(), v, true
+	}
+	return s.local
 }
 
 // pageScroll is a page that scrolls, inside the pane's gutter.

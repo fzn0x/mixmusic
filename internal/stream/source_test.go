@@ -145,13 +145,24 @@ func TestSourceInterruptsAWaitingRead(t *testing.T) {
 	}
 }
 
+// TestSourceCloseStopsTheDownload closes a source while its second chunk
+// waits upstream: the request for it is called off. Close waits for that
+// request to be under way, rather than for a time that a busy machine can
+// take to download the first chunk.
 func TestSourceCloseStopsTheDownload(t *testing.T) {
 	release := make(chan struct{})
 	defer close(release)
 	size := chunkSize + 1000
 	var canceled atomic.Bool
+	asked := make(chan struct{}, 1)
 	inner := stallingUpstream(t, size, release)
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasPrefix(r.Header.Get("Range"), "bytes=0-") {
+			select {
+			case asked <- struct{}{}:
+			default:
+			}
+		}
 		req, _ := http.NewRequestWithContext(r.Context(), r.Method, inner.URL+r.URL.String(), nil)
 		req.Header = r.Header
 		resp, err := http.DefaultClient.Do(req)
@@ -171,7 +182,11 @@ func TestSourceCloseStopsTheDownload(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	time.Sleep(100 * time.Millisecond) // the second chunk waits upstream
+	select {
+	case <-asked: // the second chunk waits upstream
+	case <-time.After(10 * time.Second):
+		t.Fatal("the second chunk was never asked for")
+	}
 	s.Close()
 	if _, err := s.Read(make([]byte, 10)); err == nil {
 		t.Error("read after Close")

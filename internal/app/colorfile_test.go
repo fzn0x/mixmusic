@@ -162,7 +162,7 @@ func (c *colorTest) watch() *fakeWatch {
 	}
 }
 
-func background(st ColorFileStatus) string { return st.Colors.Mode("dark")["background"] }
+func groundIn(st ColorFileStatus) string { return st.Colors.Mode("dark")["background"] }
 
 // TestColorFileFollows reads the file as MixMusic opens, before its first
 // frame, then again each time it changes, telling the windows once for
@@ -175,7 +175,7 @@ func TestColorFileFollows(t *testing.T) {
 		t.Fatal(err)
 	}
 	c = newColorTest(t, func(s *settings.Settings) { s.ColorSource, s.ColorFile = settings.ColorsFile, path })
-	if st := c.status(); background(st) != "#0d1117" || st.Path != path || st.Err != "" || st.ReadAt.IsZero() {
+	if st := c.status(); groundIn(st) != "#0d1117" || st.Path != path || st.Err != "" || st.ReadAt.IsZero() {
 		t.Fatalf("New didn't read the file: %+v", st)
 	}
 	// Written before the watch starts: the read that follows its start
@@ -201,13 +201,13 @@ func TestColorFileFollows(t *testing.T) {
 	if w.path != path {
 		t.Errorf("watching %q", w.path)
 	}
-	c.until("the write before the watch", func(st ColorFileStatus) bool { return background(st) == "#101820" })
+	c.until("the write before the watch", func(st ColorFileStatus) bool { return groundIn(st) == "#101820" })
 	waitTold(1)
 	if err := os.WriteFile(path, []byte(pywalFile("#202830")), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	w.changes <- nil
-	c.until("a write", func(st ColorFileStatus) bool { return background(st) == "#202830" })
+	c.until("a write", func(st ColorFileStatus) bool { return groundIn(st) == "#202830" })
 	waitTold(2)
 	w.changes <- nil // the same colours, written again
 	w.changes <- nil
@@ -233,7 +233,7 @@ func TestColorFileHalfWritten(t *testing.T) {
 	}
 	c.run()
 	w := c.watch()
-	c.until("the read as the watch started", func(st ColorFileStatus) bool { return background(st) == "#151d25" })
+	c.until("the read as the watch started", func(st ColorFileStatus) bool { return groundIn(st) == "#151d25" })
 	// The next reads find the file empty, then half written, then whole.
 	reads := []string{"", whole[:len(whole)/2], whole}
 	var mu sync.Mutex
@@ -252,7 +252,7 @@ func TestColorFileHalfWritten(t *testing.T) {
 		return colors, data, err
 	}
 	w.changes <- nil
-	st := c.until("the whole file", func(st ColorFileStatus) bool { return background(st) == "#202830" })
+	st := c.until("the whole file", func(st ColorFileStatus) bool { return groundIn(st) == "#202830" })
 	if st.Err != "" {
 		t.Errorf("an error stayed: %q", st.Err)
 	}
@@ -262,7 +262,7 @@ func TestColorFileHalfWritten(t *testing.T) {
 		t.Errorf("%d reads, want 3: empty, half written and whole", len(seen))
 	}
 	for _, st := range seen {
-		if st.Err != "" || background(st) != "#151d25" {
+		if st.Err != "" || groundIn(st) != "#151d25" {
 			t.Errorf("while the file was being written, the status was %+v", st)
 		}
 	}
@@ -293,7 +293,7 @@ func TestColorFileBroken(t *testing.T) {
 	}
 	w.changes <- nil
 	st := c.until("garbage", func(st ColorFileStatus) bool { return st.Err != "" })
-	if background(st) != "#0d1117" || !st.ReadAt.Equal(read) || st.Missing {
+	if groundIn(st) != "#0d1117" || !st.ReadAt.Equal(read) || st.Missing {
 		t.Errorf("garbage dropped the colours read last: %+v", st)
 	}
 	if err := os.Remove(path); err != nil {
@@ -308,7 +308,7 @@ func TestColorFileBroken(t *testing.T) {
 		t.Fatal(err)
 	}
 	w.changes <- nil
-	c.until("the file back", func(st ColorFileStatus) bool { return background(st) == "#303840" && !st.Missing })
+	c.until("the file back", func(st ColorFileStatus) bool { return groundIn(st) == "#303840" && !st.Missing })
 }
 
 // TestColorFileFolderGone looks for the file again, every little while,
@@ -330,7 +330,7 @@ func TestColorFileFolderGone(t *testing.T) {
 	}
 	c.run()
 	w := c.watch()
-	c.until("the read as the watch started", func(st ColorFileStatus) bool { return background(st) == "#151d25" })
+	c.until("the read as the watch started", func(st ColorFileStatus) bool { return groundIn(st) == "#151d25" })
 	if err := os.RemoveAll(dir); err != nil {
 		t.Fatal(err)
 	}
@@ -347,7 +347,7 @@ func TestColorFileFolderGone(t *testing.T) {
 	if err := os.WriteFile(path, []byte(pywalFile("#404850")), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	c.until("the folder back", func(st ColorFileStatus) bool { return background(st) == "#404850" })
+	c.until("the folder back", func(st ColorFileStatus) bool { return groundIn(st) == "#404850" })
 	c.watch() // followed again
 }
 
@@ -367,7 +367,7 @@ func TestColorFileSettingChanged(t *testing.T) {
 	c.run()
 	set(first)
 	w := c.watch()
-	c.until("the first file", func(st ColorFileStatus) bool { return background(st) == "#0d1117" })
+	c.until("the first file", func(st ColorFileStatus) bool { return groundIn(st) == "#0d1117" })
 	set(second)
 	select {
 	case <-w.ctx.Done():
@@ -377,7 +377,7 @@ func TestColorFileSettingChanged(t *testing.T) {
 	if w2 := c.watch(); w2.path != second {
 		t.Errorf("watching %q", w2.path)
 	}
-	c.until("the second file", func(st ColorFileStatus) bool { return background(st) == "#505860" && st.Path == second })
+	c.until("the second file", func(st ColorFileStatus) bool { return groundIn(st) == "#505860" && st.Path == second })
 	s := c.a.Services().Preferences.Get()
 	s.ColorSource = settings.ColorsTheme
 	if _, err := c.a.Services().Preferences.Set(s); err != nil {
@@ -411,7 +411,7 @@ func TestColorFileReload(t *testing.T) {
 		t.Fatal(err)
 	}
 	c.a.Services().Addons.Reload()
-	if st := c.status(); background(st) != "#606870" {
+	if st := c.status(); groundIn(st) != "#606870" {
 		t.Errorf("Reload, before the app runs, read %+v", st)
 	}
 	c.run()
@@ -420,7 +420,7 @@ func TestColorFileReload(t *testing.T) {
 		t.Fatal(err)
 	}
 	c.a.Services().Addons.Reload()
-	c.until("Reload, as the app runs", func(st ColorFileStatus) bool { return background(st) == "#707880" })
+	c.until("Reload, as the app runs", func(st ColorFileStatus) bool { return groundIn(st) == "#707880" })
 }
 
 // TestColorFilePywal reads pywal's file where pywal writes it, and finds it
@@ -444,7 +444,7 @@ func TestColorFilePywal(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "colors.json"), []byte(pywalFile("#808890")), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	st := c.until("pywal's file", func(st ColorFileStatus) bool { return background(st) == "#808890" })
+	st := c.until("pywal's file", func(st ColorFileStatus) bool { return groundIn(st) == "#808890" })
 	if st.Path != filepath.Join(dir, "colors.json") || st.Missing {
 		t.Errorf("pywal's file: %+v", st)
 	}

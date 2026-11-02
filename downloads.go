@@ -609,7 +609,7 @@ func (s *shell) downloadSettings(c *ui.Context) {
 			if s.button(c, "show-downloads", "show", false).Label("Show downloads").Clicked() {
 				s.navigate("/library/downloads")
 			}
-		})
+		}, "offline")
 		folder, def := st.Folder, s.svc.Downloads.Default()
 		s.rowWith(c, "Folder", func() {
 			ui.Text(c, folder)
@@ -635,7 +635,7 @@ func (s *shell) downloadSettings(c *ui.Context) {
 			if !samePath(folder, def) && s.link(c, "downloads-folder-default", "use the default") {
 				s.askMoveDownloads(def, st)
 			}
-		})
+		}, folder, st.Problem)
 		s.row(c, "Download on metered connections", "Off: downloads wait on a metered connection, such as a phone's hotspot.", func() {
 			if s.switchOf(c.Key("download-metered"), &s.set.DownloadOnMetered).Label("Download on metered connections").Changed() {
 				s.save()

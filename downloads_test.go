@@ -239,6 +239,29 @@ func TestDownloadSettings(t *testing.T) {
 	}
 }
 
+// TestDownloadSettingsFound finds the rows of the downloads by typing: by
+// what the group and the rows say, by "offline", and by the folder.
+func TestDownloadSettingsFound(t *testing.T) {
+	s, dir := newKeptShell(t, keptTracks...)
+	tt := testerOf(t, s, 1280, 6000)
+	// The test's own folder, which only the folder's row names.
+	named := filepath.Base(filepath.Dir(filepath.Dir(dir)))
+	for _, c := range []struct {
+		q         string
+		want, not []string
+	}{
+		{"downloads", []string{"Downloads", "Folder", "Download on metered connections"}, []string{"Crossfade"}},
+		{"metered", []string{"Download on metered connections"}, []string{"Folder", "2 tracks in "}},
+		{"hotspot", []string{"Download on metered connections"}, []string{"Folder"}},
+		{"offline", []string{"2 tracks in ", "Tracks kept"}, []string{"Folder", "Download on metered connections"}},
+		{named, []string{"Folder", dir}, []string{"2 tracks in ", "Download on metered connections"}},
+	} {
+		show(s, tt, settingsPath("", c.q))
+		showsOnly(t, tt, "searching "+c.q, c.want, c.not)
+		show(s, tt, "/")
+	}
+}
+
 // TestDownloadMarks marks the rows of tracks downloaded, in the lists of any
 // page, and the sidebar links to the downloads.
 func TestDownloadMarks(t *testing.T) {

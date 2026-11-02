@@ -632,7 +632,6 @@ const colorFileHelp = "https://fzn0x.github.io/mixmusic/docs/themes/#colours-fro
 // colorFileSettings chooses where the colours come from, and tells what
 // MixMusic read of the file.
 func (s *shell) colorFileSettings(c *ui.Context) {
-	k := &s.lk
 	labels := make([]string, len(colorSources))
 	chosen := labels[0]
 	for i, cs := range colorSources {
@@ -648,17 +647,40 @@ func (s *shell) colorFileSettings(c *ui.Context) {
 				s.save()
 			}
 		}
-	})
+	}, "wallpaper", "a file of your own")
 	source := s.set.ColorSource
 	if source == settings.ColorsTheme {
 		return
 	}
 	note, bad := colorFileNote(s.colorFile, s.set, time.Now())
+	// The search finds the file's row by what it shows: the file, what
+	// MixMusic read of it, and its links and button.
+	shown := ""
+	if s.colorFile.Source == source {
+		shown = s.colorFile.Path
+	}
+	words := []string{string(source), shown, "how to set it up"}
+	switch source {
+	case settings.ColorsMatugen:
+		words = append(words, "copy the template")
+	case settings.ColorsFile:
+		words = append(words, s.set.ColorFile, "choose")
+	}
+	if !s.findable("Colour file", note, words...) {
+		return
+	}
+	s.show(c, func() { s.colorFileRow(c, source, shown, note, bad) })
+}
+
+// colorFileRow shows the colour file of source, shown where it is, note
+// what MixMusic read of it, which bad tells is a problem.
+func (s *shell) colorFileRow(c *ui.Context, source settings.ColorSource, shown, note string, bad bool) {
+	k := &s.lk
 	ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
 			ui.Text(c, "Colour file").FontSize(k.bodySize())
-			if p := s.colorFile.Path; p != "" && s.colorFile.Source == source {
-				ui.Text(c, p).FontSize(k.smallSize()).TextColor(k.muted)
+			if shown != "" {
+				ui.Text(c, shown).FontSize(k.smallSize()).TextColor(k.muted)
 			}
 			ink := k.muted
 			if bad {

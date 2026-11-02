@@ -164,8 +164,11 @@ type Settings struct {
 	// MinSpeed to MaxSpeed by SpeedStep: 1 is their own speed. Only what
 	// MixMusic's own player plays takes it; Spotify plays its own tracks
 	// at their own speed.
-	SongSpeed float64   `json:"songSpeed"`
-	Equalizer Equalizer `json:"equalizer"`
+	SongSpeed float64 `json:"songSpeed"`
+	// SkipDisliked passes over the tracks the user disliked as the queue
+	// moves on, and leaves them out of radios.
+	SkipDisliked bool      `json:"skipDisliked"`
+	Equalizer    Equalizer `json:"equalizer"`
 	// Volume is from 0 to 1.
 	Volume float64 `json:"volume"`
 	// CacheSizeMB bounds the audio cache; 0 turns it off.
@@ -244,6 +247,7 @@ func Default() Settings {
 		Loudness:        true,
 		Autoplay:        true,
 		SongSpeed:       1,
+		SkipDisliked:    true,
 		Equalizer:       Equalizer{Preset: "flat", Gains: make([]float64, len(Bands))},
 		Volume:          0.8,
 		CacheSizeMB:     1024,

@@ -67,7 +67,10 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 					if s.roundButton(c, "now-next", "next", "Next", false, false).Clicked() {
 						s.p.Next()
 					}
-					s.likeButton(c, "now-like", t, 18)
+					ui.Row(c).Children(func() {
+						s.likeButton(c, "now-like", t, 18)
+						s.dislikeButton(c, "now-dislike", t, 18)
+					})
 				})
 				ui.Column(c).Height(420).Children(func() { s.lyrics(c, true) })
 				s.pluginWidgets(c)

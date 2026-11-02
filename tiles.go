@@ -32,16 +32,17 @@ func (s *shell) tileGrid(c *ui.Context, tiles func(columns int)) {
 	ui.Grid(c).Columns(columns).GapX(k.gap/2).GapY(k.gap/2).MaxWidth(1040).Margin(0, 0, k.sections()).Children(func() { tiles(columns) })
 }
 
-// flatTile is a flat field of one tile colour with a lowercase light
+// flatTile is a tile of the user's own, as "Liked songs". In the Tiles
+// layout it is a flat field of one tile colour with a lowercase light
 // title at its top left and a small caption at its foot; art, when given,
-// prints faintly under the words. It returns whether it was clicked.
-func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, columns int, title, caption, label string, art []media.Image) bool {
+// prints faintly under the words. In the layouts of cards it is a card
+// (cardTile). It returns whether it was clicked.
+func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, columns int, title, caption, label string, glyph *ui.SVG, art []media.Image) bool {
 	k := &s.lk
 	if columns < 4 && span.cols > 1 {
 		span.cols = min(span.cols, columns)
 	}
-	t := s.buttonBase(c.Key(key)).ColumnSpan(span.cols).RowSpan(span.rows).MinHeight(150).Padding(16).
-		AlignItems(ui.Start).Justify(ui.SpaceBetween).Column().Background(k.tile(tone)).Radius(k.radius).
+	t := s.buttonBase(c.Key(key)).ColumnSpan(span.cols).RowSpan(span.rows).MinHeight(150).Radius(k.radius).
 		Label(label).Cursor(ui.CursorPointer).Clip()
 	if k.moves() {
 		s.pressMotion(t, 0.97)
@@ -62,6 +63,11 @@ func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, col
 			size = min(max(28, 0.036*pane), 44) * k.scale
 		}
 	}
+	if k.cards {
+		s.cardTile(c, t, tone, large, k.words(title), caption, glyph, art, size)
+		return t.Clicked()
+	}
+	t.Padding(16).AlignItems(ui.Start).Justify(ui.SpaceBetween).Column().Background(k.tile(tone))
 	shows := len(art) > 0 && s.inView(c, t)
 	t.Children(func() {
 		if !shows {
@@ -80,6 +86,66 @@ func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, col
 		}
 	})
 	return t.Clicked()
+}
+
+// cardTile fills t, a tile of the user's own, as the layouts of cards
+// show one: a card as the covers' are, a step lighter while hovered. Art
+// fills its right side as it is, beside the title and a play button over
+// the caption; without art, glyph shows in a shape of tile colour tone,
+// over the title of size and the caption.
+func (s *shell) cardTile(c *ui.Context, t ui.Element, tone int, large bool, title, caption string, glyph *ui.SVG, art []media.Image, size float32) {
+	k := &s.lk
+	fill := k.surface
+	if t.Hovered() {
+		fill = k.surface2
+	}
+	t.Background(fill)
+	pad := max(16, 1.25*k.gap)
+	heading := func() {
+		ui.Text(c, title).FontSize(size).FontWeight(k.titleWeight()).Font(k.display).LineHeight(1.1).
+			LetterSpacing(k.tracking(-0.02, size)).TextColor(k.text)
+	}
+	t.Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).Padding(pad)
+	if len(art) > 0 {
+		shows := s.inView(c, t)
+		t.Children(func() {
+			heading()
+			ui.Row(c).Gap(16).AlignItems(ui.End).MinWidth(0).Children(func() {
+				const side = 136
+				frame := ui.Box(c).Size(side, side).Shrink(0).Radius(k.radiusSm).Background(k.surface3).Clip()
+				frame.Children(func() {
+					if !shows {
+						return
+					}
+					if b := s.art.get(c, artworkURL(art, 300), 300); b != nil {
+						ui.Image(c, b).Size(side, side).Fit(ui.Cover)
+					}
+				})
+				ui.Column(c).Gap(12).MinWidth(0).AlignItems(ui.Start).Children(func() {
+					k.labelWeight(ui.Text(c, caption).FontSize(k.bodySize()).TextColor(k.text).MaxLines(3))
+					ui.Box(c).Size(44, 44).Radius(k.round(44)).Background(k.accent).Center().Children(func() {
+						ui.Icon(c, icon("play")).FontSize(18).TextColor(k.accentText)
+					})
+				})
+			})
+		})
+		return
+	}
+	badge := float32(40)
+	if large {
+		badge = 56
+	}
+	t.Children(func() {
+		ui.Box(c).Size(badge, badge).Radius(k.round(badge)).Background(k.tile(tone)).Center().Children(func() {
+			ui.Icon(c, glyph).FontSize(badge / 2).TextColor(k.tileText)
+		})
+		ui.Column(c).Gap(4).Children(func() {
+			heading()
+			if caption != "" {
+				ui.Text(c, caption).FontSize(k.smallSize()).TextColor(k.muted).MaxLines(2)
+			}
+		})
+	})
 }
 
 // cardPad is the room a filled card leaves around its artwork, and
@@ -337,7 +403,7 @@ func (s *shell) playCollection(load func(ctx context.Context) ([]media.Track, er
 			case len(tracks) == 0:
 				s.notes = append(s.notes, player.Notice{Message: "Nothing to play here"})
 			default:
-				s.p.PlayTracks(tracks, 0)
+				s.p.PlayAll(tracks, false)
 			}
 		})
 	}()

@@ -92,6 +92,10 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 	case CommandLike:
 		if cur, ok := p.State().Current(); ok {
 			liked := a.library.IsLiked(cur.Track.ID)
+			if !liked && a.library.IsDisliked(cur.Track.ID) {
+				// The like takes the dislike back.
+				p.Disliked(cur.Track.ID, false)
+			}
 			go func() {
 				if err := (&Collection{a}).SetLiked(context.Background(), cur.Track, !liked); err != nil {
 					log.Printf("mixmusic: liking %s: %v", cur.Track.ID, err)
@@ -100,9 +104,29 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 				a.notifyLiked(cur.Track, !liked)
 			}()
 		}
+	case CommandDislike:
+		if cur, ok := p.State().Current(); ok {
+			a.dislikeGoPlayer(p, cur.Track, !a.library.IsDisliked(cur.Track.ID))
+		}
 	case CommandPlayTrack:
 		p.PlayID(cmd.TrackID)
 	}
+}
+
+// dislikeGoPlayer dislikes a track, or takes the dislike back, from
+// outside the window, as the window does: the player hears of it at once,
+// and moves on from the track if it plays, while the settings skip
+// disliked songs, and hears of it again if the library can't keep it.
+func (a *App) dislikeGoPlayer(p *player.Player, t media.Track, disliked bool) {
+	p.Disliked(t.ID, disliked)
+	go func() {
+		if err := (&Collection{a}).SetDisliked(context.Background(), t, disliked); err != nil {
+			log.Printf("mixmusic: disliking %s: %v", t.ID, err)
+			p.Disliked(t.ID, !disliked)
+			return
+		}
+		a.notifyDisliked(t, disliked)
+	}()
 }
 
 // playerServices is the app as the services of the native interface's
@@ -134,6 +158,15 @@ func (s playerServices) RecordPlay(t media.Track) {
 func (s playerServices) Radio(ctx context.Context, t media.Track) ([]media.Track, error) {
 	tracks, err := (&Catalog{s.a}).Radio(ctx, t)
 	return tracks, s.a.offlineErr(ctx, err)
+}
+
+// Skip passes over the tracks the user disliked, while the settings skip
+// those.
+func (s playerServices) Skip(t media.Track) string {
+	if s.a.settings.Get().SkipDisliked && s.a.library.IsDisliked(t.ID) {
+		return player.SkipDisliked
+	}
+	return ""
 }
 
 var _ player.Network = playerServices{}
@@ -276,6 +309,9 @@ func (a *App) Services() Services {
 
 // IsLiked reports whether a track is among the liked songs.
 func (a *App) IsLiked(id string) bool { return a.library.IsLiked(id) }
+
+// IsDisliked reports whether the user dislikes a track.
+func (a *App) IsDisliked(id string) bool { return a.library.IsDisliked(id) }
 
 // InstallYTDLP downloads the latest yt-dlp into the app's data, telling
 // progress how much came, for the native interface.

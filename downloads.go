@@ -391,7 +391,7 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 	if st.Tracks == 0 && st.Waiting == 0 && st.Failed == 0 {
 		// A folder that can't be reached tells nothing of what it holds.
 		if st.Problem == "" {
-			ui.Text(c, "nothing downloaded yet").FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
+			ui.Text(c, k.words("Nothing downloaded yet")).FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
 			ui.Text(c, "Choose Download in the menu of a track, an album or a playlist, and it plays here without the network.").
 				FontSize(k.subtitleSize()).FontWeight(300).MaxWidth(640).Margin(0, 0, 24)
 		}
@@ -405,7 +405,7 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 		s.downloadQueue(c, st)
 	}
 	if cols := s.kept.Collections(); len(cols) > 0 {
-		s.shelf(c, "downloaded", "albums & playlists", func() {
+		s.shelf(c, "downloaded", "Albums & playlists", func() {
 			// The tiles far to either side take their room, and build
 			// nothing.
 			n := len(cols)
@@ -423,7 +423,7 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 		})
 	}
 	tracks := s.downloadedTracks()
-	title := "tracks"
+	title := "Tracks"
 	if col, ok := s.kept.Collection(s.downloadsOf); ok {
 		title = col.Title
 	}
@@ -490,7 +490,7 @@ func (s *shell) openDownloads() {
 func (s *shell) downloadQueue(c *ui.Context, st downloads.Status) {
 	k := &s.lk
 	ui.Column(c).Margin(0, 0, 48).Children(func() {
-		s.sectionHead(c, "downloading", func() {
+		s.sectionHead(c, "Downloading", func() {
 			if st.Waiting > 0 {
 				label := "pause"
 				if st.Paused {
@@ -521,7 +521,7 @@ func (s *shell) downloadQueue(c *ui.Context, st downloads.Status) {
 			s.jobRow(c, j)
 		}
 		if listed := len(st.Jobs); st.Waiting > listed {
-			ui.Text(c, fmt.Sprintf("and %d more", st.Waiting-listed)).FontSize(k.smallSize()).TextColor(k.muted).Padding(8, 8)
+			ui.Text(c, k.sentence(fmt.Sprintf("and %d more", st.Waiting-listed))).FontSize(k.smallSize()).TextColor(k.muted).Padding(8, 8)
 		}
 		for _, j := range st.FailedJobs {
 			s.jobRow(c, j)
@@ -552,7 +552,7 @@ func (s *shell) jobRow(c *ui.Context, j downloads.Job) {
 		case downloads.Failed:
 			status, ink = "couldn't download: "+st.Why, k.danger
 		}
-		ui.Text(c, status).FontSize(k.smallSize()).TextColor(ink).MaxWidth(360).MaxLines(2).Shrink(1)
+		ui.Text(c, k.sentence(status)).FontSize(k.smallSize()).TextColor(ink).MaxWidth(360).MaxLines(2).Shrink(1)
 		if st.Kind == downloads.Failed && s.link(c, "job-retry-"+t.ID, "retry") {
 			s.svc.Downloads.Retry(t.ID)
 		}
@@ -604,7 +604,7 @@ func (s *shell) downloadedTile(c *ui.Context, key string, v downloads.Collection
 // hold, their folder, and whether they go on over a metered connection.
 func (s *shell) downloadSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, "downloads", func() {
+	s.group(c, "Downloads", func() {
 		st := s.kept.Status()
 		s.row(c, "Downloads", fmt.Sprintf("%s in %s. They take the quality above, play without the network, and stay until you remove them.",
 			plural(st.Tracks, "track"), byteSize(st.Bytes)), func() {
@@ -625,7 +625,7 @@ func (s *shell) downloadSettings(c *ui.Context) {
 					v = float64(s.moveDone) / float64(s.moveTotal)
 				}
 				ui.Progress(c, v).Width(160).Label("Moving the downloads")
-				ui.Text(c, "moving…").FontSize(k.smallSize()).TextColor(k.muted)
+				ui.Text(c, k.sentence("moving…")).FontSize(k.smallSize()).TextColor(k.muted)
 				return
 			}
 			if s.button(c, "downloads-folder-open", "open", false).Label("Open the folder of the downloads").Clicked() {

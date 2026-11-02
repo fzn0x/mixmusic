@@ -477,3 +477,35 @@ func TestDislikeChangesOnce(t *testing.T) {
 		t.Errorf("the queue changed %d times, not once", changes)
 	}
 }
+
+// TestDislikeLiveTrack passes over a live stream disliked as it plays, as
+// over any track. Undo goes back to its broadcast, which plays on near its
+// live edge, without a seek: a live stream can't go back to where it was.
+func TestDislikeLiveTrack(t *testing.T) {
+	h := newLiveHarness(t, disliking())
+	h.p.PlayTracks([]media.Track{liveTrack("liveRadio01"), track("b", "B")}, 0)
+	h.wait("the live stream playing", playing("liveRadio01"))
+	h.p.Time(time.Minute, 0)
+	uid := h.p.State().Queue[0].UID
+	h.svc.with(func(f *fakeServices) { f.disliked["yt:liveRadio01"] = true })
+	h.p.Disliked("yt:liveRadio01", true)
+	h.wait("b playing", playing("b"))
+	if s := h.p.State(); s.Live || s.Duration != 200*time.Second {
+		t.Errorf("b: live %v, a duration of %v", s.Live, s.Duration)
+	}
+	if got := skips(h.p.State()); !slices.Equal(got, []string{"liveRadio01"}) {
+		t.Errorf("the queue passes over %v", got)
+	}
+
+	h.svc.with(func(f *fakeServices) { delete(f.disliked, "yt:liveRadio01") })
+	h.p.Disliked("yt:liveRadio01", false)
+	h.p.Return(uid, time.Minute, true)
+	h.wait("the live stream playing again", func(p *Player) bool { return p.s.Live && playing("liveRadio01")(p) })
+	if s := h.p.State(); s.Duration != 0 || h.stream.count("seek") != 0 {
+		t.Errorf("a duration of %v, the stream did %q", s.Duration, h.stream.copy())
+	}
+	// As a live stream tried again: the time it played goes on.
+	if got := h.stream.lastLoad(); got != "load url:yt:liveRadio01 1m0s true" {
+		t.Errorf("undo loaded %q", got)
+	}
+}

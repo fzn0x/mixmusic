@@ -257,6 +257,16 @@ func TestCastOutStatuses(t *testing.T) {
 
 	o.onMedia(cast.MediaStatus{Session: 2, State: cast.Idle, IdleReason: cast.Failed})
 	ev.wait(t, "error The cast device stopped playing this track's audio")
+
+	// A track loaded to wait paused doesn't play as the device buffers it.
+	o.Load(streamURL("abcdefghijk"), audio.Cue{Start: time.Minute})
+	f.wait(t, "load http://lan/yt/abcdefghijk 1m0s false")
+	o.onMedia(cast.MediaStatus{Session: 3, State: cast.Paused, Position: time.Minute, Rate: 1, At: time.Now()})
+	ev.wait(t, "buffering false")
+	got := ev.all()
+	if i := slices.Index(got, "error The cast device stopped playing this track's audio"); slices.Contains(got[i:], "playing true") {
+		t.Errorf("a paused load played: %q", got[i:])
+	}
 }
 
 // TestCastOutCommands sends the player's commands to the device in their

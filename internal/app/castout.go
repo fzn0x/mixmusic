@@ -93,6 +93,9 @@ type castOut struct {
 	duration  time.Duration
 	playing   bool
 	buffering bool
+	// wantPlay is set while the device was last asked to play, rather than
+	// to wait paused: only then does buffering tell it plays.
+	wantPlay bool
 	// volumeSet is when MixMusic last set the device's volume, and
 	// pendingVolume the volume to set once the command before is done;
 	// muted is whether the device is muted, as it last told.
@@ -178,6 +181,7 @@ func (o *castOut) Load(rawURL string, cue audio.Cue) error {
 	o.loading, o.idle = true, false
 	o.loadedURL, o.loadedCue, o.at = rawURL, cue, cue.Start
 	o.pos, o.posAt, o.state = cue.Start, time.Now(), cast.Buffering
+	o.wantPlay = cue.Autoplay
 	o.mu.Unlock()
 	o.native(true)
 	o.load(gen, m, cue.Speed)
@@ -270,11 +274,19 @@ func (o *castOut) Play() error {
 		// asked to be.
 		return o.Load(rawURL, cue)
 	}
+	o.mu.Lock()
+	o.wantPlay = true
+	o.mu.Unlock()
 	o.do(func(ctx context.Context) { o.command(o.session.Play(ctx)) })
 	return nil
 }
 
-func (o *castOut) Pause() { o.do(func(ctx context.Context) { o.command(o.session.Pause(ctx)) }) }
+func (o *castOut) Pause() {
+	o.mu.Lock()
+	o.wantPlay = false
+	o.mu.Unlock()
+	o.do(func(ctx context.Context) { o.command(o.session.Pause(ctx)) })
+}
 
 // Stop stops the media, as a Spotify device takes over: the system's
 // media controls let go of it, and the player hears it paused.
@@ -398,7 +410,13 @@ func (o *castOut) take(st cast.MediaStatus) {
 	if st.Duration > 0 {
 		o.duration = st.Duration
 	}
-	playing := st.State == cast.Playing || st.State == cast.Buffering
+	switch st.State {
+	case cast.Playing:
+		o.wantPlay = true // as by its own remote
+	case cast.Paused:
+		o.wantPlay = false
+	}
+	playing := st.State == cast.Playing || st.State == cast.Buffering && o.wantPlay
 	buffering := st.State == cast.Buffering
 	var ended, failed bool
 	if st.State == cast.Idle {

@@ -99,6 +99,8 @@ both services in one player:
 ### On your desktop
 
 - Media keys and the system's media controls on Windows, macOS and Linux.
+- Global shortcuts of your own to play, pause, skip, change the volume,
+  mute, like what plays or show MixMusic, whichever window is in front.
 - The player's buttons on the taskbar thumbnail on Windows.
 - Tray controls, notifications of new tracks, and start at login.
 - `mixmusic://` links.
@@ -119,8 +121,9 @@ both services in one player:
 - **Plugins** add pages, commands, track actions and widgets through a
   typed API, drawn in your theme.
 - **Keyboard first.** Shortcuts for everything common, a key of your own for
-  any command, plugins' commands included, and a command palette
-  (<kbd>Ctrl</kbd> <kbd>K</kbd>) for the rest.
+  any command, plugins' commands included, keys that control the music
+  from any app, and a command palette (<kbd>Ctrl</kbd> <kbd>K</kbd>) for
+  the rest.
 - **A settings file.** Your settings are `settings.json` in your data folder
   (`%AppData%\MixMusic` on Windows, `~/Library/Application Support/MixMusic`
   on macOS, `~/.config/MixMusic` on Linux), which you can keep with your
@@ -241,7 +244,10 @@ desktop.
 - **YouTube Music:** choose Sign in to YouTube Music in Settings › Accounts
   and sign in to Google in the window that opens. What you type goes to
   Google only. MixMusic keeps the session encrypted, with a key in your
-  system's keyring where there is one.
+  system's keyring where there is one. Where that window can't open, or
+  Google refuses it, import the session of a browser you signed in with
+  (MixMusic reads it with its yt-dlp, and keeps YouTube's cookies alone),
+  or paste the Cookie header of a signed-in music.youtube.com tab.
 - **Spotify:** Spotify lets an app serve up to five users, and only while
   its owner has Premium, so you sign in with a Spotify app of your own. It
   takes two minutes: [docs/spotify.md](docs/spotify.md) walks you through
@@ -388,10 +394,11 @@ The packages you can import:
 ```
 opus/                an Opus decoder in pure Go, a port of libopus's
 aac/                 an AAC-LC decoder in pure Go
+ac3/                 an AC-3 decoder in pure Go, written from ATSC A/52
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
-lyrics/              synced lyrics from LRCLIB, and the LRC format
+lyrics/              synced lyrics from Unison and LRCLIB, in TTML and LRC
 resources/           MixMusic's logo, for code that draws it
 ```
 
@@ -444,6 +451,8 @@ talks to:
 - **Spotify,** once you sign in: your library, your Spotify Connect devices,
   and Spotify's player, loaded from `sdk.scdn.co`, when Spotify plays in
   MixMusic.
+- **Unison:** the video ID of the track that plays, or, without one, its
+  title, artists, album and length, to find its lyrics.
 - **LRCLIB:** the title, artists, album and length of the track that plays,
   to find its lyrics.
 - **GitHub:** a check for a new version at start and every few hours,
@@ -503,7 +512,9 @@ MixMusic is built on these projects:
   the AppImages.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, which finds the audio of
   the tracks MixMusic can't find itself.
-- **[LRCLIB](https://lrclib.net)**, the open database of synced lyrics.
+- **[Unison](https://unison.boidu.dev)**, the open, crowdsourced database of
+  lyrics, under the ODbL, and **[LRCLIB](https://lrclib.net)**, the open
+  database of synced lyrics.
 - **[libopus](https://opus-codec.org)**, whose decoder the Opus decoder is a
   port of, and **[SharpJaad](https://github.com/jimm98y/SharpJaad)**, the C#
   port of [JAAD](https://sourceforge.net/projects/jaadec/) the AAC decoder

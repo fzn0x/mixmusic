@@ -95,12 +95,31 @@ func TestMatchRemembers(t *testing.T) {
 	if yt.calls.Load() != 1 {
 		t.Errorf("searched %d times for one track", yt.calls.Load())
 	}
+	if got, ok := m.Matched(oneMoreTime); !ok || got.Title != "One More Time" {
+		t.Errorf("matched = %+v, %v", got, ok)
+	}
 	if err := m.Forget(oneMoreTime.ID); err != nil {
 		t.Fatal(err)
+	}
+	if _, ok := m.Matched(oneMoreTime); ok {
+		t.Error("a forgotten match is still matched")
 	}
 	m.Match(context.Background(), oneMoreTime)
 	if yt.calls.Load() != 2 {
 		t.Error("a forgotten match was not searched again")
+	}
+}
+
+// TestMatched tells the match of a track without searching for one.
+func TestMatched(t *testing.T) {
+	yt := &fakeSearch{songs: items(track("One More Time", "Daft Punk", 320000, false))}
+	m := New(yt, nil)
+	if _, ok := m.Matched(oneMoreTime); ok || yt.calls.Load() != 0 {
+		t.Errorf("a track never matched is matched, after %d searches", yt.calls.Load())
+	}
+	own := track("Song", "Artist", 1000, false)
+	if got, ok := m.Matched(own); !ok || got.ID != own.ID {
+		t.Errorf("a YouTube Music track matched = %+v, %v", got, ok)
 	}
 }
 
@@ -119,32 +138,5 @@ func TestMatchFindsNothing(t *testing.T) {
 	yt := &fakeSearch{songs: items(track("Something Else", "Nobody", 100000, false))}
 	if _, err := New(yt, nil).Match(context.Background(), oneMoreTime); !errors.Is(err, ErrNoMatch) {
 		t.Errorf("err = %v", err)
-	}
-}
-
-// TestKnownMatch tells a match found before without searching, as the
-// player asks of a Spotify track while the network is gone.
-func TestKnownMatch(t *testing.T) {
-	known, err := store.Open(filepath.Join(t.TempDir(), "matches.json"), map[string]media.Track{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	yt := &fakeSearch{songs: items(track("One More Time", "Daft Punk", 320000, false))}
-	m := New(yt, known)
-	if _, ok := m.KnownMatch(oneMoreTime); ok {
-		t.Error("a match known before any search")
-	}
-	if _, err := m.Match(context.Background(), oneMoreTime); err != nil {
-		t.Fatal(err)
-	}
-	if got, ok := m.KnownMatch(oneMoreTime); !ok || got.Title != "One More Time" {
-		t.Errorf("KnownMatch = %+v, %v", got, ok)
-	}
-	own := track("Strobe", "deadmau5", 600000, false)
-	if got, ok := m.KnownMatch(own); !ok || got.ID != own.ID {
-		t.Errorf("a YouTube Music track's own match: %+v, %v", got, ok)
-	}
-	if yt.calls.Load() != 1 {
-		t.Errorf("searched %d times", yt.calls.Load())
 	}
 }

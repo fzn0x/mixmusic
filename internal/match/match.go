@@ -105,10 +105,10 @@ func (m *Matcher) Forget(trackID string) error {
 	})
 }
 
-// KnownMatch returns the recording found before of a track, without
-// searching: for a Spotify track, its match, if one was found; a YouTube
-// Music track is its own.
-func (m *Matcher) KnownMatch(t media.Track) (media.Track, bool) {
+// Matched returns the YouTube Music track matched to t without searching:
+// t itself for a YouTube Music track, the match found before for others,
+// if any.
+func (m *Matcher) Matched(t media.Track) (media.Track, bool) {
 	if t.Source == media.SourceYouTube {
 		return t, true
 	}

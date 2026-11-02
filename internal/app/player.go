@@ -43,6 +43,10 @@ type PlaybackSource struct {
 	// Cached is set when the audio plays from the cache, without the
 	// network.
 	Cached bool `json:"cached,omitempty"`
+	// Live is set for the stream of a live video, as it goes on, which the
+	// engine plays from near its live edge: it has no length, can't seek,
+	// and isn't cached.
+	Live bool `json:"live,omitempty"`
 }
 
 // Player prepares tracks for the player of the main window, controls
@@ -80,7 +84,7 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 // the settings say of Spotify tracks: those play from their recording on
 // YouTube Music. The player falls back to it when no Spotify device can
 // play. It keeps how loud YouTube measured the track, or asks, for the
-// engine to play it at an even loudness.
+// engine to play it at an even loudness: a live stream has no measure.
 //
 // A track downloaded plays from its download, without the network, also
 // while it answers. While the network is known to be gone, a Spotify
@@ -93,7 +97,7 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	}
 	var yt media.Track
 	if p.a.offline() {
-		known, ok := p.a.matcher.KnownMatch(track)
+		known, ok := p.a.matcher.Matched(track)
 		if !ok {
 			return PlaybackSource{}, player.ErrOffline
 		}
@@ -120,6 +124,9 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	// A stream found before plays without the network, as the engine may
 	// hold its audio already; yt-dlp needs the network to find one.
 	if p.a.resolver.Fresh(videoID) {
+		if p.a.resolver.Live(videoID) {
+			return liveSource(src, videoID), nil
+		}
 		// Its measure was kept as it was found, else it is asked for now.
 		p.learnLoudness(videoID)
 		return src, nil
@@ -131,6 +138,9 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	if err != nil {
 		return PlaybackSource{}, err
 	}
+	if s.Live {
+		return liveSource(src, videoID), nil
+	}
 	if s.Measured {
 		p.a.loudness.keep(videoID, s.Loudness)
 	} else {
@@ -139,6 +149,14 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 		p.a.loudness.learn(videoID)
 	}
 	return src, nil
+}
+
+// liveSource is src as the live stream of a video, which the engine opens
+// at its own address.
+func liveSource(src PlaybackSource, videoID string) PlaybackSource {
+	src.Live = true
+	src.URL = schemeURL(streamScheme) + strings.TrimPrefix(stream.LivePath(videoID), "/")
+	return src
 }
 
 // learnLoudness asks YouTube how loud a video MixMusic holds the audio of
@@ -289,6 +307,38 @@ func (a *App) notifyTrack(t media.Track) {
 	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
 		log.Printf("mixmusic: notification: %v", err)
 	}
+}
+
+// notifyLiked tells that the track that plays joined the liked songs, or
+// left them, while the main window isn't in front: liked from elsewhere,
+// as by a global shortcut, nothing else shows it.
+func (a *App) notifyLiked(t media.Track, liked bool) {
+	a.mu.Lock()
+	main := a.main
+	a.mu.Unlock()
+	if !a.settings.Get().Notifications || main != nil && main.IsFocused() {
+		return
+	}
+	title, body := likedNote(t, liked)
+	n := mygo.NewNotification(mygo.NotificationOptions{ID: "liked", Title: title, Body: body, Silent: true})
+	n.OnClick(a.showMain)
+	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
+		log.Printf("mixmusic: notification: %v", err)
+	}
+}
+
+// likedNote is what the notification of a track liked, or no longer,
+// says.
+func likedNote(t media.Track, liked bool) (title, body string) {
+	title = "Removed from liked songs"
+	if liked {
+		title = "Added to liked songs"
+	}
+	body = t.Title
+	if artists := t.ArtistNames(); artists != "" {
+		body += " — " + artists
+	}
+	return title, body
 }
 
 // Devices returns the user's Spotify Connect devices.

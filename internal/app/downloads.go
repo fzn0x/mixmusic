@@ -160,7 +160,7 @@ func (a *App) playsOffline(t media.Track) bool {
 	if a.matcher == nil {
 		return false
 	}
-	yt, ok := a.matcher.KnownMatch(t)
+	yt, ok := a.matcher.Matched(t)
 	if !ok {
 		return false
 	}

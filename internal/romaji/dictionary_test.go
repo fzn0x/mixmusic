@@ -319,3 +319,30 @@ func BenchmarkRomanize(b *testing.B) {
 		}
 	}
 }
+
+// TestDictionaryClearsParts deletes the parts of downloads that a run
+// quitting as they came left, but not those that may still come.
+func TestDictionaryClearsParts(t *testing.T) {
+	data := []byte("辞書")
+	ts := httptest.NewServer(&served{data: data})
+	defer ts.Close()
+	d := testDictionary(t, ts, data)
+	dir := filepath.Dir(d.path)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"old.part", "new.part"} {
+		if err := os.WriteFile(filepath.Join(dir, name), data, 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	old := time.Now().Add(-time.Hour)
+	if err := os.Chtimes(filepath.Join(dir, "old.part"), old, old); err != nil {
+		t.Fatal(err)
+	}
+	d.Romanize(weather)
+	waitDownload(t, d)
+	if names := files(t, d); !slices.Equal(names, []string{dictionaryFile, "new.part"}) {
+		t.Errorf("files %q", names)
+	}
+}

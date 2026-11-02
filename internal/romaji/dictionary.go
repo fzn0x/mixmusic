@@ -276,6 +276,7 @@ func (d *Dictionary) fetch() error {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
+	d.clearParts(dir)
 	tmp, err := os.CreateTemp(dir, "*.part")
 	if err != nil {
 		return err
@@ -294,6 +295,17 @@ func (d *Dictionary) fetch() error {
 		os.Remove(tmp.Name())
 	}
 	return err
+}
+
+// clearParts deletes the parts of downloads left in dir by a MixMusic
+// that quit as they came: those older than a download lasts at most.
+func (d *Dictionary) clearParts(dir string) {
+	parts, _ := filepath.Glob(filepath.Join(dir, "*.part"))
+	for _, p := range parts {
+		if info, err := os.Stat(p); err == nil && d.now().Sub(info.ModTime()) > downloadTimeout {
+			os.Remove(p)
+		}
+	}
 }
 
 // Wait waits for the download under way, when there is one, to end, or

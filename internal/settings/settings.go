@@ -168,6 +168,11 @@ type Settings struct {
 	Loudness bool `json:"loudness"`
 	// Autoplay continues with similar tracks when the queue ends.
 	Autoplay bool `json:"autoplay"`
+	// SongSpeed plays songs faster or slower, at their own pitch, from
+	// MinSpeed to MaxSpeed by SpeedStep: 1 is their own speed. Only what
+	// MixMusic's own player plays takes it; Spotify plays its own tracks
+	// at their own speed.
+	SongSpeed float64 `json:"songSpeed"`
 	// SkipDisliked passes over the tracks the user disliked as the queue
 	// moves on, and leaves them out of radios.
 	SkipDisliked bool `json:"skipDisliked"`
@@ -265,6 +270,7 @@ func Default() Settings {
 		Quality:         QualityBest,
 		Loudness:        true,
 		Autoplay:        true,
+		SongSpeed:       1,
 		SkipDisliked:    true,
 		Equalizer:       Equalizer{Preset: "flat", Gains: make([]float64, len(Bands))},
 		Volume:          0.8,
@@ -424,6 +430,7 @@ func (s Settings) Clean() Settings {
 		s.Quality = QualityBest
 	}
 	s.Crossfade = min(max(s.Crossfade, 0), 12)
+	s.SongSpeed = CleanSpeed(s.SongSpeed)
 	s.Volume = min(max(s.Volume, 0), 1)
 	if len(s.Equalizer.Gains) != len(Bands) {
 		s.Equalizer.Gains = make([]float64, len(Bands))
@@ -474,6 +481,27 @@ func (s Settings) Clean() Settings {
 		s.RegistryURL = d.RegistryURL
 	}
 	return s
+}
+
+// The speeds MixMusic's own player plays at: from half a track's own speed
+// to three times it, by twentieths.
+const (
+	MinSpeed  = 0.5
+	MaxSpeed  = 3
+	SpeedStep = 0.05
+)
+
+// CleanSpeed returns the speed of the steps nearest v, from MinSpeed to
+// MaxSpeed: 1, a track's own speed, for none, as in settings from before
+// the speed, and for one that isn't a number.
+func CleanSpeed(v float64) float64 {
+	if math.IsNaN(v) || math.IsInf(v, 0) || v <= 0 {
+		return 1
+	}
+	v = min(max(v, MinSpeed), MaxSpeed)
+	// Dividing a whole number of steps gives the speed as the settings
+	// write it, 1.1 rather than 1.1000000000000001.
+	return math.Round(v*(1/SpeedStep)) / (1 / SpeedStep)
 }
 
 // ZoomSteps are the zooms of the interface, from 80% to 200%.

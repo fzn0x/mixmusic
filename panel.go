@@ -82,20 +82,33 @@ func (s *shell) queuePanel(c *ui.Context) {
 			ui.Text(c, text).FontSize(k.bodySize()).TextColor(k.muted).Padding(16, 8)
 			return
 		}
-		ui.Column(c).Margin(12, 0, 0).Children(func() {
-			for i := at + 1; i < len(q); i++ {
+		// The queue of a long playlist holds thousands of entries: those
+		// near the view are built, and the others take their room.
+		list := ui.Column(c.Key("queue-upcoming")).Margin(12, 0, 0)
+		from, to := s.nearRows(c, "queue-upcoming", list, upcoming, queueRowHeight)
+		list.Children(func() {
+			if from > 0 {
+				ui.Box(c).Height(float32(from) * queueRowHeight)
+			}
+			for i := at + 1 + from; i < at+1+to; i++ {
 				s.queueRow(c, i, q[i], false)
+			}
+			if to < upcoming {
+				ui.Box(c).Height(float32(upcoming-to) * queueRowHeight)
 			}
 		})
 	})
 }
+
+// queueRowHeight is the height of an entry of the queue.
+const queueRowHeight = 56
 
 // queueRow is an entry of the queue; the current one floods with the
 // accent, and one the queue passes over is muted.
 func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 	k := &s.lk
 	t := it.Track
-	row := ui.Row(c.Key("q-"+it.UID)).Height(56).Padding(0, 8).Gap(10).Radius(k.radiusSm).Cursor(ui.CursorDefault)
+	row := ui.Row(c.Key("q-"+it.UID)).Height(queueRowHeight).Padding(0, 8).Gap(10).Radius(k.radiusSm).Cursor(ui.CursorDefault)
 	ink, sub := k.text, k.muted
 	skipped := it.Skip != "" && !current
 	if skipped {

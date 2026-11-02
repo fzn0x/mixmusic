@@ -256,3 +256,31 @@ func TestYouTubeLikedReadsOn(t *testing.T) {
 		t.Errorf("the whole list shows %q", tt.Texts())
 	}
 }
+
+// TestLongQueueBuildsNearRows lists a queue of thousands of tracks, as
+// Play makes of a long playlist, building only the entries near the view.
+func TestLongQueueBuildsNearRows(t *testing.T) {
+	s := newTestShell(t)
+	tracks := make([]media.Track, 3000)
+	for i := range tracks {
+		tracks[i] = testTrack("yt:q"+strconv.Itoa(i), "Song "+strconv.Itoa(i), "Someone", "Something", media.SourceYouTube)
+	}
+	s.p.PlayTracks(tracks, 0)
+	s.settle(t, func(st player.State) bool { return len(st.Queue) == len(tracks) && st.Playing })
+	s.panel = "queue"
+	tt := tester(t, s)
+	tt.Frame()
+	if !tt.HasText("Song 1") || tt.HasText("Song 2999") {
+		t.Errorf("the queue shows %d texts, the last entry's %v", len(tt.Texts()), tt.HasText("Song 2999"))
+	}
+	if n := len(tt.Texts()); n > 1000 {
+		t.Errorf("the queue built %d texts", n)
+	}
+	// Scrolled to its end, it shows the last.
+	r, _ := tt.Find("Song 1")
+	tt.Scroll(r.X+r.W/2, r.Y+r.H/2, 0, 1e6)
+	tt.Frame()
+	if !tt.HasText("Song 2999") || tt.HasText("Song 1") {
+		t.Errorf("scrolled to its end, the queue shows the last entry %v, the first %v", tt.HasText("Song 2999"), tt.HasText("Song 1"))
+	}
+}

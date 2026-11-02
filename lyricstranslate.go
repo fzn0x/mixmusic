@@ -297,6 +297,8 @@ func (s *shell) translateOptions() []string {
 	return ls.languages
 }
 
+func init() { addSettings("playback", 60, (*shell).lyricsSettings) }
+
 // lyricsSettings chooses the language lyrics translate to.
 func (s *shell) lyricsSettings(c *ui.Context) {
 	s.group(c, "Lyrics", func() {

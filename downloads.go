@@ -598,6 +598,8 @@ func (s *shell) downloadedTile(c *ui.Context, key string, v downloads.Collection
 	}
 }
 
+func init() { addSettings("playback", 80, (*shell).downloadSettings) }
+
 // downloadSettings show the downloads in Settings › Playback: what they
 // hold, their folder, and whether they go on over a metered connection.
 func (s *shell) downloadSettings(c *ui.Context) {

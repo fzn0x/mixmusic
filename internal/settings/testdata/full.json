@@ -1,0 +1,86 @@
+{
+  "theme": "aurora",
+  "followSystem": true,
+  "lightTheme": "paper",
+  "darkTheme": "night",
+  "themeOptions": {
+    "aurora": {
+      "grain": "on"
+    }
+  },
+  "accent": "#ff8800",
+  "dynamicAccent": false,
+  "colorSource": "file",
+  "colorFile": "~/colors.json",
+  "density": "compact",
+  "layout": "crate",
+  "fontScale": 1.1,
+  "zoom": 1.25,
+  "sidebarCollapsed": true,
+  "panel": "lyrics",
+  "lyricsPlain": true,
+  "lyricsTranslate": [
+    "ja",
+    ""
+  ],
+  "lyricsRomanize": {
+    "ja": "under"
+  },
+  "skippedYtdlp": "2026.10.22",
+  "spotifyPlayback": "match",
+  "spotifyDevice": "device-1",
+  "quality": "saver",
+  "crossfade": 6,
+  "normalize": true,
+  "loudness": false,
+  "surround": true,
+  "autoplay": false,
+  "songSpeed": 1.25,
+  "skipDisliked": false,
+  "skipAi": true,
+  "musicVideos": true,
+  "equalizer": {
+    "enabled": true,
+    "preset": "bass",
+    "gains": [
+      6,
+      5,
+      4,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "preamp": -3
+  },
+  "volume": 0.5,
+  "cacheSizeMb": 4096,
+  "lyricsTranslateTo": "ja",
+  "downloadsFolder": "/home/me/Music",
+  "downloadOnMetered": true,
+  "spotifyClientId": "0123456789abcdef",
+  "scrobbling": false,
+  "youtubeChannel": "112233445566778899",
+  "youtubeHistory": false,
+  "closeToTray": true,
+  "notifications": false,
+  "showInTitle": false,
+  "mediaKeys": false,
+  "showOnDiscord": false,
+  "discordAppId": "123456789012345678",
+  "ytdlpPath": "/usr/local/bin/yt-dlp",
+  "jsRuntime": "deno",
+  "shortcuts": {
+    "player.next": "Mod+N"
+  },
+  "globalShortcuts": {
+    "player.toggle": "Mod+Alt+P"
+  },
+  "enabledPlugins": [
+    "spectrum"
+  ],
+  "registryUrl": "https://example.com/registry.json"
+}

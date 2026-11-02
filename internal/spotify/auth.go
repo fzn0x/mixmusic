@@ -51,6 +51,8 @@ var Scopes = []string{
 	"user-read-currently-playing",
 	"user-read-recently-played",
 	"user-top-read",
+	// Where the user left a podcast's episode, which it resumes from.
+	"user-read-playback-position",
 	// The Web Playback SDK plays in MixMusic with these.
 	"streaming",
 	"user-read-email",

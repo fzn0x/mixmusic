@@ -37,13 +37,23 @@ func secondaryShelf(n node) (string, node) {
 // savedInLibrary reports whether the "save to library" button of an album
 // or playlist header is on, which YouTube Music shows to a signed-in user.
 func savedInLibrary(h node) bool {
+	return saveToggle(h).get("isToggled").boolean()
+}
+
+// saveToggle returns the "save to library" button of an album or playlist
+// header, or the zero node. YouTube Music draws it with a bookmark, as
+// BOOKMARK_BORDER and BOOKMARK, and drew it with LIBRARY_ADD and
+// LIBRARY_SAVED before; signed in, it likes or unlikes the playlist.
+func saveToggle(h node) node {
 	for _, b := range h.get("buttons").list() {
 		t := b.get("toggleButtonRenderer")
-		if strings.Contains(t.get("defaultIcon", "iconType").str(), "LIBRARY") {
-			return t.get("isToggled").boolean()
+		icon := t.get("defaultIcon", "iconType").str()
+		if strings.Contains(icon, "LIBRARY") || strings.HasPrefix(icon, "BOOKMARK") ||
+			t.get("defaultServiceEndpoint", "likeEndpoint").exists() || t.get("toggledServiceEndpoint", "likeEndpoint").exists() {
+			return t
 		}
 	}
-	return false
+	return node{}
 }
 
 // headerDescription returns the description of a responsive header.

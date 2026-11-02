@@ -1,3 +1,5 @@
+<p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.id.md">Bahasa Indonesia</a></p>
+
 <p align="center">
   <img src="resources/icon.png" width="112" height="112" alt="MixMusic's icon: two pink rings and a play button on black" />
 </p>
@@ -52,32 +54,6 @@ both services in one player:
 - **Free and open source,** under the MIT license or the GPL 3.0.
 
 ## Features
-
-### New in 0.5.6
-
-- **Zoom.** <kbd>Ctrl</kbd> <kbd>=</kbd> and <kbd>Ctrl</kbd> <kbd>-</kbd>
-  make everything larger or smaller, from 80% to 200%, and
-  <kbd>Ctrl</kbd> <kbd>0</kbd> goes back to 100% (<kbd>⌘</kbd> on macOS).
-  The mini player zooms too.
-- **Even loudness.** Loud YouTube Music tracks are turned down to one level,
-  from YouTube's own measure of each track, so no song jumps out. It is on
-  by default, in Settings › Playback.
-- **AAC.** Tracks that YouTube Music has only in AAC now play. The audio
-  engine decodes AAC itself, as it does Opus.
-- **An even volume slider.** Each tenth of the slider is 6 dB, so the quiet
-  end no longer jumps.
-- **Covers offline.** The covers you saw are kept on disk, up to 256 MB, and
-  show at once at the next start, even without a connection.
-- **Steadier playback.** YouTube Music tracks start in a moment. When the
-  network drops, the song waits and then plays on from where it stopped.
-  MixMusic pauses when the computer goes to sleep.
-- **Discord with no setup.** Your profile shows what plays, as "Listening
-  to MixMusic".
-- **The track in the window title,** for the taskbar and window switchers.
-- **A new icon:** two pink rings and a play button on black.
-- **Plugins in TypeScript.** The plugin API and the community's plugins
-  are written in TypeScript and checked against the SDK's types.
-- **Two licenses.** Use MixMusic under the MIT license or the GPL 3.0.
 
 ### Search and play
 
@@ -145,6 +121,11 @@ both services in one player:
 - **Keyboard first.** Shortcuts for everything common, a key of your own for
   any command, plugins' commands included, and a command palette
   (<kbd>Ctrl</kbd> <kbd>K</kbd>) for the rest.
+- **A settings file.** Your settings are `settings.json` in your data folder
+  (`%AppData%\MixMusic` on Windows, `~/Library/Application Support/MixMusic`
+  on macOS, `~/.config/MixMusic` on Linux), which you can keep with your
+  dotfiles. Save it while MixMusic runs, and it applies at once; Settings ›
+  Desktop › Settings file opens it.
 
 ## A look around
 
@@ -183,6 +164,7 @@ Download the file for your system from the
 | Debian, Ubuntu and derivatives | [`mixmusic-<version>-linux-<arch>.deb`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Fedora, openSUSE and derivatives | [`mixmusic-<version>-linux-<arch>.rpm`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Any Linux, one file | [`mixmusic-<version>-linux-<arch>.AppImage`](https://github.com/fzn0x/mixmusic/releases/latest) |
+| Any Linux, sandboxed (Flatpak, x64) | [`mixmusic-<version>-linux-amd64.flatpak`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Any Linux, in your home folder | [`mixmusic-<version>-linux-<arch>.tar.gz`](https://github.com/fzn0x/mixmusic/releases/latest), with `install.sh` |
 
 `<arch>` is `amd64` for x64 and `arm64` for Arm. Each release lists
@@ -191,10 +173,13 @@ Download the file for your system from the
 `-windows-<arch>.tar.gz`: installed apps update from them.
 
 The installers, the portable zip and the Linux archive update themselves.
-The `.deb`, the `.rpm` and the AppImage can't replace their own files, so
-MixMusic tells you when a new version is out and downloads it for you. For
-the portable zip, unpack it anywhere and open `MixMusic.exe`. For the
-AppImage, make it executable (`chmod +x`) and open it.
+The `.deb`, the `.rpm`, the AppImage and the Flatpak can't replace their
+own files, so MixMusic tells you when a new version is out and downloads
+it for you. For the portable zip, unpack it anywhere and open
+`MixMusic.exe`. For the AppImage, make it executable (`chmod +x`) and open
+it. For the Flatpak, open it with your software center, or run
+`flatpak install ./mixmusic-<version>-linux-amd64.flatpak`; the first time,
+Flatpak fetches the GNOME runtime from Flathub.
 
 ### The first launch
 
@@ -214,7 +199,8 @@ AppImage, make it executable (`chmod +x`) and open it.
   or ALSA. Signing in to YouTube Music needs WebKitGTK 4.1, the tray icon
   needs `libayatana-appindicator3`, and keeping your sign-ins in the
   system's keyring needs `libsecret`. The `.deb` and the `.rpm` install
-  them; for the AppImage and the archive:
+  them, and the Flatpak brings them with it; for the AppImage and the
+  archive:
 
   ```sh
   # Debian and Ubuntu
@@ -226,7 +212,29 @@ AppImage, make it executable (`chmod +x`) and open it.
   itself. For the rest, such as tracks made for children, it uses
   [yt-dlp](https://github.com/yt-dlp/yt-dlp), which it installs for you
   from Settings › Playback and keeps up to date. yt-dlp needs a JavaScript
-  runtime: [Deno](https://deno.com), Node.js, Bun or QuickJS.
+  runtime: [Deno](https://deno.com), Node.js, Bun or QuickJS. The Flatpak
+  has Node.js.
+
+### The Flatpak
+
+The Flatpak runs MixMusic in a sandbox, which sees the network, the sound
+server, the display and the GPU, and none of your home folder. MixMusic
+keeps its settings and library in `~/.var/app/io.github.fzn0x.mixmusic`,
+apart from a `.deb`, `.rpm`, AppImage or archive copy, and both can run at
+once. To bring a copy's settings and library over, quit both, copy
+`settings.json`, `library.json`, `queue.json` and the `addons` folder from
+`~/.config/MixMusic` into `~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`,
+and sign in to your accounts again: sign-ins stay in the other copy's
+keyring.
+
+In the Flatpak, start at login goes through your desktop, which may ask
+you first, and a yt-dlp of your own must be in
+`~/.var/app/io.github.fzn0x.mixmusic`, as the sandbox sees no other
+folder. A Discord app that isn't a Flatpak shows what plays only if it
+was running when MixMusic started, until it restarts; Discord as a
+Flatpak works either way. The Flatpak is new: tell us in an
+[issue](https://github.com/fzn0x/mixmusic/issues) how it runs on your
+desktop.
 
 ### Accounts (all optional)
 
@@ -333,6 +341,12 @@ go run ./tools/registry -check # the community registry
 bun run build                  # the packaged app for this system, in build/
 bun run build -- -platform windows/amd64,linux/amd64,linux/arm64
 ```
+
+In the Nix shell, build Linux downloads with
+`.github/scripts/build.sh linux/amd64,linux/arm64`, as releases do. A plain
+`bun run build` there makes a Linux program that asks for Nix's own loader,
+and it starts only on NixOS. `go run ./tools/elfloader build/linux-amd64`
+checks a build.
 
 The [website](https://fzn0x.github.io/mixmusic/) is in `site/`, built with
 [Zola](https://www.getzola.org), and the guides in `docs/` are its

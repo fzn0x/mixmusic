@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
@@ -104,6 +105,20 @@ func (c *Collection) RemoveFromYouTubePlaylist(ctx context.Context, playlistID s
 	return c.a.youtube.RemoveFromPlaylist(ctx, list, track.EntryID, video)
 }
 
+// DeleteYouTubePlaylist deletes a playlist the user made on YouTube Music,
+// by its MixMusic ID: it goes from YouTube too. Mixes copied from it keep
+// their tracks, and the queue its.
+func (c *Collection) DeleteYouTubePlaylist(ctx context.Context, playlistID string) error {
+	if !c.a.youtube.SignedIn() {
+		return errNotSignedIn
+	}
+	list, err := youtubePlaylistID(playlistID)
+	if err != nil {
+		return err
+	}
+	return c.a.youtube.DeletePlaylist(ctx, list)
+}
+
 // reportYouTubePlay adds a play of a YouTube Music track to the user's
 // history there, when they signed in and keep it on.
 func (a *App) reportYouTubePlay(t media.Track) {
@@ -153,20 +168,27 @@ func (s *Accounts) SetYouTubeChannel(ctx context.Context, authUser int, pageID s
 	if set = set.Clean(); set.YouTubeChannel != pageID || authUser < 0 {
 		return AccountsStatus{}, errors.New("that is not a channel of the account")
 	}
-	if err := s.a.settings.Set(set); err != nil {
-		return AccountsStatus{}, err
-	}
-	notify()
+	// The client takes the account and its channel at once, as a brand
+	// channel is of one account, and the session keeps the account.
 	wasUser, wasPage := s.a.youtube.AuthUser(), s.a.youtube.Channel()
 	s.a.youtube.SetAccount(authUser, pageID)
 	if authUser != wasUser {
 		if err := s.a.youtubeStore.Save(youtubeSession{s.a.youtube.Cookies(), authUser}); err != nil {
 			s.a.youtube.SetAccount(wasUser, wasPage)
-			set.YouTubeChannel = wasPage
-			s.a.settings.Set(set)
 			return AccountsStatus{}, err
 		}
 	}
+	// As an edit of settings.json would: the settings keep the channel the
+	// client uses already, and the profile of the former one goes.
+	if _, err := (&Preferences{s.a}).Update(func(set *settings.Settings) { set.YouTubeChannel = pageID }); err != nil {
+		s.a.youtube.SetAccount(wasUser, wasPage)
+		if authUser != wasUser {
+			s.a.youtubeStore.Save(youtubeSession{s.a.youtube.Cookies(), wasUser})
+		}
+		return AccountsStatus{}, err
+	}
+	// The profile was the former account's, though the channel may be the
+	// same: each account's own.
 	s.a.mu.Lock()
 	s.a.youtubeMe, s.a.profileErrs.youtube = nil, ""
 	s.a.mu.Unlock()

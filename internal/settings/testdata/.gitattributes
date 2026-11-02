@@ -1,0 +1,3 @@
+# As Windows PowerShell 5.1 wrote them: CRLF, byte order marks, UTF-16
+# and the code page.
+powershell-*.json -text

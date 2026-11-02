@@ -46,6 +46,13 @@ time it starts.
   Management in its settings, by their Spotify email. Settings › Accounts
   says which it was: see
   [Spotify](spotify.md#when-spotify-refuses-the-sign-in).
+- **settings.json has a mistake.** MixMusic tells where, as "line 4,
+  column 1: a comma before } has nothing after it", and goes on with the
+  settings it had, without saving to the file, until you fix it. If it
+  quits first, it keeps your text as `settings.json.broken` beside it, and
+  saves its settings in its place. A file that doesn't read as MixMusic
+  starts is kept the same way, and MixMusic starts with the settings of a
+  new install.
 - **No tray icon on Linux.** The tray needs `libayatana-appindicator3` and a
   desktop that shows AppIndicator icons; GNOME needs its AppIndicator
   extension. Without it, closing the window quits MixMusic.
@@ -75,3 +82,10 @@ time it starts.
   yet, so the first launch asks you to allow it.
 - The portable zip does not register `mixmusic://` links, and Windows on Arm
   is less tested than the rest.
+- The Flatpak is for x64 only, and new: it sees none of your home folder,
+  so a yt-dlp of your own must be in `~/.var/app/io.github.fzn0x.mixmusic`,
+  and a Discord app that isn't a Flatpak shows what plays only if it was
+  running when MixMusic started. Its settings and library are apart from
+  another copy's: the
+  [README](https://github.com/fzn0x/mixmusic#the-flatpak) tells how to
+  bring them over.

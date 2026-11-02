@@ -28,7 +28,10 @@
   the video's radio starts from: YouTube Music makes the radio of a video
   out of videos.
 - **`lyrics`** finds synced lyrics on Unison and LRCLIB, reads TTML and LRC,
-  and translates and romanizes lyrics on Unison.
+  and translates and romanizes lyrics on Unison. Lines of TTML synced word
+  by word keep their words' times (`Line.Words`): each span with a begin
+  time is a word, or a syllable, and a line with sung text outside of them
+  has no words.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
   scrobbles by Last.fm's rules, keeping what fails offline for later.
 - **`internal/discord`** shows what plays on the user's Discord profile, over

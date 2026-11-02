@@ -51,6 +51,7 @@ func TestKindOf(t *testing.T) {
 		{"deb", "linux", "/opt/mixmusic", false, []string{"/var/lib/dpkg/info/mixmusic.list"}, "deb"},
 		{"rpm", "linux", "/opt/mixmusic", false, nil, "rpm"},
 		{"AppImage", "linux", "/tmp/.mount_MixMusXYZ/usr/bin", true, nil, "appimage"},
+		{"Flatpak", "linux", "/app/lib/mixmusic", false, []string{"/.flatpak-info"}, "flatpak"},
 		{"install.sh", "linux", "/home/me/.local/share/mixmusic", false, nil, "archive"},
 	} {
 		exists := func(p string) bool {
@@ -76,6 +77,7 @@ func TestReleaseFile(t *testing.T) {
 		"deb":         "mixmusic-0.3.0-linux-amd64.deb",
 		"rpm":         "mixmusic-0.3.0-linux-amd64.rpm",
 		"appimage":    "mixmusic-0.3.0-linux-amd64.AppImage",
+		"flatpak":     "mixmusic-0.3.0-linux-amd64.flatpak",
 		"development": "",
 	} {
 		if got := releaseFile(kind, "0.3.0", "amd64"); got != want {
@@ -93,6 +95,7 @@ func TestLatestRelease(t *testing.T) {
 		"assets": [
 			{"name": "mixmusic-0.3.0-linux-amd64.deb", "browser_download_url": "https://example.com/amd64.deb"},
 			{"name": "mixmusic-0.3.0-linux-arm64.deb", "browser_download_url": "https://example.com/arm64.deb"},
+			{"name": "mixmusic-0.3.0-linux-amd64.flatpak", "browser_download_url": "https://example.com/amd64.flatpak"},
 			{"name": "SHA256SUMS", "browser_download_url": "https://example.com/SHA256SUMS"}
 		]
 	}`
@@ -130,6 +133,22 @@ func TestLatestRelease(t *testing.T) {
 	}
 	if r.Newer || r.Download != "" || r.File != "" {
 		t.Errorf("latestRelease of an rpm, up to date = %+v", r)
+	}
+
+	// A Flatpak is offered the next bundle, which only x64 has yet.
+	r, err = latestRelease(context.Background(), srv.Client(), srv.URL, "flatpak", "amd64", "0.2.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r.Download != "https://example.com/amd64.flatpak" || r.File != "mixmusic-0.3.0-linux-amd64.flatpak" {
+		t.Errorf("latestRelease of a Flatpak = %+v", r)
+	}
+	r, err = latestRelease(context.Background(), srv.Client(), srv.URL, "flatpak", "arm64", "0.2.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !r.Newer || r.Download != "" || r.File != "" {
+		t.Errorf("latestRelease of an Arm64 Flatpak, which has no bundle = %+v", r)
 	}
 }
 

@@ -11,6 +11,13 @@ node_modules/
 /site/public/
 # The docs' pages, which go run ./tools/sitedocs makes from docs/*.md.
 /site/content/docs/*/
+# The Flatpak's inputs, and what flatpak-builder and its action leave.
+/packaging/flatpak/dist/
+/packaging/flatpak/flatpak-github-action-modified-*
+.flatpak-builder/
+/flatpak_app/
+/repo/
+*.flatpak
 mygo_windows_*.syso
 *.exe
 !resources/**/*.exe

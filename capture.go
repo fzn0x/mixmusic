@@ -24,10 +24,11 @@ import (
 // separated by |: a path shows its page and saves it, act:shot:<name> saves
 // the window as it is, act:mute mutes the player, act:play:<search> plays
 // the songs a search finds, act:resume plays the queue, act:wait:<duration>
-// waits, act:palette opens the command palette, act:panel:<queue|lyrics|none>
-// shows a side panel, act:scroll:<y|end> scrolls the page, act:theme:<id>
-// wears a theme, act:mini opens the mini player, which saves itself,
-// act:spotify logs whether MixMusic's own Spotify device could play,
+// waits, act:palette opens the command palette, act:refresh refreshes the
+// page, act:panel:<queue|lyrics|none> shows a side panel,
+// act:scroll:<y|end> scrolls the page, act:theme:<id> wears a theme,
+// act:mini opens the mini player, which saves itself, act:spotify logs
+// whether MixMusic's own Spotify device could play,
 // act:title logs the window's title, which screenshots leave out,
 // act:memory logs the Go heap, and act:heap saves a profile of it. Nothing
 // plays unless the player is muted, or plays into no device
@@ -136,6 +137,8 @@ func (s *shell) captureFromEnv() {
 				}
 			case "palette":
 				s.win.Update(func() { s.paletteOpen = true })
+			case "refresh":
+				s.win.Update(s.refreshPage)
 			case "panel":
 				s.win.Update(func() { s.panel = strings.TrimSuffix(arg, "none") })
 			case "scroll":

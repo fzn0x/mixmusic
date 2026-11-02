@@ -85,6 +85,8 @@ export interface Playlist {
   tracks: Track[];
   editable?: boolean;
   url?: string;
+  saved?: boolean;
+  deletable?: boolean;
 }
 
 export interface SearchResults {

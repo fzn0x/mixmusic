@@ -132,6 +132,9 @@ type State struct {
 	// its own speed. What MixMusic's own engine plays takes the settings'
 	// speed of its kind; Spotify plays its own tracks at their own.
 	Speed float64
+	// Remote is set while the streams play on a device away from the
+	// computer, as a cast device (SetOutput): Volume and Muted are its own.
+	Remote bool
 }
 
 // Current returns the current entry.
@@ -422,6 +425,9 @@ type Player struct {
 	version    uint64
 	snapOrder  []Item
 	snapPlayed map[string]bool
+	// snapHome is the computer's volume as it was then, which the settings
+	// keep while the streams play on a remote output.
+	snapHome float64
 
 	// writing orders the writes of the queue: written is the version of
 	// the state the last of them kept.
@@ -501,6 +507,10 @@ type Player struct {
 	// entry's 5.1 audio failed, which then plays in stereo.
 	surround   bool
 	stereoOnly bool
+	// out is where the streams play, and home the computer's volume while
+	// they play on a remote output.
+	out  Output
+	home homeVolume
 }
 
 // New returns a player of the queue saved, which plays through stream and
@@ -696,6 +706,7 @@ func (p *Player) publish() {
 	p.mu.Lock()
 	p.snap = p.s
 	p.snapOrder, p.snapPlayed = p.unshuffled, p.played
+	p.snapHome = p.home.volume
 	p.version++
 	subs, noticed := p.subs, p.noticed
 	p.mu.Unlock()

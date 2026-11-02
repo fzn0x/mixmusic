@@ -60,6 +60,10 @@ type Playback struct {
 	// MixMusic's own player plays takes it; Spotify plays its own tracks
 	// at their own speed.
 	SongSpeed float64 `json:"songSpeed"`
+	// PodcastSpeed plays podcasts' episodes faster or slower, as SongSpeed
+	// plays songs, from MinSpeed to MaxSpeed by SpeedStep: 1 is their own
+	// speed. Spotify plays its own episodes at their own speed.
+	PodcastSpeed float64 `json:"podcastSpeed"`
 	// SkipDisliked passes over the tracks the user disliked as the queue
 	// moves on, and leaves them out of radios.
 	SkipDisliked bool `json:"skipDisliked"`
@@ -84,6 +88,7 @@ func defaultPlayback() Playback {
 	p.Loudness = true
 	p.Autoplay = true
 	p.SongSpeed = 1
+	p.PodcastSpeed = 1
 	p.SkipDisliked = true
 	p.Equalizer = defaultEqualizer()
 	p.Volume = 0.8
@@ -113,6 +118,7 @@ func (p Playback) clean(d Playback) Playback {
 	}
 	p.Crossfade = min(max(p.Crossfade, 0), 12)
 	p.SongSpeed = CleanSpeed(p.SongSpeed)
+	p.PodcastSpeed = CleanSpeed(p.PodcastSpeed)
 	p.Volume = min(max(p.Volume, 0), 1)
 	p.Equalizer = p.Equalizer.clean()
 	return p

@@ -45,6 +45,12 @@ the user left them.
   isn't fetched ahead, and the queue that ends on an episode stops rather
   than start a radio. Episodes don't scrobble, and the stats leave them
   out: the history keeps them.
+- **Speed.** Episodes play at a speed of their own, `podcastSpeed`, and
+  songs at `songSpeed`: the player's `speedOf` picks by the track that
+  becomes current. The speed button by the player, the mini player's
+  menu, the command palette and the rate the media controls set change
+  the speed of the kind that plays (`speed.go`). Spotify's players, and
+  live streams, keep their own speed: the button is dimmed for them.
 - **Follows.** `library.json` keeps the shows the user follows, without
   their episodes, signed in or not; following one saves it on its service
   too, where the user signed in.

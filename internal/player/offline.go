@@ -235,8 +235,8 @@ func (p *Player) kept() (Offline, bool) {
 
 // playsOfflineFrom returns the first entry, from the one at i on, or from
 // the one after it when after, that plays without the network, in the
-// order the queue plays: around to its start when it repeats. It tells
-// false when none does.
+// order the queue plays: around to its start when it repeats, and past
+// those it passes over. It tells false when none does.
 func (p *Player) playsOfflineFrom(i int, after bool) (int, bool) {
 	k, ok := p.kept()
 	q := p.s.Queue
@@ -258,7 +258,7 @@ func (p *Player) playsOfflineFrom(i int, after bool) (int, bool) {
 		if after && j == i {
 			return -1, false // around the whole queue
 		}
-		if k.PlaysOffline(q[j].Track) {
+		if q[j].Skip == "" && k.PlaysOffline(q[j].Track) {
 			return j, true
 		}
 	}

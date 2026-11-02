@@ -523,3 +523,23 @@ func TestOfflineNothingKept(t *testing.T) {
 		t.Errorf("loads %q", got)
 	}
 }
+
+// TestOfflinePassesOverDisliked skips, while the network is gone, past a
+// download the queue passes over, as one the user dislikes, to the next
+// that plays, as the queue goes on and as a track can't play.
+func TestOfflinePassesOverDisliked(t *testing.T) {
+	net := newNet(false)
+	kept := map[string]bool{"yt:b": true, "yt:c": true}
+	h := newHarnessWith(t, Saved{}, func(f *fakeServices) Services { return keptServices{netServices{f, net}, kept} },
+		disliking("b"))
+	h.p.PlayTracks(tracks("a", "b", "c", "d"), 0)
+	h.wait("c playing", playing("c"))
+	// Repeating, the queue goes around from d, which can't play, past a
+	// and the disliked b, to c again.
+	h.p.CycleRepeat() // all
+	h.p.Ended()
+	h.wait("c again", func(p *Player) bool { return playing("c")(p) && h.stream.count("load url:yt:c 0s true") == 2 })
+	if got := h.loads(); slices.Contains(got, "b") {
+		t.Errorf("the engine loaded %v", got)
+	}
+}

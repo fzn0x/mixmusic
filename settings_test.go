@@ -245,6 +245,26 @@ func TestSkipAISwitch(t *testing.T) {
 	}
 }
 
+// TestSkipAISwitchFound finds Skip songs made with AI by typing in the box
+// of the settings, beside Skip songs you dislike.
+func TestSkipAISwitchFound(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 6000)
+	const ai, disliked = "Skip songs made with AI", "Skip songs you dislike"
+	for _, c := range []struct {
+		q         string
+		want, not []string
+	}{
+		{"made with ai", []string{ai}, []string{disliked, "Autoplay"}},
+		{"labels only some", []string{ai}, []string{disliked, "Autoplay"}},
+		{"skip songs", []string{ai, disliked}, []string{"Autoplay"}},
+	} {
+		show(s, tt, settingsPath("", c.q))
+		showsOnly(t, tt, "searching "+c.q, c.want, c.not)
+		show(s, tt, "/")
+	}
+}
+
 // TestCoversKept tells how many covers are kept on disk, and clears them.
 func TestCoversKept(t *testing.T) {
 	var cover bytes.Buffer

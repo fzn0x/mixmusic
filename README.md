@@ -374,6 +374,7 @@ The packages you can import:
 ```
 opus/                an Opus decoder in pure Go, a port of libopus's
 aac/                 an AAC-LC decoder in pure Go
+ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/52
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs

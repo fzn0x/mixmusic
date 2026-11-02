@@ -166,6 +166,9 @@ type App struct {
 	youtubeMe  *youtube.Account
 	spotifyMe  *spotify.Profile
 	nowPlaying NowPlaying
+	// started is the ID of the track whose start the reports told last
+	// (startOf).
+	started    string
 	main, mini *mygo.Window
 	// retitling is set while the main window's title waits to change.
 	retitling bool

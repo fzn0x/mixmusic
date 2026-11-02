@@ -39,5 +39,5 @@ func (a *App) attachTaskbar(win *mygo.Window) {
 	a.taskbar = bar
 	np := a.nowPlaying
 	a.mu.Unlock()
-	bar.Show(np.Playing, np.Track != nil)
+	bar.Show(np.plays(), np.Track != nil)
 }

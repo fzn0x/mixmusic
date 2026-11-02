@@ -19,7 +19,7 @@ const presenceSkew = 3 * time.Second
 // presence shows what plays on the user's Discord profile.
 type presence struct {
 	mu      sync.Mutex
-	client  *discord.Client
+	client  presenceClient
 	appID   string
 	trackID string
 	playing bool
@@ -29,8 +29,21 @@ type presence struct {
 	busy    bool
 }
 
+// presenceClient is what presence tells Discord through: a
+// discord.Client.
+type presenceClient interface {
+	SetActivity(ctx context.Context, a discord.Activity) error
+	Clear(ctx context.Context) error
+	Close() error
+}
+
+// newPresenceClient connects to Discord as the app appID.
+var newPresenceClient = func(appID string) presenceClient { return discord.New(appID) }
+
 // update tells Discord what plays now, when it changed: another track,
-// play or pause, or a seek. A paused or stopped player clears the presence.
+// play or pause, or a seek. A paused or stopped player clears the presence;
+// a track that loads plays (NowPlaying.plays), so that the presence goes
+// from one track to the next without clearing between them.
 func (p *presence) update(on bool, appID string, np NowPlaying) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
@@ -45,9 +58,9 @@ func (p *presence) update(on bool, appID string, np NowPlaying) {
 		if p.client != nil {
 			p.client.Close()
 		}
-		p.client, p.appID, p.trackID, p.playing = discord.New(appID), appID, "", false
+		p.client, p.appID, p.trackID, p.playing = newPresenceClient(appID), appID, "", false
 	}
-	playing := np.Track != nil && np.Playing
+	playing := np.plays()
 	// Discord's times are the clock's: at 2×, a track 1 minute in started
 	// half a minute ago, and ends in half the time left.
 	speed := np.speed()

@@ -194,9 +194,19 @@ func (d *deck) takeSeek() (time.Duration, *ring, bool) {
 // position returns the frame of the track the deck reads from its ring.
 func (d *deck) position() int64 { return d.ring.Load().position() }
 
-// read moves up to len(out)/2 frames of r, at the deck's speed, into out,
+// read moves up to len(out)/2 frames of r, at the deck's rate, into out,
 // and returns how many: on the audio thread.
-func (d *deck) read(r *ring, out []float32) int { return d.stretch.read(r, out, d.speed) }
+func (d *deck) read(r *ring, out []float32) int { return d.stretch.read(r, out, d.rate()) }
+
+// rate is the speed the deck plays at: its speed, but a live stream's own,
+// as it comes only as fast as it is broadcast. Engine.mu guards it, as it
+// does speed.
+func (d *deck) rate() float64 {
+	if d.live.Load() {
+		return 1
+	}
+	return d.speed
+}
 
 // heard returns the frame of the track the deck plays next, which the
 // stretch may hold back from what it read: on the audio thread.

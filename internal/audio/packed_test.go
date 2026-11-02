@@ -291,6 +291,37 @@ func TestEngineDoesNotSeekLive(t *testing.T) {
 	rec.waitFor(t, "ended")
 }
 
+// TestEngineLiveAtItsOwnSpeed plays a live stream at its own speed,
+// whatever speed it is asked to play at, from the start and after: it
+// comes as fast as it is broadcast, with nothing ahead to play faster.
+func TestEngineLiveAtItsOwnSpeed(t *testing.T) {
+	want := packedReference(t, adtsClicks)
+	path := filepath.Join(t.TempDir(), "live.aac")
+	if err := os.WriteFile(path, slices.Concat(packedSegments(t, 8, adtsClicks)...), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	e, dev, rec := newTestEngine(t)
+	e.Load(path, 0, true, 2)
+	buffered(t, e, 0, 4800)
+	got := dev.play(t, 4800)
+	// The stream moved on as many frames as were rendered, the device's and
+	// the rest of the last quantum: at 2×, twice as many.
+	e.mu.Lock()
+	rendered := 4800 + len(e.pending)/2
+	e.mu.Unlock()
+	if p := e.Position(); p != duration(int64(rendered)) {
+		t.Errorf("position %v after %d frames rendered", p, rendered)
+	}
+	e.SetSpeed(0.5)
+	got = append(got, dev.play(t, len(want)/2-4800)...)
+	for i := 2 * fadeFrames; i < len(want); i++ {
+		if got[i] != want[i] {
+			t.Fatalf("frame %d: %v, want %v", i/2, got[i], want[i])
+		}
+	}
+	rec.waitFor(t, "ended")
+}
+
 // TestDeckPlaysALiveStream plays a live stream as the app does: from the
 // stream package's live route, of the HLS playlist yt-dlp found, whose
 // segments' packed audio the deck decodes as they come, to the end of the

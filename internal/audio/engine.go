@@ -309,7 +309,7 @@ func (e *Engine) Seek(t time.Duration) {
 
 // SetSpeed plays the active deck's track at speed, from MinSpeed to
 // MaxSpeed, at its own pitch: 1 is its own speed. A track fading out keeps
-// its speed.
+// its speed, and a live stream plays at its own.
 func (e *Engine) SetSpeed(speed float64) {
 	e.mu.Lock()
 	if d := e.decks[e.active]; d != nil {
@@ -392,8 +392,8 @@ func (e *Engine) position() time.Duration {
 	}
 	pos := duration(d.heard())
 	if e.out != nil && !e.paused {
-		// What waits to be heard plays the track at the deck's speed.
-		pos -= time.Duration(float64(e.out.Delay()) * d.speed)
+		// What waits to be heard plays the track at the deck's rate.
+		pos -= time.Duration(float64(e.out.Delay()) * d.rate())
 	}
 	return max(0, pos)
 }

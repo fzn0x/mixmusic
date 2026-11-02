@@ -16,13 +16,16 @@ import (
 const romajiTip = "Shows the lyrics in romaji too, made on this computer: nothing is sent. The first time, it downloads the dictionary of the readings of kanji, 11.7 MB, from GitHub."
 
 // romajiView is what the lyrics views know of romaji: whether the lyrics
-// of the lines of, n of them, are Japanese, which ja tells; and whether
-// they wait for the dictionary of the readings of kanji to download.
+// of the lines of, n of them, are Japanese, which ja tells; whether they
+// wait for the dictionary of the readings of kanji to download; and the
+// key of the romaji made without it they last asked again for, once it
+// was there.
 type romajiView struct {
 	of      *lyrics.Line
 	n       int
 	ja      bool
 	waiting bool
+	again   string
 }
 
 // japanese tells whether lyrics are in Japanese, whose romaji MixMusic
@@ -61,6 +64,12 @@ func (s *shell) lyricsRomaji(c *ui.Context, t media.Track, ly lyrics.Lyrics, whe
 	case r.err != nil || len(r.value.Romaji) != len(ly.Lines):
 		// The romaji of other lyrics of the track.
 		return nil
+	}
+	// Romaji made before the dictionary came, for another track since, is
+	// made again, once.
+	if v := &s.lyricsView.romaji; r.value.Readings != romaji.Read && v.again != key && s.svc.Catalog.RomajiReady() {
+		v.again = key
+		s.refetch(key)
 	}
 	switch r.value.Readings {
 	case romaji.Downloading:

@@ -32,6 +32,11 @@ func (c *Catalog) LyricsRomaji(_ context.Context, l lyrics.Lyrics) (romaji.Lines
 	return c.a.romaji.Romanize(lines), nil
 }
 
+// RomajiReady tells whether the dictionary of the readings of kanji is
+// there, since it loaded or downloaded: romaji made without it can be made
+// again.
+func (c *Catalog) RomajiReady() bool { return c.a.romaji.Ready() }
+
 // WaitRomaji waits for the download of the dictionary of the readings of
 // kanji, when one is under way, to end, or ctx to.
 func (c *Catalog) WaitRomaji(ctx context.Context) error { return c.a.romaji.Wait(ctx) }

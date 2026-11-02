@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -152,9 +153,10 @@ func TestLyricsRomajiDownloading(t *testing.T) {
 	until(t, s, tt, "the second download", func() bool { return g.requests.Load() == 2 })
 }
 
-// TestLyricsRomajiReadsKanji reads the kanji of Japanese lyrics once the
-// dictionary of their readings downloaded.
-func TestLyricsRomajiReadsKanji(t *testing.T) {
+// moduleDictionary is the IPA dictionary of kagome's module, in the Go
+// module cache, which the tests serve in place of GitHub.
+func moduleDictionary(t *testing.T) []byte {
+	t.Helper()
 	out, err := exec.Command("go", "env", "GOMODCACHE").Output()
 	if err != nil {
 		t.Skipf("no Go module cache: %v", err)
@@ -163,23 +165,62 @@ func TestLyricsRomajiReadsKanji(t *testing.T) {
 	if err != nil {
 		t.Skip("the IPA dictionary isn't in the module cache: go mod download github.com/ikawaha/kagome-dict/ipa@v1.2.6 puts it there")
 	}
-	g := &gate{open: make(chan struct{}), answer: func(w http.ResponseWriter, r *http.Request) { w.Write(data) }}
-	g.let()
-	s, tt := romajiFrom(t, g)
-	// The dictionary loads in a fraction of a second, and in some seconds
-	// with the race detector.
-	for deadline := time.Now().Add(time.Minute); !tt.HasText("kami no tako"); time.Sleep(10 * time.Millisecond) {
+	return data
+}
+
+// untilRomaji waits for the window to show romaji, as the dictionary loads
+// in a fraction of a second, and in some seconds with the race detector.
+func untilRomaji(t *testing.T, s *shell, tt *ui.Tester, romaji string) {
+	t.Helper()
+	for deadline := time.Now().Add(time.Minute); !tt.HasText(romaji); time.Sleep(10 * time.Millisecond) {
 		if time.Now().After(deadline) {
-			t.Fatalf("no romaji: %q", tt.Texts())
+			t.Fatalf("no %q: %q", romaji, tt.Texts())
 		}
 		s.drain()
 		tt.Frame()
 	}
+}
+
+// TestLyricsRomajiReadsKanji reads the kanji of Japanese lyrics once the
+// dictionary of their readings downloaded.
+func TestLyricsRomajiReadsKanji(t *testing.T) {
+	data := moduleDictionary(t)
+	g := &gate{open: make(chan struct{}), answer: func(w http.ResponseWriter, r *http.Request) { w.Write(data) }}
+	g.let()
+	s, tt := romajiFrom(t, g)
+	untilRomaji(t, s, tt, "kami no tako")
 	got := tt.Texts()
 	if i := slices.Index(got, "空へ"); i < 0 || got[i+1] != "sora e" || slices.ContainsFunc(got, func(s string) bool { return strings.HasPrefix(s, "The readings of kanji") }) {
 		t.Errorf("with the dictionary: %q", got)
 	}
 	if l, ok := s.loads[romajiKey(testTracks[0])].(*loaded[romaji.Lines]); !ok || l.value.Readings != romaji.Read {
 		t.Errorf("romaji %+v", l)
+	}
+}
+
+// TestLyricsRomajiOnceReady makes again the romaji of lyrics made while
+// the dictionary couldn't be downloaded, once it downloaded for others.
+func TestLyricsRomajiOnceReady(t *testing.T) {
+	data := moduleDictionary(t)
+	g := &gate{open: make(chan struct{}), answer: func(w http.ResponseWriter, r *http.Request) { w.Write(data) }}
+	g.let()
+	s, tt := romajiFrom(t, g)
+	s.loads[romajiKey(testTracks[0])] = &loaded[romaji.Lines]{done: true, value: romaji.Lines{Romaji: []string{"紙 no 凧", "空 he"}, Readings: romaji.Unavailable}}
+	s.drain()
+	tt.Frame()
+	if !tt.HasText("The readings of kanji couldn't be downloaded: kanji show as they are.") {
+		t.Fatalf("no failure: %q", tt.Texts())
+	}
+	// The lyrics of another track download the dictionary.
+	other := lyrics.Lyrics{Language: "ja", Lines: []lyrics.Line{{Text: "今日"}}}
+	if got, _ := s.svc.Catalog.LyricsRomaji(context.Background(), other); got.Readings != romaji.Downloading {
+		t.Fatalf("another track's lyrics: %+v", got)
+	}
+	if err := s.svc.Catalog.WaitRomaji(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	untilRomaji(t, s, tt, "kami no tako")
+	if tt.HasText("The readings of kanji couldn't be downloaded: kanji show as they are.") {
+		t.Errorf("the failure stays: %q", tt.Texts())
 	}
 }

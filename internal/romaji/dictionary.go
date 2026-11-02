@@ -20,6 +20,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/ikawaha/kagome-dict/dict"
@@ -97,6 +98,8 @@ type Dictionary struct {
 	r       *Romanizer
 	used    time.Time
 	release *time.Timer
+	// ready is set once the dictionary loaded, or downloaded.
+	ready atomic.Bool
 
 	mu sync.Mutex
 	// done is closed when the download under way ends, nil while none is.
@@ -159,6 +162,10 @@ func (d *Dictionary) Loaded() bool {
 	return d.r != nil
 }
 
+// Ready tells whether the dictionary is there to read kanji with, since it
+// loaded or downloaded: lines romanized without it can be again.
+func (d *Dictionary) Ready() bool { return d.ready.Load() }
+
 // romanizer returns the dictionary, loading it from its file, or, when
 // that isn't there, nil, and starts its download. It runs with work held.
 func (d *Dictionary) romanizer() (*Romanizer, Readings) {
@@ -168,6 +175,7 @@ func (d *Dictionary) romanizer() (*Romanizer, Readings) {
 	r, err := d.load()
 	if err == nil {
 		d.r = r
+		d.ready.Store(true)
 		return r, Read
 	}
 	if !errors.Is(err, fs.ErrNotExist) {
@@ -238,6 +246,7 @@ func (d *Dictionary) download() Readings {
 			return
 		}
 		d.hold, d.until = 0, time.Time{}
+		d.ready.Store(true)
 	}()
 	return Downloading
 }

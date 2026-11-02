@@ -89,13 +89,16 @@ func TestDictionaryDownloads(t *testing.T) {
 	d := testDictionary(t, ts, data)
 
 	got := d.Romanize(weather)
-	if got.Readings != Downloading || !slices.Equal(got.Romaji, []string{"今日 haii 天気", "", ""}) {
+	if got.Readings != Downloading || !slices.Equal(got.Romaji, []string{"今日 haii 天気", "", ""}) || d.Ready() {
 		t.Fatalf("while downloading: %+v", got)
 	}
 	waitDownload(t, d)
 	kept, err := os.ReadFile(d.path)
 	if err != nil || !bytes.Equal(kept, data) {
 		t.Fatalf("kept %d bytes (%v)", len(kept), err)
+	}
+	if !d.Ready() {
+		t.Error("downloaded, not ready")
 	}
 	if names := files(t, d); !slices.Equal(names, []string{dictionaryFile}) {
 		t.Errorf("files %q", names)
@@ -125,8 +128,8 @@ func TestDictionaryNotUsed(t *testing.T) {
 				t.Fatalf("readings %v", got.Readings)
 			}
 			waitDownload(t, d)
-			if names := files(t, d); len(names) != 0 {
-				t.Fatalf("kept %q", names)
+			if names := files(t, d); len(names) != 0 || d.Ready() {
+				t.Fatalf("kept %q, ready %v", names, d.Ready())
 			}
 			// Held off: not downloaded again at once.
 			if got := d.Romanize(weather); got.Readings != Unavailable || got.Romaji[0] != "今日 haii 天気" {

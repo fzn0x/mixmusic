@@ -56,6 +56,9 @@ type Source struct {
 	// Track is the track that plays: for a Spotify track played from
 	// YouTube Music, its recording there.
 	Track media.Track
+	// Live is set for the stream of a live video, as it goes on: it has no
+	// length, and can't seek.
+	Live bool
 }
 
 // audio returns the URL of the audio of a stream to play: its 5.1
@@ -104,6 +107,10 @@ type State struct {
 	// change meanwhile.
 	Waiting  bool
 	WillPlay bool
+	// Live is set while the current track is a live stream, once its
+	// stream was found: it plays without a length, can't seek, and never
+	// ends of itself, but when its broadcast does.
+	Live bool
 }
 
 // Current returns the current entry.
@@ -160,6 +167,9 @@ type Now struct {
 	Loading  bool
 	Position time.Duration
 	Duration time.Duration
+	// Live is set for a live stream, which has no length: Position is how
+	// long it played.
+	Live bool
 	// Volume is 0 when muted.
 	Volume  float64
 	Shuffle bool

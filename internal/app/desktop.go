@@ -25,8 +25,8 @@ var mediaKeys = map[string]Command{
 }
 
 // Start opens the main window and puts MixMusic on the desktop: the tray
-// icon, the media keys, the deep links of portable copies. It runs once the
-// app is ready.
+// icon, the media keys and the user's global shortcuts, the deep links of
+// portable copies. It runs once the app is ready.
 func (a *App) Start() {
 	// Quitting closes every window; the main window must close then, not
 	// hide in the tray, or the quit stops there.
@@ -48,8 +48,23 @@ func (a *App) Start() {
 	if a.openMain(mygo.App.WasOpenedAtLogin()) == nil {
 		return
 	}
+	// Edits of settings.json apply while MixMusic runs. The watch starts
+	// beside the main thread, as WatchFiles waits for it to enroll.
+	ctx, stop := context.WithCancel(context.Background())
+	a.mu.Lock()
+	a.stopWatch = stop
+	a.mu.Unlock()
+	go a.watchSettings(ctx)
+	a.tellStart()
 	a.setupTray()
+	if a.settings.Get().CloseToTray {
+		runInBackground()
+	}
 	a.applyMediaKeys(a.settings.Get().MediaKeys)
+	// Keys that were in use at the last start may be free now.
+	if a.applyGlobalShortcuts(false) {
+		notify()
+	}
 	a.watchUpdates()
 	a.watchNetwork()
 	go a.keepYTDLPCurrent()

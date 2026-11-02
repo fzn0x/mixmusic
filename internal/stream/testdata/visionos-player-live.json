@@ -1,0 +1,56 @@
+{
+  "playabilityStatus": {
+    "status": "OK"
+  },
+  "playerConfig": {
+    "audioConfig": {
+      "enablePerFormatLoudness": true,
+      "loudnessNormalizationConfig": {
+        "applyStatefulNormalization": false,
+        "maxStatefulTimeThresholdSec": 300,
+        "minimumLoudnessTargetLkfs": -31,
+        "preserveStatefulLoudnessTarget": true
+      },
+      "loudnessTargetLkfs": -14
+    }
+  },
+  "responseContext": {
+    "visitorData": "CgtUZXN0VmlzaXRvcijAgICABjIKCgJVUxIEGgAgAA%3D%3D"
+  },
+  "streamingData": {
+    "adaptiveFormats": [
+      {
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "bitrate": 64000,
+        "itag": 139,
+        "maxDvrDurationSec": 43200,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "targetDurationSec": 5,
+        "url": "{{media}}/videoplayback?c=VISIONOS&itag=139&live=1&expire={{expire}}"
+      },
+      {
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "bitrate": 144000,
+        "itag": 140,
+        "maxDvrDurationSec": 43200,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "targetDurationSec": 5,
+        "url": "{{media}}/videoplayback?c=VISIONOS&itag=140&live=1&expire={{expire}}"
+      }
+    ],
+    "expiresInSeconds": "21540",
+    "hlsManifestUrl": "{{media}}/hls/hls_variant/expire/{{expire}}/master.m3u8"
+  },
+  "videoDetails": {
+    "author": "A radio",
+    "isLive": true,
+    "isLiveContent": true,
+    "lengthSeconds": "0",
+    "title": "a radio of beats to test to",
+    "videoId": "liveRadio01"
+  }
+}

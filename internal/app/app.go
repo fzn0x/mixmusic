@@ -4,6 +4,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"log"
@@ -61,6 +62,13 @@ type Options struct {
 	// mini player: windows that MyGo draws, of the root package.
 	Interface func(a *App, hidden bool) *mygo.Window
 	Mini      func(a *App) *mygo.Window
+	// Hotkeys registers the user's global shortcuts: mygo.GlobalShortcut
+	// when nil, once the app is ready.
+	Hotkeys Hotkeys
+	// ProblemWait is how long a settings.json with a mistake waits to be
+	// told of, a second when zero: tests shorten it, at once when
+	// negative.
+	ProblemWait time.Duration
 }
 
 // App is MixMusic.
@@ -86,6 +94,7 @@ type App struct {
 	loudness     *loudnessBook
 	matcher      *match.Matcher
 	lyrics       *lyrics.Client
+	unison       *lyrics.Unison
 	addons       *addons.Manager
 	storage      *addons.Storage
 	lyricsMemo   *memo[lyrics.Lyrics]
@@ -119,6 +128,9 @@ type App struct {
 	// readingProfiles is set while the accounts' profiles are read in the
 	// background.
 	readingProfiles atomic.Bool
+	// youtubeChecking is set while a new YouTube session waits for YouTube
+	// Music to take it: the cookies YouTube changes meanwhile aren't kept.
+	youtubeChecking atomic.Bool
 	// updating is held while an update installs.
 	updating sync.Mutex
 	// quitting is set once MixMusic starts to quit: its windows close then,
@@ -127,6 +139,8 @@ type App struct {
 	// trayHide hides the main window in the tray, out of full screen first
 	// on macOS (#84).
 	trayHide trayHide
+	// global holds the user's global shortcuts as registered (#80).
+	global globalShortcuts
 
 	mu         sync.Mutex
 	installed  string // the version installed to run at the next start
@@ -152,15 +166,27 @@ type App struct {
 	profileErrs profileErrors
 	// flushers save what the windows hold back, as MixMusic quits.
 	flushers []*func()
+	// stopWatch stops the watch of settings.json, as MixMusic quits.
+	stopWatch context.CancelFunc
+
+	// fileMu guards file, what the windows are told of settings.json;
+	// watcher is its watch, while one runs.
+	fileMu  sync.Mutex
+	file    fileState
+	watcher atomic.Pointer[mygo.FileWatcher]
 }
 
 // New opens what the app keeps in opts.DataDir and opts.CacheDir.
 func New(opts Options) (*App, error) {
 	a := &App{opts: opts, lastCrash: opts.LastCrash}
 	a.here.a = a
+	a.global.repeats = runtime.GOOS == "linux"
 	var err error
-	if a.settings, err = store.Open(filepath.Join(opts.DataDir, "settings.json"), settings.Default()); err != nil {
+	if a.settings, err = store.OpenWith(filepath.Join(opts.DataDir, "settings.json"), settings.Default(), settings.Decode); err != nil {
 		return nil, fmt.Errorf("opening settings: %w", err)
+	}
+	if err := a.settings.Aside(); err != nil {
+		log.Printf("mixmusic: settings.json didn't read (%v): kept it as settings.json.broken, and started with the settings of a new install", err)
 	}
 	if a.library, err = library.Open(filepath.Join(opts.DataDir, "library.json")); err != nil {
 		return nil, fmt.Errorf("opening the library: %w", err)
@@ -215,7 +241,9 @@ func New(opts Options) (*App, error) {
 	a.openYouTube()
 	a.proxy.Cache = a.cache
 	a.matcher = match.New(a.youtube, matches)
-	a.lyrics = lyrics.New("MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)")
+	userAgent := "MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)"
+	a.lyrics = lyrics.New(userAgent)
+	a.unison = lyrics.NewUnison(userAgent)
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
 	a.related = newMemo[[]media.Shelf](100)
 	a.artStore = artwork.NewStore(filepath.Join(opts.CacheDir, "artwork"), artworkLimit)
@@ -239,6 +267,9 @@ func (a *App) apply(s settings.Settings) {
 	if mygo.App.IsReady() {
 		a.applyMediaKeys(s.MediaKeys)
 	}
+	// Whether they can register yet, hotkeys tells, which tests give
+	// their own. The settings' save tells the windows of the problems.
+	a.applyGlobalShortcuts(false)
 	if !s.DiscordPresence {
 		a.presence.update(false, "", NowPlaying{})
 	}

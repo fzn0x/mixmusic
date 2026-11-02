@@ -11,14 +11,15 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/fzn0x/mixmusic/aac"
 	"github.com/fzn0x/mixmusic/mp4"
 	"github.com/fzn0x/mixmusic/webm"
 )
 
-// Source is the file of a track, WebM or MP4, as a deck reads it: its bytes
-// as they arrive. A Read that waits for bytes returns an error once the
-// interrupted function its Opener got returns true; Wake makes such a Read
-// check it again.
+// Source is the file of a track, WebM or MP4, or the packed audio of a live
+// stream, as a deck reads it: its bytes as they arrive. A Read that waits
+// for bytes returns an error once the interrupted function its Opener got
+// returns true; Wake makes such a Read check it again.
 type Source interface {
 	io.ReadSeeker
 	Wake()
@@ -78,6 +79,8 @@ type deck struct {
 	gain ramp
 	// playing is whether the deck plays, or holds at its position.
 	playing atomic.Bool
+	// live is set once the deck opened a live stream, which can't seek.
+	live atomic.Bool
 	// lkfs is the loudness of the track, in LKFS, as the bits of a
 	// float64: NaN until the deck opened a Measured source, which it does
 	// before it decodes a frame.
@@ -144,8 +147,11 @@ func (d *deck) close() {
 }
 
 // seek moves the deck to t: a new ring starts there, which the deck's
-// goroutine fills.
+// goroutine fills. A live stream stays where it is.
 func (d *deck) seek(t time.Duration) {
+	if d.live.Load() {
+		return
+	}
 	t = max(0, t)
 	d.mu.Lock()
 	d.seekTo = t
@@ -254,6 +260,7 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 	}
 	delay := tm.delay
 	ch := tr.channels()
+	d.live.Store(tm.live)
 	d.mu.Lock()
 	if tm.total > delay {
 		d.duration = tm.total - delay
@@ -375,7 +382,7 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 // readError words a failure of the reader for the player.
 func readError(err error) error {
 	if errors.Is(err, webm.ErrFormat) || errors.Is(err, errors.ErrUnsupported) || errors.Is(err, webm.ErrNoAudio) ||
-		errors.Is(err, mp4.ErrFormat) || errors.Is(err, mp4.ErrNoAudio) {
+		errors.Is(err, mp4.ErrFormat) || errors.Is(err, mp4.ErrNoAudio) || errors.Is(err, aac.ErrFormat) {
 		return fmt.Errorf("%w (%v)", errUnsupported, err)
 	}
 	return errNetwork

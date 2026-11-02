@@ -5,6 +5,7 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -14,7 +15,6 @@ import (
 
 	"github.com/fzn0x/mixmusic/builtin"
 	"github.com/fzn0x/mixmusic/internal/app"
-	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
@@ -27,6 +27,9 @@ func TestMain(m *testing.M) {
 	isDark = func() bool { return true }
 	setAppearance = func(mygo.ThemeSource) {}
 	copyText = func(string) {}
+	// The tests never open settings.json on the desktop.
+	openSettings = func(*app.System) error { opened <- "open"; return nil }
+	showSettings = func(*app.System) error { opened <- "show"; return nil }
 	// The tests show what they give the pages: a request that reaches for
 	// the network goes to a closed port, and fails.
 	for _, v := range []string{"HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy"} {
@@ -40,8 +43,10 @@ func TestMain(m *testing.M) {
 // testPlayer is the app as a player's services, playing nothing.
 type testPlayer struct{}
 
+// Prepare finds the stream of a track: a live one of the IDs that start
+// with "yt:live".
 func (testPlayer) Prepare(_ context.Context, t media.Track) (player.Source, error) {
-	src := player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t}
+	src := player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t, Live: strings.HasPrefix(t.ID, "yt:live")}
 	if _, ok := surroundTracks.Load(t.ID); ok {
 		src.SurroundURL = src.URL + "/5.1"
 	}
@@ -148,7 +153,6 @@ func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 	s := newShell(a, p)
 	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true}
 	s.loads["tools"] = &loaded[tools.Status]{done: true}
-	s.loads["history"] = &loaded[[]library.Play]{done: true, value: []library.Play{{Track: testTracks[0]}}}
 	for _, tr := range testTracks {
 		s.loads["related-"+tr.ID] = &loaded[[]media.Shelf]{done: true}
 	}
@@ -194,7 +198,7 @@ func TestRender(t *testing.T) {
 	if dir == "" {
 		t.Skip("MIXMUSIC_RENDER names no folder")
 	}
-	s := newTestShell(t)
+	s := newTestShellOf(t, func(o *app.Options) { o.ProblemWait = -1 })
 	album := media.Album{ID: "al-1", Source: media.SourceYouTube, Title: "Hurry Up, We're Dreaming", Artists: []media.Ref{{ID: "ar-m83", Name: "M83"}},
 		Year: "2011", Tracks: testTracks}
 	var items []media.Item
@@ -207,7 +211,7 @@ func TestRender(t *testing.T) {
 	for i := range testTracks {
 		trackItems = append(trackItems, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
 	}
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
 		{Title: "Listen again", Source: media.SourceYouTube, Items: trackItems},
 		{Title: "Albums for you", Source: media.SourceYouTube, Items: items},
 	}}
@@ -217,6 +221,10 @@ func TestRender(t *testing.T) {
 		{TimeMs: 9000, Text: "Fearless on my breath"}, {TimeMs: 14000, Text: "Gentle impulsion"},
 		{TimeMs: 19000, Text: "Shakes me, makes me lighter"}, {TimeMs: 24000, Text: "Fearless on my breath"}}}}
 
+	// Home's jump back in tile offers what played last.
+	if err := s.svc.Collection.RecordPlay(testTracks[0]); err != nil {
+		t.Fatal(err)
+	}
 	tt := ui.NewTester(s.view, 1280, 820)
 	renderTo(t, s, tt, dir, "home-idle")
 
@@ -248,6 +256,11 @@ func TestRender(t *testing.T) {
 	renderTo(t, s, tt, dir, "stats")
 	s.navigate("/library/liked")
 	renderTo(t, s, tt, dir, "library-liked")
+	signedOut := s.loads["accounts"]
+	youtubeLibraryOf(s, ownPlaylist, savedPlaylist, plainPlaylist)
+	s.navigate("/library/youtube")
+	renderTo(t, s, tt, dir, "library-youtube")
+	s.loads["accounts"] = signedOut
 
 	s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
 		YouTube: media.SearchResults{Tracks: testTracks[:3], Albums: []media.Album{album}, Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube}}},
@@ -273,6 +286,18 @@ func TestRender(t *testing.T) {
 	tall := ui.NewTester(s.view, 1280, 1500)
 	s.navigate("/settings/appearance")
 	renderTo(t, s, tall, dir, "settings-appearance-tall")
+	s.navigate("/settings/desktop")
+	renderTo(t, s, tt, dir, "settings-desktop")
+	s.main = true // which tells of settings.json in a toast too
+	brokenSettings(t, s, "{\n  \"theme\": \"aurora\",\n}")
+	renderTo(t, s, tt, dir, "settings-desktop-file-problem")
+	// The settings searched: what three sections hold, and nothing.
+	s.navigate(settingsPath("playback", "spotify"))
+	renderTo(t, s, tall, dir, "settings-find")
+	s.navigate(settingsPath("", "aurora"))
+	renderTo(t, s, tt, dir, "settings-find-theme")
+	s.navigate(settingsPath("", "zzzz"))
+	renderTo(t, s, tt, dir, "settings-find-none")
 
 	renderTo(t, s, ui.NewTester(s.miniView, 420, 132), dir, "mini")
 	renderTo(t, s, ui.NewTester(s.miniView, 340, 180), dir, "mini-narrow")
@@ -290,7 +315,7 @@ func TestRenderThemes(t *testing.T) {
 	for i := range testTracks {
 		items = append(items, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
 	}
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
 	s.p.PlayTracks(testTracks, 1)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	for _, theme := range []struct {
@@ -350,6 +375,10 @@ func TestRenderDialogs(t *testing.T) {
 		s = shell("mix", size.scale)
 		s.ask("enable Hello", enableMessage, "enable", func() {})
 		renderTo(t, s, testerOf(t, s, size.w, size.h), dir, "dialog-question"+size.name)
+
+		s = shell("mix", size.scale)
+		s.deleteYouTubePlaylist(ownPlaylist)
+		renderTo(t, s, testerOf(t, s, size.w, size.h), dir, "dialog-delete-playlist"+size.name)
 
 		s = shell("mix", size.scale)
 		s.promptName("New mix", "Name", "late night drive", "create", func(string) {})

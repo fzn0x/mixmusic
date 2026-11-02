@@ -99,7 +99,10 @@ func (s *shell) toolSettings(c *ui.Context) {
 	s.group(c, "tools", func() {
 		st := s.toolStatus()
 		if !st.done {
-			s.loading(c)
+			// The search of the settings finds the tools once known.
+			if !s.find.on() {
+				s.loading(c)
+			}
 			return
 		}
 		y, js := st.value.YTDLP, st.value.JSRuntime
@@ -123,11 +126,8 @@ func (s *shell) toolSettings(c *ui.Context) {
 				s.installButton(c, "use-ours-settings", "use MixMusic's yt-dlp")
 			}
 		})
-		jsDesc := "yt-dlp needs Deno, Node.js, Bun or QuickJS to read most YouTube streams. Install one, and MixMusic finds it."
-		if js.Found {
-			jsDesc = js.Name + " " + js.Version + " · yt-dlp uses it to solve YouTube's challenges."
-		}
-		s.row(c, "JavaScript runtime", jsDesc, func() {
+		flatpak := s.svc.System.Info().Flatpak
+		s.row(c, "JavaScript runtime", jsRuntimeHelp(js, flatpak), func() {
 			ids := []string{"", "deno", "node", "bun", "quickjs"}
 			labels := []string{"Find one", "Deno", "Node.js", "Bun", "QuickJS"}
 			chosen := s.set.JSRuntime
@@ -141,33 +141,61 @@ func (s *shell) toolSettings(c *ui.Context) {
 					s.forget("tools")
 				}
 			}
-		})
-		s.row(c, "Own yt-dlp", "Use a yt-dlp of your own, such as your package manager's, instead.", func() {
+		}, "Deno Node.js Bun QuickJS")
+		s.row(c, "Own yt-dlp", ownYTDLPHelp(flatpak), func() {
 			in, _ := s.settingInput(c, "ytdlp-path", s.set.YTDLPPath, func(path string) {
 				s.set.YTDLPPath = path
 				s.save()
 				s.forget("tools")
 			})
 			in.Placeholder("path to yt-dlp").Width(260).Label("Own yt-dlp")
-		})
+		}, "path to yt-dlp")
 		_ = k
 	})
+}
+
+// jsRuntimeHelp describes yt-dlp's JavaScript runtime, js, or tells how to
+// get one. A Flatpak's sandbox has Node.js of its own, and sees no other:
+// one chosen in settings brought over from another copy isn't there.
+func jsRuntimeHelp(js tools.Tool, flatpak bool) string {
+	switch {
+	case js.Found:
+		return js.Name + " " + js.Version + " · yt-dlp uses it to solve YouTube's challenges."
+	case flatpak:
+		return "yt-dlp needs a JavaScript runtime to read most YouTube streams. The Flatpak has Node.js, and no other: choose Find one."
+	}
+	return "yt-dlp needs Deno, Node.js, Bun or QuickJS to read most YouTube streams. Install one, and MixMusic finds it."
+}
+
+// ownYTDLPHelp describes the setting of a yt-dlp of the user's own, which
+// a Flatpak finds only in its own folders.
+func ownYTDLPHelp(flatpak bool) string {
+	if flatpak {
+		return "Use a yt-dlp of your own instead. The Flatpak sees only its own folders: put it in ~/.var/app/io.github.fzn0x.mixmusic."
+	}
+	return "Use a yt-dlp of your own, such as your package manager's, instead."
 }
 
 // cacheSettings show what the offline cache holds, and bound it.
 func (s *shell) cacheSettings(c *ui.Context) {
 	k := &s.lk
 	s.group(c, "offline cache", func() {
-		use := s.svc.System.CacheUsage()
-		s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. Tracks you played play again without the network.", plural(use.Tracks, "track"), byteSize(use.Bytes)), func() {
-			if s.button(c, "clear-cache", "clear", false).Label("Clear tracks").Disabled(use.Tracks == 0).Clicked() {
-				if err := s.svc.System.ClearCache(); err != nil {
-					s.notes = append(s.notes, noticeOf(err))
-				} else {
-					s.notes = append(s.notes, notice("Cache cleared"))
+		// The cache's folder is read for what it holds in every frame the
+		// row shows: the search of the settings finds the row by what it
+		// always says, without reading it.
+		const kept = "Tracks you played play again without the network."
+		if s.findable("Tracks kept", kept) {
+			use := s.svc.System.CacheUsage()
+			s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. "+kept, plural(use.Tracks, "track"), byteSize(use.Bytes)), func() {
+				if s.button(c, "clear-cache", "clear", false).Label("Clear tracks").Disabled(use.Tracks == 0).Clicked() {
+					if err := s.svc.System.ClearCache(); err != nil {
+						s.notes = append(s.notes, noticeOf(err))
+					} else {
+						s.notes = append(s.notes, notice("Cache cleared"))
+					}
 				}
-			}
-		})
+			})
+		}
 		covers := s.svc.System.ArtworkUsage()
 		s.row(c, "Covers kept", fmt.Sprintf("%s in %s. Covers you saw show again without the network.", plural(covers.Images, "cover"), byteSize(covers.Bytes)), func() {
 			if s.button(c, "clear-covers", "clear", false).Label("Clear covers").Disabled(covers.Images == 0 || s.clearingCovers).Clicked() {
@@ -208,7 +236,7 @@ func (s *shell) cacheSettings(c *ui.Context) {
 					s.save()
 				}
 			}
-		})
+		}, "storage disk")
 	})
 	_ = k
 }

@@ -105,24 +105,7 @@ func (a *App) scrobble(np NowPlaying) {
 	if l == nil || !a.settings.Get().Scrobbling {
 		return
 	}
-	var (
-		id string
-		t  lastfm.Track
-	)
-	if np.Track != nil {
-		id = np.Track.ID
-		t = lastfm.Track{Title: np.Track.Title, Duration: time.Duration(np.DurationMs) * time.Millisecond}
-		if len(np.Track.Artists) > 0 {
-			// Last.fm knows a track by its main artist.
-			t.Artist = np.Track.Artists[0].Name
-		}
-		if np.Track.Album != nil {
-			t.Album = np.Track.Album.Name
-		}
-		if t.Duration == 0 {
-			t.Duration = time.Duration(np.Track.DurationMs) * time.Millisecond
-		}
-	}
+	id, t := lastfmTrack(np)
 	if !l.scrobbler.Observe(time.Now(), id, t, np.Playing, time.Duration(np.PositionMs)*time.Millisecond) {
 		return
 	}
@@ -140,6 +123,30 @@ func (a *App) scrobble(np NowPlaying) {
 			log.Printf("mixmusic: scrobbling: %v", err)
 		}
 	}()
+}
+
+// lastfmTrack is what plays as the scrobbler knows it, and its ID, "" when
+// nothing does. A live stream has no length, which the scrobbler never
+// scrobbles: Last.fm hears only that it plays.
+func lastfmTrack(np NowPlaying) (string, lastfm.Track) {
+	if np.Track == nil {
+		return "", lastfm.Track{}
+	}
+	t := lastfm.Track{Title: np.Track.Title, Duration: time.Duration(np.DurationMs) * time.Millisecond}
+	if len(np.Track.Artists) > 0 {
+		// Last.fm knows a track by its main artist.
+		t.Artist = np.Track.Artists[0].Name
+	}
+	if np.Track.Album != nil {
+		t.Album = np.Track.Album.Name
+	}
+	switch {
+	case np.Live:
+		t.Duration = 0
+	case t.Duration == 0:
+		t.Duration = time.Duration(np.Track.DurationMs) * time.Millisecond
+	}
+	return np.Track.ID, t
 }
 
 // LastfmLogin connects MixMusic to the user's Last.fm account, with the

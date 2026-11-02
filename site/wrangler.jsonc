@@ -1,0 +1,22 @@
+// The site's home on Cloudflare: a Worker that serves the files Zola builds
+// into site/public, at https://mixmusic.functionx.dev, and runs no code of
+// its own. .github/workflows/cloudflare.yml builds and deploys it. To deploy
+// it by hand, build the site with that base URL first:
+//
+//   go run ./tools/sitedocs
+//   zola --root site build --base-url https://mixmusic.functionx.dev
+//   cd site && npx wrangler deploy
+{
+  "name": "mixmusic-site",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./public",
+    // Zola makes public/404.html from templates/404.html.
+    "not_found_handling": "404-page"
+  },
+  // Cloudflare makes the DNS record and the certificate for it.
+  "routes": [{ "pattern": "mixmusic.functionx.dev", "custom_domain": true }],
+  // Only that domain: no workers.dev address beside it.
+  "workers_dev": false,
+  "preview_urls": false
+}

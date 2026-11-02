@@ -1,0 +1,17 @@
+# Netscape HTTP Cookie File
+# A jar of made-up cookies, as yt-dlp writes one: YouTube's, others of
+# YouTube that requests to music.youtube.com do not send, and other sites'.
+
+.youtube.com	TRUE	/	TRUE	4102444800	SAPISID	yt-sapisid
+.youtube.com	TRUE	/	TRUE	4102444800.5	__Secure-3PAPISID	yt-3p
+#HttpOnly_.youtube.com	TRUE	/	TRUE	4102444800	SID	yt-sid
+.youtube.com	TRUE	/	FALSE	0	YSC	browser-session
+music.youtube.com	FALSE	/	TRUE		HOSTONLY	music-only
+www.youtube.com	FALSE	/	TRUE	4102444800	WWW	www-only
+.youtube.com	TRUE	/signin	TRUE	4102444800	PATHED	signin-only
+.youtube.com	TRUE	/	TRUE	946684800	EXPIRED	long-gone
+.google.com	TRUE	/	TRUE	4102444800	SAPISID	google-sapisid
+accounts.google.com	FALSE	/	TRUE	4102444800	LSID	google-lsid
+.example.com	TRUE	/	FALSE	4102444800	session	elsewhere
+.notyoutube.com	TRUE	/	FALSE	4102444800	lookalike	not-youtube
+.youtube.com	TRUE	/	TRUE	4102444800	SAPISID	second-copy

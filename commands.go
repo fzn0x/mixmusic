@@ -87,12 +87,17 @@ func (s *shell) shortcutOf(cmd command) string {
 }
 
 // givenAway tells whether the user gave the keys of a shortcut to a
-// command other than id.
+// command other than id, as its shortcut or its global shortcut.
 func (s *shell) givenAway(id, keys string) bool {
 	if keys == "" {
 		return false
 	}
 	for other, v := range s.set.Shortcuts {
+		if other != id && sameShortcut(v, keys) {
+			return true
+		}
+	}
+	for other, v := range s.set.GlobalShortcuts {
 		if other != id && sameShortcut(v, keys) {
 			return true
 		}

@@ -285,10 +285,13 @@ func (e *Engine) Unload() {
 	closeDecks(stale)
 }
 
-// Seek moves the active deck to t.
+// Seek moves the active deck to t. A live stream plays on where it is.
 func (e *Engine) Seek(t time.Duration) {
 	e.mu.Lock()
 	d := e.decks[e.active]
+	if d != nil && d.live.Load() {
+		d = nil
+	}
 	if d != nil {
 		e.reported.ended, e.reported.failed = nil, nil
 	}

@@ -114,7 +114,7 @@ func (s *shell) collectionHead(c *ui.Context, h headProps) {
 						h.onKeep(!*h.keep)
 					}
 				}
-				if h.download != nil && anyDownloadable(h.download.tracks) {
+				if h.download != nil && s.anyDownloadable(h.download.tracks) {
 					s.downloadButton(c, h.download)
 				}
 				if h.menu != nil {

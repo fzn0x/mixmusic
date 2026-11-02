@@ -29,16 +29,17 @@ const (
 )
 
 // downloadable reports whether t downloads: a track of YouTube Music, or a
-// Spotify track, as its recording there.
-func downloadable(t media.Track) bool {
-	return t.Source == media.SourceYouTube || t.Source == media.SourceSpotify
+// Spotify track, as its recording there, but a live stream, which has no
+// file to keep, once playback or a download found it live.
+func (s *shell) downloadable(t media.Track) bool {
+	return (t.Source == media.SourceYouTube || t.Source == media.SourceSpotify) && !s.kept.Live(t.ID)
 }
 
 // anyDownloadable reports whether a track of tracks downloads, at the cost
 // of one, as a rule: for the head of a page, in each frame.
-func anyDownloadable(tracks []media.Track) bool {
+func (s *shell) anyDownloadable(tracks []media.Track) bool {
 	for _, t := range tracks {
-		if downloadable(t) {
+		if s.downloadable(t) {
 			return true
 		}
 	}
@@ -46,10 +47,10 @@ func anyDownloadable(tracks []media.Track) bool {
 }
 
 // downloadableOf is the tracks of tracks that download.
-func downloadableOf(tracks []media.Track) []media.Track {
+func (s *shell) downloadableOf(tracks []media.Track) []media.Track {
 	out := make([]media.Track, 0, len(tracks))
 	for _, t := range tracks {
-		if downloadable(t) {
+		if s.downloadable(t) {
 			out = append(out, t)
 		}
 	}
@@ -70,7 +71,7 @@ func (s *shell) confirmDownload(tracks []media.Track, run func()) {
 
 // download downloads tracks on their own, telling what downloads.
 func (s *shell) download(tracks []media.Track) {
-	tracks = downloadableOf(tracks)
+	tracks = s.downloadableOf(tracks)
 	if len(tracks) == 0 {
 		return
 	}
@@ -90,7 +91,7 @@ func (s *shell) download(tracks []media.Track) {
 // downloadItems are the items of a track's menu that download it, stop its
 // download, or remove it.
 func (s *shell) downloadItems(m *ui.Menu, t media.Track) {
-	if !downloadable(t) {
+	if !s.downloadable(t) {
 		return
 	}
 	switch s.kept.State(t.ID).Kind {
@@ -198,14 +199,14 @@ func (s *shell) missing(d *downloadHead) int {
 	if m, ok := s.missingMemos[d.c.ID]; ok && m.version == v && m.first == first && m.of == len(d.tracks) {
 		return m.n
 	}
-	n := s.kept.Missing(d.c.ID, downloadableOf(d.tracks))
+	n := s.kept.Missing(d.c.ID, s.downloadableOf(d.tracks))
 	s.missingMemos[d.c.ID] = missingMemo{version: v, first: first, n: n, of: len(d.tracks)}
 	return n
 }
 
 // downloadCollection downloads the tracks of d's page, as its collection.
 func (s *shell) downloadCollection(d *downloadHead) {
-	tracks := downloadableOf(d.tracks)
+	tracks := s.downloadableOf(d.tracks)
 	if len(tracks) == 0 {
 		s.notes = append(s.notes, notice("Nothing here downloads"))
 		return
@@ -232,7 +233,7 @@ func (s *shell) downloadButton(c *ui.Context, d *downloadHead) {
 func (s *shell) withDownload(menu func(m *ui.Menu), d *downloadHead) func(m *ui.Menu) {
 	return func(m *ui.Menu) {
 		menu(m)
-		if !anyDownloadable(d.tracks) {
+		if !s.anyDownloadable(d.tracks) {
 			return
 		}
 		m.Separator()

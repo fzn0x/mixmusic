@@ -310,6 +310,42 @@ func TestDownloadMarks(t *testing.T) {
 	tt.CloseMenu()
 }
 
+// TestLiveNotDownloaded offers no Download for a live stream found before,
+// and tells an album holding one downloaded without it.
+func TestLiveNotDownloaded(t *testing.T) {
+	dir := seedDownloads(t, keptTracks...)
+	path := filepath.Join(dir, "index.json")
+	var idx map[string]any
+	if data, err := os.ReadFile(path); err != nil || json.Unmarshal(data, &idx) != nil {
+		t.Fatalf("the index: %v", err)
+	}
+	idx["live"] = map[string]bool{"lllllllllll": true}
+	if data, err := json.Marshal(idx); err != nil || os.WriteFile(path, data, 0o644) != nil {
+		t.Fatal("the index wasn't written")
+	}
+	s := newTestShellOf(t, func(o *app.Options) { o.DownloadsDir = dir })
+	live := testTrack("yt:lllllllllll", "Lofi Live", "Someone", "Mezzanine", media.SourceYouTube)
+	s.loads["album:al-mezz"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-mezz", Title: "Mezzanine", Source: media.SourceYouTube,
+		Tracks: append(slices.Clone(keptTracks), live)}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-mezz")
+	if !tt.HasText("downloaded") || tt.HasText("download 1 more") {
+		t.Errorf("an album holding a live stream shows %q", tt.Texts())
+	}
+	if err := tt.RightClick("Lofi Live"); err != nil {
+		t.Fatal(err)
+	}
+	if got := tt.Menu(); slices.Contains(got, "Download") || !slices.Contains(got, "Play next") {
+		t.Errorf("a live stream's menu holds %q", got)
+	}
+	tt.CloseMenu()
+	s.download([]media.Track{live})
+	tt.Frame()
+	if tt.HasText("Downloading Lofi Live") || s.kept.State(live.ID).Kind != downloads.None {
+		t.Error("a live stream downloads")
+	}
+}
+
 // TestOfflineToast tells once the network went that the downloads still
 // play, with a way to them.
 func TestOfflineToast(t *testing.T) {

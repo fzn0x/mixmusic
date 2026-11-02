@@ -304,6 +304,23 @@ func TestApplyGlobalShortcuts(t *testing.T) {
 	}
 }
 
+// TestGlobalShortcutsFromSettingsFile registers the global shortcuts an
+// edit of settings.json sets while MixMusic runs, and lets go of those it
+// takes away.
+func TestGlobalShortcutsFromSettingsFile(t *testing.T) {
+	a, hk, _ := newShortcutApp(t)
+	writeSettings(t, a.settings.Path(), `{"globalShortcuts": {"player.toggle": "Mod+Alt+P"}}`)
+	a.ReloadSettings()
+	if calls := hk.take(); !slices.Equal(calls, []string{"register " + acc(t, "Mod+Alt+P")}) {
+		t.Errorf("the edit called %q", calls)
+	}
+	writeSettings(t, a.settings.Path(), `{"globalShortcuts": {}}`)
+	a.ReloadSettings()
+	if calls := hk.take(); !slices.Equal(calls, []string{"unregister " + acc(t, "Mod+Alt+P")}) {
+		t.Errorf("taking the keys away called %q", calls)
+	}
+}
+
 func TestGlobalShortcutError(t *testing.T) {
 	entry := errors.New("mygo: global shortcuts on Wayland need the app installed, with its desktop entry mixmusic.desktop: GDBus.Error:org.freedesktop.portal.Error.NotAllowed")
 	if got := globalShortcutError(entry, "linux"); got != "Global shortcuts need MixMusic installed with its desktop entry" {

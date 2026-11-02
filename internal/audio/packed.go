@@ -149,6 +149,9 @@ func id3Size(b []byte) (int, bool) {
 	return n, n <= maxID3
 }
 
+// channels is 2: the decoder writes stereo, a mono stream's in both.
+func (t *packedTrack) channels() int { return 2 }
+
 // seek tells where the stream is: a live one can't move, but the frames
 // that come next are at t.
 func (t *packedTrack) seek(at time.Duration) error {

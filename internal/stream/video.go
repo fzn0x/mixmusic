@@ -43,26 +43,10 @@ func videoFamily(codec string) string {
 	return ""
 }
 
-// infoFormat is what MixMusic reads of a format yt-dlp lists.
-type infoFormat struct {
-	FormatID string            `json:"format_id"`
-	URL      string            `json:"url"`
-	Ext      string            `json:"ext"`
-	Protocol string            `json:"protocol"`
-	VCodec   string            `json:"vcodec"`
-	ACodec   string            `json:"acodec"`
-	Width    int               `json:"width"`
-	Height   int               `json:"height"`
-	FPS      float64           `json:"fps"`
-	TBR      float64           `json:"tbr"`
-	Filesize int64             `json:"filesize"`
-	Headers  map[string]string `json:"http_headers"`
-}
-
 // ytdlpVideos returns the video streams of the formats yt-dlp lists: those
 // served whole over HTTPS, without sound. YouTube's storyboards, its HLS
 // streams and its streams with sound go.
-func ytdlpVideos(formats []infoFormat) []Video {
+func ytdlpVideos(formats []ytFormat) []Video {
 	var out []Video
 	for _, f := range formats {
 		family := videoFamily(f.VCodec)

@@ -1,27 +1,39 @@
-// Package ac3 decodes AC-3 audio, of ATSC A/52, such as the 5.1 surround
-// YouTube serves in MP4 (format 380): a pure Go decoder written from the
-// published standard, ATSC A/52:2012.
+// Package ac3 decodes AC-3 and E-AC-3 audio, of ATSC A/52 and its Annex
+// E, such as the 5.1 surround YouTube serves in MP4 (formats 380 and 328):
+// a pure Go decoder written from the published standards, ATSC A/52:2012
+// and ETSI TS 102 366 V1.4.1.
 //
 // A Decoder decodes the syncframes of a stream into six channels of float32
 // samples, interleaved in the order of Left, Right, Center, LFE,
 // LeftSurround and RightSurround, those the stream lacks silent, and tells
 // the stereo downmix the stream's own mix levels ask for.
 //
-// It decodes every audio coding mode, from 1/0 to 3/2, with or without the
-// LFE, at 48, 44.1 and 32 kHz, of bsid 8 and below, with all of the tools
-// of the standard: the exponent strategies, the parametric bit allocation
-// and its delta bit allocation, coupling and its phase flags, rematrixing,
-// block switching, and dither. It applies the dynamic range gains of the
-// blocks, as the standard asks a decoder to by default, and leaves the
-// dialogue level, dialnorm, to the player. It reads the Lo/Ro mix levels
-// of the alternate syntax of Annex D (bsid 6) for the downmix. A 1+1
-// stream's Ch1 is Left and its Ch2 Right. It checks both CRCs of each
-// syncframe.
+// Of AC-3, it decodes every audio coding mode, from 1/0 to 3/2, with or
+// without the LFE, at 48, 44.1 and 32 kHz, of bsid 8 and below, with all of
+// the tools of the standard: the exponent strategies, the parametric bit
+// allocation and its delta bit allocation, coupling and its phase flags,
+// rematrixing, block switching, and dither. It reads the Lo/Ro mix levels
+// of the alternate syntax of Annex D (bsid 6) for the downmix.
 //
-// The bit allocation and the unpacking follow the standard to the bit;
+// Of E-AC-3 (bsid 11 to 16), it decodes frames of 1, 2, 3 or 6 blocks, and
+// the tools of Annex E: the frame's exponent strategies and SNR offsets,
+// spectral extension and its notch filter, and the adaptive hybrid
+// transform, of vector and gain adaptive quantization. It decodes
+// independent substream 0, and skips the frames of the others: the
+// channels past 5.1 of a stream of more, and the objects of joint object
+// coding, whose 5.1 it plays. Enhanced coupling, which encoders don't use,
+// and the reduced sample rates are errors.ErrUnsupported, and transient
+// pre-noise processing, which a decoder may leave out, it leaves out.
+//
+// It applies the dynamic range gains of the blocks, as the standard asks a
+// decoder to by default, and leaves the dialogue level, dialnorm, to the
+// player. A 1+1 stream's Ch1 is Left and its Ch2 Right. It checks the CRCs
+// of each syncframe.
+//
+// The bit allocation and the unpacking follow the standards to the bit;
 // the transform is computed in float32, with an FFT, to about 140 dB of
 // the standard's equations. The decoder checks what it reads against the
-// bounds of the standard, so that malformed frames make errors, never
+// bounds of the standards, so that malformed frames make errors, never
 // panics.
 package ac3
 
@@ -88,7 +100,7 @@ type Info struct {
 	// channels c, of Downmix[0][c] times channel c, and the right output
 	// is that of Downmix[1][c]. Its gains are scaled down so that neither
 	// output can overload, and it leaves the LFE out, as the standard
-	// allows.
+	// allows, but of an E-AC-3 stream that gives the LFE's mix level.
 	Downmix [2][MaxChannels]float32
 }
 

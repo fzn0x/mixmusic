@@ -48,8 +48,16 @@ type testPlayer struct{ a *app.App }
 // Prepare finds the stream of a track: a live one of the IDs that start
 // with "yt:live".
 func (testPlayer) Prepare(_ context.Context, t media.Track) (player.Source, error) {
-	return player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t, Live: strings.HasPrefix(t.ID, "yt:live")}, nil
+	src := player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t, Live: strings.HasPrefix(t.ID, "yt:live")}
+	if _, ok := surroundTracks.Load(t.ID); ok {
+		src.SurroundURL = src.URL + "/5.1"
+	}
+	return src, nil
 }
+
+// surroundTracks holds the IDs of the tracks testPlayer gives 5.1 surround
+// audio.
+var surroundTracks sync.Map
 
 func (p testPlayer) PrepareStream(ctx context.Context, t media.Track) (player.Source, error) {
 	return p.Prepare(ctx, t)

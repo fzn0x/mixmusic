@@ -6,7 +6,9 @@ package output
 // well, or else ALSA's default device, as MyGo's audio does. Both block
 // while the device holds enough: the stream's goroutine renders a period,
 // writes it, and goes on. PulseAudio and PipeWire move the stream to the
-// default device when it changes.
+// default device when it changes. A stream of 5.1 is one where PulseAudio's
+// default sink has a center, an LFE and surrounds, as its introspection
+// tells; ALSA's stays stereo.
 
 import (
 	"errors"
@@ -30,6 +32,30 @@ var (
 	paSimpleFree       func(s uintptr)
 	paStrerror         func(err int32) string
 
+	introspectOnce sync.Once
+	introspectErr  error
+
+	paMainloopNew              func() uintptr
+	paMainloopGetAPI           func(m uintptr) uintptr
+	paMainloopIterate          func(m uintptr, block int32, retval *int32) int32
+	paMainloopFree             func(m uintptr)
+	paContextNew               func(api uintptr, name *byte) uintptr
+	paContextConnect           func(c uintptr, server *byte, flags int32, api uintptr) int32
+	paContextGetState          func(c uintptr) int32
+	paContextDisconnect        func(c uintptr)
+	paContextUnref             func(c uintptr)
+	paContextGetSinkInfoByName func(c uintptr, name *byte, cb uintptr, userdata uintptr) uintptr
+	paOperationGetState        func(op uintptr) int32
+	paOperationUnref           func(op uintptr)
+	// sinkCallback is the pa_sink_info_cb_t of the queries, made once, as
+	// callbacks are limited; it keeps what it hears in sinkHeard.
+	sinkCallback uintptr
+	sinkMu       sync.Mutex
+	sinkHeard    struct {
+		found     bool
+		positions []int32
+	}
+
 	alsaOnce sync.Once
 	alsaErr  error
 
@@ -50,6 +76,22 @@ type paSampleSpec struct {
 	channels uint8
 }
 
+// paChannelMap is pa_channel_map, of PA_CHANNELS_MAX positions.
+type paChannelMap struct {
+	channels uint8
+	position [32]int32
+}
+
+// paSinkInfo is the start of pa_sink_info, as 64-bit systems lay it out:
+// all its fields a query reads.
+type paSinkInfo struct {
+	name        *byte
+	index       uint32
+	description *byte
+	sampleSpec  paSampleSpec
+	channelMap  paChannelMap
+}
+
 // paBufferAttr is pa_buffer_attr.
 type paBufferAttr struct {
 	maxLength, tLength, preBuf, minReq, fragSize uint32
@@ -59,11 +101,18 @@ const (
 	paStreamPlayback  = 1
 	paSampleFloat32LE = 5
 
+	paContextNoAutospawn = 1
+	paContextReady       = 4
+	paContextFailed      = 5
+	paContextTerminated  = 6
+	paOperationRunning   = 0
+
 	sndPcmStreamPlayback      = 0
 	sndPcmFormatFloatLE       = 14
 	sndPcmAccessRWInterleaved = 3
 
-	frameBytes = 2 * 4
+	// sinkTimeout bounds the query of the default sink's channels.
+	sinkTimeout = time.Second
 )
 
 func cstr(s string) *byte {
@@ -86,6 +135,94 @@ func loadPulse() error {
 		purego.RegisterLibFunc(&paStrerror, lib, "pa_strerror")
 	})
 	return pulseErr
+}
+
+// loadIntrospect loads what of PulseAudio's library tells the default
+// sink's channels.
+func loadIntrospect() error {
+	introspectOnce.Do(func() {
+		lib, err := purego.Dlopen("libpulse.so.0", purego.RTLD_NOW|purego.RTLD_GLOBAL)
+		if err != nil {
+			introspectErr = fmt.Errorf("output: PulseAudio: %w", err)
+			return
+		}
+		purego.RegisterLibFunc(&paMainloopNew, lib, "pa_mainloop_new")
+		purego.RegisterLibFunc(&paMainloopGetAPI, lib, "pa_mainloop_get_api")
+		purego.RegisterLibFunc(&paMainloopIterate, lib, "pa_mainloop_iterate")
+		purego.RegisterLibFunc(&paMainloopFree, lib, "pa_mainloop_free")
+		purego.RegisterLibFunc(&paContextNew, lib, "pa_context_new")
+		purego.RegisterLibFunc(&paContextConnect, lib, "pa_context_connect")
+		purego.RegisterLibFunc(&paContextGetState, lib, "pa_context_get_state")
+		purego.RegisterLibFunc(&paContextDisconnect, lib, "pa_context_disconnect")
+		purego.RegisterLibFunc(&paContextUnref, lib, "pa_context_unref")
+		purego.RegisterLibFunc(&paContextGetSinkInfoByName, lib, "pa_context_get_sink_info_by_name")
+		purego.RegisterLibFunc(&paOperationGetState, lib, "pa_operation_get_state")
+		purego.RegisterLibFunc(&paOperationUnref, lib, "pa_operation_unref")
+		sinkCallback = purego.NewCallback(func(c uintptr, info *paSinkInfo, eol int32, user uintptr) {
+			if eol != 0 || info == nil || sinkHeard.found {
+				return
+			}
+			n := min(int(info.channelMap.channels), len(info.channelMap.position))
+			sinkHeard.found = true
+			sinkHeard.positions = append([]int32(nil), info.channelMap.position[:n]...)
+		})
+	})
+	return introspectErr
+}
+
+// defaultSinkPositions asks PulseAudio for the channel map of its default
+// sink, as PipeWire's PulseAudio server answers too. It reports false when
+// none answers within sinkTimeout.
+func defaultSinkPositions() ([]int32, bool) {
+	if loadIntrospect() != nil {
+		return nil, false
+	}
+	sinkMu.Lock()
+	defer sinkMu.Unlock()
+	m := paMainloopNew()
+	if m == 0 {
+		return nil, false
+	}
+	defer paMainloopFree(m)
+	c := paContextNew(paMainloopGetAPI(m), cstr("MixMusic"))
+	if c == 0 {
+		return nil, false
+	}
+	defer paContextUnref(c)
+	if paContextConnect(c, nil, paContextNoAutospawn, 0) < 0 {
+		return nil, false
+	}
+	defer paContextDisconnect(c)
+	deadline := time.Now().Add(sinkTimeout)
+	// iterate runs the main loop, without blocking in it, until done.
+	iterate := func(done func() bool) bool {
+		for !done() {
+			if time.Now().After(deadline) || paMainloopIterate(m, 0, nil) < 0 {
+				return false
+			}
+			if !done() {
+				time.Sleep(2 * time.Millisecond)
+			}
+		}
+		return true
+	}
+	settled := func() bool {
+		st := paContextGetState(c)
+		return st == paContextReady || st == paContextFailed || st == paContextTerminated
+	}
+	if !iterate(settled) || paContextGetState(c) != paContextReady {
+		return nil, false
+	}
+	sinkHeard.found, sinkHeard.positions = false, nil
+	op := paContextGetSinkInfoByName(c, cstr("@DEFAULT_SINK@"), sinkCallback, 0)
+	if op == 0 {
+		return nil, false
+	}
+	defer paOperationUnref(op)
+	if !iterate(func() bool { return paOperationGetState(op) != paOperationRunning }) {
+		return nil, false
+	}
+	return sinkHeard.positions, sinkHeard.found
 }
 
 func loadALSA() error {
@@ -123,8 +260,10 @@ func Available() error {
 
 // device is PulseAudio's stream or ALSA's.
 type device interface {
-	// write plays interleaved stereo frames after those before, waiting
-	// while the device holds enough.
+	// channels returns the channels of its frames: 2, or Surround.
+	channels() int
+	// write plays interleaved frames after those before, waiting while the
+	// device holds enough.
 	write(samples []float32) error
 	// delay returns the frames written that the device has yet to play.
 	delay() int64
@@ -132,13 +271,13 @@ type device interface {
 	close()
 }
 
-func openDevice() (device, error) {
+func openDevice(channels int) (device, error) {
 	if err := Available(); err != nil {
 		return nil, err
 	}
 	var perr, aerr error
 	if loadPulse() == nil {
-		d, err := openPulse()
+		d, err := openPulse(channels)
 		if err == nil {
 			return d, nil
 		}
@@ -154,10 +293,27 @@ func openDevice() (device, error) {
 	return nil, fmt.Errorf("%w: %w", ErrNoDevice, errors.Join(perr, aerr))
 }
 
-type pulseDevice struct{ s uintptr }
+type pulseDevice struct {
+	s  uintptr
+	ch int
+}
 
-func openPulse() (*pulseDevice, error) {
-	spec := paSampleSpec{format: paSampleFloat32LE, rate: Rate, channels: 2}
+// openPulse opens a stream of channels, of Surround where the default sink
+// has 5.1 or more, else stereo.
+func openPulse(channels int) (*pulseDevice, error) {
+	ch := 2
+	var chmap unsafe.Pointer
+	if channels == Surround {
+		if positions, ok := defaultSinkPositions(); ok {
+			if m, ok := pulseSurroundMap(positions); ok {
+				cm := &paChannelMap{channels: Surround}
+				copy(cm.position[:], m[:])
+				ch, chmap = Surround, unsafe.Pointer(cm)
+			}
+		}
+	}
+	spec := paSampleSpec{format: paSampleFloat32LE, rate: Rate, channels: uint8(ch)}
+	frameBytes := uint32(4 * ch)
 	// bufferDuration ahead, asked for more every period.
 	attr := paBufferAttr{
 		maxLength: ^uint32(0),
@@ -167,12 +323,17 @@ func openPulse() (*pulseDevice, error) {
 		fragSize:  ^uint32(0),
 	}
 	var code int32
-	s := paSimpleNew(nil, cstr("MixMusic"), paStreamPlayback, nil, cstr("Music"), &spec, nil, unsafe.Pointer(&attr), &code)
+	s := paSimpleNew(nil, cstr("MixMusic"), paStreamPlayback, nil, cstr("Music"), &spec, chmap, unsafe.Pointer(&attr), &code)
 	if s == 0 {
+		if ch == Surround {
+			return openPulse(2)
+		}
 		return nil, fmt.Errorf("output: PulseAudio: %s", paStrerror(code))
 	}
-	return &pulseDevice{s}, nil
+	return &pulseDevice{s, ch}, nil
 }
+
+func (d *pulseDevice) channels() int { return d.ch }
 
 func (d *pulseDevice) write(samples []float32) error {
 	var code int32
@@ -212,6 +373,8 @@ func openALSA() (*alsaDevice, error) {
 	return &alsaDevice{pcm}, nil
 }
 
+func (d *alsaDevice) channels() int { return 2 }
+
 func (d *alsaDevice) write(samples []float32) error {
 	for len(samples) > 0 {
 		n := sndPcmWritei(d.pcm, unsafe.Pointer(&samples[0]), uintptr(len(samples)/2))
@@ -243,20 +406,24 @@ func (d *alsaDevice) close() {
 
 // Stream plays what its render function makes on the default output.
 type Stream struct {
-	render   func([]float32)
+	render   func([]float32, int)
 	dev      device
 	stopping atomic.Bool
 	done     chan struct{}
 	delay    atomic.Int64 // frames
 }
 
-// Start starts a stream. Its goroutine calls render for each period, 10
-// ms, to fill out with interleaved stereo frames; render must not block.
-// When the stream stops of itself, as when the sound server goes away,
-// failed is called with why, from that goroutine once the stream has
-// ended; Stop is not needed then. Start returns once the device is open.
-func Start(render func(out []float32), failed func(error)) (*Stream, error) {
-	dev, err := openDevice()
+// Start starts a stream of channels, 2, or Surround for 5.1, which it
+// plays where PulseAudio's default sink has 5.1 or more, else stereo. Its
+// goroutine calls render for each period, 10 ms, to fill out with frames
+// of the channels it tells, interleaved; render must not block. A stream
+// of 5.1 stays one when the default sink changes, which the sound server
+// then mixes down. When the stream stops of itself, as when the sound
+// server goes away, failed is called with why, from that goroutine once
+// the stream has ended; Stop is not needed then. Start returns once the
+// device is open.
+func Start(channels int, render func(out []float32, channels int), failed func(error)) (*Stream, error) {
+	dev, err := openDevice(channels)
 	if err != nil {
 		return nil, err
 	}
@@ -285,9 +452,10 @@ func (s *Stream) Delay() time.Duration {
 }
 
 func (s *Stream) run() error {
-	buf := make([]float32, 2*periodFrames)
+	ch := s.dev.channels()
+	buf := make([]float32, ch*periodFrames)
 	for !s.stopping.Load() {
-		if err := s.fill(buf); err != nil {
+		if err := s.fill(buf, ch); err != nil {
 			return err
 		}
 		if err := s.dev.write(buf); err != nil {
@@ -298,13 +466,14 @@ func (s *Stream) run() error {
 	return nil
 }
 
-// fill renders into buf, turning a panic of render into an error.
-func (s *Stream) fill(buf []float32) (err error) {
+// fill renders into buf, of ch channels, turning a panic of render into an
+// error.
+func (s *Stream) fill(buf []float32, ch int) (err error) {
 	defer func() {
 		if v := recover(); v != nil {
 			err = fmt.Errorf("output: rendering the audio failed: %v", v)
 		}
 	}()
-	s.render(buf)
+	s.render(buf, ch)
 	return nil
 }

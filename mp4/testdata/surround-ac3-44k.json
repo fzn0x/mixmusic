@@ -1,0 +1,35 @@
+{
+    "packets": [
+        { "pts": -256, "duration": 1536, "size": "834",
+            "side_data_list": [
+                {  }
+            ] },
+        { "pts": 1280, "duration": 1536, "size": "836" },
+        { "pts": 2816, "duration": 1536, "size": "836" },
+        { "pts": 4352, "duration": 1536, "size": "836" },
+        { "pts": 5888, "duration": 1536, "size": "836" },
+        { "pts": 7424, "duration": 1536, "size": "836" },
+        { "pts": 8960, "duration": 1536, "size": "836" },
+        { "pts": 10496, "duration": 1536, "size": "836" },
+        { "pts": 12032, "duration": 1536, "size": "836" },
+        { "pts": 13568, "duration": 1536, "size": "836" },
+        { "pts": 15104, "duration": 1536, "size": "836" },
+        { "pts": 16640, "duration": 1536, "size": "836" },
+        { "pts": 18176, "duration": 1536, "size": "836" },
+        { "pts": 19712, "duration": 1536, "size": "836" },
+        { "pts": 21248, "duration": 1536, "size": "836" }
+    ],
+    "programs": [
+
+    ],
+    "stream_groups": [
+
+    ],
+    "streams": [
+        { "codec_name": "ac3", "sample_rate": "44100", "channels": 6, "time_base": "1/44100", "extradata": "\n",
+            "side_data_list": [
+                {  }
+            ] }
+    ],
+    "format": { "duration": "0.493991" }
+}

@@ -51,11 +51,17 @@ type stretched struct {
 // filled as the decoder fills it, to the end of the track.
 func stretch(t testing.TB, in []float32, speedAt func(q int) float64) stretched {
 	t.Helper()
-	r := newRing(0)
+	return stretchOf(t, in, 2, speedAt)
+}
+
+// stretchOf is stretch of in, of ch channels interleaved.
+func stretchOf(t testing.TB, in []float32, ch int, speedAt func(q int) float64) stretched {
+	t.Helper()
+	r := newRing(0, ch)
 	s := new(stretcher)
 	var st stretched
-	frames, written := len(in)/2, 0
-	buf := make([]float32, 2*quantum)
+	frames, written := len(in)/ch, 0
+	buf := make([]float32, ch*quantum)
 	never := func(<-chan struct{}) bool { return false }
 	limit := 20 + 4*frames/quantum
 	for q := 0; ; q++ {
@@ -64,7 +70,7 @@ func stretch(t testing.TB, in []float32, speedAt func(q int) float64) stretched 
 		}
 		if written < frames {
 			n := min(ringFrames-int(r.readable()), frames-written)
-			r.writeFrom(in[2*written:2*(written+n)], never)
+			r.writeFrom(in[ch*written:ch*(written+n)], never)
 			if written += n; written == frames {
 				r.done.Store(true)
 			}
@@ -73,7 +79,7 @@ func stretch(t testing.TB, in []float32, speedAt func(q int) float64) stretched 
 		st.pos = append(st.pos, s.position(r))
 		st.bypassed = append(st.bypassed, speed == 1 && (s.src != r || s.mode != stretching))
 		n := s.read(r, buf, speed)
-		st.out = append(st.out, buf[:2*n]...)
+		st.out = append(st.out, buf[:ch*n]...)
 		st.most = max(st.most, s.have)
 		if n < quantum {
 			if !r.done.Load() || r.readable() > 0 || s.pending(r) {
@@ -277,10 +283,10 @@ func TestStretchSpeedChange(t *testing.T) {
 func TestStretchSeek(t *testing.T) {
 	in := sine(440, 2)
 	never := func(<-chan struct{}) bool { return false }
-	a, b := newRing(0), newRing(Rate)
+	a, b := newRing(0, 2), newRing(Rate, 2)
 	a.writeFrom(in[:2*20000], never)
 	b.writeFrom(in[2*Rate/2:2*(Rate/2+20000)], never)
-	b2 := newRing(Rate)
+	b2 := newRing(Rate, 2)
 	b2.writeFrom(in[2*Rate/2:2*(Rate/2+20000)], never)
 	var s, fresh stretcher
 	buf := make([]float32, 2*quantum)
@@ -310,7 +316,7 @@ func TestStretchSeek(t *testing.T) {
 func TestStretchEnd(t *testing.T) {
 	in := sine(440, 0.3)
 	for _, speed := range append([]float64{1}, speeds...) {
-		r := newRing(0)
+		r := newRing(0, 2)
 		r.writeFrom(in, func(<-chan struct{}) bool { return false })
 		r.done.Store(true)
 		var s stretcher
@@ -344,7 +350,7 @@ func TestStretchEnd(t *testing.T) {
 // TestStretchAllocs allocates nothing on the audio thread.
 func TestStretchAllocs(t *testing.T) {
 	in := sine(440, 1)
-	r := newRing(0)
+	r := newRing(0, 2)
 	r.writeFrom(in, func(<-chan struct{}) bool { return false })
 	s := new(stretcher)
 	buf := make([]float32, 2*quantum)
@@ -367,7 +373,7 @@ func BenchmarkStretch(b *testing.B) {
 		b.Run(fmt.Sprint(speed), func(b *testing.B) {
 			played := 0
 			for b.Loop() {
-				r, s := newRing(0), new(stretcher)
+				r, s := newRing(0, 2), new(stretcher)
 				for written := 0; ; {
 					if n := min(ringFrames-int(r.readable()), len(in)/2-written); n > 0 {
 						r.writeFrom(in[2*written:2*(written+n)], never)
@@ -432,7 +438,7 @@ func writeWAV(path string, pcm []float32) error {
 func TestStretchStartsOnceFilled(t *testing.T) {
 	in := sine(440, 1)
 	never := func(<-chan struct{}) bool { return false }
-	r := newRing(0)
+	r := newRing(0, 2)
 	r.writeFrom(in[:2*1000], never)
 	var s stretcher
 	buf := make([]float32, 2*quantum)
@@ -471,7 +477,7 @@ func TestStretchStartsOnceFilled(t *testing.T) {
 func TestStretchShortOfInput(t *testing.T) {
 	in := sine(440, 2)
 	never := func(<-chan struct{}) bool { return false }
-	r := newRing(0)
+	r := newRing(0, 2)
 	r.writeFrom(in[:2*20000], never)
 	var s stretcher
 	buf := make([]float32, 2*quantum)
@@ -501,5 +507,75 @@ func TestStretchShortOfInput(t *testing.T) {
 	}
 	if got, own := maxStep(out), maxStep(in); got > own*1.02 {
 		t.Errorf("a step of %.5f, the tone's largest is %.5f", got, own)
+	}
+}
+
+// sixTones is secs seconds of six channels, interleaved, each a sine of
+// its own of hz at amplitude 0.25, or silent where hz is 0.
+func sixTones(hz [6]float64, secs float64) []float32 {
+	n := int(secs * Rate)
+	out := make([]float32, 6*n)
+	for f := range n {
+		for c, h := range hz {
+			out[6*f+c] = float32(0.25 * math.Sin(2*math.Pi*h*float64(f)/Rate))
+		}
+	}
+	return out
+}
+
+// TestStretchSurround stretches the six channels of 5.1 surround as it
+// does stereo's two: at 1× it plays the ring as it is, and at every other
+// speed each channel's tone comes out on that channel alone, at its pitch
+// and level, for as long as the speed gives, the stretch holding no more
+// input than stereo's, and allocating nothing. The tones are harmonics of
+// 100 Hz, whose period is a whole number of frames: the windows the mix of
+// the channels finds go on in phase on each of them, also while the front
+// left and right are silent, as the mix is of all six.
+func TestStretchSurround(t *testing.T) {
+	const secs = 4
+	for name, hz := range map[string][6]float64{
+		"six tones":        {200, 300, 400, 500, 600, 700},
+		"the front silent": {0, 0, 400, 500, 600, 700},
+	} {
+		in := sixTones(hz, secs)
+		if got := stretchOf(t, in, 6, at(1)).out; !slices.Equal(got, in) {
+			t.Fatalf("%s at 1×: %d frames, not the %d of the ring as it is", name, len(got)/6, len(in)/6)
+		}
+		for _, speed := range speeds {
+			st := stretchOf(t, in, 6, at(speed))
+			frames := len(st.out) / 6
+			if want := secs * Rate / speed; math.Abs(float64(frames)-want) > lengthSlack(speed) {
+				t.Errorf("%s at %v×: %d frames, want %.0f", name, speed, frames, want)
+			}
+			if st.most > stretchHeld {
+				t.Errorf("%s at %v×: it held %d frames", name, speed, st.most)
+			}
+			for c := range 6 {
+				for src, h := range hz {
+					if h == 0 {
+						continue
+					}
+					want := 0.0
+					if src == c {
+						want = 0.25
+					}
+					a, _ := toneOf(st.out, 6, c, h)
+					if want == 0 && a > 0.003 || want > 0 && math.Abs(20*math.Log10(a/want)) > 0.5 {
+						t.Errorf("%s at %v×: channel %d holds %v Hz at %.4f, want %.4f", name, speed, c, h, a, want)
+					}
+				}
+			}
+		}
+	}
+	r := newRing(0, 6)
+	r.writeFrom(sixTones([6]float64{200, 300, 400, 500, 600, 700}, 1), func(<-chan struct{}) bool { return false })
+	s := new(stretcher)
+	buf := make([]float32, 6*quantum)
+	speed := 1.5
+	if n := testing.AllocsPerRun(100, func() {
+		s.read(r, buf, speed)
+		speed = 4.5 - speed // 1.5, 3, 1.5…
+	}); n != 0 {
+		t.Errorf("%v allocations a quantum", n)
 	}
 }

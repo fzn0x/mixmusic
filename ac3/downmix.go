@@ -22,7 +22,10 @@ var (
 // single surround channel, in both surround channels at -3 dB, so mixes at
 // 0.707 slev, as the standard's equations of 3/1 have it. The gains are
 // scaled down so that the gains of the stream's channels in neither output
-// sum to more than 1, and the LFE is left out.
+// sum to more than 1. The LFE is left out, as the standard allows, but of
+// an E-AC-3 stream that tells its mix level. Of E-AC-3 without mixing
+// metadata, C mixes at -4.5 dB and the surrounds at -6 dB, the middle
+// levels of AC-3.
 func downmix(h *header) [2][MaxChannels]float32 {
 	var m [2][MaxChannels]float64
 	m[0][Left], m[1][Right] = 1, 1
@@ -52,6 +55,12 @@ func downmix(h *header) [2][MaxChannels]float32 {
 			share[LeftSurround], share[RightSurround] = minus3dB, minus3dB
 		}
 	}
+	// E-AC-3's LFE mix level, which mixes the LFE into both outputs at
+	// its level less 4.5 dB, as section E.2.9 does.
+	if h.lfeon && h.lfemixlevcod >= 0 {
+		g := math.Pow(10, float64(10-h.lfemixlevcod)/20-4.5/20)
+		m[0][LFE], m[1][LFE] = g, g
+	}
 	var sum float64
 	for _, row := range m {
 		var s float64
@@ -75,11 +84,15 @@ func downmix(h *header) [2][MaxChannels]float32 {
 // setInfo sets the Info of the syncframe decoded last.
 func (d *Decoder) setInfo() {
 	h := &d.h
+	rate := bitrates[h.frmsizecod>>1] * 1000
+	if h.eac3 {
+		rate = h.size * 8 * h.rate / (h.numblks * BlockLength)
+	}
 	d.info = Info{
-		SampleRate: sampleRates[h.fscod],
+		SampleRate: h.rate,
 		Mode:       h.acmod,
 		LFE:        h.lfeon,
-		Bitrate:    bitrates[h.frmsizecod>>1] * 1000,
+		Bitrate:    rate,
 		Downmix:    downmix(h),
 	}
 }

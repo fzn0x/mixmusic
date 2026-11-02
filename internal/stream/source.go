@@ -34,8 +34,11 @@ var (
 // download has it start again there. A track it downloads whole from its
 // start goes to the cache, as one the page played to its end did.
 type Source struct {
-	p           *Proxy
-	videoID     string
+	p       *Proxy
+	videoID string
+	// path is what the source asks the proxy for: the video's Path, or its
+	// SurroundPath.
+	path        string
 	ctx         context.Context
 	cancel      context.CancelFunc
 	interrupted func() bool
@@ -71,8 +74,18 @@ type download struct {
 // waiting for bytes returns ErrInterrupted when interrupted, if not nil,
 // returns true; Wake makes such a Read check it again.
 func (p *Proxy) Open(ctx context.Context, videoID string, interrupted func() bool) (*Source, error) {
+	return p.open(ctx, videoID, Path(videoID), interrupted)
+}
+
+// OpenSurround is Open for a video's 5.1 surround audio, which it fails
+// with why when YouTube has none of the video.
+func (p *Proxy) OpenSurround(ctx context.Context, videoID string, interrupted func() bool) (*Source, error) {
+	return p.open(ctx, videoID, SurroundPath(videoID), interrupted)
+}
+
+func (p *Proxy) open(ctx context.Context, videoID, path string, interrupted func() bool) (*Source, error) {
 	ctx, cancel := context.WithCancel(ctx)
-	s := &Source{p: p, videoID: videoID, ctx: ctx, cancel: cancel, interrupted: interrupted, size: -1}
+	s := &Source{p: p, videoID: videoID, path: path, ctx: ctx, cancel: cancel, interrupted: interrupted, size: -1}
 	s.cond = sync.NewCond(&s.mu)
 	s.mu.Lock()
 	w, served := s.fetch(0)
@@ -104,7 +117,7 @@ func (s *Source) fetch(off int64) (*sourceWriter, chan struct{}) {
 	go func() {
 		defer close(served)
 		defer cancel()
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, Path(s.videoID), nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.path, nil)
 		if err == nil {
 			if off > 0 {
 				req.Header.Set("Range", "bytes="+strconv.FormatInt(off, 10)+"-")

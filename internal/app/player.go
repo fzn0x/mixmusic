@@ -37,6 +37,9 @@ type PlaybackSource struct {
 	Mode PlaybackMode `json:"mode"`
 	// URL is the audio of a stream.
 	URL string `json:"url,omitempty"`
+	// SurroundURL is the 5.1 surround audio of a stream, when YouTube has
+	// some, which plays in its place while the settings ask for 5.1.
+	SurroundURL string `json:"surroundUrl,omitempty"`
 	// Track is the track that plays: for a Spotify track played from
 	// YouTube Music, its recording there.
 	Track media.Track `json:"track"`
@@ -85,13 +88,15 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 // YouTube Music. The player falls back to it when no Spotify device can
 // play. It keeps how loud YouTube measured the track, or asks, for the
 // engine to play it at an even loudness: a live stream has no measure.
+// It tells the 5.1 surround audio of the track too, when YouTube has some.
 // The downloads are told whether the video it found is live, as one
 // doesn't download.
 //
 // A track downloaded plays from its download, without the network, also
-// while it answers. While the network is known to be gone, a Spotify
-// track plays from its recording only when it was found before: searching
-// for it would wait for the network.
+// while it answers, in stereo: downloads hold no 5.1 audio. While the
+// network is known to be gone, a Spotify track plays from its recording
+// only when it was found before: searching for it would wait for the
+// network.
 func (p *Player) PrepareStream(ctx context.Context, track media.Track) (PlaybackSource, error) {
 	if k, ok := p.a.downloads.Lookup(track.ID); ok {
 		p.learnLoudness(k.Video)
@@ -116,9 +121,33 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 		return PlaybackSource{}, err
 	}
 	src := PlaybackSource{Mode: PlaybackStream, URL: streamURL(videoID), Track: yt}
-	// The audio of its recording may be downloaded for another track.
-	if p.a.downloads.Snapshot().HasVideo(videoID) || p.a.cache.Has(videoID) {
-		src.Cached = true
+	surroundURL := schemeURL(streamScheme) + strings.TrimPrefix(stream.SurroundPath(videoID), "/")
+	offline := p.a.offline()
+	// The stereo audio of its recording may be downloaded for another
+	// track.
+	stereo := p.a.downloads.Snapshot().HasVideo(videoID) || p.a.cache.Has(videoID)
+	if cachedSurround := p.a.cache.Has(stream.SurroundKey(videoID)); cachedSurround || stereo {
+		surround := p.a.settings.Get().Surround
+		if cachedSurround {
+			src.SurroundURL = surroundURL
+		}
+		// With 5.1 on, a track held in stereo plays its 5.1 audio when
+		// YouTube has some, which takes asking it while the network
+		// answers, for up to surroundWait: else it plays what is held,
+		// and the answer, which comes on, is there for its next play.
+		if surround && !cachedSurround && !offline {
+			ask, cancel := context.WithTimeout(ctx, surroundWait)
+			if s, err := p.a.resolveStream(ask, videoID); err == nil && s.Surround != nil {
+				src.SurroundURL = surroundURL
+			}
+			cancel()
+		}
+		// It plays without the network when the audio it plays is held.
+		if surround && src.SurroundURL != "" {
+			src.Cached = cachedSurround
+		} else {
+			src.Cached = stereo
+		}
 		// A track cached before MixMusic kept measures gets one now.
 		p.learnLoudness(videoID)
 		return src, nil
@@ -131,11 +160,15 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 		if live {
 			return liveSource(src, videoID), nil
 		}
+		// Resolve gives what it found at once.
+		if s, err := p.a.resolver.Resolve(ctx, videoID); err == nil && s.Surround != nil {
+			src.SurroundURL = surroundURL
+		}
 		// Its measure was kept as it was found, else it is asked for now.
 		p.learnLoudness(videoID)
 		return src, nil
 	}
-	if p.a.online != nil && p.a.online.Offline() {
+	if offline {
 		return PlaybackSource{}, player.ErrOffline
 	}
 	s, err := p.a.resolveStream(ctx, videoID)
@@ -146,6 +179,9 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	if s.Live {
 		return liveSource(src, videoID), nil
 	}
+	if s.Surround != nil {
+		src.SurroundURL = surroundURL
+	}
 	if s.Measured {
 		p.a.loudness.keep(videoID, s.Loudness)
 	} else {
@@ -155,6 +191,10 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	}
 	return src, nil
 }
+
+// surroundWait bounds how long a track cached in stereo waits, with 5.1
+// on, for YouTube to tell whether it has 5.1 audio.
+var surroundWait = 3 * time.Second
 
 // liveSource is src as the live stream of a video, which the engine opens
 // at its own address.

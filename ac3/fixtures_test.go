@@ -13,11 +13,22 @@ import (
 var update = flag.Bool("update", false, "encode the fixtures of testdata again with ffmpeg, and rewrite fixtures.json")
 
 // fixture is a stream of testdata: of an encoding of ffmpeg 7.0's AC-3
-// encoder, its dithflags cleared, as undither does, then edited by edits,
-// in turn, to use the tools the encoder doesn't.
+// encoder, or of its E-AC-3 encoder when eac3 is set, its dithflags
+// cleared, as undither does, then edited by edits, in turn, or written
+// again as write asks, to use the tools the encoder doesn't.
 type fixture struct {
 	encoding
 	edits []string
+	eac3  bool
+	write *writeOptions
+}
+
+// path returns the fixture's file.
+func (f fixture) path() string {
+	if f.eac3 {
+		return filepath.Join("testdata", f.name+".eac3")
+	}
+	return filepath.Join("testdata", f.name+".ac3")
 }
 
 // fixtures are the streams of testdata, a fifth of a second or so of
@@ -31,29 +42,50 @@ var fixtures = func() []fixture {
 	four := three + "|" + tone(0.3, 660, 0.11, 0.03)
 	noisy := "0.1*(random(0)*2-1)"
 	return []fixture{
-		{encoding{"5.1-48k-cpl", "aevalsrc=" + six + ":s=48000:d=0.2", "5.1", []string{"-b:a", "192k", "-channel_coupling", "1"}}, nil},
-		{encoding{"5.1-48k-edited", "aevalsrc=" + six + ":s=48000:d=0.2", "5.1", []string{"-b:a", "384k"}}, []string{"delta", "short", "dynrng"}},
-		{encoding{"5.1-44k-loro", "aevalsrc=" + six + ":s=44100:d=0.12", "5.1", []string{"-b:a", "448k", "-dmix_mode", "loro", "-loro_cmixlev", "0.841", "-loro_surmixlev", "0.5"}}, nil},
-		{encoding{"5.0-32k", "aevalsrc=" + strings.Join([]string{tone(0.4, 440, 0.1, 0), noisy, tone(0.3, 300, 0.12, 0), noisy, tone(0.2, 900, 0.1, 0.05)}, "|") + ":s=32000:d=0.2", "5.0", []string{"-b:a", "256k"}}, nil},
-		{encoding{"stereo-48k-remat", "aevalsrc=0.4*sin(2*PI*440*t)+0.05*(random(0)*2-1)|0.38*sin(2*PI*440*t)+0.05*(random(0)*2-1):s=48000:d=0.2", "stereo", []string{"-b:a", "192k"}}, []string{"delta"}},
-		{encoding{"stereo-44k-phase", "aevalsrc=" + tone(0.4, 500, 0.1, 0) + "+" + noisy + "|" + tone(0.3, 700, 0.08, 0.03) + "+" + noisy + ":s=44100:d=0.25", "stereo", []string{"-b:a", "96k", "-channel_coupling", "1"}}, []string{"phase"}},
-		{encoding{"mono-32k", "aevalsrc=" + tone(0.5, 330, 0.1, 0) + "+" + noisy + ":s=32000:d=0.25", "mono", []string{"-b:a", "64k"}}, []string{"delta", "short"}},
-		{encoding{"3.0-48k", "aevalsrc=" + three + ":s=48000:d=0.15", "3.0", []string{"-b:a", "192k"}}, nil},
-		{encoding{"2.1-lfe-32k", "aevalsrc=" + tone(0.4, 440, 0.1, 0) + "|" + tone(0.4, 550, 0.07, 0.02) + "|0.5*sin(2*PI*40*t)|" + tone(0.3, 990, 0.09, 0.05) + ":s=32000:d=0.2", "FL+FR+LFE+BC", []string{"-b:a", "192k"}}, nil},
-		{encoding{"3.1-44k", "aevalsrc=" + four + ":s=44100:d=0.15", "4.0", []string{"-b:a", "256k"}}, nil},
-		{encoding{"quad-48k", "aevalsrc=" + four + ":s=48000:d=0.15", "quad", []string{"-b:a", "256k"}}, nil},
-		{encoding{"mono-lfe-44k", "aevalsrc=" + tone(0.4, 440, 0.1, 0) + "|0.5*sin(2*PI*40*t):s=44100:d=0.15", "FC+LFE", []string{"-b:a", "128k"}}, nil},
+		{encoding{"5.1-48k-cpl", "aevalsrc=" + six + ":s=48000:d=0.2", "5.1", []string{"-b:a", "192k", "-channel_coupling", "1"}}, nil, false, nil},
+		{encoding{"5.1-48k-edited", "aevalsrc=" + six + ":s=48000:d=0.2", "5.1", []string{"-b:a", "384k"}}, []string{"delta", "short", "dynrng"}, false, nil},
+		{encoding{"5.1-44k-loro", "aevalsrc=" + six + ":s=44100:d=0.12", "5.1", []string{"-b:a", "448k", "-dmix_mode", "loro", "-loro_cmixlev", "0.841", "-loro_surmixlev", "0.5"}}, nil, false, nil},
+		{encoding{"5.0-32k", "aevalsrc=" + strings.Join([]string{tone(0.4, 440, 0.1, 0), noisy, tone(0.3, 300, 0.12, 0), noisy, tone(0.2, 900, 0.1, 0.05)}, "|") + ":s=32000:d=0.2", "5.0", []string{"-b:a", "256k"}}, nil, false, nil},
+		{encoding{"stereo-48k-remat", "aevalsrc=0.4*sin(2*PI*440*t)+0.05*(random(0)*2-1)|0.38*sin(2*PI*440*t)+0.05*(random(0)*2-1):s=48000:d=0.2", "stereo", []string{"-b:a", "192k"}}, []string{"delta"}, false, nil},
+		{encoding{"stereo-44k-phase", "aevalsrc=" + tone(0.4, 500, 0.1, 0) + "+" + noisy + "|" + tone(0.3, 700, 0.08, 0.03) + "+" + noisy + ":s=44100:d=0.25", "stereo", []string{"-b:a", "96k", "-channel_coupling", "1"}}, []string{"phase"}, false, nil},
+		{encoding{"mono-32k", "aevalsrc=" + tone(0.5, 330, 0.1, 0) + "+" + noisy + ":s=32000:d=0.25", "mono", []string{"-b:a", "64k"}}, []string{"delta", "short"}, false, nil},
+		{encoding{"3.0-48k", "aevalsrc=" + three + ":s=48000:d=0.15", "3.0", []string{"-b:a", "192k"}}, nil, false, nil},
+		{encoding{"2.1-lfe-32k", "aevalsrc=" + tone(0.4, 440, 0.1, 0) + "|" + tone(0.4, 550, 0.07, 0.02) + "|0.5*sin(2*PI*40*t)|" + tone(0.3, 990, 0.09, 0.05) + ":s=32000:d=0.2", "FL+FR+LFE+BC", []string{"-b:a", "192k"}}, nil, false, nil},
+		{encoding{"3.1-44k", "aevalsrc=" + four + ":s=44100:d=0.15", "4.0", []string{"-b:a", "256k"}}, nil, false, nil},
+		{encoding{"quad-48k", "aevalsrc=" + four + ":s=48000:d=0.15", "quad", []string{"-b:a", "256k"}}, nil, false, nil},
+		{encoding{"mono-lfe-44k", "aevalsrc=" + tone(0.4, 440, 0.1, 0) + "|0.5*sin(2*PI*40*t):s=44100:d=0.15", "FC+LFE", []string{"-b:a", "128k"}}, nil, false, nil},
+		// E-AC-3.
+		{encoding{"eac3-5.1-cpl", "aevalsrc=" + six + ":s=48000:d=0.2", "5.1", []string{"-b:a", "256k"}}, nil, true, nil},
+		{encoding{"eac3-3-blocks", "aevalsrc=" + strings.ReplaceAll(six, "|", "+"+noisy+"|") + ":s=48000:d=0.15", "5.1", []string{"-b:a", "384k", "-channel_coupling", "0"}}, nil, true,
+			&writeOptions{numblks: 3, delta: []segment{{10, 3, 6}, {5, 2, 2}}, skip: true, blksw: true, bamode: true, fgain: 3}},
+		{encoding{"eac3-1-block-mix", "aevalsrc=" + six + ":s=44100:d=0.1", "5.1", []string{"-b:a", "256k"}}, nil, true,
+			&writeOptions{numblks: 1, mix: true, loroC: 3, loroS: 6, lfeMixLev: 12}},
+		{encoding{"eac3-spx", "aevalsrc=" + strings.ReplaceAll(six, "|", "+"+noisy+"|") + ":s=48000:d=0.15", "5.1", []string{"-b:a", "384k", "-channel_coupling", "0"}}, nil, true,
+			func() *writeOptions { o := spx(writeOptions{numblks: 2}, 0, 2, 6, 3, 20); return &o }()},
+		{encoding{"eac3-spx-stereo", "aevalsrc=0.4*sin(2*PI*440*t)+" + noisy + "|0.38*sin(2*PI*440*t)+" + noisy + ":s=44100:d=0.15", "stereo", []string{"-b:a", "192k", "-channel_coupling", "0"}}, nil, true,
+			func() *writeOptions { o := spx(writeOptions{numblks: 6}, 0, 1, 4, 4, 12); return &o }()},
+		{encoding{"eac3-aht-vq", "aevalsrc=0.3*(random(0)*2-1):s=48000:d=0.1", "mono", []string{"-b:a", "192k"}}, nil, true,
+			&writeOptions{numblks: 6, aht: true, csnr: 10, flatExp: 4}},
+		{encoding{"eac3-aht-gaq", "aevalsrc=0.3*(random(0)*2-1):s=48000:d=0.1", "mono", []string{"-b:a", "192k"}}, nil, true,
+			&writeOptions{numblks: 6, aht: true, csnr: 28, gaq: 3}},
 	}
 }()
 
 // make encodes the fixture into testdata, with ffmpeg, and edits it.
 func (f fixture) make(t testing.TB, path string) {
 	t.Helper()
-	data, err := os.ReadFile(f.encode(t, t.TempDir()))
+	codec := "ac3"
+	if f.eac3 {
+		codec = "eac3"
+	}
+	data, err := os.ReadFile(f.encodeAs(t, t.TempDir(), codec))
 	if err != nil {
 		t.Fatal(err)
 	}
 	data = undither(t, data)
+	if f.write != nil {
+		data = writeEAC3(t, capture(t, data), *f.write)
+	}
 	for _, e := range f.edits {
 		n := 0
 		switch e {
@@ -165,7 +197,7 @@ func TestFixtures(t *testing.T) {
 	}
 	for _, f := range fixtures {
 		t.Run(f.name, func(t *testing.T) {
-			file := filepath.Join("testdata", f.name+".ac3")
+			file := f.path()
 			if *update {
 				f.make(t, file)
 			}

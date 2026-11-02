@@ -38,8 +38,14 @@ func (s bitstring) replace(i int, bits ...byte) bitstring {
 // blockMarks are where the fields a test edits are, in bits, in each block
 // of a syncframe, and where its audio ends.
 type blockMarks struct {
-	nf     int
-	dither [6]int // the dithflags of each block, after its blksw flags
+	nf int
+	// Of E-AC-3: whether the frame is, where its dithflage is, whether it
+	// is set, and its blocks.
+	eac3      bool
+	dithflage int
+	dithOn    bool
+	numblks   int
+	dither    [6]int // the dithflags of each block, after its blksw flags
 	// phsflginu, and the phase flags, or -1, and the coupling bands.
 	phsflginu, phsflg [6]int
 	ncplbnd           [6]int
@@ -53,9 +59,11 @@ func mark(t testing.TB, f []byte) blockMarks {
 	d := NewDecoder()
 	d.onBlock = func(blk int) {
 		m.nf = d.h.nfchans
+		m.eac3, m.numblks = d.h.eac3, d.h.numblks
+		m.dithflage, m.dithOn = d.frm.dithflageAt, d.frm.dithflage
 		m.dither[blk] = d.ditherAt
 		m.phsflginu[blk], m.phsflg[blk], m.ncplbnd[blk] = d.phsflginuAt, d.phsflgAt, d.ncplbnd
-		if blk == 5 {
+		if blk == d.h.numblks-1 {
 			m.end = d.r.pos
 		}
 	}
@@ -65,17 +73,35 @@ func mark(t testing.TB, f []byte) blockMarks {
 	return m
 }
 
-// edit applies change to each syncframe of an AC-3 file, as a bitstring
-// of it and where its fields are, and returns the file of the frames it
-// returns, of their CRCs set again. A frame keeps its size: change must
-// take bits it adds from the auxiliary bits after the audio.
+// edit applies change to each syncframe of a file, as a bitstring of it
+// and where its fields are, and returns the file of the frames it returns,
+// of their CRCs set again. An AC-3 frame keeps its size: change must take
+// bits it adds from the auxiliary bits after the audio. An E-AC-3 frame
+// grows by what change adds before the end of its audio, to whole words,
+// and its frmsiz tells it.
 func edit(t testing.TB, data []byte, change func(s bitstring, m blockMarks) bitstring) []byte {
 	t.Helper()
 	var out []byte
 	for _, f := range frames(t, data) {
-		s := change(toBits(f), mark(t, f))
-		if len(s) != 8*len(f) {
-			t.Fatalf("an edit made a frame of %d bits, of %d", len(s), 8*len(f))
+		in := toBits(f)
+		m := mark(t, f)
+		s := change(append(bitstring{}, in...), m)
+		if m.eac3 {
+			// The audio, then the auxiliary bits, to a whole word before
+			// the last 18 bits: auxdatae, encinfo and crc2.
+			end := m.end + len(s) - len(in)
+			tail := s[len(s)-18:]
+			s = s[:end:end]
+			for (len(s)+18)%16 != 0 {
+				s = append(s, 0)
+			}
+			s = append(s, tail...)
+			words := len(s) / 16
+			for b := range 11 {
+				s[21+b] = byte((words - 1) >> (10 - b) & 1) // frmsiz
+			}
+		} else if len(s) != len(in) {
+			t.Fatalf("an edit made a frame of %d bits, of %d", len(s), len(in))
 		}
 		g := s.bytes()
 		setCRC(g)

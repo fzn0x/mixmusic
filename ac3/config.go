@@ -5,15 +5,17 @@ import (
 	"fmt"
 )
 
-// Config is what an MP4 file's sample entry tells of an AC-3 stream: its
-// dac3 box, the AC3SpecificBox of ETSI TS 102 366, Annex F. A Decoder
-// needs none of it, as each syncframe says it all again; it describes the
-// stream before its first frame is read.
+// Config is what an MP4 file's sample entry tells of an AC-3 or E-AC-3
+// stream: its dac3 or dec3 box, the AC3SpecificBox or EC3SpecificBox of
+// ETSI TS 102 366, Annex F. A Decoder needs none of it, as each syncframe
+// says it all again; it describes the stream before its first frame is
+// read. Of E-AC-3, it describes independent substream 0, which a Decoder
+// decodes.
 type Config struct {
 	// SampleRate is the sampling frequency, in Hz.
 	SampleRate int
 	// BSID is the version of the stream's syntax: up to 8 for AC-3, 6
-	// for the alternate syntax of Annex D.
+	// for the alternate syntax of Annex D, 16 for E-AC-3.
 	BSID int
 	// Mode is the audio coding mode, of the Mode constants.
 	Mode int
@@ -59,6 +61,32 @@ func ParseDAC3(b []byte) (Config, error) {
 	c.Bitrate = bitrates[rate] * 1000
 	if c.BSID > 8 {
 		return Config{}, fmt.Errorf("ac3: dac3: bsid %d: %w", c.BSID, errors.ErrUnsupported)
+	}
+	return c, nil
+}
+
+// ParseDEC3 reads the payload of a dec3 box, the box header left out: of
+// independent substream 0. It returns errors.ErrUnsupported for the
+// streams a Decoder doesn't decode: those of the reduced sample rates.
+func ParseDEC3(b []byte) (Config, error) {
+	if len(b) < 5 {
+		return Config{}, fmt.Errorf("%w: dec3 of %d bytes", ErrFormat, len(b))
+	}
+	var r bitReader
+	r.init(b)
+	c := Config{Bitrate: r.read(13) * 1000} // data_rate, of all the substreams
+	r.skip(3)                               // num_ind_sub
+	fscod := r.read(2)
+	c.BSID = r.read(5)
+	r.skip(1 + 1 + 3) // reserved, asvc, bsmod
+	c.Mode = r.read(3)
+	c.LFE = r.flag()
+	if fscod == 3 {
+		return Config{}, fmt.Errorf("ac3: dec3: E-AC-3 at a reduced sample rate: %w", errors.ErrUnsupported)
+	}
+	c.SampleRate = sampleRates[fscod]
+	if c.BSID <= 10 || c.BSID > 16 {
+		return Config{}, fmt.Errorf("%w: dec3: bsid %d", ErrFormat, c.BSID)
 	}
 	return c, nil
 }

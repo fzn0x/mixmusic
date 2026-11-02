@@ -119,7 +119,7 @@ func TestPrepareStreamOfALiveVideo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	a := &App{resolver: r, cache: stream.NewCache(t.TempDir(), 1<<20), matcher: match.New(nil, matches), proxy: stream.NewProxy(r)}
+	a := &App{resolver: r, cache: stream.NewCache(t.TempDir(), 1<<20), matcher: match.New(nil, matches), proxy: stream.NewProxy(r), settings: testSettings(t)}
 	a.loudness = openBook(t, filepath.Join(t.TempDir(), "loudness.json"), func(context.Context, string) (float64, error) {
 		t.Error("asked how loud a live stream is")
 		return 0, stream.ErrNoLoudness

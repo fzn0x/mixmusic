@@ -9,7 +9,7 @@ type Tap struct{ an *analyser }
 func NewTap() *Tap { return &Tap{an: newAnalyser()} }
 
 // Write adds interleaved stereo frames to what the tap heard.
-func (t *Tap) Write(frames []float32) { t.an.writeInput(frames) }
+func (t *Tap) Write(frames []float32) { t.an.writeInput(frames, 2) }
 
 // Silence makes the tap hear silence from now on: its spectrum then falls
 // to nothing, as the engine's does while nothing plays.

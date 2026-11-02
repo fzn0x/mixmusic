@@ -178,9 +178,21 @@ func toggleOf(st player.State) (name, label string) {
 // or waits for the network to play.
 func pulses(st player.State) bool { return st.Buffering || st.Waiting && st.WillPlay }
 
-// progress shows where the track is, and seeks once the user lets go.
+// progress shows where the track is, and seeks once the user lets go. A
+// live stream shows that it is, in place of a time and a length, and has
+// no seeking.
 func (s *shell) progress(c *ui.Context) {
 	k := &s.lk
+	if s.st.Live {
+		s.seeking = false
+		ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
+			ui.Text(c, "live").FontSize(k.captionSize()).TextColor(k.accent).Width(44).TextAlign(ui.End)
+			edge := 1.0
+			ui.Slider(c.Key("seek"), &edge, 0, 1).Grow(1).MinWidth(0).Label("Live: no seeking").Disabled(true)
+			ui.Box(c).Width(44)
+		})
+		return
+	}
 	cur, ok := s.st.Current()
 	dur := s.st.Duration
 	if dur <= 0 && ok {

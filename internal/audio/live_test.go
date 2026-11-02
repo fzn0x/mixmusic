@@ -8,11 +8,16 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/fzn0x/mixmusic/aac"
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/stream"
 	"github.com/fzn0x/mixmusic/internal/tools"
+	"github.com/fzn0x/mixmusic/internal/youtube"
 	"github.com/fzn0x/mixmusic/mp4"
 )
 
@@ -124,7 +129,8 @@ func livePlay(t *testing.T, ctx context.Context, p *stream.Proxy, videoID string
 	if err != nil {
 		t.Fatal(err)
 	}
-	isMP4, _ := sniffMP4(bytes.NewReader(file))
+	kind, _ := sniff(bytes.NewReader(file))
+	isMP4 := kind == mp4File
 	t.Logf("a file of %d bytes, MP4 %v", len(file), isMP4)
 	if isMP4 {
 		// YouTube's edit list skips the encoder's priming: the deck needs
@@ -216,4 +222,168 @@ func compareLive(t *testing.T, what string, got, want []float32, at, slack int64
 	if lag < -slack || lag > slack || best < 60 {
 		t.Errorf("%s: %.1f dB from ffmpeg's decode, %d frames late", what, best, lag)
 	}
+}
+
+// TestLiveStreamPlays plays a few seconds of a live stream, a 24/7 radio
+// YouTube Music finds, as the app does: from the HLS playlist the player
+// API gives, else yt-dlp, near its live edge, and on past the segments
+// that were there as it started, which a reload of the playlist brings.
+// It finds the stream with yt-dlp alone too, in both qualities, when the
+// yt-dlp MixMusic installed is there. It runs with MIXMUSIC_LIVE=1:
+//
+//	MIXMUSIC_LIVE=1 go test ./internal/audio -run LiveStream -v
+//
+// With ffmpeg on the PATH, it checks what the deck played of format 234
+// against ffmpeg's decode of the same packed audio. It plays into no
+// device, and tells neither the playlist's URL nor its segments'.
+func TestLiveStreamPlays(t *testing.T) {
+	if os.Getenv("MIXMUSIC_LIVE") == "" {
+		t.Skip("set MIXMUSIC_LIVE=1 to test against YouTube")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	videos, err := youtube.New().Search(ctx, "lofi hip hop radio beats to relax study to", youtube.FilterVideos)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var videoID, title string
+	for _, v := range videos {
+		if v.Track != nil && v.Track.DurationMs == 0 {
+			_, videoID, _ = media.ParseID(v.Track.ID)
+			title = v.Track.Title
+			break
+		}
+	}
+	if videoID == "" {
+		t.Skip("YouTube Music found no live video")
+	}
+	t.Logf("%s (%s)", title, videoID)
+	itag := regexp.MustCompile(`/itag/(\d+)/`)
+
+	play := func(t *testing.T, r *stream.Resolver) {
+		start := time.Now()
+		s, err := r.Resolve(ctx, videoID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		format := ""
+		if m := itag.FindStringSubmatch(s.URL); m != nil {
+			format = m[1]
+		}
+		t.Logf("found in %s: live %v, format %s, %s, expires in %s", time.Since(start).Round(time.Millisecond), s.Live, format,
+			s.Codec, time.Until(s.Expires).Round(time.Minute))
+		if !s.Live {
+			t.Fatal("the stream of a live video isn't live")
+		}
+		p := stream.NewProxy(r)
+		var tee *teeSource
+		open := func(ctx context.Context, videoID string, interrupted func() bool) (Source, error) {
+			l, err := p.OpenLive(ctx, videoID, interrupted)
+			if err != nil {
+				return nil, err
+			}
+			tee = &teeSource{Live: l}
+			return tee, nil
+		}
+		start = time.Now()
+		d := newDeck(videoID, 0, open, func() {})
+		defer d.close()
+		first := take(t, d, Rate/10)
+		t.Logf("the first sound in %s", time.Since(start).Round(time.Millisecond))
+		// Past the three segments it starts with, of 5 seconds each.
+		rest := take(t, d, 20*Rate)
+		t.Logf("20 s more in %s", time.Since(start).Round(time.Millisecond))
+		level := func(x []float32) float64 {
+			var e float64
+			for _, v := range x {
+				if math.IsNaN(float64(v)) || math.IsInf(float64(v), 0) {
+					t.Fatalf("a sample of %v", v)
+				}
+				e += float64(v) * float64(v)
+			}
+			return 10 * math.Log10(e/float64(len(x)))
+		}
+		t.Logf("%.1f dBFS, then %.1f dBFS", level(first), level(rest))
+		if level(rest) < -60 {
+			t.Error("the live stream played silence")
+		}
+		if total, _ := d.info(); total != 0 || !d.live.Load() {
+			t.Errorf("a duration of %v, live %v", total, d.live.Load())
+		}
+		if _, err := exec.LookPath("ffmpeg"); err != nil || format != "234" {
+			return // 233 is HE-AAC, which ffmpeg decodes with its SBR
+		}
+		d.close()
+		path := filepath.Join(t.TempDir(), "live.aac")
+		if err := os.WriteFile(path, tee.frames(), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		compareLive(t, "the live stream", append(first, rest...), ffmpegDecode(t, path, false), 0, 0)
+	}
+
+	t.Run("the player API", func(t *testing.T) {
+		r := stream.NewResolver(nil, t.TempDir())
+		r.Direct = stream.NewDirect()
+		r.Run = func(context.Context, ...string) ([]byte, error) { return nil, tools.ErrNoYTDLP }
+		play(t, r)
+	})
+	config, _ := os.UserConfigDir()
+	tm := tools.New(filepath.Join(config, "MixMusic", "bin"))
+	if _, err := tm.YTDLP(); err != nil {
+		t.Logf("yt-dlp: %v", err)
+		return
+	}
+	for _, q := range []stream.Quality{stream.QualityBest, stream.QualitySaver} {
+		t.Run("yt-dlp, "+string(q), func(t *testing.T) {
+			r := stream.NewResolver(tm, t.TempDir())
+			r.SetQuality(q)
+			play(t, r)
+		})
+	}
+}
+
+// teeSource is a live stream, which keeps what was read of it.
+type teeSource struct {
+	*stream.Live
+	mu  sync.Mutex
+	got []byte
+}
+
+func (s *teeSource) Read(b []byte) (int, error) {
+	n, err := s.Live.Read(b)
+	s.mu.Lock()
+	s.got = append(s.got, b[:n]...)
+	s.mu.Unlock()
+	return n, err
+}
+
+func (s *teeSource) Seek(offset int64, whence int) (int64, error) {
+	pos, err := s.Live.Seek(offset, whence)
+	if err == nil {
+		s.mu.Lock()
+		s.got = s.got[:min(int64(len(s.got)), pos)]
+		s.mu.Unlock()
+	}
+	return pos, err
+}
+
+// frames are the ADTS frames of what was read, without the ID3 tags of
+// the segments, as ffmpeg reads them.
+func (s *teeSource) frames() []byte {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	var out []byte
+	for b := s.got; len(b) > 0; {
+		if n, ok := id3Size(b); ok {
+			b = b[min(n, len(b)):]
+			continue
+		}
+		h, err := aac.ParseADTS(b)
+		if err != nil || h.Length > len(b) {
+			break
+		}
+		out = append(out, b[:h.Length]...)
+		b = b[h.Length:]
+	}
+	return out
 }

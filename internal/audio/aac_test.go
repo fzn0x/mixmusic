@@ -315,28 +315,33 @@ func TestDeckAACFailures(t *testing.T) {
 	}
 }
 
-func TestSniffMP4(t *testing.T) {
+func TestSniff(t *testing.T) {
 	for _, c := range []struct {
 		head string
-		want bool
+		want container
 	}{
-		{"\x00\x00\x00\x18ftypdash", true},
-		{"\x00\x00\x00\x18stypmsdh", true},
-		{"\x00\x00\x02\xdfmoov", true},
-		{"\x1a\x45\xdf\xa3\x9f\x42\x86\x81", false},
-		{"\x00\x00\x00\x18ftyp"[:7], false},
-		{"", false},
-		{"hello, this is not a file of audio", false},
+		{"\x00\x00\x00\x18ftypdash", mp4File},
+		{"\x00\x00\x00\x18stypmsdh", mp4File},
+		{"\x00\x00\x02\xdfmoov", mp4File},
+		{"\x1a\x45\xdf\xa3\x9f\x42\x86\x81", webmFile},
+		{"\x00\x00\x00\x18ftyp"[:7], webmFile},
+		{"", webmFile},
+		{"hello, this is not a file of audio", webmFile},
+		// HLS packed audio: an ID3 tag, or ADTS frames from the start.
+		{"ID3\x04\x00\x00\x00\x00\x00\x3f", packedAudio},
+		{"\xff\xf1\x50\x80\x2e\x1f\xfc\x21", packedAudio},
+		{"\xff\xf9\x50\x80", packedAudio},
+		{"\xff\xfb\x90\x64\x00\x00\x00\x00", webmFile}, // MP3, of layer 3
 	} {
 		r := bytes.NewReader([]byte(c.head))
-		got, err := sniffMP4(r)
+		got, err := sniff(r)
 		if pos, _ := r.Seek(0, io.SeekCurrent); got != c.want || err != nil || pos != 0 {
 			t.Errorf("%q: %v, %v, at %d", c.head, got, err, pos)
 		}
 	}
 	why := errors.New("the network failed")
 	b, _ := os.ReadFile(aacFragments)
-	if _, err := sniffMP4(&brokenSource{Reader: bytes.NewReader(b), n: 6, why: why}); err != why {
+	if _, err := sniff(&brokenSource{Reader: bytes.NewReader(b), n: 6, why: why}); err != why {
 		t.Errorf("a read that fails: %v", err)
 	}
 }

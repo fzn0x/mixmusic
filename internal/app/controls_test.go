@@ -42,6 +42,12 @@ func TestControlsInfo(t *testing.T) {
 	if info := controlsInfo(np, at); info.Album != "" {
 		t.Errorf("album %q", info.Album)
 	}
+	// A live stream has no length, whatever the catalog says: the controls
+	// have no seeking.
+	np.DurationMs, np.Live, np.PositionMs = 0, true, 3_600_000
+	if info := controlsInfo(np, at); info.Duration != 0 || info.Position != time.Hour {
+		t.Errorf("a live stream of %v, at %v", info.Duration, info.Position)
+	}
 }
 
 func TestControlCommands(t *testing.T) {

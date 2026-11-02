@@ -25,8 +25,8 @@ var mediaKeys = map[string]Command{
 }
 
 // Start opens the main window and puts MixMusic on the desktop: the tray
-// icon, the media keys, the deep links of portable copies. It runs once the
-// app is ready.
+// icon, the media keys and the user's global shortcuts, the deep links of
+// portable copies. It runs once the app is ready.
 func (a *App) Start() {
 	// Quitting closes every window; the main window must close then, not
 	// hide in the tray, or the quit stops there.
@@ -63,6 +63,10 @@ func (a *App) Start() {
 	a.applyMediaKeys(a.settings.Get().MediaKeys)
 	// The colour file New read: from now on, as it changes.
 	a.followColorFile(a.settings.Get().Clean())
+	// Keys that were in use at the last start may be free now.
+	if a.applyGlobalShortcuts(false) {
+		notify()
+	}
 	a.watchUpdates()
 	a.watchNetwork()
 	go a.keepYTDLPCurrent()

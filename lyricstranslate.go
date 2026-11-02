@@ -64,7 +64,8 @@ func (s *shell) systemLanguage() string {
 // Google's translation of lyrics romanizes them, and Japanese, Thai,
 // Hebrew, Hindi, Greek and Ukrainian ones didn't. The switch of these
 // shows at once; that of other languages in other scripts than Latin
-// letters only once a translation of the lyrics brought some.
+// letters only once a translation of the lyrics brought some, but for
+// Japanese, whose romaji MixMusic makes itself (lyricsromaji.go).
 var romanizedFirst = map[string]bool{"ko": true, "zh": true, "ru": true, "ar": true}
 
 // translated is the translation of lyrics, and whether any line of it came
@@ -83,26 +84,35 @@ type lyricsExtra struct {
 	// tr is the translation of the lyrics, once it came, which holds their
 	// words in Latin letters too; nil until then, and while neither shows.
 	tr *lyrics.Translation
+	// ja is set for lyrics in Japanese, whose words in Latin letters are
+	// romaji, made on the computer, once made; nil until then.
+	ja     bool
+	romaji []string
 }
 
 // line returns what line i of the lyrics shows: its words, as written or
 // in Latin letters, then those in Latin letters under it, and its
 // translation, "" where there are none.
 func (x lyricsExtra) line(i int, words string) (text, roman, meaning string) {
-	if x.tr == nil {
-		return words, "", ""
-	}
-	tl := x.tr.Lines[i]
 	text = words
+	latin := ""
 	switch {
-	case tl.Romanized == "":
-	case x.romanize == settings.RomanizeOnly:
-		text = tl.Romanized
-	case x.romanize == settings.RomanizeUnder:
-		roman = tl.Romanized
+	case x.ja:
+		if x.romaji != nil {
+			latin = x.romaji[i]
+		}
+	case x.tr != nil:
+		latin = x.tr.Lines[i].Romanized
 	}
-	if x.translate {
-		meaning = tl.Text
+	switch {
+	case latin == "":
+	case x.romanize == settings.RomanizeOnly:
+		text = latin
+	case x.romanize == settings.RomanizeUnder:
+		roman = latin
+	}
+	if x.translate && x.tr != nil {
+		meaning = x.tr.Lines[i].Text
 	}
 	return text, roman, meaning
 }
@@ -115,27 +125,33 @@ func (s *shell) lyricsChoices(c *ui.Context, t media.Track, ly lyrics.Lyrics, wh
 	lang, to := ly.Language, s.translateTarget()
 	// Lyrics of a language MixMusic can't tell may be in another.
 	canTranslate := lang != to
-	x := lyricsExtra{translate: canTranslate && slices.Contains(s.set.LyricsTranslate, lang)}
+	x := lyricsExtra{translate: canTranslate && slices.Contains(s.set.LyricsTranslate, lang), ja: s.japanese(ly)}
 	// Lyrics in another script show in Latin letters as Unison has them:
 	// at once for the languages it romanizes, and for others with their
-	// translation, if it brought them so.
+	// translation, if it brought them so. Japanese shows in romaji, which
+	// asks Unison for nothing.
 	romanize := ""
-	if lyrics.Romanizable(lang) {
+	if x.ja {
+		romanize = s.set.LyricsRomanize["ja"]
+	} else if lyrics.Romanizable(lang) {
 		romanize = s.set.LyricsRomanize[lang]
 	}
 	var tr *loaded[translated]
-	if x.translate || romanize != "" && romanizedFirst[lang] {
+	if x.translate || !x.ja && romanize != "" && romanizedFirst[lang] {
 		tr = s.translation(t, ly, to, x.translate)
 		if tr.done && tr.err == nil && len(tr.value.Lines) == len(ly.Lines) {
 			x.tr = &tr.value.Translation
 		}
 	}
-	canRomanize := lyrics.Romanizable(lang) && (romanizedFirst[lang] || x.translate && x.tr != nil && tr.value.romanized)
+	canRomanize := x.ja || lyrics.Romanizable(lang) && (romanizedFirst[lang] || x.translate && x.tr != nil && tr.value.romanized)
 	if canRomanize {
 		x.romanize = romanize
 	}
 	if ly.Synced || canTranslate || canRomanize {
 		s.lyricsSwitches(c, ly, lang, where, canTranslate, canRomanize, &x)
+	}
+	if x.ja && x.romanize != "" {
+		x.romaji = s.lyricsRomaji(c, t, ly, where)
 	}
 	if tr == nil {
 		return x
@@ -218,16 +234,21 @@ func (s *shell) lyricsSwitches(c *ui.Context, ly lyrics.Lyrics, lang, where stri
 		if !canRomanize {
 			return
 		}
-		// The switch and its ways go on one line.
+		// The switch and its ways go on one line. Japanese is romaji, kept
+		// as "ja" though MixMusic couldn't tell the lyrics' language.
 		ui.Row(c).Gap(16).AlignItems(ui.Center).Shrink(0).Children(func() {
-			names := romanizeNames[lang == "ja"]
+			as, tip := lang, romanizeTip
+			if x.ja {
+				as, tip = "ja", romajiTip
+			}
+			names := romanizeNames[as == "ja"]
 			on := x.romanize != ""
-			if s.lyricsSwitch(c, "lyrics-romanize-"+where, names[0], "Show lyrics in Latin letters", romanizeTip, &on) {
+			if s.lyricsSwitch(c, "lyrics-romanize-"+where, names[0], "Show lyrics in Latin letters", tip, &on) {
 				x.romanize = ""
 				if on {
 					x.romanize = settings.RomanizeUnder
 				}
-				s.setRomanize(lang, x.romanize)
+				s.setRomanize(as, x.romanize)
 			}
 			if x.romanize == "" {
 				return
@@ -241,7 +262,7 @@ func (s *shell) lyricsSwitches(c *ui.Context, ly lyrics.Lyrics, lang, where stri
 				if mode == 1 {
 					x.romanize = settings.RomanizeOnly
 				}
-				s.setRomanize(lang, x.romanize)
+				s.setRomanize(as, x.romanize)
 			}
 		})
 	})
@@ -302,7 +323,7 @@ func init() { addSettings("playback", 60, (*shell).lyricsSettings) }
 // lyricsSettings chooses the language lyrics translate to.
 func (s *shell) lyricsSettings(c *ui.Context) {
 	s.group(c, "Lyrics", func() {
-		s.row(c, "Translate lyrics to", "The translate switch beside the lyrics shows them in this language. While translate is on, or lyrics show in Latin letters, the lyrics of the track playing and its video ID go to Unison, which has Google translate them; nothing is sent while both are off.", func() {
+		s.row(c, "Translate lyrics to", "The translate switch beside the lyrics shows them in this language. While translate is on, or lyrics show in Latin letters, the lyrics of the track playing and its video ID go to Unison, which has Google translate them; nothing is sent while both are off. Japanese lyrics show in romaji made on this computer, which sends nothing.", func() {
 			options := s.translateOptions()
 			chosen := options[0]
 			for i, l := range translateLanguages {

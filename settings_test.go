@@ -213,6 +213,58 @@ func TestTitleSwitch(t *testing.T) {
 	}
 }
 
+// TestSkipAISwitch turns skipping the songs YouTube labels as made with AI
+// on and off from Settings › Playback, whose row says that YouTube labels
+// only some (#97).
+func TestSkipAISwitch(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 3200)
+	show(s, tt, "/settings/playback")
+	const label = "Skip songs made with AI"
+	const description = "Skips the tracks YouTube labels as made with AI. YouTube labels only some of them, so others still play."
+	if !tt.HasText(description) {
+		t.Errorf("the row doesn't say what it skips: %q", tt.Texts())
+	}
+	if s.svc.Preferences.Get().SkipAI {
+		t.Fatal("on at first")
+	}
+	focused := func() bool { return tt.Focused(label) && !tt.Focused(description) }
+	for i := 0; i < 200 && !focused(); i++ {
+		tt.Key(0, ui.KeyTab)
+	}
+	if !focused() {
+		t.Fatalf("Tab doesn't reach the switch: %q", tt.Texts())
+	}
+	for _, want := range []bool{true, false} {
+		tt.Key(0, ui.KeySpace)
+		s.drain()
+		tt.Frame()
+		if got := s.svc.Preferences.Get().SkipAI; got != want {
+			t.Errorf("the switch left skipping %v, not %v", got, want)
+		}
+	}
+}
+
+// TestSkipAISwitchFound finds Skip songs made with AI by typing in the box
+// of the settings, beside Skip songs you dislike.
+func TestSkipAISwitchFound(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 6000)
+	const ai, disliked = "Skip songs made with AI", "Skip songs you dislike"
+	for _, c := range []struct {
+		q         string
+		want, not []string
+	}{
+		{"made with ai", []string{ai}, []string{disliked, "Autoplay"}},
+		{"labels only some", []string{ai}, []string{disliked, "Autoplay"}},
+		{"skip songs", []string{ai, disliked}, []string{"Autoplay"}},
+	} {
+		show(s, tt, settingsPath("", c.q))
+		showsOnly(t, tt, "searching "+c.q, c.want, c.not)
+		show(s, tt, "/")
+	}
+}
+
 // TestCoversKept tells how many covers are kept on disk, and clears them.
 func TestCoversKept(t *testing.T) {
 	var cover bytes.Buffer

@@ -443,9 +443,9 @@ func newKeptHarness(t *testing.T, net *fakeNet, kept ...string) *harness {
 	return newHarnessWith(t, Saved{}, func(f *fakeServices) Services { return keptServices{netServices{f, net}, set} })
 }
 
-// reported are the tracks the app was told of as what plays, from the
-// report from on.
-func (h *harness) reported(from int) []string {
+// reportedFrom are the tracks the app was told of as what plays, from
+// the report from on.
+func (h *harness) reportedFrom(from int) []string {
 	var ids []string
 	h.svc.with(func(f *fakeServices) {
 		for _, r := range f.reports[min(from, len(f.reports)):] {
@@ -487,7 +487,7 @@ func TestOfflineSkipsToDownloaded(t *testing.T) {
 	from := h.reports()
 	h.p.Ended()
 	h.wait("d waiting", waiting("d", true))
-	if got := h.reported(from); !slices.Equal(got, []string{"yt:d"}) {
+	if got := h.reportedFrom(from); !slices.Equal(got, []string{"yt:d"}) {
 		t.Errorf("told of %q", got)
 	}
 	if n := h.notices(); len(n) != 1 || n[0].Message != offlineNotice {
@@ -506,7 +506,7 @@ func TestOfflineAroundTheQueue(t *testing.T) {
 	from := h.reports()
 	h.p.Ended()
 	h.wait("b again", func(p *Player) bool { return playing("b")(p) && h.stream.count("load url:yt:b 0s true") == 2 })
-	if got := h.reported(from); !slices.Equal(got, []string{"yt:b"}) {
+	if got := h.reportedFrom(from); !slices.Equal(got, []string{"yt:b"}) {
 		t.Errorf("told of %q", got)
 	}
 }

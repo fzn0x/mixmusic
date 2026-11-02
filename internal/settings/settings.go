@@ -141,6 +141,14 @@ type Settings struct {
 	Panel string `json:"panel"`
 	// LyricsPlain shows synchronized lyrics as plain text.
 	LyricsPlain bool `json:"lyricsPlain"`
+	// LyricsTranslate are the languages of the lyrics the user translates,
+	// codes of ISO 639-1 as "ja": their translation shows under each line.
+	// "" stands for lyrics whose language MixMusic can't tell.
+	LyricsTranslate []string `json:"lyricsTranslate"`
+	// LyricsRomanize shows the lyrics of a language in Latin letters,
+	// RomanizeUnder or RomanizeOnly, by the language's code; lyrics of
+	// other languages show as they are written.
+	LyricsRomanize map[string]string `json:"lyricsRomanize"`
 	// SkippedYTDLP is the release of yt-dlp the home page told of, which
 	// the user put off: it doesn't tell of it again.
 	SkippedYTDLP string `json:"skippedYtdlp"`
@@ -163,12 +171,18 @@ type Settings struct {
 	Autoplay bool `json:"autoplay"`
 	// SkipDisliked passes over the tracks the user disliked as the queue
 	// moves on, and leaves them out of radios.
-	SkipDisliked bool      `json:"skipDisliked"`
-	Equalizer    Equalizer `json:"equalizer"`
+	SkipDisliked bool `json:"skipDisliked"`
+	// SkipAI passes over the tracks YouTube labels as made with AI, as the
+	// player moves on by itself.
+	SkipAI    bool      `json:"skipAi"`
+	Equalizer Equalizer `json:"equalizer"`
 	// Volume is from 0 to 1.
 	Volume float64 `json:"volume"`
 	// CacheSizeMB bounds the audio cache; 0 turns it off.
 	CacheSizeMB int `json:"cacheSizeMb"`
+	// LyricsTranslateTo is the language lyrics translate to, a code of ISO
+	// 639-1; "" is the system's.
+	LyricsTranslateTo string `json:"lyricsTranslateTo"`
 	// DownloadsFolder is where the downloads are kept, an absolute path;
 	// "" is the default folder of the system.
 	DownloadsFolder string `json:"downloadsFolder"`
@@ -219,6 +233,14 @@ type Settings struct {
 	RegistryURL string `json:"registryUrl"`
 }
 
+// The ways of showing lyrics in Latin letters (LyricsRomanize).
+const (
+	// RomanizeUnder shows each line in Latin letters under it.
+	RomanizeUnder = "under"
+	// RomanizeOnly shows the lines in Latin letters in place of theirs.
+	RomanizeOnly = "only"
+)
+
 // DefaultRegistryURL is the community registry in MixMusic's repository.
 const DefaultRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry-2.json"
 
@@ -242,6 +264,8 @@ func Default() Settings {
 		Density:         DensityComfortable,
 		Layout:          LayoutBlend,
 		Panel:           "queue",
+		LyricsTranslate: []string{},
+		LyricsRomanize:  map[string]string{},
 		FontScale:       1,
 		Zoom:            1,
 		SpotifyPlayback: defaultSpotifyPlayback(runtime.GOOS),
@@ -283,6 +307,8 @@ var (
 	discordIDRe = regexp.MustCompile(`^[0-9]{15,22}$`)
 	// pageIDRe matches the page ID of a YouTube brand channel, a number.
 	pageIDRe = regexp.MustCompile(`^[0-9]{1,32}$`)
+	// languageRe matches the code of a language, as "ja" or "zh-Hant".
+	languageRe = regexp.MustCompile(`^[a-z]{2,3}(-[A-Z][a-z]{3})?$`)
 )
 
 // UnmarshalJSON reads settings, those of the versions before 0.5.6 too,
@@ -368,6 +394,23 @@ func (s Settings) Clean() Settings {
 	}
 	if s.Panel != "lyrics" && s.Panel != "none" {
 		s.Panel = d.Panel
+	}
+	translate := []string{}
+	for _, lang := range s.LyricsTranslate {
+		if (lang == "" || languageRe.MatchString(lang)) && !slices.Contains(translate, lang) && len(translate) < 200 {
+			translate = append(translate, lang)
+		}
+	}
+	s.LyricsTranslate = translate
+	romanize := map[string]string{}
+	for lang, how := range s.LyricsRomanize {
+		if (lang == "" || languageRe.MatchString(lang)) && (how == RomanizeUnder || how == RomanizeOnly) && len(romanize) < 200 {
+			romanize[lang] = how
+		}
+	}
+	s.LyricsRomanize = romanize
+	if !languageRe.MatchString(s.LyricsTranslateTo) {
+		s.LyricsTranslateTo = ""
 	}
 	if s.Density != DensityCompact {
 		s.Density = DensityComfortable

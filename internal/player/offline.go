@@ -86,6 +86,11 @@ func (p *Player) waitRadio() {
 		p.extendWithRadio(seed, func(added bool, err error) {
 			switch i := p.s.nextIndex(); {
 			case token != p.loadToken:
+			case added && play && p.skipsAI():
+				// Past what the queue passes over, and what YouTube labels as
+				// made with AI, checked.
+				m, at := p.moveOn(true)
+				p.step(m, at+1)
 			case added && i > p.s.Index:
 				p.playAt(i, 0, play)
 			case errors.Is(err, ErrOffline):
@@ -286,14 +291,14 @@ func (p *Player) skipOffline(i int, autoplay bool) bool {
 	return true
 }
 
-// playNext plays the entry at i as the queue goes on, or, while the
+// offlineFrom is the entry at i, as the queue goes on to it, or, while the
 // network is known to be gone, the first from it that plays without it,
-// rather than load one that can't.
-func (p *Player) playNext(i int) {
+// rather than one that can't load.
+func (p *Player) offlineFrom(i int) int {
 	if k, ok := p.kept(); ok && k.Offline() && !k.PlaysOffline(p.s.Queue[i].Track) {
 		if j, ok := p.playsOfflineFrom(i, false); ok {
-			i = j
+			return j
 		}
 	}
-	p.playAt(i, 0, true)
+	return i
 }

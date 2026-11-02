@@ -34,9 +34,12 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   requests with as the website does, it reads and changes their library:
   liked songs, playlists, albums, subscriptions, likes, dislikes and
   saves, and it deletes the playlists the user made, which it tells from
-  those they saved by the menus YouTube sends with them. Its parsers are
-  tested against recorded responses in `testdata/`, and against the live
-  service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run Live`
+  those they saved by the menus YouTube sends with them. It also reads
+  whether YouTube labels a video as made with AI, from the answer of
+  YouTube's own website, asked signed out with a field mask
+  (`MadeWithAI`): nothing of YouTube Music carries the label. Its parsers
+  are tested against recorded responses in `testdata/`, and against the
+  live service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run Live`
   (`MIXMUSIC_YT_COOKIES` adds a signed-in account, and
   `MIXMUSIC_YT_WRITE=1` lets it make and delete a playlist there, and
   dislike a song and take the dislike back).
@@ -134,6 +137,12 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   cache holds, as the app tells; once none is left, it waits for the
   network where it was, and plays on once it answers. The player pauses as
   the computer sleeps.
+  As it moves on by itself it passes over, on one path
+  (`skip.go`), the entries the settings skip, but those the user picks:
+  songs the user dislikes, and songs YouTube labels as made with AI
+  (`labels.go`). A track whose label the app doesn't know is checked
+  before it's announced, beside the search for its stream, and the next
+  track before it's preloaded or crossfaded into.
 - **`internal/online`** tells the player whether the network answers: a
   check of YouTube's and Spotify's addresses over HTTPS, shared by its
   callers, which audio coming from YouTube answers too, and a wait for the
@@ -168,8 +177,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   also finds the song of a music video, by its title and artists, which
   the video's radio starts from: YouTube Music makes the radio of a video
   out of videos.
-- **`lyrics`** finds synced lyrics on Unison and LRCLIB, and reads TTML and
-  LRC.
+- **`lyrics`** finds synced lyrics on Unison and LRCLIB, reads TTML and LRC,
+  and translates and romanizes lyrics on Unison.
 - **`internal/library`** keeps liked and disliked songs, mixes, the history
   and stats in `library.json`.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
@@ -282,7 +291,8 @@ tells the windows (`App.Watch`). A file with a mistake is told of after a
 second, and kept as `settings.json.broken` if MixMusic quits before it is
 fixed; a `settings.json` that is a link stays one. The
 cache folder holds audio, the covers shown (`artwork/`), matches, how loud
-YouTube measured the tracks played (`loudness.json`), and yt-dlp's cache,
+YouTube measured the tracks played (`loudness.json`), the videos YouTube
+labels as made with AI, for 30 days (`ai-labels.json`), and yt-dlp's cache,
 and the logs folder the log and the crash reports. The downloads are in a
 folder of their own, which the user can move in Settings › Playback
 (`downloadsFolder` in `settings.json`): by default

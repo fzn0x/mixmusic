@@ -42,6 +42,7 @@ func (a *App) flush() {
 		p.Flush()
 	}
 	a.downloads.Flush()
+	a.labels.save()
 	if err := a.settings.Flush(); err != nil {
 		log.Printf("mixmusic: saving settings.json: %v", err)
 	}

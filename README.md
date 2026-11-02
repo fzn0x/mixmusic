@@ -47,9 +47,9 @@ both services in one player:
 - **A small program.** MixMusic is one Go program that draws its own
   windows on the GPU. There is no browser inside it to download or keep in
   memory.
-- **Yours to change.** Fourteen themes come with it, in three design
-  languages, the community adds more themes and plugins, and any command
-  can have a key of your own.
+- **Yours to change.** Four layouts and fourteen themes come with it, the
+  community adds more themes and plugins, and any command can have a key
+  of your own.
 - **Private.** MixMusic has no account, server, analytics or telemetry of
   its own.
 - **Free and open source,** under the MIT license or the GPL 3.0.
@@ -113,12 +113,15 @@ both services in one player:
 
 ### Make it yours
 
-- **Themes.** Fourteen built in, with effects you can tune, one theme for
-  light mode and one for dark mode, and an accent color of your own or
-  taken from the artwork that plays. Beside MixMusic's own flat tiles and
-  giant lowercase words, Material and Material Dark follow Material 3
-  Expressive, with colors made of the cover's, and Crate and Crate Light
-  pack big covers into dense card grids under heavy headings.
+- **Layouts.** Blend, the default, has rounded shapes and springy motion
+  on dense rows of big covers. Expressive, after Material 3 Expressive, is
+  playful, with tonal fills, pill buttons and a floating player bar. Crate
+  is restrained, so that the covers do the work, and Tiles is MixMusic's
+  first look, with flat tiles and giant lowercase words.
+- **Themes.** Fourteen built in, each in any layout, with effects you can
+  tune, one theme for light mode and one for dark mode, and an accent
+  color of your own or taken from the artwork that plays. Material and
+  Material Dark make every color of the cover's.
 - **Community themes and plugins,** one click away in the marketplace.
 - **Plugins** add pages, commands, track actions and widgets through a
   typed API, drawn in your theme.
@@ -406,8 +409,8 @@ store icon in the sidebar, and you can add yours.
 
 ### Make a theme
 
-A theme is a `theme.json` file that sets colors, fonts and corners, and
-may set its layout: shapes, density, covers and headings.
+A theme is a `theme.json` file that sets colors, fonts and corners, which
+show in the layout the user chose.
 [docs/themes.md](docs/themes.md) lists every token and shows a complete
 theme. To try yours, put its folder in the themes folder (Settings ›
 Appearance › open themes folder) and choose it in Settings › Appearance.

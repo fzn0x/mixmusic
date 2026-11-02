@@ -14,8 +14,9 @@
   Google accounts of the session and their brand channels, from YouTube's
   website, and uses a brand channel by its page ID: one whose page ID the
   list doesn't tell is listed as `Unswitchable`, as without it the account
-  itself would be used. Once the app switches, it checks that YouTube Music
-  answers as the channel chosen, else goes back. It also reads
+  itself would be used. Once the app switches to a brand channel, it goes
+  back if YouTube Music answers as the Google account itself, as the list
+  names it; any other answer keeps the switch. It also reads
   whether YouTube labels a video as made with AI, from the answer of
   YouTube's own website, asked signed out with a field mask
   (`MadeWithAI`): nothing of YouTube Music carries the label. Its parsers

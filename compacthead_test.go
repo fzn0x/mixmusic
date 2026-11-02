@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"os"
 	"slices"
 	"testing"
 	"time"
@@ -291,4 +292,35 @@ func TestBarHeadOtherPage(t *testing.T) {
 		t.Errorf("back, the page is at %v, not %v, and the top bar shows %q", s.here.scroll.Y, at, tt.Texts())
 	}
 	settled(t, tt)
+}
+
+// TestRenderBarHead draws a playlist scrolled past its head, in each
+// layout design and in themes of grounds of their own, to
+// MIXMUSIC_RENDER, for a look.
+func TestRenderBarHead(t *testing.T) {
+	dir := os.Getenv("MIXMUSIC_RENDER")
+	if dir == "" {
+		t.Skip("MIXMUSIC_RENDER names no folder")
+	}
+	for _, layout := range settings.Layouts {
+		for _, theme := range []string{"mix", "aurora", "glasshouse", "daylight"} {
+			s := newTestShell(t)
+			base := coverServer(t, s)
+			s.set.Layout = layout
+			wear(s, theme, nil)
+			p := longPlaylist(s, "yt:PLlong", "Late night drive", 80)
+			p.Artwork = []media.Image{{URL: base + "/cover/3.png", Width: 300, Height: 300}}
+			s.loads["playlist:"+p.ID].(*loaded[media.Playlist]).value = p
+			tt := tester(t, s)
+			show(s, tt, playlistPath(p.ID))
+			name := string(layout) + "-" + theme
+			renderTo(t, s, tt, dir, name+"-playlist-top")
+			scrollBy(tt, 1500)
+			renderTo(t, s, tt, dir, name+"-playlist-scrolled")
+			tt.SetSize(800, 600)
+			tt.Frame()
+			tt.Advance(time.Second)
+			renderTo(t, s, tt, dir, name+"-playlist-narrow")
+		}
+	}
 }

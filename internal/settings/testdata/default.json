@@ -62,6 +62,7 @@
   "mediaKeys": true,
   "showOnDiscord": true,
   "discordAppId": "",
+  "notchPlayer": true,
   "ytdlpPath": "",
   "jsRuntime": "",
   "shortcuts": {},

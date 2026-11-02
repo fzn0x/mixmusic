@@ -375,7 +375,7 @@ halaman `/docs/` di situs itu. `go run ./tools/sitedocs && zola --root site serv
 menampilkan pratinjaunya. Rilis dibangun di shell Nix dan diterbitkan oleh
 [GoReleaser](https://goreleaser.com) (`.goreleaser.yaml`).
 
-[docs/architecture.md](docs/architecture.md) menjelaskan bagaimana
+[docs/architecture](docs/architecture/README.md) menjelaskan bagaimana
 bagian-bagiannya saling terhubung.
 
 ### Struktur kode

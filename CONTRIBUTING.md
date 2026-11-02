@@ -35,7 +35,7 @@ bun run typecheck
 go run ./tools/registry -check
 ```
 
-[docs/architecture.md](docs/architecture.md) tells where things live. A few
+[docs/architecture](docs/architecture/README.md) tells where things live. A few
 rules keep the project healthy:
 
 - **Every system.** Changes must build for macOS, Windows and Linux; `GOOS=linux go vet ./...` and `GOOS=darwin go vet ./...` check them from Windows.

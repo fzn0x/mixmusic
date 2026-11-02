@@ -244,7 +244,7 @@ bun run build -- -platform windows/amd64,linux/amd64,linux/arm64
 
 [网站](https://fzn0x.github.io/mixmusic/)的源码在 `site/` 中，用 [Zola](https://www.getzola.org) 构建，`docs/` 中的指南就是网站的 `/docs/` 页面。运行 `go run ./tools/sitedocs && zola --root site serve` 可以预览网站。正式版本在 Nix shell 中构建，由 [GoReleaser](https://goreleaser.com) 发布（`.goreleaser.yaml`）。
 
-[docs/architecture.md](docs/architecture.md) 介绍了各个部分是如何配合工作的。
+[docs/architecture](docs/architecture/README.md) 介绍了各个部分是如何配合工作的。
 
 ### 目录结构
 

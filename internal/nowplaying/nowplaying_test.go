@@ -1,6 +1,9 @@
 package nowplaying
 
 import (
+	"bytes"
+	"image"
+	"image/png"
 	"sync"
 	"testing"
 	"time"
@@ -75,7 +78,8 @@ func TestDiffAtRate(t *testing.T) {
 
 func TestDiff(t *testing.T) {
 	at := time.Unix(1000, 0)
-	base := &Info{ID: "yt:a", Title: "A", Artists: []string{"X"}, Duration: time.Minute, Position: 10 * time.Second, At: at, Playing: true, Volume: 1}
+	base := &Info{ID: "yt:a", Title: "A", Artists: []string{"X"}, Artwork: "https://example.com/a.jpg", Duration: time.Minute,
+		Position: 10 * time.Second, At: at, Playing: true, Volume: 1}
 	with := func(f func(*Info)) *Info {
 		i := *base
 		i.Artists = append([]string(nil), base.Artists...)
@@ -97,7 +101,9 @@ func TestDiff(t *testing.T) {
 		}), change{playing: true}},
 		{"another track", with(func(i *Info) { i.ID, i.Position = "yt:b", 0 }), change{track: true}},
 		{"another artist", with(func(i *Info) { i.Artists = []string{"X", "Y"} }), change{track: true}},
-		{"its artwork", with(func(i *Info) { i.Artwork = "https://example.com/a.jpg" }), change{track: true}},
+		{"its artwork", with(func(i *Info) { i.Artwork = "https://example.com/b.jpg" }), change{track: true}},
+		{"its cover", with(func(i *Info) { i.Cover = []byte("jpeg") }), change{track: true}},
+		{"its cover's file", with(func(i *Info) { i.CoverFile = "/cache/a.jpg" }), change{track: true}},
 		{"its duration", with(func(i *Info) { i.Duration = 2 * time.Minute }), change{track: true}},
 		{"the volume", with(func(i *Info) { i.Volume = 0.5 }), change{volume: true}},
 	} {
@@ -148,6 +154,13 @@ func eventually(t *testing.T, what string, ok func() bool) {
 		}
 		time.Sleep(5 * time.Millisecond)
 	}
+}
+
+// testCover is a cover, a PNG of 32×32 pixels.
+func testCover() []byte {
+	var b bytes.Buffer
+	png.Encode(&b, image.NewRGBA(image.Rect(0, 0, 32, 32)))
+	return b.Bytes()
 }
 
 func request(t *testing.T, got <-chan Request) Request {

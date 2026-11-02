@@ -149,6 +149,112 @@ func TestRun(t *testing.T) {
 	}
 }
 
+func TestFolder(t *testing.T) {
+	root := repo(t, map[string]string{
+		"docs/arch/README.md": "# Arch\n\nHow it is made, in parts that each have a file.\n\n" +
+			"1. [Two](two.md): the second.\n2. [One](one.md#deep): the first.\n\n" +
+			"See [the guide](../guide.md), [the folder](./) and ![a picture](pic.png).\n",
+		"docs/arch/one.md": "# One `pkg`\n\nOne links to [two](two.md), [its README](README.md) and <a href=\"two.md\">two</a>.\n\n" +
+			"## Deep\n\n```\n# not a heading\n```\n\n![pic](pic.png)\n",
+		"docs/arch/two.md":   "# Two\n\nTwo links to [the guide](../guide.md#top) and [code](../../src/main.go).\n",
+		"docs/arch/three.md": "# Three\n",
+		"docs/arch/pic.png":  "pic",
+		"docs/guide.md":      "# Guide\n\nSee [the parts](arch/README.md), [one](arch/one.md), [two's end](arch/two.md#end) and [the folder](arch/).\n",
+		"docs/shots/a.png":   "a folder without a README, which is no page",
+		"src/main.go":        "package main",
+	})
+	docs, err := run(opts(root))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var slugs []string
+	for _, d := range docs {
+		slugs = append(slugs, d.slug)
+	}
+	if got := strings.Join(slugs, " "); got != "arch guide" {
+		t.Errorf("pages: %s", got)
+	}
+
+	out := filepath.Join(root, "site", "content", "docs")
+	page := readFile(t, filepath.Join(out, "arch", "index.md"))
+	want := "+++\n" +
+		marker + "docs/arch/: edit its files, not this one.\n" +
+		"title = \"Arch\"\n" +
+		"description = \"How it is made, in parts that each have a file.\"\n" +
+		"weight = 10\n" +
+		"\n" +
+		"[extra]\n" +
+		"source = \"docs/arch/\"\n" +
+		"+++\n" +
+		"\n" +
+		"How it is made, in parts that each have a file.\n" +
+		"\n" +
+		"1. [Two](@/docs/arch/index.md#two): the second.\n" +
+		"2. [One](@/docs/arch/index.md#deep): the first.\n" +
+		"\n" +
+		"See [the guide](@/docs/guide/index.md), [the folder](@/docs/arch/index.md) and ![a picture](@/docs/arch/arch/pic.png).\n" +
+		"\n" +
+		"## Two {#two}\n" +
+		"\n" +
+		"Two links to [the guide](@/docs/guide/index.md#top) and [code](https://github.com/owner/name/blob/main/src/main.go).\n" +
+		"\n" +
+		"## One `pkg` {#one}\n" +
+		"\n" +
+		"One links to [two](@/docs/arch/index.md#two), [its README](@/docs/arch/index.md) and <a href=\"../arch/#two\">two</a>.\n" +
+		"\n" +
+		"### Deep\n" +
+		"\n" +
+		"```\n" +
+		"# not a heading\n" +
+		"```\n" +
+		"\n" +
+		"![pic](@/docs/arch/arch/pic.png)\n" +
+		"\n" +
+		"## Three {#three}\n"
+	if page != want {
+		t.Errorf("arch page:\n%s\nwant:\n%s", page, want)
+	}
+	if got := readFile(t, filepath.Join(out, "arch", "arch", "pic.png")); got != "pic" {
+		t.Errorf("arch/pic.png: %q", got)
+	}
+
+	guide := readFile(t, filepath.Join(out, "guide", "index.md"))
+	if s := "See [the parts](@/docs/arch/index.md), [one](@/docs/arch/index.md#one), [two's end](@/docs/arch/index.md#end) and [the folder](@/docs/arch/index.md).\n"; !strings.Contains(guide, s) {
+		t.Errorf("guide page lacks %q:\n%s", s, guide)
+	}
+	if _, err := os.Stat(filepath.Join(out, "shots")); !os.IsNotExist(err) {
+		t.Errorf("a folder without a README has a page: %v", err)
+	}
+}
+
+func TestFolderAndFile(t *testing.T) {
+	root := repo(t, map[string]string{
+		"docs/arch.md":        "# Arch\n",
+		"docs/arch/README.md": "# Arch\n",
+	})
+	if _, err := run(opts(root)); err == nil || !strings.Contains(err.Error(), "docs/arch.md and docs/arch/README.md would both be the page /docs/arch/") {
+		t.Errorf("error: %v", err)
+	}
+}
+
+func TestFolderBrokenLink(t *testing.T) {
+	root := repo(t, map[string]string{
+		"docs/arch/README.md": "# Arch\n\n[One](one.md)\n",
+		"docs/arch/one.md":    "# One\n\nText.\n\n[gone](gone.md)\n",
+	})
+	if _, err := run(opts(root)); err == nil || !strings.Contains(err.Error(), "docs/arch/one.md:5: gone.md: not in the repository") {
+		t.Errorf("error: %v", err)
+	}
+}
+
+func TestAnchor(t *testing.T) {
+	for name, want := range map[string]string{"player": "player", "Audio engine": "audio-engine", "a--b_c.d": "a-b_c-d", "-x-": "x"} {
+		if got := anchor(name); got != want {
+			t.Errorf("anchor(%q) = %q, want %q", name, got, want)
+		}
+	}
+}
+
 func TestBrokenLinks(t *testing.T) {
 	root := repo(t, map[string]string{
 		"docs/a.md": "# A\n\nText.\n\n[gone](gone.md) and ![gone](shots/gone.png)\n\n[out](../../elsewhere.md)\n",

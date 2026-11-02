@@ -1,7 +1,7 @@
 +++
-# The docs section: each of its pages is made from one of docs/*.md by
-# go run ./tools/sitedocs, which gives it its title, description and
-# order.
+# The docs section: each of its pages is made from one of docs/*.md, or
+# a folder of docs/ with a README.md, by go run ./tools/sitedocs, which
+# gives it its title, description and order.
 title = "Docs"
 description = "How to sign in to Spotify, make a theme or a plugin, and how MixMusic is made."
 sort_by = "weight"

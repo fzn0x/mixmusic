@@ -365,7 +365,7 @@ The [website](https://fzn0x.github.io/mixmusic/) is in `site/`, built with
 previews it. Releases are built in the Nix shell and published by
 [GoReleaser](https://goreleaser.com) (`.goreleaser.yaml`).
 
-[docs/architecture.md](docs/architecture.md) explains how the parts fit
+[docs/architecture](docs/architecture/README.md) explains how the parts fit
 together.
 
 ### Layout

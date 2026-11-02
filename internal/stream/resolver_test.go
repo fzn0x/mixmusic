@@ -154,12 +154,15 @@ func TestExpiry(t *testing.T) {
 // playlist of its audio, of no size and no length.
 func TestResolveLive(t *testing.T) {
 	r := NewResolver(nil, "")
-	out := `{"url": "https://manifest.googlevideo.com/api/manifest/hls_playlist/expire/1793600000/itag/234/playlist/index.m3u8",
+	// The playlist's URL expires in six hours, as YouTube's do: a fixed
+	// time would make the stream stale, and the test fail, once it passed.
+	expires := time.Now().Add(6 * time.Hour).Unix()
+	out := fmt.Sprintf(`{"url": "https://manifest.googlevideo.com/api/manifest/hls_playlist/expire/%d/itag/234/playlist/index.m3u8",
 		"ext": "mp4", "acodec": null, "protocol": "m3u8_native", "live_status": "is_live", "is_live": true, "duration": null,
-		"format_id": "234", "http_headers": {"User-Agent": "test"}}`
+		"format_id": "234", "http_headers": {"User-Agent": "test"}}`, expires)
 	r.Run = func(context.Context, ...string) ([]byte, error) { return []byte(out), nil }
 	s, err := r.Resolve(context.Background(), testID)
-	if err != nil || !s.Live || s.Codec != "mp4a.40.2" || s.Size != 0 || s.Duration != 0 || s.Expires.Unix() != 1793600000 ||
+	if err != nil || !s.Live || s.Codec != "mp4a.40.2" || s.Size != 0 || s.Duration != 0 || s.Expires.Unix() != expires ||
 		s.Header.Get("User-Agent") != "test" || s.Measured {
 		t.Errorf("stream %+v, %v", s, err)
 	}

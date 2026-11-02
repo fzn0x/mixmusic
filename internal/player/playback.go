@@ -917,7 +917,7 @@ func (p *Player) apply() {
 	if p.s.Muted {
 		v = 0
 	}
-	p.stream.SetVolume(v)
+	p.setStreamVolume()
 	p.connect.setVolume(v)
 	p.report()
 }

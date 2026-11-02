@@ -36,6 +36,11 @@ func (s *castStream) cued() []string {
 	return slices.Clone(s.tracks)
 }
 
+// mutingStream is a cast device that mutes by itself.
+type mutingStream struct{ *castStream }
+
+func (s *mutingStream) SetMuted(muted bool) { s.record("muted %v", muted) }
+
 // TestOutputMovesTheStream loads the track that plays again where it was
 // as its streams go to a cast device, playing, with the track for the
 // device's screen, and back to the computer; the output it leaves lets go
@@ -160,6 +165,16 @@ func TestOutputVolume(t *testing.T) {
 	if got := cast.last("volume"); got != "volume 0.25" {
 		t.Errorf("unmuted the device with %q", got)
 	}
+	// A device that mutes by itself keeps its volume, muted.
+	muting := &mutingStream{castStream: newCastStream(h)}
+	h.p.SetOutput(Output{Stream: muting, Volume: 0.4})
+	h.p.ToggleMute()
+	h.wait("muted", func(p *Player) bool { return p.s.Muted })
+	if got := muting.copy(); !slices.Equal(got[len(got)-2:], []string{"muted true", "volume 0.4"}) {
+		t.Errorf("muted the device with %q", got)
+	}
+	h.p.ToggleMute()
+	h.wait("unmuted", func(p *Player) bool { return !p.s.Muted })
 	time.Sleep(4 * saveVolumeAfter)
 	h.p.Flush()
 	var v []float64

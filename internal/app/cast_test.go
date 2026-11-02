@@ -278,17 +278,19 @@ func TestCastOutCommands(t *testing.T) {
 	f.calls = nil
 	f.mu.Unlock()
 
-	f.volume.Muted = true
 	o.onVolume(cast.Volume{Level: 0.4, Muted: true}, func(float64, bool) {})
 	for _, v := range []float64{0.1, 0.2, 0.3} {
+		o.SetMuted(false)
 		o.SetVolume(v)
 	}
 	f.wait(t, "volume 0.3")
 	if f.has("volume 0.2") {
 		t.Error("a volume asked in between was sent")
 	}
-	if !f.has("muted false") {
-		t.Error("a volume above 0 left the device muted")
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if n := strings.Count(strings.Join(f.calls, ","), "muted false"); n != 1 {
+		t.Errorf("unmuted %d times: %q", n, f.calls)
 	}
 }
 

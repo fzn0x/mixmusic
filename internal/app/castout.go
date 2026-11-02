@@ -315,8 +315,8 @@ func (o *castOut) Seek(t time.Duration) {
 	}
 }
 
-// SetVolume sets the device's volume, unmuting it for one above 0. While a
-// command of the volume waits, the last volume asked takes its place.
+// SetVolume sets the device's volume. While a command of the volume waits,
+// the last volume asked takes its place.
 func (o *castOut) SetVolume(v float64) {
 	o.mu.Lock()
 	o.volumeSet = time.Now()
@@ -330,17 +330,30 @@ func (o *castOut) SetVolume(v float64) {
 		o.mu.Lock()
 		v := *o.pendingVolume
 		o.pendingVolume = nil
-		muted := o.muted
 		o.mu.Unlock()
-		if muted && v > 0 {
-			if err := o.session.SetMuted(ctx, false); err == nil {
-				o.mu.Lock()
-				o.muted = false
-				o.mu.Unlock()
-			}
-		}
 		if err := o.session.SetVolume(ctx, v); err != nil {
 			log.Printf("mixmusic: setting the cast device's volume: %v", err)
+		}
+		o.mu.Lock()
+		o.volumeSet = time.Now()
+		o.mu.Unlock()
+	})
+}
+
+// SetMuted mutes the device, or unmutes it, unless it is so: the device
+// keeps its volume while muted.
+func (o *castOut) SetMuted(muted bool) {
+	o.mu.Lock()
+	same := o.muted == muted
+	o.muted = muted
+	o.volumeSet = time.Now()
+	o.mu.Unlock()
+	if same {
+		return
+	}
+	o.do(func(ctx context.Context) {
+		if err := o.session.SetMuted(ctx, muted); err != nil {
+			log.Printf("mixmusic: muting the cast device: %v", err)
 		}
 		o.mu.Lock()
 		o.volumeSet = time.Now()

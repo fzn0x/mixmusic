@@ -56,7 +56,7 @@ func (p *Player) setOutput(o Output) {
 		p.stream = p.engine
 		p.s.Volume, p.s.Muted = p.home.volume, p.home.muted
 		// The engine gets the computer's volume again.
-		p.stream.SetVolume(p.heardVolume())
+		p.setStreamVolume()
 	}
 	left.Unload()
 	p.emit(StateChange)
@@ -91,6 +91,21 @@ func clampVolume(v, or float64) float64 {
 		return or
 	}
 	return min(max(v, 0), 1)
+}
+
+// muter is a stream that mutes by itself, as a cast device does: it keeps
+// its volume while muted.
+type muter interface{ SetMuted(muted bool) }
+
+// setStreamVolume gives the stream the volume: 0 while muted, or its own
+// mute where it has one.
+func (p *Player) setStreamVolume() {
+	if m, ok := p.stream.(muter); ok {
+		m.SetMuted(p.s.Muted)
+		p.stream.SetVolume(p.s.Volume)
+		return
+	}
+	p.stream.SetVolume(p.heardVolume())
 }
 
 // heardVolume is the volume the outputs play at: 0 while muted.

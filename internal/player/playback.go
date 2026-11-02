@@ -329,6 +329,10 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	entry := p.s.Queue[i]
 	if cur, ok := p.s.Current(); !ok || cur.UID != entry.UID {
 		p.s.Live = false // until its stream is found
+		// An episode that becomes current goes on where the user left it.
+		if start == 0 {
+			start = p.resumeAt(entry.Track)
+		}
 	}
 	p.loadToken++
 	token := p.loadToken
@@ -668,7 +672,8 @@ func (p *Player) onProgress() {
 	// 10 s of the track before its end.
 	fade := time.Duration(p.svc.Settings().Crossfade) * time.Second
 	if fade > 0 && !p.crossfading && p.s.Source != nil && p.s.Source.Mode == ModeStream &&
-		hasNext && next.UID != entry.UID && dur > 0 && p.heard(dur-pos) <= fade && p.heard(dur) > 3*fade && p.mayStart(next) {
+		hasNext && next.UID != entry.UID && dur > 0 && p.heard(dur-pos) <= fade && p.heard(dur) > 3*fade && p.mayStart(next) &&
+		!spoken(entry.Track) && !spoken(next.Track) {
 		p.crossfadeTo(next, fade)
 	}
 	p.reporting.call(p, func() {
@@ -682,8 +687,9 @@ func (p *Player) onProgress() {
 func (p *Player) preload(next Item) {
 	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
 		// A live stream isn't: what the engine would hold of it would be
-		// behind its live edge by then.
-		if err == nil && src.Mode == ModeStream && src.URL != "" && !src.Live {
+		// behind its live edge by then. Nor is an episode, which the
+		// engine would hold whole beside the track that plays.
+		if err == nil && src.Mode == ModeStream && src.URL != "" && !src.Live && !spoken(next.Track) {
 			p.stream.Preload(src.audio(p.surround))
 		}
 		if errors.Is(err, ErrOffline) {

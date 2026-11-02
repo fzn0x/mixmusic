@@ -260,13 +260,17 @@ func (p *Player) fallBackToStereo(why string) {
 }
 
 // speedOf is the speed the settings s play t at in MixMusic's own engine:
-// a song's, of which a Spotify track played from YouTube Music is one. A
-// live stream plays at its own, as it is broadcast: from near its live
-// edge, faster would run out of what came of it, and slower would fall
-// behind until its playlist dropped what hadn't played.
+// a podcast's episode's, or a song's, of which a Spotify track played from
+// YouTube Music is one. A live stream plays at its own, as it is
+// broadcast: from near its live edge, faster would run out of what came of
+// it, and slower would fall behind until its playlist dropped what hadn't
+// played.
 func speedOf(s settings.Settings, t media.Track, live bool) float64 {
-	if live {
+	switch {
+	case live:
 		return 1
+	case t.IsEpisode():
+		return settings.CleanSpeed(s.PodcastSpeed)
 	}
 	return settings.CleanSpeed(s.SongSpeed)
 }

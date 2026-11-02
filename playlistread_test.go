@@ -15,10 +15,12 @@ import (
 )
 
 // slowPages is a service's playlist of tracks, read two at a time, a page
-// once the test lets it: nil reads the page, an error fails it.
+// once the test lets it: nil reads the page, an error fails it. key is the
+// fetch of the page whose reading the test follows.
 type slowPages struct {
 	tracks []media.Track
 	gate   chan error
+	key    string
 }
 
 func (f *slowPages) read(ctx context.Context, token string) ([]media.Track, string, error) {
@@ -41,35 +43,50 @@ func (f *slowPages) read(ctx context.Context, token string) ([]media.Track, stri
 
 const longPlaylistID = "yt:PLlong"
 
-// longPage shows the page of a playlist of the six test tracks, whose
-// first page holds two, and whose pages after it come as the test lets
-// them, read as a playlist's are: a page that fails is tried again.
-func longPage(t *testing.T) (*shell, *ui.Tester, *slowPages) {
+// slowReading has the shell read the playlists of the six test tracks
+// whose first page holds two, as a playlist's are read, a page that fails
+// tried again, the pages after it coming as the test lets them. It follows
+// the reading of the fetch of key.
+func slowReading(t *testing.T, s *shell, key string) *slowPages {
 	t.Helper()
 	waits := media.PageWaits
 	media.PageWaits = []time.Duration{time.Millisecond, time.Millisecond, time.Millisecond}
-	f := &slowPages{tracks: testTracks, gate: make(chan error)}
+	f := &slowPages{tracks: testTracks, gate: make(chan error), key: key}
 	read := readPlaylistOn
 	readPlaylistOn = func(s *shell, ctx context.Context, p media.Playlist, onPage func(media.Playlist)) (media.Playlist, error) {
 		err := p.ReadOn(ctx, f.read, onPage)
 		return p, err
 	}
-	s := newTestShell(t)
 	t.Cleanup(func() {
 		readPlaylistOn, media.PageWaits = read, waits
-		if r := readOf(s); r != nil && r.cancel != nil {
+		if r := f.reading(s); r != nil && r.cancel != nil {
 			r.cancel()
 		}
 	})
-	s.loads["playlist:"+longPlaylistID] = &loaded[media.Playlist]{done: true, value: media.Playlist{ID: longPlaylistID,
-		Source: media.SourceYouTube, Title: "Long", Owner: "Someone", TrackCount: len(testTracks), Tracks: testTracks[:2], More: "2"}}
+	return f
+}
+
+// longHead is the first page of the playlist of slowReading.
+func longHead(id string) *loaded[media.Playlist] {
+	return &loaded[media.Playlist]{done: true, value: media.Playlist{ID: id, Source: media.SourceYouTube, Title: "Long",
+		Owner: "Someone", TrackCount: len(testTracks), Tracks: testTracks[:2], More: "2"}}
+}
+
+// longPage shows the page of the playlist of slowReading.
+func longPage(t *testing.T) (*shell, *ui.Tester, *slowPages) {
+	t.Helper()
+	s := newTestShell(t)
+	key := "playlist:" + longPlaylistID
+	f := slowReading(t, s, key)
+	s.loads[key] = longHead(longPlaylistID)
 	tt := tester(t, s)
 	show(s, tt, playlistPath(longPlaylistID))
 	return s, tt, f
 }
 
-func readOf(s *shell) *playlistRead {
-	r, _ := s.loads["playlist:"+longPlaylistID+" read"].(*playlistRead)
+// reading is the reading the test follows.
+func (f *slowPages) reading(s *shell) *playlistRead {
+	r, _ := s.loads[f.key+" read"].(*playlistRead)
 	return r
 }
 
@@ -87,7 +104,7 @@ func (f *slowPages) let(t *testing.T, err error) {
 // page lets the next page come, and draws the page once it took it.
 func (f *slowPages) page(t *testing.T, s *shell, tt *ui.Tester) {
 	t.Helper()
-	r := readOf(s)
+	r := f.reading(s)
 	n := len(r.p.Tracks)
 	f.let(t, nil)
 	waitFor(t, s, func() bool { return len(r.p.Tracks) > n || !r.reading })
@@ -101,7 +118,7 @@ func (f *slowPages) fail(t *testing.T, s *shell, tt *ui.Tester, err error) {
 	for range len(media.PageWaits) + 1 {
 		f.let(t, err)
 	}
-	r := readOf(s)
+	r := f.reading(s)
 	waitFor(t, s, func() bool { return r.err != nil })
 	tt.Frame()
 }
@@ -189,7 +206,7 @@ func TestLongPlaylistPageFails(t *testing.T) {
 		t.Errorf("trying again shows %q", tt.Texts())
 	}
 	f.page(t, s, tt)
-	r := readOf(s)
+	r := f.reading(s)
 	if ids := func(ts []media.Track) []string {
 		out := make([]string, len(ts))
 		for i, tr := range ts {
@@ -218,5 +235,24 @@ func TestLongPlaylistCut(t *testing.T) {
 	show(s, tt, playlistPath("yt:PLcut"))
 	if !tt.HasText("This playlist has 25,000 tracks: MixMusic shows and plays its first 20,000.") {
 		t.Errorf("the page shows %q", tt.Texts())
+	}
+}
+
+// TestYouTubeLikedReadsOn shows the first page of the songs the user liked
+// on YouTube Music at once, in the library, and the rest as they come.
+func TestYouTubeLikedReadsOn(t *testing.T) {
+	s := newTestShell(t)
+	youtubeLibraryOf(s)
+	f := slowReading(t, s, "youtube:liked")
+	s.loads["youtube:liked"] = longHead("yt:LM")
+	tt := testerOf(t, s, 1280, 1800)
+	show(s, tt, "/library/youtube")
+	if !tt.HasText("Loading tracks · 2 of 6") || !tt.HasText(testTracks[1].Title) || tt.HasText(testTracks[2].Title) {
+		t.Fatalf("the first page shows %q", tt.Texts())
+	}
+	f.page(t, s, tt)
+	f.page(t, s, tt)
+	if tt.HasText("Loading tracks") || !tt.HasText(testTracks[5].Title) {
+		t.Errorf("the whole list shows %q", tt.Texts())
 	}
 }

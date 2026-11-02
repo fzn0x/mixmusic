@@ -535,7 +535,7 @@ func TestNewYouTubePlaylist(t *testing.T) {
 	s.loads["youtube:playlists"] = &loaded[[]media.Playlist]{done: true}
 	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true}
 	s.loads["youtube:artists"] = &loaded[[]media.Artist]{done: true}
-	s.loads["youtube:liked"] = &loaded[[]media.Track]{done: true}
+	s.loads["youtube:liked"] = &loaded[media.Playlist]{done: true}
 	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
 	tt := tester(t, s)
 	show(s, tt, "/album/al-x")
@@ -609,7 +609,7 @@ func youtubeLibraryOf(s *shell, playlists ...media.Playlist) *loaded[[]media.Pla
 	s.loads["youtube:playlists"] = l
 	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true}
 	s.loads["youtube:artists"] = &loaded[[]media.Artist]{done: true}
-	s.loads["youtube:liked"] = &loaded[[]media.Track]{done: true}
+	s.loads["youtube:liked"] = &loaded[media.Playlist]{done: true}
 	return l
 }
 

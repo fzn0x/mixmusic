@@ -15,13 +15,10 @@ import (
 // is not signed in to.
 var errNotSignedIn = errors.New("sign in to that service in Settings › Accounts to keep it in your library there")
 
-// YouTubeLikedTracks returns the user's liked songs on YouTube Music.
-func (c *Collection) YouTubeLikedTracks(ctx context.Context) ([]media.Track, error) {
-	p, err := c.a.youtube.LikedSongs(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return p.Tracks, nil
+// YouTubeLiked returns the user's liked songs on YouTube Music, as the
+// playlist of their first page, which Catalog.ReadOn reads on from.
+func (c *Collection) YouTubeLiked(ctx context.Context) (media.Playlist, error) {
+	return c.a.youtube.LikedSongs(ctx)
 }
 
 // YouTubePlaylists returns the playlists the user made or saved on YouTube

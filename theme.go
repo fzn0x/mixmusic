@@ -128,6 +128,11 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 			a = readableOn(a, bg)
 		}
 		accent, accentText = a, inkOn(a)
+	} else if design.tonal && mat == nil {
+		// The theme's own accent too, which it chose for Tiles.
+		if a := legibleOn(accent, over(tok("surface"), bg), 4.5); a != accent {
+			accent, accentText = a, inkOn(a)
+		}
 	}
 	k := look{dark: th.Scheme != "light", systemDark: dark, scale: float32(s.FontScale), compact: s.Density == settings.DensityCompact}
 	if th.ID == "" {
@@ -172,8 +177,11 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 		k.selected, k.selectedText, k.selectedSub = col(mat.selected), col(mat.selectedText), col(mat.selectedText)
 		k.tonalFill, k.tonalInk = k.selected, k.selectedText
 	case k.tonal:
-		// The highest surface, with the accent's ink, as it reads there.
-		k.selected, k.selectedText, k.selectedSub = k.tonalFill, col(legibleOn(nrgba(k.accent), nrgba(k.tonalFill), 4.5)), k.muted
+		// The highest surface, with the accent's ink and the muted text's,
+		// as they read there.
+		k.selected = k.tonalFill
+		k.selectedText = col(legibleOn(nrgba(k.accent), nrgba(k.tonalFill), 4.5))
+		k.selectedSub = col(legibleOn(nrgba(k.muted), nrgba(k.tonalFill), 4.5))
 	}
 
 	t := *ui.DarkTheme()

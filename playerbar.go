@@ -264,7 +264,7 @@ func pulses(st player.State) bool { return st.Buffering || st.Waiting && st.Will
 
 // progress shows where the track is, and seeks once the user lets go. A
 // live stream shows that it is, in place of a time and a length, and has
-// no seeking.
+// no seeking; nor has a track that loads, as it can't be paused either.
 func (s *shell) progress(c *ui.Context) {
 	k := &s.lk
 	if s.st.Live {
@@ -289,7 +289,7 @@ func (s *shell) progress(c *ui.Context) {
 		ui.Text(c, clock(time.Duration(s.seekTo*float64(time.Second)))).FontSize(k.captionSize()).TextColor(k.muted).
 			FontFeatures("tnum").Width(44).TextAlign(ui.End)
 		seek := ui.Slider(c.Key("seek"), &s.seekTo, 0, max(dur.Seconds(), 1)).Grow(1).MinWidth(0).KeepFocus().
-			Label("Seek").Disabled(!ok)
+			Label("Seek").Disabled(!ok || s.st.Loading)
 		_, _, held := seek.Dragged()
 		if ok && !held && (s.seeking || seek.Changed()) {
 			s.p.Seek(time.Duration(s.seekTo * float64(time.Second)))

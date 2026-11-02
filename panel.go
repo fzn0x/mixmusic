@@ -305,7 +305,9 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 				}
 			})
 		}
-		if synced {
+		// A line plays the song from there, once it plays: a song that
+		// loads isn't moved.
+		if synced && !s.st.Loading {
 			p.Cursor(ui.CursorPointer)
 			if p.Clicked() {
 				s.p.Seek(ms(line.TimeMs))

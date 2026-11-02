@@ -478,8 +478,9 @@ func TestNotchLyricsWhileLoading(t *testing.T) {
 			t.Errorf("for %q, the panel shows %q", c.want, x.tt.Texts())
 		}
 	}
+	failed := s.loads["lyrics:"+testTracks[1].ID]
 	x.click("try again")
-	if s.loads["lyrics:"+testTracks[1].ID] == nil || s.loads["lyrics:"+testTracks[1].ID].(*loaded[lyrics.Lyrics]).done {
+	if s.loads["lyrics:"+testTracks[1].ID] == failed {
 		t.Error("try again didn't ask for the lyrics again")
 	}
 }

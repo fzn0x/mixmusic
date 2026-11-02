@@ -6,6 +6,8 @@
 # script and assets, copied as they are. The docs are content/docs, shown
 # by templates/docs and styled by static/docs.css.
 
+# GitHub Pages' address. cloudflare.yml builds the copy at
+# https://mixmusic.functionx.dev with --base-url.
 base_url = "https://fzn0x.github.io/mixmusic"
 title = "MixMusic"
 description = "Spotify and YouTube Music in one free, open-source desktop player for macOS, Windows and Linux."

@@ -13,7 +13,8 @@ import (
 type track interface {
 	// seek moves the track to the last packet that starts at or before t,
 	// in the time of the packets, and resets the decoder: the packet read
-	// next decodes as the first of a stream.
+	// next decodes as the first of a stream. A live track can't move: the
+	// packets it reads next are at t.
 	seek(t time.Duration) error
 	// read reads the next packet, which decode decodes: io.EOF after the
 	// last one.
@@ -49,18 +50,25 @@ type timing struct {
 	// total is the duration of the file, codec delay included, 0 when it
 	// doesn't tell.
 	total time.Duration
+	// live is set for a live stream, which plays on from where it starts:
+	// it has no length, and seeks only tell the time of what comes next.
+	live bool
 }
 
 // openTrack reads the headers of a file, from its start, and returns its
-// audio track, and when it plays: the AAC of an MP4 file, else the Opus of
-// a WebM one. Its errors are worded for the player.
+// audio track, and when it plays: the AAC of an MP4 file, or of HLS packed
+// audio, else the Opus of a WebM one. Its errors are worded for the
+// player.
 func openTrack(src io.ReadSeeker) (track, timing, error) {
-	isMP4, err := sniffMP4(src)
+	kind, err := sniff(src)
 	if err != nil {
 		return nil, timing{}, readError(err)
 	}
-	if isMP4 {
+	switch kind {
+	case mp4File:
 		return openAAC(src)
+	case packedAudio:
+		return openPacked(src)
 	}
 	r, err := webm.NewReader(src)
 	if err != nil {
@@ -69,26 +77,40 @@ func openTrack(src io.ReadSeeker) (track, timing, error) {
 	return openOpus(r)
 }
 
-// sniffMP4 tells whether a file is an MP4 one, by the type of its first
-// box, at byte 4, and goes back to its start. A WebM file starts with
-// EBML's magic number, 1A 45 DF A3, instead.
-func sniffMP4(src io.ReadSeeker) (bool, error) {
+// container is the kind of a file of audio.
+type container int
+
+const (
+	webmFile container = iota
+	mp4File
+	// packedAudio is the AAC of HLS packed audio, in ADTS frames.
+	packedAudio
+)
+
+// sniff tells the kind of a file by its first bytes, and goes back to its
+// start: an MP4 file by the type of its first box, at byte 4, and packed
+// audio by its ID3 tag, or the syncword of an ADTS frame. A WebM file
+// starts with EBML's magic number, 1A 45 DF A3, instead.
+func sniff(src io.ReadSeeker) (container, error) {
 	var head [8]byte
 	n, err := io.ReadFull(src, head[:])
 	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
-		return false, err
+		return webmFile, err
 	}
 	if _, err := src.Seek(0, io.SeekStart); err != nil {
-		return false, err
+		return webmFile, err
 	}
-	if n < len(head) {
-		return false, nil // the WebM reader tells what is wrong
+	switch {
+	case n >= 3 && string(head[:3]) == "ID3", n >= 2 && head[0] == 0xFF && head[1]&0xF6 == 0xF0:
+		return packedAudio, nil
+	case n < len(head):
+		return webmFile, nil // the WebM reader tells what is wrong
 	}
 	switch string(head[4:]) {
 	case "ftyp", "styp", "moov", "mdat", "free", "skip", "wide", "pdin", "uuid":
-		return true, nil
+		return mp4File, nil
 	}
-	return false, nil
+	return webmFile, nil
 }
 
 // opusTrack is the Opus track of a WebM file.

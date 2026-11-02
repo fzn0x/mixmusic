@@ -95,6 +95,36 @@ func TestShortcutsClean(t *testing.T) {
 	}
 }
 
+// TestGlobalShortcutsClean keeps the global shortcuts chosen, of IDs this
+// version doesn't know too, and drops entries without keys or too long.
+func TestGlobalShortcutsClean(t *testing.T) {
+	if d := Default().GlobalShortcuts; d == nil || len(d) != 0 {
+		t.Errorf("a new install has global shortcuts %v", d)
+	}
+	if (Settings{}).Clean().GlobalShortcuts == nil {
+		t.Error("Clean must give an empty map, not nil")
+	}
+	s := Default()
+	s.GlobalShortcuts = map[string]string{"player.toggle": "Mod+Alt+P", "plugin.later": "Mod+Alt+L", "": "Mod+Alt+K",
+		"player.mute": "", "player.next": strings.Repeat("A", 65), strings.Repeat("x", 129): "Mod+Alt+X"}
+	c := s.Clean()
+	if c.GlobalShortcuts["player.toggle"] != "Mod+Alt+P" || c.GlobalShortcuts["plugin.later"] != "Mod+Alt+L" || len(c.GlobalShortcuts) != 2 {
+		t.Errorf("cleaned to %v", c.GlobalShortcuts)
+	}
+	c.GlobalShortcuts["player.toggle"] = "F9"
+	if s.GlobalShortcuts["player.toggle"] != "Mod+Alt+P" {
+		t.Error("changing the cleaned settings changed the settings")
+	}
+	// Which of too many stay is up to the map's order: only how many.
+	s.GlobalShortcuts = map[string]string{}
+	for i := range 40 {
+		s.GlobalShortcuts["command."+strings.Repeat("a", i+1)] = "Mod+Alt+P"
+	}
+	if n := len(s.Clean().GlobalShortcuts); n != 32 {
+		t.Errorf("%d of 40 global shortcuts kept, want 32", n)
+	}
+}
+
 func TestDefaultSpotifyPlayback(t *testing.T) {
 	for goos, want := range map[string]SpotifyPlayback{
 		"windows": SpotifyPlaybackHere,

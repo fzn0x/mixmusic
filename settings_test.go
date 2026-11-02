@@ -168,7 +168,9 @@ func TestPluginSettings(t *testing.T) {
 // TestCacheOff turns the offline cache off, which its sizes start with.
 func TestCacheOff(t *testing.T) {
 	s := newTestShell(t)
-	tt := testerOf(t, s, 1280, 3200)
+	// Tall enough for the cache's size to show above the player bar,
+	// under the groups of Playback before it.
+	tt := testerOf(t, s, 1280, 3600)
 	show(s, tt, "/settings/playback")
 	if !tt.HasText("1 GB at most.") {
 		t.Fatalf("the cache's size isn't shown: %q", tt.Texts())

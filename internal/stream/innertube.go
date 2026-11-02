@@ -61,6 +61,9 @@ var (
 	// all need what only yt-dlp does: a signature or a challenge solved.
 	errNoStream    = errors.New("stream: YouTube's player API gave no Opus or AAC-LC stream")
 	errNoDirectURL = errors.New("stream: YouTube's player API gave no Opus or AAC-LC stream that plays as given")
+	// errNoLiveStream is returned for a live video whose HLS playlists list
+	// no audio of liveFormats.
+	errNoLiveStream = errors.New("stream: YouTube's player API gave no HLS audio of the live stream")
 	// errBadAnswer is returned for an answer the direct route can't read.
 	errBadAnswer = errors.New("stream: unexpected answer of YouTube's player API")
 	// ErrNoLoudness is returned when YouTube tells no loudness of a video.
@@ -181,6 +184,9 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 	if err != nil {
 		return Stream{}, err
 	}
+	if ans.VideoDetails.IsLive {
+		return d.live(ctx, ans.StreamingData.HLSManifestURL, q)
+	}
 	length := time.Duration(ans.VideoDetails.LengthSeconds) * time.Second
 	f, err := pickAudio(ans.StreamingData.AdaptiveFormats, q, length)
 	if err != nil {
@@ -192,6 +198,77 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 		return Stream{}, err
 	}
 	return st, nil
+}
+
+// live returns the stream of a live video in quality q: the HLS media
+// playlist of its audio of liveFormats that the master playlist at master
+// lists, once the media server answered for it. A live stream's audio is
+// of no loudness YouTube measured.
+func (d *Direct) live(ctx context.Context, master string, q Quality) (Stream, error) {
+	if master == "" {
+		return Stream{}, errNoLiveStream
+	}
+	text, base, err := d.playlist(ctx, master)
+	if err != nil {
+		return Stream{}, err
+	}
+	renditions, err := audioRenditions(text, base)
+	if err != nil {
+		return Stream{}, fmt.Errorf("%w: %v", errBadAnswer, err)
+	}
+	for _, itag := range liveFormats[q] {
+		uri := renditions[itag]
+		if uri == "" {
+			continue
+		}
+		// Its first load fails here, where yt-dlp can still find the
+		// stream, rather than in the player.
+		text, base, err := d.playlist(ctx, uri)
+		if err != nil {
+			return Stream{}, err
+		}
+		if _, err := parseMediaPlaylist(text, base); err != nil {
+			return Stream{}, fmt.Errorf("%w: %v", errBadAnswer, err)
+		}
+		s := Stream{URL: uri, Header: http.Header{}, MimeType: "audio/aac", Codec: "mp4a.40.2", Expires: expiry(uri), Live: true}
+		s.Header.Set("User-Agent", visionAgent)
+		return s, nil
+	}
+	return Stream{}, errNoLiveStream
+}
+
+// maxPlaylist bounds the playlists the live route reads: YouTube's of a
+// live stream hold an hour of segments, of some 900 kB, which come
+// compressed to some 12 kB.
+const maxPlaylist = 16 << 20
+
+// playlist fetches the HLS playlist at rawURL, as the media server serves
+// it to the visionOS client, and returns it with its URL, which its URIs
+// are relative to.
+func (d *Direct) playlist(ctx context.Context, rawURL string) (string, *url.URL, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	if err != nil {
+		return "", nil, fmt.Errorf("%w: a playlist URL that doesn't parse", errBadAnswer)
+	}
+	req.Header.Set("User-Agent", visionAgent)
+	res, err := d.HTTP.Do(req)
+	if err != nil {
+		// The error quotes the URL, which carries the user's IP address.
+		return "", nil, fmt.Errorf("stream: loading the live stream's playlist: %w", loggable(err))
+	}
+	defer res.Body.Close()
+	switch res.StatusCode {
+	case http.StatusOK:
+	case http.StatusForbidden, http.StatusGone:
+		return "", nil, errRefused
+	default:
+		return "", nil, statusError(res.StatusCode)
+	}
+	b, err := io.ReadAll(io.LimitReader(res.Body, maxPlaylist))
+	if err != nil {
+		return "", nil, fmt.Errorf("stream: loading the live stream's playlist: %w", loggable(err))
+	}
+	return string(b), req.URL, nil
 }
 
 // Loudness asks YouTube how loud a video is: the integrated loudness of its
@@ -451,6 +528,9 @@ type playerAnswer struct {
 	VideoDetails struct {
 		VideoID       string `json:"videoId"`
 		LengthSeconds number `json:"lengthSeconds"`
+		// IsLive is set for a live video while it goes on, whose audio is
+		// in HLS, of the master playlist of HLSManifestURL.
+		IsLive bool `json:"isLive"`
 	} `json:"videoDetails"`
 	PlayerConfig struct {
 		// AudioConfig tells how loud the video is, as YouTube measured it
@@ -465,6 +545,7 @@ type playerAnswer struct {
 	} `json:"playerConfig"`
 	StreamingData struct {
 		AdaptiveFormats []playerFormat `json:"adaptiveFormats"`
+		HLSManifestURL  string         `json:"hlsManifestUrl"`
 	} `json:"streamingData"`
 }
 

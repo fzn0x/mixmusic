@@ -70,13 +70,13 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   **`resample`** converts it from its rate, 44.1 kHz for
   YouTube, to the engine's 48 kHz, with a polyphase filter of
   Kaiser-windowed sincs.
-- **`ac3`** decodes AC-3, the 5.1 surround of YouTube's format 380: a
-  pure Go decoder written from ATSC A/52, of every audio coding mode and
-  tool, into six channels, with the stereo downmix the stream's own mix
-  levels ask for. It decodes streams of ffmpeg's encoder as ffmpeg's
-  decoder does to about 110 dB, and its tests edit those streams to use
-  the tools the encoder doesn't: block switching, delta bit allocation,
-  phase flags and dynamic range gains.
+- **`ac3`** decodes AC-3 and E-AC-3, the 5.1 surround of YouTube's
+  formats 380 and 328: a pure Go decoder written from ATSC A/52 and its
+  Annex E, of every audio coding mode and tool, spectral extension and
+  AHT among them, into six channels, with the stereo downmix the
+  stream's own mix levels ask for. It decodes streams of ffmpeg's encoders
+  as ffmpeg's decoder does to about 110 dB, and its tests edit those
+  streams, or write them again, to use the tools the encoders don't.
 - **`internal/audio`** is MixMusic's audio engine: two decks, each a
   goroutine that reads a track, Opus in WebM with `webm` and `opus`, or AAC
   in MP4 with `mp4`, `aac` and `resample`, as its first bytes tell, and decodes it into

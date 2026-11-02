@@ -36,7 +36,10 @@ time it starts.
   import from Firefox there, or paste a cookie header. On macOS, reading
   Safari's cookies takes Full Disk Access for MixMusic, in System
   Settings › Privacy & Security. Zen and Helium are read from their
-  profile folders: give the folder when MixMusic doesn't find it.
+  profile folders: give the folder when MixMusic doesn't find it. On
+  Linux, a browser installed from Flathub is in the list as "Chrome
+  (Flatpak)", and so on, read from its folder in `~/.var/app`: Firefox,
+  Chrome, Chromium, Edge and Brave.
 - **Spotify plays from YouTube Music, not in MixMusic.** Spotify plays in
   MixMusic on Windows, with Premium, and with a sign-in made since MixMusic
   played Spotify itself: Settings › Playback asks you to sign in again when
@@ -82,8 +85,10 @@ time it starts.
   yet, so the first launch asks you to allow it.
 - The portable zip does not register `mixmusic://` links, and Windows on Arm
   is less tested than the rest.
-- The Flatpak is for x64 only, and new: it sees none of your home folder,
-  so a yt-dlp of your own must be in `~/.var/app/io.github.fzn0x.mixmusic`,
+- The Flatpak is for x64 only, and new: it sees none of your home folder
+  but the profiles of the browsers installed from Flathub, read-only. So a
+  yt-dlp of your own must be in `~/.var/app/io.github.fzn0x.mixmusic`, a
+  YouTube Music sign-in imports only from a browser that is a Flatpak too,
   and a Discord app that isn't a Flatpak shows what plays only if it was
   running when MixMusic started. Its settings and library are apart from
   another copy's: the

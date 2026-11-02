@@ -289,6 +289,17 @@ func TestSkipDisliked(t *testing.T) {
 	}
 }
 
+// TestCleanLayout gives settings from before the layout setting, and
+// those of a layout no more, Blend's.
+func TestCleanLayout(t *testing.T) {
+	for in, want := range map[Layout]Layout{"": LayoutBlend, "bogus": LayoutBlend, LayoutBlend: LayoutBlend,
+		LayoutExpressive: LayoutExpressive, LayoutCrate: LayoutCrate, LayoutTiles: LayoutTiles} {
+		if got := (Settings{Layout: in}).Clean().Layout; got != want {
+			t.Errorf("Clean of layout %q = %q, want %q", in, got, want)
+		}
+	}
+}
+
 // TestColorSource starts with the theme's colours, drops a source it
 // doesn't know and a path too long to be one, and keeps a pasted path
 // without its spaces and quotes.

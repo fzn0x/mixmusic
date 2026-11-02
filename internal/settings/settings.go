@@ -41,6 +41,29 @@ const (
 	DensityCompact     Density = "compact"
 )
 
+// Layout chooses the layout design of the interface: its shapes, its
+// density, its covers, its player bar, its headings and its motion. The
+// theme sets its colours and faces.
+type Layout string
+
+const (
+	// LayoutBlend has Expressive's rounded shapes and springs, and
+	// Crate's dense rows, big covers and bold headings.
+	LayoutBlend Layout = "blend"
+	// LayoutExpressive is playful and colourful: tonal fills, big rounded
+	// shapes, a floating player bar and springy motion.
+	LayoutExpressive Layout = "expressive"
+	// LayoutCrate is restrained: dense rows, big covers in cards and bold
+	// tight headings, so that the covers do the work.
+	LayoutCrate Layout = "crate"
+	// LayoutTiles is MixMusic's first layout: flat tiles, giant light
+	// lowercase words and outlined boxes.
+	LayoutTiles Layout = "tiles"
+)
+
+// Layouts are the layout designs, in the order the settings list them.
+var Layouts = []Layout{LayoutBlend, LayoutExpressive, LayoutCrate, LayoutTiles}
+
 // Quality chooses between the best audio and smaller streams.
 type Quality string
 
@@ -103,6 +126,8 @@ type Settings struct {
 	ColorSource ColorSource `json:"colorSource"`
 	ColorFile   string      `json:"colorFile"`
 	Density     Density     `json:"density"`
+	// Layout is the layout design; settings from before it have Blend's.
+	Layout Layout `json:"layout"`
 	// FontScale scales the text, from 0.85 to 1.3.
 	FontScale float64 `json:"fontScale"`
 	// Zoom scales the whole interface, one of ZoomSteps: the text, which
@@ -211,6 +236,7 @@ func Default() Settings {
 		ThemeOptions:    map[string]map[string]string{},
 		DynamicAccent:   true,
 		Density:         DensityComfortable,
+		Layout:          LayoutBlend,
 		Panel:           "queue",
 		FontScale:       1,
 		Zoom:            1,
@@ -341,6 +367,9 @@ func (s Settings) Clean() Settings {
 	}
 	if s.Density != DensityCompact {
 		s.Density = DensityComfortable
+	}
+	if !slices.Contains(Layouts, s.Layout) {
+		s.Layout = d.Layout
 	}
 	if s.FontScale < 0.85 || s.FontScale > 1.3 {
 		s.FontScale = d.FontScale

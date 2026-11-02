@@ -33,7 +33,7 @@ func globalHint(goos string) string {
 // globalShortcutSettings list the commands that global shortcuts run, and
 // their keys, which the user records as the window's shortcuts.
 func (s *shell) globalShortcutSettings(c *ui.Context) {
-	s.group(c, "from any app", func() {
+	s.group(c, "From any app", func() {
 		s.hint(c, globalHint(runtime.GOOS))
 		for _, gc := range app.GlobalCommands {
 			s.globalShortcutRow(c, gc)

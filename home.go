@@ -13,7 +13,7 @@ import (
 var homeFilters = []struct {
 	label  string
 	source media.Source
-}{{"everything", ""}, {"yours", media.SourceLocal}, {"spotify", media.SourceSpotify}, {"youtube music", media.SourceYouTube}}
+}{{"Everything", ""}, {"Yours", media.SourceLocal}, {"Spotify", media.SourceSpotify}, {"YouTube Music", media.SourceYouTube}}
 
 // homePage shows the user's own tiles, then the shelves of every service.
 func (s *shell) homePage(c *ui.Context) {
@@ -23,7 +23,7 @@ func (s *shell) homePage(c *ui.Context) {
 		for i, f := range homeFilters {
 			labels[i] = f.label
 		}
-		s.pageHeader(c, "home", labels, &s.homeFilter)
+		s.pageHeader(c, "Home", labels, &s.homeFilter)
 		s.toolProblems(c)
 		// Each service's shelves come on their own: one that fails leaves
 		// the others, and keeps its own of before on a refresh.
@@ -45,10 +45,10 @@ func (s *shell) homePage(c *ui.Context) {
 			last = &cur.Track
 		}
 		s.tileGrid(c, func(columns int) {
-			title, caption, label := "start here", "search for something to play", "Search for music"
+			title, caption, label := "Start here", k.words("Search for something to play"), "Search for music"
 			var art []media.Image
 			if last != nil {
-				title, caption, label = "jump back in", trackLine(*last), "Play "+last.Title+" again"
+				title, caption, label = "Jump back in", trackLine(*last), "Play "+last.Title+" again"
 				art = last.Artwork
 			}
 			if s.flatTile(c, "tile-last", 0, tileLarge, columns, title, caption, label, art) {
@@ -62,14 +62,14 @@ func (s *shell) homePage(c *ui.Context) {
 			span := tileWide
 			if offer {
 				span = tileSmall
-				if s.flatTile(c, "tile-spotify", 3, tileTall, columns, "add spotify", "sign in to search and play your spotify library here", "Add Spotify", nil) {
+				if s.flatTile(c, "tile-spotify", 3, tileTall, columns, "Add Spotify", k.words("Sign in to search and play your Spotify library here"), "Add Spotify", nil) {
 					s.navigate("/settings/accounts")
 				}
 			}
-			if s.flatTile(c, "tile-liked", 1, span, columns, "liked songs", plural(len(s.svc.Collection.Liked()), "track"), "Liked songs", nil) {
+			if s.flatTile(c, "tile-liked", 1, span, columns, "Liked songs", plural(len(s.svc.Collection.Liked()), "track"), "Liked songs", nil) {
 				s.navigate("/library/liked")
 			}
-			if s.flatTile(c, "tile-mixes", 2, span, columns, "your mixes", plural(len(s.svc.Collection.Playlists()), "mix", "mixes"), "Your mixes", nil) {
+			if s.flatTile(c, "tile-mixes", 2, span, columns, "Your mixes", plural(len(s.svc.Collection.Playlists()), "mix", "mixes"), "Your mixes", nil) {
 				s.navigate("/library/mixes")
 			}
 		})
@@ -114,7 +114,6 @@ func (s *shell) homePage(c *ui.Context) {
 				s.emptyLine(c, "Nothing here yet.")
 			}
 		}
-		_ = k
 	})
 }
 

@@ -369,6 +369,7 @@ func (s *shell) start() {
 	s.follow(
 		s.p.Notices(func(n player.Notice) { s.update(func() { s.notes = append(s.notes, n) }) }),
 		s.a.OnNavigate(func(target string) { s.update(func() { s.open(target) }) }),
+		s.followCast(),
 		s.a.OnGlobalShortcut(s.globalPress),
 		s.a.OnFlush(s.keepColors),
 		s.keepColors,

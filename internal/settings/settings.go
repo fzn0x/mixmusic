@@ -2,31 +2,10 @@
 package settings
 
 import (
-	"cmp"
 	"encoding/json"
-	"maps"
-	"math"
-	"path/filepath"
 	"regexp"
 	"runtime"
-	"slices"
 	"strings"
-)
-
-// SpotifyPlayback chooses how Spotify tracks play.
-type SpotifyPlayback string
-
-const (
-	// SpotifyPlaybackMatch plays Spotify tracks through MixMusic's own
-	// player, from their recording on YouTube Music.
-	SpotifyPlaybackMatch SpotifyPlayback = "match"
-	// SpotifyPlaybackConnect plays Spotify tracks on a Spotify Connect
-	// device, which needs Spotify Premium.
-	SpotifyPlaybackConnect SpotifyPlayback = "connect"
-	// SpotifyPlaybackHere plays Spotify tracks in MixMusic, which Spotify's
-	// Web Playback SDK makes a Spotify Connect device of its own. It needs
-	// Spotify Premium, and no Spotify app.
-	SpotifyPlaybackHere SpotifyPlayback = "here"
 )
 
 // NativeAudio reports whether MixMusic's audio engine plays on this
@@ -34,296 +13,47 @@ const (
 const NativeAudio = (runtime.GOOS == "windows" || runtime.GOOS == "darwin" || runtime.GOOS == "linux") &&
 	(runtime.GOARCH == "amd64" || runtime.GOARCH == "arm64")
 
-// Density chooses how much room the interface gives each element.
-type Density string
-
-const (
-	DensityComfortable Density = "comfortable"
-	DensityCompact     Density = "compact"
-)
-
-// Layout chooses the layout design of the interface: its shapes, its
-// density, its covers, its player bar, its headings and its motion. The
-// theme sets its colours and faces.
-type Layout string
-
-const (
-	// LayoutBlend has Expressive's rounded shapes and springs, and
-	// Crate's dense rows, big covers and bold headings.
-	LayoutBlend Layout = "blend"
-	// LayoutExpressive is playful and colourful: tonal fills, big rounded
-	// shapes, a floating player bar and springy motion.
-	LayoutExpressive Layout = "expressive"
-	// LayoutCrate is restrained: dense rows, big covers in cards and bold
-	// tight headings, so that the covers do the work.
-	LayoutCrate Layout = "crate"
-	// LayoutTiles is MixMusic's first layout: flat tiles, giant light
-	// lowercase words and outlined boxes.
-	LayoutTiles Layout = "tiles"
-)
-
-// Layouts are the layout designs, in the order the settings list them.
-var Layouts = []Layout{LayoutBlend, LayoutExpressive, LayoutCrate, LayoutTiles}
-
-// Quality chooses between the best audio and smaller streams.
-type Quality string
-
-const (
-	QualityBest  Quality = "best"
-	QualitySaver Quality = "saver"
-)
-
-// ColorSource chooses where the colours come from: the theme, or a file
-// that pywal or matugen make of the wallpaper, or one of the user's.
-type ColorSource string
-
-const (
-	// ColorsTheme wears the theme's own colours.
-	ColorsTheme ColorSource = ""
-	// ColorsPywal reads pywal's colors.json, in pywal's cache folder.
-	ColorsPywal ColorSource = "pywal"
-	// ColorsMatugen reads matugen.json in the data folder, which
-	// MixMusic's matugen template writes.
-	ColorsMatugen ColorSource = "matugen"
-	// ColorsFile reads the file of Settings.ColorFile.
-	ColorsFile ColorSource = "file"
-)
-
-// maxColorFile bounds the length of Settings.ColorFile, in bytes.
-const maxColorFile = 4096
-
-// Bands are the center frequencies of the equalizer's bands, in hertz.
-var Bands = []int{32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000}
-
-// Equalizer shapes the sound of MixMusic's own player.
-type Equalizer struct {
-	Enabled bool   `json:"enabled"`
-	Preset  string `json:"preset"`
-	// Gains are in decibels, one per band, from -12 to 12.
-	Gains []float64 `json:"gains"`
-	// Preamp is in decibels, from -12 to 12.
-	Preamp float64 `json:"preamp"`
-}
-
-// Settings are the user's preferences.
+// Settings are the user's preferences, by section: each section's file
+// holds its struct, its defaults and its part of Clean. The sections are
+// embedded, so that their fields are the settings' own, in Go and in
+// settings.json, whose keys come in the order of the sections: Lyrics's
+// and Translation's are apart, as they were before there were sections.
+//
+// A new setting is a field of its section, with a doc comment of its own,
+// and its key in testdata's default.json and full.json. No section has a
+// MarshalJSON or UnmarshalJSON method, which Settings would take as its
+// own: only Settings has one.
 type Settings struct {
-	// Appearance.
-	Theme string `json:"theme"`
-	// FollowSystem shows LightTheme while the computer is in light mode
-	// and DarkTheme while it is in dark mode, in place of Theme.
-	FollowSystem bool   `json:"followSystem"`
-	LightTheme   string `json:"lightTheme"`
-	DarkTheme    string `json:"darkTheme"`
-	// ThemeOptions holds the values of each theme's options, by theme ID
-	// and option ID.
-	ThemeOptions map[string]map[string]string `json:"themeOptions"`
-	// Accent replaces the theme's accent color, unless empty.
-	Accent string `json:"accent"`
-	// DynamicAccent takes the accent color from the artwork playing.
-	DynamicAccent bool `json:"dynamicAccent"`
-	// ColorSource takes the colours from a file, over the theme's, which
-	// keeps its type, corners and effects. ColorFile is the file of
-	// ColorsFile: a full path, or one that starts with ~.
-	ColorSource ColorSource `json:"colorSource"`
-	ColorFile   string      `json:"colorFile"`
-	Density     Density     `json:"density"`
-	// Layout is the layout design; settings from before it have Blend's.
-	Layout Layout `json:"layout"`
-	// FontScale scales the text, from 0.85 to 1.3.
-	FontScale float64 `json:"fontScale"`
-	// Zoom scales the whole interface, one of ZoomSteps: the text, which
-	// FontScale scales too, and everything else.
-	Zoom float64 `json:"zoom"`
-	// SidebarCollapsed shows the sidebar as icons only.
-	SidebarCollapsed bool `json:"sidebarCollapsed"`
-	// Panel is the side panel beside the pages: "queue", "lyrics" or
-	// "none". Settings from before it show the queue.
-	Panel string `json:"panel"`
-	// LyricsPlain shows synchronized lyrics as plain text.
-	LyricsPlain bool `json:"lyricsPlain"`
-	// LyricsTranslate are the languages of the lyrics the user translates,
-	// codes of ISO 639-1 as "ja": their translation shows under each line.
-	// "" stands for lyrics whose language MixMusic can't tell.
-	LyricsTranslate []string `json:"lyricsTranslate"`
-	// LyricsRomanize shows the lyrics of a language in Latin letters,
-	// RomanizeUnder or RomanizeOnly, by the language's code; lyrics of
-	// other languages show as they are written.
-	LyricsRomanize map[string]string `json:"lyricsRomanize"`
-	// SkippedYTDLP is the release of yt-dlp the home page told of, which
-	// the user put off: it doesn't tell of it again.
-	SkippedYTDLP string `json:"skippedYtdlp"`
-
-	// Playback.
-	SpotifyPlayback SpotifyPlayback `json:"spotifyPlayback"`
-	// SpotifyDevice is the Spotify Connect device to play on; the active
-	// one when empty.
-	SpotifyDevice string  `json:"spotifyDevice"`
-	Quality       Quality `json:"quality"`
-	// Crossfade overlaps tracks by this many seconds, from 0 to 12.
-	Crossfade int `json:"crossfade"`
-	// Normalize runs Volume levelling, a compressor that squeezes loud and
-	// quiet moments closer together as they play.
-	Normalize bool `json:"normalize"`
-	// Loudness turns tracks louder than -14 LKFS down to it, from YouTube's
-	// measure of each: Even loudness.
-	Loudness bool `json:"loudness"`
-	// Surround plays a track's 5.1 surround audio, when YouTube has one,
-	// in place of its stereo audio: on six speakers where the output device
-	// has them, else mixed down to stereo as the track's stream asks.
-	Surround bool `json:"surround"`
-	// Autoplay continues with similar tracks when the queue ends.
-	Autoplay bool `json:"autoplay"`
-	// SongSpeed plays songs faster or slower, at their own pitch, from
-	// MinSpeed to MaxSpeed by SpeedStep: 1 is their own speed. Only what
-	// MixMusic's own player plays takes it; Spotify plays its own tracks
-	// at their own speed.
-	SongSpeed float64 `json:"songSpeed"`
-	// SkipDisliked passes over the tracks the user disliked as the queue
-	// moves on, and leaves them out of radios.
-	SkipDisliked bool `json:"skipDisliked"`
-	// SkipAI passes over the tracks YouTube labels as made with AI, as the
-	// player moves on by itself.
-	SkipAI bool `json:"skipAi"`
-	// MusicVideos shows the picture of music videos on the now playing
-	// page, in place of their cover. It is off at first: it fetches more
-	// than the sound, and shows a web page there.
-	MusicVideos bool      `json:"musicVideos"`
-	Equalizer   Equalizer `json:"equalizer"`
-	// Volume is from 0 to 1.
-	Volume float64 `json:"volume"`
-	// CacheSizeMB bounds the audio cache; 0 turns it off.
-	CacheSizeMB int `json:"cacheSizeMb"`
-	// LyricsTranslateTo is the language lyrics translate to, a code of ISO
-	// 639-1; "" is the system's.
-	LyricsTranslateTo string `json:"lyricsTranslateTo"`
-	// DownloadsFolder is where the downloads are kept, an absolute path;
-	// "" is the default folder of the system.
-	DownloadsFolder string `json:"downloadsFolder"`
-	// DownloadOnMetered lets downloads go on over a metered connection, as
-	// a phone's hotspot: they wait without it.
-	DownloadOnMetered bool `json:"downloadOnMetered"`
-
-	// Accounts.
-	SpotifyClientID string `json:"spotifyClientId"`
-
-	// Scrobbling sends what plays to Last.fm, once the user connected it.
-	Scrobbling bool `json:"scrobbling"`
-	// YouTubeChannel is the brand channel the user uses YouTube Music as,
-	// by its page ID; "" is the account itself.
-	YouTubeChannel string `json:"youtubeChannel"`
-	// YouTubeHistory adds what the user plays to their history on YouTube
-	// Music, once they signed in, for its recommendations.
-	YouTubeHistory bool `json:"youtubeHistory"`
-
-	// The desktop.
-	CloseToTray   bool `json:"closeToTray"`
-	Notifications bool `json:"notifications"`
-	// ShowInTitle names what plays in the main window's title.
-	ShowInTitle bool `json:"showInTitle"`
-	MediaKeys   bool `json:"mediaKeys"`
-	// DiscordPresence shows what plays on the user's Discord profile, as
-	// the Discord application of DiscordAppID, or MixMusic's own when it
-	// is empty.
-	DiscordPresence bool   `json:"showOnDiscord"`
-	DiscordAppID    string `json:"discordAppId"`
-
-	// Tools.
-	YTDLPPath string `json:"ytdlpPath"`
-	JSRuntime string `json:"jsRuntime"`
-
-	// Shortcuts replaces the keys of commands, by command ID; an empty
-	// value takes a command's shortcut away.
-	Shortcuts map[string]string `json:"shortcuts"`
-	// GlobalShortcuts are the keys that run commands whichever window is
-	// in front, by command ID, written as Shortcuts are: "Mod+Alt+P".
-	// A new install has none.
-	GlobalShortcuts map[string]string `json:"globalShortcuts"`
-
-	// Add-ons.
-	EnabledPlugins []string `json:"enabledPlugins"`
-	// RegistryURL is the address of the community registry of themes and
-	// plugins.
-	RegistryURL string `json:"registryUrl"`
+	Appearance
+	Lyrics
+	Home
+	Playback
+	Cache
+	Translation
+	Downloads
+	Accounts
+	Desktop
+	Tools
+	Keys
+	Addons
 }
-
-// The ways of showing lyrics in Latin letters (LyricsRomanize).
-const (
-	// RomanizeUnder shows each line in Latin letters under it.
-	RomanizeUnder = "under"
-	// RomanizeOnly shows the lines in Latin letters in place of theirs.
-	RomanizeOnly = "only"
-)
-
-// DefaultRegistryURL is the community registry in MixMusic's repository.
-const DefaultRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry-2.json"
-
-// WebRegistryURL is the registry of the add-ons of the web interface,
-// which the versions of MixMusic before its own interface read, and kept
-// in their settings.
-const WebRegistryURL = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/community/registry.json"
-
-// DefaultDiscordAppID is MixMusic's own Discord application, whose name
-// Discord shows beside what plays when the user set no other.
-const DefaultDiscordAppID = "1562074343691788378"
 
 // Default returns the settings of a new install.
 func Default() Settings {
-	return Settings{
-		Theme:           "mix",
-		LightTheme:      "daylight",
-		DarkTheme:       "mix",
-		ThemeOptions:    map[string]map[string]string{},
-		DynamicAccent:   true,
-		Density:         DensityComfortable,
-		Layout:          LayoutBlend,
-		Panel:           "queue",
-		LyricsTranslate: []string{},
-		LyricsRomanize:  map[string]string{},
-		FontScale:       1,
-		Zoom:            1,
-		SpotifyPlayback: defaultSpotifyPlayback(runtime.GOOS),
-		Quality:         QualityBest,
-		Loudness:        true,
-		Autoplay:        true,
-		SongSpeed:       1,
-		SkipDisliked:    true,
-		Equalizer:       Equalizer{Preset: "flat", Gains: make([]float64, len(Bands))},
-		Volume:          0.8,
-		CacheSizeMB:     1024,
-		Scrobbling:      true,
-		YouTubeHistory:  true,
-		CloseToTray:     false,
-		Notifications:   true,
-		ShowInTitle:     true,
-		MediaKeys:       true,
-		DiscordPresence: true,
-		Shortcuts:       map[string]string{},
-		GlobalShortcuts: map[string]string{},
-		EnabledPlugins:  []string{},
-		RegistryURL:     DefaultRegistryURL,
-	}
+	var s Settings
+	s.Appearance = defaultAppearance()
+	s.Lyrics = defaultLyrics()
+	s.Playback = defaultPlayback()
+	s.Cache = defaultCache()
+	s.Accounts = defaultAccounts()
+	s.Desktop = defaultDesktop()
+	s.Keys = defaultKeys()
+	s.Addons = defaultAddons()
+	return s
 }
 
-// defaultSpotifyPlayback is how Spotify tracks play in a new install on
-// goos: in MixMusic where its webview, WebView2, decrypts Spotify's audio,
-// else on Spotify Connect.
-func defaultSpotifyPlayback(goos string) SpotifyPlayback {
-	if goos == "windows" {
-		return SpotifyPlaybackHere
-	}
-	return SpotifyPlaybackConnect
-}
-
-var (
-	colorRe = regexp.MustCompile(`^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$`)
-	idRe    = regexp.MustCompile(`^[a-z0-9][a-z0-9-]{0,63}$`)
-	// discordIDRe matches a Discord application ID, a number.
-	discordIDRe = regexp.MustCompile(`^[0-9]{15,22}$`)
-	// pageIDRe matches the page ID of a YouTube brand channel, a number.
-	pageIDRe = regexp.MustCompile(`^[0-9]{1,32}$`)
-	// languageRe matches the code of a language, as "ja" or "zh-Hant".
-	languageRe = regexp.MustCompile(`^[a-z]{2,3}(-[A-Z][a-z]{3})?$`)
-)
+// idRe matches the ID of a theme or a plugin.
+var idRe = regexp.MustCompile(`^[a-z0-9][a-z0-9-]{0,63}$`)
 
 // UnmarshalJSON reads settings, those of the versions before 0.5.6 too,
 // where Discord showed nothing until the user turned it on and pasted the
@@ -344,10 +74,6 @@ func (s *Settings) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DiscordApp returns the ID of the Discord application that shows what
-// plays: the user's, or MixMusic's own.
-func (s Settings) DiscordApp() string { return cmp.Or(s.DiscordAppID, DefaultDiscordAppID) }
-
 // ValidID reports whether id can name a theme or a plugin: lowercase
 // letters, digits and dashes.
 func ValidID(id string) bool { return idRe.MatchString(id) }
@@ -362,184 +88,21 @@ func CleanPath(p string) string {
 	return p
 }
 
-// ActiveTheme returns the ID of the theme to show: Theme, or the light or
-// dark one of the computer's appearance when the theme follows it.
-func (s Settings) ActiveTheme(dark bool) string {
-	switch {
-	case !s.FollowSystem:
-		return s.Theme
-	case dark:
-		return s.DarkTheme
-	default:
-		return s.LightTheme
-	}
-}
-
 // Clean returns s with every value in its range, and the defaults in place
 // of values that are missing or invalid. Its maps and slices are its own,
 // which changing doesn't change s's.
 func (s Settings) Clean() Settings {
 	d := Default()
-	if !ValidID(s.Theme) {
-		s.Theme = d.Theme
-	}
-	if !ValidID(s.LightTheme) {
-		s.LightTheme = d.LightTheme
-	}
-	if !ValidID(s.DarkTheme) {
-		s.DarkTheme = d.DarkTheme
-	}
-	options := make(map[string]map[string]string, len(s.ThemeOptions))
-	for id, values := range s.ThemeOptions {
-		options[id] = maps.Clone(values)
-	}
-	s.ThemeOptions = options
-	if s.Accent != "" && !colorRe.MatchString(s.Accent) {
-		s.Accent = ""
-	}
-	switch s.ColorSource {
-	case ColorsTheme, ColorsPywal, ColorsMatugen, ColorsFile:
-	default:
-		s.ColorSource = ColorsTheme
-	}
-	s.ColorFile = CleanPath(s.ColorFile)
-	if len(s.ColorFile) > maxColorFile {
-		s.ColorFile = ""
-	}
-	if s.Panel != "lyrics" && s.Panel != "none" {
-		s.Panel = d.Panel
-	}
-	translate := []string{}
-	for _, lang := range s.LyricsTranslate {
-		if (lang == "" || languageRe.MatchString(lang)) && !slices.Contains(translate, lang) && len(translate) < 200 {
-			translate = append(translate, lang)
-		}
-	}
-	s.LyricsTranslate = translate
-	romanize := map[string]string{}
-	for lang, how := range s.LyricsRomanize {
-		if (lang == "" || languageRe.MatchString(lang)) && (how == RomanizeUnder || how == RomanizeOnly) && len(romanize) < 200 {
-			romanize[lang] = how
-		}
-	}
-	s.LyricsRomanize = romanize
-	if !languageRe.MatchString(s.LyricsTranslateTo) {
-		s.LyricsTranslateTo = ""
-	}
-	if s.Density != DensityCompact {
-		s.Density = DensityComfortable
-	}
-	if !slices.Contains(Layouts, s.Layout) {
-		s.Layout = d.Layout
-	}
-	if s.FontScale < 0.85 || s.FontScale > 1.3 {
-		s.FontScale = d.FontScale
-	}
-	s.Zoom = zoomStep(s.Zoom, d.Zoom)
-	switch s.SpotifyPlayback {
-	case SpotifyPlaybackMatch, SpotifyPlaybackConnect, SpotifyPlaybackHere:
-	default:
-		s.SpotifyPlayback = d.SpotifyPlayback
-	}
-	if s.Quality != QualitySaver {
-		s.Quality = QualityBest
-	}
-	s.Crossfade = min(max(s.Crossfade, 0), 12)
-	s.SongSpeed = CleanSpeed(s.SongSpeed)
-	s.Volume = min(max(s.Volume, 0), 1)
-	if len(s.Equalizer.Gains) != len(Bands) {
-		s.Equalizer.Gains = make([]float64, len(Bands))
-	} else {
-		s.Equalizer.Gains = slices.Clone(s.Equalizer.Gains)
-	}
-	for i, g := range s.Equalizer.Gains {
-		s.Equalizer.Gains[i] = min(max(g, -12), 12)
-	}
-	s.Equalizer.Preamp = min(max(s.Equalizer.Preamp, -12), 12)
-	if s.Equalizer.Preset == "" {
-		s.Equalizer.Preset = "custom"
-	}
-	s.CacheSizeMB = min(max(s.CacheSizeMB, 0), 64*1024)
-	if s.DownloadsFolder = strings.TrimSpace(s.DownloadsFolder); s.DownloadsFolder != "" {
-		if filepath.IsAbs(s.DownloadsFolder) {
-			s.DownloadsFolder = filepath.Clean(s.DownloadsFolder)
-		} else {
-			s.DownloadsFolder = ""
-		}
-	}
-	s.SpotifyClientID = strings.TrimSpace(s.SpotifyClientID)
-	if s.DiscordAppID = strings.TrimSpace(s.DiscordAppID); !discordIDRe.MatchString(s.DiscordAppID) {
-		s.DiscordAppID = ""
-	}
-	if s.YouTubeChannel = strings.TrimSpace(s.YouTubeChannel); !pageIDRe.MatchString(s.YouTubeChannel) {
-		s.YouTubeChannel = ""
-	}
-	if !slices.Contains([]string{"", "deno", "node", "bun", "quickjs"}, s.JSRuntime) {
-		s.JSRuntime = ""
-	}
-	shortcuts := map[string]string{}
-	for id, keys := range s.Shortcuts {
-		if id != "" && len(id) <= 128 && len(keys) <= 64 && len(shortcuts) < 500 {
-			shortcuts[id] = keys
-		}
-	}
-	s.Shortcuts = shortcuts
-	// IDs this version doesn't know stay, for a version that does.
-	global := map[string]string{}
-	for id, keys := range s.GlobalShortcuts {
-		if id != "" && len(id) <= 128 && keys != "" && len(keys) <= 64 && len(global) < 32 {
-			global[id] = keys
-		}
-	}
-	s.GlobalShortcuts = global
-	plugins := []string{}
-	for _, id := range s.EnabledPlugins {
-		if ValidID(id) && !slices.Contains(plugins, id) {
-			plugins = append(plugins, id)
-		}
-	}
-	s.EnabledPlugins = plugins
-	if !strings.HasPrefix(s.RegistryURL, "https://") || s.RegistryURL == WebRegistryURL {
-		s.RegistryURL = d.RegistryURL
-	}
+	s.Appearance = s.Appearance.clean(d.Appearance)
+	s.Lyrics = s.Lyrics.clean()
+	s.Playback = s.Playback.clean(d.Playback)
+	s.Cache = s.Cache.clean()
+	s.Translation = s.Translation.clean()
+	s.Downloads = s.Downloads.clean()
+	s.Accounts = s.Accounts.clean()
+	s.Desktop = s.Desktop.clean()
+	s.Tools = s.Tools.clean()
+	s.Keys = s.Keys.clean()
+	s.Addons = s.Addons.clean(d.Addons)
 	return s
-}
-
-// The speeds MixMusic's own player plays at: from half a track's own speed
-// to three times it, by twentieths.
-const (
-	MinSpeed  = 0.5
-	MaxSpeed  = 3
-	SpeedStep = 0.05
-)
-
-// CleanSpeed returns the speed of the steps nearest v, from MinSpeed to
-// MaxSpeed: 1, a track's own speed, for none, as in settings from before
-// the speed, and for one that isn't a number.
-func CleanSpeed(v float64) float64 {
-	if math.IsNaN(v) || math.IsInf(v, 0) || v <= 0 {
-		return 1
-	}
-	v = min(max(v, MinSpeed), MaxSpeed)
-	// Dividing a whole number of steps gives the speed as the settings
-	// write it, 1.1 rather than 1.1000000000000001.
-	return math.Round(v*(1/SpeedStep)) / (1 / SpeedStep)
-}
-
-// ZoomSteps are the zooms of the interface, from 80% to 200%.
-var ZoomSteps = []float64{0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2}
-
-// zoomStep is the step of ZoomSteps nearest z, or def when z is outside
-// them, as in settings from before the zoom.
-func zoomStep(z, def float64) float64 {
-	if !(z >= ZoomSteps[0] && z <= ZoomSteps[len(ZoomSteps)-1]) {
-		return def
-	}
-	near := ZoomSteps[0]
-	for _, step := range ZoomSteps {
-		if math.Abs(step-z) < math.Abs(near-z) {
-			near = step
-		}
-	}
-	return near
 }

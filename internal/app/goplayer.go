@@ -81,6 +81,10 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 		p.Seek(fromMs(cmd.Value))
 	case CommandVolume:
 		p.SetVolume(cmd.Value)
+	case CommandVolumeBy:
+		p.ChangeVolume(min(max(cmd.Value, -1), 1))
+	case CommandMute:
+		p.ToggleMute()
 	case CommandShuffle:
 		p.ToggleShuffle()
 	case CommandRepeat:
@@ -95,12 +99,34 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 			go func() {
 				if err := (&Collection{a}).SetLiked(context.Background(), cur.Track, !liked); err != nil {
 					log.Printf("mixmusic: liking %s: %v", cur.Track.ID, err)
+					return
 				}
+				a.notifyLiked(cur.Track, !liked)
 			}()
+		}
+	case CommandDislike:
+		if cur, ok := p.State().Current(); ok {
+			a.dislikeGoPlayer(p, cur.Track, !a.library.IsDisliked(cur.Track.ID))
 		}
 	case CommandPlayTrack:
 		p.PlayID(cmd.TrackID)
 	}
+}
+
+// dislikeGoPlayer dislikes a track, or takes the dislike back, from
+// outside the window, as the window does: the player hears of it at once,
+// and moves on from the track if it plays, while the settings skip
+// disliked songs, and hears of it again if the library can't keep it.
+func (a *App) dislikeGoPlayer(p *player.Player, t media.Track, disliked bool) {
+	p.Disliked(t.ID, disliked)
+	go func() {
+		if err := (&Collection{a}).SetDisliked(context.Background(), t, disliked); err != nil {
+			log.Printf("mixmusic: disliking %s: %v", t.ID, err)
+			p.Disliked(t.ID, !disliked)
+			return
+		}
+		a.notifyDisliked(t, disliked)
+	}()
 }
 
 // playerServices is the app as the services of the native interface's
@@ -108,7 +134,7 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 type playerServices struct{ a *App }
 
 func playerSource(src PlaybackSource) player.Source {
-	return player.Source{Mode: player.Mode(src.Mode), URL: src.URL, Track: src.Track}
+	return player.Source{Mode: player.Mode(src.Mode), URL: src.URL, Track: src.Track, Live: src.Live}
 }
 
 func (s playerServices) Prepare(ctx context.Context, t media.Track) (player.Source, error) {
@@ -166,6 +192,7 @@ func (s playerServices) Report(now player.Now) {
 		Loading:    now.Loading,
 		PositionMs: int(now.Position / time.Millisecond),
 		DurationMs: int(now.Duration / time.Millisecond),
+		Live:       now.Live,
 		Volume:     now.Volume,
 		Shuffle:    now.Shuffle,
 		Repeat:     Repeat(now.Repeat),

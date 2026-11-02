@@ -230,6 +230,19 @@ type shell struct {
 	drafts                  map[string]*draft
 	lastfmKey, lastfmSecret string
 	signingIn               string
+	// youtubeCookies is the YouTube Music sign-in with a browser's cookies:
+	// the browsers to import from, their names, which the search of the
+	// settings finds the sign-in by too, the one chosen and its profile, the
+	// header pasted, and why the last try failed; youtubePick asks for the
+	// account and channel of the session it signed in with.
+	youtubeCookies struct {
+		browsers         []app.YouTubeBrowser
+		names            []string
+		words            string
+		browser, profile string
+		pasted, problem  string
+	}
+	youtubePick bool
 	// wells are the colour wells' colours, by key; tools are how the user
 	// sorted and searched the lists of tracks, by key.
 	wells map[string]*colorWell
@@ -319,13 +332,15 @@ func shownPanel(panel string) string {
 }
 
 // start follows the player and the app, until the window closes, and
-// shows the player's notices and the pages that deep links ask for. The
-// colours the settings' wells hold back are saved as the window closes,
-// and as MixMusic quits, as Windows ending the session doesn't close it.
+// shows the player's notices and the pages that deep links ask for, and
+// takes MixMusic's global keys as the user records keys. The colours the
+// settings' wells hold back are saved as the window closes, and as
+// MixMusic quits, as Windows ending the session doesn't close it.
 func (s *shell) start() {
 	s.follow(
 		s.p.Notices(func(n player.Notice) { s.update(func() { s.notes = append(s.notes, n) }) }),
 		s.a.OnNavigate(func(target string) { s.update(func() { s.open(target) }) }),
+		s.a.OnGlobalShortcut(s.globalPress),
 		s.a.OnFlush(s.keepColors),
 		s.keepColors,
 	)

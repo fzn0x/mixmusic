@@ -8,6 +8,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 )
@@ -308,4 +309,37 @@ func TestUndoNotSkipping(t *testing.T) {
 	if st := s.p.State(); st.Index != 1 {
 		t.Errorf("undo went back to %d", st.Index)
 	}
+}
+
+// TestGlobalDislikeHere runs the window's own dislike at a press of the
+// global shortcut of Dislike what plays while the window has the focus,
+// whose toast takes it back; the press of another global shortcut is left
+// to its command.
+func TestGlobalDislikeHere(t *testing.T) {
+	h := newTestHotkeys()
+	s, tt := newGlobalShell(t, h)
+	s.p.PlayTracks(testTracks[:2], 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	for _, gc := range app.GlobalCommands {
+		if gc.ID == "player.dislike" {
+			s.setGlobalShortcut(gc, "Mod+Alt+D")
+		}
+	}
+	if s.set.GlobalShortcuts["player.dislike"] != "Mod+Alt+D" {
+		t.Fatalf("Dislike what plays has no global shortcut: %v", s.set.GlobalShortcuts)
+	}
+	if s.globalPress("player.like", "Mod+Alt+L") {
+		t.Error("the window took the press of Like what plays")
+	}
+	tt.Frame()
+	h.press(t, globalAcc("Alt+D"))
+	s.settle(t, func(st player.State) bool { return st.Index == 1 && st.Playing })
+	eventually(t, s, "the dislike", func() bool { return s.a.IsDisliked(testTracks[0].ID) })
+	tt.Frame()
+	if !tt.HasText("Disliked " + testTracks[0].Title) {
+		t.Fatalf("no toast: %q", tt.Texts())
+	}
+	click(t, s, tt, "undo")
+	s.settle(t, func(st player.State) bool { return st.Index == 0 && st.Playing })
+	eventually(t, s, "the dislike taken back", func() bool { return !s.a.IsDisliked(testTracks[0].ID) })
 }

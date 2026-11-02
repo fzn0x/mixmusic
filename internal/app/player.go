@@ -43,6 +43,10 @@ type PlaybackSource struct {
 	// Cached is set when the audio plays from the cache, without the
 	// network.
 	Cached bool `json:"cached,omitempty"`
+	// Live is set for the stream of a live video, as it goes on, which the
+	// engine plays from near its live edge: it has no length, can't seek,
+	// and isn't cached.
+	Live bool `json:"live,omitempty"`
 }
 
 // Player prepares tracks for the player of the main window, controls
@@ -69,7 +73,7 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 // the settings say of Spotify tracks: those play from their recording on
 // YouTube Music. The player falls back to it when no Spotify device can
 // play. It keeps how loud YouTube measured the track, or asks, for the
-// engine to play it at an even loudness.
+// engine to play it at an even loudness: a live stream has no measure.
 func (p *Player) PrepareStream(ctx context.Context, track media.Track) (PlaybackSource, error) {
 	yt, err := p.a.matcher.Match(ctx, track)
 	if err != nil {
@@ -89,6 +93,9 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	// A stream found before plays without the network, as the engine may
 	// hold its audio already; yt-dlp needs the network to find one.
 	if p.a.resolver.Fresh(videoID) {
+		if p.a.resolver.Live(videoID) {
+			return liveSource(src, videoID), nil
+		}
 		// Its measure was kept as it was found, else it is asked for now.
 		p.learnLoudness(videoID)
 		return src, nil
@@ -100,6 +107,9 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	if err != nil {
 		return PlaybackSource{}, err
 	}
+	if s.Live {
+		return liveSource(src, videoID), nil
+	}
 	if s.Measured {
 		p.a.loudness.keep(videoID, s.Loudness)
 	} else {
@@ -108,6 +118,14 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 		p.a.loudness.learn(videoID)
 	}
 	return src, nil
+}
+
+// liveSource is src as the live stream of a video, which the engine opens
+// at its own address.
+func liveSource(src PlaybackSource, videoID string) PlaybackSource {
+	src.Live = true
+	src.URL = schemeURL(streamScheme) + strings.TrimPrefix(stream.LivePath(videoID), "/")
+	return src
 }
 
 // learnLoudness asks YouTube how loud a video MixMusic holds the audio of
@@ -255,6 +273,66 @@ func (a *App) notifyTrack(t media.Track) {
 	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
 		log.Printf("mixmusic: notification: %v", err)
 	}
+}
+
+// notifyLiked tells that the track that plays joined the liked songs, or
+// left them, while the main window isn't in front: liked from elsewhere,
+// as by a global shortcut, nothing else shows it.
+func (a *App) notifyLiked(t media.Track, liked bool) {
+	title, body := likedNote(t, liked)
+	a.notifyRated("liked", title, body)
+}
+
+// notifyDisliked tells that the track that plays was disliked, or no
+// longer, while the main window isn't in front, as notifyLiked does.
+func (a *App) notifyDisliked(t media.Track, disliked bool) {
+	title, body := dislikedNote(t, disliked)
+	a.notifyRated("disliked", title, body)
+}
+
+// notifyRated shows the notification id of a track liked or disliked from
+// outside the main window, unless it is in front.
+func (a *App) notifyRated(id, title, body string) {
+	a.mu.Lock()
+	main := a.main
+	a.mu.Unlock()
+	if !a.settings.Get().Notifications || main != nil && main.IsFocused() {
+		return
+	}
+	n := mygo.NewNotification(mygo.NotificationOptions{ID: id, Title: title, Body: body, Silent: true})
+	n.OnClick(a.showMain)
+	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
+		log.Printf("mixmusic: notification: %v", err)
+	}
+}
+
+// likedNote is what the notification of a track liked, or no longer,
+// says.
+func likedNote(t media.Track, liked bool) (title, body string) {
+	title = "Removed from liked songs"
+	if liked {
+		title = "Added to liked songs"
+	}
+	return title, noteBody(t)
+}
+
+// dislikedNote is what the notification of a track disliked, or no
+// longer, says.
+func dislikedNote(t media.Track, disliked bool) (title, body string) {
+	title = "Removed the dislike"
+	if disliked {
+		title = "Disliked"
+	}
+	return title, noteBody(t)
+}
+
+// noteBody names a track in a notification: its title and artists.
+func noteBody(t media.Track) string {
+	body := t.Title
+	if artists := t.ArtistNames(); artists != "" {
+		body += " — " + artists
+	}
+	return body
 }
 
 // Devices returns the user's Spotify Connect devices.

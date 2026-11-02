@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -363,6 +364,29 @@ func TestNowPlayingVideoRefresh(t *testing.T) {
 	}
 	if l := s.loads[picture].(*loaded[app.VideoSource]); l.value.Src != src.Src || l.asks > 1 {
 		t.Errorf("the picture's stream is %+v", l)
+	}
+}
+
+// TestNowPlayingVideoSettingsFile turns the picture off and on again from
+// settings.json, as an edit of it applies while MixMusic runs.
+func TestNowPlayingVideoSettingsFile(t *testing.T) {
+	track := musicVideo()
+	s, tt, page, _ := videoShell(t, track)
+	waitScript(t, s, page, "playing: true, active: true")
+	for _, on := range []bool{false, true} {
+		editSettings(t, s, `{"musicVideos": `+strconv.FormatBool(on)+`, "panel": "none"}`)
+		s.drain()
+		s.refresh()
+		tt.Frame()
+		tt.Advance(time.Second)
+		if _, ok := tt.Find("Music video: " + track.Title); ok != on {
+			t.Errorf("with musicVideos %v in settings.json, the picture shows: %v", on, ok)
+		}
+		if on {
+			waitScript(t, s, page, "active: true")
+		} else {
+			waitScript(t, s, page, "active: false")
+		}
 	}
 }
 

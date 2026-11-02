@@ -110,30 +110,35 @@ func TestSpeedMenuSlider(t *testing.T) {
 	if !ok {
 		t.Fatalf("no slider in the speed's menu: %q", tt.Texts())
 	}
+	// The ends, and somewhere near 1.5×, where a pixel of the faces of
+	// another system moves the slider a step.
+	var got float64
 	for _, c := range []struct {
-		x    float32
-		want float64
-	}{{r.X + r.W - 1, 3}, {r.X + 1, 0.5}, {r.X + r.W/2, 1.75}} {
+		x        float32
+		from, to float64
+	}{{r.X + r.W - 1, 3, 3}, {r.X + 1, 0.5, 0.5}, {r.X + 0.4*r.W, 1.4, 1.6}} {
 		tt.ClickAt(c.x, r.Y+r.H/2)
 		s.drain()
 		tt.Frame()
-		if got := s.svc.Preferences.Get().SongSpeed; got != c.want {
-			t.Errorf("the slider keeps the speed %v, want %v", got, c.want)
+		got = s.svc.Preferences.Get().SongSpeed
+		if got < c.from || got > c.to || settings.CleanSpeed(got) != got {
+			t.Errorf("the slider keeps the speed %v, want from %v to %v, by steps", got, c.from, c.to)
 		}
 		if !showsExactly(tt, "speed of songs") {
-			t.Fatalf("the menu closed as the slider moved to %v", c.want)
+			t.Fatalf("the menu closed as the slider moved to %v", got)
 		}
 		// In the menu, by the slider, and on the button.
-		if textCount(tt, speedLabel(c.want)) < 2 {
-			t.Errorf("at %v, the menu and the button show %q", c.want, tt.Texts())
+		if textCount(tt, speedLabel(got)) < 2 {
+			t.Errorf("at %v, the menu and the button show %q", got, tt.Texts())
 		}
 	}
-	takeSettings(t, s, 1.75)
+	takeSettings(t, s, got)
 
 	// The button's tip, which would cover the menu, waits for it to close.
-	b, ok := tt.Find("Speed: 1.75×")
+	label := speedButtonLabel(got)
+	b, ok := tt.Find(label)
 	if !ok {
-		t.Fatalf("the button doesn't show 1.75×: %q", tt.Texts())
+		t.Fatalf("the button isn't %q: %q", label, tt.Texts())
 	}
 	tips := func() int {
 		tt.Move(0, 0)
@@ -141,7 +146,7 @@ func TestSpeedMenuSlider(t *testing.T) {
 		tt.Move(b.X+b.W/2, b.Y+b.H/2)
 		tt.Advance(time.Second)
 		tt.Frame()
-		return textCount(tt, "Speed: 1.75×")
+		return textCount(tt, label)
 	}
 	if n := tips(); n != 1 {
 		t.Errorf("with the menu open, the button shows its tip: %d of it", n)

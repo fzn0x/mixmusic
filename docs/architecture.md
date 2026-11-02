@@ -103,8 +103,10 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   (`stretch.go`), the waveform-similarity overlap-add of Verhelst and
   Roelands, between its ring and the mix; at 1× it plays the ring as it
   is, as a live stream always plays, with nothing ahead of its live edge
-  to play faster. `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio
-  -run StretchListen` writes the test files at each speed, to listen to.
+  to play faster. The six channels of 5.1 surround stretch alike, each
+  window found on the mix of them all.
+  `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio -run StretchListen`
+  writes the test files at each speed, to listen to.
   `MIXMUSIC_LIVE=1 go test ./internal/audio -run Live` plays songs of both
   codecs, and a 24/7 live stream, as the app finds them on YouTube,
   against ffmpeg's decode.
@@ -175,7 +177,10 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   tracks it leaves out of their collections and refuses, until one plays
   as a video again. The proxy serves downloads before the cache
   (`stream.Store`), and the windows read a snapshot of what they hold in
-  each frame, a map lookup a track row.
+  each frame, a map lookup a track row. Downloads hold stereo audio only:
+  the proxy serves 5.1 surround audio from the cache or YouTube, and
+  without the network it fails, for the player to play the download's
+  stereo audio instead.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by

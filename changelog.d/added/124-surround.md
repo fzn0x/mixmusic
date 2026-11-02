@@ -7,4 +7,6 @@
   Settings › Playback, off by default. While it is on, stereo tracks play
   on the front left and right speakers of a 5.1 system, the surround mix
   of a track goes to the offline cache beside its stereo audio, and a
-  surround mix that can't play gives way to the stereo one (#124).
+  surround mix that can't play gives way to the stereo one. The surround
+  mix plays at the speed you set, as the stereo one does; downloads keep
+  the stereo audio, which plays while you're offline (#124).

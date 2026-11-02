@@ -61,7 +61,7 @@ const maxColorFile = 4096
 var colorRe = regexp.MustCompile(`^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$`)
 
 // Appearance is how the interface looks: Settings › Appearance, and the
-// sidebar and side panel as the user leaves them.
+// side panel the user leaves open.
 type Appearance struct {
 	// Theme is the ID of the theme the interface wears, unless it follows
 	// the computer.

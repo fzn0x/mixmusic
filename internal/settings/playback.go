@@ -29,7 +29,9 @@ const (
 	QualitySaver Quality = "saver"
 )
 
-// Playback is how MixMusic plays: Settings › Playback, and the volume.
+// Playback is how MixMusic plays: the Spotify tracks, the sound, the speed,
+// the music videos and the equalizer of Settings › Playback, and the
+// volume.
 type Playback struct {
 	// SpotifyPlayback is how Spotify tracks play.
 	SpotifyPlayback SpotifyPlayback `json:"spotifyPlayback"`

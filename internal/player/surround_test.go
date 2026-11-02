@@ -1,6 +1,7 @@
 package player
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -97,4 +98,35 @@ func TestSurroundPreloads(t *testing.T) {
 	h.wait("b preloaded", func(*Player) bool { return h.stream.has("preload url:yt:b/5.1") })
 	h.p.Time(196*time.Second, 200*time.Second)
 	h.wait("b crossfaded", func(*Player) bool { return h.stream.has("crossfade url:yt:b/5.1 5s") })
+}
+
+// TestSurroundFallsBackToStereo plays a track's stereo audio from where its
+// 5.1 audio failed, at once, and tells why; the next track tries its 5.1
+// audio again, as does turning 5.1 on again.
+func TestSurroundFallsBackToStereo(t *testing.T) {
+	h := newHarness(t, Saved{}, func(f *fakeServices) {
+		f.settings.Surround = true
+		f.prepare = func(t media.Track) (Source, error) { return surroundOf(t), nil }
+	})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Time(12*time.Second, 200*time.Second)
+	h.p.Error("the audio could not be decoded (ac3: invalid data)")
+	h.wait("a in stereo", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 12s true" })
+	h.wait("a playing", playing("a"))
+	told := false
+	for _, n := range h.notices() {
+		told = told || strings.Contains(n.Message, "The 5.1 surround audio of Song a couldn't play (the audio could not be decoded")
+	}
+	if !told {
+		t.Errorf("notices %+v", h.notices())
+	}
+	// A stereo stream that fails is tried again as before, in stereo.
+	h.p.Error("the network failed while loading the audio")
+	h.wait("a tried again", func(p *Player) bool { return strings.HasPrefix(h.stream.lastLoad(), "load url:yt:a?retry=") })
+	h.p.Next()
+	h.wait("b playing", playing("b"))
+	if got := h.stream.lastLoad(); got != "load url:yt:b/5.1 0s true" {
+		t.Errorf("the next track loaded %q", got)
+	}
 }

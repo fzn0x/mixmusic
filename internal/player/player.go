@@ -408,8 +408,10 @@ type Player struct {
 	// started with.
 	spotifyMode settings.SpotifyPlayback
 	// surround is whether streams play their 5.1 surround audio, as the
-	// settings ask, when they have some.
-	surround bool
+	// settings ask, when they have some; stereoOnly is set once the current
+	// entry's 5.1 audio failed, which then plays in stereo.
+	surround   bool
+	stereoOnly bool
 }
 
 // New returns a player of the queue saved, which plays through stream and

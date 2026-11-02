@@ -225,7 +225,7 @@ func (s *shell) youtubeCookieSignIn(c *ui.Context, busy bool) {
 			s.selectOf(c.Key("youtube-browser"), &yc.browser, yc.names).Width(160).Label("Browser")
 		})
 		s.row(c, "Profile", youtubeProfile, func() {
-			ui.TextInput(c.Key("youtube-profile"), &yc.profile).Placeholder("the browser's own").Width(260).Label("Profile")
+			ui.TextInput(c.Key("youtube-profile"), &yc.profile).Placeholder(k.sentence("the browser's own")).Width(260).Label("Profile")
 		})
 		ui.Row(c).Padding(12, 0).Children(func() {
 			label := "import"

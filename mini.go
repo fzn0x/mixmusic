@@ -105,7 +105,7 @@ func (s *shell) miniView(c *ui.Context) {
 					ui.Text(c, line).FontSize(k.smallSize()).TextColor(k.muted).SingleLine().Grow(1).MinWidth(0)
 					switch {
 					case ok && s.st.Live:
-						ui.Text(c, "live").FontSize(k.captionSize()).TextColor(k.accent).Shrink(0).SingleLine()
+						ui.Text(c, k.sentence("live")).FontSize(k.captionSize()).TextColor(k.accent).Shrink(0).SingleLine()
 					case ok:
 						ui.Text(c, clock(s.st.Position)+" / "+clock(s.miniDuration())).FontSize(k.captionSize()).
 							TextColor(k.muted).FontFeatures("tnum").Shrink(0).SingleLine()

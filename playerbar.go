@@ -202,7 +202,7 @@ func (s *shell) progress(c *ui.Context) {
 	if s.st.Live {
 		s.seeking = false
 		ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
-			ui.Text(c, "live").FontSize(k.captionSize()).TextColor(k.accent).Width(44).TextAlign(ui.End)
+			ui.Text(c, k.sentence("live")).FontSize(k.captionSize()).TextColor(k.accent).Width(44).TextAlign(ui.End)
 			edge := 1.0
 			ui.Slider(c.Key("seek"), &edge, 0, 1).Grow(1).MinWidth(0).Label("Live: no seeking").Disabled(true)
 			ui.Box(c).Width(44)

@@ -53,40 +53,6 @@ both services in one player:
 
 ## Features
 
-### New in 0.5.7
-
-- **Linux x64 starts again.** 0.5.6's x64 downloads didn't start outside
-  NixOS. If yours updated itself to 0.5.6, install 0.5.7 again.
-- **Radios of songs.** After a music video, Autoplay and Start radio carry
-  on with songs, not more videos.
-- **A Flatpak** for Linux on x64, in the downloads below.
-
-### New in 0.5.6
-
-- **Zoom.** <kbd>Ctrl</kbd> <kbd>=</kbd> and <kbd>Ctrl</kbd> <kbd>-</kbd>
-  make everything larger or smaller, from 80% to 200%, and
-  <kbd>Ctrl</kbd> <kbd>0</kbd> goes back to 100% (<kbd>⌘</kbd> on macOS).
-  The mini player zooms too.
-- **Even loudness.** Loud YouTube Music tracks are turned down to one level,
-  from YouTube's own measure of each track, so no song jumps out. It is on
-  by default, in Settings › Playback.
-- **AAC.** Tracks that YouTube Music has only in AAC now play. The audio
-  engine decodes AAC itself, as it does Opus.
-- **An even volume slider.** Each tenth of the slider is 6 dB, so the quiet
-  end no longer jumps.
-- **Covers offline.** The covers you saw are kept on disk, up to 256 MB, and
-  show at once at the next start, even without a connection.
-- **Steadier playback.** YouTube Music tracks start in a moment. When the
-  network drops, the song waits and then plays on from where it stopped.
-  MixMusic pauses when the computer goes to sleep.
-- **Discord with no setup.** Your profile shows what plays, as "Listening
-  to MixMusic".
-- **The track in the window title,** for the taskbar and window switchers.
-- **A new icon:** two pink rings and a play button on black.
-- **Plugins in TypeScript.** The plugin API and the community's plugins
-  are written in TypeScript and checked against the SDK's types.
-- **Two licenses.** Use MixMusic under the MIT license or the GPL 3.0.
-
 ### Search and play
 
 - **One search for both services.** Results from YouTube Music and Spotify

@@ -194,9 +194,21 @@ func TestSpringsSettle(t *testing.T) {
 				t.Fatal("the tile went")
 			}
 			tt.Move(5, 5)
-			for _, label := range []string{"Next", "Previous", "Pause"} {
+			// Each press waits for the player to do it, on its own
+			// goroutine: on a busy runner, a track still loading showed no
+			// Pause, and one that came after the window was still asked for
+			// a frame. Pause waits for the track to have loaded, as a track
+			// loading plays on.
+			press := func(label string, done func(player.State) bool) {
+				t.Helper()
 				click(t, s, tt, label)
+				s.settle(t, done)
+				tt.Frame()
 			}
+			at := s.p.State().Index
+			press("Next", func(st player.State) bool { return st.Index == at+1 && st.Playing && !st.Loading })
+			press("Previous", func(st player.State) bool { return st.Index == at && st.Playing && !st.Loading })
+			press("Pause", func(st player.State) bool { return !st.Playing })
 			tt.Advance(3 * time.Second)
 			settled(t, tt)
 		})

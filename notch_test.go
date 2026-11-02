@@ -447,7 +447,7 @@ func TestNotchLyricsWhileLoading(t *testing.T) {
 	first := &loaded[lyrics.Lyrics]{}
 	s.loads["lyrics:"+testTracks[0].ID] = first
 	s.loads["lyrics:"+testTracks[1].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB",
-		Lines: []lyrics.Line{{TimeMs: 0, Text: "Stones remember every tide"}, {TimeMs: 600000, Text: "Love is a doing word"}}}}
+		Lines: []lyrics.Line{{TimeMs: 0, Text: "Stones remember every tide"}, {TimeMs: 600000, Text: "Sand keeps the shape of it"}}}}
 	s.p.PlayTracks(testTracks, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	x := newNotchTest(t, s, testHousing)

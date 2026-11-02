@@ -208,24 +208,24 @@ func TestNotchShapes(t *testing.T) {
 func TestNotchControls(t *testing.T) {
 	s := newTestShell(t)
 	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB",
-		Lines: []lyrics.Line{{TimeMs: 0, Text: "Waiting in a car"}, {TimeMs: 30000, Text: "Waiting for a ride in the dark"},
-			{TimeMs: 60000, Text: "The night city grows"}, {TimeMs: 90000, Text: "Look and see her eyes, they glow"}}}}
+		Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper boats on the river"}, {TimeMs: 30000, Text: "Carry what the morning said"},
+			{TimeMs: 60000, Text: "Lanterns lean across the water"}, {TimeMs: 90000, Text: "Folding light into the bend"}}}}
 	s.p.PlayTracks(testTracks, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	x := newNotchTest(t, s, testHousing)
 	x.openPanel()
-	if !x.tt.HasText("Waiting in a car") || !x.tt.HasText("Waiting for a ride in the dark") || x.tt.HasText("The night city grows") {
+	if !x.tt.HasText("Paper boats on the river") || !x.tt.HasText("Carry what the morning said") || x.tt.HasText("Lanterns lean across the water") {
 		t.Errorf("at the start, the lyrics show %q", x.tt.Texts())
 	}
 	s.p.Seek(61 * time.Second)
 	s.settle(t, func(st player.State) bool { return st.Position >= 61*time.Second })
 	x.frame()
-	for _, want := range []string{"Waiting for a ride in the dark", "The night city grows", "Look and see her eyes, they glow", "1:01", "3:31"} {
+	for _, want := range []string{"Carry what the morning said", "Lanterns lean across the water", "Folding light into the bend", "1:01", "3:31"} {
 		if !x.tt.HasText(want) {
 			t.Errorf("after a seek, the panel doesn't show %q: %q", want, x.tt.Texts())
 		}
 	}
-	if x.tt.HasText("Waiting in a car") {
+	if x.tt.HasText("Paper boats on the river") {
 		t.Errorf("after a seek, the lyrics show a line two before: %q", x.tt.Texts())
 	}
 
@@ -272,8 +272,8 @@ func TestRenderNotch(t *testing.T) {
 	for name, h := range map[string]housing{"notch": testHousing, "notch-wide": wideHousing} {
 		s := newTestShell(t)
 		s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB",
-			Lines: []lyrics.Line{{TimeMs: 0, Text: "Waiting in a car"}, {TimeMs: 30000, Text: "Waiting for a ride in the dark"},
-				{TimeMs: 60000, Text: "The night city grows"}}}}
+			Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper boats on the river"}, {TimeMs: 30000, Text: "Carry what the morning said"},
+				{TimeMs: 60000, Text: "Lanterns lean across the water"}}}}
 		s.p.PlayTracks(testTracks, 0)
 		s.settle(t, func(st player.State) bool { return st.Playing })
 		x := newNotchTest(t, s, h)
@@ -447,7 +447,7 @@ func TestNotchLyricsWhileLoading(t *testing.T) {
 	first := &loaded[lyrics.Lyrics]{}
 	s.loads["lyrics:"+testTracks[0].ID] = first
 	s.loads["lyrics:"+testTracks[1].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB",
-		Lines: []lyrics.Line{{TimeMs: 0, Text: "Love, love is a verb"}, {TimeMs: 600000, Text: "Love is a doing word"}}}}
+		Lines: []lyrics.Line{{TimeMs: 0, Text: "Stones remember every tide"}, {TimeMs: 600000, Text: "Love is a doing word"}}}}
 	s.p.PlayTracks(testTracks, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	x := newNotchTest(t, s, testHousing)
@@ -458,9 +458,9 @@ func TestNotchLyricsWhileLoading(t *testing.T) {
 	s.p.Next()
 	s.settle(t, func(st player.State) bool { return st.Index == 1 && st.Playing })
 	x.frame()
-	first.value, first.done = lyrics.Lyrics{Synced: true, Lines: []lyrics.Line{{TimeMs: 0, Text: "Waiting in a car"}}}, true
+	first.value, first.done = lyrics.Lyrics{Synced: true, Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper boats on the river"}}}, true
 	x.frame()
-	if !x.tt.HasText("Love, love is a verb") || x.tt.HasText("Waiting in a car") {
+	if !x.tt.HasText("Stones remember every tide") || x.tt.HasText("Paper boats on the river") {
 		t.Errorf("the lyrics of the track before came: %q", x.tt.Texts())
 	}
 
@@ -469,7 +469,7 @@ func TestNotchLyricsWhileLoading(t *testing.T) {
 		want string
 		try  bool
 	}{
-		{&loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Lines: []lyrics.Line{{Text: "Love, love is a verb"}}}}, "No timed lyrics.", false},
+		{&loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Lines: []lyrics.Line{{Text: "Stones remember every tide"}}}}, "No timed lyrics.", false},
 		{&loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Instrumental: true}}, "This track is instrumental.", false},
 		{&loaded[lyrics.Lyrics]{done: true, err: fmt.Errorf("No lyrics found for this track: %w", lyrics.ErrNotFound)}, "No lyrics found for this track", false},
 		{&loaded[lyrics.Lyrics]{done: true, err: fmt.Errorf("Lyrics can't be loaded right now: %w", lyrics.ErrUnavailable)}, "Lyrics can't be loaded right now", true},

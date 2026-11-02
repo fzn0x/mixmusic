@@ -117,3 +117,22 @@ func TestNoRadioAfterEpisode(t *testing.T) {
 		t.Errorf("the radio added %d tracks", n-1)
 	}
 }
+
+// TestSpotifyEpisodeResumesOnDevice has a Spotify device play an episode
+// from where the user left it, and never hands it an episode ahead, which
+// it would play from its start: the player starts that one itself.
+func TestSpotifyEpisodeResumesOnDevice(t *testing.T) {
+	connectTick, connectAskEvery, connectSettle = time.Hour, time.Hour, 0
+	t.Cleanup(func() { connectTick, connectAskEvery, connectSettle = time.Second, 3*time.Second, 5*time.Second })
+	h := newResumeHarness(t, map[string]time.Duration{"spotify:e1": 10 * time.Minute, "spotify:e2": time.Minute},
+		func(f *fakeServices) { f.prepare = here })
+	own := &aheadDevice{}
+	h.p.SpotifyHere(own)
+	e1, e2 := spotifyTrack("e1"), spotifyTrack("e2")
+	e1.Episode, e2.Episode = &media.Episode{}, &media.Episode{}
+	h.p.PlayTracks([]media.Track{e1, e2}, 0)
+	h.wait("e1 playing", func(p *Player) bool { return current(p.s) == "spotify:e1" && p.connect.active() && p.s.Playing })
+	if !own.has("play spotify:e1 10m0s") {
+		t.Errorf("the device was told %v", own.calls)
+	}
+}

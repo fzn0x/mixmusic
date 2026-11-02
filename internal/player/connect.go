@@ -489,7 +489,8 @@ func (p *Player) aheadOnDevice() []Item {
 	var ahead []Item
 	for i := p.s.Index + 1; i < len(p.s.Queue) && len(ahead) < maxAhead; i++ {
 		it := p.s.Queue[i]
-		if it.Skip != "" || it.Track.Source != media.SourceSpotify {
+		// An episode the player starts itself, from where it was left.
+		if it.Skip != "" || it.Track.Source != media.SourceSpotify || spoken(it.Track) {
 			break
 		}
 		if !it.Chosen && p.checks(it.Track) && p.knownLabel(it.Track) != LabelNone {

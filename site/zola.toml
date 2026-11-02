@@ -1,6 +1,7 @@
 # The MixMusic website, built with Zola: `zola --root site serve` to
 # preview it, `zola --root site build` to build it into site/public, after
-# `go run ./tools/sitedocs`, which makes the docs' pages from docs/*.md.
+# `go run ./tools/sitedocs`, which makes the docs' pages from docs/*.md and
+# the folders of docs/ with a README.md.
 #
 # templates/index.html is the landing page; static/ holds its stylesheet,
 # script and assets, copied as they are. The docs are content/docs, shown

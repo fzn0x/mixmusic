@@ -18,10 +18,11 @@ type PageFunc func(ctx context.Context, token string) ([]Track, string, error)
 // new try: it's tried once, then once after each wait. Tests shorten them.
 var PageWaits = []time.Duration{time.Second, 2 * time.Second, 4 * time.Second}
 
-// maxEmptyPages is how many pages in a row without a track end a list: a
-// service that gave the token of another page with each, forever, would
-// be read forever.
-const maxEmptyPages = 10
+// maxEmptyPages is how many pages in a row without a track end a list. A
+// playlist may hold long runs of what doesn't play, as Spotify's local
+// files, but a service that gave the token of another page with each page
+// of nothing, forever, would be read forever.
+const maxEmptyPages = 100
 
 // ReadPage reads the page of token with read, and while it fails, tries
 // again after each of PageWaits, unless ctx ends.

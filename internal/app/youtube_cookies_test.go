@@ -14,9 +14,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/settings"
-	"github.com/fzn0x/mixmusic/internal/spotify"
-	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/tools"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
@@ -171,7 +168,9 @@ func TestBrowserSpec(t *testing.T) {
 }
 
 // cookieApp is an app whose YouTube Music is answer, with a store of the
-// YouTube session of its own, and the temporary folder of the test.
+// YouTube session of its own, and the temporary folder of the test. It
+// opens as MixMusic does, as choosing a channel changes the settings, which
+// reaches every part of the app.
 func cookieApp(t *testing.T, answer http.HandlerFunc) (*App, *atomic.Int32) {
 	t.Helper()
 	tmp := t.TempDir()
@@ -184,15 +183,10 @@ func cookieApp(t *testing.T, answer http.HandlerFunc) (*App, *atomic.Int32) {
 		answer(w, r)
 	}))
 	t.Cleanup(srv.Close)
-	yt := youtube.New()
-	yt.BaseURL = srv.URL
-	set, err := store.Open(filepath.Join(t.TempDir(), "settings.json"), settings.Default())
-	if err != nil {
-		t.Fatal(err)
-	}
-	auth := spotify.NewAuth("client")
-	a := &App{auth: auth, spotify: spotify.NewClient(auth), youtube: yt, settings: set,
-		youtubeStore: testYouTube(t, newKeeper(), nil), tools: tools.New(t.TempDir())}
+	a := fileApp(t, "")
+	a.youtube.BaseURL = srv.URL
+	a.youtubeStore = testYouTube(t, newKeeper(), nil)
+	a.tools = tools.New(t.TempDir())
 	a.watchYouTube()
 	return a, &requests
 }

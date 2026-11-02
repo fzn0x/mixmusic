@@ -741,7 +741,7 @@ func (s *shell) colorFileRow(c *ui.Context, source settings.ColorSource, shown, 
 				s.set.ColorFile = settings.CleanPath(path)
 				s.save()
 			})
-			in.Placeholder("path to a colour file").Width(260).Label("Colour file")
+			in.Placeholder(k.sentence("path to a colour file")).Width(260).Label("Colour file")
 			if s.button(c, "choose-color-file", "choose", false).Label("Choose a colour file").Clicked() {
 				s.chooseColorFile()
 			}

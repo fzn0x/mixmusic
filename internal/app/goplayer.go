@@ -81,6 +81,10 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 		p.Seek(fromMs(cmd.Value))
 	case CommandVolume:
 		p.SetVolume(cmd.Value)
+	case CommandVolumeBy:
+		p.ChangeVolume(min(max(cmd.Value, -1), 1))
+	case CommandMute:
+		p.ToggleMute()
 	case CommandShuffle:
 		p.ToggleShuffle()
 	case CommandRepeat:
@@ -91,7 +95,9 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 			go func() {
 				if err := (&Collection{a}).SetLiked(context.Background(), cur.Track, !liked); err != nil {
 					log.Printf("mixmusic: liking %s: %v", cur.Track.ID, err)
+					return
 				}
+				a.notifyLiked(cur.Track, !liked)
 			}()
 		}
 	case CommandPlayTrack:
@@ -104,7 +110,7 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 type playerServices struct{ a *App }
 
 func playerSource(src PlaybackSource) player.Source {
-	return player.Source{Mode: player.Mode(src.Mode), URL: src.URL, Track: src.Track}
+	return player.Source{Mode: player.Mode(src.Mode), URL: src.URL, Track: src.Track, Live: src.Live}
 }
 
 func (s playerServices) Prepare(ctx context.Context, t media.Track) (player.Source, error) {
@@ -141,9 +147,7 @@ func (s playerServices) KickOnline()                          { s.a.online.Kick(
 func (s playerServices) Settings() settings.Settings { return s.a.settings.Get().Clean() }
 
 func (s playerServices) SaveVolume(v float64) {
-	st := s.a.settings.Get()
-	st.Volume = v
-	if _, err := (&Preferences{s.a}).Set(st); err != nil {
+	if _, err := (&Preferences{s.a}).Update(func(st *settings.Settings) { st.Volume = v }); err != nil {
 		log.Printf("mixmusic: keeping the volume: %v", err)
 	}
 }
@@ -155,6 +159,7 @@ func (s playerServices) Report(now player.Now) {
 		Loading:    now.Loading,
 		PositionMs: int(now.Position / time.Millisecond),
 		DurationMs: int(now.Duration / time.Millisecond),
+		Live:       now.Live,
 		Volume:     now.Volume,
 		Shuffle:    now.Shuffle,
 		Repeat:     Repeat(now.Repeat),

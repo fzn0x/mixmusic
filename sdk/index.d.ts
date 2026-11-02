@@ -85,6 +85,8 @@ export interface Playlist {
   tracks: Track[];
   editable?: boolean;
   url?: string;
+  saved?: boolean;
+  deletable?: boolean;
 }
 
 export interface SearchResults {
@@ -107,6 +109,12 @@ export interface Lyrics {
   /** Lines of the lyrics; timeMs is when a line is sung, when synced. */
   lines: { timeMs: number; text: string }[];
   source: string;
+  /**
+   * The address of the source, for sources whose licence asks apps that
+   * show their lyrics to credit them with it, as Unison's does: "Lyrics
+   * from Unison (https://unison.boidu.dev)".
+   */
+  sourceUrl?: string;
 }
 
 export interface PlayerSnapshot {

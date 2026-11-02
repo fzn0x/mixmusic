@@ -271,7 +271,7 @@ func TestMPRIS(t *testing.T) {
 	if got := b.getString(busName, rootInterface, "Identity"); got != "MixMusic" {
 		t.Errorf("Identity %q", got)
 	}
-	if got := b.getString(busName, rootInterface, "DesktopEntry"); got != "mixmusic" {
+	if got := b.getString(busName, rootInterface, "DesktopEntry"); got != desktopEntry {
 		t.Errorf("DesktopEntry %q", got)
 	}
 	if !b.getBool(busName, rootInterface, "CanRaise") || b.getBool(busName, rootInterface, "CanQuit") {

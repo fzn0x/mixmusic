@@ -20,9 +20,9 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
-// TestSettingsViewed shows every section of the settings, in both of the
-// ways the themes go, and in each way Spotify plays: showing them changes
-// nothing.
+// TestSettingsViewed shows every section of the settings, and searched, in
+// both of the ways the themes go, and in each way Spotify plays: showing
+// them changes nothing.
 func TestSettingsViewed(t *testing.T) {
 	s := newTestShell(t)
 	tt := tester(t, s)
@@ -36,10 +36,12 @@ func TestSettingsViewed(t *testing.T) {
 			s.refresh()
 			before, _ := json.Marshal(s.svc.Preferences.Get())
 			for _, tab := range settingsTabs {
-				s.navigate("/settings/" + tab)
-				s.drain()
-				tt.Frame()
-				tt.Advance(time.Second)
+				for _, q := range []string{"", "a"} {
+					s.navigate(settingsPath(tab, q))
+					s.drain()
+					tt.Frame()
+					tt.Advance(time.Second)
+				}
 			}
 			if after, _ := json.Marshal(s.svc.Preferences.Get()); string(after) != string(before) {
 				t.Errorf("showing the settings changed them, following the computer %v, Spotify %s:\n%s\n%s", follow, mode, before, after)
@@ -263,6 +265,29 @@ func TestThemeCards(t *testing.T) {
 	show(s, tt, "/settings/appearance")
 	if !tt.HasText("built in") {
 		t.Errorf("the built-in themes don't say so: %q", tt.Texts())
+	}
+}
+
+// TestThemeCardLooks makes each theme card's look once, not in every
+// frame, until the themes installed change.
+func TestThemeCardLooks(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 1600)
+	show(s, tt, "/settings/appearance")
+	if len(s.cardLooks) != len(s.inv.Themes) || len(s.cardLooks) == 0 {
+		t.Fatalf("%d looks of cards for %d themes", len(s.cardLooks), len(s.inv.Themes))
+	}
+	first := s.cardLook("aurora")
+	tt.Frame()
+	if s.cardLook("aurora") != first {
+		t.Error("a frame made the card's look again")
+	}
+	if first.bg == s.cardLook("daylight").bg {
+		t.Error("two themes' cards have one ground")
+	}
+	s.refresh()
+	if s.cardLook("aurora") == first {
+		t.Error("the themes read again kept the card's look")
 	}
 }
 

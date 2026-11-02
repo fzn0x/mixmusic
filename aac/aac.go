@@ -12,7 +12,9 @@
 // that a stream which signals SBR only in its fill elements decodes as
 // its AAC-LC core, at the core's rate. The other object types, among them
 // the explicit HE-AAC ones (5 and 29), Main's prediction and LTP, and
-// streams of more than two channels, are errors.ErrUnsupported.
+// streams of more than two channels, are errors.ErrUnsupported. ParseADTS
+// reads the headers of ADTS frames, as the packed audio of YouTube's live
+// streams holds them, which give the config of their stream.
 //
 // SharpJaad, like JAAD, leaves temporal noise shaping undone and the
 // pulse data unapplied, and gives the channels of a pair noise of their

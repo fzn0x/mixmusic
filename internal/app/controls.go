@@ -98,7 +98,12 @@ func controlsInfo(np NowPlaying, at time.Time) *nowplaying.Info {
 		Volume:   np.Volume,
 		Rate:     np.speed(),
 	}
-	if info.Duration <= 0 {
+	switch {
+	case np.Live:
+		// A live stream has no length, and no seeking: the controls show
+		// how long it played.
+		info.Duration = 0
+	case info.Duration <= 0:
 		info.Duration = time.Duration(t.DurationMs) * time.Millisecond
 	}
 	for _, artist := range t.Artists {

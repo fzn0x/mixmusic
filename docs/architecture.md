@@ -32,10 +32,13 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   albums, artists, playlists, related tracks, radios and plain lyrics.
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
-  liked songs, playlists, albums, subscriptions, likes and saves. Its
-  parsers are tested against recorded responses in `testdata/`, and against
-  the live service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run
-  Live` (`MIXMUSIC_YT_COOKIES` adds a signed-in account).
+  liked songs, playlists, albums, subscriptions, likes and saves, and it
+  deletes the playlists the user made, which it tells from those they
+  saved by the menus YouTube sends with them. Its parsers are tested
+  against recorded responses in `testdata/`, and against the live service
+  with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run Live`
+  (`MIXMUSIC_YT_COOKIES` adds a signed-in account, and
+  `MIXMUSIC_YT_WRITE=1` lets it make and delete a playlist there).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
   library), and controls Spotify Connect devices.
@@ -48,6 +51,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   new URL when YouTube refuses the old one, a new connection, from the byte
   it reached, when a download gets no bytes for 15 seconds or its
   connection drops, and an on-disk cache of tracks played to their end.
+  A live video's audio is an HLS media playlist (RFC 8216) of AAC-LC in
+  packed audio, format 234, or 233 with data saver, which `Proxy.OpenLive`
+  follows from near its live edge: it loads the playlist again about once
+  per target duration, fetches each new segment once, and finds the
+  stream again before its URL expires, never caching it.
   The player API also tells how loud YouTube measured each video
   (`Stream.Loudness`, `Direct.Loudness`). Its answers are tested against
   recorded ones in `testdata/`, and against YouTube with
@@ -63,16 +71,25 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   codec delay of the edit list, from progressive files and fragmented
   ones, seeking by the sample table, the `sidx` or the `moof` boxes.
 - **`aac`** decodes AAC-LC, in mono or stereo, with all of its
-  tools: a pure Go decoder derived from SharpJaad, the C# port of JAAD,
+  tools, and reads the headers of ADTS frames: a pure Go decoder derived from SharpJaad, the C# port of JAAD,
   under SharpJaad's MIT license, which decodes YouTube's AAC within about
   136 dB of ffmpeg's decoder, but for the few frames whose channels share
   their noise, as the standard has it and ffmpeg's decoder doesn't.
   **`resample`** converts it from its rate, 44.1 kHz for
   YouTube, to the engine's 48 kHz, with a polyphase filter of
   Kaiser-windowed sincs.
+- **`ac3`** decodes AC-3, the 5.1 surround of YouTube's format 380: a
+  pure Go decoder written from ATSC A/52, of every audio coding mode and
+  tool, into six channels, with the stereo downmix the stream's own mix
+  levels ask for. It decodes streams of ffmpeg's encoder as ffmpeg's
+  decoder does to about 110 dB, and its tests edit those streams to use
+  the tools the encoder doesn't: block switching, delta bit allocation,
+  phase flags and dynamic range gains.
 - **`internal/audio`** is MixMusic's audio engine: two decks, each a
-  goroutine that reads a track, Opus in WebM with `webm` and `opus`, or AAC
-  in MP4 with `mp4`, `aac` and `resample`, as its first bytes tell, and decodes it into
+  goroutine that reads a track, Opus in WebM with `webm` and `opus`, AAC
+  in MP4 with `mp4`, `aac` and `resample`, or the AAC of a live stream's
+  packed audio, its ID3 tags passed over, which has no length and can't
+  seek, as its first bytes tell, and decodes it into
   a ring the audio thread plays from, at 48 kHz, each turning a
   track louder than -14 LKFS down to it, from the loudness its `Measured`
   source tells (Even loudness), and the preamp, equalizer, levelling
@@ -84,7 +101,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   is. `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio -run
   StretchListen` writes the test files at each speed, to listen to.
   `MIXMUSIC_LIVE=1 go test ./internal/audio -run Live` plays songs of both
-  codecs as the app finds them on YouTube, against ffmpeg's decode.
+  codecs, and a 24/7 live stream, as the app finds them on YouTube,
+  against ffmpeg's decode.
   `internal/audio/output` plays it on the system's output, without cgo:
   through WASAPI on Windows, an Audio Queue on macOS, and PulseAudio,
   which PipeWire serves too, or ALSA on Linux. On Windows it also hears
@@ -98,6 +116,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both
   called with purego, and the SystemMediaTransportControls of a hidden
   window on Windows, reached through WinRT without cgo.
+- **`internal/portal`** asks the desktop's Background portal, in a
+  Flatpak, to let MixMusic run without a window and to start it at login:
+  the sandbox's own autostart folder is one the desktop never reads.
+  `internal/app` asks it for Start at login, and for close to the tray.
+  [packaging/flatpak](../packaging/flatpak) holds the Flatpak itself.
 - **`internal/taskbar`** puts previous, play or pause, and next on the
   thumbnail of the main window's taskbar button on Windows, through the
   shell's ITaskbarList3, and takes their clicks in a window procedure in
@@ -120,8 +143,12 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
-  title, artists and duration, for playback without a Spotify device.
-- **`lyrics`** finds synced lyrics on LRCLIB and reads LRC.
+  title, artists and duration, for playback without a Spotify device. It
+  also finds the song of a music video, by its title and artists, which
+  the video's radio starts from: YouTube Music makes the radio of a video
+  out of videos.
+- **`lyrics`** finds synced lyrics on Unison and LRCLIB, and reads TTML and
+  LRC.
 - **`internal/library`** keeps liked songs, mixes, the history and stats in
   `library.json`.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
@@ -143,12 +170,17 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   to the interface the windows show: pages and widgets as views of
   elements, which the windows draw in their own styles, and canvases, whose
   drawing calls the plugin records and the window paints.
-- **`internal/store`** writes JSON files atomically; **`internal/settings`**
-  defines the settings and keeps them in range.
+- **`internal/store`** writes JSON files atomically. A file the user may
+  edit while MixMusic runs, `settings.json`, it reads again when asked
+  (`File.Reload`), and before each write, so that it never saves over an
+  edit it hasn't read: it merges the edit in, by top-level keys. While the
+  file doesn't decode, it leaves it as it is and holds its writes.
+  **`internal/settings`** defines the settings, keeps them in range, and
+  reads `settings.json` (`Decode`), at start and on each edit alike.
 - **`internal/app`** gives the windows the services (`App.Services`), tells
   them when the settings, the accounts, the add-ons or the updates change
   (`App.Watch`), makes the player, and puts MixMusic on the desktop: the
-  tray, media keys, deep links, notifications, updates.
+  tray, media keys, global shortcuts, deep links, notifications, updates.
 
 ## The windows
 
@@ -156,6 +188,13 @@ The root package draws the main window and the mini player. Pages fetch
 what they show beside the main thread (`fetch`), and a window's state
 belongs to its main thread: what finishes elsewhere comes back through
 `update`.
+
+- **Refresh** (F5, ⇧⌘R on macOS, `refresh.go`) asks again for the keys
+  the page shown and the side panel fetched in the frame before, as
+  `fetch` collects them, and renders the plugins' views again
+  (`View.Remount`). The page keeps its answers until the new ones come,
+  and keeps them when a refresh fails, which one toast tells. Home's own
+  tile and shelves read the library as it is, and need no refresh.
 
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
@@ -191,7 +230,8 @@ Two windows still show a web page, and only while they're needed:
 ## Data
 
 Everything lives in the user's data folder (`%AppData%\MixMusic` on
-Windows, `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
+Windows, `~/Library/Application Support/MixMusic` on macOS,
+`~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
 `queue.json`, `addons/`, `bin/` (yt-dlp), the YouTube session
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the
@@ -202,7 +242,13 @@ without credentials, is sealed for the user with DPAPI in
 Linux without a Secret Service, the secrets and the session are in plain
 files only the user can read (`spotify-token.json`, `lastfm.json`,
 `youtube-session.json`). `secretStore` (`internal/app/secrets.go`) moves a
-secret found in a file into the credential store once it can keep it. The
+secret found in a file into the credential store once it can keep it.
+`settings.json` may be edited while MixMusic runs: `App.watchSettings`
+watches it (`mygo.WatchFiles`, or a look every two seconds where it can't),
+and `App.ReloadSettings` applies an edit as Settings applies a change, then
+tells the windows (`App.Watch`). A file with a mistake is told of after a
+second, and kept as `settings.json.broken` if MixMusic quits before it is
+fixed; a `settings.json` that is a link stays one. The
 cache folder holds audio, the covers shown (`artwork/`), matches, how loud
 YouTube measured the tracks played (`loudness.json`), and yt-dlp's cache,
 and the logs folder the log and the crash reports. `MIXMUSIC_DATA_DIR`
@@ -226,6 +272,7 @@ aren't pages act: `act:shot:<name>` saves the window as it is,
 `act:mute` mutes the player, `act:play:<search>` plays what a search
 finds, `act:resume` plays the queue kept in the data folder,
 `act:wait:<duration>` waits, `act:palette` opens the command palette,
+`act:refresh` refreshes the page, as F5 does,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
 scrolls the page, `act:theme:<id>` wears a theme, `act:mini` opens the
 mini player, which saves `mini.png`, `act:spotify` logs whether MixMusic's

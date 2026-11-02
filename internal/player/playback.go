@@ -72,6 +72,11 @@ func (p *Player) Previous() { p.do(p.previous) }
 // isn't a number changes nothing.
 func (p *Player) SetVolume(v float64) { p.do(func() { p.setVolume(v) }) }
 
+// ChangeVolume turns the volume up or down by, from the volume the player
+// has as it takes the change, and unmutes: presses that come at once each
+// count.
+func (p *Player) ChangeVolume(by float64) { p.do(func() { p.setVolume(p.s.Volume + by) }) }
+
 // ToggleMute mutes or unmutes.
 func (p *Player) ToggleMute() {
 	p.do(func() {
@@ -141,6 +146,9 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 		return
 	}
 	entry := p.s.Queue[i]
+	if cur, ok := p.s.Current(); !ok || cur.UID != entry.UID {
+		p.s.Live = false // until its stream is found
+	}
 	p.loadToken++
 	token := p.loadToken
 	p.retry = retryState{}
@@ -150,6 +158,9 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	p.s.Index = i
 	p.s.Position = start
 	p.s.Duration = ms(entry.Track.DurationMs)
+	if p.s.Live {
+		p.s.Duration = 0
+	}
 	p.s.Error = ""
 	p.s.Buffering = true
 	p.s.Loading = autoplay
@@ -192,6 +203,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 // Connect device, or MixMusic's own.
 func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Duration, autoplay bool, d Device) {
 	p.stopStream()
+	p.s.Live = false
 	p.connect.use(d)
 	// Spotify's players have no speed but the track's own.
 	p.s.Speed = 1
@@ -244,11 +256,21 @@ func (p *Player) loadStream(src Source, start time.Duration, autoplay bool) {
 	// A Spotify device left in the middle of its track pauses.
 	p.connect.stop(true)
 	p.s.Source = &src
+	p.setLive(src.Live)
 	p.loaded = true
 	p.paused = !autoplay
 	cur, _ := p.s.Current()
 	p.s.Speed = speedOf(p.svc.Settings(), cur.Track)
 	_ = p.stream.Load(src.URL, start, autoplay, p.s.Speed)
+}
+
+// setLive tells whether the current track is a live stream, which has no
+// length.
+func (p *Player) setLive(live bool) {
+	p.s.Live = live
+	if live {
+		p.s.Duration = 0
+	}
 }
 
 func (p *Player) stopStream() {
@@ -381,6 +403,7 @@ func (p *Player) retryStream(why string) {
 			// again once this stream holds: on a slow network, its download
 			// would slow this one's.
 			p.s.Source = &src
+			p.setLive(src.Live)
 			p.loaded = true
 			p.paused = !autoplay
 			p.s.Speed = speedOf(p.svc.Settings(), entry.Track)
@@ -397,7 +420,7 @@ func (p *Player) onProgress() {
 	}
 	pos := p.s.Position
 	dur := p.s.Duration
-	if dur == 0 {
+	if dur == 0 && !p.s.Live {
 		dur = ms(entry.Track.DurationMs)
 	}
 	if p.retry.n > 0 && p.loaded && pos >= p.retry.from+retryHold {
@@ -406,7 +429,12 @@ func (p *Player) onProgress() {
 		p.retry.n = 0
 		p.prefetched = ""
 	}
-	if p.counted != entry.UID && pos >= min(countAfter, dur/2) {
+	// A live stream counts once it played countAfter: it has no half.
+	count := min(countAfter, dur/2)
+	if p.s.Live {
+		count = countAfter
+	}
+	if p.counted != entry.UID && pos >= count {
 		p.counted = entry.UID
 		go p.svc.RecordPlay(entry.Track)
 	}
@@ -421,7 +449,9 @@ func (p *Player) onProgress() {
 	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter && p.retry.n == 0 {
 		p.prefetched = next.UID
 		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
-			if err == nil && src.Mode == ModeStream && src.URL != "" {
+			// A live stream isn't: what the engine would hold of it would be
+			// behind its live edge by then.
+			if err == nil && src.Mode == ModeStream && src.URL != "" && !src.Live {
 				p.stream.Preload(src.URL)
 			}
 			if errors.Is(err, ErrOffline) {
@@ -466,6 +496,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		p.s.Position = 0
 		p.s.Duration = ms(next.Track.DurationMs)
 		p.s.Source = &src
+		p.setLive(src.Live)
 		p.s.Error = ""
 		// The track fading out keeps its speed, and next plays at its own.
 		p.s.Speed = speedOf(p.svc.Settings(), next.Track)
@@ -504,6 +535,12 @@ func (p *Player) play() {
 		p.playAt(p.s.Index, p.s.Position, true)
 		return
 	}
+	if p.atEnd && p.s.Live {
+		// The queue ran out as this live stream's broadcast ended: it is
+		// found again, as the broadcast, or its recording.
+		p.playAt(p.s.Index, 0, true)
+		return
+	}
 	if p.atEnd {
 		// The queue ran out at the end of this track: it plays again from
 		// its start, where the engine, which ended it, goes once seeked.
@@ -540,6 +577,9 @@ func (p *Player) toggle() {
 }
 
 func (p *Player) seek(t time.Duration) {
+	if p.s.Live {
+		return // a live stream plays on where it is
+	}
 	t = max(t, 0)
 	if p.s.Duration > 0 {
 		t = min(t, p.s.Duration)
@@ -612,6 +652,11 @@ func (p *Player) stopAtEnd(ended bool) {
 
 func (p *Player) previous() {
 	heard, i := p.heard(p.s.Position), p.s.Index
+	if p.s.Live {
+		// A live stream has no start to go back to: the track before
+		// plays.
+		heard = 0
+	}
 	if heard > restartAfter || i <= 0 {
 		if i <= 0 && p.s.Repeat == RepeatAll && len(p.s.Queue) > 1 && heard <= restartAfter {
 			p.playAt(len(p.s.Queue)-1, 0, true)
@@ -637,9 +682,11 @@ func (p *Player) setVolume(v float64) {
 	p.volumeTimer = p.after(saveVolumeAfter, func() { p.saveVolume(v) })
 }
 
-// saveVolume keeps the volume v in the settings, unless they keep it.
+// saveVolume keeps the volume v in the settings, unless they keep it: a
+// volume set from the settings, as an edit of settings.json sets it,
+// comes back from its position a hair off, which saves nothing.
 func (p *Player) saveVolume(v float64) {
-	if saved := volume.Saved(v); p.svc.Settings().Volume != saved {
+	if saved := volume.Saved(v); math.Abs(p.svc.Settings().Volume-saved) > 1e-9 {
 		p.svc.SaveVolume(saved)
 	}
 }
@@ -662,6 +709,7 @@ func (p *Player) now() Now {
 		Loading:  p.s.Loading,
 		Position: p.s.Position,
 		Duration: p.s.Duration,
+		Live:     p.s.Live,
 		Volume:   p.s.Volume,
 		Shuffle:  p.s.Shuffle,
 		Repeat:   p.s.Repeat,
@@ -784,7 +832,7 @@ func (p *Player) onTime(position, duration time.Duration) {
 		p.failures = 0
 	}
 	p.s.Position = position
-	if duration > 0 {
+	if duration > 0 && !p.s.Live {
 		p.s.Duration = duration
 	}
 	// The engine's time moves once it sounds: the log tells how long a

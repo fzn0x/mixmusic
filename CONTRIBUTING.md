@@ -110,11 +110,72 @@ release, and the page reads the latest version from GitHub's API. Once the
 release is published, set the two `data-version` spans to it, for when the
 API does not answer.
 
+The release has a Flatpak too, which the workflow packs from the Linux
+build's x64 archive (see [The Flatpak](#the-flatpak)). Its releases come
+from CHANGELOG.md's headings, so it needs no step of its own; when its job
+fails, the release goes out without it, and running the failed jobs again
+adds it.
+
 Installed apps update themselves from the latest release. Its update files are
 signed with the key whose public half is `updates.publicKey` in
 [mygo.config.ts](mygo.config.ts); the secret half is the repository's
 `MYGO_UPDATER_PRIVATE_KEY` secret, which the workflow signs with. Without it, the
 release has no update files and apps stay on the version they have.
+
+## The website
+
+The [website](site/templates/index.html) and the docs' pages are built with
+[Zola](https://www.getzola.org) from `site/` and `docs/` (see
+[site/zola.toml](site/zola.toml)), and go out to two places whenever what
+they're built from changes on main:
+
+- [pages.yml](.github/workflows/pages.yml) publishes them to GitHub Pages,
+  at https://fzn0x.github.io/mixmusic/.
+- [cloudflare.yml](.github/workflows/cloudflare.yml) builds them again with
+  `--base-url https://mixmusic.functionx.dev` and deploys them to that
+  domain as the Worker of [site/wrangler.jsonc](site/wrangler.jsonc), which
+  serves only the built files. It needs two secrets in the repository: a
+  Cloudflare API token as `CLOUDFLARE_API_TOKEN`, made from the "Edit
+  Cloudflare Workers" template with the functionx.dev zone in it, and the
+  account's ID as `CLOUDFLARE_ACCOUNT_ID`. Pull requests that change the
+  site check the Worker without deploying it, and keep the built site as
+  their `site-cloudflare` artifact.
+
+## The Flatpak
+
+[packaging/flatpak](packaging/flatpak) packs the app of the Linux build
+into a Flatpak, `io.github.fzn0x.mixmusic`, on the GNOME runtime, with the
+tray's library from Flathub's shared modules (a git submodule) and Node.js
+from the SDK's extension. CI builds it on every pull request, installs it
+and starts MixMusic in it; its `flatpak` artifact is the bundle. To build
+it on Linux, with [Flatpak](https://flatpak.org/setup/) and
+`flatpak install flathub org.flatpak.Builder`:
+
+```sh
+git submodule update --init
+bun run build -- -platform linux/amd64
+mkdir -p packaging/flatpak/dist
+cp build/linux-amd64/mixmusic-*-linux-amd64.tar.gz packaging/flatpak/dist/mixmusic-linux-amd64.tar.gz
+go run ./tools/metainfo -o packaging/flatpak/dist/io.github.fzn0x.mixmusic.metainfo.xml
+flatpak run org.flatpak.Builder --user --install --install-deps-from=flathub --force-clean \
+  build/flatpak packaging/flatpak/io.github.fzn0x.mixmusic.yml
+flatpak run io.github.fzn0x.mixmusic
+```
+
+`flatpak run --log-session-bus io.github.fzn0x.mixmusic` shows what the
+sandbox refuses on the session bus. GNOME runtimes get about a year of
+support: the manifest's `runtime-version`, the `gnome-<version>` image of
+ci.yml and release.yml, and the Node.js extension's branch move together.
+
+## Translations of the README
+
+[README.zh-CN.md](README.zh-CN.md) (Simplified Chinese) and
+[README.id.md](README.id.md) (Indonesian) translate
+[README.md](README.md), which stays the one that's current. A pull request
+that changes the README needn't change them: say in it which sections
+changed, so that a translator can follow. Corrections and new languages are
+welcome, as `README.<language code>.md` with a link in each README's
+language line.
 
 ## Reports
 

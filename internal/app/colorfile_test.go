@@ -398,6 +398,42 @@ func TestColorFileSettingChanged(t *testing.T) {
 	}
 }
 
+// TestColorFileFromSettingsFile follows the colour file an edit of
+// settings.json names, as one Settings names, and stops when an edit turns
+// it off.
+func TestColorFileFromSettingsFile(t *testing.T) {
+	c := newColorTest(t, nil)
+	path := c.write("colors.json", pywalFile("#0d1117"))
+	c.run()
+	edit := func(source settings.ColorSource) {
+		t.Helper()
+		data, err := json.Marshal(map[string]string{"colorSource": string(source), "colorFile": path})
+		if err != nil {
+			t.Fatal(err)
+		}
+		writeSettings(t, c.a.settings.Path(), string(data))
+		c.a.ReloadSettings()
+	}
+	edit(settings.ColorsFile)
+	w := c.watch()
+	if w.path != path {
+		t.Errorf("watching %q", w.path)
+	}
+	c.until("the file settings.json names", func(st ColorFileStatus) bool { return groundIn(st) == "#0d1117" && st.Path == path })
+	if f := c.a.Services().Preferences.File(); f.Notice.Kind != NoticeApplied || len(f.Notice.Unknown) > 0 || len(f.Notice.Adjusted) > 0 {
+		t.Errorf("File = %+v", f)
+	}
+	edit(settings.ColorsTheme)
+	select {
+	case <-w.ctx.Done():
+	case <-time.After(5 * time.Second):
+		t.Fatal("the watch goes on")
+	}
+	if st := c.status(); !st.Colors.Empty() || st.Path != "" {
+		t.Errorf("the theme's colours keep the file's: %+v", st)
+	}
+}
+
 // TestColorFileReload reads the file again on Reload add-ons, as the
 // network shares that send no changes need.
 func TestColorFileReload(t *testing.T) {

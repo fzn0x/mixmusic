@@ -85,7 +85,7 @@ type lyricsExtra struct {
 	// words in Latin letters too; nil until then, and while neither shows.
 	tr *lyrics.Translation
 	// ja is set for lyrics in Japanese, whose words in Latin letters are
-	// romaji, made on the computer, once made; nil until then.
+	// their romaji, made on the computer: nil until made.
 	ja     bool
 	romaji []string
 }

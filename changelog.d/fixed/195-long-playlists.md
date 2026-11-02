@@ -5,5 +5,6 @@
   menu's queue items and the download show once they're read. A page
   that fails is tried again a few times, then the playlist says how many
   of its tracks loaded, with Try again; one past 20,000 tracks says where
-  it was cut. Playing, downloading or copying a long playlist from its
-  tile reads all of it first, so it can take a while (#195).
+  it was cut. Playing a long playlist from its tile, downloading it or
+  copying it into a mix reads all of it first, which can take a while
+  (#195).

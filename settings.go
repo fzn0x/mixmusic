@@ -902,7 +902,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 			}
 		})
 	})
-	s.group(c, "music videos", func() {
+	s.group(c, "Music videos", func() {
 		desc := "On the now playing page, a music video plays its picture in place of the cover, muted and in time with the sound. The picture takes about 3 MB a minute more, under 1 MB with data saver."
 		problem := s.videoProblem()
 		if problem != "" {

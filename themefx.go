@@ -37,6 +37,16 @@ var (
 	coverTone = toning{0.68, 0.82, 0.55}
 )
 
+// groundTone is how a cover's colour tones a ground, dark or light: as
+// Greenroom's, or as Glasshouse's, whichever the ground is in a colour
+// file's colours.
+func groundTone(dark bool) toning {
+	if dark {
+		return washTone
+	}
+	return coverTone
+}
+
 // coverTint returns the ground's tint: the colour of the cover of what
 // plays, toned for the ground, or the fallback's without a cover, changing
 // from the last over tintFade, at once while the computer asks for less

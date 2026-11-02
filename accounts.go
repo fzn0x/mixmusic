@@ -47,6 +47,9 @@ const (
 	youtubeChannelAbout = "Brand channels of your account have their own home feed, library and likes."
 	youtubeAccountTitle = "Account and channel"
 	youtubeAccountAbout = "Each Google account of the session, and each of their brand channels, has its own home feed, library and likes."
+	// youtubeUnswitchable follows a brand channel YouTube lists without its
+	// page ID, which can't be chosen.
+	youtubeUnswitchable = "YouTube doesn't let MixMusic switch to this channel"
 
 	lastfmHint = "MixMusic keeps them in your system's credential store, with the connection."
 	lastfmForm = "Create an API account on Last.fm; any name and description will do, and the callback URL can stay empty. " +
@@ -324,6 +327,9 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 		if accounts && ch.Email != "" {
 			labels[i] += " · " + ch.Email
 		}
+		if ch.Unswitchable {
+			labels[i] += " · " + youtubeUnswitchable
+		}
 		if i == current {
 			chosen = labels[i]
 		}
@@ -340,9 +346,16 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 	}
 	s.row(c, title, about, func() {
 		if s.selectOf(c.Key("channel"), &chosen, labels).Width(260).Label(title).Changed() {
-			if i := slices.Index(labels, chosen); i >= 0 {
+			switch i := slices.Index(labels, chosen); {
+			case i < 0:
+			case list[i].Unswitchable:
+				// It stays listed, and the one used stays chosen.
+				s.notes = append(s.notes, noticeOf(fmt.Errorf("YouTube doesn't let MixMusic switch to %s", list[i].Name)))
+			default:
 				ch := list[i]
 				s.youtubePick = false
+				// The notice names the channel once YouTube Music answers as
+				// it: else the app says whom it answered as.
 				s.account("", "Using YouTube Music as "+ch.Name, func(ctx context.Context) error {
 					_, err := s.svc.Accounts.SetYouTubeChannel(ctx, ch)
 					return err

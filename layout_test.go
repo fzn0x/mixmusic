@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/settings"
@@ -120,5 +121,48 @@ func TestThemeCommands(t *testing.T) {
 	}
 	if got := s.svc.Preferences.Get().ActiveTheme(true); got != "crate" {
 		t.Errorf("the theme is %q, not crate", got)
+	}
+}
+
+// TestChooseLayout chooses each layout design in Settings › Appearance:
+// the setting is saved and the window takes its measures at once. The
+// search of the settings finds the choices by what they say.
+func TestChooseLayout(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 2400)
+	show(s, tt, "/settings/appearance")
+	for _, c := range []struct {
+		label  string
+		layout settings.Layout
+		row    float32
+	}{{"crate", settings.LayoutCrate, 48}, {"Expressive", settings.LayoutExpressive, 64}, {"Blend", settings.LayoutBlend, 56}, {"Tiles", settings.LayoutTiles, 52}} {
+		click(t, s, tt, c.label)
+		s.refresh() // as the app's watch does on a change of the settings
+		tt.Frame()
+		if got := s.svc.Preferences.Get().Layout; got != c.layout || s.lk.row != c.row {
+			t.Errorf("chose %s: the setting is %q and rows are %vpx", c.label, got, s.lk.row)
+		}
+	}
+	show(s, tt, settingsPath("appearance", "big covers"))
+	tt.Advance(time.Second)
+	showsOnly(t, tt, "searching big covers", []string{"layout", "crate", "blend"}, []string{"Follow the artwork", "Density"})
+}
+
+// TestLayoutEditedInSettingsFile applies a layout design written in
+// settings.json while MixMusic runs, and puts back one unknown.
+func TestLayoutEditedInSettingsFile(t *testing.T) {
+	s := fileShell(t)
+	tt := tester(t, s)
+	editSettings(t, s, `{"layout": "crate"}`)
+	s.refresh()
+	tt.Frame()
+	if s.set.Layout != settings.LayoutCrate || s.lk.row != 48 {
+		t.Errorf("the layout is %q, with rows of %vpx", s.set.Layout, s.lk.row)
+	}
+	editSettings(t, s, `{"layout": "grid"}`)
+	s.refresh()
+	tt.Frame()
+	if s.set.Layout != settings.LayoutBlend || s.lk.row != 56 {
+		t.Errorf("an unknown layout gave %q, with rows of %vpx", s.set.Layout, s.lk.row)
 	}
 }

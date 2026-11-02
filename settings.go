@@ -270,8 +270,34 @@ func (s *shell) openFolder(kind addons.Kind) {
 	}
 }
 
+// layoutChoices are the layout designs, in the order of settings.Layouts,
+// as Settings › Appearance offers them.
+var layoutChoices = []choice{
+	{"Blend", "Expressive's rounded shapes and springy motion, on Crate's dense rows, big covers in cards and bold headings. The default.", false},
+	{"Expressive", "Playful and colourful: tonal fills, big rounded shapes, pill buttons, a floating player bar and springy motion. The Material themes go with it, their colours made of the cover's.", false},
+	{"Crate", "Restrained: dense rows, big covers in cards and bold, tight headings, so that the covers do the work.", false},
+	{"Tiles", "Flat tiles, giant light lowercase words and outlined boxes, as MixMusic first was.", false},
+}
+
 func (s *shell) appearanceSettings(c *ui.Context) {
 	k := &s.lk
+	s.group(c, "Layout", func() {
+		layout := slices.Index(settings.Layouts, s.set.Layout)
+		options := layoutChoices
+		if k.headings == headingsLight {
+			// Tiles' own words are lowercase, as its other choices.
+			options = s.lowLayoutChoices[:0]
+			for _, o := range layoutChoices {
+				o.title = k.words(o.title)
+				options = append(options, o)
+			}
+			s.lowLayoutChoices = options
+		}
+		if s.choices(c, "layout", "Layout", &layout, options) {
+			s.set.Layout = settings.Layouts[layout]
+			s.save()
+		}
+	})
 	s.groupWith(c, "Theme", func() {
 		if s.link(c, "more-themes", "get more themes") {
 			s.navigate("/marketplace/themes")

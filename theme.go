@@ -45,8 +45,27 @@ type look struct {
 	// fx are the effects of the built-in themes.
 	fx effects
 
-	// The shell's measures; rail is the unfolded rail's width.
+	// The shell's measures; rail is the unfolded rail's width, gap the gap
+	// between covers, and cover their size on the shelves.
 	row, rail, panel, player, gutter float32
+	gap, cover                       float32
+	// The layout tokens' styles (layout.go): pill rounds buttons, chips
+	// and the search box fully; tonal fills controls rather than outlining
+	// them; cards sets covers in filled cards; floating floats the player
+	// bar over the window's foot.
+	pill, tonal, cards, floating bool
+	headings                     headingStyle
+	motion                       motionStyle
+	// selected fills what is chosen, as the current page and the track
+	// that plays, and selectedText and selectedSub ink it: the accent, or,
+	// with tonal controls, a quieter fill. tonalFill fills the secondary
+	// buttons of tonal controls, and tonalInk inks them.
+	selected, selectedText, selectedSub ui.Color
+	tonalFill, tonalInk                 ui.Color
+	// lowered are the words the light headings lowered, by the words.
+	lowered map[string]string
+	// capped are the labels the other styles capitalised, by the labels.
+	capped map[string]string
 }
 
 // fallbackTheme is the Mix theme's tokens, for a theme that lacks some.
@@ -58,12 +77,14 @@ var fallbackTheme = map[string]string{
 	"tile-3": "#a4e600", "tile-4": "#ffb000", "tile-text": "#000000",
 }
 
-// newLook is the look of the active theme of s, among themes; dark tells
-// whether the computer is in dark mode, for themes that follow it, and
-// artwork is the colour of the artwork playing, "" for none. While the
-// settings take the colours from a file, file's colours replace the
-// theme's, which keeps its type, corners and effects.
+// newLook is the look of the active theme of s, among themes, in the
+// layout design of s; dark tells whether the computer is in dark mode,
+// for themes that follow it, and artwork is the colour of the artwork
+// playing, "" for none. While the settings take the colours from a file,
+// file's colours replace the theme's, which keeps its type, corners and
+// effects.
 func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork string, file colorfile.Colors) look {
+	design := designOf(s.Layout)
 	id := s.ActiveTheme(dark)
 	var th addons.Theme
 	for _, t := range themes {
@@ -81,7 +102,29 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	if s.ColorSource != settings.ColorsTheme {
 		fromFile, fileDark = fileTokens(file, mode)
 	}
+	var fx effects
+	if th.Builtin {
+		fx = themeEffects(th, s.ThemeOptions[th.ID])
+	}
+	// The accent: the artwork's, the user's, or the theme's.
+	pick := s.Accent
+	if s.DynamicAccent && artwork != "" {
+		pick = artwork
+	}
+	// The Material themes make all their colours of it, as their seed,
+	// unless a colour file gives the colours.
+	var mat *materialColors
+	if fx.material && fromFile == nil {
+		seed := materialSeed
+		if a, ok := parseColor(pick); ok && pick != "" {
+			seed = a
+		}
+		mat = materialOf(seed, mode == "dark")
+	}
 	themeTok := func(name string) color.NRGBA {
+		if c, ok := mat.token(name); ok {
+			return c
+		}
 		if c, ok := parseColor(th.Colors[name]); ok {
 			return c
 		}
@@ -118,15 +161,24 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 		k.dark = fileDark
 	}
 	k.themeAccent = col(p.accent)
-	// The accent: the artwork's, the user's, or the theme's, as it reads on
-	// the ground.
-	pick := s.Accent
-	if s.DynamicAccent && artwork != "" {
-		pick = artwork
-	}
-	if a, ok := parseColor(pick); ok && pick != "" {
-		a = readableOn(a, bg)
+	// Other themes take the accent as it reads on the ground: at 3:1, or,
+	// in the layouts of tonal controls, which set it as small text on
+	// their fills, at 4.5:1 on the panels' surface, which has less
+	// contrast with it.
+	surface := over(p.surface, bg)
+	if a, ok := parseColor(pick); ok && pick != "" && mat == nil {
+		if design.tonal {
+			a = readableAt(a, surface, 4.5)
+		} else {
+			a = readableOn(a, bg)
+		}
 		p.accent, p.accentText = a, inkOn(a)
+	} else if design.tonal && mat == nil {
+		// The theme's own accent too, or the colour file's, chosen for
+		// the ground.
+		if a := readableAt(p.accent, surface, 4.5); a != p.accent {
+			p.accent, p.accentText = a, inkOn(a)
+		}
 	}
 	accent := p.accent
 	if k.scale <= 0 {
@@ -140,9 +192,7 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 		k.tiles[i] = col(p.tiles[i])
 	}
 	k.tileText = col(p.tileText)
-	if th.Builtin {
-		k.fx = themeEffects(th, s.ThemeOptions[th.ID])
-	}
+	k.fx = fx
 	k.hover = col(alpha(text, 0.07))
 	k.press = col(alpha(text, 0.13))
 	k.rule = col(alpha(accent, 0.45))
@@ -150,15 +200,25 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	k.scrim = col(alpha(bg, 0.72))
 	k.raised = col(over(p.surface2, bg))
 	k.radius = cssLength(th.Radius)
-	k.radiusSm = k.radius * 0.6
 	k.body = fontFamily(th.Fonts.Body)
 	k.display = fontFamily(th.Fonts.Display)
 	if th.Fonts.Display == "" {
 		k.display = k.body
 	}
-	k.row, k.rail, k.panel, k.player, k.gutter = 52, 248, 340, 92, 40
-	if k.compact {
-		k.row, k.rail, k.player, k.gutter = 40, 224, 80, 28
+	k.layoutOf(design)
+	k.selected, k.selectedText, k.selectedSub = k.accent, k.accentText, k.accentText.Alpha(0.78)
+	k.tonalFill, k.tonalInk = col(over(p.surface3, bg)), k.text
+	switch {
+	case k.tonal && mat != nil:
+		// Material's secondary container.
+		k.selected, k.selectedText, k.selectedSub = col(mat.selected), col(mat.selectedText), col(mat.selectedText)
+		k.tonalFill, k.tonalInk = k.selected, k.selectedText
+	case k.tonal:
+		// The highest surface, with the accent's ink and the muted text's,
+		// as they read there.
+		k.selected = k.tonalFill
+		k.selectedText = col(readableAt(nrgba(k.accent), nrgba(k.tonalFill), 4.5))
+		k.selectedSub = col(readableAt(nrgba(k.muted), nrgba(k.tonalFill), 4.5))
 	}
 
 	t := *ui.DarkTheme()

@@ -12,7 +12,7 @@ import (
 
 var (
 	searchPivots = []string{"all", "songs", "albums", "artists", "playlists"}
-	searchScopes = []string{"both", "spotify", "youtube music"}
+	searchScopes = []string{"both", "Spotify", "YouTube Music"}
 )
 
 // interleave alternates the items of two lists, so both services lead.
@@ -89,7 +89,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		if pivot == "all" || pivot == "songs" {
 			tracks := r.Tracks
 			if pivot == "all" {
-				s.sectionTitle(c, "songs")
+				s.sectionTitle(c, "Songs")
 				tracks = tracks[:min(len(tracks), 10)]
 			}
 			ui.Column(c).Margin(0, 0, 48).Children(func() {
@@ -99,21 +99,21 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		switch pivot {
 		case "all":
 			if len(r.Artists) > 0 {
-				s.shelf(c, "artists", "artists", func() {
+				s.shelf(c, "artists", "Artists", func() {
 					for i, a := range r.Artists {
 						s.artistTile(c, "artist-"+count(i), a)
 					}
 				})
 			}
 			if len(r.Albums) > 0 {
-				s.shelf(c, "albums", "albums", func() {
+				s.shelf(c, "albums", "Albums", func() {
 					for i, a := range r.Albums {
 						s.albumTile(c, "album-"+count(i), a)
 					}
 				})
 			}
 			if len(r.Playlists) > 0 {
-				s.shelf(c, "playlists", "playlists", func() {
+				s.shelf(c, "playlists", "Playlists", func() {
 					for i, p := range r.Playlists {
 						s.playlistTile(c, "playlist-"+count(i), p)
 					}
@@ -143,17 +143,17 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 
 // tileWrap lays artwork tiles in rows that wrap.
 func (s *shell) tileWrap(c *ui.Context, tiles func()) {
-	ui.Row(c).Wrap().GapX(16).GapY(24).AlignItems(ui.Start).Children(tiles)
+	ui.Row(c).Wrap().GapX(s.lk.gap).GapY(1.5 * s.lk.gap).AlignItems(ui.Start).Children(tiles)
 }
 
 // recentSearches invites a search, and lists the recent ones.
 func (s *shell) recentSearches(c *ui.Context) {
 	k := &s.lk
-	s.pageHeader(c, "search", nil, nil)
+	s.pageHeader(c, "Search", nil, nil)
 	ui.Column(c).Gap(16).Margin(0, 0, 48).Children(func() {
-		ui.Text(c, "find anything").FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
+		ui.Text(c, k.words("Find anything")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
 		ui.Text(c, "One search looks through YouTube Music and, once you sign in, Spotify.").
-			FontSize(k.subtitleSize()).FontWeight(300).MaxWidth(640)
+			FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640)
 		if s.button(c, "start-typing", "start typing", true).Clicked() {
 			s.searchBox.Focus()
 		}
@@ -163,14 +163,21 @@ func (s *shell) recentSearches(c *ui.Context) {
 		return
 	}
 	ui.Row(c).Justify(ui.SpaceBetween).Children(func() {
-		ui.Column(c).Grow(1).Children(func() { s.sectionTitle(c, "recent") })
+		ui.Column(c).Grow(1).Children(func() { s.sectionTitle(c, "Recent") })
 	})
 	ui.Row(c).Wrap().Gap(8).Children(func() {
 		for i, q := range searches {
-			chip := s.buttonBase(c.Key("recent-"+count(i))).Height(34).PaddingX(14).Border(2, k.outline).
-				Radius(k.radiusSm).Label(q).Cursor(ui.CursorPointer)
-			if chip.Hovered() {
-				chip.Background(k.hover)
+			chip := s.buttonBase(c.Key("recent-" + count(i))).Height(34).PaddingX(14).
+				Radius(k.round(34)).Label(q).Cursor(ui.CursorPointer)
+			switch {
+			case k.tonal && chip.Hovered():
+				chip.Background(k.surface3)
+			case k.tonal:
+				chip.Background(k.surface2)
+			case chip.Hovered():
+				chip.Background(k.hover).Border(2, k.outline)
+			default:
+				chip.Border(2, k.outline)
 			}
 			if chip.Clicked() {
 				s.query = q

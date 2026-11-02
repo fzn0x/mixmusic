@@ -410,14 +410,15 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 			// nothing.
 			n := len(cols)
 			from, to := s.nearTiles(c, "downloaded", n)
+			step := k.tileWidth() + k.gap
 			if from > 0 {
-				ui.Box(c).Width(float32(from)*(artTileSize+shelfGap) - shelfGap).Shrink(0)
+				ui.Box(c).Width(float32(from)*step - k.gap).Shrink(0)
 			}
 			for i := from; i < to; i++ {
 				s.downloadedTile(c, "downloaded-"+count(i), cols[i])
 			}
 			if to < n {
-				ui.Box(c).Width(float32(n-to)*(artTileSize+shelfGap) - shelfGap).Shrink(0)
+				ui.Box(c).Width(float32(n-to)*step - k.gap).Shrink(0)
 			}
 		})
 	}

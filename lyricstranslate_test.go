@@ -208,3 +208,26 @@ func TestTranslateTo(t *testing.T) {
 		t.Errorf("translate to %q", got)
 	}
 }
+
+// TestLyricsSettingsEdited applies an edit of settings.json to how lyrics
+// show while MixMusic runs: the language they translate to, and how the
+// lyrics of each language show, a way MixMusic has no name for put back.
+func TestLyricsSettingsEdited(t *testing.T) {
+	s := fileShell(t)
+	editSettings(t, s, `{"lyricsTranslateTo": "ja", "lyricsTranslate": ["ko"], "lyricsRomanize": {"ko": "only", "ru": "sideways"}}`)
+	s.refresh()
+	if got := s.translateTarget(); got != "ja" {
+		t.Errorf("translate to %q", got)
+	}
+	if !slices.Equal(s.set.LyricsTranslate, []string{"ko"}) || len(s.set.LyricsRomanize) != 1 || s.set.LyricsRomanize["ko"] != settings.RomanizeOnly {
+		t.Errorf("the window has %q, %v", s.set.LyricsTranslate, s.set.LyricsRomanize)
+	}
+	if n := s.svc.Preferences.File().Notice; !slices.Equal(n.Adjusted, []string{"lyricsRomanize.ru"}) || len(n.Unknown) != 0 {
+		t.Errorf("the notice tells of %q, unknown %q", n.Adjusted, n.Unknown)
+	}
+	// A switch flipped after keeps the rest of the edit.
+	s.setRomanize("ko", "")
+	if got := s.svc.Preferences.Get(); got.LyricsTranslateTo != "ja" || !slices.Equal(got.LyricsTranslate, []string{"ko"}) || len(got.LyricsRomanize) != 0 {
+		t.Errorf("saved %q, %q, %v", got.LyricsTranslateTo, got.LyricsTranslate, got.LyricsRomanize)
+	}
+}

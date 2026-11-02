@@ -122,6 +122,25 @@ signed with the key whose public half is `updates.publicKey` in
 `MYGO_UPDATER_PRIVATE_KEY` secret, which the workflow signs with. Without it, the
 release has no update files and apps stay on the version they have.
 
+## The website
+
+The [website](site/templates/index.html) and the docs' pages are built with
+[Zola](https://www.getzola.org) from `site/` and `docs/` (see
+[site/zola.toml](site/zola.toml)), and go out to two places whenever what
+they're built from changes on main:
+
+- [pages.yml](.github/workflows/pages.yml) publishes them to GitHub Pages,
+  at https://fzn0x.github.io/mixmusic/.
+- [cloudflare.yml](.github/workflows/cloudflare.yml) builds them again with
+  `--base-url https://mixmusic.functionx.dev` and deploys them to that
+  domain as the Worker of [site/wrangler.jsonc](site/wrangler.jsonc), which
+  serves only the built files. It needs two secrets in the repository: a
+  Cloudflare API token as `CLOUDFLARE_API_TOKEN`, made from the "Edit
+  Cloudflare Workers" template with the functionx.dev zone in it, and the
+  account's ID as `CLOUDFLARE_ACCOUNT_ID`. Pull requests that change the
+  site check the Worker without deploying it, and keep the built site as
+  their `site-cloudflare` artifact.
+
 ## The Flatpak
 
 [packaging/flatpak](packaging/flatpak) packs the app of the Linux build

@@ -46,6 +46,23 @@ type episodePages struct {
 	episodes []media.Track
 	more     string
 	loading  bool
+	// resume is the first of episodes left partway, or -1, as of the
+	// positions' version resumeAt and resumeOf episodes; resumed tells
+	// that it was found.
+	resume   int
+	resumeAt uint64
+	resumeOf int
+	resumed  bool
+}
+
+// resumeIndex returns the first of the episodes e lists that the user
+// left partway, or -1, found again once they or where they were left
+// changed.
+func (s *shell) resumeIndex(e *episodePages) int {
+	if v := s.svc.Collection.PositionsVersion(); !e.resumed || e.resumeAt != v || e.resumeOf != len(e.episodes) {
+		e.resume, e.resumeAt, e.resumeOf, e.resumed = s.resumable(e.episodes), v, len(e.episodes), true
+	}
+	return e.resume
 }
 
 // episodesOf returns the episodes the page of key lists, starting again
@@ -114,7 +131,7 @@ func (s *shell) podcastPage(c *ui.Context, id string) {
 		}
 		if len(episodes) > 0 {
 			h.play = func() { s.p.PlayTracks(episodes, 0) }
-			if i := s.resumable(episodes); i >= 0 {
+			if i := s.resumeIndex(pages); i >= 0 {
 				h.playLabel = "resume"
 				h.play = func() { s.p.PlayTracks(episodes, i) }
 			}

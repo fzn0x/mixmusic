@@ -231,7 +231,7 @@ func TestLookColorFileAccent(t *testing.T) {
 	if a := newLook(set, s.inv.Themes, true, "#00e0a0", f); hexColor(a.accent) != readable("#00e0a0") {
 		t.Errorf("the artwork's accent over the user's: %s", hexColor(a.accent))
 	}
-	theme := newLook(settings.Settings{Theme: "mochi", FontScale: 1}, s.inv.Themes, true, "", colorfile.Colors{})
+	theme := newLook(settings.Settings{Theme: "mochi", FontScale: 1, Layout: set.Layout}, s.inv.Themes, true, "", colorfile.Colors{})
 	if k.body != theme.body || k.display != theme.display || k.radius != theme.radius || k.fx != theme.fx {
 		t.Errorf("Mochi in a file's colours lost its type, corners or effects: %+v", k)
 	}

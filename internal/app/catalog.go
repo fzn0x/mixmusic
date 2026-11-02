@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -75,33 +76,34 @@ func (c *Catalog) Suggestions(ctx context.Context, input string) ([]string, erro
 	return c.a.youtube.Suggestions(ctx, input)
 }
 
-// Home returns the shelves of the home page: the user's own, then
-// Spotify's when they signed in, then YouTube Music's.
-func (c *Catalog) Home(ctx context.Context) ([]media.Shelf, error) {
+// SpotifyHome returns Spotify's shelves of the home page, made of the
+// user's library there, or none while they aren't signed in. The home
+// page shows the user's own first, from LocalShelves, then these, then
+// YouTube Music's.
+func (c *Catalog) SpotifyHome(ctx context.Context) ([]media.Shelf, error) {
+	if !c.a.spotify.SignedIn() {
+		return nil, nil
+	}
 	ctx, cancel := context.WithTimeout(ctx, shelfTimeout)
 	defer cancel()
-	var (
-		wg      sync.WaitGroup
-		sp, yt  []media.Shelf
-		ytErr   error
-		userID  = c.a.spotifyUserID(ctx)
-		shelves = c.localShelves()
-	)
-	if userID != "" {
-		wg.Go(func() { sp = c.a.spotify.Home(ctx, userID) })
+	me, err := c.a.spotifyProfile(ctx)
+	if err != nil {
+		return nil, err
 	}
-	wg.Go(func() { yt, ytErr = c.a.youtube.Home(ctx) })
-	wg.Wait()
-	shelves = append(shelves, sp...)
-	shelves = append(shelves, yt...)
-	if len(shelves) == 0 && ytErr != nil {
-		return nil, ytErr
-	}
-	return shelves, nil
+	return c.a.spotify.Home(ctx, me.ID)
 }
 
-// localShelves returns the shelves of what the user played and made.
-func (c *Catalog) localShelves() []media.Shelf {
+// YouTubeHome returns YouTube Music's shelves of the home page: the
+// user's own there once they signed in.
+func (c *Catalog) YouTubeHome(ctx context.Context) ([]media.Shelf, error) {
+	ctx, cancel := context.WithTimeout(ctx, shelfTimeout)
+	defer cancel()
+	return c.a.youtube.Home(ctx)
+}
+
+// LocalShelves returns the shelves of what the user played and made, as
+// the library has them now: the home page shows them first.
+func (c *Catalog) LocalShelves() []media.Shelf {
 	var shelves []media.Shelf
 	if recent := c.a.library.RecentTracks(16); len(recent) > 0 {
 		items := make([]media.Item, len(recent))
@@ -184,13 +186,54 @@ func (a *App) playlist(ctx context.Context, id string) (media.Playlist, error) {
 	return media.Playlist{}, fmt.Errorf("no playlist %s", id)
 }
 
+// songWait is how long a radio waits for YouTube Music to find the song of
+// a music video, before it goes on without it.
+var songWait = 5 * time.Second
+
+// relayTries is how many of the videos in the radio of an upload without
+// a song are looked up for a song to carry on from.
+const relayTries = 3
+
 // Radio returns tracks like the one given, to play after it. Spotify
 // tracks start the radio of their YouTube Music recording.
+//
+// YouTube Music makes the radio of a music video out of videos, so a video
+// starts the radio of its song. An upload without a song, such as a
+// cover, starts the radio of the first song its own radio suggests, or
+// when it suggests none, of the song of one of its first videos. When
+// there is no such song, or YouTube Music doesn't answer, the video's own
+// radio stands. The song of the video that plays is left out, so that it
+// isn't heard twice.
 func (c *Catalog) Radio(ctx context.Context, track media.Track) ([]media.Track, error) {
 	seed, err := c.a.matcher.Match(ctx, track)
 	if err != nil {
 		return nil, err
 	}
+	skip := []string{track.ID, seed.ID}
+	if seed.Video {
+		song, err := c.songOf(ctx, seed)
+		switch {
+		case err == nil:
+			tracks, err := c.radio(ctx, song, append(skip, song.ID))
+			if err != nil || len(tracks) > 0 {
+				return tracks, err
+			}
+		case errors.Is(err, match.ErrNoMatch):
+			tracks, err := c.radio(ctx, seed, skip)
+			if err != nil {
+				return nil, err
+			}
+			return c.relay(ctx, tracks, skip), nil
+		}
+		// The song's radio is empty, or YouTube Music didn't find the
+		// song in time: the video's own radio, as before.
+	}
+	return c.radio(ctx, seed, skip)
+}
+
+// radio returns YouTube Music's radio of seed, without the tracks whose
+// IDs are in skip.
+func (c *Catalog) radio(ctx context.Context, seed media.Track, skip []string) ([]media.Track, error) {
 	_, videoID, err := media.ParseID(seed.ID)
 	if err != nil {
 		return nil, err
@@ -201,12 +244,57 @@ func (c *Catalog) Radio(ctx context.Context, track media.Track) ([]media.Track, 
 	}
 	out := make([]media.Track, 0, len(tracks))
 	for _, t := range tracks {
-		if t.ID != seed.ID && t.ID != track.ID {
+		if !slices.Contains(skip, t.ID) {
 			out = append(out, t)
 		}
 	}
 	return out, nil
 }
+
+// relay carries on from tracks, the radio of an upload without a song,
+// with a radio of songs: the radio of the first song in it, or when it
+// has none, of the song of one of its first videos. It returns tracks
+// when there is no such song, or that radio is empty, or YouTube Music
+// doesn't answer.
+func (c *Catalog) relay(ctx context.Context, tracks []media.Track, skip []string) []media.Track {
+	if i := slices.IndexFunc(tracks, isSong); i >= 0 {
+		if found, err := c.radio(ctx, tracks[i], skip); err == nil && len(found) > 0 {
+			return found
+		}
+		return tracks
+	}
+	for _, v := range tracks[:min(len(tracks), relayTries)] {
+		song, err := c.songOf(ctx, v)
+		if errors.Is(err, match.ErrNoMatch) {
+			continue
+		}
+		if err != nil {
+			break // no more waits on a YouTube Music that doesn't answer
+		}
+		found, err := c.radio(ctx, song, skip)
+		if err != nil {
+			break
+		}
+		if len(found) > 0 {
+			return found
+		}
+	}
+	return tracks
+}
+
+// songOf returns the song of a music video, as Matcher.Song finds it,
+// waiting at most songWait.
+func (c *Catalog) songOf(ctx context.Context, video media.Track) (media.Track, error) {
+	ctx, cancel := context.WithTimeout(ctx, songWait)
+	defer cancel()
+	song, err := c.a.matcher.Song(ctx, video)
+	if err != nil && !errors.Is(err, match.ErrNoMatch) && !errors.Is(err, context.Canceled) {
+		log.Printf("mixmusic: the song of %s: %v", video.ID, err)
+	}
+	return song, err
+}
+
+func isSong(t media.Track) bool { return !t.Video }
 
 // Lyrics returns the lyrics of a track: synchronized ones from LRCLIB
 // when it has them, else YouTube Music's.

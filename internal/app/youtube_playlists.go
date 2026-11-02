@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
@@ -104,6 +105,20 @@ func (c *Collection) RemoveFromYouTubePlaylist(ctx context.Context, playlistID s
 	return c.a.youtube.RemoveFromPlaylist(ctx, list, track.EntryID, video)
 }
 
+// DeleteYouTubePlaylist deletes a playlist the user made on YouTube Music,
+// by its MixMusic ID: it goes from YouTube too. Mixes copied from it keep
+// their tracks, and the queue its.
+func (c *Collection) DeleteYouTubePlaylist(ctx context.Context, playlistID string) error {
+	if !c.a.youtube.SignedIn() {
+		return errNotSignedIn
+	}
+	list, err := youtubePlaylistID(playlistID)
+	if err != nil {
+		return err
+	}
+	return c.a.youtube.DeletePlaylist(ctx, list)
+}
+
 // reportYouTubePlay adds a play of a YouTube Music track to the user's
 // history there, when they signed in and keep it on.
 func (a *App) reportYouTubePlay(t media.Track) {
@@ -150,14 +165,11 @@ func (s *Accounts) SetYouTubeChannel(ctx context.Context, pageID string) (Accoun
 	if set = set.Clean(); set.YouTubeChannel != pageID {
 		return AccountsStatus{}, errors.New("that is not a channel of the account")
 	}
-	if err := s.a.settings.Set(set); err != nil {
+	// As an edit of settings.json would: the client uses the channel, and
+	// forgets the profile of the former one.
+	if _, err := (&Preferences{s.a}).Update(func(set *settings.Settings) { set.YouTubeChannel = pageID }); err != nil {
 		return AccountsStatus{}, err
 	}
-	notify()
-	s.a.youtube.SetChannel(pageID)
-	s.a.mu.Lock()
-	s.a.youtubeMe, s.a.profileErrs.youtube = nil, ""
-	s.a.mu.Unlock()
 	status := s.a.accountsStatus(ctx)
 	notify()
 	return status, nil

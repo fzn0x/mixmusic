@@ -1,0 +1,317 @@
+{
+ "contents": {
+  "singleColumnMusicWatchNextResultsRenderer": {
+   "tabbedRenderer": {
+    "watchNextTabbedResultsRenderer": {
+     "tabs": [
+      {
+       "tabRenderer": {
+        "title": "Up next",
+        "content": {
+         "musicQueueRenderer": {
+          "content": {
+           "playlistPanelRenderer": {
+            "contents": [
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "Instant Crush (feat. Julian Casablancas)"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Daft Punk",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCRr1xG_2WIDs18a6cIiCxeA",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "909M views"
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "4M likes"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "5:40"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "a5uQMwRMHcs",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_OMV"
+                  }
+                 }
+                }
+               },
+               "videoId": "a5uQMwRMHcs"
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "I Feel It Coming ft. Daft Punk (Official Video)"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "The Weeknd",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UClYV6hHlupm_S_ObS1W-DYw",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "1.4B views"
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "6.4M likes"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "4:58"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "qFLhGq0060w",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_OMV"
+                  }
+                 }
+                }
+               },
+               "videoId": "qFLhGq0060w"
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "As It Was (Official Video)"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Harry Styles",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCVacQ2t5GUZ2t_J3Ia9BynA",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "1B views"
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "9.3M likes"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "2:46"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "H5v3kku4y6Q",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_OMV"
+                  }
+                 }
+                }
+               },
+               "videoId": "H5v3kku4y6Q"
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "Paradise"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Coldplay",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCIaFw5VBEK8qaW6nRpx_qnw",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "2.1B views"
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "9.9M likes"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "4:21"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "1G4isv_Fylg",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_OMV"
+                  }
+                 }
+                }
+               },
+               "videoId": "1G4isv_Fylg"
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "My Drive Thru - Santogold, Julian Casablancas, N.E.R.D produced by Pharrell"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "MyDriveThru",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCqWif_hEPrstOXYdwzGMgTQ",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "5.3M views"
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "29K likes"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "2:31"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "GPZ5fnYFI4Q",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_UGC"
+                  }
+                 }
+                }
+               },
+               "videoId": "GPZ5fnYFI4Q"
+              }
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     ]
+    }
+   }
+  }
+ }
+}

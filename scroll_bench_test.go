@@ -84,7 +84,7 @@ func BenchmarkScroll(b *testing.B) {
 	b.Run("home", func(b *testing.B) {
 		s := newTestShell(b)
 		tt := testerOf(b, s, 1280, 820)
-		s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
+		s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
 		show(s, tt, "/")
 		scrollFrames(b, tt)
 	})
@@ -92,6 +92,20 @@ func BenchmarkScroll(b *testing.B) {
 		s := newTestShell(b)
 		tt := testerOf(b, s, 1280, 820)
 		show(s, tt, "/settings/playback")
+		scrollFrames(b, tt)
+	})
+	// The themes' cards, each in its theme's look.
+	b.Run("settings-appearance", func(b *testing.B) {
+		s := newTestShell(b)
+		tt := testerOf(b, s, 1280, 820)
+		show(s, tt, "/settings/appearance")
+		scrollFrames(b, tt)
+	})
+	// Searched for what most settings hold, every section builds.
+	b.Run("settings-find", func(b *testing.B) {
+		s := newTestShell(b)
+		tt := testerOf(b, s, 1280, 820)
+		show(s, tt, settingsPath("playback", "a"))
 		scrollFrames(b, tt)
 	})
 }
@@ -142,7 +156,7 @@ func settled(t *testing.T, tt *ui.Tester) {
 func TestFarShelvesBuildNothing(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 820)
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: shelves(12, 6)}
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(12, 6)}
 	show(s, tt, "/")
 	if !tt.HasText("Shelf 0") || tt.HasText("Shelf 11") {
 		t.Fatalf("at the top, the window shows %q", tt.Texts())
@@ -163,7 +177,7 @@ func TestFarShelvesBuildNothing(t *testing.T) {
 func TestFarTilesBuildNothing(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 820)
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 40)}
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 40)}
 	show(s, tt, "/")
 	if !tt.HasText("Album 0") || tt.HasText("Album 39") {
 		t.Fatalf("at the start, the shelf shows %q", tt.Texts())

@@ -7,6 +7,9 @@ name: Release
 # flake.lock pins, but the Flatpak's, which packs the Linux build in
 # Flathub's container with flatpak-builder. GoReleaser publishes, with
 # .goreleaser.yaml. Run it by hand to build an existing tag again.
+# With the secrets that CONTRIBUTING.md's "Signing and Homebrew" lists, it
+# also signs the apps, has Apple notarize the Mac's, and updates the
+# Homebrew cask; without them it skips those steps.
 on:
   push:
     tags: ["v*"]

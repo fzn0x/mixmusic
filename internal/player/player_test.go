@@ -9,6 +9,7 @@ import (
 	"math"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -1919,6 +1920,147 @@ func TestSpotifyHere(t *testing.T) {
 	if h.device.has("pause") {
 		t.Errorf("Spotify Connect's device was paused: %v", h.device.calls)
 	}
+}
+
+// aheadDevice is MixMusic's own Spotify device, which plays the tracks
+// after the one it's asked to by itself.
+type aheadDevice struct{ fakeDevice }
+
+func (d *aheadDevice) PlayAhead(_ context.Context, t media.Track, at time.Duration, ahead []media.Track) error {
+	ids := make([]string, len(ahead))
+	for i, a := range ahead {
+		ids[i] = a.ID
+	}
+	d.record("play %s %v then %s", t.ID, at, strings.Join(ids, " "))
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.state = &DeviceState{Playing: true, Progress: at, Track: &t}
+	return nil
+}
+
+func (d *aheadDevice) Hush(context.Context) error {
+	d.record("hush")
+	d.change(func(s *DeviceState) { s.Playing = false })
+	return nil
+}
+
+// calls returns the device's calls that start with pre.
+func (d *fakeDevice) with(pre string) []string {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	var out []string
+	for _, c := range d.calls {
+		if strings.HasPrefix(c, pre) {
+			out = append(out, c)
+		}
+	}
+	return out
+}
+
+// goesOn has the device go on by itself to t, and tell that it did.
+func goesOn(h *harness, d *aheadDevice, t media.Track, at time.Duration, playing bool) {
+	d.set(&DeviceState{Playing: playing, Progress: at, Track: &t})
+	h.p.HereChanged()
+}
+
+// TestSpotifyGapless has MixMusic's own device play the Spotify tracks
+// after the current one by itself: the player follows it to each, without
+// telling it to play them, and the stream after them plays once the last
+// ends. The device tells when what it plays changes: nothing else asks it.
+func TestSpotifyGapless(t *testing.T) {
+	connectTick, connectAskEvery, connectSettle = time.Hour, time.Hour, 0
+	t.Cleanup(func() { connectTick, connectAskEvery, connectSettle = time.Second, 3*time.Second, 5*time.Second })
+	h := newHarness(t, Saved{}, func(f *fakeServices) { f.prepare = here })
+	own := &aheadDevice{}
+	h.p.SpotifyHere(own)
+	sp1, sp2, sp3 := spotifyTrack("1"), spotifyTrack("2"), spotifyTrack("3")
+	h.p.PlayTracks([]media.Track{sp1, sp2, sp3, track("b", "B")}, 0)
+	h.wait("1 playing", func(p *Player) bool { return current(p.s) == "spotify:1" && p.connect.active() && p.s.Playing })
+	if !own.has("play spotify:1 0s then spotify:2 spotify:3") {
+		t.Errorf("the device was told %v", own.calls)
+	}
+	goesOn(h, own, sp2, 300*time.Millisecond, true)
+	h.wait("2 followed", func(p *Player) bool {
+		return current(p.s) == "spotify:2" && p.s.Playing && !p.s.Loading && p.connect.active() && p.s.Position == 300*time.Millisecond
+	})
+	goesOn(h, own, sp3, 200*time.Millisecond, true)
+	h.wait("3 followed", func(p *Player) bool { return current(p.s) == "spotify:3" && p.connect.active() })
+	if plays := own.with("play"); len(plays) != 1 {
+		t.Errorf("the device was told to play %v", plays)
+	}
+	// 3, the last it was given, ends.
+	goesOn(h, own, sp3, 197*time.Second, true)
+	h.wait("3 ending", func(p *Player) bool { return p.connect.ending })
+	goesOn(h, own, sp3, 0, false)
+	h.wait("b playing", playing("b"))
+}
+
+// TestSpotifyGaplessQueueChanged has the player play its own next entry
+// when the device went on by itself to one the queue no longer moves on
+// to, as another was played next meanwhile: what the device went on to is
+// hushed first.
+func TestSpotifyGaplessQueueChanged(t *testing.T) {
+	connectTick, connectAskEvery, connectSettle = time.Hour, time.Hour, 0
+	t.Cleanup(func() { connectTick, connectAskEvery, connectSettle = time.Second, 3*time.Second, 5*time.Second })
+	h := newHarness(t, Saved{}, func(f *fakeServices) { f.prepare = here })
+	own := &aheadDevice{}
+	h.p.SpotifyHere(own)
+	sp1, sp2, sp9 := spotifyTrack("1"), spotifyTrack("2"), spotifyTrack("9")
+	h.p.PlayTracks([]media.Track{sp1, sp2}, 0)
+	h.wait("1 playing", func(p *Player) bool { return current(p.s) == "spotify:1" && p.connect.active() })
+	h.p.PlayNext([]media.Track{sp9})
+	h.wait("9 next", func(p *Player) bool { next, _ := p.s.UpNext(); return next.Track.ID == "spotify:9" })
+	goesOn(h, own, sp2, 300*time.Millisecond, true)
+	h.wait("9 playing", func(p *Player) bool { return current(p.s) == "spotify:9" && p.connect.active() && p.s.Playing })
+	own.mu.Lock()
+	calls := slices.Clone(own.calls)
+	own.mu.Unlock()
+	hush, play := slices.Index(calls, "hush"), slices.Index(calls, "play spotify:9 0s then spotify:2")
+	if hush < 0 || play < hush {
+		t.Errorf("the device was told %v", calls)
+	}
+}
+
+// TestAheadOnDevice gives the device the Spotify tracks right after the
+// current one, up to the first that isn't one or that the queue passes
+// over, and none when repeating one.
+func TestAheadOnDevice(t *testing.T) {
+	h := newHarness(t, Saved{}, func(f *fakeServices) { f.prepare = here })
+	h.p.SpotifyHere(&aheadDevice{})
+	h.p.PlayTracks([]media.Track{spotifyTrack("1"), spotifyTrack("2"), track("a", "A"), spotifyTrack("3")}, 0)
+	h.wait("1 current", func(p *Player) bool { return current(p.s) == "spotify:1" })
+	ids := func(items []Item) (out []string) {
+		for _, it := range items {
+			out = append(out, it.Track.ID)
+		}
+		return out
+	}
+	h.on(func(p *Player) {
+		if got := ids(p.aheadOnDevice()); !slices.Equal(got, []string{"spotify:2"}) {
+			t.Errorf("ahead of 1: %v", got)
+		}
+		p.s.Queue[1].Skip = SkipDisliked
+		if got := p.aheadOnDevice(); len(got) != 0 {
+			t.Errorf("ahead of 1, with 2 passed over: %v", ids(got))
+		}
+		p.s.Queue[1].Skip = ""
+		p.s.Repeat = RepeatOne
+		if got := p.aheadOnDevice(); len(got) != 0 {
+			t.Errorf("ahead of 1, repeating it: %v", ids(got))
+		}
+		p.s.Repeat = RepeatOff
+	})
+	var many []media.Track
+	for i := range maxAhead + 5 {
+		many = append(many, spotifyTrack(strconv.Itoa(i)))
+	}
+	h.p.PlayTracks(many, 0)
+	h.wait("0 current", func(p *Player) bool { return current(p.s) == "spotify:0" })
+	h.on(func(p *Player) {
+		if got := p.aheadOnDevice(); len(got) != maxAhead || got[0].Track.ID != "spotify:1" {
+			t.Errorf("ahead of 0 in a long queue: %v", ids(got))
+		}
+	})
 }
 
 func TestSubscribe(t *testing.T) {

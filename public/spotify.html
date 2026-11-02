@@ -75,13 +75,63 @@
          */
         let start = null;
         let starts = 0;
+        /**
+         * hushed is set from when MixMusic hushes the player, as it went on
+         * by itself to a track MixMusic no longer plays next, until a track
+         * MixMusic waits for sounds: the player plays at no volume, and what
+         * it plays meanwhile stops. A pause alone didn't hold: the player
+         * still loading the track played it once loaded.
+         */
+        let hushed = false;
+        /** HUSH_MS is how long a hush lasts at most: a moment, past its track. */
+        const HUSH_MS = 15000;
+        let hushTimer = null;
+
+        /** loud gives the player its gain back, once hushed. */
+        function loud() {
+          clearTimeout(hushTimer);
+          if (hushed) {
+            hushed = false;
+            void player?.setVolume(gain);
+          }
+        }
 
         /** played settles start once the player plays its track, loaded. */
         function played(s) {
           const t = s?.track_window?.current_track;
-          if (start && !start.settled && s && !s.paused && !s.loading && t && (t.linked_from?.id ?? t.id) === start.id) {
+          const waiting = start && !start.settled;
+          if (waiting && s && !s.paused && !s.loading && t && (t.linked_from?.id ?? t.id) === start.id) {
             start.done(true);
+            loud();
+          } else if (hushed && !waiting && s && !s.paused) {
+            void player?.pause();
           }
+        }
+
+        /**
+         * telling is set while MixMusic is told that what the player plays
+         * changed, and again once it changed once more meanwhile: MixMusic
+         * asks what it plays, at once rather than at its next report, and
+         * so hears of a track's end, or of the player going on to the next.
+         */
+        let telling = false;
+        let again = false;
+        function changed() {
+          if (telling) {
+            again = true;
+            return;
+          }
+          telling = true;
+          mygo
+            .call("SpotifyPage.Changed")
+            .catch((err) => console.error("spotify: telling of a change:", err))
+            .finally(() => {
+              telling = false;
+              if (again) {
+                again = false;
+                changed();
+              }
+            });
         }
 
         async function open() {
@@ -106,7 +156,10 @@
               });
             }
             p.addListener("playback_error", ({ message }) => console.error(`spotify: playback_error: ${message}`));
-            p.addListener("player_state_changed", played);
+            p.addListener("player_state_changed", (s) => {
+              played(s);
+              changed();
+            });
             p.addListener("ready", ({ device_id }) => {
               clearTimeout(timer);
               if (player === p) deviceID = Promise.resolve(device_id);
@@ -138,12 +191,26 @@
               throw err;
             })),
           pause: async () => void (await player?.pause()),
-          resume: async () => void (await player?.resume()),
+          resume: async () => {
+            loud();
+            await player?.resume();
+          },
           seek: async (positionMs) => void (await player?.seek(positionMs)),
           /** setVolume sets the gain, which MixMusic works out on its own player's curve. */
           async setVolume(g) {
             gain = g;
-            await player?.setVolume(g);
+            if (!hushed) await player?.setVolume(g);
+          },
+          /**
+           * hush has the player play at no volume, at once, and stop what it
+           * plays, until a track MixMusic waits for sounds (see hushed).
+           */
+          async hush() {
+            hushed = true;
+            clearTimeout(hushTimer);
+            hushTimer = setTimeout(loud, HUSH_MS);
+            await player?.setVolume(0);
+            if (!(start && !start.settled)) await player?.pause();
           },
           /**
            * expect has started wait for the track of id, a Spotify ID, which
@@ -175,12 +242,24 @@
           async started(n, ms) {
             const s = start;
             if (!s || s.n !== n) return false;
-            const timer = setTimeout(() => s.done(false), ms);
+            // A track that never sounds leaves the player as loud as it was.
+            const timer = setTimeout(() => {
+              s.done(false);
+              loud();
+            }, ms);
             try {
               return await s.sounds;
             } finally {
               clearTimeout(timer);
             }
+          },
+          /**
+           * order tells whether the player shuffles what it plays, and how it
+           * repeats it: 0 not at all, 1 all it was given, 2 the track.
+           */
+          async order() {
+            const s = await player?.getCurrentState();
+            return { shuffle: !!s?.shuffle, repeat: s?.repeat_mode ?? 0 };
           },
           /** state is what the player plays, or null. */
           async state() {

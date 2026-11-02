@@ -515,7 +515,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.ctx, p.cancel = context.WithCancel(context.Background())
 	p.remote = device
 	p.connect = &connectEngine{p: p, device: device, tickEvery: connectTick, askEvery: connectAskEvery, askDefault: connectAskEvery,
-		settle: connectSettle}
+		settle: connectSettle, settleDefault: connectSettle}
 	st := svc.Settings()
 	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume), Speed: 1}
 	p.spotifyMode, p.skipDisliked, p.skipAI = st.SpotifyPlayback, st.SkipDisliked, st.SkipAI
@@ -575,6 +575,17 @@ func (p *Player) SpotifyHere(d Device) {
 		// A Spotify track that plays on the device isn't passed over for
 		// the label of its recording on YouTube Music.
 		p.reflag()
+	})
+}
+
+// HereChanged takes in MixMusic's own Spotify device telling that what it
+// plays changed, as its track ended or it went on to the next: the player
+// asks it at once, rather than at its next report.
+func (p *Player) HereChanged() {
+	p.do(func() {
+		if p.here != nil && p.connect.device == p.here {
+			p.connect.changed()
+		}
 	})
 }
 

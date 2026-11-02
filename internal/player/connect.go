@@ -5,6 +5,11 @@ package player
 // seconds, and may name a track by another ID, that of the copy Spotify
 // relinked for the user's country, so the engine waits for the device to
 // settle and knows its track by more than its ID.
+//
+// A device that plays a run of tracks by itself (aheadPlayer), as
+// MixMusic's own does, gets the Spotify tracks the queue moves on to after
+// the current one along with it: it goes on to them without a gap, and the
+// engine follows it there rather than telling it to play them.
 
 import (
 	"context"
@@ -44,6 +49,27 @@ var (
 	connectSettle = 5 * time.Second
 )
 
+// maxAhead is how many tracks after the current one a device that plays
+// them by itself gets at most.
+const maxAhead = 20
+
+// aheadPlayer is a device that plays tracks after the one it's asked to,
+// by itself and without a gap between them, as MixMusic's own does.
+type aheadPlayer interface {
+	PlayAhead(ctx context.Context, track media.Track, position time.Duration, ahead []media.Track) error
+}
+
+// settler is a device that tells how long its reports may still tell what
+// it did before a command: one at hand settles at once.
+type settler interface{ Settle() time.Duration }
+
+// husher is a device that silences what it plays at once, and stops it,
+// until a track it is told to play sounds: pausing a track it still loads
+// doesn't hold, as it plays it once loaded.
+type husher interface {
+	Hush(ctx context.Context) error
+}
+
 const (
 	// connectEnd is how close to its end a track is ending.
 	connectEnd = 6 * time.Second
@@ -60,13 +86,18 @@ const (
 type connectEngine struct {
 	p      *Player
 	device Device
-	// tickEvery, askDefault and settle are connectTick, connectAskEvery
-	// and connectSettle as the engine was made; askEvery is how often the
-	// device it plays on is asked what it plays.
-	tickEvery, askEvery, askDefault, settle time.Duration
+	// tickEvery, askDefault and settleDefault are connectTick,
+	// connectAskEvery and connectSettle as the engine was made; askEvery
+	// and settle are the device's it plays on.
+	tickEvery, askEvery, askDefault, settle, settleDefault time.Duration
 	// ticking is closed to stop the ticks of a track.
 	ticking chan struct{}
 	track   *media.Track
+	// ahead are the entries the device was given to play after track, by
+	// itself; followed is the move the device made to the first of them,
+	// which the player makes too, until it plays it (take).
+	ahead    []Item
+	followed *following
 	// progress is where the track is; startedAt where it started.
 	progress  time.Duration
 	startedAt time.Duration
@@ -76,6 +107,9 @@ type connectEngine struct {
 	sentAt  time.Time
 	askedAt time.Time
 	asking  bool
+	// again is set when the device changed while it was being asked: it is
+	// asked once more.
+	again bool
 	// nudged is set once the device was told again to play the track.
 	nudged bool
 	// ending is set once the device told the track is in its last seconds.
@@ -105,18 +139,34 @@ func (c *connectEngine) use(d Device) {
 	if a, ok := d.(asker); ok {
 		c.askEvery = a.AskEvery()
 	}
+	c.settle = c.settleDefault
+	if s, ok := d.(settler); ok {
+		c.settle = s.Settle()
+	}
 }
 
 func (c *connectEngine) duration() time.Duration { return ms(c.track.DurationMs) }
 
-// play plays track on the device from position, and then tells how it
+// play plays track on the device from position, with the entries ahead
+// after it on a device that plays them by itself, and then tells how it
 // went. A track the player left meanwhile stops on the device.
-func (c *connectEngine) play(track media.Track, position time.Duration, then func(error)) {
+func (c *connectEngine) play(track media.Track, ahead []Item, position time.Duration, then func(error)) {
 	// Until the device plays it, its reports would end the track before.
 	c.stop(false)
+	ap, ok := c.device.(aheadPlayer)
+	if !ok {
+		ahead = nil
+	}
 	token := c.p.loadToken
 	await(c.p, func(ctx context.Context) (struct{}, error) {
-		return struct{}{}, c.device.Play(ctx, track, position)
+		if len(ahead) == 0 {
+			return struct{}{}, c.device.Play(ctx, track, position)
+		}
+		tracks := make([]media.Track, len(ahead))
+		for i, it := range ahead {
+			tracks[i] = it.Track
+		}
+		return struct{}{}, ap.PlayAhead(ctx, track, position, tracks)
 	}, func(_ struct{}, err error) {
 		if err == nil && token != c.p.loadToken {
 			c.send(c.device.Pause)
@@ -124,6 +174,7 @@ func (c *connectEngine) play(track media.Track, position time.Duration, then fun
 		}
 		if err == nil {
 			c.track = &track
+			c.ahead = ahead
 			c.progress, c.startedAt = position, position
 			c.nudged, c.ending, c.lost, c.strays = false, false, false, 0
 			c.sentAt = time.Now()
@@ -174,7 +225,7 @@ func (c *connectEngine) resume() {
 		return
 	}
 	if c.lost {
-		c.play(*c.track, c.progress, func(error) {})
+		c.play(*c.track, c.p.aheadOnDevice(), c.progress, func(error) {})
 		return
 	}
 	c.command(c.device.Resume, func() {
@@ -208,16 +259,19 @@ func (c *connectEngine) setVolume(v float64) {
 	}
 }
 
-// stop stops following the device, pausing it when asked.
+// stop stops following the device, pausing it when asked. A move the
+// device made by itself that the player didn't make yet is dropped.
 func (c *connectEngine) stop(pause bool) {
 	if c.ticking != nil {
 		close(c.ticking)
 		c.ticking = nil
 	}
-	if pause && c.track != nil && !c.lost {
+	if pause && (c.track != nil && !c.lost || c.followed != nil) {
 		c.send(c.device.Pause)
 	}
 	c.track = nil
+	c.ahead = nil
+	c.followed = nil
 	c.playing = false
 }
 
@@ -246,27 +300,47 @@ func (c *connectEngine) poll() {
 }
 
 func (c *connectEngine) tick() {
-	track := c.track
 	dur := c.duration()
 	if c.playing {
 		c.progress = min(c.progress+c.tickEvery, dur)
 		c.p.onTime(c.progress, dur)
 	}
-	asked := time.Now()
 	near := dur-c.progress < connectEnd
-	if c.asking || (asked.Sub(c.askedAt) < c.askEvery && !near) {
+	if c.asking || (time.Since(c.askedAt) < c.askEvery && !near) {
 		return
 	}
-	c.asking = true
+	c.ask()
+}
+
+// changed takes in the device telling that what it plays changed: it is
+// asked at once, or once more when it is being asked.
+func (c *connectEngine) changed() {
+	if c.track == nil {
+		return
+	}
+	if c.asking {
+		c.again = true
+		return
+	}
+	c.ask()
+}
+
+// ask asks the device what it plays, and follows it.
+func (c *connectEngine) ask() {
+	track := c.track
+	asked := time.Now()
+	c.asking, c.again = true, false
 	c.askedAt = asked
 	await(c.p, c.device.State, func(state *DeviceState, err error) {
 		c.asking = false
 		// A report asked for before the last command tells what the device
 		// did before it.
-		if err != nil || c.track != track || c.sentAt.After(asked) {
-			return
+		if err == nil && c.track == track && !c.sentAt.After(asked) {
+			c.follow(state, time.Since(c.sentAt) < c.settle)
 		}
-		c.follow(state, time.Since(c.sentAt) < c.settle)
+		if c.again && c.track != nil {
+			c.ask()
+		}
 	})
 }
 
@@ -309,6 +383,12 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 	if settling {
 		return
 	}
+	// The device went on by itself to the track it was given after this
+	// one.
+	if state != nil && len(c.ahead) > 0 && sameTrack(state.Track, &c.ahead[0].Track) {
+		c.followOn(state)
+		return
+	}
 	// Around the end, the device moving on or stopping means the track
 	// ended.
 	if c.ending || (c.playing && dur-c.progress < connectEnd) {
@@ -331,6 +411,93 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 func (c *connectEngine) finish() {
 	c.stop(false)
 	c.p.advance(true)
+}
+
+// following is the device having gone on by itself to the entry of uid,
+// which it reported as state, with the entries after it it was given.
+type following struct {
+	uid   string
+	state DeviceState
+	ahead []Item
+}
+
+// followOn takes in the device having gone on by itself to the first entry
+// it was given after the current one: the player moves on to it too, as at
+// the end of a track, and plays it where the device plays it rather than
+// telling the device to (take). When the queue no longer moves on to that
+// entry, as one was played next meanwhile, what the device went on to is
+// silenced at once, and the player moves on to its own.
+func (c *connectEngine) followOn(state *DeviceState) {
+	next := c.ahead[0]
+	if ahead := c.p.aheadOnDevice(); len(ahead) == 0 || ahead[0].UID != next.UID {
+		// Once it is silent, unless the player moved on meanwhile.
+		c.stop(false)
+		silence := c.device.Pause
+		if h, ok := c.device.(husher); ok {
+			silence = h.Hush
+		}
+		token := c.p.loadToken
+		await(c.p, func(ctx context.Context) (struct{}, error) { return struct{}{}, silence(ctx) }, func(struct{}, error) {
+			if token == c.p.loadToken {
+				c.p.advance(true)
+			}
+		})
+		return
+	}
+	rest := c.ahead[1:]
+	c.stop(false)
+	c.followed = &following{uid: next.UID, state: *state, ahead: rest}
+	c.p.advance(true)
+}
+
+// take returns the move the device made by itself to the entry of uid,
+// once the player moved on to it, or nil. A move to another one, which the
+// player no longer makes, stops on the device.
+func (c *connectEngine) take(uid string) *following {
+	f := c.followed
+	c.followed = nil
+	if f != nil && f.uid != uid {
+		c.send(c.device.Pause)
+		return nil
+	}
+	return f
+}
+
+// follows has the engine follow the device on track, which it went on to
+// by itself (f), as if it played it there.
+func (c *connectEngine) follows(track media.Track, f *following) {
+	c.track = &track
+	c.ahead = f.ahead
+	c.progress, c.startedAt = f.state.Progress, 0
+	c.nudged, c.ending, c.lost, c.strays = false, false, false, 0
+	c.sentAt = time.Time{}
+	c.playing = f.state.Playing
+	c.p.onPlaying(c.playing)
+	c.p.onTime(c.progress, c.duration())
+	c.poll()
+}
+
+// aheadOnDevice lists the entries the queue moves on to by itself after
+// the current one, up to maxAhead, that a device which plays them by itself
+// gets: the Spotify tracks right after it, up to the first that isn't one,
+// that the queue passes over, or whose label a move would check first.
+// Repeating one has none.
+func (p *Player) aheadOnDevice() []Item {
+	if p.s.Repeat == RepeatOne || p.s.Index < 0 {
+		return nil
+	}
+	var ahead []Item
+	for i := p.s.Index + 1; i < len(p.s.Queue) && len(ahead) < maxAhead; i++ {
+		it := p.s.Queue[i]
+		if it.Skip != "" || it.Track.Source != media.SourceSpotify {
+			break
+		}
+		if !it.Chosen && p.checks(it.Track) && p.knownLabel(it.Track) != LabelNone {
+			break
+		}
+		ahead = append(ahead, it)
+	}
+	return ahead
 }
 
 // sameTrack tells whether the device plays track: by its ID, or for a

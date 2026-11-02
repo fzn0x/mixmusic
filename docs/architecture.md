@@ -282,8 +282,12 @@ Three web pages still show, and only while they're needed:
   It opens at the first Spotify track that plays in MixMusic, and makes
   MixMusic a Spotify device of its own, which the player plays tracks on
   through the Web API and follows by asking the page (`Page.Eval`); the page
-  gets its token from `SpotifyPage.Token`. Only WebView2, on Windows,
-  decrypts Spotify's audio.
+  gets its token from `SpotifyPage.Token`, and tells `SpotifyPage.Changed`
+  when what it plays changes, for the player to ask at once. A track plays
+  with the Spotify tracks the queue moves on to after it, which the device
+  goes on to without a gap, and the player follows it there
+  (`internal/player/connect.go`). Only WebView2, on Windows, decrypts
+  Spotify's audio.
 - **Google's sign-in to YouTube Music**, whose cookies MixMusic keeps.
 - **The picture of music videos** (`video.go`, `internal/app/video.go`),
   with "Show the video of music videos" on in Settings › Playback: a web

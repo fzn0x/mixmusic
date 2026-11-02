@@ -392,15 +392,27 @@ func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Dura
 	p.connect.use(d)
 	// Spotify's players have no speed but the track's own.
 	p.s.Speed = 1
+	// The device may have gone on to it by itself, from the track before.
+	followed := p.connect.take(entry.UID)
 	if !autoplay {
 		// A device can't wait paused on a track: it starts from here on
-		// play.
+		// play. What it went on to by itself stops.
 		p.connect.stop(false)
+		if followed != nil {
+			p.connect.send(d.Pause)
+		}
 		p.s.Source = &src
 		p.s.Buffering = false
 		return
 	}
-	p.connect.play(entry.Track, start, func(err error) {
+	if followed != nil {
+		p.s.Source = &src
+		p.s.Buffering, p.s.Loading = false, false
+		p.failures = 0
+		p.connect.follows(entry.Track, followed)
+		return
+	}
+	p.connect.play(entry.Track, p.aheadOnDevice(), start, func(err error) {
 		if token != p.loadToken {
 			return
 		}

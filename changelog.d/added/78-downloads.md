@@ -8,6 +8,8 @@
   metered connection unless you allow it, and when YouTube turns requests
   down, going on where they stopped, after a restart too. Settings ›
   Playback shows them, the folder they're in, which you can change, and
-  the switch for metered connections. While you're offline, the queue now
+  the switch for metered connections. A live stream doesn't download: a
+  playlist holding one downloads the rest, and once MixMusic has found it
+  live its menu offers no Download. While you're offline, the queue now
   skips tracks that aren't downloaded or cached, without an error for
   each, and waits for the network only once none is left (#78).

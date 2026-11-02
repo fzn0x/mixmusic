@@ -101,3 +101,19 @@ func TestEpisodesNeitherCrossfadeNorPreload(t *testing.T) {
 		t.Errorf("out of an episode: %q", h.stream.copy())
 	}
 }
+
+// TestNoRadioAfterEpisode stops at the end of a queue that ends on an
+// episode, with autoplay on: its radio would be of songs.
+func TestNoRadioAfterEpisode(t *testing.T) {
+	h := newResumeHarness(t, nil, func(f *fakeServices) {
+		f.settings.Autoplay = true
+		f.radio = []media.Track{track("r1"), track("r2")}
+	})
+	h.p.PlayTracks([]media.Track{episodeTrack("e1")}, 0)
+	h.wait("e1 playing", playing("e1"))
+	h.p.Ended()
+	h.wait("stopped at the end", func(p *Player) bool { return p.atEnd && !p.s.Playing })
+	if n := len(h.p.State().Queue); n != 1 {
+		t.Errorf("the radio added %d tracks", n-1)
+	}
+}

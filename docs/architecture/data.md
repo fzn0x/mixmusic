@@ -3,7 +3,8 @@
 Everything lives in the user's data folder (`%AppData%\MixMusic` on
 Windows, `~/Library/Application Support/MixMusic` on macOS,
 `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
-`queue.json`, `addons/`, `bin/` (yt-dlp), the YouTube session
+`queue.json`, `positions.json` (where the user left podcasts' episodes),
+`addons/`, `bin/` (yt-dlp), the YouTube session
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the
 scrobbles still to send, and `updater.json`, the update preferences. On

@@ -93,9 +93,10 @@ func TestPastedCookies(t *testing.T) {
 }
 
 func TestYouTubeBrowsers(t *testing.T) {
+	home := t.TempDir()
 	names := func(goos string) []string {
 		var n []string
-		for _, b := range youtubeBrowsers(goos) {
+		for _, b := range youtubeBrowsers(goos, home) {
 			n = append(n, b.Name)
 		}
 		return n
@@ -106,6 +107,10 @@ func TestYouTubeBrowsers(t *testing.T) {
 	}
 	if got := names("darwin"); !slices.Equal(got, append(want, "Safari")) {
 		t.Errorf("on macOS: %q", got)
+	}
+	// Without a browser installed as a Flatpak.
+	if got := names("linux"); !slices.Equal(got, want) {
+		t.Errorf("on Linux: %q", got)
 	}
 }
 

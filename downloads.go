@@ -433,7 +433,7 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 	if len(tracks) > 0 {
 		ui.Row(c).Gap(8).Margin(0, 0, 16).Children(func() {
 			if s.button(c, "downloads-play", "play", true).Clicked() {
-				s.p.PlayTracks(tracks, 0)
+				s.p.PlayAll(tracks, false)
 			}
 			if s.button(c, "downloads-shuffle", "shuffle", false).Clicked() {
 				s.shuffled(tracks)
@@ -589,7 +589,7 @@ func (s *shell) downloadedTile(c *ui.Context, key string, v downloads.Collection
 			}
 		}
 		if len(tracks) > 0 {
-			s.p.PlayTracks(tracks, 0)
+			s.p.PlayAll(tracks, false)
 		}
 	case open && s.downloadsOf == v.ID:
 		s.downloadsOf = ""

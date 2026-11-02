@@ -81,12 +81,109 @@ jobs:
             nix develop --command true
           fi
       - run: nix develop --command bun install --frozen-lockfile
+      # The Developer ID certificate, and the App Store Connect key that
+      # notarizes, in a keychain of their own, which mygo build signs and
+      # notarizes with (mygo.config.ts). Without the secrets the app is
+      # signed ad hoc, as before; with some of them only, the build stops.
+      - name: The Developer ID and the notary key
+        if: matrix.name == 'macOS'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          missing=""
+          for name in MACOS_CERTIFICATE MACOS_CERTIFICATE_PASSWORD APPLE_API_KEY APPLE_API_KEY_ID APPLE_API_ISSUER; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ "$missing" = " MACOS_CERTIFICATE MACOS_CERTIFICATE_PASSWORD APPLE_API_KEY APPLE_API_KEY_ID APPLE_API_ISSUER" ]; then
+            echo "::notice::No Developer ID secrets: the macOS app is signed ad hoc, and not notarized"
+            exit 0
+          fi
+          if [ -n "$missing" ]; then
+            echo "::error::Signing and notarizing the macOS app needs these secrets too:$missing"
+            exit 1
+          fi
+          umask 077
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          password="$(openssl rand -base64 24)"
+          echo "::add-mask::$password"
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          echo "$MACOS_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/developer-id.p12"
+          security import "$RUNNER_TEMP/developer-id.p12" -k "$keychain" \
+            -P "$MACOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          rm "$RUNNER_TEMP/developer-id.p12"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$password" "$keychain" > /dev/null
+          security list-keychains -d user -s "$keychain" login.keychain
+          # codesign signs with the identity's SHA-1, which names no other.
+          identity="$(security find-identity -v -p codesigning "$keychain" | awk '/"Developer ID Application: /{ print $2; exit }')"
+          if [ -z "$identity" ]; then
+            echo "::error::MACOS_CERTIFICATE holds no Developer ID Application identity"
+            security find-identity -v -p codesigning "$keychain"
+            exit 1
+          fi
+          security find-identity -v -p codesigning "$keychain" | grep "$identity"
+          # The profile that mygo build notarizes with, checked with Apple.
+          printf '%s\n' "$APPLE_API_KEY" > "$RUNNER_TEMP/notary-key.p8"
+          xcrun notarytool store-credentials mixmusic-notary --keychain "$keychain" \
+            --key "$RUNNER_TEMP/notary-key.p8" --key-id "$APPLE_API_KEY_ID" --issuer "$APPLE_API_ISSUER"
+          # Nix's shell has an xcrun of its own, with the SDK of nixpkgs as
+          # DEVELOPER_DIR: build.sh puts the Mac's own first, with Xcode's.
+          tools="$RUNNER_TEMP/apple-tools"
+          mkdir -p "$tools"
+          ln -s /usr/bin/codesign "$tools/codesign"
+          printf '#!/bin/sh\nexport DEVELOPER_DIR=%s\nexec /usr/bin/xcrun "$@"\n' "'$(xcode-select -p)'" > "$tools/xcrun"
+          chmod 755 "$tools" "$tools/xcrun"
+          {
+            echo "MACOS_SIGNING_IDENTITY=$identity"
+            echo "NOTARY_KEYCHAIN=$keychain"
+            echo "APPLE_TOOLS=$tools"
+          } >> "$GITHUB_ENV"
+      # The code signing certificate, which mygo build signs the apps, the
+      # installers and their uninstallers with, through osslsigncode
+      # (mygo.config.ts). Without the secret they are not signed, as before.
+      - name: The code signing certificate
+        if: matrix.name == 'Windows'
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+        run: |
+          if [ -z "$WINDOWS_CERTIFICATE" ]; then
+            echo "::notice::No WINDOWS_CERTIFICATE secret: the Windows apps are not signed"
+            exit 0
+          fi
+          umask 077
+          echo "$WINDOWS_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/code-signing.pfx"
+          echo "WINDOWS_CERTIFICATE_FILE=$RUNNER_TEMP/code-signing.pfx" >> "$GITHUB_ENV"
       - name: Build
         env:
           # Signs the update files; without it the build skips them.
           MYGO_UPDATER_PRIVATE_KEY: ${{ secrets.MYGO_UPDATER_PRIVATE_KEY }}
+          # Opens the code signing certificate, when it has a password.
+          MYGO_WINDOWS_CERTIFICATE_PASSWORD: ${{ matrix.name == 'Windows' && secrets.WINDOWS_CERTIFICATE_PASSWORD || '' }}
         # A build per platform, each Linux one asking for the system's loader.
         run: nix develop --command bash .github/scripts/build.sh "${{ matrix.platform }}"
+      # Gatekeeper's verdict on the app the build signed with the Developer
+      # ID: a valid signature, and the ticket of its notarization stapled to
+      # the app and to the disk image.
+      - name: Gatekeeper accepts the app
+        if: matrix.name == 'macOS' && env.MACOS_SIGNING_IDENTITY != ''
+        run: |
+          app=build/darwin-universal/MixMusic.app
+          dmg="$(ls build/darwin-universal/*.dmg)"
+          # A tag from before signing, built again, signs ad hoc.
+          if codesign -dv "$app" 2>&1 | grep -q '^Signature=adhoc'; then
+            echo "::warning::The mygo.config.ts of $TAG signs ad hoc: the macOS app is not notarized"
+            exit 0
+          fi
+          codesign --verify --deep --strict --verbose=2 "$app"
+          xcrun stapler validate "$app"
+          xcrun stapler validate "$dmg"
+          spctl --assess --type execute --verbose=4 "$app"
+          spctl --assess --type open --context context:primary-signature --verbose=4 "$dmg"
       # Nix's own loader would keep them from starting outside NixOS (#166).
       - name: The Linux builds ask for the system's loader
         if: matrix.name == 'Linux'

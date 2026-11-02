@@ -29,6 +29,9 @@ type NowPlaying struct {
 	Shuffle    bool    `json:"shuffle"`
 	Repeat     Repeat  `json:"repeat"`
 	Liked      bool    `json:"liked"`
+	// Live is set for a live stream, which has no length: PositionMs is
+	// how long it played.
+	Live bool `json:"live,omitempty"`
 }
 
 // Command is something the player is asked to do from outside its

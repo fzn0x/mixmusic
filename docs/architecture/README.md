@@ -48,5 +48,7 @@ edit the same file. The Go side's packages come first, then the windows:
 12. [Data](data.md): what MixMusic keeps where, on each system.
 13. [Capture mode](capture.md): screenshots of the pages, for the site and
     for tests.
+14. [The player around the notch](notch.md): what plays, around the
+    camera housing of a MacBook's screen.
 
 A new part gets a file of its own here, and a line in this list.

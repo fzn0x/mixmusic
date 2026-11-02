@@ -22,6 +22,7 @@ func (s *shell) view(c *ui.Context) {
 	s.followArtwork()
 	c.SetTheme(&s.lk.theme)
 	s.toasts(c)
+	s.fileToast(c)
 	s.runShortcuts(c)
 	k := &s.lk
 	root := ui.Column(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body)

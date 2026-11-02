@@ -149,8 +149,13 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   to the interface the windows show: pages and widgets as views of
   elements, which the windows draw in their own styles, and canvases, whose
   drawing calls the plugin records and the window paints.
-- **`internal/store`** writes JSON files atomically; **`internal/settings`**
-  defines the settings and keeps them in range.
+- **`internal/store`** writes JSON files atomically. A file the user may
+  edit while MixMusic runs, `settings.json`, it reads again when asked
+  (`File.Reload`), and before each write, so that it never saves over an
+  edit it hasn't read: it merges the edit in, by top-level keys. While the
+  file doesn't decode, it leaves it as it is and holds its writes.
+  **`internal/settings`** defines the settings, keeps them in range, and
+  reads `settings.json` (`Decode`), at start and on each edit alike.
 - **`internal/app`** gives the windows the services (`App.Services`), tells
   them when the settings, the accounts, the add-ons or the updates change
   (`App.Watch`), makes the player, and puts MixMusic on the desktop: the
@@ -204,7 +209,8 @@ Two windows still show a web page, and only while they're needed:
 ## Data
 
 Everything lives in the user's data folder (`%AppData%\MixMusic` on
-Windows, `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
+Windows, `~/Library/Application Support/MixMusic` on macOS,
+`~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
 `queue.json`, `addons/`, `bin/` (yt-dlp), the YouTube session
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the
@@ -215,7 +221,13 @@ without credentials, is sealed for the user with DPAPI in
 Linux without a Secret Service, the secrets and the session are in plain
 files only the user can read (`spotify-token.json`, `lastfm.json`,
 `youtube-session.json`). `secretStore` (`internal/app/secrets.go`) moves a
-secret found in a file into the credential store once it can keep it. The
+secret found in a file into the credential store once it can keep it.
+`settings.json` may be edited while MixMusic runs: `App.watchSettings`
+watches it (`mygo.WatchFiles`, or a look every two seconds where it can't),
+and `App.ReloadSettings` applies an edit as Settings applies a change, then
+tells the windows (`App.Watch`). A file with a mistake is told of after a
+second, and kept as `settings.json.broken` if MixMusic quits before it is
+fixed; a `settings.json` that is a link stays one. The
 cache folder holds audio, the covers shown (`artwork/`), matches, how loud
 YouTube measured the tracks played (`loudness.json`), and yt-dlp's cache,
 and the logs folder the log and the crash reports. `MIXMUSIC_DATA_DIR`

@@ -9,6 +9,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/resources"
 )
 
@@ -68,9 +69,7 @@ func (s *shell) toggleRail() {
 		s.narrowFold = &folded
 		return
 	}
-	st := s.svc.Preferences.Get()
-	st.SidebarCollapsed = folded
-	if _, err := s.svc.Preferences.Set(st); err != nil {
+	if _, err := s.svc.Preferences.Update(func(st *settings.Settings) { st.SidebarCollapsed = folded }); err != nil {
 		s.notes = append(s.notes, noticeOf(err))
 	}
 }

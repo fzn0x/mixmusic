@@ -67,6 +67,7 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 		}
 		s.findBox(c, tab, q, current)
 		ui.Column(c).MaxWidth(880).Children(func() {
+			s.settingsFileProblem(c)
 			if !f.on() {
 				s.settingsSection(c, settingsTabs[selected])
 				if current {
@@ -109,11 +110,16 @@ func (s *shell) settingsSection(c *ui.Context, tab string) {
 	}
 }
 
-// save keeps the settings as the controls changed them.
+// save keeps what the controls changed of the settings: only that, so
+// that an edit of settings.json that applied since refresh read them, which
+// the window doesn't show until its refresh runs, stays.
 func (s *shell) save() {
-	if _, err := s.svc.Preferences.Set(s.set); err != nil {
+	next := s.set.Clean()
+	if _, err := s.svc.Preferences.Change(s.base, next); err != nil {
 		s.notes = append(s.notes, noticeOf(err))
+		return
 	}
+	s.base = next
 }
 
 // group titles a set of rows.

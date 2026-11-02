@@ -36,6 +36,13 @@ time it starts.
   Management in its settings, by their Spotify email. Settings › Accounts
   says which it was: see
   [Spotify](spotify.md#when-spotify-refuses-the-sign-in).
+- **settings.json has a mistake.** MixMusic tells where, as "line 4,
+  column 1: a comma before } has nothing after it", and goes on with the
+  settings it had, without saving to the file, until you fix it. If it
+  quits first, it keeps your text as `settings.json.broken` beside it, and
+  saves its settings in its place. A file that doesn't read as MixMusic
+  starts is kept the same way, and MixMusic starts with the settings of a
+  new install.
 - **No tray icon on Linux.** The tray needs `libayatana-appindicator3` and a
   desktop that shows AppIndicator icons; GNOME needs its AppIndicator
   extension. Without it, closing the window quits MixMusic.

@@ -111,6 +111,8 @@ func TestSettingsFindMatches(t *testing.T) {
 		{"aurora", []string{"Aurora", "Theme: Aurora"}, []string{"Mochi", "Crossfade"}},
 		{"lévelling", []string{"Volume levelling"}, []string{"Crossfade"}},
 		{"follow each other", []string{"Crossfade"}, []string{"Volume levelling"}},
+		{"settings.json", []string{"Settings file"}, []string{"Crossfade", "Close to the tray"}},
+		{"config", []string{"Settings file"}, []string{"Crossfade"}},
 		{"zzzz", []string{"No setting matches “zzzz”."}, []string{"Crossfade", "Close to the tray"}},
 	} {
 		show(s, tt, settingsPath("", c.q))

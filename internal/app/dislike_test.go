@@ -237,3 +237,38 @@ func TestRadioOfAVideoWithoutDisliked(t *testing.T) {
 		t.Errorf("found %v, not %v, %v", trackIDs(got), want, err)
 	}
 }
+
+// TestReloadSettingsFollowsSkipDisliked has an edit of settings.json that
+// turns skipping off let the queue's disliked songs play again, and one
+// that turns it on pass over them again, as the switch does.
+func TestReloadSettingsFollowsSkipDisliked(t *testing.T) {
+	a := fileApp(t, `{}`)
+	var err error
+	if a.queue, err = store.Open(filepath.Join(a.opts.DataDir, "queue.json"), player.Saved{}); err != nil {
+		t.Fatal(err)
+	}
+	disliked := media.Track{ID: "yt:b", Source: media.SourceYouTube, Title: "B"}
+	if _, err := a.library.SetDisliked(disliked, true); err != nil {
+		t.Fatal(err)
+	}
+	stream := &quietStream{}
+	p := player.New(offlineServices{playerServices{a}}, stream, connectDevice{a}, player.Saved{})
+	stream.p.Store(p)
+	a.goPlayer.Store(p)
+	t.Cleanup(p.Close)
+	p.Enqueue([]media.Track{{ID: "yt:a", Source: media.SourceYouTube, Title: "A"}, disliked})
+	skip := func() string {
+		q := p.State().Queue
+		if len(q) != 2 {
+			return "no queue"
+		}
+		return q[1].Skip
+	}
+	until(t, "B skipped", func() bool { return skip() == player.SkipDisliked })
+	writeSettings(t, a.settings.Path(), `{"skipDisliked": false}`)
+	a.ReloadSettings()
+	until(t, "B let off", func() bool { return skip() == "" })
+	writeSettings(t, a.settings.Path(), `{"skipDisliked": true}`)
+	a.ReloadSettings()
+	until(t, "B skipped again", func() bool { return skip() == player.SkipDisliked })
+}

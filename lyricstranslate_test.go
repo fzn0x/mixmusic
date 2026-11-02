@@ -107,6 +107,23 @@ func TestLyricsTranslated(t *testing.T) {
 	}
 }
 
+// TestLyricsCreditTranslated keeps the credit Unison's lyrics ask for under
+// them while they show translated, and in Latin letters in place of their
+// words.
+func TestLyricsCreditTranslated(t *testing.T) {
+	s, texts := lyricsIn(t, "ja", &loaded[translated]{done: true, value: kiteTranslation})
+	s.loads["lyrics:"+testTracks[0].ID].(*loaded[lyrics.Lyrics]).value.SourceURL = lyrics.UnisonURL
+	s.set.LyricsTranslate = []string{"ja"}
+	s.set.LyricsRomanize = map[string]string{"ja": settings.RomanizeOnly}
+	got := texts()
+	if !slices.Contains(got, "kami no tako") || !slices.Contains(got, "Paper kite") || slices.Contains(got, "紙の凧") {
+		t.Fatalf("not translated, in romaji only: %q", got)
+	}
+	if !slices.Contains(got, "lyrics from Unison ("+lyrics.UnisonURL+")") {
+		t.Errorf("Unison's credit: %q", got)
+	}
+}
+
 // TestLyricsRomajiWithTranslation offers romaji of Japanese lyrics once
 // their translation brought some, and not when it brought none, as
 // Unison's translations of Japanese do now.

@@ -96,17 +96,17 @@ func openAAC(r *mp4.Reader, t mp4.Track) (track, timing, error) {
 // openAC3 returns the AC-3 or E-AC-3 track of r, of 5.1 surround, which
 // decodes into six channels.
 func openAC3(r *mp4.Reader, t mp4.Track) (track, timing, error) {
-	rate := t.SampleRate
-	if t.Codec == "ac-3" {
-		cfg, err := ac3.ParseDAC3(t.Config)
-		if err != nil {
-			return nil, timing{}, fmt.Errorf("%w (%v)", errUnsupported, err)
-		}
-		rate = cfg.SampleRate
+	parse := ac3.ParseDAC3
+	if t.Codec == "ec-3" {
+		parse = ac3.ParseDEC3
 	}
-	if rate <= 0 {
-		return nil, timing{}, fmt.Errorf("%w (%s at %d Hz)", errUnsupported, t.Codec, rate)
+	// The dac3 or dec3 tells the rate, and the streams the decoder refuses,
+	// as E-AC-3 of the reduced rates, before any is decoded.
+	cfg, err := parse(t.Config)
+	if err != nil {
+		return nil, timing{}, fmt.Errorf("%w (%v)", errUnsupported, err)
 	}
+	rate := cfg.SampleRate
 	dec := ac3.NewDecoder()
 	// A sample's blocks overlap the block before them: decoding starts a
 	// sample before a seek's target, whose last block settles the first
@@ -176,7 +176,11 @@ func (t *mp4Track) decode() (decoded, error) {
 		// The downmix rarely changes: a new one is kept only when it does,
 		// for the deck to hand the audio thread.
 		if m := t.surround.Info().Downmix; t.downmix == nil || m != *t.downmix {
-			t.downmix = &m
+			// A copy, not m's address, which would put m on the heap at
+			// each packet.
+			d := new([2][6]float32)
+			*d = m
+			t.downmix = d
 		}
 	}
 	// A packet's duration tells how much of its frame is audio: the last

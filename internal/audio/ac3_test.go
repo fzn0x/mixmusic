@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -25,15 +26,6 @@ var (
 	// ac3's Left to RightSurround.
 	surroundTones = [6]float64{440, 550, 660, 60, 770, 880}
 )
-
-// needDecoder skips t while ac3 decodes nothing, as before its decoders
-// came: err is what decoding gave.
-func needDecoder(t *testing.T, err error) {
-	t.Helper()
-	if errors.Is(err, errors.ErrUnsupported) || errors.Is(err, errUnsupported) {
-		t.Skipf("ac3 doesn't decode this stream yet: %v", err)
-	}
-}
 
 // toneOf returns the amplitude and the phase, in frames, of the tone of hz
 // in channel c of pcm, of ch channels interleaved at Rate, as tone does.
@@ -99,7 +91,6 @@ func TestSurroundTrack(t *testing.T) {
 				t.Fatal(err)
 			}
 			p, err := tr.decode()
-			needDecoder(t, err)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -119,7 +110,6 @@ func TestDeckPlaysSurround(t *testing.T) {
 			defer d.close()
 			got := drain(t, d)
 			err := d.failure()
-			needDecoder(t, err)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -131,15 +121,13 @@ func TestDeckPlaysSurround(t *testing.T) {
 				t.Errorf("%d frames, %v; the file tells %v", n, duration(n), total)
 			}
 			checkSurroundTones(t, got, 6, nil)
-			if m := d.downmix.Load(); m == nil || m[0][0] == 0 || m[0][LFEChannel] != 0 {
+			// The stream's downmix, of each front channel to its side.
+			if m := d.downmix.Load(); m == nil || m[0][ac3.Left] == 0 || m[1][ac3.Right] == 0 || m[0][ac3.Right] != 0 {
 				t.Errorf("downmix %v", m)
 			}
 		})
 	}
 }
-
-// LFEChannel is the LFE's place among the channels of 5.1.
-const LFEChannel = ac3.LFE
 
 // TestDeckSeeksSurround starts a deck of 5.1 within its track: the frames
 // from there are those of the whole decode, from the same frame.
@@ -149,7 +137,9 @@ func TestDeckSeeksSurround(t *testing.T) {
 		want := drain(t, whole)
 		err := whole.failure()
 		whole.close()
-		needDecoder(t, err)
+		if err != nil {
+			t.Fatal(err)
+		}
 		for _, at := range []time.Duration{100 * time.Millisecond, 333 * time.Millisecond, 700 * time.Millisecond} {
 			d := newDeck(path, at, fileOpener, func() {})
 			got := drain(t, d)
@@ -189,7 +179,9 @@ func TestEnginePlaysSurround(t *testing.T) {
 			e.mu.Lock()
 			d := e.decks[0]
 			e.mu.Unlock()
-			needDecoder(t, d.failure())
+			if err := d.failure(); err != nil {
+				t.Fatal(err)
+			}
 			if err := e.Play(); err != nil {
 				t.Fatal(err)
 			}
@@ -240,34 +232,64 @@ func TestSurroundDecodeAllocates(t *testing.T) {
 		}
 	}
 	decode()
-	needDecoder(t, err)
 	if allocs := testing.AllocsPerRun(100, decode); allocs > 0 || err != nil {
 		t.Errorf("%v allocations a packet, %v", allocs, err)
 	}
 }
 
-// BenchmarkSurroundDecode decodes the packets of a file of 5.1, as a deck
-// does.
+// BenchmarkSurroundDecode decodes the packets of the files of 5.1, read
+// beforehand, as a deck decodes them: a packet is 1536 frames, 32 ms at
+// 48 kHz, converted to Rate when the file isn't at it.
 func BenchmarkSurroundDecode(b *testing.B) {
-	data, err := os.ReadFile(surroundAC3)
-	if err != nil {
-		b.Fatal(err)
-	}
-	tr, _, err := openTrack(bytes.NewReader(data))
-	if err != nil {
-		b.Fatal(err)
-	}
-	b.ReportAllocs()
-	b.ResetTimer()
-	for range b.N {
-		if err := tr.read(); err != nil {
-			if err := tr.seek(0); err != nil {
+	for _, path := range surroundFiles {
+		b.Run(filepath.Base(path), func(b *testing.B) {
+			data, err := os.ReadFile(path)
+			if err != nil {
 				b.Fatal(err)
 			}
-			continue
-		}
-		if _, err := tr.decode(); err != nil {
-			b.Skip(err)
-		}
+			r, err := mp4.NewReader(bytes.NewReader(data))
+			if err != nil {
+				b.Fatal(err)
+			}
+			var packets []mp4.Packet
+			for {
+				p, err := r.ReadPacket()
+				if err != nil {
+					break
+				}
+				packets = append(packets, p)
+			}
+			tr, _, err := openTrack(bytes.NewReader(data))
+			if err != nil {
+				b.Fatal(err)
+			}
+			mt := tr.(*mp4Track)
+			b.ReportAllocs()
+			b.ResetTimer()
+			for i := range b.N {
+				mt.p = packets[i%len(packets)]
+				if _, err := mt.decode(); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
+// TestSurroundTrackRefused refuses E-AC-3 of the reduced rates, which its
+// dec3 tells, before any packet: the player names the format.
+func TestSurroundTrackRefused(t *testing.T) {
+	data, err := os.ReadFile(surroundEAC3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	i := bytes.Index(data, []byte("dec3"))
+	if i < 0 {
+		t.Fatal("no dec3")
+	}
+	data = bytes.Clone(data)
+	data[i+4+2] |= 0xC0 // fscod 3: a rate of fscod2
+	if _, _, err := openTrack(bytes.NewReader(data)); !errors.Is(err, errUnsupported) {
+		t.Errorf("E-AC-3 at a reduced rate: %v", err)
 	}
 }

@@ -75,7 +75,8 @@ type Track struct {
 	DurationMs int     `json:"durationMs"`
 	Artwork    []Image `json:"artwork"`
 	Explicit   bool    `json:"explicit,omitempty"`
-	// Video is set for music videos, rather than audio tracks.
+	// Video is set for what YouTube Music doesn't have as a song: music
+	// videos, other uploads and podcast episodes.
 	Video bool `json:"video,omitempty"`
 	// Plays is how many times the track played, as its service counts
 	// them: a song's plays on YouTube Music, a video's views. 0 is unknown,

@@ -120,7 +120,10 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
-  title, artists and duration, for playback without a Spotify device.
+  title, artists and duration, for playback without a Spotify device. It
+  also finds the song of a music video, by its title and artists, which
+  the video's radio starts from: YouTube Music makes the radio of a video
+  out of videos.
 - **`lyrics`** finds synced lyrics on LRCLIB and reads LRC.
 - **`internal/library`** keeps liked songs, mixes, the history and stats in
   `library.json`.

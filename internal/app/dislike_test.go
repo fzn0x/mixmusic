@@ -220,3 +220,20 @@ func TestRadioWithoutDisliked(t *testing.T) {
 		t.Errorf("not skipping, the radio has %d tracks of %d, %v", len(got), len(all), err)
 	}
 }
+
+// TestRadioOfAVideoWithoutDisliked has the radio of a music video, which
+// is its song's, leave out the songs the user dislikes too.
+func TestRadioOfAVideoWithoutDisliked(t *testing.T) {
+	c := newFakeMusic(t).catalog(t)
+	all, err := c.Radio(t.Context(), instantCrushVideo)
+	if err != nil || len(all) < 2 {
+		t.Fatalf("the radio: %v, %v", trackIDs(all), err)
+	}
+	if _, err := c.a.library.SetDisliked(all[0], true); err != nil {
+		t.Fatal(err)
+	}
+	got, err := c.Radio(t.Context(), instantCrushVideo)
+	if want := trackIDs(all[1:]); err != nil || !slices.Equal(trackIDs(got), want) {
+		t.Errorf("found %v, not %v, %v", trackIDs(got), want, err)
+	}
+}

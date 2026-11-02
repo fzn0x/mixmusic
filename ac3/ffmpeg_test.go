@@ -105,6 +105,7 @@ type toolUse map[string]int
 var tools = []string{
 	"short", "dither", "cpl", "cpl-phase", "remat", "d15", "d25", "d45", "reuse",
 	"cpl-d15", "cpl-d25", "cpl-d45", "delta", "cpl-delta", "dynrng", "bap1", "bap2", "bap3", "bap4", "bap5", "bap-asym", "bap16",
+	"spx", "spx-notch", "aht", "vq", "gaq",
 }
 
 func (u toolUse) String() string {
@@ -186,45 +187,67 @@ func (u toolUse) watch(d *Decoder, dither *[]int) {
 		if d.dynrng != 1 {
 			seen["dynrng"] = true
 		}
+		if d.spxinu {
+			seen["spx"] = true
+			for c := range nf {
+				if d.chinspx[c] && d.frm.spxattencod[c] >= 0 {
+					seen["spx-notch"] = true
+				}
+			}
+		}
+		for c := range nf {
+			if ch := &d.ch[c]; ch.aht {
+				seen["aht"] = true
+				for _, b := range ch.bap[ch.start:ch.end] {
+					switch {
+					case b == 0:
+					case b <= 7:
+						seen["vq"] = true
+					default:
+						seen["gaq"] = true
+					}
+				}
+			}
+		}
 		for k := range seen {
 			u[k]++
 		}
 	}
 }
 
-// undither clears the dithflags of every block of an AC-3 file, and sets
-// its CRCs again: decoders then make the same samples of it, as none
-// makes up noise of its own for mantissas of no bits.
+// undither clears the dithflags of every block of a file, and sets its
+// CRCs again: decoders then make the same samples of it, as none makes up
+// noise of its own for mantissas of no bits. An E-AC-3 frame without
+// dithflags, whose blocks all dither, gets dithflage and dithflags of 0.
 func undither(t testing.TB, data []byte) []byte {
 	t.Helper()
-	out := bytes.Clone(data)
-	pcm := make([]float32, MaxChannels*FrameLength)
-	at := 0
-	for _, f := range frames(t, data) {
-		var dither []int
-		d := NewDecoder()
-		toolUse{}.watch(d, &dither)
-		if _, err := d.Decode(f, pcm); err != nil {
-			t.Fatal(err)
+	return edit(t, data, func(s bitstring, m blockMarks) bitstring {
+		if m.eac3 && !m.dithOn {
+			for blk := m.numblks - 1; blk >= 0; blk-- {
+				s = s.replace(m.dither[blk], append(make([]byte, m.nf), s[m.dither[blk]])...)
+			}
+			s[m.dithflage] = 1
+			return s
 		}
-		g := out[at : at+len(f)]
-		for i := 0; i < len(dither); i += 2 {
-			for b := dither[i]; b < dither[i]+dither[i+1]; b++ {
-				g[b>>3] &^= 0x80 >> (b & 7)
+		for blk := range m.numblks {
+			for c := range m.nf {
+				s[m.dither[blk]+c] = 0
 			}
 		}
-		setCRC(g)
-		at += len(f)
-	}
-	return out
+		return s
+	})
 }
 
-// setCRC sets the crc1 and crc2 of a syncframe, as an encoder does: crc2
-// so that the CRC of all of it after the syncword is 0, and crc1 so that
-// that of its first 5/8 is. crc1 comes first, so that it can't simply be
-// that of what follows: as the CRC is linear, it solves the 16 equations
-// of its bits.
+// setCRC sets the CRCs of a syncframe, as an encoder does: of E-AC-3, its
+// crc2, so that the CRC of all of it after the syncword is 0; of AC-3, that
+// crc2, and crc1 so that the CRC of its first 5/8 is 0. crc1 comes first,
+// so that it can't simply be that of what follows: as the CRC is linear,
+// it solves the 16 equations of its bits.
 func setCRC(f []byte) {
+	if f[5]>>3 > 10 {
+		binary.BigEndian.PutUint16(f[len(f)-2:], crc16(0, f[2:len(f)-2]))
+		return
+	}
 	words := len(f) / 2
 	five8 := 2 * (words>>1 + words>>3)
 	crc := func(x uint16) uint16 {
@@ -392,10 +415,16 @@ var encodings = func() []encoding {
 
 // encode encodes e into a raw AC-3 file in dir, and returns its path.
 func (e encoding) encode(t testing.TB, dir string) string {
+	return e.encodeAs(t, dir, "ac3")
+}
+
+// encodeAs encodes e with ffmpeg's encoder of codec, ac3 or eac3, into a
+// raw file of it in dir, and returns its path.
+func (e encoding) encodeAs(t testing.TB, dir, codec string) string {
 	t.Helper()
-	path := filepath.Join(dir, e.name+".ac3")
-	args := append([]string{"-y", "-f", "lavfi", "-i", e.src + ":c=" + e.layout, "-c:a", "ac3"}, e.args...)
-	ffmpeg(t, append(args, "-f", "ac3", path)...)
+	path := filepath.Join(dir, e.name+"."+codec)
+	args := append([]string{"-y", "-f", "lavfi", "-i", e.src + ":c=" + e.layout, "-c:a", codec}, e.args...)
+	ffmpeg(t, append(args, "-f", codec, path)...)
 	return path
 }
 

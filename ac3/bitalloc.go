@@ -146,14 +146,19 @@ func (d *Decoder) allocate(ch *channel, zero bool) error {
 		}
 	}
 
-	// The bit allocation pointers.
+	// The bit allocation pointers: of the high efficiency table of AHT
+	// for a channel of AHT, of section E3.4.3.
+	tab := &bapTab
+	if ch.aht {
+		tab = &hebapTab
+	}
 	i := start
 	for j := int(maskTab[start]); ; j++ {
 		last := min(bandStart[j+1], end)
 		m := max(mask[j]-snroffset-floor, 0)&0x1fe0 + floor
 		for ; i < last; i++ {
 			a := (psd[i] - m) >> 5
-			ch.bap[i] = bapTab[min(63, max(0, a))]
+			ch.bap[i] = tab[min(63, max(0, a))]
 		}
 		if end <= last {
 			break

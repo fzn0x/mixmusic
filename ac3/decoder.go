@@ -41,6 +41,10 @@ type channel struct {
 	overlap [maxBins]float32
 
 	blksw, dithflag bool
+	// aht is whether the channel is of AHT in the frame, and aht6 the
+	// mantissas of its six blocks, which block 0 holds.
+	aht  bool
+	aht6 [6][maxBins]float32
 }
 
 // Decoder decodes an AC-3 stream. It is not safe for concurrent use.
@@ -69,6 +73,16 @@ type Decoder struct {
 	phsflg [18]bool // of each sub-band
 	// Rematrixing, of a 2/0 stream.
 	rematflg [4]bool
+
+	// E-AC-3's: the strategies of the frame, its spectral extension, and
+	// the gains of a channel of AHT.
+	frm      audioFrame
+	spx      spectralExtension
+	spxinu   bool
+	chinspx  [maxFull]bool
+	spxbegf  int // spxbegf, the code
+	spxBegin int // spx_begin_subbnd
+	gains    []uint8
 
 	// The bit allocation's parameters of the block.
 	sdcycod, fdcycod, sgaincod, dbpbcod, floorcod int
@@ -102,7 +116,7 @@ type Decoder struct {
 
 // NewDecoder returns a decoder.
 func NewDecoder() *Decoder {
-	d := &Decoder{}
+	d := &Decoder{gains: make([]uint8, 0, maxBins)}
 	d.tf.init()
 	d.Reset()
 	return d
@@ -119,6 +133,7 @@ func (d *Decoder) Reset() {
 		clear(d.ch[c].overlap[:])
 	}
 	d.random = 1
+	d.spx.noise = 1
 }
 
 // Decode decodes the syncframes of data, as an MP4 sample holds them, into
@@ -128,6 +143,11 @@ func (d *Decoder) Reset() {
 // float32 of about [-1, 1], not clipped, but finite. pcm must have room
 // for MaxChannels times the samples of data's frames: MaxChannels *
 // FrameLength for an MP4 sample.
+//
+// Of E-AC-3, it decodes independent substream 0, the program a stream has
+// to have, and skips the frames of the others and of dependent
+// substreams: the channels past 5.1 of a stream of more, and the objects
+// of one of joint object coding, whose 5.1 it plays.
 //
 // A block decodes into the second half of the last one's window and the
 // first half of its own: the first block of a stream, or the first after
@@ -142,15 +162,19 @@ func (d *Decoder) Decode(data []byte, pcm []float32) (int, error) {
 		if err := h.parse(&d.r); err != nil {
 			return n, err
 		}
-		if len(data) < h.size {
+		if len(data) < h.size || h.size < 6 {
 			return n, fmt.Errorf("%w: a syncframe of %d bytes in %d", ErrFormat, h.size, len(data))
-		}
-		if len(pcm) < MaxChannels*(n+FrameLength) {
-			return n, ErrBufferTooSmall
 		}
 		frame := data[:h.size]
 		data = data[h.size:]
-		if err := checkCRC(frame); err != nil && !d.noCRC {
+		if h.eac3 && (h.strmtyp == streamDependent || h.substreamid != 0) {
+			continue
+		}
+		samples := h.numblks * BlockLength
+		if len(pcm) < MaxChannels*(n+samples) {
+			return n, ErrBufferTooSmall
+		}
+		if err := checkCRC(frame, h.eac3); err != nil && !d.noCRC {
 			return n, err
 		}
 		d.h = h
@@ -160,15 +184,37 @@ func (d *Decoder) Decode(data []byte, pcm []float32) (int, error) {
 			return n, err
 		}
 		d.setInfo()
-		n += FrameLength
+		n += samples
 	}
 	return n, nil
 }
 
-// decodeFrame decodes the six audio blocks of the syncframe whose bsi r
-// read last, into pcm.
+// decodeFrame decodes the audio blocks of the syncframe whose bsi r read
+// last, into pcm.
 func (d *Decoder) decodeFrame(pcm []float32) error {
-	for blk := range 6 {
+	h := &d.h
+	if h.eac3 {
+		if err := d.parseAudioFrame(); err != nil {
+			return err
+		}
+		d.cplbndstrc = defaultCplBands
+		d.spx.bndstrc = defaultSpxBands
+		f := &d.frm
+		for c := range h.nfchans {
+			d.ch[c].aht = f.chahtinu[c]
+		}
+		d.ch[cplIndex].aht = f.cplahtinu
+		d.ch[lfeIndex].aht = f.lfeahtinu
+	} else {
+		d.frm = audioFrame{}
+		d.spx.inu = false
+		d.spxinu = false
+		d.chinspx = [maxFull]bool{}
+		for c := range d.ch {
+			d.ch[c].aht = false
+		}
+	}
+	for blk := range h.numblks {
 		if err := d.parseBlock(blk); err != nil {
 			return fmt.Errorf("block %d: %w", blk, err)
 		}

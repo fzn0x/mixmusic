@@ -1,6 +1,7 @@
 package ac3
 
 import (
+	"errors"
 	"fmt"
 	"math"
 )
@@ -20,18 +21,20 @@ const (
 	deltaNone  = 2
 )
 
-// parseBlock reads audio block blk of the syncframe r reads, and turns it
-// into the transform coefficients of its channels.
+// parseBlock reads audio block blk of the syncframe r reads, of AC-3 or
+// of E-AC-3, and turns it into the transform coefficients of its channels.
 func (d *Decoder) parseBlock(blk int) error {
 	r := &d.r
 	h := &d.h
+	f := &d.frm
+	eac3 := h.eac3
 	nf := h.nfchans
 	for c := range nf {
-		d.ch[c].blksw = r.flag()
+		d.ch[c].blksw = (!eac3 || f.blkswe) && r.flag()
 	}
 	d.ditherAt, d.phsflginuAt, d.phsflgAt = r.pos, -1, -1
 	for c := range nf {
-		d.ch[c].dithflag = r.flag()
+		d.ch[c].dithflag = eac3 && !f.dithflage || r.flag()
 	}
 	if r.flag() { // dynrnge
 		d.dynrng = dynamicRange(r.read(8))
@@ -45,6 +48,11 @@ func (d *Decoder) parseBlock(blk int) error {
 			d.dynrng2 = 1
 		}
 	}
+	if eac3 {
+		if err := d.parseSpectralExtension(blk); err != nil {
+			return err
+		}
+	}
 
 	// The coupling strategy. Coupling information is never shared across
 	// syncframes: in block 0, all of it is new.
@@ -55,29 +63,38 @@ func (d *Decoder) parseBlock(blk int) error {
 	}
 	moved := !wasCoupled // whether the coupling's range changed
 	newBands := false    // whether its bands did
-	if r.flag() {        // cplstre
-		m, b, err := d.parseCouplingStrategy()
+	cplstre := f.cplstre[blk]
+	if !eac3 {
+		cplstre = r.flag()
+	}
+	if cplstre {
+		m, b, err := d.parseCouplingStrategy(blk)
 		if err != nil {
 			return err
 		}
 		moved = moved || m
 		newBands = b
+	} else if eac3 && blk == 0 {
+		// A frame of one channel, or two independent ones.
+		d.cplinu = false
+		d.chincpl = [maxFull]bool{}
 	} else if blk == 0 {
 		return fmt.Errorf("%w: no coupling strategy in block 0", ErrFormat)
 	}
 	if d.cplinu {
 		var fresh [maxFull]bool
 		for c := range nf {
-			fresh[c] = moved || newBands || !wasIn[c]
+			fresh[c] = !eac3 && (moved || newBands || !wasIn[c])
 		}
 		if err := d.parseCouplingCoordinates(&fresh); err != nil {
 			return err
 		}
+		f.cplblocks++
 	}
 
 	// Rematrixing.
 	if h.acmod == ModeStereo {
-		if r.flag() { // rematstr
+		if (eac3 && blk == 0) || r.flag() { // rematstr
 			for i := range d.rematBands() {
 				d.rematflg[i] = r.flag()
 			}
@@ -89,30 +106,45 @@ func (d *Decoder) parseBlock(blk int) error {
 	// The exponent strategies, and the bandwidths.
 	cpl := &d.ch[cplIndex]
 	cplexpstr := expReuse
+	var chexpstr [maxFull]int
+	lfeexpstr := expReuse
+	if eac3 {
+		if d.cplinu {
+			cplexpstr = f.cplexpstr[blk]
+		}
+		chexpstr = f.chexpstr[blk]
+		if h.lfeon {
+			lfeexpstr = f.lfeexpstr[blk]
+		}
+	} else {
+		if d.cplinu {
+			cplexpstr = r.read(2)
+		}
+		for c := range nf {
+			chexpstr[c] = r.read(2)
+		}
+		if h.lfeon {
+			lfeexpstr = r.read(1)
+		}
+	}
 	if d.cplinu {
-		cplexpstr = r.read(2)
 		if cplexpstr == expReuse && moved {
 			return fmt.Errorf("%w: coupling exponents reused", ErrFormat)
 		}
 		cpl.start = 37 + 12*d.cplbegf
 		cpl.end = 37 + 12*(d.cplendf+3)
 	}
-	var chexpstr [maxFull]int
-	for c := range nf {
-		chexpstr[c] = r.read(2)
-	}
 	d.expstr = chexpstr
 	d.cplexpstr = cplexpstr
-	lfeexpstr := expReuse
-	if h.lfeon {
-		lfeexpstr = r.read(1)
-	}
 	for c := range nf {
 		ch := &d.ch[c]
 		end := ch.end
-		if d.chincpl[c] {
+		switch {
+		case d.chincpl[c]:
 			end = cpl.start
-		} else if chexpstr[c] != expReuse {
+		case d.chinspx[c]:
+			end = spxBand(d.spxBegin)
+		case chexpstr[c] != expReuse:
 			chbwcod := r.read(6)
 			if chbwcod > 60 {
 				return fmt.Errorf("%w: chbwcod %d", ErrFormat, chbwcod)
@@ -170,34 +202,28 @@ func (d *Decoder) parseBlock(blk int) error {
 	}
 
 	// The bit allocation's parameters.
-	if r.flag() { // baie
+	switch {
+	case eac3 && !f.bamode:
+		d.sdcycod, d.fdcycod, d.sgaincod, d.dbpbcod, d.floorcod = 2, 1, 1, 2, 7
+	case r.flag(): // baie
 		d.sdcycod = r.read(2)
 		d.fdcycod = r.read(2)
 		d.sgaincod = r.read(2)
 		d.dbpbcod = r.read(2)
 		d.floorcod = r.read(3)
-	} else if blk == 0 {
+	case blk == 0:
 		return fmt.Errorf("%w: no bit allocation parameters in block 0", ErrFormat)
 	}
-	if r.flag() { // snroffste
-		d.csnroffst = r.read(6)
-		if d.cplinu {
-			cpl.fsnroffst = r.read(4)
-			cpl.fgaincod = r.read(3)
-		}
-		for c := range nf {
-			d.ch[c].fsnroffst = r.read(4)
-			d.ch[c].fgaincod = r.read(3)
-		}
-		if h.lfeon {
-			d.ch[lfeIndex].fsnroffst = r.read(4)
-			d.ch[lfeIndex].fgaincod = r.read(3)
-		}
-	} else if blk == 0 {
-		return fmt.Errorf("%w: no SNR offsets in block 0", ErrFormat)
+	if err := d.parseOffsets(blk); err != nil {
+		return err
+	}
+	if eac3 && h.strmtyp == streamIndependent && r.flag() { // convsnroffste
+		r.skip(10)
 	}
 	if d.cplinu {
-		if r.flag() { // cplleake
+		cplleake := eac3 && f.firstcplleak
+		f.firstcplleak = false
+		if cplleake || r.flag() {
 			d.cplfleak = r.read(3)
 			d.cplsleak = r.read(3)
 		} else if !wasCoupled {
@@ -208,7 +234,13 @@ func (d *Decoder) parseBlock(blk int) error {
 		cpl.delta = false
 	}
 	d.deltaAt = r.pos
-	if r.flag() { // deltbaie
+	switch {
+	case eac3 && !f.dbaflde:
+		cpl.delta = false
+		for c := range nf {
+			d.ch[c].delta = false
+		}
+	case r.flag(): // deltbaie
 		if d.cplinu {
 			cpl.deltbae = r.read(2)
 		}
@@ -225,65 +257,45 @@ func (d *Decoder) parseBlock(blk int) error {
 				return err
 			}
 		}
-	} else if blk == 0 {
+	case blk == 0:
 		cpl.delta = false
 		for c := range nf {
 			d.ch[c].delta = false
 		}
-	} else if d.cplinu && moved && cpl.delta {
+	case d.cplinu && moved && cpl.delta:
 		return fmt.Errorf("%w: no coupling delta bit allocation", ErrFormat)
 	}
-	if r.flag() { // skiple
+	if (!eac3 || f.skipflde) && r.flag() { // skiple
 		r.skip(8 * r.read(9))
 	}
 	if r.over() {
 		return fmt.Errorf("%w: syncframe too short", ErrFormat)
 	}
 
-	// The bit allocation.
+	// The bit allocation, and the mantissas.
 	zero := d.csnroffst == 0 && (!d.cplinu || cpl.fsnroffst == 0) && (!h.lfeon || d.ch[lfeIndex].fsnroffst == 0)
 	for c := range nf {
 		zero = zero && d.ch[c].fsnroffst == 0
 	}
-	if d.cplinu {
-		if err := d.allocate(cpl, zero); err != nil {
-			return err
-		}
-	}
-	for c := range nf {
-		if err := d.allocate(&d.ch[c], zero); err != nil {
-			return err
-		}
-	}
-	if h.lfeon {
-		if err := d.allocate(&d.ch[lfeIndex], zero); err != nil {
-			return err
-		}
-	}
-
-	// The mantissas.
 	d.mantAt = r.pos
 	var g groups
 	gotCpl := false
 	for c := range nf {
 		ch := &d.ch[c]
-		if err := d.mantissas(&g, ch, ch.dithflag); err != nil {
+		if err := d.channelMantissas(&g, ch, blk, zero, ch.dithflag); err != nil {
 			return err
 		}
-		clear(ch.coef[ch.end:])
 		if d.cplinu && d.chincpl[c] && !gotCpl {
-			if err := d.mantissas(&g, cpl, false); err != nil {
+			if err := d.channelMantissas(&g, cpl, blk, zero, false); err != nil {
 				return err
 			}
 			gotCpl = true
 		}
 	}
 	if h.lfeon {
-		lfe := &d.ch[lfeIndex]
-		if err := d.mantissas(&g, lfe, false); err != nil {
+		if err := d.channelMantissas(&g, &d.ch[lfeIndex], blk, zero, false); err != nil {
 			return err
 		}
-		clear(lfe.coef[lfe.end:])
 	}
 	if r.over() {
 		return fmt.Errorf("%w: syncframe too short", ErrFormat)
@@ -295,9 +307,118 @@ func (d *Decoder) parseBlock(blk int) error {
 	if h.acmod == ModeStereo {
 		d.rematrix()
 	}
+	if d.spxinu {
+		d.extend()
+	}
 	d.compress()
 	if d.onBlock != nil {
 		d.onBlock(blk)
+	}
+	return nil
+}
+
+// parseOffsets reads the SNR offsets and the fast gains of a block, of
+// AC-3 or of the SNR offset strategy of an E-AC-3 frame.
+func (d *Decoder) parseOffsets(blk int) error {
+	r := &d.r
+	h := &d.h
+	f := &d.frm
+	nf := h.nfchans
+	cpl := &d.ch[cplIndex]
+	lfe := &d.ch[lfeIndex]
+	if !h.eac3 {
+		if !r.flag() { // snroffste
+			if blk == 0 {
+				return fmt.Errorf("%w: no SNR offsets in block 0", ErrFormat)
+			}
+			return nil
+		}
+		d.csnroffst = r.read(6)
+		if d.cplinu {
+			cpl.fsnroffst = r.read(4)
+			cpl.fgaincod = r.read(3)
+		}
+		for c := range nf {
+			d.ch[c].fsnroffst = r.read(4)
+			d.ch[c].fgaincod = r.read(3)
+		}
+		if h.lfeon {
+			lfe.fsnroffst = r.read(4)
+			lfe.fgaincod = r.read(3)
+		}
+		return nil
+	}
+	setFine := func(v int) {
+		cpl.fsnroffst, lfe.fsnroffst = v, v
+		for c := range nf {
+			d.ch[c].fsnroffst = v
+		}
+	}
+	switch {
+	case f.snroffststr == 0:
+		d.csnroffst = f.frmcsnroffst
+		setFine(f.frmfsnroffst)
+	case blk == 0 || r.flag(): // snroffste
+		d.csnroffst = r.read(6)
+		if f.snroffststr == 1 {
+			setFine(r.read(4)) // blkfsnroffst
+		} else {
+			if d.cplinu {
+				cpl.fsnroffst = r.read(4)
+			}
+			for c := range nf {
+				d.ch[c].fsnroffst = r.read(4)
+			}
+			if h.lfeon {
+				lfe.fsnroffst = r.read(4)
+			}
+		}
+	}
+	if f.frmfgaincode && r.flag() { // fgaincode
+		if d.cplinu {
+			cpl.fgaincod = r.read(3)
+		}
+		for c := range nf {
+			d.ch[c].fgaincod = r.read(3)
+		}
+		if h.lfeon {
+			lfe.fgaincod = r.read(3)
+		}
+	} else {
+		cpl.fgaincod, lfe.fgaincod = 4, 4
+		for c := range nf {
+			d.ch[c].fgaincod = 4
+		}
+	}
+	return nil
+}
+
+// channelMantissas computes the bit allocation of a channel's exponents
+// and reads its mantissas, of AC-3's quantizers or, in block 0 of a
+// channel of AHT, those of the six blocks. zero is the special case of
+// all SNR offsets 0, which allocates no bits; dither tells whether
+// mantissas of no bits are dither.
+func (d *Decoder) channelMantissas(g *groups, ch *channel, blk int, zero, dither bool) error {
+	if ch.aht {
+		if blk == 0 {
+			if err := d.allocate(ch, zero); err != nil {
+				return err
+			}
+			if err := d.ahtMantissas(ch); err != nil {
+				return err
+			}
+		}
+		d.ahtBlock(ch, blk, dither)
+		return nil
+	}
+	if err := d.allocate(ch, zero); err != nil {
+		return err
+	}
+	if err := d.mantissas(g, ch, dither); err != nil {
+		return err
+	}
+	if ch != &d.ch[cplIndex] {
+		clear(ch.coef[ch.end:])
 	}
 	return nil
 }
@@ -316,23 +437,38 @@ func dynamicRange(v int) float32 {
 	return g / float32(int(1)<<-(x+1))
 }
 
-// parseCouplingStrategy reads the coupling strategy of a block whose
+// parseCouplingStrategy reads the coupling strategy of block blk, whose
 // cplstre is set. It tells whether the coupling's range changed, and
 // whether its bands did.
-func (d *Decoder) parseCouplingStrategy() (moved, newBands bool, err error) {
+func (d *Decoder) parseCouplingStrategy(blk int) (moved, newBands bool, err error) {
 	r := &d.r
 	h := &d.h
-	d.cplinu = r.flag()
+	f := &d.frm
+	if h.eac3 {
+		d.cplinu = f.cplinu[blk]
+	} else {
+		d.cplinu = r.flag()
+	}
 	if !d.cplinu {
 		d.chincpl = [maxFull]bool{}
+		if h.eac3 {
+			for c := range h.nfchans {
+				f.firstcplcos[c] = true
+			}
+			f.firstcplleak = true
+			d.phsflginu = false
+		}
 		return false, false, nil
 	}
 	if h.acmod < ModeStereo {
 		return false, false, fmt.Errorf("%w: coupling in audio coding mode %d", ErrFormat, h.acmod)
 	}
+	if h.eac3 && r.flag() { // ecplinu
+		return false, false, fmt.Errorf("ac3: enhanced coupling: %w", errors.ErrUnsupported)
+	}
 	coupled := 0
 	for c := range h.nfchans {
-		d.chincpl[c] = r.flag()
+		d.chincpl[c] = h.eac3 && h.acmod == ModeStereo || r.flag()
 		if d.chincpl[c] {
 			coupled++
 		}
@@ -345,18 +481,34 @@ func (d *Decoder) parseCouplingStrategy() (moved, newBands bool, err error) {
 		d.phsflginuAt = r.pos
 		d.phsflginu = r.flag()
 	}
-	begf, endf := r.read(4), r.read(4)
+	begf := r.read(4)
+	var endf int
+	switch {
+	case !h.eac3 || !d.spxinu:
+		endf = r.read(4)
+	case d.spxbegf < 6:
+		endf = d.spxbegf - 2 // the coupling ends where spectral extension starts
+	default:
+		endf = d.spxbegf*2 - 7
+	}
 	if begf > endf+2 {
 		return false, false, fmt.Errorf("%w: coupling from sub-band %d to %d", ErrFormat, begf, endf+2)
 	}
 	moved = begf != d.cplbegf || endf != d.cplendf
 	d.cplbegf, d.cplendf = begf, endf
+	// E-AC-3 may leave out the band structure: the structure of the
+	// block before then holds, or the default one, which the frame starts
+	// with.
+	strce := !h.eac3 || r.flag()
 	d.ncplbnd = 0
 	for s := begf; s < endf+3; s++ {
-		strc := s > begf && r.flag()
-		newBands = newBands || strc != d.cplbndstrc[s]
-		d.cplbndstrc[s] = strc
-		if !strc {
+		strc := d.cplbndstrc[s]
+		if strce {
+			strc = s > begf && r.flag()
+			newBands = newBands || strc != d.cplbndstrc[s]
+			d.cplbndstrc[s] = strc
+		}
+		if s == begf || !strc {
 			d.ncplbnd++
 		}
 	}
@@ -369,12 +521,18 @@ func (d *Decoder) parseCouplingStrategy() (moved, newBands bool, err error) {
 func (d *Decoder) parseCouplingCoordinates(fresh *[maxFull]bool) error {
 	r := &d.r
 	h := &d.h
+	f := &d.frm
 	any := false
 	for c := range h.nfchans {
 		if !d.chincpl[c] {
+			f.firstcplcos[c] = true
 			continue
 		}
-		if !r.flag() { // cplcoe
+		// E-AC-3's first block of coupling of a channel has its
+		// coordinates, without cplcoe.
+		cplcoe := h.eac3 && f.firstcplcos[c]
+		f.firstcplcos[c] = false
+		if !cplcoe && !r.flag() { // cplcoe
 			if fresh[c] {
 				return fmt.Errorf("%w: coupling coordinates of channel %d reused", ErrFormat, c)
 			}
@@ -384,7 +542,7 @@ func (d *Decoder) parseCouplingCoordinates(fresh *[maxFull]bool) error {
 		mstr := 3 * r.read(2)
 		var co float32
 		for s := d.cplbegf; s < d.cplendf+3; s++ {
-			if !d.cplbndstrc[s] {
+			if s == d.cplbegf || !d.cplbndstrc[s] {
 				exp, mant := r.read(4), r.read(4)
 				if exp == 15 {
 					co = float32(mant) / 16
@@ -404,7 +562,7 @@ func (d *Decoder) parseCouplingCoordinates(fresh *[maxFull]bool) error {
 	} else if any {
 		var flag bool
 		for s := d.cplbegf; s < d.cplendf+3; s++ {
-			if !d.cplbndstrc[s] {
+			if s == d.cplbegf || !d.cplbndstrc[s] {
 				flag = r.flag()
 			}
 			d.phsflg[s] = flag
@@ -416,15 +574,18 @@ func (d *Decoder) parseCouplingCoordinates(fresh *[maxFull]bool) error {
 // pow2 returns 2^e.
 func pow2(e int) float32 { return float32(math.Ldexp(1, e)) }
 
-// rematBands returns the rematrixing bands of a 2/0 block, of Table 5.15.
+// rematBands returns the rematrixing bands of a 2/0 block, of Table 5.15,
+// and of section E3.3.2 with spectral extension.
 func (d *Decoder) rematBands() int {
 	switch {
-	case !d.cplinu || d.cplbegf > 2:
-		return 4
-	case d.cplbegf > 0:
+	case d.cplinu && d.cplbegf == 0:
+		return 2
+	case d.cplinu && d.cplbegf < 3:
+		return 3
+	case !d.cplinu && d.spxinu && d.spxbegf < 2:
 		return 3
 	default:
-		return 2
+		return 4
 	}
 }
 

@@ -125,8 +125,11 @@ func TestErrors(t *testing.T) {
 	f := frames(t, readFile(t, filepath.Join("testdata", "5.1-48k-cpl.ac3")))[0]
 	d := NewDecoder()
 	pcm := make([]float32, MaxChannels*FrameLength)
-	eac3 := bytes.Clone(f)
-	eac3[5] = eac3[5]&7 | 16<<3 // bsid 16
+	bsid := func(b []byte, id int) []byte {
+		b = bytes.Clone(b)
+		b[5] = b[5]&7 | byte(id)<<3
+		return b
+	}
 	for _, c := range []struct {
 		name string
 		data []byte
@@ -136,7 +139,8 @@ func TestErrors(t *testing.T) {
 		{"short", f[:len(f)-1], pcm, ErrFormat},
 		{"header", f[:5], pcm, ErrFormat},
 		{"no syncword", append([]byte{0}, f...), pcm, ErrFormat},
-		{"E-AC-3", eac3, pcm, errors.ErrUnsupported},
+		{"bsid 9", bsid(f, 9), pcm, errors.ErrUnsupported},
+		{"bsid 17", bsid(f, 17), pcm, ErrFormat},
 		{"no room", f, pcm[:len(pcm)-1], ErrBufferTooSmall},
 		{"frame and a half", append(bytes.Clone(f), f[:100]...), pcm, ErrFormat},
 	} {

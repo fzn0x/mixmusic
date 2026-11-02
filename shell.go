@@ -12,7 +12,8 @@ import (
 // view builds the main window: the rail, the top bar over the main pane
 // and the side panel, and the player bar across the bottom.
 func (s *shell) view(c *ui.Context) {
-	s.st, s.capBound = s.p.State(), false
+	s.st = s.p.State()
+	s.startPage()
 	s.kept = s.svc.Downloads.Snapshot()
 	s.applyZoom(c)
 	// A window that turns narrow or wide drops the fold the user gave

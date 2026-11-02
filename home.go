@@ -139,16 +139,26 @@ func (s *shell) localShelves() []media.Shelf {
 	return s.local
 }
 
-// pageScroll is a page that scrolls, inside the pane's gutter.
+// pageScroll is a page that scrolls, inside the pane's gutter. The page
+// the router shows keeps where it scrolled for the top bar and the rows
+// pinned under it (showPage), or, in capture mode, has it scrolled
+// (act:scroll): not the one it leaves, which shows beside it while it
+// slides in.
 func (s *shell) pageScroll(c *ui.Context, content func()) {
 	page := ui.Scroll(c).Grow(1).MinWidth(0).MinHeight(0)
-	// Capture mode scrolls the page the router shows (act:scroll): not the
-	// one it leaves, which shows beside it while it slides in.
-	if s.capScroll != nil && !s.capBound && s.pagePath == s.router.Path() {
-		s.capBound = true
-		page.TrackScroll(s.capScroll)
+	var track *ui.ScrollState
+	if s.pagePath == s.router.Path() && !s.here.built {
+		track = s.showPage(page)
 	}
 	page.Children(func() {
-		ui.Column(c).Padding(0, s.lk.gutter, 64).Children(content)
+		col := ui.Column(c).Padding(0, s.lk.gutter, 64)
+		if track != nil {
+			s.takeContent(page, col)
+		}
+		col.Children(content)
 	})
+	// Once the content took where the page is: it may have moved it.
+	if track != nil {
+		page.TrackScroll(track)
+	}
 }

@@ -8,9 +8,10 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// topBar holds the history arrows, the refresh button and the search box.
-// Under a hidden title bar, it keeps clear of the window's controls and
-// drags the window.
+// topBar holds the history arrows, the refresh button and the search box,
+// then the head of the page shown once the page scrolled it away
+// (topBarHead). Under a hidden title bar, it keeps clear of the window's
+// controls and drags the window.
 func (s *shell) topBar(c *ui.Context) {
 	k := &s.lk
 	bar := c.TitleBar()
@@ -29,7 +30,7 @@ func (s *shell) topBar(c *ui.Context) {
 			s.refreshButton(c)
 		})
 		s.searchField(c)
-		ui.Spacer(c)
+		s.topBarHead(c)
 		palette := s.buttonBase(c.Key("palette")).Height(32).PaddingX(8).Radius(k.round(32)).Label("Open the command palette").Cursor(ui.CursorPointer)
 		ink := k.muted
 		if palette.Hovered() {

@@ -80,6 +80,41 @@ func TestTonalLayoutsContrast(t *testing.T) {
 	}
 }
 
+// TestColorFileTonalContrast checks that a colour file's colours read in
+// the layout designs of tonal controls too, in a light, a dark and a glass
+// theme, as TestTonalLayoutsContrast checks the themes' own, and that a
+// Material theme wears the file's colours, not ones made of a seed.
+func TestColorFileTonalContrast(t *testing.T) {
+	s := newTestShell(t)
+	for _, name := range colorFiles {
+		f := testColors(t, name)
+		for _, id := range []string{"mix", "daylight", "aurora", "material"} {
+			for _, layout := range settings.Layouts {
+				if !designOf(layout).tonal {
+					continue
+				}
+				for _, art := range []string{"", "#ffe600", "#0a1a6e"} {
+					st := settings.Default()
+					st.FollowSystem, st.Theme, st.Layout, st.ColorSource = false, id, layout, settings.ColorsFile
+					k := newLook(st, s.inv.Themes, true, art, f)
+					checkContrast(t, fmt.Sprintf("%s in %s, %s, artwork %q", id, name, layout, art), []contrastRole{
+						{"text on the ground", k.text, k.bg, 4.5},
+						{"ink on what is chosen", k.selectedText, k.selected, 4.5},
+						{"secondary ink on what is chosen", k.selectedSub, k.selected, 4.5},
+						{"ink on a tonal button", k.tonalInk, k.tonalFill, 4.5},
+						{"the accent on surface", k.accent, col(over(nrgba(k.surface), nrgba(k.bg))), 4.5},
+					})
+					if id == "material" && art == "" {
+						if own := contrastLook(s, id, layout, ""); k.bg == own.bg {
+							t.Errorf("material in %s, %s kept its own ground", name, layout)
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 // contrastArtworks are the colours of artworks the contrast is checked
 // with: none, then vivid, dull, dark and light ones.
 var contrastArtworks = []string{"", "#ffe600", "#00c8ff", "#808080", "#5a3a1a", "#0a1a6e", "#ff0000", "#00ff66", "#f5f5f5", "#111111"}

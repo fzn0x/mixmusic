@@ -153,7 +153,8 @@ jobs:
           fi
 
   # The website, as pages.yml builds it: the docs' pages made from
-  # docs/*.md, which fails on a link to a file the repository lacks, and
+  # docs/*.md and the folders of docs with a README.md, which fails on a
+  # link to a file the repository lacks, and
   # the site built with Zola, which fails on a broken link between them.
   site:
     name: Website

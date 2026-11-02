@@ -15,8 +15,10 @@ import (
 
 	"github.com/fzn0x/mixmusic/builtin"
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/player/playertest"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/tools"
 	"github.com/fzn0x/mixmusic/internal/youtube"
@@ -43,7 +45,10 @@ func TestMain(m *testing.M) {
 
 // testPlayer is the app as a player's services, playing nothing: it
 // passes over the tracks the app's library dislikes, when it has the app.
-type testPlayer struct{ a *app.App }
+type testPlayer struct {
+	playertest.Services
+	a *app.App
+}
 
 // Prepare finds the stream of a track: a live one of the IDs that start
 // with "yt:live".
@@ -62,35 +67,27 @@ var surroundTracks sync.Map
 func (p testPlayer) PrepareStream(ctx context.Context, t media.Track) (player.Source, error) {
 	return p.Prepare(ctx, t)
 }
-func (testPlayer) StreamFailure(media.Track) string { return "" }
-func (testPlayer) RecordPlay(media.Track)           {}
-func (testPlayer) Radio(context.Context, media.Track) ([]media.Track, error) {
-	return nil, nil
-}
 func (p testPlayer) Skip(t media.Track) string {
 	if p.a != nil && p.a.IsDisliked(t.ID) {
 		return player.SkipDisliked
 	}
 	return ""
 }
-func (testPlayer) Settings() settings.Settings { return settings.Default() }
-func (testPlayer) SaveVolume(float64)          {}
-func (testPlayer) Report(player.Now)           {}
-func (testPlayer) SaveQueue(player.Saved)      {}
 
 // testStream is an engine that plays at once, silently: its time moves
 // past where it loaded, as the engine's does once a stream sounds, but for
 // the IDs that start with "yt:quiet", whose audio never comes.
 type testStream struct {
+	playertest.Stream
 	mu sync.Mutex
 	p  *player.Player
 }
 
-func (s *testStream) Load(url string, start time.Duration, autoplay bool, _ float64) error {
-	if autoplay {
+func (s *testStream) Load(url string, cue audio.Cue) error {
+	if cue.Autoplay {
 		s.player().Playing(true)
 		if !strings.HasPrefix(url, "url:yt:quiet") {
-			s.player().Time(start+time.Millisecond, 0)
+			s.player().Time(cue.Start+time.Millisecond, 0)
 		}
 	}
 	return nil
@@ -100,24 +97,8 @@ func (s *testStream) player() *player.Player {
 	defer s.mu.Unlock()
 	return s.p
 }
-func (s *testStream) Preload(string)                                 {}
-func (s *testStream) Crossfade(string, time.Duration, float64) error { return nil }
-func (s *testStream) Play() error                                    { s.player().Playing(true); return nil }
-func (s *testStream) Pause()                                         { s.player().Playing(false) }
-func (s *testStream) Stop()                                          {}
-func (s *testStream) Unload()                                        {}
-func (s *testStream) Seek(time.Duration)                             {}
-func (s *testStream) SetVolume(float64)                              {}
-func (s *testStream) SetSpeed(float64)                               {}
-
-type testDevice struct{}
-
-func (testDevice) Play(context.Context, media.Track, time.Duration) error { return nil }
-func (testDevice) Pause(context.Context) error                            { return nil }
-func (testDevice) Resume(context.Context) error                           { return nil }
-func (testDevice) Seek(context.Context, time.Duration) error              { return nil }
-func (testDevice) SetVolume(context.Context, float64) error               { return nil }
-func (testDevice) State(context.Context) (*player.DeviceState, error)     { return nil, nil }
+func (s *testStream) Play() error { s.player().Playing(true); return nil }
+func (s *testStream) Pause()      { s.player().Playing(false) }
 
 func testTrack(id, title, artist, album string, source media.Source) media.Track {
 	return media.Track{ID: id, Source: source, Title: title, Artists: []media.Ref{{ID: "ar-" + artist, Name: artist}},
@@ -140,7 +121,7 @@ func newTestShell(t testing.TB) *shell { return newTestShellOf(t, nil) }
 // newTestShellOf is newTestShell of an app whose options set changes.
 func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 	t.Helper()
-	return newTestShellWith(t, set, func(a *app.App) player.Services { return testPlayer{a} }, player.Saved{})
+	return newTestShellWith(t, set, func(a *app.App) player.Services { return testPlayer{a: a} }, player.Saved{})
 }
 
 // newTestShellWith is newTestShellOf whose player has the services svc
@@ -170,7 +151,7 @@ func newTestShellWith(t testing.TB, set func(o *app.Options), svc func(a *app.Ap
 	// The covers' downloads end before the folder goes.
 	t.Cleanup(a.Services().System.Artwork().Close)
 	stream := &testStream{}
-	p := player.New(svc(a), stream, testDevice{}, saved)
+	p := player.New(svc(a), stream, playertest.Device{}, saved)
 	stream.mu.Lock()
 	stream.p = p
 	stream.mu.Unlock()

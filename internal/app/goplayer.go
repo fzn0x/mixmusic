@@ -228,16 +228,16 @@ type engineStream struct {
 	e *audio.Engine
 }
 
-func (s engineStream) Load(url string, start time.Duration, autoplay bool, speed float64) error {
-	if err := s.e.Load(url, start, autoplay, speed); err != nil {
+func (s engineStream) Load(url string, cue audio.Cue) error {
+	if err := s.e.Load(url, cue); err != nil {
 		return err
 	}
 	s.a.setNative(true)
 	return nil
 }
 
-func (s engineStream) Crossfade(url string, d time.Duration, speed float64) error {
-	if err := s.e.Crossfade(url, d, speed); err != nil {
+func (s engineStream) Crossfade(url string, d time.Duration, cue audio.Cue) error {
+	if err := s.e.Crossfade(url, d, cue); err != nil {
 		return err
 	}
 	s.a.setNative(true)

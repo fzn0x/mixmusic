@@ -13,7 +13,7 @@ func TestEngineSpeed(t *testing.T) {
 	track := reference(t, cuesFront)
 	want := stretch(t, track, at(1.5)).out
 	e, dev, rec := newTestEngine(t)
-	if err := e.Load(cuesFront, 0, false, 1.5); err != nil {
+	if err := e.Load(cuesFront, Cue{Speed: 1.5}); err != nil {
 		t.Fatal(err)
 	}
 	buffered(t, e, 0, ringFrames/2)
@@ -58,7 +58,7 @@ func TestEngineSpeedSeek(t *testing.T) {
 	// What the deck has from the seek: the track played at 1× from it.
 	heard := func(speed float64) []float32 {
 		e, dev, _ := newTestEngine(t)
-		e.Load(cuesFront, 0, true, speed)
+		e.Load(cuesFront, Cue{Autoplay: true, Speed: speed})
 		buffered(t, e, 0, ringFrames/2)
 		dev.play(t, 4800)
 		e.Seek(time.Second)
@@ -98,7 +98,7 @@ func TestEngineSpeedSeek(t *testing.T) {
 // at its own speed, the one fading out too.
 func TestEngineCrossfadeSpeeds(t *testing.T) {
 	e, dev, _ := newTestEngine(t)
-	e.Load(cuesFront, 0, false, 2)
+	e.Load(cuesFront, Cue{Speed: 2})
 	buffered(t, e, 0, ringFrames/2)
 	e.Play()
 	dev.play(t, 100*quantum)
@@ -109,7 +109,7 @@ func TestEngineCrossfadeSpeeds(t *testing.T) {
 	before, pending := out.heard(), len(e.pending)/2
 	e.mu.Unlock()
 	const fade = 300 * time.Millisecond
-	if err := e.Crossfade(speech, fade, 1); err != nil {
+	if err := e.Crossfade(speech, fade, Cue{}); err != nil {
 		t.Fatal(err)
 	}
 	n := int(frames(fade)) / 2
@@ -137,7 +137,7 @@ func TestEngineCrossfadeSpeeds(t *testing.T) {
 // and while it is paused, which holds it where it was.
 func TestEngineSetSpeed(t *testing.T) {
 	e, dev, _ := newTestEngine(t)
-	e.Load(cuesFront, 0, true, 1)
+	e.Load(cuesFront, Cue{Autoplay: true})
 	buffered(t, e, 0, ringFrames/2)
 	dev.play(t, 4800)
 	e.SetSpeed(2)
@@ -184,12 +184,12 @@ func TestEngineSetSpeed(t *testing.T) {
 // speed Load asks.
 func TestEngineLoadsThePreloadAtSpeed(t *testing.T) {
 	e, _, _ := newTestEngine(t)
-	e.Load(cuesFront, 0, false, 1)
+	e.Load(cuesFront, Cue{})
 	e.Preload(speech)
 	e.mu.Lock()
 	preloaded := e.decks[1]
 	e.mu.Unlock()
-	if err := e.Load(speech, 0, false, 1.25); err != nil {
+	if err := e.Load(speech, Cue{Speed: 1.25}); err != nil {
 		t.Fatal(err)
 	}
 	e.mu.Lock()

@@ -172,7 +172,7 @@ func TestEnginePlaysSurround(t *testing.T) {
 			e, dev, rec := newTestEngine(t)
 			dev.surround = c.device
 			e.SetSurround(c.wanted)
-			if err := e.Load(surroundAC3, 0, false, 1); err != nil {
+			if err := e.Load(surroundAC3, Cue{}); err != nil {
 				t.Fatal(err)
 			}
 			buffered(t, e, 0, Rate/2)
@@ -216,7 +216,7 @@ func TestEngineSurroundAtSpeed(t *testing.T) {
 		e, dev, rec := newTestEngine(t)
 		dev.surround = ch == 6
 		e.SetSurround(true)
-		if err := e.Load(surroundAC3, 0, false, 1.5); err != nil {
+		if err := e.Load(surroundAC3, Cue{Speed: 1.5}); err != nil {
 			t.Fatal(err)
 		}
 		buffered(t, e, 0, ringFrames/2)

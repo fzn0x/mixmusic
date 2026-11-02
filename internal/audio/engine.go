@@ -143,15 +143,15 @@ func (e *Engine) wake() {
 	}
 }
 
-// Load plays url on the active deck from start, at speed, or holds it there
-// until Play when autoplay is false. A track that Preload loaded starts at
-// once.
-func (e *Engine) Load(url string, start time.Duration, autoplay bool, speed float64) error {
+// Load plays url on the active deck from cue's Start, at its Speed, or
+// holds it there until Play when its Autoplay is false. A track that
+// Preload loaded starts at once.
+func (e *Engine) Load(url string, cue Cue) error {
 	e.mu.Lock()
 	var stale []*deck
 	e.fading = false
 	other := 1 - e.active
-	if d := e.decks[other]; d != nil && d.url == url && start == 0 && d.position() == 0 {
+	if d := e.decks[other]; d != nil && d.url == url && cue.Start == 0 && d.position() == 0 {
 		// The preloaded track: the decks swap.
 		stale = append(stale, e.decks[e.active])
 		e.decks[e.active] = nil
@@ -159,11 +159,11 @@ func (e *Engine) Load(url string, start time.Duration, autoplay bool, speed floa
 	} else {
 		stale = append(stale, e.decks[e.active], e.decks[other])
 		e.decks[other] = nil
-		e.decks[e.active] = newDeck(url, start, e.open, e.wake)
+		e.decks[e.active] = newDeck(url, cue.Start, e.open, e.wake)
 	}
 	d := e.decks[e.active]
 	d.gain = ramp{value: 1, target: 1}
-	d.speed = clampSpeed(speed)
+	d.speed = clampSpeed(cue.Speed)
 	e.levels[e.active] = ramp{}
 	e.levels[1-e.active] = ramp{}
 	e.reported.ended, e.reported.failed = nil, nil
@@ -171,7 +171,7 @@ func (e *Engine) Load(url string, start time.Duration, autoplay bool, speed floa
 	e.mu.Unlock()
 	closeDecks(stale)
 	e.wake()
-	if autoplay {
+	if cue.Autoplay {
 		return e.Play()
 	}
 	return nil
@@ -192,9 +192,10 @@ func (e *Engine) Preload(url string) {
 	closeDecks([]*deck{stale})
 }
 
-// Crossfade plays url on the idle deck at speed while the active one fades
-// out at its own, over d: the idle deck becomes the active one.
-func (e *Engine) Crossfade(url string, d time.Duration, speed float64) error {
+// Crossfade plays url on the idle deck from its start, at cue's Speed,
+// while the active one fades out at its own, over d: the idle deck becomes
+// the active one.
+func (e *Engine) Crossfade(url string, d time.Duration, cue Cue) error {
 	e.mu.Lock()
 	from, to := e.active, 1-e.active
 	var stale []*deck
@@ -209,7 +210,7 @@ func (e *Engine) Crossfade(url string, d time.Duration, speed float64) error {
 	}
 	e.decks[to].gain = ramp{}
 	e.decks[to].gain.to(1, d)
-	e.decks[to].speed = clampSpeed(speed)
+	e.decks[to].speed = clampSpeed(cue.Speed)
 	e.levels[to] = ramp{value: 1, target: 1}
 	e.fading = true
 	e.fadeEnd = time.Now().Add(d + 50*time.Millisecond)

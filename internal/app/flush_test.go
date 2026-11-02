@@ -8,8 +8,10 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/builtin"
+	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/player/playertest"
 	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/volume"
 )
@@ -28,24 +30,20 @@ func (s offlineServices) PrepareStream(ctx context.Context, t media.Track) (play
 
 // quietStream is an engine that plays at once and tells no progress, past
 // the time that tells a stream sounds.
-type quietStream struct{ p atomic.Pointer[player.Player] }
+type quietStream struct {
+	playertest.Stream
+	p atomic.Pointer[player.Player]
+}
 
-func (s *quietStream) Load(_ string, start time.Duration, autoplay bool, _ float64) error {
-	if autoplay {
+func (s *quietStream) Load(_ string, cue audio.Cue) error {
+	if cue.Autoplay {
 		s.p.Load().Playing(true)
-		s.p.Load().Time(start+time.Millisecond, 0)
+		s.p.Load().Time(cue.Start+time.Millisecond, 0)
 	}
 	return nil
 }
-func (s *quietStream) Preload(string)                                 {}
-func (s *quietStream) Crossfade(string, time.Duration, float64) error { return nil }
-func (s *quietStream) Play() error                                    { s.p.Load().Playing(true); return nil }
-func (s *quietStream) Pause()                                         { s.p.Load().Playing(false) }
-func (s *quietStream) Stop()                                          {}
-func (s *quietStream) Unload()                                        {}
-func (s *quietStream) Seek(time.Duration)                             {}
-func (s *quietStream) SetVolume(float64)                              {}
-func (s *quietStream) SetSpeed(float64)                               {}
+func (s *quietStream) Play() error { s.p.Load().Playing(true); return nil }
+func (s *quietStream) Pause()      { s.p.Load().Playing(false) }
 
 // TestFlush quits right after the queue and the volume changed while
 // paused: the files keep them, and the windows' settings are kept first.

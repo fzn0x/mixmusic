@@ -275,7 +275,7 @@ func TestEngineDoesNotSeekLive(t *testing.T) {
 		t.Fatal(err)
 	}
 	e, dev, rec := newTestEngine(t)
-	e.Load(path, 0, true, 1)
+	e.Load(path, Cue{Autoplay: true})
 	buffered(t, e, 0, 4800)
 	got := dev.play(t, 4800)
 	e.Seek(2 * time.Second)
@@ -301,7 +301,7 @@ func TestEngineLiveAtItsOwnSpeed(t *testing.T) {
 		t.Fatal(err)
 	}
 	e, dev, rec := newTestEngine(t)
-	e.Load(path, 0, true, 2)
+	e.Load(path, Cue{Autoplay: true, Speed: 2})
 	buffered(t, e, 0, 4800)
 	got := dev.play(t, 4800)
 	// The stream moved on as many frames as were rendered, the device's and

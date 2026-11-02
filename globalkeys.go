@@ -44,13 +44,27 @@ func (s *shell) globalShortcutSettings(c *ui.Context) {
 // globalShortcutRow is a command's global shortcut: its keys, and why
 // they didn't register, with try again.
 func (s *shell) globalShortcutRow(c *ui.Context, gc app.GlobalCommand) {
-	k := &s.lk
 	keys := s.set.GlobalShortcuts[gc.ID]
 	recording := s.recording == globalRecording+gc.ID
 	problem := ""
 	if keys != "" && !recording {
 		problem = s.svc.Preferences.GlobalShortcutProblem(gc.ID)
 	}
+	// The search of the settings finds the row by its command, its keys
+	// and why they didn't register, as it finds the window's shortcuts.
+	var words []string
+	if s.find.sifting() {
+		words = []string{"global", shortcutWords(keys)}
+	}
+	if !s.findable(gc.Title, problem, words...) {
+		return
+	}
+	s.show(c, func() { s.globalShortcutRowOf(c, gc, keys, problem, recording) })
+}
+
+// globalShortcutRowOf builds the row of a command's global shortcut.
+func (s *shell) globalShortcutRowOf(c *ui.Context, gc app.GlobalCommand, keys, problem string, recording bool) {
+	k := &s.lk
 	ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
 			ui.Text(c, gc.Title).FontSize(k.bodySize())

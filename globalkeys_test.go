@@ -216,6 +216,33 @@ func TestGlobalShortcutPressRecords(t *testing.T) {
 	}
 }
 
+// TestSettingsFindGlobalShortcuts finds the global shortcuts by typing:
+// by their commands, their keys, why the system refused them, and
+// "global"; a search that holds none of these leaves them out.
+func TestSettingsFindGlobalShortcuts(t *testing.T) {
+	h := newTestHotkeys()
+	h.fail[globalAcc("Alt+V")] = errors.New(`mygo: cannot register "Ctrl+Alt+V": Hot key is already registered.`)
+	s, tt := newGlobalShell(t, h)
+	click(t, s, tt, "set the global shortcut of Volume up")
+	tt.Key(ui.Cmd|ui.Alt, ui.KeyV)
+	s.drain()
+	tt.Frame()
+	inUse := "These keys are already in use: pick others, or try again once they're free"
+	for _, q := range []string{"volume up", strings.ToLower(shortcutLabel("Mod+Alt+V")), "already in use", "global"} {
+		show(s, tt, settingsPath("", q))
+		if !tt.HasText("from any app") || !tt.HasText("change the global shortcut of Volume up") {
+			t.Errorf("searching %q doesn't find the global shortcut of Volume up: %q", q, tt.Texts())
+		}
+	}
+	if !tt.HasText(inUse) || !tt.HasText("set the global shortcut of Mute") {
+		t.Errorf("searching global: %q", tt.Texts())
+	}
+	show(s, tt, settingsPath("", "crossfade"))
+	if tt.HasText("from any app") || tt.HasText("change the global shortcut of Volume up") {
+		t.Errorf("searching crossfade shows the global shortcuts: %q", tt.Texts())
+	}
+}
+
 // TestGlobalShortcutGivenAway gives a command none of the keys of its own
 // shortcut that another command has as its global shortcut.
 func TestGlobalShortcutGivenAway(t *testing.T) {

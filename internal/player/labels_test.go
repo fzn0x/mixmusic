@@ -672,3 +672,64 @@ func TestSkipAIFallback(t *testing.T) {
 	}
 	h.noticed("Skipped Spotify 2, whose recording on YouTube Music YouTube labels as made with AI")
 }
+
+// liveLabeled is the fake app knowing YouTube's labels, whose tracks of
+// IDs that start with "live" play as live streams.
+type liveLabeled struct{ *labeled }
+
+func (l liveLabeled) Prepare(ctx context.Context, t media.Track) (Source, error) {
+	return liveServices{l.fakeServices}.Prepare(ctx, t)
+}
+
+func (l liveLabeled) PrepareStream(ctx context.Context, t media.Track) (Source, error) {
+	return liveServices{l.fakeServices}.PrepareStream(ctx, t)
+}
+
+// newLiveLabeled is newLabeled, whose tracks of IDs that start with
+// "live" play as live streams.
+func newLiveLabeled(t *testing.T, ai ...string) (*harness, *labeled) {
+	t.Helper()
+	l := &labeled{ai: map[string]bool{}, failing: map[string]bool{}, known: map[string]Label{}}
+	for _, id := range ai {
+		l.ai["yt:"+id] = true
+	}
+	h := newHarnessWith(t, Saved{}, func(f *fakeServices) Services {
+		l.fakeServices = f
+		return liveLabeled{l}
+	}, func(f *fakeServices) { f.settings.SkipAI = true })
+	return h, l
+}
+
+// TestSkipAILiveTrack checks a live stream as any video: one YouTube
+// labels as made with AI is passed over, and one it doesn't plays, live.
+// Checked ahead, a live stream isn't preloaded: what the engine held of it
+// would be behind its live edge once it played.
+func TestSkipAILiveTrack(t *testing.T) {
+	h, l := newLiveLabeled(t, "liveRadio01")
+	h.p.PlayTracks([]media.Track{track("a", "A"), liveTrack("liveRadio01"), liveTrack("liveRadio02")}, 0)
+	h.wait("a playing", playing("a"))
+	h.p.Time(11*time.Second, 200*time.Second)
+	h.wait("the first live stream marked", func(p *Player) bool { return slices.Equal(marked(p.s), []string{"yt:liveRadio01"}) })
+	h.p.Time(12*time.Second, 200*time.Second)
+	h.wait("the second live stream checked and prepared twice", func(*Player) bool {
+		n := 0
+		h.svc.with(func(f *fakeServices) {
+			for _, id := range f.prepared {
+				if id == "yt:liveRadio02" {
+					n++
+				}
+			}
+		})
+		return slices.Contains(l.checks(), "yt:liveRadio02") && n == 2
+	})
+	h.on(func(*Player) {})
+	if n := h.stream.count("preload"); n != 0 {
+		t.Errorf("%d preloads: %q", n, h.stream.copy())
+	}
+	h.p.Next()
+	h.wait("the second live stream playing", func(p *Player) bool { return p.s.Live && playing("liveRadio02")(p) })
+	h.noticed("Skipped Radio liveRadio01, which YouTube labels as made with AI")
+	if slices.Contains(h.loads(), "liveRadio01") || h.reported("yt:liveRadio01") {
+		t.Errorf("the labeled live stream was loaded or told of: %q", h.stream.copy())
+	}
+}

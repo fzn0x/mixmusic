@@ -147,3 +147,29 @@ func TestPrepareStreamTellsSurround(t *testing.T) {
 		t.Errorf("5.1 on, cached in stereo, offline: %+v, %v", src, err)
 	}
 }
+
+// TestPrepareStreamOfALiveVideoInStereo plays a live video, with 5.1 on,
+// at the address of its live stream, with no 5.1 audio beside it, even
+// where yt-dlp lists some: from the stream found now and from the one the
+// resolver holds.
+func TestPrepareStreamOfALiveVideoInStereo(t *testing.T) {
+	n := newNetTest(t)
+	n.net.Store(true)
+	n.ytdlp.Store(true)
+	n.p.a.settings = testSettings(t, func(s *settings.Settings) { s.Surround = true })
+	n.p.a.resolver.Run = func(context.Context, ...string) ([]byte, error) {
+		n.runs.Add(1)
+		return fmt.Appendf(nil, `{"url": "https://example.com/hls_playlist/expire/%d/index.m3u8", "protocol": "m3u8_native",
+			"live_status": "is_live", "formats": [{"format_id": "380", "url": "https://example.com/ac3", "ext": "m4a", "protocol": "https",
+			"acodec": "ac-3", "vcodec": "none", "abr": 384, "audio_channels": 6, "filesize": 9000}]}`, time.Now().Add(6*time.Hour).Unix()), nil
+	}
+	for i := range 2 { // found now, then found before
+		src, err := n.p.PrepareStream(context.Background(), ytTrack("liveRadio01"))
+		if err != nil || !src.Live || src.SurroundURL != "" || src.Cached || !strings.HasSuffix(src.URL, "/live/liveRadio01") {
+			t.Errorf("%d: %+v, %v", i, src, err)
+		}
+	}
+	if n.runs.Load() != 1 {
+		t.Errorf("yt-dlp ran %d times", n.runs.Load())
+	}
+}

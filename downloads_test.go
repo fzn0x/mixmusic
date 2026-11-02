@@ -332,3 +332,41 @@ func TestDownloadsUnreachable(t *testing.T) {
 		t.Errorf("the page shows %q", tt.Texts())
 	}
 }
+
+// TestHomeOfflineDownloads offers the downloads on Home once, under the
+// first service that failed, while the network is gone: not while it
+// answers.
+func TestHomeOfflineDownloads(t *testing.T) {
+	offline := true
+	was := networkOnline
+	networkOnline = func(*shell) bool { return !offline }
+	t.Cleanup(func() { networkOnline = was })
+	s, _ := newKeptShell(t, keptTracks...)
+	tt := testerOf(t, s, 1280, 1600)
+	for _, key := range []string{"home:spotify", "home:youtube"} {
+		s.loads[key] = &loaded[[]media.Shelf]{done: true, err: errors.New("no network")}
+	}
+	// A button reads as two texts, its label and its own.
+	offers := func() int {
+		n := 0
+		for _, x := range tt.Texts() {
+			if x == "open downloads" {
+				n++
+			}
+		}
+		return n / 2
+	}
+	show(s, tt, "/")
+	if n := offers(); n != 1 {
+		t.Fatalf("Home offline offers the downloads %d times: %q", n, tt.Texts())
+	}
+	click(t, s, tt, "open downloads")
+	if got := s.router.Path(); got != "/library/downloads" {
+		t.Errorf("open downloads goes to %q", got)
+	}
+	offline = false
+	show(s, tt, "/")
+	if n := offers(); n != 0 {
+		t.Errorf("Home online offers the downloads %d times", n)
+	}
+}

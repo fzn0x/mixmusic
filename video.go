@@ -63,13 +63,14 @@ type videoStatus struct {
 
 // videoWant is what a frame wants the page to do: play the picture of
 // src, of the recording track, while active and playing, at pos, the
-// player's position.
+// player's position, and at rate, the speed the sound plays at.
 type videoWant struct {
 	src     *app.VideoSource
 	track   string
 	active  bool
 	playing bool
 	pos     time.Duration
+	rate    float64
 	filter  string
 }
 
@@ -79,21 +80,22 @@ type videoSent struct {
 	active  bool
 	playing bool
 	pos     time.Duration
+	rate    float64
 	filter  string
 	at      time.Time
 }
 
 // videoSend tells whether the page is to be told want, when it was told
 // prev last: of another picture, as it shows or hides, plays or pauses,
-// of a move while paused, as a seek, or of the engine's time, every
-// videoEvery while it plays.
+// or the sound's speed changes, of a move while paused, as a seek, or of
+// the engine's time, every videoEvery while it plays.
 func videoSend(prev videoSent, want videoWant, now time.Time) bool {
 	src := ""
 	if want.src != nil {
 		src = want.src.Src
 	}
 	switch {
-	case src != prev.src, want.active != prev.active, want.playing != prev.playing, want.filter != prev.filter:
+	case src != prev.src, want.active != prev.active, want.playing != prev.playing, want.rate != prev.rate, want.filter != prev.filter:
 		return true
 	case !want.active || src == "":
 		return false
@@ -108,7 +110,10 @@ type videoCmd struct {
 	src     *app.VideoSource
 	active  bool
 	playing bool
-	filter  string
+	// rate is the speed the sound plays at, which the picture plays at
+	// too: 0 is its own.
+	rate   float64
+	filter string
 }
 
 // videoLink talks to the page of the picture from a goroutine of its own,
@@ -195,8 +200,13 @@ func (l *videoLink) send(cmd videoCmd) {
 		filter, _ := json.Marshal(cmd.filter)
 		at := l.clock()
 		sentAt := float64(time.Now().UnixMicro()) / 1000
-		st, err = l.call(ctx, fmt.Sprintf("return mv.sync({at: %s, sentAt: %s, playing: %t, active: %t, filter: %s})",
-			strconv.FormatFloat(at.Seconds(), 'f', 4, 64), strconv.FormatFloat(sentAt, 'f', 3, 64), cmd.playing, cmd.active, filter))
+		rate := cmd.rate
+		if rate <= 0 {
+			rate = 1
+		}
+		st, err = l.call(ctx, fmt.Sprintf("return mv.sync({at: %s, sentAt: %s, playing: %t, active: %t, filter: %s, rate: %s})",
+			strconv.FormatFloat(at.Seconds(), 'f', 4, 64), strconv.FormatFloat(sentAt, 'f', 3, 64), cmd.playing, cmd.active, filter,
+			strconv.FormatFloat(rate, 'f', 4, 64)))
 	}
 	var thrown pageError
 	switch {
@@ -397,7 +407,8 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 		if k.fx.phosphor {
 			filter = videoFilter
 		}
-		v.want = videoWant{src: src, track: rec.ID, active: true, playing: s.st.Playing && !s.st.Buffering, pos: s.st.Position, filter: filter}
+		v.want = videoWant{src: src, track: rec.ID, active: true, playing: s.st.Playing && !s.st.Buffering, pos: s.st.Position,
+			rate: s.st.Speed, filter: filter}
 		v.built = true
 	})
 }
@@ -592,9 +603,9 @@ func (s *shell) followVideo() {
 	if want.src != nil {
 		src = want.src.Src
 	}
-	v.sent = videoSent{src: src, active: want.active, playing: want.playing, pos: want.pos, filter: want.filter, at: now}
+	v.sent = videoSent{src: src, active: want.active, playing: want.playing, pos: want.pos, rate: want.rate, filter: want.filter, at: now}
 	v.lastSrc, v.lastTrack = want.src, want.track
-	v.link.post(videoCmd{src: want.src, active: want.active, playing: want.playing, filter: want.filter})
+	v.link.post(videoCmd{src: want.src, active: want.active, playing: want.playing, rate: want.rate, filter: want.filter})
 }
 
 // idleVideo tells the page to stop, as the window hides or minimizes: no

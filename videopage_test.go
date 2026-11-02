@@ -100,6 +100,9 @@ func TestPageFollowsTheSound(t *testing.T) {
 		{`{at: 10, sentAt: 1000, playing: true}`, 1500, 10.5},
 		{`{at: 10, sentAt: 1000, playing: false}`, 1500, 10},
 		{`{at: 10, sentAt: 1000, playing: true}`, 900, 10},
+		// At the sound's speed: half a second at 1.5× is 0.75 s of it.
+		{`{at: 10, sentAt: 1000, playing: true, rate: 1.5}`, 1500, 10.75},
+		{`{at: 10, sentAt: 1000, playing: false, rate: 1.5}`, 1500, 10},
 	} {
 		eval("mvLogic.target("+c.clock+", "+jsNum(c.now)+")", &at)
 		if at != c.want {

@@ -63,11 +63,11 @@
    * target returns where the picture is to be at now, in milliseconds since
    * the epoch, of clock: the sound's time, at, in seconds, which the Go
    * side read at sentAt, in milliseconds since the epoch, and moving on
-   * from there while it plays.
+   * from there while it plays, at its rate, 1 when it has none.
    */
   function target(clock, now) {
     if (!clock.playing) return clock.at;
-    return clock.at + Math.max(0, now - clock.sentAt) / 1000;
+    return clock.at + (Math.max(0, now - clock.sentAt) / 1000) * (clock.rate || 1);
   }
 
   /**
@@ -108,8 +108,8 @@
    * the fetch under way.
    */
   let cur = null;
-  /** clock is the sound's time, as the last sync told it. */
-  let clock = { at: 0, sentAt: 0, playing: false };
+  /** clock is the sound's time, and the rate it moves at, as the last sync told it. */
+  let clock = { at: 0, sentAt: 0, playing: false, rate: 1 };
   /** active is set while the Go side shows the picture. */
   let active = false;
   let pumping = false;
@@ -307,14 +307,18 @@
     pump(cur);
   }
 
-  /** adjust closes the gap d by which the picture runs ahead of the sound, at t. */
+  /**
+   * adjust closes the gap d by which the picture runs ahead of the sound, at
+   * t: around the sound's rate, as it plays faster or slower.
+   */
   function adjust(d, t) {
     if (video.seeking) return;
     const c = correction(d);
+    const rate = c.rate * clock.rate;
     if (c.seek) {
       seek(t);
-    } else if (video.playbackRate !== c.rate) {
-      video.playbackRate = c.rate;
+    } else if (video.playbackRate !== rate) {
+      video.playbackRate = rate;
     }
     const at = now();
     drifts.push([at, Math.abs(d)]);
@@ -408,8 +412,9 @@
 
   /**
    * mv is what the Go side calls. load plays a picture, sync tells the
-   * sound's time and whether the picture shows ({at, sentAt, playing,
-   * active, filter}), clear stops; each returns status().
+   * sound's time, the rate it moves at and whether the picture shows ({at,
+   * sentAt, playing, active, filter, rate}), clear stops; each returns
+   * status().
    */
   root.mv = {
     codecs,
@@ -418,7 +423,7 @@
       return status();
     },
     sync(s) {
-      clock = { at: s.at, sentAt: s.sentAt, playing: !!s.playing };
+      clock = { at: s.at, sentAt: s.sentAt, playing: !!s.playing, rate: s.rate > 0 ? s.rate : 1 };
       active = !!s.active;
       video.style.filter = s.filter || "";
       hold();

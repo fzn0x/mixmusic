@@ -10,7 +10,12 @@
   requests with as the website does, it reads and changes their library:
   liked songs, playlists, albums, subscriptions, likes, dislikes and
   saves, and it deletes the playlists the user made, which it tells from
-  those they saved by the menus YouTube sends with them. It also reads
+  those they saved by the menus YouTube sends with them. It lists the
+  Google accounts of the session and their brand channels, from YouTube's
+  website, and uses a brand channel by its page ID: one whose page ID the
+  list doesn't tell is listed as `Unswitchable`, as without it the account
+  itself would be used. Once the app switches, it checks that YouTube Music
+  answers as the channel chosen, else goes back. It also reads
   whether YouTube labels a video as made with AI, from the answer of
   YouTube's own website, asked signed out with a field mask
   (`MadeWithAI`): nothing of YouTube Music carries the label. Its parsers

@@ -665,9 +665,10 @@ func (p *Player) onProgress() {
 		p.prefetch(entry, next)
 	}
 	// The crossfade's seconds are those heard: at 2×, a fade of 5 s starts
-	// 10 s of the track before its end.
+	// 10 s of the track before its end. A track paused, whose time a seek
+	// tells, waits to play again.
 	fade := time.Duration(p.svc.Settings().Crossfade) * time.Second
-	if fade > 0 && !p.crossfading && p.s.Source != nil && p.s.Source.Mode == ModeStream &&
+	if fade > 0 && !p.crossfading && !p.paused && p.s.Source != nil && p.s.Source.Mode == ModeStream &&
 		hasNext && next.UID != entry.UID && dur > 0 && p.heard(dur-pos) <= fade && p.heard(dur) > 3*fade && p.mayStart(next) {
 		p.crossfadeTo(next, fade)
 	}
@@ -697,6 +698,13 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 	p.crossfading = true
 	token := p.loadToken
 	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
+		if p.paused {
+			// Paused meanwhile, the track stays paused where it is. Played
+			// again, it's crossfaded out of while there's time, as it plays
+			// on, or next starts as it ends.
+			p.crossfading = false
+			return
+		}
 		p.after(fade, func() { p.crossfading = false })
 		// A track the user chose meanwhile, or a Connect track, starts as
 		// the current one ends.

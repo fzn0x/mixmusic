@@ -38,7 +38,8 @@ func (testServices) SaveVolume(float64)                                        {
 func (testServices) Report(player.Now)                                         {}
 func (testServices) SaveQueue(player.Saved)                                    {}
 
-// testStream plays at once, silently.
+// testStream plays at once, silently: its time moves past where it
+// loaded, as the engine's does once a stream sounds.
 type testStream struct {
 	mu sync.Mutex
 	p  *player.Player
@@ -49,9 +50,10 @@ func (s *testStream) get() *player.Player {
 	defer s.mu.Unlock()
 	return s.p
 }
-func (s *testStream) Load(_ string, _ time.Duration, autoplay bool) error {
+func (s *testStream) Load(_ string, start time.Duration, autoplay bool) error {
 	if autoplay {
 		s.get().Playing(true)
+		s.get().Time(start+time.Millisecond, 0)
 	}
 	return nil
 }

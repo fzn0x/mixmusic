@@ -69,15 +69,20 @@ func (testPlayer) SaveVolume(float64)          {}
 func (testPlayer) Report(player.Now)           {}
 func (testPlayer) SaveQueue(player.Saved)      {}
 
-// testStream is an engine that plays at once, silently.
+// testStream is an engine that plays at once, silently: its time moves
+// past where it loaded, as the engine's does once a stream sounds, but for
+// the IDs that start with "yt:quiet", whose audio never comes.
 type testStream struct {
 	mu sync.Mutex
 	p  *player.Player
 }
 
-func (s *testStream) Load(_ string, _ time.Duration, autoplay bool) error {
+func (s *testStream) Load(url string, start time.Duration, autoplay bool) error {
 	if autoplay {
 		s.player().Playing(true)
+		if !strings.HasPrefix(url, "url:yt:quiet") {
+			s.player().Time(start+time.Millisecond, 0)
+		}
 	}
 	return nil
 }

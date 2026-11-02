@@ -43,6 +43,7 @@ func TestStreamRetryHolds(t *testing.T) {
 	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Time(42*time.Second, 200*time.Second)
+	h.stream.silence("a") // the tries, until the engine tells their time
 	h.wait("b preloaded", func(*Player) bool { return h.stream.count("preload url:yt:b") == 1 })
 	useRetries(t, h, "a", 0)
 	// Short of retryHold, the stream doesn't hold yet.
@@ -103,8 +104,10 @@ func TestStreamRetryEachPlay(t *testing.T) {
 func TestStreamErrorAtStart(t *testing.T) {
 	longWaits(t, 3)
 	h := newHarness(t, Saved{}, func(f *fakeServices) { f.failure = "YouTube refused to send its audio" })
+	h.stream.silence("a")
 	h.p.PlayTracks(tracks("a", "b"), 0)
-	h.wait("a playing", playing("a"))
+	// The engine plays it, but it never sounds: it still loads.
+	h.wait("a loading in the engine", func(p *Player) bool { return p.s.Index == 0 && p.loaded && p.s.Playing && p.s.Loading })
 	// The engine tells where the stream opens, and that it failed.
 	h.p.Time(0, 0)
 	h.p.Error("the stream failed")
@@ -117,8 +120,8 @@ func TestStreamErrorAtStart(t *testing.T) {
 	}
 }
 
-// TestStreamRetryWaits shows a try that waits as a track that loads, and
-// lets a seek or another track take over.
+// TestStreamRetryWaits shows a try that waits as a track that loads, which
+// can't be paused or moved, and lets another track take over.
 func TestStreamRetryWaits(t *testing.T) {
 	longWaits(t, 1)
 	broken := func(t *testing.T) *harness {
@@ -152,8 +155,16 @@ func TestStreamRetryWaits(t *testing.T) {
 	})
 	t.Run("seek", func(t *testing.T) {
 		h := broken(t)
+		loads := h.stream.count("load")
 		h.p.Seek(50 * time.Second)
-		h.wait("a at 50s", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 50s true" && playing("a")(p) })
+		h.on(func(p *Player) {
+			if !p.s.Loading || p.s.Position != 42*time.Second {
+				t.Errorf("after the seek: loading %v, position %v", p.s.Loading, p.s.Position)
+			}
+		})
+		if got := h.stream.count("load"); got != loads {
+			t.Errorf("the seek loaded the stream again: %q", h.stream.copy())
+		}
 	})
 	t.Run("next", func(t *testing.T) {
 		h := broken(t)

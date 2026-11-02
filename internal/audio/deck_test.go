@@ -87,12 +87,12 @@ func reference(t *testing.T, path string) []float32 {
 func drain(t *testing.T, d *deck) []float32 {
 	t.Helper()
 	var out []float32
-	buf := make([]float32, 2*1024)
+	buf := make([]float32, maxChannels*1024)
 	deadline := time.Now().Add(10 * time.Second)
 	for {
 		r := d.ring.Load()
-		n := r.readTo(buf)
-		out = append(out, buf[:2*n]...)
+		n := r.readTo(buf[:r.channels*1024])
+		out = append(out, buf[:r.channels*n]...)
 		if n == 0 {
 			if r.done.Load() && r.readable() == 0 {
 				return out

@@ -67,15 +67,26 @@ func newAnalyser() *analyser {
 	return a
 }
 
-// writeInput adds interleaved stereo frames to the analyser, mixed down to
-// mono as Web Audio mixes speakers: (L+R)/2.
-func (a *analyser) writeInput(buf []float32) {
+// writeInput adds frames of ch channels interleaved, 2 or 6, to the
+// analyser, mixed down to mono: stereo as Web Audio mixes speakers,
+// (L+R)/2, and 5.1 as half the sum of its stereo downmix at the standard's
+// levels, without the LFE, so that a stereo track draws alike on either.
+func (a *analyser) writeInput(buf []float32, ch int) {
 	a.mu.Lock()
-	for i := 0; i < len(buf); i += 2 {
-		a.input[a.write] = 0.5 * (buf[i] + buf[i+1])
-		a.write = (a.write + 1) % FFTSize
+	if ch == maxChannels {
+		const c, s = 0.70710677, 0.35355338
+		for i := 0; i < len(buf); i += ch {
+			f := buf[i : i+ch]
+			a.input[a.write] = 0.5*(f[0]+f[1]) + c*f[2] + s*(f[4]+f[5])
+			a.write = (a.write + 1) % FFTSize
+		}
+	} else {
+		for i := 0; i < len(buf); i += 2 {
+			a.input[a.write] = 0.5 * (buf[i] + buf[i+1])
+			a.write = (a.write + 1) % FFTSize
+		}
 	}
-	a.written += int64(len(buf) / 2)
+	a.written += int64(len(buf) / ch)
 	a.mu.Unlock()
 }
 

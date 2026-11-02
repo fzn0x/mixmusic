@@ -7,17 +7,34 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/aac"
+	"github.com/fzn0x/mixmusic/ac3"
 	"github.com/fzn0x/mixmusic/mp4"
 	"github.com/fzn0x/mixmusic/resample"
 )
 
-// aacTrack is the AAC-LC track of an MP4 file, as YouTube serves it at
-// 44.1 kHz, converted to Rate.
-type aacTrack struct {
+// frameDecoder is the decoder of an MP4 track's samples: AAC-LC's, or
+// AC-3's and E-AC-3's.
+type frameDecoder interface {
+	Decode(frame []byte, pcm []float32) (int, error)
+	Reset()
+}
+
+// mp4Track is the audio track of an MP4 file: AAC-LC, as YouTube serves it
+// at 44.1 kHz, in stereo, or the AC-3 and E-AC-3 of its 5.1 surround, in
+// six channels; converted to Rate.
+type mp4Track struct {
 	r   *mp4.Reader
-	dec *aac.Decoder
-	rs  *resample.Converter
-	p   mp4.Packet // the packet read last
+	dec frameDecoder
+	// surround is the AC-3 decoder of a surround track, whose stream tells
+	// its downmix; nil for AAC.
+	surround *ac3.Decoder
+	// downmix is the downmix the surround stream told last.
+	downmix *[2][6]float32
+	rs      *resample.Converter
+	p       mp4.Packet // the packet read last
+	// ch is the channels of the decoded frames, and frameLength the frames
+	// a sample decodes to at most.
+	ch, frameLength int
 	// rate is the track's sampling frequency. The converter makes up frames
 	// at Rate of each down frames at rate, the two rates divided by their
 	// greatest common divisor.
@@ -42,17 +59,25 @@ type aacTrack struct {
 	pcm      []float32 // the converter's output
 }
 
-// openAAC returns the AAC-LC track of an MP4 file. Its errors are worded
-// for the player.
-func openAAC(src io.ReadSeeker) (track, timing, error) {
+// openMP4 returns the audio track of an MP4 file: AAC-LC, or the AC-3 or
+// E-AC-3 of 5.1 surround. Its errors are worded for the player.
+func openMP4(src io.ReadSeeker) (track, timing, error) {
 	r, err := mp4.NewReader(src)
 	if err != nil {
 		return nil, timing{}, readError(err)
 	}
 	t := r.Track()
-	if t.Codec != "mp4a.40.2" {
-		return nil, timing{}, fmt.Errorf("%w (%s in MP4)", errUnsupported, t.Codec)
+	switch t.Codec {
+	case "mp4a.40.2":
+		return openAAC(r, t)
+	case "ac-3", "ec-3":
+		return openAC3(r, t)
 	}
+	return nil, timing{}, fmt.Errorf("%w (%s in MP4)", errUnsupported, t.Codec)
+}
+
+// openAAC returns the AAC-LC track of r.
+func openAAC(r *mp4.Reader, t mp4.Track) (track, timing, error) {
 	cfg, err := aac.ParseConfig(t.Config)
 	if err != nil {
 		return nil, timing{}, fmt.Errorf("%w (%v)", errUnsupported, err)
@@ -61,39 +86,69 @@ func openAAC(src io.ReadSeeker) (track, timing, error) {
 	if err != nil {
 		return nil, timing{}, fmt.Errorf("%w (%v)", errUnsupported, err)
 	}
-	// Decode writes stereo, a mono stream's in both channels.
-	rs, err := resample.New(cfg.SampleRate, Rate, 2)
+	// Decode writes stereo, a mono stream's in both channels. A frame of
+	// AAC overlaps the one before it: decoding starts two frames before a
+	// seek's target, as the first frame after a reset is only half there,
+	// and the second gives the converter what comes before the target.
+	return newMP4Track(r, t, dec, nil, cfg.SampleRate, 2, aac.FrameLength, 2*aac.FrameLength)
+}
+
+// openAC3 returns the AC-3 or E-AC-3 track of r, of 5.1 surround, which
+// decodes into six channels.
+func openAC3(r *mp4.Reader, t mp4.Track) (track, timing, error) {
+	parse := ac3.ParseDAC3
+	if t.Codec == "ec-3" {
+		parse = ac3.ParseDEC3
+	}
+	// The dac3 or dec3 tells the rate, and the streams the decoder refuses,
+	// as E-AC-3 of the reduced rates, before any is decoded.
+	cfg, err := parse(t.Config)
 	if err != nil {
 		return nil, timing{}, fmt.Errorf("%w (%v)", errUnsupported, err)
 	}
-	rate := int64(cfg.SampleRate)
-	g := gcd(rate, Rate)
-	// A frame of AAC overlaps the one before it: decoding starts two frames
-	// before a seek's target, as the first frame after a reset is only half
-	// there, and the second gives the converter what comes before the
-	// target.
+	rate := cfg.SampleRate
+	dec := ac3.NewDecoder()
+	// A sample's blocks overlap the block before them: decoding starts a
+	// sample before a seek's target, whose last block settles the first
+	// of the next, and gives the converter what comes before the target.
+	return newMP4Track(r, t, dec, dec, rate, ac3.MaxChannels, ac3.FrameLength, ac3.FrameLength)
+}
+
+// newMP4Track returns the track r reads, which dec decodes into frames of
+// ch channels at rate, of up to frameLength frames a sample; the decoding
+// after a seek starts preRoll frames before its target.
+func newMP4Track(r *mp4.Reader, t mp4.Track, dec frameDecoder, surround *ac3.Decoder, rate, ch, frameLength, preRoll int) (track, timing, error) {
+	rs, err := resample.New(rate, Rate, ch)
+	if err != nil {
+		return nil, timing{}, fmt.Errorf("%w (%v)", errUnsupported, err)
+	}
+	r64 := int64(rate)
+	g := gcd(r64, Rate)
 	tm := timing{
 		delay:   t.CodecDelay,
-		preRoll: time.Duration(2*aac.FrameLength) * time.Second / time.Duration(rate),
+		preRoll: time.Duration(preRoll) * time.Second / time.Duration(rate),
 		total:   r.Duration(),
 	}
-	tr := &aacTrack{
-		r: r, dec: dec, rs: rs,
-		rate: rate, up: Rate / g, down: rate / g,
-		origin:   framesAt(tm.delay, rate),
+	tr := &mp4Track{
+		r: r, dec: dec, surround: surround, rs: rs,
+		ch: ch, frameLength: frameLength,
+		rate: r64, up: Rate / g, down: r64 / g,
+		origin:   framesAt(tm.delay, r64),
 		originAt: frames(tm.delay),
-		frame:    make([]float32, 2*aac.FrameLength),
+		frame:    make([]float32, ch*frameLength),
 		// The converter gives the frames of the input it holds back with
 		// those of a frame, or at the end.
-		pcm: make([]float32, 2*(rs.MaxOutput(aac.FrameLength)+rs.Latency())),
+		pcm: make([]float32, ch*(rs.MaxOutput(frameLength)+rs.Latency())),
 	}
-	if scale := int64(t.Timescale); scale != rate {
-		tr.slack = (rate + scale - 1) / scale
+	if scale := int64(t.Timescale); scale != r64 {
+		tr.slack = (r64 + scale - 1) / scale
 	}
 	return tr, tm, nil
 }
 
-func (t *aacTrack) seek(at time.Duration) error {
+func (t *mp4Track) channels() int { return t.ch }
+
+func (t *mp4Track) seek(at time.Duration) error {
 	if err := t.r.Seek(at); err != nil {
 		return err
 	}
@@ -103,19 +158,30 @@ func (t *aacTrack) seek(at time.Duration) error {
 	return nil
 }
 
-func (t *aacTrack) read() error {
+func (t *mp4Track) read() error {
 	var err error
 	t.p, err = t.r.ReadPacket()
 	return err
 }
 
-func (t *aacTrack) decode() (decoded, error) {
+func (t *mp4Track) decode() (decoded, error) {
 	n, err := t.dec.Decode(t.p.Data, t.frame)
 	if err != nil {
 		if errors.Is(err, errors.ErrUnsupported) {
 			return decoded{}, fmt.Errorf("%w (%v)", errUnsupported, err)
 		}
 		return decoded{}, fmt.Errorf("%w (%v)", errDecode, err)
+	}
+	if t.surround != nil {
+		// The downmix rarely changes: a new one is kept only when it does,
+		// for the deck to hand the audio thread.
+		if m := t.surround.Info().Downmix; t.downmix == nil || m != *t.downmix {
+			// A copy, not m's address, which would put m on the heap at
+			// each packet.
+			d := new([2][6]float32)
+			*d = m
+			t.downmix = d
+		}
 	}
 	// A packet's duration tells how much of its frame is audio: the last
 	// one's ends early, the rest being the encoder's padding. Another's
@@ -138,13 +204,14 @@ func (t *aacTrack) decode() (decoded, error) {
 	}
 	skip := min(t.drop, keep)
 	t.drop -= skip
-	_, w := t.rs.Process(t.frame[2*skip:2*keep], t.pcm)
-	return decoded{pcm: t.pcm[:2*w], at: t.at, to: w}, nil
+	ch := int64(t.ch)
+	_, w := t.rs.Process(t.frame[ch*skip:ch*keep], t.pcm)
+	return decoded{pcm: t.pcm[:t.ch*w], at: t.at, to: w, downmix: t.downmix}, nil
 }
 
-func (t *aacTrack) end() []float32 {
+func (t *mp4Track) end() []float32 {
 	n := t.rs.Flush(t.pcm)
-	return t.pcm[:2*n]
+	return t.pcm[:t.ch*n]
 }
 
 // framesAt converts a duration to frames at rate, rounded.

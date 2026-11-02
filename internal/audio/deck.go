@@ -67,8 +67,13 @@ func parseOpusHead(b []byte) (opusHead, error) {
 type deck struct {
 	url string
 	// ring is the ring of the current position: a new one at each seek,
-	// which drops at once what the old one held.
+	// which drops at once what the old one held. Its frames are of the
+	// track's channels, once the deck read them, else stereo.
 	ring atomic.Pointer[ring]
+	// downmix is the stereo downmix of a surround track, as its stream
+	// asks for it, once the deck decoded a frame of it: the audio thread
+	// mixes its six channels down with it when the output plays two.
+	downmix atomic.Pointer[[2][6]float32]
 	// gain is the deck's gain, a ramp for crossfades: the audio thread's.
 	gain ramp
 	// playing is whether the deck plays, or holds at its position.
@@ -89,6 +94,7 @@ type deck struct {
 	changed chan struct{}
 
 	mu       sync.Mutex
+	channels int           // of the track, once its headers were read: 2 before
 	seekTo   time.Duration // a seek asked for, or -1
 	src      Source        // the open source, to wake for seeks
 	err      error         // why the deck failed
@@ -101,16 +107,17 @@ type deck struct {
 func newDeck(url string, start time.Duration, open Opener, notify func()) *deck {
 	ctx, cancel := context.WithCancel(context.Background())
 	d := &deck{
-		url:     url,
-		gain:    ramp{value: 1, target: 1},
-		trim:    newSmoother(1, glide),
-		cancel:  cancel,
-		done:    make(chan struct{}),
-		changed: make(chan struct{}, 1),
-		seekTo:  -1,
+		url:      url,
+		gain:     ramp{value: 1, target: 1},
+		trim:     newSmoother(1, glide),
+		cancel:   cancel,
+		done:     make(chan struct{}),
+		changed:  make(chan struct{}, 1),
+		seekTo:   -1,
+		channels: 2,
 	}
 	d.lkfs.Store(math.Float64bits(math.NaN()))
-	d.ring.Store(newRing(frames(start)))
+	d.ring.Store(newRing(frames(start), 2))
 	go func() {
 		defer close(d.done)
 		cur := d.ring.Load()
@@ -142,7 +149,7 @@ func (d *deck) seek(t time.Duration) {
 	t = max(0, t)
 	d.mu.Lock()
 	d.seekTo = t
-	d.ring.Store(newRing(frames(t)))
+	d.ring.Store(newRing(frames(t), d.channels))
 	d.mu.Unlock()
 	d.wake()
 }
@@ -246,11 +253,23 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		return err
 	}
 	delay := tm.delay
+	ch := tr.channels()
 	d.mu.Lock()
 	if tm.total > delay {
 		d.duration = tm.total - delay
 	}
 	d.ready = true
+	// The rings from now on hold frames of the track's channels: the one
+	// the audio thread reads takes them before it got a frame, as the one
+	// a seek asked for meanwhile, which the loop below takes.
+	d.channels = ch
+	if r := d.ring.Load(); r.channels != ch {
+		nr := newRing(r.start, ch)
+		d.ring.Store(nr)
+		if *cur == r {
+			*cur = nr
+		}
+	}
 	d.mu.Unlock()
 	notify()
 
@@ -294,9 +313,9 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		if next < skip {
 			from = max(from, min(skip-next, to))
 		}
-		next += int64(len(pcm) / 2)
+		next += int64(len(pcm) / ch)
 		if from < to {
-			(*cur).writeFrom(pcm[2*from:2*to], wait)
+			(*cur).writeFrom(pcm[int64(ch)*from:int64(ch)*to], wait)
 		}
 	}
 	if err := seekTo(start); err != nil {
@@ -324,7 +343,7 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		}
 		if err == io.EOF {
 			if pcm := tr.end(); len(pcm) > 0 {
-				write(pcm, 0, int64(len(pcm)/2))
+				write(pcm, 0, int64(len(pcm)/ch))
 			}
 			(*cur).done.Store(true)
 			notify()
@@ -345,6 +364,9 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		}
 		if next < 0 {
 			next = p.at
+		}
+		if p.downmix != nil && p.downmix != d.downmix.Load() {
+			d.downmix.Store(p.downmix) // before the frames it mixes down
 		}
 		write(p.pcm, int64(p.from), int64(p.to))
 	}

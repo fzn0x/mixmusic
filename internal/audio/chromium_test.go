@@ -82,13 +82,13 @@ func renderHere(input []float32, cfg chromiumConfig) ([]float32, [][analyserBins
 	for start := 0; start < len(out); start += 2 * quantum {
 		block := out[start:min(start+2*quantum, len(out))]
 		if cfg.EQ {
-			eq.process(block)
+			eq.process(block, 2)
 		}
 		if cfg.Compressor {
-			comp.process(block, levelThreshold, levelKnee, levelRatio, levelAttack, levelRelease)
+			comp.process(block, 2, levelThreshold, levelKnee, levelRatio, levelAttack, levelRelease)
 		}
 		if cfg.Analyse > 0 {
-			an.writeInput(block)
+			an.writeInput(block, 2)
 			if end := (start + len(block)) / 2; end%cfg.Analyse == 0 {
 				var d [analyserBins]byte
 				an.byteFrequencyData(&d)

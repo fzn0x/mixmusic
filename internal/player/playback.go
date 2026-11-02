@@ -84,6 +84,10 @@ func (p *Player) ToggleMute() {
 // it was in the way of playing Spotify tracks they choose.
 func (p *Player) SettingsChanged(s settings.Settings) {
 	p.do(func() {
+		if s.Surround != p.surround {
+			p.surround = s.Surround
+			p.switchAudio()
+		}
 		if s.SpotifyPlayback == p.spotifyMode {
 			return
 		}
@@ -92,6 +96,45 @@ func (p *Player) SettingsChanged(s settings.Settings) {
 			p.playAt(p.s.Index, p.s.Position, p.s.Playing)
 		}
 	})
+}
+
+// switchAudio plays the current stream's 5.1 surround audio, or its stereo
+// audio, as p.surround now asks, from where the other was, playing or
+// paused as it was: a track of no 5.1 audio plays on. One that loads, or
+// waits for the network, takes it when its stream loads. The next track
+// downloads again in the audio asked for.
+func (p *Player) switchAudio() {
+	src := p.s.Source
+	p.prefetched = ""
+	p.stereoOnly = false // 5.1 that failed is tried again
+	if src == nil || src.Mode != ModeStream || src.SurroundURL == "" || !p.loaded {
+		return
+	}
+	_ = p.stream.Load(p.audioOf(*src), p.s.Position, !p.paused)
+}
+
+// audioOf returns the URL of the audio of the current entry's stream to
+// play: its 5.1 audio while the settings ask for it, unless it failed.
+func (p *Player) audioOf(src Source) string { return src.audio(p.surround && !p.stereoOnly) }
+
+// playsSurround reports whether the current entry's stream plays its 5.1
+// audio.
+func (p *Player) playsSurround() bool {
+	src := p.s.Source
+	return src != nil && src.Mode == ModeStream && p.audioOf(*src) == src.SurroundURL && src.SurroundURL != ""
+}
+
+// fallBackToStereo plays the current entry's stereo audio from where its
+// 5.1 audio stopped, as that failed, and tells why once: until another
+// entry, or until 5.1 is turned on again, it plays in stereo.
+func (p *Player) fallBackToStereo(why string) {
+	cur, _ := p.s.Current()
+	p.stereoOnly = true
+	p.retry = retryState{played: p.retry.played, from: p.s.Position}
+	log.Printf("mixmusic: the 5.1 surround audio of %s stopped at %s: %s; playing it in stereo", cur.Track.ID, p.s.Position.Round(time.Second), why)
+	p.notify(Notice{Message: fmt.Sprintf("The 5.1 surround audio of %s couldn't play (%s), so it plays in stereo", cur.Track.Title, strings.TrimSuffix(why, "."))})
+	p.loaded = true
+	_ = p.stream.Load(p.s.Source.URL, p.s.Position, !p.paused)
 }
 
 // playAt plays the queue's entry at i from start, or holds it there when
@@ -104,6 +147,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	p.loadToken++
 	token := p.loadToken
 	p.retry = retryState{}
+	p.stereoOnly = false
 	p.endWait()
 	p.atEnd = false
 	p.markPlayed(entry.UID)
@@ -204,7 +248,7 @@ func (p *Player) loadStream(src Source, start time.Duration, autoplay bool) {
 	p.s.Source = &src
 	p.loaded = true
 	p.paused = !autoplay
-	_ = p.stream.Load(src.URL, start, autoplay)
+	_ = p.stream.Load(p.audioOf(src), start, autoplay)
 }
 
 func (p *Player) stopStream() {
@@ -278,6 +322,12 @@ func (p *Player) onStreamError(message string) {
 	if why == "" {
 		why = message
 	}
+	// 5.1 audio that fails, as one YouTube serves in a way the decoder
+	// can't decode, gives way to the stereo audio at once.
+	if p.playsSurround() {
+		p.fallBackToStereo(why)
+		return
+	}
 	// The stream may have broken off for want of the network: the track
 	// waits for it then, rather than spending its tries. It loads
 	// meanwhile.
@@ -339,7 +389,7 @@ func (p *Player) retryStream(why string) {
 			p.s.Source = &src
 			p.loaded = true
 			p.paused = !autoplay
-			_ = p.stream.Load(src.URL+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, autoplay)
+			_ = p.stream.Load(p.audioOf(src)+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, autoplay)
 		})
 	})
 }
@@ -377,7 +427,7 @@ func (p *Player) onProgress() {
 		p.prefetched = next.UID
 		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
 			if err == nil && src.Mode == ModeStream && src.URL != "" {
-				p.stream.Preload(src.URL)
+				p.stream.Preload(src.audio(p.surround))
 			}
 			if errors.Is(err, ErrOffline) {
 				p.prefetchOnline(next.UID)
@@ -412,6 +462,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		}
 		p.loadToken++
 		p.retry = retryState{}
+		p.stereoOnly = false
 		p.endWait()
 		p.markPlayed(next.UID)
 		p.askedAt = time.Time{}
@@ -424,7 +475,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		p.report()
 		p.loaded = true
 		p.paused = false
-		_ = p.stream.Crossfade(src.URL, fade)
+		_ = p.stream.Crossfade(src.audio(p.surround), fade)
 	})
 }
 

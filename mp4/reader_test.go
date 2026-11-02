@@ -883,6 +883,12 @@ func TestEditLists(t *testing.T) {
 
 // TestTrackEntries reads the codecs and configurations of sample entries
 // of each kind.
+// ac3Entry is an AC3SampleEntry or EC3SampleEntry of typ, of channels at
+// rate, followed by boxes.
+func ac3Entry(typ string, channels uint16, rate uint32, boxes ...[]byte) []byte {
+	return box(typ, make([]byte, 6), u16(1), make([]byte, 8), u16(channels, 16, 0, 0), u32(rate<<16), slices.Concat(boxes...))
+}
+
 func TestTrackEntries(t *testing.T) {
 	heaac := []byte{0x2B, 0x92, 0x08, 0x00}
 	longDesc := func(tag byte, data ...[]byte) []byte {
@@ -912,6 +918,13 @@ func TestTrackEntries(t *testing.T) {
 		{"QuickTime version 1", quicktime1, "mp4a.40.2", asc, 44100, 2},
 		{"QuickTime version 2", quicktime2, "mp4a.40.2", []byte{0x11, 0x80}, 48000, 6},
 		{"Opus", box("Opus", make([]byte, 6), u16(1), make([]byte, 8), u16(2, 16, 0, 0), u32(48000<<16), box("dOps", []byte("x"))), "Opus", nil, 48000, 2},
+		// The channels and rate of the dac3 and dec3, not the entry's.
+		{"AC-3 5.1", ac3Entry("ac-3", 2, 44100, box("dac3", []byte{0x10, 0x3D, 0xC0})), "ac-3", []byte{0x10, 0x3D, 0xC0}, 48000, 6},
+		{"AC-3 3/0 at 32 kHz", ac3Entry("ac-3", 2, 48000, box("dac3", []byte{0x90, 0x19, 0x40})), "ac-3", []byte{0x90, 0x19, 0x40}, 32000, 3},
+		{"E-AC-3 5.1", ac3Entry("ec-3", 2, 48000, box("dec3", []byte{0x06, 0x00, 0x20, 0x0F, 0x00})), "ec-3", []byte{0x06, 0x00, 0x20, 0x0F, 0x00}, 48000, 6},
+		{"E-AC-3 at a reduced rate", ac3Entry("ec-3", 2, 24000, box("dec3", []byte{0x01, 0x80, 0xE0, 0x04, 0x00})), "ec-3", []byte{0x01, 0x80, 0xE0, 0x04, 0x00}, 24000, 2},
+		{"AC-3, dac3 cut short", ac3Entry("ac-3", 2, 48000, box("dac3", []byte{0x10})), "ac-3", []byte{0x10}, 48000, 2},
+		{"AC-3 without a dac3", ac3Entry("ac-3", 6, 48000), "ac-3", nil, 48000, 6},
 	} {
 		moov := box("moov", mvhd(0), track{id: 1, entry: c.entry, tables: emptyTables}.trak())
 		r, err := NewReader(bytes.NewReader(slices.Concat(ftyp, moov)))

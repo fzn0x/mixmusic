@@ -59,7 +59,7 @@ func newNetTest(t *testing.T) *netTest {
 	if err != nil {
 		t.Fatal(err)
 	}
-	a := &App{resolver: r, cache: stream.NewCache(filepath.Join(n.dir, "audio"), 1<<30), matcher: match.New(nil, matches)}
+	a := &App{resolver: r, cache: stream.NewCache(filepath.Join(n.dir, "audio"), 1<<30), matcher: match.New(nil, matches), settings: testSettings(t)}
 	a.online = online.New(func(context.Context) error {
 		if n.net.Load() {
 			return nil

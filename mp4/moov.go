@@ -278,7 +278,11 @@ func (r *Reader) parseStsd(b []byte) error {
 	if err := e.check(typ); err != nil {
 		return err
 	}
-	if typ != typeMp4a {
+	switch typ {
+	case typeAc3, typeEc3:
+		return r.parseAc3(typ, e.b)
+	case typeMp4a:
+	default:
 		r.track.Codec = string(binary.BigEndian.AppendUint32(nil, typ))
 		return nil
 	}
@@ -316,6 +320,49 @@ func (r *Reader) parseStsd(b []byte) error {
 		if c.channels > 0 {
 			r.track.Channels = c.channels
 		}
+	}
+	return nil
+}
+
+// ac3Channels are the full-bandwidth channels of each acmod, the audio
+// coding mode of AC-3 and E-AC-3.
+var ac3Channels = [8]int{2, 1, 2, 3, 3, 4, 4, 5}
+
+// parseAc3 reads the box that ends an AC3SampleEntry or an EC3SampleEntry,
+// of ETSI TS 102 366, Annex F, from b, what follows the AudioSampleEntry:
+// its dac3 or dec3, whose payload is the track's Config. Their acmod and
+// lfeon give the channels, which the sample entry's channelcount need not.
+// So does the fscod of a dac3 give the rate; a dec3's may be the escape of
+// the reduced rates, which the sample entry gives then.
+func (r *Reader) parseAc3(typ uint32, b []byte) error {
+	r.track.Codec = string(binary.BigEndian.AppendUint32(nil, typ))
+	want := uint32(typeDac3)
+	if typ == typeEc3 {
+		want = typeDec3
+	}
+	box, err := findBox(b, want)
+	if err != nil || box == nil {
+		return err
+	}
+	r.track.Config = bytes.Clone(box)
+	br := bitReader{b: box}
+	if typ == typeEc3 {
+		br.read(13 + 3) // data_rate and num_ind_sub
+	}
+	fscod := br.read(2)
+	br.read(5) // bsid
+	if typ == typeEc3 {
+		br.read(2) // reserved and asvc
+	}
+	br.read(3) // bsmod
+	acmod := br.read(3)
+	lfe := br.read(1)
+	if br.short {
+		return nil
+	}
+	r.track.Channels = ac3Channels[acmod] + lfe
+	if fscod < 3 {
+		r.track.SampleRate = [3]int{48000, 44100, 32000}[fscod]
 	}
 	return nil
 }

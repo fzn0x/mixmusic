@@ -2,7 +2,8 @@ package audio
 
 // Port of Blink's DynamicsCompressor (third_party/blink/renderer/platform/
 // audio/dynamics_compressor.cc, under the BSD license of LICENSE.blink), the
-// processing of DynamicsCompressorNode, for stereo at Rate. It computes in
+// processing of DynamicsCompressorNode, for stereo and 5.1 at Rate, with
+// one detector of every channel, as Blink's is. It computes in
 // float as Blink does. The metering of the reduction, which the web player
 // doesn't read, is left out.
 
@@ -57,7 +58,7 @@ type compressor struct {
 	compressorGain             float32
 	dbMaxAttackCompressionDiff float32
 
-	preDelay                    [2][maxPreDelayFrames]float32
+	preDelay                    [maxChannels][maxPreDelayFrames]float32
 	preDelayRead, preDelayWrite int
 	lastPreDelayFrames          int
 }
@@ -78,7 +79,7 @@ func newCompressor() *compressor {
 func (c *compressor) reset() {
 	c.detectorAverage = 0
 	c.compressorGain = 1
-	c.preDelay = [2][maxPreDelayFrames]float32{}
+	c.preDelay = [maxChannels][maxPreDelayFrames]float32{}
 	c.preDelayRead = 0
 	c.preDelayWrite = defaultPreDelayFrames
 	c.dbMaxAttackCompressionDiff = -1
@@ -107,11 +108,19 @@ func flush32(x float32) float32 {
 	return x
 }
 
-// process compresses interleaved stereo frames in place, with the
+// forget clears the look-ahead of the channels from from on, which play
+// anew.
+func (c *compressor) forget(from int) {
+	for j := from; j < maxChannels; j++ {
+		clear(c.preDelay[j][:])
+	}
+}
+
+// process compresses frames of ch channels interleaved in place, with the
 // threshold and knee in dB, the ratio, and the attack and release in
 // seconds.
-func (c *compressor) process(buf []float32, dbThreshold, dbKnee, ratio, attackTime, releaseTime float32) {
-	frames := len(buf) / 2
+func (c *compressor) process(buf []float32, ch int, dbThreshold, dbKnee, ratio, attackTime, releaseTime float32) {
+	frames := len(buf) / ch
 	k := c.updateStaticCurveParameters(dbThreshold, dbKnee, ratio)
 	// Makeup gain with empirical/perceptual tuning.
 	linearPostGain := float32(math.Pow(float64(1/c.saturate(1, k)), float64(float32(0.6))))
@@ -177,8 +186,8 @@ func (c *compressor) process(buf []float32, dbThreshold, dbKnee, ratio, attackTi
 			// Delay the signal, computing the compression from the undelayed
 			// one.
 			var compressorInput float32
-			for j := range 2 {
-				undelayed := buf[2*frame+j]
+			for j := range ch {
+				undelayed := buf[ch*frame+j]
 				c.preDelay[j][write] = undelayed
 				abs := -undelayed
 				if undelayed > 0 {
@@ -217,8 +226,8 @@ func (c *compressor) process(buf []float32, dbThreshold, dbKnee, ratio, attackTi
 			// Warp the gain to smooth out sharp exponential transitions.
 			postWarpCompressorGain := float32(math.Sin(float64(piOverTwo * compressorGain)))
 			totalGain := linearPostGain * postWarpCompressorGain
-			for j := range 2 {
-				buf[2*frame+j] = c.preDelay[j][read] * totalGain
+			for j := range ch {
+				buf[ch*frame+j] = c.preDelay[j][read] * totalGain
 			}
 			frame++
 			read = (read + 1) & maxPreDelayFramesMask
@@ -235,7 +244,7 @@ func (c *compressor) setPreDelayTime(seconds float32) {
 	frames := min(int(seconds*Rate), maxPreDelayFrames-1)
 	if c.lastPreDelayFrames != frames {
 		c.lastPreDelayFrames = frames
-		c.preDelay = [2][maxPreDelayFrames]float32{}
+		c.preDelay = [maxChannels][maxPreDelayFrames]float32{}
 		c.preDelayRead = 0
 		c.preDelayWrite = frames
 	}

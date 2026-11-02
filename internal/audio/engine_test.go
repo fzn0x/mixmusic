@@ -14,22 +14,31 @@ import (
 
 // fakeDevice starts outputs that the test renders, frame for frame.
 type fakeDevice struct {
-	e       *Engine
-	mu      sync.Mutex
-	render  func([]float32)
-	failed  func(error)
-	starts  int
-	stopped bool
-	fail    error // what starting returns, if set
+	e      *Engine
+	mu     sync.Mutex
+	render func([]float32, int)
+	failed func(error)
+	// surround is whether the device has six channels, which an output
+	// plays when the engine asks for them; asked is what it asked for
+	// last, and channels what the output that plays plays.
+	surround        bool
+	asked, channels int
+	starts          int
+	stopped         bool
+	fail            error // what starting returns, if set
 }
 
-func (f *fakeDevice) start(render func([]float32), failed func(error)) (Output, error) {
+func (f *fakeDevice) start(channels int, render func([]float32, int), failed func(error)) (Output, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	if f.fail != nil {
 		return nil, f.fail
 	}
 	f.render, f.failed = render, failed
+	f.asked, f.channels = channels, 2
+	if channels == 6 && f.surround {
+		f.channels = 6
+	}
 	f.starts++
 	f.stopped = false
 	return f, nil
@@ -50,15 +59,15 @@ func (f *fakeDevice) Delay() time.Duration { return 0 }
 func (f *fakeDevice) play(t *testing.T, n int) []float32 {
 	t.Helper()
 	f.mu.Lock()
-	render := f.render
+	render, ch := f.render, f.channels
 	f.mu.Unlock()
 	if render == nil {
 		t.Fatal("no output plays")
 	}
-	out := make([]float32, 2*n)
+	out := make([]float32, ch*n)
 	for at := 0; at < n; at += 480 {
 		f.waitDecks(t, 480+quantum)
-		render(out[2*at : 2*min(at+480, n)])
+		render(out[ch*at:ch*min(at+480, n)], ch)
 	}
 	return out
 }

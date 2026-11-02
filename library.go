@@ -12,17 +12,20 @@ import (
 
 // librarySections are the library's pivots, by their paths' last part.
 var librarySections = []struct{ id, label string }{
-	{"liked", "Liked"}, {"mixes", "Mixes"}, {"downloads", "Downloads"}, {"history", "History"}, {"spotify", "Spotify"},
-	{"youtube", "YouTube Music"},
+	{"liked", "Liked"}, {"mixes", "Mixes"}, {"downloads", "Downloads"}, {"history", "History"},
+	{"disliked", "Disliked"}, {"spotify", "Spotify"}, {"youtube", "YouTube Music"},
 }
 
-// libraryPage shows liked songs, the user's mixes, the history, and the
-// libraries of the services the user signed in to.
+// libraryPage shows liked songs, the user's mixes, the history, the songs
+// they dislike once there are any, and the libraries of the services the
+// user signed in to.
 func (s *shell) libraryPage(c *ui.Context, tab string) {
 	accounts := s.accounts()
+	disliked := s.svc.Collection.Disliked()
 	var ids, labels []string
 	for _, sec := range librarySections {
-		if (sec.id == "spotify" && !accounts.Spotify.SignedIn) || (sec.id == "youtube" && !accounts.YouTube.SignedIn) {
+		if (sec.id == "spotify" && !accounts.Spotify.SignedIn) || (sec.id == "youtube" && !accounts.YouTube.SignedIn) ||
+			(sec.id == "disliked" && len(disliked) == 0) {
 			continue
 		}
 		ids = append(ids, sec.id)
@@ -45,6 +48,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 				counts[i] = len(s.svc.Collection.Playlists())
 			case "downloads":
 				counts[i] = s.kept.Status().Tracks
+			case "disliked":
+				counts[i] = len(disliked)
 			default:
 				counts[i] = -1
 			}
@@ -62,6 +67,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 			s.downloadsLibrary(c)
 		case "history":
 			s.history(c)
+		case "disliked":
+			s.dislikedSongs(c, disliked)
 		case "spotify":
 			s.spotifyLibrary(c)
 		case "youtube":
@@ -90,21 +97,54 @@ func (s *shell) likedSongs(c *ui.Context) {
 		empty: "No liked song matches “" + s.searching("liked") + "”."})
 }
 
+// dislikedSongs lists the songs the user dislikes, whose menus take the
+// dislike back.
+func (s *shell) dislikedSongs(c *ui.Context, disliked []media.Track) {
+	view := s.trackTools(c, "disliked", "list", disliked)
+	s.trackList(c, "disliked", view.tracks, trackListOptions{art: true, album: true,
+		empty: "No disliked song matches “" + s.searching("disliked") + "”."})
+}
+
 func (s *shell) mixTiles(c *ui.Context) {
 	s.tileWrap(c, func() {
-		new := s.buttonBase(c.Key("new-mix-tile")).Size(s.lk.tileWidth(), s.lk.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
-			Padding(16).Background(s.lk.tile(2)).Radius(s.lk.radius).Label("New mix").Cursor(ui.CursorPointer)
-		if new.Clicked() {
+		if s.newMixTile(c) {
 			s.newMix()
 		}
-		new.Children(func() {
-			ui.Text(c, s.lk.words("New mix")).FontSize(s.lk.size(1.5)).FontWeight(s.lk.titleWeight()).Font(s.lk.display).TextColor(s.lk.tileText)
-			ui.Text(c, s.lk.sentence("tracks of every service, together")).FontSize(s.lk.smallSize()).TextColor(s.lk.tileText)
-		})
 		for i, p := range s.svc.Collection.Playlists() {
 			s.playlistTile(c, "mix-"+count(i), p)
 		}
 	})
+}
+
+// newMixTile makes a new mix when clicked: a flat tile in the Tiles
+// layout, and in the layouts of cards a card as the mixes' beside it, a
+// plus where their covers are. It returns whether it was clicked.
+func (s *shell) newMixTile(c *ui.Context) bool {
+	k := &s.lk
+	about := k.sentence("tracks of every service, together")
+	t := s.buttonBase(c.Key("new-mix-tile")).Width(k.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Label("New mix").Cursor(ui.CursorPointer)
+	if !k.cards {
+		t.Height(k.tileWidth()).Justify(ui.SpaceBetween).Padding(16).Background(k.tile(2)).Radius(k.radius).Children(func() {
+			ui.Text(c, k.words("New mix")).FontSize(k.size(1.5)).FontWeight(k.titleWeight()).Font(k.display).TextColor(k.tileText)
+			ui.Text(c, about).FontSize(k.smallSize()).TextColor(k.tileText)
+		})
+		return t.Clicked()
+	}
+	fill := k.surface
+	if t.Hovered() {
+		fill = k.surface2
+	}
+	pad := k.cardPad()
+	t.Gap(8).Padding(pad, pad, pad+4).Radius(k.radiusSm + pad).Background(fill).Children(func() {
+		ui.Box(c).Size(k.cover, k.cover).Radius(k.radiusSm).Background(k.tile(2)).Center().Children(func() {
+			ui.Icon(c, icon("plus")).FontSize(k.cover / 4).TextColor(k.tileText)
+		})
+		ui.Column(c).Width(k.cover).Gap(2).Children(func() {
+			k.labelWeight(ui.Text(c, "New mix").FontSize(k.bodySize()).SingleLine())
+			ui.Text(c, about).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
+		})
+	})
+	return t.Clicked()
 }
 
 func (s *shell) history(c *ui.Context) {

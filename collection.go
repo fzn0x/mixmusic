@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"math"
-	"math/rand/v2"
 	"slices"
 	"strings"
 	"time"
@@ -134,14 +133,9 @@ func total(tracks []media.Track) time.Duration {
 	return d
 }
 
-// shuffled plays tracks shuffled, from one at random.
-func (s *shell) shuffled(tracks []media.Track) {
-	if len(tracks) == 0 {
-		return
-	}
-	s.p.SetShuffle(true)
-	s.p.PlayTracks(tracks, rand.IntN(len(tracks)))
-}
+// shuffled plays tracks shuffled, from one at random of those the user
+// doesn't dislike.
+func (s *shell) shuffled(tracks []media.Track) { s.p.PlayAll(tracks, true) }
 
 // pageLoading and pageProblem stand for a page whose data hasn't come.
 func (s *shell) pageLoading(c *ui.Context, title string) {
@@ -241,7 +235,7 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 		}
 		d := albumDownload(a)
 		h := headProps{art: a.Artwork, source: a.Source, facts: facts,
-			play:     func() { s.p.PlayTracks(a.Tracks, 0) },
+			play:     func() { s.p.PlayAll(a.Tracks, false) },
 			shuffle:  func() { s.shuffled(a.Tracks) },
 			download: d,
 			menu:     s.withDownload(s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""), d),
@@ -316,7 +310,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		}
 		h := headProps{art: p.Artwork, source: p.Source, facts: facts, description: p.Description, download: d, menu: menu}
 		if len(p.Tracks) > 0 {
-			h.play = func() { s.p.PlayTracks(p.Tracks, 0) }
+			h.play = func() { s.p.PlayAll(p.Tracks, false) }
 			h.shuffle = func() { s.shuffled(p.Tracks) }
 		}
 		if !local && !p.Editable && s.signedIn(p.Source) {
@@ -628,7 +622,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 			},
 		}
 		if len(a.TopTracks) > 0 {
-			h.play = func() { s.p.PlayTracks(a.TopTracks, 0) }
+			h.play = func() { s.p.PlayAll(a.TopTracks, false) }
 		}
 		if s.signedIn(a.Source) {
 			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Following, "follow", "following", s.keeping[key]

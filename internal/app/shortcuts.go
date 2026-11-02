@@ -38,6 +38,7 @@ var GlobalCommands = []GlobalCommand{
 	{"player.volumeDown", "Volume down"},
 	{"player.mute", "Mute"},
 	{"player.like", "Like what plays"},
+	{"player.dislike", "Dislike what plays"},
 	{"app.show", "Show MixMusic"},
 }
 
@@ -264,6 +265,8 @@ func (a *App) globalCommand(id string) {
 		a.command(PlayerCommand{Command: CommandMute})
 	case "player.like":
 		a.command(PlayerCommand{Command: CommandLike})
+	case "player.dislike":
+		a.command(PlayerCommand{Command: CommandDislike})
 	case "app.show":
 		// At once, in the press's callback: on Wayland the window shown
 		// then takes the focus with the press's activation token.

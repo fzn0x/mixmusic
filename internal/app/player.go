@@ -318,14 +318,27 @@ func (a *App) notifyTrack(t media.Track) {
 // left them, while the main window isn't in front: liked from elsewhere,
 // as by a global shortcut, nothing else shows it.
 func (a *App) notifyLiked(t media.Track, liked bool) {
+	title, body := likedNote(t, liked)
+	a.notifyRated("liked", title, body)
+}
+
+// notifyDisliked tells that the track that plays was disliked, or no
+// longer, while the main window isn't in front, as notifyLiked does.
+func (a *App) notifyDisliked(t media.Track, disliked bool) {
+	title, body := dislikedNote(t, disliked)
+	a.notifyRated("disliked", title, body)
+}
+
+// notifyRated shows the notification id of a track liked or disliked from
+// outside the main window, unless it is in front.
+func (a *App) notifyRated(id, title, body string) {
 	a.mu.Lock()
 	main := a.main
 	a.mu.Unlock()
 	if !a.settings.Get().Notifications || main != nil && main.IsFocused() {
 		return
 	}
-	title, body := likedNote(t, liked)
-	n := mygo.NewNotification(mygo.NotificationOptions{ID: "liked", Title: title, Body: body, Silent: true})
+	n := mygo.NewNotification(mygo.NotificationOptions{ID: id, Title: title, Body: body, Silent: true})
 	n.OnClick(a.showMain)
 	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
 		log.Printf("mixmusic: notification: %v", err)
@@ -339,11 +352,26 @@ func likedNote(t media.Track, liked bool) (title, body string) {
 	if liked {
 		title = "Added to liked songs"
 	}
-	body = t.Title
+	return title, noteBody(t)
+}
+
+// dislikedNote is what the notification of a track disliked, or no
+// longer, says.
+func dislikedNote(t media.Track, disliked bool) (title, body string) {
+	title = "Removed the dislike"
+	if disliked {
+		title = "Disliked"
+	}
+	return title, noteBody(t)
+}
+
+// noteBody names a track in a notification: its title and artists.
+func noteBody(t media.Track) string {
+	body := t.Title
 	if artists := t.ArtistNames(); artists != "" {
 		body += " — " + artists
 	}
-	return title, body
+	return body
 }
 
 // Devices returns the user's Spotify Connect devices.

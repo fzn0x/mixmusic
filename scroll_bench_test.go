@@ -9,6 +9,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // likedShell is the main window of n liked songs.
@@ -86,18 +87,25 @@ func BenchmarkScroll(b *testing.B) {
 		show(s, tt, "/settings/playback")
 		scrollFrames(b, tt)
 	})
-	// The design languages, whose controls are drawn their own way.
-	for _, theme := range []string{"material", "crate"} {
-		b.Run("liked-1000-"+theme, func(b *testing.B) {
+	// The layout designs other than Tiles, whose controls are drawn their
+	// own way, in their themes.
+	for _, c := range []struct {
+		layout settings.Layout
+		theme  string
+	}{{settings.LayoutBlend, "mix"}, {settings.LayoutExpressive, "material"}, {settings.LayoutCrate, "crate"}} {
+		name := string(c.layout)
+		b.Run("liked-1000-"+name, func(b *testing.B) {
 			s := likedShell(b, 1000)
-			wear(s, theme, nil)
+			s.set.Layout = c.layout
+			wear(s, c.theme, nil)
 			tt := testerOf(b, s, 1280, 820)
 			show(s, tt, "/library/liked")
 			scrollFrames(b, tt)
 		})
-		b.Run("home-"+theme, func(b *testing.B) {
+		b.Run("home-"+name, func(b *testing.B) {
 			s := newTestShell(b)
-			wear(s, theme, nil)
+			s.set.Layout = c.layout
+			wear(s, c.theme, nil)
 			tt := testerOf(b, s, 1280, 820)
 			s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
 			show(s, tt, "/")

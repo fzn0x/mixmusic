@@ -30,20 +30,5 @@
     "display": "'Roboto Flex', Roboto, 'Segoe UI', 'Noto Sans', system-ui, sans-serif"
   },
   "radius": "28px",
-  "layout": {
-    "radius-small": "12px",
-    "shape": "pill",
-    "row": "64px",
-    "gutter": "32px",
-    "gap": "16px",
-    "rail": "256px",
-    "cover": "176px",
-    "player-height": "80px",
-    "player": "floating",
-    "controls": "tonal",
-    "headings": "regular",
-    "cards": "filled",
-    "motion": "expressive"
-  },
   "options": []
 }

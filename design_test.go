@@ -10,14 +10,16 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
-// themed is a shell in the built-in theme id, playing, and its window.
-func themed(t *testing.T, id string) (*shell, *ui.Tester) {
+// themed is a shell in the built-in theme id and the layout design given,
+// playing, and its window.
+func themed(t *testing.T, id string, layout settings.Layout) (*shell, *ui.Tester) {
 	t.Helper()
 	s := newTestShell(t)
 	st := s.svc.Preferences.Get()
-	st.FollowSystem, st.Theme, st.Panel = false, id, "none"
+	st.FollowSystem, st.Theme, st.Layout, st.Panel = false, id, layout, "none"
 	if _, err := s.svc.Preferences.Set(st); err != nil {
 		t.Fatal(err)
 	}
@@ -37,22 +39,25 @@ func at(img *image.RGBA, x, y int) ui.Color {
 	return ui.Color{R: c.R, G: c.G, B: c.B, A: c.A}
 }
 
-// TestDesignLanguageLayouts checks that the Material and Crate themes lay
-// the window out as their layout tokens say, and Mix as before: the rows'
+// TestLayoutDesignsLayOut checks that each layout design lays the window
+// out as it says, and Tiles as before, in themes of their own: the rows'
 // height, the covers' size, the player bar docked or floating, and the
 // pages' titles and pivots.
-func TestDesignLanguageLayouts(t *testing.T) {
+func TestLayoutDesignsLayOut(t *testing.T) {
 	for _, c := range []struct {
+		layout              settings.Layout
 		theme, title, pivot string
 		row, tile           float32
 		floating            bool
 	}{
-		{"mix", "home", "everything", 52, 172, false},
-		{"material", "Home", "Everything", 64, 176 + 2*12, true},
-		{"crate", "Home", "Everything", 48, 196 + 2*9, false},
+		{settings.LayoutTiles, "mix", "home", "everything", 52, 172, false},
+		{settings.LayoutExpressive, "material", "Home", "Everything", 64, 176 + 2*12, true},
+		{settings.LayoutCrate, "crate", "Home", "Everything", 48, 196 + 2*9, false},
+		{settings.LayoutBlend, "mix", "Home", "Everything", 56, 188 + 2*10.5, true},
+		{settings.LayoutCrate, "sakura", "Home", "Everything", 48, 196 + 2*9, false},
 	} {
-		t.Run(c.theme, func(t *testing.T) {
-			s, tt := themed(t, c.theme)
+		t.Run(string(c.layout)+"-"+c.theme, func(t *testing.T) {
+			s, tt := themed(t, c.theme, c.layout)
 			s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
 			show(s, tt, "/")
 			if !tt.HasText(c.title) || !tt.HasText(c.pivot) {
@@ -102,14 +107,14 @@ func indicatorWidth(t *testing.T, s *shell, tt *ui.Tester, label string) int {
 	return n
 }
 
-// TestExpressiveIndicator checks that the Material themes' rail shows the
-// current page on an indicator that grows from the middle on a spring,
-// at once while the computer asks for less motion, and that the window
-// settles once it has grown.
+// TestExpressiveIndicator checks that Expressive's rail shows the current
+// page on an indicator that grows from the middle on a spring, at once
+// while the computer asks for less motion, and that the window settles
+// once it has grown.
 func TestExpressiveIndicator(t *testing.T) {
 	for _, reduce := range []bool{false, true} {
 		t.Run(fmt.Sprint("reduce motion ", reduce), func(t *testing.T) {
-			s, tt := themed(t, "material")
+			s, tt := themed(t, "material", settings.LayoutExpressive)
 			tt.SetPreferences(ui.Preferences{ReduceMotion: reduce})
 			show(s, tt, "/")
 			tt.Advance(time.Second)
@@ -138,12 +143,20 @@ func TestExpressiveIndicator(t *testing.T) {
 	}
 }
 
-// TestSpringsSettle presses, hovers and leaves the controls of the themes
-// that move on springs: once still, the window asks for no more frames.
+// TestSpringsSettle presses, hovers and leaves the controls of the layout
+// designs that move on springs, in light and dark themes: once still, the
+// window asks for no more frames.
 func TestSpringsSettle(t *testing.T) {
-	for _, id := range []string{"material", "material-dark", "crate", "crate-light"} {
-		t.Run(id, func(t *testing.T) {
-			s, tt := themed(t, id)
+	for _, c := range []struct {
+		layout settings.Layout
+		theme  string
+	}{
+		{settings.LayoutExpressive, "material"}, {settings.LayoutExpressive, "material-dark"},
+		{settings.LayoutCrate, "crate"}, {settings.LayoutCrate, "crate-light"},
+		{settings.LayoutBlend, "mix"}, {settings.LayoutBlend, "daylight"},
+	} {
+		t.Run(string(c.layout)+"-"+c.theme, func(t *testing.T) {
+			s, tt := themed(t, c.theme, c.layout)
 			s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
 			show(s, tt, "/")
 			r, ok := tt.Find("Album 1")
@@ -170,10 +183,10 @@ func TestSpringsSettle(t *testing.T) {
 // side panel.
 func TestFloatingPanelRoom(t *testing.T) {
 	for _, c := range []struct {
-		theme  string
+		layout settings.Layout
 		margin float32
-	}{{"mix", 0}, {"material", floatMargin}} {
-		s, tt := themed(t, c.theme)
+	}{{settings.LayoutTiles, 0}, {settings.LayoutCrate, 0}, {settings.LayoutExpressive, floatMargin}, {settings.LayoutBlend, floatMargin}} {
+		s, tt := themed(t, "mix", c.layout)
 		s.panel = "queue"
 		var got, want float32
 		tt = ui.NewTester(func(ctx *ui.Context) {
@@ -183,7 +196,7 @@ func TestFloatingPanelRoom(t *testing.T) {
 		}, 1280, 820)
 		tt.Frame()
 		if got != want {
-			t.Errorf("%s: the pane is %v wide, want %v", c.theme, got, want)
+			t.Errorf("%s: the pane is %v wide, want %v", c.layout, got, want)
 		}
 	}
 }

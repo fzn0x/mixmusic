@@ -71,10 +71,12 @@ var fallbackTheme = map[string]string{
 	"tile-3": "#a4e600", "tile-4": "#ffb000", "tile-text": "#000000",
 }
 
-// newLook is the look of the active theme of s, among themes; dark tells
-// whether the computer is in dark mode, for themes that follow it, and
-// artwork is the colour of the artwork playing, "" for none.
+// newLook is the look of the active theme of s, among themes, in the
+// layout design of s; dark tells whether the computer is in dark mode,
+// for themes that follow it, and artwork is the colour of the artwork
+// playing, "" for none.
 func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork string) look {
+	design := designOf(s.Layout)
 	id := s.ActiveTheme(dark)
 	var th addons.Theme
 	for _, t := range themes {
@@ -115,11 +117,12 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	bg.A = 255
 	text, accent := tok("text"), tok("accent")
 	accentText := tok("accent-text")
-	// Other themes take it as it reads on the ground: at 3:1, or, where
-	// controls are tonal, which set it as small text on their fills, at
-	// 4.5:1 on the panels' surface, which has less contrast with it.
+	// Other themes take it as it reads on the ground: at 3:1, or, in the
+	// layouts of tonal controls, which set it as small text on their
+	// fills, at 4.5:1 on the panels' surface, which has less contrast
+	// with it.
 	if a, ok := parseColor(pick); ok && pick != "" && mat == nil {
-		if th.Layout["controls"] == "tonal" {
+		if design.tonal {
 			a = legibleOn(a, over(tok("surface"), bg), 4.5)
 		} else {
 			a = readableOn(a, bg)
@@ -160,7 +163,7 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	if th.Fonts.Display == "" {
 		k.display = k.body
 	}
-	k.layoutOf(th)
+	k.layoutOf(design)
 	k.selected, k.selectedText, k.selectedSub = k.accent, k.accentText, k.accentText.Alpha(0.78)
 	k.tonalFill, k.tonalInk = col(over(tok("surface-3"), bg)), k.text
 	switch {

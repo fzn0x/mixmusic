@@ -30,20 +30,5 @@
     "display": "'Archivo SemiCondensed', 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif"
   },
   "radius": "8px",
-  "layout": {
-    "radius-small": "4px",
-    "shape": "box",
-    "row": "48px",
-    "gutter": "24px",
-    "gap": "12px",
-    "rail": "220px",
-    "cover": "196px",
-    "player-height": "76px",
-    "player": "docked",
-    "controls": "tonal",
-    "headings": "bold",
-    "cards": "filled",
-    "motion": "smooth"
-  },
   "options": []
 }

@@ -18,7 +18,8 @@ func TestDesignLanguagesContrast(t *testing.T) {
 	for _, id := range []string{"material", "material-dark", "crate", "crate-light"} {
 		for _, art := range artworks {
 			st := settings.Default()
-			st.FollowSystem, st.Theme = false, id
+			st.FollowSystem, st.Theme, st.Layout = false, id, map[string]settings.Layout{"material": settings.LayoutExpressive,
+				"material-dark": settings.LayoutExpressive, "crate": settings.LayoutCrate, "crate-light": settings.LayoutCrate}[id]
 			k := newLook(st, s.inv.Themes, true, art)
 			ground := func(c ui.Color) ui.Color { return col(over(nrgba(c), nrgba(k.bg))) }
 			for _, p := range []struct {

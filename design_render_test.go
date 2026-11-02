@@ -19,6 +19,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
@@ -84,109 +85,125 @@ func coverServer(t *testing.T, s *shell) string {
 	return srv.URL
 }
 
-// TestRenderDesignLanguages draws the main pages in the Material and Crate
-// themes, light and dark, and in Mix, to MIXMUSIC_RENDER, with made-up
-// covers, for a look: MIXMUSIC_THEMES lists others, and MIXMUSIC_FOLLOW=off
-// keeps the themes' own accents rather than the covers'.
+// TestRenderDesignLanguages draws the main pages in each layout design, in
+// Mix and Daylight, to MIXMUSIC_RENDER, with made-up covers, for a look:
+// MIXMUSIC_LAYOUTS and MIXMUSIC_THEMES list others, and MIXMUSIC_FOLLOW=off
+// keeps the themes' own accents rather than the covers'. The images are
+// named by the layout, then the theme.
 func TestRenderDesignLanguages(t *testing.T) {
 	dir := os.Getenv("MIXMUSIC_RENDER")
 	if dir == "" {
 		t.Skip("MIXMUSIC_RENDER names no folder")
 	}
-	themes := []string{"material", "material-dark", "crate", "crate-light", "mix"}
+	layouts := settings.Layouts
+	if only := os.Getenv("MIXMUSIC_LAYOUTS"); only != "" {
+		layouts = nil
+		for _, l := range strings.Split(only, ",") {
+			layouts = append(layouts, settings.Layout(l))
+		}
+	}
+	themes := []string{"mix", "daylight"}
 	if only := os.Getenv("MIXMUSIC_THEMES"); only != "" {
 		themes = strings.Split(only, ",")
 	}
-	for _, theme := range themes {
-		s := newTestShell(t)
-		base := coverServer(t, s)
-		art := func(n int) []media.Image {
-			return []media.Image{{URL: base + "/cover/" + strconv.Itoa(n) + ".png", Width: 300, Height: 300}}
+	for _, layout := range layouts {
+		for _, theme := range themes {
+			renderDesign(t, dir, layout, theme)
 		}
-		tracks := make([]media.Track, len(testTracks))
-		for i, tr := range testTracks {
-			tr.Artwork = art(i)
-			tracks[i] = tr
-		}
-		st := s.svc.Preferences.Get()
-		st.FollowSystem, st.Theme = false, theme
-		// The theme's own accent, rather than the cover's.
-		st.DynamicAccent = os.Getenv("MIXMUSIC_FOLLOW") != "off"
-		if _, err := s.svc.Preferences.Set(st); err != nil {
-			t.Fatal(err)
-		}
-		s.refresh()
-		album := media.Album{ID: "al-1", Source: media.SourceYouTube, Title: "Hurry Up, We're Dreaming", Artists: []media.Ref{{ID: "ar-m83", Name: "M83"}},
-			Year: "2011", Tracks: tracks, Artwork: art(0)}
-		var albums []media.Item
-		for i := range 8 {
-			a := album
-			a.ID, a.Artwork = "al-"+count(i+2), art(i+7)
-			a.Title = []string{"Mezzanine", "Untrue", "Takk...", "Dummy", "Selected Ambient Works", "Moon Safari", "Homogenic", "Kid A"}[i]
-			albums = append(albums, media.Item{Kind: media.ItemAlbum, Album: &a})
-		}
-		var trackItems []media.Item
-		for i := range tracks {
-			trackItems = append(trackItems, media.Item{Kind: media.ItemTrack, Track: &tracks[i]})
-		}
-		s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
-			{Title: "Listen again", Source: media.SourceYouTube, Items: trackItems},
-			{Title: "Albums for you", Source: media.SourceYouTube, Items: albums},
-		}}
-		s.loads["album:al-1"] = &loaded[media.Album]{done: true, value: album}
-		s.loads["artist:ar-m83"] = &loaded[media.Artist]{done: true, value: media.Artist{ID: "ar-m83", Source: media.SourceYouTube, Name: "M83",
-			Artwork: art(3), Subtitle: "2.1M monthly audience", TopTracks: tracks[:4], Related: []media.Ref{{ID: "x1", Name: "Tycho"}, {ID: "x2", Name: "Washed Out"}},
-			Albums: func() (out []media.Album) {
-				for _, it := range albums[:5] {
-					out = append(out, *it.Album)
-				}
-				return out
-			}()}}
-		s.loads["lyrics:spotify:2"] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB", Lines: []lyrics.Line{
-			{TimeMs: 0, Text: "Love, love is a verb"}, {TimeMs: 4000, Text: "Love is a doing word"},
-			{TimeMs: 9000, Text: "Fearless on my breath"}, {TimeMs: 14000, Text: "Gentle impulsion"}}}}
-		for i, tr := range tracks {
-			for range len(tracks) - i {
-				if err := s.svc.Collection.RecordPlay(tr); err != nil {
-					t.Fatal(err)
-				}
+	}
+}
+
+// renderDesign draws the main pages in layout and theme to dir.
+func renderDesign(t *testing.T, dir string, layout settings.Layout, theme string) {
+	s := newTestShell(t)
+	base := coverServer(t, s)
+	art := func(n int) []media.Image {
+		return []media.Image{{URL: base + "/cover/" + strconv.Itoa(n) + ".png", Width: 300, Height: 300}}
+	}
+	tracks := make([]media.Track, len(testTracks))
+	for i, tr := range testTracks {
+		tr.Artwork = art(i)
+		tracks[i] = tr
+	}
+	st := s.svc.Preferences.Get()
+	st.FollowSystem, st.Theme, st.Layout = false, theme, layout
+	// The theme's own accent, rather than the cover's.
+	st.DynamicAccent = os.Getenv("MIXMUSIC_FOLLOW") != "off"
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+	album := media.Album{ID: "al-1", Source: media.SourceYouTube, Title: "Hurry Up, We're Dreaming", Artists: []media.Ref{{ID: "ar-m83", Name: "M83"}},
+		Year: "2011", Tracks: tracks, Artwork: art(0)}
+	var albums []media.Item
+	for i := range 8 {
+		a := album
+		a.ID, a.Artwork = "al-"+count(i+2), art(i+7)
+		a.Title = []string{"Mezzanine", "Untrue", "Takk...", "Dummy", "Selected Ambient Works", "Moon Safari", "Homogenic", "Kid A"}[i]
+		albums = append(albums, media.Item{Kind: media.ItemAlbum, Album: &a})
+	}
+	var trackItems []media.Item
+	for i := range tracks {
+		trackItems = append(trackItems, media.Item{Kind: media.ItemTrack, Track: &tracks[i]})
+	}
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+		{Title: "Listen again", Source: media.SourceYouTube, Items: trackItems},
+		{Title: "Albums for you", Source: media.SourceYouTube, Items: albums},
+	}}
+	s.loads["album:al-1"] = &loaded[media.Album]{done: true, value: album}
+	s.loads["artist:ar-m83"] = &loaded[media.Artist]{done: true, value: media.Artist{ID: "ar-m83", Source: media.SourceYouTube, Name: "M83",
+		Artwork: art(3), Subtitle: "2.1M monthly audience", TopTracks: tracks[:4], Related: []media.Ref{{ID: "x1", Name: "Tycho"}, {ID: "x2", Name: "Washed Out"}},
+		Albums: func() (out []media.Album) {
+			for _, it := range albums[:5] {
+				out = append(out, *it.Album)
 			}
-			if err := s.svc.Collection.SetLiked(context.Background(), tr, true); err != nil {
+			return out
+		}()}}
+	s.loads["lyrics:spotify:2"] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB", Lines: []lyrics.Line{
+		{TimeMs: 0, Text: "Love, love is a verb"}, {TimeMs: 4000, Text: "Love is a doing word"},
+		{TimeMs: 9000, Text: "Fearless on my breath"}, {TimeMs: 14000, Text: "Gentle impulsion"}}}}
+	for i, tr := range tracks {
+		for range len(tracks) - i {
+			if err := s.svc.Collection.RecordPlay(tr); err != nil {
 				t.Fatal(err)
 			}
 		}
-		s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
-			YouTube: media.SearchResults{Tracks: tracks[:3], Albums: []media.Album{album, *albums[0].Album, *albums[1].Album},
-				Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube, Artwork: art(3)}}},
-			Spotify: media.SearchResults{Tracks: tracks[3:]}, SpotifySignedIn: true}}
-		s.loads["moods"] = &loaded[[]youtube.MoodGroup]{done: true, value: []youtube.MoodGroup{
-			{Title: "Moods & moments", Moods: []youtube.Mood{{Title: "Chill", Params: "a"}, {Title: "Commute", Params: "b"}, {Title: "Energy boosters", Params: "c"}, {Title: "Feel good", Params: "d"}, {Title: "Focus", Params: "e"}, {Title: "Party", Params: "f"}}},
-			{Title: "Genres", Moods: []youtube.Mood{{Title: "Ambient", Params: "g"}, {Title: "Electronic", Params: "h"}, {Title: "Hip-hop", Params: "i"}}},
-		}}
-
-		tt := ui.NewTester(s.view, 1280, 820)
-		renderTo(t, s, tt, dir, theme+"-home-idle")
-		s.p.PlayTracks(tracks, 1)
-		s.settle(t, func(st player.State) bool { return st.Playing })
-		for _, page := range []struct{ name, path string }{
-			{"home", "/"}, {"album", "/album/al-1"}, {"artist", "/artist/ar-m83"}, {"now-playing", "/now-playing"},
-			{"library-liked", "/library/liked"}, {"search", searchPath("midnight")}, {"explore-moods", "/explore/moods"},
-			{"stats", "/stats"}, {"settings-appearance", "/settings/appearance"}, {"settings-playback", "/settings/playback"},
-		} {
-			s.navigate(page.path)
-			// The covers come from the server, and their colour.
-			renderTo(t, s, tt, dir, theme+"-"+page.name)
-			renderTo(t, s, tt, dir, theme+"-"+page.name)
+		if err := s.svc.Collection.SetLiked(context.Background(), tr, true); err != nil {
+			t.Fatal(err)
 		}
-		s.navigate("/")
-		renderTo(t, s, ui.NewTester(s.view, 1280, 1500), dir, theme+"-home-tall")
-		s.paletteOpen = true
-		renderTo(t, s, tt, dir, theme+"-palette")
-		s.paletteOpen = false
-		s.ask("enable Hello", enableMessage, "enable", func() {})
-		renderTo(t, s, tt, dir, theme+"-dialog")
-		s.asking = nil
-		renderTo(t, s, ui.NewTester(s.miniView, 420, 132), dir, theme+"-mini")
-		renderTo(t, s, ui.NewTester(s.view, 960, 640), dir, theme+"-narrow")
 	}
+	s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
+		YouTube: media.SearchResults{Tracks: tracks[:3], Albums: []media.Album{album, *albums[0].Album, *albums[1].Album},
+			Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube, Artwork: art(3)}}},
+		Spotify: media.SearchResults{Tracks: tracks[3:]}, SpotifySignedIn: true}}
+	s.loads["moods"] = &loaded[[]youtube.MoodGroup]{done: true, value: []youtube.MoodGroup{
+		{Title: "Moods & moments", Moods: []youtube.Mood{{Title: "Chill", Params: "a"}, {Title: "Commute", Params: "b"}, {Title: "Energy boosters", Params: "c"}, {Title: "Feel good", Params: "d"}, {Title: "Focus", Params: "e"}, {Title: "Party", Params: "f"}}},
+		{Title: "Genres", Moods: []youtube.Mood{{Title: "Ambient", Params: "g"}, {Title: "Electronic", Params: "h"}, {Title: "Hip-hop", Params: "i"}}},
+	}}
+
+	name := string(layout) + "-" + theme
+	tt := ui.NewTester(s.view, 1280, 820)
+	renderTo(t, s, tt, dir, name+"-home-idle")
+	s.p.PlayTracks(tracks, 1)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	for _, page := range []struct{ name, path string }{
+		{"home", "/"}, {"album", "/album/al-1"}, {"artist", "/artist/ar-m83"}, {"now-playing", "/now-playing"},
+		{"library-liked", "/library/liked"}, {"search", searchPath("midnight")}, {"explore-moods", "/explore/moods"},
+		{"stats", "/stats"}, {"settings-appearance", "/settings/appearance"}, {"settings-playback", "/settings/playback"},
+	} {
+		s.navigate(page.path)
+		// The covers come from the server, and their colour.
+		renderTo(t, s, tt, dir, name+"-"+page.name)
+		renderTo(t, s, tt, dir, name+"-"+page.name)
+	}
+	s.navigate("/")
+	renderTo(t, s, ui.NewTester(s.view, 1280, 1500), dir, name+"-home-tall")
+	s.paletteOpen = true
+	renderTo(t, s, tt, dir, name+"-palette")
+	s.paletteOpen = false
+	s.ask("enable Hello", enableMessage, "enable", func() {})
+	renderTo(t, s, tt, dir, name+"-dialog")
+	s.asking = nil
+	renderTo(t, s, ui.NewTester(s.miniView, 420, 132), dir, name+"-mini")
+	renderTo(t, s, ui.NewTester(s.view, 960, 640), dir, name+"-narrow")
 }

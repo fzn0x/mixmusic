@@ -238,9 +238,10 @@ type shell struct {
 	// before, by key.
 	listTops map[string]float32
 	// cardLooks are the looks of the themes' cards in Settings, by theme,
-	// made for the themes cardThemes.
+	// made for the themes cardThemes in the layout design cardLayout.
 	cardLooks  map[string]*look
 	cardThemes []addons.Theme
+	cardLayout settings.Layout
 	// find is the search of the settings.
 	find settingsFind
 

@@ -1,9 +1,8 @@
 package main
 
-// A theme's layout tokens (docs/themes.md): its shapes, its density and the
-// style of its parts, which a design language sets beside its colours.
-// Left out, each is Mix's own, so that a theme without them looks as
-// themes did before them.
+// The layout designs: the shapes, the density and the style of the parts
+// of the interface, which Settings › Appearance chooses apart from the
+// theme, whose colours and faces they wear.
 
 import (
 	"math"
@@ -13,14 +12,14 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
-	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // headingStyle is how titles are set.
 type headingStyle int
 
 const (
-	// headingsLight sets them in giant light lowercase words, Mix's.
+	// headingsLight sets them in giant light lowercase words, Tiles'.
 	headingsLight headingStyle = iota
 	// headingsRegular sets them as written, at a regular weight and the
 	// sizes of Material's type scale.
@@ -33,7 +32,7 @@ const (
 type motionStyle int
 
 const (
-	// motionStandard moves nothing on its own: Mix's presses and hovers
+	// motionStandard moves nothing on its own: Tiles' presses and hovers
 	// show at once.
 	motionStandard motionStyle = iota
 	// motionSmooth moves them on Material's standard springs, which hardly
@@ -48,33 +47,61 @@ const (
 // and the side panel beside it.
 const floatMargin = 12
 
-// layoutOf reads the layout tokens of th into k, scaled by the density.
-func (k *look) layoutOf(th addons.Theme) {
-	px := func(key string, def float32) float32 {
-		if v, ok := addons.Pixels(th.Layout[key]); ok {
-			return float32(v)
-		}
-		return def
+// layoutDesign is a layout design's measures and styles. pill rounds
+// buttons, chips and the search box fully; tonal fills controls rather
+// than outlining them; cards sets covers in filled cards; floating floats
+// the player bar over the window's foot.
+type layoutDesign struct {
+	// radius and small are the corners of what is large, as tiles and
+	// dialogs, and of what is small, as rows and covers. Tiles has the
+	// theme's radius, and 0.6 of it.
+	radius, small                         float32
+	row, rail, player, gutter, gap, cover float32
+	pill, tonal, cards, floating          bool
+	headings                              headingStyle
+	motion                                motionStyle
+}
+
+// layoutDesigns are the layout designs, by the setting's values.
+var layoutDesigns = map[settings.Layout]layoutDesign{
+	settings.LayoutTiles: {row: 52, rail: 248, player: 92, gutter: 40, gap: 16, cover: 172},
+	// After Material 3 Expressive: its contrast of shapes, 28px on tiles,
+	// dialogs and the player bar and 12px on rows and covers, its type
+	// scale and its springs.
+	settings.LayoutExpressive: {radius: 28, small: 12, row: 64, rail: 256, player: 80, gutter: 32, gap: 16, cover: 176,
+		pill: true, tonal: true, cards: true, floating: true, headings: headingsRegular, motion: motionExpressive},
+	// Dense, with big covers, heavy headings and springs that hardly
+	// overshoot.
+	settings.LayoutCrate: {radius: 8, small: 4, row: 48, rail: 220, player: 76, gutter: 24, gap: 12, cover: 196,
+		tonal: true, cards: true, headings: headingsBold, motion: motionSmooth},
+	// Expressive's shapes and springs on Crate's density, covers and
+	// headings.
+	settings.LayoutBlend: {radius: 20, small: 10, row: 56, rail: 232, player: 80, gutter: 28, gap: 14, cover: 188,
+		pill: true, tonal: true, cards: true, floating: true, headings: headingsBold, motion: motionExpressive},
+}
+
+// designOf is the layout design the setting l names, Blend's for one
+// unknown.
+func designOf(l settings.Layout) layoutDesign {
+	if d, ok := layoutDesigns[l]; ok {
+		return d
 	}
-	style := func(key string, values ...string) int {
-		for i, v := range values {
-			if th.Layout[key] == v {
-				return i
-			}
-		}
-		return 0
+	return layoutDesigns[settings.LayoutBlend]
+}
+
+// layoutOf sets the layout design d in k, scaled by the density; k.radius
+// is the theme's.
+func (k *look) layoutOf(d layoutDesign) {
+	k.radiusSm = k.radius * 0.6
+	if d.radius > 0 {
+		k.radius, k.radiusSm = d.radius, d.small
 	}
-	k.radiusSm = px("radius-small", k.radius*0.6)
-	k.pill = th.Layout["shape"] == "pill"
-	k.tonal = th.Layout["controls"] == "tonal"
-	k.cards = th.Layout["cards"] == "filled"
-	k.floating = th.Layout["player"] == "floating"
-	k.headings = headingStyle(style("headings", "light", "regular", "bold"))
-	k.motion = motionStyle(style("motion", "standard", "smooth", "expressive"))
-	k.row, k.rail, k.panel, k.player, k.gutter = px("row", 52), px("rail", 248), 340, px("player-height", 92), px("gutter", 40)
-	k.gap, k.cover = px("gap", 16), px("cover", 172)
+	k.pill, k.tonal, k.cards, k.floating = d.pill, d.tonal, d.cards, d.floating
+	k.headings, k.motion = d.headings, d.motion
+	k.row, k.rail, k.panel, k.player, k.gutter = d.row, d.rail, 340, d.player, d.gutter
+	k.gap, k.cover = d.gap, d.cover
 	if k.compact {
-		// Compact takes off a theme's measures what it takes off Mix's:
+		// Compact takes off a design's measures what it takes off Tiles':
 		// 52, 248, 92 and 40 become 40, 224, 80 and 28. A row keeps room
 		// for its artwork.
 		scale := func(v, from, to float32) float32 { return float32(math.Round(float64(v * to / from))) }
@@ -93,7 +120,7 @@ func (k *look) round(h float32) float32 {
 }
 
 // words are the interface's own words, and the titles, as the headings
-// set them: lowercase in Mix's light style, as written otherwise. The
+// set them: lowercase in Tiles' light style, as written otherwise. The
 // lowercase words are kept, so that a frame lowers none twice: the
 // interface's own are a few dozen.
 func (k *look) words(s string) string {
@@ -167,7 +194,7 @@ func (k *look) leadWeight() int {
 	return 400
 }
 
-// tracking is the letter spacing of words of size set at Mix's tracking
+// tracking is the letter spacing of words of size set at Tiles' tracking
 // of em: theirs in the light style, none in the regular one, whose sizes
 // Material's type scale tracks, and at most -0.01em in the bold one.
 func (k *look) tracking(em, size float32) float32 {
@@ -216,7 +243,7 @@ func (k *look) scrimRadius() float32 {
 }
 
 // bigSize is the size of the large words of an empty page, as "nothing
-// playing": Mix's 3.5rem, or Material's display small.
+// playing": Tiles' 3.5rem, or Material's display small.
 func (k *look) bigSize() float32 {
 	if k.headings == headingsLight {
 		return k.size(3.5)

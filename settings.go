@@ -395,6 +395,9 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 	tk := s.cardLook(id)
 	card := s.buttonBase(c.Key("theme-"+id)).Width(200).Height(124).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 		Padding(14).Background(tk.bg).Border(1, tk.border).Label(name).Cursor(ui.CursorPointer)
+	if k.cards {
+		card.Radius(k.radiusSm)
+	}
 	if current {
 		card.Border(3, k.accent)
 	}
@@ -423,15 +426,17 @@ func themeBy(t addons.Theme) string {
 // cardLook is the look of theme id's card, made once for the themes
 // installed: a look lists the system's fonts, which takes a while, and the
 // cards show every theme in every frame. A card's look is the theme's own,
-// whatever the settings and the computer's light or dark.
+// in the layout design chosen, whatever the other settings and the
+// computer's light or dark.
 func (s *shell) cardLook(id string) *look {
 	themes := s.inv.Themes
-	if s.cardLooks == nil || len(themes) != len(s.cardThemes) || len(themes) > 0 && &themes[0] != &s.cardThemes[0] {
-		s.cardLooks, s.cardThemes = map[string]*look{}, themes
+	if s.cardLooks == nil || len(themes) != len(s.cardThemes) || len(themes) > 0 && &themes[0] != &s.cardThemes[0] ||
+		s.cardLayout != s.set.Layout {
+		s.cardLooks, s.cardThemes, s.cardLayout = map[string]*look{}, themes, s.set.Layout
 	}
 	tk, ok := s.cardLooks[id]
 	if !ok {
-		l := newLook(settings.Settings{Theme: id, FontScale: 1}, themes, false, "")
+		l := newLook(settings.Settings{Theme: id, FontScale: 1, Layout: s.set.Layout}, themes, false, "")
 		tk = &l
 		s.cardLooks[id] = tk
 	}

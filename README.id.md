@@ -565,6 +565,9 @@ senang hati.
   perubahan yang akan disadari pengguna.
 - **Bagikan tema atau plugin:** lihat [Komunitas](#komunitas).
 
+[CONTRIBUTORS.md](CONTRIBUTORS.md) berterima kasih kepada orang-orang yang
+kode, ide, dan laporannya ikut membentuk MixMusic.
+
 ## Lisensi
 
 MixMusic memiliki lisensi ganda: gunakan di bawah [lisensi MIT](LICENSE-MIT)

@@ -103,8 +103,14 @@ func (p *Player) SettingsChanged(s settings.Settings) {
 }
 
 // speedOf is the speed the settings s play t at in MixMusic's own engine:
-// a song's, of which a Spotify track played from YouTube Music is one.
-func speedOf(s settings.Settings, t media.Track) float64 {
+// a song's, of which a Spotify track played from YouTube Music is one. A
+// live stream plays at its own, as it is broadcast: from near its live
+// edge, faster would run out of what came of it, and slower would fall
+// behind until its playlist dropped what hadn't played.
+func speedOf(s settings.Settings, t media.Track, live bool) float64 {
+	if live {
+		return 1
+	}
 	return settings.CleanSpeed(s.SongSpeed)
 }
 
@@ -119,7 +125,7 @@ func (p *Player) applySpeed(s settings.Settings) {
 	if !ok || p.onDevice() {
 		return
 	}
-	speed := speedOf(s, cur.Track)
+	speed := speedOf(s, cur.Track, p.s.Live)
 	if speed == p.s.Speed {
 		return
 	}
@@ -260,7 +266,7 @@ func (p *Player) loadStream(src Source, start time.Duration, autoplay bool) {
 	p.loaded = true
 	p.paused = !autoplay
 	cur, _ := p.s.Current()
-	p.s.Speed = speedOf(p.svc.Settings(), cur.Track)
+	p.s.Speed = speedOf(p.svc.Settings(), cur.Track, p.s.Live)
 	_ = p.stream.Load(src.URL, start, autoplay, p.s.Speed)
 }
 
@@ -406,7 +412,7 @@ func (p *Player) retryStream(why string) {
 			p.setLive(src.Live)
 			p.loaded = true
 			p.paused = !autoplay
-			p.s.Speed = speedOf(p.svc.Settings(), entry.Track)
+			p.s.Speed = speedOf(p.svc.Settings(), entry.Track, p.s.Live)
 			_ = p.stream.Load(src.URL+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), at, autoplay, p.s.Speed)
 		})
 	})
@@ -499,7 +505,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		p.setLive(src.Live)
 		p.s.Error = ""
 		// The track fading out keeps its speed, and next plays at its own.
-		p.s.Speed = speedOf(p.svc.Settings(), next.Track)
+		p.s.Speed = speedOf(p.svc.Settings(), next.Track, p.s.Live)
 		p.emit(TrackChange)
 		p.report()
 		p.loaded = true

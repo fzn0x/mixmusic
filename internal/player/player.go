@@ -448,7 +448,8 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 			p.s.Position = time.Duration(saved.Position) * time.Millisecond
 		}
 		p.s.Duration = ms(p.s.Queue[p.s.Index].Track.DurationMs)
-		p.s.Speed = speedOf(st, p.s.Queue[p.s.Index].Track)
+		// Whether it is a live stream, its stream tells once found.
+		p.s.Speed = speedOf(st, p.s.Queue[p.s.Index].Track, false)
 		p.s.Shuffle = saved.Shuffle
 		if saved.Repeat == RepeatAll || saved.Repeat == RepeatOne {
 			p.s.Repeat = saved.Repeat

@@ -178,3 +178,42 @@ func TestRepeatAllPreviousAtSpeed(t *testing.T) {
 	h.p.Previous()
 	h.wait("c playing", playing("c"))
 }
+
+// TestLiveTrackAtItsOwnSpeed plays a live stream at its own speed,
+// whatever the songs' is, and tried again too: it plays from near its
+// live edge, with nothing ahead to play faster. The song after it plays at
+// the songs' speed.
+func TestLiveTrackAtItsOwnSpeed(t *testing.T) {
+	h := newLiveHarness(t, atSpeedOf(1.5))
+	h.p.PlayTracks([]media.Track{track("a", "A"), liveTrack("liveRadio01"), track("b", "B")}, 0)
+	h.wait("a playing", playing("a"))
+	if s := h.p.State(); s.Speed != 1.5 {
+		t.Errorf("a plays at %v", s.Speed)
+	}
+	h.p.Next()
+	h.wait("the live stream playing", func(p *Player) bool { return playing("liveRadio01")(p) && p.s.Live })
+	if s, got := h.p.State(), h.stream.lastLoad(); s.Speed != 1 || got != "load url:yt:liveRadio01 0s true" {
+		t.Errorf("the live stream plays at %v, loaded %q", s.Speed, got)
+	}
+	h.wait("the live stream reported at 1×", func(*Player) bool {
+		now := h.lastReport()
+		return now.Live && now.Speed == 1
+	})
+	h.setSpeed(2)
+	h.on(func(*Player) {})
+	if s := h.p.State(); s.Speed != 1 || h.stream.count("set speed") != 0 {
+		t.Errorf("the live stream plays at %v; the stream did %q", s.Speed, h.stream.copy())
+	}
+	h.p.Time(time.Minute, 0)
+	h.p.Error("the network failed while loading the audio")
+	h.wait("tried again", func(*Player) bool { return strings.HasPrefix(h.stream.lastLoad(), "load url:yt:liveRadio01?retry=") })
+	h.wait("live again", func(p *Player) bool { return p.s.Live && p.s.Playing })
+	if s, got := h.p.State(), h.stream.lastLoad(); s.Speed != 1 || !strings.HasSuffix(got, " 1m0s true") {
+		t.Errorf("tried again at %v, loaded %q", s.Speed, got)
+	}
+	h.p.Next()
+	h.wait("b playing", playing("b"))
+	if s, got := h.p.State(), h.stream.lastLoad(); s.Speed != 2 || got != "load url:yt:b 0s true speed 2" {
+		t.Errorf("b plays at %v, loaded %q", s.Speed, got)
+	}
+}

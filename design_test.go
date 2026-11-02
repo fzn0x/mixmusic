@@ -89,6 +89,31 @@ func TestLayoutDesignsLayOut(t *testing.T) {
 	}
 }
 
+// TestHomeTilesLayOut checks that the user's own tiles on Home follow the
+// layout design: flat fields of the tile colours in Tiles, and cards on
+// the surface, as the covers', in the others.
+func TestHomeTilesLayOut(t *testing.T) {
+	for _, layout := range settings.Layouts {
+		t.Run(string(layout), func(t *testing.T) {
+			s, tt := themed(t, "mix", layout)
+			show(s, tt, "/")
+			r, ok := tt.Find("0 tracks")
+			if !ok {
+				t.Fatalf("no tile of liked songs: %q", tt.Texts())
+			}
+			// Left of the caption, in the tile's padding.
+			fill := s.lk.surface
+			if layout == settings.LayoutTiles {
+				fill = s.lk.tile(1)
+			}
+			want := col(over(nrgba(fill), nrgba(s.lk.bg)))
+			if got := at(tt.Image(), int(r.X)-6, int(r.Y+r.H/2)); got != want {
+				t.Errorf("the tile of liked songs is %v, want %v", got, want)
+			}
+		})
+	}
+}
+
 // indicatorWidth is how wide the indicator of the rail's entry of label
 // shows, on a line across the entry over its icon and label.
 func indicatorWidth(t *testing.T, s *shell, tt *ui.Tester, label string) int {

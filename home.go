@@ -51,7 +51,7 @@ func (s *shell) homePage(c *ui.Context) {
 				title, caption, label = "Jump back in", trackLine(*last), "Play "+last.Title+" again"
 				art = last.Artwork
 			}
-			if s.flatTile(c, "tile-last", 0, tileLarge, columns, title, caption, label, art) {
+			if s.flatTile(c, "tile-last", 0, tileLarge, columns, title, caption, label, icon("search"), art) {
 				if last != nil {
 					s.p.PlayTracks([]media.Track{*last}, 0)
 				} else {
@@ -62,14 +62,14 @@ func (s *shell) homePage(c *ui.Context) {
 			span := tileWide
 			if offer {
 				span = tileSmall
-				if s.flatTile(c, "tile-spotify", 3, tileTall, columns, "Add Spotify", k.words("Sign in to search and play your Spotify library here"), "Add Spotify", nil) {
+				if s.flatTile(c, "tile-spotify", 3, tileTall, columns, "Add Spotify", k.words("Sign in to search and play your Spotify library here"), "Add Spotify", icon("plus"), nil) {
 					s.navigate("/settings/accounts")
 				}
 			}
-			if s.flatTile(c, "tile-liked", 1, span, columns, "Liked songs", plural(len(s.svc.Collection.Liked()), "track"), "Liked songs", nil) {
+			if s.flatTile(c, "tile-liked", 1, span, columns, "Liked songs", plural(len(s.svc.Collection.Liked()), "track"), "Liked songs", solidIcons["heart"], nil) {
 				s.navigate("/library/liked")
 			}
-			if s.flatTile(c, "tile-mixes", 2, span, columns, "Your mixes", plural(len(s.svc.Collection.Playlists()), "mix", "mixes"), "Your mixes", nil) {
+			if s.flatTile(c, "tile-mixes", 2, span, columns, "Your mixes", plural(len(s.svc.Collection.Playlists()), "mix", "mixes"), "Your mixes", icon("queue"), nil) {
 				s.navigate("/library/mixes")
 			}
 		})

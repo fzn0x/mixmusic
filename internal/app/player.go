@@ -250,6 +250,38 @@ func (a *App) notifyTrack(t media.Track) {
 	}
 }
 
+// notifyLiked tells that the track that plays joined the liked songs, or
+// left them, while the main window isn't in front: liked from elsewhere,
+// as by a global shortcut, nothing else shows it.
+func (a *App) notifyLiked(t media.Track, liked bool) {
+	a.mu.Lock()
+	main := a.main
+	a.mu.Unlock()
+	if !a.settings.Get().Notifications || main != nil && main.IsFocused() {
+		return
+	}
+	title, body := likedNote(t, liked)
+	n := mygo.NewNotification(mygo.NotificationOptions{ID: "liked", Title: title, Body: body, Silent: true})
+	n.OnClick(a.showMain)
+	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
+		log.Printf("mixmusic: notification: %v", err)
+	}
+}
+
+// likedNote is what the notification of a track liked, or no longer,
+// says.
+func likedNote(t media.Track, liked bool) (title, body string) {
+	title = "Removed from liked songs"
+	if liked {
+		title = "Added to liked songs"
+	}
+	body = t.Title
+	if artists := t.ArtistNames(); artists != "" {
+		body += " — " + artists
+	}
+	return title, body
+}
+
 // Devices returns the user's Spotify Connect devices.
 func (p *Player) Devices(ctx context.Context) ([]spotify.Device, error) {
 	return p.a.spotify.Devices(ctx)

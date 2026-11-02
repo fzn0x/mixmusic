@@ -43,6 +43,9 @@ const (
 	CommandPrevious Command = "previous"
 	CommandSeek     Command = "seek"
 	CommandVolume   Command = "volume"
+	// CommandVolumeBy turns the volume up or down by Value, from -1 to 1.
+	CommandVolumeBy Command = "volumeBy"
+	CommandMute     Command = "mute"
 	CommandLike     Command = "like"
 	CommandShuffle  Command = "shuffle"
 	CommandRepeat   Command = "repeat"
@@ -51,7 +54,7 @@ const (
 )
 
 // PlayerCommand is a Command with its argument: the position in
-// milliseconds to seek to, or the volume from 0 to 1.
+// milliseconds to seek to, the volume from 0 to 1, or its change.
 type PlayerCommand struct {
 	Command Command `json:"command"`
 	Value   float64 `json:"value,omitempty"`

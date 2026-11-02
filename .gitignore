@@ -47,3 +47,6 @@ DESIGN.md
 # The community plugins compile to JavaScript (bun run build:plugins),
 # which the registry branch publishes and main does not keep.
 /community/plugins/*/*.js
+
+# What wrangler keeps beside site/wrangler.jsonc.
+.wrangler/

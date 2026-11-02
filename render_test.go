@@ -5,6 +5,7 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -43,8 +44,10 @@ func TestMain(m *testing.M) {
 // passes over the tracks the app's library dislikes, when it has the app.
 type testPlayer struct{ a *app.App }
 
+// Prepare finds the stream of a track: a live one of the IDs that start
+// with "yt:live".
 func (testPlayer) Prepare(_ context.Context, t media.Track) (player.Source, error) {
-	return player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t}, nil
+	return player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t, Live: strings.HasPrefix(t.ID, "yt:live")}, nil
 }
 
 func (p testPlayer) PrepareStream(ctx context.Context, t media.Track) (player.Source, error) {

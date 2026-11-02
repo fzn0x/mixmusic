@@ -1,0 +1,81 @@
+name: Cloudflare
+
+# Builds the site in site/ as pages.yml does, for its copy on Cloudflare at
+# https://mixmusic.functionx.dev, and deploys it there as the Worker of
+# site/wrangler.jsonc, which only serves the built files. Pull requests that
+# change what the site is built from build it and check the Worker without
+# deploying it, and keep the build as the site-cloudflare artifact. Pushes to
+# main deploy it, with the repository's CLOUDFLARE_API_TOKEN and
+# CLOUDFLARE_ACCOUNT_ID secrets.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "docs/**"
+      - "tools/sitedocs/**"
+      - "go.mod"
+      - "flake.nix"
+      - "flake.lock"
+      - ".github/workflows/cloudflare.yml"
+  pull_request:
+    paths:
+      - "site/**"
+      - "docs/**"
+      - "tools/sitedocs/**"
+      - "go.mod"
+      - "flake.nix"
+      - "flake.lock"
+      - ".github/workflows/cloudflare.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Deploys run one at a time, in order; a pull request's newer push replaces
+# its older one.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('cloudflare-{0}', github.ref) || 'cloudflare' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  SITE_URL: https://mixmusic.functionx.dev
+  WRANGLER_VERSION: 4.147.0
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # Go and Zola, at the versions flake.lock pins.
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      # The shell's tools, fetched once, again if a download breaks off.
+      - name: The Nix shell
+        run: bash .github/scripts/nix-retry.sh nix develop --command true
+      - name: The docs' pages, from docs/*.md
+        run: nix develop --command go run ./tools/sitedocs
+      - name: Build the site
+        run: nix develop --command zola --root site build --base-url "$SITE_URL"
+      - name: Check the Worker
+        working-directory: site
+        run: npx --yes "wrangler@$WRANGLER_VERSION" deploy --dry-run
+      - if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-cloudflare
+          path: site/public
+          retention-days: 7
+      - name: Deploy
+        if: github.event_name != 'pull_request'
+        working-directory: site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::The CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets are missing (CONTRIBUTING.md, The website)."
+            exit 1
+          fi
+          npx --yes "wrangler@$WRANGLER_VERSION" deploy

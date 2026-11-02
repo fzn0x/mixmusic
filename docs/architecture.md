@@ -52,6 +52,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   new URL when YouTube refuses the old one, a new connection, from the byte
   it reached, when a download gets no bytes for 15 seconds or its
   connection drops, and an on-disk cache of tracks played to their end.
+  A live video's audio is an HLS media playlist (RFC 8216) of AAC-LC in
+  packed audio, format 234, or 233 with data saver, which `Proxy.OpenLive`
+  follows from near its live edge: it loads the playlist again about once
+  per target duration, fetches each new segment once, and finds the
+  stream again before its URL expires, never caching it.
   The player API also tells how loud YouTube measured each video
   (`Stream.Loudness`, `Direct.Loudness`). Its answers are tested against
   recorded ones in `testdata/`, and against YouTube with
@@ -67,23 +72,33 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   codec delay of the edit list, from progressive files and fragmented
   ones, seeking by the sample table, the `sidx` or the `moof` boxes.
 - **`aac`** decodes AAC-LC, in mono or stereo, with all of its
-  tools: a pure Go decoder derived from SharpJaad, the C# port of JAAD,
+  tools, and reads the headers of ADTS frames: a pure Go decoder derived from SharpJaad, the C# port of JAAD,
   under SharpJaad's MIT license, which decodes YouTube's AAC within about
   136 dB of ffmpeg's decoder, but for the few frames whose channels share
   their noise, as the standard has it and ffmpeg's decoder doesn't.
   **`resample`** converts it from its rate, 44.1 kHz for
   YouTube, to the engine's 48 kHz, with a polyphase filter of
   Kaiser-windowed sincs.
+- **`ac3`** decodes AC-3, the 5.1 surround of YouTube's format 380: a
+  pure Go decoder written from ATSC A/52, of every audio coding mode and
+  tool, into six channels, with the stereo downmix the stream's own mix
+  levels ask for. It decodes streams of ffmpeg's encoder as ffmpeg's
+  decoder does to about 110 dB, and its tests edit those streams to use
+  the tools the encoder doesn't: block switching, delta bit allocation,
+  phase flags and dynamic range gains.
 - **`internal/audio`** is MixMusic's audio engine: two decks, each a
-  goroutine that reads a track, Opus in WebM with `webm` and `opus`, or AAC
-  in MP4 with `mp4`, `aac` and `resample`, as its first bytes tell, and decodes it into
+  goroutine that reads a track, Opus in WebM with `webm` and `opus`, AAC
+  in MP4 with `mp4`, `aac` and `resample`, or the AAC of a live stream's
+  packed audio, its ID3 tags passed over, which has no length and can't
+  seek, as its first bytes tell, and decodes it into
   a ring the audio thread plays from, at 48 kHz, each turning a
   track louder than -14 LKFS down to it, from the loudness its `Measured`
   source tells (Even loudness), and the preamp, equalizer, levelling
   compressor, volume and analyser of the web player MixMusic had, ported
   from Chromium's Web Audio, which they match sample for sample.
   `MIXMUSIC_LIVE=1 go test ./internal/audio -run Live` plays songs of both
-  codecs as the app finds them on YouTube, against ffmpeg's decode.
+  codecs, and a 24/7 live stream, as the app finds them on YouTube,
+  against ffmpeg's decode.
   `internal/audio/output` plays it on the system's output, without cgo:
   through WASAPI on Windows, an Audio Queue on macOS, and PulseAudio,
   which PipeWire serves too, or ALSA on Linux. On Windows it also hears
@@ -129,7 +144,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   also finds the song of a music video, by its title and artists, which
   the video's radio starts from: YouTube Music makes the radio of a video
   out of videos.
-- **`lyrics`** finds synced lyrics on LRCLIB and reads LRC.
+- **`lyrics`** finds synced lyrics on Unison and LRCLIB, and reads TTML and
+  LRC.
 - **`internal/library`** keeps liked and disliked songs, mixes, the history
   and stats in `library.json`.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
@@ -161,7 +177,7 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/app`** gives the windows the services (`App.Services`), tells
   them when the settings, the accounts, the add-ons or the updates change
   (`App.Watch`), makes the player, and puts MixMusic on the desktop: the
-  tray, media keys, deep links, notifications, updates.
+  tray, media keys, global shortcuts, deep links, notifications, updates.
 
 ## The windows
 

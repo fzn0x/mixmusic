@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/url"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/egoist/mygo/ui"
@@ -15,7 +14,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
-var exploreTabs = []struct{ id, label string }{{"new", "new"}, {"charts", "charts"}, {"moods", "moods & genres"}}
+var exploreTabs = []struct{ id, label string }{{"new", "New"}, {"charts", "Charts"}, {"moods", "Moods & genres"}}
 
 // moodPath is the page of a mood or a genre.
 func moodPath(params string) string { return "/mood/" + url.PathEscape(params) }
@@ -33,7 +32,7 @@ func (s *shell) explorePage(c *ui.Context, tab string) {
 	}
 	s.pageScroll(c, func() {
 		before := selected
-		s.pageHeader(c, "explore", labels, &selected)
+		s.pageHeader(c, "Explore", labels, &selected)
 		if selected != before {
 			s.router.Replace("/explore/" + exploreTabs[selected].id)
 		}
@@ -98,11 +97,13 @@ func (s *shell) moodTile(c *ui.Context, key string, tone int, m youtube.Mood) bo
 	k := &s.lk
 	t := s.buttonBase(c.Key(key)).Height(96).Padding(12).AlignItems(ui.Start).Justify(ui.Start).Background(k.tile(tone)).
 		Radius(k.radius).Label("Playlists for " + m.Title).Cursor(ui.CursorPointer)
-	if t.Pressed() {
+	if k.moves() {
+		s.pressMotion(t, 0.97)
+	} else if t.Pressed() {
 		t.Scale(0.97, 0.97)
 	}
 	t.Children(func() {
-		ui.Text(c, strings.ToLower(m.Title)).FontSize(k.size(1.375)).FontWeight(300).Font(k.display).TextColor(k.tileText).MaxLines(2)
+		ui.Text(c, k.words(m.Title)).FontSize(k.size(1.375)).FontWeight(k.titleWeight()).Font(k.display).TextColor(k.tileText).MaxLines(2)
 	})
 	return t.Clicked()
 }
@@ -112,7 +113,7 @@ func (s *shell) moodPage(c *ui.Context, params string) {
 	key := "mood:" + params
 	res := fetch(s, key, func(ctx context.Context) (app.MoodPage, error) { return s.svc.Catalog.Mood(ctx, params) })
 	s.pageScroll(c, func() {
-		title := "mood"
+		title := "Mood"
 		if res.done && res.err == nil && res.value.Title != "" {
 			title = res.value.Title
 		}

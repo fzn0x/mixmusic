@@ -68,7 +68,7 @@ Every change to `theme.json` shows after a reload.
 | `scheme` | `dark` or `light`: the controls MixMusic draws, such as switches and sliders, follow it |
 | `colors` | every color below, as `#rgb`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`, `hsl()`, `oklch()` or `transparent` |
 | `fonts` | font-family lists, of which MixMusic uses the first the computer has: `body` for text, `display` for titles and the large lowercase words (the body's when left out) |
-| `radius` | the corner radius of tiles and cards, as `12px`; smaller things round by 60% of it |
+| `radius` | the corner radius of tiles and cards in the Tiles layout, as `12px`; smaller things round by 60% of it |
 | `preview` | an image of the theme, for the marketplace |
 | `files` | every file of the theme: the registry installs exactly these |
 
@@ -90,12 +90,38 @@ Keep text readable: `text-muted` on `bg`, `accent-text` on `accent` and
 picks an accent of their own, or lets it follow the artwork, MixMusic picks
 the accent's ink itself, and keeps the accent readable on your `bg`.
 
+The Blend, Expressive and Crate layouts fill what is chosen, as the
+current page, and their secondary buttons with `surface-3`: `text` on it
+needs 4.5:1 as well. They set the accent as small text on the panels, so
+there MixMusic darkens or lightens yours until it reads at 4.5:1 on
+`surface`.
+
 ### Fonts
 
-MixMusic ships Selawik, and Quicksand, Mochi's round face; other families
-must be on the user's computer, so end each list with a family every
-system has: `system-ui` or `sans-serif` for the system's font, `monospace`
-for its monospaced one.
+MixMusic ships Selawik, Quicksand, Mochi's round face, Roboto Flex, the
+Material themes' face, at weights 400, 500 and 700, and Archivo
+SemiCondensed at 800, the Walnut themes' headings'; other families must be
+on the user's computer, so end each list with a family every system has:
+`system-ui` or `sans-serif` for the system's font, `monospace` for its
+monospaced one.
+
+### Layouts
+
+A theme sets the colors, the faces and the corners; the layout is the
+user's to choose, in Settings › Appearance, with any theme:
+
+- **Blend**, the default: Expressive's rounded shapes and springs, on
+  Crate's dense rows, big covers in cards and bold headings.
+- **Expressive**, after Material 3 Expressive: tonal fills, big rounded
+  shapes, pill buttons, a floating player bar and springy motion.
+- **Crate**: dense rows, big covers in cards and bold, tight headings.
+- **Tiles**, MixMusic's first: flat tiles, giant light lowercase words
+  and outlined boxes. Only Tiles rounds with your `radius`; the others
+  have corners of their own.
+
+The layouts set your `display` face at their own weights: light in Tiles,
+regular in Expressive, and heavy in Blend and Crate. A face with those
+weights looks its best in all of them.
 
 ## Effects
 
@@ -104,7 +130,11 @@ draws and the user tunes in Settings › Appearance: Mix's tile textures,
 Aurora's drifting lights and frosted glass, Sakura's petals, Terminal's
 scanlines and glow, Greenroom's and Glasshouse's grounds in the colour of
 the cover playing, Anime's speed lines and screentone, and Mochi's rising
-sparkles. A theme of yours sets the tokens above, and MixMusic draws
+sparkles, and the Material themes' colours, which MixMusic makes of a
+seed colour in Material's HCT color space, as Material's dynamic color
+does: the cover's while it plays and "Follow the artwork" is on, the
+accent you chose otherwise, or MixMusic's pink. A theme of yours sets the
+tokens above, and MixMusic draws
 everything else with them.
 
 Themes made for the web interface of MixMusic 0.4 and before still load:

@@ -1,0 +1,34 @@
+{
+  "id": "material-dark",
+  "name": "Material Dark",
+  "version": "1.0.0",
+  "author": "MixMusic",
+  "description": "Material's dynamic colour: every colour made of the cover's, tinted surfaces and tonal fills, in Roboto Flex. Made for the Expressive layout.",
+  "scheme": "dark",
+  "colors": {
+    "bg": "#171213",
+    "surface": "#241e1f",
+    "surface-2": "#2f282a",
+    "surface-3": "#3a3334",
+    "border": "#514347",
+    "text": "#ebe0e1",
+    "text-muted": "#d5c2c6",
+    "accent": "#ffb0c9",
+    "accent-text": "#650034",
+    "danger": "#ffb4ab",
+    "success": "#83c97c",
+    "youtube": "#ff9f91",
+    "spotify": "#78cc64",
+    "tile-1": "#8e004b",
+    "tile-2": "#623f20",
+    "tile-3": "#b90064",
+    "tile-4": "#7c5635",
+    "tile-text": "#ebe0e1"
+  },
+  "fonts": {
+    "body": "'Roboto Flex', Roboto, 'Segoe UI', 'Noto Sans', system-ui, sans-serif",
+    "display": "'Roboto Flex', Roboto, 'Segoe UI', 'Noto Sans', system-ui, sans-serif"
+  },
+  "radius": "28px",
+  "options": []
+}

@@ -1,6 +1,7 @@
 package player
 
 import (
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -129,4 +130,49 @@ func TestSurroundFallsBackToStereo(t *testing.T) {
 	if got := h.stream.lastLoad(); got != "load url:yt:b/5.1 0s true" {
 		t.Errorf("the next track loaded %q", got)
 	}
+}
+
+// TestSurroundAtSpeed plays 5.1 audio at the speed of the settings, and
+// the stereo audio it switches to, falls back to and tries again, and the
+// next track's 5.1 audio it crossfades into.
+func TestSurroundAtSpeed(t *testing.T) {
+	h := newHarness(t, Saved{}, atSpeedOf(1.5), func(f *fakeServices) {
+		f.settings.Surround = true
+		f.settings.Crossfade = 5
+		f.prepare = func(t media.Track) (Source, error) { return surroundOf(t), nil }
+	})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	if got := h.stream.lastLoad(); got != "load url:yt:a/5.1 0s true speed 1.5" {
+		t.Fatalf("loaded %q", got)
+	}
+	set := func(surround bool, speed float64) {
+		s := h.svc.Settings()
+		s.Surround, s.SongSpeed = surround, speed
+		h.svc.with(func(f *fakeServices) { f.settings = s })
+		h.p.SettingsChanged(s)
+	}
+	h.p.Time(12*time.Second, 200*time.Second)
+	set(false, 1.5)
+	h.wait("a in stereo", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 12s true speed 1.5" })
+	// 5.1 on with a speed of its own: the 5.1 audio loads at the speed a
+	// played at, which then changes.
+	set(true, 2)
+	h.wait("a in 5.1 at 2×", func(p *Player) bool {
+		return h.stream.lastLoad() == "load url:yt:a/5.1 12s true speed 1.5" && h.stream.last("set speed") == "set speed 2"
+	})
+	if calls := h.stream.copy(); slices.Index(calls, "set speed 2") < slices.Index(calls, "load url:yt:a/5.1 12s true speed 1.5") {
+		t.Errorf("the speed set before the 5.1 audio loaded: %q", calls)
+	}
+	h.p.Error("the audio could not be decoded (ac3: invalid data)")
+	h.wait("a in stereo", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 12s true speed 2" })
+	h.wait("a playing", playing("a"))
+	h.p.Error("the network failed while loading the audio")
+	h.wait("a tried again", func(p *Player) bool {
+		got := h.stream.lastLoad()
+		return strings.HasPrefix(got, "load url:yt:a?retry=") && strings.HasSuffix(got, " 12s true speed 2")
+	})
+	h.wait("a playing", playing("a"))
+	h.p.Time(196*time.Second, 200*time.Second)
+	h.wait("b crossfaded", func(*Player) bool { return h.stream.has("crossfade url:yt:b/5.1 5s speed 2") })
 }

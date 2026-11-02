@@ -168,6 +168,8 @@ type shell struct {
 	// liveSince is when the live tile began turning over to what plays
 	// next, zero while it doesn't.
 	liveSince time.Time
+	// video is the picture of music videos on the now playing page.
+	video videoView
 	// The pages' own state. local are the home page's own shelves, of the
 	// library at localVersion once localBuilt.
 	homeFilter   int
@@ -368,6 +370,11 @@ func (s *shell) start() {
 		s.a.OnGlobalShortcut(s.globalPress),
 		s.a.OnFlush(s.keepColors),
 		s.keepColors,
+		// No frame comes while the window is hidden, as in the tray, or
+		// minimized, to stop the picture of a music video.
+		s.win.OnHide(func() { s.update(s.idleVideo) }),
+		s.win.OnMinimize(func() { s.update(s.idleVideo) }),
+		s.closeVideo,
 	)
 }
 

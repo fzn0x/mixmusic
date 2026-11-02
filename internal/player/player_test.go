@@ -155,13 +155,20 @@ func (f *fakeServices) with(fn func(*fakeServices)) {
 }
 
 // fakeStream is the engine: it tells the player it plays as the engine
-// does, from within Play and Pause.
+// does, from within Play and Pause, and that a stream it loaded sounds, as
+// its time moves just past where it started, once it first plays it.
 type fakeStream struct {
 	mu     sync.Mutex
 	p      *Player
 	calls  []string
 	paused bool
 	url    string
+	// from is where the stream loaded last starts, and fresh is set until
+	// it first plays, when it loaded to play. The streams of silent URLs,
+	// tried again or not, never sound.
+	from   time.Duration
+	fresh  bool
+	silent map[string]bool
 }
 
 func (s *fakeStream) record(format string, args ...any) {
@@ -183,6 +190,7 @@ func (s *fakeStream) Load(url string, start time.Duration, autoplay bool, speed 
 	s.record("load %s %v %v%s", url, start, autoplay, atSpeed(speed))
 	s.mu.Lock()
 	s.url, s.paused = url, true
+	s.from, s.fresh = start, autoplay
 	s.mu.Unlock()
 	if autoplay {
 		return s.Play()
@@ -202,13 +210,30 @@ func (s *fakeStream) SetSpeed(speed float64) { s.record("set speed %v", speed) }
 func (s *fakeStream) Play() error {
 	s.record("play")
 	s.mu.Lock()
-	was := s.paused
-	s.paused = false
+	base, _, _ := strings.Cut(s.url, "?")
+	was, fresh, silent, from := s.paused, s.fresh, s.silent[base], s.from
+	s.paused, s.fresh = false, false
 	s.mu.Unlock()
 	if was {
 		s.p.Playing(true)
 	}
+	if fresh && !silent {
+		s.p.Time(from+time.Millisecond, 0)
+	}
 	return nil
+}
+
+// silence has the streams of the tracks ids, loaded from now on, never
+// sound, as ones YouTube holds back, or that fail before their audio comes.
+func (s *fakeStream) silence(ids ...string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.silent == nil {
+		s.silent = map[string]bool{}
+	}
+	for _, id := range ids {
+		s.silent["url:yt:"+id] = true
+	}
 }
 
 func (s *fakeStream) Pause() {
@@ -555,7 +580,7 @@ func TestSwitchSilences(t *testing.T) {
 	h.wait("c playing", playing("c"))
 }
 
-// TestLoadingPlays has a track that loads play: it can't be paused
+// TestLoadingPlays has a track that loads play: it can't be paused or moved
 // meanwhile, only left for another track.
 func TestLoadingPlays(t *testing.T) {
 	// a is found once released.
@@ -582,7 +607,7 @@ func TestLoadingPlays(t *testing.T) {
 		h.p.Pause()
 		h.p.Play()
 		h.p.ToggleOnce()
-		// A seek moves where it plays from, and it still plays.
+		// Nor does a seek move where it plays from.
 		h.p.Seek(30 * time.Second)
 		h.on(func(p *Player) {
 			if !p.s.Loading || p.s.Index != 0 {
@@ -594,7 +619,7 @@ func TestLoadingPlays(t *testing.T) {
 		}
 		release()
 		h.wait("a playing", playing("a"))
-		if got := h.stream.lastLoad(); got != "load url:yt:a 30s true" {
+		if got := h.stream.lastLoad(); got != "load url:yt:a 0s true" {
 			t.Errorf("loaded %q", got)
 		}
 		if h.p.State().Loading {
@@ -628,6 +653,44 @@ func TestLoadingPlays(t *testing.T) {
 			t.Error("still loading once it failed")
 		}
 	})
+}
+
+// TestLoadingUntilItSounds has a stream the engine plays load until its time
+// moves: the engine tells it plays as soon as it holds the stream, and
+// YouTube may hold back its audio for seconds.
+func TestLoadingUntilItSounds(t *testing.T) {
+	h := newHarness(t, Saved{})
+	h.stream.silence("a")
+	h.p.PlayTracks(tracks("a"), 0)
+	h.wait("a in the engine", func(p *Player) bool { return p.loaded && p.s.Playing })
+	// The engine tells where the stream opens: it isn't heard yet.
+	h.p.Time(0, 200*time.Second)
+	h.p.Toggle()
+	h.p.Seek(30 * time.Second)
+	h.on(func(p *Player) {
+		if !p.s.Loading || !p.s.Buffering || !p.s.Playing || p.s.Position != 0 {
+			t.Errorf("before it sounds: loading %v, buffering %v, playing %v, at %v", p.s.Loading, p.s.Buffering, p.s.Playing, p.s.Position)
+		}
+	})
+	if h.stream.has("pause") || h.stream.has("seek 30s") {
+		t.Errorf("paused or moved before it sounds: %q", h.stream.copy())
+	}
+	h.svc.with(func(f *fakeServices) {
+		if last := f.reports[len(f.reports)-1]; !last.Loading {
+			t.Errorf("reported as %+v before it sounds", last)
+		}
+	})
+	h.p.Time(250*time.Millisecond, 200*time.Second)
+	h.wait("a sounding", func(p *Player) bool { return p.s.Playing && !p.s.Loading && !p.s.Buffering })
+	h.svc.with(func(f *fakeServices) {
+		if last := f.reports[len(f.reports)-1]; !last.Playing || last.Loading {
+			t.Errorf("reported as %+v once it sounds", last)
+		}
+	})
+	h.p.Seek(30 * time.Second)
+	h.wait("moved", func(*Player) bool { return h.stream.has("seek 30s") })
+	h.p.Toggle()
+	h.wait("pausing", func(p *Player) bool { return !p.s.Playing })
 }
 
 func TestEnd(t *testing.T) {
@@ -818,6 +881,7 @@ func TestStreamError(t *testing.T) {
 	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Time(42*time.Second, 200*time.Second)
+	h.stream.silence("a")
 	// Each error plays the stream again where it was, as many times as
 	// there are waits, while it doesn't hold.
 	useRetries(t, h, "a", 0)
@@ -859,6 +923,7 @@ func TestFailuresStop(t *testing.T) {
 // failed in the engine, which tells the time while a stream opens.
 func TestFailuresStopInTheEngine(t *testing.T) {
 	h := newHarness(t, Saved{})
+	h.stream.silence("a", "b", "c")
 	h.p.PlayTracks(tracks("a", "b", "c", "d"), 0)
 	for i, id := range []string{"a", "b", "c"} {
 		h.wait(id+" loaded", func(p *Player) bool { return p.s.Index == i && p.loaded && p.s.Error == "" })

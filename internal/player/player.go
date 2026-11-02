@@ -109,8 +109,9 @@ type State struct {
 	// Volume is from 0 to 1, without Muted.
 	Volume float64
 	Muted  bool
-	// Loading is set from when a track is asked to play until it plays or
-	// fails: it can't be paused meanwhile, only left for another track.
+	// Loading is set from when a track is asked to play until it sounds or
+	// fails: it can't be paused or moved meanwhile, only left for another
+	// track.
 	Loading bool
 	// Error is why the current track couldn't play.
 	Error string
@@ -471,8 +472,14 @@ type Player struct {
 	offlineSkips int
 	// askedAt is when the current track was asked to play, from askedFrom,
 	// until it sounds: the log tells when that took long.
-	askedAt     time.Time
-	askedFrom   time.Duration
+	askedAt   time.Time
+	askedFrom time.Duration
+	// unsounded is set from when the engine gets a stream to play until its
+	// time moves past soundFrom. The engine tells it plays as soon as it
+	// holds the stream, before any audio arrives, which YouTube may hold
+	// back for seconds: the track loads until then.
+	unsounded   bool
+	soundFrom   time.Duration
 	uidSeq      int
 	lastToggle  time.Time
 	reporting   throttle

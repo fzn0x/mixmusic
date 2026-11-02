@@ -1,0 +1,535 @@
+{
+  "playabilityStatus": {
+    "status": "OK"
+  },
+  "playerConfig": {
+    "audioConfig": {
+      "loudnessTargetLkfs": -14,
+      "perceptualLoudnessDb": -9.87
+    }
+  },
+  "responseContext": {
+    "visitorData": "CgtUZXN0VmlzaXRvcijAgICABjIKCgJVUxIEGgAgAA%3D%3D"
+  },
+  "streamingData": {
+    "adaptiveFormats": [
+      {
+        "approxDurationMs": "474316",
+        "averageBitrate": 5743239,
+        "bitrate": 5815927,
+        "contentLength": "340513779",
+        "fps": 60,
+        "height": 1080,
+        "indexRange": {
+          "end": "1937",
+          "start": "742"
+        },
+        "initRange": {
+          "end": "741",
+          "start": "0"
+        },
+        "itag": 299,
+        "mimeType": "video/mp4; codecs=\"avc1.64002A\"",
+        "quality": "hd1080",
+        "qualityLabel": "1080p60",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=340513779&dur=474.316&itag=299&mime=video%2Fmp4&expire={{expire}}",
+        "width": 1920
+      },
+      {
+        "approxDurationMs": "474316",
+        "averageBitrate": 3396346,
+        "bitrate": 4487124,
+        "contentLength": "201367667",
+        "fps": 60,
+        "height": 1080,
+        "indexRange": {
+          "end": "1943",
+          "start": "219"
+        },
+        "initRange": {
+          "end": "218",
+          "start": "0"
+        },
+        "itag": 303,
+        "mimeType": "video/webm; codecs=\"vp9\"",
+        "quality": "hd1080",
+        "qualityLabel": "1080p60",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=201367667&dur=474.316&itag=303&mime=video%2Fwebm&expire={{expire}}",
+        "width": 1920
+      },
+      {
+        "approxDurationMs": "474316",
+        "averageBitrate": 2951438,
+        "bitrate": 3268378,
+        "contentLength": "174989317",
+        "fps": 60,
+        "height": 1080,
+        "indexRange": {
+          "end": "1895",
+          "start": "700"
+        },
+        "initRange": {
+          "end": "699",
+          "start": "0"
+        },
+        "itag": 399,
+        "mimeType": "video/mp4; codecs=\"av01.0.09M.08\"",
+        "quality": "hd1080",
+        "qualityLabel": "1080p60",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=174989317&dur=474.316&itag=399&mime=video%2Fmp4&expire={{expire}}",
+        "width": 1920
+      },
+      {
+        "approxDurationMs": "474316",
+        "averageBitrate": 3379736,
+        "bitrate": 3478060,
+        "contentLength": "200382893",
+        "fps": 60,
+        "height": 720,
+        "indexRange": {
+          "end": "1935",
+          "start": "740"
+        },
+        "initRange": {
+          "end": "739",
+          "start": "0"
+        },
+        "itag": 298,
+        "mimeType": "video/mp4; codecs=\"avc1.4D4020\"",
+        "quality": "hd720",
+        "qualityLabel": "720p60",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=200382893&dur=474.316&itag=298&mime=video%2Fmp4&expire={{expire}}",
+        "width": 1280
+      },
+      {
+        "approxDurationMs": "474316",
+        "averageBitrate": 1925139,
+        "bitrate": 2473404,
+        "contentLength": "114140579",
+        "fps": 60,
+        "height": 720,
+        "indexRange": {
+          "end": "1937",
+          "start": "219"
+        },
+        "initRange": {
+          "end": "218",
+          "start": "0"
+        },
+        "itag": 302,
+        "mimeType": "video/webm; codecs=\"vp9\"",
+        "quality": "hd720",
+        "qualityLabel": "720p60",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=114140579&dur=474.316&itag=302&mime=video%2Fwebm&expire={{expire}}",
+        "width": 1280
+      },
+      {
+        "approxDurationMs": "474316",
+        "averageBitrate": 1529868,
+        "bitrate": 1747775,
+        "contentLength": "90705143",
+        "fps": 60,
+        "height": 720,
+        "indexRange": {
+          "end": "1895",
+          "start": "700"
+        },
+        "initRange": {
+          "end": "699",
+          "start": "0"
+        },
+        "itag": 398,
+        "mimeType": "video/mp4; codecs=\"av01.0.08M.08\"",
+        "quality": "hd720",
+        "qualityLabel": "720p60",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=90705143&dur=474.316&itag=398&mime=video%2Fmp4&expire={{expire}}",
+        "width": 1280
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 848175,
+        "bitrate": 1159059,
+        "contentLength": "50289704",
+        "fps": 30,
+        "height": 480,
+        "indexRange": {
+          "end": "1936",
+          "start": "741"
+        },
+        "initRange": {
+          "end": "740",
+          "start": "0"
+        },
+        "itag": 135,
+        "mimeType": "video/mp4; codecs=\"avc1.4D401F\"",
+        "quality": "large",
+        "qualityLabel": "480p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=50289704&dur=474.333&itag=135&mime=video%2Fmp4&expire={{expire}}",
+        "width": 854
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 603036,
+        "bitrate": 793018,
+        "contentLength": "35755027",
+        "fps": 30,
+        "height": 480,
+        "indexRange": {
+          "end": "1907",
+          "start": "220"
+        },
+        "initRange": {
+          "end": "219",
+          "start": "0"
+        },
+        "itag": 244,
+        "mimeType": "video/webm; codecs=\"vp9\"",
+        "quality": "large",
+        "qualityLabel": "480p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=35755027&dur=474.333&itag=244&mime=video%2Fwebm&expire={{expire}}",
+        "width": 854
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 534638,
+        "bitrate": 596302,
+        "contentLength": "31699574",
+        "fps": 30,
+        "height": 480,
+        "indexRange": {
+          "end": "1895",
+          "start": "700"
+        },
+        "initRange": {
+          "end": "699",
+          "start": "0"
+        },
+        "itag": 397,
+        "mimeType": "video/mp4; codecs=\"av01.0.04M.08\"",
+        "quality": "large",
+        "qualityLabel": "480p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=31699574&dur=474.333&itag=397&mime=video%2Fmp4&expire={{expire}}",
+        "width": 854
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 523706,
+        "bitrate": 633994,
+        "contentLength": "31051398",
+        "fps": 30,
+        "height": 360,
+        "indexRange": {
+          "end": "1936",
+          "start": "741"
+        },
+        "initRange": {
+          "end": "740",
+          "start": "0"
+        },
+        "itag": 134,
+        "mimeType": "video/mp4; codecs=\"avc1.4D401E\"",
+        "quality": "medium",
+        "qualityLabel": "360p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=31051398&dur=474.333&itag=134&mime=video%2Fmp4&expire={{expire}}",
+        "width": 640
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 356133,
+        "bitrate": 468307,
+        "contentLength": "21115748",
+        "fps": 30,
+        "height": 360,
+        "indexRange": {
+          "end": "1875",
+          "start": "220"
+        },
+        "initRange": {
+          "end": "219",
+          "start": "0"
+        },
+        "itag": 243,
+        "mimeType": "video/webm; codecs=\"vp9\"",
+        "quality": "medium",
+        "qualityLabel": "360p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=21115748&dur=474.333&itag=243&mime=video%2Fwebm&expire={{expire}}",
+        "width": 640
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 289499,
+        "bitrate": 338484,
+        "contentLength": "17164898",
+        "fps": 30,
+        "height": 360,
+        "indexRange": {
+          "end": "1895",
+          "start": "700"
+        },
+        "initRange": {
+          "end": "699",
+          "start": "0"
+        },
+        "itag": 396,
+        "mimeType": "video/mp4; codecs=\"av01.0.01M.08\"",
+        "quality": "medium",
+        "qualityLabel": "360p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=17164898&dur=474.333&itag=396&mime=video%2Fmp4&expire={{expire}}",
+        "width": 640
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 231765,
+        "bitrate": 245809,
+        "contentLength": "13741762",
+        "fps": 30,
+        "height": 240,
+        "indexRange": {
+          "end": "1935",
+          "start": "740"
+        },
+        "initRange": {
+          "end": "739",
+          "start": "0"
+        },
+        "itag": 133,
+        "mimeType": "video/mp4; codecs=\"avc1.4D4015\"",
+        "quality": "small",
+        "qualityLabel": "240p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=13741762&dur=474.333&itag=133&mime=video%2Fmp4&expire={{expire}}",
+        "width": 426
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 149065,
+        "bitrate": 203216,
+        "contentLength": "8838319",
+        "fps": 30,
+        "height": 240,
+        "indexRange": {
+          "end": "1855",
+          "start": "219"
+        },
+        "initRange": {
+          "end": "218",
+          "start": "0"
+        },
+        "itag": 242,
+        "mimeType": "video/webm; codecs=\"vp9\"",
+        "quality": "small",
+        "qualityLabel": "240p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=8838319&dur=474.333&itag=242&mime=video%2Fwebm&expire={{expire}}",
+        "width": 426
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 135005,
+        "bitrate": 163725,
+        "contentLength": "8004710",
+        "fps": 30,
+        "height": 240,
+        "indexRange": {
+          "end": "1895",
+          "start": "700"
+        },
+        "initRange": {
+          "end": "699",
+          "start": "0"
+        },
+        "itag": 395,
+        "mimeType": "video/mp4; codecs=\"av01.0.00M.08\"",
+        "quality": "small",
+        "qualityLabel": "240p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=8004710&dur=474.333&itag=395&mime=video%2Fmp4&expire={{expire}}",
+        "width": 426
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 105027,
+        "bitrate": 111722,
+        "contentLength": "6227247",
+        "fps": 30,
+        "height": 144,
+        "indexRange": {
+          "end": "1934",
+          "start": "739"
+        },
+        "initRange": {
+          "end": "738",
+          "start": "0"
+        },
+        "itag": 160,
+        "mimeType": "video/mp4; codecs=\"avc1.4D400C\"",
+        "quality": "tiny",
+        "qualityLabel": "144p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=6227247&dur=474.333&itag=160&mime=video%2Fmp4&expire={{expire}}",
+        "width": 256
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 75115,
+        "bitrate": 92399,
+        "contentLength": "4453735",
+        "fps": 30,
+        "height": 144,
+        "indexRange": {
+          "end": "1855",
+          "start": "219"
+        },
+        "initRange": {
+          "end": "218",
+          "start": "0"
+        },
+        "itag": 278,
+        "mimeType": "video/webm; codecs=\"vp9\"",
+        "quality": "tiny",
+        "qualityLabel": "144p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=4453735&dur=474.333&itag=278&mime=video%2Fwebm&expire={{expire}}",
+        "width": 256
+      },
+      {
+        "approxDurationMs": "474333",
+        "averageBitrate": 75010,
+        "bitrate": 99694,
+        "contentLength": "4447504",
+        "fps": 30,
+        "height": 144,
+        "indexRange": {
+          "end": "1895",
+          "start": "700"
+        },
+        "initRange": {
+          "end": "699",
+          "start": "0"
+        },
+        "itag": 394,
+        "mimeType": "video/mp4; codecs=\"av01.0.00M.08\"",
+        "quality": "tiny",
+        "qualityLabel": "144p",
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=4447504&dur=474.333&itag=394&mime=video%2Fmp4&expire={{expire}}",
+        "width": 256
+      },
+      {
+        "approxDurationMs": "474430",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "averageBitrate": 48807,
+        "bitrate": 50233,
+        "contentLength": "2894468",
+        "indexRange": {
+          "end": "1339",
+          "start": "732"
+        },
+        "initRange": {
+          "end": "731",
+          "start": "0"
+        },
+        "itag": 139,
+        "loudnessDb": 4.13,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "quality": "tiny",
+        "trackAbsoluteLoudnessLkfs": -9.87,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=2894468&dur=474.430&itag=139&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "474383",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "averageBitrate": 129485,
+        "bitrate": 130656,
+        "contentLength": "7678188",
+        "indexRange": {
+          "end": "1330",
+          "start": "723"
+        },
+        "initRange": {
+          "end": "722",
+          "start": "0"
+        },
+        "itag": 140,
+        "loudnessDb": 4.13,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "quality": "tiny",
+        "trackAbsoluteLoudnessLkfs": -9.87,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=7678188&dur=474.383&itag=140&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "474341",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 51114,
+        "bitrate": 58805,
+        "contentLength": "3030712",
+        "indexRange": {
+          "end": "1077",
+          "start": "266"
+        },
+        "initRange": {
+          "end": "265",
+          "start": "0"
+        },
+        "itag": 249,
+        "loudnessDb": 4.12,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "quality": "tiny",
+        "trackAbsoluteLoudnessLkfs": -9.88,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=3030712&dur=474.341&itag=249&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "474341",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 66829,
+        "bitrate": 75540,
+        "contentLength": "3962511",
+        "indexRange": {
+          "end": "1077",
+          "start": "266"
+        },
+        "initRange": {
+          "end": "265",
+          "start": "0"
+        },
+        "itag": 250,
+        "loudnessDb": 4.12,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "quality": "tiny",
+        "trackAbsoluteLoudnessLkfs": -9.88,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=3962511&dur=474.341&itag=250&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "474341",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "averageBitrate": 129953,
+        "bitrate": 143518,
+        "contentLength": "7705312",
+        "indexRange": {
+          "end": "1078",
+          "start": "266"
+        },
+        "initRange": {
+          "end": "265",
+          "start": "0"
+        },
+        "itag": 251,
+        "loudnessDb": 4.12,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "quality": "tiny",
+        "trackAbsoluteLoudnessLkfs": -9.88,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=7705312&dur=474.341&itag=251&mime=audio%2Fwebm&expire={{expire}}"
+      }
+    ]
+  },
+  "videoDetails": {
+    "author": "SIMPATIK MUSIC OFFICIAL",
+    "lengthSeconds": "474",
+    "title": "Ajen ajen ajen heliki liki liki - ONCOM GONDRONG - LAILA AYU ft TIARA AMORA - SIMPATIK MUSIC",
+    "videoId": "Kq-7hp9i4lE"
+  }
+}

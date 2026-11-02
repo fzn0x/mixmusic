@@ -21,6 +21,10 @@ import (
 // to load.
 const hereLoad = 20 * time.Second
 
+// hereSounds is how long a track that MixMusic's own Spotify device took
+// may load before the player has it play all the same.
+const hereSounds = 10 * time.Second
+
 // spotifyPlaysHere tells whether MixMusic plays Spotify itself: where its
 // webview, WebView2, decrypts Spotify's audio.
 const spotifyPlaysHere = runtime.GOOS == "windows"
@@ -182,10 +186,24 @@ func (d hereDevice) Play(ctx context.Context, t media.Track, at time.Duration) e
 	if err != nil {
 		return err
 	}
+	// Spotify tells the track plays about 0.3 s before its sound starts:
+	// the player has it load until then, so that it isn't paused or moved
+	// before it plays. The page waits for it from before the play, and a
+	// track played meanwhile waits for its own.
+	_, spotifyID, _ := media.ParseID(t.ID)
+	expected, err := eval[int](ctx, page, "return mm.expect("+strconv.Quote(spotifyID)+")")
+	if err != nil {
+		return err
+	}
 	if err := (&Player{d.h.a}).PlayHere(ctx, id, t, int(at/time.Millisecond)); err != nil {
 		return err
 	}
-	_, err = page.EvalContext(ctx, "await mm.setVolume("+d.level()+")")
+	if _, err := page.EvalContext(ctx, "await mm.setVolume("+d.level()+")"); err != nil {
+		return err
+	}
+	// A player that never tells its sound started plays on all the same, as
+	// the player follows it.
+	_, err = page.EvalContext(ctx, "await mm.started("+strconv.Itoa(expected)+", "+strconv.FormatInt(hereSounds.Milliseconds(), 10)+")")
 	return err
 }
 

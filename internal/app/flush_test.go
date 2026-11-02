@@ -26,12 +26,14 @@ func (s offlineServices) PrepareStream(ctx context.Context, t media.Track) (play
 	return s.Prepare(ctx, t)
 }
 
-// quietStream is an engine that plays at once and tells no progress.
+// quietStream is an engine that plays at once and tells no progress, past
+// the time that tells a stream sounds.
 type quietStream struct{ p atomic.Pointer[player.Player] }
 
-func (s *quietStream) Load(_ string, _ time.Duration, autoplay bool, _ float64) error {
+func (s *quietStream) Load(_ string, start time.Duration, autoplay bool, _ float64) error {
 	if autoplay {
 		s.p.Load().Playing(true)
+		s.p.Load().Time(start+time.Millisecond, 0)
 	}
 	return nil
 }

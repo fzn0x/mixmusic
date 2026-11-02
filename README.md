@@ -555,6 +555,9 @@ Fixes, features, themes, plugins and bug reports are all welcome.
   that a change people will notice needs.
 - **Share a theme or a plugin:** see [Community](#community).
 
+[CONTRIBUTORS.md](CONTRIBUTORS.md) thanks the people whose code, ideas and
+reports shaped MixMusic.
+
 ## License
 
 MixMusic is dual-licensed: use it under the [MIT license](LICENSE-MIT) or

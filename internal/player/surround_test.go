@@ -155,22 +155,28 @@ func TestSurroundAtSpeed(t *testing.T) {
 	h.p.Time(12*time.Second, 200*time.Second)
 	set(false, 1.5)
 	h.wait("a in stereo", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 12s true speed 1.5" })
-	// 5.1 on with a speed of its own: the 5.1 audio loads at the speed a
-	// played at, which then changes.
+	// The fake engine tells the stereo audio sounds a millisecond on.
+	h.wait("a sounding in stereo", func(p *Player) bool { return p.s.Position > 12*time.Second })
+	// 5.1 on with a speed of its own: the 5.1 audio loads from there, at
+	// the speed a played at, which then changes.
 	set(true, 2)
 	h.wait("a in 5.1 at 2×", func(p *Player) bool {
-		return h.stream.lastLoad() == "load url:yt:a/5.1 12s true speed 1.5" && h.stream.last("set speed") == "set speed 2"
+		return h.stream.lastLoad() == "load url:yt:a/5.1 12.001s true speed 1.5" && h.stream.last("set speed") == "set speed 2"
 	})
-	if calls := h.stream.copy(); slices.Index(calls, "set speed 2") < slices.Index(calls, "load url:yt:a/5.1 12s true speed 1.5") {
+	if calls := h.stream.copy(); slices.Index(calls, "set speed 2") < slices.Index(calls, "load url:yt:a/5.1 12.001s true speed 1.5") {
 		t.Errorf("the speed set before the 5.1 audio loaded: %q", calls)
 	}
+	// Each audio a loads sounds a millisecond on, and the next loads from
+	// there.
+	h.wait("a sounding in 5.1", func(p *Player) bool { return p.s.Position > 12001*time.Millisecond })
 	h.p.Error("the audio could not be decoded (ac3: invalid data)")
-	h.wait("a in stereo", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 12s true speed 2" })
+	h.wait("a in stereo", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 12.002s true speed 2" })
 	h.wait("a playing", playing("a"))
+	h.wait("a sounding in stereo again", func(p *Player) bool { return p.s.Position > 12002*time.Millisecond })
 	h.p.Error("the network failed while loading the audio")
 	h.wait("a tried again", func(p *Player) bool {
 		got := h.stream.lastLoad()
-		return strings.HasPrefix(got, "load url:yt:a?retry=") && strings.HasSuffix(got, " 12s true speed 2")
+		return strings.HasPrefix(got, "load url:yt:a?retry=") && strings.HasSuffix(got, " 12.003s true speed 2")
 	})
 	h.wait("a playing", playing("a"))
 	h.p.Time(196*time.Second, 200*time.Second)

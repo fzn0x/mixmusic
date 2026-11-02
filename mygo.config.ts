@@ -10,10 +10,11 @@ export default defineConfig({
   identifier: "app.mixmusic.desktop",
   version: pkg.version,
   copyright: "© 2026 MixMusic contributors",
-  // MyGo draws the windows itself, in Go (the root package): the only page
-  // is that of MixMusic's own Spotify device, public/spotify.html, which
-  // `mygo build` embeds as it is. It calls Go without a generated client,
-  // so `mygo dev` writes it out of the way.
+  // MyGo draws the windows itself, in Go (the root package): the only pages
+  // are that of MixMusic's own Spotify device, public/spotify.html, and that
+  // of the picture of music videos, public/video.html with video.js, which
+  // `mygo build` embeds as they are. They call Go without a generated
+  // client, so `mygo dev` writes it out of the way.
   frontendDist: "public",
   bindings: ".mygo/bindings.ts",
   out: "build",

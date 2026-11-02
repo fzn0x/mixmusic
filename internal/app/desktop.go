@@ -215,11 +215,13 @@ func (a *App) showMini() {
 		a.mu.Lock()
 		if a.mini == mini {
 			a.mini = nil
+			a.miniOpen.Store(false)
 		}
 		a.mu.Unlock()
 	})
 	a.mu.Lock()
 	a.mini = mini
+	a.miniOpen.Store(true)
 	a.mu.Unlock()
 }
 

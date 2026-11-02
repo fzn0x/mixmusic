@@ -109,6 +109,9 @@ type Stream struct {
 	// engine plays: nil otherwise, in the Surround stream itself, and in
 	// a live stream.
 	Surround *Stream
+	// Videos are the streams of the video's picture, which yt-dlp and
+	// YouTube's player API list beside the audio, for the now playing page.
+	Videos []Video
 	// Live is set for the stream of a live video, as it goes on: the
 	// packed audio of the segments of an HLS media playlist, which has no
 	// size, nor a length.
@@ -443,6 +446,12 @@ type ytFormat struct {
 	AvailableAt    float64           `json:"available_at"` // Unix seconds
 	// HasDRM is true, false or "maybe".
 	HasDRM any `json:"has_drm"`
+	// Width, Height, FPS and TBR are a video format's, which the now
+	// playing page shows the picture of (ytdlpVideos).
+	Width  int     `json:"width"`
+	Height int     `json:"height"`
+	FPS    float64 `json:"fps"`
+	TBR    float64 `json:"tbr"`
 }
 
 // surroundRank ranks the codecs of the 5.1 surround formats the engine
@@ -509,6 +518,7 @@ func parseInfo(out []byte) (Stream, error) {
 		return s, nil
 	}
 	s := in.ytFormat.stream(in.Duration)
+	s.Videos = ytdlpVideos(in.Formats)
 	// The 5.1 surround beside it, of the best codec, then the most bits.
 	var best *ytFormat
 	for i, f := range in.Formats {

@@ -295,15 +295,8 @@ func (r *Resolver) runYTDLP(ctx context.Context, args ...string) ([]byte, error)
 // ytdlpError returns the last error line yt-dlp printed, without its
 // prefixes.
 func ytdlpError(stderr string) string {
-	lines := strings.Split(strings.TrimSpace(stderr), "\n")
-	for i := len(lines) - 1; i >= 0; i-- {
-		if line := strings.TrimSpace(lines[i]); strings.HasPrefix(line, "ERROR:") {
-			line = strings.TrimSpace(strings.TrimPrefix(line, "ERROR:"))
-			if _, rest, ok := strings.Cut(line, "] "); ok && strings.HasPrefix(line, "[") {
-				line = rest
-			}
-			return "yt-dlp: " + line
-		}
+	if line := tools.ErrorLine(stderr); line != "" {
+		return "yt-dlp: " + line
 	}
 	return ""
 }

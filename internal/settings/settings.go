@@ -179,8 +179,12 @@ type Settings struct {
 	SkipDisliked bool `json:"skipDisliked"`
 	// SkipAI passes over the tracks YouTube labels as made with AI, as the
 	// player moves on by itself.
-	SkipAI    bool      `json:"skipAi"`
-	Equalizer Equalizer `json:"equalizer"`
+	SkipAI bool `json:"skipAi"`
+	// MusicVideos shows the picture of music videos on the now playing
+	// page, in place of their cover. It is off at first: it fetches more
+	// than the sound, and shows a web page there.
+	MusicVideos bool      `json:"musicVideos"`
+	Equalizer   Equalizer `json:"equalizer"`
 	// Volume is from 0 to 1.
 	Volume float64 `json:"volume"`
 	// CacheSizeMB bounds the audio cache; 0 turns it off.

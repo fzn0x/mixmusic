@@ -27,6 +27,7 @@ func TestMain(m *testing.M) {
 	isDark = func() bool { return true }
 	setAppearance = func(mygo.ThemeSource) {}
 	copyText = func(string) {}
+	webViewProblem = func(*shell) string { return "" }
 	// The tests never open settings.json on the desktop.
 	openSettings = func(*app.System) error { opened <- "open"; return nil }
 	showSettings = func(*app.System) error { opened <- "show"; return nil }

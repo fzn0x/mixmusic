@@ -7,6 +7,7 @@ import (
 	"io"
 	"math"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
@@ -110,4 +111,35 @@ func readRange(t *testing.T, s Stream, start, end int64) int64 {
 		t.Fatal("the stream is not WebM with Opus")
 	}
 	return int64(len(b))
+}
+
+// TestLivePicture finds the picture of a music video as the now playing
+// page does, through YouTube's player API and through yt-dlp when there is
+// one, reads its index, and fetches a part of it from the middle through
+// the proxy, as the page fetches them. It runs with MIXMUSIC_LIVE=1.
+func TestLivePicture(t *testing.T) {
+	if os.Getenv("MIXMUSIC_LIVE") == "" {
+		t.Skip("set MIXMUSIC_LIVE=1 to test against YouTube")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+	r := NewResolver(nil, "")
+	r.Direct = NewDirect()
+	p := NewProxy(r)
+	for _, families := range [][]string{{"vp9", "avc1"}, {"avc1"}} {
+		pic, err := p.Picture(ctx, musicVideoID, func(vs []Video) (Video, bool) {
+			return PickVideo(vs, families, 630, 354, false)
+		})
+		if err != nil {
+			t.Fatalf("%v: %v", families, err)
+		}
+		mid := pic.Index.Segments[len(pic.Index.Segments)/2]
+		t.Logf("%v: %s, %s, %d × %d, %d bytes, init %d, %d segments, %s", families, pic.Itag, pic.MimeType, pic.Width, pic.Height,
+			pic.Size, pic.Index.Init, len(pic.Index.Segments), pic.Duration)
+		rec := httptest.NewRecorder()
+		p.ServeVideo(rec, httptest.NewRequest("GET", fmt.Sprintf("%s&range=%d-%d", VideoPath(musicVideoID, pic.Itag), mid.Start, mid.End), nil))
+		if rec.Code != http.StatusPartialContent || int64(rec.Body.Len()) != mid.End-mid.Start+1 {
+			t.Fatalf("%v: the middle part: %d, %d bytes", families, rec.Code, rec.Body.Len())
+		}
+	}
 }

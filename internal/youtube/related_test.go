@@ -27,3 +27,35 @@ func TestParseRelated(t *testing.T) {
 		t.Errorf("related misses playlists or artists: %v", kinds)
 	}
 }
+
+// TestTrackVideoType keeps the kind of video YouTube Music gives each
+// track, of videos only.
+func TestTrackVideoType(t *testing.T) {
+	shelves := sectionShelves(fixture(t, "related").get("contents", "sectionListRenderer", "contents"))
+	got := map[string]media.Track{}
+	for _, s := range shelves {
+		for _, it := range s.Items {
+			if it.Track != nil {
+				got[it.Track.ID] = *it.Track
+			}
+		}
+	}
+	for id, want := range map[string]string{
+		"yt:2fJGJdjWxGE": "MUSIC_VIDEO_TYPE_OFFICIAL_SOURCE_MUSIC",
+		"yt:TDeKxDNMfww": media.VideoUser,
+	} {
+		tr, ok := got[id]
+		if !ok {
+			t.Errorf("no track %s", id)
+			continue
+		}
+		if !tr.Video || tr.VideoType != want {
+			t.Errorf("%s: Video %v, VideoType %q, want %q", id, tr.Video, tr.VideoType, want)
+		}
+	}
+	for id, tr := range got {
+		if !tr.Video && tr.VideoType != "" {
+			t.Errorf("the song %s has the video type %q", id, tr.VideoType)
+		}
+	}
+}

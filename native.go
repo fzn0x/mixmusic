@@ -257,9 +257,12 @@ type shell struct {
 	// before, by key.
 	listTops map[string]float32
 	// cardLooks are the looks of the themes' cards in Settings, by theme,
-	// made for the themes cardThemes.
+	// made for the themes cardThemes in the layout design cardLayout.
 	cardLooks  map[string]*look
 	cardThemes []addons.Theme
+	cardLayout settings.Layout
+	// lowLayoutChoices are the layout designs' choices in Tiles' words.
+	lowLayoutChoices []choice
 	// find is the search of the settings.
 	find settingsFind
 
@@ -287,8 +290,10 @@ type shell struct {
 	recording        string
 	recordingFocused bool
 	// plainKeys are the commands' keys without modifiers that a focused
-	// control takes, as the frame's runShortcuts found them.
-	plainKeys []plainKey
+	// control takes, as the frame's runShortcuts found them;
+	// themeCommands choose the themes, made once for the add-ons.
+	plainKeys     []plainKey
+	themeCommands []command
 	// offer is the new version the window offers, until the user answers;
 	// updating is set while it downloads, updated once it is installed.
 	offer                   *app.Release
@@ -428,6 +433,12 @@ func (s *shell) refresh() {
 		s.fileNotice = &n
 	}
 	s.inv = s.svc.Addons.List()
+	// A command to choose each theme, which the frames list.
+	s.themeCommands = s.themeCommands[:0]
+	for _, t := range s.inv.Themes {
+		id := t.ID
+		s.themeCommands = append(s.themeCommands, command{"theme." + id, "Theme: " + t.Name, "", "themes", func() { s.chooseTheme(id) }})
+	}
 	s.refetch("accounts")
 	if s.offer == nil {
 		s.offer = s.svc.System.UpdateOffer()
@@ -578,7 +589,7 @@ func (s *shell) promptDialog(c *ui.Context) {
 	}
 	open := true
 	var in ui.Element
-	s.dialog(c, &open, dialogOptions{key: "prompt", title: strings.ToLower(p.title)}, func() {
+	s.dialog(c, &open, dialogOptions{key: "prompt", title: s.lk.words(p.title)}, func() {
 		in = ui.TextInput(c.Key("prompt"), &p.value).AutoFocus().Label(p.label).Width(360)
 	}, func() {
 		name := strings.TrimSpace(p.value)

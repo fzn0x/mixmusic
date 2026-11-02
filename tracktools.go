@@ -83,17 +83,18 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 	return view
 }
 
-// filterBox is the 36px outlined box that searches what a page shows, as
-// "search this playlist" does, in its own key: the user's text is query,
-// which Escape clears with clear, and goes on once it's clear. focus gives
-// the box the keyboard focus. It returns the box's input.
+// filterBox is the 36px box, outlined or, with tonal controls, filled,
+// that searches what a page shows, as "search this playlist" does, in its
+// own key: the user's text is query, which Escape clears with clear, and
+// goes on once it's clear. focus gives the box the keyboard focus. It
+// returns the box's input.
 func (s *shell) filterBox(c *ui.Context, key, placeholder, label string, query *string, focus bool, clear func()) ui.Element {
 	k := &s.lk
-	box := ui.Row(c).Height(36).Width(320).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).Radius(k.radiusSm).Cursor(ui.CursorText)
+	box := ui.Row(c).Height(36).Width(320).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).Radius(k.round(36)).Cursor(ui.CursorText)
 	var in ui.Element
 	box.Children(func() {
 		ui.Icon(c, icon("search")).FontSize(16).TextColor(k.muted)
-		in = ui.TextInputBase(c.Key(key), query).Placeholder(placeholder).Grow(1).MinWidth(0).
+		in = ui.TextInputBase(c.Key(key), query).Placeholder(k.sentence(placeholder)).Grow(1).MinWidth(0).
 			Label(label).FontSize(k.bodySize())
 		if *query != "" {
 			in.OnShortcut(0, ui.KeyEscape, clear)
@@ -102,10 +103,16 @@ func (s *shell) filterBox(c *ui.Context, key, placeholder, label string, query *
 			in.Focus()
 		}
 	})
-	if in.Focused() {
+	switch {
+	case in.Focused():
 		box.Border(2, k.accent)
-	} else {
+	case k.tonal:
+		box.Background(k.surface2)
+	default:
 		box.Border(2, k.outline)
+	}
+	if in.Focused() && k.tonal {
+		box.Background(k.surface2)
 	}
 	return in
 }

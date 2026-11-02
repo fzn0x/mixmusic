@@ -184,7 +184,7 @@ func (s *shell) findHead(c *ui.Context) {
 		// Screen readers hear the group in the link's name, as the
 		// groups of a section show a link each.
 		in := s.linkOf(c.Key("find-in-"+section), "show in "+section, "").FontSize(s.lk.smallSize()).
-			Label("Show " + group + " in " + section)
+			Label("Show " + s.lk.words(group) + " in " + section)
 		if in.Clicked() {
 			f.reveal = group
 			s.navigate(settingsPath(section, ""))

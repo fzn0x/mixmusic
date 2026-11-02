@@ -32,7 +32,7 @@ func (s *shell) installButton(c *ui.Context, key, label string) {
 				v = float64(s.installDone) / float64(s.installTotal)
 			}
 			ui.Progress(c, v).Width(200)
-			ui.Text(c, "installing yt-dlp…").FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, k.sentence("installing yt-dlp…")).FontSize(k.smallSize()).TextColor(k.muted)
 		})
 		return
 	}
@@ -96,7 +96,7 @@ func (s *shell) toolProblems(c *ui.Context) {
 // toolSettings show the tools MixMusic runs, and install yt-dlp.
 func (s *shell) toolSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, "tools", func() {
+	s.group(c, "Tools", func() {
 		st := s.toolStatus()
 		if !st.done {
 			// The search of the settings finds the tools once known.
@@ -179,7 +179,7 @@ func ownYTDLPHelp(flatpak bool) string {
 // cacheSettings show what the offline cache holds, and bound it.
 func (s *shell) cacheSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, "offline cache", func() {
+	s.group(c, "Offline cache", func() {
 		// The cache's folder is read for what it holds in every frame the
 		// row shows: the search of the settings finds the row by what it
 		// always says, without reading it.

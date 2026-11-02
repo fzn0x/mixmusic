@@ -287,9 +287,15 @@ func (s *shell) downloadMark(c *ui.Context, key string, t media.Track, on bool) 
 	k := &s.lk
 	st := s.kept.State(t.ID)
 	box := ui.Box(c.Key(key)).Size(14, 14).Shrink(0).Center()
-	ink, track := k.muted, k.muted.Alpha(0.5)
-	if on {
-		ink, track = k.accentText, k.accentText.Alpha(0.4)
+	// The current row is flooded with the accent, or, with tonal controls,
+	// filled quieter: the mark takes the inks that read there, as the
+	// source mark does.
+	ink, track, accent, danger := k.muted, k.muted.Alpha(0.5), k.accent, k.danger
+	switch {
+	case on && k.tonal:
+		ink, track, accent = k.selectedSub, k.selectedSub.Alpha(0.4), k.selectedText
+	case on:
+		ink, track, accent, danger = k.accentText, k.accentText.Alpha(0.4), k.accentText, k.accentText
 	}
 	switch st.Kind {
 	case downloads.Done:
@@ -307,10 +313,6 @@ func (s *shell) downloadMark(c *ui.Context, key string, t media.Track, on bool) 
 		if st.Progress >= 0 {
 			label = fmt.Sprintf("Downloading, %d%%", int(math.Round(st.Progress*100)))
 		}
-		accent := k.accent
-		if on {
-			accent = k.accentText
-		}
 		v := float32(max(st.Progress, 0.04))
 		box.Label(label).Tooltip(label).Draw(func(p *ui.Painter, r ui.Rect) {
 			var ring, arc ui.Path
@@ -322,10 +324,6 @@ func (s *shell) downloadMark(c *ui.Context, key string, t media.Track, on bool) 
 		})
 	case downloads.Failed:
 		label := "Couldn't download: " + st.Why
-		danger := k.danger
-		if on {
-			danger = k.accentText
-		}
 		box.Label(label).Tooltip(label).Children(func() {
 			ui.Icon(c, icon("alert")).FontSize(13).TextColor(danger)
 		})

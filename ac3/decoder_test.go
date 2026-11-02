@@ -130,6 +130,9 @@ func TestErrors(t *testing.T) {
 		b[5] = b[5]&7 | byte(id)<<3
 		return b
 	}
+	e := frames(t, readFile(t, filepath.Join("testdata", "eac3-5.1-cpl.eac3")))[0]
+	reduced := bytes.Clone(e)
+	reduced[4] |= 0xC0 // fscod 3: of the reduced sample rates
 	for _, c := range []struct {
 		name string
 		data []byte
@@ -141,6 +144,9 @@ func TestErrors(t *testing.T) {
 		{"no syncword", append([]byte{0}, f...), pcm, ErrFormat},
 		{"bsid 9", bsid(f, 9), pcm, errors.ErrUnsupported},
 		{"bsid 17", bsid(f, 17), pcm, ErrFormat},
+		{"E-AC-3 at 24 kHz", reduced, pcm, errors.ErrUnsupported},
+		{"E-AC-3 short", e[:len(e)-2], pcm, ErrFormat},
+		{"E-AC-3 no room", e, pcm[:MaxChannels*FrameLength-1], ErrBufferTooSmall},
 		{"no room", f, pcm[:len(pcm)-1], ErrBufferTooSmall},
 		{"frame and a half", append(bytes.Clone(f), f[:100]...), pcm, ErrFormat},
 	} {

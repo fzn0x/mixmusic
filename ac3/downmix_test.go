@@ -2,7 +2,6 @@ package ac3
 
 import (
 	"math"
-	"path/filepath"
 	"testing"
 )
 
@@ -14,11 +13,14 @@ func TestFFmpegDownmix(t *testing.T) {
 	haveFFmpeg(t)
 	for _, f := range fixtures {
 		t.Run(f.name, func(t *testing.T) {
-			file := filepath.Join("testdata", f.name+".ac3")
+			file := f.path()
 			data := readFile(t, file)
 			ours, d, _ := decodeAll(t, data)
 			if d.h.nfchans+b2i(d.h.lfeon) <= 2 {
 				t.Skip("two channels or one")
+			}
+			if d.h.lfemixlevcod >= 0 {
+				t.Skip("an LFE mix level, which ffmpeg's downmix leaves out")
 			}
 			m := d.Info().Downmix
 			ref := ffmpegDecode(t, file, "-downmix", "stereo")

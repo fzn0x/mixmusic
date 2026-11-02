@@ -55,7 +55,11 @@ func (s *shell) startPage() {
 func (s *shell) showPage(page ui.Element) *ui.ScrollState {
 	sp := &s.here
 	if !sp.was || sp.path != s.pagePath {
+		// The window keeps each handle bound for good: one does for
+		// every page.
+		handle := sp.scroll.Handle
 		*sp = shownPage{path: s.pagePath, pins: map[string]*pin{}, fresh: true}
+		sp.scroll.Handle = handle
 	}
 	sp.built, sp.bar, sp.room = true, nil, 0
 	if h := page.LayoutBounds().H; h > 0 {

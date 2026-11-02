@@ -72,6 +72,29 @@ func TestLyricsSwitches(t *testing.T) {
 	}
 }
 
+// TestLyricsSwitchesInBlend names the switches above the lyrics as the
+// layouts set labels: capitalised in Blend, where Tiles' are lowercase.
+func TestLyricsSwitchesInBlend(t *testing.T) {
+	s, texts := lyricsIn(t, "ko", nil)
+	st := s.svc.Preferences.Get()
+	st.Layout = settings.LayoutBlend
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+	got := texts()
+	for _, name := range []string{"Synced", "Translate", "Romanize"} {
+		if !slices.Contains(got, name) {
+			t.Errorf("%q doesn't show in Blend: %q", name, got)
+		}
+	}
+	for _, name := range []string{"translate", "romanize"} {
+		if slices.Contains(got, name) {
+			t.Errorf("%q shows lowercase in Blend", name)
+		}
+	}
+}
+
 // TestLyricsTranslated shows each line's translation under it, and its
 // romaji, under it or in its place, as the user chose for Japanese.
 func TestLyricsTranslated(t *testing.T) {

@@ -253,7 +253,7 @@ func (s *shell) lyricsSwitch(c *ui.Context, key, label, name, tip string, on *bo
 	changed := false
 	ui.Row(c).Gap(8).AlignItems(ui.Center).Shrink(0).Children(func() {
 		changed = s.switchOf(c.Key(key), on).Label(name).Tooltip(tip).Changed()
-		ui.Text(c, label).FontSize(s.lk.smallSize())
+		ui.Text(c, s.lk.sentence(label)).FontSize(s.lk.smallSize())
 	})
 	return changed
 }

@@ -35,7 +35,7 @@
           {%- endif %}
         </nav>
         {%- endif %}
-        {%- if page.extra.source is ending_with("/") %}
+        {%- if page.extra.source is ending_with(pat="/") %}
         <p class="docs-source">Made from the files of <a href="https://github.com/fzn0x/mixmusic/tree/main/{{ page.extra.source }}">{{ page.extra.source }}</a> in the repository, a file for each part.</p>
         {%- else %}
         <p class="docs-source">Made from <a href="https://github.com/fzn0x/mixmusic/blob/main/{{ page.extra.source }}">{{ page.extra.source }}</a> in the repository. <a href="https://github.com/fzn0x/mixmusic/edit/main/{{ page.extra.source }}">Edit it on GitHub</a>.</p>

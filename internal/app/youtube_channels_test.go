@@ -3,8 +3,11 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
+	"os"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/fzn0x/mixmusic/internal/youtube"
@@ -17,9 +20,8 @@ const recordsPage = "111111111111111111111"
 // channelsApp is an app signed in to YouTube Music with a session of one
 // Google account, Ada, which manages two brand channels: Ada Records, and
 // Ada Archive, which the list tells no page ID of. Its account's menu
-// answers as the brand channel the page ID of a request names, unless
-// pageless, as when YouTube takes no page ID.
-func channelsApp(t *testing.T, pageless bool) (*App, *Accounts) {
+// answers as Ada, and with records to a request of Ada Records' page ID.
+func channelsApp(t *testing.T, records http.HandlerFunc) (*App, *Accounts) {
 	t.Helper()
 	accounts := `{"actions":[{"getMultiPageMenuAction":{"menu":{"multiPageMenuRenderer":{"sections":[
 		{"accountSectionListRenderer":{"contents":[{"accountItemSectionRenderer":{"contents":[
@@ -36,8 +38,8 @@ func channelsApp(t *testing.T, pageless bool) (*App, *Accounts) {
 			w.Write([]byte(accounts))
 			return
 		}
-		if r.Header.Get("X-Goog-PageId") == recordsPage && !pageless {
-			answerMenu(w, "Ada Records", "@adarecords")
+		if r.Header.Get("X-Goog-PageId") == recordsPage {
+			records(w, r)
 			return
 		}
 		answerMenu(w, "Ada", "@ada")
@@ -64,6 +66,11 @@ func answerMenu(w http.ResponseWriter, name, handle string) {
 	})
 }
 
+// answeringAs answers the account's menu as name, of handle.
+func answeringAs(name, handle string) http.HandlerFunc {
+	return func(w http.ResponseWriter, _ *http.Request) { answerMenu(w, name, handle) }
+}
+
 // channelNamed returns the channel of list named name.
 func channelNamed(t *testing.T, list []youtube.AccountChannel, name string) youtube.AccountChannel {
 	t.Helper()
@@ -80,7 +87,7 @@ func channelNamed(t *testing.T, list []youtube.AccountChannel, name string) yout
 // page ID of, which would be the account itself: it is never the channel
 // used, and can't be chosen.
 func TestYouTubeChannelWithoutPageID(t *testing.T) {
-	a, s := channelsApp(t, false)
+	a, s := channelsApp(t, answeringAs("Ada Records", "@adarecords"))
 	ctx := context.Background()
 	list, err := s.YouTubeChannels(ctx)
 	if err != nil || len(list) != 3 {
@@ -98,34 +105,47 @@ func TestYouTubeChannelWithoutPageID(t *testing.T) {
 	}
 }
 
-// TestYouTubeChannelChecked checks, once switched to a brand channel, that
-// YouTube Music answers as it.
-func TestYouTubeChannelChecked(t *testing.T) {
-	a, s := channelsApp(t, false)
+// chooseRecords chooses Ada Records, of the channels s lists.
+func chooseRecords(t *testing.T, s *Accounts) (AccountsStatus, error) {
+	t.Helper()
 	ctx := context.Background()
-	list, _ := s.YouTubeChannels(ctx)
-	status, err := s.SetYouTubeChannel(ctx, channelNamed(t, list, "Ada Records"))
+	list, err := s.YouTubeChannels(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return s.SetYouTubeChannel(ctx, channelNamed(t, list, "Ada Records"))
+}
+
+// usesRecords fails unless a uses YouTube Music as Ada Records, and keeps
+// it in the settings.
+func usesRecords(t *testing.T, a *App) {
+	t.Helper()
+	if a.youtube.Channel() != recordsPage || a.settings.Get().YouTubeChannel != recordsPage {
+		t.Errorf("using %q, keeping %q", a.youtube.Channel(), a.settings.Get().YouTubeChannel)
+	}
+}
+
+// TestYouTubeChannelChosen uses a brand channel YouTube Music answers as.
+func TestYouTubeChannelChosen(t *testing.T) {
+	a, s := channelsApp(t, answeringAs("Ada Records", "@adarecords"))
+	status, err := chooseRecords(t, s)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if me := status.YouTube.Account; me == nil || me.Name != "Ada Records" {
 		t.Errorf("signed in as %+v", me)
 	}
-	if a.youtube.Channel() != recordsPage || a.settings.Get().YouTubeChannel != recordsPage {
-		t.Errorf("using %q, keeping %q", a.youtube.Channel(), a.settings.Get().YouTubeChannel)
-	}
+	usesRecords(t, a)
 }
 
-// TestYouTubeChannelAnswersAsAnother goes back to the account and channel
-// used before, and says so, when YouTube Music answers as another than the
-// channel chosen.
-func TestYouTubeChannelAnswersAsAnother(t *testing.T) {
-	a, s := channelsApp(t, true)
-	ctx := context.Background()
-	list, _ := s.YouTubeChannels(ctx)
-	_, err := s.SetYouTubeChannel(ctx, channelNamed(t, list, "Ada Records"))
-	if err == nil || err.Error() != "YouTube Music answered as Ada, not as Ada Records: MixMusic goes on as before" {
-		t.Errorf("choosing a channel YouTube Music doesn't answer as: %v", err)
+// TestYouTubeChannelAnswersAsAccount goes back to the account and channel
+// used before, and says so, when YouTube Music answers a brand channel's
+// requests as the Google account itself.
+func TestYouTubeChannelAnswersAsAccount(t *testing.T) {
+	a, s := channelsApp(t, answeringAs("Ada", "@ada"))
+	_, err := chooseRecords(t, s)
+	if err == nil || err.Error() != "YouTube Music answered as the account Ada, not as its channel Ada Records: MixMusic goes on as before" {
+		t.Errorf("choosing a channel YouTube Music answers as the account: %v", err)
 	}
 	if a.youtube.Channel() != "" || a.settings.Get().YouTubeChannel != "" {
 		t.Errorf("using %q, keeping %q", a.youtube.Channel(), a.settings.Get().YouTubeChannel)
@@ -136,7 +156,53 @@ func TestYouTubeChannelAnswersAsAnother(t *testing.T) {
 	if me != nil && me.Name != "Ada" {
 		t.Errorf("the profile kept is %+v", me)
 	}
-	if list, _ := s.YouTubeChannels(ctx); !channelNamed(t, list, "Ada").Current {
+	if list, _ := s.YouTubeChannels(context.Background()); !channelNamed(t, list, "Ada").Current {
 		t.Errorf("after going back: %+v", list)
 	}
+}
+
+// TestYouTubeChannelAnswersOtherwise keeps a switch YouTube Music answers
+// with a name that is neither the channel's nor the account's, as one it
+// changed since, and logs that it did, without the names.
+func TestYouTubeChannelAnswersOtherwise(t *testing.T) {
+	logs := &channelLog{}
+	log.SetOutput(logs)
+	t.Cleanup(func() { log.SetOutput(os.Stderr) })
+	a, s := channelsApp(t, answeringAs("Ada Records Official", "@adarecordsofficial"))
+	if _, err := chooseRecords(t, s); err != nil {
+		t.Fatal(err)
+	}
+	usesRecords(t, a)
+	logs.mu.Lock()
+	text := logs.b.String()
+	logs.mu.Unlock()
+	if !strings.Contains(text, "YouTube Music answers with another name than the account list gives the channel chosen") || strings.Contains(text, "Ada") {
+		t.Errorf("logged %q", text)
+	}
+}
+
+// TestYouTubeChannelProfileUnread keeps a switch when the profile YouTube
+// Music answers with can't be read.
+func TestYouTubeChannelProfileUnread(t *testing.T) {
+	a, s := channelsApp(t, func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusInternalServerError) })
+	status, err := chooseRecords(t, s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if status.YouTube.Error == "" {
+		t.Errorf("the profile read: %+v", status.YouTube)
+	}
+	usesRecords(t, a)
+}
+
+// channelLog keeps what the app logs, as several goroutines log it.
+type channelLog struct {
+	mu sync.Mutex
+	b  strings.Builder
+}
+
+func (l *channelLog) Write(p []byte) (int, error) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return l.b.Write(p)
 }

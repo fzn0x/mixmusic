@@ -37,9 +37,10 @@ func (s *Accounts) YouTubeChannels(ctx context.Context) ([]youtube.AccountChanne
 // itself without one. The home, library and likes are theirs. The account
 // stays beside the session's cookies, the channel in the settings.
 //
-// Then YouTube Music must answer as ch, by its handle or its name: else
-// MixMusic goes back to the account and channel it used before, and says
-// whom YouTube Music answered as. A channel of no name isn't checked.
+// Switched to a brand channel, YouTube Music may still answer as the
+// Google account itself, as the account list names it: MixMusic then goes
+// back to the account and channel it used before, and says so. Any other
+// answer, or none, keeps the switch.
 func (s *Accounts) SetYouTubeChannel(ctx context.Context, ch youtube.AccountChannel) (AccountsStatus, error) {
 	if !s.a.youtube.SignedIn() {
 		return AccountsStatus{}, errNotSignedIn
@@ -52,20 +53,45 @@ func (s *Accounts) SetYouTubeChannel(ctx context.Context, ch youtube.AccountChan
 	if set = set.Clean(); set.YouTubeChannel != ch.PageID || ch.AuthUser < 0 {
 		return AccountsStatus{}, errors.New("that is not a channel of the account")
 	}
+	var itself *youtube.AccountChannel
+	if ch.PageID != "" {
+		itself = s.a.youtubeAccountItself(ctx, ch)
+	}
 	wasUser, wasPage := s.a.youtube.AuthUser(), s.a.youtube.Channel()
 	if err := s.a.useYouTubeAccount(ch.AuthUser, ch.PageID); err != nil {
 		return AccountsStatus{}, err
 	}
 	status := s.a.accountsStatus(ctx)
-	if me := status.YouTube.Account; me != nil && ch.Name != "" && !ch.Is(*me) {
+	me := status.YouTube.Account
+	switch {
+	case me == nil || ch.Name == "" || ch.Is(*me):
+	case itself != nil && itself.Is(*me):
 		if err := s.a.useYouTubeAccount(wasUser, wasPage); err != nil {
 			log.Printf("mixmusic: going back to the YouTube Music account used before: %v", err)
 		}
 		notify()
-		return AccountsStatus{}, fmt.Errorf("YouTube Music answered as %s, not as %s: MixMusic goes on as before", me.Name, ch.Name)
+		return AccountsStatus{}, fmt.Errorf("YouTube Music answered as the account %s, not as its channel %s: MixMusic goes on as before", me.Name, ch.Name)
+	default:
+		log.Print("mixmusic: YouTube Music answers with another name than the account list gives the channel chosen")
 	}
 	notify()
 	return status, nil
+}
+
+// youtubeAccountItself returns the Google account itself of ch, a brand
+// channel, as the session's account list names it, or nil when the list
+// can't be read or doesn't name it.
+func (a *App) youtubeAccountItself(ctx context.Context, ch youtube.AccountChannel) *youtube.AccountChannel {
+	channels, err := a.youtube.Channels(ctx)
+	if err != nil {
+		return nil
+	}
+	for _, it := range channels {
+		if it.PageID == "" && !it.Unswitchable && it.AuthUser == ch.AuthUser && it.Email == ch.Email {
+			return &it
+		}
+	}
+	return nil
 }
 
 // useYouTubeAccount makes the client use YouTube Music as the Google

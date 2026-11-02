@@ -426,11 +426,6 @@ func TestChooseAccountAndChannel(t *testing.T) {
 			w.Write([]byte(accounts))
 			return
 		}
-		// YouTube Music answers as the brand channel the request names.
-		if r.Header.Get("X-Goog-AuthUser") == "1" && r.Header.Get("X-Goog-PageId") == "222222222222222222222" {
-			answerMenu(w, "Bob's Band", "")
-			return
-		}
 		menu(w, r)
 	})
 	s := &Accounts{a}

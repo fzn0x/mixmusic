@@ -354,8 +354,8 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 			default:
 				ch := list[i]
 				s.youtubePick = false
-				// The notice names the channel once YouTube Music answers as
-				// it: else the app says whom it answered as.
+				// The notice names the channel once switched, unless YouTube
+				// Music answered as the account itself, which the app tells.
 				s.account("", "Using YouTube Music as "+ch.Name, func(ctx context.Context) error {
 					_, err := s.svc.Accounts.SetYouTubeChannel(ctx, ch)
 					return err

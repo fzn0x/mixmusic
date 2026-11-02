@@ -262,6 +262,26 @@ func TestDownloadSettingsFound(t *testing.T) {
 	}
 }
 
+// TestDownloadsRefreshNothing dims the refresh button (#151) on the
+// downloads page, which shows only what is always current, as the liked
+// songs do: a refresh asks for nothing.
+func TestDownloadsRefreshNothing(t *testing.T) {
+	s, _ := newKeptShell(t, keptTracks...)
+	tt := tester(t, s)
+	show(s, tt, "/library/downloads")
+	tt.Frame()
+	if !tt.HasText("Teardrop") || !tt.HasText("Mezzanine") {
+		t.Fatalf("the downloads show %q", tt.Texts())
+	}
+	if len(s.shown) != 0 || !s.refreshOff {
+		t.Errorf("the downloads refresh %v", s.shown)
+	}
+	s.refreshPage()
+	if s.refreshAt != "" {
+		t.Error("a refresh of the downloads asked for something")
+	}
+}
+
 // TestDownloadMarks marks the rows of tracks downloaded, in the lists of any
 // page, and the sidebar links to the downloads.
 func TestDownloadMarks(t *testing.T) {

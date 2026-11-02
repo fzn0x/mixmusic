@@ -160,8 +160,9 @@ func parseMultiRowItem(r node, show media.Ref) (media.Item, bool) {
 	return media.Item{Kind: media.ItemTrack, Track: newEpisode(videoID, title, line, episodeArt(thumbnailList(r)))}, true
 }
 
-// parseEpisodeListItem reads a row of a search that is an episode, whose
-// title opens the episode's page, "Sep 1 • <its show>"; ok is false for
+// parseEpisodeListItem reads a row that is an episode, of a search,
+// "Sep 1 • <its show>", or of a playlist, with its length: its title opens
+// the episode's page, or its play button plays an episode. ok is false for
 // other rows.
 func parseEpisodeListItem(item node, titleRuns []node) (media.Item, bool) {
 	watch := overlayWatch(item)
@@ -179,8 +180,14 @@ func parseEpisodeListItem(item node, titleRuns []node) (media.Item, bool) {
 	for i := 1; i < len(item.get("flexColumns").list()); i++ {
 		runs = append(runs, flexRuns(item, i)...)
 	}
+	// A playlist's row tells the length in a column of its own.
+	for _, col := range item.get("fixedColumns").list() {
+		runs = append(runs, col.get("musicResponsiveListItemFixedColumnRenderer", "text").runs()...)
+	}
 	title := item.get("flexColumns", 0, "musicResponsiveListItemFlexColumnRenderer", "text").text()
-	return media.Item{Kind: media.ItemTrack, Track: newEpisode(videoID, title, parseEpisodeRuns(runs), episodeArt(thumbnailList(item)))}, true
+	t := newEpisode(videoID, title, parseEpisodeRuns(runs), episodeArt(thumbnailList(item)))
+	t.EntryID = item.get("playlistItemData", "playlistSetVideoId").str()
+	return media.Item{Kind: media.ItemTrack, Track: t}, true
 }
 
 // parseEpisodeCard reads a card of a carousel that opens an episode's

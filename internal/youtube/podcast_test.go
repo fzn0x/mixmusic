@@ -214,3 +214,22 @@ func TestLibraryPodcasts(t *testing.T) {
 		t.Errorf("request = %v", r.body)
 	}
 }
+
+// TestEpisodeInPlaylist reads an episode a playlist holds as one, with its
+// length and its place in the playlist.
+func TestEpisodeInPlaylist(t *testing.T) {
+	var v any
+	json.Unmarshal([]byte(`{
+		"flexColumns":[
+			{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"Why we dream","navigationEndpoint":{"watchEndpoint":{"videoId":"ep2"}}}]}}},
+			{"musicResponsiveListItemFlexColumnRenderer":{"text":{"runs":[{"text":"The Lab","navigationEndpoint":{"browseEndpoint":{"browseId":"UClab","browseEndpointContextSupportedConfigs":{"browseEndpointContextMusicConfig":{"pageType":"MUSIC_PAGE_TYPE_USER_CHANNEL"}}}}}]}}}],
+		"fixedColumns":[{"musicResponsiveListItemFixedColumnRenderer":{"text":{"runs":[{"text":"34:05"}]}}}],
+		"overlay":{"musicItemThumbnailOverlayRenderer":{"content":{"musicPlayButtonRenderer":{"playNavigationEndpoint":{"watchEndpoint":{"videoId":"ep2",
+			"watchEndpointMusicSupportedConfigs":{"watchEndpointMusicConfig":{"musicVideoType":"MUSIC_VIDEO_TYPE_PODCAST_EPISODE"}}}}}}}},
+		"playlistItemData":{"videoId":"ep2","playlistSetVideoId":"SET2"}}`), &v)
+	it, ok := parseListItem(node{v})
+	if !ok || it.Track == nil || !it.Track.IsEpisode() || it.Track.DurationMs != 2045000 || it.Track.EntryID != "SET2" ||
+		it.Track.ArtistNames() != "The Lab" {
+		t.Errorf("the row = %+v, %v", it.Track, ok)
+	}
+}

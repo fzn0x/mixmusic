@@ -484,7 +484,7 @@ func TestEngineCrossfadesIntoAAC(t *testing.T) {
 	e.master = newSmoother(1, glide)
 	e.SetLoudness(true)
 	t.Cleanup(e.Close)
-	e.Load(cuesFront+"#-8", 0, false, 1)
+	e.Load(cuesFront+"#-8", Cue{})
 	buffered(t, e, 0, ringFrames/2)
 	e.Play()
 	at := 188 * quantum
@@ -492,7 +492,7 @@ func TestEngineCrossfadesIntoAAC(t *testing.T) {
 	e.Preload(aacFragments + "#-11")
 	buffered(t, e, 1, ringFrames/2)
 	const fade = 300 * time.Millisecond
-	if err := e.Crossfade(aacFragments+"#-11", fade, 1); err != nil {
+	if err := e.Crossfade(aacFragments+"#-11", fade, Cue{}); err != nil {
 		t.Fatal(err)
 	}
 	got := dev.play(t, len(b)/2+4800)

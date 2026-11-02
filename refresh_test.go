@@ -142,7 +142,7 @@ func TestRefreshOneToast(t *testing.T) {
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	s.panel = "lyrics"
 	lyricsKey := "lyrics:" + testTracks[0].ID
-	s.loads[lyricsKey] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Source: "LRCLIB", Lines: []lyrics.Line{{Text: "Waiting in a car"}}}}
+	s.loads[lyricsKey] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Source: "LRCLIB", Lines: []lyrics.Line{{Text: "Paper boats on the river"}}}}
 	tt := tester(t, s)
 	badAlbum(s)
 	show(s, tt, "/album/al-x")
@@ -157,7 +157,7 @@ func TestRefreshOneToast(t *testing.T) {
 	if got := refreshToasts(tt); len(got) != 1 {
 		t.Errorf("two asks that failed showed the toasts %q", got)
 	}
-	if !tt.HasText("Waiting in a car") {
+	if !tt.HasText("Paper boats on the river") {
 		t.Errorf("the panel dropped its lyrics: %q", tt.Texts())
 	}
 }

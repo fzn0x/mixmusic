@@ -125,6 +125,11 @@ func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 			t.Fatal(err)
 		}
 	}
+	// The tests were written for the words of the Tiles layout, as a user
+	// who chose it: the design tests choose the others.
+	if err := os.WriteFile(filepath.Join(dir, "data", "settings.json"), []byte(`{"layout": "tiles"}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	opts := app.Options{DataDir: filepath.Join(dir, "data"), CacheDir: filepath.Join(dir, "cache"),
 		LogsDir: filepath.Join(dir, "logs"), Builtin: builtin.FS, Version: "0.4.0"}
 	if set != nil {
@@ -315,7 +320,8 @@ func TestRenderThemes(t *testing.T) {
 		id      string
 		options map[string]string
 	}{{"mix", nil}, {"mix", map[string]string{"texture": "slashes", "white-tiles": "true"}}, {"aurora", nil}, {"sakura", nil}, {"terminal", nil}, {"daylight", nil},
-		{"greenroom", nil}, {"glasshouse", nil}, {"anime", nil}, {"mochi", nil}} {
+		{"greenroom", nil}, {"glasshouse", nil}, {"anime", nil}, {"mochi", nil}, {"material", nil}, {"material-dark", nil},
+		{"walnut", nil}, {"walnut-light", nil}} {
 		st := s.svc.Preferences.Get()
 		st.FollowSystem, st.Theme = false, theme.id
 		st.ThemeOptions = map[string]map[string]string{theme.id: theme.options}

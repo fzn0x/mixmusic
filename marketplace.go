@@ -26,7 +26,7 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 		if reg.done && reg.err == nil {
 			counts = []int{len(reg.value.Themes), len(reg.value.Plugins)}
 		}
-		s.pageHeaderCounts(c, "marketplace", marketTabs, counts, &selected)
+		s.pageHeaderCounts(c, "Marketplace", marketTabs, counts, &selected)
 		if selected != before {
 			s.router.Replace("/marketplace/" + marketTabs[selected])
 		}
@@ -131,25 +131,25 @@ func (s *shell) marketCard(c *ui.Context, kind addons.Kind, e addons.Entry, base
 			}
 		})
 		ui.Column(c).Padding(16).Gap(6).Children(func() {
-			ui.Text(c, strings.ToLower(e.Name)).FontSize(k.size(1.5)).FontWeight(300).Font(k.display).SingleLine()
+			ui.Text(c, k.words(e.Name)).FontSize(k.size(1.5)).FontWeight(k.titleWeight()).Font(k.display).SingleLine()
 			ui.Text(c, e.Version+" · by "+e.Author).FontSize(k.captionSize()).TextColor(k.muted)
 			if e.Description != "" {
 				ui.Text(c, e.Description).FontSize(k.smallSize()).MaxLines(3)
 			}
 			if len(e.Permissions) > 0 {
-				ui.Text(c, "asks for "+strings.Join(e.Permissions, ", ")).FontSize(k.captionSize()).TextColor(k.muted)
+				ui.Text(c, k.sentence("asks for "+strings.Join(e.Permissions, ", "))).FontSize(k.captionSize()).TextColor(k.muted)
 			}
 			ui.Row(c).Gap(8).Margin(8, 0, 0).Children(func() {
 				busy := s.installingAddon == e.ID
 				switch {
 				case builtin:
-					ui.Text(c, "built in").FontSize(k.smallSize()).TextColor(k.muted)
+					ui.Text(c, k.sentence("built in")).FontSize(k.smallSize()).TextColor(k.muted)
 				case has && !outdated:
 					if s.button(c, "remove-"+e.ID, "remove", false).Disabled(busy).Clicked() {
 						s.uninstall(kind, e)
 					}
 				case kind == addons.KindPlugin && e.API != addons.PluginAPI:
-					ui.Text(c, "made for an older MixMusic").FontSize(k.smallSize()).TextColor(k.muted)
+					ui.Text(c, k.sentence("made for an older MixMusic")).FontSize(k.smallSize()).TextColor(k.muted)
 				default:
 					label := "install"
 					switch {
@@ -173,7 +173,7 @@ func (s *shell) marketCard(c *ui.Context, kind addons.Kind, e addons.Entry, base
 					if use.Clicked() {
 						s.chooseTheme(e.ID)
 					}
-					use.Children(func() { ui.Text(c, "use it").FontSize(k.smallSize()).TextColor(k.accent) })
+					use.Children(func() { ui.Text(c, k.sentence("use it")).FontSize(k.smallSize()).TextColor(k.accent) })
 				}
 			})
 		})

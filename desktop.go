@@ -13,7 +13,7 @@ import (
 )
 
 func (s *shell) desktopSettings(c *ui.Context) {
-	s.group(c, "on the desktop", func() {
+	s.group(c, "On the desktop", func() {
 		toggle := func(key, title, description string, v *bool, words ...string) {
 			s.row(c, title, description, func() {
 				if s.switchOf(c.Key(key), v).Label(title).Changed() {
@@ -207,7 +207,7 @@ func (s *shell) updateSettings(c *ui.Context) {
 	if u.Kind == "development" {
 		return
 	}
-	s.group(c, "updates", func() {
+	s.group(c, "Updates", func() {
 		asks := ""
 		switch {
 		case u.Enabled && !u.AutomaticDownloads:

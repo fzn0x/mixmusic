@@ -64,7 +64,7 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 			pick = -1
 		}
 		before := pick
-		s.pageHeader(c, "settings", settingsTabs, &pick)
+		s.pageHeader(c, "Settings", settingsTabs, &pick)
 		if pick != before {
 			s.router.Replace(settingsPath(settingsTabs[pick], ""))
 		}
@@ -132,12 +132,13 @@ func (s *shell) group(c *ui.Context, title string, rows func()) { s.groupWith(c,
 // While the user searches the settings, it shows what the search finds of
 // them (findGroup).
 func (s *shell) groupWith(c *ui.Context, title string, links, rows func()) {
+	k := &s.lk
 	f := &s.find
 	if f.on() {
 		s.findGroup(c, title, links, rows)
 		return
 	}
-	g := ui.Column(c).Margin(0, 0, 48)
+	g := ui.Column(c).Margin(0, 0, k.sections())
 	// The group a search's link showed in its section comes into view.
 	if f.reveal != "" && f.reveal == title && f.current {
 		f.reveal = ""
@@ -145,7 +146,11 @@ func (s *shell) groupWith(c *ui.Context, title string, links, rows func()) {
 	}
 	g.Children(func() {
 		s.sectionHead(c, title, links)
-		ui.Column(c).Dividers(1, s.lk.border).Children(rows)
+		group := ui.Column(c).Dividers(1, k.border)
+		if k.cards {
+			group.Background(k.surface).Radius(k.radiusSm+k.cardPad()).Padding(4, 2*k.cardPad())
+		}
+		group.Children(rows)
 	})
 }
 
@@ -268,9 +273,35 @@ func (s *shell) openFolder(kind addons.Kind) {
 	}
 }
 
+// layoutChoices are the layout designs, in the order of settings.Layouts,
+// as Settings › Appearance offers them.
+var layoutChoices = []choice{
+	{"Blend", "Expressive's rounded shapes and springy motion, on Crate's dense rows, big covers in cards and bold headings. The default.", false},
+	{"Expressive", "Playful and colourful: tonal fills, big rounded shapes, pill buttons, a floating player bar and springy motion. The Material themes go with it, their colours made of the cover's.", false},
+	{"Crate", "Restrained: dense rows, big covers in cards and bold, tight headings, so that the covers do the work.", false},
+	{"Tiles", "Flat tiles, giant light lowercase words and outlined boxes, as MixMusic first was.", false},
+}
+
 func (s *shell) appearanceSettings(c *ui.Context) {
 	k := &s.lk
-	s.groupWith(c, "theme", func() {
+	s.group(c, "Layout", func() {
+		layout := slices.Index(settings.Layouts, s.set.Layout)
+		options := layoutChoices
+		if k.headings == headingsLight {
+			// Tiles' own words are lowercase, as its other choices.
+			options = s.lowLayoutChoices[:0]
+			for _, o := range layoutChoices {
+				o.title = k.words(o.title)
+				options = append(options, o)
+			}
+			s.lowLayoutChoices = options
+		}
+		if s.choices(c, "layout", "Layout", &layout, options) {
+			s.set.Layout = settings.Layouts[layout]
+			s.save()
+		}
+	})
+	s.groupWith(c, "Theme", func() {
 		if s.link(c, "more-themes", "get more themes") {
 			s.navigate("/marketplace/themes")
 		}
@@ -326,7 +357,7 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			}
 		})
 	}
-	s.group(c, "colour and type", func() {
+	s.group(c, "Colour and type", func() {
 		s.colorFileSettings(c)
 		artwork, accent := "Take the accent colour from the artwork of what plays.", "Replaces the theme's accent when the artwork does not set it."
 		if s.set.ColorSource != settings.ColorsTheme {
@@ -406,6 +437,9 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 	tk := s.cardLook(id)
 	card := s.buttonBase(c.Key("theme-"+id)).Width(200).Height(124).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 		Padding(14).Background(tk.bg).Border(1, tk.border).Label(name).Cursor(ui.CursorPointer)
+	if k.cards {
+		card.Radius(k.radiusSm)
+	}
 	if current {
 		card.Border(3, k.accent)
 	}
@@ -413,7 +447,7 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 		s.chooseTheme(id)
 	}
 	card.Children(func() {
-		ui.Text(c, name).FontSize(k.size(1.5)).FontWeight(300).Font(tk.display).TextColor(tk.text).SingleLine()
+		ui.Text(c, name).FontSize(k.size(1.5)).FontWeight(tk.titleWeight()).Font(tk.display).TextColor(tk.text).SingleLine()
 		ui.Row(c).Gap(4).Children(func() {
 			for i := range 4 {
 				ui.Box(c).Size(22, 22).Background(tk.tile(i))
@@ -434,15 +468,17 @@ func themeBy(t addons.Theme) string {
 // cardLook is the look of theme id's card, made once for the themes
 // installed: a look lists the system's fonts, which takes a while, and the
 // cards show every theme in every frame. A card's look is the theme's own,
-// whatever the settings and the computer's light or dark.
+// in the layout design chosen, whatever the other settings and the
+// computer's light or dark.
 func (s *shell) cardLook(id string) *look {
 	themes := s.inv.Themes
-	if s.cardLooks == nil || len(themes) != len(s.cardThemes) || len(themes) > 0 && &themes[0] != &s.cardThemes[0] {
-		s.cardLooks, s.cardThemes = map[string]*look{}, themes
+	if s.cardLooks == nil || len(themes) != len(s.cardThemes) || len(themes) > 0 && &themes[0] != &s.cardThemes[0] ||
+		s.cardLayout != s.set.Layout {
+		s.cardLooks, s.cardThemes, s.cardLayout = map[string]*look{}, themes, s.set.Layout
 	}
 	tk, ok := s.cardLooks[id]
 	if !ok {
-		l := newLook(settings.Settings{Theme: id, FontScale: 1}, themes, false, "", colorfile.Colors{})
+		l := newLook(settings.Settings{Theme: id, FontScale: 1, Layout: s.set.Layout}, themes, false, "", colorfile.Colors{})
 		tk = &l
 		s.cardLooks[id] = tk
 	}
@@ -705,7 +741,7 @@ func (s *shell) colorFileRow(c *ui.Context, source settings.ColorSource, shown, 
 				s.set.ColorFile = settings.CleanPath(path)
 				s.save()
 			})
-			in.Placeholder("path to a colour file").Width(260).Label("Colour file")
+			in.Placeholder(k.sentence("path to a colour file")).Width(260).Label("Colour file")
 			if s.button(c, "choose-color-file", "choose", false).Label("Choose a colour file").Clicked() {
 				s.chooseColorFile()
 			}
@@ -775,7 +811,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 	k := &s.lk
 	sp := s.accounts().Spotify
 	signedIn := sp.SignedIn
-	s.group(c, "spotify tracks", func() {
+	s.group(c, "Spotify tracks", func() {
 		here := "MixMusic plays them itself, at Spotify's own quality, and shows among your Spotify devices. Needs Spotify Premium, and no Spotify app."
 		if !spotifyPlaysHere {
 			here = "This computer's webview can't play Spotify's protected audio, so MixMusic can't play Spotify itself."
@@ -783,9 +819,9 @@ func (s *shell) playbackSettings(c *ui.Context) {
 		modes := []settings.SpotifyPlayback{settings.SpotifyPlaybackHere, settings.SpotifyPlaybackConnect, settings.SpotifyPlaybackMatch}
 		mode := slices.Index(modes, s.set.SpotifyPlayback)
 		if s.choices(c, "spotify-mode", "How Spotify tracks play", &mode, []choice{
-			{"in mixmusic, from spotify", here, !spotifyPlaysHere},
-			{"on spotify connect", "Your Spotify app, or another Spotify device, plays them, at Spotify's own quality. Needs Spotify Premium and a device with Spotify open.", false},
-			{"in mixmusic, from youtube music", "MixMusic plays their recording on YouTube Music, with the equalizer, crossfade and visualizer. Works without Premium.", false},
+			{k.words("In MixMusic, from Spotify"), here, !spotifyPlaysHere},
+			{k.words("On Spotify Connect"), "Your Spotify app, or another Spotify device, plays them, at Spotify's own quality. Needs Spotify Premium and a device with Spotify open.", false},
+			{k.words("In MixMusic, from YouTube Music"), "MixMusic plays their recording on YouTube Music, with the equalizer, crossfade and visualizer. Works without Premium.", false},
 		}) {
 			s.set.SpotifyPlayback = modes[mode]
 			s.save()
@@ -821,7 +857,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 			s.deviceRow(c)
 		}
 	})
-	s.group(c, "sound", func() {
+	s.group(c, "Sound", func() {
 		s.row(c, "Quality", "Data saver streams smaller files of YouTube Music.", func() {
 			saver := 0
 			if s.set.Quality == settings.QualitySaver {
@@ -933,7 +969,7 @@ func (s *shell) deviceRow(c *ui.Context) {
 func (s *shell) equalizerSettings(c *ui.Context) {
 	k := &s.lk
 	eq := &s.set.Equalizer
-	s.group(c, "equalizer", func() {
+	s.group(c, "Equalizer", func() {
 		s.row(c, "Equalizer", "Shape the sound of YouTube Music with ten bands and a preamp.", func() {
 			if s.switchOf(c.Key("eq-on"), &eq.Enabled).Label("Equalizer").Changed() {
 				s.save()
@@ -1046,7 +1082,7 @@ func (s *shell) aboutSettings(c *ui.Context) {
 	k := &s.lk
 	info := s.svc.System.Info()
 	u := s.svc.System.Updates()
-	s.group(c, "mixmusic", func() {
+	s.group(c, "MixMusic", func() {
 		version := "MixMusic " + info.Version + " · " + info.Platform + " " + info.Arch
 		if build, ok := buildNames[u.Kind]; ok {
 			version += " · " + build
@@ -1080,7 +1116,7 @@ func (s *shell) aboutSettings(c *ui.Context) {
 		})
 	})
 	s.updateSettings(c)
-	s.group(c, "licenses", func() {
+	s.group(c, "Licenses", func() {
 		for i, n := range append(s.svc.System.Notices(), fontNotices()...) {
 			open := s.licenseOpen == i
 			// A license's text shows with its row.

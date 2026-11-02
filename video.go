@@ -297,17 +297,27 @@ func (s *shell) videoProblem() string {
 	return v.problem
 }
 
+// hasPicture reports whether what st plays is a music video whose picture
+// the now playing page can show: one the engine plays, unless live. A live
+// stream keeps its cover, as a song does: the page plays the parts of a
+// stream of a length, which its index tells, at the engine's time in it,
+// while a live stream's picture comes in the segments of a playlist that
+// grows as it goes on, and the engine's time is how long it played.
+func hasPicture(st player.State) bool {
+	src := st.Source
+	return src != nil && src.Mode == player.ModeStream && src.Track.MusicVideo() && !st.Live
+}
+
 // videoTrack returns the recording that plays, when the now playing page
 // shows its picture: a music video playing in the engine, with the setting
 // on, a web view to show it, and the mini player closed, the main window
 // showing no picture while it is open.
 func (s *shell) videoTrack() (media.Track, bool) {
-	src := s.st.Source
-	if !s.set.MusicVideos || src == nil || src.Mode != player.ModeStream || !src.Track.MusicVideo() ||
-		s.video.broken[src.Track.ID] || s.videoProblem() != "" || s.svc.System.MiniPlayerOpen() {
+	if !s.set.MusicVideos || !hasPicture(s.st) || s.video.broken[s.st.Source.Track.ID] ||
+		s.videoProblem() != "" || s.svc.System.MiniPlayerOpen() {
 		return media.Track{}, false
 	}
-	return src.Track, true
+	return s.st.Source.Track, true
 }
 
 // sleeve is the now playing page's sleeve, size wide: the cover, with the
@@ -640,8 +650,7 @@ func (s *shell) closeVideo() {
 // videoToggle shows or hides the picture of music videos, beside the
 // transport, while a music video plays where its picture can show.
 func (s *shell) videoToggle(c *ui.Context) {
-	src := s.st.Source
-	if src == nil || src.Mode != player.ModeStream || !src.Track.MusicVideo() || s.videoProblem() != "" {
+	if !hasPicture(s.st) || s.videoProblem() != "" {
 		return
 	}
 	label := "Show the video"

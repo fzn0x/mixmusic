@@ -458,6 +458,49 @@ func TestNowPlayingSongKeepsItsCover(t *testing.T) {
 	}
 }
 
+// TestNowPlayingLiveVideoKeepsItsCover keeps the cover of a music video
+// that plays live, as a song's, with no button to show its picture: the
+// page plays a stream of a length at the engine's time in it, and a live
+// stream has neither. Its picture isn't looked for, nor taken for broken,
+// so that its recording shows one once the broadcast ended.
+func TestNowPlayingLiveVideoKeepsItsCover(t *testing.T) {
+	track := musicVideo()
+	track.ID = "yt:liveVideo01"
+	s, tt, page, _ := videoShell(t, track)
+	if !s.p.State().Live {
+		t.Fatal("the music video doesn't play live")
+	}
+	// Its picture's stream is held already: it still doesn't show.
+	tt.Advance(time.Second)
+	if _, ok := tt.Find("Music video: " + track.Title); ok {
+		t.Error("a live stream shows a picture")
+	}
+	if _, ok := tt.Find("Visualizer"); !ok {
+		t.Error("no visualizer over the live stream's cover")
+	}
+	for _, label := range []string{"Show the cover", "Show the video"} {
+		if _, ok := tt.Find(label); ok {
+			t.Errorf("a live stream offers %q", label)
+		}
+	}
+	// Nor is it looked for.
+	for key := range s.loads {
+		if strings.HasPrefix(key, "video:") {
+			delete(s.loads, key)
+		}
+	}
+	tt.Advance(time.Second)
+	for key := range s.loads {
+		if strings.HasPrefix(key, "video:") {
+			t.Errorf("a live stream's picture is looked for: %s", key)
+		}
+	}
+	page.none(t)
+	if s.video.shown || s.video.lastSrc != nil || s.video.broken[track.ID] {
+		t.Errorf("a live stream's picture: shown %v, sent %v, broken %v", s.video.shown, s.video.lastSrc != nil, s.video.broken[track.ID])
+	}
+}
+
 // TestNowPlayingVideoReducedMotion keeps the cover while the system asks
 // for less motion, with a button that plays the picture.
 func TestNowPlayingVideoReducedMotion(t *testing.T) {

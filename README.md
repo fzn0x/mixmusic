@@ -53,6 +53,14 @@ both services in one player:
 
 ## Features
 
+### New in 0.5.7
+
+- **Linux x64 starts again.** 0.5.6's x64 downloads didn't start outside
+  NixOS. If yours updated itself to 0.5.6, install 0.5.7 again.
+- **Radios of songs.** After a music video, Autoplay and Start radio carry
+  on with songs, not more videos.
+- **A Flatpak** for Linux on x64, in the downloads below.
+
 ### New in 0.5.6
 
 - **Zoom.** <kbd>Ctrl</kbd> <kbd>=</kbd> and <kbd>Ctrl</kbd> <kbd>-</kbd>

@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/tools"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
@@ -361,6 +362,22 @@ func TestPasteCookies(t *testing.T) {
 	kept, err := a.youtubeStore.Load()
 	if err != nil || !slices.Contains(cookieNames(kept.cookies), "SAPISID=pasted") {
 		t.Errorf("kept %q, %v", cookieNames(kept.cookies), err)
+	}
+}
+
+// TestSignInKeepsSettingsEdits forgets the channel of the session before,
+// and keeps what an edit of settings.json changed since MixMusic read it.
+func TestSignInKeepsSettingsEdits(t *testing.T) {
+	a, _ := cookieApp(t, signedIn(true))
+	if _, err := (&Preferences{a}).Update(func(set *settings.Settings) { set.YouTubeChannel = "123456789012345678901" }); err != nil {
+		t.Fatal(err)
+	}
+	writeSettings(t, a.settings.Path(), `{"youtubeChannel": "123456789012345678901", "crossfade": 7}`)
+	if _, err := (&Accounts{a}).YouTubePasteCookies(context.Background(), "SAPISID=pasted"); err != nil {
+		t.Fatal(err)
+	}
+	if set := a.settings.Get(); set.YouTubeChannel != "" || set.Crossfade != 7 {
+		t.Errorf("after signing in, the channel is %q and the crossfade %d", set.YouTubeChannel, set.Crossfade)
 	}
 }
 

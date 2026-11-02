@@ -372,9 +372,10 @@ func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (Accoun
 		}
 		return AccountsStatus{}, fmt.Errorf("YouTube Music did not accept the sign-in: %w", err)
 	}
-	if set := a.settings.Get(); set.YouTubeChannel != "" {
-		set.YouTubeChannel = ""
-		if err := a.settings.Set(set); err != nil {
+	// As signing out does: over the settings as they are now, which an
+	// edit of settings.json may have changed since they were read.
+	if a.settings.Get().YouTubeChannel != "" {
+		if err := a.settings.Update(func(set *settings.Settings) error { set.YouTubeChannel = ""; return nil }); err != nil {
 			log.Printf("mixmusic: forgetting the YouTube Music channel: %v", err)
 		}
 	}

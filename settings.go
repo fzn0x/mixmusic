@@ -702,8 +702,9 @@ func (s *shell) playbackSettings(c *ui.Context) {
 func (s *shell) speedSettings(c *ui.Context) {
 	s.group(c, "speed", func() {
 		s.speedRow(c, "song-speed", "Songs", "Speed of songs", &s.set.SongSpeed)
-		// Spotify's players have no speed to set.
-		s.hint(c, "Speed changes what MixMusic plays itself: YouTube Music, and Spotify tracks played from it. Tracks Spotify plays, in MixMusic or on Spotify Connect, keep their own speed.")
+		// Spotify's players have no speed to set, and a live stream has
+		// nothing ahead of its live edge to play faster.
+		s.hint(c, "Speed changes what MixMusic plays itself: YouTube Music, and Spotify tracks played from it. Tracks Spotify plays, in MixMusic or on Spotify Connect, keep their own speed. So do live streams, which play as they're broadcast.")
 	})
 }
 

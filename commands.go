@@ -98,7 +98,8 @@ func (s *shell) stepSpeed(dir int) {
 }
 
 // setSongSpeed sets the speed of songs, the kind of track that plays, and
-// tells it: a Spotify device plays its track at its own.
+// tells it: a Spotify device plays its track at its own, as a live stream
+// plays.
 func (s *shell) setSongSpeed(v float64) {
 	s.set.SongSpeed = settings.CleanSpeed(v)
 	s.save()
@@ -106,8 +107,11 @@ func (s *shell) setSongSpeed(v float64) {
 	if s.set.SongSpeed != 1 {
 		msg = "Songs play at " + speedLabel(s.set.SongSpeed)
 	}
-	if src := s.st.Source; src != nil && src.Mode != player.ModeStream {
+	switch src := s.st.Source; {
+	case src != nil && src.Mode != player.ModeStream:
 		msg += " — Spotify plays this one at its own speed"
+	case s.st.Live:
+		msg += " — this live stream plays at its own speed"
 	}
 	s.notes = append(s.notes, notice(msg))
 }

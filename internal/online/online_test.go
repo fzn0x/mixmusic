@@ -201,3 +201,88 @@ func TestWaitEndsWithItsContext(t *testing.T) {
 		t.Errorf("Wait = %v", err)
 	}
 }
+
+// TestOnChange tells when the network went and came back, once each, as
+// checks and audio tell it.
+func TestOnChange(t *testing.T) {
+	f := &fakeProbe{}
+	f.up.Store(true)
+	w := New(f.probe)
+	var mu sync.Mutex
+	var got []bool
+	cancel := w.OnChange(func(ok bool) {
+		mu.Lock()
+		defer mu.Unlock()
+		got = append(got, ok)
+	})
+	told := func() []bool {
+		mu.Lock()
+		defer mu.Unlock()
+		return append([]bool(nil), got...)
+	}
+	ctx := context.Background()
+	w.Check(ctx) // up, as at first: nothing to tell
+	f.up.Store(false)
+	w.Kick()
+	w.Check(ctx)
+	w.Kick()
+	w.Check(ctx) // still gone
+	w.Seen()     // audio came
+	if g := told(); len(g) != 2 || g[0] || !g[1] {
+		t.Errorf("told %v, want [false true]", g)
+	}
+	cancel()
+	w.Kick()
+	w.Check(ctx)
+	if g := told(); len(g) != 2 {
+		t.Errorf("told %v after cancel", g)
+	}
+}
+
+// TestOnChangeToldBeforeTheAnswer tells the listeners that the network
+// went before the check that found it returns, so that they hear the turns
+// in order: audio that comes after the check tells of the way back after.
+func TestOnChangeToldBeforeTheAnswer(t *testing.T) {
+	f := &fakeProbe{}
+	f.up.Store(true)
+	w := New(f.probe)
+	var mu sync.Mutex
+	var got []bool
+	defer w.OnChange(func(ok bool) {
+		if !ok {
+			// A listener slower than the check's caller.
+			time.Sleep(20 * time.Millisecond)
+		}
+		mu.Lock()
+		defer mu.Unlock()
+		got = append(got, ok)
+	})()
+	ctx := context.Background()
+	w.Check(ctx)
+	f.up.Store(false)
+	w.Kick()
+	w.Check(ctx)
+	w.Seen()
+	mu.Lock()
+	defer mu.Unlock()
+	if len(got) != 2 || got[0] || !got[1] {
+		t.Errorf("told %v, want [false true]", got)
+	}
+}
+
+// TestOnChangeLatest leaves out a turn that another came after before it
+// was told, so that what the listeners hear last is the answer.
+func TestOnChangeLatest(t *testing.T) {
+	w := New(nil)
+	var got []bool
+	defer w.OnChange(func(ok bool) { got = append(got, ok) })()
+	w.mu.Lock()
+	gone, back := w.turn(true), w.turn(true)
+	w.mu.Unlock()
+	w.tell(back, true)
+	w.tell(gone, false)
+	w.tell(0, false)
+	if len(got) != 1 || !got[0] {
+		t.Errorf("told %v, want [true]", got)
+	}
+}

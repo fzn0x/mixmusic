@@ -60,12 +60,23 @@ type Player struct{ a *App }
 // Prepare finds how to play a track: the URL of its audio, found ahead so
 // that errors such as YouTube refusing it show before playback starts, a
 // Spotify Connect device, or Spotify in MixMusic.
+//
+// While the network is known to be gone, a Spotify track that plays
+// through Spotify plays from its download, or the offline cache, instead,
+// or can't play: no Spotify device would play it.
 func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource, error) {
 	if track.Source == media.SourceSpotify {
-		switch p.a.settings.Get().SpotifyPlayback {
-		case settings.SpotifyPlaybackConnect:
-			return PlaybackSource{Mode: PlaybackConnect, Track: track}, nil
-		case settings.SpotifyPlaybackHere:
+		mode := p.a.settings.Get().SpotifyPlayback
+		if mode == settings.SpotifyPlaybackConnect || mode == settings.SpotifyPlaybackHere {
+			if p.a.offline() {
+				if p.a.playsOffline(track) {
+					return p.PrepareStream(ctx, track)
+				}
+				return PlaybackSource{}, player.ErrOffline
+			}
+			if mode == settings.SpotifyPlaybackConnect {
+				return PlaybackSource{Mode: PlaybackConnect, Track: track}, nil
+			}
 			return PlaybackSource{Mode: PlaybackSpotify, Track: track}, nil
 		}
 	}
@@ -78,27 +89,51 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 // play. It keeps how loud YouTube measured the track, or asks, for the
 // engine to play it at an even loudness: a live stream has no measure.
 // It tells the 5.1 surround audio of the track too, when YouTube has some.
+// The downloads are told whether the video it found is live, as one
+// doesn't download.
+//
+// A track downloaded plays from its download, without the network, also
+// while it answers, in stereo: downloads hold no 5.1 audio. While the
+// network is known to be gone, a Spotify track plays from its recording
+// only when it was found before: searching for it would wait for the
+// network.
 func (p *Player) PrepareStream(ctx context.Context, track media.Track) (PlaybackSource, error) {
-	yt, err := p.a.matcher.Match(ctx, track)
-	if err != nil {
-		return PlaybackSource{}, p.a.offlineErr(ctx, err)
+	if k, ok := p.a.downloads.Lookup(track.ID); ok {
+		p.learnLoudness(k.Video)
+		return PlaybackSource{Mode: PlaybackStream, URL: streamURL(k.Video), Track: k.Track, Cached: true}, nil
+	}
+	var yt media.Track
+	if p.a.offline() {
+		known, ok := p.a.matcher.Matched(track)
+		if !ok {
+			return PlaybackSource{}, player.ErrOffline
+		}
+		yt = known
+	} else {
+		found, err := p.a.matcher.Match(ctx, track)
+		if err != nil {
+			return PlaybackSource{}, p.a.offlineErr(ctx, err)
+		}
+		yt = found
 	}
 	_, videoID, err := media.ParseID(yt.ID)
 	if err != nil {
 		return PlaybackSource{}, err
 	}
-	base := schemeURL(streamScheme)
-	src := PlaybackSource{Mode: PlaybackStream, URL: base + strings.TrimPrefix(stream.Path(videoID), "/"), Track: yt}
-	surroundURL := base + strings.TrimPrefix(stream.SurroundPath(videoID), "/")
-	surround := p.a.settings.Get().Surround
-	offline := p.a.online != nil && p.a.online.Offline()
-	if cachedSurround := p.a.cache.Has(stream.SurroundKey(videoID)); cachedSurround || p.a.cache.Has(videoID) {
+	src := PlaybackSource{Mode: PlaybackStream, URL: streamURL(videoID), Track: yt}
+	surroundURL := schemeURL(streamScheme) + strings.TrimPrefix(stream.SurroundPath(videoID), "/")
+	offline := p.a.offline()
+	// The stereo audio of its recording may be downloaded for another
+	// track.
+	stereo := p.a.downloads.Snapshot().HasVideo(videoID) || p.a.cache.Has(videoID)
+	if cachedSurround := p.a.cache.Has(stream.SurroundKey(videoID)); cachedSurround || stereo {
+		surround := p.a.settings.Get().Surround
 		if cachedSurround {
 			src.SurroundURL = surroundURL
 		}
-		// With 5.1 on, a track cached in stereo plays its 5.1 audio when
+		// With 5.1 on, a track held in stereo plays its 5.1 audio when
 		// YouTube has some, which takes asking it while the network
-		// answers, for up to surroundWait: else it plays from the cache,
+		// answers, for up to surroundWait: else it plays what is held,
 		// and the answer, which comes on, is there for its next play.
 		if surround && !cachedSurround && !offline {
 			ask, cancel := context.WithTimeout(ctx, surroundWait)
@@ -107,11 +142,11 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 			}
 			cancel()
 		}
-		// It plays from the cache when the audio it plays is there.
+		// It plays without the network when the audio it plays is held.
 		if surround && src.SurroundURL != "" {
 			src.Cached = cachedSurround
 		} else {
-			src.Cached = p.a.cache.Has(videoID)
+			src.Cached = stereo
 		}
 		// A track cached before MixMusic kept measures gets one now.
 		p.learnLoudness(videoID)
@@ -120,7 +155,9 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	// A stream found before plays without the network, as the engine may
 	// hold its audio already; yt-dlp needs the network to find one.
 	if p.a.resolver.Fresh(videoID) {
-		if p.a.resolver.Live(videoID) {
+		live := p.a.resolver.Live(videoID)
+		p.a.downloads.SetLive(videoID, live)
+		if live {
 			return liveSource(src, videoID), nil
 		}
 		// Resolve gives what it found at once.
@@ -138,6 +175,7 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	if err != nil {
 		return PlaybackSource{}, err
 	}
+	p.a.downloads.SetLive(videoID, s.Live)
 	if s.Live {
 		return liveSource(src, videoID), nil
 	}
@@ -188,16 +226,23 @@ func (p *Player) StreamFailure(track media.Track) string {
 }
 
 // ForgetMatch drops the YouTube Music recording found for a Spotify track,
-// so that the next play searches again. The player no longer skips the
-// track for the label of the recording it drops.
+// so that the next play searches again. A track downloaded downloads
+// again, as its new match, and the player no longer skips the track for
+// the label of the recording it drops.
 func (p *Player) ForgetMatch(trackID string) error {
 	if err := p.a.matcher.Forget(trackID); err != nil {
 		return err
 	}
+	p.a.downloads.Rematch(trackID)
 	if gp := p.a.goPlayer.Load(); gp != nil {
 		gp.ForgetLabel(trackID)
 	}
 	return nil
+}
+
+// streamURL is the address of a video's audio, which the engine opens.
+func streamURL(videoID string) string {
+	return schemeURL(streamScheme) + strings.TrimPrefix(stream.Path(videoID), "/")
 }
 
 // Report tells the app what the player plays, for the tray, the main

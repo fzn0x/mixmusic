@@ -203,8 +203,12 @@ func (p *Player) pastEnd(m *move) {
 
 // goTo plays the entry at i, which the move m reached, unless its label,
 // known or checked first, has it passed over. An entry the user chose
-// plays.
+// plays. Going on while the network is gone, it plays the first entry
+// from i that plays without it (offlineFrom).
 func (p *Player) goTo(m *move, i int) {
+	if m.dir > 0 {
+		i = p.offlineFrom(i)
+	}
 	entry := p.s.Queue[i]
 	label := LabelNone
 	if !entry.Chosen && p.checks(entry.Track) {

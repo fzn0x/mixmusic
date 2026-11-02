@@ -25,8 +25,18 @@ var resolveCheck = 3 * time.Second
 // has MixMusic check it: the system counts a network behind a captive
 // portal as online, and one without a route out may still answer. The
 // handlers run on the main thread, and only pass on what came.
+//
+// Downloads wait on a metered connection, unless the settings let them go
+// on, as the system tells it: MyGo's Network is asked here alone, as it
+// waits for the app's loop, which tests don't run.
 func (a *App) watchNetwork() {
-	mygo.Network.OnChanged(func(mygo.NetworkStatus) { a.online.Kick() })
+	a.setMetered(mygo.Network.Status().Metered)
+	mygo.Network.OnChanged(func(st mygo.NetworkStatus) {
+		a.online.Kick()
+		a.setMetered(st.Metered)
+		// The windows tell once the network went.
+		go a.online.Check(context.Background())
+	})
 	mygo.Power.OnSuspend(func() {
 		if p := a.goPlayer.Load(); p != nil {
 			p.Sleeping()
@@ -43,6 +53,12 @@ func (a *App) watchNetwork() {
 			p.Woke()
 		}
 	})
+}
+
+// setMetered takes in whether the connection is metered.
+func (a *App) setMetered(metered bool) {
+	a.metered.Store(metered)
+	a.downloads.SetMetered(metered, a.settings.Get().DownloadOnMetered)
 }
 
 // offlineErr returns err, why something that needs the network failed, as

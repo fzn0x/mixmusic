@@ -187,7 +187,7 @@ func TestSetSurroundRestartsTheOutput(t *testing.T) {
 	for _, five := range []bool{true, false} {
 		e, dev, _ := newTestEngine(t)
 		dev.surround = five
-		if err := e.Load(cuesFront, 0, true); err != nil {
+		if err := e.Load(cuesFront, 0, true, 1); err != nil {
 			t.Fatal(err)
 		}
 		if dev.asked != 2 || dev.channels != 2 || dev.starts != 1 {
@@ -228,7 +228,7 @@ func TestSetSurroundRestartsTheOutput(t *testing.T) {
 	if dev.starts != 0 {
 		t.Errorf("%d starts with no track", dev.starts)
 	}
-	if err := e.Load(cuesFront, 0, true); err != nil {
+	if err := e.Load(cuesFront, 0, true, 1); err != nil {
 		t.Fatal(err)
 	}
 	if dev.asked != 6 || dev.channels != 6 || dev.starts != 1 {
@@ -244,7 +244,7 @@ func TestOutputChangesChannels(t *testing.T) {
 	e, dev, _ := newTestEngine(t)
 	dev.surround = true
 	e.SetSurround(true)
-	if err := e.Load(cuesFront, 0, false); err != nil {
+	if err := e.Load(cuesFront, 0, false, 1); err != nil {
 		t.Fatal(err)
 	}
 	buffered(t, e, 0, ringFrames/2)

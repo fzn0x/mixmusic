@@ -39,7 +39,7 @@ func TestLastfmTrack(t *testing.T) {
 		now := time.Now()
 		for i := range 100 {
 			at := time.Duration(i) * 2 * time.Second
-			s.Observe(now.Add(at), id, t2, true, at)
+			s.Observe(now.Add(at), id, t2, true, at, 1)
 		}
 		want := 1
 		if live {

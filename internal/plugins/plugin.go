@@ -467,12 +467,18 @@ type snapshot struct {
 	Repeat     player.Repeat `json:"repeat"`
 	Queue      []media.Track `json:"queue"`
 	Index      int           `json:"index"`
+	// Speed is the speed the track plays at, 1 its own.
+	Speed float64 `json:"speed"`
 }
 
 func (pl *plugin) playerState() snapshot {
 	st := pl.h.p.State()
 	s := snapshot{Playing: st.Playing, PositionMs: st.Position.Milliseconds(), DurationMs: st.Duration.Milliseconds(),
-		Volume: st.Volume, Shuffle: st.Shuffle, Repeat: st.Repeat, Queue: make([]media.Track, len(st.Queue)), Index: st.Index}
+		Volume: st.Volume, Shuffle: st.Shuffle, Repeat: st.Repeat, Queue: make([]media.Track, len(st.Queue)), Index: st.Index,
+		Speed: st.Speed}
+	if s.Speed <= 0 {
+		s.Speed = 1
+	}
 	for i, it := range st.Queue {
 		s.Queue[i] = it.Track
 	}

@@ -172,7 +172,7 @@ func TestEnginePlaysSurround(t *testing.T) {
 			e, dev, rec := newTestEngine(t)
 			dev.surround = c.device
 			e.SetSurround(c.wanted)
-			if err := e.Load(surroundAC3, 0, false); err != nil {
+			if err := e.Load(surroundAC3, 0, false, 1); err != nil {
 				t.Fatal(err)
 			}
 			buffered(t, e, 0, Rate/2)

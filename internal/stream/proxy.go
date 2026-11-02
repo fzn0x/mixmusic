@@ -50,6 +50,9 @@ type Proxy struct {
 	HTTP     *http.Client
 	// Cache keeps the audio of tracks played to their end, if set.
 	Cache *Cache
+	// Kept, if set, holds audio kept apart from the cache, as downloads,
+	// which the proxy serves first.
+	Kept Store
 	// Seen, if set, is called when YouTube answers with audio, which tells
 	// that the network answers.
 	Seen func()
@@ -128,6 +131,12 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	p.setFailure(videoID, "")
+	// What is kept holds stereo audio only: 5.1 surround audio comes from
+	// the cache or YouTube, and with no network fails, which the player
+	// plays in stereo instead.
+	if !surround && p.Kept != nil && p.Kept.Serve(w, r, videoID) {
+		return
+	}
 	key := videoID
 	if surround {
 		key = SurroundKey(videoID)

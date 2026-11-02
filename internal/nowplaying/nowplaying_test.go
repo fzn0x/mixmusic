@@ -25,6 +25,54 @@ func TestPosition(t *testing.T) {
 	}
 }
 
+// TestPositionAtRate moves the position on at the rate the track plays
+// at.
+func TestPositionAtRate(t *testing.T) {
+	at := time.Unix(1000, 0)
+	i := Info{Duration: 60 * time.Second, Position: 10 * time.Second, At: at, Playing: true, Rate: 2}
+	if got := i.position(at.Add(5 * time.Second)); got != 20*time.Second {
+		t.Errorf("at 2×: %v, want 20s", got)
+	}
+	i.Rate = 0.5
+	if got := i.position(at.Add(5 * time.Second)); got != 12500*time.Millisecond {
+		t.Errorf("at 0.5×: %v, want 12.5s", got)
+	}
+	i.Playing = false
+	if got := i.position(at.Add(5 * time.Second)); got != 10*time.Second {
+		t.Errorf("paused: %v, want 10s", got)
+	}
+}
+
+// TestDiffAtRate takes a position as far on as the rate puts it for no
+// seek, and another rate for a change.
+func TestDiffAtRate(t *testing.T) {
+	at := time.Unix(1000, 0)
+	base := &Info{ID: "yt:a", Title: "A", Duration: time.Minute, Position: 10 * time.Second, At: at, Playing: true, Rate: 2}
+	next := *base
+	next.Position, next.At = 12*time.Second, at.Add(time.Second)
+	if c := diff(base, &next); c.any() {
+		t.Errorf("a second on at 2×: %+v", c)
+	}
+	next.Position = 11 * time.Second
+	if c := diff(base, &next); c != (change{}) {
+		t.Errorf("a second on at 2×, 1 s of the track: %+v, want no seek", c)
+	}
+	next.Position = 15 * time.Second
+	if c := diff(base, &next); !c.seeked {
+		t.Errorf("a second on at 2×, 5 s of the track: %+v, want a seek", c)
+	}
+	faster := *base
+	faster.Rate = 3
+	if c := diff(base, &faster); c != (change{rate: true}) {
+		t.Errorf("another rate: %+v", c)
+	}
+	own := *base
+	own.Rate = 0
+	if c := diff(&own, &Info{ID: "yt:a", Title: "A", Duration: time.Minute, Position: 10 * time.Second, At: at, Playing: true, Rate: 1}); c.any() {
+		t.Errorf("a rate of 1 and none: %+v", c)
+	}
+}
+
 func TestDiff(t *testing.T) {
 	at := time.Unix(1000, 0)
 	base := &Info{ID: "yt:a", Title: "A", Artists: []string{"X"}, Duration: time.Minute, Position: 10 * time.Second, At: at, Playing: true, Volume: 1}

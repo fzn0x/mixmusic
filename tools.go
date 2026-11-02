@@ -183,7 +183,7 @@ func (s *shell) cacheSettings(c *ui.Context) {
 		// The cache's folder is read for what it holds in every frame the
 		// row shows: the search of the settings finds the row by what it
 		// always says, without reading it.
-		const kept = "Tracks you played play again without the network."
+		const kept = "Tracks you played play again without the network. Downloads are kept apart, and clearing the cache leaves them."
 		if s.findable("Tracks kept", kept) {
 			use := s.svc.System.CacheUsage()
 			s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. "+kept, plural(use.Tracks, "track"), byteSize(use.Bytes)), func() {

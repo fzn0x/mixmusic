@@ -126,6 +126,10 @@ type State struct {
 	// stream was found: it plays without a length, can't seek, and never
 	// ends of itself, but when its broadcast does.
 	Live bool
+	// Speed is the speed the current track plays at, at its own pitch: 1 is
+	// its own speed. What MixMusic's own engine plays takes the settings'
+	// speed of its kind; Spotify plays its own tracks at their own.
+	Speed float64
 }
 
 // Current returns the current entry.
@@ -206,6 +210,9 @@ type Now struct {
 	Volume  float64
 	Shuffle bool
 	Repeat  Repeat
+	// Speed is the speed the track plays at, 1 its own: Position and
+	// Duration are the track's own time, which moves on at Speed.
+	Speed float64
 }
 
 // Saved is the queue as it survives a restart.
@@ -246,6 +253,18 @@ type Network interface {
 	KickOnline()
 }
 
+// Offline is what the player asks of the app of the tracks that play
+// without the network, when its Services have it too: without, every
+// track that can't play for want of the network waits for it.
+type Offline interface {
+	// Offline reports, without asking the network, whether it was found
+	// gone.
+	Offline() bool
+	// PlaysOffline reports whether track plays without the network: it is
+	// downloaded, or the offline cache holds it.
+	PlaysOffline(track media.Track) bool
+}
+
 // Services are what the player asks of the app.
 type Services interface {
 	// Prepare finds how track plays; PrepareStream how it plays from
@@ -273,17 +292,20 @@ type Services interface {
 }
 
 // Stream is MixMusic's own audio engine, as *audio.Engine, whose events
-// the player takes as an audio.Events.
+// the player takes as an audio.Events. Its speeds keep the pitch: 1 plays
+// a track at its own speed.
 type Stream interface {
-	Load(url string, start time.Duration, autoplay bool) error
+	Load(url string, start time.Duration, autoplay bool, speed float64) error
 	Preload(url string)
-	Crossfade(url string, d time.Duration) error
+	Crossfade(url string, d time.Duration, speed float64) error
 	Play() error
 	Pause()
 	Stop()
 	Unload()
 	Seek(t time.Duration)
 	SetVolume(v float64)
+	// SetSpeed plays the track loaded at speed.
+	SetSpeed(speed float64)
 }
 
 // These are the times the player keeps; tests shorten them.
@@ -324,7 +346,8 @@ const (
 	// before its audio is downloaded too.
 	prepareAfter  = time.Second
 	prefetchAfter = 10 * time.Second
-	// restartAfter is how far into a track Previous goes back to its start.
+	// restartAfter is how long into a track, heard at its speed, Previous
+	// goes back to its start.
 	restartAfter = 3 * time.Second
 	// radioMax is how many tracks a radio adds at most.
 	radioMax = 25
@@ -443,6 +466,9 @@ type Player struct {
 	// stalls counts the stream's Buffering events, so that a check of the
 	// network after one tells it is the last.
 	stalls int
+	// offlineSkips counts the entries skipped for want of the network
+	// since a track last played: no more than the queue holds are.
+	offlineSkips int
 	// askedAt is when the current track was asked to play, from askedFrom,
 	// until it sounds: the log tells when that took long.
 	askedAt     time.Time
@@ -484,7 +510,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.connect = &connectEngine{p: p, device: device, tickEvery: connectTick, askEvery: connectAskEvery, askDefault: connectAskEvery,
 		settle: connectSettle}
 	st := svc.Settings()
-	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume)}
+	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume), Speed: 1}
 	p.spotifyMode, p.skipDisliked, p.skipAI = st.SpotifyPlayback, st.SkipDisliked, st.SkipAI
 	p.surround = st.Surround
 	if len(saved.Tracks) > 0 {
@@ -508,6 +534,8 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 			p.s.Position = time.Duration(saved.Position) * time.Millisecond
 		}
 		p.s.Duration = ms(p.s.Queue[p.s.Index].Track.DurationMs)
+		// Whether it is a live stream, its stream tells once found.
+		p.s.Speed = speedOf(st, p.s.Queue[p.s.Index].Track, false)
 		p.s.Shuffle = saved.Shuffle
 		if saved.Repeat == RepeatAll || saved.Repeat == RepeatOne {
 			p.s.Repeat = saved.Repeat

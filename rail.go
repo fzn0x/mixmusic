@@ -258,6 +258,9 @@ func (s *shell) mixes(c *ui.Context, path string) {
 		})
 		ui.Scroll(c).Grow(1).MinHeight(0).Children(func() {
 			s.sideLink(c, "liked", k.words("Liked songs"), len(s.svc.Collection.Liked()), "/library/liked", path)
+			if s.kept.Any() {
+				s.sideLink(c, "downloads", k.words("Downloads"), s.kept.Status().Tracks, "/library/downloads", path)
+			}
 			for _, m := range s.svc.Collection.Playlists() {
 				s.sideLink(c, "mix-"+m.ID, m.Title, m.TrackCount, playlistPath(m.ID), path)
 			}

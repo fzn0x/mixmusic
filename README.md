@@ -47,8 +47,9 @@ both services in one player:
 - **A small program.** MixMusic is one Go program that draws its own
   windows on the GPU. There is no browser inside it to download or keep in
   memory.
-- **Yours to change.** Ten themes come with it, the community adds more
-  themes and plugins, and any command can have a key of your own.
+- **Yours to change.** Four layouts and fourteen themes come with it, the
+  community adds more themes and plugins, and any command can have a key
+  of your own.
 - **Private.** MixMusic has no account, server, analytics or telemetry of
   its own.
 - **Free and open source,** under the MIT license or the GPL 3.0.
@@ -100,7 +101,8 @@ both services in one player:
 
 - Media keys and the system's media controls on Windows, macOS and Linux.
 - Global shortcuts of your own to play, pause, skip, change the volume,
-  mute, like what plays or show MixMusic, whichever window is in front.
+  mute, like or dislike what plays or show MixMusic, whichever window is
+  in front.
 - The player's buttons on the taskbar thumbnail on Windows.
 - Tray controls, notifications of new tracks, and start at login.
 - `mixmusic://` links.
@@ -114,9 +116,15 @@ both services in one player:
 
 ### Make it yours
 
-- **Themes.** Ten built in, with effects you can tune, one theme for light
-  mode and one for dark mode, and an accent color of your own or taken
-  from the artwork that plays.
+- **Layouts.** Blend, the default, has rounded shapes and springy motion
+  on dense rows of big covers. Expressive, after Material 3 Expressive, is
+  playful, with tonal fills, pill buttons and a floating player bar. Crate
+  is restrained, so that the covers do the work, and Tiles is MixMusic's
+  first look, with flat tiles and giant lowercase words.
+- **Themes.** Fourteen built in, each in any layout, with effects you can
+  tune, one theme for light mode and one for dark mode, and an accent
+  color of your own or taken from the artwork that plays. Material and
+  Material Dark make every color of the cover's.
 - **Community themes and plugins,** one click away in the marketplace.
 - **Plugins** add pages, commands, track actions and widgets through a
   typed API, drawn in your theme.
@@ -378,7 +386,7 @@ internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
 internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
-internal/library     liked songs, mixes, history and stats
+internal/library     liked and disliked songs, mixes, history and stats
 internal/lastfm      scrobbling to Last.fm
 internal/discord     what plays, on your Discord profile
 internal/diag        the log, without secrets, and the reports of crashes
@@ -409,7 +417,8 @@ store icon in the sidebar, and you can add yours.
 
 ### Make a theme
 
-A theme is a `theme.json` file that sets colors, fonts and corners.
+A theme is a `theme.json` file that sets colors, fonts and corners, which
+show in the layout the user chose.
 [docs/themes.md](docs/themes.md) lists every token and shows a complete
 theme. To try yours, put its folder in the themes folder (Settings ›
 Appearance › open themes folder) and choose it in Settings › Appearance.
@@ -464,8 +473,8 @@ talks to:
 
 What it keeps on your computer:
 
-- Your settings and library (liked songs, mixes, history and recent
-  searches), in the folder Settings › About names.
+- Your settings and library (liked and disliked songs, mixes, history and
+  recent searches), in the folder Settings › About names.
 - The tracks you played, in the cache, as much as you allow in Settings ›
   Playback, and how loud YouTube measured them.
 - The covers you saw, up to 256 MB.
@@ -520,9 +529,13 @@ MixMusic is built on these projects:
   port of [JAAD](https://sourceforge.net/projects/jaadec/) the AAC decoder
   derives from.
 - **[FFmpeg](https://ffmpeg.org)**, which the decoders' tests compare with.
-- **[Selawik](https://github.com/microsoft/Selawik)** and
-  **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**, the
-  typefaces of the windows.
+- **[Selawik](https://github.com/microsoft/Selawik)**,
+  **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**,
+  **[Roboto Flex](https://github.com/googlefonts/roboto-flex)** and
+  **[Archivo](https://github.com/Omnibus-Type/Archivo)**, the typefaces of
+  the windows.
+- **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
+  whose HCT color science the Material themes' colors are a port of.
 - **[Kevin MacLeod](https://incompetech.com)**, whose music, under
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), plays in the
   walkthrough and on the website.
@@ -544,10 +557,14 @@ Fixes, features, themes, plugins and bug reports are all welcome.
 MixMusic is dual-licensed: use it under the [MIT license](LICENSE-MIT) or
 the [GNU General Public License, version 3](LICENSE-GPL), whichever you
 prefer. Contributions are accepted under both. The typefaces in `fonts` are
-under the SIL Open Font License: [Selawik's](fonts/OFL.txt) and
-[Quicksand's](fonts/quicksand-OFL.txt). The Opus decoder is a port of
-libopus, under [its BSD license](opus/LICENSE.libopus), and the AAC decoder
-derives from SharpJaad, under [its MIT license](aac/LICENSE.sharpjaad).
+under the SIL Open Font License: [Selawik's](fonts/OFL.txt),
+[Quicksand's](fonts/quicksand-OFL.txt),
+[Roboto Flex's](fonts/robotoflex-OFL.txt) and
+[Archivo's](fonts/archivo-OFL.txt). The Opus decoder is a port of
+libopus, under [its BSD license](opus/LICENSE.libopus), the AAC decoder
+derives from SharpJaad, under [its MIT license](aac/LICENSE.sharpjaad), and
+the HCT color science is a port of Material Color Utilities, under
+[its Apache license](internal/hct/LICENSE.material-color-utilities).
 
 MixMusic is not affiliated with, endorsed by or sponsored by Spotify or
 Google. It plays what these services offer their users, through the

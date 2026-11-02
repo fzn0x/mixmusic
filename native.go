@@ -18,6 +18,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/plugins"
@@ -102,9 +103,14 @@ type shell struct {
 	router *ui.Router
 	// set is the settings, as the window's controls change them, and base
 	// what refresh read last, which save tells the changes from.
-	set, base    settings.Settings
-	inv          addons.Inventory
-	lk           look
+	set, base settings.Settings
+	inv       addons.Inventory
+	lk        look
+	// colorFile is what the app read of the colour file the settings
+	// name, and oneMode is set while the look wears a file with one set of
+	// colours, which decides light or dark.
+	colorFile    app.ColorFileStatus
+	oneMode      bool
 	art          *artworks
 	loads        map[string]any
 	notes        []player.Notice
@@ -251,9 +257,12 @@ type shell struct {
 	// before, by key.
 	listTops map[string]float32
 	// cardLooks are the looks of the themes' cards in Settings, by theme,
-	// made for the themes cardThemes.
+	// made for the themes cardThemes in the layout design cardLayout.
 	cardLooks  map[string]*look
 	cardThemes []addons.Theme
+	cardLayout settings.Layout
+	// lowLayoutChoices are the layout designs' choices in Tiles' words.
+	lowLayoutChoices []choice
 	// find is the search of the settings.
 	find settingsFind
 
@@ -281,8 +290,10 @@ type shell struct {
 	recording        string
 	recordingFocused bool
 	// plainKeys are the commands' keys without modifiers that a focused
-	// control takes, as the frame's runShortcuts found them.
-	plainKeys []plainKey
+	// control takes, as the frame's runShortcuts found them;
+	// themeCommands choose the themes, made once for the add-ons.
+	plainKeys     []plainKey
+	themeCommands []command
 	// offer is the new version the window offers, until the user answers;
 	// updating is set while it downloads, updated once it is installed.
 	offer                   *app.Release
@@ -411,6 +422,7 @@ func (s *shell) refresh() {
 	s.set = s.svc.Preferences.Get()
 	// A copy of its own, as the controls change s.set's maps and slices.
 	s.base = s.set.Clean()
+	s.colorFile = s.svc.Preferences.ColorFile()
 	s.file = s.svc.Preferences.File()
 	if !first {
 		s.followSettings(old)
@@ -421,6 +433,12 @@ func (s *shell) refresh() {
 		s.fileNotice = &n
 	}
 	s.inv = s.svc.Addons.List()
+	// A command to choose each theme, which the frames list.
+	s.themeCommands = s.themeCommands[:0]
+	for _, t := range s.inv.Themes {
+		id := t.ID
+		s.themeCommands = append(s.themeCommands, command{"theme." + id, "Theme: " + t.Name, "", "themes", func() { s.chooseTheme(id) }})
+	}
 	s.refetch("accounts")
 	if s.offer == nil {
 		s.offer = s.svc.System.UpdateOffer()
@@ -429,21 +447,39 @@ func (s *shell) refresh() {
 	s.syncPlugins()
 }
 
-// restyle makes the look again, of the settings, the computer's appearance
-// and the artwork playing. The windows' own parts, as the title bar and
-// its buttons, take the theme's light or dark: the computer's while the
-// theme follows it, which it reads then.
+// restyle makes the look again, of the settings, the colour file, the
+// computer's appearance and the artwork playing. The windows' own parts,
+// as the title bar and its buttons, take the theme's light or dark: the
+// computer's while the theme follows it, which it reads then. A colour
+// file with one set of colours, as pywal's, decides light or dark instead,
+// and while the theme follows the computer, the theme of the file's mode
+// shows. The appearance is set straight to the file's mode then, never to
+// the computer's first, which would make the title bar flicker.
 func (s *shell) restyle() {
-	if s.set.FollowSystem {
-		setAppearance(mygo.ThemeSystem)
+	var file colorfile.Colors
+	if s.set.ColorSource != settings.ColorsTheme {
+		file = s.colorFile.Colors
 	}
-	s.lk = newLook(s.set, s.inv.Themes, isDark(), s.artColor)
-	switch {
-	case s.set.FollowSystem:
-	case s.lk.dark:
-		setAppearance(mygo.ThemeDark)
-	default:
-		setAppearance(mygo.ThemeLight)
+	dark, one := fileMode(file)
+	if s.oneMode = one; one {
+		s.lk = newLook(s.set, s.inv.Themes, dark, s.artColor, file)
+		if s.lk.dark {
+			setAppearance(mygo.ThemeDark)
+		} else {
+			setAppearance(mygo.ThemeLight)
+		}
+	} else {
+		if s.set.FollowSystem {
+			setAppearance(mygo.ThemeSystem)
+		}
+		s.lk = newLook(s.set, s.inv.Themes, isDark(), s.artColor, file)
+		switch {
+		case s.set.FollowSystem:
+		case s.lk.dark:
+			setAppearance(mygo.ThemeDark)
+		default:
+			setAppearance(mygo.ThemeLight)
+		}
 	}
 	s.art.phosphor = s.lk.fx.phosphor
 	s.plugins.SetTheme(pluginTheme(&s.lk))
@@ -553,7 +589,7 @@ func (s *shell) promptDialog(c *ui.Context) {
 	}
 	open := true
 	var in ui.Element
-	s.dialog(c, &open, dialogOptions{key: "prompt", title: strings.ToLower(p.title)}, func() {
+	s.dialog(c, &open, dialogOptions{key: "prompt", title: s.lk.words(p.title)}, func() {
 		in = ui.TextInput(c.Key("prompt"), &p.value).AutoFocus().Label(p.label).Width(360)
 	}, func() {
 		name := strings.TrimSpace(p.value)

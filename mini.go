@@ -14,8 +14,9 @@ const (
 	// the window grows, so that resizing it loads no other image.
 	miniArt = 180
 	// miniRoom is the width the mini player keeps beside its artwork: the
-	// window's buttons, and the transport with the like button.
-	miniRoom = 232
+	// window's buttons, and the transport with the like and dislike
+	// buttons.
+	miniRoom = 272
 	// The mini player's window at 100%: the size it opens at, and the
 	// least it takes.
 	miniWidth, miniHeight       = 420, 132
@@ -88,7 +89,7 @@ func (s *shell) miniView(c *ui.Context) {
 			}
 		})
 		ui.Column(c).Grow(1).MinWidth(0).Padding(0, 12).Gap(8).Justify(ui.Center).Children(func() {
-			title, line := "nothing playing", "play something in MixMusic"
+			title, line := k.words("Nothing playing"), "play something in MixMusic"
 			if ok {
 				title, line = cur.Track.Title, names(cur.Track.Artists)
 			}
@@ -96,8 +97,8 @@ func (s *shell) miniView(c *ui.Context) {
 				line += " · waiting for the network"
 			}
 			ui.Column(c).MinWidth(0).Children(func() {
-				ui.Text(c, title).FontSize(k.size(1.25)).FontWeight(300).Font(k.display).
-					LetterSpacing(-0.02 * k.size(1.25)).SingleLine().MinWidth(0)
+				ui.Text(c, title).FontSize(k.size(1.25)).FontWeight(k.titleWeight()).Font(k.display).
+					LetterSpacing(k.tracking(-0.02, k.size(1.25))).SingleLine().MinWidth(0)
 				ui.Row(c).Gap(6).MinWidth(0).Children(func() {
 					if ok {
 						s.sourceMark(c, cur.Track.Source, false)
@@ -105,7 +106,7 @@ func (s *shell) miniView(c *ui.Context) {
 					ui.Text(c, line).FontSize(k.smallSize()).TextColor(k.muted).SingleLine().Grow(1).MinWidth(0)
 					switch {
 					case ok && s.st.Live:
-						ui.Text(c, "live").FontSize(k.captionSize()).TextColor(k.accent).Shrink(0).SingleLine()
+						ui.Text(c, k.sentence("live")).FontSize(k.captionSize()).TextColor(k.accent).Shrink(0).SingleLine()
 					case ok:
 						ui.Text(c, clock(s.st.Position)+" / "+clock(s.miniDuration())).FontSize(k.captionSize()).
 							TextColor(k.muted).FontFeatures("tnum").Shrink(0).SingleLine()
@@ -132,7 +133,8 @@ func (s *shell) miniView(c *ui.Context) {
 	s.overlay(c)
 }
 
-// miniControls are the mini player's transport, and its like button.
+// miniControls are the mini player's transport, and its like and dislike
+// buttons.
 func (s *shell) miniControls(c *ui.Context) {
 	cur, ok := s.st.Current()
 	ui.Row(c).Gap(8).Children(func() {
@@ -151,7 +153,10 @@ func (s *shell) miniControls(c *ui.Context) {
 			s.p.Next()
 		}
 		if ok {
-			s.likeButton(c, "mini-like", cur.Track, 16)
+			ui.Row(c).Children(func() {
+				s.likeButton(c, "mini-like", cur.Track, 16)
+				s.dislikeButton(c, "mini-dislike", cur.Track, 16)
+			})
 		}
 	})
 }

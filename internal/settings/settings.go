@@ -41,6 +41,29 @@ const (
 	DensityCompact     Density = "compact"
 )
 
+// Layout chooses the layout design of the interface: its shapes, its
+// density, its covers, its player bar, its headings and its motion. The
+// theme sets its colours and faces.
+type Layout string
+
+const (
+	// LayoutBlend has Expressive's rounded shapes and springs, and
+	// Crate's dense rows, big covers and bold headings.
+	LayoutBlend Layout = "blend"
+	// LayoutExpressive is playful and colourful: tonal fills, big rounded
+	// shapes, a floating player bar and springy motion.
+	LayoutExpressive Layout = "expressive"
+	// LayoutCrate is restrained: dense rows, big covers in cards and bold
+	// tight headings, so that the covers do the work.
+	LayoutCrate Layout = "crate"
+	// LayoutTiles is MixMusic's first layout: flat tiles, giant light
+	// lowercase words and outlined boxes.
+	LayoutTiles Layout = "tiles"
+)
+
+// Layouts are the layout designs, in the order the settings list them.
+var Layouts = []Layout{LayoutBlend, LayoutExpressive, LayoutCrate, LayoutTiles}
+
 // Quality chooses between the best audio and smaller streams.
 type Quality string
 
@@ -48,6 +71,25 @@ const (
 	QualityBest  Quality = "best"
 	QualitySaver Quality = "saver"
 )
+
+// ColorSource chooses where the colours come from: the theme, or a file
+// that pywal or matugen make of the wallpaper, or one of the user's.
+type ColorSource string
+
+const (
+	// ColorsTheme wears the theme's own colours.
+	ColorsTheme ColorSource = ""
+	// ColorsPywal reads pywal's colors.json, in pywal's cache folder.
+	ColorsPywal ColorSource = "pywal"
+	// ColorsMatugen reads matugen.json in the data folder, which
+	// MixMusic's matugen template writes.
+	ColorsMatugen ColorSource = "matugen"
+	// ColorsFile reads the file of Settings.ColorFile.
+	ColorsFile ColorSource = "file"
+)
+
+// maxColorFile bounds the length of Settings.ColorFile, in bytes.
+const maxColorFile = 4096
 
 // Bands are the center frequencies of the equalizer's bands, in hertz.
 var Bands = []int{32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000}
@@ -77,8 +119,15 @@ type Settings struct {
 	// Accent replaces the theme's accent color, unless empty.
 	Accent string `json:"accent"`
 	// DynamicAccent takes the accent color from the artwork playing.
-	DynamicAccent bool    `json:"dynamicAccent"`
-	Density       Density `json:"density"`
+	DynamicAccent bool `json:"dynamicAccent"`
+	// ColorSource takes the colours from a file, over the theme's, which
+	// keeps its type, corners and effects. ColorFile is the file of
+	// ColorsFile: a full path, or one that starts with ~.
+	ColorSource ColorSource `json:"colorSource"`
+	ColorFile   string      `json:"colorFile"`
+	Density     Density     `json:"density"`
+	// Layout is the layout design; settings from before it have Blend's.
+	Layout Layout `json:"layout"`
 	// FontScale scales the text, from 0.85 to 1.3.
 	FontScale float64 `json:"fontScale"`
 	// Zoom scales the whole interface, one of ZoomSteps: the text, which
@@ -114,8 +163,11 @@ type Settings struct {
 	// has them, else mixed down to stereo as the track's stream asks.
 	Surround bool `json:"surround"`
 	// Autoplay continues with similar tracks when the queue ends.
-	Autoplay  bool      `json:"autoplay"`
-	Equalizer Equalizer `json:"equalizer"`
+	Autoplay bool `json:"autoplay"`
+	// SkipDisliked passes over the tracks the user disliked as the queue
+	// moves on, and leaves them out of radios.
+	SkipDisliked bool      `json:"skipDisliked"`
+	Equalizer    Equalizer `json:"equalizer"`
 	// Volume is from 0 to 1.
 	Volume float64 `json:"volume"`
 	// CacheSizeMB bounds the audio cache; 0 turns it off.
@@ -185,6 +237,7 @@ func Default() Settings {
 		ThemeOptions:    map[string]map[string]string{},
 		DynamicAccent:   true,
 		Density:         DensityComfortable,
+		Layout:          LayoutBlend,
 		Panel:           "queue",
 		FontScale:       1,
 		Zoom:            1,
@@ -192,6 +245,7 @@ func Default() Settings {
 		Quality:         QualityBest,
 		Loudness:        true,
 		Autoplay:        true,
+		SkipDisliked:    true,
 		Equalizer:       Equalizer{Preset: "flat", Gains: make([]float64, len(Bands))},
 		Volume:          0.8,
 		CacheSizeMB:     1024,
@@ -255,6 +309,16 @@ func (s Settings) DiscordApp() string { return cmp.Or(s.DiscordAppID, DefaultDis
 // letters, digits and dashes.
 func ValidID(id string) bool { return idRe.MatchString(id) }
 
+// CleanPath is a path the user typed or pasted, without the spaces around
+// it, or the double quotes Windows Explorer's Copy as path puts around it.
+func CleanPath(p string) string {
+	p = strings.TrimSpace(p)
+	if len(p) >= 2 && p[0] == '"' && p[len(p)-1] == '"' {
+		p = strings.TrimSpace(p[1 : len(p)-1])
+	}
+	return p
+}
+
 // ActiveTheme returns the ID of the theme to show: Theme, or the light or
 // dark one of the computer's appearance when the theme follows it.
 func (s Settings) ActiveTheme(dark bool) string {
@@ -290,11 +354,23 @@ func (s Settings) Clean() Settings {
 	if s.Accent != "" && !colorRe.MatchString(s.Accent) {
 		s.Accent = ""
 	}
+	switch s.ColorSource {
+	case ColorsTheme, ColorsPywal, ColorsMatugen, ColorsFile:
+	default:
+		s.ColorSource = ColorsTheme
+	}
+	s.ColorFile = CleanPath(s.ColorFile)
+	if len(s.ColorFile) > maxColorFile {
+		s.ColorFile = ""
+	}
 	if s.Panel != "lyrics" && s.Panel != "none" {
 		s.Panel = d.Panel
 	}
 	if s.Density != DensityCompact {
 		s.Density = DensityComfortable
+	}
+	if !slices.Contains(Layouts, s.Layout) {
+		s.Layout = d.Layout
 	}
 	if s.FontScale < 0.85 || s.FontScale > 1.3 {
 		s.FontScale = d.FontScale

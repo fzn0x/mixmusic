@@ -54,10 +54,14 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 	k := &s.lk
 	row := ui.Row(c.Key(key+"-"+count(i)+"-"+t.ID)).Height(k.row).Padding(0, 8).Gap(16).Radius(k.radiusSm)
 	ink, sub := k.text, k.muted
+	disliked := s.a.IsDisliked(t.ID)
+	if disliked {
+		ink = k.muted
+	}
 	switch {
 	case current:
-		row.Background(k.accent)
-		ink, sub = k.accentText, k.accentText.Alpha(0.78)
+		row.Background(k.selected)
+		ink, sub = k.selectedText, k.selectedSub
 	case row.Hovered():
 		row.Background(k.hover)
 	}
@@ -79,8 +83,13 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 	}
 	row.ContextMenu(menu)
 	hovered := row.Hovered()
+	// A row of 60px or more shows larger artwork.
+	art := float32(40)
+	if k.row >= 60 {
+		art = 48
+	}
 	row.Children(func() {
-		lead := s.buttonBase(c.Key(key+"-lead-"+count(i))).Size(40, 40).Shrink(0).Cursor(ui.CursorPointer)
+		lead := s.buttonBase(c.Key(key+"-lead-"+count(i))).Size(art, art).Shrink(0).Cursor(ui.CursorPointer)
 		label := "Play " + t.Title
 		if current && s.st.Playing {
 			label = "Pause " + t.Title
@@ -92,13 +101,13 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 		lead.Children(func() {
 			switch {
 			case o.art:
-				s.cover(c, key+"-cover-"+count(i), t.Artwork, 40, false)
+				s.cover(c, key+"-cover-"+count(i), t.Artwork, art, false)
 				if hovered || current {
 					name := "play"
 					if current && s.st.Playing {
 						name = "pause"
 					}
-					ui.Box(c).Absolute().Top(0).Left(0).Size(40, 40).Background(k.scrim).Center().Children(func() {
+					ui.Box(c).Absolute().Top(0).Left(0).Size(art, art).Background(k.scrim).Radius(k.scrimRadius()).Center().Children(func() {
 						ui.Icon(c, icon(name)).FontSize(16).TextColor(k.text)
 					})
 				}
@@ -148,9 +157,13 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 				Width(88).TextAlign(ui.End).Shrink(0)
 		}
 		s.sourceMark(c, t.Source, current)
-		if hovered || s.a.IsLiked(t.ID) {
+		// The thumb takes the heart's place on a disliked song.
+		switch {
+		case disliked:
+			s.dislikeButton(c, key+"-dislike-"+count(i), t, 16)
+		case hovered || s.a.IsLiked(t.ID):
 			s.likeButton(c, key+"-like-"+count(i), t, 16)
-		} else {
+		default:
 			ui.Box(c).Size(32, 32).Shrink(0)
 		}
 		duration := ""

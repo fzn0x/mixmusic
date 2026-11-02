@@ -32,13 +32,14 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   albums, artists, playlists, related tracks, radios and plain lyrics.
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
-  liked songs, playlists, albums, subscriptions, likes and saves, and it
-  deletes the playlists the user made, which it tells from those they
-  saved by the menus YouTube sends with them. Its parsers are tested
-  against recorded responses in `testdata/`, and against the live service
-  with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run Live`
+  liked songs, playlists, albums, subscriptions, likes, dislikes and
+  saves, and it deletes the playlists the user made, which it tells from
+  those they saved by the menus YouTube sends with them. Its parsers are
+  tested against recorded responses in `testdata/`, and against the live
+  service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run Live`
   (`MIXMUSIC_YT_COOKIES` adds a signed-in account, and
-  `MIXMUSIC_YT_WRITE=1` lets it make and delete a playlist there).
+  `MIXMUSIC_YT_WRITE=1` lets it make and delete a playlist there, and
+  dislike a song and take the dislike back).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
   library), and controls Spotify Connect devices.
@@ -125,7 +126,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   and Spotify tracks matched to their recording, through the engine, and
   Spotify tracks on a Spotify device: a Spotify Connect device, or MixMusic
   itself, as below. It shuffles, repeats, crossfades, starts radios when the
-  queue runs out, counts plays and keeps up to 500 tracks of the queue,
+  queue runs out, passes over the songs the user dislikes but those they
+  pick, counts plays and keeps up to 500 tracks of the queue,
   around the one playing, in `queue.json`, as it changes and as MixMusic
   quits. A track that can't play for want of the network waits for it
   where it was, and plays on once it answers; the player pauses as the
@@ -144,8 +146,8 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   out of videos.
 - **`lyrics`** finds synced lyrics on Unison and LRCLIB, and reads TTML and
   LRC.
-- **`internal/library`** keeps liked songs, mixes, the history and stats in
-  `library.json`.
+- **`internal/library`** keeps liked and disliked songs, mixes, the history
+  and stats in `library.json`.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
   scrobbles by Last.fm's rules, keeping what fails offline for later.
 - **`internal/discord`** shows what plays on the user's Discord profile, over
@@ -157,6 +159,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/addons`** validates theme and plugin manifests, lists the
   built-in and installed add-ons, and installs add-ons from the community
   registry.
+- **`internal/colorfile`** reads the colours of pywal's `colors.json`,
+  matugen's JSON, MixMusic's matugen template and a `theme.json`, telling
+  them apart by what they hold; `internal/app/colorfile.go` follows the
+  file the settings name with MyGo's file watch, and keeps the colours it
+  read last while the file is half written.
 - **`internal/plugins`** runs the plugins the user enabled, each in a
   JavaScript runtime of its own, [sobek](https://github.com/grafana/sobek)
   (a fork of goja with ES modules), on a goroutine of its own: their
@@ -201,10 +208,16 @@ belongs to its main thread: what finishes elsewhere comes back through
   once, keeps it on disk as it came, up to 256 MB, and logs a host's
   failures at most once a minute, without the addresses.
 - **Themes** give their tokens: colours, fonts, radius (`theme.go`), and
-  the accent follows the artwork of what plays. The windows draw the
-  effects of the built-in themes, as their options say (`effects.go`):
-  Mix's textures, Aurora's drifting lights and frosted dialogs, Sakura's
-  petals, Terminal's scanlines, glow and phosphor artwork.
+  the accent follows the artwork of what plays. A colour file's colours
+  replace the theme's, kept readable (`colorfile.go`). The layout design
+  the user chose, Blend, Expressive, Crate or Tiles, sets the shapes, the
+  density and the styles of the parts in whatever theme (`layout.go`).
+  The windows draw the effects of the built-in themes, as their options
+  say (`effects.go`): Mix's textures, Aurora's drifting lights and frosted
+  dialogs, Sakura's petals, Terminal's scanlines, glow and phosphor
+  artwork. The Material themes make their colours of a seed in HCT
+  (`material.go`, `internal/hct`, a port of Material Color Utilities),
+  unless a colour file gives them.
 - **Deep links** and second launches open their pages in the main window
   (`App.OnNavigate`).
 
@@ -269,11 +282,13 @@ finds, `act:resume` plays the queue kept in the data folder,
 `act:wait:<duration>` waits, `act:palette` opens the command palette,
 `act:refresh` refreshes the page, as F5 does,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
-scrolls the page, `act:theme:<id>` wears a theme, `act:mini` opens the
-mini player, which saves `mini.png`, `act:spotify` logs whether MixMusic's
-own Spotify device could play, `act:title` logs the window's title, which
-the screenshots leave out, and `act:memory` and `act:heap` log the Go
-heap and save a profile of it. Nothing plays unless the player is muted,
+scrolls the page, `act:theme:<id>` wears a theme,
+`act:colors:<off|pywal|matugen|path>` takes the colours from a file, as
+Settings › Appearance does, `act:mini` opens the mini player, which saves
+`mini.png`, `act:spotify` logs whether MixMusic's own Spotify device
+could play, `act:title` logs the window's title, which the screenshots
+leave out, and `act:memory` and `act:heap` log the Go heap and save a
+profile of it. Nothing plays unless the player is muted,
 or `MIXMUSIC_SILENT=1` has the audio engine play into no device, which
 keeps the visualizer and the lyrics moving without a sound.
 `MIXMUSIC_CAPTURE_COMMUNITY=<dir>` has the marketplace read the community

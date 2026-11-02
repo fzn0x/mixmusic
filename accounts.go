@@ -53,7 +53,7 @@ const (
 )
 
 func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
-	s.group(c, "spotify", func() {
+	s.group(c, "Spotify", func() {
 		if sp.SignedIn && sp.Error == "" {
 			who := "Signed in"
 			if sp.Profile != nil {
@@ -150,7 +150,7 @@ func (s *shell) signOutOfSpotify() {
 }
 
 func (s *shell) youtubeAccount(c *ui.Context, yt app.YouTubeAccount) {
-	s.group(c, "youtube music", func() {
+	s.group(c, "YouTube Music", func() {
 		if !yt.SignedIn {
 			// One sign-in at a time, of the three ways.
 			busy := strings.HasPrefix(s.signingIn, "youtube")
@@ -225,7 +225,7 @@ func (s *shell) youtubeCookieSignIn(c *ui.Context, busy bool) {
 			s.selectOf(c.Key("youtube-browser"), &yc.browser, yc.names).Width(160).Label("Browser")
 		})
 		s.row(c, "Profile", youtubeProfile, func() {
-			ui.TextInput(c.Key("youtube-profile"), &yc.profile).Placeholder("the browser's own").Width(260).Label("Profile")
+			ui.TextInput(c.Key("youtube-profile"), &yc.profile).Placeholder(k.sentence("the browser's own")).Width(260).Label("Profile")
 		})
 		ui.Row(c).Padding(12, 0).Children(func() {
 			label := "import"
@@ -351,7 +351,7 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 }
 
 func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
-	s.group(c, "last.fm", func() {
+	s.group(c, "Last.fm", func() {
 		if lf.Connected {
 			if lf.Expired {
 				const title, again = "Last.fm no longer accepts this connection", "Disconnect, then connect again to go on scrobbling."

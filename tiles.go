@@ -22,27 +22,31 @@ var (
 )
 
 // tileGrid lays tiles on four columns of rows of at least 150px, capped at
-// 1040px, two columns under a 640px pane.
+// 1040px, two columns under a 640px pane, half the theme's gap apart.
 func (s *shell) tileGrid(c *ui.Context, tiles func(columns int)) {
 	columns := 4
 	if s.paneWidth(c) < 640 {
 		columns = 2
 	}
-	ui.Grid(c).Columns(columns).GapX(8).GapY(8).MaxWidth(1040).Margin(0, 0, 48).Children(func() { tiles(columns) })
+	k := &s.lk
+	ui.Grid(c).Columns(columns).GapX(k.gap/2).GapY(k.gap/2).MaxWidth(1040).Margin(0, 0, k.sections()).Children(func() { tiles(columns) })
 }
 
-// flatTile is a flat field of one tile colour with a lowercase light
+// flatTile is a tile of the user's own, as "Liked songs". In the Tiles
+// layout it is a flat field of one tile colour with a lowercase light
 // title at its top left and a small caption at its foot; art, when given,
-// prints faintly under the words. It returns whether it was clicked.
-func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, columns int, title, caption, label string, art []media.Image) bool {
+// prints faintly under the words. In the layouts of cards it is a card
+// (cardTile). It returns whether it was clicked.
+func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, columns int, title, caption, label string, glyph *ui.SVG, art []media.Image) bool {
 	k := &s.lk
 	if columns < 4 && span.cols > 1 {
 		span.cols = min(span.cols, columns)
 	}
-	t := s.buttonBase(c.Key(key)).ColumnSpan(span.cols).RowSpan(span.rows).MinHeight(150).Padding(16).
-		AlignItems(ui.Start).Justify(ui.SpaceBetween).Column().Background(k.tile(tone)).Radius(k.radius).
+	t := s.buttonBase(c.Key(key)).ColumnSpan(span.cols).RowSpan(span.rows).MinHeight(150).Radius(k.radius).
 		Label(label).Cursor(ui.CursorPointer).Clip()
-	if t.Pressed() {
+	if k.moves() {
+		s.pressMotion(t, 0.97)
+	} else if t.Pressed() {
 		t.Scale(0.97, 0.97)
 	}
 	large := span.cols > 1 && span.rows > 1
@@ -51,6 +55,19 @@ func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, col
 	if large {
 		size = min(max(32, 0.056*pane), 60) * k.scale
 	}
+	leading := float32(0.95)
+	if k.headings != headingsLight {
+		// Smaller, and as written: Material's headline sizes.
+		size, leading = min(max(20, 0.022*pane), 28)*k.scale, 1.1
+		if large {
+			size = min(max(28, 0.036*pane), 44) * k.scale
+		}
+	}
+	if k.cards {
+		s.cardTile(c, t, tone, large, k.words(title), caption, glyph, art, size)
+		return t.Clicked()
+	}
+	t.Padding(16).AlignItems(ui.Start).Justify(ui.SpaceBetween).Column().Background(k.tile(tone))
 	shows := len(art) > 0 && s.inView(c, t)
 	t.Children(func() {
 		if !shows {
@@ -62,8 +79,8 @@ func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, col
 			ui.Box(c).Absolute().Top(0).Right(0).Bottom(0).Left(0).PassThrough().
 				Draw(func(p *ui.Painter, r ui.Rect) { paintTexture(p, r, texture, ink) })
 		}
-		ui.Text(c, strings.ToLower(title)).FontSize(size).FontWeight(300).Font(k.display).LineHeight(0.95).
-			LetterSpacing(-0.02 * size).TextColor(k.tileText)
+		ui.Text(c, k.words(title)).FontSize(size).FontWeight(k.titleWeight()).Font(k.display).LineHeight(leading).
+			LetterSpacing(k.tracking(-0.02, size)).TextColor(k.tileText)
 		if caption != "" {
 			ui.Text(c, caption).FontSize(k.smallSize()).TextColor(k.tileText).MaxWidthPercent(66).MaxLines(4)
 		}
@@ -71,25 +88,110 @@ func (s *shell) flatTile(c *ui.Context, key string, tone int, span tileSpan, col
 	return t.Clicked()
 }
 
-// artTileSize is the width of an art tile, and shelfGap the gap between the
-// tiles of a shelf.
-const (
-	artTileSize = 172
-	shelfGap    = 16
-)
+// cardTile fills t, a tile of the user's own, as the layouts of cards
+// show one: a card as the covers' are, a step lighter while hovered. Art
+// fills its right side as it is, beside the title and a play button over
+// the caption; without art, glyph shows in a shape of tile colour tone,
+// over the title of size and the caption.
+func (s *shell) cardTile(c *ui.Context, t ui.Element, tone int, large bool, title, caption string, glyph *ui.SVG, art []media.Image, size float32) {
+	k := &s.lk
+	fill := k.surface
+	if t.Hovered() {
+		fill = k.surface2
+	}
+	t.Background(fill)
+	pad := max(16, 1.25*k.gap)
+	heading := func() {
+		ui.Text(c, title).FontSize(size).FontWeight(k.titleWeight()).Font(k.display).LineHeight(1.1).
+			LetterSpacing(k.tracking(-0.02, size)).TextColor(k.text)
+	}
+	t.Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).Padding(pad)
+	if len(art) > 0 {
+		shows := s.inView(c, t)
+		t.Children(func() {
+			heading()
+			ui.Row(c).Gap(16).AlignItems(ui.End).MinWidth(0).Children(func() {
+				const side = 136
+				frame := ui.Box(c).Size(side, side).Shrink(0).Radius(k.radiusSm).Background(k.surface3).Clip()
+				frame.Children(func() {
+					if !shows {
+						return
+					}
+					if b := s.art.get(c, artworkURL(art, 300), 300); b != nil {
+						ui.Image(c, b).Size(side, side).Fit(ui.Cover)
+					}
+				})
+				ui.Column(c).Gap(12).MinWidth(0).AlignItems(ui.Start).Children(func() {
+					k.labelWeight(ui.Text(c, caption).FontSize(k.bodySize()).TextColor(k.text).MaxLines(3))
+					ui.Box(c).Size(44, 44).Radius(k.round(44)).Background(k.accent).Center().Children(func() {
+						ui.Icon(c, icon("play")).FontSize(18).TextColor(k.accentText)
+					})
+				})
+			})
+		})
+		return
+	}
+	badge := float32(40)
+	if large {
+		badge = 56
+	}
+	t.Children(func() {
+		ui.Box(c).Size(badge, badge).Radius(k.round(badge)).Background(k.tile(tone)).Center().Children(func() {
+			ui.Icon(c, glyph).FontSize(badge / 2).TextColor(k.tileText)
+		})
+		ui.Column(c).Gap(4).Children(func() {
+			heading()
+			if caption != "" {
+				ui.Text(c, caption).FontSize(k.smallSize()).TextColor(k.muted).MaxLines(2)
+			}
+		})
+	})
+}
+
+// cardPad is the room a filled card leaves around its artwork, and
+// tileWidth the width of an art tile: its artwork's, or its card's.
+func (k *look) cardPad() float32 {
+	if !k.cards {
+		return 0
+	}
+	return max(8, 0.75*k.gap)
+}
+
+func (k *look) tileWidth() float32 { return k.cover + 2*k.cardPad() }
+
+// sections is the room between the sections of a page: three gaps, 48px
+// at Mix's.
+func (k *look) sections() float32 { return 3 * k.gap }
 
 // artTile is a square frame of artwork with its title and a subtitle that
 // starts with the source mark; round for artists. Hovering shows a play
-// circle. It tells whether it was opened or its play circle clicked.
+// circle. It tells whether it was opened or its play circle clicked. In a
+// theme of filled cards, it is a card, a step lighter while hovered.
 func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, subtitle string, source media.Source, round, active, playable bool, menu func(m *ui.Menu)) (open, play bool) {
 	k := &s.lk
-	const size = artTileSize
-	tile := s.buttonBase(c.Key(key)).Width(size).Shrink(0).Column().AlignItems(ui.Start).Gap(8).Label(title).Cursor(ui.CursorPointer)
+	size := k.cover
+	tile := s.buttonBase(c.Key(key)).Width(k.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Gap(8).Label(title).Cursor(ui.CursorPointer)
 	if menu != nil {
 		tile.ContextMenu(menu)
 	}
 	open = tile.Clicked()
 	hovered := tile.Hovered()
+	if pad := k.cardPad(); pad > 0 {
+		fill := k.surface
+		if hovered {
+			fill = k.surface2
+		}
+		tile.Padding(pad, pad, pad+4).Radius(k.radiusSm + pad).Background(fill)
+	}
+	// The play circle rises into place on the theme's spring as the
+	// pointer comes, and sinks as it goes.
+	rise := float32(0)
+	if hovered {
+		rise = 1
+	}
+	if k.moves() && (hovered || !tile.Settled("play")) {
+		rise = tile.AnimateTo("play", rise, k.spring(true))
+	}
 	tile.Children(func() {
 		frame := ui.Box(c).Size(size, size).Shrink(0)
 		frame.Children(func() {
@@ -97,9 +199,12 @@ func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, sub
 			if active {
 				ui.Box(c).Absolute().Top(0).Left(0).Size(size, size).InsetShadow(0, 0, 0, 3, k.accent).Radius(k.radiusSm)
 			}
-			if playable && hovered {
+			if playable && rise > 0.01 {
 				p := s.buttonBase(c.Key(key+"-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().Right(8).Bottom(8).
 					Label("Play " + title).Cursor(ui.CursorPointer)
+				if rise < 1 {
+					p.Translate(0, 12*(1-rise)).Opacity(min(1, rise))
+				}
 				if p.Clicked() {
 					play = true
 				}
@@ -107,7 +212,7 @@ func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, sub
 			}
 		})
 		ui.Column(c).Width(size).Gap(2).Children(func() {
-			ui.Text(c, title).FontSize(k.bodySize()).SingleLine()
+			k.labelWeight(ui.Text(c, title).FontSize(k.bodySize()).SingleLine())
 			ui.Row(c).Gap(6).MinWidth(0).Children(func() {
 				s.sourceMark(c, source, false)
 				ui.Text(c, subtitle).FontSize(k.smallSize()).TextColor(k.muted).SingleLine().MinWidth(0)
@@ -135,7 +240,7 @@ func (s *shell) shelfWith(c *ui.Context, key, title string, links, tiles func())
 		s.shelfScroll[at] = st
 	}
 	step := 0.8 * (s.paneWidth(c) - 2*k.gutter)
-	col := ui.Column(c.Key(key)).Margin(0, 0, 48)
+	col := ui.Column(c.Key(key)).Margin(0, 0, k.sections())
 	if h, far := s.farFromView(c, "shelf "+at, col); far {
 		col.Height(h) // its tiles build once it nears the view
 		return
@@ -152,7 +257,7 @@ func (s *shell) shelfWith(c *ui.Context, key, title string, links, tiles func())
 				st.ScrollTo(min(st.X+step, st.MaxX), 0, ui.Smooth)
 			}
 		})
-		ui.ScrollHorizontal(c).TrackScroll(st).Gap(shelfGap).Padding(0, 0, 12).Children(tiles)
+		ui.ScrollHorizontal(c).TrackScroll(st).Gap(k.gap).Padding(0, 0, 12).Children(tiles)
 	})
 }
 
@@ -298,7 +403,7 @@ func (s *shell) playCollection(load func(ctx context.Context) ([]media.Track, er
 			case len(tracks) == 0:
 				s.notes = append(s.notes, player.Notice{Message: "Nothing to play here"})
 			default:
-				s.p.PlayTracks(tracks, 0)
+				s.p.PlayAll(tracks, false)
 			}
 		})
 	}()
@@ -319,14 +424,15 @@ func (s *shell) shelves(c *ui.Context, key string, shelves []media.Shelf) {
 			// nothing.
 			n := len(sh.Items)
 			from, to := s.nearTiles(c, key+"-"+count(i), n)
+			step := s.lk.tileWidth() + s.lk.gap
 			if from > 0 {
-				ui.Box(c).Width(float32(from)*(artTileSize+shelfGap) - shelfGap).Shrink(0)
+				ui.Box(c).Width(float32(from)*step - s.lk.gap).Shrink(0)
 			}
 			for j := from; j < to; j++ {
 				s.itemTile(c, key+"-"+count(i)+"-"+count(j), sh.Items[j], tracks)
 			}
 			if to < n {
-				ui.Box(c).Width(float32(n-to)*(artTileSize+shelfGap) - shelfGap).Shrink(0)
+				ui.Box(c).Width(float32(n-to)*step - s.lk.gap).Shrink(0)
 			}
 		})
 	}
@@ -342,7 +448,7 @@ func (s *shell) nearTiles(c *ui.Context, key string, n int) (from, to int) {
 		x = st.X
 	}
 	s.moved(c, "tiles "+at, x)
-	w, step := s.paneWidth(c), float32(artTileSize+shelfGap)
+	w, step := s.paneWidth(c), s.lk.tileWidth()+s.lk.gap
 	from = min(max(int((x-w)/step), 0), n)
 	to = min(max(int(math.Ceil(float64((x+2*w)/step))), from), n)
 	return from, to

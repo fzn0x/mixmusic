@@ -12,11 +12,22 @@ import (
 )
 
 // playerBar shows what plays, the transport and where it is in the track,
-// and the volume; the next track waits in view under the current one.
+// and the volume; the next track waits in view under the current one. It
+// runs across the window's foot, or floats over it as a raised card.
 func (s *shell) playerBar(c *ui.Context) {
 	k := &s.lk
-	ui.Row(c).Height(k.player).Shrink(0).Padding(0, 24, 0, 16).Gap(24).Background(k.surface).
-		BorderWidth(1, 0, 0, 0).BorderColor(k.border).Children(func() {
+	bar := ui.Row(c).Height(k.player).Shrink(0).Padding(0, 24, 0, 16).Gap(24)
+	if k.floating {
+		shade := 0.16
+		if k.dark {
+			shade = 0.4
+		}
+		bar.Margin(0, floatMargin, floatMargin).Padding(0, 20, 0, 9).Radius(k.radius).Background(col(over(nrgba(k.surface2), nrgba(k.bg)))).
+			Shadow(0, 6, 20, -6, ui.RGBA(0, 0, 0, float32(shade)))
+	} else {
+		bar.Background(k.surface).BorderWidth(1, 0, 0, 0).BorderColor(k.border)
+	}
+	bar.Children(func() {
 		ui.Row(c).Grow(1).Basis(0).MinWidth(220).Gap(12).Children(func() { s.nowPlayingInfo(c) })
 		ui.Column(c).Grow(1.6).Basis(0).MinWidth(320).Gap(6).AlignItems(ui.Center).Children(func() {
 			s.transport(c)
@@ -30,16 +41,21 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 	k := &s.lk
 	cur, ok := s.st.Current()
 	if !ok {
-		ui.Text(c, "pick something to play").FontSize(k.smallSize()).TextColor(k.muted)
+		ui.Text(c, k.words("Pick something to play")).FontSize(k.smallSize()).TextColor(k.muted)
 		return
 	}
 	t := cur.Track
-	art := s.buttonBase(c.Key("player-art")).Size(62, 62).Shrink(0).Label("Open now playing").Cursor(ui.CursorPointer)
+	// The artwork fills a short bar, but its margins.
+	size := float32(62)
+	if k.player < 80 {
+		size = k.player - 16
+	}
+	art := s.buttonBase(c.Key("player-art")).Size(size, size).Shrink(0).Label("Open now playing").Cursor(ui.CursorPointer)
 	art.ContextMenu(func(m *ui.Menu) { s.trackMenu(m, t) })
 	if art.Clicked() {
 		s.navigate("/now-playing")
 	}
-	art.Children(func() { s.cover(c, "player-cover", t.Artwork, 62, false) })
+	art.Children(func() { s.cover(c, "player-cover", t.Artwork, size, false) })
 	ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 		if t.Album != nil && t.Album.ID != "" {
 			link := s.buttonBase(c.Key("player-title")).Justify(ui.Start).MinWidth(0).Label(t.Title).Cursor(ui.CursorPointer)
@@ -73,7 +89,10 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 			}
 		}
 	})
-	s.likeButton(c, "player-like", t, 18)
+	ui.Row(c).Shrink(0).Children(func() {
+		s.likeButton(c, "player-like", t, 18)
+		s.dislikeButton(c, "player-dislike", t, 18)
+	})
 }
 
 // likeButton likes a track, or no longer.
@@ -83,8 +102,29 @@ func (s *shell) likeButton(c *ui.Context, key string, t media.Track, size float3
 	if on {
 		label = "Remove from liked songs"
 	}
+	if s.ratingButton(c, key, "heart", label, on, size) {
+		s.setLiked(t, !on)
+	}
+}
+
+// dislikeButton dislikes a track, or no longer.
+func (s *shell) dislikeButton(c *ui.Context, key string, t media.Track, size float32) {
+	on := s.a.IsDisliked(t.ID)
+	label := "Dislike"
+	if on {
+		label = "Remove the dislike"
+	}
+	if s.ratingButton(c, key, "dislike", label, on, size) {
+		s.setDisliked(t, !on)
+	}
+}
+
+// ratingButton is a 32px button of the icon name, which tells whether the
+// user rates the track so: muted, in ink under the pointer, and filled
+// with the accent when on. It reports whether it was clicked.
+func (s *shell) ratingButton(c *ui.Context, key, name, label string, on bool, size float32) bool {
 	k := &s.lk
-	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.radiusSm).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
+	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.round(32)).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
 	ink := k.muted
 	switch {
 	case on:
@@ -95,21 +135,24 @@ func (s *shell) likeButton(c *ui.Context, key string, t media.Track, size float3
 	if b.Hovered() {
 		b.Background(k.hover)
 	}
-	if b.Clicked() {
-		s.setLiked(t, !on)
-	}
+	clicked := b.Clicked()
 	b.Children(func() {
-		svg := icons["heart"]
+		svg := icons[name]
 		if on {
-			svg = solidIcons["heart"]
+			svg = solidIcons[name]
 		}
 		ui.Icon(c, svg).FontSize(size).TextColor(ink)
 	})
+	return clicked
 }
 
 // setLiked likes a track or no longer, beside the main thread: liking a
-// Spotify track asks Spotify.
+// Spotify track asks Spotify. Liking a disliked track takes the dislike
+// back, which the player hears of at once.
 func (s *shell) setLiked(t media.Track, on bool) {
+	if on && s.a.IsDisliked(t.ID) {
+		s.p.Disliked(t.ID, false)
+	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
@@ -120,6 +163,47 @@ func (s *shell) setLiked(t media.Track, on bool) {
 			}
 		})
 	}()
+}
+
+// setDisliked dislikes a track or no longer. The player hears of it at
+// once, and moves on from the track if it plays, while the settings skip
+// disliked songs; the library keeps it, and YouTube Music hears of it,
+// beside the main thread. A dislike says so at once, in a toast whose undo
+// takes it back, likes the track again if it was liked, and goes back to
+// it where it was if it played.
+func (s *shell) setDisliked(t media.Track, on bool) {
+	s.p.Disliked(t.ID, on)
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		err := s.svc.Collection.SetDisliked(ctx, t, on)
+		s.update(func() {
+			if err != nil {
+				// The library keeps what it had: the player too.
+				s.p.Disliked(t.ID, !on)
+				s.notes = append(s.notes, noticeOf(err))
+			}
+		})
+	}()
+	if !on {
+		return
+	}
+	liked := s.a.IsLiked(t.ID)
+	back := func() {}
+	if cur, ok := s.st.Current(); ok && cur.Track.ID == t.ID && s.set.SkipDisliked {
+		uid, at := cur.UID, s.st.Position
+		playing := s.st.Playing || s.st.Loading || s.st.Waiting && s.st.WillPlay
+		back = func() { s.p.Return(uid, at, playing) }
+	}
+	s.actionToasts = append(s.actionToasts, actionToast{"Disliked " + t.Title, "undo", func() {
+		s.p.Disliked(t.ID, false)
+		if liked {
+			s.setLiked(t, true)
+		} else {
+			s.setDisliked(t, false)
+		}
+		back()
+	}})
 }
 
 func (s *shell) transport(c *ui.Context) {
@@ -186,7 +270,7 @@ func (s *shell) progress(c *ui.Context) {
 	if s.st.Live {
 		s.seeking = false
 		ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
-			ui.Text(c, "live").FontSize(k.captionSize()).TextColor(k.accent).Width(44).TextAlign(ui.End)
+			ui.Text(c, k.sentence("live")).FontSize(k.captionSize()).TextColor(k.accent).Width(44).TextAlign(ui.End)
 			edge := 1.0
 			ui.Slider(c.Key("seek"), &edge, 0, 1).Grow(1).MinWidth(0).Label("Live: no seeking").Disabled(true)
 			ui.Box(c).Width(44)

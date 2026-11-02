@@ -44,6 +44,9 @@ type effects struct {
 	speedlines, screentone bool
 	// sparkles drift up the ground, twinkling (Mochi).
 	sparkles bool
+	// material makes the colours of Material's scheme of a seed: the
+	// artwork's, as the accent follows it, or the accent (Material).
+	material bool
 }
 
 // optionValue is the value of a theme's option: the user's, or its
@@ -95,6 +98,8 @@ func themeEffects(th addons.Theme, chosen map[string]string) effects {
 		fx.speedlines, fx.screentone = opt("speedlines") == "true", opt("screentone") == "true"
 	case "mochi":
 		fx.sparkles = opt("sparkles") == "true"
+	case "material", "material-dark":
+		fx.material = true
 	}
 	return fx
 }
@@ -113,7 +118,7 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 	case k.fx.petals:
 		root.Draw(paintPetals)
 	case k.fx.wash:
-		t := s.coverTint(c, k.accent, washTone)
+		t := s.coverTint(c, k.accent, groundTone(k.dark))
 		root.Draw(func(p *ui.Painter, r ui.Rect) {
 			paintWash(p, r, t.color(p.Now()))
 			if t.changing(p.Now()) {
@@ -121,7 +126,7 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 			}
 		})
 	case k.fx.cover:
-		t := s.coverTint(c, k.accent, coverTone)
+		t := s.coverTint(c, k.accent, groundTone(k.dark))
 		// Without a cover, the accent's light is half as strong: the
 		// glass stays white.
 		accent, strength := k.accent, 1.0

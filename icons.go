@@ -19,6 +19,7 @@ var iconPaths = map[string]string{
 	"repeat":       "M4 11V8.5A2.5 2.5 0 0 1 6.5 6H19M16 3l3 3-3 3M20 13v2.5a2.5 2.5 0 0 1-2.5 2.5H5M8 21l-3-3 3-3",
 	"repeatOne":    "M4 11V8.5A2.5 2.5 0 0 1 6.5 6H19M16 3l3 3-3 3M20 13v2.5a2.5 2.5 0 0 1-2.5 2.5H5M8 21l-3-3 3-3M11.5 10.5 13 9.5v5",
 	"heart":        "M12 20.5S3.5 15.2 3.5 9.2A4.7 4.7 0 0 1 12 6.6a4.7 4.7 0 0 1 8.5 2.6c0 6-8.5 11.3-8.5 11.3Z",
+	"dislike":      "M16.5 3.5h4v10h-4zM16.5 3.5H7.2a2 2 0 0 0-2 1.6l-1.6 7a2 2 0 0 0 2 2.4H10V18a2.5 2.5 0 0 0 2.5 2.5l4-7Z",
 	"queue":        "M3.5 6h11M3.5 11h11M3.5 16h7M17 13.5v7l4.5-3.5z",
 	"lyrics":       "M4.5 5h15v10.5H11l-4.5 4v-4h-2zM8 9h8M8 12h5",
 	"volume":       "M4 9.5h3.5L12 5.5v13l-4.5-4H4zM15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11",
@@ -53,7 +54,7 @@ var iconPaths = map[string]string{
 }
 
 // icons are iconPaths drawn as lines, and solidIcons as filled shapes, as
-// the web interface's play glyph and a liked heart.
+// the web interface's play glyph, a liked heart and a disliked thumb.
 var icons, solidIcons = makeIcons()
 
 func makeIcons() (lines, solid map[string]*ui.SVG) {

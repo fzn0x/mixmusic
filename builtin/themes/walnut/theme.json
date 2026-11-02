@@ -1,0 +1,34 @@
+{
+  "id": "walnut",
+  "name": "Walnut",
+  "version": "1.0.0",
+  "author": "MixMusic",
+  "description": "Walnut-dark neutrals lit by tangerine, with heavy condensed headings.",
+  "scheme": "dark",
+  "colors": {
+    "bg": "#24160b",
+    "surface": "#2d1e12",
+    "surface-2": "#38271a",
+    "surface-3": "#453224",
+    "border": "rgba(255, 228, 196, 0.12)",
+    "text": "#f8f3eb",
+    "text-muted": "#c5b099",
+    "accent": "#fa8927",
+    "accent-text": "#1f0c00",
+    "danger": "#ff6e5f",
+    "success": "#a6d36b",
+    "youtube": "#ff5b4d",
+    "spotify": "#5cc285",
+    "tile-1": "#a3420f",
+    "tile-2": "#6b3584",
+    "tile-3": "#17655f",
+    "tile-4": "#982a46",
+    "tile-text": "#ffffff"
+  },
+  "fonts": {
+    "body": "'Segoe UI', 'Helvetica Neue', 'Noto Sans', 'DejaVu Sans', system-ui, sans-serif",
+    "display": "'Archivo SemiCondensed', 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif"
+  },
+  "radius": "8px",
+  "options": []
+}

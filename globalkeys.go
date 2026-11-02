@@ -33,7 +33,7 @@ func globalHint(goos string) string {
 // globalShortcutSettings list the commands that global shortcuts run, and
 // their keys, which the user records as the window's shortcuts.
 func (s *shell) globalShortcutSettings(c *ui.Context) {
-	s.group(c, "from any app", func() {
+	s.group(c, "From any app", func() {
 		s.hint(c, globalHint(runtime.GOOS))
 		for _, gc := range app.GlobalCommands {
 			s.globalShortcutRow(c, gc)
@@ -191,11 +191,15 @@ func (s *shell) giveUpGlobal(id, keys string) {
 // globalPress takes the press of one of MixMusic's own global shortcuts,
 // whose keys never reach the window, as the user records the keys of a
 // shortcut in Settings › Shortcuts, or in a search of the settings that
-// found it: on the main thread, while the window has the focus. The
-// command of the keys runs otherwise.
-func (s *shell) globalPress(_, keys string) bool {
-	if s.recording == "" || s.win != nil && !s.win.IsFocused() {
+// found it: on the main thread, while the window has the focus. Then too,
+// the window runs its own dislike, whose toast takes it back. The command
+// of the keys runs otherwise.
+func (s *shell) globalPress(id, keys string) bool {
+	if s.win != nil && !s.win.IsFocused() {
 		return false
+	}
+	if s.recording == "" {
+		return s.globalHere(id)
 	}
 	if !s.showsShortcuts() {
 		// The page went without a frame that ended the recording.
@@ -227,6 +231,26 @@ func (s *shell) globalPress(_, keys string) bool {
 		s.win.Invalidate()
 	}
 	return took
+}
+
+// globalHere runs the window's own command of the global shortcut of id,
+// pressed while the window has the focus, for the command that does more
+// there: a dislike says so in a toast whose undo takes it back. It tells
+// whether it ran.
+func (s *shell) globalHere(id string) bool {
+	if id != "player.dislike" {
+		return false
+	}
+	for _, cmd := range s.commands() {
+		if cmd.id == id {
+			cmd.run()
+			if s.win != nil {
+				s.win.Invalidate()
+			}
+			return true
+		}
+	}
+	return false
 }
 
 // showsShortcuts tells whether the page shows the rows of the shortcuts:

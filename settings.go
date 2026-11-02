@@ -10,9 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -61,7 +64,7 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 			pick = -1
 		}
 		before := pick
-		s.pageHeader(c, "settings", settingsTabs, &pick)
+		s.pageHeader(c, "Settings", settingsTabs, &pick)
 		if pick != before {
 			s.router.Replace(settingsPath(settingsTabs[pick], ""))
 		}
@@ -129,12 +132,13 @@ func (s *shell) group(c *ui.Context, title string, rows func()) { s.groupWith(c,
 // While the user searches the settings, it shows what the search finds of
 // them (findGroup).
 func (s *shell) groupWith(c *ui.Context, title string, links, rows func()) {
+	k := &s.lk
 	f := &s.find
 	if f.on() {
 		s.findGroup(c, title, links, rows)
 		return
 	}
-	g := ui.Column(c).Margin(0, 0, 48)
+	g := ui.Column(c).Margin(0, 0, k.sections())
 	// The group a search's link showed in its section comes into view.
 	if f.reveal != "" && f.reveal == title && f.current {
 		f.reveal = ""
@@ -142,7 +146,11 @@ func (s *shell) groupWith(c *ui.Context, title string, links, rows func()) {
 	}
 	g.Children(func() {
 		s.sectionHead(c, title, links)
-		ui.Column(c).Dividers(1, s.lk.border).Children(rows)
+		group := ui.Column(c).Dividers(1, k.border)
+		if k.cards {
+			group.Background(k.surface).Radius(k.radiusSm+k.cardPad()).Padding(4, 2*k.cardPad())
+		}
+		group.Children(rows)
 	})
 }
 
@@ -265,9 +273,35 @@ func (s *shell) openFolder(kind addons.Kind) {
 	}
 }
 
+// layoutChoices are the layout designs, in the order of settings.Layouts,
+// as Settings › Appearance offers them.
+var layoutChoices = []choice{
+	{"Blend", "Expressive's rounded shapes and springy motion, on Crate's dense rows, big covers in cards and bold headings. The default.", false},
+	{"Expressive", "Playful and colourful: tonal fills, big rounded shapes, pill buttons, a floating player bar and springy motion. The Material themes go with it, their colours made of the cover's.", false},
+	{"Crate", "Restrained: dense rows, big covers in cards and bold, tight headings, so that the covers do the work.", false},
+	{"Tiles", "Flat tiles, giant light lowercase words and outlined boxes, as MixMusic first was.", false},
+}
+
 func (s *shell) appearanceSettings(c *ui.Context) {
 	k := &s.lk
-	s.groupWith(c, "theme", func() {
+	s.group(c, "Layout", func() {
+		layout := slices.Index(settings.Layouts, s.set.Layout)
+		options := layoutChoices
+		if k.headings == headingsLight {
+			// Tiles' own words are lowercase, as its other choices.
+			options = s.lowLayoutChoices[:0]
+			for _, o := range layoutChoices {
+				o.title = k.words(o.title)
+				options = append(options, o)
+			}
+			s.lowLayoutChoices = options
+		}
+		if s.choices(c, "layout", "Layout", &layout, options) {
+			s.set.Layout = settings.Layouts[layout]
+			s.save()
+		}
+	})
+	s.groupWith(c, "Theme", func() {
 		if s.link(c, "more-themes", "get more themes") {
 			s.navigate("/marketplace/themes")
 		}
@@ -275,7 +309,11 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			s.openFolder(addons.KindTheme)
 		}
 	}, func() {
-		s.row(c, "Follow the computer", "Show one theme while the computer is in light mode and another in dark mode. The theme you pick below is the one for the mode it is in now.", func() {
+		follow := "Show one theme while the computer is in light mode and another in dark mode. The theme you pick below is the one for the mode it is in now."
+		if s.oneMode {
+			follow = "Show one theme in light mode and another in dark mode. Your colour file's colours are light or dark, so the theme of their mode shows."
+		}
+		s.row(c, "Follow the computer", follow, func() {
 			if s.switchOf(c.Key("follow"), &s.set.FollowSystem).Label("Follow the computer").Changed() {
 				s.save()
 			}
@@ -283,6 +321,9 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 		if s.set.FollowSystem {
 			s.row(c, "In light mode", "", func() { s.themeSelect(c, "light-theme", "Theme in light mode", &s.set.LightTheme) })
 			s.row(c, "In dark mode", "", func() { s.themeSelect(c, "dark-theme", "Theme in dark mode", &s.set.DarkTheme) })
+		}
+		if !s.wornColors().Empty() {
+			s.hint(c, "Your colour file sets the colours. The theme sets the type, corners and effects.")
 		}
 		// The search finds a theme's card by the theme's name, who made it,
 		// and whether it is light or dark.
@@ -316,13 +357,19 @@ func (s *shell) appearanceSettings(c *ui.Context) {
 			}
 		})
 	}
-	s.group(c, "colour and type", func() {
-		s.row(c, "Follow the artwork", "Take the accent colour from the artwork of what plays.", func() {
+	s.group(c, "Colour and type", func() {
+		s.colorFileSettings(c)
+		artwork, accent := "Take the accent colour from the artwork of what plays.", "Replaces the theme's accent when the artwork does not set it."
+		if s.set.ColorSource != settings.ColorsTheme {
+			artwork = "Take the accent colour from the artwork of what plays, over your colour file's."
+			accent = "Replaces your colour file's accent when the artwork does not set it."
+		}
+		s.row(c, "Follow the artwork", artwork, func() {
 			if s.switchOf(c.Key("dynamic-accent"), &s.set.DynamicAccent).Label("Follow the artwork").Changed() {
 				s.save()
 			}
 		})
-		s.row(c, "Accent colour", "Replaces the theme's accent when the artwork does not set it.", func() { s.accentControl(c) })
+		s.row(c, "Accent colour", accent, func() { s.accentControl(c) })
 		s.zoomRow(c)
 		s.row(c, "Text size", fmt.Sprintf("%d%%", int(s.set.FontScale*100+0.5)), func() {
 			if ui.StepSlider(c.Key("font-scale"), &s.set.FontScale, 0.85, 1.3, 0.05).Width(200).Label("Text size").Changed() {
@@ -390,6 +437,9 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 	tk := s.cardLook(id)
 	card := s.buttonBase(c.Key("theme-"+id)).Width(200).Height(124).Column().AlignItems(ui.Start).Justify(ui.SpaceBetween).
 		Padding(14).Background(tk.bg).Border(1, tk.border).Label(name).Cursor(ui.CursorPointer)
+	if k.cards {
+		card.Radius(k.radiusSm)
+	}
 	if current {
 		card.Border(3, k.accent)
 	}
@@ -397,7 +447,7 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 		s.chooseTheme(id)
 	}
 	card.Children(func() {
-		ui.Text(c, name).FontSize(k.size(1.5)).FontWeight(300).Font(tk.display).TextColor(tk.text).SingleLine()
+		ui.Text(c, name).FontSize(k.size(1.5)).FontWeight(tk.titleWeight()).Font(tk.display).TextColor(tk.text).SingleLine()
 		ui.Row(c).Gap(4).Children(func() {
 			for i := range 4 {
 				ui.Box(c).Size(22, 22).Background(tk.tile(i))
@@ -418,15 +468,17 @@ func themeBy(t addons.Theme) string {
 // cardLook is the look of theme id's card, made once for the themes
 // installed: a look lists the system's fonts, which takes a while, and the
 // cards show every theme in every frame. A card's look is the theme's own,
-// whatever the settings and the computer's light or dark.
+// in the layout design chosen, whatever the other settings and the
+// computer's light or dark.
 func (s *shell) cardLook(id string) *look {
 	themes := s.inv.Themes
-	if s.cardLooks == nil || len(themes) != len(s.cardThemes) || len(themes) > 0 && &themes[0] != &s.cardThemes[0] {
-		s.cardLooks, s.cardThemes = map[string]*look{}, themes
+	if s.cardLooks == nil || len(themes) != len(s.cardThemes) || len(themes) > 0 && &themes[0] != &s.cardThemes[0] ||
+		s.cardLayout != s.set.Layout {
+		s.cardLooks, s.cardThemes, s.cardLayout = map[string]*look{}, themes, s.set.Layout
 	}
 	tk, ok := s.cardLooks[id]
 	if !ok {
-		l := newLook(settings.Settings{Theme: id, FontScale: 1}, themes, false, "")
+		l := newLook(settings.Settings{Theme: id, FontScale: 1, Layout: s.set.Layout}, themes, false, "", colorfile.Colors{})
 		tk = &l
 		s.cardLooks[id] = tk
 	}
@@ -436,7 +488,11 @@ func (s *shell) cardLook(id string) *look {
 // accentControl chooses the accent colour.
 func (s *shell) accentControl(c *ui.Context) {
 	s.colorControl(c, "accent", "Accent colour", s.chosenAccent(), func(hex string) { s.set.Accent = hex })
-	if s.set.Accent != "" && s.link(c, "accent-theme", "use the theme's") {
+	whose := "use the theme's"
+	if !s.wornColors().Empty() {
+		whose = "use the file's"
+	}
+	if s.set.Accent != "" && s.link(c, "accent-theme", whose) {
 		s.set.Accent = ""
 		s.wells["accent"].edits = 0
 		s.save()
@@ -577,19 +633,174 @@ func (s *shell) setThemeOption(theme, id, value string) {
 	s.set.ThemeOptions = options
 }
 
-// chosenAccent is the accent the user chose, or the active theme's.
+// chosenAccent is the accent the user chose, or the active theme's, or
+// the colour file's.
 func (s *shell) chosenAccent() ui.Color {
 	if a, ok := parseColor(s.set.Accent); ok && s.set.Accent != "" {
 		return col(a)
 	}
-	id := s.set.ActiveTheme(s.lk.systemDark)
-	for _, t := range s.inv.Themes {
-		if a, ok := parseColor(t.Colors["accent"]); ok && t.ID == id {
-			return col(a)
+	return s.lk.themeAccent
+}
+
+// wornColors are the colour file's colours the look wears, none while the
+// theme's show.
+func (s *shell) wornColors() colorfile.Colors {
+	if s.set.ColorSource == settings.ColorsTheme {
+		return colorfile.Colors{}
+	}
+	return s.colorFile.Colors
+}
+
+// colorSources are the choices of Colours from a file.
+var colorSources = []struct {
+	source settings.ColorSource
+	label  string
+}{
+	{settings.ColorsTheme, "Off"},
+	{settings.ColorsPywal, "pywal"},
+	{settings.ColorsMatugen, "matugen"},
+	{settings.ColorsFile, "A file of your own"},
+}
+
+// colorFileHelp is where docs/themes.md tells how to set up a colour file.
+const colorFileHelp = "https://fzn0x.github.io/mixmusic/docs/themes/#colours-from-a-file"
+
+// colorFileSettings chooses where the colours come from, and tells what
+// MixMusic read of the file.
+func (s *shell) colorFileSettings(c *ui.Context) {
+	labels := make([]string, len(colorSources))
+	chosen := labels[0]
+	for i, cs := range colorSources {
+		labels[i] = cs.label
+		if cs.source == s.set.ColorSource {
+			chosen = cs.label
 		}
 	}
-	a, _ := parseColor(fallbackTheme["accent"])
-	return col(a)
+	s.row(c, "Colours from a file", "Take the colours from pywal or matugen, and follow them as they change. The theme keeps its type, corners and effects.", func() {
+		if s.selectOf(c.Key("color-source"), &chosen, labels).Width(200).Label("Colours from a file").Changed() {
+			if i := slices.Index(labels, chosen); i >= 0 && colorSources[i].source != s.set.ColorSource {
+				s.set.ColorSource = colorSources[i].source
+				s.save()
+			}
+		}
+	}, "wallpaper", "a file of your own")
+	source := s.set.ColorSource
+	if source == settings.ColorsTheme {
+		return
+	}
+	note, bad := colorFileNote(s.colorFile, s.set, time.Now())
+	// The search finds the file's row by what it shows: the file, what
+	// MixMusic read of it, and its links and button.
+	shown := ""
+	if s.colorFile.Source == source {
+		shown = s.colorFile.Path
+	}
+	words := []string{string(source), shown, "how to set it up"}
+	switch source {
+	case settings.ColorsMatugen:
+		words = append(words, "copy the template")
+	case settings.ColorsFile:
+		words = append(words, s.set.ColorFile, "choose")
+	}
+	if !s.findable("Colour file", note, words...) {
+		return
+	}
+	s.show(c, func() { s.colorFileRow(c, source, shown, note, bad) })
+}
+
+// colorFileRow shows the colour file of source, shown where it is, note
+// what MixMusic read of it, which bad tells is a problem.
+func (s *shell) colorFileRow(c *ui.Context, source settings.ColorSource, shown, note string, bad bool) {
+	k := &s.lk
+	ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
+		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
+			ui.Text(c, "Colour file").FontSize(k.bodySize())
+			if shown != "" {
+				ui.Text(c, shown).FontSize(k.smallSize()).TextColor(k.muted)
+			}
+			ink := k.muted
+			if bad {
+				ink = k.danger
+			}
+			ui.Text(c, note).FontSize(k.smallSize()).TextColor(ink)
+			ui.Row(c).Gap(16).Padding(4, 0, 0).Children(func() {
+				if s.link(c, "color-file-help", "how to set it up") {
+					go s.svc.System.OpenExternal(colorFileHelp)
+				}
+				if source == settings.ColorsMatugen && s.link(c, "copy-template", "copy the template") {
+					copyText(colorfile.MatugenTemplate)
+					s.notes = append(s.notes, notice("Template copied"))
+				}
+			})
+		})
+		if source != settings.ColorsFile {
+			return
+		}
+		ui.Row(c).Shrink(0).Gap(8).Children(func() {
+			in, _ := s.settingInput(c, "color-file", s.set.ColorFile, func(path string) {
+				s.set.ColorFile = settings.CleanPath(path)
+				s.save()
+			})
+			in.Placeholder(k.sentence("path to a colour file")).Width(260).Label("Colour file")
+			if s.button(c, "choose-color-file", "choose", false).Label("Choose a colour file").Clicked() {
+				s.chooseColorFile()
+			}
+		})
+	})
+}
+
+// colorFileNote tells what MixMusic read of the colour file the settings
+// name, as of now, and whether that's a problem.
+func colorFileNote(st app.ColorFileStatus, set settings.Settings, now time.Time) (string, bool) {
+	source := set.ColorSource
+	switch {
+	case source == settings.ColorsFile && set.ColorFile == "":
+		return "Choose a file: pywal's colors.json, what matugen --json prints, or a theme.json.", false
+	case st.Source != source || st.Path == "" && st.Err == "":
+		return "Reading it…", false
+	case st.Missing && source == settings.ColorsPywal:
+		return "It isn't there yet: pywal writes it when you run wal.", true
+	case st.Missing && source == settings.ColorsMatugen:
+		return "It isn't there yet: add MixMusic's template to matugen's config.toml, and run matugen.", true
+	case st.Missing:
+		return "It isn't there. The theme's colours show until it is.", true
+	case st.Err != "" && !st.Colors.Empty():
+		return "It can't be read: " + strings.TrimSuffix(st.Err, ".") + ". MixMusic keeps the colours it read at " + clockOf(st.ReadAt, now) + ".", true
+	case st.Err != "":
+		return "It can't be read: " + strings.TrimSuffix(st.Err, ".") + ". The theme's colours show.", true
+	}
+	return "Read at " + clockOf(st.ReadAt, now) + ", and followed as it changes.", false
+}
+
+// clockOf is the time of t, with its day unless it is now's.
+func clockOf(t, now time.Time) string {
+	if y, m, d := t.Date(); y == now.Year() && m == now.Month() && d == now.Day() {
+		return t.Format("15:04")
+	}
+	return t.Format("2 Jan 15:04")
+}
+
+// openFileDialog asks the user for files, as MyGo's dialog does; tests
+// replace it.
+var openFileDialog = func(opts mygo.OpenDialogOptions) ([]string, error) { return mygo.Dialog.Open(opts) }
+
+// chooseColorFile asks the user for a colour file, beside the main thread,
+// and reads the one they choose.
+func (s *shell) chooseColorFile() {
+	win := s.win
+	go func() {
+		paths, err := openFileDialog(mygo.OpenDialogOptions{Parent: win, Title: "Choose a colour file", ShowHiddenFiles: true,
+			Filters: []mygo.FileFilter{{Name: "Colour files", Extensions: []string{"json"}}, {Name: "All files", Extensions: []string{"*"}}}})
+		s.update(func() {
+			switch {
+			case err != nil:
+				s.notes = append(s.notes, noticeOf(err))
+			case len(paths) > 0 && paths[0] != s.set.ColorFile:
+				s.set.ColorFile = paths[0]
+				s.save()
+			}
+		})
+	}()
 }
 
 // spotifyPlaysHere tells whether MixMusic plays Spotify itself: where its
@@ -600,7 +811,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 	k := &s.lk
 	sp := s.accounts().Spotify
 	signedIn := sp.SignedIn
-	s.group(c, "spotify tracks", func() {
+	s.group(c, "Spotify tracks", func() {
 		here := "MixMusic plays them itself, at Spotify's own quality, and shows among your Spotify devices. Needs Spotify Premium, and no Spotify app."
 		if !spotifyPlaysHere {
 			here = "This computer's webview can't play Spotify's protected audio, so MixMusic can't play Spotify itself."
@@ -608,9 +819,9 @@ func (s *shell) playbackSettings(c *ui.Context) {
 		modes := []settings.SpotifyPlayback{settings.SpotifyPlaybackHere, settings.SpotifyPlaybackConnect, settings.SpotifyPlaybackMatch}
 		mode := slices.Index(modes, s.set.SpotifyPlayback)
 		if s.choices(c, "spotify-mode", "How Spotify tracks play", &mode, []choice{
-			{"in mixmusic, from spotify", here, !spotifyPlaysHere},
-			{"on spotify connect", "Your Spotify app, or another Spotify device, plays them, at Spotify's own quality. Needs Spotify Premium and a device with Spotify open.", false},
-			{"in mixmusic, from youtube music", "MixMusic plays their recording on YouTube Music, with the equalizer, crossfade and visualizer. Works without Premium.", false},
+			{k.words("In MixMusic, from Spotify"), here, !spotifyPlaysHere},
+			{k.words("On Spotify Connect"), "Your Spotify app, or another Spotify device, plays them, at Spotify's own quality. Needs Spotify Premium and a device with Spotify open.", false},
+			{k.words("In MixMusic, from YouTube Music"), "MixMusic plays their recording on YouTube Music, with the equalizer, crossfade and visualizer. Works without Premium.", false},
 		}) {
 			s.set.SpotifyPlayback = modes[mode]
 			s.save()
@@ -646,7 +857,7 @@ func (s *shell) playbackSettings(c *ui.Context) {
 			s.deviceRow(c)
 		}
 	})
-	s.group(c, "sound", func() {
+	s.group(c, "Sound", func() {
 		s.row(c, "Quality", "Data saver streams smaller files of YouTube Music.", func() {
 			saver := 0
 			if s.set.Quality == settings.QualitySaver {
@@ -695,6 +906,26 @@ func (s *shell) playbackSettings(c *ui.Context) {
 				s.save()
 			}
 		})
+		s.row(c, "Skip songs you dislike", "Songs you dislike don't play when the queue moves on, and radios leave them out.", func() {
+			if s.switchOf(c.Key("skip-disliked"), &s.set.SkipDisliked).Label("Skip songs you dislike").Changed() {
+				s.save()
+			}
+		})
+		// Where dislikes go, and, once there are any, a link to them.
+		note, see := dislikesNote, len(s.svc.Collection.Disliked()) > 0
+		if see {
+			note += " See the songs you dislike."
+		}
+		s.found(c, "", note, func() {
+			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
+				ui.Text(c, dislikesNote)
+				if see {
+					ui.Text(c, " ")
+					s.linkOf(c, "See the songs you dislike", "/library/disliked")
+					ui.Text(c, ".")
+				}
+			})
+		})
 	})
 	s.equalizerSettings(c)
 	s.cacheSettings(c)
@@ -704,6 +935,10 @@ func (s *shell) playbackSettings(c *ui.Context) {
 // surroundDescription tells what 5.1 surround does, in Settings › Playback.
 const surroundDescription = "Some tracks have a 5.1 surround mix beside their stereo one. It plays on six speakers where your output has them, " +
 	"else mixed down to stereo. The 5.1 button by the player turns it on and off too."
+
+// dislikesNote is what the note under Skip songs you dislike says of where
+// dislikes go.
+const dislikesNote = "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic."
 
 // deviceRow chooses the Spotify Connect device that plays Spotify tracks.
 func (s *shell) deviceRow(c *ui.Context) {
@@ -731,7 +966,7 @@ func (s *shell) deviceRow(c *ui.Context) {
 func (s *shell) equalizerSettings(c *ui.Context) {
 	k := &s.lk
 	eq := &s.set.Equalizer
-	s.group(c, "equalizer", func() {
+	s.group(c, "Equalizer", func() {
 		s.row(c, "Equalizer", "Shape the sound of YouTube Music with ten bands and a preamp.", func() {
 			if s.switchOf(c.Key("eq-on"), &eq.Enabled).Label("Equalizer").Changed() {
 				s.save()
@@ -844,7 +1079,7 @@ func (s *shell) aboutSettings(c *ui.Context) {
 	k := &s.lk
 	info := s.svc.System.Info()
 	u := s.svc.System.Updates()
-	s.group(c, "mixmusic", func() {
+	s.group(c, "MixMusic", func() {
 		version := "MixMusic " + info.Version + " · " + info.Platform + " " + info.Arch
 		if build, ok := buildNames[u.Kind]; ok {
 			version += " · " + build
@@ -878,7 +1113,7 @@ func (s *shell) aboutSettings(c *ui.Context) {
 		})
 	})
 	s.updateSettings(c)
-	s.group(c, "licenses", func() {
+	s.group(c, "Licenses", func() {
 		for i, n := range append(s.svc.System.Notices(), fontNotices()...) {
 			open := s.licenseOpen == i
 			// A license's text shows with its row.

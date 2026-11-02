@@ -273,3 +273,60 @@ func TestZoom(t *testing.T) {
 		}
 	}
 }
+
+// TestSkipDisliked passes over disliked songs in new installs, and in the
+// settings of earlier versions, which don't have it, until the user turns
+// it off.
+func TestSkipDisliked(t *testing.T) {
+	for file, want := range map[string]bool{`{}`: true, `{"autoplay":false}`: true, `{"skipDisliked":false}`: false, `{"skipDisliked":true}`: true} {
+		s := Default()
+		if err := json.Unmarshal([]byte(file), &s); err != nil {
+			t.Fatal(err)
+		}
+		if s.Clean().SkipDisliked != want {
+			t.Errorf("%s skips disliked songs %v, not %v", file, s.SkipDisliked, want)
+		}
+	}
+}
+
+// TestCleanLayout gives settings from before the layout setting, and
+// those of a layout no more, Blend's.
+func TestCleanLayout(t *testing.T) {
+	for in, want := range map[Layout]Layout{"": LayoutBlend, "bogus": LayoutBlend, LayoutBlend: LayoutBlend,
+		LayoutExpressive: LayoutExpressive, LayoutCrate: LayoutCrate, LayoutTiles: LayoutTiles} {
+		if got := (Settings{Layout: in}).Clean().Layout; got != want {
+			t.Errorf("Clean of layout %q = %q, want %q", in, got, want)
+		}
+	}
+}
+
+// TestColorSource starts with the theme's colours, drops a source it
+// doesn't know and a path too long to be one, and keeps a pasted path
+// without its spaces and quotes.
+func TestColorSource(t *testing.T) {
+	if d := Default(); d.ColorSource != ColorsTheme || d.ColorFile != "" {
+		t.Errorf("a new install reads a colour file: %q %q", d.ColorSource, d.ColorFile)
+	}
+	for _, source := range []ColorSource{ColorsTheme, ColorsPywal, ColorsMatugen, ColorsFile} {
+		if got := (Settings{ColorSource: source}).Clean().ColorSource; got != source {
+			t.Errorf("Clean made %q %q", source, got)
+		}
+	}
+	if got := (Settings{ColorSource: "wallust"}).Clean().ColorSource; got != ColorsTheme {
+		t.Errorf("an unknown source stayed: %q", got)
+	}
+	for in, want := range map[string]string{
+		"  ~/.cache/wal/colors.json ":    "~/.cache/wal/colors.json",
+		`"C:\Users\me\colors.json"`:      `C:\Users\me\colors.json`,
+		` " /home/me/my colours.json " `: "/home/me/my colours.json",
+		`"`:                              `"`,
+		"/" + strings.Repeat("a", 5000):  "",
+		"/" + strings.Repeat("a", 4095):  "/" + strings.Repeat("a", 4095),
+		`/home/me/"quoted" name.json`:    `/home/me/"quoted" name.json`,
+		"":                               "",
+	} {
+		if got := (Settings{ColorFile: in}).Clean().ColorFile; got != want {
+			t.Errorf("Clean made the colour file %q %q, want %q", in, got, want)
+		}
+	}
+}

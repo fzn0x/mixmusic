@@ -40,8 +40,9 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// testPlayer is the app as a player's services, playing nothing.
-type testPlayer struct{}
+// testPlayer is the app as a player's services, playing nothing: it
+// passes over the tracks the app's library dislikes, when it has the app.
+type testPlayer struct{ a *app.App }
 
 // Prepare finds the stream of a track: a live one of the IDs that start
 // with "yt:live".
@@ -64,6 +65,12 @@ func (testPlayer) StreamFailure(media.Track) string { return "" }
 func (testPlayer) RecordPlay(media.Track)           {}
 func (testPlayer) Radio(context.Context, media.Track) ([]media.Track, error) {
 	return nil, nil
+}
+func (p testPlayer) Skip(t media.Track) string {
+	if p.a != nil && p.a.IsDisliked(t.ID) {
+		return player.SkipDisliked
+	}
+	return ""
 }
 func (testPlayer) Settings() settings.Settings { return settings.Default() }
 func (testPlayer) SaveVolume(float64)          {}
@@ -132,6 +139,11 @@ func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 			t.Fatal(err)
 		}
 	}
+	// The tests were written for the words of the Tiles layout, as a user
+	// who chose it: the design tests choose the others.
+	if err := os.WriteFile(filepath.Join(dir, "data", "settings.json"), []byte(`{"layout": "tiles"}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	opts := app.Options{DataDir: filepath.Join(dir, "data"), CacheDir: filepath.Join(dir, "cache"),
 		LogsDir: filepath.Join(dir, "logs"), Builtin: builtin.FS, Version: "0.4.0"}
 	if set != nil {
@@ -144,7 +156,7 @@ func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 	// The covers' downloads end before the folder goes.
 	t.Cleanup(a.Services().System.Artwork().Close)
 	stream := &testStream{}
-	p := player.New(testPlayer{}, stream, testDevice{}, player.Saved{})
+	p := player.New(testPlayer{a}, stream, testDevice{}, player.Saved{})
 	stream.mu.Lock()
 	stream.p = p
 	stream.mu.Unlock()
@@ -261,6 +273,13 @@ func TestRender(t *testing.T) {
 	s.navigate("/library/youtube")
 	renderTo(t, s, tt, dir, "library-youtube")
 	s.loads["accounts"] = signedOut
+	// A song the user dislikes, muted in the queue and in its own pivot.
+	s.setDisliked(testTracks[3], true)
+	eventually(t, s, "the dislike", func() bool { return s.a.IsDisliked(testTracks[3].ID) })
+	s.navigate("/library/disliked")
+	s.panel = "queue"
+	renderTo(t, s, tt, dir, "library-disliked")
+	s.panel = ""
 
 	s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
 		YouTube: media.SearchResults{Tracks: testTracks[:3], Albums: []media.Album{album}, Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube}}},
@@ -277,6 +296,7 @@ func TestRender(t *testing.T) {
 
 	s.navigate("/settings/playback")
 	renderTo(t, s, tt, dir, "settings-playback")
+	renderTo(t, s, ui.NewTester(s.view, 1280, 1700), dir, "settings-playback-tall")
 	s.navigate("/settings/appearance")
 	renderTo(t, s, tt, dir, "settings-appearance")
 	s.navigate("/settings/accounts")
@@ -322,7 +342,8 @@ func TestRenderThemes(t *testing.T) {
 		id      string
 		options map[string]string
 	}{{"mix", nil}, {"mix", map[string]string{"texture": "slashes", "white-tiles": "true"}}, {"aurora", nil}, {"sakura", nil}, {"terminal", nil}, {"daylight", nil},
-		{"greenroom", nil}, {"glasshouse", nil}, {"anime", nil}, {"mochi", nil}} {
+		{"greenroom", nil}, {"glasshouse", nil}, {"anime", nil}, {"mochi", nil}, {"material", nil}, {"material-dark", nil},
+		{"walnut", nil}, {"walnut-light", nil}} {
 		st := s.svc.Preferences.Get()
 		st.FollowSystem, st.Theme = false, theme.id
 		st.ThemeOptions = map[string]map[string]string{theme.id: theme.options}
@@ -340,6 +361,48 @@ func TestRenderThemes(t *testing.T) {
 		if theme.id == "aurora" {
 			s.navigate("/settings/appearance")
 			renderTo(t, s, ui.NewTester(s.view, 1280, 1700), dir, "theme-aurora-settings")
+		}
+	}
+}
+
+// TestRenderColorFiles draws the home page and the mini player of themes
+// in the colours of pywal's and matugen's files to MIXMUSIC_RENDER, and the
+// appearance settings that read them.
+func TestRenderColorFiles(t *testing.T) {
+	dir := os.Getenv("MIXMUSIC_RENDER")
+	if dir == "" {
+		t.Skip("MIXMUSIC_RENDER names no folder")
+	}
+	s := newTestShell(t)
+	var items []media.Item
+	for i := range testTracks {
+		items = append(items, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
+	}
+	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
+	s.p.PlayTracks(testTracks, 1)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	for _, c := range []struct{ name, file, theme string }{
+		{"pywal", "pywal-3.8.json", "mix"}, {"pywal-light", "pywal-light.json", "daylight"},
+		{"pywal-aurora", "pywal-3.8.json", "aurora"}, {"pywal-light-greenroom", "pywal-light.json", "greenroom"},
+		{"matugen-mochi", "matugen-4.2.json", "mochi"}, {"matugen-terminal", "matugen-4.2.json", "terminal"},
+	} {
+		path, err := filepath.Abs(filepath.Join("internal", "colorfile", "testdata", c.file))
+		if err != nil {
+			t.Fatal(err)
+		}
+		st := s.svc.Preferences.Get()
+		st.FollowSystem, st.Theme, st.DynamicAccent = false, c.theme, false
+		st.ColorSource, st.ColorFile = settings.ColorsFile, path
+		if _, err := s.svc.Preferences.Set(st); err != nil {
+			t.Fatal(err)
+		}
+		s.refresh()
+		s.navigate("/")
+		renderTo(t, s, ui.NewTester(s.view, 1280, 820), dir, "colors-"+c.name)
+		renderTo(t, s, ui.NewTester(s.miniView, 420, 132), dir, "colors-"+c.name+"-mini")
+		if c.name == "pywal" {
+			s.navigate("/settings/appearance")
+			renderTo(t, s, ui.NewTester(s.view, 1280, 2200), dir, "colors-pywal-settings")
 		}
 	}
 }

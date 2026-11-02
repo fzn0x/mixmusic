@@ -32,10 +32,13 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   albums, artists, playlists, related tracks, radios and plain lyrics.
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
-  liked songs, playlists, albums, subscriptions, likes and saves. Its
-  parsers are tested against recorded responses in `testdata/`, and against
-  the live service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run
-  Live` (`MIXMUSIC_YT_COOKIES` adds a signed-in account).
+  liked songs, playlists, albums, subscriptions, likes and saves, and it
+  deletes the playlists the user made, which it tells from those they
+  saved by the menus YouTube sends with them. Its parsers are tested
+  against recorded responses in `testdata/`, and against the live service
+  with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run Live`
+  (`MIXMUSIC_YT_COOKIES` adds a signed-in account, and
+  `MIXMUSIC_YT_WRITE=1` lets it make and delete a playlist there).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
   library), and controls Spotify Connect devices.
@@ -93,6 +96,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both
   called with purego, and the SystemMediaTransportControls of a hidden
   window on Windows, reached through WinRT without cgo.
+- **`internal/portal`** asks the desktop's Background portal, in a
+  Flatpak, to let MixMusic run without a window and to start it at login:
+  the sandbox's own autostart folder is one the desktop never reads.
+  `internal/app` asks it for Start at login, and for close to the tray.
+  [packaging/flatpak](../packaging/flatpak) holds the Flatpak itself.
 - **`internal/taskbar`** puts previous, play or pause, and next on the
   thumbnail of the main window's taskbar button on Windows, through the
   shell's ITaskbarList3, and takes their clicks in a window procedure in
@@ -115,7 +123,10 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
-  title, artists and duration, for playback without a Spotify device.
+  title, artists and duration, for playback without a Spotify device. It
+  also finds the song of a music video, by its title and artists, which
+  the video's radio starts from: YouTube Music makes the radio of a video
+  out of videos.
 - **`lyrics`** finds synced lyrics on LRCLIB and reads LRC.
 - **`internal/library`** keeps liked songs, mixes, the history and stats in
   `library.json`.
@@ -151,6 +162,13 @@ The root package draws the main window and the mini player. Pages fetch
 what they show beside the main thread (`fetch`), and a window's state
 belongs to its main thread: what finishes elsewhere comes back through
 `update`.
+
+- **Refresh** (F5, ⇧⌘R on macOS, `refresh.go`) asks again for the keys
+  the page shown and the side panel fetched in the frame before, as
+  `fetch` collects them, and renders the plugins' views again
+  (`View.Remount`). The page keeps its answers until the new ones come,
+  and keeps them when a refresh fails, which one toast tells. Home's own
+  tile and shelves read the library as it is, and need no refresh.
 
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
@@ -221,6 +239,7 @@ aren't pages act: `act:shot:<name>` saves the window as it is,
 `act:mute` mutes the player, `act:play:<search>` plays what a search
 finds, `act:resume` plays the queue kept in the data folder,
 `act:wait:<duration>` waits, `act:palette` opens the command palette,
+`act:refresh` refreshes the page, as F5 does,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
 scrolls the page, `act:theme:<id>` wears a theme, `act:mini` opens the
 mini player, which saves `mini.png`, `act:spotify` logs whether MixMusic's

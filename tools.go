@@ -126,11 +126,8 @@ func (s *shell) toolSettings(c *ui.Context) {
 				s.installButton(c, "use-ours-settings", "use MixMusic's yt-dlp")
 			}
 		})
-		jsDesc := "yt-dlp needs Deno, Node.js, Bun or QuickJS to read most YouTube streams. Install one, and MixMusic finds it."
-		if js.Found {
-			jsDesc = js.Name + " " + js.Version + " · yt-dlp uses it to solve YouTube's challenges."
-		}
-		s.row(c, "JavaScript runtime", jsDesc, func() {
+		flatpak := s.svc.System.Info().Flatpak
+		s.row(c, "JavaScript runtime", jsRuntimeHelp(js, flatpak), func() {
 			ids := []string{"", "deno", "node", "bun", "quickjs"}
 			labels := []string{"Find one", "Deno", "Node.js", "Bun", "QuickJS"}
 			chosen := s.set.JSRuntime
@@ -145,7 +142,7 @@ func (s *shell) toolSettings(c *ui.Context) {
 				}
 			}
 		}, "Deno Node.js Bun QuickJS")
-		s.row(c, "Own yt-dlp", "Use a yt-dlp of your own, such as your package manager's, instead.", func() {
+		s.row(c, "Own yt-dlp", ownYTDLPHelp(flatpak), func() {
 			in, _ := s.settingInput(c, "ytdlp-path", s.set.YTDLPPath, func(path string) {
 				s.set.YTDLPPath = path
 				s.save()
@@ -155,6 +152,28 @@ func (s *shell) toolSettings(c *ui.Context) {
 		}, "path to yt-dlp")
 		_ = k
 	})
+}
+
+// jsRuntimeHelp describes yt-dlp's JavaScript runtime, js, or tells how to
+// get one. A Flatpak's sandbox has Node.js of its own, and sees no other:
+// one chosen in settings brought over from another copy isn't there.
+func jsRuntimeHelp(js tools.Tool, flatpak bool) string {
+	switch {
+	case js.Found:
+		return js.Name + " " + js.Version + " · yt-dlp uses it to solve YouTube's challenges."
+	case flatpak:
+		return "yt-dlp needs a JavaScript runtime to read most YouTube streams. The Flatpak has Node.js, and no other: choose Find one."
+	}
+	return "yt-dlp needs Deno, Node.js, Bun or QuickJS to read most YouTube streams. Install one, and MixMusic finds it."
+}
+
+// ownYTDLPHelp describes the setting of a yt-dlp of the user's own, which
+// a Flatpak finds only in its own folders.
+func ownYTDLPHelp(flatpak bool) string {
+	if flatpak {
+		return "Use a yt-dlp of your own instead. The Flatpak sees only its own folders: put it in ~/.var/app/io.github.fzn0x.mixmusic."
+	}
+	return "Use a yt-dlp of your own, such as your package manager's, instead."
 }
 
 // cacheSettings show what the offline cache holds, and bound it.

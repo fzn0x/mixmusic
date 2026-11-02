@@ -18,6 +18,8 @@ type File[T any] struct {
 	path  string
 	mu    sync.RWMutex
 	value T
+	// version counts the changes Update made.
+	version uint64
 }
 
 // Open loads the value kept at path, or def when the file does not exist
@@ -68,7 +70,16 @@ func (f *File[T]) Update(fn func(v *T) error) error {
 		return err
 	}
 	f.value = next
+	f.version++
 	return nil
+}
+
+// Version counts the changes made to the value since the file opened, so
+// that what a reader made of the value can be kept until it changes.
+func (f *File[T]) Version() uint64 {
+	f.mu.RLock()
+	defer f.mu.RUnlock()
+	return f.version
 }
 
 // Set replaces the value and saves it.

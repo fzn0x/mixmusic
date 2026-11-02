@@ -104,6 +104,20 @@ func (c *Collection) RemoveFromYouTubePlaylist(ctx context.Context, playlistID s
 	return c.a.youtube.RemoveFromPlaylist(ctx, list, track.EntryID, video)
 }
 
+// DeleteYouTubePlaylist deletes a playlist the user made on YouTube Music,
+// by its MixMusic ID: it goes from YouTube too. Mixes copied from it keep
+// their tracks, and the queue its.
+func (c *Collection) DeleteYouTubePlaylist(ctx context.Context, playlistID string) error {
+	if !c.a.youtube.SignedIn() {
+		return errNotSignedIn
+	}
+	list, err := youtubePlaylistID(playlistID)
+	if err != nil {
+		return err
+	}
+	return c.a.youtube.DeletePlaylist(ctx, list)
+}
+
 // reportYouTubePlay adds a play of a YouTube Music track to the user's
 // history there, when they signed in and keep it on.
 func (a *App) reportYouTubePlay(t media.Track) {

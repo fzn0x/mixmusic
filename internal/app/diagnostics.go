@@ -46,14 +46,19 @@ func (s *System) DismissCrash() {
 }
 
 // ReportURL returns the address of a new problem report on GitHub, with
-// the version and the setup filled in: the system, the tools, the theme
-// and the plugins. Nothing of the user's accounts or library goes in it.
+// the version and the setup filled in: the system, how MixMusic was
+// installed, the tools, the theme and the plugins. Nothing of the user's
+// accounts or library goes in it.
 func (s *System) ReportURL(ctx context.Context) string {
 	info := s.Info()
 	set := s.a.settings.Get()
 	tools := s.a.tools.Status(ctx)
 	var b strings.Builder
-	fmt.Fprintf(&b, "MixMusic %s on %s %s\n", info.Version, runtime.GOOS, runtime.GOARCH)
+	fmt.Fprintf(&b, "MixMusic %s on %s %s", info.Version, runtime.GOOS, runtime.GOARCH)
+	if kind := installKind(); kind != "" {
+		fmt.Fprintf(&b, ", installed as %s", kind)
+	}
+	b.WriteString("\n")
 	outdated := ""
 	if tools.YTDLP.Latest != "" {
 		outdated = ", older than the latest, " + tools.YTDLP.Latest

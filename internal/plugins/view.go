@@ -93,6 +93,32 @@ func (v *View) Mount() {
 	})
 }
 
+// Remount renders the view again, as when the window that shows it left
+// it and came back, but showing what it set until the render sets anew:
+// its cleanup runs, then its render. A view no window shows stays as it
+// is.
+func (v *View) Remount() {
+	v.pl.loop.post(func() {
+		if !v.mounted || v.pl.stopping {
+			return
+		}
+		if v.cleanup != nil {
+			v.pl.call(v.cleanup)
+			v.cleanup = nil
+		}
+		// The callbacks of what shows belong to the render that ended.
+		v.handlers = nil
+		result, err := v.render(sobek.Undefined(), v.jsObject())
+		if err != nil {
+			v.failed(jsError(err))
+			return
+		}
+		if fn, ok := sobek.AssertFunction(result); ok {
+			v.cleanup = fn
+		}
+	})
+}
+
 // Unmount ends the view's render, once no window shows it.
 func (v *View) Unmount() { v.pl.loop.post(v.unmount) }
 

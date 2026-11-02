@@ -313,33 +313,37 @@ func plain(s string) string {
 }
 
 // RadioTracks keeps, of what a radio suggests, the songs not queued yet:
-// neither the same upload nor another of the same song. Of a song offered
-// as both, it keeps the song rather than its music video.
+// neither the same upload nor another of the same song. It leaves out the
+// music videos, uploads and episodes a radio suggests beside its songs,
+// and keeps them only when it has no song left to add, so that the music
+// carries on.
 func RadioTracks(found, queued []media.Track) []media.Track {
+	if songs := radioTracks(found, queued, false); len(songs) > 0 {
+		return songs
+	}
+	return radioTracks(found, queued, true)
+}
+
+// radioTracks keeps, of what a radio suggests, the songs not queued yet,
+// or the videos.
+func radioTracks(found, queued []media.Track, videos bool) []media.Track {
 	ids := map[string]bool{}
 	songs := map[string]bool{}
 	for _, t := range queued {
 		ids[t.ID] = true
 		songs[SongKey(t)] = true
 	}
-	keep := make([]bool, len(found))
-	for _, video := range []bool{false, true} {
-		for i, t := range found {
-			if t.Video != video {
-				continue
-			}
-			key := SongKey(t)
-			if ids[t.ID] || songs[key] {
-				continue
-			}
-			ids[t.ID], songs[key], keep[i] = true, true, true
-		}
-	}
 	var out []media.Track
-	for i, t := range found {
-		if keep[i] {
-			out = append(out, t)
+	for _, t := range found {
+		if t.Video != videos {
+			continue
 		}
+		key := SongKey(t)
+		if ids[t.ID] || songs[key] {
+			continue
+		}
+		ids[t.ID], songs[key] = true, true
+		out = append(out, t)
 	}
 	return out
 }

@@ -14,7 +14,6 @@ import (
 
 	"github.com/fzn0x/mixmusic/builtin"
 	"github.com/fzn0x/mixmusic/internal/app"
-	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
@@ -140,7 +139,6 @@ func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 	s := newShell(a, p)
 	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true}
 	s.loads["tools"] = &loaded[tools.Status]{done: true}
-	s.loads["history"] = &loaded[[]library.Play]{done: true, value: []library.Play{{Track: testTracks[0]}}}
 	for _, tr := range testTracks {
 		s.loads["related-"+tr.ID] = &loaded[[]media.Shelf]{done: true}
 	}
@@ -199,7 +197,7 @@ func TestRender(t *testing.T) {
 	for i := range testTracks {
 		trackItems = append(trackItems, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
 	}
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
 		{Title: "Listen again", Source: media.SourceYouTube, Items: trackItems},
 		{Title: "Albums for you", Source: media.SourceYouTube, Items: items},
 	}}
@@ -209,6 +207,10 @@ func TestRender(t *testing.T) {
 		{TimeMs: 9000, Text: "Fearless on my breath"}, {TimeMs: 14000, Text: "Gentle impulsion"},
 		{TimeMs: 19000, Text: "Shakes me, makes me lighter"}, {TimeMs: 24000, Text: "Fearless on my breath"}}}}
 
+	// Home's jump back in tile offers what played last.
+	if err := s.svc.Collection.RecordPlay(testTracks[0]); err != nil {
+		t.Fatal(err)
+	}
 	tt := ui.NewTester(s.view, 1280, 820)
 	renderTo(t, s, tt, dir, "home-idle")
 
@@ -240,6 +242,11 @@ func TestRender(t *testing.T) {
 	renderTo(t, s, tt, dir, "stats")
 	s.navigate("/library/liked")
 	renderTo(t, s, tt, dir, "library-liked")
+	signedOut := s.loads["accounts"]
+	youtubeLibraryOf(s, ownPlaylist, savedPlaylist, plainPlaylist)
+	s.navigate("/library/youtube")
+	renderTo(t, s, tt, dir, "library-youtube")
+	s.loads["accounts"] = signedOut
 
 	s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
 		YouTube: media.SearchResults{Tracks: testTracks[:3], Albums: []media.Album{album}, Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube}}},
@@ -289,7 +296,7 @@ func TestRenderThemes(t *testing.T) {
 	for i := range testTracks {
 		items = append(items, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
 	}
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
 	s.p.PlayTracks(testTracks, 1)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	for _, theme := range []struct {
@@ -349,6 +356,10 @@ func TestRenderDialogs(t *testing.T) {
 		s = shell("mix", size.scale)
 		s.ask("enable Hello", enableMessage, "enable", func() {})
 		renderTo(t, s, testerOf(t, s, size.w, size.h), dir, "dialog-question"+size.name)
+
+		s = shell("mix", size.scale)
+		s.deleteYouTubePlaylist(ownPlaylist)
+		renderTo(t, s, testerOf(t, s, size.w, size.h), dir, "dialog-delete-playlist"+size.name)
 
 		s = shell("mix", size.scale)
 		s.promptName("New mix", "Name", "late night drive", "create", func(string) {})

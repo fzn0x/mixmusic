@@ -56,6 +56,7 @@ func (s *shell) commands() []command {
 		{"view.palette", "Command palette", "Mod+K", "view", func() { s.paletteOpen = !s.paletteOpen }},
 		{"view.mini", "Mini player", "Mod+M", "view", s.showMini},
 		{"view.sidebar", "Collapse or expand the sidebar", "Mod+B", "view", s.toggleRail},
+		{"view.refresh", "Refresh this page", refreshKeys, "view", s.refreshPage},
 		{"view.zoomIn", "Zoom in", "Mod+=", "view", func() { s.zoomBy(1) }},
 		{"view.zoomOut", "Zoom out", "Mod+-", "view", func() { s.zoomBy(-1) }},
 		{"view.zoomReset", "Reset zoom", "Mod+0", "view", func() { s.setZoom(1) }},

@@ -104,9 +104,29 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 				a.notifyLiked(cur.Track, !liked)
 			}()
 		}
+	case CommandDislike:
+		if cur, ok := p.State().Current(); ok {
+			a.dislikeGoPlayer(p, cur.Track, !a.library.IsDisliked(cur.Track.ID))
+		}
 	case CommandPlayTrack:
 		p.PlayID(cmd.TrackID)
 	}
+}
+
+// dislikeGoPlayer dislikes a track, or takes the dislike back, from
+// outside the window, as the window does: the player hears of it at once,
+// and moves on from the track if it plays, while the settings skip
+// disliked songs, and hears of it again if the library can't keep it.
+func (a *App) dislikeGoPlayer(p *player.Player, t media.Track, disliked bool) {
+	p.Disliked(t.ID, disliked)
+	go func() {
+		if err := (&Collection{a}).SetDisliked(context.Background(), t, disliked); err != nil {
+			log.Printf("mixmusic: disliking %s: %v", t.ID, err)
+			p.Disliked(t.ID, !disliked)
+			return
+		}
+		a.notifyDisliked(t, disliked)
+	}()
 }
 
 // playerServices is the app as the services of the native interface's

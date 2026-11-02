@@ -272,3 +272,62 @@ func TestReloadSettingsFollowsSkipDisliked(t *testing.T) {
 	a.ReloadSettings()
 	until(t, "B skipped again", func() bool { return skip() == player.SkipDisliked })
 }
+
+// TestGlobalDislike dislikes what plays from outside the window, as a
+// global shortcut does: the library keeps it, and the player moves on from
+// it at once, while the settings skip disliked songs.
+func TestGlobalDislike(t *testing.T) {
+	a := newQuietApp(t, nil)
+	p := a.GoPlayer()
+	plays := func(id string) func(player.State) bool {
+		return func(s player.State) bool {
+			cur, ok := s.Current()
+			return ok && cur.Track.ID == id && s.Playing
+		}
+	}
+	p.PlayTracks([]media.Track{
+		{ID: "yt:a", Source: media.SourceYouTube, Title: "A"},
+		{ID: "yt:b", Source: media.SourceYouTube, Title: "B"},
+	}, 0)
+	waitPlayer(t, p, "a playing", plays("yt:a"))
+	a.globalCommand("player.dislike")
+	waitPlayer(t, p, "b playing", plays("yt:b"))
+	until(t, "a disliked", func() bool { return a.library.IsDisliked("yt:a") })
+	if q := p.State().Queue; q[0].Skip != player.SkipDisliked {
+		t.Errorf("the queue doesn't pass over a: %+v", q[0])
+	}
+}
+
+// TestGlobalDislikeTakenBack takes the dislike of what plays back at a
+// second press, which plays on while the settings don't skip disliked
+// songs.
+func TestGlobalDislikeTakenBack(t *testing.T) {
+	a := newQuietApp(t, nil)
+	st := a.settings.Get()
+	st.SkipDisliked = false
+	if err := a.settings.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	p := a.GoPlayer()
+	p.SettingsChanged(st)
+	p.PlayTracks([]media.Track{{ID: "yt:a", Source: media.SourceYouTube, Title: "A"}}, 0)
+	waitPlayer(t, p, "a playing", func(s player.State) bool { return s.Playing })
+	a.command(PlayerCommand{Command: CommandDislike})
+	until(t, "a disliked", func() bool { return a.library.IsDisliked("yt:a") })
+	a.command(PlayerCommand{Command: CommandDislike})
+	until(t, "the dislike taken back", func() bool { return !a.library.IsDisliked("yt:a") })
+	if s := p.State(); !s.Playing || s.Index != 0 || len(a.library.Disliked()) != 0 {
+		t.Errorf("playing %v at %d, disliked %v", s.Playing, s.Index, a.library.Disliked())
+	}
+}
+
+// TestDislikedNote tells what a dislike from outside the window did.
+func TestDislikedNote(t *testing.T) {
+	track := media.Track{Title: "One More Time", Artists: []media.Ref{{Name: "Daft Punk"}}}
+	if title, body := dislikedNote(track, true); title != "Disliked" || body != "One More Time — Daft Punk" {
+		t.Errorf("disliked: %q, %q", title, body)
+	}
+	if title, body := dislikedNote(media.Track{Title: "Intro"}, false); title != "Removed the dislike" || body != "Intro" {
+		t.Errorf("no longer disliked: %q, %q", title, body)
+	}
+}

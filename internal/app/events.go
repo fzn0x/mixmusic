@@ -50,6 +50,7 @@ const (
 	CommandVolumeBy Command = "volumeBy"
 	CommandMute     Command = "mute"
 	CommandLike     Command = "like"
+	CommandDislike  Command = "dislike"
 	CommandShuffle  Command = "shuffle"
 	CommandRepeat   Command = "repeat"
 	// CommandPlayTrack plays the track of TrackID.

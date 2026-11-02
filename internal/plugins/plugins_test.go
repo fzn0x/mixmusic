@@ -18,11 +18,12 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/player/playertest"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // testServices are the app as the player's services, playing nothing.
-type testServices struct{}
+type testServices struct{ playertest.Services }
 
 func (testServices) Prepare(_ context.Context, t media.Track) (player.Source, error) {
 	return player.Source{Mode: player.ModeStream, URL: "url:" + t.ID, Track: t}, nil
@@ -30,18 +31,11 @@ func (testServices) Prepare(_ context.Context, t media.Track) (player.Source, er
 func (s testServices) PrepareStream(ctx context.Context, t media.Track) (player.Source, error) {
 	return s.Prepare(ctx, t)
 }
-func (testServices) StreamFailure(media.Track) string                          { return "" }
-func (testServices) RecordPlay(media.Track)                                    {}
-func (testServices) Radio(context.Context, media.Track) ([]media.Track, error) { return nil, nil }
-func (testServices) Skip(media.Track) string                                   { return "" }
-func (testServices) Settings() settings.Settings                               { return settings.Default() }
-func (testServices) SaveVolume(float64)                                        {}
-func (testServices) Report(player.Now)                                         {}
-func (testServices) SaveQueue(player.Saved)                                    {}
 
 // testStream plays at once, silently: its time moves past where it
 // loaded, as the engine's does once a stream sounds.
 type testStream struct {
+	playertest.Stream
 	mu sync.Mutex
 	p  *player.Player
 }
@@ -58,24 +52,8 @@ func (s *testStream) Load(_ string, cue audio.Cue) error {
 	}
 	return nil
 }
-func (s *testStream) Preload(string)                                   {}
-func (s *testStream) Crossfade(string, time.Duration, audio.Cue) error { return nil }
-func (s *testStream) Play() error                                      { s.get().Playing(true); return nil }
-func (s *testStream) Pause()                                           { s.get().Playing(false) }
-func (s *testStream) Stop()                                            {}
-func (s *testStream) Unload()                                          {}
-func (s *testStream) Seek(time.Duration)                               {}
-func (s *testStream) SetVolume(float64)                                {}
-func (s *testStream) SetSpeed(float64)                                 {}
-
-type testDevice struct{}
-
-func (testDevice) Play(context.Context, media.Track, time.Duration) error { return nil }
-func (testDevice) Pause(context.Context) error                            { return nil }
-func (testDevice) Resume(context.Context) error                           { return nil }
-func (testDevice) Seek(context.Context, time.Duration) error              { return nil }
-func (testDevice) SetVolume(context.Context, float64) error               { return nil }
-func (testDevice) State(context.Context) (*player.DeviceState, error)     { return nil, nil }
+func (s *testStream) Play() error { s.get().Playing(true); return nil }
+func (s *testStream) Pause()      { s.get().Playing(false) }
 
 // testUI keeps what the plugins showed.
 type testUI struct {
@@ -126,7 +104,7 @@ func newTestHost(t *testing.T) *testHost {
 		t.Fatal(err)
 	}
 	stream := &testStream{}
-	p := player.New(testServices{}, stream, testDevice{}, player.Saved{})
+	p := player.New(testServices{}, stream, playertest.Device{}, player.Saved{})
 	stream.mu.Lock()
 	stream.p = p
 	stream.mu.Unlock()

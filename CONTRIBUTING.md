@@ -148,6 +148,16 @@ sandbox refuses on the session bus. GNOME runtimes get about a year of
 support: the manifest's `runtime-version`, the `gnome-<version>` image of
 ci.yml and release.yml, and the Node.js extension's branch move together.
 
+## Translations of the README
+
+[README.zh-CN.md](README.zh-CN.md) (Simplified Chinese) and
+[README.id.md](README.id.md) (Indonesian) translate
+[README.md](README.md), which stays the one that's current. A pull request
+that changes the README needn't change them: say in it which sections
+changed, so that a translator can follow. Corrections and new languages are
+welcome, as `README.<language code>.md` with a link in each README's
+language line.
+
 ## Reports
 
 Open an [issue](https://github.com/fzn0x/mixmusic/issues) with what you did,

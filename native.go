@@ -161,6 +161,8 @@ type shell struct {
 	// folds the rail; narrowFold is the fold the user gave it there.
 	narrow     bool
 	narrowFold *bool
+	// wordmark is the size of MixMusic's name in the rail (wordmarkSize).
+	wordmark wordmarkFit
 	// zoom is the zoom the window shows, zoomRoom the largest it has room
 	// for, and zoomToast set when the next frame tells of a new zoom.
 	zoom, zoomRoom float64

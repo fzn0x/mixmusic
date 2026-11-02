@@ -164,8 +164,8 @@ type fakeStream struct {
 	paused bool
 	url    string
 	// from is where the stream loaded last starts, and fresh is set until
-	// it first plays. The streams of silent URLs, tried again or not, never
-	// sound.
+	// it first plays, when it loaded to play. The streams of silent URLs,
+	// tried again or not, never sound.
 	from   time.Duration
 	fresh  bool
 	silent map[string]bool
@@ -181,7 +181,7 @@ func (s *fakeStream) Load(url string, start time.Duration, autoplay bool) error 
 	s.record("load %s %v %v", url, start, autoplay)
 	s.mu.Lock()
 	s.url, s.paused = url, true
-	s.from, s.fresh = start, true
+	s.from, s.fresh = start, autoplay
 	s.mu.Unlock()
 	if autoplay {
 		return s.Play()

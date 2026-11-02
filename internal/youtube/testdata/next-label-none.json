@@ -1,0 +1,47 @@
+{
+ "currentVideoEndpoint": {
+  "watchEndpoint": {
+   "videoId": "dQw4w9WgXcQ"
+  }
+ },
+ "engagementPanels": [
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {}
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {
+     "structuredDescriptionContentRenderer": {
+      "items": [
+       {},
+       {},
+       {},
+       {},
+       {}
+      ]
+     }
+    }
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  }
+ ]
+}

@@ -126,6 +126,13 @@ func newTestShell(t testing.TB) *shell { return newTestShellOf(t, nil) }
 // newTestShellOf is newTestShell of an app whose options set changes.
 func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 	t.Helper()
+	return newTestShellWith(t, set, func(a *app.App) player.Services { return testPlayer{a} }, player.Saved{})
+}
+
+// newTestShellWith is newTestShellOf whose player has the services svc
+// makes of the app, and the queue saved.
+func newTestShellWith(t testing.TB, set func(o *app.Options), svc func(a *app.App) player.Services, saved player.Saved) *shell {
+	t.Helper()
 	dir := t.TempDir()
 	for _, d := range []string{"data", "cache", "logs"} {
 		if err := os.MkdirAll(filepath.Join(dir, d), 0o755); err != nil {
@@ -149,7 +156,7 @@ func newTestShellOf(t testing.TB, set func(o *app.Options)) *shell {
 	// The covers' downloads end before the folder goes.
 	t.Cleanup(a.Services().System.Artwork().Close)
 	stream := &testStream{}
-	p := player.New(testPlayer{a}, stream, testDevice{}, player.Saved{})
+	p := player.New(svc(a), stream, testDevice{}, saved)
 	stream.mu.Lock()
 	stream.p = p
 	stream.mu.Unlock()

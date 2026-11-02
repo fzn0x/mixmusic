@@ -331,6 +331,12 @@ bun run build                  # the packaged app for this system, in build/
 bun run build -- -platform windows/amd64,linux/amd64,linux/arm64
 ```
 
+In the Nix shell, build Linux downloads with
+`.github/scripts/build.sh linux/amd64,linux/arm64`, as releases do. A plain
+`bun run build` there makes a Linux program that asks for Nix's own loader,
+and it starts only on NixOS. `go run ./tools/elfloader build/linux-amd64`
+checks a build.
+
 The [website](https://fzn0x.github.io/mixmusic/) is in `site/`, built with
 [Zola](https://www.getzola.org), and the guides in `docs/` are its
 `/docs/` pages. `go run ./tools/sitedocs && zola --root site serve`

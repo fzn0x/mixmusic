@@ -192,6 +192,13 @@ it. For the Flatpak, open it with your software center, or run
 `flatpak install ./mixmusic-<version>-linux-amd64.flatpak`; the first time,
 Flatpak fetches the GNOME runtime from Flathub.
 
+Coming soon, once its tap is up: on a Mac, [Homebrew](https://brew.sh)
+installs MixMusic, and `brew upgrade` updates it.
+
+```sh
+brew install --cask fzn0x/tap/mixmusic
+```
+
 ### The first launch
 
 - **macOS:** the app isn't notarized by Apple yet, so the first time you

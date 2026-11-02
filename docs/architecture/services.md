@@ -29,6 +29,22 @@
   out of videos.
 - **`lyrics`** finds synced lyrics on Unison and LRCLIB, reads TTML and LRC,
   and translates and romanizes lyrics on Unison.
+- **`internal/romaji`** writes Japanese lyrics in Hepburn romaji on the
+  computer, as Unison gives none for Japanese: kana from a table, and kanji
+  by the readings that kagome's tokenizer finds in its IPA dictionary,
+  word by word. The dictionary isn't built in, which would grow the app by
+  11.7 MB: `Dictionary` downloads it from kagome-dict's module on GitHub
+  the first time romaji is on for Japanese lyrics, checks it against the
+  SHA-256 written in the package, keeps it in the cache's `romaji/`, and
+  checks it again each time it loads. A download that fails or isn't the
+  dictionary goes, and is tried again after 30 seconds, twice as long
+  after each failure in a row, up to 10 minutes. Until it is there, the
+  lines' kana are in romaji and their kanji stay as they are. Loaded, the
+  dictionary takes some 89 MB of memory: it loads in about 0.4 s when
+  lines need it, and goes 5 minutes after they last did. The windows make
+  each track's romaji once, with its lyrics. Its tests read the
+  dictionary from the Go module cache, where
+  `go mod download github.com/ikawaha/kagome-dict/ipa@v1.2.6` puts it.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
   scrobbles by Last.fm's rules, keeping what fails offline for later.
 - **`internal/discord`** shows what plays on the user's Discord profile, over

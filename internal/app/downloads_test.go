@@ -193,3 +193,26 @@ func TestDownloadsMoveToDefault(t *testing.T) {
 		t.Error("moved into the cache")
 	}
 }
+
+// TestReloadSettingsMetered lets downloads go on over a metered connection
+// once an edit of settings.json allows it, as the switch in Settings does,
+// and holds them again once an edit takes it back.
+func TestReloadSettingsMetered(t *testing.T) {
+	a := fileApp(t, `{}`)
+	a.metered.Store(true)
+	a.apply(a.settings.Get())
+	const why = "Waiting for a connection that isn't metered, as Settings › Playback asks"
+	if got := a.downloads.Snapshot().Status().Hold; got != why {
+		t.Fatalf("on a metered connection, the downloads hold for %q", got)
+	}
+	writeSettings(t, a.settings.Path(), `{"downloadOnMetered": true}`)
+	a.ReloadSettings()
+	if got := a.downloads.Snapshot().Status().Hold; got != "" {
+		t.Errorf("allowed over a metered connection, the downloads hold for %q", got)
+	}
+	writeSettings(t, a.settings.Path(), `{"downloadOnMetered": false}`)
+	a.ReloadSettings()
+	if got := a.downloads.Snapshot().Status().Hold; got != why {
+		t.Errorf("taken back, the downloads hold for %q", got)
+	}
+}

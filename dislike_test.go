@@ -228,6 +228,29 @@ func TestSkipSwitch(t *testing.T) {
 	}
 }
 
+// TestSkipSwitchFound finds Skip songs you dislike, and its note on where
+// dislikes go, by typing in the box of the settings.
+func TestSkipSwitchFound(t *testing.T) {
+	s := newTestShell(t)
+	if err := s.svc.Collection.SetDisliked(context.Background(), testTracks[0], true); err != nil {
+		t.Fatal(err)
+	}
+	tt := testerOf(t, s, 1280, 6000)
+	const row, link = "Skip songs you dislike", "See the songs you dislike"
+	for _, c := range []struct {
+		q         string
+		want, not []string
+	}{
+		{"dislike", []string{row, dislikesNote, link}, []string{"Crossfade"}},
+		{"skip songs", []string{row}, []string{dislikesNote, "Crossfade"}},
+		{"takes no dislikes", []string{dislikesNote, link}, []string{row, "Crossfade"}},
+	} {
+		show(s, tt, settingsPath("", c.q))
+		showsOnly(t, tt, "searching "+c.q, c.want, c.not)
+		show(s, tt, "/")
+	}
+}
+
 // TestPlayButtonSkips starts an album's play button at its first song the
 // user doesn't dislike, and its shuffle at one of those.
 func TestPlayButtonSkips(t *testing.T) {

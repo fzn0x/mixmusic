@@ -9,8 +9,6 @@ import (
 	"slices"
 	"strings"
 	"time"
-
-	"golang.org/x/net/dns/dnsmessage"
 )
 
 // service is the name cast devices announce themselves under by mDNS.
@@ -49,8 +47,8 @@ func Browse(ctx context.Context, opts BrowseOptions) ([]Device, error) {
 	defer stop()
 
 	id := queryID()
-	send := func(questions []dnsmessage.Question) error {
-		q, err := query(id, questions)
+	send := func(qs []question) error {
+		q, err := dnsQuery(id, qs)
 		if err != nil {
 			return err
 		}
@@ -64,8 +62,7 @@ func Browse(ctx context.Context, opts BrowseOptions) ([]Device, error) {
 		}
 		return sendToGroup(conn, q)
 	}
-	ptr := dnsmessage.Question{Name: mustName(service), Type: dnsmessage.TypePTR, Class: dnsmessage.ClassINET}
-	if err := send([]dnsmessage.Question{ptr}); err != nil {
+	if err := send([]question{{service, typePTR}}); err != nil {
 		return nil, err
 	}
 	found := newFindings()
@@ -110,21 +107,6 @@ func queryID() uint16 {
 	var b [2]byte
 	_, _ = rand.Read(b[:])
 	return binary.BigEndian.Uint16(b[:])
-}
-
-// query returns an mDNS query of questions.
-func query(id uint16, questions []dnsmessage.Question) ([]byte, error) {
-	b := dnsmessage.NewBuilder(nil, dnsmessage.Header{ID: id})
-	b.EnableCompression()
-	if err := b.StartQuestions(); err != nil {
-		return nil, err
-	}
-	for _, q := range questions {
-		if err := b.Question(q); err != nil {
-			return nil, err
-		}
-	}
-	return b.Finish()
 }
 
 // sendToGroup sends q to mDNS's group on each network of the computer that
@@ -179,20 +161,12 @@ func ipv4Of(ifi net.Interface) net.IP {
 	return nil
 }
 
-func mustName(s string) dnsmessage.Name {
-	n, err := dnsmessage.NewName(s)
-	if err != nil {
-		panic(err)
-	}
-	return n
-}
-
 // findings gather what the answers of a browse tell, by the names of the
 // records: the instances of the service, where each is and what it says of
 // itself, and the addresses of the hosts.
 type findings struct {
 	instances []string
-	srv       map[string]dnsmessage.SRVResource
+	srv       map[string]record
 	txt       map[string][]string
 	hosts     map[string]net.IP
 	// from is the address each instance's answer came from, which is the
@@ -201,114 +175,58 @@ type findings struct {
 }
 
 func newFindings() *findings {
-	return &findings{srv: map[string]dnsmessage.SRVResource{}, txt: map[string][]string{}, hosts: map[string]net.IP{},
+	return &findings{srv: map[string]record{}, txt: map[string][]string{}, hosts: map[string]net.IP{},
 		from: map[string]net.IP{}}
 }
 
-// read takes in an answer from the address from. What it can't read it
-// leaves out.
+// read takes in an answer from the address from: a device may put its
+// records among the answers or beside them. What it can't read it leaves
+// out.
 func (f *findings) read(msg []byte, from net.IP) {
-	var p dnsmessage.Parser
-	h, err := p.Start(msg)
-	if err != nil || !h.Response {
+	_, response, records, err := parseDNS(msg)
+	if err != nil || !response {
 		return
 	}
-	if err := p.SkipAllQuestions(); err != nil {
-		return
-	}
-	var named []string
-	take := func(rh dnsmessage.ResourceHeader) error {
-		name := strings.ToLower(rh.Name.String())
-		switch rh.Type {
-		case dnsmessage.TypePTR:
-			r, err := p.PTRResource()
-			if err != nil {
-				return err
+	for _, r := range records {
+		name := r.name
+		switch r.rtype {
+		case typePTR:
+			if name != service {
+				continue
 			}
-			if name == service {
-				inst := strings.ToLower(r.PTR.String())
-				if !slices.Contains(f.instances, inst) {
-					f.instances = append(f.instances, inst)
-				}
-				named = append(named, inst)
+			name = strings.ToLower(r.target)
+			if !slices.Contains(f.instances, name) {
+				f.instances = append(f.instances, name)
 			}
-		case dnsmessage.TypeSRV:
-			r, err := p.SRVResource()
-			if err != nil {
-				return err
-			}
+		case typeSRV:
+			r.target = strings.ToLower(r.target)
 			f.srv[name] = r
-			named = append(named, name)
-		case dnsmessage.TypeTXT:
-			r, err := p.TXTResource()
-			if err != nil {
-				return err
-			}
-			f.txt[name] = r.TXT
-			named = append(named, name)
-		case dnsmessage.TypeA:
-			r, err := p.AResource()
-			if err != nil {
-				return err
-			}
-			f.hosts[name] = net.IP(r.A[:])
-		default:
-			return p.SkipAnswer()
+		case typeTXT:
+			f.txt[name] = r.txt
+		case typeA:
+			f.hosts[name] = r.ip
+			continue
 		}
-		return nil
-	}
-	// The answers, then what comes with them. A device may put its records
-	// in either.
-	for {
-		rh, err := p.AnswerHeader()
-		if err != nil {
-			break
-		}
-		if take(rh) != nil {
-			return
-		}
-	}
-	if p.SkipAllAuthorities() == nil {
-		for {
-			rh, err := p.AdditionalHeader()
-			if err != nil {
-				break
-			}
-			if rh.Type == dnsmessage.TypePTR || rh.Type == dnsmessage.TypeSRV || rh.Type == dnsmessage.TypeTXT || rh.Type == dnsmessage.TypeA {
-				if take(rh) != nil {
-					break
-				}
-			} else if p.SkipAdditional() != nil {
-				break
-			}
-		}
-	}
-	for _, n := range named {
-		if f.from[n] == nil {
-			f.from[n] = from
+		if f.from[name] == nil {
+			f.from[name] = from
 		}
 	}
 }
 
 // missing returns the questions that would tell the rest of the instances
 // found in part: where they are, and what they say of themselves.
-func (f *findings) missing() []dnsmessage.Question {
-	var qs []dnsmessage.Question
-	ask := func(name string, t dnsmessage.Type) {
-		if n, err := dnsmessage.NewName(name); err == nil {
-			qs = append(qs, dnsmessage.Question{Name: n, Type: t, Class: dnsmessage.ClassINET})
-		}
-	}
+func (f *findings) missing() []question {
+	var qs []question
 	for _, inst := range f.instances {
 		srv, ok := f.srv[inst]
 		if !ok {
-			ask(inst, dnsmessage.TypeSRV)
+			qs = append(qs, question{inst, typeSRV})
 		}
 		if _, ok := f.txt[inst]; !ok {
-			ask(inst, dnsmessage.TypeTXT)
+			qs = append(qs, question{inst, typeTXT})
 		}
-		if ok && f.hosts[strings.ToLower(srv.Target.String())] == nil {
-			ask(srv.Target.String(), dnsmessage.TypeA)
+		if ok && f.hosts[srv.target] == nil {
+			qs = append(qs, question{srv.target, typeA})
 		}
 	}
 	return qs
@@ -323,7 +241,7 @@ func (f *findings) devices() []Device {
 		if !ok {
 			continue
 		}
-		host := f.hosts[strings.ToLower(srv.Target.String())]
+		host := f.hosts[srv.target]
 		if host == nil {
 			host = f.from[inst]
 		}
@@ -331,7 +249,7 @@ func (f *findings) devices() []Device {
 			continue
 		}
 		txt := txtValues(f.txt[inst])
-		d := Device{ID: txt["id"], Name: txt["fn"], Model: txt["md"], Host: host.String(), Port: int(srv.Port)}
+		d := Device{ID: txt["id"], Name: txt["fn"], Model: txt["md"], Host: host.String(), Port: int(srv.port)}
 		if d.Model == groupModel {
 			continue
 		}
@@ -339,9 +257,9 @@ func (f *findings) devices() []Device {
 			d.ID = inst
 		}
 		if d.Name == "" {
-			d.Name, _, _ = strings.Cut(inst, ".")
+			d.Name = firstLabel(inst)
 		}
-		if i := slices.IndexFunc(out, func(o Device) bool { return o.ID == d.ID }); i >= 0 {
+		if slices.ContainsFunc(out, func(o Device) bool { return o.ID == d.ID }) {
 			continue
 		}
 		out = append(out, d)
@@ -362,4 +280,22 @@ func txtValues(txt []string) map[string]string {
 		}
 	}
 	return out
+}
+
+// firstLabel returns the first label of a name as readName writes it,
+// unescaped: the name of a device that tells none.
+func firstLabel(name string) string {
+	var sb strings.Builder
+	for i := 0; i < len(name); i++ {
+		switch c := name[i]; {
+		case c == '\\' && i+1 < len(name):
+			i++
+			sb.WriteByte(name[i])
+		case c == '.':
+			return sb.String()
+		default:
+			sb.WriteByte(c)
+		}
+	}
+	return sb.String()
 }

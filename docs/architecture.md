@@ -163,6 +163,13 @@ what they show beside the main thread (`fetch`), and a window's state
 belongs to its main thread: what finishes elsewhere comes back through
 `update`.
 
+- **Refresh** (F5, ⇧⌘R on macOS, `refresh.go`) asks again for the keys
+  the page shown and the side panel fetched in the frame before, as
+  `fetch` collects them, and renders the plugins' views again
+  (`View.Remount`). The page keeps its answers until the new ones come,
+  and keeps them when a refresh fails, which one toast tells. Home's own
+  tile and shelves read the library as it is, and need no refresh.
+
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
   MB of pixels (`artwork.go`). An image that couldn't load tries again
@@ -232,6 +239,7 @@ aren't pages act: `act:shot:<name>` saves the window as it is,
 `act:mute` mutes the player, `act:play:<search>` plays what a search
 finds, `act:resume` plays the queue kept in the data folder,
 `act:wait:<duration>` waits, `act:palette` opens the command palette,
+`act:refresh` refreshes the page, as F5 does,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
 scrolls the page, `act:theme:<id>` wears a theme, `act:mini` opens the
 mini player, which saves `mini.png`, `act:spotify` logs whether MixMusic's

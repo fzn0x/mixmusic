@@ -126,10 +126,11 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 							c.Announce("Press the keys of the shortcut of " + cmd.title + ". Escape cancels, Backspace removes it.")
 						}
 					}
+					// Reset puts the command's own keys back, which a command
+					// the user gave them to gives up, as when they're recorded.
 					if _, custom := s.set.Shortcuts[cmd.id]; custom && !recording &&
 						s.button(c, "shortcut-reset-"+cmd.id, "reset", false).Label("reset the shortcut of "+cmd.title).Clicked() {
-						delete(s.set.Shortcuts, cmd.id)
-						s.save()
+						s.setShortcut(cmd, cmd.shortcut)
 					}
 				})
 			}

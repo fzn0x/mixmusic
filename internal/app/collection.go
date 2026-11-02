@@ -19,6 +19,10 @@ type Collection struct{ a *App }
 // Liked returns the liked tracks, the last liked first.
 func (c *Collection) Liked() []media.Track { return c.a.library.Liked() }
 
+// Version counts the changes of the library, as a play or a new mix: what
+// a window made of it holds until the version changes.
+func (c *Collection) Version() uint64 { return c.a.library.Version() }
+
 // LikedIDs returns the IDs of the liked tracks, for lists to show hearts.
 func (c *Collection) LikedIDs() []string {
 	liked := c.a.library.Liked()

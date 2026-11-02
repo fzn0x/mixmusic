@@ -156,9 +156,13 @@ type shell struct {
 	// liveSince is when the live tile began turning over to what plays
 	// next, zero while it doesn't.
 	liveSince time.Time
-	// The pages' own state.
-	homeFilter  int
-	searchPivot int
+	// The pages' own state. local are the home page's own shelves, of the
+	// library at localVersion once localBuilt.
+	homeFilter   int
+	local        []media.Shelf
+	localVersion uint64
+	localBuilt   bool
+	searchPivot  int
 	// shelfScroll is where the shelves scrolled, by page and shelf.
 	shelfScroll map[string]*ui.ScrollState
 	// artistPivot is the pivot chosen on the page of the artist artistOf.
@@ -182,6 +186,20 @@ type shell struct {
 	lyricsView   lyricsState
 	// pagePath is the path of the page being built.
 	pagePath string
+	// shown are the keys of what the page shown and the side panel fetched
+	// in the frame before, which a refresh asks again for; showing those
+	// of the frame being built, while collecting is set. refreshAt is the
+	// page a refresh asked again for, until it ended, and refreshTold is
+	// set once one of its answers failed, which a toast told. refreshOff
+	// and refreshBusy are what the refresh button showed in the frame:
+	// dimmed, or a spinner; refreshTip its tooltip, of the keys
+	// refreshTipOf.
+	shown, showing           map[string]bool
+	collecting               bool
+	refreshAt                string
+	refreshTold              bool
+	refreshOff, refreshBusy  bool
+	refreshTip, refreshTipOf string
 	// capScroll scrolls the pages in capture mode, nil otherwise, and
 	// capBound tells whether a page took it in the build.
 	capScroll *ui.ScrollState
@@ -194,10 +212,13 @@ type shell struct {
 	renaming, deleting, clearingHistory bool
 	renameTo, renameID                  string
 	deleteID, deleteTitle               string
-	// spotifyMore holds the liked songs on Spotify loaded past the first
-	// page.
-	spotifyMore []media.Track
-	loadingMore bool
+	// spotifyLiked are the liked songs on Spotify the library shows: the
+	// first page, of answer spotifyLikedAt of spotifyLikedOf, then those
+	// loaded past it, while loadingMore.
+	spotifyLiked   []media.Track
+	spotifyLikedOf *loaded[app.TrackPage]
+	spotifyLikedAt int
+	loadingMore    bool
 	// keeping holds the pages whose saving or following waits for the
 	// service, by their keys.
 	keeping map[string]bool
@@ -258,7 +279,7 @@ func newShell(a *app.App, p *player.Player) *shell {
 		wells: map[string]*colorWell{}, tools: map[string]*trackTool{}, listTops: map[string]float32{}, keeping: map[string]bool{}, licenseOpen: -1,
 		mountedViews: map[*plugins.View]bool{}, seenViews: map[*plugins.View]bool{}, pluginInputs: map[string]*string{},
 		canvasSizes: map[*plugins.Canvas][2]float32{}, cssColors: map[string]ui.Color{}, svgs: map[string]*ui.SVG{},
-		dialogScrolls: map[string]*dialogScroll{}}
+		dialogScrolls: map[string]*dialogScroll{}, shown: map[string]bool{}, showing: map[string]bool{}}
 	s.queueList.Selected = new(int)
 	*s.queueList.Selected = -1
 	s.art = newArtworks(s.update, s.svc.System.Artwork())
@@ -553,15 +574,25 @@ type loaded[T any] struct {
 	value T
 	err   error
 	done  bool
-	// again has fetch ask once more; asks counts the times it asked.
-	again bool
-	asks  int
+	// again has fetch ask once more; asks counts the times it asked, and
+	// answers the answers it took.
+	again   bool
+	asks    int
+	answers int
+	// refreshing is set from the user's refresh until its answer comes.
+	refreshing bool
 }
 
 // fetch returns what get gives for key, which it asks for once, beside the
 // main thread: until it comes, the result isn't done. Asked to ask again,
-// by refetch, it keeps what it got until the new answer comes.
+// by refetch or a refresh, it keeps what it got until the new answer
+// comes, and a refresh that fails keeps it after.
 func fetch[T any](s *shell, key string, get func(ctx context.Context) (T, error)) *loaded[T] {
+	// What the page shown fetches, a refresh asks again for. The accounts
+	// follow the app's changes (refresh): no page refreshes them.
+	if s.collecting && key != "accounts" {
+		s.showing[key] = true
+	}
 	l, ok := s.loads[key].(*loaded[T])
 	if ok && !l.again {
 		return l
@@ -572,16 +603,26 @@ func fetch[T any](s *shell, key string, get func(ctx context.Context) (T, error)
 	}
 	l.again = false
 	l.asks++
-	ask := l.asks
+	ask, refreshing := l.asks, l.refreshing
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 		v, err := get(ctx)
 		s.update(func() {
 			// An answer to an older ask that comes last is older too.
-			if l.asks == ask {
-				l.value, l.err, l.done = v, err, true
+			if l.asks != ask {
+				return
 			}
+			l.refreshing = false
+			if refreshing && err != nil && l.done && l.err == nil {
+				// Unless the page forgot it meanwhile, as after signing in.
+				if cur, _ := s.loads[key].(*loaded[T]); cur == l {
+					s.refreshFailed(err)
+				}
+				return
+			}
+			l.value, l.err, l.done = v, err, true
+			l.answers++
 		})
 	}()
 	return l

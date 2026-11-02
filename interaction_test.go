@@ -29,7 +29,7 @@ func tester(t *testing.T, s *shell) *ui.Tester { return testerOf(t, s, 1280, 820
 // testerOf is a window of the shell of a size.
 func testerOf(t testing.TB, s *shell, w, h int) *ui.Tester {
 	t.Helper()
-	for _, key := range []string{"home", "explore", "charts"} {
+	for _, key := range []string{"home:spotify", "home:youtube", "explore", "charts"} {
 		s.loads[key] = &loaded[[]media.Shelf]{done: true}
 	}
 	// About asks GitHub for the newest release, unless the test tells it.
@@ -904,12 +904,12 @@ func TestShelfArrows(t *testing.T) {
 	}
 	// The shelf is below the fold of a window of the usual size.
 	tt := testerOf(t, s, 1280, 1600)
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Albums for you", Source: media.SourceYouTube, Items: items}}}
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Albums for you", Source: media.SourceYouTube, Items: items}}}
 	show(s, tt, "/")
 	click(t, s, tt, "Scroll Albums for you on")
 	tt.Advance(time.Second)
 	tt.Frame()
-	if st := s.shelfScroll["/ home-0"]; st == nil || st.X <= 0 {
+	if st := s.shelfScroll["/ home:youtube-0"]; st == nil || st.X <= 0 {
 		t.Errorf("the shelf didn't scroll on: %+v", st)
 	}
 }
@@ -1257,6 +1257,24 @@ func TestShortcutRecorder(t *testing.T) {
 	tt.Click("reset all")
 	if len(s.set.Shortcuts) != 0 || s.shortcutOf(command{id: "view.palette", shortcut: "Mod+K"}) != "Mod+K" {
 		t.Errorf("reset all leaves %v", s.set.Shortcuts)
+	}
+}
+
+// TestShortcutResetTakesKeys resets a command's shortcut to its own keys,
+// which the command the user gave them to gives up: rather than leave the
+// command with none, its reset gone.
+func TestShortcutResetTakesKeys(t *testing.T) {
+	s := newTestShell(t)
+	s.set.Shortcuts = map[string]string{"player.mute": "Mod+K", "view.palette": "Mod+P"}
+	tt := testerOf(t, s, 1280, 4000)
+	show(s, tt, "/settings/shortcuts")
+	click(t, s, tt, "reset the shortcut of Command palette")
+	palette := command{id: "view.palette", shortcut: "Mod+K"}
+	if keys := s.shortcutOf(palette); keys != "Mod+K" {
+		t.Errorf("reset gave the palette %q", keys)
+	}
+	if keys, ok := s.set.Shortcuts["player.mute"]; !ok || keys != "" || !tt.HasText("Mute has no shortcut now") {
+		t.Errorf("Mute keeps %q, %v", keys, ok)
 	}
 }
 

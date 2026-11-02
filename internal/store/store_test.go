@@ -63,6 +63,27 @@ func TestUpdateErrorKeepsValue(t *testing.T) {
 	}
 }
 
+// TestVersion counts the changes made, but not those that failed.
+func TestVersion(t *testing.T) {
+	f, err := Open(filepath.Join(t.TempDir(), "doc.json"), doc{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v := f.Version(); v != 0 {
+		t.Fatalf("a file just opened is at version %d", v)
+	}
+	if err := f.Update(func(d *doc) error { d.Name = "one"; return nil }); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.Set(doc{Name: "two"}); err != nil {
+		t.Fatal(err)
+	}
+	_ = f.Update(func(d *doc) error { d.Name = "three"; return errors.New("boom") })
+	if v := f.Version(); v != 2 {
+		t.Errorf("two changes and a failed one made version %d, want 2", v)
+	}
+}
+
 func TestOpenCorruptMovesAside(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "doc.json")
 	if err := os.WriteFile(path, []byte("{not json"), 0o644); err != nil {

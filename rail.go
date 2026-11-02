@@ -137,7 +137,10 @@ func (s *shell) brand(c *ui.Context, collapsed bool) {
 			// The mark keeps its pink in every theme, as the app's icon
 			// does.
 			ui.Icon(c, brandMark).Size(26, 26).Shrink(0).TextColor(brandPink)
-			ui.Text(c, "mixmusic").FontSize(24).FontWeight(k.displayWeight()).Font(k.display).LetterSpacing(k.tracking(-0.03, 24)).
+			// The rail's padding, the mark, the two gaps and the button
+			// leave the name the rest.
+			size := s.wordmarkSize(c, s.railWidth()-2*16-bar.Left-26-2*12-32)
+			ui.Text(c, "mixmusic").FontSize(size).FontWeight(k.displayWeight()).Font(k.display).LetterSpacing(k.tracking(-0.03, size)).
 				SingleLine().Grow(1).MinWidth(0)
 		}
 		label := "Collapse the sidebar"
@@ -148,6 +151,43 @@ func (s *shell) brand(c *ui.Context, collapsed bool) {
 			s.toggleRail()
 		}
 	})
+}
+
+// wordmarkFit is the size of MixMusic's name in the rail, the face, weight
+// and room it was measured for, and its width at 24.
+type wordmarkFit struct {
+	font   string
+	weight int
+	room   float32
+	size   float32
+	width  float32
+}
+
+// wordmarkSize is the size of MixMusic's name in room DIPs: 24, or less
+// when the theme's face is too wide for it there, as Sakura's Georgia is,
+// so that the name never shows cut. It measures the name once for each
+// face, weight and room, not every frame.
+func (s *shell) wordmarkSize(c *ui.Context, room float32) float32 {
+	k := &s.lk
+	f := wordmarkFit{font: k.display, weight: k.displayWeight(), room: room}
+	if s.wordmark.size > 0 && s.wordmark.font == f.font && s.wordmark.weight == f.weight && s.wordmark.room == f.room {
+		return s.wordmark.size
+	}
+	f.width, _ = c.MeasureText(0, ui.Span{Text: "mixmusic", Font: f.font, Size: 24, Weight: f.weight, LetterSpacing: k.tracking(-0.03, 24)})
+	f.size = fitSize(24, f.width, room)
+	s.wordmark = f
+	return f.size
+}
+
+// fitSize is the size of a text that measures w at size, to fit in room:
+// size when it fits, else smaller by halves of a DIP, but never below
+// two thirds of size, where a name stops reading as a name.
+func fitSize(size, w, room float32) float32 {
+	if w <= room || w <= 0 {
+		return size
+	}
+	fit := float32(math.Floor(float64(size*room/w)*2)) / 2
+	return max(fit, float32(math.Round(float64(size)*2/3)))
 }
 
 // navEntry is an outlined box of an icon with its lowercase label; the

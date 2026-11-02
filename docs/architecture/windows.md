@@ -19,7 +19,8 @@ belongs to its main thread: what finishes elsewhere comes back through
   again, and where a list longer than 20,000 was cut. Play and Shuffle
   take the whole list: pressed while it's read, they wait for it, unless
   another track started meanwhile. The items of the page's menu that
-  take its tracks, and its download, show once the list is whole.
+  take its tracks, and its download, show once the list is whole. The
+  queue builds only its entries near the view, as it may hold thousands.
 
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48

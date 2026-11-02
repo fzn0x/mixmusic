@@ -65,6 +65,24 @@
         let deviceID = null;
         let problem = null;
         let gain = 0.64;
+        /**
+         * start is the track MixMusic waits for, as mm.expect named it: the
+         * number expect returned, its Spotify ID, sounds, which done settles,
+         * and whether it did. The player tells it plays as soon as it takes a
+         * track, while it still loads its audio, about 0.3 s before it
+         * sounds; it tells once more when it no longer loads, as the sound
+         * starts. starts counts the tracks expected.
+         */
+        let start = null;
+        let starts = 0;
+
+        /** played settles start once the player plays its track, loaded. */
+        function played(s) {
+          const t = s?.track_window?.current_track;
+          if (start && !start.settled && s && !s.paused && !s.loading && t && (t.linked_from?.id ?? t.id) === start.id) {
+            start.done(true);
+          }
+        }
 
         async function open() {
           if (problem) throw new Error(problem);
@@ -88,6 +106,7 @@
               });
             }
             p.addListener("playback_error", ({ message }) => console.error(`spotify: playback_error: ${message}`));
+            p.addListener("player_state_changed", played);
             p.addListener("ready", ({ device_id }) => {
               clearTimeout(timer);
               if (player === p) deviceID = Promise.resolve(device_id);
@@ -125,6 +144,43 @@
           async setVolume(g) {
             gain = g;
             await player?.setVolume(g);
+          },
+          /**
+           * expect has started wait for the track of id, a Spotify ID, which
+           * MixMusic is about to play, and returns the number started takes.
+           * It comes before the play, so that started misses none of what the
+           * player tells. The track expected before is no longer waited for.
+           */
+          expect(id) {
+            start?.done(false);
+            let settle;
+            const sounds = new Promise((resolve) => (settle = resolve));
+            start = {
+              n: ++starts,
+              id,
+              sounds,
+              settled: false,
+              done(ok) {
+                this.settled = true;
+                settle(ok);
+              },
+            };
+            return start.n;
+          },
+          /**
+           * started resolves true once the track expect numbered n plays and
+           * its sound starts, which may be before started is called, or false
+           * after ms without, or once another track is expected.
+           */
+          async started(n, ms) {
+            const s = start;
+            if (!s || s.n !== n) return false;
+            const timer = setTimeout(() => s.done(false), ms);
+            try {
+              return await s.sounds;
+            } finally {
+              clearTimeout(timer);
+            }
           },
           /** state is what the player plays, or null. */
           async state() {

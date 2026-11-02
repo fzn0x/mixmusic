@@ -271,6 +271,8 @@ func (s *shell) itemTile(c *ui.Context, key string, it media.Item, tracks []medi
 		s.playlistTile(c, key, *it.Playlist)
 	case it.Artist != nil:
 		s.artistTile(c, key, *it.Artist)
+	case it.Podcast != nil:
+		s.podcastTile(c, key, *it.Podcast)
 	case it.Track != nil:
 		s.trackTile(c, key, *it.Track, tracks)
 	}

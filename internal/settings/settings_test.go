@@ -229,3 +229,14 @@ func TestZoom(t *testing.T) {
 		}
 	}
 }
+
+// TestCleanLayout gives settings from before the layout setting, and
+// those of a layout no more, Blend's.
+func TestCleanLayout(t *testing.T) {
+	for in, want := range map[Layout]Layout{"": LayoutBlend, "bogus": LayoutBlend, LayoutBlend: LayoutBlend,
+		LayoutExpressive: LayoutExpressive, LayoutCrate: LayoutCrate, LayoutTiles: LayoutTiles} {
+		if got := (Settings{Layout: in}).Clean().Layout; got != want {
+			t.Errorf("Clean of layout %q = %q, want %q", in, got, want)
+		}
+	}
+}

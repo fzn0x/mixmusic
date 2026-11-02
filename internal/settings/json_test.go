@@ -2,10 +2,12 @@ package settings
 
 import (
 	"bytes"
+	"encoding"
 	"encoding/json"
 	"flag"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -69,5 +71,24 @@ func TestFullFile(t *testing.T) {
 	s.DownloadsFolder = t.TempDir() // the file's is absolute on Unix only
 	if c := s.Clean(); !bytes.Equal(stored(t, c), stored(t, s)) {
 		t.Errorf("Clean changed full.json's settings:\n%s", stored(t, c))
+	}
+}
+
+// TestSectionsFlatten keeps each section of Settings a set of its fields
+// in settings.json: a section that marshaled or unmarshaled itself would
+// lend its method to Settings, which would then write or read only it.
+func TestSectionsFlatten(t *testing.T) {
+	for _, f := range reflect.VisibleFields(reflect.TypeFor[Settings]()) {
+		if !f.Anonymous {
+			continue
+		}
+		for _, i := range []reflect.Type{
+			reflect.TypeFor[json.Marshaler](), reflect.TypeFor[json.Unmarshaler](),
+			reflect.TypeFor[encoding.TextMarshaler](), reflect.TypeFor[encoding.TextUnmarshaler](),
+		} {
+			if f.Type.Implements(i) || reflect.PointerTo(f.Type).Implements(i) {
+				t.Errorf("the section %s is a %s", f.Name, i)
+			}
+		}
 	}
 }

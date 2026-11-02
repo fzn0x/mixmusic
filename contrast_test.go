@@ -6,6 +6,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -87,7 +88,7 @@ var contrastArtworks = []string{"", "#ffe600", "#00c8ff", "#808080", "#5a3a1a", 
 func contrastLook(s *shell, id string, layout settings.Layout, art string) look {
 	st := settings.Default()
 	st.FollowSystem, st.Theme, st.Layout = false, id, layout
-	return newLook(st, s.inv.Themes, true, art)
+	return newLook(st, s.inv.Themes, true, art, colorfile.Colors{})
 }
 
 // contrastRole is ink on a ground, which must read at minRatio.

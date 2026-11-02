@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -14,7 +15,7 @@ func lookOf(layout settings.Layout, density settings.Density) look {
 	th := addons.Theme{ID: "test", Name: "Test", Scheme: "dark", Colors: fallbackTheme, Radius: "10px"}
 	s := settings.Default()
 	s.FollowSystem, s.Theme, s.Layout, s.Density = false, th.ID, layout, density
-	return newLook(s, []addons.Theme{th}, true, "")
+	return newLook(s, []addons.Theme{th}, true, "", colorfile.Colors{})
 }
 
 // TestTilesLayout checks that Tiles has the measures and styles the

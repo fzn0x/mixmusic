@@ -9,6 +9,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -27,6 +28,9 @@ type look struct {
 	danger, success, youtube, spotify       ui.Color
 	tiles                                   [4]ui.Color
 	tileText                                ui.Color
+	// themeAccent is the accent of the theme, or of the colour file, which
+	// the user's and the artwork's replace.
+	themeAccent ui.Color
 	// The tints derived from the tokens.
 	hover, press, rule, outline, scrim ui.Color
 	// raised is the face of the menus that float over the page: surface-2
@@ -76,8 +80,10 @@ var fallbackTheme = map[string]string{
 // newLook is the look of the active theme of s, among themes, in the
 // layout design of s; dark tells whether the computer is in dark mode,
 // for themes that follow it, and artwork is the colour of the artwork
-// playing, "" for none.
-func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork string) look {
+// playing, "" for none. While the settings take the colours from a file,
+// file's colours replace the theme's, which keeps its type, corners and
+// effects.
+func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork string, file colorfile.Colors) look {
 	design := designOf(s.Layout)
 	id := s.ActiveTheme(dark)
 	var th addons.Theme
@@ -86,6 +92,15 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 			th = t
 			break
 		}
+	}
+	mode := "dark"
+	if th.ID != "" && th.Scheme == "light" {
+		mode = "light"
+	}
+	var fromFile map[string]color.NRGBA
+	fileDark := false
+	if s.ColorSource != settings.ColorsTheme {
+		fromFile, fileDark = fileTokens(file, mode)
 	}
 	var fx effects
 	if th.Builtin {
@@ -96,16 +111,17 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	if s.DynamicAccent && artwork != "" {
 		pick = artwork
 	}
-	// The Material themes make all their colours of it, as their seed.
+	// The Material themes make all their colours of it, as their seed,
+	// unless a colour file gives the colours.
 	var mat *materialColors
-	if fx.material {
+	if fx.material && fromFile == nil {
 		seed := materialSeed
 		if a, ok := parseColor(pick); ok && pick != "" {
 			seed = a
 		}
-		mat = materialOf(seed, th.Scheme != "light")
+		mat = materialOf(seed, mode == "dark")
 	}
-	tok := func(name string) color.NRGBA {
+	themeTok := func(name string) color.NRGBA {
 		if c, ok := mat.token(name); ok {
 			return c
 		}
@@ -115,55 +131,74 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 		c, _ := parseColor(fallbackTheme[name])
 		return c
 	}
-	bg := tok("bg")
-	bg.A = 255
-	text, accent := tok("text"), tok("accent")
-	accentText := tok("accent-text")
-	// Other themes take it as it reads on the ground: at 3:1, or, in the
-	// layouts of tonal controls, which set it as small text on their
-	// fills, at 4.5:1 on the panels' surface, which has less contrast
-	// with it.
+	tok := func(name string) color.NRGBA {
+		c, ok := fromFile[name]
+		if !ok {
+			return themeTok(name)
+		}
+		// The theme's glass, as Aurora's and Glasshouse's surfaces, which
+		// show the lights of its ground through, stays glass, which shows
+		// the file's colour over the ground.
+		if t := themeTok(name); t.A < 255 && (name == "surface" || name == "surface-2" || name == "surface-3") {
+			ground := fromFile["bg"]
+			return glassOf(over(c, ground), ground, t.A)
+		}
+		return c
+	}
+	p := paletteOf(tok)
+	p.bg.A = 255
+	whiteTiles := th.Builtin && th.ID == "mix" && optionValue(th, s.ThemeOptions[th.ID], "white-tiles") == "true"
+	if whiteTiles {
+		// Classic white ink on tiles, for those who prefer it to contrast.
+		p.tileText = white
+	}
+	if fromFile != nil {
+		p.keepReadable(whiteTiles)
+	}
+	bg, text := p.bg, p.text
+	k := look{dark: mode == "dark", systemDark: dark, scale: float32(s.FontScale), compact: s.Density == settings.DensityCompact}
+	if fromFile != nil {
+		k.dark = fileDark
+	}
+	k.themeAccent = col(p.accent)
+	// Other themes take the accent as it reads on the ground: at 3:1, or,
+	// in the layouts of tonal controls, which set it as small text on
+	// their fills, at 4.5:1 on the panels' surface, which has less
+	// contrast with it.
+	surface := over(p.surface, bg)
 	if a, ok := parseColor(pick); ok && pick != "" && mat == nil {
 		if design.tonal {
-			a = legibleOn(a, over(tok("surface"), bg), 4.5)
+			a = readableAt(a, surface, 4.5)
 		} else {
 			a = readableOn(a, bg)
 		}
-		accent, accentText = a, inkOn(a)
+		p.accent, p.accentText = a, inkOn(a)
 	} else if design.tonal && mat == nil {
-		// The theme's own accent too, which it chose for Tiles.
-		if a := legibleOn(accent, over(tok("surface"), bg), 4.5); a != accent {
-			accent, accentText = a, inkOn(a)
+		// The theme's own accent too, or the colour file's, chosen for
+		// the ground.
+		if a := readableAt(p.accent, surface, 4.5); a != p.accent {
+			p.accent, p.accentText = a, inkOn(a)
 		}
 	}
-	k := look{dark: th.Scheme != "light", systemDark: dark, scale: float32(s.FontScale), compact: s.Density == settings.DensityCompact}
-	if th.ID == "" {
-		k.dark = true
-	}
+	accent := p.accent
 	if k.scale <= 0 {
 		k.scale = 1
 	}
-	k.bg, k.surface, k.surface2, k.surface3 = col(bg), col(tok("surface")), col(tok("surface-2")), col(tok("surface-3"))
-	k.border, k.text, k.muted = col(tok("border")), col(text), col(tok("text-muted"))
-	k.accent, k.accentText = col(accent), col(accentText)
-	k.danger, k.success, k.youtube, k.spotify = col(tok("danger")), col(tok("success")), col(tok("youtube")), col(tok("spotify"))
+	k.bg, k.surface, k.surface2, k.surface3 = col(bg), col(p.surface), col(p.surface2), col(p.surface3)
+	k.border, k.text, k.muted = col(p.border), col(text), col(p.muted)
+	k.accent, k.accentText = col(accent), col(p.accentText)
+	k.danger, k.success, k.youtube, k.spotify = col(p.danger), col(p.success), col(p.youtube), col(p.spotify)
 	for i := range k.tiles {
-		k.tiles[i] = col(tok("tile-" + strconv.Itoa(i+1)))
+		k.tiles[i] = col(p.tiles[i])
 	}
-	k.tileText = col(tok("tile-text"))
-	if th.Builtin {
-		k.fx = fx
-		if th.ID == "mix" && optionValue(th, s.ThemeOptions[th.ID], "white-tiles") == "true" {
-			// Classic white ink on tiles, for those who prefer it to contrast.
-			k.tileText = ui.RGB(255, 255, 255)
-		}
-	}
+	k.tileText = col(p.tileText)
+	k.fx = fx
 	k.hover = col(alpha(text, 0.07))
 	k.press = col(alpha(text, 0.13))
 	k.rule = col(alpha(accent, 0.45))
 	k.outline = col(alpha(text, 0.85))
 	k.scrim = col(alpha(bg, 0.72))
-	k.raised = col(over(tok("surface-2"), bg))
+	k.raised = col(over(p.surface2, bg))
 	k.radius = cssLength(th.Radius)
 	k.body = fontFamily(th.Fonts.Body)
 	k.display = fontFamily(th.Fonts.Display)
@@ -172,7 +207,7 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	}
 	k.layoutOf(design)
 	k.selected, k.selectedText, k.selectedSub = k.accent, k.accentText, k.accentText.Alpha(0.78)
-	k.tonalFill, k.tonalInk = col(over(tok("surface-3"), bg)), k.text
+	k.tonalFill, k.tonalInk = col(over(p.surface3, bg)), k.text
 	switch {
 	case k.tonal && mat != nil:
 		// Material's secondary container.
@@ -182,8 +217,8 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 		// The highest surface, with the accent's ink and the muted text's,
 		// as they read there.
 		k.selected = k.tonalFill
-		k.selectedText = col(legibleOn(nrgba(k.accent), nrgba(k.tonalFill), 4.5))
-		k.selectedSub = col(legibleOn(nrgba(k.muted), nrgba(k.tonalFill), 4.5))
+		k.selectedText = col(readableAt(nrgba(k.accent), nrgba(k.tonalFill), 4.5))
+		k.selectedSub = col(readableAt(nrgba(k.muted), nrgba(k.tonalFill), 4.5))
 	}
 
 	t := *ui.DarkTheme()
@@ -197,11 +232,11 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	t.Accent, t.AccentText = k.accent, k.accentText
 	t.AccentHover = col(mix(accent, text, 0.14))
 	t.AccentPressed = col(mix(accent, bg, 0.14))
-	t.Danger, t.Success, t.Warning = k.danger, k.success, col(tok("tile-4"))
+	t.Danger, t.Success, t.Warning = k.danger, k.success, k.tiles[3]
 	t.Selection, t.Focus = col(alpha(accent, 0.35)), k.accent
 	// Toasts are inverted, an ink block with ground-coloured text.
 	t.Inverse, t.InverseText = k.text, k.bg
-	t.Scrollbar = col(tok("surface-3"))
+	t.Scrollbar = k.surface3
 	t.Radius = k.radiusSm
 	t.FontSize = k.size(0.9375)
 	t.Font = k.body

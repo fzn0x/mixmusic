@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -55,7 +56,7 @@ func TestMaterialSeed(t *testing.T) {
 	look := func(accent, artwork string, follow bool) look {
 		st := settings.Default()
 		st.FollowSystem, st.Theme, st.Accent, st.DynamicAccent = false, th.ID, accent, follow
-		return newLook(st, s.inv.Themes, true, artwork)
+		return newLook(st, s.inv.Themes, true, artwork, colorfile.Colors{})
 	}
 	primary := func(seed color.NRGBA) color.NRGBA { return materialOf(seed, true).tokens["accent"] }
 	blue, green := color.NRGBA{R: 0x21, G: 0x4f, B: 0xd8, A: 255}, color.NRGBA{R: 0x2e, G: 0xa0, B: 0x43, A: 255}

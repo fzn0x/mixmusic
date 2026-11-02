@@ -415,3 +415,45 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GORELEASER_CURRENT_TAG: ${{ env.TAG }}
         run: nix develop --command goreleaser release --clean --release-notes "$RUNNER_TEMP/notes.md"
+      # The Homebrew cask, Casks/mixmusic.rb of fzn0x/homebrew-tap, for
+      # `brew install --cask fzn0x/tap/mixmusic`: tools/cask writes it for
+      # the disk image of the release, now out, and the token of the
+      # HOMEBREW_TAP_TOKEN secret puts it in the tap. Without the secret or
+      # the tap, the release goes out without it. (GoReleaser's
+      # homebrew_casks can't write it: see .goreleaser.yaml.)
+      - name: The Homebrew cask
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          TAP: fzn0x/homebrew-tap
+          # With these secrets, the macOS build notarizes or fails.
+          NOTARIZED: ${{ secrets.MACOS_CERTIFICATE != '' }}
+        run: |
+          set -euo pipefail
+          v="${TAG#v}"
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::No HOMEBREW_TAP_TOKEN secret: the Homebrew cask stays as it is"
+            exit 0
+          fi
+          if [ ! -d tools/cask ]; then
+            echo "::notice::$TAG has no tools/cask: the Homebrew cask stays as it is"
+            exit 0
+          fi
+          if ! gh api "repos/$TAP" --silent; then
+            echo "::warning::$TAP doesn't exist, or HOMEBREW_TAP_TOKEN can't reach it: the Homebrew cask stays as it is"
+            exit 0
+          fi
+          cask="$RUNNER_TEMP/mixmusic.rb"
+          nix develop --command go run ./tools/cask -version "$v" \
+            -dmg "release/mixmusic-$v-macos-universal.dmg" -notarized="$NOTARIZED" -o "$cask"
+          cat "$cask"
+          # Replacing the cask takes the SHA of the file it replaces.
+          path=Casks/mixmusic.rb
+          sha=""
+          if found="$(gh api "repos/$TAP/contents/$path" --jq .sha 2>/dev/null)"; then
+            sha="$found"
+          fi
+          gh api --method PUT "repos/$TAP/contents/$path" --silent \
+            -f message="mixmusic $v" \
+            -f content="$(base64 -w0 "$cask")" \
+            ${sha:+-f "sha=$sha"}
+          echo "$TAP's $path is of MixMusic $v"

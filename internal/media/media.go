@@ -91,6 +91,9 @@ type Track struct {
 	// EntryID names the track's place in the playlist it was read from,
 	// which taking it out of the playlist names; only YouTube Music sets it.
 	EntryID string `json:"entryId,omitempty"`
+	// Episode is set for a podcast's episode: what it has besides a
+	// track's.
+	Episode *Episode `json:"episode,omitempty"`
 }
 
 // The kinds of video of YouTube Music that MusicVideo takes, as VideoType
@@ -206,14 +209,16 @@ const (
 	ItemPlaylist ItemKind = "playlist"
 )
 
-// Item is one entry of a shelf: a track, an album, an artist or a
-// playlist, as Kind says.
+// Item is one entry of a shelf: a track, an album, an artist, a playlist
+// or a podcast, as Kind says.
 type Item struct {
 	Kind     ItemKind  `json:"kind"`
 	Track    *Track    `json:"track,omitempty"`
 	Album    *Album    `json:"album,omitempty"`
 	Artist   *Artist   `json:"artist,omitempty"`
 	Playlist *Playlist `json:"playlist,omitempty"`
+	// Podcast is the show of an item of ItemPodcast.
+	Podcast *Podcast `json:"podcast,omitempty"`
 }
 
 // Shelf is a titled row of items, as the home feed shows them.

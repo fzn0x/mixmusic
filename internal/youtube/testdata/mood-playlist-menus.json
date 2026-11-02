@@ -1,0 +1,376 @@
+{
+ "contents": {
+  "singleColumnBrowseResultsRenderer": {
+   "tabs": [
+    {
+     "tabRenderer": {
+      "content": {
+       "sectionListRenderer": {
+        "contents": [
+         {
+          "musicCarouselShelfRenderer": {
+           "header": {
+            "musicCarouselShelfBasicHeaderRenderer": {
+             "title": {
+              "runs": [
+               {
+                "text": "Coffee shop blends",
+                "navigationEndpoint": {
+                 "browseEndpoint": {
+                  "browseId": "FEmusic_moods_and_genres_category",
+                  "params": "ggMPOg1uX2dsdVFONkZBREhy"
+                 }
+                }
+               }
+              ]
+             },
+             "headerStyle": "MUSIC_CAROUSEL_SHELF_BASIC_HEADER_STYLE_DISPLAY_TWO"
+            }
+           },
+           "contents": [
+            {
+             "musicTwoRowItemRenderer": {
+              "title": {
+               "runs": [
+                {
+                 "text": "Hits Café ",
+                 "navigationEndpoint": {
+                  "browseEndpoint": {
+                   "browseId": "VLRDCLAK5uy_testCCCCCCCCCCCC",
+                   "browseEndpointContextSupportedConfigs": {
+                    "browseEndpointContextMusicConfig": {
+                     "pageType": "MUSIC_PAGE_TYPE_PLAYLIST"
+                    }
+                   }
+                  }
+                 }
+                }
+               ]
+              },
+              "subtitle": {
+               "runs": [
+                {
+                 "text": "Playlist"
+                },
+                {
+                 "text": " • "
+                },
+                {
+                 "text": "YouTube Music"
+                }
+               ]
+              },
+              "navigationEndpoint": {
+               "browseEndpoint": {
+                "browseId": "VLRDCLAK5uy_testCCCCCCCCCCCC",
+                "browseEndpointContextSupportedConfigs": {
+                 "browseEndpointContextMusicConfig": {
+                  "pageType": "MUSIC_PAGE_TYPE_PLAYLIST"
+                 }
+                }
+               }
+              },
+              "menu": {
+               "menuRenderer": {
+                "items": [
+                 {
+                  "menuServiceItemRenderer": {
+                   "text": {
+                    "runs": [
+                     {
+                      "text": "Play next"
+                     }
+                    ]
+                   },
+                   "icon": {
+                    "iconType": "QUEUE_PLAY_NEXT"
+                   },
+                   "serviceEndpoint": {
+                    "queueAddEndpoint": {
+                     "queueTarget": {
+                      "playlistId": "RDCLAK5uy_testCCCCCCCCCCCC",
+                      "onEmptyQueue": {
+                       "watchEndpoint": {
+                        "playlistId": "RDCLAK5uy_testCCCCCCCCCCCC"
+                       }
+                      }
+                     },
+                     "queueInsertPosition": "INSERT_AFTER_CURRENT_VIDEO",
+                     "commands": [
+                      {
+                       "addToToastAction": {
+                        "item": {
+                         "notificationTextRenderer": {
+                          "successResponseText": {
+                           "runs": [
+                            {
+                             "text": "Playlist will play next"
+                            }
+                           ]
+                          }
+                         }
+                        }
+                       }
+                      }
+                     ]
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "toggleMenuServiceItemRenderer": {
+                   "defaultText": {
+                    "runs": [
+                     {
+                      "text": "Save playlist to library"
+                     }
+                    ]
+                   },
+                   "defaultIcon": {
+                    "iconType": "BOOKMARK_BORDER"
+                   },
+                   "defaultServiceEndpoint": {
+                    "modalEndpoint": {
+                     "modal": {
+                      "modalWithTitleAndButtonRenderer": {
+                       "title": {
+                        "runs": [
+                         {
+                          "text": "Save this for later"
+                         }
+                        ]
+                       },
+                       "content": {
+                        "runs": [
+                         {
+                          "text": "Save favorites to your library after signing in"
+                         }
+                        ]
+                       },
+                       "button": {
+                        "buttonRenderer": {
+                         "style": "STYLE_BLUE_TEXT",
+                         "isDisabled": false,
+                         "text": {
+                          "runs": [
+                           {
+                            "text": "Sign in"
+                           }
+                          ]
+                         },
+                         "navigationEndpoint": {
+                          "signInEndpoint": {
+                           "hack": true
+                          }
+                         }
+                        }
+                       }
+                      }
+                     }
+                    }
+                   },
+                   "toggledText": {
+                    "runs": [
+                     {
+                      "text": "Remove playlist from library"
+                     }
+                    ]
+                   },
+                   "toggledIcon": {
+                    "iconType": "BOOKMARK"
+                   },
+                   "toggledServiceEndpoint": {
+                    "likeEndpoint": {
+                     "status": "INDIFFERENT",
+                     "target": {
+                      "playlistId": "RDCLAK5uy_testCCCCCCCCCCCC"
+                     }
+                    }
+                   },
+                   "isToggled": false
+                  }
+                 }
+                ]
+               }
+              }
+             }
+            },
+            {
+             "musicTwoRowItemRenderer": {
+              "title": {
+               "runs": [
+                {
+                 "text": "Coffee Shop Blend",
+                 "navigationEndpoint": {
+                  "browseEndpoint": {
+                   "browseId": "VLRDCLAK5uy_testDDDDDDDDDDDD",
+                   "browseEndpointContextSupportedConfigs": {
+                    "browseEndpointContextMusicConfig": {
+                     "pageType": "MUSIC_PAGE_TYPE_PLAYLIST"
+                    }
+                   }
+                  }
+                 }
+                }
+               ]
+              },
+              "subtitle": {
+               "runs": [
+                {
+                 "text": "Playlist"
+                },
+                {
+                 "text": " • "
+                },
+                {
+                 "text": "YouTube Music"
+                }
+               ]
+              },
+              "navigationEndpoint": {
+               "browseEndpoint": {
+                "browseId": "VLRDCLAK5uy_testDDDDDDDDDDDD",
+                "browseEndpointContextSupportedConfigs": {
+                 "browseEndpointContextMusicConfig": {
+                  "pageType": "MUSIC_PAGE_TYPE_PLAYLIST"
+                 }
+                }
+               }
+              },
+              "menu": {
+               "menuRenderer": {
+                "items": [
+                 {
+                  "menuServiceItemRenderer": {
+                   "text": {
+                    "runs": [
+                     {
+                      "text": "Play next"
+                     }
+                    ]
+                   },
+                   "icon": {
+                    "iconType": "QUEUE_PLAY_NEXT"
+                   },
+                   "serviceEndpoint": {
+                    "queueAddEndpoint": {
+                     "queueTarget": {
+                      "playlistId": "RDCLAK5uy_testDDDDDDDDDDDD",
+                      "onEmptyQueue": {
+                       "watchEndpoint": {
+                        "playlistId": "RDCLAK5uy_testDDDDDDDDDDDD"
+                       }
+                      }
+                     },
+                     "queueInsertPosition": "INSERT_AFTER_CURRENT_VIDEO",
+                     "commands": [
+                      {
+                       "addToToastAction": {
+                        "item": {
+                         "notificationTextRenderer": {
+                          "successResponseText": {
+                           "runs": [
+                            {
+                             "text": "Playlist will play next"
+                            }
+                           ]
+                          }
+                         }
+                        }
+                       }
+                      }
+                     ]
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "toggleMenuServiceItemRenderer": {
+                   "defaultText": {
+                    "runs": [
+                     {
+                      "text": "Save playlist to library"
+                     }
+                    ]
+                   },
+                   "defaultIcon": {
+                    "iconType": "BOOKMARK_BORDER"
+                   },
+                   "defaultServiceEndpoint": {
+                    "modalEndpoint": {
+                     "modal": {
+                      "modalWithTitleAndButtonRenderer": {
+                       "title": {
+                        "runs": [
+                         {
+                          "text": "Save this for later"
+                         }
+                        ]
+                       },
+                       "content": {
+                        "runs": [
+                         {
+                          "text": "Save favorites to your library after signing in"
+                         }
+                        ]
+                       },
+                       "button": {
+                        "buttonRenderer": {
+                         "style": "STYLE_BLUE_TEXT",
+                         "isDisabled": false,
+                         "text": {
+                          "runs": [
+                           {
+                            "text": "Sign in"
+                           }
+                          ]
+                         },
+                         "navigationEndpoint": {
+                          "signInEndpoint": {
+                           "hack": true
+                          }
+                         }
+                        }
+                       }
+                      }
+                     }
+                    }
+                   },
+                   "toggledText": {
+                    "runs": [
+                     {
+                      "text": "Remove playlist from library"
+                     }
+                    ]
+                   },
+                   "toggledIcon": {
+                    "iconType": "BOOKMARK"
+                   },
+                   "toggledServiceEndpoint": {
+                    "likeEndpoint": {
+                     "status": "INDIFFERENT",
+                     "target": {
+                      "playlistId": "RDCLAK5uy_testDDDDDDDDDDDD"
+                     }
+                    }
+                   },
+                   "isToggled": false
+                  }
+                 }
+                ]
+               }
+              }
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  }
+ }
+}

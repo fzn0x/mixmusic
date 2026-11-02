@@ -1,0 +1,405 @@
+{
+ "contents": {
+  "singleColumnMusicWatchNextResultsRenderer": {
+   "tabbedRenderer": {
+    "watchNextTabbedResultsRenderer": {
+     "tabs": [
+      {
+       "tabRenderer": {
+        "title": "Up next",
+        "content": {
+         "musicQueueRenderer": {
+          "content": {
+           "playlistPanelRenderer": {
+            "contents": [
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "Instant Crush (feat. Julian Casablancas)"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Daft Punk",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCRr1xG_2WIDs18a6cIiCxeA",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " & "
+                 },
+                 {
+                  "text": "Julian Casablancas",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCWhpbdGLnR8XtXLr0yl2nYA",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "Random Access Memories",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "MPREb_K8qWMWVqXGi",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "2013"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "5:38"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "khnokW3Mw24",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+                  }
+                 }
+                }
+               },
+               "videoId": "khnokW3Mw24"
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "Get Lucky (Radio Edit - feat. Pharrell Williams and Nile Rodgers)"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Daft Punk",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCRr1xG_2WIDs18a6cIiCxeA",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": ", "
+                 },
+                 {
+                  "text": "Pharrell Williams",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCJw8VyO6e3v6S0327AsgwcQ",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " & "
+                 },
+                 {
+                  "text": "Nile Rodgers",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCThde8ccpEr6sP8dIHZ-ceQ",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "Get Lucky (Radio Edit - feat. Pharrell Williams and Nile Rodgers)",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "MPREb_yw4jv9byKCr",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "2013"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "4:09"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "Rgrt_8mXrK8",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+                  }
+                 }
+                }
+               },
+               "videoId": "Rgrt_8mXrK8"
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "Save Your Tears"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "The Weeknd",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UClYV6hHlupm_S_ObS1W-DYw",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "After Hours",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "MPREb_TH6Wut5eTMQ",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "2020"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "3:36"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "RmYCOm4ehKs",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+                  }
+                 }
+                }
+               },
+               "videoId": "RmYCOm4ehKs"
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "As It Was"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Harry Styles",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UCVacQ2t5GUZ2t_J3Ia9BynA",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "Harry's House",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "MPREb_OVSyn3JG7Ru",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "2022"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "2:48"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "nujn6wbr-e8",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+                  }
+                 }
+                }
+               },
+               "videoId": "nujn6wbr-e8"
+              }
+             },
+             {
+              "playlistPanelVideoRenderer": {
+               "title": {
+                "runs": [
+                 {
+                  "text": "Harry Styles x Indie Pop Type Beat - \"Nighttime\" (Prod. Pacific)"
+                 }
+                ]
+               },
+               "longBylineText": {
+                "runs": [
+                 {
+                  "text": "Pacific",
+                  "navigationEndpoint": {
+                   "browseEndpoint": {
+                    "browseId": "UC05ubDFSJo5DASaZYoddkog",
+                    "browseEndpointContextSupportedConfigs": {
+                     "browseEndpointContextMusicConfig": {
+                      "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                     }
+                    }
+                   }
+                  }
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "203K views"
+                 },
+                 {
+                  "text": " • "
+                 },
+                 {
+                  "text": "3.9K likes"
+                 }
+                ]
+               },
+               "lengthText": {
+                "runs": [
+                 {
+                  "text": "2:28"
+                 }
+                ]
+               },
+               "navigationEndpoint": {
+                "watchEndpoint": {
+                 "videoId": "DkKB4KNKr10",
+                 "watchEndpointMusicSupportedConfigs": {
+                  "watchEndpointMusicConfig": {
+                   "musicVideoType": "MUSIC_VIDEO_TYPE_OMV"
+                  }
+                 }
+                }
+               },
+               "videoId": "DkKB4KNKr10"
+              }
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     ]
+    }
+   }
+  }
+ }
+}

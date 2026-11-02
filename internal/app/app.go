@@ -4,6 +4,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"log"
@@ -64,6 +65,10 @@ type Options struct {
 	// Hotkeys registers the user's global shortcuts: mygo.GlobalShortcut
 	// when nil, once the app is ready.
 	Hotkeys Hotkeys
+	// ProblemWait is how long a settings.json with a mistake waits to be
+	// told of, a second when zero: tests shorten it, at once when
+	// negative.
+	ProblemWait time.Duration
 }
 
 // App is MixMusic.
@@ -157,6 +162,14 @@ type App struct {
 	profileErrs profileErrors
 	// flushers save what the windows hold back, as MixMusic quits.
 	flushers []*func()
+	// stopWatch stops the watch of settings.json, as MixMusic quits.
+	stopWatch context.CancelFunc
+
+	// fileMu guards file, what the windows are told of settings.json;
+	// watcher is its watch, while one runs.
+	fileMu  sync.Mutex
+	file    fileState
+	watcher atomic.Pointer[mygo.FileWatcher]
 }
 
 // New opens what the app keeps in opts.DataDir and opts.CacheDir.
@@ -165,8 +178,11 @@ func New(opts Options) (*App, error) {
 	a.here.a = a
 	a.global.repeats = runtime.GOOS == "linux"
 	var err error
-	if a.settings, err = store.Open(filepath.Join(opts.DataDir, "settings.json"), settings.Default()); err != nil {
+	if a.settings, err = store.OpenWith(filepath.Join(opts.DataDir, "settings.json"), settings.Default(), settings.Decode); err != nil {
 		return nil, fmt.Errorf("opening settings: %w", err)
+	}
+	if err := a.settings.Aside(); err != nil {
+		log.Printf("mixmusic: settings.json didn't read (%v): kept it as settings.json.broken, and started with the settings of a new install", err)
 	}
 	if a.library, err = library.Open(filepath.Join(opts.DataDir, "library.json")); err != nil {
 		return nil, fmt.Errorf("opening the library: %w", err)

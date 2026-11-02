@@ -48,7 +48,18 @@ func (a *App) Start() {
 	if a.openMain(mygo.App.WasOpenedAtLogin()) == nil {
 		return
 	}
+	// Edits of settings.json apply while MixMusic runs. The watch starts
+	// beside the main thread, as WatchFiles waits for it to enroll.
+	ctx, stop := context.WithCancel(context.Background())
+	a.mu.Lock()
+	a.stopWatch = stop
+	a.mu.Unlock()
+	go a.watchSettings(ctx)
+	a.tellStart()
 	a.setupTray()
+	if a.settings.Get().CloseToTray {
+		runInBackground()
+	}
 	a.applyMediaKeys(a.settings.Get().MediaKeys)
 	// Keys that were in use at the last start may be free now.
 	if a.applyGlobalShortcuts(false) {

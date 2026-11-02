@@ -11,6 +11,7 @@
 | **Fedora, openSUSE**, x64 | [`mixmusic-{version}-linux-amd64.rpm`](https://github.com/{repo}/releases/download/{tag}/mixmusic-{version}-linux-amd64.rpm) |
 | **Fedora, openSUSE**, Arm64 | [`mixmusic-{version}-linux-arm64.rpm`](https://github.com/{repo}/releases/download/{tag}/mixmusic-{version}-linux-arm64.rpm) |
 | **Any Linux**, one file | [`mixmusic-{version}-linux-amd64.AppImage`](https://github.com/{repo}/releases/download/{tag}/mixmusic-{version}-linux-amd64.AppImage), or [`-arm64.AppImage`](https://github.com/{repo}/releases/download/{tag}/mixmusic-{version}-linux-arm64.AppImage) on Arm64: make it executable and open it |
+| **Any Linux**, sandboxed, x64 | [`mixmusic-{version}-linux-amd64.flatpak`](https://github.com/{repo}/releases/download/{tag}/mixmusic-{version}-linux-amd64.flatpak): `flatpak install ./mixmusic-{version}-linux-amd64.flatpak`, which fetches the GNOME runtime from Flathub the first time |
 | **Any Linux**, x64 or Arm64 | `mixmusic-{version}-linux-<arch>.tar.gz` and [`install.sh`](https://github.com/{repo}/releases/download/{tag}/install.sh) side by side, then `sh install.sh` |
 
 **First launch.** The macOS app is not notarized yet: open it once from System Settings › Privacy & Security › Open Anyway, or run `xattr -dr com.apple.quarantine /Applications/MixMusic.app`. The Windows installer is not signed yet: if SmartScreen warns, choose More info › Run anyway.

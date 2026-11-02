@@ -68,6 +68,31 @@ func setTheme(theme string) func(*cfg) error {
 	return func(c *cfg) error { c.Theme = theme; return nil }
 }
 
+// TestVersionCountsEdits counts an edit of the file, read in, as a change
+// of the value, and a reload that finds nothing new as none: what readers
+// made of the value follows an edit by hand too.
+func TestVersionCountsEdits(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "cfg.json")
+	f := openCfg(t, path)
+	if err := f.Update(setTheme("aurora")); err != nil {
+		t.Fatal(err)
+	}
+	v := f.Version()
+	if c, err := f.Reload(); err != nil || c.Changed {
+		t.Fatalf("a reload of MixMusic's own save: changed %v, %v", c.Changed, err)
+	}
+	if got := f.Version(); got != v {
+		t.Errorf("a reload that found nothing new moved the version from %d to %d", v, got)
+	}
+	writeText(t, path, `{"theme": "sakura", "volume": 0.8}`)
+	if _, err := f.Reload(); err != nil {
+		t.Fatal(err)
+	}
+	if got := f.Version(); got <= v {
+		t.Errorf("an edit read in left the version at %d", got)
+	}
+}
+
 func setVolume(v float64) func(*cfg) error {
 	return func(c *cfg) error { c.Volume = v; return nil }
 }

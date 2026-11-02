@@ -52,8 +52,7 @@ func (a *App) syncSpotifyLike(ctx context.Context, track media.Track, liked bool
 	if track.Source != media.SourceSpotify || !a.spotify.SignedIn() {
 		return
 	}
-	_, id, _ := media.ParseID(track.ID)
-	uri := spotify.URI("track", id)
+	uri := spotify.TrackURI(track)
 	var err error
 	if liked {
 		err = a.spotify.Save(ctx, uri)

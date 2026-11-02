@@ -129,7 +129,8 @@ func (a *App) scrobble(np NowPlaying) {
 // nothing does. A live stream has no length, which the scrobbler never
 // scrobbles: Last.fm hears only that it plays.
 func lastfmTrack(np NowPlaying) (string, lastfm.Track) {
-	if np.Track == nil {
+	// Last.fm keeps music: a podcast's episode is none.
+	if np.Track == nil || np.Track.IsEpisode() {
 		return "", lastfm.Track{}
 	}
 	t := lastfm.Track{Title: np.Track.Title, Duration: time.Duration(np.DurationMs) * time.Millisecond}

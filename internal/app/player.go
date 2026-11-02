@@ -98,6 +98,9 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 // only when it was found before: searching for it would wait for the
 // network.
 func (p *Player) PrepareStream(ctx context.Context, track media.Track) (PlaybackSource, error) {
+	if track.Source == media.SourceSpotify && track.IsEpisode() {
+		return PlaybackSource{}, errSpotifyEpisode
+	}
 	if k, ok := p.a.downloads.Lookup(track.ID); ok {
 		p.learnLoudness(k.Video)
 		return PlaybackSource{Mode: PlaybackStream, URL: streamURL(k.Video), Track: k.Track, Cached: true}, nil
@@ -259,6 +262,7 @@ func (p *Player) Report(np NowPlaying) {
 	p.a.mu.Unlock()
 	s := p.a.settings.Get()
 	p.a.scrobble(np)
+	p.a.keepPosition(np)
 	p.a.presence.update(s.DiscordPresence, s.DiscordApp(), np)
 	p.a.reportControls(np)
 	if bar != nil {
@@ -439,15 +443,16 @@ func (p *Player) Devices(ctx context.Context) ([]spotify.Device, error) {
 	return p.a.spotify.Devices(ctx)
 }
 
-// ConnectPlay plays a Spotify track on the Spotify Connect device of the
-// settings, or the active one, from positionMs.
+// ConnectPlay plays a Spotify track, or a podcast's episode, on the
+// Spotify Connect device of the settings, or the active one, from
+// positionMs.
 func (p *Player) ConnectPlay(ctx context.Context, track media.Track, positionMs int) error {
-	_, id, err := media.ParseID(track.ID)
+	_, _, err := media.ParseID(track.ID)
 	if err != nil || track.Source != media.SourceSpotify {
 		return errors.New("only Spotify tracks play on Spotify Connect")
 	}
 	device := p.a.settings.Get().SpotifyDevice
-	err = p.a.spotify.Play(ctx, device, []string{spotify.URI("track", id)}, positionMs)
+	err = p.a.spotify.Play(ctx, device, []string{spotify.TrackURI(track)}, positionMs)
 	var apiErr *spotify.APIError
 	if errors.As(err, &apiErr) && apiErr.Status == 404 && device == "" {
 		// No device is active: wake up the first one that takes commands.
@@ -457,7 +462,7 @@ func (p *Player) ConnectPlay(ctx context.Context, track media.Track, positionMs 
 		}
 		for _, d := range devices {
 			if !d.Restricted {
-				return p.a.spotify.Play(ctx, d.ID, []string{spotify.URI("track", id)}, positionMs)
+				return p.a.spotify.Play(ctx, d.ID, []string{spotify.TrackURI(track)}, positionMs)
 			}
 		}
 	}
@@ -467,24 +472,23 @@ func (p *Player) ConnectPlay(ctx context.Context, track media.Track, positionMs 
 // playHereRetry is how long PlayHere waits before asking Spotify again.
 var playHereRetry = time.Second
 
-// PlayHere plays a Spotify track from positionMs on the device of the Web
-// Playback SDK, MixMusic's own, by its ID, and the Spotify tracks ahead
-// after it, which the device goes on to by itself: up to the first that
-// isn't one, so that it plays none but those, in their order. Spotify may
-// not know a device that just connected for a moment, so it asks again a
-// few times.
+// PlayHere plays a Spotify track, or a podcast's episode, from positionMs
+// on the device of the Web Playback SDK, MixMusic's own, by its ID, and
+// the Spotify tracks and episodes ahead after it, which the device goes
+// on to by itself: up to the first that isn't one, so that it plays none
+// but those, in their order. Spotify may not know a device that just
+// connected for a moment, so it asks again a few times.
 func (p *Player) PlayHere(ctx context.Context, deviceID string, track media.Track, positionMs int, ahead ...media.Track) error {
-	_, id, err := media.ParseID(track.ID)
+	_, _, err := media.ParseID(track.ID)
 	if err != nil || track.Source != media.SourceSpotify {
 		return errors.New("only Spotify tracks play with Spotify")
 	}
-	uris := []string{spotify.URI("track", id)}
+	uris := []string{spotify.TrackURI(track)}
 	for _, t := range ahead {
-		_, id, err := media.ParseID(t.ID)
-		if err != nil || t.Source != media.SourceSpotify {
+		if _, _, err := media.ParseID(t.ID); err != nil || t.Source != media.SourceSpotify {
 			break
 		}
-		uris = append(uris, spotify.URI("track", id))
+		uris = append(uris, spotify.TrackURI(t))
 	}
 	for try := 0; ; try++ {
 		err = p.a.spotify.Play(ctx, deviceID, uris, positionMs)

@@ -85,6 +85,7 @@ type App struct {
 
 	settings     *store.File[settings.Settings]
 	library      *library.Library
+	positions    *library.Positions
 	youtube      *youtube.Client
 	auth         *spotify.Auth
 	spotify      *spotify.Client
@@ -211,6 +212,9 @@ func New(opts Options) (*App, error) {
 	}
 	if a.library, err = library.Open(filepath.Join(opts.DataDir, "library.json")); err != nil {
 		return nil, fmt.Errorf("opening the library: %w", err)
+	}
+	if a.positions, err = library.OpenPositions(filepath.Join(opts.DataDir, "positions.json")); err != nil {
+		return nil, fmt.Errorf("opening where episodes were left: %w", err)
 	}
 	if a.updates, err = store.Open(filepath.Join(opts.DataDir, "updater.json"), updatePrefs{}); err != nil {
 		return nil, fmt.Errorf("opening the update preferences: %w", err)

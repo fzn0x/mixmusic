@@ -154,10 +154,17 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 			}
 		}
 	}
+	// The tiles of YouTube Music's playlists delete those the user made,
+	// or take out of the library those they saved: of its shelves, only
+	// this one, which shows them gone at once.
+	var more func(m *ui.Menu, p media.Playlist)
+	if key == "youtube" {
+		more = s.youtubeLibraryItems
+	}
 	if len(playlists.value) > 0 || links != nil {
 		s.shelfWith(c, key+"-playlists", "playlists", links, func() {
 			for i, p := range playlists.value {
-				s.playlistTile(c, key+"-playlist-"+count(i), p)
+				s.playlistTileWith(c, key+"-playlist-"+count(i), p, more)
 			}
 		})
 	}

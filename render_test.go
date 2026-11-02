@@ -240,6 +240,11 @@ func TestRender(t *testing.T) {
 	renderTo(t, s, tt, dir, "stats")
 	s.navigate("/library/liked")
 	renderTo(t, s, tt, dir, "library-liked")
+	signedOut := s.loads["accounts"]
+	youtubeLibraryOf(s, ownPlaylist, savedPlaylist, plainPlaylist)
+	s.navigate("/library/youtube")
+	renderTo(t, s, tt, dir, "library-youtube")
+	s.loads["accounts"] = signedOut
 
 	s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
 		YouTube: media.SearchResults{Tracks: testTracks[:3], Albums: []media.Album{album}, Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube}}},
@@ -342,6 +347,10 @@ func TestRenderDialogs(t *testing.T) {
 		s = shell("mix", size.scale)
 		s.ask("enable Hello", enableMessage, "enable", func() {})
 		renderTo(t, s, testerOf(t, s, size.w, size.h), dir, "dialog-question"+size.name)
+
+		s = shell("mix", size.scale)
+		s.deleteYouTubePlaylist(ownPlaylist)
+		renderTo(t, s, testerOf(t, s, size.w, size.h), dir, "dialog-delete-playlist"+size.name)
 
 		s = shell("mix", size.scale)
 		s.promptName("New mix", "Name", "late night drive", "create", func(string) {})

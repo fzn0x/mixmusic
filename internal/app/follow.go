@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
@@ -24,9 +25,31 @@ func (c *Collection) YouTubeLikedTracks(ctx context.Context) ([]media.Track, err
 }
 
 // YouTubePlaylists returns the playlists the user made or saved on YouTube
-// Music.
+// Music. Those the user made are Editable, for tracks to go into them: the
+// ones YouTube offers to delete, and the others of the account's name.
 func (c *Collection) YouTubePlaylists(ctx context.Context) ([]media.Playlist, error) {
-	return c.a.youtube.LibraryPlaylists(ctx)
+	playlists, err := c.a.youtube.LibraryPlaylists(ctx)
+	if len(playlists) > 0 {
+		if me := c.a.youtubeAccount(ctx).Account; me != nil {
+			markOwn(playlists, me.Name)
+		}
+	}
+	return playlists, err
+}
+
+// markOwn marks Editable the playlists of the library that are the user's
+// by their owner's name: the account's, as the library names the owner,
+// or none. It leaves those YouTube says the user saved, which are someone
+// else's, and its automatic ones, which aren't PL….
+func markOwn(playlists []media.Playlist, account string) {
+	for i := range playlists {
+		p := &playlists[i]
+		_, id, _ := media.ParseID(p.ID)
+		if !p.Editable && !p.Saved && account != "" && strings.HasPrefix(id, "PL") &&
+			(p.Owner == "" || strings.EqualFold(p.Owner, account)) {
+			p.Editable = true
+		}
+	}
 }
 
 // YouTubeAlbums returns the albums the user saved on YouTube Music.

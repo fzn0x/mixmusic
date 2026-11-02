@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"math/rand/v2"
+	"slices"
 	"strings"
 	"time"
 
@@ -295,6 +296,13 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 				}
 			}
 		}
+		if p.Deletable && p.Source == media.SourceYouTube {
+			base := menu
+			menu = func(m *ui.Menu) {
+				base(m)
+				s.deleteYouTubeItem(m, p)
+			}
+		}
 		h := headProps{art: p.Artwork, source: p.Source, facts: facts, description: p.Description, menu: menu}
 		if len(p.Tracks) > 0 {
 			h.play = func() { s.p.PlayTracks(p.Tracks, 0) }
@@ -380,6 +388,116 @@ func (s *shell) mixDialogs(c *ui.Context, key string) {
 			s.notes = append(s.notes, player.Notice{Message: "Deleted " + s.deleteTitle})
 			s.navigate("/library/mixes")
 		}
+	}
+}
+
+// deleteOnYouTube and unsaveOnYouTube delete a playlist of the user's on
+// YouTube Music and take one they saved out of their library; tests
+// answer for YouTube.
+var (
+	deleteOnYouTube = func(s *shell, ctx context.Context, id string) error {
+		return s.svc.Collection.DeleteYouTubePlaylist(ctx, id)
+	}
+	unsaveOnYouTube = func(s *shell, ctx context.Context, id string) error {
+		return s.svc.Collection.SetSaved(ctx, "playlist", id, "", false)
+	}
+)
+
+// deleteYouTubeItem ends a menu of a playlist the user made on YouTube
+// Music, which YouTube offers to delete, with the item that does, when
+// they're signed in. It's greyed out while the delete runs.
+func (s *shell) deleteYouTubeItem(m *ui.Menu, p media.Playlist) {
+	if !p.Deletable || p.Source != media.SourceYouTube || !s.signedIn(media.SourceYouTube) {
+		return
+	}
+	m.Separator()
+	if m.Item("Delete from YouTube Music…").Disabled(s.keeping["delete:"+p.ID]).Chosen() {
+		s.deleteYouTubePlaylist(p)
+	}
+}
+
+// youtubeLibraryItems end the menu of a playlist's tile in the library of
+// YouTube Music: deleting it, for one the user made, or taking it out of
+// the library, for one they saved.
+func (s *shell) youtubeLibraryItems(m *ui.Menu, p media.Playlist) {
+	switch {
+	case p.Deletable:
+		s.deleteYouTubeItem(m, p)
+	case p.Saved && p.Source == media.SourceYouTube && s.signedIn(media.SourceYouTube):
+		m.Separator()
+		if m.Item("Remove from library").Disabled(s.keeping["remove:"+p.ID]).Chosen() {
+			s.removeYouTubePlaylist(p)
+		}
+	}
+}
+
+// deleteYouTubePlaylist asks, then deletes a playlist the user made on
+// YouTube Music. Once YouTube did, the library and the menus that list
+// the user's playlists show it gone, and Library › youtube music takes the
+// place of its page, if it shows: Back leads to no playlist that's gone.
+// Refused, the library reads its playlists again, in case it went from
+// another device.
+func (s *shell) deleteYouTubePlaylist(p media.Playlist) {
+	s.ask("delete playlist", "Delete "+p.Title+" from YouTube Music? It goes from YouTube too, and you can't undo this. "+
+		"To keep its tracks in MixMusic, copy it into a mix first.", "delete", func() {
+		key := "delete:" + p.ID
+		s.keeping[key] = true
+		go func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			defer cancel()
+			err := deleteOnYouTube(s, ctx, p.ID)
+			s.update(func() {
+				delete(s.keeping, key)
+				if err != nil {
+					s.notes = append(s.notes, player.Notice{Message: "Couldn't delete " + p.Title + ": " + err.Error(), Error: true})
+					s.refetch("youtube:playlists")
+					return
+				}
+				s.dropPlaylist("youtube:playlists", p.ID)
+				s.forget("playlist:" + p.ID)
+				s.notes = append(s.notes, notice("Deleted "+p.Title+" from YouTube Music"))
+				if s.router.Path() == playlistPath(p.ID) {
+					s.router.Replace("/library/youtube")
+				}
+			})
+		}()
+	})
+}
+
+// removeYouTubePlaylist takes a playlist the user saved out of their
+// library on YouTube Music, without asking: saving it again undoes it.
+func (s *shell) removeYouTubePlaylist(p media.Playlist) {
+	key := "remove:" + p.ID
+	s.keeping[key] = true
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		err := unsaveOnYouTube(s, ctx, p.ID)
+		s.update(func() {
+			delete(s.keeping, key)
+			if err != nil {
+				s.notes = append(s.notes, noticeOf(err))
+				return
+			}
+			s.dropPlaylist("youtube:playlists", p.ID)
+			s.forget("playlist:" + p.ID)
+			s.notes = append(s.notes, notice(p.Title+": no longer saved"))
+		})
+	}()
+}
+
+// dropPlaylist takes a playlist out of the list fetched for key, where it
+// shows, rather than read the list again, which YouTube may answer as it
+// was a moment before. A list still on its way is asked for again, once
+// it's needed: the answer coming may be older.
+func (s *shell) dropPlaylist(key, id string) {
+	l, ok := s.loads[key].(*loaded[[]media.Playlist])
+	switch {
+	case !ok:
+	case !l.done:
+		s.refetch(key)
+	default:
+		l.value = slices.DeleteFunc(slices.Clone(l.value), func(p media.Playlist) bool { return p.ID == id })
 	}
 }
 

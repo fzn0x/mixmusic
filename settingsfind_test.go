@@ -113,6 +113,8 @@ func TestSettingsFindMatches(t *testing.T) {
 		{"follow each other", []string{"Crossfade"}, []string{"Volume levelling"}},
 		{"settings.json", []string{"Settings file"}, []string{"Crossfade", "Close to the tray"}},
 		{"config", []string{"Settings file"}, []string{"Crossfade"}},
+		{"music video", []string{"Show the video of music videos", "Show or hide the video of music videos"}, []string{"Crossfade", "Autoplay"}},
+		{"3 mb a minute", []string{"Show the video of music videos"}, []string{"Crossfade"}},
 		{"zzzz", []string{"No setting matches “zzzz”."}, []string{"Crossfade", "Close to the tray"}},
 	} {
 		show(s, tt, settingsPath("", c.q))

@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/volume"
@@ -187,13 +188,13 @@ func atSpeed(speed float64) string {
 	return fmt.Sprintf(" speed %v", speed)
 }
 
-func (s *fakeStream) Load(url string, start time.Duration, autoplay bool, speed float64) error {
-	s.record("load %s %v %v%s", url, start, autoplay, atSpeed(speed))
+func (s *fakeStream) Load(url string, cue audio.Cue) error {
+	s.record("load %s %v %v%s", url, cue.Start, cue.Autoplay, atSpeed(cue.Speed))
 	s.mu.Lock()
 	s.url, s.paused = url, true
-	s.from, s.fresh = start, autoplay
+	s.from, s.fresh = cue.Start, cue.Autoplay
 	s.mu.Unlock()
-	if autoplay {
+	if cue.Autoplay {
 		return s.Play()
 	}
 	return nil
@@ -201,8 +202,8 @@ func (s *fakeStream) Load(url string, start time.Duration, autoplay bool, speed 
 
 func (s *fakeStream) Preload(url string) { s.record("preload %s", url) }
 
-func (s *fakeStream) Crossfade(url string, d time.Duration, speed float64) error {
-	s.record("crossfade %s %v%s", url, d, atSpeed(speed))
+func (s *fakeStream) Crossfade(url string, d time.Duration, cue audio.Cue) error {
+	s.record("crossfade %s %v%s", url, d, atSpeed(cue.Speed))
 	return nil
 }
 

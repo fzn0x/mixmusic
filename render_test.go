@@ -15,6 +15,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/builtin"
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
@@ -86,11 +87,11 @@ type testStream struct {
 	p  *player.Player
 }
 
-func (s *testStream) Load(url string, start time.Duration, autoplay bool, _ float64) error {
-	if autoplay {
+func (s *testStream) Load(url string, cue audio.Cue) error {
+	if cue.Autoplay {
 		s.player().Playing(true)
 		if !strings.HasPrefix(url, "url:yt:quiet") {
-			s.player().Time(start+time.Millisecond, 0)
+			s.player().Time(cue.Start+time.Millisecond, 0)
 		}
 	}
 	return nil
@@ -100,15 +101,15 @@ func (s *testStream) player() *player.Player {
 	defer s.mu.Unlock()
 	return s.p
 }
-func (s *testStream) Preload(string)                                 {}
-func (s *testStream) Crossfade(string, time.Duration, float64) error { return nil }
-func (s *testStream) Play() error                                    { s.player().Playing(true); return nil }
-func (s *testStream) Pause()                                         { s.player().Playing(false) }
-func (s *testStream) Stop()                                          {}
-func (s *testStream) Unload()                                        {}
-func (s *testStream) Seek(time.Duration)                             {}
-func (s *testStream) SetVolume(float64)                              {}
-func (s *testStream) SetSpeed(float64)                               {}
+func (s *testStream) Preload(string)                                   {}
+func (s *testStream) Crossfade(string, time.Duration, audio.Cue) error { return nil }
+func (s *testStream) Play() error                                      { s.player().Playing(true); return nil }
+func (s *testStream) Pause()                                           { s.player().Playing(false) }
+func (s *testStream) Stop()                                            {}
+func (s *testStream) Unload()                                          {}
+func (s *testStream) Seek(time.Duration)                               {}
+func (s *testStream) SetVolume(float64)                                {}
+func (s *testStream) SetSpeed(float64)                                 {}
 
 type testDevice struct{}
 

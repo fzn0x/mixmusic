@@ -16,6 +16,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/volume"
@@ -296,9 +297,10 @@ type Services interface {
 // the player takes as an audio.Events. Its speeds keep the pitch: 1 plays
 // a track at its own speed.
 type Stream interface {
-	Load(url string, start time.Duration, autoplay bool, speed float64) error
+	// Load and Crossfade start a track as cue asks, as the engine's do.
+	Load(url string, cue audio.Cue) error
 	Preload(url string)
-	Crossfade(url string, d time.Duration, speed float64) error
+	Crossfade(url string, d time.Duration, cue audio.Cue) error
 	Play() error
 	Pause()
 	Stop()

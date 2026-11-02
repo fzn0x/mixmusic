@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -112,6 +113,31 @@ func TestPrepareStreamTellsSurround(t *testing.T) {
 	if src, err := n.p.PrepareStream(ctx, ytTrack("eeeeeeeee5e")); err != nil || src.SurroundURL != surroundURL("eeeeeeeee5e") || src.Cached {
 		t.Errorf("5.1 on, cached in stereo: %+v, %v", src, err)
 	}
+	// While yt-dlp takes long, it plays from the cache, in stereo, after
+	// surroundWait.
+	wait := surroundWait
+	surroundWait = 30 * time.Millisecond
+	t.Cleanup(func() { surroundWait = wait })
+	n.p.a.resolver.Forget("eeeeeeeee5e")
+	n.hang.Store(true)
+	released := make(chan struct{})
+	t.Cleanup(func() { close(released) })
+	run := n.p.a.resolver.Run
+	n.p.a.resolver.Run = func(ctx context.Context, args ...string) ([]byte, error) {
+		if n.hang.Load() {
+			select {
+			case <-ctx.Done():
+			case <-released:
+			}
+			return nil, errors.New("yt-dlp gave up")
+		}
+		return run(ctx, args...)
+	}
+	started := time.Now()
+	if src, err := n.p.PrepareStream(ctx, ytTrack("eeeeeeeee5e")); err != nil || src.SurroundURL != "" || !src.Cached || time.Since(started) > 2*time.Second {
+		t.Errorf("5.1 on, cached in stereo, yt-dlp slow: %+v, %v, after %v", src, err, time.Since(started))
+	}
+	n.hang.Store(false)
 	// Offline, it plays from the cache, in stereo.
 	n.p.a.resolver.Forget("eeeeeeeee5e")
 	n.net.Store(false)

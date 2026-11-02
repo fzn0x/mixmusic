@@ -94,11 +94,14 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 		}
 		// With 5.1 on, a track cached in stereo plays its 5.1 audio when
 		// YouTube has some, which takes asking it while the network
-		// answers: else it plays from the cache.
+		// answers, for up to surroundWait: else it plays from the cache,
+		// and the answer, which comes on, is there for its next play.
 		if surround && !cachedSurround && !offline {
-			if s, err := p.a.resolveStream(ctx, videoID); err == nil && s.Surround != nil {
+			ask, cancel := context.WithTimeout(ctx, surroundWait)
+			if s, err := p.a.resolveStream(ask, videoID); err == nil && s.Surround != nil {
 				src.SurroundURL = surroundURL
 			}
+			cancel()
 		}
 		// It plays from the cache when the audio it plays is there.
 		if surround && src.SurroundURL != "" {
@@ -140,6 +143,10 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 	}
 	return src, nil
 }
+
+// surroundWait bounds how long a track cached in stereo waits, with 5.1
+// on, for YouTube to tell whether it has 5.1 audio.
+var surroundWait = 3 * time.Second
 
 // learnLoudness asks YouTube how loud a video MixMusic holds the audio of
 // is, unless the book knows, or the network is gone: the engine would wait

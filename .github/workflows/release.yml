@@ -341,6 +341,10 @@ jobs:
           done
           ls update-*.json
       - name: Release notes
+        env:
+          # With these secrets, the builds sign or fail.
+          MACOS_NOTARIZED: ${{ secrets.MACOS_CERTIFICATE != '' }}
+          WINDOWS_SIGNED: ${{ secrets.WINDOWS_CERTIFICATE != '' }}
         run: |
           set -euo pipefail
           v="${TAG#v}"
@@ -357,6 +361,14 @@ jobs:
           else
             echo "::warning::The release has no Flatpak: its job failed"
             grep -v -F '.flatpak' .github/release-notes.md > "$downloads"
+          fi
+          # Signed apps open without an allowance at their first launch: the
+          # notes leave out the lines that tell how to give it.
+          if [ "$MACOS_NOTARIZED" = true ]; then
+            sed -i '/^\*\*First launch on macOS\.\*\*/d' "$downloads"
+          fi
+          if [ "$WINDOWS_SIGNED" = true ]; then
+            sed -i '/^\*\*First launch on Windows\.\*\*/d' "$downloads"
           fi
           {
             # The version's section of CHANGELOG.md, without its link

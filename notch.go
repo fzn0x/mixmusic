@@ -273,7 +273,7 @@ func (n *notch) topRow(c *ui.Context, cx, alpha float32) {
 	wing, art := float32(h.wing()), float32(h.art())
 	top := (hh - art) / 2
 	if alpha > 0 {
-		open := ui.ButtonBase(c.Key("notch-main")).Absolute().Left(cx-hw/2-wing-notchOpenRoom+6).Top((hh-28)/2).
+		open := n.s.buttonBase(c.Key("notch-main")).Absolute().Left(cx-hw/2-wing-notchOpenRoom+6).Top((hh-28)/2).
 			Size(28, 28).Radius(14).Label("Open MixMusic").Cursor(ui.CursorPointer).Opacity(alpha).Disabled(!n.open)
 		n.buttonLook(open, false, false)
 		open.Children(func() { ui.Icon(c, icon("mini")).FontSize(15).TextColor(notchWhite) })
@@ -285,7 +285,7 @@ func (n *notch) topRow(c *ui.Context, cx, alpha float32) {
 	if n.open {
 		label = "Close the player"
 	}
-	left := ui.ButtonBase(c.Key("notch-left")).Absolute().Left(cx-hw/2-wing).Top(0).Size(wing, hh).
+	left := n.s.buttonBase(c.Key("notch-left")).Absolute().Left(cx-hw/2-wing).Top(0).Size(wing, hh).
 		Label(label).Cursor(ui.CursorPointer)
 	if left.FocusVisible() {
 		n.keyFocus = true
@@ -358,7 +358,7 @@ func (n *notch) body(c *ui.Context, t media.Track) {
 	s := n.s
 	ui.Column(c).Width(232).Shrink(0).Gap(8).Children(func() {
 		ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
-			cover := ui.ButtonBase(c.Key("notch-cover")).Size(64, 64).Radius(10).Clip().Shrink(0).
+			cover := n.s.buttonBase(c.Key("notch-cover")).Size(64, 64).Radius(10).Clip().Shrink(0).
 				Label("Show what plays in MixMusic").Cursor(ui.CursorPointer)
 			if cover.FocusVisible() {
 				n.keyFocus = true
@@ -413,7 +413,7 @@ func (n *notch) transport(c *ui.Context, key, name, label string, main, disabled
 	if main {
 		size, ink = 38, notchBlack
 	}
-	b := ui.ButtonBase(c.Key(key)).Size(size, size).Radius(size / 2).Label(label).Cursor(ui.CursorPointer).Disabled(disabled)
+	b := n.s.buttonBase(c.Key(key)).Size(size, size).Radius(size / 2).Label(label).Cursor(ui.CursorPointer).Disabled(disabled)
 	n.buttonLook(b, main, disabled)
 	b.Children(func() { ui.Icon(c, icon(name)).FontSize(18).TextColor(ink) })
 	return b
@@ -510,7 +510,7 @@ func (n *notch) lyrics(c *ui.Context, t media.Track) {
 		note(l.err.Error())
 		// A track without lyrics stays so; a failure may pass.
 		if !errors.Is(l.err, lyrics.ErrNotFound) {
-			again := ui.ButtonBase(c.Key("notch-lyrics-retry")).Padding(4, 10).Radius(12).Border(1, notchMuted).
+			again := n.s.buttonBase(c.Key("notch-lyrics-retry")).Padding(4, 10).Radius(12).Border(1, notchMuted).
 				AlignSelf(ui.Start).Label("try again").Cursor(ui.CursorPointer)
 			n.buttonLook(again, false, false)
 			again.Children(func() { ui.Text(c, "try again").FontSize(12).TextColor(notchWhite) })

@@ -88,6 +88,19 @@ func TestHistory(t *testing.T) {
 	}
 }
 
+// TestVersion counts what changes the library, a play as a new mix.
+func TestVersion(t *testing.T) {
+	l := open(t)
+	before := l.Version()
+	l.RecordPlay(tr("yt:a", media.SourceYouTube, "A"))
+	if _, err := l.CreatePlaylist("Night drive", "", nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := l.Version(); got != before+2 {
+		t.Errorf("a play and a new mix moved the version from %d to %d", before, got)
+	}
+}
+
 func TestSearches(t *testing.T) {
 	l := open(t)
 	for _, q := range []string{"one", "two", "ONE", "  "} {

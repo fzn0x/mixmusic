@@ -126,7 +126,7 @@ func pagesOf(t *testing.T, theme string, density settings.Density, layout map[st
 	for i := range testTracks {
 		items = append(items, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
 	}
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
 		{Title: "Listen again", Source: media.SourceYouTube, Items: items}, {Title: "Albums for you", Source: media.SourceYouTube,
 			Items: []media.Item{{Kind: media.ItemAlbum, Album: &album}}}}}
 	s.loads["album:al-1"] = &loaded[media.Album]{done: true, value: album}
@@ -136,7 +136,7 @@ func pagesOf(t *testing.T, theme string, density settings.Density, layout map[st
 		}
 	}
 	tt := testerOf(t, s, 1280, 820)
-	s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
 		{Title: "Listen again", Source: media.SourceYouTube, Items: items}, {Title: "Albums for you", Source: media.SourceYouTube,
 			Items: []media.Item{{Kind: media.ItemAlbum, Album: &album}}}}}
 	s.p.PlayTracks(testTracks, 1)

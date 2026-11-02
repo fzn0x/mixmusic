@@ -66,28 +66,7 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 	}
 	view := tool.viewOf(tracks)
 	ui.Row(c).Gap(12).Margin(0, 0, 16).Children(func() {
-		box := ui.Row(c).Height(36).Width(320).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).Radius(k.round(36)).Cursor(ui.CursorText)
-		var search ui.Element
-		box.Children(func() {
-			ui.Icon(c, icon("search")).FontSize(16).TextColor(k.muted)
-			search = ui.TextInputBase(c.Key(key+"-search"), &tool.query).Placeholder(k.sentence("search this " + noun)).Grow(1).MinWidth(0).
-				Label("Search this " + noun).FontSize(k.bodySize())
-			if tool.query != "" {
-				// Escape clears the search, and goes on once it's clear.
-				search.OnShortcut(0, ui.KeyEscape, func() { tool.query = "" })
-			}
-		})
-		switch {
-		case search.Focused():
-			box.Border(2, k.accent)
-		case k.tonal:
-			box.Background(k.surface2)
-		default:
-			box.Border(2, k.outline)
-		}
-		if search.Focused() && k.tonal {
-			box.Background(k.surface2)
-		}
+		s.filterBox(c, key+"-search", "search this "+noun, "Search this "+noun, &tool.query, false, func() { tool.query = "" })
 		labels := slices.Clone(trackSortLabels)
 		labels[0] = strings.ToUpper(noun[:1]) + noun[1:] + " order"
 		chosen := labels[max(slices.Index(trackSorts, tool.sort), 0)]
@@ -102,6 +81,40 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 		}
 	})
 	return view
+}
+
+// filterBox is the 36px box, outlined or, with tonal controls, filled,
+// that searches what a page shows, as "search this playlist" does, in its
+// own key: the user's text is query, which Escape clears with clear, and
+// goes on once it's clear. focus gives the box the keyboard focus. It
+// returns the box's input.
+func (s *shell) filterBox(c *ui.Context, key, placeholder, label string, query *string, focus bool, clear func()) ui.Element {
+	k := &s.lk
+	box := ui.Row(c).Height(36).Width(320).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).Radius(k.round(36)).Cursor(ui.CursorText)
+	var in ui.Element
+	box.Children(func() {
+		ui.Icon(c, icon("search")).FontSize(16).TextColor(k.muted)
+		in = ui.TextInputBase(c.Key(key), query).Placeholder(k.sentence(placeholder)).Grow(1).MinWidth(0).
+			Label(label).FontSize(k.bodySize())
+		if *query != "" {
+			in.OnShortcut(0, ui.KeyEscape, clear)
+		}
+		if focus {
+			in.Focus()
+		}
+	})
+	switch {
+	case in.Focused():
+		box.Border(2, k.accent)
+	case k.tonal:
+		box.Background(k.surface2)
+	default:
+		box.Border(2, k.outline)
+	}
+	if in.Focused() && k.tonal {
+		box.Background(k.surface2)
+	}
+	return in
 }
 
 // searching is what the user searches in the list of key, if anything.

@@ -129,7 +129,7 @@ func TestRenderDesignLanguages(t *testing.T) {
 		for i := range tracks {
 			trackItems = append(trackItems, media.Item{Kind: media.ItemTrack, Track: &tracks[i]})
 		}
-		s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+		s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
 			{Title: "Listen again", Source: media.SourceYouTube, Items: trackItems},
 			{Title: "Albums for you", Source: media.SourceYouTube, Items: albums},
 		}}

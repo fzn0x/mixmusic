@@ -53,7 +53,7 @@ func TestDesignLanguageLayouts(t *testing.T) {
 	} {
 		t.Run(c.theme, func(t *testing.T) {
 			s, tt := themed(t, c.theme)
-			s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
+			s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
 			show(s, tt, "/")
 			if !tt.HasText(c.title) || !tt.HasText(c.pivot) {
 				t.Errorf("the home page doesn't say %q and %q: %q", c.title, c.pivot, tt.Texts())
@@ -144,7 +144,7 @@ func TestSpringsSettle(t *testing.T) {
 	for _, id := range []string{"material", "material-dark", "crate", "crate-light"} {
 		t.Run(id, func(t *testing.T) {
 			s, tt := themed(t, id)
-			s.loads["home"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
+			s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
 			show(s, tt, "/")
 			r, ok := tt.Find("Album 1")
 			if !ok {

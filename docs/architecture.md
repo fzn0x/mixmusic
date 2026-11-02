@@ -153,9 +153,12 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   while the network is gone, on a metered connection unless the settings
   allow it, for 15 minutes once YouTube turns one down, and on a full
   disk; a track YouTube won't send fails with why, and others try again
-  after 30 seconds, 2 minutes and 10. The proxy serves downloads before the
-  cache (`stream.Store`), and the windows read a snapshot of what they hold
-  in each frame, a map lookup a track row.
+  after 30 seconds, 2 minutes and 10. A live stream has no file to keep:
+  the index keeps the videos playback or a download found live, whose
+  tracks it leaves out of their collections and refuses, until one plays
+  as a video again. The proxy serves downloads before the cache
+  (`stream.Store`), and the windows read a snapshot of what they hold in
+  each frame, a map lookup a track row.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by

@@ -225,8 +225,9 @@ func (d *doc) order() {
 	slices.SortStableFunc(d.parts, func(a, b *doc) int { return at(a) - at(b) })
 }
 
-// anchor is the id of a heading named after a file: the letters and digits
-// of its name, in lower case, with a dash for what's between them.
+// anchor is the id of a heading named after a file: the letters, digits and
+// underscores of its name, in lower case, with a dash for what's between
+// them.
 func anchor(name string) string {
 	var b strings.Builder
 	dash := false

@@ -6,4 +6,5 @@
   keep the track's own time, a crossfade lasts the seconds you hear, and
   Last.fm counts how much of a song you heard. The system's media
   controls move on at the speed, and setting the rate over MPRIS sets it.
-  Spotify plays its own tracks at their own speed (#99).
+  Spotify plays its own tracks at their own speed, and live streams play
+  as they're broadcast (#99).

@@ -9,6 +9,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/player/playertest"
 )
 
 // offlinePlayer is testPlayer without the network: no track can be found,
@@ -36,7 +37,7 @@ func (offlinePlayer) KickOnline() {}
 func offlineShell(t *testing.T) *shell {
 	s := newTestShell(t)
 	stream := &testStream{}
-	p := player.New(offlinePlayer{}, stream, testDevice{}, player.Saved{})
+	p := player.New(offlinePlayer{}, stream, playertest.Device{}, player.Saved{})
 	stream.mu.Lock()
 	stream.p = p
 	stream.mu.Unlock()

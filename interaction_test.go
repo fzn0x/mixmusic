@@ -222,7 +222,7 @@ func (p aiPlayer) Label(_ context.Context, t media.Track, _ bool) player.Label {
 // still plays one (#97).
 func TestQueueMadeWithAI(t *testing.T) {
 	s := newTestShellWith(t, nil, func(a *app.App) player.Services {
-		return aiPlayer{testPlayer: testPlayer{a}, ai: map[string]bool{"yt:3": true}}
+		return aiPlayer{testPlayer: testPlayer{a: a}, ai: map[string]bool{"yt:3": true}}
 	}, player.Saved{Tracks: testTracks, Index: 1})
 	s.settle(t, func(st player.State) bool { return len(st.Queue) > 2 && st.Queue[2].Skip == player.SkipMadeWithAI })
 	s.p.Disliked(testTracks[4].ID, true)
@@ -252,7 +252,7 @@ func TestQueueMadeWithAI(t *testing.T) {
 // track, which YouTube labels as made with AI, and its row play it (#97).
 func TestAlbumPlayPastAI(t *testing.T) {
 	s := newTestShellWith(t, nil, func(a *app.App) player.Services {
-		return aiPlayer{testPlayer: testPlayer{a}, ai: map[string]bool{"yt:1": true}}
+		return aiPlayer{testPlayer: testPlayer{a: a}, ai: map[string]bool{"yt:1": true}}
 	}, player.Saved{})
 	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:3]}}
 	tt := tester(t, s)

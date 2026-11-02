@@ -588,9 +588,11 @@ func (p *Player) setVolume(v float64) {
 	p.volumeTimer = p.after(saveVolumeAfter, func() { p.saveVolume(v) })
 }
 
-// saveVolume keeps the volume v in the settings, unless they keep it.
+// saveVolume keeps the volume v in the settings, unless they keep it: a
+// volume set from the settings, as an edit of settings.json sets it,
+// comes back from its position a hair off, which saves nothing.
 func (p *Player) saveVolume(v float64) {
-	if saved := volume.Saved(v); p.svc.Settings().Volume != saved {
+	if saved := volume.Saved(v); math.Abs(p.svc.Settings().Volume-saved) > 1e-9 {
 		p.svc.SaveVolume(saved)
 	}
 }

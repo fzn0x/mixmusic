@@ -57,8 +57,10 @@ func registerFonts() {
 }
 
 // fontNotices are the licenses of the faces MixMusic includes, which its
-// copies must reproduce, as those of its code.
-func fontNotices() []app.Notice {
+// copies must reproduce, as those of its code. Settings › About shows them
+// in every frame, and every section does while the user searches the
+// settings: they are read once.
+var fontNotices = sync.OnceValue(func() []app.Notice {
 	var notices []app.Notice
 	for _, f := range []struct{ name, file string }{
 		{"Selawik, the interface's face", "fonts/OFL.txt"},
@@ -69,4 +71,4 @@ func fontNotices() []app.Notice {
 		}
 	}
 	return notices
-}
+})

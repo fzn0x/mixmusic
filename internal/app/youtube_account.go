@@ -18,6 +18,7 @@ import (
 
 	"github.com/egoist/mygo"
 
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
@@ -352,9 +353,8 @@ func (s *Accounts) YouTubeLogout(ctx context.Context) error {
 	s.a.youtubeMe, s.a.profileErrs.youtube = nil, ""
 	s.a.mu.Unlock()
 	err := s.a.youtubeStore.Clear()
-	if set := s.a.settings.Get(); set.YouTubeChannel != "" {
-		set.YouTubeChannel = ""
-		if serr := s.a.settings.Set(set); serr == nil {
+	if s.a.settings.Get().YouTubeChannel != "" {
+		if serr := s.a.settings.Update(func(set *settings.Settings) error { set.YouTubeChannel = ""; return nil }); serr == nil {
 			notify()
 		}
 	}

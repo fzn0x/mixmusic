@@ -293,9 +293,7 @@ func (s *shell) devicesButton(c *ui.Context) {
 }
 
 func (s *shell) setDevice(id string) {
-	st := s.svc.Preferences.Get()
-	st.SpotifyDevice = id
-	if _, err := s.svc.Preferences.Set(st); err != nil {
+	if _, err := s.svc.Preferences.Update(func(st *settings.Settings) { st.SpotifyDevice = id }); err != nil {
 		s.notes = append(s.notes, noticeOf(err))
 	}
 }

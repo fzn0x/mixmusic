@@ -22,6 +22,7 @@ func (s *shell) view(c *ui.Context) {
 	s.followArtwork()
 	c.SetTheme(&s.lk.theme)
 	s.toasts(c)
+	s.fileToast(c)
 	s.runShortcuts(c)
 	k := &s.lk
 	root := ui.Column(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body)
@@ -34,7 +35,10 @@ func (s *shell) view(c *ui.Context) {
 				ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Children(func() {
 					s.mainPane(c)
 					if s.panel != "" {
+						// The panel's lyrics refresh with the page.
+						s.collecting = true
 						s.sidePanel(c)
+						s.collecting = false
 					}
 				})
 			})
@@ -49,6 +53,7 @@ func (s *shell) view(c *ui.Context) {
 	s.sweepDialogs()
 	s.sweepViews()
 	s.followVideo()
+	s.keepShown(c)
 }
 
 // mainPane shows the page of the router's path. Pages scroll themselves,
@@ -60,6 +65,9 @@ func (s *shell) mainPane(c *ui.Context) {
 // page builds the page of a route.
 func (s *shell) page(c *ui.Context, r *ui.Route) {
 	s.pagePath = r.Path()
+	// The page shown, not one that slides away, is what a refresh asks
+	// again for.
+	s.collecting = r.Path() == s.router.Path()
 	switch {
 	case r.Match("/"):
 		r.Title("Home")
@@ -80,9 +88,9 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 	case r.Match("/now-playing"):
 		s.nowPlayingPage(c)
 	case r.Match("/settings"):
-		s.settingsPage(c, "")
+		s.settingsPage(c, "", r.Query("q"))
 	case r.Match("/settings/{tab}"):
-		s.settingsPage(c, r.Param("tab"))
+		s.settingsPage(c, r.Param("tab"), r.Query("q"))
 	case r.Match("/explore"):
 		s.explorePage(c, "")
 	case r.Match("/explore/{tab}"):
@@ -100,6 +108,7 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 	default:
 		s.lost(c, "This page isn't one of MixMusic's.")
 	}
+	s.collecting = false
 }
 
 // lost stands for a page there is none of, saying why.

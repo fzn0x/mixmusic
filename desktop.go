@@ -14,14 +14,14 @@ import (
 
 func (s *shell) desktopSettings(c *ui.Context) {
 	s.group(c, "on the desktop", func() {
-		toggle := func(key, title, description string, v *bool) {
+		toggle := func(key, title, description string, v *bool, words ...string) {
 			s.row(c, title, description, func() {
 				if s.switchOf(c.Key(key), v).Label(title).Changed() {
 					s.save()
 				}
-			})
+			}, words...)
 		}
-		toggle("tray", "Close to the tray", "Closing the window keeps the music playing; quit from the tray icon.", &s.set.CloseToTray)
+		toggle("tray", "Close to the tray", "Closing the window keeps the music playing; quit from the tray icon.", &s.set.CloseToTray, "minimize background")
 		toggle("media-keys", "Media keys", "The keyboard's play, next and previous keys control MixMusic.", &s.set.MediaKeys)
 		toggle("notifications", "Notifications", "Tell what starts playing while MixMusic is in the background.", &s.set.Notifications)
 		toggle("title", "Show what plays in the window title", "The window's title names the track that plays, for the taskbar, the window switcher and screen readers.", &s.set.ShowInTitle)
@@ -38,7 +38,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 					s.save()
 				})
 				in.Placeholder("MixMusic's").Width(260).Label("Discord application ID")
-			})
+			}, "Discord shows the name of MixMusic's application. To show another, create one in the developer portal and paste its application ID.")
 		}
 		s.row(c, "Start at login", "", func() {
 			// The system says, beside the main thread.
@@ -56,12 +56,12 @@ func (s *shell) desktopSettings(c *ui.Context) {
 					})
 				}()
 			}
-		})
+		}, "startup launch")
 		s.row(c, "Reset settings", "Puts back the settings of a new install; your accounts, library and add-ons stay.", func() {
 			if s.button(c, "reset", "reset", false).Clicked() {
 				s.resetting = true
 			}
-		})
+		}, "defaults")
 	})
 	if s.confirm(c, "reset-settings", &s.resetting, "reset settings", "Put back every setting as it was on a new install?", "reset") {
 		if _, err := s.svc.Preferences.Reset(); err != nil {
@@ -87,19 +87,28 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 			palette += ", " + keys + ","
 		}
 	}
-	ui.Row(c).Gap(24).AlignItems(ui.Center).Margin(0, 0, 32).Children(func() {
-		ui.Text(c, "Shortcuts of a single key work while you are not typing; "+palette+" lists every command, those of plugins too.").
-			FontSize(k.smallSize()).TextColor(k.muted).Grow(1).MinWidth(0).MaxWidth(640)
-		if len(s.set.Shortcuts) > 0 && s.link(c, "shortcuts-reset", "reset all") {
-			s.set.Shortcuts, s.recording = nil, ""
-			s.save()
-		}
-	})
+	// The search of the settings shows the commands it finds without the
+	// section's introduction.
+	if !s.find.on() {
+		ui.Row(c).Gap(24).AlignItems(ui.Center).Margin(0, 0, 32).Children(func() {
+			ui.Text(c, "Shortcuts of a single key work while you are not typing; "+palette+" lists every command, those of plugins too.").
+				FontSize(k.smallSize()).TextColor(k.muted).Grow(1).MinWidth(0).MaxWidth(640)
+			if len(s.set.Shortcuts) > 0 && s.link(c, "shortcuts-reset", "reset all") {
+				s.set.Shortcuts, s.recording = nil, ""
+				s.save()
+			}
+		})
+	}
 	for _, g := range groups {
 		s.group(c, g, func() {
 			for _, cmd := range byGroup[g] {
 				current := s.shortcutOf(cmd)
 				recording := s.recording == cmd.id
+				// The search finds a command by its keys too.
+				var keys []string
+				if s.find.sifting() {
+					keys = []string{shortcutWords(current)}
+				}
 				s.row(c, cmd.title, "", func() {
 					label, ink, action := shortcutLabel(current), k.muted, "change"
 					switch {
@@ -132,7 +141,7 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 						s.button(c, "shortcut-reset-"+cmd.id, "reset", false).Label("reset the shortcut of "+cmd.title).Clicked() {
 						s.setShortcut(cmd, cmd.shortcut)
 					}
-				})
+				}, keys...)
 			}
 		})
 	}
@@ -240,6 +249,12 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 		})
 		return
 	}
+	// The search of the settings finds the newest version by these words,
+	// without asking GitHub for it.
+	const words = "newest newer version update release"
+	if _, asked := s.loads["release"]; !asked && !s.findable("", words) {
+		return
+	}
 	r := fetch(s, "release", s.svc.System.LatestRelease)
 	again := func() {
 		if !s.updating && s.link(c, "release-again", "check again") {
@@ -248,9 +263,9 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 	}
 	switch rel := r.value; {
 	case !r.done:
-		s.row(c, "Looking for a newer version…", "", func() {})
+		s.row(c, "Looking for a newer version…", "", func() {}, words)
 	case r.err != nil:
-		s.row(c, "Couldn't look for a newer version", r.err.Error(), again)
+		s.row(c, "Couldn't look for a newer version", r.err.Error(), again, words)
 	case rel.Newer:
 		var describe []string
 		if t, err := time.Parse(time.RFC3339, rel.Date); err == nil {
@@ -281,9 +296,9 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 					go s.svc.System.OpenExternal(rel.Download)
 				}
 			}
-		})
+		}, words)
 	default:
-		s.row(c, "This is the newest version", "", again)
+		s.row(c, "This is the newest version", "", again, words)
 	}
 }
 

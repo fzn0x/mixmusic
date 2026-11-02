@@ -1120,6 +1120,19 @@ func TestSettingsKeep(t *testing.T) {
 	}
 }
 
+// TestShortcutLabel writes shortcuts as the system does.
+func TestShortcutLabel(t *testing.T) {
+	want := map[string]string{"Mod+Shift+ArrowLeft": "Ctrl+Shift+←", "Alt+1": "Alt+1", "Space": "Space", "": ""}
+	if runtime.GOOS == "darwin" {
+		want = map[string]string{"Mod+Shift+ArrowLeft": "⌘⇧←", "Alt+1": "⌥1", "Space": "Space", "": ""}
+	}
+	for in, w := range want {
+		if got := shortcutLabel(in); got != w {
+			t.Errorf("shortcutLabel(%q) = %q, not %q", in, got, w)
+		}
+	}
+}
+
 func TestShortcutParsing(t *testing.T) {
 	for in, ok := range map[string]bool{"Space": true, "Mod+Shift+L": true, "Alt+1": true, "Mod+,": true, "Shift+ArrowRight": true, "": false, "Hyper+K": false, "Mod+NoSuchKey": false} {
 		if _, _, got := parseShortcut(in); got != ok {

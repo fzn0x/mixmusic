@@ -52,7 +52,7 @@ func TestLayoutDesignsLayOut(t *testing.T) {
 	}{
 		{settings.LayoutTiles, "mix", "home", "everything", 52, 172, false},
 		{settings.LayoutExpressive, "material", "Home", "Everything", 64, 176 + 2*12, true},
-		{settings.LayoutCrate, "crate", "Home", "Everything", 48, 196 + 2*9, false},
+		{settings.LayoutCrate, "walnut", "Home", "Everything", 48, 196 + 2*9, false},
 		{settings.LayoutBlend, "mix", "Home", "Everything", 56, 188 + 2*10.5, true},
 		{settings.LayoutCrate, "sakura", "Home", "Everything", 48, 196 + 2*9, false},
 	} {
@@ -152,7 +152,7 @@ func TestSpringsSettle(t *testing.T) {
 		theme  string
 	}{
 		{settings.LayoutExpressive, "material"}, {settings.LayoutExpressive, "material-dark"},
-		{settings.LayoutCrate, "crate"}, {settings.LayoutCrate, "crate-light"},
+		{settings.LayoutCrate, "walnut"}, {settings.LayoutCrate, "walnut-light"},
 		{settings.LayoutBlend, "mix"}, {settings.LayoutBlend, "daylight"},
 	} {
 		t.Run(string(c.layout)+"-"+c.theme, func(t *testing.T) {

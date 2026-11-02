@@ -18,7 +18,7 @@ func TestFacesRegistered(t *testing.T) {
 			have[f.Name] = true
 		}
 	}
-	for _, family := range []string{face, faceSemilight, faceRound, faceMaterial, faceCrate} {
+	for _, family := range []string{face, faceSemilight, faceRound, faceMaterial, faceArchivo} {
 		if !have[family] {
 			t.Errorf("%s isn't registered: %v", family, have)
 		}

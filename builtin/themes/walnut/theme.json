@@ -1,9 +1,9 @@
 {
-  "id": "crate",
-  "name": "Crate",
+  "id": "walnut",
+  "name": "Walnut",
   "version": "1.0.0",
   "author": "MixMusic",
-  "description": "Dense and dark: big covers in card grids, a compact sidebar and heavy headings, lit by tangerine.",
+  "description": "Walnut-dark neutrals lit by tangerine, with heavy condensed headings.",
   "scheme": "dark",
   "colors": {
     "bg": "#24160b",

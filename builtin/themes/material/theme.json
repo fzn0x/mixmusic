@@ -3,7 +3,7 @@
   "name": "Material",
   "version": "1.0.0",
   "author": "MixMusic",
-  "description": "Material 3 Expressive: tonal colours made of the cover's, pill buttons, rounded cards and a floating player, on springs.",
+  "description": "Material's dynamic colour: every colour made of the cover's, tinted surfaces and tonal fills, in Roboto Flex. Made for the Expressive layout.",
   "scheme": "light",
   "colors": {
     "bg": "#fff8f8",

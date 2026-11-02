@@ -92,7 +92,7 @@ func BenchmarkScroll(b *testing.B) {
 	for _, c := range []struct {
 		layout settings.Layout
 		theme  string
-	}{{settings.LayoutBlend, "mix"}, {settings.LayoutExpressive, "material"}, {settings.LayoutCrate, "crate"}} {
+	}{{settings.LayoutBlend, "mix"}, {settings.LayoutExpressive, "material"}, {settings.LayoutCrate, "walnut"}} {
 		name := string(c.layout)
 		b.Run("liked-1000-"+name, func(b *testing.B) {
 			s := likedShell(b, 1000)

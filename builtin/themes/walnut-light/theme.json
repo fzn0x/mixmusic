@@ -1,9 +1,9 @@
 {
-  "id": "crate-light",
-  "name": "Crate Light",
+  "id": "walnut-light",
+  "name": "Walnut Light",
   "version": "1.0.0",
   "author": "MixMusic",
-  "description": "Crate by day: big covers in card grids and heavy headings on warm paper.",
+  "description": "Walnut by day: warm paper lit by tangerine, with heavy condensed headings.",
   "scheme": "light",
   "colors": {
     "bg": "#f9f2e9",

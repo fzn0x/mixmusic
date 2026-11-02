@@ -115,12 +115,12 @@ func TestThemeCommands(t *testing.T) {
 		t.Fatalf("%d theme commands for %d themes", len(themes), len(s.inv.Themes))
 	}
 	for _, cmd := range themes {
-		if cmd.id == "theme.crate" {
+		if cmd.id == "theme.walnut" {
 			cmd.run()
 		}
 	}
-	if got := s.svc.Preferences.Get().ActiveTheme(true); got != "crate" {
-		t.Errorf("the theme is %q, not crate", got)
+	if got := s.svc.Preferences.Get().ActiveTheme(true); got != "walnut" {
+		t.Errorf("the theme is %q, not walnut", got)
 	}
 }
 

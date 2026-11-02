@@ -9,14 +9,14 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
-// TestDesignLanguagesContrast checks that the Material and Crate themes
+// TestDesignLanguagesContrast checks that the Material and Walnut themes
 // keep every text role readable, light and dark, in every layout design:
 // 4.5:1 for text, 3:1 for the marks of the services and for the accent in
 // Tiles, with their own colours and with the accents of many artworks, of
 // which the Material themes make all their colours.
 func TestDesignLanguagesContrast(t *testing.T) {
 	s := newTestShell(t)
-	for _, id := range []string{"material", "material-dark", "crate", "crate-light"} {
+	for _, id := range []string{"material", "material-dark", "walnut", "walnut-light"} {
 		for _, layout := range settings.Layouts {
 			for _, art := range contrastArtworks {
 				k := contrastLook(s, id, layout, art)

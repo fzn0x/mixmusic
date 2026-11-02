@@ -17,7 +17,7 @@ import (
 // variable font; quicksand-OFL.txt is theirs. Roboto Flex, the Material
 // themes' face, comes as static instances of its variable font, at the
 // weights of Material's type scale, and Archivo SemiCondensed ExtraBold
-// sets the Crate themes' headings; robotoflex-OFL.txt and archivo-OFL.txt
+// sets the Walnut themes' headings; robotoflex-OFL.txt and archivo-OFL.txt
 // are their licenses.
 //
 //go:embed fonts/*.ttf fonts/*.txt
@@ -33,9 +33,9 @@ const (
 	// faceRound is Quicksand, Mochi's face.
 	faceRound = "Quicksand"
 	// faceMaterial is Roboto Flex, the Material themes' face, and
-	// faceCrate Archivo SemiCondensed, the Crate themes' headings'.
+	// faceArchivo Archivo SemiCondensed, the Walnut themes' headings'.
 	faceMaterial = "Roboto Flex"
-	faceCrate    = "Archivo SemiCondensed"
+	faceArchivo  = "Archivo SemiCondensed"
 )
 
 var fontsOnce sync.Once
@@ -55,7 +55,7 @@ func registerFonts() {
 			"fonts/robotoflex-regular.ttf":              faceMaterial,
 			"fonts/robotoflex-medium.ttf":               faceMaterial,
 			"fonts/robotoflex-bold.ttf":                 faceMaterial,
-			"fonts/archivo-semicondensed-extrabold.ttf": faceCrate,
+			"fonts/archivo-semicondensed-extrabold.ttf": faceArchivo,
 		} {
 			data, err := fontFiles.ReadFile(file)
 			if err == nil {
@@ -78,7 +78,7 @@ var fontNotices = sync.OnceValue(func() []app.Notice {
 		{"Selawik, the interface's face", "fonts/OFL.txt"},
 		{"Quicksand, Mochi's face", "fonts/quicksand-OFL.txt"},
 		{"Roboto Flex, the Material themes' face", "fonts/robotoflex-OFL.txt"},
-		{"Archivo, the Crate themes' headings' face", "fonts/archivo-OFL.txt"},
+		{"Archivo, the Walnut themes' headings' face", "fonts/archivo-OFL.txt"},
 	} {
 		if text, err := fontFiles.ReadFile(f.file); err == nil {
 			notices = append(notices, app.Notice{Name: f.name, Text: string(text)})

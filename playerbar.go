@@ -381,13 +381,14 @@ func (s *shell) showPanel(p string) {
 	s.save()
 }
 
-// volumeControl mutes, and sets the volume.
+// volumeControl mutes, and sets the volume. Its slider gives up room to the
+// buttons beside it, as the speed's, where the player bar lacks it.
 func (s *shell) volumeControl(c *ui.Context) {
 	v := s.st.Volume
 	if s.st.Muted {
 		v = 0
 	}
-	ui.Row(c).Gap(4).Width(140).Children(func() {
+	ui.Row(c).Gap(4).Width(140).MinWidth(80).Children(func() {
 		name, label := "volume", "Mute"
 		if s.st.Muted {
 			label = "Unmute"

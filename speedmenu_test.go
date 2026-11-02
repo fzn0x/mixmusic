@@ -364,3 +364,28 @@ func TestMenuSpeeds(t *testing.T) {
 		t.Errorf("the steps became %v", speedSteps)
 	}
 }
+
+// TestSpeedButtonFits keeps the player bar's buttons in the window at its
+// least width, with the speed shown: the volume's slider gives up room.
+func TestSpeedButtonFits(t *testing.T) {
+	for _, layout := range []settings.Layout{settings.LayoutBlend, settings.LayoutTiles} {
+		s := newTestShell(t)
+		st := s.svc.Preferences.Get()
+		st.Layout, st.SongSpeed = layout, 1.75
+		if _, err := s.svc.Preferences.Set(st); err != nil {
+			t.Fatal(err)
+		}
+		s.refresh()
+		s.p.PlayTracks(testTracks[:1], 0)
+		s.settle(t, func(st player.State) bool { return st.Playing })
+		tt := testerOf(t, s, 940, 600)
+		for _, label := range []string{"Speed: 1.75×", "Volume", "Open the mini player"} {
+			if r, ok := tt.Find(label); !ok || r.W == 0 || r.X+r.W > 940 {
+				t.Errorf("%s: %q is at %v, out of a window 940 wide", layout, label, r)
+			}
+		}
+		if r, _ := tt.Find("Volume"); r.W < 40 {
+			t.Errorf("%s: the volume's slider is %v wide", layout, r.W)
+		}
+	}
+}

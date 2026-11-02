@@ -252,6 +252,7 @@ func (p *Player) Report(np NowPlaying) {
 	p.a.mu.Lock()
 	prev := p.a.nowPlaying
 	p.a.nowPlaying = np
+	started := p.a.startOf(np)
 	tray := p.a.tray
 	main := p.a.main
 	bar := p.a.taskbar
@@ -261,19 +262,36 @@ func (p *Player) Report(np NowPlaying) {
 	p.a.presence.update(s.DiscordPresence, s.DiscordApp(), np)
 	p.a.reportControls(np)
 	if bar != nil {
-		bar.Show(np.Playing, np.Track != nil)
+		bar.Show(np.plays(), np.Track != nil)
 	}
 
-	changed := np.Track != nil && (prev.Track == nil || prev.Track.ID != np.Track.ID)
 	if tip := trayTip(np); tray != nil && tip != trayTip(prev) {
 		tray.SetToolTip(tip)
 	}
 	if windowTitle(np, s.ShowInTitle) != windowTitle(prev, s.ShowInTitle) {
 		p.a.retitle()
 	}
-	if changed && np.Playing && p.a.settings.Get().Notifications && (main == nil || !main.IsFocused()) {
+	if started && s.Notifications && (main == nil || !main.IsFocused()) {
 		go p.a.notifyTrack(*np.Track)
 	}
+}
+
+// startOf reports whether np tells that a track started: it sounds, no
+// longer loading, and it isn't the track whose start was told last. A
+// track is reported loading first, then playing, so it is the second
+// report that tells it started; paused and played again, it didn't start
+// again. Nothing playing at all forgets the track, which starts again
+// when played again. a.mu guards it.
+func (a *App) startOf(np NowPlaying) bool {
+	switch {
+	case np.Track == nil:
+		a.started = ""
+		return false
+	case !np.Playing || np.Loading || np.Track.ID == a.started:
+		return false
+	}
+	a.started = np.Track.ID
+	return true
 }
 
 // command has the player do what the tray, the media keys, the system's
@@ -311,9 +329,7 @@ func playingLine(np NowPlaying) string {
 	if artists := oneLine(np.Track.ArtistNames()); artists != "" {
 		line += " — " + artists
 	}
-	// A track that loads plays once loaded. As one track ends, the next
-	// loads with the player paused: it isn't a pause.
-	if !np.Playing && !np.Loading {
+	if !np.plays() {
 		line = "Paused: " + line
 	}
 	return line

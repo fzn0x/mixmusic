@@ -94,7 +94,7 @@ func controlsInfo(np NowPlaying, at time.Time) *nowplaying.Info {
 		Duration: time.Duration(np.DurationMs) * time.Millisecond,
 		Position: time.Duration(np.PositionMs) * time.Millisecond,
 		At:       at,
-		Playing:  np.Playing,
+		Playing:  np.plays(),
 		Volume:   np.Volume,
 		Rate:     np.speed(),
 	}

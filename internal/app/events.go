@@ -37,6 +37,12 @@ type NowPlaying struct {
 	Speed float64 `json:"speed,omitempty"`
 }
 
+// plays reports whether the track plays, or loads to play: the player
+// loads a track only to play it, and it plays once loaded. Between two
+// tracks, the next loads with the player paused: that isn't a pause. A
+// track that fails is reported as neither.
+func (np NowPlaying) plays() bool { return np.Track != nil && (np.Playing || np.Loading) }
+
 // speed returns the speed the track plays at.
 func (np NowPlaying) speed() float64 {
 	if np.Speed > 0 {

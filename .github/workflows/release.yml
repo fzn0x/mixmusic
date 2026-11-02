@@ -71,6 +71,15 @@ jobs:
       - uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      # The shell's tools, fetched once, again if a download breaks off. A
+      # tag rebuilt from before the script fetches them once.
+      - name: The Nix shell
+        run: |
+          if [ -f .github/scripts/nix-retry.sh ]; then
+            bash .github/scripts/nix-retry.sh nix develop --command true
+          else
+            nix develop --command true
+          fi
       - run: nix develop --command bun install --frozen-lockfile
       - name: Build
         env:
@@ -281,6 +290,15 @@ jobs:
       - uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      # The shell's tools, fetched once, again if a download breaks off. A
+      # tag rebuilt from before the script fetches them once.
+      - name: The Nix shell
+        run: |
+          if [ -f .github/scripts/nix-retry.sh ]; then
+            bash .github/scripts/nix-retry.sh nix develop --command true
+          else
+            nix develop --command true
+          fi
       # Every file of release/, which .gitignore leaves out, and their
       # SHA256SUMS, under these notes.
       - name: Publish the release

@@ -280,6 +280,13 @@ func TestRender(t *testing.T) {
 	s.main = true // which tells of settings.json in a toast too
 	brokenSettings(t, s, "{\n  \"theme\": \"aurora\",\n}")
 	renderTo(t, s, tt, dir, "settings-desktop-file-problem")
+	// The settings searched: what three sections hold, and nothing.
+	s.navigate(settingsPath("playback", "spotify"))
+	renderTo(t, s, tall, dir, "settings-find")
+	s.navigate(settingsPath("", "aurora"))
+	renderTo(t, s, tt, dir, "settings-find-theme")
+	s.navigate(settingsPath("", "zzzz"))
+	renderTo(t, s, tt, dir, "settings-find-none")
 
 	renderTo(t, s, ui.NewTester(s.miniView, 420, 132), dir, "mini")
 	renderTo(t, s, ui.NewTester(s.miniView, 340, 180), dir, "mini-narrow")

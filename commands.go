@@ -50,6 +50,7 @@ func (s *shell) commands() []command {
 		{"go.stats", "Stats", "", "go to", func() { s.navigate("/stats") }},
 		{"go.marketplace", "Marketplace", "", "go to", func() { s.navigate("/marketplace") }},
 		{"go.settings", "Settings", "Mod+,", "go to", func() { s.navigate("/settings") }},
+		{"go.settingsSearch", "Search the settings", "", "go to", s.searchSettings},
 		{"view.queue", "Show or hide the queue", "Mod+J", "view", func() { s.togglePanel("queue") }},
 		{"view.lyrics", "Show or hide the lyrics", "Mod+Shift+L", "view", func() { s.togglePanel("lyrics") }},
 		{"view.palette", "Command palette", "Mod+K", "view", func() { s.paletteOpen = !s.paletteOpen }},
@@ -223,14 +224,20 @@ func shortcutLabel(s string) string {
 	if s == "" {
 		return ""
 	}
-	r := strings.NewReplacer("ArrowLeft", "←", "ArrowRight", "→", "ArrowUp", "↑", "ArrowDown", "↓")
 	if runtime.GOOS == "darwin" {
-		r = strings.NewReplacer("Mod+", "⌘", "Shift+", "⇧", "Alt+", "⌥", "Ctrl+", "⌃",
-			"ArrowLeft", "←", "ArrowRight", "→", "ArrowUp", "↑", "ArrowDown", "↓")
-		return r.Replace(s)
+		return macKeyLabels.Replace(s)
 	}
-	return r.Replace(strings.ReplaceAll(s, "Mod+", "Ctrl+"))
+	return arrowLabels.Replace(strings.ReplaceAll(s, "Mod+", "Ctrl+"))
 }
+
+// arrowLabels write the arrows of shortcuts as arrows, and macKeyLabels
+// the modifiers too, as macOS does. Shortcuts' labels show in every frame
+// of Settings › Shortcuts and the palette: the replacers are made once.
+var (
+	arrowLabels  = strings.NewReplacer("ArrowLeft", "←", "ArrowRight", "→", "ArrowUp", "↑", "ArrowDown", "↓")
+	macKeyLabels = strings.NewReplacer("Mod+", "⌘", "Shift+", "⇧", "Alt+", "⌥", "Ctrl+", "⌃",
+		"ArrowLeft", "←", "ArrowRight", "→", "ArrowUp", "↑", "ArrowDown", "↓")
+)
 
 // shortcuts run the commands whose shortcuts were pressed, but while the
 // user records one, whose keys are the shortcut's instead.
@@ -300,7 +307,13 @@ func (s *shell) palette(c *ui.Context) {
 	if query := strings.TrimSpace(s.paletteQuery); query != "" {
 		// Enter searches what was typed; the arrows reach the commands.
 		search := command{"search", "Search for “" + query + "”", "", "search", func() { s.navigate(searchPath(query)) }}
-		found = append([]command{search}, found...)
+		// Last, the search of the settings: with no command found, Down
+		// reaches it.
+		settings := command{"settings.find", "Search the settings for “" + query + "”", "", "settings", func() {
+			s.navigate(settingsPath("", query))
+			s.find.focus = true
+		}}
+		found = append(append([]command{search}, found...), settings)
 	}
 	s.paletteAt = min(max(s.paletteAt, 0), max(len(found)-1, 0))
 	s.dialogFrame(c, &s.paletteOpen, dialogOptions{key: "palette", title: "Command palette", width: 640}, func(panel ui.Element) {

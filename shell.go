@@ -87,9 +87,9 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 	case r.Match("/now-playing"):
 		s.nowPlayingPage(c)
 	case r.Match("/settings"):
-		s.settingsPage(c, "")
+		s.settingsPage(c, "", r.Query("q"))
 	case r.Match("/settings/{tab}"):
-		s.settingsPage(c, r.Param("tab"))
+		s.settingsPage(c, r.Param("tab"), r.Query("q"))
 	case r.Match("/explore"):
 		s.explorePage(c, "")
 	case r.Match("/explore/{tab}"):

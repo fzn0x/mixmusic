@@ -195,6 +195,59 @@ func TestEnginePlaysSurround(t *testing.T) {
 	}
 }
 
+// TestEngineSurroundAtSpeed plays a track of 5.1 at 1.5×: on a device of
+// 5.1, its six channels as the stretch plays them, sample for sample after
+// the fade in, to its end; on a device of stereo, what the stretch plays
+// mixed down as the stream asks.
+func TestEngineSurroundAtSpeed(t *testing.T) {
+	whole := newDeck(surroundAC3, 0, fileOpener, func() {})
+	track := drain(t, whole)
+	err, m := whole.failure(), whole.downmix.Load()
+	whole.close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := stretchOf(t, track, 6, at(1.5)).out
+	n := len(want) / 6
+	if d := float64(n) - float64(len(track)/6)/1.5; math.Abs(d) > lengthSlack(1.5) {
+		t.Fatalf("the stretch plays %d frames of %d", n, len(track)/6)
+	}
+	for _, ch := range []int{6, 2} {
+		e, dev, rec := newTestEngine(t)
+		dev.surround = ch == 6
+		e.SetSurround(true)
+		if err := e.Load(surroundAC3, 0, false, 1.5); err != nil {
+			t.Fatal(err)
+		}
+		buffered(t, e, 0, ringFrames/2)
+		if err := e.Play(); err != nil {
+			t.Fatal(err)
+		}
+		if dev.channels != ch {
+			t.Fatalf("the output plays %d channels", dev.channels)
+		}
+		got := dev.play(t, n+4800)
+		for f := fadeFrames; f < n+4800; f++ {
+			for c := range ch {
+				var w float32
+				switch {
+				case f >= n: // the end
+				case ch == 6:
+					w = want[6*f+c]
+				default:
+					for s := range 6 {
+						w += m[c][s] * want[6*f+s]
+					}
+				}
+				if math.Abs(float64(got[ch*f+c]-w)) > 1e-6 {
+					t.Fatalf("on %d channels, frame %d, channel %d: %v, want %v", ch, f, c, got[ch*f+c], w)
+				}
+			}
+		}
+		rec.waitFor(t, "ended")
+	}
+}
+
 // TestSurroundDecodeAllocates decodes the packets of a file of 5.1 again
 // and again: after the first, nothing may be allocated.
 func TestSurroundDecodeAllocates(t *testing.T) {

@@ -50,7 +50,7 @@ func TestRingOfSixChannels(t *testing.T) {
 // surroundDeck returns a deck that plays frames of channels from ring,
 // at its full level: frame f of channel c is value(f, c).
 func surroundDeck(channels, n int, value func(f, c int) float32, downmix *[2][6]float32) *deck {
-	d := &deck{gain: ramp{value: 1, target: 1}, trim: newSmoother(1, glide), changed: make(chan struct{}, 1)}
+	d := &deck{gain: ramp{value: 1, target: 1}, trim: newSmoother(1, glide), speed: 1, changed: make(chan struct{}, 1)}
 	d.lkfs.Store(math.Float64bits(math.NaN()))
 	r := newRing(0, channels)
 	pcm := make([]float32, channels*n)

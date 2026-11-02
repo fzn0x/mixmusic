@@ -8,6 +8,10 @@ package audio
 // about where the speed puts it in the input, within a search range: from
 // where it best continues the window before, so that their overlap adds up
 // in phase. At 1× a deck plays its ring as it is.
+//
+// The input is of the ring's channels, stereo or 5.1 surround's six, which
+// it cuts alike: each window takes the same frames of every channel, found
+// on the channels mixed, so that they stay together as they were.
 
 import "math"
 
@@ -74,16 +78,18 @@ const (
 )
 
 // stretcher time-stretches what a deck reads from its ring. It belongs to
-// the audio thread, and allocates nothing.
+// the audio thread, and allocates nothing: its room is for maxChannels.
 type stretcher struct {
-	// src is the ring it reads: another one, as after a seek, starts it
-	// over.
+	// src is the ring it reads, and ch the channels of its frames, which a
+	// ring keeps: another ring, as after a seek, or the one a deck makes
+	// once it read its track's channels, starts it over.
 	src  *ring
+	ch   int
 	mode stretchMode
-	// in holds have frames of the input, interleaved, from frame lo of
-	// the ring; mono holds them with their channels mixed, which the
-	// search compares.
-	in   [2 * stretchFrames]float32
+	// in holds have frames of the input, of ch channels interleaved, from
+	// frame lo of the ring; mono holds them with their channels mixed,
+	// which the search compares.
+	in   [maxChannels * stretchFrames]float32
 	mono [stretchFrames]float32
 	lo   int64
 	have int
@@ -102,7 +108,7 @@ type stretcher struct {
 	// out is the hop the last window made, of which outAt frames played,
 	// and tail the falling half of that window, which the next window's
 	// rising half adds to.
-	out, tail [2 * stretchHop]float32
+	out, tail [maxChannels * stretchHop]float32
 	outAt     int
 	// from and to are the frames of the input out plays from and to.
 	from, to int64
@@ -112,7 +118,7 @@ type stretcher struct {
 
 // reset starts the stretcher over on r, at 1×.
 func (s *stretcher) reset(r *ring) {
-	s.src, s.mode, s.have, s.end, s.done = r, bypassed, 0, -1, false
+	s.src, s.ch, s.mode, s.have, s.end, s.done = r, r.channels, bypassed, 0, -1, false
 	s.outAt = stretchHop
 }
 
@@ -141,9 +147,9 @@ func (s *stretcher) ready(r *ring) bool {
 	return held+r.readable() >= stretchHeld || r.done.Load()
 }
 
-// read moves up to len(out)/2 frames of r, played at speed, into out, and
-// returns how many: fewer when the ring has nothing to play, as while it
-// waits for the decoder, and at the end of the track.
+// read moves up to len(out)/r.channels frames of r, played at speed, into
+// out, and returns how many: fewer when the ring has nothing to play, as
+// while it waits for the decoder, and at the end of the track.
 //
 // The stretch starts once it is ready. Until then, as when a track starts
 // or after a seek, and whenever the ring runs short, as when the network
@@ -153,7 +159,8 @@ func (s *stretcher) read(r *ring, out []float32, speed float64) int {
 	if r != s.src {
 		s.reset(r)
 	}
-	want, got := len(out)/2, 0
+	ch := s.ch
+	want, got := len(out)/ch, 0
 	for got < want {
 		switch s.mode {
 		case bypassed:
@@ -161,7 +168,7 @@ func (s *stretcher) read(r *ring, out []float32, speed float64) int {
 				s.start(r, speed)
 				continue
 			}
-			return got + r.readTo(out[2*got:2*want])
+			return got + r.readTo(out[ch*got:ch*want])
 		case unwinding:
 			if speed != 1 && s.ready(r) {
 				s.start(r, speed)
@@ -177,13 +184,13 @@ func (s *stretcher) read(r *ring, out []float32, speed float64) int {
 				continue
 			}
 			k := min(n, want-got)
-			copy(out[2*got:2*(got+k)], s.in[:2*k])
+			copy(out[ch*got:ch*(got+k)], s.in[:ch*k])
 			s.drop(s.lo + int64(k))
 			got += k
 		case stretching:
 			if s.outAt < stretchHop {
 				k := min(stretchHop-s.outAt, want-got)
-				copy(out[2*got:2*(got+k)], s.out[2*s.outAt:])
+				copy(out[ch*got:ch*(got+k)], s.out[ch*s.outAt:])
 				s.outAt += k
 				got += k
 				continue
@@ -218,25 +225,32 @@ func (s *stretcher) step(r *ring, speed float64) bool {
 	if !s.fill(r, max(tpl, hi)+stretchWindow) {
 		return false
 	}
+	ch := s.ch
 	if s.fresh {
 		s.fresh = false
-		in := s.in[2*(tpl-s.lo):]
+		in := s.in[ch*int(tpl-s.lo):][:ch*stretchHop]
+		tail := s.tail[:ch*stretchHop]
 		for f := range stretchHop {
 			w := stretchHann[stretchHop+f]
-			s.tail[2*f], s.tail[2*f+1] = w*in[2*f], w*in[2*f+1]
+			for c := range ch {
+				tail[ch*f+c] = w * in[ch*f+c]
+			}
 		}
 	}
 	x := s.best(tpl, lo, hi, center)
-	in := s.in[2*(x-s.lo) : 2*(x-s.lo+stretchWindow)]
+	// The rising half of the window adds to the falling half of the one
+	// before, on every channel; its falling half waits for the next.
+	j := ch * int(x-s.lo)
+	in := s.in[j : j+ch*stretchWindow]
+	rise, fall := in[:ch*stretchHop], in[ch*stretchHop:]
+	out, tail := s.out[:ch*stretchHop], s.tail[:ch*stretchHop]
 	for f := range stretchHop {
-		w := stretchHann[f]
-		s.out[2*f] = s.tail[2*f] + w*in[2*f]
-		s.out[2*f+1] = s.tail[2*f+1] + w*in[2*f+1]
-	}
-	for f := range stretchHop {
-		w := stretchHann[stretchHop+f]
-		s.tail[2*f] = w * in[2*(stretchHop+f)]
-		s.tail[2*f+1] = w * in[2*(stretchHop+f)+1]
+		w, v := stretchHann[f], stretchHann[stretchHop+f]
+		for c := range ch {
+			i := ch*f + c
+			out[i] = tail[i] + w*rise[i]
+			tail[i] = v * fall[i]
+		}
 	}
 	s.from, s.to = tpl, x+stretchHop
 	s.prev = x
@@ -307,8 +321,11 @@ func (s *stretcher) best(tpl, lo, hi, center int64) int64 {
 }
 
 // fill reads the ring until the input reaches frame need, and reports
-// whether it did: past the end of the track, the input is silence.
+// whether it did: past the end of the track, the input is silence. What
+// the search compares is the mean of the channels.
 func (s *stretcher) fill(r *ring, need int64) bool {
+	ch := s.ch
+	mix := 1 / float32(ch)
 	for s.lo+int64(s.have) < need {
 		at := s.have
 		k := int(min(need-s.lo-int64(at), int64(stretchFrames-at)))
@@ -316,16 +333,20 @@ func (s *stretcher) fill(r *ring, need int64) bool {
 			return false
 		}
 		if s.end >= 0 {
-			clear(s.in[2*at : 2*(at+k)])
+			clear(s.in[ch*at : ch*(at+k)])
 			clear(s.mono[at : at+k])
 			s.have += k
 			continue
 		}
 		// The ring ended if it had, with all it holds, before it was read.
 		ended := r.done.Load()
-		n := r.readTo(s.in[2*at : 2*(at+k)])
+		n := r.readTo(s.in[ch*at : ch*(at+k)])
 		for f := at; f < at+n; f++ {
-			s.mono[f] = 0.5 * (s.in[2*f] + s.in[2*f+1])
+			var sum float32
+			for _, v := range s.in[ch*f : ch*f+ch] {
+				sum += v
+			}
+			s.mono[f] = mix * sum
 		}
 		s.have += n
 		if n < k {
@@ -344,7 +365,7 @@ func (s *stretcher) drop(keep int64) {
 	if k == 0 {
 		return
 	}
-	copy(s.in[:], s.in[2*k:2*s.have])
+	copy(s.in[:], s.in[s.ch*k:s.ch*s.have])
 	copy(s.mono[:], s.mono[k:s.have])
 	s.have -= k
 	s.lo += int64(k)

@@ -201,8 +201,8 @@ func (d *deck) takeSeek() (time.Duration, *ring, bool) {
 // position returns the frame of the track the deck reads from its ring.
 func (d *deck) position() int64 { return d.ring.Load().position() }
 
-// read moves up to len(out)/2 frames of r, at the deck's rate, into out,
-// and returns how many: on the audio thread.
+// read moves up to len(out)/r.channels frames of r, at the deck's rate,
+// into out, and returns how many: on the audio thread.
 func (d *deck) read(r *ring, out []float32) int { return d.stretch.read(r, out, d.rate()) }
 
 // rate is the speed the deck plays at: its speed, but a live stream's own,

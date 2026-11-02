@@ -7,12 +7,13 @@
   <meta name="description" content="MixMusic is a free, open-source desktop player for macOS, Windows and Linux: one search, one queue and one library across Spotify and YouTube Music, with themes and plugins from the community." />
   <meta name="theme-color" content="#121212" />
   <link rel="icon" type="image/png" href="assets/icon.png" />
-  <link rel="canonical" href="https://fzn0x.github.io/mixmusic/" />
+  {%- set home = config.base_url | trim_end(pat='/') ~ '/' %}
+  <link rel="canonical" href="{{ home }}" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="MixMusic: Spotify and YouTube Music in one player" />
   <meta property="og:description" content="One search, one queue and one library across both services, in a free, open-source desktop player you can theme and extend." />
-  <meta property="og:url" content="https://fzn0x.github.io/mixmusic/" />
-  <meta property="og:image" content="https://fzn0x.github.io/mixmusic/assets/og.jpg" />
+  <meta property="og:url" content="{{ home }}" />
+  <meta property="og:image" content="{{ get_url(path='assets/og.jpg') }}" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />

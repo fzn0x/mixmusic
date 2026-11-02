@@ -243,6 +243,23 @@ func TestSettingsFindGlobalShortcuts(t *testing.T) {
 	}
 }
 
+// TestGlobalShortcutFoundRecords records the keys of a global shortcut a
+// search of the settings found, MixMusic's own global keys included, from
+// the first section's page.
+func TestGlobalShortcutFoundRecords(t *testing.T) {
+	h := newTestHotkeys()
+	s, tt := newGlobalShell(t, h)
+	click(t, s, tt, "set the global shortcut of Play or pause")
+	tt.Key(ui.Cmd|ui.Alt, ui.KeyP)
+	show(s, tt, settingsPath("", "next track"))
+	click(t, s, tt, "set the global shortcut of Next track")
+	h.press(t, globalAcc("Alt+P"))
+	tt.Frame()
+	if g := s.set.GlobalShortcuts; g["player.next"] != "Mod+Alt+P" || g["player.toggle"] != "" || s.recording != "" {
+		t.Errorf("the press recorded %v, recording %q", g, s.recording)
+	}
+}
+
 // TestGlobalShortcutGivenAway gives a command none of the keys of its own
 // shortcut that another command has as its global shortcut.
 func TestGlobalShortcutGivenAway(t *testing.T) {

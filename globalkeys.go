@@ -190,13 +190,14 @@ func (s *shell) giveUpGlobal(id, keys string) {
 
 // globalPress takes the press of one of MixMusic's own global shortcuts,
 // whose keys never reach the window, as the user records the keys of a
-// shortcut in Settings › Shortcuts: on the main thread, while the window
-// has the focus. The command of the keys runs otherwise.
+// shortcut in Settings › Shortcuts, or in a search of the settings that
+// found it: on the main thread, while the window has the focus. The
+// command of the keys runs otherwise.
 func (s *shell) globalPress(_, keys string) bool {
 	if s.recording == "" || s.win != nil && !s.win.IsFocused() {
 		return false
 	}
-	if s.router.Path() != "/settings/shortcuts" {
+	if !s.showsShortcuts() {
 		// The page went without a frame that ended the recording.
 		s.recording = ""
 		return false
@@ -226,4 +227,15 @@ func (s *shell) globalPress(_, keys string) bool {
 		s.win.Invalidate()
 	}
 	return took
+}
+
+// showsShortcuts tells whether the page shows the rows of the shortcuts:
+// Settings › Shortcuts, or a search of the settings. A search ends the
+// recording as its words change, as the row may go.
+func (s *shell) showsShortcuts() bool {
+	p := s.router.Path()
+	if p == "/settings/shortcuts" {
+		return true
+	}
+	return (p == "/settings" || strings.HasPrefix(p, "/settings/")) && s.router.Query("q") != ""
 }

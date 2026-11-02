@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	searchPivots = []string{"all", "songs", "albums", "artists", "playlists"}
+	searchPivots = []string{"all", "songs", "albums", "artists", "playlists", "podcasts"}
 	searchScopes = []string{"both", "Spotify", "YouTube Music"}
 )
 
@@ -60,7 +60,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		var counts []int
 		if res.done && res.err == nil {
 			r := mergeResults(res.value, s.searchScope)
-			counts = []int{-1, len(r.Tracks), len(r.Albums), len(r.Artists), len(r.Playlists)}
+			counts = []int{-1, len(r.Tracks), len(r.Albums), len(r.Artists), len(r.Playlists), s.podcastCount(q)}
 		}
 		s.pageHeaderCounts(c, q, searchPivots, counts, &s.searchPivot)
 		ui.Row(c).Margin(0, 0, 24).Children(func() {
@@ -137,6 +137,8 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 					s.playlistTile(c, "playlist-"+count(i), p)
 				}
 			})
+		case "podcasts":
+			s.podcastSearch(c, q)
 		}
 	})
 }

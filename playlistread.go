@@ -15,6 +15,10 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 )
 
+// wholeWait is how long what takes a whole playlist waits for it to be
+// read, as a download: one of thousands of tracks takes minutes.
+const wholeWait = 10 * time.Minute
+
 // readPlaylistOn reads the tracks of a playlist past those it holds, from
 // its service; tests answer for the services.
 var readPlaylistOn = func(s *shell, ctx context.Context, p media.Playlist, onPage func(media.Playlist)) (media.Playlist, error) {

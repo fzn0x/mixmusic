@@ -572,7 +572,7 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 // any service can join, and opens it.
 func (s *shell) importPlaylist(id string) {
 	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), wholeWait)
 		defer cancel()
 		p, err := s.svc.Collection.ImportPlaylist(ctx, id)
 		s.update(func() {

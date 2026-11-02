@@ -1,0 +1,91 @@
+# MixMusic as a Flatpak, for the release's mixmusic-<version>-linux-amd64.flatpak.
+# It packs the app of the release's Linux archive, as mygo build makes it,
+# with the libraries the GNOME runtime lacks, and Node.js, for yt-dlp.
+# Before flatpak-builder, dist/ needs the archive and the metadata
+# (CONTRIBUTING.md, "The Flatpak"):
+#
+#   dist/mixmusic-linux-amd64.tar.gz                build/linux-amd64/mixmusic-<version>-linux-amd64.tar.gz
+#   dist/io.github.fzn0x.mixmusic.metainfo.xml      go run ./tools/metainfo -o <it>
+#
+# Flathub can't take this manifest as it is: it builds from source, without
+# the network.
+id: io.github.fzn0x.mixmusic
+runtime: org.gnome.Platform
+# GNOME 51 has GTK 3, libsecret, the PulseAudio client library and
+# WebKitGTK 4.1, which the YouTube Music sign-in shows. GNOME runtimes get
+# about a year of support: move this version, the gnome-<version> image of
+# ci.yml and release.yml, and the branch of the Node.js extension (the
+# freedesktop SDK the GNOME SDK is built on) together.
+runtime-version: '51'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.node24
+command: mixmusic
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=wayland
+  - --socket=fallback-x11
+  # The sound server, PulseAudio or PipeWire's.
+  - --socket=pulseaudio
+  # MyGo draws on the GPU.
+  - --device=dri
+  - --talk-name=org.freedesktop.Notifications
+  # The tray icon.
+  - --talk-name=org.kde.StatusNotifierWatcher
+  # The keyring, where the desktop has no Secret portal, which libsecret
+  # takes when there is one.
+  - --talk-name=org.freedesktop.secrets
+  # Discord's socket: the app's, while it ran when MixMusic started, and
+  # the folders where Discord, its Canary build and Vesktop put it when
+  # they are Flatpaks themselves. The MPRIS player needs no permission:
+  # org.mpris.MediaPlayer2.io.github.fzn0x.mixmusic is the app's own.
+  - --filesystem=xdg-run/discord-ipc-0
+  - --filesystem=xdg-run/app/com.discordapp.Discord:create
+  - --filesystem=xdg-run/app/com.discordapp.DiscordCanary:create
+  - --filesystem=xdg-run/app/dev.vencord.Vesktop:create
+modules:
+  # The tray icon's library, of Flathub's shared modules, a git submodule
+  # at the commit they are taken from.
+  - shared-modules/libayatana-appindicator/libayatana-appindicator-gtk3.json
+
+  # Node.js, which yt-dlp solves YouTube's challenges with, as the sandbox
+  # sees no runtime of the system's. It runs on the runtime's OpenSSL,
+  # zlib and ICU.
+  - name: node
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 /usr/lib/sdk/node24/bin/node /app/bin/node
+
+  - name: mixmusic
+    buildsystem: simple
+    sources:
+      # Only x64 for now.
+      - type: archive
+        path: dist/mixmusic-linux-amd64.tar.gz
+        strip-components: 0
+        dest: app
+        only-arches:
+          - x86_64
+      - type: file
+        path: dist/io.github.fzn0x.mixmusic.metainfo.xml
+      - type: file
+        path: mixmusic.sh
+      - type: file
+        path: system-loader.py
+      - type: file
+        path: ../../resources/icon.svg
+    build-commands:
+      # The app keeps everything it needs inside itself. Built in Nix's
+      # shell, it names Nix's dynamic loader, which the runtime lacks:
+      # it runs on the runtime's.
+      - python3 system-loader.py app/mixmusic
+      - install -Dm755 app/mixmusic /app/lib/mixmusic/mixmusic
+      - install -Dm755 mixmusic.sh /app/bin/mixmusic
+      # mygo build's entry, which opens mixmusic:// links, named after the
+      # app's ID, as the icon is. GLib names the window after the program,
+      # which StartupWMClass tells the desktop.
+      - install -Dm644 app/mixmusic.desktop /app/share/applications/io.github.fzn0x.mixmusic.desktop
+      - desktop-file-edit --set-icon=io.github.fzn0x.mixmusic --set-key=StartupWMClass --set-value=mixmusic /app/share/applications/io.github.fzn0x.mixmusic.desktop
+      - install -Dm644 icon.svg /app/share/icons/hicolor/scalable/apps/io.github.fzn0x.mixmusic.svg
+      - install -Dm644 io.github.fzn0x.mixmusic.metainfo.xml -t /app/share/metainfo

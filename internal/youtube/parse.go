@@ -267,7 +267,9 @@ func parseListItem(item node) (media.Item, bool) {
 		return media.Item{Kind: media.ItemTrack, Track: t}, true
 	}
 	nav := item.get("navigationEndpoint")
-	return browseItem(pageType(nav), nav.get("browseEndpoint", "browseId").str(), title, b, thumbs)
+	it, ok := browseItem(pageType(nav), nav.get("browseEndpoint", "browseId").str(), title, b, thumbs)
+	markFromMenu(it, item.get("menu"))
+	return it, ok
 }
 
 // parseTwoRowItem reads a musicTwoRowItemRenderer: a card of a carousel,
@@ -283,7 +285,43 @@ func parseTwoRowItem(r node) (media.Item, bool) {
 	if watch := nav.get("watchEndpoint"); watch.get("videoId").str() != "" {
 		return media.Item{Kind: media.ItemTrack, Track: newTrack(watch.get("videoId").str(), title, watch, b, thumbs, isExplicit(r))}, true
 	}
-	return browseItem(pageType(nav), nav.get("browseEndpoint", "browseId").str(), title, b, thumbs)
+	it, ok := browseItem(pageType(nav), nav.get("browseEndpoint", "browseId").str(), title, b, thumbs)
+	markFromMenu(it, r.get("menu"))
+	return it, ok
+}
+
+// markFromMenu marks a playlist item with what its menu offers: to delete
+// it, or to take it out of the library.
+func markFromMenu(it media.Item, menu node) {
+	if p := it.Playlist; p != nil {
+		p.Deletable, p.Saved = playlistMenu(menu)
+		// Only its owner may delete a playlist, and they may edit it.
+		p.Editable = p.Deletable
+	}
+}
+
+// playlistMenu reads what a playlist's menu offers the user: to delete it,
+// which YouTube Music offers for the playlists the user made, as its
+// website does with a deletePlaylistEndpoint, and to take it out of the
+// library, which it offers for those the user saved, with a "Remove
+// playlist from library" toggle that is on.
+func playlistMenu(menu node) (deletable, saved bool) {
+	deletable = menu.find("deletePlaylistEndpoint").exists()
+	for _, it := range menu.get("menuRenderer", "items").list() {
+		toggle := it.get("toggleMenuServiceItemRenderer")
+		if toggle.get("isToggled").boolean() && unsaves(toggle.get("toggledServiceEndpoint")) ||
+			unsaves(it.get("menuServiceItemRenderer", "serviceEndpoint")) {
+			saved = true
+		}
+	}
+	return deletable, saved
+}
+
+// unsaves reports whether an endpoint takes a playlist out of the library,
+// as like/removelike does.
+func unsaves(endpoint node) bool {
+	like := endpoint.get("likeEndpoint")
+	return like.get("status").str() == "INDIFFERENT" && like.get("target", "playlistId").str() != ""
 }
 
 // browseItem makes the album, artist or playlist an item links to.

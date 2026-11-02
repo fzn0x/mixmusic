@@ -116,7 +116,8 @@ editor at it with a JSDoc `@param {import("./sdk").MixMusicAPI} api`.
 
 A page and a widget show elements, which their `render` function sets on
 the view it gets, and sets again when they change; it may return a
-function MixMusic calls when the page closes:
+function MixMusic calls when the page closes, or before it renders the
+page again:
 
 ```js
 api.ui.addSidebarItem({ id: "home", label: "my plugin", page: "home", icon: svgString });
@@ -132,14 +133,17 @@ api.ui.addPage({
         row([button("click", () => (count++, draw()), { primary: true }), button("search lofi", () => api.ui.navigate("/search?q=lofi"))]),
       );
     draw();
-    return () => {}; // runs when the page closes
+    return () => {}; // runs when the page closes, or refreshes
   },
 });
 ```
 
 The page lives at `/plugin/<plugin id>/<name>` and gets MixMusic's giant
 title; a widget shows on the now playing page, under the lyrics, with its
-title. Elements take the theme's colours and type, as MixMusic's own pages
+title. Refreshing the page (F5, or ⇧⌘R on macOS) renders it again, and
+the widgets shown: the function `render` returned runs, then `render`,
+as when the user leaves the page and comes back, but what the view
+showed stays until `render` sets it anew. Elements take the theme's colours and type, as MixMusic's own pages
 do. `icon` is the SVG of a 24×24 icon drawn in `currentColor`.
 
 | element | |

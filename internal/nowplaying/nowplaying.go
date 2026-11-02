@@ -85,6 +85,18 @@ func diff(prev, next *Info) change {
 
 func valid(s string) string { return strings.ToValidUTF8(s, "�") }
 
+// mprisNames returns the bus name of the MPRIS player, and the name of
+// the desktop entry it gives, inside the Flatpak whose ID is flatpakID,
+// or outside any when that is "". A Flatpak's sandbox lets it own only
+// names under its ID, such as org.mpris.MediaPlayer2.<ID>, and names its
+// desktop entry after the ID.
+func mprisNames(flatpakID string) (bus, desktopEntry string) {
+	if flatpakID == "" {
+		return "org.mpris.MediaPlayer2.mixmusic", "mixmusic"
+	}
+	return "org.mpris.MediaPlayer2." + flatpakID, flatpakID
+}
+
 func equal(a, b []string) bool {
 	if len(a) != len(b) {
 		return false

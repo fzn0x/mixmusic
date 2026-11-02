@@ -465,8 +465,26 @@ type choice struct {
 
 // choices chooses one of a few ways, each with its title and what it does:
 // a radio button each, the chosen one filled with the accent; -1 chooses
-// none. It tells whether the user changed the choice.
+// none. It tells whether the user changed the choice. The search of the
+// settings finds the choices by their label, and their options' titles
+// and descriptions.
 func (s *shell) choices(c *ui.Context, key, label string, selected *int, options []choice) bool {
+	if s.find.sifting() {
+		var text strings.Builder
+		for _, o := range options {
+			text.WriteString(o.title + " " + o.description + " ")
+		}
+		if !s.findable(label, text.String()) {
+			return false
+		}
+	}
+	changed := false
+	s.show(c, func() { changed = s.choicesOf(c, key, label, selected, options) })
+	return changed
+}
+
+// choicesOf builds choices.
+func (s *shell) choicesOf(c *ui.Context, key, label string, selected *int, options []choice) bool {
 	k := &s.lk
 	changed := false
 	ui.Column(c.Key(key)).Gap(4).Padding(14, 0).Label(label).Children(func() {

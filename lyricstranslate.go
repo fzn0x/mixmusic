@@ -299,7 +299,7 @@ func (s *shell) translateOptions() []string {
 
 // lyricsSettings chooses the language lyrics translate to.
 func (s *shell) lyricsSettings(c *ui.Context) {
-	s.group(c, "lyrics", func() {
+	s.group(c, "Lyrics", func() {
 		s.row(c, "Translate lyrics to", "The translate switch beside the lyrics shows them in this language. While translate is on, or lyrics show in Latin letters, the lyrics of the track playing and its video ID go to Unison, which has Google translate them; nothing is sent while both are off.", func() {
 			options := s.translateOptions()
 			chosen := options[0]

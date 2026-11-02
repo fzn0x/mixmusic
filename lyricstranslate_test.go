@@ -249,6 +249,24 @@ func TestTranslateTo(t *testing.T) {
 	}
 }
 
+// TestLyricsSettingsInBlend titles the lyrics' group of the settings as
+// Blend sets titles, as written, where Tiles lowers them.
+func TestLyricsSettingsInBlend(t *testing.T) {
+	s := newTestShell(t)
+	st := s.svc.Preferences.Get()
+	st.Layout = settings.LayoutBlend
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+	tt := testerOf(t, s, 1280, 1800)
+	show(s, tt, "/settings/playback")
+	texts := tt.Texts()
+	if i := slices.Index(texts, "Translate lyrics to"); i < 1 || texts[i-1] != "Lyrics" {
+		t.Errorf("the group of Translate lyrics to isn't titled Lyrics: %q", texts)
+	}
+}
+
 // TestLyricsSettingsEdited applies an edit of settings.json to how lyrics
 // show while MixMusic runs: the language they translate to, and how the
 // lyrics of each language show, a way MixMusic has no name for put back.

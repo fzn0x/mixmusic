@@ -100,7 +100,8 @@ both services in one player:
 
 - Media keys and the system's media controls on Windows, macOS and Linux.
 - Global shortcuts of your own to play, pause, skip, change the volume,
-  mute, like what plays or show MixMusic, whichever window is in front.
+  mute, like or dislike what plays or show MixMusic, whichever window is
+  in front.
 - The player's buttons on the taskbar thumbnail on Windows.
 - Tray controls, notifications of new tracks, and start at login.
 - `mixmusic://` links.

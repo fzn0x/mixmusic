@@ -403,9 +403,15 @@ func (s *shell) videoSource(rec media.Track) *loaded[app.VideoSource] {
 	w, h := videoShape(videoAspect(rec.Artwork, nil), videoFrame)
 	pw, ph := s.artPixels(w), s.artPixels(h)
 	families := v.families
-	return fetch(s, "video:"+rec.ID+":"+strconv.Itoa(pw)+"x"+strconv.Itoa(ph), func(ctx context.Context) (app.VideoSource, error) {
+	key := "video:" + rec.ID + ":" + strconv.Itoa(pw) + "x" + strconv.Itoa(ph)
+	l := fetch(s, key, func(ctx context.Context) (app.VideoSource, error) {
 		return s.svc.Player.Video(ctx, rec, pw, ph, families)
 	})
+	// The picture follows the player, as the sound does: a refresh of the
+	// page doesn't ask for its stream again, nor waits for it, nor tells
+	// that it failed.
+	delete(s.showing, key)
+	return l
 }
 
 // videoCover is the thumbnail of a music video, filling a frame of w × h.

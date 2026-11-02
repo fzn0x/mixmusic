@@ -337,6 +337,35 @@ func TestNowPlayingVideo(t *testing.T) {
 	}
 }
 
+// TestNowPlayingVideoRefresh refreshes the now playing page of a music
+// video: the page's shelves are asked for again, the picture's stream, which
+// follows the player as the sound does, isn't.
+func TestNowPlayingVideoRefresh(t *testing.T) {
+	track := musicVideo()
+	s, tt, page, src := videoShell(t, track)
+	waitScript(t, s, page, "mv.load(")
+	tt.Frame()
+	var picture string
+	for key := range s.loads {
+		if strings.HasPrefix(key, "video:") {
+			picture = key
+		}
+	}
+	if picture == "" {
+		t.Fatal("no picture was fetched")
+	}
+	s.refreshPage()
+	if s.refreshingKey(picture) {
+		t.Error("a refresh asks for the picture's stream again")
+	}
+	if !s.refreshingKey("related-" + track.ID) {
+		t.Errorf("a refresh doesn't ask for the page's shelves again: %v", s.shown)
+	}
+	if l := s.loads[picture].(*loaded[app.VideoSource]); l.value.Src != src.Src || l.asks > 1 {
+		t.Errorf("the picture's stream is %+v", l)
+	}
+}
+
 // TestNowPlayingVideoOff keeps the cover and the visualizer of songs, of
 // music videos with the setting off, and of a picture that failed.
 func TestNowPlayingVideoOff(t *testing.T) {

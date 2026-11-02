@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net"
 	"slices"
 	"strings"
 	"sync"
@@ -61,8 +62,6 @@ type castState struct {
 	// remote is set while the player's streams play on a cast device: the
 	// engine's events are nobody's then.
 	remote atomic.Bool
-	// browse finds the devices: cast.Browse, unless a test sets it.
-	browse func(ctx context.Context) ([]cast.Device, error)
 }
 
 type castFound struct {
@@ -112,7 +111,7 @@ func (a *App) browseCast() {
 		return
 	}
 	c.browsing = true
-	browse := c.browse
+	browse := a.opts.CastBrowse
 	c.mu.Unlock()
 	if browse == nil {
 		browse = func(ctx context.Context) ([]cast.Device, error) { return cast.Browse(ctx, cast.BrowseOptions{}) }
@@ -257,7 +256,7 @@ func (a *App) castTo(ctx context.Context, id string) error {
 	switch {
 	case !ok:
 		c.mu.Unlock()
-		return errors.New("that cast device is no longer on the network")
+		return errors.New("That cast device is no longer on the network")
 	case c.active != nil && c.active.device.ID == id:
 		c.mu.Unlock()
 		return nil
@@ -290,12 +289,17 @@ func (a *App) castTo(ctx context.Context, id string) error {
 		OnEnd: func(err error) { a.castEnded(out, err) },
 	})
 	if err != nil {
-		return fmt.Errorf("couldn't connect to %s: %w", d.Name, err)
+		log.Printf("mixmusic: connecting to a cast device: %v", err)
+		var ne net.Error
+		if errors.As(err, &ne) || errors.Is(err, context.DeadlineExceeded) {
+			return fmt.Errorf("Couldn't connect to %s: check that it's on, on this computer's network", d.Name)
+		}
+		return fmt.Errorf("Couldn't cast to %s: %v", d.Name, err)
 	}
 	server, err := serveToCast(localIP(session.LocalAddr()), session.RemoteIP(), a.proxy)
 	if err != nil {
 		session.Close(true)
-		return fmt.Errorf("couldn't serve %s the audio: %w", d.Name, err)
+		return fmt.Errorf("Couldn't serve %s the audio: %v", d.Name, err)
 	}
 	out.served, out.fetched, out.contentType, out.native = server.url, server.fetched.Load, a.castContentType, a.setNative
 	out.start(session)

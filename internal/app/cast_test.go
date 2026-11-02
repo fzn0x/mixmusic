@@ -365,7 +365,7 @@ func newCastApp(t *testing.T, r *casttest.Responder) (*App, *player.Player, *qui
 		t.Fatal(err)
 	}
 	a.proxy.Kept = keptAudio{}
-	a.cast.browse = func(ctx context.Context) ([]cast.Device, error) {
+	a.opts.CastBrowse = func(ctx context.Context) ([]cast.Device, error) {
 		return cast.Browse(ctx, cast.BrowseOptions{To: r.Addr(), Wait: 200 * time.Millisecond})
 	}
 	engine := &quietStream{}
@@ -546,7 +546,7 @@ func TestCastToNothing(t *testing.T) {
 	a.browseCast()
 	dev.Close()
 	err := svc.Cast(context.Background(), dev.ID)
-	if err == nil || !strings.HasPrefix(err.Error(), "couldn't connect to Living Room") {
+	if err == nil || err.Error() != "Couldn't connect to Living Room: check that it's on, on this computer's network" {
 		t.Errorf("cast to a device gone: %v", err)
 	}
 	if _, ok := svc.CastStarting(); ok {

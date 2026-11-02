@@ -20,6 +20,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
+	"github.com/fzn0x/mixmusic/internal/cast"
 	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/match"
@@ -74,6 +75,9 @@ type Options struct {
 	// told of, a second when zero: tests shorten it, at once when
 	// negative.
 	ProblemWait time.Duration
+	// CastBrowse, when set, finds the cast devices on the network in place
+	// of mDNS: tests set it.
+	CastBrowse func(ctx context.Context) ([]cast.Device, error)
 }
 
 // App is MixMusic.

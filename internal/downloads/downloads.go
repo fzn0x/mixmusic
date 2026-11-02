@@ -430,11 +430,11 @@ func (m *Manager) Add(tracks []media.Track, quality string) int {
 }
 
 // pin keeps t for pin, adding it in quality when it's new, and tells
-// whether it was. A track that failed is tried again. A track of a video
-// found live is refused: a live stream has no file to keep. Its caller
-// holds mu.
+// whether it was. A track that failed is tried again. A new track of a
+// video found live is refused: a live stream has no file to keep. Its
+// caller holds mu.
 func (m *Manager) pin(t media.Track, pin, quality string) bool {
-	if t.ID == "" || m.idx.Live[videoOf(t)] {
+	if t.ID == "" {
 		return false
 	}
 	if e, ok := m.idx.Tracks[t.ID]; ok {
@@ -446,6 +446,9 @@ func (m *Manager) pin(t media.Track, pin, quality string) bool {
 			delete(m.tries, t.ID)
 			delete(m.nextAt, t.ID)
 		}
+		return false
+	}
+	if m.idx.Live[videoOf(t)] {
 		return false
 	}
 	m.idx.Seq++

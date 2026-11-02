@@ -903,6 +903,22 @@ func TestMoveKeepsLive(t *testing.T) {
 	}
 }
 
+// TestLiveKeepsDownloaded keeps a track downloaded of a video then found
+// live for each collection that holds it after, which pins it.
+func TestLiveKeepsDownloaded(t *testing.T) {
+	m := open(t, t.TempDir(), Options{Fetcher: &fetcher{}})
+	a := yt("aaaaaaaaaaa", "A")
+	m.AddCollection(Collection{ID: "album:x", Kind: "album", Title: "X"}, []media.Track{a}, "best")
+	m.Start()
+	until(t, "the download", func() bool { return kind(m, a.ID) == Done })
+	m.SetLive("aaaaaaaaaaa", true)
+	m.AddCollection(Collection{ID: "playlist:p", Kind: "playlist", Title: "P"}, []media.Track{a}, "best")
+	m.RemoveCollection("album:x")
+	if c, _ := m.Snapshot().Collection("playlist:p"); kind(m, a.ID) != Done || c.Kept != 1 {
+		t.Errorf("with the playlist kept, the track is %v, and %d of it kept", kind(m, a.ID), c.Kept)
+	}
+}
+
 // TestLeaveOutNoVideo leaves nothing out for no video, as the tracks
 // whose recording isn't found yet have.
 func TestLeaveOutNoVideo(t *testing.T) {

@@ -13,9 +13,12 @@ const ringFrames = 1 << 15
 // may touch. A deck makes a new ring when it seeks, so that the reader
 // drops what the old one held.
 type ring struct {
-	buf   [2 * ringFrames]float32 // interleaved stereo
-	read  atomic.Int64            // the frames read
-	write atomic.Int64            // the frames written
+	// channels is the channels of its frames, interleaved: 2, or 6 for
+	// 5.1 surround.
+	channels int
+	buf      []float32    // ringFrames frames
+	read     atomic.Int64 // the frames read
+	write    atomic.Int64 // the frames written
 	// start is the frame of the track the ring starts at.
 	start int64
 	// done is set after the last frame: the track's end, or an error.
@@ -24,20 +27,24 @@ type ring struct {
 	space chan struct{}
 }
 
-func newRing(start int64) *ring {
-	return &ring{start: start, space: make(chan struct{}, 1)}
+// newRing returns a ring of frames of channels, of the track from frame
+// start.
+func newRing(start int64, channels int) *ring {
+	return &ring{channels: channels, buf: make([]float32, channels*ringFrames), start: start, space: make(chan struct{}, 1)}
 }
 
 // readable returns the frames the reader may read.
 func (r *ring) readable() int64 { return r.write.Load() - r.read.Load() }
 
-// readTo moves up to len(out)/2 frames into out, and returns how many.
+// readTo moves up to len(out)/channels frames into out, and returns how
+// many.
 func (r *ring) readTo(out []float32) int {
-	n := int(min(int64(len(out)/2), r.readable()))
+	ch := r.channels
+	n := int(min(int64(len(out)/ch), r.readable()))
 	at := int(r.read.Load() % ringFrames)
 	first := min(n, ringFrames-at)
-	copy(out[:2*first], r.buf[2*at:])
-	copy(out[2*first:2*n], r.buf[:])
+	copy(out[:ch*first], r.buf[ch*at:])
+	copy(out[ch*first:ch*n], r.buf)
 	r.read.Add(int64(n))
 	select {
 	case r.space <- struct{}{}:
@@ -50,8 +57,9 @@ func (r *ring) readTo(out []float32) int {
 // long as wait allows: it returns the frames written, all of them unless
 // wait returned false.
 func (r *ring) writeFrom(in []float32, wait func(<-chan struct{}) bool) int {
+	ch := r.channels
 	written := 0
-	for written < len(in)/2 {
+	for written < len(in)/ch {
 		free := ringFrames - int(r.readable())
 		if free == 0 {
 			if !wait(r.space) {
@@ -59,11 +67,11 @@ func (r *ring) writeFrom(in []float32, wait func(<-chan struct{}) bool) int {
 			}
 			continue
 		}
-		n := min(free, len(in)/2-written)
+		n := min(free, len(in)/ch-written)
 		at := int(r.write.Load() % ringFrames)
 		first := min(n, ringFrames-at)
-		copy(r.buf[2*at:], in[2*written:2*(written+first)])
-		copy(r.buf[:], in[2*(written+first):2*(written+n)])
+		copy(r.buf[ch*at:], in[ch*written:ch*(written+first)])
+		copy(r.buf, in[ch*(written+first):ch*(written+n)])
 		r.write.Add(int64(n))
 		written += n
 	}

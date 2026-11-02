@@ -60,6 +60,9 @@ type device struct {
 	event  syscall.Handle
 	frames uint32 // the size of its buffer
 	freq   uint64 // the frequency of its clock
+	// channels is the channels of the stream: 2, or Surround on a device
+	// of 5.1 or more, when the stream asks for them.
+	channels int
 }
 
 func (d *device) close() {
@@ -80,9 +83,11 @@ func (d *device) close() {
 	}
 }
 
-// openDefault opens the default output device for a stream of float32
-// stereo at Rate, which Windows converts to the device's own format.
-func openDefault(e *iMMDeviceEnumerator) (*device, error) {
+// openDefault opens the default output device for a stream of float32 at
+// Rate, which Windows converts to the device's own format: of Surround
+// channels when asked for them and the device mixes 5.1 or more, its
+// surrounds as the device's mix names them, else stereo.
+func openDefault(e *iMMDeviceEnumerator, channels int) (*device, error) {
 	dev, err := e.defaultRender()
 	if err != nil {
 		return nil, err
@@ -99,20 +104,24 @@ func openDefault(e *iMMDeviceEnumerator) (*device, error) {
 		d.close()
 		return nil, err
 	}
-	format := waveFormat{
-		formatTag:      waveFormatExtensible,
-		channels:       2,
-		samplesPerSec:  Rate,
-		avgBytesPerSec: Rate * 8,
-		blockAlign:     8,
-		bitsPerSample:  32,
-		size:           22,
-		validBits:      32,
-		channelMask:    speakerStereo,
-		subFormat:      subtypeIEEEFloat,
+	mask := uint32(speakerStereo)
+	d.channels = 2
+	if channels == Surround {
+		if n, m, err := d.client.mixFormat(); err == nil {
+			if sm, ok := surroundMask(n, m); ok {
+				d.channels, mask = Surround, sm
+			}
+		}
 	}
+	format := streamFormat(d.channels, mask)
 	const flags = streamflagsEventCallback | streamflagsAutoConvert | streamflagsSRCQuality
 	if err := d.client.initialize(flags, int64(bufferDuration/100), &format); err != nil {
+		if d.channels == Surround {
+			// A device that takes no stream of 5.1, whatever its mix says,
+			// plays stereo, through a client of its own.
+			d.close()
+			return openDefault(e, 2)
+		}
 		return fail(err)
 	}
 	h, _, errno := syscall.SyscallN(procCreateEventW.Addr(), 0, 0, 0, 0)
@@ -141,13 +150,32 @@ func openDefault(e *iMMDeviceEnumerator) (*device, error) {
 	return d, nil
 }
 
+// streamFormat is the WAVEFORMATEXTENSIBLE of a stream of float32 at Rate
+// of channels on the speakers of mask.
+func streamFormat(channels int, mask uint32) waveFormat {
+	return waveFormat{
+		formatTag:      waveFormatExtensible,
+		channels:       uint16(channels),
+		samplesPerSec:  Rate,
+		avgBytesPerSec: uint32(Rate * 4 * channels),
+		blockAlign:     uint16(4 * channels),
+		bitsPerSample:  32,
+		size:           22,
+		validBits:      32,
+		channelMask:    mask,
+		subFormat:      subtypeIEEEFloat,
+	}
+}
+
 // Available returns nil: Windows always has WASAPI, if not a device.
 func Available() error { return nil }
 
 // Stream plays what its render function makes on the default output
 // device of Windows, following the default device when it changes.
 type Stream struct {
-	render func([]float32)
+	render func([]float32, int)
+	// channels is what the stream asks devices for.
+	channels int
 
 	stopping atomic.Bool
 	done     chan struct{}
@@ -155,14 +183,17 @@ type Stream struct {
 	delay atomic.Int64
 }
 
-// Start starts a stream. Its goroutine calls render for each period of the
-// device, about every 10 ms, to fill out with interleaved stereo frames;
-// render must not block. When the stream stops of itself, as when no
-// output device is left, failed is called with why, from that goroutine
-// once the stream has ended; Stop is not needed then. Start returns once the
-// device plays, or why it can't.
-func Start(render func(out []float32), failed func(error)) (*Stream, error) {
-	s := &Stream{render: render, done: make(chan struct{})}
+// Start starts a stream of channels, 2, or Surround for 5.1, which it
+// plays where the device mixes 5.1 or more, else stereo. Its goroutine
+// calls render for each period of the device, about every 10 ms, to fill
+// out with frames of the channels it tells, interleaved: those of the
+// device that plays, which change as the default device does. render must
+// not block. When the stream stops of itself, as when no output device is
+// left, failed is called with why, from that goroutine once the stream has
+// ended; Stop is not needed then. Start returns once the device plays, or
+// why it can't.
+func Start(channels int, render func(out []float32, channels int), failed func(error)) (*Stream, error) {
+	s := &Stream{render: render, channels: channels, done: make(chan struct{})}
 	ready := make(chan error, 1)
 	go func() {
 		err := s.run(ready)
@@ -212,7 +243,7 @@ func (s *Stream) run(ready chan<- error) error {
 		return nil
 	}
 	defer e.release()
-	d, err := openDefault(e)
+	d, err := openDefault(e, s.channels)
 	if err == nil {
 		if err = s.prime(d); err != nil {
 			d.close()
@@ -242,7 +273,7 @@ func (s *Stream) fill(d *device, n uint32) (err error) {
 	if err != nil {
 		return err
 	}
-	out := unsafe.Slice((*float32)(unsafe.Pointer(p)), 2*n)
+	out := unsafe.Slice((*float32)(unsafe.Pointer(p)), d.channels*int(n))
 	defer func() {
 		if v := recover(); v != nil {
 			clear(out)
@@ -250,7 +281,7 @@ func (s *Stream) fill(d *device, n uint32) (err error) {
 			err = fmt.Errorf("output: WASAPI: rendering the audio failed: %v", v)
 		}
 	}()
-	s.render(out)
+	s.render(out, d.channels)
 	return d.render.releaseBuffer(n)
 }
 
@@ -329,7 +360,7 @@ func (s *Stream) loop(e *iMMDeviceEnumerator, d *device) error {
 func (s *Stream) reopen(e *iMMDeviceEnumerator) (*device, error) {
 	deadline := time.Now().Add(deviceWait)
 	for {
-		d, err := openDefault(e)
+		d, err := openDefault(e, s.channels)
 		if err == nil {
 			if err = s.prime(d); err == nil {
 				return d, nil

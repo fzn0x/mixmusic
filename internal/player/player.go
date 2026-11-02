@@ -49,9 +49,23 @@ type Source struct {
 	Mode Mode
 	// URL is the audio of a stream.
 	URL string
+	// SurroundURL is the 5.1 surround audio of a stream, which plays in
+	// place of URL's while the settings ask for 5.1: "" for a track
+	// YouTube has none of.
+	SurroundURL string
 	// Track is the track that plays: for a Spotify track played from
 	// YouTube Music, its recording there.
 	Track media.Track
+}
+
+// audio returns the URL of the audio of a stream to play: its 5.1
+// surround audio when surround is set and it has some, else its stereo
+// audio.
+func (s Source) audio(surround bool) string {
+	if surround && s.SurroundURL != "" {
+		return s.SurroundURL
+	}
+	return s.URL
 }
 
 // Item is an entry of the queue.
@@ -393,6 +407,11 @@ type Player struct {
 	// spotifyMode is the settings' Spotify playback the current track
 	// started with.
 	spotifyMode settings.SpotifyPlayback
+	// surround is whether streams play their 5.1 surround audio, as the
+	// settings ask, when they have some; stereoOnly is set once the current
+	// entry's 5.1 audio failed, which then plays in stereo.
+	surround   bool
+	stereoOnly bool
 }
 
 // New returns a player of the queue saved, which plays through stream and
@@ -413,6 +432,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	st := svc.Settings()
 	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume)}
 	p.spotifyMode = st.SpotifyPlayback
+	p.surround = st.Surround
 	if len(saved.Tracks) > 0 {
 		radio := marks(saved.Radio, len(saved.Tracks))
 		p.s.Queue = make([]Item, len(saved.Tracks))

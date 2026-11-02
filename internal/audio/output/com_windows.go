@@ -41,7 +41,6 @@ const (
 	streamflagsSRCQuality    = 0x08000000 // AUDCLNT_STREAMFLAGS_SRC_DEFAULT_QUALITY
 
 	waveFormatExtensible = 0xFFFE
-	speakerStereo        = 0x3 // SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT
 
 	// HRESULTs.
 	sOK                       = 0
@@ -212,6 +211,22 @@ func (c *iAudioClient) initialize(flags uint32, bufferDuration int64, format *wa
 	r, _, _ := syscall.SyscallN(c.vtbl.initialize, uintptr(unsafe.Pointer(c)),
 		sharemodeShared, uintptr(flags), uintptr(bufferDuration), 0, uintptr(unsafe.Pointer(format)), 0)
 	return check(r)
+}
+
+// mixFormat returns the channels of the format the device mixes in, and
+// their speakers, 0 when it names none.
+func (c *iAudioClient) mixFormat() (channels int, mask uint32, err error) {
+	var p *waveFormat
+	r, _, _ := syscall.SyscallN(c.vtbl.getMixFormat, uintptr(unsafe.Pointer(c)), uintptr(unsafe.Pointer(&p)))
+	if err := check(r); err != nil {
+		return 0, 0, err
+	}
+	defer syscall.SyscallN(procCoTaskMemFree.Addr(), uintptr(unsafe.Pointer(p)))
+	channels = int(p.channels)
+	if p.formatTag == waveFormatExtensible && p.size >= 22 {
+		mask = p.channelMask
+	}
+	return channels, mask, nil
 }
 
 func (c *iAudioClient) bufferSize() (uint32, error) {

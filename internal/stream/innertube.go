@@ -191,6 +191,13 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 	if err := d.check(ctx, &st); err != nil {
 		return Stream{}, err
 	}
+	// The 5.1 surround beside it, unchecked: few play it, and its first
+	// request tells if YouTube refuses it.
+	if sf, ok := pickSurround(ans.StreamingData.AdaptiveFormats, length); ok {
+		sur := sf.stream()
+		sur.Loudness, sur.Measured = ans.loudness(&sf)
+		st.Surround = &sur
+	}
 	return st, nil
 }
 
@@ -584,6 +591,16 @@ func (f playerFormat) plain(length time.Duration) bool {
 		f.AudioChannels <= 2 && f.SpatialAudioType == "" && !(length > 0 && dur > 0 && dur < length/2)
 }
 
+// surround tells whether f is a 5.1 surround stream the engine plays: AC-3
+// or E-AC-3 in MP4, of six channels, of the original dynamics,
+// unencrypted, and whole. length is the video's, 0 when unknown.
+func (f playerFormat) surround(length time.Duration) bool {
+	dur := time.Duration(f.ApproxDurationMs) * time.Millisecond
+	return strings.HasPrefix(f.MimeType, "audio/mp4") && surroundRank(f.codec()) > 0 && f.AudioChannels == 6 &&
+		!f.IsDrc && len(f.DrmFamilies) == 0 && f.Type != "FORMAT_STREAM_TYPE_OTF" && f.TargetDurationSec == 0 &&
+		!(length > 0 && dur > 0 && dur < length/2)
+}
+
 // direct tells whether f's URL plays as given: YouTube sends some only
 // with a signature, or with a challenge to solve first, as yt-dlp does.
 func (f playerFormat) direct() bool {
@@ -652,6 +669,26 @@ func pickAudio(formats []playerFormat, q Quality, length time.Duration) (playerF
 		return playerFormat{}, errNoDirectURL
 	}
 	return playerFormat{}, errNoStream
+}
+
+// pickSurround picks the 5.1 surround stream of a video the engine plays,
+// of its original audio track, AC-3 first, then of the most bits, when it
+// has one whose URL plays as given. length is the video's, 0 when unknown.
+func pickSurround(formats []playerFormat, length time.Duration) (best playerFormat, found bool) {
+	rank, codec := 0, 0
+	for _, f := range formats {
+		if !f.surround(length) || !f.direct() {
+			continue
+		}
+		r, c := f.trackRank(), surroundRank(f.codec())
+		switch {
+		case !found, r > rank, r == rank && c > codec:
+		case r < rank, c < codec, f.Bitrate <= best.Bitrate:
+			continue
+		}
+		best, rank, codec, found = f, r, c, true
+	}
+	return best, found
 }
 
 // pickOf picks, of the formats of a codec, which of tells, the best or the

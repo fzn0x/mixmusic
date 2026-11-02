@@ -560,6 +560,11 @@ func (s *shell) playbackSettings(c *ui.Context) {
 				s.save()
 			}
 		})
+		s.row(c, "Play 5.1 surround when a track has it", surroundDescription, func() {
+			if s.switchOf(c.Key("surround"), &s.set.Surround).Label("Play 5.1 surround when a track has it").Changed() {
+				s.save()
+			}
+		})
 		s.row(c, "Autoplay", "When the queue runs out, a radio of what you played carries on.", func() {
 			if s.switchOf(c.Key("autoplay"), &s.set.Autoplay).Label("Autoplay").Changed() {
 				s.save()
@@ -570,6 +575,10 @@ func (s *shell) playbackSettings(c *ui.Context) {
 	s.cacheSettings(c)
 	s.toolSettings(c)
 }
+
+// surroundDescription tells what 5.1 surround does, in Settings › Playback.
+const surroundDescription = "Some tracks have a 5.1 surround mix beside their stereo one. It plays on six speakers where your output has them, " +
+	"else mixed down to stereo. The 5.1 button by the player turns it on and off too."
 
 // deviceRow chooses the Spotify Connect device that plays Spotify tracks.
 func (s *shell) deviceRow(c *ui.Context) {

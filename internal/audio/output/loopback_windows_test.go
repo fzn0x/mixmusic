@@ -20,7 +20,7 @@ func TestCaptureProcessChildren(t *testing.T) {
 	if os.Getenv("MIXMUSIC_TONE_CHILD") != "" {
 		// The child: it plays.
 		phase := 0
-		s, err := Start(func(out []float32) {
+		s, err := Start(2, func(out []float32, _ int) {
 			for i := 0; i < len(out); i += 2 {
 				v := float32(1e-5 * math.Sin(2*math.Pi*1000*float64(phase)/Rate))
 				out[i], out[i+1] = v, v
@@ -87,7 +87,7 @@ func TestCaptureProcess(t *testing.T) {
 	}
 	const amplitude = 1e-5 // -100 dB
 	phase := 0
-	s, err := Start(func(out []float32) {
+	s, err := Start(2, func(out []float32, _ int) {
 		for i := 0; i < len(out); i += 2 {
 			v := float32(amplitude * math.Sin(2*math.Pi*1000*float64(phase)/Rate))
 			out[i], out[i+1] = v, v

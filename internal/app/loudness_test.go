@@ -163,7 +163,7 @@ func TestPrepareStreamLearnsTheLoudness(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(cache.Dir, "CHIWNDAwTqQ.webm"), []byte("audio"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	a := &App{resolver: r, cache: cache, matcher: match.New(nil, nil)}
+	a := &App{resolver: r, cache: cache, matcher: match.New(nil, nil), settings: testSettings(t)}
 	a.loudness = openBook(t, filepath.Join(t.TempDir(), "loudness.json"), func(ctx context.Context, videoID string) (float64, error) {
 		asked.Add(1)
 		return map[string]float64{"3IUqoyTxEU8": -7.93, "CHIWNDAwTqQ": -11.93}[videoID], nil

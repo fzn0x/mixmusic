@@ -215,6 +215,20 @@ func TestLoudness(t *testing.T) {
 	}
 }
 
+// TestSurround has 5.1 surround off in new installs, and in the settings
+// of earlier versions, which don't have it, until the user turns it on.
+func TestSurround(t *testing.T) {
+	for file, want := range map[string]bool{`{}`: false, `{"surround":false}`: false, `{"surround":true}`: true} {
+		s := Default()
+		if err := json.Unmarshal([]byte(file), &s); err != nil {
+			t.Fatal(err)
+		}
+		if s = s.Clean(); s.Surround != want {
+			t.Errorf("%s: 5.1 surround %v, not %v", file, s.Surround, want)
+		}
+	}
+}
+
 // TestZoom keeps a zoom of the steps, takes the nearest step for another
 // in range, and 100% for one outside them, as settings from before it.
 func TestZoom(t *testing.T) {

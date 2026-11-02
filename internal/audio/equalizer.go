@@ -59,15 +59,16 @@ func (e *equalizer) set(enabled bool, gains [len(Bands)]float64, preamp float64)
 	}
 }
 
-// process runs a quantum of interleaved stereo frames through the preamp
-// and the filters. A filter moving to a new gain takes the gain of the
-// start of each quantum, as a k-rate parameter would.
-func (e *equalizer) process(buf []float32) {
+// process runs a quantum of frames of ch channels interleaved, 2 or 6,
+// through the preamp and the filters. A filter moving to a new gain takes
+// the gain of the start of each quantum, as a k-rate parameter would.
+func (e *equalizer) process(buf []float32, ch int) {
 	if !e.preamp.settled() || e.preamp.value != 1 {
-		for i := 0; i < len(buf); i += 2 {
+		for i := 0; i < len(buf); i += ch {
 			g := float32(e.preamp.next())
-			buf[i] *= g
-			buf[i+1] *= g
+			for c := range ch {
+				buf[i+c] *= g
+			}
 		}
 	}
 	for i := range e.filters {
@@ -78,12 +79,20 @@ func (e *equalizer) process(buf []float32) {
 			e.at[i] = g.value
 		}
 		if moving {
-			g.advance(len(buf) / 2)
+			g.advance(len(buf) / ch)
 		} else if g.value == 0 {
 			// Flat: the filter is the identity.
-			f.pass(buf)
+			f.pass(buf, ch)
 			continue
 		}
-		f.process(buf)
+		f.process(buf, ch)
+	}
+}
+
+// forget clears the memory of the filters' channels from channel from on,
+// which play anew.
+func (e *equalizer) forget(from int) {
+	for i := range e.filters {
+		e.filters[i].forget(from)
 	}
 }

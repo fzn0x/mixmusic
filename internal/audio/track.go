@@ -9,8 +9,11 @@ import (
 )
 
 // track is the audio track of a file as a deck plays it: the packets its
-// reader reads, decoded into stereo at Rate.
+// reader reads, decoded into frames of its channels at Rate.
 type track interface {
+	// channels returns the channels of the frames it decodes: 2, or 6 for
+	// 5.1 surround, in the order of ac3's Left to RightSurround.
+	channels() int
 	// seek moves the track to the last packet that starts at or before t,
 	// in the time of the packets, and resets the decoder: the packet read
 	// next decodes as the first of a stream.
@@ -26,11 +29,15 @@ type track interface {
 	end() []float32
 }
 
-// decoded is the audio of a packet: the frames of pcm, interleaved stereo
-// at Rate, which follow those decoded before since the last seek. Those
-// from from to to play; the others are padding.
+// decoded is the audio of a packet: the frames of pcm, of the track's
+// channels interleaved, at Rate, which follow those decoded before since
+// the last seek. Those from from to to play; the others are padding.
 type decoded struct {
 	pcm []float32
+	// downmix is, of a surround track, the stereo downmix its stream asks
+	// for, as ac3.Info's Downmix: the same pointer while it doesn't
+	// change. Nil for stereo.
+	downmix *[2][6]float32
 	// at is, of the first packet after a seek, the frame of the stream,
 	// codec delay included, of the first frame of pcm: the deck reads it of
 	// that packet only.
@@ -52,15 +59,15 @@ type timing struct {
 }
 
 // openTrack reads the headers of a file, from its start, and returns its
-// audio track, and when it plays: the AAC of an MP4 file, else the Opus of
-// a WebM one. Its errors are worded for the player.
+// audio track, and when it plays: the AAC, AC-3 or E-AC-3 of an MP4 file,
+// else the Opus of a WebM one. Its errors are worded for the player.
 func openTrack(src io.ReadSeeker) (track, timing, error) {
 	isMP4, err := sniffMP4(src)
 	if err != nil {
 		return nil, timing{}, readError(err)
 	}
 	if isMP4 {
-		return openAAC(src)
+		return openMP4(src)
 	}
 	r, err := webm.NewReader(src)
 	if err != nil {
@@ -125,6 +132,8 @@ func openOpus(r *webm.Reader) (track, timing, error) {
 	}
 	return &opusTrack{r: r, dec: dec, pcm: make([]float32, 2*5760)}, tm, nil
 }
+
+func (t *opusTrack) channels() int { return 2 }
 
 func (t *opusTrack) seek(at time.Duration) error {
 	if err := t.r.Seek(at); err != nil {

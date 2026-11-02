@@ -93,8 +93,25 @@ func (p *Proxy) timing() (stall, reconnect, backoff time.Duration) {
 // Path returns the path the proxy serves a video's audio at.
 func Path(videoID string) string { return "/yt/" + videoID }
 
+// SurroundSuffix ends the path the proxy serves a video's 5.1 surround
+// audio at, after Path.
+const SurroundSuffix = "/5.1"
+
+// SurroundPath returns the path the proxy serves a video's 5.1 surround
+// audio at: its Surround stream.
+func SurroundPath(videoID string) string { return Path(videoID) + SurroundSuffix }
+
+// SurroundKey is the name a video's 5.1 surround audio is cached by, beside
+// its stereo audio, cached by its ID.
+func SurroundKey(videoID string) string { return videoID + ".5.1" }
+
+// errNoSurround is why the proxy serves no 5.1 surround audio of a video
+// YouTube has none of.
+var errNoSurround = errors.New("YouTube has no 5.1 surround audio of this track")
+
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	videoID, ok := strings.CutPrefix(r.URL.Path, "/yt/")
+	videoID, surround := strings.CutSuffix(videoID, SurroundSuffix)
 	if !ok || !ValidVideoID(videoID) {
 		http.Error(w, "not found", http.StatusNotFound)
 		return
@@ -104,10 +121,24 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	p.setFailure(videoID, "")
-	if p.Cache != nil && p.Cache.Serve(w, r, videoID) {
+	key := videoID
+	if surround {
+		key = SurroundKey(videoID)
+	}
+	if p.Cache != nil && p.Cache.Serve(w, r, key) {
 		return
 	}
-	s, err := p.resolve(r.Context(), videoID)
+	resolve := func() (Stream, error) {
+		s, err := p.resolve(r.Context(), videoID)
+		if err != nil || !surround {
+			return s, err
+		}
+		if s.Surround == nil {
+			return Stream{}, errNoSurround
+		}
+		return *s.Surround, nil
+	}
+	s, err := resolve()
 	if err != nil {
 		p.fail(w, videoID, err)
 		return
@@ -130,7 +161,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	first, err := p.fetch(r.Context(), s, start, min(start+chunkSize-1, end))
 	if errors.Is(err, errExpired) {
 		p.Resolver.Forget(videoID)
-		if s, err = p.resolve(r.Context(), videoID); err == nil {
+		if s, err = resolve(); err == nil {
 			first, err = p.fetch(r.Context(), s, start, min(start+chunkSize-1, end))
 		}
 	}
@@ -158,7 +189,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var out io.Writer = w
 	var capture *capture
 	if p.Cache != nil && start == 0 && end == s.Size-1 {
-		if capture = p.Cache.Begin(videoID, s.MimeType, s.Size); capture != nil {
+		if capture = p.Cache.Begin(key, s.MimeType, s.Size); capture != nil {
 			out = io.MultiWriter(w, capture)
 			defer capture.Abort() // a no-op once committed
 		}

@@ -204,6 +204,9 @@ func (s *shell) progress(c *ui.Context) {
 }
 
 func (s *shell) playerSide(c *ui.Context) {
+	if hasSurround(s.st) {
+		s.surroundButton(c)
+	}
 	if s.iconButton(c, "lyrics", "lyrics", "Lyrics", s.panel == "lyrics", 18).Clicked() {
 		s.togglePanel("lyrics")
 	}
@@ -216,6 +219,47 @@ func (s *shell) playerSide(c *ui.Context) {
 	s.volumeControl(c)
 	if s.iconButton(c, "mini", "mini", "Open the mini player", false, 18).Clicked() {
 		s.showMini()
+	}
+}
+
+// hasSurround reports whether the track that plays has 5.1 surround audio
+// beside its stereo audio.
+func hasSurround(st player.State) bool {
+	src := st.Source
+	return src != nil && src.Mode == player.ModeStream && src.SurroundURL != ""
+}
+
+// surroundButton turns 5.1 surround on and off, as the setting of Settings
+// › Playback does, for a track that has some: a 32px button of "5.1", in
+// muted ink, which turns to ink over a tint on hover, and to the accent
+// when on, as iconButton.
+func (s *shell) surroundButton(c *ui.Context) {
+	k := &s.lk
+	on := s.set.Surround
+	label := "5.1 surround: off"
+	if on {
+		label = "5.1 surround: on"
+	}
+	b := s.buttonBase(c.Key("surround")).Height(32).PaddingX(6).Radius(k.radiusSm).Label(label).Tooltip(label).
+		Cursor(ui.CursorPointer)
+	ink := k.muted
+	switch {
+	case on:
+		ink = k.accent
+	case b.Hovered():
+		ink = k.text
+	}
+	if b.Pressed() {
+		b.Background(k.press)
+	} else if b.Hovered() {
+		b.Background(k.hover)
+	}
+	b.Children(func() {
+		ui.Text(c, "5.1").FontSize(k.smallSize()).FontWeight(600).FontFeatures("tnum").TextColor(ink).SingleLine().Shrink(0)
+	})
+	if b.Clicked() {
+		s.set.Surround = !on
+		s.save()
 	}
 }
 

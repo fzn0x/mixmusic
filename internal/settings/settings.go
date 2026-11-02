@@ -109,6 +109,10 @@ type Settings struct {
 	// Loudness turns tracks louder than -14 LKFS down to it, from YouTube's
 	// measure of each: Even loudness.
 	Loudness bool `json:"loudness"`
+	// Surround plays a track's 5.1 surround audio, when YouTube has one,
+	// in place of its stereo audio: on six speakers where the output device
+	// has them, else mixed down to stereo as the track's stream asks.
+	Surround bool `json:"surround"`
 	// Autoplay continues with similar tracks when the queue ends.
 	Autoplay  bool      `json:"autoplay"`
 	Equalizer Equalizer `json:"equalizer"`

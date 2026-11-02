@@ -45,8 +45,11 @@ type Watch struct {
 	check *check
 	// kick is closed, and replaced, when a Wait should check at once.
 	kick chan struct{}
-	// told are told when the answer turns.
-	told []*func(ok bool)
+	// told are told when the answer turns; turns counts the turns.
+	told  []*func(ok bool)
+	turns uint64
+	// telling has them told of one turn at a time, in order.
+	telling sync.Mutex
 }
 
 // check is a check of the network, and its answer once done closes.
@@ -100,13 +103,42 @@ func (w *Watch) run(c *check) {
 	w.check = nil
 	turned := w.at.IsZero() && !c.ok || !w.at.IsZero() && w.ok != c.ok
 	w.ok, w.at, w.stale = c.ok, time.Now(), false
-	told := w.told
+	turn := w.turn(turned)
 	w.mu.Unlock()
+	// Before the callers of the check have its answer, so that one who
+	// was told it has been told of the turn too.
+	w.tell(turn, c.ok)
 	close(c.done)
-	if turned {
-		for _, fn := range told {
-			(*fn)(c.ok)
-		}
+}
+
+// turn counts a turn of the answer, if it turned, and returns it, 0 if it
+// didn't. Its caller holds mu.
+func (w *Watch) turn(turned bool) uint64 {
+	if !turned {
+		return 0
+	}
+	w.turns++
+	return w.turns
+}
+
+// tell tells the OnChange funcs of turn, the answer turning to ok, unless
+// it is 0 or the answer turned again since: what they hear last is the
+// answer, though a check and audio that came tell from goroutines of
+// their own. The funcs mustn't wait for the Watch.
+func (w *Watch) tell(turn uint64, ok bool) {
+	if turn == 0 {
+		return
+	}
+	w.telling.Lock()
+	defer w.telling.Unlock()
+	w.mu.Lock()
+	latest, told := turn == w.turns, w.told
+	w.mu.Unlock()
+	if !latest {
+		return
+	}
+	for _, fn := range told {
+		(*fn)(ok)
 	}
 }
 
@@ -139,16 +171,12 @@ func (w *Watch) Seen() {
 	now := time.Now()
 	back := !w.at.IsZero() && !w.ok
 	w.ok, w.at, w.seen, w.stale = true, now, now, false
-	told := w.told
 	if back {
 		w.wake()
 	}
+	turn := w.turn(back)
 	w.mu.Unlock()
-	if back {
-		for _, fn := range told {
-			(*fn)(true)
-		}
-	}
+	w.tell(turn, true)
 }
 
 // Kick has the next check ask the network, and a Wait check at once: the

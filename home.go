@@ -156,6 +156,9 @@ func (s *shell) pageScroll(c *ui.Context, content func()) {
 			s.takeContent(page, col)
 		}
 		col.Children(content)
+		if track != nil && s.here.room > 0 {
+			col.MinHeight(s.here.room)
+		}
 	})
 	// Once the content took where the page is: it may have moved it.
 	if track != nil {

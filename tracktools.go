@@ -54,6 +54,11 @@ type trackView struct {
 // trackTools is the search box and the sort of a list of tracks, which
 // noun names, as the user left them in the list of key. It returns the
 // view of tracks they make, whole until the list has two tracks.
+//
+// They stay pinned under the top bar once the page scrolled past them
+// (pinRow). There, what the user searches or sorts shows from the list's
+// start, under them, and the page keeps the room for them to stay there,
+// however few tracks match.
 func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track) trackView {
 	k := &s.lk
 	tool := s.tools[key]
@@ -65,7 +70,9 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 		return viewTracks(tracks, "order", "")
 	}
 	view := tool.viewOf(tracks)
-	ui.Row(c).Gap(12).Margin(0, 0, 16).Children(func() {
+	row, pin := s.pinRow(c, key+"-tools")
+	query, sort := tool.query, tool.sort
+	row.Gap(12).Children(func() {
 		s.filterBox(c, key+"-search", "search this "+noun, "Search this "+noun, &tool.query, false, func() { tool.query = "" })
 		labels := slices.Clone(trackSortLabels)
 		labels[0] = strings.ToUpper(noun[:1]) + noun[1:] + " order"
@@ -80,6 +87,15 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 				FontFeatures("tnum")
 		}
 	})
+	if pin != nil && pin.pinned {
+		if tool.query != query || tool.sort != sort {
+			// The page builds again from there (pageScroll).
+			s.pageScrolled().Y = pin.at()
+		}
+		if strings.TrimSpace(tool.query) != "" {
+			s.here.room = max(s.here.room, pin.at()+s.here.view)
+		}
+	}
 	return view
 }
 

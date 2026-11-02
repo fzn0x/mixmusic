@@ -115,6 +115,20 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 	}
 }
 
+// groundOn fills e with the ground as the window shows it where e is, over
+// what scrolls under e: a row pinned over a page shows as the ground
+// around it does.
+func (s *shell) groundOn(c *ui.Context, e ui.Element) {
+	e.Background(s.lk.bg)
+	paint := s.groundPaint(c)
+	if paint == nil {
+		return
+	}
+	w, h := c.Size()
+	window := ui.Rect{W: w, H: h}
+	e.Draw(func(p *ui.Painter, r ui.Rect) { p.Clip(r, 0, func() { paint(p, window) }) })
+}
+
 // groundPaint paints the theme's ground on the window's box, or is nil
 // for a theme of none.
 func (s *shell) groundPaint(c *ui.Context) func(p *ui.Painter, r ui.Rect) {

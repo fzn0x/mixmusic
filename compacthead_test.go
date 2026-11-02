@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"math"
 	"slices"
 	"testing"
 	"time"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // longPlaylist is a playlist of YouTube Music of n tracks, which the page
@@ -112,6 +114,65 @@ func sameColor(a, b color.Color) bool {
 	r1, g1, b1, a1 := a.RGBA()
 	r2, g2, b2, a2 := b.RGBA()
 	return r1 == r2 && g1 == g2 && b1 == b2 && a1 == a2
+}
+
+// TestPinnedSearch keeps the search and the sort of a playlist's tracks
+// under the top bar once the page scrolled past them, in every layout
+// design. What the user types there keeps the focus, and shows the
+// tracks found under them, however few.
+func TestPinnedSearch(t *testing.T) {
+	const label = "Search this playlist"
+	for _, layout := range settings.Layouts {
+		s := newTestShell(t)
+		s.set.Layout = layout
+		s.restyle()
+		p := longPlaylist(s, "yt:PLlong", "Late night drive", 80)
+		tt := tester(t, s)
+		show(s, tt, playlistPath(p.ID))
+		before, _ := tt.Find(label)
+		scrollBy(tt, 1500)
+		pinned, ok := tt.Find(label)
+		if !ok || pinned.Y < 48+pinPad || pinned.Y > 48+pinPad+40 {
+			t.Fatalf("%s: scrolled, the search is at %v (%v), at %v before", layout, pinned, ok, before)
+		}
+		scrollBy(tt, 600)
+		if r, _ := tt.Find(label); r.Y != pinned.Y {
+			t.Errorf("%s: scrolled further, the search moved from %v to %v", layout, pinned, r)
+		}
+		if _, ok := tt.Find("Midnight City 0"); ok {
+			t.Errorf("%s: the list's start shows, scrolled far", layout)
+		}
+		click(t, s, tt, label)
+		tt.Type("teardrop 7")
+		s.drain()
+		tt.Frame()
+		tt.Advance(time.Second)
+		if !tt.Focused(label) {
+			t.Errorf("%s: typing, the search lost the focus", layout)
+		}
+		if r, _ := tt.Find(label); r.Y != pinned.Y {
+			t.Errorf("%s: typing, the search moved from %v to %v", layout, pinned, r)
+		}
+		found, ok := tt.Find("Teardrop 7")
+		if !ok || found.Y < pinned.Y+pinned.H || found.Y > pinned.Y+pinned.H+120 {
+			t.Errorf("%s: the first track found is at %v (%v), the search at %v", layout, found, ok, pinned)
+		}
+		if pin := s.here.pins["playlist:"+p.ID+"-tools"]; pin == nil || math.Abs(float64(s.here.scroll.Y-pin.at())) > 0.5 {
+			t.Errorf("%s: searching, the page is at %v, pinned at %+v", layout, s.here.scroll.Y, pin)
+		}
+		tt.Key(0, ui.KeyEscape)
+		s.drain()
+		tt.Frame()
+		tt.Advance(time.Second)
+		if r, _ := tt.Find(label); r.Y != pinned.Y || !tt.HasText("Midnight City 0") {
+			t.Errorf("%s: cleared, the search is at %v, and the list shows %q", layout, r, tt.Texts())
+		}
+		scrollBy(tt, -3000)
+		if r, _ := tt.Find(label); r.Y != before.Y {
+			t.Errorf("%s: back at the top, the search is at %v, not %v", layout, r, before)
+		}
+		settled(t, tt)
+	}
 }
 
 // TestBarHeadNarrow moves the download of the head in the top bar into its

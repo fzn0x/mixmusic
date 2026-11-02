@@ -89,7 +89,6 @@ func (d *Decoder) parseBlock(blk int) error {
 		if err := d.parseCouplingCoordinates(&fresh); err != nil {
 			return err
 		}
-		f.cplblocks++
 	}
 
 	// Rematrixing.

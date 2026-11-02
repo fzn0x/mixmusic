@@ -416,6 +416,39 @@ func TestMPRIS(t *testing.T) {
 		t.Errorf("the volume changed %v", s.props)
 	}
 
+	// The rate.
+	if got := b.getDouble(busName, "Rate"); got != 1 {
+		t.Errorf("Rate %v", got)
+	}
+	if lo, hi := b.getDouble(busName, "MinimumRate"), b.getDouble(busName, "MaximumRate"); lo != MinRate || hi != MaxRate {
+		t.Errorf("MinimumRate %v, MaximumRate %v", lo, hi)
+	}
+	faster := louder
+	faster.Rate, faster.At = 2, time.Now()
+	c.Show(&faster)
+	if s := nextSignal(t, signals, "PropertiesChanged"); !s.props["Rate"] || len(s.props) != 1 {
+		t.Errorf("the rate changed %v", s.props)
+	}
+	if s := nextSignal(t, signals, "Seeked"); s.position != 100e6 {
+		t.Errorf("at another rate, Seeked to %d µs, want 100 s", s.position)
+	}
+	if got := b.getDouble(busName, "Rate"); got != 2 {
+		t.Errorf("Rate %v at 2×", got)
+	}
+	for v, want := range map[float64]Request{
+		1.5: {Command: SetRate, Rate: 1.5},
+		10:  {Command: SetRate, Rate: MaxRate},
+		0.1: {Command: SetRate, Rate: MinRate},
+		0:   {Command: Pause},
+	} {
+		if err := b.set(busName, "Rate", gVariantNewDouble(v)); err != nil {
+			t.Fatal(err)
+		}
+		if r := request(t, got); r != want {
+			t.Errorf("setting Rate to %v asked %+v, want %+v", v, r, want)
+		}
+	}
+
 	c.Show(nil)
 	eventually(t, "the player leaving the bus", func() bool { return !b.hasOwner(busName) })
 	c.Show(&louder)

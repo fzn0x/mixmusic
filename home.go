@@ -15,6 +15,10 @@ var homeFilters = []struct {
 	source media.Source
 }{{"Everything", ""}, {"Yours", media.SourceLocal}, {"Spotify", media.SourceSpotify}, {"YouTube Music", media.SourceYouTube}}
 
+// networkOnline tells whether the network answers, as last checked; tests
+// answer for it.
+var networkOnline = func(s *shell) bool { return s.svc.Downloads.Online() }
+
 // homePage shows the user's own tiles, then the shelves of every service.
 func (s *shell) homePage(c *ui.Context) {
 	k := &s.lk
@@ -100,8 +104,17 @@ func (s *shell) homePage(c *ui.Context) {
 				s.loading(c)
 				return
 			case sv.shelves.err != nil:
-				failed = true
 				s.problem(c, sv.shelves.err, func() { s.forget(key) })
+				// Offline, the downloads still play: they're offered once,
+				// under the first service that failed.
+				if !failed && !networkOnline(s) && s.kept.Status().Tracks > 0 {
+					ui.Row(c).Margin(16, 0, 0).Children(func() {
+						if s.button(c, "home-downloads", "open downloads", true).Clicked() {
+							s.navigate("/library/downloads")
+						}
+					})
+				}
+				failed = true
 			}
 		}
 		if shown == 0 && !failed {

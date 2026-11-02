@@ -69,6 +69,7 @@ func (a *App) Start() {
 	}
 	a.watchUpdates()
 	a.watchNetwork()
+	a.downloads.Start()
 	go a.keepYTDLPCurrent()
 }
 

@@ -29,20 +29,21 @@ func (s offlineServices) PrepareStream(ctx context.Context, t media.Track) (play
 // quietStream is an engine that plays at once and tells no progress.
 type quietStream struct{ p atomic.Pointer[player.Player] }
 
-func (s *quietStream) Load(_ string, _ time.Duration, autoplay bool) error {
+func (s *quietStream) Load(_ string, _ time.Duration, autoplay bool, _ float64) error {
 	if autoplay {
 		s.p.Load().Playing(true)
 	}
 	return nil
 }
-func (s *quietStream) Preload(string)                        {}
-func (s *quietStream) Crossfade(string, time.Duration) error { return nil }
-func (s *quietStream) Play() error                           { s.p.Load().Playing(true); return nil }
-func (s *quietStream) Pause()                                { s.p.Load().Playing(false) }
-func (s *quietStream) Stop()                                 {}
-func (s *quietStream) Unload()                               {}
-func (s *quietStream) Seek(time.Duration)                    {}
-func (s *quietStream) SetVolume(float64)                     {}
+func (s *quietStream) Preload(string)                                 {}
+func (s *quietStream) Crossfade(string, time.Duration, float64) error { return nil }
+func (s *quietStream) Play() error                                    { s.p.Load().Playing(true); return nil }
+func (s *quietStream) Pause()                                         { s.p.Load().Playing(false) }
+func (s *quietStream) Stop()                                          {}
+func (s *quietStream) Unload()                                        {}
+func (s *quietStream) Seek(time.Duration)                             {}
+func (s *quietStream) SetVolume(float64)                              {}
+func (s *quietStream) SetSpeed(float64)                               {}
 
 // TestFlush quits right after the queue and the volume changed while
 // paused: the files keep them, and the windows' settings are kept first.

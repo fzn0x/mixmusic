@@ -3,6 +3,7 @@ package lastfm
 import (
 	"context"
 	"errors"
+	"math"
 	"slices"
 	"sync"
 	"time"
@@ -71,10 +72,13 @@ type listen struct {
 	track    Track
 	playing  bool
 	position time.Duration
+	// rate is the speed it plays at, 1 its own.
+	rate float64
 	// seen is when the player was last observed.
 	seen time.Time
 	// start is when the play started, or zero until it plays.
-	start     time.Time
+	start time.Time
+	// listened is how much of the track was heard.
 	listened  time.Duration
 	announced bool
 	scrobbled bool
@@ -118,17 +122,22 @@ func (s *Scrobbler) SetQueue(plays []Play) {
 
 // Observe tells the Scrobbler what the player does at now: id identifies the
 // loaded track and is empty when none is, t describes it, playing reports
-// whether it plays, and position is how far into the track it is. The time
-// between two observations while the track plays counts as listening, up
-// to 5 seconds. The track plays again when the position goes back near 0
-// after it had advanced, or after another one. Observe reports whether Send
-// has something to send.
-func (s *Scrobbler) Observe(now time.Time, id string, t Track, playing bool, position time.Duration) bool {
+// whether it plays, position is how far into the track it is, and rate is
+// the speed it plays at, where 1, or 0, is its own. The time between two
+// observations while the track plays counts as listening, up to 5
+// seconds, to as much of the track as it played at the rate of the first:
+// at 2×, a second plays two of the track. The track plays again when the
+// position goes back near 0 after it had advanced, or after another one.
+// Observe reports whether Send has something to send.
+func (s *Scrobbler) Observe(now time.Time, id string, t Track, playing bool, position time.Duration, rate float64) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if !(rate > 0) || math.IsInf(rate, 0) {
+		rate = 1
+	}
 	c := &s.cur
 	if c.id != "" && c.playing {
-		c.listened += min(max(now.Sub(c.seen), 0), maxGap)
+		c.listened += time.Duration(float64(min(max(now.Sub(c.seen), 0), maxGap)) * c.rate)
 		s.count()
 	}
 	again := id == c.id && position < startWindow && c.position-position > startWindow
@@ -138,9 +147,10 @@ func (s *Scrobbler) Observe(now time.Time, id string, t Track, playing bool, pos
 	if id == "" {
 		return s.pending()
 	}
-	c.track, c.playing, c.position, c.seen = t, playing, position, now
+	c.track, c.playing, c.position, c.rate, c.seen = t, playing, position, rate, now
 	if playing && c.start.IsZero() {
-		c.start = now.Add(-position)
+		// When it would have started, playing at the rate it does.
+		c.start = now.Add(-time.Duration(float64(position) / rate))
 	}
 	if playing && !c.announced && t.complete() && s.active() {
 		c.announced = true

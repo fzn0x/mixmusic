@@ -71,7 +71,7 @@ func TestEngineLoudness(t *testing.T) {
 		cuesFront:          0,  // one of no known loudness, as it is
 	} {
 		e, dev := newMeasuredEngine(t)
-		e.Load(url, 0, false)
+		e.Load(url, 0, false, 1)
 		buffered(t, e, 0, ringFrames/2)
 		e.Play()
 		got := dev.play(t, len(want)/2)
@@ -87,7 +87,7 @@ func TestEngineLoudness(t *testing.T) {
 func TestEngineLoudnessSwitch(t *testing.T) {
 	want := reference(t, cuesFront)
 	e, dev := newMeasuredEngine(t)
-	e.Load(cuesFront+"#-8", 0, false)
+	e.Load(cuesFront+"#-8", 0, false, 1)
 	buffered(t, e, 0, ringFrames/2)
 	e.Play()
 	at := 4800
@@ -114,7 +114,7 @@ func TestEngineLoudnessSwitch(t *testing.T) {
 func TestEngineLoudnessCrossfade(t *testing.T) {
 	a, b := reference(t, cuesFront), reference(t, speech)
 	e, dev := newMeasuredEngine(t)
-	e.Load(cuesFront+"#-8", 0, false)
+	e.Load(cuesFront+"#-8", 0, false, 1)
 	buffered(t, e, 0, ringFrames/2)
 	e.Play()
 	at := 188 * quantum
@@ -122,7 +122,7 @@ func TestEngineLoudnessCrossfade(t *testing.T) {
 	e.Preload(speech + "#-11")
 	buffered(t, e, 1, ringFrames/2)
 	const fade = 300 * time.Millisecond
-	if err := e.Crossfade(speech+"#-11", fade); err != nil {
+	if err := e.Crossfade(speech+"#-11", fade, 1); err != nil {
 		t.Fatal(err)
 	}
 	n := int(frames(fade)) + 4800

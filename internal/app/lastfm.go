@@ -106,7 +106,7 @@ func (a *App) scrobble(np NowPlaying) {
 		return
 	}
 	id, t := lastfmTrack(np)
-	if !l.scrobbler.Observe(time.Now(), id, t, np.Playing, time.Duration(np.PositionMs)*time.Millisecond) {
+	if !l.scrobbler.Observe(time.Now(), id, t, np.Playing, time.Duration(np.PositionMs)*time.Millisecond, np.Speed) {
 		return
 	}
 	go func() {

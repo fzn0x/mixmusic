@@ -149,3 +149,6 @@ func playsLabel(t media.Track) string {
 
 // ms is v milliseconds.
 func ms(v int) time.Duration { return time.Duration(v) * time.Millisecond }
+
+// speedLabel writes a speed as 1.25× or 2×.
+func speedLabel(v float64) string { return strconv.FormatFloat(v, 'f', -1, 64) + "×" }

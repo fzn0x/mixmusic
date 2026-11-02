@@ -30,7 +30,9 @@ type headProps struct {
 	keptLabel string
 	onKeep    func(on bool)
 	keeping   bool
-	menu      func(m *ui.Menu)
+	// download downloads the collection, if set.
+	download *downloadHead
+	menu     func(m *ui.Menu)
 }
 
 // fact is one of the facts of a collection's head: a text, or artists,
@@ -111,6 +113,9 @@ func (s *shell) collectionHead(c *ui.Context, h headProps) {
 					if s.button(c, "head-keep", label, *h.keep).Disabled(h.keeping).Clicked() {
 						h.onKeep(!*h.keep)
 					}
+				}
+				if h.download != nil && s.anyDownloadable(h.download.tracks) {
+					s.downloadButton(c, h.download)
 				}
 				if h.menu != nil {
 					s.roundButton(c, "head-more", "more", "More", false, false).Menu(h.menu)
@@ -228,10 +233,12 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 		if len(a.Tracks) > 0 {
 			facts = append(facts, fact{text: longDuration(total(a.Tracks))})
 		}
+		d := albumDownload(a)
 		h := headProps{art: a.Artwork, source: a.Source, facts: facts,
-			play:    func() { s.p.PlayAll(a.Tracks, false) },
-			shuffle: func() { s.shuffled(a.Tracks) },
-			menu:    s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""),
+			play:     func() { s.p.PlayAll(a.Tracks, false) },
+			shuffle:  func() { s.shuffled(a.Tracks) },
+			download: d,
+			menu:     s.withDownload(s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""), d),
 		}
 		if s.signedIn(a.Source) {
 			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, "save", "saved", s.keeping[key]
@@ -291,6 +298,9 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 				}
 			}
 		}
+		// The download goes before the delete, which ends the menu.
+		d := playlistDownload(p)
+		menu = s.withDownload(menu, d)
 		if p.Deletable && p.Source == media.SourceYouTube {
 			base := menu
 			menu = func(m *ui.Menu) {
@@ -298,7 +308,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 				s.deleteYouTubeItem(m, p)
 			}
 		}
-		h := headProps{art: p.Artwork, source: p.Source, facts: facts, description: p.Description, menu: menu}
+		h := headProps{art: p.Artwork, source: p.Source, facts: facts, description: p.Description, download: d, menu: menu}
 		if len(p.Tracks) > 0 {
 			h.play = func() { s.p.PlayAll(p.Tracks, false) }
 			h.shuffle = func() { s.shuffled(p.Tracks) }

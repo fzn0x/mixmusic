@@ -26,6 +26,14 @@ export default defineConfig({
     publicKey: "y/g7m+MircfXqdGupUFNygznyyR/Y41D1YAOYw41ISU=",
     github: "fzn0x/mixmusic",
   },
+  // macOS asks the user before MixMusic finds cast devices on the network
+  // and plays on them, with this reason.
+  macos: {
+    infoPlist: {
+      NSLocalNetworkUsageDescription: "MixMusic finds the cast devices on your network, such as Chromecasts and Nest speakers, to play on them.",
+      NSBonjourServices: ["_googlecast._tcp"],
+    },
+  },
   linux: {
     comment: "Spotify and YouTube Music in one customizable player",
     categories: ["AudioVideo", "Audio", "Player"],

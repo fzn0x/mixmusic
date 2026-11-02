@@ -391,9 +391,9 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 	if st.Tracks == 0 && st.Waiting == 0 && st.Failed == 0 {
 		// A folder that can't be reached tells nothing of what it holds.
 		if st.Problem == "" {
-			ui.Text(c, k.words("Nothing downloaded yet")).FontSize(k.size(3.5)).FontWeight(300).Font(k.display).TextColor(k.accent)
+			ui.Text(c, k.words("Nothing downloaded yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
 			ui.Text(c, "Choose Download in the menu of a track, an album or a playlist, and it plays here without the network.").
-				FontSize(k.subtitleSize()).FontWeight(300).MaxWidth(640).Margin(0, 0, 24)
+				FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640).Margin(0, 0, 24)
 		}
 		s.downloadsFolderLine(c, st)
 		problem()

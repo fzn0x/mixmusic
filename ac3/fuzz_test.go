@@ -3,19 +3,18 @@ package ac3
 import (
 	"errors"
 	"math"
-	"path/filepath"
 	"testing"
 )
 
 // FuzzDecode decodes any bytes, its first telling whether to check CRCs,
 // as the syncframes of an MP4 sample, and checks that the decoder doesn't
-// panic, decodes the frames it can to FrameLength samples each, refuses
+// panic, decodes the frames it can to their blocks' samples, refuses
 // the others with ErrFormat or errors.ErrUnsupported, and makes only
 // finite samples. Without the CRCs, which would refuse nearly every
 // mutation, it reads what a corrupt frame holds.
 func FuzzDecode(f *testing.F) {
 	for _, x := range fixtures {
-		all := frames(f, readFile(f, filepath.Join("testdata", x.name+".ac3")))
+		all := frames(f, readFile(f, x.path()))
 		f.Add(append([]byte{0}, all[1]...))
 		f.Add(append(append([]byte{1}, all[2]...), all[3]...))
 	}
@@ -32,7 +31,7 @@ func FuzzDecode(f *testing.F) {
 		if err != nil && !errors.Is(err, ErrFormat) && !errors.Is(err, errors.ErrUnsupported) && !errors.Is(err, ErrBufferTooSmall) {
 			t.Fatalf("error %v", err)
 		}
-		if n%FrameLength != 0 {
+		if n%BlockLength != 0 {
 			t.Fatalf("%d samples", n)
 		}
 		for i, v := range pcm[:MaxChannels*n] {

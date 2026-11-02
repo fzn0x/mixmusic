@@ -22,6 +22,14 @@ type header struct {
 	surmixlev  int // -1 without surround channels
 	dialnorm   int
 	end        int // the bit after the bsi
+	rate       int // the sampling frequency, in Hz
+	// E-AC-3's, of Annex E: whether the frame is of its syntax (bsid 11
+	// to 16), its stream type and substream, the blocks of the frame, and
+	// the LFE's mix level code, or -1.
+	eac3                 bool
+	strmtyp, substreamid int
+	numblks              int
+	lfemixlevcod         int
 	// The Lo/Ro mix levels of the alternate syntax of Annex D (bsid 6),
 	// -1 when the frame doesn't give them.
 	loroCmixlev, loroSurmixlev int
@@ -41,32 +49,38 @@ func frameWords(fscod, frmsizecod int) int {
 	}
 }
 
-// parseHeader reads the syncinfo and the bsi of the syncframe at the start
-// of b, which r reads, and leaves r after the bsi. It needs only the first
-// bytes of the frame, and doesn't check that b holds it whole.
+// parse reads the syncinfo and the bsi of the syncframe r reads, from its
+// start, and leaves r after the bsi: of AC-3, or of E-AC-3, as the bsid,
+// which both have 5 bytes into the frame, tells. It needs only the first
+// bytes of the frame, and doesn't check that r holds it whole.
 func (h *header) parse(r *bitReader) error {
+	start := r.pos
 	if r.read(16) != syncWord {
 		return fmt.Errorf("%w: no syncword", ErrFormat)
 	}
+	r.skip(24)
+	h.bsid = r.read(5)
+	r.pos = start + 16
+	switch {
+	case h.bsid > 10 && h.bsid <= 16:
+		return h.parseEAC3(r)
+	case h.bsid == 9 || h.bsid == 10:
+		return fmt.Errorf("ac3: bsid %d: %w", h.bsid, errors.ErrUnsupported)
+	case h.bsid > 16:
+		return fmt.Errorf("%w: bsid %d", ErrFormat, h.bsid)
+	}
+	*h = header{bsid: h.bsid, numblks: 6, lfemixlevcod: -1}
 	r.skip(16) // crc1
 	h.fscod = r.read(2)
 	h.frmsizecod = r.read(6)
-	h.bsid = r.read(5)
-	if h.bsid > 8 && h.bsid != 9 && h.bsid != 10 {
-		if h.bsid > 10 && h.bsid <= 16 {
-			return fmt.Errorf("ac3: E-AC-3 (bsid %d): %w", h.bsid, errors.ErrUnsupported)
-		}
-		return fmt.Errorf("%w: bsid %d", ErrFormat, h.bsid)
-	}
-	if h.bsid > 8 {
-		return fmt.Errorf("ac3: bsid %d: %w", h.bsid, errors.ErrUnsupported)
-	}
+	r.skip(5) // bsid
 	if h.fscod == 3 {
 		return fmt.Errorf("%w: fscod 3", ErrFormat)
 	}
 	if h.frmsizecod >= 2*len(bitrates) {
 		return fmt.Errorf("%w: frmsizecod %d", ErrFormat, h.frmsizecod)
 	}
+	h.rate = sampleRates[h.fscod]
 	h.size = 2 * frameWords(h.fscod, h.frmsizecod)
 	h.bsmod = r.read(3)
 	h.acmod = r.read(3)
@@ -155,11 +169,15 @@ func crc16(c uint16, b []byte) uint16 {
 	return c
 }
 
-// checkCRC checks the two CRCs of a syncframe of AC-3, whole in frame:
-// that of its first 5/8, and that of all of it, after the syncword.
-func checkCRC(frame []byte) error {
-	words := len(frame) / 2
-	five8 := 2 * (words>>1 + words>>3)
+// checkCRC checks the CRCs of a syncframe, whole in frame: of AC-3, both,
+// of its first 5/8 and of all of it after the syncword; of E-AC-3, its
+// one, of all of it after the syncword.
+func checkCRC(frame []byte, eac3 bool) error {
+	five8 := 2
+	if !eac3 {
+		words := len(frame) / 2
+		five8 = 2 * (words>>1 + words>>3)
+	}
 	c := crc16(0, frame[2:five8])
 	if c != 0 {
 		return fmt.Errorf("%w: crc1 mismatch", ErrFormat)

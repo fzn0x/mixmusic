@@ -188,7 +188,7 @@ func renderDesign(t *testing.T, dir string, layout settings.Layout, theme string
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	for _, page := range []struct{ name, path string }{
 		{"home", "/"}, {"album", "/album/al-1"}, {"artist", "/artist/ar-m83"}, {"now-playing", "/now-playing"},
-		{"library-liked", "/library/liked"}, {"search", searchPath("midnight")}, {"explore-moods", "/explore/moods"},
+		{"library-liked", "/library/liked"}, {"library-mixes", "/library/mixes"}, {"search", searchPath("midnight")}, {"explore-moods", "/explore/moods"},
 		{"stats", "/stats"}, {"settings-appearance", "/settings/appearance"}, {"settings-playback", "/settings/playback"},
 	} {
 		s.navigate(page.path)

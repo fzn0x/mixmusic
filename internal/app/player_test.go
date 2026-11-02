@@ -2,9 +2,11 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"slices"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -44,6 +46,28 @@ func TestPrepareSpotifyTrack(t *testing.T) {
 		if err != nil || src.Mode != want || src.Track.ID != track.ID {
 			t.Errorf("%s: Prepare = %+v, %v; want mode %s", mode, src, err, want)
 		}
+	}
+}
+
+// TestPlayHereAhead plays the Spotify tracks ahead after the track, in
+// their order, up to the first that isn't one.
+func TestPlayHereAhead(t *testing.T) {
+	var body struct {
+		URIs       []string `json:"uris"`
+		PositionMs int      `json:"position_ms"`
+	}
+	p := testPlayer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Error(err)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}), settings.Default())
+	sp := func(id string) media.Track { return media.Track{ID: "sp:" + id, Source: media.SourceSpotify} }
+	err := p.PlayHere(context.Background(), "mixmusic", sp("t1"), 1500, sp("t2"), sp("t3"),
+		media.Track{ID: "yt:v1", Source: media.SourceYouTube}, sp("t4"))
+	want := []string{"spotify:track:t1", "spotify:track:t2", "spotify:track:t3"}
+	if err != nil || !slices.Equal(body.URIs, want) || body.PositionMs != 1500 {
+		t.Errorf("PlayHere = %v, playing %v from %d; want %v from 1500", err, body.URIs, body.PositionMs, want)
 	}
 }
 

@@ -412,15 +412,26 @@ func (p *Player) ConnectPlay(ctx context.Context, track media.Track, positionMs 
 var playHereRetry = time.Second
 
 // PlayHere plays a Spotify track from positionMs on the device of the Web
-// Playback SDK, MixMusic's own, by its ID. Spotify may not know a device
-// that just connected for a moment, so it asks again a few times.
-func (p *Player) PlayHere(ctx context.Context, deviceID string, track media.Track, positionMs int) error {
+// Playback SDK, MixMusic's own, by its ID, and the Spotify tracks ahead
+// after it, which the device goes on to by itself: up to the first that
+// isn't one, so that it plays none but those, in their order. Spotify may
+// not know a device that just connected for a moment, so it asks again a
+// few times.
+func (p *Player) PlayHere(ctx context.Context, deviceID string, track media.Track, positionMs int, ahead ...media.Track) error {
 	_, id, err := media.ParseID(track.ID)
 	if err != nil || track.Source != media.SourceSpotify {
 		return errors.New("only Spotify tracks play with Spotify")
 	}
+	uris := []string{spotify.URI("track", id)}
+	for _, t := range ahead {
+		_, id, err := media.ParseID(t.ID)
+		if err != nil || t.Source != media.SourceSpotify {
+			break
+		}
+		uris = append(uris, spotify.URI("track", id))
+	}
 	for try := 0; ; try++ {
-		err = p.a.spotify.Play(ctx, deviceID, []string{spotify.URI("track", id)}, positionMs)
+		err = p.a.spotify.Play(ctx, deviceID, uris, positionMs)
 		var apiErr *spotify.APIError
 		if try == 4 || !errors.As(err, &apiErr) || apiErr.Status != http.StatusNotFound {
 			return err

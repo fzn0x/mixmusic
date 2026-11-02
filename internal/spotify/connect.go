@@ -98,6 +98,25 @@ func (c *Client) SetVolume(ctx context.Context, deviceID string, percent int) er
 	return c.do(ctx, http.MethodPut, "/me/player/volume", q, nil, nil)
 }
 
+// Shuffle has a device shuffle what it plays, or play it in its order.
+func (c *Client) Shuffle(ctx context.Context, deviceID string, on bool) error {
+	q := url.Values{"state": {strconv.FormatBool(on)}}
+	if deviceID != "" {
+		q.Set("device_id", deviceID)
+	}
+	return c.do(ctx, http.MethodPut, "/me/player/shuffle", q, nil, nil)
+}
+
+// Repeat has a device repeat the track it plays ("track"), all it plays
+// ("context"), or nothing ("off").
+func (c *Client) Repeat(ctx context.Context, deviceID, state string) error {
+	q := url.Values{"state": {state}}
+	if deviceID != "" {
+		q.Set("device_id", deviceID)
+	}
+	return c.do(ctx, http.MethodPut, "/me/player/repeat", q, nil, nil)
+}
+
 // Transfer moves playback to a device.
 func (c *Client) Transfer(ctx context.Context, deviceID string, play bool) error {
 	return c.do(ctx, http.MethodPut, "/me/player", nil, map[string]any{"device_ids": []string{deviceID}, "play": play}, nil)

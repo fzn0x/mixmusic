@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"runtime"
 	"strconv"
 	"strings"
@@ -146,6 +147,16 @@ type SpotifyPage struct{ a *App }
 // Spotify's player plays.
 func (s *SpotifyPage) Token(ctx context.Context) (string, error) { return s.a.spotify.AccessToken(ctx) }
 
+// Changed tells that what Spotify's player plays changed, as its track
+// ended or it went on to the next: the player asks it at once, rather than
+// at its next report, a second later.
+func (s *SpotifyPage) Changed(context.Context) error {
+	if p := s.a.goPlayer.Load(); p != nil {
+		p.HereChanged()
+	}
+	return nil
+}
+
 // SpotifyHereCheck tells, for development, whether MixMusic's own
 // Spotify device could play: its page loads, its webview decrypts
 // Spotify's audio, and it reaches the app for a token, which it gets once
@@ -166,6 +177,12 @@ func (a *App) SpotifyHereCheck(ctx context.Context) (string, error) {
 type hereDevice struct{ h *spotifyHere }
 
 func (d hereDevice) Play(ctx context.Context, t media.Track, at time.Duration) error {
+	return d.PlayAhead(ctx, t, at, nil)
+}
+
+// PlayAhead plays t from at, and the tracks ahead after it, which Spotify
+// goes on to by itself, without a gap.
+func (d hereDevice) PlayAhead(ctx context.Context, t media.Track, at time.Duration, ahead []media.Track) error {
 	switch a := d.h.a; {
 	case !a.spotify.SignedIn():
 		return errors.New("sign in to Spotify in Settings › Accounts to play it")
@@ -195,7 +212,7 @@ func (d hereDevice) Play(ctx context.Context, t media.Track, at time.Duration) e
 	if err != nil {
 		return err
 	}
-	if err := (&Player{d.h.a}).PlayHere(ctx, id, t, int(at/time.Millisecond)); err != nil {
+	if err := (&Player{d.h.a}).PlayHere(ctx, id, t, int(at/time.Millisecond), ahead...); err != nil {
 		return err
 	}
 	if _, err := page.EvalContext(ctx, "await mm.setVolume("+d.level()+")"); err != nil {
@@ -204,8 +221,46 @@ func (d hereDevice) Play(ctx context.Context, t media.Track, at time.Duration) e
 	// A player that never tells its sound started plays on all the same, as
 	// the player follows it.
 	_, err = page.EvalContext(ctx, "await mm.started("+strconv.Itoa(expected)+", "+strconv.FormatInt(hereSounds.Milliseconds(), 10)+")")
+	if err == nil && len(ahead) > 0 {
+		go d.inOrder(page, id)
+	}
 	return err
 }
+
+// inOrder has Spotify play the tracks it was given in their order, and
+// stop after the last: it shuffles and repeats as the user last had it on
+// their account, and the player would then follow it to tracks it doesn't
+// play next, and stop them.
+func (d hereDevice) inOrder(page *mygo.Page, deviceID string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	order, err := eval[struct {
+		Shuffle bool `json:"shuffle"`
+		Repeat  int  `json:"repeat"`
+	}](ctx, page, "return await mm.order()")
+	if err != nil {
+		return
+	}
+	if order.Shuffle {
+		if err := d.h.a.spotify.Shuffle(ctx, deviceID, false); err != nil {
+			log.Printf("mixmusic: Spotify's player shuffles: %v", err)
+		}
+	}
+	if order.Repeat != 0 {
+		if err := d.h.a.spotify.Repeat(ctx, deviceID, "off"); err != nil {
+			log.Printf("mixmusic: Spotify's player repeats: %v", err)
+		}
+	}
+}
+
+// Settle is how long the page's reports may still tell what it played
+// before a command: a moment, as it answers at once, and Play returns once
+// the new track sounds.
+func (d hereDevice) Settle() time.Duration { return time.Second }
+
+// Hush silences what the device went on to by itself, at once, and stops
+// it, until a track it is told to play sounds.
+func (d hereDevice) Hush(ctx context.Context) error { return d.do(ctx, "await mm.hush()") }
 
 // level is the gain of the player's volume, 0 when muted, for the page.
 func (d hereDevice) level() string {

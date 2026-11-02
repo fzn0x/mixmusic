@@ -254,51 +254,30 @@ type edit struct {
 func (d *doc) rewrite(o options, docs map[string]*doc) error {
 	d.assets = map[string]string{}
 	lines := strings.Split(d.body, "\n")
+	edits := make([][]edit, len(lines))
 	var errs []error
-	fence := ""
+	links(lines, func(i, start, end int, image, html bool) {
+		t := lines[i][start:end]
+		angled := strings.HasPrefix(t, "<")
+		t = strings.Trim(t, "<>")
+		to, err := d.resolve(t, image, html, o, docs)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("%s:%d: %s: %w", d.file, d.offset+i+1, t, err))
+			return
+		}
+		if angled {
+			to = "<" + to + ">"
+		}
+		edits[i] = append(edits[i], edit{start, end, to})
+	})
 	for i, line := range lines {
-		trimmed := strings.TrimLeft(line, " \t")
-		if fence != "" {
-			if strings.HasPrefix(trimmed, fence) && strings.Trim(trimmed, fence[:1]+" \t") == "" {
-				fence = ""
-			}
+		if len(edits[i]) == 0 {
 			continue
 		}
-		if strings.HasPrefix(trimmed, "```") || strings.HasPrefix(trimmed, "~~~") {
-			fence = trimmed[:len(trimmed)-len(strings.TrimLeft(trimmed, trimmed[:1]))]
-			continue
-		}
-		masked := maskCode(line)
-		var edits []edit
-		target := func(start, end int, image, html bool) {
-			t := line[start:end]
-			angled := strings.HasPrefix(t, "<")
-			t = strings.Trim(t, "<>")
-			to, err := d.resolve(t, image, html, o, docs)
-			if err != nil {
-				errs = append(errs, fmt.Errorf("%s:%d: %s: %w", d.file, d.offset+i+1, t, err))
-				return
-			}
-			if angled {
-				to = "<" + to + ">"
-			}
-			edits = append(edits, edit{start, end, to})
-		}
-		if m := refDef.FindStringSubmatchIndex(masked); m != nil {
-			target(m[2], m[3], false, false)
-		} else {
-			for _, m := range inlineLink.FindAllStringSubmatchIndex(masked, -1) {
-				target(m[4], m[5], m[3] > m[2], false)
-			}
-		}
-		for _, m := range htmlAttr.FindAllStringSubmatchIndex(masked, -1) {
-			attr := strings.ToLower(masked[m[2]:m[3]])
-			target(m[4]+1, m[5]-1, attr != "href", true)
-		}
-		slices.SortFunc(edits, func(a, b edit) int { return a.start - b.start })
+		slices.SortFunc(edits[i], func(a, b edit) int { return a.start - b.start })
 		var b strings.Builder
 		at := 0
-		for _, e := range edits {
+		for _, e := range edits[i] {
 			if e.start < at {
 				continue
 			}
@@ -311,6 +290,53 @@ func (d *doc) rewrite(o options, docs map[string]*doc) error {
 	}
 	d.body = strings.Join(lines, "\n")
 	return errors.Join(errs...)
+}
+
+// links calls f with the target of each link of the Markdown's lines,
+// outside code: of a link or an image, of a link defined by reference, and
+// of an attribute of HTML that holds an address. It names the line, and
+// where the target is in it.
+func links(lines []string, f func(i, start, end int, image, html bool)) {
+	code := inCode(lines)
+	for i, line := range lines {
+		if code[i] {
+			continue
+		}
+		masked := maskCode(line)
+		if m := refDef.FindStringSubmatchIndex(masked); m != nil {
+			f(i, m[2], m[3], false, false)
+		} else {
+			for _, m := range inlineLink.FindAllStringSubmatchIndex(masked, -1) {
+				f(i, m[4], m[5], m[3] > m[2], false)
+			}
+		}
+		for _, m := range htmlAttr.FindAllStringSubmatchIndex(masked, -1) {
+			attr := strings.ToLower(masked[m[2]:m[3]])
+			f(i, m[4]+1, m[5]-1, attr != "href", true)
+		}
+	}
+}
+
+// inCode tells which of the Markdown's lines are fenced code, with their
+// fences.
+func inCode(lines []string) []bool {
+	code := make([]bool, len(lines))
+	fence := ""
+	for i, line := range lines {
+		trimmed := strings.TrimLeft(line, " \t")
+		if fence != "" {
+			code[i] = true
+			if strings.HasPrefix(trimmed, fence) && strings.Trim(trimmed, fence[:1]+" \t") == "" {
+				fence = ""
+			}
+			continue
+		}
+		if strings.HasPrefix(trimmed, "```") || strings.HasPrefix(trimmed, "~~~") {
+			code[i] = true
+			fence = trimmed[:len(trimmed)-len(strings.TrimLeft(trimmed, trimmed[:1]))]
+		}
+	}
+	return code
 }
 
 // maskCode hides the code spans of a line, keeping its length, so that what
@@ -359,24 +385,12 @@ func maskCode(line string) string {
 // links go through Zola's @/ paths, which it checks; Zola leaves HTML's
 // as they are, so those are relative to the page, at /docs/<slug>/.
 func (d *doc) resolve(target string, image, html bool, o options, docs map[string]*doc) (string, error) {
-	if target == "" || strings.HasPrefix(target, "#") || strings.HasPrefix(target, "//") || scheme.MatchString(target) {
-		return target, nil
-	}
-	p, suffix := target, ""
-	if i := strings.IndexAny(p, "?#"); i >= 0 {
-		p, suffix = p[:i], p[i:]
-	}
-	p, err := url.PathUnescape(p)
+	p, suffix, err := inRepo(d.file, target)
 	if err != nil {
 		return "", err
 	}
-	if strings.HasPrefix(p, "/") {
-		p = path.Clean(strings.TrimPrefix(p, "/"))
-	} else {
-		p = path.Join(path.Dir(d.file), p)
-	}
-	if p == ".." || strings.HasPrefix(p, "../") {
-		return "", errors.New("outside the repository")
+	if p == "" {
+		return target, nil
 	}
 	info, err := os.Stat(filepath.Join(o.root, filepath.FromSlash(p)))
 	if err != nil {
@@ -406,6 +420,32 @@ func (d *doc) resolve(target string, image, html bool, o options, docs map[strin
 		return "@/" + path.Join(o.section(), d.slug, escape(local)) + suffix, nil
 	}
 	return github(o, "blob", p) + suffix, nil
+}
+
+// inRepo is what a link of the file from points at in the repository: its
+// path from the root, slash-separated, and the query or fragment after it.
+// The path is empty for a link elsewhere, or within the page.
+func inRepo(from, target string) (p, suffix string, err error) {
+	if target == "" || strings.HasPrefix(target, "#") || strings.HasPrefix(target, "//") || scheme.MatchString(target) {
+		return "", "", nil
+	}
+	p = target
+	if i := strings.IndexAny(p, "?#"); i >= 0 {
+		p, suffix = p[:i], p[i:]
+	}
+	p, err = url.PathUnescape(p)
+	if err != nil {
+		return "", "", err
+	}
+	if strings.HasPrefix(p, "/") {
+		p = path.Clean(strings.TrimPrefix(p, "/"))
+	} else {
+		p = path.Join(path.Dir(from), p)
+	}
+	if p == ".." || strings.HasPrefix(p, "../") {
+		return "", "", errors.New("outside the repository")
+	}
+	return p, suffix, nil
 }
 
 // github is the address of a file (blob) or a folder (tree) on GitHub.

@@ -309,6 +309,9 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 			return
 		}
 		if err != nil {
+			if errors.Is(err, ErrOffline) && p.skipOffline(i, autoplay) {
+				return
+			}
 			if !p.offline(err, start, autoplay) {
 				p.fail(err.Error())
 			}
@@ -372,6 +375,9 @@ func (p *Player) streamInstead(token int, entry Item, start time.Duration, autop
 				return
 			}
 			if err != nil {
+				if errors.Is(err, ErrOffline) && p.skipOffline(p.s.Index, autoplay) {
+					return
+				}
 				if !p.offline(err, start, autoplay) {
 					p.fail(err.Error())
 				}
@@ -962,6 +968,7 @@ func (p *Player) onTime(position, duration time.Duration) {
 		// that one failed.
 		p.retry.played = true
 		p.failures = 0
+		p.offlineSkips = 0
 	}
 	p.s.Position = position
 	if duration > 0 && !p.s.Live {

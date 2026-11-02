@@ -117,20 +117,50 @@ func TestYTDLPError(t *testing.T) {
 }
 
 func TestPlainError(t *testing.T) {
-	for msg, want := range map[string]string{
-		"yt-dlp: pFptt7Cargc: Requested format is not available. Use --list-formats for a list of available formats": "YouTube gave no audio for this track; updating yt-dlp in Settings › Playback often fixes it",
-		"yt-dlp: pFptt7Cargc: Sign in to confirm your age. This video may be inappropriate for some users.":          "YouTube plays this track only to signed-in adults, on its own website",
-		"yt-dlp: pFptt7Cargc: Sign in to confirm you’re not a bot. Use --cookies-from-browser":                       "YouTube asks to confirm this is not a bot; try again in a while",
-		"yt-dlp: pFptt7Cargc: Video unavailable. The uploader has not made this video available in your country":     "this track is not available in your country",
-		"yt-dlp: pFptt7Cargc: Video unavailable. This content isn't available, try again later.":                     "YouTube is turning down requests from this network for now; try again in a while",
-		"yt-dlp: w3XzgjlKFjc: Video unavailable":                                                                     "this track is no longer on YouTube Music",
-		"yt-dlp: pFptt7Cargc: Private video. Sign in if you've been granted access to this video":                    "this track is private",
-		"yt-dlp: pFptt7Cargc: Join this channel to get access to members-only content like this video":               "only the members of its channel can play this track",
-		"yt-dlp: unable to download webpage: HTTP Error 500":                                                         "",
+	type plain struct {
+		text string
+		kind error
+	}
+	for msg, want := range map[string]plain{
+		"yt-dlp: pFptt7Cargc: Requested format is not available. Use --list-formats for a list of available formats": {"YouTube gave no audio for this track; updating yt-dlp in Settings › Playback often fixes it", nil},
+		"yt-dlp: pFptt7Cargc: Sign in to confirm your age. This video may be inappropriate for some users.":          {"YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
+		"yt-dlp: pFptt7Cargc: Sign in to confirm you’re not a bot. Use --cookies-from-browser":                       {"YouTube asks to confirm this is not a bot; try again in a while", ErrThrottled},
+		"yt-dlp: pFptt7Cargc: Video unavailable. The uploader has not made this video available in your country":     {"this track is not available in your country", ErrUnavailable},
+		"yt-dlp: pFptt7Cargc: Video unavailable. This content isn't available, try again later.":                     {"YouTube is turning down requests from this network for now; try again in a while", ErrThrottled},
+		"yt-dlp: w3XzgjlKFjc: Video unavailable":                                                                     {"this track is no longer on YouTube Music", ErrUnavailable},
+		"yt-dlp: pFptt7Cargc: Private video. Sign in if you've been granted access to this video":                    {"this track is private", ErrUnavailable},
+		"yt-dlp: pFptt7Cargc: Join this channel to get access to members-only content like this video":               {"only the members of its channel can play this track", ErrUnavailable},
+		"yt-dlp: unable to download webpage: HTTP Error 500":                                                         {"", nil},
 	} {
-		if got := plainError(msg); got != want {
-			t.Errorf("plainError(%q) = %q, want %q", msg, got, want)
+		if got, kind := plainError(msg); got != want.text || kind != want.kind {
+			t.Errorf("plainError(%q) = %q, %v; want %q, %v", msg, got, kind, want.text, want.kind)
 		}
+	}
+}
+
+// TestYTDLPErrorKinds keeps the words the player shows of yt-dlp's errors,
+// and tells their kinds, for downloads to wait, retry or give up.
+func TestYTDLPErrorKinds(t *testing.T) {
+	for stderr, want := range map[string]struct {
+		text string
+		kind error
+	}{
+		"ERROR: [youtube] pFptt7Cargc: Sign in to confirm you’re not a bot.":                                          {"YouTube asks to confirm this is not a bot; try again in a while", ErrThrottled},
+		"ERROR: [youtube] pFptt7Cargc: Video unavailable":                                                             {"this track is no longer on YouTube Music", ErrUnavailable},
+		"ERROR: [youtube] pFptt7Cargc: Unable to download API page: <urlopen error [Errno 11001] getaddrinfo failed>": {"yt-dlp: pFptt7Cargc: Unable to download API page: <urlopen error [Errno 11001] getaddrinfo failed>", ErrNetwork},
+		"ERROR: [youtube] pFptt7Cargc: something new":                                                                 {"yt-dlp: pFptt7Cargc: something new", nil},
+	} {
+		err := ytdlpFailure(stderr)
+		if err == nil {
+			t.Errorf("%q: no error", stderr)
+			continue
+		}
+		if err.Error() != want.text || want.kind != nil && !errors.Is(err, want.kind) || want.kind == nil && errors.Unwrap(err) != nil {
+			t.Errorf("%q: %q, of kind %v; want %q, %v", stderr, err, errors.Unwrap(err), want.text, want.kind)
+		}
+	}
+	if !errors.Is(statusError(http.StatusTooManyRequests), ErrThrottled) || errors.Is(statusError(http.StatusNotFound), ErrThrottled) {
+		t.Error("HTTP 429 alone is YouTube turning requests down")
 	}
 }
 

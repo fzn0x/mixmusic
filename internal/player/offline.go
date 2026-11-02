@@ -3,11 +3,14 @@ package player
 // Waiting for the network: a track that can't play for want of it keeps
 // its place, and plays on from there once the network answers, rather
 // than failing, so that the queue doesn't skip on while the network is
-// gone.
+// gone. Where the app tells which tracks play without the network, as
+// those downloaded, the queue skips to the next of them instead, at once,
+// and waits only once none is left.
 
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 )
 
@@ -227,4 +230,75 @@ func (p *Player) Sleeping() {
 			p.pause()
 		}
 	})
+}
+
+// kept returns the app's Offline, if its services have it.
+func (p *Player) kept() (Offline, bool) {
+	k, ok := p.svc.(Offline)
+	return k, ok
+}
+
+// playsOfflineFrom returns the first entry, from the one at i on, or from
+// the one after it when after, that plays without the network, in the
+// order the queue plays: around to its start when it repeats, and past
+// those it passes over. It tells false when none does.
+func (p *Player) playsOfflineFrom(i int, after bool) (int, bool) {
+	k, ok := p.kept()
+	q := p.s.Queue
+	if !ok || i < 0 || i >= len(q) {
+		return -1, false
+	}
+	start := i
+	if after {
+		start = i + 1
+	}
+	for step := range len(q) {
+		j := start + step
+		if j >= len(q) {
+			if p.s.Repeat != RepeatAll {
+				return -1, false
+			}
+			j -= len(q)
+		}
+		if after && j == i {
+			return -1, false // around the whole queue
+		}
+		if q[j].Skip == "" && k.PlaysOffline(q[j].Track) {
+			return j, true
+		}
+	}
+	return -1, false
+}
+
+// skipOffline plays, in place of the entry at i, which can't play for want
+// of the network, the next that plays without it, and tells whether there
+// was one: it skips the others at once, without an error for each, and
+// without telling the app of each as what plays. It skips no more entries
+// than the queue holds before one plays: the track waits for the network
+// then.
+func (p *Player) skipOffline(i int, autoplay bool) bool {
+	if p.offlineSkips >= len(p.s.Queue) {
+		return false
+	}
+	j, ok := p.playsOfflineFrom(i, true)
+	if !ok {
+		return false
+	}
+	p.offlineSkips++
+	log.Printf("mixmusic: the network is gone; playing %s, which plays without it, in place of %s",
+		p.s.Queue[j].Track.ID, p.s.Queue[i].Track.ID)
+	p.playAt(j, 0, autoplay)
+	return true
+}
+
+// offlineFrom is the entry at i, as the queue goes on to it, or, while the
+// network is known to be gone, the first from it that plays without it,
+// rather than one that can't load.
+func (p *Player) offlineFrom(i int) int {
+	if k, ok := p.kept(); ok && k.Offline() && !k.PlaysOffline(p.s.Queue[i].Track) {
+		if j, ok := p.playsOfflineFrom(i, false); ok {
+			return j
+		}
+	}
+	return i
 }

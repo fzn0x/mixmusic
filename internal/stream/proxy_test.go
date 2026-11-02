@@ -323,3 +323,32 @@ func TestProxyServesAndCachesAAC(t *testing.T) {
 		t.Error("a cached AAC stream outlived a limit it no longer fits")
 	}
 }
+
+// TestProxyServesKeptFirst serves downloaded audio before the cache and
+// YouTube.
+func TestProxyServesKeptFirst(t *testing.T) {
+	p := NewProxy(NewResolver(nil, ""))
+	p.Resolver.Run = func(context.Context, ...string) ([]byte, error) {
+		t.Error("the proxy looked for the stream of a track it keeps")
+		return nil, errors.New("no")
+	}
+	p.Cache = NewCache(t.TempDir(), 1<<20)
+	p.Kept = keptStore{testID: "kept audio"}
+	rec := get(t, p, "bytes=5-9")
+	if rec.Code != http.StatusPartialContent || rec.Body.String() != "audio" {
+		t.Errorf("%d %q", rec.Code, rec.Body.String())
+	}
+	if _, n := p.Cache.Usage(); n != 0 {
+		t.Errorf("the cache keeps %d tracks", n)
+	}
+}
+
+type keptStore map[string]string
+
+func (k keptStore) Serve(w http.ResponseWriter, r *http.Request, videoID string) bool {
+	data, ok := k[videoID]
+	if ok {
+		http.ServeContent(w, r, "", time.Time{}, strings.NewReader(data))
+	}
+	return ok
+}

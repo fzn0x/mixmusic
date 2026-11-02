@@ -98,8 +98,9 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   plays its track faster or slower at its own pitch by WSOLA
   (`stretch.go`), the waveform-similarity overlap-add of Verhelst and
   Roelands, between its ring and the mix; at 1× it plays the ring as it
-  is. `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio -run
-  StretchListen` writes the test files at each speed, to listen to.
+  is, as a live stream always plays, with nothing ahead of its live edge
+  to play faster. `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio
+  -run StretchListen` writes the test files at each speed, to listen to.
   `MIXMUSIC_LIVE=1 go test ./internal/audio -run Live` plays songs of both
   codecs, and a 24/7 live stream, as the app finds them on YouTube,
   against ffmpeg's decode.

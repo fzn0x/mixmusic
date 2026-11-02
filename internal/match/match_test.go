@@ -123,6 +123,28 @@ func TestMatched(t *testing.T) {
 	}
 }
 
+// TestMatchedFoundBefore tells the match found before without a search.
+func TestMatchedFoundBefore(t *testing.T) {
+	known, err := store.Open(filepath.Join(t.TempDir(), "matches.json"), map[string]media.Track{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	yt := &fakeSearch{songs: items(track("One More Time", "Daft Punk", 320000, false))}
+	m := New(yt, known)
+	if _, ok := m.Matched(oneMoreTime); ok {
+		t.Error("matched before a search")
+	}
+	if _, err := m.Match(context.Background(), oneMoreTime); err != nil {
+		t.Fatal(err)
+	}
+	if got, ok := m.Matched(oneMoreTime); !ok || got.Title != "One More Time" {
+		t.Errorf("Matched = %+v, %v", got, ok)
+	}
+	if yt.calls.Load() != 1 {
+		t.Errorf("%d searches", yt.calls.Load())
+	}
+}
+
 func TestMatchFallsBackToVideos(t *testing.T) {
 	yt := &fakeSearch{
 		songs:  items(track("Something Else", "Nobody", 100000, false)),

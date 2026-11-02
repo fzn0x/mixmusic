@@ -1,0 +1,84 @@
+{
+ "currentVideoEndpoint": {
+  "watchEndpoint": {
+   "videoId": "NWuajLluF_E"
+  }
+ },
+ "engagementPanels": [
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {}
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {
+     "structuredDescriptionContentRenderer": {
+      "items": [
+       {},
+       {},
+       {
+        "howThisWasMadeSectionViewModel": {
+         "bodyText": {
+          "content": "Audioinhalte oder visuelle Inhalte wurden verändert oder vollständig mithilfe von KI generiert. Weitere Informationen",
+          "commandRuns": [
+           {
+            "startIndex": 96,
+            "length": 21,
+            "onTap": {
+             "innertubeCommand": {
+              "commandMetadata": {
+               "webCommandMetadata": {
+                "url": "//support.google.com/youtube/answer/15447836?hl=de",
+                "webPageType": "WEB_PAGE_TYPE_UNKNOWN",
+                "rootVe": 83769
+               }
+              },
+              "urlEndpoint": {
+               "url": "//support.google.com/youtube/answer/15447836?hl=de",
+               "target": "TARGET_NEW_WINDOW"
+              }
+             }
+            }
+           }
+          ],
+          "styleRuns": [
+           {
+            "startIndex": 96,
+            "length": 21,
+            "fontColor": 4278607828
+           }
+          ]
+         },
+         "bodyHeader": {
+          "content": "Mit KI erstellt"
+         }
+        }
+       },
+       {},
+       {}
+      ]
+     }
+    }
+   }
+  },
+  {
+   "engagementPanelSectionListRenderer": {
+    "content": {}
+   }
+  }
+ ]
+}

@@ -709,7 +709,8 @@ func (s *shell) speedSettings(c *ui.Context) {
 }
 
 // speedRow sets a speed, from settings.MinSpeed to settings.MaxSpeed by
-// settings.SpeedStep, and offers the tracks' own while another is set.
+// settings.SpeedStep, and offers the tracks' own while another is set. The
+// search of the settings finds it by the words of a speed, at any.
 func (s *shell) speedRow(c *ui.Context, key, title, label string, v *float64) {
 	desc := "Their own speed."
 	if *v != 1 {
@@ -728,7 +729,7 @@ func (s *shell) speedRow(c *ui.Context, key, title, label string, v *float64) {
 				s.save()
 			}
 		})
-	})
+	}, "faster slower tempo rate pitch")
 }
 
 // deviceRow chooses the Spotify Connect device that plays Spotify tracks.

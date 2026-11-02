@@ -52,6 +52,19 @@ func TestSpeedSettings(t *testing.T) {
 	}
 }
 
+// TestSpeedFound finds the speed of songs by the words of a speed, at
+// their own speed too.
+func TestSpeedFound(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 3200)
+	for _, q := range []string{"faster", "slower", "tempo", "playback rate", "pitch"} {
+		show(s, tt, settingsPath("playback", q))
+		if _, ok := tt.Find("Speed of songs"); !ok {
+			t.Errorf("searching %q doesn't find the speed of songs: %q", q, tt.Texts())
+		}
+	}
+}
+
 // TestPlayerBarSpeed shows the speed after the artists while MixMusic
 // plays the track at another than its own.
 func TestPlayerBarSpeed(t *testing.T) {

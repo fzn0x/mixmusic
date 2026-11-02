@@ -316,6 +316,7 @@ func (s *shell) playerSide(c *ui.Context) {
 	if s.set.SpotifyPlayback == settings.SpotifyPlaybackConnect {
 		s.devicesButton(c)
 	}
+	s.speedButton(c)
 	s.volumeControl(c)
 	if s.iconButton(c, "mini", "mini", "Open the mini player", false, 18).Clicked() {
 		s.showMini()

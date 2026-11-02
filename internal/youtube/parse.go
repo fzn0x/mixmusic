@@ -250,6 +250,9 @@ func parseListItem(item node) (media.Item, bool) {
 	if len(titleRuns) == 0 {
 		return media.Item{}, false
 	}
+	if it, ok := parseEpisodeListItem(item, titleRuns); ok {
+		return it, true
+	}
 	title := item.get("flexColumns", 0, "musicResponsiveListItemFlexColumnRenderer", "text").text()
 	watch := titleRuns[0].get("navigationEndpoint", "watchEndpoint")
 	videoID := item.get("playlistItemData", "videoId").str()
@@ -287,6 +290,9 @@ func parseTwoRowItem(r node) (media.Item, bool) {
 	b := parseByline(r.get("subtitle").runs())
 	thumbs := artwork(thumbnailList(r))
 	nav := r.get("navigationEndpoint")
+	if pageType(nav) == pageTypeEpisode {
+		return parseEpisodeCard(r, title)
+	}
 	if watch := nav.get("watchEndpoint"); watch.get("videoId").str() != "" {
 		return media.Item{Kind: media.ItemTrack, Track: newTrack(watch.get("videoId").str(), title, watch, b, thumbs, isExplicit(r))}, true
 	}
@@ -329,7 +335,8 @@ func unsaves(endpoint node) bool {
 	return like.get("status").str() == "INDIFFERENT" && like.get("target", "playlistId").str() != ""
 }
 
-// browseItem makes the album, artist or playlist an item links to.
+// browseItem makes the album, artist, playlist or podcast an item links
+// to.
 func browseItem(pageType, browseID, title string, b byline, thumbs []media.Image) (media.Item, bool) {
 	if browseID == "" {
 		return media.Item{}, false
@@ -360,6 +367,8 @@ func browseItem(pageType, browseID, title string, b byline, thumbs []media.Image
 			Tracks:  []media.Track{},
 			URL:     "https://music.youtube.com/browse/" + browseID,
 		}}, true
+	case pageTypePodcast:
+		return podcastItem(browseID, title, b, thumbs), true
 	case pageTypePlaylist:
 		id := strings.TrimPrefix(browseID, "VL")
 		owner := ""
@@ -407,6 +416,8 @@ func parseItems(contents []node) []media.Item {
 			item, ok = parseListItem(r)
 		case "musicTwoRowItemRenderer":
 			item, ok = parseTwoRowItem(r)
+		case "musicMultiRowListItemRenderer":
+			item, ok = parseMultiRowItem(r, media.Ref{})
 		}
 		if ok {
 			items = append(items, item)

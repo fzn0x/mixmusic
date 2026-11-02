@@ -1,0 +1,171 @@
+{
+ "contents": {
+  "tabbedSearchResultsRenderer": {
+   "tabs": [
+    {
+     "tabRenderer": {
+      "content": {
+       "sectionListRenderer": {
+        "contents": [
+         {
+          "musicShelfRenderer": {
+           "title": {
+            "runs": [
+             {
+              "text": "Podcasts"
+             }
+            ]
+           },
+           "contents": [
+            {
+             "musicResponsiveListItemRenderer": {
+              "thumbnail": {
+               "musicThumbnailRenderer": {
+                "thumbnail": {
+                 "thumbnails": [
+                  {
+                   "url": "https://i.ytimg.com/pl_c/PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW/studio_square_thumbnail.jpg?sqp=CMaKpNcG-oaymwEICDwQPCAASFqi85f_AwYIkfODoAY&rs=AMzJL3mO_KeS6b-Mz5xvTRy9jq9GKFtsqw",
+                   "width": 60,
+                   "height": 60
+                  },
+                  {
+                   "url": "https://i.ytimg.com/pl_c/PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW/studio_square_thumbnail.jpg?sqp=CMaKpNcG-oaymwEICHgQeCAASFqi85f_AwYIkfODoAY&rs=AMzJL3kTRHr66S-ZeDLSTTjA6qzynheu-w",
+                   "width": 120,
+                   "height": 120
+                  },
+                  {
+                   "url": "https://i.ytimg.com/pl_c/PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW/studio_square_thumbnail.jpg?sqp=CMaKpNcG-oaymwEKCOIBEOIBIABIWqLzl_8DBgiR84OgBg&rs=AMzJL3nibgw49tMGO_ijGQvb1psR09FQhA",
+                   "width": 226,
+                   "height": 226
+                  },
+                  {
+                   "url": "https://i.ytimg.com/pl_c/PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW/studio_square_thumbnail.jpg?sqp=CMaKpNcG-oaymwEKCKAEEKAEIABIWqLzl_8DBgiR84OgBg&rs=AMzJL3k6-evnvRZ8JR-TQQI54TkAAufGaA",
+                   "width": 544,
+                   "height": 544
+                  }
+                 ]
+                }
+               }
+              },
+              "flexColumns": [
+               {
+                "musicResponsiveListItemFlexColumnRenderer": {
+                 "text": {
+                  "runs": [
+                   {
+                    "text": "Huberman Lab"
+                   }
+                  ]
+                 },
+                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+                }
+               },
+               {
+                "musicResponsiveListItemFlexColumnRenderer": {
+                 "text": {
+                  "runs": [
+                   {
+                    "text": "Andrew Huberman",
+                    "navigationEndpoint": {
+                     "browseEndpoint": {
+                      "browseId": "UC2D2CMWXMOVWx7giW1n3LIg",
+                      "browseEndpointContextSupportedConfigs": {
+                       "browseEndpointContextMusicConfig": {
+                        "pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
+                       }
+                      }
+                     }
+                    }
+                   }
+                  ]
+                 },
+                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+                }
+               }
+              ],
+              "navigationEndpoint": {
+               "browseEndpoint": {
+                "browseId": "MPSPPLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW",
+                "browseEndpointContextSupportedConfigs": {
+                 "browseEndpointContextMusicConfig": {
+                  "pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
+                 }
+                }
+               }
+              }
+             }
+            },
+            {
+             "musicResponsiveListItemRenderer": {
+              "thumbnail": {
+               "musicThumbnailRenderer": {
+                "thumbnail": {
+                 "thumbnails": [
+                  {
+                   "url": "https://i.ytimg.com/podcasts_artwork/OLSpjFQNSkAmwVl4KDtYxPB-PJdVyT56BAA/auto_created_podcast_show_avatar.jpg?sqp=CMaKpNcG-oaymwEICDwQPCAASFo&rs=AMzJL3nc9WetEk0X0VnRb5oLpAli8ib8oA",
+                   "width": 60,
+                   "height": 60
+                  },
+                  {
+                   "url": "https://i.ytimg.com/podcasts_artwork/OLSpjFQNSkAmwVl4KDtYxPB-PJdVyT56BAA/auto_created_podcast_show_avatar.jpg?sqp=CMaKpNcG-oaymwEICHgQeCAASFo&rs=AMzJL3kico56_f6hySioOWrcZ04DaZNeZA",
+                   "width": 120,
+                   "height": 120
+                  },
+                  {
+                   "url": "https://i.ytimg.com/podcasts_artwork/OLSpjFQNSkAmwVl4KDtYxPB-PJdVyT56BAA/auto_created_podcast_show_avatar.jpg?sqp=CMaKpNcG-oaymwEKCOIBEOIBIABIWg&rs=AMzJL3mCf-FxgMihQ4R5lqfmzK78knv3FQ",
+                   "width": 226,
+                   "height": 226
+                  },
+                  {
+                   "url": "https://i.ytimg.com/podcasts_artwork/OLSpjFQNSkAmwVl4KDtYxPB-PJdVyT56BAA/auto_created_podcast_show_avatar.jpg?sqp=CMaKpNcG-oaymwEKCKAEEKAEIABIWg&rs=AMzJL3nSfXTSaQ9ozQcWjE1QdYfFhlHuLA",
+                   "width": 544,
+                   "height": 544
+                  }
+                 ]
+                }
+               }
+              },
+              "flexColumns": [
+               {
+                "musicResponsiveListItemFlexColumnRenderer": {
+                 "text": {
+                  "runs": [
+                   {
+                    "text": "HUBERMAN LAB"
+                   }
+                  ]
+                 },
+                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+                }
+               },
+               {
+                "musicResponsiveListItemFlexColumnRenderer": {
+                 "text": {},
+                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+                }
+               }
+              ],
+              "navigationEndpoint": {
+               "browseEndpoint": {
+                "browseId": "MPSPOLSpjFQNSkAmwVl4KDtYxPB-PJdVyT56BAA",
+                "browseEndpointContextSupportedConfigs": {
+                 "browseEndpointContextMusicConfig": {
+                  "pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
+                 }
+                }
+               }
+              }
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      }
+     }
+    }
+   ]
+  }
+ }
+}

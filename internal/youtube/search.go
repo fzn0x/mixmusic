@@ -17,6 +17,9 @@ const (
 	FilterAlbums    Filter = "albums"
 	FilterArtists   Filter = "artists"
 	FilterPlaylists Filter = "playlists"
+	// FilterPodcasts finds shows, and FilterEpisodes their episodes.
+	FilterPodcasts Filter = "podcasts"
+	FilterEpisodes Filter = "episodes"
 )
 
 // filterParams are the opaque search parameters of each filter, as the
@@ -27,6 +30,8 @@ var filterParams = map[Filter]string{
 	FilterAlbums:    "EgWKAQIYAWoKEAkQChAFEAMQBA%3D%3D",
 	FilterArtists:   "EgWKAQIgAWoKEAkQChAFEAMQBA%3D%3D",
 	FilterPlaylists: "EgeKAQQoAEABagoQCRAKEAUQAxAE",
+	FilterPodcasts:  "EgWKAQJQAWoKEAkQBRAKEAMQBA%3D%3D",
+	FilterEpisodes:  "EgWKAQJIAWoKEAkQBRAKEAMQBA%3D%3D",
 }
 
 // ErrUnknownFilter is returned for filters YouTube Music has none of.

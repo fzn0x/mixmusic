@@ -45,6 +45,7 @@ func TestVideoSend(t *testing.T) {
 		{"still not shown", idle, videoWant{src: src}, at.Add(time.Hour), false},
 		{"shown again", idle, videoWant{src: src, active: true, playing: true}, at.Add(time.Millisecond), true},
 		{"a theme's tint", playing, videoWant{src: src, active: true, playing: true, filter: videoFilter}, at.Add(time.Millisecond), true},
+		{"another speed", playing, videoWant{src: src, active: true, playing: true, rate: 1.5}, at.Add(time.Millisecond), true},
 		{"nothing to play", videoSent{}, videoWant{}, at, false},
 	} {
 		if got := videoSend(c.prev, c.want, c.now); got != c.send {

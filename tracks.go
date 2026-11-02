@@ -157,6 +157,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 				Width(88).TextAlign(ui.End).Shrink(0)
 		}
 		s.sourceMark(c, t.Source, current)
+		s.downloadMark(c, key+"-dl-"+count(i), t, current)
 		// The thumb takes the heart's place on a disliked song.
 		switch {
 		case disliked:

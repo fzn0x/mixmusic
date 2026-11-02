@@ -294,6 +294,9 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 		if m.Item("Play").Chosen() {
 			s.playAlbum(a.ID)
 		}
+		if a.Source != media.SourceLocal && m.Item("Download").Chosen() {
+			s.downloadAlbum(a.ID)
+		}
 		s.copyLinkItem(m, a.URL)
 	})
 	switch {
@@ -323,6 +326,9 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 		}
 		if m.Item("Play").Chosen() {
 			s.playPlaylist(p.ID)
+		}
+		if m.Item("Download").Chosen() {
+			s.downloadPlaylist(p.ID)
 		}
 		s.copyLinkItem(m, p.URL)
 		if more != nil {

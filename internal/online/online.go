@@ -6,6 +6,7 @@ package online
 
 import (
 	"context"
+	"slices"
 	"sync"
 	"time"
 )
@@ -44,6 +45,11 @@ type Watch struct {
 	check *check
 	// kick is closed, and replaced, when a Wait should check at once.
 	kick chan struct{}
+	// told are told when the answer turns; turns counts the turns.
+	told  []*func(ok bool)
+	turns uint64
+	// telling has them told of one turn at a time, in order.
+	telling sync.Mutex
 }
 
 // check is a check of the network, and its answer once done closes.
@@ -95,9 +101,60 @@ func (w *Watch) run(c *check) {
 	// Audio that came meanwhile answers too.
 	c.ok = err == nil || w.seen.After(started)
 	w.check = nil
+	turned := w.at.IsZero() && !c.ok || !w.at.IsZero() && w.ok != c.ok
 	w.ok, w.at, w.stale = c.ok, time.Now(), false
+	turn := w.turn(turned)
 	w.mu.Unlock()
+	// Before the callers of the check have its answer, so that one who
+	// was told it has been told of the turn too.
+	w.tell(turn, c.ok)
 	close(c.done)
+}
+
+// turn counts a turn of the answer, if it turned, and returns it, 0 if it
+// didn't. Its caller holds mu.
+func (w *Watch) turn(turned bool) uint64 {
+	if !turned {
+		return 0
+	}
+	w.turns++
+	return w.turns
+}
+
+// tell tells the OnChange funcs of turn, the answer turning to ok, unless
+// it is 0 or the answer turned again since: what they hear last is the
+// answer, though a check and audio that came tell from goroutines of
+// their own. The funcs mustn't wait for the Watch.
+func (w *Watch) tell(turn uint64, ok bool) {
+	if turn == 0 {
+		return
+	}
+	w.telling.Lock()
+	defer w.telling.Unlock()
+	w.mu.Lock()
+	latest, told := turn == w.turns, w.told
+	w.mu.Unlock()
+	if !latest {
+		return
+	}
+	for _, fn := range told {
+		(*fn)(ok)
+	}
+}
+
+// OnChange has fn told when the answer turns, from any goroutine: that the
+// network went, or came back. The first answer is told when it's that the
+// network doesn't answer.
+func (w *Watch) OnChange(fn func(ok bool)) (cancel func()) {
+	f := &fn
+	w.mu.Lock()
+	w.told = append(slices.Clone(w.told), f)
+	w.mu.Unlock()
+	return func() {
+		w.mu.Lock()
+		defer w.mu.Unlock()
+		w.told = slices.DeleteFunc(slices.Clone(w.told), func(g *func(bool)) bool { return g == f })
+	}
 }
 
 // Offline reports whether the last answer, within offlineFor, was that the
@@ -111,13 +168,15 @@ func (w *Watch) Offline() bool {
 // Seen takes in audio that came from YouTube: the network answers.
 func (w *Watch) Seen() {
 	w.mu.Lock()
-	defer w.mu.Unlock()
 	now := time.Now()
 	back := !w.at.IsZero() && !w.ok
 	w.ok, w.at, w.seen, w.stale = true, now, now, false
 	if back {
 		w.wake()
 	}
+	turn := w.turn(back)
+	w.mu.Unlock()
+	w.tell(turn, true)
 }
 
 // Kick has the next check ask the network, and a Wait check at once: the

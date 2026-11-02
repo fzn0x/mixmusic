@@ -20,6 +20,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
+	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -48,6 +49,9 @@ type Options struct {
 	DataDir string
 	// CacheDir keeps what can be fetched again: audio, yt-dlp's cache.
 	CacheDir string
+	// DownloadsDir keeps the downloads, unless the user chose another
+	// folder: DataDir's downloads when it's empty.
+	DownloadsDir string
 	// Builtin holds the add-ons MixMusic ships with.
 	Builtin fs.FS
 	// TrayIcon is the PNG of the tray icon.
@@ -91,6 +95,7 @@ type App struct {
 	proxy        *stream.Proxy
 	online       *online.Watch
 	cache        *stream.Cache
+	downloads    *downloads.Manager
 	loudness     *loudnessBook
 	matcher      *match.Matcher
 	labels       *labelCache
@@ -145,6 +150,8 @@ type App struct {
 	trayHide trayHide
 	// global holds the user's global shortcuts as registered (#80).
 	global globalShortcuts
+	// metered is set while the system tells the connection is metered.
+	metered atomic.Bool
 
 	mu         sync.Mutex
 	installed  string // the version installed to run at the next start
@@ -262,6 +269,7 @@ func New(opts Options) (*App, error) {
 	a.colors = newMemo[string](500)
 	a.addons = addons.NewManager(filepath.Join(opts.DataDir, "addons"), opts.Builtin)
 	a.storage = addons.NewStorage(filepath.Join(opts.DataDir, "addons", ".storage"))
+	a.openDownloads(s.DownloadsFolder)
 	a.apply(s)
 	return a, nil
 }
@@ -271,6 +279,7 @@ func (a *App) apply(s settings.Settings) {
 	a.tools.Configure(s.YTDLPPath, s.JSRuntime)
 	a.resolver.SetQuality(stream.Quality(s.Quality))
 	a.cache.SetLimit(int64(s.CacheSizeMB) << 20)
+	a.downloads.SetMetered(a.metered.Load(), s.DownloadOnMetered)
 	if a.auth.ClientID() != s.SpotifyClientID {
 		a.auth.SetClientID(s.SpotifyClientID)
 	}

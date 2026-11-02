@@ -84,3 +84,23 @@ func TestCachePrunesLeastRecent(t *testing.T) {
 		t.Error("Clear left tracks")
 	}
 }
+
+func TestCacheTake(t *testing.T) {
+	c := NewCache(t.TempDir(), 1<<20)
+	cp := c.Begin(testID, "audio/webm", 5)
+	cp.Write([]byte("hello"))
+	cp.Commit()
+	dst := filepath.Join(t.TempDir(), "audio", testID+".webm")
+	if ok, err := c.Take(testID, dst); !ok || err != nil {
+		t.Fatalf("Take: %v, %v", ok, err)
+	}
+	if b, err := os.ReadFile(dst); err != nil || string(b) != "hello" {
+		t.Errorf("took %q, %v", b, err)
+	}
+	if c.Has(testID) {
+		t.Error("the cache still holds what it gave")
+	}
+	if ok, err := c.Take("aaaaaaaaaaa", dst); ok || err != nil {
+		t.Errorf("Take of a track it doesn't hold: %v, %v", ok, err)
+	}
+}

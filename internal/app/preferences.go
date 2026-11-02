@@ -65,9 +65,9 @@ func (p *Preferences) Change(base, next settings.Settings) (settings.Settings, e
 	return s, uerr
 }
 
-// Reset puts back the settings of a new install, keeping the accounts and
-// the tools set up. A settings.json with a mistake is kept as
-// settings.json.broken.
+// Reset puts back the settings of a new install, keeping the accounts, the
+// tools set up, and the folder the downloads are in. A settings.json with
+// a mistake is kept as settings.json.broken.
 func (p *Preferences) Reset() (settings.Settings, error) {
 	a := p.a
 	cur := a.settings.Get()
@@ -76,6 +76,7 @@ func (p *Preferences) Reset() (settings.Settings, error) {
 	d.SpotifyClientID = cur.SpotifyClientID
 	d.YouTubeChannel = cur.YouTubeChannel
 	d.YTDLPPath, d.JSRuntime = cur.YTDLPPath, cur.JSRuntime
+	d.DownloadsFolder = cur.DownloadsFolder
 	d = d.Clean()
 	if err := a.settings.Replace(d); err != nil {
 		return prev, err

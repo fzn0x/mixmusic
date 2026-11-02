@@ -137,6 +137,7 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 			ui.Text(c, t.Title).FontSize(k.bodySize()).TextColor(ink).SingleLine()
 			ui.Row(c).Gap(6).MinWidth(0).Children(func() {
 				s.sourceMark(c, t.Source, current)
+				s.downloadMark(c, "q-dl-"+it.UID, t, current)
 				line := names(t.Artists)
 				if it.Radio {
 					line += " · radio"
@@ -258,7 +259,7 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 	x := s.lyricsChoices(c, t, ly, where)
 	active := -1
 	if synced {
-		pos := s.st.Position + 250*time.Millisecond
+		pos := s.st.Position + lyricsLead(s.st.Speed)
 		for i, line := range ly.Lines {
 			if ms(line.TimeMs) <= pos {
 				active = i
@@ -326,6 +327,17 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		view.scrolled = active
 		view.list.ScrollTo(active, ui.Center)
 	}
+}
+
+// lyricsLead is how far ahead of the position synced lyrics light up, at
+// the speed the track plays at: the position comes every 250 ms, in which
+// the track moves on 250 ms at its speed, so a line lights up no later
+// than it starts.
+func lyricsLead(speed float64) time.Duration {
+	if speed <= 0 {
+		speed = 1
+	}
+	return time.Duration(float64(250*time.Millisecond) * speed)
 }
 
 // lyricsCredit names where lyrics come from, with the link to it their
@@ -400,6 +412,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		s.setDisliked(t, !disliked)
 	}
 	s.addToMenus(m, one)
+	s.downloadItems(m, t)
 	m.Separator()
 	for _, a := range t.Artists {
 		if a.ID != "" {

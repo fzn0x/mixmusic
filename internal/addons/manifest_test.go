@@ -85,3 +85,15 @@ func TestValidFile(t *testing.T) {
 		}
 	}
 }
+
+func TestValidColor(t *testing.T) {
+	for s, want := range map[string]bool{
+		"#000": true, "#00bde3": true, "#00BDE3cc": true, "rgba(255, 255, 255, 0.16)": true, "hsl(0 100% 50%)": true,
+		"oklch(62.8% 0.2577 29.23)": true, "transparent": true,
+		"": false, "00bde3": false, "red": false, "url(x)": false, "rgb(1, 2, 3); color: red": false, "#00bde3 ": false,
+	} {
+		if got := ValidColor(s); got != want {
+			t.Errorf("ValidColor(%q) = %v", s, got)
+		}
+	}
+}

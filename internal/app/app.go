@@ -103,6 +103,8 @@ type App struct {
 	artwork      *artwork.Client
 	artStore     *artwork.Store
 	colors       *memo[string]
+	// colorFile follows the colour file the settings name.
+	colorFile colorFile
 
 	presence presence
 	// native is MixMusic's own audio engine, made at its first use.
@@ -289,6 +291,7 @@ func (a *App) apply(s settings.Settings) {
 	if a.youtube.SignedIn() && a.youtube.Channel() != s.YouTubeChannel {
 		a.youtube.SetChannel(s.YouTubeChannel)
 	}
+	a.followColorFile(s)
 	a.retitle()
 }
 

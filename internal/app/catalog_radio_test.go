@@ -12,9 +12,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
@@ -65,8 +68,18 @@ func recorded(t *testing.T, name string) []byte {
 	return data
 }
 
-// catalog returns a catalog that asks m.
+// catalog returns a catalog that asks m, with a library and settings of a
+// new install, whose radios leave out the songs the library dislikes.
 func (m *fakeMusic) catalog(t *testing.T) *Catalog {
+	dir := t.TempDir()
+	lib, err := library.Open(filepath.Join(dir, "library.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	st, err := store.Open(filepath.Join(dir, "settings.json"), settings.Default())
+	if err != nil {
+		t.Fatal(err)
+	}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body struct {
 			VideoID string `json:"videoId"`
@@ -94,7 +107,7 @@ func (m *fakeMusic) catalog(t *testing.T) *Catalog {
 	t.Cleanup(srv.Close)
 	yt := youtube.New()
 	yt.BaseURL = srv.URL
-	return &Catalog{&App{youtube: yt, matcher: match.New(yt, nil)}}
+	return &Catalog{&App{youtube: yt, matcher: match.New(yt, nil), library: lib, settings: st}}
 }
 
 func (m *fakeMusic) note(asked *[]string, what string) {

@@ -260,6 +260,21 @@ func TestZoom(t *testing.T) {
 	}
 }
 
+// TestSkipDisliked passes over disliked songs in new installs, and in the
+// settings of earlier versions, which don't have it, until the user turns
+// it off.
+func TestSkipDisliked(t *testing.T) {
+	for file, want := range map[string]bool{`{}`: true, `{"autoplay":false}`: true, `{"skipDisliked":false}`: false, `{"skipDisliked":true}`: true} {
+		s := Default()
+		if err := json.Unmarshal([]byte(file), &s); err != nil {
+			t.Fatal(err)
+		}
+		if s.Clean().SkipDisliked != want {
+			t.Errorf("%s skips disliked songs %v, not %v", file, s.SkipDisliked, want)
+		}
+	}
+}
+
 // TestCleanLayout gives settings from before the layout setting, and
 // those of a layout no more, Blend's.
 func TestCleanLayout(t *testing.T) {

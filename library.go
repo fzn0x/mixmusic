@@ -12,16 +12,20 @@ import (
 
 // librarySections are the library's pivots, by their paths' last part.
 var librarySections = []struct{ id, label string }{
-	{"liked", "Liked"}, {"mixes", "Mixes"}, {"history", "History"}, {"spotify", "Spotify"}, {"youtube", "YouTube Music"},
+	{"liked", "Liked"}, {"mixes", "Mixes"}, {"history", "History"}, {"disliked", "Disliked"}, {"spotify", "Spotify"},
+	{"youtube", "YouTube Music"},
 }
 
-// libraryPage shows liked songs, the user's mixes, the history, and the
-// libraries of the services the user signed in to.
+// libraryPage shows liked songs, the user's mixes, the history, the songs
+// they dislike once there are any, and the libraries of the services the
+// user signed in to.
 func (s *shell) libraryPage(c *ui.Context, tab string) {
 	accounts := s.accounts()
+	disliked := s.svc.Collection.Disliked()
 	var ids, labels []string
 	for _, sec := range librarySections {
-		if (sec.id == "spotify" && !accounts.Spotify.SignedIn) || (sec.id == "youtube" && !accounts.YouTube.SignedIn) {
+		if (sec.id == "spotify" && !accounts.Spotify.SignedIn) || (sec.id == "youtube" && !accounts.YouTube.SignedIn) ||
+			(sec.id == "disliked" && len(disliked) == 0) {
 			continue
 		}
 		ids = append(ids, sec.id)
@@ -42,6 +46,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 				counts[i] = len(s.svc.Collection.Liked())
 			case "mixes":
 				counts[i] = len(s.svc.Collection.Playlists())
+			case "disliked":
+				counts[i] = len(disliked)
 			default:
 				counts[i] = -1
 			}
@@ -57,6 +63,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 			s.mixTiles(c)
 		case "history":
 			s.history(c)
+		case "disliked":
+			s.dislikedSongs(c, disliked)
 		case "spotify":
 			s.spotifyLibrary(c)
 		case "youtube":
@@ -82,6 +90,14 @@ func (s *shell) likedSongs(c *ui.Context) {
 	view := s.trackTools(c, "liked", "list", liked)
 	s.trackList(c, "liked", view.tracks, trackListOptions{art: true, album: true,
 		empty: "No liked song matches “" + s.searching("liked") + "”."})
+}
+
+// dislikedSongs lists the songs the user dislikes, whose menus take the
+// dislike back.
+func (s *shell) dislikedSongs(c *ui.Context, disliked []media.Track) {
+	view := s.trackTools(c, "disliked", "list", disliked)
+	s.trackList(c, "disliked", view.tracks, trackListOptions{art: true, album: true,
+		empty: "No disliked song matches “" + s.searching("disliked") + "”."})
 }
 
 func (s *shell) mixTiles(c *ui.Context) {

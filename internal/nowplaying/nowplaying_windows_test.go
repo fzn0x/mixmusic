@@ -342,7 +342,8 @@ func TestMediaFlyout(t *testing.T) {
 	eventually(t, "the artwork", func() bool { return read(t, s).thumbnail })
 
 	// At 2×, from 20 s: the controls are told the rate where Windows lets
-	// them, on x64, and where the track is.
+	// them, on x64, and where the track is. The session learns the two
+	// apart, either first.
 	faster := info
 	faster.Rate, faster.Position, faster.At = 2, 20*time.Second, time.Now()
 	c.Show(&faster)
@@ -350,8 +351,8 @@ func TestMediaFlyout(t *testing.T) {
 		f := read(t, s)
 		return f.at >= 19*time.Second && f.at <= 22*time.Second
 	})
-	if f := read(t, s); runtime.GOARCH == "amd64" && f.rate != 2 {
-		t.Errorf("the flyout's rate %v at 2×", f.rate)
+	if runtime.GOARCH == "amd64" {
+		eventually(t, "the rate of 2×", func() bool { return read(t, s).rate == 2 })
 	}
 	c.Show(&info)
 	eventually(t, "the position at 1×", func() bool {

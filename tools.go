@@ -32,7 +32,7 @@ func (s *shell) installButton(c *ui.Context, key, label string) {
 				v = float64(s.installDone) / float64(s.installTotal)
 			}
 			ui.Progress(c, v).Width(200)
-			ui.Text(c, "installing yt-dlp…").FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, k.sentence("installing yt-dlp…")).FontSize(k.smallSize()).TextColor(k.muted)
 		})
 		return
 	}

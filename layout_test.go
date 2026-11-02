@@ -98,6 +98,12 @@ func TestWords(t *testing.T) {
 		if got := k.words("Liked songs on YouTube Music"); got != "Liked songs on YouTube Music" {
 			t.Errorf("%s: %q", l, got)
 		}
+		if got := k.sentence("waiting for the network"); got != "Waiting for the network" {
+			t.Errorf("%s: the label %q", l, got)
+		}
+		if n := testing.AllocsPerRun(10, func() { k.sentence("waiting for the network") }); n != 0 {
+			t.Errorf("%s: capitalising a label again allocates %v times", l, n)
+		}
 	}
 }
 

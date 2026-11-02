@@ -143,13 +143,25 @@ func (k *look) words(s string) string {
 
 // sentence is a label of the interface's, as "sign out": as it is in the
 // light style, whose words are lowercase, and with its first letter in
-// capitals otherwise.
+// capitals otherwise. Those are kept, as the lowered words are.
 func (k *look) sentence(s string) string {
 	if k.headings == headingsLight || s == "" {
 		return s
 	}
+	if c, ok := k.capped[s]; ok {
+		return c
+	}
 	r, n := utf8.DecodeRuneInString(s)
-	return string(unicode.ToUpper(r)) + s[n:]
+	up := unicode.ToUpper(r)
+	if up == r {
+		return s // capitalised without a copy
+	}
+	c := string(up) + s[n:]
+	if k.capped == nil || len(k.capped) >= 256 {
+		k.capped = map[string]string{}
+	}
+	k.capped[s] = c
+	return c
 }
 
 // labelWeight sets the weight of the labels of buttons and chips: the

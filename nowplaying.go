@@ -55,7 +55,7 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 					}
 					if s.st.Waiting {
 						ui.Text(c, "·").FontSize(k.smallSize()).TextColor(k.muted)
-						ui.Text(c, "waiting for the network").FontSize(k.smallSize()).TextColor(k.muted)
+						ui.Text(c, k.sentence("waiting for the network")).FontSize(k.smallSize()).TextColor(k.muted)
 					}
 				})
 				s.progress(c)

@@ -269,7 +269,7 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 	n := len(ly.Lines) + 1
 	list := ui.List(c.Key("lyrics-"+where+"-"+t.ID), &view.list, n, func(i int) {
 		if i == len(ly.Lines) {
-			ui.Text(c, "lyrics from "+ly.Source).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24)
+			ui.Text(c, k.sentence("lyrics from "+ly.Source)).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24)
 			return
 		}
 		line := ly.Lines[i]

@@ -376,7 +376,7 @@ func (s *shell) liveCard(c *ui.Context, t, next media.Track, size float32) {
 			return
 		}
 		ui.Column(c).Fill().Justify(ui.SpaceBetween).Padding(6, 7).Background(k.tile(0)).Children(func() {
-			ui.Text(c, "up next").FontSize(11).LineHeight(1).TextColor(k.tileText)
+			ui.Text(c, k.words("Up next")).FontSize(11).LineHeight(1).TextColor(k.tileText)
 			ui.Text(c, next.Title).FontSize(12).LineHeight(1.15).MaxLines(3).TextColor(k.tileText)
 		})
 	})

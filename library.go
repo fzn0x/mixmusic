@@ -93,7 +93,7 @@ func (s *shell) mixTiles(c *ui.Context) {
 		}
 		new.Children(func() {
 			ui.Text(c, s.lk.words("New mix")).FontSize(s.lk.size(1.5)).FontWeight(s.lk.titleWeight()).Font(s.lk.display).TextColor(s.lk.tileText)
-			ui.Text(c, "tracks of every service, together").FontSize(s.lk.smallSize()).TextColor(s.lk.tileText)
+			ui.Text(c, s.lk.sentence("tracks of every service, together")).FontSize(s.lk.smallSize()).TextColor(s.lk.tileText)
 		})
 		for i, p := range s.svc.Collection.Playlists() {
 			s.playlistTile(c, "mix-"+count(i), p)

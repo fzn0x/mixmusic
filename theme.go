@@ -60,6 +60,8 @@ type look struct {
 	tonalFill, tonalInk                 ui.Color
 	// lowered are the words the light headings lowered, by the words.
 	lowered map[string]string
+	// capped are the labels the other styles capitalised, by the labels.
+	capped map[string]string
 }
 
 // fallbackTheme is the Mix theme's tokens, for a theme that lacks some.

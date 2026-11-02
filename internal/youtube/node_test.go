@@ -46,3 +46,21 @@ func TestNodeRenderer(t *testing.T) {
 		t.Errorf("renderer = %q, %v", name, r.v)
 	}
 }
+
+func TestNodeFind(t *testing.T) {
+	n := parse(t, `{"menu": {"items": [{"plain": {}}, {"dialog": {"button": {"command": {"deletePlaylistEndpoint": {"playlistId": "PLx"}}}}}]}}`)
+	if got := n.find("deletePlaylistEndpoint").get("playlistId").str(); got != "PLx" {
+		t.Errorf("found %q", got)
+	}
+	if n.find("missing").exists() || n.get("menu", "items", 0).find("deletePlaylistEndpoint").exists() {
+		t.Error("found what isn't there")
+	}
+	// Deeper than find looks, nothing is found.
+	deep := map[string]any{"deletePlaylistEndpoint": map[string]any{}}
+	for range maxFindDepth {
+		deep = map[string]any{"in": deep}
+	}
+	if (node{deep}).find("deletePlaylistEndpoint").exists() {
+		t.Error("found a key deeper than find looks")
+	}
+}

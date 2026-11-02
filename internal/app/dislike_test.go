@@ -220,3 +220,55 @@ func TestRadioWithoutDisliked(t *testing.T) {
 		t.Errorf("not skipping, the radio has %d tracks of %d, %v", len(got), len(all), err)
 	}
 }
+
+// TestRadioOfAVideoWithoutDisliked has the radio of a music video, which
+// is its song's, leave out the songs the user dislikes too.
+func TestRadioOfAVideoWithoutDisliked(t *testing.T) {
+	c := newFakeMusic(t).catalog(t)
+	all, err := c.Radio(t.Context(), instantCrushVideo)
+	if err != nil || len(all) < 2 {
+		t.Fatalf("the radio: %v, %v", trackIDs(all), err)
+	}
+	if _, err := c.a.library.SetDisliked(all[0], true); err != nil {
+		t.Fatal(err)
+	}
+	got, err := c.Radio(t.Context(), instantCrushVideo)
+	if want := trackIDs(all[1:]); err != nil || !slices.Equal(trackIDs(got), want) {
+		t.Errorf("found %v, not %v, %v", trackIDs(got), want, err)
+	}
+}
+
+// TestReloadSettingsFollowsSkipDisliked has an edit of settings.json that
+// turns skipping off let the queue's disliked songs play again, and one
+// that turns it on pass over them again, as the switch does.
+func TestReloadSettingsFollowsSkipDisliked(t *testing.T) {
+	a := fileApp(t, `{}`)
+	var err error
+	if a.queue, err = store.Open(filepath.Join(a.opts.DataDir, "queue.json"), player.Saved{}); err != nil {
+		t.Fatal(err)
+	}
+	disliked := media.Track{ID: "yt:b", Source: media.SourceYouTube, Title: "B"}
+	if _, err := a.library.SetDisliked(disliked, true); err != nil {
+		t.Fatal(err)
+	}
+	stream := &quietStream{}
+	p := player.New(offlineServices{playerServices{a}}, stream, connectDevice{a}, player.Saved{})
+	stream.p.Store(p)
+	a.goPlayer.Store(p)
+	t.Cleanup(p.Close)
+	p.Enqueue([]media.Track{{ID: "yt:a", Source: media.SourceYouTube, Title: "A"}, disliked})
+	skip := func() string {
+		q := p.State().Queue
+		if len(q) != 2 {
+			return "no queue"
+		}
+		return q[1].Skip
+	}
+	until(t, "B skipped", func() bool { return skip() == player.SkipDisliked })
+	writeSettings(t, a.settings.Path(), `{"skipDisliked": false}`)
+	a.ReloadSettings()
+	until(t, "B let off", func() bool { return skip() == "" })
+	writeSettings(t, a.settings.Path(), `{"skipDisliked": true}`)
+	a.ReloadSettings()
+	until(t, "B skipped again", func() bool { return skip() == player.SkipDisliked })
+}

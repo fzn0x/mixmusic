@@ -200,6 +200,11 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 }
 
 func (s *shell) playlistTile(c *ui.Context, key string, p media.Playlist) {
+	s.playlistTileWith(c, key, p, nil)
+}
+
+// playlistTileWith is a playlist's tile whose menu more ends, if set.
+func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, more func(m *ui.Menu, p media.Playlist)) {
 	var parts []string
 	if p.Owner != "" {
 		parts = append(parts, p.Owner)
@@ -215,6 +220,9 @@ func (s *shell) playlistTile(c *ui.Context, key string, p media.Playlist) {
 			s.playPlaylist(p.ID)
 		}
 		s.copyLinkItem(m, p.URL)
+		if more != nil {
+			more(m, p)
+		}
 	})
 	switch {
 	case play:

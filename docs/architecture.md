@@ -33,12 +33,16 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
   liked songs, playlists, albums, subscriptions, likes, dislikes and
-  saves. It also reads whether YouTube labels a video as made with AI, from
-  the answer of YouTube's own website, asked signed out with a field mask
+  saves, and it deletes the playlists the user made, which it tells from
+  those they saved by the menus YouTube sends with them. It also reads
+  whether YouTube labels a video as made with AI, from the answer of
+  YouTube's own website, asked signed out with a field mask
   (`MadeWithAI`): nothing of YouTube Music carries the label. Its parsers
   are tested against recorded responses in `testdata/`, and against the
   live service with `MIXMUSIC_LIVE=1 go test ./internal/youtube -run Live`
-  (`MIXMUSIC_YT_COOKIES` adds a signed-in account).
+  (`MIXMUSIC_YT_COOKIES` adds a signed-in account, and
+  `MIXMUSIC_YT_WRITE=1` lets it make and delete a playlist there, and
+  dislike a song and take the dislike back).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
   library), and controls Spotify Connect devices.
@@ -96,6 +100,11 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both
   called with purego, and the SystemMediaTransportControls of a hidden
   window on Windows, reached through WinRT without cgo.
+- **`internal/portal`** asks the desktop's Background portal, in a
+  Flatpak, to let MixMusic run without a window and to start it at login:
+  the sandbox's own autostart folder is one the desktop never reads.
+  `internal/app` asks it for Start at login, and for close to the tray.
+  [packaging/flatpak](../packaging/flatpak) holds the Flatpak itself.
 - **`internal/taskbar`** puts previous, play or pause, and next on the
   thumbnail of the main window's taskbar button on Windows, through the
   shell's ITaskbarList3, and takes their clicks in a window procedure in
@@ -124,7 +133,10 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
   yt-dlp from its releases, checked against their published checksums.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
-  title, artists and duration, for playback without a Spotify device.
+  title, artists and duration, for playback without a Spotify device. It
+  also finds the song of a music video, by its title and artists, which
+  the video's radio starts from: YouTube Music makes the radio of a video
+  out of videos.
 - **`lyrics`** finds synced lyrics on LRCLIB and reads LRC.
 - **`internal/library`** keeps liked and disliked songs, mixes, the history
   and stats in `library.json`.
@@ -147,8 +159,13 @@ the queue through MixMusic's own audio engine, or on Spotify's devices.
   to the interface the windows show: pages and widgets as views of
   elements, which the windows draw in their own styles, and canvases, whose
   drawing calls the plugin records and the window paints.
-- **`internal/store`** writes JSON files atomically; **`internal/settings`**
-  defines the settings and keeps them in range.
+- **`internal/store`** writes JSON files atomically. A file the user may
+  edit while MixMusic runs, `settings.json`, it reads again when asked
+  (`File.Reload`), and before each write, so that it never saves over an
+  edit it hasn't read: it merges the edit in, by top-level keys. While the
+  file doesn't decode, it leaves it as it is and holds its writes.
+  **`internal/settings`** defines the settings, keeps them in range, and
+  reads `settings.json` (`Decode`), at start and on each edit alike.
 - **`internal/app`** gives the windows the services (`App.Services`), tells
   them when the settings, the accounts, the add-ons or the updates change
   (`App.Watch`), makes the player, and puts MixMusic on the desktop: the
@@ -160,6 +177,13 @@ The root package draws the main window and the mini player. Pages fetch
 what they show beside the main thread (`fetch`), and a window's state
 belongs to its main thread: what finishes elsewhere comes back through
 `update`.
+
+- **Refresh** (F5, ⇧⌘R on macOS, `refresh.go`) asks again for the keys
+  the page shown and the side panel fetched in the frame before, as
+  `fetch` collects them, and renders the plugins' views again
+  (`View.Remount`). The page keeps its answers until the new ones come,
+  and keeps them when a refresh fails, which one toast tells. Home's own
+  tile and shelves read the library as it is, and need no refresh.
 
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
@@ -195,7 +219,8 @@ Two windows still show a web page, and only while they're needed:
 ## Data
 
 Everything lives in the user's data folder (`%AppData%\MixMusic` on
-Windows, `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
+Windows, `~/Library/Application Support/MixMusic` on macOS,
+`~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
 `queue.json`, `addons/`, `bin/` (yt-dlp), the YouTube session
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the
@@ -206,7 +231,13 @@ without credentials, is sealed for the user with DPAPI in
 Linux without a Secret Service, the secrets and the session are in plain
 files only the user can read (`spotify-token.json`, `lastfm.json`,
 `youtube-session.json`). `secretStore` (`internal/app/secrets.go`) moves a
-secret found in a file into the credential store once it can keep it. The
+secret found in a file into the credential store once it can keep it.
+`settings.json` may be edited while MixMusic runs: `App.watchSettings`
+watches it (`mygo.WatchFiles`, or a look every two seconds where it can't),
+and `App.ReloadSettings` applies an edit as Settings applies a change, then
+tells the windows (`App.Watch`). A file with a mistake is told of after a
+second, and kept as `settings.json.broken` if MixMusic quits before it is
+fixed; a `settings.json` that is a link stays one. The
 cache folder holds audio, the covers shown (`artwork/`), matches, how loud
 YouTube measured the tracks played (`loudness.json`), the videos YouTube
 labels as made with AI, for 30 days (`ai-labels.json`), and yt-dlp's cache,
@@ -231,6 +262,7 @@ aren't pages act: `act:shot:<name>` saves the window as it is,
 `act:mute` mutes the player, `act:play:<search>` plays what a search
 finds, `act:resume` plays the queue kept in the data folder,
 `act:wait:<duration>` waits, `act:palette` opens the command palette,
+`act:refresh` refreshes the page, as F5 does,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
 scrolls the page, `act:theme:<id>` wears a theme, `act:mini` opens the
 mini player, which saves `mini.png`, `act:spotify` logs whether MixMusic's

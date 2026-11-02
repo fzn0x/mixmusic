@@ -231,8 +231,10 @@ func TestNotchControls(t *testing.T) {
 
 	x.click("Pause")
 	s.settle(t, func(st player.State) bool { return !st.Playing })
+	x.frame()
 	x.click("Play")
 	s.settle(t, func(st player.State) bool { return st.Playing })
+	x.frame()
 	x.click("Next")
 	s.settle(t, func(st player.State) bool { return st.Index == 1 })
 	x.frame()

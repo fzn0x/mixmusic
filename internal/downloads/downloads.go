@@ -725,6 +725,9 @@ func (m *Manager) SetLive(video string, live bool) {
 // audio out of the downloads, and of their collections. Its caller holds
 // mu, and takes in the change.
 func (m *Manager) leaveOut(video string) {
+	if video == "" {
+		return // the tracks of no video known
+	}
 	m.idx.Live[video] = true
 	for id, e := range m.idx.Tracks {
 		if e.video() != video || m.done(e) {

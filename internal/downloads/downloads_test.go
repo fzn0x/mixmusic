@@ -903,6 +903,19 @@ func TestMoveKeepsLive(t *testing.T) {
 	}
 }
 
+// TestLeaveOutNoVideo leaves nothing out for no video, as the tracks
+// whose recording isn't found yet have.
+func TestLeaveOutNoVideo(t *testing.T) {
+	m := open(t, t.TempDir(), Options{Fetcher: &fetcher{}, Matcher: &matcher{}})
+	m.Add([]media.Track{sp("tear", "Teardrop")}, "best")
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.leaveOut("")
+	if _, ok := m.idx.Tracks["sp:tear"]; !ok || len(m.idx.Live) != 0 {
+		t.Errorf("left out a track of no video known: live %v", m.idx.Live)
+	}
+}
+
 // TestWatchAsksBack tells the watchers beside the manager's lock, so that
 // they may ask it what changed.
 func TestWatchAsksBack(t *testing.T) {

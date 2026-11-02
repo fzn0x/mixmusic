@@ -37,6 +37,7 @@ const (
 	asyncCompleted = 1
 	// GlobalSystemMediaTransportControlsSessionPlaybackStatus.
 	sessionClosed  = 0
+	sessionStopped = 3
 	sessionPlaying = 4
 	sessionPaused  = 5
 
@@ -325,6 +326,12 @@ func TestMediaFlyout(t *testing.T) {
 	c.Show(&info)
 	s := find(t, info.Title)
 	defer release(s)
+	// The session learns the track, its playback and its timeline apart,
+	// any first: on a busy runner, it showed the title while still opened.
+	eventually(t, "the playback and the timeline", func() bool {
+		f := read(t, s)
+		return f.status >= sessionStopped && f.end > 0
+	})
 	f := read(t, s)
 	if f.artist != "Ann, Bo" || f.album != "Album" {
 		t.Errorf("the flyout shows %+v", f)

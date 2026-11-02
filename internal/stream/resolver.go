@@ -103,6 +103,9 @@ type Stream struct {
 	// it, and yt-dlp doesn't.
 	Loudness float64
 	Measured bool
+	// Videos are the streams of the video's picture, which yt-dlp and
+	// YouTube's player API list beside the audio, for the now playing page.
+	Videos []Video
 	// Live is set for the stream of a live video, as it goes on: the
 	// packed audio of the segments of an HLS media playlist, which has no
 	// size, nor a length.
@@ -421,6 +424,7 @@ type info struct {
 	Duration       float64           `json:"duration"`
 	Headers        map[string]string `json:"http_headers"`
 	AvailableAt    float64           `json:"available_at"` // Unix seconds
+	Formats        []infoFormat      `json:"formats"`
 	// LiveStatus is "is_live" for a live video, as it goes on, whose
 	// stream comes over Protocol "m3u8_native": an HLS media playlist.
 	LiveStatus string `json:"live_status"`
@@ -456,6 +460,7 @@ func parseInfo(out []byte) (Stream, error) {
 		Codec:    in.ACodec,
 		Bitrate:  in.ABR,
 		Expires:  expiry(in.URL),
+		Videos:   ytdlpVideos(in.Formats),
 	}
 	for k, v := range in.Headers {
 		s.Header.Set(k, v)

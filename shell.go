@@ -53,6 +53,7 @@ func (s *shell) view(c *ui.Context) {
 	s.promptDialog(c)
 	s.sweepDialogs()
 	s.sweepViews()
+	s.followVideo()
 	s.keepShown(c)
 }
 

@@ -51,20 +51,24 @@ type playlistRead struct {
 
 // readOn returns the playlist of of, the fetch of key, as read so far. Its
 // first answer, and each answer of a refresh, start reading the rest
-// beside the page.
+// beside the page; what waited for the reading before waits for the new
+// one.
 func (s *shell) readOn(key string, of *loaded[media.Playlist]) *playlistRead {
 	key += " read"
-	r, _ := s.loads[key].(*playlistRead)
-	if r != nil && r.of == of && r.at == of.answers {
-		return r
+	old, _ := s.loads[key].(*playlistRead)
+	if old != nil && old.of == of && old.at == of.answers {
+		return old
 	}
-	if r != nil && r.cancel != nil {
-		r.cancel()
+	r := &playlistRead{key: key, of: of, at: of.answers, p: of.value}
+	if old != nil {
+		if old.cancel != nil {
+			old.cancel()
+		}
+		r.then, r.from, r.does = old.then, old.from, old.does
 	}
-	r = &playlistRead{key: key, of: of, at: of.answers, p: of.value}
 	s.loads[key] = r
 	if r.p.More == "" {
-		r.length = total(r.p.Tracks)
+		s.readDone(r, r.p, nil)
 	} else {
 		s.readRest(r)
 	}

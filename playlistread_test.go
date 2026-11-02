@@ -192,6 +192,18 @@ func TestLongPlaylistPlayGivesWay(t *testing.T) {
 	}
 }
 
+// TestLongPlaylistPlayWaitsThroughRefresh plays what Play waited for once
+// a refresh of the page, which reads it again, has it.
+func TestLongPlaylistPlayWaitsThroughRefresh(t *testing.T) {
+	s, tt, _ := longPage(t)
+	click(t, s, tt, "play")
+	head := s.loads["playlist:"+longPlaylistID].(*loaded[media.Playlist])
+	head.value.Tracks, head.value.More = testTracks, ""
+	head.answers++
+	tt.Frame()
+	s.settle(t, func(st player.State) bool { return len(st.Queue) == len(testTracks) && st.Index == 0 && st.Playing })
+}
+
 // TestLongPlaylistPageFails says how many tracks loaded when a page fails
 // after its tries, and loads the rest when asked to try again.
 func TestLongPlaylistPageFails(t *testing.T) {

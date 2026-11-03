@@ -1,0 +1,51 @@
+name: Overlap
+
+# A pull request that conflicts with another open one conflicts with main
+# once the other merges. This check merges the pull request with each of
+# the other open ones, while both are open, so that the one pushed last
+# makes room before either merges. tools/overlap tells how.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  # A merge queue asks every required check of what it merges: there's
+  # nothing to compare then, and the job is skipped.
+  merge_group:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: overlap-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  overlap:
+    name: Merges with the other pull requests
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: Fetch the other open pull requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          THIS: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 1000 --json number,isDraft \
+            --jq ".[] | select(.isDraft | not) | select(.number != $THIS) | .number" > "$RUNNER_TEMP/others"
+          while read -r n; do
+            git fetch -q origin "+refs/pull/$n/head:refs/overlap/$n"
+          done < "$RUNNER_TEMP/others"
+      - name: Merge with each of them
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: |
+          args=()
+          while read -r n; do args+=("#$n=refs/overlap/$n"); done < "$RUNNER_TEMP/others"
+          go run ./tools/overlap -base "$BASE" -head HEAD "${args[@]}" | tee -a "$GITHUB_STEP_SUMMARY"

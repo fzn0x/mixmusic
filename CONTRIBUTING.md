@@ -64,6 +64,14 @@ Many pull requests are open at once, and one that merges shouldn't make the
 others conflict. So a feature lives in files of its own: adding one touches
 those files and a few new ones, not a shared list or a shared struct.
 
+Each pull request branches off main, and only main merges into it. One
+built on another's branch carries the other's changes a second time once
+that one is squashed into main, and conflicts: a pull request that needs
+another waits for it to merge. CI's Overlap check merges each pull request
+with every other open one ([tools/overlap](tools/overlap/main.go)). When it
+fails, the pull request pushed last changes so that the two don't touch the
+same lines, as below, or waits for the other to merge.
+
 - **Settings.** A setting lives in its section's struct in
   `internal/settings`, in that section's file, such as
   `internal/settings/playback.go`, with its default and its clean-up beside

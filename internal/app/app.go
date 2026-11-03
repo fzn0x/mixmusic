@@ -26,6 +26,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/online"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/romaji"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/store"
@@ -74,6 +75,10 @@ type Options struct {
 	// told of, a second when zero: tests shorten it, at once when
 	// negative.
 	ProblemWait time.Duration
+	// RomajiURL is where the dictionary of the readings of kanji, which
+	// romaji downloads, comes from: romaji.DictionaryURL when empty. Tests
+	// give their own.
+	RomajiURL string
 }
 
 // App is MixMusic.
@@ -104,6 +109,7 @@ type App struct {
 	lyrics       *lyrics.Client
 	unison       *lyrics.Unison
 	translations *translations
+	romaji       *romaji.Dictionary
 	addons       *addons.Manager
 	storage      *addons.Storage
 	lyricsMemo   *memo[lyrics.Lyrics]
@@ -275,6 +281,7 @@ func New(opts Options) (*App, error) {
 	a.lyrics = lyrics.New(userAgent)
 	a.unison = lyrics.NewUnison(userAgent)
 	a.translations = newTranslations(filepath.Join(opts.CacheDir, "lyrics-translations"))
+	a.romaji = newRomaji(opts, userAgent)
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
 	a.related = newMemo[[]media.Shelf](100)
 	a.artStore = artwork.NewStore(filepath.Join(opts.CacheDir, "artwork"), artworkLimit)

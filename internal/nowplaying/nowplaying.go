@@ -9,6 +9,7 @@ package nowplaying
 
 import (
 	"errors"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -25,9 +26,17 @@ type Info struct {
 	Title   string
 	Artists []string
 	Album   string
-	// Artwork is the address of an https image of the track, or empty.
-	Artwork  string
-	Duration time.Duration
+	// Artwork is the address of an https image of the track, or empty,
+	// which tells covers apart.
+	Artwork string
+	// Cover is the image at Artwork, as its host sent it, once MixMusic
+	// has it: macOS and Windows show it. Show keeps it, so it mustn't
+	// change after.
+	Cover []byte
+	// CoverFile is the path of a file of Cover, which MPRIS hands the
+	// desktop, as desktops read covers from files: where CoverFiles is set.
+	CoverFile string
+	Duration  time.Duration
 	// Position is where the track was at At.
 	Position time.Duration
 	At       time.Time
@@ -39,11 +48,23 @@ type Info struct {
 	Rate float64
 }
 
+// CoverFiles is set where the system's controls take a cover's file, not
+// its bytes: on Linux, MPRIS hands the desktop its address.
+const CoverFiles = runtime.GOOS == "linux"
+
 // The speeds MixMusic plays at, which the system's controls may ask.
 const (
 	MinRate = 0.5
 	MaxRate = 3
 )
+
+// cover returns the address of the cover Info has, or "" when it has none.
+func (i *Info) cover() string {
+	if len(i.Cover) == 0 {
+		return ""
+	}
+	return i.Artwork
+}
 
 // rate returns the speed the track plays at.
 func (i *Info) rate() float64 {
@@ -92,7 +113,8 @@ func diff(prev, next *Info) change {
 	}
 	var c change
 	c.track = prev.ID != next.ID || prev.Title != next.Title || prev.Album != next.Album ||
-		prev.Artwork != next.Artwork || prev.Duration != next.Duration || !equal(prev.Artists, next.Artists)
+		prev.Artwork != next.Artwork || prev.cover() != next.cover() || prev.CoverFile != next.CoverFile ||
+		prev.Duration != next.Duration || !equal(prev.Artists, next.Artists)
 	c.playing = prev.Playing != next.Playing
 	if !c.track {
 		d := next.Position - prev.position(next.At)

@@ -55,7 +55,7 @@ in
   src = lib.cleanSource ../.;
   # The hash of the Go modules go.sum names: a change of go.sum changes it,
   # and `nix build` then tells the new one.
-  vendorHash = "sha256-Kgn/a+vNes144RQ4ySW/71jSaTf5BYOa132ca7NISow=";
+  vendorHash = "sha256-ZZ0C0+5x6K1J0GVgsyJly2SoxhUyXRSVniEG5cgrg6M=";
 
   subPackages = [ "." ];
   env.CGO_ENABLED = "0";

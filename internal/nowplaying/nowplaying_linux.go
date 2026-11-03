@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"runtime"
 	"strconv"
@@ -575,10 +576,16 @@ func metadata(info *Info) uintptr {
 	if info.Album != "" {
 		entries = append(entries, entry("xesam:album", gVariantNewString(info.Album)))
 	}
-	if info.Artwork != "" {
-		entries = append(entries, entry("mpris:artUrl", gVariantNewString(info.Artwork)))
+	if info.CoverFile != "" {
+		entries = append(entries, entry("mpris:artUrl", gVariantNewString(fileURI(info.CoverFile))))
 	}
 	return array("{sv}", entries)
+}
+
+// fileURI is the file: URI of the file at path, which desktops read the
+// cover from: online or not, they then never download it themselves.
+func fileURI(path string) string {
+	return (&url.URL{Scheme: "file", Path: path}).String()
 }
 
 // trackID is the MPRIS track ID of a track's ID.

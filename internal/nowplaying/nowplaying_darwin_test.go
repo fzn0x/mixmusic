@@ -3,10 +3,6 @@
 package nowplaying
 
 import (
-	"image"
-	"image/png"
-	"net/http"
-	"net/http/httptest"
 	"sync"
 	"testing"
 	"time"
@@ -101,12 +97,6 @@ func invoke(b objc.Block, arg objc.ID) int {
 
 func TestNowPlaying(t *testing.T) {
 	setUp(t)
-	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		png.Encode(w, image.NewRGBA(image.Rect(0, 0, 32, 32)))
-	}))
-	defer srv.Close()
-	artworkClient = srv.Client()
-
 	got := make(chan Request, requests)
 	c, err := Open(func(r Request) { got <- r }, nil)
 	if err != nil {
@@ -118,7 +108,8 @@ func TestNowPlaying(t *testing.T) {
 		Title:    "Song",
 		Artists:  []string{"Ann", "Bo"},
 		Album:    "Album",
-		Artwork:  srv.URL + "/art.png",
+		Artwork:  "https://example.com/art.png",
+		Cover:    testCover(),
 		Duration: 200 * time.Second,
 		Position: 10 * time.Second,
 		At:       time.Now(),
@@ -181,7 +172,7 @@ func TestNowPlaying(t *testing.T) {
 	}
 
 	other := paused
-	other.ID, other.Title, other.Artwork = "yt:2", "Other", ""
+	other.ID, other.Title, other.Artwork, other.Cover = "yt:2", "Other", "", nil
 	c.Show(&other)
 	eventually(t, "Now Playing showing another track", func() bool {
 		s = nowPlaying()
@@ -190,6 +181,10 @@ func TestNowPlaying(t *testing.T) {
 	if s.artwork {
 		t.Error("another track kept the artwork of the one before")
 	}
+	// Its cover comes after it, once MixMusic has it.
+	other.Artwork, other.Cover = "https://example.com/other.png", testCover()
+	c.Show(&other)
+	eventually(t, "Now Playing showing the other track's cover", func() bool { return nowPlaying().artwork })
 
 	c.Show(nil)
 	eventually(t, "Now Playing showing nothing", func() bool {

@@ -203,6 +203,8 @@ type lyricsState struct {
 	// language lyrics translate to, once asked for.
 	system    string
 	languages []string
+	// romaji is what they know of the romaji of Japanese lyrics.
+	romaji romajiView
 }
 
 // lyricsScroll is where a lyrics view scrolled, the line it last scrolled

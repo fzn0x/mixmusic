@@ -22,6 +22,23 @@ belongs to its main thread: what finishes elsewhere comes back through
   take its tracks, and its download, show once the list is whole. The
   queue builds only its entries near the view, as it may hold thousands.
 
+- **The top bar and the rows pinned under it** (`compacthead.go`). The
+  page shown keeps where it scrolled in a `ui.ScrollState`
+  (`pageScroll`), which the top bar, built before the page, reads in the
+  same frame. The heads of playlists, albums, artists
+  (`collectionHead`) and the liked songs (`likedHead`) tell how far down
+  the page their buttons end, as the frame before laid them out; past
+  there, the top bar shows the head small, from the same data: artwork,
+  title, play, shuffle and download, fading in with `AnimateTo`, at once
+  while the computer asks for less motion. Where the bar is narrow, the
+  download goes into its menu. The search and the sort of a list of
+  tracks (`trackTools`) stay pinned under the top bar once the page
+  scrolls past them (`pinRow`): the same element, made absolute at the
+  page's offset over the ground repainted (`groundOn`), so that the box
+  typed in keeps the focus. A search or a sort there shows the list from
+  its start under them, and the page keeps the room for it. Nothing
+  scans a list for this in a frame.
+
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
   MB of pixels (`artwork.go`). An image that couldn't load tries again

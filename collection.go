@@ -15,6 +15,10 @@ import (
 
 // headProps are what the head of an album, a playlist or an artist shows.
 type headProps struct {
+	// title is the collection's, which the top bar shows with its
+	// artwork and its buttons once the page scrolled the head away; it
+	// shows none for a head without.
+	title       string
 	art         []media.Image
 	round       bool
 	source      media.Source
@@ -51,14 +55,20 @@ func texts(ts ...string) []fact {
 	return out
 }
 
-// collectionHead pairs the artwork with the facts and the actions.
+// collectionHead pairs the artwork with the facts and the actions, and
+// tells the top bar of them (headed).
 func (s *shell) collectionHead(c *ui.Context, h headProps) {
 	k := &s.lk
 	size := float32(math.Round(float64(k.cover * 208 / 172)))
 	if s.paneWidth(c) < 720 {
 		size = float32(math.Round(float64(k.cover * 128 / 172)))
 	}
-	ui.Row(c).Gap(24).AlignItems(ui.End).Margin(0, 0, 32).Children(func() {
+	head := ui.Row(c).Gap(24).AlignItems(ui.End).Margin(0, 0, 32)
+	if h.title != "" {
+		s.headed(head, barHead{title: h.title, art: h.art, round: h.round, play: h.play, shuffle: h.shuffle,
+			download: h.download, menu: h.menu})
+	}
+	head.Children(func() {
 		s.cover(c, "head-cover", h.art, size, h.round)
 		ui.Column(c).Grow(1).MinWidth(0).Gap(12).Children(func() {
 			ui.Row(c).Gap(6).Wrap().Children(func() {
@@ -234,7 +244,7 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 			facts = append(facts, fact{text: longDuration(total(a.Tracks))})
 		}
 		d := albumDownload(a)
-		h := headProps{art: a.Artwork, source: a.Source, facts: facts,
+		h := headProps{title: a.Title, art: a.Artwork, source: a.Source, facts: facts,
 			play:     func() { s.p.PlayAll(a.Tracks, false) },
 			shuffle:  func() { s.shuffled(a.Tracks) },
 			download: d,
@@ -317,7 +327,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 				s.deleteYouTubeItem(m, p)
 			}
 		}
-		h := headProps{art: p.Artwork, source: p.Source, facts: facts, description: p.Description, download: d, menu: menu}
+		h := headProps{title: p.Title, art: p.Artwork, source: p.Source, facts: facts, description: p.Description, download: d, menu: menu}
 		if len(tracks) > 0 {
 			h.play = func() { s.whenRead(r, "plays", func(t []media.Track) { s.p.PlayAll(t, false) }) }
 			h.shuffle = func() { s.whenRead(r, "shuffles", s.shuffled) }
@@ -623,7 +633,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 				el.ScrollIntoView()
 			}
 		}
-		h := headProps{art: a.Artwork, round: true, source: a.Source, facts: texts(a.Subtitle), description: a.Description,
+		h := headProps{title: a.Name, art: a.Artwork, round: true, source: a.Source, facts: texts(a.Subtitle), description: a.Description,
 			playLabel: "play top songs",
 			menu: func(m *ui.Menu) {
 				if len(a.TopTracks) > 0 && m.Item("Start radio").Chosen() {

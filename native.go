@@ -216,10 +216,11 @@ type shell struct {
 	refreshTold              bool
 	refreshOff, refreshBusy  bool
 	refreshTip, refreshTipOf string
-	// capScroll scrolls the pages in capture mode, nil otherwise, and
-	// capBound tells whether a page took it in the build.
+	// capScroll scrolls the pages in capture mode, nil otherwise.
 	capScroll *ui.ScrollState
-	capBound  bool
+	// here is what the top bar and the rows pinned under it know of the
+	// page shown: where it scrolled, and its head.
+	here shownPage
 	// Dialogs, and their subjects; naming asks for a name, as a new mix's.
 	// dialogScrolls are where the bodies of the dialogs shown are
 	// scrolled, by their keys.

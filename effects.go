@@ -110,21 +110,43 @@ func themeEffects(th addons.Theme, chosen map[string]string) effects {
 // painted: the frames an animation asks for paint again without building
 // the view.
 func (s *shell) ground(c *ui.Context, root ui.Element) {
+	if paint := s.groundPaint(c); paint != nil {
+		root.Draw(paint)
+	}
+}
+
+// groundOn fills e with the ground as the window shows it where e is, over
+// what scrolls under e: a row pinned over a page shows as the ground
+// around it does.
+func (s *shell) groundOn(c *ui.Context, e ui.Element) {
+	e.Background(s.lk.bg)
+	paint := s.groundPaint(c)
+	if paint == nil {
+		return
+	}
+	w, h := c.Size()
+	window := ui.Rect{W: w, H: h}
+	e.Draw(func(p *ui.Painter, r ui.Rect) { p.Clip(r, 0, func() { paint(p, window) }) })
+}
+
+// groundPaint paints the theme's ground on the window's box, or is nil
+// for a theme of none.
+func (s *shell) groundPaint(c *ui.Context) func(p *ui.Painter, r ui.Rect) {
 	k := &s.lk
 	switch {
 	case k.fx.aurora:
 		tint, accent, drift := k.fx.tint, k.accent, k.fx.drift && !c.Preferences().ReduceMotion
-		root.Draw(func(p *ui.Painter, r ui.Rect) { paintAurora(p, r, tint, accent, drift) })
+		return func(p *ui.Painter, r ui.Rect) { paintAurora(p, r, tint, accent, drift) }
 	case k.fx.petals:
-		root.Draw(paintPetals)
+		return paintPetals
 	case k.fx.wash:
 		t := s.coverTint(c, k.accent, groundTone(k.dark))
-		root.Draw(func(p *ui.Painter, r ui.Rect) {
+		return func(p *ui.Painter, r ui.Rect) {
 			paintWash(p, r, t.color(p.Now()))
 			if t.changing(p.Now()) {
 				p.AnimationFrame()
 			}
-		})
+		}
 	case k.fx.cover:
 		t := s.coverTint(c, k.accent, groundTone(k.dark))
 		// Without a cover, the accent's light is half as strong: the
@@ -133,15 +155,15 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 		if s.artColor == "" {
 			strength = 0.5
 		}
-		root.Draw(func(p *ui.Painter, r ui.Rect) {
+		return func(p *ui.Painter, r ui.Rect) {
 			paintCover(p, r, t.color(p.Now()), accent, strength)
 			if t.changing(p.Now()) {
 				p.AnimationFrame()
 			}
-		})
+		}
 	case k.fx.speedlines || k.fx.screentone:
 		lines, tone, ink, at := k.fx.speedlines, k.fx.screentone, k.text, s.burstAt(c)
-		root.Draw(func(p *ui.Painter, r ui.Rect) {
+		return func(p *ui.Painter, r ui.Rect) {
 			if tone {
 				s.paintScreentone(p, r, ink)
 			}
@@ -152,14 +174,15 @@ func (s *shell) ground(c *ui.Context, root ui.Element) {
 					p.AnimationFrame()
 				}
 			}
-		})
+		}
 	case k.fx.sparkles:
 		// They rise while something plays, and hold still where they are
 		// otherwise, as while the computer asks for less motion.
 		s.rise.set(c.Now(), s.st.Playing && !c.Preferences().ReduceMotion)
 		inks, rise := sparkleInks(k), s.rise
-		root.Draw(func(p *ui.Painter, r ui.Rect) { paintSparkles(p, r, inks, rise) })
+		return func(p *ui.Painter, r ui.Rect) { paintSparkles(p, r, inks, rise) }
 	}
+	return nil
 }
 
 // frosted fills a dialog's panel with the surface, laid over the ground

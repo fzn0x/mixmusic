@@ -95,10 +95,31 @@ func (s *shell) likedSongs(c *ui.Context) {
 			FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640)
 		return
 	}
-	ui.Row(c).Gap(8).Margin(0, 0, 16).Children(func() { s.downloadButton(c, likedDownload(liked)) })
+	s.likedHead(c, liked)
 	view := s.trackTools(c, "liked", "list", liked)
 	s.trackList(c, "liked", view.tracks, trackListOptions{art: true, album: true,
 		empty: "No liked song matches “" + s.searching("liked") + "”."})
+}
+
+// likedHead plays, shuffles and downloads the liked songs, as a
+// collection's head does, and tells the top bar of it (headed).
+func (s *shell) likedHead(c *ui.Context, liked []media.Track) {
+	d := likedDownload(liked)
+	h := barHead{title: "Liked songs", glyph: solidIcons["heart"], download: d,
+		play:    func() { s.p.PlayAll(liked, false) },
+		shuffle: func() { s.shuffled(liked) },
+	}
+	row := ui.Row(c).Gap(8).Wrap().Margin(0, 0, 16)
+	s.headed(row, h)
+	row.Children(func() {
+		if s.button(c, "liked-play", "play", true).Clicked() {
+			h.play()
+		}
+		if s.button(c, "liked-shuffle", "shuffle", false).Clicked() {
+			h.shuffle()
+		}
+		s.downloadButton(c, d)
+	})
 }
 
 // dislikedSongs lists the songs the user dislikes, whose menus take the

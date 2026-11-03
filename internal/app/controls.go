@@ -26,6 +26,9 @@ type controls struct {
 	native bool
 	np     NowPlaying
 	at     time.Time // when np came
+	// covers hands the controls the covers of the artwork store, once
+	// they're reached.
+	covers *controlsCovers
 }
 
 // controlCommands are the player's commands for what the system's
@@ -70,6 +73,7 @@ func (a *App) showControls() {
 		switch {
 		case err == nil:
 			c.c = ctl
+			c.covers = a.newControlsCovers(a.showControls)
 		case !errors.Is(err, nowplaying.ErrUnsupported):
 			log.Printf("mixmusic: the system's media controls: %v", err)
 		}
@@ -77,11 +81,20 @@ func (a *App) showControls() {
 	if c.c == nil {
 		return
 	}
+	c.c.Show(c.shown())
+}
+
+// shown is what the system's controls show: the engine's track, with its
+// cover once the artwork store has it, or nil. c.mu is held.
+func (c *controls) shown() *nowplaying.Info {
 	if !c.native || c.np.Track == nil {
-		c.c.Show(nil)
-		return
+		return nil
 	}
-	c.c.Show(controlsInfo(c.np, c.at))
+	info := controlsInfo(c.np, c.at)
+	if c.covers != nil {
+		info.Cover, info.CoverFile = c.covers.get(info.Artwork)
+	}
+	return info
 }
 
 // controlsInfo is what np shows in the system's controls, reported at at.

@@ -255,7 +255,7 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 
 func (s *shell) playlistPage(c *ui.Context, id string) {
 	key := "playlist:" + id
-	res := fetch(s, key, func(ctx context.Context) (media.Playlist, error) { return s.svc.Catalog.Playlist(ctx, id) })
+	res := fetch(s, key, func(ctx context.Context) (media.Playlist, error) { return s.svc.Catalog.PlaylistStart(ctx, id) })
 	switch {
 	case !res.done:
 		s.pageLoading(c, "playlist")
@@ -265,6 +265,15 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		return
 	}
 	p := res.value
+	// The first page shows at once, and the rest as they come. What takes
+	// the whole playlist waits for it: Play and Shuffle, and the menu's and
+	// the download's, which aren't offered until then.
+	r := s.readOn(key, res)
+	tracks, whole := r.p.Tracks, p
+	whole.Tracks = tracks
+	if r.reading {
+		whole.Tracks = nil
+	}
 	local := p.Source == media.SourceLocal
 	s.pageScroll(c, func() {
 		s.pageHeader(c, p.Title, nil, nil)
@@ -272,19 +281,19 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if local {
 			owner = "your mix"
 		}
-		n := p.TrackCount
+		n := r.p.TrackCount
 		if n == 0 {
-			n = len(p.Tracks)
+			n = len(tracks)
 		}
 		facts := texts(owner, plural(n, "track"))
-		if len(p.Tracks) > 0 {
-			facts = append(facts, fact{text: longDuration(total(p.Tracks))})
+		if !r.reading && r.err == nil && len(tracks) > 0 {
+			facts = append(facts, fact{text: longDuration(r.length)})
 		}
 		importID := p.ID
 		if local {
 			importID = ""
 		}
-		menu := s.collectionMenu(p.Title, p.Tracks, p.URL, p.Source, importID)
+		menu := s.collectionMenu(p.Title, whole.Tracks, p.URL, p.Source, importID)
 		if local {
 			base := menu
 			menu = func(m *ui.Menu) {
@@ -299,7 +308,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 			}
 		}
 		// The download goes before the delete, which ends the menu.
-		d := playlistDownload(p)
+		d := playlistDownload(whole)
 		menu = s.withDownload(menu, d)
 		if p.Deletable && p.Source == media.SourceYouTube {
 			base := menu
@@ -309,9 +318,9 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 			}
 		}
 		h := headProps{art: p.Artwork, source: p.Source, facts: facts, description: p.Description, download: d, menu: menu}
-		if len(p.Tracks) > 0 {
-			h.play = func() { s.p.PlayAll(p.Tracks, false) }
-			h.shuffle = func() { s.shuffled(p.Tracks) }
+		if len(tracks) > 0 {
+			h.play = func() { s.whenRead(r, "plays", func(t []media.Track) { s.p.PlayAll(t, false) }) }
+			h.shuffle = func() { s.whenRead(r, "shuffles", s.shuffled) }
 		}
 		if !local && !p.Editable && s.signedIn(p.Source) {
 			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, "save", "saved", s.keeping[key]
@@ -326,7 +335,8 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if local {
 			noun = "mix"
 		}
-		view := s.trackTools(c, key, noun, p.Tracks)
+		s.readLine(c, r, noun)
+		view := s.trackTools(c, key, noun, tracks)
 		empty := "This playlist is empty."
 		switch {
 		case s.searching(key) != "":
@@ -362,7 +372,11 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 				}
 			}
 		}
-		s.trackList(c, "playlist", view.tracks, o)
+		// A playlist whose first page was empty may have more: the line
+		// above says they load.
+		if len(tracks) > 0 || !r.reading {
+			s.trackList(c, "playlist", view.tracks, o)
+		}
 	})
 	s.mixDialogs(c, key)
 }
@@ -558,7 +572,7 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 // any service can join, and opens it.
 func (s *shell) importPlaylist(id string) {
 	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), wholeWait)
 		defer cancel()
 		p, err := s.svc.Collection.ImportPlaylist(ctx, id)
 		s.update(func() {

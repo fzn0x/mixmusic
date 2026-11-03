@@ -72,6 +72,7 @@
   "mediaKeys": false,
   "showOnDiscord": false,
   "discordAppId": "123456789012345678",
+  "notchPlayer": false,
   "ytdlpPath": "/usr/local/bin/yt-dlp",
   "jsRuntime": "deno",
   "shortcuts": {

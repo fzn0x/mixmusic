@@ -295,14 +295,19 @@ func (s *shell) youtubeLibrary(c *ui.Context) {
 		fetch(s, "youtube:artists", col.YouTubeArtists),
 		func(c *ui.Context) {
 			s.sectionTitle(c, "Liked on YouTube Music")
-			liked := fetch(s, "youtube:liked", col.YouTubeLikedTracks)
+			liked := fetch(s, "youtube:liked", col.YouTubeLiked)
 			switch {
 			case !liked.done:
 				s.loading(c)
 			case liked.err != nil:
 				s.problem(c, liked.err, func() { s.forget("youtube:liked") })
 			default:
-				s.trackList(c, "youtube-liked", liked.value, trackListOptions{art: true, album: true, empty: "No liked songs on YouTube Music."})
+				// The first page shows at once, and the rest as they come.
+				r := s.readOn("youtube:liked", liked)
+				s.readLine(c, r, "list")
+				if len(r.p.Tracks) > 0 || !r.reading {
+					s.trackList(c, "youtube-liked", r.p.Tracks, trackListOptions{art: true, album: true, empty: "No liked songs on YouTube Music."})
+				}
 			}
 		})
 }

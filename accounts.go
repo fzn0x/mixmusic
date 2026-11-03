@@ -37,7 +37,7 @@ const (
 	youtubeForm    = "Sign in to YouTube Music. Log in. Google account. " + youtubeHint + " " + youtubeSession
 
 	youtubeImport       = "Sign in with the session of a browser you signed in to YouTube Music with."
-	youtubeProfile      = "Another profile than the browser's own, by its name or its folder. MixMusic finds those of Zen and Helium in their folders."
+	youtubeProfile      = "Another profile than the browser's own, by its name or its folder. MixMusic finds those of Zen, Helium and the browsers installed as Flatpaks in their folders."
 	youtubeImportHint   = "MixMusic reads the browser's cookies with yt-dlp, keeps YouTube's alone, encrypted on this computer, and deletes the rest at once. Close the browser first: while it's open, it may hold its cookies, or not have saved a new sign-in yet. Recent Chrome on Windows seals its cookies against other programs: use Firefox there, or paste a cookie header."
 	youtubePaste        = "In a tab signed in to music.youtube.com, open the developer tools, and copy the Cookie header of a request to music.youtube.com from the Network panel. The text of a cookies.txt file will do too."
 	youtubePasteHint    = "A cookie header is as good as your password: paste it here alone. YouTube may end a session that goes on in the browser; one from a private window you then close lasts longest."
@@ -47,6 +47,9 @@ const (
 	youtubeChannelAbout = "Brand channels of your account have their own home feed, library and likes."
 	youtubeAccountTitle = "Account and channel"
 	youtubeAccountAbout = "Each Google account of the session, and each of their brand channels, has its own home feed, library and likes."
+	// youtubeUnswitchable follows a brand channel YouTube lists without its
+	// page ID, which can't be chosen.
+	youtubeUnswitchable = "YouTube doesn't let MixMusic switch to this channel"
 
 	lastfmHint = "MixMusic keeps them in your system's credential store, with the connection."
 	lastfmForm = "Create an API account on Last.fm; any name and description will do, and the callback URL can stay empty. " +
@@ -224,7 +227,8 @@ func (s *shell) youtubeCookieSignIn(c *ui.Context, busy bool) {
 			s.alert(c, "MixMusic didn't sign in to YouTube Music", yc.problem, nil).Margin(12, 0)
 		}
 		s.row(c, "Import from a browser", youtubeImport, func() {
-			s.selectOf(c.Key("youtube-browser"), &yc.browser, yc.names).Width(160).Label("Browser")
+			// Wide enough for "Chromium (Flatpak)".
+			s.selectOf(c.Key("youtube-browser"), &yc.browser, yc.names).Width(200).Label("Browser")
 		})
 		s.row(c, "Profile", youtubeProfile, func() {
 			ui.TextInput(c.Key("youtube-profile"), &yc.profile).Placeholder(k.sentence("the browser's own")).Width(260).Label("Profile")
@@ -324,6 +328,9 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 		if accounts && ch.Email != "" {
 			labels[i] += " · " + ch.Email
 		}
+		if ch.Unswitchable {
+			labels[i] += " · " + youtubeUnswitchable
+		}
 		if i == current {
 			chosen = labels[i]
 		}
@@ -340,11 +347,18 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 	}
 	s.row(c, title, about, func() {
 		if s.selectOf(c.Key("channel"), &chosen, labels).Width(260).Label(title).Changed() {
-			if i := slices.Index(labels, chosen); i >= 0 {
+			switch i := slices.Index(labels, chosen); {
+			case i < 0:
+			case list[i].Unswitchable:
+				// It stays listed, and the one used stays chosen.
+				s.notes = append(s.notes, noticeOf(fmt.Errorf("YouTube doesn't let MixMusic switch to %s", list[i].Name)))
+			default:
 				ch := list[i]
 				s.youtubePick = false
+				// The notice names the channel once switched, unless YouTube
+				// Music answered as the account itself, which the app tells.
 				s.account("", "Using YouTube Music as "+ch.Name, func(ctx context.Context) error {
-					_, err := s.svc.Accounts.SetYouTubeChannel(ctx, ch.AuthUser, ch.PageID)
+					_, err := s.svc.Accounts.SetYouTubeChannel(ctx, ch)
 					return err
 				})
 			}

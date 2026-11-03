@@ -31,6 +31,9 @@ func (s *shell) room(w, h float32) float64 {
 	if s.set.SpotifyPlayback == settings.SpotifyPlaybackConnect {
 		width = roomWidthDevices
 	}
+	if s.castShown() {
+		width += roomCast
+	}
 	height := float32(roomHeight + roomPerPage*len(s.plugins.SidebarItems()))
 	return float64(min(w/width, h/height))
 }

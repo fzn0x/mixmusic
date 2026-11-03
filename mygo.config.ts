@@ -40,6 +40,12 @@ export default defineConfig({
     notarize: process.env.NOTARY_KEYCHAIN
       ? { keychainProfile: "mixmusic-notary", keychain: process.env.NOTARY_KEYCHAIN }
       : undefined,
+    // macOS asks the user before MixMusic finds cast devices on the network
+    // and plays on them, with this reason.
+    infoPlist: {
+      NSLocalNetworkUsageDescription: "MixMusic finds the cast devices on your network, such as Chromecasts and Nest speakers, to play on them.",
+      NSBonjourServices: ["_googlecast._tcp"],
+    },
   },
   // The workflow's code signing certificate, whose password is
   // MYGO_WINDOWS_CERTIFICATE_PASSWORD: osslsigncode signs the app, the

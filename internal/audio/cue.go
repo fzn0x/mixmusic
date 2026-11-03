@@ -1,6 +1,10 @@
 package audio
 
-import "time"
+import (
+	"time"
+
+	"github.com/fzn0x/mixmusic/internal/media"
+)
 
 // Cue is how Load and Crossfade start a track, beside its URL. Its zero
 // value starts a track from its start, at its own speed, and Load holds
@@ -17,4 +21,7 @@ type Cue struct {
 	// Speed is the speed the track plays at, from MinSpeed to MaxSpeed, at
 	// its own pitch: 1, or 0, is its own speed.
 	Speed float64
+	// Track is the track, for an output that shows what plays, as a cast
+	// device's screen: the engine plays without it.
+	Track *media.Track
 }

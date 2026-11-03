@@ -313,6 +313,7 @@ func (s *shell) playerSide(c *ui.Context) {
 	if s.iconButton(c, "queue", "queue", "Queue", s.panel == "queue", 18).Clicked() {
 		s.togglePanel("queue")
 	}
+	s.castButton(c)
 	if s.set.SpotifyPlayback == settings.SpotifyPlaybackConnect {
 		s.devicesButton(c)
 	}

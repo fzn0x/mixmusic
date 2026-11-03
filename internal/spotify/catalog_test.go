@@ -111,6 +111,9 @@ func TestPlaylistOwnedReadsItems(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := p.ReadOn(context.Background(), c.PlaylistPage, nil); err != nil {
+		t.Fatal(err)
+	}
 	if !p.Editable || len(p.Tracks) != 2 || p.Tracks[1].ID != "sp:t2" {
 		t.Errorf("playlist = %+v", p)
 	}

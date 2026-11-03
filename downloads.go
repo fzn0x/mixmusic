@@ -262,7 +262,7 @@ func (s *shell) downloadAlbum(id string) {
 
 func (s *shell) downloadPlaylist(id string) {
 	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), wholeWait)
 		defer cancel()
 		p, err := s.svc.Catalog.Playlist(ctx, id)
 		s.update(func() {

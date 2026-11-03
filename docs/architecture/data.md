@@ -20,9 +20,11 @@ and `App.ReloadSettings` applies an edit as Settings applies a change, then
 tells the windows (`App.Watch`). A file with a mistake is told of after a
 second, and kept as `settings.json.broken` if MixMusic quits before it is
 fixed; a `settings.json` that is a link stays one. The
-cache folder holds audio, the covers shown (`artwork/`), matches, how loud
+cache folder holds audio, the covers shown (`artwork/`), on Linux the
+cover the desktop's media controls show (`now-playing/`), matches, how loud
 YouTube measured the tracks played (`loudness.json`), the videos YouTube
-labels as made with AI, for 30 days (`ai-labels.json`), and yt-dlp's cache,
+labels as made with AI, for 30 days (`ai-labels.json`), the dictionary of
+the readings of kanji romaji downloads (`romaji/`), and yt-dlp's cache,
 and the logs folder the log and the crash reports. The downloads are in a
 folder of their own, which the user can move in Settings › Playback
 (`downloadsFolder` in `settings.json`): by default

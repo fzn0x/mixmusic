@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -32,6 +33,9 @@ type cookieBrowser struct {
 	dirs             func(goos, home string, getenv func(string) string) []string
 	// darwin is set for Safari, which is on macOS alone.
 	darwin bool
+	// flatpak is set for a browser installed as a Flatpak, on Linux, which
+	// lists once its folder is there.
+	flatpak bool
 }
 
 var cookieBrowsers = []cookieBrowser{
@@ -84,17 +88,25 @@ var isDir = func(path string) bool {
 // YouTubeBrowsers returns the browsers whose YouTube Music session MixMusic
 // can import on this system.
 func (s *Accounts) YouTubeBrowsers() []YouTubeBrowser {
-	return youtubeBrowsers(runtime.GOOS)
+	home, _ := os.UserHomeDir()
+	return youtubeBrowsers(runtime.GOOS, home)
 }
 
-func youtubeBrowsers(goos string) []YouTubeBrowser {
+// youtubeBrowsers lists the browsers of goos, but the Flatpaks of those not
+// installed as one in home.
+func youtubeBrowsers(goos, home string) []YouTubeBrowser {
 	var list []YouTubeBrowser
-	for _, b := range cookieBrowsers {
-		if !b.darwin || goos == "darwin" {
+	for _, b := range browsersOn(goos) {
+		if !b.flatpak || b.found(goos, home) {
 			list = append(list, YouTubeBrowser{ID: b.id, Name: b.name})
 		}
 	}
 	return list
+}
+
+// found reports whether one of the browser's folders is there.
+func (b cookieBrowser) found(goos, home string) bool {
+	return b.dirs != nil && slices.ContainsFunc(b.dirs(goos, home, os.Getenv), isDir)
 }
 
 // spec returns the browser, with its profile, as yt-dlp's
@@ -106,16 +118,19 @@ func (b cookieBrowser) spec(profile, goos, home string, getenv func(string) stri
 	if b.engine == "safari" {
 		return "safari", nil // which has no profiles
 	}
-	if profile == "" && b.dirs != nil {
-		for _, dir := range b.dirs(goos, home, getenv) {
-			if isDir(dir) {
-				profile = dir
-				break
-			}
-		}
-		if profile == "" {
+	// A Flatpak's profile, by its name, is in its folder, which yt-dlp
+	// doesn't know.
+	if b.dirs != nil && (profile == "" || b.flatpak && !strings.ContainsAny(profile, `/\`)) {
+		dirs := b.dirs(goos, home, getenv)
+		i := slices.IndexFunc(dirs, isDir)
+		if i < 0 {
 			return "", fmt.Errorf("MixMusic didn't find the profiles of %s: give the folder of one", b.name)
 		}
+		dir := dirs[i]
+		if profile != "" {
+			dir = filepath.Join(dir, profile)
+		}
+		profile = dir
 	}
 	spec := b.engine
 	if profile != "" {
@@ -165,16 +180,12 @@ const cookieExportPrefix = "mixmusic-cookies-"
 // folder, or "" for the one the browser uses. Of the browser's cookies,
 // MixMusic keeps those of YouTube alone, as the sign-in window does.
 func (s *Accounts) YouTubeImportCookies(ctx context.Context, browser, profile string) (AccountsStatus, error) {
-	i := -1
-	for j, b := range cookieBrowsers {
-		if b.id == browser && (!b.darwin || runtime.GOOS == "darwin") {
-			i = j
-		}
-	}
+	browsers := browsersOn(runtime.GOOS)
+	i := slices.IndexFunc(browsers, func(b cookieBrowser) bool { return b.id == browser })
 	if i < 0 {
 		return AccountsStatus{}, fmt.Errorf("MixMusic can't import the cookies of %q", browser)
 	}
-	b := cookieBrowsers[i]
+	b := browsers[i]
 	home, _ := os.UserHomeDir()
 	spec, err := b.spec(profile, runtime.GOOS, home, os.Getenv)
 	if err != nil {

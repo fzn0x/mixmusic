@@ -189,12 +189,11 @@ type macControls struct {
 
 	mu    sync.Mutex
 	shown *Info
-	// image is the artwork of the track imageFor, an NSImage retained; the
-	// artwork's handler hands it out until it changes.
+	// image is the cover at the address imageFor, an NSImage retained, or 0
+	// when it didn't decode; the artwork's handler hands it out until it
+	// changes.
 	image    objc.ID
 	imageFor string
-	// fetching is the track whose artwork downloads.
-	fetching string
 }
 
 func open(ask func(Request), run func(func())) (platform, error) {
@@ -260,18 +259,34 @@ func (m *macControls) show(next *Info) {
 		}
 	}
 	m.shown = next
-	if next == nil || next.ID != m.imageFor {
-		m.dropImage()
-	}
-	fetch := next != nil && next.Artwork != "" && m.imageFor == "" && m.fetching != next.ID
-	if fetch {
-		m.fetching = next.ID
-	}
 	m.mu.Unlock()
 	m.run(func() { withPool(m.update) })
-	if fetch {
-		go m.fetchArtwork(next.ID, next.Artwork)
+}
+
+// picture makes the NSImage of the cover of info, unless it has it, on the
+// main thread.
+func (m *macControls) picture(info *Info) {
+	cover := ""
+	if info != nil {
+		cover = info.cover()
 	}
+	m.mu.Lock()
+	have := cover == m.imageFor
+	m.mu.Unlock()
+	if have {
+		return
+	}
+	var image objc.ID
+	if cover != "" {
+		data := info.Cover
+		d := msgDataID(class("NSData"), sel("dataWithBytes:length:"), unsafe.Pointer(&data[0]), uint(len(data)))
+		runtime.KeepAlive(data)
+		image = msgIDID(msgID(class("NSImage"), sel("alloc")), sel("initWithData:"), d)
+	}
+	m.mu.Lock()
+	m.dropImage()
+	m.image, m.imageFor = image, cover
+	m.mu.Unlock()
 }
 
 // dropImage lets go of the artwork; m.mu is held.
@@ -285,10 +300,11 @@ func (m *macControls) dropImage() {
 // update shows what m.shown holds, on the main thread.
 func (m *macControls) update() {
 	m.mu.Lock()
-	info, image := m.shown, m.image
-	if info != nil && m.imageFor != info.ID {
-		image = 0
-	}
+	info := m.shown
+	m.mu.Unlock()
+	m.picture(info)
+	m.mu.Lock()
+	image, cover := m.image, m.imageFor
 	m.mu.Unlock()
 	// MediaPlayer may call the artwork's handler, which takes m.mu, from
 	// here on.
@@ -321,19 +337,20 @@ func (m *macControls) update() {
 	set(keyDefaultRate, nsNumber(1))
 	set(keyMediaType, msgUintID(class("NSNumber"), sel("numberWithUnsignedInteger:"), mpMediaTypeAudio))
 	if image != 0 {
-		set(keyArtwork, m.artwork(info.ID, msgSize(image, sel("size"))))
+		set(keyArtwork, m.artwork(cover, msgSize(image, sel("size"))))
 	}
 	msgSetID(center, sel("setNowPlayingInfo:"), dict)
 	msgSetUint(center, sel("setPlaybackState:"), state)
 }
 
 // artwork returns an autoreleased MPMediaItemArtwork of the image of the
-// track id, whose handler hands out the image while it is that track's.
-func (m *macControls) artwork(id string, size cgSize) objc.ID {
+// cover at the address cover, whose handler hands out the image while it
+// is that cover's.
+func (m *macControls) artwork(cover string, size cgSize) objc.ID {
 	handler := objc.NewBlock(func(objc.Block, cgSize) objc.ID {
 		m.mu.Lock()
 		defer m.mu.Unlock()
-		if m.image == 0 || m.imageFor != id {
+		if m.image == 0 || m.imageFor != cover {
 			return 0
 		}
 		return autorelease(msgID(m.image, sel("retain")))
@@ -341,40 +358,4 @@ func (m *macControls) artwork(id string, size cgSize) objc.ID {
 	defer handler.Release()
 	art := msgArtworkID(msgID(class("MPMediaItemArtwork"), sel("alloc")), sel("initWithBoundsSize:requestHandler:"), size, handler)
 	return autorelease(art)
-}
-
-// fetchArtwork downloads the artwork of the track id, and shows it if the
-// track still shows.
-func (m *macControls) fetchArtwork(id, rawURL string) {
-	data, err := download(rawURL)
-	if err != nil || len(data) == 0 {
-		m.mu.Lock()
-		if m.fetching == id {
-			m.fetching = ""
-		}
-		m.mu.Unlock()
-		return
-	}
-	m.run(func() {
-		withPool(func() {
-			d := msgDataID(class("NSData"), sel("dataWithBytes:length:"), unsafe.Pointer(&data[0]), uint(len(data)))
-			runtime.KeepAlive(data)
-			image := msgIDID(msgID(class("NSImage"), sel("alloc")), sel("initWithData:"), d)
-			m.mu.Lock()
-			if m.fetching == id {
-				m.fetching = ""
-			}
-			if image == 0 || m.shown == nil || m.shown.ID != id {
-				m.mu.Unlock()
-				if image != 0 {
-					release(image)
-				}
-				return
-			}
-			m.dropImage()
-			m.image, m.imageFor = image, id
-			m.mu.Unlock()
-			m.update()
-		})
-	})
 }

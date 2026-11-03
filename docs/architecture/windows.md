@@ -12,6 +12,16 @@ belongs to its main thread: what finishes elsewhere comes back through
   and keeps them when a refresh fails, which one toast tells. Home's own
   tile and shelves read the library as it is, and need no refresh.
 
+- **Long playlists** (`playlistread.go`): a playlist's page, and the
+  songs liked on YouTube Music in the library, show their first page of
+  tracks at once and read the rest beside it, telling how many came, how
+  many could be read when a page failed for good, with a way to try
+  again, and where a list longer than 20,000 was cut. Play and Shuffle
+  take the whole list: pressed while it's read, they wait for it, unless
+  another track started meanwhile. The items of the page's menu that
+  take its tracks, and its download, show once the list is whole. The
+  queue builds only its entries near the view, as it may hold thousands.
+
 - **The top bar and the rows pinned under it** (`compacthead.go`). The
   page shown keeps where it scrolled in a `ui.ScrollState`
   (`pageScroll`), which the top bar, built before the page, reads in the
@@ -28,15 +38,17 @@ belongs to its main thread: what finishes elsewhere comes back through
   typed in keeps the focus. A search or a sort there shows the list from
   its start under them, and the page keeps the room for it. Nothing
   scans a list for this in a frame.
+
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
   MB of pixels (`artwork.go`). An image that couldn't load tries again
   after 1 to 2 seconds, then less often, up to every 2 minutes, and at once
   when another of its host loads; one whose address gives no image waits
-  half an hour. Both windows, the accent and Terminal's tint read the
-  images through `artwork.Store` (`internal/artwork`), which downloads each
-  once, keeps it on disk as it came, up to 256 MB, and logs a host's
-  failures at most once a minute, without the addresses.
+  half an hour. Both windows, the accent, Terminal's tint and the
+  system's media controls read the images through `artwork.Store`
+  (`internal/artwork`), which downloads each once, keeps it on disk as it
+  came, up to 256 MB, and logs a host's failures at most once a minute,
+  without the addresses.
 - **Themes** give their tokens: colours, fonts, radius (`theme.go`), and
   the accent follows the artwork of what plays. A colour file's colours
   replace the theme's, kept readable (`colorfile.go`). The layout design
@@ -48,5 +60,16 @@ belongs to its main thread: what finishes elsewhere comes back through
   artwork. The Material themes make their colours of a seed in HCT
   (`material.go`, `internal/hct`, a port of Material Color Utilities),
   unless a colour file gives them.
+- **Lyrics** light the line sung now, and its words as they are sung when
+  they have times (`lyricswords.go`). Lines of TTML synced word by word
+  keep their words' times (`lyrics.Line.Words`): each span with a begin
+  time is a word, or a syllable, and a line with sung text outside of them
+  has none. The line's text element is clear, and its Draw paints the
+  glyphs of a layout of its own, the same, cut where the song is, the part
+  sung in the accent. The song's time moves on from the position the
+  player last told, at the track's speed, for 1.5 s at most, so the words
+  fill in frames that only paint again; Reduce Motion lights each word
+  whole as it starts. Lines shown in Latin letters in their place light
+  whole.
 - **Deep links** and second launches open their pages in the main window
   (`App.OnNavigate`).

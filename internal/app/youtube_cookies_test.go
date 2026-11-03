@@ -93,9 +93,10 @@ func TestPastedCookies(t *testing.T) {
 }
 
 func TestYouTubeBrowsers(t *testing.T) {
+	home := t.TempDir()
 	names := func(goos string) []string {
 		var n []string
-		for _, b := range youtubeBrowsers(goos) {
+		for _, b := range youtubeBrowsers(goos, home) {
 			n = append(n, b.Name)
 		}
 		return n
@@ -106,6 +107,10 @@ func TestYouTubeBrowsers(t *testing.T) {
 	}
 	if got := names("darwin"); !slices.Equal(got, append(want, "Safari")) {
 		t.Errorf("on macOS: %q", got)
+	}
+	// Without a browser installed as a Flatpak.
+	if got := names("linux"); !slices.Equal(got, want) {
+		t.Errorf("on Linux: %q", got)
 	}
 }
 
@@ -439,7 +444,7 @@ func TestChooseAccountAndChannel(t *testing.T) {
 	}
 
 	band := list[1]
-	if _, err := s.SetYouTubeChannel(ctx, band.AuthUser, band.PageID); err != nil {
+	if _, err := s.SetYouTubeChannel(ctx, band); err != nil {
 		t.Fatal(err)
 	}
 	if r := last.Load(); r.Header.Get("X-Goog-AuthUser") != "1" || r.Header.Get("X-Goog-PageId") != band.PageID {
@@ -458,13 +463,13 @@ func TestChooseAccountAndChannel(t *testing.T) {
 	}
 
 	// A channel that isn't one of the session any more is none of the list.
-	if _, err := s.SetYouTubeChannel(ctx, 1, "333333333333333333333"); err != nil {
+	if _, err := s.SetYouTubeChannel(ctx, youtube.AccountChannel{AuthUser: 1, PageID: "333333333333333333333"}); err != nil {
 		t.Fatal(err)
 	}
 	if list, _ := s.YouTubeChannels(ctx); list[0].Current || list[1].Current {
 		t.Errorf("a channel gone is current: %+v", list)
 	}
-	if _, err := s.SetYouTubeChannel(ctx, -1, ""); err == nil {
+	if _, err := s.SetYouTubeChannel(ctx, youtube.AccountChannel{AuthUser: -1}); err == nil {
 		t.Error("chose an account that can't be")
 	}
 }

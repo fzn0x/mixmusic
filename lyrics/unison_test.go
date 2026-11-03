@@ -63,7 +63,7 @@ func TestUnisonBySong(t *testing.T) {
 		}
 	})
 	l, err := u.Get(context.Background(), song)
-	if err != nil || !l.Synced || len(l.Lines) != 2 || l.Lines[1] != (Line{2500, "Again"}) {
+	if err != nil || !l.Synced || len(l.Lines) != 2 || saidOf(l.Lines)[1] != (said{2500, "Again"}) {
 		t.Fatalf("lyrics = %+v, %v", l, err)
 	}
 

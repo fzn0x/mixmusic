@@ -160,8 +160,8 @@ func renderDesign(t *testing.T, dir string, layout settings.Layout, theme string
 			return out
 		}()}}
 	s.loads["lyrics:spotify:2"] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB", Lines: []lyrics.Line{
-		{TimeMs: 0, Text: "Love, love is a verb"}, {TimeMs: 4000, Text: "Love is a doing word"},
-		{TimeMs: 9000, Text: "Fearless on my breath"}, {TimeMs: 14000, Text: "Gentle impulsion"}}}}
+		{TimeMs: 0, Text: "Stones remember every tide"}, {TimeMs: 4000, Text: "Sand keeps the shape of it"},
+		{TimeMs: 9000, Text: "Quiet as the harbour light"}, {TimeMs: 14000, Text: "Slow wind over the pier"}}}}
 	for i, tr := range tracks {
 		for range len(tracks) - i {
 			if err := s.svc.Collection.RecordPlay(tr); err != nil {

@@ -14,7 +14,7 @@ import (
 // ParseTTML reads lyrics in TTML, the timed text XML that lyrics
 // synchronized word by word, or line by line, come in. Each paragraph
 // (<p>) is a line, sung at its begin time; the words of a line synced word
-// by word are read as its text, and their own times are left out.
+// by word, its spans with times, are read as its text and as its Words.
 // Background vocals (spans of the role x-bg) follow the line's words, in
 // parentheses.
 //
@@ -33,7 +33,9 @@ func ParseTTML(ttml string) (Lyrics, error) {
 		timed, untimed []Line
 		in             bool // in a paragraph
 		begin          string
-		text, bg       strings.Builder
+		end            int // the paragraph's, -1 when it doesn't tell
+		text, bg       lineText
+		words          wordTimes
 		// skip is the depth of an element whose text isn't sung, as a
 		// translation, and bgAt the depth of a background vocal, 0
 		// outside of them; depth counts the elements open in the
@@ -54,12 +56,19 @@ func ParseTTML(ttml string) (Lyrics, error) {
 				if t.Name.Local == "p" {
 					in, depth, skip, bgAt = true, 0, 0, 0
 					begin = attr(t, "begin")
-					text.Reset()
-					bg.Reset()
+					ms, ok := clockTime(begin)
+					if !ok {
+						ms = -1
+					}
+					end = endOf(t, ms)
+					text.reset()
+					bg.reset()
+					words.reset()
 				}
 				continue
 			}
 			depth++
+			words.enter(t)
 			switch role := attr(t, "role"); {
 			case skip > 0:
 				continue
@@ -68,9 +77,9 @@ func ParseTTML(ttml string) (Lyrics, error) {
 				continue
 			case role == "x-bg" && bgAt == 0:
 				bgAt = depth
-				bg.Reset()
+				bg.reset()
 			case t.Name.Local == "br":
-				write(&text, &bg, bgAt, " ")
+				write(&text, &bg, bgAt, " ", words.at())
 			}
 			// A paragraph without a time of its own is sung at its
 			// first word's.
@@ -83,13 +92,15 @@ func ParseTTML(ttml string) (Lyrics, error) {
 			}
 			if depth == 0 { // the paragraph's own end
 				in = false
-				line := Line{Text: collapse(text.String())}
+				said := text.collapsed()
+				line := Line{Text: string(said.runes)}
 				ms, ok := clockTime(begin)
 				if !ok {
 					untimed = append(untimed, line)
 					continue
 				}
 				line.TimeMs = ms
+				line.Words = words.words(said, end)
 				timed = append(timed, line)
 				continue
 			}
@@ -98,17 +109,16 @@ func ParseTTML(ttml string) (Lyrics, error) {
 				skip = 0
 			case bgAt:
 				bgAt = 0
-				if vocal := collapse(bg.String()); vocal != "" {
-					if !strings.HasPrefix(vocal, "(") {
-						vocal = "(" + vocal + ")"
-					}
-					text.WriteString(" " + vocal)
+				if vocal := bg.collapsed(); len(vocal.runes) > 0 {
+					text.write(" ", -1)
+					text.add(vocal.parenthesized())
 				}
 			}
+			words.leave()
 			depth--
 		case xml.CharData:
 			if in && skip == 0 {
-				write(&text, &bg, bgAt, string(t))
+				write(&text, &bg, bgAt, string(t), words.at())
 			}
 		}
 	}
@@ -126,12 +136,13 @@ func ParseTTML(ttml string) (Lyrics, error) {
 // translation or the romanization of a line.
 var unsung = map[string]bool{"x-translation": true, "x-roman": true, "x-transliteration": true}
 
-// write adds s to the line's text, or to its background vocal when in one.
-func write(text, bg *strings.Builder, bgAt int, s string) {
+// write adds s, of the word owner, to the line's text, or to its
+// background vocal when in one.
+func write(text, bg *lineText, bgAt int, s string, owner int) {
 	if bgAt > 0 {
-		bg.WriteString(s)
+		bg.write(s, owner)
 	} else {
-		text.WriteString(s)
+		text.write(s, owner)
 	}
 }
 
@@ -144,10 +155,6 @@ func attr(e xml.StartElement, local string) string {
 	}
 	return ""
 }
-
-// collapse makes each run of white space in s one space, as XML reads
-// text, and trims it.
-func collapse(s string) string { return strings.Join(strings.Fields(s), " ") }
 
 // clockTime reads a time of TTML in milliseconds: a clock time, as
 // "1:02.5" or "00:01:02.500", or an offset with its unit, as "62.5s",

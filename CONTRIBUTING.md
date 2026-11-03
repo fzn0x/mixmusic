@@ -153,6 +153,65 @@ signed with the key whose public half is `updates.publicKey` in
 `MYGO_UPDATER_PRIVATE_KEY` secret, which the workflow signs with. Without it, the
 release has no update files and apps stay on the version they have.
 
+### Signing and Homebrew
+
+The workflow signs and notarizes the macOS app, signs the Windows apps and
+installers, and updates the Homebrew cask, each once its secrets are in the
+repository; without them it says so in a notice and skips that part, and
+the release goes out as before. Some of the macOS secrets without the
+others stop the build. `mygo build` signs, before it makes the update
+archives, so that updates install the signed app too: see the comments of
+[mygo.config.ts](mygo.config.ts) and of the workflow.
+
+| Secret | What it holds |
+|---|---|
+| `MACOS_CERTIFICATE` | the Developer ID Application certificate and its private key, as a `.p12`, in base64 |
+| `MACOS_CERTIFICATE_PASSWORD` | the password of the `.p12` |
+| `APPLE_API_KEY` | an App Store Connect API key, the `AuthKey_<key ID>.p8` file as it is, which notarizes |
+| `APPLE_API_KEY_ID`, `APPLE_API_ISSUER` | its key ID and its issuer ID |
+| `WINDOWS_CERTIFICATE` | a code signing certificate and its private key, as a `.pfx`, in base64 |
+| `WINDOWS_CERTIFICATE_PASSWORD` | its password, if it has one |
+| `HOMEBREW_TAP_TOKEN` | a token that can write to `fzn0x/homebrew-tap` |
+
+What only the maintainer can do, once:
+
+1. **macOS.** In the [Apple Developer Program](https://developer.apple.com/programs/),
+   create a Developer ID Application certificate, and export it with its
+   key from Keychain Access as a `.p12` with a password. In App Store
+   Connect › Users and Access › Integrations, create a team API key with
+   the Developer role. Then:
+
+   ```sh
+   base64 -i developer-id.p12 | gh secret set MACOS_CERTIFICATE
+   gh secret set MACOS_CERTIFICATE_PASSWORD
+   gh secret set APPLE_API_KEY < AuthKey_XXXXXXXXXX.p8
+   gh secret set APPLE_API_KEY_ID
+   gh secret set APPLE_API_ISSUER
+   ```
+2. **Windows.** Get a code signing certificate that comes as a `.pfx`,
+   then:
+
+   ```sh
+   base64 -w0 code-signing.pfx | gh secret set WINDOWS_CERTIFICATE
+   gh secret set WINDOWS_CERTIFICATE_PASSWORD
+   ```
+
+   Most certificates sold today keep their key on a hardware token or in a
+   signing service, and never come as a `.pfx`: those sign with MyGo's
+   `windows.signCommand` instead, which takes a step of its own. SmartScreen
+   may still warn about a new certificate until it has a reputation.
+3. **Homebrew.** Create the public repository `fzn0x/homebrew-tap`, and a
+   fine-grained personal access token for it alone with Contents: Read and
+   write, then `gh secret set HOMEBREW_TAP_TOKEN`. The next release writes
+   `Casks/mixmusic.rb` there, for `brew install --cask fzn0x/tap/mixmusic`.
+
+The first signed release: check on a Mac and on Windows that it opens
+without a warning, and that `brew install`, `brew upgrade` and
+`brew uninstall` work. Then take "not notarized yet" and "not signed yet"
+out of the README's first launch, docs/troubleshooting.md and the
+website, and "once its tap is up" out of the README's Homebrew line. The
+release notes and the cask's caveats leave them out by themselves.
+
 ## The website
 
 The [website](site/templates/index.html) and the docs' pages are built with

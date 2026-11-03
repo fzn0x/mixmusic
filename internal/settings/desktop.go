@@ -33,6 +33,10 @@ type Desktop struct {
 	// DiscordAppID is the ID of the user's own Discord application, which
 	// DiscordPresence shows as; "" is MixMusic's.
 	DiscordAppID string `json:"discordAppId"`
+	// NotchPlayer shows what plays around the camera housing of a
+	// MacBook's screen, and opens a player there (#46). It is on at
+	// first, and does nothing on other screens and systems.
+	NotchPlayer bool `json:"notchPlayer"`
 }
 
 // defaultDesktop is how a new install fits in the desktop.
@@ -42,6 +46,7 @@ func defaultDesktop() Desktop {
 	d.ShowInTitle = true
 	d.MediaKeys = true
 	d.DiscordPresence = true
+	d.NotchPlayer = true
 	return d
 }
 

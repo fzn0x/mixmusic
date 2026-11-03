@@ -30,7 +30,9 @@
 
       # The tools releases are built and published with, at the versions
       # flake.lock pins: Go, Bun for `mygo build`, NSIS for the Windows
-      # installers, and GoReleaser; and Zola, which builds the website.
+      # installers, osslsigncode, which signs the Windows apps when
+      # release.yml has a certificate, and GoReleaser; and Zola, which
+      # builds the website.
       # release.yml, ci.yml and pages.yml run in it, as `nix develop` does
       # here.
       devShells = each systems (pkgs: {
@@ -47,6 +49,7 @@
             ]
             ++ lib.optionals stdenv.hostPlatform.isLinux [
               nsis
+              osslsigncode
               binutils
             ];
         };

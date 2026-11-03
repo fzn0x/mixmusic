@@ -13,6 +13,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/audio/output"
 	"github.com/fzn0x/mixmusic/internal/hct"
+	"github.com/fzn0x/mixmusic/internal/romaji"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/tools"
@@ -103,6 +104,8 @@ func (s *System) Notices() []Notice {
 		{Name: "SharpJaad, which decodes AAC audio", Text: aac.License},
 		{Name: "Chromium's Web Audio, which shapes the sound", Text: audio.License},
 		{Name: "Material Color Utilities, which make the Material themes' colours", Text: hct.License},
+		{Name: "kagome, which reads the kanji of Japanese lyrics for their romaji", Text: romaji.License},
+		{Name: "The IPA dictionary (mecab-ipadic), which romaji downloads the first time it's turned on", Text: romaji.DictionaryNotice},
 	}
 }
 

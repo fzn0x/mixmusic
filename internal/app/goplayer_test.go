@@ -3,6 +3,7 @@ package app
 import (
 	"math"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -36,16 +37,48 @@ func newQuietApp(t *testing.T, set func(o *Options)) *App {
 		t.Fatal(err)
 	}
 	stream := &quietStream{}
-	p := player.New(offlineServices{playerServices{a}}, stream, connectDevice{a}, player.Saved{})
+	svc := endingServices{offlineServices{playerServices{a}}, &plays{}}
+	p := player.New(svc, stream, connectDevice{a}, player.Saved{})
 	stream.p.Store(p)
 	a.goPlayer.Store(p)
 	// The player writes the queue beside its goroutine, which Close doesn't
-	// wait for: Flush does, before the folder goes.
+	// wait for: Flush does, before the folder goes. It counts plays beside
+	// it too, which neither waits for: the end does.
 	t.Cleanup(func() {
 		p.Close()
 		p.Flush()
+		svc.plays.end()
 	})
 	return a
+}
+
+// endingServices are offlineServices whose plays stop being counted as the
+// test ends. A track of no length counts as it starts, and a play counted
+// as the test's folder goes would write the library into it.
+type endingServices struct {
+	offlineServices
+	plays *plays
+}
+
+func (s endingServices) RecordPlay(t media.Track) {
+	s.plays.mu.Lock()
+	defer s.plays.mu.Unlock()
+	if !s.plays.ended {
+		s.offlineServices.RecordPlay(t)
+	}
+}
+
+// plays orders the counting of plays before the end of a test.
+type plays struct {
+	mu    sync.Mutex
+	ended bool
+}
+
+// end waits for a play being counted, and keeps the ones after from being.
+func (p *plays) end() {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.ended = true
 }
 
 // waitPlayer waits for the player's state to come to what ok wants.

@@ -52,6 +52,11 @@ type colorFile struct {
 	st     ColorFileStatus
 	// raw is the content of the file as last read whole.
 	raw []byte
+	// reading holds one read of the file at a time, from the read to what
+	// it sets, so that a read that began before the file changed never
+	// lands after one that began since: the watch's and Reload's run at
+	// once.
+	reading sync.Mutex
 	// cancel stops the watch, nil while none was started; running counts
 	// the goroutines that read the file.
 	cancel  context.CancelFunc
@@ -197,6 +202,9 @@ func (a *App) watchColorFile(ctx context.Context, gen int, s settings.Settings) 
 // doesn't read whole is read again a moment later: it may be being
 // written. A file that still doesn't keeps the colours read last.
 func (a *App) readColorFile(ctx context.Context, gen int, path string, retry bool) bool {
+	f := &a.colorFile
+	f.reading.Lock()
+	defer f.reading.Unlock()
 	colors, raw, err := readColors(path)
 	for i := 0; retry && i < colorFileTries && err != nil && !errors.Is(err, fs.ErrNotExist); i++ {
 		if !sleep(ctx, colorFileRetry) {
@@ -204,7 +212,6 @@ func (a *App) readColorFile(ctx context.Context, gen int, path string, retry boo
 		}
 		colors, raw, err = readColors(path)
 	}
-	f := &a.colorFile
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	if f.gen != gen {

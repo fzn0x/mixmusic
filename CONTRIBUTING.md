@@ -82,7 +82,14 @@ those files and a few new ones, not a shared list or a shared struct.
 - **Tests.** A feature's tests go in a test file of their own, named after
   the feature, such as `speed_test.go`, not at the end of a shared one.
 - **Docs.** Each part's docs are a file of their own in
-  [docs/architecture](docs/architecture/README.md).
+  [docs/architecture](docs/architecture/README.md), which nothing lists by
+  hand. A feature that is a part of its own, such as podcasts, gets a new
+  file there; one that adds to a part goes in that part's file, beside
+  what it's nearest to.
+- **Beside, not at the end.** Where a change has to add to something
+  shared, such as a field of `app.Options`, a check of a condition or an
+  item of a list, it goes beside the ones it's nearest to. The end, and
+  the top, are where every other change adds too.
 - **The changelog.** A change people will notice adds a file of its own to
   changelog.d, as [Commits](#commits) tells.
 - **Small files.** Keep files small, and name them after what they hold.

@@ -18,17 +18,23 @@ func TestDefaultIsClean(t *testing.T) {
 
 func TestCleanClampsAndRepairs(t *testing.T) {
 	s := Settings{
-		Theme:           "../../etc",
-		Accent:          "red; background: url(x)",
-		FontScale:       5,
-		SpotifyPlayback: "nonsense",
-		Crossfade:       60,
-		Volume:          -1,
-		Equalizer:       Equalizer{Gains: []float64{99, -99}},
-		JSRuntime:       "python",
-		EnabledPlugins:  []string{"sleep-timer", "sleep-timer", "Bad ID", "../x"},
-		RegistryURL:     "http://insecure.example",
-		YouTubeChannel:  "1234; x",
+		Appearance: Appearance{
+			Theme:     "../../etc",
+			Accent:    "red; background: url(x)",
+			FontScale: 5,
+		},
+		Playback: Playback{
+			SpotifyPlayback: "nonsense",
+			Crossfade:       60,
+			Volume:          -1,
+			Equalizer:       Equalizer{Gains: []float64{99, -99}},
+		},
+		Tools: Tools{JSRuntime: "python"},
+		Addons: Addons{
+			EnabledPlugins: []string{"sleep-timer", "sleep-timer", "Bad ID", "../x"},
+			RegistryURL:    "http://insecure.example",
+		},
+		Accounts: Accounts{YouTubeChannel: "1234; x"},
 	}.Clean()
 	if s.Theme != "mix" || s.Accent != "" || s.FontScale != 1 || s.SpotifyPlayback != Default().SpotifyPlayback {
 		t.Errorf("appearance and playback not repaired: %+v", s)
@@ -42,7 +48,7 @@ func TestCleanClampsAndRepairs(t *testing.T) {
 	if s.YouTubeChannel != "" {
 		t.Errorf("a channel that is not a page ID was kept: %q", s.YouTubeChannel)
 	}
-	if c := (Settings{YouTubeChannel: " 112233445566778899 "}).Clean(); c.YouTubeChannel != "112233445566778899" {
+	if c := (Settings{Accounts: Accounts{YouTubeChannel: " 112233445566778899 "}}).Clean(); c.YouTubeChannel != "112233445566778899" {
 		t.Errorf("a page ID was not kept: %q", c.YouTubeChannel)
 	}
 	if !Default().YouTubeHistory {
@@ -135,7 +141,7 @@ func TestDefaultSpotifyPlayback(t *testing.T) {
 			t.Errorf("defaultSpotifyPlayback(%q) = %q, want %q", goos, got, want)
 		}
 	}
-	if c := (Settings{SpotifyPlayback: SpotifyPlaybackHere}).Clean(); c.SpotifyPlayback != SpotifyPlaybackHere {
+	if c := (Settings{Playback: Playback{SpotifyPlayback: SpotifyPlaybackHere}}).Clean(); c.SpotifyPlayback != SpotifyPlaybackHere {
 		t.Errorf("Clean dropped playback here: %q", c.SpotifyPlayback)
 	}
 }
@@ -160,11 +166,11 @@ func TestCleanCopies(t *testing.T) {
 // TestRegistryURL moves settings off the web interface's registry, which
 // earlier versions kept as theirs.
 func TestRegistryURL(t *testing.T) {
-	if got := (Settings{RegistryURL: WebRegistryURL}).Clean().RegistryURL; got != DefaultRegistryURL {
+	if got := (Settings{Addons: Addons{RegistryURL: WebRegistryURL}}).Clean().RegistryURL; got != DefaultRegistryURL {
 		t.Errorf("the web interface's registry became %q", got)
 	}
 	const own = "https://example.com/my-registry.json"
-	if got := (Settings{RegistryURL: own}).Clean().RegistryURL; got != own {
+	if got := (Settings{Addons: Addons{RegistryURL: own}}).Clean().RegistryURL; got != own {
 		t.Errorf("a registry of the user's became %q", got)
 	}
 }
@@ -197,7 +203,7 @@ func TestDiscordPresence(t *testing.T) {
 			t.Errorf("%s shows on Discord %v, not %v", c.file, s.DiscordPresence, c.want)
 		}
 	}
-	if got := (Settings{DiscordAppID: own}).DiscordApp(); got != own {
+	if got := (Settings{Desktop: Desktop{DiscordAppID: own}}).DiscordApp(); got != own {
 		t.Errorf("the user's application became %q", got)
 	}
 }
@@ -220,7 +226,7 @@ func TestShowInTitle(t *testing.T) {
 // keeps the user's choice.
 func TestCleanPanel(t *testing.T) {
 	for in, want := range map[string]string{"": "queue", "bogus": "queue", "queue": "queue", "lyrics": "lyrics", "none": "none"} {
-		if got := (Settings{Panel: in}).Clean().Panel; got != want {
+		if got := (Settings{Appearance: Appearance{Panel: in}}).Clean().Panel; got != want {
 			t.Errorf("Clean of the panel %q gives %q, not %q", in, got, want)
 		}
 	}
@@ -294,7 +300,7 @@ func TestSkipDisliked(t *testing.T) {
 func TestCleanLayout(t *testing.T) {
 	for in, want := range map[Layout]Layout{"": LayoutBlend, "bogus": LayoutBlend, LayoutBlend: LayoutBlend,
 		LayoutExpressive: LayoutExpressive, LayoutCrate: LayoutCrate, LayoutTiles: LayoutTiles} {
-		if got := (Settings{Layout: in}).Clean().Layout; got != want {
+		if got := (Settings{Appearance: Appearance{Layout: in}}).Clean().Layout; got != want {
 			t.Errorf("Clean of layout %q = %q, want %q", in, got, want)
 		}
 	}
@@ -308,11 +314,11 @@ func TestColorSource(t *testing.T) {
 		t.Errorf("a new install reads a colour file: %q %q", d.ColorSource, d.ColorFile)
 	}
 	for _, source := range []ColorSource{ColorsTheme, ColorsPywal, ColorsMatugen, ColorsFile} {
-		if got := (Settings{ColorSource: source}).Clean().ColorSource; got != source {
+		if got := (Settings{Appearance: Appearance{ColorSource: source}}).Clean().ColorSource; got != source {
 			t.Errorf("Clean made %q %q", source, got)
 		}
 	}
-	if got := (Settings{ColorSource: "wallust"}).Clean().ColorSource; got != ColorsTheme {
+	if got := (Settings{Appearance: Appearance{ColorSource: "wallust"}}).Clean().ColorSource; got != ColorsTheme {
 		t.Errorf("an unknown source stayed: %q", got)
 	}
 	for in, want := range map[string]string{
@@ -325,7 +331,7 @@ func TestColorSource(t *testing.T) {
 		`/home/me/"quoted" name.json`:    `/home/me/"quoted" name.json`,
 		"":                               "",
 	} {
-		if got := (Settings{ColorFile: in}).Clean().ColorFile; got != want {
+		if got := (Settings{Appearance: Appearance{ColorFile: in}}).Clean().ColorFile; got != want {
 			t.Errorf("Clean made the colour file %q %q, want %q", in, got, want)
 		}
 	}

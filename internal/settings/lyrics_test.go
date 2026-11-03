@@ -10,9 +10,11 @@ import (
 // in, and leaves out what isn't one.
 func TestLyricsTranslation(t *testing.T) {
 	s := Settings{
-		LyricsTranslate:   []string{"ja", "", "ja", "zh-Hant", "Japanese", "x"},
-		LyricsRomanize:    map[string]string{"ja": RomanizeOnly, "ko": RomanizeUnder, "ru": "sideways", "<b>": RomanizeOnly},
-		LyricsTranslateTo: "zh-Hant",
+		Lyrics: Lyrics{
+			LyricsTranslate: []string{"ja", "", "ja", "zh-Hant", "Japanese", "x"},
+			LyricsRomanize:  map[string]string{"ja": RomanizeOnly, "ko": RomanizeUnder, "ru": "sideways", "<b>": RomanizeOnly},
+		},
+		Translation: Translation{LyricsTranslateTo: "zh-Hant"},
 	}.Clean()
 	if strings.Join(s.LyricsTranslate, ",") != "ja,,zh-Hant" {
 		t.Errorf("translate = %q", s.LyricsTranslate)
@@ -24,7 +26,7 @@ func TestLyricsTranslation(t *testing.T) {
 		t.Errorf("translate to %q", s.LyricsTranslateTo)
 	}
 	for _, to := range []string{"english", "EN", "en-us", "../x"} {
-		if got := (Settings{LyricsTranslateTo: to}).Clean().LyricsTranslateTo; got != "" {
+		if got := (Settings{Translation: Translation{LyricsTranslateTo: to}}).Clean().LyricsTranslateTo; got != "" {
 			t.Errorf("translate to %q kept as %q", to, got)
 		}
 	}

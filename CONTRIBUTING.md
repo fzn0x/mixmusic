@@ -73,23 +73,34 @@ fails, the pull request pushed last changes so that the two don't touch the
 same lines, as below, or waits for the other to merge.
 
 - **Settings.** A setting lives in its section's struct in
-  `internal/settings`, in that section's file, such as
-  `internal/settings/playback.go`, with its default and its clean-up beside
-  it. Each field has a doc comment of its own, so a new field never makes
-  gofmt re-align the ones beside it. `settings.json` stays flat: the
-  sections are embedded. A literal names the section, as in
+  `internal/settings`, in that section's file, such as `Playback` in
+  `internal/settings/playback.go`, with its default in `defaultPlayback()`
+  and its clean-up in the section's `clean` beside it. Each field has a doc
+  comment of its own, so a new field never makes gofmt re-align the ones
+  beside it. `settings.json` stays flat: the sections are embedded. A
+  literal names the section, as in
   `settings.Settings{Playback: settings.Playback{Volume: 1}}`: editors'
   gopls doesn't read a section's field set on `Settings` itself, which
-  Go 1.27 compiles, and a test keeps it so.
-- **The settings page.** A setting's row lives in its feature's file, and
-  registers itself from `init()` with an order number, spaced by 10.
-  Nothing edits a central list or switch.
+  Go 1.27 compiles, and a test keeps it so. Add the key to
+  `testdata/full.json` with a value that isn't its default, and rewrite
+  `testdata/default.json` with
+  `go test ./internal/settings -run TestDefaultFile -update`.
+- **The settings page.** A setting's row lives in its feature's file, as
+  `settings_surround.go` does, and registers itself from `init()` with
+  `addSettings(place, order, build)`: a place is a tab, as `"playback"`,
+  or a group, as `soundRows`. Orders go up in tens, so a new row slots in
+  between. Two rows at the same order stop MixMusic at start-up, so the
+  tests catch it; the second to merge takes another number. Nothing edits
+  a central list or switch.
 - **Options, not arguments.** When a function or an interface method would
   take one more argument, give it an options struct whose zero value keeps
-  what it does today, and add a field. Don't add bool or positional
-  arguments to interfaces that tests fake.
+  what it does today, and add a field, as `audio.Cue` does for how a track
+  starts. Don't add bool or positional arguments to interfaces that tests
+  fake.
 - **Test fakes.** Fakes embed the do-nothing doubles of
-  `internal/player/playertest`, and override only what the test needs.
+  `internal/player/playertest` (`Services`, `Stream` and `Device`), and
+  override only what the test needs. A new method on one of the player's
+  interfaces goes there too, doing nothing.
 - **Tests.** A feature's tests go in a test file of their own, named after
   the feature, such as `speed_test.go`, not at the end of a shared one.
 - **Docs.** Each part's docs are a file of their own in

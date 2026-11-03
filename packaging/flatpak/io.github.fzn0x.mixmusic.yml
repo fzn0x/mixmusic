@@ -44,6 +44,20 @@ finish-args:
   - --filesystem=xdg-run/app/com.discordapp.Discord:create
   - --filesystem=xdg-run/app/com.discordapp.DiscordCanary:create
   - --filesystem=xdg-run/app/dev.vencord.Vesktop:create
+  # The profiles of the browsers installed from Flathub, read-only, which
+  # Settings › Accounts imports a YouTube Music sign-in from: each keeps
+  # them in its own folder of ~/.var/app, which the sandbox hides. These
+  # are the profiles alone, not the rest of the browsers' folders. Firefox
+  # makes new ones in its config folder, since Firefox 147, unless its
+  # .mozilla has some; the browsers made from Chromium keep the key of
+  # their cookies in the keyring, which org.freedesktop.secrets reaches.
+  - --filesystem=~/.var/app/org.mozilla.firefox/.mozilla/firefox:ro
+  - --filesystem=~/.var/app/org.mozilla.firefox/config/mozilla/firefox:ro
+  - --filesystem=~/.var/app/com.google.Chrome/config/google-chrome:ro
+  - --filesystem=~/.var/app/org.chromium.Chromium/config/chromium:ro
+  - --filesystem=~/.var/app/com.microsoft.Edge/config/microsoft-edge:ro
+  - --filesystem=~/.var/app/com.brave.Browser/config/BraveSoftware/Brave-Browser:ro
+  - --filesystem=~/.var/app/app.zen_browser.zen/.zen:ro
 modules:
   # The tray icon's library, of Flathub's shared modules, a git submodule
   # at the commit they are taken from.

@@ -148,8 +148,10 @@ func newTestShellWith(t testing.TB, set func(o *app.Options), svc func(a *app.Ap
 	if err != nil {
 		t.Fatal(err)
 	}
-	// The covers' downloads end before the folder goes.
-	t.Cleanup(a.Services().System.Artwork().Close)
+	// The downloads and the covers' end, and what waits to be saved, such
+	// as the index of the downloads and where episodes were left, is saved
+	// after the player closed and before the folder goes.
+	t.Cleanup(a.Close)
 	stream := &testStream{}
 	p := player.New(svc(a), stream, playertest.Device{}, saved)
 	stream.mu.Lock()

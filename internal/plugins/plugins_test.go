@@ -103,6 +103,9 @@ func newTestHost(t *testing.T) *testHost {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// What waits to be saved is saved after the host and the player closed,
+	// before the folder goes.
+	t.Cleanup(a.Close)
 	stream := &testStream{}
 	p := player.New(testServices{}, stream, playertest.Device{}, player.Saved{})
 	stream.mu.Lock()

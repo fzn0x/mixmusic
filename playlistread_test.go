@@ -101,13 +101,15 @@ func (f *slowPages) let(t *testing.T, err error) {
 	}
 }
 
-// page lets the next page come, and draws the page once it took it.
+// page lets the next page come, and draws the page once it took it. The
+// last page and the end of the reading reach the page apart, so after the
+// last it waits for the end too.
 func (f *slowPages) page(t *testing.T, s *shell, tt *ui.Tester) {
 	t.Helper()
 	r := f.reading(s)
 	n := len(r.p.Tracks)
 	f.let(t, nil)
-	waitFor(t, s, func() bool { return len(r.p.Tracks) > n || !r.reading })
+	waitFor(t, s, func() bool { return len(r.p.Tracks) > n && r.p.More != "" || !r.reading })
 	tt.Frame()
 }
 

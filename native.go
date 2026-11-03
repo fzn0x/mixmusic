@@ -322,6 +322,9 @@ type shell struct {
 	movingDownloads     bool
 	moveDone, moveTotal int64
 
+	// podcasts is what the podcasts' pages keep between frames.
+	podcasts podcastPages
+
 	// main is set in the main window, which alone tells of settings.json.
 	// file is settings.json as refresh read it last, toldFile the last of
 	// its notices the window told or let go, and fileNotice the one the

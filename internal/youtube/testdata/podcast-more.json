@@ -1,0 +1,172 @@
+{
+ "continuationContents": {
+  "musicShelfContinuation": {
+   "contents": [
+    {
+     "musicMultiRowListItemRenderer": {
+      "thumbnail": {
+       "musicThumbnailRenderer": {
+        "thumbnail": {
+         "thumbnails": [
+          {
+           "url": "https://i.ytimg.com/vi/qGb7hYMlA3o/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3mN0M2OkUhKlzYXzSYP1JgkzVaYgw",
+           "width": 400,
+           "height": 225
+          },
+          {
+           "url": "https://i.ytimg.com/vi/qGb7hYMlA3o/hq720.jpg?sqp=-oaymwEKCKAGEMIDIABIWg&rs=AMzJL3nk7_xY6sqS-fA9gsukXddTioCpkg",
+           "width": 800,
+           "height": 450
+          },
+          {
+           "url": "https://i.ytimg.com/vi/qGb7hYMlA3o/hq720.jpg?sqp=-oaymwEKCNUGEN8DIABIWg&rs=AMzJL3mfowJC--ww3Rl1IoeTO7c4aEIFLw",
+           "width": 853,
+           "height": 479
+          }
+         ]
+        }
+       }
+      },
+      "onTap": {
+       "watchEndpoint": {
+        "videoId": "qGb7hYMlA3o",
+        "watchEndpointMusicSupportedConfigs": {
+         "watchEndpointMusicConfig": {
+          "musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+         }
+        }
+       }
+      },
+      "title": {
+       "runs": [
+        {
+         "text": "Defining Healthy Masculinity & How to Build It | Terry Real",
+         "navigationEndpoint": {
+          "browseEndpoint": {
+           "browseId": "MPEDqGb7hYMlA3o",
+           "browseEndpointContextSupportedConfigs": {
+            "browseEndpointContextMusicConfig": {
+             "pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+            }
+           }
+          }
+         }
+        }
+       ]
+      },
+      "subtitle": {
+       "runs": [
+        {
+         "text": "243K views"
+        },
+        {
+         "text": " • "
+        },
+        {
+         "text": "Dec 29, 2025"
+        }
+       ]
+      },
+      "playbackProgress": {
+       "musicPlaybackProgressRenderer": {
+        "playbackProgressPercentage": 0,
+        "durationText": {
+         "runs": [
+          {
+           "text": " • "
+          },
+          {
+           "text": "2 hr 50 min"
+          }
+         ]
+        }
+       }
+      }
+     }
+    },
+    {
+     "musicMultiRowListItemRenderer": {
+      "thumbnail": {
+       "musicThumbnailRenderer": {
+        "thumbnail": {
+         "thumbnails": [
+          {
+           "url": "https://i.ytimg.com/vi/fYhY-vC000A/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3kKPhDvetQKXJQAI_4-Iac9Cq8eCw",
+           "width": 400,
+           "height": 225
+          },
+          {
+           "url": "https://i.ytimg.com/vi/fYhY-vC000A/hq720.jpg?sqp=-oaymwEKCKAGEMIDIABIWg&rs=AMzJL3m5EltzeLzLfIDiWBIVw3wEQmmJ8w",
+           "width": 800,
+           "height": 450
+          },
+          {
+           "url": "https://i.ytimg.com/vi/fYhY-vC000A/hq720.jpg?sqp=-oaymwEKCNUGEN8DIABIWg&rs=AMzJL3mylljTlaOSAXo18Xizt1bcQD041A",
+           "width": 853,
+           "height": 479
+          }
+         ]
+        }
+       }
+      },
+      "onTap": {
+       "watchEndpoint": {
+        "videoId": "fYhY-vC000A",
+        "watchEndpointMusicSupportedConfigs": {
+         "watchEndpointMusicConfig": {
+          "musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+         }
+        }
+       }
+      },
+      "title": {
+       "runs": [
+        {
+         "text": "Essentials: How to Optimize Your Hormones for Health & Vitality | Dr. Kyle Gillett",
+         "navigationEndpoint": {
+          "browseEndpoint": {
+           "browseId": "MPEDfYhY-vC000A",
+           "browseEndpointContextSupportedConfigs": {
+            "browseEndpointContextMusicConfig": {
+             "pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+            }
+           }
+          }
+         }
+        }
+       ]
+      },
+      "subtitle": {
+       "runs": [
+        {
+         "text": "107K views"
+        },
+        {
+         "text": " • "
+        },
+        {
+         "text": "Dec 25, 2025"
+        }
+       ]
+      },
+      "playbackProgress": {
+       "musicPlaybackProgressRenderer": {
+        "playbackProgressPercentage": 0,
+        "durationText": {
+         "runs": [
+          {
+           "text": " • "
+          },
+          {
+           "text": "37 min"
+          }
+         ]
+        }
+       }
+      }
+     }
+    }
+   ]
+  }
+ }
+}

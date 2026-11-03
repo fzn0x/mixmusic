@@ -1,0 +1,363 @@
+{
+ "contents": {
+  "twoColumnBrowseResultsRenderer": {
+   "tabs": [
+    {
+     "tabRenderer": {
+      "content": {
+       "sectionListRenderer": {
+        "contents": [
+         {
+          "musicResponsiveHeaderRenderer": {
+           "title": {
+            "runs": [
+             {
+              "text": "Huberman Lab"
+             }
+            ]
+           },
+           "straplineTextOne": {
+            "runs": [
+             {
+              "text": "Andrew Huberman",
+              "navigationEndpoint": {
+               "browseEndpoint": {
+                "browseId": "UC2D2CMWXMOVWx7giW1n3LIg",
+                "browseEndpointContextSupportedConfigs": {
+                 "browseEndpointContextMusicConfig": {
+                  "pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
+                 }
+                }
+               }
+              }
+             }
+            ]
+           },
+           "thumbnail": {
+            "musicThumbnailRenderer": {
+             "thumbnail": {
+              "thumbnails": [
+               {
+                "url": "https://i.ytimg.com/pl_c/PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW/studio_square_thumbnail.jpg?sqp=COSKpNcG-oaymwEICDwQPCAASFqi85f_AwYIkfODoAY&rs=AMzJL3m_1iTc03krb_6GE3eYOlWNDkPXZw",
+                "width": 60,
+                "height": 60
+               },
+               {
+                "url": "https://i.ytimg.com/pl_c/PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW/studio_square_thumbnail.jpg?sqp=COSKpNcG-oaymwEICHgQeCAASFqi85f_AwYIkfODoAY&rs=AMzJL3kfNjC9lPB-Ug9KbUBX_R5Q5O7w6g",
+                "width": 120,
+                "height": 120
+               },
+               {
+                "url": "https://i.ytimg.com/pl_c/PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW/studio_square_thumbnail.jpg?sqp=COSKpNcG-oaymwEKCOIBEOIBIABIWqLzl_8DBgiR84OgBg&rs=AMzJL3k1uKDyEAy7H1rOlU0ZKXxrGRPlzw",
+                "width": 226,
+                "height": 226
+               },
+               {
+                "url": "https://i.ytimg.com/pl_c/PLPNW_gerXa4Pc8S2qoUQc5e8Ir97RLuVW/studio_square_thumbnail.jpg?sqp=COSKpNcG-oaymwEKCKAEEKAEIABIWqLzl_8DBgiR84OgBg&rs=AMzJL3lYL_dD2hdMtWbhmDm_qDJ_XA4YiA",
+                "width": 544,
+                "height": 544
+               }
+              ]
+             }
+            }
+           },
+           "description": {
+            "musicDescriptionShelfRenderer": {
+             "description": {
+              "runs": [
+               {
+                "text": "The Huberman Lab podcast is hosted by Andrew Huberman, Ph.D., a neuroscientist and tenured professor in the department of neurobiology, and by courtesy, psychiatry and behavioral sciences at Stanford School of Medicine."
+               }
+              ]
+             }
+            }
+           },
+           "buttons": [
+            {
+             "toggleButtonRenderer": {
+              "isToggled": false,
+              "defaultIcon": {
+               "iconType": "BOOKMARK_BORDER"
+              },
+              "toggledIcon": {
+               "iconType": "BOOKMARK"
+              }
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "secondaryContents": {
+    "sectionListRenderer": {
+     "contents": [
+      {
+       "musicShelfRenderer": {
+        "contents": [
+         {
+          "musicMultiRowListItemRenderer": {
+           "thumbnail": {
+            "musicThumbnailRenderer": {
+             "thumbnail": {
+              "thumbnails": [
+               {
+                "url": "https://i.ytimg.com/vi/y-fRFiTrrg4/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3naJM5V2iY3wAq9NM5MoFEM_N2l9Q",
+                "width": 400,
+                "height": 225
+               },
+               {
+                "url": "https://i.ytimg.com/vi/y-fRFiTrrg4/hq720.jpg?sqp=-oaymwEKCKAGEMIDIABIWg&rs=AMzJL3n_c1QZBv2gBdH3SLXaJMQ5r2w3kg",
+                "width": 800,
+                "height": 450
+               },
+               {
+                "url": "https://i.ytimg.com/vi/y-fRFiTrrg4/hq720.jpg?sqp=-oaymwEKCNUGEN8DIABIWg&rs=AMzJL3lgwBAUFNLeP2XqZUMMO2RJTpLdjg",
+                "width": 853,
+                "height": 479
+               }
+              ]
+             }
+            }
+           },
+           "onTap": {
+            "watchEndpoint": {
+             "videoId": "y-fRFiTrrg4",
+             "watchEndpointMusicSupportedConfigs": {
+              "watchEndpointMusicConfig": {
+               "musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+              }
+             }
+            }
+           },
+           "title": {
+            "runs": [
+             {
+              "text": "Access the Sublime & Live Your Best Life | Robert Greene",
+              "navigationEndpoint": {
+               "browseEndpoint": {
+                "browseId": "MPEDy-fRFiTrrg4",
+                "browseEndpointContextSupportedConfigs": {
+                 "browseEndpointContextMusicConfig": {
+                  "pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+                 }
+                }
+               }
+              }
+             }
+            ]
+           },
+           "subtitle": {
+            "runs": [
+             {
+              "text": "58K views"
+             },
+             {
+              "text": " • "
+             },
+             {
+              "text": "8h ago"
+             }
+            ]
+           },
+           "playbackProgress": {
+            "musicPlaybackProgressRenderer": {
+             "playbackProgressPercentage": 0,
+             "durationText": {
+              "runs": [
+               {
+                "text": " • "
+               },
+               {
+                "text": "2 hr 18 min"
+               }
+              ]
+             }
+            }
+           }
+          }
+         },
+         {
+          "musicMultiRowListItemRenderer": {
+           "thumbnail": {
+            "musicThumbnailRenderer": {
+             "thumbnail": {
+              "thumbnails": [
+               {
+                "url": "https://i.ytimg.com/vi/arMMF0ISRRM/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3me7C1LfE3jo_yse5P_p4t4IPDkYw",
+                "width": 400,
+                "height": 225
+               },
+               {
+                "url": "https://i.ytimg.com/vi/arMMF0ISRRM/hq720.jpg?sqp=-oaymwEKCKAGEMIDIABIWg&rs=AMzJL3mmgww1T2tgBaAWO1cZJY9hxa7QAg",
+                "width": 800,
+                "height": 450
+               },
+               {
+                "url": "https://i.ytimg.com/vi/arMMF0ISRRM/hq720.jpg?sqp=-oaymwEKCNUGEN8DIABIWg&rs=AMzJL3mggZJV1D8gkBqK1UG8d6gM0AtiGg",
+                "width": 853,
+                "height": 479
+               }
+              ]
+             }
+            }
+           },
+           "onTap": {
+            "watchEndpoint": {
+             "videoId": "arMMF0ISRRM",
+             "watchEndpointMusicSupportedConfigs": {
+              "watchEndpointMusicConfig": {
+               "musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+              }
+             }
+            }
+           },
+           "title": {
+            "runs": [
+             {
+              "text": "Essentials: How Smells Influence Our Hormones, Health & Behavior | Dr. Noam Sobel",
+              "navigationEndpoint": {
+               "browseEndpoint": {
+                "browseId": "MPEDarMMF0ISRRM",
+                "browseEndpointContextSupportedConfigs": {
+                 "browseEndpointContextMusicConfig": {
+                  "pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+                 }
+                }
+               }
+              }
+             }
+            ]
+           },
+           "subtitle": {
+            "runs": [
+             {
+              "text": "104K views"
+             },
+             {
+              "text": " • "
+             },
+             {
+              "text": "4d ago"
+             }
+            ]
+           },
+           "playbackProgress": {
+            "musicPlaybackProgressRenderer": {
+             "playbackProgressPercentage": 0,
+             "durationText": {
+              "runs": [
+               {
+                "text": " • "
+               },
+               {
+                "text": "34 min"
+               }
+              ]
+             }
+            }
+           }
+          }
+         },
+         {
+          "musicMultiRowListItemRenderer": {
+           "thumbnail": {
+            "musicThumbnailRenderer": {
+             "thumbnail": {
+              "thumbnails": [
+               {
+                "url": "https://i.ytimg.com/vi/NlVu0P1RdHs/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3muEQCuYSMqVJLdquLYfVs73vxmnQ",
+                "width": 400,
+                "height": 225
+               },
+               {
+                "url": "https://i.ytimg.com/vi/NlVu0P1RdHs/hq720.jpg?sqp=-oaymwEKCKAGEMIDIABIWg&rs=AMzJL3m7tTZwGUglp74n_c6qW5vOrE6FeA",
+                "width": 800,
+                "height": 450
+               },
+               {
+                "url": "https://i.ytimg.com/vi/NlVu0P1RdHs/hq720.jpg?sqp=-oaymwEKCNUGEN8DIABIWg&rs=AMzJL3muPOFU-A_cn1J4xWMmjac_eI7Riw",
+                "width": 853,
+                "height": 479
+               }
+              ]
+             }
+            }
+           },
+           "onTap": {
+            "watchEndpoint": {
+             "videoId": "NlVu0P1RdHs",
+             "watchEndpointMusicSupportedConfigs": {
+              "watchEndpointMusicConfig": {
+               "musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+              }
+             }
+            }
+           },
+           "title": {
+            "runs": [
+             {
+              "text": "Unlocking Persistent Motivation & Extreme Resilience | Ross Edgley",
+              "navigationEndpoint": {
+               "browseEndpoint": {
+                "browseId": "MPEDNlVu0P1RdHs",
+                "browseEndpointContextSupportedConfigs": {
+                 "browseEndpointContextMusicConfig": {
+                  "pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+                 }
+                }
+               }
+              }
+             }
+            ]
+           },
+           "subtitle": {
+            "runs": [
+             {
+              "text": "169K views"
+             },
+             {
+              "text": " • "
+             },
+             {
+              "text": "Oct 26"
+             }
+            ]
+           },
+           "playbackProgress": {
+            "musicPlaybackProgressRenderer": {
+             "playbackProgressPercentage": 0,
+             "durationText": {
+              "runs": [
+               {
+                "text": " • "
+               },
+               {
+                "text": "2 hr 43 min"
+               }
+              ]
+             }
+            }
+           }
+          }
+         }
+        ],
+        "continuations": [
+         {
+          "nextContinuationData": {
+           "continuation": "4qmFsgJmEiZNUFNQUExQTldfZ2VyWGE0UGM4UzJxb1VRYzVlOElyOTdSTHVWVxo8ZWg1UVZEcERRbEZwUlVSc1JFOUVUa2RPYWsxNlVUQlpORkZxV1hwT01GbVNBUU1JMlFqYUNBUUlBaEFC"
+          }
+         }
+        ]
+       }
+      }
+     ]
+    }
+   }
+  }
+ }
+}

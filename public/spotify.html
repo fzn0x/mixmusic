@@ -273,7 +273,8 @@
               track: t && {
                 id: `sp:${t.linked_from?.id ?? t.id}`,
                 title: t.name,
-                artists: t.artists.map((a) => ({ name: a.name })),
+                // An episode may name no artists.
+                artists: (t.artists ?? []).map((a) => ({ name: a.name })),
                 durationMs: t.duration_ms,
               },
             };

@@ -82,6 +82,8 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 		s.artistPage(c, r.Param("id"))
 	case r.Match("/playlist/{id}"):
 		s.playlistPage(c, r.Param("id"))
+	case r.Match("/podcast/{id}"):
+		s.podcastPage(c, r.Param("id"))
 	case r.Match("/library"):
 		s.libraryPage(c, "")
 	case r.Match("/library/{tab}"):
@@ -170,6 +172,8 @@ func itemPath(it media.Item) string {
 		return artistPath(it.Artist.ID)
 	case it.Playlist != nil:
 		return playlistPath(it.Playlist.ID)
+	case it.Podcast != nil:
+		return podcastPath(it.Podcast.ID)
 	}
 	return ""
 }

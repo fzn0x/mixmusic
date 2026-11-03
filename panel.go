@@ -412,7 +412,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 			s.notes = append(s.notes, notice("Added "+t.Title+" to the queue"))
 		}
 	}
-	if m.Item("Start radio").Chosen() {
+	if !t.IsEpisode() && m.Item("Start radio").Chosen() {
 		s.startRadio(t)
 	}
 	m.Separator()
@@ -433,7 +433,9 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		s.setDisliked(t, !disliked)
 	}
 	s.addToMenus(m, one)
-	s.downloadItems(m, t)
+	if !t.IsEpisode() {
+		s.downloadItems(m, t)
+	}
 	m.Separator()
 	for _, a := range t.Artists {
 		if a.ID != "" {
@@ -448,6 +450,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 			s.navigate(albumPath(t.Album.ID))
 		}
 	}
+	s.episodeItems(m, t)
 	if t.URL != "" {
 		u := t.URL
 		if m.Item("Open in " + sourceName(t.Source)).Chosen() {
@@ -455,7 +458,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		}
 		s.copyLinkItem(m, u)
 	}
-	if t.Source == media.SourceSpotify {
+	if t.Source == media.SourceSpotify && !t.IsEpisode() {
 		if m.Item("Find another YouTube Music match").Chosen() {
 			if err := s.svc.Player.ForgetMatch(t.ID); err != nil {
 				s.notes = append(s.notes, noticeOf(err))

@@ -70,6 +70,9 @@ func (l *Library) Stats(days int) Stats {
 		if p.PlayedAt.Before(since) {
 			break // the history is newest first
 		}
+		if p.Track.IsEpisode() {
+			continue // the stats are of music; the history keeps episodes
+		}
 		s.Plays++
 		ms += p.Track.DurationMs
 		if i, ok := dayIndex[p.PlayedAt.In(l.now().Location()).Format(time.DateOnly)]; ok {

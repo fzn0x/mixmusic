@@ -180,7 +180,9 @@ func (p *Player) pastEnd(m *move) {
 		// over, and none became current.
 		seed, ok = Item{Track: *p.passing.lastPlayed}, true
 	}
-	if !ok {
+	// A podcast's episode has no radio: YouTube Music's of one is of songs
+	// unlike it.
+	if !ok || spoken(seed.Track) {
 		p.stopMove(m, "")
 		return
 	}

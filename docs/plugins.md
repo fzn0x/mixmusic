@@ -100,6 +100,8 @@ JavaScript straight away too: the same module, without the types.
 [sdk/index.d.ts](../sdk/index.d.ts) types the whole API; copy it next to your
 plugin and import its types, as above, or in a JavaScript plugin point your
 editor at it with a JSDoc `@param {import("./sdk").MixMusicAPI} api`.
+A track that is a podcast's episode has an `episode`, with its show, and
+its artists name the show.
 
 | | |
 |---|---|

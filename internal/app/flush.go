@@ -21,6 +21,7 @@ func (a *App) OnFlush(fn func()) (cancel func()) {
 
 // flush saves at once what waits a moment to be saved: what the windows
 // hold back, then the queue and the volume, the index of the downloads,
+// where episodes were left,
 // then settings.json where it holds no settings MixMusic can read: gone,
 // or with a mistake, which is kept as settings.json.broken, so that the
 // next start doesn't fall back to the settings of a new install. The
@@ -42,6 +43,9 @@ func (a *App) flush() {
 		p.Flush()
 	}
 	a.downloads.Flush()
+	if err := a.positions.Flush(); err != nil {
+		log.Printf("mixmusic: keeping where episodes were left: %v", err)
+	}
 	a.labels.save()
 	if err := a.settings.Flush(); err != nil {
 		log.Printf("mixmusic: saving settings.json: %v", err)

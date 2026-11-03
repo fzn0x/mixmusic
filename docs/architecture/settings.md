@@ -7,3 +7,12 @@
   file doesn't decode, it leaves it as it is and holds its writes.
   **`internal/settings`** defines the settings, keeps them in range, and
   reads `settings.json` (`Decode`), at start and on each edit alike.
+- **A struct for each section.** `Settings` embeds one struct for each
+  part of the settings, such as `Appearance`, `Playback` and `Desktop`, each
+  in a file of its own with its defaults and its clean-up. JSON flattens
+  embedded structs, so `settings.json` keeps one flat object, in the
+  order the sections are embedded. `testdata/default.json` and
+  `testdata/full.json` pin how it writes.
+- **The settings page** builds each tab from the parts that registered for
+  it with `addSettings`, from their features' files, in the order they
+  asked for.

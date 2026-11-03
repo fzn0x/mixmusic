@@ -386,6 +386,7 @@ internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
 internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
+internal/romaji      Japanese lyrics in romaji, kanji read by kagome
 internal/library     liked and disliked songs, mixes, history and stats
 internal/lastfm      scrobbling to Last.fm
 internal/discord     what plays, on your Discord profile
@@ -468,7 +469,10 @@ talks to:
   to find its lyrics.
 - **GitHub:** a check for a new version at start and every few hours,
   which you can turn off in Settings › About; the community registry when
-  you open the marketplace; and the downloads of yt-dlp.
+  you open the marketplace; the downloads of yt-dlp; and, the first time
+  you turn on romaji beside Japanese lyrics, the dictionary of the
+  readings of kanji (11.7 MB). Romaji is made on your computer: the
+  lyrics aren't sent.
 - **Last.fm,** once you connect it: what you play.
 - **Discord,** unless you turn it off: what plays, sent to the Discord app
   on your computer, which shows it on your profile.
@@ -480,7 +484,8 @@ What it keeps on your computer:
 - The tracks you played, in the cache, as much as you allow in Settings ›
   Playback, and how loud YouTube measured them.
 - The covers you saw, up to 256 MB.
-- The translations of lyrics you turned on, by track and language.
+- The translations of lyrics you turned on, by track and language, and
+  the dictionary romaji reads kanji with, once you turned it on.
 - Your sign-ins, the YouTube Music session included, in the system's
   keyring. On Windows, when the Credential Manager can't keep one, it goes
   in a file encrypted for your Windows account; on Linux without a
@@ -527,6 +532,12 @@ MixMusic is built on these projects:
 - **[Unison](https://unison.boidu.dev)**, the open, crowdsourced database of
   lyrics, under the ODbL, and **[LRCLIB](https://lrclib.net)**, the open
   database of synced lyrics.
+- **[kagome](https://github.com/ikawaha/kagome)**, the Japanese
+  morphological analyser that reads the kanji of lyrics for their romaji,
+  with the IPA dictionary of
+  [kagome-dict](https://github.com/ikawaha/kagome-dict), made from
+  mecab-ipadic, which MixMusic downloads the first time romaji is turned
+  on.
 - **[libopus](https://opus-codec.org)**, whose decoder the Opus decoder is a
   port of, and **[SharpJaad](https://github.com/jimm98y/SharpJaad)**, the C#
   port of [JAAD](https://sourceforge.net/projects/jaadec/) the AAC decoder

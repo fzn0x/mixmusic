@@ -20,6 +20,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
+	"github.com/fzn0x/mixmusic/internal/cast"
 	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/match"
@@ -82,6 +83,9 @@ type Options struct {
 	// romaji downloads, comes from: romaji.DictionaryURL when empty. Tests
 	// give their own.
 	RomajiURL string
+	// CastBrowse, when set, finds the cast devices on the network in place
+	// of mDNS: tests set it.
+	CastBrowse func(ctx context.Context) ([]cast.Device, error)
 }
 
 // App is MixMusic.
@@ -139,6 +143,8 @@ type App struct {
 	// here is MixMusic's own Spotify device, which the player plays
 	// Spotify tracks on where it can.
 	here spotifyHere
+	// cast is the cast devices found, and the one the player plays on.
+	cast castState
 	// videoPage is the page of the main window that plays the picture of
 	// music videos, while it is open.
 	videoPage atomic.Pointer[mygo.Page]

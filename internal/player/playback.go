@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/volume"
@@ -232,7 +231,7 @@ func (p *Player) switchAudio() {
 	if src == nil || src.Mode != ModeStream || src.SurroundURL == "" || !p.loaded {
 		return
 	}
-	_ = p.stream.Load(p.audioOf(*src), audio.Cue{Start: p.s.Position, Autoplay: !p.paused, Speed: p.s.Speed})
+	_ = p.stream.Load(p.audioOf(*src), p.cue(p.s.Position, !p.paused))
 }
 
 // audioOf returns the URL of the audio of the current entry's stream to
@@ -256,7 +255,7 @@ func (p *Player) fallBackToStereo(why string) {
 	log.Printf("mixmusic: the 5.1 surround audio of %s stopped at %s: %s; playing it in stereo", cur.Track.ID, p.s.Position.Round(time.Second), why)
 	p.notify(Notice{Message: fmt.Sprintf("The 5.1 surround audio of %s couldn't play (%s), so it plays in stereo", cur.Track.Title, strings.TrimSuffix(why, "."))})
 	p.loaded = true
-	_ = p.stream.Load(p.s.Source.URL, audio.Cue{Start: p.s.Position, Autoplay: !p.paused, Speed: p.s.Speed})
+	_ = p.stream.Load(p.s.Source.URL, p.cue(p.s.Position, !p.paused))
 }
 
 // speedOf is the speed the settings s play t at in MixMusic's own engine:
@@ -474,7 +473,7 @@ func (p *Player) loadStream(src Source, start time.Duration, autoplay bool) {
 	cur, _ := p.s.Current()
 	p.s.Speed = speedOf(p.svc.Settings(), cur.Track, p.s.Live)
 	p.unsounded, p.soundFrom = autoplay, start
-	_ = p.stream.Load(p.audioOf(src), audio.Cue{Start: start, Autoplay: autoplay, Speed: p.s.Speed})
+	_ = p.stream.Load(p.audioOf(src), p.cue(start, autoplay))
 }
 
 // setLive tells whether the current track is a live stream, which has no
@@ -629,7 +628,7 @@ func (p *Player) retryStream(why string) {
 			p.paused = !autoplay
 			p.s.Speed = speedOf(p.svc.Settings(), entry.Track, p.s.Live)
 			p.unsounded, p.soundFrom = autoplay, at
-			_ = p.stream.Load(p.audioOf(src)+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), audio.Cue{Start: at, Autoplay: autoplay, Speed: p.s.Speed})
+			_ = p.stream.Load(p.audioOf(src)+"?retry="+strconv.FormatInt(time.Now().UnixMilli(), 10), p.cue(at, autoplay))
 		})
 	})
 }
@@ -703,8 +702,13 @@ func (p *Player) preload(next Item) {
 	})
 }
 
-// crossfadeTo plays next while the current track fades out, over fade.
+// crossfadeTo plays next while the current track fades out, over fade. A
+// remote output plays one stream at a time: next starts there as the
+// current track ends.
 func (p *Player) crossfadeTo(next Item, fade time.Duration) {
+	if p.out.Stream != nil {
+		return
+	}
 	p.crossfading = true
 	token := p.loadToken
 	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
@@ -745,7 +749,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		p.report()
 		p.loaded = true
 		p.paused = false
-		_ = p.stream.Crossfade(src.audio(p.surround), fade, audio.Cue{Speed: p.s.Speed})
+		_ = p.stream.Crossfade(src.audio(p.surround), fade, p.cue(0, false))
 	})
 }
 
@@ -907,6 +911,9 @@ func (p *Player) setVolume(v float64) {
 	p.s.Volume = v
 	p.s.Muted = false
 	p.apply()
+	if p.out.Stream != nil {
+		return // the device's own, which the settings don't keep
+	}
 	if p.volumeTimer != nil {
 		p.volumeTimer.Stop()
 	}
@@ -928,7 +935,7 @@ func (p *Player) apply() {
 	if p.s.Muted {
 		v = 0
 	}
-	p.stream.SetVolume(v)
+	p.setStreamVolume()
 	p.connect.setVolume(v)
 	p.report()
 }
@@ -991,7 +998,7 @@ func (p *Player) writeQueue() {
 func (p *Player) Flush() {
 	p.writeQueue()
 	p.mu.Lock()
-	v := p.snap.Volume
+	v := p.keptVolume(p.snap)
 	p.mu.Unlock()
 	p.saveVolume(v)
 }

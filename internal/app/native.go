@@ -27,9 +27,10 @@ var errNoNative = errors.New("MixMusic's audio engine isn't available on this sy
 // engineEvents passes the engine's events to the player, once there is one.
 type engineEvents struct{ a *App }
 
-// to returns the events' destination: the player, or nowhere.
+// to returns the events' destination: the player, or nowhere, as while
+// the player plays on a cast device.
 func (e engineEvents) to() audio.Events {
-	if p := e.a.goPlayer.Load(); p != nil {
+	if p := e.a.goPlayer.Load(); p != nil && !e.a.cast.remote.Load() {
 		return p
 	}
 	return noEvents{}

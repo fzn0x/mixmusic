@@ -68,6 +68,9 @@ type Options struct {
 	// mini player: windows that MyGo draws, of the root package.
 	Interface func(a *App, hidden bool) *mygo.Window
 	Mini      func(a *App) *mygo.Window
+	// Notch opens the player around the notch of a MacBook's screen, or
+	// returns nil where no screen has a camera housing (#46).
+	Notch func(a *App) *mygo.Window
 	// Hotkeys registers the user's global shortcuts: mygo.GlobalShortcut
 	// when nil, once the app is ready.
 	Hotkeys Hotkeys
@@ -141,6 +144,8 @@ type App struct {
 	// miniOpen is set while the mini player is open, which the main
 	// window's frames ask without taking mu.
 	miniOpen atomic.Bool
+	// notch is the player around the notch, while it shows.
+	notch notchPlayer
 	// onNavigate shows the pages of the main window.
 	onNavigate *func(target string)
 	// updates keeps the user's choices of updates.

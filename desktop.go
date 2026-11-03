@@ -14,6 +14,10 @@ import (
 
 func init() { addSettings("desktop", 10, (*shell).desktopSettings) }
 
+// desktopRows are the rows of Settings › On the desktop that register
+// from their features' files, below Discord's.
+const desktopRows = "desktop › On the desktop"
+
 func (s *shell) desktopSettings(c *ui.Context) {
 	s.group(c, "On the desktop", func() {
 		toggle := func(key, title, description string, v *bool, words ...string) {
@@ -42,6 +46,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 				in.Placeholder("MixMusic's").Width(260).Label("Discord application ID")
 			}, "Discord shows the name of MixMusic's application. To show another, create one in the developer portal and paste its application ID.")
 		}
+		s.settingsOf(c, desktopRows)
 		s.row(c, "Start at login", "", func() {
 			// The system says, beside the main thread.
 			login := fetch(s, "openAtLogin", func(context.Context) (bool, error) { return s.svc.Preferences.OpenAtLogin(), nil })

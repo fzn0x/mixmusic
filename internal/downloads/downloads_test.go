@@ -957,7 +957,9 @@ func TestFlakyProgress(t *testing.T) {
 	m := open(t, t.TempDir(), Options{Fetcher: f})
 	m.Add([]media.Track{yt("acacacacaca", "Slow")}, "best")
 	m.Start()
-	until(t, "the download", func() bool { return kind(m, "yt:acacacacaca") != Waiting && kind(m, "yt:acacacacaca") != Downloading })
+	// One read: a retry takes it from Downloading back to Waiting, which
+	// two reads could each miss.
+	until(t, "the download", func() bool { k := kind(m, "yt:acacacacaca"); return k != Waiting && k != Downloading })
 	if k := kind(m, "yt:acacacacaca"); k != Done {
 		t.Fatalf("it is %v: %s", k, m.State("yt:acacacacaca").Why)
 	}

@@ -17,10 +17,11 @@ belongs to its main thread: what finishes elsewhere comes back through
   MB of pixels (`artwork.go`). An image that couldn't load tries again
   after 1 to 2 seconds, then less often, up to every 2 minutes, and at once
   when another of its host loads; one whose address gives no image waits
-  half an hour. Both windows, the accent and Terminal's tint read the
-  images through `artwork.Store` (`internal/artwork`), which downloads each
-  once, keeps it on disk as it came, up to 256 MB, and logs a host's
-  failures at most once a minute, without the addresses.
+  half an hour. Both windows, the accent, Terminal's tint and the
+  system's media controls read the images through `artwork.Store`
+  (`internal/artwork`), which downloads each once, keeps it on disk as it
+  came, up to 256 MB, and logs a host's failures at most once a minute,
+  without the addresses.
 - **Themes** give their tokens: colours, fonts, radius (`theme.go`), and
   the accent follows the artwork of what plays. A colour file's colours
   replace the theme's, kept readable (`colorfile.go`). The layout design

@@ -8,7 +8,11 @@
   controls, and passes on what they ask: Now Playing on macOS, through
   MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both
   called with purego, and the SystemMediaTransportControls of a hidden
-  window on Windows, reached through WinRT without cgo.
+  window on Windows, reached through WinRT without cgo. It downloads
+  nothing: `internal/app` hands it each cover from the artwork store
+  (`controls_cover.go`), as its bytes on macOS and Windows, and on Linux
+  as a file in the cache folder's `now-playing/`, whose address MPRIS
+  gives the desktop.
 - **`internal/portal`** asks the desktop's Background portal, in a
   Flatpak, to let MixMusic run without a window and to start it at login:
   the sandbox's own autostart folder is one the desktop never reads.

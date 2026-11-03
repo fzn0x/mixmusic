@@ -10,10 +10,6 @@ package nowplaying
 import (
 	"errors"
 	"fmt"
-	"image"
-	"image/png"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -304,20 +300,13 @@ func TestMediaFlyout(t *testing.T) {
 	}
 	defer syscall.SyscallN(procRoUninitialize.Addr())
 
-	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		png.Encode(w, image.NewRGBA(image.Rect(0, 0, 32, 32)))
-	}))
-	defer srv.Close()
-	client := artworkClient
-	artworkClient = srv.Client()
-	defer func() { artworkClient = client }()
-
+	// The cover comes after the track, as MixMusic hands it once it has it.
 	info := Info{
 		ID:       "yt:abc",
 		Title:    fmt.Sprintf("Song %d", time.Now().UnixNano()),
 		Artists:  []string{"Ann", "Bo"},
 		Album:    "Album",
-		Artwork:  srv.URL + "/art.png",
+		Artwork:  "https://example.com/art.png",
 		Duration: 200 * time.Second,
 		Position: 10 * time.Second,
 		At:       time.Now(),
@@ -346,7 +335,12 @@ func TestMediaFlyout(t *testing.T) {
 	if at := f.at - f.updated.Sub(info.At); at < 9*time.Second || at > 11*time.Second {
 		t.Errorf("position %v at %v, want about 10 s at %v", f.at, f.updated, info.At)
 	}
-	eventually(t, "the artwork", func() bool { return read(t, s).thumbnail })
+	if f.thumbnail {
+		t.Error("the flyout shows a cover before MixMusic has it")
+	}
+	info.Cover, info.At = testCover(), time.Now()
+	c.Show(&info)
+	eventually(t, "the cover", func() bool { return read(t, s).thumbnail })
 
 	// At 2×, from 20 s: the controls are told the rate where Windows lets
 	// them, on x64, and where the track is. The session learns the two

@@ -12,16 +12,31 @@ import (
 
 func TestParseLRC(t *testing.T) {
 	lrc := "[ar:Someone]\n[ti:Song]\n[00:12.50]First line\n[00:05.00][01:00.1]Repeated\n[00:20]\nno time here\n[00:30.123] Spaced  "
-	got := ParseLRC(lrc)
-	want := []Line{{5000, "Repeated"}, {12500, "First line"}, {20000, ""}, {30123, "Spaced"}, {60100, "Repeated"}}
+	lines := ParseLRC(lrc)
+	got := saidOf(lines)
+	want := []said{{5000, "Repeated"}, {12500, "First line"}, {20000, ""}, {30123, "Spaced"}, {60100, "Repeated"}}
 	if len(got) != len(want) {
 		t.Fatalf("lines = %+v", got)
 	}
 	for i := range want {
-		if got[i] != want[i] {
-			t.Errorf("line %d = %+v, want %+v", i, got[i], want[i])
+		if got[i] != want[i] || lines[i].Words != nil {
+			t.Errorf("line %d = %+v, want %+v", i, lines[i], want[i])
 		}
 	}
+}
+
+// said is when a line is sung and its text, which tests compare.
+type said struct {
+	ms   int
+	text string
+}
+
+func saidOf(lines []Line) []said {
+	out := make([]said, len(lines))
+	for i, l := range lines {
+		out[i] = said{l.TimeMs, l.Text}
+	}
+	return out
 }
 
 func TestParseLRCOffset(t *testing.T) {

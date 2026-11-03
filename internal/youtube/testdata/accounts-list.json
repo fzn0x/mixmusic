@@ -1,0 +1,182 @@
+{
+  "responseContext": {
+    "serviceTrackingParams": [{ "service": "GFEEDBACK", "params": [{ "key": "logged_in", "value": "1" }] }]
+  },
+  "actions": [
+    {
+      "getMultiPageMenuAction": {
+        "menu": {
+          "multiPageMenuRenderer": {
+            "sections": [
+              {
+                "accountSectionListRenderer": {
+                  "contents": [
+                    {
+                      "accountItemSectionRenderer": {
+                        "contents": [
+                          {
+                            "accountItem": {
+                              "accountName": { "simpleText": "Ada Example" },
+                              "accountPhoto": { "thumbnails": [{ "url": "https://yt3.example.com/ada=s88", "width": 88, "height": 88 }] },
+                              "isSelected": true,
+                              "isDisabled": false,
+                              "hasChannel": true,
+                              "serviceEndpoint": {
+                                "selectActiveIdentityEndpoint": {
+                                  "supportedTokens": [
+                                    { "accountStateToken": { "hasChannel": true, "isMerged": false, "obfuscatedGaiaId": "100000000000000000001" } },
+                                    { "offlineCacheKeyToken": { "clientCacheKey": "100000000000000000001" } },
+                                    { "accountSigninToken": { "signinUrl": "https://www.youtube.com/signin?action_handle_signin=true&authuser=0&next=https%3A%2F%2Fwww.youtube.com%2F" } },
+                                    { "datasyncIdToken": { "datasyncIdToken": "100000000000000000001||" } }
+                                  ]
+                                }
+                              },
+                              "accountByline": { "simpleText": "@adaexample" },
+                              "channelHandle": { "simpleText": "@adaexample" }
+                            }
+                          },
+                          {
+                            "accountItem": {
+                              "accountName": { "simpleText": "Ada Records" },
+                              "isSelected": false,
+                              "isDisabled": false,
+                              "hasChannel": true,
+                              "serviceEndpoint": {
+                                "selectActiveIdentityEndpoint": {
+                                  "supportedTokens": [
+                                    { "pageIdToken": { "pageId": "100000000000000000002" } },
+                                    { "accountStateToken": { "hasChannel": true, "isMerged": false, "obfuscatedGaiaId": "100000000000000000002" } },
+                                    { "offlineCacheKeyToken": { "clientCacheKey": "100000000000000000002" } },
+                                    { "accountSigninToken": { "signinUrl": "https://www.youtube.com/signin?action_handle_signin=true&authuser=0&pageid=100000000000000000002&next=https%3A%2F%2Fwww.youtube.com%2F" } },
+                                    { "datasyncIdToken": { "datasyncIdToken": "100000000000000000002||100000000000000000001" } }
+                                  ]
+                                }
+                              },
+                              "accountByline": { "simpleText": "@adarecords" },
+                              "channelHandle": { "simpleText": "@adarecords" }
+                            }
+                          },
+                          {
+                            "accountItem": {
+                              "accountName": { "simpleText": "Ada Live" },
+                              "isSelected": false,
+                              "isDisabled": false,
+                              "hasChannel": true,
+                              "serviceEndpoint": {
+                                "selectActiveIdentityEndpoint": {
+                                  "supportedTokens": [
+                                    { "accountStateToken": { "hasChannel": true, "isMerged": false, "obfuscatedGaiaId": "100000000000000000003" } },
+                                    { "offlineCacheKeyToken": { "clientCacheKey": "100000000000000000003" } },
+                                    { "datasyncIdToken": { "datasyncIdToken": "100000000000000000003||100000000000000000001" } }
+                                  ]
+                                }
+                              },
+                              "accountByline": { "simpleText": "@adalive" },
+                              "channelHandle": { "simpleText": "@adalive" }
+                            }
+                          },
+                          {
+                            "accountItem": {
+                              "accountName": { "simpleText": "Ada Archive" },
+                              "isSelected": false,
+                              "isDisabled": false,
+                              "hasChannel": true,
+                              "serviceEndpoint": {
+                                "selectActiveIdentityEndpoint": {
+                                  "supportedTokens": [
+                                    { "accountStateToken": { "hasChannel": true, "isMerged": false, "obfuscatedGaiaId": "100000000000000000004" } },
+                                    { "offlineCacheKeyToken": { "clientCacheKey": "100000000000000000004" } }
+                                  ]
+                                }
+                              },
+                              "accountByline": { "simpleText": "@adaarchive" },
+                              "channelHandle": { "simpleText": "@adaarchive" }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "header": {
+                    "googleAccountHeaderRenderer": { "name": { "simpleText": "Ada Example" }, "email": { "simpleText": "ada@example.com" } }
+                  }
+                }
+              },
+              {
+                "accountSectionListRenderer": {
+                  "contents": [
+                    {
+                      "accountItemSectionRenderer": {
+                        "contents": [
+                          {
+                            "accountItem": {
+                              "accountName": { "simpleText": "Bob's Band" },
+                              "isSelected": false,
+                              "isDisabled": false,
+                              "hasChannel": true,
+                              "serviceEndpoint": {
+                                "selectActiveIdentityEndpoint": {
+                                  "supportedTokens": [
+                                    { "accountStateToken": { "hasChannel": true, "isMerged": false, "obfuscatedGaiaId": "200000000000000000002" } },
+                                    { "accountSigninToken": { "signinUrl": "https://www.youtube.com/signin?action_handle_signin=true&authuser=1&next=https%3A%2F%2Fwww.youtube.com%2F" } }
+                                  ]
+                                }
+                              },
+                              "channelHandle": { "simpleText": "@bobsband" }
+                            }
+                          },
+                          {
+                            "accountItem": {
+                              "accountName": { "simpleText": "Bob Example" },
+                              "isSelected": false,
+                              "isDisabled": false,
+                              "hasChannel": true,
+                              "serviceEndpoint": {
+                                "selectActiveIdentityEndpoint": {
+                                  "supportedTokens": [
+                                    { "accountStateToken": { "hasChannel": true, "isMerged": false, "obfuscatedGaiaId": "200000000000000000001" } },
+                                    { "accountSigninToken": { "signinUrl": "https://www.youtube.com/signin?action_handle_signin=true&authuser=1&next=https%3A%2F%2Fwww.youtube.com%2F" } },
+                                    { "datasyncIdToken": { "datasyncIdToken": "200000000000000000001||" } }
+                                  ]
+                                }
+                              },
+                              "channelHandle": { "simpleText": "@bobexample" }
+                            }
+                          },
+                          {
+                            "accountItem": {
+                              "accountName": { "simpleText": "Bob Podcasts" },
+                              "isSelected": false,
+                              "isDisabled": false,
+                              "hasChannel": true,
+                              "serviceEndpoint": {
+                                "selectActiveIdentityEndpoint": {
+                                  "supportedTokens": [
+                                    { "accountSigninToken": { "signinUrl": "https://www.youtube.com/signin?action_handle_signin=true&authuser=1&pageid=200000000000000000003&next=https%3A%2F%2Fwww.youtube.com%2F" } }
+                                  ]
+                                }
+                              },
+                              "channelHandle": { "simpleText": "@bobpodcasts" }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "header": {
+                    "googleAccountHeaderRenderer": { "name": { "simpleText": "Bob Example" }, "email": { "simpleText": "bob@example.com" } }
+                  }
+                }
+              }
+            ],
+            "footer": {
+              "multiPageMenuSectionRenderer": {
+                "items": [{ "compactLinkRenderer": { "title": { "simpleText": "View all channels" } } }]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

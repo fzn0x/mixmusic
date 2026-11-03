@@ -1,9 +1,11 @@
 package youtube
 
 import (
+	"cmp"
 	"context"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 // AccountChannel is an identity the account can use YouTube Music as: the
@@ -22,6 +24,19 @@ type AccountChannel struct {
 	Email    string `json:"email,omitempty"`
 	// Current is set for the channel the session uses.
 	Current bool `json:"current,omitempty"`
+	// Unswitchable is set for a brand channel the list tells no page ID
+	// of: without one, MixMusic would use the account itself.
+	Unswitchable bool `json:"unswitchable,omitempty"`
+}
+
+// Is reports whether a, the account YouTube Music answers as, is ch: by
+// their handles when both have one, which are the channels' own, else by
+// their names.
+func (ch AccountChannel) Is(a Account) bool {
+	if ch.Handle != "" && a.Handle != "" {
+		return strings.EqualFold(ch.Handle, a.Handle)
+	}
+	return strings.EqualFold(strings.TrimSpace(ch.Name), strings.TrimSpace(a.Name))
 }
 
 // webClient is YouTube's website, which lists the channels of an account;
@@ -49,9 +64,17 @@ func (c *Client) Channels(ctx context.Context) ([]AccountChannel, error) {
 // headed by its address; an item's sign-in link names the index of its
 // account. An item without one is of the account of the other items of its
 // section, else of asked, the account the list was asked as.
+//
+// Of the items of an account that tell no page ID, one is the account
+// itself: the one whose data sync ID says so, else the first, as the list
+// puts the account before its brand channels. The others are brand
+// channels that MixMusic can't tell apart from it: Unswitchable.
 func parseChannels(n node, asked int) []AccountChannel {
 	var channels []AccountChannel
-	var known []bool // whether the item named its account
+	// Of each item, whether it named its account, and whether its tokens
+	// tell it is a brand channel, or the account itself.
+	type told struct{ account, brand, own bool }
+	var tells []told
 	seen := map[string]bool{}
 	var walk func(v any, email string)
 	walk = func(v any, email string) {
@@ -71,10 +94,11 @@ func parseChannels(n node, asked int) []AccountChannel {
 				}
 				item := node{x}
 				user, named := channelAuthUser(item)
+				page, brand, own := channelIdentity(item)
 				ch := AccountChannel{
 					Name:     item.get("accountName").text(),
 					Handle:   item.get("channelHandle").text(),
-					PageID:   channelPageID(item),
+					PageID:   page,
 					AuthUser: user,
 					Email:    email,
 					Current:  item.get("isSelected").boolean(),
@@ -88,19 +112,19 @@ func parseChannels(n node, asked int) []AccountChannel {
 				}
 				seen[id] = true
 				channels = append(channels, ch)
-				known = append(known, named)
+				tells = append(tells, told{named, brand, own})
 			}
 		}
 	}
 	walk(n.v, "")
 	sections := map[string]int{}
 	for i, ch := range channels {
-		if known[i] && ch.Email != "" {
+		if tells[i].account && ch.Email != "" {
 			sections[ch.Email] = ch.AuthUser
 		}
 	}
 	for i := range channels {
-		if !known[i] {
+		if !tells[i].account {
 			user, ok := sections[channels[i].Email]
 			if !ok || channels[i].Email == "" {
 				user = asked
@@ -108,18 +132,56 @@ func parseChannels(n node, asked int) []AccountChannel {
 			channels[i].AuthUser = user
 		}
 	}
+	accountOf := func(ch AccountChannel) string { return ch.Email + "|" + strconv.Itoa(ch.AuthUser) }
+	self := map[string]int{} // the item that is the account itself, of each account
+	for i, ch := range channels {
+		if ch.PageID != "" || tells[i].brand {
+			continue
+		}
+		if j, ok := self[accountOf(ch)]; !ok || tells[i].own && !tells[j].own {
+			self[accountOf(ch)] = i
+		}
+	}
+	for i := range channels {
+		if j, ok := self[accountOf(channels[i])]; channels[i].PageID == "" && (!ok || j != i) {
+			channels[i].Unswitchable = true
+		}
+	}
 	return channels
 }
 
-// channelPageID returns the page ID of a brand channel's account item, in
-// the tokens its switching endpoint carries; the account itself has none.
-func channelPageID(item node) string {
+// channelIdentity returns the page ID of a brand channel's account item,
+// from the tokens its switching endpoint carries: its page ID token, else
+// the page its sign-in link names, else its data sync ID. That holds the
+// IDs of the channel and of its account, "channel||account", for a brand
+// channel, and "account||" for the account itself. brand reports an item
+// the tokens tell is a brand channel's, own one they tell is the account
+// itself.
+func channelIdentity(item node) (pageID string, brand, own bool) {
+	var linked, synced string
 	for _, t := range channelTokens(item) {
-		if id := t.get("pageIdToken", "pageId").str(); id != "" {
-			return id
+		if id := t.get("pageIdToken", "pageId").str(); id != "" && pageID == "" {
+			pageID = id
+		}
+		if link := t.get("accountSigninToken", "signinUrl").str(); link != "" && linked == "" {
+			if u, err := url.Parse(link); err == nil {
+				linked = u.Query().Get("pageid")
+			}
+		}
+		if id := t.get("datasyncIdToken", "datasyncIdToken").str(); id != "" {
+			channel, account, ok := strings.Cut(id, "||")
+			switch {
+			case !ok:
+			case account != "":
+				brand, synced = true, channel
+			case channel != "":
+				own = true
+			}
 		}
 	}
-	return ""
+	pageID = cmp.Or(pageID, linked, synced)
+	brand = brand || pageID != ""
+	return pageID, brand, own && !brand
 }
 
 // channelAuthUser returns the index of the Google account of an account

@@ -119,8 +119,16 @@ export interface SearchResponse {
 export interface Lyrics {
   synced: boolean;
   instrumental?: boolean;
-  /** Lines of the lyrics; timeMs is when a line is sung, when synced. */
-  lines: { timeMs: number; text: string }[];
+  /**
+   * Lines of the lyrics; timeMs is when a line is sung, when synced. Lines
+   * synced word by word have their words too, each sung from startMs to
+   * endMs, in the order they come in text.
+   */
+  lines: {
+    timeMs: number;
+    text: string;
+    words?: { text: string; startMs: number; endMs: number }[];
+  }[];
   source: string;
   /**
    * The address of the source, for sources whose licence asks apps that

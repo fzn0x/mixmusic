@@ -167,7 +167,7 @@ func (c *Collection) MoveInPlaylist(id string, from, to int) error {
 // ImportPlaylist copies a playlist of a service into a playlist of
 // MixMusic, where tracks of other services can join it.
 func (c *Collection) ImportPlaylist(ctx context.Context, id string) (media.Playlist, error) {
-	p, err := c.a.playlist(ctx, id)
+	p, err := c.a.wholePlaylist(ctx, id)
 	if err != nil {
 		return media.Playlist{}, err
 	}

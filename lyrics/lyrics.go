@@ -38,6 +38,22 @@ var (
 type Line struct {
 	TimeMs int    `json:"timeMs"`
 	Text   string `json:"text"`
+	// Words are the words of a line synchronized word by word, with their
+	// times; nil for lines synchronized line by line, and lyrics that
+	// aren't synchronized.
+	Words []Word `json:"words,omitempty"`
+}
+
+// Word is a word of a line synchronized word by word, or a syllable of
+// one, as the lyrics time them: the times it is sung from and to, in
+// milliseconds.
+type Word struct {
+	// Text is the word as the line's Text holds it: the words of a line
+	// come in it in their order, each the first found after the word
+	// before.
+	Text    string `json:"text"`
+	StartMs int    `json:"startMs"`
+	EndMs   int    `json:"endMs"`
 }
 
 // Lyrics are the words of a track.

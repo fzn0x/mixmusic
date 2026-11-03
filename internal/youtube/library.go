@@ -57,7 +57,8 @@ func parseAccount(n node) Account {
 	return a
 }
 
-// LikedSongs returns the user's liked songs on YouTube Music.
+// LikedSongs returns the user's liked songs on YouTube Music, as the
+// playlist of their first page: More reads on, as for any playlist.
 func (c *Client) LikedSongs(ctx context.Context) (media.Playlist, error) {
 	if err := c.session(); err != nil {
 		return media.Playlist{}, err

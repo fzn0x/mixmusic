@@ -2,7 +2,12 @@
 
 - **`internal/media`** defines what every service shares: tracks, albums,
   artists, playlists, shelves. IDs carry their service: `yt:<video id>`,
-  `sp:<track id>`, `mx:<mix id>`.
+  `sp:<track id>`, `mx:<mix id>`. The services give a playlist with its
+  first page of tracks, and `More`, the token of the next;
+  `Playlist.ReadOn` reads on a page at a time, asks again after 1, 2 and
+  4 seconds for a page that fails, and stops at `MaxTracks`, 20,000, past
+  which the playlist is `Cut`. `Catalog.Playlist` reads one whole, for
+  what takes all of it, as a download or a plugin.
 - **`internal/youtube`** reads YouTube Music through the API its website uses:
   search, suggestions, the home and explore pages, charts, moods and genres,
   albums, artists, playlists, related tracks, radios and plain lyrics.
@@ -10,7 +15,13 @@
   requests with as the website does, it reads and changes their library:
   liked songs, playlists, albums, subscriptions, likes, dislikes and
   saves, and it deletes the playlists the user made, which it tells from
-  those they saved by the menus YouTube sends with them. It also reads
+  those they saved by the menus YouTube sends with them. It lists the
+  Google accounts of the session and their brand channels, from YouTube's
+  website, and uses a brand channel by its page ID: one whose page ID the
+  list doesn't tell is listed as `Unswitchable`, as without it the account
+  itself would be used. Once the app switches to a brand channel, it goes
+  back if YouTube Music answers as the Google account itself, as the list
+  names it; any other answer keeps the switch. It also reads
   whether YouTube labels a video as made with AI, from the answer of
   YouTube's own website, asked signed out with a field mask
   (`MadeWithAI`): nothing of YouTube Music carries the label. Its parsers

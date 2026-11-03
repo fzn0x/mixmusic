@@ -36,6 +36,7 @@
   "surround": true,
   "autoplay": false,
   "songSpeed": 1.25,
+  "podcastSpeed": 1.5,
   "skipDisliked": false,
   "skipAi": true,
   "musicVideos": true,

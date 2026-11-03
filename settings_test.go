@@ -282,7 +282,8 @@ func TestCoversKept(t *testing.T) {
 		t.Fatal(err)
 	}
 	store.Close()
-	tt := testerOf(t, s, 1280, 3200)
+	// Tall enough for Settings › Playback down to the offline cache.
+	tt := testerOf(t, s, 1280, 4000)
 	show(s, tt, "/settings/playback")
 	if !tt.HasText("1 cover in ") {
 		t.Fatalf("the covers kept aren't shown: %q", tt.Texts())

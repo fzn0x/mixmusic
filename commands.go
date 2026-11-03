@@ -6,9 +6,6 @@ import (
 	"strings"
 
 	"github.com/egoist/mygo/ui"
-
-	"github.com/fzn0x/mixmusic/internal/player"
-	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // command is something the user can do from anywhere: by its shortcut, or
@@ -33,7 +30,7 @@ func (s *shell) commands() []command {
 		{"player.mute", "Mute", "M", "playback", s.p.ToggleMute},
 		{"player.faster", "Speed up", "", "playback", func() { s.stepSpeed(1) }},
 		{"player.slower", "Slow down", "", "playback", func() { s.stepSpeed(-1) }},
-		{"player.normalSpeed", "Normal speed", "", "playback", func() { s.setSongSpeed(1) }},
+		{"player.normalSpeed", "Normal speed", "", "playback", func() { s.changeSpeed(1) }},
 		{"player.shuffle", "Shuffle", "Mod+S", "playback", s.p.ToggleShuffle},
 		{"player.repeat", "Repeat", "Mod+R", "playback", s.p.CycleRepeat},
 		{"player.like", "Like what plays", "Mod+L", "playback", func() {
@@ -88,34 +85,36 @@ func (s *shell) commands() []command {
 	return cmds
 }
 
-// stepSpeed moves the speed of songs a quarter up, or down for a negative
-// dir, to the next quarter: 1.1× goes up to 1.25×, then 1.5×, and down to
-// 1×.
+// stepSpeed moves the speed of the kind of track that plays, songs or
+// podcasts, a quarter up, or down for a negative dir, to the next quarter:
+// 1.1× goes up to 1.25×, then 1.5×, and down to 1×.
 func (s *shell) stepSpeed(dir int) {
-	v := s.set.SongSpeed
+	speed, _ := s.playingSpeed()
+	v := *speed
 	if dir > 0 {
 		v = (math.Floor(4*v) + 1) / 4
 	} else {
 		v = (math.Ceil(4*v) - 1) / 4
 	}
-	s.setSongSpeed(v)
+	s.changeSpeed(v)
 }
 
-// setSongSpeed sets the speed of songs, the kind of track that plays, and
-// tells it: a Spotify device plays its track at its own, as a live stream
-// plays.
-func (s *shell) setSongSpeed(v float64) {
-	s.set.SongSpeed = settings.CleanSpeed(v)
-	s.save()
-	msg := "Songs play at their own speed"
-	if s.set.SongSpeed != 1 {
-		msg = "Songs play at " + speedLabel(s.set.SongSpeed)
+// changeSpeed sets the speed of the kind of track that plays, songs or
+// podcasts, and tells it: a Spotify device plays its track at its own, as a
+// live stream plays.
+func (s *shell) changeSpeed(v float64) {
+	s.setSpeed(v)
+	speed, podcasts := s.playingSpeed()
+	kind := "Songs"
+	if podcasts {
+		kind = "Podcasts"
 	}
-	switch src := s.st.Source; {
-	case src != nil && src.Mode != player.ModeStream:
-		msg += " — Spotify plays this one at its own speed"
-	case s.st.Live:
-		msg += " — this live stream plays at its own speed"
+	msg := kind + " play at their own speed"
+	if *speed != 1 {
+		msg = kind + " play at " + speedLabel(*speed)
+	}
+	if why := s.speedLocked(); why != "" {
+		msg += " — " + why
 	}
 	s.notes = append(s.notes, notice(msg))
 }

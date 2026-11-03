@@ -53,6 +53,7 @@ var iconPaths = map[string]string{
 	"edit":         "M4 20h4l11-11-4-4L4 16zM13 7l4 4",
 	"sidebar":      "M3.5 4.5h17v15h-17zM9 4.5v15",
 	"video":        "M3.5 5.5h17v13h-17zM10 9v6l5-3z",
+	"speed":        "M6 18A8.5 8.5 0 1 1 18 18M12 12l3.5-3.5",
 }
 
 // icons are iconPaths drawn as lines, and solidIcons as filled shapes, as

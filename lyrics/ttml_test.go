@@ -27,13 +27,13 @@ func TestParseTTMLWordSynced(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []Line{{1250, "Paper kites"}, {3500, "over the bay (the bay)"}, {62000, "Tom & Jo (hey)"}}
+	want := []said{{1250, "Paper kites"}, {3500, "over the bay (the bay)"}, {62000, "Tom & Jo (hey)"}}
 	if !l.Synced || len(l.Lines) != len(want) {
 		t.Fatalf("lyrics = %+v", l)
 	}
-	for i := range want {
-		if l.Lines[i] != want[i] {
-			t.Errorf("line %d = %+v, want %+v", i, l.Lines[i], want[i])
+	for i, got := range saidOf(l.Lines) {
+		if got != want[i] {
+			t.Errorf("line %d = %+v, want %+v", i, got, want[i])
 		}
 	}
 }
@@ -54,12 +54,13 @@ func TestParseTTMLLineSynced(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []Line{{9000, "Earlier"}, {10500, "紙の飛行機"}, {12000, "Second line"}, {13500, "Third line"}, {15000, "Fourth"}}
+	want := []said{{9000, "Earlier"}, {10500, "紙の飛行機"}, {12000, "Second line"}, {13500, "Third line"}, {15000, "Fourth"}}
 	if !l.Synced || len(l.Lines) != len(want) {
 		t.Fatalf("lyrics = %+v", l)
 	}
-	for i := range want {
-		if l.Lines[i] != want[i] {
+	for i, got := range saidOf(l.Lines) {
+		// Lines synced line by line have no words.
+		if got != want[i] || l.Lines[i].Words != nil {
 			t.Errorf("line %d = %+v, want %+v", i, l.Lines[i], want[i])
 		}
 	}
@@ -80,8 +81,8 @@ func TestParseTTMLLeavesOut(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []Line{{1000, "Sung"}, {2000, "First word"}}
-	if !l.Synced || len(l.Lines) != len(want) || l.Lines[0] != want[0] || l.Lines[1] != want[1] {
+	want := []said{{1000, "Sung"}, {2000, "First word"}}
+	if got := saidOf(l.Lines); !l.Synced || len(got) != len(want) || got[0] != want[0] || got[1] != want[1] {
 		t.Errorf("lyrics = %+v", l)
 	}
 }

@@ -43,5 +43,16 @@ belongs to its main thread: what finishes elsewhere comes back through
   artwork. The Material themes make their colours of a seed in HCT
   (`material.go`, `internal/hct`, a port of Material Color Utilities),
   unless a colour file gives them.
+- **Lyrics** light the line sung now, and its words as they are sung when
+  they have times (`lyricswords.go`). Lines of TTML synced word by word
+  keep their words' times (`lyrics.Line.Words`): each span with a begin
+  time is a word, or a syllable, and a line with sung text outside of them
+  has none. The line's text element is clear, and its Draw paints the
+  glyphs of a layout of its own, the same, cut where the song is, the part
+  sung in the accent. The song's time moves on from the position the
+  player last told, at the track's speed, for 1.5 s at most, so the words
+  fill in frames that only paint again; Reduce Motion lights each word
+  whole as it starts. Lines shown in Latin letters in their place light
+  whole.
 - **Deep links** and second launches open their pages in the main window
   (`App.OnNavigate`).

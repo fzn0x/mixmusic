@@ -594,7 +594,7 @@ func TestSkipAISettings(t *testing.T) {
 	if next, _ := h.p.State().UpNext(); next.Track.ID != "yt:b" {
 		t.Errorf("up next %s", next.Track.ID)
 	}
-	h.p.SettingsChanged(settings.Settings{SkipAI: true, SpotifyPlayback: off.SpotifyPlayback})
+	h.p.SettingsChanged(settings.Settings{Playback: settings.Playback{SkipAI: true, SpotifyPlayback: off.SpotifyPlayback}})
 	h.wait("skipping on", func(p *Player) bool { return p.skipAI && slices.Equal(marked(p.s), []string{"yt:b"}) })
 	h.on(func(p *Player) {
 		if !playing("a")(p) {

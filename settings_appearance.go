@@ -282,7 +282,7 @@ func (s *shell) cardLook(id string) *look {
 	}
 	tk, ok := s.cardLooks[id]
 	if !ok {
-		l := newLook(settings.Settings{Theme: id, FontScale: 1, Layout: s.set.Layout}, themes, false, "", colorfile.Colors{})
+		l := newLook(settings.Settings{Appearance: settings.Appearance{Theme: id, FontScale: 1, Layout: s.set.Layout}}, themes, false, "", colorfile.Colors{})
 		tk = &l
 		s.cardLooks[id] = tk
 	}

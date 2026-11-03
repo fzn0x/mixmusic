@@ -253,7 +253,7 @@ func (a *App) colorFileFailed(gen int, path string, err error) bool {
 func (a *App) rereadColorFile() {
 	f := &a.colorFile
 	f.mu.Lock()
-	gen, s := f.gen, settings.Settings{ColorSource: f.source, ColorFile: f.file}
+	gen, s := f.gen, settings.Settings{Appearance: settings.Appearance{ColorSource: f.source, ColorFile: f.file}}
 	f.mu.Unlock()
 	if s.ColorSource == settings.ColorsTheme || s.ColorSource == settings.ColorsFile && s.ColorFile == "" {
 		return

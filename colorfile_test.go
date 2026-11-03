@@ -196,7 +196,7 @@ func TestLookColorFileModes(t *testing.T) {
 	}
 	// The settings without a colour file, as the theme cards have them,
 	// wear the theme's own.
-	own := newLook(settings.Settings{Theme: "mix", FontScale: 1}, s.inv.Themes, true, "", matugen)
+	own := newLook(settings.Settings{Appearance: settings.Appearance{Theme: "mix", FontScale: 1}}, s.inv.Themes, true, "", matugen)
 	if hexColor(own.bg) != "#000000" {
 		t.Errorf("a theme card wears the file's ground %s", hexColor(own.bg))
 	}
@@ -231,7 +231,7 @@ func TestLookColorFileAccent(t *testing.T) {
 	if a := newLook(set, s.inv.Themes, true, "#00e0a0", f); hexColor(a.accent) != readable("#00e0a0") {
 		t.Errorf("the artwork's accent over the user's: %s", hexColor(a.accent))
 	}
-	theme := newLook(settings.Settings{Theme: "mochi", FontScale: 1, Layout: set.Layout}, s.inv.Themes, true, "", colorfile.Colors{})
+	theme := newLook(settings.Settings{Appearance: settings.Appearance{Theme: "mochi", FontScale: 1, Layout: set.Layout}}, s.inv.Themes, true, "", colorfile.Colors{})
 	if k.body != theme.body || k.display != theme.display || k.radius != theme.radius || k.fx != theme.fx {
 		t.Errorf("Mochi in a file's colours lost its type, corners or effects: %+v", k)
 	}
@@ -410,7 +410,7 @@ func TestChooseColorFile(t *testing.T) {
 // it's another.
 func TestColorFileNote(t *testing.T) {
 	now := time.Date(2026, 11, 2, 14, 30, 0, 0, time.Local)
-	set := settings.Settings{ColorSource: settings.ColorsPywal}
+	set := settings.Settings{Appearance: settings.Appearance{ColorSource: settings.ColorsPywal}}
 	read := app.ColorFileStatus{Source: settings.ColorsPywal, Path: "/x", Colors: testColors(t, "pywal-3.8.json"), ReadAt: now.Add(-time.Hour)}
 	if got, bad := colorFileNote(read, set, now); got != "Read at 13:30, and followed as it changes." || bad {
 		t.Errorf("%q, %v", got, bad)
@@ -459,10 +459,10 @@ func TestColorFileSettingsViewed(t *testing.T) {
 func TestColorsStep(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "colors.json")
 	for arg, want := range map[string]settings.Settings{
-		"pywal":   {ColorSource: settings.ColorsPywal},
-		"matugen": {ColorSource: settings.ColorsMatugen},
-		path:      {ColorSource: settings.ColorsFile, ColorFile: path},
-		"off":     {ColorSource: settings.ColorsTheme},
+		"pywal":   {Appearance: settings.Appearance{ColorSource: settings.ColorsPywal}},
+		"matugen": {Appearance: settings.Appearance{ColorSource: settings.ColorsMatugen}},
+		path:      {Appearance: settings.Appearance{ColorSource: settings.ColorsFile, ColorFile: path}},
+		"off":     {Appearance: settings.Appearance{ColorSource: settings.ColorsTheme}},
 	} {
 		var set settings.Settings
 		colorsStep(&set, arg)

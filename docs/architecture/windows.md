@@ -12,6 +12,16 @@ belongs to its main thread: what finishes elsewhere comes back through
   and keeps them when a refresh fails, which one toast tells. Home's own
   tile and shelves read the library as it is, and need no refresh.
 
+- **Long playlists** (`playlistread.go`): a playlist's page, and the
+  songs liked on YouTube Music in the library, show their first page of
+  tracks at once and read the rest beside it, telling how many came, how
+  many could be read when a page failed for good, with a way to try
+  again, and where a list longer than 20,000 was cut. Play and Shuffle
+  take the whole list: pressed while it's read, they wait for it, unless
+  another track started meanwhile. The items of the page's menu that
+  take its tracks, and its download, show once the list is whole. The
+  queue builds only its entries near the view, as it may hold thousands.
+
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
   MB of pixels (`artwork.go`). An image that couldn't load tries again

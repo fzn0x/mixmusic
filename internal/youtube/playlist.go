@@ -7,12 +7,9 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 )
 
-// maxPlaylistPages bounds how many pages of a long playlist are read, of
-// about a hundred tracks each.
-const maxPlaylistPages = 10
-
-// Playlist returns a playlist with its tracks, by its playlist ID (PL…,
-// RD…, OLAK5uy_…), reading up to about a thousand tracks.
+// Playlist returns a playlist with its first page of tracks, about a
+// hundred, by its playlist ID (PL…, RD…, OLAK5uy_…). While it has more,
+// More is the token of their next page, which PlaylistPage reads.
 func (c *Client) Playlist(ctx context.Context, playlistID string) (media.Playlist, error) {
 	n, err := c.browse(ctx, "VL"+playlistID)
 	if err != nil {
@@ -22,19 +19,23 @@ func (c *Client) Playlist(ctx context.Context, playlistID string) (media.Playlis
 	if err != nil {
 		return p, err
 	}
-	for page := 1; token != "" && page < maxPlaylistPages; page++ {
-		more, err := c.call(ctx, "browse", map[string]any{"continuation": token}, nil)
-		if err != nil {
-			break // keep the tracks read so far
-		}
-		var items []node
-		items, token = continuationItems(more)
-		p.Tracks = append(p.Tracks, tracksOf(parseItems(items))...)
-	}
-	if p.TrackCount == 0 {
+	p.More = token
+	if p.TrackCount == 0 && token == "" {
 		p.TrackCount = len(p.Tracks)
 	}
 	return p, nil
+}
+
+// PlaylistPage returns the tracks of a page of a playlist past its first,
+// by the token of More, and the token of the page after it, "" after the
+// last.
+func (c *Client) PlaylistPage(ctx context.Context, token string) ([]media.Track, string, error) {
+	n, err := c.call(ctx, "browse", map[string]any{"continuation": token}, nil)
+	if err != nil {
+		return nil, "", err
+	}
+	items, next := continuationItems(n)
+	return tracksOf(parseItems(items)), next, nil
 }
 
 // parsePlaylist reads the first page of a playlist, and returns the token

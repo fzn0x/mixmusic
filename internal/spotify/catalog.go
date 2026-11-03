@@ -16,8 +16,6 @@ const (
 	searchLimit = 10
 	// pageLimit is the most items of a page of most lists.
 	pageLimit = 50
-	// maxTracks bounds how many tracks of an album or playlist are read.
-	maxTracks = 1000
 )
 
 // ErrPlaylistUnavailable is returned for playlists whose tracks Spotify
@@ -85,7 +83,9 @@ func (c *Client) Search(ctx context.Context, query string) (media.SearchResults,
 	return out, nil
 }
 
-// Album returns an album with its tracks.
+// Album returns an album with its tracks, up to media.MaxTracks. A page of
+// them that fails is asked for again a few times, and then fails the
+// album.
 func (c *Client) Album(ctx context.Context, id string) (media.Album, error) {
 	var a album
 	if err := c.get(ctx, "/albums/"+url.PathEscape(id), nil, &a); err != nil {
@@ -95,13 +95,22 @@ func (c *Client) Album(ctx context.Context, id string) (media.Album, error) {
 	if a.Tracks == nil {
 		return out, nil
 	}
-	for next := a.Tracks.Next; next != "" && len(out.Tracks) < maxTracks; {
+	read := func(ctx context.Context, next string) ([]media.Track, string, error) {
 		var page paging[*track]
 		if err := c.get(ctx, next, nil, &page); err != nil {
-			break // keep the tracks read so far
+			return nil, "", err
 		}
-		out.Tracks = append(out.Tracks, toTracks(page.Items, &a)...)
-		next = page.Next
+		return toTracks(page.Items, &a), page.Next, nil
+	}
+	for next := a.Tracks.Next; next != "" && len(out.Tracks) < media.MaxTracks; {
+		tracks, after, err := media.ReadPage(ctx, read, next)
+		if err != nil {
+			return media.Album{}, err
+		}
+		out.Tracks, next = append(out.Tracks, tracks...), after
+	}
+	if len(out.Tracks) > media.MaxTracks {
+		out.Tracks = out.Tracks[:media.MaxTracks]
 	}
 	return out, nil
 }
@@ -153,31 +162,45 @@ func (c *Client) Artist(ctx context.Context, id string) (media.Artist, error) {
 	return out, nil
 }
 
-// Playlist returns a playlist with its tracks. Spotify only shows the
-// tracks of playlists the user owns or collaborates on.
+// Playlist returns a playlist with its first page of tracks. Spotify only
+// shows the tracks of playlists the user owns or collaborates on. While it
+// has more, More is the address of their next page, which PlaylistPage
+// reads.
 func (c *Client) Playlist(ctx context.Context, id, userID string) (media.Playlist, error) {
 	var p playlist
 	if err := c.get(ctx, "/playlists/"+url.PathEscape(id), nil, &p); err != nil {
 		return media.Playlist{}, err
 	}
 	out := toPlaylist(&p, userID)
-	entries := p.entries()
-	if entries == nil {
-		if !out.Editable {
-			return out, ErrPlaylistUnavailable
-		}
-		entries = &paging[playlistItem]{Next: c.BaseURL + "/playlists/" + url.PathEscape(id) + "/items?limit=" + strconv.Itoa(pageLimit)}
+	if entries := p.entries(); entries != nil {
+		out.More = entries.Next
+		return out, nil
 	}
-	for next := entries.Next; next != "" && len(out.Tracks) < maxTracks; {
-		var page paging[playlistItem]
-		if err := c.get(ctx, next, nil, &page); err != nil {
-			break
-		}
-		out.Tracks = append(out.Tracks, playlistTracks(page.Items)...)
-		out.TrackCount = max(out.TrackCount, page.Total)
-		next = page.Next
+	if !out.Editable {
+		return out, ErrPlaylistUnavailable
 	}
+	// Spotify gave the playlist without its tracks: their first page is
+	// asked for apart.
+	var page paging[playlistItem]
+	if err := c.get(ctx, "/playlists/"+url.PathEscape(id)+"/items?limit="+strconv.Itoa(pageLimit), nil, &page); err != nil {
+		return media.Playlist{}, err
+	}
+	out.Tracks, out.More, out.TrackCount = playlistTracks(page.Items), page.Next, max(out.TrackCount, page.Total)
 	return out, nil
+}
+
+// PlaylistPage returns the tracks of a page of a playlist past its first,
+// by the address of More, and the address of the page after it, "" after
+// the last. It asks only the API for them.
+func (c *Client) PlaylistPage(ctx context.Context, next string) ([]media.Track, string, error) {
+	if !strings.HasPrefix(next, strings.TrimRight(c.BaseURL, "/")+"/") {
+		return nil, "", errors.New("spotify: the next page of the playlist is not the API's")
+	}
+	var page paging[playlistItem]
+	if err := c.get(ctx, next, nil, &page); err != nil {
+		return nil, "", err
+	}
+	return playlistTracks(page.Items), page.Next, nil
 }
 
 // MyPlaylists returns the playlists the user made or follows.

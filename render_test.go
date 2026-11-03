@@ -224,9 +224,9 @@ func TestRender(t *testing.T) {
 	}}
 	s.loads["album:al-1"] = &loaded[media.Album]{done: true, value: album}
 	s.loads["lyrics:spotify:2"] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB", Lines: []lyrics.Line{
-		{TimeMs: 0, Text: "Love, love is a verb"}, {TimeMs: 4000, Text: "Love is a doing word"},
-		{TimeMs: 9000, Text: "Fearless on my breath"}, {TimeMs: 14000, Text: "Gentle impulsion"},
-		{TimeMs: 19000, Text: "Shakes me, makes me lighter"}, {TimeMs: 24000, Text: "Fearless on my breath"}}}}
+		{TimeMs: 0, Text: "Stones remember every tide"}, {TimeMs: 4000, Text: "Sand keeps the shape of it"},
+		{TimeMs: 9000, Text: "Quiet as the harbour light"}, {TimeMs: 14000, Text: "Slow wind over the pier"},
+		{TimeMs: 19000, Text: "Lifts me, sets me down again"}, {TimeMs: 24000, Text: "Quiet as the harbour light"}}}}
 
 	// Home's jump back in tile offers what played last.
 	if err := s.svc.Collection.RecordPlay(testTracks[0]); err != nil {

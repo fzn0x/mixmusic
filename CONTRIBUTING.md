@@ -69,7 +69,10 @@ those files and a few new ones, not a shared list or a shared struct.
   `internal/settings/playback.go`, with its default and its clean-up beside
   it. Each field has a doc comment of its own, so a new field never makes
   gofmt re-align the ones beside it. `settings.json` stays flat: the
-  sections are embedded.
+  sections are embedded. A literal names the section, as in
+  `settings.Settings{Playback: settings.Playback{Volume: 1}}`: editors'
+  gopls doesn't read a section's field set on `Settings` itself, which
+  Go 1.27 compiles, and a test keeps it so.
 - **The settings page.** A setting's row lives in its feature's file, and
   registers itself from `init()` with an order number, spaced by 10.
   Nothing edits a central list or switch.

@@ -10,7 +10,16 @@
 # no other Linux has, so 0.5.6's x64 builds didn't start outside NixOS
 # (#166). MYGO_LDFLAGS applies to every target of a build: hence a build
 # per platform.
+#
+# On a Mac, Nix's shell has an xcrun of its own, which finds tools in the
+# SDK of nixpkgs (its DEVELOPER_DIR), without notarytool or stapler. When
+# release.yml signs, APPLE_TOOLS holds the Mac's own xcrun and codesign,
+# which mygo build signs and notarizes with: they come first.
 set -euo pipefail
+
+if [ -n "${APPLE_TOOLS:-}" ]; then
+	PATH="$APPLE_TOOLS:$PATH"
+fi
 
 IFS=, read -r -a platforms <<<"${1:?usage: build.sh <platform>[,<platform>...]}"
 for p in "${platforms[@]}"; do

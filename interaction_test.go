@@ -393,7 +393,7 @@ func TestNowPlayingRelated(t *testing.T) {
 func TestLyricsTwice(t *testing.T) {
 	s := newTestShell(t)
 	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB",
-		Lines: []lyrics.Line{{TimeMs: 0, Text: "Waiting in a car"}, {TimeMs: 60000, Text: "Waiting for a ride in the dark"}}}}
+		Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper boats on the river"}, {TimeMs: 60000, Text: "Carry what the morning said"}}}}
 	s.p.PlayTracks(testTracks, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	tt := testerOf(t, s, 1280, 1800)
@@ -403,7 +403,7 @@ func TestLyricsTwice(t *testing.T) {
 	tt.Advance(time.Second)
 	n := 0
 	for _, text := range tt.Texts() {
-		if text == "Waiting in a car" {
+		if text == "Paper boats on the river" {
 			n++
 		}
 	}
@@ -535,7 +535,7 @@ func TestNewYouTubePlaylist(t *testing.T) {
 	s.loads["youtube:playlists"] = &loaded[[]media.Playlist]{done: true}
 	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true}
 	s.loads["youtube:artists"] = &loaded[[]media.Artist]{done: true}
-	s.loads["youtube:liked"] = &loaded[[]media.Track]{done: true}
+	s.loads["youtube:liked"] = &loaded[media.Playlist]{done: true}
 	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
 	tt := tester(t, s)
 	show(s, tt, "/album/al-x")
@@ -609,7 +609,7 @@ func youtubeLibraryOf(s *shell, playlists ...media.Playlist) *loaded[[]media.Pla
 	s.loads["youtube:playlists"] = l
 	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true}
 	s.loads["youtube:artists"] = &loaded[[]media.Artist]{done: true}
-	s.loads["youtube:liked"] = &loaded[[]media.Track]{done: true}
+	s.loads["youtube:liked"] = &loaded[media.Playlist]{done: true}
 	return l
 }
 
@@ -1073,7 +1073,7 @@ func TestPanelKept(t *testing.T) {
 func TestLyricsPlainKept(t *testing.T) {
 	s := newTestShell(t)
 	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB",
-		Lines: []lyrics.Line{{TimeMs: 0, Text: "Waiting in a car"}}}}
+		Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper boats on the river"}}}}
 	s.p.PlayTracks(testTracks, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	s.showPanel("lyrics")

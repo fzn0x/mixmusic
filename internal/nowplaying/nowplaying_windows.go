@@ -240,9 +240,8 @@ type winControls struct {
 	shown *Info
 	// rate is the rate the controls were told last, or 0.
 	rate float64
-	// artwork is the address of the artwork shown, fetching that of the
-	// artwork that downloads.
-	artwork, fetching string
+	// artwork is the address of the cover the thumbnail shows.
+	artwork string
 	// on is set while the controls are on. They last went off at offAt,
 	// and nothing shows since cleared; settling turns them on or off
 	// later.
@@ -537,7 +536,7 @@ func (w *winControls) settle() {
 }
 
 // describe shows the track of info: its title, artists and album, and its
-// artwork once it downloaded.
+// cover once MixMusic has it.
 func (w *winControls) describe(info *Info) {
 	set := func(fn uintptr, this unsafe.Pointer, s string) {
 		h, err := newHString(s)
@@ -552,37 +551,19 @@ func (w *winControls) describe(info *Info) {
 	set(w.music.vtbl.putTitle, unsafe.Pointer(w.music), info.Title)
 	set(w.music.vtbl.putArtist, unsafe.Pointer(w.music), strings.Join(info.Artists, ", "))
 	set(w.music2.vtbl.putAlbumTitle, unsafe.Pointer(w.music2), info.Album)
-	if info.Artwork != w.artwork {
+	if cover := info.cover(); cover != w.artwork {
+		var ref *iInspectable
+		if cover != "" {
+			ref = w.thumbnail(info.Cover)
+		}
+		syscall.SyscallN(w.updater.vtbl.putThumbnail, uintptr(unsafe.Pointer(w.updater)), uintptr(unsafe.Pointer(ref)))
 		w.artwork = ""
-		syscall.SyscallN(w.updater.vtbl.putThumbnail, uintptr(unsafe.Pointer(w.updater)), 0)
-		if info.Artwork != "" && info.Artwork != w.fetching {
-			w.fetching = info.Artwork
-			go w.fetchArtwork(info.Artwork)
+		if ref != nil {
+			release(unsafe.Pointer(ref))
+			w.artwork = cover
 		}
 	}
 	syscall.SyscallN(w.updater.vtbl.update, uintptr(unsafe.Pointer(w.updater)))
-}
-
-// fetchArtwork downloads the artwork at rawURL, and shows it if it's still
-// the artwork of the track that shows.
-func (w *winControls) fetchArtwork(rawURL string) {
-	data, err := download(rawURL)
-	w.do(func() {
-		if w.fetching == rawURL {
-			w.fetching = ""
-		}
-		if err != nil || len(data) == 0 || w.smtc == nil || w.shown == nil || w.shown.Artwork != rawURL {
-			return
-		}
-		ref := w.thumbnail(data)
-		if ref == nil {
-			return
-		}
-		syscall.SyscallN(w.updater.vtbl.putThumbnail, uintptr(unsafe.Pointer(w.updater)), uintptr(unsafe.Pointer(ref)))
-		release(unsafe.Pointer(ref))
-		syscall.SyscallN(w.updater.vtbl.update, uintptr(unsafe.Pointer(w.updater)))
-		w.artwork = rawURL
-	})
 }
 
 // thumbnail returns a reference to a stream of the image data, or nil.

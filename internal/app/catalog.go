@@ -162,11 +162,14 @@ func (c *Catalog) Artist(ctx context.Context, id string) (media.Artist, error) {
 }
 
 // Playlist returns a playlist with its tracks, of any service or made in
-// MixMusic.
+// MixMusic: all of them, up to media.MaxTracks, past which it's Cut. A page
+// of them that still fails after a few tries fails it.
 func (c *Catalog) Playlist(ctx context.Context, id string) (media.Playlist, error) {
-	return c.a.playlist(ctx, id)
+	return c.a.wholePlaylist(ctx, id)
 }
 
+// playlist returns a playlist with its first page of tracks, which readOn
+// reads on from.
 func (a *App) playlist(ctx context.Context, id string) (media.Playlist, error) {
 	source, native, err := media.ParseID(id)
 	if err != nil {

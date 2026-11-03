@@ -27,6 +27,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/online"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/romaji"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/store"
@@ -68,6 +69,9 @@ type Options struct {
 	// mini player: windows that MyGo draws, of the root package.
 	Interface func(a *App, hidden bool) *mygo.Window
 	Mini      func(a *App) *mygo.Window
+	// Notch opens the player around the notch of a MacBook's screen, or
+	// returns nil where no screen has a camera housing (#46).
+	Notch func(a *App) *mygo.Window
 	// Hotkeys registers the user's global shortcuts: mygo.GlobalShortcut
 	// when nil, once the app is ready.
 	Hotkeys Hotkeys
@@ -75,6 +79,10 @@ type Options struct {
 	// told of, a second when zero: tests shorten it, at once when
 	// negative.
 	ProblemWait time.Duration
+	// RomajiURL is where the dictionary of the readings of kanji, which
+	// romaji downloads, comes from: romaji.DictionaryURL when empty. Tests
+	// give their own.
+	RomajiURL string
 	// CastBrowse, when set, finds the cast devices on the network in place
 	// of mDNS: tests set it.
 	CastBrowse func(ctx context.Context) ([]cast.Device, error)
@@ -107,6 +115,7 @@ type App struct {
 	lyrics       *lyrics.Client
 	unison       *lyrics.Unison
 	translations *translations
+	romaji       *romaji.Dictionary
 	addons       *addons.Manager
 	storage      *addons.Storage
 	lyricsMemo   *memo[lyrics.Lyrics]
@@ -141,6 +150,8 @@ type App struct {
 	// miniOpen is set while the mini player is open, which the main
 	// window's frames ask without taking mu.
 	miniOpen atomic.Bool
+	// notch is the player around the notch, while it shows.
+	notch notchPlayer
 	// onNavigate shows the pages of the main window.
 	onNavigate *func(target string)
 	// updates keeps the user's choices of updates.
@@ -277,6 +288,7 @@ func New(opts Options) (*App, error) {
 	a.lyrics = lyrics.New(userAgent)
 	a.unison = lyrics.NewUnison(userAgent)
 	a.translations = newTranslations(filepath.Join(opts.CacheDir, "lyrics-translations"))
+	a.romaji = newRomaji(opts, userAgent)
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
 	a.related = newMemo[[]media.Shelf](100)
 	a.artStore = artwork.NewStore(filepath.Join(opts.CacheDir, "artwork"), artworkLimit)

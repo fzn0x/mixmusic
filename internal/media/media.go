@@ -194,6 +194,13 @@ type Playlist struct {
 	// Deletable is set for playlists the user may delete on their
 	// service: those YouTube Music offers to delete, the user's own.
 	Deletable bool `json:"deletable,omitempty"`
+	// More names the next page of the playlist's tracks, past those it
+	// holds, while its service has more: its token there, which ReadOn
+	// reads on from.
+	More string `json:"-"`
+	// Cut is set for a playlist of more tracks than MixMusic reads,
+	// MaxTracks: it holds the first of them.
+	Cut bool `json:"-"`
 }
 
 // ItemKind is the kind of an Item.

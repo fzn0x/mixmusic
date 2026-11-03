@@ -32,6 +32,12 @@ release:
   extra_files:
     - glob: ./release/*
 
+# No homebrew_casks: GoReleaser makes a cask of the archives and binaries
+# it builds itself, and it builds none here (it fails with "no linux/macos
+# archives found"); and its casks install commands (binary), not apps
+# (app). release.yml writes the cask with tools/cask once the release is
+# out.
+
 # GoReleaser writes no changelog of its own: release.yml always passes the
 # notes it takes from CHANGELOG.md with --release-notes. Don't set
 # changelog.disable: it drops those notes too, and the release is

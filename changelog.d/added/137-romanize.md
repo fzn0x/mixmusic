@@ -5,6 +5,4 @@
   its romanization, then its translation. The choice is remembered for
   the next song in the same language. The romanization comes with the
   translation from Unison: while it's on, the lyrics go to Unison with
-  the track's video ID. Romaji for Japanese isn't there yet, as the
-  translation service gives none for Japanese: the switch, named
-  "romaji", shows once it does (#137).
+  the track's video ID (#137).

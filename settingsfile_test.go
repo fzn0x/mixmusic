@@ -219,6 +219,8 @@ func TestSettingsFileFollows(t *testing.T) {
 		t.Fatalf("the panel is %q", s.panel)
 	}
 	s.loads["registry"] = &loaded[int]{done: true}
+	toolsBefore := &loaded[tools.Status]{done: true, asks: 1}
+	s.loads["tools"] = toolsBefore
 	editSettings(t, s, `{"panel": "lyrics", "registryUrl": "https://example.com/registry.json", "ytdlpPath": "/opt/yt-dlp", "zoom": 1.25}`)
 	s.refresh()
 	if s.panel != "lyrics" {
@@ -227,8 +229,9 @@ func TestSettingsFileFollows(t *testing.T) {
 	if _, ok := s.loads["registry"]; ok {
 		t.Error("the marketplace keeps the former registry")
 	}
-	if _, ok := s.loads["tools"].(*loaded[tools.Status]); ok {
-		t.Error("the tools stay as they were")
+	// The tools are asked again, and stay shown until the answer comes.
+	if l, _ := s.loads["tools"].(*loaded[tools.Status]); l != toolsBefore || !l.again && l.asks == 1 {
+		t.Error("the tools aren't asked again")
 	}
 	if !s.zoomToast {
 		t.Error("the zoom isn't told")

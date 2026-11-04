@@ -157,7 +157,9 @@ func parseMultiRowItem(r node, show media.Ref) (media.Item, bool) {
 	if show.Name != "" {
 		line.show = show
 	}
-	return media.Item{Kind: media.ItemTrack, Track: newEpisode(videoID, title, line, episodeArt(thumbnailList(r)))}, true
+	t := newEpisode(videoID, title, line, episodeArt(thumbnailList(r)))
+	readProgress(t, r.get("playbackProgress", "musicPlaybackProgressRenderer"))
+	return media.Item{Kind: media.ItemTrack, Track: t}, true
 }
 
 // parseEpisodeListItem reads a row that is an episode, of a search,

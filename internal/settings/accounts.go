@@ -19,7 +19,8 @@ type Accounts struct {
 	// by its page ID; "" is the account itself.
 	YouTubeChannel string `json:"youtubeChannel"`
 	// YouTubeHistory adds what the user plays to their history on YouTube
-	// Music, once they signed in, for its recommendations.
+	// Music, once they signed in, for its recommendations, and where they
+	// left episodes, which YouTube Music resumes them from.
 	YouTubeHistory bool `json:"youtubeHistory"`
 }
 

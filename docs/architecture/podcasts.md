@@ -39,8 +39,28 @@ the user left them.
   nothing is kept; within 2 minutes of the end, or 3% of a short episode,
   it counts as played. An episode that becomes current plays from 5
   seconds before its place, through the player's optional `Resumer`, or
-  from Spotify's `resume_point` while MixMusic has none. Moving within the
-  current episode, as Previous does, never resumes.
+  from its service's while MixMusic has none: Spotify's `resume_point`,
+  or YouTube Music's, as below. Moving within the current episode, as
+  Previous does, never resumes.
+- **Where YouTube Music saw them (`internal/youtube/progress.go`,
+  `internal/library/resume.go`, `internal/app/youtube_watchtime.go`).**
+  Signed in, a row of a show's episodes tells how far the user got, as
+  `playbackProgressPercentage` of its length, and "Played" in its
+  `playbackProgressText` once they finished it: the episode keeps it as
+  `ResumeMs` and `Played`, with `ToldAt`, when it was read. That place
+  outranks MixMusic's own when it is newer: it changed since MixMusic kept
+  its own, whose track keeps the place YouTube Music told then, and was
+  read after. When MixMusic never saw it, the place further along wins.
+  One within 30 seconds and a percent of MixMusic's own keeps MixMusic's,
+  exact to the second. Once an episode's play counts, the play goes to
+  the history with a `youtube.Watch`, which reports the listening to the
+  player response's `videostatsWatchtimeUrl` as YouTube's player does,
+  with the same playback nonce: what was heard since it started, then on
+  the schedule the response tells, 10, 20 and 30 seconds after it started
+  and every 40 after, a few seconds early at random as the player has
+  them; as it pauses and plays again; and a last time, `final=1`, as
+  another track plays or none does. The history setting governs it as it
+  does the plays: off, or signed out, nothing goes.
 - **The player.** Episodes never crossfade, the next episode's audio
   isn't fetched ahead, and the queue that ends on an episode stops rather
   than start a radio. Episodes don't scrobble, and the stats leave them

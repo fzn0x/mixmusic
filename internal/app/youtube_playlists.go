@@ -128,6 +128,11 @@ func (a *App) reportYouTubePlay(t media.Track) {
 	if err != nil {
 		return
 	}
+	// An episode's play goes with the reports of how much of it is heard.
+	if t.IsEpisode() {
+		a.countWatchtime(t)
+		return
+	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()

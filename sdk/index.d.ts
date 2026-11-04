@@ -55,7 +55,7 @@ export interface Episode {
   show: Ref;
   /** The day it came out, as 2026-10-30, or its month or year alone. */
   released?: string;
-  /** Where the user left it on Spotify, and whether they heard it all. */
+  /** Where the user left it on its service, signed in, and whether they heard it all. */
   resumeMs?: number;
   played?: boolean;
 }

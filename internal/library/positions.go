@@ -154,14 +154,15 @@ func (p *Positions) Get(id string) (Position, bool) {
 
 // ResumeAt returns where an episode plays from as it starts: a little
 // before where the user left it, or where its service says they left it
-// when MixMusic has no place of its own; 0 for one played, and for a
-// track that is no episode.
+// when MixMusic has no place of its own, or YouTube Music's place outranks
+// it (toldOutranks); 0 for one played, and for a track that is no episode.
 func (p *Positions) ResumeAt(t media.Track) time.Duration {
 	if !t.IsEpisode() {
 		return 0
 	}
 	at := time.Duration(0)
-	if pos, ok := p.Get(t.ID); ok {
+	pos, ok := p.Get(t.ID)
+	if ok && !toldOutranks(pos, t) {
 		if pos.Started() {
 			at = time.Duration(pos.PositionMs) * time.Millisecond
 		}

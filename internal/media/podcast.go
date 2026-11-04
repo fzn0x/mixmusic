@@ -1,5 +1,7 @@
 package media
 
+import "time"
+
 // ItemPodcast is the kind of an Item that holds a podcast.
 const ItemPodcast ItemKind = "podcast"
 
@@ -14,8 +16,12 @@ type Episode struct {
 	// service tells.
 	Released string `json:"released,omitempty"`
 	// ResumeMs is where the user left the episode on its service: only
-	// Spotify tells, to a sign-in that lets MixMusic read it.
+	// a sign-in tells, and Spotify's one that lets MixMusic read it.
 	ResumeMs int `json:"resumeMs,omitempty"`
+	// ToldAt is when YouTube Music told ResumeMs and Played, as the
+	// episode was read: zero when it told nothing, as signed out, and for
+	// Spotify's, which a place MixMusic keeps of its own always outranks.
+	ToldAt time.Time `json:"toldAt,omitzero"`
 	// Played is set once the user heard the episode to its end, as its
 	// service tells.
 	Played bool `json:"played,omitempty"`

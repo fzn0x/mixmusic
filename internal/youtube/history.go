@@ -20,29 +20,46 @@ func (c *Client) ReportPlay(ctx context.Context, videoID string) error {
 	if c.session() != nil {
 		return nil
 	}
+	_, err := c.reportPlay(ctx, videoID, playbackNonce())
+	return err
+}
+
+// reportPlay asks for the player response of videoID, reports the play to
+// its videostatsPlaybackUrl with the playback nonce cpn, and returns the
+// response.
+func (c *Client) reportPlay(ctx context.Context, videoID, cpn string) (node, error) {
 	n, err := c.call(ctx, "player", map[string]any{
 		"videoId":         videoID,
 		"playbackContext": map[string]any{"contentPlaybackContext": map[string]any{}},
 	}, nil)
 	if err != nil {
-		return err
+		return node{}, err
 	}
 	base := n.get("playbackTracking", "videostatsPlaybackUrl", "baseUrl").str()
 	if base == "" {
-		return errors.New("youtube music: no playback report for this track")
+		return node{}, errors.New("youtube music: no playback report for this track")
 	}
 	u, err := url.Parse(base)
 	if err != nil {
-		return err
+		return node{}, err
 	}
 	if !reportsTo(u) {
-		return fmt.Errorf("youtube music: refusing to report the play to %s", u.Host)
+		return node{}, fmt.Errorf("youtube music: refusing to report the play to %s", u.Host)
 	}
 	q := u.Query()
 	q.Set("ver", "2")
 	q.Set("c", clientName)
-	q.Set("cpn", playbackNonce())
+	q.Set("cpn", cpn)
 	u.RawQuery = q.Encode()
+	return n, c.ping(ctx, u)
+}
+
+// ping sends one of the reports of YouTube's player, at u, with the
+// session, as its website sends them.
+func (c *Client) ping(ctx context.Context, u *url.URL) error {
+	if !reportsTo(u) {
+		return fmt.Errorf("youtube music: refusing to report to %s", u.Host)
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
 		return err

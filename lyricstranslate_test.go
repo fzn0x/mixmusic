@@ -52,25 +52,29 @@ func lyricsIn(t *testing.T, lang string, tr *loaded[translated]) (*shell, func()
 
 // TestLyricsSwitches offers to translate lyrics in another language than
 // the one they translate to, and to show those in another script in Latin
-// letters, where Unison romanizes them, or in romaji, for Japanese.
+// letters, which MixMusic writes, or in romaji, for Japanese.
 func TestLyricsSwitches(t *testing.T) {
 	for _, c := range []struct {
 		lang                string
+		lines               []lyrics.Line
 		translate, romanize string
 	}{
-		{"ko", "translate", "romanize"},
-		{"ru", "translate", "romanize"},
-		{"ja", "translate", "romaji"},
-		// Unison romanized no Ukrainian when checked: its switch waits
-		// for a translation that brings some.
-		{"uk", "translate", ""},
-		{"es", "translate", ""},
-		{"en", "", ""},
+		{"ko", seoulLines, "translate", "romanize"},
+		{"ru", []lyrics.Line{{Text: "Бумажный змей"}}, "translate", "romanize"},
+		{"ja", kiteLines, "translate", "romaji"},
+		// Unison romanized no Ukrainian when checked: MixMusic does.
+		{"uk", []lyrics.Line{{Text: "Паперовий змій"}}, "translate", "romanize"},
+		// Lyrics said to be Korean, not in Hangul, have nothing to
+		// romanize.
+		{"ko", kiteLines[:1], "translate", ""},
+		{"es", kiteLines, "translate", ""},
+		{"en", kiteLines, "", ""},
 		// A language MixMusic couldn't tell may be another, as Japanese,
 		// with kana.
-		{"", "translate", "romaji"},
+		{"", kiteLines, "translate", "romaji"},
 	} {
-		_, texts := lyricsIn(t, c.lang, nil)
+		s, texts := lyricsIn(t, c.lang, nil)
+		s.loads["lyrics:"+testTracks[0].ID].(*loaded[lyrics.Lyrics]).value.Lines = c.lines
 		got := texts()
 		for _, name := range []string{"translate", "romaji", "romanize"} {
 			want := name == c.translate || name == c.romanize
@@ -78,7 +82,7 @@ func TestLyricsSwitches(t *testing.T) {
 				t.Errorf("%q lyrics: %q shows: %v", c.lang, name, !want)
 			}
 		}
-		if !slices.Contains(got, "紙の凧") {
+		if !slices.Contains(got, c.lines[0].Text) {
 			t.Errorf("%q lyrics: the lyrics don't show: %q", c.lang, got)
 		}
 	}
@@ -88,6 +92,7 @@ func TestLyricsSwitches(t *testing.T) {
 // layouts set labels: capitalised in Blend, where Tiles' are lowercase.
 func TestLyricsSwitchesInBlend(t *testing.T) {
 	s, texts := lyricsIn(t, "ko", nil)
+	s.loads["lyrics:"+testTracks[0].ID].(*loaded[lyrics.Lyrics]).value.Lines = seoulLines
 	st := s.svc.Preferences.Get()
 	st.Layout = settings.LayoutBlend
 	if _, err := s.svc.Preferences.Set(st); err != nil {
@@ -230,9 +235,10 @@ func TestLyricsTranslationFails(t *testing.T) {
 	if s.loads["lyrics-translation:"+testTracks[0].ID+":en"] == failed {
 		t.Error("try again didn't ask for the translation again")
 	}
-	// Romanization alone says so of romanization.
-	s, texts = lyricsIn(t, "ko", failed)
-	s.set.LyricsRomanize = map[string]string{"ko": settings.RomanizeUnder}
+	// Romanization alone, asked of Unison, says so of romanization: of
+	// lyrics said to be in Arabic, which MixMusic can't romanize itself.
+	s, texts = lyricsIn(t, "ar", failed)
+	s.set.LyricsRomanize = map[string]string{"ar": settings.RomanizeUnder}
 	if got := texts(); !slices.Contains(got, "Romanization isn't available right now.") {
 		t.Errorf("failed romanization: %q", got)
 	}

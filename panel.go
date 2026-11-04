@@ -218,6 +218,8 @@ type lyricsState struct {
 	languages []string
 	// romaji is what they know of the romaji of Japanese lyrics.
 	romaji romajiView
+	// local is what they know of the lyrics romanized on the computer.
+	local romanizeView
 }
 
 // lyricsScroll is where a lyrics view scrolled, the line it last scrolled
@@ -306,10 +308,11 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 			ink = k.muted
 		}
 		// The line sung now lights word by word, when its words have times
-		// and show as they are written (lyricswords.go).
-		var words []lyrics.Word
-		if synced && i == active && text == line.Text {
-			words = line.Words
+		// (lyricswords.go), and so does its romanization made on the
+		// computer (lyricsromanize.go).
+		var words, romanWords []lyrics.Word
+		if synced && i == active {
+			words, romanWords = x.words(i, line, text, roman)
 		}
 		var p ui.Element
 		if roman == "" && meaning == "" {
@@ -320,7 +323,7 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 			p = ui.Column(c).Padding(4, 24).Gap(2).Children(func() {
 				s.lyricsText(c, text, size, ink, words, 0, 0)
 				if roman != "" {
-					ui.Text(c, roman).FontSize(sub).TextColor(k.muted)
+					s.lyricsRoman(c, roman, sub, romanWords)
 				}
 				if meaning != "" {
 					ui.Text(c, meaning).FontSize(sub).TextColor(k.muted)

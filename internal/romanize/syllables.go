@@ -4,14 +4,13 @@ package romanize
 // time, each a space apart, and digits and punctuation as they go.
 type syllables struct {
 	pieces []piece
-	at     int
 	last   string
 	// word is set when the piece before is a syllable or a digit.
 	word bool
 }
 
-// add adds the syllable latin, made of the runes rs.
-func (b *syllables) add(rs []rune, latin string) {
+// add adds the syllable latin, the run's bytes up to end.
+func (b *syllables) add(end int, latin string) {
 	if latin != "" {
 		b.last = latin
 		if len(b.pieces) > 0 {
@@ -19,23 +18,25 @@ func (b *syllables) add(rs []rune, latin string) {
 		}
 		b.word = true
 	}
-	b.put(rs, latin)
+	b.pieces = append(b.pieces, piece{end, latin})
 }
 
-// repeat says the syllable before again, for the repeat mark rs.
-func (b *syllables) repeat(rs []rune) { b.add(rs, b.last) }
+// repeat says the syllable before again, for a mark of repetition, the
+// run's bytes up to end.
+func (b *syllables) repeat(end int) { b.add(end, b.last) }
 
-// plain adds text, made of rs, that isn't a syllable: digits, a space
-// from a syllable, and punctuation.
-func (b *syllables) plain(rs []rune, text string) {
+// plain adds text that isn't a syllable, the run's bytes up to end:
+// digits, a space from a syllable, and punctuation.
+func (b *syllables) plain(end int, text string) {
 	digit := text != "" && text[0] >= '0' && text[0] <= '9'
 	if digit && b.word && !b.digit() {
 		text = " " + text
 	}
 	b.word = digit
-	b.put(rs, text)
+	b.pieces = append(b.pieces, piece{end, text})
 }
 
+// digit tells whether the piece before ends with a digit.
 func (b *syllables) digit() bool {
 	if len(b.pieces) == 0 {
 		return false
@@ -44,9 +45,11 @@ func (b *syllables) digit() bool {
 	return last != "" && last[len(last)-1] >= '0' && last[len(last)-1] <= '9'
 }
 
-func (b *syllables) put(rs []rune, text string) {
+// bytesOf counts the bytes of the runes rs.
+func bytesOf(rs []rune) int {
+	n := 0
 	for _, r := range rs {
-		b.at += len(string(r))
+		n += len(string(r))
 	}
-	b.pieces = append(b.pieces, piece{b.at, text})
+	return n
 }

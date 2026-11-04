@@ -409,22 +409,26 @@ func init() { register(lao, laoRun, "lo") }
 func laoRun(run, _ string) []piece {
 	t := &laoText{rs: []rune(run)}
 	var b syllables
+	end := 0
 	for t.i < len(t.rs) {
 		from := t.i
 		switch r := t.rs[t.i]; {
 		case r == laoRepeat:
 			// ໆ says the syllable before again: ແຊວໆ, xèo xèo.
 			t.i++
-			b.repeat(t.rs[from:t.i])
+			end += bytesOf(t.rs[from:t.i])
+			b.repeat(end)
 		case r >= 0x0ED0 && r <= 0x0ED9 || r == 0x0EAF:
 			t.i++
-			b.plain(t.rs[from:t.i], plain(r))
+			end += bytesOf(t.rs[from:t.i])
+			b.plain(end, plain(r))
 		default:
 			latin := t.syllable()
 			if t.i == from {
 				t.i++
 			}
-			b.add(t.rs[from:t.i], latin)
+			end += bytesOf(t.rs[from:t.i])
+			b.add(end, latin)
 		}
 	}
 	return b.pieces

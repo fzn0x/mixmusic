@@ -458,20 +458,23 @@ func (m *Manager) pin(t media.Track, pin, quality string) bool {
 
 // AddCollection downloads the tracks of an album, a playlist, a mix or the
 // liked songs, as c. A collection downloaded before takes the tracks it
-// holds now, but a live stream, which it leaves out. It returns how many
-// tracks it added.
+// holds now, but a live stream, which it leaves out, and keeps those it no
+// longer holds that are downloaded with it, until its download is
+// removed. It returns how many tracks it added.
 func (m *Manager) AddCollection(c Collection, tracks []media.Track, quality string) int {
 	if m == nil || c.ID == "" {
 		return 0
 	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	if old, ok := m.idx.Collections[c.ID]; ok {
+	old, held := m.idx.Collections[c.ID]
+	if held {
 		c.Added, c.Art = old.Added, old.Art
 	} else {
 		c.Added = time.Now()
 	}
 	c.Tracks = make([]string, 0, len(tracks))
+	listed := make(map[string]bool, len(tracks))
 	n := 0
 	for _, t := range tracks {
 		if t.ID == "" {
@@ -481,7 +484,18 @@ func (m *Manager) AddCollection(c Collection, tracks []media.Track, quality stri
 			n++
 		}
 		if _, ok := m.idx.Tracks[t.ID]; ok {
+			listed[t.ID] = true
 			c.Tracks = append(c.Tracks, t.ID)
+		}
+	}
+	// The tracks it no longer holds that are downloaded with it stay, after
+	// the others: its download's removal removes them.
+	if held {
+		for _, id := range old.Tracks {
+			if e, ok := m.idx.Tracks[id]; ok && !listed[id] && e.pinned(c.ID) {
+				listed[id] = true
+				c.Tracks = append(c.Tracks, id)
+			}
 		}
 	}
 	if c.Total <= len(c.Tracks) {

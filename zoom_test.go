@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
@@ -138,6 +139,31 @@ func TestZoomKeysGivenAway(t *testing.T) {
 	}
 	if keys := s.zoomKeys(); strings.Contains(keys, "reset") {
 		t.Errorf("the setting names a key to reset: %q", keys)
+	}
+}
+
+// TestPlusKeys gives Zoom in the keys of +, the keypad's + among them
+// (#251), while it keeps its own shortcut: macOS's View › Zoom In has ⌘+
+// then, and not once the user changed the shortcut or gave Mod+Shift+= to
+// another command.
+func TestPlusKeys(t *testing.T) {
+	s := newZoomShell(t)
+	s.zoomIn = &mygo.MenuItem{Label: "Zoom In"}
+	for _, c := range []struct {
+		what      string
+		shortcuts map[string]string
+		want      string
+	}{
+		{"by default", nil, "CmdOrCtrl+Plus"},
+		{"Zoom in on other keys", map[string]string{"view.zoomIn": "Mod+Alt+Z"}, ""},
+		{"Mod+Shift+= given to Mute", map[string]string{"player.mute": "Mod+Shift+="}, ""},
+		{"back to the defaults", map[string]string{}, "CmdOrCtrl+Plus"},
+	} {
+		s.set.Shortcuts = c.shortcuts
+		s.zoomInKey()
+		if s.plusKeys() != (c.want != "") || s.zoomIn.Accelerator != c.want {
+			t.Errorf("%s: the keys of + %v, the menu's key %q, want %q", c.what, s.plusKeys(), s.zoomIn.Accelerator, c.want)
+		}
 	}
 }
 

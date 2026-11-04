@@ -497,6 +497,11 @@ func (n *notch) progress(c *ui.Context, t media.Track) {
 // say why, and a lookup that failed can be tried again. They come from
 // Catalog.Lyrics, which keeps them: opening the panel doesn't ask again.
 func (n *notch) lyrics(c *ui.Context, t media.Track) {
+	if t.IsEpisode() {
+		// An episode has its chapters in their place (episodedetails.go).
+		n.chapters(c, t)
+		return
+	}
 	s := n.s
 	note := func(text string) {
 		ui.Text(c, text).FontSize(12).TextColor(notchMuted).MaxLines(3)

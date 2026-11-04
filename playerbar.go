@@ -307,7 +307,7 @@ func (s *shell) playerSide(c *ui.Context) {
 	if hasSurround(s.st) {
 		s.surroundButton(c)
 	}
-	if s.iconButton(c, "lyrics", "lyrics", "Lyrics", s.panel == "lyrics", 18).Clicked() {
+	if s.iconButton(c, "lyrics", s.lyricsIcon(), s.lyricsTitle(), s.panel == "lyrics", 18).Clicked() {
 		s.togglePanel("lyrics")
 	}
 	if s.iconButton(c, "queue", "queue", "Queue", s.panel == "queue", 18).Clicked() {

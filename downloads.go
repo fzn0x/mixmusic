@@ -60,13 +60,20 @@ func (s *shell) downloadableOf(tracks []media.Track) []media.Track {
 // confirmDownload runs run, which downloads tracks, after asking when they
 // are many, or take a gigabyte or so.
 func (s *shell) confirmDownload(tracks []media.Track, run func()) {
-	size := s.svc.Downloads.Estimate(tracks)
-	if len(tracks) <= bigDownload && size < bigDownloadBytes {
+	size, big := s.downloadSize(tracks)
+	if !big {
 		run()
 		return
 	}
 	s.ask("download "+plural(len(tracks), "track"), "That's about "+byteSize(size)+". They play without the network, and stay until you remove them.",
 		"download", run)
+}
+
+// downloadSize is about how many bytes tracks take, downloaded, and
+// whether they're as many, or as big, as MixMusic asks before downloading.
+func (s *shell) downloadSize(tracks []media.Track) (size int64, big bool) {
+	size = s.svc.Downloads.Estimate(tracks)
+	return size, len(tracks) > bigDownload || size >= bigDownloadBytes
 }
 
 // download downloads tracks on their own, telling what downloads.
@@ -171,7 +178,7 @@ func (s *shell) downloadOf(d *downloadHead) downloadAction {
 		return downloadAction{fmt.Sprintf("downloading %d of %d", v.Kept, len(v.Tracks)), "Cancel download", false,
 			remove("Stop downloading " + title + "? What downloaded of it goes too, unless another download keeps it.")}
 	}
-	if more := s.missing(d) + v.Failed; more > 0 {
+	if more := s.missing(d); more > 0 {
 		return downloadAction{fmt.Sprintf("download %d more", more), fmt.Sprintf("Download %d more", more), false,
 			func() { s.downloadCollection(d) }}
 	}
@@ -187,9 +194,11 @@ type missingMemo struct {
 	n, of   int
 }
 
-// missing counts the tracks of d's page its download doesn't hold, once for
-// each change of the downloads, not in each frame: a playlist holds
-// thousands.
+// missing counts the tracks of d's page, a collection downloaded, that its
+// download doesn't hold or failed to download, which downloading it again
+// downloads: once for each change of the downloads, not in each frame, as
+// a playlist holds thousands. Those it holds that the page no longer does
+// don't count, as downloading it again doesn't try them.
 func (s *shell) missing(d *downloadHead) int {
 	var first *media.Track
 	if len(d.tracks) > 0 {
@@ -199,7 +208,13 @@ func (s *shell) missing(d *downloadHead) int {
 	if m, ok := s.missingMemos[d.c.ID]; ok && m.version == v && m.first == first && m.of == len(d.tracks) {
 		return m.n
 	}
-	n := s.kept.Missing(d.c.ID, s.downloadableOf(d.tracks))
+	tracks := s.downloadableOf(d.tracks)
+	n := s.kept.Missing(d.c.ID, tracks)
+	for _, t := range tracks {
+		if s.kept.State(t.ID).Kind == downloads.Failed {
+			n++
+		}
+	}
 	s.missingMemos[d.c.ID] = missingMemo{version: v, first: first, n: n, of: len(d.tracks)}
 	return n
 }
@@ -222,7 +237,10 @@ func (s *shell) downloadCollection(d *downloadHead) {
 }
 
 // downloadButton is the button of a collection's head that downloads it.
+// The tracks added to the collection downloaded download first, as the
+// page shows them (syncDownload).
 func (s *shell) downloadButton(c *ui.Context, d *downloadHead) {
+	s.syncDownload(d)
 	a := s.downloadOf(d)
 	if s.button(c, "head-download", a.label, a.done).Clicked() {
 		a.run()
@@ -643,8 +661,13 @@ func (s *shell) downloadSettings(c *ui.Context) {
 				s.save()
 			}
 		})
+		s.settingsOf(c, downloadRows)
 	})
 }
+
+// downloadRows are the rows of Settings › Playback › Downloads that
+// register from their features' files, after its own.
+const downloadRows = "playback › Downloads"
 
 // samePath reports whether two folders are the same, as their names tell:
 // regardless of case on Windows.

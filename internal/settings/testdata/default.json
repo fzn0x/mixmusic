@@ -53,6 +53,7 @@
   "lyricsTranslateTo": "",
   "downloadsFolder": "",
   "downloadOnMetered": false,
+  "downloadAdded": true,
   "spotifyClientId": "",
   "scrobbling": true,
   "youtubeChannel": "",

@@ -62,6 +62,7 @@
   "lyricsTranslateTo": "ja",
   "downloadsFolder": "/home/me/Music",
   "downloadOnMetered": true,
+  "downloadAdded": false,
   "spotifyClientId": "0123456789abcdef",
   "scrobbling": false,
   "youtubeChannel": "112233445566778899",

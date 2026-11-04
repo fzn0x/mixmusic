@@ -71,6 +71,12 @@ func (d *Downloads) AddCollection(c downloads.Collection, tracks []media.Track) 
 	return d.a.downloads.AddCollection(c, tracks, d.a.quality())
 }
 
+// SyncCollection downloads the tracks added to a collection downloaded
+// before, of tracks, those it holds now, and returns how many it added.
+func (d *Downloads) SyncCollection(c downloads.Collection, tracks []media.Track) int {
+	return d.a.downloads.SyncCollection(c, tracks, d.a.quality())
+}
+
 // Remove removes the downloads of tracks.
 func (d *Downloads) Remove(ids ...string) { d.a.downloads.Remove(ids...) }
 

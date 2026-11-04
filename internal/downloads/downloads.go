@@ -458,30 +458,74 @@ func (m *Manager) pin(t media.Track, pin, quality string) bool {
 
 // AddCollection downloads the tracks of an album, a playlist, a mix or the
 // liked songs, as c. A collection downloaded before takes the tracks it
-// holds now, but a live stream, which it leaves out. It returns how many
-// tracks it added.
+// holds now, but a live stream, which it leaves out, and keeps those it no
+// longer holds that are downloaded with it, until its download is
+// removed. It returns how many tracks it added.
 func (m *Manager) AddCollection(c Collection, tracks []media.Track, quality string) int {
+	return m.collect(c, tracks, quality, false)
+}
+
+// SyncCollection downloads the tracks added to c, a collection downloaded
+// before, since: those of tracks, the tracks it holds now, that its
+// download never held. The others stay as they are: one that failed isn't
+// tried again, one whose download was removed isn't downloaded again, and
+// one it no longer holds stays downloaded with it, as AddCollection keeps
+// it. A collection not downloaded stays so. It returns how many tracks it
+// added.
+func (m *Manager) SyncCollection(c Collection, tracks []media.Track, quality string) int {
+	return m.collect(c, tracks, quality, true)
+}
+
+// collect takes in tracks, those of the collection c, as AddCollection,
+// or, when added, as SyncCollection.
+func (m *Manager) collect(c Collection, tracks []media.Track, quality string, added bool) int {
 	if m == nil || c.ID == "" {
 		return 0
 	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	if old, ok := m.idx.Collections[c.ID]; ok {
+	old, held := m.idx.Collections[c.ID]
+	var had map[string]bool
+	switch {
+	case held:
 		c.Added, c.Art = old.Added, old.Art
-	} else {
+		had = make(map[string]bool, len(old.Tracks))
+		for _, id := range old.Tracks {
+			had[id] = true
+		}
+	case added:
+		return 0
+	default:
 		c.Added = time.Now()
 	}
 	c.Tracks = make([]string, 0, len(tracks))
+	listed := make(map[string]bool, len(tracks))
 	n := 0
 	for _, t := range tracks {
 		if t.ID == "" {
 			continue
 		}
-		if m.pin(t, c.ID, quality) {
-			n++
+		// A track it held stays listed, whatever became of its download, so
+		// that it isn't taken for one added.
+		if !added || !had[t.ID] {
+			if m.pin(t, c.ID, quality) {
+				n++
+			}
+			if _, ok := m.idx.Tracks[t.ID]; !ok {
+				continue
+			}
 		}
-		if _, ok := m.idx.Tracks[t.ID]; ok {
-			c.Tracks = append(c.Tracks, t.ID)
+		listed[t.ID] = true
+		c.Tracks = append(c.Tracks, t.ID)
+	}
+	// The tracks it no longer holds that are downloaded with it stay, after
+	// the others: its download's removal removes them.
+	if held {
+		for _, id := range old.Tracks {
+			if e, ok := m.idx.Tracks[id]; ok && !listed[id] && e.pinned(c.ID) {
+				listed[id] = true
+				c.Tracks = append(c.Tracks, id)
+			}
 		}
 	}
 	if c.Total <= len(c.Tracks) {

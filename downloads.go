@@ -171,7 +171,7 @@ func (s *shell) downloadOf(d *downloadHead) downloadAction {
 		return downloadAction{fmt.Sprintf("downloading %d of %d", v.Kept, len(v.Tracks)), "Cancel download", false,
 			remove("Stop downloading " + title + "? What downloaded of it goes too, unless another download keeps it.")}
 	}
-	if more := s.missing(d) + v.Failed; more > 0 {
+	if more := s.missing(d); more > 0 {
 		return downloadAction{fmt.Sprintf("download %d more", more), fmt.Sprintf("Download %d more", more), false,
 			func() { s.downloadCollection(d) }}
 	}
@@ -187,9 +187,11 @@ type missingMemo struct {
 	n, of   int
 }
 
-// missing counts the tracks of d's page its download doesn't hold, once for
-// each change of the downloads, not in each frame: a playlist holds
-// thousands.
+// missing counts the tracks of d's page, a collection downloaded, that its
+// download doesn't hold or failed to download, which downloading it again
+// downloads: once for each change of the downloads, not in each frame, as
+// a playlist holds thousands. Those it holds that the page no longer does
+// don't count, as downloading it again doesn't try them.
 func (s *shell) missing(d *downloadHead) int {
 	var first *media.Track
 	if len(d.tracks) > 0 {
@@ -199,7 +201,13 @@ func (s *shell) missing(d *downloadHead) int {
 	if m, ok := s.missingMemos[d.c.ID]; ok && m.version == v && m.first == first && m.of == len(d.tracks) {
 		return m.n
 	}
-	n := s.kept.Missing(d.c.ID, s.downloadableOf(d.tracks))
+	tracks := s.downloadableOf(d.tracks)
+	n := s.kept.Missing(d.c.ID, tracks)
+	for _, t := range tracks {
+		if s.kept.State(t.ID).Kind == downloads.Failed {
+			n++
+		}
+	}
 	s.missingMemos[d.c.ID] = missingMemo{version: v, first: first, n: n, of: len(d.tracks)}
 	return n
 }

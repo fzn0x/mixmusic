@@ -3,6 +3,8 @@ package main
 import (
 	"testing"
 
+	"github.com/egoist/mygo/ui"
+
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -61,5 +63,56 @@ func TestWordmarkFits(t *testing.T) {
 				}
 			}
 		}
+	}
+}
+
+// macTitleBar is the room macOS 26's window buttons take at the top left
+// of the main window, whose title bar is hidden.
+var macTitleBar = ui.TitleBar{Height: 28, Left: 69}
+
+// TestRailTopOnMac checks the top of the rail beside macOS's window
+// buttons (#247): the name fits whole in every built-in theme, layout
+// design and density, and the button that folds the rail is beside the
+// window's buttons, not under them, and inside the rail, where a narrow
+// window's folded rail unfolds with it.
+func TestRailTopOnMac(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 800)
+	tt.SetTitleBar(macTitleBar)
+	inRail := func(what, label string) {
+		t.Helper()
+		r, ok := tt.Find(label)
+		switch {
+		case !ok:
+			t.Errorf("%s: no %q in %q", what, label, tt.Texts())
+		case r.X+r.W > s.railWidth() || r.X < macTitleBar.Left && r.Y < macTitleBar.Height:
+			t.Errorf("%s: %q is at %+v, in a rail %v wide under window buttons %+v", what, label, r, s.railWidth(), macTitleBar)
+		}
+	}
+	for _, th := range s.inv.Themes {
+		if !th.Builtin {
+			continue
+		}
+		for _, layout := range settings.Layouts {
+			for _, density := range []settings.Density{settings.DensityComfortable, settings.DensityCompact} {
+				st := s.svc.Preferences.Get()
+				st.FollowSystem, st.Theme, st.Layout, st.Density, st.SidebarCollapsed = false, th.ID, layout, density, false
+				if _, err := s.svc.Preferences.Set(st); err != nil {
+					t.Fatal(err)
+				}
+				s.refresh()
+				tt.Frame()
+				what := th.ID + ", " + string(layout) + ", " + string(density)
+				if f := s.wordmark; !tt.HasText("mixmusic") || f.width*f.size/24 > f.room {
+					t.Errorf("%s: the name is %v wide at %v, in %v", what, f.width*f.size/24, f.size, f.room)
+				}
+				inRail(what, "Collapse the sidebar")
+			}
+		}
+	}
+	tt.SetSize(1100, 800)
+	inRail("the narrow window", "Expand the sidebar")
+	if err := tt.Click("Expand the sidebar"); err != nil || s.railFolded() {
+		t.Errorf("the narrow window's rail doesn't unfold: %v", err)
 	}
 }

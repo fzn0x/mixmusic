@@ -71,5 +71,14 @@ belongs to its main thread: what finishes elsewhere comes back through
   fill in frames that only paint again; Reduce Motion lights each word
   whole as it starts. Lines shown in Latin letters in their place light
   whole.
+- **The mini player's volume** (`minivolume.go`) is a button that mutes,
+  and the player bar's slider above it, in a popover that shows while the
+  pointer is over either, a drag holds it or the keyboard's focus is on
+  either, and for 0.4 s after. The wheel over it, as over the player
+  bar's volume, steps the volume (`wheelVolume`, `volume.go`). Escape
+  gives the focus back to the button itself: MyGo gives an overlay's
+  focus back to what had it as the overlay opened, which it may take
+  from a tip that showed in its place before. `miniRoom` keeps the
+  button's room beside the artwork.
 - **Deep links** and second launches open their pages in the main window
   (`App.OnNavigate`).

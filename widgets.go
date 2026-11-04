@@ -13,8 +13,14 @@ import (
 // iconButton is a 32px button of an icon, in muted ink, which turns to ink
 // over a tint on hover, and to the accent when on.
 func (s *shell) iconButton(c *ui.Context, key, name, label string, on bool, size float32) ui.Element {
+	return s.untippedIconButton(c, key, name, label, on, size).Tooltip(label)
+}
+
+// untippedIconButton is an iconButton without its tip, for a button whose
+// hover shows something else above it, as the mini player's volume does.
+func (s *shell) untippedIconButton(c *ui.Context, key, name, label string, on bool, size float32) ui.Element {
 	k := &s.lk
-	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.round(32)).Label(label).Tooltip(label).Cursor(ui.CursorPointer)
+	b := s.buttonBase(c.Key(key)).Size(32, 32).Radius(k.round(32)).Label(label).Cursor(ui.CursorPointer)
 	ink := k.muted
 	switch {
 	case on:

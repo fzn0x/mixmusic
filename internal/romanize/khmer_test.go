@@ -75,6 +75,8 @@ func TestKhmer(t *testing.T) {
 		"ស្រលាញ់ៗ":        "srâ loănh loănh",
 		"ចាំបងផង\u200Bណា": "chăm bâng phâng na",
 		"(ស្រលាញ់) baby":  "(srâ loănh) baby",
+		"ទៅរកអូន":         "tŏu rôk on",
+		"ថ្ងៃនេះ":         "thngai néh",
 	} {
 		if got := Line(in, "km"); got != want {
 			t.Errorf("%s: %q, want %q", in, got, want)
@@ -131,6 +133,9 @@ func TestKhmerUnseen(t *testing.T) {
 func TestKhmerWrong(t *testing.T) {
 	for in, want := range map[string]string{
 		"រតនគិរី": "rô tân kĭ ri", "មណ្ឌលគិរី": "môn dôl kĭ ri", "ព្រះវិហារ": "preăh vĭ har", "សមុទ្រ": "sâ mŭ trô",
+		// A word's first syllable without a vowel sign after an open long
+		// vowel, which rules take for its final: ស្រី រលូន, srei rô lun.
+		"ស្រីរលូន": "sreir lun", "ភ្លឺរលោង": "phlœr loŭng",
 		"ពិភពលោក": "pĭph pô loŭk", "ស្ទឹងត្រែង": "stœ\u0306ng trêng",
 	} {
 		if got := Line(in, "km"); got != want {

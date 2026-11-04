@@ -30,8 +30,10 @@ import "strings"
 //
 // What only a dictionary knows comes out wrong: the open syllables of
 // words of Pali and Sanskrit, as រតនគិរី, the standard's "rôtânôkiri",
-// here "rô tân kĭ ri"; and words said against their series, as វិហារ,
-// "vihéar", here "vĭ har".
+// here "rô tân kĭ ri"; words said against their series, as វិហារ,
+// "vihéar", here "vĭ har"; and a word's first syllable without a vowel
+// sign after an open long vowel, which the rules take for its final, as
+// in ស្រីរលូន, srei rô lun, here "sreir lun".
 
 // khmerLetters are the sounds of the consonants, from ក, at the start of
 // a syllable and at its end.
@@ -275,9 +277,10 @@ type khmerSyllable struct {
 // bare tells whether s has no vowel written.
 func (s khmerSyllable) bare() bool { return !s.a.anchored() }
 
-// closes tells whether s can take a final.
+// closes tells whether s can take a final: not after ំ, ះ, ៈ or ៏, nor
+// after ៃ and ៅ, which end in a glide, as in ទៅរក, tŏu rôk.
 func (s khmerSyllable) closes() bool {
-	return !s.a.nikahit && !s.a.reahmuk && !s.a.yuuk && !s.a.ahsda
+	return !s.a.nikahit && !s.a.reahmuk && !s.a.yuuk && !s.a.ahsda && s.a.vowel != 'ៃ' && s.a.vowel != 'ៅ'
 }
 
 // text writes s, its vowel as its series reads it.

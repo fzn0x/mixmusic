@@ -1,0 +1,158 @@
+{
+ "contents": {
+  "sectionListRenderer": {
+   "contents": [
+    {
+     "musicDescriptionShelfRenderer": {
+      "description": {
+       "runs": [
+        {
+         "text": "Why owls stay up, and what the barn hears at night.\nNotes: "
+        },
+        {
+         "navigationEndpoint": {
+          "urlEndpoint": {
+           "target": "TARGET_NEW_WINDOW",
+           "url": "https://example.com/night-science/owls"
+          }
+         },
+         "text": "https://example.com/night-sci..."
+        },
+        {
+         "text": "\nOur site: "
+        },
+        {
+         "navigationEndpoint": {
+          "urlEndpoint": {
+           "target": "TARGET_NEW_WINDOW",
+           "url": "https://www.youtube.com/redirect?event=video_description&q=https%3A%2F%2Fexample.org%2Fbarn&v=Ep1Video000"
+          }
+         },
+         "text": "example.org/barn"
+        },
+        {
+         "text": "\nNot a page: "
+        },
+        {
+         "navigationEndpoint": {
+          "urlEndpoint": {
+           "url": "javascript:alert(1)"
+          }
+         },
+         "text": "run this"
+        },
+        {
+         "text": "\n\n\n"
+        },
+        {
+         "navigationEndpoint": {
+          "watchEndpoint": {
+           "continuePlayback": true,
+           "startTimeSeconds": 0,
+           "videoId": "Ep1Video000"
+          }
+         },
+         "text": "0:00"
+        },
+        {
+         "text": " - Dusk\n"
+        },
+        {
+         "navigationEndpoint": {
+          "watchEndpoint": {
+           "continuePlayback": true,
+           "startTimeSeconds": 754,
+           "videoId": "Ep1Video000"
+          }
+         },
+         "text": "12:34"
+        },
+        {
+         "text": " - The barn\n"
+        },
+        {
+         "navigationEndpoint": {
+          "watchEndpoint": {
+           "continuePlayback": true,
+           "startTimeSeconds": 7500,
+           "videoId": "Ep1Video000"
+          }
+         },
+         "text": "2:05:00"
+        },
+        {
+         "text": " - Long after the end\nPart one: "
+        },
+        {
+         "navigationEndpoint": {
+          "watchEndpoint": {
+           "videoId": "otherVideo1"
+          }
+         },
+         "text": "Owls, part one"
+        },
+        {
+         "text": " "
+        },
+        {
+         "navigationEndpoint": {
+          "browseEndpoint": {
+           "browseId": "FEhashtag",
+           "params": "6gUECgJvdw%3D%3D"
+          }
+         },
+         "text": "#owls"
+        }
+       ]
+      },
+      "header": {
+       "runs": [
+        {
+         "text": "Sleep and the brain"
+        }
+       ]
+      },
+      "maxCollapsedLines": 0,
+      "maxExpandedLines": 0,
+      "strapline": {
+       "runs": [
+        {
+         "text": "12K views"
+        },
+        {
+         "text": " • "
+        },
+        {
+         "text": "Oct 26, 2025"
+        },
+        {
+         "text": " • "
+        },
+        {
+         "text": "1 hr 2 min"
+        }
+       ]
+      },
+      "subheader": {
+       "runs": [
+        {
+         "navigationEndpoint": {
+          "browseEndpoint": {
+           "browseEndpointContextSupportedConfigs": {
+            "browseEndpointContextMusicConfig": {
+             "pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
+            }
+           },
+           "browseId": "MPSPPLshow"
+          }
+         },
+         "text": "Night Science"
+        }
+       ]
+      }
+     }
+    }
+   ]
+  }
+ }
+}

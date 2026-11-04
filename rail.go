@@ -86,7 +86,7 @@ func (s *shell) rail(c *ui.Context) {
 		pad = 17
 	}
 	ui.Column(c).Width(s.railWidth()).Shrink(0).Padding(0, pad, 16).Gap(24).Background(k.bg).Clip().Children(func() {
-		s.brand(c, collapsed)
+		s.brand(c, collapsed, s.railWidth()-2*pad)
 		ui.Column(c).Gap(4).Shrink(0).Children(func() {
 			for _, n := range nav {
 				s.navEntry(c, "nav-"+n.id, k.words(n.label), icon(n.icon), n.path, n.id == current)
@@ -124,33 +124,76 @@ func mustSVG(data []byte) *ui.SVG {
 }
 
 // brand is MixMusic's mark and name, where the window drags under a
-// hidden title bar, and the button that collapses the rail.
-func (s *shell) brand(c *ui.Context, collapsed bool) {
-	k := &s.lk
+// hidden title bar, and the button that collapses the rail, in inner DIPs,
+// the rail's width inside its padding. On macOS the window's buttons take
+// the left of that row, where the name doesn't fit beside them, nor the
+// button in the folded rail (#247): the row keeps them, and the button
+// where it fits, and the mark and name go under it.
+func (s *shell) brand(c *ui.Context, collapsed bool, inner float32) {
 	bar := c.TitleBar()
-	row := ui.Row(c).Height(max(bar.Height, 48)).Shrink(0).Padding(0, 0, 0, bar.Left).Gap(12)
-	if bar.Height > 0 {
-		row.DragWindow()
+	band := func(children func()) {
+		row := ui.Row(c).Height(max(bar.Height, 48)).Shrink(0).Padding(0, 0, 0, bar.Left).Gap(12)
+		if bar.Height > 0 {
+			row.DragWindow()
+		}
+		row.Children(children)
 	}
-	row.Children(func() {
-		if !collapsed {
-			// The mark keeps its pink in every theme, as the app's icon
-			// does.
-			ui.Icon(c, brandMark).Size(26, 26).Shrink(0).TextColor(brandPink)
-			// The rail's padding, the mark, the two gaps and the button
-			// leave the name the rest.
-			size := s.wordmarkSize(c, s.railWidth()-2*16-bar.Left-26-2*12-32)
-			ui.Text(c, "mixmusic").FontSize(size).FontWeight(k.displayWeight()).Font(k.display).LetterSpacing(k.tracking(-0.03, size)).
-				SingleLine().Grow(1).MinWidth(0)
+	if bar.Left == 0 {
+		band(func() {
+			if !collapsed {
+				// The mark, the two gaps and the button leave the name the
+				// rest.
+				s.logo(c, inner-26-2*12-32)
+			}
+			s.railButton(c, collapsed)
+		})
+		return
+	}
+	beside := inner-bar.Left >= 12+32
+	ui.Column(c).Shrink(0).Children(func() {
+		band(func() {
+			if beside {
+				ui.Spacer(c)
+				s.railButton(c, collapsed)
+			}
+		})
+		if collapsed && beside {
+			return
 		}
-		label := "Collapse the sidebar"
-		if collapsed {
-			label = "Expand the sidebar"
-		}
-		if s.iconButton(c, "collapse", "sidebar", label, false, 18).Clicked() {
-			s.toggleRail()
-		}
+		ui.Row(c).Height(40).Shrink(0).Gap(12).Children(func() {
+			if !collapsed {
+				room := inner - 26 - 12
+				if !beside {
+					room -= 12 + 32
+				}
+				s.logo(c, room)
+			}
+			if !beside {
+				s.railButton(c, collapsed)
+			}
+		})
 	})
+}
+
+// logo is MixMusic's mark, and its name in what is left of room DIPs.
+func (s *shell) logo(c *ui.Context, room float32) {
+	k := &s.lk
+	// The mark keeps its pink in every theme, as the app's icon does.
+	ui.Icon(c, brandMark).Size(26, 26).Shrink(0).TextColor(brandPink)
+	size := s.wordmarkSize(c, room)
+	ui.Text(c, "mixmusic").FontSize(size).FontWeight(k.displayWeight()).Font(k.display).LetterSpacing(k.tracking(-0.03, size)).
+		SingleLine().Grow(1).MinWidth(0)
+}
+
+// railButton folds or unfolds the rail.
+func (s *shell) railButton(c *ui.Context, collapsed bool) {
+	label := "Collapse the sidebar"
+	if collapsed {
+		label = "Expand the sidebar"
+	}
+	if s.iconButton(c, "collapse", "sidebar", label, false, 18).Clicked() {
+		s.toggleRail()
+	}
 }
 
 // wordmarkFit is the size of MixMusic's name in the rail, the face, weight

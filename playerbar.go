@@ -382,21 +382,16 @@ func (s *shell) showPanel(p string) {
 	s.save()
 }
 
-// volumeControl mutes, and sets the volume. Its slider gives up room to the
-// buttons beside it, as the speed's, where the player bar lacks it.
+// volumeControl mutes, and sets the volume, as the wheel over it does. Its
+// slider gives up room to the buttons beside it, as the speed's, where the
+// player bar lacks it.
 func (s *shell) volumeControl(c *ui.Context) {
 	v := s.st.Volume
 	if s.st.Muted {
 		v = 0
 	}
-	ui.Row(c).Gap(4).Width(140).MinWidth(80).Children(func() {
-		name, label := "volume", "Mute"
-		if s.st.Muted {
-			label = "Unmute"
-		}
-		if v == 0 {
-			name = "volumeMute"
-		}
+	s.wheelVolume(ui.Row(c).Gap(4).Width(140).MinWidth(80)).Children(func() {
+		name, label := muteOf(s.st)
 		if s.iconButton(c, "mute", name, label, false, 18).Clicked() {
 			s.p.ToggleMute()
 		}

@@ -126,6 +126,8 @@ type App struct {
 	colors       *memo[string]
 	// colorFile follows the colour file the settings name.
 	colorFile colorFile
+	// episodeDetails keeps the details of the episodes the player showed.
+	episodeDetails *memo[media.EpisodeDetails]
 
 	presence presence
 	// native is MixMusic's own audio engine, made at its first use.
@@ -295,6 +297,7 @@ func New(opts Options) (*App, error) {
 	a.romaji = newRomaji(opts, userAgent)
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
 	a.related = newMemo[[]media.Shelf](100)
+	a.episodeDetails = newMemo[media.EpisodeDetails](100)
 	a.artStore = artwork.NewStore(filepath.Join(opts.CacheDir, "artwork"), artworkLimit)
 	a.artwork = artwork.New()
 	a.artwork.Store = a.artStore

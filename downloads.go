@@ -661,8 +661,13 @@ func (s *shell) downloadSettings(c *ui.Context) {
 				s.save()
 			}
 		})
+		s.settingsOf(c, downloadRows)
 	})
 }
+
+// downloadRows are the rows of Settings › Playback › Downloads that
+// register from their features' files, after its own.
+const downloadRows = "playback › Downloads"
 
 // samePath reports whether two folders are the same, as their names tell:
 // regardless of case on Windows.

@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/egoist/mygo/ui"
+
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -232,5 +234,28 @@ func TestDownloadAddedLiked(t *testing.T) {
 	tt.Frame()
 	if k := s.kept.State(roadTripDone[1].ID).Kind; k != downloads.Waiting {
 		t.Errorf("the song liked is %v", k)
+	}
+}
+
+// TestDownloadAddedSetting turns the downloads of the tracks added off in
+// Settings › Playback › Downloads, from the keyboard.
+func TestDownloadAddedSetting(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 3000)
+	show(s, tt, "/settings/playback")
+	// The switch, not what holds its row too, as the page.
+	const label = "Download songs added later"
+	focused := func() bool { return tt.Focused(label) && !tt.Focused(downloadAddedAbout) }
+	for i := 0; i < 200 && !focused(); i++ {
+		tt.Key(0, ui.KeyTab)
+	}
+	if !focused() {
+		t.Fatalf("Tab doesn't reach the switch: the page shows %q", tt.Texts())
+	}
+	tt.Key(0, ui.KeySpace)
+	s.drain()
+	tt.Frame()
+	if s.svc.Preferences.Get().DownloadAdded {
+		t.Error("the switch wasn't kept")
 	}
 }

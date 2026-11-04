@@ -78,7 +78,9 @@
   the systems of each language of Cyrillic, told by its letters when the
   lyrics' language isn't known; ELOT 743 for Greek; Hunterian for the
   Brahmic scripts, by one engine over their aligned blocks; RTGS for
-  Thai, by a syllabifier of rules; EWTS for Tibetan; and the vowel
+  Thai, by a syllabifier of rules; BGN/PCGN for Lao and Burmese and the
+  UN's system for Khmer, each parted into syllables by its script's own
+  structure (`syllables.go` places them); EWTS for Tibetan; and the vowel
   points of Hebrew and Arabic where they're written. `Words` gives each
   word of a line synced word by word its part of the line in Latin
   letters. Chinese reads `pinyin.bin`, 177 KB built in, which

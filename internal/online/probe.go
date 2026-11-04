@@ -6,6 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	// The proxy of Windows' settings is in http.DefaultTransport before
+	// probeClient clones it.
+	_ "github.com/fzn0x/mixmusic/internal/sysproxy"
 )
 
 // The addresses Probe asks, and how; tests change them. YouTube's answer

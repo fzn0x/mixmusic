@@ -33,6 +33,21 @@
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
   library), and controls Spotify Connect devices.
+- **`internal/sysproxy`** picks the proxy of every request MixMusic makes,
+  as the `Proxy` of `http.DefaultTransport`, which the clients use or
+  clone: the environment's (`HTTPS_PROXY` and the like) when it names
+  one; on Windows, failing that, the one of Windows' settings, which
+  browsers, WebView2 and yt-dlp use too. Automatic setup comes first,
+  detection or a setup script, which WinHTTP answers for each site and
+  which is remembered for 5 minutes, failures too; then the proxy
+  server, unless the bypass list names the address. Loopback addresses
+  always connect directly. It reads the settings again when their
+  registry key changes, as VPN and proxy apps turn them on and off,
+  logs what MixMusic connects through, without user names or passwords,
+  and gives yt-dlp a `--proxy` where yt-dlp wouldn't find that proxy
+  itself. A package that clones `http.DefaultTransport` as it
+  initializes imports it, as `internal/online` does. macOS and Linux
+  keep the environment's proxy alone.
 - **`internal/match`** finds a Spotify track's recording on YouTube Music, by
   title, artists and duration, for playback without a Spotify device. It
   also finds the song of a music video, by its title and artists, which

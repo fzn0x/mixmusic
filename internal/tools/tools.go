@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/proc"
+	"github.com/fzn0x/mixmusic/internal/sysproxy"
 )
 
 // releaseURL is where the latest yt-dlp release's files are downloaded.
@@ -184,7 +185,8 @@ func (m *Manager) JSRuntime() (name, path string, ok bool) {
 }
 
 // YTDLPArgs returns the arguments every yt-dlp run gets: the JavaScript
-// runtime to use, and where to cache what it learns about YouTube's player.
+// runtime to use, where to cache what it learns about YouTube's player,
+// and the proxy MixMusic uses when yt-dlp wouldn't find it.
 func (m *Manager) YTDLPArgs(cacheDir string) []string {
 	args := []string{"--no-warnings", "--no-progress"}
 	if cacheDir != "" {
@@ -193,7 +195,7 @@ func (m *Manager) YTDLPArgs(cacheDir string) []string {
 	if name, path, ok := m.JSRuntime(); ok {
 		args = append(args, "--js-runtimes", name+":"+path)
 	}
-	return args
+	return append(args, sysproxy.YTDLPArgs("https://music.youtube.com/")...)
 }
 
 // Tool describes an installed tool.

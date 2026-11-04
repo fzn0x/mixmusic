@@ -28,8 +28,9 @@ import (
 	"github.com/fzn0x/mixmusic/internal/sysproxy"
 )
 
-// releaseURL is where the latest yt-dlp release's files are downloaded.
-const releaseURL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/"
+// releaseURL is where the latest yt-dlp release's files are downloaded. It
+// is a variable for tests.
+var releaseURL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/"
 
 // latestURL redirects to the page of the latest yt-dlp release, whose path
 // ends in its version. It is a variable for tests.
@@ -100,8 +101,14 @@ func exe(name string) string {
 	return name
 }
 
-// managedPath is where InstallYTDLP puts yt-dlp.
-func (m *Manager) managedPath() string { return filepath.Join(m.Dir, exe("yt-dlp")) }
+// managedPath is where InstallYTDLP puts yt-dlp: on macOS, in the folder
+// it unpacks it in (unpackedPath).
+func (m *Manager) managedPath() string {
+	if goos == "darwin" {
+		return m.unpackedPath()
+	}
+	return filepath.Join(m.Dir, exe("yt-dlp"))
+}
 
 // toolDirs are the folders where installers put programs that an app
 // opened from the desktop does not find on its PATH: opened from the
@@ -394,7 +401,7 @@ var version = func(ctx context.Context, path, flag string) string {
 }
 
 // asset returns the name of the yt-dlp executable of a platform in its
-// releases.
+// releases: on macOS, the zip archive of it unpacked (installUnpacked).
 func asset(goos, goarch string) (string, error) {
 	switch goos + "/" + goarch {
 	case "windows/amd64":
@@ -408,7 +415,7 @@ func asset(goos, goarch string) (string, error) {
 	case "linux/arm64":
 		return "yt-dlp_linux_aarch64", nil
 	case "darwin/amd64", "darwin/arm64":
-		return "yt-dlp_macos", nil
+		return "yt-dlp_macos.zip", nil
 	}
 	return "", fmt.Errorf("yt-dlp has no build for %s/%s: install it with your package manager", goos, goarch)
 }
@@ -421,7 +428,7 @@ type Progress func(done, total int64)
 // checking it against the checksums the release publishes. It replaces a
 // yt-dlp installed before, so it also updates it.
 func (m *Manager) InstallYTDLP(ctx context.Context, progress Progress) error {
-	name, err := asset(runtime.GOOS, runtime.GOARCH)
+	name, err := asset(goos, goarch)
 	if err != nil {
 		return err
 	}
@@ -442,6 +449,9 @@ func (m *Manager) InstallYTDLP(ctx context.Context, progress Progress) error {
 	}
 	if err := os.MkdirAll(m.Dir, 0o755); err != nil {
 		return err
+	}
+	if strings.HasSuffix(name, ".zip") {
+		return m.installUnpacked(ctx, data)
 	}
 	tmp, err := os.CreateTemp(m.Dir, ".yt-dlp-*")
 	if err != nil {
@@ -483,14 +493,23 @@ func (m *Manager) LatestYTDLP(ctx context.Context) (string, error) {
 }
 
 // UpdateYTDLP replaces the yt-dlp MixMusic installed with the latest
-// release when that is newer, and reports whether it did. It leaves alone
-// a yt-dlp the user installed or chose, which they keep up to date.
+// release when that is newer, or when it is macOS's single file of before,
+// and reports whether it did. It leaves alone a yt-dlp the user installed
+// or chose, which they keep up to date.
 func (m *Manager) UpdateYTDLP(ctx context.Context) (bool, error) {
 	m.mu.Lock()
 	chosen := m.ytdlpPath
 	m.mu.Unlock()
 	if chosen != "" || !isFile(m.managedPath()) {
 		return false, nil
+	}
+	if m.singleOnMac() {
+		// The single file installed before, which starts in 8 s: the
+		// unpacked build replaces it, whatever its version (#245).
+		if err := m.InstallYTDLP(ctx, nil); err != nil {
+			return false, err
+		}
+		return true, nil
 	}
 	latest, err := m.LatestYTDLP(ctx)
 	if err != nil {

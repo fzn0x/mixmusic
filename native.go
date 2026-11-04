@@ -216,6 +216,9 @@ type shell struct {
 	refreshTold              bool
 	refreshOff, refreshBusy  bool
 	refreshTip, refreshTipOf string
+	// pull is a pull of the page shown down past its top, which refreshes
+	// it once let go (pullrefresh.go).
+	pull pullState
 	// capScroll scrolls the pages in capture mode, nil otherwise.
 	capScroll *ui.ScrollState
 	// here is what the top bar and the rows pinned under it know of the

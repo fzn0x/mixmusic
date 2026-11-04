@@ -11,6 +11,22 @@ belongs to its main thread: what finishes elsewhere comes back through
   (`View.Remount`). The page keeps its answers until the new ones come,
   and keeps them when a refresh fails, which one toast tells. Home's own
   tile and shelves read the library as it is, and need no refresh.
+- **Pull to refresh** (`pullrefresh.go`): the scroll container of the
+  page shown (`pageScroll`) takes its scrolling first, with
+  `HandleInput`, before MyGo scrolls anything. A pull starts only on a
+  page at rest at its top: scrolling that came up to the top goes on to
+  its gesture's end without pulling, as Windows and Linux send a fling's
+  momentum as any scrolling, and macOS's, which MyGo marks (`Momentum`),
+  never pulls. A touchpad pulls by its distance (`Precise`), a wheel by
+  its notches, three of which go far enough. A gesture ends once no
+  scrolling came for a quarter of a second, or as the fingers leave,
+  which macOS and Linux tell with an event that scrolls nothing; let go
+  past the threshold, the pull runs Refresh. A strip above the page's
+  content, which is keyed so that it keeps its state, opens with the
+  pull. Scrolling sideways, or with a modifier, as Shift+wheel, never
+  pulls, nor does scrolling a scroller inside the page, whose own
+  handler marks it (`scrollsInside`), as the lyrics of the now playing
+  page do.
 
 - **Long playlists** (`playlistread.go`): a playlist's page, and the
   songs liked on YouTube Music in the library, show their first page of

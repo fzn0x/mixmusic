@@ -199,9 +199,10 @@ func (s *shell) reorderable(row ui.Element, uid string, i int) {
 	}
 }
 
-// lyricsPanel shows the lyrics of the track playing.
+// lyricsPanel shows the lyrics of the track playing, or the details of an
+// episode.
 func (s *shell) lyricsPanel(c *ui.Context) {
-	s.panelHead(c, "Lyrics", nil)
+	s.panelHead(c, s.lyricsTitle(), nil)
 	s.lyrics(c, false)
 }
 
@@ -246,6 +247,11 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		return
 	}
 	t := cur.Track
+	if t.IsEpisode() {
+		// An episode has its details in their place (episodedetails.go).
+		s.episodeDetails(c, t, large)
+		return
+	}
 	l := fetch(s, "lyrics:"+t.ID, func(ctx context.Context) (lyrics.Lyrics, error) { return s.svc.Catalog.Lyrics(ctx, t) })
 	switch {
 	case !l.done:

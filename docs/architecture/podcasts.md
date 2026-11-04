@@ -51,6 +51,21 @@ the user left them.
   menu, the command palette and the rate the media controls set change
   the speed of the kind that plays (`speed.go`). Spotify's players, and
   live streams, keep their own speed: the button is dimmed for them.
+- **Details (`episodedetails.go`).** Where a song shows its lyrics, in
+  the side panel, on the now playing page and in the notch, an episode
+  shows its details, which `Catalog.EpisodeDetails` asks for the first
+  time they show, then keeps: `media.EpisodeDetails`, its show, views,
+  day and length, and its description line by line, in runs of plain
+  text, links and times. YouTube Music's come from the page of the Details
+  tab its player has where a song has Lyrics, browsed by `MPPE` and the
+  video ID, whose runs mark the links and the times; the episode's own
+  page, `MPED`, has the same description, and the player's answer none.
+  Spotify's come from `GET /episodes/{id}`, whose plain `description`
+  `media.ParseDescription` reads, finding web addresses and times as
+  12:34 or 1:02:03. Lines that start or end with a time are chapters
+  (`media.ChaptersOf`): the panel lights the one that plays, and the notch
+  shows it. Links open only web pages, http and https, and times past the
+  episode's length don't seek.
 - **Follows.** `library.json` keeps the shows the user follows, without
   their episodes, signed in or not; following one saves it on its service
   too, where the user signed in.

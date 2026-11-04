@@ -48,7 +48,9 @@ opens it with a `shell` of its own, and keeps its state in a `notch`.
   window gets: `keyHandBack` waits for the last one's release, as giving
   the keyboard back between a press and its release cancels MyGo's click.
 - **Lyrics** come from `Catalog.Lyrics`, which keeps them, through
-  `fetch`: the line sung now, with those before and after it.
+  `fetch`: the line sung now, with those before and after it. An episode
+  shows the chapter that plays in their place, from its details
+  (`episodedetails.go`).
 - **The setting**'s row is `settings_notch.go`, in Settings › On the
   desktop, only where a housing was found (`hasNotch`, found again as the
   displays change).

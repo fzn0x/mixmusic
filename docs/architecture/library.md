@@ -21,7 +21,17 @@
   after 30 seconds, 2 minutes and 10. A live stream has no file to keep:
   the index keeps the videos playback or a download found live, whose
   tracks it leaves out of their collections and refuses, until one plays
-  as a video again. The proxy serves downloads before the cache
+  as a video again. A collection downloaded keeps the tracks taken out of
+  it since, until its download is removed: MixMusic can't tell them from
+  those a service stopped listing, as a video made private. Its page
+  brings it up to date (`syncDownload` in `downloadsync.go`), once for
+  each of the page's answers: `SyncCollection` downloads the tracks its
+  download never held, and leaves those it held as they are, so that one
+  that failed or whose download was removed isn't asked for again. As
+  many tracks as Download asks before wait for the head's button, and
+  the setting `downloadAdded` turns it off. Nothing happens in the
+  background: knowing what was added to a playlist means reading it
+  whole. The proxy serves downloads before the cache
   (`stream.Store`), and the windows read a snapshot of what they hold in
   each frame, a map lookup a track row. Downloads hold stereo audio only:
   the proxy serves 5.1 surround audio from the cache or YouTube, and

@@ -337,12 +337,12 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		}
 	}).Grow(1).MinHeight(0)
 	// Lyrics the user scrolls, to read back say, stop following the song
-	// for a while.
+	// for a while, and never pull the page they're on.
 	list.HandleInput(func(ev ui.InputEvent) bool {
 		if ev.Kind == ui.InputScroll || ev.Kind == ui.InputPointerMove && ev.Button >= 0 {
 			view.userAt = time.Now()
 		}
-		return false
+		return s.scrollsInside(ev)
 	})
 	if synced && active >= 0 && active != view.scrolled && time.Since(view.userAt) > lyricsPause {
 		view.scrolled = active

@@ -64,6 +64,19 @@ type Manager struct {
 	jsRuntime string    // a runtime the user chose: "deno", "node", "bun" or "quickjs"
 	latest    string    // the latest yt-dlp release, as last found
 	checked   time.Time // when GitHub was last asked for it
+	versions  map[versionKey]knownVersion
+}
+
+// versionKey is a program's path and the flag that has it print its
+// version.
+type versionKey struct{ path, flag string }
+
+// knownVersion is the version a program printed, while its file is the
+// size it had then and changed when it did.
+type knownVersion struct {
+	size    int64
+	changed time.Time
+	version string
 }
 
 // New returns a manager that installs tools into dir.
@@ -225,16 +238,46 @@ type Status struct {
 func (m *Manager) Status(ctx context.Context) Status {
 	var s Status
 	if p, err := m.YTDLP(); err == nil {
-		s.YTDLP = m.ytdlpTool(ctx, p, version(ctx, p, "--version"))
+		s.YTDLP = m.ytdlpTool(ctx, p, m.version(ctx, p, "--version"))
 	}
 	if name, p, ok := m.JSRuntime(); ok {
 		flag := "--version"
 		if name == "quickjs" {
 			flag = "-h"
 		}
-		s.JSRuntime = Tool{Found: true, Name: name, Path: p, Version: version(ctx, p, flag)}
+		s.JSRuntime = Tool{Found: true, Name: name, Path: p, Version: m.version(ctx, p, flag)}
 	}
 	return s
+}
+
+// version returns the first line the program at path prints for flag, as
+// version does, asking it once while its file stays the same: Settings asks
+// for the tools again at each change of them, and yt-dlp for macOS takes 8
+// s to start (#246).
+func (m *Manager) version(ctx context.Context, path, flag string) string {
+	info, err := os.Stat(path)
+	if err != nil {
+		return version(ctx, path, flag)
+	}
+	key := versionKey{path, flag}
+	m.mu.Lock()
+	known, ok := m.versions[key]
+	m.mu.Unlock()
+	if ok && known.size == info.Size() && known.changed.Equal(info.ModTime()) {
+		return known.version
+	}
+	v := version(ctx, path, flag)
+	if v == "" {
+		// It failed, or ran out of time: ask again next time.
+		return v
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.versions == nil {
+		m.versions = map[versionKey]knownVersion{}
+	}
+	m.versions[key] = knownVersion{info.Size(), info.ModTime(), v}
+	return v
 }
 
 // ytdlpTool describes the yt-dlp at path, whose version is v.
@@ -337,8 +380,9 @@ func updateCommand(path string) string {
 	return ""
 }
 
-// version returns the first line a program prints for flag.
-func version(ctx context.Context, path, flag string) string {
+// version returns the first line a program prints for flag. It is a
+// variable for tests.
+var version = func(ctx context.Context, path, flag string) string {
 	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 	out, err := proc.Command(ctx, path, flag).Output()
@@ -452,7 +496,7 @@ func (m *Manager) UpdateYTDLP(ctx context.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if version(ctx, m.managedPath(), "--version") == latest {
+	if m.version(ctx, m.managedPath(), "--version") == latest {
 		return false, nil
 	}
 	if err := m.InstallYTDLP(ctx, nil); err != nil {

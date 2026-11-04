@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"sync/atomic"
 	"testing"
+	"time"
 )
 
 func TestAsset(t *testing.T) {
@@ -244,6 +245,51 @@ func TestYTDLPToolOffline(t *testing.T) {
 	m.checked = m.checked.Add(-retryTTL)
 	if got := m.ytdlpTool(context.Background(), "/usr/bin/yt-dlp", "2025.01.15"); got.Latest != "2026.09.01" {
 		t.Errorf("after %s: %+v", retryTTL, got)
+	}
+}
+
+// TestVersionKept asks a program its version once while its file stays
+// the same, and again once it changed, or didn't answer (#246).
+func TestVersionKept(t *testing.T) {
+	asked, answer := 0, "2026.10.26"
+	saved := version
+	version = func(context.Context, string, string) string { asked++; return answer }
+	t.Cleanup(func() { version = saved })
+	path := filepath.Join(t.TempDir(), exe("yt-dlp"))
+	write := func(data string, at time.Time) {
+		t.Helper()
+		if err := os.WriteFile(path, []byte(data), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Chtimes(path, at, at); err != nil {
+			t.Fatal(err)
+		}
+	}
+	ctx := context.Background()
+	m := New(t.TempDir())
+	write("old", time.Unix(1_700_000_000, 0))
+	for range 3 {
+		if got := m.version(ctx, path, "--version"); got != "2026.10.26" {
+			t.Fatalf("version = %q", got)
+		}
+	}
+	if asked != 1 {
+		t.Errorf("asked an unchanged program %d times, want once", asked)
+	}
+	if m.version(ctx, path, "-h"); asked != 2 {
+		t.Errorf("another flag wasn't asked")
+	}
+	answer = "2026.11.01"
+	write("new", time.Unix(1_700_000_100, 0))
+	if got := m.version(ctx, path, "--version"); got != "2026.11.01" || asked != 3 {
+		t.Errorf("after an update: %q, asked %d times", got, asked)
+	}
+	answer = ""
+	write("newer", time.Unix(1_700_000_200, 0))
+	m.version(ctx, path, "--version")
+	m.version(ctx, path, "--version")
+	if asked != 5 {
+		t.Errorf("a program that didn't answer was asked %d times in all, want 5", asked)
 	}
 }
 

@@ -140,7 +140,8 @@ func (s *shell) toolSettings(c *ui.Context) {
 				if i := slices.Index(labels, chosen); i >= 0 {
 					s.set.JSRuntime = ids[i]
 					s.save()
-					s.forget("tools")
+					// The tools stay shown until the answer comes.
+					s.refetch("tools")
 				}
 			}
 		}, "Deno Node.js Bun QuickJS")
@@ -148,7 +149,7 @@ func (s *shell) toolSettings(c *ui.Context) {
 			in, _ := s.settingInput(c, "ytdlp-path", s.set.YTDLPPath, func(path string) {
 				s.set.YTDLPPath = path
 				s.save()
-				s.forget("tools")
+				s.refetch("tools")
 			})
 			in.Placeholder("path to yt-dlp").Width(260).Label("Own yt-dlp")
 		}, "path to yt-dlp")

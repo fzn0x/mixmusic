@@ -15,9 +15,11 @@ const (
 	miniArt = 180
 	// miniRoom is the width the mini player keeps beside its artwork: the
 	// window's buttons, and the transport with the like, dislike and
-	// volume buttons. At its size at 100%, the artwork still takes the
-	// window's height.
-	miniRoom = 288
+	// volume buttons, which comes as near the window's buttons as its own
+	// gap. At the size it opens at, the artwork still takes the window's
+	// height, on Windows too, where the frameless window's borders take 8
+	// DIPs of it at the sides and the foot.
+	miniRoom = 280
 	// The mini player's window at 100%: the size it opens at, and the
 	// least it takes.
 	miniWidth, miniHeight       = 420, 132
@@ -91,7 +93,9 @@ func (s *shell) miniView(c *ui.Context) {
 				ui.Image(c, b).Size(side, h).Fit(ui.Cover)
 			}
 		})
-		ui.Column(c).Grow(1).MinWidth(0).Padding(0, 12).Gap(8).Justify(ui.Center).Children(func() {
+		// The transport reaches nearer the window's buttons than what plays
+		// above it, as near as its own gap.
+		ui.Column(c).Grow(1).MinWidth(0).PaddingStart(12).PaddingEnd(4).Gap(8).Justify(ui.Center).Children(func() {
 			title, line := k.words("Nothing playing"), "play something in MixMusic"
 			if ok {
 				title, line = cur.Track.Title, names(cur.Track.Artists)
@@ -99,7 +103,7 @@ func (s *shell) miniView(c *ui.Context) {
 			if ok && s.st.Waiting {
 				line += " · waiting for the network"
 			}
-			ui.Column(c).MinWidth(0).Children(func() {
+			ui.Column(c).MinWidth(0).PaddingEnd(8).Children(func() {
 				ui.Text(c, title).FontSize(k.size(1.25)).FontWeight(k.titleWeight()).Font(k.display).
 					LetterSpacing(k.tracking(-0.02, k.size(1.25))).SingleLine().MinWidth(0)
 				ui.Row(c).Gap(6).MinWidth(0).Children(func() {

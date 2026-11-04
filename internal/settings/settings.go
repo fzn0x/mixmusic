@@ -45,6 +45,7 @@ func Default() Settings {
 	s.Lyrics = defaultLyrics()
 	s.Playback = defaultPlayback()
 	s.Cache = defaultCache()
+	s.Downloads = defaultDownloads()
 	s.Accounts = defaultAccounts()
 	s.Desktop = defaultDesktop()
 	s.Keys = defaultKeys()

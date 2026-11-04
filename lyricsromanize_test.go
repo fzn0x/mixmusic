@@ -222,7 +222,12 @@ func TestSungWordsRomanizedHere(t *testing.T) {
 		tt.Frame()
 	}
 	at := wordsAt(t, s, tt, "jongi bae", "jongi", "bae")
-	if img := tt.Image(); lit(t, s, img, at[1], "bae") || inkIn(img, at[0], s.lk.accent) == 0 {
+	// The start of jongi is sung, as lit tells: the strokes of Selawik
+	// Light, the line's, are thinner than a pixel, and Linux smooths them
+	// in grey, with no pixel wholly in the accent.
+	sung := at[0]
+	sung.W *= 0.4
+	if img := tt.Image(); lit(t, s, img, at[1], "bae") || !lit(t, s, img, sung, "jongi's start") {
 		t.Error("the line in Latin letters doesn't light word by word")
 	}
 	if asked(s) {

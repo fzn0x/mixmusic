@@ -82,6 +82,9 @@ func TestKeepPosition(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// The places are written 10 s after a change, by when the folder may
+	// be gone: at once, before it goes, as App.Close does.
+	t.Cleanup(func() { pos.Flush() })
 	a := &App{positions: pos}
 	ep := spotifyEpisode
 	a.keepPosition(NowPlaying{Track: &ep, Playing: true, PositionMs: 120000, DurationMs: 1830000})

@@ -16,6 +16,8 @@ func TestNotices(t *testing.T) {
 		{"SharpJaad", "Copyright (c) 2023 Lukas Volf"},
 		{"Chromium", "Copyright (C) 2010 Google Inc."},
 		{"Material Color Utilities", "Copyright 2021 Google LLC"},
+		{"Unihan", "Unicode, Inc."},
+		{"pinyin-data", "Copyright (c) 2016 mozillazg"},
 	} {
 		found := false
 		for _, n := range notices {

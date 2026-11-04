@@ -36,12 +36,17 @@ func (s *shell) lyricsText(c *ui.Context, text string, size float32, ink ui.Colo
 	if len(words) == 0 {
 		return e
 	}
+	return s.sungText(c, e, text, ui.Font{Family: k.body, Size: size, Weight: k.leadWeight()}, ink, k.text, words, padX, padY)
+}
+
+// sungText makes e, the text element of a line of lyrics in font, light
+// its words up as they are sung: the part sung in lit, the rest in dim. A
+// line in Latin letters under its line lights so too (lyricsromanize.go).
+func (s *shell) sungText(c *ui.Context, e ui.Element, text string, font ui.Font, lit, dim ui.Color, words []lyrics.Word, padX, padY float32) ui.Element {
 	l := ui.Local(e, "sung", func() sungLine { return sungLine{} })
 	clock := l.follow(s.st, c.Now())
-	font := ui.Font{Family: k.body, Size: size, Weight: k.leadWeight()}
 	dir, still := c.Direction(), c.Preferences().ReduceMotion
-	lit, dim := ink, k.text
-	return e.Font(k.body).TextColor(ink.Alpha(0)).Draw(func(p *ui.Painter, r ui.Rect) {
+	return e.Font(font.Family).FontWeight(font.Weight).TextColor(lit.Alpha(0)).Draw(func(p *ui.Painter, r ui.Rect) {
 		g := l.layout(sungKey{text, font, r.W - 2*padX, dir}, words)
 		fill, next := l.light(words, clock.at(p.Now()), still)
 		g.paint(p, r.X+padX, r.Y+padY, fill, lit, dim, &l.buf)

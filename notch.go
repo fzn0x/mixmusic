@@ -534,16 +534,17 @@ func (n *notch) lyrics(c *ui.Context, t media.Track) {
 	lines := l.value.Lines
 	pos := s.st.Position + lyricsLead(s.st.Speed)
 	at := sort.Search(len(lines), func(i int) bool { return ms(lines[i].TimeMs) > pos }) - 1
-	line := func(i int) string {
-		if i < 0 || i >= len(lines) || lines[i].Text == "" {
-			return "♪"
-		}
-		return lines[i].Text
-	}
+	// In Latin letters, as the user shows the lyrics of their language
+	// (lyricsromanize.go).
+	latin, how := s.latinLines(t, l.value)
+	line := func(i int) string { return notchLine(lines, latin, how, i) }
 	if at > 0 {
 		ui.Text(c, line(at-1)).FontSize(12).TextColor(notchMuted).SingleLine().MinWidth(0)
 	}
 	ui.Text(c, line(at)).FontSize(15).FontWeight(600).TextColor(notchWhite).MaxLines(2).MinWidth(0)
+	if under := notchUnder(latin, how, at); under != "" {
+		ui.Text(c, under).FontSize(12).TextColor(notchMuted).SingleLine().MinWidth(0)
+	}
 	if at+1 < len(lines) {
 		ui.Text(c, line(at+1)).FontSize(12).TextColor(notchMuted).SingleLine().MinWidth(0)
 	}

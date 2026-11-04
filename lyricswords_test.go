@@ -256,20 +256,22 @@ func TestSungWordsAsLines(t *testing.T) {
 	}
 }
 
-// TestSungWordsRomanized lights a line shown in Latin letters in their
-// place as a whole, as their words aren't those sung, and the line as
-// written word by word with them under it.
+// TestSungWordsRomanized lights a line shown in Unison's Latin letters in
+// their place as a whole, as their words aren't those sung, and the line
+// as written word by word with them under it: Arabic's, which Unison
+// romanizes better than MixMusic. Those MixMusic makes light word by word
+// (lyricsromanize_test.go).
 func TestSungWordsRomanized(t *testing.T) {
 	lines := []lyrics.Line{
-		{TimeMs: 1000, Text: "종이 배", Words: []lyrics.Word{word("종이", 1000, 2000), word("배", 2000, 3000)}},
-		{TimeMs: 60000, Text: "바다", Words: []lyrics.Word{word("바다", 60000, 61000)}},
+		{TimeMs: 1000, Text: "قلب حبيب", Words: []lyrics.Word{word("قلب", 1000, 2000), word("حبيب", 2000, 3000)}},
+		{TimeMs: 60000, Text: "بحر", Words: []lyrics.Word{word("بحر", 60000, 61000)}},
 	}
-	tr := translated{lyrics.Translation{From: "ko", To: "en", Lines: []lyrics.TranslatedLine{
-		{Text: "Paper boat", Romanized: "jongi bae"}, {Text: "Sea", Romanized: "bada"}}}, true}
+	tr := translated{lyrics.Translation{From: "ar", To: "en", Lines: []lyrics.TranslatedLine{
+		{Text: "Beloved heart", Romanized: "qalb habib"}, {Text: "Sea", Romanized: "bahr"}}}, true}
 	s := newTestShell(t)
-	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "Unison", Language: "ko", Lines: lines}}
+	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "Unison", Language: "ar", Lines: lines}}
 	s.loads["lyrics-translation:"+testTracks[0].ID+":en"] = &loaded[translated]{done: true, value: tr}
-	s.set.LyricsRomanize = map[string]string{"ko": settings.RomanizeOnly}
+	s.set.LyricsRomanize = map[string]string{"ar": settings.RomanizeOnly}
 	s.p.PlayTracks(testTracks, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing && !st.Loading })
 	s.p.Time(1500*time.Millisecond, 200*time.Second)
@@ -278,22 +280,22 @@ func TestSungWordsRomanized(t *testing.T) {
 	s.open("/lyrics")
 	s.drain()
 	tt.Frame()
-	at := wordsAt(t, s, tt, "jongi bae", "jongi", "bae")
-	if img := tt.Image(); !lit(t, s, img, at[1], "bae") {
+	at := wordsAt(t, s, tt, "qalb habib", "qalb", "habib")
+	if img := tt.Image(); !lit(t, s, img, at[1], "habib") {
 		t.Error("a line in Latin letters doesn't light whole")
 	}
 
-	s.set.LyricsRomanize = map[string]string{"ko": settings.RomanizeUnder}
+	s.set.LyricsRomanize = map[string]string{"ar": settings.RomanizeUnder}
 	s.drain()
 	tt.Frame()
-	under, ok := tt.Find("jongi bae")
+	under, ok := tt.Find("qalb habib")
 	if !ok {
 		t.Fatalf("no Latin letters under the line: %q", tt.Texts())
 	}
 	if img := tt.Image(); inkIn(img, under, s.lk.accent) > 0 {
 		t.Error("the Latin letters under the line light")
 	}
-	if _, ok := tt.Find("종이 배"); !ok {
+	if _, ok := tt.Find("قلب حبيب"); !ok {
 		t.Fatalf("the line doesn't show: %q", tt.Texts())
 	}
 }

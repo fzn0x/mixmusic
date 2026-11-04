@@ -26,9 +26,10 @@ var fontFiles embed.FS
 const (
 	// face is the family of the interface's text.
 	face = "Selawik"
-	// faceSemilight is Selawik Semilight, which says it weighs 300 as
-	// Selawik Light does, so it has a family of its own: the nav labels'
-	// weight, 350 in the web interface.
+	// faceSemilight is Selawik Semilight, the nav labels' weight, 350 in
+	// the web interface. It says it weighs 300, as Selawik Light does, so
+	// it is registered under a family of its own; but on Windows and Linux
+	// that family names Selawik's, whose weight 300 is Light (fonts).
 	faceSemilight = "Selawik Semilight"
 	// faceRound is Quicksand, Mochi's face.
 	faceRound = "Quicksand"
@@ -40,29 +41,39 @@ const (
 
 var fontsOnce sync.Once
 
+// fonts are the faces MixMusic registers, in the order it registers them.
+// Selawik Light and Semilight both say they weigh 300, and are both of the
+// family Selawik in their names: weight 300 of Selawik is the one that
+// comes first, so Light does, for the page titles and pivots. Registered
+// from a map, in another order each launch, the titles were Semilight in
+// about half of them, heavier and wider (#241). On Windows, MyGo looks a
+// family the app names up as the font's own, so there the nav labels'
+// Selawik Semilight is Light too, as on Linux; macOS keeps it to its file.
+var fonts = []struct{ file, family string }{
+	{"fonts/selawkl.ttf", face},
+	{"fonts/selawk.ttf", face},
+	{"fonts/selawksb.ttf", face},
+	{"fonts/selawkb.ttf", face},
+	{"fonts/selawksl.ttf", faceSemilight},
+	{"fonts/quicksand-light.ttf", faceRound},
+	{"fonts/quicksand-regular.ttf", faceRound},
+	{"fonts/quicksand-bold.ttf", faceRound},
+	{"fonts/robotoflex-regular.ttf", faceMaterial},
+	{"fonts/robotoflex-medium.ttf", faceMaterial},
+	{"fonts/robotoflex-bold.ttf", faceMaterial},
+	{"fonts/archivo-semicondensed-extrabold.ttf", faceArchivo},
+}
+
 // registerFonts registers the faces once.
 func registerFonts() {
 	fontsOnce.Do(func() {
-		for file, family := range map[string]string{
-			"fonts/selawkl.ttf":                         face,
-			"fonts/selawk.ttf":                          face,
-			"fonts/selawksb.ttf":                        face,
-			"fonts/selawkb.ttf":                         face,
-			"fonts/selawksl.ttf":                        faceSemilight,
-			"fonts/quicksand-light.ttf":                 faceRound,
-			"fonts/quicksand-regular.ttf":               faceRound,
-			"fonts/quicksand-bold.ttf":                  faceRound,
-			"fonts/robotoflex-regular.ttf":              faceMaterial,
-			"fonts/robotoflex-medium.ttf":               faceMaterial,
-			"fonts/robotoflex-bold.ttf":                 faceMaterial,
-			"fonts/archivo-semicondensed-extrabold.ttf": faceArchivo,
-		} {
-			data, err := fontFiles.ReadFile(file)
+		for _, f := range fonts {
+			data, err := fontFiles.ReadFile(f.file)
 			if err == nil {
-				err = ui.RegisterFont(data, family)
+				err = ui.RegisterFont(data, f.family)
 			}
 			if err != nil {
-				log.Printf("mixmusic: the font %s: %v", file, err)
+				log.Printf("mixmusic: the font %s: %v", f.file, err)
 			}
 		}
 	})

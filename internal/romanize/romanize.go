@@ -19,6 +19,7 @@
 //     vowels marked (brahmic.go);
 //   - Thai: the Royal Thai General System, syllable by syllable (thai.go);
 //   - Lao: BGN/PCGN (1966), syllable by syllable (lao.go);
+//   - Khmer: the UN's system of 1972, syllable by syllable (khmer.go);
 //   - Tibetan: Extended Wylie (tibetan.go);
 //   - Hebrew by the rules of the Academy of the Hebrew Language (2006),
 //     and Arabic, Persian and Urdu by the plain form of ALA-LC's (hebrew.go,
@@ -97,6 +98,7 @@ const (
 	sinhala
 	thai
 	lao
+	khmer
 	tibetan
 	hebrew
 	arabic
@@ -137,6 +139,8 @@ func scriptOf(r rune, lang string) script {
 		return thai
 	case unicode.Is(unicode.Lao, r):
 		return lao
+	case unicode.Is(unicode.Khmer, r):
+		return khmer
 	case unicode.Is(unicode.Tibetan, r):
 		return tibetan
 	case unicode.Is(unicode.Hebrew, r):

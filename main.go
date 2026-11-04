@@ -15,6 +15,7 @@ import (
 	"github.com/fzn0x/mixmusic/builtin"
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/diag"
+	"github.com/fzn0x/mixmusic/internal/sysproxy"
 )
 
 //go:embed resources/tray.png
@@ -63,6 +64,8 @@ func main() {
 	} else {
 		defer logs.Close()
 	}
+	// The proxy of Windows' settings, followed from now on, and logged.
+	sysproxy.Install()
 	dataDir, err := mygo.App.Path(mygo.PathUserData)
 	if err != nil {
 		log.Fatal(err)

@@ -60,13 +60,20 @@ func (s *shell) downloadableOf(tracks []media.Track) []media.Track {
 // confirmDownload runs run, which downloads tracks, after asking when they
 // are many, or take a gigabyte or so.
 func (s *shell) confirmDownload(tracks []media.Track, run func()) {
-	size := s.svc.Downloads.Estimate(tracks)
-	if len(tracks) <= bigDownload && size < bigDownloadBytes {
+	size, big := s.downloadSize(tracks)
+	if !big {
 		run()
 		return
 	}
 	s.ask("download "+plural(len(tracks), "track"), "That's about "+byteSize(size)+". They play without the network, and stay until you remove them.",
 		"download", run)
+}
+
+// downloadSize is about how many bytes tracks take, downloaded, and
+// whether they're as many, or as big, as MixMusic asks before downloading.
+func (s *shell) downloadSize(tracks []media.Track) (size int64, big bool) {
+	size = s.svc.Downloads.Estimate(tracks)
+	return size, len(tracks) > bigDownload || size >= bigDownloadBytes
 }
 
 // download downloads tracks on their own, telling what downloads.
@@ -230,7 +237,10 @@ func (s *shell) downloadCollection(d *downloadHead) {
 }
 
 // downloadButton is the button of a collection's head that downloads it.
+// The tracks added to the collection downloaded download first, as the
+// page shows them (syncDownload).
 func (s *shell) downloadButton(c *ui.Context, d *downloadHead) {
+	s.syncDownload(d)
 	a := s.downloadOf(d)
 	if s.button(c, "head-download", a.label, a.done).Clicked() {
 		a.run()

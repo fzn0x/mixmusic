@@ -318,6 +318,7 @@ type shell struct {
 	// move of their folder under way, which moveDone of moveTotal bytes
 	// came of.
 	missingMemos        map[string]missingMemo
+	syncMemos           map[string]syncMemo // the pages their downloads took the tracks of last
 	downloadsOf         string
 	downloadsList       downloadsView
 	movingDownloads     bool

@@ -336,13 +336,16 @@ var punctuation = map[rune]string{
 	'،': ",", '؛': ";", '؟': "?", '۔': ".", '٪': "%", '।': ".", '॥': ".",
 	'։': ".", '՝': ",", '՜': "!", '՞': "?", '፡': " ", '።': ".", '፣': ",", '፤': ";", '፧': "?",
 	'་': " ", '༌': " ", '།': "/", '༎': "//", '჻': ".", '๚': ".", '๛': ".",
+	// Lao, Khmer and Burmese; and the zero-width space, which parts their
+	// words where they're parted.
+	'ຯ': "…", '។': ".", '៕': ".", '៖': ":", '៘': "…", '၊': ",", '။': ".", 0x200B: " ",
 	// The Greek question mark, and its ano teleia.
 	';': "?", '·': ";",
 }
 
 // zeros are the zeros of the digits of other scripts, which are written
 // as 0 to 9.
-var zeros = []rune{0x0660, 0x06F0, 0x0966, 0x09E6, 0x0A66, 0x0AE6, 0x0B66, 0x0BE6, 0x0C66, 0x0CE6, 0x0D66, 0x0DE6, 0x0E50, 0x0ED0, 0x0F20, 0x1040, 0xFF10}
+var zeros = []rune{0x0660, 0x06F0, 0x0966, 0x09E6, 0x0A66, 0x0AE6, 0x0B66, 0x0BE6, 0x0C66, 0x0CE6, 0x0D66, 0x0DE6, 0x0E50, 0x0ED0, 0x0F20, 0x1040, 0x17E0, 0xFF10}
 
 // plain writes what isn't of a script romanized: punctuation as its
 // Latin kin, digits as 0 to 9, the rest as it is.

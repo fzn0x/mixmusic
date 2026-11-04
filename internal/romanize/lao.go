@@ -44,9 +44,9 @@ const laoSonorants = "ງຍນມຣລວ"
 const laoWoFirsts = "ກຂຄຈສຊຕທດບປຜພຝຟ"
 
 const (
-	laoHo, laoO, laoWo, laoNyo   = 'ຫ', 'ອ', 'ວ', 'ຍ'
-	laoLo, laoSignLo, laoSignNyo = 'ລ', 0x0EBC, 0x0EBD
-	laoCancel, laoRepeat         = 0x0ECC, 0x0EC6
+	laoHo, laoO, laoWo, laoNyo = 'ຫ', 'ອ', 'ວ', 'ຍ'
+	laoSignLo, laoSignNyo      = 0x0EBC, 0x0EBD
+	laoCancel, laoRepeat       = 0x0ECC, 0x0EC6
 )
 
 func laoConsonant(r rune) bool {

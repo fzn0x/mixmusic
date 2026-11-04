@@ -195,8 +195,8 @@ func khmerInitial(cons []rune, shift, above rune) (string, int) {
 			l = "p"
 		case c == 'ត' && over != 0 && k == len(cons)-1 && !strings.ContainsRune(khmerNasals, over):
 			// ត's subscript is written as ដ's, and usually is ដ: ក្តី,
-			// kdei; but under a nasal or over another subscript it is t:
-			// កន្ត្រាប់, kântráb.
+			// kdei; but under a nasal or over another subscript it is t,
+			// as the t of note 3's own exception, កន្ត្រ…, kântr….
 			l = "d"
 		}
 		if k > 0 && !strings.ContainsRune(khmerLight, c) {

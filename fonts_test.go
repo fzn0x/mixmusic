@@ -7,6 +7,22 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
+// TestSelawikLight sets Selawik's weight 300, the page titles', in Selawik
+// Light, not in Semilight, which says it weighs 300 too and took it in
+// about half the launches (#241): Light is 5.4% narrower than Regular,
+// Semilight 2.7%.
+func TestSelawikLight(t *testing.T) {
+	registerFonts()
+	const line = "The quick brown fox jumps over the lazy dog 0123456789"
+	width := func(weight int) float32 {
+		w, _ := ui.ShapeText(line, ui.Font{Family: face, Size: 40, Weight: weight}, 0).Size()
+		return w
+	}
+	if r := width(300) / width(400); r > 0.96 {
+		t.Errorf("Selawik's weight 300 is %.3f of its 400's width, Semilight's; Light's is 0.946", r)
+	}
+}
+
 // TestFacesRegistered checks that the faces MixMusic ships register under
 // the families the themes name, and that their licenses show in Settings
 // › About.

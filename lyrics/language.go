@@ -54,6 +54,31 @@ func GuessLanguage(lines []Line) string {
 	return byWords(lines)
 }
 
+// ScriptLanguage tells the language of the letters of lyrics in another
+// script than Latin letters, by their script, as GuessLanguage does, all
+// their Latin letters aside: Korean for lyrics mostly in English with
+// lines in Hangul; "" when their letters are all Latin.
+func ScriptLanguage(lines []Line) string {
+	count := map[string]int{}
+	for _, l := range lines {
+		for _, r := range l.Text {
+			if !unicode.IsLetter(r) || unicode.Is(unicode.Latin, r) {
+				continue
+			}
+			for _, s := range scripts {
+				if unicode.Is(s.table, r) {
+					count[s.lang]++
+					break
+				}
+			}
+		}
+	}
+	if len(count) == 0 {
+		return ""
+	}
+	return otherScript(count, lines)
+}
+
 // scripts are the scripts other than Latin letters, and the language each
 // tells when it is the commonest: "ja" is kana, which Japanese writes
 // along with Han, Chinese.
@@ -64,7 +89,7 @@ var scripts = []struct {
 	{unicode.Hiragana, "ja"}, {unicode.Katakana, "ja"}, {unicode.Han, "zh"}, {unicode.Hangul, "ko"},
 	{unicode.Cyrillic, "ru"}, {unicode.Greek, "el"}, {unicode.Arabic, "ar"}, {unicode.Hebrew, "he"},
 	{unicode.Thai, "th"}, {unicode.Devanagari, "hi"}, {unicode.Bengali, "bn"}, {unicode.Tamil, "ta"},
-	{unicode.Telugu, "te"}, {unicode.Gujarati, "gu"}, {unicode.Gurmukhi, "pa"}, {unicode.Kannada, "kn"},
+	{unicode.Telugu, "te"}, {unicode.Gujarati, "gu"}, {unicode.Gurmukhi, "pa"}, {unicode.Oriya, "or"}, {unicode.Kannada, "kn"},
 	{unicode.Malayalam, "ml"}, {unicode.Georgian, "ka"}, {unicode.Armenian, "hy"}, {unicode.Khmer, "km"},
 	{unicode.Lao, "lo"}, {unicode.Myanmar, "my"}, {unicode.Sinhala, "si"}, {unicode.Ethiopic, "am"},
 	{unicode.Tibetan, "bo"},
@@ -94,16 +119,50 @@ func otherScript(count map[string]int, lines []Line) string {
 		return false
 	}
 	switch {
-	case best == "ru" && has("ґєії"):
+	case best == "ru" && has("әғқұһ"):
+		return "kk"
+	case best == "ru" && has("ң"):
+		return "ky"
+	case best == "ru" && has("өү"):
+		return "mn"
+	case best == "ru" && has("ў"):
+		return "be"
+	case best == "ru" && has("ґєї"):
 		return "uk"
+	case best == "ru" && has("і"):
+		// Ukrainian, or Belarusian, which writes no и.
+		if has("и") {
+			return "uk"
+		}
+		return "be"
+	case best == "ru" && has("ѓќѕ"):
+		return "mk"
 	case best == "ru" && has("ђћџљњј"):
 		return "sr"
+	case best == "ru" && !has("ыэё") && hardVowel(lines):
+		return "bg"
+	case best == "bn" && has("ৰৱ"):
+		return "as"
 	case best == "ar" && has("ٹڈڑںے"):
 		return "ur"
 	case best == "ar" && has("پچژگ"):
 		return "fa"
 	}
 	return best
+}
+
+// hardVowel tells Bulgarian, whose ъ is a vowel within a word, as in
+// път; Russian's sits only before е, ё, ю and я, as in подъезд.
+func hardVowel(lines []Line) bool {
+	for _, l := range lines {
+		runes := []rune(strings.ToLower(l.Text))
+		for i, r := range runes {
+			if r == 'ъ' && i+1 < len(runes) && unicode.Is(unicode.Cyrillic, runes[i+1]) && !strings.ContainsRune("еёюя", runes[i+1]) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // vietnamese tells the letters of Vietnamese that no other language of

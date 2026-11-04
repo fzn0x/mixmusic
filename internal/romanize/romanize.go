@@ -18,6 +18,9 @@
 //     aligned blocks: Hunterian, India's national system, with its long
 //     vowels marked (brahmic.go);
 //   - Thai: the Royal Thai General System, syllable by syllable (thai.go);
+//   - Lao: BGN/PCGN (1966), syllable by syllable (lao.go);
+//   - Khmer: the UN's system of 1972, syllable by syllable (khmer.go);
+//   - Burmese: BGN/PCGN (1970), syllable by syllable (burmese.go);
 //   - Tibetan: Extended Wylie (tibetan.go);
 //   - Hebrew by the rules of the Academy of the Hebrew Language (2006),
 //     and Arabic, Persian and Urdu by the plain form of ALA-LC's (hebrew.go,
@@ -95,6 +98,9 @@ const (
 	brahmic
 	sinhala
 	thai
+	lao
+	khmer
+	myanmar
 	tibetan
 	hebrew
 	arabic
@@ -133,6 +139,12 @@ func scriptOf(r rune, lang string) script {
 		return sinhala
 	case unicode.Is(unicode.Thai, r):
 		return thai
+	case unicode.Is(unicode.Lao, r):
+		return lao
+	case unicode.Is(unicode.Khmer, r):
+		return khmer
+	case unicode.Is(unicode.Myanmar, r):
+		return myanmar
 	case unicode.Is(unicode.Tibetan, r):
 		return tibetan
 	case unicode.Is(unicode.Hebrew, r):
@@ -336,13 +348,16 @@ var punctuation = map[rune]string{
 	'،': ",", '؛': ";", '؟': "?", '۔': ".", '٪': "%", '।': ".", '॥': ".",
 	'։': ".", '՝': ",", '՜': "!", '՞': "?", '፡': " ", '።': ".", '፣': ",", '፤': ";", '፧': "?",
 	'་': " ", '༌': " ", '།': "/", '༎': "//", '჻': ".", '๚': ".", '๛': ".",
+	// Lao, Khmer and Burmese; and the zero-width space, which parts their
+	// words where they're parted.
+	'ຯ': "…", '។': ".", '៕': ".", '៖': ":", '៘': "…", '၊': ",", '။': ".", 0x200B: " ",
 	// The Greek question mark, and its ano teleia.
 	';': "?", '·': ";",
 }
 
 // zeros are the zeros of the digits of other scripts, which are written
 // as 0 to 9.
-var zeros = []rune{0x0660, 0x06F0, 0x0966, 0x09E6, 0x0A66, 0x0AE6, 0x0B66, 0x0BE6, 0x0C66, 0x0CE6, 0x0D66, 0x0DE6, 0x0E50, 0x0ED0, 0x0F20, 0x1040, 0xFF10}
+var zeros = []rune{0x0660, 0x06F0, 0x0966, 0x09E6, 0x0A66, 0x0AE6, 0x0B66, 0x0BE6, 0x0C66, 0x0CE6, 0x0D66, 0x0DE6, 0x0E50, 0x0ED0, 0x0F20, 0x1040, 0x17E0, 0xFF10}
 
 // plain writes what isn't of a script romanized: punctuation as its
 // Latin kin, digits as 0 to 9, the rest as it is.

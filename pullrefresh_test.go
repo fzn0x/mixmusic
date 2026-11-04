@@ -32,8 +32,8 @@ func pullAlbum(s *shell, n int) *loaded[media.Album] {
 	return l
 }
 
-// pullAt is where the tests pull the page: over its content, beside the
-// queue.
+// pullX and pullY are where the tests pull the page: over its content,
+// beside the queue.
 const pullX, pullY = 640, 400
 
 // swipe scrolls by each of dys at x, y as a touchpad does, a frame apart.
@@ -107,12 +107,17 @@ func TestPullThreshold(t *testing.T) {
 	// Past it: the refresh, with the button's spinner, and its toast.
 	tt.Advance(time.Second)
 	swipe(tt, pullX, pullY, -50, -50, -50)
-	rested(s, tt)
-	if l.asks != 1 {
+	// The answer waits for drain.
+	tt.Advance(pullRest)
+	tt.Frame()
+	if l.asks != 1 || !l.refreshing {
 		t.Fatalf("a pull past the threshold asked %d times", l.asks)
 	}
-	if _, ok := tt.Find("Refreshing"); !ok && s.refreshing() {
+	if _, ok := tt.Find("Refreshing"); !ok {
 		t.Error("the button isn't a spinner while the pull's refresh is out")
+	}
+	if !tt.HasText("refreshing") {
+		t.Errorf("the strip doesn't say the page refreshes as it closes: %q", tt.Texts())
 	}
 	waitRefreshed(t, s, tt)
 	if got := refreshToasts(tt); !slices.Equal(got, []string{"Couldn't refresh: media: malformed id"}) {
@@ -165,7 +170,8 @@ func TestPullMomentum(t *testing.T) {
 	if y := s.pageScrolled().Y; y < 800 {
 		t.Fatalf("the album scrolled to %v", y)
 	}
-	// A fling up, on past the top for three times the threshold.
+	// A fling up, which goes on past the top for several times the
+	// threshold.
 	fling := make([]float32, 25)
 	for i := range fling {
 		fling[i] = -60
@@ -349,8 +355,8 @@ func TestPullInside(t *testing.T) {
 }
 
 // TestPullDimmed shows nothing and does nothing on a page that has
-// nothing to refresh, where the button is dimmed, nor while a refresh is
-// out.
+// nothing to refresh, where the button is dimmed: a touchpad's pull, or
+// the wheel's.
 func TestPullDimmed(t *testing.T) {
 	s := newTestShell(t)
 	tt := tester(t, s)

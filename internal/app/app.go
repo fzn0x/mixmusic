@@ -128,6 +128,9 @@ type App struct {
 	colorFile colorFile
 
 	presence presence
+	// watchtime reports the listening to YouTube Music's episodes to the
+	// history there.
+	watchtime watchtime
 	// native is MixMusic's own audio engine, made at its first use.
 	native     *audio.Engine
 	nativeOnce sync.Once

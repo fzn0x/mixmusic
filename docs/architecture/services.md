@@ -56,6 +56,24 @@
   each track's romaji once, with its lyrics. Its tests read the
   dictionary from the Go module cache, where
   `go mod download github.com/ikawaha/kagome-dict/ipa@v1.2.6` puts it.
+- **`internal/romanize`** writes lyrics in the other scripts in Latin
+  letters on the computer, each run of a script of a line by the standard
+  of its language, as the package's doc lists them: the Revised
+  Romanization for Korean, with its sound changes; pinyin for Chinese;
+  the systems of each language of Cyrillic, told by its letters when the
+  lyrics' language isn't known; ELOT 743 for Greek; Hunterian for the
+  Brahmic scripts, by one engine over their aligned blocks; RTGS for
+  Thai, by a syllabifier of rules; EWTS for Tibetan; and the vowel
+  points of Hebrew and Arabic where they're written. `Words` gives each
+  word of a line synced word by word its part of the line in Latin
+  letters. Chinese reads `pinyin.bin`, 177 KB built in, which
+  `tools/pinyindata` makes from Unihan and mozillazg's pinyin-data and
+  phrase-pinyin-data: each character's reading, and only the words read
+  otherwise than their characters, 8,799 of 47,152. It is read the first
+  time Chinese is romanized, in 4 ms, and holds 1.3 MB. The windows make
+  each track's romanization once, with its lyrics (`lyricsromanize.go`),
+  and ask Unison for none, but Arabic's, whose romanization by Google
+  has the vowels Arabic doesn't write.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
   scrobbles by Last.fm's rules, keeping what fails offline for later.
 - **`internal/discord`** shows what plays on the user's Discord profile, over

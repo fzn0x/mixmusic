@@ -104,8 +104,9 @@ func TestEpisodeDetailsSeek(t *testing.T) {
 	tt := testerOf(t, s, 1280, 1000)
 	s.open("/lyrics")
 	tt.Frame()
-	// The accent's ink of the lines of the first two chapters: the line
-	// lit is all of it, the other only its time.
+	// The accent's ink of the lines of the first two chapters: a line lit
+	// is all of it, one that isn't only its time. Each line is measured
+	// against itself, as glyphs draw apart on each system.
 	accent := func() (dusk, barn int) {
 		img := tt.Image()
 		for _, l := range []struct {
@@ -120,14 +121,13 @@ func TestEpisodeDetailsSeek(t *testing.T) {
 		}
 		return dusk, barn
 	}
-	if dusk, barn := accent(); dusk < 2*barn {
-		t.Errorf("at the start, the first chapter isn't lit: %d of the accent against %d", dusk, barn)
-	}
+	dusk, barn := accent()
 	click(t, s, tt, "Play from 12:34")
 	s.settle(t, func(st player.State) bool { return st.Position == 754*time.Second })
 	tt.Frame()
-	if dusk, barn := accent(); barn < 2*dusk {
-		t.Errorf("at 12:34, the second chapter isn't lit: %d of the accent against %d", barn, dusk)
+	if duskThen, barnThen := accent(); 2*dusk < 3*duskThen || 2*barnThen < 3*barn {
+		t.Errorf("the line lit didn't move from the first chapter to the second: the accent's ink went from %d to %d, and from %d to %d",
+			dusk, duskThen, barn, barnThen)
 	}
 	if _, ok := tt.Find("Play from 2:05:00"); ok || !tt.HasText("2:05:00") {
 		t.Errorf("a time past the end seeks, or doesn't show: %q", tt.Texts())

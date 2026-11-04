@@ -143,7 +143,9 @@ func (s *shell) localShelves() []media.Shelf {
 // the router shows keeps where it scrolled for the top bar and the rows
 // pinned under it (showPage), or, in capture mode, has it scrolled
 // (act:scroll): not the one it leaves, which shows beside it while it
-// slides in.
+// slides in. The page shown may be pulled down past its top to refresh it,
+// which opens a strip above its content (pullStrip): the content is keyed,
+// so that what it holds keeps its state as the strip comes and goes.
 func (s *shell) pageScroll(c *ui.Context, content func()) {
 	page := ui.Scroll(c).Grow(1).MinWidth(0).MinHeight(0)
 	var track *ui.ScrollState
@@ -151,7 +153,10 @@ func (s *shell) pageScroll(c *ui.Context, content func()) {
 		track = s.showPage(page)
 	}
 	page.Children(func() {
-		col := ui.Column(c).Padding(0, s.lk.gutter, 64)
+		if track != nil {
+			s.pullStrip(c)
+		}
+		col := ui.Column(c.Key("page-content")).Padding(0, s.lk.gutter, 64)
 		if track != nil {
 			s.takeContent(page, col)
 		}
@@ -162,6 +167,6 @@ func (s *shell) pageScroll(c *ui.Context, content func()) {
 	})
 	// Once the content took where the page is: it may have moved it.
 	if track != nil {
-		page.TrackScroll(track)
+		page.TrackScroll(track).HandleInput(s.pullInput)
 	}
 }

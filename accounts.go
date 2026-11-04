@@ -253,7 +253,8 @@ func (s *shell) youtubeCookieSignIn(c *ui.Context, busy bool) {
 		ui.Column(c).Gap(8).Padding(14, 0).Children(func() {
 			ui.Text(c, "Paste a cookie header").FontSize(k.bodySize())
 			ui.Text(c, youtubePaste).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(720)
-			ui.TextArea(c.Key("youtube-cookies"), &yc.pasted).Placeholder("SAPISID=…; SID=…").Height(88).MaxWidth(720).Label("Cookie header")
+			ui.TextArea(c.Key("youtube-cookies"), &yc.pasted).Placeholder("SAPISID=…; SID=…").Height(88).MaxWidth(720).Label("Cookie header").
+				HandleInput(s.scrollsInside)
 			label := "sign in with it"
 			if s.signingIn == "youtube-paste" {
 				label = "signing in…"

@@ -18,6 +18,7 @@
 //     aligned blocks: Hunterian, India's national system, with its long
 //     vowels marked (brahmic.go);
 //   - Thai: the Royal Thai General System, syllable by syllable (thai.go);
+//   - Lao: BGN/PCGN (1966), syllable by syllable (lao.go);
 //   - Tibetan: Extended Wylie (tibetan.go);
 //   - Hebrew by the rules of the Academy of the Hebrew Language (2006),
 //     and Arabic, Persian and Urdu by the plain form of ALA-LC's (hebrew.go,
@@ -95,6 +96,7 @@ const (
 	brahmic
 	sinhala
 	thai
+	lao
 	tibetan
 	hebrew
 	arabic
@@ -133,6 +135,8 @@ func scriptOf(r rune, lang string) script {
 		return sinhala
 	case unicode.Is(unicode.Thai, r):
 		return thai
+	case unicode.Is(unicode.Lao, r):
+		return lao
 	case unicode.Is(unicode.Tibetan, r):
 		return tibetan
 	case unicode.Is(unicode.Hebrew, r):

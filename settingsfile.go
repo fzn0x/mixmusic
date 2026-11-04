@@ -53,7 +53,7 @@ func (s *shell) followSettings(old settings.Settings) {
 		clear(s.loads)
 	}
 	if old.YTDLPPath != s.set.YTDLPPath || old.JSRuntime != s.set.JSRuntime {
-		s.forget("tools")
+		s.refetch("tools")
 	}
 	if old.RegistryURL != s.set.RegistryURL {
 		// Its answer is the former registry's.

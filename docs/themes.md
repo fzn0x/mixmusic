@@ -10,6 +10,10 @@ my-theme/
 └── preview.png  optional: an image for the marketplace
 ```
 
+![MixMusic's home page](shots/home.webp)
+
+And <img src="shots/search.webp" alt="The search page">.
+
 ## Make one
 
 1. In Settings › Appearance, choose **open themes folder**.

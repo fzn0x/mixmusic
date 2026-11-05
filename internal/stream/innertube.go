@@ -35,12 +35,41 @@ const (
 	visionOSVer  = "26.5.23O471"
 )
 
+// The client the direct route asks, beside the visionOS one, whether a
+// video has 5.1 surround audio: YouTube's app for Samsung's TVs, which
+// YouTube tells of the AC-3 and E-AC-3 streams it lists to the visionOS
+// app none of. Their URLs need a challenge solved first, which only
+// yt-dlp does, as its tv_samsung client: the route learns from it only
+// that they are there. These change with yt-dlp's.
+const (
+	tvName    = "TVHTML5"
+	tvVersion = "5.20260707"
+	// tvNumber is tvName's number, for the headers.
+	tvNumber = "7"
+	tvAgent  = "Mozilla/5.0 (SMART-TV; Linux; Tizen 2.4.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/2.4.0 TV Safari/538.1"
+	tvMake   = "Samsung"
+	tvModel  = "UKS9800"
+	tvOS     = "Tizen"
+	tvOSVer  = "2.4.0"
+)
+
 // apiClient is a client of YouTube's API the route asks as.
 type apiClient struct {
 	name, version, number, agent, deviceMake, deviceModel, os, osVersion string
 }
 
-var visionClient = apiClient{visionName, visionVersion, visionNumber, visionAgent, visionMake, visionModel, visionOS, visionOSVer}
+var (
+	visionClient = apiClient{visionName, visionVersion, visionNumber, visionAgent, visionMake, visionModel, visionOS, visionOSVer}
+	tvClient     = apiClient{tvName, tvVersion, tvNumber, tvAgent, tvMake, tvModel, tvOS, tvOSVer}
+)
+
+// signatureTimestamp is the version of YouTube's web player the TV client
+// tells it plays in, without which YouTube answers it that the page needs
+// to be reloaded: the day the version came out, in days since 1970, as
+// yt-dlp reads it from the player's code. YouTube takes the versions of
+// the last few months, so the route tells that of a week ago, rather than
+// load the player's 3 MB.
+func signatureTimestamp(now time.Time) int { return int(now.Unix()/(24*60*60)) - 7 }
 
 // innertubeURL is the origin of YouTube's player API.
 const innertubeURL = "https://www.youtube.com"
@@ -55,6 +84,11 @@ const (
 	// pauseFor: yt-dlp alone finds streams meanwhile.
 	pauseAfter = 3
 	pauseFor   = 30 * time.Minute
+	// surroundGrace is how long a stream found waits, past its check, for
+	// the TV client to tell whether the video has 5.1 surround audio: its
+	// answer, asked at once, comes in a fifth of a second, mostly before
+	// the check's.
+	surroundGrace = 500 * time.Millisecond
 )
 
 var (
@@ -116,7 +150,9 @@ func refusal(err error) bool {
 // itself, as YouTube's visionOS app, signed out: in a fraction of the time
 // yt-dlp takes, and with streams YouTube serves at once. YouTube gives it
 // no streams of some videos, such as those made for children, which yt-dlp
-// still finds. Its methods are safe for concurrent use.
+// still finds. It asks as YouTube's TV app too whether a video has 5.1
+// surround audio, whose URL yt-dlp finds. Its methods are safe for
+// concurrent use.
 type Direct struct {
 	// HTTP asks the API, and the media server whether it serves a stream.
 	HTTP *http.Client
@@ -136,6 +172,10 @@ type Direct struct {
 	// refused counts refusals in a row; the route rests until pausedUntil.
 	refused     int
 	pausedUntil time.Time
+	// tvRefused counts the TV client's refusals in a row; it isn't asked
+	// until tvPausedUntil.
+	tvRefused     int
+	tvPausedUntil time.Time
 }
 
 // visitorCall is a request of a visitor ID, shared by every stream that
@@ -187,6 +227,11 @@ func (d *Direct) count(err error) {
 }
 
 func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream, error) {
+	// The TV client is asked at once, beside, whether the video has 5.1
+	// surround audio.
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	tv := d.askTV(ctx, videoID)
 	ans, err := d.answer(ctx, videoID)
 	if err != nil {
 		return Stream{}, err
@@ -206,13 +251,113 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 		return Stream{}, err
 	}
 	// The 5.1 surround beside it, unchecked: few play it, and its first
-	// request tells if YouTube refuses it.
+	// request tells if YouTube refuses it. YouTube lists none to the
+	// visionOS app, of the videos seen: the TV client tells of it then.
 	if sf, ok := pickSurround(ans.StreamingData.AdaptiveFormats, length, true); ok {
 		sur := sf.stream()
 		sur.Loudness, sur.Measured = ans.loudness(&sf)
 		st.Surround = &sur
+	} else {
+		st.Surround = d.toldTV(tv)
 	}
 	return st, nil
+}
+
+// toldTV is what the TV client told of a video's 5.1 surround audio, as
+// askTV asked it, waiting surroundGrace at most: its stream, without a
+// URL, or nil when the video has none, the client rests, or its answer
+// didn't come in time. It counts how asking went.
+func (d *Direct) toldTV(answer <-chan toldSurround) *Stream {
+	if answer == nil {
+		return nil
+	}
+	t := time.NewTimer(surroundGrace)
+	defer t.Stop()
+	select {
+	case told := <-answer:
+		d.countTV(told.err)
+		return told.s
+	case <-t.C:
+		return nil
+	}
+}
+
+// toldSurround is the TV client's answer of whether a video has 5.1
+// surround audio.
+type toldSurround struct {
+	s   *Stream
+	err error
+}
+
+// askTV asks the TV client whether a video has 5.1 surround audio, unless
+// it rests, and returns where its answer comes: nil while it rests.
+func (d *Direct) askTV(ctx context.Context, videoID string) <-chan toldSurround {
+	d.mu.Lock()
+	resting := d.now().Before(d.tvPausedUntil)
+	d.mu.Unlock()
+	if resting {
+		return nil
+	}
+	answer := make(chan toldSurround, 1)
+	go func() {
+		s, err := d.tvSurround(ctx, videoID)
+		answer <- toldSurround{s, err}
+	}()
+	return answer
+}
+
+// countTV takes in how asking the TV client went, and has it rest after
+// pauseAfter refusals in a row, as YouTube may have changed what it asks
+// of the client: the videos found meanwhile have no 5.1 audio.
+func (d *Direct) countTV(err error) {
+	var status apiStatusError
+	var playability playabilityError
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	switch {
+	case err == nil:
+		d.tvRefused = 0
+	case errors.Is(err, errBadAnswer) || errors.As(err, &status) || errors.As(err, &playability):
+		d.tvRefused++
+		if d.tvRefused >= pauseAfter {
+			d.tvRefused = 0
+			d.tvPausedUntil = d.now().Add(pauseFor)
+			log.Printf("mixmusic: YouTube's player API refused the TV app %d times in a row (%s); it isn't asked of 5.1 surround audio for %d minutes",
+				pauseAfter, strings.TrimPrefix(err.Error(), "stream: "), int(pauseFor/time.Minute))
+		}
+	}
+}
+
+// tvSurround asks YouTube's player API, as the TV client, for the 5.1
+// surround audio of a video: of the formats it lists, the one
+// pickSurround picks, without its URL, which only yt-dlp makes play; nil
+// when it lists none. Without a visitor ID, which YouTube asks of the
+// client, it isn't asked.
+func (d *Direct) tvSurround(ctx context.Context, videoID string) (*Stream, error) {
+	visitor, err := d.visitorID(ctx)
+	if err != nil {
+		return nil, nil
+	}
+	var ans playerAnswer
+	sts := map[string]any{"signatureTimestamp": signatureTimestamp(d.now())}
+	if err := d.call(ctx, tvClient, "player", playerBody(videoID, sts), visitor, &ans); err != nil {
+		return nil, err
+	}
+	if s := ans.status(); s.Status != "OK" {
+		return nil, s
+	}
+	if ans.VideoDetails.VideoID != videoID {
+		return nil, fmt.Errorf("%w: the streams of another video", errBadAnswer)
+	}
+	length := time.Duration(ans.VideoDetails.LengthSeconds) * time.Second
+	f, ok := pickSurround(ans.StreamingData.AdaptiveFormats, length, false)
+	if !ok {
+		return nil, nil
+	}
+	s := f.stream()
+	s.URL, s.Header = "", http.Header{}
+	s.Loudness, s.Measured = ans.loudness(&f)
+	return &s, nil
 }
 
 // live returns the stream of a live video in quality q: the HLS media

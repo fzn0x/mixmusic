@@ -2,7 +2,9 @@
 // YouTube's player API as YouTube's visionOS app, else with yt-dlp, and
 // serves them to the player's audio element through a local scheme, with
 // range requests, so it can seek. The stream of a live video is an HLS
-// playlist, which OpenLive follows as the broadcast goes on.
+// playlist, which OpenLive follows as the broadcast goes on. Whether a
+// video has 5.1 surround audio, YouTube's player API tells YouTube's TV
+// app, and yt-dlp finds that audio as it is asked for.
 package stream
 
 import (
@@ -107,7 +109,8 @@ type Stream struct {
 	// Surround is the video's 5.1 surround audio, AC-3 or E-AC-3 in MP4,
 	// beside the stereo audio of the Stream, when YouTube has one the
 	// engine plays: nil otherwise, in the Surround stream itself, and in
-	// a live stream.
+	// a live stream. Its URL is "" when YouTube's player API told only
+	// that it is there: Resolver.Surround has yt-dlp find it.
 	Surround *Stream
 	// Videos are the streams of the video's picture, which yt-dlp and
 	// YouTube's player API list beside the audio, for the now playing page.
@@ -136,6 +139,9 @@ type Resolver struct {
 	mu      sync.Mutex
 	quality Quality
 	calls   map[string]*resolution
+	// surrounds are the 5.1 surround audio yt-dlp found of videos whose
+	// stream YouTube's player API gave.
+	surrounds map[string]*resolution
 }
 
 // resolution is the result of resolving a video, shared by every caller
@@ -154,7 +160,7 @@ func (res *resolution) fresh() bool {
 
 // NewResolver returns a resolver that runs the yt-dlp of t.
 func NewResolver(t *tools.Manager, cacheDir string) *Resolver {
-	r := &Resolver{Tools: t, CacheDir: cacheDir, quality: QualityBest, calls: map[string]*resolution{}}
+	r := &Resolver{Tools: t, CacheDir: cacheDir, quality: QualityBest, calls: map[string]*resolution{}, surrounds: map[string]*resolution{}}
 	r.Run = r.runYTDLP
 	return r
 }
@@ -177,8 +183,38 @@ func (r *Resolver) Resolve(ctx context.Context, videoID string) (Stream, error) 
 	if !ValidVideoID(videoID) {
 		return Stream{}, ErrBadVideoID
 	}
+	return r.share(ctx, videoID, false, r.resolve)
+}
+
+// Surround returns the 5.1 surround audio of a video, which the stream
+// Resolve returns tells of: errNoSurround when YouTube has none. Of most
+// videos, YouTube's player API tells only that it is there: yt-dlp finds
+// it then, as it is asked for, once, and it is kept until it is about to
+// expire, as Resolve's streams are.
+func (r *Resolver) Surround(ctx context.Context, videoID string) (Stream, error) {
+	s, err := r.Resolve(ctx, videoID)
+	switch {
+	case err != nil:
+		return Stream{}, err
+	case s.Surround == nil:
+		return Stream{}, errNoSurround
+	case s.Surround.URL != "":
+		return *s.Surround, nil
+	}
+	return r.share(ctx, videoID, true, r.findSurround)
+}
+
+// share returns what find finds of a video, shared by every caller asking
+// for it while it runs, and kept until it fails or is about to expire: in
+// calls, or surrounds for the 5.1 surround audio.
+func (r *Resolver) share(ctx context.Context, videoID string, surround bool,
+	find func(ctx context.Context, videoID string, quality Quality) (Stream, error)) (Stream, error) {
 	r.mu.Lock()
-	res := r.calls[videoID]
+	calls := r.calls
+	if surround {
+		calls = r.surrounds
+	}
+	res := calls[videoID]
 	if res != nil {
 		select {
 		case <-res.done:
@@ -190,14 +226,14 @@ func (r *Resolver) Resolve(ctx context.Context, videoID string) (Stream, error) 
 	}
 	if res == nil {
 		res = &resolution{done: make(chan struct{})}
-		r.calls[videoID] = res
+		calls[videoID] = res
 		quality := r.quality
 		go func() {
 			defer close(res.done)
 			// Not the caller's context: other callers may wait for this.
 			ctx, cancel := context.WithTimeout(context.Background(), resolveTimeout)
 			defer cancel()
-			res.stream, res.err = r.resolve(ctx, videoID, quality)
+			res.stream, res.err = find(ctx, videoID, quality)
 		}()
 	}
 	r.mu.Unlock()
@@ -244,16 +280,18 @@ func (r *Resolver) Live(videoID string) bool {
 	}
 }
 
-// Forget drops what the resolver remembers of a video, for example after
-// its stream URL was refused.
+// Forget drops what the resolver remembers of a video, its 5.1 surround
+// audio too, for example after its stream URL was refused.
 func (r *Resolver) Forget(videoID string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if res := r.calls[videoID]; res != nil {
-		select {
-		case <-res.done:
-			delete(r.calls, videoID)
-		default:
+	for _, calls := range []map[string]*resolution{r.calls, r.surrounds} {
+		if res := calls[videoID]; res != nil {
+			select {
+			case <-res.done:
+				delete(calls, videoID)
+			default:
+			}
 		}
 	}
 }
@@ -272,6 +310,10 @@ func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality)
 		if err == nil {
 			if took := time.Since(start); took > slowResolve {
 				log.Printf("mixmusic: found the stream of %s in %s, through YouTube's player API", videoID, took.Round(10*time.Millisecond))
+			}
+			if s.Surround != nil && s.Surround.URL == "" && !r.findsSurround() {
+				log.Printf("mixmusic: YouTube has 5.1 surround audio of %s, which takes yt-dlp and a JavaScript runtime to play", videoID)
+				s.Surround = nil
 			}
 			return s, nil
 		}
@@ -297,6 +339,34 @@ func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality)
 		log.Printf("mixmusic: found the stream of %s in %s with yt-dlp", videoID, took)
 	}
 	return s, nil
+}
+
+// findsSurround reports whether yt-dlp can find the 5.1 surround audio
+// YouTube's player API tells only of: its URL plays once yt-dlp solved a
+// challenge, which takes a JavaScript runtime. A resolver without tools,
+// as in tests, runs a yt-dlp of its own.
+func (r *Resolver) findsSurround() bool {
+	if r.Tools == nil {
+		return true
+	}
+	_, err := r.Tools.YTDLP()
+	_, _, ok := r.Tools.JSRuntime()
+	return err == nil && ok
+}
+
+// findSurround has yt-dlp find the 5.1 surround audio of a video, which
+// YouTube's player API told only of.
+func (r *Resolver) findSurround(ctx context.Context, videoID string, quality Quality) (Stream, error) {
+	start := time.Now()
+	s, err := r.ytdlp(ctx, videoID, quality)
+	if err != nil {
+		return Stream{}, err
+	}
+	if s.Surround == nil {
+		return Stream{}, errNoSurround
+	}
+	log.Printf("mixmusic: found the 5.1 surround audio of %s in %s with yt-dlp", videoID, time.Since(start).Round(10*time.Millisecond))
+	return *s.Surround, nil
 }
 
 // ytdlp asks yt-dlp for the stream of a video. It asks signed out, also

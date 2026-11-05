@@ -3,7 +3,7 @@
 
 MixMusic shows synced and word-by-word lyrics for Spotify and YouTube Music tracks, and can translate them or show them in Latin letters.
 
-Lyrics come from Unison, LRCLIB and YouTube Music, for the track that plays, whichever service it's from. Nothing needs setting up; translations, and the romanization of Arabic, are sent for only while you turn them on.
+Lyrics come from Unison, LRCLIB and YouTube Music, for the track that plays, whichever service it's from. Nothing needs setting up. The lyrics themselves go to Unison, for their translation or for the romanization of Arabic, only while you turn those on.
 
 ## Where lyrics show
 
@@ -26,8 +26,8 @@ Refresh this page (F5, or ⇧⌘R on macOS) asks again. For a podcast episode, t
 
 MixMusic asks, in order:
 
-1. **Unison** (https://unison.boidu.dev), an open, crowdsourced database of lyrics, by the track's video ID, or by its title, artist, album and length. Unison has many lyrics timed word by word. While it's out of reach, MixMusic goes on to LRCLIB after a wait of 3 seconds at most.
-2. **LRCLIB** (https://lrclib.net), the open database of synced lyrics, by the track's title, artists, album and length: when Unison has no lyrics, can't be reached, or has only plain lyrics where LRCLIB has synced ones.
+1. **[Unison](https://unison.boidu.dev),** an open, crowdsourced database of lyrics, by the track's video ID, or by its title, artists, album and length. Unison has many lyrics timed word by word. While it's out of reach, MixMusic goes on to LRCLIB after a wait of 3 seconds at most.
+2. **[LRCLIB](https://lrclib.net),** the open database of synced lyrics, by the track's title, artists, album and length: when Unison has no lyrics, can't be reached, or has only plain lyrics where LRCLIB has synced ones.
 3. **YouTube Music:** when neither has any lyrics, or both have only plain ones and YouTube Music's are longer.
 
 A Spotify track is looked up by the video ID of its recording on YouTube Music once MixMusic has matched one, and by its title, artists, album and length before. The line at the end of the lyrics names where they came from.

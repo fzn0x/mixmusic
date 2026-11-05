@@ -13,8 +13,10 @@ Three web pages still show, and only while they're needed:
   when what it plays changes, for the player to ask at once. A track plays
   with the Spotify tracks the queue moves on to after it, which the device
   goes on to without a gap, and the player follows it there
-  (`internal/player/connect.go`). Only WebView2, on Windows, decrypts
-  Spotify's audio.
+  (`internal/player/connect.go`). At a track's end, the player gives it up
+  to 2 s to go on before it plays the next track itself: after a seek into
+  a track's last seconds, Spotify stops on it a moment while it loads the
+  next. Only WebView2, on Windows, decrypts Spotify's audio.
 - **Google's sign-in to YouTube Music**, whose cookies MixMusic keeps.
 - **The picture of music videos** (`video.go`, `internal/app/video.go`),
   with "Show the video of music videos" on in Settings › Playback: a web

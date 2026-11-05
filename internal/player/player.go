@@ -529,7 +529,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.ctx, p.cancel = context.WithCancel(context.Background())
 	p.remote = device
 	p.connect = &connectEngine{p: p, device: device, tickEvery: connectTick, askEvery: connectAskEvery, askDefault: connectAskEvery,
-		settle: connectSettle, settleDefault: connectSettle}
+		settle: connectSettle, settleDefault: connectSettle, goOn: connectGoOn}
 	st := svc.Settings()
 	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume), Speed: 1}
 	p.spotifyMode, p.skipDisliked, p.skipAI = st.SpotifyPlayback, st.SkipDisliked, st.SkipAI

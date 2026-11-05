@@ -13,6 +13,7 @@ package player
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -47,6 +48,9 @@ var (
 	// connectSettle is how long the device's reports may still tell what
 	// it did before a command.
 	connectSettle = 5 * time.Second
+	// connectGoOn is how long a device that ended a track may take to go
+	// on by itself to the one it was given after it.
+	connectGoOn = 2 * time.Second
 )
 
 // maxAhead is how many tracks after the current one a device that plays
@@ -86,10 +90,10 @@ const (
 type connectEngine struct {
 	p      *Player
 	device Device
-	// tickEvery, askDefault and settleDefault are connectTick,
-	// connectAskEvery and connectSettle as the engine was made; askEvery
-	// and settle are the device's it plays on.
-	tickEvery, askEvery, askDefault, settle, settleDefault time.Duration
+	// tickEvery, askDefault, settleDefault and goOn are connectTick,
+	// connectAskEvery, connectSettle and connectGoOn as the engine was
+	// made; askEvery and settle are the device's it plays on.
+	tickEvery, askEvery, askDefault, settle, settleDefault, goOn time.Duration
 	// ticking is closed to stop the ticks of a track.
 	ticking chan struct{}
 	track   *media.Track
@@ -114,6 +118,9 @@ type connectEngine struct {
 	nudged bool
 	// ending is set once the device told the track is in its last seconds.
 	ending bool
+	// endedAt is when the device was first seen to end the track without
+	// having gone on yet to the entry it was given after it (ended).
+	endedAt time.Time
 	// strays counts the reports in a row of the device playing something
 	// else.
 	strays int
@@ -241,7 +248,10 @@ func (c *connectEngine) seek(t time.Duration) {
 	}
 	moved := func() {
 		c.progress = t
-		c.ending = false
+		// Sought into its last seconds, the track may end before the
+		// device, once settled, tells where it is.
+		c.ending = c.duration()-t < connectEnd
+		c.endedAt = time.Time{}
 		c.sentAt = time.Now()
 		c.p.onTime(t, c.duration())
 	}
@@ -272,6 +282,7 @@ func (c *connectEngine) stop(pause bool) {
 	c.track = nil
 	c.ahead = nil
 	c.followed = nil
+	c.endedAt = time.Time{}
 	c.playing = false
 }
 
@@ -348,14 +359,23 @@ func (c *connectEngine) ask() {
 // command or not.
 func (c *connectEngine) follow(state *DeviceState, settling bool) {
 	dur := c.duration()
-	if state != nil && sameTrack(state.Track, c.track) {
+	// The track given after this one may share its title, artist and
+	// length, as a re-release does: by its ID, it's that one.
+	next := state != nil && state.Track != nil && len(c.ahead) > 0 &&
+		state.Track.ID != c.track.ID && state.Track.ID == c.ahead[0].Track.ID
+	if state != nil && !next && sameTrack(state.Track, c.track) {
 		c.strays = 0
 		c.lost = false
 		// After its end, Spotify plays the track again from its start when
 		// it repeats, or stops on it, at its start or at its end.
 		back := state.Progress < connectStart || (!state.Playing && dur-state.Progress < connectStill)
 		if c.ending && !settling && back {
-			c.finish()
+			// Stopped on it, it may still go on by itself.
+			if state.Playing {
+				c.finish()
+			} else {
+				c.ended()
+			}
 			return
 		}
 		// The device may still report the track loading, paused.
@@ -372,6 +392,7 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 		}
 		c.progress = state.Progress
 		c.ending = dur-state.Progress < connectEnd
+		c.endedAt = time.Time{}
 		if state.Playing != c.playing {
 			c.playing = state.Playing
 			c.p.onPlaying(state.Playing)
@@ -390,9 +411,14 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 		return
 	}
 	// Around the end, the device moving on or stopping means the track
-	// ended.
+	// ended. Telling nothing, it may still go on by itself; playing
+	// another track, it went elsewhere.
 	if c.ending || (c.playing && dur-c.progress < connectEnd) {
-		c.finish()
+		if state == nil || state.Track == nil {
+			c.ended()
+		} else {
+			c.finish()
+		}
 		return
 	}
 	// Otherwise someone plays something else on it: twice in a row, it is
@@ -406,6 +432,36 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 		c.playing = false
 		c.p.onPlaying(false)
 	}
+}
+
+// ended takes in the device having ended the track, and stopped on it or
+// telling nothing. A device given tracks to play after it goes on to the
+// first by itself, but may first stop a moment while it loads that one:
+// Spotify does when a seek into the track's last seconds kept it from
+// loading it ahead. It has goOn to, before the player moves on itself:
+// told to play that track as it went on to it by itself, Spotify started
+// it again, late, or went on past it.
+func (c *connectEngine) ended() {
+	if len(c.ahead) == 0 {
+		c.finish()
+		return
+	}
+	if c.endedAt.IsZero() {
+		c.endedAt = time.Now()
+		// It is asked once more then, unless it tells before.
+		track := c.track
+		c.p.after(c.goOn, func() {
+			if c.track == track && !c.endedAt.IsZero() {
+				c.changed()
+			}
+		})
+		return
+	}
+	if time.Since(c.endedAt) < c.goOn {
+		return
+	}
+	log.Printf("mixmusic: Spotify's player didn't go on by itself after %s", c.track.ID)
+	c.finish()
 }
 
 func (c *connectEngine) finish() {

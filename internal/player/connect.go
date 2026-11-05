@@ -248,7 +248,9 @@ func (c *connectEngine) seek(t time.Duration) {
 	}
 	moved := func() {
 		c.progress = t
-		c.ending = false
+		// Sought into its last seconds, the track may end before the
+		// device, once settled, tells where it is.
+		c.ending = c.duration()-t < connectEnd
 		c.endedAt = time.Time{}
 		c.sentAt = time.Now()
 		c.p.onTime(t, c.duration())

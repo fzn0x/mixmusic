@@ -88,7 +88,7 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 		})
 		if next, ok := s.st.UpNext(); ok && next.Track.ID != t.ID && s.panel != "queue" {
 			if w, _ := c.Size(); w >= 1100 {
-				ui.Text(c, "next · "+next.Track.Title+" — "+names(next.Track.Artists)).FontSize(k.captionSize()).
+				ui.Text(c, "next · "+next.Track.Title+" - "+names(next.Track.Artists)).FontSize(k.captionSize()).
 					TextColor(k.muted).SingleLine()
 			}
 		}

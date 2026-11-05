@@ -502,7 +502,7 @@ func (p *Player) fellBack(why string) {
 	}
 	p.warned[why] = true
 	p.notify(Notice{
-		Message:  strings.TrimSuffix(why, ".") + " — playing it from YouTube Music instead",
+		Message:  strings.TrimSuffix(why, ".") + " - playing it from YouTube Music instead",
 		Error:    true,
 		Settings: true,
 	})

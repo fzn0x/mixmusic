@@ -28,7 +28,7 @@ func TestMemoForgetsOldest(t *testing.T) {
 
 func TestTrayTip(t *testing.T) {
 	track := &media.Track{Title: "One More Time", Artists: []media.Ref{{Name: "Daft Punk"}}}
-	if got := trayTip(NowPlaying{Track: track, Playing: true}); got != "One More Time — Daft Punk" {
+	if got := trayTip(NowPlaying{Track: track, Playing: true}); got != "One More Time - Daft Punk" {
 		t.Errorf("playing tip = %q", got)
 	}
 	if got := trayTip(NowPlaying{Track: track}); !strings.HasPrefix(got, "Paused: ") {
@@ -59,19 +59,19 @@ func TestWindowTitle(t *testing.T) {
 		hide bool
 		want string
 	}{
-		{"playing", NowPlaying{Track: track, Playing: true}, false, "One More Time — Daft Punk"},
-		{"paused", NowPlaying{Track: track}, false, "Paused: One More Time — Daft Punk"},
+		{"playing", NowPlaying{Track: track, Playing: true}, false, "One More Time - Daft Punk"},
+		{"paused", NowPlaying{Track: track}, false, "Paused: One More Time - Daft Punk"},
 		// As one track ends, the next loads with the player paused.
-		{"loading", NowPlaying{Track: track, Loading: true}, false, "One More Time — Daft Punk"},
+		{"loading", NowPlaying{Track: track, Loading: true}, false, "One More Time - Daft Punk"},
 		{"nothing to play", NowPlaying{}, false, "MixMusic"},
 		{"turned off", NowPlaying{Track: track, Playing: true}, true, "MixMusic"},
-		{"two artists", NowPlaying{Track: &media.Track{Title: "Song", Artists: []media.Ref{{Name: "Ann"}, {Name: "Bo"}}}, Playing: true}, false, "Song — Ann, Bo"},
+		{"two artists", NowPlaying{Track: &media.Track{Title: "Song", Artists: []media.Ref{{Name: "Ann"}, {Name: "Bo"}}}, Playing: true}, false, "Song - Ann, Bo"},
 		{"no artists", NowPlaying{Track: &media.Track{Title: "Song"}, Playing: true}, false, "Song"},
 		{"no title", NowPlaying{Track: &media.Track{Artists: []media.Ref{{Name: "Ann"}}}, Playing: true}, false, "MixMusic"},
 		{"lines and bytes", NowPlaying{Track: &media.Track{Title: "One\nMore\x00Time\xff"}, Playing: true}, false, "One More Time�"},
 		{"spaces", NowPlaying{Track: &media.Track{Title: "  One \t More ", Artists: []media.Ref{{Name: "\r\n"}}}, Playing: true}, false, "One More"},
-		// An override left open would turn " — Daft Punk" around.
-		{"direction", NowPlaying{Track: &media.Track{Title: "One\u202eMore\u2066", Artists: []media.Ref{{Name: "Daft Punk"}}}, Playing: true}, false, "OneMore — Daft Punk"},
+		// An override left open would turn " - Daft Punk" around.
+		{"direction", NowPlaying{Track: &media.Track{Title: "One\u202eMore\u2066", Artists: []media.Ref{{Name: "Daft Punk"}}}, Playing: true}, false, "OneMore - Daft Punk"},
 	} {
 		got := windowTitle(c.np, !c.hide)
 		if got != c.want {

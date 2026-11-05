@@ -95,8 +95,8 @@ func sourceName(s media.Source) string {
 	return "MixMusic"
 }
 
-// trackLine is "Title — Artist", for notices.
-func trackLine(t media.Track) string { return t.Title + " — " + names(t.Artists) }
+// trackLine is "Title - Artist", for notices.
+func trackLine(t media.Track) string { return t.Title + " - " + names(t.Artists) }
 
 // byteSize writes a size as "512 MB".
 func byteSize(n int64) string {

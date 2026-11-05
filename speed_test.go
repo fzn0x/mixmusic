@@ -174,7 +174,7 @@ func TestSpeedToastOnDevice(t *testing.T) {
 	s := newTestShell(t)
 	s.st.Source = &player.Source{Mode: player.ModeConnect}
 	s.changeSpeed(1.5)
-	if n := s.notes[len(s.notes)-1]; n.Message != "Songs play at 1.5× — Spotify plays this one at its own speed" {
+	if n := s.notes[len(s.notes)-1]; n.Message != "Songs play at 1.5× - Spotify plays this one at its own speed" {
 		t.Errorf("told %q", n.Message)
 	}
 }
@@ -186,7 +186,7 @@ func TestSpeedToastLive(t *testing.T) {
 	s.st.Source = &player.Source{Mode: player.ModeStream, Live: true}
 	s.st.Live = true
 	s.changeSpeed(1.5)
-	if n := s.notes[len(s.notes)-1]; n.Message != "Songs play at 1.5× — this live stream plays at its own speed" {
+	if n := s.notes[len(s.notes)-1]; n.Message != "Songs play at 1.5× - this live stream plays at its own speed" {
 		t.Errorf("told %q", n.Message)
 	}
 	tt := testerOf(t, s, 1280, 3200)

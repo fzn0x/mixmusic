@@ -239,7 +239,7 @@ func TestQueueMadeWithAI(t *testing.T) {
 	}
 	s.panel = ""
 	tt.Frame()
-	if !tt.HasText("next · Windowlicker — Aphex Twin") {
+	if !tt.HasText("next · Windowlicker - Aphex Twin") {
 		t.Errorf("the player bar doesn't name what plays next: %q", tt.Texts())
 	}
 	s.panel = "queue"

@@ -324,7 +324,7 @@ func TestGlobalDislikeTakenBack(t *testing.T) {
 // TestDislikedNote tells what a dislike from outside the window did.
 func TestDislikedNote(t *testing.T) {
 	track := media.Track{Title: "One More Time", Artists: []media.Ref{{Name: "Daft Punk"}}}
-	if title, body := dislikedNote(track, true); title != "Disliked" || body != "One More Time — Daft Punk" {
+	if title, body := dislikedNote(track, true); title != "Disliked" || body != "One More Time - Daft Punk" {
 		t.Errorf("disliked: %q, %q", title, body)
 	}
 	if title, body := dislikedNote(media.Track{Title: "Intro"}, false); title != "Removed the dislike" || body != "Intro" {

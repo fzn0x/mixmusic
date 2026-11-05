@@ -592,6 +592,108 @@ func TestAddToYouTubePlaylistListsYours(t *testing.T) {
 	}
 }
 
+// listFor has YouTube answer the lists of the user's playlists of the test
+// with what answer gives, and returns how many times it was asked.
+func listFor(t *testing.T, answer func() ([]media.Playlist, error)) func() int {
+	var (
+		mu    sync.Mutex
+		asked int
+	)
+	was := listOnYouTube
+	listOnYouTube = func(*shell, context.Context) ([]media.Playlist, error) {
+		mu.Lock()
+		asked++
+		mu.Unlock()
+		return answer()
+	}
+	t.Cleanup(func() { listOnYouTube = was })
+	return func() int {
+		mu.Lock()
+		defer mu.Unlock()
+		return asked
+	}
+}
+
+// youtubeOwn returns the user's playlists on YouTube Music as the shell
+// keeps them, or nil before it asked for them.
+func youtubeOwn(s *shell) *loaded[[]media.Playlist] {
+	l, _ := s.loads["youtube:playlists"].(*loaded[[]media.Playlist])
+	return l
+}
+
+// trackMenuChoice opens the menu of the first track shown and chooses
+// what path leads to.
+func trackMenuChoice(t *testing.T, tt *ui.Tester, path ...string) error {
+	t.Helper()
+	if err := tt.RightClick(testTracks[0].Title); err != nil {
+		t.Fatal(err)
+	}
+	defer tt.CloseMenu()
+	return tt.ChooseMenuItem(path...)
+}
+
+// TestYouTubePlaylistsAhead lists the user's playlists on YouTube Music
+// the first time a track's menu opens (#260), as the system's menus show
+// what they held as they opened: the window asks for them once signed
+// in, once however many frames come, again once forgotten, and never
+// signed out.
+func TestYouTubePlaylistsAhead(t *testing.T) {
+	asked := listFor(t, func() ([]media.Playlist, error) { return []media.Playlist{ownPlaylist, savedPlaylist}, nil })
+	s := newTestShell(t)
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	if items := menuOf(t, tt, testTracks[0].Title); slices.Contains(items, "Add to YouTube Music playlist") {
+		t.Errorf("signed out, the menu is %q", items)
+	}
+	for range 3 {
+		tt.Frame()
+	}
+	if n := asked(); n != 0 || youtubeOwn(s) != nil {
+		t.Fatalf("signed out, YouTube was asked %d times", n)
+	}
+
+	signIn := func() {
+		t.Helper()
+		s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+		tt.Frame()
+		if youtubeOwn(s) == nil {
+			t.Fatal("signed in, the window didn't ask for the user's playlists")
+		}
+		s.settle(t, func(player.State) bool { return youtubeOwn(s).done })
+	}
+	signIn()
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", "Loading your playlists…"); err == nil || !strings.Contains(err.Error(), "no item") {
+		t.Errorf("the first menu says they load: %v", err)
+	}
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", ownPlaylist.Title); err != nil {
+		t.Errorf("the first menu doesn't list the user's playlist: %v", err)
+	}
+	for range 5 {
+		tt.Frame()
+	}
+	s.drain()
+	if n := asked(); n != 1 {
+		t.Errorf("YouTube was asked %d times, not once", n)
+	}
+
+	// Forgotten, as signing in again or choosing another channel leaves
+	// them, they're asked for again; signed out, they aren't.
+	s.forget("youtube:playlists")
+	signIn()
+	if n := asked(); n != 2 {
+		t.Errorf("forgotten, YouTube was asked %d times, not twice", n)
+	}
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true}
+	s.forget("youtube:playlists")
+	for range 3 {
+		tt.Frame()
+	}
+	if n := asked(); n != 2 || youtubeOwn(s) != nil {
+		t.Errorf("signed out again, YouTube was asked %d times", n)
+	}
+}
+
 // Playlists of a library on YouTube Music: one the user made, one they
 // saved, and one that's neither.
 var (

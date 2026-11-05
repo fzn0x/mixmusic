@@ -1,4 +1,5 @@
 # Themes
+<!-- docs: group=make order=10 -->
 
 A theme sets the colors, the typefaces and the corners of MixMusic, which
 draws everything with them. A theme is a folder:

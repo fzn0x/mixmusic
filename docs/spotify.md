@@ -1,4 +1,5 @@
 # Spotify
+<!-- docs: group=start order=30 -->
 
 MixMusic reads your Spotify library and searches Spotify through the Spotify
 Web API, and plays Spotify tracks itself, on Spotify Connect, or from their

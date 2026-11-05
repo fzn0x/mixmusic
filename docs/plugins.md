@@ -1,4 +1,5 @@
 # Plugins
+<!-- docs: group=make order=20 -->
 
 A plugin adds to MixMusic: a page, a command, an item in the menu of every
 track, a widget on the now playing page. It is a folder holding a manifest

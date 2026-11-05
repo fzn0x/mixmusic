@@ -1,4 +1,5 @@
 # Troubleshooting
+<!-- docs: group=start order=90 -->
 
 MixMusic writes what goes wrong to `mixmusic.log`, without your sign-ins:
 Settings › About › open logs folder shows it, beside the reports of any

@@ -1,4 +1,5 @@
 # Code of conduct
+<!-- docs: group=project order=40 -->
 
 MixMusic is made by people who love music and like making things for each
 other. Keep it a place where everyone is glad to take part.

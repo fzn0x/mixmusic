@@ -2070,6 +2070,31 @@ func TestSpotifyAheadNotGoneOn(t *testing.T) {
 	}
 }
 
+// TestSpotifyRepeatOneSeekToEnd repeats one Spotify track, sought into its
+// last second: the device ends it before it tells where it is, and stops
+// on it at its start. The player takes that for its end, and plays it
+// again, rather than telling the device to play on, as for a track it was
+// slow to start.
+func TestSpotifyRepeatOneSeekToEnd(t *testing.T) {
+	connectTick, connectAskEvery, connectSettle = time.Hour, time.Hour, 0
+	t.Cleanup(func() { connectTick, connectAskEvery, connectSettle = time.Second, 3*time.Second, 5*time.Second })
+	h := newHarness(t, Saved{}, func(f *fakeServices) { f.prepare = here })
+	own := &aheadDevice{}
+	h.p.SpotifyHere(own)
+	sp1, sp2 := spotifyTrack("1"), spotifyTrack("2")
+	h.on(func(p *Player) { p.s.Repeat = RepeatOne })
+	h.p.PlayTracks([]media.Track{sp1, sp2}, 0)
+	h.wait("1 playing", func(p *Player) bool { return current(p.s) == "spotify:1" && p.connect.active() && p.s.Playing })
+	h.p.Seek(199500 * time.Millisecond)
+	h.wait("1 seeked", func(p *Player) bool { return p.connect.progress == 199500*time.Millisecond })
+	tells(h, own, &DeviceState{Playing: false, Progress: 0, Track: &sp1})
+	h.wait("1 played again", func(p *Player) bool { return len(own.with("play spotify:1 0s")) == 2 })
+	if own.has("resume") {
+		t.Errorf("the device was told %v", own.calls)
+	}
+	h.wait("1 playing again", func(p *Player) bool { return current(p.s) == "spotify:1" && p.connect.active() && p.s.Playing })
+}
+
 // TestSpotifyGaplessQueueChanged has the player play its own next entry
 // when the device went on by itself to one the queue no longer moves on
 // to, as another was played next meanwhile: what the device went on to is

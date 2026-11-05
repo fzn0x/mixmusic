@@ -2070,6 +2070,66 @@ func TestSpotifyAheadNotGoneOn(t *testing.T) {
 	}
 }
 
+// TestSpotifyGaplessOnAtOnce has the device tell, right after the end of a
+// track, that it plays the one it was given after it: the player follows
+// it there at once, without telling it to play it, also when that one
+// shares the track's title, artist and length, as a re-release does.
+func TestSpotifyGaplessOnAtOnce(t *testing.T) {
+	sp1 := spotifyTrack("1")
+	again := sp1
+	again.ID = "spotify:1-again"
+	for name, next := range map[string]media.Track{"another song": spotifyTrack("2"), "a song of the same name": again} {
+		t.Run(name, func(t *testing.T) {
+			connectTick, connectAskEvery, connectSettle, connectGoOn = time.Hour, time.Hour, 0, time.Hour
+			t.Cleanup(func() {
+				connectTick, connectAskEvery, connectSettle, connectGoOn = time.Second, 3*time.Second, 5*time.Second, 2*time.Second
+			})
+			h := newHarness(t, Saved{}, func(f *fakeServices) { f.prepare = here })
+			own := &aheadDevice{}
+			h.p.SpotifyHere(own)
+			h.p.PlayTracks([]media.Track{sp1, next, spotifyTrack("3")}, 0)
+			h.wait("1 playing", func(p *Player) bool { return current(p.s) == "spotify:1" && p.connect.active() && p.s.Playing })
+			tells(h, own, &DeviceState{Playing: true, Progress: 197 * time.Second, Track: &sp1})
+			goesOn(h, own, next, 300*time.Millisecond, true)
+			h.wait("the next followed", func(p *Player) bool {
+				return current(p.s) == next.ID && p.s.Index == 1 && p.connect.active() && p.s.Position == 300*time.Millisecond
+			})
+			if plays := own.with("play"); len(plays) != 1 {
+				t.Errorf("the device was told to play %v", plays)
+			}
+		})
+	}
+}
+
+// TestSpotifyEndedElsewhere has the device, at the end of a track, play
+// something other than the track it was given after it: it isn't going on
+// to that one, and the player plays it at once.
+func TestSpotifyEndedElsewhere(t *testing.T) {
+	sp1, sp2, sp9 := spotifyTrack("1"), spotifyTrack("2"), spotifyTrack("9")
+	for name, after := range map[string]*DeviceState{
+		"another track":            {Playing: true, Progress: 300 * time.Millisecond, Track: &sp9},
+		"the track from its start": {Playing: true, Progress: 300 * time.Millisecond, Track: &sp1},
+	} {
+		t.Run(name, func(t *testing.T) {
+			connectTick, connectAskEvery, connectSettle, connectGoOn = time.Hour, time.Hour, 0, time.Hour
+			t.Cleanup(func() {
+				connectTick, connectAskEvery, connectSettle, connectGoOn = time.Second, 3*time.Second, 5*time.Second, 2*time.Second
+			})
+			h := newHarness(t, Saved{}, func(f *fakeServices) { f.prepare = here })
+			own := &aheadDevice{}
+			h.p.SpotifyHere(own)
+			h.p.PlayTracks([]media.Track{sp1, sp2, spotifyTrack("3")}, 0)
+			h.wait("1 playing", func(p *Player) bool { return current(p.s) == "spotify:1" && p.connect.active() && p.s.Playing })
+			tells(h, own, &DeviceState{Playing: true, Progress: 197 * time.Second, Track: &sp1})
+			tells(h, own, after)
+			h.wait("2 playing", func(p *Player) bool { return current(p.s) == "spotify:2" && p.connect.active() && p.s.Playing })
+			if !own.has("play spotify:2 0s then spotify:3") {
+				t.Errorf("the device was told %v", own.calls)
+			}
+		})
+	}
+}
+
 // TestSpotifyRepeatOneSeekToEnd repeats one Spotify track, sought into its
 // last second: the device ends it before it tells where it is, and stops
 // on it at its start. The player takes that for its end, and plays it

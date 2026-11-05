@@ -135,6 +135,22 @@ func TestYouTubePlaylistsYours(t *testing.T) {
 	}
 }
 
+// TestCreateYouTubePlaylist makes a playlist on YouTube Music that is the
+// user's, to add to and to delete, as the library would list it.
+func TestCreateYouTubePlaylist(t *testing.T) {
+	a, f := signedInYouTube(t, func(string) (int, any) { return http.StatusOK, map[string]any{"playlistId": "PLnew"} })
+	p, err := (&Collection{a: a}).CreateYouTubePlaylist(context.Background(), " Road trip ", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.ID != "yt:PLnew" || p.Title != "Road trip" || !p.Editable || !p.Deletable {
+		t.Errorf("made %+v", p)
+	}
+	if asks := f.asked(); len(asks) != 1 || asks[0].endpoint != "playlist/create" || asks[0].body["title"] != "Road trip" {
+		t.Errorf("asked %+v", asks)
+	}
+}
+
 // TestDeleteYouTubePlaylist deletes a playlist of YouTube Music by its
 // MixMusic ID, and nothing of another service or signed out.
 func TestDeleteYouTubePlaylist(t *testing.T) {

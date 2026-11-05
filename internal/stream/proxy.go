@@ -358,13 +358,19 @@ func (p *Proxy) fail(w http.ResponseWriter, videoID string, err error) {
 }
 
 // loggable returns err without the stream URL a request's error quotes,
-// which carries the user's IP address, and without the addresses a
+// which carries the user's IP address, without the addresses a
 // connection's error names, the computer's among them, which over IPv6 is
-// its address on the internet: what went wrong, for the log.
+// its address on the internet, and without the server a lookup's error
+// names, which tells near where the computer is: what went wrong, for the
+// log.
 func loggable(err error) error {
 	var ue *url.Error
 	if errors.As(err, &ue) {
 		err = ue.Err
+	}
+	var de *net.DNSError
+	if errors.As(err, &de) {
+		return fmt.Errorf("lookup: %s", de.Err)
 	}
 	var oe *net.OpError
 	if errors.As(err, &oe) {

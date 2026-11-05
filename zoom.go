@@ -225,7 +225,7 @@ func (s *shell) useMenuBar() {
 // plusKeys tells whether Zoom in has the keys of +, Mod+Shift+= (alsoKeys):
 // while it keeps its own shortcut, and no other command took them. The
 // keypad's + is one of them, which MyGo gives the window as no key (#251):
-// macOS's menu and Windows' hook of the window's thread take it first.
+// macOS's menu takes it first, and internal/keypad on Windows and Linux.
 func (s *shell) plusKeys() bool {
 	for _, cmd := range s.commands() {
 		if cmd.id == "view.zoomIn" {
@@ -253,11 +253,12 @@ func (s *shell) zoomInKey() {
 	}
 }
 
-// useKeypad has Ctrl and the keypad's + zoom in on Windows, while Zoom in
-// has the keys of + (plusKeys): a hook of the window's thread takes the
-// press before MyGo, which has no key for it (#251).
+// useKeypad has Ctrl and the keypad's + zoom in on Windows and Linux, while
+// Zoom in has the keys of + (plusKeys): a hook of the window's thread on
+// Windows, and a handler of the GTK window's key presses on Linux, take
+// the press before MyGo, which has no key for it (#251).
 func (s *shell) useKeypad() {
-	if runtime.GOOS != "windows" {
+	if runtime.GOOS != "windows" && runtime.GOOS != "linux" {
 		return
 	}
 	var stop func()

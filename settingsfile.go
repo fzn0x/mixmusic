@@ -59,7 +59,8 @@ func (s *shell) followSettings(old settings.Settings) {
 		// Its answer is the former registry's.
 		s.forget("registry")
 	}
-	if old.Zoom != s.set.Zoom && s.main {
+	// The mini player reads out a zoom it chose itself.
+	if old.Zoom != s.set.Zoom && s.main && !s.miniChose(s.set.Zoom) {
 		s.zoomToast = true
 	}
 }

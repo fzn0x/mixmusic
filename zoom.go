@@ -7,10 +7,12 @@ import (
 	"runtime"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/keypad"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
@@ -114,10 +116,42 @@ func (s *shell) zoomBy(dir int) {
 func (s *shell) setZoom(z float64) {
 	s.set.Zoom = z
 	s.zoomToast = true
+	// The one window but the main one that zooms is the mini player.
+	if !s.main {
+		s.miniChoose(z)
+	}
 	s.save()
 	if s.win != nil {
 		s.win.Invalidate()
 	}
+}
+
+// miniZooms are the zooms the apps' mini players chose, one each, until
+// their main windows hear of them: a mini player reads out the zoom it
+// chooses, and its main window doesn't toast it too (#259).
+var miniZooms struct {
+	sync.Mutex
+	m map[*app.App]float64
+}
+
+// miniChoose keeps the zoom z the mini player chose, before it saves it.
+func (s *shell) miniChoose(z float64) {
+	miniZooms.Lock()
+	defer miniZooms.Unlock()
+	if miniZooms.m == nil {
+		miniZooms.m = map[*app.App]float64{}
+	}
+	miniZooms.m[s.a] = z
+}
+
+// miniChose tells whether the mini player chose the zoom z, which the main
+// window hears the zoom changed to, and forgets the one it chose.
+func (s *shell) miniChose(z float64) bool {
+	miniZooms.Lock()
+	defer miniZooms.Unlock()
+	chose, ok := miniZooms.m[s.a]
+	delete(miniZooms.m, s.a)
+	return ok && chose == z
 }
 
 // zoomKeys tells the keys that zoom, as the user has them: "Ctrl+= and

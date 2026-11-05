@@ -25,6 +25,10 @@
   thumbnail of the main window's taskbar button on Windows, through the
   shell's ITaskbarList3, and takes their clicks in a window procedure in
   front of MyGo's.
+- **`internal/keypad`** takes Ctrl and the keypad's + on Windows, which
+  MyGo gives its windows as no key, in a keyboard hook of the window's
+  thread, so that they zoom in as Ctrl+= does (#251). On macOS, View › Zoom
+  In's ⌘+ takes them (`zoomInKey`).
 - **`internal/diag`** writes the log, `mixmusic.log` in the logs folder,
   rotated at a megabyte and without the cookies, hashes and tokens a line
   may hold, and has Go write a crash to `crash.log` there, which the next

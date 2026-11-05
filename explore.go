@@ -182,9 +182,16 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 			})
 		}
 		own := s.youtubePlaylists()
-		if !own.done {
+		switch {
+		case !own.done:
 			// Only until the answer the window asked for ahead comes.
 			m.Item("Loading your playlists…").Disabled(true)
+			return
+		case own.err != nil:
+			// Asked again, as a refresh asks, unless they already are:
+			// they may be there the next time the menu opens.
+			own.refresh()
+			m.Item("Couldn't load your playlists").Disabled(true)
 			return
 		}
 		editable := slices.DeleteFunc(slices.Clone(own.value), func(p media.Playlist) bool { return !p.Editable })

@@ -694,6 +694,47 @@ func TestYouTubePlaylistsAhead(t *testing.T) {
 	}
 }
 
+// TestYouTubePlaylistsLate says the user's playlists on YouTube Music
+// load in a track's menu only while the answer the window asked for is
+// still to come, and that they couldn't when YouTube failed, which a menu
+// opened then asks again for, once however many open meanwhile.
+func TestYouTubePlaylistsLate(t *testing.T) {
+	answers := make(chan error)
+	asked := listFor(t, func() ([]media.Playlist, error) {
+		if err := <-answers; err != nil {
+			return nil, err
+		}
+		return []media.Playlist{ownPlaylist}, nil
+	})
+	s := newTestShell(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", "Loading your playlists…"); err == nil || !strings.Contains(err.Error(), "disabled") {
+		t.Errorf("before the answer, the menu: %v", err)
+	}
+	answers <- errors.New("YouTube Music is busy")
+	s.settle(t, func(player.State) bool { return youtubeOwn(s).done })
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", "Couldn't load your playlists"); err == nil || !strings.Contains(err.Error(), "disabled") {
+		t.Errorf("once YouTube failed, the menu: %v", err)
+	}
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", "No playlists of yours"); err == nil || !strings.Contains(err.Error(), "no item") {
+		t.Errorf("once YouTube failed, the menu says the user has none: %v", err)
+	}
+	for range 3 {
+		tt.Frame()
+	}
+	answers <- nil
+	s.settle(t, func(player.State) bool { return youtubeOwn(s).err == nil })
+	if n := asked(); n != 2 {
+		t.Errorf("YouTube was asked %d times, not twice", n)
+	}
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", ownPlaylist.Title); err != nil {
+		t.Errorf("asked again, the menu: %v", err)
+	}
+}
+
 // Playlists of a library on YouTube Music: one the user made, one they
 // saved, and one that's neither.
 var (

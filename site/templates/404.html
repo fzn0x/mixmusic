@@ -12,7 +12,7 @@
     <h1>This page isn't here</h1>
     <p>It may have moved, or its address may be mistyped. The home page and the docs have the rest.</p>
     <div class="missing-actions">
-      <a class="btn btn-filled" href="{{ config.base_url | trim_end_matches(pat='/') ~ '/' }}">Home page</a>
+      <a class="btn btn-filled" href="{{ config.base_url | trim_end(pat='/') ~ '/' }}">Home page</a>
       <a class="btn btn-tonal" href="{{ get_url(path='@/docs/_index.md') }}">Docs</a>
     </div>
   </main>

@@ -37,7 +37,7 @@ func (c *Client) reportPlay(ctx context.Context, videoID, cpn string) (node, err
 	}
 	base := n.get("playbackTracking", "videostatsPlaybackUrl", "baseUrl").str()
 	if base == "" {
-		return node{}, errors.New("youtube music: no playback report for this track")
+		return node{}, noReport(n, "playback")
 	}
 	u, err := url.Parse(base)
 	if err != nil {
@@ -52,6 +52,27 @@ func (c *Client) reportPlay(ctx context.Context, videoID, cpn string) (node, err
 	q.Set("cpn", cpn)
 	u.RawQuery = q.Encode()
 	return n, c.ping(ctx, u)
+}
+
+// noReport is the error of a player response with no URL of the report
+// what, such as "playback": it tells why, as the response's
+// playabilityStatus does.
+func noReport(n node, what string) error {
+	err := fmt.Sprintf("youtube music: no %s report for this track", what)
+	status := n.get("playabilityStatus")
+	why := status.get("status").str()
+	if why == "" {
+		return errors.New(err)
+	}
+	reason := status.get("reason").str()
+	if reason != "" {
+		why += fmt.Sprintf(", %q", reason)
+	}
+	sub := status.get("errorScreen", "playerErrorMessageRenderer", "subreason").text()
+	if sub != "" && sub != reason {
+		why += fmt.Sprintf(", %q", sub)
+	}
+	return fmt.Errorf("%s: YouTube's player answered %s", err, why)
 }
 
 // ping sends one of the reports of YouTube's player, at u, with the

@@ -232,8 +232,9 @@ func TestSpaceAfterClicks(t *testing.T) {
 		spacePlays(t, s, tt, "a click on a theme")
 	})
 	t.Run("now playing", func(t *testing.T) {
-		// The sidebar's tile shows in a window 720 tall and more; the
-		// player bar's artwork, labelled as it, in any.
+		// The sidebar's tile shows where the sidebar has room for it, as
+		// in a window 1000 tall but not 700; the player bar's artwork,
+		// labelled as it, in any.
 		for _, h := range []int{1000, 700} {
 			s := playing(t)
 			tt := testerOf(t, s, 1280, h)

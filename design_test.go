@@ -237,3 +237,64 @@ func TestFloatingPanelRoom(t *testing.T) {
 		}
 	}
 }
+
+// TestLiveTileRoom checks that the rail's live tile shows whole above the
+// player bar, or not at all, in every layout design, the rail folded or
+// not, under macOS's window buttons or not, in windows down to 650 tall:
+// Expressive's rail, of taller entries, ran on under its floating bar in
+// macOS's default window of 1280×787 (#258). The tile shows there in
+// every design, as in Windows' 1280×757 inside, and the entries keep
+// their height in a window of 1536×870, where nothing ran on, beside a
+// long list of mixes.
+func TestLiveTileRoom(t *testing.T) {
+	for _, layout := range settings.Layouts {
+		t.Run(string(layout), func(t *testing.T) {
+			s, _ := themed(t, "mix", layout)
+			for i := range 20 {
+				if _, err := s.svc.Collection.CreatePlaylist(fmt.Sprint("Mix ", i), "", nil); err != nil {
+					t.Fatal(err)
+				}
+			}
+			tt := testerOf(t, s, 1536, 870)
+			natural := float32(42)
+			if s.lk.tonal {
+				natural = s.lk.tonalEntry()
+			}
+			for _, folded := range []bool{false, true} {
+				st := s.svc.Preferences.Get()
+				st.SidebarCollapsed = folded
+				if _, err := s.svc.Preferences.Set(st); err != nil {
+					t.Fatal(err)
+				}
+				s.refresh()
+				for _, bar := range []ui.TitleBar{{}, macTitleBar} {
+					tt.SetTitleBar(bar)
+					for _, size := range [][2]int{{1536, 870}, {1280, 787}, {1280, 757}, {1280, 720}, {1280, 700}, {1280, 650}} {
+						w, h := size[0], size[1]
+						tt.SetSize(w, h)
+						show(s, tt, "/")
+						what := fmt.Sprintf("%dx%d, folded %v, macOS %v", w, h, folded, bar.Left > 0)
+						top := float32(h) - s.lk.barRoom()
+						// The first of that label is the tile, or the player
+						// bar's artwork where there is none.
+						r, _ := tt.Find("Open now playing")
+						tile := r.Y < top || r.H == 0
+						switch {
+						case tile && (r.H != liveSize(folded) || r.Y+r.H > top):
+							t.Errorf("%s: the live tile shows at %+v, the player bar from %v", what, r, top)
+						case !tile && (h >= 787 || h == 757 && bar.Left == 0):
+							t.Errorf("%s: no live tile", what)
+						}
+						entry, _ := tt.Find(s.lk.words("Settings"))
+						if h == 870 && entry.H != natural {
+							t.Errorf("%s: the entries are %v tall, want %v", what, entry.H, natural)
+						}
+						if mixes, ok := tt.Find(s.lk.words("Your mixes")); !folded && (!ok || mixes.Y < entry.Y+entry.H) {
+							t.Errorf("%s: the mixes at %+v run into the entries, to %+v", what, mixes, entry)
+						}
+					}
+				}
+			}
+		})
+	}
+}

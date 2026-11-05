@@ -12,7 +12,7 @@ The search box at the top of the window, "Search Spotify and YouTube Music", sea
 - **The pivots** at the top of the results are All, Songs, Albums, Artists, Playlists and Podcasts, each with how many it found. All shows the first ten songs, then shelves of artists, albums and playlists.
 - **The services:** under the pivots, choose both, Spotify or YouTube Music. With both, the results of the two services take turns, so that each leads.
 - **Each result** has a mark of its service. YouTube Music's songs say how many times they played, or how many views a video has, as "1.2B plays" or "905M views", so that the original stands out from covers. Spotify gives apps no such count.
-- **Without Spotify,** the page says it searches YouTube Music only, with a link to sign in. Spotify allows apps such as yours ten results of each kind.
+- **Without Spotify,** the page says it searches YouTube Music only, with a link to sign in. Spotify gives an app in development mode, as your Spotify app is, ten results of each kind.
 
 The command palette (Ctrl+K) searches too: type anything, and its first item is "Search for" what you typed.
 
@@ -34,7 +34,7 @@ The Queue button by the player, or Ctrl+J (⌘J), shows Up next at the right of 
 
 - **Play next,** in a track's or a list's menu, puts it right after the track playing. **Add to queue** puts it after the tracks you added, and before those of the radio.
 - **Drag** a track in Up next to move it, and use the × on its row to take it out. Clear takes out every track after the one playing. Double-click a track to play it.
-- **Marks** after the artists tell what a track is: "radio" for those a radio added, "skipped" for a song the queue passes over as you dislike it, and "made with AI" for one it passes over as YouTube labels it so. Clicking a skipped track still plays it.
+- **Marks** after the artists tell what a track is: "radio" for those a radio added, "skipped" for a song the queue passes over as you dislike it, and "made with AI" for one it passes over as YouTube labels it so. Clicking a skipped track's cover still plays it.
 - **In a wide window,** the player bar shows the track that plays next under the one playing, while Up next is closed.
 - **After a restart,** the queue comes back on the track that played, where it was, with up to 500 tracks around it.
 
@@ -139,7 +139,7 @@ Some YouTube Music tracks have a 5.1 surround mix beside their stereo one. While
 
 - On a 5.1 output device, the six channels play as they are. On headphones or two speakers, they're mixed down to stereo, as the track's own downmix levels say.
 - While it's on, stereo tracks play on the front left and right speakers of a 5.1 system.
-- The surround mix needs yt-dlp and a JavaScript runtime, which find it in a few seconds the first time a track plays.
+- The surround mix needs yt-dlp and a JavaScript runtime, which find it in a few seconds the first time the track plays.
 - The surround mix goes to the offline cache beside the stereo audio. Downloads keep the stereo audio, which plays while you're offline, and a surround mix that can't play gives way to the stereo one.
 
 ## How Spotify tracks play
@@ -158,7 +158,7 @@ While Spotify plays a track, in MixMusic or on Spotify Connect, its sound is Spo
 
 Quality, in Settings › Playback › Sound, chooses between best and data saver.
 
-- **Data saver** plays the smallest audio YouTube offers for each track, the original rather than its stable-volume version, and a live stream's 22 kHz stream.
+- **Data saver** plays the smallest audio YouTube offers for each track, and a live stream's 22 kHz stream. For the few videos that also come in YouTube's stable-volume version, which is no smaller and squeezes the sound, it plays the original.
 - The picture of music videos takes its lowest quality.
 - Downloads take the quality chosen here.
 

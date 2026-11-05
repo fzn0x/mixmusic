@@ -61,7 +61,7 @@ func TestGetExact(t *testing.T) {
 		if r.URL.Path != "/get" || q.Get("duration") != "200" || q.Get("album_name") != "Album" || r.Header.Get("User-Agent") != "test-agent" {
 			t.Errorf("request = %s %v", r.URL.Path, q)
 		}
-		w.Write([]byte(`{"syncedLyrics": "[00:01.00]Hello", "plainLyrics": "Hello"}`))
+		w.Write([]byte(`{"syncedLyrics": "[00:01.00]Hello\n[00:04.00]Again", "plainLyrics": "Hello\nAgain"}`))
 	}))
 	defer srv.Close()
 	c := New("test-agent")
@@ -79,9 +79,9 @@ func TestGetFallsBackToSearch(t *testing.T) {
 			return
 		}
 		w.Write([]byte(`[
-			{"duration": 150, "syncedLyrics": "[00:01.00]Wrong length"},
+			{"duration": 150, "syncedLyrics": "[00:01.00]Wrong length\n[00:04.00]Again"},
 			{"duration": 201, "plainLyrics": "Plain"},
-			{"duration": 199, "syncedLyrics": "[00:01.00]Right"}]`))
+			{"duration": 199, "syncedLyrics": "[00:01.00]Right\n[00:04.00]Again"}]`))
 	}))
 	defer srv.Close()
 	c := New("test")
@@ -125,7 +125,9 @@ func busy(cached func(w http.ResponseWriter)) *httptest.Server {
 // TestGetBusy takes the lyrics LRCLIB's database has while LRCLIB is busy,
 // and tells a track it hasn't from LRCLIB out of reach.
 func TestGetBusy(t *testing.T) {
-	srv := busy(func(w http.ResponseWriter) { w.Write([]byte(`{"duration": 200, "syncedLyrics": "[00:01.00]Cached"}`)) })
+	srv := busy(func(w http.ResponseWriter) {
+		w.Write([]byte(`{"duration": 200, "syncedLyrics": "[00:01.00]Cached\n[00:04.00]Again"}`))
+	})
 	defer srv.Close()
 	c := New("test")
 	c.BaseURL = srv.URL
@@ -174,5 +176,50 @@ func TestGetUnavailable(t *testing.T) {
 	srv.Close()
 	if _, err := c.Get(context.Background(), song); !errors.Is(err, ErrUnavailable) {
 		t.Errorf("LRCLIB out of reach: err = %v", err)
+	}
+}
+
+// TestTimedLyrics has lyrics synced only when they can be followed in time:
+// two lines or more at different times. One line, or lines all at one
+// time, are plain, without their times (#277).
+func TestTimedLyrics(t *testing.T) {
+	for _, c := range []struct {
+		what   string
+		lrc    string
+		synced bool
+	}{
+		{"lines at their times", "[00:01.00]One\n[00:04.00]Two", true},
+		{"one line", "[00:01.00]One", false},
+		{"one line at the start", "[00:00.00]probe", false},
+		{"lines all at one time", "[00:00.00]One\n[00:00.00]Two", false},
+		{"one line among empty ones", "[00:00.00]\n[00:05.00]One\n[00:09.00]", false},
+	} {
+		l := timedLyrics(ParseLRC(c.lrc), "LRCLIB")
+		if l.Synced != c.synced || l.Source != "LRCLIB" || len(l.Lines) == 0 {
+			t.Errorf("%s: lyrics = %+v", c.what, l)
+			continue
+		}
+		if !l.Synced && l.Lines[len(l.Lines)-1].TimeMs != 0 {
+			t.Errorf("%s: plain lyrics keep times: %+v", c.what, l.Lines)
+		}
+	}
+}
+
+// TestGetJunkSynced takes LRCLIB's plain lyrics where its synced ones
+// can't be followed in time, and the synced ones as plain where it has no
+// others (#277).
+func TestGetJunkSynced(t *testing.T) {
+	for _, c := range []struct{ answer, first string }{
+		{`{"syncedLyrics": "[00:00.00]probe", "plainLyrics": "Line one\nLine two"}`, "Line one"},
+		{`{"syncedLyrics": "[00:00.00]probe"}`, "probe"},
+	} {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(c.answer)) }))
+		cl := New("test-agent")
+		cl.BaseURL = srv.URL
+		l, err := cl.Get(context.Background(), song)
+		srv.Close()
+		if err != nil || l.Synced || len(l.Lines) == 0 || l.Lines[0].Text != c.first {
+			t.Errorf("%s: lyrics = %+v, %v", c.answer, l, err)
+		}
 	}
 }

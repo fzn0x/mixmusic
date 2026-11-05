@@ -82,8 +82,11 @@ func TestUnisonFormats(t *testing.T) {
 		{"plain", "One\nTwo", false, "One"},
 		{"lrc", "no times here", false, "no times here"},
 		// An unknown format is read as what it looks like.
-		{"", "[00:03.00]Timed", true, "Timed"},
-		{"srt", `<tt><body><p begin="1s">Marked up</p></body></tt>`, true, "Marked up"},
+		{"", "[00:03.00]Timed\n[00:06.00]Again", true, "Timed"},
+		{"srt", `<tt><body><p begin="1s">Marked up</p><p begin="4s">Again</p></body></tt>`, true, "Marked up"},
+		// Times that can't be followed: plain (#277).
+		{"lrc", "[00:00.00]probe", false, "probe"},
+		{"ttml", `<tt><body><p begin="0s">One</p><p begin="0s">Two</p></body></tt>`, false, "One"},
 		{"", "Just text", false, "Just text"},
 	} {
 		l, err := unisonServer(t, c.format, c.text, nil).Get(context.Background(), song)

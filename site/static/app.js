@@ -1,5 +1,5 @@
 // The MixMusic site: the working player in the hero, feature tabs, the
-// walkthrough's chapters, the sketch of the layouts and themes, and
+// video's chapters, the gallery of layouts and themes, and
 // download buttons named for the visitor's system. Every download goes to
 // the latest release on GitHub.
 (() => {
@@ -83,8 +83,8 @@
     });
   }
 
-  // The walkthrough: each chapter seeks the video to its page, and the
-  // chapter of the page playing lights up.
+  // The video: each chapter seeks it to its scene, and the
+  // chapter of the scene playing lights up.
   const video = $("[data-walkthrough]");
   const chapterRow = $("[data-chapters]");
   if (video && chapterRow) {
@@ -120,7 +120,7 @@
     const clock = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
     const time = $("[data-time]");
     const draw = () => {
-      const total = video.duration || 60;
+      const total = video.duration || 80;
       fill.style.width = `${(100 * video.currentTime) / total}%`;
       time.textContent = `${clock(video.currentTime)} / ${clock(total)}`;
       scrub.setAttribute("aria-valuemax", String(Math.round(total)));
@@ -129,7 +129,7 @@
     };
     const seekTo = (x) => {
       const r = scrub.getBoundingClientRect();
-      video.currentTime = Math.min(Math.max((x - r.left) / r.width, 0), 1) * (video.duration || 60);
+      video.currentTime = Math.min(Math.max((x - r.left) / r.width, 0), 1) * (video.duration || 80);
       draw();
     };
     video.addEventListener("timeupdate", draw);
@@ -140,7 +140,7 @@
     const toggle = () => (video.paused ? video.play().catch(() => {}) : video.pause());
     const state = () => {
       play.classList.toggle("is-playing", !video.paused);
-      play.setAttribute("aria-label", video.paused ? "Play the walkthrough" : "Pause the walkthrough");
+      play.setAttribute("aria-label", video.paused ? "Play the video" : "Pause the video");
     };
     play.addEventListener("click", toggle);
     video.addEventListener("click", toggle);
@@ -154,7 +154,7 @@
       scrub.addEventListener("pointerup", () => scrub.removeEventListener("pointermove", move), { once: true });
     });
     scrub.addEventListener("keydown", (e) => {
-      const total = video.duration || 60;
+      const total = video.duration || 80;
       const to = { ArrowRight: video.currentTime + 5, ArrowUp: video.currentTime + 5, ArrowLeft: video.currentTime - 5, ArrowDown: video.currentTime - 5, Home: 0, End: total }[e.key];
       if (to === undefined) return;
       e.preventDefault();
@@ -163,30 +163,35 @@
     });
   }
 
-  // Layouts and themes: the chips re-draw the sketch of the home page in
-  // each layout and each theme, whose tokens styles.css holds.
-  const looks = $("[data-looks]");
-  if (looks) {
-    const look = $("[data-look]", looks);
-    const frame = $("[data-look-frame]", looks);
-    const choose = (group, key, desc) => {
-      const chips = $$(`[data-${key}]`, group);
-      chips.forEach((chip) =>
-        chip.addEventListener("click", () => {
-          chips.forEach((c) => {
-            c.classList.toggle("is-current", c === chip);
-            c.setAttribute("aria-pressed", String(c === chip));
-          });
-          look.dataset[key] = chip.dataset[key];
-          desc.textContent = chip.dataset.desc;
-        }),
-      );
-    };
-    choose($("[data-layouts]", looks), "layout", $("[data-layout-desc]", looks));
-    choose($("[data-themes]", looks), "theme", $("[data-theme-desc]", looks));
-    const fitLook = () => frame.style.setProperty("--lfit", (frame.clientWidth / 1000).toFixed(4));
-    addEventListener("resize", fitLook);
-    fitLook();
+  // Layouts and themes: each chip shows the home page in its layout, in
+  // the Mix theme, or in its theme, in the Blend layout; the other group
+  // goes back to its default, which the picture shows.
+  const gallery = $("[data-gallery]");
+  if (gallery) {
+    const show = crossfader($(".gallery-img", gallery));
+    const name = $("[data-gallery-name]", gallery);
+    const desc = $("[data-gallery-desc]", gallery);
+    const chips = $$("[data-kind]", gallery);
+    const src = (chip) => `assets/shots/${chip.dataset.kind}-${chip.dataset.id}.webp`;
+    chips.forEach((chip) => {
+      const pre = new Image();
+      chip.addEventListener("pointerenter", () => (pre.src = src(chip)), { once: true });
+      chip.addEventListener("click", () => {
+        if (chip.classList.contains("is-current")) return;
+        const layout = chip.dataset.kind === "layout";
+        chips.forEach((c) => {
+          const on = c === chip || (c.dataset.kind !== chip.dataset.kind && c.dataset.id === (layout ? "mix" : "blend"));
+          c.classList.toggle("is-current", on);
+          c.setAttribute("aria-pressed", String(on));
+        });
+        const other = layout ? "the Mix theme" : "the Blend layout";
+        show(src(chip), `MixMusic's home page in the ${chip.dataset.name} ${layout ? "layout" : "theme"} and ${other}.`);
+        name.textContent = `${chip.dataset.name}, in ${other}`;
+        desc.textContent = chip.dataset.desc;
+        const accent = $(".dots i:nth-child(2)", chip)?.style.background;
+        gallery.style.setProperty("--glow", accent || "#cf6e74");
+      });
+    });
   }
 
   // The player in the hero: a working copy of MixMusic's window in its

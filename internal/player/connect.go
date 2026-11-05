@@ -359,7 +359,11 @@ func (c *connectEngine) ask() {
 // command or not.
 func (c *connectEngine) follow(state *DeviceState, settling bool) {
 	dur := c.duration()
-	if state != nil && sameTrack(state.Track, c.track) {
+	// The track given after this one may share its title, artist and
+	// length, as a re-release does: by its ID, it's that one.
+	next := state != nil && state.Track != nil && len(c.ahead) > 0 &&
+		state.Track.ID != c.track.ID && state.Track.ID == c.ahead[0].Track.ID
+	if state != nil && !next && sameTrack(state.Track, c.track) {
 		c.strays = 0
 		c.lost = false
 		// After its end, Spotify plays the track again from its start when

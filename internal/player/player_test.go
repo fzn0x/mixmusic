@@ -1877,7 +1877,7 @@ func TestConnectFallsBack(t *testing.T) {
 	h.wait("the next one too", func(p *Player) bool { return h.stream.lastLoad() == "load url:spotify:2 0s true" })
 	// Told once.
 	n := h.notices()
-	if len(n) != 1 || n[0].Message != "no Spotify device is active — playing it from YouTube Music instead" || !n[0].Settings {
+	if len(n) != 1 || n[0].Message != "no Spotify device is active - playing it from YouTube Music instead" || !n[0].Settings {
 		t.Errorf("notices %+v", n)
 	}
 }

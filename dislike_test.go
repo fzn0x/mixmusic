@@ -80,7 +80,7 @@ func TestDislike(t *testing.T) {
 	s.settle(t, func(st player.State) bool { return st.Index == 2 })
 	s.panel = "" // which shows what plays next itself
 	tt.Frame()
-	if !tt.HasText("next · " + testTracks[4].Title + " — Burial") {
+	if !tt.HasText("next · " + testTracks[4].Title + " - Burial") {
 		t.Errorf("the next line doesn't pass over %s: %q", aphex.Title, tt.Texts())
 	}
 	click(t, s, tt, "Next")

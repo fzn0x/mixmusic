@@ -112,7 +112,7 @@ func TestCommandVolumeAndMute(t *testing.T) {
 // TestLikedNote tells what a like from outside the window did.
 func TestLikedNote(t *testing.T) {
 	track := media.Track{Title: "One More Time", Artists: []media.Ref{{Name: "Daft Punk"}}}
-	if title, body := likedNote(track, true); title != "Added to liked songs" || body != "One More Time — Daft Punk" {
+	if title, body := likedNote(track, true); title != "Added to liked songs" || body != "One More Time - Daft Punk" {
 		t.Errorf("liked: %q, %q", title, body)
 	}
 	if title, body := likedNote(media.Track{Title: "Intro"}, false); title != "Removed from liked songs" || body != "Intro" {

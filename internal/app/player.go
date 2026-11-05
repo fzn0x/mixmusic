@@ -321,7 +321,7 @@ func windowTitle(np NowPlaying, show bool) string {
 }
 
 // playingLine names what plays, as the tray's tooltip and the main
-// window's title show it: "One More Time — Daft Punk", after "Paused: "
+// window's title show it: "One More Time - Daft Punk", after "Paused: "
 // while it's paused, or "MixMusic" with nothing to play.
 func playingLine(np NowPlaying) string {
 	if np.Track == nil {
@@ -332,7 +332,7 @@ func playingLine(np NowPlaying) string {
 		return "MixMusic"
 	}
 	if artists := oneLine(np.Track.ArtistNames()); artists != "" {
-		line += " — " + artists
+		line += " - " + artists
 	}
 	if !np.plays() {
 		line = "Paused: " + line
@@ -434,7 +434,7 @@ func dislikedNote(t media.Track, disliked bool) (title, body string) {
 func noteBody(t media.Track) string {
 	body := t.Title
 	if artists := t.ArtistNames(); artists != "" {
-		body += " — " + artists
+		body += " - " + artists
 	}
 	return body
 }

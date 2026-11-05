@@ -114,7 +114,7 @@ func (s *shell) changeSpeed(v float64) {
 		msg = kind + " play at " + speedLabel(*speed)
 	}
 	if why := s.speedLocked(); why != "" {
-		msg += " — " + why
+		msg += " - " + why
 	}
 	s.notes = append(s.notes, notice(msg))
 }

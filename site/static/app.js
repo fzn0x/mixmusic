@@ -1,6 +1,7 @@
-// The MixMusic site: feature tabs, the walkthrough's chapters, the theme
-// gallery, and download buttons named for the visitor's system. Every
-// download goes to the latest release on GitHub.
+// The MixMusic site: the working player in the hero, feature tabs, the
+// walkthrough's chapters, the sketch of the layouts and themes, and
+// download buttons named for the visitor's system. Every download goes to
+// the latest release on GitHub.
 (() => {
   "use strict";
 
@@ -8,6 +9,9 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  const ua = navigator.userAgent;
+  const platform = navigator.userAgentData?.platform || navigator.platform || ua;
+  const mac = /Mac/.test(platform) && !/iPhone|iPad/.test(ua);
 
   // The app bar rises once the page scrolls under it.
   const appbar = $("[data-appbar]");
@@ -132,7 +136,7 @@
     video.addEventListener("loadedmetadata", draw);
 
     // The round button and a click on the video play and pause it.
-    const play = $("[data-play]");
+    const play = $("[data-play]", video.closest("section"));
     const toggle = () => (video.paused ? video.play().catch(() => {}) : video.pause());
     const state = () => {
       play.classList.toggle("is-playing", !video.paused);
@@ -159,34 +163,34 @@
     });
   }
 
-  // The theme gallery: each chip shows the home page in its theme, on a
-  // glow of the theme's accent.
-  const gallery = $("[data-gallery]");
-  if (gallery) {
-    const show = crossfader($(".gallery-img", gallery));
-    const name = $("[data-gallery-name]", gallery);
-    const desc = $("[data-gallery-desc]", gallery);
-    const chips = $$(".chip-theme", gallery);
-    chips.forEach((chip) => {
-      const pre = new Image();
-      chip.addEventListener("pointerenter", () => (pre.src = `assets/shots/theme-${chip.dataset.theme}.webp`), { once: true });
-      chip.addEventListener("click", () => {
-        if (chip.classList.contains("is-current")) return;
-        chips.forEach((c) => {
-          c.classList.toggle("is-current", c === chip);
-          c.setAttribute("aria-pressed", String(c === chip));
-        });
-        const accent = $(".dots i", chip)?.style.background;
-        if (accent) gallery.style.setProperty("--glow", accent);
-        show(`assets/shots/theme-${chip.dataset.theme}.webp`, `The home page in the ${chip.dataset.name} theme.`);
-        name.textContent = chip.dataset.meta === "community" ? `${chip.dataset.name}, from the community` : chip.dataset.name;
-        desc.textContent = chip.dataset.desc;
-      });
-    });
+  // Layouts and themes: the chips re-draw the sketch of the home page in
+  // each layout and each theme, whose tokens styles.css holds.
+  const looks = $("[data-looks]");
+  if (looks) {
+    const look = $("[data-look]", looks);
+    const frame = $("[data-look-frame]", looks);
+    const choose = (group, key, desc) => {
+      const chips = $$(`[data-${key}]`, group);
+      chips.forEach((chip) =>
+        chip.addEventListener("click", () => {
+          chips.forEach((c) => {
+            c.classList.toggle("is-current", c === chip);
+            c.setAttribute("aria-pressed", String(c === chip));
+          });
+          look.dataset[key] = chip.dataset[key];
+          desc.textContent = chip.dataset.desc;
+        }),
+      );
+    };
+    choose($("[data-layouts]", looks), "layout", $("[data-layout-desc]", looks));
+    choose($("[data-themes]", looks), "theme", $("[data-theme-desc]", looks));
+    const fitLook = () => frame.style.setProperty("--lfit", (frame.clientWidth / 1000).toFixed(4));
+    addEventListener("resize", fitLook);
+    fitLook();
   }
 
   // The player in the hero: a working copy of MixMusic's window in its
-  // default theme, playing Creative Commons songs from this site, with its
+  // default look, playing Creative Commons songs from this site, with its
   // mini player for narrow screens and for the mini player button.
   const wrap = $("[data-demo-wrap]");
   if (wrap) {
@@ -198,13 +202,16 @@
       { title: "Fluffing a Duck", file: "fluffing-a-duck", dur: 67, cover: 9, art: "#8cc0bd" },
       { title: "Monkeys Spinning Monkeys", file: "monkeys-spinning-monkeys", dur: 125, cover: 15, art: "#db9361" },
     ];
+    // The speed button's steps, as the app's menu has them.
+    const SPEEDS = [1, 1.25, 1.5, 2, 0.75];
     const ARTIST = "Kevin MacLeod";
     const audio = $("[data-audio]", wrap);
     const all = (sel) => $$(sel, wrap);
     const clock = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
-    const st = { order: SONGS.map((_, i) => i), ordered: null, pos: 0, repeat: "off", liked: new Set(), panel: "queue", query: "" };
+    const st = { order: SONGS.map((_, i) => i), ordered: null, pos: 0, repeat: "off", liked: new Set(), disliked: new Set(), panel: "queue", query: "", speed: 0 };
     const song = () => SONGS[st.order[st.pos]];
     const duration = () => (Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : song().dur);
+    const speedLabel = (x) => `${x}×`;
     let loaded = -1;
 
     function drawTime() {
@@ -226,14 +233,10 @@
       all("[data-cover]").forEach((img) => (img.src = cover));
       all("[data-cover-alt]").forEach((img) => (img.alt = `A cover made for ${t.title} on this page`));
       all("[data-title]").forEach((e) => (e.textContent = t.title));
-      all("[data-title-lower]").forEach((e) => (e.textContent = t.title.toLowerCase()));
       all("[data-artist]").forEach((e) => (e.textContent = ARTIST));
-      const next = st.pos < st.order.length - 1 ? SONGS[st.order[st.pos + 1]] : st.repeat === "all" ? SONGS[st.order[0]] : null;
-      all("[data-next-up]").forEach((e) => (e.textContent = next ? `next · ${next.title} — ${ARTIST}` : ""));
-      all("[data-like]").forEach((b) => {
-        const on = st.liked.has(t.file);
-        b.setAttribute("aria-pressed", String(on));
-      });
+      all("[data-like]").forEach((b) => b.setAttribute("aria-pressed", String(st.liked.has(t.file))));
+      all("[data-dislike]").forEach((b) => b.setAttribute("aria-pressed", String(st.disliked.has(t.file))));
+      all("[data-liked-count]").forEach((e) => (e.textContent = String(st.liked.size)));
       wrap.style.setProperty("--art", t.art);
       drawTime();
     }
@@ -246,10 +249,20 @@
       });
     }
 
+    function drawSpeed() {
+      const x = SPEEDS[st.speed];
+      audio.playbackRate = x;
+      all("[data-speed-label]").forEach((e) => (e.textContent = x === 1 ? "" : speedLabel(x)));
+      all("[data-speed-note]").forEach((e) => (e.textContent = x === 1 ? "" : ` · ${speedLabel(x)}`));
+      all("[data-speed]").forEach((b) => b.setAttribute("aria-label", `Speed: ${speedLabel(x)}. Each click goes to the next step.`));
+    }
+
     function row(i, current, onPick) {
       const t = SONGS[i];
       const li = document.createElement("li");
+      const skipped = st.disliked.has(t.file);
       if (current) li.classList.add("is-current");
+      if (skipped && !current) li.classList.add("is-skipped");
       const b = document.createElement("button");
       b.type = "button";
       b.innerHTML = `<img alt="" width="40" height="40" /><span class="r-text"><b></b><small></small></span><span class="r-time"></span>`;
@@ -257,7 +270,7 @@
       $("b", b).textContent = t.title;
       $("small", b).textContent = ARTIST;
       $(".r-time", b).textContent = clock(t.dur);
-      b.setAttribute("aria-label", `${current ? "Playing: " : "Play "}${t.title} by ${ARTIST}`);
+      b.setAttribute("aria-label", `${current ? "Playing: " : "Play "}${t.title} by ${ARTIST}${skipped && !current ? ", disliked: the queue passes over it" : ""}`);
       if (current) b.setAttribute("aria-current", "true");
       b.addEventListener("click", () => {
         const list = li.parentElement;
@@ -281,7 +294,7 @@
       $("[data-page='search']", wrap).hidden = !q;
       $("[data-rail-search]", wrap).classList.toggle("is-on", !!q);
       if (!q) return;
-      $("[data-query]", wrap).textContent = q;
+      $("[data-query]", wrap).textContent = st.query.trim();
       const results = $("[data-results]", wrap);
       results.replaceChildren();
       const found = SONGS.map((t, i) => [t, i]).filter(([t]) => `${t.title} ${ARTIST}`.toLowerCase().includes(q));
@@ -293,10 +306,7 @@
         return;
       }
       for (const [, i] of found) {
-        results.append(row(i, i === st.order[st.pos], () => {
-          const at = st.order.indexOf(i);
-          play(at);
-        }));
+        results.append(row(i, i === st.order[st.pos], () => play(st.order.indexOf(i))));
       }
     }
 
@@ -304,7 +314,9 @@
       if (loaded === st.order[st.pos]) return;
       loaded = st.order[st.pos];
       audio.src = `assets/music/${song().file}.m4a`;
+      audio.playbackRate = SPEEDS[st.speed];
     }
+    // A song picked by hand plays, disliked or not.
     function play(at) {
       if (at !== undefined) {
         st.pos = at;
@@ -321,28 +333,56 @@
       if (audio.paused) play();
       else audio.pause();
     }
+    // The queue passes over the songs you dislike, forward and back.
+    const liked = (at) => !st.disliked.has(SONGS[st.order[at]].file);
+    function step(from, dir) {
+      for (let at = from + dir; at >= 0 && at < st.order.length; at += dir) if (liked(at)) return at;
+      return -1;
+    }
     function next(auto) {
       if (auto && st.repeat === "one") return play(st.pos);
-      if (st.pos < st.order.length - 1) return play(st.pos + 1);
-      if (st.repeat === "all" || !auto) return play(0);
+      let at = step(st.pos, 1);
+      if (at < 0 && (st.repeat === "all" || !auto)) at = step(-1, 1);
+      if (at >= 0) return play(at);
       audio.pause();
     }
     function prev() {
-      if (audio.currentTime > 3 || st.pos === 0) {
+      const at = step(st.pos, -1);
+      if (audio.currentTime > 3 || at < 0) {
         audio.currentTime = 0;
         return drawTime();
       }
-      play(st.pos - 1);
+      play(at);
     }
 
     all("[data-play]").forEach((b) => b.addEventListener("click", toggle));
     all("[data-next]").forEach((b) => b.addEventListener("click", () => next(false)));
     all("[data-prev]").forEach((b) => b.addEventListener("click", prev));
+    // A song is liked or disliked, not both; disliking the song that plays
+    // moves on from it at once.
     all("[data-like]").forEach((b) =>
       b.addEventListener("click", () => {
         const f = song().file;
-        st.liked.has(f) ? st.liked.delete(f) : st.liked.add(f);
+        if (st.liked.has(f)) st.liked.delete(f);
+        else {
+          st.liked.add(f);
+          st.disliked.delete(f);
+        }
         drawSong();
+        drawLists();
+      }),
+    );
+    all("[data-dislike]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const f = song().file;
+        const on = !st.disliked.has(f);
+        if (on) {
+          st.disliked.add(f);
+          st.liked.delete(f);
+        } else st.disliked.delete(f);
+        drawSong();
+        drawLists();
+        if (on && !audio.paused) next(false);
       }),
     );
     const repeat = $("[data-repeat]", wrap);
@@ -373,9 +413,16 @@
       drawSong();
       drawLists();
     });
+    // The speed: each click the next step, at the song's own pitch.
+    all("[data-speed]").forEach((b) =>
+      b.addEventListener("click", () => {
+        st.speed = (st.speed + 1) % SPEEDS.length;
+        drawSpeed();
+      }),
+    );
 
     // Seeking and the volume: a click or a drag on the slider, or the arrows.
-    function slider(el, set, step) {
+    function slider(el, set, nudge) {
       const at = (x) => {
         const r = el.getBoundingClientRect();
         return Math.min(Math.max((x - r.left) / r.width, 0), 1);
@@ -391,7 +438,7 @@
         const d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
         if (!d) return;
         e.preventDefault();
-        step(d);
+        nudge(d);
       });
     }
     all("[data-seek]").forEach((el) =>
@@ -419,6 +466,7 @@
       mute.setAttribute("aria-label", audio.muted ? "Unmute" : "Mute");
     };
     audio.volume = 0.8;
+    audio.preservesPitch = true;
     slider(vol, setVolume, (d) => setVolume(Math.min(Math.max(audio.volume + d * 0.05, 0), 1)));
     mute.addEventListener("click", () => {
       audio.muted = !audio.muted;
@@ -428,7 +476,7 @@
     // The side panel shows up next or the lyrics; these songs have none.
     const showPanel = (p) => {
       st.panel = p;
-      $("[data-panel-title]", wrap).textContent = p === "lyrics" ? "lyrics" : "up next";
+      $("[data-panel-title]", wrap).textContent = p === "lyrics" ? "Lyrics" : "Up next";
       $("[data-panel-queue]", wrap).hidden = p !== "queue";
       $("[data-panel-lyrics]", wrap).hidden = p !== "lyrics";
       $("[data-panel-clear]", wrap).hidden = p !== "queue";
@@ -510,7 +558,7 @@
       }
     }
 
-    // The window is drawn at the app's 1280x760 and scaled to the column;
+    // The window is drawn at the app's 1280x820 and scaled to the column;
     // it lies down flat as it scrolls up to the middle.
     const frameEl = $("[data-app-frame]", wrap);
     const mini = $("[data-mini]", wrap);
@@ -518,7 +566,7 @@
       const w = wrap.clientWidth;
       frameEl.style.setProperty("--fit", (w / 1280).toFixed(4));
       const narrow = w <= 700;
-      mini.style.setProperty("--mfit", (narrow ? w / 420 : Math.min(1.5, w / 420)).toFixed(4));
+      mini.style.setProperty("--mfit", (narrow ? w / 440 : Math.min(1.5, w / 440)).toFixed(4));
     }
     addEventListener("resize", fit);
     fit();
@@ -543,6 +591,7 @@
 
     drawSong();
     drawPlay();
+    drawSpeed();
     drawLists();
     drawVolume();
   }
@@ -620,15 +669,11 @@
   }
 
   // Sections ease in as they scroll into the window (styles.css).
-  $$(".section .section-head").forEach((el) =>
-    el.classList.add("reveal"),
-  );
+  $$(".section .section-head").forEach((el) => el.classList.add("reveal"));
 
   // The visitor's system names the download buttons and marks its card.
   // The buttons all open the latest release, where every file is.
-  const ua = navigator.userAgent;
-  const platform = navigator.userAgentData?.platform || navigator.platform || ua;
-  const os = /Mac/.test(platform) && !/iPhone|iPad/.test(ua)
+  const os = mac
     ? "mac"
     : /Win/.test(platform)
       ? "windows"
@@ -640,7 +685,10 @@
     $$("[data-download-label]").forEach((label) => (label.textContent = `Download for ${names[os]}`));
     $(`.system[data-os="${os}"]`)?.classList.add("is-yours");
   }
-  if (os === "mac") $$("kbd[data-mod]").forEach((k) => (k.textContent = "⌘"));
+  if (mac) {
+    $$("kbd[data-mod]").forEach((k) => (k.textContent = "⌘"));
+    $$("[data-mod-hint]").forEach((k) => (k.textContent = "⌘K"));
+  }
 
   // The latest release's version, when it is newer than the page's.
   fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: "application/vnd.github+json" } })

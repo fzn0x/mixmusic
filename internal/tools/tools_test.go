@@ -18,6 +18,7 @@ func TestAsset(t *testing.T) {
 		{"windows", "amd64"}: "yt-dlp.exe",
 		{"linux", "amd64"}:   "yt-dlp_linux",
 		{"linux", "arm64"}:   "yt-dlp_linux_aarch64",
+		{"darwin", "arm64"}:  "yt-dlp_macos.zip",
 	} {
 		got, err := asset(platform[0], platform[1])
 		if err != nil || got != want {

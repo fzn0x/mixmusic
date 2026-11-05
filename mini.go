@@ -198,7 +198,8 @@ func (s *shell) miniProgress(c *ui.Context) {
 // applyMiniZoom zooms the mini player by the zoom chosen, and its window
 // with it, so that it looks as at 100%, only larger or smaller. A change
 // made in the mini player is read out rather than told in a toast, which
-// would cover its controls: the window growing or shrinking shows it.
+// would cover its controls: the window growing or shrinking shows it. The
+// main window, which hears of it, doesn't toast it either (miniChose).
 func (s *shell) applyMiniZoom(c *ui.Context) {
 	z, was := s.set.Zoom, s.zoom
 	s.zoom = z

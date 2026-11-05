@@ -650,10 +650,13 @@ func (p *Player) onProgress() {
 		p.retry.n = 0
 		p.prefetched = ""
 	}
-	// A live stream counts once it played countAfter: it has no half.
-	count := min(countAfter, dur/2)
-	if p.s.Live {
-		count = countAfter
+	// A track of no length counts once it played countAfter, as it has no
+	// half: a live stream, or one its list didn't tell the length of, as
+	// the home page's shelves, until its stream tells it. The engine tells
+	// the time as a stream opens, before its length.
+	count := countAfter
+	if dur > 0 {
+		count = min(countAfter, dur/2)
 	}
 	if p.counted != entry.UID && pos >= count {
 		p.counted = entry.UID

@@ -1,7 +1,8 @@
 # The MixMusic website, built with Zola: `zola --root site serve` to
 # preview it, `zola --root site build` to build it into site/public, after
-# `go run ./tools/sitedocs`, which makes the docs' pages from docs/*.md and
-# the folders of docs/ with a README.md.
+# `go run ./tools/sitedocs`, which makes the docs' pages from docs/*.md, the
+# folders of docs/ with a README.md, and CONTRIBUTING.md, CODE_OF_CONDUCT.md
+# and SECURITY.md.
 #
 # templates/index.html is the landing page; static/ holds its stylesheet,
 # script and assets, copied as they are. The docs are content/docs, shown
@@ -14,7 +15,9 @@ title = "MixMusic"
 description = "Spotify and YouTube Music in one free, open-source desktop player for macOS, Windows and Linux."
 default_language = "en"
 
-# robots.txt is only read at a domain's root, which the site is not.
+# robots.txt is only read at a domain's root: cloudflare.yml writes one for
+# the copy at https://mixmusic.functionx.dev, and GitHub Pages' copy, under
+# /mixmusic/, has none.
 generate_robots_txt = false
 
 # The docs are Markdown for GitHub as much as for the site: what looks like
@@ -26,8 +29,18 @@ skip_content_templating = ["docs/**"]
 insert_anchor_links = "heading"
 # > [!NOTE] blocks, as GitHub shows them.
 github_alerts = true
+# The docs' images load as they near the window, beside the page; their
+# sizes, which tools/sitedocs reads, keep their room meanwhile.
+lazy_async_image = true
 
 [link_checker]
 # GitHub's pages make their anchors with a script, which `zola check` does
 # not run.
 skip_anchor_prefixes = ["https://github.com/"]
+
+[extra]
+# The site's one address for search engines. Both copies of the site, on
+# GitHub Pages and on Cloudflare, name this one in each page's canonical
+# link, og:url and sitemap.xml, so that the same page at two addresses
+# counts as one.
+canonical_url = "https://mixmusic.functionx.dev"

@@ -558,7 +558,7 @@ kbd {
   gap: clamp(28px, 4vw, 56px);
   align-items: start;
 }
-.look-frame { position: relative; isolation: isolate; height: calc(620px * var(--lfit, 0.62)); container-type: inline-size; }
+.look-frame { position: relative; isolation: isolate; aspect-ratio: 1000 / 620; min-height: 0; }
 .look-frame::before {
   content: "";
   position: absolute;
@@ -908,7 +908,8 @@ html.js .demo-fallback { display: none; }
 }
 
 .app-frame {
-  height: calc(820px * var(--fit, 0.9375));
+  aspect-ratio: 1280 / 820;
+  min-height: 0;
   perspective: 1800px;
   overflow-x: clip;
 }

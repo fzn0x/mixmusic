@@ -1,46 +1,125 @@
 {% extends "base.html" %}
+{% import "macros.html" as macros %}
 
 {%- block title %}{{ page.title }} · MixMusic docs{% endblock title %}
-{%- block description %}{{ page.description }}{% endblock description %}
+{%- block description %}{% if page.description %}{{ page.description }}{% else %}{{ config.description }}{% endif %}{% endblock description %}
 {%- block meta %}
-  <link rel="canonical" href="{{ page.permalink }}" />
-  <meta property="og:type" content="article" />
-  <meta property="og:title" content="{{ page.title }} · MixMusic docs" />
-  <meta property="og:description" content="{{ page.description }}" />
-  <meta property="og:url" content="{{ page.permalink }}" />
-  <meta property="og:image" content="{{ get_url(path='assets/og.jpg') }}" />
-  <meta name="twitter:card" content="summary_large_image" />
+  {%- set base = config.extra.canonical_url | trim_end_matches(pat='/') %}
+  {%- set url = base ~ current_path %}
+  {%- set root = base ~ "/" %}
+  {%- set docs_url = base ~ "/docs/" %}
+  {%- set image = base ~ "/assets/og.jpg" %}
+  {%- if page.description %}{% set description = page.description %}{% else %}{% set description = config.description %}{% endif %}
+  {{- macros::social(title=page.title ~ " · MixMusic docs", description=description, url=url, type="article", base=base) }}
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@graph": [
+    {"@type": "TechArticle",
+     "headline": {{ page.title | json_encode() | safe }},
+     "description": {{ description | json_encode() | safe }},
+     "url": {{ url | json_encode() | safe }},
+     "mainEntityOfPage": {{ url | json_encode() | safe }},
+     "inLanguage": "en",
+     "image": {{ image | json_encode() | safe }},
+     "articleSection": {{ page.extra.group_title | default(value="Docs") | json_encode() | safe }},
+     "author": {"@type": "Organization", "name": "MixMusic contributors", "url": "https://github.com/fzn0x/mixmusic/graphs/contributors"},
+     "publisher": {"@type": "Organization", "name": "MixMusic contributors", "url": "https://github.com/fzn0x/mixmusic"},
+     "about": {"@type": "SoftwareApplication", "name": "MixMusic", "url": {{ root | json_encode() | safe }}},
+     "isPartOf": {"@type": "WebSite", "name": "MixMusic", "url": {{ root | json_encode() | safe }}}},
+    {"@type": "BreadcrumbList", "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "MixMusic", "item": {{ root | json_encode() | safe }}},
+      {"@type": "ListItem", "position": 2, "name": "Docs", "item": {{ docs_url | json_encode() | safe }}},
+      {"@type": "ListItem", "position": 3, "name": {{ page.title | json_encode() | safe }}, "item": {{ url | json_encode() | safe }}}
+    ]}
+  ]}
+  </script>
 {%- endblock meta %}
+{%- block head %}
+  {%- if page.extra.images is defined %}
+  <style>
+    {%- for src, size in page.extra.images %}
+    .prose img[src$="{{ src }}"] { width: min(100%, {{ size[0] }}px); aspect-ratio: {{ size[0] }} / {{ size[1] }}; }
+    {%- endfor %}
+  </style>
+  {%- endif %}
+{%- endblock head %}
 {%- block docs_current %} aria-current="true"{% endblock docs_current %}
+{%- block menu %}
+    <button class="icon-btn topbar-menu" type="button" aria-label="Open the docs menu" aria-controls="docs-drawer" aria-expanded="false" data-drawer-open><svg class="icon" width="24" height="24" aria-hidden="true"><use href="#i-menu" /></svg></button>
+{%- endblock menu %}
 
-{%- block content %}
+{%- block body %}
   {%- set docs = get_section(path="docs/_index.md") %}
   {%- set current = page.permalink %}
   {%- set toc = page.toc %}
-  <div class="docs">
+  <div class="docs{% if toc %} has-toc{% endif %}">
     {% include "partials/docs-nav.html" %}
+    <div class="scrim" data-drawer-close aria-hidden="true"></div>
 
-    <article class="prose">
-      <h1>{{ page.title }}</h1>
-      {{ page.content | safe }}
+    <main id="content" class="docs-main">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="{{ docs.permalink }}">Docs</a></li>
+          {%- if page.extra.group is defined %}
+          <li><a href="{{ docs.permalink }}#{{ page.extra.group }}">{{ page.extra.group_title }}</a></li>
+          {%- endif %}
+          <li><span aria-current="page">{{ page.title }}</span></li>
+        </ol>
+      </nav>
+
+      <article class="prose">
+        <h1>{{ page.title }}</h1>
+        {{ page.content | safe }}
+      </article>
 
       <footer class="docs-foot">
         {%- if page.lower or page.higher %}
-        <nav class="docs-pager" aria-label="Previous and next doc">
+        <nav class="pager" aria-label="Previous and next doc">
           {%- if page.lower %}
-          <a class="docs-prev" href="{{ page.lower.permalink }}"><span>Previous</span><strong>{{ page.lower.title }}</strong></a>
+          <a class="pager-link pager-prev" href="{{ page.lower.permalink }}" rel="prev">
+            <svg class="icon" width="24" height="24" aria-hidden="true"><use href="#i-prev" /></svg>
+            <span><small>Previous</small><strong>{{ page.lower.title }}</strong></span>
+          </a>
           {%- endif %}
           {%- if page.higher %}
-          <a class="docs-next" href="{{ page.higher.permalink }}"><span>Next</span><strong>{{ page.higher.title }}</strong></a>
+          <a class="pager-link pager-next" href="{{ page.higher.permalink }}" rel="next">
+            <span><small>Next</small><strong>{{ page.higher.title }}</strong></span>
+            <svg class="icon" width="24" height="24" aria-hidden="true"><use href="#i-next" /></svg>
+          </a>
           {%- endif %}
         </nav>
         {%- endif %}
         {%- if page.extra.source is ending_with(pat="/") %}
         <p class="docs-source">Made from the files of <a href="https://github.com/fzn0x/mixmusic/tree/main/{{ page.extra.source }}">{{ page.extra.source }}</a> in the repository, a file for each part.</p>
         {%- else %}
-        <p class="docs-source">Made from <a href="https://github.com/fzn0x/mixmusic/blob/main/{{ page.extra.source }}">{{ page.extra.source }}</a> in the repository. <a href="https://github.com/fzn0x/mixmusic/edit/main/{{ page.extra.source }}">Edit it on GitHub</a>.</p>
+        <p class="docs-source">
+          <span>Made from <a href="https://github.com/fzn0x/mixmusic/blob/main/{{ page.extra.source }}">{{ page.extra.source }}</a> in the repository.</span>
+          <a class="btn btn-text btn-small" href="https://github.com/fzn0x/mixmusic/edit/main/{{ page.extra.source }}"><svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-edit" /></svg><span>Edit this page on GitHub</span></a>
+        </p>
         {%- endif %}
       </footer>
-    </article>
+    </main>
+
+    {%- if toc %}
+    <aside class="toc" aria-labelledby="toc-title">
+      <p class="toc-title" id="toc-title">On this page</p>
+      <ol data-toc>
+        {%- for h in toc %}
+        <li><a href="#{{ h.id }}">{{ h.title }}</a>
+          {%- if h.children %}
+          <ol>
+            {%- for c in h.children %}
+            <li><a href="#{{ c.id }}">{{ c.title }}</a></li>
+            {%- endfor %}
+          </ol>
+          {%- endif %}
+        </li>
+        {%- endfor %}
+      </ol>
+    </aside>
+    {%- endif %}
   </div>
-{%- endblock content %}
+{%- endblock body %}
+
+{%- block scripts %}
+  {% include "partials/docs-script.html" %}
+{%- endblock scripts %}

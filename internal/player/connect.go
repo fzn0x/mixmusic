@@ -370,7 +370,12 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 		// it repeats, or stops on it, at its start or at its end.
 		back := state.Progress < connectStart || (!state.Playing && dur-state.Progress < connectStill)
 		if c.ending && !settling && back {
-			c.ended()
+			// Stopped on it, it may still go on by itself.
+			if state.Playing {
+				c.finish()
+			} else {
+				c.ended()
+			}
 			return
 		}
 		// The device may still report the track loading, paused.
@@ -406,9 +411,14 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 		return
 	}
 	// Around the end, the device moving on or stopping means the track
-	// ended.
+	// ended. Telling nothing, it may still go on by itself; playing
+	// another track, it went elsewhere.
 	if c.ending || (c.playing && dur-c.progress < connectEnd) {
-		c.ended()
+		if state == nil || state.Track == nil {
+			c.ended()
+		} else {
+			c.finish()
+		}
 		return
 	}
 	// Otherwise someone plays something else on it: twice in a row, it is
@@ -424,13 +434,13 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 	}
 }
 
-// ended takes in the device having ended the track. A device given tracks
-// to play after it goes on to the first by itself, but may first stop on
-// the track a moment, or tell nothing, while it loads that one: Spotify
-// does when a seek into the track's last seconds kept it from loading it
-// ahead. It has goOn to, before the player moves on itself: told to play
-// that track as it went on to it by itself, Spotify started it again,
-// late, or went on past it.
+// ended takes in the device having ended the track, and stopped on it or
+// telling nothing. A device given tracks to play after it goes on to the
+// first by itself, but may first stop a moment while it loads that one:
+// Spotify does when a seek into the track's last seconds kept it from
+// loading it ahead. It has goOn to, before the player moves on itself:
+// told to play that track as it went on to it by itself, Spotify started
+// it again, late, or went on past it.
 func (c *connectEngine) ended() {
 	if len(c.ahead) == 0 {
 		c.finish()

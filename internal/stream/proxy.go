@@ -59,6 +59,8 @@ type Proxy struct {
 
 	mu       sync.Mutex
 	failures map[string]string // why the last request of a video failed
+	// media sends the requests of streams, to their other servers too.
+	media mediaServers
 	// stall, reconnect and backoff are stallTimeout, reconnectTimeout and
 	// reconnectWait, unless a test shortens them.
 	stall, reconnect, backoff time.Duration
@@ -426,7 +428,9 @@ func stalled(ctx context.Context, err error) error {
 // fetch requests bytes start to end of a stream. The request is given up
 // for a stall when an answer, a redirect's too, doesn't come within
 // stallTimeout of its request going out, and its body gives it up when a
-// read waits as long for bytes; connecting has the transport's own limits.
+// read waits as long for bytes. A server that doesn't connect within
+// connectTimeout has the stream's next server asked; the last has the
+// transport's own limits.
 func (p *Proxy) fetch(ctx context.Context, s Stream, start, end int64) (*stallingBody, error) {
 	return p.request(ctx, s.URL, s.Header, start, end)
 }
@@ -472,7 +476,7 @@ func (p *Proxy) request(ctx context.Context, rawURL string, header http.Header, 
 	if end >= 0 {
 		req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", start, end))
 	}
-	res, err := p.HTTP.Do(req)
+	res, _, err := p.media.do(p.HTTP, req)
 	mu.Lock()
 	answered = true
 	timer.Stop()
@@ -550,7 +554,7 @@ func (p *Proxy) probeSize(ctx context.Context, s Stream) (int64, error) {
 		req.Header[k] = v
 	}
 	req.Header.Set("Range", "bytes=0-0")
-	res, err := p.HTTP.Do(req)
+	res, _, err := p.media.do(p.HTTP, req)
 	if err != nil {
 		return 0, stalled(ctx, err)
 	}

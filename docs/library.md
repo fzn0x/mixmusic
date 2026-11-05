@@ -60,7 +60,7 @@ Signed in to Spotify, Library › Spotify has your Playlists, your Albums, the A
 
 - **Save** an album or a playlist, and **follow** an artist, from their pages, as for YouTube Music: it happens on Spotify.
 - **Spotify playlists** don't change from MixMusic. To add to one, copy it into a mix.
-- Spotify shows apps such as yours the tracks of the playlists you own or collaborate on, not of playlists others made: MixMusic tells you when a playlist is one of those. [Spotify](spotify.md#what-spotify-allows-apps) lists the other limits.
+- Spotify shows an app in development mode, as your Spotify app is, the tracks of the playlists you own or collaborate on, not of playlists others made: MixMusic tells you when a playlist is one of those. [Spotify](spotify.md#what-spotify-allows-apps) lists the other limits.
 
 ## Long playlists
 

@@ -9,7 +9,7 @@
   {%- set root = base ~ "/" %}
   {%- set docs_url = base ~ "/docs/" %}
   {%- set image = base ~ "/assets/og.jpg" %}
-  {{- macros::social(title="MixMusic docs", description=section.description, url=url, type="website", base=base) }}
+  {{- macros::social(title="MixMusic docs", description=section.description, url=url, kind="website", base=base) }}
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@graph": [
     {"@type": "CollectionPage",

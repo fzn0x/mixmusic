@@ -13,7 +13,7 @@
   {%- set base = config.extra.canonical_url | trim_end_matches(pat='/') %}
   {%- set root = base ~ "/" %}
   {%- set image = base ~ "/assets/og.jpg" %}
-  {{- macros::social(title="MixMusic: Spotify and YouTube Music in one desktop player", description="One search, one queue and one library across Spotify and YouTube Music, with lyrics, podcasts and downloads, in a free, open-source desktop player you can theme and extend.", url=root, type="website", base=base) }}
+  {{- macros::social(title="MixMusic: Spotify and YouTube Music in one desktop player", description="One search, one queue and one library across Spotify and YouTube Music, with lyrics, podcasts and downloads, in a free, open-source desktop player you can theme and extend.", url=root, kind="website", base=base) }}
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@graph": [
     {"@type": "SoftwareApplication",

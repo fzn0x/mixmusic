@@ -1,13 +1,13 @@
-{#- What search engines and link previews read of a page: its canonical
-    address, at config.extra.canonical_url whichever copy of the site this
-    is, and its Open Graph and Twitter cards. Macros don't see the context:
-    the page passes what they show, and base, the canonical address of the
-    site's root. -#}
-{% macro social(title, description, url, type, base) %}
+{% macro social(title, description, url, kind, base) %}
+  {# What search engines and link previews read of a page: its canonical
+     address, at config.extra.canonical_url whichever copy of the site
+     this is, and its Open Graph and Twitter cards. Macros don't see the
+     context: the page passes what they show, and base, the canonical
+     address of the site's root. #}
   <link rel="canonical" href="{{ url }}" />
   <meta property="og:site_name" content="MixMusic" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="{{ type }}" />
+  <meta property="og:type" content="{{ kind }}" />
   <meta property="og:title" content="{{ title }}" />
   <meta property="og:description" content="{{ description }}" />
   <meta property="og:url" content="{{ url }}" />

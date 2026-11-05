@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-{#- Zola's sitemap, at the site's one address for search engines,
-    config.extra.canonical_url, in both copies of the site. -#}
+{# Zola's sitemap, at the site's one address for search engines,
+    config.extra.canonical_url, in both copies of the site. #}
 {%- set from = config.base_url | trim_end_matches(pat='/') %}
 {%- set to = config.extra.canonical_url | trim_end_matches(pat='/') %}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

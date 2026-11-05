@@ -73,6 +73,28 @@ type Lyrics struct {
 	Language string `json:"language,omitempty"`
 }
 
+// timedLyrics are lyrics of lines with times: synced when they can be
+// followed in time, as two lines or more at different times are, and plain
+// else, without their times. One line, or lines all at one time, as
+// "[00:00.00]probe", would never move (#277).
+func timedLyrics(lines []Line, source string) Lyrics {
+	at := -1
+	for _, l := range lines {
+		switch {
+		case strings.TrimSpace(l.Text) == "":
+		case at < 0:
+			at = l.TimeMs
+		case l.TimeMs != at:
+			return Lyrics{Synced: true, Lines: lines, Source: source}
+		}
+	}
+	plain := Lyrics{Lines: make([]Line, len(lines)), Source: source}
+	for i, l := range lines {
+		plain.Lines[i] = Line{Text: l.Text}
+	}
+	return plain
+}
+
 // Plain makes lyrics of text without times.
 func Plain(text, source string) Lyrics {
 	l := Lyrics{Lines: []Line{}, Source: source}
@@ -169,7 +191,11 @@ func (r record) lyrics() (Lyrics, error) {
 	case r.Instrumental:
 		return Lyrics{Instrumental: true, Lines: []Line{}, Source: "LRCLIB"}, nil
 	case r.SyncedLyrics != "":
-		return Lyrics{Synced: true, Lines: ParseLRC(r.SyncedLyrics), Source: "LRCLIB"}, nil
+		l := timedLyrics(ParseLRC(r.SyncedLyrics), "LRCLIB")
+		if !l.Synced && r.PlainLyrics != "" {
+			return Plain(r.PlainLyrics, "LRCLIB"), nil
+		}
+		return l, nil
 	case r.PlainLyrics != "":
 		return Plain(r.PlainLyrics, "LRCLIB"), nil
 	}

@@ -126,7 +126,7 @@ func readUnison(text, format string) (Lyrics, error) {
 		return ParseTTML(text)
 	case "lrc":
 		if lines := ParseLRC(text); len(lines) > 0 {
-			return Lyrics{Synced: true, Lines: lines}, nil
+			return timedLyrics(lines, ""), nil
 		}
 	}
 	return Plain(text, ""), nil

@@ -10,7 +10,8 @@
   {%- set docs_url = base ~ "/docs/" %}
   {%- set image = base ~ "/assets/og.jpg" %}
   {%- if page.description %}{% set description = page.description %}{% else %}{% set description = config.description %}{% endif %}
-  {{- macros::social(title=page.title ~ " · MixMusic docs", description=description, url=url, type="article", base=base) }}
+  {%- set social_title = page.title ~ " · MixMusic docs" %}
+  {{- macros::social(title=social_title, description=description, url=url, kind="article", base=base) }}
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@graph": [
     {"@type": "TechArticle",

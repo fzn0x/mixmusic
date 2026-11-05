@@ -29,7 +29,7 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></symbol>
   </svg>
 
-  {%- set home = config.base_url | trim_end_matches(pat='/') ~ '/' %}
+  {%- set home = config.base_url | trim_end(pat='/') ~ '/' %}
   <header class="topbar" data-topbar>
     {%- block menu %}{% endblock menu %}
     <a class="brand" href="{{ home }}">

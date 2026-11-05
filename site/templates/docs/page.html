@@ -1,35 +1,38 @@
 {% extends "base.html" %}
-{% import "macros.html" as macros %}
 
 {%- block title %}{{ page.title }} · MixMusic docs{% endblock title %}
 {%- block description %}{% if page.description %}{{ page.description }}{% else %}{{ config.description }}{% endif %}{% endblock description %}
 {%- block meta %}
-  {%- set base = config.extra.canonical_url | trim_end_matches(pat='/') %}
+  {%- set base = config.extra.canonical_url | trim_end(pat='/') %}
   {%- set url = base ~ current_path %}
   {%- set root = base ~ "/" %}
   {%- set docs_url = base ~ "/docs/" %}
   {%- set image = base ~ "/assets/og.jpg" %}
   {%- if page.description %}{% set description = page.description %}{% else %}{% set description = config.description %}{% endif %}
   {%- set social_title = page.title ~ " · MixMusic docs" %}
-  {{- macros::social(title=social_title, description=description, url=url, kind="article", base=base) }}
+  {%- set social_description = description %}
+  {%- set social_url = url %}
+  {%- set social_kind = "article" %}
+  {%- set social_base = base %}
+  {% include "partials/social.html" %}
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@graph": [
     {"@type": "TechArticle",
-     "headline": {{ page.title | json_encode() | safe }},
-     "description": {{ description | json_encode() | safe }},
-     "url": {{ url | json_encode() | safe }},
-     "mainEntityOfPage": {{ url | json_encode() | safe }},
+     "headline": {{ page.title | json_encode | safe }},
+     "description": {{ description | json_encode | safe }},
+     "url": {{ url | json_encode | safe }},
+     "mainEntityOfPage": {{ url | json_encode | safe }},
      "inLanguage": "en",
-     "image": {{ image | json_encode() | safe }},
-     "articleSection": {{ page.extra.group_title | default(value="Docs") | json_encode() | safe }},
+     "image": {{ image | json_encode | safe }},
+     "articleSection": {{ page.extra.group_title | default(value="Docs") | json_encode | safe }},
      "author": {"@type": "Organization", "name": "MixMusic contributors", "url": "https://github.com/fzn0x/mixmusic/graphs/contributors"},
      "publisher": {"@type": "Organization", "name": "MixMusic contributors", "url": "https://github.com/fzn0x/mixmusic"},
-     "about": {"@type": "SoftwareApplication", "name": "MixMusic", "url": {{ root | json_encode() | safe }}},
-     "isPartOf": {"@type": "WebSite", "name": "MixMusic", "url": {{ root | json_encode() | safe }}}},
+     "about": {"@type": "SoftwareApplication", "name": "MixMusic", "url": {{ root | json_encode | safe }}},
+     "isPartOf": {"@type": "WebSite", "name": "MixMusic", "url": {{ root | json_encode | safe }}}},
     {"@type": "BreadcrumbList", "itemListElement": [
-      {"@type": "ListItem", "position": 1, "name": "MixMusic", "item": {{ root | json_encode() | safe }}},
-      {"@type": "ListItem", "position": 2, "name": "Docs", "item": {{ docs_url | json_encode() | safe }}},
-      {"@type": "ListItem", "position": 3, "name": {{ page.title | json_encode() | safe }}, "item": {{ url | json_encode() | safe }}}
+      {"@type": "ListItem", "position": 1, "name": "MixMusic", "item": {{ root | json_encode | safe }}},
+      {"@type": "ListItem", "position": 2, "name": "Docs", "item": {{ docs_url | json_encode | safe }}},
+      {"@type": "ListItem", "position": 3, "name": {{ page.title | json_encode | safe }}, "item": {{ url | json_encode | safe }}}
     ]}
   ]}
   </script>

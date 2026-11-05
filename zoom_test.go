@@ -3,6 +3,7 @@ package main
 import (
 	"math"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 
@@ -198,6 +199,36 @@ func TestMiniZoom(t *testing.T) {
 	s.drain()
 	if s.p.State().Shuffle {
 		t.Error("Mod+S shuffled in the mini player")
+	}
+}
+
+// TestMiniZoomToldOnce zooms the mini player with the main window open:
+// the mini player reads the zoom out, and the main window doesn't toast
+// it too, as it does a zoom chosen in settings.json (#259).
+func TestMiniZoomToldOnce(t *testing.T) {
+	s := fileShell(t)
+	mini := newShell(s.a, s.p)
+	tt := ui.NewTester(mini.miniView, miniWidth, miniHeight)
+	tt.Frame()
+	tt.Announcements()
+	tt.Key(ui.Cmd, ui.KeyEqual)
+	mini.drain()
+	tt.Frame()
+	// The main window hears of it, as the app tells the windows.
+	s.refresh()
+	if s.set.Zoom != 1.1 {
+		t.Fatalf("the main window has the zoom %v", s.set.Zoom)
+	}
+	if got := tt.Announcements(); !slices.Equal(got, []string{"Zoom 110%"}) {
+		t.Errorf("the mini player read out %q", got)
+	}
+	if s.zoomToast {
+		t.Error("the main window toasts the mini player's zoom too")
+	}
+	editSettings(t, s, `{"zoom": 1.25}`)
+	s.refresh()
+	if !s.zoomToast {
+		t.Error("the main window doesn't toast a zoom chosen in settings.json")
 	}
 }
 

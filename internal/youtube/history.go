@@ -28,10 +28,7 @@ func (c *Client) ReportPlay(ctx context.Context, videoID string) error {
 // its videostatsPlaybackUrl with the playback nonce cpn, and returns the
 // response.
 func (c *Client) reportPlay(ctx context.Context, videoID, cpn string) (node, error) {
-	n, err := c.call(ctx, "player", map[string]any{
-		"videoId":         videoID,
-		"playbackContext": map[string]any{"contentPlaybackContext": map[string]any{}},
-	}, nil)
+	n, err := c.player(ctx, videoID)
 	if err != nil {
 		return node{}, err
 	}
@@ -52,6 +49,26 @@ func (c *Client) reportPlay(ctx context.Context, videoID, cpn string) (node, err
 	q.Set("cpn", cpn)
 	u.RawQuery = q.Encode()
 	return n, c.ping(ctx, u)
+}
+
+// player asks for the player response of videoID, as YouTube Music's
+// player does as a track starts: with the signature timestamp of its code,
+// without which YouTube answers "Video unavailable", and no
+// playbackTracking, of every video.
+func (c *Client) player(ctx context.Context, videoID string) (node, error) {
+	return c.call(ctx, "player", map[string]any{
+		"videoId": videoID,
+		"playbackContext": map[string]any{"contentPlaybackContext": map[string]any{
+			"signatureTimestamp": signatureTimestamp(time.Now()),
+		}},
+	}, nil)
+}
+
+// signatureTimestamp returns a signature timestamp YouTube accepts: that of
+// the player's code of a few days ago, which is the day it was built, in
+// days since 1970. YouTube takes those of builds months old, and newer.
+func signatureTimestamp(now time.Time) int {
+	return int(now.UTC().AddDate(0, 0, -3).Unix() / (24 * 60 * 60))
 }
 
 // noReport is the error of a player response with no URL of the report

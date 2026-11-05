@@ -1,4 +1,4 @@
-//go:build !windows
+//go:build !windows && !(linux && (amd64 || arm64))
 
 package keypad
 

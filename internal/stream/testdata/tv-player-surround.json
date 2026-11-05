@@ -1,0 +1,178 @@
+{
+  "playabilityStatus": {
+    "status": "OK"
+  },
+  "playerConfig": {
+    "audioConfig": {
+      "enablePerFormatLoudness": true,
+      "loudnessDb": -6.7299995,
+      "perceptualLoudnessDb": -20.73
+    }
+  },
+  "streamingData": {
+    "adaptiveFormats": [
+      {
+        "approxDurationMs": "238770",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "averageBitrate": 129497,
+        "bitrate": 130716,
+        "contentLength": "3865003",
+        "itag": 140,
+        "loudnessDb": -6.7299995,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -20.73,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=3865003&dur=238.770&itag=140&mime=audio%2Fmp4&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238770",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "averageBitrate": 129497,
+        "bitrate": 130714,
+        "contentLength": "3865003",
+        "isDrc": true,
+        "itag": 140,
+        "loudnessDb": -4.8099995,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -18.81,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=3865003&dur=238.770&itag=140&mime=audio%2Fmp4&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 53789,
+        "bitrate": 74891,
+        "contentLength": "1605220",
+        "itag": 249,
+        "loudnessDb": -6.7299995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -20.73,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=1605220&dur=238.741&itag=249&mime=audio%2Fwebm&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 54060,
+        "bitrate": 75708,
+        "contentLength": "1613321",
+        "isDrc": true,
+        "itag": 249,
+        "loudnessDb": -4.8099995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -18.81,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=1613321&dur=238.741&itag=249&mime=audio%2Fwebm&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 69285,
+        "bitrate": 91074,
+        "contentLength": "2067649",
+        "itag": 250,
+        "loudnessDb": -6.7299995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -20.73,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=2067649&dur=238.741&itag=250&mime=audio%2Fwebm&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 69627,
+        "bitrate": 92101,
+        "contentLength": "2077863",
+        "isDrc": true,
+        "itag": 250,
+        "loudnessDb": -4.8099995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -18.81,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=2077863&dur=238.741&itag=250&mime=audio%2Fwebm&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "averageBitrate": 131635,
+        "bitrate": 158514,
+        "contentLength": "3928358",
+        "itag": 251,
+        "loudnessDb": -6.7299995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -20.73,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=3928358&dur=238.741&itag=251&mime=audio%2Fwebm&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "averageBitrate": 132174,
+        "bitrate": 159768,
+        "contentLength": "3944444",
+        "isDrc": true,
+        "itag": 251,
+        "loudnessDb": -4.8099995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -18.81,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=3944444&dur=238.741&itag=251&mime=audio%2Fwebm&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238720",
+        "audioChannels": 6,
+        "audioQuality": "AUDIO_QUALITY_HIGH",
+        "audioSampleRate": "48000",
+        "averageBitrate": 384120,
+        "bitrate": 384890,
+        "contentLength": "11462155",
+        "itag": 328,
+        "loudnessDb": -12.72,
+        "mimeType": "audio/mp4; codecs=\"ec-3\"",
+        "trackAbsoluteLoudnessLkfs": -26.720001,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=11462155&dur=238.720&itag=328&mime=audio%2Fmp4&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238720",
+        "audioChannels": 6,
+        "audioQuality": "AUDIO_QUALITY_HIGH",
+        "audioSampleRate": "48000",
+        "averageBitrate": 384120,
+        "bitrate": 384888,
+        "contentLength": "11462153",
+        "itag": 380,
+        "loudnessDb": -12.72,
+        "mimeType": "audio/mp4; codecs=\"ac-3\"",
+        "trackAbsoluteLoudnessLkfs": -26.720001,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=11462153&dur=238.720&itag=380&mime=audio%2Fmp4&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238713",
+        "audioChannels": 6,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "averageBitrate": 391165,
+        "bitrate": 392580,
+        "contentLength": "11672031",
+        "itag": 773,
+        "loudnessDb": 0.27999973,
+        "mimeType": "audio/mp4; codecs=\"iamf.001.001.Opus\"",
+        "trackAbsoluteLoudnessLkfs": -13.72,
+        "url": "{{media}}/videoplayback?c=TVHTML5&clen=11672031&dur=238.713&itag=773&mime=audio%2Fmp4&n=Qm7xKz3vLpW9cT&expire={{expire}}"
+      }
+    ],
+    "expiresInSeconds": "21540"
+  },
+  "videoDetails": {
+    "lengthSeconds": "239",
+    "videoId": "vrssjWvQMEc"
+  }
+}

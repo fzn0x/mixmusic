@@ -9,6 +9,14 @@
   new URL when YouTube refuses the old one, a new connection, from the byte
   it reached, when a download gets no bytes for 15 seconds or its
   connection drops, and an on-disk cache of tracks played to their end.
+  YouTube lists no 5.1 surround audio to the visionOS app, so the direct
+  route asks as YouTube's app for Samsung's TVs too, at once, which it
+  tells of a video's AC-3 and E-AC-3 (formats 380 and 328), and waits for
+  that answer half a second past the stereo stream's at most. Their URLs
+  need a challenge solved, which yt-dlp does with a JavaScript runtime:
+  it finds the 5.1 audio as it is asked for (`Resolver.Surround`), once,
+  in some 3 s, and YouTube serves it a few seconds after. Without yt-dlp
+  and a runtime, no 5.1 audio is offered.
   A live video's audio is an HLS media playlist (RFC 8216) of AAC-LC in
   packed audio, format 234, or 233 with data saver, which `Proxy.OpenLive`
   follows from near its live edge: it loads the playlist again about once

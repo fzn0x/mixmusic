@@ -9,10 +9,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/tools"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
 
@@ -141,5 +143,51 @@ func TestLivePicture(t *testing.T) {
 		if rec.Code != http.StatusPartialContent || int64(rec.Body.Len()) != mid.End-mid.Start+1 {
 			t.Fatalf("%v: the middle part: %d, %d bytes", families, rec.Code, rec.Body.Len())
 		}
+	}
+}
+
+// TestLiveSurround finds the stereo audio of a video YouTube has a 5.1 mix
+// of through YouTube's player API, which tells the TV client of the 5.1
+// audio, and of a song in stereo alone, which has none. With the yt-dlp
+// MixMusic installed and a JavaScript runtime, yt-dlp finds the 5.1 audio,
+// whose start the proxy serves: AC-3 in MP4. It runs with MIXMUSIC_LIVE=1.
+func TestLiveSurround(t *testing.T) {
+	if os.Getenv("MIXMUSIC_LIVE") == "" {
+		t.Skip("set MIXMUSIC_LIVE=1 to test against YouTube")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	d := NewDirect()
+	for _, id := range []string{surroundID, songID} {
+		start := time.Now()
+		s, err := d.Stream(ctx, id, QualityBest)
+		if err != nil {
+			t.Fatalf("%s: %v", id, err)
+		}
+		t.Logf("%s: found in %s, 5.1 %v", id, time.Since(start).Round(time.Millisecond), s.Surround != nil)
+		if sur := s.Surround; (sur != nil) != (id == surroundID) || sur != nil && (sur.URL != "" || sur.Codec != "ac-3" || sur.Size <= 0) {
+			t.Errorf("%s: surround %+v", id, sur)
+		}
+	}
+
+	config, _ := os.UserConfigDir()
+	tm := tools.New(filepath.Join(config, "MixMusic", "bin"))
+	if _, err := tm.YTDLP(); err != nil {
+		t.Skip("no yt-dlp to find the 5.1 audio")
+	}
+	if _, _, ok := tm.JSRuntime(); !ok {
+		t.Skip("no JavaScript runtime to find the 5.1 audio")
+	}
+	r := NewResolver(tm, t.TempDir())
+	r.Direct = d
+	p := NewProxy(r)
+	start := time.Now()
+	req := httptest.NewRequest("GET", SurroundPath(surroundID), nil).WithContext(ctx)
+	req.Header.Set("Range", "bytes=0-65535")
+	rec := httptest.NewRecorder()
+	p.ServeHTTP(rec, req)
+	t.Logf("5.1 audio served in %s", time.Since(start).Round(time.Millisecond))
+	if b := rec.Body.Bytes(); rec.Code != http.StatusPartialContent || len(b) < 8 || string(b[4:8]) != "ftyp" || !bytes.Contains(b, []byte("ac-3")) {
+		t.Errorf("5.1 audio: %d, %d bytes", rec.Code, len(b))
 	}
 }

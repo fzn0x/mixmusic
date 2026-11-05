@@ -52,6 +52,10 @@ type fakeTube struct {
 	// answer is the player endpoint's answer to a request, nil for HTTP
 	// 500: by default the recorded answer of the song.
 	answer func(r playerRequest) []byte
+	// tv is its answer to a request of the TV client, nil for HTTP 500:
+	// by default the recorded answer of the song, of no 5.1 audio, as of
+	// the video asked for.
+	tv func(r playerRequest) []byte
 	// visitorStatus, when set, is the HTTP status of the visitor_id
 	// endpoint's answers.
 	visitorStatus int
@@ -65,6 +69,7 @@ type fakeTube struct {
 	visitorHeader http.Header
 	visitorBody   map[string]any
 	requests      []playerRequest
+	tvRequests    []playerRequest
 	expires       int64 // the expire of the last URLs given
 }
 
@@ -72,6 +77,9 @@ func newFakeTube(t *testing.T) *fakeTube {
 	t.Helper()
 	f := &fakeTube{t: t}
 	f.answer = func(playerRequest) []byte { return f.recorded("") }
+	f.tv = func(r playerRequest) []byte {
+		return bytes.ReplaceAll(f.recordedTV(""), []byte(songID), []byte(r.VideoID))
+	}
 	f.media = serveClen
 	f.hls = f.serveHLS
 	f.srv = httptest.NewServer(http.HandlerFunc(f.serve))
@@ -104,6 +112,19 @@ func (f *fakeTube) answersWith(suffix string) {
 	f.answers(func(playerRequest) []byte { return f.recorded(suffix) })
 }
 
+// answersTV has the player endpoint answer the TV client fn.
+func (f *fakeTube) answersTV(fn func(r playerRequest) []byte) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.tv = fn
+}
+
+// answersTVWith has the player endpoint answer the TV client testdata's
+// tv-player<suffix>.json.
+func (f *fakeTube) answersTVWith(suffix string) {
+	f.answersTV(func(playerRequest) []byte { return f.recordedTV(suffix) })
+}
+
 // serves has the media server answer with fn.
 func (f *fakeTube) serves(fn http.HandlerFunc) {
 	f.mu.Lock()
@@ -121,14 +142,28 @@ func (f *fakeTube) refuses(status int) {
 // the URLs it gave before.
 func (f *fakeTube) recorded(suffix string) []byte {
 	f.t.Helper()
-	raw, err := os.ReadFile("testdata/visionos-player" + suffix + ".json")
-	if err != nil {
-		f.t.Fatal(err)
-	}
 	f.mu.Lock()
 	f.expires = max(f.expires+1, time.Now().Add(6*time.Hour).Unix())
 	expires := f.expires
 	f.mu.Unlock()
+	return f.recordedFile("visionos-player"+suffix+".json", expires)
+}
+
+// recordedTV returns an answer of testdata to the TV client,
+// tv-player<suffix>.json, with stream URLs at f that expire in six hours.
+func (f *fakeTube) recordedTV(suffix string) []byte {
+	f.t.Helper()
+	return f.recordedFile("tv-player"+suffix+".json", time.Now().Add(6*time.Hour).Unix())
+}
+
+// recordedFile returns the answer of testdata in file, with stream URLs at
+// f that expire at expires.
+func (f *fakeTube) recordedFile(file string, expires int64) []byte {
+	f.t.Helper()
+	raw, err := os.ReadFile("testdata/" + file)
+	if err != nil {
+		f.t.Fatal(err)
+	}
 	s := strings.ReplaceAll(string(raw), "{{media}}", f.srv.URL+"/media")
 	return []byte(strings.ReplaceAll(s, "{{expire}}", strconv.FormatInt(expires, 10)))
 }
@@ -154,8 +189,13 @@ func (f *fakeTube) serve(w http.ResponseWriter, r *http.Request) {
 		req := playerRequest{Header: r.Header.Clone(), Body: body, Visitor: r.Header.Get("X-Goog-Visitor-Id")}
 		req.VideoID, _ = body["videoId"].(string)
 		f.mu.Lock()
-		f.requests = append(f.requests, req)
 		answer := f.answer
+		if dig(body, "context", "client", "clientName") == tvName {
+			f.tvRequests = append(f.tvRequests, req)
+			answer = f.tv
+		} else {
+			f.requests = append(f.requests, req)
+		}
 		f.mu.Unlock()
 		if a := answer(req); a != nil {
 			// YouTube's answers carry back the visitor ID of the request.
@@ -215,11 +255,20 @@ func (f *fakeTube) locked(fn func()) {
 	fn()
 }
 
-// players returns the requests of the player endpoint so far.
+// players returns the requests of the player endpoint so far, but the TV
+// client's.
 func (f *fakeTube) players() []playerRequest {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return append([]playerRequest(nil), f.requests...)
+}
+
+// tvPlayers returns the TV client's requests of the player endpoint so
+// far.
+func (f *fakeTube) tvPlayers() []playerRequest {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return append([]playerRequest(nil), f.tvRequests...)
 }
 
 func (f *fakeTube) visitorCount() int {

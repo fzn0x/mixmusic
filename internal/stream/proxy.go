@@ -147,14 +147,10 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resolve := func() (Stream, error) {
-		s, err := p.resolve(r.Context(), videoID)
-		if err != nil || !surround {
-			return s, err
+		if surround {
+			return p.resolveSurround(r.Context(), videoID)
 		}
-		if s.Surround == nil {
-			return Stream{}, errNoSurround
-		}
-		return *s.Surround, nil
+		return p.resolve(r.Context(), videoID)
 	}
 	s, err := resolve()
 	if err != nil {
@@ -307,18 +303,43 @@ func (p *Proxy) resolve(ctx context.Context, videoID string) (Stream, error) {
 	if err != nil {
 		return s, err
 	}
-	if wait := time.Until(s.Available); wait > 0 {
-		wait = min(wait, maxAvailableWait)
-		log.Printf("mixmusic: waiting %.1fs for YouTube to serve the stream of %s", wait.Seconds(), videoID)
-		t := time.NewTimer(wait)
-		defer t.Stop()
-		select {
-		case <-t.C:
-		case <-ctx.Done():
-			return Stream{}, ctx.Err()
-		}
+	if err := p.served(ctx, videoID, s); err != nil {
+		return Stream{}, err
 	}
 	return s, nil
+}
+
+// resolveSurround is resolve for the 5.1 surround audio of a video, which
+// yt-dlp may find only as it is asked for: YouTube serves it a few seconds
+// later then.
+func (p *Proxy) resolveSurround(ctx context.Context, videoID string) (Stream, error) {
+	s, err := p.Resolver.Surround(ctx, videoID)
+	if err != nil {
+		return s, err
+	}
+	if err := p.served(ctx, videoID, s); err != nil {
+		return Stream{}, err
+	}
+	return s, nil
+}
+
+// served waits until YouTube serves s, a stream of a video, up to
+// maxAvailableWait.
+func (p *Proxy) served(ctx context.Context, videoID string, s Stream) error {
+	wait := time.Until(s.Available)
+	if wait <= 0 {
+		return nil
+	}
+	wait = min(wait, maxAvailableWait)
+	log.Printf("mixmusic: waiting %.1fs for YouTube to serve the stream of %s", wait.Seconds(), videoID)
+	t := time.NewTimer(wait)
+	defer t.Stop()
+	select {
+	case <-t.C:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 // Failure returns why the last request of a video's audio failed, in plain

@@ -1,0 +1,178 @@
+{
+  "playabilityStatus": {
+    "status": "OK"
+  },
+  "playerConfig": {
+    "audioConfig": {
+      "enablePerFormatLoudness": true,
+      "loudnessNormalizationConfig": {
+        "applyStatefulNormalization": false,
+        "maxStatefulTimeThresholdSec": 300,
+        "minimumLoudnessTargetLkfs": -31,
+        "preserveStatefulLoudnessTarget": true
+      },
+      "loudnessTargetLkfs": -14,
+      "perceptualLoudnessDb": -20.73,
+      "trackAbsoluteLoudnessLkfs": -20.73
+    }
+  },
+  "responseContext": {
+    "visitorData": "CgtUZXN0VmlzaXRvcijAgICABjIKCgJVUxIEGgAgAA%3D%3D"
+  },
+  "streamingData": {
+    "adaptiveFormats": [
+      {
+        "approxDurationMs": "238840",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "averageBitrate": 48807,
+        "bitrate": 50123,
+        "contentLength": "1457162",
+        "itag": 139,
+        "loudnessDb": -6.7299995,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "trackAbsoluteLoudnessLkfs": -20.73,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=1457162&dur=238.840&itag=139&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238840",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "22050",
+        "averageBitrate": 48807,
+        "bitrate": 50130,
+        "contentLength": "1457162",
+        "isDrc": true,
+        "itag": 139,
+        "loudnessDb": -4.8099995,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.5\"",
+        "trackAbsoluteLoudnessLkfs": -18.81,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=1457162&dur=238.840&itag=139&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238770",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "averageBitrate": 129497,
+        "bitrate": 130716,
+        "contentLength": "3865003",
+        "itag": 140,
+        "loudnessDb": -6.7299995,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -20.73,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=3865003&dur=238.770&itag=140&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238770",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "44100",
+        "averageBitrate": 129497,
+        "bitrate": 130714,
+        "contentLength": "3865003",
+        "isDrc": true,
+        "itag": 140,
+        "loudnessDb": -4.8099995,
+        "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "trackAbsoluteLoudnessLkfs": -18.81,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=3865003&dur=238.770&itag=140&mime=audio%2Fmp4&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 53789,
+        "bitrate": 74891,
+        "contentLength": "1605220",
+        "itag": 249,
+        "loudnessDb": -6.7299995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -20.73,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=1605220&dur=238.741&itag=249&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 54060,
+        "bitrate": 75708,
+        "contentLength": "1613321",
+        "isDrc": true,
+        "itag": 249,
+        "loudnessDb": -4.8099995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -18.81,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=1613321&dur=238.741&itag=249&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 69285,
+        "bitrate": 91074,
+        "contentLength": "2067649",
+        "itag": 250,
+        "loudnessDb": -6.7299995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -20.73,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=2067649&dur=238.741&itag=250&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_LOW",
+        "audioSampleRate": "48000",
+        "averageBitrate": 69627,
+        "bitrate": 92101,
+        "contentLength": "2077863",
+        "isDrc": true,
+        "itag": 250,
+        "loudnessDb": -4.8099995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -18.81,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=2077863&dur=238.741&itag=250&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "averageBitrate": 131635,
+        "bitrate": 158514,
+        "contentLength": "3928358",
+        "itag": 251,
+        "loudnessDb": -6.7299995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -20.73,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=3928358&dur=238.741&itag=251&mime=audio%2Fwebm&expire={{expire}}"
+      },
+      {
+        "approxDurationMs": "238741",
+        "audioChannels": 2,
+        "audioQuality": "AUDIO_QUALITY_MEDIUM",
+        "audioSampleRate": "48000",
+        "averageBitrate": 132174,
+        "bitrate": 159768,
+        "contentLength": "3944444",
+        "isDrc": true,
+        "itag": 251,
+        "loudnessDb": -4.8099995,
+        "mimeType": "audio/webm; codecs=\"opus\"",
+        "trackAbsoluteLoudnessLkfs": -18.81,
+        "url": "{{media}}/videoplayback?c=VISIONOS&clen=3944444&dur=238.741&itag=251&mime=audio%2Fwebm&expire={{expire}}"
+      }
+    ],
+    "expiresInSeconds": "21540"
+  },
+  "videoDetails": {
+    "author": "5.1 Test & Clips",
+    "lengthSeconds": "239",
+    "title": "5.1 Dolby Atmos Surround Experience | You’ve Never Heard YouTube Like This Before! 4K HDR",
+    "videoId": "vrssjWvQMEc"
+  }
+}

@@ -58,6 +58,21 @@ func TestResumeEpisode(t *testing.T) {
 	}
 }
 
+// TestResumeEpisodeInPlace plays an episode from where the user left it
+// when the queue it replaces was at the same place: the episode becomes
+// current all the same (#275).
+func TestResumeEpisodeInPlace(t *testing.T) {
+	saved := Saved{Tracks: []media.Track{track("s0"), track("s1")}, Index: 0}
+	h := newHarnessWith(t, saved, func(f *fakeServices) Services {
+		return &resumingServices{fakeServices: f, at: map[string]time.Duration{"yt:e1": 5 * time.Minute}}
+	})
+	h.p.PlayTracks([]media.Track{episodeTrack("e1"), episodeTrack("e2")}, 0)
+	h.wait("e1 playing", playing("e1"))
+	if got := h.stream.lastLoad(); got != "load url:yt:e1 5m0s true" {
+		t.Errorf("loaded %q", got)
+	}
+}
+
 // TestRestartEpisode plays an episode from its start when the user asks
 // for it, as the episode is current: Previous, or seeking to its start.
 func TestRestartEpisode(t *testing.T) {

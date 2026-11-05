@@ -216,7 +216,10 @@ func (p *Player) playItems(items []Item, first int, list bool) {
 		items = p.shuffledFrom(items, first)
 		first = 0
 	}
-	p.s.Queue = items
+	// Nothing of the new queue is current until it plays: the index of the
+	// queue before would name one of its entries, which then wouldn't
+	// become current, as an episode resumes as it does (#275).
+	p.s.Queue, p.s.Index = items, -1
 	p.emit(QueueChange)
 	if !list || !p.skipsAI() {
 		p.playAt(first, 0, true)

@@ -38,6 +38,15 @@ belongs to its main thread: what finishes elsewhere comes back through
   take its tracks, and its download, show once the list is whole. The
   queue builds only its entries near the view, as it may hold thousands.
 
+- **Menus** are the system's: MyGo builds one as it opens, and again for
+  the item chosen, never while it shows, so what a menu lists is fetched
+  before it opens. Signed in to YouTube Music, the main window reads the
+  user's playlists there at once (`keepYouTubePlaylists`), which a
+  track's "Add to YouTube Music playlist" lists, and keeps them: one made
+  goes in first, and one deleted leaves, without reading the list again
+  (`keepPlaylist`, `dropPlaylist`); signing in or out, or choosing
+  another channel, reads it again.
+
 - **The top bar and the rows pinned under it** (`compacthead.go`). The
   page shown keeps where it scrolled in a `ui.ScrollState`
   (`pageScroll`), which the top bar, built before the page, reads in the

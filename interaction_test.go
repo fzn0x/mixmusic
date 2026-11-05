@@ -592,6 +592,149 @@ func TestAddToYouTubePlaylistListsYours(t *testing.T) {
 	}
 }
 
+// listFor has YouTube answer the lists of the user's playlists of the test
+// with what answer gives, and returns how many times it was asked.
+func listFor(t *testing.T, answer func() ([]media.Playlist, error)) func() int {
+	var (
+		mu    sync.Mutex
+		asked int
+	)
+	was := listOnYouTube
+	listOnYouTube = func(*shell, context.Context) ([]media.Playlist, error) {
+		mu.Lock()
+		asked++
+		mu.Unlock()
+		return answer()
+	}
+	t.Cleanup(func() { listOnYouTube = was })
+	return func() int {
+		mu.Lock()
+		defer mu.Unlock()
+		return asked
+	}
+}
+
+// youtubeOwn returns the user's playlists on YouTube Music as the shell
+// keeps them, or nil before it asked for them.
+func youtubeOwn(s *shell) *loaded[[]media.Playlist] {
+	l, _ := s.loads["youtube:playlists"].(*loaded[[]media.Playlist])
+	return l
+}
+
+// trackMenuChoice opens the menu of the first track shown and chooses
+// what path leads to.
+func trackMenuChoice(t *testing.T, tt *ui.Tester, path ...string) error {
+	t.Helper()
+	if err := tt.RightClick(testTracks[0].Title); err != nil {
+		t.Fatal(err)
+	}
+	defer tt.CloseMenu()
+	return tt.ChooseMenuItem(path...)
+}
+
+// TestYouTubePlaylistsAhead lists the user's playlists on YouTube Music
+// the first time a track's menu opens (#260), as the system's menus show
+// what they held as they opened: the window asks for them once signed
+// in, once however many frames come, again once forgotten, and never
+// signed out.
+func TestYouTubePlaylistsAhead(t *testing.T) {
+	asked := listFor(t, func() ([]media.Playlist, error) { return []media.Playlist{ownPlaylist, savedPlaylist}, nil })
+	s := newTestShell(t)
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	if items := menuOf(t, tt, testTracks[0].Title); slices.Contains(items, "Add to YouTube Music playlist") {
+		t.Errorf("signed out, the menu is %q", items)
+	}
+	for range 3 {
+		tt.Frame()
+	}
+	if n := asked(); n != 0 || youtubeOwn(s) != nil {
+		t.Fatalf("signed out, YouTube was asked %d times", n)
+	}
+
+	signIn := func() {
+		t.Helper()
+		s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+		tt.Frame()
+		if youtubeOwn(s) == nil {
+			t.Fatal("signed in, the window didn't ask for the user's playlists")
+		}
+		s.settle(t, func(player.State) bool { return youtubeOwn(s).done })
+	}
+	signIn()
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", "Loading your playlists…"); err == nil || !strings.Contains(err.Error(), "no item") {
+		t.Errorf("the first menu says they load: %v", err)
+	}
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", ownPlaylist.Title); err != nil {
+		t.Errorf("the first menu doesn't list the user's playlist: %v", err)
+	}
+	for range 5 {
+		tt.Frame()
+	}
+	s.drain()
+	if n := asked(); n != 1 {
+		t.Errorf("YouTube was asked %d times, not once", n)
+	}
+
+	// Forgotten, as signing in again or choosing another channel leaves
+	// them, they're asked for again; signed out, they aren't.
+	s.forget("youtube:playlists")
+	signIn()
+	if n := asked(); n != 2 {
+		t.Errorf("forgotten, YouTube was asked %d times, not twice", n)
+	}
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true}
+	s.forget("youtube:playlists")
+	for range 3 {
+		tt.Frame()
+	}
+	if n := asked(); n != 2 || youtubeOwn(s) != nil {
+		t.Errorf("signed out again, YouTube was asked %d times", n)
+	}
+}
+
+// TestYouTubePlaylistsLate says the user's playlists on YouTube Music
+// load in a track's menu only while the answer the window asked for is
+// still to come, and that they couldn't when YouTube failed, which a menu
+// opened then asks again for, once however many open meanwhile.
+func TestYouTubePlaylistsLate(t *testing.T) {
+	answers := make(chan error)
+	asked := listFor(t, func() ([]media.Playlist, error) {
+		if err := <-answers; err != nil {
+			return nil, err
+		}
+		return []media.Playlist{ownPlaylist}, nil
+	})
+	s := newTestShell(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", "Loading your playlists…"); err == nil || !strings.Contains(err.Error(), "disabled") {
+		t.Errorf("before the answer, the menu: %v", err)
+	}
+	answers <- errors.New("YouTube Music is busy")
+	s.settle(t, func(player.State) bool { return youtubeOwn(s).done })
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", "Couldn't load your playlists"); err == nil || !strings.Contains(err.Error(), "disabled") {
+		t.Errorf("once YouTube failed, the menu: %v", err)
+	}
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", "No playlists of yours"); err == nil || !strings.Contains(err.Error(), "no item") {
+		t.Errorf("once YouTube failed, the menu says the user has none: %v", err)
+	}
+	for range 3 {
+		tt.Frame()
+	}
+	answers <- nil
+	s.settle(t, func(player.State) bool { return youtubeOwn(s).err == nil })
+	if n := asked(); n != 2 {
+		t.Errorf("YouTube was asked %d times, not twice", n)
+	}
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", ownPlaylist.Title); err != nil {
+		t.Errorf("asked again, the menu: %v", err)
+	}
+}
+
 // Playlists of a library on YouTube Music: one the user made, one they
 // saved, and one that's neither.
 var (
@@ -866,6 +1009,43 @@ func TestDropPlaylist(t *testing.T) {
 	s.dropPlaylist("youtube:playlists", ownPlaylist.ID)
 	if !coming.again {
 		t.Error("a list on its way isn't asked for again")
+	}
+}
+
+// TestKeepPlaylist puts a playlist the user made first in a list fetched,
+// in a copy, for the next track menu to add to it, and has a list still
+// on its way, or one that failed, asked for again; a list never fetched
+// stays so.
+func TestKeepPlaylist(t *testing.T) {
+	s := newTestShell(t)
+	made := media.Playlist{ID: "yt:PLnew", Source: media.SourceYouTube, Title: "Road trip", Editable: true, Deletable: true}
+	s.keepPlaylist("youtube:playlists", made)
+	if _, ok := s.loads["youtube:playlists"]; ok {
+		t.Error("a list never fetched was made")
+	}
+	shown := []media.Playlist{ownPlaylist, savedPlaylist}
+	done := &loaded[[]media.Playlist]{done: true, value: shown}
+	s.loads["youtube:playlists"] = done
+	s.keepPlaylist("youtube:playlists", made)
+	if len(done.value) != 3 || done.value[0].ID != made.ID || done.value[1].ID != ownPlaylist.ID || len(shown) != 2 || done.again {
+		t.Errorf("the list holds %+v, the one shown before %+v, asks again %v", done.value, shown, done.again)
+	}
+	for _, l := range []*loaded[[]media.Playlist]{{}, {done: true, err: errors.New("offline")}} {
+		s.loads["youtube:playlists"] = l
+		s.keepPlaylist("youtube:playlists", made)
+		if !l.again || len(l.value) != 0 {
+			t.Errorf("a list %+v isn't asked for again", l)
+		}
+	}
+
+	// The next menu of a track lists it.
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	s.loads["youtube:playlists"] = done
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", made.Title); err != nil {
+		t.Errorf("the menu after it was made: %v", err)
 	}
 }
 

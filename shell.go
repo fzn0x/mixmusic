@@ -22,6 +22,7 @@ func (s *shell) view(c *ui.Context) {
 		s.narrow, s.narrowFold = w <= narrowWidth, nil
 	}
 	s.followArtwork()
+	s.keepYouTubePlaylists()
 	c.SetTheme(&s.lk.theme)
 	s.toasts(c)
 	s.fileToast(c)

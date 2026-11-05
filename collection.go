@@ -530,6 +530,22 @@ func (s *shell) dropPlaylist(key, id string) {
 	}
 }
 
+// keepPlaylist puts a playlist the user just made first in the list
+// fetched for key, where the library and the track menus show it at once,
+// rather than read the list again, which YouTube may answer as it was a
+// moment before, as for dropPlaylist. A list still on its way, or one that
+// failed, is asked for again.
+func (s *shell) keepPlaylist(key string, p media.Playlist) {
+	l, ok := s.loads[key].(*loaded[[]media.Playlist])
+	switch {
+	case !ok:
+	case !l.done, l.err != nil:
+		s.refetch(key)
+	default:
+		l.value = slices.Insert(slices.Clone(l.value), 0, p)
+	}
+}
+
 // collectionMenu is the menu of an album or a playlist: play it, queue
 // it, save it as a mix or a playlist, open it on its service or copy its
 // link there.

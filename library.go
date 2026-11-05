@@ -311,7 +311,7 @@ func (s *shell) tookSpotifyLiked(first *loaded[app.TrackPage], at int, page app.
 func (s *shell) youtubeLibrary(c *ui.Context) {
 	col := s.svc.Collection
 	s.serviceLibrary(c, "youtube",
-		fetch(s, "youtube:playlists", col.YouTubePlaylists),
+		s.youtubePlaylists(),
 		fetch(s, "youtube:albums", col.YouTubeAlbums),
 		fetch(s, "youtube:artists", col.YouTubeArtists),
 		func(c *ui.Context) {

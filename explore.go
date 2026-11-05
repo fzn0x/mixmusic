@@ -129,6 +129,31 @@ func (s *shell) moodPage(c *ui.Context, params string) {
 	})
 }
 
+// listOnYouTube lists the playlists of the user's library on YouTube
+// Music; tests answer for YouTube.
+var listOnYouTube = func(s *shell, ctx context.Context) ([]media.Playlist, error) {
+	return s.svc.Collection.YouTubePlaylists(ctx)
+}
+
+// youtubePlaylists returns the playlists of the user's library on YouTube
+// Music, which the library shows and the track menu adds to.
+func (s *shell) youtubePlaylists() *loaded[[]media.Playlist] {
+	list := listOnYouTube
+	return fetch(s, "youtube:playlists", func(ctx context.Context) ([]media.Playlist, error) { return list(s, ctx) })
+}
+
+// keepYouTubePlaylists fetches the user's playlists on YouTube Music once
+// they're signed in, before any track menu opens: the system's menus show
+// what they held as they opened, so a menu that asked for them itself
+// said "Loading your playlists…" until it opened again (#260). Signed
+// out, nothing is asked; signing in or out, or choosing another channel,
+// forgets them, and they're asked for again.
+func (s *shell) keepYouTubePlaylists() {
+	if s.accounts().YouTube.SignedIn {
+		s.youtubePlaylists()
+	}
+}
+
 // addToMenus are the track menu's ways to keep a track: in a mix, or in a
 // YouTube Music playlist of the user's.
 func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
@@ -156,9 +181,17 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 				s.createYouTubePlaylist(name, []media.Track{t}, nil)
 			})
 		}
-		own := fetch(s, "youtube:playlists", s.svc.Collection.YouTubePlaylists)
-		if !own.done {
+		own := s.youtubePlaylists()
+		switch {
+		case !own.done:
+			// Only until the answer the window asked for ahead comes.
 			m.Item("Loading your playlists…").Disabled(true)
+			return
+		case own.err != nil:
+			// Asked again, as a refresh asks, unless they already are:
+			// they may be there the next time the menu opens.
+			own.refresh()
+			m.Item("Couldn't load your playlists").Disabled(true)
 			return
 		}
 		editable := slices.DeleteFunc(slices.Clone(own.value), func(p media.Playlist) bool { return !p.Editable })
@@ -220,7 +253,7 @@ func (s *shell) createYouTubePlaylist(title string, tracks []media.Track, done f
 				s.notes = append(s.notes, player.Notice{Message: "Couldn't create " + title + ": " + err.Error(), Error: true})
 				return
 			}
-			s.forget("youtube:playlists")
+			s.keepPlaylist("youtube:playlists", p)
 			s.notes = append(s.notes, notice("Created "+p.Title+" on YouTube Music"))
 			if done != nil {
 				done(p)

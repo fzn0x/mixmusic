@@ -40,7 +40,8 @@ func youtubePlaylistID(id string) (string, error) {
 
 // CreateYouTubePlaylist makes a playlist on YouTube Music, private to the
 // account, of tracks of any service: Spotify tracks go in as their
-// recordings on YouTube Music, and those without one stay out.
+// recordings on YouTube Music, and those without one stay out. The
+// playlist is the user's, to add to and to delete.
 func (c *Collection) CreateYouTubePlaylist(ctx context.Context, title string, tracks []media.Track) (media.Playlist, error) {
 	if !c.a.youtube.SignedIn() {
 		return media.Playlist{}, errNotSignedIn
@@ -66,6 +67,7 @@ func (c *Collection) CreateYouTubePlaylist(ctx context.Context, title string, tr
 		Tracks:     []media.Track{},
 		Artwork:    []media.Image{},
 		Editable:   true,
+		Deletable:  true,
 		URL:        "https://music.youtube.com/playlist?list=" + id,
 	}, nil
 }

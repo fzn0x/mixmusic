@@ -124,7 +124,7 @@ func ParseTTML(ttml string) (Lyrics, error) {
 	}
 	if len(timed) > 0 {
 		slices.SortStableFunc(timed, func(a, b Line) int { return a.TimeMs - b.TimeMs })
-		return Lyrics{Synced: true, Lines: timed}, nil
+		return timedLyrics(timed, ""), nil
 	}
 	if untimed == nil {
 		untimed = []Line{}

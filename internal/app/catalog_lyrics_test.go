@@ -64,11 +64,11 @@ func status(code int, body string) http.HandlerFunc {
 }
 
 const (
-	unisonSynced = `{"success":true,"data":{"format":"ttml","syncType":"linesync","lyrics":"<tt><body><div><p begin=\"0:01.000\">From Unison</p></div></body></tt>"}}`
+	unisonSynced = `{"success":true,"data":{"format":"ttml","syncType":"linesync","lyrics":"<tt><body><div><p begin=\"0:01.000\">From Unison</p><p begin=\"0:04.000\">Second line</p></div></body></tt>"}}`
 	unisonPlain  = `{"success":true,"data":{"format":"plain","syncType":"plain","lyrics":"Plain from Unison\nSecond line\nThird line"}}`
 	unisonDown   = `{"success":false,"error":"Internal error"}`
 	unisonMiss   = `{"success":false,"code":"NOT_FOUND"}`
-	lrclibSynced = `{"syncedLyrics":"[00:01.00]From LRCLIB"}`
+	lrclibSynced = `{"syncedLyrics":"[00:01.00]From LRCLIB\n[00:04.00]Again"}`
 )
 
 var aSong = media.Track{ID: "yt:abcdefghijk", Source: media.SourceYouTube, Title: "Song (Official Video)",

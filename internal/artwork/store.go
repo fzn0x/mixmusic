@@ -294,9 +294,16 @@ func (s *Store) download(ctx context.Context, rawURL string) ([]byte, error) {
 		c = &call{done: make(chan struct{})}
 		s.calls[rawURL] = c
 		s.spawn(func() {
-			s.slots <- struct{}{}
-			c.data, c.err = s.fetch(rawURL, nil)
-			<-s.slots
+			// The caller found no file, but a download that ended since
+			// may have kept one: the image shows from it, as it did for
+			// that download's callers, rather than downloading again.
+			if f, ok := s.read(rawURL); ok {
+				c.data = f.data
+			} else {
+				s.slots <- struct{}{}
+				c.data, c.err = s.fetch(rawURL, nil)
+				<-s.slots
+			}
 			s.mu.Lock()
 			delete(s.calls, rawURL)
 			s.mu.Unlock()

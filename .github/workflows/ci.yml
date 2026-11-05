@@ -64,6 +64,23 @@ jobs:
         run: go test ./...
         env:
           OPUS_TESTVECTORS: ${{ runner.os == 'Linux' && format('{0}/opus-vectors/opus_newvectors', runner.temp) || '' }}
+      # MixMusic takes keys MyGo has none for from its GTK window: these
+      # press them in one, on a virtual display. A test that skips found no
+      # display, GTK or xdotool: here, that fails.
+      - name: Keys in a GTK window
+        if: runner.os == 'Linux'
+        shell: bash
+        env:
+          GDK_BACKEND: x11
+          NO_AT_BRIDGE: "1"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb xdotool libgtk-3-0t64
+          xvfb-run -a go test ./internal/keypad/ -run 'TestWatch|TestPlusPressed' -count=1 -v | tee keys.log
+          if grep -q -- '--- SKIP' keys.log; then
+            echo "A test skipped."
+            exit 1
+          fi
       - name: Community registry
         run: go run ./tools/registry -check
       - name: Changelog fragments

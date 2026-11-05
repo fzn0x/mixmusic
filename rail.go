@@ -76,11 +76,14 @@ func (s *shell) toggleRail() {
 
 // The rail's parts are railGap apart, over its foot's padding of railFoot,
 // and the mixes take mixesLeast at least: their title and a mix and a
-// half.
+// half. In a short window the entries of tonal controls tighten as far as
+// tightEntry, the least height Apple's guidelines give what is clicked,
+// to keep the live tile's room.
 const (
 	railGap    = 24
 	railFoot   = 16
 	mixesLeast = 88
+	tightEntry = 44
 )
 
 // rail is the sidebar: where to go, the user's mixes, and a live tile of
@@ -99,7 +102,9 @@ func (s *shell) rail(c *ui.Context) {
 	navLeast := entries*s.leastEntry() + (entries-1)*4
 	ui.Column(c).Width(s.railWidth()).Shrink(0).Padding(0, pad, railFoot).Gap(railGap).Background(k.bg).Clip().Children(func() {
 		least := s.brand(c, collapsed, s.railWidth()-2*pad) + railGap + navLeast + railGap + railFoot
-		ui.Column(c).Gap(4).Shrink(0).Children(func() {
+		// Where the rail is short, and only there, as the mixes grow from
+		// nothing into the rest, the entries give some of their height.
+		ui.Column(c).Gap(4).MinHeight(navLeast).Children(func() {
 			for _, n := range nav {
 				s.navEntry(c, "nav-"+n.id, k.words(n.label), icon(n.icon), n.path, n.id == current)
 			}
@@ -114,8 +119,8 @@ func (s *shell) rail(c *ui.Context) {
 			ui.Spacer(c)
 		}
 		// The live tile shows where the rail has room for it whole, with
-		// the mixes short, above the player bar, which covered it in a
-		// short window when the rail ran on (#258).
+		// the entries tight and the mixes short, above the player bar,
+		// which covered it in a short window when the rail ran on (#258).
 		_, h := c.Size()
 		if h-k.barRoom()-least >= railGap+liveSize(collapsed) {
 			s.liveTile(c, collapsed)
@@ -308,10 +313,11 @@ func (s *shell) navEntry(c *ui.Context, key, label string, svg *ui.SVG, path str
 func (k *look) tonalEntry() float32 { return min(56, k.row-8) }
 
 // leastEntry is the least height of a page's entry in the rail: a tonal
-// one's, or an outlined one's box.
+// one tightens to tightEntry in a short window, and an outlined one keeps
+// its box.
 func (s *shell) leastEntry() float32 {
 	if s.lk.tonal {
-		return s.lk.tonalEntry()
+		return min(s.lk.tonalEntry(), tightEntry)
 	}
 	return 42
 }
@@ -323,7 +329,7 @@ func (s *shell) tonalNav(c *ui.Context, key, label string, svg *ui.SVG, path str
 	k := &s.lk
 	folded := s.railFolded()
 	h := k.tonalEntry()
-	row := s.buttonBase(c.Key(key)).Height(h).Gap(14).Padding(0, 16).Justify(ui.Start).Label(label).Cursor(ui.CursorPointer)
+	row := s.buttonBase(c.Key(key)).Height(h).MinHeight(s.leastEntry()).Shrink(1).Gap(14).Padding(0, 16).Justify(ui.Start).Label(label).Cursor(ui.CursorPointer)
 	if folded {
 		row.Tooltip(label).Padding(0).Justify(ui.Center)
 	}

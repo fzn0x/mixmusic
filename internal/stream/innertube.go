@@ -35,6 +35,13 @@ const (
 	visionOSVer  = "26.5.23O471"
 )
 
+// apiClient is a client of YouTube's API the route asks as.
+type apiClient struct {
+	name, version, number, agent, deviceMake, deviceModel, os, osVersion string
+}
+
+var visionClient = apiClient{visionName, visionVersion, visionNumber, visionAgent, visionMake, visionModel, visionOS, visionOSVer}
+
 // innertubeURL is the origin of YouTube's player API.
 const innertubeURL = "https://www.youtube.com"
 
@@ -200,7 +207,7 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 	}
 	// The 5.1 surround beside it, unchecked: few play it, and its first
 	// request tells if YouTube refuses it.
-	if sf, ok := pickSurround(ans.StreamingData.AdaptiveFormats, length); ok {
+	if sf, ok := pickSurround(ans.StreamingData.AdaptiveFormats, length, true); ok {
 		sur := sf.stream()
 		sur.Loudness, sur.Measured = ans.loudness(&sf)
 		st.Surround = &sur
@@ -401,7 +408,7 @@ func (d *Direct) askVisitor(ctx context.Context) (string, error) {
 			VisitorData string `json:"visitorData"`
 		} `json:"responseContext"`
 	}
-	if err := d.call(ctx, "visitor_id", nil, "", &ans); err != nil {
+	if err := d.call(ctx, visionClient, "visitor_id", nil, "", &ans); err != nil {
 		return "", err
 	}
 	if ans.ResponseContext.VisitorData == "" {
@@ -410,32 +417,38 @@ func (d *Direct) askVisitor(ctx context.Context) (string, error) {
 	return ans.ResponseContext.VisitorData, nil
 }
 
-// player asks YouTube's player API for the streams of a video.
+// player asks YouTube's player API, as the visionOS client, for the
+// streams of a video.
 func (d *Direct) player(ctx context.Context, videoID, visitor string) (playerAnswer, error) {
 	var ans playerAnswer
-	err := d.call(ctx, "player", map[string]any{
-		"videoId": videoID,
-		"playbackContext": map[string]any{
-			"contentPlaybackContext": map[string]any{"html5Preference": "HTML5_PREF_WANTS"},
-		},
-		"contentCheckOk": true,
-		"racyCheckOk":    true,
-	}, visitor, &ans)
+	err := d.call(ctx, visionClient, "player", playerBody(videoID, map[string]any{}), visitor, &ans)
 	return ans, err
 }
 
-// call posts body, with the context of the visionOS client, to an endpoint
-// of YouTube's API, and reads its answer into out. It sends no cookie and
-// no account: the route asks signed out.
-func (d *Direct) call(ctx context.Context, endpoint string, body map[string]any, visitor string, out any) error {
+// playerBody is what the route asks the player endpoint of a video, with
+// playback, what its client tells of the player it plays in.
+func playerBody(videoID string, playback map[string]any) map[string]any {
+	playback["html5Preference"] = "HTML5_PREF_WANTS"
+	return map[string]any{
+		"videoId":         videoID,
+		"playbackContext": map[string]any{"contentPlaybackContext": playback},
+		"contentCheckOk":  true,
+		"racyCheckOk":     true,
+	}
+}
+
+// call posts body, with the context of client c, to an endpoint of
+// YouTube's API, and reads its answer into out. It sends no cookie and no
+// account: the route asks signed out.
+func (d *Direct) call(ctx context.Context, c apiClient, endpoint string, body map[string]any, visitor string, out any) error {
 	client := map[string]any{
-		"clientName":       visionName,
-		"clientVersion":    visionVersion,
-		"deviceMake":       visionMake,
-		"deviceModel":      visionModel,
-		"osName":           visionOS,
-		"osVersion":        visionOSVer,
-		"userAgent":        visionAgent,
+		"clientName":       c.name,
+		"clientVersion":    c.version,
+		"deviceMake":       c.deviceMake,
+		"deviceModel":      c.deviceModel,
+		"osName":           c.os,
+		"osVersion":        c.osVersion,
+		"userAgent":        c.agent,
 		"hl":               "en",
 		"timeZone":         "UTC",
 		"utcOffsetMinutes": 0,
@@ -457,10 +470,10 @@ func (d *Direct) call(ctx context.Context, endpoint string, body map[string]any,
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", visionAgent)
+	req.Header.Set("User-Agent", c.agent)
 	req.Header.Set("Origin", innertubeURL)
-	req.Header.Set("X-YouTube-Client-Name", visionNumber)
-	req.Header.Set("X-YouTube-Client-Version", visionVersion)
+	req.Header.Set("X-YouTube-Client-Name", c.number)
+	req.Header.Set("X-YouTube-Client-Version", c.version)
 	if visitor != "" {
 		req.Header.Set("X-Goog-Visitor-Id", visitor)
 	}
@@ -757,12 +770,14 @@ func pickAudio(formats []playerFormat, q Quality, length time.Duration) (playerF
 }
 
 // pickSurround picks the 5.1 surround stream of a video the engine plays,
-// of its original audio track, AC-3 first, then of the most bits, when it
-// has one whose URL plays as given. length is the video's, 0 when unknown.
-func pickSurround(formats []playerFormat, length time.Duration) (best playerFormat, found bool) {
+// of its original audio track, AC-3 first, then of the most bits: when
+// direct, of those whose URL plays as given, else of any, as the TV
+// client's, whose URLs only yt-dlp makes play. length is the video's, 0
+// when unknown.
+func pickSurround(formats []playerFormat, length time.Duration, direct bool) (best playerFormat, found bool) {
 	rank, codec := 0, 0
 	for _, f := range formats {
-		if !f.surround(length) || !f.direct() {
+		if !f.surround(length) || direct && !f.direct() {
 			continue
 		}
 		r, c := f.trackRank(), surroundRank(f.codec())

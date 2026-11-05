@@ -95,23 +95,31 @@ func TestPickSurround(t *testing.T) {
 	}{"English original", true}
 	short := ac3
 	short.ApproxDurationMs = 30000
+	challenged := eac3
+	challenged.URL += "&n=Qm7xKz3vLpW9cT"
 	for _, c := range []struct {
 		name    string
 		formats []playerFormat
 		want    int // the itag, 0 for none
+		listed  int // the itag of any URL, 0 for none
 	}{
-		{"stereo only", []playerFormat{opus}, 0},
-		{"AC-3 before E-AC-3", []playerFormat{opus, eac3, ac3}, 380},
-		{"E-AC-3", []playerFormat{opus, eac3}, 328},
-		{"surround Opus", []playerFormat{opus51}, 0},
-		{"needs yt-dlp", []playerFormat{ciphered}, 0},
-		{"stable volume", []playerFormat{drc}, 0},
-		{"the original track before a dub", []playerFormat{dub, original}, 328},
-		{"cut short", []playerFormat{short}, 0},
+		{"stereo only", []playerFormat{opus}, 0, 0},
+		{"AC-3 before E-AC-3", []playerFormat{opus, eac3, ac3}, 380, 380},
+		{"E-AC-3", []playerFormat{opus, eac3}, 328, 328},
+		{"surround Opus", []playerFormat{opus51}, 0, 0},
+		{"needs yt-dlp", []playerFormat{ciphered}, 0, 380},
+		{"a challenge to solve", []playerFormat{opus, challenged}, 0, 328},
+		{"stable volume", []playerFormat{drc}, 0, 0},
+		{"the original track before a dub", []playerFormat{dub, original}, 328, 328},
+		{"cut short", []playerFormat{short}, 0, 0},
 	} {
-		got, ok := pickSurround(c.formats, 200*time.Second)
+		got, ok := pickSurround(c.formats, 200*time.Second, true)
 		if ok != (c.want != 0) || ok && got.Itag != c.want {
 			t.Errorf("%s: %d, %v", c.name, got.Itag, ok)
+		}
+		got, ok = pickSurround(c.formats, 200*time.Second, false)
+		if ok != (c.listed != 0) || ok && got.Itag != c.listed {
+			t.Errorf("%s, of any URL: %d, %v", c.name, got.Itag, ok)
 		}
 	}
 	// Stereo stays what pickAudio picks.

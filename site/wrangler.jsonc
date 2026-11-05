@@ -1,10 +1,12 @@
 // The site's home on Cloudflare: a Worker that serves the files Zola builds
 // into site/public, at https://mixmusic.functionx.dev, and runs no code of
 // its own. .github/workflows/cloudflare.yml builds and deploys it. To deploy
-// it by hand, build the site with that base URL first:
+// it by hand, build the site with that base URL first, and write its
+// robots.txt as cloudflare.yml does:
 //
 //   go run ./tools/sitedocs
 //   zola --root site build --base-url https://mixmusic.functionx.dev
+//   printf 'User-agent: *\nAllow: /\n\nSitemap: https://mixmusic.functionx.dev/sitemap.xml\n' > site/public/robots.txt
 //   cd site && npx wrangler deploy
 {
   "name": "mixmusic-site",

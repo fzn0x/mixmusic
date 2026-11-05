@@ -1,4 +1,5 @@
 # Security
+<!-- docs: group=project order=50 -->
 
 ## Reporting a vulnerability
 

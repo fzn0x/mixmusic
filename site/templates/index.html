@@ -3,18 +3,39 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MixMusic: Spotify and YouTube Music in one player</title>
-  <meta name="description" content="MixMusic is a free, open-source desktop player for macOS, Windows and Linux: one search, one queue and one library across Spotify and YouTube Music, with themes and plugins from the community." />
+  <title>MixMusic: Spotify and YouTube Music in one desktop player</title>
+  <meta name="description" content="A free, open-source desktop player for macOS, Windows and Linux: one search, queue and library for Spotify and YouTube Music, with lyrics and podcasts." />
   <meta name="theme-color" content="#121212" />
+  <meta name="color-scheme" content="dark" />
   <link rel="icon" type="image/png" href="assets/icon.png" />
   {%- set home = config.base_url | trim_end(pat='/') ~ '/' %}
-  <link rel="canonical" href="{{ home }}" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="MixMusic: Spotify and YouTube Music in one player" />
-  <meta property="og:description" content="One search, one queue and one library across both services, in a free, open-source desktop player you can theme and extend." />
-  <meta property="og:url" content="{{ home }}" />
-  <meta property="og:image" content="{{ get_url(path='assets/og.jpg') }}" />
-  <meta name="twitter:card" content="summary_large_image" />
+  {%- set base = config.extra.canonical_url | trim_end(pat='/') %}
+  {%- set root = base ~ "/" %}
+  {%- set image = base ~ "/assets/og.jpg" %}
+  {%- set social_title = "MixMusic: Spotify and YouTube Music in one desktop player" %}
+  {%- set social_description = "One search, one queue and one library across Spotify and YouTube Music, with lyrics, podcasts and downloads, in a free, open-source desktop player you can theme and extend." %}
+  {%- set social_url = root %}
+  {%- set social_kind = "website" %}
+  {%- set social_base = base %}
+  {% include "partials/social.html" %}
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@graph": [
+    {"@type": "SoftwareApplication",
+     "name": "MixMusic",
+     "url": {{ root | json_encode | safe }},
+     "description": "A free, open-source desktop player for Spotify and YouTube Music: one search, one queue and one library across both, with synced lyrics, podcasts, downloads, themes and plugins.",
+     "applicationCategory": "MultimediaApplication",
+     "operatingSystem": "macOS 12 or later, Windows 10 and 11, Linux",
+     "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+     "isAccessibleForFree": true,
+     "license": ["https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT", "https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL"],
+     "downloadUrl": "https://github.com/fzn0x/mixmusic/releases/latest",
+     "image": {{ image | json_encode | safe }},
+     "author": {"@type": "Organization", "name": "MixMusic contributors", "url": "https://github.com/fzn0x/mixmusic/graphs/contributors"},
+     "sameAs": ["https://github.com/fzn0x/mixmusic"]},
+    {"@type": "WebSite", "name": "MixMusic", "url": {{ root | json_encode | safe }}, "inLanguage": "en"}
+  ]}
+  </script>
   <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
   <script>document.documentElement.className = "js";</script>
@@ -35,6 +56,14 @@
     <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.4-1.2-1.7-1.2-3 0-1 .8-1.6 1.8-1.6H17a3.5 3.5 0 0 0 3.5-3.5c0-4-3.8-7.2-8.5-7.2ZM7.5 11.5h.01M9.5 7.5h.01M14.5 7.5h.01" /></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor" /></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 4.5v15M17 4.5v15" /></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><path d="M9 4.5h6v9H9zM5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5" /></symbol>
+    <symbol id="i-layout" viewBox="0 0 24 24"><path d="M3.5 4.5h17v15h-17zM9 4.5v15M9 13h11.5" /></symbol>
+    <symbol id="i-surround" viewBox="0 0 24 24"><path d="M12 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM8 16a5.6 5.6 0 0 1 0-8M16 8a5.6 5.6 0 0 1 0 8M5 19a10 10 0 0 1 0-14M19 5a10 10 0 0 1 0 14" /></symbol>
+    <symbol id="i-cast" viewBox="0 0 24 24"><path d="M3.5 8V5h17v14h-6M3.5 9.5a9.5 9.5 0 0 1 9.5 9.5M3.5 13.5a5.5 5.5 0 0 1 5.5 5.5M3.5 17.5a1.5 1.5 0 0 1 1.5 1.5" /></symbol>
+    <symbol id="i-notch" viewBox="0 0 24 24"><path d="M2.5 5.5h19v13h-19zM8.5 5.5v1.5a1.5 1.5 0 0 0 1.5 1.5h4a1.5 1.5 0 0 0 1.5-1.5V5.5" /></symbol>
+    <symbol id="i-speed" viewBox="0 0 24 24"><path d="M6 18A8.5 8.5 0 1 1 18 18M12 12l3.5-3.5" /></symbol>
+    <symbol id="i-dislike" viewBox="0 0 24 24"><path d="M16.5 3.5h4v10h-4zM16.5 3.5H7.2a2 2 0 0 0-2 1.6l-1.6 7a2 2 0 0 0 2 2.4H10V18a2.5 2.5 0 0 0 2.5 2.5l4-7Z" /></symbol>
+    <symbol id="i-radio" viewBox="0 0 24 24"><path d="M3.5 5.5h17v13h-17zM10 9v6l5-3z" /></symbol>
     <!-- MixMusic's own icons, as the app draws them (icons.go). -->
     <symbol id="a-home" viewBox="0 0 24 24"><path d="M3.5 11 12 3.5l8.5 7.5M5.5 9.5V20h5v-6h3v6h5V9.5" /></symbol>
     <symbol id="a-search" viewBox="0 0 24 24"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM15.2 15.2 20.5 20.5" /></symbol>
@@ -51,14 +80,17 @@
     <symbol id="a-repeat" viewBox="0 0 24 24"><path d="M4 11V8.5A2.5 2.5 0 0 1 6.5 6H19M16 3l3 3-3 3M20 13v2.5a2.5 2.5 0 0 1-2.5 2.5H5M8 21l-3-3 3-3" /></symbol>
     <symbol id="a-repeatOne" viewBox="0 0 24 24"><path d="M4 11V8.5A2.5 2.5 0 0 1 6.5 6H19M16 3l3 3-3 3M20 13v2.5a2.5 2.5 0 0 1-2.5 2.5H5M8 21l-3-3 3-3M11.5 10.5 13 9.5v5" /></symbol>
     <symbol id="a-heart" viewBox="0 0 24 24"><path d="M12 20.5S3.5 15.2 3.5 9.2A4.7 4.7 0 0 1 12 6.6a4.7 4.7 0 0 1 8.5 2.6c0 6-8.5 11.3-8.5 11.3Z" /></symbol>
+    <symbol id="a-dislike" viewBox="0 0 24 24"><path d="M16.5 3.5h4v10h-4zM16.5 3.5H7.2a2 2 0 0 0-2 1.6l-1.6 7a2 2 0 0 0 2 2.4H10V18a2.5 2.5 0 0 0 2.5 2.5l4-7Z" /></symbol>
     <symbol id="a-queue" viewBox="0 0 24 24"><path d="M3.5 6h11M3.5 11h11M3.5 16h7M17 13.5v7l4.5-3.5z" /></symbol>
     <symbol id="a-lyrics" viewBox="0 0 24 24"><path d="M4.5 5h15v10.5H11l-4.5 4v-4h-2zM8 9h8M8 12h5" /></symbol>
+    <symbol id="a-speed" viewBox="0 0 24 24"><path d="M6 18A8.5 8.5 0 1 1 18 18M12 12l3.5-3.5" /></symbol>
     <symbol id="a-volume" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4zM15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11" /></symbol>
     <symbol id="a-volumeMute" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5" /></symbol>
     <symbol id="a-plus" viewBox="0 0 24 24"><path d="M12 4.5v15M4.5 12h15" /></symbol>
     <symbol id="a-close" viewBox="0 0 24 24"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13" /></symbol>
     <symbol id="a-back" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5M8.5 12H20" /></symbol>
     <symbol id="a-forward" viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5M15.5 12H4" /></symbol>
+    <symbol id="a-refresh" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.5H15" /></symbol>
     <symbol id="a-mini" viewBox="0 0 24 24"><path d="M3.5 5h17v14h-17zM11.5 12h7v5h-7z" /></symbol>
     <symbol id="a-sidebar" viewBox="0 0 24 24"><path d="M3.5 4.5h17v15h-17zM9 4.5v15" /></symbol>
   </svg>
@@ -71,7 +103,8 @@
       </a>
       <nav class="appbar-nav" aria-label="Sections">
         <a href="#features">Features</a>
-        <a href="#customize">Themes and plugins</a>
+        <a href="#new">New</a>
+        <a href="#customize">Layouts and themes</a>
         <a href="#download">Download</a>
         <a href="{{ get_url(path='@/docs/_index.md') }}">Docs</a>
       </nav>
@@ -86,7 +119,7 @@
     <section class="hero" id="top" aria-labelledby="hero-title">
       <div class="hero-copy">
         <h1 id="hero-title">Spotify and YouTube&nbsp;Music <br class="hero-break" />in one player.</h1>
-        <p class="hero-sub">One search across both services, one queue that mixes them and one library that keeps them, in a free, open-source desktop player you can theme and extend.</p>
+        <p class="hero-sub">One search across both services, one queue that mixes them and one library that keeps them, with synced lyrics, podcasts and downloads, in a free, open-source desktop player you can theme and extend.</p>
         <div class="actions">
           <a class="btn btn-filled btn-large" data-download href="https://github.com/fzn0x/mixmusic/releases/latest">
             <svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-download" /></svg>
@@ -100,43 +133,46 @@
         <p class="meta">Version <span data-version>0.5.8</span> · MIT or GPLv3 · macOS, Windows and Linux · YouTube Music needs no account</p>
       </div>
       <figure class="stage stage-hero demo-fallback" style="--glow: #717ed6">
-        <img src="assets/shots/now-playing.webp" width="1536" height="870" fetchpriority="high" alt="The now playing page in the Mochi theme: アイドル by YOASOBI, its cover under the visualizer, and its synced lyrics beside it." />
+        <img src="assets/shots/now-playing.webp" width="1920" height="1058" fetchpriority="high" alt="MixMusic's now playing page in its default look, Blend with the Mix theme: アイドル by YOASOBI, its cover over the visualizer, the player, its synced lyrics with the Translate and Romaji switches, and up next beside them." />
       </figure>
 
       <div class="demo-wrap" data-demo-wrap>
         <div class="app-frame" data-app-frame>
-          <div class="app" role="group" aria-label="A working copy of the MixMusic player, in its default theme, Mix" data-app>
+          <div class="app" role="group" aria-label="A working copy of MixMusic's player in its default look, the Blend layout and the Mix theme" data-app>
             <header class="app-top">
               <div class="app-brand">
-                <svg class="app-rings" width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="12" cy="16" r="8.5" /><circle class="app-rings-accent" cx="20" cy="16" r="8.5" /></svg>
+                <svg class="app-mark" width="26" height="26" aria-hidden="true"><use href="#i-rings" /></svg>
                 <span>mixmusic</span>
-                <span class="a-ico a-quiet" aria-hidden="true"><svg width="18" height="18"><use href="#a-sidebar" /></svg></span>
+                <span class="a-ico a-quiet" aria-hidden="true"><svg width="20" height="20"><use href="#a-sidebar" /></svg></span>
               </div>
-              <button class="a-ico a-btn" type="button" aria-label="Back to now playing" data-back><svg width="18" height="18" aria-hidden="true"><use href="#a-back" /></svg></button>
-              <span class="a-ico a-quiet" aria-hidden="true"><svg width="18" height="18"><use href="#a-forward" /></svg></span>
+              <div class="app-history">
+                <button class="a-ico a-btn" type="button" aria-label="Back to now playing" data-back><svg width="20" height="20" aria-hidden="true"><use href="#a-back" /></svg></button>
+                <span class="a-ico a-quiet" aria-hidden="true"><svg width="20" height="20"><use href="#a-forward" /></svg></span>
+                <span class="a-ico a-quiet" aria-hidden="true"><svg width="20" height="20"><use href="#a-refresh" /></svg></span>
+              </div>
               <label class="app-search">
-                <svg width="16" height="16" aria-hidden="true"><use href="#a-search" /></svg>
-                <input type="search" placeholder="search spotify and youtube music" autocomplete="off" spellcheck="false" aria-label="Search the songs of this demo" data-search />
+                <svg width="18" height="18" aria-hidden="true"><use href="#a-search" /></svg>
+                <input type="search" placeholder="Search Spotify and YouTube Music" autocomplete="off" spellcheck="false" aria-label="Search the songs of this demo" data-search />
               </label>
-              <span class="app-hint" aria-hidden="true">Ctrl+K</span>
+              <span class="app-hint" aria-hidden="true" data-mod-hint>Ctrl+K</span>
             </header>
 
             <nav class="app-rail" aria-hidden="true">
               <ul class="app-nav">
-                <li><span class="app-box"><svg width="18" height="18"><use href="#a-home" /></svg></span>home</li>
-                <li data-rail-search><span class="app-box"><svg width="18" height="18"><use href="#a-search" /></svg></span>search</li>
-                <li><span class="app-box"><svg width="18" height="18"><use href="#a-compass" /></svg></span>explore</li>
-                <li><span class="app-box"><svg width="18" height="18"><use href="#a-library" /></svg></span>library</li>
-                <li><span class="app-box"><svg width="18" height="18"><use href="#a-stats" /></svg></span>stats</li>
-                <li><span class="app-box"><svg width="18" height="18"><use href="#a-store" /></svg></span>marketplace</li>
-                <li><span class="app-box"><svg width="18" height="18"><use href="#a-settings" /></svg></span>settings</li>
+                <li><svg width="22" height="22"><use href="#a-home" /></svg>Home</li>
+                <li data-rail-search><svg width="22" height="22"><use href="#a-search" /></svg>Search</li>
+                <li><svg width="22" height="22"><use href="#a-compass" /></svg>Explore</li>
+                <li><svg width="22" height="22"><use href="#a-library" /></svg>Library</li>
+                <li><svg width="22" height="22"><use href="#a-stats" /></svg>Stats</li>
+                <li><svg width="22" height="22"><use href="#a-store" /></svg>Marketplace</li>
+                <li><svg width="22" height="22"><use href="#a-settings" /></svg>Settings</li>
               </ul>
-              <p class="app-mixes-head"><span>your mixes</span><svg width="16" height="16"><use href="#a-plus" /></svg></p>
+              <p class="app-mixes-head"><span>Your mixes</span><svg width="18" height="18"><use href="#a-plus" /></svg></p>
               <ul class="app-mixes">
-                <li>liked songs<b>18</b></li>
-                <li>late night drive<b>9</b></li>
-                <li>sunday morning<b>7</b></li>
-                <li>deep focus<b>7</b></li>
+                <li>Liked songs<b data-liked-count>0</b></li>
+                <li>Late night drive<b>9</b></li>
+                <li>Sunday morning<b>7</b></li>
+                <li>Deep focus<b>7</b></li>
               </ul>
               <div class="app-live">
                 <img width="76" height="76" src="assets/covers/cover-10.webp" alt="" data-cover />
@@ -146,47 +182,46 @@
 
             <div class="app-pane">
               <section class="app-page" aria-label="Now playing" data-page="now">
-                <h2 class="app-word" data-title-lower>local forecast - elevator</h2>
-                <div class="app-now">
-                  <div class="app-sleeve">
-                    <img width="480" height="480" src="assets/covers/cover-10.webp" alt="" data-cover data-cover-alt />
-                    <canvas width="560" height="186" aria-hidden="true" data-viz></canvas>
+                <h2 class="app-title" data-title>Local Forecast - Elevator</h2>
+                <div class="app-sleeve">
+                  <img width="480" height="480" src="assets/covers/cover-10.webp" alt="" data-cover data-cover-alt />
+                  <canvas width="520" height="174" aria-hidden="true" data-viz></canvas>
+                </div>
+                <div class="app-now-side">
+                  <p class="app-credits"><span data-artist></span><span class="a-dim">·</span><span class="a-dim">incompetech.com</span></p>
+                  <div class="app-progress">
+                    <span data-elapsed>0:00</span>
+                    <div class="a-slider" role="slider" tabindex="0" aria-label="Position in the song" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-seek><span class="a-fill" data-fill></span></div>
+                    <span data-total>0:00</span>
                   </div>
-                  <div class="app-now-side">
-                    <p class="app-credits"><span data-artist></span><span class="a-dim">·</span><span class="a-dim">incompetech.com</span></p>
-                    <div class="app-progress">
-                      <span data-elapsed>0:00</span>
-                      <div class="a-slider" role="slider" tabindex="0" aria-label="Position in the song" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-seek><span class="a-fill" data-fill></span></div>
-                      <span data-total>0:00</span>
-                    </div>
-                    <div class="app-row">
-                      <button class="a-round a-main" type="button" aria-label="Play" data-play><svg class="i-play" width="22" height="22" aria-hidden="true"><use href="#a-play" /></svg><svg class="i-pause" width="22" height="22" aria-hidden="true"><use href="#a-pause" /></svg></button>
-                      <button class="a-round" type="button" aria-label="Next" data-next><svg width="18" height="18" aria-hidden="true"><use href="#a-next" /></svg></button>
+                  <div class="app-row">
+                    <button class="a-round a-main" type="button" aria-label="Play" data-play><svg class="i-play" width="22" height="22" aria-hidden="true"><use href="#a-play" /></svg><svg class="i-pause" width="22" height="22" aria-hidden="true"><use href="#a-pause" /></svg></button>
+                    <button class="a-round" type="button" aria-label="Next" data-next><svg width="18" height="18" aria-hidden="true"><use href="#a-next" /></svg></button>
+                    <span class="app-rate">
                       <button class="a-ico a-btn a-like" type="button" aria-label="Like" aria-pressed="false" data-like><svg width="18" height="18" aria-hidden="true"><use href="#a-heart" /></svg></button>
-                    </div>
-                    <div class="a-seg" aria-hidden="true"><span class="is-on">synced</span><span>plain text</span></div>
-                    <p class="app-empty">This track is instrumental.</p>
+                      <button class="a-ico a-btn a-like" type="button" aria-label="Dislike" aria-pressed="false" data-dislike><svg width="18" height="18" aria-hidden="true"><use href="#a-dislike" /></svg></button>
+                    </span>
                   </div>
+                  <p class="app-empty">This track is instrumental.</p>
                 </div>
               </section>
               <section class="app-page" aria-label="Search" data-page="search" hidden>
-                <h2 class="app-word" data-query></h2>
+                <h2 class="app-title" data-query></h2>
                 <ol class="app-rows" data-results></ol>
               </section>
             </div>
 
             <aside class="app-panel" aria-label="Up next">
               <div class="app-panel-head">
-                <h3 data-panel-title>up next</h3>
-                <span class="a-link" aria-hidden="true" data-panel-clear>clear</span>
-                <span class="a-ico a-quiet" aria-hidden="true"><svg width="16" height="16"><use href="#a-close" /></svg></span>
+                <h3 data-panel-title>Up next</h3>
+                <span class="a-link" aria-hidden="true" data-panel-clear>Clear</span>
+                <span class="a-ico a-quiet" aria-hidden="true"><svg width="18" height="18"><use href="#a-close" /></svg></span>
               </div>
               <div data-panel-queue>
-                <p class="app-cap">now playing</p>
+                <p class="app-cap">Now playing</p>
                 <ol class="app-rows" data-queue></ol>
               </div>
               <div class="app-panel-lyrics" data-panel-lyrics hidden>
-                <div class="a-seg" aria-hidden="true"><span class="is-on">synced</span><span>plain text</span></div>
                 <p class="app-empty">This track is instrumental.</p>
               </div>
             </aside>
@@ -194,8 +229,11 @@
             <footer class="app-bar">
               <div class="app-bar-left">
                 <img width="62" height="62" src="assets/covers/cover-10.webp" alt="" data-cover />
-                <span class="app-bar-text"><b data-title>Local Forecast - Elevator</b><small data-artist></small><small class="a-next" data-next-up></small></span>
-                <button class="a-ico a-btn a-like" type="button" aria-label="Like" aria-pressed="false" data-like><svg width="18" height="18" aria-hidden="true"><use href="#a-heart" /></svg></button>
+                <span class="app-bar-text"><b data-title>Local Forecast - Elevator</b><small><span data-artist></span><span data-speed-note></span></small></span>
+                <span class="app-rate">
+                  <button class="a-ico a-btn a-like" type="button" aria-label="Like" aria-pressed="false" data-like><svg width="18" height="18" aria-hidden="true"><use href="#a-heart" /></svg></button>
+                  <button class="a-ico a-btn a-like" type="button" aria-label="Dislike" aria-pressed="false" data-dislike><svg width="18" height="18" aria-hidden="true"><use href="#a-dislike" /></svg></button>
+                </span>
               </div>
               <div class="app-bar-mid">
                 <div class="app-transport">
@@ -214,6 +252,7 @@
               <div class="app-bar-right">
                 <button class="a-ico a-btn" type="button" aria-label="Lyrics" aria-pressed="false" data-show="lyrics"><svg width="18" height="18" aria-hidden="true"><use href="#a-lyrics" /></svg></button>
                 <button class="a-ico a-btn" type="button" aria-label="Queue" aria-pressed="true" data-show="queue"><svg width="18" height="18" aria-hidden="true"><use href="#a-queue" /></svg></button>
+                <button class="a-ico a-btn a-speed" type="button" aria-label="Speed: 1×. Each click goes to the next step." data-speed><svg width="18" height="18" aria-hidden="true"><use href="#a-speed" /></svg><span data-speed-label></span></button>
                 <button class="a-ico a-btn" type="button" aria-label="Mute" data-mute><svg class="i-vol" width="18" height="18" aria-hidden="true"><use href="#a-volume" /></svg><svg class="i-muted" width="18" height="18" aria-hidden="true"><use href="#a-volumeMute" /></svg></button>
                 <div class="a-slider a-volume" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80" data-volume><span class="a-fill" style="width: 80%"></span></div>
                 <button class="a-ico a-btn" type="button" aria-label="Open the mini player" data-to-mini><svg width="18" height="18" aria-hidden="true"><use href="#a-mini" /></svg></button>
@@ -223,7 +262,7 @@
         </div>
 
         <div class="mini-frame" data-mini-frame>
-          <div class="mini" role="group" aria-label="A working copy of the MixMusic mini player" data-mini>
+          <div class="mini" role="group" aria-label="A working copy of MixMusic's mini player" data-mini>
             <img class="mini-art" width="132" height="132" src="assets/covers/cover-10.webp" alt="" data-cover />
             <div class="mini-body">
               <b class="mini-title" data-title>Local Forecast - Elevator</b>
@@ -233,6 +272,7 @@
                 <button class="a-round a-main mini-toggle" type="button" aria-label="Play" data-play><svg class="i-play" width="18" height="18" aria-hidden="true"><use href="#a-play" /></svg><svg class="i-pause" width="18" height="18" aria-hidden="true"><use href="#a-pause" /></svg></button>
                 <button class="a-ico a-btn" type="button" aria-label="Next" data-next><svg width="18" height="18" aria-hidden="true"><use href="#a-next" /></svg></button>
                 <button class="a-ico a-btn a-like" type="button" aria-label="Like" aria-pressed="false" data-like><svg width="16" height="16" aria-hidden="true"><use href="#a-heart" /></svg></button>
+                <button class="a-ico a-btn a-like" type="button" aria-label="Dislike" aria-pressed="false" data-dislike><svg width="16" height="16" aria-hidden="true"><use href="#a-dislike" /></svg></button>
               </div>
             </div>
             <div class="mini-corner">
@@ -244,7 +284,7 @@
         </div>
 
         <audio preload="none" data-audio></audio>
-        <p class="demo-note">A working copy of MixMusic's player, in its default theme. <span class="note-full">Play, skip, seek, search, or open the mini player.</span><span class="note-mini">Play, skip, or pick a song from up next.</span> Music: “Local Forecast - Elevator”, “Carefree”, “Wallpaper”, “Inspired”, “Fluffing a Duck” and “Monkeys Spinning Monkeys” by Kevin MacLeod (<a href="https://incompetech.com/">incompetech.com</a>), licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, converted to AAC for this page. The covers are made for this page. In the app, every track carries the mark of the service it plays from; these songs play from this site, so they have none.</p>
+        <p class="demo-note">A working copy of MixMusic's player in its default look: the Blend layout, the Mix theme, and an accent that follows the cover playing. <span class="note-full">Play, skip, seek, like or dislike, change the speed, search, or open the mini player.</span><span class="note-mini">Play, skip, or pick a song from up next.</span> Music: “Local Forecast - Elevator”, “Carefree”, “Wallpaper”, “Inspired”, “Fluffing a Duck” and “Monkeys Spinning Monkeys” by Kevin MacLeod (<a href="https://incompetech.com/">incompetech.com</a>), licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, converted to AAC for this page. The covers are made for this page. In the app, every track carries the mark of the service it plays from; these songs play from this site, so they have none.</p>
       </div>
     </section>
 
@@ -292,12 +332,12 @@
 
         <div class="tab-body">
           <figure class="stage stage-tab" data-stage>
-            <img class="stage-img is-shown" data-stage-img src="assets/shots/search.webp" width="1536" height="870" loading="lazy" alt="The search page, with the songs YouTube Music finds for yoasobi, each marked with where it comes from." />
+            <img class="stage-img is-shown" data-stage-img src="assets/shots/search.webp" width="1920" height="1058" loading="lazy" alt="MixMusic's search page for YOASOBI: pivots for songs, albums, artists, playlists and podcasts, and the songs YouTube Music finds, each marked with its service." />
           </figure>
 
-          <div class="panel" role="tabpanel" id="panel-search" aria-labelledby="tab-search" data-shot="search" data-alt="The search page, with the songs YouTube Music finds for yoasobi, each marked with where it comes from.">
+          <div class="panel" role="tabpanel" id="panel-search" aria-labelledby="tab-search" data-shot="search" data-alt="MixMusic's search page for YOASOBI: pivots for songs, albums, artists, playlists and podcasts, and the songs YouTube Music finds, each marked with its service.">
             <h3>One search box for both services</h3>
-            <p>Suggestions come as you type, and the songs, albums, artists and playlists of Spotify and YouTube Music land in the same lists, each with a mark of where it comes from.</p>
+            <p>Suggestions come as you type, and the songs, albums, artists, playlists and podcasts of Spotify and YouTube Music land in the same lists, each with a mark of where it comes from.</p>
             <ul class="marks">
               <li><span class="mark mark-spotify" aria-hidden="true"></span>A disc for Spotify</li>
               <li><span class="mark mark-youtube" aria-hidden="true"></span>A square for YouTube Music</li>
@@ -305,110 +345,199 @@
             <p class="note">YouTube Music needs no account. Spotify joins the same search once you sign in with an app of your own; <a href="{{ get_url(path='@/docs/spotify/index.md') }}">the guide</a> takes two minutes.</p>
           </div>
 
-          <div class="panel" role="tabpanel" id="panel-queue" aria-labelledby="tab-queue" data-shot="home" data-alt="The home page's tiles and recently played, with up next beside them." hidden>
+          <div class="panel" role="tabpanel" id="panel-queue" aria-labelledby="tab-queue" data-shot="home" data-alt="MixMusic's home page: Jump back in, Add Spotify, Liked songs and Your mixes as rounded cards, and Recently played under them." hidden>
             <h3>Tracks of both, in one queue</h3>
-            <p>Play next or add to the queue from any track, album or playlist, then drag to reorder. Shuffle, repeat and crossfade work across both services, and a radio carries on when the queue runs out.</p>
-            <p class="note">With Premium, Spotify tracks play in MixMusic or on a Spotify Connect device. Without it, MixMusic plays their recording from YouTube Music.</p>
+            <p>Play next or add to the queue from any track, album or playlist, then drag to reorder. Shuffle, repeat, crossfade and speed work across both services, a radio carries on when the queue runs out, and the songs you dislike are passed over.</p>
+            <p class="note">With Premium, Spotify tracks play in MixMusic, one after another without a gap, or on a Spotify Connect device. Without it, MixMusic plays their recording from YouTube Music. A cast button sends what plays to a Chromecast or a Google speaker on your network.</p>
           </div>
 
-          <div class="panel" role="tabpanel" id="panel-library" aria-labelledby="tab-library" data-shot="liked" data-alt="The library's liked songs, アイドル playing at the top." hidden>
-            <h3>Liked songs and mixes of every service</h3>
-            <p>Like songs from either service and keep them together. Mixes hold tracks of both, a Spotify or YouTube Music playlist imports into one, and you can search and sort inside any of them.</p>
-            <p class="note">Your history and listening stats, day by day, sit beside them.</p>
+          <div class="panel" role="tabpanel" id="panel-library" aria-labelledby="tab-library" data-shot="liked" data-alt="The library's liked songs, with Play, Shuffle and Download, and pivots for mixes, podcasts, downloads and history." hidden>
+            <h3>Liked songs, mixes, podcasts and downloads</h3>
+            <p>Like songs from either service and keep them together. Mixes hold tracks of both, and a Spotify or YouTube Music playlist imports into one. Library › Podcasts keeps the shows you follow, and Library › Downloads what plays without the network.</p>
+            <p class="note">Your history and listening stats, day by day, sit beside them. Playlists of up to 20,000 tracks load in full.</p>
           </div>
 
-          <div class="panel" role="tabpanel" id="panel-explore" aria-labelledby="tab-explore" data-shot="explore" data-alt="Explore's moods and genres, as tiles." hidden>
+          <div class="panel" role="tabpanel" id="panel-explore" aria-labelledby="tab-explore" data-shot="explore" data-alt="MixMusic's Explore page: new albums and singles, and what's trending, in rows of covers." hidden>
             <h3>Find what you have not heard yet</h3>
             <p>New albums and singles, the charts of your country, and dozens of moods and genres, each opening its playlists. Under now playing, songs, playlists and artists like what you hear.</p>
-            <p class="note">Explore comes from YouTube Music, so it needs no account.</p>
+            <p class="note">Explore comes from YouTube Music, so it needs no account. YouTube's live radio channels play too.</p>
           </div>
 
-          <div class="panel" role="tabpanel" id="panel-lyrics" aria-labelledby="tab-lyrics" data-shot="lyrics" data-alt="The lyrics panel, following アイドル, beside the anime movie nights mix." hidden>
+          <div class="panel" role="tabpanel" id="panel-lyrics" aria-labelledby="tab-lyrics" data-shot="lyrics" data-alt="The lyrics panel beside the library, following アイドル line by line, with its Synced, Translate and Romaji switches." hidden>
             <h3>Lyrics that follow the song</h3>
-            <p>Synced lyrics from Unison, LRCLIB and YouTube Music light up line by line, on now playing or beside any page, or read them whole as plain text.</p>
-            <p class="note">Tune the sound with a 10-band equalizer and its presets, volume levelling and crossfade. What you played is cached for next time.</p>
+            <p>Synced lyrics from Unison, LRCLIB and YouTube Music light up line by line, or word by word where they're timed so, on now playing or beside any page. Translate them, or show Japanese, Korean, Chinese, Russian and many other scripts in Latin letters.</p>
+            <p class="note">Tune the sound with a 10-band equalizer and its presets, volume levelling and crossfade. Tracks YouTube Music has a 5.1 mix of play in surround on a 5.1 system.</p>
           </div>
 
-          <div class="panel" role="tabpanel" id="panel-keyboard" aria-labelledby="tab-keyboard" data-shot="palette" data-alt="The command palette over the home page." hidden>
+          <div class="panel" role="tabpanel" id="panel-keyboard" aria-labelledby="tab-keyboard" data-shot="palette" data-alt="The command palette over the marketplace, listing playback commands and their keys." hidden>
             <h3>Fast at the keyboard, quiet in the background</h3>
             <dl class="keys">
               <div><dt><kbd data-mod>Ctrl</kbd><kbd>K</kbd></dt><dd>Command palette</dd></div>
               <div><dt><kbd>Space</kbd></dt><dd>Play or pause</dd></div>
               <div><dt><kbd data-mod>Ctrl</kbd><kbd>→</kbd></dt><dd>Next track</dd></div>
-              <div><dt><kbd data-mod>Ctrl</kbd><kbd>F</kbd></dt><dd>Search</dd></div>
+              <div><dt><kbd data-mod>Ctrl</kbd><kbd>D</kbd></dt><dd>Dislike the song playing</dd></div>
             </dl>
-            <p class="note">Every key is yours to change. The tray, media keys, notifications, a mini player and start at login do the everyday work while the window stays closed.</p>
+            <p class="note">Every key is yours to change, and global shortcuts of your own work from any app. The tray, media keys, notifications, a mini player and start at login do the everyday work while the window stays closed.</p>
           </div>
 
-          <div class="panel" role="tabpanel" id="panel-accounts" aria-labelledby="tab-accounts" data-shot="accounts" data-alt="Settings › Accounts, with the steps to sign in to Spotify." hidden>
+          <div class="panel" role="tabpanel" id="panel-accounts" aria-labelledby="tab-accounts" data-shot="accounts" data-alt="Settings › Accounts, with the four steps to sign in to Spotify." hidden>
             <h3>Your own music comes along</h3>
-            <p>Sign in to YouTube Music on Google's own page for your home feed and library, or to Spotify with an app of your own. Likes and saves reach the service too.</p>
+            <p>Sign in to YouTube Music on Google's own page, or import the sign-in of a browser you use, for your home feed and library, and to Spotify with an app of your own. Likes and saves reach the service too.</p>
             <p class="note">Last.fm gets every track you hear, and Discord shows what plays on your profile.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section walkthrough" id="walkthrough" aria-labelledby="walkthrough-title" style="--glow: #717ed6">
+    <section class="section" id="new" aria-labelledby="new-title">
       <div class="section-head">
-        <h2 id="walkthrough-title">A minute in the player</h2>
-        <p class="lead">Page by page, from home to the sleep timer, in the Mochi theme, with sound.</p>
+        <h2 id="new-title">New in 0.5.9</h2>
+        <p class="lead">Podcasts, layouts, downloads and lyrics in your language came with the latest release, and more besides. The <a href="https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md">changelog</a> has all of it.</p>
+      </div>
+      <ul class="bento">
+        <li class="tile tile-wide">
+          <div class="tile-art tile-art-lyrics" aria-hidden="true">
+            <p class="ly ly-past">朝ごはんを食べた</p>
+            <p class="ly ly-now"><span class="ly-sung">今日は</span>いい天気</p>
+            <p class="ly ly-roman">kyō wa ii tenki</p>
+            <p class="ly ly-trans">The weather is nice today</p>
+          </div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-lyrics" /></svg>Lyrics in your language</h3>
+          <p>Turn on translate beside the lyrics and each line shows its translation under it. Japanese can show in romaji, and Korean, Chinese, Russian, Hindi, Thai and other scripts in Latin letters, made on your computer. Lyrics timed word by word light each word as it's sung.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-mic" /></svg>Podcasts</h3>
+          <p>Shows and episodes from YouTube Music and Spotify, in search and in Library › Podcasts. An episode starts where you left it, on another device too, with a speed of its own.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-download" /></svg>Downloads</h3>
+          <p>Download songs, albums, playlists, mixes and your liked songs, and they play without the network. Songs added to a downloaded playlist later download on their own.</p>
+        </li>
+        <li class="tile tile-tall">
+          <div class="tile-art tile-art-layouts" aria-hidden="true">
+            <span class="mini-look" data-l="blend"><i></i><i></i><i></i></span>
+            <span class="mini-look" data-l="expressive"><i></i><i></i><i></i></span>
+            <span class="mini-look" data-l="crate"><i></i><i></i><i></i></span>
+            <span class="mini-look" data-l="tiles"><i></i><i></i><i></i></span>
+          </div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-layout" /></svg>Layouts</h3>
+          <p>Blend, the new default, Expressive, Crate and Tiles, MixMusic's look until now. Each sets shapes, density, headings and motion apart from the theme, and every theme shows in every layout.</p>
+          <a class="link" href="#customize">See them below</a>
+        </li>
+        <li class="tile">
+          <div class="tile-art tile-art-chip" aria-hidden="true"><span>5.1</span></div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-surround" /></svg>5.1 surround</h3>
+          <p>A track YouTube Music has a 5.1 mix of shows a 5.1 button by the player: six channels on a 5.1 system, mixed down to stereo on headphones.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-cast" /></svg>Casting</h3>
+          <p>Send what plays to a Chromecast, a Google Home or Nest speaker, or a TV with Chromecast built in. The queue stays in MixMusic, and the device's own buttons work.</p>
+        </li>
+        <li class="tile tile-wide">
+          <div class="tile-art tile-art-notch" aria-hidden="true">
+            <span class="notch"><img src="assets/covers/cover-14.webp" width="480" height="480" alt="" loading="lazy" /><i></i><b><s></s><s></s><s></s><s></s></b></span>
+          </div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-notch" /></svg>A player around the notch</h3>
+          <p>On a MacBook with a notch, the black around the camera widens with the cover and bars that move as it plays. Click it for the player, the progress and the line of lyrics sung now, over any app, full screen too.</p>
+        </li>
+        <li class="tile">
+          <div class="tile-art tile-art-chip" aria-hidden="true"><span>1.25×</span></div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-speed" /></svg>Speed</h3>
+          <p>From half speed to three times, at the song's own pitch, from the speed button by the player or the command palette.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-keyboard" /></svg>Global shortcuts</h3>
+          <p>Keys of your own that play, skip, change the volume or like a song from any app, recorded in Settings › Shortcuts.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-dislike" /></svg>Dislikes</h3>
+          <p>The thumbs-down passes over a song from then on, in the queue and in radios. Signed in to YouTube Music, your dislikes go there too. Songs YouTube labels as made with AI can be skipped as well.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-radio" /></svg>Live streams and music videos</h3>
+          <p>YouTube's 24/7 radio channels play live, and music videos can show their picture on the now playing page, muted and in step with the sound.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="section walkthrough" id="video" aria-labelledby="video-title" style="--glow: #8f7ce0">
+      <div class="section-head">
+        <h2 id="video-title">MixMusic in 80 seconds</h2>
+        <p class="lead">Search, word-by-word lyrics, romaji and translation, the four layouts, colours from the cover, the library and downloads, podcasts and the rest of 0.5.9, with sound.</p>
       </div>
       <figure class="video">
-        <video src="assets/walkthrough.mp4" poster="assets/walkthrough.webp" width="1920" height="1080" playsinline preload="metadata" aria-label="The walkthrough: a minute in MixMusic, page by page, in the Mochi theme" data-walkthrough></video>
+        <video src="assets/promo.mp4" poster="assets/promo-poster.webp" width="1920" height="1080" playsinline preload="metadata" aria-label="MixMusic's promo video: 80 seconds of MixMusic 0.5.9 in the Blend layout, narrated" data-walkthrough></video>
       </figure>
       <div class="player">
-        <button class="play" type="button" aria-label="Play the walkthrough" data-play><svg class="icon i-play" width="22" height="22" aria-hidden="true"><use href="#i-play" /></svg><svg class="icon i-pause" width="22" height="22" aria-hidden="true"><use href="#i-pause" /></svg></button>
-        <div class="scrub" role="slider" tabindex="0" aria-label="Position in the walkthrough" aria-valuemin="0" aria-valuemax="63" aria-valuenow="0" aria-valuetext="0:00 of 1:02" data-scrub><span class="scrub-fill" data-scrub-fill></span></div>
-        <span class="time" data-time>0:00 / 1:02</span>
+        <button class="play" type="button" aria-label="Play the video" data-play><svg class="icon i-play" width="22" height="22" aria-hidden="true"><use href="#i-play" /></svg><svg class="icon i-pause" width="22" height="22" aria-hidden="true"><use href="#i-pause" /></svg></button>
+        <div class="scrub" role="slider" tabindex="0" aria-label="Position in the video" aria-valuemin="0" aria-valuemax="80" aria-valuenow="0" aria-valuetext="0:00 of 1:20" data-scrub><span class="scrub-fill" data-scrub-fill></span></div>
+        <span class="time" data-time>0:00 / 1:20</span>
       </div>
-      <div class="chips" role="group" aria-label="Chapters of the walkthrough" data-chapters>
-        <button class="chip is-current" type="button" aria-current="true" data-at="0">Home</button>
-        <button class="chip" type="button" data-at="4">Now playing</button>
-        <button class="chip" type="button" data-at="9">Search</button>
-        <button class="chip" type="button" data-at="18.1">Library</button>
-        <button class="chip" type="button" data-at="27.2">Explore</button>
-        <button class="chip" type="button" data-at="30.2">Stats</button>
-        <button class="chip" type="button" data-at="33.2">Palette</button>
-        <button class="chip" type="button" data-at="36.3">Themes</button>
-        <button class="chip" type="button" data-at="52.9">Plugins</button>
+      <div class="chips" role="group" aria-label="Chapters of the video" data-chapters>
+        <button class="chip is-current" type="button" aria-current="true" data-at="0">Intro</button>
+        <button class="chip" type="button" data-at="7.4">Meet MixMusic</button>
+        <button class="chip" type="button" data-at="14.6">Search</button>
+        <button class="chip" type="button" data-at="19.6">Word by word</button>
+        <button class="chip" type="button" data-at="23.8">Romaji</button>
+        <button class="chip" type="button" data-at="28.6">Translate</button>
+        <button class="chip" type="button" data-at="32.8">Layouts</button>
+        <button class="chip" type="button" data-at="39.4">Cover colours</button>
+        <button class="chip" type="button" data-at="42.2">Library</button>
+        <button class="chip" type="button" data-at="51">Podcasts</button>
+        <button class="chip" type="button" data-at="56.6">And more</button>
+        <button class="chip" type="button" data-at="65.8">Get it</button>
       </div>
-      <p class="note">The music you hear is royalty-free, by Kevin MacLeod (<a href="https://incompetech.com/">incompetech.com</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>), because we can't use copyrighted songs on our website or in our README.</p>
+      <p class="note">The voice and the music were made for this video with ElevenLabs, on Higgsfield. The songs on screen play silently, because we can't use copyrighted songs on our website.</p>
     </section>
 
     <section class="section" id="customize" aria-labelledby="customize-title">
       <div class="section-head">
         <h2 id="customize-title">Make it yours</h2>
-        <p class="lead">The whole look is a theme. Ten ship with the app, and the community makes more.</p>
+        <p class="lead">A layout sets the shapes, the density and the headings; a theme sets the colours, the type and the corners. Choose any of each in Settings › Appearance.</p>
       </div>
 
-      <div class="gallery" data-gallery style="--glow: #00bde3">
+      <div class="gallery" data-gallery>
         <figure class="stage stage-gallery">
-          <img class="gallery-img is-shown" src="assets/shots/theme-mix.webp" width="1440" height="844" loading="lazy" alt="The home page in the Mix theme." />
+          <img class="gallery-img is-shown" src="assets/shots/theme-mix.webp" width="1920" height="1058" loading="lazy" alt="MixMusic's home page in the Mix theme and the Blend layout." />
         </figure>
         <div class="gallery-side">
-          <p class="gallery-caption"><strong data-gallery-name>Mix</strong> <span data-gallery-desc>The default: flat colour tiles and giant lowercase on true black.</span></p>
-          <div class="chips chips-themes" role="group" aria-label="Choose a theme to preview">
-            <button class="chip chip-theme is-current" type="button" aria-pressed="true" data-theme="mix" data-name="Mix" data-desc="The default, flat colour tiles and giant lowercase on true black." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#00bde3"></i><i style="background:#e6007e"></i><i style="background:#a4e600"></i><i style="background:#ffb000"></i></span>Mix</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="aurora" data-name="Aurora" data-desc="Frosted glass panels over slowly drifting northern lights." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#4ee6c0"></i><i style="background:#7b5cff"></i><i style="background:#3fa9ff"></i><i style="background:#ff6b9a"></i></span>Aurora</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="daylight" data-name="Daylight" data-desc="Black ink and deep tiles on white, for bright rooms." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#0078d7"></i><i style="background:#c30052"></i><i style="background:#107c10"></i><i style="background:#ca5010"></i></span>Daylight</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="midnight" data-name="Midnight" data-desc="True black for OLED screens, with a coral accent." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#ff5a7a"></i><i style="background:#7b5cff"></i><i style="background:#00c2a8"></i><i style="background:#ffb000"></i></span>Midnight</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="sakura" data-name="Sakura" data-desc="Cherry blossom pinks on paper white." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#e0457b"></i><i style="background:#f7a8c4"></i><i style="background:#9fd6c2"></i><i style="background:#f9c784"></i></span>Sakura</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="terminal" data-name="Terminal" data-desc="Green phosphor on black, in a monospaced font." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#39ff14"></i><i style="background:#1f8f1f"></i><i style="background:#b8ffb0"></i><i style="background:#ffb000"></i></span>Terminal</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="greenroom" data-name="Greenroom" data-desc="A charcoal backstage lit by one jade light, washed in the colour of the cover playing." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#0e7c58"></i><i style="background:#8b2a73"></i><i style="background:#2a4bb8"></i><i style="background:#b9461a"></i></span>Greenroom</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="glasshouse" data-name="Glasshouse" data-desc="White glass and a rose-red accent, frosted over the colours of the cover." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#e11d48"></i><i style="background:#7c3aed"></i><i style="background:#0369a1"></i><i style="background:#0f766e"></i></span>Glasshouse</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="anime" data-name="Anime" data-desc="Summer-sky blues and cel colours, with speed lines that burst as each track starts." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#5cc8ff"></i><i style="background:#ffa040"></i><i style="background:#ff8fcf"></i><i style="background:#63d98b"></i></span>Anime</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="mochi" data-name="Mochi" data-desc="Kawaii candy pastels, round as mochi, with sparkles drifting up." data-meta="built in"><span class="dots" aria-hidden="true"><i style="background:#ffb5d3"></i><i style="background:#cdb9ff"></i><i style="background:#a9ead5"></i><i style="background:#ffe08a"></i></span>Mochi</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="neon-nights" data-name="Neon Nights" data-desc="Electric magenta and violet tiles on deep indigo, from the community." data-meta="community"><span class="dots" aria-hidden="true"><i style="background:#ff3ea5"></i><i style="background:#8a5cff"></i><i style="background:#22d3ee"></i><i style="background:#ffd23e"></i></span>Neon Nights</button>
-            <button class="chip chip-theme" type="button" aria-pressed="false" data-theme="paper-mint" data-name="Paper Mint" data-desc="A quiet light theme of graphite ink, mint and coral tiles, from the community." data-meta="community"><span class="dots" aria-hidden="true"><i style="background:#0c7a5d"></i><i style="background:#c4473a"></i><i style="background:#3d6fb6"></i><i style="background:#8a6510"></i></span>Paper Mint</button>
+          <p class="gallery-caption" aria-live="polite"><strong data-gallery-name>Mix, in the Blend layout</strong> <span data-gallery-desc>The default: true black and greys, with cyan for everything live.</span></p>
+          <div class="look-group">
+            <p class="look-label" id="layout-label">Layout</p>
+            <div class="chips" role="group" aria-labelledby="layout-label">
+              <button class="chip is-current" type="button" aria-pressed="true" data-kind="layout" data-id="blend" data-name="Blend" data-desc="The default since 0.5.9: rounded shapes and springy motion, dense rows of big covers in cards, under bold headings.">Blend</button>
+              <button class="chip" type="button" aria-pressed="false" data-kind="layout" data-id="expressive" data-name="Expressive" data-desc="After Material 3 Expressive: tonal fills, pill buttons and chips, large rounded cards, a floating player bar and springs.">Expressive</button>
+              <button class="chip" type="button" aria-pressed="false" data-kind="layout" data-id="crate" data-name="Crate" data-desc="Dense and restrained, with big covers in cards and bold, tight headings, so that the covers do the work.">Crate</button>
+              <button class="chip" type="button" aria-pressed="false" data-kind="layout" data-id="tiles" data-name="Tiles" data-desc="MixMusic's look until 0.5.9: flat colour tiles, giant lowercase words and outlined boxes.">Tiles</button>
+            </div>
           </div>
+          <div class="look-group">
+            <p class="look-label" id="theme-label">Theme</p>
+            <div class="chips chips-themes" role="group" aria-labelledby="theme-label">
+              <button class="chip chip-theme is-current" type="button" aria-pressed="true" data-kind="theme" data-id="mix" data-name="Mix" data-desc="The default: true black and greys, with cyan for everything live."><span class="dots" aria-hidden="true"><i style="background:#000000"></i><i style="background:#00bde3"></i><i style="background:#e6007e"></i></span>Mix</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="aurora" data-name="Aurora" data-desc="Frosted glass panels over slowly drifting northern lights."><span class="dots" aria-hidden="true"><i style="background:#070a16"></i><i style="background:#4ee6c0"></i><i style="background:#7b5cff"></i></span>Aurora</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="daylight" data-name="Daylight" data-desc="Black ink and deep colours on white, for bright rooms."><span class="dots" aria-hidden="true"><i style="background:#ffffff"></i><i style="background:#0078d7"></i><i style="background:#c30052"></i></span>Daylight</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="midnight" data-name="Midnight" data-desc="True black for OLED screens, with a coral accent."><span class="dots" aria-hidden="true"><i style="background:#000000"></i><i style="background:#ff5a7a"></i><i style="background:#7b5cff"></i></span>Midnight</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="material-dark" data-name="Material Dark" data-desc="Material's dynamic colour: every colour made of the cover playing, in Roboto Flex."><span class="dots" aria-hidden="true"><i style="background:#171213"></i><i style="background:#ffb0c9"></i><i style="background:#8e004b"></i></span>Material Dark</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="material" data-name="Material" data-desc="Material's dynamic colour, light: every colour made of the cover playing, in Roboto Flex."><span class="dots" aria-hidden="true"><i style="background:#fff8f8"></i><i style="background:#b90064"></i><i style="background:#ffd9e2"></i></span>Material</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="walnut" data-name="Walnut" data-desc="Walnut-dark neutrals lit by tangerine, with heavy condensed headings."><span class="dots" aria-hidden="true"><i style="background:#24160b"></i><i style="background:#fa8927"></i><i style="background:#17655f"></i></span>Walnut</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="walnut-light" data-name="Walnut Light" data-desc="Walnut by day: warm paper lit by tangerine, with heavy condensed headings."><span class="dots" aria-hidden="true"><i style="background:#f9f2e9"></i><i style="background:#973900"></i><i style="background:#6b3584"></i></span>Walnut Light</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="sakura" data-name="Sakura" data-desc="Cherry blossom pinks on paper white."><span class="dots" aria-hidden="true"><i style="background:#fff5f7"></i><i style="background:#e0457b"></i><i style="background:#9fd6c2"></i></span>Sakura</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="greenroom" data-name="Greenroom" data-desc="A charcoal backstage lit by one jade light, the cover's colour washing down from the top."><span class="dots" aria-hidden="true"><i style="background:#0e1411"></i><i style="background:#2be09c"></i><i style="background:#8b2a73"></i></span>Greenroom</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="glasshouse" data-name="Glasshouse" data-desc="White glass and a rose-red accent, frosted over the colours of the cover."><span class="dots" aria-hidden="true"><i style="background:#f8f2f4"></i><i style="background:#e11d48"></i><i style="background:#7c3aed"></i></span>Glasshouse</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="anime" data-name="Anime" data-desc="Summer-sky blues and cel colours, with speed lines that streak when the track changes."><span class="dots" aria-hidden="true"><i style="background:#eaf6ff"></i><i style="background:#f0501f"></i><i style="background:#5cc8ff"></i></span>Anime</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="mochi" data-name="Mochi" data-desc="Kawaii candy pastels, round as mochi, with sparkles drifting up."><span class="dots" aria-hidden="true"><i style="background:#fff6fa"></i><i style="background:#cc3d82"></i><i style="background:#cdb9ff"></i></span>Mochi</button>
+              <button class="chip chip-theme" type="button" aria-pressed="false" data-kind="theme" data-id="terminal" data-name="Terminal" data-desc="Green phosphor on black, in a monospaced font."><span class="dots" aria-hidden="true"><i style="background:#030603"></i><i style="background:#39ff14"></i><i style="background:#1f8f1f"></i></span>Terminal</button>
+            </div>
+          </div>
+          <p class="note">Each theme is shown in Blend, and each layout in Mix; every theme works in every layout. With Follow the artwork on, as it is at first, the accent takes the colour of the cover playing. More themes, as Neon Nights and Paper Mint, install from the marketplace.</p>
         </div>
       </div>
 
       <div class="columns">
         <div class="column">
           <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-palette" /></svg>Make a theme</h3>
-          <p>A theme is a folder with a <code>theme.json</code>: eighteen colours, the fonts and a corner radius. MixMusic draws everything with them, so a theme keeps working as the app changes. Let it follow your computer, with one theme for light mode and one for dark.</p>
+          <p>A theme is a folder with a <code>theme.json</code>: eighteen colours, the fonts and a corner radius. MixMusic draws everything with them, in every layout, so a theme keeps working as the app changes. Let it follow your computer, with one theme for light mode and one for dark, or wear the colours pywal or matugen make of your wallpaper.</p>
           <a class="link" href="{{ get_url(path='@/docs/themes/index.md') }}">Theme guide<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
         </div>
         <div class="column">
@@ -458,22 +587,23 @@
           <div><dt>First launch</dt><dd>The macOS app is not notarized yet: open it once from System Settings › Privacy &amp; Security › Open Anyway. The Windows installer is not signed yet: if SmartScreen warns, choose More info › Run anyway.</dd></div>
           <div><dt>Linux</dt><dd>GTK 3, and PulseAudio (which PipeWire serves too) or ALSA; signing in to YouTube Music takes WebKitGTK 4.1. On Debian and Ubuntu: <code>sudo apt install libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0</code>. The Flatpak, for x64, needs only Flatpak, and brings the rest with it.</dd></div>
         </dl>
-        <p class="note">Check each file against <code>SHA256SUMS</code> in the release. Older versions are on the <a href="https://github.com/fzn0x/mixmusic/releases">releases page</a> too.</p>
+        <p class="note">Check each file against <code>SHA256SUMS</code> in the release. Older versions are on the <a href="https://github.com/fzn0x/mixmusic/releases">releases page</a> too. <a href="{{ get_url(path='@/docs/troubleshooting/index.md') }}">Troubleshooting</a> helps when something doesn't work.</p>
       </div>
     </section>
 
     <section class="section section-open" id="open-source" aria-labelledby="open-title">
       <div class="open-copy">
         <h2 id="open-title">Built in the open</h2>
-        <p>MixMusic is open source under the MIT license or the GNU GPL, version 3: one small Go program built on MyGo, which draws its windows itself on the GPU, with no browser inside. Fixes, features, themes, plugins and reports of what does not work are all welcome.</p>
+        <p>MixMusic is open source under the MIT license or the GNU GPL, version 3: one Go program built on MyGo, which draws its windows itself on the GPU, with no browser inside. Fixes, features, themes, plugins and reports of what does not work are all welcome.</p>
+        <a class="link" href="{{ get_url(path='@/docs/_index.md') }}">Read the docs<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
       </div>
       <ul class="links">
-        <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CONTRIBUTING.md"><strong>Contributing</strong><span>Build it, check it, open a pull request</span></a></li>
+        <li><a href="{{ get_url(path='@/docs/contributing/index.md') }}"><strong>Contributing</strong><span>Build it, check it, open a pull request</span></a></li>
         <li><a href="https://github.com/fzn0x/mixmusic/issues"><strong>Issues</strong><span>Report a bug or ask for a feature</span></a></li>
         <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md"><strong>Changelog</strong><span>What changed in each release</span></a></li>
         <li><a href="{{ get_url(path='@/docs/architecture/index.md') }}"><strong>Architecture</strong><span>Where everything lives</span></a></li>
-        <li><a href="https://github.com/fzn0x/mixmusic/blob/main/CODE_OF_CONDUCT.md"><strong>Code of conduct</strong><span>How we work together</span></a></li>
-        <li><a href="https://github.com/fzn0x/mixmusic/blob/main/SECURITY.md"><strong>Security</strong><span>Report a vulnerability privately</span></a></li>
+        <li><a href="{{ get_url(path='@/docs/code-of-conduct/index.md') }}"><strong>Code of conduct</strong><span>How we work together</span></a></li>
+        <li><a href="{{ get_url(path='@/docs/security/index.md') }}"><strong>Security</strong><span>Report a vulnerability privately</span></a></li>
       </ul>
     </section>
   </main>

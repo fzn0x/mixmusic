@@ -1,12 +1,19 @@
 {% extends "base.html" %}
 
-{%- block title %}Not found · MixMusic{% endblock title %}
+{%- block title %}Page not found · MixMusic{% endblock title %}
+{%- block description %}This page of the MixMusic site isn't here. The home page and the docs have the rest.{% endblock description %}
+{%- block meta %}
+  <meta name="robots" content="noindex" />
+{%- endblock meta %}
 
-{%- block content %}
-  <div class="docs docs-missing">
-    <article class="prose">
-      <h1>This page isn't here</h1>
-      <p>It may have moved. The <a href="{{ config.base_url | trim_end(pat='/') ~ '/' }}">home page</a> and the <a href="{{ get_url(path='@/docs/_index.md') }}">docs</a> have the rest.</p>
-    </article>
-  </div>
-{%- endblock content %}
+{%- block body %}
+  <main id="content" class="missing">
+    <p class="missing-code" aria-hidden="true">404</p>
+    <h1>This page isn't here</h1>
+    <p>It may have moved, or its address may be mistyped. The home page and the docs have the rest.</p>
+    <div class="missing-actions">
+      <a class="btn btn-filled" href="{{ config.base_url | trim_end(pat='/') ~ '/' }}">Home page</a>
+      <a class="btn btn-tonal" href="{{ get_url(path='@/docs/_index.md') }}">Docs</a>
+    </div>
+  </main>
+{%- endblock body %}

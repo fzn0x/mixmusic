@@ -37,6 +37,15 @@ func (s *shell) playerBar(c *ui.Context) {
 	})
 }
 
+// barRoom is the height the player bar takes at the window's foot, with
+// the margin under it when it floats.
+func (k *look) barRoom() float32 {
+	if k.floating {
+		return k.player + floatMargin
+	}
+	return k.player
+}
+
 func (s *shell) nowPlayingInfo(c *ui.Context) {
 	k := &s.lk
 	cur, ok := s.st.Current()

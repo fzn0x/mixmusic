@@ -1,4 +1,5 @@
 # Architecture
+<!-- docs: group=project order=60 -->
 
 MixMusic is one Go program. [MyGo](https://github.com/egoist/mygo) draws its
 windows in Go, with its `ui` package: immediate-mode views, which the GPU

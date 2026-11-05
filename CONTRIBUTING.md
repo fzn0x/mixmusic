@@ -1,4 +1,5 @@
 # Contributing
+<!-- docs: group=project order=10 -->
 
 Thank you for helping. There are three ways in: themes and plugins for the
 community registry, fixes and features of the app, and reports of what does

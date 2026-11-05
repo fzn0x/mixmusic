@@ -74,6 +74,18 @@ func (s *shell) toggleRail() {
 	}
 }
 
+// The rail's parts are railGap apart, over its foot's padding of railFoot,
+// and the mixes take mixesLeast at least: their title and a mix and a
+// half. In a short window the entries of tonal controls tighten as far as
+// tightEntry, the least height Apple's guidelines give what is clicked,
+// to keep the live tile's room.
+const (
+	railGap    = 24
+	railFoot   = 16
+	mixesLeast = 88
+	tightEntry = 44
+)
+
 // rail is the sidebar: where to go, the user's mixes, and a live tile of
 // what plays.
 func (s *shell) rail(c *ui.Context) {
@@ -85,23 +97,32 @@ func (s *shell) rail(c *ui.Context) {
 	if collapsed {
 		pad = 17
 	}
-	ui.Column(c).Width(s.railWidth()).Shrink(0).Padding(0, pad, 16).Gap(24).Background(k.bg).Clip().Children(func() {
-		s.brand(c, collapsed, s.railWidth()-2*pad)
-		ui.Column(c).Gap(4).Shrink(0).Children(func() {
+	items := s.plugins.SidebarItems()
+	entries := float32(len(nav) + len(items))
+	navLeast := entries*s.leastEntry() + (entries-1)*4
+	ui.Column(c).Width(s.railWidth()).Shrink(0).Padding(0, pad, railFoot).Gap(railGap).Background(k.bg).Clip().Children(func() {
+		least := s.brand(c, collapsed, s.railWidth()-2*pad) + railGap + navLeast + railGap + railFoot
+		// Where the rail is short, and only there, as the mixes grow from
+		// nothing into the rest, the entries give some of their height.
+		ui.Column(c).Gap(4).MinHeight(navLeast).Children(func() {
 			for _, n := range nav {
 				s.navEntry(c, "nav-"+n.id, k.words(n.label), icon(n.icon), n.path, n.id == current)
 			}
-			for _, it := range s.plugins.SidebarItems() {
+			for _, it := range items {
 				s.navEntry(c, "plugin-"+it.ID, k.words(it.Label), s.svgOf(it.Icon), it.Path, path == it.Path)
 			}
 		})
 		if !collapsed {
 			s.mixes(c, path)
+			least += mixesLeast
 		} else {
 			ui.Spacer(c)
 		}
+		// The live tile shows where the rail has room for it whole, with
+		// the entries tight and the mixes short, above the player bar,
+		// which covered it in a short window when the rail ran on (#258).
 		_, h := c.Size()
-		if h >= 720 {
+		if h-k.barRoom()-least >= railGap+liveSize(collapsed) {
 			s.liveTile(c, collapsed)
 		}
 	})
@@ -128,11 +149,12 @@ func mustSVG(data []byte) *ui.SVG {
 // the rail's width inside its padding. On macOS the window's buttons take
 // the left of that row, where the name doesn't fit beside them, nor the
 // button in the folded rail (#247): the row keeps them, and the button
-// where it fits, and the mark and name go under it.
-func (s *shell) brand(c *ui.Context, collapsed bool, inner float32) {
+// where it fits, and the mark and name go under it. It tells its height.
+func (s *shell) brand(c *ui.Context, collapsed bool, inner float32) float32 {
 	bar := c.TitleBar()
+	tall := max(bar.Height, 48)
 	band := func(children func()) {
-		row := ui.Row(c).Height(max(bar.Height, 48)).Shrink(0).Padding(0, 0, 0, bar.Left).Gap(12)
+		row := ui.Row(c).Height(tall).Shrink(0).Padding(0, 0, 0, bar.Left).Gap(12)
 		if bar.Height > 0 {
 			row.DragWindow()
 		}
@@ -147,7 +169,7 @@ func (s *shell) brand(c *ui.Context, collapsed bool, inner float32) {
 			}
 			s.railButton(c, collapsed)
 		})
-		return
+		return tall
 	}
 	beside := inner-bar.Left >= 12+32
 	ui.Column(c).Shrink(0).Children(func() {
@@ -173,6 +195,10 @@ func (s *shell) brand(c *ui.Context, collapsed bool, inner float32) {
 			}
 		})
 	})
+	if collapsed && beside {
+		return tall
+	}
+	return tall + 40
 }
 
 // logo is MixMusic's mark, and its name in what is left of room DIPs.
@@ -282,14 +308,28 @@ func (s *shell) navEntry(c *ui.Context, key, label string, svg *ui.SVG, path str
 	})
 }
 
+// tonalEntry is the height of a page's entry in the rail of tonal
+// controls.
+func (k *look) tonalEntry() float32 { return min(56, k.row-8) }
+
+// leastEntry is the least height of a page's entry in the rail: a tonal
+// one tightens to tightEntry in a short window, and an outlined one keeps
+// its box.
+func (s *shell) leastEntry() float32 {
+	if s.lk.tonal {
+		return min(s.lk.tonalEntry(), tightEntry)
+	}
+	return 42
+}
+
 // tonalNav is a page of the rail as tonal controls show it: its icon and
 // label, the current one on an indicator in the fill of what is chosen,
 // which grows from the middle on the theme's spring as it becomes current.
 func (s *shell) tonalNav(c *ui.Context, key, label string, svg *ui.SVG, path string, current bool) {
 	k := &s.lk
 	folded := s.railFolded()
-	h := min(56, k.row-8)
-	row := s.buttonBase(c.Key(key)).Height(h).Gap(14).Padding(0, 16).Justify(ui.Start).Label(label).Cursor(ui.CursorPointer)
+	h := k.tonalEntry()
+	row := s.buttonBase(c.Key(key)).Height(h).MinHeight(s.leastEntry()).Shrink(1).Gap(14).Padding(0, 16).Justify(ui.Start).Label(label).Cursor(ui.CursorPointer)
 	if folded {
 		row.Tooltip(label).Padding(0).Justify(ui.Center)
 	}
@@ -332,7 +372,7 @@ func (s *shell) tonalNav(c *ui.Context, key, label string, svg *ui.SVG, path str
 // mixes lists liked songs and the user's mixes, with their counts.
 func (s *shell) mixes(c *ui.Context, path string) {
 	k := &s.lk
-	ui.Column(c).Grow(1).MinHeight(88).Children(func() {
+	ui.Column(c).Grow(1).MinHeight(mixesLeast).Children(func() {
 		ui.Row(c).Justify(ui.SpaceBetween).Margin(0, 0, 8).Children(func() {
 			ui.Text(c, k.words("Your mixes")).FontSize(k.bodySize()).TextColor(k.accent)
 			if s.iconButton(c, "new-mix", "plus", "New mix", false, 18).Clicked() {
@@ -380,6 +420,15 @@ func (s *shell) newMix() {
 	})
 }
 
+// liveSize is the size of the live tile's artwork, and its height: the
+// line it shows while nothing plays is shorter.
+func liveSize(collapsed bool) float32 {
+	if collapsed {
+		return 42
+	}
+	return 76
+}
+
 // liveTile shows what plays, and opens now playing.
 func (s *shell) liveTile(c *ui.Context, collapsed bool) {
 	k := &s.lk
@@ -392,10 +441,7 @@ func (s *shell) liveTile(c *ui.Context, collapsed bool) {
 		}
 		return
 	}
-	size := float32(76)
-	if collapsed {
-		size = 42
-	}
+	size := liveSize(collapsed)
 	t := cur.Track
 	// While a track plays with another up next, the artwork turns over to
 	// it now and then.

@@ -14,6 +14,11 @@
   follows from near its live edge: it loads the playlist again about once
   per target duration, fetches each new segment once, and finds the
   stream again before its URL expires, never caching it.
+  The URL of a track's stream names each of YouTube's servers that hold
+  it: when one doesn't connect within 3 seconds, the TLS handshake
+  included, the stream's requests, and the direct route's check of it,
+  ask the next, as YouTube's player does, and for 10 minutes ask the one
+  that didn't answer last (`mediaServers`).
   The player API also tells how loud YouTube measured each video
   (`Stream.Loudness`, `Direct.Loudness`). Both list the streams of a
   video's picture beside its audio (`Stream.Videos`), which the now

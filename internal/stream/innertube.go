@@ -117,6 +117,8 @@ type Direct struct {
 	BaseURL string
 	// now tells the time; tests replace it.
 	now func() time.Time
+	// media sends the checks of streams, to their other servers too.
+	media mediaServers
 
 	mu sync.Mutex
 	// visitor is the visitor ID YouTube gave the route, since visitorAt.
@@ -485,7 +487,9 @@ func (d *Direct) call(ctx context.Context, endpoint string, body map[string]any,
 // check asks the media server for the first byte of a stream, so that a
 // URL it refuses fails here, where yt-dlp can still find the stream, and
 // not in the player. It reads the stream's size when its format didn't
-// tell it.
+// tell it. When the stream's server can't be reached, it asks the
+// stream's other servers, and the stream goes on with the one that
+// answered.
 func (d *Direct) check(ctx context.Context, s *Stream) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL, nil)
 	if err != nil {
@@ -495,7 +499,7 @@ func (d *Direct) check(ctx context.Context, s *Stream) error {
 		req.Header[k] = v
 	}
 	req.Header.Set("Range", "bytes=0-0")
-	res, err := d.HTTP.Do(req)
+	res, moved, err := d.media.do(d.HTTP, req)
 	if err != nil {
 		// The error quotes the URL, which carries the user's IP address.
 		var ue *url.Error
@@ -519,6 +523,9 @@ func (d *Direct) check(ctx context.Context, s *Stream) error {
 		if size, err := strconv.ParseInt(total, 10, 64); err == nil && size > 0 {
 			s.Size = size
 		}
+	}
+	if moved != "" {
+		s.URL = moved
 	}
 	return nil
 }

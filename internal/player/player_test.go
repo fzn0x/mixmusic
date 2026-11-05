@@ -1996,6 +1996,80 @@ func TestSpotifyGapless(t *testing.T) {
 	h.wait("b playing", playing("b"))
 }
 
+// tells has the device tell it now plays s, nothing when nil, and waits
+// until the player asked it and took it in.
+func tells(h *harness, d *aheadDevice, s *DeviceState) {
+	h.t.Helper()
+	d.set(s)
+	h.p.HereChanged()
+	h.wait("the device asked", func(p *Player) bool { return !p.connect.asking })
+}
+
+// TestSpotifyGaplessAfterSeek seeks into the last seconds of a Spotify
+// track, the next of which the device then didn't load ahead: at the end,
+// it stops on the track a moment, or tells nothing, before it goes on by
+// itself. The player waits for it, and follows it there, rather than
+// telling it to play the next track, which Spotify started again late, or
+// went on past (#273).
+func TestSpotifyGaplessAfterSeek(t *testing.T) {
+	sp1, sp2, sp3 := spotifyTrack("1"), spotifyTrack("2"), spotifyTrack("3")
+	for name, between := range map[string]*DeviceState{
+		"stopped at its start": {Playing: false, Progress: 0, Track: &sp1},
+		"stopped at its end":   {Playing: false, Progress: 200 * time.Second, Track: &sp1},
+		"telling nothing":      nil,
+	} {
+		t.Run(name, func(t *testing.T) {
+			connectTick, connectAskEvery, connectSettle, connectGoOn = time.Hour, time.Hour, 0, time.Hour
+			t.Cleanup(func() {
+				connectTick, connectAskEvery, connectSettle, connectGoOn = time.Second, 3*time.Second, 5*time.Second, 2*time.Second
+			})
+			h := newHarness(t, Saved{}, func(f *fakeServices) { f.prepare = here })
+			own := &aheadDevice{}
+			h.p.SpotifyHere(own)
+			h.p.PlayTracks([]media.Track{sp1, sp2, sp3}, 0)
+			h.wait("1 playing", func(p *Player) bool { return current(p.s) == "spotify:1" && p.connect.active() && p.s.Playing })
+			h.p.Seek(193 * time.Second)
+			h.wait("1 seeked", func(p *Player) bool { return p.connect.progress == 193*time.Second })
+			tells(h, own, &DeviceState{Playing: true, Progress: 197 * time.Second, Track: &sp1})
+			tells(h, own, between)
+			goesOn(h, own, sp2, 200*time.Millisecond, true)
+			h.wait("2 followed", func(p *Player) bool { return current(p.s) == "spotify:2" && p.connect.active() })
+			if plays := own.with("play"); len(plays) != 1 {
+				t.Errorf("the device was told to play %v", plays)
+			}
+			h.wait("2 where the device plays it", func(p *Player) bool { return p.s.Position == 200*time.Millisecond })
+			// The tracks after it are still the device's to go on to.
+			goesOn(h, own, sp3, 100*time.Millisecond, true)
+			h.wait("3 followed", func(p *Player) bool { return current(p.s) == "spotify:3" && p.s.Index == 2 })
+			if plays := own.with("play"); len(plays) != 1 {
+				t.Errorf("the device was told to play %v", plays)
+			}
+		})
+	}
+}
+
+// TestSpotifyAheadNotGoneOn has the device stop at the end of a track
+// without going on to the one it was given after it: once it had the time
+// to, the player has it play that one.
+func TestSpotifyAheadNotGoneOn(t *testing.T) {
+	connectTick, connectAskEvery, connectSettle, connectGoOn = time.Hour, time.Hour, 0, 20*time.Millisecond
+	t.Cleanup(func() {
+		connectTick, connectAskEvery, connectSettle, connectGoOn = time.Second, 3*time.Second, 5*time.Second, 2*time.Second
+	})
+	h := newHarness(t, Saved{}, func(f *fakeServices) { f.prepare = here })
+	own := &aheadDevice{}
+	h.p.SpotifyHere(own)
+	sp1, sp2 := spotifyTrack("1"), spotifyTrack("2")
+	h.p.PlayTracks([]media.Track{sp1, sp2}, 0)
+	h.wait("1 playing", func(p *Player) bool { return current(p.s) == "spotify:1" && p.connect.active() && p.s.Playing })
+	tells(h, own, &DeviceState{Playing: true, Progress: 197 * time.Second, Track: &sp1})
+	tells(h, own, &DeviceState{Playing: false, Progress: 0, Track: &sp1})
+	h.wait("2 playing", func(p *Player) bool { return current(p.s) == "spotify:2" && p.connect.active() && p.s.Playing })
+	if !own.has("play spotify:2 0s") {
+		t.Errorf("the device was told %v", own.calls)
+	}
+}
+
 // TestSpotifyGaplessQueueChanged has the player play its own next entry
 // when the device went on by itself to one the queue no longer moves on
 // to, as another was played next meanwhile: what the device went on to is

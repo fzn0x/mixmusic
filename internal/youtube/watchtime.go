@@ -2,7 +2,6 @@ package youtube
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math/rand/v2"
 	"net/url"
@@ -64,7 +63,7 @@ func (c *Client) StartWatch(ctx context.Context, videoID string) (*Watch, error)
 	tracking := n.get("playbackTracking")
 	base := tracking.get("videostatsWatchtimeUrl", "baseUrl").str()
 	if base == "" {
-		return nil, errors.New("youtube music: no watch time report for this track")
+		return nil, noReport(n, "watch time")
 	}
 	u, err := url.Parse(base)
 	if err != nil {

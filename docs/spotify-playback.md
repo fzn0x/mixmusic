@@ -22,7 +22,7 @@ Spotify refuses the sign-in. For the code, read
 | Visualizer | on Windows | on Windows, for the Spotify app on this computer | yes |
 | Cast, 5.1 | no | no | yes |
 | Podcast episodes | yes | yes | no |
-| Default | on Windows | on macOS and Linux | |
+| Default | on Windows | on macOS and Linux | no |
 | In settings.json | `"spotifyPlayback": "here"` | `"connect"` | `"match"` |
 
 When the way you chose can't play a track, as when no device answers or

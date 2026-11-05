@@ -10,25 +10,42 @@ Spotify and Last.fm themselves. For the code, read
 
 ## Where MixMusic keeps its data
 
-| | Windows | macOS | Linux |
-|---|---|---|---|
-| Data: settings, library, add-ons, yt-dlp | `%AppData%\MixMusic` | `~/Library/Application Support/MixMusic` | `~/.config/MixMusic` |
-| Cache | `%LocalAppData%\MixMusic` | `~/Library/Caches/MixMusic` | `~/.cache/MixMusic` |
-| Logs | `%AppData%\MixMusic\logs` | `~/Library/Logs/MixMusic` | `~/.config/MixMusic/logs` |
-| Downloads | `%LocalAppData%\MixMusic\downloads` | `~/Library/Application Support/MixMusic/downloads` | `~/.local/share/MixMusic/downloads` |
-| Sign-ins | the Credential Manager | the login Keychain | the Secret Service: GNOME Keyring, KWallet or KeePassXC |
+MixMusic keeps its data in four folders, and your sign-ins in the
+system's credential store. Settings › About names the data folder, and
+opens the logs folder. A development copy, run with `bun run dev`, uses
+`MixMusic Dev` in place of `MixMusic` in these names, so it never touches
+an installed copy's data.
 
-- **On Linux**, `$XDG_CONFIG_HOME`, `$XDG_CACHE_HOME` and `$XDG_DATA_HOME`
-  take the place of `~/.config`, `~/.cache` and `~/.local/share` when you
-  set them.
-- **The Flatpak** keeps all of it under
-  `~/.var/app/io.github.fzn0x.mixmusic`: the data in `config/MixMusic`,
-  the cache in `cache/MixMusic`, and the downloads in
-  `data/MixMusic/downloads`. It is apart from a `.deb`, `.rpm`, AppImage
-  or archive copy's.
-- **A development copy**, run with `bun run dev`, uses `MixMusic Dev` in
-  place of `MixMusic`, so it never touches an installed copy's data.
-- Settings › About names the data folder, and opens the logs folder.
+### Windows
+
+- Data (settings, library, add-ons, yt-dlp): `%AppData%\MixMusic`
+- Cache: `%LocalAppData%\MixMusic`
+- Logs: `%AppData%\MixMusic\logs`
+- Downloads: `%LocalAppData%\MixMusic\downloads`
+- Sign-ins: the Credential Manager
+
+### macOS
+
+- Data: `~/Library/Application Support/MixMusic`
+- Cache: `~/Library/Caches/MixMusic`
+- Logs: `~/Library/Logs/MixMusic`
+- Downloads: `~/Library/Application Support/MixMusic/downloads`
+- Sign-ins: the login Keychain
+
+### Linux
+
+- Data: `~/.config/MixMusic`
+- Cache: `~/.cache/MixMusic`
+- Logs: `~/.config/MixMusic/logs`
+- Downloads: `~/.local/share/MixMusic/downloads`
+- Sign-ins: the Secret Service, as GNOME Keyring, KWallet or KeePassXC
+
+`$XDG_CONFIG_HOME`, `$XDG_CACHE_HOME` and `$XDG_DATA_HOME` take the place
+of `~/.config`, `~/.cache` and `~/.local/share` when you set them. The
+Flatpak keeps all of it under `~/.var/app/io.github.fzn0x.mixmusic`: the
+data in `config/MixMusic`, the cache in `cache/MixMusic`, and the
+downloads in `data/MixMusic/downloads`, apart from a `.deb`, `.rpm`,
+AppImage or archive copy's.
 
 ### The data folder
 

@@ -253,7 +253,7 @@ func (s *shell) createYouTubePlaylist(title string, tracks []media.Track, done f
 				s.notes = append(s.notes, player.Notice{Message: "Couldn't create " + title + ": " + err.Error(), Error: true})
 				return
 			}
-			s.forget("youtube:playlists")
+			s.keepPlaylist("youtube:playlists", p)
 			s.notes = append(s.notes, notice("Created "+p.Title+" on YouTube Music"))
 			if done != nil {
 				done(p)

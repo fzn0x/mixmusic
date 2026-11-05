@@ -1012,6 +1012,43 @@ func TestDropPlaylist(t *testing.T) {
 	}
 }
 
+// TestKeepPlaylist puts a playlist the user made first in a list fetched,
+// in a copy, for the next track menu to add to it, and has a list still
+// on its way, or one that failed, asked for again; a list never fetched
+// stays so.
+func TestKeepPlaylist(t *testing.T) {
+	s := newTestShell(t)
+	made := media.Playlist{ID: "yt:PLnew", Source: media.SourceYouTube, Title: "Road trip", Editable: true, Deletable: true}
+	s.keepPlaylist("youtube:playlists", made)
+	if _, ok := s.loads["youtube:playlists"]; ok {
+		t.Error("a list never fetched was made")
+	}
+	shown := []media.Playlist{ownPlaylist, savedPlaylist}
+	done := &loaded[[]media.Playlist]{done: true, value: shown}
+	s.loads["youtube:playlists"] = done
+	s.keepPlaylist("youtube:playlists", made)
+	if len(done.value) != 3 || done.value[0].ID != made.ID || done.value[1].ID != ownPlaylist.ID || len(shown) != 2 || done.again {
+		t.Errorf("the list holds %+v, the one shown before %+v, asks again %v", done.value, shown, done.again)
+	}
+	for _, l := range []*loaded[[]media.Playlist]{{}, {done: true, err: errors.New("offline")}} {
+		s.loads["youtube:playlists"] = l
+		s.keepPlaylist("youtube:playlists", made)
+		if !l.again || len(l.value) != 0 {
+			t.Errorf("a list %+v isn't asked for again", l)
+		}
+	}
+
+	// The next menu of a track lists it.
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
+	s.loads["youtube:playlists"] = done
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	tt := tester(t, s)
+	show(s, tt, "/album/al-x")
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", made.Title); err != nil {
+		t.Errorf("the menu after it was made: %v", err)
+	}
+}
+
 // TestSaveAsMix saves an album's tracks as a new mix, named after it to
 // start with.
 func TestSaveAsMix(t *testing.T) {

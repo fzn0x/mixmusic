@@ -6,6 +6,492 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.9] - 2026-11-06
+
+Podcasts from YouTube Music and Spotify, which start where you left them
+on another device (#10, #231). Layouts apart from the theme: MixMusic
+opens in Blend, the new default, after the update, and Tiles keeps the
+look you had (#68); four new themes come with them, and the colours of
+pywal, matugen or a file of your own (#68, #74). New too: downloads
+that play without the network (#78), dislikes (#77), global shortcuts
+(#80), signing in to YouTube Music from a browser (#96), skipping songs
+made with AI (#97), speed (#99, #198), the picture of music videos
+(#103), live streams (#123), 5.1 surround (#124), casting (#201) and a
+player around a MacBook's notch (#46). Lyrics come from Unison first,
+can be translated, show in Latin letters, and light word by word
+(#135, #136, #137, #197, #238, #243). MixMusic connects through
+Windows' proxy (#228), reads playlists of up to 20,000 tracks (#195),
+reaches your YouTube Music history again (#261), and plays from another
+YouTube server when one doesn't answer (#262). MixMusic 0.3.0 and later
+offer this version in Settings › About, except the Linux x64 copies of
+0.5.6, which don't start: install it from the release page.
+
+### Added
+
+- Podcasts from YouTube Music and Spotify: a podcasts pivot in the search
+  finds shows and episodes, a show's page lists its episodes newest first,
+  with their days and lengths, and Library › Podcasts keeps the episodes
+  you're listening to and the shows you follow, which are saved on their
+  service too when you're signed in. An episode plays from where you left
+  it, without a crossfade, and the queue that ends on one stops rather than
+  start a radio; episodes don't scrobble, and the stats leave them out.
+  Spotify's episodes play only from Spotify, in MixMusic or on Spotify
+  Connect, and signing in to Spotify again lets MixMusic start them where
+  you left them on another device (#10).
+- A player around the notch of a MacBook's screen. While a track is
+  loaded, the black around the camera widens with its cover, and bars
+  that move while it plays. Click either side for a panel with the
+  player, the progress and the line of the lyrics sung now; Escape, a
+  click on either side or moving the pointer away for two seconds closes
+  it, and its cover opens MixMusic on the now playing page. It shows over
+  every app and on every Space, full screen too, leaves the keyboard in
+  the app you were using until it opens, and stays while MixMusic is in
+  the tray. Turn it off in Settings › On the desktop, which shows the
+  switch only on Macs with a notch, or with `notchPlayer` in
+  settings.json. Other Macs, external displays, Windows and Linux show
+  nothing new (#46).
+- Layouts, in Settings › Appearance, apart from the theme: Blend, now the
+  default, has rounded shapes and springy motion on dense rows of big
+  covers in cards, under bold headings; Expressive, after Material 3
+  Expressive, has tonal fills, pill buttons and chips, large rounded
+  cards, a floating player bar and springs; Crate is dense and
+  restrained, so that the covers do the work; and Tiles is MixMusic's
+  look so far, with flat tiles and giant lowercase words. Every theme
+  shows in every layout. MixMusic opens in Blend after the update: to
+  keep the look you had, choose Tiles. It's `layout` in settings.json
+  too (#68).
+- Four themes: Material and Material Dark, whose every colour is made
+  of the cover that plays (with Follow the artwork, on by default), in
+  Roboto Flex, and Walnut and Walnut Light, walnut and warm paper lit by
+  tangerine, with heavy condensed headings. MixMusic grows by about
+  0.5 MB with the two new typefaces (#68).
+- Colours from a file, in Settings › Appearance: MixMusic wears the
+  colours pywal or matugen make of your wallpaper, or those of a file of
+  your own, and changes colour as the file does, with no reload. The theme
+  keeps its type, corners and effects. MixMusic changes the file's colours
+  that wouldn't read, keeping their hue; a file with one set of colours,
+  as pywal's, decides whether MixMusic is light or dark, title bar
+  included; and while Follow the artwork is on, as it is by default, the
+  cover playing still sets the accent (#74).
+- Dislike songs you never want to hear again: with the thumbs-down beside
+  the heart in the player bar, on the now playing page and in the mini
+  player, with Dislike in every track's menu, with Ctrl+D (⌘D on macOS),
+  or from any app with a global shortcut of your own. MixMusic then passes
+  over them as the queue moves on, forward and back, moves on at once from
+  the song you disliked as it plays, and leaves them out of radios; a
+  toast's undo takes a dislike back and goes back to the song where it
+  was. A song you pick yourself still plays, and the play buttons of
+  albums, playlists, mixes and artists start at their first song you don't
+  dislike. A song is liked or disliked, not both: disliking a liked song
+  unlikes it, on Spotify too. Signed in to YouTube Music, dislikes of its
+  songs go there too; Spotify takes none, so those stay in MixMusic. The
+  library lists them in a new disliked pivot, the queue shows the songs it
+  skips, and Settings › Playback turns the skipping off. The mini player's
+  artwork is narrower, to make room for the button. Plugins get
+  `api.library.isDisliked` and `setDisliked` (#77).
+- Downloads: download tracks, albums, playlists, mixes and your liked
+  songs from their menus and pages, and they play without the network.
+  They stay until you remove them, apart from the offline cache, and
+  gather in Library › Downloads, where you see what downloads and why one
+  failed. Spotify tracks download as their recording on YouTube Music.
+  Track rows show a mark for each download. Two download at a time, in the
+  quality of Settings › Playback, and they wait while you're offline, on a
+  metered connection unless you allow it, and when YouTube turns requests
+  down, going on where they stopped, after a restart too. Settings ›
+  Playback shows them, the folder they're in, which you can change, and
+  the switch for metered connections. A live stream doesn't download: a
+  playlist holding one downloads the rest, and once MixMusic has found it
+  live its menu offers no Download. While you're offline, the queue now
+  skips tracks that aren't downloaded or cached, without an error for
+  each, and waits for the network only once none is left (#78).
+- Global shortcuts: keys of your own that play or pause, skip, turn the
+  volume up or down, mute, like what plays or show MixMusic whichever
+  window is in front, with its window closed to the tray too. Record them
+  in the new "from any app" group at the top of Settings › Shortcuts.
+  None are set on a new install. They need Ctrl, Alt or the Windows key
+  (Super on Linux, ⌘ or ⌃ on macOS); F1 to F12 may stand alone, but F12
+  on Windows. While MixMusic runs, those keys do nothing else, in its own
+  window too, so a window shortcut of another command gives them up.
+  Keys the system refuses, being in use already, stay yours, with the
+  reason on the row and try again; MixMusic tries again at each start.
+  Liking from another window shows a notification when notifications are
+  on. The media keys stay as they are (#80).
+- Sign in to YouTube Music without the sign-in window, in Settings ›
+  Accounts: import the session of a browser you signed in with (Firefox,
+  Chrome, Chromium, Edge, Brave, Opera, Vivaldi, Helium, Zen, and Safari
+  on macOS), which MixMusic reads with its yt-dlp, keeping YouTube's
+  cookies alone, or paste the Cookie header of a signed-in tab. A session
+  signed in to several Google accounts, or with brand channels, asks
+  which to use, and keeps it beside the session. Close the browser before
+  you import; recent Chrome on Windows seals its cookies, so use Firefox
+  or paste a header there (#96).
+- Skip songs made with AI, in Settings › Playback and off by default: as
+  the queue moves on by itself, at the end of a song, on Next and
+  Previous, into autoplay's radios, and from the play and shuffle buttons
+  of a list, MixMusic passes over the songs YouTube labels as made with
+  AI. YouTube labels only some of them, so others still play. A song you
+  pick by name plays anyway. Skipped songs stay in the queue, dimmed, and
+  one notice tells of them. MixMusic asks YouTube about each song once,
+  signed out, which can add up to half a second before a song you skip
+  to starts; a song YouTube doesn't answer for within 10 seconds plays.
+  Spotify songs are checked by their recording on YouTube Music when they
+  play from there (#97).
+- Play songs faster or slower, from half speed to three times, at their
+  own pitch: Settings › Playback › Speed, or Speed up, Slow down and
+  Normal speed in the command palette, which have no keys until you give
+  them some in Settings › Shortcuts. The player bar shows the speed after
+  the artists while it isn't 1×. The clock, the seek bar and synced lyrics
+  keep the track's own time, a crossfade lasts the seconds you hear, and
+  Last.fm counts how much of a song you heard. The system's media
+  controls move on at the speed, and setting the rate over MPRIS sets it.
+  Spotify plays its own tracks at their own speed, and live streams play
+  as they're broadcast (#99).
+- Music videos can show their picture on the now playing page, in place of
+  the cover: turn on "Show the video of music videos" in Settings ›
+  Playback, or press the video button beside the transport while one
+  plays. The picture is muted and follows MixMusic's own sound, pausing
+  and seeking with it. It shows only for official music videos and
+  uploads, never for songs or live streams, and keeps the cover where the
+  system has no web view (WebView2 on Windows, WebKitGTK on Linux). The
+  picture is fetched as it plays, about 3 MB a minute at 360p, the lowest
+  quality with data saver, and nothing while it's paused or not shown: on
+  another page, with the window hidden or minimized, or with the mini
+  player open. While the system asks for less motion, a button on the
+  cover plays it. A web view then runs beside MixMusic, which takes memory
+  until a minute after the last picture (#103).
+- Live streams play, such as YouTube's 24/7 radio channels: from about 15
+  seconds behind the broadcast, for as long as it goes on. The player bar
+  and the mini player say "live" in place of a time and a length, with no
+  seeking, and Previous goes to the track before. A live stream ends only
+  when its broadcast does, isn't kept in the offline cache, and isn't
+  scrobbled to Last.fm, which hears only that it plays; Discord shows how
+  long it played. It plays at its own level, as YouTube measures none for
+  Even loudness. After a pause of up to about an hour it goes on from
+  where it was, after a longer one from near the live edge. Data saver
+  plays its 22 kHz stream (#123).
+- For developers: an AC-3 decoder in Go (`ac3`), written from the ATSC
+  A/52 standard: every channel layout up to 5.1 and every tool of the
+  standard, decoded into six channels, with the stereo downmix each
+  stream's own mix levels ask for, and the `dac3` box of MP4 files (#124).
+- For developers: the `ac3` package decodes E-AC-3 too, of ATSC A/52's
+  Annex E: frames of 1 to 6 blocks, spectral extension and the adaptive
+  hybrid transform among its tools, and the 5.1 of a stream of more
+  channels or of objects; and reads the `dec3` box of MP4 files (#124).
+- 5.1 surround: a track YouTube Music has a 5.1 surround mix of, beside
+  its stereo one, shows a 5.1 button by the player, which plays the
+  surround mix from where the stereo one was. On a 5.1 output device the
+  six channels play as they are; on headphones or two speakers they are
+  mixed down to stereo, as the track's own downmix levels say. The choice
+  stays for later tracks: "Play 5.1 surround when a track has it" in
+  Settings › Playback, off by default. While it is on, stereo tracks play
+  on the front left and right speakers of a 5.1 system, the surround mix
+  of a track goes to the offline cache beside its stereo audio, and a
+  surround mix that can't play gives way to the stereo one. The surround
+  mix plays at the speed you set, as the stereo one does; downloads keep
+  the stereo audio, which plays while you're offline (#124).
+- Lyrics come from Unison first, an open, crowdsourced database of
+  lyrics, then from LRCLIB, then from YouTube Music, so more tracks have
+  synced lyrics. Unison is asked by the track's video ID, or by its
+  title, artist, album and length, and the lyrics panel ends its lyrics
+  with "lyrics from Unison (https://unison.boidu.dev)", as their licence
+  asks. While Unison is out of reach, lyrics come from LRCLIB as before,
+  after a wait of 3 seconds at most (#135).
+- Lyrics in another language can be translated: turn on "translate"
+  beside the lyrics, in the lyrics panel or on the now playing page, and
+  each line shows its translation under it, smaller, moving with it in
+  synced lyrics. The switch shows for lyrics in another language than
+  the one they translate to, the system's by default, which "Translate
+  lyrics to" in Settings › Playback changes, and is remembered for the
+  next song in the same language. While it's on, the lyrics of the track
+  playing and its video ID go to Unison, which has Google translate them;
+  nothing is sent while it's off, as it is by default. Each translation
+  is kept on disk, so a song is translated once. When the service is
+  busy, the lyrics show untranslated with "Translation isn't available
+  right now." and try again (#136).
+- Japanese lyrics can show in romaji: turn on "romaji" beside them, in
+  the lyrics panel or on the now playing page, then choose "romaji
+  under" or "romaji only", as "kyō wa ii tenki" for 今日はいい天気. With
+  translate on too, a line shows the Japanese, its romaji, then its
+  translation. The romaji is made on your computer, and the lyrics
+  aren't sent anywhere for it. The first time, MixMusic downloads the
+  dictionary of the readings of kanji, 11.7 MB, from GitHub, and keeps
+  it in its cache: until it's there, or while it can't be downloaded,
+  kana show in romaji and kanji as they are. While Japanese lyrics show
+  in romaji, MixMusic uses some 90 MB more memory, which it gives back a
+  few minutes after (#137).
+- Lyrics in Korean, Chinese, Russian or Arabic can show in Latin letters:
+  turn on "romanize" beside the lyrics, then choose "romanized under",
+  each line with its romanization under it, or "romanized only", in
+  place of the line. With translate on too, a line shows the original,
+  its romanization, then its translation. The choice is remembered for
+  the next song in the same language. Arabic's romanization comes with
+  the translation from Unison: while it's on, Arabic lyrics go to Unison
+  with the track's video ID (#137).
+- Lyrics timed word by word, as Unison has many, light each word of the
+  line sung now as it's sung, in the lyrics panel and on the now playing
+  page: the word fills with the accent from its start to its end, words
+  sung stay lit, and words to come keep the colour of the lines to come.
+  Background vocals light the same way. Lyrics timed line by line show as
+  before, and so do lines shown in Latin letters in their place, which
+  light whole. While the system asks for less motion, each word lights
+  whole as it starts. Plugins reading lyrics get the words and their
+  times too (#197).
+- A speed button by the player, beside the volume, shows the speed while
+  it isn't 1× and opens a menu of steps, from 0.75× to 2×, with a slider
+  for the rest. The mini player has the steps in its menu, on a right
+  click. Podcasts get a speed of their own, Podcasts in Settings ›
+  Playback › Speed, 1× at first: episodes play at it, songs at theirs, and
+  the button, the command palette's Speed up, Slow down and Normal speed,
+  and the rate the media controls set change the speed of the kind that
+  plays. While Spotify plays its own tracks or episodes, or a live stream
+  plays, the button is dimmed, and its tip tells why (#198).
+- On Linux, Settings › Accounts imports a YouTube Music sign-in from
+  Firefox, Chrome, Chromium, Edge and Brave installed from Flathub too:
+  each shows in the list of browsers as "Chrome (Flatpak)" and so on,
+  apart from the same browser installed otherwise. MixMusic's Flatpak may
+  read their profiles, read-only, to do so (#199).
+- Scrolled down a playlist, an album, an artist or your liked songs, the
+  top bar shows what you're in: its cover, its name, and Play, Shuffle
+  and Download, which fade in as the page's head scrolls away, and show
+  at once when your system asks for less motion. In a narrow window the
+  name shortens, and Download moves into the bar's menu. The search and
+  Sort of a playlist's tracks, and of your liked and disliked songs, stay
+  pinned under the top bar while the list scrolls, and what you search
+  or sort there shows from the list's start. Liked songs get Play and
+  Shuffle buttons of their own (#200).
+- Casting: a cast button by the player, shown while a Chromecast, a
+  Google Home or Nest speaker, or a TV with Chromecast built in is on your
+  network, lists them by name and model, and moves what plays there from
+  where it was; "This computer" brings it back. The device plays YouTube
+  Music tracks, and Spotify tracks in "Match" mode as their YouTube Music
+  recording, with their cover, title and artist on its screen; Spotify
+  tracks that play on Spotify Connect, or in MixMusic itself, stay where
+  they play. Play, pause, seek, next, previous and the volume act on the
+  device, and its own buttons and remote show in MixMusic. The queue stays
+  in MixMusic, which sends each track as the one before ends, so tracks
+  don't crossfade on a device. The device fetches the audio from MixMusic
+  while casting, which may ask the first time whether MixMusic may take
+  connections from your network: Windows' firewall does, and macOS asks
+  for the local network. Live streams don't cast yet (#201).
+- An episode shows its details where a song shows its lyrics: the side
+  panel says Details, and it and the now playing page show the show, the
+  views, the day it came out and its length, then the whole description.
+  The show's name opens its page, times in the description, as 12:34 or
+  1:02:03, play the episode from there, and links open in the browser.
+  The chapter that plays lights up, and the notch player shows it with
+  those before and after it. The details come from YouTube Music's
+  Details tab, or from Spotify, when an episode plays, and are kept
+  (#226).
+- A playlist, an album, a mix or your liked songs that you downloaded
+  download the songs added to them since on their own, as you open their
+  page or refresh it. Over a hundred songs at once, or a gigabyte, wait
+  for you to choose Download more, as a notice tells. A song that failed
+  isn't tried again, and one whose download you removed isn't downloaded
+  again: Download more still offers them. Songs taken out of a playlist
+  stay downloaded with it until you remove its download. Download songs
+  added later, in Settings › Playback, turns it off (#227).
+- Pull a page down past its top to refresh it, with two fingers on a
+  touchpad, a finger on a touchscreen, or the mouse wheel turned up there
+  three notches or more. A strip above the page grows with the pull and
+  says when letting go refreshes; the refresh is Refresh this page's,
+  with its spinner and its toast when it fails. Scrolling that carries
+  the page up to its top, a fling's momentum among it, never pulls, nor
+  does Shift+scroll on a shelf, scrolling sideways, or scrolling the
+  lyrics on the now playing page. Pages Refresh is dimmed on don't pull,
+  and while your system asks for less motion the strip opens and closes
+  at once (#229).
+- The mini player has a volume button, after the heart and the
+  thumbs-down: a click mutes and unmutes, the wheel over it turns the
+  volume up and down a step a notch, as Volume up and Volume down do, and
+  a small slider shows above it while the pointer is over either. Tab
+  reaches the button, and goes on into the slider, whose arrows set the
+  volume; Escape closes it. The wheel turns the player bar's volume too.
+  The mini player's artwork is narrower in its narrowest window, to make
+  room for the button (#230).
+- Signed in to YouTube Music, an episode starts where you left it on
+  another device, when that's newer than where you left it in MixMusic,
+  and one you finished there starts from its start. While an episode
+  plays, MixMusic tells YouTube Music how far you got, as its own player
+  does, so that YouTube Music on your phone goes on from there. The switch
+  that adds what you play to your history, in Settings › Accounts,
+  governs it too (#231).
+- Lyrics in every major script show in Latin letters made on your
+  computer, nothing of them sent, and the "romanize" switch shows for
+  them at once: Korean by the Revised Romanization, with its sound
+  changes ("한국어" is "hangugeo"); Chinese in pinyin with tone marks, a
+  character of several readings read by its word ("银行" is "yín háng"),
+  simplified and traditional; Russian, Ukrainian, Belarusian, Bulgarian,
+  Serbian, Macedonian, Kazakh, Kyrgyz and Mongolian, each by its own
+  system; Greek, Armenian and Georgian; Hindi, Bengali, Punjabi,
+  Gujarati, Odia, Tamil, Telugu, Kannada, Malayalam, Sinhala and the
+  other languages of their scripts; Thai, a syllable apart; Tibetan;
+  Hebrew and Persian; and Amharic. The English of a line, as in K-pop,
+  stays as it is. Lines timed word by word light each word in Latin
+  letters too, and the notch player shows the lyrics in Latin letters as
+  the panel does. Arabic still comes from Unison, whose romanization has
+  the vowels Arabic doesn't write: until it comes, and when it can't,
+  Arabic shows in Latin letters made on your computer (#238).
+- Lyrics in Lao, Khmer and Burmese show in Latin letters made on your
+  computer too, nothing of them sent, and the "romanize" switch shows for
+  them at once: Lao by BGN/PCGN ("ຫຼວງພະບາງ" is "louang pha bang"), Khmer
+  by the UN's system, its vowels read by their consonants ("ភ្នំពេញ" is
+  "phnum pénh"), and Burmese by BGN/PCGN, its sounds voiced as said
+  ("မင်္ဂလာပါ" is "min ga la ba"), each a syllable apart. Lines timed word
+  by word light each word in Latin letters too (#243).
+
+### Changed
+
+- The system's media controls (the Windows media flyout, macOS's Now
+  Playing, and the desktop's controls on Linux) take each cover from the
+  covers MixMusic keeps on disk, so a cover already shown in the window
+  shows there at once, isn't downloaded again, and shows offline too. On
+  Linux, the desktop reads it from a file in MixMusic's cache folder
+  (`now-playing/`) rather than downloading it itself (#196).
+- On macOS, the yt-dlp MixMusic installs starts in 0.2 seconds instead of
+  8: MixMusic installs yt-dlp's unpacked build, which doesn't unpack Python
+  again at every start. A track that only yt-dlp can play starts that much
+  sooner, and so does Settings › Playback › Tools. The yt-dlp installed
+  before is replaced a minute after MixMusic starts, at its update check,
+  whatever its version. It takes about 120 MB on disk instead of 37 (#245).
+
+### Fixed
+
+- The notification of a new track shows again, once you hear it, while
+  MixMusic is in the background. It never showed: the track changed while
+  it loaded, and played only after. Between two tracks, Discord's status no
+  longer goes away and comes back, the system's media controls no longer
+  show the next track as paused for a moment, and the taskbar's play
+  button no longer turns to Play and back (#145).
+- While a track loads, it can't be paused or moved: the play button, the
+  position and the lines of timed lyrics take no click until you hear it,
+  and the keys, the media keys and the system's media controls do nothing
+  either. A track counted as playing before its sound came, as YouTube held
+  its audio back or Spotify's player still loaded it, and a move started
+  its load over from there (#184).
+- Spotify songs that play in MixMusic itself follow one another without a
+  gap: Spotify goes on to the next by itself, where 1 to 2 seconds of
+  silence came between them. MixMusic hears at once that a Spotify song
+  ended, so a YouTube Music song after it starts without a wait too. When
+  the queue changed meanwhile, as a song was played next, what Spotify
+  went on to is silenced and the chosen song plays (#187).
+- The sidebar shows MixMusic's name whole beside the logo. It showed cut
+  short, as "mixmu…", in the Sakura theme, and in every theme with the
+  compact density; it now shrinks a little where the theme's face is too
+  wide for the sidebar (#191).
+- With Crossfade on, a pause made in the last seconds of a song holds:
+  the next song no longer fades in a moment later. Played again, the song
+  fades into the next one while there's time, or the next one starts as
+  it ends (#193).
+- Choosing a YouTube brand channel never quietly uses the account itself.
+  A brand channel YouTube lists without the ID MixMusic needs shows in the
+  list, but can't be chosen, and says why. If YouTube Music still answers
+  as the account itself after a switch to a brand channel, MixMusic goes
+  back to the one used before and says so (#194).
+- Playlists longer than about 1,000 tracks, and the songs liked on
+  YouTube Music, are no longer cut short: up to 20,000 tracks are read.
+  The first hundred or so show at once and the rest load beside them;
+  Play and Shuffle, pressed meanwhile, wait for all of them, and the
+  menu's queue items and the download show once they're read. A page
+  that fails is tried again a few times, then the playlist says how many
+  of its tracks loaded, with Try again; one past 20,000 tracks says where
+  it was cut. Playing a long playlist from its tile, downloading it or
+  copying it into a mix reads all of it first, which can take a while
+  (#195).
+- With the colours of pywal, matugen or a file of your own, the theme no
+  longer goes back to the file's colours from before it changed, when
+  Reload add-ons and the file's watch read it at the same time (#220).
+- Removing the download of a playlist removes the songs taken out of it
+  before you downloaded more of it, which used to stay downloaded for
+  good (#227).
+- On Windows, MixMusic connects through the proxy set in Windows'
+  settings, as browsers do: a setup script, automatic detection or a
+  proxy server, with its bypass list. It follows the setting as VPN and
+  proxy apps turn it on and off. Before, it connected directly, so on a
+  network that lets traffic out only through a proxy, songs were found
+  but didn't play: "MixMusic could not reach YouTube's audio servers"
+  (#228).
+- Page titles and pivots are set in Selawik Light at every launch. In
+  about half of them they were Selawik Semilight, heavier and wider, as
+  the two faces both say they weigh 300 and the first registered won
+  (#241).
+- On macOS, Settings › Playback › Tools shows a JavaScript runtime you
+  choose at once. It loaded for 8 seconds or more at each choice, as yt-dlp
+  was asked its version again, and after a few choices in a row yt-dlp
+  showed without it (#246).
+- On macOS, MixMusic's name beside the logo shows whole: the window's
+  buttons keep the top of the sidebar, with the button that folds it, and
+  the logo and name go under them. The name was cut to "mix…", and the
+  folded sidebar's button to unfold it was out of sight (#247).
+- Ctrl and the keypad's + zoom in on Windows and Linux, and ⌘ and the
+  keypad's + on macOS, where View › Zoom In now shows ⌘+. They did nothing,
+  though the keypad's − zoomed out. As Ctrl+Shift+= does, they follow Zoom
+  in while it keeps its own shortcut in Settings › Shortcuts (#251).
+- A track YouTube Music has a 5.1 surround mix of shows the 5.1 button by
+  the player, and plays the mix while "Play 5.1 surround when a track has
+  it" is on. No track did: YouTube didn't list the mix where MixMusic
+  asked for the stereo audio. The mix takes yt-dlp and a JavaScript
+  runtime, which find it in a few seconds when it first plays (#257).
+- In the Expressive layout, the sidebar's card of what plays shows whole
+  above the floating player bar. In a window under about 800 px tall, as
+  macOS's default one, it ran on under the bar, half of its title hidden;
+  the sidebar's pages now sit a little closer there to keep the card's
+  room, and in a window too short for it the card goes, in every layout
+  (#258).
+- A zoom chosen in the mini player is read out once, by the mini player.
+  The main window, open behind it, showed it in a toast too, which screen
+  readers read out as well. A zoom chosen in settings.json still shows
+  its toast in the main window (#259).
+- A track's "Add to YouTube Music playlist" lists your playlists the first
+  time it opens. It said "Loading your playlists…" for as long as it was
+  open, and listed them only once opened again. MixMusic now reads them
+  once you're signed in, before any menu opens, and a playlist you make
+  shows there at once. When YouTube couldn't answer, it says "Couldn't
+  load your playlists", where it said "No playlists of yours", and asks
+  again for the next time it opens (#260).
+- Songs you play from YouTube Music reach your history there again, with
+  "Add what you play to your YouTube Music history" on, so YouTube Music's
+  home and radios learn from what you play in MixMusic. YouTube had begun
+  answering MixMusic's request as if every video were unavailable, and no
+  play reached the history. When YouTube gives no way to report a play,
+  the log now says why (#261).
+- A track whose audio is on a YouTube server that the network doesn't
+  reach plays from another of YouTube's servers that hold it, as
+  YouTube's own player does. It failed with "MixMusic could not reach
+  YouTube's audio servers" after waiting on that one server for about 10
+  seconds, while other tracks played fine; the next server is now asked
+  within 3 seconds, and the tracks after it start with the servers that
+  answered (#262).
+- A song played from a shelf of the home page or Explore, such as Quick
+  picks, counts as a play once it played 30 seconds, or half of a shorter
+  one, as other songs do. It counted as soon as it started: skipped a
+  second later, or failing to load, it still joined the history and
+  Recently played, and went to the YouTube Music history (#264).
+- A show saved on YouTube Music or Spotify, as when you followed it in
+  another profile or on your phone, says Following on its page, and
+  Following stops following it there. It said Follow, though Library ›
+  Podcasts listed it under the shows saved there, and Follow followed it
+  again (#271).
+- A cover downloads once, however many windows and the system's media
+  controls ask for it. Now and then, one that asked just as its download
+  for another ended downloaded it a second time (#272).
+- Spotify songs that play in MixMusic itself follow one another without a
+  gap also after a seek into a song's last seconds. More than a second of
+  silence came before the next song then, or a song of the queue was
+  skipped: Spotify stops on the song a moment while it loads the next, and
+  MixMusic took that for the end and told it to play the next song itself.
+  A Spotify song sought into its last second no longer starts over instead
+  of moving on (#273).
+- An episode played from a show's page starts where you left it, in
+  MixMusic or on another device, whatever played before. It started from
+  its start when what played before was at the same place in its queue,
+  as the first episode played while the first track of the queue before
+  was current (#275).
+- Lyrics are offered "synced" only when their lines can be followed in
+  time. Lyrics of one timed line, or of lines all at one time, as LRCLIB's
+  "probe" for Never Gonna Give You Up, offered it, and never moved; they
+  are plain now, and another source's lyrics take their place when it has
+  more of them (#277).
+
 ## [0.5.8] - 2026-11-02
 
 Delete the playlists you made on YouTube Music, and take saved ones out of
@@ -729,7 +1215,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.8...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.9...HEAD
+[0.5.9]: https://github.com/fzn0x/mixmusic/compare/v0.5.8...v0.5.9
 [0.5.8]: https://github.com/fzn0x/mixmusic/compare/v0.5.7...v0.5.8
 [0.5.7]: https://github.com/fzn0x/mixmusic/compare/v0.5.6...v0.5.7
 [0.5.6]: https://github.com/fzn0x/mixmusic/compare/v0.5.5...v0.5.6

@@ -214,7 +214,7 @@ motion, the strip opens and closes at once.
 ## Keyboard shortcuts
 
 These are the keys of a new install. <kbd>Ctrl</kbd> on Windows and Linux
-is <kbd>⌘</kbd> on macOS, and <kbd>Alt</kbd> is <kbd>⌥</kbd>. Shortcuts of
+is <kbd>⌘</kbd> on macOS, and <kbd>Alt</kbd> is <kbd>⌥</kbd> there. Shortcuts of
 a single key, as <kbd>Space</kbd>, <kbd>M</kbd> and the arrows, work
 while you're not typing in a text field. The ID is the command's name in
 `settings.json`.

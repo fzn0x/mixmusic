@@ -46,7 +46,7 @@ player API won't give it:
   JavaScript runtime: Deno, Node.js, Bun or QuickJS. Without one, yt-dlp
   can't read most streams.
 - **5.1 surround mixes**, as below.
-- **A pause of the direct route.** When YouTube's player API refuses
+- **A rest from the player API.** When YouTube's player API refuses
   three streams in a row, MixMusic leaves it alone for 30 minutes, and
   yt-dlp finds every stream meanwhile. The log says so.
 

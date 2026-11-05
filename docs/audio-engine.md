@@ -14,8 +14,8 @@ and [its codecs](architecture/codecs.md).
 
 ## Decoding
 
-MixMusic decodes every format YouTube serves it in Go, with decoders of
-its own. It uses no FFmpeg and no codec of the system.
+MixMusic decodes the audio YouTube serves it in Go, with decoders of its
+own. It uses no FFmpeg and no codec of the system.
 
 | Format | What YouTube uses it for | Decoder | Written from |
 |---|---|---|---|

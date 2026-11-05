@@ -178,6 +178,40 @@ func TestFollowSpotifyPodcast(t *testing.T) {
 	}
 }
 
+// TestUnfollowSavedPodcast stops following a show the user saved on
+// Spotify only, there, and fails when Spotify refuses, but stops one they
+// followed in MixMusic even so.
+func TestUnfollowSavedPodcast(t *testing.T) {
+	show := media.Podcast{ID: "sp:s1", Source: media.SourceSpotify, Title: "The Daily Thing"}
+	collection := func(answers map[string]string) (*Collection, func() []string) {
+		sp, requests := spotifyAPI(t, answers)
+		lib, err := library.Open(filepath.Join(t.TempDir(), "library.json"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return &Collection{&App{spotify: sp, library: lib}}, requests
+	}
+	ctx := context.Background()
+	c, requests := collection(map[string]string{"DELETE /me/library": ""})
+	if err := c.SetPodcastFollowed(ctx, show, false); err != nil {
+		t.Fatal(err)
+	}
+	if got := requests(); len(got) != 1 || !strings.HasPrefix(got[0], "DELETE /me/library?") || !strings.Contains(got[0], url.QueryEscape("spotify:show:s1")) {
+		t.Errorf("not taken out on Spotify: %q", got)
+	}
+	// Spotify refuses all.
+	c, _ = collection(map[string]string{})
+	if err := c.SetPodcastFollowed(ctx, show, false); err == nil {
+		t.Error("Spotify refused, and a show followed only there stopped")
+	}
+	if err := c.SetPodcastFollowed(ctx, show, true); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.SetPodcastFollowed(ctx, show, false); err != nil || c.Follows(show.ID) {
+		t.Errorf("Spotify refused a show followed in MixMusic: %v, follows %v", err, c.Follows(show.ID))
+	}
+}
+
 // TestSpotifyPodcastSignedOut asks the user to sign in to open Spotify's
 // podcasts.
 func TestSpotifyPodcastSignedOut(t *testing.T) {

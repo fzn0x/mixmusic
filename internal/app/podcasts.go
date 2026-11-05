@@ -121,8 +121,10 @@ func (c *Collection) Follows(id string) bool { return c.a.library.Follows(id) }
 
 // SetPodcastFollowed follows a podcast in MixMusic, or stops, and saves it
 // to the user's library of its service, or takes it out, when they signed
-// in there: that it can't is logged, as for likes.
+// in there: that it can't is logged, as for likes, unless the user stops
+// following one they followed only there, which then fails.
 func (c *Collection) SetPodcastFollowed(ctx context.Context, p media.Podcast, on bool) error {
+	here := c.a.library.Follows(p.ID)
 	if err := c.a.library.SetFollowed(p, on); err != nil {
 		return err
 	}
@@ -134,7 +136,10 @@ func (c *Collection) SetPodcastFollowed(ctx context.Context, p media.Podcast, on
 	case p.Source == media.SourceSpotify && c.a.spotify.SignedIn():
 		err = c.a.spotifySave(ctx, spotify.URI("show", native), on)
 	}
-	if err != nil {
+	switch {
+	case err != nil && !on && !here:
+		return err
+	case err != nil:
 		log.Printf("mixmusic: saving a podcast on its service: %v", err)
 	}
 	return nil

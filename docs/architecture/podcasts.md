@@ -88,7 +88,13 @@ the user left them.
   episode's length don't seek.
 - **Follows.** `library.json` keeps the shows the user follows, without
   their episodes, signed in or not; following one saves it on its service
-  too, where the user signed in.
+  too, where the user signed in. Signed in, a show saved there, as from
+  another profile or device, counts as followed on its page: the page
+  tells (`Saved`), or else the shows saved there do, the list Library ›
+  Podcasts shows, asked for once. Stopping takes it out there, and fails
+  when the service refuses one followed only there. The list takes the
+  change in place rather than be read again, which the service may answer
+  as it was a moment before.
 - **The windows (`podcasts.go`).** `/podcast/<id>` is a show's page, the
   search's podcasts pivot asks only once it shows, and Library › Podcasts
   lists the episodes in progress, the shows followed, and those saved on

@@ -123,10 +123,10 @@ func (s *shell) podcastPage(c *ui.Context, id string) {
 		if p.EpisodeCount > 0 {
 			facts = append(facts, fact{text: plural(p.EpisodeCount, "episode")})
 		}
-		following := s.svc.Collection.Follows(p.ID)
+		following := s.followsPodcast(p)
 		h := headProps{art: p.Artwork, source: p.Source, facts: facts, description: p.Description,
 			keep: &following, keepLabel: "follow", keptLabel: "following", keeping: s.keeping[key],
-			onKeep: func(on bool) { s.followPodcast(key, p, on) },
+			onKeep: func(on bool) { s.followPodcast(key, p, &res.value.Saved, on) },
 			menu:   s.collectionMenu(p.Title, nil, p.URL, p.Source, ""),
 		}
 		if len(episodes) > 0 {
@@ -165,9 +165,24 @@ func (s *shell) resumable(episodes []media.Track) int {
 	return -1
 }
 
+// followsPodcast reports whether the user follows the podcast p: in
+// MixMusic, or on its service, signed in there, as p's page tells or the
+// podcasts saved there do, which Library › Podcasts lists.
+func (s *shell) followsPodcast(p media.Podcast) bool {
+	if !s.signedIn(p.Source) {
+		return s.svc.Collection.Follows(p.ID)
+	}
+	// The list is asked for as the page shows, before the user follows or
+	// stops, which then goes into it.
+	saved := s.savedOn(p.Source)
+	return s.svc.Collection.Follows(p.ID) || p.Saved ||
+		saved.done && saved.err == nil && slices.ContainsFunc(saved.value, func(x media.Podcast) bool { return x.ID == p.ID })
+}
+
 // followPodcast follows the podcast of the page of key, or stops: in
-// MixMusic, and on its service where the user signed in.
-func (s *shell) followPodcast(key string, p media.Podcast, on bool) {
+// MixMusic, and on its service where the user signed in, as saved, the
+// page's word, and the podcasts saved there then tell.
+func (s *shell) followPodcast(key string, p media.Podcast, saved *bool, on bool) {
 	s.keeping[key] = true
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -175,17 +190,51 @@ func (s *shell) followPodcast(key string, p media.Podcast, on bool) {
 		err := s.svc.Collection.SetPodcastFollowed(ctx, p, on)
 		s.update(func() {
 			delete(s.keeping, key)
-			switch {
-			case err != nil:
+			if err != nil {
 				s.notes = append(s.notes, noticeOf(err))
-			case on:
+				return
+			}
+			if on {
 				s.notes = append(s.notes, notice(p.Title+": following"))
-			default:
+			} else {
 				s.notes = append(s.notes, notice(p.Title+": no longer following"))
 			}
-			s.forget(string(p.Source) + ":podcasts")
+			if s.signedIn(p.Source) {
+				*saved = on
+				s.savedChanged(p, on)
+			}
 		})
 	}()
+}
+
+// savedOn returns the podcasts the user saved on the service source, asked
+// for once for Library › Podcasts and the shows' pages.
+func (s *shell) savedOn(source media.Source) *loaded[[]media.Podcast] {
+	get := s.svc.Collection.YouTubePodcasts
+	if source == media.SourceSpotify {
+		get = s.svc.Collection.SpotifyPodcasts
+	}
+	return fetch(s, string(source)+":podcasts", get)
+}
+
+// savedChanged writes into the podcasts saved on p's service, as fetched,
+// that the user followed p there or stopped, rather than read the list
+// again, which the service may answer as it was a moment before. A list
+// still on its way, or that failed, is asked for again, once it's needed.
+func (s *shell) savedChanged(p media.Podcast, on bool) {
+	key := string(p.Source) + ":podcasts"
+	l, ok := s.loads[key].(*loaded[[]media.Podcast])
+	switch {
+	case !ok:
+	case !l.done || l.err != nil:
+		s.refetch(key)
+	default:
+		saved := slices.DeleteFunc(slices.Clone(l.value), func(x media.Podcast) bool { return x.ID == p.ID })
+		if on {
+			saved = slices.Insert(saved, 0, p.Summary())
+		}
+		l.value = saved
+	}
 }
 
 // episodeListOptions say what an episode list shows.
@@ -491,12 +540,11 @@ func (s *shell) podcastLibrary(c *ui.Context) {
 		})
 	}
 	accounts := s.accounts()
-	col := s.svc.Collection
 	if accounts.Spotify.SignedIn {
-		s.savedPodcasts(c, "spotify", "Saved on Spotify", fetch(s, "spotify:podcasts", col.SpotifyPodcasts))
+		s.savedPodcasts(c, "spotify", "Saved on Spotify", s.savedOn(media.SourceSpotify))
 	}
 	if accounts.YouTube.SignedIn {
-		s.savedPodcasts(c, "youtube", "Saved on YouTube Music", fetch(s, "youtube:podcasts", col.YouTubePodcasts))
+		s.savedPodcasts(c, "youtube", "Saved on YouTube Music", s.savedOn(media.SourceYouTube))
 	}
 }
 

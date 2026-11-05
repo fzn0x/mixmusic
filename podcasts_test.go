@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/egoist/mygo/ui"
+
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -83,6 +85,85 @@ func TestPodcastPage(t *testing.T) {
 	}
 	if p := s.svc.Collection.Podcasts(); len(p) != 1 || len(p[0].Episodes) != 0 {
 		t.Errorf("follows %+v", p)
+	}
+}
+
+// TestSavedPodcastFollowed says "following" on the page of a show the user
+// saved on YouTube Music, signed in, followed in another profile or on
+// another device, as its page or the shows saved there tell: following
+// stops there too, and Library › Podcasts lists it no more. Signed out,
+// the page says "follow".
+func TestSavedPodcastFollowed(t *testing.T) {
+	key := "podcast:" + testShow.ID
+	setUp := func(signedIn, saved bool, list []media.Podcast) (*shell, *ui.Tester, *loaded[[]media.Podcast]) {
+		s := newPodcastShell(t)
+		s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: signedIn}}}
+		p := testShow
+		p.Saved = saved
+		s.loads[key] = &loaded[media.Podcast]{done: true, value: p}
+		var lib *loaded[[]media.Podcast]
+		if list != nil {
+			lib = &loaded[[]media.Podcast]{done: true, value: list}
+			s.loads["youtube:podcasts"] = lib
+		}
+		tt := testerOf(t, s, 1280, 1000)
+		show(s, tt, podcastPath(testShow.ID))
+		return s, tt, lib
+	}
+	says := func(tt *ui.Tester, label string) bool { _, ok := tt.Find(label); return ok }
+
+	s, tt, lib := setUp(true, true, nil)
+	if !says(tt, "following") {
+		t.Errorf("a show saved on YouTube Music: %q", tt.Texts())
+	}
+	if _, asked := s.loads["youtube:podcasts"]; !asked {
+		t.Error("the page didn't ask for the shows saved, which a change goes into")
+	}
+
+	s, tt, lib = setUp(true, true, []media.Podcast{testShow.Summary()})
+	click(t, s, tt, "following")
+	s.settle(t, func(player.State) bool { return !s.keeping[key] })
+	tt.Frame()
+	if !says(tt, "follow") || says(tt, "following") || s.svc.Collection.Follows(testShow.ID) {
+		t.Errorf("stopped following: %q", tt.Texts())
+	}
+	if page := s.loads[key].(*loaded[media.Podcast]); page.value.Saved || len(lib.value) != 0 {
+		t.Errorf("stopped following: saved %v, the library holds %+v", page.value.Saved, lib.value)
+	}
+	show(s, tt, "/library/podcasts")
+	if showsText(tt.Texts(), "Saved on YouTube Music") {
+		t.Errorf("the library still lists it: %q", tt.Texts())
+	}
+
+	if _, tt, _ := setUp(true, false, []media.Podcast{testShow.Summary()}); !says(tt, "following") {
+		t.Errorf("a show the saved shows list: %q", tt.Texts())
+	}
+	if _, tt, _ := setUp(false, true, []media.Podcast{testShow.Summary()}); !says(tt, "follow") || says(tt, "following") {
+		t.Errorf("signed out: %q", tt.Texts())
+	}
+
+	s, tt, lib = setUp(true, false, []media.Podcast{})
+	click(t, s, tt, "follow")
+	s.settle(t, func(player.State) bool { return !s.keeping[key] })
+	tt.Frame()
+	if page := s.loads[key].(*loaded[media.Podcast]); !says(tt, "following") || !page.value.Saved ||
+		len(lib.value) != 1 || lib.value[0].ID != testShow.ID || len(lib.value[0].Episodes) != 0 {
+		t.Errorf("followed: %q, saved %v, the library holds %+v", tt.Texts(), page.value.Saved, lib.value)
+	}
+}
+
+// TestSavedSpotifyPodcastFollowed says "following" on the page of a show
+// saved on Spotify, signed in there, as the shows saved there tell.
+func TestSavedSpotifyPodcastFollowed(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{Spotify: app.SpotifyAccount{SignedIn: true}}}
+	sp := media.Podcast{ID: "sp:s1", Source: media.SourceSpotify, Title: "The Daily Thing", Authors: []media.Ref{}, Episodes: []media.Track{}}
+	s.loads["podcast:sp:s1"] = &loaded[media.Podcast]{done: true, value: sp}
+	s.loads["spotify:podcasts"] = &loaded[[]media.Podcast]{done: true, value: []media.Podcast{sp}}
+	tt := testerOf(t, s, 1280, 1000)
+	show(s, tt, podcastPath("sp:s1"))
+	if _, ok := tt.Find("following"); !ok {
+		t.Errorf("a show saved on Spotify: %q", tt.Texts())
 	}
 }
 

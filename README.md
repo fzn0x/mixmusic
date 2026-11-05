@@ -30,7 +30,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/banner.webp" alt="MixMusic's pages in the Mochi theme, standing upright on a dark stage and facing you: now playing アイドル by YOASOBI in the middle, outlined in pink, with the mini player in front of it, and home, search, the library, a mix, explore, stats, settings and the marketplace on both sides" />
+  <img src="docs/banner.webp" alt="MixMusic 0.5.9 in its default look, the Blend layout with the Mix theme, standing upright on a dark stage and facing you: now playing アイドル by YOASOBI in the middle, outlined in pink, with romaji under each line of its lyrics and the mini player in front of it; a search on the left and the library's mixes on the right" />
 </p>
 
 ## Why MixMusic
@@ -141,27 +141,17 @@ both services in one player:
 
 ## A look around
 
-https://github.com/user-attachments/assets/a803dedd-46ac-4219-966f-2b64aff14b5e
-
-<p align="center"><sub>A minute in MixMusic, page by page, in the Mochi theme, with sound: home, now playing, search, an artist and an album, liked songs, mixes, explore, stats, the command palette, the themes, the equalizer, the marketplace and a plugin.</sub></p>
-
-> [!NOTE]
-> The music you hear is royalty-free, by Kevin MacLeod
-> ([incompetech.com](https://incompetech.com), licensed under
-> [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), because we
-> can't use copyrighted songs on our website or in our README.
-
 <p align="center">
-  <img src="docs/look-listen.webp" alt="MixMusic's pages in the Mochi theme, standing upright on a dark stage and facing you: now playing アイドル by YOASOBI in the middle, outlined in pink, with the mini player in front of it; home, search, YOASOBI's artist page and the album THE BOOK 3 on the left; the lyrics panel, explore, liked songs and the library's mixes on the right" />
+  <img src="docs/look-listen.webp" alt="MixMusic's pages in the Blend layout, standing upright on a dark stage and facing you: now playing アイドル by YOASOBI in the middle, outlined in pink, each line of its lyrics with romaji and an English translation under it; the album THE BOOK 3 on the left and a followed podcast's page on the right" />
 </p>
 
-<p align="center"><sub><b>Listen.</b> In the middle, now playing アイドル by YOASOBI with its synced lyrics, and the mini player in front of it. On the left, home, one search across both services, an artist and an album. On the right, the lyrics panel, explore, your liked songs and your mixes.</sub></p>
+<p align="center"><sub><b>Listen.</b> In the middle, now playing アイドル by YOASOBI: each line lights up as it's sung, with romaji and a translation under it. On the left, an album; on the right, a podcast you follow.</sub></p>
 
 <p align="center">
-  <img src="docs/look-yours.webp" alt="More of MixMusic in the Mochi theme, standing upright on a dark stage and facing you: Settings › Appearance with its built-in themes in the middle, outlined in pink; a mix, listening stats, the command palette and the history on the left; the marketplace's community themes, the Sleep Timer plugin, the equalizer and the shortcuts on the right" />
+  <img src="docs/look-yours.webp" alt="More of MixMusic, standing upright on a dark stage and facing you: Settings › Appearance with the four layouts in the middle, outlined in pink; a Material theme coloured by the cover that plays on the left, and the marketplace's community themes on the right" />
 </p>
 
-<p align="center"><sub><b>Make it yours.</b> In the middle, the ten built-in themes. On the left, a mix, your listening stats, the command palette (<kbd>Ctrl</kbd> <kbd>K</kbd>) and your history. On the right, community themes in the marketplace, the Sleep Timer plugin, the ten-band equalizer and shortcuts you can change.</sub></p>
+<p align="center"><sub><b>Make it yours.</b> In the middle, the four layouts: Blend, the default, Expressive, Crate and Tiles, under the themes. On the left, a Material theme that takes its colours from the cover that plays. On the right, community themes in the marketplace.</sub></p>
 
 ## Install
 
@@ -559,8 +549,8 @@ MixMusic is built on these projects:
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   whose HCT color science the Material themes' colors are a port of.
 - **[Kevin MacLeod](https://incompetech.com)**, whose music, under
-  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), plays in the
-  walkthrough and on the website.
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), plays on the
+  website.
 
 ## Contributing
 

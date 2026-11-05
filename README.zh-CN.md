@@ -32,7 +32,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/banner.webp" alt="Mochi 主题下的 MixMusic 各个页面，竖立在深色舞台上、正对着你：中间是正在播放 YOASOBI《アイドル》的页面，带粉色描边，前面是迷你播放器；两侧是首页、搜索、音乐库、一个混合歌单、探索、统计、设置和市场" />
+  <img src="docs/banner.webp" alt="MixMusic 0.5.9 的默认外观（Blend 布局、Mix 主题），竖立在深色舞台上、正对着你：中间是正在播放 YOASOBI《アイドル》的页面，带粉色描边，每行歌词下方显示罗马音，前面是迷你播放器；左边是搜索，右边是音乐库里的混合歌单" />
 </p>
 
 ## 为什么选择 MixMusic
@@ -97,24 +97,17 @@
 
 ## 界面一览
 
-https://github.com/user-attachments/assets/a803dedd-46ac-4219-966f-2b64aff14b5e
-
-<p align="center"><sub>用一分钟逐页浏览 MixMusic，使用 Mochi 主题，带声音：首页、正在播放、搜索、一位艺人和一张专辑、喜欢的歌曲、混合歌单、探索、统计、命令面板、主题、均衡器、市场和一个插件。</sub></p>
-
-> [!NOTE]
-> 你在视频中听到的是 Kevin MacLeod 创作的免版税音乐（来自 [incompetech.com](https://incompetech.com)，采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可），因为我们不能在网站或 README 中使用受版权保护的歌曲。
-
 <p align="center">
-  <img src="docs/look-listen.webp" alt="Mochi 主题下的 MixMusic 各个页面，竖立在深色舞台上、正对着你：中间是正在播放 YOASOBI《アイドル》的页面，带粉色描边，前面是迷你播放器；左边是首页、搜索、YOASOBI 的艺人页和专辑《THE BOOK 3》；右边是歌词面板、探索、喜欢的歌曲和音乐库里的混合歌单" />
+  <img src="docs/look-listen.webp" alt="Blend 布局下的 MixMusic 各个页面，竖立在深色舞台上、正对着你：中间是正在播放 YOASOBI《アイドル》的页面，带粉色描边，每行歌词下方显示罗马音和英文翻译；左边是专辑《THE BOOK 3》，右边是一个已关注播客的页面" />
 </p>
 
-<p align="center"><sub><b>听歌。</b>中间是正在播放的 YOASOBI《アイドル》和它的同步歌词，前面是迷你播放器。左边是首页、同时覆盖两个服务的搜索、一位艺人和一张专辑。右边是歌词面板、探索、你喜欢的歌曲和你的混合歌单。</sub></p>
+<p align="center"><sub><b>听歌。</b>中间是正在播放的 YOASOBI《アイドル》：每行歌词随演唱逐字亮起，下方显示罗马音和翻译。左边是一张专辑，右边是你关注的播客。</sub></p>
 
 <p align="center">
-  <img src="docs/look-yours.webp" alt="Mochi 主题下 MixMusic 的更多页面，竖立在深色舞台上、正对着你：中间是 Settings › Appearance（设置 › 外观）和其中的内置主题，带粉色描边；左边是一个混合歌单、收听统计、命令面板和播放历史；右边是市场里的社区主题、Sleep Timer 插件、均衡器和快捷键" />
+  <img src="docs/look-yours.webp" alt="MixMusic 的更多页面，竖立在深色舞台上、正对着你：中间是 Settings › Appearance（设置 › 外观）和四种布局，带粉色描边；左边是随正在播放的封面变色的 Material 主题，右边是市场里的社区主题" />
 </p>
 
-<p align="center"><sub><b>个性化。</b>中间是十个内置主题。左边是一个混合歌单、你的收听统计、命令面板（<kbd>Ctrl</kbd> <kbd>K</kbd>）和你的播放历史。右边是市场里的社区主题、Sleep Timer 插件、十段均衡器和可以修改的快捷键。</sub></p>
+<p align="center"><sub><b>个性化。</b>中间是四种布局：默认的 Blend，以及 Expressive、Crate 和 Tiles，下方是主题。左边是从正在播放的封面取色的 Material 主题。右边是市场里的社区主题。</sub></p>
 
 ## 安装
 
@@ -347,7 +340,7 @@ MixMusic 基于以下项目构建：
 - **[libopus](https://opus-codec.org)**：MixMusic 的 Opus 解码器移植自它的解码器。**[SharpJaad](https://github.com/jimm98y/SharpJaad)**：[JAAD](https://sourceforge.net/projects/jaadec/) 的 C# 移植版，MixMusic 的 AAC 解码器就源自它。
 - **[FFmpeg](https://ffmpeg.org)**：解码器的测试以它作为对照。
 - **[Selawik](https://github.com/microsoft/Selawik)** 和 **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**：窗口中使用的字体。
-- **[Kevin MacLeod](https://incompetech.com)**：演示视频和网站中播放的是他的音乐，采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可。
+- **[Kevin MacLeod](https://incompetech.com)**：网站中播放的是他的音乐，采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可。
 
 ## 参与贡献
 

@@ -32,7 +32,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/banner.webp" alt="Halaman-halaman MixMusic dengan tema Mochi, berdiri tegak di atas panggung gelap dan menghadap ke arah Anda: di tengah, アイドル oleh YOASOBI sedang diputar, bergaris tepi merah muda, dengan pemutar mini di depannya, dan di kedua sisinya beranda, pencarian, pustaka, sebuah mix, Explore, statistik, pengaturan, serta marketplace" />
+  <img src="docs/banner.webp" alt="MixMusic 0.5.9 dengan tampilan bawaannya, tata letak Blend dengan tema Mix, berdiri tegak di atas panggung gelap dan menghadap ke arah Anda: di tengah, アイドル oleh YOASOBI sedang diputar, bergaris tepi merah muda, dengan romaji di bawah setiap baris liriknya dan pemutar mini di depannya; di kiri sebuah pencarian, di kanan mix di pustaka" />
 </p>
 
 ## Mengapa MixMusic
@@ -140,28 +140,17 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
 
 ## Sekilas tampilan
 
-https://github.com/user-attachments/assets/a803dedd-46ac-4219-966f-2b64aff14b5e
-
-<p align="center"><sub>Satu menit di MixMusic, halaman demi halaman, dengan tema Mochi, lengkap dengan suara: beranda, lagu yang sedang diputar, pencarian, halaman artis dan album, lagu yang disukai, mix, Explore, statistik, palet perintah, tema, equalizer, marketplace, dan sebuah plugin.</sub></p>
-
-> [!NOTE]
-> Musik yang Anda dengar bebas royalti, karya Kevin MacLeod
-> ([incompetech.com](https://incompetech.com), dilisensikan di bawah
-> [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), karena kami
-> tidak bisa memakai lagu yang dilindungi hak cipta di situs web maupun di
-> README kami.
-
 <p align="center">
-  <img src="docs/look-listen.webp" alt="Halaman-halaman MixMusic dengan tema Mochi, berdiri tegak di atas panggung gelap dan menghadap ke arah Anda: di tengah, アイドル oleh YOASOBI sedang diputar, bergaris tepi merah muda, dengan pemutar mini di depannya; di kiri, beranda, pencarian, halaman artis YOASOBI, dan album THE BOOK 3; di kanan, panel lirik, Explore, lagu yang disukai, dan mix di pustaka" />
+  <img src="docs/look-listen.webp" alt="Halaman-halaman MixMusic dengan tata letak Blend, berdiri tegak di atas panggung gelap dan menghadap ke arah Anda: di tengah, アイドル oleh YOASOBI sedang diputar, bergaris tepi merah muda, setiap baris liriknya dengan romaji dan terjemahan bahasa Inggris di bawahnya; di kiri album THE BOOK 3, di kanan halaman podcast yang diikuti" />
 </p>
 
-<p align="center"><sub><b>Dengarkan.</b> Di tengah, アイドル oleh YOASOBI sedang diputar dengan lirik tersinkronnya, dan pemutar mini di depannya. Di kiri, beranda, satu pencarian untuk kedua layanan, halaman artis, dan album. Di kanan, panel lirik, Explore, lagu yang Anda sukai, dan mix Anda.</sub></p>
+<p align="center"><sub><b>Dengarkan.</b> Di tengah, アイドル oleh YOASOBI sedang diputar: setiap baris menyala saat dinyanyikan, dengan romaji dan terjemahan di bawahnya. Di kiri, sebuah album; di kanan, podcast yang Anda ikuti.</sub></p>
 
 <p align="center">
-  <img src="docs/look-yours.webp" alt="Bagian lain MixMusic dengan tema Mochi, berdiri tegak di atas panggung gelap dan menghadap ke arah Anda: di tengah, Settings › Appearance (Pengaturan › Tampilan) dengan tema-tema bawaannya, bergaris tepi merah muda; di kiri, sebuah mix, statistik mendengarkan, palet perintah, dan riwayat; di kanan, tema komunitas di marketplace, plugin Sleep Timer, equalizer, dan pintasan" />
+  <img src="docs/look-yours.webp" alt="Bagian lain MixMusic, berdiri tegak di atas panggung gelap dan menghadap ke arah Anda: di tengah, Settings › Appearance (Pengaturan › Tampilan) dengan keempat tata letak, bergaris tepi merah muda; di kiri, tema Material yang diwarnai sampul lagu yang diputar; di kanan, tema komunitas di marketplace" />
 </p>
 
-<p align="center"><sub><b>Sesuaikan sesuka Anda.</b> Di tengah, sepuluh tema bawaan. Di kiri, sebuah mix, statistik mendengarkan Anda, palet perintah (<kbd>Ctrl</kbd> <kbd>K</kbd>), dan riwayat Anda. Di kanan, tema komunitas di marketplace, plugin Sleep Timer, equalizer sepuluh band, dan pintasan yang bisa Anda ubah.</sub></p>
+<p align="center"><sub><b>Sesuaikan sesuka Anda.</b> Di tengah, keempat tata letak: Blend, yang bawaan, Expressive, Crate, dan Tiles, di atas tema-temanya. Di kiri, tema Material yang mengambil warnanya dari sampul lagu yang diputar. Di kanan, tema komunitas di marketplace.</sub></p>
 
 ## Pemasangan
 
@@ -549,7 +538,7 @@ MixMusic dibangun di atas proyek-proyek berikut:
   jenis huruf yang dipakai di jendela aplikasi.
 - **[Kevin MacLeod](https://incompetech.com)**, yang musiknya, di bawah
   lisensi [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
-  diputar di video panduan dan di situs web.
+  diputar di situs web.
 
 ## Berkontribusi
 

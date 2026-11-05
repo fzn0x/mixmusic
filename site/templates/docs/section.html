@@ -1,35 +1,78 @@
 {% extends "base.html" %}
+{% import "macros.html" as macros %}
 
-{%- block title %}MixMusic docs{% endblock title %}
+{%- block title %}MixMusic docs: how to use the player, how it works, and how to help{% endblock title %}
 {%- block description %}{{ section.description }}{% endblock description %}
 {%- block meta %}
-  <link rel="canonical" href="{{ section.permalink }}" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="MixMusic docs" />
-  <meta property="og:description" content="{{ section.description }}" />
-  <meta property="og:url" content="{{ section.permalink }}" />
-  <meta property="og:image" content="{{ get_url(path='assets/og.jpg') }}" />
-  <meta name="twitter:card" content="summary_large_image" />
+  {%- set base = config.extra.canonical_url | trim_end_matches(pat='/') %}
+  {%- set url = base ~ current_path %}
+  {%- set root = base ~ "/" %}
+  {%- set docs_url = base ~ "/docs/" %}
+  {%- set image = base ~ "/assets/og.jpg" %}
+  {{- macros::social(title="MixMusic docs", description=section.description, url=url, type="website", base=base) }}
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@graph": [
+    {"@type": "CollectionPage",
+     "name": "MixMusic docs",
+     "description": {{ section.description | json_encode() | safe }},
+     "url": {{ url | json_encode() | safe }},
+     "inLanguage": "en",
+     "isPartOf": {"@type": "WebSite", "name": "MixMusic", "url": {{ root | json_encode() | safe }}}},
+    {"@type": "BreadcrumbList", "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "MixMusic", "item": {{ root | json_encode() | safe }}},
+      {"@type": "ListItem", "position": 2, "name": "Docs", "item": {{ url | json_encode() | safe }}}
+    ]}
+  ]}
+  </script>
 {%- endblock meta %}
 {%- block docs_current %} aria-current="true"{% endblock docs_current %}
+{%- block menu %}
+    <button class="icon-btn topbar-menu" type="button" aria-label="Open the docs menu" aria-controls="docs-drawer" aria-expanded="false" data-drawer-open><svg class="icon" width="24" height="24" aria-hidden="true"><use href="#i-menu" /></svg></button>
+{%- endblock menu %}
 
-{%- block content %}
+{%- block body %}
   {%- set docs = section %}
   {%- set current = section.permalink %}
   {%- set toc = [] %}
   <div class="docs">
     {% include "partials/docs-nav.html" %}
+    <div class="scrim" data-drawer-close aria-hidden="true"></div>
 
-    <article class="prose">
-      <h1>{{ section.title }}</h1>
-      <div class="docs-intro">
-        {{ section.content | safe }}
-      </div>
-      <ul class="docs-list">
-        {%- for p in section.pages %}
-        <li><a href="{{ p.permalink }}"><strong>{{ p.title }}</strong><span>{{ p.description }}</span></a></li>
-        {%- endfor %}
-      </ul>
-    </article>
+    <main id="content" class="docs-main docs-index">
+      <header class="index-head">
+        <h1>MixMusic docs</h1>
+        <div class="index-intro">
+          {{ section.content | safe }}
+        </div>
+      </header>
+
+      {%- for p in section.pages %}
+      {%- if p.extra.group_first | default(value=false) %}
+      {%- if not loop.first %}
+        </ul>
+      </section>
+      {%- endif %}
+      <section class="index-group" aria-labelledby="{{ p.extra.group }}">
+        <h2 id="{{ p.extra.group }}">{{ p.extra.group_title }}</h2>
+        <ul class="cards">
+      {%- endif %}
+          <li>
+            <a class="card" href="{{ p.permalink }}">
+              <strong>{{ p.title }}</strong>
+              {%- if p.description %}
+              <span>{{ p.description }}</span>
+              {%- endif %}
+            </a>
+          </li>
+      {%- if loop.last %}
+        </ul>
+      </section>
+      {%- endif %}
+      {%- endfor %}
+    </main>
   </div>
-{%- endblock content %}
+{%- endblock body %}
+
+{%- block scripts %}
+  {% include "partials/docs-script.html" %}
+{%- endblock scripts %}

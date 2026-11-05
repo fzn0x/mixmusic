@@ -1,17 +1,38 @@
-<nav class="docs-nav" aria-label="Docs">
-      <ul>
-        <li><a href="{{ docs.permalink }}"{% if current == docs.permalink %} aria-current="page"{% endif %}>Overview</a></li>
-        {%- for p in docs.pages %}
+{#- The docs' navigation drawer: the overview, then each group of docs
+    with its pages, in the order tools/sitedocs gives them, and the
+    sections of the page shown under it. A wide window shows it beside the
+    page; a narrow one opens it over the page from the top app bar's menu
+    button, or, without script, shows it above the page. It needs docs, the
+    docs section, current, the address of the page shown, and toc, its
+    sections. -#}
+<nav class="drawer" id="docs-drawer" aria-label="Docs" data-drawer>
+      <div class="drawer-head">
+        <span class="drawer-title">MixMusic docs</span>
+        <button class="icon-btn" type="button" aria-label="Close the docs menu" data-drawer-close><svg class="icon" width="24" height="24" aria-hidden="true"><use href="#i-close" /></svg></button>
+      </div>
+      <ul class="drawer-list">
+        <li><a class="drawer-item" href="{{ docs.permalink }}"{% if current == docs.permalink %} aria-current="page"{% endif %}>Overview</a></li>
+      </ul>
+      {%- for p in docs.pages %}
+      {%- if p.extra.group_first | default(value=false) %}
+      {%- if not loop.first %}
+      </ul>
+      {%- endif %}
+      <p class="drawer-label" id="drawer-{{ p.extra.group }}">{{ p.extra.group_title }}</p>
+      <ul class="drawer-list" aria-labelledby="drawer-{{ p.extra.group }}">
+      {%- endif %}
         <li>
-          <a href="{{ p.permalink }}"{% if current == p.permalink %} aria-current="page"{% endif %}>{{ p.title }}</a>
+          <a class="drawer-item" href="{{ p.permalink }}"{% if current == p.permalink %} aria-current="page"{% endif %}>{{ p.title }}</a>
           {%- if current == p.permalink and toc %}
-          <ul class="docs-toc">
+          <ul class="drawer-toc">
             {%- for h in toc %}
             <li><a href="#{{ h.id }}">{{ h.title }}</a></li>
             {%- endfor %}
           </ul>
           {%- endif %}
         </li>
-        {%- endfor %}
+      {%- if loop.last %}
       </ul>
+      {%- endif %}
+      {%- endfor %}
     </nav>

@@ -64,12 +64,14 @@
 
       // On this page: the last heading above the top third of the window.
       const toc = d.querySelector("[data-toc]");
-      if (toc && "IntersectionObserver" in window) {
+      if (toc) {
         const links = new Map([...toc.querySelectorAll("a")].map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
         const heads = [...links.keys()].map((id) => d.getElementById(id)).filter(Boolean);
         const mark = () => {
           let on = heads[0];
           for (const h of heads) if (h.getBoundingClientRect().top < innerHeight / 3) on = h;
+          // At the foot of the page, the last section is the one read.
+          if (innerHeight + scrollY >= d.documentElement.scrollHeight - 4) on = heads[heads.length - 1];
           links.forEach((a, id) => (id === on?.id ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current")));
         };
         let ticking = false;

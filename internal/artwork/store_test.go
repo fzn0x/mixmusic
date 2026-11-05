@@ -199,6 +199,22 @@ func TestStoreDownloadsOnce(t *testing.T) {
 	}
 }
 
+// TestStoreDownloadsOnceAsItEnds downloads an image once for a caller who
+// found no file just before a download kept it, and asks after it ended
+// (#272).
+func TestStoreDownloadsOnceAsItEnds(t *testing.T) {
+	h := newHost(t)
+	s, _, _ := testStore(t, t.TempDir(), 1<<20, h.srv)
+	mustBytes(t, s, h.srv.URL+"/a.png")
+	// The caller's read came before the image was kept, its download now.
+	if got, err := s.download(context.Background(), h.srv.URL+"/a.png"); err != nil || !bytes.Equal(got, blue) {
+		t.Errorf("got %d bytes, %v", len(got), err)
+	}
+	if n := h.hits.Load(); n != 1 {
+		t.Errorf("the host was asked %d times, want once", n)
+	}
+}
+
 // TestStoreHonoursNoStore keeps no image its host says not to.
 func TestStoreHonoursNoStore(t *testing.T) {
 	h := newHost(t)

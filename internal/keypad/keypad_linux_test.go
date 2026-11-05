@@ -174,7 +174,8 @@ func TestWatch(t *testing.T) {
 	press("ctrl+KP_Add", 1, 0)
 	press("ctrl+shift+KP_Add", 1, 0)
 	press("KP_Add", 0, 1)
-	press("ctrl+alt+KP_Add", 0, 1)
+	// Not Ctrl, Alt and the keypad's +: X's keymap makes it XF86Next_VMode,
+	// which the X server keeps, and no window gets (TestPlusPressed).
 	press("ctrl+super+KP_Add", 0, 1)
 	press("ctrl+KP_Subtract", 0, 1)
 	take = false

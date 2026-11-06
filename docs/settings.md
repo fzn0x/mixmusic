@@ -15,32 +15,34 @@ Settings has seven sections, named across its top: Appearance, Playback,
 Accounts, Plugins, Desktop, Shortcuts and About. Each is a list of groups,
 and each group a list of rows.
 
+![Settings on its Playback section: the seven sections across the top, the search the settings box under them, and the Spotify tracks group, with In MixMusic, from Spotify, On Spotify Connect and In MixMusic, from YouTube Music, the one chosen](shots/playback.webp)
+
 ### Appearance
 
 How MixMusic looks; [Look and feel](look-and-feel.md) tells all of it.
 
 | Group | What's there |
 |---|---|
-| Layout | Blend, Expressive, Crate or Tiles. |
-| Theme | **Follow the computer**, with **In light mode** and **In dark mode**; a card for each theme; **get more themes**, which opens the marketplace, and **open themes folder**. Themes that didn't load are listed with the reason. |
-| *Theme* options | The options of a built-in theme that has some, as Aurora's drifting lights and glass blur. |
-| Colour and type | **Colours from a file** (pywal, matugen or a file of your own) and its **Colour file**, **Follow the artwork**, **Accent colour**, **Zoom**, **Text size**, **Density** and **Icons only in the sidebar**. |
+| [Layout](look-and-feel.md#layouts) | Blend, Expressive, Crate or Tiles. |
+| [Theme](look-and-feel.md#themes) | **Follow the computer**, with **In light mode** and **In dark mode**; a card for each theme; **get more themes**, which opens the marketplace, and **open themes folder**. Themes that didn't load are listed with the reason. |
+| [*Theme* options](look-and-feel.md#theme-options) | The options of a built-in theme that has some, as Aurora's drifting lights and glass blur. |
+| Colour and type | **[Colours from a file](look-and-feel.md#colours-from-a-file)** (pywal, matugen or a file of your own) and its **Colour file**, **[Follow the artwork](look-and-feel.md#the-accent-and-the-artwork)**, **Accent colour**, **[Zoom](look-and-feel.md#density-text-size-and-zoom)**, **Text size**, **Density** and **Icons only in the sidebar**. |
 
 ### Playback
 
-How MixMusic plays.
+How MixMusic plays; [Playing music](playing-music.md) tells all of it.
 
 | Group | What's there |
 |---|---|
-| Spotify tracks | How Spotify tracks play: **In MixMusic, from Spotify** (Premium, on Windows and macOS), **On Spotify Connect**, with the **Device** that plays them, or **In MixMusic, from YouTube Music**. See [Spotify](spotify.md). |
-| Sound | **Quality** (best, or data saver), **Crossfade** (off, or 1 to 12 seconds), **Even loudness**, **Volume levelling**, **Play 5.1 surround when a track has it**, **Autoplay**, **Skip songs made with AI** and **Skip songs you dislike**. |
-| Speed | **Songs** and **Podcasts**, each from 0.5× to 3×, at the tracks' own pitch, with **normal** to go back to 1×. |
-| Music videos | **Show the video of music videos**, on the now playing page. |
-| Equalizer | The **Equalizer** switch, a **Preset** (Flat, Bass boost, Treble boost, Vocal, Electronic, Rock, Acoustic, Late night or Lo-fi), and the preamp and ten bands, from −12 to +12 dB. |
-| Lyrics | **Translate lyrics to**: the language the translate switch beside the lyrics shows them in. |
-| Offline cache | **Tracks kept** and **Covers kept**, each with **clear**, and the cache's **Size**: off, 512 MB, 1 GB, 4 GB or 16 GB. |
-| Downloads | How many tracks are downloaded and how much room they take, with **show**; their **Folder**, with **open** and **change**; **Download on metered connections** and **Download songs added later**. |
-| Tools | **yt-dlp**, which MixMusic installs and keeps up to date, the **JavaScript runtime** it runs with (found by itself, or Deno, Node.js, Bun or QuickJS), and **Own yt-dlp**, the path to one of yours. |
+| [Spotify tracks](playing-music.md#how-spotify-tracks-play) | How Spotify tracks play: **In MixMusic, from Spotify** (Premium, on Windows and macOS), **On Spotify Connect**, with the **Device** that plays them, or **In MixMusic, from YouTube Music**. See [Spotify](spotify.md). |
+| Sound | **[Quality](playing-music.md#data-saver)** (best, or data saver), **[Crossfade](playing-music.md#crossfade-and-gapless-playback)** (off, or 1 to 12 seconds), **[Even loudness](playing-music.md#even-loudness-volume-levelling-and-the-volume)**, **Volume levelling**, **Play 5.1 surround when a track has it**, **[Autoplay](playing-music.md#autoplay-and-radios)**, **[Skip songs made with AI](playing-music.md#skipping-songs-made-with-ai)** and **[Skip songs you dislike](playing-music.md#dislikes-and-skipping)**. |
+| [Speed](playing-music.md#speed) | **Songs** and **Podcasts**, each from 0.5× to 3×, at the tracks' own pitch, with **normal** to go back to 1×. |
+| [Music videos](playing-music.md#the-picture-of-music-videos) | **Show the video of music videos**, on the now playing page. |
+| [Equalizer](playing-music.md#the-equalizer) | The **Equalizer** switch, a **Preset** (Flat, Bass boost, Treble boost, Vocal, Electronic, Rock, Acoustic, Late night or Lo-fi), and the preamp and ten bands, from −12 to +12 dB. |
+| [Lyrics](lyrics.md#translate) | **Translate lyrics to**: the language the translate switch beside the lyrics shows them in. |
+| [Offline cache](library.md#the-offline-cache) | **Tracks kept** and **Covers kept**, each with **clear**, and the cache's **Size**: off, 512 MB, 1 GB, 4 GB or 16 GB. |
+| [Downloads](library.md#where-they-are) | How many tracks are downloaded and how much room they take, with **show**; their **Folder**, with **open** and **change**; **Download on metered connections** and **Download songs added later**. |
+| [Tools](how-it-works.md#yt-dlp-and-the-javascript-runtime) | **yt-dlp**, which MixMusic installs and keeps up to date, the **JavaScript runtime** it runs with (found by itself, or Deno, Node.js, Bun or QuickJS), and **Own yt-dlp**, the path to one of yours. |
 
 ### Accounts
 
@@ -63,13 +65,13 @@ The **On the desktop** group:
 
 | Row | What it does |
 |---|---|
-| Close to the tray | Closing the window keeps the music playing; quit from the tray icon. Off at first. |
+| [Close to the tray](desktop.md#close-to-the-tray) | Closing the window keeps the music playing; quit from the tray icon. Off at first. |
 | Media keys | The keyboard's play, next and previous keys control MixMusic. On at first. |
-| Notifications | Tells what starts playing while neither MixMusic's window nor the mini player is in front. On at first. |
-| Show what plays in the window title | The window's title names the track that plays. On at first. |
-| Show what plays on Discord | Your Discord profile shows what you listen to. On at first. Under it, **Discord application ID**, to show another application's name. |
-| Player around the notch | The player around a MacBook's notch. On at first, and shown only on Macs with a notch. |
-| Start at login | Starts MixMusic, hidden, when you sign in to your computer. |
+| [Notifications](desktop.md#notifications) | Tells what starts playing while neither MixMusic's window nor the mini player is in front. On at first. |
+| [Show what plays in the window title](desktop.md#the-window-title) | The window's title names the track that plays. On at first. |
+| [Show what plays on Discord](desktop.md#discord) | Your Discord profile shows what you listen to. On at first. Under it, **Discord application ID**, to show another application's name. |
+| [Player around the notch](desktop.md#the-player-around-the-notch) | The player around a MacBook's notch. On at first, and shown only on Macs with a notch. |
+| [Start at login](desktop.md#start-at-login) | Starts MixMusic, hidden, when you sign in to your computer. |
 | Settings file | **open** opens `settings.json`, **show in folder** shows it in its folder. |
 | Reset settings | Puts back the settings of a new install, after asking. Your accounts, library and add-ons stay. |
 
@@ -86,9 +88,9 @@ themes and the plugins' commands. See
 
 | Group | What's there |
 |---|---|
-| MixMusic | The **Version**, with the system and how this copy was installed; whether a newer version is out, with **what's new** and **install** (or its download, for a copy that can't replace itself); the folder your data lives in; and **source code**, **contribute**, **report a problem** and **open logs folder**. |
-| Updates | **Check for updates**, at start and every few hours, and **Install updates without asking**, which downloads them in the background for the next launch. |
-| Licenses | The licenses of the code and the typefaces MixMusic includes, each with **show**. |
+| MixMusic | The **Version**, with the system and how this copy was [installed](getting-started.md#install); whether a newer version is out, with **what's new** and **install** (or its download, for a copy that can't replace itself); the folder your [data](data-and-privacy.md#where-mixmusic-keeps-its-data) lives in; and **source code**, **contribute**, **report a problem** and **open logs folder** (see [Troubleshooting](troubleshooting.md)). |
+| [Updates](how-it-works.md#mixmusic-itself) | **Check for updates**, at start and every few hours, and **Install updates without asking**, which downloads them in the background for the next launch. |
+| Licenses | The licenses of the code and the typefaces MixMusic includes, each with **show**: see [License](license.md) and [Credits](credits.md). |
 
 Without Install updates without asking, a new version asks in a pop-up:
 **install** it, **later**, which asks again at the next start, or **skip
@@ -115,7 +117,8 @@ colour. Each setting found keeps its control, so you change it right there.
 
 ## settings.json
 
-MixMusic keeps your settings in `settings.json`, in its data folder:
+MixMusic keeps your settings in `settings.json`, in its
+[data folder](data-and-privacy.md#the-data-folder):
 
 | System | settings.json |
 |---|---|
@@ -134,7 +137,8 @@ names the data folder. You can keep the file with your dotfiles: a
 Save the file, and what you changed applies at once, as if you had changed
 it in Settings; a toast says "Applied settings.json". MixMusic reads the
 file again before it saves to it, so it doesn't write over an edit it
-hasn't read.
+hasn't read: [the settings' part of the architecture](architecture/settings.md)
+tells how.
 
 - **A key you take out** goes back to its default, as at a new install.
   Taking out `spotifyClientId` signs you out of Spotify, and plugins you
@@ -169,15 +173,18 @@ settings.json**. Meanwhile:
 
 <kbd>Ctrl</kbd> <kbd>K</kbd> (<kbd>⌘</kbd> <kbd>K</kbd> on macOS) opens the
 command palette, which lists every command: MixMusic's, a "Theme:" command
-for each theme, and those of your plugins, each with its group and its
+for each [theme](look-and-feel.md#themes), and those of your
+[plugins](marketplace.md#what-a-plugin-can-do), each with its group and its
 keys.
 
 - Type to keep the commands whose name or group holds what you typed.
 - <kbd>↑</kbd> and <kbd>↓</kbd> move through the list, and
   <kbd>Enter</kbd> runs the command chosen.
 - Once you type, the first item is **Search for** what you typed, which
-  searches YouTube Music and Spotify, and the last is **Search the settings
-  for** it.
+  [searches](playing-music.md#search) YouTube Music and Spotify, and the
+  last is **Search the settings for** it.
+
+![The command palette over the marketplace: "Type a command or a search", and the playback commands, Play or pause first, each with its group and its keys, as Space, Ctrl+→ and Ctrl+←](shots/palette.webp)
 
 ## Refresh a page
 
@@ -192,8 +199,9 @@ and forward arrows. It's in the command palette and macOS's View menu too.
 - Home, searches, albums, artists, playlists, Explore, your Spotify and
   YouTube Music libraries, the lyrics, the marketplace and Settings' checks
   refresh. Plugins' pages and widgets render again.
-- A playlist, an album or a mix you downloaded downloads the songs added to
-  it since, as you refresh it.
+- A playlist, an album or a mix you downloaded downloads the
+  [songs added to it since](library.md#songs-added-later), as you refresh
+  it.
 - The button is dimmed on pages that always show what is current, as your
   liked songs and the stats.
 - <kbd>Ctrl</kbd> <kbd>R</kbd> (<kbd>⌘</kbd> <kbd>R</kbd>) stays Repeat.
@@ -292,7 +300,8 @@ Plugins' commands follow, with the keys their plugin gives them, if any.
 - After you click a button, a tile or a switch, <kbd>Space</kbd> still plays
   or pauses. A control you reach with <kbd>Tab</kbd> takes <kbd>Space</kbd>
   and <kbd>Enter</kbd> itself.
-- The mini player takes no shortcuts but the zoom's.
+- The [mini player](desktop.md#the-mini-player) takes no shortcuts but the
+  zoom's.
 - Keys that work from any app are the global shortcuts: see
   [Global shortcuts](desktop.md#global-shortcuts).
 

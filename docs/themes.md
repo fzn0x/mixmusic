@@ -17,9 +17,10 @@ my-theme/
    [community/themes/paper-mint](../community/themes/paper-mint), into a folder
    named after its new `id`.
 3. Change `id`, `name` and `author`, then the colors.
-4. Run **Reload add-ons** from the command palette (<kbd>Ctrl</kbd> <kbd>K</kbd>)
-   and pick the theme in Settings › Appearance. Themes that fail to load are
-   listed there, with the reason.
+4. Run **[Reload add-ons](marketplace.md#reload-add-ons)** from the command
+   palette (<kbd>Ctrl</kbd> <kbd>K</kbd>) and pick the theme in
+   [Settings › Appearance](look-and-feel.md#themes). Themes that fail to load
+   are listed there, with the reason.
 
 Every change to `theme.json` shows after a reload.
 
@@ -109,7 +110,8 @@ monospaced one.
 ### Layouts
 
 A theme sets the colors, the faces and the corners; the layout is the
-user's to choose, in Settings › Appearance, with any theme:
+user's to choose, in [Settings › Appearance](look-and-feel.md#layouts),
+with any theme:
 
 - **Blend**, the default: Expressive's rounded shapes and springs, on
   Crate's dense rows, big covers in cards and bold headings.
@@ -127,7 +129,8 @@ weights looks its best in all of them.
 ## Effects
 
 The themes MixMusic ships with add effects of their own, which MixMusic
-draws and the user tunes in Settings › Appearance: Mix's tile textures,
+draws and the user tunes in
+[Settings › Appearance](look-and-feel.md#theme-options): Mix's tile textures,
 Aurora's drifting lights and frosted glass, Sakura's petals, Terminal's
 scanlines and glow, Greenroom's and Glasshouse's grounds in the colour of
 the cover playing, Anime's speed lines and screentone, and Mochi's rising
@@ -314,5 +317,5 @@ all but the primary: then it falls between the first two.
 ## Share it
 
 Themes in [community/themes](../community/themes) can be installed by everyone
-from the marketplace. [community/README.md](../community/README.md) tells how
-to add yours.
+from the [marketplace](marketplace.md#install-a-theme).
+[community/README.md](../community/README.md) tells how to add yours.

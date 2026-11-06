@@ -1,0 +1,149 @@
+name: Linux app
+
+# MixMusic started as Linux users start it, and checked from outside as a
+# desktop sees it (#146): the build from flake.nix, and the release's
+# linux/amd64 archive on plain Ubuntu, each on a virtual X display and a
+# session bus of its own. .github/scripts/linux-app.py checks that it
+# shows its window, registers its tray icon, answers the media keys and
+# MPRIS, follows settings.json and colour files as they change, and zooms
+# with Ctrl and the keypad's +. Its frames, logs and D-Bus answers are the
+# jobs' artifacts. It isn't a required check: it reads the network, and
+# the runner's display and sound server.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "**.go"
+      - go.mod
+      - go.sum
+      - flake.nix
+      - flake.lock
+      - nix/**
+      - package.json
+      - bun.lock
+      - mygo.config.ts
+      - resources/**
+      - .github/scripts/**
+      - .github/workflows/linux-app.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linux-app-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # `nix build`, as PR #133 has Linux users build MixMusic from source,
+  # started on Ubuntu, outside NixOS, with Nix's libraries.
+  #
+  # A Nix build finds no OpenGL driver outside NixOS: its libglvnd looks in
+  # /run/opengl-driver, which only NixOS has. MixMusic needs none here:
+  # MyGo draws the windows on the CPU when the machine has no GPU device,
+  # as runners have none, and MixMusic opens no WebKitGTK page until the
+  # user signs in or watches a music video.
+  nix:
+    name: The Nix build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: MixMusic, from source
+        run: bash .github/scripts/nix-retry.sh nix build --print-build-logs
+      - name: A display, a sound server, and the checks' tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb xdotool x11-utils dbus pulseaudio ffmpeg python3-gi gir1.2-glib-2.0
+          pulseaudio --start --exit-idle-time=-1
+      - name: Start it, and check it
+        run: |
+          xvfb-run -a -s "-screen 0 1600x1000x24" dbus-run-session -- \
+            /usr/bin/python3 .github/scripts/linux-app.py --libs nix result/bin/mixmusic linux-app
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: linux-app-nix
+          path: linux-app/
+          if-no-files-found: error
+
+  # The linux/amd64 archive, built as release.yml builds it, started on
+  # Ubuntu with the libraries the docs have users install: it asks for the
+  # system's loader, not Nix's (#166).
+  release:
+    name: The release build on Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      # The shell's tools, fetched once, again if a download breaks off.
+      - name: The Nix shell
+        run: bash .github/scripts/nix-retry.sh nix develop --command true
+      - run: nix develop --command bun install --frozen-lockfile
+      - run: nix develop --command bash .github/scripts/build.sh linux/amd64
+      - name: Unpack the archive
+        run: |
+          mkdir app
+          tar -xzf build/linux-amd64/mixmusic-*-linux-amd64.tar.gz -C app
+          find app -type f | head -n 20
+      # docs/getting-started.md's line for Debian and Ubuntu.
+      - name: The libraries the docs name, a display, a sound server, and the checks' tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0 libayatana-appindicator3-1 libsecret-1-0
+          sudo apt-get install -y xvfb xdotool x11-utils dbus pulseaudio ffmpeg python3-gi gir1.2-glib-2.0
+          pulseaudio --start --exit-idle-time=-1
+      - name: Start it, and check it
+        run: |
+          app="$(find app -type f -name mixmusic -perm -u+x | head -n 1)"
+          xvfb-run -a -s "-screen 0 1600x1000x24" dbus-run-session -- \
+            /usr/bin/python3 .github/scripts/linux-app.py --libs system "$app" linux-app
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: linux-app-release
+          path: linux-app/
+          if-no-files-found: error
+
+  # How long yt-dlp takes to start on Linux (#245): yt-dlp_linux, the
+  # single file, unpacks Python into a new folder at each start;
+  # yt-dlp_linux.zip holds the same build unpacked.
+  ytdlp:
+    name: yt-dlp's start
+    runs-on: ubuntu-latest
+    steps:
+      - name: Time yt-dlp_linux and yt-dlp_linux.zip
+        run: |
+          cd "$RUNNER_TEMP"
+          url=https://github.com/yt-dlp/yt-dlp/releases/latest/download
+          for f in SHA2-256SUMS yt-dlp_linux yt-dlp_linux.zip; do
+            curl -fsSL --retry 3 -o "$f" "$url/$f"
+          done
+          grep -E ' (yt-dlp_linux|yt-dlp_linux\.zip)$' SHA2-256SUMS | sha256sum -c -
+          chmod +x yt-dlp_linux
+          mkdir unpacked
+          unzip -q yt-dlp_linux.zip -d unpacked
+          find unpacked -maxdepth 1 | sort
+          program="$(find unpacked -maxdepth 1 -type f -perm -u+x | head -n 1)"
+          TIMEFORMAT=%R
+          times() {
+            sync
+            echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null
+            for _ in 1 2 3 4 5 6; do { time "$1" --version >/dev/null; } 2>&1; done | paste -sd ' '
+          }
+          single="$(times ./yt-dlp_linux)"
+          zipped="$(times "$program")"
+          {
+            echo "### yt-dlp $(./yt-dlp_linux --version) on ubuntu-latest: seconds to --version, the first after the page cache is dropped"
+            echo
+            echo "| Build | Six runs |"
+            echo "|---|---|"
+            echo "| yt-dlp_linux, the single file | $single |"
+            echo "| yt-dlp_linux.zip, unpacked ($program) | $zipped |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"

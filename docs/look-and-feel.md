@@ -4,14 +4,17 @@
 MixMusic's look is a layout and a theme: four layouts, fourteen built-in
 themes, light and dark, and colours from the artwork or from pywal and matugen.
 
-Everything on this page is in Settings › Appearance. The layout sets the
-shapes, the density, the player bar, the headings and the motion; the theme
-sets the colours, the typefaces and the corners. Every theme works in every
-layout, and each change shows at once, with nothing to restart.
+Everything on this page is in [Settings › Appearance](settings.md#appearance).
+The layout sets the shapes, the density, the player bar, the headings and
+the motion; the theme sets the colours, the typefaces and the corners.
+Every theme works in every layout, and each change shows at once, with
+nothing to restart.
 
 ## Layouts
 
 Choose one in Settings › Appearance › Layout.
+
+![Settings › Appearance › Layout: Blend, chosen, then Expressive, Crate and Tiles, each with a line on how it looks, and the Theme group starting below, with Get more themes and Open themes folder](shots/appearance.webp)
 
 | Layout | What it looks like |
 |---|---|
@@ -39,7 +42,8 @@ In `settings.json`, the layout is `"layout"`: `"blend"`, `"expressive"`,
 Settings › Appearance › Theme shows a card for every theme you have, drawn
 in its own colours, with its name, its four tile colours, and "built in" or
 the name of who made it. Click a card to wear its theme; the theme you wear
-has an outline in the accent. The command palette
+has an outline in the accent. The
+[command palette](settings.md#the-command-palette)
 (<kbd>Ctrl</kbd> <kbd>K</kbd>, <kbd>⌘</kbd> <kbd>K</kbd> on macOS) lists
 every theme too, as "Theme: Aurora" and so on.
 
@@ -84,7 +88,8 @@ computer is in light mode and the other while it is in dark mode, and
 switches as the computer does. They start as Daylight and Mix.
 
 While Follow the computer is on, clicking a theme card, or "use it" in the
-marketplace, sets the theme of the mode the computer is in now.
+[marketplace](marketplace.md#install-a-theme), sets the theme of the mode
+the computer is in now.
 
 ## The accent and the artwork
 
@@ -105,6 +110,8 @@ colour does: the cover's while a track plays and Follow the artwork is on,
 else your Accent colour, else MixMusic's pink. So the whole window changes
 colour with each cover. They are set in Roboto Flex, which MixMusic brings
 with it, and are made for the Expressive layout, though they work in any.
+
+![The Material theme on the now playing page of アイドル by YOASOBI: a pale ground, and the buttons, switches, seek bars and the visualizer in a violet blue taken from the cover](shots/material.webp)
 
 To keep their colours from changing with each track, turn off Follow the
 artwork, and choose an Accent colour for them to start from.
@@ -155,10 +162,12 @@ The zoom has keys of its own:
 | Back to 100% | <kbd>Ctrl</kbd> <kbd>0</kbd> | <kbd>⌘</kbd> <kbd>0</kbd> |
 
 macOS's View menu has Zoom In, Zoom Out and Actual Size. Each change shows
-a toast with a button that resets it. The mini player zooms too, and its
-window grows and shrinks with it. A window too small for the zoom you chose
-zooms only as far as it has room for, and Settings says so. Settings ›
-Shortcuts changes these keys, as it does every other.
+a toast with a button that resets it. The
+[mini player](desktop.md#the-mini-player) zooms too, and its window grows
+and shrinks with it. A window too small for the zoom you chose zooms only
+as far as it has room for, and Settings says so.
+[Settings › Shortcuts](settings.md#change-a-shortcut) changes these keys,
+as it does every other.
 
 <kbd>Ctrl</kbd> <kbd>B</kbd> (<kbd>⌘</kbd> <kbd>B</kbd> on macOS) folds and
 unfolds the sidebar.
@@ -171,15 +180,17 @@ settings, Animation effects turned off in Windows' accessibility settings,
 or animations turned off on a Linux desktop), MixMusic moves less:
 
 - Aurora's lights, Anime's speed lines and Mochi's sparkles hold still.
-- Lyrics timed word by word light each word whole as it starts, rather
-  than filling it as it's sung.
+- Lyrics timed [word by word](lyrics.md#word-by-word) light each word
+  whole as it starts, rather than filling it as it's sung.
 - What moves on springs, as a button you press or the mark of the page
   you're on, goes where it goes at once, and the head of a playlist or an
   album shows in the top bar at once as you scroll.
-- The strip of pull to refresh opens and closes at once.
-- The picture of a music video waits for you to press play on the cover.
-- On a MacBook's notch, the player's panel fades in place rather than
-  growing, and its bars rest.
+- The strip of [pull to refresh](settings.md#pull-to-refresh) opens and
+  closes at once.
+- The [picture of a music video](playing-music.md#the-picture-of-music-videos)
+  waits for you to press play on the cover.
+- On a [MacBook's notch](desktop.md#the-player-around-the-notch), the
+  player's panel fades in place rather than growing, and its bars rest.
 
 ## Marketplace themes
 
@@ -192,6 +203,7 @@ it. [Marketplace](marketplace.md) tells more.
 To make a theme of your own, start from [Themes](themes.md): it lists
 every colour, font and corner a theme sets, and shows a complete one. Put
 its folder in the themes folder ("open themes folder" in Settings ›
-Appearance › Theme), and run **Reload add-ons** from the command palette.
-A theme that fails to load is listed under the theme cards, with the
-reason.
+Appearance › Theme), and run
+**[Reload add-ons](marketplace.md#reload-add-ons)** from the command
+palette. A theme that fails to load is listed under the theme cards, with
+the reason.

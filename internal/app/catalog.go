@@ -335,6 +335,58 @@ func (c *Catalog) songOf(ctx context.Context, video media.Track) (media.Track, e
 
 func isSong(t media.Track) bool { return !t.Video }
 
+// videoNote is the note of the lyrics of a music video its song's
+// synchronized lyrics don't keep time with, whichever lyrics show.
+const videoNote = "Not synced: the song's synced lyrics don't match this video."
+
+// timeSlack is how much longer or shorter than its song a music video may
+// be for the song's synchronized lyrics to keep time with it: YouTube
+// Music tells lengths in whole seconds.
+const timeSlack = 3 * time.Second
+
+// videoSong returns the song of a music video, for its lyrics, if YouTube
+// Music has one.
+func (c *Catalog) videoSong(ctx context.Context, video media.Track) (media.Track, bool) {
+	if c.a.matcher == nil {
+		return media.Track{}, false
+	}
+	song, err := c.songOf(ctx, video)
+	return song, err == nil
+}
+
+// keepsTime reports whether lyrics timed for a song keep time with its
+// music video: whether the video is as long as the song, give or take
+// timeSlack. A longer video, as one that opens with a scene before the
+// song, plays every line late. A length nobody tells is taken to fit.
+func (c *Catalog) keepsTime(ctx context.Context, video, song media.Track) bool {
+	length := time.Duration(video.DurationMs) * time.Millisecond
+	if length <= 0 {
+		length = c.videoLength(ctx, video)
+	}
+	if length <= 0 || song.DurationMs <= 0 {
+		return true
+	}
+	off := length - time.Duration(song.DurationMs)*time.Millisecond
+	return off.Abs() <= timeSlack
+}
+
+// videoLength returns the length of a YouTube video, as YouTube Music's
+// radio of it, which starts with it, tells it; 0 when it doesn't, waiting
+// at most songWait.
+func (c *Catalog) videoLength(ctx context.Context, video media.Track) time.Duration {
+	_, id, err := media.ParseID(video.ID)
+	if err != nil {
+		return 0
+	}
+	ctx, cancel := context.WithTimeout(ctx, songWait)
+	defer cancel()
+	tracks, err := c.a.youtube.Radio(ctx, id)
+	if err != nil || len(tracks) == 0 || tracks[0].ID != video.ID {
+		return 0
+	}
+	return time.Duration(tracks[0].DurationMs) * time.Millisecond
+}
+
 // Lyrics returns the lyrics of a track: Unison's, else LRCLIB's, else
 // YouTube Music's. Synchronized lyrics of a later source win over plain
 // ones of an earlier, and YouTube Music's plain lyrics over shorter ones.
@@ -349,9 +401,21 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 		log.Printf("mixmusic: the lyrics of %s, on Unison: %v", track.ID, err)
 	}
 	// LRCLIB fills in when Unison has nothing, or is down, and when it
-	// has synchronized lyrics where Unison has plain ones.
+	// has synchronized lyrics where Unison has plain ones. Unison looks a
+	// music video up by its own ID, but LRCLIB has the lyrics of its song,
+	// timed for the song (#290).
+	note := ""
 	if err != nil || !l.Synced {
-		lr, lrErr := c.a.lyrics.Get(ctx, q)
+		lq, song, ofSong := q, media.Track{}, false
+		if track.Video && q.VideoID != "" {
+			if song, ofSong = c.videoSong(ctx, track); ofSong {
+				lq = lyricsQuery(song)
+			}
+		}
+		lr, lrErr := c.a.lyrics.Get(ctx, lq)
+		if lrErr == nil && lr.Synced && ofSong && !c.keepsTime(ctx, track, song) {
+			lr, note = lr.Untimed(), videoNote
+		}
 		switch {
 		case lrErr == nil && (err != nil || lr.Synced):
 			l, err = lr, nil
@@ -365,6 +429,10 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 		if yt, ytErr := c.youtubeLyrics(ctx, track); ytErr == nil && (err != nil || len(yt.Lines) > len(l.Lines)) {
 			l, err = yt, nil
 		}
+	}
+	// Whichever plain lyrics show, they tell why they aren't synced.
+	if note != "" && err == nil && !l.Synced {
+		l.Note = note
 	}
 	if err != nil {
 		// A track LRCLIB was too busy to look everywhere for, or that a

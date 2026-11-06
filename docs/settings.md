@@ -92,6 +92,8 @@ themes and the plugins' commands. See
 | [Updates](how-it-works.md#mixmusic-itself) | **Check for updates**, at start and every few hours, and **Install updates without asking**, which downloads them in the background for the next launch. |
 | Licenses | The licenses of the code and the typefaces MixMusic includes, each with **show**: see [License](license.md) and [Credits](credits.md). |
 
+![Settings › About: the MixMusic group, with the version, MixMusic 0.5.9 · windows amd64 · portable, "This is the newest version" with Check again, where your data lives, its folder covered here, and the Source code, Contribute, Report a problem and Open logs folder buttons; then Updates, with Check for updates on and Install updates without asking off](shots/about.webp)
+
 Without Install updates without asking, a new version asks in a pop-up:
 **install** it, **later**, which asks again at the next start, or **skip
 this version**. The `.deb`, the `.rpm`, the AppImage and the Flatpak can't

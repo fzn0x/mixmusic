@@ -80,6 +80,8 @@ and the item that quits MixMusic. On Windows and macOS, a click on the icon
 shows the main window and a right click opens the menu; on Linux, a click
 opens the menu.
 
+![The tray icon's menu on Windows: Play / Pause, Next and Previous, then Show MixMusic and Mini player, then Exit](shots/tray-menu.webp)
+
 ### Close to the tray
 
 With **Close to the tray** on, in Settings › Desktop, closing the main

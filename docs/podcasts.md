@@ -78,6 +78,8 @@ Where a song shows its lyrics, an episode shows its details: in the [side panel]
 - **Chapters:** lines that start or end with a time are chapters, and the chapter that plays lights up as the episode goes on. On a MacBook with a notch, the [notch player](desktop.md#the-player-around-the-notch) shows it, with the chapters before and after it.
 - **Where they come from:** YouTube Music's Details tab, or Spotify, asked for the first time they show, and kept: a refresh doesn't ask again.
 
+![Now playing an episode of the Lex Fridman Podcast, at 1:09 of 3:34:26: its cover with the visualizer on the left, and under the player its details: the show, 1.3M views, Oct 26 and 3 hr 34 min, then its description with its links](shots/episode.webp)
+
 ## Speed
 
 Podcasts have a speed of their own, apart from songs': Podcasts, in Settings › Playback › Speed, 1× at first. Episodes play at it, and songs at theirs.

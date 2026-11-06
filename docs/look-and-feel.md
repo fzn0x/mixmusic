@@ -47,6 +47,8 @@ has an outline in the accent. The
 (<kbd>Ctrl</kbd> <kbd>K</kbd>, <kbd>⌘</kbd> <kbd>K</kbd> on macOS) lists
 every theme too, as "Theme: Aurora" and so on.
 
+![Settings › Appearance › Theme: Get more themes and Open themes folder beside its title, the Follow the computer switch, off, then a card for each of the fourteen built-in themes, from Anime to Walnut Light, each drawn in its own colours with its four tile colours and "built in", Mix outlined as the one worn](shots/theme-cards.webp)
+
 The title bar of the window is light or dark as the theme is.
 
 ### The built-in themes
@@ -74,6 +76,8 @@ A built-in theme with options shows them in a group under the theme cards,
 named after it, as **Aurora options**: switches for its effects, sliders
 for its blur or glow, and Aurora's colour of light. Each theme keeps its
 own options.
+
+![MixMusic wearing Aurora, its northern lights behind the settings: the last rows of theme cards, then the Aurora options group, with the Drifting lights switch on, the Glass blur slider at 22px and the Light color swatch, violet](shots/theme-options.webp)
 
 While your system asks for less motion, Aurora's lights, Anime's speed
 lines and Mochi's sparkles hold still (see
@@ -137,6 +141,8 @@ nothing to reload. In Settings › Appearance › Colour and type, set
   light or dark, title bar included.
 - While Follow the artwork is on, the cover still sets the accent. Turn it
   off to keep the file's.
+
+![Settings › Appearance › Colour and type with Colours from a file set to pywal: the window in the file's dark blue ground with an orange accent, the Colour file row, its path covered here, "Read at 01:14, and followed as it changes." and How to set it up, then Follow the artwork, off, and an orange Accent colour](shots/colours-file.webp)
 
 [Themes: Colours from a file](themes.md#colours-from-a-file) has the
 setup for pywal and matugen, the files MixMusic reads, and how each colour

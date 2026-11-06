@@ -354,6 +354,7 @@ func (s *shell) artistTile(c *ui.Context, key string, a media.Artist) {
 		if m.Item("Open").Chosen() {
 			s.navigate(artistPath(a.ID))
 		}
+		s.followItem(m, a)
 		s.copyLinkItem(m, a.URL)
 	})
 	if open {

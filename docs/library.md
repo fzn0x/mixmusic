@@ -3,7 +3,7 @@
 
 MixMusic keeps your liked songs, mixes, downloads, history and stats for Spotify and YouTube Music tracks together, beside each service's own library.
 
-What MixMusic keeps itself, as your liked and disliked songs, your mixes and your history, is in `library.json` in your [data folder](data-and-privacy.md#the-data-folder), and works with no account. What you keep on a service, as its playlists and saved albums, shows once you [sign in](accounts.md) to it, and the changes you make in MixMusic reach it.
+What MixMusic keeps itself, as your liked and disliked songs, your mixes, the artists you follow without an account and your history, is in `library.json` in your [data folder](data-and-privacy.md#the-data-folder), and works with no account. What you keep on a service, as its playlists and saved albums, shows once you [sign in](accounts.md) to it, and the changes you make in MixMusic reach it.
 
 ## The Library page
 
@@ -12,6 +12,7 @@ Library, in the sidebar or with Alt+2 (⌥2 on macOS), has these pivots, each wi
 - **Liked:** the songs you liked, of every service.
 - **Mixes:** the playlists you make in MixMusic.
 - **Podcasts:** the episodes you're listening to and the shows you follow: see [Podcasts](podcasts.md#following-shows).
+- **Artists:** the new releases of the artists you follow, and the artists themselves: see [Artists you follow](#artists-you-follow).
 - **Downloads:** what plays without the network.
 - **History:** what you played.
 - **Disliked:** the songs you disliked, once there are any.
@@ -44,6 +45,24 @@ A mix is a playlist of MixMusic's own, which holds tracks of every service.
 - **A mix's page** has Play, Shuffle and Download, the search and Sort of its tracks, and in its More menu Rename and Delete. Deleting asks first; the tracks stay where they came from. Remove from this mix, in a track's menu there, takes it out.
 
 Your mixes show in the sidebar under Your mixes, with how many tracks each holds, and on Home's Your mixes tile and shelf.
+
+## Artists you follow
+
+Follow an artist with Follow on their page, with Follow in the page's More menu (⋯), or with Follow in the menu of their tile, a right click on it in the search, on Home or in the library. Following, or Unfollow in those menus, stops.
+
+- **Signed in to the artist's service,** you follow them there: you subscribe on YouTube Music, or follow on Spotify, as in the service's own app.
+- **Signed out,** MixMusic keeps them itself, in `library.json`, as it keeps the podcasts you follow, and the toast says "following in MixMusic". Signing in later doesn't follow them on the service: MixMusic never writes to your account on its own. Their page still says Following, and stopping stops in MixMusic, and on the service too where you follow them there.
+- **Library › Artists** has their new releases first, then Followed in MixMusic, the artists MixMusic keeps, then Followed on Spotify and Followed on YouTube Music, the artists you follow on each service you signed in to, past those MixMusic keeps. The pivot counts the artists MixMusic keeps.
+
+### New releases
+
+Home shows "New from artists you follow" after your own shelves, and Library › Artists shows it first, once there are any: the albums, singles and EPs of the artists you follow, in MixMusic and on the services you signed in to, newest first. Home's Spotify and YouTube Music pivots keep that service's.
+
+- **New** is out in the last 8 weeks. Spotify tells the day a release came out, which its tile shows, as Nov 1. YouTube Music tells only the year, which its tile shows: a release of this year counts as new all year, and last year's in the first 8 weeks of the new one.
+- **Newest first:** a release known by its year alone counts from the first day of its year, so this year's come after those of the last weeks. Of one day, or one year, an artist's newest come first.
+- **At most** an artist's four newest show, and 30 in all.
+- **Where they come from:** the artist's page on YouTube Music, which lists their latest albums and singles, or Spotify's list of their albums and singles, the 10 newest of each. Neither service gives apps a feed of the new releases of the artists you follow: YouTube Music's New releases are everyone's, and Spotify took its own list from apps in February 2026. Spotify's artists need you signed in to Spotify.
+- **How often:** MixMusic asks for an artist's releases at most every 12 hours, and an hour after their service failed, as Home or Library › Artists shows and when you [refresh](settings.md#refresh-a-page) them: up to 30 artists in one go, 3 at a time, those never asked first, and the rest the next time. An artist whose service fails shows what was read before. What it read is kept in `releases.json` in the [cache folder](data-and-privacy.md#the-cache-folder), so that Home shows it at once at the next start, then what's new once it's read.
 
 ## YouTube Music playlists, albums and artists
 

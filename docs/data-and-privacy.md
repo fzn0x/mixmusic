@@ -53,7 +53,8 @@ AppImage or archive copy's.
   what you save applies at once.
 - `library.json`: your liked and disliked songs, your mixes, the last
   1,000 tracks you played, which the history and the stats read, your
-  last 20 searches, and the shows you follow.
+  last 20 searches, the shows you follow, and the artists you follow
+  in MixMusic.
 - `queue.json`: up to 500 tracks of the queue, around the one playing,
   and where it was.
 - `positions.json`: where you left the latest 500 podcast episodes.
@@ -77,6 +78,8 @@ AppImage or archive copy's.
 - `loudness.json`: how loud YouTube measured the tracks you played.
 - `ai-labels.json`: the videos YouTube labels as made with AI, kept 30
   days, while you skip them.
+- `releases.json`: the releases of the last year of the artists you
+  follow, for [New from artists you follow](library.md#new-releases).
 - `lyrics-translations/`: the translations of lyrics you turned on, by
   track and language.
 - `romaji/`: the dictionary of the readings of kanji, once you turn on
@@ -118,6 +121,7 @@ Where the credential store can't keep a secret:
 |---|---|---|
 | Browsing YouTube Music: search, home, explore, pages | YouTube Music (`music.youtube.com`) | what you search and open, with a visitor ID YouTube gave; signed in, your session's cookies |
 | Your YouTube Music library, once you sign in | YouTube Music | the likes, dislikes, saves, playlists and follows you make |
+| New releases of the artists you follow | YouTube Music, and Spotify once you sign in | the artists' IDs, to read their pages or lists of albums, at most every 12 hours each |
 | The audio of a track | YouTube's player API (`www.youtube.com`) and media servers; yt-dlp, which asks YouTube too | the video's ID, always signed out |
 | Your YouTube Music history, signed in, while "Add what you play to your YouTube Music history" is on | YouTube Music | the tracks you play, once they played a while, and how far you got in episodes |
 | Skip songs made with AI, while it's on | YouTube (`www.youtube.com`), signed out | the video's ID, once a video |

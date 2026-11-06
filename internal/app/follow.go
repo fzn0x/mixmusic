@@ -92,6 +92,11 @@ func (c *Collection) SetFollowing(ctx context.Context, artistID string, on bool)
 	if err != nil {
 		return err
 	}
+	if !on {
+		// What was read of their releases goes: a look reads it again
+		// while they're still followed.
+		defer c.a.releases.forget(c.a, artistID)
+	}
 	switch source {
 	case media.SourceYouTube:
 		if !c.a.youtube.SignedIn() {

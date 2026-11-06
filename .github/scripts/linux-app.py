@@ -56,8 +56,8 @@ TITLE = "Check tone"
 ARTIST = "MixMusic CI"
 TONE_HZ = 440
 # The track's cover: the system's controls show covers of https addresses
-# alone.
-COVER = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/resources/icon.png"
+# alone: MixMusic's icon at a tag, whose address stays when files move.
+COVER = "https://raw.githubusercontent.com/fzn0x/mixmusic/v0.5.9/resources/icon.png"
 MPRIS = "org.mpris.MediaPlayer2.mixmusic"  # outside a Flatpak
 MPRIS_PATH = "/org/mpris/MediaPlayer2"
 PLAYER = "org.mpris.MediaPlayer2.Player"

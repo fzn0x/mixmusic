@@ -65,7 +65,7 @@ The **On the desktop** group:
 |---|---|
 | Close to the tray | Closing the window keeps the music playing; quit from the tray icon. Off at first. |
 | Media keys | The keyboard's play, next and previous keys control MixMusic. On at first. |
-| Notifications | Tells what starts playing while MixMusic's window isn't in front. On at first. |
+| Notifications | Tells what starts playing while neither MixMusic's window nor the mini player is in front. On at first. |
 | Show what plays in the window title | The window's title names the track that plays. On at first. |
 | Show what plays on Discord | Your Discord profile shows what you listen to. On at first. Under it, **Discord application ID**, to show another application's name. |
 | Player around the notch | The player around a MacBook's notch. On at first, and shown only on Macs with a notch. |

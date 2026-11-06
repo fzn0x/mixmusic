@@ -257,7 +257,6 @@ func (p *Player) Report(np NowPlaying) {
 	p.a.nowPlaying = np
 	started := p.a.startOf(np)
 	tray := p.a.tray
-	main := p.a.main
 	bar := p.a.taskbar
 	p.a.mu.Unlock()
 	s := p.a.settings.Get()
@@ -276,7 +275,7 @@ func (p *Player) Report(np NowPlaying) {
 	if windowTitle(np, s.ShowInTitle) != windowTitle(prev, s.ShowInTitle) {
 		p.a.retitle()
 	}
-	if started && s.Notifications && (main == nil || !main.IsFocused()) {
+	if started && s.Notifications && !p.a.playingInFront() {
 		go p.a.notifyTrack(*np.Track)
 	}
 }
@@ -366,6 +365,10 @@ func cut(s string, n int) string {
 	return s
 }
 
+// showNote shows a notification; tests, which run no MyGo loop for it to
+// wait for, replace it.
+var showNote = (*mygo.Notification).Show
+
 // notifyTrack shows a notification of the track that started.
 func (a *App) notifyTrack(t media.Track) {
 	body := t.ArtistNames()
@@ -374,38 +377,37 @@ func (a *App) notifyTrack(t media.Track) {
 	}
 	n := mygo.NewNotification(mygo.NotificationOptions{ID: "now-playing", Title: t.Title, Body: body, Silent: true})
 	n.OnClick(a.showMain)
-	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
+	if err := showNote(n); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
 		log.Printf("mixmusic: notification: %v", err)
 	}
 }
 
 // notifyLiked tells that the track that plays joined the liked songs, or
-// left them, while the main window isn't in front: liked from elsewhere,
-// as by a global shortcut, nothing else shows it.
+// left them, while neither the main window nor the mini player is in
+// front: liked from elsewhere, as by a global shortcut, nothing else
+// shows it.
 func (a *App) notifyLiked(t media.Track, liked bool) {
 	title, body := likedNote(t, liked)
 	a.notifyRated("liked", title, body)
 }
 
 // notifyDisliked tells that the track that plays was disliked, or no
-// longer, while the main window isn't in front, as notifyLiked does.
+// longer, while neither the main window nor the mini player is in front,
+// as notifyLiked does.
 func (a *App) notifyDisliked(t media.Track, disliked bool) {
 	title, body := dislikedNote(t, disliked)
 	a.notifyRated("disliked", title, body)
 }
 
 // notifyRated shows the notification id of a track liked or disliked from
-// outside the main window, unless it is in front.
+// outside MixMusic's windows, unless one that shows it is in front.
 func (a *App) notifyRated(id, title, body string) {
-	a.mu.Lock()
-	main := a.main
-	a.mu.Unlock()
-	if !a.settings.Get().Notifications || main != nil && main.IsFocused() {
+	if !a.settings.Get().Notifications || a.inFront() {
 		return
 	}
 	n := mygo.NewNotification(mygo.NotificationOptions{ID: id, Title: title, Body: body, Silent: true})
 	n.OnClick(a.showMain)
-	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
+	if err := showNote(n); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
 		log.Printf("mixmusic: notification: %v", err)
 	}
 }

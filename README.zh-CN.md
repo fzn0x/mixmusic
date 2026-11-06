@@ -121,12 +121,12 @@
 | Debian、Ubuntu 及其衍生发行版 | [`mixmusic-<version>-linux-<arch>.deb`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Fedora、openSUSE 及其衍生发行版 | [`mixmusic-<version>-linux-<arch>.rpm`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | 任意 Linux，单个文件 | [`mixmusic-<version>-linux-<arch>.AppImage`](https://github.com/fzn0x/mixmusic/releases/latest) |
-| 任意 Linux，沙盒运行（Flatpak，x64） | [`mixmusic-<version>-linux-amd64.flatpak`](https://github.com/fzn0x/mixmusic/releases/latest) |
+| 任意 Linux，沙盒运行（Flatpak） | [`mixmusic-<version>-linux-<arch>.flatpak`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | 任意 Linux，装在你的主文件夹中 | [`mixmusic-<version>-linux-<arch>.tar.gz`](https://github.com/fzn0x/mixmusic/releases/latest)，附带 `install.sh` |
 
 `<arch>` 在 x64 上是 `amd64`，在 Arm 上是 `arm64`。每个版本都附有 `SHA256SUMS`，可以用来校验下载的文件。名为 `update-…`、`….delta`、`mixmusic-<version>-macos-…` 或 `-windows-<arch>.tar.gz` 的文件不需要下载：它们是已安装的应用自动更新时用的。
 
-安装程序、便携版 zip 和 Linux 压缩包会自行更新。`.deb`、`.rpm`、AppImage 和 Flatpak 无法替换自身的文件，所以有新版本时，MixMusic 会告诉你，并替你下载。便携版 zip 解压到任意位置，打开 `MixMusic.exe` 即可。AppImage 先加上可执行权限（`chmod +x`），再打开。Flatpak 可以用你的软件中心打开，或者运行 `flatpak install ./mixmusic-<version>-linux-amd64.flatpak`；第一次安装时，Flatpak 会从 Flathub 获取 GNOME 运行时。
+安装程序、便携版 zip 和 Linux 压缩包会自行更新。`.deb`、`.rpm`、AppImage 和 Flatpak 无法替换自身的文件，所以有新版本时，MixMusic 会告诉你，并替你下载。便携版 zip 解压到任意位置，打开 `MixMusic.exe` 即可。AppImage 先加上可执行权限（`chmod +x`），再打开。Flatpak 可以用你的软件中心打开，或者运行 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`；第一次安装时，Flatpak 会从 Flathub 获取 GNOME 运行时。
 
 ### 首次启动
 

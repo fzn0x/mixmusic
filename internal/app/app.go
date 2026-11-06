@@ -271,6 +271,7 @@ func New(opts Options) (*App, error) {
 	a.lastfmStore = lastfmStore{newSecretStore(opts.DataDir, lastfmSecret, "lastfm.json", "lastfm.dpapi")}
 	a.openLastfm()
 	a.tools = tools.New(filepath.Join(opts.DataDir, "bin"))
+	a.tools.Bundled = bundledYTDLP()
 	a.resolver = stream.NewResolver(a.tools, filepath.Join(opts.CacheDir, "yt-dlp"))
 	// MIXMUSIC_YTDLP_ONLY has yt-dlp find every stream, as before MixMusic
 	// asked YouTube's player API: to time one against the other, or to

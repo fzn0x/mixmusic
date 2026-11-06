@@ -114,6 +114,9 @@ func (s *shell) toolSettings(c *ui.Context) {
 			if y.Managed {
 				desc += ", MixMusic's own, which it keeps up to date"
 			}
+			if y.Bundled {
+				desc += ", which comes with MixMusic and updates with it"
+			}
 			if outdated(y) {
 				desc += ". " + y.Latest + " is out."
 			}

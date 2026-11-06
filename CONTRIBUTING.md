@@ -171,11 +171,11 @@ release, and the page reads the latest version from GitHub's API. Once the
 release is published, set the two `data-version` spans to it, for when the
 API does not answer.
 
-The release has a Flatpak too, which the workflow packs from the Linux
-build's x64 archive (see [The Flatpak](#the-flatpak)). Its releases come
-from CHANGELOG.md's headings, so it needs no step of its own; when its job
-fails, the release goes out without it, and running the failed jobs again
-adds it.
+The release has a Flatpak for each architecture too, which the workflow
+packs from the Linux build's x64 and Arm64 archives (see
+[The Flatpak](#the-flatpak)). Their releases come from CHANGELOG.md's
+headings, so they need no step of their own; when one's job fails, the
+release goes out without it, and running the failed jobs again adds it.
 
 Installed apps update themselves from the latest release. Its update files are
 signed with the key whose public half is `updates.publicKey` in
@@ -282,10 +282,14 @@ they're built from changes on main:
 [packaging/flatpak](packaging/flatpak) packs the app of the Linux build
 into a Flatpak, `io.github.fzn0x.mixmusic`, on the GNOME runtime, with the
 tray's library from Flathub's shared modules (a git submodule) and Node.js
-from the SDK's extension. CI builds it on every pull request, installs it
-and starts MixMusic in it; its `flatpak` artifact is the bundle. To build
-it on Linux, with [Flatpak](https://flatpak.org/setup/) and
-`flatpak install flathub org.flatpak.Builder`:
+from the SDK's extension, for x64 and Arm64: the manifest takes the
+Linux archive of the architecture it builds for. CI builds both on every
+pull request, each on a runner of its architecture, installs them and
+starts MixMusic in them; its `flatpak-amd64` and `flatpak-arm64`
+artifacts are the bundles. To build it on Linux, with
+[Flatpak](https://flatpak.org/setup/) and
+`flatpak install flathub org.flatpak.Builder`, on x64 (on Arm64, the
+same with `arm64` for `amd64`):
 
 ```sh
 git submodule update --init
@@ -301,7 +305,8 @@ flatpak run io.github.fzn0x.mixmusic
 `flatpak run --log-session-bus io.github.fzn0x.mixmusic` shows what the
 sandbox refuses on the session bus. GNOME runtimes get about a year of
 support: the manifest's `runtime-version`, the `gnome-<version>` image of
-ci.yml and release.yml, and the Node.js extension's branch move together.
+ci.yml and release.yml, and the Node.js extension's branch move together;
+the image must be published for both architectures, as Flathub's are.
 
 ## Translations of the README
 
@@ -312,6 +317,19 @@ that changes the README needn't change them: say in it which sections
 changed, so that a translator can follow. Corrections and new languages are
 welcome, as `README.<language code>.md` with a link in each README's
 language line.
+
+## Flathub
+
+[packaging/flathub](packaging/flathub) builds MixMusic from source as
+Flathub builds apps, without the network, and the
+[flathub workflow](.github/workflows/flathub.yml) builds it the way
+Flathub's builder does, with Flathub's linter, when what it's built from
+changes, and weekly. After a change of `go.mod` or `go.sum`, run
+`go run ./tools/flathub`, which writes `packaging/flathub/go-modules.json`
+again; the workflow fails until it's current. Its
+[README](packaging/flathub/README.md) tells what the build needs, why it
+asks for each permission, and how MixMusic is submitted to Flathub and
+kept up to date there.
 
 ## Reports
 

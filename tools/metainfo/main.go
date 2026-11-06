@@ -3,7 +3,9 @@
 // with the releases of CHANGELOG.md in place of its <releases/>, each with
 // its date, its summary (the first paragraph of its section) and a link to
 // its page. The Flatpak builds of ci.yml and release.yml run it before
-// flatpak-builder, which reads the file it writes.
+// flatpak-builder, which reads the file it writes. With -template, it
+// fills another such file: Flathub's build fills that of packaging/flathub
+// as it builds MixMusic from source.
 //
 //	go run ./tools/metainfo -o packaging/flatpak/dist/io.github.fzn0x.mixmusic.metainfo.xml
 package main
@@ -19,8 +21,9 @@ import (
 	"strings"
 )
 
-// template is the metadata with <releases/> in place of the releases.
-const template = "packaging/flatpak/io.github.fzn0x.mixmusic.metainfo.xml"
+// template is the metadata with <releases/> in place of the releases,
+// which -template sets.
+var template = "packaging/flatpak/io.github.fzn0x.mixmusic.metainfo.xml"
 
 // releasePage is the page of a version's release, by its tag.
 const releasePage = "https://github.com/fzn0x/mixmusic/releases/tag/v"
@@ -28,6 +31,7 @@ const releasePage = "https://github.com/fzn0x/mixmusic/releases/tag/v"
 func main() {
 	root := flag.String("root", ".", "the repository's root")
 	out := flag.String("o", "", "the file to write; standard output when empty")
+	flag.StringVar(&template, "template", template, "the metadata to fill, from the root")
 	flag.Parse()
 	tmpl, err := os.ReadFile(filepath.Join(*root, template))
 	if err != nil {

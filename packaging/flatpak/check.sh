@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Checks a bundle of MixMusic's Flatpak, as ci.yml and release.yml build
-# it, in their flatpak-builder container:
+# it, in their flatpak-builder container, on a machine of the bundle's
+# architecture, x64 or Arm64:
 #
 #   packaging/flatpak/check.sh <bundle> [shots]
 #
 # It installs the bundle, finds the app, its launcher and Node.js where
-# the manifest puts them, loads in the sandbox each library MixMusic and
-# MyGo load, and runs Node.js on the runtime's OpenSSL, zlib and ICU. With
+# the manifest puts them, checks that the app is for this machine and that
+# the runtime has its loader, loads in the sandbox each library MixMusic
+# and MyGo load, and runs Node.js on the runtime's OpenSSL, zlib and ICU. With
 # shots, it starts MixMusic in the sandbox too, under a virtual X server
 # and a session bus of its own, which saves screenshots of home, Settings ›
 # About and Settings › Playback, with its tools, into shots, then quits.
@@ -36,6 +38,27 @@ flatpak run --user --command=node "$id" -e '
 	require("zlib").gzipSync("mixmusic");
 	new Intl.DateTimeFormat("ja-JP", { dateStyle: "full" }).format(0);
 	console.log("Node.js " + process.version + ", ICU " + process.versions.icu + ", OpenSSL " + process.versions.openssl);
+'
+
+# The archive of another architecture, or a loader the runtime lacks,
+# would keep MixMusic from starting, which only shots tries.
+echo "== The app is for this machine, and its loader is in the runtime"
+flatpak run --user --command=python3 "$id" -c '
+import os, platform, struct
+with open("/app/lib/mixmusic/mixmusic", "rb") as f:
+    elf = f.read()
+machine = {62: "x86_64", 183: "aarch64"}.get(struct.unpack_from("<H", elf, 0x12)[0])
+if machine != platform.machine():
+    raise SystemExit(f"The app is for {machine}, the sandbox runs on {platform.machine()}")
+phoff = struct.unpack_from("<Q", elf, 0x20)[0]
+phentsize, phnum = struct.unpack_from("<HH", elf, 0x36)
+for i in range(phnum):
+    kind, _, offset, _, _, size = struct.unpack_from("<IIQQQQ", elf, phoff + i * phentsize)
+    if kind == 3:  # PT_INTERP
+        loader = bytes(elf[offset : offset + size]).split(b"\0")[0].decode()
+        if not os.path.exists(loader):
+            raise SystemExit(f"The app asks for {loader}, which the runtime lacks")
+        print(f"The app is for {machine}, and runs on {loader}")
 '
 
 echo "== The libraries MixMusic loads"

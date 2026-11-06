@@ -219,13 +219,7 @@ func (s *shell) updateSettings(c *ui.Context) {
 		return
 	}
 	s.group(c, "Updates", func() {
-		asks := ""
-		switch {
-		case u.Enabled && !u.AutomaticDownloads:
-			asks = " A new version asks to install."
-		case !u.Enabled:
-			asks = " A new version offers its download."
-		}
+		asks := newVersionDoes(u)
 		last := ""
 		if t, err := time.Parse(time.RFC3339, u.LastCheck); err == nil {
 			last = " Last checked " + t.Local().Format("2 Jan 2006, 15:04") + "."
@@ -251,11 +245,27 @@ func (s *shell) updateSettings(c *ui.Context) {
 	})
 }
 
+// newVersionDoes tells, after the row of the checks, what a new version
+// found does in a copy of u's: Flathub's comes through the software
+// center.
+func newVersionDoes(u app.UpdateStatus) string {
+	switch {
+	case u.Enabled && !u.AutomaticDownloads:
+		return " A new version asks to install."
+	case u.Kind == "flathub":
+		return " A new version comes from Flathub, through your software center."
+	case !u.Enabled:
+		return " A new version offers its download."
+	}
+	return ""
+}
+
 // buildNames tell how a copy of each kind was installed, as
 // UpdateStatus.Kind says.
 var buildNames = map[string]string{
 	"installer": "installed with the setup", "portable": "portable", "app": "app", "archive": "installed with install.sh",
-	"deb": ".deb package", "rpm": ".rpm package", "pacman": "AUR package", "appimage": "AppImage", "flatpak": "Flatpak", "development": "development build",
+	"deb": ".deb package", "rpm": ".rpm package", "pacman": "AUR package", "appimage": "AppImage", "flatpak": "Flatpak",
+	"flathub": "Flathub", "development": "development build",
 }
 
 // releaseRow tells whether a newer version is out, and installs it, or
@@ -360,6 +370,10 @@ func replacing(kind, file string) string {
 			return ""
 		}
 		return "Open " + file + " with your software center, or run flatpak install ./" + file + ". Your library and settings stay."
+	case "flathub":
+		// Flathub builds each release, and the software center installs
+		// it with the updates of the other apps: no download replaces it.
+		return "Your software center, such as GNOME Software or KDE Discover, installs it from Flathub with your other updates, once Flathub has built it, or run flatpak update. Your library and settings stay."
 	case "development":
 		return "Development builds don't update themselves."
 	}

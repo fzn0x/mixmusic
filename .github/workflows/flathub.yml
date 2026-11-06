@@ -1,0 +1,243 @@
+name: Flathub
+
+# Builds packaging/flathub's manifest, MixMusic from source, as Flathub's
+# builder (flathub-infra/vorarbeiter) builds an app: in the image of
+# Flathub's linter, with its seccomp profile and the recipes of its
+# justfile, at the commit below. The manifest's linter runs first; the
+# sources download; the build runs in flatpak-builder's sandbox, without
+# the network, as a stable build, which mirrors the screenshots; then the
+# linter checks the repository it made. The bundle is then installed and
+# started in the release's Flatpak's check. tools/flathub writes the folder
+# Flathub's repository would hold, which builds this commit.
+on:
+  pull_request:
+    paths:
+      - packaging/flathub/**
+      - packaging/flatpak/mixmusic.sh
+      - tools/flathub/**
+      - tools/metainfo/**
+      - internal/app/flathub.go
+      - public/**
+      - go.mod
+      - go.sum
+      - .github/workflows/flathub.yml
+  push:
+    branches: [main]
+    paths:
+      - packaging/flathub/**
+      - packaging/flatpak/mixmusic.sh
+      - tools/flathub/**
+      - tools/metainfo/**
+      - internal/app/flathub.go
+      - public/**
+      - go.mod
+      - go.sum
+      - .github/workflows/flathub.yml
+  # The rest of MixMusic, which the paths leave out, and the runtime, the
+  # SDK's extensions and Flathub's linter, which change on their own.
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flathub-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_ID: io.github.fzn0x.mixmusic
+  LINTER: ghcr.io/flathub-infra/flatpak-builder-lint:unprivileged
+  VORARBEITER: https://raw.githubusercontent.com/flathub-infra/vorarbeiter/984d1f0bbeb9d1ac640681cac53940b9dee31bf8
+
+jobs:
+  # go-modules.json names the modules go.sum does, as the proxy serves them.
+  sources:
+    name: Go modules' sources
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - run: go run ./tools/flathub -check
+
+  build:
+    name: Build (${{ matrix.arch }})
+    needs: sources
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    env:
+      BUILD_ARCH: ${{ matrix.arch }}
+      # A build of Flathub's default branch: stable, with the screenshots
+      # mirrored and, on x86_64, the sources bundled.
+      REF: refs/heads/master
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true # Flathub's shared modules
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: The folder of Flathub's repository, building this commit
+        env:
+          COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          go run ./tools/flathub -o work -commit "$COMMIT"
+          git -C work init -q
+          git -C work add -A
+          git -C work -c user.name=CI -c user.email=ci@localhost commit -q -m "Build MixMusic ${COMMIT::12}"
+          cat "work/$APP_ID.yml"
+      - name: Flathub's recipes and seccomp profile
+        run: |
+          curl -fsSL --retry 3 -o work/.flathub.justfile "$VORARBEITER/justfile"
+          curl -fsSL --retry 3 -o flatpak.seccomp.json "$VORARBEITER/flatpak.seccomp.json"
+          mkdir -p work/tmp work/.local/state flatpak
+          chmod -R 777 work flatpak
+      # As on Flathub's runners: flatpak-builder's sandbox makes namespaces.
+      - name: Let the build make namespaces
+        run: |
+          sudo aa-teardown >/dev/null 2>&1 || true
+          sudo systemctl disable --now apparmor.service >/dev/null 2>&1 || true
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0 || true
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+      - name: Room for the SDK
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          df -h /
+      - name: Pull the linter's image
+        run: |
+          for delay in 0 15 30 60; do
+            sleep "$delay"
+            docker pull "$LINTER" && exit 0
+          done
+          exit 1
+      - name: Lint the manifest
+        run: |
+          docker run --rm \
+            --entrypoint="" \
+            --security-opt apparmor=unconfined \
+            --security-opt seccomp="$GITHUB_WORKSPACE/flatpak.seccomp.json" \
+            -v "$GITHUB_WORKSPACE/work:/work" -w /work \
+            -e APP_ID -e REF -e GITHUB_ACTIONS \
+            -e TMPDIR=/work/tmp -e XDG_STATE_HOME=/work/.local/state \
+            "$LINTER" \
+            bash -c 'git config --global --add safe.directory "*" && just -f .flathub.justfile validate-manifest "$APP_ID"'
+      - name: Download the sources
+        run: |
+          docker run --rm \
+            --entrypoint="" \
+            --security-opt apparmor=unconfined \
+            --security-opt seccomp="$GITHUB_WORKSPACE/flatpak.seccomp.json" \
+            --cap-drop all \
+            -v /proc:/host/proc \
+            -v "$GITHUB_WORKSPACE/work:/work" -w /work \
+            -e APP_ID -e TMPDIR=/work/tmp \
+            "$LINTER" \
+            bash -c 'just -f .flathub.justfile prepare-env && just -f .flathub.justfile download-sources "$APP_ID"'
+      - name: Build, without the network
+        run: |
+          docker run --rm \
+            --entrypoint="" \
+            --security-opt apparmor=unconfined \
+            --security-opt seccomp="$GITHUB_WORKSPACE/flatpak.seccomp.json" \
+            --cap-drop all \
+            -v /proc:/host/proc \
+            -v "$GITHUB_WORKSPACE/work:/work" -w /work \
+            -v "$GITHUB_WORKSPACE/flatpak:/home/flatbld/.local/share/flatpak" \
+            -e APP_ID -e REF -e BUILD_ARCH -e TMPDIR=/work/tmp \
+            "$LINTER" \
+            bash -c 'just -f .flathub.justfile prepare-env && just -f .flathub.justfile build "$APP_ID" "$REF" "$BUILD_ARCH"'
+      - name: Lint the build, its metadata and its desktop entry
+        run: |
+          docker run --rm \
+            --entrypoint="" \
+            --security-opt apparmor=unconfined \
+            --security-opt seccomp="$GITHUB_WORKSPACE/flatpak.seccomp.json" \
+            -v "$GITHUB_WORKSPACE/work:/work" -w /work \
+            -e REF -e BUILD_ARCH -e GITHUB_ACTIONS \
+            -e TMPDIR=/work/tmp -e XDG_STATE_HOME=/work/.local/state \
+            "$LINTER" \
+            bash -c '
+              set -e
+              just -f .flathub.justfile validate-build
+              flatpak-builder-lint --exceptions appstream "builddir/files/share/metainfo/$0.metainfo.xml"
+              desktop-file-validate "builddir/files/share/applications/$0.desktop"
+            ' "$APP_ID"
+      - name: The bundle
+        run: |
+          docker run --rm \
+            --entrypoint="" \
+            --security-opt apparmor=unconfined \
+            --security-opt seccomp="$GITHUB_WORKSPACE/flatpak.seccomp.json" \
+            -v "$GITHUB_WORKSPACE/work:/work" -w /work \
+            -e TMPDIR=/work/tmp \
+            "$LINTER" \
+            flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
+              repo "mixmusic-flathub-$BUILD_ARCH.flatpak" "$APP_ID" stable
+          ls -l "work/mixmusic-flathub-$BUILD_ARCH.flatpak"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: flathub-${{ matrix.arch }}
+          path: work/mixmusic-flathub-${{ matrix.arch }}.flatpak
+          if-no-files-found: error
+      - name: The linter's log
+        if: ${{ !cancelled() }}
+        run: cat work/.local/state/flatpak_builder_lint/linter.log 2>/dev/null || true
+
+  # The bundle installed and started, as the release's Flatpak is, in
+  # Flathub's container with the GNOME runtime; then what Flathub's build
+  # has of its own: its mark, and the yt-dlp of its manifest, with its
+  # solver of YouTube's challenges and Node.js.
+  check:
+    name: Install and start (${{ matrix.arch }})
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: flathub-${{ matrix.arch }}
+      - name: Install it, and start MixMusic in its sandbox
+        run: bash packaging/flatpak/check.sh "mixmusic-flathub-${{ matrix.arch }}.flatpak" shots
+      - name: Flathub's mark and yt-dlp
+        run: |
+          flatpak run --user --command=sh "$APP_ID" -c '
+            set -e
+            test -s /app/share/mixmusic/flathub
+            test -s "/app/share/licenses/$FLATPAK_ID/LICENSE-MIT"
+            test -s "/app/share/licenses/$FLATPAK_ID/github.com/egoist/mygo/LICENSE"
+            echo "yt-dlp $(/app/bin/yt-dlp --version)"
+            python3 -c "import yt_dlp_ejs; print(\"yt-dlp-ejs\", yt_dlp_ejs.version)"
+            # As MixMusic runs it: its header, then no address to read.
+            header="$(yt-dlp --verbose --js-runtimes node:/app/bin/node 2>&1 || true)"
+            echo "$header" | grep "^\[debug\]"
+            echo "$header" | grep -q "JS runtimes: node"
+          '
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: flathub-screenshots-${{ matrix.arch }}
+          path: shots/
+          if-no-files-found: ignore

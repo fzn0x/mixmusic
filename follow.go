@@ -120,6 +120,9 @@ func (s *shell) followedOn(a media.Artist, on bool) {
 // followItem is the item of an artist's menus that follows them, or stops
 // (followArtist). It's greyed out while their service answers.
 func (s *shell) followItem(m *ui.Menu, a media.Artist) {
+	if a.Source == media.SourceFile {
+		return // no releases to follow
+	}
 	on := !s.followsArtist(a)
 	label := "Follow"
 	if !on {

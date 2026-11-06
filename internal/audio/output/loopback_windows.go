@@ -48,11 +48,6 @@ const (
 
 	// activationWait is how long the activation may take.
 	activationWait = 5 * time.Second
-	// quietAfter is how long the processes may give no audio before the
-	// capture hears silence: packets come every 10 ms while they play.
-	quietAfter = 100 * time.Millisecond
-	// period is the silence the capture hears at a time, as a stream's.
-	period = time.Second * periodFrames / Rate
 )
 
 // activationParams is AUDIOCLIENT_ACTIVATION_PARAMS, of process loopback.
@@ -380,9 +375,7 @@ func startLoopback(client *iAudioClient) (*loopback, error) {
 // it hears nothing, or until the client fails.
 func (c *Capture) loop(l *loopback, write func([]float32)) {
 	var frames []float32
-	silence := make([]float32, 2*periodFrames)
-	heard := time.Now() // when the last packet came
-	filled := heard     // how far silence was given since
+	q := newQuiet(time.Now())
 	for !c.stopping.Load() {
 		syscall.WaitForSingleObject(l.event, 20)
 		got := false
@@ -415,21 +408,10 @@ func (c *Capture) loop(l *loopback, write func([]float32)) {
 			write(frames)
 			got = true
 		}
-		now := time.Now()
-		if got {
-			heard, filled = now, now
-			continue
-		}
-		if now.Sub(heard) < quietAfter {
-			continue
-		}
-		// Silence, at the pace of a stream, and no more than a moment of it
-		// at once, as after the computer slept.
-		if earliest := now.Add(-2 * quietAfter); filled.Before(earliest) {
-			filled = earliest
-		}
-		for ; now.Sub(filled) >= period; filled = filled.Add(period) {
-			write(silence)
+		if now := time.Now(); got {
+			q.audio(now)
+		} else {
+			q.fill(now, write)
 		}
 	}
 }

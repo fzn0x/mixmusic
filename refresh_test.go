@@ -254,7 +254,7 @@ func TestRefreshShown(t *testing.T) {
 		}
 	}
 	for path, want := range map[string][]string{
-		"/":               {"home:spotify", "home:youtube", "tools"},
+		"/":               {"home:spotify", "home:youtube", "releases", "tools"},
 		"/settings/about": {"release"},
 		"/explore/charts": {"charts"},
 	} {

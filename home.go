@@ -94,6 +94,9 @@ func (s *shell) homePage(c *ui.Context) {
 			shown += len(shelves)
 		}
 		put("home-yours", s.localShelves())
+		// The new releases of the artists followed show at once too, as
+		// the last run found them, until this run's look comes.
+		shown += s.releasesShelf(c, "home-releases", source)
 		for _, sv := range services {
 			if source != "" && source != sv.source {
 				continue

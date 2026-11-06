@@ -652,6 +652,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 		h := headProps{title: a.Name, art: a.Artwork, round: true, source: a.Source, facts: texts(a.Subtitle), description: a.Description,
 			playLabel: "play top songs",
 			menu: func(m *ui.Menu) {
+				s.followItem(m, a)
 				if len(a.TopTracks) > 0 && m.Item("Start radio").Chosen() {
 					s.startRadio(a.TopTracks[0])
 				}
@@ -664,14 +665,10 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 		if len(a.TopTracks) > 0 {
 			h.play = func() { s.p.PlayAll(a.TopTracks, false) }
 		}
-		if s.signedIn(a.Source) {
-			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Following, "follow", "following", s.keeping[key]
-			h.onKeep = func(on bool) {
-				s.keep(key, string(a.Source)+":artists", a.Name, "following", &res.value.Following, on, func(ctx context.Context) error {
-					return s.svc.Collection.SetFollowing(ctx, a.ID, on)
-				})
-			}
-		}
+		// Signed out of the artist's service, they're followed in MixMusic.
+		following := s.followsArtist(a)
+		h.keep, h.keepLabel, h.keptLabel, h.keeping = &following, "follow", "following", s.keeping[key]
+		h.onKeep = func(on bool) { s.followArtist(a, on) }
 		s.collectionHead(c, h)
 		section("songs", func() {
 			s.sectionTitle(c, "Top songs")

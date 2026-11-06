@@ -12,7 +12,7 @@ import (
 
 // librarySections are the library's pivots, by their paths' last part.
 var librarySections = []struct{ id, label string }{
-	{"liked", "Liked"}, {"mixes", "Mixes"}, {"podcasts", "Podcasts"}, {"downloads", "Downloads"}, {"history", "History"},
+	{"liked", "Liked"}, {"mixes", "Mixes"}, {"podcasts", "Podcasts"}, {"artists", "Artists"}, {"downloads", "Downloads"}, {"history", "History"},
 	{"disliked", "Disliked"}, {"spotify", "Spotify"}, {"youtube", "YouTube Music"},
 }
 
@@ -48,6 +48,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 				counts[i] = len(s.svc.Collection.Playlists())
 			case "podcasts":
 				counts[i] = len(s.svc.Collection.Podcasts())
+			case "artists":
+				counts[i] = len(s.svc.Collection.FollowedArtists())
 			case "downloads":
 				counts[i] = s.kept.Status().Tracks
 			case "disliked":
@@ -67,6 +69,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 			s.mixTiles(c)
 		case "podcasts":
 			s.podcastLibrary(c)
+		case "artists":
+			s.artistLibrary(c)
 		case "downloads":
 			s.downloadsLibrary(c)
 		case "history":

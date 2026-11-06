@@ -2,19 +2,20 @@
 <!-- docs: group=start order=90 -->
 
 MixMusic writes what goes wrong to `mixmusic.log`, without your sign-ins:
-Settings › About › open logs folder shows it, beside the reports of any
-crash. Settings › About › report a problem opens a new issue on GitHub with
-your version, system, tools, theme and plugins filled in; attach the log
-after reading it. After a crash, MixMusic offers to report it the next
-time it starts.
+[Settings › About](settings.md#about) › open logs folder shows it, beside
+the reports of any crash, in
+[the logs folder](data-and-privacy.md#the-logs-folder). Settings › About ›
+report a problem opens a new issue on GitHub with your version, system,
+tools, theme and plugins filled in; attach the log after reading it. After
+a crash, MixMusic offers to report it the next time it starts.
 
 ## Common problems
 
 - **A YouTube Music track doesn't play.** It says why: some are not
   available in your country, or only to signed-in adults on YouTube's own
   website. The tracks MixMusic can't find the audio of itself, such as those
-  made for children, need yt-dlp: check Settings › Playback that it is
-  installed, and a JavaScript runtime found. MixMusic updates the yt-dlp it
+  made for children, [need yt-dlp](streams.md#when-yt-dlp-is-needed): check
+  Settings › Playback that it is installed, and a JavaScript runtime found. MixMusic updates the yt-dlp it
   installed every day, as an old one stops finding streams; one of your
   own, chosen there, you keep up to date yourself (`yt-dlp -U`, or your
   package manager).
@@ -23,14 +24,16 @@ time it starts.
   also looks where Homebrew, Deno, Bun, Volta, Scoop and WinGet install;
   elsewhere, choose the runtime in Settings › Playback.
 - **YouTube Music signed you out.** Settings › Accounts says so when YouTube
-  ends the session, as it does when you sign out of Google everywhere or
-  change your password. Sign out there, then sign in again.
+  [ends the session](accounts.md#when-youtube-ends-the-session), as it does
+  when you sign out of Google everywhere or change your password. Sign out
+  there, then sign in again.
 - **Google refuses the sign-in window** with "This browser or app may not
   be secure". Google decides this; try again later, or from another
   network. Or sign in with a browser instead, in Settings › Accounts:
-  import the session of a browser you signed in to YouTube Music with, or
-  paste the Cookie header of a request of a signed-in music.youtube.com
-  tab.
+  [import the session](accounts.md#import-from-a-browser) of a browser you
+  signed in to YouTube Music with, or
+  [paste the Cookie header](accounts.md#paste-a-cookie-header) of a request
+  of a signed-in music.youtube.com tab.
 - **Importing a browser's session fails.** Close the browser first: while
   it runs, it may hold its cookies, or not have saved a new sign-in yet.
   Recent Chrome on Windows seals its cookies against other programs:
@@ -41,10 +44,11 @@ time it starts.
   Linux, a browser installed from Flathub is in the list as "Chrome
   (Flatpak)", and so on, read from its folder in `~/.var/app`: Firefox,
   Chrome, Chromium, Edge and Brave.
-- **Spotify plays from YouTube Music, not in MixMusic.** Spotify plays in
-  MixMusic on Windows and macOS, with Premium, and with a sign-in made since MixMusic
-  played Spotify itself: Settings › Playback asks you to sign in again when
-  yours is older.
+- **Spotify plays from YouTube Music, not in MixMusic.** Spotify
+  [plays in MixMusic](spotify.md#how-spotify-tracks-play) on Windows and
+  macOS, with Premium, and with a sign-in made since MixMusic played
+  Spotify itself: Settings › Playback asks you to sign in again when yours
+  is older.
 - **Spotify refuses the sign-in.** A Spotify app in development mode serves
   only while its owner has Premium, and only the accounts added under Users
   Management in its settings, by their Spotify email. Settings › Accounts
@@ -56,14 +60,16 @@ time it starts.
   quits first, it keeps your text as `settings.json.broken` beside it, and
   saves its settings in its place. A file that doesn't read as MixMusic
   starts is kept the same way, and MixMusic starts with the settings of a
-  new install.
-- **No tray icon on Linux.** The tray needs `libayatana-appindicator3` and a
-  desktop that shows AppIndicator icons; GNOME needs its AppIndicator
-  extension. Without it, closing the window quits MixMusic.
-- **Linux does not start it.** Install GTK 3, as the
-  [README](https://github.com/fzn0x/mixmusic#the-first-launch) says.
+  new install: see [Settings](settings.md#when-it-has-a-mistake).
+- **No tray icon on Linux.** The [tray](desktop.md#the-tray) needs
+  `libayatana-appindicator3` and a desktop that shows AppIndicator icons;
+  GNOME needs its AppIndicator extension. Without it, closing the window
+  quits MixMusic.
+- **Linux does not start it.** Install GTK 3, as
+  [Getting started](getting-started.md#the-first-launch) says.
 - **macOS cannot check the app,** as it is not notarized yet: open it from
-  System Settings › Privacy & Security › Open Anyway.
+  System Settings › Privacy & Security › Open Anyway, as
+  [Getting started](getting-started.md#the-first-launch) says.
 
 ## Known issues
 
@@ -84,8 +90,9 @@ time it starts.
   channel's members do not play, as streams are found signed out.
 - The macOS app is not notarized and the Windows installer is not signed
   yet, so the first launch asks you to allow it.
-- The portable zip does not register `mixmusic://` links, and Windows on Arm
-  is less tested than the rest.
+- The portable zip does not register
+  [`mixmusic://` links](desktop.md#mixmusic-links), and Windows on Arm is
+  less tested than the rest.
 - The Flatpak is new: it sees none of your home folder but the profiles
   of the browsers installed from Flathub, read-only. So a
   yt-dlp of your own must be in `~/.var/app/io.github.fzn0x.mixmusic`, a

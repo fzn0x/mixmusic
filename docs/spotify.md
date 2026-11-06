@@ -83,7 +83,9 @@ Settings › Playback chooses:
   [notes](https://support.spotify.com/us/article/equalizer/) that its audio
   settings can't change while another device plays it. The
   [visualizer](audio-engine.md#the-visualizer) and the plugins' analyser
-  hear it on Windows 10 build 20348 and later, not yet on macOS.
+  hear it on Windows 10 build 20348 and later, and on macOS 14.2 and
+  later once you allow MixMusic to record what other apps play, as macOS
+  asks the first time.
   Sign-ins made before MixMusic played Spotify itself do not allow it:
   Settings › Playback asks you to sign in again. When Spotify cannot play
   here, MixMusic plays the track from YouTube Music instead, and says why.

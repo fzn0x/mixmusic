@@ -151,8 +151,10 @@ Where the credential store can't keep a secret:
   while romanize is on.
 - The audio: the offline cache, the downloads, and on Windows what the
   visualizer hears of Spotify through Windows' process loopback, which
-  hears only Spotify's app. MixMusic analyzes that audio in memory, and
-  never records or sends it.
+  hears only Spotify's app. On macOS it hears Spotify in MixMusic through
+  a process tap of MixMusic's own web views, which macOS lets it do once
+  you allowed it to record what other apps play. MixMusic analyzes that
+  audio in memory, and never records or sends it.
 - The log and the crash reports, until you choose to send one.
 
 ## Clear, move or reset

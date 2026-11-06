@@ -19,7 +19,7 @@ Spotify refuses the sign-in. For the code, read
 | Needs Premium | yes | yes | no |
 | Systems | Windows and macOS | every system, with a device that has Spotify open | every system |
 | Equalizer, crossfade, speed, Even loudness | no | no | yes |
-| Visualizer | on Windows | on Windows, for the Spotify app on this computer | yes |
+| Visualizer | on Windows, and macOS 14.2 and later | on Windows, for the Spotify app on this computer | yes |
 | Cast, 5.1 | no | no | yes |
 | Podcast episodes | yes | yes | no |
 | Default | on Windows and macOS | on Linux | no |
@@ -91,7 +91,10 @@ or macOS.
   as MixMusic's own. The equalizer, crossfade, Even loudness and speed
   don't reach it: Spotify keeps its own loudness and speed. On Windows 10
   build 20348 and later, the visualizer hears it through Windows' process
-  loopback. On macOS it doesn't hear it yet, and draws nothing then.
+  loopback, and on macOS 14.2 and later through a process tap, once you
+  allowed MixMusic to record what other apps play, as macOS asks the first
+  time ([the visualizer](audio-engine.md#the-visualizer)). Where it can't
+  hear it, it draws nothing.
 
 ### What 0.5.9 changed
 

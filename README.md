@@ -498,8 +498,10 @@ sign-in.
 
 On Windows, the visualizer hears the audio of Spotify playing on this
 computer, in MixMusic or in the Spotify app, through Windows' process
-loopback, which hears only that app. It analyzes the audio in memory and
-never records or sends it.
+loopback, which hears only that app. On macOS 14.2 and later, it hears
+Spotify playing in MixMusic through a process tap, once you allow it, as
+macOS asks. It analyzes the audio in memory and never records or sends
+it.
 
 ## Credits
 

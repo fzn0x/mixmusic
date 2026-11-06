@@ -49,6 +49,11 @@ a crash, MixMusic offers to report it the next time it starts.
   macOS, with Premium, and with a sign-in made since MixMusic played
   Spotify itself: Settings › Playback asks you to sign in again when yours
   is older.
+- **The visualizer stays flat for Spotify on a Mac.** It hears Spotify in
+  MixMusic from macOS 14.2 on, once you allowed MixMusic to record what
+  other apps play, as macOS asks the first time. Allow it in System
+  Settings › Privacy & Security › Screen & System Audio Recording, then
+  play the track again. The log says why it can't hear.
 - **Spotify refuses the sign-in.** A Spotify app in development mode serves
   only while its owner has Premium, and only the accounts added under Users
   Management in its settings, by their Spotify email. Settings › Accounts

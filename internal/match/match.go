@@ -24,6 +24,10 @@ const threshold = 0.6
 // ErrNoMatch is returned when YouTube Music has no recording close enough.
 var ErrNoMatch = errors.New("no matching recording found on YouTube Music")
 
+// ErrLocal is returned for a track on the user's computer, which is never
+// looked for on YouTube Music: MixMusic plays it from its file.
+var ErrLocal = errors.New("a track on this computer isn't looked for on YouTube Music")
+
 // Searcher searches YouTube Music.
 type Searcher interface {
 	Search(ctx context.Context, query string, filter youtube.Filter) ([]media.Item, error)
@@ -46,8 +50,11 @@ func New(yt Searcher, known *store.File[map[string]media.Track]) *Matcher {
 
 // Match returns the YouTube Music track of the same recording as t.
 func (m *Matcher) Match(ctx context.Context, t media.Track) (media.Track, error) {
-	if t.Source == media.SourceYouTube {
+	switch t.Source {
+	case media.SourceYouTube:
 		return t, nil
+	case media.SourceFile:
+		return media.Track{}, ErrLocal
 	}
 	if found, ok := m.known(t.ID); ok {
 		return found, nil
@@ -109,8 +116,11 @@ func (m *Matcher) Forget(trackID string) error {
 // t itself for a YouTube Music track, the match found before for others,
 // if any.
 func (m *Matcher) Matched(t media.Track) (media.Track, bool) {
-	if t.Source == media.SourceYouTube {
+	switch t.Source {
+	case media.SourceYouTube:
 		return t, true
+	case media.SourceFile:
+		return media.Track{}, false
 	}
 	return m.known(t.ID)
 }

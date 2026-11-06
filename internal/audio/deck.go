@@ -12,7 +12,9 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/aac"
+	"github.com/fzn0x/mixmusic/flac"
 	"github.com/fzn0x/mixmusic/mp4"
+	"github.com/fzn0x/mixmusic/ogg"
 	"github.com/fzn0x/mixmusic/webm"
 )
 
@@ -413,7 +415,8 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 // readError words a failure of the reader for the player.
 func readError(err error) error {
 	if errors.Is(err, webm.ErrFormat) || errors.Is(err, errors.ErrUnsupported) || errors.Is(err, webm.ErrNoAudio) ||
-		errors.Is(err, mp4.ErrFormat) || errors.Is(err, mp4.ErrNoAudio) || errors.Is(err, aac.ErrFormat) {
+		errors.Is(err, mp4.ErrFormat) || errors.Is(err, mp4.ErrNoAudio) || errors.Is(err, aac.ErrFormat) ||
+		errors.Is(err, flac.ErrFormat) || errors.Is(err, ogg.ErrFormat) || errors.Is(err, errWAV) || errors.Is(err, errMP3) {
 		return fmt.Errorf("%w (%v)", errUnsupported, err)
 	}
 	return errNetwork

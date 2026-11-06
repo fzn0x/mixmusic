@@ -26,6 +26,7 @@ func (a *App) OnFlush(fn func()) (cancel func()) {
 // of them.
 func (a *App) Close() {
 	a.downloads.Close()
+	a.closeLocalFiles()
 	a.artStore.Close()
 	a.flush()
 }

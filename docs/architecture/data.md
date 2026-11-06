@@ -4,6 +4,7 @@ Everything lives in the user's data folder (`%AppData%\MixMusic` on
 Windows, `~/Library/Application Support/MixMusic` on macOS,
 `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
 `queue.json`, `positions.json` (where the user left podcasts' episodes),
+`local-files.json` (the index of the music on the computer),
 `addons/`, `bin/` (yt-dlp), the YouTube session
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the
@@ -21,7 +22,8 @@ and `App.ReloadSettings` applies an edit as Settings applies a change, then
 tells the windows (`App.Watch`). A file with a mistake is told of after a
 second, and kept as `settings.json.broken` if MixMusic quits before it is
 fixed; a `settings.json` that is a link stays one. The
-cache folder holds audio, the covers shown (`artwork/`), on Linux the
+cache folder holds audio, the covers shown (`artwork/`), the covers of
+the music on the computer (`local-art/`), on Linux the
 cover the desktop's media controls show (`now-playing/`), matches, how loud
 YouTube measured the tracks played (`loudness.json`), the videos YouTube
 labels as made with AI, for 30 days (`ai-labels.json`), the releases of

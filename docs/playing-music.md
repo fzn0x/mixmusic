@@ -11,6 +11,9 @@ The search box at the top of the window, "Search Spotify and YouTube Music", sea
 
 - **The pivots** at the top of the results are All, Songs, Albums, Artists, Playlists and Podcasts, each with how many it found. All shows the first ten songs, then shelves of artists, albums and playlists.
 - **The services:** under the pivots, choose both, Spotify or YouTube Music. With both, the results of the two services take turns, so that each leads.
+- **On this computer:** with both services chosen, the [music on this
+  computer](local-music.md#search) that matches shows first, in its own
+  section, without the network too.
 - **Each result** has a mark of its service. YouTube Music's songs say how many times they played, or how many views a video has, as "1.2B plays" or "905M views", so that the original stands out from covers. Spotify gives apps no such count.
 - **Without Spotify,** the page says it searches YouTube Music only, with a link to [sign in](spotify.md#sign-in). Spotify gives an app in [development mode](spotify.md#what-spotify-allows-apps), as your Spotify app is, ten results of each kind.
 

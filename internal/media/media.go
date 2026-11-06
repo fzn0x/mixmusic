@@ -21,6 +21,9 @@ const (
 	SourceSpotify Source = "spotify"
 	// SourceLocal is MixMusic itself: playlists made in the app.
 	SourceLocal Source = "local"
+	// SourceFile is the music kept on the user's computer, which MixMusic
+	// plays from its files, and sends to no service.
+	SourceFile Source = "file"
 )
 
 // prefixes maps sources to the prefix of their IDs.
@@ -28,6 +31,7 @@ var prefixes = map[Source]string{
 	SourceYouTube: "yt",
 	SourceSpotify: "sp",
 	SourceLocal:   "mx",
+	SourceFile:    "file",
 }
 
 // ErrBadID is returned for IDs that name no source.

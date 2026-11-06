@@ -141,6 +141,10 @@ func (o *castOut) do(fn func(ctx context.Context)) {
 // errLive is why a live stream doesn't play on a cast device.
 var errLive = errors.New("live streams don't play on cast devices yet")
 
+// errLocalCast is why a track on this computer doesn't: MixMusic doesn't
+// hand a device its file.
+var errLocalCast = errors.New("tracks on this computer don't play on cast devices")
+
 // videoOf returns the video of the address of a stream PrepareStream
 // gave, and whether it is the video's 5.1 audio.
 func videoOf(rawURL string) (videoID string, surround bool, err error) {
@@ -150,6 +154,9 @@ func videoOf(rawURL string) (videoID string, surround bool, err error) {
 	}
 	if strings.HasPrefix(u.Path, stream.LivePath("")) {
 		return "", false, errLive
+	}
+	if strings.HasPrefix(u.Path, "/file/") {
+		return "", false, errLocalCast
 	}
 	id, ok := strings.CutPrefix(u.Path, "/yt/")
 	id, surround = strings.CutSuffix(id, stream.SurroundSuffix)

@@ -64,8 +64,9 @@ type timing struct {
 
 // openTrack reads the headers of a file, from its start, and returns its
 // audio track, and when it plays: the AAC, AC-3 or E-AC-3 of an MP4 file,
-// the AAC of HLS packed audio, else the Opus of a WebM one. Its errors are
-// worded for the player.
+// the AAC of HLS packed audio, the audio of a file kept on a computer,
+// FLAC, Opus or Vorbis in Ogg, WAV or MP3, else the Opus of a WebM file.
+// Its errors are worded for the player.
 func openTrack(src io.ReadSeeker) (track, timing, error) {
 	kind, err := sniff(src)
 	if err != nil {
@@ -76,6 +77,14 @@ func openTrack(src io.ReadSeeker) (track, timing, error) {
 		return openMP4(src)
 	case packedAudio:
 		return openPacked(src)
+	case flacFile:
+		return openFLAC(src)
+	case oggFile:
+		return openOgg(src)
+	case wavFile:
+		return openWAV(src)
+	case mp3File:
+		return openMP3(src)
 	}
 	r, err := webm.NewReader(src)
 	if err != nil {
@@ -92,32 +101,110 @@ const (
 	mp4File
 	// packedAudio is the AAC of HLS packed audio, in ADTS frames.
 	packedAudio
+	// The files kept on a computer, as the local library holds them.
+	flacFile
+	oggFile
+	wavFile
+	mp3File
 )
 
 // sniff tells the kind of a file by its first bytes, and goes back to its
-// start: an MP4 file by the type of its first box, at byte 4, and packed
-// audio by its ID3 tag, or the syncword of an ADTS frame. A WebM file
-// starts with EBML's magic number, 1A 45 DF A3, instead.
+// start: an MP4 file by the type of its first box, at byte 4, packed
+// audio by the syncword of an ADTS frame, FLAC, Ogg and WAV files by
+// their magic numbers, and MP3 by the syncword of an MPEG audio frame.
+// After an ID3 tag, as packed audio and MP3 files start with, the first
+// frame tells them apart, as it tells a FLAC file with a tag before it;
+// what else follows a tag is packed audio. A WebM file starts with
+// EBML's magic number, 1A 45 DF A3, instead.
 func sniff(src io.ReadSeeker) (container, error) {
-	var head [8]byte
+	var head [12]byte
 	n, err := io.ReadFull(src, head[:])
 	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
 		return webmFile, err
 	}
+	kind := webmFile
+	switch {
+	case n >= 10 && string(head[:3]) == "ID3":
+		if kind, err = sniffTagged(src, head[:]); err != nil {
+			return webmFile, err
+		}
+	case n >= 4 && string(head[:4]) == "fLaC":
+		kind = flacFile
+	case n >= 4 && string(head[:4]) == "OggS":
+		kind = oggFile
+	case n >= 12 && string(head[:4]) == "RIFF" && string(head[8:12]) == "WAVE":
+		kind = wavFile
+	}
 	if _, err := src.Seek(0, io.SeekStart); err != nil {
 		return webmFile, err
+	}
+	if kind != webmFile {
+		return kind, nil
 	}
 	switch {
 	case n >= 3 && string(head[:3]) == "ID3", n >= 2 && head[0] == 0xFF && head[1]&0xF6 == 0xF0:
 		return packedAudio, nil
-	case n < len(head):
+	case n >= 4 && mpegFrame(head[:4]):
+		return mp3File, nil
+	case n < 8:
 		return webmFile, nil // the WebM reader tells what is wrong
 	}
-	switch string(head[4:]) {
+	switch string(head[4:8]) {
 	case "ftyp", "styp", "moov", "mdat", "free", "skip", "wide", "pdin", "uuid":
 		return mp4File, nil
 	}
 	return webmFile, nil
+}
+
+// sniffTagged tells the kind of a file that starts with the ID3 tag whose
+// header head starts with, by what follows the tag: FLAC, MP3, else
+// packed audio. A small tag, as those of packed audio, is read through;
+// past a large one, as an MP3 file's with its cover, the file seeks.
+func sniffTagged(src io.ReadSeeker, head []byte) (container, error) {
+	if head[6]|head[7]|head[8]|head[9] >= 0x80 {
+		return packedAudio, nil
+	}
+	size := int64(head[6])<<21 | int64(head[7])<<14 | int64(head[8])<<7 | int64(head[9])
+	if head[5]&0x10 != 0 {
+		size += 10 // a footer
+	}
+	var next [4]byte
+	switch rest := 10 + size - int64(len(head)); {
+	case rest <= -4:
+		copy(next[:], head[10+size:])
+	case rest <= 4096:
+		if _, err := io.CopyN(io.Discard, src, max(0, rest)); err != nil {
+			return packedAudio, nil
+		}
+		k := copy(next[:], head[min(int64(len(head)), 10+size):])
+		if _, err := io.ReadFull(src, next[k:]); err != nil {
+			return packedAudio, nil
+		}
+	default:
+		if _, err := src.Seek(10+size, io.SeekStart); err != nil {
+			return webmFile, err
+		}
+		if _, err := io.ReadFull(src, next[:]); err != nil {
+			return packedAudio, nil
+		}
+	}
+	switch {
+	case string(next[:]) == "fLaC":
+		return flacFile, nil
+	case next[0] == 0xFF && next[1]&0xF6 == 0xF0:
+		return packedAudio, nil
+	case mpegFrame(next[:]):
+		return mp3File, nil
+	}
+	return packedAudio, nil
+}
+
+// mpegFrame reports whether b starts the header of an MPEG audio frame of
+// Layer III: its syncword, and a version, a bitrate and a sampling
+// frequency that aren't reserved.
+func mpegFrame(b []byte) bool {
+	return b[0] == 0xFF && b[1]&0xE0 == 0xE0 && b[1]>>3&3 != 1 && b[1]>>1&3 == 1 &&
+		b[2]>>4 != 15 && b[2]>>2&3 != 3
 }
 
 // opusTrack is the Opus track of a WebM file.

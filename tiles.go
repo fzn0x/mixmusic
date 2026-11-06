@@ -296,7 +296,7 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 		if m.Item("Play").Chosen() {
 			s.playAlbum(a.ID)
 		}
-		if a.Source != media.SourceLocal && m.Item("Download").Chosen() {
+		if a.Source != media.SourceLocal && a.Source != media.SourceFile && m.Item("Download").Chosen() {
 			s.downloadAlbum(a.ID)
 		}
 		s.copyLinkItem(m, a.URL)

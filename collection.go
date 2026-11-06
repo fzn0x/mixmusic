@@ -563,7 +563,7 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 				s.p.Enqueue(tracks)
 				s.notes = append(s.notes, player.Notice{Message: "Added " + title + " to the queue"})
 			}
-			if m.Item("Start radio").Chosen() {
+			if source != media.SourceFile && m.Item("Start radio").Chosen() {
 				s.startRadio(tracks[0])
 			}
 			if m.Item("Save as a new mix").Chosen() {
@@ -576,7 +576,7 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 					s.notes = append(s.notes, notice("Created "+p.Title))
 				})
 			}
-			if s.accounts().YouTube.SignedIn && m.Item("Save as a YouTube Music playlist").Chosen() {
+			if s.accounts().YouTube.SignedIn && source != media.SourceFile && m.Item("Save as a YouTube Music playlist").Chosen() {
 				s.promptName("New playlist on YouTube Music", "Name", title, "create", func(name string) {
 					s.createYouTubePlaylist(name, tracks, func(p media.Playlist) { s.navigate(playlistPath(p.ID)) })
 				})
@@ -653,7 +653,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 			playLabel: "play top songs",
 			menu: func(m *ui.Menu) {
 				s.followItem(m, a)
-				if len(a.TopTracks) > 0 && m.Item("Start radio").Chosen() {
+				if len(a.TopTracks) > 0 && a.Source != media.SourceFile && m.Item("Start radio").Chosen() {
 					s.startRadio(a.TopTracks[0])
 				}
 				if a.URL != "" && m.Item("Open on "+sourceName(a.Source)).Chosen() {
@@ -666,9 +666,12 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 			h.play = func() { s.p.PlayAll(a.TopTracks, false) }
 		}
 		// Signed out of the artist's service, they're followed in MixMusic.
+		// An artist of the music on this computer has no releases to follow.
 		following := s.followsArtist(a)
-		h.keep, h.keepLabel, h.keptLabel, h.keeping = &following, "follow", "following", s.keeping[key]
-		h.onKeep = func(on bool) { s.followArtist(a, on) }
+		if a.Source != media.SourceFile {
+			h.keep, h.keepLabel, h.keptLabel, h.keeping = &following, "follow", "following", s.keeping[key]
+			h.onKeep = func(on bool) { s.followArtist(a, on) }
+		}
 		s.collectionHead(c, h)
 		section("songs", func() {
 			s.sectionTitle(c, "Top songs")

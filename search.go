@@ -66,6 +66,9 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		ui.Row(c).Margin(0, 0, 24).Children(func() {
 			s.segmented(c, "scope", "Services", &s.searchScope, searchScopes...)
 		})
+		if s.searchScope == 0 {
+			s.computerResults(c, q, searchPivots[s.searchPivot])
+		}
 		switch {
 		case !res.done:
 			s.loading(c)

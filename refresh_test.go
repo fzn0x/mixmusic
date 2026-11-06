@@ -190,7 +190,9 @@ func TestRefreshOnce(t *testing.T) {
 // palette and Settings › Shortcuts, where the user may give it Mod+R.
 func TestRefreshKeys(t *testing.T) {
 	s := newTestShell(t)
-	tt := testerOf(t, s, 1280, 4000)
+	// Tall enough for Settings › Shortcuts, whose rows of every command
+	// the user goes down to Refresh's.
+	tt := testerOf(t, s, 1280, 4800)
 	show(s, tt, "/stats")
 	tt.Key(0, ui.KeyF5)
 	s.drain()

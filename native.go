@@ -335,6 +335,9 @@ type shell struct {
 	// podcasts is what the podcasts' pages keep between frames.
 	podcasts podcastPages
 
+	// computer is what Library › On this computer keeps between frames.
+	computer computerPage
+
 	// main is set in the main window, which alone tells of settings.json.
 	// file is settings.json as refresh read it last, toldFile the last of
 	// its notices the window told or let go, and fileNotice the one the
@@ -353,8 +356,9 @@ func newShell(a *app.App, p *player.Player) *shell {
 		dialogScrolls: map[string]*dialogScroll{}, shown: map[string]bool{}, showing: map[string]bool{}, missingMemos: map[string]missingMemo{}}
 	s.queueList.Selected = new(int)
 	*s.queueList.Selected = -1
-	// The covers the downloads keep show without the network.
-	s.art = newArtworks(s.update, keptArt{s.svc.Downloads.ArtworkFile, s.svc.System.Artwork()})
+	// The covers the downloads keep show without the network, as those of
+	// the music on this computer do.
+	s.art = newArtworks(s.update, keptArt{s.localArt, s.svc.System.Artwork()})
 	s.kept = s.svc.Downloads.Snapshot()
 	s.refresh()
 	// The side panel the user left.
@@ -390,6 +394,8 @@ func (s *shell) start() {
 		// minimized, to stop the picture of a music video.
 		s.win.OnHide(func() { s.update(s.idleVideo) }),
 		s.win.OnMinimize(func() { s.update(s.idleVideo) }),
+		// Music files dropped on the window play.
+		s.win.OnFileDrop(s.dropFiles),
 		s.closeVideo,
 	)
 }
@@ -401,6 +407,7 @@ func (s *shell) follow(stop ...func()) {
 		s.p.Subscribe(func(player.Event) { s.win.Invalidate() }),
 		s.a.Watch(func() { s.update(s.refresh) }),
 		s.svc.Downloads.Watch(func() { s.win.Invalidate() }),
+		s.svc.LocalFiles.Watch(func() { s.win.Invalidate() }),
 		s.svc.Downloads.OnNetwork(func(online bool) { s.update(func() { s.followNetwork(online) }) }),
 		mygo.Theme.OnUpdated(func() { s.update(s.restyle) }),
 	)

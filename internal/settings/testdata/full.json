@@ -63,6 +63,10 @@
   "downloadsFolder": "/home/me/Music",
   "downloadOnMetered": true,
   "downloadAdded": false,
+  "musicFolders": [
+    "/home/me/Music/Albums",
+    "/media/me/Records"
+  ],
   "spotifyClientId": "0123456789abcdef",
   "scrobbling": false,
   "youtubeChannel": "112233445566778899",

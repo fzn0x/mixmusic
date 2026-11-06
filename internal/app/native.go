@@ -118,7 +118,8 @@ func (o *silentOutput) Delay() time.Duration { return 0 }
 
 // openNative opens, for the native engine, the audio at a URL PrepareStream
 // gave: with its loudness, when MixMusic knows it, for the engine to play
-// it at an even loudness; or the live stream of a video, which has none.
+// it at an even loudness; or the live stream of a video, which has none;
+// or the file of a track on this computer.
 func (a *App) openNative(ctx context.Context, rawURL string, interrupted func() bool) (audio.Source, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
@@ -129,6 +130,9 @@ func (a *App) openNative(ctx context.Context, rawURL string, interrupted func() 
 			return nil, fmt.Errorf("not the live stream of a video: %s", rawURL)
 		}
 		return a.proxy.OpenLive(ctx, videoID, interrupted)
+	}
+	if native, ok := strings.CutPrefix(u.Path, "/file/"); ok {
+		return a.openFile(native)
 	}
 	videoID, ok := strings.CutPrefix(u.Path, "/yt/")
 	videoID, surround := strings.CutSuffix(videoID, stream.SurroundSuffix)

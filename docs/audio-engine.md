@@ -38,6 +38,28 @@ These decoders are Go packages anyone can import, documented on
 [pkg.go.dev](https://pkg.go.dev/github.com/fzn0x/mixmusic): `opus`, `aac`,
 `ac3`, `webm`, `mp4` and `resample`.
 
+### Files on this computer
+
+The [music on this computer](local-music.md) plays through the same
+engine, from its files, which the engine tells apart by their first bytes:
+
+| Format | Decoder | Notes |
+|---|---|---|
+| FLAC | `flac`, written from RFC 9639 | every frame and subframe kind, up to 8 channels and 32 bits; it decodes FFmpeg's FLAC as it was encoded, sample for sample, as the MD5 of its STREAMINFO checks; seeking by the SEEKTABLE, else by searching for frames |
+| Opus in Ogg | `opus`, after `ogg`, written from RFC 3533 and RFC 7845 | mono and stereo; seeking by the pages' granule positions |
+| Vorbis in Ogg | [jfreymuth/vorbis](https://github.com/jfreymuth/vorbis), after `ogg` | within about 109 dB of FFmpeg's decoder |
+| MP3 | [go-mp3](https://github.com/hajimehoshi/go-mp3), of Hajime Hoshi | MPEG-1, 2 and 2.5 Layer III, to 16 bits, within about 80 dB of FFmpeg's decoder; the delay and padding LAME's tag tells are dropped, as FFmpeg drops them, so that an album plays without gaps |
+| WAV | the engine's own | PCM of 8 to 32 bits, and floats |
+| AAC in MP4 (`.m4a`) | `aac`, after `mp4` | AAC-LC, as YouTube's |
+
+- **Any rate, any channels.** A file's audio is converted to 48 kHz by
+  `resample`, and more than two channels are mixed down to stereo, as
+  ITU-R BS.775 mixes 5.1 down, scaled so that they don't clip.
+- **The decoders MixMusic didn't write**, go-mp3's and Vorbis's, run
+  guarded: a file made to break one fails as a broken file, and never
+  stops MixMusic. Every reader of files, MixMusic's own and theirs, is
+  fuzzed with broken files.
+
 ## Resampling
 
 The engine plays everything at 48 kHz, the rate Opus decodes to. YouTube's

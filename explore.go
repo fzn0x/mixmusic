@@ -171,7 +171,7 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 			}
 		}
 	})
-	if !s.accounts().YouTube.SignedIn || len(tracks) != 1 {
+	if !s.accounts().YouTube.SignedIn || len(tracks) != 1 || tracks[0].Source == media.SourceFile {
 		return
 	}
 	t := tracks[0]

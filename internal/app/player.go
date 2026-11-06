@@ -65,6 +65,9 @@ type Player struct{ a *App }
 // through Spotify plays from its download, or the offline cache, instead,
 // or can't play: no Spotify device would play it.
 func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource, error) {
+	if track.Source == media.SourceFile {
+		return p.a.prepareFile(track)
+	}
 	if track.Source == media.SourceSpotify {
 		mode := p.a.settings.Get().SpotifyPlayback
 		if mode == settings.SpotifyPlaybackConnect || mode == settings.SpotifyPlaybackHere {
@@ -98,6 +101,9 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 // only when it was found before: searching for it would wait for the
 // network.
 func (p *Player) PrepareStream(ctx context.Context, track media.Track) (PlaybackSource, error) {
+	if track.Source == media.SourceFile {
+		return p.a.prepareFile(track)
+	}
 	if track.Source == media.SourceSpotify && track.IsEpisode() {
 		return PlaybackSource{}, errSpotifyEpisode
 	}

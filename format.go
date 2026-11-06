@@ -91,6 +91,8 @@ func sourceName(s media.Source) string {
 		return "Spotify"
 	case media.SourceYouTube:
 		return "YouTube Music"
+	case media.SourceFile:
+		return "this computer"
 	}
 	return "MixMusic"
 }

@@ -14,6 +14,7 @@ Library, in the sidebar or with Alt+2 (⌥2 on macOS), has these pivots, each wi
 - **Podcasts:** the episodes you're listening to and the shows you follow: see [Podcasts](podcasts.md#following-shows).
 - **Artists:** the new releases of the artists you follow, and the artists themselves: see [Artists you follow](#artists-you-follow).
 - **Downloads:** what plays without the network.
+- **On this computer:** the music files of the folders you add, which play from your computer: see [Music on this computer](local-music.md).
 - **History:** what you played.
 - **Disliked:** the songs you disliked, once there are any.
 - **Spotify** and **YouTube Music:** your library on each service you signed in to.

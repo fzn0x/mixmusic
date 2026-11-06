@@ -10,7 +10,8 @@ MIXMUSIC_CAPTURE=shots MIXMUSIC_CAPTURE_QUIT=1 MIXMUSIC_CAPTURE_ROUTES="/|/searc
 `MIXMUSIC_CAPTURE_WAIT` sets how long each step gets (`5s`). Steps that
 aren't pages act: `act:shot:<name>` saves the window as it is,
 `act:mute` mutes the player, `act:play:<search>` plays what a search
-finds, `act:resume` plays the queue kept in the data folder,
+finds, `act:local:<search>` the music on this computer it finds, all of
+it without one, `act:resume` plays the queue kept in the data folder,
 `act:wait:<duration>` waits, `act:palette` opens the command palette,
 `act:refresh` refreshes the page, as F5 does,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`

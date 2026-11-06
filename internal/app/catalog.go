@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
@@ -138,6 +139,11 @@ func (c *Catalog) Album(ctx context.Context, id string) (media.Album, error) {
 			a.Saved = c.a.spotifyHas(ctx, spotify.URI("album", native))
 		}
 		return a, err
+	case media.SourceFile:
+		if a, ok := c.a.localFiles.Album(id); ok {
+			return a, nil
+		}
+		return media.Album{}, errors.New("this album is no longer on this computer")
 	}
 	return media.Album{}, fmt.Errorf("no album %s", id)
 }
@@ -157,6 +163,11 @@ func (c *Catalog) Artist(ctx context.Context, id string) (media.Artist, error) {
 			a.Following = c.a.spotifyHas(ctx, spotify.URI("artist", native))
 		}
 		return a, err
+	case media.SourceFile:
+		if a, ok := c.a.localFiles.Artist(id); ok {
+			return a, nil
+		}
+		return media.Artist{}, errors.New("this artist's music is no longer on this computer")
 	}
 	return media.Artist{}, fmt.Errorf("no artist %s", id)
 }
@@ -393,6 +404,10 @@ func (c *Catalog) videoLength(ctx context.Context, video media.Track) time.Durat
 func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, error) {
 	if l, ok := c.a.lyricsMemo.get(track.ID); ok {
 		return l, nil
+	}
+	// A file of no artist, as a voice memo, is looked for nowhere.
+	if localfiles.NoArtist(track) {
+		return lyrics.Lyrics{}, lyricsError{"No lyrics found for this track.", lyrics.ErrNotFound}
 	}
 	q := lyricsQuery(track)
 	q.VideoID = c.videoID(track)

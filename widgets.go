@@ -466,7 +466,8 @@ func (s *shell) alert(c *ui.Context, title, message string, actions func()) ui.E
 }
 
 // sourceMark tells where a track comes from by a shape: a disc for
-// Spotify, a square for YouTube Music, two rings for MixMusic's own mixes.
+// Spotify, a square for YouTube Music, a ring and its hole for the music
+// on this computer, two rings for MixMusic's own mixes.
 func (s *shell) sourceMark(c *ui.Context, source media.Source, on bool) {
 	k := &s.lk
 	ink := k.muted
@@ -486,6 +487,13 @@ func (s *shell) sourceMark(c *ui.Context, source media.Source, on bool) {
 			p.Fill(ui.Rect{X: r.X + 0.8, Y: r.Y + 0.8, W: 8.4, H: 8.4}, ink, 4.2)
 		case media.SourceYouTube:
 			p.Fill(ui.Rect{X: r.X + 1, Y: r.Y + 1, W: 8, H: 8}, ink, 0)
+		case media.SourceFile:
+			// A disc of a record, with its hole, for the music on the
+			// computer.
+			var d ui.Path
+			d.Circle(r.X+5, r.Y+5, 3.7)
+			p.StrokePath(&d, 1.3, ink)
+			p.Fill(ui.Rect{X: r.X + 4.2, Y: r.Y + 4.2, W: 1.6, H: 1.6}, ink, 0.8)
 		default:
 			var a, b ui.Path
 			a.Circle(r.X+3.6, r.Y+5, 2.8)

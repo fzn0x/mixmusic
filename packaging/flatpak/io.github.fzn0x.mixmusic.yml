@@ -1,10 +1,12 @@
-# MixMusic as a Flatpak, for the release's mixmusic-<version>-linux-amd64.flatpak.
-# It packs the app of the release's Linux archive, as mygo build makes it,
-# with the libraries the GNOME runtime lacks, and Node.js, for yt-dlp.
-# Before flatpak-builder, dist/ needs the archive and the metadata
+# MixMusic as a Flatpak, for the release's mixmusic-<version>-linux-amd64.flatpak
+# and mixmusic-<version>-linux-arm64.flatpak. It packs the app of the
+# release's Linux archive for the Flatpak's architecture, as mygo build
+# makes it, with the libraries the GNOME runtime lacks, and Node.js, for
+# yt-dlp. Before flatpak-builder, dist/ needs the archive and the metadata
 # (CONTRIBUTING.md, "The Flatpak"):
 #
-#   dist/mixmusic-linux-amd64.tar.gz                build/linux-amd64/mixmusic-<version>-linux-amd64.tar.gz
+#   dist/mixmusic-linux-amd64.tar.gz                build/linux-amd64/mixmusic-<version>-linux-amd64.tar.gz, for x86_64
+#   dist/mixmusic-linux-arm64.tar.gz                build/linux-arm64/mixmusic-<version>-linux-arm64.tar.gz, for aarch64
 #   dist/io.github.fzn0x.mixmusic.metainfo.xml      go run ./tools/metainfo -o <it>
 #
 # Flathub can't take this manifest as it is: it builds from source, without
@@ -74,13 +76,20 @@ modules:
   - name: mixmusic
     buildsystem: simple
     sources:
-      # Only x64 for now.
+      # The archive of the architecture built for, which flatpak-builder's
+      # --arch names: the other is neither read nor needed.
       - type: archive
         path: dist/mixmusic-linux-amd64.tar.gz
         strip-components: 0
         dest: app
         only-arches:
           - x86_64
+      - type: archive
+        path: dist/mixmusic-linux-arm64.tar.gz
+        strip-components: 0
+        dest: app
+        only-arches:
+          - aarch64
       - type: file
         path: dist/io.github.fzn0x.mixmusic.metainfo.xml
       - type: file

@@ -1,7 +1,7 @@
 // Package library keeps what the user collects in MixMusic itself, across
 // services: liked and disliked tracks, playlists that mix tracks of every
 // service, the history of what they played, their recent searches, the
-// podcasts they follow and where they left their episodes.
+// podcasts and the artists they follow, and where they left the episodes.
 package library
 
 import (
@@ -52,6 +52,10 @@ type Data struct {
 	Playlists []Playlist    `json:"playlists"`
 	History   []Play        `json:"history"`
 	Searches  []string      `json:"searches"`
+
+	// Artists are the artists the user follows in MixMusic, rather than on
+	// their service, the last followed first.
+	Artists []FollowedArtist `json:"artists,omitempty"`
 
 	// Podcasts are the podcasts the user follows, without their episodes,
 	// the last followed first.

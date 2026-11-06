@@ -7,17 +7,23 @@ package output
 // (AudioHardwareCreateProcessTap of a CATapDescription). A private
 // aggregate device of the tap alone gives what it hears as its input, which
 // an IOProc of the device reads on Core Audio's I/O thread and hands to the
-// capture's goroutine. macOS asks the user once whether MixMusic may record
-// what other apps play, at its first tap, with the reason Info.plist gives
-// (NSAudioCaptureUsageDescription): until they answer, and once they
-// refuse, the tap hears silence, which only TCC's private
-// TCCAccessPreflight tells apart from a quiet song.
+// capture's goroutine.
+//
+// A tap hears only once the user allowed MixMusic to record what other
+// apps play, which macOS asks once, with the reason Info.plist gives
+// (NSAudioCaptureUsageDescription). Until they answer, and once they
+// refuse, it hears silence, and no call fails. So MixMusic asks first,
+// through TCC's private TCCAccessRequest, and taps once they allowed it:
+// a tap that has macOS ask itself starts only 90 s later, though the user
+// answered at once, and TCCAccessPreflight goes on telling the process
+// that asked that it didn't ask yet.
 
 import (
 	"errors"
 	"fmt"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"time"
 	"unsafe"
 
@@ -65,8 +71,13 @@ var (
 	audioDeviceStart                    func(device uint32, proc uintptr) int32
 	audioDeviceStop                     func(device uint32, proc uintptr) int32
 
-	// tccAccessPreflight is TCC's, nil where it isn't there.
+	// tccAccessPreflight and tccAccessRequest are TCC's, nil where they
+	// aren't there.
 	tccAccessPreflight func(service, options objc.ID) int32
+	tccAccessRequest   func(service, options objc.ID, answer objc.Block)
+	// allowed is set once the user allowed MixMusic to record what other
+	// apps play, as TCCAccessRequest answered.
+	allowed atomic.Bool
 
 	tapPoolPush func() uintptr
 	tapPoolPop  func(pool uintptr)
@@ -118,6 +129,9 @@ func loadTaps() error {
 		if tcc, err := purego.Dlopen("/System/Library/PrivateFrameworks/TCC.framework/Versions/A/TCC", purego.RTLD_LAZY); err == nil {
 			if sym, err := purego.Dlsym(tcc, "TCCAccessPreflight"); err == nil {
 				purego.RegisterFunc(&tccAccessPreflight, sym)
+			}
+			if sym, err := purego.Dlsym(tcc, "TCCAccessRequest"); err == nil {
+				purego.RegisterFunc(&tccAccessRequest, sym)
 			}
 		}
 		tapCallback = purego.NewCallback(func(device uint32, _ unsafe.Pointer, in *audioBufferList, _, _, _, _ unsafe.Pointer) int32 {
@@ -174,7 +188,8 @@ func nsDictionary(kv ...any) objc.ID {
 
 // permission returns what the user answered when macOS asked whether
 // MixMusic may record what other apps play: tccAllowed, tccRefused, or
-// another answer before macOS asked, and where TCC doesn't tell.
+// another answer before macOS asked, and where TCC doesn't tell. A process
+// that asked goes on being told it didn't.
 func permission() int32 {
 	if loadTaps() != nil || tccAccessPreflight == nil {
 		return -1
@@ -182,6 +197,41 @@ func permission() int32 {
 	var st int32
 	withPool(func() { st = tccAccessPreflight(nsString("kTCCServiceAudioCapture"), 0) })
 	return st
+}
+
+// ask has macOS ask the user whether MixMusic may record what other apps
+// play, unless they answered already, and waits for their answer: true
+// once they allowed it, and where TCC can't ask, as Core Audio then asks
+// at the tap.
+func ask() bool {
+	if allowed.Load() {
+		return true
+	}
+	switch permission() {
+	case tccAllowed:
+		allowed.Store(true)
+		return true
+	case tccRefused:
+		return false
+	}
+	if tccAccessRequest == nil {
+		return true
+	}
+	answer := make(chan bool, 1)
+	// TCC answers on a queue of its own.
+	block := objc.NewBlock(func(_ objc.Block, ok bool) {
+		select {
+		case answer <- ok:
+		default:
+		}
+	})
+	withPool(func() { tccAccessRequest(nsString("kTCCServiceAudioCapture"), 0, block) })
+	ok := <-answer
+	block.Release()
+	if ok {
+		allowed.Store(true)
+	}
+	return ok
 }
 
 // AudioProcess is a process Core Audio knows: one that plays or records,
@@ -366,20 +416,23 @@ type Capture struct {
 // it feeds hears the sound stop. It returns once the capture runs, or why
 // it can't: ErrNoLoopback before macOS 14.2, and ErrRefused once the user
 // refused MixMusic to record what other apps play. The first capture has
-// macOS ask them.
+// macOS ask them, and waits for their answer.
 func CaptureProcess(pid uint32, write func([]float32)) (*Capture, error) {
-	return captureProcess(pid, write, tapUnmuted)
-}
-
-// captureProcess is CaptureProcess, with the tap's mute behavior: muted,
-// the process plays into the tap alone, as tests have it.
-func captureProcess(pid uint32, write func([]float32), mute int) (*Capture, error) {
 	if err := loadTaps(); err != nil {
 		return nil, err
 	}
-	asked := permission()
-	if asked == tccRefused {
+	if !ask() {
 		return nil, ErrRefused
+	}
+	return startCapture(pid, write, tapUnmuted)
+}
+
+// startCapture is CaptureProcess once the user answered, with the tap's
+// mute behavior: muted, the process plays into the tap alone, as tests
+// have it.
+func startCapture(pid uint32, write func([]float32), mute int) (*Capture, error) {
+	if err := loadTaps(); err != nil {
+		return nil, err
 	}
 	process := processObject(pid)
 	if process == 0 {
@@ -392,7 +445,8 @@ func captureProcess(pid uint32, write func([]float32), mute int) (*Capture, erro
 	c := &Capture{stop: make(chan struct{}), done: make(chan struct{})}
 	go func() {
 		defer close(c.done)
-		c.loop(t, process, mute, asked, write)
+		defer t.close()
+		c.loop(t, write)
 	}()
 	return c, nil
 }
@@ -404,41 +458,24 @@ func (c *Capture) Stop() {
 }
 
 // loop hands what the tap hears to write until Stop, at Rate, and silence
-// while it hears nothing. Until the user answered whether MixMusic may
-// hear other apps, it asks TCC again each second: once they allowed it, it
-// taps again, as a tap made before hears silence; once they refused, it
-// taps no more, and Err tells ErrRefused.
-func (c *Capture) loop(t *tap, process uint32, mute int, asked int32, write func([]float32)) {
-	defer func() {
-		if t != nil {
-			t.close()
-		}
-	}()
+// while it hears nothing.
+func (c *Capture) loop(t *tap, write func([]float32)) {
+	// The tap hears at the rate of the output device.
 	var conv *resample.Converter
 	var out []float32
-	rated := func() {
-		// The tap hears at the rate of the output device.
-		conv = nil
-		if t.rate != Rate {
-			if c, err := resample.New(int(t.rate), Rate, 2); err == nil {
-				conv, out = c, make([]float32, 2*c.MaxOutput(tapFrames))
-			}
+	if t.rate != Rate {
+		if r, err := resample.New(int(t.rate), Rate, 2); err == nil {
+			conv, out = r, make([]float32, 2*r.MaxOutput(tapFrames))
 		}
 	}
-	rated()
 	q := newQuiet(time.Now())
 	tick := time.NewTicker(20 * time.Millisecond)
 	defer tick.Stop()
-	askedAt := time.Now()
 	for {
-		var full chan []float32
-		if t != nil {
-			full = t.full
-		}
 		select {
 		case <-c.stop:
 			return
-		case b := <-full:
+		case b := <-t.full:
 			if conv != nil {
 				_, n := conv.Process(b, out)
 				write(out[:2*n])
@@ -449,24 +486,6 @@ func (c *Capture) loop(t *tap, process uint32, mute int, asked int32, write func
 			q.audio(time.Now())
 		case now := <-tick.C:
 			q.fill(now, write)
-			if asked == tccAllowed || t == nil || now.Sub(askedAt) < time.Second {
-				continue
-			}
-			askedAt = now
-			switch asked = permission(); asked {
-			case tccAllowed:
-				t.close()
-				var err error
-				if t, err = newTap(process, mute); err != nil {
-					c.fail(err)
-				} else {
-					rated()
-				}
-			case tccRefused:
-				t.close()
-				t = nil
-				c.fail(ErrRefused)
-			}
 		}
 	}
 }

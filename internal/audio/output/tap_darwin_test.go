@@ -43,12 +43,12 @@ func TestCaptureProcess(t *testing.T) {
 	}
 	var mu sync.Mutex
 	var heard []float32
-	c, err := captureProcess(uint32(os.Getpid()), func(frames []float32) {
+	c, err := startCapture(uint32(os.Getpid()), func(frames []float32) {
 		mu.Lock()
 		heard = append(heard, frames...)
 		mu.Unlock()
 	}, tapMuted)
-	if errors.Is(err, ErrNoLoopback) || errors.Is(err, ErrRefused) {
+	if errors.Is(err, ErrNoLoopback) {
 		s.Stop()
 		t.Skip(err)
 	}
@@ -101,8 +101,32 @@ func TestCaptureNoProcess(t *testing.T) {
 	if err := loadTaps(); err != nil {
 		t.Skip(err)
 	}
-	if c, err := CaptureProcess(1<<30, func([]float32) {}); err == nil {
+	if c, err := startCapture(1<<30, func([]float32) {}, tapMuted); err == nil {
 		c.Stop()
 		t.Error("captured a process that doesn't run")
+	}
+}
+
+// TestAsk has TCC ask whether this process may record what other apps
+// play, and waits for its answer, which comes at once where macOS can't
+// ask, as over SSH, and is remembered once it allows it. It may show
+// macOS's question, so it runs only with MIXMUSIC_TCC_ASK=1.
+func TestAsk(t *testing.T) {
+	if os.Getenv("MIXMUSIC_TCC_ASK") != "1" {
+		t.Skip("MIXMUSIC_TCC_ASK=1 has macOS ask")
+	}
+	if err := loadTaps(); err != nil {
+		t.Skip(err)
+	}
+	answer := make(chan bool, 1)
+	go func() { answer <- ask() }()
+	select {
+	case ok := <-answer:
+		t.Logf("allowed: %v; TCC tells %d", ok, permission())
+		if !ok && allowed.Load() {
+			t.Error("refused, ask remembers it allowed")
+		}
+	case <-time.After(2 * time.Minute):
+		t.Fatal("TCC didn't answer")
 	}
 }

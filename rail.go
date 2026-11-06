@@ -493,7 +493,10 @@ func (s *shell) liveCard(c *ui.Context, t, next media.Track, size float32) {
 	} else {
 		c.After(liveRest - at%half)
 	}
-	card := ui.Box(c.Key("live-card")).Size(size, size).Shrink(0).Radius(k.radiusSm).Clip()
+	// Neither face clips: each rounds its own corners. A clip turning in 3D
+	// is drawn through a mask, which MyGo made anew for frames of each turn
+	// and kept: a hundred megabytes and more while something played (#309).
+	card := ui.Box(c.Key("live-card")).Size(size, size).Shrink(0)
 	// A new run of turns starts from the artwork.
 	angle := card.AnimateWith(s.liveSince, 180*float32(turns), liveTurn, ui.EaseInOut)
 	turned := math.Mod(float64(angle), 360)
@@ -504,14 +507,26 @@ func (s *shell) liveCard(c *ui.Context, t, next media.Track, size float32) {
 	card.RotateX(float32(turned)).Perspective(600)
 	card.Children(func() {
 		if !back {
-			s.cover(c, "live-cover", t.Artwork, size, false)
+			s.liveFace(c, t.Artwork, size)
 			return
 		}
-		ui.Column(c).Fill().Justify(ui.SpaceBetween).Padding(6, 7).Background(k.tile(0)).Children(func() {
+		ui.Column(c).Fill().Radius(k.radiusSm).Justify(ui.SpaceBetween).Padding(6, 7).Background(k.tile(0)).Children(func() {
 			ui.Text(c, k.words("Up next")).FontSize(11).LineHeight(1).TextColor(k.tileText)
 			ui.Text(c, next.Title).FontSize(12).LineHeight(1.15).MaxLines(3).TextColor(k.tileText)
 		})
 	})
+}
+
+// liveFace is the artwork on the live card's face, as cover shows it but
+// without its clip: the image rounds its own corners, and crops to fill
+// the square.
+func (s *shell) liveFace(c *ui.Context, art []media.Image, size float32) {
+	k := &s.lk
+	if b := s.art.get(c, artworkURL(art, int(size*s.zoomOf())), s.artPixels(size)); b != nil {
+		ui.Image(c, b).Size(size, size).Fit(ui.Cover).Radius(k.radiusSm)
+		return
+	}
+	ui.Box(c).Size(size, size).Radius(k.radiusSm).Background(k.surface3)
 }
 
 // noticeOf tells an error as a notice.

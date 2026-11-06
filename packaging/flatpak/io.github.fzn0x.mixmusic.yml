@@ -97,7 +97,7 @@ modules:
       - type: file
         path: system-loader.py
       - type: file
-        path: ../../resources/icon.svg
+        path: ../../brand/icon.svg
     build-commands:
       # The app keeps everything it needs inside itself. Built in Nix's
       # shell, it names Nix's dynamic loader, which the runtime lacks:

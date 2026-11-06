@@ -18,7 +18,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/sysproxy"
 )
 
-//go:embed resources/tray.png
+//go:embed brand/tray.png
 var trayIcon []byte
 
 // allowAudio lets pages play sound no click started: the hidden page of

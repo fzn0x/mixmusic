@@ -57,7 +57,7 @@ install -Dm755 mixmusic "$dest/lib/mixmusic/mixmusic"
 # desktop finds it.
 install -Dm755 packaging/flatpak/mixmusic.sh "$dest/bin/mixmusic"
 install -Dm644 "packaging/flathub/$id.desktop" "$dest/share/applications/$id.desktop"
-install -Dm644 resources/icon.svg "$dest/share/icons/hicolor/scalable/apps/$id.svg"
+install -Dm644 brand/icon.svg "$dest/share/icons/hicolor/scalable/apps/$id.svg"
 go run ./tools/metainfo -template "packaging/flathub/$id.metainfo.xml" -o "$dest/share/metainfo/$id.metainfo.xml"
 
 # MixMusic's licenses, and those of the Go modules built into it.

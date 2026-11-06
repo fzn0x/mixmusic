@@ -81,7 +81,7 @@ in
   '';
 
   postInstall = ''
-    install -Dm644 resources/icon.png $out/share/pixmaps/mixmusic.png
+    install -Dm644 brand/icon.png $out/share/pixmaps/mixmusic.png
   '';
 
   desktopItems = [

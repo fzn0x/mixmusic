@@ -56,8 +56,8 @@ TITLE = "Check tone"
 ARTIST = "MixMusic CI"
 TONE_HZ = 440
 # The track's cover: the system's controls show covers of https addresses
-# alone.
-COVER = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/resources/icon.png"
+# alone: MixMusic's icon at a tag, whose address stays when files move.
+COVER = "https://raw.githubusercontent.com/fzn0x/mixmusic/v0.5.9/resources/icon.png"
 MPRIS = "org.mpris.MediaPlayer2.mixmusic"  # outside a Flatpak
 MPRIS_PATH = "/org/mpris/MediaPlayer2"
 PLAYER = "org.mpris.MediaPlayer2.Player"
@@ -531,11 +531,11 @@ class Session:
         props = get_all(item["bus"], item["path"], ITEM)
         save_json(self.out, "tray-item.json", props)
         icon = os.path.join(props.get("IconThemePath", ""), props.get("IconName", "") + ".png")
-        with open(os.path.join(os.path.dirname(__file__), "..", "..", "resources", "tray.png"), "rb") as f:
+        with open(os.path.join(os.path.dirname(__file__), "..", "..", "brand", "tray.png"), "rb") as f:
             same = os.path.isfile(icon) and open(icon, "rb").read() == f.read()
         self.c.add("The tray item is active, with MixMusic's icon", props.get("Status") == "Active" and same,
                    f"Status {props.get('Status')}, icon {icon}"
-                   + (" = resources/tray.png" if same else " differs or is missing"))
+                   + (" = brand/tray.png" if same else " differs or is missing"))
         layout = call(item["bus"], props["Menu"], MENU, "GetLayout", GLib.Variant("(iias)", (0, -1, [])))[1]
         save_json(self.out, "tray-menu.json", layout)
         labels = {}

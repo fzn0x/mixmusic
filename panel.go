@@ -111,7 +111,8 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 	row := ui.Row(c.Key("q-"+it.UID)).Height(queueRowHeight).Padding(0, 8).Gap(10).Radius(k.radiusSm).Cursor(ui.CursorDefault)
 	ink, sub := k.text, k.muted
 	skipped := it.Skip != "" && !current
-	if skipped {
+	missing := s.missingFile(t)
+	if skipped || missing {
 		ink = k.muted
 	}
 	switch {
@@ -156,6 +157,8 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 					line += " · radio"
 				}
 				switch {
+				case missing:
+					line = "File not found"
 				case skipped && it.Skip == player.SkipMadeWithAI:
 					// A click still plays it.
 					line += " · made with AI"
@@ -424,7 +427,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 			s.notes = append(s.notes, notice("Added "+t.Title+" to the queue"))
 		}
 	}
-	if !t.IsEpisode() && m.Item("Start radio").Chosen() {
+	if !t.IsEpisode() && t.Source != media.SourceFile && m.Item("Start radio").Chosen() {
 		s.startRadio(t)
 	}
 	m.Separator()
@@ -448,6 +451,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	if !t.IsEpisode() {
 		s.downloadItems(m, t)
 	}
+	s.localItems(m, t)
 	m.Separator()
 	for _, a := range t.Artists {
 		if a.ID != "" {
@@ -502,6 +506,10 @@ func (s *shell) copyLinkItem(m *ui.Menu, rawURL string) {
 
 // startRadio plays track, then tracks like it.
 func (s *shell) startRadio(t media.Track) {
+	if t.Source == media.SourceFile {
+		s.notes = append(s.notes, notice("Radios start from tracks of Spotify and YouTube Music"))
+		return
+	}
 	s.notes = append(s.notes, notice("Starting a radio of "+t.Title+"…"))
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)

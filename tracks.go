@@ -55,7 +55,8 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 	row := ui.Row(c.Key(key+"-"+count(i)+"-"+t.ID)).Height(k.row).Padding(0, 8).Gap(16).Radius(k.radiusSm)
 	ink, sub := k.text, k.muted
 	disliked := s.a.IsDisliked(t.ID)
-	if disliked {
+	missing := s.missingFile(t)
+	if disliked || missing {
 		ink = k.muted
 	}
 	switch {
@@ -129,7 +130,11 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 						Radius(2).Label("Explicit").Shrink(0)
 				}
 			})
-			s.artistLinks(c, key+"-artists-"+count(i), t.Artists, sub)
+			if missing {
+				ui.Text(c, "File not found").FontSize(k.smallSize()).TextColor(sub).SingleLine()
+			} else {
+				s.artistLinks(c, key+"-artists-"+count(i), t.Artists, sub)
+			}
 		})
 		if o.album {
 			ui.Row(c).Grow(1).Basis(0).MinWidth(0).Children(func() {

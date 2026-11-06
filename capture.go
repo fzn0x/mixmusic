@@ -24,7 +24,8 @@ import (
 // MIXMUSIC_CAPTURE names the folder; MIXMUSIC_CAPTURE_ROUTES the steps,
 // separated by |: a path shows its page and saves it, act:shot:<name> saves
 // the window as it is, act:mute mutes the player, act:play:<search> plays
-// the songs a search finds, act:resume plays the queue, act:wait:<duration>
+// the songs a search finds, act:local:<search> the music on this computer
+// it finds, all of it without one, act:resume plays the queue, act:wait:<duration>
 // waits, act:palette opens the command palette, act:refresh refreshes the
 // page, act:panel:<queue|lyrics|none> shows a side panel,
 // act:scroll:<y|end> scrolls the page, act:theme:<id> wears a theme,
@@ -129,6 +130,20 @@ func (s *shell) captureFromEnv() {
 					continue
 				}
 				s.p.PlayTracks(res.YouTube.Tracks, 0)
+			case "local":
+				if !mayPlay("the music on this computer") {
+					continue
+				}
+				tracks := s.svc.LocalFiles.Tracks()
+				if arg != "" {
+					tracks = s.svc.LocalFiles.Search(arg, 100).Tracks
+				}
+				if len(tracks) == 0 {
+					log.Printf("mixmusic: capture: no music on this computer of %q", arg)
+					continue
+				}
+				log.Printf("mixmusic: capture: playing %d tracks on this computer, from %s", len(tracks), tracks[0].Title)
+				s.p.PlayTracks(tracks, 0)
 			case "resume":
 				if mayPlay("the queue") {
 					s.p.Play()

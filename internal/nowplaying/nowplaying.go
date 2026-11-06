@@ -202,6 +202,26 @@ type platform interface {
 	close()
 }
 
+// artworkReader is a system's media controls that tell back the cover
+// they hold: macOS's Now Playing.
+type artworkReader interface {
+	// heldArtwork returns the size of the cover the controls hold, in
+	// points, and false when they hold none.
+	heldArtwork() (width, height float64, ok bool)
+}
+
+// Artwork returns the size of the cover the system's controls hold now,
+// as they tell it back, and whether they hold one: where they tell it,
+// as Now Playing on macOS does, else told is false.
+func (c *Controls) Artwork() (width, height float64, ok, told bool) {
+	r, told := c.sys.(artworkReader)
+	if !told {
+		return 0, 0, false, false
+	}
+	width, height, ok = r.heldArtwork()
+	return width, height, ok, true
+}
+
 // Open reaches the system's media controls, which show nothing until Show.
 // handle gets what they ask, one request at a time, on a goroutine of its
 // own. run runs a function on the main thread and waits for it, which

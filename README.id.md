@@ -165,7 +165,7 @@ Unduh file untuk sistem Anda dari
 | Debian, Ubuntu, dan turunannya | [`mixmusic-<version>-linux-<arch>.deb`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Fedora, openSUSE, dan turunannya | [`mixmusic-<version>-linux-<arch>.rpm`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Linux apa saja, satu file | [`mixmusic-<version>-linux-<arch>.AppImage`](https://github.com/fzn0x/mixmusic/releases/latest) |
-| Linux apa saja, dalam sandbox (Flatpak, x64) | [`mixmusic-<version>-linux-amd64.flatpak`](https://github.com/fzn0x/mixmusic/releases/latest) |
+| Linux apa saja, dalam sandbox (Flatpak) | [`mixmusic-<version>-linux-<arch>.flatpak`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Linux apa saja, di folder home Anda | [`mixmusic-<version>-linux-<arch>.tar.gz`](https://github.com/fzn0x/mixmusic/releases/latest), beserta `install.sh` |
 
 `<arch>` adalah `amd64` untuk x64 dan `arm64` untuk Arm. Setiap rilis
@@ -181,7 +181,7 @@ mengunduhkannya untuk Anda. Untuk zip portabel, ekstrak di mana saja lalu
 buka `MixMusic.exe`. Untuk AppImage, jadikan file itu bisa dijalankan
 (`chmod +x`) lalu buka. Untuk Flatpak, buka dengan pusat perangkat lunak
 (software center) Anda, atau jalankan
-`flatpak install ./mixmusic-<version>-linux-amd64.flatpak`; saat pertama
+`flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`; saat pertama
 kali, Flatpak akan mengambil runtime GNOME dari Flathub.
 
 ### Pertama kali dijalankan

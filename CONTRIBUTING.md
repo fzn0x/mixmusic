@@ -282,10 +282,14 @@ they're built from changes on main:
 [packaging/flatpak](packaging/flatpak) packs the app of the Linux build
 into a Flatpak, `io.github.fzn0x.mixmusic`, on the GNOME runtime, with the
 tray's library from Flathub's shared modules (a git submodule) and Node.js
-from the SDK's extension. CI builds it on every pull request, installs it
-and starts MixMusic in it; its `flatpak` artifact is the bundle. To build
-it on Linux, with [Flatpak](https://flatpak.org/setup/) and
-`flatpak install flathub org.flatpak.Builder`:
+from the SDK's extension, for x64 and Arm64: the manifest takes the
+Linux archive of the architecture it builds for. CI builds both on every
+pull request, each on a runner of its architecture, installs them and
+starts MixMusic in them; its `flatpak-amd64` and `flatpak-arm64`
+artifacts are the bundles. To build it on Linux, with
+[Flatpak](https://flatpak.org/setup/) and
+`flatpak install flathub org.flatpak.Builder`, on x64 (on Arm64, the
+same with `arm64` for `amd64`):
 
 ```sh
 git submodule update --init
@@ -301,7 +305,8 @@ flatpak run io.github.fzn0x.mixmusic
 `flatpak run --log-session-bus io.github.fzn0x.mixmusic` shows what the
 sandbox refuses on the session bus. GNOME runtimes get about a year of
 support: the manifest's `runtime-version`, the `gnome-<version>` image of
-ci.yml and release.yml, and the Node.js extension's branch move together.
+ci.yml and release.yml, and the Node.js extension's branch move together;
+the image must be published for both architectures, as Flathub's are.
 
 ## Translations of the README
 

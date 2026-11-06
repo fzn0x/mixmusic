@@ -163,6 +163,9 @@ so that nothing played out loud:
 - **The first tap, as macOS asked** at the tap itself, took about 90 s to
   start, and TCC went on answering 2 in that run: why MixMusic asks
   first.
+- **The first run, as MixMusic asks first**, with the build of MixMusic's
+  own name that had never been allowed: the tap started as soon as the
+  user clicked Allow, and heard Spotify in that same run, as above.
 
 **An embedded Chromium (CEF) with Widevine** isn't needed on macOS, and
 would be costly:

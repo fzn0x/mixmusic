@@ -50,12 +50,14 @@ func (s *shell) commands() []command {
 				s.notes = append(s.notes, notice("Play something first"))
 			}
 		}},
+		{"player.openFiles", "Open music files…", "Mod+O", "playback", s.openMusicFiles},
 		{"go.home", "Go home", "Alt+1", "go to", func() { s.navigate("/") }},
 		{"go.search", "Search", "Mod+F", "go to", func() { s.searchBox.Focus() }},
 		{"go.explore", "Explore", "Alt+5", "go to", func() { s.navigate("/explore") }},
 		{"go.library", "Library", "Alt+2", "go to", func() { s.navigate("/library") }},
 		{"go.liked", "Liked songs", "Alt+3", "go to", func() { s.navigate("/library/liked") }},
 		{"go.downloads", "Downloads", "", "go to", func() { s.navigate("/library/downloads") }},
+		{"go.computer", "On this computer", "", "go to", func() { s.navigate("/library/computer") }},
 		{"go.nowPlaying", "Now playing", "Alt+4", "go to", func() { s.navigate("/now-playing") }},
 		{"go.stats", "Stats", "", "go to", func() { s.navigate("/stats") }},
 		{"go.marketplace", "Marketplace", "", "go to", func() { s.navigate("/marketplace") }},

@@ -58,7 +58,7 @@ type controlsCovers struct {
 // newControlsCovers returns the covers of the artwork store, which call
 // changed once one loaded.
 func (a *App) newControlsCovers(changed func()) *controlsCovers {
-	cc := &controlsCovers{load: a.artStore.Bytes, changed: changed, now: time.Now}
+	cc := &controlsCovers{load: a.coverBytes, changed: changed, now: time.Now}
 	if nowplaying.CoverFiles {
 		// Desktops take the file's address whole.
 		dir := filepath.Join(a.opts.CacheDir, "now-playing")

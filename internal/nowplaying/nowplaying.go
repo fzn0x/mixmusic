@@ -26,8 +26,9 @@ type Info struct {
 	Title   string
 	Artists []string
 	Album   string
-	// Artwork is the address of an https image of the track, or empty,
-	// which tells covers apart.
+	// Artwork is the address of an https image of the track, or of the
+	// cover of a track on this computer that MixMusic keeps, or empty,
+	// which tells covers apart: the systems take Cover, or CoverFile.
 	Artwork string
 	// Cover is the image at Artwork, as its host sent it, once MixMusic
 	// has it: macOS and Windows show it. Show keeps it, so it mustn't
@@ -199,6 +200,26 @@ type platform interface {
 	// show shows info, or nothing for nil.
 	show(info *Info)
 	close()
+}
+
+// artworkReader is a system's media controls that tell back the cover
+// they hold: macOS's Now Playing.
+type artworkReader interface {
+	// heldArtwork returns the size of the cover the controls hold, in
+	// points, and false when they hold none.
+	heldArtwork() (width, height float64, ok bool)
+}
+
+// Artwork returns the size of the cover the system's controls hold now,
+// as they tell it back, and whether they hold one: where they tell it,
+// as Now Playing on macOS does, else told is false.
+func (c *Controls) Artwork() (width, height float64, ok, told bool) {
+	r, told := c.sys.(artworkReader)
+	if !told {
+		return 0, 0, false, false
+	}
+	width, height, ok = r.heldArtwork()
+	return width, height, ok, true
 }
 
 // Open reaches the system's media controls, which show nothing until Show.

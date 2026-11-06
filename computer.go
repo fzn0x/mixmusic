@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
-	"strings"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
@@ -363,7 +362,7 @@ func (s *shell) localItems(m *ui.Menu, t media.Track) {
 // localArt is the covers of the music on this computer, which show from
 // their files, as the downloads' do.
 func (s *shell) localArt(url string) (string, bool) {
-	if strings.HasPrefix(url, "localart:") {
+	if localfiles.IsArt(url) {
 		return s.svc.LocalFiles.ArtworkFile(url)
 	}
 	return s.svc.Downloads.ArtworkFile(url)

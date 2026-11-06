@@ -57,6 +57,7 @@ var (
 	msgDataID    func(obj objc.ID, sel objc.SEL, p unsafe.Pointer, n uint) objc.ID
 	msgSize      func(obj objc.ID, sel objc.SEL) cgSize
 	msgArtworkID func(obj objc.ID, sel objc.SEL, size cgSize, handler objc.Block) objc.ID
+	msgSizeID    func(obj objc.ID, sel objc.SEL, size cgSize) objc.ID
 	msgBlockID   func(obj objc.ID, sel objc.SEL, handler objc.Block) objc.ID
 
 	// The keys of the now playing info, NSStrings.
@@ -90,7 +91,7 @@ func loadMediaPlayer() error {
 			return
 		}
 		for _, fn := range []any{&msgID, &msgIDID, &msgSetID, &msgSetIDID, &msgSetUint, &msgUintID, &msgFloatID,
-			&msgFloat, &msgBytesID, &msgDataID, &msgSize, &msgArtworkID, &msgBlockID} {
+			&msgFloat, &msgBytesID, &msgDataID, &msgSize, &msgArtworkID, &msgSizeID, &msgBlockID} {
 			purego.RegisterFunc(fn, msgSend)
 		}
 		purego.RegisterLibFunc(&poolPush, lib, "objc_autoreleasePoolPush")
@@ -341,6 +342,32 @@ func (m *macControls) update() {
 	}
 	msgSetID(center, sel("setNowPlayingInfo:"), dict)
 	msgSetUint(center, sel("setPlaybackState:"), state)
+}
+
+// heldArtwork returns the size of the image of the artwork Now Playing
+// holds, as MPNowPlayingInfoCenter tells it back, and asks of it: false
+// when it holds none, or its handler gives none.
+func (m *macControls) heldArtwork() (width, height float64, ok bool) {
+	m.run(func() {
+		withPool(func() {
+			center := msgID(class("MPNowPlayingInfoCenter"), sel("defaultCenter"))
+			info := msgID(center, sel("nowPlayingInfo"))
+			if info == 0 {
+				return
+			}
+			art := msgIDID(info, sel("objectForKey:"), keyArtwork)
+			if art == 0 {
+				return
+			}
+			image := msgSizeID(art, sel("imageWithSize:"), cgSize{600, 600})
+			if image == 0 {
+				return
+			}
+			size := msgSize(image, sel("size"))
+			width, height, ok = size.width, size.height, true
+		})
+	})
+	return width, height, ok
 }
 
 // artwork returns an autoreleased MPMediaItemArtwork of the image of the

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"io"
@@ -199,5 +200,38 @@ func TestLocalNotices(t *testing.T) {
 		if !found {
 			t.Errorf("no notice of %s with its license", want.name)
 		}
+	}
+}
+
+// TestLocalControlsCover hands the system's media controls the cover of a
+// track on this computer, from the cover the index keeps: its bytes, for
+// Windows and macOS, and a file of them, for MPRIS.
+func TestLocalControlsCover(t *testing.T) {
+	a, music := localApp(t)
+	cover := pngCover(16)
+	if err := os.WriteFile(filepath.Join(music, "Shore", "cover.png"), cover, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	scanned(t, a)
+	tr := (&LocalFiles{a}).Tracks()[0]
+	info := controlsInfo(NowPlaying{Track: &tr, DurationMs: 200}, time.Now())
+	if len(tr.Artwork) != 1 || info.Artwork != tr.Artwork[0].URL {
+		t.Fatalf("the controls show %q of %+v", info.Artwork, tr.Artwork)
+	}
+	changed := make(chan struct{}, 4)
+	cc := a.newControlsCovers(func() { changed <- struct{}{} })
+	if data, _ := cc.get(info.Artwork); data != nil {
+		t.Fatal("a cover before it loaded")
+	}
+	await(t, changed)
+	if data, _ := cc.get(info.Artwork); !bytes.Equal(data, cover) {
+		t.Fatalf("the controls got %d bytes, not the cover's %d", len(data), len(cover))
+	}
+	files, changedFiles := testCovers(a.coverBytes, t.TempDir())
+	files.get(info.Artwork)
+	await(t, changedFiles)
+	_, file := files.get(info.Artwork)
+	if b, err := os.ReadFile(file); err != nil || !bytes.Equal(b, cover) || filepath.Ext(file) != ".png" {
+		t.Errorf("the cover's file %q: %v", file, err)
 	}
 }

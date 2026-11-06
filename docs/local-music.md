@@ -136,4 +136,7 @@ what plays, as their settings say:
 - **[Lyrics](lyrics.md)**, when you show them, are looked for on Unison
   and LRCLIB by its title, artists, album and length.
 
+A file that names no artist, as a voice memo, shows by its file's name,
+which may be anything: Last.fm and the lyrics hear nothing of it.
+
 [Your data and privacy](data-and-privacy.md) lists every feature's.

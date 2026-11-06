@@ -16,6 +16,13 @@ import (
 // UnknownArtist is the artist of a track whose file names none.
 const UnknownArtist = "Unknown artist"
 
+// NoArtist reports whether t is a track on this computer whose file names
+// no artist, as a voice memo: its title is its file's name, which may be
+// anything, and no service hears of it.
+func NoArtist(t media.Track) bool {
+	return t.Source == media.SourceFile && len(t.Artists) == 1 && t.Artists[0].ID == "" && t.Artists[0].Name == UnknownArtist
+}
+
 // VariousArtists is the artist of an album of several artists that names
 // no album artist.
 const VariousArtists = "Various artists"

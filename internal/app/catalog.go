@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
@@ -403,6 +404,10 @@ func (c *Catalog) videoLength(ctx context.Context, video media.Track) time.Durat
 func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, error) {
 	if l, ok := c.a.lyricsMemo.get(track.ID); ok {
 		return l, nil
+	}
+	// A file of no artist, as a voice memo, is looked for nowhere.
+	if localfiles.NoArtist(track) {
+		return lyrics.Lyrics{}, lyricsError{"No lyrics found for this track.", lyrics.ErrNotFound}
 	}
 	q := lyricsQuery(track)
 	q.VideoID = c.videoID(track)

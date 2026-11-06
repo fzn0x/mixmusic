@@ -136,7 +136,7 @@ Where the credential store can't keep a secret:
 | Spotify in MixMusic | Spotify's player, loaded from `sdk.scdn.co` | what Spotify's own player sends |
 | Lyrics | Unison (`unison.boidu.dev`) | the video ID of the track that plays, or, without one, its title, artists, album and length |
 | Lyrics, when Unison has none | LRCLIB (`lrclib.net`) | the title, artists, album and length of the track that plays |
-| Lyrics of a track on this computer | Unison, then LRCLIB | its title, artists, album and length, as its tags tell; never its file |
+| Lyrics of a track on this computer | Unison, then LRCLIB | its title, artists, album and length, as its tags tell, unless they name no artist; never its file |
 | Translate, or romanized Arabic, while it's on beside the lyrics | Unison, which has Google translate them | the lyrics of the track that plays, with its video ID |
 | Romaji, the first time you turn it on | GitHub | a download of the dictionary of kanji readings; the lyrics stay on your computer |
 | Last.fm, once you connect it | Last.fm | the title, artists, album and length of what you play, and when |

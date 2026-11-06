@@ -138,6 +138,10 @@ func TestLocalTracksGoNowhere(t *testing.T) {
 	if id, _ := lastfmTrack(NowPlaying{Track: &tr, DurationMs: 200}); id != "" {
 		t.Error("a track of no artist scrobbles")
 	}
+	// Nor are its lyrics looked for: the network here goes nowhere.
+	if _, err := (&Catalog{a}).Lyrics(context.Background(), tr); err == nil || err.Error() != "No lyrics found for this track." {
+		t.Errorf("the lyrics of a track of no artist: %v", err)
+	}
 	named := tr
 	named.Artists = []media.Ref{{Name: "Ada Field"}}
 	if id, lt := lastfmTrack(NowPlaying{Track: &named, DurationMs: 200}); id == "" || lt.Artist != "Ada Field" {

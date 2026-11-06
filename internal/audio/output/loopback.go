@@ -6,8 +6,14 @@ import (
 )
 
 // ErrNoLoopback is returned where the system can't hear what a process
-// plays: on Windows before build 20348, and on other systems.
+// plays: on Windows before build 20348, on macOS before 14.2, and on other
+// systems.
 var ErrNoLoopback = errors.New("output: this system can't hear what a process plays")
+
+// ErrRefused is returned where the user refused MixMusic the permission to
+// hear what other apps play: on macOS, which asks at the first capture.
+var ErrRefused = errors.New("output: the permission to record what other apps play was refused " +
+	"(System Settings › Privacy & Security › Screen & System Audio Recording)")
 
 const (
 	// quietAfter is how long the processes may give no audio before the

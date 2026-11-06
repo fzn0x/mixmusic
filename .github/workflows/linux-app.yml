@@ -48,6 +48,9 @@ jobs:
   nix:
     name: The Nix build
     runs-on: ubuntu-latest
+    # A run takes about 4 minutes; one that hangs gives up long before
+    # GitHub's 6 hours.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
@@ -55,10 +58,17 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: MixMusic, from source
         run: bash .github/scripts/nix-retry.sh nix build --print-build-logs
+      # The tools alone, without what apt recommends with them: video
+      # drivers and speech models came with ffmpeg, and over a slow mirror
+      # they once took 25 minutes. xauth (for xvfb-run), the X fonts and
+      # PulseAudio's pactl, parec and pacat came as recommendations, so
+      # they are named.
       - name: A display, a sound server, and the checks' tools
+        timeout-minutes: 10
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb xdotool x11-utils dbus pulseaudio ffmpeg python3-gi gir1.2-glib-2.0
+          sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 \
+            xvfb xauth xfonts-base xdotool x11-utils dbus pulseaudio pulseaudio-utils ffmpeg python3-gi gir1.2-glib-2.0
           pulseaudio --start --exit-idle-time=-1
       - name: Start it, and check it
         run: |
@@ -77,6 +87,7 @@ jobs:
   release:
     name: The release build on Ubuntu
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
@@ -93,11 +104,15 @@ jobs:
           tar -xzf build/linux-amd64/mixmusic-*-linux-amd64.tar.gz -C app
           find app -type f | head -n 20
       # docs/getting-started.md's line for Debian and Ubuntu.
+      # The libraries as the docs' line installs them, with what apt
+      # recommends; the checks' tools as the Nix build's job installs them.
       - name: The libraries the docs name, a display, a sound server, and the checks' tools
+        timeout-minutes: 10
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0 libayatana-appindicator3-1 libsecret-1-0
-          sudo apt-get install -y xvfb xdotool x11-utils dbus pulseaudio ffmpeg python3-gi gir1.2-glib-2.0
+          sudo apt-get install -y -o Acquire::Retries=3 libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0 libayatana-appindicator3-1 libsecret-1-0
+          sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 \
+            xvfb xauth xfonts-base xdotool x11-utils dbus pulseaudio pulseaudio-utils ffmpeg python3-gi gir1.2-glib-2.0
           pulseaudio --start --exit-idle-time=-1
       - name: Start it, and check it
         run: |
@@ -120,6 +135,7 @@ jobs:
   ytdlp:
     name: yt-dlp's start
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v6

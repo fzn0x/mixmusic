@@ -16,7 +16,7 @@ import (
 // newZoomShell is a test shell that plays Spotify tracks from their
 // YouTube Music recordings, as on every system, so that the player bar
 // has no Spotify Connect devices button, whose room it leaves out: Linux
-// and macOS play them on Spotify Connect by default.
+// plays them on Spotify Connect by default.
 func newZoomShell(t *testing.T) *shell {
 	s := newTestShell(t)
 	set := s.svc.Preferences.Get()

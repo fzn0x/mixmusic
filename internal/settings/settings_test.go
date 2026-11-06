@@ -134,7 +134,7 @@ func TestGlobalShortcutsClean(t *testing.T) {
 func TestDefaultSpotifyPlayback(t *testing.T) {
 	for goos, want := range map[string]SpotifyPlayback{
 		"windows": SpotifyPlaybackHere,
-		"darwin":  SpotifyPlaybackConnect,
+		"darwin":  SpotifyPlaybackHere,
 		"linux":   SpotifyPlaybackConnect,
 	} {
 		if got := defaultSpotifyPlayback(goos); got != want {

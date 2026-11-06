@@ -280,6 +280,9 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 	}
 	synced := ly.Synced && !s.set.LyricsPlain
 	x := s.lyricsChoices(c, t, ly, where)
+	if ly.Note != "" {
+		s.lyricsNote(c, ly.Note)
+	}
 	active := -1
 	if synced {
 		pos := s.st.Position + lyricsLead(s.st.Speed)

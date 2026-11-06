@@ -138,6 +138,11 @@ export interface Lyrics {
   sourceUrl?: string;
   /** The language of the lyrics, as "ja", when known. */
   language?: string;
+  /**
+   * Why the lyrics don't show as their source has them, as synced lyrics
+   * of a song shown without their times with a longer music video of it.
+   */
+  note?: string;
 }
 
 export interface PlayerSnapshot {

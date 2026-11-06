@@ -71,6 +71,19 @@ type Lyrics struct {
 	// Language is the language of the lyrics, a code of ISO 639-1 as "ja",
 	// when their source tells it or GuessLanguage could; "" when unknown.
 	Language string `json:"language,omitempty"`
+	// Note says why the lyrics don't show as their source has them, as
+	// synchronized lyrics shown without their times; "" when they do.
+	Note string `json:"note,omitempty"`
+}
+
+// Untimed returns the lyrics without their times, as plain lyrics.
+func (l Lyrics) Untimed() Lyrics {
+	lines := make([]Line, len(l.Lines))
+	for i, line := range l.Lines {
+		lines[i] = Line{Text: line.Text}
+	}
+	l.Synced, l.Lines = false, lines
+	return l
 }
 
 // timedLyrics are lyrics of lines with times: synced when they can be
@@ -88,11 +101,7 @@ func timedLyrics(lines []Line, source string) Lyrics {
 			return Lyrics{Synced: true, Lines: lines, Source: source}
 		}
 	}
-	plain := Lyrics{Lines: make([]Line, len(lines)), Source: source}
-	for i, l := range lines {
-		plain.Lines[i] = Line{Text: l.Text}
-	}
-	return plain
+	return Lyrics{Lines: lines, Source: source}.Untimed()
 }
 
 // Plain makes lyrics of text without times.

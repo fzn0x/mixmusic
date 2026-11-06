@@ -24,9 +24,11 @@ import (
 // fakeMusic is YouTube Music as the radio tests need it. search answers
 // a search of its songs, and radio the radio of a video, with a recorded
 // answer, or nil for HTTP 500. It notes the searches and the radios asked.
+// browse, when set, answers the pages it browses, as a track's lyrics.
 type fakeMusic struct {
 	search func(r *http.Request, query string) []byte
 	radio  func(videoID string) []byte
+	browse func(browseID string) []byte
 
 	mu       sync.Mutex
 	searches []string
@@ -82,18 +84,21 @@ func (m *fakeMusic) catalog(t *testing.T) *Catalog {
 	}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body struct {
-			VideoID string `json:"videoId"`
-			Query   string `json:"query"`
+			VideoID  string `json:"videoId"`
+			Query    string `json:"query"`
+			BrowseID string `json:"browseId"`
 		}
 		json.NewDecoder(r.Body).Decode(&body)
 		var answer []byte
-		switch r.URL.Path {
-		case "/youtubei/v1/search":
+		switch {
+		case r.URL.Path == "/youtubei/v1/search":
 			m.note(&m.searches, body.Query)
 			answer = m.search(r, body.Query)
-		case "/youtubei/v1/next":
+		case r.URL.Path == "/youtubei/v1/next":
 			m.note(&m.radios, body.VideoID)
 			answer = m.radio(body.VideoID)
+		case r.URL.Path == "/youtubei/v1/browse" && m.browse != nil:
+			answer = m.browse(body.BrowseID)
 		default:
 			http.NotFound(w, r)
 			return

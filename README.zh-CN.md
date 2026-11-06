@@ -1,7 +1,7 @@
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong> · <a href="README.id.md">Bahasa Indonesia</a></p>
 
 <p align="center">
-  <img src="resources/icon.png" width="112" height="112" alt="MixMusic 的图标：黑色背景上的两个粉色圆环和一个播放按钮" />
+  <img src="brand/icon.png" width="112" height="112" alt="MixMusic 的图标：黑色背景上的两个粉色圆环和一个播放按钮" />
 </p>
 
 <h1 align="center">MixMusic</h1>
@@ -276,7 +276,7 @@ webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
 lyrics/              synced lyrics from LRCLIB, and the LRC format
-resources/           MixMusic's logo, for code that draws it
+brand/               MixMusic's logo, for code that draws it
 ```
 
 ## 社区

@@ -34,7 +34,7 @@ typefaces and the code it ports, keep licences of their own, listed below.
   plugins: opening a pull request for one agrees to it.
 
 The Go packages anyone can import, `opus`, `aac`, `ac3`, `webm`, `mp4`,
-`resample`, `lyrics` and `resources`, come under the same choice, with the
+`resample`, `lyrics` and `brand`, come under the same choice, with the
 licences of the code they derive from, below.
 
 ## Parts with licences of their own

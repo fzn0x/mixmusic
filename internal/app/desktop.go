@@ -346,16 +346,30 @@ func (a *App) OnNavigate(fn func(target string)) (cancel func()) {
 }
 
 // SecondInstance shows the main window when the user starts MixMusic again.
-func (a *App) SecondInstance([]string, string) { a.showMain() }
+func (a *App) SecondInstance([]string, string) { whenReady(a.showMain) }
 
 // Activate shows the main window when the app is activated without it in
 // view, as by a click on its Dock icon after it was closed to the tray, or
 // while it leaves full screen to hide there.
 func (a *App) Activate(bool) {
-	a.mu.Lock()
-	win := a.main
-	a.mu.Unlock()
-	if win == nil || !win.IsVisible() || win.IsMinimized() || a.trayHide.pending() {
-		a.showMain()
+	whenReady(func() {
+		a.mu.Lock()
+		win := a.main
+		a.mu.Unlock()
+		if win == nil || !win.IsVisible() || win.IsMinimized() || a.trayHide.pending() {
+			a.showMain()
+		}
+	})
+}
+
+// whenReady runs fn now once MyGo is ready, and before then once it is,
+// after Start opened the main window: no window can open earlier, and a
+// second start of MixMusic, or a click on its Dock icon, can come while it
+// is still starting (#305).
+func whenReady(fn func()) {
+	if mygo.App.IsReady() {
+		fn()
+		return
 	}
+	mygo.App.WhenReady(fn)
 }

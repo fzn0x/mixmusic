@@ -18,6 +18,17 @@
   **`resample`** converts it from its rate, 44.1 kHz for
   YouTube, to the engine's 48 kHz, with a polyphase filter of
   Kaiser-windowed sincs.
+- **`flac`** decodes FLAC, written from RFC 9639: the STREAMINFO and
+  SEEKTABLE, and every kind of frame and subframe, checking their CRCs and
+  passing over the frames that fail them, seeking by the SEEKTABLE's
+  points, else by halving the file, searching for frames by their sync
+  codes and headers. Its tests decode FFmpeg's files to the MD5 of their
+  STREAMINFO, and, with ffmpeg on the PATH, encode sound at each of its
+  levels and ways of coding stereo and decode it back as it was.
+- **`ogg`** reads the packets of an Ogg file's first logical bitstream,
+  RFC 3533, with the granule positions of their pages, checking their
+  CRCs, and seeks by them, as the Opus and Vorbis of files on a computer
+  are kept.
 - **`ac3`** decodes AC-3 and E-AC-3, the 5.1 surround of YouTube's
   formats 380 and 328: a pure Go decoder written from ATSC A/52 and its
   Annex E, of every audio coding mode and tool, spectral extension and

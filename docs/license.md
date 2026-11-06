@@ -34,8 +34,8 @@ typefaces and the code it ports, keep licences of their own, listed below.
   plugins: opening a pull request for one agrees to it.
 
 The Go packages anyone can import, `opus`, `aac`, `ac3`, `webm`, `mp4`,
-`resample`, `lyrics` and `brand`, come under the same choice, with the
-licences of the code they derive from, below.
+`flac`, `ogg`, `resample`, `lyrics` and `brand`, come under the same
+choice, with the licences of the code they derive from, below.
 
 ## Parts with licences of their own
 
@@ -47,6 +47,8 @@ licences of the code they derive from, below.
 | The colours of the Material themes, `internal/hct` | a port of Material Color Utilities, by Google | Apache 2.0 | [internal/hct/LICENSE.material-color-utilities](../internal/hct/LICENSE.material-color-utilities) |
 | The readings of Chinese, built in | made from the Unihan database of Unicode, and from mozillazg's pinyin-data and phrase-pinyin-data | the Unicode License v3, and MIT | [LICENSE.unicode](../internal/romanize/LICENSE.unicode), [LICENSE.pinyin-data](../internal/romanize/LICENSE.pinyin-data), [LICENSE.phrase-pinyin-data](../internal/romanize/LICENSE.phrase-pinyin-data) |
 | kagome, which reads kanji for romaji | a Go module, by ikawaha | MIT | [internal/romaji/LICENSE.kagome](../internal/romaji/LICENSE.kagome) |
+| go-mp3, which decodes MP3 files | a Go module, by Hajime Hoshi and its authors | Apache 2.0 | [internal/audio/LICENSE.go-mp3](../internal/audio/LICENSE.go-mp3) |
+| jfreymuth/vorbis, which decodes Vorbis files | a Go module, by Johann Freymuth | MIT | [internal/audio/LICENSE.vorbis](../internal/audio/LICENSE.vorbis) |
 | The IPA dictionary, downloaded the first time you turn romaji on | kagome-dict's, made from mecab-ipadic 2.7.0-20070801 | MIT for kagome-dict, and the notice of mecab-ipadic | [LICENSE.kagome-dict](../internal/romaji/LICENSE.kagome-dict), [NOTICE.ipadic](../internal/romaji/NOTICE.ipadic) |
 | Selawik, the interface's face | by Microsoft | SIL Open Font License 1.1 | [fonts/OFL.txt](../fonts/OFL.txt) |
 | Quicksand, the Mochi theme's face | by Andrew Paglinawan | SIL Open Font License 1.1 | [fonts/quicksand-OFL.txt](../fonts/quicksand-OFL.txt) |

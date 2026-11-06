@@ -51,6 +51,13 @@ of its own.
   equalizer's filters, the compressor of volume levelling and the
   visualizer's analyser are ports of its biquad, DynamicsCompressor and
   AnalyserNode, so MixMusic sounds as its web player did.
+- **[go-mp3](https://github.com/hajimehoshi/go-mp3)**, by Hajime Hoshi
+  and its authors, a port of PDMP3, which decodes the MP3 files on your
+  computer, and **[jfreymuth/vorbis](https://github.com/jfreymuth/vorbis)**,
+  by Johann Freymuth, which decodes their Vorbis.
+- **[Xiph.Org](https://xiph.org)**, whose FLAC (RFC 9639) and Ogg
+  (RFC 3533) MixMusic's `flac` and `ogg` read, as their specifications
+  have them.
 - **[FFmpeg](https://ffmpeg.org)**, which the tests of the decoders and of
   the resampler compare with.
 - **W. Verhelst and M. Roelands**, whose WSOLA, the waveform-similarity

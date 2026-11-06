@@ -3,6 +3,21 @@
 - **`internal/library`** keeps liked and disliked songs, mixes, the history
   and stats, and the artists followed in MixMusic
   ([Following artists](follows.md)), in `library.json`.
+- **`internal/localfiles`** keeps the index of the music on the user's
+  computer, `local-files.json`: the music files of the folders the
+  settings name (`musicFolders`), by path, with their size, time of
+  change and tags, which `internal/tags` reads (ID3v2 and ID3v1, MP4's
+  `ilst`, Vorbis comments and FLAC's PICTURE, WAV's INFO), and whether
+  the engine plays them, as `audio.Probe` tells. A scan, at the start,
+  when the folders change and on demand, reads only the files new or
+  changed by their size or time of change, four at a time, drops those
+  gone, and keeps those of a folder that can't be read. Covers, held or
+  beside the files, go to the cache's `local-art`, by their hash. A track's
+  ID is its file's path in base64 (`file:<path>`), so that one in a mix
+  or the queue plays as long as its file is there; the player plays it
+  from the file (`prepareFile`), and it goes to no service: the matcher
+  refuses it (`match.ErrLocal`), no radio starts from it, and a cast
+  device isn't handed it. One whose file is gone is missing until a scan.
 - **`internal/downloads`** keeps the tracks the user downloads, apart from
   the offline cache: a folder of their audio (`audio/<video id>.webm`, or
   `.m4a` for a track YouTube has only in AAC) and covers (`art/`), with

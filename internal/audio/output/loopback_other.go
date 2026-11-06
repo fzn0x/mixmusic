@@ -13,3 +13,6 @@ func CaptureProcess(pid uint32, write func([]float32)) (*Capture, error) {
 
 // Stop does nothing.
 func (c *Capture) Stop() {}
+
+// Err returns nil.
+func (c *Capture) Err() error { return nil }

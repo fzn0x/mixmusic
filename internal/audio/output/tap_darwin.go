@@ -353,6 +353,7 @@ func (t *tap) close() {
 
 // Capture hears what a process plays.
 type Capture struct {
+	stopped
 	once sync.Once
 	stop chan struct{}
 	done chan struct{}
@@ -406,7 +407,7 @@ func (c *Capture) Stop() {
 // while it hears nothing. Until the user answered whether MixMusic may
 // hear other apps, it asks TCC again each second: once they allowed it, it
 // taps again, as a tap made before hears silence; once they refused, it
-// taps no more.
+// taps no more, and Err tells ErrRefused.
 func (c *Capture) loop(t *tap, process uint32, mute int, asked int32, write func([]float32)) {
 	defer func() {
 		if t != nil {
@@ -456,12 +457,15 @@ func (c *Capture) loop(t *tap, process uint32, mute int, asked int32, write func
 			case tccAllowed:
 				t.close()
 				var err error
-				if t, err = newTap(process, mute); err == nil {
+				if t, err = newTap(process, mute); err != nil {
+					c.fail(err)
+				} else {
 					rated()
 				}
 			case tccRefused:
 				t.close()
 				t = nil
+				c.fail(ErrRefused)
 			}
 		}
 	}

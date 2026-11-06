@@ -102,8 +102,12 @@ func rootNamed(procs []proc, name string) uint32 {
 	return 0
 }
 
-// capture is what the listener hears through, an output.Capture.
-type capture interface{ Stop() }
+// capture is what the listener hears through, an output.Capture: Err tells
+// why it stopped hearing before Stop.
+type capture interface {
+	Stop()
+	Err() error
+}
 
 // listener hears, into its tap, the processes that play what the engine
 // doesn't, while the analyser reads the tap.
@@ -220,6 +224,15 @@ func (l *listener) run() {
 		l.mu.Lock()
 		want, closed := l.want, l.closed
 		l.mu.Unlock()
+		if l.capture != nil {
+			// As when the user refused it at macOS's question: it hears
+			// again once what it hears changes.
+			if err := l.capture.Err(); err != nil {
+				l.capture.Stop()
+				l.capture = nil
+				l.fail(err)
+			}
+		}
 		// While nothing reads the analyser, the listener hears nothing: on
 		// macOS, where hearing asks the user's permission, it asks only
 		// once the visualizer or a plugin would show what it hears.
@@ -258,11 +271,16 @@ func (l *listener) hear(want hearing) {
 	}
 	c, err := l.start(pid, l.tap.Write)
 	if err != nil {
-		if !l.failed {
-			l.failed = true
-			log.Printf("mixmusic: the visualizer can't hear Spotify: %v", err)
-		}
+		l.fail(err)
 		return
 	}
 	l.capture = c
+}
+
+// fail says why the listener can't hear, once a run.
+func (l *listener) fail(err error) {
+	if !l.failed {
+		l.failed = true
+		log.Printf("mixmusic: the visualizer can't hear Spotify: %v", err)
+	}
 }

@@ -19,9 +19,19 @@ type fakeCaptures struct {
 	err     error
 }
 
-type fakeCapture struct{ stopped atomic.Bool }
+type fakeCapture struct {
+	stopped atomic.Bool
+	err     atomic.Pointer[error]
+}
 
 func (c *fakeCapture) Stop() { c.stopped.Store(true) }
+
+func (c *fakeCapture) Err() error {
+	if p := c.err.Load(); p != nil {
+		return *p
+	}
+	return nil
+}
 
 func (f *fakeCaptures) start(pid uint32, _ func([]float32)) (capture, error) {
 	f.mu.Lock()
@@ -128,6 +138,29 @@ func TestListenerFailsOnce(t *testing.T) {
 	l.close() // the listener's goroutine, which owns failed, ends
 	if !l.failed {
 		t.Error("the failure wasn't noted")
+	}
+}
+
+// TestListenerSaysWhyItStopped stops a capture that stopped hearing, as
+// when the user refused it at macOS's question, and says why.
+func TestListenerSaysWhyItStopped(t *testing.T) {
+	var f fakeCaptures
+	l := listenWith(func(hearing) uint32 { return 42 }, f.start)
+	l.follow(spotifyPlays)
+	var a audio.Analysis
+	l.analyse(&a)
+	eventually(t, "hearing", func() bool { n, _ := f.last(); return n == 1 })
+	_, c := f.last()
+	refused := errors.New("refused")
+	c.err.Store(&refused)
+	eventually(t, "stopping the capture that stopped hearing", c.stopped.Load)
+	l.analyse(&a)
+	l.close()
+	if !l.failed {
+		t.Error("the failure wasn't noted")
+	}
+	if n, _ := f.last(); n != 1 {
+		t.Errorf("heard again %d times, with nothing changed", n-1)
 	}
 }
 

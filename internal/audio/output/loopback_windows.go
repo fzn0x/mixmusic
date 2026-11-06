@@ -187,6 +187,7 @@ func (cc *iAudioCaptureClient) releaseBuffer(n uint32) error {
 
 // Capture hears what a process and its children play.
 type Capture struct {
+	stopped
 	stopping atomic.Bool
 	done     chan struct{}
 }
@@ -372,7 +373,7 @@ func startLoopback(client *iAudioClient) (*loopback, error) {
 }
 
 // loop hands what the client hears to write until Stop, and silence while
-// it hears nothing, or until the client fails.
+// it hears nothing, or until the client fails, which Err then tells.
 func (c *Capture) loop(l *loopback, write func([]float32)) {
 	var frames []float32
 	q := newQuiet(time.Now())
@@ -382,6 +383,7 @@ func (c *Capture) loop(l *loopback, write func([]float32)) {
 		for {
 			n, err := l.capture.nextPacket()
 			if err != nil {
+				c.fail(err)
 				return
 			}
 			if n == 0 {
@@ -389,6 +391,7 @@ func (c *Capture) loop(l *loopback, write func([]float32)) {
 			}
 			p, n, flags, err := l.capture.buffer()
 			if err != nil {
+				c.fail(err)
 				return
 			}
 			frames = frames[:0]
@@ -403,6 +406,7 @@ func (c *Capture) loop(l *loopback, write func([]float32)) {
 				}
 			}
 			if err := l.capture.releaseBuffer(n); err != nil {
+				c.fail(err)
 				return
 			}
 			write(frames)

@@ -60,7 +60,7 @@ Signed in to YouTube Music, MixMusic and YouTube Music go on from each other's p
 
 ## Spotify's episodes
 
-- **They play only from Spotify,** with "How Spotify tracks play" in Settings › Playback set to In MixMusic, from Spotify (on Windows) or On Spotify Connect, either of which needs Spotify Premium. YouTube Music has no recording of them.
+- **They play only from Spotify,** with "How Spotify tracks play" in Settings › Playback set to In MixMusic, from Spotify (on Windows and macOS) or On Spotify Connect, either of which needs Spotify Premium. YouTube Music has no recording of them.
 - **Where you left them:** Spotify tells MixMusic where you left an episode on another device. A sign-in to Spotify made before MixMusic had podcasts doesn't allow it: sign in to Spotify again once, in Settings › Accounts.
 - **Speed:** Spotify plays its episodes at their own speed, so the speed button is dimmed while one plays.
 

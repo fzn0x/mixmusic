@@ -5,13 +5,13 @@ Playback SDK, in the hidden window of `public/spotify.html`
 ([its web view](webviews.md)). Spotify encrypts its audio, and the SDK
 plays only where the web view has a decryption module (a CDM) it takes.
 Here is what each system's web view gives it, as tried for #295 in
-November 2026, and what playing there would take. MixMusic plays Spotify
-itself on Windows only.
+November 2026, and what playing there takes. MixMusic plays Spotify
+itself on Windows and macOS.
 
 | System | Its web view | Spotify in MixMusic |
 |---|---|---|
 | Windows | WebView2: Chromium, with Widevine | plays; the default |
-| macOS | WKWebView: WebKit, with FairPlay | possible: the SDK starts with FairPlay; not yet heard |
+| macOS | WKWebView: WebKit, with FairPlay | plays; On Spotify Connect stays the default |
 | Linux | WebKitGTK: WebKit, without EME | not in its web view; costly with an embedded Chromium |
 
 ## What the SDK asks for
@@ -33,11 +33,13 @@ itself on Windows only.
 
 ## macOS
 
-The probe ran on macOS 26.5 (Apple silicon), in the test build of 0.5.9 and
-MyGo 0.7.3's WKWebView. It used a hidden window of `public/spotify.html`, at
-`mygo://localhost`, with a script in every frame that noted what the SDK's
-frame asked of EME. The SDK got a made-up token, so no account was touched.
+MixMusic plays Spotify itself on macOS too, with the FairPlay of its web
+view (#295). Two probes on the test Mac found what that takes. Both ran on
+macOS 26.5 (Apple silicon), with MyGo 0.7.3's WKWebView.
 
+**Without a sign-in.** The probe used a hidden window of
+`public/spotify.html`, at `mygo://localhost`, with a script in every frame
+that noted what the SDK's frame asked of EME. The SDK got a made-up token.
 What it found:
 
 - **EME.** `requestMediaKeySystemAccess` grants `com.apple.fps` and
@@ -63,40 +65,42 @@ What it found:
   - Its page is hidden (`document.visibilityState`), unlike WebView2's.
   - WebKit slows a hidden page's timers to once a second unless
     `BackgroundThrottling` is `ThrottlingOff`.
-- **Not tried: the device getting ready, and a track sounding.** Both need
-  a Spotify sign-in, which the test Mac doesn't have.
-  - Spotify's Web Player supports Safari, which plays with the same
-    FairPlay.
-  - Whether Spotify's licence server answers WKWebView as it answers
-    Safari is what a sign-in would tell.
 
-What it would take, if a signed-in check plays:
+**Signed in.** A build of the change, with the maintainer's own Spotify
+sign-in, played one track on MixMusic's device at volume 0. The page's
+gain was set to 0 before the player was made. What it found:
 
-1. `spotifyPlaysHere` true on macOS too, in `internal/app/spotifyhere.go`
-   and `settings_playback.go`.
-2. `canPlay` in `public/spotify.html` takes FairPlay (`com.apple.fps`), as
-   it takes Widevine and PlayReady.
-3. The device's window gets `BackgroundThrottling: ThrottlingOff` on macOS,
-   for the SDK's own timers. Its autoplay needs nothing.
-4. Update the text of Settings › Playback, `docs/spotify.md` and
-   `docs/spotify-playback.md`. Add tests in a new file and a changelog
-   fragment.
-   - Connect stays the default on macOS until a few Macs have played this
-     way.
-5. Check with a Spotify sign-in on a Mac:
-   - the device gets ready;
-   - a track plays at volume 0, its time moving;
-   - the gapless list, a seek near the end and the hush behave as on
-     Windows (#184, #187, #273).
+- **The device gets ready.** `mm.supported()` is true, and `ready` gives a
+  device ID 2.3 s after the player connects.
+- **The track plays.**
+  - The Web API takes the play in 0.5 s.
+  - The track sounds 3.2 s after that: the player no longer loads, and
+    isn't paused.
+  - Its position moves a second each second, from 6 ms to 10.6 s in 11 s,
+    at volume 0, on the track asked for.
+- **The sound comes out of WebKit's GPU process.** Core Audio's process list
+  showed `com.apple.WebKit.GPU` running output from when the track sounded
+  until its pause. No other process did.
+- **Not checked on the Mac:** the gapless list, a seek near a track's end,
+  and the hush (#184, #187, #273). They run in the same page as on Windows.
 
-Steps 1 to 4 take about a day, plus the check.
+What it took:
 
-**The visualizer** would need more:
+- **The gate.** `playsSpotifyOn` in `internal/app/spotifyhere.go` takes
+  Windows and macOS. The settings ask `app.SpotifyPlaysHere`.
+- **The key system.** `canPlay` in `public/spotify.html` takes FairPlay
+  (`com.apple.fps`), after Widevine and PlayReady.
+- **The window.** On macOS the device's window keeps its page running
+  while hidden (`herePage`: `ThrottlingOff`), for the SDK's own timers.
+  Its autoplay needs nothing.
+- **The default.** On Spotify Connect stays the default on macOS
+  (`defaultSpotifyPlayback`).
+
+**The visualizer** is a follow-up:
 
 - **The process.** WKWebView plays media in WebKit's GPU process,
-  `com.apple.WebKit.GPU`, one per launch of the app. While the hidden page
-  played, it was the only process running output (Core Audio's process
-  list), with a new PID at each launch.
+  `com.apple.WebKit.GPU`, one per launch of the app, with a new PID at each
+  launch.
 - **The tap.** A Core Audio process tap (`AudioHardwareCreateProcessTap`,
   macOS 14.2 and later) of that PID would hear it.
   - It needs `NSAudioCaptureUsageDescription` in the app's Info.plist, and
@@ -108,8 +112,8 @@ Steps 1 to 4 take about a day, plus the check.
 That is a few days of work on its own. Until then, Spotify plays on macOS
 without the visualizer, as on Spotify Connect.
 
-**An embedded Chromium (CEF) with Widevine** is the fallback if FairPlay
-fails, and it is costly:
+**An embedded Chromium (CEF) with Widevine** isn't needed on macOS, and
+would be costly:
 
 - CEF's minimal build for macOS arm64 is 135 MB to download and 353 MB
   unpacked.

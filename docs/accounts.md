@@ -18,6 +18,8 @@ Settings › Accounts › YouTube Music offers three ways to sign in. The
 first is the simplest; the other two are for when it can't open, or Google
 refuses it.
 
+![Settings › Accounts › YouTube Music, signed out: the sign in to youtube music button and a note on Google's own page, Import from a browser with Firefox chosen, Profile, "The browser's own", and the Import button, then Paste a cookie header, with its box and the sign in with it button](shots/accounts-youtube.webp)
+
 ### The sign-in window
 
 Choose **sign in to youtube music**. A window of MixMusic opens on Google's
@@ -171,6 +173,8 @@ Last.fm API account of your own:
 2. Paste its **API key** and **shared secret** in Settings › Accounts ›
    Last.fm, and choose **connect to last.fm**.
 3. Approve MixMusic on the page that opens in your browser.
+
+![Settings › Accounts › Last.fm, not connected: the three steps, with a link to Last.fm, the API key and Shared secret boxes, each "32 letters and digits", the connect to last.fm button, and a note that MixMusic keeps them in your system's credential store](shots/accounts-lastfm.webp)
 
 Settings › Accounts then says **Scrobbling as** your name, with a switch
 that pauses scrobbling and starts it again. A track counts once half of it

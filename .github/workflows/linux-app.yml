@@ -48,9 +48,9 @@ jobs:
   nix:
     name: The Nix build
     runs-on: ubuntu-latest
-    # A run takes about 4 minutes; one that hangs gives up long before
-    # GitHub's 6 hours.
-    timeout-minutes: 30
+    # A run takes about 4 minutes, more when apt's mirror is slow; one that
+    # hangs gives up long before GitHub's 6 hours.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
@@ -58,17 +58,26 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: MixMusic, from source
         run: bash .github/scripts/nix-retry.sh nix build --print-build-logs
-      # The tools alone, without what apt recommends with them: video
-      # drivers and speech models came with ffmpeg, and over a slow mirror
-      # they once took 25 minutes. xauth (for xvfb-run), the X fonts and
-      # PulseAudio's pactl, parec and pacat came as recommendations, so
-      # they are named.
-      - name: A display, a sound server, and the checks' tools
+      # FFmpeg grabs the display's frames and makes the tone the checks
+      # play. It comes from Nix's binary cache, in nixpkgs' full build, the
+      # one with x11grab: from Ubuntu's archive its libraries were 74 MB,
+      # which the runner's mirror once took more than 10 minutes for.
+      - name: FFmpeg
         timeout-minutes: 10
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 \
-            xvfb xauth xfonts-base xdotool x11-utils dbus pulseaudio pulseaudio-utils ffmpeg python3-gi gir1.2-glib-2.0
+          bash .github/scripts/nix-retry.sh nix build --no-link --inputs-from . 'nixpkgs#ffmpeg-full^bin'
+          ffmpeg="$(nix build --no-link --print-out-paths --inputs-from . 'nixpkgs#ffmpeg-full^bin')"
+          echo "$ffmpeg/bin" >> "$GITHUB_PATH"
+          "$ffmpeg/bin/ffmpeg" -hide_banner -version | head -n 1
+      # The tools alone, without what apt recommends with them. xauth (for
+      # xvfb-run), the X fonts and PulseAudio's pactl, parec and pacat came
+      # as recommendations, so they are named. apt-install.sh goes on from
+      # Ubuntu's own archive when the runner's mirror is slow.
+      - name: A display, a sound server, and the checks' tools
+        timeout-minutes: 15
+        run: |
+          bash .github/scripts/apt-install.sh --no-install-recommends \
+            xvfb xauth xfonts-base xdotool x11-utils dbus pulseaudio pulseaudio-utils python3-gi gir1.2-glib-2.0
           pulseaudio --start --exit-idle-time=-1
       - name: Start it, and check it
         run: |
@@ -87,7 +96,8 @@ jobs:
   release:
     name: The release build on Ubuntu
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # A run takes about 7 minutes, more when apt's mirror is slow.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
@@ -103,16 +113,23 @@ jobs:
           mkdir app
           tar -xzf build/linux-amd64/mixmusic-*-linux-amd64.tar.gz -C app
           find app -type f | head -n 20
+      # FFmpeg as the Nix build's job gets it.
+      - name: FFmpeg
+        timeout-minutes: 10
+        run: |
+          bash .github/scripts/nix-retry.sh nix build --no-link --inputs-from . 'nixpkgs#ffmpeg-full^bin'
+          ffmpeg="$(nix build --no-link --print-out-paths --inputs-from . 'nixpkgs#ffmpeg-full^bin')"
+          echo "$ffmpeg/bin" >> "$GITHUB_PATH"
+          "$ffmpeg/bin/ffmpeg" -hide_banner -version | head -n 1
       # docs/getting-started.md's line for Debian and Ubuntu.
       # The libraries as the docs' line installs them, with what apt
       # recommends; the checks' tools as the Nix build's job installs them.
       - name: The libraries the docs name, a display, a sound server, and the checks' tools
-        timeout-minutes: 10
+        timeout-minutes: 25
         run: |
-          sudo apt-get update
-          sudo apt-get install -y -o Acquire::Retries=3 libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0 libayatana-appindicator3-1 libsecret-1-0
-          sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 \
-            xvfb xauth xfonts-base xdotool x11-utils dbus pulseaudio pulseaudio-utils ffmpeg python3-gi gir1.2-glib-2.0
+          bash .github/scripts/apt-install.sh libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0 libayatana-appindicator3-1 libsecret-1-0
+          bash .github/scripts/apt-install.sh --no-install-recommends \
+            xvfb xauth xfonts-base xdotool x11-utils dbus pulseaudio pulseaudio-utils python3-gi gir1.2-glib-2.0
           pulseaudio --start --exit-idle-time=-1
       - name: Start it, and check it
         run: |

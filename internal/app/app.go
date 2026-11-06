@@ -128,6 +128,8 @@ type App struct {
 	colorFile colorFile
 	// episodeDetails keeps the details of the episodes the player showed.
 	episodeDetails *memo[media.EpisodeDetails]
+	// releases keeps what the artists the user follows put out lately.
+	releases releaseBook
 
 	presence presence
 	// watchtime reports the listening to YouTube Music's episodes to the

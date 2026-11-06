@@ -460,3 +460,52 @@ jobs:
             -f content="$(base64 -w0 "$cask")" \
             ${sha:+-f "sha=$sha"}
           echo "$TAP's $path is of MixMusic $v"
+      # The AUR's mixmusic-bin, for `yay -S mixmusic-bin` on Arch Linux and
+      # its derivatives: tools/aur writes its PKGBUILD and .SRCINFO for the
+      # .deb files of the release, now out, and the key of the
+      # AUR_SSH_PRIVATE_KEY secret pushes them to the AUR, which makes the
+      # package at the first push. Without the secret, and for
+      # pre-releases, which pacman can't order, the release goes out
+      # without it.
+      - name: The AUR package
+        env:
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          v="${TAG#v}"
+          if [ -z "$AUR_SSH_PRIVATE_KEY" ]; then
+            echo "::notice::No AUR_SSH_PRIVATE_KEY secret: the AUR package stays as it is"
+            exit 0
+          fi
+          if [ ! -d tools/aur ]; then
+            echo "::notice::$TAG has no tools/aur: the AUR package stays as it is"
+            exit 0
+          fi
+          case "$v" in *-*)
+            echo "::notice::$TAG is a pre-release: the AUR package stays as it is"
+            exit 0 ;;
+          esac
+          umask 077
+          mkdir -p ~/.ssh
+          printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
+          # The key only signs in: a host that isn't the AUR learns nothing
+          # it could push with. Its key goes in the log, to compare with
+          # those the Arch wiki lists.
+          ssh-keyscan -t ed25519 aur.archlinux.org > ~/.ssh/known_hosts
+          ssh-keygen -lf ~/.ssh/known_hosts
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/aur -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+          aur="$RUNNER_TEMP/aur"
+          git clone ssh://aur@aur.archlinux.org/mixmusic-bin.git "$aur"
+          nix develop --command go run ./tools/aur -version "$v" -release release -o "$aur"
+          cat "$aur/PKGBUILD"
+          cd "$aur"
+          git add PKGBUILD .SRCINFO
+          if git diff --cached --quiet; then
+            echo "The AUR's mixmusic-bin is of MixMusic $v already"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "mixmusic-bin $v"
+          git push origin HEAD:master
+          echo "The AUR's mixmusic-bin is of MixMusic $v"

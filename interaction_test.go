@@ -305,6 +305,10 @@ func TestReplacing(t *testing.T) {
 	if got := replacing("flatpak", ""); got != "" {
 		t.Errorf("a Flatpak without a bundle to install says %q", got)
 	}
+	// The AUR's package updates with the system, and offers no download.
+	if got := replacing("pacman", ""); !strings.Contains(got, "yay -Syu") {
+		t.Errorf("the AUR's package says %q", got)
+	}
 	if got := downloadLabel("flatpak"); got != "download the Flatpak" {
 		t.Errorf("the Flatpak's download is %q", got)
 	}

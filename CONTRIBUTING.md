@@ -202,6 +202,7 @@ archives, so that updates install the signed app too: see the comments of
 | `WINDOWS_CERTIFICATE` | a code signing certificate and its private key, as a `.pfx`, in base64 |
 | `WINDOWS_CERTIFICATE_PASSWORD` | its password, if it has one |
 | `HOMEBREW_TAP_TOKEN` | a token that can write to `fzn0x/homebrew-tap` |
+| `AUR_SSH_PRIVATE_KEY` | the private SSH key of the AUR account that maintains `mixmusic-bin` |
 
 What only the maintainer can do, once:
 
@@ -234,10 +235,25 @@ What only the maintainer can do, once:
    fine-grained personal access token for it alone with Contents: Read and
    write, then `gh secret set HOMEBREW_TAP_TOKEN`. The next release writes
    `Casks/mixmusic.rb` there, for `brew install --cask fzn0x/tap/mixmusic`.
+4. **The AUR.** Make an account on the [AUR](https://aur.archlinux.org),
+   and a key of its own for the workflow alone, with no passphrase. Add
+   the public key to the account's SSH Public Key, then:
+
+   ```sh
+   ssh-keygen -t ed25519 -N "" -C "mixmusic release" -f aur
+   gh secret set AUR_SSH_PRIVATE_KEY < aur
+   ```
+
+   The next release pushes `mixmusic-bin` there, from
+   [packaging/aur](packaging/aur) with `tools/aur`, for
+   `yay -S mixmusic-bin`. It installs the files of the release's `.deb`,
+   and MixMusic tells it by pacman's database: it offers no download, as
+   pacman updates it. Pre-releases stay off the AUR.
 
 The first signed release: check on a Mac and on Windows that it opens
 without a warning, and that `brew install`, `brew upgrade` and
-`brew uninstall` work. Then take "not notarized yet" and "not signed yet"
+`brew uninstall` work, and on Arch that `yay -S mixmusic-bin` installs a
+MixMusic whose Settings › About says "AUR package". Then take "(coming soon)" out of the README's AUR row. Then take "not notarized yet" and "not signed yet"
 out of the README's first launch, docs/troubleshooting.md and the
 website, and "once its tap is up" out of the README's Homebrew line. The
 release notes and the cask's caveats leave them out by themselves.

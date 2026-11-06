@@ -165,6 +165,7 @@ Download the file for your system from the
 | Windows, portable, no installation | [`mixmusic-<version>-windows-<arch>-portable.zip`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Debian, Ubuntu and derivatives | [`mixmusic-<version>-linux-<arch>.deb`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Fedora, openSUSE and derivatives | [`mixmusic-<version>-linux-<arch>.rpm`](https://github.com/fzn0x/mixmusic/releases/latest) |
+| Arch Linux and derivatives (coming soon) | [`mixmusic-bin`](https://aur.archlinux.org/packages/mixmusic-bin) on the AUR: `yay -S mixmusic-bin` |
 | Any Linux, one file | [`mixmusic-<version>-linux-<arch>.AppImage`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Any Linux, sandboxed (Flatpak, x64) | [`mixmusic-<version>-linux-amd64.flatpak`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Any Linux, in your home folder | [`mixmusic-<version>-linux-<arch>.tar.gz`](https://github.com/fzn0x/mixmusic/releases/latest), with `install.sh` |
@@ -177,7 +178,8 @@ Download the file for your system from the
 The installers, the portable zip and the Linux archive update themselves.
 The `.deb`, the `.rpm`, the AppImage and the Flatpak can't replace their
 own files, so MixMusic tells you when a new version is out and downloads
-it for you. For the portable zip, unpack it anywhere and open
+it for you. The AUR's `mixmusic-bin` updates with the rest of your
+system. For the portable zip, unpack it anywhere and open
 `MixMusic.exe`. For the AppImage, make it executable (`chmod +x`) and open
 it. For the Flatpak, open it with your software center, or run
 `flatpak install ./mixmusic-<version>-linux-amd64.flatpak`; the first time,

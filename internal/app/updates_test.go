@@ -50,6 +50,7 @@ func TestKindOf(t *testing.T) {
 		{"app bundle", "darwin", "/Applications/MixMusic.app/Contents/MacOS", false, nil, "app"},
 		{"deb", "linux", "/opt/mixmusic", false, []string{"/var/lib/dpkg/info/mixmusic.list"}, "deb"},
 		{"rpm", "linux", "/opt/mixmusic", false, nil, "rpm"},
+		{"AUR", "linux", "/opt/mixmusic", false, []string{"/var/lib/pacman/local"}, "pacman"},
 		{"AppImage", "linux", "/tmp/.mount_MixMusXYZ/usr/bin", true, nil, "appimage"},
 		{"Flatpak", "linux", "/app/lib/mixmusic", false, []string{"/.flatpak-info"}, "flatpak"},
 		{"install.sh", "linux", "/home/me/.local/share/mixmusic", false, nil, "archive"},
@@ -78,6 +79,7 @@ func TestReleaseFile(t *testing.T) {
 		"rpm":         "mixmusic-0.3.0-linux-amd64.rpm",
 		"appimage":    "mixmusic-0.3.0-linux-amd64.AppImage",
 		"flatpak":     "mixmusic-0.3.0-linux-amd64.flatpak",
+		"pacman":      "",
 		"development": "",
 	} {
 		if got := releaseFile(kind, "0.3.0", "amd64"); got != want {

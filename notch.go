@@ -38,6 +38,8 @@ var (
 		t.Background = ui.Transparent
 		t.Text, t.TextMuted = notchWhite, notchMuted
 		t.Accent, t.AccentHover, t.AccentPressed, t.AccentText = notchWhite, notchWhite, notchMuted, notchBlack
+		// White while another app has the keyboard, as it mostly does.
+		t.InactiveAccent = notchWhite
 		t.Focus = notchWhite
 		t.Font, t.FontSize = "", 13
 		return &t

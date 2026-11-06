@@ -230,6 +230,10 @@ func newLook(s settings.Settings, themes []addons.Theme, dark bool, artwork stri
 	t.SurfaceHover, t.SurfacePressed = col(over(alpha(text, 0.07), bg)), col(over(alpha(text, 0.13), bg))
 	t.Border, t.Text, t.TextMuted = k.border, k.text, k.muted
 	t.Accent, t.AccentText = k.accent, k.accentText
+	// The sliders and switches keep the accent while another window is in
+	// front, as the rest of MixMusic does: MyGo fades its widgets' to gray
+	// there.
+	t.InactiveAccent = t.Accent
 	t.AccentHover = col(mix(accent, text, 0.14))
 	t.AccentPressed = col(mix(accent, bg, 0.14))
 	t.Danger, t.Success, t.Warning = k.danger, k.success, k.tiles[3]

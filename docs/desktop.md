@@ -191,9 +191,9 @@ already. The tray icon's tip names what plays too.
   icon; on macOS it is attached, a thumbnail that grows as you expand the
   notification; on Linux it is the notification's image, where your
   desktop shows one.
-- It is the cover the [media controls](#media-keys-and-the-systems-media-controls)
-  show, from the covers MixMusic keeps: a track on this computer shows the
-  cover its file holds, or the one beside it.
+- It is the cover the system's media controls show, from the covers
+  MixMusic keeps: a track on this computer shows the cover its file holds,
+  or the one beside it.
 - MixMusic waits up to 2 seconds for a cover it hasn't downloaded yet:
   without one by then, the notification shows without it. When the next
   track starts meanwhile, only the next one's shows.

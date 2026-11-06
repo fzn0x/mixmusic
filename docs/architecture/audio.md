@@ -25,7 +25,10 @@
   through WASAPI on Windows, an Audio Queue on macOS, and PulseAudio,
   which PipeWire serves too, or ALSA on Linux. On Windows it also hears
   what a process and its children play, through WASAPI's
-  process loopback: `internal/app`'s listener hears Spotify there, in
-  MixMusic's webview or the Spotify app, into a `Tap`, the analyser of
-  the engine for audio outside it, which the visualizer and the plugins'
-  analyser read while Spotify plays.
+  process loopback, and on macOS 14.2 and later what a process plays,
+  through a Core Audio process tap: `internal/app`'s listener hears
+  Spotify there, in MixMusic's webview, or the Spotify app on Windows,
+  into a `Tap`, the analyser of the engine for audio outside it, which
+  the visualizer and the plugins' analyser read while Spotify plays. It
+  hears only while they read it; on macOS, which asks the user once, the
+  tap is of WebKit's GPU process ([Spotify here](spotify-here.md#macos)).

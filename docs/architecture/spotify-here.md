@@ -97,21 +97,75 @@ What it took:
   as on Windows (`defaultSpotifyPlayback`). An install whose settings.json
   already has `spotifyPlayback` keeps it.
 
-**The visualizer** is a follow-up:
+**The visualizer** hears it through a process tap, from macOS 14.2 on
+(#304). The listener of `internal/app/listen.go` feeds the same `Tap` as
+on Windows ([the audio engine](audio.md)):
 
 - **The process.** WKWebView plays media in WebKit's GPU process,
-  `com.apple.WebKit.GPU`, one per launch of the app, with a new PID at each
-  launch.
-- **The tap.** A Core Audio process tap (`AudioHardwareCreateProcessTap`,
-  macOS 14.2 and later) of that PID would hear it.
-  - It needs `NSAudioCaptureUsageDescription` in the app's Info.plist, and
-    the user agrees at the first capture.
-  - The PID is known only through WebKit's private
-    `-[WKWebView _gpuProcessIdentifier]`, which MyGo would have to expose.
-- **Unknown:** whether a tap hears audio that FairPlay decrypted.
+  `com.apple.WebKit.GPU`, one for each app that has web views, with a new
+  PID at each launch. MixMusic's is the one macOS holds MixMusic
+  responsible for (`processes_darwin.go`):
+  - launchd starts WebKit's processes, so their parent is PID 1, but
+    libSystem's private `responsibility_get_pid_responsible_for_pid`
+    gives the app they work for, as macOS asks permissions of it;
+  - Core Audio's process list (`kAudioHardwarePropertyProcessObjectList`)
+    gives each process's PID and bundle ID.
+  - On the test Mac, the GPU process found so was always the one that
+    WebKit's private `-[WKWebView _gpuProcessIdentifier]` names, beside
+    Safari's.
+- **The tap** (`internal/audio/output/tap_darwin.go`, with purego, as
+  the rest of the output, without cgo, which `mygo build` turns off):
+  - a `CATapDescription` of a stereo mixdown of that process, unmuted and
+    private, for `AudioHardwareCreateProcessTap`;
+  - a private aggregate device of the tap alone, which starts it as it
+    starts;
+  - an IOProc of the device, on Core Audio's I/O thread, hands each 512
+    frames to the capture's goroutine, which converts them to 48 kHz when
+    the output device runs at another rate, and gives silence at a
+    stream's pace when the I/O stops, as the loopback of Windows does.
+- **When.** The listener hears only while Spotify plays in MixMusic and
+  the visualizer or a plugin reads the analyser, and for 2 s after the
+  last read. It stops when Spotify pauses, and as MixMusic quits.
+- **The permission.** macOS asks once whether MixMusic may record what
+  other apps play, with `NSAudioCaptureUsageDescription` from
+  `mygo.config.ts`. A tap hears only once the user allowed it: until they
+  answer, and once they refuse, it runs but hears digital silence, and no
+  call fails.
+  - **MixMusic asks first**, through TCC's private `TCCAccessRequest`
+    (`kTCCServiceAudioCapture`), and taps once the user answered. The
+    capture waits for the answer.
+  - **Not the tap.** A tap that has macOS ask itself started only 90 s
+    later on the test Mac, though the user had answered in 5 s:
+    coreaudiod started the tap at the answer, and MixMusic's call returned
+    90 s later.
+  - **Not the preflight alone.** `TCCAccessPreflight` (0 allowed, 1
+    refused, 2 not asked) answered 2 in that process for the rest of its
+    run, though the user had allowed it; a new process was told 0. So
+    MixMusic keeps `TCCAccessRequest`'s answer for the run.
+  - Once refused, a capture fails with `ErrRefused`, and the log says why,
+    once a run, as it does of a Windows without process loopback.
+- **Before macOS 14.2** there is no `AudioHardwareCreateProcessTap`: the
+  capture fails with `ErrNoLoopback`, and the visualizer stays flat for
+  Spotify.
 
-That is a few days of work on its own. Until then, Spotify plays on macOS
-without the visualizer, as on Spotify Connect.
+**Tried on the test Mac** (macOS 26.5, November 2026), with a muted tap,
+so that nothing played out loud:
+
+- **A tone** at -80 dBFS in the page of MixMusic's device, in a build
+  signed with the hardened runtime, as releases are, without entitlements:
+  the analyser's waveform peaked at -80.0 dBFS, and its bars rose.
+- **Spotify in MixMusic**, with the maintainer's sign-in: the tap hears
+  FairPlay's decrypted audio.
+  - At volume 0 the tap heard exact zeros.
+  - At a gain of -80 dB, the song peaked at -90 to -105 dBFS; at -73 dB,
+    about 7 dB higher; at 0 again, zeros.
+  - Pausing stopped the tap.
+- **The first tap, as macOS asked** at the tap itself, took about 90 s to
+  start, and TCC went on answering 2 in that run: why MixMusic asks
+  first.
+- **The first run, as MixMusic asks first**, with the build of MixMusic's
+  own name that had never been allowed: the tap started as soon as the
+  user clicked Allow, and heard Spotify in that same run, as above.
 
 **An embedded Chromium (CEF) with Widevine** isn't needed on macOS, and
 would be costly:

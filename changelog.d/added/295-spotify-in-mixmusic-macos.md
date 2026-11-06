@@ -3,5 +3,4 @@
   the default of a new install. Spotify's own player plays them, at
   Spotify's quality, with FairPlay, macOS's own protection for Spotify's
   audio, and MixMusic shows among your Spotify devices. It needs Spotify
-  Premium. An install that chose a way before keeps it, and the visualizer
-  can't hear Spotify on macOS yet (#295).
+  Premium. An install that chose a way before keeps it (#295).

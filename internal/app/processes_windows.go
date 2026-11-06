@@ -1,9 +1,18 @@
 package app
 
 import (
+	"os"
 	"syscall"
 	"unsafe"
 )
+
+// webViewAudio returns the browser process of MixMusic's WebView2, whose
+// children play what its web views play, or 0 for none: Windows hears a
+// process and its children, but not theirs, so not WebView2's audio from
+// MixMusic's own process.
+func webViewAudio(procs []proc) uint32 {
+	return childNamed(procs, uint32(os.Getpid()), "msedgewebview2.exe")
+}
 
 // processes returns the processes that run.
 func processes() []proc {

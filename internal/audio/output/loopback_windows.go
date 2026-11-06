@@ -48,11 +48,6 @@ const (
 
 	// activationWait is how long the activation may take.
 	activationWait = 5 * time.Second
-	// quietAfter is how long the processes may give no audio before the
-	// capture hears silence: packets come every 10 ms while they play.
-	quietAfter = 100 * time.Millisecond
-	// period is the silence the capture hears at a time, as a stream's.
-	period = time.Second * periodFrames / Rate
 )
 
 // activationParams is AUDIOCLIENT_ACTIVATION_PARAMS, of process loopback.
@@ -192,6 +187,7 @@ func (cc *iAudioCaptureClient) releaseBuffer(n uint32) error {
 
 // Capture hears what a process and its children play.
 type Capture struct {
+	stopped
 	stopping atomic.Bool
 	done     chan struct{}
 }
@@ -377,18 +373,17 @@ func startLoopback(client *iAudioClient) (*loopback, error) {
 }
 
 // loop hands what the client hears to write until Stop, and silence while
-// it hears nothing, or until the client fails.
+// it hears nothing, or until the client fails, which Err then tells.
 func (c *Capture) loop(l *loopback, write func([]float32)) {
 	var frames []float32
-	silence := make([]float32, 2*periodFrames)
-	heard := time.Now() // when the last packet came
-	filled := heard     // how far silence was given since
+	q := newQuiet(time.Now())
 	for !c.stopping.Load() {
 		syscall.WaitForSingleObject(l.event, 20)
 		got := false
 		for {
 			n, err := l.capture.nextPacket()
 			if err != nil {
+				c.fail(err)
 				return
 			}
 			if n == 0 {
@@ -396,6 +391,7 @@ func (c *Capture) loop(l *loopback, write func([]float32)) {
 			}
 			p, n, flags, err := l.capture.buffer()
 			if err != nil {
+				c.fail(err)
 				return
 			}
 			frames = frames[:0]
@@ -410,26 +406,16 @@ func (c *Capture) loop(l *loopback, write func([]float32)) {
 				}
 			}
 			if err := l.capture.releaseBuffer(n); err != nil {
+				c.fail(err)
 				return
 			}
 			write(frames)
 			got = true
 		}
-		now := time.Now()
-		if got {
-			heard, filled = now, now
-			continue
-		}
-		if now.Sub(heard) < quietAfter {
-			continue
-		}
-		// Silence, at the pace of a stream, and no more than a moment of it
-		// at once, as after the computer slept.
-		if earliest := now.Add(-2 * quietAfter); filled.Before(earliest) {
-			filled = earliest
-		}
-		for ; now.Sub(filled) >= period; filled = filled.Add(period) {
-			write(silence)
+		if now := time.Now(); got {
+			q.audio(now)
+		} else {
+			q.fill(now, write)
 		}
 	}
 }

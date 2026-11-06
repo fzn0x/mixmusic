@@ -240,10 +240,23 @@ alike either way.
 Spotify plays in Spotify's own player, which the engine never hears. On
 Windows 10 build 20348 and later, MixMusic hears it anyway, in MixMusic's
 own web view or in the Spotify app on this computer, through Windows'
-process loopback, which hears one app and its children alone. It analyzes
-that audio in memory and never records or sends it. Where MixMusic can't
-hear what plays, as on a Spotify device elsewhere, the visualizer draws
-nothing.
+process loopback, which hears one app and its children alone. On macOS
+14.2 and later, it hears Spotify in MixMusic through a process tap of
+the part of macOS that plays MixMusic's web views. It hears only while the
+visualizer or a plugin shows what it hears, and analyzes that audio in
+memory: it never records or sends it.
+
+- **On a Mac, macOS asks first.** The first time the visualizer would
+  hear Spotify in MixMusic, macOS asks whether MixMusic may record what
+  other apps play: that is how macOS names hearing another app. Allow it,
+  and the visualizer moves. Refuse it, and the visualizer stays flat for
+  Spotify; allow it later in System Settings › Privacy & Security ›
+  Screen & System Audio Recording, then play the track again.
+- **Before macOS 14.2,** MixMusic can't hear Spotify, and the visualizer
+  stays flat for it.
+
+Where MixMusic can't hear what plays, as on a Spotify device elsewhere,
+the visualizer draws nothing, and the log says why.
 
 ## Buffering
 

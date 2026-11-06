@@ -34,11 +34,11 @@ export default defineConfig({
   // Connect key of its secrets, which it puts in a keychain of its own:
   // `mygo build` signs the app with the hardened runtime and a timestamp,
   // has Apple notarize the disk image, and staples the ticket to both.
-  // MixMusic needs no entitlements: it isn't sandboxed, records nothing,
-  // sends no Apple events and loads only the system's frameworks; its
-  // plugins run in sobek, which makes no machine code, and its web pages in
-  // WebKit's own processes. Without the secrets, as on a contributor's Mac,
-  // the app is signed ad hoc.
+  // MixMusic needs no entitlements: it isn't sandboxed, uses no microphone
+  // or camera, sends no Apple events and loads only the system's
+  // frameworks; its plugins run in sobek, which makes no machine code, and
+  // its web pages in WebKit's own processes. Without the secrets, as on a
+  // contributor's Mac, the app is signed ad hoc.
   macos: {
     signingIdentity: process.env.MACOS_SIGNING_IDENTITY || undefined,
     notarize: process.env.NOTARY_KEYCHAIN
@@ -48,6 +48,10 @@ export default defineConfig({
     // and plays on them, with this reason.
     infoPlist: {
       NSLocalNetworkUsageDescription: "MixMusic finds the cast devices on your network, such as Chromecasts and Nest speakers, to play on them.",
+      // And before the visualizer first hears Spotify in MixMusic, which
+      // WebKit's own process plays: through a tap of that process, which
+      // macOS counts as recording what other apps play.
+      NSAudioCaptureUsageDescription: "MixMusic hears the Spotify tracks it plays, for its visualizer and the plugins' analyser. It never records or sends them.",
       NSBonjourServices: ["_googlecast._tcp"],
     },
   },

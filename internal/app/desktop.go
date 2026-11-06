@@ -40,6 +40,13 @@ func (a *App) Start() {
 	// process before it returns.
 	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { a.flush() })
 	mygo.App.OnQuit(a.flush)
+	// The listener stops hearing Spotify as MixMusic quits: on macOS, its
+	// tap and the device that reads it go.
+	mygo.App.OnWillQuit(func(*mygo.QuitEvent) {
+		if l := a.listen.Load(); l != nil {
+			l.close()
+		}
+	})
 	if runtime.GOOS != "darwin" && !mygo.App.IsPackaged() {
 		if err := mygo.App.RegisterURLScheme(URLScheme); err != nil {
 			log.Printf("mixmusic: registering %s links: %v", URLScheme, err)

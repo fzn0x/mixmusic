@@ -29,3 +29,15 @@ site's screenshots are made this way, from a throwaway profile, at
 1536x900 (`MIXMUSIC_CAPTURE_SIZE=1552x909`: the size includes the
 window's invisible borders). `go test . -run Render` with
 `MIXMUSIC_RENDER=<dir>` draws the pages and themes without a window.
+
+On Linux, [linux-app.py](../../.github/scripts/linux-app.py) starts a build
+in capture mode, then again as a desktop does, and checks it from outside:
+its window, its tray icon, the media keys, MPRIS, the zoom keys, and
+settings.json and colour files edited while it runs. The Linux app
+workflow runs it on the Nix build and on the release's archive, and keeps
+the frames, the logs and the D-Bus answers. On a Linux machine with Xvfb,
+xdotool, ffmpeg, PulseAudio and PyGObject:
+
+```sh
+xvfb-run -a -s "-screen 0 1600x1000x24" dbus-run-session -- python3 .github/scripts/linux-app.py ./mixmusic out
+```

@@ -96,8 +96,9 @@ func defaultPlayback() Playback {
 }
 
 // defaultSpotifyPlayback is how Spotify tracks play in a new install on
-// goos: in MixMusic where its webview, WebView2, decrypts Spotify's audio,
-// else on Spotify Connect.
+// goos: in MixMusic on Windows, whose webview, WebView2, decrypts Spotify's
+// audio, else on Spotify Connect. macOS's decrypts it too, and plays it in
+// MixMusic once the user chooses it there (#295).
 func defaultSpotifyPlayback(goos string) SpotifyPlayback {
 	if goos == "windows" {
 		return SpotifyPlaybackHere

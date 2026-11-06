@@ -2,20 +2,20 @@ package main
 
 import (
 	"context"
-	"runtime"
 	"slices"
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // The groups of Settings › Playback: the Spotify tracks and the sound
 // here, the others in their features' files.
 
-// spotifyPlaysHere tells whether MixMusic plays Spotify itself: where its
-// webview, WebView2, decrypts Spotify's audio.
-var spotifyPlaysHere = runtime.GOOS == "windows"
+// spotifyPlaysHere tells whether MixMusic plays Spotify itself: on Windows
+// and macOS, whose webviews decrypt Spotify's audio.
+var spotifyPlaysHere = app.SpotifyPlaysHere()
 
 func init() { addSettings("playback", 10, (*shell).spotifyTrackSettings) }
 
@@ -27,7 +27,7 @@ func (s *shell) spotifyTrackSettings(c *ui.Context) {
 	s.group(c, "Spotify tracks", func() {
 		here := "MixMusic plays them itself, at Spotify's own quality, and shows among your Spotify devices. Needs Spotify Premium, and no Spotify app."
 		if !spotifyPlaysHere {
-			here = "This computer's webview can't play Spotify's protected audio, so MixMusic can't play Spotify itself."
+			here = "This computer's webview, WebKitGTK, can't play Spotify's protected audio, so MixMusic can't play Spotify itself."
 		}
 		modes := []settings.SpotifyPlayback{settings.SpotifyPlaybackHere, settings.SpotifyPlaybackConnect, settings.SpotifyPlaybackMatch}
 		mode := slices.Index(modes, s.set.SpotifyPlayback)

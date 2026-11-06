@@ -183,8 +183,7 @@ func flacFile(blocks ...[]byte) []byte {
 }
 
 // TestFLAC reads a FLAC file's Vorbis comments, of keys in any case and
-// given twice, and its PICTURE block; its album artists, its artists,
-// are not told apart.
+// given twice, and its PICTURE block.
 func TestFLAC(t *testing.T) {
 	b := flacFile(
 		[]byte{4}, vcomments("title=Glass Rivers", "ARTIST=Ada Field", "Artist=Orin Vale", "ALBUM=Field Notes",
@@ -193,8 +192,8 @@ func TestFLAC(t *testing.T) {
 		[]byte{6}, flacPictureBlock(3, "image/png", png),
 	)
 	check(t, read(t, b), Tags{
-		Title: "Glass Rivers", Artists: []string{"Ada Field", "Orin Vale"}, Album: "Field Notes", Track: 5, Disc: 1, Year: 2017,
-		Picture: &Picture{MIME: "image/png", Data: png, front: true},
+		Title: "Glass Rivers", Artists: []string{"Ada Field", "Orin Vale"}, Album: "Field Notes", AlbumArtists: []string{"Ada Field", "Orin Vale"},
+		Track: 5, Disc: 1, Year: 2017, Picture: &Picture{MIME: "image/png", Data: png, front: true},
 	})
 	// An ID3v2 tag before it, as some programs write.
 	v2 := id3(3, 0, frame3("TALB", 0, append([]byte{0}, "From the ID3 tag"...)))

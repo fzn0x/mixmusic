@@ -40,8 +40,8 @@ type Tags struct {
 	Title   string
 	Artists []string
 	Album   string
-	// AlbumArtists are the artists of the album, when they differ from
-	// the track's, as a compilation's.
+	// AlbumArtists are the artists of the album, as a compilation's
+	// differ from its tracks'.
 	AlbumArtists []string
 	// Track and Disc are the track's numbers on its album, from 1.
 	Track, Disc int
@@ -106,7 +106,6 @@ func Read(r io.ReadSeeker) (Tags, error) {
 	if err != nil {
 		return Tags{}, err
 	}
-	t.clean()
 	return t, nil
 }
 
@@ -207,21 +206,6 @@ func (t *Tags) setPicture(p *Picture) {
 	}
 	if t.Picture == nil || p.front && !t.Picture.front {
 		t.Picture = p
-	}
-}
-
-// clean drops the album artists that are the track's artists.
-func (t *Tags) clean() {
-	if len(t.AlbumArtists) == len(t.Artists) {
-		same := true
-		for i := range t.Artists {
-			if !strings.EqualFold(t.Artists[i], t.AlbumArtists[i]) {
-				same = false
-			}
-		}
-		if same {
-			t.AlbumArtists = nil
-		}
 	}
 }
 

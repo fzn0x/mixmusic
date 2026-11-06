@@ -178,3 +178,22 @@ func TestLocalCatalog(t *testing.T) {
 	}
 	_ = music
 }
+
+// TestLocalNotices shows the licenses of the decoders of the music on this
+// computer that MixMusic didn't write: go-mp3's and jfreymuth/vorbis's.
+func TestLocalNotices(t *testing.T) {
+	for _, want := range []struct{ name, text string }{
+		{"go-mp3", "Apache License"},
+		{"jfreymuth/vorbis", "Copyright (c) 2016 Johann Freymuth"},
+	} {
+		found := false
+		for _, n := range (&System{}).Notices() {
+			if strings.HasPrefix(n.Name, want.name) {
+				found = strings.Contains(n.Text, want.text)
+			}
+		}
+		if !found {
+			t.Errorf("no notice of %s with its license", want.name)
+		}
+	}
+}

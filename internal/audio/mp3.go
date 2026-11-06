@@ -1,6 +1,7 @@
 package audio
 
 import (
+	_ "embed"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -9,6 +10,13 @@ import (
 
 	"github.com/hajimehoshi/go-mp3"
 )
+
+// MP3License is the license of go-mp3, the MP3 decoder of Hajime Hoshi
+// and its authors, which MixMusic is built with, and whose binary copies
+// must give it.
+//
+//go:embed LICENSE.go-mp3
+var MP3License string
 
 // errMP3 is wrapped by the errors of an MP3 file MixMusic can't read.
 var errMP3 = errors.New("mp3: invalid data")

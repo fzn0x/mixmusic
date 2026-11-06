@@ -103,6 +103,8 @@ func (s *System) Notices() []Notice {
 	return []Notice{
 		{Name: "libopus, which decodes Opus audio", Text: opus.License},
 		{Name: "SharpJaad, which decodes AAC audio", Text: aac.License},
+		{Name: "go-mp3, which decodes the MP3 files on this computer", Text: audio.MP3License},
+		{Name: "jfreymuth/vorbis, which decodes the Vorbis files on this computer", Text: audio.VorbisLicense},
 		{Name: "Chromium's Web Audio, which shapes the sound", Text: audio.License},
 		{Name: "Material Color Utilities, which make the Material themes' colours", Text: hct.License},
 		{Name: "Unihan, whose readings of Chinese characters write Chinese lyrics in pinyin", Text: romanize.UnihanLicense},

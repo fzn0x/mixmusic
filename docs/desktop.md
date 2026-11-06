@@ -155,7 +155,8 @@ the keys; <kbd>Escape</kbd> cancels and <kbd>Backspace</kbd> removes it.
   settings can change them. On macOS, a letter is the key in its place on
   a US keyboard.
 - Liking or disliking from another window shows a notification, while
-  notifications are on.
+  notifications are on and neither MixMusic's window nor the mini player
+  is in front.
 
 The media keys work as they do without any global shortcut.
 
@@ -164,7 +165,9 @@ The media keys work as they do without any global shortcut.
 With **Notifications** on, in Settings › Desktop and on by default,
 MixMusic shows a notification when a track starts while its window isn't
 in front: the title, the artists and the album. A click on it shows
-MixMusic. The tray icon's tip names what plays too.
+MixMusic. None shows while the mini player is in front, or on a MacBook
+while the player around the notch is open: they show the track already.
+The tray icon's tip names what plays too.
 
 ## Discord
 

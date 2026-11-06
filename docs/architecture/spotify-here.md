@@ -11,7 +11,7 @@ itself on Windows and macOS.
 | System | Its web view | Spotify in MixMusic |
 |---|---|---|
 | Windows | WebView2: Chromium, with Widevine | plays; the default |
-| macOS | WKWebView: WebKit, with FairPlay | plays; On Spotify Connect stays the default |
+| macOS | WKWebView: WebKit, with FairPlay | plays; the default |
 | Linux | WebKitGTK: WebKit, without EME | not in its web view; costly with an embedded Chromium |
 
 ## What the SDK asks for
@@ -93,8 +93,9 @@ What it took:
 - **The window.** On macOS the device's window keeps its page running
   while hidden (`herePage`: `ThrottlingOff`), for the SDK's own timers.
   Its autoplay needs nothing.
-- **The default.** On Spotify Connect stays the default on macOS
-  (`defaultSpotifyPlayback`).
+- **The default.** In MixMusic is the default of a new install on macOS,
+  as on Windows (`defaultSpotifyPlayback`). An install whose settings.json
+  already has `spotifyPlayback` keeps it.
 
 **The visualizer** is a follow-up:
 

@@ -68,7 +68,7 @@ token moves into it and the file goes.
 
 Settings › Playback chooses:
 
-- **Here, from Spotify** (the default on Windows). MixMusic plays the track
+- **In MixMusic, from Spotify** (the default on Windows and macOS). MixMusic plays the track
   itself, with Spotify's Web Playback SDK, at Spotify's own quality, and no
   Spotify app needs to be open: MixMusic shows among your Spotify devices
   while it plays. It needs Spotify Premium, and Windows or macOS, whose
@@ -85,7 +85,7 @@ Settings › Playback chooses:
   Sign-ins made before MixMusic played Spotify itself do not allow it:
   Settings › Playback asks you to sign in again. When Spotify cannot play
   here, MixMusic plays the track from YouTube Music instead, and says why.
-- **On Spotify Connect** (the default elsewhere). A Spotify device plays the track: your
+- **On Spotify Connect** (the default on Linux). A Spotify device plays the track: your
   Spotify app on this computer, your phone, a speaker. It needs Spotify
   Premium, and a device with Spotify open. The devices button of the player
   bar chooses which device plays; by default, the active one. When no device

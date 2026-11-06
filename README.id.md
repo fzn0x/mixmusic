@@ -92,7 +92,7 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
 ### Tiga cara memutar Spotify
 
 - **Langsung di MixMusic,** dengan kualitas Spotify, tanpa membuka aplikasi
-  Spotify (Premium, di Windows).
+  Spotify (Premium, di Windows dan macOS).
 - **Lewat Spotify Connect:** di aplikasi Spotify, ponsel, atau speaker Anda.
 - **Dari YouTube Music:** MixMusic memutar rekaman lagu Spotify tersebut yang
   ada di YouTube Music, yang bisa diputar tanpa Premium.

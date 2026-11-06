@@ -318,6 +318,19 @@ changed, so that a translator can follow. Corrections and new languages are
 welcome, as `README.<language code>.md` with a link in each README's
 language line.
 
+## Flathub
+
+[packaging/flathub](packaging/flathub) builds MixMusic from source as
+Flathub builds apps, without the network, and the
+[flathub workflow](.github/workflows/flathub.yml) builds it the way
+Flathub's builder does, with Flathub's linter, when what it's built from
+changes, and weekly. After a change of `go.mod` or `go.sum`, run
+`go run ./tools/flathub`, which writes `packaging/flathub/go-modules.json`
+again; the workflow fails until it's current. Its
+[README](packaging/flathub/README.md) tells what the build needs, why it
+asks for each permission, and how MixMusic is submitted to Flathub and
+kept up to date there.
+
 ## Reports
 
 Open an [issue](https://github.com/fzn0x/mixmusic/issues) with what you did,

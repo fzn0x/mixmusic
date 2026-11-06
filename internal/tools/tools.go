@@ -59,6 +59,11 @@ type Manager struct {
 	Dir string
 	// HTTP downloads them.
 	HTTP *http.Client
+	// Bundled is the yt-dlp that comes with MixMusic, as Flathub's build
+	// has it, which MixMusic's package keeps up to date: while it's
+	// there, MixMusic runs it unless the user chose another, and downloads
+	// none.
+	Bundled string
 
 	mu        sync.Mutex
 	ytdlpPath string    // a path the user chose, overriding the search
@@ -110,6 +115,15 @@ func (m *Manager) managedPath() string {
 	return filepath.Join(m.Dir, exe("yt-dlp"))
 }
 
+// bundled returns the path of the yt-dlp that comes with MixMusic while
+// it's there, else "".
+func (m *Manager) bundled() string {
+	if m.Bundled != "" && isFile(m.Bundled) {
+		return m.Bundled
+	}
+	return ""
+}
+
 // toolDirs are the folders where installers put programs that an app
 // opened from the desktop does not find on its PATH: opened from the
 // Finder, the Dock or a desktop menu, it gets a short PATH, without
@@ -156,7 +170,8 @@ func lookPath(name string) (string, error) {
 }
 
 // YTDLP returns the path of yt-dlp: the one the user chose, else the one
-// MixMusic installed, else one installed on the system.
+// that comes with MixMusic, else the one MixMusic installed, else one
+// installed on the system.
 func (m *Manager) YTDLP() (string, error) {
 	m.mu.Lock()
 	chosen := m.ytdlpPath
@@ -166,6 +181,9 @@ func (m *Manager) YTDLP() (string, error) {
 			return chosen, nil
 		}
 		return "", missingError{chosen}
+	}
+	if p := m.bundled(); p != "" {
+		return p, nil
 	}
 	if p := m.managedPath(); isFile(p) {
 		return p, nil
@@ -226,6 +244,9 @@ type Tool struct {
 	Version string `json:"version,omitempty"`
 	// Managed is set for tools MixMusic installed, which it can update.
 	Managed bool `json:"managed,omitempty"`
+	// Bundled is set for the yt-dlp that comes with MixMusic, which
+	// MixMusic's package updates.
+	Bundled bool `json:"bundled,omitempty"`
 	// Latest is the version of the latest yt-dlp release, set when the
 	// yt-dlp found is older.
 	Latest string `json:"latest,omitempty"`
@@ -287,9 +308,14 @@ func (m *Manager) version(ctx context.Context, path, flag string) string {
 	return v
 }
 
-// ytdlpTool describes the yt-dlp at path, whose version is v.
+// ytdlpTool describes the yt-dlp at path, whose version is v. That of
+// MixMusic's package is as new as the package: GitHub isn't asked.
 func (m *Manager) ytdlpTool(ctx context.Context, path, v string) Tool {
 	t := Tool{Found: true, Name: "yt-dlp", Path: path, Version: v, Managed: path == m.managedPath()}
+	if path == m.Bundled {
+		t.Bundled = true
+		return t
+	}
 	if latest := m.knownLatest(ctx); older(v, latest) {
 		t.Latest = latest
 		if !t.Managed {
@@ -426,8 +452,13 @@ type Progress func(done, total int64)
 
 // InstallYTDLP downloads the latest yt-dlp for this platform into Dir,
 // checking it against the checksums the release publishes. It replaces a
-// yt-dlp installed before, so it also updates it.
+// yt-dlp installed before, so it also updates it. With the yt-dlp that
+// comes with MixMusic there, it downloads none: that one runs once the
+// user's choice of another is cleared.
 func (m *Manager) InstallYTDLP(ctx context.Context, progress Progress) error {
+	if m.bundled() != "" {
+		return nil
+	}
 	name, err := asset(goos, goarch)
 	if err != nil {
 		return err
@@ -495,12 +526,13 @@ func (m *Manager) LatestYTDLP(ctx context.Context) (string, error) {
 // UpdateYTDLP replaces the yt-dlp MixMusic installed with the latest
 // release when that is newer, or when it is macOS's single file of before,
 // and reports whether it did. It leaves alone a yt-dlp the user installed
-// or chose, which they keep up to date.
+// or chose, which they keep up to date, and one installed before the
+// yt-dlp that comes with MixMusic, which runs in its place.
 func (m *Manager) UpdateYTDLP(ctx context.Context) (bool, error) {
 	m.mu.Lock()
 	chosen := m.ytdlpPath
 	m.mu.Unlock()
-	if chosen != "" || !isFile(m.managedPath()) {
+	if chosen != "" || m.bundled() != "" || !isFile(m.managedPath()) {
 		return false, nil
 	}
 	if m.singleOnMac() {

@@ -1,0 +1,107 @@
+# MixMusic built from source as Flathub builds apps: in the GNOME SDK, with
+# the Go and Node.js extensions, without the network, from this
+# repository and the Go modules go.sum names (go-modules.json, which
+# go run ./tools/flathub writes). The flathub workflow builds it the way
+# Flathub's builder does, on x86_64 and aarch64, and runs Flathub's linter
+# on it (README.md).
+#
+# Flathub takes no manifest that is AI-generated or AI-assisted, which
+# this one is: it is MixMusic's own build and check of what Flathub needs,
+# not the manifest to submit (README.md, "Submitting").
+#
+# Its MixMusic is this checkout. go run ./tools/flathub -o <dir> writes the
+# folder of Flathub's repository, with the release's tag (-tag) or a commit
+# (-commit) in its place.
+id: io.github.fzn0x.mixmusic
+runtime: org.gnome.Platform
+# GNOME 51 has GTK 3, libsecret, the PulseAudio client library and
+# WebKitGTK 4.1, which the YouTube Music sign-in shows. Its SDK is that of
+# freedesktop 26.08, whose Go extension has the Go of go.mod.
+runtime-version: '51'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.golang
+  - org.freedesktop.Sdk.Extension.node24
+command: mixmusic
+finish-args:
+  - --share=ipc
+  # YouTube Music, Spotify, lyrics, covers and casting.
+  - --share=network
+  - --socket=wayland
+  - --socket=fallback-x11
+  # The sound server, PulseAudio or PipeWire's.
+  - --socket=pulseaudio
+  # MyGo, the UI toolkit, draws on the GPU.
+  - --device=dri
+  # The notifications of what plays and of tracks liked from the tray or
+  # the media keys, which MyGo, the UI toolkit, sends to the notification
+  # server.
+  - --talk-name=org.freedesktop.Notifications
+  # The tray icon, which close to the tray keeps MixMusic in.
+  - --talk-name=org.kde.StatusNotifierWatcher
+  # The keyring, which keeps the YouTube Music, Spotify and Last.fm
+  # sign-ins, where the desktop has no Secret portal; libsecret takes the
+  # portal when there is one.
+  - --talk-name=org.freedesktop.secrets
+  # Discord's socket, which shows what plays on the user's profile when
+  # they turn it on: the app's, while it ran when MixMusic started, and
+  # the folders where Discord, its Canary build and Vesktop put it when
+  # they are Flatpaks themselves. The MPRIS player needs no permission:
+  # org.mpris.MediaPlayer2.io.github.fzn0x.mixmusic is the app's own.
+  - --filesystem=xdg-run/discord-ipc-0
+  - --filesystem=xdg-run/app/com.discordapp.Discord:create
+  - --filesystem=xdg-run/app/com.discordapp.DiscordCanary:create
+  - --filesystem=xdg-run/app/dev.vencord.Vesktop:create
+modules:
+  # The tray icon's library, of Flathub's shared modules.
+  - shared-modules/libayatana-appindicator/libayatana-appindicator-gtk3.json
+
+  # Node.js, which yt-dlp solves YouTube's challenges with, as the
+  # extension installs it, on the runtime's OpenSSL, zlib and ICU.
+  - name: node
+    buildsystem: simple
+    build-commands:
+      - /usr/lib/sdk/node24/install.sh
+      - install -d ${FLATPAK_DEST}/bin
+      - ln -s ../node/bin/node ${FLATPAK_DEST}/bin/node
+
+  # yt-dlp, which finds the audio of the tracks YouTube won't give
+  # MixMusic itself, with its solver of YouTube's challenges: MixMusic
+  # runs this one, which Flathub's bot keeps up to date, and downloads
+  # none (internal/app/flathub.go).
+  - name: yt-dlp
+    buildsystem: simple
+    build-commands:
+      - pip3 install --no-index --no-deps --prefix=${FLATPAK_DEST} yt_dlp-*.whl yt_dlp_ejs-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/7f/3d/16ea7d5638cf585991f2c5705e8083688dde633d32d0871f2404e0f4d827/yt_dlp-2026.10.26-py3-none-any.whl
+        sha256: a05c5b5d8562f7e8a62f5334348b406af4930d56d3a65f8021d14af0e22339ae
+        x-checker-data:
+          type: pypi
+          name: yt-dlp
+          packagetype: bdist_wheel
+      - type: file
+        url: https://files.pythonhosted.org/packages/e3/bd/520769863744b669440a924271a6159ddd82ad5ae26b4ac4d4b69e9f8d44/yt_dlp_ejs-0.8.0-py3-none-any.whl
+        sha256: 79300e5fca7f937a1eeede11f0456862c1b41107ce1d726871e0207424f4bdb4
+        x-checker-data:
+          type: pypi
+          name: yt-dlp-ejs
+          packagetype: bdist_wheel
+
+  - name: mixmusic
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/golang/bin
+    build-commands:
+      - sh packaging/flathub/build.sh
+    sources:
+      - type: dir
+        path: ../..
+        skip:
+          - .git
+          - .flatpak-builder
+          - build
+          - node_modules
+          - packaging/flatpak/dist
+      - go-modules.json

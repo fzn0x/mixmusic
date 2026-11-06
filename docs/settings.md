@@ -42,6 +42,7 @@ How MixMusic plays; [Playing music](playing-music.md) tells all of it.
 | [Lyrics](lyrics.md#translate) | **Translate lyrics to**: the language the translate switch beside the lyrics shows them in. |
 | [Offline cache](library.md#the-offline-cache) | **Tracks kept** and **Covers kept**, each with **clear**, and the cache's **Size**: off, 512 MB, 1 GB, 4 GB or 16 GB. |
 | [Downloads](library.md#where-they-are) | How many tracks are downloaded and how much room they take, with **show**; their **Folder**, with **open** and **change**; **Download on metered connections** and **Download songs added later**. |
+| [Music on this computer](local-music.md#add-a-folder) | **Folders**, with **add a folder** and **rescan**, then each folder of music, with how many tracks it holds and how many files were skipped, and **remove**. |
 | [Tools](how-it-works.md#yt-dlp-and-the-javascript-runtime) | **yt-dlp**, which MixMusic installs and keeps up to date, the **JavaScript runtime** it runs with (found by itself, or Deno, Node.js, Bun or QuickJS), and **Own yt-dlp**, the path to one of yours. |
 
 ### Accounts
@@ -249,6 +250,7 @@ while you're not typing in a text field. The ID is the command's name in
 | Slow down | none | none | `player.slower` |
 | Normal speed | none | none | `player.normalSpeed` |
 | Start a radio of what plays | none | none | `player.radio` |
+| [Open music files…](local-music.md#open-files-without-a-folder) | <kbd>Ctrl</kbd> <kbd>O</kbd> | <kbd>⌘</kbd> <kbd>O</kbd> | `player.openFiles` |
 
 ### Go to
 
@@ -262,6 +264,7 @@ while you're not typing in a text field. The ID is the command's name in
 | Search | <kbd>Ctrl</kbd> <kbd>F</kbd> | <kbd>⌘</kbd> <kbd>F</kbd> | `go.search` |
 | Settings | <kbd>Ctrl</kbd> <kbd>,</kbd> | <kbd>⌘</kbd> <kbd>,</kbd> | `go.settings` |
 | Downloads | none | none | `go.downloads` |
+| On this computer | none | none | `go.computer` |
 | Stats | none | none | `go.stats` |
 | Marketplace | none | none | `go.marketplace` |
 | Search the settings | none | none | `go.settingsSearch` |

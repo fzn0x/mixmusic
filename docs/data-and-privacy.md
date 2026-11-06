@@ -55,6 +55,10 @@ AppImage or archive copy's.
   1,000 tracks you played, which the history and the stats read, your
   last 20 searches, the shows you follow, and the artists you follow
   in MixMusic.
+- `local-files.json`: the index of the [music on this computer](local-music.md):
+  the path, size, time of change and tags of each music file of the
+  folders you added. The folders themselves are `musicFolders` in
+  `settings.json`.
 - `queue.json`: up to 500 tracks of the queue, around the one playing,
   and where it was.
 - `positions.json`: where you left the latest 500 podcast episodes.
@@ -72,6 +76,8 @@ AppImage or archive copy's.
 - `audio/`: the offline cache, the tracks you played, as much as
   Settings › Playback › Offline cache allows (1 GB by default).
 - `artwork/`: the covers you saw, up to 256 MB.
+- `local-art/`: a copy of the covers of the music on this computer, which
+  a file holds or that is beside it, by its hash.
 - `now-playing/`, on Linux: the cover of what plays, for the desktop's
   media controls.
 - `matches.json`: the YouTube Music recordings found for Spotify tracks.
@@ -130,6 +136,7 @@ Where the credential store can't keep a secret:
 | Spotify in MixMusic | Spotify's player, loaded from `sdk.scdn.co` | what Spotify's own player sends |
 | Lyrics | Unison (`unison.boidu.dev`) | the video ID of the track that plays, or, without one, its title, artists, album and length |
 | Lyrics, when Unison has none | LRCLIB (`lrclib.net`) | the title, artists, album and length of the track that plays |
+| Lyrics of a track on this computer | Unison, then LRCLIB | its title, artists, album and length, as its tags tell; never its file |
 | Translate, or romanized Arabic, while it's on beside the lyrics | Unison, which has Google translate them | the lyrics of the track that plays, with its video ID |
 | Romaji, the first time you turn it on | GitHub | a download of the dictionary of kanji readings; the lyrics stay on your computer |
 | Last.fm, once you connect it | Last.fm | the title, artists, album and length of what you play, and when |
@@ -150,6 +157,9 @@ Where the credential store can't keep a secret:
 ## What stays on your computer
 
 - Your settings, your library, your history and your searches.
+- The [music on this computer](local-music.md#privacy): MixMusic plays it
+  from its files, and sends no file anywhere. Last.fm and Discord hear of
+  what plays as of any track, as their settings say.
 - Latin letters for lyrics, Japanese romaji included: MixMusic makes them
   itself, and sends no lyrics for them. Only Arabic's come from Unison,
   while romanize is on.

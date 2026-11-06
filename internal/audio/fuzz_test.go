@@ -10,12 +10,12 @@ import (
 	"time"
 )
 
-// FuzzTrack opens any bytes as a deck does, as a WebM or an MP4 file, or
-// HLS packed audio, and seeks, reads and decodes their track: it never panics, fails only with
+// FuzzTrack opens any bytes as a deck does, as a WebM or an MP4 file, HLS
+// packed audio, or a file kept on a computer, and seeks, reads and decodes their track: it never panics, fails only with
 // the deck's words, and makes finite frames, as many as it says, of which
 // those to play are within them.
 func FuzzTrack(f *testing.F) {
-	for _, path := range append([]string{cuesFront, monoStream}, aacFiles...) {
+	for _, path := range append(append([]string{cuesFront, monoStream}, aacFiles...), localFiles...) {
 		b, err := os.ReadFile(path)
 		if err != nil {
 			f.Fatal(err)

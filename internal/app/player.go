@@ -366,6 +366,10 @@ func cut(s string, n int) string {
 	return s
 }
 
+// showNote shows a notification; tests, which run no MyGo loop for it to
+// wait for, replace it.
+var showNote = (*mygo.Notification).Show
+
 // notifyTrack shows a notification of the track that started.
 func (a *App) notifyTrack(t media.Track) {
 	body := t.ArtistNames()
@@ -374,7 +378,7 @@ func (a *App) notifyTrack(t media.Track) {
 	}
 	n := mygo.NewNotification(mygo.NotificationOptions{ID: "now-playing", Title: t.Title, Body: body, Silent: true})
 	n.OnClick(a.showMain)
-	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
+	if err := showNote(n); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
 		log.Printf("mixmusic: notification: %v", err)
 	}
 }
@@ -405,7 +409,7 @@ func (a *App) notifyRated(id, title, body string) {
 	}
 	n := mygo.NewNotification(mygo.NotificationOptions{ID: id, Title: title, Body: body, Silent: true})
 	n.OnClick(a.showMain)
-	if err := n.Show(); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
+	if err := showNote(n); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
 		log.Printf("mixmusic: notification: %v", err)
 	}
 }

@@ -93,10 +93,10 @@ Settings › Playback chooses:
   On Windows, the visualizer and the plugins' analyser hear the Spotify app
   on this computer, as it plays, never recording it; other devices they
   can't hear, and the visualizer shows nothing then.
-- **Here, from YouTube Music.** MixMusic finds the track's recording on YouTube
-  Music and plays it in its own player, with the equalizer, crossfade and the
-  visualizer. It works without Premium. When a match is wrong, choose **Find
-  another YouTube Music match** in the track's menu.
+- **In MixMusic, from YouTube Music.** MixMusic finds the track's recording
+  on YouTube Music and plays it in its own player, with the equalizer,
+  crossfade and the visualizer. It works without Premium. When a match is
+  wrong, choose **Find another YouTube Music match** in the track's menu.
 
 ## What Spotify allows apps
 

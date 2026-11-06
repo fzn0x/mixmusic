@@ -71,9 +71,12 @@ quality, with no Spotify app open. It needs Spotify Premium, and Windows.
 
 - **How.** Spotify's Web Playback SDK, which MixMusic loads from
   `sdk.scdn.co`, plays Spotify's protected audio in a hidden window of a
-  page of MixMusic's own. Only WebView2, the web view of Windows, decrypts
-  that audio: WebKitGTK on Linux doesn't, and macOS's web view isn't known
-  to, so this way is greyed out there.
+  page of MixMusic's own. Only WebView2, the web view of Windows, plays
+  it in MixMusic yet, so this way is greyed out elsewhere. WebKitGTK on
+  Linux can't decrypt it. macOS's web view starts Spotify's player with
+  FairPlay, but no one has heard it play there:
+  [Spotify in MixMusic on each system](architecture/spotify-here.md)
+  tells what was tried.
 - **A device of its own.** The page makes MixMusic a Spotify Connect
   device, named MixMusic, which shows among your Spotify devices while it
   plays. MixMusic plays tracks on it through the Web API, as on any

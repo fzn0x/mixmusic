@@ -72,8 +72,10 @@ Settings › Playback chooses:
   itself, with Spotify's Web Playback SDK, at Spotify's own quality, and no
   Spotify app needs to be open: MixMusic shows among your Spotify devices
   while it plays. It needs Spotify Premium, and Windows, whose webview,
-  WebView2, plays Spotify's protected audio: WebKitGTK on Linux does not,
-  and macOS's is not known to, as Settings › Playback says there. The
+  WebView2, plays Spotify's protected audio. WebKitGTK on Linux can't, and
+  macOS's hasn't been heard playing it yet
+  ([what each system can do](architecture/spotify-here.md)), so Settings ›
+  Playback greys this way out there. The
   equalizer and crossfade leave Spotify's audio as it is, as on Spotify
   Connect: use a system-wide equalizer for it, since Spotify
   [notes](https://support.spotify.com/us/article/equalizer/) that its audio

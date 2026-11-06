@@ -47,6 +47,10 @@ opens it with a `shell` of its own, and keeps its state in a `notch`.
   outside, which goes on to what it was on, and count the presses the
   window gets: `keyHandBack` waits for the last one's release, as giving
   the keyboard back between a press and its release cancels MyGo's click.
+- **Notifications**: while the open panel has the keyboard, the track
+  that starts shows no notification, as while the main window or the mini
+  player is in front (`internal/app/infront.go`). A like or a dislike
+  still shows one, as the panel shows neither.
 - **Lyrics** come from `Catalog.Lyrics`, which keeps them, through
   `fetch`: the line sung now, with those before and after it. An episode
   shows the chapter that plays in their place, from its details

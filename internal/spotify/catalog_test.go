@@ -6,21 +6,25 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 )
 
 // fakeAPI serves canned responses by path and query, and records the
-// requests it gets.
+// requests it gets, which may come at once.
 type fakeAPI struct {
 	responses map[string]string
+	mu        sync.Mutex
 	requests  []string
 }
 
 func (f *fakeAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	key := r.Method + " " + r.URL.Path
+	f.mu.Lock()
 	f.requests = append(f.requests, key+"?"+r.URL.RawQuery)
+	f.mu.Unlock()
 	body, ok := f.responses[key+"?"+r.URL.RawQuery]
 	if !ok {
 		body, ok = f.responses[key]

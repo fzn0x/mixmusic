@@ -16,6 +16,11 @@ const (
 	searchLimit = 10
 	// pageLimit is the most items of a page of most lists.
 	pageLimit = 50
+	// albumPageLimit is the most items of a page of an artist's albums: 10
+	// in Spotify's reference since 2026, against 50 for most lists.
+	albumPageLimit = 10
+	// albumPages is how many pages of an artist's albums Artist reads.
+	albumPages = 5
 )
 
 // ErrPlaylistUnavailable is returned for playlists whose tracks Spotify
@@ -125,19 +130,29 @@ func (c *Client) Artist(ctx context.Context, id string) (media.Artist, error) {
 	out := toArtist(&a)
 	var wg sync.WaitGroup
 	wg.Go(func() {
-		var albums paging[*album]
-		q := url.Values{"include_groups": {"album,single"}, "limit": {strconv.Itoa(pageLimit)}}
-		if c.get(ctx, "/artists/"+url.PathEscape(id)+"/albums", q, &albums) != nil {
+		// The first page says how many there are; the others are read at
+		// once, and kept in their order.
+		pages := make([][]*album, albumPages)
+		first, total, err := c.artistAlbums(ctx, id, 0)
+		if err != nil {
 			return
 		}
-		for _, al := range albums.Items {
-			if al == nil {
-				continue
-			}
-			if converted := toAlbum(al); converted.Kind == media.AlbumKindAlbum {
-				out.Albums = append(out.Albums, converted)
-			} else {
-				out.Singles = append(out.Singles, converted)
+		pages[0] = first
+		var more sync.WaitGroup
+		for i := 1; i < albumPages && i*albumPageLimit < total; i++ {
+			more.Go(func() { pages[i], _, _ = c.artistAlbums(ctx, id, i*albumPageLimit) })
+		}
+		more.Wait()
+		for _, page := range pages {
+			for _, al := range page {
+				if al == nil {
+					continue
+				}
+				if converted := toAlbum(al); converted.Kind == media.AlbumKindAlbum {
+					out.Albums = append(out.Albums, converted)
+				} else {
+					out.Singles = append(out.Singles, converted)
+				}
 			}
 		}
 	})
@@ -160,6 +175,17 @@ func (c *Client) Artist(ctx context.Context, id string) (media.Artist, error) {
 	})
 	wg.Wait()
 	return out, nil
+}
+
+// artistAlbums returns the page of an artist's albums and singles from
+// offset, and how many they have.
+func (c *Client) artistAlbums(ctx context.Context, id string, offset int) ([]*album, int, error) {
+	var res paging[*album]
+	q := url.Values{"include_groups": {"album,single"}, "limit": {strconv.Itoa(albumPageLimit)}, "offset": {strconv.Itoa(offset)}}
+	if err := c.get(ctx, "/artists/"+url.PathEscape(id)+"/albums", q, &res); err != nil {
+		return nil, 0, err
+	}
+	return res.Items, res.Total, nil
 }
 
 // Playlist returns a playlist with its first page of tracks. Spotify only

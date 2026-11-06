@@ -103,7 +103,7 @@ func controlsInfo(np NowPlaying, at time.Time) *nowplaying.Info {
 	info := &nowplaying.Info{
 		ID:       t.ID,
 		Title:    t.Title,
-		Artwork:  largeArtwork(t.Artwork),
+		Artwork:  controlsArtwork(t.Artwork),
 		Duration: time.Duration(np.DurationMs) * time.Millisecond,
 		Position: time.Duration(np.PositionMs) * time.Millisecond,
 		At:       at,

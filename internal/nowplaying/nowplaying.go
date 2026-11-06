@@ -26,8 +26,9 @@ type Info struct {
 	Title   string
 	Artists []string
 	Album   string
-	// Artwork is the address of an https image of the track, or empty,
-	// which tells covers apart.
+	// Artwork is the address of an https image of the track, or of the
+	// cover of a track on this computer that MixMusic keeps, or empty,
+	// which tells covers apart: the systems take Cover, or CoverFile.
 	Artwork string
 	// Cover is the image at Artwork, as its host sent it, once MixMusic
 	// has it: macOS and Windows show it. Show keeps it, so it mustn't

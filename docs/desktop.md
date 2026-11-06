@@ -118,7 +118,9 @@ cover, the title and the artists, and takes their buttons:
 
 The covers there come from the
 [covers MixMusic keeps](library.md#the-offline-cache) on disk, so a cover
-you saw in the window shows there at once, and offline too.
+you saw in the window shows there at once, and offline too. A track [on
+this computer](local-music.md) shows the cover its file holds, or the one
+beside it, from MixMusic's copy in its cache.
 
 **Media keys**, in Settings › Desktop and on by default, has the keyboard's
 play or pause, next and previous keys control MixMusic, and its stop key

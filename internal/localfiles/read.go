@@ -169,6 +169,9 @@ func (x *Index) ArtFile(url string) (string, bool) {
 // the windows show from their files, and nothing fetches.
 const artScheme = "localart:"
 
+// IsArt reports whether url is the address of a cover the index keeps.
+func IsArt(url string) bool { return strings.HasPrefix(url, artScheme) }
+
 // ReadFile reads a file the user opened, which no folder of the index
 // holds, as a scan reads one: its entry, or why it can't play.
 func (x *Index) ReadFile(path string) (Entry, error) {

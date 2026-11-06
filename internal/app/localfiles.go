@@ -138,6 +138,31 @@ func (l *LocalFiles) Missing(id string) bool { return l.a.localFiles.Missing(id)
 // ArtworkFile returns the file of a cover the index keeps, by its address.
 func (l *LocalFiles) ArtworkFile(url string) (string, bool) { return l.a.localFiles.ArtFile(url) }
 
+// controlsArtwork is the cover the system's media controls show of a
+// track: its largest https image, else the cover the index keeps of a
+// track on this computer.
+func controlsArtwork(images []media.Image) string {
+	if u := largeArtwork(images); u != "" {
+		return u
+	}
+	for _, img := range images {
+		if localfiles.IsArt(img.URL) {
+			return img.URL
+		}
+	}
+	return ""
+}
+
+// coverBytes returns the cover at an address, for the system's media
+// controls: one the index keeps from its file, else the artwork store's,
+// which downloads it unless it has it.
+func (a *App) coverBytes(ctx context.Context, rawURL string) ([]byte, error) {
+	if path, ok := a.localFiles.ArtFile(rawURL); ok {
+		return os.ReadFile(path)
+	}
+	return a.artStore.Bytes(ctx, rawURL)
+}
+
 // ChooseFolder asks for a folder of music to add to the library.
 func (l *LocalFiles) ChooseFolder(parent *mygo.Window) (string, error) {
 	paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: "Add a folder of music",

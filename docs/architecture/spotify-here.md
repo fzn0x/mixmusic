@@ -135,8 +135,9 @@ on Windows ([the audio engine](audio.md)):
     the answer: 0 allowed, 1 refused, 2 not asked yet. The capture asks it
     each second until the user answered, and taps again once they allow
     it.
-  - Once refused, a capture fails at once, and the log says why, once a
-    run, as it does of a Windows without process loopback.
+  - Once refused, a capture fails at once, and one that ran when the user
+    refused stops within a second (`Capture.Err`). The log says why, once
+    a run, as it does of a Windows without process loopback.
 - **Before macOS 14.2** there is no `AudioHardwareCreateProcessTap`: the
   capture fails with `ErrNoLoopback`, and the visualizer stays flat for
   Spotify.

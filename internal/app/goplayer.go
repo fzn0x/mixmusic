@@ -301,6 +301,7 @@ type Services struct {
 	Addons      *Addons
 	System      *System
 	Downloads   *Downloads
+	LocalFiles  *LocalFiles
 }
 
 // Services returns the app's services.
@@ -314,6 +315,7 @@ func (a *App) Services() Services {
 		Addons:      &Addons{a},
 		System:      &System{a},
 		Downloads:   &Downloads{a},
+		LocalFiles:  &LocalFiles{a},
 	}
 }
 

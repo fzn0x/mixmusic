@@ -23,6 +23,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/cast"
 	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/library"
+	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/online"
@@ -110,6 +111,10 @@ type App struct {
 	online       *online.Watch
 	cache        *stream.Cache
 	downloads    *downloads.Manager
+	// localFiles is the index of the music on the computer, and
+	// localScans its scans.
+	localFiles   *localfiles.Index
+	localScans   localScans
 	loudness     *loudnessBook
 	matcher      *match.Matcher
 	labels       *labelCache
@@ -311,6 +316,9 @@ func New(opts Options) (*App, error) {
 	a.addons = addons.NewManager(filepath.Join(opts.DataDir, "addons"), opts.Builtin)
 	a.storage = addons.NewStorage(filepath.Join(opts.DataDir, "addons", ".storage"))
 	a.openDownloads(s.DownloadsFolder)
+	if err := a.openLocalFiles(); err != nil {
+		return nil, fmt.Errorf("opening the index of the music on this computer: %w", err)
+	}
 	a.apply(s)
 	return a, nil
 }
@@ -321,6 +329,7 @@ func (a *App) apply(s settings.Settings) {
 	a.resolver.SetQuality(stream.Quality(s.Quality))
 	a.cache.SetLimit(int64(s.CacheSizeMB) << 20)
 	a.downloads.SetMetered(a.metered.Load(), s.DownloadOnMetered)
+	a.followLocalFiles(s)
 	if a.auth.ClientID() != s.SpotifyClientID {
 		a.auth.SetClientID(s.SpotifyClientID)
 	}

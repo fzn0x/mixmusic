@@ -138,6 +138,11 @@ func (c *Catalog) Album(ctx context.Context, id string) (media.Album, error) {
 			a.Saved = c.a.spotifyHas(ctx, spotify.URI("album", native))
 		}
 		return a, err
+	case media.SourceFile:
+		if a, ok := c.a.localFiles.Album(id); ok {
+			return a, nil
+		}
+		return media.Album{}, errors.New("this album is no longer on this computer")
 	}
 	return media.Album{}, fmt.Errorf("no album %s", id)
 }
@@ -157,6 +162,11 @@ func (c *Catalog) Artist(ctx context.Context, id string) (media.Artist, error) {
 			a.Following = c.a.spotifyHas(ctx, spotify.URI("artist", native))
 		}
 		return a, err
+	case media.SourceFile:
+		if a, ok := c.a.localFiles.Artist(id); ok {
+			return a, nil
+		}
+		return media.Artist{}, errors.New("this artist's music is no longer on this computer")
 	}
 	return media.Artist{}, fmt.Errorf("no artist %s", id)
 }

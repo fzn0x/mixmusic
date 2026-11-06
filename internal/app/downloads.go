@@ -158,8 +158,12 @@ func (d *Downloads) Online() bool { return d.a.online == nil || !d.a.online.Offl
 func (a *App) offline() bool { return a.online != nil && a.online.Offline() }
 
 // playsOffline reports whether a track plays without the network: it is
-// downloaded, or its recording's audio is, or in the offline cache.
+// downloaded, or its recording's audio is, or in the offline cache, or it
+// is on this computer.
 func (a *App) playsOffline(t media.Track) bool {
+	if t.Source == media.SourceFile {
+		return true // from its file
+	}
 	if _, ok := a.downloads.Lookup(t.ID); ok {
 		return true
 	}

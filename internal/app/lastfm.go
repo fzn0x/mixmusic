@@ -13,6 +13,8 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/lastfm"
+	"github.com/fzn0x/mixmusic/internal/localfiles"
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/store"
 )
 
@@ -131,6 +133,12 @@ func (a *App) scrobble(np NowPlaying) {
 func lastfmTrack(np NowPlaying) (string, lastfm.Track) {
 	// Last.fm keeps music: a podcast's episode is none.
 	if np.Track == nil || np.Track.IsEpisode() {
+		return "", lastfm.Track{}
+	}
+	// A track on this computer whose file names no artist isn't one
+	// Last.fm can count.
+	if np.Track.Source == media.SourceFile && len(np.Track.Artists) == 1 && np.Track.Artists[0].ID == "" &&
+		np.Track.Artists[0].Name == localfiles.UnknownArtist {
 		return "", lastfm.Track{}
 	}
 	t := lastfm.Track{Title: np.Track.Title, Duration: time.Duration(np.DurationMs) * time.Millisecond}

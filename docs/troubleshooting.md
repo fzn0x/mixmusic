@@ -9,6 +9,8 @@ report a problem opens a new issue on GitHub with your version, system,
 tools, theme and plugins filled in; attach the log after reading it. After
 a crash, MixMusic offers to report it the next time it starts.
 
+![Settings › About: the version of MixMusic and whether it's the newest, with the Report a problem and Open logs folder buttons under it, and the Updates group below](shots/about.webp)
+
 ## Common problems
 
 - **A YouTube Music track doesn't play.** It says why: some are not

@@ -1,7 +1,8 @@
 # The library and downloads
 
 - **`internal/library`** keeps liked and disliked songs, mixes, the history
-  and stats in `library.json`.
+  and stats, and the artists followed in MixMusic
+  ([Following artists](follows.md)), in `library.json`.
 - **`internal/downloads`** keeps the tracks the user downloads, apart from
   the offline cache: a folder of their audio (`audio/<video id>.webm`, or
   `.m4a` for a track YouTube has only in AAC) and covers (`art/`), with

@@ -32,7 +32,7 @@ How MixMusic plays.
 
 | Group | What's there |
 |---|---|
-| Spotify tracks | How Spotify tracks play: **In MixMusic, from Spotify** (Premium, on Windows), **On Spotify Connect**, with the **Device** that plays them, or **In MixMusic, from YouTube Music**. See [Spotify](spotify.md). |
+| Spotify tracks | How Spotify tracks play: **In MixMusic, from Spotify** (Premium, on Windows and macOS), **On Spotify Connect**, with the **Device** that plays them, or **In MixMusic, from YouTube Music**. See [Spotify](spotify.md). |
 | Sound | **Quality** (best, or data saver), **Crossfade** (off, or 1 to 12 seconds), **Even loudness**, **Volume levelling**, **Play 5.1 surround when a track has it**, **Autoplay**, **Skip songs made with AI** and **Skip songs you dislike**. |
 | Speed | **Songs** and **Podcasts**, each from 0.5× to 3×, at the tracks' own pitch, with **normal** to go back to 1×. |
 | Music videos | **Show the video of music videos**, on the now playing page. |

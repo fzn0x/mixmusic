@@ -16,7 +16,11 @@ Three web pages still show, and only while they're needed:
   (`internal/player/connect.go`). At a track's end, the player gives it up
   to 2 s to go on before it plays the next track itself: after a seek into
   a track's last seconds, Spotify stops on it a moment while it loads the
-  next. Only WebView2, on Windows, decrypts Spotify's audio.
+  next. WebView2 decrypts Spotify's audio with Widevine, and macOS's
+  WKWebView with FairPlay, where the window keeps its page running while
+  hidden (`herePage`). WebKitGTK has no EME:
+  [Spotify in MixMusic on each system](spotify-here.md) tells what each web
+  view gives the SDK.
 - **Google's sign-in to YouTube Music**, whose cookies MixMusic keeps.
 - **The picture of music videos** (`video.go`, `internal/app/video.go`),
   with "Show the video of music videos" on in Settings › Playback: a web

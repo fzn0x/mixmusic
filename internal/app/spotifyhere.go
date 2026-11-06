@@ -26,9 +26,29 @@ const hereLoad = 20 * time.Second
 // may load before the player has it play all the same.
 const hereSounds = 10 * time.Second
 
-// spotifyPlaysHere tells whether MixMusic plays Spotify itself: where its
-// webview, WebView2, decrypts Spotify's audio.
-const spotifyPlaysHere = runtime.GOOS == "windows"
+// spotifyPlaysHere tells whether MixMusic plays Spotify itself here.
+var spotifyPlaysHere = playsSpotifyOn(runtime.GOOS)
+
+// SpotifyPlaysHere tells whether MixMusic plays Spotify itself on this
+// system, for the settings to offer it.
+func SpotifyPlaysHere() bool { return spotifyPlaysHere }
+
+// playsSpotifyOn tells whether MixMusic plays Spotify itself on goos: where
+// its webview decrypts Spotify's audio, WebView2 with Widevine on Windows,
+// WKWebView with FairPlay on macOS. WebKitGTK has no EME (#295).
+func playsSpotifyOn(goos string) bool { return goos == "windows" || goos == "darwin" }
+
+// herePage is how the page of the device runs on goos. On macOS the page
+// of a hidden window is hidden, and WebKit slows its timers to once a
+// second, which Spotify's player runs on: it keeps running there. WebView2
+// keeps the page of a hidden window running, and its option is the whole
+// browser's, which the first page sets.
+func herePage(goos string) mygo.PageOptions {
+	if goos == "darwin" {
+		return mygo.PageOptions{BackgroundThrottling: mygo.ThrottlingOff}
+	}
+	return mygo.PageOptions{}
+}
 
 // spotifyHere is MixMusic's own Spotify device for the native interface:
 // Spotify's Web Playback SDK, which plays Spotify's protected audio, in the
@@ -60,6 +80,7 @@ func (h *spotifyHere) page(ctx context.Context) (*mygo.Page, error) {
 			Hidden:      true,
 			SkipTaskbar: true,
 			URL:         "/spotify.html",
+			Page:        herePage(runtime.GOOS),
 		})
 		loaded := make(chan struct{})
 		h.win, h.loaded = win, loaded

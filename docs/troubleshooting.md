@@ -42,7 +42,7 @@ time it starts.
   (Flatpak)", and so on, read from its folder in `~/.var/app`: Firefox,
   Chrome, Chromium, Edge and Brave.
 - **Spotify plays from YouTube Music, not in MixMusic.** Spotify plays in
-  MixMusic on Windows, with Premium, and with a sign-in made since MixMusic
+  MixMusic on Windows and macOS, with Premium, and with a sign-in made since MixMusic
   played Spotify itself: Settings › Playback asks you to sign in again when
   yours is older.
 - **Spotify refuses the sign-in.** A Spotify app in development mode serves

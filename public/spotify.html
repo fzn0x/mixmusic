@@ -28,12 +28,15 @@
         };
 
         let supported = null;
-        /** canPlay tells whether the webview decrypts Spotify's audio, with Widevine or PlayReady. */
+        /**
+         * canPlay tells whether the webview decrypts Spotify's audio: with
+         * Widevine or PlayReady in WebView2, with FairPlay in macOS's.
+         */
         const canPlay = () =>
           (supported ??= (async () => {
             if (!isSecureContext || !navigator.requestMediaKeySystemAccess) return false;
             const config = [{ initDataTypes: ["cenc"], audioCapabilities: [{ contentType: 'audio/mp4; codecs="mp4a.40.2"' }] }];
-            for (const system of ["com.widevine.alpha", "com.microsoft.playready.recommendation", "com.microsoft.playready"]) {
+            for (const system of ["com.widevine.alpha", "com.microsoft.playready.recommendation", "com.microsoft.playready", "com.apple.fps"]) {
               try {
                 await (await navigator.requestMediaKeySystemAccess(system, config)).createMediaKeys();
                 return true;

@@ -17,7 +17,7 @@ Spotify refuses the sign-in. For the code, read
 | Who plays the audio | Spotify's player, inside MixMusic | a Spotify app or device | MixMusic's own engine |
 | The audio | Spotify's, at Spotify's quality | Spotify's, at Spotify's quality | the track's recording on YouTube Music |
 | Needs Premium | yes | yes | no |
-| Systems | Windows | every system, with a device that has Spotify open | every system |
+| Systems | Windows and macOS | every system, with a device that has Spotify open | every system |
 | Equalizer, crossfade, speed, Even loudness | no | no | yes |
 | Visualizer | on Windows | on Windows, for the Spotify app on this computer | yes |
 | Cast, 5.1 | no | no | yes |
@@ -67,13 +67,16 @@ downloads again as its new match.
 ## In MixMusic, from Spotify
 
 MixMusic plays the track itself, with Spotify's own player, at Spotify's
-quality, with no Spotify app open. It needs Spotify Premium, and Windows.
+quality, with no Spotify app open. It needs Spotify Premium, and Windows
+or macOS.
 
 - **How.** Spotify's Web Playback SDK, which MixMusic loads from
   `sdk.scdn.co`, plays Spotify's protected audio in a hidden window of a
-  page of MixMusic's own. Only WebView2, the web view of Windows, decrypts
-  that audio: WebKitGTK on Linux doesn't, and macOS's web view isn't known
-  to, so this way is greyed out there.
+  page of MixMusic's own. The web view decrypts it: WebView2 with
+  Widevine on Windows, WKWebView with FairPlay on macOS. WebKitGTK on
+  Linux can't, so this way is greyed out there:
+  [Spotify in MixMusic on each system](architecture/spotify-here.md)
+  tells what was tried, and what Linux could do.
 - **A device of its own.** The page makes MixMusic a Spotify Connect
   device, named MixMusic, which shows among your Spotify devices while it
   plays. MixMusic plays tracks on it through the Web API, as on any
@@ -88,7 +91,7 @@ quality, with no Spotify app open. It needs Spotify Premium, and Windows.
   as MixMusic's own. The equalizer, crossfade, Even loudness and speed
   don't reach it: Spotify keeps its own loudness and speed. On Windows 10
   build 20348 and later, the visualizer hears it through Windows' process
-  loopback.
+  loopback. On macOS it doesn't hear it yet, and draws nothing then.
 
 ### What 0.5.9 changed
 

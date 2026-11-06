@@ -118,7 +118,7 @@ a service doesn't apply to them:
   files.
 - Show in Explorer, in a track's menu (Show in Finder on macOS), opens the
   folder of its file.
-- The system's [media controls](desktop.md#media-keys-and-the-systems-media-controls)
+- The system's [media controls](desktop.md)
   show it with its cover, as any track.
 
 ## Privacy

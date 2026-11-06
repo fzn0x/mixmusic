@@ -10,6 +10,10 @@ export default defineConfig({
   identifier: "app.mixmusic.desktop",
   version: pkg.version,
   copyright: "© 2026 MixMusic contributors",
+  // The icon that `mygo build` makes each platform's icons of. It isn't
+  // in resources/, MyGo's place for it by default: `mygo build` ships every
+  // file there beside the app, which reads none as it runs (#303).
+  icon: "brand/icon.png",
   // MyGo draws the windows itself, in Go (the root package): the only pages
   // are that of MixMusic's own Spotify device, public/spotify.html, and that
   // of the picture of music videos, public/video.html with video.js, which

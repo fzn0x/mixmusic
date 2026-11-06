@@ -7,10 +7,10 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/brand"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
-	"github.com/fzn0x/mixmusic/resources"
 )
 
 // navItem is a page of the rail.
@@ -131,7 +131,7 @@ func (s *shell) rail(c *ui.Context) {
 // brandMark is MixMusic's mark, the pink rings with a play button of its
 // icon, and brandPink their colour.
 var (
-	brandMark = mustSVG(resources.Mark)
+	brandMark = mustSVG(brand.Mark)
 	brandPink = ui.RGB(0xe6, 0x00, 0x7e)
 )
 

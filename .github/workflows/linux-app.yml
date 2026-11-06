@@ -26,6 +26,7 @@ on:
       - bun.lock
       - mygo.config.ts
       - resources/**
+      - brand/**
       - .github/scripts/**
       - .github/workflows/linux-app.yml
 

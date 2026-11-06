@@ -331,7 +331,7 @@ func TestSniff(t *testing.T) {
 		{"ID3\x04\x00\x00\x00\x00\x00\x3f", packedAudio},
 		{"\xff\xf1\x50\x80\x2e\x1f\xfc\x21", packedAudio},
 		{"\xff\xf9\x50\x80", packedAudio},
-		{"\xff\xfb\x90\x64\x00\x00\x00\x00", webmFile}, // MP3, of layer 3
+		{"\xff\xfb\x90\x64\x00\x00\x00\x00", mp3File}, // MP3, of layer 3
 	} {
 		r := bytes.NewReader([]byte(c.head))
 		got, err := sniff(r)

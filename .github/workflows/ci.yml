@@ -201,7 +201,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [windows/amd64, linux/amd64, darwin/universal]
+        # linux/arm64 is for the Arm64 Flatpak, which packs its archive:
+        # Windows on Arm builds in the release alone.
+        platform: [windows/amd64, linux/amd64, linux/arm64, darwin/universal]
+        # The archives the Flatpak jobs pack the app of.
+        include:
+          - { platform: linux/amd64, archive: linux-amd64 }
+          - { platform: linux/arm64, archive: linux-arm64 }
     steps:
       - uses: actions/checkout@v7
       # The tools of flake.nix's shell, at the versions of flake.lock.
@@ -216,7 +222,7 @@ jobs:
       # Nix's own loader would keep it from starting outside NixOS (#166).
       - name: The Linux build asks for the system's loader
         if: startsWith(matrix.platform, 'linux/')
-        run: nix develop --command go run ./tools/elfloader build/linux-amd64
+        run: nix develop --command go run ./tools/elfloader build/linux-*
       # release.yml finds the installer by this name.
       - name: The installer has the name the release looks for
         if: startsWith(matrix.platform, 'windows/')
@@ -227,24 +233,32 @@ jobs:
         run: |
           nix develop --command bash .github/scripts/package.sh "$(jq -r .version package.json)" packages
           ls -l packages
-      # The Flatpak job packs the app of this archive.
+      # The Flatpak job of its architecture packs the app of this archive.
       - name: Keep the Linux archive for the Flatpak
-        if: matrix.platform == 'linux/amd64'
+        if: matrix.archive
         uses: actions/upload-artifact@v7
         with:
-          name: linux-amd64
-          path: build/linux-amd64/mixmusic-*-linux-amd64.tar.gz
+          name: ${{ matrix.archive }}
+          path: build/${{ matrix.archive }}/mixmusic-*-${{ matrix.archive }}.tar.gz
           if-no-files-found: error
           retention-days: 3
 
-  # The Flatpak, as release.yml makes it, of the Linux build above, in
-  # Flathub's container with the GNOME runtime and flatpak-builder:
-  # installed and started in its sandbox. Linux users can try a change
-  # from its flatpak artifact.
+  # The Flatpaks, as release.yml makes them, of the Linux builds above, in
+  # Flathub's container with the GNOME runtime and flatpak-builder, on a
+  # runner of each one's architecture: installed and started in their
+  # sandbox. Linux users can try a change from their flatpak-<arch>
+  # artifacts. The x64 job keeps the name it had.
   flatpak:
-    name: Flatpak
+    name: Flatpak${{ matrix.arch == 'arm64' && ' (Arm64)' || '' }}
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: amd64, flatpak: x86_64, runner: ubuntu-latest }
+          # Flathub's container is made for Arm64 too.
+          - { arch: arm64, flatpak: aarch64, runner: ubuntu-24.04-arm }
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
       options: --privileged
@@ -259,31 +273,32 @@ jobs:
           cache: false
       - uses: actions/download-artifact@v8
         with:
-          name: linux-amd64
+          name: linux-${{ matrix.arch }}
           path: linux
       - name: The app and its metadata
         run: |
           mkdir -p packaging/flatpak/dist
-          cp linux/mixmusic-*-linux-amd64.tar.gz packaging/flatpak/dist/mixmusic-linux-amd64.tar.gz
+          cp linux/mixmusic-*-linux-${{ matrix.arch }}.tar.gz packaging/flatpak/dist/mixmusic-linux-${{ matrix.arch }}.tar.gz
           go run ./tools/metainfo -o packaging/flatpak/dist/io.github.fzn0x.mixmusic.metainfo.xml
           appstreamcli validate --no-net --explain packaging/flatpak/dist/io.github.fzn0x.mixmusic.metainfo.xml
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.8
         with:
           manifest-path: packaging/flatpak/io.github.fzn0x.mixmusic.yml
-          bundle: mixmusic-linux-amd64.flatpak
+          bundle: mixmusic-linux-${{ matrix.arch }}.flatpak
+          arch: ${{ matrix.flatpak }}
           branch: stable
           upload-artifact: false
       - name: Install it, and start MixMusic in its sandbox
-        run: bash packaging/flatpak/check.sh mixmusic-linux-amd64.flatpak shots
+        run: bash packaging/flatpak/check.sh mixmusic-linux-${{ matrix.arch }}.flatpak shots
       - uses: actions/upload-artifact@v7
         with:
-          name: flatpak
-          path: mixmusic-linux-amd64.flatpak
+          name: flatpak-${{ matrix.arch }}
+          path: mixmusic-linux-${{ matrix.arch }}.flatpak
           if-no-files-found: error
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
-          name: flatpak-screenshots
+          name: flatpak-screenshots-${{ matrix.arch }}
           path: shots/
           if-no-files-found: ignore
 

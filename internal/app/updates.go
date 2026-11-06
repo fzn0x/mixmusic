@@ -57,7 +57,9 @@ type UpdateStatus struct {
 	Enabled bool `json:"enabled"`
 	// Kind is how this copy was installed, which decides the download of
 	// a release that replaces it: "installer", "portable", "app",
-	// "archive", "deb", "rpm", "appimage", "flatpak" or "development".
+	// "archive", "deb", "rpm", "pacman" (the AUR's mixmusic-bin, which
+	// pacman updates, and no download replaces), "appimage", "flatpak" or
+	// "development".
 	Kind string `json:"kind"`
 	// AutomaticChecks looks for a new version at start and every few
 	// hours.
@@ -421,8 +423,9 @@ func installKind() string {
 
 // kindOf tells how a copy whose executable is in dir was installed on
 // goos: the Windows installer leaves its uninstaller beside it, a Flatpak
-// has /.flatpak-info at the root of its sandbox, and the .deb and the
-// .rpm put it in /opt/mixmusic, which dpkg keeps a list of for the .deb.
+// has /.flatpak-info at the root of its sandbox, and the .deb, the .rpm
+// and the AUR's mixmusic-bin put it in /opt/mixmusic, which dpkg keeps a
+// list of for the .deb, and which pacman's database tells the AUR's by.
 func kindOf(goos, dir string, appImage bool, exists func(string) bool) string {
 	switch goos {
 	case "windows":
@@ -440,6 +443,8 @@ func kindOf(goos, dir string, appImage bool, exists func(string) bool) string {
 		return "appimage"
 	case dir == "/opt/mixmusic" && exists("/var/lib/dpkg/info/mixmusic.list"):
 		return "deb"
+	case dir == "/opt/mixmusic" && exists("/var/lib/pacman/local"):
+		return "pacman"
 	case dir == "/opt/mixmusic":
 		return "rpm"
 	}

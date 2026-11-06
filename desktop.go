@@ -255,7 +255,7 @@ func (s *shell) updateSettings(c *ui.Context) {
 // UpdateStatus.Kind says.
 var buildNames = map[string]string{
 	"installer": "installed with the setup", "portable": "portable", "app": "app", "archive": "installed with install.sh",
-	"deb": ".deb package", "rpm": ".rpm package", "appimage": "AppImage", "flatpak": "Flatpak", "development": "development build",
+	"deb": ".deb package", "rpm": ".rpm package", "pacman": "AUR package", "appimage": "AppImage", "flatpak": "Flatpak", "development": "development build",
 }
 
 // releaseRow tells whether a newer version is out, and installs it, or
@@ -347,6 +347,10 @@ func replacing(kind, file string) string {
 		return "Open " + file + " with your software center, or run sudo apt install ./" + file + ". Your library and settings stay."
 	case "rpm":
 		return "Open " + file + " with your software center, or run sudo dnf install ./" + file + ". Your library and settings stay."
+	case "pacman":
+		// The AUR's mixmusic-bin updates with the system, as pacman's
+		// packages do: no download of the release replaces it.
+		return "Update it as you update your system, with your AUR helper, such as yay -Syu, or with makepkg -si in its AUR folder. Your library and settings stay."
 	case "appimage":
 		return "Make " + file + " executable and use it in place of this AppImage. Your library and settings stay."
 	case "flatpak":

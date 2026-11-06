@@ -1,0 +1,43 @@
+# Maintainer: fzn0x <https://github.com/fzn0x>
+#
+# Written for each release by tools/aur of github.com/fzn0x/mixmusic, from
+# packaging/aur/PKGBUILD.tmpl: change that, not this.
+pkgname=mixmusic-bin
+_pkgname=mixmusic
+_version={{.Version}}
+pkgver={{.PkgVer}}
+pkgrel=1
+pkgdesc="Spotify and YouTube Music in one customizable player"
+arch=('x86_64' 'aarch64')
+url="https://github.com/fzn0x/mixmusic"
+license=('MIT OR GPL-3.0-only')
+# MixMusic plays through PulseAudio, which PipeWire serves too, or ALSA.
+# WebKitGTK shows Google's sign-in to YouTube Music.
+depends=('gtk3' 'webkit2gtk-4.1' 'alsa-lib' 'hicolor-icon-theme')
+optdepends=('libpulse: sound through PulseAudio or PipeWire'
+            'libayatana-appindicator: the tray icon'
+            'libsecret: keep sign-ins in the keyring'
+            'yt-dlp: the few YouTube Music tracks that need it, which MixMusic can also install itself'
+            'deno: the JavaScript runtime yt-dlp solves YouTube with'
+            'nodejs: another JavaScript runtime yt-dlp can use')
+provides=("$_pkgname")
+conflicts=("$_pkgname")
+# The app is built and stripped upstream; it runs on the system's loader.
+options=('!strip' '!debug')
+source=("LICENSE-MIT::https://raw.githubusercontent.com/fzn0x/mixmusic/v${_version}/LICENSE-MIT")
+source_x86_64=("$_pkgname-$_version-linux-amd64.deb::https://github.com/fzn0x/mixmusic/releases/download/v${_version}/mixmusic-${_version}-linux-amd64.deb")
+source_aarch64=("$_pkgname-$_version-linux-arm64.deb::https://github.com/fzn0x/mixmusic/releases/download/v${_version}/mixmusic-${_version}-linux-arm64.deb")
+sha256sums=('{{.LicenseSHA256}}')
+sha256sums_x86_64=('{{.AMD64SHA256}}')
+sha256sums_aarch64=('{{.ARM64SHA256}}')
+
+package() {
+  # The files the .deb installs: the app in /opt/mixmusic, its entry and
+  # its icons. MixMusic tells it is pacman's by them, and offers no
+  # download in place of this package.
+  bsdtar -xf data.tar.* -C "$pkgdir"
+  rm -f "$pkgdir/usr/bin/$_pkgname"
+  install -d "$pkgdir/usr/bin"
+  ln -s "/opt/$_pkgname/$_pkgname" "$pkgdir/usr/bin/$_pkgname"
+  install -Dm644 LICENSE-MIT "$pkgdir/usr/share/licenses/$pkgname/LICENSE-MIT"
+}

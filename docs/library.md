@@ -3,7 +3,7 @@
 
 MixMusic keeps your liked songs, mixes, downloads, history and stats for Spotify and YouTube Music tracks together, beside each service's own library.
 
-What MixMusic keeps itself, as your liked and disliked songs, your mixes and your history, is in `library.json` in your data folder, and works with no account. What you keep on a service, as its playlists and saved albums, shows once you sign in to it, and the changes you make in MixMusic reach it.
+What MixMusic keeps itself, as your liked and disliked songs, your mixes and your history, is in `library.json` in your [data folder](data-and-privacy.md#the-data-folder), and works with no account. What you keep on a service, as its playlists and saved albums, shows once you [sign in](accounts.md) to it, and the changes you make in MixMusic reach it.
 
 ## The Library page
 
@@ -19,7 +19,7 @@ Library, in the sidebar or with Alt+2 (⌥2 on macOS), has these pivots, each wi
 
 ## Liked songs
 
-Like a track with the heart in the player bar, on the now playing page, in the mini player or on its row, with Add to liked songs in its menu, or with Ctrl+L (⌘L on macOS) for the track playing. The heart again, or Remove from liked songs, takes it back.
+Like a track with the heart in the player bar, on the now playing page, in the [mini player](desktop.md#the-mini-player) or on its row, with Add to liked songs in its menu, or with Ctrl+L (⌘L on macOS) for the track playing. The heart again, or Remove from liked songs, takes it back.
 
 - **One list for both services.** Library › Liked, Liked songs in the sidebar, Home's Liked songs tile and Alt+3 open it.
 - **Signed in, a like reaches the service too:** a Spotify track is saved to your Spotify library, and a YouTube Music track is liked on YouTube Music.
@@ -36,6 +36,8 @@ Library › Disliked lists the songs you disliked, newest first, with the same s
 
 A mix is a playlist of MixMusic's own, which holds tracks of every service.
 
+![Library › Mixes: the New mix tile, "Tracks of every service, together", then three mixes, Anisong night, Focus, no words and Weekend, each with its cover and how many tracks it holds, and the same mixes under Your mixes in the sidebar](shots/mixes.webp)
+
 - **Make one** with the New mix tile in Library › Mixes, the + beside Your mixes in the sidebar, Add to mix › New mix… in a track's menu, or Save as a new mix in the More menu of an album or a playlist, which copies its tracks.
 - **Add tracks** with Add to mix in a track's menu, then the mix's name.
 - **Copy a service's playlist** with Copy into a mix you can extend, in the playlist's More menu: the mix keeps its tracks, and any track can join them. A long playlist is read whole first, which can take a while.
@@ -45,7 +47,7 @@ Your mixes show in the sidebar under Your mixes, with how many tracks each holds
 
 ## YouTube Music playlists, albums and artists
 
-Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a new playlist link, your Albums, the Artists you follow, and Liked on YouTube Music. A brand channel of your account, chosen in Settings › Accounts, has a library of its own.
+Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a new playlist link, your Albums, the Artists you follow, and Liked on YouTube Music. A [brand channel](accounts.md#several-google-accounts-and-brand-channels) of your account, chosen in Settings › Accounts, has a library of its own.
 
 - **Save** an album or a playlist with Save on its page, which then says Saved; pressing it again takes it out of your library. **Follow** an artist with Follow on their page, which subscribes on YouTube Music.
 - **Make a playlist** with new playlist in Library › YouTube Music, with Add to YouTube Music playlist › New playlist… in a track's menu, or with Save as a YouTube Music playlist in an album's or a playlist's More menu. Spotify tracks are found on YouTube Music first.
@@ -83,7 +85,7 @@ A track counts as played once it played for 30 seconds, or half of a shorter one
 
 - **Library › History** lists your last 300 plays, the latest first. Clear history forgets every track you played, after asking, and your stats start over.
 - **Home** shows the track you played last in its Jump back in tile, and the tracks you played lately in its Recently played shelf.
-- **YouTube Music's history.** Signed in to YouTube Music, the songs you play also join your history there, so that YouTube Music's home and its radios learn from them. "Add what you play to your history", in Settings › Accounts, turns it off.
+- **YouTube Music's history.** Signed in to YouTube Music, the songs you play also join your history there, so that YouTube Music's home and its radios learn from them. ["Add what you play to your history"](accounts.md#your-youtube-music-history), in Settings › Accounts, turns it off.
 
 ## Stats
 
@@ -103,8 +105,8 @@ Download tracks, albums, playlists, mixes and your liked songs, and they play wi
 ### What you can download
 
 - **Download** in a track's menu downloads it. The download button of an album's, a playlist's or a mix's page, or of your liked songs, downloads it whole, as Download in its More menu does.
-- **YouTube Music tracks** download as they are. **Spotify tracks** download as their recording on YouTube Music.
-- **Live streams** don't download: a playlist holding one downloads the rest, and once MixMusic has found a stream live, its menu offers no Download. **Podcast episodes** don't download.
+- **YouTube Music tracks** download as they are. **Spotify tracks** download as their [recording on YouTube Music](playing-music.md#how-spotify-tracks-play).
+- **[Live streams](playing-music.md#live-streams)** don't download: a playlist holding one downloads the rest, and once MixMusic has found a stream live, its menu offers no Download. **Podcast episodes** don't download.
 - **Many at once:** over a hundred tracks, or about a gigabyte, asks first, with the size.
 
 ### Following a download
@@ -114,9 +116,11 @@ Download tracks, albums, playlists, mixes and your liked songs, and they play wi
 - **Library › Downloads** says how many tracks the downloads hold, their size and their folder, with links to open the folder and to the settings. While tracks download, it shows how far they came, with pause or resume, cancel all, and retry failed, and each track's state, with why one failed. Then come your downloaded albums, playlists and mixes, whose tracks show below when you choose one, and every downloaded track, with Play, Shuffle, search and Sort. Remove all downloads, at its foot, asks first.
 - **The sidebar** lists Downloads under Your mixes once you have some, and the command palette's Downloads opens them.
 
+![Library › Downloads: 10 tracks, 29 MB, with Open folder and Settings, the album THE BOOK 3 under Albums & playlists, and the Tracks list below with Play and Shuffle, while Downloads shows in the sidebar under Liked songs](shots/downloads.webp)
+
 ### How they download
 
-- Two tracks download at a time, in the quality of Settings › Playback › Sound › Quality: best or data saver.
+- Two tracks download at a time, in the quality of Settings › Playback › Sound › Quality: best or [data saver](playing-music.md#data-saver).
 - They wait while you're offline, on a metered connection unless you allow it, and when YouTube turns requests down, then go on where they stopped, after a restart too.
 - Downloads keep the stereo audio of a track. A 5.1 surround mix plays from the offline cache or YouTube, and offline the stereo audio plays.
 
@@ -137,7 +141,7 @@ Settings › Playback › Downloads shows how many tracks the downloads hold and
 - **Download on metered connections:** off by default, so that downloads wait on a phone's hotspot and the like.
 - **Download songs added later:** on by default.
 
-The folder holds the tracks' audio as WebM or M4A files, their covers and an index of what it holds, which MixMusic reads. It moves whole.
+The folder holds the tracks' audio as WebM or M4A files, their covers and an index of what it holds, which MixMusic reads. It moves whole. [Where the audio streams come from](streams.md#downloads-and-the-cache) tells what a download fetches, and [the library's part of the architecture](architecture/library.md) how the folder is kept.
 
 When the network goes while you have downloads, a toast says that they still play, with a link to them, and Home offers to open them when it can't load.
 
@@ -149,4 +153,4 @@ Apart from downloads, MixMusic keeps the tracks you played, so that they play ag
 - **Covers kept:** the covers you saw, up to 256 MB, which show again without the network, with Clear.
 - **Size:** Off, 512 MB, 1 GB (the default), 4 GB or 16 GB. Off keeps no tracks.
 
-The cache keeps how loud YouTube measured each track too, for Even loudness offline. Live streams aren't kept in it, and a track's 5.1 surround mix is kept beside its stereo audio.
+The cache keeps how loud YouTube measured each track too, for [Even loudness](playing-music.md#even-loudness-volume-levelling-and-the-volume) offline. Live streams aren't kept in it, and a track's 5.1 surround mix is kept beside its stereo audio. [The audio engine](audio-engine.md#the-offline-cache) tells how it fills and empties.

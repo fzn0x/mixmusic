@@ -171,11 +171,11 @@ release, and the page reads the latest version from GitHub's API. Once the
 release is published, set the two `data-version` spans to it, for when the
 API does not answer.
 
-The release has a Flatpak too, which the workflow packs from the Linux
-build's x64 archive (see [The Flatpak](#the-flatpak)). Its releases come
-from CHANGELOG.md's headings, so it needs no step of its own; when its job
-fails, the release goes out without it, and running the failed jobs again
-adds it.
+The release has a Flatpak for each architecture too, which the workflow
+packs from the Linux build's x64 and Arm64 archives (see
+[The Flatpak](#the-flatpak)). Their releases come from CHANGELOG.md's
+headings, so they need no step of their own; when one's job fails, the
+release goes out without it, and running the failed jobs again adds it.
 
 Installed apps update themselves from the latest release. Its update files are
 signed with the key whose public half is `updates.publicKey` in

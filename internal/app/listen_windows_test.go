@@ -66,7 +66,7 @@ func TestListenerHears(t *testing.T) {
 	heard := false
 	var a audio.Analysis
 	for deadline := time.Now().Add(3 * time.Second); !heard && time.Now().Before(deadline); time.Sleep(50 * time.Millisecond) {
-		l.tap.Analyse(&a)
+		l.analyse(&a) // as the visualizer reads it
 		for _, db := range a.Decibels {
 			heard = heard || db > -200
 		}

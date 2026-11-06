@@ -127,20 +127,42 @@ on Windows ([the audio engine](audio.md)):
   the visualizer or a plugin reads the analyser, and for 2 s after the
   last read. It stops when Spotify pauses, and as MixMusic quits.
 - **The permission.** macOS asks once whether MixMusic may record what
-  other apps play, at the first tap, with `NSAudioCaptureUsageDescription`
-  from `mygo.config.ts`.
-  - Until the user answers, and once they refuse, the tap runs but hears
-    digital silence: no call fails.
-  - TCC's private `TCCAccessPreflight` (`kTCCServiceAudioCapture`) tells
-    the answer: 0 allowed, 1 refused, 2 not asked yet. The capture asks it
-    each second until the user answered, and taps again once they allow
-    it.
-  - Once refused, a capture fails at once, and one that ran when the user
-    refused stops within a second (`Capture.Err`). The log says why, once
-    a run, as it does of a Windows without process loopback.
+  other apps play, with `NSAudioCaptureUsageDescription` from
+  `mygo.config.ts`. A tap hears only once the user allowed it: until they
+  answer, and once they refuse, it runs but hears digital silence, and no
+  call fails.
+  - **MixMusic asks first**, through TCC's private `TCCAccessRequest`
+    (`kTCCServiceAudioCapture`), and taps once the user answered. The
+    capture waits for the answer.
+  - **Not the tap.** A tap that has macOS ask itself started only 90 s
+    later on the test Mac, though the user had answered in 5 s:
+    coreaudiod started the tap at the answer, and MixMusic's call returned
+    90 s later.
+  - **Not the preflight alone.** `TCCAccessPreflight` (0 allowed, 1
+    refused, 2 not asked) answered 2 in that process for the rest of its
+    run, though the user had allowed it; a new process was told 0. So
+    MixMusic keeps `TCCAccessRequest`'s answer for the run.
+  - Once refused, a capture fails with `ErrRefused`, and the log says why,
+    once a run, as it does of a Windows without process loopback.
 - **Before macOS 14.2** there is no `AudioHardwareCreateProcessTap`: the
   capture fails with `ErrNoLoopback`, and the visualizer stays flat for
   Spotify.
+
+**Tried on the test Mac** (macOS 26.5, November 2026), with a muted tap,
+so that nothing played out loud:
+
+- **A tone** at -80 dBFS in the page of MixMusic's device, in a build
+  signed with the hardened runtime, as releases are, without entitlements:
+  the analyser's waveform peaked at -80.0 dBFS, and its bars rose.
+- **Spotify in MixMusic**, with the maintainer's sign-in: the tap hears
+  FairPlay's decrypted audio.
+  - At volume 0 the tap heard exact zeros.
+  - At a gain of -80 dB, the song peaked at -90 to -105 dBFS; at -73 dB,
+    about 7 dB higher; at 0 again, zeros.
+  - Pausing stopped the tap.
+- **The first tap, as macOS asked** at the tap itself, took about 90 s to
+  start, and TCC went on answering 2 in that run: why MixMusic asks
+  first.
 
 **An embedded Chromium (CEF) with Widevine** isn't needed on macOS, and
 would be costly:

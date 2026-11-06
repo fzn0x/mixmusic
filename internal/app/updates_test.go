@@ -137,7 +137,7 @@ func TestLatestRelease(t *testing.T) {
 		t.Errorf("latestRelease of an rpm, up to date = %+v", r)
 	}
 
-	// A Flatpak is offered the next bundle, which only x64 has yet.
+	// A Flatpak is offered the next bundle of its architecture.
 	r, err = latestRelease(context.Background(), srv.Client(), srv.URL, "flatpak", "amd64", "0.2.0")
 	if err != nil {
 		t.Fatal(err)

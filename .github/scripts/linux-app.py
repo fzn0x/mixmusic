@@ -466,6 +466,359 @@ def capture_run(c, mixmusic, profile, out):
           TITLE in title, f"title {title or 'not logged'}")
 
 
+class Session:
+    """MixMusic started as a user starts it, and what its checks found."""
+
+    def __init__(self, c, args, out, work, tone, cover):
+        self.c, self.out, self.cover = c, out, cover
+        self.nix = args.libs == "nix"
+        self.profile = os.path.join(work, "profile")
+        self.settings = make_profile(self.profile, tone, COVER)
+        self.pywal = os.path.join(work, "xdg-cache", "wal", "colors.json")
+        self.items_file = os.path.join(out, "tray-items.json")
+        self.source = monitor()
+        self.display = Display(out)
+        self.tray = None
+        self.started = time.monotonic()
+        self.log = open(os.path.join(out, "mixmusic-stderr.log"), "w")
+        env = app_env(self.profile, {"XDG_CACHE_HOME": os.path.join(work, "xdg-cache")})
+        self.app = subprocess.Popen([os.path.abspath(args.mixmusic)], env=env, stdout=self.log,
+                                    stderr=subprocess.STDOUT)
+
+    def grab(self, name=None):
+        return self.display.grab(self.region, name)
+
+    def window(self):
+        """It starts, and shows its window."""
+        app = self.app
+        found = until(lambda: app.poll() is not None or windows(app.pid), 90)
+        if not self.c.add("MixMusic starts and shows its window", app.poll() is None and found,
+                          f"in {time.monotonic() - self.started:.1f} s" if found and app.poll() is None
+                          else f"exited with {app.poll()}" if app.poll() is not None else "no window in 90 s"):
+            return False
+        time.sleep(5)  # its first frames
+        self.wid, *region = windows(app.pid)[0]
+        self.region = tuple(region)
+        ok, saw = drawn(*self.grab("01-window"))
+        self.c.add("The window on the display is drawn", ok, f"{self.region[2]}x{self.region[3]}, {saw}")
+        return True
+
+    def libraries(self):
+        """Its libraries: the system's for the release build, the Nix
+        store's for the Nix build."""
+        libs = libraries(self.app.pid)
+        save_json(self.out, "libraries.json", libs)
+        gtk = next((p for n, p in libs.items() if n.startswith("libgtk-3.so")), "")
+        loader = next((p for n, p in libs.items() if n.startswith("ld-linux")), "")
+        self.c.add(f"GTK and the loader are the {'Nix store' if self.nix else 'system'}'s",
+                   gtk and loader and gtk.startswith("/nix/store/") == self.nix
+                   and loader.startswith("/nix/store/") == self.nix,
+                   f"{gtk or 'no GTK'}, {loader or 'no loader'}")
+
+    def tray_icon(self):
+        """The tray icon, which libayatana-appindicator registers with the
+        desktop's StatusNotifierWatcher, and its menu."""
+        def registered():
+            try:
+                with open(self.items_file) as f:
+                    return json.load(f)[-1]
+            except (OSError, ValueError, IndexError):
+                return None
+        item = until(registered, 30)
+        if not self.c.add("The tray icon registers with the desktop's StatusNotifierWatcher", item,
+                          f"{item['bus']} {item['path']}" if item else "no item in 30 s"):
+            return
+        props = get_all(item["bus"], item["path"], ITEM)
+        save_json(self.out, "tray-item.json", props)
+        icon = os.path.join(props.get("IconThemePath", ""), props.get("IconName", "") + ".png")
+        with open(os.path.join(os.path.dirname(__file__), "..", "..", "resources", "tray.png"), "rb") as f:
+            same = os.path.isfile(icon) and open(icon, "rb").read() == f.read()
+        self.c.add("The tray item is active, with MixMusic's icon", props.get("Status") == "Active" and same,
+                   f"Status {props.get('Status')}, icon {icon}"
+                   + (" = resources/tray.png" if same else " differs or is missing"))
+        layout = call(item["bus"], props["Menu"], MENU, "GetLayout", GLib.Variant("(iias)", (0, -1, [])))[1]
+        save_json(self.out, "tray-menu.json", layout)
+        labels = {}
+
+        def walk(node):
+            node_id, node_props, children = node
+            if node_props.get("label"):
+                labels[node_props["label"].replace("_", "")] = node_id
+            for child in children:
+                walk(child)
+        walk(layout)
+        self.tray = dict(item, menu=props["Menu"], labels=labels)
+        missing = [t for t in TRAY_ITEMS if t not in labels]
+        self.c.add("The tray menu has the player's commands and Quit",
+                   not missing and any(label.startswith("Quit") for label in labels),
+                   ", ".join(labels) + (f"; missing {', '.join(missing)}" if missing else ""))
+
+    def click(self, label):
+        """Clicks an item of the tray menu, as a panel does."""
+        call(self.tray["bus"], self.tray["menu"], MENU, "Event",
+             GLib.Variant("(isvu)", (self.tray["labels"][label], "clicked", GLib.Variant("i", 0), 0)))
+
+    def zoom_keys(self):
+        """The zoom keys in the window, which the GTK handler of #251 takes
+        for the keypad's +: read back from settings.json, which MixMusic
+        saves, and which it writes at its start."""
+        until(lambda: read_settings(self.settings), 20)
+        run("xdotool", "windowfocus", "--sync", self.wid, timeout=10)
+
+        def zoom():
+            return (read_settings(self.settings) or {}).get("zoom")
+        for i, (keys, want) in enumerate([("ctrl+KP_Add", 1.1), ("ctrl+equal", 1.25), ("ctrl+KP_Subtract", 1.1),
+                                          ("ctrl+minus", 1.0), ("ctrl+KP_Add", 1.1), ("ctrl+0", 1.0)]):
+            before = zoom()
+            run("xdotool", "key", keys)
+            got = until(lambda: zoom() if zoom() == want else None, 5) or zoom()
+            self.grab(f"02-zoom-{i + 1}-{keys.replace('+', '-')}")
+            self.c.add(f"{keys.replace('ctrl+', 'Ctrl+')} zooms to {want:.0%}", got == want, f"zoom {before} → {got}")
+
+    def shows(self, *want, timeout=10):
+        """Waits for most of the window to wear one of the colours want: the
+        colours' bg, or their surface, which the panel and the cards wear."""
+        seen = []
+
+        def look():
+            colour, _ = dominant(*self.grab())
+            seen.append(colour)
+            return any(near(colour, w) for w in want)
+        t = time.monotonic()
+        ok = until(look, timeout, every=0.3)
+        return ok, (f"{seen[-1] if seen else 'nothing'} on most of the window, after {time.monotonic() - t:.1f} s"
+                    f" (bg or surface: {' or '.join(want)})")
+
+    def settings_file(self):
+        """settings.json edited while MixMusic runs (#81): through inotify,
+        the theme written over the file, and the zoom in place."""
+        watched = inotify_inodes(self.app.pid)
+        folder = os.stat(os.path.dirname(self.settings)).st_ino
+        self.c.add("settings.json is watched through inotify",
+                   folder in watched or os.stat(self.settings).st_ino in watched,
+                   f"{len(watched)} inotify watches, the data folder's inode {folder} "
+                   + ("among them" if folder in watched else "not among them"))
+        self.base, _ = dominant(*self.grab())
+        edit_settings(self.settings, lambda s: s.update(theme="daylight", followSystem=False))
+        ok, saw = self.shows("#ffffff", "#f6f6f6")  # builtin/themes/daylight
+        self.grab("03-settings-theme-daylight")
+        self.c.add("settings.json's theme, changed while it runs, shows", ok, f"from {self.base}: {saw}")
+        before = self.grab()[2]
+        edit_settings(self.settings, lambda s: s.update(zoom=1.5), in_place=True)
+        time.sleep(2)
+        after = self.grab("04-settings-zoom-150")[2]
+        step = 3 * 97
+        changed = sum(1 for i in range(0, len(after), step) if after[i:i + 3] != before[i:i + 3]) / (len(after) / step)
+        self.c.add("settings.json's zoom, changed in place while it runs, shows",
+                   changed > 0.05 and (read_settings(self.settings) or {}).get("zoom") == 1.5,
+                   f"{changed:.0%} of the window changed")
+        edit_settings(self.settings, lambda s: s.update(zoom=1))
+
+    def colour_files(self):
+        """Colour files (#74): pywal's colors.json, where pywal writes it
+        under XDG_CACHE_HOME, followed as it changes, and matugen's, in the
+        data folder."""
+        foreground = "#e8e4f0"
+
+        def pywal_file(background):
+            os.makedirs(os.path.dirname(self.pywal), exist_ok=True)
+            palette = {f"color{i}": v for i, v in enumerate(
+                [background, "#c94f6d", "#81b29a", "#dbc074", "#719cd6", "#9d79d6", "#63cdcf", "#dfdfe0"] * 2)}
+            with open(self.pywal + ".tmp", "w") as f:
+                json.dump({"wallpaper": "/tmp/wall.png", "alpha": "100",
+                           "special": {"background": background, "foreground": foreground, "cursor": foreground},
+                           "colors": palette}, f, indent=2)
+            os.replace(self.pywal + ".tmp", self.pywal)
+
+        def surface(bg):
+            # pywal's surface, 4.5% of the way to its foreground (pywalTokens).
+            return "#" + "".join(
+                f"{round(int(bg[i:i + 2], 16) * 0.955 + int(foreground[i:i + 2], 16) * 0.045):02x}" for i in (1, 3, 5))
+        pywal_file("#1e2a4a")
+        edit_settings(self.settings, lambda s: s.update(colorSource="pywal"))
+        ok, saw = self.shows("#1e2a4a", surface("#1e2a4a"))
+        self.grab("05-colours-pywal")
+        self.c.add("pywal's colors.json in $XDG_CACHE_HOME/wal colours the window", ok, saw)
+        pywal_file("#4a1e2a")
+        ok, saw = self.shows("#4a1e2a", surface("#4a1e2a"))
+        self.grab("06-colours-pywal-changed")
+        self.c.add("A change of pywal's colors.json shows while it runs", ok, saw)
+        tokens = {"surface": "#24302e", "surface-2": "#2e3b39", "surface-3": "#394745", "border": "#4a5856",
+                  "text": "#e0f0ec", "text-muted": "#a8bab6", "accent": "#5fd4bd", "accent-text": "#00382f"}
+        with open(os.path.join(os.path.dirname(self.settings), "matugen.json"), "w") as f:
+            json.dump({"dark": dict(tokens, bg="#12332d"), "light": dict(tokens, bg="#f0fbf8", text="#10201c")}, f)
+        edit_settings(self.settings, lambda s: s.update(colorSource="matugen", theme="mix"))
+        ok, saw = self.shows("#12332d", tokens["surface"])
+        self.grab("07-colours-matugen")
+        self.c.add("matugen.json in the data folder colours the window", ok, saw)
+        edit_settings(self.settings, lambda s: s.update(colorSource=""))
+        self.shows(self.base)
+        with open(os.path.join(self.profile, "logs", "mixmusic.log")) as f:
+            polled = "looking at it every" in f.read()
+        self.c.add("settings.json was never watched by polling", not polled,
+                   "the fallback was logged" if polled else "no fallback logged")
+
+    def playback(self):
+        """The media keys: a press of the keyboard's play key, which MixMusic
+        grabs on X11, plays the queue it kept: the track, downloaded. The
+        MPRIS player comes once something plays."""
+        run("xdotool", "key", "XF86AudioPlay")
+        came = until(lambda: has_owner(MPRIS), 20)
+        playing = came and until(lambda: status() == "Playing", 10)
+        if self.c.add("The keyboard's play key plays, and MPRIS's player comes", playing,
+                      f"{MPRIS} {'on the bus' if came else 'not on the bus in 20 s'}, {status() if came else ''}"):
+            return True
+        if not came:
+            # Space plays too, from the window: the MPRIS checks still run.
+            run("xdotool", "windowfocus", "--sync", self.wid, timeout=10)
+            run("xdotool", "key", "space")
+            came = until(lambda: has_owner(MPRIS), 20)
+        return came
+
+    def mpris(self):
+        """MPRIS's player, as a desktop reads it, the cover's file (#196),
+        and the track's sound."""
+        c = self.c
+        xml = call(MPRIS, MPRIS_PATH, "org.freedesktop.DBus.Introspectable", "Introspect")[0]
+        with open(os.path.join(self.out, "mpris-introspect.xml"), "w") as f:
+            f.write(xml)
+        c.add("MPRIS's player introspects, with its two interfaces",
+              'interface name="org.mpris.MediaPlayer2"' in xml and f'interface name="{PLAYER}"' in xml,
+              f"{len(xml)} bytes")
+        root = get_all(MPRIS, MPRIS_PATH, "org.mpris.MediaPlayer2")
+        c.add("MPRIS names MixMusic", root.get("Identity") == "MixMusic" and root.get("DesktopEntry") == "mixmusic",
+              f"Identity {root.get('Identity')}, DesktopEntry {root.get('DesktopEntry')}, "
+              f"CanRaise {root.get('CanRaise')}, CanQuit {root.get('CanQuit')}")
+        art = until(lambda: get_all(MPRIS, MPRIS_PATH, PLAYER)["Metadata"].get("mpris:artUrl"), 30)
+        player = get_all(MPRIS, MPRIS_PATH, PLAYER)
+        save_json(self.out, "mpris.json", {"org.mpris.MediaPlayer2": root, PLAYER: player})
+        meta = player["Metadata"]
+        c.add("MPRIS shows the track", meta.get("xesam:title") == TITLE and meta.get("xesam:artist") == [ARTIST]
+              and meta.get("mpris:length", 0) > 0,
+              f"{meta.get('xesam:title')} by {meta.get('xesam:artist')}, {meta.get('mpris:length', 0) / 1e6:.0f} s")
+        folder = os.path.join(self.profile, "cache", "now-playing")
+        path = GLib.filename_from_uri(art)[0] if art and art.startswith("file://") else ""
+        kept = open(path, "rb").read() if path.startswith(folder + os.sep) and os.path.isfile(path) else None
+        in_store = kept is not None and kept in stored(os.path.join(self.profile, "cache", "artwork"))
+        c.add("MPRIS's cover is a file of the cache's now-playing folder, byte for byte the artwork store's (#196)",
+              kept == self.cover and in_store,
+              f"{art or 'no mpris:artUrl in 30 s'}: " + (
+                  "not in now-playing" if kept is None else
+                  f"{len(kept)} bytes, {'the' if kept == self.cover else 'not the'} cover's, "
+                  f"{'as' if in_store else 'not as'} the store keeps it"))
+        level, hz = listen(self.source) if self.source else (-math.inf, 0)
+        c.add("The track sounds from the sound server", level > -60 and abs(hz - TONE_HZ) < 15,
+              f"{level:.1f} dBFS at {hz:.0f} Hz" if self.source else "no sound server")
+        p1 = get(MPRIS, MPRIS_PATH, PLAYER, "Position")
+        time.sleep(1)
+        p2 = get(MPRIS, MPRIS_PATH, PLAYER, "Position")
+        c.add("MPRIS's position moves on as it plays", p1 is not None and p2 is not None and p2 > p1,
+              f"{(p1 or 0) / 1e6:.2f} s, then {(p2 or 0) / 1e6:.2f} s")
+        self.grab("08-playing")
+
+    def controls(self):
+        """The desktop's controls, through MPRIS, and the window's title."""
+        c = self.c
+        call(MPRIS, MPRIS_PATH, PLAYER, "PlayPause")
+        paused = until(lambda: status() == "Paused", 5)
+        level, _ = listen(self.source) if self.source else (-math.inf, 0)
+        c.add("MPRIS's PlayPause pauses, and the sound stops", paused and level < -70, f"{status()}, {level:.1f} dBFS")
+        before = status()
+        call(MPRIS, MPRIS_PATH, PLAYER, "PlayPause")
+        c.add("MPRIS's PlayPause plays again", before == "Paused" and until(lambda: status() == "Playing", 5),
+              f"{before} → {status()}")
+        call(MPRIS, MPRIS_PATH, PLAYER, "Seek", GLib.Variant("(x)", (120_000_000,)))
+        moved = until(lambda: (get(MPRIS, MPRIS_PATH, PLAYER, "Position") or 0) > 115_000_000, 5)
+        c.add("MPRIS's Seek moves on 2 minutes", moved,
+              f"at {(get(MPRIS, MPRIS_PATH, PLAYER, 'Position') or 0) / 1e6:.1f} s")
+        title = run("xdotool", "getwindowname", self.wid).stdout.strip()
+        c.add("The window's title names what plays", TITLE in title, title)
+
+    def global_shortcut(self):
+        """A global shortcut of the settings (#80), on X11, with another
+        window in front."""
+        edit_settings(self.settings, lambda s: s.update(globalShortcuts={"player.toggle": "Mod+Alt+P"}))
+        time.sleep(2)
+        other = subprocess.Popen(["xmessage", "-geometry", "+0+0", "Another window in front"])
+        front = until(lambda: run("xdotool", "search", "--onlyvisible", "--classname", "xmessage").stdout.split(), 10)
+        if front:
+            run("xdotool", "windowfocus", "--sync", front[0], timeout=10)
+        focused = run("xdotool", "getwindowfocus").stdout.strip()
+        before = status()
+        run("xdotool", "key", "ctrl+alt+p")
+        in_front = bool(front) and focused == front[0]
+        self.c.add("A global shortcut of settings.json pauses with another window in front (X11)",
+                   in_front and before == "Playing" and until(lambda: status() == "Paused", 5),
+                   f"{before} → {status()}, with {'xmessage' if in_front else 'window ' + focused} focused")
+        other.kill()
+
+    def tray_menu(self):
+        """The tray menu's Play / Pause, as a panel clicks it, once the
+        player takes a toggle again: it takes one in 400 ms
+        (toggleDebounce); and its Mini player."""
+        if not self.tray or any(label not in self.tray["labels"] for label in ["Play / Pause", "Mini player"]):
+            return
+        time.sleep(1)
+        before = status()
+        self.click("Play / Pause")
+        self.c.add("The tray menu's Play / Pause plays",
+                   before == "Paused" and until(lambda: status() == "Playing", 5), f"{before} → {status()}")
+        tip = get(self.tray["bus"], self.tray["path"], ITEM, "Title") or ""
+        self.c.add("The tray item's title names what plays", TITLE in tip, tip)
+        self.click("Mini player")
+        mini = until(lambda: [w for w in windows(self.app.pid) if w[0] != self.wid], 10)
+        if mini:
+            time.sleep(2)
+            self.display.grab(tuple(mini[0][1:]), "09-mini-player")
+        self.c.add("The tray menu's Mini player opens it", mini,
+                   f"{mini[0][3]}x{mini[0][4]} window" if mini else "no second window in 10 s")
+
+    def quit(self):
+        """The tray menu's Quit quits: MPRIS's player can't (CanQuit)."""
+        labels = (self.tray or {}).get("labels", {})
+        quit_label = next((label for label in labels if label.startswith("Quit")), "")
+        if quit_label:
+            self.click(quit_label)
+        try:
+            code = self.app.wait(20)
+        except subprocess.TimeoutExpired:
+            code = "still running after 20 s"
+        self.c.add("The tray menu's Quit quits MixMusic", code == 0, f"exit {code}")
+        crash = os.path.join(self.profile, "logs", "crash.log")
+        size = os.path.getsize(crash) if os.path.exists(crash) else 0
+        self.c.add("No crash was logged", size == 0, f"crash.log {size} bytes")
+
+    def check(self):
+        if not self.window():
+            return
+        self.libraries()
+        self.tray_icon()
+        self.zoom_keys()
+        self.settings_file()
+        self.colour_files()
+        if self.playback():
+            self.mpris()
+            self.controls()
+            self.global_shortcut()
+            self.tray_menu()
+        self.quit()
+
+    def close(self):
+        if self.app.poll() is None:
+            self.app.send_signal(signal.SIGTERM)
+            try:
+                self.app.wait(10)
+            except subprocess.TimeoutExpired:
+                self.app.kill()
+        self.log.close()
+        for name in ["mixmusic.log", "crash.log"]:
+            path = os.path.join(self.profile, "logs", name)
+            if os.path.exists(path):
+                shutil.copy(path, os.path.join(self.out, name))
+        if os.path.exists(self.settings):
+            shutil.copy(self.settings, os.path.join(self.out, "settings.json"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--libs", choices=["nix", "system"], default="system")
@@ -480,7 +833,6 @@ def main():
     global bus
     out = os.path.abspath(args.out)
     os.makedirs(out, exist_ok=True)
-    mixmusic = os.path.abspath(args.mixmusic)
     c = Checks(out)
     work = os.path.join(out, "work")
     os.makedirs(work, exist_ok=True)
@@ -490,319 +842,29 @@ def main():
 
     capture = os.path.join(work, "capture-profile")
     make_profile(capture, tone, COVER)
-    capture_run(c, mixmusic, capture, out)
+    capture_run(c, os.path.abspath(args.mixmusic), capture, out)
 
     # The stand-in for the panel's tray, before MixMusic starts, as on a
     # desktop.
     items_file = os.path.join(out, "tray-items.json")
-    watcher_proc = subprocess.Popen([sys.executable, os.path.abspath(__file__), "--watcher", items_file, "-", "-"])
+    helpers = [subprocess.Popen([sys.executable, os.path.abspath(__file__), "--watcher", items_file, "-", "-"])]
     until(lambda: has_owner(WATCHER), 10)
     # An idle null sink wakes every 2 seconds, and starts a new stream at
     # its next waking: silence played at a low latency keeps it awake, as
     # in ci.yml's audio job.
-    source = monitor()
-    keep_awake = subprocess.Popen(["pacat", "--latency-msec=10", "--format=s16le", "--rate=48000", "--channels=2",
-                                   "/dev/zero"]) if source else None
-
-    profile = os.path.join(work, "profile")
-    settings = make_profile(profile, tone, COVER)
-    pywal = os.path.join(work, "xdg-cache", "wal", "colors.json")
-    display = Display(out)
-    started = time.monotonic()
-    app_log = open(os.path.join(out, "mixmusic-stderr.log"), "w")
-    app = subprocess.Popen([mixmusic], env=app_env(profile, {"XDG_CACHE_HOME": os.path.join(work, "xdg-cache")}),
-                           stdout=app_log, stderr=subprocess.STDOUT)
+    if monitor():
+        helpers.append(subprocess.Popen(["pacat", "--latency-msec=10", "--format=s16le", "--rate=48000",
+                                         "--channels=2", "/dev/zero"]))
+    s = Session(c, args, out, work, tone, cover)
     try:
-        check_app(c, args, app, started, display, settings, profile, pywal, items_file, source, cover, out)
+        s.check()
     finally:
-        if app.poll() is None:
-            app.send_signal(signal.SIGTERM)
-            try:
-                app.wait(10)
-            except subprocess.TimeoutExpired:
-                app.kill()
-        for p in [watcher_proc, keep_awake]:
-            if p:
-                p.kill()
-        app_log.close()
-        for name in ["mixmusic.log", "crash.log"]:
-            path = os.path.join(profile, "logs", name)
-            if os.path.exists(path):
-                shutil.copy(path, os.path.join(out, name))
-        if os.path.exists(settings):
-            shutil.copy(settings, os.path.join(out, "settings.json"))
+        s.close()
+        for p in helpers:
+            p.kill()
         shutil.rmtree(work, ignore_errors=True)
     ok = c.save(f"MixMusic on Linux ({args.libs} libraries)")
     sys.exit(0 if ok else 1)
-
-
-def check_app(c, args, app, started, display, settings, profile, pywal, items_file, source, cover, out):
-    # It starts, and shows its window.
-    found = until(lambda: app.poll() is not None or windows(app.pid), 90)
-    if not c.add("MixMusic starts and shows its window", app.poll() is None and found,
-                 f"in {time.monotonic() - started:.1f} s" if found and app.poll() is None
-                 else f"exited with {app.poll()}" if app.poll() is not None else "no window in 90 s"):
-        return
-    time.sleep(5)  # its first frames
-    wid, *region = windows(app.pid)[0]
-    region = tuple(region)
-    ok, saw = drawn(*display.grab(region, "01-window"))
-    c.add("The window on the display is drawn", ok, f"{region[2]}x{region[3]}, {saw}")
-
-    # Its libraries: the system's for the release build, the Nix store's
-    # for the Nix build.
-    libs = libraries(app.pid)
-    save_json(out, "libraries.json", libs)
-    gtk = next((p for n, p in libs.items() if n.startswith("libgtk-3.so")), "")
-    loader = next((p for n, p in libs.items() if n.startswith("ld-linux")), "")
-    want_nix = args.libs == "nix"
-    c.add(f"GTK and the loader are the {'Nix store' if want_nix else 'system'}'s",
-          gtk and loader and gtk.startswith("/nix/store/") == want_nix and loader.startswith("/nix/store/") == want_nix,
-          f"{gtk or 'no GTK'}, {loader or 'no loader'}")
-
-    # The tray icon, which libayatana-appindicator registers with the
-    # desktop's StatusNotifierWatcher.
-    def tray_item():
-        try:
-            with open(items_file) as f:
-                return json.load(f)[-1]
-        except (OSError, ValueError, IndexError):
-            return None
-    item = until(tray_item, 30)
-    tray = None
-    if c.add("The tray icon registers with the desktop's StatusNotifierWatcher", item,
-             f"{item['bus']} {item['path']}" if item else "no item in 30 s"):
-        tray = item
-        props = get_all(item["bus"], item["path"], ITEM)
-        save_json(out, "tray-item.json", props)
-        icon = os.path.join(props.get("IconThemePath", ""), props.get("IconName", "") + ".png")
-        with open(os.path.join(os.path.dirname(__file__), "..", "..", "resources", "tray.png"), "rb") as f:
-            same = os.path.isfile(icon) and open(icon, "rb").read() == f.read()
-        c.add("The tray item is active, with MixMusic's icon", props.get("Status") == "Active" and same,
-              f"Status {props.get('Status')}, icon {icon}{' = resources/tray.png' if same else ' differs or is missing'}")
-        layout = call(item["bus"], props["Menu"], MENU, "GetLayout", GLib.Variant("(iias)", (0, -1, [])))[1]
-        save_json(out, "tray-menu.json", layout)
-        labels = {}
-
-        def walk(node):
-            node_id, node_props, children = node
-            if node_props.get("label"):
-                labels[node_props["label"].replace("_", "")] = node_id
-            for child in children:
-                walk(child)
-        walk(layout)
-        tray = dict(item, menu=props["Menu"], labels=labels)
-        missing = [t for t in TRAY_ITEMS if t not in labels]
-        quit_item = any(label.startswith("Quit") for label in labels)
-        c.add("The tray menu has the player's commands and Quit", not missing and quit_item,
-              ", ".join(labels) + (f"; missing {', '.join(missing)}" if missing else ""))
-
-    # settings.json, which MixMusic writes at its start and watches.
-    until(lambda: read_settings(settings), 20)
-    pid = app.pid
-    watched = inotify_inodes(pid)
-    folder = os.stat(os.path.dirname(settings)).st_ino
-    c.add("settings.json is watched through inotify", folder in watched or os.stat(settings).st_ino in watched,
-          f"{len(watched)} inotify watches, the data folder's inode {folder} "
-          + ("among them" if folder in watched else "not among them"))
-
-    # The zoom keys in the window, which the GTK handler of #251 takes for
-    # the keypad's +: read back from settings.json, which MixMusic saves.
-    run("xdotool", "windowfocus", "--sync", wid, timeout=10)
-    zoom = lambda: (read_settings(settings) or {}).get("zoom")  # noqa: E731
-    for i, (keys, want) in enumerate([("ctrl+KP_Add", 1.1), ("ctrl+equal", 1.25), ("ctrl+KP_Subtract", 1.1),
-                                      ("ctrl+minus", 1.0), ("ctrl+KP_Add", 1.1), ("ctrl+0", 1.0)]):
-        before = zoom()
-        run("xdotool", "key", keys)
-        got = until(lambda: zoom() if zoom() == want else None, 5) or zoom()
-        display.grab(region, f"02-zoom-{i + 1}-{keys.replace('+', '-')}")
-        c.add(f"{keys.replace('ctrl+', 'Ctrl+')} zooms to {want:.0%}", got == want, f"zoom {before} → {got}")
-
-    # settings.json edited while MixMusic runs (#81): the theme, written
-    # over the file, and the zoom, in place. Most of the window is the
-    # colours' bg, or their surface, which the panel and the cards wear.
-    def shows(*want, timeout=10):
-        seen = []
-
-        def look():
-            colour, share = dominant(*display.grab(region))
-            seen.append(colour)
-            return any(near(colour, w) for w in want)
-        t = time.monotonic()
-        ok = until(look, timeout, every=0.3)
-        return ok, (f"{seen[-1] if seen else 'nothing'} on most of the window, after {time.monotonic() - t:.1f} s"
-                    f" (bg or surface: {' or '.join(want)})")
-
-    base, _ = dominant(*display.grab(region))
-    edit_settings(settings, lambda s: s.update(theme="daylight", followSystem=False))
-    ok, saw = shows("#ffffff", "#f6f6f6")  # builtin/themes/daylight
-    display.grab(region, "03-settings-theme-daylight")
-    c.add("settings.json's theme, changed while it runs, shows", ok, f"from {base}: {saw}")
-    before = display.grab(region)[2]
-    edit_settings(settings, lambda s: s.update(zoom=1.5), in_place=True)
-    time.sleep(2)
-    w, h, after = display.grab(region, "04-settings-zoom-150")
-    changed = sum(1 for i in range(0, len(after), 3 * 97) if after[i:i + 3] != before[i:i + 3]) / (len(after) / (3 * 97))
-    c.add("settings.json's zoom, changed in place while it runs, shows",
-          changed > 0.05 and (read_settings(settings) or {}).get("zoom") == 1.5, f"{changed:.0%} of the window changed")
-    edit_settings(settings, lambda s: s.update(zoom=1))
-
-    # Colour files (#74): pywal's colors.json, where pywal writes it under
-    # XDG_CACHE_HOME, followed as it changes, and matugen's, in the data
-    # folder.
-    foreground = "#e8e4f0"
-
-    def pywal_file(background):
-        os.makedirs(os.path.dirname(pywal), exist_ok=True)
-        palette = {f"color{i}": v for i, v in enumerate(
-            [background, "#c94f6d", "#81b29a", "#dbc074", "#719cd6", "#9d79d6", "#63cdcf", "#dfdfe0"] * 2)}
-        with open(pywal + ".tmp", "w") as f:
-            json.dump({"wallpaper": "/tmp/wall.png", "alpha": "100",
-                       "special": {"background": background, "foreground": foreground, "cursor": foreground},
-                       "colors": palette}, f, indent=2)
-        os.replace(pywal + ".tmp", pywal)
-
-    def surface(bg):
-        # pywal's surface, 4.5% of the way to its foreground (pywalTokens).
-        return "#" + "".join(f"{round(int(bg[i:i + 2], 16) * 0.955 + int(foreground[i:i + 2], 16) * 0.045):02x}"
-                             for i in (1, 3, 5))
-    pywal_file("#1e2a4a")
-    edit_settings(settings, lambda s: s.update(colorSource="pywal"))
-    ok, saw = shows("#1e2a4a", surface("#1e2a4a"))
-    display.grab(region, "05-colours-pywal")
-    c.add("pywal's colors.json in $XDG_CACHE_HOME/wal colours the window", ok, saw)
-    pywal_file("#4a1e2a")
-    ok, saw = shows("#4a1e2a", surface("#4a1e2a"))
-    display.grab(region, "06-colours-pywal-changed")
-    c.add("A change of pywal's colors.json shows while it runs", ok, saw)
-    matugen = os.path.join(os.path.dirname(settings), "matugen.json")
-    tokens = {"surface": "#24302e", "surface-2": "#2e3b39", "surface-3": "#394745", "border": "#4a5856",
-              "text": "#e0f0ec", "text-muted": "#a8bab6", "accent": "#5fd4bd", "accent-text": "#00382f"}
-    with open(matugen, "w") as f:
-        json.dump({"dark": dict(tokens, bg="#12332d"), "light": dict(tokens, bg="#f0fbf8", text="#10201c")}, f)
-    edit_settings(settings, lambda s: s.update(colorSource="matugen", theme="mix"))
-    ok, saw = shows("#12332d", tokens["surface"])
-    display.grab(region, "07-colours-matugen")
-    c.add("matugen.json in the data folder colours the window", ok, saw)
-    edit_settings(settings, lambda s: s.update(colorSource=""))
-    shows(base)
-    c.add("settings.json was never watched by polling",
-          "looking at it every" not in open(os.path.join(profile, "logs", "mixmusic.log")).read(), "no fallback logged")
-
-    # The media keys: a press of the keyboard's play key, which MixMusic
-    # grabs on X11, plays the queue it kept: the track, downloaded. The
-    # MPRIS player comes once something plays.
-    run("xdotool", "key", "XF86AudioPlay")
-    came = until(lambda: has_owner(MPRIS), 20)
-    playing = came and until(lambda: status() == "Playing", 10)
-    if not c.add("The keyboard's play key plays, and MPRIS's player comes", playing,
-                 f"{MPRIS} {'on the bus' if came else 'not on the bus in 20 s'}, {status() if came else ''}"):
-        if not came:
-            # Space plays too, from the window: the MPRIS checks still run.
-            run("xdotool", "windowfocus", "--sync", wid, timeout=10)
-            run("xdotool", "key", "space")
-            if not until(lambda: has_owner(MPRIS), 20):
-                return
-    xml = call(MPRIS, MPRIS_PATH, "org.freedesktop.DBus.Introspectable", "Introspect")[0]
-    with open(os.path.join(out, "mpris-introspect.xml"), "w") as f:
-        f.write(xml)
-    c.add("MPRIS's player introspects, with its two interfaces",
-          'interface name="org.mpris.MediaPlayer2"' in xml and f'interface name="{PLAYER}"' in xml, f"{len(xml)} bytes")
-    root = get_all(MPRIS, MPRIS_PATH, "org.mpris.MediaPlayer2")
-    c.add("MPRIS names MixMusic", root.get("Identity") == "MixMusic" and root.get("DesktopEntry") == "mixmusic",
-          f"Identity {root.get('Identity')}, DesktopEntry {root.get('DesktopEntry')}, CanRaise {root.get('CanRaise')}, "
-          f"CanQuit {root.get('CanQuit')}")
-    art = until(lambda: get_all(MPRIS, MPRIS_PATH, PLAYER)["Metadata"].get("mpris:artUrl"), 30)
-    player = get_all(MPRIS, MPRIS_PATH, PLAYER)
-    save_json(out, "mpris.json", {"org.mpris.MediaPlayer2": root, PLAYER: player})
-    meta = player["Metadata"]
-    c.add("MPRIS shows the track", meta.get("xesam:title") == TITLE and meta.get("xesam:artist") == [ARTIST]
-          and meta.get("mpris:length", 0) > 0, f"{meta.get('xesam:title')} by {meta.get('xesam:artist')}, "
-          f"{meta.get('mpris:length', 0) / 1e6:.0f} s")
-    cover_dir = os.path.join(profile, "cache", "now-playing")
-    path = GLib.filename_from_uri(art)[0] if art and art.startswith("file://") else ""
-    kept = open(path, "rb").read() if path.startswith(cover_dir + os.sep) and os.path.isfile(path) else None
-    in_store = kept is not None and kept in stored(os.path.join(profile, "cache", "artwork"))
-    c.add("MPRIS's cover is a file of the cache's now-playing folder, byte for byte the artwork store's (#196)",
-          kept == cover and in_store,
-          f"{art or 'no mpris:artUrl in 30 s'}: " + (
-              "not in now-playing" if kept is None else
-              f"{len(kept)} bytes, {'the' if kept == cover else 'not the'} cover's, "
-              f"{'as' if in_store else 'not as'} the store keeps it"))
-    level, hz = listen(source) if source else (-math.inf, 0)
-    c.add("The track sounds from the sound server", level > -60 and abs(hz - TONE_HZ) < 15,
-          f"{level:.1f} dBFS at {hz:.0f} Hz" if source else "no sound server")
-    p1 = get(MPRIS, MPRIS_PATH, PLAYER, "Position")
-    time.sleep(1)
-    p2 = get(MPRIS, MPRIS_PATH, PLAYER, "Position")
-    c.add("MPRIS's position moves on as it plays", p1 is not None and p2 is not None and p2 > p1,
-          f"{(p1 or 0) / 1e6:.2f} s, then {(p2 or 0) / 1e6:.2f} s")
-    display.grab(region, "08-playing")
-
-    # The desktop's controls, through MPRIS.
-    call(MPRIS, MPRIS_PATH, PLAYER, "PlayPause")
-    paused = until(lambda: status() == "Paused", 5)
-    level, _ = listen(source) if source else (-math.inf, 0)
-    c.add("MPRIS's PlayPause pauses, and the sound stops", paused and level < -70,
-          f"{status()}, {level:.1f} dBFS")
-    call(MPRIS, MPRIS_PATH, PLAYER, "PlayPause")
-    c.add("MPRIS's PlayPause plays again", until(lambda: status() == "Playing", 5), status())
-    call(MPRIS, MPRIS_PATH, PLAYER, "Seek", GLib.Variant("(x)", (120_000_000,)))
-    moved = until(lambda: (get(MPRIS, MPRIS_PATH, PLAYER, "Position") or 0) > 115_000_000, 5)
-    c.add("MPRIS's Seek moves on 2 minutes", moved, f"at {(get(MPRIS, MPRIS_PATH, PLAYER, 'Position') or 0) / 1e6:.1f} s")
-    c.add("The window's title names what plays", TITLE in run("xdotool", "getwindowname", wid).stdout,
-          run("xdotool", "getwindowname", wid).stdout.strip())
-
-    # A global shortcut of the settings (#80), on X11, with another window
-    # in front.
-    edit_settings(settings, lambda s: s.update(globalShortcuts={"player.toggle": "Mod+Alt+P"}))
-    time.sleep(2)
-    other = subprocess.Popen(["xmessage", "-geometry", "+0+0", "Another window in front"])
-    front = until(lambda: run("xdotool", "search", "--onlyvisible", "--classname", "xmessage").stdout.split(), 10)
-    if front:
-        run("xdotool", "windowfocus", "--sync", front[0], timeout=10)
-    focused = run("xdotool", "getwindowfocus").stdout.strip()
-    run("xdotool", "key", "ctrl+alt+p")
-    in_front = bool(front) and focused == front[0]
-    c.add("A global shortcut of settings.json pauses with another window in front (X11)",
-          in_front and until(lambda: status() == "Paused", 5),
-          f"{status()}, with {'xmessage' if in_front else 'window ' + focused} focused")
-    other.kill()
-
-    def click(label):
-        call(tray["bus"], tray["menu"], MENU, "Event",
-             GLib.Variant("(isvu)", (tray["labels"][label], "clicked", GLib.Variant("i", 0), 0)))
-
-    # The tray menu's Play / Pause, as a panel clicks it, once the player
-    # takes a toggle again: it takes one in 400 ms (toggleDebounce).
-    if tray and "Play / Pause" in tray["labels"]:
-        time.sleep(1)
-        click("Play / Pause")
-        c.add("The tray menu's Play / Pause plays", until(lambda: status() == "Playing", 5), status())
-        tip = get(tray["bus"], tray["path"], ITEM, "Title") or ""
-        c.add("The tray item's title names what plays", TITLE in tip, tip)
-
-        # Its Mini player opens a window of its own.
-        click("Mini player")
-        mini = until(lambda: [w for w in windows(app.pid) if w[0] != wid], 10)
-        if mini:
-            time.sleep(2)
-            display.grab(tuple(mini[0][1:]), "09-mini-player")
-        c.add("The tray menu's Mini player opens it", mini,
-              f"{mini[0][3]}x{mini[0][4]} window" if mini else "no second window in 10 s")
-
-    # The tray menu's Quit quits: MPRIS's player can't (CanQuit).
-    quit_label = next((label for label in (tray or {}).get("labels", {}) if label.startswith("Quit")), "")
-    if quit_label:
-        click(quit_label)
-    try:
-        code = app.wait(20)
-    except subprocess.TimeoutExpired:
-        code = "still running after 20 s"
-    c.add("The tray menu's Quit quits MixMusic", code == 0, f"exit {code}")
-    crash = os.path.join(profile, "logs", "crash.log")
-    c.add("No crash was logged", not os.path.exists(crash) or os.path.getsize(crash) == 0,
-          f"crash.log {os.path.getsize(crash) if os.path.exists(crash) else 0} bytes")
 
 
 if __name__ == "__main__":

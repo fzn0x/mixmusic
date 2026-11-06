@@ -2,7 +2,9 @@
 <!-- docs: group=make order=20 -->
 
 A plugin adds to MixMusic: a page, a command, an item in the menu of every
-track, a widget on the now playing page. It is a folder holding a manifest
+track, a widget on the
+[now playing page](getting-started.md#up-next-lyrics-and-now-playing). It
+is a folder holding a manifest
 and an ES module, written in TypeScript and compiled to the JavaScript
 MixMusic runs:
 
@@ -216,12 +218,13 @@ api.ui.addTrackAction({
 
 ## Try it
 
-1. In Settings › Plugins, choose **open plugins folder** and put your plugin's
-   folder there, named after its `id`.
+1. In [Settings › Plugins](settings.md#plugins), choose **open plugins
+   folder** and put your plugin's folder there, named after its `id`.
 2. Choose **reload**, then enable it. A plugin that fails to start says why,
    in a notice and in the list; reload tries it again.
 
 ## Share it
 
 [community/README.md](../community/README.md) tells how to add your plugin to
-the community registry, from which everyone can install it.
+the community registry, from which everyone can
+[install it](marketplace.md#install-and-enable-a-plugin).

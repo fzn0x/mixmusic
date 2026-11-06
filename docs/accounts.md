@@ -7,9 +7,10 @@ the sign-in window, a browser's session, brand channels, scrobbling and signing 
 MixMusic needs no account: YouTube Music's search, artists, albums,
 playlists and radios work signed out, as soon as you open it. Sign in for
 your own library and recommendations. All three accounts are in Settings ›
-Accounts, and MixMusic keeps each sign-in in your system's credential
-store (the keyring on Linux): on Windows, one the Credential Manager can't
-keep goes in a file encrypted for your Windows account.
+Accounts, and MixMusic keeps each sign-in in your system's
+[credential store](data-and-privacy.md#sign-ins) (the keyring on Linux): on
+Windows, one the Credential Manager can't keep goes in a file encrypted for
+your Windows account.
 
 ## YouTube Music
 
@@ -100,26 +101,29 @@ the first account until you choose another there.
 | | Signed out | Signed in |
 |---|---|---|
 | Home | YouTube Music's home, as it shows signed out | your own home feed and recommendations |
-| Library | MixMusic's own: liked songs, mixes, podcasts, downloads and history | also Library › YouTube Music: your liked songs, playlists, albums and artists there, in full |
+| Library | [MixMusic's own](library.md): liked songs, mixes, podcasts, downloads and history | also [Library › YouTube Music](library.md#youtube-music-playlists-albums-and-artists): your liked songs, playlists, albums and artists there, in full |
 | Likes and dislikes | kept in MixMusic | kept in MixMusic, and they reach YouTube Music |
 | Albums, playlists, artists | | save albums and playlists, and follow artists, on YouTube Music, from their pages |
 | Playlists | | make playlists on YouTube Music, add tracks of either service to them, take tracks out, and delete the ones you made |
-| Podcasts | | the shows you follow are saved on YouTube Music, and episodes start where you left them on another device |
+| Podcasts | | the shows you follow are saved on YouTube Music, and episodes [start where you left them](podcasts.md#with-youtube-music) on another device |
 | History | | what you play joins your YouTube Music history |
 
-Tracks play the same signed in or out: your session never goes to yt-dlp,
-which finds some tracks' audio. So tracks YouTube keeps for signed-in
-adults, or for a channel's members, don't play either way.
+Tracks play the same signed in or out: your session never goes to
+[yt-dlp](streams.md#when-yt-dlp-is-needed), which finds some tracks' audio.
+So tracks YouTube keeps for signed-in adults, or for a channel's members,
+don't play either way.
 
 ### Your YouTube Music history
 
 **Add what you play to your history**, in Settings › Accounts › YouTube
 Music and on by default, adds the tracks you play to your history on
 YouTube Music, which its home and its radios are made from. A track joins
-it once it played a while, as it does on Last.fm, not as soon as it
-starts. The switch also lets MixMusic tell YouTube Music how far you got
-in an episode, as its own player does, so that YouTube Music on your phone
-goes on from there. Turn it off to keep what you play in MixMusic.
+it once it [played a while](library.md#history-and-recently-played), as it
+does on Last.fm, not as soon as it starts. The switch also lets MixMusic
+tell YouTube Music how far you got in an episode, as its own player does,
+so that YouTube Music on your phone
+[goes on from there](podcasts.md#with-youtube-music). Turn it off to keep
+what you play in MixMusic.
 
 ### When YouTube ends the session
 
@@ -142,14 +146,18 @@ Spotify app of your own. It takes a few minutes, once:
 4. Paste the app's **Client ID** in Settings › Accounts › Spotify, choose
    **sign in to spotify**, and finish in your browser.
 
+![Settings › Accounts › Spotify, signed out: the four steps, with the redirect URI and its copy link, the Client ID box, "32 letters and digits", the sign in to spotify button, and a note on what Spotify's development mode allows](shots/accounts.webp)
+
 [Spotify](spotify.md) walks through each step, says what to do when
 Spotify refuses the sign-in, and explains the three ways Spotify tracks
-play: in MixMusic itself (Premium, on Windows), on Spotify Connect, or from
-their recording on YouTube Music, which needs no Premium.
+play: in MixMusic itself (Premium, on Windows and macOS), on Spotify
+Connect, or from their recording on YouTube Music, which needs no Premium.
 
 Signed in, MixMusic searches Spotify beside YouTube Music, and shows your
-Spotify library in Library › Spotify; likes, saved albums and playlists,
-followed artists and followed shows reach Spotify. Dislikes stay in
+Spotify library in
+[Library › Spotify](library.md#spotify-playlists-albums-and-artists);
+likes, saved albums and playlists, followed artists and followed shows
+reach Spotify. [Dislikes](playing-music.md#dislikes-and-skipping) stay in
 MixMusic, as Spotify takes none.
 
 ## Last.fm
@@ -167,8 +175,9 @@ Last.fm API account of your own:
 Settings › Accounts then says **Scrobbling as** your name, with a switch
 that pauses scrobbling and starts it again. A track counts once half of it
 played, or four minutes, and scrobbles made offline are sent once you're
-back online. Last.fm hears that a live stream plays, but it isn't
-scrobbled, and podcasts' episodes aren't either.
+back online. Last.fm hears that a [live stream](playing-music.md#live-streams)
+plays, but it isn't scrobbled, and [podcasts' episodes](podcasts.md#not-counted)
+aren't either.
 
 When Last.fm no longer accepts the connection, Settings › Accounts says so:
 disconnect, then connect again.
@@ -184,6 +193,6 @@ Each account has its button in Settings › Accounts, which asks first:
   stay on Last.fm.
 
 Signing out deletes the sign-in from your computer. What MixMusic keeps
-itself, your liked songs, mixes and history, stays. The YouTube Music
+itself, your [liked songs, mixes and history](library.md), stays. The YouTube Music
 session is a browser session, which can do with your account what YouTube
 Music can: treat it like a password, and sign out to delete it.

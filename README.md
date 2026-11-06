@@ -86,7 +86,7 @@ both services in one player:
 ### Spotify, three ways
 
 - **In MixMusic itself,** at Spotify's quality, with no Spotify app open
-  (Premium, on Windows).
+  (Premium, on Windows and macOS).
 - **On Spotify Connect:** your Spotify app, your phone or a speaker.
 - **From YouTube Music:** MixMusic plays the Spotify track's recording on
   YouTube Music, which needs no Premium to play.

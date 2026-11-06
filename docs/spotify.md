@@ -24,9 +24,9 @@ an app of your own. It takes two minutes:
    e-mail address of the Spotify account you sign in to MixMusic with, as
    your Spotify account page shows it.
 4. Copy the app's **Client ID**.
-5. In MixMusic, open Settings › Accounts, paste the Client ID and choose
-   **sign in to spotify**. Your browser opens Spotify's sign-in page; once you
-   agree, it sends you back to MixMusic.
+5. In MixMusic, open [Settings › Accounts](accounts.md#spotify), paste the
+   Client ID and choose **sign in to spotify**. Your browser opens Spotify's
+   sign-in page; once you agree, it sends you back to MixMusic.
 
 To let a friend sign in with your app, add their name and Spotify e-mail
 address under **Users Management** too.
@@ -56,11 +56,13 @@ Then choose **sign in to spotify** again, or **sign out** to stop using
 Spotify.
 
 MixMusic never sees your password. It keeps the token Spotify gives it in
-your system's credential store: the Keychain on macOS, the Credential Manager
-on Windows, the Secret Service (GNOME Keyring, KWallet…) on Linux. On Windows,
-where the Credential Manager can't keep it, it is encrypted for your Windows
-account in `spotify-token.dpapi`, in MixMusic's data folder. On Linux without
-a Secret Service, it is in a file only your user can read,
+your system's [credential store](data-and-privacy.md#sign-ins): the
+Keychain on macOS, the Credential Manager on Windows, the Secret Service
+(GNOME Keyring, KWallet…) on Linux. On Windows, where the Credential
+Manager can't keep it, it is encrypted for your Windows account in
+`spotify-token.dpapi`, in MixMusic's
+[data folder](data-and-privacy.md#the-data-folder). On Linux without a
+Secret Service, it is in a file only your user can read,
 `spotify-token.json` in the data folder; once a Secret Service is there, the
 token moves into it and the file goes.
 
@@ -79,9 +81,9 @@ Settings › Playback chooses:
   equalizer and crossfade leave Spotify's audio as it is, as on Spotify
   Connect: use a system-wide equalizer for it, since Spotify
   [notes](https://support.spotify.com/us/article/equalizer/) that its audio
-  settings can't change while another device plays it. The visualizer and
-  the plugins' analyser hear it on Windows 10 build 20348 and later, not
-  yet on macOS.
+  settings can't change while another device plays it. The
+  [visualizer](audio-engine.md#the-visualizer) and the plugins' analyser
+  hear it on Windows 10 build 20348 and later, not yet on macOS.
   Sign-ins made before MixMusic played Spotify itself do not allow it:
   Settings › Playback asks you to sign in again. When Spotify cannot play
   here, MixMusic plays the track from YouTube Music instead, and says why.
@@ -93,10 +95,15 @@ Settings › Playback chooses:
   On Windows, the visualizer and the plugins' analyser hear the Spotify app
   on this computer, as it plays, never recording it; other devices they
   can't hear, and the visualizer shows nothing then.
-- **Here, from YouTube Music.** MixMusic finds the track's recording on YouTube
-  Music and plays it in its own player, with the equalizer, crossfade and the
-  visualizer. It works without Premium. When a match is wrong, choose **Find
-  another YouTube Music match** in the track's menu.
+- **In MixMusic, from YouTube Music.** MixMusic finds the track's recording
+  on YouTube Music and plays it in its own player, with the equalizer,
+  crossfade and the visualizer. It works without Premium. When a match is
+  wrong, choose **Find another YouTube Music match** in the track's menu.
+
+![Settings › Playback › Spotify tracks: In MixMusic, from Spotify, On Spotify Connect and In MixMusic, from YouTube Music, the one chosen, each with a line on what it needs, and a link to sign in to Spotify in accounts](shots/playback.webp)
+
+[How Spotify tracks play](spotify-playback.md), under How it works, tells
+what each way does inside.
 
 ## What Spotify allows apps
 

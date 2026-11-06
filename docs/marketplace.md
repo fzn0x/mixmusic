@@ -12,15 +12,17 @@ MixMusic's repository on GitHub.
 ## Open the marketplace
 
 - **Marketplace** in the sidebar, the store icon;
-- **get more themes** in Settings › Appearance › Theme, or **get plugins**
-  in Settings › Plugins;
-- **Marketplace** in the command palette (<kbd>Ctrl</kbd> <kbd>K</kbd>,
-  <kbd>⌘</kbd> <kbd>K</kbd> on macOS).
+- **get more themes** in [Settings › Appearance](look-and-feel.md#themes) ›
+  Theme, or **get plugins** in [Settings › Plugins](settings.md#plugins);
+- **Marketplace** in the [command palette](settings.md#the-command-palette)
+  (<kbd>Ctrl</kbd> <kbd>K</kbd>, <kbd>⌘</kbd> <kbd>K</kbd> on macOS).
 
 Its two pivots, **themes** and **plugins**, say how many of each there
 are. Each add-on has a card: a preview (a theme's own ground and tile
 colours, or its picture), its name, version and author, what it is in one
 sentence, and for a plugin, what it asks for.
+
+![The marketplace's themes: the Themes and Plugins pivots, "Made by the community, reviewed in the open", and the cards of Neon Nights and Paper Mint, each with its tile colours, its version and author, a line on what it is, and Install](shots/marketplace.webp)
 
 The marketplace reads the community registry from GitHub when you open it,
 and keeps it for ten minutes. Refresh the page (<kbd>F5</kbd>,
@@ -30,13 +32,16 @@ and keeps it for ten minutes. Refresh the page (<kbd>F5</kbd>,
 
 Choose **install** on its card. Once it's installed, a toast says so, with
 **use it**, which wears the theme; the card has **use it** too, while you
-wear another theme. An installed theme joins the theme cards of Settings ›
-Appearance, and works with every layout and option there.
+wear another theme. An installed theme joins the
+[theme cards](look-and-feel.md#themes) of Settings › Appearance, and works
+with every [layout](look-and-feel.md#layouts) and option there.
 
 While your themes follow the computer's light or dark mode, "use it" makes
 it the theme of the mode the computer is in now.
 
 ## Install and enable a plugin
+
+![The marketplace's plugins: the cards of Sleep Timer and Spectrum, each with its version and author, a line on what it does, what it asks for, as "Asks for playback, storage", and Install](shots/plugin.webp)
 
 1. Choose **install** on the plugin's card. MixMusic asks first:
 
@@ -60,7 +65,7 @@ author moves it to the plugin API of MixMusic's own interface.
 ## What a plugin can do
 
 A plugin runs in a JavaScript engine of MixMusic's own, inside MixMusic,
-not in a browser. Through the plugin API, it can:
+not in a browser. Through the [plugin API](plugins.md#the-api), it can:
 
 - add **pages**, with an item of their own in the sidebar;
 - add **commands** to the command palette, with keys you can change in
@@ -78,6 +83,10 @@ not in a browser. Through the plugin API, it can:
 
 What it draws, it draws in your theme's colours and type. Everything it
 added goes when you turn it off.
+[How MixMusic works](how-it-works.md#themes-plugins-and-the-marketplace)
+tells how plugins run, and
+[the add-ons' part of the architecture](architecture/addons.md) shows the
+code.
 
 ### What it asks for
 
@@ -100,8 +109,9 @@ marketplace.
 
 - When the marketplace has a newer version of an add-on you have, its card
   says **update to** and the version.
-- **remove**, on a card, removes the add-on. If it was your theme, Mix
-  takes its place; a plugin stops first.
+- **remove**, on a card, removes the add-on. If it was your theme,
+  [Mix](look-and-feel.md#the-built-in-themes) takes its place; a plugin
+  stops first.
 - In Settings › Plugins, the trash button beside a plugin removes it, after
   asking.
   The plugin and its files are deleted; what it stored stays.
@@ -110,11 +120,13 @@ marketplace.
 ## Reload add-ons
 
 **Reload add-ons**, in the command palette, finds the themes and plugins
-in your add-ons folders again, reads your colour file again, and starts
+in your add-ons folders again, reads your
+[colour file](look-and-feel.md#colours-from-a-file) again, and starts
 again the plugins that failed. **reload** in Settings › Plugins does the
 same. Run it after you put an add-on in a folder yourself, or change one.
 
-The folders are in MixMusic's data folder, `addons/themes` and
+The folders are in MixMusic's
+[data folder](data-and-privacy.md#the-data-folder), `addons/themes` and
 `addons/plugins`: **open themes folder** in Settings › Appearance › Theme
 and **open plugins folder** in Settings › Plugins open them.
 

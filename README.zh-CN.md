@@ -66,7 +66,7 @@
 
 ### Spotify 的三种播放方式
 
-- **直接在 MixMusic 里播放**：音质与 Spotify 相同，无需打开 Spotify 应用（需要 Premium，仅限 Windows）。
+- **直接在 MixMusic 里播放**：音质与 Spotify 相同，无需打开 Spotify 应用（需要 Premium，仅限 Windows 和 macOS）。
 - **通过 Spotify Connect 播放**：在你的 Spotify 应用、手机或音箱上播放。
 - **通过 YouTube Music 播放**：MixMusic 播放这首 Spotify 歌曲在 YouTube Music 上的同一录音，不需要 Premium 也能播放。
 

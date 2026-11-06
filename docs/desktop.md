@@ -4,9 +4,9 @@
 MixMusic on your desktop: the mini player, the MacBook notch player, the tray,
 media keys and media controls, global shortcuts, notifications and Discord.
 
-Most of what this page covers is in Settings › Desktop, and the global
-shortcuts are in Settings › Shortcuts. All of it works on Windows, macOS
-and Linux unless a section says otherwise.
+Most of what this page covers is in [Settings › Desktop](settings.md#desktop),
+and the global shortcuts are in [Settings › Shortcuts](settings.md#shortcuts).
+All of it works on Windows, macOS and Linux unless a section says otherwise.
 
 ## The mini player
 
@@ -23,7 +23,8 @@ and the time and the length ("live" for a live stream), with a line of the
 accent along its foot for the progress. Its buttons:
 
 - previous, play or pause, and next;
-- the heart, which likes what plays, and the thumbs-down, which dislikes it;
+- the heart, which [likes](library.md#liked-songs) what plays, and the
+  thumbs-down, which [dislikes](playing-music.md#dislikes-and-skipping) it;
 - the volume: a click mutes and unmutes, the mouse wheel over it turns the
   volume up and down, and a small slider shows above it while the pointer
   is over it. <kbd>Tab</kbd> reaches the button and then the slider, whose
@@ -31,12 +32,15 @@ accent along its foot for the progress. Its buttons:
 - at the top right, one button that opens MixMusic's main window and one
   that closes the mini player.
 
+![The mini player playing アイドル by YOASOBI: the cover on the left, the title, the artist with the mark of YouTube Music, 0:17 of 3:33, previous, pause and next, the heart, the thumbs-down and the volume, and at the top right the buttons that open the main window and close the mini player](shots/mini-player.webp)
+
 Drag the mini player anywhere but its buttons to move it, and drag its
 edges to resize it: the cover takes its height, and grows up to 180 px at
 100% zoom. It opens where you left it. A right click opens a menu of
-speeds for what plays. The mini player takes no keyboard shortcuts but the
-zoom's. It zooms with the main window, and its window grows and shrinks
-with it.
+[speeds](playing-music.md#speed) for what plays. The mini player takes no
+keyboard shortcuts but the zoom's. It
+[zooms](look-and-feel.md#density-text-size-and-zoom) with the main window,
+and its window grows and shrinks with it.
 
 ## The player around the notch
 
@@ -45,10 +49,12 @@ camera while a track is loaded: the cover on the left, and bars that move
 while it plays on the right.
 
 - **Click either side** for a panel that grows down from the notch, with
-  the player, the progress bar, and the line of the lyrics sung now, with
-  the lines before and after it. For a podcast's episode, it shows the
-  chapter that plays instead. The panel shows the lyrics in Latin letters
-  when the lyrics panel does.
+  the player, the progress bar, and the line of the [lyrics](lyrics.md)
+  sung now, with the lines before and after it. For a podcast's episode,
+  it shows the [chapter](podcasts.md#episode-details-and-chapters) that
+  plays instead. The panel shows the lyrics in
+  [Latin letters](lyrics.md#other-scripts-in-latin-letters) when the lyrics
+  panel does.
 - **The cover** in the panel opens MixMusic on the now playing page.
 - **To close it**, press <kbd>Escape</kbd>, click either side of the notch
   again, or move the pointer away for two seconds.
@@ -63,6 +69,8 @@ It is on by default. Turn it off with **Player around the notch** in
 Settings › Desktop, a switch that shows only on Macs with a notch, or with
 `"notchPlayer": false` in `settings.json`. Other Macs, external displays, a
 MacBook with its lid closed, Windows and Linux show nothing of it.
+[The notch's part of the architecture](architecture/notch.md) tells how
+it's drawn.
 
 ## The tray
 
@@ -103,9 +111,11 @@ cover, the title and the artists, and takes their buttons:
   buttons of headphones reach too.
 - **Linux**: an MPRIS player, which your desktop shows in its media
   controls and passes its media keys to. In the Flatpak, it shows under the
-  Flatpak's name. Setting the speed (rate) over MPRIS sets MixMusic's speed.
+  Flatpak's name. Setting the speed (rate) over MPRIS sets MixMusic's
+  [speed](playing-music.md#speed).
 
-The covers there come from the covers MixMusic keeps on disk, so a cover
+The covers there come from the
+[covers MixMusic keeps](library.md#the-offline-cache) on disk, so a cover
 you saw in the window shows there at once, and offline too.
 
 **Media keys**, in Settings › Desktop and on by default, has the keyboard's
@@ -130,13 +140,16 @@ Desktop to keep it to MixMusic's name.
 
 Global shortcuts are keys of your own that control MixMusic whichever
 window is in front, even with its window closed to the tray. Record them in
-the **From any app** group at the top of Settings › Shortcuts, for:
+the **From any app** group at the top of
+[Settings › Shortcuts](settings.md#change-a-shortcut), for:
 
 - Play or pause
 - Next track and Previous track
 - Volume up, Volume down and Mute
 - Like what plays and Dislike what plays
 - Show MixMusic
+
+![Settings › Shortcuts: the From any app group at the top, "These keys control MixMusic whichever window is in front", with Play or pause, Next track, Previous track and Volume up, each with none and a Set button](shots/shortcuts.webp)
 
 A new install has none. To set one, choose **set** on its row and press
 the keys; <kbd>Escape</kbd> cancels and <kbd>Backspace</kbd> removes it.

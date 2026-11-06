@@ -9,7 +9,9 @@ Lyrics come from Unison, LRCLIB and YouTube Music, for the track that plays, whi
 
 - **The lyrics panel** opens at the right of the window, beside the page you're on, from the Lyrics button by the player (beside Queue), or with Ctrl+Shift+L (⇧⌘L on macOS). The same keys or button close it.
 - **The now playing page** shows them larger, under the player: open it from the cover in the player bar, the card at the foot of the sidebar, or Alt+4 (⌥4).
-- **The notch player,** on a MacBook with a notch, shows the line sung now, with the line before and the line after, in Latin letters when you show the lyrics so.
+- **The [notch player](desktop.md#the-player-around-the-notch),** on a MacBook with a notch, shows the line sung now, with the line before and the line after, in Latin letters when you show the lyrics so.
+
+![The lyrics panel at the right of the window, beside Library › Liked: its Synced and Plain text choice, the Translate and Romaji switches, and the lyrics of アイドル by YOASOBI, the line sung now lighting up in the accent colour](shots/lyrics.webp)
 
 The panel and the page show the same lyrics, with the same switches above them, and each keeps where it was scrolled. Synced lyrics follow the song; scroll them to read back, and they stay where you put them for a few seconds before they follow again. Click a line of synced lyrics to play the song from there, once it plays.
 
@@ -30,7 +32,7 @@ MixMusic asks, in order:
 2. **[LRCLIB](https://lrclib.net),** the open database of synced lyrics, by the track's title, artists, album and length: when Unison has no lyrics, can't be reached, or has only plain lyrics where LRCLIB has synced ones.
 3. **YouTube Music:** when neither has any lyrics, or both have only plain ones and YouTube Music's are longer.
 
-A Spotify track is looked up by the video ID of its recording on YouTube Music once MixMusic has matched one, and by its title, artists, album and length before. The line at the end of the lyrics names where they came from.
+A Spotify track is looked up by the video ID of its [recording on YouTube Music](playing-music.md#how-spotify-tracks-play) once MixMusic has matched one, and by its title, artists, album and length before. The line at the end of the lyrics names where they came from.
 
 ## Synced and plain lyrics
 
@@ -38,7 +40,7 @@ Synced lyrics have a time for each line. The line sung now lights in the accent 
 
 - **Synced or Plain text:** above synced lyrics, this choice shows them as plain text instead, without following the song. MixMusic remembers it for every track.
 - **When "synced" is offered:** only for lyrics whose lines can be followed in time. Lyrics of one timed line, or whose lines all have one time, count as plain, and another source's lyrics take their place when it has more of them.
-- **At another speed,** synced lyrics keep the track's own time, so they still light as the words are sung.
+- **At another [speed](playing-music.md#speed),** synced lyrics keep the track's own time, so they still light as the words are sung.
 
 Plain lyrics show as they are, with no choice above them.
 
@@ -50,15 +52,15 @@ Lyrics timed word by word, as Unison has many, light each word of the line sung 
 - words sung stay lit, and words to come keep the colour of the lines to come;
 - background vocals light the same way.
 
-Lines shown in Latin letters made on your computer light word by word too. Romaji, and Arabic's romanization from Unison, don't: shown in place of the line, they light a whole line at a time, as lyrics timed line by line do. While your system asks for less motion, each word lights whole as it starts.
+Lines shown in Latin letters made on your computer light word by word too. Romaji, and Arabic's romanization from Unison, don't: shown in place of the line, they light a whole line at a time, as lyrics timed line by line do. While your system asks for [less motion](look-and-feel.md#reduced-motion), each word lights whole as it starts.
 
 ## Translate
 
 Lyrics in another language can show their translation: turn on Translate above them, in the panel or on the now playing page. Each line then shows its translation under it, smaller, moving with it in synced lyrics.
 
-- **When the switch shows:** for lyrics in another language than the one they translate to. That's your system's language by default; "Translate lyrics to", in Settings › Playback › Lyrics, chooses another, among 47.
+- **When the switch shows:** for lyrics in another language than the one they translate to. That's your system's language by default; "Translate lyrics to", in [Settings › Playback](settings.md#playback) › Lyrics, chooses another, among 47.
 - **It's remembered** for the next song in the same language: turned on for Korean lyrics, it stays on for Korean lyrics.
-- **What is sent:** while Translate is on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them. Nothing is sent while it's off, as it is by default.
+- **What is sent:** while Translate is on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them. Nothing is sent while it's off, as it is by default. [Your data and privacy](data-and-privacy.md#what-each-feature-sends-where) lists what every feature sends.
 - **Once per song:** each translation is kept on disk, by track and language, so a song is translated once.
 - **While it comes,** the panel says "Translation is on its way…". When the service is busy, the lyrics show untranslated, with "Translation isn't available right now." and try again.
 
@@ -69,6 +71,8 @@ With romaji or Latin letters on too, each line shows the original, then its Lati
 kyō wa ii tenki
 The weather is nice today.
 ```
+
+![The now playing page of アイドル with Translate and Romaji on, and Romaji under chosen: each line of its lyrics with its romaji under it, then its English translation](shots/lyrics-translate.webp)
 
 ## Japanese lyrics in romaji
 
@@ -126,7 +130,7 @@ For lyrics in another script that MixMusic doesn't romanize itself, the Romanize
 
 ## The notch player's line
 
-On a MacBook with a notch, the notch player's panel shows the lyrics beside the player: the line sung now, larger, the line before and the line after it, following the music. It shows them in Latin letters as you chose for their language in the panel, with the line in Latin letters under the line sung now when you show them under. Plain lyrics say "No timed lyrics.", and a podcast episode shows its chapter instead, with those before and after it.
+On a MacBook with a notch, the [notch player's](desktop.md#the-player-around-the-notch) panel shows the lyrics beside the player: the line sung now, larger, the line before and the line after it, following the music. It shows them in Latin letters as you chose for their language in the panel, with the line in Latin letters under the line sung now when you show them under. Plain lyrics say "No timed lyrics.", and a podcast episode shows its chapter instead, with those before and after it.
 
 ## Credits
 

@@ -181,8 +181,9 @@ func (p *Player) pastEnd(m *move) {
 		seed, ok = Item{Track: *p.passing.lastPlayed}, true
 	}
 	// A podcast's episode has no radio: YouTube Music's of one is of songs
-	// unlike it.
-	if !ok || spoken(seed.Track) {
+	// unlike it. Nor has a track on this computer, which goes to no
+	// service.
+	if !ok || spoken(seed.Track) || seed.Track.Source == media.SourceFile {
 		p.stopMove(m, "")
 		return
 	}

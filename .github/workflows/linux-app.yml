@@ -111,13 +111,24 @@ jobs:
           path: linux-app/
           if-no-files-found: error
 
-  # How long yt-dlp takes to start on Linux (#245): yt-dlp_linux, the
-  # single file, unpacks Python into a new folder at each start;
-  # yt-dlp_linux.zip holds the same build unpacked.
+  # The yt-dlp MixMusic installs on Linux, and how long it takes to start
+  # (#245). yt-dlp_linux, the single file, unpacks Python into a new folder
+  # at each start, as yt-dlp_macos did in 8 s, which made macOS install the
+  # unpacked build (#250). On Linux it starts in under a second, about 0.4 s
+  # more than yt-dlp_linux.zip unpacked, so Linux keeps the single file:
+  # this fails if that changes.
   ytdlp:
     name: yt-dlp's start
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: MixMusic installs yt-dlp, checks it, and runs it
+        env:
+          MIXMUSIC_LIVE: "1"
+        run: go test ./internal/tools/ -run '^TestLiveInstall$' -count=1 -v
       - name: Time yt-dlp_linux and yt-dlp_linux.zip
         run: |
           cd "$RUNNER_TEMP"
@@ -147,3 +158,8 @@ jobs:
             echo "| yt-dlp_linux, the single file | $single |"
             echo "| yt-dlp_linux.zip, unpacked ($program) | $zipped |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
+          median="$(echo "$single" | tr ' ' '\n' | tail -n 5 | sort -n | sed -n 3p)"
+          if ! awk -v m="$median" 'BEGIN { exit !(m < 2) }'; then
+            echo "yt-dlp_linux takes $median s to start: install yt-dlp_linux.zip unpacked on Linux, as macOS does (#245)" >&2
+            exit 1
+          fi

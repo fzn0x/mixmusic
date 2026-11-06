@@ -54,6 +54,7 @@
   "downloadsFolder": "",
   "downloadOnMetered": false,
   "downloadAdded": true,
+  "musicFolders": [],
   "spotifyClientId": "",
   "scrobbling": true,
   "youtubeChannel": "",

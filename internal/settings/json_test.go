@@ -69,6 +69,7 @@ func TestFullFile(t *testing.T) {
 	}
 	// Every value of it is one Clean keeps.
 	s.DownloadsFolder = t.TempDir() // the file's is absolute on Unix only
+	s.MusicFolders = []string{t.TempDir(), t.TempDir()}
 	if c := s.Clean(); !bytes.Equal(stored(t, c), stored(t, s)) {
 		t.Errorf("Clean changed full.json's settings:\n%s", stored(t, c))
 	}

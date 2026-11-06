@@ -31,6 +31,7 @@ type Settings struct {
 	Cache
 	Translation
 	Downloads
+	LocalFiles
 	Accounts
 	Desktop
 	Tools
@@ -46,6 +47,7 @@ func Default() Settings {
 	s.Playback = defaultPlayback()
 	s.Cache = defaultCache()
 	s.Downloads = defaultDownloads()
+	s.LocalFiles = defaultLocalFiles()
 	s.Accounts = defaultAccounts()
 	s.Desktop = defaultDesktop()
 	s.Keys = defaultKeys()
@@ -100,6 +102,7 @@ func (s Settings) Clean() Settings {
 	s.Cache = s.Cache.clean()
 	s.Translation = s.Translation.clean()
 	s.Downloads = s.Downloads.clean()
+	s.LocalFiles = s.LocalFiles.clean()
 	s.Accounts = s.Accounts.clean()
 	s.Desktop = s.Desktop.clean()
 	s.Tools = s.Tools.clean()

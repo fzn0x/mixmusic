@@ -144,8 +144,8 @@ Spotify app of your own. It takes a few minutes, once:
 
 [Spotify](spotify.md) walks through each step, says what to do when
 Spotify refuses the sign-in, and explains the three ways Spotify tracks
-play: in MixMusic itself (Premium, on Windows), on Spotify Connect, or from
-their recording on YouTube Music, which needs no Premium.
+play: in MixMusic itself (Premium, on Windows and macOS), on Spotify
+Connect, or from their recording on YouTube Music, which needs no Premium.
 
 Signed in, MixMusic searches Spotify beside YouTube Music, and shows your
 Spotify library in Library › Spotify; likes, saved albums and playlists,

@@ -74,9 +74,9 @@ time it starts.
 - YouTube Music has no sign-in for other apps: MixMusic signs in with a
   browser session, which can do with your account what YouTube Music can.
   Treat it like a password; sign out in Settings › Accounts to delete it.
-- Spotify plays in MixMusic itself only on Windows, whose webview,
-  WebView2, plays Spotify's protected audio: WebKitGTK on Linux does not,
-  and macOS's is not known to. Elsewhere, Spotify Connect plays it.
+- Spotify plays in MixMusic itself only on Windows and macOS, whose
+  webviews play Spotify's protected audio: WebKitGTK on Linux does not, so
+  Spotify Connect plays it there.
 - Spotify allows apps in development mode up to five users, while their
   owner has Premium, and lets them read less: search shows ten results of
   each kind, and the tracks of playlists you do not own stay hidden.

@@ -15,7 +15,7 @@
 #
 # MixMusic gets a profile of its own (MIXMUSIC_DATA_DIR) that holds one
 # track, downloaded: a 440 Hz tone that ffmpeg makes, which plays without
-# the network, with a cover that a server of this script serves. MixMusic
+# the network, with MixMusic's icon from GitHub as its cover. MixMusic
 # starts twice:
 #
 #   - in capture mode, which saves its own frames of home, Settings › About
@@ -33,7 +33,6 @@
 import argparse
 import array
 import collections
-import http.server
 import json
 import math
 import os
@@ -44,6 +43,7 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.request
 import zlib
 
 import gi
@@ -55,6 +55,9 @@ VIDEO = "mixmusicCI1"  # the downloaded track's video ID: 11 characters
 TITLE = "Check tone"
 ARTIST = "MixMusic CI"
 TONE_HZ = 440
+# The track's cover: the system's controls show covers of https addresses
+# alone.
+COVER = "https://raw.githubusercontent.com/fzn0x/mixmusic/main/resources/icon.png"
 MPRIS = "org.mpris.MediaPlayer2.mixmusic"  # outside a Flatpak
 MPRIS_PATH = "/org/mpris/MediaPlayer2"
 PLAYER = "org.mpris.MediaPlayer2.Player"
@@ -302,15 +305,25 @@ def listen(source, seconds=1.5):
 
 # The profile MixMusic starts with.
 
-def make_media(work):
-    """Makes the tone, which plays for 10 minutes, and its cover."""
-    tone, cover = os.path.join(work, "tone.webm"), os.path.join(work, "cover.png")
+def make_tone(work):
+    """Makes the tone, which plays for 10 minutes."""
+    tone = os.path.join(work, "tone.webm")
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "lavfi", "-i",
                     f"sine=frequency={TONE_HZ}:sample_rate=48000:duration=600", "-ac", "2",
                     "-c:a", "libopus", "-b:a", "96k", "-f", "webm", tone], check=True)
-    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=512x512",
-                    "-frames:v", "1", cover], check=True)
-    return tone, cover
+    return tone
+
+
+def fetch(url):
+    """Downloads url, trying again twice."""
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(url, timeout=30) as r:
+                return r.read()
+        except OSError:
+            if attempt == 2:
+                raise
+            time.sleep(5)
 
 
 def make_profile(root, tone, cover_url):
@@ -337,27 +350,14 @@ def make_profile(root, tone, cover_url):
     return os.path.join(data, "settings.json")
 
 
-def serve(path):
-    """Serves the file at path on the loopback, and lists the requests."""
-    asked = []
-
-    class Handler(http.server.BaseHTTPRequestHandler):
-        def do_GET(self):
-            asked.append(self.path)
-            with open(path, "rb") as f:
-                body = f.read()
-            self.send_response(200)
-            self.send_header("Content-Type", "image/png")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-
-        def log_message(self, *args):
-            pass
-
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
-    threading.Thread(target=server.serve_forever, daemon=True).start()
-    return f"http://127.0.0.1:{server.server_address[1]}/cover.png", asked
+def stored(folder):
+    """The images the artwork store keeps in folder: each file is a line
+    of JSON, then the image."""
+    images = []
+    for name in os.listdir(folder) if os.path.isdir(folder) else []:
+        with open(os.path.join(folder, name), "rb") as f:
+            images.append(f.read().split(b"\n", 1)[-1])
+    return images
 
 
 def app_env(profile, extra=None):
@@ -484,13 +484,13 @@ def main():
     c = Checks(out)
     work = os.path.join(out, "work")
     os.makedirs(work, exist_ok=True)
-    tone, cover = make_media(work)
-    cover_url, cover_asked = serve(cover)
-    with open(cover, "rb") as f:
-        cover_bytes = f.read()
+    tone = make_tone(work)
+    cover = fetch(COVER)
     bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
 
-    capture_run(c, mixmusic, os.path.join(work, "capture-profile"), out)
+    capture = os.path.join(work, "capture-profile")
+    make_profile(capture, tone, COVER)
+    capture_run(c, mixmusic, capture, out)
 
     # The stand-in for the panel's tray, before MixMusic starts, as on a
     # desktop.
@@ -505,7 +505,7 @@ def main():
                                    "/dev/zero"]) if source else None
 
     profile = os.path.join(work, "profile")
-    settings = make_profile(profile, tone, cover_url)
+    settings = make_profile(profile, tone, COVER)
     pywal = os.path.join(work, "xdg-cache", "wal", "colors.json")
     display = Display(out)
     started = time.monotonic()
@@ -513,8 +513,7 @@ def main():
     app = subprocess.Popen([mixmusic], env=app_env(profile, {"XDG_CACHE_HOME": os.path.join(work, "xdg-cache")}),
                            stdout=app_log, stderr=subprocess.STDOUT)
     try:
-        check_app(c, args, app, started, display, settings, profile, pywal, items_file, source,
-                  cover_bytes, cover_asked, out)
+        check_app(c, args, app, started, display, settings, profile, pywal, items_file, source, cover, out)
     finally:
         if app.poll() is None:
             app.send_signal(signal.SIGTERM)
@@ -537,8 +536,7 @@ def main():
     sys.exit(0 if ok else 1)
 
 
-def check_app(c, args, app, started, display, settings, profile, pywal, items_file, source,
-              cover_bytes, cover_asked, out):
+def check_app(c, args, app, started, display, settings, profile, pywal, items_file, source, cover, out):
     # It starts, and shows its window.
     found = until(lambda: app.poll() is not None or windows(app.pid), 90)
     if not c.add("MixMusic starts and shows its window", app.poll() is None and found,
@@ -621,21 +619,23 @@ def check_app(c, args, app, started, display, settings, profile, pywal, items_fi
         c.add(f"{keys.replace('ctrl+', 'Ctrl+')} zooms to {want:.0%}", got == want, f"zoom {before} → {got}")
 
     # settings.json edited while MixMusic runs (#81): the theme, written
-    # over the file, and the zoom, in place.
-    def shows(want, timeout=10):
+    # over the file, and the zoom, in place. Most of the window is the
+    # colours' bg, or their surface, which the panel and the cards wear.
+    def shows(*want, timeout=10):
         seen = []
 
         def look():
             colour, share = dominant(*display.grab(region))
             seen.append(colour)
-            return near(colour, want)
+            return any(near(colour, w) for w in want)
         t = time.monotonic()
         ok = until(look, timeout, every=0.3)
-        return ok, f"{seen[-1] if seen else 'nothing'} on most of the window, after {time.monotonic() - t:.1f} s"
+        return ok, (f"{seen[-1] if seen else 'nothing'} on most of the window, after {time.monotonic() - t:.1f} s"
+                    f" (bg or surface: {' or '.join(want)})")
 
     base, _ = dominant(*display.grab(region))
     edit_settings(settings, lambda s: s.update(theme="daylight", followSystem=False))
-    ok, saw = shows("#ffffff")
+    ok, saw = shows("#ffffff", "#f6f6f6")  # builtin/themes/daylight
     display.grab(region, "03-settings-theme-daylight")
     c.add("settings.json's theme, changed while it runs, shows", ok, f"from {base}: {saw}")
     before = display.grab(region)[2]
@@ -650,22 +650,29 @@ def check_app(c, args, app, started, display, settings, profile, pywal, items_fi
     # Colour files (#74): pywal's colors.json, where pywal writes it under
     # XDG_CACHE_HOME, followed as it changes, and matugen's, in the data
     # folder.
+    foreground = "#e8e4f0"
+
     def pywal_file(background):
         os.makedirs(os.path.dirname(pywal), exist_ok=True)
         palette = {f"color{i}": v for i, v in enumerate(
             [background, "#c94f6d", "#81b29a", "#dbc074", "#719cd6", "#9d79d6", "#63cdcf", "#dfdfe0"] * 2)}
         with open(pywal + ".tmp", "w") as f:
             json.dump({"wallpaper": "/tmp/wall.png", "alpha": "100",
-                       "special": {"background": background, "foreground": "#e8e4f0", "cursor": "#e8e4f0"},
+                       "special": {"background": background, "foreground": foreground, "cursor": foreground},
                        "colors": palette}, f, indent=2)
         os.replace(pywal + ".tmp", pywal)
+
+    def surface(bg):
+        # pywal's surface, 4.5% of the way to its foreground (pywalTokens).
+        return "#" + "".join(f"{round(int(bg[i:i + 2], 16) * 0.955 + int(foreground[i:i + 2], 16) * 0.045):02x}"
+                             for i in (1, 3, 5))
     pywal_file("#1e2a4a")
     edit_settings(settings, lambda s: s.update(colorSource="pywal"))
-    ok, saw = shows("#1e2a4a")
+    ok, saw = shows("#1e2a4a", surface("#1e2a4a"))
     display.grab(region, "05-colours-pywal")
     c.add("pywal's colors.json in $XDG_CACHE_HOME/wal colours the window", ok, saw)
     pywal_file("#4a1e2a")
-    ok, saw = shows("#4a1e2a")
+    ok, saw = shows("#4a1e2a", surface("#4a1e2a"))
     display.grab(region, "06-colours-pywal-changed")
     c.add("A change of pywal's colors.json shows while it runs", ok, saw)
     matugen = os.path.join(os.path.dirname(settings), "matugen.json")
@@ -674,11 +681,11 @@ def check_app(c, args, app, started, display, settings, profile, pywal, items_fi
     with open(matugen, "w") as f:
         json.dump({"dark": dict(tokens, bg="#12332d"), "light": dict(tokens, bg="#f0fbf8", text="#10201c")}, f)
     edit_settings(settings, lambda s: s.update(colorSource="matugen", theme="mix"))
-    ok, saw = shows("#12332d")
+    ok, saw = shows("#12332d", tokens["surface"])
     display.grab(region, "07-colours-matugen")
     c.add("matugen.json in the data folder colours the window", ok, saw)
     edit_settings(settings, lambda s: s.update(colorSource=""))
-    shows("#000000")
+    shows(base)
     c.add("settings.json was never watched by polling",
           "looking at it every" not in open(os.path.join(profile, "logs", "mixmusic.log")).read(), "no fallback logged")
 
@@ -703,7 +710,8 @@ def check_app(c, args, app, started, display, settings, profile, pywal, items_fi
           'interface name="org.mpris.MediaPlayer2"' in xml and f'interface name="{PLAYER}"' in xml, f"{len(xml)} bytes")
     root = get_all(MPRIS, MPRIS_PATH, "org.mpris.MediaPlayer2")
     c.add("MPRIS names MixMusic", root.get("Identity") == "MixMusic" and root.get("DesktopEntry") == "mixmusic",
-          f"Identity {root.get('Identity')}, DesktopEntry {root.get('DesktopEntry')}")
+          f"Identity {root.get('Identity')}, DesktopEntry {root.get('DesktopEntry')}, CanRaise {root.get('CanRaise')}, "
+          f"CanQuit {root.get('CanQuit')}")
     art = until(lambda: get_all(MPRIS, MPRIS_PATH, PLAYER)["Metadata"].get("mpris:artUrl"), 30)
     player = get_all(MPRIS, MPRIS_PATH, PLAYER)
     save_json(out, "mpris.json", {"org.mpris.MediaPlayer2": root, PLAYER: player})
@@ -713,9 +721,14 @@ def check_app(c, args, app, started, display, settings, profile, pywal, items_fi
           f"{meta.get('mpris:length', 0) / 1e6:.0f} s")
     cover_dir = os.path.join(profile, "cache", "now-playing")
     path = GLib.filename_from_uri(art)[0] if art and art.startswith("file://") else ""
-    same = path.startswith(cover_dir + os.sep) and os.path.isfile(path) and open(path, "rb").read() == cover_bytes
-    c.add("MPRIS's cover is the file in the cache's now-playing folder, byte for byte the cover (#196)", same,
-          f"{art or 'no mpris:artUrl in 30 s'}; the cover was asked for {len(cover_asked)} times")
+    kept = open(path, "rb").read() if path.startswith(cover_dir + os.sep) and os.path.isfile(path) else None
+    in_store = kept is not None and kept in stored(os.path.join(profile, "cache", "artwork"))
+    c.add("MPRIS's cover is a file of the cache's now-playing folder, byte for byte the artwork store's (#196)",
+          kept == cover and in_store,
+          f"{art or 'no mpris:artUrl in 30 s'}: " + (
+              "not in now-playing" if kept is None else
+              f"{len(kept)} bytes, {'the' if kept == cover else 'not the'} cover's, "
+              f"{'as' if in_store else 'not as'} the store keeps it"))
     level, hz = listen(source) if source else (-math.inf, 0)
     c.add("The track sounds from the sound server", level > -60 and abs(hz - TONE_HZ) < 15,
           f"{level:.1f} dBFS at {hz:.0f} Hz" if source else "no sound server")
@@ -745,27 +758,32 @@ def check_app(c, args, app, started, display, settings, profile, pywal, items_fi
     edit_settings(settings, lambda s: s.update(globalShortcuts={"player.toggle": "Mod+Alt+P"}))
     time.sleep(2)
     other = subprocess.Popen(["xmessage", "-geometry", "+0+0", "Another window in front"])
-    front = until(lambda: run("xdotool", "search", "--onlyvisible", "--pid", str(other.pid)).stdout.split(), 10)
+    front = until(lambda: run("xdotool", "search", "--onlyvisible", "--classname", "xmessage").stdout.split(), 10)
     if front:
         run("xdotool", "windowfocus", "--sync", front[0], timeout=10)
-    run("xdotool", "key", "ctrl+alt+p")
     focused = run("xdotool", "getwindowfocus").stdout.strip()
+    run("xdotool", "key", "ctrl+alt+p")
+    in_front = bool(front) and focused == front[0]
     c.add("A global shortcut of settings.json pauses with another window in front (X11)",
-          front and until(lambda: status() == "Paused", 5),
-          f"{status()}, with {'xmessage' if front and focused == front[0] else 'window ' + focused} focused")
+          in_front and until(lambda: status() == "Paused", 5),
+          f"{status()}, with {'xmessage' if in_front else 'window ' + focused} focused")
     other.kill()
 
-    # The tray menu's Play / Pause, as a panel clicks it.
-    if tray and "Play / Pause" in tray["labels"]:
+    def click(label):
         call(tray["bus"], tray["menu"], MENU, "Event",
-             GLib.Variant("(isvu)", (tray["labels"]["Play / Pause"], "clicked", GLib.Variant("i", 0), 0)))
+             GLib.Variant("(isvu)", (tray["labels"][label], "clicked", GLib.Variant("i", 0), 0)))
+
+    # The tray menu's Play / Pause, as a panel clicks it, once the player
+    # takes a toggle again: it takes one in 400 ms (toggleDebounce).
+    if tray and "Play / Pause" in tray["labels"]:
+        time.sleep(1)
+        click("Play / Pause")
         c.add("The tray menu's Play / Pause plays", until(lambda: status() == "Playing", 5), status())
         tip = get(tray["bus"], tray["path"], ITEM, "Title") or ""
         c.add("The tray item's title names what plays", TITLE in tip, tip)
 
         # Its Mini player opens a window of its own.
-        call(tray["bus"], tray["menu"], MENU, "Event",
-             GLib.Variant("(isvu)", (tray["labels"]["Mini player"], "clicked", GLib.Variant("i", 0), 0)))
+        click("Mini player")
         mini = until(lambda: [w for w in windows(app.pid) if w[0] != wid], 10)
         if mini:
             time.sleep(2)
@@ -773,13 +791,15 @@ def check_app(c, args, app, started, display, settings, profile, pywal, items_fi
         c.add("The tray menu's Mini player opens it", mini,
               f"{mini[0][3]}x{mini[0][4]} window" if mini else "no second window in 10 s")
 
-    # MPRIS's Quit quits.
-    call(MPRIS, MPRIS_PATH, "org.mpris.MediaPlayer2", "Quit")
+    # The tray menu's Quit quits: MPRIS's player can't (CanQuit).
+    quit_label = next((label for label in (tray or {}).get("labels", {}) if label.startswith("Quit")), "")
+    if quit_label:
+        click(quit_label)
     try:
         code = app.wait(20)
     except subprocess.TimeoutExpired:
         code = "still running after 20 s"
-    c.add("MPRIS's Quit quits MixMusic", code == 0, f"exit {code}")
+    c.add("The tray menu's Quit quits MixMusic", code == 0, f"exit {code}")
     crash = os.path.join(profile, "logs", "crash.log")
     c.add("No crash was logged", not os.path.exists(crash) or os.path.getsize(crash) == 0,
           f"crash.log {os.path.getsize(crash) if os.path.exists(crash) else 0} bytes")

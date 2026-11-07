@@ -103,7 +103,7 @@ the first account until you choose another there.
 | | Signed out | Signed in |
 |---|---|---|
 | Home | YouTube Music's home, as it shows signed out | your own home feed and recommendations |
-| Library | [MixMusic's own](library.md): liked songs, mixes, podcasts, artists, downloads and history | also [Library › YouTube Music](library.md#youtube-music-playlists-albums-and-artists): your liked songs, playlists, albums and artists there, in full |
+| Library | [MixMusic's own](library.md): liked songs, mixes, podcasts, artists, downloads and history | also [Library › YouTube Music](library.md#youtube-music-playlists-albums-and-artists): your liked songs, the songs in your library, playlists, albums and artists there, in full |
 | Likes and dislikes | kept in MixMusic | kept in MixMusic, and they reach YouTube Music |
 | Albums, playlists, artists | [follow artists](library.md#artists-you-follow) in MixMusic, and see their new releases | save albums and playlists, and follow artists, on YouTube Music, from their pages |
 | Playlists | | make playlists on YouTube Music, add tracks of either service to them, take tracks out, and delete the ones you made |

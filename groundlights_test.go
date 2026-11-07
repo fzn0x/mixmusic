@@ -100,6 +100,12 @@ func TestAuroraDrift(t *testing.T) {
 			paint(p, r)
 		})
 	}, 320, 200)
+	// The lights drift across and back, so the 10 s below must not span
+	// a turn, where they would end where they started: they start a
+	// quarter of the way across, not wherever the clock put them.
+	start := auroraStart
+	auroraStart = tt.Now().Add(-auroraPeriod / 4)
+	t.Cleanup(func() { auroraStart = start })
 	tt.Frame()
 	before, drawn := append([]byte(nil), tt.Image().Pix...), s.lights.bmp
 	builds, paints = 0, 0

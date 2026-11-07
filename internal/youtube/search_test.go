@@ -156,8 +156,8 @@ func TestParseSearchPlaylists(t *testing.T) {
 
 func TestParseSuggestions(t *testing.T) {
 	got := parseSuggestions(fixture(t, "suggest"))
-	if len(got) == 0 || got[0] != "daft punk" {
-		t.Errorf("suggestions = %q", got)
+	if len(got.Searches) == 0 || got.Searches[0] != "daft punk" {
+		t.Errorf("searches = %q", got.Searches)
 	}
 }
 

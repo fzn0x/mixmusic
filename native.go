@@ -141,6 +141,8 @@ type shell struct {
 	impact impact
 	tone   tone
 	rise   rise
+	// lights are Aurora's or Glasshouse's, drawn once for their colours.
+	lights groundLights
 	// asking is the question a dialog asks before an action, if any.
 	asking *question
 	// panel is the side panel shown: "queue", "lyrics" or "".

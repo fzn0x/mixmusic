@@ -92,15 +92,15 @@ func paintWash(p *ui.Painter, r ui.Rect, c ui.Color) {
 		ui.LinearGradient{From: withAlpha(c, 0.55), To: withAlpha(c, 0), Angle: 180, Oklab: true}, 0)
 }
 
-// paintCover lights Glasshouse's ground with the cover's colour c in two
-// soft lights, and its accent in a third, at a strength from 0 to 1, which
-// the translucent panels over them frost.
-func paintCover(p *ui.Painter, r ui.Rect, c, accent ui.Color, strength float64) {
-	p.Clip(r, 0, func() {
-		glow(p, r.X+0.12*r.W, r.Y+0.04*r.H, 0.85*r.W, 0.80*r.H, withAlpha(c, 0.5*strength))
-		glow(p, r.X+0.94*r.W, r.Y+0.32*r.H, 0.60*r.W, 0.70*r.H, withAlpha(accent, 0.14*strength))
-		glow(p, r.X+0.55*r.W, r.Y+1.04*r.H, 0.95*r.W, 0.55*r.H, withAlpha(c, 0.32*strength))
-	})
+// paintCover lights Glasshouse's ground, bg, with the cover's colour c in
+// two soft lights, and its accent in a third, at a strength from 0 to 1,
+// which the translucent panels over them frost.
+func (s *shell) paintCover(p *ui.Painter, r ui.Rect, bg, c, accent ui.Color, strength float64) {
+	p.Image(s.lights.of(bg, [3]groundLight{
+		{0.12, 0.04, 0.85, 0.80, withAlpha(c, 0.5*strength)},
+		{0.94, 0.32, 0.60, 0.70, withAlpha(accent, 0.14*strength)},
+		{0.55, 1.04, 0.95, 0.55, withAlpha(c, 0.32*strength)},
+	}), r, ui.FillBox)
 }
 
 // burstFor is how long Anime's speed lines burst once a track starts.

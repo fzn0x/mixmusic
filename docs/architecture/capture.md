@@ -18,7 +18,9 @@ it without one, `act:resume` plays the queue kept in the data folder,
 scrolls the page, `act:theme:<id>` wears a theme,
 `act:colors:<off|pywal|matugen|path>` takes the colours from a file, as
 Settings › Appearance does, `act:mini` opens the mini player, which saves
-`mini.png`, `act:spotify` logs whether MixMusic's own Spotify device
+`mini.png`, `act:library:<add|remove>:<search>` saves the first YouTube
+Music song a search finds to the library there, or takes it out, as its
+menu does, `act:spotify` logs whether MixMusic's own Spotify device
 could play, `act:title` logs the window's title, which the screenshots
 leave out, `act:nowplaying` the cover the system's media controls hold,
 as they tell it back on macOS, and `act:memory` and `act:heap` log the Go heap and save a

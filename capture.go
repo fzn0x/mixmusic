@@ -30,7 +30,10 @@ import (
 // page, act:panel:<queue|lyrics|none> shows a side panel,
 // act:scroll:<y|end> scrolls the page, act:theme:<id> wears a theme,
 // act:colors:<off|pywal|matugen|path> takes the colours from a file,
-// act:mini opens the mini player, which saves itself, act:spotify logs
+// act:mini opens the mini player, which saves itself,
+// act:library:<add|remove>:<search> saves the first YouTube Music song a
+// search finds to the user's library there, or takes it out, as its menu
+// does, act:spotify logs
 // whether MixMusic's own Spotify device could play,
 // act:title logs the window's title, which screenshots leave out,
 // act:nowplaying logs the cover the system's media controls hold,
@@ -123,6 +126,18 @@ func (s *shell) captureFromEnv() {
 					_ = pprof.WriteHeapProfile(f)
 					f.Close()
 				}
+			case "library":
+				add, q, _ := strings.Cut(arg, ":")
+				res, err := s.svc.Catalog.Search(context.Background(), q)
+				if err != nil || len(res.YouTube.Tracks) == 0 {
+					log.Printf("mixmusic: capture: searching %q: %v", q, err)
+					continue
+				}
+				t := res.YouTube.Tracks[0]
+				s.win.Update(func() {
+					log.Printf("mixmusic: capture: %s %s (%s), in the library: %v", add, t.Title, t.ID, s.songInLibrary(t.ID))
+					s.saveSong(t, add == "add")
+				})
 			case "play":
 				if !mayPlay(strconv.Quote(arg)) {
 					continue

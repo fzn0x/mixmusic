@@ -28,8 +28,8 @@ const (
 	face = "Selawik"
 	// faceSemilight is Selawik Semilight, the nav labels' weight, 350 in
 	// the web interface. It says it weighs 300, as Selawik Light does, so
-	// it is registered under a family of its own; but on Windows and Linux
-	// that family names Selawik's, whose weight 300 is Light (fonts).
+	// it is registered under a family of its own, which MyGo keeps to its
+	// file (fonts).
 	faceSemilight = "Selawik Semilight"
 	// faceRound is Quicksand, Mochi's face.
 	faceRound = "Quicksand"
@@ -46,9 +46,10 @@ var fontsOnce sync.Once
 // family Selawik in their names: weight 300 of Selawik is the one that
 // comes first, so Light does, for the page titles and pivots. Registered
 // from a map, in another order each launch, the titles were Semilight in
-// about half of them, heavier and wider (#241). On Windows, MyGo looks a
-// family the app names up as the font's own, so there the nav labels'
-// Selawik Semilight is Light too, as on Linux; macOS keeps it to its file.
+// about half of them, heavier and wider (#241). Before MyGo 0.8, Windows
+// and Linux looked the nav labels' Selawik Semilight up as the family of
+// its file, Selawik, and set them in Light; every system keeps it to its
+// file now.
 var fonts = []struct{ file, family string }{
 	{"fonts/selawkl.ttf", face},
 	{"fonts/selawk.ttf", face},

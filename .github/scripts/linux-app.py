@@ -530,7 +530,10 @@ class Session:
             return
         props = get_all(item["bus"], item["path"], ITEM)
         save_json(self.out, "tray-item.json", props)
-        icon = os.path.join(props.get("IconThemePath", ""), props.get("IconName", "") + ".png")
+        # MyGo 0.8 names the icon by its file's absolute path, which KDE
+        # takes as it is, rather than by a name in IconThemePath.
+        name = props.get("IconName", "")
+        icon = name if os.path.isabs(name) else os.path.join(props.get("IconThemePath", ""), name + ".png")
         with open(os.path.join(os.path.dirname(__file__), "..", "..", "brand", "tray.png"), "rb") as f:
             same = os.path.isfile(icon) and open(icon, "rb").read() == f.read()
         self.c.add("The tray item is active, with MixMusic's icon", props.get("Status") == "Active" and same,

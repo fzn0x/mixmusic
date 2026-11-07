@@ -12,7 +12,10 @@
   nothing: `internal/app` hands it each cover from the artwork store
   (`controls_cover.go`), as its bytes on macOS and Windows, and on Linux
   as a file in the cache folder's `now-playing/`, whose address MPRIS
-  gives the desktop.
+  gives the desktop. The notification of a track that starts shows the
+  same cover (`notecover.go`), its centre square at most 512 pixels
+  across (`artwork.Square`), as the bytes MyGo's notifications take; it
+  waits 2 seconds at most for it.
 - **`internal/portal`** asks the desktop's Background portal, in a
   Flatpak, to let MixMusic run without a window and to start it at login:
   the sandbox's own autostart folder is one the desktop never reads.

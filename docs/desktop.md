@@ -181,10 +181,22 @@ The media keys work as they do without any global shortcut.
 
 With **Notifications** on, in Settings › Desktop and on by default,
 MixMusic shows a notification when a track starts while its window isn't
-in front: the title, the artists and the album. A click on it shows
-MixMusic. None shows while the mini player is in front, or on a MacBook
-while the player around the notch is open: they show the track already.
-The tray icon's tip names what plays too.
+in front: the title, the artists and the album, with the cover. A click
+on it shows MixMusic. None shows while the mini player is in front, or on
+a MacBook while the player around the notch is open: they show the track
+already. The tray icon's tip names what plays too.
+
+- The cover is its centre square, as the player bar shows it: the middle
+  of a music video's thumbnail. On Windows it takes the place of the tray
+  icon; on macOS it is attached, a thumbnail that grows as you expand the
+  notification; on Linux it is the notification's image, where your
+  desktop shows one.
+- It is the cover the system's media controls show, from the covers
+  MixMusic keeps: a track on this computer shows the cover its file holds,
+  or the one beside it.
+- MixMusic waits up to 2 seconds for a cover it hasn't downloaded yet:
+  without one by then, the notification shows without it. When the next
+  track starts meanwhile, only the next one's shows.
 
 ## Discord
 

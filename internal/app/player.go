@@ -375,13 +375,15 @@ func cut(s string, n int) string {
 // wait for, replace it.
 var showNote = (*mygo.Notification).Show
 
-// notifyTrack shows a notification of the track that started.
+// notifyTrack shows a notification of the track that started, with its
+// cover once it loaded, unless another track started meanwhile
+// (trackNote).
 func (a *App) notifyTrack(t media.Track) {
-	body := t.ArtistNames()
-	if t.Album != nil && t.Album.Name != "" {
-		body += " • " + t.Album.Name
+	opts, ok := a.trackNote(t)
+	if !ok {
+		return
 	}
-	n := mygo.NewNotification(mygo.NotificationOptions{ID: "now-playing", Title: t.Title, Body: body, Silent: true})
+	n := mygo.NewNotification(opts)
 	n.OnClick(a.showMain)
 	if err := showNote(n); err != nil && !errors.Is(err, mygo.ErrNotificationsDenied) {
 		log.Printf("mixmusic: notification: %v", err)

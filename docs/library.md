@@ -67,7 +67,7 @@ Home shows "New from artists you follow" after your own shelves, and Library ›
 
 ## YouTube Music playlists, albums and artists
 
-Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a new playlist link, your Albums, the Artists you follow, and Liked on YouTube Music. A [brand channel](accounts.md#several-google-accounts-and-brand-channels) of your account, chosen in Settings › Accounts, has a library of its own.
+Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a new playlist link, your Albums, the Artists you follow, the Songs in your library, and Liked on YouTube Music. A [brand channel](accounts.md#several-google-accounts-and-brand-channels) of your account, chosen in Settings › Accounts, has a library of its own.
 
 - **Save** an album or a playlist with Save on its page, which then says Saved; pressing it again takes it out of your library. **Follow** an artist with Follow on their page, which subscribes on YouTube Music.
 - **Make a playlist** with new playlist in Library › YouTube Music, with Add to YouTube Music playlist › New playlist… in a track's menu, or with Save as a YouTube Music playlist in an album's or a playlist's More menu. Spotify tracks are found on YouTube Music first.
@@ -75,6 +75,7 @@ Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a
 - **Take a track out** of a playlist of yours with Remove from this playlist, in its menu on the playlist's page.
 - **Delete a playlist you made** with Delete from YouTube Music…, in the More menu of its page or of its tile in Library › YouTube Music. It asks first, since the playlist goes from YouTube too and can't come back: to keep its tracks, copy it into a mix first. Mixes copied from it, and the queue, keep their tracks.
 - **A playlist you saved** has Remove from library on its tile instead, which takes it out of your library without asking: saving it again undoes it.
+- **Keep a song without liking it** with Add to library in its menu: it goes to Songs in your library, as YouTube Music's own Save to library does, and stays out of your likes, which shape what YouTube Music recommends. Remove from library in its menu takes it out. Spotify keeps no such songs apart from those you like.
 
 ## Spotify playlists, albums and artists
 

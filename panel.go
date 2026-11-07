@@ -447,6 +447,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	if m.Item(label).Chosen() {
 		s.setDisliked(t, !disliked)
 	}
+	s.librarySongItem(m, t)
 	s.addToMenus(m, one)
 	if !t.IsEpisode() {
 		s.downloadItems(m, t)

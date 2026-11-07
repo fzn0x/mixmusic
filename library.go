@@ -324,6 +324,7 @@ func (s *shell) youtubeLibrary(c *ui.Context) {
 		fetch(s, "youtube:albums", col.YouTubeAlbums),
 		fetch(s, "youtube:artists", col.YouTubeArtists),
 		func(c *ui.Context) {
+			s.youtubeSongsList(c)
 			s.sectionTitle(c, "Liked on YouTube Music")
 			liked := fetch(s, "youtube:liked", col.YouTubeLiked)
 			switch {

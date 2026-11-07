@@ -13,8 +13,9 @@ import (
 )
 
 // libraryToggleItem is the save toggle of a song's menu, as YouTube Music
-// sends it to a signed-in user: its default side is what a click does.
-func libraryToggleItem(icon, first, then string) map[string]any {
+// sends it to a signed-in user: its default side's icon and token, its
+// toggled side's token, and whether the toggled side shows.
+func libraryToggleItem(icon, first, then string, toggled bool) map[string]any {
 	feedback := func(token string) map[string]any {
 		return map[string]any{"feedbackEndpoint": map[string]any{"feedbackToken": token}}
 	}
@@ -23,6 +24,7 @@ func libraryToggleItem(icon, first, then string) map[string]any {
 		"defaultIcon":            map[string]any{"iconType": icon},
 		"defaultServiceEndpoint": feedback(first),
 		"toggledServiceEndpoint": feedback(then),
+		"isToggled":              toggled,
 	}}
 }
 
@@ -45,22 +47,25 @@ var (
 )
 
 // TestSongSaveToggle reads whether a song is in the library, and the
-// tokens to save it and take it out, from its menu: the website's older
-// icons and its bookmarks alike. A menu without it, as a visitor's, has
-// none.
+// tokens to save it and take it out, from its menu: as YouTube Music
+// answered on 2026-11-08, a bookmark whose toggled side shows for a song
+// saved, and as the website once sent it, the side a click takes first. A
+// menu without it, as a visitor's, has none.
 func TestSongSaveToggle(t *testing.T) {
 	for _, c := range []struct {
 		icon, first, then string
+		toggled           bool
 		want              songToggle
 	}{
-		{"LIBRARY_ADD", "add", "remove", songToggle{add: "add", remove: "remove"}},
-		{"LIBRARY_SAVED", "remove", "add", songToggle{add: "add", remove: "remove", saved: true}},
-		{"BOOKMARK_BORDER", "add", "remove", songToggle{add: "add", remove: "remove"}},
-		{"BOOKMARK", "remove", "add", songToggle{add: "add", remove: "remove", saved: true}},
+		{"BOOKMARK_BORDER", "add", "remove", false, songToggle{add: "add", remove: "remove"}},
+		{"BOOKMARK_BORDER", "add", "remove", true, songToggle{add: "add", remove: "remove", saved: true}},
+		{"LIBRARY_ADD", "add", "remove", false, songToggle{add: "add", remove: "remove"}},
+		{"LIBRARY_SAVED", "remove", "add", false, songToggle{add: "add", remove: "remove", saved: true}},
+		{"BOOKMARK", "remove", "add", false, songToggle{add: "add", remove: "remove", saved: true}},
 	} {
-		got, ok := songSaveToggle(node{songMenu(likeToggle, libraryToggleItem(c.icon, c.first, c.then))})
+		got, ok := songSaveToggle(node{songMenu(likeToggle, libraryToggleItem(c.icon, c.first, c.then, c.toggled))})
 		if !ok || got != c.want {
-			t.Errorf("%s: %+v, %v", c.icon, got, ok)
+			t.Errorf("%s, toggled %v: %+v, %v", c.icon, c.toggled, got, ok)
 		}
 	}
 	if got, ok := songSaveToggle(node{songMenu(subscribeToggle, likeToggle)}); ok {
@@ -73,7 +78,7 @@ func TestSongSaveToggle(t *testing.T) {
 // menu.
 func nextWith(videoID string, menu map[string]any) map[string]any {
 	other := map[string]any{"playlistPanelVideoRenderer": map[string]any{"videoId": "other",
-		"menu": songMenu(libraryToggleItem("LIBRARY_SAVED", "other-remove", "other-add"))}}
+		"menu": songMenu(libraryToggleItem("BOOKMARK_BORDER", "other-add", "other-remove", true))}}
 	wanted := map[string]any{"playlistPanelVideoWrapperRenderer": map[string]any{"primaryRenderer": map[string]any{
 		"playlistPanelVideoRenderer": map[string]any{"videoId": videoID, "menu": menu}}}}
 	return map[string]any{"contents": map[string]any{"singleColumnMusicWatchNextResultsRenderer": map[string]any{
@@ -108,11 +113,7 @@ func (s *songLibraryServer) client(t *testing.T) *Client {
 		var answer any
 		switch r.URL.Path {
 		case "/youtubei/v1/next":
-			first, then, icon := "add-vid", "remove-vid", "LIBRARY_ADD"
-			if s.saved {
-				first, then, icon = then, first, "LIBRARY_SAVED"
-			}
-			answer = nextWith(body["videoId"].(string), songMenu(likeToggle, libraryToggleItem(icon, first, then)))
+			answer = nextWith(body["videoId"].(string), songMenu(likeToggle, libraryToggleItem("BOOKMARK_BORDER", "add-vid", "remove-vid", s.saved)))
 		case "/youtubei/v1/feedback":
 			tokens, _ := body["feedbackTokens"].([]any)
 			for _, tok := range tokens {
@@ -142,8 +143,8 @@ func (s *songLibraryServer) sent() (paths, tokens []string) {
 
 // TestSetSongSaved saves a song to the library and takes it out, with the
 // token its menu holds for each, from the song's own entry in its queue; a
-// song already as asked sends nothing. Signed out, nothing is asked, and
-// a change YouTube didn't take fails.
+// song already as asked gets the token again, which leaves it so. Signed
+// out, nothing is asked, and a change YouTube didn't take fails.
 func TestSetSongSaved(t *testing.T) {
 	s := &songLibraryServer{processed: true}
 	c := s.client(t)
@@ -171,7 +172,7 @@ func TestSetSongSaved(t *testing.T) {
 	if err := c.SetSongSaved(ctx, "vid", false); err != nil {
 		t.Fatal(err)
 	}
-	if _, tokens := s.sent(); !slices.Equal(tokens, []string{"add-vid", "remove-vid"}) {
+	if _, tokens := s.sent(); !slices.Equal(tokens, []string{"add-vid", "add-vid", "remove-vid"}) {
 		t.Errorf("the tokens sent are %v", tokens)
 	}
 

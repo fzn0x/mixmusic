@@ -39,10 +39,11 @@ func (c *Client) SongSaved(ctx context.Context, videoID string) (bool, error) {
 
 // SetSongSaved saves a song, by its video ID, to the user's library, or
 // takes it out, without liking it, with the token its menu holds for
-// that. A song already as asked stays as it is.
+// that. The token goes whatever the menu says of the song: each does one
+// thing, which leaves a song already as asked as it is.
 func (c *Client) SetSongSaved(ctx context.Context, videoID string, saved bool) error {
 	t, err := c.libraryToggle(ctx, videoID)
-	if err != nil || t.saved == saved {
+	if err != nil {
 		return err
 	}
 	token := t.add
@@ -103,8 +104,11 @@ type songToggle struct {
 }
 
 // songSaveToggle reads the save toggle of a song's menu, which YouTube
-// Music shows to a signed-in user only. Its default side is what a click
-// does: for a song saved, its icon says so, and it takes the song out.
+// Music shows to a signed-in user only. As it answered on 2026-11-08, its
+// default side saves the song (BOOKMARK_BORDER), its toggled side takes it
+// out (BOOKMARK), and isToggled tells that it is saved. The website once
+// sent the side a click takes first instead, LIBRARY_SAVED for a song
+// saved, and the icons tell the sides apart in either.
 func songSaveToggle(menu node) (songToggle, bool) {
 	for _, it := range menu.get("menuRenderer", "items").list() {
 		t := it.get("toggleMenuServiceItemRenderer")
@@ -114,10 +118,15 @@ func songSaveToggle(menu node) (songToggle, bool) {
 		if first == "" || then == "" || !strings.Contains(icon, "LIBRARY") && !strings.HasPrefix(icon, "BOOKMARK") {
 			continue
 		}
+		s := songToggle{add: first, remove: then}
 		if icon == "LIBRARY_SAVED" || icon == "LIBRARY_REMOVE" || icon == "BOOKMARK" {
-			return songToggle{add: then, remove: first, saved: true}, true
+			s = songToggle{add: then, remove: first, saved: true}
 		}
-		return songToggle{add: first, remove: then}, true
+		// The toggled side shows.
+		if t.get("isToggled").boolean() {
+			s.saved = !s.saved
+		}
+		return s, true
 	}
 	return songToggle{}, false
 }

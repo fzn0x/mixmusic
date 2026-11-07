@@ -70,10 +70,12 @@ func (c *Catalog) Search(ctx context.Context, query string) (SearchResponse, err
 	return res, nil
 }
 
-// Suggestions returns searches to suggest for what the user typed.
-func (c *Catalog) Suggestions(ctx context.Context, input string) ([]string, error) {
+// Suggestions returns what to suggest for what the user typed: YouTube
+// Music's searches, songs, albums, artists and playlists, or the recent
+// searches while nothing is typed.
+func (c *Catalog) Suggestions(ctx context.Context, input string) (media.Suggestions, error) {
 	if strings.TrimSpace(input) == "" {
-		return c.a.library.Searches(), nil
+		return media.Suggestions{Searches: c.a.library.Searches()}, nil
 	}
 	return c.a.youtube.Suggestions(ctx, input)
 }

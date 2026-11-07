@@ -61,7 +61,7 @@ The sidebar on the left goes to MixMusic's pages: Home, Search, Explore, Library
 
 ### The top bar
 
-The top bar holds the back and forward arrows, and [Refresh this page](settings.md#refresh-a-page), which asks the services again for what the page shows (F5, or ⇧⌘R on macOS). [Pulling a page down](settings.md#pull-to-refresh) past its top refreshes it too. Then comes the search box, "Search Spotify and YouTube Music" (Ctrl+F, ⌘F on macOS), which suggests searches as you type: see [Playing music](playing-music.md#search). Once you scroll down a playlist, an album, an artist or your liked songs, the top bar shows its cover and name, with Play, Shuffle and Download. The button at the right of the top bar, which shows its key, opens the [command palette](settings.md#the-command-palette).
+The top bar holds the back and forward arrows, and [Refresh this page](settings.md#refresh-a-page), which asks the services again for what the page shows (F5, or ⇧⌘R on macOS). [Pulling a page down](settings.md#pull-to-refresh) past its top refreshes it too. Then comes the search box, "Search Spotify and YouTube Music" (Ctrl+F, ⌘F on macOS), which suggests searches, songs, albums, artists and playlists as you type: see [Playing music](playing-music.md#search). Once you scroll down a playlist, an album, an artist or your liked songs, the top bar shows its cover and name, with Play, Shuffle and Download. The button at the right of the top bar, which shows its key, opens the [command palette](settings.md#the-command-palette).
 
 ### The player bar
 

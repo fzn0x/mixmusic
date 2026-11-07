@@ -21,6 +21,25 @@ func (p *Player) PlayTracks(tracks []media.Track, start int) {
 	p.do(func() { p.playTracks(tracks, start) })
 }
 
+// PlayWithRadio replaces the queue with t, which the user chose, and plays
+// it at once. With autoplay on, t's radio follows it in the queue as soon
+// as it is found, rather than once t ends; a queue replaced meanwhile gets
+// none of it.
+func (p *Player) PlayWithRadio(t media.Track) {
+	p.do(func() {
+		p.playTracks([]media.Track{t}, 0)
+		if len(p.s.Queue) == 0 || !p.svc.Settings().Autoplay || spoken(t) || t.Source == media.SourceFile {
+			return
+		}
+		seed := p.s.Queue[0]
+		await(p, func(ctx context.Context) ([]media.Track, error) { return p.svc.Radio(ctx, t) }, func(found []media.Track, err error) {
+			if err == nil && indexIn(p.s.Queue, seed.UID) >= 0 {
+				p.addRadio(found)
+			}
+		})
+	})
+}
+
 // PlayAll replaces the queue with tracks, and plays them from the first
 // the queue doesn't pass over, as a collection's play button does;
 // shuffled, from one of those at random, shuffle on. When it would pass
@@ -338,32 +357,38 @@ func (p *Player) extendWithRadio(seed Item, then func(added bool, err error)) {
 			then(false, err)
 			return
 		}
-		queued := make([]media.Track, len(p.s.Queue))
-		for i, it := range p.s.Queue {
-			queued[i] = it.Track
-		}
-		tracks, labeled := p.withoutLabeled(RadioTracks(found, queued))
-		tracks = tracks[:min(len(tracks), radioMax)]
-		if len(tracks) == 0 {
-			if labeled {
-				err = errOnlyLabeled
-			}
-			then(false, err)
-			return
-		}
-		items := make([]Item, len(tracks))
-		for i, t := range tracks {
-			items[i] = p.item(t, true)
-		}
-		p.s.Queue = append(slices.Clone(p.s.Queue), items...)
-		if p.unshuffled != nil {
-			p.unshuffled = append(slices.Clone(p.unshuffled), items...)
-		}
-		p.emit(QueueChange)
-		p.passing.radios++
-		p.checkRadio(items)
-		then(true, nil)
+		then(p.addRadio(found))
 	})
+}
+
+// addRadio adds, of the tracks a radio found, those it keeps at the end
+// of the queue, as the radio's entries, and tells whether it added any,
+// or that all it would have added YouTube labels as made with AI.
+func (p *Player) addRadio(found []media.Track) (added bool, err error) {
+	queued := make([]media.Track, len(p.s.Queue))
+	for i, it := range p.s.Queue {
+		queued[i] = it.Track
+	}
+	tracks, labeled := p.withoutLabeled(RadioTracks(found, queued))
+	tracks = tracks[:min(len(tracks), radioMax)]
+	if len(tracks) == 0 {
+		if labeled {
+			return false, errOnlyLabeled
+		}
+		return false, nil
+	}
+	items := make([]Item, len(tracks))
+	for i, t := range tracks {
+		items[i] = p.item(t, true)
+	}
+	p.s.Queue = append(slices.Clone(p.s.Queue), items...)
+	if p.unshuffled != nil {
+		p.unshuffled = append(slices.Clone(p.unshuffled), items...)
+	}
+	p.emit(QueueChange)
+	p.passing.radios++
+	p.checkRadio(items)
+	return true, nil
 }
 
 // uploadMark matches what marks an upload in a title, in brackets:

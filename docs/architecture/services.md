@@ -9,8 +9,9 @@
   which the playlist is `Cut`. `Catalog.Playlist` reads one whole, for
   what takes all of it, as a download or a plugin.
 - **`internal/youtube`** reads YouTube Music through the API its website uses:
-  search, suggestions, the home and explore pages, charts, moods and genres,
-  albums, artists, playlists, related tracks, radios and plain lyrics.
+  search, suggestions (searches, then songs, albums, artists and
+  playlists), the home and explore pages, charts, moods and genres, albums,
+  artists, playlists, related tracks, radios and plain lyrics.
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
   liked songs, playlists, albums, subscriptions, likes, dislikes and

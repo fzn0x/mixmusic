@@ -66,6 +66,7 @@ func (c *Client) Search(ctx context.Context, query string) (media.SearchResults,
 	}
 	out := media.SearchResults{
 		Tracks:    toTracks(res.Tracks.Items, nil),
+		Videos:    []media.Track{},
 		Albums:    []media.Album{},
 		Artists:   []media.Artist{},
 		Playlists: []media.Playlist{},

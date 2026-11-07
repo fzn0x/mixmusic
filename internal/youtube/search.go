@@ -63,10 +63,10 @@ func parseSearch(n node) []media.Item {
 	return items
 }
 
-// SearchAll searches songs, albums, artists and playlists at once. It fails
-// only when every one of the searches fails.
+// SearchAll searches songs, videos, albums, artists and playlists at once.
+// It fails only when every one of the searches fails.
 func (c *Client) SearchAll(ctx context.Context, query string) (media.SearchResults, error) {
-	filters := []Filter{FilterSongs, FilterAlbums, FilterArtists, FilterPlaylists}
+	filters := []Filter{FilterSongs, FilterVideos, FilterAlbums, FilterArtists, FilterPlaylists}
 	found := make([][]media.Item, len(filters))
 	errs := make([]error, len(filters))
 	var wg sync.WaitGroup
@@ -74,8 +74,14 @@ func (c *Client) SearchAll(ctx context.Context, query string) (media.SearchResul
 		wg.Go(func() { found[i], errs[i] = c.Search(ctx, query, f) })
 	}
 	wg.Wait()
+	return gatherResults(filters, found, errs)
+}
 
-	results := media.SearchResults{Tracks: []media.Track{}, Albums: []media.Album{}, Artists: []media.Artist{}, Playlists: []media.Playlist{}}
+// gatherResults sorts the items each filter found by kind: the tracks of
+// FilterVideos are videos, those of any other filter songs. It fails only
+// when every one of the searches failed.
+func gatherResults(filters []Filter, found [][]media.Item, errs []error) (media.SearchResults, error) {
+	results := media.SearchResults{Tracks: []media.Track{}, Videos: []media.Track{}, Albums: []media.Album{}, Artists: []media.Artist{}, Playlists: []media.Playlist{}}
 	failed := 0
 	for i := range filters {
 		if errs[i] != nil {
@@ -85,7 +91,11 @@ func (c *Client) SearchAll(ctx context.Context, query string) (media.SearchResul
 		for _, item := range found[i] {
 			switch item.Kind {
 			case media.ItemTrack:
-				results.Tracks = append(results.Tracks, *item.Track)
+				if filters[i] == FilterVideos {
+					results.Videos = append(results.Videos, *item.Track)
+				} else {
+					results.Tracks = append(results.Tracks, *item.Track)
+				}
 			case media.ItemAlbum:
 				results.Albums = append(results.Albums, *item.Album)
 			case media.ItemArtist:

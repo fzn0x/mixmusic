@@ -2,6 +2,7 @@ package youtube
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -171,5 +172,36 @@ func TestParseSongsOfAVideo(t *testing.T) {
 	}
 	if got := items[0].Track.ArtistNames(); got != "Daft Punk, Julian Casablancas" {
 		t.Errorf("artists = %q", got)
+	}
+}
+
+// TestGatherResults keeps the videos a search found apart from its songs,
+// and fails only when every search failed.
+func TestGatherResults(t *testing.T) {
+	song := media.Item{Kind: media.ItemTrack, Track: &media.Track{ID: "yt:song", Title: "A song"}}
+	set := media.Item{Kind: media.ItemTrack, Track: &media.Track{ID: "yt:set", Title: "A DJ set", Video: true}}
+	album := media.Item{Kind: media.ItemAlbum, Album: &media.Album{ID: "yt:album"}}
+	filters := []Filter{FilterSongs, FilterVideos, FilterAlbums}
+	got, err := gatherResults(filters, [][]media.Item{{song}, {set}, {album}}, make([]error, 3))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got.Tracks) != 1 || got.Tracks[0].ID != "yt:song" {
+		t.Errorf("songs = %+v", got.Tracks)
+	}
+	if len(got.Videos) != 1 || got.Videos[0].ID != "yt:set" {
+		t.Errorf("videos = %+v", got.Videos)
+	}
+	if len(got.Albums) != 1 {
+		t.Errorf("albums = %+v", got.Albums)
+	}
+
+	failed := errors.New("offline")
+	got, err = gatherResults(filters, [][]media.Item{{song}, nil, nil}, []error{nil, failed, failed})
+	if err != nil || len(got.Tracks) != 1 || got.Videos == nil || len(got.Videos) != 0 {
+		t.Errorf("with the videos failing: %+v, %v", got, err)
+	}
+	if _, err = gatherResults(filters, make([][]media.Item, 3), []error{failed, failed, failed}); err == nil {
+		t.Error("every search failed, and gatherResults didn't")
 	}
 }

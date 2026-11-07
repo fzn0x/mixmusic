@@ -240,9 +240,12 @@ type Shelf struct {
 	Items    []Item `json:"items"`
 }
 
-// SearchResults holds what a search found, by kind.
+// SearchResults holds what a search found, by kind. Videos are the videos
+// of YouTube that aren't songs of YouTube Music's catalog, as DJ sets,
+// live recordings and uploads of fans; only YouTube Music finds them.
 type SearchResults struct {
 	Tracks    []Track    `json:"tracks"`
+	Videos    []Track    `json:"videos"`
 	Albums    []Album    `json:"albums"`
 	Artists   []Artist   `json:"artists"`
 	Playlists []Playlist `json:"playlists"`

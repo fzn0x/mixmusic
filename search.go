@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	searchPivots = []string{"all", "songs", "albums", "artists", "playlists", "podcasts"}
+	searchPivots = []string{"all", "songs", "videos", "albums", "artists", "playlists", "podcasts"}
 	searchScopes = []string{"both", "Spotify", "YouTube Music"}
 )
 
@@ -40,6 +40,7 @@ func mergeResults(r app.SearchResponse, scope int) media.SearchResults {
 	}
 	return media.SearchResults{
 		Tracks:    interleave(r.Spotify.Tracks, r.YouTube.Tracks),
+		Videos:    interleave(r.Spotify.Videos, r.YouTube.Videos),
 		Albums:    interleave(r.Spotify.Albums, r.YouTube.Albums),
 		Artists:   interleave(r.Spotify.Artists, r.YouTube.Artists),
 		Playlists: interleave(r.Spotify.Playlists, r.YouTube.Playlists),
@@ -60,7 +61,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		var counts []int
 		if res.done && res.err == nil {
 			r := mergeResults(res.value, s.searchScope)
-			counts = []int{-1, len(r.Tracks), len(r.Albums), len(r.Artists), len(r.Playlists), s.podcastCount(q)}
+			counts = []int{-1, len(r.Tracks), len(r.Videos), len(r.Albums), len(r.Artists), len(r.Playlists), s.podcastCount(q)}
 		}
 		s.pageHeaderCounts(c, q, searchPivots, counts, &s.searchPivot)
 		ui.Row(c).Margin(0, 0, 24).Children(func() {
@@ -97,6 +98,23 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 			}
 			ui.Column(c).Margin(0, 0, 48).Children(func() {
 				s.trackList(c, "results", tracks, trackListOptions{art: true, album: true, plays: true, empty: "No songs match."})
+			})
+		}
+		// Videos are YouTube's own, as DJ sets and live recordings, which
+		// aren't songs of YouTube Music's catalog: All shows the first few,
+		// and the Videos pivot every one.
+		if (pivot == "all" && len(r.Videos) > 0) || pivot == "videos" {
+			videos := r.Videos
+			if pivot == "all" {
+				s.sectionTitle(c, "Videos")
+				videos = videos[:min(len(videos), 5)]
+			}
+			empty := "No videos match."
+			if s.searchScope == 1 {
+				empty = "Only YouTube Music has videos."
+			}
+			ui.Column(c).Margin(0, 0, 48).Children(func() {
+				s.trackList(c, "video-results", videos, trackListOptions{art: true, plays: true, empty: empty})
 			})
 		}
 		switch pivot {

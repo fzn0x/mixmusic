@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"strings"
 	"time"
 
@@ -90,6 +91,10 @@ func (s *shell) searchField(c *ui.Context) {
 	box.Children(func() {
 		ui.Icon(c, icon("search")).FontSize(18).TextColor(ink)
 		cb := ui.ComboboxBase(c.Key("search"), &s.query)
+		if s.suggesting && focused {
+			cb.SetOpen(true)
+			s.suggesting = false
+		}
 		in := cb.Input.Placeholder(k.words("Search Spotify and YouTube Music")).Grow(1).MinWidth(0).Bind(&s.searchBox).
 			Label("Search").FontSize(k.bodySize())
 		if in.Changed() {
@@ -272,6 +277,26 @@ func (s *shell) suggestedLine(it media.Item) (title, line string, art []media.Im
 		line += " · " + by
 	}
 	return title, line, art
+}
+
+// typeSearch has the search box hold text as typed, with the focus and
+// its suggestions showing, for capture mode.
+func (s *shell) typeSearch(text string) {
+	s.query, s.queryAt, s.suggesting = text, time.Now(), true
+	s.searchBox.Focus()
+}
+
+// chooseSuggested chooses the first song, video, album, artist or
+// playlist the box suggests, of kind, as a click would, for capture mode.
+func (s *shell) chooseSuggested(kind string) {
+	for _, it := range s.suggested.Items {
+		_, line, _ := s.suggestedLine(it)
+		if strings.HasPrefix(strings.ToLower(line), kind) {
+			s.openSuggested(it)
+			return
+		}
+	}
+	log.Printf("mixmusic: capture: no %s among the suggestions", kind)
 }
 
 // openSuggested plays a song the box suggested at once, with its radio

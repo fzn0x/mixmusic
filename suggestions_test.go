@@ -124,3 +124,29 @@ func TestSuggestedItemsFit(t *testing.T) {
 		t.Errorf("the last song, reached by the arrows, stays below the window, at %v", last)
 	}
 }
+
+// TestCaptureSuggestions types in the search box and chooses a suggested
+// song, as capture mode's act:search and act:suggested do: the
+// suggestions show for what was typed, and the song plays.
+func TestCaptureSuggestions(t *testing.T) {
+	s := newTestShell(t)
+	song := media.Track{ID: "yt:4D7u5KF7SP8", Source: media.SourceYouTube, Title: "Get Lucky", DurationMs: 248000}
+	s.loads["suggest:daft"] = &loaded[media.Suggestions]{done: true, value: media.Suggestions{
+		Searches: []string{"daft punk"},
+		Items: []media.Item{
+			{Kind: media.ItemArtist, Artist: &media.Artist{ID: "yt:UCdaft", Source: media.SourceYouTube, Name: "Daft Punk"}},
+			{Kind: media.ItemTrack, Track: &song},
+		},
+	}}
+	tt := tester(t, s)
+	s.typeSearch("daft")
+	tt.Advance(time.Second)
+	if !tt.HasText("daft punk") || !tt.HasText("Get Lucky") {
+		t.Fatalf("typed in, the box suggests %q", tt.Texts())
+	}
+	s.chooseSuggested("song")
+	s.settle(t, func(st player.State) bool {
+		cur, ok := st.Current()
+		return ok && cur.Track.ID == song.ID
+	})
+}

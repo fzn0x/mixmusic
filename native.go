@@ -153,8 +153,11 @@ type shell struct {
 	queryAt      time.Time
 	suggested    media.Suggestions
 	suggestedFor string
-	searchBox    ui.Handle
-	queueList    ui.ListState
+	// suggesting opens the box's suggestions once it has the focus, as
+	// capture mode types in it.
+	suggesting bool
+	searchBox  ui.Handle
+	queueList  ui.ListState
 	// seeking and seekTo are the seek bar while the user drags it.
 	seeking bool
 	seekTo  float64

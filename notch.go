@@ -204,14 +204,16 @@ func (n *notch) view(c *ui.Context) {
 	cr := h.compactRadius()
 	root.Draw(func(p *ui.Painter, r ui.Rect) {
 		if reduce {
-			p.Clip(ui.Rect{X: r.X + cx - cw/2, Y: r.Y - cr, W: cw, H: hh + cr}, cr, func() {
+			p.Clip(ui.Rect{X: r.X + cx - cw/2, Y: r.Y - 2*cr, W: cw, H: hh + 2*cr}, cr, func() {
 				p.Fill(ui.Rect{X: r.X + cx - cw/2, Y: r.Y, W: cw, H: hh}, notchBlack, 0)
 			})
 		}
 		if fill.A > 0 {
 			// Square at the top, against the screen's edge: the rounded
-			// rectangle starts above the window.
-			p.Clip(ui.Rect{X: r.X + cx - pw/2, Y: r.Y - pr, W: pw, H: ph + pr}, pr, func() {
+			// rectangle starts two radii above the window, so its top
+			// corners miss it. A radius above, as before, macOS drew their
+			// curve a few pixels into the window, softening the black.
+			p.Clip(ui.Rect{X: r.X + cx - pw/2, Y: r.Y - 2*pr, W: pw, H: ph + 2*pr}, pr, func() {
 				p.Fill(ui.Rect{X: r.X + cx - pw/2, Y: r.Y, W: pw, H: ph}, fill, 0)
 			})
 		}

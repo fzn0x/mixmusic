@@ -128,6 +128,10 @@ func (s *shell) captureFromEnv() {
 				}
 			case "library":
 				add, q, _ := strings.Cut(arg, ":")
+				if add != "add" && add != "remove" {
+					log.Printf("mixmusic: capture: act:library takes add or remove, not %q", add)
+					continue
+				}
 				res, err := s.svc.Catalog.Search(context.Background(), q)
 				if err != nil || len(res.YouTube.Tracks) == 0 {
 					log.Printf("mixmusic: capture: searching %q: %v", q, err)

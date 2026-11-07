@@ -149,4 +149,8 @@ func TestCaptureSuggestions(t *testing.T) {
 		cur, ok := st.Current()
 		return ok && cur.Track.ID == song.ID
 	})
+	tt.Frame()
+	if tt.HasText("daft punk") {
+		t.Errorf("once a song was chosen, the suggestions still show: %q", tt.Texts())
+	}
 }

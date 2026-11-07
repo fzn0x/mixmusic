@@ -91,9 +91,9 @@ func (s *shell) searchField(c *ui.Context) {
 	box.Children(func() {
 		ui.Icon(c, icon("search")).FontSize(18).TextColor(ink)
 		cb := ui.ComboboxBase(c.Key("search"), &s.query)
-		if s.suggesting && focused {
-			cb.SetOpen(true)
-			s.suggesting = false
+		if show := s.showSuggestions; show != nil && (focused || !*show) {
+			cb.SetOpen(*show)
+			s.showSuggestions = nil
 		}
 		in := cb.Input.Placeholder(k.words("Search Spotify and YouTube Music")).Grow(1).MinWidth(0).Bind(&s.searchBox).
 			Label("Search").FontSize(k.bodySize())
@@ -282,16 +282,20 @@ func (s *shell) suggestedLine(it media.Item) (title, line string, art []media.Im
 // typeSearch has the search box hold text as typed, with the focus and
 // its suggestions showing, for capture mode.
 func (s *shell) typeSearch(text string) {
-	s.query, s.queryAt, s.suggesting = text, time.Now(), true
+	show := true
+	s.query, s.queryAt, s.showSuggestions = text, time.Now(), &show
 	s.searchBox.Focus()
 }
 
 // chooseSuggested chooses the first song, video, album, artist or
-// playlist the box suggests, of kind, as a click would, for capture mode.
+// playlist the box suggests, of kind, as a click would, closing them, for
+// capture mode.
 func (s *shell) chooseSuggested(kind string) {
 	for _, it := range s.suggested.Items {
 		_, line, _ := s.suggestedLine(it)
 		if strings.HasPrefix(strings.ToLower(line), kind) {
+			show := false
+			s.showSuggestions = &show
 			s.openSuggested(it)
 			return
 		}

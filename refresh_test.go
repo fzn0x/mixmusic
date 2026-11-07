@@ -53,6 +53,17 @@ func refreshToasts(tt *ui.Tester) []string {
 	return out
 }
 
+// pressRefresh presses the keys of Refresh this page on this system: F5,
+// or ⇧⌘R on macOS.
+func pressRefresh(t *testing.T, tt *ui.Tester) {
+	t.Helper()
+	mods, key, ok := parseShortcut(refreshKeys)
+	if !ok {
+		t.Fatalf("Refresh's keys %q don't parse", refreshKeys)
+	}
+	tt.Key(mods, key)
+}
+
 // badAlbum is the page of an album that showed, whose ID names no service:
 // asking for it again fails at once, offline.
 func badAlbum(s *shell) *loaded[media.Album] {
@@ -88,7 +99,7 @@ func TestRefreshMix(t *testing.T) {
 		t.Fatal("the page followed the mix by itself: nothing to refresh")
 	}
 	tt.Announcements()
-	tt.Key(0, ui.KeyF5)
+	pressRefresh(t, tt)
 	waitRefreshed(t, s, tt)
 	if !tt.HasText(testTracks[2].Title) {
 		t.Errorf("F5 didn't show the mix's new track: %q", tt.Texts())
@@ -108,7 +119,7 @@ func TestRefreshKeepsWhatFails(t *testing.T) {
 	if !s.shown["album:al-x"] {
 		t.Fatalf("the album isn't what the page shows: %v", s.shown)
 	}
-	tt.Key(0, ui.KeyF5)
+	pressRefresh(t, tt)
 	if !l.refreshing || l.asks != 1 {
 		t.Fatalf("F5 didn't ask again: refreshing %v, asks %d", l.refreshing, l.asks)
 	}
@@ -149,7 +160,7 @@ func TestRefreshOneToast(t *testing.T) {
 	if !s.shown["album:al-x"] || !s.shown[lyricsKey] {
 		t.Fatalf("the page and the panel show %v", s.shown)
 	}
-	tt.Key(0, ui.KeyF5)
+	pressRefresh(t, tt)
 	if !s.refreshingKey(lyricsKey) {
 		t.Fatal("the panel's lyrics don't refresh with the page")
 	}
@@ -169,8 +180,8 @@ func TestRefreshOnce(t *testing.T) {
 	tt := tester(t, s)
 	l := badAlbum(s)
 	show(s, tt, "/album/al-x")
-	tt.Key(0, ui.KeyF5)
-	tt.Key(0, ui.KeyF5)
+	pressRefresh(t, tt)
+	pressRefresh(t, tt)
 	tt.Click("Refresh this page")
 	tt.Frame()
 	if l.asks != 1 {
@@ -194,7 +205,7 @@ func TestRefreshKeys(t *testing.T) {
 	// the user goes down to Refresh's.
 	tt := testerOf(t, s, 1280, 4800)
 	show(s, tt, "/stats")
-	tt.Key(0, ui.KeyF5)
+	pressRefresh(t, tt)
 	s.drain()
 	if st := s.p.State(); st.Repeat != player.RepeatOff {
 		t.Errorf("F5 changed repeat to %v", st.Repeat)
@@ -218,18 +229,19 @@ func TestRefreshKeys(t *testing.T) {
 	}
 }
 
-// TestRefreshYieldsKeys leaves F5 to the command the user gave it before
-// Refresh this page had it: that command keeps it, and Refresh has none.
+// TestRefreshYieldsKeys leaves Refresh's keys (F5, ⇧⌘R on macOS) to the
+// command the user gave them before Refresh this page had them: that
+// command keeps them, and Refresh has none.
 func TestRefreshYieldsKeys(t *testing.T) {
 	s := newTestShell(t)
-	s.set.Shortcuts = map[string]string{"player.mute": "F5"}
+	s.set.Shortcuts = map[string]string{"player.mute": refreshKeys}
 	tt := tester(t, s)
 	l := badAlbum(s)
 	show(s, tt, "/album/al-x")
-	tt.Key(0, ui.KeyF5)
+	pressRefresh(t, tt)
 	s.settle(t, func(st player.State) bool { return st.Muted })
 	if l.refreshing || l.asks != 0 {
-		t.Error("F5, the user's for Mute, refreshed the page")
+		t.Errorf("%s, the user's for Mute, refreshed the page", refreshKeys)
 	}
 	if keys := s.shortcutOf(command{id: "view.refresh", shortcut: refreshKeys}); keys != "" {
 		t.Errorf("Refresh this page keeps %q", keys)
@@ -351,7 +363,7 @@ export default function activate(api) {
 	until(t, s, tt, "the plugin's page", func() bool { return s.plugins.Page("/plugin/again/home") != nil })
 	show(s, tt, "/plugin/again/home")
 	until(t, s, tt, "the first render", func() bool { return tt.HasText("rendered 1") })
-	tt.Key(0, ui.KeyF5)
+	pressRefresh(t, tt)
 	until(t, s, tt, "the render of the refresh", func() bool { return tt.HasText("rendered 2") })
 }
 
@@ -391,7 +403,7 @@ func TestRefreshRegistry(t *testing.T) {
 	if tt.HasText("paper mint") {
 		t.Fatal("the registry kept for ten minutes didn't keep")
 	}
-	tt.Key(0, ui.KeyF5)
+	pressRefresh(t, tt)
 	waitRefreshed(t, s, tt)
 	if !tt.HasText("paper mint") {
 		t.Errorf("the refresh didn't ask the registry: %q", tt.Texts())
@@ -456,7 +468,7 @@ func TestRenderRefresh(t *testing.T) {
 	tt := tester(t, s)
 	show(s, tt, "/album/al-x")
 	renderTo(t, s, tt, dir, "refresh-idle")
-	tt.Key(0, ui.KeyF5)
+	pressRefresh(t, tt)
 	tt.Frame()
 	img := tt.Image()
 	f, err := os.Create(filepath.Join(dir, "refresh-busy.png"))

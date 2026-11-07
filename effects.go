@@ -2,6 +2,7 @@ package main
 
 import (
 	"image"
+	"image/color"
 	"image/draw"
 	"math"
 	"strconv"
@@ -135,8 +136,8 @@ func (s *shell) groundPaint(c *ui.Context) func(p *ui.Painter, r ui.Rect) {
 	k := &s.lk
 	switch {
 	case k.fx.aurora:
-		tint, accent, drift := k.fx.tint, k.accent, k.fx.drift && !c.Preferences().ReduceMotion
-		return func(p *ui.Painter, r ui.Rect) { paintAurora(p, r, tint, accent, drift) }
+		bg, tint, accent, drift := k.bg, k.fx.tint, k.accent, k.fx.drift && !c.Preferences().ReduceMotion
+		return func(p *ui.Painter, r ui.Rect) { s.paintAurora(p, r, bg, tint, accent, drift) }
 	case k.fx.petals:
 		return paintPetals
 	case k.fx.wash:
@@ -151,12 +152,12 @@ func (s *shell) groundPaint(c *ui.Context) func(p *ui.Painter, r ui.Rect) {
 		t := s.coverTint(c, k.accent, groundTone(k.dark))
 		// Without a cover, the accent's light is half as strong: the
 		// glass stays white.
-		accent, strength := k.accent, 1.0
+		bg, accent, strength := k.bg, k.accent, 1.0
 		if s.artColor == "" {
 			strength = 0.5
 		}
 		return func(p *ui.Painter, r ui.Rect) {
-			paintCover(p, r, t.color(p.Now()), accent, strength)
+			s.paintCover(p, r, bg, t.color(p.Now()), accent, strength)
 			if t.changing(p.Now()) {
 				p.AnimationFrame()
 			}
@@ -228,10 +229,10 @@ const auroraPeriod = 40 * time.Second
 // auroraStart is when Aurora's lights started drifting.
 var auroraStart = time.Now()
 
-// paintAurora paints the three lights of Aurora's ground, its stylesheet's
-// radial gradients, on a ground 140% of the window's size, which drifts
-// across it and back when drift is set.
-func paintAurora(p *ui.Painter, r ui.Rect, tint, accent ui.Color, drift bool) {
+// paintAurora paints the three lights of Aurora's ground over bg, its
+// stylesheet's radial gradients, on a ground 140% of the window's size,
+// which drifts across it and back when drift is set.
+func (s *shell) paintAurora(p *ui.Painter, r ui.Rect, bg, tint, accent ui.Color, drift bool) {
 	var x, y float32
 	if drift {
 		phase := float32(math.Mod(float64(p.Now().Sub(auroraStart))/float64(auroraPeriod), 2))
@@ -244,42 +245,68 @@ func paintAurora(p *ui.Painter, r ui.Rect, tint, accent ui.Color, drift bool) {
 		p.After(100 * time.Millisecond)
 	}
 	w, h := 1.4*r.W, 1.4*r.H
-	ox, oy := r.X-(w-r.W)*x, r.Y-(h-r.H)*y
-	p.Clip(r, 0, func() {
-		glow(p, ox+0.15*w, oy+0.10*h, 0.60*w, 0.50*h, withAlpha(tint, 0.45))
-		glow(p, ox+0.85*w, oy+0.25*h, 0.50*w, 0.45*h, withAlpha(accent, 0.30))
-		glow(p, ox+0.50*w, oy+h, 0.70*w, 0.60*h, ui.Color{R: 40, G: 90, B: 255, A: 64})
+	ground := s.lights.of(bg, [3]groundLight{
+		{0.15, 0.10, 0.60, 0.50, withAlpha(tint, 0.45)},
+		{0.85, 0.25, 0.50, 0.45, withAlpha(accent, 0.30)},
+		{0.50, 1, 0.70, 0.60, ui.Color{R: 40, G: 90, B: 255, A: 64}},
 	})
+	p.Clip(r, 0, func() { p.Image(ground, ui.Rect{X: r.X - (w-r.W)*x, Y: r.Y - (h-r.H)*y, W: w, H: h}, ui.FillBox) })
 }
 
-// glowRings is how many rings a glow is painted with: enough that their
-// steps don't show.
-const glowRings = 48
+// groundLight is one of the lights of a ground: a glow of c, at its
+// opacity, centered at (x, y), of radii rx and ry, in shares of the
+// ground's width and height.
+type groundLight struct {
+	x, y, rx, ry float64
+	c            ui.Color
+}
 
-// glow paints a radial gradient centered on (cx, cy), of radii rx and ry:
-// c at the center, fading evenly to nothing 70% of the way out, as
-// radial-gradient(c, transparent 70%) does. It paints rings, each over the
-// ones around it, of the opacity that brings what they cover to the
-// gradient's, and keeps what the opacities lost to rounding for the rings
-// after.
-func glow(p *ui.Painter, cx, cy, rx, ry float32, c ui.Color) {
-	if rx <= 0 || ry <= 0 || c.A == 0 {
-		return
+// groundLights are a ground's colour under its three lights, drawn into a
+// bitmap once for their colours: the same bitmap, stretched, is the
+// ground of a window of any size, one image, whose pixels the GPU shades
+// once a frame. Painted as stacks of rings, the lights had it shade each
+// pixel under them dozens of times, more than a laptop's GPU had time for
+// (#325).
+type groundLights struct {
+	bg  ui.Color
+	all [3]groundLight
+	bmp *ui.Bitmap
+}
+
+// lightsW and lightsH are the size of a ground's bitmap: its pixels, a
+// few DIPs apart on the ground, are many to a light, and the GPU blends
+// between them as smoothly as the gradients would.
+const lightsW, lightsH = 256, 160
+
+// of returns the bitmap of bg under all, drawn again only when they
+// change.
+func (l *groundLights) of(bg ui.Color, all [3]groundLight) *ui.Bitmap {
+	if l.bmp == nil || l.bg != bg || l.all != all {
+		*l = groundLights{bg: bg, all: all, bmp: ui.NewBitmap(drawLights(bg, all[:]))}
 	}
-	a := float64(c.A) / 255
-	p.Transform(ui.Scaling(1, ry/rx), cx, cy, func() {
-		covered := 0.0
-		for i := 1; i <= glowRings; i++ {
-			want := a * float64(i) / glowRings
-			ring := math.Round(255 * (1 - (1-want)/(1-covered)))
-			if ring <= 0 {
-				continue
+	return l.bmp
+}
+
+// drawLights draws lights over bg, each as its stylesheet's
+// radial-gradient(c, transparent 70%) of its radii: c at its opacity at
+// the center, fading evenly to nothing 70% of the way out.
+func drawLights(bg ui.Color, lights []groundLight) *image.RGBA {
+	img := image.NewRGBA(image.Rect(0, 0, lightsW, lightsH))
+	for y := range lightsH {
+		v := (float64(y) + 0.5) / lightsH
+		for x := range lightsW {
+			u := (float64(x) + 0.5) / lightsW
+			r, g, b := float64(bg.R)/255, float64(bg.G)/255, float64(bg.B)/255
+			for _, l := range lights {
+				a := float64(l.c.A) / 255 * max(1-math.Hypot((u-l.x)/(0.7*l.rx), (v-l.y)/(0.7*l.ry)), 0)
+				r += (float64(l.c.R)/255 - r) * a
+				g += (float64(l.c.G)/255 - g) * a
+				b += (float64(l.c.B)/255 - b) * a
 			}
-			covered = 1 - (1-covered)*(1-ring/255)
-			rad := 0.7 * rx * float32(glowRings-i+1) / glowRings
-			p.Fill(ui.Rect{X: cx - rad, Y: cy - rad, W: 2 * rad, H: 2 * rad}, ui.Color{R: c.R, G: c.G, B: c.B, A: uint8(ring)}, rad)
+			img.SetRGBA(x, y, color.RGBA{R: unit(r), G: unit(g), B: unit(b), A: 255})
 		}
-	})
+	}
+	return img
 }
 
 // withAlpha is c at an opacity of a.

@@ -18,7 +18,7 @@ The search box at the top of the window, "Search Spotify and YouTube Music", sea
 - **Each result** has a mark of its service. YouTube Music's songs say how many times they played, or how many views a video has, as "1.2B plays" or "905M views", so that the original stands out from covers. Spotify gives apps no such count.
 - **Without Spotify,** the page says it searches YouTube Music only, with a link to [sign in](spotify.md#sign-in). Spotify gives an app in [development mode](spotify.md#what-spotify-allows-apps), as your Spotify app is, ten results of each kind.
 
-![The search page for YOASOBI: the All, Songs, Albums, Artists, Playlists and Podcasts pivots with how many each found, the Both, Spotify and YouTube Music choice, a note that it searches YouTube Music only until you sign in to Spotify, and the songs found, each with its plays and the mark of its service](shots/search.webp)
+![The search page for YOASOBI: the All, Songs, Videos, Albums, Artists, Playlists and Podcasts pivots with how many each found, the Both, Spotify and YouTube Music choice, a note that it searches YouTube Music only until you sign in to Spotify, and the songs found, each with its plays and the mark of its service](shots/search.webp)
 
 The [command palette](settings.md#the-command-palette) (Ctrl+K) searches too: type anything, and its first item is "Search for" what you typed.
 

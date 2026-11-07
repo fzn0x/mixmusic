@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"image/color"
 	"math"
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -80,5 +82,38 @@ func TestAuroraGround(t *testing.T) {
 		if got := img.RGBAAt(pt[0], pt[1]); levelsApart(got, want) > 2 {
 			t.Errorf("at %v Aurora's ground is %v, want %v", pt, got, want)
 		}
+	}
+}
+
+// TestAuroraDrift has Aurora's lights drift in frames that paint the
+// ground again five times a second, without building the view or drawing
+// the lights again.
+func TestAuroraDrift(t *testing.T) {
+	s := newTestShell(t)
+	wear(s, "aurora", nil)
+	builds, paints := 0, 0
+	tt := ui.NewTester(func(ctx *ui.Context) {
+		builds++
+		paint := s.groundPaint(ctx)
+		ui.Column(ctx).Fill().Draw(func(p *ui.Painter, r ui.Rect) {
+			paints++
+			paint(p, r)
+		})
+	}, 320, 200)
+	tt.Frame()
+	before, drawn := append([]byte(nil), tt.Image().Pix...), s.lights.bmp
+	builds, paints = 0, 0
+	tt.Advance(10 * time.Second)
+	if builds != 0 {
+		t.Errorf("drifting, the lights built the view %d times in 10 s", builds)
+	}
+	if paints < 45 || paints > 51 {
+		t.Errorf("drifting, the lights painted %d times in 10 s, want 50", paints)
+	}
+	if bytes.Equal(before, tt.Image().Pix) {
+		t.Error("the lights stood still")
+	}
+	if s.lights.bmp != drawn {
+		t.Error("drifting, the lights were drawn again")
 	}
 }

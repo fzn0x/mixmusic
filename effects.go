@@ -229,6 +229,12 @@ const auroraPeriod = 40 * time.Second
 // auroraStart is when Aurora's lights started drifting.
 var auroraStart = time.Now()
 
+// auroraFrame is how often Aurora's lights drift a step. They are soft:
+// at their fastest, halfway across, a fifth of a second moves them far
+// enough to change a pixel by about a level of colour, which more frames,
+// each painting the whole window again, would show no more smoothly.
+const auroraFrame = 200 * time.Millisecond
+
 // paintAurora paints the three lights of Aurora's ground over bg, its
 // stylesheet's radial gradients, on a ground 140% of the window's size,
 // which drifts across it and back when drift is set.
@@ -241,8 +247,7 @@ func (s *shell) paintAurora(p *ui.Painter, r ui.Rect, bg, tint, accent ui.Color,
 		}
 		phase = ui.EaseInOut(phase)
 		x, y = phase, 0.6*phase
-		// The lights move a pixel or so a frame: ten frames a second will do.
-		p.After(100 * time.Millisecond)
+		p.After(auroraFrame)
 	}
 	w, h := 1.4*r.W, 1.4*r.H
 	ground := s.lights.of(bg, [3]groundLight{

@@ -13,6 +13,9 @@ aren't pages act: `act:shot:<name>` saves the window as it is,
 finds, `act:local:<search>` the music on this computer it finds, all of
 it without one, `act:resume` plays the queue kept in the data folder,
 `act:wait:<duration>` waits, `act:palette` opens the command palette,
+`act:search:<text>` types text in the search box, whose suggestions
+show, `act:suggested:<song|video|album|artist|playlist>` chooses the
+first suggestion of that kind, as a click would,
 `act:refresh` refreshes the page, as F5 does,
 `act:panel:<queue|lyrics|none>` shows a side panel, `act:scroll:<y|end>`
 scrolls the page, `act:theme:<id>` wears a theme,

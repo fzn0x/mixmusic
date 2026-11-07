@@ -15,7 +15,8 @@
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
   liked songs, playlists, albums, subscriptions, likes, dislikes and
-  saves, and it deletes the playlists the user made, which it tells from
+  saves, songs saved to the library apart from likes, by the feedback
+  tokens of their menus in the queue of their "next", and it deletes the playlists the user made, which it tells from
   those they saved by the menus YouTube sends with them. It lists the
   Google accounts of the session and their brand channels, from YouTube's
   website, and uses a brand channel by its page ID: one whose page ID the

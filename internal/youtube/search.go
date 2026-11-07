@@ -101,30 +101,36 @@ func (c *Client) SearchAll(ctx context.Context, query string) (media.SearchResul
 	return results, nil
 }
 
-// Suggestions returns the searches YouTube Music suggests for what the
-// user typed so far.
-func (c *Client) Suggestions(ctx context.Context, input string) ([]string, error) {
+// Suggestions returns what YouTube Music suggests for what the user typed
+// so far: searches, then songs, albums, artists and playlists.
+func (c *Client) Suggestions(ctx context.Context, input string) (media.Suggestions, error) {
 	n, err := c.call(ctx, "music/get_search_suggestions", map[string]any{"input": input}, nil)
 	if err != nil {
-		return nil, err
+		return media.Suggestions{}, err
 	}
 	return parseSuggestions(n), nil
 }
 
-func parseSuggestions(n node) []string {
-	out := []string{}
+// parseSuggestions reads the sections of suggestions: YouTube Music puts
+// the searches in the first, and the songs, albums, artists and playlists,
+// as rows of a search's results, in the second.
+func parseSuggestions(n node) media.Suggestions {
+	out := media.Suggestions{Searches: []string{}}
 	for _, section := range n.get("contents").list() {
 		for _, c := range section.get("searchSuggestionsSectionRenderer", "contents").list() {
-			s := c.get("searchSuggestionRenderer")
-			if !s.exists() {
-				continue
-			}
-			q := s.get("navigationEndpoint", "searchEndpoint", "query").str()
-			if q == "" {
-				q = s.get("suggestion").text()
-			}
-			if q != "" {
-				out = append(out, q)
+			switch name, r := c.renderer(); name {
+			case "searchSuggestionRenderer":
+				q := r.get("navigationEndpoint", "searchEndpoint", "query").str()
+				if q == "" {
+					q = r.get("suggestion").text()
+				}
+				if q != "" {
+					out.Searches = append(out.Searches, q)
+				}
+			case "musicResponsiveListItemRenderer":
+				if it, ok := parseListItem(r); ok {
+					out.Items = append(out.Items, it)
+				}
 			}
 		}
 	}

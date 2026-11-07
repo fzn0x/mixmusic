@@ -26,7 +26,10 @@ import (
 // the window as it is, act:mute mutes the player, act:play:<search> plays
 // the songs a search finds, act:local:<search> the music on this computer
 // it finds, all of it without one, act:resume plays the queue, act:wait:<duration>
-// waits, act:palette opens the command palette, act:refresh refreshes the
+// waits, act:palette opens the command palette, act:search:<text> types
+// text in the search box, whose suggestions show, act:suggested:<kind>
+// chooses the first song, video, album, artist or playlist it suggests,
+// act:refresh refreshes the
 // page, act:panel:<queue|lyrics|none> shows a side panel,
 // act:scroll:<y|end> scrolls the page, act:theme:<id> wears a theme,
 // act:colors:<off|pywal|matugen|path> takes the colours from a file,
@@ -157,6 +160,10 @@ func (s *shell) captureFromEnv() {
 				}
 			case "palette":
 				s.win.Update(func() { s.paletteOpen = true })
+			case "search":
+				s.win.Update(func() { s.typeSearch(arg) })
+			case "suggested":
+				s.win.Update(func() { s.chooseSuggested(arg) })
 			case "refresh":
 				s.win.Update(s.refreshPage)
 			case "panel":

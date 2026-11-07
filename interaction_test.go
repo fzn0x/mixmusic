@@ -1664,8 +1664,8 @@ func TestAboutRelease(t *testing.T) {
 // search.
 func TestSearchSuggestions(t *testing.T) {
 	s := newTestShell(t)
-	s.loads["suggest:"] = &loaded[[]string]{done: true, value: []string{"boards of canada"}}
-	s.loads["suggest:daft"] = &loaded[[]string]{done: true, value: []string{"Daft", "daft punk", "daft punk get lucky"}}
+	s.loads["suggest:"] = &loaded[media.Suggestions]{done: true, value: media.Suggestions{Searches: []string{"boards of canada"}}}
+	s.loads["suggest:daft"] = &loaded[media.Suggestions]{done: true, value: media.Suggestions{Searches: []string{"Daft", "daft punk", "daft punk get lucky"}}}
 	for _, q := range []string{"daft punk", "boards of canada"} {
 		s.loads["search:"+q] = &loaded[app.SearchResponse]{done: true}
 	}

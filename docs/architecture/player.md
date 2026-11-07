@@ -5,7 +5,8 @@
   and Spotify tracks matched to their recording, through the engine, and
   Spotify tracks on a Spotify device: a Spotify Connect device, or MixMusic
   itself, as below. It shuffles, repeats, crossfades, starts radios when the
-  queue runs out, passes over the songs the user dislikes but those they
+  queue runs out, or at once after a suggested song (`PlayWithRadio`),
+  passes over the songs the user dislikes but those they
   pick, counts plays and keeps up to 500 tracks of the queue,
   around the one playing, in `queue.json`, as it changes and as MixMusic
   quits. A track that can't play for want of the network gives way at once

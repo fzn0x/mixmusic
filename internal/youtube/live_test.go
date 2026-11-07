@@ -70,7 +70,7 @@ func TestLive(t *testing.T) {
 	}
 
 	suggestions, err := c.Suggestions(ctx, "daft p")
-	if err != nil || len(suggestions) == 0 {
+	if err != nil || len(suggestions.Searches) == 0 || len(suggestions.Items) == 0 {
 		t.Fatalf("suggestions: %v, %v", suggestions, err)
 	}
 }

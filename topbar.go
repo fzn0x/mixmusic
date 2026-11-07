@@ -103,13 +103,15 @@ func (s *shell) searchField(c *ui.Context) {
 			options, items = s.suggestions(c)
 		}
 		cb.Popup(func(panel ui.Element) {
-			// A menu, below the box and as wide, rather than below the text.
-			panel.AttachTo(box, ui.AnchorBottomStart, ui.AnchorTopStart).MarginY(6).MinWidth(box.Bounds().W).Padding(4).
+			// A menu, below the box and as wide, rather than below the text:
+			// a long title ends in an ellipsis rather than widen it, but in a
+			// box too narrow to read one.
+			b := box.Bounds()
+			panel.AttachTo(box, ui.AnchorBottomStart, ui.AnchorTopStart).MarginY(6).MinWidth(b.W).MaxWidth(max(b.W, 360)).Padding(4).
 				Radius(k.radiusSm).Background(k.raised).Border(1, k.border).Shadow(0, 12, 32, -8, ui.RGBA(0, 0, 0, 0.55))
 			// In a window too short for them all, the rows scroll, and the
 			// one the arrows reach comes into view.
 			_, h := c.Size()
-			b := box.Bounds()
 			ui.Scroll(c.Key("search-suggestions")).MaxHeight(max(h-b.Y-b.H-6-8-12, 120)).Children(func() {
 				for _, q := range options {
 					item := cb.Item(q).Height(36).PaddingX(12).Gap(12).AlignItems(ui.Center).Radius(k.radiusSm).Cursor(ui.CursorPointer)

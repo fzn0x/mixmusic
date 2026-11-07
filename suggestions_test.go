@@ -84,13 +84,16 @@ func TestSuggestedItems(t *testing.T) {
 }
 
 // TestSuggestedItemsFit has the suggestions scroll in a window too short
-// for them all, rather than run past its bottom.
+// for them all, rather than run past its bottom, and a long title end in
+// an ellipsis, rather than widen them past the search box.
 func TestSuggestedItemsFit(t *testing.T) {
 	s := newTestShell(t)
 	var items []media.Item
 	for _, id := range []string{"a", "b", "c", "d", "e"} {
 		items = append(items, media.Item{Kind: media.ItemTrack, Track: &media.Track{ID: "yt:" + id, Source: media.SourceYouTube, Title: "Song " + id}})
 	}
+	long := "Get Lucky (feat. Pharrell Williams and Nile Rodgers) [Radio Edit, Remastered]"
+	items[0].Track.Title = long
 	s.loads["suggest:daft"] = &loaded[media.Suggestions]{done: true, value: media.Suggestions{
 		Searches: []string{"daft 1", "daft 2", "daft 3", "daft 4", "daft 5", "daft 6", "daft 7"}, Items: items,
 	}}
@@ -100,6 +103,12 @@ func TestSuggestedItemsFit(t *testing.T) {
 	}
 	tt.Type("daft")
 	tt.Advance(time.Second)
+	// The box holds the input 38 from its left (padding, icon and gap) and
+	// 12 from its right; the popup is as wide, or 360 in a narrower box.
+	in, _ := tt.Find("Search")
+	if row, ok := tt.Find(long); !ok || row.X+row.W > in.X-38+max(in.W+50, 360) {
+		t.Errorf("the long title shows at %v, the box's input at %v", row, in)
+	}
 	last, ok := tt.Find("Song e")
 	if !ok {
 		t.Fatalf("the suggestions are %q", tt.Texts())

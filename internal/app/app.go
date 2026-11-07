@@ -26,6 +26,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/nowplaying"
 	"github.com/fzn0x/mixmusic/internal/online"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/romaji"
@@ -87,6 +88,10 @@ type Options struct {
 	// CastBrowse, when set, finds the cast devices on the network in place
 	// of mDNS: tests set it.
 	CastBrowse func(ctx context.Context) ([]cast.Device, error)
+	// Controls, when set, reaches the system's media controls in place of
+	// nowplaying.Open on MyGo's main thread: tests, which run no event
+	// loop, set it, since macOS's controls would wait for one for ever.
+	Controls func(handle func(nowplaying.Request)) (*nowplaying.Controls, error)
 }
 
 // App is MixMusic.

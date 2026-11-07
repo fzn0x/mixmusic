@@ -19,6 +19,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/cast"
 	"github.com/fzn0x/mixmusic/internal/cast/casttest"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/nowplaying"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/store"
 )
@@ -358,12 +359,19 @@ func (keptAudio) Serve(w http.ResponseWriter, r *http.Request, videoID string) b
 	return true
 }
 
+// noControls stands for a system without media controls, for tests: they
+// run no event loop, which macOS's controls would wait for.
+func noControls(func(nowplaying.Request)) (*nowplaying.Controls, error) {
+	return nil, nowplaying.ErrUnsupported
+}
+
 // newCastApp is an app whose player plays YouTube tracks silently on the
 // computer, and which finds the cast devices r answers for.
 func newCastApp(t *testing.T, r *casttest.Responder) (*App, *player.Player, *quietStream) {
 	t.Helper()
 	dir := t.TempDir()
-	opts := Options{DataDir: filepath.Join(dir, "data"), CacheDir: filepath.Join(dir, "cache"), Builtin: builtin.FS, Version: "test"}
+	opts := Options{DataDir: filepath.Join(dir, "data"), CacheDir: filepath.Join(dir, "cache"), Builtin: builtin.FS, Version: "test",
+		Controls: noControls}
 	a, err := New(opts)
 	if err != nil {
 		t.Fatal(err)

@@ -68,7 +68,13 @@ func (a *App) showControls() {
 	if c.c == nil && !c.tried && c.native && c.np.Track != nil {
 		c.tried = true
 		c.mu.Unlock()
-		ctl, err := nowplaying.Open(a.controlsAsked, mygo.RunOnMain)
+		open := a.opts.Controls
+		if open == nil {
+			open = func(handle func(nowplaying.Request)) (*nowplaying.Controls, error) {
+				return nowplaying.Open(handle, mygo.RunOnMain)
+			}
+		}
+		ctl, err := open(a.controlsAsked)
 		c.mu.Lock()
 		switch {
 		case err == nil:

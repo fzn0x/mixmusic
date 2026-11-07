@@ -9,7 +9,8 @@ This page covers finding music, the queue, the sound settings and the ways Spoti
 
 The search box at the top of the window, "Search Spotify and YouTube Music", searches both services at once. Ctrl+F (⌘F on macOS) puts the cursor in it. As you type, it suggests searches from YouTube Music; Enter, or a suggestion, opens the results. With nothing typed, the Search page lists your recent searches, which its clear link forgets.
 
-- **The pivots** at the top of the results are All, Songs, Albums, Artists, Playlists and Podcasts, each with how many it found. All shows the first ten songs, then shelves of artists, albums and playlists.
+- **The pivots** at the top of the results are All, Songs, Videos, Albums, Artists, Playlists and Podcasts, each with how many it found. All shows the first ten songs, the first five videos, then shelves of artists, albums and playlists.
+- **Videos** are YouTube's videos that aren't songs of YouTube Music's catalog, such as DJ sets, live recordings and fans' uploads, and they play as songs do. Only YouTube Music has them.
 - **The services:** under the pivots, choose both, Spotify or YouTube Music. With both, the results of the two services take turns, so that each leads.
 - **On this computer:** with both services chosen, the [music on this
   computer](local-music.md#search) that matches shows first, in its own

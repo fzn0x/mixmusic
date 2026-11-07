@@ -36,7 +36,7 @@ type SearchResponse struct {
 }
 
 func emptyResults() media.SearchResults {
-	return media.SearchResults{Tracks: []media.Track{}, Albums: []media.Album{}, Artists: []media.Artist{}, Playlists: []media.Playlist{}}
+	return media.SearchResults{Tracks: []media.Track{}, Videos: []media.Track{}, Albums: []media.Album{}, Artists: []media.Artist{}, Playlists: []media.Playlist{}}
 }
 
 // Search searches YouTube Music, and Spotify when the user signed in.

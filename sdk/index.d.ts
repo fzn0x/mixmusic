@@ -104,6 +104,8 @@ export interface Playlist {
 
 export interface SearchResults {
   tracks: Track[];
+  /** Videos of YouTube that aren't songs, as DJ sets and live recordings; YouTube Music's only. */
+  videos: Track[];
   albums: Album[];
   artists: Artist[];
   playlists: Playlist[];

@@ -23,6 +23,7 @@ func (s *shell) view(c *ui.Context) {
 	}
 	s.followArtwork()
 	s.keepYouTubePlaylists()
+	s.keepYouTubeSongs()
 	c.SetTheme(&s.lk.theme)
 	s.toasts(c)
 	s.fileToast(c)

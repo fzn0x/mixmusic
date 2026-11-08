@@ -57,6 +57,10 @@ type Options struct {
 	// DownloadsDir keeps the downloads, unless the user chose another
 	// folder: DataDir's downloads when it's empty.
 	DownloadsDir string
+	// WatchMusic, when set, watches a folder of music for changes in place
+	// of the system, from the first scan on, not only once the app started:
+	// tests set it.
+	WatchMusic localfiles.WatchFolder
 	// Builtin holds the add-ons MixMusic ships with.
 	Builtin fs.FS
 	// TrayIcon is the PNG of the tray icon.

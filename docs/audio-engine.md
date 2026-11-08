@@ -101,17 +101,38 @@ the default device when you change it. It renders 10 ms of audio at a
 time, at most 40 ms ahead of the device. After a second of silence, as
 when you pause, it lets the device go, so that the computer can sleep.
 
+[The output device](playing-music.md#the-output-device) of Settings ›
+Playback has it play on another device. It plays there while the device
+is there, and checks every second that it still is: once it's gone, the
+engine plays on the default device and says so, and once it's back, the
+engine plays there again. What the device held, 40 ms at most, is
+dropped as the engine moves, and the track plays on from there. The
+engine asks each device for 5.1 itself, so surround plays on the device
+chosen as it does on the default one.
+
 - **Windows:** WASAPI, in shared mode, with Windows converting to the
   device's own format. The thread that renders the audio registers with
   Windows' multimedia scheduler, MMCSS, as Pro Audio (or runs at a higher
   priority where MMCSS isn't there), so the music doesn't stutter while a
-  game or a browser keeps the computer busy (fixed in 0.5.2).
+  game or a browser keeps the computer busy (fixed in 0.5.2). The devices
+  are the render endpoints that are active, by their friendly names, and
+  the device chosen is its endpoint, by its ID.
 - **macOS:** an Audio Queue of Core Audio on the default output. A 5.1
   queue tells Core Audio its channel layout, which maps the channels to
-  your speakers.
+  your speakers. The devices are Core Audio's devices with output
+  channels that Sound settings shows, and a device chosen gets a queue of
+  its own, by its UID.
 - **Linux:** PulseAudio's simple API, which PipeWire serves too, or else
   ALSA's default device. PulseAudio and PipeWire move the stream when the
-  default device changes; ALSA's stays stereo.
+  default device changes; ALSA's stays stereo. The devices are the sound
+  server's sinks, by their descriptions, or, without a sound server,
+  ALSA's: each card's default device, its HDMI and S/PDIF outputs, and the
+  devices of your own ALSA configuration.
+
+Spotify tracks that Spotify's own player plays don't go through the
+engine: in MixMusic, on Windows and macOS, its web view plays them on the
+system's default device, whatever the device chosen, and on Spotify
+Connect, the Spotify device plays them.
 
 No C library is linked in: the output calls the system's audio libraries
 while MixMusic runs.

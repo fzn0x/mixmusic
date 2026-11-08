@@ -84,11 +84,6 @@ const (
 	// pauseFor: yt-dlp alone finds streams meanwhile.
 	pauseAfter = 3
 	pauseFor   = 30 * time.Minute
-	// surroundGrace is how long a stream found waits, past its check, for
-	// the TV client to tell whether the video has 5.1 surround audio: its
-	// answer, asked at once, comes in a fifth of a second, mostly before
-	// the check's.
-	surroundGrace = 500 * time.Millisecond
 )
 
 var (
@@ -150,8 +145,9 @@ func refusal(err error) bool {
 // itself, as YouTube's visionOS app, signed out: in a fraction of the time
 // yt-dlp takes, and with streams YouTube serves at once. YouTube gives it
 // no streams of some videos, such as those made for children, which yt-dlp
-// still finds. It asks as YouTube's TV app too whether a video has 5.1
-// surround audio, whose URL yt-dlp finds. Its methods are safe for
+// still finds. It asks as YouTube's TV app too, beside, whether a video
+// has 5.1 surround audio, whose URL yt-dlp finds, and tells of it with the
+// stream or, without waiting for it, after it. Its methods are safe for
 // concurrent use.
 type Direct struct {
 	// HTTP asks the API, and the media server whether it serves a stream.
@@ -230,10 +226,16 @@ func (d *Direct) count(err error) {
 
 func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream, error) {
 	// The TV client is asked at once, beside, whether the video has 5.1
-	// surround audio.
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	tv := d.askTV(ctx, videoID)
+	// surround audio. The stream doesn't wait for its answer: one that
+	// comes after it goes with it (Stream.later), and the request is given
+	// up when no stream is found.
+	tv, stop := d.askTV(ctx, videoID)
+	handed := false
+	defer func() {
+		if !handed {
+			stop()
+		}
+	}()
 	ans, err := d.answer(ctx, videoID)
 	if err != nil {
 		return Stream{}, err
@@ -259,53 +261,41 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 		sur := sf.stream()
 		sur.Loudness, sur.Measured = ans.loudness(&sf)
 		st.Surround = &sur
-	} else {
-		st.Surround = d.toldTV(tv)
+	} else if tv != nil {
+		// The TV client's 5.1 audio, without a URL, when its answer came
+		// already, as it mostly does: else it goes with the stream.
+		if sur, came := tv.now(); came {
+			st.Surround = sur
+		} else {
+			st.later, handed = tv, true
+		}
 	}
 	return st, nil
 }
 
-// toldTV is what the TV client told of a video's 5.1 surround audio, as
-// askTV asked it, waiting surroundGrace at most: its stream, without a
-// URL, or nil when the video has none, the client rests, or its answer
-// didn't come in time. It counts how asking went.
-func (d *Direct) toldTV(answer <-chan toldSurround) *Stream {
-	if answer == nil {
-		return nil
-	}
-	t := time.NewTimer(surroundGrace)
-	defer t.Stop()
-	select {
-	case told := <-answer:
-		d.countTV(told.err)
-		return told.s
-	case <-t.C:
-		return nil
-	}
-}
-
-// toldSurround is the TV client's answer of whether a video has 5.1
-// surround audio.
-type toldSurround struct {
-	s   *Stream
-	err error
-}
-
 // askTV asks the TV client whether a video has 5.1 surround audio, unless
-// it rests, and returns where its answer comes: nil while it rests.
-func (d *Direct) askTV(ctx context.Context, videoID string) <-chan toldSurround {
+// it rests, and returns where its answer comes, nil while it rests, with
+// what gives the request up. The request isn't ctx's: it goes on after
+// the stream was found, for surroundTimeout at most. Its answer tells the
+// 5.1 audio's stream, without a URL, or nil when the video has none, and
+// is counted as it comes.
+func (d *Direct) askTV(ctx context.Context, videoID string) (*toldLater, context.CancelFunc) {
 	d.mu.Lock()
 	resting := d.now().Before(d.tvPausedUntil)
 	d.mu.Unlock()
 	if resting {
-		return nil
+		return nil, func() {}
 	}
-	answer := make(chan toldSurround, 1)
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), surroundTimeout)
+	told := &toldLater{done: make(chan struct{})}
 	go func() {
+		defer cancel()
 		s, err := d.tvSurround(ctx, videoID)
-		answer <- toldSurround{s, err}
+		d.countTV(err)
+		told.surround = s
+		close(told.done)
 	}()
-	return answer
+	return told, cancel
 }
 
 // countTV takes in how asking the TV client went, and has it rest after

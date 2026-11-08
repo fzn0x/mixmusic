@@ -201,6 +201,12 @@ func (p *Player) SettingsChanged(s settings.Settings) {
 			p.surround = s.Surround
 			p.switchAudio()
 		}
+		if s.VolumeCurve != p.curve {
+			// The device that plays hears the volume again, for its gain on
+			// the new curve; the engine hears of the curve from the app.
+			p.curve = s.VolumeCurve
+			p.connect.setVolume(p.heardVolume())
+		}
 		moved := s.SpotifyPlayback != p.spotifyMode
 		if moved || s.SkipDisliked != p.skipDisliked || s.SkipAI != p.skipAI {
 			// A Spotify track that plays on a device isn't passed over for

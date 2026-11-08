@@ -1,0 +1,43 @@
+/*
+ * The star count of the GitHub button in the top bar, on the home page and
+ * the docs (stars.js): after a line, in the button's own colour. Its room
+ * is kept while it loads, so that nothing moves when it comes, and it goes
+ * when GitHub doesn't answer. Without script it isn't there.
+ */
+
+.stars { display: none; }
+.js .stars {
+  display: inline-block;
+  min-width: calc(2.2em + 9px);
+  margin-left: 2px;
+  padding-left: 9px;
+  border-left: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+.js .stars.is-shown { opacity: 1; }
+.js .stars[hidden] { display: none; }
+.stars-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Phones: the home page's button keeps its star and the count, its words
+   still read out; the docs' button is its star alone, as before. */
+@media (max-width: 480px) {
+  .js .appbar-inner .btn:has(.stars) > span:not(.stars) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .js .topbar-github .stars { display: none; }
+}

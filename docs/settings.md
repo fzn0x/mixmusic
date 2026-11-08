@@ -316,7 +316,7 @@ Plugins' commands follow, with the keys their plugin gives them, if any.
   or pauses. A control you reach with <kbd>Tab</kbd> takes <kbd>Space</kbd>
   and <kbd>Enter</kbd> itself.
 - The [mini player](desktop.md#the-mini-player) takes no shortcuts but the
-  zoom's.
+  zoom's, and <kbd>Escape</kbd>, which closes its panel.
 - Keys that work from any app are the global shortcuts: see
   [Global shortcuts](desktop.md#global-shortcuts).
 

@@ -22,25 +22,61 @@ It shows the cover, the title, the artists with the mark of their service,
 and the time and the length ("live" for a live stream), with a line of the
 accent along its foot for the progress. Its buttons:
 
-- previous, play or pause, and next;
+- at the top right, one button that opens MixMusic's main window and one
+  that closes the mini player;
+- beside the time, the buttons of its [panel](#its-panel): the queue, the
+  lyrics and the output device, and, after a track couldn't play, a red
+  warning sign;
+- [shuffle and repeat](playing-music.md#shuffle-and-repeat), in the accent
+  while they're on, around previous, play or pause, and next;
 - the heart, which [likes](library.md#liked-songs) what plays, and the
   thumbs-down, which [dislikes](playing-music.md#dislikes-and-skipping) it;
 - the volume: a click mutes and unmutes, the mouse wheel over it turns the
   volume up and down, and a small slider shows above it while the pointer
   is over it. <kbd>Tab</kbd> reaches the button and then the slider, whose
-  arrow keys set the volume; <kbd>Escape</kbd> closes it;
-- at the top right, one button that opens MixMusic's main window and one
-  that closes the mini player.
+  arrow keys set the volume; <kbd>Escape</kbd> closes it.
 
 ![The mini player playing アイドル by YOASOBI: the cover on the left, the title, the artist with the mark of YouTube Music, 0:17 of 3:33, previous, pause and next, the heart, the thumbs-down and the volume, and at the top right the buttons that open the main window and close the mini player](shots/mini-player.webp)
+
+The line along its foot seeks: click it or drag it, or reach it with
+<kbd>Tab</kbd> and use the arrow keys. Under the pointer it thickens, and
+the time there shows above it.
 
 Drag the mini player anywhere but its buttons to move it, and drag its
 edges to resize it: the cover takes its height, and grows up to 180 px at
 100% zoom. It opens where you left it. A right click opens a menu of
 [speeds](playing-music.md#speed) for what plays. The mini player takes no
-keyboard shortcuts but the zoom's. It
-[zooms](look-and-feel.md#density-text-size-and-zoom) with the main window,
-and its window grows and shrinks with it.
+keyboard shortcuts but the zoom's, and <kbd>Escape</kbd>, which closes its
+panel. It [zooms](look-and-feel.md#density-text-size-and-zoom) with the
+main window, and its window grows and shrinks with it.
+
+### Its panel
+
+The buttons beside the time open a panel under the mini player, or above
+it when it's at the foot of the screen, one at a time:
+
+- **Queue:** the track playing and what plays after it, with your place in
+  the queue, as "3 of 24". Click a track to play it, and right-click it
+  for its menu, as in [Up next](playing-music.md#the-queue-and-up-next).
+  A page its menu goes to, as Go to album, opens in the main window.
+- **Lyrics:** the line sung now, which lights up word by word where the
+  [lyrics](lyrics.md) have the words' times, and the line after it, in
+  Latin letters where the lyrics panel shows them so. Lyrics without times
+  show whole. For a podcast's episode, the chapter that plays, and the
+  next.
+- **Output device:** the [output devices](playing-music.md#the-output-device)
+  of your computer, and the [cast devices](casting.md) on your network and
+  your Spotify Connect devices, while the player bar shows their buttons.
+  Click one to play there.
+- **The red warning sign,** after a track couldn't play since the mini
+  player opened: why, as its toast's
+  [details](troubleshooting.md#tracks-that-fail-to-play) tell, with
+  **copy**. Once you close it, the sign goes until another track fails.
+
+The window grows to show the panel, and shrinks back as it closes, the
+mini player staying where it is. Its button again, the × at the panel's
+top, or <kbd>Escape</kbd> closes it. The mini player opens with the panel
+it showed as it closed, but the warning sign's.
 
 ## The player around the notch
 

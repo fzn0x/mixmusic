@@ -165,5 +165,29 @@ belongs to its main thread: what finishes elsewhere comes back through
   focus back to what had it as the overlay opened, which it may take
   from a tip that showed in its place before. `miniRoom` keeps the
   button's room beside the artwork.
+- **The mini player's panel** (`minipanel.go`, `miniwindow.go`) shows
+  the queue, the lyrics, the output devices or the details of the latest
+  track that couldn't play, one at a time, which `settings.MiniPanel`
+  keeps for the next start, but the error's. The window grows for it by
+  `miniPanelHeight`: as a panel opens, after the frame (`miniWindow.later`,
+  `App.WhenReady` in the app), the window's content and the work area of
+  its display (`Screen.DisplayMatching`) choose the side, below unless
+  there's more room above, and frames move the window a step at a time
+  for 200 ms (`moveMini`), at once under Reduce Motion, the player keeping
+  its height and place while the panel takes the rest. The window's
+  limits lift while it moves and hold the panel's height once it's open;
+  closing shrinks it back, and closing the window with the panel open
+  takes it out at once (`compactMini`), so that the window's state keeps
+  the player's size. Tests fake the window and the screen (`fakeMini`).
+  The panel builds after the player for Tab, and `Reverse` puts it above.
+  The queue is a `ui.List` of the entries from the one playing, whose
+  menus are the main window's: a page one goes to opens in the main
+  window (`miniPages`). The lyrics show the line sung now with `sungText`.
+  The error's button shows for a failure newer than the latest when the
+  mini player opened, or when its panel last closed. The transport row
+  (`minirow.go`) fits its buttons in the room the artwork leaves
+  (`miniRowOf`), its gaps growing with it; where a button doesn't fit,
+  the mini player's menu holds it. The progress along the foot is a
+  `SliderBase` drawn as a 2 DIP line at rest (`miniseek.go`).
 - **Deep links** and second launches open their pages in the main window
   (`App.OnNavigate`).

@@ -277,6 +277,8 @@ type shell struct {
 	// sorted and searched the lists of tracks, by key.
 	wells map[string]*colorWell
 	tools map[string]*trackTool
+	// moves is what the keys moved last in a mix (mixorder.go).
+	moves rowMoves
 	// listTops are where the track lists and the shelves were in the frame
 	// before, by key.
 	listTops map[string]float32

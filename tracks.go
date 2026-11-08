@@ -15,6 +15,9 @@ type trackListOptions struct {
 	// plays shows how many times each track played, where its service
 	// says: in a search, to tell the original from the covers.
 	plays bool
+	// move, if set, moves the track at from to to, as the user drags it
+	// onto another or presses Alt+Up or Alt+Down on it (movable).
+	move func(from, to int)
 	// menu adds items to a track's menu, as removing it from a playlist.
 	menu  func(m *ui.Menu, i int, t media.Track)
 	empty string
@@ -98,6 +101,9 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 		lead.Label(label)
 		if lead.Clicked() {
 			play()
+		}
+		if o.move != nil {
+			s.movable(row, lead, key, i, len(tracks), o.move)
 		}
 		lead.Children(func() {
 			switch {

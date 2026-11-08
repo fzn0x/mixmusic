@@ -382,6 +382,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 				}
 			}
 		}
+		o.move = s.playlistMove(key, r, p)
 		// A playlist whose first page was empty may have more: the line
 		// above says they load.
 		if len(tracks) > 0 || !r.reading {

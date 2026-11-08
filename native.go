@@ -146,6 +146,9 @@ type shell struct {
 	lights groundLights
 	// asking is the question a dialog asks before an action, if any.
 	asking *question
+	// failure is the dialog of the details of a track that couldn't play
+	// (playbackerrors.go).
+	failure failureView
 	// panel is the side panel shown: "queue", "lyrics" or "".
 	panel string
 	// query is what the search box holds, typed last at queryAt; suggested

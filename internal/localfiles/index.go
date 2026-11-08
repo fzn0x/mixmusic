@@ -121,7 +121,8 @@ func Open(path, art string, probe func(io.ReadSeeker) (time.Duration, error)) (*
 		entries: map[string]Entry{}, gone: map[string]bool{}, stats: map[string]stat{}}
 	if s := f.Get(); s.Version == version {
 		for _, e := range s.Files {
-			if filepath.IsAbs(e.Path) {
+			// A path that isn't UTF-8 is kept in base64, as save keeps it.
+			if e.Path = store.DecodePath(e.Path); filepath.IsAbs(e.Path) {
 				x.entries[e.Path] = e
 			}
 		}
@@ -252,11 +253,13 @@ func (x *Index) Found(id string) {
 	}
 }
 
-// save keeps the entries in the index file.
+// save keeps the entries in the index file, each path as text: one that
+// isn't UTF-8, which the file can't hold as text, in base64.
 func (x *Index) save() error {
 	x.mu.Lock()
 	s := saved{Version: version, Files: make([]Entry, 0, len(x.entries))}
 	for _, e := range x.entries {
+		e.Path = store.EncodePath(e.Path)
 		s.Files = append(s.Files, e)
 	}
 	x.mu.Unlock()

@@ -80,6 +80,7 @@
   "notifications": false,
   "showInTitle": false,
   "keepOnTop": true,
+  "miniPanel": "lyrics",
   "mediaKeys": false,
   "showOnDiscord": false,
   "discordAppId": "123456789012345678",

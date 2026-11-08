@@ -3,6 +3,8 @@ package settings
 import (
 	"math"
 	"runtime"
+
+	"github.com/fzn0x/mixmusic/internal/volume"
 )
 
 // SpotifyPlayback chooses how Spotify tracks play.
@@ -79,6 +81,9 @@ type Playback struct {
 	MusicVideos bool `json:"musicVideos"`
 	// Equalizer shapes the sound of MixMusic's own player.
 	Equalizer Equalizer `json:"equalizer"`
+	// VolumeCurve is how the positions of the volume slider sound, in
+	// MixMusic's own player and in Spotify's alike (#383): Natural at first.
+	VolumeCurve volume.Curve `json:"volumeCurve"`
 	// Volume is from 0 to 1.
 	Volume float64 `json:"volume"`
 }
@@ -94,6 +99,7 @@ func defaultPlayback() Playback {
 	p.PodcastSpeed = 1
 	p.SkipDisliked = true
 	p.Equalizer = defaultEqualizer()
+	p.VolumeCurve = volume.Natural
 	p.Volume = 0.8
 	return p
 }
@@ -125,6 +131,7 @@ func (p Playback) clean(d Playback) Playback {
 	p.SongSpeed = CleanSpeed(p.SongSpeed)
 	p.PodcastSpeed = CleanSpeed(p.PodcastSpeed)
 	p.Volume = min(max(p.Volume, 0), 1)
+	p.VolumeCurve = cleanVolumeCurve(p.VolumeCurve, d.VolumeCurve)
 	p.Equalizer = p.Equalizer.clean()
 	return p
 }

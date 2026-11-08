@@ -516,6 +516,9 @@ type Player struct {
 	// entry's 5.1 audio failed, which then plays in stereo.
 	surround   bool
 	stereoOnly bool
+	// curve is the volume's curve, as the settings ask: a change has the
+	// device play the volume on the new one.
+	curve volume.Curve
 	// out is where the streams play, and home the computer's volume while
 	// they play on a remote output; engine is the stream the player was
 	// made with, which stream is again back on the computer.
@@ -543,6 +546,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume), Speed: 1}
 	p.spotifyMode, p.skipDisliked, p.skipAI = st.SpotifyPlayback, st.SkipDisliked, st.SkipAI
 	p.surround = st.Surround
+	p.curve = st.VolumeCurve
 	if len(saved.Tracks) > 0 {
 		radio := marks(saved.Radio, len(saved.Tracks))
 		chosen := marks(saved.Chosen, len(saved.Tracks))

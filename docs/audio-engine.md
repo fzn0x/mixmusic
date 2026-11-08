@@ -167,6 +167,14 @@ of 250 ms, the settings of the web player MixMusic had.
 
 **The volume slider** has even steps of loudness: each tenth of it is
 6 dB, down to -40 dB, and one press of the volume keys is about 3 dB.
+That is the Natural curve of Settings › Playback › Volume, the default.
+On Linear, the gain is the slider's position itself, so that its middle
+is -6 dB, where Natural's is -30 dB. Spotify's own player in MixMusic
+plays at the gain of the same curve, and a Spotify Connect device gets
+the square root of that gain as its volume, as MixMusic has always sent
+it. The slider keeps its position as the curve changes, and so does
+settings.json, whose `volume` is the square root of the position's gain
+on Natural, whatever the curve.
 
 ## The equalizer
 

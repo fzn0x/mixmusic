@@ -58,3 +58,12 @@
   the visualizer and the plugins' analyser read while Spotify plays. It
   hears only while they read it; on macOS, which asks the user once, the
   tap is of WebKit's GPU process ([Spotify here](spotify-here.md#macos)).
+- **`internal/volume`** has the volume's curves, which Settings › Playback
+  › Volume chooses between (#383): Natural, each tenth of the slider 6 dB
+  down to -40 dB, and Linear, whose gain is the slider's position. The
+  player keeps the position, as settings.json does whatever the curve
+  (`Saved`, `Of`). The app gives the engine the curve
+  (`Engine.SetVolumeCurve`, in `applyEngine`), Spotify's page in MixMusic
+  the gain of the position on it (`hereDevice.gain`), and a Spotify
+  Connect device the square root of that gain (`connectPercent`). As the
+  curve changes, the player sends the device that plays the volume again.

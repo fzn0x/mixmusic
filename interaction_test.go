@@ -49,9 +49,15 @@ func show(s *shell, tt *ui.Tester, path string) {
 	tt.Advance(time.Second)
 }
 
+// click clicks what shows or is labeled label, scrolling the page to it
+// first when it's out of view (reveal), as a user would.
 func click(t *testing.T, s *shell, tt *ui.Tester, label string) {
 	t.Helper()
-	if err := tt.Click(label); err != nil {
+	err := tt.Click(label)
+	if err != nil && reveal(tt, label) {
+		err = tt.Click(label)
+	}
+	if err != nil {
 		t.Fatalf("clicking %q: %v; the window shows %q", label, err, tt.Texts())
 	}
 	s.drain()

@@ -8,8 +8,8 @@ import (
 
 const (
 	// volumeStep is how far a notch of the wheel over a volume control
-	// turns the volume, as Volume up and Volume down do: about 3 dB on its
-	// curve (internal/volume).
+	// turns the volume, as Volume up and Volume down do: about 3 dB on the
+	// Natural curve (internal/volume).
 	volumeStep = 0.05
 	// volumeScroll is how far a touchpad scrolls over a volume control, in
 	// DIPs, for each volumeStep.

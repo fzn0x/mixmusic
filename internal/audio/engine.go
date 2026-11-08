@@ -84,6 +84,10 @@ type Engine struct {
 	eq          *equalizer
 	comp        *compressor
 	master      smoother
+	// vol is the volume's position, from 0 to 1, and curve the curve it
+	// plays on, whose gain at vol is what master glides to.
+	vol   float64
+	curve volume.Curve
 	// The audio thread's buffers: a quantum, the rest of the last one, and
 	// a deck's frames. bus is the channels of the quantum, as the output
 	// asked for them last.
@@ -119,6 +123,7 @@ func NewEngine(open Opener, start OutputStarter, events Events) *Engine {
 		eq:     newEqualizer(),
 		comp:   newCompressor(),
 		master: newSmoother(0.64, glide), // the gain of the volume 0.8 saved
+		vol:    volume.Of(0.8),
 		an:     newAnalyser(),
 		bus:    2,
 		notify: make(chan struct{}, 1),
@@ -333,11 +338,12 @@ func (e *Engine) SetSpeed(speed float64) {
 	e.mu.Unlock()
 }
 
-// SetVolume sets the volume, from 0 to 1, on volume's curve: each tenth of
-// it is 6 dB.
+// SetVolume sets the volume, from 0 to 1, on the curve SetVolumeCurve
+// chose: Natural's at first, where each tenth of it is 6 dB.
 func (e *Engine) SetVolume(v float64) {
 	e.mu.Lock()
-	e.master.target = volume.Gain(v)
+	e.vol = v
+	e.master.target = e.curve.Gain(v)
 	e.mu.Unlock()
 }
 

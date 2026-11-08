@@ -170,7 +170,7 @@ func TestCacheOff(t *testing.T) {
 	s := newTestShell(t)
 	// Tall enough for the cache's size to show above the player bar,
 	// under the groups of Playback before it.
-	tt := testerOf(t, s, 1280, 3600)
+	tt := testerOf(t, s, 1280, 4400)
 	show(s, tt, "/settings/playback")
 	if !tt.HasText("1 GB at most.") {
 		t.Fatalf("the cache's size isn't shown: %q", tt.Texts())

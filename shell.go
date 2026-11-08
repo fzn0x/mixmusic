@@ -53,6 +53,7 @@ func (s *shell) view(c *ui.Context) {
 		s.overlay(c)
 	})
 	s.palette(c)
+	s.coverDialog(c)
 	s.updateOffer(c)
 	s.questionDialog(c)
 	s.promptDialog(c)

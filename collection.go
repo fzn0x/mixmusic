@@ -312,6 +312,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 				if m.Item("Rename").Chosen() {
 					s.renaming, s.renameTo, s.renameID = true, p.Title, p.ID
 				}
+				s.changeCoverItem(m, p)
 				if m.Item("Delete").Chosen() {
 					s.deleting, s.deleteID, s.deleteTitle = true, p.ID, p.Title
 				}

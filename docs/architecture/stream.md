@@ -9,6 +9,9 @@
   new URL when YouTube refuses the old one, a new connection, from the byte
   it reached, when a download gets no bytes for 15 seconds or its
   connection drops, and an on-disk cache of tracks played to their end.
+  A `Source` tells whether its audio comes from this computer, a download
+  or the cache (`Source.Local`), whose failure the engine words as the
+  file's.
   YouTube lists no 5.1 surround audio to the visionOS app, so the direct
   route asks as YouTube's app for Samsung's TVs too, at once, which it
   tells of a video's AC-3 and E-AC-3 (formats 380 and 328), and waits for

@@ -238,6 +238,15 @@ func (p *Player) kept() (Offline, bool) {
 	return k, ok
 }
 
+// playsOffline reports whether the current track plays without the
+// network, as the app tells: a file on this computer, or a download. When
+// its stream fails, the network isn't what it lacks.
+func (p *Player) playsOffline() bool {
+	k, ok := p.kept()
+	cur, has := p.s.Current()
+	return ok && has && k.PlaysOffline(cur.Track)
+}
+
 // playsOfflineFrom returns the first entry, from the one at i on, or from
 // the one after it when after, that plays without the network, in the
 // order the queue plays: around to its start when it repeats, and past

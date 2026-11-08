@@ -19,7 +19,10 @@
   Roelands, between its ring and the mix; at 1× it plays the ring as it
   is, as a live stream always plays, with nothing ahead of its live edge
   to play faster. The six channels of 5.1 surround stretch alike, each
-  window found on the mix of them all.
+  window found on the mix of them all. A deck fails in the words of the
+  web player's audio element, but a read of a `Local` source, a file on
+  this computer or a download, that fails is the file's failure ("Can't
+  read the file"), not the network's.
   `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio -run StretchListen`
   writes the test files at each speed, to listen to.
   `MIXMUSIC_LIVE=1 go test ./internal/audio -run Live` plays songs of both

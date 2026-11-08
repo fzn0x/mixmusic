@@ -28,6 +28,14 @@ type Source interface {
 	Close() error
 }
 
+// Local is a Source that tells whether its audio is on this computer, as
+// a file's or a download's: a read of it that fails then, as of a file
+// cut short or on a drive unplugged, is the file's failure, not the
+// network's.
+type Local interface {
+	Local() bool
+}
+
 // Opener opens the Source of a track's URL, whose reads stop waiting when
 // interrupted returns true. Its errors say why in the words of the
 // interface, as the player shows them.
@@ -39,6 +47,9 @@ var (
 	errNetwork     = errors.New("the network failed while loading the audio")
 	errDecode      = errors.New("the audio could not be decoded")
 	errUnsupported = errors.New("the audio format is not supported")
+	// errFile is errNetwork of a Local source, in the words MixMusic
+	// has for a file on this computer.
+	errFile = errors.New("Can't read the file")
 )
 
 // opusHead is what a deck needs of an OpusHead (RFC 7845, section 5.1).
@@ -245,7 +256,7 @@ func (d *deck) info() (time.Duration, bool) {
 // play opens the track and decodes it from start into *cur, the ring of
 // the position it plays, following seeks, until the deck closes: it
 // returns nil then, or why it failed.
-func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open Opener, notify func()) error {
+func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open Opener, notify func()) (err error) {
 	interrupted := func() bool { return ctx.Err() != nil || d.seekPending() }
 	src, err := open(ctx, d.url, interrupted)
 	if err != nil {
@@ -254,6 +265,12 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		}
 		return err
 	}
+	// A file on this computer that can't be read isn't the network failing.
+	defer func() {
+		if l, ok := src.(Local); ok && err == errNetwork && l.Local() {
+			err = errFile
+		}
+	}()
 	// Before any frame: the audio thread sees the loudness with the first
 	// frames the ring gives it.
 	if m, ok := src.(Measured); ok {

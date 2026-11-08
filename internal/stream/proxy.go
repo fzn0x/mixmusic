@@ -136,14 +136,14 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// What is kept holds stereo audio only: 5.1 surround audio comes from
 	// the cache or YouTube, and with no network fails, which the player
 	// plays in stereo instead.
-	if !surround && p.Kept != nil && p.Kept.Serve(w, r, videoID) {
+	if !surround && p.Kept != nil && fromHere(w, func() bool { return p.Kept.Serve(w, r, videoID) }) {
 		return
 	}
 	key := videoID
 	if surround {
 		key = SurroundKey(videoID)
 	}
-	if p.Cache != nil && p.Cache.Serve(w, r, key) {
+	if p.Cache != nil && fromHere(w, func() bool { return p.Cache.Serve(w, r, key) }) {
 		return
 	}
 	resolve := func() (Stream, error) {

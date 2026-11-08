@@ -5,8 +5,9 @@
 # and SECURITY.md.
 #
 # templates/index.html is the landing page; static/ holds its stylesheet,
-# script and assets, copied as they are. The docs are content/docs, shown
-# by templates/docs and styled by static/docs.css.
+# script and assets, copied as they are, and data/faq.toml the questions
+# its FAQ answers. The docs are content/docs, shown by templates/docs and
+# styled by static/docs.css.
 
 # GitHub Pages' address. cloudflare.yml builds the copy at
 # https://mixmusic.functionx.dev with --base-url.

@@ -238,6 +238,12 @@ type Shelf struct {
 	Subtitle string `json:"subtitle,omitempty"`
 	Source   Source `json:"source"`
 	Items    []Item `json:"items"`
+	// Key names the shelf among its service's, in words that stay the
+	// same in every language and from day to day, as its title doesn't:
+	// on YouTube Music, the page its title or its More button opens, and
+	// the kind of shelf on Spotify and in MixMusic. It is "" where the
+	// service names it by its title alone.
+	Key string `json:"key,omitempty"`
 }
 
 // SearchResults holds what a search found, by kind. Videos are the videos

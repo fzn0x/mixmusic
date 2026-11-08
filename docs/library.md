@@ -78,6 +78,7 @@ Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a
 - **Put a playlist of yours in order** as you do a mix, once its tracks are all read: it changes on YouTube Music too. When YouTube Music refuses a move, a toast says so and the playlist shows as YouTube keeps it.
 - **Delete a playlist you made** with Delete from YouTube Music…, in the More menu of its page or of its tile in Library › YouTube Music. It asks first, since the playlist goes from YouTube too and can't come back: to keep its tracks, copy it into a mix first. Mixes copied from it, and the queue, keep their tracks.
 - **A playlist you saved** has Remove from library on its tile instead, which takes it out of your library without asking: saving it again undoes it.
+- **Suggestions:** below the tracks of a playlist of yours, once they're all loaded, Suggestions has five songs YouTube Music suggests adding to it, leaving out those you dislike. Each plays alone from its cover, and Add puts it at the playlist's end at once; Refresh shows five more, and adding the last brings them too. They aren't the playlist's: Play and Shuffle leave them out. While you search the playlist's tracks, they hide.
 - **Keep a song without liking it** with Add to library in its menu: it goes to Songs in your library, as YouTube Music's own Save to library does, and stays out of your likes, which shape what YouTube Music recommends. Remove from library in its menu takes it out. Spotify keeps no such songs apart from those you like.
 
 ## Spotify playlists, albums and artists

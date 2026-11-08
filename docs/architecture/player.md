@@ -20,6 +20,13 @@
   (`labels.go`). A track whose label the app doesn't know is checked
   before it's announced, beside the search for its stream, and the next
   track before it's preloaded or crossfaded into.
+- **On a Spotify device** (`connect.go`), the player sends commands and
+  asks what the device plays, and waits for its reports, which lag the
+  commands, to settle. A track ends when the device stops on it, goes back
+  to its start, plays another track, or tells it plays on well past the
+  track's end: MixMusic's own device, given a track with nothing after it,
+  may stay on it once it ended, its position counting on (#373). The time
+  shown never passes the track's end.
 - **`internal/online`** tells the player whether the network answers: a
   check of YouTube's and Spotify's addresses over HTTPS, shared by its
   callers, which audio coming from YouTube answers too, and a wait for the

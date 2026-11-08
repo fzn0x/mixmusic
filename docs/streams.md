@@ -154,8 +154,12 @@ or E-AC-3, format 328.
 
 - **Asking a TV app.** YouTube lists no 5.1 audio to the visionOS app.
   So, at the same time, MixMusic asks the player API as YouTube's app for
-  Samsung's TVs, which YouTube tells of a video's AC-3 and E-AC-3, and
-  waits for its answer at most half a second past the stereo one's.
+  Samsung's TVs, which YouTube tells of a video's AC-3 and E-AC-3. A
+  track doesn't wait for that answer: it starts as soon as its stereo
+  stream is found and checked, and when the answer comes after, the 5.1
+  button shows a moment later, and on later plays of the track at once.
+  Before 0.5.11, a track waited up to half a second for the answer,
+  which on a slow connection often came late or not at all.
 - **yt-dlp and a JavaScript runtime.** The addresses of these streams
   need a challenge solved, which only yt-dlp does. MixMusic has it find
   the mix only when it is asked for, as you press 5.1 or a track starts

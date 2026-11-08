@@ -34,6 +34,15 @@
   included, the stream's requests, and the direct route's check of it,
   ask the next, as YouTube's player does, and for 10 minutes ask the one
   that didn't answer last (`mediaServers`).
+  yt-dlp runs quickly first (`Resolver.findWithYTDLP`): as its visionos
+  client alone, `youtube:player_client=visionos;skip=hls,dash`, without
+  `--js-runtimes`, the only client of yt-dlp 2026.10.26 whose streams need
+  neither a challenge solved nor a PO token. When that finds no audio, it
+  runs the full way (`Resolver.ytdlp`), with its default clients and the
+  runtime, which alone finds 5.1 audio (`findSurround`); at once when the
+  player API told the visionOS client that the video has no stream for it
+  (`quickHelps`). The log tells which run found a stream, and how long
+  each took.
   The player API also tells how loud YouTube measured each video
   (`Stream.Loudness`, `Direct.Loudness`). Both list the streams of a
   video's picture beside its audio (`Stream.Videos`), which the now

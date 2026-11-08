@@ -59,6 +59,22 @@ why in plain words, such as "this track is not available in your
 country", "only the members of its channel can play this track" or
 "YouTube plays this track only to signed-in adults, on its own website".
 
+yt-dlp runs twice at most for a track, a quick way first:
+
+- **The quick run** asks the player API as the visionOS app alone, as
+  MixMusic's own requests do, without the JavaScript runtime and without
+  the HLS and DASH manifests. It solves no challenge, which takes the
+  full run several seconds of the computer's time, and YouTube serves its
+  streams at once. It runs when the player API rests, doesn't answer in
+  time, or refuses MixMusic's own request.
+- **The full run** asks as yt-dlp's default apps, with the JavaScript
+  runtime: when the quick run finds no audio, and at once when the player
+  API said that the visionOS app gets no stream of the video, as of one
+  made for children. It alone finds 5.1 surround mixes, so a track the
+  quick run found offers none.
+- **The log** says which run found the stream, and how long each took.
+  Before 0.5.11, yt-dlp ran the full way only.
+
 ## Formats and quality
 
 Settings › Playback › Sound › Quality chooses between best, the default,

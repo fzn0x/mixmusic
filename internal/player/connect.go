@@ -82,7 +82,31 @@ const (
 	connectStart = 3 * time.Second
 	// connectStill is how little a track waiting where it started moved.
 	connectStill = 1500 * time.Millisecond
+	// connectOver is how far past its end a device may tell a track plays
+	// before the track is taken as ended: the length the device knows may
+	// be a little longer than the one MixMusic does.
+	connectOver = 2 * time.Second
 )
+
+// pastEnd tells whether the device tells it plays its track past the
+// track's end: Spotify's own player in MixMusic, given a track with
+// nothing after it, may stay on it once it ended, its position counting
+// on as if it still played.
+func pastEnd(state *DeviceState, dur time.Duration) bool {
+	if dur <= 0 || state.Track == nil {
+		return false
+	}
+	return state.Progress > max(dur, ms(state.Track.DurationMs))+connectOver
+}
+
+// within is position, but no further than the end of a track of dur, when
+// its length is known.
+func within(position, dur time.Duration) time.Duration {
+	if dur > 0 {
+		return min(position, dur)
+	}
+	return position
+}
 
 // connectEngine plays Spotify tracks on the device. It belongs to the
 // player's goroutine, and tells the player what the device does as the
@@ -378,6 +402,18 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 			}
 			return
 		}
+		// Telling it plays on past the end, it ended. Given tracks after
+		// it, it may still go on by itself; given none, its player is
+		// paused, as it sounds nothing, rather than left playing.
+		if !settling && pastEnd(state, dur) {
+			if len(c.ahead) > 0 {
+				c.ended()
+				return
+			}
+			c.stop(true)
+			c.p.advance(true)
+			return
+		}
 		// The device may still report the track loading, paused.
 		if settling && c.playing && !state.Playing {
 			return
@@ -390,14 +426,15 @@ func (c *connectEngine) follow(state *DeviceState, settling bool) {
 			c.send(c.device.Resume)
 			return
 		}
-		c.progress = state.Progress
+		// The time shown stays within the track, whatever the device tells.
+		c.progress = within(state.Progress, dur)
 		c.ending = dur-state.Progress < connectEnd
 		c.endedAt = time.Time{}
 		if state.Playing != c.playing {
 			c.playing = state.Playing
 			c.p.onPlaying(state.Playing)
 		}
-		c.p.onTime(state.Progress, dur)
+		c.p.onTime(c.progress, dur)
 		return
 	}
 	// The device may still report what it played before the command.
@@ -524,7 +561,7 @@ func (c *connectEngine) take(uid string) *following {
 func (c *connectEngine) follows(track media.Track, f *following) {
 	c.track = &track
 	c.ahead = f.ahead
-	c.progress, c.startedAt = f.state.Progress, 0
+	c.progress, c.startedAt = within(f.state.Progress, c.duration()), 0
 	c.nudged, c.ending, c.lost, c.strays = false, false, false, 0
 	c.sentAt = time.Time{}
 	c.playing = f.state.Playing

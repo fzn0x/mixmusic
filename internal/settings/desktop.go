@@ -36,6 +36,30 @@ type Desktop struct {
 	// DiscordAppID is the ID of the user's own Discord application, which
 	// DiscordPresence shows as; "" is MixMusic's.
 	DiscordAppID string `json:"discordAppId"`
+	// DiscordFirstLine is the first line of the Discord status, a template
+	// whose placeholders, as {title}, name the track's (#352). Empty, the
+	// line shows nothing.
+	DiscordFirstLine string `json:"discordFirstLine"`
+	// DiscordSecondLine is the status's second line, a template as
+	// DiscordFirstLine is.
+	DiscordSecondLine string `json:"discordSecondLine"`
+	// DiscordCover shows the track's cover in the status, where its
+	// service has it online.
+	DiscordCover bool `json:"discordCover"`
+	// DiscordServiceBadge shows a badge of the track's service, YouTube
+	// Music, Spotify or this computer, at the cover's corner. It is off
+	// at first.
+	DiscordServiceBadge bool `json:"discordServiceBadge"`
+	// DiscordTimeLeft shows the time played and the time left in the
+	// status.
+	DiscordTimeLeft bool `json:"discordTimeLeft"`
+	// DiscordListenButton shows a button in the status that opens the
+	// track on its service. It is off at first.
+	DiscordListenButton bool `json:"discordListenButton"`
+	// DiscordKeepWhilePaused keeps the status while the track is paused,
+	// marked as paused and without its times, where pausing clears it at
+	// first.
+	DiscordKeepWhilePaused bool `json:"discordKeepWhilePaused"`
 	// NotchPlayer shows what plays around the camera housing of a
 	// MacBook's screen, and opens a player there (#46). It is on at
 	// first, and does nothing on other screens and systems.
@@ -49,15 +73,19 @@ func defaultDesktop() Desktop {
 	d.ShowInTitle = true
 	d.MediaKeys = true
 	d.DiscordPresence = true
+	d.DiscordFirstLine, d.DiscordSecondLine = DefaultDiscordFirstLine, DefaultDiscordSecondLine
+	d.DiscordCover, d.DiscordTimeLeft = true, true
 	d.NotchPlayer = true
 	return d
 }
 
-// clean is d without a Discord application ID that isn't one.
+// clean is d without a Discord application ID that isn't one, and with
+// lines of the Discord status that Discord takes.
 func (d Desktop) clean() Desktop {
 	if d.DiscordAppID = strings.TrimSpace(d.DiscordAppID); !discordIDRe.MatchString(d.DiscordAppID) {
 		d.DiscordAppID = ""
 	}
+	d.DiscordFirstLine, d.DiscordSecondLine = cleanDiscordLine(d.DiscordFirstLine), cleanDiscordLine(d.DiscordSecondLine)
 	return d
 }
 

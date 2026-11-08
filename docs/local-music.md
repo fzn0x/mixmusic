@@ -14,8 +14,9 @@ Settings › Playback › Music on this computer, or the add a folder button of
 Library › On this computer, opens your system's folder picker. MixMusic
 reads the folder and the folders in it, and keeps what it finds:
 
-- **Folders** lists each folder with how many tracks it holds, and how
-  many files it skipped: files of kinds it can't play, or broken.
+- **Folders** lists each folder with how many tracks it holds, how many
+  files it skipped, files of kinds it can't play or broken, and how many
+  folders in it can't be read, as one MixMusic isn't allowed to read.
 - **Remove** takes a folder out of the library. Its files stay where they
   are, and its tracks stay in your mixes, greyed.
 - **Rescan** reads the folders again now. MixMusic also reads them as it
@@ -35,7 +36,9 @@ would keep from being ejected; on Linux, one past the system's limit on
 watched folders, `fs.inotify.max_user_watches`. For such a folder,
 rescan, or start MixMusic again, to see what
 you added. Hidden folders, whose names start with a dot, are passed
-over.
+over. Files and folders play whatever their names hold, even names that
+aren't valid UTF-8, as on some Linux drives: MixMusic keeps their paths
+in base64, so that they name the same files after a restart.
 
 ## Open files without a folder
 
@@ -54,7 +57,7 @@ shows how many tracks your folders hold, and:
 
 - **Songs:** every track, with Play, Shuffle and open files, a box that
   searches the list, and a Sort menu: the list's own order, by album and
-  track number, Title, Artist or Length.
+  track number, Title, Artist, Length or Plays.
 - **Albums:** the albums your files' tags name, with their covers. An
   album is grouped by its title and its album artist, or, without an
   album artist, by the folder its files are in, as an album's files
@@ -109,8 +112,11 @@ track whose file goes, or can't be read, while it plays, after one more
 try at once, also while you're offline.
 
 - **A rescan** drops the files that are gone from the library. Those of a
-  folder that can't be read at all, as on a drive unplugged, stay, greyed,
-  until it's back.
+  folder that can't be read stay until a scan reads it again: those of a
+  folder of music on a drive unplugged, even partway through the scan,
+  greyed until it's back, and those of a folder in it that can't be
+  read, as one MixMusic isn't allowed to read, as they were, greyed only
+  if their own files can't be reached.
 - **Your mixes and liked songs** keep the track, greyed, and it plays
   again once its file is back where it was.
 
@@ -145,7 +151,9 @@ what plays, as their settings say:
 - **[Last.fm](accounts.md)**, once you connect it, scrobbles its title,
   artists, album and length. A track of no artist isn't scrobbled.
 - **Discord**, unless you turn it off in Settings › Desktop, shows its
-  title and artists, without a cover.
+  title and artists, or [the lines you chose](desktop.md#what-your-discord-status-shows),
+  without a cover or a Listen button: with the service's badge on, a
+  record's badge takes the cover's place.
 - **[Lyrics](lyrics.md)**, when you show them, are looked for on Unison
   and LRCLIB by its title, artists, album and length.
 

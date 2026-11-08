@@ -182,9 +182,9 @@ func TestDirectAsksTheTVClientOfSurround(t *testing.T) {
 	if s.Codec != "opus" || !strings.Contains(s.URL, "c=VISIONOS") || !strings.Contains(s.URL, "itag=251") {
 		t.Errorf("stereo %+v", s)
 	}
-	if sur := s.Surround; sur == nil || sur.URL != "" || sur.Codec != "ac-3" || sur.MimeType != `audio/mp4; codecs="ac-3"` ||
+	if sur := toldOf(t, s); sur == nil || sur.URL != "" || sur.Codec != "ac-3" || sur.MimeType != `audio/mp4; codecs="ac-3"` ||
 		sur.Size != surround380 || sur.Duration != surroundSecs || !sur.Measured || sur.Loudness != -26.720001 || sur.Surround != nil {
-		t.Errorf("surround %+v", s.Surround)
+		t.Errorf("surround %+v", sur)
 	}
 
 	// It asks as YouTube's app for Samsung's TVs, signed out, with the
@@ -237,8 +237,8 @@ func TestDirectAsksTheTVClientOfSurround(t *testing.T) {
 	// A video of no 5.1 audio has none.
 	f.answersWith("")
 	f.answersTVWith("")
-	if s, err := d.Stream(context.Background(), songID, QualityBest); err != nil || s.Surround != nil {
-		t.Errorf("without 5.1: %+v, %v", s.Surround, err)
+	if s, err := d.Stream(context.Background(), songID, QualityBest); err != nil || toldOf(t, s) != nil {
+		t.Errorf("without 5.1: %+v, %v", toldOf(t, s), err)
 	}
 }
 
@@ -247,25 +247,6 @@ func TestDirectAsksTheTVClientOfSurround(t *testing.T) {
 func TestSignatureTimestamp(t *testing.T) {
 	if got := signatureTimestamp(time.Date(2026, 11, 9, 23, 59, 0, 0, time.UTC)); got != 20759 {
 		t.Errorf("signatureTimestamp = %d", got)
-	}
-}
-
-// TestDirectWaitsLittleForTheTVClient finds the stereo audio of a video
-// while the TV client's answer doesn't come, surroundGrace after its check
-// at most: of no 5.1 audio, then.
-func TestDirectWaitsLittleForTheTVClient(t *testing.T) {
-	f := newFakeTube(t)
-	f.answersWith("-surround")
-	released := make(chan struct{})
-	t.Cleanup(func() { close(released) })
-	f.answersTV(func(playerRequest) []byte {
-		<-released
-		return nil
-	})
-	start := time.Now()
-	s, err := f.direct().Stream(context.Background(), surroundID, QualityBest)
-	if took := time.Since(start); err != nil || s.Surround != nil || took > surroundGrace+time.Second {
-		t.Errorf("stream %+v, surround %+v, %v, after %v", s, s.Surround, err, took)
 	}
 }
 
@@ -283,8 +264,9 @@ func TestDirectRestsTheTVClientAfterRefusals(t *testing.T) {
 	d := f.direct()
 	now := time.Now()
 	d.now = func() time.Time { return now }
+	// Each answer, which the stream doesn't wait for, counts as it comes.
 	for i := range pauseAfter + 2 {
-		if s, err := d.Stream(context.Background(), songID, QualityBest); err != nil || s.Surround != nil {
+		if s, err := d.Stream(context.Background(), songID, QualityBest); err != nil || toldOf(t, s) != nil {
 			t.Fatalf("stream %d: %+v, %v", i+1, s.Surround, err)
 		}
 	}
@@ -293,7 +275,7 @@ func TestDirectRestsTheTVClientAfterRefusals(t *testing.T) {
 	}
 	now = now.Add(pauseFor + time.Minute)
 	f.answersTVWith("")
-	if _, err := d.Stream(context.Background(), songID, QualityBest); err != nil || len(f.tvPlayers()) != pauseAfter+1 {
+	if s, err := d.Stream(context.Background(), songID, QualityBest); err != nil || toldOf(t, s) != nil || len(f.tvPlayers()) != pauseAfter+1 {
 		t.Errorf("after the rest: %v, %d requests of the TV client", err, len(f.tvPlayers()))
 	}
 	if n := strings.Count(logs.String(), "refused the TV app 3 times in a row (YouTube's player API answered UNPLAYABLE: The page needs to be reloaded.)"); n != 1 {
@@ -321,9 +303,8 @@ func TestResolverFindsSurroundWithYTDLP(t *testing.T) {
 		}
 		return surroundInfo(ytSurround("380", "ac-3", 384, fmt.Sprintf(`"available_at": %d`, available))), nil
 	}
-	s, err := r.Resolve(ctx, surroundID)
-	if err != nil || s.Surround == nil || s.Surround.URL != "" || runs.Load() != 0 {
-		t.Fatalf("stream %+v, %v, after %d runs of yt-dlp", s.Surround, err, runs.Load())
+	if s := knownSurround(t, r, surroundID); s.Surround == nil || s.Surround.URL != "" || runs.Load() != 0 {
+		t.Fatalf("stream %+v, after %d runs of yt-dlp", s.Surround, runs.Load())
 	}
 	var wg sync.WaitGroup
 	for range 5 {
@@ -344,12 +325,14 @@ func TestResolverFindsSurroundWithYTDLP(t *testing.T) {
 		t.Errorf("stereo %s, %v", s.URL, err)
 	}
 	r.Forget(surroundID)
+	knownSurround(t, r, surroundID)
 	if _, err := r.Surround(ctx, surroundID); err != nil || runs.Load() != 2 {
 		t.Errorf("a video forgotten: %v, after %d runs of yt-dlp", err, runs.Load())
 	}
 
 	// yt-dlp finding none, there is none.
 	r.Forget(surroundID)
+	knownSurround(t, r, surroundID)
 	r.Run = func(context.Context, ...string) ([]byte, error) { return surroundInfo(), nil }
 	if _, err := r.Surround(ctx, surroundID); !errors.Is(err, errNoSurround) {
 		t.Errorf("none that yt-dlp found: %v", err)
@@ -371,9 +354,11 @@ func TestResolverFindsSurroundWithYTDLP(t *testing.T) {
 // JavaScript runtime, which solves its URL's challenge, or without
 // yt-dlp.
 func TestResolverOffersNoSurroundYTDLPCantFind(t *testing.T) {
+	logs := captureLog(t)
 	f := newFakeTube(t)
 	f.answersWith("-surround")
 	f.answersTVWith("-surround")
+	heard := 0
 	dir := t.TempDir()
 	ytdlp := filepath.Join(dir, "yt-dlp")
 	if err := os.WriteFile(ytdlp, []byte("yt-dlp"), 0o755); err != nil {
@@ -392,8 +377,20 @@ func TestResolverOffersNoSurroundYTDLPCantFind(t *testing.T) {
 			t.Errorf("%s: yt-dlp ran", name)
 			return nil, errors.New("no yt-dlp here")
 		}
+		r.Told = func(string) { t.Errorf("%s: 5.1 audio told of", name) }
 		if s, err := r.Resolve(context.Background(), surroundID); err != nil || s.Codec != "opus" || s.Surround != nil {
 			t.Errorf("%s: stream %+v, surround %+v, %v", name, s, s.Surround, err)
+		}
+		// Nor once the TV client's answer came, with the stream or after.
+		heard++
+		for deadline := time.Now().Add(5 * time.Second); strings.Count(logs.String(), "takes yt-dlp and a JavaScript runtime to play") < heard; {
+			if time.Now().After(deadline) {
+				t.Fatalf("%s: the TV client's answer wasn't heard:\n%s", name, logs.String())
+			}
+			time.Sleep(5 * time.Millisecond)
+		}
+		if s, err := r.Resolve(context.Background(), surroundID); err != nil || s.Surround != nil {
+			t.Errorf("%s: after the answer: surround %+v, %v", name, s.Surround, err)
 		}
 	}
 }
@@ -431,6 +428,8 @@ func TestProxyServesSurroundYTDLPFinds(t *testing.T) {
 	if rec := get(Path(surroundID), "bytes=0-99"); rec.Code != 206 || rec.Body.Len() != 100 || runs.Load() != 0 {
 		t.Fatalf("stereo: %d, %d bytes, after %d runs of yt-dlp", rec.Code, rec.Body.Len(), runs.Load())
 	}
+	// The 5.1 button shows once the TV client told of 5.1 audio.
+	knownSurround(t, r, surroundID)
 	start := time.Now()
 	if rec := get(SurroundPath(surroundID), ""); rec.Code != 200 || !bytes.Equal(rec.Body.Bytes(), data5) ||
 		rec.Header().Get("Content-Type") != "audio/mp4" {

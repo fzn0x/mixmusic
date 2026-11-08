@@ -35,7 +35,21 @@
   kind it makes against its decode.
   `internal/audio/output` plays it on the system's output, without cgo:
   through WASAPI on Windows, an Audio Queue on macOS, and PulseAudio,
-  which PipeWire serves too, or ALSA on Linux. On Windows it also hears
+  which PipeWire serves too, or ALSA on Linux. `Devices` lists the
+  output devices (`devices.go` puts together what each system tells, so
+  that tests give it what a system would), and a stream whose `Options`
+  name one plays on it while it's there, checks every second that it
+  still is, plays on the default device meanwhile, and tells `Moved`
+  each time it moves. `internal/app/outputdevice.go` keeps the device
+  Settings › Playback chose, opens the engine's outputs on it, has the
+  engine open its output again (`Engine.ReopenOutput`) when the choice
+  changes, and tells the windows when the device goes away and comes
+  back. The player bar's device button and `outputChoices` and
+  `outputMenu` in the root package's `outputdevice.go` show the choice.
+  `MIXMUSIC_AUDIO=1 go test ./internal/audio/output -run TestStream`
+  plays on the default device by its ID, and on one that isn't there;
+  on Linux it moves a stream between a null sink that `pactl` adds and
+  takes away, and the default sink. On Windows it also hears
   what a process and its children play, through WASAPI's
   process loopback, and on macOS 14.2 and later what a process plays,
   through a Core Audio process tap: `internal/app`'s listener hears

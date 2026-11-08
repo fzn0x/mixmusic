@@ -7,6 +7,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/discord"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
 // TestTrackStartsOnce tells that a track started once it sounds: not while
@@ -102,7 +103,7 @@ func TestPresenceBetweenTracks(t *testing.T) {
 		{NowPlaying{Track: tb, Playing: true}, ""},
 		{NowPlaying{Track: tb}, "clear"},
 	} {
-		p.update(true, "app", c.np)
+		p.update(settings.Default().Desktop, c.np)
 		got := ""
 		select {
 		case got = <-f.calls:

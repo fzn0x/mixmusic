@@ -188,9 +188,9 @@ func scanLine(st localfiles.Status) string {
 func init() { addSettings("playback", 85, (*shell).computerSettings) }
 
 // computerSettings are Settings › Playback › Music on this computer: the
-// folders of music the library holds, with how many tracks each holds and
-// how many files MixMusic skipped, a way to add one, to remove one, and to
-// read them again.
+// folders of music the library holds, with how many tracks each holds, how
+// many files MixMusic skipped and how many of the folders in it can't be
+// read, a way to add one, to remove one, and to read them again.
 func (s *shell) computerSettings(c *ui.Context) {
 	k := &s.lk
 	st := s.svc.LocalFiles.Status()
@@ -222,6 +222,9 @@ func (s *shell) computerSettings(c *ui.Context) {
 						line += fmt.Sprintf(" · %d skipped, of kinds MixMusic can't play or broken", f.Skipped)
 					}
 					ui.Text(c, line)
+					if len(f.Unread) > 0 {
+						ui.Text(c, " · "+unreadLine(len(f.Unread))).TextColor(k.danger)
+					}
 				}
 			}, func() {
 				if s.button(c, "computer-folder-remove-"+count(i), "remove", false).Label("Remove " + folder).Clicked() {
@@ -231,6 +234,15 @@ func (s *shell) computerSettings(c *ui.Context) {
 		}
 		s.unwatchedFolders(c)
 	})
+}
+
+// unreadLine tells of the n folders in a folder of music that the last
+// scan couldn't read, whose tracks the library keeps as they were.
+func unreadLine(n int) string {
+	if n == 1 {
+		return "1 folder in it can't be read: its tracks stay as they were"
+	}
+	return plural(n, "folder") + " in it can't be read: their tracks stay as they were"
 }
 
 // folderStatus is what the last scan found of folder.
@@ -363,6 +375,9 @@ func (s *shell) localItems(m *ui.Menu, t media.Track) {
 // localArt is the covers of the music on this computer, which show from
 // their files, as the downloads' do.
 func (s *shell) localArt(url string) (string, bool) {
+	if p, ok := s.mixCoverFile(url); ok {
+		return p, true
+	}
 	if localfiles.IsArt(url) {
 		return s.svc.LocalFiles.ArtworkFile(url)
 	}

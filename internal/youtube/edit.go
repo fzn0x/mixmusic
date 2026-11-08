@@ -82,10 +82,12 @@ var errNotDeletable = errors.New("only a playlist you made on YouTube Music can 
 // works.
 var errDeleteRefused = errors.New("YouTube Music refused: it may be gone already, or another account's")
 
-// AddToPlaylist adds a video to a playlist of the user.
+// AddToPlaylist adds a video to a playlist of the user. One the playlist
+// holds already YouTube refuses, which is ErrAlreadyInPlaylist:
+// AddToPlaylistAnyway adds it a second time.
 func (c *Client) AddToPlaylist(ctx context.Context, playlistID, videoID string) error {
 	return c.editPlaylist(ctx, playlistID, map[string]any{"action": "ACTION_ADD_VIDEO", "addedVideoId": videoID},
-		errors.New("YouTube Music did not add it: it may be in that playlist already"))
+		errors.New("YouTube Music did not add it"))
 }
 
 // RemoveFromPlaylist takes a video out of a playlist of the user. entryID
@@ -100,9 +102,10 @@ func (c *Client) RemoveFromPlaylist(ctx context.Context, playlistID, entryID, vi
 }
 
 // editPlaylist applies one action to a playlist. YouTube answers a refused
-// edit with a status that does not say it succeeded, and refused; an edit
-// of a playlist that isn't the account's, with 401 or 403, which leaves
-// the session as it was.
+// edit with a status that does not say it succeeded, which refusedEdit
+// tells the reason of, refused when it can't; an edit of a playlist that
+// isn't the account's, with 401 or 403, which leaves the session as it
+// was.
 func (c *Client) editPlaylist(ctx context.Context, playlistID string, action map[string]any, refused error) error {
 	if err := c.session(); err != nil {
 		return err
@@ -116,7 +119,7 @@ func (c *Client) editPlaylist(ctx context.Context, playlistID string, action map
 		return c.refusedOrEnded(ctx, err, errNotYours)
 	}
 	if !strings.Contains(n.get("status").str(), "SUCCEEDED") {
-		return refused
+		return refusedEdit(n, refused)
 	}
 	return nil
 }

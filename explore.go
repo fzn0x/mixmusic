@@ -200,17 +200,7 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 		}
 		for _, p := range editable {
 			if m.Item(p.Title).Chosen() {
-				go func() {
-					err := s.svc.Collection.AddToYouTubePlaylist(context.Background(), p.ID, t)
-					s.update(func() {
-						if err != nil {
-							s.notes = append(s.notes, noticeOf(err))
-							return
-						}
-						s.notes = append(s.notes, notice("Added "+t.Title+" to "+p.Title))
-						s.forget("playlist:" + p.ID)
-					})
-				}()
+				s.addToYouTubePlaylist(p, t)
 			}
 		}
 		if len(editable) == 0 {
@@ -219,22 +209,12 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 	})
 }
 
-// addToMix adds tracks to a mix.
+// addToMix adds tracks to a mix, but those it holds already, which the
+// toast offers to add anyway (toldMixAdd).
 func (s *shell) addToMix(p media.Playlist, tracks []media.Track) {
 	go func() {
-		err := s.svc.Collection.AddToPlaylist(context.Background(), p.ID, tracks)
-		s.update(func() {
-			if err != nil {
-				s.notes = append(s.notes, noticeOf(err))
-				return
-			}
-			what := plural(len(tracks), "track")
-			if len(tracks) == 1 {
-				what = tracks[0].Title
-			}
-			s.notes = append(s.notes, notice("Added "+what+" to "+p.Title))
-			s.forget("playlist:" + p.ID)
-		})
+		held, err := s.svc.Collection.AddToMix(p.ID, tracks)
+		s.update(func() { s.toldMixAdd(p, tracks, held, err) })
 	}()
 }
 

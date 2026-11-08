@@ -47,8 +47,14 @@ player API won't give it:
   can't read most streams.
 - **5.1 surround mixes**, as below.
 - **A rest from the player API.** When YouTube's player API refuses
-  three streams in a row, MixMusic leaves it alone for 30 minutes, and
-  yt-dlp finds every stream meanwhile. The log says so.
+  three streams in a row, MixMusic asks for the third once more with a
+  new visitor ID, as YouTube may refuse the one it gave rather than
+  MixMusic. Refused again, it leaves the player API alone for 2 minutes,
+  and yt-dlp finds every stream meanwhile; refused after a rest, it rests
+  twice as long as before, up to 30 minutes, until a stream is found. A
+  track it doesn't answer for in time, 4 seconds, counts as a refusal,
+  and the next track waits 2 seconds at most for it. The log says how
+  long it rests. Before 0.5.11, it rested 30 minutes at once.
 
 yt-dlp runs signed out too, with its own cache in MixMusic's cache folder,
 for at most 90 seconds a track. Install it, and choose the JavaScript
@@ -58,6 +64,22 @@ the first page of this section. When yt-dlp finds no stream, MixMusic says
 why in plain words, such as "this track is not available in your
 country", "only the members of its channel can play this track" or
 "YouTube plays this track only to signed-in adults, on its own website".
+
+yt-dlp runs twice at most for a track, a quick way first:
+
+- **The quick run** asks the player API as the visionOS app alone, as
+  MixMusic's own requests do, without the JavaScript runtime and without
+  the HLS and DASH manifests. It solves no challenge, which takes the
+  full run several seconds of the computer's time, and YouTube serves its
+  streams at once. It runs when the player API rests, doesn't answer in
+  time, or refuses MixMusic's own request.
+- **The full run** asks as yt-dlp's default apps, with the JavaScript
+  runtime: when the quick run finds no audio, and at once when the player
+  API said that the visionOS app gets no stream of the video, as of one
+  made for children. It alone finds 5.1 surround mixes, so a track the
+  quick run found offers none.
+- **The log** says which run found the stream, and how long each took.
+  Before 0.5.11, yt-dlp ran the full way only.
 
 ## Formats and quality
 
@@ -154,8 +176,12 @@ or E-AC-3, format 328.
 
 - **Asking a TV app.** YouTube lists no 5.1 audio to the visionOS app.
   So, at the same time, MixMusic asks the player API as YouTube's app for
-  Samsung's TVs, which YouTube tells of a video's AC-3 and E-AC-3, and
-  waits for its answer at most half a second past the stereo one's.
+  Samsung's TVs, which YouTube tells of a video's AC-3 and E-AC-3. A
+  track doesn't wait for that answer: it starts as soon as its stereo
+  stream is found and checked, and when the answer comes after, the 5.1
+  button shows a moment later, and on later plays of the track at once.
+  Before 0.5.11, a track waited up to half a second for the answer,
+  which on a slow connection often came late or not at all.
 - **yt-dlp and a JavaScript runtime.** The addresses of these streams
   need a challenge solved, which only yt-dlp does. MixMusic has it find
   the mix only when it is asked for, as you press 5.1 or a track starts
@@ -256,7 +282,7 @@ bot", which it asks of a visitor it doesn't trust.
 - **Through the player API**, MixMusic drops the visitor ID YouTube
   doesn't trust, takes the new one YouTube's answer carries, or asks for a
   new one, and asks once more. Refused that way for three tracks in a
-  row, it leaves the player API to yt-dlp for 30 minutes, as above.
+  row, it leaves the player API to yt-dlp for a few minutes, as above.
 - **Through yt-dlp**, the track says "YouTube asks to confirm this is not
   a bot; try again in a while". When yt-dlp hears "try again later", the
   track says "YouTube is turning down requests from this network for

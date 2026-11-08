@@ -3,6 +3,7 @@
 Everything lives in the user's data folder (`%AppData%\MixMusic` on
 Windows, `~/Library/Application Support/MixMusic` on macOS,
 `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
+`mix-covers/` (the covers the user chose for mixes),
 `queue.json`, `positions.json` (where the user left podcasts' episodes),
 `local-files.json` (the index of the music on the computer),
 `addons/`, `bin/` (yt-dlp), the YouTube session

@@ -56,6 +56,9 @@ func (a *App) applyEngine(s settings.Settings) {
 	if e == nil {
 		return
 	}
+	// The volume's curve, on which Spotify in MixMusic plays too
+	// (hereDevice.gain).
+	e.SetVolumeCurve(s.VolumeCurve)
 	var gains [len(audio.Bands)]float64
 	copy(gains[:], s.Equalizer.Gains)
 	e.SetEqualizer(s.Equalizer.Enabled, gains, s.Equalizer.Preamp)

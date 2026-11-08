@@ -293,12 +293,15 @@ func (d hereDevice) level() string {
 			v = 0
 		}
 	}
-	return gain(v)
+	return d.gain(v)
 }
 
 // gain is the gain of the volume v for the page, the gain MixMusic's own
-// player plays it at, so that both sound alike.
-func gain(v float64) string { return strconv.FormatFloat(volume.Gain(v), 'f', -1, 64) }
+// player plays it at, on the curve of the settings, so that both sound
+// alike.
+func (d hereDevice) gain(v float64) string {
+	return strconv.FormatFloat(d.h.a.settings.Get().VolumeCurve.Gain(v), 'f', -1, 64)
+}
 
 // do runs a command of the device in its page, if it's open.
 func (d hereDevice) do(ctx context.Context, code string) error {
@@ -318,7 +321,7 @@ func (d hereDevice) Seek(ctx context.Context, at time.Duration) error {
 }
 
 func (d hereDevice) SetVolume(ctx context.Context, v float64) error {
-	return d.do(ctx, "await mm.setVolume("+gain(v)+")")
+	return d.do(ctx, "await mm.setVolume("+d.gain(v)+")")
 }
 
 // hereState is what the page tells the device plays.

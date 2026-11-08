@@ -532,11 +532,17 @@ func (p *Player) ConnectSeek(ctx context.Context, positionMs int) error {
 
 // ConnectVolume sets the volume of the Spotify Connect device to the
 // player's volume v, from 0 to 1: the percentage earlier versions sent for
-// the same loudness of MixMusic's own player, so that a Spotify track on a
-// device keeps its balance against a YouTube Music one.
+// the same loudness of MixMusic's own player, on the curve of the settings,
+// so that a Spotify track on a device keeps its balance against a YouTube
+// Music one.
 func (p *Player) ConnectVolume(ctx context.Context, v float64) error {
-	return p.a.spotify.SetVolume(ctx, p.a.settings.Get().SpotifyDevice, int(volume.Saved(v)*100+0.5))
+	s := p.a.settings.Get()
+	return p.a.spotify.SetVolume(ctx, s.SpotifyDevice, connectPercent(s.VolumeCurve, v))
 }
+
+// connectPercent is the percentage of a Spotify Connect device's volume
+// the volume v is sent as on curve c.
+func connectPercent(c volume.Curve, v float64) int { return int(c.Share(v)*100 + 0.5) }
 
 // ConnectState returns what the Spotify Connect device plays, or nil when
 // no device is active.

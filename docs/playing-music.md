@@ -153,10 +153,23 @@ Music videos can show their picture on the now playing page, in place of the cov
 - While your system asks for less motion, a button on the cover plays the picture.
 - A web view runs beside MixMusic while pictures show, which takes memory until a minute after the last one.
 
+## The output device
+
+MixMusic plays on the system's default output device, and moves to the new one when you change it in your system's sound settings. To play music on headphones or a DAC while calls and the system's sounds stay on the speakers, choose the device MixMusic plays on: **Output device**, at the top of Settings › Playback › Sound.
+
+- **The choices** are **System default**, which names the device it is now, and each output device of your computer by the name your system gives it. Two of one name, as two monitors of one model, are told apart by a number. The refresh button beside it looks for devices again.
+- **The speaker button** beside the volume chooses too, where the window is wide enough for it beside the player bar's other buttons, and while there's a choice to make: more than one device, or one chosen. It turns to the accent while a device is chosen, and its tip names it.
+- **When the device goes away,** as headphones you unplug, MixMusic plays on the system's default device and says so, and goes back to the device a second after it's back, saying so too. A device that's there but can't play, as one another app holds, gives way to the default for 10 seconds before MixMusic tries it again. Settings and the menu still show the device chosen, as not connected.
+- **Where it doesn't apply:** a [cast device](casting.md) plays what you cast on itself, and Spotify tracks that Spotify plays, in MixMusic itself or on Spotify Connect, play where Spotify plays them: in MixMusic, on the system's default device. The menu says so while one plays.
+- **What each system lists:** on Windows, its playback devices that are enabled; on macOS, its devices with outputs, as Sound settings shows them; on Linux, PulseAudio's or PipeWire's sinks, or, without either, ALSA's devices. [The audio engine](audio-engine.md#the-output-on-each-system) tells more.
+
+5.1 surround, the visualizer and Even loudness work on any device.
+
 ## 5.1 surround
 
 Some YouTube Music tracks have a 5.1 surround mix beside their stereo one. While one plays, a 5.1 button shows by the player: pressing it plays the surround mix from where the stereo one was, and pressing it again goes back to stereo. The choice stays for later tracks, as "Play 5.1 surround when a track has it" in Settings › Playback › Sound, which the button turns on and off. It's off by default.
 
+- A track doesn't wait to learn whether it has a 5.1 mix: it starts at once, and the 5.1 button may show a moment later, once YouTube has said so. With 5.1 on, the track then plays its surround mix from where it is.
 - On a 5.1 output device, the six channels play as they are. On headphones or two speakers, they're mixed down to stereo, as the track's own downmix levels say.
 - While it's on, stereo tracks play on the front left and right speakers of a 5.1 system.
 - The surround mix [needs yt-dlp and a JavaScript runtime](streams.md#surround-mixes-and-what-they-need), which find it in a few seconds the first time the track plays.

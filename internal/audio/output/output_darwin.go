@@ -6,7 +6,10 @@ package output
 // it when it changes, as MyGo's audio does: the queue's own thread hands
 // back each buffer it played, and the stream's goroutine renders into it
 // and queues it again. A queue of 5.1 tells Core Audio its layout, which
-// maps its channels to the device's speakers.
+// maps its channels to the device's speakers. A stream that asks for a
+// device plays on it through a queue of its UID, and checks every second
+// that the device is there: when it went away, a queue on the default
+// output takes over, and gives way to one on the device once it's back.
 
 import (
 	"errors"
@@ -100,9 +103,9 @@ var (
 	coreAudio bool
 
 	// aqCallback is made once, as callbacks are limited; it hands the
-	// buffers a queue played back to the stream of the queue, in aqStreams.
+	// buffers a queue played back to the stream's queue, in aqStreams.
 	aqCallback uintptr
-	aqStreams  sync.Map // queue → *Stream
+	aqStreams  sync.Map // queue → *queue
 )
 
 func loadAudioToolbox() error {
@@ -126,10 +129,10 @@ func loadAudioToolbox() error {
 		}
 		aqCallback = purego.NewCallback(func(user, q uintptr, b *audioQueueBuffer) {
 			if v, ok := aqStreams.Load(q); ok {
-				s := v.(*Stream)
-				s.queued.Add(-1)
+				qq := v.(*queue)
+				qq.queued.Add(-1)
 				select {
-				case s.free <- b:
+				case qq.free <- b:
 				default:
 				}
 			}
@@ -154,67 +157,113 @@ func outputChannels() int {
 	if !coreAudio {
 		return 0
 	}
-	addr := audioObjectPropertyAddress{kAudioHardwarePropertyDefaultOutputDevice, kAudioObjectPropertyScopeGlobal, 0}
-	var dev uint32
-	size := uint32(unsafe.Sizeof(dev))
-	if audioObjectGetPropertyData(kAudioObjectSystemObject, &addr, 0, nil, &size, unsafe.Pointer(&dev)) != 0 || dev == 0 {
+	dev := defaultOutputDevice()
+	if dev == 0 {
 		return 0
 	}
-	// An AudioBufferList: the number of buffers, then each AudioBuffer of
-	// 16 bytes, after 4 bytes of padding, whose first field is its
-	// channels.
-	addr = audioObjectPropertyAddress{kAudioDevicePropertyStreamConfiguration, kAudioDevicePropertyScopeOutput, 0}
-	if audioObjectGetPropertyDataSize(dev, &addr, 0, nil, &size) != 0 || size < 8 || size > 1<<16 {
-		return 0
-	}
-	buf := make([]byte, size)
-	if audioObjectGetPropertyData(dev, &addr, 0, nil, &size, unsafe.Pointer(&buf[0])) != 0 {
-		return 0
-	}
-	buf = buf[:min(int(size), len(buf))]
-	return bufferListChannels(buf)
+	return deviceChannels(dev)
 }
 
-// Stream plays what its render function makes on the default output.
+// Stream plays what its render function makes on the default output, or
+// on the device its Options name, while that one is there.
 type Stream struct {
 	render func([]float32, int)
-	// channels is the queue's: 2, or Surround.
-	channels int
-	q        uintptr
-	free     chan *audioQueueBuffer
-	queued   atomic.Int64 // buffers the queue holds
-	stop     chan struct{}
-	once     sync.Once
-	done     chan struct{}
+	// asked is the channels the stream asks for, and want the UID of the
+	// device it asks for, "" for the default.
+	asked int
+	want  string
+	avoid avoid
+	mover *mover
+	// q is the queue that plays, which the stream's goroutine changes as
+	// the device does.
+	q    atomic.Pointer[queue]
+	stop chan struct{}
+	once sync.Once
+	done chan struct{}
 }
 
-// Start starts a stream of channels, 2, or Surround for 5.1, which it
-// plays where the default device has six output channels or more, else
-// stereo. Its goroutine calls render for each period, 10 ms, to fill out
-// with frames of the channels it tells, interleaved; render must not
-// block. A queue of 5.1 stays one when the default device changes, which
-// Core Audio then mixes down. When the stream stops of itself, as when the
-// device goes away, failed is called with why, from that goroutine once
-// the stream has ended; Stop is not needed then. Start returns once the
-// queue plays.
-func Start(channels int, render func(out []float32, channels int), failed func(error)) (*Stream, error) {
+// queue is an Audio Queue of a stream, on one device.
+type queue struct {
+	q uintptr
+	// channels is the queue's: 2, or Surround.
+	channels int
+	// device is the UID of the device it plays on, "" for the default
+	// device, which it follows; fallback is set while it plays there in
+	// place of the device the stream asks for.
+	device   string
+	fallback bool
+	free     chan *audioQueueBuffer
+	queued   atomic.Int64 // buffers the queue holds
+}
+
+// Open starts a stream as o tells: of o.Channels, 2, or Surround for 5.1,
+// which it plays where the device has six output channels or more, else
+// stereo, on o.Device or the default device. A queue of 5.1 on the default
+// device stays one when the default device changes, which Core Audio then
+// mixes down. Open returns once the queue plays.
+func Open(o Options) (*Stream, error) {
 	if err := loadAudioToolbox(); err != nil {
 		return nil, err
 	}
-	if channels == Surround {
-		channels = coreAudioChannels(channels, outputChannels())
-	} else {
-		channels = 2
+	s := &Stream{render: o.Render, asked: o.Channels, want: o.Device, mover: newMover(o),
+		stop: make(chan struct{}), done: make(chan struct{})}
+	q, err := s.open()
+	if err != nil {
+		return nil, err
 	}
-	s, err := start(channels, render, failed)
-	if err != nil && channels == Surround {
-		// A device that takes no queue of 5.1 plays stereo.
-		return start(2, render, failed)
-	}
-	return s, err
+	s.q.Store(q)
+	s.mover.tell(q.fallback)
+	go func() {
+		err := s.run()
+		s.q.Load().dispose()
+		close(s.done)
+		if err != nil && o.Failed != nil {
+			o.Failed(err)
+		}
+	}()
+	return s, nil
 }
 
-func start(channels int, render func(out []float32, channels int), failed func(error)) (*Stream, error) {
+// target returns the UID of the device the stream plays on, "" for the
+// default one, its output channels, and whether it plays on the default in
+// place of the device the stream asks for.
+func (s *Stream) target() (uid string, channels int, fallback bool) {
+	if s.want != "" && s.avoid.may(time.Now()) {
+		if _, ch, ok := outputDevice(s.want); ok {
+			return s.want, ch, false
+		}
+	}
+	return "", outputChannels(), s.want != ""
+}
+
+// open starts a queue on the device the stream plays on, as target tells.
+// When the device asked for is there but fails to start, the default
+// device plays, and avoid keeps the stream from trying it for a while.
+func (s *Stream) open() (*queue, error) {
+	uid, ch, fallback := s.target()
+	channels := 2
+	if s.asked == Surround {
+		channels = coreAudioChannels(Surround, ch)
+	}
+	q, err := s.start(channels, uid)
+	if err != nil && channels == Surround {
+		// A device that takes no queue of 5.1 plays stereo.
+		q, err = s.start(2, uid)
+	}
+	if err != nil && uid != "" {
+		s.avoid.failed(time.Now())
+		return s.open()
+	}
+	if err != nil {
+		return nil, err
+	}
+	q.fallback = fallback
+	return q, nil
+}
+
+// start starts a queue of channels on the device of the UID uid, or on the
+// default device when it's "".
+func (s *Stream) start(channels int, uid string) (*queue, error) {
 	desc := audioStreamBasicDescription{
 		sampleRate:       Rate,
 		formatID:         kAudioFormatLinearPCM,
@@ -225,25 +274,26 @@ func start(channels int, render func(out []float32, channels int), failed func(e
 		channelsPerFrame: uint32(channels),
 		bitsPerChannel:   32,
 	}
-	s := &Stream{
-		render:   render,
-		channels: channels,
-		free:     make(chan *audioQueueBuffer, aqBuffers),
-		stop:     make(chan struct{}),
-		done:     make(chan struct{}),
-	}
-	if st := audioQueueNewOutput(&desc, aqCallback, 0, 0, 0, 0, &s.q); st != 0 {
+	q := &queue{channels: channels, device: uid, free: make(chan *audioQueueBuffer, aqBuffers)}
+	if st := audioQueueNewOutput(&desc, aqCallback, 0, 0, 0, 0, &q.q); st != 0 {
 		return nil, osStatus("AudioQueueNewOutput", st)
 	}
-	aqStreams.Store(s.q, s)
-	fail := func(err error) (*Stream, error) {
-		audioQueueDispose(s.q, true)
-		aqStreams.Delete(s.q)
+	aqStreams.Store(q.q, q)
+	fail := func(err error) (*queue, error) {
+		q.dispose()
 		return nil, err
+	}
+	if uid != "" {
+		ref := cfString(uid)
+		st := audioQueueSetProperty(q.q, kAudioQueuePropertyCurrentDevice, unsafe.Pointer(&ref), uint32(unsafe.Sizeof(ref)))
+		cfRelease(ref)
+		if st != 0 {
+			return fail(osStatus("AudioQueueSetProperty", st))
+		}
 	}
 	if channels == Surround {
 		layout := audioChannelLayout{tag: kAudioChannelLayoutTagMPEG51A}
-		if st := audioQueueSetProperty(s.q, kAudioQueuePropertyChannelLayout, unsafe.Pointer(&layout), uint32(unsafe.Sizeof(layout))); st != 0 {
+		if st := audioQueueSetProperty(q.q, kAudioQueuePropertyChannelLayout, unsafe.Pointer(&layout), uint32(unsafe.Sizeof(layout))); st != 0 {
 			return fail(osStatus("AudioQueueSetProperty", st))
 		}
 	}
@@ -251,27 +301,27 @@ func start(channels int, render func(out []float32, channels int), failed func(e
 	// with an underrun.
 	for range aqBuffers {
 		var b *audioQueueBuffer
-		if st := audioQueueAllocateBuffer(s.q, uint32(periodFrames*channels*4), &b); st != 0 {
+		if st := audioQueueAllocateBuffer(q.q, uint32(periodFrames*channels*4), &b); st != 0 {
 			return fail(osStatus("AudioQueueAllocateBuffer", st))
 		}
-		if err := s.fill(b); err != nil {
+		if err := s.fill(q, b); err != nil {
 			return fail(err)
 		}
 	}
-	if st := audioQueueStart(s.q, 0); st != 0 {
+	if st := audioQueueStart(q.q, 0); st != 0 {
 		return fail(osStatus("AudioQueueStart", st))
 	}
-	go func() {
-		err := s.run()
-		audioQueueStop(s.q, true)
-		audioQueueDispose(s.q, true)
-		aqStreams.Delete(s.q)
-		close(s.done)
-		if err != nil && failed != nil {
-			failed(err)
-		}
-	}()
-	return s, nil
+	return q, nil
+}
+
+// dispose stops the queue and disposes of it.
+func (q *queue) dispose() {
+	if q.q == 0 {
+		return
+	}
+	audioQueueStop(q.q, true)
+	audioQueueDispose(q.q, true)
+	aqStreams.Delete(q.q)
 }
 
 // Stop stops the stream and disposes of its queue. It waits for the
@@ -283,43 +333,86 @@ func (s *Stream) Stop() {
 
 // Delay returns how long what render makes now waits before it plays.
 func (s *Stream) Delay() time.Duration {
-	return time.Duration(s.queued.Load()*periodFrames) * time.Second / Rate
+	q := s.q.Load()
+	if q == nil {
+		return 0
+	}
+	return time.Duration(q.queued.Load()*periodFrames) * time.Second / Rate
 }
 
 func (s *Stream) run() error {
 	// A queue that stopped taking buffers, as when its device went away.
 	stalled := time.NewTimer(time.Second)
 	defer stalled.Stop()
+	// While the stream asks for a device, it checks whether it went away,
+	// or came back.
+	var check <-chan time.Time
+	if s.want != "" {
+		t := time.NewTicker(checkInterval)
+		defer t.Stop()
+		check = t.C
+	}
 	for {
+		q := s.q.Load()
 		select {
 		case <-s.stop:
 			return nil
-		case b := <-s.free:
-			if err := s.fill(b); err != nil {
+		case b := <-q.free:
+			if err := s.fill(q, b); err != nil {
 				return err
 			}
 			stalled.Reset(time.Second)
 		case <-stalled.C:
-			return errors.New("output: the audio queue stopped playing")
+			if uid, _, _ := s.target(); s.want == "" || q.device == "" || uid == q.device {
+				return errors.New("output: the audio queue stopped playing")
+			}
+			// The device asked for went away: the default device plays.
+			if err := s.move(); err != nil {
+				return err
+			}
+			stalled.Reset(time.Second)
+		case <-check:
+			if uid, _, _ := s.target(); uid == q.device {
+				continue
+			}
+			if err := s.move(); err != nil {
+				return err
+			}
+			stalled.Reset(time.Second)
 		}
 	}
 }
 
-// fill renders a period into b and queues it, turning a panic of render
-// into an error.
-func (s *Stream) fill(b *audioQueueBuffer) (err error) {
-	out := unsafe.Slice((*float32)(b.audioData), periodFrames*s.channels)
+// move has the stream play on the device it should, in a queue of its
+// own: what the queue before held is dropped.
+func (s *Stream) move() error {
+	s.q.Load().dispose()
+	q, err := s.open()
+	if err != nil {
+		// Stop and the stream's end dispose of a queue that never played.
+		s.q.Store(&queue{free: make(chan *audioQueueBuffer)})
+		return err
+	}
+	s.q.Store(q)
+	s.mover.tell(q.fallback)
+	return nil
+}
+
+// fill renders a period into b and queues it on q, turning a panic of
+// render into an error.
+func (s *Stream) fill(q *queue, b *audioQueueBuffer) (err error) {
+	out := unsafe.Slice((*float32)(b.audioData), periodFrames*q.channels)
 	defer func() {
 		if v := recover(); v != nil {
 			clear(out)
 			err = fmt.Errorf("output: rendering the audio failed: %v", v)
 		}
 	}()
-	s.render(out, s.channels)
+	s.render(out, q.channels)
 	b.audioDataByteSize = uint32(len(out) * 4)
-	s.queued.Add(1)
-	if st := audioQueueEnqueueBuffer(s.q, b, 0, 0); st != 0 {
-		s.queued.Add(-1)
+	q.queued.Add(1)
+	if st := audioQueueEnqueueBuffer(q.q, b, 0, 0); st != 0 {
+		q.queued.Add(-1)
 		return osStatus("AudioQueueEnqueueBuffer", st)
 	}
 	return nil

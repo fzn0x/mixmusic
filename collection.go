@@ -312,6 +312,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 				if m.Item("Rename").Chosen() {
 					s.renaming, s.renameTo, s.renameID = true, p.Title, p.ID
 				}
+				s.changeCoverItem(m, p)
 				if m.Item("Delete").Chosen() {
 					s.deleting, s.deleteID, s.deleteTitle = true, p.ID, p.Title
 				}
@@ -382,11 +383,13 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 				}
 			}
 		}
+		o.move = s.playlistMove(key, r, p)
 		// A playlist whose first page was empty may have more: the line
 		// above says they load.
 		if len(tracks) > 0 || !r.reading {
 			s.trackList(c, "playlist", view.tracks, o)
 		}
+		s.playlistSuggestions(c, key, p)
 	})
 	s.mixDialogs(c, key)
 }

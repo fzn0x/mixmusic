@@ -53,10 +53,12 @@ func (s *shell) view(c *ui.Context) {
 		s.overlay(c)
 	})
 	s.palette(c)
+	s.coverDialog(c)
 	s.updateOffer(c)
 	s.questionDialog(c)
 	s.trackInfoDialog(c)
 	s.promptDialog(c)
+	s.failureDialog(c)
 	s.sweepDialogs()
 	s.sweepViews()
 	s.followVideo()
@@ -139,6 +141,8 @@ func (s *shell) toasts(c *ui.Context) {
 		switch {
 		case n.Settings:
 			c.ToastAction(n.Message, "settings", func() { s.navigate("/settings/playback") })
+		case n.Failure != 0:
+			s.failureToast(c, n)
 		case n.Error:
 			c.AddToast(ui.Toast{Title: n.Message, Type: "error"})
 		default:

@@ -3,6 +3,9 @@
 // its logo, the pink rings with a play button, for the code that draws it.
 // The app builds them in, so they stay out of resources/, whose every file
 // `mygo build` ships beside the app (#303).
+//
+// discord/ holds the badges of the Discord status, which tools/discordbadges
+// draws: Discord reads them from GitHub, and the app doesn't build them in.
 package brand
 
 import _ "embed"

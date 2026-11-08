@@ -31,7 +31,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 		toggle("media-keys", "Media keys", "The keyboard's play, next and previous keys control MixMusic. Keys of your own that work everywhere are in Settings › Shortcuts.", &s.set.MediaKeys)
 		toggle("notifications", "Notifications", "Tell what starts playing while MixMusic is in the background.", &s.set.Notifications)
 		toggle("title", "Show what plays in the window title", "The window's title names the track that plays, for the taskbar, the window switcher and screen readers.", &s.set.ShowInTitle)
-		toggle("discord", "Show what plays on Discord", "While Discord runs, your profile says what you listen to, with the artwork and the time left; pausing clears it.", &s.set.DiscordPresence)
+		toggle("discord", "Show what plays on Discord", "While Discord runs, your profile says what you listen to: you choose its lines, cover, time and button.", &s.set.DiscordPresence)
 		if s.set.DiscordPresence {
 			describe := func() {
 				ui.Text(c, "Discord shows the name of MixMusic's application. To show another, create one in the ")

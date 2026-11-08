@@ -27,11 +27,14 @@ const (
 var ErrNoPlaylist = errors.New("library: no such playlist")
 
 // Playlist is a playlist made in MixMusic, which may hold tracks of every
-// service.
+// service. Cover names the file of the cover the user chose for it, in
+// the folder of covers (covers.go), or is empty while it shows its
+// tracks' covers.
 type Playlist struct {
 	ID          string        `json:"id"`
 	Title       string        `json:"title"`
 	Description string        `json:"description,omitempty"`
+	Cover       string        `json:"cover,omitempty"`
 	Tracks      []media.Track `json:"tracks"`
 	Created     time.Time     `json:"created"`
 	Updated     time.Time     `json:"updated"`
@@ -169,7 +172,8 @@ func (l *Library) Playlists() []media.Playlist {
 	return out
 }
 
-// media converts a playlist, taking its artwork from its first tracks.
+// media converts a playlist, taking its artwork from its first tracks,
+// or from the cover chosen for it.
 func (p Playlist) media() media.Playlist {
 	mp := media.Playlist{
 		ID:          media.ID(media.SourceLocal, p.ID),
@@ -187,6 +191,9 @@ func (p Playlist) media() media.Playlist {
 			mp.Artwork = t.Artwork
 			break
 		}
+	}
+	if p.Cover != "" {
+		mp.Artwork = []media.Image{CoverImage(p.Cover)}
 	}
 	return mp
 }

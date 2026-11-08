@@ -219,20 +219,42 @@ already. The tray icon's tip names what plays too.
 
 While the Discord app runs on your computer, your Discord profile shows
 what you listen to: the title, the artists, the cover and the time left.
-Pausing clears it, and a live stream shows how long it has played.
-Discord's member list says "Listening to MixMusic". There's nothing to set
-up: turn it off with **Show what plays on Discord** in Settings › Desktop.
+Pausing clears it, and a live stream shows how long it has played. You
+can [choose what it shows](#what-your-discord-status-shows). Discord's
+member list says "Listening to MixMusic". There's nothing to set up: turn
+it off with **Show what plays on Discord** in Settings › Desktop.
 
 - **Discord application ID**, under the switch, shows the name of a Discord
   application of your own in place of MixMusic's: create one in Discord's
   [developer portal](https://discord.com/developers/applications) and paste
   its application ID.
+- Under them, a **preview** shows your status as Discord's card does, of
+  what plays, or of a song while nothing does, and follows what you choose
+  below it, the lines as you type them.
 - Discord's own Spotify status comes from your Discord account's link to
   Spotify. To show only MixMusic, turn off "Display Spotify as your status"
   in Discord's Connections.
 - MixMusic finds Discord's Canary build too, and Vesktop installed with
   Flatpak. In MixMusic's Flatpak, a Discord app that isn't a Flatpak shows
   what plays only if it was running when MixMusic started.
+
+### What your Discord status shows
+
+The rows under the preview choose what your profile says. At first it
+says what it always did: the title, the artists, the cover and the time
+left, and a pause clears it.
+
+| Row | What it does |
+|---|---|
+| First line, Second line | What the two lines say. Type text and placeholders: `{title}`, `{artist}`, `{album}` and `{service}` (YouTube Music, Spotify or my computer), as `{artist} · {album}`. A placeholder at a line's start or end with nothing to show, as the album of a single, takes the separator beside it along. Anything else in braces shows as typed, and the row says so in red. A line holds 128 characters, as many as Discord shows; an empty one shows nothing. **reset** puts back `{title}` or `{artist}`. |
+| Cover | The track's cover, where its service has one online. A file on your computer has none Discord can read. On at first. |
+| Service badge | A small round mark at the cover's corner: a green disc for Spotify, a red square for YouTube Music, a record for a file on your computer. Without a cover, the badge takes its place. Off at first. |
+| Time left | How long the track has played and how long it has left, as a bar; a live stream, how long it has played. On at first. |
+| Listen button | A **Listen on Spotify** or **Listen on YouTube Music** button that opens the track there. Discord shows it to the others who see your profile, not always to you. A file on your computer has none. Off at first. |
+| Keep while paused | A paused track stays, marked with a pause badge, whose tip says Paused, and without its time. Off, a pause clears your status, as before. |
+
+Discord reads the badges from MixMusic's GitHub repository, and an
+application of your own shows them as MixMusic's does.
 
 ## Start at login
 

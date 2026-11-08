@@ -313,6 +313,7 @@ func (s *shell) progress(c *ui.Context) {
 }
 
 func (s *shell) playerSide(c *ui.Context) {
+	room := s.outputRoom(c)
 	if hasSurround(s.st) {
 		s.surroundButton(c)
 	}
@@ -327,6 +328,7 @@ func (s *shell) playerSide(c *ui.Context) {
 		s.devicesButton(c)
 	}
 	s.speedButton(c)
+	s.outputButton(c, room)
 	s.volumeControl(c)
 	if s.iconButton(c, "mini", "mini", "Open the mini player", false, 18).Clicked() {
 		s.showMini()

@@ -333,6 +333,7 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 			s.downloadPlaylist(p.ID)
 		}
 		s.copyLinkItem(m, p.URL)
+		s.changeCoverItem(m, p)
 		if more != nil {
 			more(m, p)
 		}

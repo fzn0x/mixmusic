@@ -73,8 +73,15 @@ func (c *Collection) CreateYouTubePlaylist(ctx context.Context, title string, tr
 }
 
 // AddToYouTubePlaylist adds a track of any service to a playlist of the
-// user on YouTube Music.
+// user on YouTube Music. One the playlist holds already YouTube refuses,
+// which is ErrAlreadyInPlaylist: AddToYouTubePlaylistAnyway adds it again.
 func (c *Collection) AddToYouTubePlaylist(ctx context.Context, playlistID string, track media.Track) error {
+	return c.addToYouTube(ctx, playlistID, track, c.a.youtube.AddToPlaylist)
+}
+
+// addToYouTube adds a track of any service to a playlist of the user on
+// YouTube Music with add, by its video there.
+func (c *Collection) addToYouTube(ctx context.Context, playlistID string, track media.Track, add func(ctx context.Context, list, video string) error) error {
 	if !c.a.youtube.SignedIn() {
 		return errNotSignedIn
 	}
@@ -86,7 +93,10 @@ func (c *Collection) AddToYouTubePlaylist(ctx context.Context, playlistID string
 	if err != nil {
 		return err
 	}
-	return c.a.youtube.AddToPlaylist(ctx, list, video)
+	if err = add(ctx, list, video); errors.Is(err, youtube.ErrAlreadyInPlaylist) {
+		return ErrAlreadyInPlaylist
+	}
+	return err
 }
 
 // RemoveFromYouTubePlaylist takes a track, as read from the playlist, out

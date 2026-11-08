@@ -17,8 +17,8 @@ var ErrCantPlay = errors.New("the file can't be played")
 // decodes the first of its audio: it returns how long the file plays, 0
 // when the file doesn't tell, or why a deck can't play it, wrapping
 // ErrCantPlay, in the words of the player. It reads little of the file:
-// of MP3, the tags of its first frame tell its length, else its bitrate
-// does, where a deck that plays it reads every frame's header.
+// of MP3, the headers of its first frame tell its length, else its
+// bitrate does, where a deck that plays it reads every frame's header.
 func Probe(src io.ReadSeeker) (time.Duration, error) {
 	kind, err := sniff(src)
 	if err != nil {
@@ -72,9 +72,10 @@ func cantPlay(err error) error { return fmt.Errorf("%w: %v", ErrCantPlay, err) }
 
 // probeMP3 decodes the first frames of an MP3 file, without the scan of
 // its frames go-mp3 makes of a file it can seek, and reads its length: of
-// its LAME tag, or of its bitrate and size.
+// its LAME tag, else of the frames its Xing, Info or VBRI header counts,
+// as a file of a variable bitrate has, else of its bitrate and size.
 func probeMP3(src io.ReadSeeker) (time.Duration, error) {
-	start, end := mp3Gap(src)
+	h := readMP3Header(src)
 	if _, err := src.Seek(0, io.SeekStart); err != nil {
 		return 0, err
 	}
@@ -98,8 +99,8 @@ func probeMP3(src io.ReadSeeker) (time.Duration, error) {
 	if rate <= 0 {
 		return 0, cantPlay(errUnsupported)
 	}
-	if end > start {
-		return time.Duration(end-start) * time.Second / time.Duration(rate), nil
+	if length, ok := h.length(rate); ok {
+		return length, nil
 	}
 	return mp3Length(src), nil
 }

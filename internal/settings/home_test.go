@@ -15,7 +15,7 @@ import (
 func TestHomeShelvesRoundTrip(t *testing.T) {
 	s := Default()
 	s.HomeShelves = []HomeShelf{
-		{Key: "playlist:local:night-drive", Title: "Night drive"},
+		{Key: "playlist:mx:night-drive", Title: "Night drive"},
 		{Key: "youtube:FEmusic_listen_again", Title: "Listen again"},
 		{Key: "local:recent", Title: "Recently played", Hidden: true},
 		{Key: "youtube:title:Quick picks", Title: "Quick picks"},

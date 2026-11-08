@@ -10,10 +10,11 @@ type Stream struct{}
 // Available returns ErrUnsupported.
 func Available() error { return ErrUnsupported }
 
-// Start returns ErrUnsupported.
-func Start(channels int, render func(out []float32, channels int), failed func(error)) (*Stream, error) {
-	return nil, ErrUnsupported
-}
+// Open returns ErrUnsupported.
+func Open(o Options) (*Stream, error) { return nil, ErrUnsupported }
+
+// Devices returns ErrUnsupported.
+func Devices() ([]Device, error) { return nil, ErrUnsupported }
 
 // Stop does nothing.
 func (s *Stream) Stop() {}

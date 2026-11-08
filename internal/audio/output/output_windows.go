@@ -63,6 +63,9 @@ type device struct {
 	// channels is the channels of the stream: 2, or Surround on a device
 	// of 5.1 or more, when the stream asks for them.
 	channels int
+	// fallback is set on the default device that plays in place of the
+	// one the stream asks for, which isn't there or can't play.
+	fallback bool
 }
 
 func (d *device) close() {
@@ -83,16 +86,48 @@ func (d *device) close() {
 	}
 }
 
-// openDefault opens the default output device for a stream of float32 at
-// Rate, which Windows converts to the device's own format: of Surround
-// channels when asked for them and the device mixes 5.1 or more, its
-// surrounds as the device's mix names them, else stereo.
-func openDefault(e *iMMDeviceEnumerator, channels int) (*device, error) {
-	dev, err := e.defaultRender()
+// pick returns the endpoint a stream that asks for the device want plays
+// on: want, while it is there and active, and the stream may try it, else
+// the default device, and whether that is in want's place.
+func pick(e *iMMDeviceEnumerator, want string, may bool) (dev *iMMDevice, fallback bool, err error) {
+	if want != "" && may {
+		if dev, err := e.device(want); err == nil {
+			if st, err := dev.state(); err == nil && st == deviceStateActive {
+				return dev, false, nil
+			}
+			dev.release()
+		}
+	}
+	dev, err = e.defaultRender()
+	return dev, want != "", err
+}
+
+// openOn opens the device a stream that asks for the device want plays on,
+// as pick picks it. When want is there but fails to open, the default
+// device plays, and avoid keeps the stream from trying want for a while.
+func openOn(e *iMMDeviceEnumerator, want string, a *avoid, channels int) (*device, error) {
+	dev, fallback, err := pick(e, want, a.may(time.Now()))
 	if err != nil {
 		return nil, err
 	}
-	defer dev.release()
+	d, err := openEndpoint(dev, channels)
+	dev.release()
+	if err != nil && !fallback && want != "" {
+		a.failed(time.Now())
+		return openOn(e, want, a, channels)
+	}
+	if d != nil {
+		d.fallback = fallback
+	}
+	return d, err
+}
+
+// openEndpoint opens an output device for a stream of float32 at Rate,
+// which Windows converts to the device's own format: of Surround channels
+// when asked for them and the device mixes 5.1 or more, its surrounds as
+// the device's mix names them, else stereo.
+func openEndpoint(dev *iMMDevice, channels int) (*device, error) {
+	var err error
 	d := &device{}
 	if d.id, err = dev.id(); err != nil {
 		return nil, err
@@ -120,7 +155,7 @@ func openDefault(e *iMMDeviceEnumerator, channels int) (*device, error) {
 			// A device that takes no stream of 5.1, whatever its mix says,
 			// plays stereo, through a client of its own.
 			d.close()
-			return openDefault(e, 2)
+			return openEndpoint(dev, 2)
 		}
 		return fail(err)
 	}
@@ -170,12 +205,17 @@ func streamFormat(channels int, mask uint32) waveFormat {
 // Available returns nil: Windows always has WASAPI, if not a device.
 func Available() error { return nil }
 
-// Stream plays what its render function makes on the default output
-// device of Windows, following the default device when it changes.
+// Stream plays what its render function makes on an output device of
+// Windows: the default device, following it when it changes, or the device
+// its Options name, while that one is there.
 type Stream struct {
 	render func([]float32, int)
-	// channels is what the stream asks devices for.
+	// channels is what the stream asks devices for, and want the device it
+	// asks for, "" for the default.
 	channels int
+	want     string
+	avoid    avoid
+	mover    *mover
 
 	stopping atomic.Bool
 	done     chan struct{}
@@ -183,23 +223,18 @@ type Stream struct {
 	delay atomic.Int64
 }
 
-// Start starts a stream of channels, 2, or Surround for 5.1, which it
-// plays where the device mixes 5.1 or more, else stereo. Its goroutine
-// calls render for each period of the device, about every 10 ms, to fill
-// out with frames of the channels it tells, interleaved: those of the
-// device that plays, which change as the default device does. render must
-// not block. When the stream stops of itself, as when no output device is
-// left, failed is called with why, from that goroutine once the stream has
-// ended; Stop is not needed then. Start returns once the device plays, or
-// why it can't.
-func Start(channels int, render func(out []float32, channels int), failed func(error)) (*Stream, error) {
-	s := &Stream{render: render, channels: channels, done: make(chan struct{})}
+// Open starts a stream as o tells: of o.Channels, 2, or Surround for 5.1,
+// which it plays where the device mixes 5.1 or more, else stereo, on
+// o.Device or the default device. It returns once the device plays, or why
+// it can't.
+func Open(o Options) (*Stream, error) {
+	s := &Stream{render: o.Render, channels: o.Channels, want: o.Device, mover: newMover(o), done: make(chan struct{})}
 	ready := make(chan error, 1)
 	go func() {
 		err := s.run(ready)
 		close(s.done)
-		if err != nil && failed != nil {
-			failed(err)
+		if err != nil && o.Failed != nil {
+			o.Failed(err)
 		}
 	}()
 	if err := <-ready; err != nil {
@@ -227,27 +262,26 @@ func (s *Stream) run(ready chan<- error) error {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	defer boostThread()()
-	r, _, _ := syscall.SyscallN(procCoInitializeEx.Addr(), 0, coinitMultithreaded)
-	switch r {
-	case sOK, sFalse:
-		defer syscall.SyscallN(procCoUninitialize.Addr())
-	case rpcEChangedMode:
-		// The thread's COM was set up otherwise: WASAPI works in either.
-	default:
-		ready <- check(r)
+	undo, err := initCOM()
+	if err != nil {
+		ready <- err
 		return nil
 	}
+	defer undo()
 	e, err := newDeviceEnumerator()
 	if err != nil {
 		ready <- err
 		return nil
 	}
 	defer e.release()
-	d, err := openDefault(e, s.channels)
+	d, err := openOn(e, s.want, &s.avoid, s.channels)
 	if err == nil {
 		if err = s.prime(d); err != nil {
 			d.close()
 		}
+	}
+	if err == nil {
+		s.mover.tell(d.fallback)
 	}
 	ready <- err
 	if err != nil {
@@ -285,14 +319,9 @@ func (s *Stream) fill(d *device, n uint32) (err error) {
 	return d.render.releaseBuffer(n)
 }
 
-const (
-	// checkInterval is how often the stream checks which device is the
-	// default.
-	checkInterval = time.Second
-	// deviceWait is how long the stream waits for an output device when
-	// there is none, as while the user switches devices, before it fails.
-	deviceWait = 2 * time.Second
-)
+// deviceWait is how long the stream waits for an output device when there
+// is none, as while the user switches devices, before it fails.
+const deviceWait = 2 * time.Second
 
 func (s *Stream) loop(e *iMMDeviceEnumerator, d *device) error {
 	defer func() { d.close() }()
@@ -327,13 +356,7 @@ func (s *Stream) loop(e *iMMDeviceEnumerator, d *device) error {
 		}
 		if !reopen && time.Since(lastCheck) >= checkInterval {
 			lastCheck = time.Now()
-			if dev, err := e.defaultRender(); err == nil {
-				id, err := dev.id()
-				dev.release()
-				reopen = err == nil && id != d.id
-			} else {
-				reopen = errors.Is(err, hresult(eNotFound))
-			}
+			reopen = s.elsewhere(e, d)
 		}
 		if !reopen {
 			continue
@@ -349,18 +372,33 @@ func (s *Stream) loop(e *iMMDeviceEnumerator, d *device) error {
 			return err
 		}
 		d = nd
+		s.mover.tell(d.fallback)
 		written += int64(d.frames)
 		lastCheck = time.Now()
 	}
 	return nil
 }
 
-// reopen opens and primes the default device, waiting for one to appear for
-// deviceWait. It returns nil, nil when the stream stops meanwhile.
+// elsewhere reports whether the stream should play on another device than
+// d: as the default device changed, or the device the stream asks for went
+// away, or came back.
+func (s *Stream) elsewhere(e *iMMDeviceEnumerator, d *device) bool {
+	dev, _, err := pick(e, s.want, s.avoid.may(time.Now()))
+	if err != nil {
+		return errors.Is(err, hresult(eNotFound))
+	}
+	id, err := dev.id()
+	dev.release()
+	return err == nil && id != d.id
+}
+
+// reopen opens and primes the device the stream plays on, waiting for one
+// to appear for deviceWait. It returns nil, nil when the stream stops
+// meanwhile.
 func (s *Stream) reopen(e *iMMDeviceEnumerator) (*device, error) {
 	deadline := time.Now().Add(deviceWait)
 	for {
-		d, err := openDefault(e, s.channels)
+		d, err := openOn(e, s.want, &s.avoid, s.channels)
 		if err == nil {
 			if err = s.prime(d); err == nil {
 				return d, nil

@@ -466,6 +466,8 @@ func (p *Player) streamInstead(token int, entry Item, start time.Duration, autop
 func (p *Player) loadStream(src Source, start time.Duration, autoplay bool) {
 	// A Spotify device left in the middle of its track pauses.
 	p.connect.stop(true)
+	// YouTube may have told of its 5.1 audio while it was found.
+	src = p.withTold(src)
 	p.s.Source = &src
 	p.setLive(src.Live)
 	p.loaded = true

@@ -465,6 +465,9 @@ type Player struct {
 	// the user paused it or it loaded paused: a stream that breaks off then
 	// stays paused once tried again.
 	paused bool
+	// told is the last 5.1 surround audio YouTube told of after its stream
+	// was found, which the stream takes as it loads (surroundtold.go).
+	told toldSurround
 	// stopWait stops the wait for the network under way, if any; radioWaits
 	// is set when the radio waits, at the end of the queue, rather than the
 	// current track. toldOffline is set once the user was told that the

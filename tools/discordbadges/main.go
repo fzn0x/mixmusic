@@ -28,10 +28,11 @@ const size = 256
 // edges.
 const samples = 4
 
-// The colours of the badges: the ground and the marks, as the Mix theme
-// has them.
+// The colours of the badges: a dark grey ground, which shows on Discord's
+// dark cards and light ones, and the marks, the services' in the Mix
+// theme's colours.
 var (
-	ground  = color.NRGBA{0x18, 0x18, 0x18, 0xff}
+	ground  = color.NRGBA{0x30, 0x30, 0x30, 0xff}
 	spotify = color.NRGBA{0x1e, 0xd7, 0x60, 0xff}
 	youtube = color.NRGBA{0xff, 0x40, 0x40, 0xff}
 	white   = color.NRGBA{0xff, 0xff, 0xff, 0xff}

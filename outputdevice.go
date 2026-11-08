@@ -154,30 +154,38 @@ func (s *shell) outputLabel() string {
 // the player bar, with its gap.
 const roomOutput = 36
 
-// outputRoom tells whether the player bar has room for the device button,
-// from the frame before: the room its side has left with every other
-// button at its full size, which a box that grows into it measures, as the
-// first of the side. The button shows once there's room for it and a
-// little more, and goes once none is left, so that it doesn't come and go
-// as it takes the room.
-func (s *shell) outputRoom(c *ui.Context) bool {
+// outputRoom is the device button's room in the player bar, as the frame
+// before left it: the room its side has to spare with every other button
+// at its full size, which a box that grows into it measures, as the first
+// of the side.
+func (s *shell) outputRoom(c *ui.Context) *outputSlot {
 	room := ui.Box(c.Key("output-room")).Grow(1).Basis(0).MinWidth(0).Margin(0, -4, 0, 0)
-	shown := ui.Local(room, "shown", func() bool { return false })
-	free := room.Bounds().W
-	switch {
-	case *shown && free < 1:
-		*shown = false
-	case !*shown && free >= roomOutput+4:
-		*shown = true
-	}
-	return *shown
+	slot := ui.Local(room, "slot", func() outputSlot { return outputSlot{} })
+	slot.free = room.Bounds().W
+	return slot
 }
 
-// outputButtonShown reports whether the player bar shows the device
-// button, given its room: while MixMusic's own player is there, and there
-// is a choice to make, as more than one device, or a device chosen.
-func (s *shell) outputButtonShown(room bool) bool {
-	if !room || !settings.NativeAudio {
+// outputSlot is the device button's room, and whether it showed.
+type outputSlot struct {
+	free  float32
+	shown bool
+}
+
+// fits reports whether the device button fits beside the others: once
+// there is room for it and a little more, and while it showed, until none
+// is left, so that it doesn't come and go as it takes the room.
+func (o *outputSlot) fits() bool {
+	if o.shown {
+		return o.free >= 1
+	}
+	return o.free >= roomOutput+4
+}
+
+// outputChoice reports whether there is a choice of output device to make,
+// which the device button offers: while MixMusic's own player is there,
+// more than one device, or a device chosen.
+func (s *shell) outputChoice() bool {
+	if !settings.NativeAudio {
 		return false
 	}
 	devices := s.outputDevices()
@@ -187,16 +195,23 @@ func (s *shell) outputButtonShown(room bool) bool {
 // outputButton is the device button beside the volume, where the player
 // bar has room for it: its menu chooses the output device, and a click
 // looks for the devices again, for the next time it opens. It's in the
-// accent while a device is chosen.
-func (s *shell) outputButton(c *ui.Context, room bool) {
-	if !s.outputButtonShown(room) {
+// accent while a device is chosen. Its slot is there without it, so that
+// the controls after it keep what they hold as it comes and goes.
+func (s *shell) outputButton(c *ui.Context, room *outputSlot) {
+	room.shown = room.fits() && s.outputChoice()
+	slot := ui.Row(c.Key("output-slot")).Shrink(0)
+	if !room.shown {
+		// Without the gap before it.
+		slot.Margin(0, -4, 0, 0)
 		return
 	}
-	b := s.iconButton(c, "output", "speaker", s.outputLabel(), s.set.OutputDevice.ID != "", 18)
-	b.Menu(s.outputMenu)
-	if b.Clicked() {
-		s.refetch(outputDevicesKey)
-	}
+	slot.Children(func() {
+		b := s.iconButton(c, "output", "speaker", s.outputLabel(), s.set.OutputDevice.ID != "", 18)
+		b.Menu(s.outputMenu)
+		if b.Clicked() {
+			s.refetch(outputDevicesKey)
+		}
+	})
 }
 
 // followOutput tells, in a notice, when the device chosen goes away and

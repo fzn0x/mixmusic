@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       # Go and Zola, at the versions flake.lock pins.
-      - uses: cachix/install-nix-action@v31
+      - uses: ./.github/actions/install-nix
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       # The shell's tools, fetched once, again if a download breaks off.

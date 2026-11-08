@@ -201,6 +201,10 @@ type Playlist struct {
 	// Deletable is set for playlists the user may delete on their
 	// service: those YouTube Music offers to delete, the user's own.
 	Deletable bool `json:"deletable,omitempty"`
+	// Suggest names the songs the service suggests adding to a playlist
+	// of the user's: its token there, which the suggestions are read by,
+	// or "" for a playlist that has none.
+	Suggest string `json:"-"`
 	// More names the next page of the playlist's tracks, past those it
 	// holds, while its service has more: its token there, which ReadOn
 	// reads on from.

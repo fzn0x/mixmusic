@@ -83,7 +83,7 @@ func TestMiniVolumeKeys(t *testing.T) {
 	s.settle(t, func(st player.State) bool { return st.Playing && st.Volume == 0.5 })
 	mini := ui.NewTester(s.miniView, miniWidth, miniHeight)
 	mini.Frame()
-	for range 10 {
+	for range 30 {
 		if mini.Focused("Mute") {
 			break
 		}
@@ -126,11 +126,12 @@ func TestMiniVolumeKeys(t *testing.T) {
 const miniBorder = 8
 
 // TestMiniVolumeFits keeps the mini player's controls, its volume button
-// too, apart and in the window at its least size, at every zoom, with the
-// transport's gap at least before the window's buttons, and its slider in
-// the window above the button. At the size it opens at, the artwork still
-// takes the window's height. Each holds without borders, and with
-// Windows' (miniBorder).
+// too, apart and in the window at its least size, at every zoom: the
+// window's buttons on the title's row, the panels' on the artists', and
+// the transport under them, and the volume's slider in the window above
+// its button. At the size it opens at, the artwork still takes the
+// window's height. Each holds without borders, and with Windows'
+// (miniBorder).
 func TestMiniVolumeFits(t *testing.T) {
 	s := newTestShell(t)
 	s.p.PlayTracks(testTracks, 0)
@@ -145,20 +146,28 @@ func TestMiniVolumeFits(t *testing.T) {
 			inside := func(r ui.Rect) bool {
 				return r.X >= 0 && r.Y >= 0 && r.X+r.W <= float32(w)+0.01 && r.Y+r.H <= float32(h)+0.01
 			}
-			var before ui.Rect
-			for i, label := range []string{"Previous", "Pause", "Next", "Like", "Dislike", "Mute", "Open MixMusic"} {
-				r, ok := mini.Find(label)
-				if !ok || !inside(r) {
-					t.Errorf("at %s in %dx%d, %s is at %+v (%v), out of the window", percent(z), w, h, label, r, ok)
+			row := func(labels ...string) (top, bottom float32) {
+				var before ui.Rect
+				top = float32(h)
+				for i, label := range labels {
+					r, ok := mini.Find(label)
+					if !ok || !inside(r) {
+						t.Errorf("at %s in %dx%d, %s is at %+v (%v), out of the window", percent(z), w, h, label, r, ok)
+					}
+					if i > 0 && r.X < before.X+before.W-0.01 {
+						t.Errorf("at %s in %dx%d, %s at %+v runs into what's before it, at %+v", percent(z), w, h, label, r, before)
+					}
+					before = r
+					top, bottom = min(top, r.Y), max(bottom, r.Y+r.H)
 				}
-				gap := float32(0)
-				if label == "Open MixMusic" {
-					gap = 8 * float32(z)
-				}
-				if i > 0 && r.X < before.X+before.W+gap-0.01 {
-					t.Errorf("at %s in %dx%d, %s at %+v runs into what's before it, at %+v", percent(z), w, h, label, r, before)
-				}
-				before = r
+				return top, bottom
+			}
+			_, windowFoot := row("Open MixMusic", "Close the mini player")
+			panelsTop, panelsFoot := row("Queue", "Lyrics", "Output device")
+			transportTop, _ := row("Shuffle", "Previous", "Pause", "Next", "Repeat: off", "Like", "Dislike", "Mute")
+			if panelsTop < windowFoot-0.01 || transportTop < panelsFoot-0.01 {
+				t.Errorf("at %s in %dx%d, the rows run into each other: the window's buttons end at %v, the panels' go from %v to %v, the transport starts at %v",
+					percent(z), w, h, windowFoot, panelsTop, panelsFoot, transportTop)
 			}
 			b, _ := mini.Find("Mute")
 			mini.Move(b.X+b.W/2, b.Y+b.H/2)
@@ -172,7 +181,7 @@ func TestMiniVolumeFits(t *testing.T) {
 		mini := ui.NewTester(s.miniView, w, h)
 		mini.Frame()
 		// The transport starts 12 DIPs after the artwork.
-		if r, _ := mini.Find("Previous"); r.X < float32(h)+12 {
+		if r, _ := mini.Find("Shuffle"); r.X < float32(h)+12 {
 			t.Errorf("in %dx%d, the artwork gives up its room: the transport starts at %v", w, h, r.X)
 		}
 	}

@@ -383,7 +383,7 @@ func (e *Engine) SetSurround(on bool) {
 	e.surround = on
 	e.mu.Unlock()
 	if changed {
-		e.restartOutput()
+		e.restartOutput(false)
 	}
 }
 
@@ -475,14 +475,14 @@ func (e *Engine) ensureOutput() error {
 }
 
 // restartOutput starts the output that plays again, when it was asked for
-// other channels than the engine asks for now. One that fails to start
-// fails as one that stops of itself does.
-func (e *Engine) restartOutput() {
+// other channels than the engine asks for now, or always. One that fails
+// to start fails as one that stops of itself does.
+func (e *Engine) restartOutput(always bool) {
 	e.outMu.Lock()
 	defer e.outMu.Unlock()
 	e.mu.Lock()
 	out, channels := e.out, e.outputChannels()
-	if out == nil || e.outChannels == channels {
+	if out == nil || !always && e.outChannels == channels {
 		e.mu.Unlock()
 		return
 	}

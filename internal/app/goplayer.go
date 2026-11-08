@@ -50,7 +50,8 @@ func (a *App) startGoPlayer() (*player.Player, error) {
 }
 
 // applyEngine gives the engine the sound of the settings: the equalizer,
-// the levelling, Even loudness, and the output of 5.1 surround.
+// the levelling, Even loudness, the output of 5.1 surround, and the device
+// it plays on.
 func (a *App) applyEngine(s settings.Settings) {
 	e := a.nativeEngine()
 	if e == nil {
@@ -65,6 +66,7 @@ func (a *App) applyEngine(s settings.Settings) {
 	e.SetNormalize(s.Normalize)
 	e.SetLoudness(s.Loudness)
 	e.SetSurround(s.Surround)
+	a.applyOutputDevice(e, s.OutputDevice)
 }
 
 // commandGoPlayer has the native interface's player do what the tray, the

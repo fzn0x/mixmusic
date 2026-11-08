@@ -7,6 +7,38 @@ import (
 	"time"
 )
 
+// TestWireButtons gives Discord two buttons at most, of labels it takes,
+// each opening a web page: a button that would open anything else, or
+// with no label, is left out.
+func TestWireButtons(t *testing.T) {
+	cases := []struct {
+		name string
+		in   []Button
+		want string
+	}{
+		{"none", nil, `{"type":2}`},
+		{"one", []Button{{"Listen on Spotify", "https://open.spotify.com/track/1"}},
+			`{"type":2,"buttons":[{"label":"Listen on Spotify","url":"https://open.spotify.com/track/1"}]}`},
+		{"the first two", []Button{{"A", "https://a.example/"}, {"B", "http://b.example/"}, {"C", "https://c.example/"}},
+			`{"type":2,"buttons":[{"label":"A","url":"https://a.example/"},{"label":"B","url":"http://b.example/"}]}`},
+		{"long label", []Button{{strings.Repeat("l", 40), "https://a.example/"}},
+			`{"type":2,"buttons":[{"label":"` + strings.Repeat("l", 31) + `…","url":"https://a.example/"}]}`},
+		{"not the web", []Button{{"Open", "file:///C:/song.mp3"}, {"Listen", " https://a.example/ "}},
+			`{"type":2,"buttons":[{"label":"Listen","url":"https://a.example/"}]}`},
+		{"no label", []Button{{"  ", "https://a.example/"}}, `{"type":2}`},
+		{"long URL", []Button{{"Listen", "https://a.example/" + strings.Repeat("a", 500)}}, `{"type":2}`},
+	}
+	for _, c := range cases {
+		b, err := json.Marshal(Activity{Type: Listening, Buttons: c.in}.wire())
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(b) != c.want {
+			t.Errorf("%s: %s\nwant %s", c.name, b, c.want)
+		}
+	}
+}
+
 func TestFit(t *testing.T) {
 	a127 := strings.Repeat("a", 127)
 	cases := []struct{ in, want string }{
@@ -57,6 +89,10 @@ func TestWire(t *testing.T) {
 			`{"type":2,"status_display_type":1,"state":"Tame Impala"}`},
 		{"nothing to show in the member list", Activity{Type: Listening, Details: "Song", StatusDisplay: ShowState},
 			`{"type":2,"details":"Song"}`},
+		{"badge", Activity{Type: Listening, LargeImage: "https://example.com/a.jpg", SmallImage: " https://example.com/b.png ", SmallText: "Spotify"},
+			`{"type":2,"assets":{"large_image":"https://example.com/a.jpg","small_image":"https://example.com/b.png","small_text":"Spotify"}}`},
+		{"badge too long", Activity{Type: Listening, SmallImage: "https://example.com/" + strings.Repeat("a", 300), SmallText: "P"},
+			`{"type":2,"assets":{"small_text":"P "}}`},
 	}
 	for _, c := range cases {
 		b, err := json.Marshal(c.in.wire())

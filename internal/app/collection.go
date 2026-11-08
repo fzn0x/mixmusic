@@ -110,13 +110,19 @@ func (c *Collection) UpdatePlaylist(id, title, description string) error {
 	return c.a.library.UpdatePlaylist(native, title, description)
 }
 
-// DeletePlaylist deletes a playlist.
+// DeletePlaylist deletes a playlist, and the file of the cover chosen for
+// it, if any.
 func (c *Collection) DeletePlaylist(id string) error {
 	native, err := localID(id)
 	if err != nil {
 		return err
 	}
-	return c.a.library.DeletePlaylist(native)
+	cover, _ := c.a.library.PlaylistCover(native)
+	if err := c.a.library.DeletePlaylist(native); err != nil {
+		return err
+	}
+	c.a.removeMixCover(cover)
+	return nil
 }
 
 // AddToPlaylist appends tracks to a playlist made in MixMusic, or to a

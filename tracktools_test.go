@@ -41,7 +41,7 @@ func TestViewTracks(t *testing.T) {
 		{"title", "air", []string{"Éclair", "track 2"}, []int{2, 1}},
 		{"order", "nothing like it", nil, []int{}},
 	} {
-		v := viewTracks(tracks, c.sort, c.query)
+		v := viewTracks(tracks, c.sort, c.query, nil)
 		if !slices.Equal(titles(v), c.want) || !slices.Equal(v.indices, c.indices) {
 			t.Errorf("%s, %q: %q at %v, want %q at %v", c.sort, c.query, titles(v), v.indices, c.want, c.indices)
 		}

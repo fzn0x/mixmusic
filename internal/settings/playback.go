@@ -55,6 +55,9 @@ type Playback struct {
 	// in place of its stereo audio: on six speakers where the output device
 	// has them, else mixed down to stereo as the track's stream asks.
 	Surround bool `json:"surround"`
+	// OutputDevice is the device MixMusic's own player plays on: the
+	// system's default when its ID is empty.
+	OutputDevice OutputDevice `json:"outputDevice"`
 	// Autoplay continues with similar tracks when the queue ends.
 	Autoplay bool `json:"autoplay"`
 	// SongSpeed plays songs faster or slower, at their own pitch, from
@@ -124,6 +127,7 @@ func (p Playback) clean(d Playback) Playback {
 		p.Quality = QualityBest
 	}
 	p.Crossfade = min(max(p.Crossfade, 0), 12)
+	p.OutputDevice = p.OutputDevice.clean()
 	p.SongSpeed = CleanSpeed(p.SongSpeed)
 	p.PodcastSpeed = CleanSpeed(p.PodcastSpeed)
 	p.Volume = min(max(p.Volume, 0), 1)

@@ -73,6 +73,23 @@ belongs to its main thread: what finishes elsewhere comes back through
   its start under them, and the page keeps the room for it. Nothing
   scans a list for this in a frame.
 
+- **Sorting by plays and putting a mix in order.** A list of tracks
+  sorted by plays (`trackplays.go`) counts them from the history
+  (`Collection.PlayCounts`), and sorts again once the library's version
+  changes. A mix, and a playlist of the user's on YouTube Music read
+  whole, move their tracks while they show in their own order
+  (`mixorder.go`): a row drags its place (`Element.Drag`), as the queue's
+  entries do, and the row it's dropped on takes it; Alt+Up and Alt+Down,
+  from the focus inside a row (`OnShortcut`), move it a place, and its
+  play button takes the focus at its new place. The page shows the new
+  order at once, in the playlist as read (`playlistRead`). A mix is saved
+  with `MoveInPlaylist`; YouTube Music hears of each move after the one
+  before, as `ACTION_MOVE_VIDEO_BEFORE`, by the entries' places in the
+  playlist (`setVideoId`), and when it refuses one the page reads the
+  playlist again. Spotify's playlists don't move: its API moves items by
+  their positions, which the list of a playlist doesn't keep, as it
+  leaves out what isn't a track.
+
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
   MB of pixels (`artwork.go`). An image that couldn't load tries again

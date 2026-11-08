@@ -45,7 +45,7 @@ shows how many tracks your folders hold, and:
 
 - **Songs:** every track, with Play, Shuffle and open files, a box that
   searches the list, and a Sort menu: the list's own order, by album and
-  track number, Title, Artist or Length.
+  track number, Title, Artist, Length or Plays.
 - **Albums:** the albums your files' tags name, with their covers. An
   album is grouped by its title and its album artist, or, without an
   album artist, by the folder its files are in, as an album's files

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -46,16 +47,17 @@ func TestPathsNotUTF8(t *testing.T) {
 	}
 }
 
-// TestIndexOfBefore reads the index file of the versions before, whose
-// paths are all text, a path that wasn't UTF-8 with replacement
-// characters in place of its bytes.
+// TestIndexOfBefore reads an index file whose paths are all text, as the
+// versions before wrote them, a path that wasn't UTF-8 with replacement
+// characters in place of its bytes. The file is of the index's own
+// version: one of another is read again from the files.
 func TestIndexOfBefore(t *testing.T) {
 	ti := newIndex(t)
 	file := filepath.Join(filepath.Dir(ti.dir), "local-files.json")
 	a := filepath.Join(ti.dir, "a.mp3")
 	b := filepath.Join(ti.dir, "caf�.mp3")
 	quoted := func(p string) string { return strings.ReplaceAll(p, `\`, `\\`) }
-	old := `{"version": 1, "files": [{"path": "` + quoted(a) + `", "size": 3, "modified": 4, "title": "One"},
+	old := `{"version": ` + strconv.Itoa(version) + `, "files": [{"path": "` + quoted(a) + `", "size": 3, "modified": 4, "title": "One"},
 		{"path": "` + quoted(b) + `", "size": 5, "modified": 6}]}`
 	if err := os.WriteFile(file, []byte(old), 0o644); err != nil {
 		t.Fatal(err)

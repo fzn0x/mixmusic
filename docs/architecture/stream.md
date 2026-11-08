@@ -11,8 +11,12 @@
   connection drops, and an on-disk cache of tracks played to their end.
   YouTube lists no 5.1 surround audio to the visionOS app, so the direct
   route asks as YouTube's app for Samsung's TVs too, at once, which it
-  tells of a video's AC-3 and E-AC-3 (formats 380 and 328), and waits for
-  that answer half a second past the stereo stream's at most. Their URLs
+  tells of a video's AC-3 and E-AC-3 (formats 380 and 328). The stream
+  doesn't wait for that answer: one that comes after it goes with it
+  (`toldLater`), the resolver keeps it with the stream it keeps and tells
+  the app (`Resolver.Told`), and the app the player
+  (`Player.SurroundFound`), whose track then offers the 5.1 audio, and
+  plays it from where it is while 5.1 is on. Their URLs
   need a challenge solved, which yt-dlp does with a JavaScript runtime:
   it finds the 5.1 audio as it is asked for (`Resolver.Surround`), once,
   in some 3 s, and YouTube serves it a few seconds after. Without yt-dlp

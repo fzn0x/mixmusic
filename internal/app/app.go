@@ -332,6 +332,7 @@ func New(opts Options) (*App, error) {
 func (a *App) apply(s settings.Settings) {
 	a.tools.Configure(s.YTDLPPath, s.JSRuntime)
 	a.resolver.SetQuality(stream.Quality(s.Quality))
+	a.resolver.SetSurround(s.Surround)
 	a.cache.SetLimit(int64(s.CacheSizeMB) << 20)
 	a.downloads.SetMetered(a.metered.Load(), s.DownloadOnMetered)
 	a.followLocalFiles(s)

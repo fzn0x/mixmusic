@@ -1,0 +1,28 @@
+/*
+ * The home page's questions and answers, near its foot: two columns of
+ * short answers, each under its question, one column on narrow screens.
+ * The colours are the page's own (styles.css).
+ */
+
+.faq {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 clamp(28px, 4vw, 56px);
+  margin: 0;
+}
+.faq-item {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 24px 0 28px;
+  border-top: 1px solid var(--outline);
+}
+.faq-item h3 { font-size: 1.125rem; font-weight: 750; letter-spacing: -0.01em; }
+.faq-item p { color: var(--ink-2); font-size: 0.9688rem; max-width: 62ch; }
+.faq-item code { white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .faq { grid-template-columns: minmax(0, 1fr); }
+  .faq-item { padding: 20px 0 22px; }
+  .faq-item code { white-space: normal; overflow-wrap: anywhere; }
+}

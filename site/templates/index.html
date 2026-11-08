@@ -36,6 +36,9 @@
     {"@type": "WebSite", "name": "MixMusic", "url": {{ root | json_encode | safe }}, "inLanguage": "en"}
   ]}
   </script>
+  {#- The FAQ's questions and answers, which the page shows near its foot. #}
+  {%- set faq = load_data(path="data/faq.toml") %}
+  <link rel="stylesheet" href="faq.css" />
   <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
   <script>document.documentElement.className = "js";</script>
@@ -588,6 +591,21 @@
           <div><dt>Linux</dt><dd>GTK 3, and PulseAudio (which PipeWire serves too) or ALSA; signing in to YouTube Music takes WebKitGTK 4.1. On Debian and Ubuntu: <code>sudo apt install libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0</code>. The Flatpak needs only Flatpak, and brings the rest with it.</dd></div>
         </dl>
         <p class="note">Check each file against <code>SHA256SUMS</code> in the release. Older versions are on the <a href="https://github.com/fzn0x/mixmusic/releases">releases page</a> too. <a href="{{ get_url(path='@/docs/troubleshooting/index.md') }}">Troubleshooting</a> helps when something doesn't work.</p>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="section-head">
+        <h2 id="faq-title">Questions and answers</h2>
+        <p class="lead">What people ask before they install, each answered in a few lines, with the page of the docs that tells more.</p>
+      </div>
+      <div class="faq">
+        {%- for item in faq.questions %}
+        <div class="faq-item">
+          <h3>{{ item.question }}</h3>
+          <p>{{ item.answer | markdown(inline=true) | safe }}</p>
+        </div>
+        {%- endfor %}
       </div>
     </section>
 

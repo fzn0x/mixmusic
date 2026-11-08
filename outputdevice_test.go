@@ -73,12 +73,54 @@ func TestOutputChoices(t *testing.T) {
 }
 
 // outputShell is a test shell of an app whose computer has the output
-// devices that devices returns.
+// devices that devices returns. Spotify tracks play from YouTube Music, on
+// every system: on Linux, a new install's Spotify Connect shows its
+// devices button in the player bar too, which takes the room of the
+// device button at 1280.
 func outputShell(t *testing.T, devices func() []app.OutputDevice) *shell {
 	t.Helper()
-	return newTestShellOf(t, func(o *app.Options) {
+	s := newTestShellOf(t, func(o *app.Options) {
 		o.OutputDevices = func() ([]app.OutputDevice, error) { return devices(), nil }
 	})
+	st := s.svc.Preferences.Get()
+	st.SpotifyPlayback = settings.SpotifyPlaybackMatch
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+	return s
+}
+
+// TestOutputButtonBesideSpotifyConnect gives the device button its room
+// beside Spotify Connect's devices button in a wider window: at 1280, the
+// two don't fit with the others, and the device button waits.
+func TestOutputButtonBesideSpotifyConnect(t *testing.T) {
+	s := outputShell(t, func() []app.OutputDevice {
+		return []app.OutputDevice{{ID: "hp", Name: "Headphones"}, {ID: "sp", Name: "Speakers", Default: true}}
+	})
+	st := s.svc.Preferences.Get()
+	st.SpotifyPlayback = settings.SpotifyPlaybackConnect
+	if _, err := s.svc.Preferences.Set(st); err != nil {
+		t.Fatal(err)
+	}
+	s.refresh()
+	tt := tester(t, s)
+	outputFrames(s, tt)
+	if _, ok := tt.Find("Output device: System default"); ok {
+		t.Error("a device button beside Spotify Connect's at 1280")
+	}
+	for _, label := range []string{"Spotify Connect devices", "Volume", "Open the mini player"} {
+		if r, ok := tt.Find(label); !ok || r.X+r.W > 1280 {
+			t.Errorf("%q is at %v, out of a window 1280 wide", label, r)
+		}
+	}
+	tt.SetSize(1600, 900)
+	settleOutput(t, s, tt)
+	devices, _ := tt.Find("Spotify Connect devices")
+	output, ok := tt.Find("Output device: System default")
+	if !ok || output.X <= devices.X+devices.W {
+		t.Errorf("the device button is at %v, Spotify Connect's at %v", output, devices)
+	}
 }
 
 // settleOutput lets the player bar find its room, and the window list the

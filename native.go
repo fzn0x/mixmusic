@@ -185,6 +185,8 @@ type shell struct {
 	liveSince time.Time
 	// video is the picture of music videos on the now playing page.
 	video videoView
+	// home is Home's own state, as the user arranges it (homeedit.go).
+	home homeArrange
 	// The pages' own state. local are the home page's own shelves, of the
 	// library at localVersion once localBuilt.
 	homeFilter   int

@@ -46,6 +46,15 @@ belongs to its main thread: what finishes elsewhere comes back through
   goes in first, and one deleted leaves, without reading the list again
   (`keepPlaylist`, `dropPlaylist`); signing in or out, or choosing
   another channel, reads it again.
+- **Keep on top** (`keepontop.go`): the main window opens above the
+  others while `keepOnTop` is on (`WindowOptions.AlwaysOnTop`), and each
+  frame of it compares the setting with what the window was told last,
+  so that the switch, the command palette, macOS's Window › Keep on Top
+  and settings.json all reach it, and tells the window once
+  (`Window.SetAlwaysOnTop`, through `keepAbove`, which tests replace).
+  The Window menu's item is a checkbox whose label is fixed, as MyGo
+  builds the menu as it opens; the frame checks it as the setting
+  changes. The mini player's window is always on top, by its own options.
 
 - **The top bar and the rows pinned under it** (`compacthead.go`). The
   page shown keeps where it scrolled in a `ui.ScrollState`

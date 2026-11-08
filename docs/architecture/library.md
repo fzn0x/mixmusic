@@ -11,7 +11,12 @@
   the engine plays them, as `audio.Probe` tells. A scan, at the start,
   when the folders change and on demand, reads only the files new or
   changed by their size or time of change, four at a time, drops those
-  gone, and keeps those of a folder that can't be read. Covers, held or
+  gone, and keeps those of a folder that can't be read until a scan
+  reads it: a music folder that isn't there at the scan's end, as on a
+  drive unplugged partway, and a folder in one whose list of files, or
+  a file's information, fails to read other than as gone
+  (`Folder.Unread`, which Settings counts; `Missing` looks at their
+  files). Covers, held or
   beside the files, go to the cache's `local-art`, by their hash. A track's
   ID is its file's path in base64 (`file:<path>`), so that one in a mix
   or the queue plays as long as its file is there; the player plays it

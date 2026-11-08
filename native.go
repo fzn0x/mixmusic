@@ -248,6 +248,8 @@ type shell struct {
 	renaming, deleting, clearingHistory bool
 	renameTo, renameID                  string
 	deleteID, deleteTitle               string
+	// covering changes the cover of a mix (mixcover.go).
+	covering mixCovering
 	// spotifyLiked are the liked songs on Spotify the library shows: the
 	// first page, of answer spotifyLikedAt of spotifyLikedOf, then those
 	// loaded past it, while loadingMore.

@@ -374,6 +374,9 @@ func (s *shell) localItems(m *ui.Menu, t media.Track) {
 // localArt is the covers of the music on this computer, which show from
 // their files, as the downloads' do.
 func (s *shell) localArt(url string) (string, bool) {
+	if p, ok := s.mixCoverFile(url); ok {
+		return p, true
+	}
 	if localfiles.IsArt(url) {
 		return s.svc.LocalFiles.ArtworkFile(url)
 	}

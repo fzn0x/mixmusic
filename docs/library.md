@@ -49,6 +49,14 @@ A mix is a playlist of MixMusic's own, which holds tracks of every service.
 
 Your mixes show in the sidebar under Your mixes, with how many tracks each holds, and on Home's Your mixes tile and shelf.
 
+### A mix's cover
+
+A mix shows the cover of its first song that has one, until you choose another.
+
+- **Change cover…**, in the More menu of the mix's page, or in the menu of its tile in Library › Mixes and on Home, opens a dialog: **choose an image…** opens a PNG, JPEG or WebP file of yours, and the covers of the mix's songs below are a click away.
+- **The cover** shows cut to a centred square, on the mix's page and its tiles. MixMusic keeps a copy of it, at most 600 pixels across, in `mix-covers` in your [data folder](data-and-privacy.md#the-data-folder): the file you chose can move or go.
+- **Use the songs' covers**, in the same dialog, goes back to them. Deleting the mix deletes its cover too.
+
 ## Artists you follow
 
 Follow an artist with Follow on their page, with Follow in the page's More menu (⋯), or with Follow in the menu of their tile, a right click on it in the search, on Home or in the library. Following, or Unfollow in those menus, stops.

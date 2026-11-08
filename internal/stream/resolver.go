@@ -329,6 +329,9 @@ func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality)
 				return Stream{}, failure{plain, kind}
 			}
 		}
+		if direct != nil {
+			return Stream{}, bothFailed{direct, err}
+		}
 		return Stream{}, err
 	}
 	took := time.Since(start).Round(10 * time.Millisecond)

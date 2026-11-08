@@ -124,3 +124,28 @@ func TestKeepOnTopStart(t *testing.T) {
 		t.Errorf("the open window was told %v", got)
 	}
 }
+
+// TestKeepOnTopCommand keeps the main window on top from the command
+// palette, and stops, telling which in a toast.
+func TestKeepOnTopCommand(t *testing.T) {
+	told := keptAbove(t)
+	s := newTestShell(t)
+	s.main = true
+	tt := tester(t, s)
+	for _, want := range []bool{true, false} {
+		runCommand(t, s, tt, "view.keepOnTop")
+		if got := s.svc.Preferences.Get().KeepOnTop; got != want {
+			t.Errorf("the command saved keepOnTop %v, not %v", got, want)
+		}
+		toast := "MixMusic stays on top of other windows"
+		if !want {
+			toast = "MixMusic no longer stays on top"
+		}
+		if !tt.HasText(toast) {
+			t.Errorf("no toast %q: %q", toast, tt.Texts())
+		}
+	}
+	if got := told(); !slices.Equal(got, []bool{true, false}) {
+		t.Errorf("the window was told %v", got)
+	}
+}

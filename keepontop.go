@@ -6,9 +6,9 @@ import (
 )
 
 // Keep on top keeps the main window above the other windows, while the
-// settings say so (#350): from Settings › Desktop or settings.json. The
-// mini player stays on top whatever they say, as its window's options
-// have it.
+// settings say so (#350): from Settings › Desktop, the command palette or
+// settings.json. The mini player stays on top whatever they say, as its
+// window's options have it.
 
 func init() { addSettings(desktopRows, 15, (*shell).keepOnTopRow) }
 
@@ -58,4 +58,16 @@ func (s *shell) followOnTop() {
 		return
 	}
 	s.onTop.kept = want
+}
+
+// toggleOnTop keeps the main window on top, or stops, from the command
+// palette, and tells which: nothing else shows it.
+func (s *shell) toggleOnTop() {
+	s.set.KeepOnTop = !s.set.KeepOnTop
+	s.save()
+	msg := "MixMusic stays on top of other windows"
+	if !s.set.KeepOnTop {
+		msg = "MixMusic no longer stays on top"
+	}
+	s.notes = append(s.notes, notice(msg))
 }

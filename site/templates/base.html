@@ -13,6 +13,8 @@
   <link rel="preload" href="{{ get_url(path='assets/fonts/figtree-latin.woff2') }}" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="{{ get_url(path='docs.css') }}" />
   <script>document.documentElement.classList.add("js");</script>
+  <link rel="stylesheet" href="{{ get_url(path='stars.css') }}" />
+  <script src="{{ get_url(path='stars.js') }}" defer></script>
   {%- block head %}{% endblock head %}
 </head>
 <body>
@@ -44,6 +46,7 @@
     <a class="btn btn-tonal btn-small topbar-github" href="https://github.com/fzn0x/mixmusic">
       <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg>
       <span>GitHub</span>
+      <span class="stars" data-stars></span>
     </a>
   </header>
 

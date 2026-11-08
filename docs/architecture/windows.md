@@ -11,6 +11,27 @@ belongs to its main thread: what finishes elsewhere comes back through
   (`View.Remount`). The page keeps its answers until the new ones come,
   and keeps them when a refresh fails, which one toast tells. Home's own
   tile and shelves read the library as it is, and need no refresh.
+- **Home's arrangement** (`homelayout.go`, `homeshelves.go`,
+  `homeedit.go`). Home's shelves come in groups: the user's own, at once,
+  then Spotify's and YouTube Music's, each as its fetch answers, then
+  each shelf the user added, on its own. A shelf's key stays the same in
+  every language and from day to day (`shelfKeys`): its source and
+  `media.Shelf.Key`, which YouTube Music's parser takes from the browse
+  ID its header opens, with the parameters of a page of its own (`FE…`),
+  and Spotify's and the library's give by kind; else its title.
+  `homeShelves` in settings.json lists keys in the user's order, hidden
+  or not, and `homePlaces` shows those first, then each group's others in
+  the group's order, so that a service's new shelves come after them; a
+  group that still loads holds back what comes after it, as before. Edit
+  home starts from the whole order (`arranged`): each shelf shown goes in
+  at its place, and one placed that its service no longer has leaves,
+  once the service answered with others. A move, a hide or an add saves
+  that whole order. Rows drag as the queue's entries do (`Element.Drag`),
+  and Alt+Up and Alt+Down are their own shortcuts (`OnShortcut`), which
+  keep the focus on the row moved. A playlist and an artist added are
+  fetched by their pages' keys; a mix, the month's most played and the
+  downloads are made of the library or the downloads, and kept until
+  they change (`memo`).
 - **Pull to refresh** (`pullrefresh.go`): the scroll container of the
   page shown (`pageScroll`) takes its scrolling first, with
   `HandleInput`, before MyGo scrolls anything. A pull starts only on a

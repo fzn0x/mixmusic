@@ -303,6 +303,8 @@ type shell struct {
 	svgs                    map[string]*ui.SVG
 	// licenseOpen is the license shown.
 	licenseOpen int
+	// trackInfo is the dialog of a track's Track info (trackinfo.go).
+	trackInfo trackInfoView
 	// installing is set while yt-dlp installs, which installDone of
 	// installTotal bytes came of.
 	installing                bool

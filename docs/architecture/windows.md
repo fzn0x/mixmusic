@@ -28,6 +28,15 @@ belongs to its main thread: what finishes elsewhere comes back through
   handler marks it (`scrollsInside`), as the lyrics of the now playing
   page do.
 
+- **A playlist's suggestions** (`playlistsuggestions.go`): below the
+  tracks of a playlist of the user's on YouTube Music, once they're all
+  read, the songs YouTube Music suggests adding to it, from the token
+  the playlist's page gave (`Playlist.Suggest`), and a refresh's token
+  for the next ones. The loads keep them beside the playlist's fetch, so
+  that the playlist read again keeps them. Each is a list of one, which
+  plays it alone; one added leaves them, joins the end of the tracks as
+  read at once, and the playlist is read again for its place there,
+  which taking it out needs.
 - **Long playlists** (`playlistread.go`): a playlist's page, and the
   songs liked on YouTube Music in the library, show their first page of
   tracks at once and read the rest beside it, telling how many came, how

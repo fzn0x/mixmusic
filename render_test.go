@@ -141,6 +141,9 @@ func newTestShellWith(t testing.TB, set func(o *app.Options), svc func(a *app.Ap
 	}
 	opts := app.Options{DataDir: filepath.Join(dir, "data"), CacheDir: filepath.Join(dir, "cache"),
 		LogsDir: filepath.Join(dir, "logs"), Builtin: builtin.FS, Version: "0.4.0"}
+	// The window lists none of the output devices of the computer the tests
+	// run on, whose button would come and go with them: a test gives some.
+	opts.OutputDevices = func() ([]app.OutputDevice, error) { return nil, nil }
 	if set != nil {
 		set(&opts)
 	}

@@ -4,10 +4,12 @@ import (
 	"slices"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -79,12 +81,34 @@ func outputShell(t *testing.T, devices func() []app.OutputDevice) *shell {
 	})
 }
 
-// settleOutput lets the window list the devices, and the player bar find
-// its room.
-func settleOutput(s *shell, tt *ui.Tester) {
-	for range 3 {
+// settleOutput lets the player bar find its room, and the window list the
+// devices, until it took the answer to its last ask, which comes beside the
+// main thread.
+func settleOutput(t *testing.T, s *shell, tt *ui.Tester) {
+	t.Helper()
+	for deadline := time.Now().Add(5 * time.Second); ; time.Sleep(time.Millisecond) {
 		s.drain()
 		tt.Frame()
+		l, _ := s.loads[outputDevicesKey].(*loaded[[]app.OutputDevice])
+		if l != nil && l.done && !l.again && l.answers == l.asks {
+			s.drain()
+			tt.Frame()
+			tt.Frame()
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("the window didn't list the output devices")
+		}
+	}
+}
+
+// outputFrames builds a few frames, as a window shows once its devices would
+// have loaded.
+func outputFrames(s *shell, tt *ui.Tester) {
+	for range 5 {
+		s.drain()
+		tt.Frame()
+		time.Sleep(time.Millisecond)
 	}
 }
 
@@ -101,7 +125,7 @@ func TestOutputButton(t *testing.T) {
 		return slices.Clone(devices)
 	})
 	tt := tester(t, s)
-	settleOutput(s, tt)
+	settleOutput(t, s, tt)
 	button, ok := tt.Find("Output device: System default")
 	if !ok {
 		t.Fatalf("no device button: %q", tt.Texts())
@@ -118,7 +142,7 @@ func TestOutputButton(t *testing.T) {
 	if err := tt.ChooseMenuItem("Headphones (USB DAC)"); err != nil {
 		t.Fatal(err)
 	}
-	settleOutput(s, tt)
+	settleOutput(t, s, tt)
 	if got := s.svc.Preferences.Get().OutputDevice; got != (settings.OutputDevice{ID: "hp", Name: "Headphones (USB DAC)"}) {
 		t.Errorf("the settings keep %+v", got)
 	}
@@ -131,18 +155,18 @@ func TestOutputButton(t *testing.T) {
 	devices = devices[1:]
 	mu.Unlock()
 	s.refetch(outputDevicesKey)
-	settleOutput(s, tt)
+	settleOutput(t, s, tt)
 	if err := tt.Click("Output device: Headphones (USB DAC)"); err != nil {
 		t.Fatal(err)
 	}
-	settleOutput(s, tt)
+	settleOutput(t, s, tt)
 	if got, want := tt.Menu(), []string{"System default", "Speakers", "Headphones (USB DAC)"}; !slices.Equal(got, want) {
 		t.Errorf("menu %q, want %q", got, want)
 	}
 	if err := tt.ChooseMenuItem("System default"); err != nil {
 		t.Fatal(err)
 	}
-	settleOutput(s, tt)
+	settleOutput(t, s, tt)
 	if got := s.svc.Preferences.Get().OutputDevice; got != (settings.OutputDevice{}) {
 		t.Errorf("the settings keep %+v", got)
 	}
@@ -154,7 +178,7 @@ func TestOutputButton(t *testing.T) {
 func TestOutputButtonHidden(t *testing.T) {
 	one := outputShell(t, func() []app.OutputDevice { return []app.OutputDevice{{ID: "sp", Name: "Speakers", Default: true}} })
 	tt := tester(t, one)
-	settleOutput(one, tt)
+	settleOutput(t, one, tt)
 	if _, ok := tt.Find("Output device: System default"); ok {
 		t.Error("a device button with one device")
 	}
@@ -163,7 +187,7 @@ func TestOutputButtonHidden(t *testing.T) {
 		return []app.OutputDevice{{ID: "hp", Name: "Headphones"}, {ID: "sp", Name: "Speakers", Default: true}}
 	})
 	tt = testerOf(t, two, 940, 600)
-	settleOutput(two, tt)
+	outputFrames(two, tt)
 	if _, ok := tt.Find("Output device: System default"); ok {
 		t.Error("a device button at the least width")
 	}
@@ -174,10 +198,79 @@ func TestOutputButtonHidden(t *testing.T) {
 	}
 	// Widened, the window has room for it.
 	tt.SetSize(1280, 820)
-	settleOutput(two, tt)
+	settleOutput(t, two, tt)
 	if _, ok := tt.Find("Output device: System default"); !ok {
 		t.Errorf("no device button at 1280: %q", tt.Texts())
 	}
+}
+
+// TestOutputButtonNarrowed shows no device button that comes with the
+// devices after the window narrowed below its room, and shows it once the
+// window is wide again.
+func TestOutputButtonNarrowed(t *testing.T) {
+	var mu sync.Mutex
+	devices := []app.OutputDevice{{ID: "sp", Name: "Speakers", Default: true}}
+	s := outputShell(t, func() []app.OutputDevice {
+		mu.Lock()
+		defer mu.Unlock()
+		return slices.Clone(devices)
+	})
+	tt := tester(t, s)
+	settleOutput(t, s, tt)
+	tt.SetSize(1150, 820)
+	outputFrames(s, tt)
+	mu.Lock()
+	devices = append(devices, app.OutputDevice{ID: "hp", Name: "Headphones"})
+	mu.Unlock()
+	s.refetch(outputDevicesKey)
+	tt.SetSize(1280, 820)
+	tt.Frame()
+	tt.SetSize(1150, 820)
+	settleOutput(t, s, tt)
+	if _, ok := tt.Find("Output device: System default"); ok {
+		t.Error("a device button where the player bar has no room for it")
+	}
+	tt.SetSize(1280, 820)
+	outputFrames(s, tt)
+	if _, ok := tt.Find("Output device: System default"); !ok {
+		t.Errorf("no device button in a window wide again: %q", tt.Texts())
+	}
+}
+
+// TestOutputButtonKeepsTheVolume turns the volume with a touchpad across
+// the device button's coming: the scroll it had before counts after.
+func TestOutputButtonKeepsTheVolume(t *testing.T) {
+	var mu sync.Mutex
+	devices := []app.OutputDevice{{ID: "sp", Name: "Speakers", Default: true}}
+	s := outputShell(t, func() []app.OutputDevice {
+		mu.Lock()
+		defer mu.Unlock()
+		return slices.Clone(devices)
+	})
+	s.p.PlayTracks(testTracks, 0)
+	s.p.SetVolume(0.5)
+	s.settle(t, func(st player.State) bool { return st.Playing && st.Volume == 0.5 })
+	tt := tester(t, s)
+	settleOutput(t, s, tt)
+	r, ok := tt.Find("Volume")
+	if !ok {
+		t.Fatalf("no volume slider: %q", tt.Texts())
+	}
+	x, y := r.X+r.W/2, r.Y+r.H/2
+	tt.Scroll(x, y, 0, volumeScroll*0.6)
+	mu.Lock()
+	devices = append(devices, app.OutputDevice{ID: "hp", Name: "Headphones"})
+	mu.Unlock()
+	s.refetch(outputDevicesKey)
+	settleOutput(t, s, tt)
+	if _, ok := tt.Find("Output device: System default"); !ok {
+		t.Fatalf("no device button: %q", tt.Texts())
+	}
+	if r2, _ := tt.Find("Volume"); r2 != r {
+		t.Errorf("the volume moved from %v to %v as the device button came", r, r2)
+	}
+	tt.Scroll(x, y, 0, volumeScroll*0.6)
+	s.settle(t, volumeNear(0.45))
 }
 
 // TestOutputDeviceSetting chooses the output device in Settings ›
@@ -188,7 +281,7 @@ func TestOutputDeviceSetting(t *testing.T) {
 	})
 	tt := testerOf(t, s, 1280, 3200)
 	show(s, tt, "/settings/playback")
-	settleOutput(s, tt)
+	settleOutput(t, s, tt)
 	if !tt.HasText("Output device") || !tt.HasText(outputDescription) {
 		t.Fatalf("no output device row: %q", tt.Texts())
 	}

@@ -20,10 +20,16 @@ var homeFilters = []struct {
 var networkOnline = func(s *shell) bool { return s.svc.Downloads.Online() }
 
 // homePage shows the user's own tiles, then the shelves of every service,
-// in the order the user arranged them (homelayout.go).
+// in the order the user arranged them (homelayout.go), or, while they
+// edit it, the list they arrange them in (homeedit.go).
 func (s *shell) homePage(c *ui.Context) {
 	k := &s.lk
 	s.pageScroll(c, func() {
+		if s.home.editing {
+			s.pageHeader(c, "Home", nil, nil)
+			s.homeEditor(c)
+			return
+		}
 		labels := make([]string, len(homeFilters))
 		for i, f := range homeFilters {
 			labels[i] = f.label
@@ -39,6 +45,11 @@ func (s *shell) homePage(c *ui.Context) {
 		} else if cur, ok := s.st.Current(); ok {
 			last = &cur.Track
 		}
+		ui.Row(c).Justify(ui.End).Margin(0, 0, 16).Children(func() {
+			if s.button(c, "home-edit", "edit home", false).Clicked() {
+				s.home.editing = true
+			}
+		})
 		s.tileGrid(c, func(columns int) {
 			title, caption, label := "Start here", k.words("Search for something to play"), "Search for music"
 			var art []media.Image

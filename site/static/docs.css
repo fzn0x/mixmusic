@@ -435,8 +435,28 @@ p { text-wrap: pretty; }
 .prose pre code { padding: 0; border-radius: 0; background: none; font: inherit; }
 .copy { position: absolute; top: 6px; right: 6px; width: 40px; height: 40px; color: var(--on-surface-variant); opacity: 0.7; transition: opacity var(--fast) var(--ease); }
 .code:hover .copy,
-.copy:focus-visible { opacity: 1; }
-.copy.is-done { color: var(--tip); opacity: 1; }
+.copy:focus-visible,
+.copy.is-told { opacity: 1; }
+.copy.is-done { color: var(--tip); }
+/* "Copied", or the keys to copy with, beside the button for a moment
+   (copy.js). */
+.copy-tip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 2px);
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--on-surface);
+  color: var(--surface);
+  font: 650 0.8125rem/1.2 var(--font);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity var(--fast) var(--ease);
+}
+.copy.is-told .copy-tip { opacity: 1; }
+.copy-tip:empty { display: none; }
 
 /* Tables: a surface of their own, which scrolls in itself when the table
    can't fit, never the page; a header row with nothing in it is left out. */

@@ -1,0 +1,69 @@
+/*
+ * The home page's commands, each in a block with its copy button
+ * (copy.js), in the page's own colours (styles.css). The docs style
+ * theirs in docs.css.
+ */
+
+.code { position: relative; margin-top: 10px; }
+.cmd {
+  margin: 0;
+  padding: 10px 50px 10px 14px;
+  border-radius: var(--radius-small);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--outline);
+  color: var(--ink);
+  font: 500 0.8125rem/1.6 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.cmd code { padding: 0; border-radius: 0; background: none; font: inherit; white-space: inherit; overflow-wrap: inherit; }
+
+.copy {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-2);
+  cursor: pointer;
+  isolation: isolate;
+  transition: color var(--fast) var(--ease);
+}
+.copy::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--fast) var(--ease);
+}
+.copy:hover,
+.copy.is-done { color: var(--ink); }
+.copy:hover::after { opacity: 0.08; }
+.copy:active::after { opacity: 0.14; }
+
+/* "Copied", or the keys to copy with, beside the button for a moment. */
+.copy-tip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 2px);
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font: 650 0.8125rem/1.2 var(--font);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity var(--fast) var(--ease);
+}
+.copy.is-told .copy-tip { opacity: 1; }
+.copy-tip:empty { display: none; }

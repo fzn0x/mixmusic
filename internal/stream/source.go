@@ -52,6 +52,10 @@ type Source struct {
 	err    error     // why a download failed
 	closed bool
 	pos    int64
+
+	// local is set when the last download's audio came from this
+	// computer: from what is kept, as a download, or from the cache.
+	local bool
 }
 
 // span is bytes of the audio, from off.
@@ -266,6 +270,10 @@ type sourceWriter struct {
 	status int
 	once   sync.Once
 	ready  chan struct{}
+
+	// here is set while the proxy serves the download from this
+	// computer, as fromHere does.
+	here bool
 }
 
 func (w *sourceWriter) Header() http.Header { return w.header }
@@ -293,9 +301,36 @@ func (w *sourceWriter) answer(status int) {
 				}
 			}
 		}
+		if s.dl == w.d && (status == http.StatusOK || status == http.StatusPartialContent) {
+			s.local = w.here
+		}
 		s.mu.Unlock()
 		close(w.ready)
 	})
+}
+
+// fromHere has serve answer w from audio on this computer, as a download
+// or the cache, and reports whether it had it: a Source the proxy answers
+// learns so before the first of its bytes.
+func fromHere(w http.ResponseWriter, serve func() bool) bool {
+	sw, ok := w.(*sourceWriter)
+	if ok {
+		sw.here = true
+	}
+	served := serve()
+	if ok && !served {
+		sw.here = false
+	}
+	return served
+}
+
+// Local reports whether the audio comes from this computer, as
+// audio.Local: a download, or the cache, whose failure to read is the
+// file's, not the network's.
+func (s *Source) Local() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.local
 }
 
 func (w *sourceWriter) Write(b []byte) (int, error) {

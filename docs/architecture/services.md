@@ -11,13 +11,21 @@
 - **`internal/youtube`** reads YouTube Music through the API its website uses:
   search, suggestions (searches, then songs, albums, artists and
   playlists), the home and explore pages, charts, moods and genres, albums,
-  artists, playlists, related tracks, radios and plain lyrics.
+  artists, playlists, related tracks, radios and plain lyrics. Below a
+  playlist the user owns, YouTube Music suggests songs to add, five at a
+  time: the playlist's `Suggest` is the token of the first, and each
+  answer has the token of a refresh, for the next (`PlaylistSuggestions`).
   Signed in with the cookies of the user's session, which it signs its
   requests with as the website does, it reads and changes their library:
   liked songs, playlists, albums, subscriptions, likes, dislikes and
   saves, songs saved to the library apart from likes, by the feedback
   tokens of their menus in the queue of their "next", and it deletes the playlists the user made, which it tells from
-  those they saved by the menus YouTube sends with them. It lists the
+  those they saved by the menus YouTube sends with them. An add of a
+  video the playlist holds already YouTube refuses, offering in its
+  answer the same add with its check skipped (`DEDUPE_OPTION_SKIP`):
+  that, not the answer's words, which are in the account's language,
+  tells it from other refusals (`ErrAlreadyInPlaylist`), and
+  `AddToPlaylistAnyway` sends it. It lists the
   Google accounts of the session and their brand channels, from YouTube's
   website, and uses a brand channel by its page ID: one whose page ID the
   list doesn't tell is listed as `Unswitchable`, as without it the account
@@ -96,4 +104,13 @@
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
   scrobbles by Last.fm's rules, keeping what fails offline for later.
 - **`internal/discord`** shows what plays on the user's Discord profile, over
-  Discord's local pipe or socket.
+  Discord's local pipe or socket: an activity's lines, times, picture, the
+  small image at its corner and up to two buttons, fitted to Discord's
+  limits. What the activity holds is the app's choice
+  (`internal/app/discordstatus.go`): `DiscordActivity` makes it of what
+  plays and the settings, as a pure function that the settings page's
+  preview draws too, and `presence` sends it again whenever the track, the
+  play or pause, the position or those settings change. The badges of
+  the services and of a pause are `brand/discord`'s PNGs, drawn by
+  `tools/discordbadges`, which Discord reads from GitHub by their
+  addresses, whatever the application.

@@ -16,8 +16,8 @@ import (
 
 // trackSorts are the orders a list of tracks shows in, the list's own
 // first, and their labels after it.
-var trackSorts = []string{"order", "title", "artist", "length"}
-var trackSortLabels = []string{"", "Title", "Artist", "Length"}
+var trackSorts = []string{"order", "title", "artist", "length", "plays"}
+var trackSortLabels = []string{"", "Title", "Artist", "Length", "Plays"}
 
 // trackTool is how the user sorted a list of tracks, and what they search
 // in it.
@@ -30,16 +30,21 @@ type trackTool struct {
 	view                trackView
 	of                  []media.Track
 	viewSort, viewQuery string
+	// viewPlays is the version of the library whose plays a view sorted
+	// by plays counted, 0 for the other sorts.
+	viewPlays uint64
 }
 
 // viewOf returns the view of tracks the user's sort and search make, made
-// again only when one of them changed. Lists of tracks are replaced when
-// they change, not changed in place: the same slice holds the same tracks.
-func (t *trackTool) viewOf(tracks []media.Track) trackView {
+// again only when one of them changed, or, sorted by plays, the history
+// of plays. Lists of tracks are replaced when they change, not changed in
+// place: the same slice holds the same tracks.
+func (t *trackTool) viewOf(tracks []media.Track, plays playCounter) trackView {
 	same := len(t.of) == len(tracks) && (len(tracks) == 0 || &t.of[0] == &tracks[0])
-	if !same || t.viewSort != t.sort || t.viewQuery != t.query {
-		t.view = viewTracks(tracks, t.sort, t.query)
-		t.of, t.viewSort, t.viewQuery = tracks, t.sort, t.query
+	version := playsVersion(t.sort, plays)
+	if !same || t.viewSort != t.sort || t.viewQuery != t.query || t.viewPlays != version {
+		t.view = viewTracks(tracks, t.sort, t.query, playCounts(t.sort, plays))
+		t.of, t.viewSort, t.viewQuery, t.viewPlays = tracks, t.sort, t.query, version
 	}
 	return t.view
 }
@@ -67,9 +72,9 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 		s.tools[key] = tool
 	}
 	if len(tracks) < 2 {
-		return viewTracks(tracks, "order", "")
+		return viewTracks(tracks, "order", "", nil)
 	}
-	view := tool.viewOf(tracks)
+	view := tool.viewOf(tracks, s.svc.Collection)
 	row, pin := s.pinRow(c, key+"-tools")
 	query, sort := tool.query, tool.sort
 	row.Gap(12).Children(func() {
@@ -143,8 +148,9 @@ func (s *shell) searching(key string) string {
 
 // viewTracks keeps the tracks whose title, artists or album hold every
 // word of query, in the order sort says, as the web interface's track
-// tools do: tracks that sort the same keep the list's order.
-func viewTracks(tracks []media.Track, sort, query string) trackView {
+// tools do: tracks that sort the same keep the list's order. plays counts
+// the plays of each track, by its ID, for the sort by plays.
+func viewTracks(tracks []media.Track, sort, query string, plays map[string]int) trackView {
 	words := strings.Fields(fold(query))
 	type row struct {
 		track media.Track
@@ -174,6 +180,8 @@ func viewTracks(tracks []media.Track, sort, query string) trackView {
 		}
 	case "length":
 		by = func(a, b media.Track) int { return cmp.Compare(a.DurationMs, b.DurationMs) }
+	case "plays":
+		by = byPlays(plays)
 	}
 	if by != nil {
 		slices.SortStableFunc(rows, func(a, b row) int { return by(a.track, b.track) })

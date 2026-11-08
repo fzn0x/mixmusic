@@ -88,8 +88,11 @@ or macOS.
   sign-ins made before 0.5.0 lack: Settings › Playback asks you to sign in
   again, and until you do, Spotify tracks play from YouTube Music.
 - **The sound.** Spotify's player plays at your volume, on the same curve
-  as MixMusic's own. The equalizer, crossfade, Even loudness and speed
-  don't reach it: Spotify keeps its own loudness and speed. On Windows 10
+  as MixMusic's own, on the system's default device: the
+  [output device](playing-music.md#the-output-device) chosen in Settings ›
+  Playback doesn't reach it, as the web view plays it where the system
+  does. The equalizer, crossfade, Even loudness and speed don't reach it
+  either: Spotify keeps its own loudness and speed. On Windows 10
   build 20348 and later, the visualizer hears it through Windows' process
   loopback, and on macOS 14.2 and later through a process tap, once you
   allowed MixMusic to record what other apps play, as macOS asks the first

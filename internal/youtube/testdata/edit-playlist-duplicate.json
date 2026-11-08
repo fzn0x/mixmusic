@@ -1,0 +1,62 @@
+{
+ "_fixture": "Written by hand from the documented shape of YouTube Music's answer, not recorded: replace with a recorded answer once one is.",
+ "responseContext": {
+  "serviceTrackingParams": [
+   {
+    "service": "GFEEDBACK",
+    "params": [
+     {
+      "key": "logged_in",
+      "value": "1"
+     }
+    ]
+   }
+  ]
+ },
+ "status": "STATUS_FAILED",
+ "actions": [
+  {
+   "clickTrackingParams": "CAAQhGcTEwi-duplicate",
+   "addToToastAction": {
+    "item": {
+     "notificationActionRenderer": {
+      "responseText": {
+       "runs": [
+        {
+         "text": "This track is already in the playlist"
+        }
+       ]
+      },
+      "actionButton": {
+       "buttonRenderer": {
+        "style": "STYLE_BLUE_TEXT",
+        "text": {
+         "runs": [
+          {
+           "text": "Add anyway"
+          }
+         ]
+        },
+        "trackingParams": "CAEQ8FsiEwi-duplicate",
+        "command": {
+         "clickTrackingParams": "CAEQ8FsiEwi-duplicate",
+         "playlistEditEndpoint": {
+          "playlistId": "PLtestOwnPlaylist",
+          "actions": [
+           {
+            "addedVideoId": "testVideo01",
+            "action": "ACTION_ADD_VIDEO",
+            "dedupeOption": "DEDUPE_OPTION_SKIP"
+           }
+          ]
+         }
+        }
+       }
+      },
+      "trackingParams": "CAAQyscDIhMI-duplicate"
+     }
+    }
+   }
+  }
+ ]
+}

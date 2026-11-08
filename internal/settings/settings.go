@@ -68,6 +68,7 @@ func (s *Settings) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, (*plain)(s)); err != nil {
 		return err
 	}
+	s.readPaths()
 	var keys struct {
 		Before *bool `json:"discordPresence"`
 		Now    *bool `json:"showOnDiscord"`

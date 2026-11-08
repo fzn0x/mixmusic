@@ -146,6 +146,9 @@ type shell struct {
 	lights groundLights
 	// asking is the question a dialog asks before an action, if any.
 	asking *question
+	// failure is the dialog of the details of a track that couldn't play
+	// (playbackerrors.go).
+	failure failureView
 	// panel is the side panel shown: "queue", "lyrics" or "".
 	panel string
 	// query is what the search box holds, typed last at queryAt; suggested
@@ -247,6 +250,8 @@ type shell struct {
 	renaming, deleting, clearingHistory bool
 	renameTo, renameID                  string
 	deleteID, deleteTitle               string
+	// covering changes the cover of a mix (mixcover.go).
+	covering mixCovering
 	// spotifyLiked are the liked songs on Spotify the library shows: the
 	// first page, of answer spotifyLikedAt of spotifyLikedOf, then those
 	// loaded past it, while loadingMore.
@@ -279,6 +284,8 @@ type shell struct {
 	// sorted and searched the lists of tracks, by key.
 	wells map[string]*colorWell
 	tools map[string]*trackTool
+	// moves is what the keys moved last in a mix (mixorder.go).
+	moves rowMoves
 	// listTops are where the track lists and the shelves were in the frame
 	// before, by key.
 	listTops map[string]float32
@@ -397,6 +404,7 @@ func (s *shell) start() {
 		s.p.Notices(func(n player.Notice) { s.update(func() { s.notes = append(s.notes, n) }) }),
 		s.a.OnNavigate(func(target string) { s.update(func() { s.open(target) }) }),
 		s.followCast(),
+		s.followOutput(),
 		s.a.OnGlobalShortcut(s.globalPress),
 		s.a.OnFlush(s.keepColors),
 		s.keepColors,

@@ -269,7 +269,7 @@ func (p *Player) Report(np NowPlaying) {
 	p.a.scrobble(np)
 	p.a.keepPosition(np)
 	p.a.reportWatchtime(np, s.YouTubeHistory)
-	p.a.presence.update(s.DiscordPresence, s.DiscordApp(), np)
+	p.a.presence.update(s.Desktop, np)
 	p.a.reportControls(np)
 	if bar != nil {
 		bar.Show(np.plays(), np.Track != nil)

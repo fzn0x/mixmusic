@@ -2,13 +2,16 @@ package app
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
+	"github.com/egoist/mygo"
 	"github.com/fzn0x/mixmusic/internal/store"
 )
 
@@ -89,7 +92,7 @@ func TestReleaseFile(t *testing.T) {
 }
 
 func TestLatestRelease(t *testing.T) {
-	const body = `{
+	body := strings.ReplaceAll(`{
 		"tag_name": "v0.3.0",
 		"html_url": "https://github.com/fzn0x/mixmusic/releases/tag/v0.3.0",
 		"published_at": "2026-10-21T10:00:00Z",
@@ -98,9 +101,11 @@ func TestLatestRelease(t *testing.T) {
 			{"name": "mixmusic-0.3.0-linux-amd64.deb", "browser_download_url": "https://example.com/amd64.deb"},
 			{"name": "mixmusic-0.3.0-linux-arm64.deb", "browser_download_url": "https://example.com/arm64.deb"},
 			{"name": "mixmusic-0.3.0-linux-amd64.flatpak", "browser_download_url": "https://example.com/amd64.flatpak"},
+			{"name": "update-GOOS-arm64.json", "browser_download_url": "https://example.com/v0.3.0/update-arm64.json"},
+			{"name": "update-GOOS-amd64.json", "browser_download_url": "https://example.com/v0.3.0/update-amd64.json"},
 			{"name": "SHA256SUMS", "browser_download_url": "https://example.com/SHA256SUMS"}
 		]
-	}`
+	}`, "GOOS", runtime.GOOS)
 	var agent string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		agent = r.Header.Get("User-Agent")
@@ -120,6 +125,7 @@ func TestLatestRelease(t *testing.T) {
 		Page:     "https://github.com/fzn0x/mixmusic/releases/tag/v0.3.0",
 		Download: "https://example.com/arm64.deb",
 		File:     "mixmusic-0.3.0-linux-arm64.deb",
+		manifest: "https://example.com/v0.3.0/update-arm64.json",
 	}
 	if r != want {
 		t.Errorf("latestRelease = %+v, want %+v", r, want)
@@ -151,6 +157,55 @@ func TestLatestRelease(t *testing.T) {
 	}
 	if !r.Newer || r.Download != "" || r.File != "" {
 		t.Errorf("latestRelease of an Arm64 Flatpak, which has no bundle = %+v", r)
+	}
+}
+
+// TestTaggedManifest: when GitHub's latest/download address fails, the
+// update is read from the release's own address (#412).
+func TestTaggedManifest(t *testing.T) {
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if agent := r.Header.Get("User-Agent"); agent != "mygo-updater" {
+			t.Errorf("User-Agent = %q", agent)
+		}
+		switch r.URL.Path {
+		case "/v0.3.0/update.json":
+			w.Write([]byte(`{"version":"0.3.0"}`))
+		case "/v0.3.0/app.tar.gz":
+			w.Write([]byte("archive"))
+		default:
+			http.Error(w, "", http.StatusGatewayTimeout)
+		}
+	}))
+	defer srv.Close()
+	client := updateClient
+	updateClient = srv.Client()
+	defer func() { updateClient = client }()
+
+	var src mygo.UpdateSource = taggedManifest(srv.URL + "/v0.3.0/update.json")
+	read := func(rc io.ReadCloser, err error) string {
+		t.Helper()
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer rc.Close()
+		b, err := io.ReadAll(rc)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return string(b)
+	}
+	ctx := context.Background()
+	if got := read(src.Manifest(ctx, false)); got != `{"version":"0.3.0"}` {
+		t.Errorf("Manifest = %q", got)
+	}
+	if got := read(src.Open(ctx, srv.URL+"/v0.3.0/app.tar.gz")); got != "archive" {
+		t.Errorf("Open = %q", got)
+	}
+	if _, err := src.Open(ctx, srv.URL+"/latest/download/app.tar.gz"); err == nil || !strings.Contains(err.Error(), "504 Gateway Timeout") {
+		t.Errorf("Open of a file GitHub doesn't send: err = %v, want its status", err)
+	}
+	if _, err := src.Open(ctx, "http://example.com/app.tar.gz"); err == nil || !strings.Contains(err.Error(), "HTTPS") {
+		t.Errorf("Open over HTTP: err = %v, want a refusal", err)
 	}
 }
 

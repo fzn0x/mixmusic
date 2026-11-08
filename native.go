@@ -151,6 +151,9 @@ type shell struct {
 	failure failureView
 	// panel is the side panel shown: "queue", "lyrics" or "".
 	panel string
+	// mini is what the mini player keeps from frame to frame: its panel,
+	// and its window as the panel grows it (minipanel.go).
+	mini miniState
 	// query is what the search box holds, typed last at queryAt; suggested
 	// is what it suggested for suggestedFor.
 	query        string

@@ -70,6 +70,7 @@
   "notifications": true,
   "showInTitle": true,
   "keepOnTop": false,
+  "miniPanel": "",
   "mediaKeys": true,
   "showOnDiscord": true,
   "discordAppId": "",

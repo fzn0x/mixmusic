@@ -26,6 +26,9 @@ type Desktop struct {
 	// KeepOnTop keeps the main window above the other windows (#350). It
 	// is off at first; the mini player stays on top either way.
 	KeepOnTop bool `json:"keepOnTop"`
+	// MiniPanel is the panel the mini player shows beside it as it opens
+	// (#371): MiniQueue, MiniLyrics or MiniOutput, or "" for none.
+	MiniPanel string `json:"miniPanel"`
 	// MediaKeys has the keyboard's play, next and previous keys control
 	// MixMusic.
 	MediaKeys bool `json:"mediaKeys"`
@@ -79,9 +82,11 @@ func defaultDesktop() Desktop {
 	return d
 }
 
-// clean is d without a Discord application ID that isn't one, and with
-// lines of the Discord status that Discord takes.
+// clean is d without a Discord application ID that isn't one, with lines of
+// the Discord status that Discord takes, and with a panel of the mini
+// player it has.
 func (d Desktop) clean() Desktop {
+	d.MiniPanel = cleanMiniPanel(d.MiniPanel)
 	if d.DiscordAppID = strings.TrimSpace(d.DiscordAppID); !discordIDRe.MatchString(d.DiscordAppID) {
 		d.DiscordAppID = ""
 	}

@@ -21,6 +21,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/cast"
+	"github.com/fzn0x/mixmusic/internal/diag"
 	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/localfiles"
@@ -100,6 +101,10 @@ type App struct {
 	// lastCrash is the crash report of the run before, until the user
 	// answers about it.
 	lastCrash string
+	// memory records how MixMusic uses its memory while the user asks, in
+	// the logs folder (memory.go): made at its first use.
+	memory     *diag.MemoryRecorder
+	memoryOnce sync.Once
 
 	settings     *store.File[settings.Settings]
 	library      *library.Library

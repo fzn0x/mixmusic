@@ -81,6 +81,7 @@ func (s *System) ReportURL(ctx context.Context) string {
 		fmt.Fprintf(&b, "Plugins: %s\n", strings.Join(set.EnabledPlugins, ", "))
 	}
 	b.WriteString("\nThe log, mixmusic.log, is in the folder Settings › About opens: read it before you attach it.\n")
+	b.WriteString(s.memoryNote())
 	q := url.Values{"template": {"bug_report.yml"}, "version": {info.Version}, "more": {b.String()}}
 	return issuesURL + "?" + q.Encode()
 }

@@ -95,8 +95,13 @@ type mp3Header struct {
 	delay, padding int64
 }
 
+// mp3FrameMin is the fewest bytes a frame of Layer III takes: one of
+// MPEG-2 at 8 kbit/s and 24 kHz.
+const mp3FrameMin = 24
+
 // readMP3Header reads the header of an MP3 file's first frame, past its
-// ID3v2 tag: its frames are -1 for a file without one.
+// ID3v2 tag: its frames are -1 for a file without one, or whose header
+// counts more frames than the file could hold, as one broken.
 func readMP3Header(src io.ReadSeeker) mp3Header {
 	var h [10]byte
 	at := int64(0)
@@ -111,7 +116,11 @@ func readMP3Header(src io.ReadSeeker) mp3Header {
 	}
 	var b [512]byte
 	n, _ := readAt(src, at, b[:])
-	return firstFrameHeader(b[:n])
+	m := firstFrameHeader(b[:n])
+	if size, err := src.Seek(0, io.SeekEnd); err != nil || m.frames*mp3FrameMin > size-at {
+		m.frames, m.lame = -1, false
+	}
+	return m
 }
 
 // firstFrameHeader reads the header of f, the start of an MP3 file's

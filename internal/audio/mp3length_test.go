@@ -113,6 +113,8 @@ func TestProbeMP3Length(t *testing.T) {
 		{"VBRI in mono", silentMP3(mp3Mono, vbriHead(1, 40), low...), 960 * ms, 984 * ms},
 		{"constant bitrate without a header", silentMP3(mp3Stereo, nil, sameRate(128, 40)...), 960 * ms, 960 * ms},
 		{"Info without a LAME tag, after ID3", append(id3, silentMP3(mp3Stereo, xingHead("Info", 40, false, 0, 0), sameRate(128, 40)...)...), 960 * ms, 984 * ms},
+		// Of the size then, the header's frame with the others.
+		{"Xing counting more than the file holds", silentMP3(mp3Stereo, xingHead("Xing", 1<<31, true, 576, 1152), sameRate(128, 40)...), 984 * ms, 984 * ms},
 		// Of the first frame's bitrate then.
 		{"VBRI of another version", silentMP3(mp3Stereo, vbriHead(2, 40), low...), 264 * ms, 984 * ms},
 	} {

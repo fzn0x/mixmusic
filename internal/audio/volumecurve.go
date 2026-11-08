@@ -11,3 +11,11 @@ func (e *Engine) SetVolumeCurve(c volume.Curve) {
 	e.master.target = c.Gain(e.vol)
 	e.mu.Unlock()
 }
+
+// VolumeCurve is the curve SetVolumeCurve chose last: none, which is
+// Natural, at first.
+func (e *Engine) VolumeCurve() volume.Curve {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	return e.curve
+}

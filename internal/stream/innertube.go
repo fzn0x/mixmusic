@@ -15,7 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -151,9 +150,9 @@ func refusal(err error) bool {
 // itself, as YouTube's visionOS app, signed out: in a fraction of the time
 // yt-dlp takes, and with streams YouTube serves at once. YouTube gives it
 // no streams of some videos, such as those made for children, which yt-dlp
-// still finds. While 5.1 surround is on, it asks as YouTube's TV app too
-// whether a video has 5.1 surround audio, whose URL yt-dlp finds. Its
-// methods are safe for concurrent use.
+// still finds. It asks as YouTube's TV app too whether a video has 5.1
+// surround audio, whose URL yt-dlp finds. Its methods are safe for
+// concurrent use.
 type Direct struct {
 	// HTTP asks the API, and the media server whether it serves a stream.
 	HTTP *http.Client
@@ -163,9 +162,6 @@ type Direct struct {
 	now func() time.Time
 	// media sends the checks of streams, to their other servers too.
 	media mediaServers
-	// surround is set while 5.1 surround is on: only then is the TV client
-	// asked of a video's 5.1 audio, which a track would wait for.
-	surround atomic.Bool
 
 	mu sync.Mutex
 	// visitor is the visitor ID YouTube gave the route, since visitorAt.
@@ -295,13 +291,9 @@ type toldSurround struct {
 	err error
 }
 
-// askTV asks the TV client whether a video has 5.1 surround audio, while
-// 5.1 surround is on and the client doesn't rest, and returns where its
-// answer comes: nil when it isn't asked.
+// askTV asks the TV client whether a video has 5.1 surround audio, unless
+// it rests, and returns where its answer comes: nil while it rests.
 func (d *Direct) askTV(ctx context.Context, videoID string) <-chan toldSurround {
-	if !d.surround.Load() {
-		return nil
-	}
 	d.mu.Lock()
 	resting := d.now().Before(d.tvPausedUntil)
 	d.mu.Unlock()
@@ -315,16 +307,6 @@ func (d *Direct) askTV(ctx context.Context, videoID string) <-chan toldSurround 
 	}()
 	return answer
 }
-
-// SetSurround tells the route whether 5.1 surround is on. While it is
-// off, as it is by default, the TV client isn't asked of a video's 5.1
-// audio, and a stream found doesn't wait for its answer: its Surround is
-// nil, unless the visionOS client listed some.
-func (d *Direct) SetSurround(on bool) { d.surround.Store(on) }
-
-// Surround reports whether the route asks of 5.1 surround audio, as
-// SetSurround set it.
-func (d *Direct) Surround() bool { return d.surround.Load() }
 
 // countTV takes in how asking the TV client went, and has it rest after
 // pauseAfter refusals in a row, as YouTube may have changed what it asks

@@ -16,4 +16,4 @@ func (s *shell) surroundRow(c *ui.Context) {
 
 // surroundDescription tells what 5.1 surround does, in Settings › Playback.
 const surroundDescription = "Some tracks have a 5.1 surround mix beside their stereo one. It plays on six speakers where your output has them, " +
-	"else mixed down to stereo. While it's on, MixMusic asks YouTube which tracks have one, and the 5.1 button by the player turns it off and on."
+	"else mixed down to stereo. The 5.1 button by the player turns it on and off too."

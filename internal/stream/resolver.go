@@ -178,29 +178,6 @@ func (r *Resolver) SetQuality(q Quality) {
 	}
 }
 
-// SetSurround tells whether 5.1 surround is on, which has the direct route
-// ask YouTube's TV app whether a video has 5.1 audio: while it is off, a
-// stream found doesn't wait for that answer. Turned on, the streams found
-// before that tell of no 5.1 audio, which may have been found without
-// asking, are found again as they are asked for.
-func (r *Resolver) SetSurround(on bool) {
-	if r.Direct == nil || r.Direct.surround.Swap(on) == on || !on {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	for id, res := range r.calls {
-		select {
-		case <-res.done:
-			if res.err == nil && res.stream.Surround != nil {
-				continue
-			}
-		default: // running: it may not ask
-		}
-		delete(r.calls, id)
-	}
-}
-
 // Resolve returns the audio stream of a video.
 func (r *Resolver) Resolve(ctx context.Context, videoID string) (Stream, error) {
 	if !ValidVideoID(videoID) {

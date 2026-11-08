@@ -1,7 +1,9 @@
-<script>
+<script src="{{ get_url(path='copy.js') }}" defer></script>
+  <script>
     // The docs' drawer, which a narrow window opens over the page as a
-    // modal; a copy button on each block of code; and the section of the
-    // page in view, lit in "On this page".
+    // modal, and the section of the page in view, lit in "On this page".
+    // copy.js, the home page's too, gives each block of code its copy
+    // button.
     (() => {
       const d = document;
       const root = d.documentElement;
@@ -35,32 +37,6 @@
         if (e.key === "Escape" && root.classList.contains("drawer-open")) show(false);
       });
       narrow.addEventListener("change", () => root.classList.contains("drawer-open") && show(false));
-
-      // Copy buttons.
-      d.querySelectorAll(".prose pre").forEach((pre) => {
-        if (!navigator.clipboard) return;
-        const b = d.createElement("button");
-        b.type = "button";
-        b.className = "icon-btn copy";
-        b.setAttribute("aria-label", "Copy the code");
-        b.innerHTML = '<svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-copy" /></svg>';
-        b.addEventListener("click", () => {
-          navigator.clipboard.writeText(pre.querySelector("code")?.innerText ?? pre.innerText).then(() => {
-            b.classList.add("is-done");
-            b.setAttribute("aria-label", "Copied");
-            b.querySelector("use").setAttribute("href", "#i-check");
-            setTimeout(() => {
-              b.classList.remove("is-done");
-              b.setAttribute("aria-label", "Copy the code");
-              b.querySelector("use").setAttribute("href", "#i-copy");
-            }, 1600);
-          });
-        });
-        const wrap = d.createElement("div");
-        wrap.className = "code";
-        pre.replaceWith(wrap);
-        wrap.append(pre, b);
-      });
 
       // On this page: the last heading above the top third of the window.
       const toc = d.querySelector("[data-toc]");

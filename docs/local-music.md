@@ -26,7 +26,9 @@ time of change differs from the last scan. A library of thousands of
 files is read whole once, then in moments. MixMusic doesn't watch the
 folders as you work in them: rescan, or start MixMusic again, to see what
 you added. Hidden folders, whose names start with a dot, are passed
-over.
+over. Files and folders play whatever their names hold, even names that
+aren't valid UTF-8, as on some Linux drives: MixMusic keeps their paths
+in base64, so that they name the same files after a restart.
 
 ## Open files without a folder
 

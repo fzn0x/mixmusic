@@ -151,6 +151,10 @@ tells how.
   and the toast says that too.
 - **Encodings.** Save it as UTF-8. A file with a byte order mark, or in
   UTF-16, as Windows PowerShell 5.1 writes it, reads too.
+- **Names that aren't UTF-8.** A folder or a file whose name isn't valid
+  UTF-8, as on some Linux drives, is written in base64 after `base64:`, as
+  `"base64:L2hvbWUvYWRhL2NhZuk="`, so that it names the same folder when
+  MixMusic reads the file again. Every other path is written as it is.
 
 Its keys are short names of the settings, as `theme`, `layout`, `zoom`,
 `closeToTray`, `notchPlayer`, `shortcuts` and `globalShortcuts`. Open the

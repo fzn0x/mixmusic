@@ -19,26 +19,23 @@ var homeFilters = []struct {
 // answer for it.
 var networkOnline = func(s *shell) bool { return s.svc.Downloads.Online() }
 
-// homePage shows the user's own tiles, then the shelves of every service.
+// homePage shows the user's own tiles, then the shelves of every service,
+// in the order the user arranged them (homelayout.go), or, while they
+// edit it, the list they arrange them in (homeedit.go).
 func (s *shell) homePage(c *ui.Context) {
 	k := &s.lk
 	s.pageScroll(c, func() {
+		if s.home.editing {
+			s.pageHeader(c, "Home", nil, nil)
+			s.homeEditor(c)
+			return
+		}
 		labels := make([]string, len(homeFilters))
 		for i, f := range homeFilters {
 			labels[i] = f.label
 		}
 		s.pageHeader(c, "Home", labels, &s.homeFilter)
 		s.toolProblems(c)
-		// Each service's shelves come on their own: one that fails leaves
-		// the others, and keeps its own of before on a refresh.
-		services := []struct {
-			source  media.Source
-			key     string
-			shelves *loaded[[]media.Shelf]
-		}{
-			{media.SourceSpotify, "home:spotify", fetch(s, "home:spotify", s.svc.Catalog.SpotifyHome)},
-			{media.SourceYouTube, "home:youtube", fetch(s, "home:youtube", s.svc.Catalog.YouTubeHome)},
-		}
 		accounts := fetch(s, "accounts", func(ctx context.Context) (app.AccountsStatus, error) { return s.svc.Accounts.Status(ctx), nil })
 
 		// The track played last, as the library has it now.
@@ -48,6 +45,11 @@ func (s *shell) homePage(c *ui.Context) {
 		} else if cur, ok := s.st.Current(); ok {
 			last = &cur.Track
 		}
+		ui.Row(c).Justify(ui.End).Margin(0, 0, 16).Children(func() {
+			if s.button(c, "home-edit", "edit home", false).Clicked() {
+				s.home.editing = true
+			}
+		})
 		s.tileGrid(c, func(columns int) {
 			title, caption, label := "Start here", k.words("Search for something to play"), "Search for music"
 			var art []media.Image
@@ -79,35 +81,29 @@ func (s *shell) homePage(c *ui.Context) {
 		})
 		// The user's own shelves show at once, then those of each service
 		// once they came: one that still loads holds back those after it,
-		// which would move once it came. Each group keeps keys of its own,
-		// which shelves coming or going in another don't move.
+		// which would move once it came (homePlaces).
 		source := homeFilters[s.homeFilter].source
+		layout := s.set.HomeShelves
 		shown, failed := 0, false
-		put := func(key string, of []media.Shelf) {
-			var shelves []media.Shelf
-			for _, sh := range of {
-				if source == "" || sh.Source == source {
-					shelves = append(shelves, sh)
-				}
-			}
-			s.shelves(c, key, shelves)
-			shown += len(shelves)
-		}
-		put("home-yours", s.localShelves())
-		// The new releases of the artists followed show at once too, as
-		// the last run found them, until this run's look comes.
-		shown += s.releasesShelf(c, "home-releases", source)
-		for _, sv := range services {
-			if source != "" && source != sv.source {
-				continue
-			}
-			put(sv.key, sv.shelves.value)
-			switch key := sv.key; {
-			case !sv.shelves.done:
+		for _, p := range homePlaces(layout, s.homeGroups(layout), source) {
+			g := p.group
+			switch {
+			case p.shelf != nil:
+				shown += s.showHomeShelf(c, p.shelf, source)
+			case !g.done:
 				s.loading(c)
 				return
-			case sv.shelves.err != nil:
-				s.problem(c, sv.shelves.err, func() { s.forget(key) })
+			case g.added:
+				// A shelf the user added that couldn't come says why where
+				// it shows.
+				key := g.key
+				ui.Column(c.Key("home-added-"+key)).Margin(0, 0, k.sections()).Children(func() {
+					s.sectionTitle(c, g.title)
+					s.problem(c, g.err, func() { s.forget(key) })
+				})
+			default:
+				key := g.key
+				s.problem(c, g.err, func() { s.forget(key) })
 				// Offline, the downloads still play: they're offered once,
 				// under the first service that failed.
 				if !failed && !networkOnline(s) && s.kept.Status().Tracks > 0 {
@@ -131,6 +127,16 @@ func (s *shell) homePage(c *ui.Context) {
 			}
 		}
 	})
+}
+
+// showHomeShelf shows the shelf sh of Home, of the pivot of source, and
+// returns how many items it shows.
+func (s *shell) showHomeShelf(c *ui.Context, sh *homeShelf, source media.Source) int {
+	if sh.build != nil {
+		return sh.build(c, sh.ui, source)
+	}
+	s.itemShelf(c, sh.ui, sh.shelf)
+	return len(sh.shelf.Items)
 }
 
 // localShelves are the home page's shelves of what the user played and

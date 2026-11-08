@@ -48,18 +48,19 @@ func sectionShelves(sections node) []media.Shelf {
 			continue
 		}
 		var (
-			title, subtitle string
-			contents        []node
+			title, subtitle, key string
+			contents             []node
 		)
 		if carousel := s.get("musicCarouselShelfRenderer"); carousel.exists() {
 			header := carousel.get("header", "musicCarouselShelfBasicHeaderRenderer")
-			title, subtitle = header.get("title").text(), header.get("strapline").text()
+			title, subtitle, key = header.get("title").text(), header.get("strapline").text(), shelfKey(header)
 			contents = carousel.get("contents").list()
 		} else if grid := s.get("gridRenderer"); grid.exists() {
-			title = grid.get("header", "gridHeaderRenderer", "title").text()
+			header := grid.get("header", "gridHeaderRenderer")
+			title, key = header.get("title").text(), shelfKey(header)
 			contents = grid.get("items").list()
 		} else if list := s.get("musicShelfRenderer"); list.exists() {
-			title = list.get("title").text()
+			title, key = list.get("title").text(), shelfKey(list)
 			contents = list.get("contents").list()
 		} else {
 			continue
@@ -68,7 +69,7 @@ func sectionShelves(sections node) []media.Shelf {
 		if len(items) == 0 {
 			continue
 		}
-		shelves = append(shelves, media.Shelf{Title: title, Subtitle: subtitle, Source: media.SourceYouTube, Items: items})
+		shelves = append(shelves, media.Shelf{Title: title, Subtitle: subtitle, Source: media.SourceYouTube, Items: items, Key: key})
 	}
 	return shelves
 }

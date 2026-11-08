@@ -44,6 +44,7 @@ func Default() Settings {
 	var s Settings
 	s.Appearance = defaultAppearance()
 	s.Lyrics = defaultLyrics()
+	s.Home = defaultHome()
 	s.Playback = defaultPlayback()
 	s.Cache = defaultCache()
 	s.Downloads = defaultDownloads()
@@ -99,6 +100,7 @@ func (s Settings) Clean() Settings {
 	d := Default()
 	s.Appearance = s.Appearance.clean(d.Appearance)
 	s.Lyrics = s.Lyrics.clean()
+	s.Home = s.Home.clean()
 	s.Playback = s.Playback.clean(d.Playback)
 	s.Cache = s.Cache.clean()
 	s.Translation = s.Translation.clean()

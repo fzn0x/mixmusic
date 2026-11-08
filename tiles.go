@@ -423,29 +423,34 @@ func (s *shell) playCollection(load func(ctx context.Context) ([]media.Track, er
 // queue.
 func (s *shell) shelves(c *ui.Context, key string, shelves []media.Shelf) {
 	for i, sh := range shelves {
-		var tracks []media.Track
-		for _, it := range sh.Items {
-			if it.Track != nil {
-				tracks = append(tracks, *it.Track)
-			}
-		}
-		s.shelf(c, key+"-"+count(i), sh.Title, func() {
-			// The tiles far to either side take their room, and build
-			// nothing.
-			n := len(sh.Items)
-			from, to := s.nearTiles(c, key+"-"+count(i), n)
-			step := s.lk.tileWidth() + s.lk.gap
-			if from > 0 {
-				ui.Box(c).Width(float32(from)*step - s.lk.gap).Shrink(0)
-			}
-			for j := from; j < to; j++ {
-				s.itemTile(c, key+"-"+count(i)+"-"+count(j), sh.Items[j], tracks)
-			}
-			if to < n {
-				ui.Box(c).Width(float32(n-to)*step - s.lk.gap).Shrink(0)
-			}
-		})
+		s.itemShelf(c, key+"-"+count(i), sh)
 	}
+}
+
+// itemShelf shows the shelf sh, keyed key: a row of its tiles, whose
+// tracks play as one queue.
+func (s *shell) itemShelf(c *ui.Context, key string, sh media.Shelf) {
+	var tracks []media.Track
+	for _, it := range sh.Items {
+		if it.Track != nil {
+			tracks = append(tracks, *it.Track)
+		}
+	}
+	s.shelf(c, key, sh.Title, func() {
+		// The tiles far to either side take their room, and build nothing.
+		n := len(sh.Items)
+		from, to := s.nearTiles(c, key, n)
+		step := s.lk.tileWidth() + s.lk.gap
+		if from > 0 {
+			ui.Box(c).Width(float32(from)*step - s.lk.gap).Shrink(0)
+		}
+		for j := from; j < to; j++ {
+			s.itemTile(c, key+"-"+count(j), sh.Items[j], tracks)
+		}
+		if to < n {
+			ui.Box(c).Width(float32(n-to)*step - s.lk.gap).Shrink(0)
+		}
+	})
 }
 
 // nearTiles returns the tiles, of the n art tiles of the shelf keyed key,

@@ -28,6 +28,21 @@
     "ja": "under"
   },
   "skippedYtdlp": "2026.10.22",
+  "homeShelves": [
+    {
+      "key": "playlist:mx:night-drive",
+      "title": "Night drive"
+    },
+    {
+      "key": "youtube:FEmusic_listen_again",
+      "title": "Listen again"
+    },
+    {
+      "key": "local:recent",
+      "title": "Recently played",
+      "hidden": true
+    }
+  ],
   "spotifyPlayback": "match",
   "spotifyDevice": "device-1",
   "quality": "saver",

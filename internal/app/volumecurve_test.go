@@ -60,6 +60,12 @@ func TestVolumeCurveInBoth(t *testing.T) {
 	if v := a.settings.Get().Volume; math.Abs(v-volume.Saved(0.5)) > 1e-9 {
 		t.Errorf("on Linear, settings.json keeps the volume as %v, not %v", v, volume.Saved(0.5))
 	}
+	// A volume key steps the position, which plays on the curve.
+	a.command(PlayerCommand{Command: CommandVolumeBy, Value: 0.05})
+	waitPlayer(t, p, "a step up", func(s player.State) bool { return math.Abs(s.Volume-0.55) < 1e-9 })
+	if got, want := here.level(), strconv.FormatFloat(volume.Linear.Gain(p.State().Volume), 'f', -1, 64); got != want {
+		t.Errorf("a step up on Linear plays Spotify in MixMusic at %s, not %s", got, want)
+	}
 }
 
 // TestConnectPercent sends a Spotify Connect device the share of its

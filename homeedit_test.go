@@ -338,24 +338,35 @@ func TestEditHomeAdds(t *testing.T) {
 	if len(kept) < 4 || !slices.Equal(kept[:4], []string{homeArtist + m83.ID, homeDownloads, homeTopMonth, homePlaylist + col.Playlists()[0].ID}) {
 		t.Errorf("settings.json keeps %q", kept)
 	}
-	// Recently played is Home's own: it's on Home already.
-	click(t, s, tt, "add a shelf")
-	if got := tt.Menu(); !slices.Contains(got, "Recently played") {
-		t.Errorf("the menu holds %q", got)
+	// Recently played is Home's own: it's on Home already, and choosing
+	// it hides it, as choosing a shelf added again takes it off.
+	choose("Recently played")
+	choose("Recently played")
+	choose("Most played this month")
+	choose("Most played this month")
+	kept = keysOf(homeKept(t, s))
+	if i := slices.Index(kept, homeTopMonth); i != 0 || slices.Index(kept, homeRecent) != 1 {
+		t.Errorf("chosen twice, settings.json keeps %q", kept)
 	}
-	tt.CloseMenu()
+	choose("Recently played")
+	if kept = keysOf(homeKept(t, s)); !slices.Contains(kept, "-"+homeRecent) {
+		t.Errorf("Recently played chosen while on Home, settings.json keeps %q", kept)
+	}
+	choose("Recently played")
+	choose("Most played this month")
+	choose("Most played this month")
 
 	click(t, s, tt, "done")
-	titles := []string{"New from M83", "Downloads", "Most played this month", "Night drive", "Recently played"}
+	titles := []string{"Most played this month", "Recently played", "New from M83", "Downloads", "Night drive"}
 	if got := homeShelfOrder(tt, titles...); !slices.Equal(got, titles) {
 		t.Errorf("Home shows %q, want %q", got, titles)
 	}
 	if got := homeShelfOrder(tt, "Your mixes"); len(got) != 1 {
 		t.Error("Your mixes doesn't show after the shelves added")
 	}
-	// The artist's newest release first, the mix's tracks and the
-	// downloads.
-	for _, text := range []string{"Oceans Niagara", testTracks[3].Title, keptTracks[1].Title} {
+	// The artist's newest release first, the mix's tracks, the downloads
+	// and what played most.
+	for _, text := range []string{"Oceans Niagara", testTracks[3].Title, keptTracks[1].Title, testTracks[5].Title} {
 		if !tt.HasText(text) {
 			t.Errorf("Home doesn't show %q: %q", text, tt.Texts())
 		}

@@ -11,8 +11,9 @@ import (
 )
 
 // The details of the tracks that couldn't play (#351): the toast that
-// tells of one has Details, which shows them in a dialog, with Copy. The
-// text of the details is failurereport.go's.
+// tells of one has Details, which shows them in a dialog, with Copy, and
+// Settings › About lists the last few, until MixMusic closes. The text of
+// the details is failurereport.go's.
 
 // failureView is the dialog of a failure's details: whether it shows, and
 // the failure's ID, as the player keeps it.
@@ -99,3 +100,34 @@ func (s *shell) privacy() privacy {
 	home, _ := os.UserHomeDir()
 	return privacyOf(s.accounts(), home)
 }
+
+func init() { addSettings("about", 25, (*shell).playbackErrorSettings) }
+
+// playbackErrorSettings list the tracks that couldn't play since MixMusic
+// started, the latest first, each with its details: Settings › About ›
+// Recent playback errors.
+func (s *shell) playbackErrorSettings(c *ui.Context) {
+	failures := s.p.Failures()
+	s.group(c, "Recent playback errors", func() {
+		if len(failures) == 0 {
+			s.hint(c, noFailures)
+			return
+		}
+		pr := s.privacy()
+		for _, f := range failures {
+			title := pr.clean(failureTrack(f.Track))
+			line := failureWhen(f.At, c.Now())
+			if n := len(f.Steps); n > 0 {
+				line += " · " + pr.clean(f.Steps[n-1].Why)
+			}
+			s.row(c, title, line, func() {
+				if s.button(c, "failure-details-"+strconv.Itoa(f.ID), "details", false).Label("details of " + title).Clicked() {
+					s.showFailure(f.ID)
+				}
+			}, "playback errors failed couldn't play details copy report")
+		}
+	})
+}
+
+// noFailures tells that no track failed to play.
+const noFailures = "No track failed to play since MixMusic started. The last few that do are listed here until MixMusic closes, with what was tried."

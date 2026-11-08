@@ -41,7 +41,7 @@ A mix is a playlist of MixMusic's own, which holds tracks of every service.
 ![Library › Mixes: the New mix tile, "Tracks of every service, together", then three mixes, Anisong night, Focus, no words and Weekend, each with its cover and how many tracks it holds, and the same mixes under Your mixes in the sidebar](shots/mixes.webp)
 
 - **Make one** with the New mix tile in Library › Mixes, the + beside Your mixes in the sidebar, Add to mix › New mix… in a track's menu, or Save as a new mix in the More menu of an album or a playlist, which copies its tracks.
-- **Add tracks** with Add to mix in a track's menu, then the mix's name.
+- **Add tracks** with Add to mix in a track's menu, then the mix's name. A track the mix holds already stays out, and the toast says Already in, with Add anyway, which adds it a second time.
 - **Copy a service's playlist** with Copy into a mix you can extend, in the playlist's More menu: the mix keeps its tracks, and any track can join them. A long playlist is read whole first, which can take a while.
 - **A mix's page** has Play, Shuffle and Download, the search and Sort of its tracks, and in its More menu Rename and Delete. Deleting asks first; the tracks stay where they came from. Remove from this mix, in a track's menu there, takes it out.
 
@@ -71,7 +71,7 @@ Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a
 
 - **Save** an album or a playlist with Save on its page, which then says Saved; pressing it again takes it out of your library. **Follow** an artist with Follow on their page, which subscribes on YouTube Music.
 - **Make a playlist** with new playlist in Library › YouTube Music, with Add to YouTube Music playlist › New playlist… in a track's menu, or with Save as a YouTube Music playlist in an album's or a playlist's More menu. Spotify tracks are found on YouTube Music first.
-- **Add a track** with Add to YouTube Music playlist in its menu, then one of your playlists: it lists those you can add to. Tracks of either service go in.
+- **Add a track** with Add to YouTube Music playlist in its menu, then one of your playlists: it lists those you can add to. Tracks of either service go in. A song the playlist holds already YouTube Music doesn't add again: the toast says Already in, with Add anyway, which adds it a second time, as YouTube Music's own Add anyway does. Other refusals say what they are, as a playlist that may be another account's, or a sign-in YouTube Music no longer accepts.
 - **Take a track out** of a playlist of yours with Remove from this playlist, in its menu on the playlist's page.
 - **Delete a playlist you made** with Delete from YouTube Music…, in the More menu of its page or of its tile in Library › YouTube Music. It asks first, since the playlist goes from YouTube too and can't come back: to keep its tracks, copy it into a mix first. Mixes copied from it, and the queue, keep their tracks.
 - **A playlist you saved** has Remove from library on its tile instead, which takes it out of your library without asking: saving it again undoes it.

@@ -1,0 +1,64 @@
+{# The site's theme, on the home page and the docs: light or dark as the
+   system is, unless the visitor chose one with the theme button of the
+   top bar, which goes from the system's to light, to dark and back, and
+   which the browser keeps. It runs in the page's head, before the page
+   draws, so a chosen theme never flashes the other: it sets data-theme on
+   the root, which styles.css and docs.css read, and gives the browser's bar
+   (theme-color) the theme's colour. Include it after the theme-color
+   metas. #}
+<script>
+    (() => {
+      const d = document;
+      const root = d.documentElement;
+      const KEY = "mixmusic:theme";
+      const ORDER = ["system", "light", "dark"];
+      const NAMES = { system: "as the system", light: "light", dark: "dark" };
+      const NEXT = { system: "the system's theme", light: "light", dark: "dark" };
+      // Each theme-color meta keeps its own colour for its scheme.
+      const bars = [...d.querySelectorAll('meta[name="theme-color"]')].map((m) => ({ meta: m, own: m.content, scheme: /light/.test(m.media) ? "light" : "dark" }));
+      const colour = (scheme) => bars.find((b) => b.scheme === scheme)?.own;
+      const read = () => {
+        // Storage can be missing or refused, as in a private window: then
+        // the theme is the system's.
+        try {
+          const t = localStorage.getItem(KEY);
+          return t === "light" || t === "dark" ? t : "system";
+        } catch {
+          return "system";
+        }
+      };
+      let theme = read();
+      const apply = () => {
+        if (theme === "system") delete root.dataset.theme;
+        else root.dataset.theme = theme;
+        bars.forEach((b) => (b.meta.content = theme === "system" ? b.own : colour(theme)));
+        const next = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
+        d.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+          const label = `Theme: ${NAMES[theme]}. Switch to ${NEXT[next]}`;
+          button.setAttribute("aria-label", label);
+          button.title = label;
+          button.querySelector("use")?.setAttribute("href", `#i-theme-${theme}`);
+        });
+      };
+      apply();
+      d.addEventListener("DOMContentLoaded", () => {
+        apply();
+        d.querySelectorAll("[data-theme-toggle]").forEach((button) =>
+          button.addEventListener("click", () => {
+            theme = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
+            try {
+              if (theme === "system") localStorage.removeItem(KEY);
+              else localStorage.setItem(KEY, theme);
+            } catch {}
+            apply();
+          }),
+        );
+      });
+      // A choice made in another tab of the site.
+      addEventListener("storage", (e) => {
+        if (e.key !== KEY && e.key !== null) return;
+        theme = read();
+        apply();
+      });
+    })();
+  </script>

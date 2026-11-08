@@ -1,0 +1,108 @@
+# The questions the home page answers in its FAQ, in their order, and the
+# FAQPage structured data it gives search engines (templates/index.html).
+# Each answer is Markdown, short, says only what the docs say, and links
+# the doc that tells more, as @/docs/<name>/index.md.
+
+[[questions]]
+question = "Is MixMusic free?"
+answer = '''
+Yes, for any purpose. MixMusic is free and open source, under the MIT
+license or the GNU GPL, version 3, whichever you choose.
+[License](@/docs/license/index.md) tells what each allows, and what else
+MixMusic includes.
+'''
+
+[[questions]]
+question = "Do I need an account?"
+answer = '''
+No. YouTube Music's search, home, Explore, artists, albums, playlists,
+podcasts and radios play with no account, and your liked songs, mixes and
+history stay on your computer. Sign in to YouTube Music for your own
+library and recommendations: [Accounts](@/docs/accounts/index.md) tells
+how.
+'''
+
+[[questions]]
+question = "Do I need Spotify Premium?"
+answer = '''
+Only for Spotify. Spotify lets an app serve up to five accounts, and only
+while its owner has Premium, so you sign in with a Spotify app of your
+own, made with an account that has Premium. Spotify tracks then play in
+MixMusic itself, on Windows and macOS, or on Spotify Connect, both with
+Premium, or from their recording on YouTube Music, which needs no
+Premium.
+[Spotify](@/docs/spotify/index.md) walks through it.
+'''
+
+[[questions]]
+question = "What does MixMusic collect?"
+answer = '''
+Nothing for itself: MixMusic has no account, server, analytics or
+telemetry of its own. It talks to the services you use: YouTube Music,
+Spotify and Last.fm, Unison and LRCLIB for the lyrics of the track that
+plays, and GitHub for updates, yt-dlp and the marketplace. Your library,
+history and searches stay on your computer.
+[Your data and privacy](@/docs/data-and-privacy/index.md#what-each-feature-sends-where)
+lists what each feature sends, and where.
+'''
+
+[[questions]]
+question = "Where does MixMusic keep my data?"
+answer = '''
+In a data folder on your computer, which Settings › About names:
+`%AppData%\MixMusic` on Windows, `~/Library/Application Support/MixMusic`
+on macOS and `~/.config/MixMusic` on Linux. Your sign-ins stay in your
+system's credential store.
+[Your data and privacy](@/docs/data-and-privacy/index.md#where-mixmusic-keeps-its-data)
+tells what each file holds, and how to move or clear it.
+'''
+
+[[questions]]
+question = "How does MixMusic update?"
+answer = '''
+The installers, the portable zip, the macOS app and the Linux archive
+update themselves: MixMusic looks for a new version when it starts and
+every 6 hours, and asks before it installs one, unless you turn on
+Install updates without asking in Settings › About. Each update is
+signed, and one whose signature doesn't match is never installed. The
+`.deb`, the `.rpm`, the AppImage and the Flatpak can't replace their own
+files, so MixMusic tells you of a new version and downloads its file for
+you. [How MixMusic works](@/docs/how-it-works/index.md#mixmusic-itself)
+tells more.
+'''
+
+[[questions]]
+question = "Which Linux packages are there?"
+answer = '''
+A `.deb` for Debian, Ubuntu and their derivatives, an `.rpm` for Fedora
+and openSUSE, and for any Linux an AppImage, a Flatpak and a `.tar.gz`
+archive whose `install.sh` installs MixMusic in your home folder, each
+for x64 and Arm64. The `.deb` and the `.rpm` install what MixMusic needs,
+and the Flatpak brings it along.
+[Getting started](@/docs/getting-started/index.md#install) tells what
+the others need.
+'''
+
+[[questions]]
+question = "Why do macOS and Windows warn me the first time?"
+answer = '''
+The macOS app isn't notarized by Apple yet, and the Windows installer
+isn't signed yet. On macOS, open it once from System Settings › Privacy &
+Security › Open Anyway; on Windows, if SmartScreen warns, choose More
+info, then Run anyway. MixMusic's code is open on GitHub, and each
+release lists `SHA256SUMS` to check the downloads with.
+[Getting started](@/docs/getting-started/index.md#the-first-launch) has
+the rest.
+'''
+
+[[questions]]
+question = "How do I report a problem?"
+answer = '''
+In MixMusic, Settings › About › Report a problem opens a new issue on
+GitHub in your browser, with your version, system, tools, theme and
+plugins filled in; nothing goes until you send it. Open logs folder,
+beside it, shows the log to attach, once you've read it. Or open an
+[issue](https://github.com/fzn0x/mixmusic/issues) yourself.
+[Troubleshooting](@/docs/troubleshooting/index.md) covers the common
+problems first.
+'''

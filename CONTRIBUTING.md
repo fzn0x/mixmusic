@@ -255,7 +255,7 @@ without a warning, and that `brew install`, `brew upgrade` and
 `brew uninstall` work, and on Arch that `yay -S mixmusic-bin` installs a
 MixMusic whose Settings › About says "AUR package". Then take "(coming soon)" out of the README's AUR row. Then take "not notarized yet" and "not signed yet"
 out of the README's first launch, docs/troubleshooting.md and the
-website, and "once its tap is up" out of the README's Homebrew line. The
+website, its FAQ in site/data/faq.toml too, and "once its tap is up" out of the README's Homebrew line. The
 release notes and the cask's caveats leave them out by themselves.
 
 ## The website

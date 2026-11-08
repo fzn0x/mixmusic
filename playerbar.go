@@ -301,7 +301,7 @@ func (s *shell) progress(c *ui.Context) {
 	ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
 		ui.Text(c, clock(time.Duration(s.seekTo*float64(time.Second)))).FontSize(k.captionSize()).TextColor(k.muted).
 			FontFeatures("tnum").Width(44).TextAlign(ui.End)
-		seek := ui.Slider(c.Key("seek"), &s.seekTo, 0, max(dur.Seconds(), 1)).Grow(1).MinWidth(0).KeepFocus().
+		seek := s.seekSlider(c, &s.seekTo, max(dur.Seconds(), 1)).Grow(1).MinWidth(0).KeepFocus().
 			Label("Seek").Disabled(!ok || s.st.Loading)
 		_, _, held := seek.Dragged()
 		if ok && !held && (s.seeking || seek.Changed()) {

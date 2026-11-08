@@ -21,8 +21,9 @@ import (
 )
 
 // version is the version of the index file: one of another is read again
-// from the files.
-const version = 1
+// from the files. 2 reads the lengths of VBR MP3s from their frame counts
+// (#370), which the files indexed before held wrong.
+const version = 2
 
 // Entry is a file of the index: where it is, its size and time of change,
 // which tell a scan whether it changed, and what its tags tell.

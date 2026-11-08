@@ -29,8 +29,10 @@
   codecs, and a 24/7 live stream, as the app finds them on YouTube,
   against ffmpeg's decode. `Probe` tells whether a deck plays a file, and
   how long, reading little of it, for the index of the music on this
-  computer; with ffmpeg on the PATH, the tests play a file of each kind
-  it makes against its decode.
+  computer: of an MP3, the frames its Xing, Info or VBRI header counts,
+  less its LAME tag's delay and padding, else its first frame's bitrate
+  and its size. With ffmpeg on the PATH, the tests play a file of each
+  kind it makes against its decode.
   `internal/audio/output` plays it on the system's output, without cgo:
   through WASAPI on Windows, an Audio Queue on macOS, and PulseAudio,
   which PipeWire serves too, or ALSA on Linux. On Windows it also hears

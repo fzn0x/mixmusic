@@ -81,16 +81,32 @@ func openMP3(src io.ReadSeeker) (track, timing, error) {
 	return newPCMTrack(c, rate, 2, tm)
 }
 
-// mp3Gap reads the Xing or Info tag of an MP3 file's first frame, and the
-// LAME tag after it: it returns the frame the audio starts at, as go-mp3
-// decodes the file, past the tag's frame, the encoder's delay and the
-// decoder's, and the frame it ends at, before the encoder's padding. It
-// returns zeros for a file without them.
-func mp3Gap(src io.ReadSeeker) (start, end int64) {
+// mp3Header is what the first frame of an MP3 file tells of the audio
+// after it, in the Xing or Info header LAME and ffmpeg write, or in the
+// VBRI header of Fraunhofer's encoders, as files of a variable bitrate
+// have.
+type mp3Header struct {
+	// frames is how many frames of audio follow the header's, -1 when it
+	// doesn't tell, and frame how many samples each holds.
+	frames, frame int64
+	// lame is set when a LAME tag after a Xing or Info header tells the
+	// encoder's delay and padding.
+	lame           bool
+	delay, padding int64
+}
+
+// mp3FrameMin is the fewest bytes a frame of Layer III takes: one of
+// MPEG-2 at 8 kbit/s and 24 kHz.
+const mp3FrameMin = 24
+
+// readMP3Header reads the header of an MP3 file's first frame, past its
+// ID3v2 tag: its frames are -1 for a file without one, or whose header
+// counts more frames than the file could hold, as one broken.
+func readMP3Header(src io.ReadSeeker) mp3Header {
 	var h [10]byte
 	at := int64(0)
 	if _, err := readAt(src, 0, h[:]); err != nil {
-		return 0, 0
+		return mp3Header{frames: -1}
 	}
 	if string(h[:3]) == "ID3" && h[6]|h[7]|h[8]|h[9] < 0x80 {
 		at = 10 + (int64(h[6])<<21 | int64(h[7])<<14 | int64(h[8])<<7 | int64(h[9]))
@@ -100,9 +116,19 @@ func mp3Gap(src io.ReadSeeker) (start, end int64) {
 	}
 	var b [512]byte
 	n, _ := readAt(src, at, b[:])
-	f := b[:n]
+	m := firstFrameHeader(b[:n])
+	if size, err := src.Seek(0, io.SeekEnd); err != nil || m.frames*mp3FrameMin > size-at {
+		m.frames, m.lame = -1, false
+	}
+	return m
+}
+
+// firstFrameHeader reads the header of f, the start of an MP3 file's
+// first frame.
+func firstFrameHeader(f []byte) mp3Header {
+	none := mp3Header{frames: -1}
 	if len(f) < 4 || !mpegFrame(f) {
-		return 0, 0
+		return none
 	}
 	mpeg1, mono := f[1]>>3&3 == 3, f[3]>>6 == 3
 	side, frame := 17, int64(1152) // the side information's bytes, and a frame's samples
@@ -114,38 +140,78 @@ func mp3Gap(src io.ReadSeeker) (start, end int64) {
 	case !mpeg1:
 		frame = 576
 	}
-	x := 4 + side
-	if len(f) < x+8 || string(f[x:x+4]) != "Xing" && string(f[x:x+4]) != "Info" {
-		return 0, 0
+	none.frame = frame
+	if x := f[min(4+side, len(f)):]; len(x) >= 8 && (string(x[:4]) == "Xing" || string(x[:4]) == "Info") {
+		return xingHeader(x, frame)
 	}
-	flags := binary.BigEndian.Uint32(f[x+4:])
-	x += 8
-	frames := int64(-1)
-	if flags&1 != 0 {
-		if len(f) < x+4 {
-			return 0, 0
-		}
-		frames = int64(binary.BigEndian.Uint32(f[x:]))
-		x += 4
+	// A VBRI header is 32 bytes after the frame's header, whatever the
+	// side information's size: "VBRI", its version, 1, the encoder's delay,
+	// the quality and the file's bytes, then the frames.
+	v := f[min(4+32, len(f)):]
+	if len(v) < 18 || string(v[:4]) != "VBRI" || binary.BigEndian.Uint16(v[4:]) != 1 {
+		return none
 	}
+	return mp3Header{frames: int64(binary.BigEndian.Uint32(v[14:])), frame: frame}
+}
+
+// xingHeader reads a Xing or Info header, x on, of a file whose frames are
+// of frame samples, and the LAME tag after it.
+func xingHeader(x []byte, frame int64) mp3Header {
+	flags := binary.BigEndian.Uint32(x[4:])
+	x = x[8:]
+	if flags&1 == 0 || len(x) < 4 {
+		return mp3Header{frames: -1, frame: frame}
+	}
+	h := mp3Header{frames: int64(binary.BigEndian.Uint32(x)), frame: frame}
+	x = x[4:]
 	for _, field := range []struct {
 		flag uint32
 		size int
 	}{{2, 4}, {4, 100}, {8, 4}} {
 		if flags&field.flag != 0 {
-			x += field.size
+			x = x[min(field.size, len(x)):]
 		}
 	}
 	// The LAME tag: its encoder's name, then 12 bytes, then the delay and
 	// the padding, 12 bits each. ffmpeg writes one too, as "Lavc".
-	if frames < 0 || len(f) < x+24 || string(f[x:x+4]) != "LAME" && string(f[x:x+4]) != "Lavc" && string(f[x:x+4]) != "Lavf" {
+	if len(x) < 24 || string(x[:4]) != "LAME" && string(x[:4]) != "Lavc" && string(x[:4]) != "Lavf" {
+		return h
+	}
+	g := x[21:]
+	h.lame = true
+	h.delay, h.padding = int64(g[0])<<4|int64(g[1])>>4, int64(g[1]&15)<<8|int64(g[2])
+	return h
+}
+
+// mp3Gap reads the Xing or Info tag of an MP3 file's first frame, and the
+// LAME tag after it: it returns the frame the audio starts at, as go-mp3
+// decodes the file, past the tag's frame, the encoder's delay and the
+// decoder's, and the frame it ends at, before the encoder's padding. It
+// returns zeros for a file without them.
+func mp3Gap(src io.ReadSeeker) (start, end int64) { return readMP3Header(src).gap() }
+
+// gap is mp3Gap of the file whose header h is.
+func (h mp3Header) gap() (start, end int64) {
+	if !h.lame || h.frames < 0 {
 		return 0, 0
 	}
-	g := f[x+21:]
-	delay, padding := int64(g[0])<<4|int64(g[1])>>4, int64(g[1]&15)<<8|int64(g[2])
-	start = frame + delay + mp3DecoderDelay
-	end = start + frames*frame - delay - padding
+	start = h.frame + h.delay + mp3DecoderDelay
+	end = start + h.frames*h.frame - h.delay - h.padding
 	return start, end
+}
+
+// length is how long the audio of the file whose header h is plays, at
+// rate, and whether the header tells: of its LAME tag, without the
+// encoder's delay and padding, else of its frames.
+func (h mp3Header) length(rate int) (time.Duration, bool) {
+	n := h.frames * h.frame
+	if start, end := h.gap(); end > start {
+		n = end - start
+	}
+	if n <= 0 {
+		return 0, false
+	}
+	return time.Duration(n) * time.Second / time.Duration(rate), true
 }
 
 // guard runs fn, which runs a decoder MixMusic didn't write: a panic of

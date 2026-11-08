@@ -68,7 +68,7 @@ of case and accents, and shows even without the network.
 
 | Kind | Files | Notes |
 |---|---|---|
-| MP3 | `.mp3` | MPEG-1, 2 and 2.5 Layer III; without the silence LAME's tag tells of at their start and end, so that an album's tracks follow each other without gaps |
+| MP3 | `.mp3` | MPEG-1, 2 and 2.5 Layer III; without the silence LAME's tag tells of at their start and end, so that an album's tracks follow each other without gaps; of a variable bitrate, as long as its Xing or VBRI header tells |
 | FLAC | `.flac` | up to 8 channels and 32 bits |
 | WAV | `.wav` | PCM of 8 to 32 bits, or floats of 32 or 64 |
 | AAC | `.m4a`, `.mp4` | AAC-LC; HE-AAC and Apple Lossless (ALAC) aren't played |

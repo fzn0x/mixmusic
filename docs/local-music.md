@@ -14,8 +14,9 @@ Settings › Playback › Music on this computer, or the add a folder button of
 Library › On this computer, opens your system's folder picker. MixMusic
 reads the folder and the folders in it, and keeps what it finds:
 
-- **Folders** lists each folder with how many tracks it holds, and how
-  many files it skipped: files of kinds it can't play, or broken.
+- **Folders** lists each folder with how many tracks it holds, how many
+  files it skipped, files of kinds it can't play or broken, and how many
+  folders in it can't be read, as one MixMusic isn't allowed to read.
 - **Remove** takes a folder out of the library. Its files stay where they
   are, and its tracks stay in your mixes, greyed.
 - **Rescan** reads the folders again now. MixMusic also reads them as it
@@ -98,8 +99,11 @@ plugged in shows greyed, with File not found in place of its artists.
 Playing it moves on to the next track, with a short notice.
 
 - **A rescan** drops the files that are gone from the library. Those of a
-  folder that can't be read at all, as on a drive unplugged, stay, greyed,
-  until it's back.
+  folder that can't be read stay until a scan reads it again: those of a
+  folder of music on a drive unplugged, even partway through the scan,
+  greyed until it's back, and those of a folder in it that can't be
+  read, as one MixMusic isn't allowed to read, as they were, greyed only
+  if their own files can't be reached.
 - **Your mixes and liked songs** keep the track, greyed, and it plays
   again once its file is back where it was.
 

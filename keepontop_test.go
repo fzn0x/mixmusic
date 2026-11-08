@@ -149,3 +149,43 @@ func TestKeepOnTopCommand(t *testing.T) {
 		t.Errorf("the window was told %v", got)
 	}
 }
+
+// TestKeepOnTopMenu has macOS's Window menu keep the window's items and
+// list the windows, with Keep on Top, a checkbox that keeps the main
+// window on top and is checked as the setting changes elsewhere.
+func TestKeepOnTopMenu(t *testing.T) {
+	told := keptAbove(t)
+	s := newTestShell(t)
+	s.main = true
+	tt := tester(t, s)
+	menu := s.windowMenu()
+	if menu.Role != mygo.RoleWindowMenu {
+		t.Errorf("the menu's role is %q, which lists no windows", menu.Role)
+	}
+	var roles []mygo.MenuRole
+	for _, it := range menu.Submenu {
+		roles = append(roles, it.Role)
+	}
+	if want := []mygo.MenuRole{mygo.RoleMinimize, mygo.RoleZoom, "", "", "", mygo.RoleFront}; !slices.Equal(roles, want) {
+		t.Errorf("the Window menu's roles are %q, want %q", roles, want)
+	}
+	item := menu.Submenu[3]
+	if item != s.onTop.item || item.Label != "Keep on Top" || item.Type != mygo.MenuItemCheckbox || item.Checked {
+		t.Fatalf("the item is %+v", *item)
+	}
+	// MyGo checks it before it calls Click.
+	item.Checked = true
+	item.Click(item, nil)
+	s.drain()
+	tt.Frame()
+	if !s.svc.Preferences.Get().KeepOnTop || !slices.Equal(told(), []bool{true}) {
+		t.Errorf("the item saved keepOnTop %v, told the window %v", s.svc.Preferences.Get().KeepOnTop, told())
+	}
+	// Turned off elsewhere, it's no longer checked.
+	s.set.KeepOnTop = false
+	s.save()
+	tt.Frame()
+	if item.Checked || !slices.Equal(told(), []bool{true, false}) {
+		t.Errorf("turned off in the settings: checked %v, told the window %v", item.Checked, told())
+	}
+}

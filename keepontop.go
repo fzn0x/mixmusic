@@ -6,9 +6,9 @@ import (
 )
 
 // Keep on top keeps the main window above the other windows, while the
-// settings say so (#350): from Settings › Desktop, the command palette or
-// settings.json. The mini player stays on top whatever they say, as its
-// window's options have it.
+// settings say so (#350): from Settings › Desktop, the command palette,
+// macOS's Window menu or settings.json. The mini player stays on top
+// whatever they say, as its window's options have it.
 
 func init() { addSettings(desktopRows, 15, (*shell).keepOnTopRow) }
 
@@ -28,9 +28,11 @@ func (s *shell) keepOnTopRow(c *ui.Context) {
 	}, "always on top float pin above other windows")
 }
 
-// onTop is what the main window was last told of staying on top.
+// onTop is what the main window was last told of staying on top, and
+// macOS's Window › Keep on Top, which shows it.
 type onTop struct {
 	kept bool
+	item *mygo.MenuItem
 }
 
 // keepAbove keeps a window above the other windows, or lets them cover it
@@ -51,13 +53,17 @@ func (s *shell) startOnTop() bool {
 }
 
 // followOnTop keeps the main window on top, or lets it go, once the
-// setting changed, wherever it changed.
+// setting changed, wherever it changed, and checks the Window menu's item
+// with it.
 func (s *shell) followOnTop() {
 	want := s.set.KeepOnTop
 	if !s.main || want == s.onTop.kept || !keepAbove(s.win, want) {
 		return
 	}
 	s.onTop.kept = want
+	if s.onTop.item != nil {
+		s.onTop.item.SetChecked(want)
+	}
 }
 
 // toggleOnTop keeps the main window on top, or stops, from the command
@@ -70,4 +76,28 @@ func (s *shell) toggleOnTop() {
 		msg = "MixMusic no longer stays on top"
 	}
 	s.notes = append(s.notes, notice(msg))
+}
+
+// windowMenu is macOS's Window menu: the system's, which lists the windows
+// too, with Keep on Top, a checkbox. MyGo builds a menu as it opens, so
+// the item's label is known before, and its check follows the setting
+// (followOnTop).
+func (s *shell) windowMenu() *mygo.MenuItem {
+	s.onTop.item = &mygo.MenuItem{Label: "Keep on Top", Type: mygo.MenuItemCheckbox, Checked: s.set.KeepOnTop,
+		// MyGo checks it, or not, before it calls Click.
+		Click: func(item *mygo.MenuItem, _ *mygo.Window) {
+			on := item.IsChecked()
+			s.update(func() {
+				s.set.KeepOnTop = on
+				s.save()
+			})
+		}}
+	return &mygo.MenuItem{Role: mygo.RoleWindowMenu, Submenu: []*mygo.MenuItem{
+		{Role: mygo.RoleMinimize},
+		{Role: mygo.RoleZoom},
+		mygo.Separator(),
+		s.onTop.item,
+		mygo.Separator(),
+		{Role: mygo.RoleFront},
+	}}
 }

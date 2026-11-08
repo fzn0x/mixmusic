@@ -369,23 +369,24 @@ func (c *Client) Home(ctx context.Context, userID string) ([]media.Shelf, error)
 	}
 
 	shelves := []media.Shelf{}
-	add := func(title string, items []media.Item) {
+	// Each shelf's key names its kind, which Home keeps it by.
+	add := func(key, title string, items []media.Item) {
 		if len(items) > 0 {
-			shelves = append(shelves, media.Shelf{Title: title, Source: media.SourceSpotify, Items: items})
+			shelves = append(shelves, media.Shelf{Title: title, Source: media.SourceSpotify, Items: items, Key: key})
 		}
 	}
-	add("Recently played on Spotify", trackItems(recent))
-	add("Your top tracks", trackItems(top))
+	add("recent", "Recently played on Spotify", trackItems(recent))
+	add("top", "Your top tracks", trackItems(top))
 	var items []media.Item
 	for i := range playlists {
 		items = append(items, media.Item{Kind: media.ItemPlaylist, Playlist: &playlists[i]})
 	}
-	add("Your Spotify playlists", items)
+	add("playlists", "Your Spotify playlists", items)
 	items = nil
 	for i := range albums {
 		items = append(items, media.Item{Kind: media.ItemAlbum, Album: &albums[i]})
 	}
-	add("Saved albums", items)
+	add("albums", "Saved albums", items)
 	return shelves, nil
 }
 

@@ -48,6 +48,7 @@
     ],
     "preamp": 0
   },
+  "volumeCurve": "natural",
   "volume": 0.8,
   "cacheSizeMb": 1024,
   "lyricsTranslateTo": "",

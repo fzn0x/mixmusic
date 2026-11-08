@@ -57,6 +57,7 @@
     ],
     "preamp": -3
   },
+  "volumeCurve": "linear",
   "volume": 0.5,
   "cacheSizeMb": 4096,
   "lyricsTranslateTo": "ja",

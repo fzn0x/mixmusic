@@ -25,6 +25,10 @@
   "normalize": false,
   "loudness": true,
   "surround": false,
+  "outputDevice": {
+    "id": "",
+    "name": ""
+  },
   "autoplay": true,
   "songSpeed": 1,
   "podcastSpeed": 1,

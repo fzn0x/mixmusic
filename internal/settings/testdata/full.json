@@ -34,6 +34,10 @@
   "normalize": true,
   "loudness": false,
   "surround": true,
+  "outputDevice": {
+    "id": "{0.0.0.00000000}.{ec3a06c1-26c5-4159-8114-bc167b0bad07}",
+    "name": "Headphones (USB DAC)"
+  },
   "autoplay": false,
   "songSpeed": 1.25,
   "podcastSpeed": 1.5,

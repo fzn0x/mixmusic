@@ -7,12 +7,16 @@ package output
 // while the device holds enough: the stream's goroutine renders a period,
 // writes it, and goes on. PulseAudio and PipeWire move the stream to the
 // default device when it changes. A stream of 5.1 is one where PulseAudio's
-// default sink has a center, an LFE and surrounds, as its introspection
-// tells; ALSA's stays stereo.
+// sink has a center, an LFE and surrounds, as its introspection tells;
+// ALSA's stays stereo. A stream that asks for a device plays on that sink,
+// or that ALSA device, and checks every second, beside its goroutine, that
+// the device is there: when it went away, the stream plays on the default
+// device, and goes back to the device once it's there again.
 
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -45,16 +49,15 @@ var (
 	paContextDisconnect        func(c uintptr)
 	paContextUnref             func(c uintptr)
 	paContextGetSinkInfoByName func(c uintptr, name *byte, cb uintptr, userdata uintptr) uintptr
+	paContextGetSinkInfoList   func(c uintptr, cb uintptr, userdata uintptr) uintptr
 	paOperationGetState        func(op uintptr) int32
 	paOperationUnref           func(op uintptr)
 	// sinkCallback is the pa_sink_info_cb_t of the queries, made once, as
-	// callbacks are limited; it keeps what it hears in sinkHeard.
+	// callbacks are limited; it keeps the sinks it hears of in sinkHeard,
+	// which sinkMu guards with the queries.
 	sinkCallback uintptr
 	sinkMu       sync.Mutex
-	sinkHeard    struct {
-		found     bool
-		positions []int32
-	}
+	sinkHeard    []pulseSink
 
 	alsaOnce sync.Once
 	alsaErr  error
@@ -111,14 +114,12 @@ const (
 	sndPcmFormatFloatLE       = 14
 	sndPcmAccessRWInterleaved = 3
 
-	// sinkTimeout bounds the query of the default sink's channels.
+	// sinkTimeout bounds a query of PulseAudio's sinks.
 	sinkTimeout = time.Second
+	// defaultSink is the name PulseAudio's queries take for the default
+	// sink.
+	defaultSink = "@DEFAULT_SINK@"
 )
-
-func cstr(s string) *byte {
-	b := append([]byte(s), 0)
-	return &b[0]
-}
 
 func loadPulse() error {
 	pulseOnce.Do(func() {
@@ -137,8 +138,8 @@ func loadPulse() error {
 	return pulseErr
 }
 
-// loadIntrospect loads what of PulseAudio's library tells the default
-// sink's channels.
+// loadIntrospect loads what of PulseAudio's library tells its sinks: their
+// names and channels.
 func loadIntrospect() error {
 	introspectOnce.Do(func() {
 		lib, err := purego.Dlopen("libpulse.so.0", purego.RTLD_NOW|purego.RTLD_GLOBAL)
@@ -156,24 +157,46 @@ func loadIntrospect() error {
 		purego.RegisterLibFunc(&paContextDisconnect, lib, "pa_context_disconnect")
 		purego.RegisterLibFunc(&paContextUnref, lib, "pa_context_unref")
 		purego.RegisterLibFunc(&paContextGetSinkInfoByName, lib, "pa_context_get_sink_info_by_name")
+		purego.RegisterLibFunc(&paContextGetSinkInfoList, lib, "pa_context_get_sink_info_list")
 		purego.RegisterLibFunc(&paOperationGetState, lib, "pa_operation_get_state")
 		purego.RegisterLibFunc(&paOperationUnref, lib, "pa_operation_unref")
 		sinkCallback = purego.NewCallback(func(c uintptr, info *paSinkInfo, eol int32, user uintptr) {
-			if eol != 0 || info == nil || sinkHeard.found {
+			if eol != 0 || info == nil {
 				return
 			}
-			n := min(int(info.channelMap.channels), len(info.channelMap.position))
-			sinkHeard.found = true
-			sinkHeard.positions = append([]int32(nil), info.channelMap.position[:n]...)
+			sinkHeard = append(sinkHeard, sinkOf(info))
 		})
 	})
 	return introspectErr
 }
 
-// defaultSinkPositions asks PulseAudio for the channel map of its default
-// sink, as PipeWire's PulseAudio server answers too. It reports false when
-// none answers within sinkTimeout.
-func defaultSinkPositions() ([]int32, bool) {
+// sinkOf returns what a pa_sink_info tells of its sink.
+func sinkOf(info *paSinkInfo) pulseSink {
+	n := min(int(info.channelMap.channels), len(info.channelMap.position))
+	return pulseSink{
+		name:        cString(info.name),
+		description: cString(info.description),
+		positions:   append([]int32(nil), info.channelMap.position[:n]...),
+	}
+}
+
+// cString returns the string of C at p, which ends at its first 0.
+func cString(p *byte) string {
+	if p == nil {
+		return ""
+	}
+	n := 0
+	for *(*byte)(unsafe.Add(unsafe.Pointer(p), n)) != 0 {
+		n++
+	}
+	return string(unsafe.Slice(p, n))
+}
+
+// pulseQuery asks PulseAudio, as PipeWire's PulseAudio server answers too,
+// for the sinks of the query that start begins on a context, and returns
+// those it heard of. It reports false when no server answered within
+// sinkTimeout.
+func pulseQuery(start func(c uintptr) uintptr) ([]pulseSink, bool) {
 	if loadIntrospect() != nil {
 		return nil, false
 	}
@@ -213,8 +236,8 @@ func defaultSinkPositions() ([]int32, bool) {
 	if !iterate(settled) || paContextGetState(c) != paContextReady {
 		return nil, false
 	}
-	sinkHeard.found, sinkHeard.positions = false, nil
-	op := paContextGetSinkInfoByName(c, cstr("@DEFAULT_SINK@"), sinkCallback, 0)
+	sinkHeard = nil
+	op := start(c)
 	if op == 0 {
 		return nil, false
 	}
@@ -222,7 +245,22 @@ func defaultSinkPositions() ([]int32, bool) {
 	if !iterate(func() bool { return paOperationGetState(op) != paOperationRunning }) {
 		return nil, false
 	}
-	return sinkHeard.positions, sinkHeard.found
+	return sinkHeard, true
+}
+
+// pulseSinks returns PulseAudio's sinks, false when no server answers.
+func pulseSinks() ([]pulseSink, bool) {
+	return pulseQuery(func(c uintptr) uintptr { return paContextGetSinkInfoList(c, sinkCallback, 0) })
+}
+
+// sinkNamed returns PulseAudio's sink of the name, defaultSink for the
+// default one, false when there is none or no server answers.
+func sinkNamed(name string) (pulseSink, bool) {
+	sinks, ok := pulseQuery(func(c uintptr) uintptr { return paContextGetSinkInfoByName(c, cstr(name), sinkCallback, 0) })
+	if !ok || len(sinks) == 0 {
+		return pulseSink{}, false
+	}
+	return sinks[0], true
 }
 
 func loadALSA() error {
@@ -240,6 +278,7 @@ func loadALSA() error {
 		purego.RegisterLibFunc(&sndPcmDrop, lib, "snd_pcm_drop")
 		purego.RegisterLibFunc(&sndPcmClose, lib, "snd_pcm_close")
 		purego.RegisterLibFunc(&sndStrerror, lib, "snd_strerror")
+		registerHints(lib)
 	})
 	return alsaErr
 }
@@ -258,6 +297,48 @@ func Available() error {
 	return fmt.Errorf("%w: %w", ErrUnsupported, errors.Join(perr, aerr))
 }
 
+// Devices returns PulseAudio's sinks, sorted by name, the default one
+// marked, or, where no PulseAudio server answers, ALSA's output devices.
+func Devices() ([]Device, error) {
+	if err := Available(); err != nil {
+		return nil, err
+	}
+	if sinks, ok := pulseSinks(); ok {
+		def, _ := sinkNamed(defaultSink)
+		return pulseDevices(sinks, def.name), nil
+	}
+	if loadALSA() == nil {
+		return alsaDevices(alsaHints()), nil
+	}
+	return nil, ErrNoDevice
+}
+
+// present reports whether the device of the ID id is there, as Devices
+// would list it, and false for ok when the system doesn't tell.
+func present(id string) (here, ok bool) {
+	if name, isALSA := strings.CutPrefix(id, alsaPrefix); isALSA {
+		if loadALSA() != nil {
+			return false, false
+		}
+		for _, h := range alsaHints() {
+			if h.name == name {
+				return true, true
+			}
+		}
+		return false, true
+	}
+	sinks, ok := pulseSinks()
+	if !ok {
+		return false, false
+	}
+	for _, s := range sinks {
+		if s.name == id {
+			return true, true
+		}
+	}
+	return false, true
+}
+
 // device is PulseAudio's stream or ALSA's.
 type device interface {
 	// channels returns the channels of its frames: 2, or Surround.
@@ -271,26 +352,61 @@ type device interface {
 	close()
 }
 
-func openDevice(channels int) (device, error) {
+// openDevice opens the device a stream that asks for the device want plays
+// on: want, while it's there and the stream may try it, else the default
+// device, and reports whether that is in want's place. When want is there
+// but fails to open, the default device plays, and a keeps the stream from
+// trying want for a while.
+func openDevice(want string, a *avoid, channels int) (device, bool, error) {
 	if err := Available(); err != nil {
-		return nil, err
+		return nil, false, err
+	}
+	if want != "" && a.may(time.Now()) {
+		if d, ok := openWanted(want, channels); ok {
+			return d, false, nil
+		}
+		if here, _ := present(want); here {
+			a.failed(time.Now())
+		}
 	}
 	var perr, aerr error
 	if loadPulse() == nil {
-		d, err := openPulse(channels)
+		d, err := openPulse("", channels)
 		if err == nil {
-			return d, nil
+			return d, want != "", nil
 		}
 		perr = err
 	}
 	if loadALSA() == nil {
-		d, err := openALSA()
+		d, err := openALSA("default")
 		if err == nil {
-			return d, nil
+			return d, want != "", nil
 		}
 		aerr = err
 	}
-	return nil, fmt.Errorf("%w: %w", ErrNoDevice, errors.Join(perr, aerr))
+	return nil, false, fmt.Errorf("%w: %w", ErrNoDevice, errors.Join(perr, aerr))
+}
+
+// openWanted opens the device of the ID want, false when it isn't there or
+// can't open.
+func openWanted(want string, channels int) (device, bool) {
+	if name, isALSA := strings.CutPrefix(want, alsaPrefix); isALSA {
+		if loadALSA() != nil {
+			return nil, false
+		}
+		d, err := openALSA(name)
+		return d, err == nil
+	}
+	if loadPulse() != nil {
+		return nil, false
+	}
+	// A sound server may put a stream asked for a sink that isn't there on
+	// another: only a sink that is there is asked for.
+	if here, _ := present(want); !here {
+		return nil, false
+	}
+	d, err := openPulse(want, channels)
+	return d, err == nil
 }
 
 type pulseDevice struct {
@@ -298,14 +414,19 @@ type pulseDevice struct {
 	ch int
 }
 
-// openPulse opens a stream of channels, of Surround where the default sink
-// has 5.1 or more, else stereo.
-func openPulse(channels int) (*pulseDevice, error) {
+// openPulse opens a stream of channels on the sink of the name, the
+// default sink for "": of Surround where the sink has 5.1 or more, else
+// stereo.
+func openPulse(sink string, channels int) (*pulseDevice, error) {
 	ch := 2
 	var chmap unsafe.Pointer
 	if channels == Surround {
-		if positions, ok := defaultSinkPositions(); ok {
-			if m, ok := pulseSurroundMap(positions); ok {
+		name := sink
+		if name == "" {
+			name = defaultSink
+		}
+		if s, ok := sinkNamed(name); ok {
+			if m, ok := pulseSurroundMap(s.positions); ok {
 				cm := &paChannelMap{channels: Surround}
 				copy(cm.position[:], m[:])
 				ch, chmap = Surround, unsafe.Pointer(cm)
@@ -322,11 +443,15 @@ func openPulse(channels int) (*pulseDevice, error) {
 		minReq:    periodFrames * frameBytes,
 		fragSize:  ^uint32(0),
 	}
+	var dev *byte
+	if sink != "" {
+		dev = cstr(sink)
+	}
 	var code int32
-	s := paSimpleNew(nil, cstr("MixMusic"), paStreamPlayback, nil, cstr("Music"), &spec, chmap, unsafe.Pointer(&attr), &code)
+	s := paSimpleNew(nil, cstr("MixMusic"), paStreamPlayback, dev, cstr("Music"), &spec, chmap, unsafe.Pointer(&attr), &code)
 	if s == 0 {
 		if ch == Surround {
-			return openPulse(2)
+			return openPulse(sink, 2)
 		}
 		return nil, fmt.Errorf("output: PulseAudio: %s", paStrerror(code))
 	}
@@ -360,9 +485,10 @@ func (d *pulseDevice) close() {
 
 type alsaDevice struct{ pcm uintptr }
 
-func openALSA() (*alsaDevice, error) {
+// openALSA opens ALSA's device of the name, in stereo.
+func openALSA(name string) (*alsaDevice, error) {
 	var pcm uintptr
-	if e := sndPcmOpen(&pcm, cstr("default"), sndPcmStreamPlayback, 0); e < 0 {
+	if e := sndPcmOpen(&pcm, cstr(name), sndPcmStreamPlayback, 0); e < 0 {
 		return nil, fmt.Errorf("output: ALSA: %s", sndStrerror(e))
 	}
 	latency := uint32(bufferDuration / time.Microsecond)
@@ -404,36 +530,51 @@ func (d *alsaDevice) close() {
 	sndPcmClose(d.pcm)
 }
 
-// Stream plays what its render function makes on the default output.
+// Stream plays what its render function makes on the default output, or
+// on the device its Options name, while that one is there.
 type Stream struct {
-	render   func([]float32, int)
+	render func([]float32, int)
+	// asked is the channels the stream asks for, and want the device it
+	// asks for, "" for the default.
+	asked int
+	want  string
+	avoid avoid
+	mover *mover
+	// dev is the device that plays, which the stream's goroutine changes;
+	// fallback is set while it is the default device in want's place, and
+	// move once the stream should open its device again, as the device it
+	// asks for went away or came back.
 	dev      device
+	fallback atomic.Bool
+	move     atomic.Bool
 	stopping atomic.Bool
 	done     chan struct{}
 	delay    atomic.Int64 // frames
 }
 
-// Start starts a stream of channels, 2, or Surround for 5.1, which it
-// plays where PulseAudio's default sink has 5.1 or more, else stereo. Its
-// goroutine calls render for each period, 10 ms, to fill out with frames
-// of the channels it tells, interleaved; render must not block. A stream
-// of 5.1 stays one when the default sink changes, which the sound server
-// then mixes down. When the stream stops of itself, as when the sound
-// server goes away, failed is called with why, from that goroutine once
-// the stream has ended; Stop is not needed then. Start returns once the
-// device is open.
-func Start(channels int, render func(out []float32, channels int), failed func(error)) (*Stream, error) {
-	dev, err := openDevice(channels)
+// Open starts a stream as o tells: of o.Channels, 2, or Surround for 5.1,
+// which it plays where PulseAudio's sink has 5.1 or more, else stereo, on
+// o.Device or the default device. A stream of 5.1 on the default device
+// stays one when the default sink changes, which the sound server then
+// mixes down. Open returns once the device is open.
+func Open(o Options) (*Stream, error) {
+	s := &Stream{render: o.Render, asked: o.Channels, want: o.Device, mover: newMover(o), done: make(chan struct{})}
+	dev, fallback, err := openDevice(s.want, &s.avoid, s.asked)
 	if err != nil {
 		return nil, err
 	}
-	s := &Stream{render: render, dev: dev, done: make(chan struct{})}
+	s.dev = dev
+	s.fallback.Store(fallback)
+	s.mover.tell(fallback)
+	if s.want != "" {
+		go s.watch()
+	}
 	go func() {
 		err := s.run()
 		s.dev.close()
 		close(s.done)
-		if err != nil && failed != nil {
-			failed(err)
+		if err != nil && o.Failed != nil {
+			o.Failed(err)
 		}
 	}()
 	return s, nil
@@ -451,20 +592,88 @@ func (s *Stream) Delay() time.Duration {
 	return time.Duration(s.delay.Load()) * time.Second / Rate
 }
 
+// watch checks, every checkInterval until the stream ends, whether the
+// device the stream asks for went away, or came back, and has the stream
+// open its device again then. It asks the sound server beside the stream's
+// goroutine, which a slow answer would hold up.
+func (s *Stream) watch() {
+	t := time.NewTicker(checkInterval)
+	defer t.Stop()
+	for {
+		select {
+		case <-s.done:
+			return
+		case <-t.C:
+		}
+		here, ok := present(s.want)
+		if ok && here == s.fallback.Load() {
+			s.move.Store(true)
+		}
+	}
+}
+
 func (s *Stream) run() error {
-	ch := s.dev.channels()
-	buf := make([]float32, ch*periodFrames)
+	var buf []float32
 	for !s.stopping.Load() {
+		if s.move.Swap(false) && s.moves() {
+			if err := s.reopen(); err != nil {
+				return err
+			}
+		}
+		ch := s.dev.channels()
+		if len(buf) != ch*periodFrames {
+			buf = make([]float32, ch*periodFrames)
+		}
 		if err := s.fill(buf, ch); err != nil {
 			return err
 		}
 		if err := s.dev.write(buf); err != nil {
-			return err
+			if s.want == "" || s.fallback.Load() {
+				return err
+			}
+			// The device asked for went away: the default device plays.
+			if err := s.reopen(); err != nil {
+				return err
+			}
+			continue
 		}
 		s.delay.Store(s.dev.delay())
 	}
 	return nil
 }
+
+// moves reports whether the stream, which watch asked to move, opens its
+// device again: not while it plays on the default device after the device
+// it asks for failed to open, until it may try that one again.
+func (s *Stream) moves() bool {
+	return !s.fallback.Load() || s.avoid.may(time.Now())
+}
+
+// reopen closes the device that plays, and opens the one the stream should
+// play on: what the device before held is dropped.
+func (s *Stream) reopen() error {
+	s.dev.close()
+	s.delay.Store(0)
+	dev, fallback, err := openDevice(s.want, &s.avoid, s.asked)
+	if err != nil {
+		// The stream's end closes a device: this one is closed already.
+		s.dev = closed{}
+		return err
+	}
+	s.dev = dev
+	s.fallback.Store(fallback)
+	s.mover.tell(fallback)
+	return nil
+}
+
+// closed is the device of a stream whose device closed, and couldn't open
+// again.
+type closed struct{}
+
+func (closed) channels() int         { return 2 }
+func (closed) write([]float32) error { return ErrNoDevice }
+func (closed) delay() int64          { return 0 }
+func (closed) close()                {}
 
 // fill renders into buf, of ch channels, turning a panic of render into an
 // error.

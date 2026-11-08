@@ -20,7 +20,12 @@
   liked songs, playlists, albums, subscriptions, likes, dislikes and
   saves, songs saved to the library apart from likes, by the feedback
   tokens of their menus in the queue of their "next", and it deletes the playlists the user made, which it tells from
-  those they saved by the menus YouTube sends with them. It lists the
+  those they saved by the menus YouTube sends with them. An add of a
+  video the playlist holds already YouTube refuses, offering in its
+  answer the same add with its check skipped (`DEDUPE_OPTION_SKIP`):
+  that, not the answer's words, which are in the account's language,
+  tells it from other refusals (`ErrAlreadyInPlaylist`), and
+  `AddToPlaylistAnyway` sends it. It lists the
   Google accounts of the session and their brand channels, from YouTube's
   website, and uses a brand channel by its page ID: one whose page ID the
   list doesn't tell is listed as `Unswitchable`, as without it the account

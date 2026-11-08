@@ -63,7 +63,11 @@ belongs to its main thread: what finishes elsewhere comes back through
   track's "Add to YouTube Music playlist" lists, and keeps them: one made
   goes in first, and one deleted leaves, without reading the list again
   (`keepPlaylist`, `dropPlaylist`); signing in or out, or choosing
-  another channel, reads it again.
+  another channel, reads it again. An add from those menus to a
+  playlist, or to a mix, that holds the track already says so in a
+  toast, with Add anyway (`alreadyin.go`): YouTube Music refuses it, and
+  a mix leaves it out (`AddNewToPlaylist`); Add anyway adds it a second
+  time.
 - **Keep on top** (`keepontop.go`): the main window opens above the
   others while `keepOnTop` is on (`WindowOptions.AlwaysOnTop`), and each
   frame of it compares the setting with what the window was told last,

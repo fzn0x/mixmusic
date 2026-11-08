@@ -387,6 +387,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if len(tracks) > 0 || !r.reading {
 			s.trackList(c, "playlist", view.tracks, o)
 		}
+		s.playlistSuggestions(c, key, p)
 	})
 	s.mixDialogs(c, key)
 }

@@ -6,6 +6,140 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.10] - 2026-11-08
+
+Play the music files on your computer beside Spotify and YouTube Music
+(#317). On macOS, MixMusic plays Spotify itself, as on Windows, and the
+visualizer hears it (#295, #304). Follow artists without an account,
+and see their new releases on Home (#310). The search finds YouTube's
+videos, such as DJ sets (#331), its suggestions play songs and open
+albums, artists and playlists (#327), and a YouTube Music song can join
+your library without a like (#328). Notifications show the track's
+cover (#102), and a Flatpak comes for Linux on Arm64 (#294). MixMusic
+takes about half the memory it took (#309), Aurora no longer makes the
+app lag (#325), and a second start no longer crashes it (#305).
+MixMusic 0.3.0 and later offer this version in Settings › About, except
+the Linux x64 copies of 0.5.6, which don't start: install it from the
+release page.
+
+### Added
+
+- The notification of a track that starts shows its cover, a track on
+  this computer's too, cut to its centre square as the player bar shows
+  it: in place of the tray icon on Windows, attached on macOS, where it
+  grows as the notification expands, and as the notification's image on
+  Linux. A cover that hasn't downloaded within 2 seconds leaves the
+  notification without one, as before (#102).
+- MixMusic builds from source as Flathub builds apps, and CI checks that
+  build with every change. MixMusic isn't on Flathub for now. A copy
+  built this way calls itself Flathub in Settings › About, offers no
+  `.flatpak`, and runs the yt-dlp that comes with it rather than
+  downloading one (#293).
+- A Flatpak for Linux on Arm64, `mixmusic-<version>-linux-arm64.flatpak`,
+  beside the x64 one, for the Raspberry Pi 5, Asahi Linux and Snapdragon
+  laptops: `flatpak install ./mixmusic-<version>-linux-arm64.flatpak`.
+  In an Arm64 Flatpak, Settings › About offers each new version's Arm64
+  bundle (#294).
+- On macOS, MixMusic plays Spotify tracks itself, with no Spotify app
+  open, as on Windows: In MixMusic, from Spotify in Settings › Playback,
+  the default of a new install. Spotify's own player plays them, at
+  Spotify's quality, with FairPlay, macOS's own protection for Spotify's
+  audio, and MixMusic shows among your Spotify devices. It needs Spotify
+  Premium. An install that chose a way before keeps it (#295).
+- On macOS 14.2 and later, the visualizer and the plugins' analyser hear
+  the Spotify tracks MixMusic plays itself, as on Windows. macOS asks
+  once, the first time the visualizer would hear one, whether MixMusic may
+  record what other apps play; MixMusic only analyzes that audio, and
+  never records or sends it. It hears Spotify only while the visualizer or
+  a plugin shows it (#304).
+- Follow artists without an account: signed out of their service,
+  Follow on an artist's page keeps them in MixMusic, and signed in, it
+  follows them on YouTube Music or Spotify, as before. Follow and
+  Unfollow are in the page's More menu and in the menus of artists'
+  tiles too. Library › Artists lists the artists you follow, in MixMusic
+  and on each service, and Home's "New from artists you follow" shows
+  their albums and singles of the last eight weeks, or of this year where
+  YouTube Music tells only the year. MixMusic asks for an artist's
+  releases at most every 12 hours, and never follows on a service on its
+  own (#310).
+- The system's media controls, Windows' media flyout, Now Playing on
+  macOS and MPRIS on Linux, show the cover of a track on this computer,
+  as they show an online track's (#317).
+- Play the music files on your computer beside Spotify and YouTube Music.
+  Add folders of music in Settings › Playback › Music on this computer,
+  and Library › On this computer lists their songs, albums and artists,
+  with the tags and covers your files hold; the search finds them too, in
+  a section of their own. Open files with Open music files… (Ctrl+O, ⌘O
+  on macOS), or drop them on the window, and they play at once. MixMusic
+  plays MP3, without gaps, FLAC, WAV, M4A, and Opus and Vorbis in Ogg,
+  reads a folder again only where files changed, and uploads nothing.
+  Tracks on this computer join the queue, your mixes and your liked songs;
+  one whose file is gone shows greyed, as File not found, and is passed
+  over (#317).
+- The search box suggests songs, albums, artists and playlists from
+  YouTube Music below the searches it suggests, each with its cover and
+  what it is and by whom. A song plays at once, with its radio after it
+  in the queue when Autoplay is on; an album, artist or playlist opens
+  its page. The arrow keys move through them all, and in a short window
+  the suggestions scroll (#327).
+- Keep a YouTube Music song without liking it: Add to library in a
+  song's menu saves it to your library on YouTube Music, as its own Save
+  to library does, so it stays out of your likes, which shape what
+  YouTube Music recommends. Library › YouTube Music lists them in Songs
+  in your library, whose menus take them out again (#328).
+- The search finds YouTube's videos too, such as DJ sets, live
+  recordings and fans' uploads, which aren't songs of YouTube Music's
+  catalog: All shows the first five under the songs, and a new Videos
+  pivot lists every one (#331).
+
+### Changed
+
+- On Windows 11, the tray icon's menu opens above the taskbar, centred on
+  the icon, as the system's own menus do. On Windows and Linux, the
+  sidebar's labels are in Selawik Semilight, as on macOS, rather than in
+  Light (#102).
+
+### Fixed
+
+- No notification repeats what the mini player shows while it is in
+  front, as none does for the main window: neither the track that starts
+  nor a like or a dislike, as from a global shortcut. On a MacBook, the
+  track's notification doesn't show either while the player around the
+  notch is open (#289).
+- The synced lyrics of a music video longer than its song, as one that
+  opens with a scene before the song, no longer light up each line too
+  early: LRCLIB's lyrics, timed for the song, show without their times,
+  with a note saying so. Lyrics Unison has of the video itself stay
+  synced (#290).
+- The downloads no longer ship `resources.go`, a file of MixMusic's
+  source code, nor copies of its icons that it never reads beside the
+  app: the Linux archive holds `mixmusic`, `mixmusic.desktop` and
+  `mixmusic.png` alone, and the `.deb`, the `.rpm`, the AppImage, the
+  macOS app, the Windows installer and the portable zip lose them too
+  (#303).
+- MixMusic no longer crashes when it's started again while it's still
+  starting, as by a second double-click, or by opening it while it starts
+  at login. It finishes starting, then shows its window. A click on its
+  Dock icon on macOS during the start no longer crashes it either (#305).
+- MixMusic takes about half the memory it took while it plays: on a Mac,
+  about 200 MB rather than about 400 MB. The artwork in the sidebar, which
+  turns over now and then to show what plays next, left behind what it
+  drew for each turn (#309).
+- A Spotify artist's page asks for their albums and singles ten at a
+  time, the most Spotify now allows, so they show again where Spotify
+  refused the larger page (#319).
+- Aurora no longer makes the whole app lag. Its northern lights had the
+  graphics card paint the window over and over in every frame: on a Mac,
+  pages scrolled at about 16 frames a second, and the lights alone kept
+  the graphics card 80% busy. They look the same, pages scroll at 60
+  frames a second as in the other themes, and the drifting lights take
+  about 6% of it. Glasshouse's lights, drawn the same way, scroll
+  smoothly again too (#325).
+- On a MacBook, the black of the player around the notch is square
+  against the top of the screen, as meant: its rounded corners reached a
+  few pixels down into it, which left its top corners slightly
+  see-through (#335).
+
 ## [0.5.9] - 2026-11-06
 
 Podcasts from YouTube Music and Spotify, which start where you left them
@@ -1215,7 +1349,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.9...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.10...HEAD
+[0.5.10]: https://github.com/fzn0x/mixmusic/compare/v0.5.9...v0.5.10
 [0.5.9]: https://github.com/fzn0x/mixmusic/compare/v0.5.8...v0.5.9
 [0.5.8]: https://github.com/fzn0x/mixmusic/compare/v0.5.7...v0.5.8
 [0.5.7]: https://github.com/fzn0x/mixmusic/compare/v0.5.6...v0.5.7

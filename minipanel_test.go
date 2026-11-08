@@ -502,3 +502,28 @@ func TestMiniPages(t *testing.T) {
 		t.Errorf("the mini player went to %q", at)
 	}
 }
+
+// TestMiniTrackInfo shows the Track info of an entry of the queue, from
+// its menu, in the mini player, whose window the panel grew; Escape closes
+// the dialog before the panel.
+func TestMiniTrackInfo(t *testing.T) {
+	withTrackInfo(t, app.TrackInfo{Plays: app.PlaysEngine,
+		Stream: &app.TrackStream{Codec: "Opus", Container: "WebM", Bitrate: 139.3, Size: 3_400_000, Duration: 207 * time.Second}})
+	s := miniShell(t, nil)
+	tt, f := miniAt(t, s, 100, 100, 420, 132)
+	click(t, s, tt, "Queue")
+	f.settle(t, s)
+	if err := tt.RightClick("Play Teardrop"); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt.ChooseMenuItem("Track info"); err != nil {
+		t.Fatalf("%v: the menu holds %q", err, tt.Menu())
+	}
+	until(t, s, tt, "the dialog", func() bool { return tt.HasText("Opus in WebM") })
+	tt.Key(0, ui.KeyEscape)
+	s.drain()
+	tt.Frame()
+	if tt.HasText("Opus in WebM") || s.mini.panel != settings.MiniQueue {
+		t.Errorf("Escape over Track info: the dialog shows %v, the panel is %q", tt.HasText("Opus in WebM"), s.mini.panel)
+	}
+}

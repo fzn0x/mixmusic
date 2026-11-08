@@ -109,8 +109,10 @@ func (s *shell) miniView(c *ui.Context) {
 	s.moveMini(c)
 	s.miniPages()
 	if s.mini.win != nil {
-		// What the menus of the queue's entries ask, as a new mix's name.
+		// What the menus of the queue's entries show and ask, as a
+		// track's Track info and a new mix's name.
 		s.questionDialog(c)
+		s.trackInfoDialog(c)
 		s.promptDialog(c)
 	}
 	s.overlay(c)

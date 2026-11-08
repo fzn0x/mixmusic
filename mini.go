@@ -135,7 +135,7 @@ func (s *shell) miniView(c *ui.Context) {
 		})
 	})
 	if ok && !s.st.Live {
-		s.miniProgress(c)
+		s.miniSeek(c, w)
 	}
 	s.overlay(c)
 }
@@ -179,20 +179,6 @@ func (s *shell) miniDuration() time.Duration {
 		return ms(cur.Track.DurationMs)
 	}
 	return 0
-}
-
-// miniProgress draws how far the track has played, in a 2px line of the
-// accent along the foot of the window.
-func (s *shell) miniProgress(c *ui.Context) {
-	k := &s.lk
-	done := float32(0)
-	if d := s.miniDuration(); d > 0 {
-		done = min(float32(s.st.Position)/float32(d), 1)
-	}
-	ui.Box(c).Absolute().Left(0).Bottom(0).FillWidth().Height(2).PassThrough().Label("Progress").
-		Draw(func(p *ui.Painter, r ui.Rect) {
-			p.Fill(ui.Rect{X: r.X, Y: r.Y, W: r.W * done, H: r.H}, k.accent, 0)
-		})
 }
 
 // applyMiniZoom zooms the mini player by the zoom chosen, and its window

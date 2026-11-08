@@ -573,6 +573,12 @@ func (p *Player) onStreamError(message string) {
 	// The app heard of the track as paused, as the engine paused it.
 	p.report()
 	p.emit(StateChange)
+	// A track that plays without the network, as a file on this computer,
+	// is tried again whatever the network does.
+	if p.playsOffline() {
+		p.retryStream(why)
+		return
+	}
 	p.checkOnline(func() { p.wait(p.s.Position, autoplay) }, func() { p.retryStream(why) })
 }
 
@@ -580,19 +586,22 @@ func (p *Player) onStreamError(message string) {
 // after the next of retryWaits for a stream that played, or at once for
 // one that never did; once its tries ran out, it fails with why the last
 // one did. A try that finds no stream, as while the network is down,
-// counts as one.
+// counts as one. A track that plays without the network is tried once, at
+// once, as one that never played: a file that is gone, or can't be read,
+// isn't read a moment later either.
 func (p *Player) retryStream(why string) {
 	entry, _ := p.s.Current()
 	r := &p.retry
 	tries, wait := 1, time.Duration(0)
-	if r.played {
+	waits := r.played && !p.playsOffline()
+	if waits {
 		tries = len(retryWaits)
 	}
 	if r.n >= tries {
 		p.fail(why)
 		return
 	}
-	if r.played {
+	if waits {
 		wait = retryWaits[r.n]
 	}
 	r.n++

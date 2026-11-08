@@ -56,17 +56,36 @@ type Activity struct {
 	LargeImage string
 	// LargeText is shown when the picture is hovered: the track's album.
 	LargeText string
+	// SmallImage is a small round picture at the corner of LargeImage, as
+	// a badge of the track's service, and SmallText is shown when it is
+	// hovered. Discord shows it only on a LargeImage.
+	SmallImage, SmallText string
+	// Buttons are links shown under the activity, as one that opens the
+	// track on its service: Discord shows two at most, to the others who
+	// see the user's profile.
+	Buttons []Button
 	// StatusDisplay is what the member list shows beside the user's name,
 	// the application's name when what it names is empty.
 	StatusDisplay StatusDisplay
 }
 
+// Button is a link under an activity: its label, and the http or https
+// URL it opens.
+type Button struct {
+	Label, URL string
+}
+
 // Discord takes texts of minText to maxText characters, and images of up to
-// maxImage. It counts characters as JavaScript does, in UTF-16 code units.
+// maxImage. A button's label is 1 to maxLabel characters long, its URL up to
+// maxURL, and an activity has maxButtons buttons at most. It counts
+// characters as JavaScript does, in UTF-16 code units.
 const (
-	minText  = 2
-	maxText  = 128
-	maxImage = 256
+	minText    = 2
+	maxText    = 128
+	maxImage   = 256
+	maxLabel   = 32
+	maxURL     = 512
+	maxButtons = 2
 )
 
 // activity is an Activity as Discord's SET_ACTIVITY command takes it.
@@ -77,6 +96,13 @@ type activity struct {
 	State         string        `json:"state,omitempty"`
 	Timestamps    *timestamps   `json:"timestamps,omitempty"`
 	Assets        *assets       `json:"assets,omitempty"`
+	Buttons       []button      `json:"buttons,omitempty"`
+}
+
+// button is a Button as SET_ACTIVITY takes it.
+type button struct {
+	Label string `json:"label"`
+	URL   string `json:"url"`
 }
 
 // timestamps are an activity's start and end, in Unix milliseconds.
@@ -89,11 +115,13 @@ type timestamps struct {
 type assets struct {
 	LargeImage string `json:"large_image,omitempty"`
 	LargeText  string `json:"large_text,omitempty"`
+	SmallImage string `json:"small_image,omitempty"`
+	SmallText  string `json:"small_text,omitempty"`
 }
 
 // wire returns a as Discord takes it, its texts fitted to Discord's limits.
-// It leaves out what is empty, and an image too long for Discord, which a
-// cut would break.
+// It leaves out what is empty, an image or a URL too long for Discord,
+// which a cut would break, and the buttons past the second.
 func (a Activity) wire() *activity {
 	w := &activity{Type: a.Type, Details: fit(a.Details), State: fit(a.State)}
 	if (a.StatusDisplay == ShowState && w.State != "") || (a.StatusDisplay == ShowDetails && w.Details != "") {
@@ -102,35 +130,59 @@ func (a Activity) wire() *activity {
 	if !a.Start.IsZero() || !a.End.IsZero() {
 		w.Timestamps = &timestamps{Start: unixMilli(a.Start), End: unixMilli(a.End)}
 	}
-	image := strings.TrimSpace(a.LargeImage)
-	if utf16Len(image) > maxImage {
-		image = ""
+	as := assets{LargeImage: imageOf(a.LargeImage), LargeText: fit(a.LargeText),
+		SmallImage: imageOf(a.SmallImage), SmallText: fit(a.SmallText)}
+	if as != (assets{}) {
+		w.Assets = &as
 	}
-	if text := fit(a.LargeText); image != "" || text != "" {
-		w.Assets = &assets{LargeImage: image, LargeText: text}
+	for _, b := range a.Buttons {
+		label, url := fitTo(b.Label, maxLabel), strings.TrimSpace(b.URL)
+		if len(w.Buttons) == maxButtons || label == "" || !webURL(url) {
+			continue
+		}
+		w.Buttons = append(w.Buttons, button{Label: label, URL: url})
 	}
 	return w
+}
+
+// imageOf is an image as Discord takes it: without surrounding spaces, and
+// none when it is longer than Discord takes.
+func imageOf(s string) string {
+	if s = strings.TrimSpace(s); utf16Len(s) > maxImage {
+		return ""
+	}
+	return s
+}
+
+// webURL reports whether a button can open s: an http or https URL that
+// Discord takes.
+func webURL(s string) bool {
+	return (strings.HasPrefix(s, "https://") || strings.HasPrefix(s, "http://")) && utf16Len(s) <= maxURL
 }
 
 // fit returns s without surrounding spaces, padded with a space when it is
 // one character long and cut with an ellipsis when it is longer than
 // Discord takes. An empty s stays empty.
 func fit(s string) string {
-	s = strings.TrimSpace(s)
-	n := utf16Len(s)
-	switch {
-	case s == "":
-		return ""
-	case n < minText:
+	s = fitTo(s, maxText)
+	if s != "" && utf16Len(s) < minText {
 		return s + " "
-	case n <= maxText:
+	}
+	return s
+}
+
+// fitTo returns s without surrounding spaces, cut with an ellipsis when it
+// is longer than n.
+func fitTo(s string, n int) string {
+	s = strings.TrimSpace(s)
+	if utf16Len(s) <= n {
 		return s
 	}
 	var b strings.Builder
 	used := 0
 	for _, r := range s {
 		w := utf16.RuneLen(r)
-		if used+w > maxText-1 {
+		if used+w > n-1 {
 			break
 		}
 		b.WriteRune(r)

@@ -350,9 +350,12 @@ func (a *App) apply(s settings.Settings) {
 	// Whether they can register yet, hotkeys tells, which tests give
 	// their own. The settings' save tells the windows of the problems.
 	a.applyGlobalShortcuts(false)
-	if !s.DiscordPresence {
-		a.presence.update(false, "", NowPlaying{})
-	}
+	// Discord shows what plays as the settings now choose, or nothing, at
+	// once, even while paused, when no report comes.
+	a.mu.Lock()
+	np := a.nowPlaying
+	a.mu.Unlock()
+	a.presence.update(s.Desktop, np)
 	if p := a.goPlayer.Load(); p != nil {
 		p.SettingsChanged(s)
 		a.applyEngine(s)

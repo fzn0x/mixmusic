@@ -29,6 +29,13 @@
   follows from near its live edge: it loads the playlist again about once
   per target duration, fetches each new segment once, and finds the
   stream again before its URL expires, never caching it.
+  After `pauseAfter` refusals of the player API in a row, the direct
+  route asks for the last once more with a new visitor ID, then rests
+  (`Direct.Stream`, `directrest.go`): `restFirst`, 2 minutes, then twice
+  as long each time it is refused again after a rest, up to `restMax`,
+  30 minutes, until it finds a stream. A try that runs out of its time
+  counts as a refusal, without the new visitor ID, and the one after it
+  is bounded by `slowTimeout`, 2 s, rather than the resolver's 4 s.
   The URL of a track's stream names each of YouTube's servers that hold
   it: when one doesn't connect within 3 seconds, the TLS handshake
   included, the stream's requests, and the direct route's check of it,

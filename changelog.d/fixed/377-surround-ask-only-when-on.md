@@ -1,6 +1,6 @@
 - YouTube Music tracks no longer start up to half a second late while
-  "Play 5.1 surround when a track has it" is off, as it is by default:
-  MixMusic asks YouTube whether a track has a 5.1 mix only while it's
-  on, rather than for every track, and waited for that answer on a slow
-  connection. With it off, the 5.1 button shows only for a track whose
-  5.1 mix MixMusic knows of already, as one in the offline cache (#377).
+  MixMusic waits to learn whether they have a 5.1 surround mix, which on
+  a slow connection often came late or not at all. A track starts as
+  soon as its stereo audio is found, whether 5.1 surround is on or off,
+  and the 5.1 button shows a moment later, once YouTube says the track
+  has a mix; with 5.1 on, the track then plays it from where it is (#377).

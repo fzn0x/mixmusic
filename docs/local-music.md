@@ -136,7 +136,9 @@ what plays, as their settings say:
 - **[Last.fm](accounts.md)**, once you connect it, scrobbles its title,
   artists, album and length. A track of no artist isn't scrobbled.
 - **Discord**, unless you turn it off in Settings › Desktop, shows its
-  title and artists, without a cover.
+  title and artists, or [the lines you chose](desktop.md#what-your-discord-status-shows),
+  without a cover or a Listen button: with the service's badge on, a
+  record's badge takes the cover's place.
 - **[Lyrics](lyrics.md)**, when you show them, are looked for on Unison
   and LRCLIB by its title, artists, album and length.
 

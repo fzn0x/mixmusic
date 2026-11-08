@@ -96,4 +96,13 @@
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
   scrobbles by Last.fm's rules, keeping what fails offline for later.
 - **`internal/discord`** shows what plays on the user's Discord profile, over
-  Discord's local pipe or socket.
+  Discord's local pipe or socket: an activity's lines, times, picture, the
+  small image at its corner and up to two buttons, fitted to Discord's
+  limits. What the activity holds is the app's choice
+  (`internal/app/discordstatus.go`): `DiscordActivity` makes it of what
+  plays and the settings, as a pure function that the settings page's
+  preview draws too, and `presence` sends it again whenever the track, the
+  play or pause, the position or those settings change. The badges of
+  the services and of a pause are `brand/discord`'s PNGs, drawn by
+  `tools/discordbadges`, which Discord reads from GitHub by their
+  addresses, whatever the application.

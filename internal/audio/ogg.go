@@ -45,6 +45,9 @@ type oggOpusTrack struct {
 	r   *ogg.Reader
 	dec *opus.Decoder
 	p   ogg.Packet // the packet read last
+	// ch is the channels of the OpusHead, which the decoder gives in
+	// stereo.
+	ch int
 	// next is the granule position, the frame at Rate with the pre-skip,
 	// that the packet read next starts at.
 	next int64
@@ -74,7 +77,7 @@ func openOggOpus(r *ogg.Reader, head []byte) (track, timing, error) {
 	if last > 0 {
 		tm.total = duration(last)
 	}
-	return &oggOpusTrack{r: r, dec: dec, pcm: make([]float32, 2*5760)}, tm, nil
+	return &oggOpusTrack{r: r, dec: dec, ch: h.channels, pcm: make([]float32, 2*5760)}, tm, nil
 }
 
 func (t *oggOpusTrack) channels() int { return 2 }

@@ -182,7 +182,8 @@ belongs to its main thread: what finishes elsewhere comes back through
   The panel builds after the player for Tab, and `Reverse` puts it above.
   The queue is a `ui.List` of the entries from the one playing, whose
   menus are the main window's: a page one goes to opens in the main
-  window (`miniPages`). The lyrics show the line sung now with `sungText`.
+  window (`miniPages`), and the dialogs they open, as Track info, show
+  in the mini player. The lyrics show the line sung now with `sungText`.
   The error's button shows for a failure newer than the latest when the
   mini player opened, or when its panel last closed. The transport row
   (`minirow.go`) fits its buttons in the room the artwork leaves

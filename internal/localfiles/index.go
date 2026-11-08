@@ -9,6 +9,7 @@ package localfiles
 
 import (
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"slices"
@@ -57,6 +58,10 @@ type Folder struct {
 	Path string
 	// Tracks counts the files MixMusic plays, and Skipped those it can't.
 	Tracks, Skipped int
+	// Unread are the folders in it that the scan couldn't read, as one
+	// MixMusic isn't allowed to: their tracks stay as the scan before
+	// found them, until a scan reads them.
+	Unread []string
 	// Problem is why the folder can't be read, as when it is on a drive
 	// that isn't there: "" when it can. Its tracks stay meanwhile.
 	Problem string
@@ -78,10 +83,12 @@ type Status struct {
 type Index struct {
 	file *store.File[saved]
 	art  string
-	// probe and readTags read a file, as audio.Probe and tags.Read do;
-	// tests give their own.
+	// probe and readTags read a file, as audio.Probe and tags.Read do,
+	// and walk a folder, as filepath.WalkDir does when it's nil; tests
+	// give their own.
 	probe    func(io.ReadSeeker) (time.Duration, error)
 	readTags func(io.ReadSeeker) (tags.Tags, error)
+	walk     func(string, fs.WalkDirFunc) error
 	now      func() time.Time
 
 	mu      sync.Mutex
@@ -184,7 +191,8 @@ func (x *Index) Entry(path string) (Entry, bool) {
 
 // Missing reports whether the file of a local track isn't there: one the
 // last scan found that playing found gone since, or, beyond the index, as
-// of a mix, one that isn't there when looked at, at most every 30 seconds.
+// of a mix, or in a folder the last scan couldn't read, one that isn't
+// there when looked at, at most every 30 seconds.
 func (x *Index) Missing(id string) bool {
 	path, ok := PathOf(id)
 	if !ok {
@@ -196,14 +204,20 @@ func (x *Index) Missing(id string) bool {
 		return true
 	}
 	if e, ok := x.entries[path]; ok && e.Skipped == "" {
-		// The files of a folder that can't be read, as on a drive
-		// unplugged, stay in the index, and are missing meanwhile.
+		// The files of a folder that can't be read stay in the index:
+		// those of a music folder that can't be read at all, as on a
+		// drive unplugged, are missing meanwhile, and those of a folder
+		// in one, as one MixMusic isn't allowed to read, are looked at.
+		unread := false
 		for _, f := range x.folders {
 			if f.Problem != "" && within(path, f.Path) {
 				return true
 			}
+			unread = unread || slices.ContainsFunc(f.Unread, func(dir string) bool { return within(path, dir) })
 		}
-		return false
+		if !unread {
+			return false
+		}
 	}
 	now := x.now()
 	if s, ok := x.stats[path]; ok && now.Sub(s.at) < 30*time.Second {

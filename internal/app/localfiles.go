@@ -266,7 +266,10 @@ func (a *App) openFile(native string) (audio.Source, error) {
 }
 
 // fileSource is a file as the engine reads it: all of it is there, so a
-// read never waits.
+// read never waits, and one that fails is the file's failure, not the
+// network's.
 type fileSource struct{ *os.File }
 
 func (fileSource) Wake() {}
+
+func (fileSource) Local() bool { return true }

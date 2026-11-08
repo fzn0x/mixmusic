@@ -158,6 +158,7 @@ func TestLiveSurround(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 	d := NewDirect()
+	d.SetSurround(true)
 	for _, id := range []string{surroundID, songID} {
 		start := time.Now()
 		s, err := d.Stream(ctx, id, QualityBest)

@@ -174,7 +174,7 @@ func TestDirectAsksTheTVClientOfSurround(t *testing.T) {
 	f := newFakeTube(t)
 	f.answersWith("-surround")
 	f.answersTVWith("-surround")
-	d := f.direct()
+	d := f.surroundDirect()
 	s, err := d.Stream(context.Background(), surroundID, QualityBest)
 	if err != nil {
 		t.Fatal(err)
@@ -263,7 +263,7 @@ func TestDirectWaitsLittleForTheTVClient(t *testing.T) {
 		return nil
 	})
 	start := time.Now()
-	s, err := f.direct().Stream(context.Background(), surroundID, QualityBest)
+	s, err := f.surroundDirect().Stream(context.Background(), surroundID, QualityBest)
 	if took := time.Since(start); err != nil || s.Surround != nil || took > surroundGrace+time.Second {
 		t.Errorf("stream %+v, surround %+v, %v, after %v", s, s.Surround, err, took)
 	}
@@ -280,7 +280,7 @@ func TestDirectRestsTheTVClientAfterRefusals(t *testing.T) {
 
 	f := newFakeTube(t)
 	f.answersTVWith("-reload")
-	d := f.direct()
+	d := f.surroundDirect()
 	now := time.Now()
 	d.now = func() time.Time { return now }
 	for i := range pauseAfter + 2 {
@@ -313,7 +313,7 @@ func TestResolverFindsSurroundWithYTDLP(t *testing.T) {
 	var runs atomic.Int32
 	available := time.Now().Add(time.Hour).Unix()
 	r := NewResolver(nil, "")
-	r.Direct = f.direct()
+	r.Direct = f.surroundDirect()
 	r.Run = func(_ context.Context, args ...string) ([]byte, error) {
 		runs.Add(1)
 		if url := args[len(args)-1]; url != "https://music.youtube.com/watch?v="+surroundID {
@@ -387,7 +387,7 @@ func TestResolverOffersNoSurroundYTDLPCantFind(t *testing.T) {
 		m := tools.New(t.TempDir())
 		configure(m)
 		r := NewResolver(m, "")
-		r.Direct = f.direct()
+		r.Direct = f.surroundDirect()
 		r.Run = func(context.Context, ...string) ([]byte, error) {
 			t.Errorf("%s: yt-dlp ran", name)
 			return nil, errors.New("no yt-dlp here")
@@ -410,7 +410,7 @@ func TestProxyServesSurroundYTDLPFinds(t *testing.T) {
 	srv5, data5 := upstream(t, 5000, &minGen)
 	var runs atomic.Int32
 	r := NewResolver(nil, "")
-	r.Direct = f.direct()
+	r.Direct = f.surroundDirect()
 	const wait = 300 * time.Millisecond
 	r.Run = func(context.Context, ...string) ([]byte, error) {
 		runs.Add(1)

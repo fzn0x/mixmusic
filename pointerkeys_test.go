@@ -385,7 +385,8 @@ func TestControlsLeaveSpace(t *testing.T) {
 			switch {
 			case raw.MatchString(line) && !allowedRaw(name, line):
 				t.Errorf("%s builds a control without pointerKeys: %s", at, strings.TrimSpace(line))
-			case strings.Contains(line, ".KeepFocus()") && name != "mini.go" && !strings.Contains(line, "ui.Slider("):
+			case strings.Contains(line, ".KeepFocus()") && name != "mini.go" && !strings.Contains(line, "ui.Slider(") &&
+				!strings.Contains(line, "s.seekSlider("):
 				t.Errorf("%s keeps the focus off a control: %s", at, strings.TrimSpace(line))
 			}
 		}

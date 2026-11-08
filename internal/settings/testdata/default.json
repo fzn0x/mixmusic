@@ -13,6 +13,7 @@
   "fontScale": 1,
   "zoom": 1,
   "sidebarCollapsed": false,
+  "wavyProgress": false,
   "panel": "queue",
   "lyricsPlain": false,
   "lyricsTranslate": [],

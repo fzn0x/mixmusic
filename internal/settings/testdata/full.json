@@ -17,6 +17,7 @@
   "fontScale": 1.1,
   "zoom": 1.25,
   "sidebarCollapsed": true,
+  "wavyProgress": true,
   "panel": "lyrics",
   "lyricsPlain": true,
   "lyricsTranslate": [

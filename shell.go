@@ -56,6 +56,7 @@ func (s *shell) view(c *ui.Context) {
 	s.coverDialog(c)
 	s.updateOffer(c)
 	s.questionDialog(c)
+	s.trackInfoDialog(c)
 	s.promptDialog(c)
 	s.failureDialog(c)
 	s.sweepDialogs()

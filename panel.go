@@ -453,6 +453,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		s.downloadItems(m, t)
 	}
 	s.localItems(m, t)
+	s.trackInfoItem(m, t)
 	m.Separator()
 	for _, a := range t.Artists {
 		if a.ID != "" {

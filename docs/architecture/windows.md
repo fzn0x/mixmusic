@@ -133,6 +133,14 @@ belongs to its main thread: what finishes elsewhere comes back through
   artwork. The Material themes make their colours of a seed in HCT
   (`material.go`, `internal/hct`, a port of Material Color Utilities),
   unless a colour file gives them.
+- **The wavy progress bar** (`wavy.go`), while Settings asks for it, is a
+  `SliderBase` drawn as the theme draws its sliders, but for the played
+  part: a wave whose points its `Draw` works out from `p.Now()`, so that
+  it moves in frames that only paint, at 30 a second. How high it rises
+  is an `Animate` of whether the track plays, which eases it flat as it
+  pauses, and goes at once under Reduce Motion, where the wave holds
+  still. Flat, it is the theme's slider to the pixel, which
+  `TestWavyProgress` checks.
 - **Lyrics** light the line sung now, and its words as they are sung when
   they have times (`lyricswords.go`); in Latin letters made on the
   computer, under the line or in its place, each word's romanization

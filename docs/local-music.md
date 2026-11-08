@@ -95,7 +95,9 @@ tags, the Vorbis comments of FLAC, Opus and Vorbis, and WAV's INFO list.
 
 A track whose file moved, was deleted, or is on a drive that isn't
 plugged in shows greyed, with File not found in place of its artists.
-Playing it moves on to the next track, with a short notice.
+Playing it moves on to the next track, with a short notice. So does a
+track whose file goes, or can't be read, while it plays, after one more
+try at once, also while you're offline.
 
 - **A rescan** drops the files that are gone from the library. Those of a
   folder that can't be read at all, as on a drive unplugged, stay, greyed,

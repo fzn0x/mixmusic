@@ -295,7 +295,8 @@ the visualizer draws nothing, and the log says why.
   the track plays on as soon as the network answers. A track that broke
   off after it played is loaded again up to three times, after 1, 3 and 9
   seconds, and gets all three tries back once it plays on for ten
-  seconds.
+  seconds. A download, or a track on this computer, is loaded again once,
+  at once, and then skipped, as its file is what fails.
 - **When the network is gone.** After 8 seconds of buffering, MixMusic
   checks whether the network answers. While it doesn't, the queue plays
   on with the tracks it holds, downloads and the offline cache, and waits

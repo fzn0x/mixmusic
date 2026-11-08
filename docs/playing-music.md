@@ -175,6 +175,7 @@ Quality, in Settings › Playback › Sound, chooses between best and data saver
 - **The [offline cache](library.md#the-offline-cache)** keeps the tracks you played, as much as Settings › Playback › Offline cache allows, and they play again without the network. Downloads play without it too: see [Your library](library.md#downloads).
 - **While you're offline,** the queue skips the tracks that aren't downloaded or cached, without an error for each, and waits for the network only once none is left. A toast says that your downloads still play, and Home offers to open them.
 - **When the network drops** partway through a song, the song waits for it, and plays on from where it stopped once it's back. The player bar says that it waits for the network, and the play button chooses whether the song plays then. Songs whose audio MixMusic holds still play meanwhile.
+- **A downloaded song, or one on this computer, that can't be read,** as a damaged file or one on a drive unplugged, doesn't wait for the network, which wouldn't help: MixMusic tries it again at once, and then moves on, saying why, as File not found or Can't read the file.
 - **A song whose audio stops arriving,** as on a slow connection, loads again where it was, up to three times. When three songs in a row can't play, MixMusic stops, rather than step through the rest of the queue.
 - **When the computer goes to sleep,** MixMusic pauses, and stays paused when it wakes, ready where it was. A Spotify Connect device elsewhere plays on.
 

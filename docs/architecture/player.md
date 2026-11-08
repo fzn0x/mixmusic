@@ -12,8 +12,10 @@
   quits. A track that can't play for want of the network gives way at once
   to the next that plays without it, a download or a track the offline
   cache holds, as the app tells; once none is left, it waits for the
-  network where it was, and plays on once it answers. The player pauses as
-  the computer sleeps.
+  network where it was, and plays on once it answers. A track that plays
+  without the network, whose audio fails, doesn't wait for it: it is tried
+  once more, at once, and then fails with why. The player pauses as the
+  computer sleeps.
   As it moves on by itself it passes over, on one path
   (`skip.go`), the entries the settings skip, but those the user picks:
   songs the user dislikes, and songs YouTube labels as made with AI

@@ -62,6 +62,7 @@
   "closeToTray": false,
   "notifications": true,
   "showInTitle": true,
+  "keepOnTop": false,
   "mediaKeys": true,
   "showOnDiscord": true,
   "discordAppId": "",

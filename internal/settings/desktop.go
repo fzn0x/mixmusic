@@ -23,6 +23,9 @@ type Desktop struct {
 	Notifications bool `json:"notifications"`
 	// ShowInTitle names what plays in the main window's title.
 	ShowInTitle bool `json:"showInTitle"`
+	// KeepOnTop keeps the main window above the other windows (#350). It
+	// is off at first; the mini player stays on top either way.
+	KeepOnTop bool `json:"keepOnTop"`
 	// MediaKeys has the keyboard's play, next and previous keys control
 	// MixMusic.
 	MediaKeys bool `json:"mediaKeys"`

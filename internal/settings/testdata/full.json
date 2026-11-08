@@ -74,6 +74,7 @@
   "closeToTray": true,
   "notifications": false,
   "showInTitle": false,
+  "keepOnTop": true,
   "mediaKeys": false,
   "showOnDiscord": false,
   "discordAppId": "123456789012345678",

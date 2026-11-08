@@ -45,6 +45,7 @@ func Open(a *app.App, hidden bool) *mygo.Window {
 		StateKey:        "main",
 		TitleBarStyle:   titleBarStyle(runtime.GOOS),
 		Hidden:          hidden,
+		AlwaysOnTop:     s.startOnTop(),
 		Content:         ui.View(s.view),
 	}))
 	fitOnScreen(s.win)
@@ -177,6 +178,8 @@ type shell struct {
 	// (zoomInKey).
 	zoomIn            *mygo.MenuItem
 	zoomInAccelerator string
+	// onTop is whether the main window was kept on top (keepontop.go).
+	onTop onTop
 	// liveSince is when the live tile began turning over to what plays
 	// next, zero while it doesn't.
 	liveSince time.Time

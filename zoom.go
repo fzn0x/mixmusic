@@ -224,7 +224,8 @@ func (s *shell) zoomRow(c *ui.Context) {
 }
 
 // useMenuBar gives macOS's menu bar the system's menus, but a View menu
-// whose items refresh the page and zoom MixMusic. It leaves out Reload
+// whose items refresh the page and zoom MixMusic, and a Window menu with
+// Keep on Top (windowMenu). It leaves out Reload
 // and Force Reload, which do nothing in a window of native interface and
 // took ⌘R from Repeat and ⇧⌘R from Refresh this page. The items have no
 // keys of their own, so that the keys reach the window, where the user
@@ -251,7 +252,7 @@ func (s *shell) useMenuBar() {
 			mygo.Separator(),
 			{Role: mygo.RoleToggleFullScreen},
 		}},
-		{Role: mygo.RoleWindowMenu},
+		s.windowMenu(),
 	}))
 	s.zoomInKey()
 }

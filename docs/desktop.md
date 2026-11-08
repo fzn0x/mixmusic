@@ -140,6 +140,23 @@ window switcher and screen readers, and starts with "Paused:" while it's
 paused. Turn off **Show what plays in the window title** in Settings ›
 Desktop to keep it to MixMusic's name.
 
+## Keep the window on top
+
+**Keep on top**, in Settings › Desktop and off at first, keeps MixMusic's
+main window above your other windows, for when you work beside it.
+MixMusic remembers it between starts. Turn it on or off with:
+
+- the **Keep on top** switch in Settings › Desktop;
+- **Keep the window on top, or not** in the command palette, which has no
+  keys at first: Settings › Shortcuts can give it some. A toast says
+  which it did;
+- **Keep on Top** in macOS's Window menu, checked while it's on;
+- `"keepOnTop": true` in `settings.json`.
+
+The [mini player](#the-mini-player) stays on top either way. On Linux,
+your desktop decides: one on Wayland may keep no window above the others,
+the mini player included.
+
 ## Global shortcuts
 
 Global shortcuts are keys of your own that control MixMusic whichever

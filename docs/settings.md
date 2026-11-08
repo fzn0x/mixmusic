@@ -72,6 +72,7 @@ The **On the desktop** group:
 | [Show what plays in the window title](desktop.md#the-window-title) | The window's title names the track that plays. On at first. |
 | [Show what plays on Discord](desktop.md#discord) | Your Discord profile shows what you listen to. On at first. Under it, **Discord application ID**, to show another application's name. |
 | [Player around the notch](desktop.md#the-player-around-the-notch) | The player around a MacBook's notch. On at first, and shown only on Macs with a notch. |
+| [Keep on top](desktop.md#keep-the-window-on-top) | MixMusic's window stays above your other windows. Off at first. |
 | [Start at login](desktop.md#start-at-login) | Starts MixMusic, hidden, when you sign in to your computer. |
 | Settings file | **open** opens `settings.json`, **show in folder** shows it in its folder. |
 | Reset settings | Puts back the settings of a new install, after asking. Your accounts, library and add-ons stay. |
@@ -277,6 +278,7 @@ while you're not typing in a text field. The ID is the command's name in
 | Show or hide the queue | <kbd>Ctrl</kbd> <kbd>J</kbd> | <kbd>⌘</kbd> <kbd>J</kbd> | `view.queue` |
 | Show or hide the lyrics | <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>L</kbd> | <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>L</kbd> | `view.lyrics` |
 | Mini player | <kbd>Ctrl</kbd> <kbd>M</kbd> | <kbd>⌘</kbd> <kbd>M</kbd> | `view.mini` |
+| [Keep the window on top, or not](desktop.md#keep-the-window-on-top) | none | none | `view.keepOnTop` |
 | Collapse or expand the sidebar | <kbd>Ctrl</kbd> <kbd>B</kbd> | <kbd>⌘</kbd> <kbd>B</kbd> | `view.sidebar` |
 | Refresh this page | <kbd>F5</kbd> | <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>R</kbd> | `view.refresh` |
 | Zoom in | <kbd>Ctrl</kbd> <kbd>=</kbd>, also <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>=</kbd> and <kbd>Ctrl</kbd> with the keypad's <kbd>+</kbd> | <kbd>⌘</kbd> <kbd>=</kbd>, also <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>=</kbd> and <kbd>⌘</kbd> with the keypad's <kbd>+</kbd> | `view.zoomIn` |

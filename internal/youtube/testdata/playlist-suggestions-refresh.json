@@ -1,0 +1,880 @@
+{
+ "responseContext": {
+  "serviceTrackingParams": [
+   {
+    "service": "GFEEDBACK",
+    "params": [
+     {
+      "key": "logged_in",
+      "value": "1"
+     }
+    ]
+   }
+  ]
+ },
+ "_fixture": "Written by hand from the documented shape of YouTube Music's answer, not recorded: replace with a recorded answer once one is.",
+ "continuationContents": {
+  "musicShelfContinuation": {
+   "contents": [
+    {
+     "musicResponsiveListItemRenderer": {
+      "thumbnail": {
+       "musicThumbnailRenderer": {
+        "thumbnail": {
+         "thumbnails": [
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo006/sddefault.jpg",
+           "width": 60,
+           "height": 60
+          },
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo006/hqdefault.jpg",
+           "width": 120,
+           "height": 120
+          }
+         ]
+        },
+        "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+        "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+       }
+      },
+      "overlay": {
+       "musicItemThumbnailOverlayRenderer": {
+        "content": {
+         "musicPlayButtonRenderer": {
+          "playNavigationEndpoint": {
+           "watchEndpoint": {
+            "videoId": "sugVideo006",
+            "watchEndpointMusicSupportedConfigs": {
+             "watchEndpointMusicConfig": {
+              "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+             }
+            }
+           }
+          },
+          "playIcon": {
+           "iconType": "PLAY_ARROW"
+          },
+          "pauseIcon": {
+           "iconType": "PAUSE"
+          },
+          "accessibilityPlayData": {
+           "accessibilityData": {
+            "label": "Play Northbound - Field Notes"
+           }
+          }
+         }
+        },
+        "contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
+        "displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
+       }
+      },
+      "flexColumns": [
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Northbound",
+            "navigationEndpoint": {
+             "watchEndpoint": {
+              "videoId": "sugVideo006",
+              "watchEndpointMusicSupportedConfigs": {
+               "watchEndpointMusicConfig": {
+                "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Field Notes",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "UCsugArtist0005",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Maps",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "MPREb_sugAlbum05",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_MEDIUM"
+        }
+       }
+      ],
+      "fixedColumns": [
+       {
+        "musicResponsiveListItemFixedColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "4:22"
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+         "size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+        }
+       }
+      ],
+      "menu": {
+       "menuRenderer": {
+        "items": [
+         {
+          "menuNavigationItemRenderer": {
+           "text": {
+            "runs": [
+             {
+              "text": "Start radio"
+             }
+            ]
+           },
+           "icon": {
+            "iconType": "MIX"
+           },
+           "navigationEndpoint": {
+            "watchEndpoint": {
+             "videoId": "sugVideo006",
+             "playlistId": "RDAMVMsugVideo006",
+             "params": "wAEB"
+            }
+           }
+          }
+         }
+        ]
+       }
+      },
+      "playlistItemData": {
+       "videoId": "sugVideo006"
+      },
+      "flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
+      "itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
+     }
+    },
+    {
+     "musicResponsiveListItemRenderer": {
+      "thumbnail": {
+       "musicThumbnailRenderer": {
+        "thumbnail": {
+         "thumbnails": [
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo007/sddefault.jpg",
+           "width": 60,
+           "height": 60
+          },
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo007/hqdefault.jpg",
+           "width": 120,
+           "height": 120
+          }
+         ]
+        },
+        "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+        "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+       }
+      },
+      "overlay": {
+       "musicItemThumbnailOverlayRenderer": {
+        "content": {
+         "musicPlayButtonRenderer": {
+          "playNavigationEndpoint": {
+           "watchEndpoint": {
+            "videoId": "sugVideo007",
+            "watchEndpointMusicSupportedConfigs": {
+             "watchEndpointMusicConfig": {
+              "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+             }
+            }
+           }
+          },
+          "playIcon": {
+           "iconType": "PLAY_ARROW"
+          },
+          "pauseIcon": {
+           "iconType": "PAUSE"
+          },
+          "accessibilityPlayData": {
+           "accessibilityData": {
+            "label": "Play Glass Rain - Mira Vale"
+           }
+          }
+         }
+        },
+        "contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
+        "displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
+       }
+      },
+      "flexColumns": [
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Glass Rain",
+            "navigationEndpoint": {
+             "watchEndpoint": {
+              "videoId": "sugVideo007",
+              "watchEndpointMusicSupportedConfigs": {
+               "watchEndpointMusicConfig": {
+                "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Mira Vale",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "UCsugArtist0002",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Glass Rain",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "MPREb_sugAlbum06",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_MEDIUM"
+        }
+       }
+      ],
+      "fixedColumns": [
+       {
+        "musicResponsiveListItemFixedColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "3:03"
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+         "size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+        }
+       }
+      ],
+      "menu": {
+       "menuRenderer": {
+        "items": [
+         {
+          "menuNavigationItemRenderer": {
+           "text": {
+            "runs": [
+             {
+              "text": "Start radio"
+             }
+            ]
+           },
+           "icon": {
+            "iconType": "MIX"
+           },
+           "navigationEndpoint": {
+            "watchEndpoint": {
+             "videoId": "sugVideo007",
+             "playlistId": "RDAMVMsugVideo007",
+             "params": "wAEB"
+            }
+           }
+          }
+         }
+        ]
+       }
+      },
+      "playlistItemData": {
+       "videoId": "sugVideo007"
+      },
+      "flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
+      "itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
+     }
+    },
+    {
+     "musicResponsiveListItemRenderer": {
+      "thumbnail": {
+       "musicThumbnailRenderer": {
+        "thumbnail": {
+         "thumbnails": [
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo008/sddefault.jpg",
+           "width": 60,
+           "height": 60
+          },
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo008/hqdefault.jpg",
+           "width": 120,
+           "height": 120
+          }
+         ]
+        },
+        "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+        "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+       }
+      },
+      "overlay": {
+       "musicItemThumbnailOverlayRenderer": {
+        "content": {
+         "musicPlayButtonRenderer": {
+          "playNavigationEndpoint": {
+           "watchEndpoint": {
+            "videoId": "sugVideo008",
+            "watchEndpointMusicSupportedConfigs": {
+             "watchEndpointMusicConfig": {
+              "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+             }
+            }
+           }
+          },
+          "playIcon": {
+           "iconType": "PLAY_ARROW"
+          },
+          "pauseIcon": {
+           "iconType": "PAUSE"
+          },
+          "accessibilityPlayData": {
+           "accessibilityData": {
+            "label": "Play Late Bus - Ruth Okoro"
+           }
+          }
+         }
+        },
+        "contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
+        "displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
+       }
+      },
+      "flexColumns": [
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Late Bus",
+            "navigationEndpoint": {
+             "watchEndpoint": {
+              "videoId": "sugVideo008",
+              "watchEndpointMusicSupportedConfigs": {
+               "watchEndpointMusicConfig": {
+                "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Ruth Okoro",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "UCsugArtist0006",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Late Bus",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "MPREb_sugAlbum07",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_MEDIUM"
+        }
+       }
+      ],
+      "fixedColumns": [
+       {
+        "musicResponsiveListItemFixedColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "2:47"
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+         "size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+        }
+       }
+      ],
+      "menu": {
+       "menuRenderer": {
+        "items": [
+         {
+          "menuNavigationItemRenderer": {
+           "text": {
+            "runs": [
+             {
+              "text": "Start radio"
+             }
+            ]
+           },
+           "icon": {
+            "iconType": "MIX"
+           },
+           "navigationEndpoint": {
+            "watchEndpoint": {
+             "videoId": "sugVideo008",
+             "playlistId": "RDAMVMsugVideo008",
+             "params": "wAEB"
+            }
+           }
+          }
+         }
+        ]
+       }
+      },
+      "playlistItemData": {
+       "videoId": "sugVideo008"
+      },
+      "flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
+      "itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
+     }
+    },
+    {
+     "musicResponsiveListItemRenderer": {
+      "thumbnail": {
+       "musicThumbnailRenderer": {
+        "thumbnail": {
+         "thumbnails": [
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo009/sddefault.jpg",
+           "width": 60,
+           "height": 60
+          },
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo009/hqdefault.jpg",
+           "width": 120,
+           "height": 120
+          }
+         ]
+        },
+        "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+        "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+       }
+      },
+      "overlay": {
+       "musicItemThumbnailOverlayRenderer": {
+        "content": {
+         "musicPlayButtonRenderer": {
+          "playNavigationEndpoint": {
+           "watchEndpoint": {
+            "videoId": "sugVideo009",
+            "watchEndpointMusicSupportedConfigs": {
+             "watchEndpointMusicConfig": {
+              "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+             }
+            }
+           }
+          },
+          "playIcon": {
+           "iconType": "PLAY_ARROW"
+          },
+          "pauseIcon": {
+           "iconType": "PAUSE"
+          },
+          "accessibilityPlayData": {
+           "accessibilityData": {
+            "label": "Play Tidewater - Junebug"
+           }
+          }
+         }
+        },
+        "contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
+        "displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
+       }
+      },
+      "flexColumns": [
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Tidewater",
+            "navigationEndpoint": {
+             "watchEndpoint": {
+              "videoId": "sugVideo009",
+              "watchEndpointMusicSupportedConfigs": {
+               "watchEndpointMusicConfig": {
+                "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Junebug",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "UCsugArtist0003",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Satellites",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "MPREb_sugAlbum03",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_MEDIUM"
+        }
+       }
+      ],
+      "fixedColumns": [
+       {
+        "musicResponsiveListItemFixedColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "3:55"
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+         "size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+        }
+       }
+      ],
+      "menu": {
+       "menuRenderer": {
+        "items": [
+         {
+          "menuNavigationItemRenderer": {
+           "text": {
+            "runs": [
+             {
+              "text": "Start radio"
+             }
+            ]
+           },
+           "icon": {
+            "iconType": "MIX"
+           },
+           "navigationEndpoint": {
+            "watchEndpoint": {
+             "videoId": "sugVideo009",
+             "playlistId": "RDAMVMsugVideo009",
+             "params": "wAEB"
+            }
+           }
+          }
+         }
+        ]
+       }
+      },
+      "playlistItemData": {
+       "videoId": "sugVideo009"
+      },
+      "flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
+      "itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
+     }
+    },
+    {
+     "musicResponsiveListItemRenderer": {
+      "thumbnail": {
+       "musicThumbnailRenderer": {
+        "thumbnail": {
+         "thumbnails": [
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo010/sddefault.jpg",
+           "width": 60,
+           "height": 60
+          },
+          {
+           "url": "https://i.ytimg.com/vi/sugVideo010/hqdefault.jpg",
+           "width": 120,
+           "height": 120
+          }
+         ]
+        },
+        "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+        "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+       }
+      },
+      "overlay": {
+       "musicItemThumbnailOverlayRenderer": {
+        "content": {
+         "musicPlayButtonRenderer": {
+          "playNavigationEndpoint": {
+           "watchEndpoint": {
+            "videoId": "sugVideo010",
+            "watchEndpointMusicSupportedConfigs": {
+             "watchEndpointMusicConfig": {
+              "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+             }
+            }
+           }
+          },
+          "playIcon": {
+           "iconType": "PLAY_ARROW"
+          },
+          "pauseIcon": {
+           "iconType": "PAUSE"
+          },
+          "accessibilityPlayData": {
+           "accessibilityData": {
+            "label": "Play Lanterns - Kai Moreno"
+           }
+          }
+         }
+        },
+        "contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
+        "displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
+       }
+      },
+      "flexColumns": [
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Lanterns",
+            "navigationEndpoint": {
+             "watchEndpoint": {
+              "videoId": "sugVideo010",
+              "watchEndpointMusicSupportedConfigs": {
+               "watchEndpointMusicConfig": {
+                "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Kai Moreno",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "UCsugArtist0007",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+        }
+       },
+       {
+        "musicResponsiveListItemFlexColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "Lanterns",
+            "navigationEndpoint": {
+             "browseEndpoint": {
+              "browseId": "MPREb_sugAlbum08",
+              "browseEndpointContextSupportedConfigs": {
+               "browseEndpointContextMusicConfig": {
+                "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+               }
+              }
+             }
+            }
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_MEDIUM"
+        }
+       }
+      ],
+      "fixedColumns": [
+       {
+        "musicResponsiveListItemFixedColumnRenderer": {
+         "text": {
+          "runs": [
+           {
+            "text": "3:19"
+           }
+          ]
+         },
+         "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+         "size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+        }
+       }
+      ],
+      "menu": {
+       "menuRenderer": {
+        "items": [
+         {
+          "menuNavigationItemRenderer": {
+           "text": {
+            "runs": [
+             {
+              "text": "Start radio"
+             }
+            ]
+           },
+           "icon": {
+            "iconType": "MIX"
+           },
+           "navigationEndpoint": {
+            "watchEndpoint": {
+             "videoId": "sugVideo010",
+             "playlistId": "RDAMVMsugVideo010",
+             "params": "wAEB"
+            }
+           }
+          }
+         }
+        ]
+       }
+      },
+      "playlistItemData": {
+       "videoId": "sugVideo010"
+      },
+      "flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
+      "itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
+     }
+    }
+   ],
+   "continuations": [
+    {
+     "reloadContinuationData": {
+      "continuation": "SUGGESTIONS-REFRESH-2",
+      "clickTrackingParams": "CAAQhGcTEwi-suggestions"
+     }
+    }
+   ]
+  }
+ }
+}

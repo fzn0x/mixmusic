@@ -28,6 +28,15 @@ belongs to its main thread: what finishes elsewhere comes back through
   handler marks it (`scrollsInside`), as the lyrics of the now playing
   page do.
 
+- **A playlist's suggestions** (`playlistsuggestions.go`): below the
+  tracks of a playlist of the user's on YouTube Music, once they're all
+  read, the songs YouTube Music suggests adding to it, from the token
+  the playlist's page gave (`Playlist.Suggest`), and a refresh's token
+  for the next ones. The loads keep them beside the playlist's fetch, so
+  that the playlist read again keeps them. Each is a list of one, which
+  plays it alone; one added leaves them, joins the end of the tracks as
+  read at once, and the playlist is read again for its place there,
+  which taking it out needs.
 - **Long playlists** (`playlistread.go`): a playlist's page, and the
   songs liked on YouTube Music in the library, show their first page of
   tracks at once and read the rest beside it, telling how many came, how
@@ -37,6 +46,15 @@ belongs to its main thread: what finishes elsewhere comes back through
   another track started meanwhile. The items of the page's menu that
   take its tracks, and its download, show once the list is whole. The
   queue builds only its entries near the view, as it may hold thousands.
+- **Tracks that couldn't play** (`playbackerrors.go`,
+  `failurereport.go`): the toast of the player's notice of one has
+  Details, which opens a dialog of the failure the notice names.
+  `failureDetails` builds what it shows, wherever it's built: the track,
+  where it comes from, when, the steps tried, and Copy, which puts
+  `failureReport`'s text on the clipboard. Both leave out what `privacy`
+  holds, the names of the accounts signed in and the home folder, and
+  URLs' queries, cookies, tokens and addresses. Settings › About lists
+  the failures the player keeps.
 
 - **Menus** are the system's: MyGo builds one as it opens, and again for
   the item chosen, never while it shows, so what a menu lists is fetched
@@ -45,7 +63,11 @@ belongs to its main thread: what finishes elsewhere comes back through
   track's "Add to YouTube Music playlist" lists, and keeps them: one made
   goes in first, and one deleted leaves, without reading the list again
   (`keepPlaylist`, `dropPlaylist`); signing in or out, or choosing
-  another channel, reads it again.
+  another channel, reads it again. An add from those menus to a
+  playlist, or to a mix, that holds the track already says so in a
+  toast, with Add anyway (`alreadyin.go`): YouTube Music refuses it, and
+  a mix leaves it out (`AddNewToPlaylist`); Add anyway adds it a second
+  time.
 - **Keep on top** (`keepontop.go`): the main window opens above the
   others while `keepOnTop` is on (`WindowOptions.AlwaysOnTop`), and each
   frame of it compares the setting with what the window was told last,
@@ -72,6 +94,23 @@ belongs to its main thread: what finishes elsewhere comes back through
   typed in keeps the focus. A search or a sort there shows the list from
   its start under them, and the page keeps the room for it. Nothing
   scans a list for this in a frame.
+
+- **Sorting by plays and putting a mix in order.** A list of tracks
+  sorted by plays (`trackplays.go`) counts them from the history
+  (`Collection.PlayCounts`), and sorts again once the library's version
+  changes. A mix, and a playlist of the user's on YouTube Music read
+  whole, move their tracks while they show in their own order
+  (`mixorder.go`): a row drags its place (`Element.Drag`), as the queue's
+  entries do, and the row it's dropped on takes it; Alt+Up and Alt+Down,
+  from the focus inside a row (`OnShortcut`), move it a place, and its
+  play button takes the focus at its new place. The page shows the new
+  order at once, in the playlist as read (`playlistRead`). A mix is saved
+  with `MoveInPlaylist`; YouTube Music hears of each move after the one
+  before, as `ACTION_MOVE_VIDEO_BEFORE`, by the entries' places in the
+  playlist (`setVideoId`), and when it refuses one the page reads the
+  playlist again. Spotify's playlists don't move: its API moves items by
+  their positions, which the list of a playlist doesn't keep, as it
+  leaves out what isn't a track.
 
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48

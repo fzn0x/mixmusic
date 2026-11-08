@@ -67,7 +67,7 @@ func (a *App) nativeEngine() *audio.Engine {
 		return nil
 	}
 	a.nativeOnce.Do(func() {
-		start := startNative
+		start := a.startNative
 		if Silent() {
 			start = startSilent
 		}
@@ -154,9 +154,17 @@ func (a *App) openNative(ctx context.Context, rawURL string, interrupted func() 
 }
 
 // startNative starts the output of the native engine, of channels: 2, or
-// 6 for 5.1 surround where the device has it.
-func startNative(channels int, render func([]float32, int), failed func(error)) (audio.Output, error) {
-	s, err := output.Start(channels, render, failed)
+// 6 for 5.1 surround where the device has it, on the output device chosen,
+// or on the system's default device while that one isn't there.
+func (a *App) startNative(channels int, render func([]float32, int), failed func(error)) (audio.Output, error) {
+	chosen := a.chosenOutput()
+	s, err := output.Open(output.Options{
+		Channels: channels,
+		Render:   render,
+		Failed:   failed,
+		Device:   chosen.ID,
+		Moved:    func(fallback bool) { a.outputMoved(chosen, fallback) },
+	})
 	switch {
 	case errors.Is(err, output.ErrNoDevice):
 		return nil, errors.New("no audio output device")

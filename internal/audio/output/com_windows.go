@@ -190,11 +190,7 @@ func (d *iMMDevice) id() (string, error) {
 		return "", err
 	}
 	defer syscall.SyscallN(procCoTaskMemFree.Addr(), uintptr(unsafe.Pointer(p)))
-	n := 0
-	for *(*uint16)(unsafe.Add(unsafe.Pointer(p), 2*n)) != 0 {
-		n++
-	}
-	return syscall.UTF16ToString(unsafe.Slice(p, n)), nil
+	return utf16String(p), nil
 }
 
 func (d *iMMDevice) activateClient() (*iAudioClient, error) {

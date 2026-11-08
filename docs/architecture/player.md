@@ -29,6 +29,18 @@
   track's end: MixMusic's own device, given a track with nothing after it,
   may stay on it once it ended, its position counting on (#373). The time
   shown never passes the track's end.
+- **Failures** (`failures.go`): the player keeps the last 10 tracks that
+  couldn't play, until MixMusic quits (`Failures`, `FailureOf`), and the
+  notice of each names its own (`Notice.Failure`). Each holds the steps
+  tried of the track since it loaded, in turn, with why each failed: the
+  Spotify device it fell back from (`fellBack`), the 5.1 audio it gave
+  up, the stream and its tries again, one step for each run of the same
+  error, and the error that failed it, named after how the track was to
+  play (`way`): the file, a download or the offline cache, the stream,
+  or finding it. An error that tells its own steps, as the resolver's
+  does when yt-dlp failed after YouTube's player API (`stream.bothFailed`),
+  gives them in its place: `await` keeps the error of the answer the
+  player takes in, for `tried` to read.
 - **`internal/online`** tells the player whether the network answers: a
   check of YouTube's and Spotify's addresses over HTTPS, shared by its
   callers, which audio coming from YouTube answers too, and a wait for the

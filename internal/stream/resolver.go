@@ -112,6 +112,11 @@ type Stream struct {
 	// a live stream. Its URL is "" when YouTube's player API told only
 	// that it is there: Resolver.Surround has yt-dlp find it.
 	Surround *Stream
+	// later is the answer of YouTube's TV app of the video's 5.1 surround
+	// audio, while Surround is nil and the answer hadn't come as the
+	// direct route found the stream: the resolver keeps it with the stream
+	// as it comes (Resolver.Told).
+	later *toldLater
 	// Videos are the streams of the video's picture, which yt-dlp and
 	// YouTube's player API list beside the audio, for the now playing page.
 	Videos []Video
@@ -135,6 +140,12 @@ type Resolver struct {
 	// Run runs yt-dlp with args and returns what it printed; tests replace
 	// it.
 	Run func(ctx context.Context, args ...string) ([]byte, error)
+	// Told, when set, is called with a video's ID once YouTube's TV app
+	// told, after Resolve returned the video's stream, that the video has
+	// 5.1 surround audio: the stream Resolve returns has its Surround from
+	// then on, and the track that plays it can offer it. It is called on
+	// a goroutine of its own.
+	Told func(videoID string)
 
 	mu      sync.Mutex
 	quality Quality
@@ -150,6 +161,9 @@ type resolution struct {
 	done   chan struct{}
 	stream Stream
 	err    error
+	// surround is the 5.1 surround audio YouTube's TV app told of after
+	// the stream was found, under the resolver's mutex (hear).
+	surround *Stream
 }
 
 // fresh reports whether a resolution that ended found a stream that isn't
@@ -229,18 +243,25 @@ func (r *Resolver) share(ctx context.Context, videoID string, surround bool,
 		calls[videoID] = res
 		quality := r.quality
 		go func() {
-			defer close(res.done)
 			// Not the caller's context: other callers may wait for this.
 			ctx, cancel := context.WithTimeout(context.Background(), resolveTimeout)
-			defer cancel()
-			res.stream, res.err = find(ctx, videoID, quality)
+			s, err := find(ctx, videoID, quality)
+			cancel()
+			later := s.later
+			s.later = nil
+			res.stream, res.err = s, err
+			close(res.done)
+			// The TV app's answer of 5.1 audio that came after the stream.
+			if later != nil {
+				r.hear(videoID, res, later)
+			}
 		}()
 	}
 	r.mu.Unlock()
 
 	select {
 	case <-res.done:
-		return res.stream, res.err
+		return r.result(res)
 	case <-ctx.Done():
 		return Stream{}, ctx.Err()
 	}
@@ -297,9 +318,9 @@ func (r *Resolver) Forget(videoID string) {
 }
 
 // resolve finds the stream of a video through the direct route, when the
-// resolver has it, else with yt-dlp. The log tells when it took a while,
-// and why yt-dlp found it, never the stream's URL, which carries the
-// user's IP address.
+// resolver has it, else with yt-dlp, quickly first (findWithYTDLP). The
+// log tells when it took a while, and why and how yt-dlp found it, never
+// the stream's URL, which carries the user's IP address.
 func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality) (Stream, error) {
 	start := time.Now()
 	var direct error
@@ -319,7 +340,7 @@ func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality)
 		}
 		direct = err
 	}
-	s, err := r.ytdlp(ctx, videoID, quality)
+	s, run, err := r.findWithYTDLP(ctx, videoID, quality, direct)
 	if err != nil {
 		// Without yt-dlp, why YouTube gave the direct route no stream is
 		// the better answer, when it is a plain one.
@@ -329,14 +350,18 @@ func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality)
 				return Stream{}, failure{plain, kind}
 			}
 		}
+		if direct != nil {
+			return Stream{}, bothFailed{direct, err}
+		}
 		return Stream{}, err
 	}
 	took := time.Since(start).Round(10 * time.Millisecond)
 	switch {
 	case direct != nil:
-		log.Printf("mixmusic: found the stream of %s in %s with yt-dlp (%s)", videoID, took, strings.TrimPrefix(direct.Error(), "stream: "))
+		log.Printf("mixmusic: found the stream of %s in %s with yt-dlp's %s run in %s (%s)", videoID, took, run.name, run.took,
+			strings.TrimPrefix(direct.Error(), "stream: "))
 	case took > slowResolve:
-		log.Printf("mixmusic: found the stream of %s in %s with yt-dlp", videoID, took)
+		log.Printf("mixmusic: found the stream of %s in %s with yt-dlp's %s run in %s", videoID, took, run.name, run.took)
 	}
 	return s, nil
 }
@@ -369,10 +394,12 @@ func (r *Resolver) findSurround(ctx context.Context, videoID string, quality Qua
 	return *s.Surround, nil
 }
 
-// ytdlp asks yt-dlp for the stream of a video. It asks signed out, also
-// when the user signed in to YouTube Music: with an account's cookies,
-// YouTube answers yt-dlp with fewer streams, often none it can play, and
-// it may flag the account for using yt-dlp.
+// ytdlp asks yt-dlp for the stream of a video the full way: with its
+// default clients and the JavaScript runtime, which find what the quick
+// run can't, and the 5.1 surround audio, as the stream's Surround. It asks
+// signed out, also when the user signed in to YouTube Music: with an
+// account's cookies, YouTube answers yt-dlp with fewer streams, often none
+// it can play, and it may flag the account for using yt-dlp.
 func (r *Resolver) ytdlp(ctx context.Context, videoID string, quality Quality) (Stream, error) {
 	args := []string{"-J", "--no-playlist", "-f", formats[quality]}
 	if r.Tools != nil {

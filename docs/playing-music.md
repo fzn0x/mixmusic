@@ -143,8 +143,9 @@ Music videos can show their picture on the now playing page, in place of the cov
 
 ## 5.1 surround
 
-Some YouTube Music tracks have a 5.1 surround mix beside their stereo one. While one plays, a 5.1 button shows by the player: pressing it plays the surround mix from where the stereo one was, and pressing it again goes back to stereo. The choice stays for later tracks, as "Play 5.1 surround when a track has it" in Settings › Playback › Sound, which the button turns on and off. It's off by default.
+Some YouTube Music tracks have a 5.1 surround mix beside their stereo one. Turn on "Play 5.1 surround when a track has it" in Settings › Playback › Sound, and MixMusic asks YouTube whether each track has one. While one plays, a 5.1 button shows by the player: pressing it goes back to stereo from where the surround mix was, and pressing it again plays the surround mix. The choice stays for later tracks, as the setting, which the button turns off and on. It's off by default.
 
+- While the setting is off, MixMusic doesn't ask, so tracks start sooner, and the 5.1 button shows only for a track whose 5.1 mix it knows of already: one the offline cache keeps, or one yt-dlp found.
 - On a 5.1 output device, the six channels play as they are. On headphones or two speakers, they're mixed down to stereo, as the track's own downmix levels say.
 - While it's on, stereo tracks play on the front left and right speakers of a 5.1 system.
 - The surround mix [needs yt-dlp and a JavaScript runtime](streams.md#surround-mixes-and-what-they-need), which find it in a few seconds the first time the track plays.

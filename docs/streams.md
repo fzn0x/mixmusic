@@ -153,9 +153,13 @@ Some tracks have a 5.1 surround mix beside their stereo one, which
 or E-AC-3, format 328.
 
 - **Asking a TV app.** YouTube lists no 5.1 audio to the visionOS app.
-  So, at the same time, MixMusic asks the player API as YouTube's app for
-  Samsung's TVs, which YouTube tells of a video's AC-3 and E-AC-3, and
-  waits for its answer at most half a second past the stereo one's.
+  So, while "Play 5.1 surround when a track has it" is on, MixMusic asks
+  the player API at the same time as YouTube's app for Samsung's TVs,
+  which YouTube tells of a video's AC-3 and E-AC-3, and waits for its
+  answer at most half a second past the stereo one's. While it's off, as
+  it is by default, MixMusic doesn't ask, and a track starts without that
+  wait. Before 0.5.11, it asked for every track, so a track could start
+  half a second late on a slow connection with the setting off.
 - **yt-dlp and a JavaScript runtime.** The addresses of these streams
   need a challenge solved, which only yt-dlp does. MixMusic has it find
   the mix only when it is asked for, as you press 5.1 or a track starts

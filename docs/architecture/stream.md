@@ -17,6 +17,10 @@
   it finds the 5.1 audio as it is asked for (`Resolver.Surround`), once,
   in some 3 s, and YouTube serves it a few seconds after. Without yt-dlp
   and a runtime, no 5.1 audio is offered.
+  The route asks the TV app only while 5.1 surround is on, as `App.apply`
+  tells it (`Resolver.SetSurround`): off, a stream found waits for nothing
+  more, and turned on, the streams kept that tell of no 5.1 audio are
+  found again as they are asked for.
   A live video's audio is an HLS media playlist (RFC 8216) of AAC-LC in
   packed audio, format 234, or 233 with data saver, which `Proxy.OpenLive`
   follows from near its live edge: it loads the playlist again about once

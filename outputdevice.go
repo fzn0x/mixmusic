@@ -183,7 +183,8 @@ func (o *outputSlot) fits() bool {
 
 // outputChoice reports whether there is a choice of output device to make,
 // which the device button offers: while MixMusic's own player is there,
-// more than one device, or a device chosen.
+// more than one device, or a device chosen. It lists the devices whatever
+// the room, so that they're there once the room is.
 func (s *shell) outputChoice() bool {
 	if !settings.NativeAudio {
 		return false
@@ -198,7 +199,8 @@ func (s *shell) outputChoice() bool {
 // accent while a device is chosen. Its slot is there without it, so that
 // the controls after it keep what they hold as it comes and goes.
 func (s *shell) outputButton(c *ui.Context, room *outputSlot) {
-	room.shown = room.fits() && s.outputChoice()
+	choice := s.outputChoice()
+	room.shown = choice && room.fits()
 	slot := ui.Row(c.Key("output-slot")).Shrink(0)
 	if !room.shown {
 		// Without the gap before it.

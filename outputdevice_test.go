@@ -139,7 +139,11 @@ func settleOutput(t *testing.T, s *shell, tt *ui.Tester) {
 			return
 		}
 		if time.Now().After(deadline) {
-			t.Fatal("the window didn't list the output devices")
+			if l == nil {
+				t.Fatalf("the window never asked for the output devices; the player bar shows %q", tt.Texts())
+			}
+			t.Fatalf("the window didn't take the output devices: done %v, again %v, asks %d, answers %d, %d devices, error %v",
+				l.done, l.again, l.asks, l.answers, len(l.value), l.err)
 		}
 	}
 }

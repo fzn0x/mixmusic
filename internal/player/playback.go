@@ -250,6 +250,7 @@ func (p *Player) playsSurround() bool {
 // entry, or until 5.1 is turned on again, it plays in stereo.
 func (p *Player) fallBackToStereo(why string) {
 	cur, _ := p.s.Current()
+	p.tried("its 5.1 surround audio", why)
 	p.stereoOnly = true
 	p.retry = retryState{played: p.retry.played, from: p.s.Position}
 	log.Printf("mixmusic: the 5.1 surround audio of %s stopped at %s: %s; playing it in stereo", cur.Track.ID, p.s.Position.Round(time.Second), why)
@@ -494,6 +495,7 @@ func (p *Player) stopStream() {
 // fellBack tells why a Spotify track plays from YouTube Music instead, once
 // for each reason.
 func (p *Player) fellBack(why string) {
+	p.tried(p.spotifyWay(), why)
 	if p.warned[why] {
 		return
 	}
@@ -531,7 +533,7 @@ func (p *Player) fail(message string) {
 	if ok {
 		why = fmt.Sprintf("Couldn't play %s: %s", cur.Track.Title, why)
 	}
-	p.notify(Notice{Message: why, Error: true})
+	p.notify(Notice{Message: why, Error: true, Failure: p.keepFailure(message, stop)})
 	if stop {
 		return
 	}
@@ -592,6 +594,7 @@ func (p *Player) onStreamError(message string) {
 func (p *Player) retryStream(why string) {
 	entry, _ := p.s.Current()
 	r := &p.retry
+	p.tried(again(p.way(entry), r.n), why)
 	tries, wait := 1, time.Duration(0)
 	waits := r.played && !p.playsOffline()
 	if waits {

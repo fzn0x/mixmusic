@@ -194,6 +194,9 @@ const (
 type Notice struct {
 	Message string
 	Error   bool
+	// Failure names the track that couldn't play it tells of, for
+	// FailureOf: 0 for none.
+	Failure int
 	// Settings is set when the playback settings change what it tells.
 	Settings bool
 }
@@ -451,6 +454,9 @@ type Player struct {
 	failures    int
 	// warned holds what fellBack told, to tell it once.
 	warned map[string]bool
+	// failed keeps the tracks that couldn't play, and what was tried of
+	// the current one (failures.go).
+	failed failing
 	// unshuffled is the queue in its own order while it is shuffled, and
 	// played the entries that became current since the queue was filled,
 	// by UID. Neither is changed in place, as what is published shares
@@ -737,7 +743,12 @@ func (p *Player) notify(n Notice) { p.notices = append(p.notices, n) }
 func await[T any](p *Player, work func(ctx context.Context) (T, error), then func(T, error)) {
 	go func() {
 		v, err := work(p.ctx)
-		p.do(func() { then(v, err) })
+		p.do(func() {
+			// A failure it tells of may tell its steps (tried).
+			p.failed.awaited = err
+			then(v, err)
+			p.failed.awaited = nil
+		})
 	}()
 }
 

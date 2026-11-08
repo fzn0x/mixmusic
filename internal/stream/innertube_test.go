@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -713,95 +712,6 @@ func TestDirectRejectsAnotherVideosAnswer(t *testing.T) {
 	f := newFakeTube(t)
 	if _, err := f.direct().Stream(context.Background(), "w3XzgjlKFjc", QualityBest); !errors.Is(err, errBadAnswer) {
 		t.Errorf("the song's answer for another video: %v", err)
-	}
-}
-
-func TestDirectPausesAfterRefusals(t *testing.T) {
-	var logs bytes.Buffer
-	log.SetOutput(&logs)
-	t.Cleanup(func() { log.SetOutput(os.Stderr) })
-
-	f := newFakeTube(t)
-	d := f.direct()
-	now := time.Now()
-	d.now = func() time.Time { return now }
-	stream := func() error {
-		_, err := d.Stream(context.Background(), songID, QualityBest)
-		return err
-	}
-
-	// What says a video has no stream for the route, or that the network
-	// failed, never pauses it.
-	for _, suffix := range []string{"-age", "-unplayable"} {
-		f.answersWith(suffix)
-		for range pauseAfter + 1 {
-			stream()
-		}
-	}
-	f.answers(func(playerRequest) []byte {
-		return []byte(strings.ReplaceAll(string(withoutOpus(f.recorded(""))), `codecs=\"mp4a.40.2\"`, `codecs=\"mp4a.40.5\"`))
-	})
-	for range pauseAfter + 1 {
-		if err := stream(); !errors.Is(err, errNoStream) {
-			t.Fatalf("no Opus and no AAC-LC: %v", err)
-		}
-	}
-	down := &Direct{HTTP: &http.Client{Transport: offline{}}, BaseURL: f.srv.URL, now: d.now}
-	for range pauseAfter + 1 {
-		if _, err := down.Stream(context.Background(), songID, QualityBest); errors.Is(err, errDirectPaused) {
-			t.Fatal("paused offline")
-		}
-	}
-	f.answersWith("")
-	if err := stream(); err != nil {
-		t.Fatalf("after videos without streams for the route: %v", err)
-	}
-
-	// A refusal of the media server, URLs that need yt-dlp, a bot check a
-	// new visitor ID doesn't pass, and an HTTP error each count.
-	for name, refuse := range map[string]func(){
-		"media server": func() { f.refuses(http.StatusForbidden) },
-		"signatures": func() {
-			f.answers(func(playerRequest) []byte {
-				return []byte(strings.ReplaceAll(string(f.recorded("")), "&expire=", "&n=AbCdEfGhIjKl&expire="))
-			})
-		},
-		"bot check": func() { f.answersWith("-bot-check") },
-		"HTTP 500":  func() { f.answers(func(playerRequest) []byte { return nil }) },
-	} {
-		f.answersWith("")
-		f.serves(serveClen)
-		refuse()
-		for i := range pauseAfter {
-			if err := stream(); err == nil || errors.Is(err, errDirectPaused) {
-				t.Fatalf("%s: refusal %d: %v", name, i+1, err)
-			}
-		}
-		asked := len(f.players())
-		if err := stream(); !errors.Is(err, errDirectPaused) || len(f.players()) != asked {
-			t.Fatalf("%s: not paused after %d refusals: %v", name, pauseAfter, err)
-		}
-		now = now.Add(pauseFor + time.Minute)
-	}
-
-	// A stream found sets the count back.
-	f.answersWith("")
-	f.refuses(http.StatusForbidden)
-	stream()
-	stream()
-	f.serves(serveClen)
-	if err := stream(); err != nil {
-		t.Fatal(err)
-	}
-	f.refuses(http.StatusForbidden)
-	stream()
-	if err := stream(); !errors.Is(err, errRefused) {
-		t.Errorf("after refusals that a stream found came between: %v", err)
-	}
-
-	pauses := strings.Count(logs.String(), "YouTube's player API refused 3 streams in a row; yt-dlp alone finds them for 30 minutes")
-	if pauses != 4 || strings.Contains(logs.String(), "videoplayback") || strings.Contains(logs.String(), testVisitor) {
-		t.Errorf("%d pauses logged, or a stream URL or the visitor ID:\n%s", pauses, logs.String())
 	}
 }
 

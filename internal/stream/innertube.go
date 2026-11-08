@@ -80,8 +80,9 @@ const (
 	// directTimeout bounds the direct route, so that an answer that doesn't
 	// come leaves yt-dlp the time to find the stream.
 	directTimeout = 4 * time.Second
-	// After pauseAfter refusals in a row, the direct route rests for
-	// pauseFor: yt-dlp alone finds streams meanwhile.
+	// After pauseAfter refusals in a row, the direct route rests, a few
+	// minutes at first (directrest.go), and the TV client for pauseFor:
+	// yt-dlp alone finds streams meanwhile.
 	pauseAfter = 3
 	pauseFor   = 30 * time.Minute
 	// surroundGrace is how long a stream found waits, past its check, for
@@ -171,9 +172,8 @@ type Direct struct {
 	visitor   string
 	visitorAt time.Time
 	asking    *visitorCall // the request of a visitor ID under way, or nil
-	// refused counts refusals in a row; the route rests until pausedUntil.
-	refused     int
-	pausedUntil time.Time
+	// rest is how the route rests after refusals in a row (directrest.go).
+	rest restState
 	// tvRefused counts the TV client's refusals in a row; it isn't asked
 	// until tvPausedUntil.
 	tvRefused     int
@@ -193,39 +193,6 @@ func NewDirect() *Direct {
 	// The default transport, which the proxy's client uses too, keeps the
 	// connection the check opened to the media server for its requests.
 	return &Direct{HTTP: &http.Client{Timeout: 8 * time.Second}, BaseURL: innertubeURL, now: time.Now}
-}
-
-// Stream returns the audio stream of a video in quality q, once the media
-// server answered for it.
-func (d *Direct) Stream(ctx context.Context, videoID string, q Quality) (Stream, error) {
-	d.mu.Lock()
-	resting := d.now().Before(d.pausedUntil)
-	d.mu.Unlock()
-	if resting {
-		return Stream{}, errDirectPaused
-	}
-	s, err := d.stream(ctx, videoID, q)
-	d.count(err)
-	return s, err
-}
-
-// count takes in how finding a stream went, and pauses the route after
-// pauseAfter refusals in a row.
-func (d *Direct) count(err error) {
-	d.mu.Lock()
-	defer d.mu.Unlock()
-	switch {
-	case err == nil:
-		d.refused = 0
-	case refusal(err):
-		d.refused++
-		if d.refused >= pauseAfter {
-			d.refused = 0
-			d.pausedUntil = d.now().Add(pauseFor)
-			log.Printf("mixmusic: YouTube's player API refused %d streams in a row; yt-dlp alone finds them for %d minutes",
-				pauseAfter, int(pauseFor/time.Minute))
-		}
-	}
 }
 
 func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream, error) {

@@ -121,6 +121,8 @@ type deck struct {
 	err      error         // why the deck failed
 	duration time.Duration
 	ready    bool // whether the headers were read
+	// holds is what the track holds, once they were.
+	holds Format
 }
 
 // newDeck starts a deck of url at start. notify is called, from the deck's
@@ -316,6 +318,8 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		d.duration = tm.total - delay
 	}
 	d.ready = true
+	d.holds = describe(tr)
+	d.holds.Duration = d.duration
 	// The rings from now on hold frames of the track's channels: the one
 	// the audio thread reads takes them before it got a frame, as the one
 	// a seek asked for meanwhile, which the loop below takes.

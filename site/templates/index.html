@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MixMusic: Spotify and YouTube Music in one desktop player</title>
   <meta name="description" content="A free, open-source desktop player for macOS, Windows and Linux: one search, queue and library for Spotify and YouTube Music, with lyrics and podcasts." />
-  <meta name="theme-color" content="#121212" />
-  <meta name="color-scheme" content="dark" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#fff8f8" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)" />
+  {% include "partials/theme.html" %}
   <link rel="icon" type="image/png" href="assets/icon.png" />
   {%- set home = config.base_url | trim_end(pat='/') ~ '/' %}
   {%- set base = config.extra.canonical_url | trim_end(pat='/') %}
@@ -123,6 +125,7 @@
         <a href="#download">Download</a>
         <a href="{{ get_url(path='@/docs/_index.md') }}">Docs</a>
       </nav>
+      <button class="theme-toggle" type="button" aria-label="Theme: as the system" data-theme-toggle><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-theme-system" /></svg></button>
       <a class="btn btn-outlined btn-small" href="https://github.com/fzn0x/mixmusic">
         <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg>
         <span>Star on GitHub</span>

@@ -3,7 +3,11 @@
  * the shapes of MixMusic's default layout, Blend: rounded cards, pill
  * buttons and chips, bold headings in sentence case. Colour comes from
  * the brand pink of the mark and the download button, and the artwork of
- * each cover and screenshot, which tints its glow.
+ * each cover and screenshot, which tints its glow. Light or dark as the
+ * system is, or as the theme button chose (partials/theme.html): light
+ * takes the scheme of MixMusic's Material theme, as the docs do. The
+ * working player, the sketches of the app and the screenshots show the
+ * app in its default, dark look in either.
  */
 
 @font-face {
@@ -43,6 +47,10 @@
   --on-brand: #ffffff;
   --spotify: #1ed760;
   --youtube: #ff4040;
+  --scrollbar: #3a3a3a;
+  --scrollbar-hover: #4a4a4a;
+  --dot-ring: rgba(255, 255, 255, 0.5);
+  --kbd-edge: rgba(0, 0, 0, 0.35);
 
   /* Blend's corners: 20px on what is large, 10px on what is small. */
   --radius-card: 20px;
@@ -61,6 +69,53 @@
   --mono: "Cascadia Mono", Consolas, "SFMono-Regular", ui-monospace, monospace;
 }
 
+/* Light: the scheme of MixMusic's Material theme (builtin/themes/material),
+   with its Spotify and YouTube marks, as the system has it unless the
+   visitor chose dark, or as the visitor chose. The two blocks are the
+   same: keep them so. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #fff8f8;
+    --surface-1: #fff0f2;
+    --surface-2: #f7ebec;
+    --surface-3: #ebe0e1;
+    --outline: #dccdd0;
+    --outline-strong: rgba(32, 26, 27, 0.34);
+    --ink: #201a1b;
+    --ink-2: #514347;
+    --brand: #b90064;
+    --brand-text: #b90064;
+    --on-brand: #ffffff;
+    --spotify: #1f7314;
+    --youtube: #be281c;
+    --scrollbar: #d3c4c7;
+    --scrollbar-hover: #b8a9ac;
+    --dot-ring: rgba(32, 26, 27, 0.3);
+    --kbd-edge: rgba(32, 26, 27, 0.16);
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fff8f8;
+  --surface-1: #fff0f2;
+  --surface-2: #f7ebec;
+  --surface-3: #ebe0e1;
+  --outline: #dccdd0;
+  --outline-strong: rgba(32, 26, 27, 0.34);
+  --ink: #201a1b;
+  --ink-2: #514347;
+  --brand: #b90064;
+  --brand-text: #b90064;
+  --on-brand: #ffffff;
+  --spotify: #1f7314;
+  --youtube: #be281c;
+  --scrollbar: #d3c4c7;
+  --scrollbar-hover: #b8a9ac;
+  --dot-ring: rgba(32, 26, 27, 0.3);
+  --kbd-edge: rgba(32, 26, 27, 0.16);
+}
+
 *,
 *::before,
 *::after { box-sizing: border-box; }
@@ -68,7 +123,7 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
-  scrollbar-color: #3a3a3a var(--bg);
+  scrollbar-color: var(--scrollbar) var(--bg);
   -webkit-text-size-adjust: 100%;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -89,8 +144,8 @@ body {
 
 ::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: #3a3a3a; border: 3px solid var(--bg); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #4a4a4a; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border: 3px solid var(--bg); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
 img, video { display: block; max-width: 100%; height: auto; }
 
@@ -217,7 +272,40 @@ code {
   text-decoration: none;
   transition: color var(--fast) var(--ease), background-color var(--fast) var(--ease);
 }
-.appbar-nav a:hover { color: var(--ink); background: rgba(255, 255, 255, 0.06); }
+.appbar-nav a:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); }
+
+/* The theme button: the system's, light or dark (partials/theme.html). It
+   needs script, so the page without it has none. */
+.theme-toggle {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: 0 -12px 0 -8px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-2);
+  cursor: pointer;
+  isolation: isolate;
+  transition: color var(--fast) var(--ease);
+}
+.theme-toggle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--fast) var(--ease);
+}
+.theme-toggle:hover { color: var(--ink); }
+.theme-toggle:hover::after { opacity: 0.08; }
+.theme-toggle:active::after { opacity: 0.14; }
+html:not(.js) .theme-toggle { display: none; }
 
 /* Layout. */
 
@@ -305,7 +393,7 @@ h3 { font-size: 1.3125rem; font-weight: 700; line-height: 1.25; letter-spacing: 
   border-radius: 12px 12px 0 0;
   transition: color var(--fast) var(--ease), background-color var(--fast) var(--ease);
 }
-.tab:hover { color: var(--ink); background: rgba(255, 255, 255, 0.05); }
+.tab:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 5%, transparent); }
 .tab::after {
   content: "";
   position: absolute;
@@ -357,7 +445,7 @@ kbd {
   padding: 0 8px;
   border-radius: 8px;
   background: var(--surface-3);
-  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 -2px 0 var(--kbd-edge);
   font: 600 0.8125rem/1 var(--font);
   font-variant-numeric: tabular-nums;
 }
@@ -545,7 +633,7 @@ kbd {
   cursor: pointer;
   transition: background-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease), color var(--fast) var(--ease);
 }
-.chip:hover { background: rgba(255, 255, 255, 0.06); }
+.chip:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
 .chip.is-current { background: color-mix(in srgb, var(--glow) 30%, var(--surface-2)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glow) 60%, transparent); }
 
 /* Layouts and themes: the home page in each layout and each theme, which
@@ -570,7 +658,7 @@ kbd {
 .chips-themes { gap: 6px; }
 .chip-theme { padding-left: 10px; }
 .dots { display: inline-flex; }
-.dots i { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.5); }
+.dots i { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--dot-ring); }
 .dots i + i { margin-left: -3px; }
 .gallery .chip.is-current { background: var(--ink); color: var(--bg); box-shadow: none; }
 
@@ -1162,7 +1250,9 @@ html.js .demo-fallback { display: none; }
 
 @media (max-width: 760px) {
   .appbar-nav { display: none; }
-  .appbar-inner .btn { margin-left: auto; }
+  .appbar-inner .btn,
+  .appbar-inner .theme-toggle { margin-left: auto; }
+  html.js .appbar-inner .theme-toggle + .btn { margin-left: 0; }
   .columns,
   .needs dl,
   .links { grid-template-columns: minmax(0, 1fr); }

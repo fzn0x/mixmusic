@@ -28,6 +28,7 @@ func (a *App) Close() {
 	a.downloads.Close()
 	a.closeLocalFiles()
 	a.artStore.Close()
+	a.stopMemory()
 	a.flush()
 }
 

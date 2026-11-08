@@ -7,8 +7,6 @@ import (
 	"math"
 	"os"
 	"path/filepath"
-	"runtime"
-	"runtime/pprof"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +15,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/diag"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
@@ -40,7 +39,8 @@ import (
 // whether MixMusic's own Spotify device could play,
 // act:title logs the window's title, which screenshots leave out,
 // act:nowplaying logs the cover the system's media controls hold,
-// act:memory logs the Go heap, and act:heap saves a profile of it. Nothing
+// act:memory logs the Go heap and the process's memory, and act:heap
+// saves a profile of the heap, as Record memory use does. Nothing
 // plays unless the player is muted, or plays into no device
 // (MIXMUSIC_SILENT).
 // MIXMUSIC_CAPTURE_WAIT is how long each page gets, MIXMUSIC_CAPTURE_SIZE
@@ -119,15 +119,10 @@ func (s *shell) captureFromEnv() {
 			case "nowplaying":
 				log.Printf("mixmusic: capture: the system's media controls: %s", s.a.ControlsArtwork())
 			case "memory":
-				var m runtime.MemStats
-				runtime.ReadMemStats(&m)
-				log.Printf("mixmusic: capture: Go heap %d MB in use, %d MB from the system, %d GCs",
-					m.HeapInuse>>20, m.Sys>>20, m.NumGC)
+				log.Printf("mixmusic: capture: %s", diag.ReadMemory())
 			case "heap":
-				runtime.GC()
-				if f, err := os.Create(filepath.Join(dir, "heap.pprof")); err == nil {
-					_ = pprof.WriteHeapProfile(f)
-					f.Close()
+				if err := diag.WriteHeapProfile(filepath.Join(dir, "heap.pprof")); err != nil {
+					log.Printf("mixmusic: capture: %v", err)
 				}
 			case "library":
 				add, q, _ := strings.Cut(arg, ":")

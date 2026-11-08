@@ -2,9 +2,11 @@
  * The docs: the Markdown of docs/ as a Material 3 documentation site. A
  * top app bar, a navigation drawer of the docs' groups, the doc in the
  * site's type, and "On this page" beside it on wide screens. Light or dark
- * as the system is: dark keeps the home page's near-black greys and pink,
- * and light takes the scheme MixMusic's Material theme makes of the same
- * pink (builtin/themes/material). Nothing loads from elsewhere.
+ * as the system is, or as the theme button chose (partials/theme.html):
+ * dark keeps the home page's near-black greys and pink, and light takes
+ * the scheme MixMusic's Material theme makes of the same pink
+ * (builtin/themes/material), as the home page's light does. Nothing loads
+ * from elsewhere.
  */
 
 @font-face {
@@ -62,9 +64,11 @@
   --radius-m: 12px;
 }
 
-/* Light: the scheme of MixMusic's Material theme, made of its pink. */
+/* Light: the scheme of MixMusic's Material theme, made of its pink, as the
+   system has it unless the visitor chose dark, or as the visitor chose. The
+   two blocks are the same: keep them so. */
 @media (prefers-color-scheme: light) {
-  :root {
+  :root:not([data-theme="dark"]) {
     color-scheme: light;
     --surface: #fff8f8;
     --surface-low: #fff0f2;
@@ -89,6 +93,31 @@
     --warning: #845b00;
     --caution: #b8202a;
   }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --surface: #fff8f8;
+  --surface-low: #fff0f2;
+  --surface-container: #f7ebec;
+  --surface-high: #f1e5e7;
+  --surface-highest: #ebe0e1;
+  --on-surface: #201a1b;
+  --on-surface-variant: #514347;
+  --prose: #2b2224;
+  --outline: #847377;
+  --outline-variant: #dccdd0;
+  --primary: #b90064;
+  --on-primary: #ffffff;
+  --brand: #b90064;
+  --secondary-container: #ffd9e2;
+  --on-secondary-container: #3e001d;
+  --scrim: rgba(32, 26, 27, 0.4);
+  --shadow: rgba(32, 26, 27, 0.18);
+  --note: #0b5cba;
+  --tip: #1a7034;
+  --important: #7139c9;
+  --warning: #845b00;
+  --caution: #b8202a;
 }
 
 *,
@@ -259,6 +288,11 @@ p { text-wrap: pretty; }
   transition: background-color var(--fast) var(--ease), color var(--fast) var(--ease);
 }
 .topbar-nav a:hover { background: color-mix(in srgb, var(--on-surface) 8%, transparent); color: var(--on-surface); }
+
+/* The theme button: the system's, light or dark (partials/theme.html). It
+   needs script, so the page without it has none. */
+.theme-toggle { margin-right: 4px; }
+html:not(.js) .theme-toggle { display: none; }
 
 /* The layout: the drawer, the doc, and "On this page". */
 
@@ -608,7 +642,9 @@ p { text-wrap: pretty; }
   .docs-main { padding-top: 16px; }
   .topbar { padding: 0 8px 0 12px; }
   .topbar-nav { display: none; }
-  .topbar-github { margin-left: auto; }
+  .topbar-github,
+  .theme-toggle { margin-left: auto; }
+  html.js .theme-toggle + .topbar-github { margin-left: 0; }
   html:not(.js) .drawer { position: static; max-height: none; overflow: visible; padding: 8px 0 0; border-bottom: 1px solid var(--outline-variant); }
   html.js .topbar-menu { display: inline-flex; }
   html.js .drawer {

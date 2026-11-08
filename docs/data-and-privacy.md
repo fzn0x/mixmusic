@@ -101,6 +101,14 @@ AppImage or archive copy's.
 - `crash-<time>.log`: the report of a crash, the last five kept. The next
   start offers to report it, in a new GitHub issue that you read and send
   yourself.
+- `memory.log` and `heap-<time>.pprof`, only while you
+  [record memory use](settings.md#about): a line each minute of how much
+  memory MixMusic uses, its Go heap's and the whole app's as the system
+  tells it, and profiles of the Go heap, the last five kept, which tell
+  where in MixMusic's code its memory was taken, and how much. They hold
+  only how MixMusic uses its memory: nothing of your music, your
+  library or your accounts. Report a problem tells of them, for you to
+  attach.
 
 ### Sign-ins
 

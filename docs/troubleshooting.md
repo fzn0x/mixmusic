@@ -68,6 +68,13 @@ a crash, MixMusic offers to report it the next time it starts.
   saves its settings in its place. A file that doesn't read as MixMusic
   starts is kept the same way, and MixMusic starts with the settings of a
   new install: see [Settings](settings.md#when-it-has-a-mistake).
+- **MixMusic takes too much memory.** Turn on Settings › About › Record
+  memory use, and use MixMusic as when it grew: it writes how it uses its
+  memory to `memory.log` each minute, and saves a heap profile once it
+  passes 1 GB, or when you press save a heap profile. Report a problem
+  then tells of them: attach them to the issue. They hold only how
+  MixMusic uses its memory ([the logs folder](data-and-privacy.md#the-logs-folder)).
+  It's off again at the next start.
 - **No tray icon on Linux.** The [tray](desktop.md#the-tray) needs
   `libayatana-appindicator3` and a desktop that shows AppIndicator icons;
   GNOME needs its AppIndicator extension. Without it, closing the window

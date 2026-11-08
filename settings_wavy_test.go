@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -11,16 +12,10 @@ import (
 // first, saved as wavyProgress, and found by a search for "squiggly".
 func TestWavyProgressRow(t *testing.T) {
 	s := newTestShell(t)
-	tt := testerOf(t, s, 1280, 3600)
+	// The window's own height: Tab brings the switch into view, wherever
+	// the settings above it put it.
+	tt := tester(t, s)
 	show(s, tt, "/settings/appearance")
-	var above float32
-	for _, text := range []string{"Icons only in the sidebar", "Wavy progress bar", wavyProgressDescription} {
-		r, ok := tt.Find(text)
-		if !ok || r.Y <= above {
-			t.Fatalf("Settings › Appearance shows %q out of place: %q", text, tt.Texts())
-		}
-		above = r.Y
-	}
 	if s.svc.Preferences.Get().WavyProgress {
 		t.Fatal("on at first")
 	}
@@ -30,6 +25,15 @@ func TestWavyProgressRow(t *testing.T) {
 	}
 	if !focused() {
 		t.Fatalf("Tab doesn't reach the switch: %q", tt.Texts())
+	}
+	tt.Advance(time.Second)
+	var above float32
+	for _, text := range []string{"Icons only in the sidebar", "Wavy progress bar", wavyProgressDescription} {
+		r, ok := tt.Find(text)
+		if !ok || r.H <= 0 || r.Y <= above {
+			t.Fatalf("Settings › Appearance shows %q out of place, at %v: %q", text, r, tt.Texts())
+		}
+		above = r.Y
 	}
 	for _, want := range []bool{true, false} {
 		tt.Key(0, ui.KeySpace)

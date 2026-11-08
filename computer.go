@@ -232,6 +232,7 @@ func (s *shell) computerSettings(c *ui.Context) {
 				}
 			}, folder)
 		}
+		s.unwatchedFolders(c)
 	})
 }
 

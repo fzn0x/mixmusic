@@ -31,7 +31,8 @@ type LocalFiles struct{ a *App }
 var errFileMissing = errors.New("File not found")
 
 // localScans keeps the scans of the index: one at a time, the folders it
-// scanned last, and its end, which Close waits for.
+// scanned last, and its end, which Close waits for; and the watch of the
+// folders (localwatch.go).
 type localScans struct {
 	mu      sync.Mutex
 	started bool
@@ -39,6 +40,7 @@ type localScans struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
 	wg      sync.WaitGroup
+	watch   *localfiles.Watcher
 }
 
 // openLocalFiles opens the index of the music on the computer, in the
@@ -82,6 +84,7 @@ func (a *App) scanLocalFiles(folders []string, force bool) {
 	sc := &a.localScans
 	sc.mu.Lock()
 	defer sc.mu.Unlock()
+	a.watchLocalFiles(folders)
 	if sc.ctx.Err() != nil || !force && len(folders) == 0 && len(sc.folders) == 0 && len(a.localFiles.Tracks()) == 0 {
 		sc.folders = slices.Clone(folders)
 		return
@@ -96,12 +99,14 @@ func (a *App) scanLocalFiles(folders []string, force bool) {
 	}()
 }
 
-// closeLocalFiles stops a scan, and waits for it, as MixMusic quits.
+// closeLocalFiles stops a scan and the watch of the folders, and waits for
+// them, as MixMusic quits.
 func (a *App) closeLocalFiles() {
 	if a.localFiles == nil {
 		return
 	}
 	a.localScans.cancel()
+	a.closeLocalWatch()
 	a.localScans.wg.Wait()
 }
 

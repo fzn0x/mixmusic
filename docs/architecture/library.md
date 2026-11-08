@@ -31,6 +31,26 @@
   from the file (`prepareFile`), and it goes to no service: the matcher
   refuses it (`match.ErrLocal`), no radio starts from it, and a cast
   device isn't handed it. One whose file is gone is missing until a scan.
+- **The watch of the folders** (`internal/localfiles/watch*.go`): from
+  MixMusic's start (`startLocalFiles`), a `localfiles.Watcher` watches
+  the folders scanned, each through its system's own API:
+  ReadDirectoryChangesW on Windows, through an I/O completion port;
+  FSEvents on macOS, through purego, one stream of a whole tree, file by
+  file, which holds no file open, as kqueue would of each folder; and
+  inotify on Linux, a watch of each folder in it but hidden ones, added
+  as folders come. What they tell gathers until it settles, a second
+  without a change or five at most, and `Index.update` reads only the
+  paths told: a file new or changed by its size or time of change, a
+  folder made or renamed to, whole, and drops what went. A scan and an
+  update take turns (`Index.work`). A watch that lost track, as when the
+  system's buffer overflowed, or that ended, as when the folder was
+  renamed or its drive unplugged, has the folders scanned; one that ended
+  is watched again once its folder is back, looked for every 30 seconds.
+  A folder on a network drive (or, on Windows, a removable one, which a
+  watch would keep from being ejected), past inotify's limits, or on
+  another system isn't watched, and is scanned as before:
+  `LocalFiles.Unwatched` tells why, which Settings shows. Tests give
+  their own watch (`Options.WatchMusic`).
 - **`internal/downloads`** keeps the tracks the user downloads, apart from
   the offline cache: a folder of their audio (`audio/<video id>.webm`, or
   `.m4a` for a track YouTube has only in AAC) and covers (`art/`), with

@@ -101,6 +101,9 @@ type Index struct {
 	again       bool
 	next        []string
 	read, found int
+	// work is held by a scan, and by an update of what the watch of the
+	// folders told changed, so that one changes the entries at a time.
+	work sync.Mutex
 	// gone are the files found missing since the last scan, as playing them
 	// did, and stats what the files beyond the index looked like lately.
 	gone  map[string]bool

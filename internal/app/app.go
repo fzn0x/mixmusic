@@ -89,6 +89,9 @@ type Options struct {
 	// CastBrowse, when set, finds the cast devices on the network in place
 	// of mDNS: tests set it.
 	CastBrowse func(ctx context.Context) ([]cast.Device, error)
+	// OutputDevices, when set, lists the audio output devices in place of
+	// the system: tests set it.
+	OutputDevices func() ([]OutputDevice, error)
 	// Controls, when set, reaches the system's media controls in place of
 	// nowplaying.Open on MyGo's main thread: tests, which run no event
 	// loop, set it, since macOS's controls would wait for one for ever.
@@ -167,6 +170,8 @@ type App struct {
 	here spotifyHere
 	// cast is the cast devices found, and the one the player plays on.
 	cast castState
+	// output is the audio output device the engine plays on.
+	output outputState
 	// videoPage is the page of the main window that plays the picture of
 	// music videos, while it is open.
 	videoPage atomic.Pointer[mygo.Page]
@@ -290,6 +295,7 @@ func New(opts Options) (*App, error) {
 	a.tools = tools.New(filepath.Join(opts.DataDir, "bin"))
 	a.tools.Bundled = bundledYTDLP()
 	a.resolver = stream.NewResolver(a.tools, filepath.Join(opts.CacheDir, "yt-dlp"))
+	a.resolver.Told = a.surroundTold
 	// MIXMUSIC_YTDLP_ONLY has yt-dlp find every stream, as before MixMusic
 	// asked YouTube's player API: to time one against the other, or to
 	// tell which fails. The API still tells how loud tracks are.
@@ -349,9 +355,12 @@ func (a *App) apply(s settings.Settings) {
 	// Whether they can register yet, hotkeys tells, which tests give
 	// their own. The settings' save tells the windows of the problems.
 	a.applyGlobalShortcuts(false)
-	if !s.DiscordPresence {
-		a.presence.update(false, "", NowPlaying{})
-	}
+	// Discord shows what plays as the settings now choose, or nothing, at
+	// once, even while paused, when no report comes.
+	a.mu.Lock()
+	np := a.nowPlaying
+	a.mu.Unlock()
+	a.presence.update(s.Desktop, np)
 	if p := a.goPlayer.Load(); p != nil {
 		p.SettingsChanged(s)
 		a.applyEngine(s)

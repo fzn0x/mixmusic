@@ -71,6 +71,9 @@ func parsePlaylist(n node, playlistID string) (media.Playlist, string, error) {
 	head := n.get("contents", "twoColumnBrowseResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer", "contents", 0)
 	p.Editable = head.get("musicEditablePlaylistDetailHeaderRenderer").exists()
 	p.Deletable = head.find("deletePlaylistEndpoint").exists()
+	if p.Editable {
+		p.Suggest = suggestToken(n)
+	}
 	_, shelf := secondaryShelf(n)
 	contents := shelf.get("contents").list()
 	p.Tracks = tracksOf(parseItems(contents))

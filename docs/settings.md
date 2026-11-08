@@ -35,14 +35,14 @@ How MixMusic plays; [Playing music](playing-music.md) tells all of it.
 | Group | What's there |
 |---|---|
 | [Spotify tracks](playing-music.md#how-spotify-tracks-play) | How Spotify tracks play: **In MixMusic, from Spotify** (Premium, on Windows and macOS), **On Spotify Connect**, with the **Device** that plays them, or **In MixMusic, from YouTube Music**. See [Spotify](spotify.md). |
-| Sound | **[Quality](playing-music.md#data-saver)** (best, or data saver), **[Crossfade](playing-music.md#crossfade-and-gapless-playback)** (off, or 1 to 12 seconds), **[Even loudness](playing-music.md#even-loudness-volume-levelling-and-the-volume)**, **Volume levelling**, **Play 5.1 surround when a track has it**, **[Autoplay](playing-music.md#autoplay-and-radios)**, **[Skip songs made with AI](playing-music.md#skipping-songs-made-with-ai)** and **[Skip songs you dislike](playing-music.md#dislikes-and-skipping)**. |
+| Sound | **[Output device](playing-music.md#the-output-device)** (System default, or a device by name), **[Quality](playing-music.md#data-saver)** (best, or data saver), **[Crossfade](playing-music.md#crossfade-and-gapless-playback)** (off, or 1 to 12 seconds), **[Even loudness](playing-music.md#even-loudness-volume-levelling-and-the-volume)**, **Volume levelling**, **Play 5.1 surround when a track has it**, **[Autoplay](playing-music.md#autoplay-and-radios)**, **[Skip songs made with AI](playing-music.md#skipping-songs-made-with-ai)** and **[Skip songs you dislike](playing-music.md#dislikes-and-skipping)**. |
 | [Speed](playing-music.md#speed) | **Songs** and **Podcasts**, each from 0.5× to 3×, at the tracks' own pitch, with **normal** to go back to 1×. |
 | [Music videos](playing-music.md#the-picture-of-music-videos) | **Show the video of music videos**, on the now playing page. |
 | [Equalizer](playing-music.md#the-equalizer) | The **Equalizer** switch, a **Preset** (Flat, Bass boost, Treble boost, Vocal, Electronic, Rock, Acoustic, Late night or Lo-fi), and the preamp and ten bands, from −12 to +12 dB. |
 | [Lyrics](lyrics.md#translate) | **Translate lyrics to**: the language the translate switch beside the lyrics shows them in. |
 | [Offline cache](library.md#the-offline-cache) | **Tracks kept** and **Covers kept**, each with **clear**, and the cache's **Size**: off, 512 MB, 1 GB, 4 GB or 16 GB. |
 | [Downloads](library.md#where-they-are) | How many tracks are downloaded and how much room they take, with **show**; their **Folder**, with **open** and **change**; **Download on metered connections** and **Download songs added later**. |
-| [Music on this computer](local-music.md#add-a-folder) | **Folders**, with **add a folder** and **rescan**, then each folder of music, with how many tracks it holds and how many files were skipped, and **remove**. |
+| [Music on this computer](local-music.md#add-a-folder) | **Folders**, with **add a folder** and **rescan**, then each folder of music, with how many tracks it holds, how many files were skipped and how many folders in it can't be read, and **remove**. |
 | [Tools](how-it-works.md#yt-dlp-and-the-javascript-runtime) | **yt-dlp**, which MixMusic installs and keeps up to date, the **JavaScript runtime** it runs with (found by itself, or Deno, Node.js, Bun or QuickJS), and **Own yt-dlp**, the path to one of yours. |
 
 ### Accounts
@@ -70,7 +70,7 @@ The **On the desktop** group:
 | Media keys | The keyboard's play, next and previous keys control MixMusic. On at first. |
 | [Notifications](desktop.md#notifications) | Tells what starts playing while neither MixMusic's window nor the mini player is in front. On at first. |
 | [Show what plays in the window title](desktop.md#the-window-title) | The window's title names the track that plays. On at first. |
-| [Show what plays on Discord](desktop.md#discord) | Your Discord profile shows what you listen to. On at first. Under it, **Discord application ID**, to show another application's name. |
+| [Show what plays on Discord](desktop.md#discord) | Your Discord profile shows what you listen to. On at first. Under it, **Discord application ID**, to show another application's name, a preview of your status, and [what it shows](desktop.md#what-your-discord-status-shows): its two lines, the cover, the service's badge, the time left, a Listen button, and whether it stays while paused. |
 | [Player around the notch](desktop.md#the-player-around-the-notch) | The player around a MacBook's notch. On at first, and shown only on Macs with a notch. |
 | [Keep on top](desktop.md#keep-the-window-on-top) | MixMusic's window stays above your other windows. Off at first. |
 | [Start at login](desktop.md#start-at-login) | Starts MixMusic, hidden, when you sign in to your computer. |
@@ -93,6 +93,7 @@ themes and the plugins' commands. See
 | MixMusic | The **Version**, with the system and how this copy was [installed](getting-started.md#install); whether a newer version is out, with **what's new** and **install** (or its download, for a copy that can't replace itself); the folder your [data](data-and-privacy.md#where-mixmusic-keeps-its-data) lives in; and **source code**, **contribute**, **report a problem** and **open logs folder** (see [Troubleshooting](troubleshooting.md)). |
 | Memory use | **Record memory use**, for a report of MixMusic taking too much memory: while it's on, MixMusic writes how it uses its memory to `memory.log` in [the logs folder](data-and-privacy.md#the-logs-folder) each minute, and saves a heap profile there once it passes 1 GB, and **save a heap profile** saves one at once. It's off again at the next start. |
 | [Updates](how-it-works.md#mixmusic-itself) | **Check for updates**, at start and every few hours, and **Install updates without asking**, which downloads them in the background for the next launch. |
+| [Recent playback errors](troubleshooting.md#tracks-that-fail-to-play) | The last 10 tracks that couldn't play since MixMusic started, the latest first, with the time and why, each with **details**: what was tried, and **copy**. |
 | Licenses | The licenses of the code and the typefaces MixMusic includes, each with **show**: see [License](license.md) and [Credits](credits.md). |
 
 ![Settings › About: the MixMusic group, with the version, MixMusic 0.5.9 · windows amd64 · portable, "This is the newest version" with Check again, where your data lives, its folder covered here, and the Source code, Contribute, Report a problem and Open logs folder buttons; then Updates, with Check for updates on and Install updates without asking off](shots/about.webp)
@@ -153,6 +154,10 @@ tells how.
   and the toast says that too.
 - **Encodings.** Save it as UTF-8. A file with a byte order mark, or in
   UTF-16, as Windows PowerShell 5.1 writes it, reads too.
+- **Names that aren't UTF-8.** A folder or a file whose name isn't valid
+  UTF-8, as on some Linux drives, is written in base64 after `base64:`, as
+  `"base64:L2hvbWUvYWRhL2NhZuk="`, so that it names the same folder when
+  MixMusic reads the file again. Every other path is written as it is.
 
 Its keys are short names of the settings, as `theme`, `layout`, `zoom`,
 `closeToTray`, `notchPlayer`, `shortcuts` and `globalShortcuts`. Open the
@@ -305,6 +310,9 @@ Plugins' commands follow, with the keys their plugin gives them, if any.
   page's chart keep them while they have the keyboard's focus.
 - The arrows don't scroll a page: the mouse wheel, <kbd>Page Up</kbd> and
   <kbd>Page Down</kbd>, and <kbd>Home</kbd> and <kbd>End</kbd> do.
+- In a mix, <kbd>Alt</kbd> <kbd>↑</kbd> and <kbd>Alt</kbd> <kbd>↓</kbd> move the
+  track whose play button has the focus a place up or down: see
+  [Mixes](library.md#mixes).
 - After you click a button, a tile or a switch, <kbd>Space</kbd> still plays
   or pauses. A control you reach with <kbd>Tab</kbd> takes <kbd>Space</kbd>
   and <kbd>Enter</kbd> itself.

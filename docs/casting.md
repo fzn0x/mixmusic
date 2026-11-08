@@ -52,7 +52,8 @@ MixMusic, from YouTube Music for them.
 - **The sound.** The device plays the audio itself: tracks don't crossfade
   there, as it plays one at a time, and the equalizer and the other
   effects of MixMusic's [audio engine](audio-engine.md) stay on this
-  computer. MixMusic asks the device to play at the
+  computer, as does the [output device](playing-music.md#the-output-device)
+  chosen for it. MixMusic asks the device to play at the
   [speed](playing-music.md#speed) you set.
 
 When another app takes the device over, as someone casting to it from a

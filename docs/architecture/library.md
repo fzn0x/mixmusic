@@ -2,7 +2,15 @@
 
 - **`internal/library`** keeps liked and disliked songs, mixes, the history
   and stats, and the artists followed in MixMusic
-  ([Following artists](follows.md)), in `library.json`.
+  ([Following artists](follows.md)), in `library.json`. A mix's cover
+  that the user chose is a file of `mix-covers/` in the data folder,
+  which the mix names (`Playlist.Cover`): its centre square, at most 600
+  pixels across, a JPEG, or a PNG where it isn't opaque, under a name of
+  its own each time, so that the windows never show an older image of
+  the same address (`internal/app/mixcovers.go`). The mix's artwork is
+  then `mixcover:<name>`, which the windows read from the file, as
+  they read the local covers (`localArt`); deleting the mix, or going
+  back to its songs' covers, removes the file (`mixcover.go`).
 - **`internal/localfiles`** keeps the index of the music on the user's
   computer, `local-files.json`: the music files of the folders the
   settings name (`musicFolders`), by path, with their size, time of
@@ -11,7 +19,12 @@
   the engine plays them, as `audio.Probe` tells. A scan, at the start,
   when the folders change and on demand, reads only the files new or
   changed by their size or time of change, four at a time, drops those
-  gone, and keeps those of a folder that can't be read. Covers, held or
+  gone, and keeps those of a folder that can't be read until a scan
+  reads it: a music folder that isn't there at the scan's end, as on a
+  drive unplugged partway, and a folder in one whose list of files, or
+  a file's information, fails to read other than as gone
+  (`Folder.Unread`, which Settings counts; `Missing` looks at their
+  files). Covers, held or
   beside the files, go to the cache's `local-art`, by their hash. A track's
   ID is its file's path in base64 (`file:<path>`), so that one in a mix
   or the queue plays as long as its file is there; the player plays it

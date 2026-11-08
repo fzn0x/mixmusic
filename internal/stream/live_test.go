@@ -127,6 +127,7 @@ func TestLivePicture(t *testing.T) {
 	defer cancel()
 	r := NewResolver(nil, "")
 	r.Direct = NewDirect()
+	knownSurround(t, r, surroundID)
 	p := NewProxy(r)
 	for _, families := range [][]string{{"vp9", "avc1"}, {"avc1"}} {
 		pic, err := p.Picture(ctx, musicVideoID, func(vs []Video) (Video, bool) {
@@ -164,8 +165,10 @@ func TestLiveSurround(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", id, err)
 		}
-		t.Logf("%s: found in %s, 5.1 %v", id, time.Since(start).Round(time.Millisecond), s.Surround != nil)
-		if sur := s.Surround; (sur != nil) != (id == surroundID) || sur != nil && (sur.URL != "" || sur.Codec != "ac-3" || sur.Size <= 0) {
+		found := time.Since(start).Round(time.Millisecond)
+		sur := toldOf(t, s)
+		t.Logf("%s: found in %s, 5.1 %v, told in %s", id, found, sur != nil, time.Since(start).Round(time.Millisecond))
+		if (sur != nil) != (id == surroundID) || sur != nil && (sur.URL != "" || sur.Codec != "ac-3" || sur.Size <= 0) {
 			t.Errorf("%s: surround %+v", id, sur)
 		}
 	}
@@ -180,6 +183,7 @@ func TestLiveSurround(t *testing.T) {
 	}
 	r := NewResolver(tm, t.TempDir())
 	r.Direct = d
+	knownSurround(t, r, surroundID)
 	p := NewProxy(r)
 	start := time.Now()
 	req := httptest.NewRequest("GET", SurroundPath(surroundID), nil).WithContext(ctx)

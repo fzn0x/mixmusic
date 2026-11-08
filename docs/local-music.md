@@ -23,8 +23,17 @@ reads the folder and the folders in it, and keeps what it finds:
 
 A scan reads only what changed: a file new to it, or one whose size or
 time of change differs from the last scan. A library of thousands of
-files is read whole once, then in moments. MixMusic doesn't watch the
-folders as you work in them: rescan, or start MixMusic again, to see what
+files is read whole once, then in moments.
+
+While MixMusic runs, it watches the folders: a file you add, change,
+rename or remove in them shows in the library within a few seconds,
+without a scan, and a folder you copy in is read once, as the copy
+settles. Where it can't watch a folder, Settings says why, under the
+folders: one on a network drive, whose server may not tell of what other
+computers change; on Windows, one on a removable drive, which a watch
+would keep from being ejected; on Linux, one past the system's limit on
+watched folders, `fs.inotify.max_user_watches`. For such a folder,
+rescan, or start MixMusic again, to see what
 you added. Hidden folders, whose names start with a dot, are passed
 over.
 

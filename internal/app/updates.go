@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/egoist/mygo"
+	"github.com/egoist/mygo/netproxy"
 )
 
 // releasesAPI answers with the newest release of MixMusic.
@@ -271,6 +272,10 @@ type Release struct {
 	Download string `json:"download"`
 	// File is the name of that file.
 	File string `json:"file"`
+	// manifest is the address of the release's update manifest for this
+	// platform, update-<os>-<arch>.json, under the release's own tag; ""
+	// when the release has none.
+	manifest string
 }
 
 // LatestRelease asks GitHub for the newest release of MixMusic.
@@ -288,6 +293,9 @@ func (a *App) installUpdate(ctx context.Context, progress func(done, total int64
 	}
 	defer a.updating.Unlock()
 	up, err := mygo.Updater.Check(ctx)
+	if err != nil && !errors.Is(err, mygo.ErrUpdatesDisabled) {
+		up, err = a.checkTagged(ctx, err)
+	}
 	switch {
 	case errors.Is(err, mygo.ErrUpdatesDisabled):
 		return "", errors.New("this copy of MixMusic cannot replace its own files: download the new version instead")
@@ -308,6 +316,66 @@ func (a *App) installUpdate(ctx context.Context, progress func(done, total int64
 	a.mu.Unlock()
 	notify()
 	return up.Version, nil
+}
+
+// checkTagged checks for a new version again after the check failed with
+// failed, reading the manifest at the newest release's own address, such
+// as .../releases/download/v0.5.10/update-windows-amd64.json. MyGo's feed
+// is .../releases/latest/download/, a redirect that GitHub can fail alone:
+// on 2026-11-08 it answered 504 Gateway Timeout for hours while the
+// release's address and the API worked (#412). It returns failed when the
+// API doesn't tell the release's manifest.
+func (a *App) checkTagged(ctx context.Context, failed error) (*mygo.Update, error) {
+	log.Printf("mixmusic: checking for updates again, at the release's address: %v", failed)
+	apiCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
+	r, err := latestRelease(apiCtx, http.DefaultClient, releasesAPI, installKind(), runtime.GOARCH, a.version())
+	cancel()
+	if err != nil || r.manifest == "" {
+		return nil, failed
+	}
+	mygo.Updater.SetSource(taggedManifest(r.manifest))
+	// The update Check returns keeps downloading from this source.
+	defer mygo.Updater.SetSource(nil)
+	return mygo.Updater.Check(ctx)
+}
+
+// taggedManifest is an update source that reads the manifest at its
+// address, and the files the manifest names at theirs.
+type taggedManifest string
+
+func (m taggedManifest) Manifest(ctx context.Context, _ bool) (io.ReadCloser, error) {
+	return getUpdateFile(ctx, string(m))
+}
+
+func (m taggedManifest) Open(ctx context.Context, url string) (io.ReadCloser, error) {
+	return getUpdateFile(ctx, url)
+}
+
+// updateClient downloads updates through the proxy the user set, as
+// MyGo's updater does.
+var updateClient = &http.Client{Transport: netproxy.Transport()}
+
+// getUpdateFile downloads a file of an update, over HTTPS only.
+func getUpdateFile(ctx context.Context, url string) (io.ReadCloser, error) {
+	if !strings.HasPrefix(url, "https://") {
+		return nil, fmt.Errorf("refusing to download %s: updates need HTTPS", url)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	// MyGo's: GitHub's store of release files answers 400 to a User-Agent
+	// with bytes outside ASCII.
+	req.Header.Set("User-Agent", "mygo-updater")
+	res, err := updateClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != http.StatusOK {
+		res.Body.Close()
+		return nil, fmt.Errorf("GET %s: %s", url, res.Status)
+	}
+	return res.Body, nil
 }
 
 // Restart quits MixMusic and starts it again, as the update it installed.
@@ -359,6 +427,11 @@ func latestRelease(ctx context.Context, client *http.Client, api, kind, arch, ru
 			if a.Name == file {
 				r.Download, r.File = a.URL, file
 			}
+		}
+	}
+	for _, a := range gh.Assets {
+		if a.Name == "update-"+runtime.GOOS+"-"+arch+".json" {
+			r.manifest = a.URL
 		}
 	}
 	return r, nil

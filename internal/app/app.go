@@ -88,6 +88,9 @@ type Options struct {
 	// CastBrowse, when set, finds the cast devices on the network in place
 	// of mDNS: tests set it.
 	CastBrowse func(ctx context.Context) ([]cast.Device, error)
+	// OutputDevices, when set, lists the audio output devices in place of
+	// the system: tests set it.
+	OutputDevices func() ([]OutputDevice, error)
 	// Controls, when set, reaches the system's media controls in place of
 	// nowplaying.Open on MyGo's main thread: tests, which run no event
 	// loop, set it, since macOS's controls would wait for one for ever.
@@ -162,6 +165,8 @@ type App struct {
 	here spotifyHere
 	// cast is the cast devices found, and the one the player plays on.
 	cast castState
+	// output is the audio output device the engine plays on.
+	output outputState
 	// videoPage is the page of the main window that plays the picture of
 	// music videos, while it is open.
 	videoPage atomic.Pointer[mygo.Page]

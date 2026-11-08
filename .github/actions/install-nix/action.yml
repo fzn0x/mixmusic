@@ -1,0 +1,38 @@
+name: Install Nix
+description: >-
+  cachix/install-nix-action, tried again when its download of Nix breaks
+  off. releases.nixos.org sometimes ends the runner's TLS connection for a
+  while ("unexpected eof while reading"), which failed whole runs. The
+  installer fails before it changes anything, so trying again is safe.
+inputs:
+  github_access_token:
+    description: The token Nix reads GitHub's flakes with.
+    required: true
+runs:
+  using: composite
+  steps:
+    - id: first
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.first.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed; trying again in 30 seconds"
+        sleep 30
+    - id: second
+      if: steps.first.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.second.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed again; trying once more in 90 seconds"
+        sleep 90
+    - if: steps.second.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      with:
+        github_access_token: ${{ inputs.github_access_token }}

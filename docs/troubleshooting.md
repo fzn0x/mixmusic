@@ -11,6 +11,28 @@ a crash, MixMusic offers to report it the next time it starts.
 
 ![Settings › About: the version of MixMusic and whether it's the newest, with the Report a problem and Open logs folder buttons under it, and the Updates group below](shots/about.webp)
 
+## Tracks that fail to play
+
+When a track can't play, a toast says why, and MixMusic moves on to the
+next one. Its **details** shows what MixMusic tried, in turn, and why each
+try failed, with the time:
+
+- Spotify Connect, or Spotify in MixMusic, before a Spotify track plays
+  from YouTube Music;
+- YouTube's player API, then yt-dlp, which find a track's stream;
+- the stream itself, as many times as MixMusic tried it again;
+- a download or the offline cache, or a file on this computer.
+
+**copy** puts it all on the clipboard, as text ready for an issue, with
+MixMusic's version and your system. It leaves out the names of your
+accounts, cookies and tokens, your computer's addresses, and the name of
+your home folder, which a path shows as `~`.
+
+The last 10 stay until MixMusic closes, in
+[Settings › About](settings.md#about) › Recent playback errors, each with
+its **details**. The keyboard reaches **details** in the toast with
+<kbd>Tab</kbd>, and **copy** has the focus as the details open.
+
 ## Common problems
 
 - **A YouTube Music track doesn't play.** It says why: some are not

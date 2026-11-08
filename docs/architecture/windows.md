@@ -37,6 +37,15 @@ belongs to its main thread: what finishes elsewhere comes back through
   another track started meanwhile. The items of the page's menu that
   take its tracks, and its download, show once the list is whole. The
   queue builds only its entries near the view, as it may hold thousands.
+- **Tracks that couldn't play** (`playbackerrors.go`,
+  `failurereport.go`): the toast of the player's notice of one has
+  Details, which opens a dialog of the failure the notice names.
+  `failureDetails` builds what it shows, wherever it's built: the track,
+  where it comes from, when, the steps tried, and Copy, which puts
+  `failureReport`'s text on the clipboard. Both leave out what `privacy`
+  holds, the names of the accounts signed in and the home folder, and
+  URLs' queries, cookies, tokens and addresses. Settings › About lists
+  the failures the player keeps.
 
 - **Menus** are the system's: MyGo builds one as it opens, and again for
   the item chosen, never while it shows, so what a menu lists is fetched

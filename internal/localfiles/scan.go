@@ -43,7 +43,7 @@ func (x *Index) Scan(ctx context.Context, folders []string) error {
 	x.mu.Unlock()
 	x.changed()
 	for {
-		err := x.scan(ctx, folders)
+		err := x.scanAlone(ctx, folders)
 		x.mu.Lock()
 		again := x.again && ctx.Err() == nil
 		folders, x.again, x.next = x.next, false, nil

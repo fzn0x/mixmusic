@@ -309,6 +309,9 @@ Plugins' commands follow, with the keys their plugin gives them, if any.
   page's chart keep them while they have the keyboard's focus.
 - The arrows don't scroll a page: the mouse wheel, <kbd>Page Up</kbd> and
   <kbd>Page Down</kbd>, and <kbd>Home</kbd> and <kbd>End</kbd> do.
+- In a mix, <kbd>Alt</kbd> <kbd>↑</kbd> and <kbd>Alt</kbd> <kbd>↓</kbd> move the
+  track whose play button has the focus a place up or down: see
+  [Mixes](library.md#mixes).
 - After you click a button, a tile or a switch, <kbd>Space</kbd> still plays
   or pauses. A control you reach with <kbd>Tab</kbd> takes <kbd>Space</kbd>
   and <kbd>Enter</kbd> itself.

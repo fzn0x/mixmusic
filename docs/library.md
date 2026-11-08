@@ -26,7 +26,8 @@ Like a track with the heart in the player bar, on the now playing page, in the [
 - **One list for both services.** Library › Liked, Liked songs in the sidebar, Home's Liked songs tile and Alt+3 open it.
 - **Signed in, a like reaches the service too:** a Spotify track is saved to your Spotify library, and a YouTube Music track is liked on YouTube Music.
 - **Liking a song you disliked** takes the dislike back.
-- **The list** has Play, Shuffle and Download, a box that searches it and a Sort menu: the list's own order, Title, Artist or Length. What you search shows how many tracks of the list match.
+- **The list** has Play, Shuffle and Download, a box that searches it and a Sort menu: the list's own order, Title, Artist, Length or Plays. What you search shows how many tracks of the list match.
+- **Plays** puts the songs you played most in MixMusic first, as your [history](#history-and-recently-played) counts them, over its last 1,000 plays; songs played as often, and those not played, keep the list's order. The list follows the plays as they're counted.
 
 The songs you liked on a service before, or in its own app, are in that service's pivot of the library: Liked on Spotify, in pages that Load more adds to, and Liked on YouTube Music.
 
@@ -44,6 +45,7 @@ A mix is a playlist of MixMusic's own, which holds tracks of every service.
 - **Add tracks** with Add to mix in a track's menu, then the mix's name.
 - **Copy a service's playlist** with Copy into a mix you can extend, in the playlist's More menu: the mix keeps its tracks, and any track can join them. A long playlist is read whole first, which can take a while.
 - **A mix's page** has Play, Shuffle and Download, the search and Sort of its tracks, and in its More menu Rename and Delete. Deleting asks first; the tracks stay where they came from. Remove from this mix, in a track's menu there, takes it out.
+- **Put a mix in order** by dragging a track onto another, which it takes the place of: a line shows where it goes. From the keyboard, <kbd>Tab</kbd> to a track's play button, then <kbd>Alt</kbd> <kbd>↑</kbd> and <kbd>Alt</kbd> <kbd>↓</kbd> (<kbd>⌥</kbd> <kbd>↑</kbd> and <kbd>⌥</kbd> <kbd>↓</kbd> on macOS) move it a place up or down, and the focus goes with it. The mix keeps its new order at once. While its tracks show sorted or searched, they don't move: choose the mix's own order in Sort and clear the search first.
 
 Your mixes show in the sidebar under Your mixes, with how many tracks each holds, and on Home's Your mixes tile and shelf.
 
@@ -73,6 +75,7 @@ Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a
 - **Make a playlist** with new playlist in Library › YouTube Music, with Add to YouTube Music playlist › New playlist… in a track's menu, or with Save as a YouTube Music playlist in an album's or a playlist's More menu. Spotify tracks are found on YouTube Music first.
 - **Add a track** with Add to YouTube Music playlist in its menu, then one of your playlists: it lists those you can add to. Tracks of either service go in.
 - **Take a track out** of a playlist of yours with Remove from this playlist, in its menu on the playlist's page.
+- **Put a playlist of yours in order** as you do a mix, once its tracks are all read: it changes on YouTube Music too. When YouTube Music refuses a move, a toast says so and the playlist shows as YouTube keeps it.
 - **Delete a playlist you made** with Delete from YouTube Music…, in the More menu of its page or of its tile in Library › YouTube Music. It asks first, since the playlist goes from YouTube too and can't come back: to keep its tracks, copy it into a mix first. Mixes copied from it, and the queue, keep their tracks.
 - **A playlist you saved** has Remove from library on its tile instead, which takes it out of your library without asking: saving it again undoes it.
 - **Keep a song without liking it** with Add to library in its menu: it goes to Songs in your library, as YouTube Music's own Save to library does, and stays out of your likes, which shape what YouTube Music recommends. Remove from library in its menu takes it out. Spotify keeps no such songs apart from those you like.

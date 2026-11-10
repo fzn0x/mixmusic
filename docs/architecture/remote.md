@@ -133,7 +133,7 @@ its fingerprint, ID and name, as one it controls.
 Remove, in Settings › Remote control, forgets a paired computer: its
 session closes at once, and the next one is refused as not paired, so it
 has to pair again. Turning remote control off closes the server, its
-sessions and the discovery answers.
+sessions, which it tells that it is off, and the discovery answers.
 
 ## A session
 
@@ -144,8 +144,10 @@ second, and every 2 s besides; the other sends commands (`command`: play,
 pause, next, previous, seek, volume) and a `ping` every 2 s. Either side
 drops a connection after 6 s with no message, as from a computer that
 went to sleep or left the network, and the controlling one connects again,
-after 1 s, then 2, then up to 10, while its page shows. The page
-moves the position on between two states as the track plays.
+after 1 s, then 2, then up to 10, while its page shows, and looks for it
+anew, as a computer that started again listens at another port. The page
+moves the position on between two states as the track plays, and the
+session ends 30 s after the page closes.
 
 ## Listening on the network
 

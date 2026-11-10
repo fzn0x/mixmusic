@@ -23,6 +23,10 @@ MixMusic looks for devices a few seconds after it starts, then every 45
 seconds, and again as you open the cast menu. A device stays listed for
 three minutes after it was last seen. Groups of speakers aren't listed.
 
+Below the devices, the menu lists the other computers with MixMusic's
+[remote control](remote-control.md) on, which you control from here
+rather than play on.
+
 ## What plays on the device
 
 - **YouTube Music tracks**, music videos' audio included, with their

@@ -93,6 +93,10 @@ type Options struct {
 	// CastBrowse, when set, finds the cast devices on the network in place
 	// of mDNS: tests set it.
 	CastBrowse func(ctx context.Context) ([]cast.Device, error)
+	// Remote, when set, has remote control find the other computers,
+	// listen and keep its key in place of the network and the credential
+	// store: tests set it (remote.go).
+	Remote *RemoteOptions
 	// OutputDevices, when set, lists the audio output devices in place of
 	// the system: tests set it.
 	OutputDevices func() ([]OutputDevice, error)
@@ -180,6 +184,9 @@ type App struct {
 	here spotifyHere
 	// cast is the cast devices found, and the one the player plays on.
 	cast castState
+	// remote is remote control's: the server, the computers found and
+	// paired, and the one controlled (remote.go).
+	remote remoteState
 	// output is the audio output device the engine plays on.
 	output outputState
 	// videoPage is the page of the main window that plays the picture of

@@ -59,7 +59,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 	ink, sub := k.text, k.muted
 	disliked := s.a.IsDisliked(t.ID)
 	missing := s.missingFile(t)
-	if disliked || missing {
+	if disliked || missing || s.hides(t) {
 		ink = k.muted
 	}
 	switch {
@@ -131,10 +131,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 		ui.Column(c).Grow(2).Basis(0).MinWidth(0).Gap(2).Children(func() {
 			ui.Row(c).Gap(6).MinWidth(0).Children(func() {
 				ui.Text(c, t.Title).FontSize(k.bodySize()).TextColor(ink).SingleLine().MinWidth(0)
-				if t.Explicit {
-					ui.Text(c, "e").FontSize(k.captionSize()).TextColor(sub).Padding(0, 4).Border(1, sub).
-						Radius(2).Label("Explicit").Shrink(0)
-				}
+				s.explicitMark(c, t, sub)
 			})
 			if missing {
 				ui.Text(c, "File not found").FontSize(k.smallSize()).TextColor(sub).SingleLine()

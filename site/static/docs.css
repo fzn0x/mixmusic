@@ -699,7 +699,15 @@ html:not(.js) .theme-toggle { display: none; }
 
 @media (max-width: 480px) {
   .topbar-docs { margin-left: 2px; padding-left: 12px; }
-  .topbar-github span { display: none; }
+  /* Its words are read out still. */
+  .topbar-github span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
   .topbar-github { width: 40px; padding: 0; }
   .topbar-github:has(.icon) { padding: 0; }
 }

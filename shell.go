@@ -59,6 +59,7 @@ func (s *shell) view(c *ui.Context) {
 	s.trackInfoDialog(c)
 	s.tagDialog(c)
 	s.moveDialog(c)
+	s.copiesDialog(c)
 	s.promptDialog(c)
 	s.failureDialog(c)
 	s.remoteCodeDialog(c)

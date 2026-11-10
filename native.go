@@ -202,6 +202,9 @@ type shell struct {
 	searchPivot  int
 	// shelfScroll is where the shelves scrolled, by page and shelf.
 	shelfScroll map[string]*ui.ScrollState
+	// versions are the versions of the albums the lists showed, and the
+	// version each album's page shows (versions.go).
+	versions albumVersions
 	// artistPivot is the pivot chosen on the page of the artist artistOf.
 	artistPivot int
 	artistOf    string

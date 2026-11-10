@@ -48,7 +48,7 @@ jobs:
   # user signs in or watches a music video.
   nix:
     name: The Nix build
-    runs-on: ubuntu-26.04 # temporary (#407)
+    runs-on: ubuntu-latest
     # A run takes about 4 minutes, more when apt's mirror is slow; one that
     # hangs gives up long before GitHub's 6 hours.
     timeout-minutes: 45
@@ -96,7 +96,7 @@ jobs:
   # system's loader, not Nix's (#166).
   release:
     name: The release build on Ubuntu
-    runs-on: ubuntu-26.04 # temporary (#407)
+    runs-on: ubuntu-latest
     # A run takes about 7 minutes, more when apt's mirror is slow.
     timeout-minutes: 45
     steps:

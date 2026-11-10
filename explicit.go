@@ -114,15 +114,26 @@ func (s *shell) explicitBadge(c *ui.Context, ink ui.Color) {
 const hiddenNote = "hidden by your settings"
 
 // explicitMark marks the row of an explicit track, after its title: its
-// "e", and while the settings hide it, a note that they do.
+// "e".
 func (s *shell) explicitMark(c *ui.Context, t media.Track, ink ui.Color) {
-	if !t.Explicit {
+	if t.Explicit {
+		s.explicitBadge(c, ink)
+	}
+}
+
+// artistLine is the line under the title of a track's row, of key: its
+// artists, and while the settings hide it, a note that they do.
+func (s *shell) artistLine(c *ui.Context, key string, t media.Track, ink ui.Color) {
+	if !s.hides(t) {
+		s.artistLinks(c, key, t.Artists, ink)
 		return
 	}
-	s.explicitBadge(c, ink)
-	if s.hides(t) {
-		ui.Text(c, hiddenNote).FontSize(s.lk.captionSize()).TextColor(ink).SingleLine().Shrink(0)
-	}
+	k := &s.lk
+	ui.Row(c).MinWidth(0).Gap(k.smallSize() / 4).Children(func() {
+		s.artistLinks(c, key, t.Artists, ink)
+		ui.Text(c, "·").FontSize(k.smallSize()).TextColor(ink).Shrink(0)
+		ui.Text(c, hiddenNote).FontSize(k.smallSize()).TextColor(ink).SingleLine().Shrink(0)
+	})
 }
 
 // queueTitle is the title of an entry of the queue, with its "e" while the

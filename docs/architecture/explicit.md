@@ -33,8 +33,8 @@ keep them, dimmed.
   (`shownVersions`); `PrefersClean` has its tile and its page open the
   clean version. Rows of a track the setting hides, in the user's own
   lists, the library and on an album's page, are dimmed, with their "e"
-  and "hidden by your settings" (`explicitMark`), and so are the entries
-  of the queue (`queueTitle`).
+  and "hidden by your settings" under their title (`explicitMark`,
+  `artistLine`), and so are the entries of the queue (`queueTitle`).
 - **Radios** (`internal/app/catalog.go`). `Catalog.Radio`, which autoplay
   and Start radio read, leaves out the explicit songs while the setting
   is on, as it leaves out disliked ones.

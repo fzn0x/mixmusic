@@ -136,7 +136,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 			if missing {
 				ui.Text(c, "File not found").FontSize(k.smallSize()).TextColor(sub).SingleLine()
 			} else {
-				s.artistLinks(c, key+"-artists-"+count(i), t.Artists, sub)
+				s.artistLine(c, key+"-artists-"+count(i), t, sub)
 			}
 		})
 		if o.album {

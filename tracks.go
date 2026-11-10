@@ -37,6 +37,7 @@ func (s *shell) trackList(c *ui.Context, key string, tracks []media.Track, o tra
 	}
 	cur, hasCur := s.st.Current()
 	list := ui.Column(c.Key(key))
+	s.pickList(list, key, tracks)
 	from, to := s.nearRows(c, key, list, len(tracks), s.lk.row)
 	list.Children(func() {
 		// The rows far from the view take their room, and build nothing.
@@ -76,14 +77,18 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 			s.p.PlayTracks(tracks, i)
 		}
 	}
-	if row.DoubleClicked() {
+	// While the list has tracks selected, a click selects, and a double
+	// click is two of them.
+	if row.DoubleClicked() && !s.picking(key) {
 		play()
 	}
+	s.pickRow(row, key, i, t, tracks, current)
 	menu := func(m *ui.Menu) {
 		s.trackMenu(m, t)
 		if o.menu != nil {
 			o.menu(m, i, t)
 		}
+		s.pickItem(m, key, t)
 	}
 	row.ContextMenu(menu)
 	hovered := row.Hovered()
@@ -93,6 +98,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 		art = 48
 	}
 	row.Children(func() {
+		s.pickBox(c, key, i, t, tracks)
 		lead := s.buttonBase(c.Key(key+"-lead-"+count(i))).Size(art, art).Shrink(0).Cursor(ui.CursorPointer)
 		label := "Play " + t.Title
 		if current && s.st.Playing {

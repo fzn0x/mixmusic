@@ -50,6 +50,7 @@ func (s *shell) view(c *ui.Context) {
 			})
 		})
 		s.playerBar(c)
+		s.picksBar(c)
 		s.overlay(c)
 	})
 	s.palette(c)

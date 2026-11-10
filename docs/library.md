@@ -131,6 +131,16 @@ The Stats page, in the sidebar, shows what you listened to, This week, This mont
 
 Tracks count as in the history. Podcast episodes stay out of the stats, and clearing the history starts them over.
 
+### Your year
+
+Next to Stats' ranges, Your year looks back at one calendar year of your history. It shows for past years that have plays, and for the current year from December; with several years, a row of years above it chooses one. It tells:
+
+- how many tracks you played and the minutes you listened;
+- your top five songs, artists and albums;
+- the month you listened most, the song the year began with, the song you played most often in one day, and how many new artists you found, which are those you hadn't played before the year, when your history reaches back that far.
+
+**Save image** saves a card of the year as a PNG, a square for a chat or a feed, and **Save image for a story** a tall one, with your top artists and albums too. Both are in your theme's colours. The history keeps your last 1,000 plays, so an older year shows what that still holds.
+
 ## Downloads
 
 Download tracks, albums, playlists, mixes and your liked songs, and they play without the network. They stay until you remove them, apart from the offline cache.

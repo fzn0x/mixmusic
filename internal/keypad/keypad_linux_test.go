@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -53,6 +55,14 @@ var (
 	gtkMainIterationDo      func(blocking bool) bool
 )
 
+// X, for the keycodes of the keys pressed.
+var (
+	xOpenDisplay     func(name uintptr) uintptr
+	xCloseDisplay    func(display uintptr) int32
+	xStringToKeysym  func(name string) uint64
+	xKeysymToKeycode func(display uintptr, keysym uint64) uint8
+)
+
 // TestWatch presses keys in a GTK window, as a keyboard does, with
 // xdotool. Ctrl and the keypad's + go to plus, and no further while it
 // takes them. Other keys, those plus leaves, and every key after stop, go
@@ -89,6 +99,39 @@ func TestWatch(t *testing.T) {
 	}
 	if !gtkInitCheck(0, 0) {
 		t.Fatal("GTK can't open the display")
+	}
+	x11, err := purego.Dlopen("libX11.so.6", purego.RTLD_NOW|purego.RTLD_GLOBAL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for name, fn := range map[string]any{
+		"XOpenDisplay":     &xOpenDisplay,
+		"XCloseDisplay":    &xCloseDisplay,
+		"XStringToKeysym":  &xStringToKeysym,
+		"XKeysymToKeycode": &xKeysymToKeycode,
+	} {
+		purego.RegisterLibFunc(fn, x11, name)
+	}
+	display := xOpenDisplay(0)
+	if display == 0 {
+		t.Fatal("X can't open the display")
+	}
+	defer xCloseDisplay(display)
+	// byKeycode gives keys, as xdotool names them, with the key pressed,
+	// the last, by its keycode, as a keyboard sends it. Given a key's name,
+	// xdotool also holds the modifiers of the first map entry at its level
+	// in the key's type. Since xkeyboard-config 2.46, the type of the
+	// keypad's + and −, CTRL+ALT, has Alt's entry first at their first
+	// level (#407): ctrl+KP_Add went as Ctrl, Alt and the keypad's +, which
+	// is XF86Next_VMode, and which the X server keeps.
+	byKeycode := func(keys string) string {
+		t.Helper()
+		i := strings.LastIndex(keys, "+") + 1
+		code := xKeysymToKeycode(display, xStringToKeysym(keys[i:]))
+		if code == 0 {
+			t.Fatalf("%s: no key has it in X's keymap", keys[i:])
+		}
+		return keys[:i] + strconv.Itoa(int(code))
 	}
 	const title = "MixMusic keypad test"
 	win := gtkWindowNew(0) // GTK_WINDOW_TOPLEVEL
@@ -162,7 +205,7 @@ func TestWatch(t *testing.T) {
 	press := func(keys string, wantCalls, wantPassed int) {
 		t.Helper()
 		c0, p0 := calls, passed
-		xdotool("key", keys)
+		xdotool("key", byKeycode(keys))
 		if !turn(func() bool { return calls > c0 || passed > p0 }) {
 			t.Fatalf("%s: the window got no key", keys)
 		}

@@ -6,6 +6,7 @@ Windows, `~/Library/Application Support/MixMusic` on macOS,
 `mix-covers/` (the covers the user chose for mixes),
 `queue.json`, `positions.json` (where the user left podcasts' episodes),
 `local-files.json` (the index of the music on the computer),
+`local-copies.json` (the copies of one song among its files, [copies.md](copies.md)),
 `addons/`, `bin/` (yt-dlp), the YouTube session
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the

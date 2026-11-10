@@ -43,6 +43,12 @@ func youtubePlaylistID(id string) (string, error) {
 // recordings on YouTube Music, and those without one stay out. The
 // playlist is the user's, to add to and to delete.
 func (c *Collection) CreateYouTubePlaylist(ctx context.Context, title string, tracks []media.Track) (media.Playlist, error) {
+	return c.createOnYouTube(ctx, title, tracks, media.Private)
+}
+
+// createOnYouTube is CreateYouTubePlaylist of a playlist that privacy says
+// who may open.
+func (c *Collection) createOnYouTube(ctx context.Context, title string, tracks []media.Track, privacy media.Privacy) (media.Playlist, error) {
 	if !c.a.youtube.SignedIn() {
 		return media.Playlist{}, errNotSignedIn
 	}
@@ -55,7 +61,7 @@ func (c *Collection) CreateYouTubePlaylist(ctx context.Context, title string, tr
 	if len(tracks) > 0 && len(ids) == 0 {
 		return media.Playlist{}, errors.New("none of these tracks is on YouTube Music")
 	}
-	id, err := c.a.youtube.CreatePlaylist(ctx, title, ids)
+	id, err := c.a.youtube.CreatePlaylistAs(ctx, title, ids, privacy)
 	if err != nil {
 		return media.Playlist{}, err
 	}
@@ -68,6 +74,8 @@ func (c *Collection) CreateYouTubePlaylist(ctx context.Context, title string, tr
 		Artwork:    []media.Image{},
 		Editable:   true,
 		Deletable:  true,
+		Mine:       true,
+		Privacy:    privacy,
 		URL:        "https://music.youtube.com/playlist?list=" + id,
 	}, nil
 }

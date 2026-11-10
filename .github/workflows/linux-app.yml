@@ -48,9 +48,7 @@ jobs:
   # user signs in or watches a music video.
   nix:
     name: The Nix build
-    # Ubuntu 24.04 for now: on 26.04, which ubuntu-latest moves to, the
-    # zoom keys' checks fail (#407).
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     # A run takes about 4 minutes, more when apt's mirror is slow; one that
     # hangs gives up long before GitHub's 6 hours.
     timeout-minutes: 45
@@ -98,8 +96,7 @@ jobs:
   # system's loader, not Nix's (#166).
   release:
     name: The release build on Ubuntu
-    # Ubuntu 24.04 for now, as the Nix build's job (#407).
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     # A run takes about 7 minutes, more when apt's mirror is slow.
     timeout-minutes: 45
     steps:

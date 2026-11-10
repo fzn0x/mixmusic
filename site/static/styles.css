@@ -825,7 +825,6 @@ kbd {
 }
 
 html.no-js .demo-wrap { display: none; }
-html.js .demo-fallback { display: none; }
 
 .demo-wrap {
   position: relative;

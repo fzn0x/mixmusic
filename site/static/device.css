@@ -1,0 +1,153 @@
+/*
+ * The hero's device frame: MixMusic on a drawn laptop, in CSS alone. The
+ * live player (the home page's working copy) sits in its screen, and the
+ * screenshot that shows without script does too. The laptop is a plain
+ * one, made for this page: a black bezel with a thin rim and a camera, a
+ * flat base wider than the lid, and a soft shadow under it. It follows the
+ * theme: the screen is dark in either, as the app is, and the base takes
+ * the theme's metal.
+ *
+ * Phones have no laptop. They see the mini player, which has no frame,
+ * and the screenshot without script as it is.
+ */
+
+:root {
+  --lap-bezel: #060607;
+  --lap-rim: #3b3b41;
+  --lap-rim-lit: rgba(255, 255, 255, 0.16);
+  --lap-deck-hi: #3f3f46;
+  --lap-deck-lo: #25252a;
+  --lap-deck-edge: rgba(255, 255, 255, 0.14);
+  --lap-camera: #1a1d29;
+  --lap-camera-lens: #3e4a78;
+  --lap-shadow: rgba(0, 0, 0, 0.7);
+  --lap-shadow-near: rgba(0, 0, 0, 0.5);
+}
+/* Light: the same two blocks, as styles.css has them. Keep them so. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --lap-rim: #a79ca0;
+    --lap-rim-lit: rgba(255, 255, 255, 0.7);
+    --lap-deck-hi: #e5dcde;
+    --lap-deck-lo: #c4b9bc;
+    --lap-deck-edge: rgba(255, 255, 255, 0.85);
+    --lap-shadow: rgba(66, 38, 46, 0.5);
+    --lap-shadow-near: rgba(66, 38, 46, 0.34);
+  }
+}
+:root[data-theme="light"] {
+  --lap-rim: #a79ca0;
+  --lap-rim-lit: rgba(255, 255, 255, 0.7);
+  --lap-deck-hi: #e5dcde;
+  --lap-deck-lo: #c4b9bc;
+  --lap-deck-edge: rgba(255, 255, 255, 0.85);
+  --lap-shadow: rgba(66, 38, 46, 0.5);
+  --lap-shadow-near: rgba(66, 38, 46, 0.34);
+}
+
+/* The measures of the laptop, which follow the width it has. The live
+   player's container is .demo-wrap, whose pieces are its screen, the
+   frame, and its base, drawn by its ::after, as the frame clips what
+   reaches past its sides. The screenshot's container is the window. */
+.demo-wrap .app-frame,
+.demo-wrap::after {
+  --bez: clamp(7px, 1.1cqw, 13px);
+  --deck: clamp(9px, 1.5cqw, 17px);
+  --over: clamp(8px, 1.4cqw, 16px);
+}
+.laptop-still {
+  --bez: clamp(7px, 1.1vw, 13px);
+  --deck: clamp(9px, 1.5vw, 17px);
+  --over: clamp(8px, 1.4vw, 16px);
+}
+
+/* The lid: the screen with its bezel and rim drawn round it. */
+.demo-wrap .app-frame,
+.stage.laptop-still img {
+  border-radius: 8px;
+  background: #000;
+  box-shadow:
+    0 0 0 var(--bez) var(--lap-bezel),
+    0 0 0 calc(var(--bez) + 1px) var(--lap-rim),
+    0 0 0 calc(var(--bez) + 2px) rgba(0, 0, 0, 0.35);
+}
+.demo-wrap .app-frame {
+  position: relative;
+  /* The room of the base and its shadow under the lid. */
+  margin: var(--bez) 0 calc(var(--bez) + var(--deck) + 14px);
+}
+/* The screen lies flat: the app's tilt, with the page's scroll, is not for
+   a screen. Its corners are the screen's. */
+.demo-wrap .app {
+  border-radius: 8px;
+  box-shadow: none;
+  transform: scale(var(--fit, 0.9375));
+}
+
+/* The base, with its shadow: flat, wider than the lid, with a lit top edge. */
+.demo-wrap::after,
+.laptop-still::after {
+  content: "";
+  position: absolute;
+  left: calc(-1 * (var(--bez) + var(--over)));
+  right: calc(-1 * (var(--bez) + var(--over)));
+  top: calc(100% + var(--bez) + 2px);
+  height: var(--deck);
+  border-radius: 1px 1px 999px 999px / 1px 1px 100% 100%;
+  background:
+    linear-gradient(to right, transparent 0, var(--lap-deck-edge) 8%, var(--lap-deck-edge) 92%, transparent 100%) top / 100% 1px no-repeat,
+    linear-gradient(to bottom, var(--lap-deck-hi), var(--lap-deck-lo));
+  /* The soft shadow where it touches the table: a wide, flat blur under
+     it, and a tight one at its edge. */
+  box-shadow:
+    0 10px 12px -8px var(--lap-shadow-near),
+    0 26px 34px -14px var(--lap-shadow);
+  pointer-events: none;
+}
+
+/* The live player's base sits under its frame, whose height is its width's
+   share, with the bezel above and under it. */
+.demo-wrap::after {
+  top: calc(100cqw * 820 / 1280 + 2 * var(--bez) + 2px);
+}
+
+/* The glass, a faint reflection over the screen, and the camera in the
+   bezel above it. */
+.demo-wrap .app-frame::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--bez)) calc(-1 * var(--bez)) 0;
+  border-radius: calc(8px + var(--bez)) calc(8px + var(--bez)) 8px 8px;
+  background:
+    radial-gradient(circle at 50% calc(var(--bez) / 2), var(--lap-camera-lens) 0 1.2px, var(--lap-camera) 1.5px 3px, transparent 3.5px),
+    linear-gradient(112deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0) 38%);
+  pointer-events: none;
+}
+
+/* The screenshot, which shows where script does not run: in the same lid.
+   The figure keeps its glow (styles.css); the base hangs from the figure. */
+.stage.laptop-still {
+  position: relative;
+  margin-top: calc(clamp(40px, 5vw, 64px) + var(--bez));
+  margin-bottom: calc(var(--bez) + var(--deck) + 14px);
+}
+
+/* Phones have no laptop: the screenshot is plain, as before. */
+@media (max-width: 700px) {
+  .stage.laptop-still {
+    margin-top: clamp(40px, 5vw, 64px);
+    margin-bottom: 0;
+  }
+  .stage.laptop-still img {
+    border-radius: var(--radius-card);
+    box-shadow: 0 0 0 1px var(--outline), 0 18px 40px -28px rgba(0, 0, 0, 0.7);
+  }
+  .laptop-still::after { display: none; }
+}
+
+/* The base goes with the lid, which narrow screens, and the mini player
+   on any, hide. */
+@container (max-width: 700px) {
+  .demo-wrap::after { display: none; }
+}
+.demo-wrap[data-view="mini"]::after { display: none; }

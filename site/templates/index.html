@@ -48,6 +48,7 @@
     {%- endfor %}
   ]}
   </script>
+  <link rel="stylesheet" href="device.css" />
   <link rel="stylesheet" href="faq.css" />
   <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
@@ -151,9 +152,18 @@
         </div>
         <p class="meta">Version <span data-version>0.5.10</span> · MIT or GPLv3 · macOS, Windows and Linux · YouTube Music needs no account</p>
       </div>
-      <figure class="stage stage-hero demo-fallback" style="--glow: #717ed6">
-        <img src="assets/shots/now-playing.webp" width="1920" height="1058" fetchpriority="high" alt="MixMusic's now playing page in its default look, Blend with the Mix theme: アイドル by YOASOBI, its cover over the visualizer, the player, its synced lyrics with the Translate and Romaji switches, and up next beside them." />
-      </figure>
+      {#- The screenshot for visitors without script, where the working
+          copy below doesn't run. It is in a noscript, so that a browser
+          that runs script never fetches it, and a phone without script
+          gets a smaller one than a desktop. #}
+      <noscript>
+        <figure class="stage stage-hero laptop-still" style="--glow: #717ed6">
+          <picture>
+            <source media="(max-width: 700px)" srcset="assets/shots/now-playing-960.webp" width="960" height="529" />
+            <img src="assets/shots/now-playing.webp" width="1920" height="1058" alt="MixMusic's now playing page in its default look, Blend with the Mix theme: アイドル by YOASOBI, its cover over the visualizer, the player, its synced lyrics with the Translate and Romaji switches, and up next beside them." />
+          </picture>
+        </figure>
+      </noscript>
 
       <div class="demo-wrap" data-demo-wrap>
         <div class="app-frame" data-app-frame>

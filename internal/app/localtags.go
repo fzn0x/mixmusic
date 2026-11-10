@@ -47,7 +47,7 @@ func cantEdit(path string, err error) error {
 // read-only, a folder MixMusic can't write in, or a kind of file whose
 // tags it doesn't write, as WAV.
 func (l *LocalFiles) EditableTags(id string) (FileTags, error) {
-	path, err := pathOf(id)
+	path, err := pathOf(l.a.fileID(id))
 	if err != nil {
 		return FileTags{}, err
 	}
@@ -75,7 +75,7 @@ func (l *LocalFiles) EditableTags(id string) (FileTags, error) {
 // Editable tells why the tags of the files of tracks can't be written, as
 // EditableTags does: of the first that can't, by its name.
 func (l *LocalFiles) Editable(ids []string) error {
-	for _, id := range ids {
+	for _, id := range l.a.copyIDs(ids) {
 		path, err := pathOf(id)
 		if err != nil {
 			return err
@@ -153,7 +153,7 @@ var writeOptions = tagwrite.Options{Check: func(r io.ReadSeeker) error {
 // all the same.
 func (l *LocalFiles) EditTags(ids []string, t tagwrite.Tags, fields tagwrite.Fields, progress func(done int)) (int, error) {
 	var paths []string
-	for _, id := range ids {
+	for _, id := range l.a.copyIDs(ids) {
 		path, err := pathOf(id)
 		if err != nil {
 			return 0, err
@@ -169,6 +169,7 @@ func (l *LocalFiles) EditTags(ids []string, t tagwrite.Tags, fields tagwrite.Fie
 // whose songs have no album artists, gives them all the album artists the
 // album shows, so that they stay together.
 func (l *LocalFiles) MoveToAlbum(id, albumID string) error {
+	id = l.a.fileID(id)
 	path, err := pathOf(id)
 	if err != nil {
 		return err
@@ -194,7 +195,7 @@ func (l *LocalFiles) MoveToAlbum(id, albumID string) error {
 // MovePlan tells what MoveToAlbum writes: the album's title and album
 // artists, and the album's songs that take its album artists too.
 func (l *LocalFiles) MovePlan(id, albumID string) (localfiles.Move, error) {
-	path, err := pathOf(id)
+	path, err := pathOf(l.a.fileID(id))
 	if err != nil {
 		return localfiles.Move{}, err
 	}
@@ -248,7 +249,7 @@ func (l *LocalFiles) write(paths []string, edit func(path string) (tagwrite.Tags
 			}
 		}
 		if p := l.a.goPlayer.Load(); p != nil {
-			p.Retagged(tracks)
+			p.Retagged(l.a.withSongs(tracks))
 		}
 	}
 	return len(done), first

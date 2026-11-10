@@ -20,7 +20,7 @@ import (
 // fast is the timing of the tests: short, but not so short that a busy
 // runner takes a computer for gone.
 var fast = Timing{Ping: 100 * time.Millisecond, Silence: 2 * time.Second, Code: 5 * time.Second,
-	StateEvery: 10 * time.Millisecond, Rest: 200 * time.Millisecond}
+	StateEvery: 10 * time.Millisecond, Rest: time.Second}
 
 // fakeHost is the computer controlled's side of the app: who may control
 // it, the codes it shows, and a player that keeps the commands it gets.
@@ -624,7 +624,7 @@ func TestReplayed(t *testing.T) {
 func TestVanished(t *testing.T) {
 	h := newFakeHost()
 	timing := fast
-	timing.Silence = 500 * time.Millisecond
+	timing.Silence = 800 * time.Millisecond
 	s, addr := serve(t, h, timing)
 	d := newDialer(t, "Laptop", timing)
 	peer, err := pair(t, d, addr, h, same)

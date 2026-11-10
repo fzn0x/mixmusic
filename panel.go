@@ -452,6 +452,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	}
 	s.librarySongItem(m, t)
 	s.addToMenus(m, one)
+	s.addToSpotifyMenu(m, one)
 	if !t.IsEpisode() {
 		s.downloadItems(m, t)
 	}

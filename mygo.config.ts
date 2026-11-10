@@ -44,15 +44,16 @@ export default defineConfig({
     notarize: process.env.NOTARY_KEYCHAIN
       ? { keychainProfile: "mixmusic-notary", keychain: process.env.NOTARY_KEYCHAIN }
       : undefined,
-    // macOS asks the user before MixMusic finds cast devices on the network
-    // and plays on them, with this reason.
+    // macOS asks the user before MixMusic finds cast devices, or MixMusic
+    // on other computers (remote control), on the network, and plays on
+    // them or controls them, with this reason.
     infoPlist: {
-      NSLocalNetworkUsageDescription: "MixMusic finds the cast devices on your network, such as Chromecasts and Nest speakers, to play on them.",
+      NSLocalNetworkUsageDescription: "MixMusic finds the cast devices on your network, such as Chromecasts and Nest speakers, to play on them, and MixMusic on your other computers, to control it.",
       // And before the visualizer first hears Spotify in MixMusic, which
       // WebKit's own process plays: through a tap of that process, which
       // macOS counts as recording what other apps play.
       NSAudioCaptureUsageDescription: "MixMusic hears the Spotify tracks it plays, for its visualizer and the plugins' analyser. It never records or sends them.",
-      NSBonjourServices: ["_googlecast._tcp"],
+      NSBonjourServices: ["_googlecast._tcp", "_mixmusic._tcp"],
     },
   },
   // The workflow's code signing certificate, whose password is

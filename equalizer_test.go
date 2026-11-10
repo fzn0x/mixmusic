@@ -48,7 +48,7 @@ func TestEqualizerSliders(t *testing.T) {
 	s.set.Equalizer.Gains[1], s.set.Equalizer.Gains[2] = 12, -12 // 64 Hz up, 125 Hz down
 	// Tall enough for the sliders to show whole above the player bar,
 	// under the groups of Playback before them.
-	tt := testerOf(t, s, 1280, 3000)
+	tt := testerOf(t, s, 1280, 3600)
 	show(s, tt, "/settings/playback")
 	img := tt.Image()
 	near := func(c color.Color, want color.NRGBA) bool {

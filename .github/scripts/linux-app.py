@@ -33,6 +33,8 @@
 import argparse
 import array
 import collections
+import ctypes
+import functools
 import json
 import math
 import os
@@ -159,6 +161,40 @@ def until(fn, timeout, every=0.25):
 
 def run(*args, timeout=30):
     return subprocess.run(args, capture_output=True, text=True, timeout=timeout)
+
+
+@functools.cache
+def xlib():
+    """libX11, for the keycodes of keys."""
+    x11 = ctypes.CDLL("libX11.so.6")
+    x11.XOpenDisplay.restype = ctypes.c_void_p
+    x11.XOpenDisplay.argtypes = [ctypes.c_char_p]
+    x11.XCloseDisplay.argtypes = [ctypes.c_void_p]
+    x11.XStringToKeysym.restype = ctypes.c_ulong
+    x11.XStringToKeysym.argtypes = [ctypes.c_char_p]
+    x11.XKeysymToKeycode.restype = ctypes.c_ubyte
+    x11.XKeysymToKeycode.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
+    return x11
+
+
+def key(keys):
+    """Presses keys, as xdotool names them (ctrl+KP_Add), with the key
+    pressed, the last, by its keycode in the X server's keymap, as a
+    keyboard sends it. Given a key's name, xdotool also holds the modifiers
+    of the first map entry at its level in the key's type. Since
+    xkeyboard-config 2.46, the type of the keypad's + and −, CTRL+ALT, has
+    Alt's entry first at their first level (#407): ctrl+KP_Add went as
+    Ctrl, Alt and the keypad's +, which is XF86Next_VMode, and which the X
+    server keeps."""
+    *mods, name = keys.split("+")
+    x11 = xlib()
+    display = x11.XOpenDisplay(None)
+    code = x11.XKeysymToKeycode(display, x11.XStringToKeysym(name.encode())) if display else 0
+    if display:
+        x11.XCloseDisplay(display)
+    # A key X has no keycode for, or keycode 8 or 9, which xdotool would
+    # read as a digit's key, goes by its name.
+    return run("xdotool", "key", "+".join(mods + [str(code) if code >= 10 else name]))
 
 
 # D-Bus, as a desktop calls it.
@@ -573,7 +609,7 @@ class Session:
         for i, (keys, want) in enumerate([("ctrl+KP_Add", 1.1), ("ctrl+equal", 1.25), ("ctrl+KP_Subtract", 1.1),
                                           ("ctrl+minus", 1.0), ("ctrl+KP_Add", 1.1), ("ctrl+0", 1.0)]):
             before = zoom()
-            run("xdotool", "key", keys)
+            key(keys)
             got = until(lambda: zoom() if zoom() == want else None, 5) or zoom()
             self.grab(f"02-zoom-{i + 1}-{keys.replace('+', '-')}")
             self.c.add(f"{keys.replace('ctrl+', 'Ctrl+')} zooms to {want:.0%}", got == want, f"zoom {before} → {got}")
@@ -665,7 +701,7 @@ class Session:
         """The media keys: a press of the keyboard's play key, which MixMusic
         grabs on X11, plays the queue it kept: the track, downloaded. The
         MPRIS player comes once something plays."""
-        run("xdotool", "key", "XF86AudioPlay")
+        key("XF86AudioPlay")
         came = until(lambda: has_owner(MPRIS), 20)
         playing = came and until(lambda: status() == "Playing", 10)
         if self.c.add("The keyboard's play key plays, and MPRIS's player comes", playing,
@@ -674,7 +710,7 @@ class Session:
         if not came:
             # Space plays too, from the window: the MPRIS checks still run.
             run("xdotool", "windowfocus", "--sync", self.wid, timeout=10)
-            run("xdotool", "key", "space")
+            key("space")
             came = until(lambda: has_owner(MPRIS), 20)
         return came
 
@@ -748,7 +784,7 @@ class Session:
             run("xdotool", "windowfocus", "--sync", front[0], timeout=10)
         focused = run("xdotool", "getwindowfocus").stdout.strip()
         before = status()
-        run("xdotool", "key", "ctrl+alt+p")
+        key("ctrl+alt+p")
         in_front = bool(front) and focused == front[0]
         self.c.add("A global shortcut of settings.json pauses with another window in front (X11)",
                    in_front and before == "Playing" and until(lambda: status() == "Paused", 5),

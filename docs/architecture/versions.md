@@ -24,8 +24,10 @@ whose page switches between its versions (#345).
   don't tell: `VersionsTold` says when a group's list tells, by its
   badges or its titles' marks, which version is explicit.
   `PreferredVersion` picks, of the versions of the first one's edition,
-  the explicit one, or the clean one with `cleanVersions` on
-  (Settings › Playback › Explicit content). `VersionLabels` names each
+  the explicit one, or the clean one with `cleanVersions` or
+  `hideExplicit` on (`PrefersClean`, Settings › Playback › Explicit
+  content); with `hideExplicit`, the switch leaves out the explicit
+  ones ([explicit.md](explicit.md)). `VersionLabels` names each
   version for the switch, by its edition and, where an edition comes
   both ways, by whether it's explicit.
 - **The tiles and the page** (`versions.go`). `albumTiles` groups the

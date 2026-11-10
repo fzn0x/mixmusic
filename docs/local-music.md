@@ -99,6 +99,12 @@ MP4's tags, the Vorbis comments of FLAC, Opus and Vorbis, and WAV's INFO
 list.
 
 - **A file without tags** shows by its file's name, by Unknown artist.
+- **Explicit:** a song is explicit when its tags' content advisory says
+  so, as music stores and taggers write it: iTunes' `rtng` of an M4A
+  file, or an `ITUNESADVISORY` tag, set to 1 (2 is clean), or an
+  `EXPLICIT` tag set to 1 or yes.
+  [Hide explicit content](playing-music.md#hiding-explicit-content)
+  keeps those from playing.
 - **Covers:** the cover a file holds, the front cover when it holds
   several, else an image beside it named cover, folder, front or album
   (`.jpg`, `.png` or `.webp`). MixMusic keeps a copy of each in its cache

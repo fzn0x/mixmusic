@@ -4,9 +4,13 @@
 // break, the button says "Copied", and a live region tells screen readers
 // so. Where the Clipboard API is missing or refused, as on a page not
 // served over HTTPS, the button copies the way browsers did before it, and
-// failing that selects the block, for Ctrl+C (⌘C on a Mac).
+// failing that selects the block, for Ctrl+C (⌘C on a Mac). Blocks and
+// tables that scroll sideways take the keyboard's focus, to scroll them.
 (() => {
   const d = document;
+  // The docs' tables scroll sideways in a narrow window: the keyboard can
+  // reach them, to scroll them with the arrow keys.
+  d.querySelectorAll(".prose table").forEach((table) => (table.tabIndex = 0));
   const blocks = d.querySelectorAll(".prose pre, pre[data-copy]");
   if (!blocks.length) return;
   const mac = /Mac|iPhone|iPad/.test(navigator.userAgentData?.platform || navigator.platform || "");
@@ -67,6 +71,9 @@
 
   blocks.forEach((pre) => {
     const code = pre.querySelector("code") || pre;
+    // A block that scrolls sideways can be scrolled with the arrow keys
+    // once the keyboard can reach it.
+    pre.tabIndex = 0;
     const label = pre.dataset.copy || "Copy the code";
     const b = d.createElement("button");
     b.type = "button";

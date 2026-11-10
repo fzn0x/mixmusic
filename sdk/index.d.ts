@@ -100,6 +100,12 @@ export interface Playlist {
   url?: string;
   saved?: boolean;
   deletable?: boolean;
+  /** Set for a playlist the user made on its service, not one they saved or collaborate on. */
+  mine?: boolean;
+  /** Set for a playlist others than its owner add to. */
+  collaborative?: boolean;
+  /** Who may open the playlist, where its service tells. */
+  privacy?: "public" | "unlisted" | "private";
 }
 
 export interface SearchResults {

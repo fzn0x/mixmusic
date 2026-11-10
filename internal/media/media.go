@@ -205,6 +205,16 @@ type Playlist struct {
 	// Deletable is set for playlists the user may delete on their
 	// service: those YouTube Music offers to delete, the user's own.
 	Deletable bool `json:"deletable,omitempty"`
+	// Mine is set for a playlist the signed-in user made on its
+	// service, as against one they saved, follow or collaborate on.
+	Mine bool `json:"mine,omitempty"`
+	// Collaborative is set for a playlist that others than its owner
+	// add to: on Spotify, one its owner made collaborative; on YouTube
+	// Music, one whose page shows its collaborators.
+	Collaborative bool `json:"collaborative,omitempty"`
+	// Privacy is who may open the playlist on its service, or "" where
+	// the service doesn't tell.
+	Privacy Privacy `json:"privacy,omitempty"`
 	// Suggest names the songs the service suggests adding to a playlist
 	// of the user's: its token there, which the suggestions are read by,
 	// or "" for a playlist that has none.

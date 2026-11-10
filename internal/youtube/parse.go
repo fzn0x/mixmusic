@@ -277,6 +277,7 @@ func parseListItem(item node) (media.Item, bool) {
 	nav := item.get("navigationEndpoint")
 	it, ok := browseItem(pageType(nav), nav.get("browseEndpoint", "browseId").str(), title, b, thumbs)
 	markFromMenu(it, item.get("menu"))
+	markExplicit(it, item)
 	return it, ok
 }
 
@@ -298,7 +299,17 @@ func parseTwoRowItem(r node) (media.Item, bool) {
 	}
 	it, ok := browseItem(pageType(nav), nav.get("browseEndpoint", "browseId").str(), title, b, thumbs)
 	markFromMenu(it, r.get("menu"))
+	markExplicit(it, r)
 	return it, ok
+}
+
+// markExplicit marks an album item explicit when its renderer r carries
+// the explicit badge, which tells an album's explicit version from its
+// clean one.
+func markExplicit(it media.Item, r node) {
+	if it.Album != nil {
+		it.Album.Explicit = isExplicit(r)
+	}
 }
 
 // markFromMenu marks a playlist item with what its menu offers: to delete

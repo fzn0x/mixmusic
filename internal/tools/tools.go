@@ -10,9 +10,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -32,9 +34,19 @@ import (
 // is a variable for tests.
 var releaseURL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/"
 
+// tagURL is where the files of a yt-dlp release are downloaded by its
+// version, as .../releases/download/2026.08.19/. GitHub can fail the
+// latest/download address alone, as it did on 2026-11-08 while each
+// release's own address worked (#412, #431). It is a variable for tests.
+var tagURL = "https://github.com/yt-dlp/yt-dlp/releases/download/"
+
 // latestURL redirects to the page of the latest yt-dlp release, whose path
 // ends in its version. It is a variable for tests.
 var latestURL = "https://github.com/yt-dlp/yt-dlp/releases/latest"
+
+// apiURL tells the latest yt-dlp release, as GitHub's API, when latestURL
+// doesn't. It is a variable for tests.
+var apiURL = "https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest"
 
 // ErrNoYTDLP is returned when yt-dlp is not installed.
 var ErrNoYTDLP = errors.New("yt-dlp is not installed: install it from Settings › Playback")
@@ -463,20 +475,17 @@ func (m *Manager) InstallYTDLP(ctx context.Context, progress Progress) error {
 	if err != nil {
 		return err
 	}
-	sums, err := m.fetch(ctx, releaseURL+"SHA2-256SUMS", nil)
-	if err != nil {
-		return fmt.Errorf("downloading yt-dlp checksums: %w", err)
+	data, err := m.download(ctx, releaseURL, name, progress)
+	if errors.As(err, new(fetchError)) && ctx.Err() == nil {
+		// The release's own address, which GitHub can serve while the
+		// latest one fails (tagURL).
+		if v, verr := m.LatestYTDLP(ctx); verr == nil {
+			log.Printf("mixmusic: downloading yt-dlp %s from its release's address: %v", v, err)
+			data, err = m.download(ctx, tagURL+v+"/", name, progress)
+		}
 	}
-	want, err := checksum(sums, name)
 	if err != nil {
 		return err
-	}
-	data, err := m.fetch(ctx, releaseURL+name, progress)
-	if err != nil {
-		return fmt.Errorf("downloading yt-dlp: %w", err)
-	}
-	if got := sha256.Sum256(data); hex.EncodeToString(got[:]) != want {
-		return errors.New("downloaded yt-dlp does not match its published checksum")
 	}
 	if err := os.MkdirAll(m.Dir, 0o755); err != nil {
 		return err
@@ -502,9 +511,94 @@ func (m *Manager) InstallYTDLP(ctx context.Context, progress Progress) error {
 	return os.Rename(tmp.Name(), m.managedPath())
 }
 
+// download fetches the yt-dlp file name from base, the address of a
+// release's files, and checks it against the checksums published beside
+// it. A download that failed is a fetchError.
+func (m *Manager) download(ctx context.Context, base, name string, progress Progress) ([]byte, error) {
+	sums, err := m.fetch(ctx, base+"SHA2-256SUMS", nil)
+	if err != nil {
+		return nil, fetchError{fmt.Errorf("downloading yt-dlp checksums: %w", err)}
+	}
+	want, err := checksum(sums, name)
+	if err != nil {
+		return nil, err
+	}
+	data, err := m.fetch(ctx, base+name, progress)
+	if err != nil {
+		return nil, fetchError{fmt.Errorf("downloading yt-dlp: %w", err)}
+	}
+	if got := sha256.Sum256(data); hex.EncodeToString(got[:]) != want {
+		return nil, errors.New("downloaded yt-dlp does not match its published checksum")
+	}
+	return data, nil
+}
+
+// fetchError is a download that failed, which another address of the
+// same files may not.
+type fetchError struct{ err error }
+
+func (e fetchError) Error() string { return e.err.Error() }
+func (e fetchError) Unwrap() error { return e.err }
+
 // LatestYTDLP returns the version of the latest yt-dlp release, such as
-// 2026.08.19.
+// 2026.08.19: from where the release page redirects, or from GitHub's API
+// when that fails.
 func (m *Manager) LatestYTDLP(ctx context.Context) (string, error) {
+	v, err := m.latestOfPage(ctx)
+	if err == nil || ctx.Err() != nil {
+		return v, err
+	}
+	if v, apiErr := m.latestOfAPI(ctx); apiErr == nil {
+		return v, nil
+	}
+	return "", err
+}
+
+// latestOfAPI asks GitHub's API for the latest yt-dlp release.
+func (m *Manager) latestOfAPI(ctx context.Context) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiURL, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Accept", "application/vnd.github+json")
+	res, err := m.HTTP.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("finding the latest yt-dlp: HTTP %d", res.StatusCode)
+	}
+	var release struct {
+		Tag string `json:"tag_name"`
+	}
+	if err := json.NewDecoder(io.LimitReader(res.Body, 1<<20)).Decode(&release); err != nil {
+		return "", fmt.Errorf("finding the latest yt-dlp: %w", err)
+	}
+	if !validVersion(release.Tag) {
+		return "", fmt.Errorf("finding the latest yt-dlp: release %q", release.Tag)
+	}
+	return release.Tag, nil
+}
+
+// validVersion reports whether v can name a release in a path of its
+// address, as 2026.08.19 does: letters, digits, dots, dashes, underscores
+// and pluses, not dots alone.
+func validVersion(v string) bool {
+	if strings.Trim(v, ".") == "" {
+		return false
+	}
+	for _, r := range v {
+		if (r < '0' || r > '9') && (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && !strings.ContainsRune(".-_+", r) {
+			return false
+		}
+	}
+	return true
+}
+
+// latestOfPage reads the latest yt-dlp release from where its page
+// redirects.
+func (m *Manager) latestOfPage(ctx context.Context) (string, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodHead, latestURL, nil)
 	if err != nil {
 		return "", err
@@ -517,7 +611,7 @@ func (m *Manager) LatestYTDLP(ctx context.Context) (string, error) {
 	}
 	res.Body.Close()
 	_, v, ok := strings.Cut(res.Header.Get("Location"), "/releases/tag/")
-	if !ok || v == "" || strings.Contains(v, "/") {
+	if !ok || !validVersion(v) {
 		return "", fmt.Errorf("finding the latest yt-dlp: HTTP %d without a release", res.StatusCode)
 	}
 	return v, nil

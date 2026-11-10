@@ -2,9 +2,10 @@
 // and, on a computer with the site built, with `npm test` in this folder:
 //   zola --root site build --base-url http://127.0.0.1:4173
 //
-// Every page is loaded in Chromium, Firefox and WebKit, at a phone's width
-// and a desktop's, in the dark theme. Two more runs, in Chromium, use the
-// light theme and reduced motion at both widths.
+// Every page is loaded in Chromium, Firefox and WebKit, at a phone's width,
+// a tablet's (820 px) and a desktop's, in the dark theme. Two more runs, in
+// Chromium, use the light theme and reduced motion at the phone's and the
+// desktop's.
 //
 // Tests in tests/ run in every project. Tests in tests/motion/ run only in
 // the reduced-motion projects: a check that nothing moves under reduced
@@ -16,6 +17,8 @@ const PORT = 4173;
 
 const sizes = {
   phone: { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: false },
+  // Between the two, where a nav that fits at both can still wrap (#426).
+  tablet: { viewport: { width: 820, height: 1180 }, hasTouch: true, isMobile: false },
   desktop: { viewport: { width: 1280, height: 800 } },
 };
 
@@ -39,7 +42,7 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: { baseURL: `http://127.0.0.1:${PORT}`, colorScheme: "dark", reducedMotion: "no-preference", locale: "en-US" },
   projects: [
-    ...["chromium", "firefox", "webkit"].flatMap((b) => ["phone", "desktop"].map((s) => project(`${b}-${s}`, b, s, {}, own))),
+    ...["chromium", "firefox", "webkit"].flatMap((b) => ["phone", "tablet", "desktop"].map((s) => project(`${b}-${s}`, b, s, {}, own))),
     ...["phone", "desktop"].map((s) => project(`light-${s}`, "chromium", s, { colorScheme: "light" }, { testIgnore: ["**/motion/**"] })),
     ...["phone", "desktop"].map((s) => project(`reduced-motion-${s}`, "chromium", s, { reducedMotion: "reduce" }, { testIgnore: ["**/light/**"] })),
   ],

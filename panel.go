@@ -283,6 +283,7 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 	}
 	synced := ly.Synced && !s.set.LyricsPlain
 	x := s.lyricsChoices(c, t, ly, where)
+	s.lyricsShareBar(c, t, ly, where)
 	if ly.Note != "" {
 		s.lyricsNote(c, ly.Note)
 	}
@@ -343,8 +344,10 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 			})
 		}
 		// A line plays the song from there, once it plays: a song that
-		// loads isn't moved.
-		if synced && !s.st.Loading {
+		// loads isn't moved. While lines are chosen to share, it is chosen.
+		if s.lyricPick.picking(t.ID) {
+			s.pickLine(p, i, text)
+		} else if synced && !s.st.Loading {
 			p.Cursor(ui.CursorPointer)
 			if p.Clicked() {
 				s.p.Seek(ms(line.TimeMs))
@@ -476,6 +479,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		}
 		s.copyLinkItem(m, u)
 	}
+	s.shareItem(m, s.songShare(t))
 	if t.Source == media.SourceSpotify && !t.IsEpisode() {
 		if m.Item("Find another YouTube Music match").Chosen() {
 			if err := s.svc.Player.ForgetMatch(t.ID); err != nil {

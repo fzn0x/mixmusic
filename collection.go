@@ -248,7 +248,7 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 			play:     func() { s.p.PlayAll(a.Tracks, false) },
 			shuffle:  func() { s.shuffled(a.Tracks) },
 			download: d,
-			menu:     s.withDownload(s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""), d),
+			menu:     s.withDownload(s.withShare(s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""), albumShare(a)), d),
 		}
 		if s.signedIn(a.Source) {
 			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, "save", "saved", s.keeping[key]
@@ -303,7 +303,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if local {
 			importID = ""
 		}
-		menu := s.collectionMenu(p.Title, whole.Tracks, p.URL, p.Source, importID)
+		menu := s.withShare(s.collectionMenu(p.Title, whole.Tracks, p.URL, p.Source, importID), playlistShare(p))
 		if local {
 			base := menu
 			menu = func(m *ui.Menu) {

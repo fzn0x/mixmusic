@@ -97,16 +97,13 @@ func (s *shell) tagItems(m *ui.Menu, t media.Track) {
 	}
 }
 
-// withAlbumEdit is the menu of an album, with Edit album… after it when
-// the album is on this computer.
-func (s *shell) withAlbumEdit(menu func(m *ui.Menu), a media.Album) func(m *ui.Menu) {
-	if a.Source != media.SourceFile {
-		return menu
+// editAlbumOf is Edit album… in the menu of the page of an album on this
+// computer, of its tracks.
+func (s *shell) editAlbumOf(m *ui.Menu, source media.Source, tracks []media.Track) {
+	if source != media.SourceFile || len(tracks) == 0 || tracks[0].Album == nil {
+		return
 	}
-	return func(m *ui.Menu) {
-		menu(m)
-		s.editAlbumItem(m, a)
-	}
+	s.editAlbumItem(m, media.Album{ID: tracks[0].Album.ID, Source: source})
 }
 
 // editAlbumItem is Edit album… in the menu of an album on this computer.

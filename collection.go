@@ -248,7 +248,7 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 			play:     func() { s.p.PlayAll(a.Tracks, false) },
 			shuffle:  func() { s.shuffled(a.Tracks) },
 			download: d,
-			menu:     s.withAlbumEdit(s.withDownload(s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""), d), a),
+			menu:     s.withDownload(s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""), d),
 		}
 		if s.signedIn(a.Source) {
 			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, "save", "saved", s.keeping[key]
@@ -584,6 +584,7 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 					s.createYouTubePlaylist(name, tracks, func(p media.Playlist) { s.navigate(playlistPath(p.ID)) })
 				})
 			}
+			s.editAlbumOf(m, source, tracks)
 		}
 		if importID != "" && m.Item("Copy into a mix you can extend").Chosen() {
 			s.importPlaylist(importID)

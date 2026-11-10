@@ -133,6 +133,19 @@ belongs to its main thread: what finishes elsewhere comes back through
   their positions, which the list of a playlist doesn't keep, as it
   leaves out what isn't a track.
 
+- **Selecting tracks** (`trackselect.go`). One list of tracks at a time,
+  on the page shown, has tracks selected (`trackPicks`): a click on a row
+  with Cmd or Ctrl (`ClickModifiers`, `ui.Cmd`), or with Shift, which
+  selects from the row clicked last, or Select in a row's menu, starts
+  it; then each click selects or lets go, a double click plays nothing,
+  and the rows show check boxes. The list hands over the tracks its frame
+  built (`pickList`), whose order the actions follow, made again only
+  once the selection or the list changed. The bar above the player bar
+  (`picksBar`) acts on them; its buttons register from `init()` with
+  `addPickAction(order, build)`, each in its feature's file, as the
+  settings' rows do. Escape, the bar's close button, or another page or
+  search, lets the tracks go.
+
 - **Artwork** downloads only for what shows in the window, scaled to the
   size it shows at, and the images shown most recently are kept, up to 48
   MB of pixels (`artwork.go`). An image that couldn't load tries again

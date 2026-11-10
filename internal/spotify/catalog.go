@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -118,6 +119,8 @@ func (c *Client) Album(ctx context.Context, id string) (media.Album, error) {
 	if len(out.Tracks) > media.MaxTracks {
 		out.Tracks = out.Tracks[:media.MaxTracks]
 	}
+	// Spotify marks tracks explicit, not albums.
+	out.Explicit = slices.ContainsFunc(out.Tracks, func(t media.Track) bool { return t.Explicit })
 	return out, nil
 }
 

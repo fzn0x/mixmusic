@@ -61,7 +61,9 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		var counts []int
 		if res.done && res.err == nil {
 			r := mergeResults(res.value, s.searchScope)
-			counts = []int{-1, len(r.Tracks), len(r.Videos), len(r.Albums), len(r.Artists), len(r.Playlists), s.podcastCount(q)}
+			// An album counts once, however many versions it has.
+			albums := len(s.albumGroups("album", r.Albums))
+			counts = []int{-1, len(r.Tracks), len(r.Videos), albums, len(r.Artists), len(r.Playlists), s.podcastCount(q)}
 		}
 		s.pageHeaderCounts(c, q, searchPivots, counts, &s.searchPivot)
 		ui.Row(c).Margin(0, 0, 24).Children(func() {
@@ -127,11 +129,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 				})
 			}
 			if len(r.Albums) > 0 {
-				s.shelf(c, "albums", "Albums", func() {
-					for i, a := range r.Albums {
-						s.albumTile(c, "album-"+count(i), a)
-					}
-				})
+				s.shelf(c, "albums", "Albums", func() { s.albumTiles(c, "album", r.Albums) })
 			}
 			if len(r.Playlists) > 0 {
 				s.shelf(c, "playlists", "Playlists", func() {
@@ -141,11 +139,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 				})
 			}
 		case "albums":
-			s.tileWrap(c, func() {
-				for i, a := range r.Albums {
-					s.albumTile(c, "album-"+count(i), a)
-				}
-			})
+			s.tileWrap(c, func() { s.albumTiles(c, "album", r.Albums) })
 		case "artists":
 			s.tileWrap(c, func() {
 				for i, a := range r.Artists {

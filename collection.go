@@ -217,7 +217,13 @@ func (s *shell) keep(key, list, what, label string, kept *bool, on bool, do func
 	}()
 }
 
-func (s *shell) albumPage(c *ui.Context, id string) {
+func (s *shell) albumPage(c *ui.Context, page string) {
+	// An album with versions shows the one chosen (versions.go).
+	id, waiting := s.versionShown(page)
+	if waiting {
+		s.pageLoading(c, "album")
+		return
+	}
 	key := "album:" + id
 	res := fetch(s, key, func(ctx context.Context) (media.Album, error) { return s.svc.Catalog.Album(ctx, id) })
 	switch {
@@ -259,6 +265,7 @@ func (s *shell) albumPage(c *ui.Context, id string) {
 			}
 		}
 		s.collectionHead(c, h)
+		s.versionSwitch(c, page, id)
 		s.trackList(c, "album", a.Tracks, trackListOptions{})
 	})
 }
@@ -684,20 +691,12 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 		})
 		if len(a.Albums) > 0 {
 			section("albums", func() {
-				s.shelf(c, "albums", "Albums", func() {
-					for i, al := range a.Albums {
-						s.albumTile(c, "album-"+count(i), al)
-					}
-				})
+				s.shelf(c, "albums", "Albums", func() { s.albumTiles(c, "album", a.Albums) })
 			})
 		}
 		if len(a.Singles) > 0 {
 			section("singles", func() {
-				s.shelf(c, "singles", "Singles & EPs", func() {
-					for i, al := range a.Singles {
-						s.albumTile(c, "single-"+count(i), al)
-					}
-				})
+				s.shelf(c, "singles", "Singles & EPs", func() { s.albumTiles(c, "single", a.Singles) })
 			})
 		}
 		if len(a.Related) > 0 {

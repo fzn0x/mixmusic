@@ -75,6 +75,9 @@ type Playback struct {
 	// SkipAI passes over the tracks YouTube labels as made with AI, as the
 	// player moves on by itself.
 	SkipAI bool `json:"skipAi"`
+	// CleanVersions shows and opens the clean version of an album that
+	// comes explicit and clean, in place of the explicit one (#345).
+	CleanVersions bool `json:"cleanVersions"`
 	// MusicVideos shows the picture of music videos on the now playing
 	// page, in place of their cover. It is off at first: it fetches more
 	// than the sound, and shows a web page there.

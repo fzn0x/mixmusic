@@ -286,12 +286,15 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 	if a.Year != "" {
 		parts = append(parts, a.Year)
 	}
+	if n := s.versionsLabel(a.ID); n != "" {
+		parts = append(parts, n)
+	}
 	if n := names(a.Artists); n != "" {
 		parts = append(parts, n)
 	}
 	open, play := s.artTile(c, key, a.Artwork, a.Title, strings.Join(parts, " · "), a.Source, false, false, true, func(m *ui.Menu) {
 		if m.Item("Open").Chosen() {
-			s.navigate(albumPath(a.ID))
+			s.openAlbum(a.ID)
 		}
 		if m.Item("Play").Chosen() {
 			s.playAlbum(a.ID)
@@ -306,7 +309,7 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 	case play:
 		s.playAlbum(a.ID)
 	case open:
-		s.navigate(albumPath(a.ID))
+		s.openAlbum(a.ID)
 	}
 }
 
@@ -392,8 +395,9 @@ func (s *shell) playFrom(tracks []media.Track, t media.Track) {
 
 // playAlbum and playPlaylist fetch what a collection holds, and play it.
 func (s *shell) playAlbum(id string) {
+	album := s.albumToPlay(id)
 	s.playCollection(func(ctx context.Context) ([]media.Track, error) {
-		a, err := s.svc.Catalog.Album(ctx, id)
+		a, err := album(ctx)
 		return a.Tracks, err
 	})
 }

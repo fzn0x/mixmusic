@@ -154,6 +154,10 @@ type Album struct {
 	TrackCount int       `json:"trackCount,omitempty"`
 	Tracks     []Track   `json:"tracks"`
 	URL        string    `json:"url,omitempty"`
+	// Explicit is set for an album its service marks explicit: YouTube
+	// Music's lists of albums badge it, and an album's page tells it by
+	// its tracks. Spotify's lists of albums don't tell.
+	Explicit bool `json:"explicit,omitempty"`
 	// PlaylistID is the playlist of an album's tracks on YouTube Music,
 	// which saving the album saves.
 	PlaylistID string `json:"playlistId,omitempty"`

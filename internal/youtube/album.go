@@ -55,6 +55,7 @@ func parseAlbum(n node, browseID string) (media.Album, error) {
 		if len(t.Artwork) == 0 {
 			t.Artwork = album.Artwork
 		}
+		album.Explicit = album.Explicit || t.Explicit
 	}
 	if album.TrackCount == 0 {
 		album.TrackCount = len(album.Tracks)

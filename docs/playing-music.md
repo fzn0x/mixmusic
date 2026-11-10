@@ -57,6 +57,16 @@ For lyrics, see [Share lines](lyrics.md#share-lines).
 
 It tells what MixMusic knows without asking a service: a track that hasn't played yet tells its format once it plays, as MixMusic finds its stream then. A Spotify track that Spotify plays, in MixMusic or on a Connect device, plays at the quality your Spotify account and Spotify's settings choose, and Spotify tells MixMusic nothing of its audio.
 
+## Versions of an album
+
+Spotify and YouTube Music list an album that came out explicit and clean twice, and its editions, as a deluxe or a remastered one, beside it. On an artist's page, in the search and in the library, MixMusic shows one tile for the album, which says how many versions it has, as "2019 · 3 versions".
+
+- **The tile** opens the album on its explicit version, and its play button plays that one. With **Prefer clean versions** on, in [Settings › Playback](settings.md#playback), it shows and opens the clean one.
+- **The album's page** has a switch of its versions under its head, named as the titles name them, as Explicit, Clean, Deluxe Edition or Remastered 2009, and Standard for the album as it first came out. The page keeps the version you chose until you open the album from its tile again.
+- **On Spotify,** whose lists don't tell which version is explicit, the page reads every version first, and tells by their tracks.
+
+Albums are versions of one when they're of the same service and the same artists, and have the same title once its last part in brackets, or after a dash, is set aside, as long as that part names a version: Clean, Explicit, Edited, Deluxe, Remastered, an anniversary or an edition, with its year. A live album, a re-recording, as "(Taylor's Version)", or remixes are albums of their own. Versions of the same edition are one album only when their years, and their numbers of tracks where the service tells them, agree; and two albums of the same title from different years, as a self-titled album and a live one of that name, stay two tiles. Albums on this computer aren't grouped.
+
 ## The queue and Up next
 
 The Queue button by the player, or Ctrl+J (⌘J), shows Up next at the right of the window: the track playing, then what plays after it.

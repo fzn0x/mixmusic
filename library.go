@@ -250,11 +250,7 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 		})
 	}
 	if len(albums.value) > 0 {
-		s.shelf(c, key+"-albums", "Albums", func() {
-			for i, a := range albums.value {
-				s.albumTile(c, key+"-album-"+count(i), a)
-			}
-		})
+		s.shelf(c, key+"-albums", "Albums", func() { s.albumTiles(c, key+"-album", albums.value) })
 	}
 	if len(artists.value) > 0 {
 		s.shelf(c, key+"-artists", "Artists you follow", func() {

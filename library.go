@@ -242,13 +242,18 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 	if key == "youtube" {
 		more = s.youtubeLibraryItems
 	}
-	if len(playlists.value) > 0 || links != nil {
+	// The playlists of others the user collaborates on have a shelf of
+	// their own.
+	if slices.ContainsFunc(playlists.value, func(p media.Playlist) bool { return !collaboration(p) }) || links != nil {
 		s.shelfWith(c, key+"-playlists", "Playlists", links, func() {
 			for i, p := range playlists.value {
-				s.playlistTileWith(c, key+"-playlist-"+count(i), p, more)
+				if !collaboration(p) {
+					s.playlistTileWith(c, key+"-playlist-"+count(i), p, more)
+				}
 			}
 		})
 	}
+	s.collaborationsShelf(c, key, playlists.value, more)
 	if len(albums.value) > 0 {
 		s.shelf(c, key+"-albums", "Albums", func() { s.albumTiles(c, key+"-album", albums.value) })
 	}

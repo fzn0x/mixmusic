@@ -13,7 +13,7 @@ permissions:
 jobs:
   go:
     name: Go (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os == 'ubuntu-latest' && 'ubuntu-26.04' || matrix.os }} # temporary (#407)
     strategy:
       fail-fast: false
       matrix:
@@ -96,7 +96,7 @@ jobs:
   # one does, and BlackHole, a virtual device, stand in for one.
   audio:
     name: Audio output (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os == 'ubuntu-latest' && 'ubuntu-26.04' || matrix.os }} # temporary (#407)
     # A run takes about a minute; one that hangs gives up long before
     # GitHub's 6 hours.
     timeout-minutes: 30

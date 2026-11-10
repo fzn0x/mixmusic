@@ -1,4 +1,4 @@
-name: Keys on Ubuntu 26.04 (temporary, #407)
+name: Keys on Ubuntu 26.04, temporary
 
 # Temporary: the keypad's keys on Ubuntu 24.04 and 26.04 side by side, from
 # the X server's keymap to GTK 3's window. Removed before the pull request
@@ -29,7 +29,7 @@ jobs:
         run: |
           libgtk=libgtk-3-0t64
           bash .github/scripts/apt-install.sh --no-install-recommends \
-            xvfb xauth xdotool x11-utils x11-xkb-utils xinput "$libgtk" python3-gi gir1.2-gtk-3.0
+            xvfb xauth xdotool x11-utils x11-xkb-utils x11-xserver-utils xinput "$libgtk" python3-gi gir1.2-gtk-3.0
       - name: Evidence
         run: bash .github/keys26/evidence.sh keys26
       - name: Keys in a GTK window

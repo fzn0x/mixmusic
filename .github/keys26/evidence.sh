@@ -11,7 +11,7 @@ section() {
 	echo
 	echo "=== $*"
 }
-keys=(ctrl+KP_Add ctrl+KP_Subtract KP_Add ctrl+equal ctrl+minus ctrl+alt+KP_Add)
+keys=(ctrl+KP_Add ctrl+KP_Subtract KP_Add ctrl+equal ctrl+minus ctrl+alt+KP_Add ctrl+86 ctrl+82 86)
 
 section "System"
 . /etc/os-release

@@ -673,9 +673,6 @@
     place();
   }
 
-  // Sections ease in as they scroll into the window (styles.css).
-  $$(".section .section-head").forEach((el) => el.classList.add("reveal"));
-
   // The visitor's system names the download buttons and marks its card.
   // The buttons all open the latest release, where every file is.
   const os = mac

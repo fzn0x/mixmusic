@@ -1224,15 +1224,6 @@ html.js .demo-fallback { display: none; }
 .merge-row { transition: box-shadow var(--medium) var(--ease); }
 .merge.is-live .merge-row.is-merged { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--row-art, var(--ink)) 70%, transparent); }
 
-/* Sections ease in as they scroll into the window, driven by the scroll
-   itself; where scroll timelines are missing, they are simply there. */
-@keyframes reveal { from { opacity: 0; transform: translateY(24px); } }
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
-  }
-}
-
 /* Smaller windows. */
 
 @media (max-width: 1080px) {

@@ -71,6 +71,13 @@ func parsePlaylist(n node, playlistID string) (media.Playlist, string, error) {
 	head := n.get("contents", "twoColumnBrowseResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer", "contents", 0)
 	p.Editable = head.get("musicEditablePlaylistDetailHeaderRenderer").exists()
 	p.Deletable = head.find("deletePlaylistEndpoint").exists()
+	// Only its owner may delete a playlist; who may open it, its tools
+	// tell them. Its avatars show its collaborators once it has some.
+	p.Mine, p.Privacy = p.Deletable, headerPrivacy(head)
+	var names string
+	if p.Collaborative, names = facepile(h); p.Owner == "" {
+		p.Owner = names
+	}
 	if p.Editable {
 		p.Suggest = suggestToken(n)
 	}

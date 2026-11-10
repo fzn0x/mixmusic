@@ -1,0 +1,114 @@
+{
+ "_fixture": "Written by hand from the documented shapes of the parts of a playlist page's header that tell its collaboration, with made-up names, not recorded: the avatars of its collaborators, which open the panel of its collaboration; the avatar of its owner alone, which opens their channel; and the tools of the header of a playlist of the user's, which tell who may open it. MIXMUSIC_LIVE=1 MIXMUSIC_YT_WRITE=1 MIXMUSIC_YT_COOKIES='SAPISID=…; …' MIXMUSIC_YT_RECORD=dir go test ./internal/youtube -run LiveCollaboration -v records the pages of a playlist before and after its owner invites, as collab-page-*.json, to replace this one once their names and IDs are taken out.",
+ "collaborators": {
+  "avatarStackViewModel": {
+   "avatars": [
+    {
+     "avatarViewModel": {
+      "image": {
+       "sources": [
+        {
+         "url": "https://yt3.ggpht.com/test-avatar-ana=s48",
+         "width": 48,
+         "height": 48
+        }
+       ]
+      },
+      "avatarImageSize": "AVATAR_SIZE_XS"
+     }
+    },
+    {
+     "avatarViewModel": {
+      "image": {
+       "sources": [
+        {
+         "url": "https://yt3.ggpht.com/test-avatar-bo=s48",
+         "width": 48,
+         "height": 48
+        }
+       ]
+      },
+      "avatarImageSize": "AVATAR_SIZE_XS"
+     }
+    }
+   ],
+   "text": {
+    "content": "Ana Testwood and 2 others"
+   },
+   "rendererContext": {
+    "accessibilityContext": {
+     "label": "by Ana Testwood and 2 others"
+    },
+    "commandContext": {
+     "onTap": {
+      "innertubeCommand": {
+       "clickTrackingParams": "CAAQ-collaborators",
+       "showEngagementPanelEndpoint": {
+        "identifier": {
+         "surface": "ENGAGEMENT_PANEL_SURFACE_MUSIC",
+         "tag": "PAplaylist_collaborate"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "owner": {
+  "avatarStackViewModel": {
+   "avatars": [
+    {
+     "avatarViewModel": {
+      "image": {
+       "sources": [
+        {
+         "url": "https://yt3.ggpht.com/test-avatar-ana=s48",
+         "width": 48,
+         "height": 48
+        }
+       ]
+      },
+      "avatarImageSize": "AVATAR_SIZE_XS"
+     }
+    }
+   ],
+   "text": {
+    "content": "Ana Testwood"
+   },
+   "rendererContext": {
+    "accessibilityContext": {
+     "label": "Ana Testwood"
+    },
+    "commandContext": {
+     "onTap": {
+      "innertubeCommand": {
+       "clickTrackingParams": "CAAQ-owner",
+       "browseEndpoint": {
+        "browseId": "UCtestAnaTestwood",
+        "browseEndpointContextSupportedConfigs": {
+         "browseEndpointContextMusicConfig": {
+          "pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "editHeader": {
+  "musicPlaylistEditHeaderRenderer": {
+   "title": {
+    "runs": [
+     {
+      "text": "Late night"
+     }
+    ]
+   },
+   "privacy": "PRIVATE",
+   "playlistId": "PLtestOwnPlaylist"
+  }
+ }
+}

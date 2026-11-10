@@ -488,6 +488,9 @@ func (a *App) pair(ctx context.Context, d *remote.Dialer, p *remotePairing, f re
 		return
 	}
 	log.Printf("mixmusic: remote control: paired with %s, which this computer controls", peer.Name)
+	// A session that ended as the computer removed this one gives way to
+	// a new one, at once.
+	a.endControl(f.ID)
 	a.relistRemote()
 	a.notifyRemote("Paired with " + peer.Name)
 }

@@ -65,6 +65,9 @@ AppImage or archive copy's.
 - `positions.json`: where you left the latest 500 podcast episodes.
 - `lastfm-queue.json`: the scrobbles still to send, as while offline.
 - `updater.json`: your choices of updates.
+- `remote.json`: whether [remote control](remote-control.md) is on, and
+  the computers paired with this one, by their names and their keys'
+  fingerprints. The key of this computer is in the credential store.
 - `addons/`: the themes and plugins you installed, and what plugins keep
   in `addons/.storage`.
 - `bin/`: MixMusic's own yt-dlp.

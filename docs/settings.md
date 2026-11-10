@@ -80,6 +80,12 @@ The **On the desktop** group:
 
 [On the desktop](desktop.md) tells what each does.
 
+The **Remote control** group: **Allow remote control**, off at first,
+lets the other computers with MixMusic on your network find this one,
+pair with it by a code it shows, and control it; and the computers
+paired, each with **Remove**. [Remote control](remote-control.md) tells
+more.
+
 ### Shortcuts
 
 Every command, by group, with its keys: **From any app** first, the global

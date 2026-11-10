@@ -12,9 +12,11 @@ go to the services' pages, and cards are drawn on this computer.
   (1080 by 1080) and `Wide` (1200 by 630) are the sizes, and sizes of
   text are for a card 1080 wide, which other widths scale. The yearly
   recap draws its cards with it too.
-- **The layout.** The cover is cut to a square with rounded corners, on
-  top, or small at the foot (`CoverFoot`), or beside the lines on a wide
-  card. Lines run from the top and wrap at spaces, anywhere in text of a
+- **The layout.** The cover is cut to a square with rounded corners. On
+  a tall card (the story) it sits above the lines across their whole
+  width, so its margins are equal; on a card about as wide as it is tall
+  (the square and the wide one) it sits beside the lines; and with
+  `CoverFoot` it is small at the foot, before the foot's lines. Lines run from the top and wrap at spaces, anywhere in text of a
   script written without them, and end with an ellipsis past their most
   rows. If all do not fit, their text shrinks to 55% of its size, then
   rows go from the end. The foot keeps its place at the bottom. The ground

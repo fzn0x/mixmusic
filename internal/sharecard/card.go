@@ -165,7 +165,9 @@ func (c Card) Render(fam Family) (*image.NRGBA, error) {
 	r := &typesetter{fam: fam, faces: map[faceKey]font.Face{}}
 	defer r.close()
 
-	wide := c.Size.W > c.Size.H
+	// A card about as wide as it is tall puts the cover beside its lines; a
+	// taller one puts it above them, across their width.
+	wide := c.Size.W*5 >= c.Size.H*4
 	top, textLeft, textW := margin, margin, inner
 	// The foot keeps its place at the bottom, so it is set first.
 	footLeft, footW := margin, inner
@@ -187,15 +189,15 @@ func (c Card) Render(fam Family) (*image.NRGBA, error) {
 		}
 	case wide:
 		// A wide card puts the cover beside its lines.
-		side := math.Min(inner*0.5, h-2*margin)
+		side := math.Round(math.Min(inner*0.46, h-2*margin))
 		drawCover(img, c.Cover, image.Rect(int(margin), int(top), int(margin+side), int(top+side)), scale)
-		textLeft = margin + side + margin*0.8
+		textLeft = margin + side + math.Round(margin*0.45)
 		textW = w - margin - textLeft
 		footLeft, footW = textLeft, textW
 		footLines = r.set(c, c.Foot, scale, footW, false)
 		footTop = h - margin - blockHeight(footLines)
 	default:
-		side := math.Min(inner, h*0.42)
+		side := inner
 		drawCover(img, c.Cover, image.Rect(int(margin), int(top), int(margin+side), int(top+side)), scale)
 		top += side + 56*scale
 	}

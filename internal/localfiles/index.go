@@ -23,8 +23,9 @@ import (
 
 // version is the version of the index file: one of another is read again
 // from the files. 2 reads the lengths of VBR MP3s from their frame counts
-// (#370), which the files indexed before held wrong.
-const version = 2
+// (#370), which the files indexed before held wrong. 3 reads the content
+// advisory that marks a track explicit (#427), which they didn't keep.
+const version = 3
 
 // Entry is a file of the index: where it is, its size and time of change,
 // which tell a scan whether it changed, and what its tags tell.
@@ -41,6 +42,8 @@ type Entry struct {
 	Disc         int      `json:"disc,omitempty"`
 	Year         int      `json:"year,omitempty"`
 	DurationMs   int      `json:"durationMs,omitempty"`
+	// Explicit is set for a file its tags' content advisory marks explicit.
+	Explicit bool `json:"explicit,omitempty"`
 	// Art is the file of the cover in the folder of covers, "" without
 	// one.
 	Art string `json:"art,omitempty"`

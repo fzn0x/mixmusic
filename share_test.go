@@ -61,13 +61,13 @@ func TestShareMenus(t *testing.T) {
 	t.Cleanup(func() { copyText = was })
 	s := newTestShell(t)
 	tr := testTracks[0]
-	tr.URL = "https://music.youtube.com/watch?v=midnight"
-	album := media.Album{ID: "al-x", Title: "Hurry Up, We're Dreaming", Source: media.SourceYouTube, Year: "2011",
-		Artists: []media.Ref{{Name: "M83"}}, URL: "https://music.youtube.com/browse/MPREb_hurry", Tracks: []media.Track{tr}}
-	list := media.Playlist{ID: "pl-x", Title: "Shoegaze", Source: media.SourceYouTube, URL: "https://music.youtube.com/playlist?list=PLshoegaze"}
+	tr.URL = "https://music.youtube.com/watch?v=glassharbor"
+	album := media.Album{ID: "al-x", Title: "Paper Lanterns", Source: media.SourceYouTube, Year: "2011",
+		Artists: []media.Ref{{Name: "North Pier"}}, URL: "https://music.youtube.com/browse/MPREb_lanterns", Tracks: []media.Track{tr}}
+	list := media.Playlist{ID: "pl-x", Title: "Rainy Day Mix", Source: media.SourceYouTube, URL: "https://music.youtube.com/playlist?list=PLrainy"}
 	bare := media.Playlist{ID: "pl-y", Title: "Mixtape"}
 	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: album}
-	s.loads["search:m83"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{YouTube: media.SearchResults{
+	s.loads["search:pier"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{YouTube: media.SearchResults{
 		Albums: []media.Album{album}, Playlists: []media.Playlist{list, bare}}}}
 	tt := testerOf(t, s, 1280, 1800)
 	dir := t.TempDir()
@@ -91,7 +91,7 @@ func TestShareMenus(t *testing.T) {
 	show(s, tt, "/album/al-x")
 	copyLink(rightClick(tr.Title), tr.URL)
 	copyLink(more, album.URL)
-	show(s, tt, searchPath("m83"))
+	show(s, tt, searchPath("pier"))
 	copyLink(rightClick(album.Title), album.URL)
 	copyLink(rightClick(list.Title), list.URL)
 
@@ -116,7 +116,7 @@ func TestShareMenus(t *testing.T) {
 	}
 	select {
 	case opts := <-asked:
-		if opts.DefaultPath != "Hurry Up, We're Dreaming.png" || len(opts.Filters) != 1 || !slices.Equal(opts.Filters[0].Extensions, []string{"png"}) {
+		if opts.DefaultPath != "Paper Lanterns.png" || len(opts.Filters) != 1 || !slices.Equal(opts.Filters[0].Extensions, []string{"png"}) {
 			t.Errorf("the dialog asks %+v", opts)
 		}
 	case <-time.After(5 * time.Second):
@@ -160,7 +160,7 @@ func TestShareCancelled(t *testing.T) {
 	asked := savesTo(t, "")
 	tt := tester(t, s)
 	show(s, tt, "/")
-	s.saveCard("Midnight City", nil, sharecard.Square, s.titleCard(shareTarget{kind: "Song", title: "Midnight City"}))
+	s.saveCard("Glass Harbor", nil, sharecard.Square, s.titleCard(shareTarget{kind: "Song", title: "Glass Harbor"}))
 	select {
 	case <-asked:
 	case <-time.After(5 * time.Second):
@@ -180,7 +180,7 @@ func TestShareFailed(t *testing.T) {
 	savesTo(t, filepath.Join(t.TempDir(), "missing", "card.png"))
 	tt := tester(t, s)
 	show(s, tt, "/")
-	s.saveCard("Midnight City", nil, sharecard.Square, s.titleCard(shareTarget{kind: "Song", title: "Midnight City"}))
+	s.saveCard("Glass Harbor", nil, sharecard.Square, s.titleCard(shareTarget{kind: "Song", title: "Glass Harbor"}))
 	until(t, s, tt, "the failure", func() bool {
 		return slices.ContainsFunc(tt.Texts(), func(text string) bool { return strings.Contains(text, "missing") })
 	})
@@ -191,11 +191,11 @@ func TestShareFailed(t *testing.T) {
 func TestSongShareLinks(t *testing.T) {
 	s := newTestShell(t)
 	tr := testTracks[1]
-	tr.URL = "https://open.spotify.com/track/teardrop"
+	tr.URL = "https://open.spotify.com/track/saltflats"
 	if got := s.songShare(tr).links; !slices.Equal(got, []shareLink{{"Spotify", tr.URL}}) {
 		t.Errorf("links without a match: %v", got)
 	}
-	if got := youtubeLink(media.Track{ID: "yt:dQw4w9WgXcQ"}); got != "https://music.youtube.com/watch?v=dQw4w9WgXcQ" {
+	if got := youtubeLink(media.Track{ID: "yt:abcDEF12345"}); got != "https://music.youtube.com/watch?v=abcDEF12345" {
 		t.Errorf("a track without an address links to %q", got)
 	}
 	if got := youtubeLink(media.Track{ID: "spotify:2"}); got != "" {
@@ -204,8 +204,8 @@ func TestSongShareLinks(t *testing.T) {
 	if got := playlistShare(media.Playlist{Title: "Night drive", Source: media.SourceLocal}); got.kind != "Mix" || len(got.links) != 0 {
 		t.Errorf("a mix shares as %+v", got)
 	}
-	if got := albumShare(media.Album{Title: "Mezzanine", Kind: media.AlbumKindEP, Year: "1998", Artists: []media.Ref{{Name: "Massive Attack"}}}); got.kind != "EP" ||
-		got.subtitle != "Massive Attack · 1998" {
+	if got := albumShare(media.Album{Title: "Salt Flats", Kind: media.AlbumKindEP, Year: "1998", Artists: []media.Ref{{Name: "Orchard Radio"}}}); got.kind != "EP" ||
+		got.subtitle != "Orchard Radio · 1998" {
 		t.Errorf("an album shares as %+v", got)
 	}
 }
@@ -213,11 +213,11 @@ func TestSongShareLinks(t *testing.T) {
 // TestCardFileName proposes names the systems' dialogs take.
 func TestCardFileName(t *testing.T) {
 	for in, want := range map[string]string{
-		"Midnight City":         "Midnight City.png",
+		"Glass Harbor":          "Glass Harbor.png",
 		`AC/DC: "Back"?`:        "AC-DC- -Back.png",
 		"   ":                   "MixMusic.png",
 		"...":                   "MixMusic.png",
-		"Glósóli":               "Glósóli.png",
+		"Ñandú blanco":          "Ñandú blanco.png",
 		"a\nb":                  "a-b.png",
 		string(make([]rune, 0)): "MixMusic.png",
 	} {

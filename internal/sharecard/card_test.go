@@ -150,13 +150,13 @@ func TestRender(t *testing.T) {
 	dir := outDir(t)
 	long := strings.Repeat("A very long title that goes on and on ", 8)
 	titles := []struct{ name, title, artist string }{
-		{"plain", "Midnight City", "M83"},
+		{"plain", "Glass Harbor", "North Pier"},
 		{"long", long, "An artist with a name long enough to need two lines of its own, as some do"},
 		{"unbroken", strings.Repeat("W", 120), "x"},
 		{"hebrew", "שיר האהבה הגדול של כל הזמנים", "אריק איינשטיין"},
 		{"arabic", "أغنية عن الليل والمدينة", "فيروز"},
 		{"mixed", "Hello שלום World", "Mixed"},
-		{"cjk", "夜に駆ける 夜に駆ける 夜に駆ける 夜に駆ける 夜に駆ける 夜に駆ける 夜に駆ける", "YOASOBI 周杰倫 아이유"},
+		{"cjk", "星空の下で歌う 星空の下で歌う 星空の下で歌う 星空の下で歌う 星空の下で歌う 星空の下で歌う 星空の下で歌う", "Aster Vale 星河 별빛"},
 		{"emoji", "Party \U0001F389 time", "DJ"},
 	}
 	sizes := map[string]Size{"story": Story, "square": Square, "wide": Wide}
@@ -315,13 +315,13 @@ func TestLyrics(t *testing.T) {
 		c := Card{
 			Size: size, Colors: light, Cover: cover(300), CoverAt: CoverFoot,
 			Lines: []Line{
-				{Text: "Waiting in a car", Size: 76, Weight: 700, MaxLines: 3},
-				{Text: "Waiting for a ride in the dark", Size: 76, Weight: 700, MaxLines: 3, Gap: 28},
-				{Text: "The night city grows", Size: 76, Weight: 700, MaxLines: 3, Gap: 28},
+				{Text: "Lanterns on the water", Size: 76, Weight: 700, MaxLines: 3},
+				{Text: "Counting the boats until morning comes in", Size: 76, Weight: 700, MaxLines: 3, Gap: 28},
+				{Text: "The tide keeps the time", Size: 76, Weight: 700, MaxLines: 3, Gap: 28},
 			},
 			Foot: []Line{
-				{Text: "Midnight City", Size: 44, Weight: 700},
-				{Text: "M83", Size: 34, Weight: 400, Ink: light.Muted},
+				{Text: "Glass Harbor", Size: 44, Weight: 700},
+				{Text: "North Pier", Size: 34, Weight: 400, Ink: light.Muted},
 			},
 		}
 		img, err := c.Render(fam)
@@ -379,7 +379,7 @@ func TestErrors(t *testing.T) {
 // TestPNG writes a PNG that decodes to the card's size.
 func TestPNG(t *testing.T) {
 	var buf bytes.Buffer
-	if err := song(Story, dark, "Midnight City", "M83", true).PNG(&buf, family(t)); err != nil {
+	if err := song(Story, dark, "Glass Harbor", "North Pier", true).PNG(&buf, family(t)); err != nil {
 		t.Fatal(err)
 	}
 	img, err := png.Decode(&buf)
@@ -394,7 +394,7 @@ func TestPNG(t *testing.T) {
 // TestVisual reorders what reads right to left, and leaves the rest.
 func TestVisual(t *testing.T) {
 	for _, tc := range []struct{ in, want string }{
-		{"Midnight City", "Midnight City"},
+		{"Glass Harbor", "Glass Harbor"},
 		{"שלום", "םולש"},
 		{"abc שלום def", "abc םולש def"},
 		{"", ""},
@@ -435,7 +435,7 @@ func TestWrapUnspaced(t *testing.T) {
 	ts := &typesetter{fam: fam, faces: map[faceKey]font.Face{}}
 	defer ts.close()
 	prim := fam.Faces[1].Font
-	for _, text := range []string{strings.Repeat("夜に駆ける", 30), strings.Repeat("W", 80), strings.Repeat("word ", 60)} {
+	for _, text := range []string{strings.Repeat("星空の下で歌う", 30), strings.Repeat("W", 80), strings.Repeat("word ", 60)} {
 		rows := ts.wrap(prim, 40, text, 600, 50)
 		if len(rows) < 2 {
 			t.Errorf("%.12q... fits one row of 600 pixels", text)

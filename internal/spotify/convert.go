@@ -80,6 +80,7 @@ type playlist struct {
 	Images        []image               `json:"images"`
 	Owner         owner                 `json:"owner"`
 	Collaborative bool                  `json:"collaborative"`
+	Public        *bool                 `json:"public"`
 	ExternalURLs  externalURLs          `json:"external_urls"`
 	Items         *paging[playlistItem] `json:"items"`
 	Tracks        *paging[playlistItem] `json:"tracks"`
@@ -216,6 +217,13 @@ func toPlaylist(p *playlist, userID string) media.Playlist {
 		Tracks:      []media.Track{},
 		Editable:    userID != "" && (p.Owner.ID == userID || p.Collaborative),
 		URL:         p.ExternalURLs.Spotify,
+	}
+	out.Mine, out.Collaborative = userID != "" && p.Owner.ID == userID, p.Collaborative
+	if p.Public != nil {
+		out.Privacy = media.Private
+		if *p.Public {
+			out.Privacy = media.Public
+		}
 	}
 	if e := p.entries(); e != nil {
 		out.TrackCount = e.Total

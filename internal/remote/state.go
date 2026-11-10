@@ -34,6 +34,9 @@ type Track struct {
 	Artists []string `json:"artists,omitempty"`
 	Album   string   `json:"album,omitempty"`
 	Artwork string   `json:"artwork,omitempty"`
+	// Entry names the track's entry in the queue, for the commands on the
+	// queue: an older MixMusic tells none.
+	Entry string `json:"entry,omitempty"`
 }
 
 // The commands a session sends.
@@ -46,21 +49,51 @@ const (
 	OpVolume   = "volume"
 )
 
+// The commands on the queue, which a computer whose welcome tells
+// FeatureQueue takes: OpPlayEntry plays the entry Entry, OpRemove takes it
+// out of the queue, OpMove moves it to the place of the entry To, as
+// dragging it there does, and OpClear empties the queue after the track
+// that plays. Only the entries after that track move or go.
+const (
+	OpPlayEntry = "playEntry"
+	OpRemove    = "remove"
+	OpMove      = "move"
+	OpClear     = "clear"
+)
+
+// queueOp reports whether op is a command on the queue.
+func queueOp(op string) bool {
+	switch op {
+	case OpPlayEntry, OpRemove, OpMove, OpClear:
+		return true
+	}
+	return false
+}
+
 // Command is what the computer controlling asks the player of the one
 // controlled: Op, and for OpSeek where to, for OpVolume the volume, from 0
-// to 1.
+// to 1, and for the commands on the queue the entries, as the tracks of a
+// state name them.
 type Command struct {
 	Op         string  `json:"op"`
 	PositionMs int64   `json:"positionMs,omitempty"`
 	Volume     float64 `json:"volume,omitempty"`
+	Entry      string  `json:"entry,omitempty"`
+	To         string  `json:"to,omitempty"`
 }
 
 // clean is c with its values in range, or false for a command the
 // protocol doesn't have.
 func (c Command) clean() (Command, bool) {
 	switch c.Op {
-	case OpPlay, OpPause, OpNext, OpPrevious:
+	case OpPlay, OpPause, OpNext, OpPrevious, OpClear:
 		return Command{Op: c.Op}, true
+	case OpPlayEntry, OpRemove:
+		e := cleanEntry(c.Entry)
+		return Command{Op: c.Op, Entry: e}, e != ""
+	case OpMove:
+		e, to := cleanEntry(c.Entry), cleanEntry(c.To)
+		return Command{Op: c.Op, Entry: e, To: to}, e != "" && to != "" && e != to
 	case OpSeek:
 		return Command{Op: c.Op, PositionMs: max(c.PositionMs, 0)}, true
 	case OpVolume:
@@ -112,7 +145,26 @@ func cleanTrack(t Track) Track {
 	if !strings.HasPrefix(t.Artwork, "https://") || len(t.Artwork) > 2048 {
 		t.Artwork = ""
 	}
+	t.Entry = cleanEntry(t.Entry)
 	return t
+}
+
+// cleanEntry is the name of an entry of the queue, or "" for one that
+// isn't one.
+func cleanEntry(s string) string { return cleanToken(s, 64) }
+
+// cleanToken is s, or "" when it is longer than n bytes, or holds other
+// than the letters, digits and punctuation of ASCII.
+func cleanToken(s string, n int) string {
+	if len(s) > n {
+		return ""
+	}
+	for i := 0; i < len(s); i++ {
+		if s[i] <= ' ' || s[i] >= 0x7f {
+			return ""
+		}
+	}
+	return s
 }
 
 // cleanText is s without control characters, at most n characters.

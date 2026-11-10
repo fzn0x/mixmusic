@@ -168,7 +168,7 @@ func (d *Dialer) Connect(ctx context.Context, addr string, key Fingerprint) (*Se
 		return nil, err
 	}
 	w := newWire(tc)
-	if err := w.send(message{Type: "hello", Want: wantControl, Name: d.Name, Version: version}, t.silence()); err != nil {
+	if err := w.send(message{Type: "hello", Want: wantControl, Name: d.Name, Version: version, Features: features}, t.silence()); err != nil {
 		tc.Close()
 		return nil, err
 	}
@@ -177,7 +177,8 @@ func (d *Dialer) Connect(ctx context.Context, addr string, key Fingerprint) (*Se
 		tc.Close()
 		return nil, err
 	}
-	s := &Session{w: w, conn: tc, name: cleanName(welcome.Name), timing: t, done: make(chan struct{})}
+	s := &Session{w: w, conn: tc, name: cleanName(welcome.Name), features: cleanFeatures(welcome.Features), timing: t,
+		done: make(chan struct{})}
 	go s.read()
 	go s.ping()
 	return s, nil
@@ -187,10 +188,15 @@ func (d *Dialer) Connect(ctx context.Context, addr string, key Fingerprint) (*Se
 // and the commands sent to it. It ends as that computer goes quiet, or
 // refuses it, or Close.
 type Session struct {
-	w      *wire
-	conn   net.Conn
-	name   string
-	timing Timing
+	w    *wire
+	conn net.Conn
+	name string
+	// features are what the computer controlled can do beyond the
+	// version, as its welcome told.
+	features []string
+	timing   Timing
+	// handing runs one hand-over at a time.
+	handing sync.Mutex
 
 	mu       sync.Mutex
 	state    State
@@ -200,6 +206,10 @@ type Session struct {
 	err      error
 	done     chan struct{}
 	once     sync.Once
+	// handed counts the hand-overs, and taken waits for the answer to the
+	// one under way.
+	handed int64
+	taken  chan Taken
 }
 
 // Name returns the name of the computer controlled, as it told it.
@@ -236,11 +246,15 @@ func (s *Session) tell() {
 	}
 }
 
-// Do sends a command.
+// Do sends a command. A command on the queue goes only to a computer
+// that takes them: ErrOlder.
 func (s *Session) Do(c Command) error {
 	c, ok := c.clean()
 	if !ok {
 		return errors.New("remote: no such command")
+	}
+	if queueOp(c.Op) && !s.Can(FeatureQueue) {
+		return ErrOlder
 	}
 	select {
 	case <-s.done:
@@ -301,6 +315,10 @@ func (s *Session) read() {
 			s.state, s.at, s.has = st, time.Now(), true
 			s.mu.Unlock()
 			s.tell()
+		case "taken":
+			if m.Taken != nil {
+				s.tookOver(*m.Taken)
+			}
 		case "refused":
 			s.end(errOf(m.Reason))
 			return

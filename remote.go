@@ -34,6 +34,8 @@ type remoteView struct {
 	// turning is the switch of Settings › Remote control while it turns
 	// remote control on or off.
 	turning *bool
+	// handing is set while what plays here moves to another computer.
+	handing bool
 }
 
 // remotePath is the page of the computer id.

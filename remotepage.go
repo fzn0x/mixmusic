@@ -90,8 +90,9 @@ func (s *shell) remoteCodeEntry(c *ui.Context, id, name string) {
 
 // remotePlayer shows what plays on the computer id, as v's state tells,
 // with its controls: the cover, the title and the artists, where the track
-// is, which moves on as it plays, the transport, the volume, and the tracks
-// after it.
+// is, which moves on as it plays, the transport, the volume, what plays
+// here, to move there (remotehandover.go), and the tracks after it
+// (remotequeue.go).
 func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 	k := &s.lk
 	st := v.State
@@ -134,18 +135,9 @@ func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 		ui.Box(c).Width(24)
 		s.remoteVolume(c, id, st)
 	})
-	if len(st.Next) > 0 {
-		s.sectionHead(c, "Next on "+v.Computer.Name, nil)
-		ui.Column(c).Gap(6).Children(func() {
-			for _, t := range st.Next {
-				line := t.Title
-				if len(t.Artists) > 0 {
-					line += " - " + strings.Join(t.Artists, ", ")
-				}
-				ui.Text(c, line).FontSize(k.smallSize()).SingleLine().MinWidth(0)
-			}
-		})
-	}
+	s.remoteHandOver(c, id, v)
+	s.remoteQueue(c, id, v)
+	s.remoteOlder(c, v)
 }
 
 // remoteHold is how long the page shows a seek or a volume the user set,

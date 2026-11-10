@@ -212,6 +212,12 @@ func (s *fsStream) event(path string, flags uint32) {
 	switch {
 	case flags&fsMustScanSubDirs != 0 && p == s.root:
 		s.tell.Lost()
+	case p == s.root && flags&(fsItemRemoved|fsItemRenamed) == 0:
+		// The folder of music itself, made or written in. FSEvents tells a
+		// path's flags gathered over its recent past, so a folder made just
+		// before its watch started tells it was made. It's there, as its
+		// watch is: what changed in it, its files tell.
+		s.tell.Changed(p)
 	case flags&(fsMustScanSubDirs|fsItemCreated|fsItemRemoved|fsItemRenamed) != 0:
 		s.tell.Moved(p)
 	case flags&(fsItemModified|fsItemMetaMod) != 0:

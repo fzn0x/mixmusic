@@ -288,10 +288,15 @@ func TestWrongCode(t *testing.T) {
 }
 
 // TestRefused refuses a computer not paired, and a pairing while remote
-// control is off; and a pairing whose user cancels it ends on both.
+// control is off; and a pairing whose user cancels it ends on both. Each
+// pairing starts as soon as the last was told how it ended, while that
+// one's handler lingers, as on a busy computer: it isn't refused as busy,
+// which it was on CI, the test then waiting for an end that never came.
 func TestRefused(t *testing.T) {
 	h := newFakeHost()
-	s, addr := serve(t, h, fast)
+	slow := fast
+	slow.linger = 200 * time.Millisecond
+	s, addr := serve(t, h, slow)
 	d := newDialer(t, "Laptop", fast)
 	ctx := context.Background()
 	if _, err := d.Connect(ctx, addr, s.Identity.Fingerprint()); !errors.Is(err, ErrNotPaired) {
@@ -313,7 +318,8 @@ func TestRefused(t *testing.T) {
 		return "", ctx.Err()
 	})
 	if !errors.Is(err, ErrCanceled) {
-		t.Errorf("a pairing canceled there ended with %v", err)
+		// Nothing ends there then: waiting for it would hang.
+		t.Fatalf("a pairing canceled there ended with %v", err)
 	}
 	if err := <-h.ended; !errors.Is(err, ErrCanceled) {
 		t.Errorf("the pairing canceled ended with %v there", err)
@@ -322,8 +328,8 @@ func TestRefused(t *testing.T) {
 	h.mu.Lock()
 	h.keepErr = errors.New("the disk is full")
 	h.mu.Unlock()
-	if _, err := pair(t, d, addr, h, same); err == nil {
-		t.Error("paired with a computer that couldn't keep it")
+	if _, err := pair(t, d, addr, h, same); err == nil || errors.Is(err, ErrBusy) {
+		t.Fatalf("pairing with a computer that couldn't keep it: %v", err)
 	}
 	<-h.ended
 }

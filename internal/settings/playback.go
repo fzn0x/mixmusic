@@ -78,6 +78,10 @@ type Playback struct {
 	// CleanVersions shows and opens the clean version of an album that
 	// comes explicit and clean, in place of the explicit one (#345).
 	CleanVersions bool `json:"cleanVersions"`
+	// HideExplicit leaves the songs, videos and albums their service marks
+	// explicit out of the lists the services make, and has the queue pass
+	// over them, those the user chose too (#427). PrefersClean while on.
+	HideExplicit bool `json:"hideExplicit"`
 	// MusicVideos shows the picture of music videos on the now playing
 	// page, in place of their cover. It is off at first: it fetches more
 	// than the sound, and shows a web page there.

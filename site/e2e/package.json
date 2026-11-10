@@ -1,0 +1,13 @@
+{
+  "name": "mixmusic-site-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Playwright checks of the built website. For CI and the maintainers only: nothing here ships to visitors.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.3",
+    "@playwright/test": "1.65.0"
+  }
+}

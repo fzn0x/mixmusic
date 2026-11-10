@@ -1,0 +1,39 @@
+/*
+ * Reduced motion (#360), for the demos and the tiles that act out a
+ * feature. A visitor who asks their system for less motion gets:
+ *
+ *   - demos that show their finished state, with nothing playing;
+ *   - tiles that stay where they are when hovered, focused or pressed;
+ *   - entrances (reveal.css) that are simply there;
+ *   - the hero's player working as it does for everyone, and only its
+ *     decorative movement stopped.
+ *
+ * The part of a demo or a tile that moves carries data-motion. This file
+ * stops every animation and transition inside it, and the check of the
+ * site (site/e2e/tests/motion/) looks at what carries it to see that
+ * nothing there moves under reduced motion. A new demo or tile only has to
+ * mark itself, and its script has to draw the finished state when
+ * MixReveal.reduced is true (reveal.js).
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-motion],
+  [data-motion] *,
+  [data-motion] *::before,
+  [data-motion] *::after,
+  [data-motion]::before,
+  [data-motion]::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* What nudges or grows under a pointer, in the page's own styles. */
+  .play:hover,
+  .play:active,
+  .btn:active,
+  .a-btn:active,
+  .a-round:active,
+  .link:hover .icon {
+    transform: none !important;
+  }
+}

@@ -149,6 +149,9 @@ type shell struct {
 	// failure is the dialog of the details of a track that couldn't play
 	// (playbackerrors.go).
 	failure failureView
+	// remote is the page of a computer controlled, and the dialog of the
+	// code this one shows (remote.go).
+	remote remoteView
 	// panel is the side panel shown: "queue", "lyrics" or "".
 	panel string
 	// mini is what the mini player keeps from frame to frame: its panel,
@@ -409,6 +412,7 @@ func (s *shell) start() {
 		s.p.Notices(func(n player.Notice) { s.update(func() { s.notes = append(s.notes, n) }) }),
 		s.a.OnNavigate(func(target string) { s.update(func() { s.open(target) }) }),
 		s.followCast(),
+		s.followRemote(),
 		s.followOutput(),
 		s.a.OnGlobalShortcut(s.globalPress),
 		s.a.OnFlush(s.keepColors),

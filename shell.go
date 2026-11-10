@@ -59,6 +59,7 @@ func (s *shell) view(c *ui.Context) {
 	s.trackInfoDialog(c)
 	s.promptDialog(c)
 	s.failureDialog(c)
+	s.remoteCodeDialog(c)
 	s.sweepDialogs()
 	s.sweepViews()
 	s.followVideo()
@@ -98,6 +99,8 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 		s.libraryPage(c, r.Param("tab"))
 	case r.Match("/now-playing"):
 		s.nowPlayingPage(c)
+	case r.Match("/remote/{id}"):
+		s.remotePage(c, r.Param("id"))
 	case r.Match("/settings"):
 		s.settingsPage(c, "", r.Query("q"))
 	case r.Match("/settings/{tab}"):

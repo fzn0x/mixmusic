@@ -163,6 +163,10 @@ type RemoteView struct {
 	State    remote.State
 	At       time.Time
 	HasState bool
+	// CanQueue is set when the computer takes the commands on its queue,
+	// and CanHandOver when it takes what plays here: an older MixMusic
+	// doesn't.
+	CanQueue, CanHandOver bool
 }
 
 // remoteControl is the session with the computer whose page shows.
@@ -284,6 +288,7 @@ func (rc *Remote) View(id string) RemoteView {
 	case ctl.session != nil:
 		v.Step = RemoteConnected
 		v.State, v.At, v.HasState = ctl.session.State()
+		v.CanQueue, v.CanHandOver = ctl.session.Can(remote.FeatureQueue), ctl.session.Can(remote.FeatureHandOver)
 		return v
 	case !isFound:
 		v.Step = RemoteAway
@@ -403,18 +408,9 @@ func (a *App) connectRemote(ctl *remoteControl, addr string, kept PairedComputer
 
 // Do sends a command to the computer id, whose page shows.
 func (rc *Remote) Do(id string, c remote.Command) error {
-	r := &rc.a.remote
-	r.mu.Lock()
-	ctl := r.control
-	r.mu.Unlock()
-	if ctl == nil || ctl.id != id {
-		return errors.New("Not connected to that computer")
-	}
-	ctl.mu.Lock()
-	s := ctl.session
-	ctl.mu.Unlock()
-	if s == nil {
-		return errors.New("Not connected to that computer")
+	s, err := rc.session(id)
+	if err != nil {
+		return err
 	}
 	return s.Do(c)
 }
@@ -548,6 +544,8 @@ func remoteProblem(name string, err error) string {
 		return "Another computer answered in place of " + name + ": it isn't the one paired."
 	case errors.Is(err, remote.ErrVersion):
 		return remote.ErrVersion.Error() + "."
+	case errors.Is(err, remote.ErrOlder):
+		return "MixMusic on " + name + " is older, and can't do that: update it there."
 	case errors.Is(err, remote.ErrLost):
 		return name + " stopped answering: connecting again…"
 	case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):

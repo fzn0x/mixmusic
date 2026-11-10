@@ -77,7 +77,7 @@ func (p *Player) choose(i int) {
 	}
 	q := slices.Clone(p.s.Queue)
 	skipped := q[i].Skip != ""
-	q[i].Chosen, q[i].Skip = true, ""
+	q[i].Chosen, q[i].Skip = true, p.keptSkip(q[i].Track)
 	p.s.Queue = q
 	if skipped {
 		p.emit(QueueChange)
@@ -102,7 +102,7 @@ func (p *Player) disliked(id string, disliked bool) {
 		switch {
 		case disliked:
 			it.Chosen = false
-			if p.skipDisliked {
+			if p.skipDisliked && it.Skip != SkipExplicit {
 				it.Skip = SkipDisliked
 			}
 		case it.Skip == SkipDisliked:
@@ -207,6 +207,8 @@ func (p *Player) SettingsChanged(s settings.Settings) {
 			p.curve = s.VolumeCurve
 			p.connect.setVolume(p.heardVolume())
 		}
+		// The queue passes over explicit songs while they're hidden.
+		p.hideChanged(s)
 		moved := s.SpotifyPlayback != p.spotifyMode
 		if moved || s.SkipDisliked != p.skipDisliked || s.SkipAI != p.skipAI {
 			// A Spotify track that plays on a device isn't passed over for
@@ -320,7 +322,7 @@ func (p *Player) reflag() {
 	for i, it := range p.s.Queue {
 		switch {
 		case it.Chosen:
-			it.Skip = ""
+			it.Skip = p.keptSkip(it.Track)
 		case i != p.s.Index || it.Skip != "":
 			it.Skip = p.skipOf(it.Track)
 		}
@@ -334,6 +336,10 @@ func (p *Player) reflag() {
 // autoplay is false.
 func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	if i < 0 || i >= len(p.s.Queue) {
+		return
+	}
+	// An entry the settings hide, which the user chose, doesn't play.
+	if p.refuses(p.s.Queue[i].Track) {
 		return
 	}
 	entry := p.s.Queue[i]

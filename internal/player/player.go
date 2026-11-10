@@ -508,6 +508,9 @@ type Player struct {
 	spotifyMode  settings.SpotifyPlayback
 	skipDisliked bool
 	skipAI       bool
+	// hideExplicit is whether the settings hide explicit content, whose
+	// songs never play (explicit.go).
+	hideExplicit bool
 	// passing is what the player keeps of passing over entries as it moves
 	// on.
 	passing passState
@@ -545,6 +548,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	st := svc.Settings()
 	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume), Speed: 1}
 	p.spotifyMode, p.skipDisliked, p.skipAI = st.SpotifyPlayback, st.SkipDisliked, st.SkipAI
+	p.hideExplicit = st.HideExplicit
 	p.surround = st.Surround
 	p.curve = st.VolumeCurve
 	if len(saved.Tracks) > 0 {
@@ -554,13 +558,14 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 		for i, t := range saved.Tracks {
 			p.s.Queue[i] = p.item(t, radio[i])
 			if chosen[i] {
-				p.s.Queue[i].Chosen, p.s.Queue[i].Skip = true, ""
+				p.s.Queue[i].Chosen, p.s.Queue[i].Skip = true, p.keptSkip(t)
 			}
 		}
 		p.s.Index = min(max(saved.Index, 0), len(p.s.Queue)-1)
 		// The current entry plays on, as it was: the queue passes over a
-		// track disliked meanwhile only as it moves on.
-		p.s.Queue[p.s.Index].Chosen, p.s.Queue[p.s.Index].Skip = true, ""
+		// track disliked meanwhile only as it moves on. One the settings
+		// hide doesn't play.
+		p.s.Queue[p.s.Index].Chosen, p.s.Queue[p.s.Index].Skip = true, p.keptSkip(p.s.Queue[p.s.Index].Track)
 		// The position is the saved current track's. A queue kept before
 		// the index was kept within its tracks may name one past them: the
 		// track held instead starts from its start.

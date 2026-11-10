@@ -112,6 +112,9 @@ func (p *Player) moveBack() *move {
 // disliked it, or the app knows YouTube labels it as made with AI, as the
 // settings skip those; "" for one that plays, or that waits for its check.
 func (p *Player) skipOf(t media.Track) string {
+	if p.hides(t) {
+		return SkipExplicit
+	}
 	if why := p.svc.Skip(t); why != "" {
 		return why
 	}
@@ -250,9 +253,10 @@ func (p *Player) hold() {
 }
 
 // passOver notes that the move m passed over the entry it, for why, to
-// tell of it once a track plays; the entry the move began from isn't.
+// tell of it once a track plays; the entry the move began from isn't, nor
+// an explicit song the settings hide, which the user knows of.
 func (p *Player) passOver(m *move, it Item, why string) {
-	if it.UID == m.from {
+	if it.UID == m.from || why == SkipExplicit {
 		return
 	}
 	m.passed++
@@ -359,6 +363,9 @@ func (p *Player) tellSkipped() {
 // allPassedOver tells why the queue would pass over every entry of items,
 // for a list played whose tracks it all passes over.
 func allPassedOver(items []Item) string {
+	if why := explicitPassedOver(items); why != "" {
+		return why
+	}
 	ai := 0
 	for _, it := range items {
 		if it.Skip == SkipMadeWithAI {

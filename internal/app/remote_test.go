@@ -295,6 +295,34 @@ func TestRemoteSessionGoesIdle(t *testing.T) {
 	untilView(t, lap, idOf(desk), "the session again", func(v RemoteView) bool { return v.Step == RemoteConnected })
 }
 
+// TestRemoteHostStartsAgain tells that remote control turned off on the
+// computer controlled, and connects again once it is back on, at another
+// port, which a new look finds.
+func TestRemoteHostStartsAgain(t *testing.T) {
+	retry, most, again := remoteRetry, remoteRetryMost, castBrowseAgain
+	remoteRetry, remoteRetryMost, castBrowseAgain = 20*time.Millisecond, 100*time.Millisecond, 0
+	t.Cleanup(func() { remoteRetry, remoteRetryMost, castBrowseAgain = retry, most, again })
+	n := remotetest.New()
+	desk := newRemoteApp(t, n, "Desktop")
+	lap := newRemoteApp(t, n, "Laptop")
+	if err := desk.Remote().SetOn(true); err != nil {
+		t.Fatal(err)
+	}
+	pairApps(t, lap, desk)
+	deskID := idOf(desk)
+	if err := desk.Remote().SetOn(false); err != nil {
+		t.Fatal(err)
+	}
+	v := untilView(t, lap, deskID, "remote control off there", func(v RemoteView) bool { return v.Step != RemoteConnected })
+	if v.Problem != "" && !strings.Contains(v.Problem, "Remote control is off on Desktop") && !strings.Contains(v.Problem, "Couldn't reach Desktop") {
+		t.Errorf("the page says %q", v.Problem)
+	}
+	if err := desk.Remote().SetOn(true); err != nil {
+		t.Fatal(err)
+	}
+	untilView(t, lap, deskID, "the session again", func(v RemoteView) bool { return v.Step == RemoteConnected && v.HasState })
+}
+
 // TestRemoteKeyKept makes the computer's key once, and reads it back at
 // the next start.
 func TestRemoteKeyKept(t *testing.T) {

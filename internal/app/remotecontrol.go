@@ -350,6 +350,9 @@ func (a *App) connectRemote(ctl *remoteControl, addr string, kept PairedComputer
 			a.notifyRemote(kept.Name + " removed this computer: pair again to control it")
 			return
 		}
+		// The computer may listen elsewhere since it started again: it is
+		// looked for anew, unless it was a moment ago.
+		a.Remote().Find()
 		a.notifyRemote("")
 	}
 	key, err := remote.ParseFingerprint(kept.Key)

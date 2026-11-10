@@ -325,6 +325,9 @@ type shell struct {
 	licenseOpen int
 	// trackInfo is the dialog of a track's Track info (trackinfo.go).
 	trackInfo trackInfoView
+	// tagDialogs edit the tags of the music on this computer
+	// (localtags.go).
+	tagDialogs tagDialogs
 	// installing is set while yt-dlp installs, which installDone of
 	// installTotal bytes came of.
 	installing                bool

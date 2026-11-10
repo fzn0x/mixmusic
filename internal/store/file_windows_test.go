@@ -181,3 +181,24 @@ func TestWriteGivesUp(t *testing.T) {
 		t.Errorf("the folder holds %d files, want settings.json alone", len(entries))
 	}
 }
+
+// TestReplaceWhileLocked leaves a file as it was when a program has it
+// open without sharing its deletion, which keeps any file from taking its
+// place, and says why.
+func TestReplaceWhileLocked(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "song.flac")
+	if err := os.WriteFile(path, []byte("old"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	f, err := os.Open(path) // FILE_SHARE_READ | FILE_SHARE_WRITE
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = replaceWith(path, "new")
+	f.Close()
+	if !busy(err) {
+		t.Errorf("replacing a file open: %v", err)
+	}
+	onlyFile(t, dir, "song.flac", "old")
+}

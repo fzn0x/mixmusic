@@ -18,6 +18,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/store"
 )
 
 // LocalFiles is the music on the user's computer, as the windows show it:
@@ -256,13 +257,15 @@ func (a *App) prepareFile(track media.Track) (PlaybackSource, error) {
 }
 
 // openFile opens, for the engine, the file of a local track, by the native
-// part of its ID that the address of prepareFile ends with.
+// part of its ID that the address of prepareFile ends with. Its tags can
+// change meanwhile, the new file taking its place, as the engine goes on
+// playing it (store.OpenShared).
 func (a *App) openFile(native string) (audio.Source, error) {
 	path, ok := localfiles.PathOf(media.ID(media.SourceFile, native))
 	if !ok {
 		return nil, fmt.Errorf("not a file of this computer: %s", native)
 	}
-	f, err := os.Open(path)
+	f, err := store.OpenShared(path)
 	if err != nil {
 		a.localFiles.Gone(media.ID(media.SourceFile, native))
 		return nil, errFileMissing

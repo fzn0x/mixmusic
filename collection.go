@@ -591,6 +591,7 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 					s.createYouTubePlaylist(name, tracks, func(p media.Playlist) { s.navigate(playlistPath(p.ID)) })
 				})
 			}
+			s.editAlbumOf(m, source, tracks)
 		}
 		if importID != "" && m.Item("Copy into a mix you can extend").Chosen() {
 			s.importPlaylist(importID)

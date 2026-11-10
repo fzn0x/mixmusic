@@ -13,8 +13,9 @@ import (
 var id3Frames = map[string]string{
 	"TIT2": "title", "TPE1": "artist", "TALB": "album", "TPE2": "albumartist",
 	"TRCK": "track", "TPOS": "disc", "TYER": "year", "TDRC": "year", "TORY": "year", "TDOR": "year",
+	"TCON": "genre", "TSRC": "isrc",
 	"TT2": "title", "TP1": "artist", "TAL": "album", "TP2": "albumartist",
-	"TRK": "track", "TPA": "disc", "TYE": "year", "TOR": "year",
+	"TRK": "track", "TPA": "disc", "TYE": "year", "TOR": "year", "TCO": "genre", "TRC": "isrc",
 }
 
 // id3v2 reads the ID3v2 tag at offset at into t, of version 2.2, 2.3 or
@@ -121,6 +122,12 @@ func readFrames(b []byte, version byte, unsynced bool, t *Tags) {
 			t.setPicture(apic(data))
 		case id == "PIC":
 			t.setPicture(pic(data))
+		case id3Frames[id] == "genre":
+			values := textFrame(data, version)
+			for i, v := range values {
+				values[i] = id3Genre(v)
+			}
+			t.set("genre", values...)
 		case id3Frames[id] != "":
 			t.set(id3Frames[id], textFrame(data, version)...)
 		}
@@ -188,18 +195,45 @@ func frameData(data []byte, version byte, flags uint16, unsynced bool) ([]byte, 
 	return data, true
 }
 
-// textFrame reads the values of a text frame: one, or of 2.4 any number,
-// between NULs.
+// textFrame reads the values of a text frame: one, or of 2.3 and 2.4 any
+// number, between NULs, as 2.4 has them and programs write 2.3 too.
 func textFrame(data []byte, version byte) []string {
 	if len(data) < 1 {
 		return nil
 	}
 	s := decode(data[0], data[1:])
 	values := strings.Split(strings.TrimRight(s, "\x00"), "\x00")
-	if version < 4 {
+	if version < 3 {
 		values = values[:1]
 	}
 	return values
+}
+
+// id3Genre reads a genre of ID3v2: its name, or the number of a genre of
+// ID3v1, as "(17)" or "17", or of 2.3 that number then a name that
+// refines it, as "(17)Indie Rock"; "((" starts a name that starts with
+// "(".
+func id3Genre(v string) string {
+	switch {
+	case strings.HasPrefix(v, "(("):
+		return v[1:]
+	case strings.HasPrefix(v, "("):
+		ref, rest, ok := strings.Cut(v[1:], ")")
+		if !ok {
+			return v
+		}
+		if strings.TrimSpace(rest) != "" {
+			return id3Genre(rest)
+		}
+		switch ref {
+		case "RX":
+			return "Remix"
+		case "CR":
+			return "Cover"
+		}
+		return genreName(ref, v)
+	}
+	return genreName(v, v)
 }
 
 // decode decodes text of an ID3v2 encoding: 0 ISO-8859-1, 1 UTF-16 with a

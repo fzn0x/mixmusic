@@ -1,6 +1,6 @@
 // Package tags reads the tags of music files kept on a computer: the
-// title, artists, album, album artists, track and disc numbers, year and
-// cover a file tells of itself. It reads ID3v2 and ID3v1 tags, as MP3
+// title, artists, album, album artists, track and disc numbers, year,
+// genre, ISRC and cover a file tells of itself. It reads ID3v2 and ID3v1 tags, as MP3
 // files have them, and WAV files in a chunk, the items of an MP4 file's
 // ilst, Vorbis comments and pictures, as FLAC, Opus and Vorbis files have
 // them, and the INFO list of a WAV file.
@@ -46,6 +46,10 @@ type Tags struct {
 	// Track and Disc are the track's numbers on its album, from 1.
 	Track, Disc int
 	Year        int
+	// Genre is the first genre the file tells, by its name.
+	Genre string
+	// ISRC is the recording's International Standard Recording Code.
+	ISRC string
 	// Picture is the cover, the front cover when the file tells which.
 	Picture *Picture
 }
@@ -149,7 +153,7 @@ func (f *file) bytesAt(off, n, limit int64) ([]byte, error) {
 
 // set fills the fields of t that are still empty with the values a tag
 // gives for key, a field's name: title, artist, album, albumartist, track,
-// disc or year. A key that names no field changes nothing.
+// disc, year, genre or isrc. A key that names no field changes nothing.
 func (t *Tags) set(key string, values ...string) {
 	var vs []string
 	for _, v := range values {
@@ -188,6 +192,14 @@ func (t *Tags) set(key string, values ...string) {
 	case "year":
 		if t.Year == 0 {
 			t.Year = year(vs[0])
+		}
+	case "genre":
+		if t.Genre == "" {
+			t.Genre = vs[0]
+		}
+	case "isrc":
+		if t.ISRC == "" {
+			t.ISRC = vs[0]
 		}
 	}
 }

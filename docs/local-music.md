@@ -94,14 +94,61 @@ play counts as skipped in Settings, and never stops a scan.
 ## Tags and covers
 
 MixMusic reads the title, artists, album, album artists, track and disc
-numbers and year your files' tags tell: ID3v2 and ID3v1 of MP3, MP4's
-tags, the Vorbis comments of FLAC, Opus and Vorbis, and WAV's INFO list.
+numbers, year and genre your files' tags tell: ID3v2 and ID3v1 of MP3,
+MP4's tags, the Vorbis comments of FLAC, Opus and Vorbis, and WAV's INFO
+list.
 
 - **A file without tags** shows by its file's name, by Unknown artist.
 - **Covers:** the cover a file holds, the front cover when it holds
   several, else an image beside it named cover, folder, front or album
   (`.jpg`, `.png` or `.webp`). MixMusic keeps a copy of each in its cache
-  folder, never beside your music, and never changes your files.
+  folder, never beside your music.
+
+MixMusic changes a file only when you edit its tags, as below.
+
+## Edit tags
+
+A wrong title, artist, album or year, a missing cover, or a song filed
+under the wrong album can be put right in MixMusic:
+
+- **Edit info…**, in the menu of a song on this computer, opens its
+  title, artists, album, album artist, track and disc numbers, year,
+  genre and cover. Separate several artists with `;`. Choose an image
+  sets the cover, a JPEG or PNG of at most 10 MB, and Remove the cover
+  takes it away. Save writes what you changed into the file.
+- **Edit album…**, in the menu of an album on this computer and of its
+  page, changes what its songs share in one go: the album's title, its
+  album artist, its year and its cover.
+- **Move to album…**, in the menu of a song, files it under another
+  album of your library, which you find by its title, or under a new one
+  you name, by writing its album's tags. An album without an album
+  artist is grouped by its folder: a song from another folder joins it
+  once all its songs have the album artist it shows, which the dialog
+  says it writes to them too.
+
+The mini player's menus leave them out: its window is too small for
+their dialogs. The library shows the new tags at once, and so do the queue and the
+player. Your mixes and liked songs keep the title they had until you add
+the song again.
+
+MixMusic writes ID3v2 tags to MP3 files (2.3 or 2.4, as the file had,
+else 2.4, and the ID3v1 tag too where the file has one), Vorbis comments
+and the cover's picture to FLAC files, and the comment header of Opus and
+Vorbis files, and the tags of M4A files. WAV files can't be edited.
+
+- **Only the tags change.** The audio stays as it was, byte for byte, as
+  do the tags you didn't change, as a comment or ReplayGain.
+- **Safe writes.** MixMusic writes the new file beside the old one,
+  reads its tags back, opens it as the player would, and only then
+  renames it over the old one. Whatever fails, as a full disk, leaves the
+  file as it was, and the dialog says why. A song can be edited while it
+  plays.
+- **What can't be changed says so first:** a file that is read-only, a
+  folder MixMusic can't write in, or a WAV file, before any dialog
+  opens. On Windows, a file another program holds open says so on
+  Save; close it there, and save again.
+- **A new cover takes the place of the pictures** the file holds, as a
+  back cover, so that it's the one every player shows.
 
 ## When a file is gone
 
@@ -138,6 +185,8 @@ a service doesn't apply to them:
 - [Track info](playing-music.md#track-info), in a track's menu, tells what
   its file holds, its format, bitrate, sample rate, bit depth, channels
   and length, and its path, size and tags.
+- [Edit info… and Move to album…](#edit-tags), in a track's menu, change
+  its file's tags, and Edit album…, in an album's, those of its songs.
 - The system's [media controls](desktop.md)
   show it with its cover, as any track.
 

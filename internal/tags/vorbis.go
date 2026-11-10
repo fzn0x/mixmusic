@@ -15,6 +15,7 @@ var vorbisKeys = map[string]string{
 	"TITLE": "title", "ARTIST": "artist", "ALBUM": "album",
 	"ALBUMARTIST": "albumartist", "ALBUM ARTIST": "albumartist", "ALBUM_ARTIST": "albumartist",
 	"TRACKNUMBER": "track", "DISCNUMBER": "disc", "DATE": "year", "YEAR": "year", "ORIGINALDATE": "year",
+	"GENRE": "genre", "ISRC": "isrc",
 }
 
 // flac reads the metadata blocks of a FLAC file from offset at, after its

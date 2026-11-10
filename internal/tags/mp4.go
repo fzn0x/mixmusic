@@ -3,12 +3,13 @@ package tags
 import (
 	"encoding/binary"
 	"strconv"
+	"strings"
 )
 
 // The items of an MP4 file's ilst the tags take.
 var mp4Items = map[string]string{
 	"\xa9nam": "title", "\xa9ART": "artist", "\xa9alb": "album", "aART": "albumartist",
-	"\xa9day": "year", "trkn": "track", "disk": "disc",
+	"\xa9day": "year", "trkn": "track", "disk": "disc", "\xa9gen": "genre",
 }
 
 // maxBoxes bounds the boxes read of a level.
@@ -96,7 +97,8 @@ func boxes(b []byte, fn func(kind string, data []byte)) {
 
 // ilst reads the items of the ilst of a meta box's data, which starts with
 // its version and flags, but in some files of QuickTime, whose first box
-// starts at once.
+// starts at once. An item of text may hold several values, a data box
+// each, as some programs write several artists.
 func ilst(meta []byte, t *Tags) {
 	if len(meta) >= 8 && string(meta[4:8]) != "hdlr" && string(meta[4:8]) != "ilst" {
 		meta = meta[4:]
@@ -106,7 +108,12 @@ func ilst(meta []byte, t *Tags) {
 			return
 		}
 		boxes(data, func(item string, data []byte) {
+			var texts []string
+			name := ""
 			boxes(data, func(kind string, d []byte) {
+				if kind == "name" && len(d) >= 4 {
+					name = strings.ToUpper(string(d[4:]))
+				}
 				if kind != "data" || len(d) < 8 {
 					return
 				}
@@ -128,10 +135,23 @@ func ilst(meta []byte, t *Tags) {
 							t.set(key, strconv.Itoa(n))
 						}
 					}
-				case key != "" && typ == 1:
-					t.set(key, string(value))
+				case item == "gnre":
+					// The number of a genre of ID3v1, from 1.
+					if len(value) >= 2 {
+						if n := int(binary.BigEndian.Uint16(value)); n > 0 {
+							t.set("genre", genreName(strconv.Itoa(n-1), ""))
+						}
+					}
+				case (key != "" || item == "----") && typ == 1:
+					texts = append(texts, string(value))
 				}
 			})
+			switch key := mp4Items[item]; {
+			case key != "":
+				t.set(key, texts...)
+			case item == "----" && name == "ISRC":
+				t.set("isrc", texts...)
+			}
 		})
 	})
 }

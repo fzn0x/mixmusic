@@ -44,6 +44,7 @@ func (x *Index) Reread(paths []string) {
 	if err := x.save(); err != nil {
 		log.Printf("mixmusic: keeping the index of the music on this computer: %v", err)
 	}
+	x.relink()
 	x.changed()
 }
 

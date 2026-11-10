@@ -112,6 +112,8 @@ type Index struct {
 	version uint64
 	views   *views
 	watch   []*func()
+	// copies are the songs with copies of the entries (songs.go).
+	copies copyLinks
 }
 
 // stat is whether a file was there, and when it was looked at.
@@ -137,6 +139,9 @@ func Open(path, art string, probe func(io.ReadSeeker) (time.Duration, error)) (*
 				x.entries[e.Path] = e
 			}
 		}
+	}
+	if err := x.openLinks(path); err != nil {
+		return nil, err
 	}
 	return x, nil
 }
@@ -197,8 +202,14 @@ func (x *Index) Entry(path string) (Entry, bool) {
 // Missing reports whether the file of a local track isn't there: one the
 // last scan found that playing found gone since, or, beyond the index, as
 // of a mix, or in a folder the last scan couldn't read, one that isn't
-// there when looked at, at most every 30 seconds.
+// there when looked at, at most every 30 seconds; and of a song with
+// copies, while none of its copies is there.
 func (x *Index) Missing(id string) bool {
+	if IsSong(id) {
+		// A song with copies, while none of its files is there.
+		_, ok := x.FileOf(id)
+		return !ok
+	}
 	path, ok := PathOf(id)
 	if !ok {
 		return false

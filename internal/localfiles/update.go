@@ -157,6 +157,7 @@ func (x *Index) update(ctx context.Context, changed map[string]bool) (rescan boo
 	if err := x.save(); err != nil {
 		log.Printf("mixmusic: keeping the index of the music on this computer: %v", err)
 	}
+	x.relink()
 	x.changed()
 	return rescan
 }

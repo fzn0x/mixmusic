@@ -191,6 +191,16 @@ func (l *LocalFiles) MoveToAlbum(id, albumID string) error {
 	return err
 }
 
+// MovePlan tells what MoveToAlbum writes: the album's title and album
+// artists, and the album's songs that take its album artists too.
+func (l *LocalFiles) MovePlan(id, albumID string) (localfiles.Move, error) {
+	path, err := pathOf(id)
+	if err != nil {
+		return localfiles.Move{}, err
+	}
+	return l.a.localFiles.MoveTo(path, albumID)
+}
+
 // MoveToNewAlbum files the song of id under a new album of a title, by
 // writing its album's tag; its album artists stay.
 func (l *LocalFiles) MoveToNewAlbum(id, title string) error {

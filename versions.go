@@ -87,14 +87,15 @@ func (s *shell) albumTiles(c *ui.Context, key string, albums []media.Album) {
 // Settings › Playback prefers clean versions; or the first, while they
 // don't tell which is explicit.
 func (s *shell) preferredVersion(versions []media.Album) media.Album {
-	i, _ := media.PreferredVersion(versions, s.set.CleanVersions)
+	i, _ := media.PreferredVersion(versions, s.set.PrefersClean())
 	return versions[i]
 }
 
 // versionsLabel tells how many versions the album id has, for its tile:
 // "" for one.
 func (s *shell) versionsLabel(id string) string {
-	if n := len(s.versions.of[id]); n > 1 {
+	// Those the settings hide don't count (explicit.go).
+	if n := len(s.shownGroup(s.versions.of[id])); n > 1 {
 		return plural(n, "version")
 	}
 	return ""
@@ -137,7 +138,7 @@ func (s *shell) versionShown(id string) (shown string, waiting bool) {
 	if !all {
 		return "", true
 	}
-	i, _ := media.PreferredVersion(versions, s.set.CleanVersions)
+	i, _ := media.PreferredVersion(versions, s.set.PrefersClean())
 	delete(v.choosing, id)
 	if v.shown == nil {
 		v.shown = map[string]string{}
@@ -179,6 +180,11 @@ func (s *shell) versionSwitch(c *ui.Context, id, shown string) {
 	if !told && !all {
 		return
 	}
+	// The settings hiding explicit content, it leaves out the explicit
+	// versions (explicit.go).
+	if g, versions = s.shownVersions(g, versions); len(g) < 2 {
+		return
+	}
 	at := slices.IndexFunc(g, func(a media.Album) bool { return a.ID == shown })
 	labels := media.VersionLabels(versions)
 	ui.Row(c).Margin(0, 0, 24).Children(func() {
@@ -196,7 +202,7 @@ func (s *shell) versionSwitch(c *ui.Context, id, shown string) {
 // versions is explicit, the one their pages tell, as its page opens on. A
 // page read already plays as it is.
 func (s *shell) albumToPlay(id string) func(ctx context.Context) (media.Album, error) {
-	g, clean, album := s.versions.of[id], s.set.CleanVersions, s.svc.Catalog.Album
+	g, clean, album := s.versions.of[id], s.set.PrefersClean(), s.svc.Catalog.Album
 	if len(g) > 1 && !media.VersionsTold(g) {
 		versions, all := s.loadedVersions(g, false)
 		if !all {

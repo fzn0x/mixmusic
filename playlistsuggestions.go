@@ -122,6 +122,9 @@ func (s *shell) playlistSuggestions(c *ui.Context, key string, p media.Playlist)
 			return
 		}
 		for i, t := range st.tracks {
+			if s.hides(t) {
+				continue // the settings hide it (explicit.go)
+			}
 			ui.Row(c.Key("suggested-" + t.ID)).Gap(16).AlignItems(ui.Center).Children(func() {
 				// A list of one: playing a suggestion plays it alone.
 				ui.Column(c).Grow(1).Basis(0).MinWidth(0).Children(func() {

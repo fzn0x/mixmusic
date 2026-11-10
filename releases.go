@@ -31,7 +31,7 @@ func (s *shell) newReleases() []media.Release {
 func (s *shell) releasesShelf(c *ui.Context, key string, source media.Source) int {
 	var shown []media.Release
 	for _, r := range s.newReleases() {
-		if source == "" || source == media.SourceLocal || r.Album.Source == source {
+		if (source == "" || source == media.SourceLocal || r.Album.Source == source) && !s.hidesAlbum(r.Album) {
 			shown = append(shown, r)
 		}
 	}

@@ -45,6 +45,9 @@ func (s *shell) homePage(c *ui.Context) {
 		} else if cur, ok := s.st.Current(); ok {
 			last = &cur.Track
 		}
+		if last != nil && s.hides(*last) {
+			last = nil // the settings hide it (explicit.go)
+		}
 		ui.Row(c).Justify(ui.End).Margin(0, 0, 16).Children(func() {
 			if s.button(c, "home-edit", "edit home", false).Clicked() {
 				s.home.editing = true

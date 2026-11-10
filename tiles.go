@@ -437,6 +437,11 @@ func (s *shell) shelves(c *ui.Context, key string, shelves []media.Shelf) {
 // itemShelf shows the shelf sh, keyed key: a row of its tiles, whose
 // tracks play as one queue.
 func (s *shell) itemShelf(c *ui.Context, key string, sh media.Shelf) {
+	// What the settings hide doesn't show (explicit.go).
+	sh, shows := s.shownShelf(sh)
+	if !shows {
+		return
+	}
 	var tracks []media.Track
 	for _, it := range sh.Items {
 		if it.Track != nil {

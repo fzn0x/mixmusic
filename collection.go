@@ -287,6 +287,8 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 	// the download's, which aren't offered until then.
 	r := s.readOn(key, res)
 	tracks, whole := r.p.Tracks, p
+	// Those of others leave out what the settings hide (explicit.go).
+	tracks = s.shownPlaylist(key, p, tracks)
 	whole.Tracks = tracks
 	if r.reading {
 		whole.Tracks = nil
@@ -634,7 +636,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 		s.pageProblem(c, "artist", res.err, key)
 		return
 	}
-	a := res.value
+	a := s.shownArtist(res.value)
 	s.pageScroll(c, func() {
 		if s.artistOf != id {
 			s.artistOf, s.artistPivot = id, 0

@@ -13,10 +13,7 @@ permissions:
 jobs:
   go:
     name: Go (${{ matrix.os }})
-    # Ubuntu 24.04 for now: on 26.04, which ubuntu-latest moves to, the
-    # keypad's keys don't reach the GTK window of the key checks (#407). The
-    # job keeps its name, which the branch's rules require.
-    runs-on: ${{ matrix.os == 'ubuntu-latest' && 'ubuntu-24.04' || matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -99,8 +96,7 @@ jobs:
   # one does, and BlackHole, a virtual device, stand in for one.
   audio:
     name: Audio output (${{ matrix.os }})
-    # Ubuntu 24.04 for now, as the Go job (#407).
-    runs-on: ${{ matrix.os == 'ubuntu-latest' && 'ubuntu-24.04' || matrix.os }}
+    runs-on: ${{ matrix.os }}
     # A run takes about a minute; one that hangs gives up long before
     # GitHub's 6 hours.
     timeout-minutes: 30

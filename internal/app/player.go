@@ -270,6 +270,7 @@ func (p *Player) Report(np NowPlaying) {
 	p.a.keepPosition(np)
 	p.a.reportWatchtime(np, s.YouTubeHistory)
 	p.a.presence.update(s.Desktop, np)
+	p.a.reportOverlay(np)
 	p.a.reportControls(np)
 	if bar != nil {
 		bar.Show(np.plays(), np.Track != nil)

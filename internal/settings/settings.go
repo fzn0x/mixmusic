@@ -34,6 +34,7 @@ type Settings struct {
 	LocalFiles
 	Accounts
 	Desktop
+	Overlay
 	Tools
 	Keys
 	Addons
@@ -51,6 +52,7 @@ func Default() Settings {
 	s.LocalFiles = defaultLocalFiles()
 	s.Accounts = defaultAccounts()
 	s.Desktop = defaultDesktop()
+	s.Overlay = defaultOverlay()
 	s.Keys = defaultKeys()
 	s.Addons = defaultAddons()
 	return s
@@ -108,6 +110,7 @@ func (s Settings) Clean() Settings {
 	s.LocalFiles = s.LocalFiles.clean()
 	s.Accounts = s.Accounts.clean()
 	s.Desktop = s.Desktop.clean()
+	s.Overlay = s.Overlay.clean()
 	s.Tools = s.Tools.clean()
 	s.Keys = s.Keys.clean()
 	s.Addons = s.Addons.clean(d.Addons)

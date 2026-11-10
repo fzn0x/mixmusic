@@ -100,6 +100,10 @@ type Options struct {
 	// nowplaying.Open on MyGo's main thread: tests, which run no event
 	// loop, set it, since macOS's controls would wait for one for ever.
 	Controls func(handle func(nowplaying.Request)) (*nowplaying.Controls, error)
+	// OverlayListen, when set, opens the listener of the server of overlays
+	// in place of net.Listen: tests, which listen on a port the system
+	// picks, set it.
+	OverlayListen OverlayListen
 }
 
 // App is MixMusic.
@@ -154,6 +158,8 @@ type App struct {
 	releases releaseBook
 
 	presence presence
+	// overlay serves what plays to the overlays of streams (overlay.go).
+	overlay overlayHost
 	// watchtime reports the listening to YouTube Music's episodes to the
 	// history there.
 	watchtime watchtime
@@ -365,6 +371,7 @@ func (a *App) apply(s settings.Settings) {
 	np := a.nowPlaying
 	a.mu.Unlock()
 	a.presence.update(s.Desktop, np)
+	a.applyOverlay(s)
 	if p := a.goPlayer.Load(); p != nil {
 		p.SettingsChanged(s)
 		a.applyEngine(s)

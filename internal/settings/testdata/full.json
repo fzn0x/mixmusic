@@ -108,6 +108,8 @@
   "discordListenButton": true,
   "discordKeepWhilePaused": true,
   "notchPlayer": false,
+  "overlayServer": true,
+  "overlayPort": 9000,
   "ytdlpPath": "/usr/local/bin/yt-dlp",
   "jsRuntime": "deno",
   "shortcuts": {

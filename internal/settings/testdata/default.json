@@ -82,6 +82,8 @@
   "discordListenButton": false,
   "discordKeepWhilePaused": false,
   "notchPlayer": true,
+  "overlayServer": false,
+  "overlayPort": 8284,
   "ytdlpPath": "",
   "jsRuntime": "",
   "shortcuts": {},

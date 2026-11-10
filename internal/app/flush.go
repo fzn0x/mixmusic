@@ -29,6 +29,7 @@ func (a *App) Close() {
 	a.closeLocalFiles()
 	a.artStore.Close()
 	a.stopMemory()
+	a.stopOverlay()
 	a.flush()
 }
 

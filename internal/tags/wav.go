@@ -5,6 +5,7 @@ import "encoding/binary"
 // The items of a WAV file's INFO list the tags take.
 var infoItems = map[string]string{
 	"INAM": "title", "IART": "artist", "IPRD": "album", "ICRD": "year", "ITRK": "track", "IPRT": "track",
+	"IGNR": "genre",
 }
 
 // wav reads the chunks of a WAV file: an ID3v2 tag in an "id3 " chunk,

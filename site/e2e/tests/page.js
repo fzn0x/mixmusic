@@ -55,8 +55,29 @@ export const load = async (page, path) => {
     scrollTo(0, 0);
   });
   await page.waitForLoadState("networkidle");
-  // Whatever eases in has finished.
+  // Whatever eases in has finished: what the page tells is running, then a
+  // moment more for what it may not tell, as a transition of a heading's
+  // "#" mark, a pseudo-element, in WebKit.
+  await settle(page);
   await page.waitForTimeout(600);
+};
+
+// settle waits until the animations and transitions that end have ended:
+// the hero's entrance and the reveals the scroll began, which take 640 ms
+// after a delay of up to 320 ms, among them. One that loops never ends,
+// and isn't waited for. A reveal can start a frame after the scroll, so it
+// looks again until none runs. A fixed wait of 600 ms alone let WebKit's
+// check of contrast see the tour's tabs half faded in.
+export const settle = async (page) => {
+  await page.evaluate(async () => {
+    const frames = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    for (let i = 0; i < 10; i++) {
+      await frames();
+      const ending = document.getAnimations().filter((a) => a.playState === "running" && a.effect?.getComputedTiming().endTime !== Infinity);
+      if (!ending.length) return;
+      await Promise.all(ending.map((a) => a.finished.catch(() => {})));
+    }
+  });
 };
 
 export { expect };

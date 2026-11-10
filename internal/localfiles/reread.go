@@ -113,3 +113,12 @@ func refNames(rs []media.Ref) []string {
 	}
 	return out
 }
+
+// KeepCover keeps an image in the folder of covers, as one a file holds,
+// and returns its address, which the windows show it from, as a cover
+// about to be written to a file: false when it can't, or it's of a kind
+// the windows don't show.
+func (x *Index) KeepCover(data []byte, mime string) (string, bool) {
+	name := x.keepArt(data, mime)
+	return artScheme + name, name != ""
+}

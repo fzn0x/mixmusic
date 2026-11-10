@@ -9,8 +9,12 @@ import (
 	_ "image/png"
 )
 
-// checkCover returns the MIME type of a cover, by its first bytes: a JPEG
-// or PNG image of at most MaxCover bytes, whose size can be read.
+// CoverType returns the MIME type of an image to write as a cover, by its
+// first bytes: ErrCover unless it's a JPEG or PNG image of at most
+// MaxCover bytes, whose size can be read.
+func CoverType(data []byte) (string, error) { return checkCover(&Picture{Data: data}) }
+
+// checkCover returns the MIME type of a cover, as CoverType does.
 func checkCover(p *Picture) (string, error) {
 	if len(p.Data) == 0 || len(p.Data) > MaxCover {
 		return "", ErrCover

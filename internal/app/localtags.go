@@ -243,6 +243,8 @@ func (l *LocalFiles) write(paths []string, edit func(path string) (tagwrite.Tags
 		for _, p := range done {
 			if t, ok := l.a.localFiles.Track(p); ok {
 				tracks = append(tracks, t)
+			} else if e, err := l.a.localFiles.ReadFile(p); err == nil {
+				tracks = append(tracks, localfiles.TrackOf(e)) // a file opened
 			}
 		}
 		if p := l.a.goPlayer.Load(); p != nil {

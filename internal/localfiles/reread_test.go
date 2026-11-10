@@ -2,6 +2,7 @@ package localfiles
 
 import (
 	"os"
+	"path/filepath"
 	"reflect"
 	"slices"
 	"sync/atomic"
@@ -82,5 +83,21 @@ func TestMoveTo(t *testing.T) {
 	}
 	if _, err := ti.MoveTo(shore1, album("Shore")); err == nil {
 		t.Error("moved to its own album")
+	}
+}
+
+// TestMoveOpenedFile tells how a file the index doesn't hold, as one
+// opened, joins an album of it.
+func TestMoveOpenedFile(t *testing.T) {
+	ti := newIndex(t)
+	ti.write(t, "Kites/01.mp3", "Paper Kites|Ada Field|Kites|Ada Field|1", time.Hour)
+	ti.scan(t)
+	opened := filepath.Join(t.TempDir(), "opened.mp3")
+	if err := os.WriteFile(opened, []byte("Loose|Ada Field|||"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got, err := ti.MoveTo(opened, ti.Albums()[0].ID)
+	if err != nil || got.Album != "Kites" || !slices.Equal(got.AlbumArtists, []string{"Ada Field"}) {
+		t.Errorf("%+v, %v", got, err)
 	}
 }

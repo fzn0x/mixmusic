@@ -64,18 +64,19 @@ type Move struct {
 // join the album of id, as the index groups albums: by their titles and
 // album artists, or, without album artists, by the folder their files are
 // in. An album without album artists that the file isn't in the folder of
-// gets those it shows, as its one artist or Various artists.
+// gets those it shows, as its one artist or Various artists. The file
+// needn't be one of the index's, as one opened.
 func (x *Index) MoveTo(path, id string) (Move, error) {
-	e, ok := x.Entry(path)
-	if !ok {
-		return Move{}, errors.New("the song is no longer on this computer")
-	}
 	a, ok := x.Album(id)
 	if !ok || len(a.Tracks) == 0 {
 		return Move{}, errors.New("the album is no longer on this computer")
 	}
-	if t := e.track(); t.Album != nil && t.Album.ID == id {
-		return Move{}, errors.New("the song is on that album already")
+	// A file opened, which no folder of the index holds, can join one of
+	// its albums too.
+	if e, ok := x.Entry(path); ok {
+		if t := e.track(); t.Album != nil && t.Album.ID == id {
+			return Move{}, errors.New("the song is on that album already")
+		}
 	}
 	var entries []Entry
 	for _, t := range a.Tracks {

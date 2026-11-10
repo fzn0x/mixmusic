@@ -3,8 +3,9 @@
 
 With MixMusic on two computers of the same network, as a desktop and a
 laptop, one can show what the other plays and control it: play, pause,
-next, previous, seeking and the volume. There is no server and no
-account: the two find each other on the network and talk directly.
+next, previous, seeking, the volume and the queue. It can also move what
+plays on it to the other. There is no server and no account: the two
+find each other on the network and talk directly.
 
 ## Turn it on
 
@@ -43,9 +44,40 @@ it plays, and the tracks after it. Under them:
 - the seek bar, which seeks once you let go of it;
 - the volume of that computer.
 
+Its queue, under **Next on …**, works as this computer's does: click a
+track's cover, or double-click the track, to play it there; drag a track
+onto another to move it to that one's place; the cross beside a track, or
+**Remove from the queue** in its menu, takes it out; and **Clear** empties
+the queue there after the track that plays.
+
 What you do there, on its own window, its keys or its media controls,
 shows here too. The page connects again by itself when the other computer
 was asleep or left the network a moment.
+
+## Move what plays here there
+
+While something plays on this computer, the page of the other shows it,
+under **On this computer**, with **Move to …**. That moves it there: the
+queue, the track that plays and where it is, whether it plays, shuffle
+and repeat. The other computer plays it in place of what it played, and
+this one pauses. The queue moves with up to 100 tracks before the one that
+plays and the rest after it, 1,000 tracks at most.
+
+Each track plays there as if it had been chosen there:
+
+- **YouTube Music and Spotify** tracks play as that computer plays
+  theirs: a Spotify track as its Spotify settings say, or from YouTube
+  Music when it isn't signed in to Spotify. A track that needs a sign-in
+  that computer hasn't fails there, as it would if chosen there.
+- **Music files of this computer** don't move: their paths name nothing
+  on the other computer. It plays its own file of the same song instead:
+  one whose tags have the same title and an artist of the same name, of
+  the same length give or take 3 seconds, of the same album first. A file
+  it doesn't have is left out of the queue there, and this computer says
+  how many were. When the track that plays here is one, the next track
+  plays there, from its start. When it has none of the tracks, nothing
+  moves, and the music plays on here. A file is never looked for on
+  YouTube Music or Spotify.
 
 ## Paired computers
 
@@ -100,8 +132,11 @@ about it:
 - **"Another computer answered in place of …"**: something else on the
   network answers at the address of the computer paired. MixMusic doesn't
   talk to it.
+- **"MixMusic on … is older"**: update MixMusic there. Until then its page
+  here shows what plays there and controls it, but doesn't change its
+  queue or move what plays here to it.
 
 ## Not yet
 
-Handing what plays here over to the other computer, playing a track of
-its queue from here, and seeing more than its next 20 tracks.
+Seeing more than the other computer's next 20 tracks, and moving what
+plays there to this computer.

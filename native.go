@@ -220,6 +220,9 @@ type shell struct {
 	statsDay   dayTip
 	statsTable bool
 	statsRows  ui.ListState
+	// recapPick is the year of the recap on the stats, by its place in
+	// the years it lists, the latest first.
+	recapPick int
 	// The command palette, what it searches, and its row chosen;
 	// paletteMoved is set in the frame the keys move the choice.
 	paletteOpen  bool

@@ -264,6 +264,7 @@ code {
 .brand:hover { color: var(--ink); }
 .appbar-nav { display: flex; gap: 4px; margin-left: auto; }
 .appbar-nav a {
+  white-space: nowrap;
   padding: 8px 14px;
   border-radius: 999px;
   color: var(--ink-2);
@@ -1227,6 +1228,27 @@ html.no-js .demo-wrap { display: none; }
 
 @media (max-width: 1080px) {
   .appbar-nav a[href="#new"] { display: none; }
+}
+
+/* Between the phone's layout and the desktop's, the labels of the bar sit
+   closer, so that they stay on one line inside it (#426). */
+@media (max-width: 960px) {
+  .appbar-inner { gap: 12px; }
+  .appbar-nav { gap: 0; }
+  .appbar-nav a { padding: 8px 10px; }
+}
+
+/* The GitHub button's words go, for the star and its count: they are still
+   read aloud. */
+@media (max-width: 900px) and (min-width: 761px) {
+  .appbar-inner .btn > span:first-of-type {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 960px) {

@@ -328,18 +328,22 @@ func TestSessionEnds(t *testing.T) {
 	})
 }
 
-// TestHeartbeat pings the device while the session lasts.
+// TestHeartbeat pings the device while the session lasts: the device
+// answers each ping, so the session outlasts silentFor. It waits for the
+// pings, not for some pings' time, as CI's runners can be slow.
 func TestHeartbeat(t *testing.T) {
 	d := casttest.New(t)
 	h := newHeard()
 	open(t, d, h)
-	// Five pings' time: the device answers each, and the session lasts.
-	select {
-	case err := <-h.ended:
-		t.Fatalf("ended: %v", err)
-	case <-time.After(5 * pingEvery):
-	}
-	if d.Pings() == 0 {
-		t.Error("no pings")
+	start := time.Now()
+	deadline := time.After(10 * time.Second)
+	for d.Pings() < 3 || time.Since(start) < silentFor+2*pingEvery {
+		select {
+		case err := <-h.ended:
+			t.Fatalf("ended after %v and %d pings: %v", time.Since(start), d.Pings(), err)
+		case <-deadline:
+			t.Fatalf("%d pings in %v", d.Pings(), time.Since(start))
+		case <-time.After(pingEvery):
+		}
 	}
 }

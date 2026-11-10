@@ -168,7 +168,7 @@ jobs:
           cd "$RUNNER_TEMP"
           url=https://github.com/yt-dlp/yt-dlp/releases/latest/download
           for f in SHA2-256SUMS yt-dlp_linux yt-dlp_linux.zip; do
-            curl -fsSL --retry 3 -o "$f" "$url/$f"
+            curl -fsSL --retry 5 --retry-delay 10 --retry-max-time 120 --retry-all-errors -o "$f" "$url/$f"
           done
           grep -E ' (yt-dlp_linux|yt-dlp_linux\.zip)$' SHA2-256SUMS | sha256sum -c -
           chmod +x yt-dlp_linux

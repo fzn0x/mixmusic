@@ -311,6 +311,10 @@ func TestLinkByHand(t *testing.T) {
 	if err := ti.Link([]string{TrackID(a)}); err == nil {
 		t.Error("a file was linked alone")
 	}
+	opened := filepath.Join(t.TempDir(), "opened.mp3")
+	if err := ti.Link([]string{TrackID(a), TrackID(opened)}); err != errOutside {
+		t.Errorf("a file beyond the folders of music linked: %v", err)
+	}
 }
 
 // TestLinkSongs makes two songs with copies one, by hand: OnLinked hears

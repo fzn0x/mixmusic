@@ -441,8 +441,12 @@ func (x *Index) SongIDs() map[string]string {
 	return out
 }
 
-// errOneFile is a link of fewer than two files.
-var errOneFile = errors.New("a song needs two files or more to link")
+// errOneFile is a link of fewer than two files, and errOutside one of a
+// track that isn't a song of the folders of music, as a file opened.
+var (
+	errOneFile = errors.New("a song needs two files or more to link")
+	errOutside = errors.New("only the songs of your folders of music can be linked as copies")
+)
 
 // Link makes the tracks of ids copies of one song, by hand: files of the
 // index, and songs with copies, which become one. They stay linked
@@ -453,6 +457,7 @@ func (x *Index) Link(ids []string) error {
 	defer c.mu.Unlock()
 	x.mu.Lock()
 	var paths, songs []string
+	outside := false
 	for _, id := range ids {
 		if s := x.songOf(id); s != nil {
 			if !slices.Contains(songs, s.id) {
@@ -461,17 +466,21 @@ func (x *Index) Link(ids []string) error {
 			paths = append(paths, s.copies...)
 			continue
 		}
-		if p, ok := PathOf(id); ok {
-			if e, ok := x.entries[p]; ok && e.Skipped == "" {
-				paths = append(paths, p)
-			}
+		p, ok := PathOf(id)
+		if e, in := x.entries[p]; ok && in && e.Skipped == "" {
+			paths = append(paths, p)
+		} else {
+			outside = true
 		}
 	}
 	saved := c.state.saved
 	x.mu.Unlock()
 	slices.Sort(paths)
 	paths = slices.Compact(paths)
-	if len(paths) < 2 {
+	switch {
+	case outside:
+		return errOutside
+	case len(paths) < 2:
 		return errOneFile
 	}
 	next := cloneLinks(saved)

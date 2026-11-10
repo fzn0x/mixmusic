@@ -299,6 +299,7 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 		if a.Source != media.SourceLocal && a.Source != media.SourceFile && m.Item("Download").Chosen() {
 			s.downloadAlbum(a.ID)
 		}
+		s.editAlbumItem(m, a)
 		s.copyLinkItem(m, a.URL)
 	})
 	switch {

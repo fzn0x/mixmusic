@@ -370,6 +370,7 @@ func (s *shell) localItems(m *ui.Menu, t media.Track) {
 	if m.Item(label).Chosen() {
 		mygo.Shell.ShowItemInFolder(path)
 	}
+	s.tagItems(m, t)
 }
 
 // localArt is the covers of the music on this computer, which show from

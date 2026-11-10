@@ -512,13 +512,13 @@ func TestDragInSpotifyPlaylist(t *testing.T) {
 	partly.TrackCount = 5
 	s, tt = collabShell(t, signedInTo(false, true), partly)
 	dragTrack(t, s, tt, bandTracks[3].Title, bandTracks[1].Title)
-	if got := asks.asked(); len(got) != 0 || !slices.Equal(titlesShown(t, tt, bandTracks), titlesOf(bandTracks)) {
+	if got := asks.asked(); len(got) != 0 || !slices.Equal(titlesShown(t, tt, bandTracks), collabTitles(bandTracks)) {
 		t.Errorf("a playlist with an item not shown moved: asked %q, shows %q", got, titlesShown(t, tt, bandTracks))
 	}
 }
 
-// titlesOf returns the titles of tracks.
-func titlesOf(tracks []media.Track) []string {
+// collabTitles returns the titles of tracks.
+func collabTitles(tracks []media.Track) []string {
 	out := make([]string, len(tracks))
 	for i, tr := range tracks {
 		out[i] = tr.Title

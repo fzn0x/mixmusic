@@ -6,6 +6,4 @@
   Settings › Desktop › Remote control lists the computers paired, each
   with Remove. There is no server and no account: the two computers find
   each other on the network and talk directly, encrypted, each sure of
-  the other's key since the pairing. Handing what plays over to the other
-  computer, and playing a track of its queue from here, come later
-  (#353).
+  the other's key since the pairing (#353).

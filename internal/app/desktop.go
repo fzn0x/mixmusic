@@ -77,6 +77,7 @@ func (a *App) Start() {
 	a.watchUpdates()
 	a.watchNetwork()
 	a.watchCast()
+	a.watchRemote()
 	a.downloads.Start()
 	a.startLocalFiles()
 	go a.keepYTDLPCurrent()

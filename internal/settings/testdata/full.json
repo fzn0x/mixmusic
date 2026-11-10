@@ -59,6 +59,7 @@
   "podcastSpeed": 1.5,
   "skipDisliked": false,
   "skipAi": true,
+  "cleanVersions": true,
   "musicVideos": true,
   "equalizer": {
     "enabled": true,

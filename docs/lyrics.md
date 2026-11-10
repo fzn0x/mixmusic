@@ -128,6 +128,10 @@ Arabic doesn't write its short vowels, which no rule can tell, so Arabic's roman
 
 For lyrics in another script that MixMusic doesn't romanize itself, the Romanize switch shows once you turn on Translate and their translation from Unison comes with Latin letters.
 
+## Share lines
+
+Share lines, above the lyrics, saves lines you choose as an image card. Click Share lines, then click each line to choose it: it shows tinted, and a second click lets it go. Up to 12 lines fit a card. While you choose, a click on a line doesn't play the song from there. Save image saves a square card and Save for a story a tall one, as a PNG, where the system's dialog says. The card sets the lines large, with the song's cover, title and artist at its foot, in the colours of your theme, and ends with where the lyrics come from, as their licence asks. Done stops choosing. What a line shows, in Latin letters or translated, is what the card holds: the line as the lyrics show it, with no line under it.
+
 ## The notch player's line
 
 On a MacBook with a notch, the [notch player's](desktop.md#the-player-around-the-notch) panel shows the lyrics beside the player: the line sung now, larger, the line before and the line after it, following the music. It shows them in Latin letters as you chose for their language in the panel, with the line in Latin letters under the line sung now when you show them under. Plain lyrics say "No timed lyrics.", and a podcast episode shows its chapter instead, with those before and after it.

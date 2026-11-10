@@ -300,6 +300,7 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 			s.downloadAlbum(a.ID)
 		}
 		s.copyLinkItem(m, a.URL)
+		s.shareItem(m, albumShare(a))
 	})
 	switch {
 	case play:
@@ -333,6 +334,7 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 			s.downloadPlaylist(p.ID)
 		}
 		s.copyLinkItem(m, p.URL)
+		s.shareItem(m, playlistShare(p))
 		s.changeCoverItem(m, p)
 		if more != nil {
 			more(m, p)

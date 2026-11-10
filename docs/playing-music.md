@@ -25,14 +25,25 @@ The [command palette](settings.md#the-command-palette) (Ctrl+K) searches too: ty
 ## Playing from anywhere
 
 - **A track's row:** double-click it, or click its cover, to play the list from that track: the album, the playlist or the search results. Doing so on the track that plays pauses it.
-- **A track's menu,** from the … button of its row or a right click: Play, Play next, Add to queue, Start radio, Add to liked songs, Dislike, [Add to library](library.md#youtube-music-playlists-albums-and-artists) (YouTube Music, signed in), [Add to mix](library.md#mixes), [Add to YouTube Music playlist](library.md#youtube-music-playlists-albums-and-artists) (signed in), [Download](library.md#downloads), Go to the artist, Go to album, Open in Spotify or YouTube Music, and Copy link. A Spotify track that plays from YouTube Music also has Find another YouTube Music match, for when the recording found is the wrong one.
-- **An album's or a playlist's page:** Play and Shuffle, and the More menu: Play next, Add to queue, Start radio, Save as a new mix, Save as a YouTube Music playlist (signed in), Open on its service and Copy link.
+- **A track's menu,** from the … button of its row or a right click: Play, Play next, Add to queue, Start radio, Add to liked songs, Dislike, [Add to library](library.md#youtube-music-playlists-albums-and-artists) (YouTube Music, signed in), [Add to mix](library.md#mixes), [Add to YouTube Music playlist](library.md#youtube-music-playlists-albums-and-artists) (signed in), [Download](library.md#downloads), Go to the artist, Go to album, Open in Spotify or YouTube Music, Copy link, and [Share](#sharing). A Spotify track that plays from YouTube Music also has Find another YouTube Music match, for when the recording found is the wrong one.
+- **An album's or a playlist's page:** Play and Shuffle, and the More menu: Play next, Add to queue, Start radio, Save as a new mix, Save as a YouTube Music playlist (signed in), Open on its service, Copy link and [Share](#sharing). The tiles of albums, playlists and mixes have Share in their menus too.
 - **An artist's page:** Play top songs and [Follow](library.md#artists-you-follow), then Top songs, Albums, Singles & EPs, and Fans also like. Its More menu follows the artist or stops, and starts a radio of the artist.
 - **A tile,** on Home, Explore, the search or the library: its play button plays it, and clicking the tile opens its page.
 - **Home's Jump back in** plays the track you played last again.
 - **[Synced lyrics](lyrics.md#synced-and-plain-lyrics):** click a line to play the song from there.
 
 A track that loads can't be paused or moved until you hear it: the play button shows that it loads, and the keys and media controls wait too. Choosing another track still leaves it.
+
+## Sharing
+
+Share, in the menu of a song, an album, a playlist or a mix, has what to send to a friend. There is no server in it: the links go to the services' own pages, and the images are made on your computer.
+
+- **Copy link** copies the page of the song, album or playlist on its service. A Spotify song that MixMusic has found on YouTube Music, as it does when the song plays or downloads, has both: Copy the link on Spotify and Copy the link on YouTube Music. A mix and a file on this computer have no page, so they have no link to copy.
+- **Save image…** saves a square card, for a chat or a feed, as a PNG. **Save image for a story…** saves a tall one, 1080 by 1920 pixels. The system's dialog asks where. The card has the cover, the kind (Song, Album, Single, EP, Playlist or Mix), the title and the artist, in the colours of the theme you use now, in its typeface where MixMusic has it. Titles that don't fit end with an ellipsis.
+
+Letters of Hebrew, Arabic, Chinese, Japanese and Korean come from the fonts your system has. MixMusic doesn't carry them, so a computer without one shows those letters blank.
+
+For lyrics, see [Share lines](lyrics.md#share-lines).
 
 ## Track info
 

@@ -130,7 +130,8 @@ func (s *Server) Serve(ln net.Listener) error {
 	}
 }
 
-// Close stops listening, and closes every connection.
+// Close stops listening, and closes every connection, telling the other
+// computers that remote control is off.
 func (s *Server) Close() error {
 	s.mu.Lock()
 	s.closed = true
@@ -139,6 +140,7 @@ func (s *Server) Close() error {
 	s.conns = nil
 	s.mu.Unlock()
 	for c := range conns {
+		_ = c.w.send(message{Type: "refused", Reason: reasonOff}, 300*time.Millisecond)
 		c.conn.Close()
 	}
 	if ln != nil {

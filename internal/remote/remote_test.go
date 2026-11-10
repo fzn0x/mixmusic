@@ -650,7 +650,8 @@ func TestVanished(t *testing.T) {
 	waitFor(t, "the session's end there", func() bool { return s.Sessions() == 0 }, func() any { return s.Sessions() })
 }
 
-// TestClosed ends the sessions as the server closes.
+// TestClosed ends the sessions as the server closes, as remote control
+// turns off, which they're told.
 func TestClosed(t *testing.T) {
 	h := newFakeHost()
 	s, addr := serve(t, h, fast)
@@ -667,6 +668,9 @@ func TestClosed(t *testing.T) {
 	case <-sess.Done():
 	case <-time.After(5 * time.Second):
 		t.Fatal("the session went on after the server closed")
+	}
+	if !errors.Is(sess.Err(), ErrOff) {
+		t.Errorf("the session ended with %v", sess.Err())
 	}
 	if _, err := d.Connect(context.Background(), addr, peer.Key); err == nil {
 		t.Error("connected to a server closed")

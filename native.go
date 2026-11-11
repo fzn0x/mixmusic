@@ -303,6 +303,9 @@ type shell struct {
 	// picks are the tracks selected in a track list, which the bar above
 	// the player bar acts on (trackselect.go).
 	picks trackPicks
+	// exports is whether the tracks selected have any to export
+	// (export.go).
+	exports exportMemo
 	// listTops are where the track lists and the shelves were in the frame
 	// before, by key.
 	listTops map[string]float32

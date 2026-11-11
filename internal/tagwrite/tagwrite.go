@@ -4,7 +4,8 @@
 // MP3 files, Vorbis comments and PICTURE blocks in FLAC files, the
 // comment header of Ogg Opus and Ogg Vorbis files, and the items of an
 // MP4 file's ilst, as M4A files hold them. WAV files it leaves as they
-// are.
+// are. RemuxWebM writes the Opus of a WebM file, whose tags other players
+// don't read, as an Ogg Opus file with tags, for an export.
 //
 // Only the tags change. The audio is copied byte for byte, as are the
 // tags a file holds that the write doesn't name, and the new tags come

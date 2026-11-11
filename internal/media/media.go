@@ -92,6 +92,10 @@ type Track struct {
 	Plays int64 `json:"plays,omitempty"`
 	// URL opens the track on the service's website.
 	URL string `json:"url,omitempty"`
+	// ISRC is the recording's International Standard Recording Code,
+	// where its service gives one: Spotify does, of a track but on an
+	// album's page.
+	ISRC string `json:"isrc,omitempty"`
 	// EntryID names the track's place in the playlist it was read from,
 	// which taking it out of the playlist names; only YouTube Music sets it.
 	EntryID string `json:"entryId,omitempty"`

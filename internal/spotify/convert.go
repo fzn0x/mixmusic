@@ -49,6 +49,11 @@ type track struct {
 	Artists      []artist     `json:"artists"`
 	Album        *album       `json:"album"`
 	ExternalURLs externalURLs `json:"external_urls"`
+	// ExternalIDs are of a whole track, as a playlist's or a search's;
+	// an album's page leaves them out.
+	ExternalIDs struct {
+		ISRC string `json:"isrc"`
+	} `json:"external_ids"`
 }
 
 type owner struct {
@@ -147,6 +152,7 @@ func toTrack(t *track, from *album) (media.Track, bool) {
 		Explicit:   t.Explicit,
 		Artwork:    []media.Image{},
 		URL:        t.ExternalURLs.Spotify,
+		ISRC:       t.ExternalIDs.ISRC,
 	}
 	if al != nil {
 		mt.Album = &media.Ref{ID: media.ID(media.SourceSpotify, al.ID), Name: al.Name}

@@ -126,12 +126,23 @@ func (o *object) query(iid *guid) (*object, error) {
 	return q, nil
 }
 
-// hresult is the error of a failed HRESULT, nil for a success.
+// hresultWords tell what the HRESULTs the firewall gives most mean.
+var hresultWords = map[uint32]string{
+	0x80070005: "access denied: only an administrator may change the firewall's rules",
+	0x800706d9: "Windows Firewall's service doesn't run",
+}
+
+// hresult is the error of a failed HRESULT, in words when it's a known
+// one; nil for a success.
 func hresult(r uintptr) error {
-	if int32(uint32(r)) < 0 {
-		return fmt.Errorf("HRESULT %#x", uint32(r))
+	code := uint32(r)
+	if int32(code) >= 0 {
+		return nil
 	}
-	return nil
+	if words, ok := hresultWords[code]; ok {
+		return fmt.Errorf("%s (HRESULT %#x)", words, code)
+	}
+	return fmt.Errorf("HRESULT %#x", code)
 }
 
 // variant is VARIANT on 64-bit Windows: its type, and a union of 16 bytes

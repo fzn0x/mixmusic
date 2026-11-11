@@ -42,3 +42,17 @@ MixMusic's files, the resolver and the engine hold.
 - **Copies.** `trackCopies` is the place a song's copies are to show,
   side by side, the one that plays marked, once MixMusic links them
   (#340). It shows nothing yet.
+- **How a stream was found** (`trackinfostream.go`, #475). The stream the
+  resolver holds tells its route (`Stream.Route`: the player API, yt-dlp's
+  quick run, its full run, or the full run as the account), the
+  arguments of the yt-dlp run that found it (`Stream.Args`), and whether
+  it was asked for as the account (`Stream.AsAccount`). `TrackStream`
+  carries them, the arguments as one command line that `stream.ShownArgs`
+  made safe to show: the session's cookies file, tokens (PO token,
+  visitor data, data sync ID and the like), passwords and a proxy's login
+  are hidden, and the user's home folder is "~". Only a stream the
+  resolver holds is told of: one that plays from a download or the cache
+  has none. Copy stream URL puts `TrackStream.URL` on the clipboard. The
+  address stops working after a few hours and carries the IP address of
+  the network that asked for it, so nothing shows it, logs it or keeps
+  it beyond the resolver's own copy: only the click copies it.

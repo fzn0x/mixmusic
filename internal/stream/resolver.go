@@ -110,6 +110,11 @@ type Stream struct {
 	// Music account (Resolver.SetAsAccount), and false for one asked for
 	// signed out, as every stream was before.
 	AsAccount bool
+	// Route is how the stream was found, and Args, of a run of yt-dlp, the
+	// arguments it ran with: they may name the user's folders and the file
+	// of their session, so what shows them hides those (ShownArgs).
+	Route Route
+	Args  []string
 	// Surround is the video's 5.1 surround audio, AC-3 or E-AC-3 in MP4,
 	// beside the stereo audio of the Stream, when YouTube has one the
 	// engine plays: nil otherwise, in the Surround stream itself, and in
@@ -128,6 +133,35 @@ type Stream struct {
 	// packed audio of the segments of an HLS media playlist, which has no
 	// size, nor a length.
 	Live bool
+}
+
+// Route is how a stream was found.
+type Route string
+
+const (
+	// RoutePlayerAPI is YouTube's player API, asked as YouTube's visionOS
+	// app, the direct route.
+	RoutePlayerAPI Route = "player-api"
+	// RouteQuick is yt-dlp's quick run, as the visionOS client alone.
+	RouteQuick Route = "yt-dlp-quick"
+	// RouteFull is yt-dlp's full run, with its default clients and the
+	// JavaScript runtime.
+	RouteFull Route = "yt-dlp-full"
+	// RouteAccount is yt-dlp's full run with the user's YouTube Music
+	// session, as their account (Resolver.SetAsAccount).
+	RouteAccount Route = "yt-dlp-account"
+)
+
+// found returns s, which a run of yt-dlp with args found, or the player
+// API, with how it was found: the 5.1 surround audio beside it too.
+func (s Stream) found(route Route, args []string) Stream {
+	s.Route, s.Args = route, append([]string(nil), args...)
+	if s.Surround != nil {
+		sur := *s.Surround
+		sur.Route, sur.Args = s.Route, s.Args
+		s.Surround = &sur
+	}
+	return s
 }
 
 // slowResolve is how long finding a stream takes before the log tells.
@@ -352,6 +386,7 @@ func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality)
 			if took := time.Since(start); took > slowResolve {
 				log.Printf("mixmusic: found the stream of %s in %s, through YouTube's player API", videoID, took.Round(10*time.Millisecond))
 			}
+			s = s.found(RoutePlayerAPI, nil)
 			if s.Surround != nil && s.Surround.URL == "" && !r.findsSurround() {
 				log.Printf("mixmusic: YouTube has 5.1 surround audio of %s, which takes yt-dlp and a JavaScript runtime to play", videoID)
 				s.Surround = nil
@@ -431,7 +466,11 @@ func (r *Resolver) ytdlp(ctx context.Context, videoID string, quality Quality) (
 	if err != nil {
 		return Stream{}, err
 	}
-	return parseInfo(out)
+	s, err := parseInfo(out)
+	if err != nil {
+		return Stream{}, err
+	}
+	return s.found(RouteFull, args), nil
 }
 
 // runYTDLP runs yt-dlp, turning its error output into the error.

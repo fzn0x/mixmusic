@@ -71,7 +71,10 @@
   engine plays, or a live stream, falls back to the ways above, and a
   stream found so that YouTube refuses (`Forget`) is found signed out
   from then on (`refusedAsAccount`). `Stream.AsAccount` tells which way a
-  stream was found. Which account's answers tell Premium, the youtube
+  stream was found. `Stream.Route` tells which route found it, and
+  `Stream.Args` the arguments of the run of yt-dlp that did (#475): Track
+  info shows them through `ShownArgs`, which hides the session file, tokens
+  and passwords, and the home folder. Which account's answers tell Premium, the youtube
   package reads (`Client.Premium`).
   The player API also tells how loud YouTube measured each video
   (`Stream.Loudness`, `Direct.Loudness`). Both list the streams of a

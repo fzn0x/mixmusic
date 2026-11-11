@@ -147,6 +147,7 @@ func (s *shell) trackInfoBody(c *ui.Context, t media.Track, l *loaded[app.TrackI
 		return
 	}
 	s.infoRows(c, trackFacts(t, l.value))
+	s.streamCopy(c, l.value.Stream)
 	if rows := tagRows(l.value); len(rows) > 0 {
 		ui.Text(c, k.sentence("its tags")).FontSize(k.smallSize()).FontWeight(k.leadWeight()).Margin(8, 0, 0)
 		s.infoRows(c, rows)
@@ -258,6 +259,7 @@ func trackFacts(t media.Track, info app.TrackInfo) []infoRow {
 	} else if st != nil && st.Size > 0 {
 		rows = append(rows, infoRow{"Size", byteSize(st.Size), false})
 	}
+	rows = append(rows, streamRows(st)...)
 	if info.Playing {
 		rows = append(rows, infoRow{"Playing", playingLine(info), false})
 	}

@@ -89,7 +89,11 @@ func (r *Resolver) quickYTDLP(ctx context.Context, videoID string, quality Quali
 	if err != nil {
 		return Stream{}, err
 	}
-	return parseInfo(out)
+	s, err := parseInfo(out)
+	if err != nil {
+		return Stream{}, err
+	}
+	return s.found(RouteQuick, args), nil
 }
 
 // withoutJSRuntime returns args, the arguments of every run of yt-dlp,

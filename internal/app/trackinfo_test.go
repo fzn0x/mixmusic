@@ -2,9 +2,13 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -144,9 +148,10 @@ func TestTrackInfoOfADownload(t *testing.T) {
 func TestTrackInfoOfAStream(t *testing.T) {
 	a := newQuietApp(t, nil)
 	a.resolver.Direct = nil
+	expires := time.Now().Add(6 * time.Hour).Unix()
 	a.resolver.Run = func(context.Context, ...string) ([]byte, error) {
 		return fmt.Appendf(nil, `{"url": "https://example.com/a?expire=%d", "ext": "m4a", "acodec": "mp4a.40.2", "abr": 129.5,
-			"filesize": 2000, "duration": 200}`, time.Now().Add(6*time.Hour).Unix()), nil
+			"filesize": 2000, "duration": 200}`, expires), nil
 	}
 	if info := infoOf(t, a, ytTrack("ddddddddddd"), nil); info.Stream != nil || info.File != nil || info.Engine != nil {
 		t.Errorf("a track not found yet: %+v", info)
@@ -155,9 +160,69 @@ func TestTrackInfoOfAStream(t *testing.T) {
 		t.Fatal(err)
 	}
 	info := infoOf(t, a, ytTrack("ddddddddddd"), nil)
-	want := TrackStream{Codec: "AAC", Container: "MP4", Bitrate: 129.5, Size: 2000, Duration: 200 * time.Second}
-	if info.Stream == nil || *info.Stream != want {
-		t.Errorf("a stream found: %+v", info.Stream)
+	url := fmt.Sprintf("https://example.com/a?expire=%d", expires)
+	want := TrackStream{Codec: "AAC", Container: "MP4", Bitrate: 129.5, Size: 2000, Duration: 200 * time.Second,
+		Route: stream.RouteQuick, URL: url}
+	got := info.Stream
+	if got == nil {
+		t.Fatal("no stream found")
+	}
+	command := got.Command
+	got.Command = ""
+	if *got != want {
+		t.Errorf("a stream found: %+v, want %+v", got, want)
+	}
+	for _, part := range []string{"yt-dlp -J --no-playlist -f \"" + ytFormatOf(t) + "\"", `--extractor-args "youtube:player_client=visionos;skip=hls,dash"`,
+		"-- https://music.youtube.com/watch?v=ddddddddddd"} {
+		if !strings.Contains(command, part) {
+			t.Errorf("the arguments shown lack %q: %s", part, command)
+		}
+	}
+	if strings.Contains(command, url) {
+		t.Errorf("the arguments shown hold the stream's address: %s", command)
+	}
+}
+
+// ytFormatOf is the format selector yt-dlp asks for the best quality.
+func ytFormatOf(t *testing.T) string {
+	t.Helper()
+	var got string
+	r := stream.NewResolver(nil, "")
+	r.Run = func(_ context.Context, args ...string) ([]byte, error) {
+		got = args[slices.Index(args, "-f")+1]
+		return nil, errors.New("stop")
+	}
+	r.Resolve(context.Background(), "ddddddddddd")
+	return got
+}
+
+// TestTrackInfoOfAStreamAsTheAccount tells that a stream was asked for as
+// the user's YouTube Music account, and hides the file of their session
+// in the arguments it shows.
+func TestTrackInfoOfAStreamAsTheAccount(t *testing.T) {
+	a := newQuietApp(t, nil)
+	a.resolver.Direct = nil
+	// Without tools the resolver asks as the account, as it does in its tests.
+	a.resolver.Tools = nil
+	a.resolver.Session = func() []*http.Cookie {
+		return []*http.Cookie{{Name: "LOGIN_INFO", Value: "made-up-login"}, {Name: "SAPISID", Value: "made-up-sapisid"}}
+	}
+	a.resolver.SetAsAccount(true)
+	var cookies string
+	a.resolver.Run = func(_ context.Context, args ...string) ([]byte, error) {
+		cookies = args[slices.Index(args, "--cookies")+1]
+		return fmt.Appendf(nil, `{"url": "https://example.com/a?expire=%d", "ext": "webm", "acodec": "opus", "abr": 256, "duration": 200}`,
+			time.Now().Add(6*time.Hour).Unix()), nil
+	}
+	if _, err := a.resolver.Resolve(context.Background(), "ddddddddddd"); err != nil {
+		t.Fatal(err)
+	}
+	st := infoOf(t, a, ytTrack("ddddddddddd"), nil).Stream
+	if st == nil || !st.AsAccount || st.Route != stream.RouteAccount || cookies == "" {
+		t.Fatalf("a stream as the account: %+v", st)
+	}
+	if !strings.Contains(st.Command, "--cookies (hidden)") || strings.Contains(st.Command, cookies) || strings.Contains(st.Command, "made-up") {
+		t.Errorf("the arguments shown: %s", st.Command)
 	}
 }
 

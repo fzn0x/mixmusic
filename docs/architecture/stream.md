@@ -22,7 +22,11 @@
   plays it from where it is while 5.1 is on. Their URLs
   need a challenge solved, which yt-dlp does with a JavaScript runtime:
   it finds the 5.1 audio as it is asked for (`Resolver.Surround`), once,
-  in some 3 s, and YouTube serves it a few seconds after. Without yt-dlp
+  in some 3 s, and YouTube serves it a few seconds after. The proxy tells
+  whether it serves a video's 5.1 audio at once (`Proxy.SurroundReady`):
+  from the cache, or found, once YouTube serves it. Else the player plays
+  the stereo audio while the proxy makes the 5.1 audio ready
+  (`Proxy.PrepareSurround`), and the 5.1 audio once it is. Without yt-dlp
   and a runtime, no 5.1 audio is offered.
   A live video's audio is an HLS media playlist (RFC 8216) of AAC-LC in
   packed audio, format 234, or 233 with data saver, which `Proxy.OpenLive`

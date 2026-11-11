@@ -186,8 +186,10 @@ or E-AC-3, format 328.
   need a challenge solved, which only yt-dlp does. MixMusic has it find
   the mix only when it is asked for, as you press 5.1 or a track starts
   with "Play 5.1 surround when a track has it" on, once a track, in about
-  3 seconds; YouTube serves it a few seconds after. Without yt-dlp and a
-  runtime, no 5.1 is offered.
+  3 seconds; YouTube serves it a few seconds after. The track plays in
+  stereo meanwhile, and goes on in 5.1 from where it is once YouTube
+  serves the mix; before 0.5.11, it was silent until then. Without yt-dlp
+  and a runtime, no 5.1 is offered.
 - **Which.** AC-3 first, then the mix of the most bits, of the original
   audio track.
 - **Offline.** Downloads keep the stereo audio only, which plays while

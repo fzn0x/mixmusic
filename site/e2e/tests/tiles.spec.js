@@ -14,6 +14,10 @@ const center = (loc) => loc.evaluate((el) => el.scrollIntoView({ block: "center"
 // Longer than any wait between two changes of a picture, as tiles.js
 // plays them: a picture that didn't change for that long is held.
 const held = 3500;
+// How long a round of Downloads may take: WebKit on a busy runner keeps
+// the steps' timers late, and a card starts after those that came in with
+// it.
+const round = { timeout: 10_000 };
 const headings = [
   "Lyrics in your language",
   "Podcasts",
@@ -52,9 +56,9 @@ test("a card plays on its own, again and again, once in the window, and is back 
   }
   await expect(percent, "out of the window, it waits at its start").toHaveText("40%");
   await center(downloads);
-  await expect(percent).toHaveText("100%");
-  await expect(percent, "back at its start").toHaveText("40%");
-  await expect(percent, "and again").toHaveText("100%");
+  await expect(percent).toHaveText("100%", round);
+  await expect(percent, "back at its start").toHaveText("40%", round);
+  await expect(percent, "and again").toHaveText("100%", round);
   await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
   await expect(percent, "out of the window, back at its start").toHaveText("40%", { timeout: 3000 });
 });
@@ -78,13 +82,13 @@ test("hovering a card holds it where it is, and leaving it lets it go on", async
   const downloads = card(page, "Downloads");
   const percent = downloads.locator("[data-percent]");
   await center(downloads);
-  await expect(percent).toHaveText("100%");
+  await expect(percent).toHaveText("100%", round);
   await downloads.hover();
   const at = await percent.textContent();
   await page.waitForTimeout(held);
   await expect(percent, "hovered, it held").toHaveText(at);
   await page.mouse.move(0, 0);
-  await expect(percent, "and goes on once left").not.toHaveText(at);
+  await expect(percent, "and goes on once left").not.toHaveText(at, round);
 });
 
 test("the keyboard's focus holds a card too", async ({ page }) => {
@@ -94,7 +98,7 @@ test("the keyboard's focus holds a card too", async ({ page }) => {
   const queue = dislikes.locator(".ta-qwrap");
   const at = () => queue.getAttribute("data-at");
   await center(dislikes);
-  await expect(queue, "it plays: the queue passes over the song disliked").toHaveAttribute("data-at", "2");
+  await expect(queue, "it plays: the queue passes over the song disliked").toHaveAttribute("data-at", "2", round);
   // A key first, so that the focus that follows is the keyboard's.
   await page.keyboard.press("Shift");
   await dislikes.focus();
@@ -105,7 +109,7 @@ test("the keyboard's focus holds a card too", async ({ page }) => {
   // The focus leaves without scrolling the card away, as Tab may: out of the
   // window, it would go back to its start.
   await dislikes.evaluate((el) => el.blur());
-  await expect.poll(at, { message: "and goes on once the focus left" }).not.toBe(was);
+  await expect.poll(at, { message: "and goes on once the focus left", ...round }).not.toBe(was);
 });
 
 test("on a touch screen the cards play on their own too", async ({ browser, browserName, baseURL }) => {
@@ -119,7 +123,7 @@ test("on a touch screen the cards play on their own too", async ({ browser, brow
   const downloads = card(page, "Downloads");
   const percent = downloads.locator("[data-percent]");
   await center(downloads);
-  await expect(percent).toHaveText("100%", { timeout: 6000 });
-  await expect(percent, "and again").toHaveText("40%", { timeout: 6000 });
+  await expect(percent).toHaveText("100%", round);
+  await expect(percent, "and again").toHaveText("40%", round);
   await context.close();
 });

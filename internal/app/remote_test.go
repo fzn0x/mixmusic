@@ -17,8 +17,11 @@ import (
 	"github.com/fzn0x/mixmusic/internal/remote/remotetest"
 )
 
-// fastRemote is the protocol's timing in these tests.
-var fastRemote = remote.Timing{Ping: 100 * time.Millisecond, Silence: 2 * time.Second, Code: 10 * time.Second,
+// fastRemote is the protocol's timing in these tests. Silence stays the
+// app's 6 s: the computer paired with keeps the other in remote.json,
+// put on the disk, before it tells the pairing went, which a busy runner
+// can make take seconds; no test waits for a silence to run out.
+var fastRemote = remote.Timing{Ping: 100 * time.Millisecond, Silence: 6 * time.Second, Code: 10 * time.Second,
 	StateEvery: 10 * time.Millisecond, Rest: 100 * time.Millisecond}
 
 // newRemoteApp is a quiet app named name on the network n, which listens on

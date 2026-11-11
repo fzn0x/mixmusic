@@ -1,16 +1,15 @@
 /*
- * Feature tiles that act out what they do (tiles.js, #358): while a tile is
- * hovered or has the keyboard's focus, its little picture plays the
- * feature: a lyric line moving on, a selection stepping past a disliked
- * song, a bar filling. On a touch screen each tile plays once on its own
- * as it scrolls in, one after another. The songs and the lyrics in them are
- * made up for this page.
+ * Feature tiles that act out what they do (tiles.js, #358): each tile's
+ * little picture plays the feature on its own, again and again, while it is
+ * in the window: a lyric line moving on, a selection stepping past a
+ * disliked song, a bar filling. Hovered or focused, a tile holds where it
+ * is. The songs and the lyrics in them are made up for this page.
  *
  * Under reduced motion nothing here moves: the tiles show their pictures at
  * rest, and hovering or focusing them changes nothing (the last block).
  */
 
-/* A tile that plays can take the keyboard's focus. */
+/* A tile that plays takes the keyboard's focus, which holds it. */
 .tile[data-act]:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 3px; }
 
 /* The picture, in the black of the other tiles' pictures. */
@@ -33,6 +32,8 @@
 .tile-act .ta-text > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tile-act .ta-bar { height: 4px; border-radius: 2px; background: #2c2c2c; overflow: hidden; }
 .tile-act .ta-bar i { display: block; height: 100%; width: var(--ta-fill, 40%); border-radius: inherit; background: #ff8cc6; transition: width 1400ms linear; }
+/* Back at rest, a bar jumps there rather than run backwards. */
+.tile-act .ta-bar.is-snap i { transition: none; }
 .tile-act .ta-time { display: flex; justify-content: space-between; color: #adadad; font-size: 0.75rem; font-weight: 500; }
 
 /* Dislikes: the selection steps down the queue and passes over a song. */

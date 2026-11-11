@@ -1,11 +1,12 @@
 // Feature tiles that act out what they do (#358). Each tile of the list
 // below has a picture, drawn here or already in the page, and a list of
-// timed steps. The picture plays while the tile is hovered or has the
-// keyboard's focus, and goes back to rest when the pointer or the focus
-// leaves. Where there is no pointer to hover with (a touch screen), each
-// tile plays once on its own as it scrolls into the window, the tiles that
-// come in together one after another. The songs and lyric lines are made
-// up. tiles.css has the look.
+// timed steps. The pictures play on their own, again and again, while
+// they are in the window: the steps, a moment on how they end, back to
+// rest, and a moment at rest. They start a little apart, so that they don't
+// move together. A tile holds where it is while it's hovered or has the
+// keyboard's focus, which is how to stop one, and goes on once the pointer
+// or the focus leaves. The songs and lyric lines are made up. tiles.css has
+// the look.
 //
 // Under reduced motion nothing plays: the pictures stay at rest, and
 // hovering or focusing a tile changes nothing. Without script the page is as
@@ -13,9 +14,10 @@
 //
 // An act is { tile, art }. `tile` is the heading the tile has, and `art`
 // draws the picture, or takes the one already in the tile, and returns
-// { steps, rest }: `steps` is a list of [wait, change] pairs, each change
-// made `wait` milliseconds after the one before it, and `rest` puts the
-// picture at rest again.
+// { steps, rest, again }: `steps` is a list of [wait, change] pairs, each
+// change made `wait` milliseconds after the one before it, `rest` puts the
+// picture at rest at once, and `again`, if there, are the steps that take
+// it back to rest as it plays again, else `rest` alone.
 (() => {
   const reduced = () => (window.MixReveal ? window.MixReveal.reduced : matchMedia("(prefers-reduced-motion: reduce)").matches);
   const q = (el, s) => el.querySelector(s);
@@ -31,6 +33,14 @@
     const el = make(html);
     tile.insertBefore(el, tile.firstElementChild);
     return el;
+  };
+  // snap makes change, to a bar, at once, without the fill's transition: a
+  // bar back at rest doesn't run backwards.
+  const snap = (bar, change) => () => {
+    bar.classList.add("is-snap");
+    change();
+    void bar.offsetWidth;
+    bar.classList.remove("is-snap");
   };
 
   const acts = [];
@@ -70,6 +80,14 @@
           set(first);
           lines.forEach((l) => l.classList.remove("is-leaving"));
         },
+        // The song's first lines come back as the others came.
+        again: [
+          [0, () => lines.forEach((l) => l.classList.add("is-leaving"))],
+          [230, () => {
+            set(first);
+            lines.forEach((l) => l.classList.remove("is-leaving"));
+          }],
+        ],
       };
     },
   });
@@ -88,7 +106,7 @@
         bar.style.setProperty("--ta-fill", fill);
         now.textContent = time;
       };
-      return { steps: [[250, at("100%", "34:10")]], rest: at("62%", "21:40") };
+      return { steps: [[250, at("100%", "34:10")]], rest: snap(bar, at("62%", "21:40")) };
     },
   });
 
@@ -108,7 +126,7 @@
         state.textContent = text;
         percent.textContent = `${n}%`;
       };
-      return { steps: [[250, to(100, "5 of 5 songs")]], rest: to(40, "2 of 5 songs") };
+      return { steps: [[250, to(100, "5 of 5 songs")]], rest: snap(bar, to(40, "2 of 5 songs")) };
     },
   });
 
@@ -138,18 +156,22 @@
       const title = q(el, "[data-title]");
       const down = (n) => () => keys[n].classList.add("is-down");
       const up = () => keys.forEach((k) => k.classList.remove("is-down"));
+      // The keys pressed, and the song after it plays.
+      const press = (song) => [
+        [400, down(0)],
+        [260, down(1)],
+        [260, down(2)],
+        [220, () => (title.textContent = song)],
+        [300, up],
+      ];
       return {
-        steps: [
-          [400, down(0)],
-          [260, down(1)],
-          [260, down(2)],
-          [220, () => (title.textContent = "Slow Static")],
-          [300, up],
-        ],
+        steps: press("Slow Static"),
         rest: () => {
           up();
           title.textContent = "Neon Tide";
         },
+        // Pressed again, they bring the first song back.
+        again: press("Neon Tide"),
       };
     },
   });
@@ -165,54 +187,83 @@
     },
   });
 
-  // One running picture for each tile.
+  // How long a picture shows how it ends, how long it rests before it plays
+  // again, and how far apart the tiles start, in milliseconds.
+  const hold = 1800;
+  const pause = 900;
+  const apart = 350;
+
+  // One picture for each tile, and the round it plays again and again.
   const tiles = [];
   for (const act of acts) {
     const tile = [...document.querySelectorAll(".bento .tile")].find((t) => t.querySelector("h3")?.textContent.trim() === act.tile);
     if (!tile) continue;
-    const { steps, rest } = act.art(tile);
-    let timers = [];
-    const back = () => {
-      timers.forEach(clearTimeout);
-      timers = [];
-      rest();
-    };
-    const play = (delay = 0) => {
-      back();
-      let at = delay;
-      for (const [wait, change] of steps) {
-        at += wait;
-        timers.push(setTimeout(change, at));
-      }
-    };
-    tiles.push({ tile, play, back });
+    const { steps, rest, again = [[0, rest]] } = act.art(tile);
+    tiles.push({ tile, round: [...steps, [hold, () => {}], ...again, [pause, () => {}]] });
   }
 
   // Under reduced motion the pictures stay at rest, whatever is hovered.
   if (reduced()) return;
 
-  for (const { tile, play, back } of tiles) {
-    // A tile that plays takes the keyboard's focus, to play for it too.
+  // A tile plays while it is in the window and the page is shown, unless
+  // it's hovered or has the keyboard's focus: then it holds where it is, and
+  // goes on from there.
+  const players = new Map();
+  tiles.forEach(({ tile, round }, n) => {
+    let next = 0; // the change of the round that comes next
+    let timer = null;
+    let first = n * apart;
+    const now = { seen: !("IntersectionObserver" in window), hovered: false, focused: false };
+    const step = (extra) => {
+      const [wait, change] = round[next];
+      timer = setTimeout(() => {
+        change();
+        next = (next + 1) % round.length;
+        step(0);
+      }, wait + extra);
+    };
+    const update = () => {
+      const plays = now.seen && !now.hovered && !now.focused && !document.hidden;
+      if (plays && !timer) {
+        step(first);
+        first = 0;
+      } else if (!plays && timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+    players.set(tile, { now, update });
+
+    // A tile takes the keyboard's focus, which holds it.
     tile.setAttribute("data-act", "");
     tile.tabIndex = 0;
-    tile.addEventListener("pointerenter", (e) => e.pointerType !== "touch" && play());
-    tile.addEventListener("pointerleave", (e) => e.pointerType !== "touch" && !tile.matches(":focus-visible") && back());
-    tile.addEventListener("focus", () => tile.matches(":focus-visible") && play());
-    tile.addEventListener("blur", back);
-  }
+    const hover = (on) => (e) => {
+      if (e.pointerType === "touch") return;
+      now.hovered = on;
+      update();
+    };
+    tile.addEventListener("pointerenter", hover(true));
+    tile.addEventListener("pointerleave", hover(false));
+    tile.addEventListener("focus", () => {
+      now.focused = tile.matches(":focus-visible");
+      update();
+    });
+    tile.addEventListener("blur", () => {
+      now.focused = false;
+      update();
+    });
+    update();
+  });
 
-  // Where nothing hovers, each tile plays once, as it scrolls in: the ones
-  // that come in together, a little apart.
-  if (matchMedia("(hover: none)").matches && window.MixReveal) {
-    let together = 0;
-    for (const t of tiles) {
-      window.MixReveal.watch(t.tile, {
-        animate: false,
-        onEnter: () => {
-          t.play(together++ * 220);
-          setTimeout(() => (together = 0), 50);
-        },
-      });
-    }
+  if ("IntersectionObserver" in window) {
+    const seen = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        const p = players.get(e.target);
+        p.now.seen = e.isIntersecting;
+        p.update();
+      }
+    });
+    for (const tile of players.keys()) seen.observe(tile);
   }
+  document.addEventListener("visibilitychange", () => players.forEach((p) => p.update()));
 })();

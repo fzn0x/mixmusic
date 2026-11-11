@@ -39,8 +39,19 @@ func emptyResults() media.SearchResults {
 	return media.SearchResults{Tracks: []media.Track{}, Videos: []media.Track{}, Albums: []media.Album{}, Artists: []media.Artist{}, Playlists: []media.Playlist{}}
 }
 
-// Search searches YouTube Music, and Spotify when the user signed in.
+// Search searches YouTube Music, and Spotify when the user signed in, and
+// keeps the query among the recent searches.
 func (c *Catalog) Search(ctx context.Context, query string) (SearchResponse, error) {
+	res, err := c.search(ctx, query)
+	if query = strings.TrimSpace(query); err == nil && query != "" {
+		c.a.library.AddSearch(query)
+	}
+	return res, err
+}
+
+// search searches YouTube Music, and Spotify when the user signed in: an
+// AI assistant's searches aren't the user's own.
+func (c *Catalog) search(ctx context.Context, query string) (SearchResponse, error) {
 	query = strings.TrimSpace(query)
 	res := SearchResponse{YouTube: emptyResults(), Spotify: emptyResults(), SpotifySignedIn: c.a.spotify.SignedIn(), Errors: []string{}}
 	if query == "" {
@@ -66,7 +77,6 @@ func (c *Catalog) Search(ctx context.Context, query string) (SearchResponse, err
 	if ytErr != nil && (spErr != nil || !res.SpotifySignedIn) {
 		return res, ytErr
 	}
-	c.a.library.AddSearch(query)
 	return res, nil
 }
 

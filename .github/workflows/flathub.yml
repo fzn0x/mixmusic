@@ -100,8 +100,8 @@ jobs:
           cat "work/$APP_ID.yml"
       - name: Flathub's recipes and seccomp profile
         run: |
-          curl -fsSL --retry 5 --retry-delay 10 --retry-max-time 120 --retry-all-errors -o work/.flathub.justfile "$VORARBEITER/justfile"
-          curl -fsSL --retry 5 --retry-delay 10 --retry-max-time 120 --retry-all-errors -o flatpak.seccomp.json "$VORARBEITER/flatpak.seccomp.json"
+          curl -fsSL --retry 15 --retry-all-errors --retry-max-time 1800 -o work/.flathub.justfile "$VORARBEITER/justfile"
+          curl -fsSL --retry 15 --retry-all-errors --retry-max-time 1800 -o flatpak.seccomp.json "$VORARBEITER/flatpak.seccomp.json"
           mkdir -p work/tmp work/.local/state flatpak
           chmod -R 777 work flatpak
       # As on Flathub's runners: flatpak-builder's sandbox makes namespaces.

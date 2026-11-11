@@ -52,7 +52,7 @@ jobs:
       - name: Download the Opus test vectors
         if: runner.os == 'Linux' && steps.opus-vectors.outputs.cache-hit != 'true'
         run: |
-          curl -fsSL --retry 5 --retry-delay 10 --retry-max-time 120 --retry-all-errors -o "$RUNNER_TEMP/opus-vectors.tar.gz" https://opus-codec.org/static/testvectors/opus_testvectors-rfc8251.tar.gz
+          curl -fsSL --retry 15 --retry-all-errors --retry-max-time 1800 -o "$RUNNER_TEMP/opus-vectors.tar.gz" https://opus-codec.org/static/testvectors/opus_testvectors-rfc8251.tar.gz
           echo "6b26a22f9ba87b2b836906a9bb7afec5f8e54d49553b1200382520ee6fedfa55  $RUNNER_TEMP/opus-vectors.tar.gz" | sha256sum -c -
           mkdir -p "$RUNNER_TEMP/opus-vectors"
           tar -xzf "$RUNNER_TEMP/opus-vectors.tar.gz" -C "$RUNNER_TEMP/opus-vectors"

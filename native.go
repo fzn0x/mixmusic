@@ -300,6 +300,9 @@ type shell struct {
 	tools map[string]*trackTool
 	// moves is what the keys moved last in a mix (mixorder.go).
 	moves rowMoves
+	// picks are the tracks selected in a track list, which the bar above
+	// the player bar acts on (trackselect.go).
+	picks trackPicks
 	// listTops are where the track lists and the shelves were in the frame
 	// before, by key.
 	listTops map[string]float32

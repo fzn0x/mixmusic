@@ -157,20 +157,7 @@ func (s *shell) keepYouTubePlaylists() {
 // addToMenus are the track menu's ways to keep a track: in a mix, or in a
 // YouTube Music playlist of the user's.
 func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
-	m.Submenu("Add to mix", func(m *ui.Menu) {
-		if m.Item("New mix…").Chosen() {
-			s.newMixOf(tracks)
-		}
-		mixes := s.svc.Collection.Playlists()
-		if len(mixes) > 0 {
-			m.Separator()
-		}
-		for _, p := range mixes {
-			if m.Item(p.Title).Chosen() {
-				s.addToMix(p, tracks)
-			}
-		}
-	})
+	m.Submenu("Add to mix", func(m *ui.Menu) { s.mixItems(m, tracks) })
 	if !s.accounts().YouTube.SignedIn || len(tracks) != 1 || tracks[0].Source == media.SourceFile {
 		return
 	}
@@ -207,6 +194,23 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 			m.Item("No playlists of yours").Disabled(true)
 		}
 	})
+}
+
+// mixItems are the items of Add to mix, of a track's menu or of the bar
+// of the tracks selected: New mix…, then the user's mixes.
+func (s *shell) mixItems(m *ui.Menu, tracks []media.Track) {
+	if m.Item("New mix…").Chosen() {
+		s.newMixOf(tracks)
+	}
+	mixes := s.svc.Collection.Playlists()
+	if len(mixes) > 0 {
+		m.Separator()
+	}
+	for _, p := range mixes {
+		if m.Item(p.Title).Chosen() {
+			s.addToMix(p, tracks)
+		}
+	}
 }
 
 // addToMix adds tracks to a mix, but those it holds already, which the

@@ -34,6 +34,15 @@ The [command palette](settings.md#the-command-palette) (Ctrl+K) searches too: ty
 
 A track that loads can't be paused or moved until you hear it: the play button shows that it loads, and the keys and media controls wait too. Choosing another track still leaves it.
 
+## Selecting tracks
+
+Select several tracks of a list to act on them all at once:
+
+- **Ctrl-click** a track's row (⌘-click on macOS) to select it, or choose **Select** in its menu. Once a track is selected, the rows show check boxes, and a click on a row, or on its box, selects it or lets it go.
+- **Shift-click** a row to select every track from the one you clicked last to it.
+- **The bar** above the player bar tells how many are selected, and has select all, Add to queue, Add to mix and Download, which take the tracks in the list's order. Download shows while some of them aren't downloaded yet.
+- **Escape**, the bar's close button, or another page or search lets them go.
+
 ## Sharing
 
 Share, in the menu of a song, an album, a playlist or a mix, has what to send to a friend. There is no server in it: the links go to the services' own pages, and the images are made on your computer.

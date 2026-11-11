@@ -1,4 +1,4 @@
-<p align="center"><a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <strong>Bahasa Indonesia</strong></p>
+<p align="center"><a href="README.md">English</a> · <a href="README.hi.md">हिन्दी</a> · <a href="README.zh-CN.md">简体中文</a> · <strong>Bahasa Indonesia</strong> · <a href="README.ur.md">اردو</a> · <a href="README.pt-BR.md">Português (Brasil)</a> · <a href="README.bn.md">বাংলা</a> · <a href="README.ru.md">Русский</a> · <a href="README.am.md">አማርኛ</a></p>
 
 <p align="center">
   <img src="brand/icon.png" width="112" height="112" alt="Ikon MixMusic: dua cincin merah muda dan tombol putar di atas latar hitam" />
@@ -51,9 +51,9 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
 - **Program kecil.** MixMusic adalah satu program Go yang menggambar
   jendelanya sendiri di GPU. Tidak ada browser di dalamnya yang harus
   diunduh atau ditampung di memori.
-- **Bebas diubah.** Ada sepuluh tema bawaan, komunitas menambahkan tema dan
-  plugin lainnya, dan setiap perintah bisa diberi tombol pilihan Anda
-  sendiri.
+- **Bebas diubah.** Ada empat tata letak dan empat belas tema bawaan,
+  komunitas menambahkan tema dan plugin lainnya, dan setiap perintah bisa
+  diberi tombol pilihan Anda sendiri.
 - **Privat.** MixMusic tidak punya akun, server, analitik, atau telemetri
   sendiri.
 - **Gratis dan open source,** di bawah lisensi MIT atau GPL 3.0.
@@ -107,6 +107,10 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
 ### Di desktop Anda
 
 - Tombol media dan kontrol media sistem di Windows, macOS, dan Linux.
+- Pintasan global pilihan Anda untuk memutar, menjeda, melewati lagu,
+  mengubah volume, membisukan, menyukai atau tidak menyukai lagu yang sedang
+  diputar, atau menampilkan MixMusic, di jendela mana pun yang sedang di
+  depan.
 - Tombol pemutar di thumbnail taskbar Windows.
 - Kontrol di tray, notifikasi setiap kali lagu baru diputar, dan berjalan
   otomatis saat login.
@@ -121,15 +125,24 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
 
 ### Sesuaikan sesuka Anda
 
-- **Tema.** Sepuluh tema bawaan dengan efek yang bisa diatur, satu tema
-  untuk mode terang dan satu untuk mode gelap, serta warna aksen pilihan
-  Anda sendiri atau yang diambil dari sampul lagu yang sedang diputar.
+- **Tata letak.** Blend, yang bawaan, berbentuk membulat dengan gerak yang
+  lentur pada deretan padat sampul besar. Expressive, mengikuti Material 3
+  Expressive, terasa ceria, dengan isian warna tonal, tombol berbentuk pil,
+  dan bilah pemutar yang melayang. Crate bersahaja, agar sampul-sampulnya
+  yang berbicara, dan Tiles adalah tampilan pertama MixMusic, dengan ubin
+  datar dan kata-kata raksasa berhuruf kecil.
+- **Tema.** Empat belas tema bawaan, masing-masing bisa dipakai di tata
+  letak mana pun, dengan efek yang bisa diatur, satu tema untuk mode terang
+  dan satu untuk mode gelap, serta warna aksen pilihan Anda sendiri atau
+  yang diambil dari sampul lagu yang sedang diputar. Material dan Material
+  Dark membuat setiap warnanya dari sampul lagu.
 - **Tema dan plugin komunitas,** cukup sekali klik di marketplace.
 - **Plugin** menambahkan halaman, perintah, aksi lagu, dan widget lewat API
   bertipe, dan semuanya tampil dengan tema Anda.
 - **Mengutamakan keyboard.** Pintasan untuk semua hal yang umum, tombol
   pilihan Anda sendiri untuk perintah apa pun (termasuk perintah dari
-  plugin), dan palet perintah (<kbd>Ctrl</kbd> <kbd>K</kbd>) untuk sisanya.
+  plugin), tombol yang mengendalikan musik dari aplikasi mana pun, dan palet
+  perintah (<kbd>Ctrl</kbd> <kbd>K</kbd>) untuk sisanya.
 - **File pengaturan.** Pengaturan Anda tersimpan sebagai `settings.json` di
   folder data Anda (`%AppData%\MixMusic` di Windows,
   `~/Library/Application Support/MixMusic` di macOS, `~/.config/MixMusic` di
@@ -164,6 +177,7 @@ Unduh file untuk sistem Anda dari
 | Windows, portabel, tanpa instalasi | [`mixmusic-<version>-windows-<arch>-portable.zip`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Debian, Ubuntu, dan turunannya | [`mixmusic-<version>-linux-<arch>.deb`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Fedora, openSUSE, dan turunannya | [`mixmusic-<version>-linux-<arch>.rpm`](https://github.com/fzn0x/mixmusic/releases/latest) |
+| Arch Linux dan turunannya (segera hadir) | [`mixmusic-bin`](https://aur.archlinux.org/packages/mixmusic-bin) di AUR: `yay -S mixmusic-bin` |
 | Linux apa saja, satu file | [`mixmusic-<version>-linux-<arch>.AppImage`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Linux apa saja, dalam sandbox (Flatpak) | [`mixmusic-<version>-linux-<arch>.flatpak`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Linux apa saja, di folder home Anda | [`mixmusic-<version>-linux-<arch>.tar.gz`](https://github.com/fzn0x/mixmusic/releases/latest), beserta `install.sh` |
@@ -177,12 +191,20 @@ terpasang untuk memperbarui dirinya.
 Installer, zip portabel, dan arsip Linux bisa memperbarui dirinya sendiri.
 `.deb`, `.rpm`, AppImage, dan Flatpak tidak bisa menimpa file instalasinya
 sendiri, jadi MixMusic akan memberi tahu Anda saat versi baru tersedia dan
-mengunduhkannya untuk Anda. Untuk zip portabel, ekstrak di mana saja lalu
+mengunduhkannya untuk Anda. `mixmusic-bin` dari AUR diperbarui bersama
+sistem Anda yang lain. Untuk zip portabel, ekstrak di mana saja lalu
 buka `MixMusic.exe`. Untuk AppImage, jadikan file itu bisa dijalankan
 (`chmod +x`) lalu buka. Untuk Flatpak, buka dengan pusat perangkat lunak
 (software center) Anda, atau jalankan
 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`; saat pertama
 kali, Flatpak akan mengambil runtime GNOME dari Flathub.
+
+Segera hadir, setelah tap-nya siap: di Mac, [Homebrew](https://brew.sh)
+memasang MixMusic, dan `brew upgrade` memperbaruinya.
+
+```sh
+brew install --cask fzn0x/tap/mixmusic
+```
 
 ### Pertama kali dijalankan
 
@@ -250,7 +272,13 @@ bagaimana Flatpak berjalan di desktop Anda.
   di Settings › Accounts (Pengaturan › Akun), lalu masuk ke Google di jendela
   yang terbuka. Apa yang Anda ketik hanya dikirim ke Google. MixMusic
   menyimpan sesi itu dalam keadaan terenkripsi, dengan kunci di keyring
-  sistem Anda jika tersedia.
+  sistem Anda jika tersedia. Jika jendela itu tidak bisa dibuka, atau Google
+  menolaknya, masuklah dengan browser Anda sendiri, yang dibuka MixMusic
+  dengan profil baru miliknya sendiri dan dihapusnya begitu Anda berhasil
+  masuk; impor sesi dari browser yang pernah Anda pakai untuk masuk
+  (MixMusic membacanya dengan yt-dlp-nya, dan hanya menyimpan cookie
+  YouTube); atau tempelkan header Cookie dari tab music.youtube.com yang
+  sudah masuk.
 - **Spotify:** Spotify hanya mengizinkan sebuah aplikasi melayani paling
   banyak lima pengguna, dan hanya selama pemiliknya berlangganan Premium,
   jadi Anda masuk dengan aplikasi Spotify buatan Anda sendiri. Hanya butuh
@@ -386,7 +414,8 @@ internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
 internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
-internal/library     liked songs, mixes, history and stats
+internal/romaji      Japanese lyrics in romaji, kanji read by kagome
+internal/library     liked and disliked songs, mixes, history and stats
 internal/lastfm      scrobbling to Last.fm
 internal/discord     what plays, on your Discord profile
 internal/diag        the log, without secrets, and the reports of crashes
@@ -402,10 +431,11 @@ Package yang bisa Anda impor:
 ```
 opus/                an Opus decoder in pure Go, a port of libopus's
 aac/                 an AAC-LC decoder in pure Go
+ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/52
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
-lyrics/              synced lyrics from LRCLIB, and the LRC format
+lyrics/              synced lyrics from Unison and LRCLIB, and translations
 brand/               MixMusic's logo, for code that draws it
 ```
 
@@ -416,7 +446,8 @@ toko di sidebar), dan Anda juga bisa menambahkan karya Anda sendiri.
 
 ### Membuat tema
 
-Tema adalah file `theme.json` yang mengatur warna, font, dan bentuk sudut.
+Tema adalah file `theme.json` yang mengatur warna, font, dan bentuk sudut,
+yang tampil dalam tata letak pilihan pengguna.
 [docs/themes.md](docs/themes.md) mencantumkan setiap token dan memberi
 contoh tema yang lengkap. Untuk mencoba tema Anda, letakkan foldernya di
 folder tema, yang bisa dibuka lewat Settings › Appearance › open themes
@@ -461,12 +492,19 @@ MixMusic berkomunikasi dengan:
 - **Spotify,** setelah Anda masuk: pustaka Anda, perangkat Spotify Connect
   Anda, dan pemutar Spotify, yang dimuat dari `sdk.scdn.co` saat Spotify
   diputar di MixMusic.
+- **Unison:** ID video lagu yang sedang diputar, atau, jika tidak ada,
+  judul, artis, album, dan durasinya, untuk mencari liriknya. Hanya saat
+  Anda menyalakan terjemahan, atau romanisasi, di samping lirik: lirik
+  lagu yang sedang diputar, beserta ID videonya, yang oleh Unison
+  diterjemahkan lewat Google.
 - **LRCLIB:** judul, artis, album, dan durasi lagu yang sedang diputar,
   untuk mencari liriknya.
 - **GitHub:** pemeriksaan versi baru saat aplikasi dibuka dan setiap
   beberapa jam, yang bisa Anda matikan di Settings › About (Pengaturan ›
-  Tentang); registry komunitas saat Anda membuka marketplace; dan unduhan
-  yt-dlp.
+  Tentang); registry komunitas saat Anda membuka marketplace; unduhan
+  yt-dlp; dan, saat pertama kali Anda menyalakan romaji di samping lirik
+  bahasa Jepang, kamus bacaan kanji (11,7 MB). Romaji dibuat di komputer
+  Anda: liriknya tidak dikirim.
 - **Last.fm,** setelah Anda menghubungkannya: lagu yang Anda putar.
 - **Discord,** kecuali Anda mematikannya: lagu yang sedang diputar, dikirim
   ke aplikasi Discord di komputer Anda, yang kemudian menampilkannya di
@@ -474,12 +512,15 @@ MixMusic berkomunikasi dengan:
 
 Yang disimpan MixMusic di komputer Anda:
 
-- Pengaturan dan pustaka Anda (lagu yang disukai, mix, riwayat, dan
-  pencarian terakhir), di folder yang disebutkan di Settings › About.
+- Pengaturan dan pustaka Anda (lagu yang disukai dan tidak disukai, mix,
+  riwayat, dan pencarian terakhir), di folder yang disebutkan di
+  Settings › About.
 - Lagu yang pernah Anda putar, di cache, sebanyak yang Anda izinkan di
   Settings › Playback (Pengaturan › Pemutaran), beserta tingkat
   kenyaringannya menurut pengukuran YouTube.
 - Sampul yang pernah Anda lihat, hingga 256 MB.
+- Terjemahan lirik yang Anda nyalakan, menurut lagu dan bahasa, serta kamus
+  yang dipakai romaji untuk membaca kanji, setelah Anda menyalakannya.
 - Data login Anda, termasuk sesi YouTube Music, di keyring sistem. Di
   Windows, jika Credential Manager (Manajer Kredensial) tidak bisa
   menyimpannya, data itu disimpan di file yang dienkripsi untuk akun Windows
@@ -493,8 +534,11 @@ sebuah layanan akan menghapus data login layanan tersebut.
 
 Di Windows, visualizer mendengarkan audio Spotify yang diputar di komputer
 ini, baik di MixMusic maupun di aplikasi Spotify, lewat process loopback
-Windows, yang hanya mendengar aplikasi itu saja. Visualizer menganalisis
-audio itu di memori dan tidak pernah merekam atau mengirimkannya.
+Windows, yang hanya mendengar aplikasi itu saja. Di macOS 14.2 ke atas,
+visualizer mendengarkan Spotify yang diputar di MixMusic lewat process tap,
+setelah Anda mengizinkannya, seperti yang diminta macOS. Visualizer
+menganalisis audio itu di memori dan tidak pernah merekam atau
+mengirimkannya.
 
 ## Kredit
 
@@ -525,17 +569,28 @@ MixMusic dibangun di atas proyek-proyek berikut:
   AppImage.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, yang menemukan audio
   lagu-lagu yang tidak bisa ditemukan MixMusic sendiri.
-- **[LRCLIB](https://lrclib.net)**, database terbuka berisi lirik
+- **[Unison](https://unison.betterlyrics.org)**, database lirik terbuka
+  hasil urunan banyak orang, di bawah ODbL, dan
+  **[LRCLIB](https://lrclib.net)**, database terbuka berisi lirik
   tersinkron.
+- **[kagome](https://github.com/ikawaha/kagome)**, penganalisis morfologi
+  bahasa Jepang yang membaca kanji pada lirik untuk menghasilkan romajinya,
+  dengan kamus IPA dari
+  [kagome-dict](https://github.com/ikawaha/kagome-dict), yang dibuat dari
+  mecab-ipadic, dan diunduh MixMusic saat pertama kali romaji dinyalakan.
 - **[libopus](https://opus-codec.org)**, karena decoder Opus MixMusic adalah
   port dari decodernya, dan **[SharpJaad](https://github.com/jimm98y/SharpJaad)**,
   port C# dari [JAAD](https://sourceforge.net/projects/jaadec/) yang
   menjadi dasar decoder AAC.
 - **[FFmpeg](https://ffmpeg.org)**, yang menjadi pembanding dalam pengujian
   decoder.
-- **[Selawik](https://github.com/microsoft/Selawik)** dan
+- **[Selawik](https://github.com/microsoft/Selawik)**,
   **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**,
-  jenis huruf yang dipakai di jendela aplikasi.
+  **[Roboto Flex](https://github.com/googlefonts/roboto-flex)** dan
+  **[Archivo](https://github.com/Omnibus-Type/Archivo)**, jenis huruf yang
+  dipakai di jendela aplikasi.
+- **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
+  yang ilmu warna HCT-nya diportkan menjadi warna-warna tema Material.
 - **[Kevin MacLeod](https://incompetech.com)**, yang musiknya, di bawah
   lisensi [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
   diputar di situs web.
@@ -564,10 +619,14 @@ MixMusic memiliki lisensi ganda: gunakan di bawah [lisensi MIT](LICENSE-MIT)
 atau [GNU General Public License, versi 3](LICENSE-GPL), mana pun yang Anda
 pilih. Kontribusi diterima di bawah kedua lisensi tersebut. Jenis huruf di
 `fonts` berada di bawah SIL Open Font License:
-[lisensi Selawik](fonts/OFL.txt) dan
-[lisensi Quicksand](fonts/quicksand-OFL.txt). Decoder Opus adalah port dari
-libopus, di bawah [lisensi BSD-nya](opus/LICENSE.libopus), dan decoder AAC
-berasal dari SharpJaad, di bawah [lisensi MIT-nya](aac/LICENSE.sharpjaad).
+[lisensi Selawik](fonts/OFL.txt),
+[lisensi Quicksand](fonts/quicksand-OFL.txt),
+[lisensi Roboto Flex](fonts/robotoflex-OFL.txt), dan
+[lisensi Archivo](fonts/archivo-OFL.txt). Decoder Opus adalah port dari
+libopus, di bawah [lisensi BSD-nya](opus/LICENSE.libopus), decoder AAC
+berasal dari SharpJaad, di bawah [lisensi MIT-nya](aac/LICENSE.sharpjaad),
+dan ilmu warna HCT adalah port dari Material Color Utilities, di bawah
+[lisensi Apache-nya](internal/hct/LICENSE.material-color-utilities).
 
 MixMusic tidak berafiliasi dengan, tidak didukung secara resmi oleh, dan
 tidak disponsori oleh Spotify maupun Google. MixMusic memutar apa yang

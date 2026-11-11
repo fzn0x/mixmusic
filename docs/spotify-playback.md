@@ -16,6 +16,7 @@ Spotify refuses the sign-in. For the code, read
 |---|---|---|---|
 | Who plays the audio | Spotify's player, inside MixMusic | a Spotify app or device | MixMusic's own engine |
 | The audio | Spotify's, at Spotify's quality | Spotify's, at Spotify's quality | the track's recording on YouTube Music |
+| Lossless | no | yes, once it's on in the device's Spotify ([how](#lossless)) | no |
 | Needs Premium | yes | yes | no |
 | Systems | Windows and macOS | every system, with a device that has Spotify open | every system |
 | Equalizer, crossfade, speed, Even loudness | no | no | yes |
@@ -140,6 +141,36 @@ Spotify open.
   other devices it can't hear, and it draws nothing then.
 - **Sleep.** As the computer goes to sleep, MixMusic pauses its own
   player, and a device elsewhere plays on.
+
+## Lossless
+
+Spotify streams music losslessly, in up to 24-bit quality, but only to
+Spotify's own apps (the desktop app 1.2.67 or later, the mobile app 9.0.58
+or later) and some Spotify Connect devices. It needs Spotify Premium; in
+the countries where Spotify sells Premium Lite, Standard and Platinum, as
+India, Indonesia, the UAE, Saudi Arabia and South Africa, it needs
+**Premium Platinum**, and Lite and Standard don't have it. So in MixMusic,
+Spotify tracks play losslessly **On Spotify Connect** alone. In MixMusic,
+from Spotify, Spotify's player in MixMusic gets its usual, lossy audio,
+and from YouTube Music the track is YouTube Music's recording.
+
+To listen in lossless:
+
+1. In Settings › Playback › Spotify tracks, choose **On Spotify Connect**,
+   and open the Spotify app, on this computer or another device.
+2. Turn Lossless on there:
+   - **In the Spotify app on a computer, phone or tablet**: choose your
+     profile picture › **Settings and privacy** › **Media quality**, then
+     **Lossless**, for Wi-Fi or cellular streaming.
+   - **On another Spotify device**, as a speaker: in Spotify on your phone,
+     while it plays there, tap the devices button, choose the device, then
+     **Change quality settings** › **Lossless**.
+
+Lossless doesn't cover music videos, podcasts or audiobooks, and a weak
+connection, Bluetooth or a device without lossless can play it lossy.
+[Spotify's help](https://support.spotify.com/article/lossless-audio-quality/)
+tells more. Settings › Playback › Spotify tracks tells the same, under the
+three ways.
 
 ## Premium and development mode
 

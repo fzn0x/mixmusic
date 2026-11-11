@@ -69,7 +69,27 @@ func (s *shell) spotifyTrackSettings(c *ui.Context) {
 		case s.set.SpotifyPlayback == settings.SpotifyPlaybackConnect:
 			s.deviceRow(c)
 		}
+		s.hint(c, spotifyLossless(s.set.SpotifyPlayback))
 	})
+}
+
+// spotifyLosslessPlan is the plan Spotify streams lossless audio to:
+// Premium, and in the countries where Spotify sells Premium Lite,
+// Standard and Platinum, as India and Indonesia, Platinum alone.
+const spotifyLosslessPlan = "It needs Spotify Premium, or Premium Platinum in the countries where Spotify sells Lite, Standard and Platinum plans. "
+
+// spotifyLosslessSteps turn Lossless on in Spotify's own app, as Spotify's
+// help tells them, and on another Spotify device from the phone's app.
+const spotifyLosslessSteps = "In the Spotify app, choose your profile picture › Settings and privacy › Media quality › Lossless (the desktop app 1.2.67 or later). For another Spotify device, in Spotify on your phone, tap the devices button while it plays, choose the device, then Change quality settings › Lossless."
+
+// spotifyLossless tells how Spotify's lossless audio plays with the way
+// Spotify tracks play, mode: Spotify streams it to its own apps and some
+// Connect devices alone, so only On Spotify Connect plays it.
+func spotifyLossless(mode settings.SpotifyPlayback) string {
+	if mode == settings.SpotifyPlaybackConnect {
+		return "Lossless: the device plays it once it's on there, in up to 24-bit quality. " + spotifyLosslessPlan + spotifyLosslessSteps
+	}
+	return "Lossless: Spotify streams it only to its own apps and some Spotify Connect devices, so it plays only with On Spotify Connect, with the Spotify app open. " + spotifyLosslessPlan + spotifyLosslessSteps
 }
 
 // deviceRow chooses the Spotify Connect device that plays Spotify tracks.

@@ -333,9 +333,13 @@ the image must be published for both architectures, as Flathub's are.
 
 ## Translations of the README
 
-[README.zh-CN.md](README.zh-CN.md) (Simplified Chinese) and
-[README.id.md](README.id.md) (Indonesian) translate
-[README.md](README.md), which stays the one that's current. A pull request
+[README.hi.md](README.hi.md) (Hindi), [README.zh-CN.md](README.zh-CN.md)
+(Simplified Chinese), [README.id.md](README.id.md) (Indonesian),
+[README.ur.md](README.ur.md) (Urdu), [README.pt-BR.md](README.pt-BR.md)
+(Brazilian Portuguese), [README.bn.md](README.bn.md) (Bengali),
+[README.ru.md](README.ru.md) (Russian) and [README.am.md](README.am.md)
+(Amharic) translate [README.md](README.md), which stays the one that's
+current. A pull request
 that changes the README needn't change them: say in it which sections
 changed, so that a translator can follow. Corrections and new languages are
 welcome, as `README.<language code>.md` with a link in each README's

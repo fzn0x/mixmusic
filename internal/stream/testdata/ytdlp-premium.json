@@ -1,0 +1,80 @@
+{
+ "_fixture": "Written by hand from the shape of ytdlp-omv.json, yt-dlp's -J output, not recorded: a song as yt-dlp lists it for a YouTube Music Premium account, with Premium's Opus of format 774 and AAC-LC of format 141 beside the formats everyone gets, and 774 picked. MIXMUSIC_LIVE=1 MIXMUSIC_YT_COOKIES='LOGIN_INFO=…; SAPISID=…; …' MIXMUSIC_YT_RECORD=dir go test ./internal/stream -run LiveAccountStream -v records it as ytdlp-premium.json, without its URLs, to replace this one.",
+ "id": "BH-SnQ8J1VU",
+ "format_id": "774",
+ "url": "https://rr1---sn-test.googlevideo.com/videoplayback?expire=1793591621&itag=774",
+ "ext": "webm",
+ "acodec": "opus",
+ "abr": 255.581,
+ "filesize": 6612034,
+ "duration": 207,
+ "http_headers": {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "en-us,en;q=0.5",
+  "Sec-Fetch-Mode": "navigate"
+ },
+ "available_at": 1793570019,
+ "formats": [
+  {
+   "format_id": "139",
+   "url": "https://rr1---sn-test.googlevideo.com/videoplayback?expire=1793591621&itag=139",
+   "ext": "m4a",
+   "protocol": "https",
+   "vcodec": "none",
+   "acodec": "mp4a.40.5",
+   "abr": 48.807,
+   "audio_channels": 2
+  },
+  {
+   "format_id": "249",
+   "url": "https://rr1---sn-test.googlevideo.com/videoplayback?expire=1793591621&itag=249",
+   "ext": "webm",
+   "protocol": "https",
+   "vcodec": "none",
+   "acodec": "opus",
+   "abr": 51.114,
+   "audio_channels": 2
+  },
+  {
+   "format_id": "140",
+   "url": "https://rr1---sn-test.googlevideo.com/videoplayback?expire=1793591621&itag=140",
+   "ext": "m4a",
+   "protocol": "https",
+   "vcodec": "none",
+   "acodec": "mp4a.40.2",
+   "abr": 129.485,
+   "audio_channels": 2
+  },
+  {
+   "format_id": "251",
+   "url": "https://rr1---sn-test.googlevideo.com/videoplayback?expire=1793591621&itag=251",
+   "ext": "webm",
+   "protocol": "https",
+   "vcodec": "none",
+   "acodec": "opus",
+   "abr": 129.953,
+   "audio_channels": 2
+  },
+  {
+   "format_id": "141",
+   "url": "https://rr1---sn-test.googlevideo.com/videoplayback?expire=1793591621&itag=141",
+   "ext": "m4a",
+   "protocol": "https",
+   "vcodec": "none",
+   "acodec": "mp4a.40.2",
+   "abr": 255.803,
+   "audio_channels": 2
+  },
+  {
+   "format_id": "774",
+   "url": "https://rr1---sn-test.googlevideo.com/videoplayback?expire=1793591621&itag=774",
+   "ext": "webm",
+   "protocol": "https",
+   "vcodec": "none",
+   "acodec": "opus",
+   "abr": 255.581,
+   "audio_channels": 2
+  }
+ ]
+}

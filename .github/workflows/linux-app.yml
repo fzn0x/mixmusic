@@ -82,13 +82,17 @@ jobs:
         run: |
           bash .github/scripts/apt-install.sh --no-install-recommends \
             xvfb xauth xfonts-base xdotool x11-utils dbus pulseaudio pulseaudio-utils python3-gi gir1.2-glib-2.0
+          # Ubuntu's archive out of reach: apt-install.sh said so, and the
+          # steps after this one skip, as APT_SKIPPED says.
+          [ -f "$RUNNER_TEMP/apt-skipped" ] && exit 0
           pulseaudio --start --exit-idle-time=-1
       - name: Start it, and check it
+        if: env.APT_SKIPPED != '1'
         run: |
           xvfb-run -a -s "-screen 0 1600x1000x24" dbus-run-session -- \
             /usr/bin/python3 .github/scripts/linux-app.py --libs nix result/bin/mixmusic linux-app
       - uses: actions/upload-artifact@v7
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && env.APT_SKIPPED != '1' }}
         with:
           name: linux-app-nix
           path: linux-app/
@@ -134,14 +138,18 @@ jobs:
           bash .github/scripts/apt-install.sh libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0 libayatana-appindicator3-1 libsecret-1-0
           bash .github/scripts/apt-install.sh --no-install-recommends \
             xvfb xauth xfonts-base xdotool x11-utils dbus pulseaudio pulseaudio-utils python3-gi gir1.2-glib-2.0
+          # Ubuntu's archive out of reach: apt-install.sh said so, and the
+          # steps after this one skip, as APT_SKIPPED says.
+          [ -f "$RUNNER_TEMP/apt-skipped" ] && exit 0
           pulseaudio --start --exit-idle-time=-1
       - name: Start it, and check it
+        if: env.APT_SKIPPED != '1'
         run: |
           app="$(find app -type f -name mixmusic -perm -u+x | head -n 1)"
           xvfb-run -a -s "-screen 0 1600x1000x24" dbus-run-session -- \
             /usr/bin/python3 .github/scripts/linux-app.py --libs system "$app" linux-app
       - uses: actions/upload-artifact@v7
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && env.APT_SKIPPED != '1' }}
         with:
           name: linux-app-release
           path: linux-app/

@@ -71,6 +71,9 @@ AppImage or archive copy's.
 - `remote.json`: whether [remote control](remote-control.md) is on, and
   the computers paired with this one, by their names and their keys'
   fingerprints. The key of this computer is in the credential store.
+- `mcp.json`, while [AI assistants](ai-assistants.md) may control
+  MixMusic: the port on `127.0.0.1` the command they start connects to,
+  and the key it gives, new each time it turns on.
 - `addons/`: the themes and plugins you installed, and what plugins keep
   in `addons/.storage`.
 - `bin/`: MixMusic's own yt-dlp.
@@ -157,6 +160,7 @@ Where the credential store can't keep a secret:
 | Last.fm, once you connect it | Last.fm | the title, artists, album and length of what you play, and when |
 | Discord, unless you turn it off in Settings › Desktop | the Discord app on your computer | the title, artists, album and cover address of what plays, and its times, as you choose them; with the Listen button, the track's link on its service |
 | Casting | the cast device you choose, on your network | the title, artist and cover of what plays; the device fetches the audio from MixMusic while you cast |
+| AI assistants, while you let them control MixMusic | the assistant on your computer, and from it the AI model it uses, which may be on the internet | what plays and the queue, the results of its searches, and the names of your playlists and mixes, as it asks for them |
 | Remote control, with a computer paired | that computer's MixMusic, on your network, encrypted | what plays, the volume and the next 20 tracks, and the commands; when you move what plays to it, the queue, with the tags of your music files, never their paths |
 | Checks for updates, unless you turn them off in Settings › About | GitHub | a request for the newest release, and its download when you install it |
 | yt-dlp, when you install or update it | GitHub | a request for the version of yt-dlp's latest release, from its page or GitHub's API, and a download of it |

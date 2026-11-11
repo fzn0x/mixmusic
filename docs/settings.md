@@ -88,6 +88,12 @@ pair with it by a code it shows, and control it; and the computers
 paired, each with **Remove**. [Remote control](remote-control.md) tells
 more.
 
+The **AI assistants** group: **Let AI assistants control MixMusic**, off
+at first, lets the AI assistants of this computer that speak MCP control
+MixMusic; on, it shows the command an assistant starts and its
+configuration, each with **copy**, and the assistants connected.
+[AI assistants](ai-assistants.md) tells more.
+
 ### Shortcuts
 
 Every command, by group, with its keys: **From any app** first, the global

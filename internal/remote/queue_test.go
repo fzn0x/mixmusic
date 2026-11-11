@@ -27,6 +27,9 @@ func controlled(t *testing.T) (*fakeHost, *Server, *Dialer, *Session) {
 		t.Fatal(err)
 	}
 	<-h.ended
+	// The pairing is told how it ended before its handler returns, and
+	// counts in Sessions until then: a busy runner may still count it.
+	waitFor(t, "the pairing's end there", func() bool { return s.Sessions() == 0 }, func() any { return s.Sessions() })
 	return h, s, d, connect(t, d, addr, peer.Key)
 }
 

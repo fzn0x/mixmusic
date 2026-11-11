@@ -159,7 +159,7 @@ Where the credential store can't keep a secret:
 | Casting | the cast device you choose, on your network | the title, artist and cover of what plays; the device fetches the audio from MixMusic while you cast |
 | Remote control, with a computer paired | that computer's MixMusic, on your network, encrypted | what plays, the volume and the next 20 tracks, and the commands; when you move what plays to it, the queue, with the tags of your music files, never their paths |
 | Checks for updates, unless you turn them off in Settings › About | GitHub | a request for the newest release, and its download when you install it |
-| yt-dlp, when you install or update it | GitHub | a download of yt-dlp's latest release |
+| yt-dlp, when you install or update it | GitHub | a request for the version of yt-dlp's latest release, from its page or GitHub's API, and a download of it |
 | The marketplace, when you open it | GitHub | a download of the registry, and of the add-ons you install |
 | Knowing whether the network answers | YouTube and Spotify | a request over HTTPS for an empty answer |
 

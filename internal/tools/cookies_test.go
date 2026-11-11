@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"slices"
@@ -12,12 +14,25 @@ import (
 )
 
 // TestMain runs the test binary as a fake yt-dlp when a test asks: it then
-// exports cookies as fakeYTDLP says, and never reads a browser.
+// exports cookies as fakeYTDLP says, and never reads a browser. Unless
+// MIXMUSIC_LIVE is set, GitHub's addresses lead to a server here that
+// refuses every request, so that a test that doesn't fake one, or a
+// fallback it didn't expect, never reaches GitHub.
 func TestMain(m *testing.M) {
 	if mode := os.Getenv("MIXMUSIC_FAKE_YTDLP"); mode != "" {
 		os.Exit(fakeYTDLP(mode, os.Args[1:]))
 	}
-	os.Exit(m.Run())
+	if os.Getenv("MIXMUSIC_LIVE") != "" {
+		os.Exit(m.Run())
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "not faked: "+r.URL.Path, http.StatusTeapot)
+	}))
+	releaseURL, tagURL = srv.URL+"/latest/download/", srv.URL+"/download/"
+	latestURL, apiURL = srv.URL+"/latest", srv.URL+"/api"
+	code := m.Run()
+	srv.Close()
+	os.Exit(code)
 }
 
 // fakeJar is a jar the fake yt-dlp writes, of made-up cookies.

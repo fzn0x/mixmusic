@@ -61,7 +61,10 @@
   `testdata/`, and against YouTube with
   `MIXMUSIC_LIVE=1 go test ./internal/stream -run Live`.
 - **`internal/tools`** finds yt-dlp and a JavaScript runtime, and installs
-  yt-dlp from its releases, checked against their published checksums. On
+  yt-dlp from its releases, checked against their published checksums. It
+  downloads from the latest release's address, `releases/latest/download/`,
+  and when GitHub fails that one alone, as it can, from the release's own
+  address, by the version its page or GitHub's API names (#431). On
   macOS it installs the unpacked build, `yt-dlp_macos.zip`, into
   `bin/yt-dlp_macos/`: the single file starts in 8 s, the unpacked one in
   0.2 s (#245). A yt-dlp that comes with MixMusic (`Manager.Bundled`), as

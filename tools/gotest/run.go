@@ -75,6 +75,12 @@ func (r *result) add(e event) {
 	}
 }
 
+// broken tells whether the package failed, or never ended, as when go
+// test itself was stopped.
+func (r *result) broken() bool {
+	return r.failed || !r.ended
+}
+
 // running tells whether a test started and hadn't ended when the package
 // did, and wasn't waiting its turn: a test the binary crashed or timed out
 // in.
@@ -90,7 +96,7 @@ func (r *result) failedTests() []string {
 	for name := range r.fails {
 		names = append(names, name)
 	}
-	if r.failed {
+	if r.broken() {
 		for test := range r.tests {
 			if r.running(test) && !slices.Contains(names, top(test)) {
 				names = append(names, top(test))

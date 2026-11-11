@@ -70,7 +70,7 @@ func (p *pkg) update(r *result, failfast bool) {
 	for _, name := range r.passedTests() {
 		p.passed(name)
 	}
-	if !r.failed {
+	if !r.broken() {
 		for _, name := range slices.Sorted(maps.Keys(p.pending)) {
 			p.passed(name)
 		}
@@ -113,7 +113,7 @@ func (s *session) main(args []string) int {
 	}
 	var failed []*pkg
 	for _, r := range results {
-		if r.failed || !r.ended {
+		if r.broken() {
 			p := &pkg{path: r.pkg, fails: map[string]int{}, pending: map[string]*result{}}
 			p.update(r, c.failfast)
 			failed = append(failed, p)

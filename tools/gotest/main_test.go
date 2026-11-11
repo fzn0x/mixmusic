@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -21,7 +22,8 @@ import (
 // /home/runner/work/demo and /usr/local/go.
 
 // fake answers each run of go test with the next recording, as go test
-// would, and keeps the command lines.
+// would, and keeps the command lines. A recording named name:n stops after
+// its first n lines, as go test stopped there.
 type fake struct {
 	t     *testing.T
 	runs  []string
@@ -33,12 +35,18 @@ func (f *fake) goTest(args []string, line func([]byte)) error {
 	if len(f.calls) > len(f.runs) {
 		f.t.Fatalf("go %s: run %d, of %d recorded", strings.Join(args, " "), len(f.calls), len(f.runs))
 	}
-	data, err := os.ReadFile(filepath.Join("testdata", f.runs[len(f.calls)-1]+".json"))
+	name, cut, stopped := strings.Cut(f.runs[len(f.calls)-1], ":")
+	data, err := os.ReadFile(filepath.Join("testdata", name+".json"))
 	if err != nil {
 		f.t.Fatal(err)
 	}
-	failed := false
-	for _, l := range bytes.SplitAfter(data, []byte("\n")) {
+	lines := bytes.SplitAfter(data, []byte("\n"))
+	if stopped {
+		n, _ := strconv.Atoi(cut)
+		lines = lines[:n]
+	}
+	failed := stopped
+	for _, l := range lines {
 		if len(l) > 0 {
 			line(l)
 			failed = failed || bytes.Contains(l, []byte(`"Action":"fail"`))
@@ -252,6 +260,21 @@ func TestVerbosePackages(t *testing.T) {
 	flaky := strings.Index(out, "=== RUN   TestBefore")
 	if pass < 0 || ok < pass || flaky < ok {
 		t.Errorf("pass's lines from %d to %d, then flaky's from %d: want them apart", pass, ok, flaky)
+	}
+}
+
+func TestGoStopped(t *testing.T) {
+	// go test stopped in TestTwo, before the package ended: that's no
+	// pass, and the package runs again.
+	code, out, calls, _ := gotest(t, []string{"-count=1", "./pass/"}, "pass:7", "pass")
+	if code != 0 {
+		t.Errorf("exit %d, want 0", code)
+	}
+	wantArgs(t, calls[1], "test", "-count=1", "-json", "example.com/demo/pass")
+	want(t, "the output", out, []string{"::warning title=Flaky test::example.com/demo/pass TestTwo failed 1 time, then passed\n"}, nil)
+	code, _, _, _ = gotest(t, []string{"-attempts=0", "-count=1", "./pass/"}, "pass:7")
+	if code != 1 {
+		t.Errorf("-attempts=0: exit %d, want 1", code)
 	}
 }
 

@@ -129,6 +129,26 @@ type Card struct {
 	Lines   []Line
 	Foot    []Line
 	Align   Align
+	// Mark is set at the bottom right; nil sets none.
+	Mark *Mark
+}
+
+// Mark is a mark set at the bottom right of a card, as an app's: its logo,
+// then its name, on one line. The foot keeps clear of it.
+type Mark struct {
+	// Logo is the logo, a little higher than the name's letters, keeping its
+	// shape; nil shows none.
+	Logo image.Image
+	// Name is the name: its Text, Size, Weight and Ink, on one line.
+	Name Line
+}
+
+// setMark is a Mark set at a scale: the name set, and the logo's size, the
+// gap between them and the whole mark's size, in pixels.
+type setMark struct {
+	name              []setLine
+	logoW, logoH, gap float64
+	width, height     float64
 }
 
 // Rendering is the part of a card's drawing that went wrong.
@@ -169,8 +189,14 @@ func (c Card) Render(fam Family) (*image.NRGBA, error) {
 	// taller one puts it above them, across their width.
 	wide := c.Size.W*5 >= c.Size.H*4
 	top, textLeft, textW := margin, margin, inner
+	// The mark takes the bottom right, which the foot leaves it.
+	mark := r.setMark(c, scale, inner)
+	clear := 0.0
+	if mark.width > 0 {
+		clear = mark.width + 32*scale
+	}
 	// The foot keeps its place at the bottom, so it is set first.
-	footLeft, footW := margin, inner
+	footLeft, footW := margin, inner-clear
 	footLines := r.set(c, c.Foot, scale, footW, false)
 	footH := blockHeight(footLines)
 	footTop := h - margin - footH
@@ -180,7 +206,7 @@ func (c Card) Render(fam Family) (*image.NRGBA, error) {
 		side := math.Min(math.Max(footH, h*0.1), h*0.16)
 		drawCover(img, c.Cover, image.Rect(int(margin), int(h-margin-side), int(margin+side), int(h-margin)), scale)
 		footLeft = margin + side + 28*scale
-		footW = w - margin - footLeft
+		footW = w - margin - footLeft - clear
 		footLines = r.set(c, c.Foot, scale, footW, false)
 		footH = blockHeight(footLines)
 		footTop = h - margin - side + (side-footH)/2
@@ -193,7 +219,7 @@ func (c Card) Render(fam Family) (*image.NRGBA, error) {
 		drawCover(img, c.Cover, image.Rect(int(margin), int(top), int(margin+side), int(top+side)), scale)
 		textLeft = margin + side + math.Round(margin*0.45)
 		textW = w - margin - textLeft
-		footLeft, footW = textLeft, textW
+		footLeft, footW = textLeft, textW-clear
 		footLines = r.set(c, c.Foot, scale, footW, false)
 		footTop = h - margin - blockHeight(footLines)
 	default:
@@ -202,8 +228,11 @@ func (c Card) Render(fam Family) (*image.NRGBA, error) {
 		top += side + 56*scale
 	}
 	room := h - margin - top
-	if len(footLines) > 0 {
+	switch {
+	case len(footLines) > 0:
 		room = footTop - top - 32*scale
+	case mark.height > 0:
+		room = h - margin - mark.height - top - 32*scale
 	}
 	// The lines shrink to fit the room, then lose lines.
 	var lines []setLine
@@ -216,7 +245,56 @@ func (c Card) Render(fam Family) (*image.NRGBA, error) {
 	lines = r.fitHeight(lines, room)
 	r.draw(img, lines, textLeft, top, textW, c.Align)
 	r.draw(img, footLines, footLeft, footTop, footW, c.Align)
+	r.drawMark(img, c.Mark, mark, w-margin, h-margin)
 	return img, nil
+}
+
+// setMark sets the card's mark at scale, no wider than width.
+func (t *typesetter) setMark(c Card, scale, width float64) setMark {
+	if c.Mark == nil {
+		return setMark{}
+	}
+	var s setMark
+	name := c.Mark.Name
+	name.MaxLines = 1
+	s.name = t.set(c, []Line{name}, scale, width, false)
+	px := name.Size * scale
+	if len(s.name) > 0 {
+		px = s.name[0].px
+		s.width = s.name[0].rows[0].width
+		s.height = s.name[0].height
+	}
+	if logo := c.Mark.Logo; logo != nil && px > 0 && logo.Bounds().Dy() > 0 {
+		b := logo.Bounds()
+		s.logoH = math.Round(px * 1.3)
+		s.logoW = math.Round(s.logoH * float64(b.Dx()) / float64(b.Dy()))
+		if s.width > 0 {
+			s.gap = math.Round(px * 0.4)
+		}
+		s.width += s.logoW + s.gap
+		s.height = math.Max(s.height, s.logoH)
+	}
+	return s
+}
+
+// drawMark draws the mark m, set as s, ending at right and bottom, its logo
+// and name centred on one line.
+func (t *typesetter) drawMark(img *image.NRGBA, m *Mark, s setMark, right, bottom float64) {
+	if m == nil || s.width <= 0 {
+		return
+	}
+	x := right - s.width
+	if s.logoW > 0 {
+		top := bottom - (s.height+s.logoH)/2
+		at := image.Rect(int(math.Round(x)), int(math.Round(top)), int(math.Round(x+s.logoW)), int(math.Round(top+s.logoH)))
+		logo := image.NewNRGBA(image.Rect(0, 0, at.Dx(), at.Dy()))
+		xdraw.CatmullRom.Scale(logo, logo.Bounds(), m.Logo, m.Logo.Bounds(), xdraw.Src, nil)
+		draw.Draw(img, at, logo, image.Point{}, draw.Over)
+		x += s.logoW + s.gap
+	}
+	if len(s.name) > 0 {
+		t.draw(img, s.name, x, bottom-(s.height+s.name[0].height)/2, right-x, AlignLeft)
+	}
 }
 
 // PNG draws the card and writes it as a PNG.

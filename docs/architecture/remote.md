@@ -67,6 +67,14 @@ is its key's fingerprint, the SHA-256 of the certificate's public key
 (SubjectPublicKeyInfo), and its ID, which discovery tells, is the first 80
 bits of it, as 16 letters and digits.
 
+The app reads and makes the key (`identity`) with no lock held that a
+frame takes. On the main thread, MyGo runs the window's events while the
+credential store answers, which may take a while as the system asks the
+user. A frame then shows the code and the page, and takes the lock of
+remote control: held around the key, the main thread would wait for
+itself (#464). A second call while the key is read, a click meanwhile,
+is told to try again, rather than wait for the first.
+
 ## Finding the computers
 
 A computer with remote control on announces `_mixmusic._tcp.local.`: an

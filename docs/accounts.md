@@ -2,7 +2,7 @@
 <!-- docs: group=start order=20 -->
 
 Sign in to YouTube Music, Spotify and Last.fm in MixMusic, all optional:
-the sign-in window, a browser's session, brand channels, scrobbling and signing out.
+the sign-in window, your own browser, a browser's session, brand channels, scrobbling and signing out.
 
 MixMusic needs no account: YouTube Music's search, artists, albums,
 playlists and radios work signed out, as soon as you open it. Sign in for
@@ -14,8 +14,8 @@ your Windows account.
 
 ## YouTube Music
 
-Settings › Accounts › YouTube Music offers three ways to sign in. The
-first is the simplest; the other two are for when it can't open, or Google
+Settings › Accounts › YouTube Music offers four ways to sign in. The
+first is the simplest; the others are for when it can't open, or Google
 refuses it.
 
 ![Settings › Accounts › YouTube Music, signed out: the sign in to youtube music button and a note on Google's own page, Import from a browser with Firefox chosen, Profile, "The browser's own", and the Import button, then Paste a cookie header, with its box and the sign in with it button](shots/accounts-youtube.webp)
@@ -30,7 +30,43 @@ the session encrypted on your computer. The window closes once you're in.
 The window needs the system's web view: WebView2 on Windows, which Windows
 11 includes, and WebKitGTK 4.1 on Linux. Google sometimes refuses it with
 "This browser or app may not be secure". That's Google's decision: try
-again later or from another network, or use one of the two ways below.
+again later or from another network, or use one of the ways below.
+
+### Sign in with your browser
+
+**Sign in with your browser** lists the browsers MixMusic finds on your
+computer: Chrome, Edge, Brave, Chromium, Vivaldi, Helium, Firefox and Zen.
+Choose one, then **sign in with** it:
+
+1. The browser opens with a new, empty profile of its own, made for this
+   sign-in alone, at YouTube Music's sign-in. Your own profiles, with
+   their tabs, bookmarks and sign-ins, stay as they are: MixMusic neither
+   opens nor reads them.
+2. Sign in there, as in any browser. Google knows the browser, so it
+   doesn't refuse it as it may refuse the window.
+3. Once YouTube Music is signed in, MixMusic takes the session from the new
+   profile, keeps YouTube's cookies alone, encrypted on your computer, as
+   the window does, closes the browser and deletes the profile.
+
+Closing the browser, or **cancel** beside the button, ends the sign-in, as
+do 10 minutes without one; the profile is deleted then too. On macOS, a
+browser made from Chromium ends it once you close its last window, while
+Firefox and Zen go on running until you quit them.
+
+- **Where MixMusic looks.** On Windows, where each browser installs, and
+  the browsers Windows knows from the registry; on macOS, in Applications
+  and the Applications folder of your home; on Linux, the browsers'
+  commands, as `google-chrome` or `firefox`, and the folders their
+  packages install to. Snaps work, as Ubuntu's Firefox and Chromium are.
+  Browsers installed from Flathub, and MixMusic's own Flatpak, which sees
+  none of your programs, aren't offered: use one of the ways below there.
+- **How it reads the session.** A browser made from Chromium starts with
+  its DevTools protocol on a pipe between MixMusic and the browser, never
+  on the network, which MixMusic asks for the profile's cookies. Firefox
+  and Zen keep them in the profile's own cookie store, which MixMusic
+  reads.
+- If MixMusic quits while you sign in, it closes the browser, and deletes
+  what's left of the profile at its next start.
 
 ### Import from a browser
 

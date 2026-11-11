@@ -32,10 +32,13 @@ on:
 permissions:
   contents: read
 
-# Deploys run one at a time, in order; a pull request's newer push replaces
-# its older one.
+# A pull request's newer push replaces its older run. Each push to main runs
+# to its end, so that every commit on main shows how it went: one whose
+# commit is no longer main's newest builds and deploys nothing, leaving
+# that to the newer one's run. A shared concurrency group would have GitHub
+# cancel the runs waiting in it, which shows as failed.
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('cloudflare-{0}', github.ref) || 'cloudflare' }}
+  group: cloudflare-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
@@ -43,7 +46,25 @@ env:
   WRANGLER_VERSION: 4.147.0
 
 jobs:
+  newest:
+    name: Main's newest commit
+    # Only a push can be behind a newer one.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      newest: ${{ steps.newest.outputs.newest }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+      - id: newest
+        run: bash .github/scripts/newest.sh
+
   deploy:
+    needs: newest
+    # A pull request's run, or one started by hand, goes on without that
+    # check.
+    if: ${{ !cancelled() && needs.newest.result != 'failure' && needs.newest.outputs.newest != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -72,8 +93,13 @@ jobs:
           name: site-cloudflare
           path: site/public
           retention-days: 7
-      - name: Deploy
+      # Main may have moved on while the site built.
+      - id: still
+        name: Still main's newest commit
         if: github.event_name != 'pull_request'
+        run: bash .github/scripts/newest.sh
+      - name: Deploy
+        if: github.event_name != 'pull_request' && steps.still.outputs.newest == 'true'
         working-directory: site
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

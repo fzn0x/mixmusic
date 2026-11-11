@@ -1,0 +1,145 @@
+{#- PixelSkyHero: a pixel-art night scene behind the home page's hero, which
+    it doesn't restyle. index.html wraps the hero in <div class="pxh"> and
+    includes this first in it. Ported from a React component: the same
+    image, star overlay, classes and styles.
+
+    The scene is assets/hero-night.png, 360x190 native pixels, which the
+    browser scales up with nearest-neighbour, anchored to the bottom, so it
+    stays crisp at any size. Only the stars of the SVG overlay move,
+    twinkling, and not under reduced motion (data-motion has the site's
+    check watch them). It shows in the dark scheme: the light scheme's dark
+    text keeps the page's light ground. -#}
+<style>
+.pxh { position: relative; isolation: isolate; overflow: hidden; background: #040507; }
+.pxh__bg, .pxh__stars {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: -1; pointer-events: none;
+}
+.pxh__bg {
+  object-fit: cover;
+  object-position: center bottom; /* matches the SVG's xMidYMax slice */
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+@keyframes pxh-tw { 0%, 100% { opacity: 1 } 50% { opacity: .15 } }
+@media (prefers-reduced-motion: no-preference) {
+  .pxh__s1 { animation: pxh-tw 2.4s steps(2) infinite }
+  .pxh__s2 { animation: pxh-tw 3.6s steps(2) infinite .8s }
+  .pxh__s3 { animation: pxh-tw 5s steps(2) infinite 1.7s }
+}
+/* Behind the text blocks only, a soft dark glow, so the scene's stars and
+   city lights don't show through the words: the copy at the top, and the
+   note under the player, which sits over the city on a phone. The copy's
+   glow spans its text, which starts at the left, not its whole width. */
+.pxh .hero-copy, .pxh .demo-note { position: relative; }
+.pxh .hero-copy::before, .pxh .demo-note::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+}
+.pxh .hero-copy::before {
+  top: -64px; bottom: -180px; left: -120px; width: min(calc(100% + 240px), 1120px);
+  background: radial-gradient(closest-side, rgba(4, 5, 7, 0.92), rgba(4, 5, 7, 0.85) 65%, rgba(4, 5, 7, 0));
+}
+.pxh .demo-note::before {
+  inset: -48px -64px;
+  background: radial-gradient(closest-side, rgba(4, 5, 7, 0.92), rgba(4, 5, 7, 0.86) 60%, rgba(4, 5, 7, 0));
+}
+/* The light scheme keeps the page's own ground: its text is dark. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .pxh { background: none; }
+  :root:not([data-theme="dark"]) .pxh__bg,
+  :root:not([data-theme="dark"]) .pxh__stars,
+  :root:not([data-theme="dark"]) .pxh .hero-copy::before,
+  :root:not([data-theme="dark"]) .pxh .demo-note::before { display: none; }
+}
+:root[data-theme="light"] .pxh { background: none; }
+:root[data-theme="light"] .pxh__bg,
+:root[data-theme="light"] .pxh__stars,
+:root[data-theme="light"] .pxh .hero-copy::before,
+:root[data-theme="light"] .pxh .demo-note::before { display: none; }
+</style>
+<img class="pxh__bg" src="assets/hero-night.png" alt="" aria-hidden="true" width="360" height="190" decoding="async" fetchpriority="high" />
+<svg class="pxh__stars" viewBox="0 0 360 190" preserveAspectRatio="xMidYMax slice" shape-rendering="crispEdges" aria-hidden="true" data-motion>
+  <rect class="pxh__s1" x="231" y="71" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="231" y="65" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s3" x="94" y="65" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="48" y="57" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s2" x="72" y="11" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="304" y="50" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="319" y="1" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="30" y="4" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s3" x="123" y="76" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="302" y="25" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s2" x="327" y="37" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="2" y="84" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="208" y="70" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="130" y="40" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s3" x="262" y="36" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="205" y="13" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s2" x="197" y="8" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="350" y="0" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s1" x="192" y="90" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="214" y="9" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s3" x="345" y="34" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s1" x="7" y="52" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="68" y="31" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="5" y="7" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="229" y="65" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s2" x="67" y="53" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="59" y="50" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="303" y="38" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="107" y="23" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="308" y="82" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="226" y="33" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="312" y="42" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s3" x="197" y="9" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="7" y="76" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s2" x="190" y="79" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="65" y="75" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="93" y="80" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s2" x="159" y="29" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s3" x="97" y="20" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s1" x="309" y="10" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="24" y="13" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="19" y="65" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s1" x="131" y="53" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="150" y="66" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s3" x="35" y="16" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s1" x="143" y="27" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s2" x="8" y="8" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s3" x="210" y="57" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s1" x="144" y="47" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s2" x="47" y="46" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s3" x="230" y="42" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s1" x="243" y="45" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s2" x="17" y="2" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="246" y="8" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s1" x="38" y="57" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s2" x="22" y="94" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s3" x="174" y="45" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="213" y="3" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="293" y="1" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="194" y="74" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="46" y="81" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="131" y="53" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s3" x="198" y="94" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="265" y="65" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="158" y="76" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="246" y="2" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s1" x="314" y="84" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="130" y="1" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s3" x="154" y="18" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s1" x="337" y="56" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="123" y="41" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="340" y="32" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s1" x="109" y="49" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s2" x="298" y="40" width="1" height="1" fill="#cfe9ff" />
+  <rect class="pxh__s3" x="69" y="17" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="141" y="21" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="230" y="60" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s3" x="109" y="52" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="344" y="40" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s2" x="164" y="9" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s3" x="142" y="77" width="1" height="1" fill="#ffffff" />
+  <rect class="pxh__s1" x="292" y="45" width="1" height="1" fill="#7cf0e6" />
+  <rect class="pxh__s2" x="332" y="72" width="1" height="1" fill="#ffffff" />
+</svg>

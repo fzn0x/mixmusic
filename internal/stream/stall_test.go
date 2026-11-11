@@ -46,6 +46,26 @@ func (l *logs) String() string {
 	return l.buf.String()
 }
 
+// waitFor returns the log once it has every one of lines, failing the test
+// with why unless they all come within a few seconds: what the proxy logs
+// after it relayed the audio may come after the player read the last of it.
+func (l *logs) waitFor(t *testing.T, why string, lines ...string) string {
+	t.Helper()
+	for deadline := time.Now().Add(5 * time.Second); ; time.Sleep(time.Millisecond) {
+		got := l.String()
+		missing := false
+		for _, s := range lines {
+			missing = missing || !strings.Contains(got, s)
+		}
+		if !missing {
+			return got
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("%s:\n%s", why, got)
+		}
+	}
+}
+
 // readAll reads all of s, failing the test unless it ends within a few
 // seconds.
 func readAll(t *testing.T, s *Source) ([]byte, error) {
@@ -130,9 +150,8 @@ func TestProxyResumesAStalledDownload(t *testing.T) {
 	if r := ranges(); len(r) != 2 || r[1] != fmt.Sprintf("bytes=30000-%d", size-1) {
 		t.Errorf("requests %q", r)
 	}
-	if l := logged.String(); !strings.Contains(l, testID+" broke off at byte 30000") || !strings.Contains(l, "comes again") {
-		t.Errorf("the log doesn't tell the break:\n%s", l)
-	}
+	// The proxy tells that the audio came again once it relayed the rest.
+	logged.waitFor(t, "the log doesn't tell the break", testID+" broke off at byte 30000", testID+" comes again")
 }
 
 // TestProxyResumesADroppedConnection does the same for a connection that

@@ -4,6 +4,9 @@
 #
 #   bash .github/scripts/apt-install.sh --no-install-recommends pulseaudio
 #
+# With no packages, it only points apt's lists at a mirror that answers and
+# brings them up to date, for a tool that runs apt itself after it.
+#
 # It asks the archive over HTTPS and over IPv4: on 2026-11-11 the runners
 # couldn't reach Ubuntu's mirrors over plain HTTP for hours, every index
 # timing out, while HTTPS answered; and they have no route for IPv6.
@@ -24,9 +27,10 @@
 # later apt-install.sh in the job skips at once.
 set -euo pipefail
 
+what="${*:-anything}"
 skipped="${RUNNER_TEMP:-/tmp}/apt-skipped"
 if [ -f "$skipped" ]; then
-	echo "::warning::Ubuntu's archive was out of reach earlier in this job: not installing $*."
+	echo "::warning::Ubuntu's archive was out of reach earlier in this job: not installing $what."
 	exit 0
 fi
 
@@ -92,12 +96,12 @@ while :; do
 	[ "$wait" -gt 120 ] && wait=120
 done
 
-echo "::warning::Ubuntu's archive was out of reach for $(((SECONDS - start) / 60)) minutes: not installing $*, and skipping the checks that need it."
+echo "::warning::Ubuntu's archive was out of reach for $(((SECONDS - start) / 60)) minutes: not installing $what, and skipping the checks that need it."
 touch "$skipped"
 if [ -n "${GITHUB_ENV:-}" ]; then
 	echo "APT_SKIPPED=1" >>"$GITHUB_ENV"
 fi
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
-	echo "Ubuntu's archive was out of reach: the checks that need $* were skipped." >>"$GITHUB_STEP_SUMMARY"
+	echo "Ubuntu's archive was out of reach: the checks that need ${*:-it} were skipped." >>"$GITHUB_STEP_SUMMARY"
 fi
 exit 0

@@ -162,10 +162,12 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
+      # It downloads yt-dlp: tools/gotest runs it again when it fails, up to
+      # 3 more times.
       - name: MixMusic installs yt-dlp, checks it, and runs it
         env:
           MIXMUSIC_LIVE: "1"
-        run: go test ./internal/tools/ -run '^TestLiveInstall$' -count=1 -v
+        run: go run ./tools/gotest ./internal/tools/ -run '^TestLiveInstall$' -count=1 -v
       - name: Time yt-dlp_linux and yt-dlp_linux.zip
         run: |
           cd "$RUNNER_TEMP"

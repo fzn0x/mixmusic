@@ -62,8 +62,11 @@ jobs:
       # from its module, checked against go.sum: the app doesn't build it in.
       - name: Download the dictionary of the romaji tests
         run: go mod download github.com/ikawaha/kagome-dict/ipa@v1.2.6
+      # tools/gotest runs a test that fails again, up to 3 more times: one
+      # that passes then is reported as flaky, and one that fails every
+      # time fails the step.
       - name: Test
-        run: go test ./...
+        run: go run ./tools/gotest ./...
         env:
           OPUS_TESTVECTORS: ${{ runner.os == 'Linux' && format('{0}/opus-vectors/opus_newvectors', runner.temp) || '' }}
       # MixMusic takes keys MyGo has none for from its GTK window: these
@@ -139,7 +142,7 @@ jobs:
             pacat --latency-msec=10 --format=s16le --rate=48000 --channels=2 /dev/zero &
             sleep 2
           fi
-          go test ./internal/audio/... -run 'TestStream|TestStartStop|TestRenderPanic|TestEngineOnTheDevice' -count=1 -v | tee audio.log
+          go run ./tools/gotest ./internal/audio/... -run 'TestStream|TestStartStop|TestRenderPanic|TestEngineOnTheDevice' -count=1 -v | tee audio.log
           if grep -q -- '--- SKIP' audio.log; then
             echo "A test skipped: the runner has no audio device."
             exit 1
@@ -157,7 +160,7 @@ jobs:
             bash .github/scripts/apt-install.sh dbus
             bus="dbus-run-session --"
           fi
-          $bus go test ./internal/nowplaying/ ./internal/portal/ -run 'TestMPRIS|TestNowPlaying|TestBackgroundPortal' -count=1 -v | tee controls.log
+          $bus go run ./tools/gotest ./internal/nowplaying/ ./internal/portal/ -run 'TestMPRIS|TestNowPlaying|TestBackgroundPortal' -count=1 -v | tee controls.log
           if grep -q -- '--- SKIP' controls.log; then
             echo "A test skipped."
             exit 1

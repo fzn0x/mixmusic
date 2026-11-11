@@ -460,6 +460,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	}
 	s.localItems(m, t)
 	s.copyItems(m, t)
+	s.exportItem(m, t)
 	s.trackInfoItem(m, t)
 	m.Separator()
 	for _, a := range t.Artists {

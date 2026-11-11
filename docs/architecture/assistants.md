@@ -52,7 +52,8 @@ portable copy; and the JSON of `mcpServers`, which most assistants take.
   and at quit; the file of a run that crashed goes at the next start. Its
   status is `System.AssistantStatus`, with the command, its JSON, and the
   assistants connected, by the names they give.
-- **The tools** (`internal/app/assistanttools.go`) don't make a second
+- **The tools** (`internal/app/assistanttools.go`, and
+  `assistantfind.go` for search and the playlists) don't make a second
   player API: they read what plays and the queue as remote control tells
   them (`remoteStateOf`), with each track's service, and send play, pause,
   next, previous, seeking, the volume and the queue's entries through

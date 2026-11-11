@@ -81,6 +81,79 @@ func TestKeptTrackFails(t *testing.T) {
 	}
 }
 
+// TestRetryEndsBeforeItHolds has a track that plays without the network,
+// tried again, that ends before it holds count as a try that failed: a
+// file cut short as it plays, tried again, ends before where it stopped
+// (#456). One that resumed near the track's end, or held, ends, as before,
+// and so does a stream.
+func TestRetryEndsBeforeItHolds(t *testing.T) {
+	// breakAt has a's stream break off at, as a file cut short fails, and
+	// waits for the try, which doesn't sound.
+	breakAt := func(h *harness, at time.Duration) {
+		t.Helper()
+		h.p.PlayTracks(tracks("a", "b"), 0)
+		h.wait("a playing", playing("a"))
+		h.p.Time(at, 200*time.Second)
+		h.stream.silence("a")
+		h.p.Playing(false)
+		h.p.Error("Can't read the file")
+		h.wait("a tried", func(p *Player) bool { return retries(h, "a") == 1 && p.loaded })
+	}
+	t.Run("a file cut short", func(t *testing.T) {
+		longWaits(t, 3)
+		h := newFileHarness(t, newNet(true), nil, "a", "b")
+		breakAt(h, 8*time.Second)
+		// The try tells the cut file's length, as an MP3's, guessed from its
+		// size, and a moment past where it resumed.
+		h.p.Time(8*time.Second+50*time.Millisecond, 3*time.Second)
+		h.p.Ended()
+		h.wait("b playing", playing("b"))
+		if n := h.notices(); len(n) != 1 || n[0].Message != "Couldn't play Song a: Can't read the file" {
+			t.Errorf("notices %+v", n)
+		}
+	})
+	t.Run("at the track's end", func(t *testing.T) {
+		longWaits(t, 3)
+		h := newFileHarness(t, newNet(true), nil, "a", "b")
+		breakAt(h, 195*time.Second)
+		h.p.Ended()
+		h.wait("b playing", playing("b"))
+		if n := h.notices(); len(n) != 0 {
+			t.Errorf("notices %+v", n)
+		}
+	})
+	t.Run("played on", func(t *testing.T) {
+		longWaits(t, 3)
+		h := newFileHarness(t, newNet(true), nil, "a", "b")
+		breakAt(h, 8*time.Second)
+		h.p.Playing(true)
+		h.p.Time(8*time.Second+retryHold, 200*time.Second)
+		h.p.Ended()
+		h.wait("b playing", playing("b"))
+		if n := h.notices(); len(n) != 0 {
+			t.Errorf("notices %+v", n)
+		}
+	})
+	t.Run("a stream", func(t *testing.T) {
+		h := newFileHarness(t, newNet(true), nil, "b")
+		h.p.PlayTracks(tracks("a", "b"), 0)
+		h.wait("a playing", playing("a"))
+		h.p.Time(42*time.Second, 200*time.Second)
+		h.stream.silence("a")
+		h.p.Playing(false)
+		h.p.Error("the stream failed")
+		h.wait("a tried", func(p *Player) bool { return retries(h, "a") == 1 && p.loaded })
+		h.p.Ended()
+		h.wait("b playing", playing("b"))
+		if n := retries(h, "a"); n != 1 {
+			t.Errorf("tried %d times", n)
+		}
+		if n := h.notices(); len(n) != 0 {
+			t.Errorf("notices %+v", n)
+		}
+	})
+}
+
 // TestStreamBesideKeptWaits has a stream that breaks off while the
 // network is gone wait for it, as before, beside tracks that play without
 // it.

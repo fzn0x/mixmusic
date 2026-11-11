@@ -1,4 +1,4 @@
-<p align="center"><a href="README.md">English</a> · <strong>简体中文</strong> · <a href="README.id.md">Bahasa Indonesia</a></p>
+<p align="center"><a href="README.md">English</a> · <a href="README.hi.md">हिन्दी</a> · <strong>简体中文</strong> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.ur.md">اردو</a> · <a href="README.pt-BR.md">Português (Brasil)</a> · <a href="README.bn.md">বাংলা</a> · <a href="README.ru.md">Русский</a> · <a href="README.am.md">አማርኛ</a></p>
 
 <p align="center">
   <img src="brand/icon.png" width="112" height="112" alt="MixMusic 的图标：黑色背景上的两个粉色圆环和一个播放按钮" />
@@ -43,7 +43,7 @@
 - **统一的播放队列和音乐库**：Spotify 的歌曲可以紧接着 YouTube Music 的歌曲播放，一个歌单里也可以同时放两边的歌。
 - **无需账号**：打开应用就能播放 YouTube Music。只有想用自己的音乐库时才需要登录。Spotify 是可选的。
 - **程序小巧**：MixMusic 是一个 Go 程序，用 GPU 自己绘制窗口。它内部不带浏览器，既不用额外下载，也不会让浏览器常驻内存。
-- **随你改造**：自带十个主题，社区还提供更多主题和插件，任何命令都可以设置你自己的快捷键。
+- **随你改造**：自带四种布局和十四个主题，社区还提供更多主题和插件，任何命令都可以设置你自己的快捷键。
 - **注重隐私**：MixMusic 没有自己的账号体系、服务器、统计分析或遥测。
 - **免费开源**：可按 MIT 许可证或 GPL 3.0 使用。
 
@@ -80,6 +80,7 @@
 ### 桌面集成
 
 - 在 Windows、macOS 和 Linux 上支持媒体键和系统的媒体控制。
+- 你自己设置的全局快捷键：播放、暂停、切歌、调节音量、静音、喜欢或不喜欢正在播放的歌曲，或者显示 MixMusic，不论哪个窗口在最前面。
 - 在 Windows 上，任务栏缩略图中带有播放器按钮。
 - 托盘控制、切换到新歌曲时的通知，以及开机自启。
 - `mixmusic://` 链接。
@@ -89,7 +90,8 @@
 
 ### 个性化
 
-- **主题**：内置十个主题，效果可以调节；浅色模式和深色模式可以各用一个主题；强调色可以自己选，也可以取自正在播放的歌曲封面。
+- **布局**：默认的 Blend 采用圆润的造型和富有弹性的动效，在密集排列的大封面上呈现。Expressive 参照 Material 3 Expressive，风格活泼，有色调填充、胶囊按钮和悬浮的播放栏。Crate 比较克制，让封面来说话；Tiles 是 MixMusic 最初的样子，有扁平的方块和巨大的小写文字。
+- **主题**：内置十四个主题，每个都能用在任何一种布局中，效果可以调节；浅色模式和深色模式可以各用一个主题；强调色可以自己选，也可以取自正在播放的歌曲封面。Material 和 Material Dark 会让每一种颜色都取自封面。
 - **社区主题和插件**：在市场里一键安装。
 - **插件**：通过带类型的 API 添加页面、命令、歌曲操作和小组件，并按你的主题绘制。
 - **键盘优先**：常用操作都有快捷键；任何命令（包括插件的命令）都可以设置你自己的快捷键；其余操作可以用命令面板（<kbd>Ctrl</kbd> <kbd>K</kbd>）完成。
@@ -120,13 +122,20 @@
 | Windows 便携版，无需安装 | [`mixmusic-<version>-windows-<arch>-portable.zip`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Debian、Ubuntu 及其衍生发行版 | [`mixmusic-<version>-linux-<arch>.deb`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | Fedora、openSUSE 及其衍生发行版 | [`mixmusic-<version>-linux-<arch>.rpm`](https://github.com/fzn0x/mixmusic/releases/latest) |
+| Arch Linux 及其衍生发行版（即将推出） | AUR 上的 [`mixmusic-bin`](https://aur.archlinux.org/packages/mixmusic-bin)：`yay -S mixmusic-bin` |
 | 任意 Linux，单个文件 | [`mixmusic-<version>-linux-<arch>.AppImage`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | 任意 Linux，沙盒运行（Flatpak） | [`mixmusic-<version>-linux-<arch>.flatpak`](https://github.com/fzn0x/mixmusic/releases/latest) |
 | 任意 Linux，装在你的主文件夹中 | [`mixmusic-<version>-linux-<arch>.tar.gz`](https://github.com/fzn0x/mixmusic/releases/latest)，附带 `install.sh` |
 
 `<arch>` 在 x64 上是 `amd64`，在 Arm 上是 `arm64`。每个版本都附有 `SHA256SUMS`，可以用来校验下载的文件。名为 `update-…`、`….delta`、`mixmusic-<version>-macos-…` 或 `-windows-<arch>.tar.gz` 的文件不需要下载：它们是已安装的应用自动更新时用的。
 
-安装程序、便携版 zip 和 Linux 压缩包会自行更新。`.deb`、`.rpm`、AppImage 和 Flatpak 无法替换自身的文件，所以有新版本时，MixMusic 会告诉你，并替你下载。便携版 zip 解压到任意位置，打开 `MixMusic.exe` 即可。AppImage 先加上可执行权限（`chmod +x`），再打开。Flatpak 可以用你的软件中心打开，或者运行 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`；第一次安装时，Flatpak 会从 Flathub 获取 GNOME 运行时。
+安装程序、便携版 zip 和 Linux 压缩包会自行更新。`.deb`、`.rpm`、AppImage 和 Flatpak 无法替换自身的文件，所以有新版本时，MixMusic 会告诉你，并替你下载。AUR 的 `mixmusic-bin` 随你系统的其余软件一起更新。便携版 zip 解压到任意位置，打开 `MixMusic.exe` 即可。AppImage 先加上可执行权限（`chmod +x`），再打开。Flatpak 可以用你的软件中心打开，或者运行 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`；第一次安装时，Flatpak 会从 Flathub 获取 GNOME 运行时。
+
+即将推出，等它的 tap 上线后：在 Mac 上，可以用 [Homebrew](https://brew.sh) 安装 MixMusic，用 `brew upgrade` 更新它。
+
+```sh
+brew install --cask fzn0x/tap/mixmusic
+```
 
 ### 首次启动
 
@@ -154,7 +163,7 @@ Flatpak 版在沙盒中运行 MixMusic。沙盒能访问网络、声音服务器
 
 ### 账号（均为可选）
 
-- **YouTube Music**：在 Settings › Accounts（设置 › 账号）中选择 Sign in to YouTube Music（登录 YouTube Music），然后在弹出的窗口中登录 Google。你输入的内容只会发送给 Google。MixMusic 会加密保存登录会话；系统有密钥环时，密钥就存放在密钥环中。
+- **YouTube Music**：在 Settings › Accounts（设置 › 账号）中选择 Sign in to YouTube Music（登录 YouTube Music），然后在弹出的窗口中登录 Google。你输入的内容只会发送给 Google。MixMusic 会加密保存登录会话；系统有密钥环时，密钥就存放在密钥环中。如果那个窗口打不开，或者 Google 拒绝它，可以用你自己的浏览器登录，MixMusic 会用一个它自己的新配置文件打开浏览器，你登录完成后再把这个配置文件删除；也可以导入你已登录的某个浏览器的会话（MixMusic 用它的 yt-dlp 读取，并且只保留 YouTube 的 cookie）；或者粘贴已登录的 music.youtube.com 标签页的 Cookie 请求头。
 - **Spotify**：Spotify 规定一个应用最多只能服务五个用户，而且只有在应用的所有者订阅了 Premium 时才行，所以你需要用自己创建的 Spotify 应用登录。只需两分钟：[docs/spotify.md](docs/spotify.md) 会一步步带你完成。
 - **Last.fm**：在 [last.fm/api/account/create](https://www.last.fm/api/account/create) 创建一个 API 账号（名称随意，不用填回调 URL），把它的 API key 和 shared secret 粘贴到 Settings › Accounts 中，然后在浏览器中授权 MixMusic。
 - **Discord**：Discord 应用运行时，你的个人资料上会显示你正在听的内容。可以在 Settings › Desktop（设置 › 桌面）中关闭。
@@ -256,7 +265,8 @@ internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
 internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
-internal/library     liked songs, mixes, history and stats
+internal/romaji      Japanese lyrics in romaji, kanji read by kagome
+internal/library     liked and disliked songs, mixes, history and stats
 internal/lastfm      scrobbling to Last.fm
 internal/discord     what plays, on your Discord profile
 internal/diag        the log, without secrets, and the reports of crashes
@@ -272,10 +282,11 @@ community/           community themes and plugins, and their registry
 ```
 opus/                an Opus decoder in pure Go, a port of libopus's
 aac/                 an AAC-LC decoder in pure Go
+ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/52
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
-lyrics/              synced lyrics from LRCLIB, and the LRC format
+lyrics/              synced lyrics from Unison and LRCLIB, and translations
 brand/               MixMusic's logo, for code that draws it
 ```
 
@@ -306,22 +317,24 @@ MixMusic 没有自己的账号体系、服务器、统计分析或遥测。它�
 
 - **YouTube 和 Google**：YouTube Music 的曲库、音频流和每首歌的响度（这些都在未登录状态下请求），以及封面图片；部分音频流通过 yt-dlp 获取。登录后，还有你在那里的音乐库；另外，除非你在 Settings › Accounts（设置 › 账号）中关闭，你播放的歌曲也会发送过去，进入你的 YouTube Music 播放记录。
 - **Spotify**（登录之后）：你的音乐库、你的 Spotify Connect 设备；在 MixMusic 内播放 Spotify 时，还有从 `sdk.scdn.co` 加载的 Spotify 播放器。
+- **Unison**：正在播放的歌曲的视频 ID，没有视频 ID 时则是它的标题、艺人、专辑和时长，用来查找歌词。只有在你于歌词旁打开翻译或罗马音时，才会发送正在播放的歌曲的歌词和它的视频 ID，由 Unison 交给 Google 翻译。
 - **LRCLIB**：正在播放的歌曲的标题、艺人、专辑和时长，用来查找歌词。
-- **GitHub**：启动时以及之后每隔几小时检查一次新版本，可以在 Settings › About（设置 › 关于）中关闭；打开市场时获取社区注册表；以及下载 yt-dlp。
+- **GitHub**：启动时以及之后每隔几小时检查一次新版本，可以在 Settings › About（设置 › 关于）中关闭；打开市场时获取社区注册表；下载 yt-dlp；以及第一次在日文歌词旁打开罗马音时，下载汉字读音词典（11.7 MB）。罗马音在你的电脑上生成：歌词不会被发送出去。
 - **Last.fm**（连接之后）：你播放的内容。
 - **Discord**（除非你关闭）：正在播放的内容，发送给你电脑上的 Discord 应用，由它显示在你的个人资料上。
 
 它在你电脑上保存的内容：
 
-- 你的设置和音乐库（喜欢的歌曲、混合歌单、播放历史和最近的搜索），保存在 Settings › About 中显示的文件夹里。
+- 你的设置和音乐库（喜欢和不喜欢的歌曲、混合歌单、播放历史和最近的搜索），保存在 Settings › About 中显示的文件夹里。
 - 你播放过的歌曲，存放在缓存中，大小以你在 Settings › Playback（设置 › 播放）中允许的为限；以及 YouTube 测得的这些歌曲的响度。
 - 你看过的封面，最多 256 MB。
+- 你打开过的歌词翻译（按歌曲和语言保存），以及罗马音用来读汉字的词典（打开罗马音之后才有）。
 - 你的登录信息（包括 YouTube Music 会话），保存在系统密钥环中。在 Windows 上，如果凭据管理器（Credential Manager）存不下某条登录信息，它会存进一个针对你的 Windows 账户加密的文件；在没有密钥环的 Linux 上，则存进只有你的用户能读取的文件。
 - 日志，其中不含你的登录信息。
 
 在音乐库的播放历史页面可以清除播放记录，在 Settings › Playback 中可以清除缓存和封面，退出某个服务的登录会删除它的登录信息。
 
-在 Windows 上，可视化效果通过 Windows 的进程环回（process loopback）获取 Spotify 在这台电脑上播放的音频，无论是在 MixMusic 中还是在 Spotify 应用中播放；进程环回只采集那一个应用的声音。音频只在内存中分析，从不录制或发送。
+在 Windows 上，可视化效果通过 Windows 的进程环回（process loopback）获取 Spotify 在这台电脑上播放的音频，无论是在 MixMusic 中还是在 Spotify 应用中播放；进程环回只采集那一个应用的声音。在 macOS 14.2 及更高版本上，可视化效果通过进程采集（process tap）获取在 MixMusic 中播放的 Spotify 的音频，需要你按 macOS 的提示允许。音频只在内存中分析，从不录制或发送。
 
 ## 致谢
 
@@ -336,10 +349,12 @@ MixMusic 基于以下项目构建：
 - **[Zola](https://www.getzola.org)**：构建网站。
 - **[NSIS](https://nsis.sourceforge.io)**：制作 Windows 安装程序；[appimagetool](https://github.com/AppImage/appimagetool) 则用来制作 AppImage。
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**：为 MixMusic 自己找不到音频的歌曲找到音频。
-- **[LRCLIB](https://lrclib.net)**：开放的同步歌词数据库。
+- **[Unison](https://unison.betterlyrics.org)**：开放的、由众包建立的歌词数据库，采用 ODbL 许可；**[LRCLIB](https://lrclib.net)**：开放的同步歌词数据库。
+- **[kagome](https://github.com/ikawaha/kagome)**：日语形态分析器，读出歌词中的汉字以生成罗马音；搭配 [kagome-dict](https://github.com/ikawaha/kagome-dict) 的 IPA 词典，它由 mecab-ipadic 制成，MixMusic 在第一次打开罗马音时下载。
 - **[libopus](https://opus-codec.org)**：MixMusic 的 Opus 解码器移植自它的解码器。**[SharpJaad](https://github.com/jimm98y/SharpJaad)**：[JAAD](https://sourceforge.net/projects/jaadec/) 的 C# 移植版，MixMusic 的 AAC 解码器就源自它。
 - **[FFmpeg](https://ffmpeg.org)**：解码器的测试以它作为对照。
-- **[Selawik](https://github.com/microsoft/Selawik)** 和 **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**：窗口中使用的字体。
+- **[Selawik](https://github.com/microsoft/Selawik)**、**[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**、**[Roboto Flex](https://github.com/googlefonts/roboto-flex)** 和 **[Archivo](https://github.com/Omnibus-Type/Archivo)**：窗口中使用的字体。
+- **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**：Material 主题的颜色移植自它的 HCT 色彩科学。
 - **[Kevin MacLeod](https://incompetech.com)**：网站中播放的是他的音乐，采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可。
 
 ## 参与贡献
@@ -354,6 +369,6 @@ MixMusic 基于以下项目构建：
 
 ## 许可证
 
-MixMusic 采用双重许可：你可以任选 [MIT 许可证](LICENSE-MIT)或 [GNU General Public License, version 3](LICENSE-GPL) 来使用它。贡献同时以这两种许可证接受。`fonts` 中的字体采用 SIL Open Font License：[Selawik 的许可证](fonts/OFL.txt)和 [Quicksand 的许可证](fonts/quicksand-OFL.txt)。Opus 解码器移植自 libopus，采用[它的 BSD 许可证](opus/LICENSE.libopus)；AAC 解码器源自 SharpJaad，采用[它的 MIT 许可证](aac/LICENSE.sharpjaad)。
+MixMusic 采用双重许可：你可以任选 [MIT 许可证](LICENSE-MIT)或 [GNU General Public License, version 3](LICENSE-GPL) 来使用它。贡献同时以这两种许可证接受。`fonts` 中的字体采用 SIL Open Font License：[Selawik 的许可证](fonts/OFL.txt)、[Quicksand 的许可证](fonts/quicksand-OFL.txt)、[Roboto Flex 的许可证](fonts/robotoflex-OFL.txt)和 [Archivo 的许可证](fonts/archivo-OFL.txt)。Opus 解码器移植自 libopus，采用[它的 BSD 许可证](opus/LICENSE.libopus)；AAC 解码器源自 SharpJaad，采用[它的 MIT 许可证](aac/LICENSE.sharpjaad)；HCT 色彩科学移植自 Material Color Utilities，采用[它的 Apache 许可证](internal/hct/LICENSE.material-color-utilities)。
 
 MixMusic 与 Spotify 和 Google 没有任何关联，也未获得它们的认可或赞助。它通过这些服务自己的接口，播放它们向用户提供的内容；请在它们的条款允许的范围内使用。Spotify 和 YouTube Music 是其各自所有者的商标。

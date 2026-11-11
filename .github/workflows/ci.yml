@@ -107,9 +107,10 @@ jobs:
   audio:
     name: Audio output (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    # A run takes about a minute; one that hangs gives up long before
-    # GitHub's 6 hours.
-    timeout-minutes: 30
+    # A run takes about a minute, and its steps' downloads and tests may
+    # try again for longer; one that hangs gives up long before GitHub's 6
+    # hours.
+    timeout-minutes: 210
     strategy:
       fail-fast: false
       matrix:
@@ -133,6 +134,7 @@ jobs:
           pactl info
       - name: An audio device
         if: runner.os == 'macOS'
+        timeout-minutes: 50
         run: |
           bash .github/scripts/retry.sh 45 brew install --cask blackhole-2ch
           sudo killall coreaudiod || true
@@ -141,6 +143,7 @@ jobs:
       # A test that skips found no device: here, that fails.
       - name: Play through the device
         shell: bash
+        timeout-minutes: 45
         env:
           MIXMUSIC_AUDIO: "1"
         run: |
@@ -163,6 +166,7 @@ jobs:
       # background and start at login.
       - name: Show in the system's media controls
         shell: bash
+        timeout-minutes: 55
         run: |
           bus=""
           if [ "$RUNNER_OS" = Linux ]; then

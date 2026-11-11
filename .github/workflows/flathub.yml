@@ -67,7 +67,8 @@ jobs:
     name: Build (${{ matrix.arch }})
     needs: sources
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
+    # Its downloads try again for up to 30 or 45 minutes each.
+    timeout-minutes: 270
     strategy:
       fail-fast: false
       matrix:

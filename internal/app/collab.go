@@ -33,13 +33,14 @@ func (c *Collection) InviteYouTubeCollaborators(ctx context.Context, playlistID 
 	if err != nil {
 		return "", err
 	}
-	if unlist {
-		if err := c.a.youtube.SetPlaylistPrivacy(ctx, list, media.Unlisted); err != nil {
-			return "", err
-		}
+	if !unlist {
+		return c.a.youtube.InviteCollaborators(ctx, list)
 	}
-	link, err := c.a.youtube.InviteCollaborators(ctx, list)
-	if err != nil && unlist {
+	if err := c.a.youtube.SetPlaylistPrivacy(ctx, list, media.Unlisted); err != nil {
+		return "", err
+	}
+	link, err := c.a.youtube.InviteCollaboratorsOnceUnlisted(ctx, list)
+	if err != nil {
 		err = fmt.Errorf("%w; the playlist is unlisted now", err)
 	}
 	return link, err

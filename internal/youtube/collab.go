@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 )
@@ -62,21 +63,51 @@ var (
 // can't open a private playlist, which SetPlaylistPrivacy makes unlisted
 // first.
 func (c *Client) InviteCollaborators(ctx context.Context, playlistID string) (string, error) {
-	_, link, err := c.invite(ctx, playlistID)
+	_, link, err := c.invite(ctx, playlistID, 0)
 	return link, err
 }
 
-// invite is InviteCollaborators, which returns YouTube's answer too.
-func (c *Client) invite(ctx context.Context, playlistID string) (node, string, error) {
-	n, err := c.editPlaylistAnswer(ctx, playlistID, map[string]any{"action": actionInvite}, errInviteRefused, errInviteDenied)
-	if err != nil {
-		return n, "", badRequest(err, errInviteDenied)
+// InviteCollaboratorsOnceUnlisted is InviteCollaborators for a playlist
+// that SetPlaylistPrivacy made unlisted a moment ago. YouTube refuses to
+// turn collaboration on, with HTTP 400, until the change reaches it, so it
+// asks again every unlistedRetry, for up to unlistedWait.
+func (c *Client) InviteCollaboratorsOnceUnlisted(ctx context.Context, playlistID string) (string, error) {
+	_, link, err := c.invite(ctx, playlistID, unlistedWait)
+	return link, err
+}
+
+// unlistedWait is how long an invite waits for YouTube to take in that a
+// private playlist is unlisted now, and unlistedRetry how often it asks
+// meanwhile. YouTube answers "Precondition check failed" for a while
+// after the change: 18 s on 2026-11-11. Tests shorten them.
+var (
+	unlistedWait  = 45 * time.Second
+	unlistedRetry = 3 * time.Second
+)
+
+// invite is InviteCollaborators, which returns YouTube's answer too. While
+// YouTube refuses it with HTTP 400, it asks again for up to wait.
+func (c *Client) invite(ctx context.Context, playlistID string, wait time.Duration) (node, string, error) {
+	deadline := time.Now().Add(wait)
+	for {
+		n, err := c.editPlaylistAnswer(ctx, playlistID, map[string]any{"action": actionInvite}, errInviteRefused, errInviteDenied)
+		if err == nil {
+			link := inviteLink(n)
+			if link == "" {
+				return n, "", errNoInviteLink
+			}
+			return n, link, nil
+		}
+		var api *APIError
+		if !errors.As(err, &api) || api.Status != http.StatusBadRequest || time.Now().Add(unlistedRetry).After(deadline) {
+			return n, "", badRequest(err, errInviteDenied)
+		}
+		select {
+		case <-ctx.Done():
+			return n, "", badRequest(err, errInviteDenied)
+		case <-time.After(unlistedRetry):
+		}
 	}
-	link := inviteLink(n)
-	if link == "" {
-		return n, "", errNoInviteLink
-	}
-	return n, link, nil
 }
 
 // StopCollaboration turns YouTube Music's collaboration off for a playlist

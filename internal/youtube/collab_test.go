@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 )
@@ -48,6 +50,53 @@ func TestInviteCollaborators(t *testing.T) {
 		if link, err := c.InviteCollaborators(ctx, "PLtestOwnPlaylist"); link != "" || !errors.Is(err, tc.want) {
 			t.Errorf("%s: %q, %v, want %v", tc.name, link, err, tc.want)
 		}
+	}
+}
+
+// TestInviteOnceUnlisted asks again while YouTube refuses the invite of a
+// playlist made unlisted a moment ago with 400, as it does until the
+// change reaches it, and gives up after unlistedWait; a plain invite asks
+// once.
+func TestInviteOnceUnlisted(t *testing.T) {
+	wait, retry := unlistedWait, unlistedRetry
+	unlistedWait, unlistedRetry = 200*time.Millisecond, time.Millisecond
+	t.Cleanup(func() { unlistedWait, unlistedRetry = wait, retry })
+	invite := fixture(t, "edit-playlist-invite").v
+	precondition := map[string]any{"error": map[string]any{"code": 400, "message": "Precondition check failed.", "status": "FAILED_PRECONDITION"}}
+	var mu sync.Mutex
+	refusals := 2
+	c, requests, _ := statusYouTube(t, func(string) (int, any) {
+		mu.Lock()
+		defer mu.Unlock()
+		if refusals != 0 {
+			refusals--
+			return http.StatusBadRequest, precondition
+		}
+		return http.StatusOK, invite
+	})
+	c.SetCookies(session)
+	ctx := context.Background()
+	link, err := c.InviteCollaboratorsOnceUnlisted(ctx, "PLtestOwnPlaylist")
+	if err != nil || link != "https://music.youtube.com/playlist?list=PLtestOwnPlaylist&jct=testJoinToken01" || len(requests()) != 3 {
+		t.Fatalf("after two refusals: %q, %v, %d requests", link, err, len(requests()))
+	}
+
+	mu.Lock()
+	refusals = 1
+	mu.Unlock()
+	if _, err := c.InviteCollaborators(ctx, "PLtestOwnPlaylist"); !errors.Is(err, errInviteDenied) || len(requests()) != 4 {
+		t.Errorf("a plain invite: %v, %d requests", err, len(requests()))
+	}
+
+	mu.Lock()
+	refusals = -1
+	mu.Unlock()
+	start := time.Now()
+	if _, err := c.InviteCollaboratorsOnceUnlisted(ctx, "PLtestOwnPlaylist"); !errors.Is(err, errInviteDenied) {
+		t.Errorf("refused throughout: %v", err)
+	}
+	if took := time.Since(start); took > 2*time.Second {
+		t.Errorf("gave up after %v", took)
 	}
 }
 

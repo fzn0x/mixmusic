@@ -30,7 +30,10 @@
   turns it on answers with an invite link (`InviteCollaborators`),
   another closes the playlist to contributions (`StopCollaboration`), and
   a private playlist, which collaborators can't open, is made unlisted
-  first (`SetPlaylistPrivacy`). A playlist page's header tells who may
+  first (`SetPlaylistPrivacy`). YouTube refuses the invite with 400
+  ("Precondition check failed") until that change reaches it, 18 s in a
+  live run, so `InviteCollaboratorsOnceUnlisted` asks again every 3 s for
+  up to 45 s. A playlist page's header tells who may
   open a playlist of the user's, in its tools, and whether its avatars
   are its collaborators', by the panel they open: `Mine`, `Privacy` and
   `Collaborative` of `media.Playlist`. Its tests read hand-written

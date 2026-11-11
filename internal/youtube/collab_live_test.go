@@ -86,7 +86,7 @@ func TestLiveCollaboration(t *testing.T) {
 	}
 	page(c, "collab-page-unlisted", func(p media.Playlist) bool { return p.Privacy == media.Unlisted })
 
-	answer, link, err := c.invite(ctx, id)
+	answer, link, err := c.invite(ctx, id, unlistedWait)
 	record("collab-invite", answer)
 	if err != nil {
 		t.Fatalf("inviting: %v; the answer: %v", err, answer.v)

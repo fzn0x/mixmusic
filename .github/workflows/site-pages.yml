@@ -58,6 +58,8 @@ jobs:
       - name: Install the browsers
         working-directory: site/e2e
         run: bash ../../.github/scripts/retry.sh 45 npx playwright install --with-deps chromium firefox webkit
+      # A page check that fails runs again, up to twice, and shows as flaky
+      # in the report when it passes then.
       - name: Check the pages
         working-directory: site/e2e
         run: npx playwright test

@@ -164,6 +164,8 @@ type App struct {
 	presence presence
 	// overlay serves what plays to the overlays of streams (overlay.go).
 	overlay overlayHost
+	// assistants serves the AI assistants of this computer (assistant.go).
+	assistants assistantHost
 	// watchtime reports the listening to YouTube Music's episodes to the
 	// history there.
 	watchtime watchtime
@@ -379,6 +381,7 @@ func (a *App) apply(s settings.Settings) {
 	a.mu.Unlock()
 	a.presence.update(s.Desktop, np)
 	a.applyOverlay(s)
+	a.applyAssistants(s)
 	if p := a.goPlayer.Load(); p != nil {
 		p.SettingsChanged(s)
 		a.applyEngine(s)

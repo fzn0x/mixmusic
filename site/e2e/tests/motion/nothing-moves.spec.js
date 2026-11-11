@@ -18,7 +18,10 @@ test("no animation runs on the home page while it rests", async ({ page }) => {
   expect(running, "animations running at rest").toEqual([]);
 });
 
+// moving looks at each marked part for about two seconds: the demos and the
+// feature cards together take longer than a test's 30 s.
 test("the parts of demos and tiles that move, marked data-motion, stay still", async ({ page }) => {
+  test.setTimeout(120_000);
   await load(page, "/");
   expect(await moving(page)).toEqual([]);
 });
@@ -26,6 +29,7 @@ test("the parts of demos and tiles that move, marked data-motion, stay still", a
 // The check has to see movement when there is some: a marked part that
 // animates itself, in a way no style sheet can switch off, is caught.
 test("the check catches a marked part that moves", async ({ page }) => {
+  test.setTimeout(120_000);
   await load(page, "/");
   await page.evaluate(() => {
     const el = document.createElement("div");

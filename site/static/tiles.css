@@ -1,63 +1,556 @@
 /*
- * Feature tiles that act out what they do (tiles.js, #358): each tile's
- * little picture plays the feature on its own, again and again, while it is
- * in the window: a lyric line moving on, a selection stepping past a
- * disliked song, a bar filling. Hovered or focused, a tile holds where it
- * is. The songs and the lyrics in them are made up for this page.
+ * Feature cards that act out what they do (tiles.js, #358): the tiles of
+ * "New in" and the plugin card of "Make it yours". Each card's picture is a
+ * small, simplified piece of the app, drawn in HTML: a lyric line lit word
+ * by word, a download ticking its songs off, a gauge stepping up the speed.
+ * It plays on its own, again and again, while the card is in the window,
+ * and holds while the card is hovered or focused. The songs, devices and
+ * channels in them are made up for this page.
  *
- * Under reduced motion nothing here moves: the tiles show their pictures at
- * rest, and hovering or focusing them changes nothing (the last block).
+ * What moves is transform and opacity, with text set by the script, and
+ * the notch, the one shape that grows. Entrances ease out (--ta-ease);
+ * what loops on its own (sound bars, the live dot, a caret) runs only
+ * while its card plays (.is-playing), and stops while it's held.
+ *
+ * Under reduced motion nothing here moves: tiles.js draws each picture as
+ * it ends, and motion.css stops every animation and transition inside what
+ * carries data-motion.
  */
 
-/* A tile that plays takes the keyboard's focus, which holds it. */
-.tile[data-act]:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 3px; }
+:root {
+  --ta-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ta-spring: cubic-bezier(0.34, 1.5, 0.64, 1);
+  --ta-accent: #ff8cc6;
+  --ta-cyan: #52e4ea;
+  --ta-ink: #ffffff;
+  --ta-ink-2: #c2c2c2;
+  --ta-ink-3: #9a9a9a;
+  --ta-panel: #121212;
+  --ta-panel-2: #1d1d1d;
+  --ta-line: rgba(255, 255, 255, 0.09);
+  --ta-row: 28px;
+}
 
-/* The picture, in the black of the other tiles' pictures. */
+/* A card that plays takes the keyboard's focus, which holds it. */
+.tile[data-act]:focus-visible,
+.column[data-act]:focus-visible { outline: 2px solid var(--brand-text); outline-offset: 3px; }
+
+/* The picture: the black of the app, a little lighter inside. */
 .tile-act {
   display: grid;
   align-content: center;
-  gap: 8px;
-  min-height: 104px;
-  padding: 14px 16px;
-  color: #fff;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.25;
+  gap: 10px;
+  min-height: 156px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: #000;
+  box-shadow: inset 0 0 0 1px var(--ta-line);
+  color: var(--ta-ink);
+  font: 600 0.8125rem/1.25 var(--font);
   font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  isolation: isolate;
 }
-.tile-act small { color: #adadad; font-size: 0.75rem; font-weight: 500; }
+.column > .tile-act { justify-self: stretch; width: 100%; max-width: 460px; margin: 0; }
+.tile-act small { color: var(--ta-ink-3); font-size: 0.75rem; font-weight: 500; }
+.tile-act .icon { flex: none; }
+.tile-act.is-snap,
+.tile-act.is-snap *,
+.tile-act .is-snap,
+.tile-act .is-snap * { transition: none !important; }
+
+/* What loops on its own stops while the card is held. */
+[data-act].is-held .tile-act,
+[data-act].is-held .tile-act * { animation-play-state: paused !important; }
+
+/* Shared parts: a row with a cover, a pill, a bar, a check. */
 .tile-act .ta-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.tile-act .ta-cover { flex: none; width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #7769d3, #d96472); }
-.tile-act .ta-text { display: grid; min-width: 0; }
+.tile-act .ta-cover { flex: none; width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(135deg, #7769d3, #d96472); }
+.tile-act .ta-cover-pod { background: linear-gradient(135deg, #e99453, #8f3f6e); }
+.tile-act .ta-cover-mix { background: linear-gradient(135deg, #5181ec, #52e4ea); }
+.tile-act .ta-text { display: grid; min-width: 0; flex: 1; }
 .tile-act .ta-text > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tile-act .ta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ta-panel-2);
+  color: var(--ta-ink-2);
+  font-size: 0.75rem;
+}
+.tile-act .ta-pill.is-accent { background: #3a2230; color: var(--ta-accent); }
 .tile-act .ta-bar { height: 4px; border-radius: 2px; background: #2c2c2c; overflow: hidden; }
-.tile-act .ta-bar i { display: block; height: 100%; width: var(--ta-fill, 40%); border-radius: inherit; background: #ff8cc6; transition: width 1400ms linear; }
-/* Back at rest, a bar jumps there rather than run backwards. */
-.tile-act .ta-bar.is-snap i { transition: none; }
-.tile-act .ta-time { display: flex; justify-content: space-between; color: #adadad; font-size: 0.75rem; font-weight: 500; }
+.tile-act .ta-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ta-accent);
+  transform: scaleX(var(--ta-fill, 0.4));
+  transform-origin: left;
+  transition: transform 160ms linear;
+}
+.tile-act .ta-time { display: flex; justify-content: space-between; color: var(--ta-ink-3); font-size: 0.75rem; font-weight: 500; }
+.tile-act .ta-check {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ta-accent);
+  color: #000;
+  opacity: 0;
+  transform: scale(0.6);
+}
+.tile-act .ta-check svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.tile-act .is-done > .ta-check { opacity: 1; transform: none; animation: ta-pop 420ms var(--ta-ease) both; }
+.tile-act .is-pop { animation: ta-pop 380ms var(--ta-ease) both; }
 
-/* Dislikes: the selection steps down the queue and passes over a song. */
-.ta-song { padding: 4px 8px; border-radius: 8px; }
-.ta-song.is-on { background: #3a2230; }
-.ta-song.is-off strong { color: #adadad; text-decoration: line-through; }
-.ta-song svg { margin-left: auto; width: 14px; height: 14px; fill: none; stroke: #ff8cc6; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; visibility: hidden; }
-.ta-song.is-off svg { visibility: visible; }
+/* A segmented control whose mark slides to the one chosen. */
+.tile-act .ta-seg {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--ta-panel-2);
+  font-size: 0.75rem;
+}
+.tile-act .ta-seg > span:not(.ta-seg-mark) { position: relative; z-index: 1; padding: 5px 4px; text-align: center; color: var(--ta-ink-3); transition: color 300ms var(--ta-ease); }
+.tile-act .ta-seg > span.is-on { color: #000; }
+.tile-act .ta-seg-mark {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--n));
+  border-radius: 999px;
+  background: var(--ta-accent);
+  transform: translateX(calc(100% * var(--at, 0)));
+  transition: transform 520ms var(--ta-spring);
+}
 
-/* Global shortcuts: keys pressed, and the song that follows. */
-.ta-keys { display: flex; gap: 6px; }
-.ta-keys kbd { margin: 0; transition: transform 120ms var(--ease); }
-.ta-keys kbd.is-down { transform: translateY(2px); background: #ff8cc6; color: #000; }
+/* Lyrics: a line lit word by word, its romaji and its translation, then the
+   next line rising into place. */
+.ta-lyrics { align-content: start; gap: 12px; padding: 18px 22px; }
+.ta-lyrics .ta-lyr-top { display: flex; gap: 8px; }
+.ta-lyrics .ta-lyr { display: grid; gap: 4px; font-family: "Yu Gothic UI", "Hiragino Sans", "Noto Sans CJK JP", "Noto Sans JP", sans-serif; }
+.ta-lyrics .ly { margin: 0; line-height: 1.3; transition: transform 460ms var(--ta-ease), opacity 460ms var(--ta-ease); }
+.ta-lyrics .ly:nth-child(2) { transition-delay: 40ms; }
+.ta-lyrics .ly:nth-child(3) { transition-delay: 110ms; }
+.ta-lyrics .ly:nth-child(4) { transition-delay: 180ms; }
+.ta-lyrics .ly-past { color: #858585; font-size: 1.125rem; font-weight: 600; }
+.ta-lyrics .ly-now { margin-top: 4px; color: #8c8c8c; font-size: 1.75rem; font-weight: 800; }
+.ta-lyrics .ly-roman { color: #d4d4d4; font: 600 1.0625rem/1.3 var(--font); }
+.ta-lyrics .ly-trans { color: #a3a3a3; font: 500 0.9375rem/1.3 var(--font); }
+.ta-lyrics .w { position: relative; display: inline-block; }
+.ta-lyrics .w b { position: absolute; inset: 0; color: var(--ta-accent); font-weight: inherit; opacity: 0; transition: opacity 220ms var(--ta-ease); }
+.ta-lyrics .w.is-sung b { opacity: 1; }
+.ta-lyrics .ta-lyr.is-leaving .ly { transform: translateY(-12px); opacity: 0; transition-duration: 240ms; transition-delay: 0ms; }
+.ta-lyrics .ta-lyr.is-coming .ly { transform: translateY(14px); opacity: 0; }
 
-/* The lyric lines: the picture that is already there moves on. */
-/* The lines slide up and are replaced; none fades, so no colour between two
-   is ever on show. */
-.tile .ly { transition: transform 220ms var(--ease); }
-.tile .ly.is-leaving { transform: translateY(-8px); }
+/* Podcasts: an episode picked up where the phone left it. */
+.ta-pod .ta-note {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ta-panel-2);
+  color: var(--ta-ink-2);
+  font-size: 0.75rem;
+  transition: background-color 300ms var(--ta-ease), color 300ms var(--ta-ease);
+}
+.ta-pod .ta-note.is-on { background: #3a2230; color: var(--ta-accent); }
+.ta-pod .ta-chip { padding: 3px 9px; border-radius: 999px; background: var(--ta-panel-2); color: var(--ta-accent); font-size: 0.75rem; font-weight: 700; }
+
+/* Downloads: the songs ticked off one by one, and a bar of ticks filling. */
+.ta-dl .ta-pct { color: var(--ta-accent); font-size: 0.875rem; font-weight: 750; }
+.ta-dl .ta-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.ta-dl .ta-list li { display: flex; align-items: center; height: 22px; padding: 0 2px; color: var(--ta-ink-2); }
+.ta-dl .ta-list li > :not(:first-child) { margin-left: auto; }
+.ta-dl .ta-list li .ta-check { display: none; }
+.ta-dl .ta-list li.is-done .ta-check { display: grid; }
+.ta-dl .ta-list li.is-done { color: var(--ta-ink); }
+.ta-dl .ta-ring {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #3a3a3a;
+  border-top-color: var(--ta-accent);
+  opacity: 0;
+}
+.ta-dl li.is-now .ta-ring { opacity: 1; }
+.ta-dl li.is-done .ta-ring { display: none; }
+.is-playing .ta-dl li.is-now .ta-ring { animation: ta-spin 900ms linear infinite; }
+.ta-dl .ta-ticks { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 3px; height: 6px; }
+.ta-dl .ta-ticks i { border-radius: 2px; background: #2c2c2c; }
+.ta-dl .ta-ticks i::after { content: ""; display: block; height: 100%; border-radius: inherit; background: var(--ta-accent); opacity: 0; transform: scaleY(0.4); transition: opacity 220ms var(--ta-ease), transform 320ms var(--ta-ease); }
+.ta-dl .ta-ticks i.is-on::after { opacity: 1; transform: none; }
+.ta-dl .ta-state { display: flex; align-items: center; gap: 6px; }
+
+/* Layouts: a segmented control that cycles them, over a sketch of the app
+   in each. */
+.ta-layouts { align-content: start; gap: 14px; padding: 16px; }
+.ta-layouts .ta-looks { display: grid; }
+.ta-look {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns: 22% repeat(3, minmax(0, 1fr));
+  grid-template-rows: 12% 1fr 1fr 15%;
+  gap: 6px;
+  aspect-ratio: 4 / 3.4;
+  padding: 8px;
+  border-radius: 12px;
+  background: #0b0b0b;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  opacity: 0;
+  transform: translateY(8px) scale(0.97);
+  transition: opacity 420ms var(--ta-ease), transform 620ms var(--ta-ease);
+}
+.ta-look.is-shown { opacity: 1; transform: none; }
+.ta-look i { display: block; background: #272727; }
+.ta-look .s { grid-row: 1 / 4; }
+.ta-look .h { grid-column: 2 / -1; width: 55%; }
+.ta-look .c:nth-of-type(3) { background: linear-gradient(135deg, #52e4ea, #5181ec); }
+.ta-look .c:nth-of-type(4) { background: linear-gradient(135deg, #e99453, #d96472); }
+.ta-look .c:nth-of-type(5) { background: linear-gradient(135deg, #7769d3, #cf6e74); }
+.ta-look .c:nth-of-type(6),
+.ta-look .c:nth-of-type(7),
+.ta-look .c:nth-of-type(8) { background: #1d1d1d; }
+.ta-look .p { grid-column: 1 / -1; background: #cf6e74; }
+.ta-look[data-l="blend"] i { border-radius: 8px; }
+.ta-look[data-l="blend"] .p { border-radius: 999px; margin: 0 6px; background: #2a2a2a; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.ta-look[data-l="expressive"] { gap: 8px; }
+.ta-look[data-l="expressive"] i { border-radius: 14px; }
+.ta-look[data-l="expressive"] .s { background: #3d2a30; }
+.ta-look[data-l="expressive"] .h { border-radius: 999px; background: #3d2a30; }
+.ta-look[data-l="expressive"] .p { border-radius: 999px; margin: 2px 16px; background: #ffb0c9; }
+.ta-look[data-l="crate"] { gap: 3px; }
+.ta-look[data-l="crate"] i { border-radius: 3px; }
+.ta-look[data-l="crate"] .h { width: 80%; background: #e6e6e6; }
+.ta-look[data-l="crate"] .p { background: #181818; }
+.ta-look[data-l="tiles"] { border-radius: 0; }
+.ta-look[data-l="tiles"] i { border-radius: 0; }
+.ta-look[data-l="tiles"] .s { background: none; box-shadow: inset 0 0 0 2px #fff; }
+.ta-look[data-l="tiles"] .h { background: #fff; width: 35%; }
+.ta-look[data-l="tiles"] .c:nth-of-type(3) { background: #00bde3; }
+.ta-look[data-l="tiles"] .c:nth-of-type(4) { background: #e6007e; }
+.ta-look[data-l="tiles"] .c:nth-of-type(5) { background: #f2a33a; }
+.ta-look[data-l="tiles"] .c:nth-of-type(6),
+.ta-look[data-l="tiles"] .c:nth-of-type(7),
+.ta-look[data-l="tiles"] .c:nth-of-type(8) { background: none; box-shadow: inset 0 0 0 2px #fff; }
+.ta-look[data-l="tiles"] .p { background: #181818; }
+
+/* 5.1 surround: stereo, then all six channels. */
+.ta-surround { gap: 14px; }
+.ta-surround .ta-seg { justify-self: center; width: 150px; }
+.ta-surround .ta-chans { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.ta-surround .ch { display: grid; justify-items: center; gap: 6px; }
+.ta-surround .ch b { display: flex; align-items: flex-end; width: 100%; max-width: 26px; height: 46px; border-radius: 6px; background: #161616; overflow: hidden; }
+.ta-surround .ch s {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background: #3a3a3a;
+  transform: scaleY(0.12);
+  transform-origin: bottom;
+  transition: transform 420ms var(--ta-ease), background-color 300ms var(--ta-ease);
+}
+.ta-surround .ch.is-on s { background: var(--ta-accent); transform: scaleY(var(--lv, 0.7)); }
+.is-playing .ta-surround .ch.is-on s { animation: ta-level var(--dur, 820ms) ease-in-out calc(var(--i, 0) * -170ms) infinite alternate; }
+.ta-surround .ch small { color: var(--ta-ink-3); font-size: 0.6875rem; font-weight: 600; }
+.ta-surround .ch.is-on small { color: var(--ta-ink-2); }
+
+/* Casting: the devices come in, the TV is picked, and the cast begins. */
+.ta-cast { align-content: start; gap: 8px; padding: 14px 16px; }
+.ta-cast .ta-head { display: flex; align-items: center; gap: 6px; color: var(--ta-ink-2); font-size: 0.75rem; }
+.ta-cast .ta-devwrap { position: relative; }
+.ta-cast .ta-devs { list-style: none; margin: 0; padding: 0; }
+.ta-cast .ta-devs li {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--ta-row);
+  padding: 0 10px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 360ms var(--ta-ease), transform 460ms var(--ta-ease);
+}
+.ta-cast .is-in li { opacity: 1; transform: none; }
+.ta-cast .is-in li:nth-of-type(2) { transition-delay: 120ms; }
+.ta-cast .is-in li:nth-of-type(3) { transition-delay: 240ms; }
+.ta-cast .ta-devs svg { width: 16px; height: 16px; fill: none; stroke: var(--ta-ink-2); stroke-width: 1.8; stroke-linejoin: round; }
+.ta-cast .ta-sel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--ta-row);
+  border-radius: 8px;
+  background: #3a2230;
+  opacity: 0;
+  transform: translateY(calc(var(--ta-row) * var(--at, 0)));
+  transition: transform 520ms var(--ta-spring), opacity 300ms var(--ta-ease);
+}
+.ta-cast .is-in .ta-sel { opacity: 1; }
+.ta-cast .ta-pulse { position: relative; margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: var(--ta-accent); opacity: 0; transition: opacity 200ms; }
+.ta-cast li.is-picked .ta-pulse { opacity: 1; }
+.ta-cast .ta-pulse::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--ta-accent); opacity: 0; }
+.is-playing .ta-cast li.is-picked .ta-pulse::after { animation: ta-ring 1400ms var(--ta-ease) infinite; }
+.ta-cast .ta-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: var(--ta-panel-2);
+  color: var(--ta-ink);
+  font-size: 0.75rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 360ms var(--ta-ease), transform 520ms var(--ta-ease);
+}
+.ta-cast .ta-toast .icon { color: var(--ta-accent); }
+.ta-cast .ta-toast.is-in { opacity: 1; transform: none; }
+
+/* The notch: the black around a MacBook's camera, which widens with the
+   cover and bars, then opens into the player. */
+.ta-notch { place-items: start center; align-content: stretch; padding: 0; min-height: 168px; background: linear-gradient(#1b1b2b, #2a2340); }
+.ta-notch .ta-menubar { position: absolute; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 7px 14px; }
+.ta-notch .ta-menubar span { display: flex; gap: 8px; }
+.ta-notch .ta-menubar i { display: block; width: 22px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.18); }
+.ta-notch .ta-shape {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  width: 108px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 0 0 14px 14px;
+  background: #000;
+  transition: width 560ms var(--ta-spring), height 560ms var(--ta-ease), border-radius 560ms var(--ta-ease);
+}
+.ta-notch .is-wide { width: 236px; }
+.ta-notch .is-open { width: min(340px, 86%); height: 124px; border-radius: 0 0 22px 22px; align-items: start; padding: 10px 14px; }
+.ta-notch .ta-mini { display: contents; }
+.ta-notch .ta-mini img { width: 18px; height: 18px; border-radius: 5px; opacity: 0; transform: scale(0.6); transition: opacity 300ms var(--ta-ease), transform 420ms var(--ta-spring); }
+.ta-notch .ta-mini b { grid-column: 3; display: flex; align-items: flex-end; gap: 2px; height: 14px; opacity: 0; transition: opacity 300ms var(--ta-ease) 80ms; }
+.ta-notch .ta-mini s { display: block; width: 3px; height: 100%; border-radius: 2px; background: var(--ta-cyan); transform: scaleY(0.4); transform-origin: bottom; }
+.is-playing .ta-notch .ta-mini s { animation: ta-level 820ms ease-in-out infinite alternate; }
+.ta-notch .ta-mini s:nth-child(2) { --lv: 0.9; animation-delay: -300ms !important; }
+.ta-notch .ta-mini s:nth-child(3) { --lv: 0.6; animation-delay: -600ms !important; }
+.ta-notch .ta-mini s:nth-child(4) { --lv: 0.75; animation-delay: -150ms !important; }
+.ta-notch .is-wide .ta-mini img,
+.ta-notch .is-wide .ta-mini b { opacity: 1; transform: none; }
+.ta-notch .is-open .ta-mini img,
+.ta-notch .is-open .ta-mini b { opacity: 0; }
+.ta-notch .ta-panel {
+  position: absolute;
+  inset: 12px 14px 10px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 260ms var(--ta-ease), transform 420ms var(--ta-ease);
+}
+.ta-notch .is-open .ta-panel { opacity: 1; transform: none; transition-delay: 180ms; }
+.ta-notch .ta-panel img { width: 36px; height: 36px; border-radius: 9px; }
+.ta-notch .ta-panel p { margin: 0; color: var(--ta-ink-2); font-size: 0.75rem; font-weight: 500; }
+
+/* Speed: a gauge whose needle steps up to three times. */
+.ta-speed { place-items: center; }
+.ta-speed .ta-gauge { position: relative; width: 150px; height: 84px; }
+.ta-speed .ta-gauge svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ta-speed .ta-gauge .track { fill: none; stroke: #2c2c2c; stroke-width: 6; stroke-linecap: round; }
+.ta-speed .ta-gauge .tick { stroke: #4a4a4a; stroke-width: 2; stroke-linecap: round; }
+.ta-speed .ta-needle {
+  position: absolute;
+  left: calc(50% - 1.5px);
+  bottom: 6px;
+  width: 3px;
+  height: 58px;
+  border-radius: 2px;
+  background: var(--ta-accent);
+  transform: rotate(var(--a, -45deg));
+  transform-origin: 50% 100%;
+  transition: transform 640ms var(--ta-spring);
+}
+.ta-speed .ta-hub { position: absolute; left: calc(50% - 6px); bottom: 0; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
+.ta-speed .ta-ends { display: flex; align-items: center; justify-content: space-between; width: 180px; margin-top: -4px; color: var(--ta-ink-3); font-size: 0.6875rem; }
+.ta-speed .ta-val { padding: 4px 12px; border-radius: 999px; background: var(--ta-panel-2); color: var(--ta-accent); font-size: 1rem; font-weight: 750; }
+
+/* Global shortcuts: keys pressed over another app, and the next song. */
+.ta-keysact { position: relative; gap: 12px; }
+.ta-keysact .ta-win {
+  position: absolute;
+  inset: 12px 12px auto auto;
+  width: 46%;
+  height: 58%;
+  border-radius: 10px;
+  background: #0f0f0f;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+  z-index: -1;
+}
+.ta-keysact .ta-win::before { content: ""; position: absolute; left: 10px; top: 9px; width: 30px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); }
+.ta-keysact .ta-win::after { content: ""; position: absolute; left: 10px; right: 14px; top: 24px; height: 28px; border-radius: 4px; background: repeating-linear-gradient(#1c1c1c 0 5px, transparent 5px 11px); }
+.ta-keysact .ta-keys { display: flex; gap: 6px; }
+.ta-keysact kbd { margin: 0; transition: transform 140ms var(--ta-ease), background-color 140ms, color 140ms, box-shadow 140ms; }
+.ta-keysact kbd.is-down { transform: translateY(2px); background: var(--ta-accent); color: #000; box-shadow: inset 0 0 0 transparent; }
+.ta-keysact .ta-np { padding: 8px; border-radius: 12px; background: var(--ta-panel-2); }
+.ta-keysact .ta-flip { display: grid; overflow: hidden; }
+.ta-keysact .ta-flip > * { transition: transform 360ms var(--ta-ease), opacity 360ms var(--ta-ease); }
+.ta-keysact .ta-flip.is-leaving > * { transform: translateY(-100%); opacity: 0; transition-duration: 200ms; }
+.ta-keysact .ta-flip.is-coming > * { transform: translateY(100%); opacity: 0; }
+
+/* Dislikes: the thumbs-down, and the queue passing over that song. */
+.ta-dislike { align-content: start; padding: 14px; }
+.ta-dislike .ta-qwrap { position: relative; }
+.ta-dislike .ta-queue { list-style: none; margin: 0; padding: 0; }
+.ta-dislike .ta-queue li { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; height: var(--ta-row); padding: 0 10px; transition: color 300ms; }
+.ta-dislike .ta-queue strong { font-weight: 650; }
+.ta-dislike .ta-queue small { margin-left: auto; }
+.ta-dislike .ta-now {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--ta-row);
+  border-radius: 8px;
+  background: #3a2230;
+  transform: translateY(calc(var(--ta-row) * var(--at, 0)));
+  transition: transform 560ms var(--ta-spring);
+}
+.ta-dislike .ta-thumb {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--ta-accent);
+  opacity: 0;
+  transform: scale(0.5) rotate(-20deg);
+}
+.ta-dislike .ta-thumb svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ta-dislike li.is-off .ta-thumb { opacity: 1; transform: none; animation: ta-pop 420ms var(--ta-ease) both; }
+.ta-dislike li.is-off strong { color: var(--ta-ink-3); text-decoration: line-through; }
+.ta-dislike .ta-skip { position: absolute; right: 36px; color: var(--ta-ink-3); font-size: 0.6875rem; opacity: 0; transform: translateX(6px); transition: opacity 300ms var(--ta-ease), transform 420ms var(--ta-ease); }
+.ta-dislike li.is-skipped .ta-skip { opacity: 1; transform: none; }
+.ta-dislike li.is-skipped small { display: none; }
+.ta-dislike li.is-skipped .ta-thumb { margin-left: auto; }
+
+/* Live streams and music videos: a picture that drifts, and the radio's
+   listeners. */
+.ta-live { position: relative; align-content: end; min-height: 156px; padding: 12px 14px; }
+.ta-live .ta-scene { position: absolute; inset: -12%; z-index: -1; background: radial-gradient(60% 70% at 30% 40%, #7769d3, transparent 70%), radial-gradient(50% 60% at 75% 60%, #d96472, transparent 70%), #12101d; transform: translateX(-4%) scale(1.06); }
+.ta-live .ta-scene + .ta-scene { background: radial-gradient(55% 65% at 70% 35%, #52e4ea, transparent 70%), radial-gradient(50% 60% at 25% 70%, #5181ec, transparent 70%), #0b1420; opacity: 0; }
+.is-playing .ta-live .ta-scene { animation: ta-drift 9s ease-in-out infinite alternate; }
+.is-playing .ta-live .ta-scene + .ta-scene { animation: ta-drift 9s ease-in-out infinite alternate-reverse, ta-cross 9s ease-in-out infinite alternate; }
+.ta-live .ta-shade { position: absolute; inset: 0; z-index: -1; background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.82)); }
+.ta-live .ta-badge { position: absolute; top: 12px; left: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 6px; background: #c41f3a; color: #fff; font-size: 0.6875rem; font-weight: 800; letter-spacing: 0.06em; }
+.ta-live .ta-badge i { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+.is-playing .ta-live .ta-badge i { animation: ta-blink 1200ms ease-in-out infinite; }
+.ta-live .ta-muted { position: absolute; top: 12px; right: 14px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(0, 0, 0, 0.55); }
+.ta-live .ta-muted svg { width: 13px; height: 13px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ta-live .ta-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.ta-live .ta-foot small { color: #d0d0d0; }
+.ta-live .ta-eq { display: flex; align-items: flex-end; gap: 3px; height: 18px; }
+.ta-live .ta-eq s { display: block; width: 3px; height: 100%; border-radius: 2px; background: var(--ta-cyan); transform: scaleY(0.4); transform-origin: bottom; }
+.is-playing .ta-live .ta-eq s { animation: ta-level 760ms ease-in-out infinite alternate; }
+.ta-live .ta-eq s:nth-child(2) { --lv: 0.85; animation-delay: -250ms !important; }
+.ta-live .ta-eq s:nth-child(3) { --lv: 0.55; animation-delay: -500ms !important; }
+.ta-live .ta-eq s:nth-child(4) { --lv: 0.95; animation-delay: -120ms !important; }
+.ta-live .ta-eq s:nth-child(5) { --lv: 0.7; animation-delay: -380ms !important; }
+
+/* Add a plugin: the marketplace, Spectrum installed, and its bars. */
+.ta-market { align-content: start; gap: 10px; padding: 14px 16px; }
+.ta-market .ta-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ta-market .ta-items li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: var(--ta-panel);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 360ms var(--ta-ease), transform 460ms var(--ta-ease);
+}
+.ta-market .ta-items.is-in li { opacity: 1; transform: none; }
+.ta-market .ta-items.is-in li:nth-child(2) { transition-delay: 120ms; }
+.ta-market .ta-items.is-in li:nth-child(3) { transition-delay: 240ms; }
+.ta-market .ta-ic { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--ta-panel-2); color: var(--ta-accent); }
+.ta-market .ta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 78px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--ta-panel-2);
+  color: var(--ta-ink);
+  font-size: 0.75rem;
+  transition: transform 160ms var(--ta-ease), background-color 300ms var(--ta-ease), color 300ms;
+}
+.ta-market .ta-btn.is-press { transform: scale(0.92); }
+.ta-market .ta-btn .ta-spin { display: none; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #4a4a4a; border-top-color: var(--ta-accent); }
+.ta-market .ta-btn.is-busy .ta-spin { display: block; }
+.is-playing .ta-market .ta-btn.is-busy .ta-spin { animation: ta-spin 800ms linear infinite; }
+.ta-market .ta-btn.is-busy .ta-lab { display: none; }
+.ta-market .ta-btn.is-done { background: #3a2230; color: var(--ta-accent); }
+.ta-market .ta-btn .ta-check { display: none; }
+.ta-market .ta-btn.is-done .ta-check { display: grid; width: 14px; height: 14px; opacity: 1; transform: none; animation: ta-pop 420ms var(--ta-ease) both; }
+.ta-market .ta-spectrum {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 30px;
+  padding: 0 4px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 400ms var(--ta-ease), transform 520ms var(--ta-ease);
+}
+.ta-market .ta-spectrum.is-in { opacity: 1; transform: none; }
+.ta-market .ta-spectrum s { flex: 1; height: 100%; border-radius: 2px; background: linear-gradient(var(--ta-accent), #7769d3); transform: scaleY(var(--lv, 0.5)); transform-origin: bottom; }
+.is-playing .ta-market .ta-spectrum.is-in s { animation: ta-level var(--dur, 700ms) ease-in-out infinite alternate; }
+
+@keyframes ta-pop {
+  0% { opacity: 0; transform: scale(0.6); }
+  60% { opacity: 1; transform: scale(1.14); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ta-level {
+  from { transform: scaleY(0.18); }
+  to { transform: scaleY(var(--lv, 0.8)); }
+}
+@keyframes ta-spin { to { transform: rotate(1turn); } }
+@keyframes ta-blink { 50% { opacity: 0; } }
+@keyframes ta-ring {
+  0% { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0; transform: scale(3.2); }
+}
+@keyframes ta-drift {
+  from { transform: translateX(-4%) scale(1.06); }
+  to { transform: translateX(4%) scale(1.12); }
+}
+@keyframes ta-cross {
+  0%, 35% { opacity: 0; }
+  65%, 100% { opacity: 1; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .tile-act *,
-  .tile .ly,
-  .tile-art-chip span {
+  .tile-act {
     animation: none !important;
     transition: none !important;
   }

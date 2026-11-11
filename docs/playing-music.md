@@ -40,7 +40,7 @@ Select several tracks of a list to act on them all at once:
 
 - **Ctrl-click** a track's row (⌘-click on macOS) to select it, or choose **Select** in its menu. Once a track is selected, the rows show check boxes, and a click on a row, or on its box, selects it or lets it go.
 - **Shift-click** a row to select every track from the one you clicked last to it.
-- **The bar** above the player bar tells how many are selected, and has select all, Add to queue, Add to mix and Download, which take the tracks in the list's order. Download shows while some of them aren't downloaded yet.
+- **The bar** above the player bar tells how many are selected, and has select all, Add to queue, Add to mix and Download, which take the tracks in the list's order. Download shows while some of them aren't downloaded yet, and [export](library.md#export-to-a-folder) while some are downloaded or on this computer.
 - **Escape**, the bar's close button, or another page or search lets them go.
 
 ## Sharing

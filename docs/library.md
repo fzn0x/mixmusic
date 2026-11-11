@@ -188,6 +188,16 @@ A playlist, an album, a mix or your liked songs that you downloaded download the
 - Songs taken out of a playlist stay downloaded with it until you remove its download, which removes them too.
 - "Download songs added later", in Settings › Playback › Downloads, turns it off.
 
+### Export to a folder
+
+Take your downloads, and the music on this computer, to a phone or another player: **Export…** in a track's menu, or **export** in the bar of the [tracks you selected](playing-music.md#selecting-tracks), asks for a folder and writes a copy of each track there.
+
+- Each copy is named "Artist - Title", made safe for file names on Windows, macOS and Linux. A name that's taken gets a number, as "Artist - Title (2)", so that nothing in the folder is written over.
+- A download's copy holds its title, artists and album, the cover the downloads keep, and, from its album's page, the year, the album's artists and its track number, which need the network. Spotify songs from a playlist, your liked songs or a search also carry their ISRC.
+- A download keeps its format: an M4A file stays M4A, and Opus, which YouTube serves in WebM, a container few players read tags from, becomes an Ogg Opus file (`.opus`), with the same audio, packet for packet.
+- A song on this computer is copied as it is, with its own tags and cover; of a song with copies, its best copy.
+- The downloads and your files stay as they are. A toast tells when the copies are written, with show, which shows them in their folder.
+
 ### Where they are
 
 Settings › Playback › Downloads shows how many tracks the downloads hold and their size, with Show, which opens Library › Downloads, and:

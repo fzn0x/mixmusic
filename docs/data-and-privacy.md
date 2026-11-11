@@ -143,7 +143,8 @@ Where the credential store can't keep a secret:
 | Browsing YouTube Music: search, home, explore, pages | YouTube Music (`music.youtube.com`) | what you search and open, with a visitor ID YouTube gave; signed in, your session's cookies |
 | Your YouTube Music library, once you sign in | YouTube Music | the likes, dislikes, saves, playlists and follows you make |
 | New releases of the artists you follow | YouTube Music, and Spotify once you sign in | the artists' IDs, to read their pages or lists of albums, at most every 12 hours each |
-| The audio of a track | YouTube's player API (`www.youtube.com`) and media servers; yt-dlp, which asks YouTube too | the video's ID, always signed out |
+| The audio of a track | YouTube's player API (`www.youtube.com`) and media servers; yt-dlp, which asks YouTube too | the video's ID, signed out |
+| The audio of a track, while "Play audio as your account" is on | yt-dlp, which asks YouTube (`www.youtube.com`, `music.youtube.com`) | the video's ID, with your YouTube Music session's cookies, in a file of yours alone that goes once yt-dlp ran |
 | Your YouTube Music history, signed in, while "Add what you play to your YouTube Music history" is on | YouTube Music | the tracks you play, once they played a while, and how far you got in episodes |
 | Skip songs made with AI, while it's on | YouTube (`www.youtube.com`), signed out | the video's ID, once a video |
 | Covers | the image servers of YouTube, Google and Spotify | the image asked for |

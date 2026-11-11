@@ -46,7 +46,15 @@
   list doesn't tell is listed as `Unswitchable`, as without it the account
   itself would be used. Once the app switches to a brand channel, it goes
   back if YouTube Music answers as the Google account itself, as the list
-  names it; any other answer keeps the switch. It also reads
+  names it; any other answer keeps the switch. Each answer to a signed-in
+  request tells whether the account has YouTube Music Premium, in its
+  GFEEDBACK tracking parameters (`has_unlimited_entitlement`, else
+  `premium_membership`): the client keeps what the latest that told said,
+  for the session and account it was told of (`Client.Premium`,
+  `premium.go`), and the app offers Premium's higher bitrate from it
+  (#471). Its fixtures are hand-written from the parameters of a recorded
+  answer; `go test ./internal/youtube -run LivePremium`, signed in,
+  records an account's own. It also reads
   whether YouTube labels a video as made with AI, from the answer of
   YouTube's own website, asked signed out with a field mask
   (`MadeWithAI`): nothing of YouTube Music carries the label. Its parsers

@@ -113,7 +113,11 @@ the first account until you choose another there.
 Tracks play the same signed in or out: your session never goes to
 [yt-dlp](streams.md#when-yt-dlp-is-needed), which finds some tracks' audio.
 So tracks YouTube keeps for signed-in adults, or for a channel's members,
-don't play either way.
+don't play either way. Only
+[Play audio as your account](playing-music.md#play-audio-as-your-account),
+off at first, hands yt-dlp your session, for YouTube Music Premium's
+higher bitrate; when MixMusic sees your account has Premium, it offers it
+once.
 
 ### Your YouTube Music history
 

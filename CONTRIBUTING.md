@@ -119,6 +119,29 @@ same lines, as below, or waits for the other to merge.
   Split a file when two features that have nothing to do with each other
   keep editing it.
 
+## When CI fails
+
+CI tries again what fails for a reason that isn't the change's, so that
+a red check means something is wrong:
+
+- **Flaky tests.** CI runs the Go tests with
+  [tools/gotest](tools/gotest/main.go), which runs a test that fails
+  again, up to 3 more times. One that passes then is reported as flaky:
+  a warning on the run, and a line in its summary. Look into it all the
+  same. The website's page checks run again up to twice, and
+  Playwright's report shows those that pass then as flaky.
+- **Downloads.** Installs and downloads try again, waiting longer each
+  time: Go's modules, Bun's and npm's packages, the browsers, Homebrew,
+  Docker images and files fetched with curl for up to 30 or 45 minutes
+  (`.github/scripts/retry.sh`), and Nix and its binary cache for up to 45
+  (`nix-retry.sh` and the install-nix action).
+- **Whole runs.** A run of CI, Linux app, Site pages, Pages or Cloudflare
+  that fails runs its failed jobs again by itself, waiting longer each
+  time, for up to 5 hours (`rerun.yml`).
+
+A failure that's left after all that is real: a test or a step that
+fails every time it's tried. Fix it rather than run it again.
+
 ## Commits
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org),

@@ -36,6 +36,13 @@ type Local interface {
 	Local() bool
 }
 
+// Shortened is a Source that tells whether it lost the end of its audio as
+// it played, as a file on this computer cut short meanwhile: the end of the
+// file it reads then is a failure of the file, not the end of the track.
+type Shortened interface {
+	Shortened() bool
+}
+
 // Opener opens the Source of a track's URL, whose reads stop waiting when
 // interrupted returns true. Its errors say why in the words of the
 // interface, as the player shows them.
@@ -403,6 +410,11 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 			err = io.EOF // what's left is less than loading it again costs
 		}
 		if err == io.EOF {
+			// A file cut short as it played ends at the cut, as a whole one
+			// ends at its end: only the file tells them apart.
+			if s, ok := src.(Shortened); ok && s.Shortened() {
+				return errFile
+			}
 			if pcm := tr.end(); len(pcm) > 0 {
 				write(pcm, 0, int64(len(pcm)/ch))
 			}

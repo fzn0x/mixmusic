@@ -1,0 +1,73 @@
+{
+ "_fixture": "Written by hand, not recorded: YouTube Music's answer to account/account_menu for an account with Premium. Its GFEEDBACK parameters are those of a recorded signed-in WEB_REMIX answer of a YouTube Premium account, with premium_membership youtube_premium and has_unlimited_entitlement True; the header's name and handle are made up. MIXMUSIC_LIVE=1 MIXMUSIC_YT_COOKIES='SAPISID=…; …' MIXMUSIC_YT_RECORD=dir go test ./internal/youtube -run LivePremium -v records the account's own answer, its tracking parameters alone, as account-menu-premium.json or account-menu-free.json, to replace this one.",
+ "responseContext": {
+  "serviceTrackingParams": [
+   {
+    "service": "GFEEDBACK",
+    "params": [
+     {
+      "key": "ipcc",
+      "value": "0"
+     },
+     {
+      "key": "premium_membership",
+      "value": "youtube_premium"
+     },
+     {
+      "key": "has_unlimited_entitlement",
+      "value": "True"
+     },
+     {
+      "key": "has_alc_entitlement",
+      "value": "false"
+     },
+     {
+      "key": "logged_in",
+      "value": "1"
+     }
+    ]
+   },
+   {
+    "service": "CSI",
+    "params": [
+     {
+      "key": "c",
+      "value": "WEB_REMIX"
+     },
+     {
+      "key": "yt_li",
+      "value": "1"
+     }
+    ]
+   }
+  ]
+ },
+ "actions": [
+  {
+   "openPopupAction": {
+    "popup": {
+     "multiPageMenuRenderer": {
+      "header": {
+       "activeAccountHeaderRenderer": {
+        "accountName": {
+         "runs": [
+          {
+           "text": "Ada Example"
+          }
+         ]
+        },
+        "channelHandle": {
+         "runs": [
+          {
+           "text": "@adaexample"
+          }
+         ]
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ ]
+}

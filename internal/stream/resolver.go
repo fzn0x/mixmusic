@@ -106,6 +106,10 @@ type Stream struct {
 	// it, and yt-dlp doesn't.
 	Loudness float64
 	Measured bool
+	// AsAccount is set for a stream yt-dlp found as the user's YouTube
+	// Music account (Resolver.SetAsAccount), and false for one asked for
+	// signed out, as every stream was before.
+	AsAccount bool
 	// Surround is the video's 5.1 surround audio, AC-3 or E-AC-3 in MP4,
 	// beside the stereo audio of the Stream, when YouTube has one the
 	// engine plays: nil otherwise, in the Surround stream itself, and in
@@ -146,9 +150,20 @@ type Resolver struct {
 	// then on, and the track that plays it can offer it. It is called on
 	// a goroutine of its own.
 	Told func(videoID string)
+	// Session, when set, returns the cookies of the user's YouTube Music
+	// session that yt-dlp asks for streams as, while SetAsAccount asks for
+	// that: nil asks signed out.
+	Session func() []*http.Cookie
 
 	mu      sync.Mutex
 	quality Quality
+	// asAccount is set while the user asks for streams as their account,
+	// and refusedAsAccount holds the videos whose stream found so YouTube
+	// refused, which are found signed out (account.go).
+	asAccount        bool
+	refusedAsAccount map[string]bool
+	// noLogin tells the log once of a session yt-dlp can't ask as.
+	noLogin sync.Once
 	calls   map[string]*resolution
 	// surrounds are the 5.1 surround audio yt-dlp found of videos whose
 	// stream YouTube's player API gave.
@@ -310,6 +325,7 @@ func (r *Resolver) Forget(videoID string) {
 		if res := calls[videoID]; res != nil {
 			select {
 			case <-res.done:
+				r.refused(videoID, res)
 				delete(calls, videoID)
 			default:
 			}
@@ -318,10 +334,14 @@ func (r *Resolver) Forget(videoID string) {
 }
 
 // resolve finds the stream of a video through the direct route, when the
-// resolver has it, else with yt-dlp, quickly first (findWithYTDLP). The
+// resolver has it, else with yt-dlp, quickly first (findWithYTDLP); as
+// the user's account first, while they ask for that (accountStream). The
 // log tells when it took a while, and why and how yt-dlp found it, never
 // the stream's URL, which carries the user's IP address.
 func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality) (Stream, error) {
+	if s, ok := r.accountStream(ctx, videoID, quality); ok {
+		return s, nil
+	}
 	start := time.Now()
 	var direct error
 	if r.Direct != nil {
@@ -399,7 +419,8 @@ func (r *Resolver) findSurround(ctx context.Context, videoID string, quality Qua
 // run can't, and the 5.1 surround audio, as the stream's Surround. It asks
 // signed out, also when the user signed in to YouTube Music: with an
 // account's cookies, YouTube answers yt-dlp with fewer streams, often none
-// it can play, and it may flag the account for using yt-dlp.
+// it can play, and it may flag the account for using yt-dlp. Only the
+// user's own choice asks as their account, before it (accountStream).
 func (r *Resolver) ytdlp(ctx context.Context, videoID string, quality Quality) (Stream, error) {
 	args := []string{"-J", "--no-playlist", "-f", formats[quality]}
 	if r.Tools != nil {

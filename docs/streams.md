@@ -22,7 +22,9 @@ YouTube's own apps do: as YouTube's app for visionOS, signed out.
   [Even loudness](audio-engine.md#even-loudness) uses.
 - **Signed out, always.** MixMusic sends no cookie and no account with
   it, also while you're signed in to YouTube Music: with an account,
-  YouTube answers with fewer streams, often none that plays.
+  YouTube answers with fewer streams, often none that plays. Only
+  [Play audio as your account](#as-your-account) asks as you, through
+  yt-dlp.
 - **A visitor ID.** YouTube gives each visitor an ID, which MixMusic keeps
   and sends back, as a browser would.
 - **Checked before it plays.** MixMusic asks YouTube's server for the
@@ -56,7 +58,8 @@ player API won't give it:
   and the next track waits 2 seconds at most for it. The log says how
   long it rests. Before 0.5.11, it rested 30 minutes at once.
 
-yt-dlp runs signed out too, with its own cache in MixMusic's cache folder,
+yt-dlp runs signed out too, unless you ask for
+[your account's audio](#as-your-account), with its own cache in MixMusic's cache folder,
 for at most 90 seconds a track. Install it, and choose the JavaScript
 runtime, in Settings › Playback › Tools;
 [how it updates](how-it-works.md#yt-dlp-and-the-javascript-runtime) is on
@@ -80,6 +83,41 @@ yt-dlp runs twice at most for a track, a quick way first:
   quick run found offers none.
 - **The log** says which run found the stream, and how long each took.
   Before 0.5.11, yt-dlp ran the full way only.
+
+## As your account
+
+YouTube Music Premium's audio has a higher bitrate: Opus of format 774
+and AAC-LC of format 141, near 256 kbit/s, beside the 130 or so of
+formats 251 and 140. YouTube serves them only to a request made as a
+Premium account. With **Play audio as your account** on, in Settings ›
+Playback › Sound, and off at first, MixMusic asks for each track as your
+account before anything else; see
+[Playing music](playing-music.md#play-audio-as-your-account) for when it
+does, and what it risks.
+
+- **How.** yt-dlp gets your YouTube Music session as a file of cookies of
+  the Netscape format, with `--cookies`: written for that run alone, in
+  the system's temporary folder, readable by you alone, and deleted once
+  yt-dlp ran, as the copies of a browser's cookies MixMusic imports are.
+  One that a MixMusic that stopped meanwhile left goes as MixMusic starts.
+  The session MixMusic keeps never changes for it.
+- **What yt-dlp asks as.** The full run, with the JavaScript runtime and
+  yt-dlp's own apps for a signed-in session, which it picks itself: for a
+  Premium account, apps that need no proof-of-origin token for their
+  streams, and YouTube Music's own web app too for a music.youtube.com
+  address. yt-dlp asks as an account only with your session's LOGIN_INFO
+  and SAPISID cookies; the log says when they're missing.
+- **What it picks.** The same formats as signed out, best first: Opus of
+  the most bits, so 774 when YouTube lists it, else AAC-LC, so 141 before
+  140.
+- **When it fails.** yt-dlp gets 30 seconds. A run as your account that
+  fails, finds no audio the engine plays, or finds a live stream, whose
+  audio is the same either way, is followed by the signed-out ways, as
+  without the switch: YouTube's player API, then yt-dlp signed out. A
+  stream found as your account that YouTube refuses is found signed out,
+  for that track, until MixMusic restarts.
+- **The log** says when a stream was found as your account, in how long,
+  and its codec and bitrate, or why it wasn't. It never names the session.
 
 ## Formats and quality
 

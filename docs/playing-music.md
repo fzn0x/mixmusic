@@ -240,6 +240,16 @@ Quality, in Settings › Playback › Sound, chooses between best and data saver
 - The picture of music videos takes its lowest quality.
 - [Downloads](library.md#how-they-download) take the quality chosen here.
 
+## Play audio as your account
+
+YouTube serves YouTube Music Premium's audio of a higher bitrate, near 256 kbit/s rather than near 130, only to a request made as a Premium account. MixMusic asks for each track's audio signed out, so a Premium member hears what everyone hears, unless they turn on **Play audio as your account**, in Settings › Playback › Sound, beside Quality. It's off at first.
+
+- **What it risks.** YouTube may flag an account used this way, as it's asked through [yt-dlp](streams.md#as-your-account), and tracks may start more slowly: yt-dlp takes a few seconds where YouTube's player API takes a moment.
+- **When it asks as your account.** While you're [signed in to YouTube Music](accounts.md#youtube-music), with the best quality: data saver gains nothing from Premium. yt-dlp needs a JavaScript runtime for it, which Settings › Playback › Tools shows. It asks as the first Google account of your session, so while MixMusic uses [another Google account](accounts.md#several-google-accounts-and-brand-channels) of it, tracks are asked for signed out.
+- **A track never fails for it.** When YouTube gives nothing that plays as your account, or turns the request down, or refuses the audio it gave, the track is found signed out, as without the switch.
+- **The offer.** When MixMusic sees that your YouTube Music account has Premium, it offers once to turn the switch on, saying what it risks. It never turns it on by itself.
+- Tracks played before, and kept in the [offline cache](library.md#the-offline-cache), play as they were kept. [Downloads](library.md#how-they-download) are asked for as your account too while it's on.
+
 ## Without the network
 
 - **The [offline cache](library.md#the-offline-cache)** keeps the tracks you played, as much as Settings › Playback › Offline cache allows, and they play again without the network. Downloads play without it too: see [Your library](library.md#downloads).

@@ -314,6 +314,7 @@ func New(opts Options) (*App, error) {
 	a.tools.Bundled = bundledYTDLP()
 	a.resolver = stream.NewResolver(a.tools, filepath.Join(opts.CacheDir, "yt-dlp"))
 	a.resolver.Told = a.surroundTold
+	a.resolver.Session = a.audioAsAccountSession
 	// MIXMUSIC_YTDLP_ONLY has yt-dlp find every stream, as before MixMusic
 	// asked YouTube's player API: to time one against the other, or to
 	// tell which fails. The API still tells how loud tracks are.
@@ -362,6 +363,7 @@ func New(opts Options) (*App, error) {
 func (a *App) apply(s settings.Settings) {
 	a.tools.Configure(s.YTDLPPath, s.JSRuntime)
 	a.resolver.SetQuality(stream.Quality(s.Quality))
+	a.resolver.SetAsAccount(s.AudioAsAccount)
 	a.cache.SetLimit(int64(s.CacheSizeMB) << 20)
 	a.downloads.SetMetered(a.metered.Load(), s.DownloadOnMetered)
 	a.followLocalFiles(s)

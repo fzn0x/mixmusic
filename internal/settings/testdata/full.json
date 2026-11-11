@@ -46,6 +46,8 @@
   "spotifyPlayback": "match",
   "spotifyDevice": "device-1",
   "quality": "saver",
+  "audioAsAccount": true,
+  "audioAsAccountOffered": true,
   "crossfade": 6,
   "normalize": true,
   "loudness": false,

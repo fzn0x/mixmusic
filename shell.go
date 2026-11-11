@@ -57,6 +57,7 @@ func (s *shell) view(c *ui.Context) {
 	s.palette(c)
 	s.coverDialog(c)
 	s.updateOffer(c)
+	s.audioAsAccountOffer(c)
 	s.questionDialog(c)
 	s.trackInfoDialog(c)
 	s.tagDialog(c)

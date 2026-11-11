@@ -43,6 +43,15 @@ type Playback struct {
 	// Quality chooses between the best audio of YouTube Music and smaller
 	// streams.
 	Quality Quality `json:"quality"`
+	// AudioAsAccount asks for the audio of YouTube Music's tracks as the
+	// user's account, while they're signed in to YouTube Music, for
+	// Premium's higher bitrate (#471). It is off at first: YouTube may flag
+	// an account used so, and tracks may start more slowly.
+	AudioAsAccount bool `json:"audioAsAccount"`
+	// AudioAsAccountOffered is set once MixMusic offered AudioAsAccount, as
+	// it saw the account has Premium, and the user answered: it offers it
+	// once.
+	AudioAsAccountOffered bool `json:"audioAsAccountOffered"`
 	// Crossfade overlaps tracks by this many seconds, from 0 to 12.
 	Crossfade int `json:"crossfade"`
 	// Normalize runs Volume levelling, a compressor that squeezes loud and

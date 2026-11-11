@@ -54,6 +54,25 @@
   player API told the visionOS client that the video has no stream for it
   (`quickHelps`). The log tells which run found a stream, and how long
   each took.
+  While the user asks for their account's audio (`Resolver.SetAsAccount`,
+  `account.go`, #471), the resolver asks yt-dlp as the account before
+  any of that (`accountStream`): the full way, with the session the app
+  gives (`Resolver.Session`: signed in, its first Google account) in a
+  Netscape cookies file of its own (`writeSession`, `--cookies`), made
+  with `os.CreateTemp` and removed after the run, named as the app's
+  copies of browsers' cookies, which it removes at start
+  (`SessionFilePrefix`). yt-dlp picks its clients for a signed-in
+  session, and for a Premium account those whose streams need no PO
+  token, adding `web_music` for a music.youtube.com address; the
+  formats are the same, so Premium's Opus of format 774 comes first. It
+  asks only with the best quality, a JavaScript runtime, and a session
+  holding LOGIN_INFO and SAPISID, without which yt-dlp asks signed out.
+  The run gets `accountTimeout`, 30 s; one that fails, finds nothing the
+  engine plays, or a live stream, falls back to the ways above, and a
+  stream found so that YouTube refuses (`Forget`) is found signed out
+  from then on (`refusedAsAccount`). `Stream.AsAccount` tells which way a
+  stream was found. Which account's answers tell Premium, the youtube
+  package reads (`Client.Premium`).
   The player API also tells how loud YouTube measured each video
   (`Stream.Loudness`, `Direct.Loudness`). Both list the streams of a
   video's picture beside its audio (`Stream.Videos`), which the now

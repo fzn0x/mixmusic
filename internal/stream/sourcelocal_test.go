@@ -52,8 +52,15 @@ func TestSourceTellsLocal(t *testing.T) {
 			}
 			time.Sleep(10 * time.Millisecond)
 		}
-		if !read(t, p).Local() {
-			t.Error("a track from the cache isn't local")
+		// Another program, as an antivirus, may hold a file a moment after it
+		// came into the cache, which then can't serve it: the track streams
+		// meanwhile. Once the cache serves it, it is local.
+		deadline = time.Now().Add(5 * time.Second)
+		for !read(t, p).Local() {
+			if time.Now().After(deadline) {
+				t.Fatal("a track from the cache isn't local")
+			}
+			time.Sleep(10 * time.Millisecond)
 		}
 	})
 	t.Run("kept no longer", func(t *testing.T) {

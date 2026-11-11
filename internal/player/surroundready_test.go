@@ -77,6 +77,18 @@ func (s *readyServices) call(h *harness, n int, url string) *readyCall {
 	return c
 }
 
+// taken waits until a preparation of url returned that it is ready, and
+// then a few turns of the player's goroutine, to which the answer comes
+// back right after: a check after it sees what the answer did, if
+// anything.
+func (s *readyServices) taken(h *harness, url string) {
+	h.t.Helper()
+	h.wait("the answer of "+url, func(*Player) bool { return s.SurroundReady(Source{SurroundURL: url}) })
+	for range 3 {
+		h.on(func(*Player) {})
+	}
+}
+
 // newReadyHarness is a harness whose app makes 5.1 audio ready as the test
 // answers.
 func newReadyHarness(t *testing.T, setup ...func(*fakeServices)) (*harness, *readyServices) {
@@ -196,8 +208,7 @@ func TestSurroundReadyingStops(t *testing.T) {
 	h.setSurround(false)
 	h.wait("a's preparation stopped", func(*Player) bool { return c.ctx.Err() != nil })
 	c.answer <- nil
-	h.on(func(*Player) {})
-	h.on(func(*Player) {})
+	r.taken(h, "url:yt:a/5.1")
 	if n := h.stream.count("load"); n != loads || h.stream.sounding() != "url:yt:a" {
 		t.Fatalf("5.1 turned off: loaded %q, sounding %q", h.stream.with("load"), h.stream.sounding())
 	}
@@ -215,8 +226,7 @@ func TestSurroundReadyingStops(t *testing.T) {
 		t.Error("a's preparation goes on as b plays")
 	}
 	c.answer <- nil
-	h.on(func(*Player) {})
-	h.on(func(*Player) {})
+	r.taken(h, "url:yt:a/5.1")
 	if got := h.stream.lastLoad(); got != "load url:yt:b 0s true" {
 		t.Fatalf("a's 5.1 audio ready as b plays: loaded %q", got)
 	}

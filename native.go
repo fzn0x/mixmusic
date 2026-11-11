@@ -293,7 +293,10 @@ type shell struct {
 		browser, profile string
 		pasted, problem  string
 	}
-	youtubePick bool
+	// youtubeBrowser is the YouTube Music sign-in through a browser of the
+	// user's, with a profile of its own (accounts_browser.go).
+	youtubeBrowser youtubeBrowserSignIn
+	youtubePick    bool
 	// wells are the colour wells' colours, by key; tools are how the user
 	// sorted and searched the lists of tracks, by key.
 	wells map[string]*colorWell

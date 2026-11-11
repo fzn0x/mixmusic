@@ -16,6 +16,7 @@ import (
 	"github.com/fzn0x/mixmusic/builtin"
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/audio"
+	"github.com/fzn0x/mixmusic/internal/browser"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/player/playertest"
@@ -144,6 +145,9 @@ func newTestShellWith(t testing.TB, set func(o *app.Options), svc func(a *app.Ap
 	// The window lists none of the output devices of the computer the tests
 	// run on, whose button would come and go with them: a test gives some.
 	opts.OutputDevices = func() ([]app.OutputDevice, error) { return nil, nil }
+	// Nor its browsers, which a sign-in to YouTube Music opens: a test
+	// gives some.
+	opts.Browsers = &app.BrowserSignIn{Find: func() []browser.Browser { return nil }}
 	if set != nil {
 		set(&opts)
 	}

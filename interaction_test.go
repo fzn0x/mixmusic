@@ -1132,12 +1132,12 @@ func TestCopyLink(t *testing.T) {
 		Albums: []media.Album{album}, Artists: []media.Artist{artist}, Playlists: []media.Playlist{list, {ID: "pl-y", Title: "Mixtape"}}}}}
 	// The search's shelves go below the fold of a window of the usual size.
 	tt := testerOf(t, s, 1280, 1800)
-	copyLink := func(open func() error, want string) {
+	copyLink := func(open func() error, want string, path ...string) {
 		t.Helper()
 		if err := open(); err != nil {
 			t.Fatal(err)
 		}
-		if err := tt.ChooseMenuItem("Copy link"); err != nil {
+		if err := tt.ChooseMenuItem(append(path, "Copy link")...); err != nil {
 			t.Fatalf("%v: the menu holds %q", err, tt.Menu())
 		}
 		tt.Frame()
@@ -1148,7 +1148,7 @@ func TestCopyLink(t *testing.T) {
 	rightClick := func(label string) func() error { return func() error { return tt.RightClick(label) } }
 	more := func() error { return tt.Click("More") }
 	show(s, tt, "/album/al-x")
-	copyLink(rightClick(tr.Title), tr.URL)
+	copyLink(rightClick(tr.Title), tr.URL, "Copy")
 	copyLink(more, album.URL)
 	show(s, tt, artistPath(artist.ID))
 	copyLink(more, artist.URL)

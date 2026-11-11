@@ -482,8 +482,8 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		if m.Item("Open in " + sourceName(t.Source)).Chosen() {
 			go s.svc.System.OpenExternal(u)
 		}
-		s.copyLinkItem(m, u)
 	}
+	s.copySongItems(m, t)
 	s.shareItem(m, s.songShare(t))
 	if t.Source == media.SourceSpotify && !t.IsEpisode() {
 		if m.Item("Find another YouTube Music match").Chosen() {

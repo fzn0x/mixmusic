@@ -1,0 +1,1 @@
+- A song's menu has a Copy submenu: Copy link (moved there), Copy title, Copy artist, which copies all of its artists separated by commas, and Copy "Artist - Title" (#474).

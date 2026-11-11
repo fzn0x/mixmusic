@@ -159,7 +159,11 @@ func (r *Resolver) ytdlpAsAccount(ctx context.Context, videoID string, quality Q
 	if err != nil {
 		return Stream{}, err
 	}
-	return parseInfo(out)
+	s, err := parseInfo(out)
+	if err != nil {
+		return Stream{}, err
+	}
+	return s.found(RouteAccount, args), nil
 }
 
 // writeSession writes cookies, of a YouTube Music session, into a new file

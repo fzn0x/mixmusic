@@ -44,6 +44,11 @@ func main() {
 		mygo.App.SetPath(mygo.PathCache, filepath.Join(dir, "cache"))
 		mygo.App.SetPath(mygo.PathLogs, filepath.Join(dir, "logs"))
 	}
+	// An AI assistant starts MixMusic --mcp to reach the MixMusic that runs.
+	userData := func() (string, error) { return mygo.App.Path(mygo.PathUserData) }
+	if relayed, status := relayAssistant(os.Args[1:], userData, os.Stdin, os.Stdout, os.Stderr); relayed {
+		os.Exit(status)
+	}
 	if !mygo.App.RequestSingleInstanceLock() {
 		return // the running instance takes over
 	}

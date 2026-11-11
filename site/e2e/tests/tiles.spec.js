@@ -38,6 +38,9 @@ test("a tile plays on its own, again and again, once in the window", async ({ pa
   await expect(percent).toHaveText("100%");
   await expect(percent, "back at rest").toHaveText("40%");
   await expect(percent, "and again").toHaveText("100%");
+  // Out of the window again, it goes back to rest at once.
+  await page.evaluate(() => scrollTo(0, 0));
+  await expect(percent, "out of the window, back at rest").toHaveText("40%", { timeout: 1000 });
 });
 
 test("hovering a tile holds it where it is, and leaving it lets it go on", async ({ page }) => {

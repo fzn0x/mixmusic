@@ -1,5 +1,5 @@
 // What the reduced-motion check looks at (#360): the parts of the page that
-// carry data-motion, which are the ones of every demo (#357) and hover tile
+// carry data-motion, which are the ones of every demo (#357) and feature tile
 // (#358) that move. A new demo or tile marks its moving parts and is
 // covered, with nothing to add here.
 

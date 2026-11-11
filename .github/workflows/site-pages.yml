@@ -46,6 +46,14 @@ jobs:
       # links are absolute.
       - name: Build the site
         run: nix develop --command zola --root site build --base-url http://127.0.0.1:4173
+      # Playwright installs the browsers' libraries with apt, from the lists
+      # it finds. On 2026-11-11 the runners' own mirror went unanswered over
+      # HTTP for hours, and Playwright's apt waited on it until cancelled. So
+      # apt-install.sh, given no packages, first points the lists at a
+      # mirror that answers over HTTPS. While none does, it says so, and the
+      # pages' checks skip.
+      - name: A mirror of Ubuntu's archive
+        run: bash .github/scripts/apt-install.sh
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -55,9 +63,12 @@ jobs:
         working-directory: site/e2e
         run: npm ci
       - name: Install the browsers
+        if: env.APT_SKIPPED != '1'
+        timeout-minutes: 60
         working-directory: site/e2e
         run: npx playwright install --with-deps chromium firefox webkit
       - name: Check the pages
+        if: env.APT_SKIPPED != '1'
         working-directory: site/e2e
         run: npx playwright test
       - name: Keep the report of a failed run

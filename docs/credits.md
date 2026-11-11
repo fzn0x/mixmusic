@@ -75,6 +75,10 @@ of its own.
 
 ## Lyrics and their Latin letters
 
+- **[Better Lyrics](https://betterlyrics.org)**, whose service keeps
+  lyrics timed word by word, which MixMusic asks first. The lyrics panel
+  credits it under each of its lyrics: "lyrics from Better Lyrics
+  (https://betterlyrics.org)".
 - **[Unison](https://unison.boidu.dev)**, the open, crowdsourced database
   of lyrics, most of them timed word by word, under the
   [ODbL](https://opendatacommons.org/licenses/odbl/). As its licence asks,

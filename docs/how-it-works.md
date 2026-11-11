@@ -96,8 +96,9 @@ browser, with PKCE, and comes back to MixMusic at
 MixMusic has no server of its own. Apart from YouTube and Spotify, it
 talks to:
 
-- **Lyrics:** [Unison](https://unison.boidu.dev), an open, crowdsourced
-  database of lyrics, first, then [LRCLIB](https://lrclib.net), then
+- **Lyrics:** [Better Lyrics](https://betterlyrics.org), for lyrics timed
+  word by word, first, then [Unison](https://unison.boidu.dev), an open,
+  crowdsourced database of lyrics, then [LRCLIB](https://lrclib.net), then
   YouTube Music's own lyrics. Unison also translates lyrics, through
   Google, and romanizes Arabic, but only while you turn those on.
 - **Latin letters for lyrics** are made on your computer for every other

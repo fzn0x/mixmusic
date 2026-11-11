@@ -26,6 +26,11 @@ type Timing struct {
 	// Rest is how long the computer controlled refuses to pair again after
 	// a code that didn't match: 3 s.
 	Rest time.Duration
+
+	// linger, for tests, holds a pairing's handler before it returns, once
+	// the other computer was told how the pairing went, as a busy computer
+	// may: none at all.
+	linger time.Duration
 }
 
 func (t Timing) ping() time.Duration       { return or(t.Ping, 2*time.Second) }
@@ -267,11 +272,20 @@ func (s *Server) pair(c *serverConn, name string) {
 	}
 	s.pairing = true
 	s.mu.Unlock()
-	defer func() {
+	// The pairing ends here before the other computer hears how it went:
+	// that computer may start the next one at once, which must not find
+	// this one still running, and be refused as busy.
+	release := sync.OnceFunc(func() {
 		s.mu.Lock()
 		s.pairing = false
 		s.mu.Unlock()
-	}()
+	})
+	defer release()
+	if t.linger > 0 {
+		// Before the release deferred, so that the tests find a pairing
+		// that only ends as its handler returns.
+		defer time.Sleep(t.linger)
+	}
 	code, err := NewCode()
 	if err != nil {
 		return
@@ -285,11 +299,32 @@ func (s *Server) pair(c *serverConn, name string) {
 		if errors.Is(err, ErrBusy) {
 			reason = reasonBusy
 		}
+		release()
 		refuse(reason)
 		return
 	}
-	// The user refusing it closes the connection, which ends the rounds.
+	// finish tells the host how the pairing ended, once, and ends it here,
+	// returning what keeping it said.
+	var (
+		once sync.Once
+		kept error
+	)
+	finish := func(err error) error {
+		once.Do(func() {
+			if errors.Is(err, ErrWrongCode) {
+				s.mu.Lock()
+				s.rested = time.Now()
+				s.mu.Unlock()
+			}
+			kept = done(err)
+			release()
+		})
+		return kept
+	}
+	// The user refusing it ends it, then closes the connection, which ends
+	// the rounds.
 	stop := context.AfterFunc(ctx, func() {
+		finish(ErrCanceled)
 		_ = c.w.send(message{Type: "failed", Reason: reasonCanceled}, time.Second)
 		c.conn.Close()
 	})
@@ -308,15 +343,10 @@ func (s *Server) pair(c *serverConn, name string) {
 		err = ErrCanceled
 	}
 	if err != nil {
-		if errors.Is(err, ErrWrongCode) {
-			s.mu.Lock()
-			s.rested = time.Now()
-			s.mu.Unlock()
-		}
-		done(err)
+		finish(err)
 		return
 	}
-	if err := done(nil); err != nil {
+	if err := finish(nil); err != nil {
 		_ = c.w.send(message{Type: "failed", Reason: reasonKeep}, t.silence())
 		return
 	}

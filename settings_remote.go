@@ -35,6 +35,12 @@ func (s *shell) remoteSettings(c *ui.Context) {
 				s.setRemote(on)
 			}
 		}, "remote control another computer laptop desktop network pair phone")
+		if fw := s.a.Firewall(); on && fw != nil {
+			s.readFirewall(fw)
+			if s.firewallKeepsOut() {
+				s.hint(c, "Windows Firewall keeps the other computers from reaching this one. Windows Firewall, below, tells why, and how to let them in.")
+			}
+		}
 		paired := rc.Paired()
 		if len(paired) == 0 {
 			s.hint(c, "No computer is paired yet. To control another computer, choose it in the player bar's devices menu, the cast button's.")
@@ -81,6 +87,9 @@ func (s *shell) setRemote(on bool) {
 		err := s.a.Remote().SetOn(on)
 		s.update(func() {
 			s.remote.turning = nil
+			// Listening, MixMusic may have been let in or kept out, by
+			// Windows Firewall's question: it's read again.
+			s.firewall.reread()
 			if err != nil {
 				s.notes = append(s.notes, noticeOf(err))
 			}

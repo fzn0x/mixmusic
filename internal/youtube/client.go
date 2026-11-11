@@ -53,6 +53,9 @@ type Client struct {
 	// among those it is signed in to: a browser signed in to several
 	// numbers them from 0.
 	authUser int
+	// premium is what YouTube Music's answers told of the account's
+	// Premium (premium.go).
+	premium premiumSeen
 }
 
 // New returns a client for YouTube Music in English, for the US.
@@ -164,6 +167,7 @@ func (c *Client) callWith(ctx context.Context, ic innerClient, endpoint string, 
 	}
 	now := time.Now()
 	signed := !o.anonymous && c.signRequest(req, now)
+	signedAs := c.signedAs(signed)
 	res, err := c.HTTP.Do(req)
 	if err != nil {
 		return node{}, fmt.Errorf("youtube music: %w", err)
@@ -195,6 +199,9 @@ func (c *Client) callWith(ctx context.Context, ic innerClient, endpoint string, 
 	}
 	if signed && accountEndpoints[endpoint] && loggedOut(n) {
 		c.reject()
+	}
+	if signed && !loggedOut(n) {
+		c.seePremium(signedAs, n)
 	}
 	return n, nil
 }

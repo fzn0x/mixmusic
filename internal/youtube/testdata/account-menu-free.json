@@ -1,0 +1,45 @@
+{
+ "_fixture": "Written by hand, not recorded: YouTube Music's answer to account/account_menu for an account without Premium, as account-menu-premium.json is, with has_unlimited_entitlement False, the value its recorded True stands against. MIXMUSIC_LIVE=1 MIXMUSIC_YT_COOKIES='SAPISID=…; …' MIXMUSIC_YT_RECORD=dir go test ./internal/youtube -run LivePremium -v records an account's own answer, its tracking parameters alone, to replace this one.",
+ "responseContext": {
+  "serviceTrackingParams": [
+   {
+    "service": "GFEEDBACK",
+    "params": [
+     {
+      "key": "ipcc",
+      "value": "0"
+     },
+     {
+      "key": "has_unlimited_entitlement",
+      "value": "False"
+     },
+     {
+      "key": "logged_in",
+      "value": "1"
+     }
+    ]
+   }
+  ]
+ },
+ "actions": [
+  {
+   "openPopupAction": {
+    "popup": {
+     "multiPageMenuRenderer": {
+      "header": {
+       "activeAccountHeaderRenderer": {
+        "accountName": {
+         "runs": [
+          {
+           "text": "Ada Example"
+          }
+         ]
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ ]
+}

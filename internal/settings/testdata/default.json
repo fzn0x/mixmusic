@@ -23,6 +23,8 @@
   "spotifyPlayback": "here",
   "spotifyDevice": "",
   "quality": "best",
+  "audioAsAccount": false,
+  "audioAsAccountOffered": false,
   "crossfade": 0,
   "normalize": false,
   "loudness": true,

@@ -32,6 +32,10 @@ type Desktop struct {
 	// MediaKeys has the keyboard's play, next and previous keys control
 	// MixMusic.
 	MediaKeys bool `json:"mediaKeys"`
+	// AssistantControl lets the AI assistants of this computer control
+	// MixMusic over MCP (#477), through the command they start. It is off
+	// at first.
+	AssistantControl bool `json:"assistantControl"`
 	// DiscordPresence shows what plays on the user's Discord profile, as
 	// the Discord application of DiscordAppID, or MixMusic's own when it
 	// is empty.

@@ -133,14 +133,15 @@ func TestRecapSave(t *testing.T) {
 	for _, tc := range []struct {
 		button string
 		size   sharecard.Size
-	}{{"save image", sharecard.Square}, {"save image for a story", sharecard.Story}} {
+		name   string
+	}{{"save image", sharecard.Square, "MixMusic 2026.png"}, {"save image for a story", sharecard.Story, "MixMusic 2026 story.png"}} {
 		path := filepath.Join(dir, sizeName(tc.size)+".png")
 		asked := savesTo(t, path)
 		click(t, s, tt, tc.button)
 		select {
 		case opts := <-asked:
-			if opts.DefaultPath != "MixMusic 2026.png" {
-				t.Errorf("the dialog proposes %q", opts.DefaultPath)
+			if opts.DefaultPath != tc.name {
+				t.Errorf("%s: the dialog proposes %q, want %q", tc.button, opts.DefaultPath, tc.name)
 			}
 		case <-time.After(5 * time.Second):
 			t.Fatalf("%s opened no save dialog", tc.button)

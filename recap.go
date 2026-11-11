@@ -91,10 +91,10 @@ func (s *shell) recapView(c *ui.Context, years []int) {
 	s.sectionTitle(c, "Share")
 	ui.Row(c).Gap(8).Wrap().Margin(0, 0, 24).Children(func() {
 		if s.button(c, "recap-save", "save image", true).Clicked() {
-			s.saveCard(recapFileName(r), nil, sharecard.Square, s.recapCard(r))
+			s.saveCard(recapFileName(r, sharecard.Square), nil, sharecard.Square, s.recapCard(r))
 		}
 		if s.button(c, "recap-save-story", "save image for a story", false).Clicked() {
-			s.saveCard(recapFileName(r), nil, sharecard.Story, s.recapCard(r))
+			s.saveCard(recapFileName(r, sharecard.Story), nil, sharecard.Story, s.recapCard(r))
 		}
 	})
 }
@@ -168,8 +168,14 @@ func recapDay(date string) string {
 	return t.Format("2 January")
 }
 
-// recapFileName is what the card of r is called at first.
-func recapFileName(r library.Recap) string { return fmt.Sprintf("MixMusic %d", r.Year) }
+// recapFileName is what the card of r in size is called at first: the
+// story's name says so, so that both saved in one folder keep apart.
+func recapFileName(r library.Recap, size sharecard.Size) string {
+	if size == sharecard.Story {
+		return fmt.Sprintf("MixMusic %d story", r.Year)
+	}
+	return fmt.Sprintf("MixMusic %d", r.Year)
+}
 
 // recapCard builds the card of r in the colours of the current theme: the
 // year's minutes and top five songs on a square, and its top artists and

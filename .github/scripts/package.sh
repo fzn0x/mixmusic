@@ -29,9 +29,11 @@ declare -A runtime_sha256=(
 	[aarch64]="00cbdfcf917cc6c0ff6d3347d59e0ca1f7f45a6df1a428a0d6d8a78664d87444"
 )
 
-# fetch downloads url to dest and checks its SHA-256.
+# fetch downloads url to dest and checks its SHA-256. GitHub can answer a
+# release download with a 504 or break it off for a minute: curl tries
+# again every 10 s, on any error, for 2 minutes.
 fetch() {
-	curl -fsSL --retry 3 -o "$3" "$1"
+	curl -fsSL --retry 5 --retry-delay 10 --retry-max-time 120 --retry-all-errors -o "$3" "$1"
 	echo "$2  $3" | sha256sum -c --quiet -
 }
 

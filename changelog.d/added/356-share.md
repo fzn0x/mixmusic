@@ -3,4 +3,5 @@
   found on YouTube Music, and saves an image card of its cover, title
   and artist in your theme's colours, as a square for a chat or a tall one
   for a story. On the lyrics, Share lines saves the lines you choose as a
-  card, with the song's cover, title and artist at its foot (#356).
+  card, with the song's cover, title and artist at its foot, and
+  MixMusic's logo and name at its bottom right (#356).

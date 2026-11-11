@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"slices"
+	"sync"
 
 	"github.com/egoist/mygo/ui"
 
@@ -15,7 +16,8 @@ import (
 // Share lines, above the lyrics, lets the user choose lines of them, by
 // clicking each, and save them as an image card: the lines large, and the
 // song's cover, title and artist at its foot, with where the lyrics come
-// from, which their licences ask for. While lines are being chosen, a
+// from, which their licences ask for, and MixMusic's mark and name at the
+// bottom right. While lines are being chosen, a
 // click on a line chooses it rather than plays the song from there.
 
 // lyricsPickMax is how many lines a card holds: the card shrinks its text
@@ -138,6 +140,11 @@ func (s *shell) saveLyricsCard(t media.Track, ly lyrics.Lyrics, size sharecard.S
 		if credit != "" {
 			c.Foot = append(c.Foot, sharecard.Line{Text: credit, Size: 26, Weight: 400, Ink: colors.Muted})
 		}
+		c.Mark = &sharecard.Mark{Logo: cardLogo(), Name: sharecard.Line{Text: "mixmusic", Size: 30, Weight: 700}}
 		return c
 	})
 }
+
+// cardLogo is MixMusic's mark in its pink, as the sidebar shows it beside
+// the name, drawn once for the cards that carry it.
+var cardLogo = sync.OnceValue(func() image.Image { return brandMark.Image(256, 256, nil) })

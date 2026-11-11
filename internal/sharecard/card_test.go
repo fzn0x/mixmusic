@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image"
 	"image/color"
+	"image/draw"
 	"image/png"
 	"os"
 	"path/filepath"
@@ -337,6 +338,65 @@ func TestLyrics(t *testing.T) {
 		x, y := size.W*9/100+20, size.H-size.W*9/100-20
 		if got := img.NRGBAAt(x, y); got != (color.NRGBA{30, 60, 230, 255}) {
 			t.Errorf("%s: the foot of the cover is %v", name, got)
+		}
+	}
+}
+
+// TestMark sets a mark at the bottom right of a lyrics card: its logo shows
+// there, inside the margin, and the foot keeps clear of it, however long.
+func TestMark(t *testing.T) {
+	fam := family(t)
+	dir := outDir(t)
+	pink := color.NRGBA{230, 0, 126, 255}
+	logo := image.NewNRGBA(image.Rect(0, 0, 64, 64))
+	draw.Draw(logo, logo.Bounds(), &image.Uniform{pink}, image.Point{}, draw.Src)
+	mark := &Mark{Logo: logo, Name: Line{Text: "mixmusic", Size: 30, Weight: 700}}
+	for name, size := range map[string]Size{"story": Story, "square": Square} {
+		c := Card{
+			Size: size, Colors: dark, Cover: cover(300), CoverAt: CoverFoot,
+			Lines: []Line{{Text: "Lanterns on the water", Size: 76, Weight: 700, MaxLines: 3}},
+			Foot: []Line{
+				{Text: "Glass Harbor and the Long Tide of the Northern Lighthouse Keepers", Size: 44, Weight: 700, MaxLines: 2},
+				{Text: "North Pier, the Saltwick Choir and the Morning Ferry Band", Size: 34, Weight: 400, Ink: dark.Muted},
+			},
+			Mark: mark,
+		}
+		img, err := c.Render(fam)
+		if err != nil {
+			t.Fatal(err)
+		}
+		save(t, dir, "mark-"+name, img)
+		margin := size.W * 9 / 100
+		g, _ := Card{Size: size, Colors: dark}.Render(fam)
+		if p, bad := inkOutside(t, img, g, margin-2); bad {
+			t.Errorf("%s: ink at %v is outside the margin", name, p)
+		}
+		ts := &typesetter{fam: fam, faces: map[faceKey]font.Face{}}
+		set := ts.setMark(c, float64(size.W)/design, float64(size.W-2*margin))
+		ts.close()
+		if set.width <= set.logoW || set.logoW <= 0 {
+			t.Fatalf("%s: the mark is set as %+v", name, set)
+		}
+		// The logo shows at the mark's left, at the bottom right of the card.
+		left, top := size.W-margin-int(set.width), size.H-margin-int(set.height)
+		if got := img.NRGBAAt(left+int(set.logoW)/2, top+int(set.height)/2); got != pink {
+			t.Errorf("%s: the middle of the logo is %v", name, got)
+		}
+		// The mark's corner is as on a card of the mark alone: the foot
+		// stays out of it.
+		only, err := Card{Size: size, Colors: dark, Mark: mark}.Render(fam)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ink(only, g) == 0 {
+			t.Fatalf("%s: the mark alone draws nothing", name)
+		}
+		for y := top - 8; y < size.H-margin; y++ {
+			for x := left - 8; x < size.W-margin; x++ {
+				if img.NRGBAAt(x, y) != only.NRGBAAt(x, y) {
+					t.Fatalf("%s: the foot reaches the mark at %v", name, image.Pt(x, y))
+				}
+			}
 		}
 	}
 }

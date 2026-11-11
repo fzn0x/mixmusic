@@ -1,0 +1,8 @@
+{"Time":"2026-11-11T21:44:56.8366217+07:00","Action":"start","Package":"example.com/demo/mainpanic"}
+{"Time":"2026-11-11T21:44:56.8456207+07:00","Action":"run","Package":"example.com/demo/mainpanic","Test":"TestOne"}
+{"Time":"2026-11-11T21:44:56.8456207+07:00","Action":"output","Package":"example.com/demo/mainpanic","Test":"TestOne","Output":"=== RUN   TestOne\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:56.8456207+07:00","Action":"output","Package":"example.com/demo/mainpanic","Test":"TestOne","Output":"--- PASS: TestOne (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:56.8456207+07:00","Action":"pass","Package":"example.com/demo/mainpanic","Test":"TestOne","Elapsed":0}
+{"Time":"2026-11-11T21:44:56.8462496+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:56.8467588+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"ok  \texample.com/demo/mainpanic\t0.010s\n"}
+{"Time":"2026-11-11T21:44:56.8467588+07:00","Action":"pass","Package":"example.com/demo/mainpanic","Elapsed":0.01}

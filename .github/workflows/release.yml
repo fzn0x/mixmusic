@@ -85,7 +85,16 @@ jobs:
           else
             nix develop --command true
           fi
-      - run: nix develop --command bun install --frozen-lockfile
+      # Bun's and Go's packages, again if a download breaks off. A tag
+      # rebuilt from before the script installs them once.
+      - name: Bun's and Go's packages
+        run: |
+          if [ -f .github/scripts/retry.sh ]; then
+            nix develop --command bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
+            nix develop --command bash .github/scripts/retry.sh 45 go mod download
+          else
+            nix develop --command bun install --frozen-lockfile
+          fi
       # The Developer ID certificate, and the App Store Connect key that
       # notarizes, in a keychain of their own, which mygo build signs and
       # notarizes with (mygo.config.ts). Without the secrets the app is
@@ -505,11 +514,18 @@ jobs:
           # The key only signs in: a host that isn't the AUR learns nothing
           # it could push with. Its key goes in the log, to compare with
           # those the Arch wiki lists.
-          ssh-keyscan -t ed25519 aur.archlinux.org > ~/.ssh/known_hosts
+          retry() {
+            if [ -f .github/scripts/retry.sh ]; then
+              bash .github/scripts/retry.sh 45 "$@"
+            else
+              "$@"
+            fi
+          }
+          retry sh -c 'ssh-keyscan -t ed25519 aur.archlinux.org > ~/.ssh/known_hosts && test -s ~/.ssh/known_hosts'
           ssh-keygen -lf ~/.ssh/known_hosts
           export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/aur -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
           aur="$RUNNER_TEMP/aur"
-          git clone ssh://aur@aur.archlinux.org/mixmusic-bin.git "$aur"
+          retry git clone ssh://aur@aur.archlinux.org/mixmusic-bin.git "$aur"
           nix develop --command go run ./tools/aur -version "$v" -release release -o "$aur"
           cat "$aur/PKGBUILD"
           cd "$aur"

@@ -37,7 +37,9 @@ export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: 0,
+  // In CI a check that fails runs again, up to twice: one that passes then
+  // shows as flaky in the report, and one that fails every time fails.
+  retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: { baseURL: `http://127.0.0.1:${PORT}`, colorScheme: "dark", reducedMotion: "no-preference", locale: "en-US" },

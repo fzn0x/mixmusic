@@ -51,12 +51,15 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: site/e2e/package-lock.json
+      # The checks and the browsers, again if a download breaks off.
       - name: Install the checks
         working-directory: site/e2e
-        run: npm ci
+        run: bash ../../.github/scripts/retry.sh 45 npm ci
       - name: Install the browsers
         working-directory: site/e2e
-        run: npx playwright install --with-deps chromium firefox webkit
+        run: bash ../../.github/scripts/retry.sh 45 npx playwright install --with-deps chromium firefox webkit
+      # A page check that fails runs again, up to twice, and shows as flaky
+      # in the report when it passes then.
       - name: Check the pages
         working-directory: site/e2e
         run: npx playwright test

@@ -1,0 +1,15 @@
+{"Time":"2026-11-11T21:44:56.4245889+07:00","Action":"start","Package":"example.com/demo/mainpanic"}
+{"Time":"2026-11-11T21:44:56.4365479+07:00","Action":"run","Package":"example.com/demo/mainpanic","Test":"TestOne"}
+{"Time":"2026-11-11T21:44:56.4370717+07:00","Action":"output","Package":"example.com/demo/mainpanic","Test":"TestOne","Output":"=== RUN   TestOne\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:56.4370717+07:00","Action":"output","Package":"example.com/demo/mainpanic","Test":"TestOne","Output":"--- PASS: TestOne (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:56.4370717+07:00","Action":"pass","Package":"example.com/demo/mainpanic","Test":"TestOne","Elapsed":0}
+{"Time":"2026-11-11T21:44:56.4370717+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:56.439193+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"panic: the server didn't stop\n"}
+{"Time":"2026-11-11T21:44:56.439193+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"\n"}
+{"Time":"2026-11-11T21:44:56.439193+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"goroutine 1 [running]:\n"}
+{"Time":"2026-11-11T21:44:56.439193+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"example.com/demo/mainpanic.TestMain(0x7ff7309852a0?)\n"}
+{"Time":"2026-11-11T21:44:56.439193+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"\t/home/runner/work/demo/mainpanic/main_test.go:11 +0x51\n"}
+{"Time":"2026-11-11T21:44:56.439193+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"main.main()\n"}
+{"Time":"2026-11-11T21:44:56.439193+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"\t_testmain.go:48 +0xa5\n"}
+{"Time":"2026-11-11T21:44:56.4408529+07:00","Action":"output","Package":"example.com/demo/mainpanic","Output":"FAIL\texample.com/demo/mainpanic\t0.016s\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:56.4408529+07:00","Action":"fail","Package":"example.com/demo/mainpanic","Elapsed":0.016}

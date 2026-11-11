@@ -3,7 +3,10 @@ description: >-
   cachix/install-nix-action, tried again when its download of Nix breaks
   off. releases.nixos.org sometimes ends the runner's TLS connection for a
   while ("unexpected eof while reading"), which failed whole runs. The
-  installer fails before it changes anything, so trying again is safe.
+  installer fails before it changes anything, so trying again is safe. It
+  waits 10 seconds after the first failure, then twice as long after each,
+  up to 5 minutes, as .github/scripts/retry.sh does: 12 tries in about 45
+  minutes. A step can't loop, so each try is a step of its own.
 inputs:
   github_access_token:
     description: The token Nix reads GitHub's flakes with.
@@ -11,28 +14,128 @@ inputs:
 runs:
   using: composite
   steps:
-    - id: first
+    - id: try1
       uses: cachix/install-nix-action@v31
       continue-on-error: true
       with:
         github_access_token: ${{ inputs.github_access_token }}
-    - if: steps.first.outcome == 'failure'
+    - if: steps.try1.outcome == 'failure'
       shell: bash
       run: |
-        echo "::warning::Installing Nix failed; trying again in 30 seconds"
-        sleep 30
-    - id: second
-      if: steps.first.outcome == 'failure'
+        echo "::warning::Installing Nix failed (try 1 of 12): trying again in 10 seconds"
+        sleep 10
+    - id: try2
+      if: steps.try1.outcome == 'failure'
       uses: cachix/install-nix-action@v31
       continue-on-error: true
       with:
         github_access_token: ${{ inputs.github_access_token }}
-    - if: steps.second.outcome == 'failure'
+    - if: steps.try2.outcome == 'failure'
       shell: bash
       run: |
-        echo "::warning::Installing Nix failed again; trying once more in 90 seconds"
-        sleep 90
-    - if: steps.second.outcome == 'failure'
+        echo "::warning::Installing Nix failed (try 2 of 12): trying again in 20 seconds"
+        sleep 20
+    - id: try3
+      if: steps.try2.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.try3.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed (try 3 of 12): trying again in 40 seconds"
+        sleep 40
+    - id: try4
+      if: steps.try3.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.try4.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed (try 4 of 12): trying again in 80 seconds"
+        sleep 80
+    - id: try5
+      if: steps.try4.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.try5.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed (try 5 of 12): trying again in 160 seconds"
+        sleep 160
+    - id: try6
+      if: steps.try5.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.try6.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed (try 6 of 12): trying again in 300 seconds"
+        sleep 300
+    - id: try7
+      if: steps.try6.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.try7.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed (try 7 of 12): trying again in 300 seconds"
+        sleep 300
+    - id: try8
+      if: steps.try7.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.try8.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed (try 8 of 12): trying again in 300 seconds"
+        sleep 300
+    - id: try9
+      if: steps.try8.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.try9.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed (try 9 of 12): trying again in 300 seconds"
+        sleep 300
+    - id: try10
+      if: steps.try9.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.try10.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed (try 10 of 12): trying again in 300 seconds"
+        sleep 300
+    - id: try11
+      if: steps.try10.outcome == 'failure'
+      uses: cachix/install-nix-action@v31
+      continue-on-error: true
+      with:
+        github_access_token: ${{ inputs.github_access_token }}
+    - if: steps.try11.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::Installing Nix failed (try 11 of 12): trying again in 300 seconds"
+        sleep 300
+    - id: try12
+      if: steps.try11.outcome == 'failure'
       uses: cachix/install-nix-action@v31
       with:
         github_access_token: ${{ inputs.github_access_token }}

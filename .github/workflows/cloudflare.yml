@@ -84,6 +84,11 @@ jobs:
       - name: robots.txt
         run: |
           printf 'User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n' "$SITE_URL" > site/public/robots.txt
+      # Wrangler, fetched once, again if the download breaks off: the
+      # check and the deploy run it from npx's cache.
+      - name: Wrangler
+        working-directory: site
+        run: bash ../.github/scripts/retry.sh 45 npx --yes "wrangler@$WRANGLER_VERSION" --version
       - name: Check the Worker
         working-directory: site
         run: npx --yes "wrangler@$WRANGLER_VERSION" deploy --dry-run

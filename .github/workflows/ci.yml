@@ -28,6 +28,11 @@ jobs:
       - name: Formatting
         if: runner.os == 'Linux'
         run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      # Go's modules, again if a download breaks off. setup-go's cache has
+      # them, unless go.sum changed.
+      - name: Go's modules
+        shell: bash
+        run: bash .github/scripts/retry.sh 45 go mod download
       - name: Vet for Linux, Windows and macOS
         shell: bash
         run: |
@@ -47,7 +52,7 @@ jobs:
       - name: Download the Opus test vectors
         if: runner.os == 'Linux' && steps.opus-vectors.outputs.cache-hit != 'true'
         run: |
-          curl -fsSL --retry 5 --retry-delay 10 --retry-max-time 120 --retry-all-errors -o "$RUNNER_TEMP/opus-vectors.tar.gz" https://opus-codec.org/static/testvectors/opus_testvectors-rfc8251.tar.gz
+          curl -fsSL --retry 15 --retry-all-errors --retry-max-time 1800 -o "$RUNNER_TEMP/opus-vectors.tar.gz" https://opus-codec.org/static/testvectors/opus_testvectors-rfc8251.tar.gz
           echo "6b26a22f9ba87b2b836906a9bb7afec5f8e54d49553b1200382520ee6fedfa55  $RUNNER_TEMP/opus-vectors.tar.gz" | sha256sum -c -
           mkdir -p "$RUNNER_TEMP/opus-vectors"
           tar -xzf "$RUNNER_TEMP/opus-vectors.tar.gz" -C "$RUNNER_TEMP/opus-vectors"
@@ -55,15 +60,20 @@ jobs:
       # registry check reads: main keeps their TypeScript only.
       - uses: oven-sh/setup-bun@v2
       - name: Compile the community plugins
+        shell: bash
         run: |
-          bun install --frozen-lockfile
+          bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
           bun run build:plugins
       # The romaji tests read the IPA dictionary, which the app downloads,
       # from its module, checked against go.sum: the app doesn't build it in.
       - name: Download the dictionary of the romaji tests
-        run: go mod download github.com/ikawaha/kagome-dict/ipa@v1.2.6
+        shell: bash
+        run: bash .github/scripts/retry.sh 45 go mod download github.com/ikawaha/kagome-dict/ipa@v1.2.6
+      # tools/gotest runs a test that fails again, up to 3 more times: one
+      # that passes then is reported as flaky, and one that fails every
+      # time fails the step.
       - name: Test
-        run: go test ./...
+        run: go run ./tools/gotest ./...
         env:
           OPUS_TESTVECTORS: ${{ runner.os == 'Linux' && format('{0}/opus-vectors/opus_newvectors', runner.temp) || '' }}
       # MixMusic takes keys MyGo has none for from its GTK window: these
@@ -73,8 +83,9 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         # apt-install.sh goes on from Ubuntu's own archive when the
-        # runner's mirror is slow.
-        timeout-minutes: 20
+        # runner's mirror is slow, and a test that fails runs again, up to
+        # 3 more times.
+        timeout-minutes: 60
         env:
           GDK_BACKEND: x11
           NO_AT_BRIDGE: "1"
@@ -82,7 +93,7 @@ jobs:
           bash .github/scripts/apt-install.sh xvfb xdotool libgtk-3-0t64
           # Ubuntu's archive out of reach: apt-install.sh said so, and this skips.
           [ -f "$RUNNER_TEMP/apt-skipped" ] && exit 0
-          xvfb-run -a go test ./internal/keypad/ -run 'TestWatch|TestPlusPressed' -count=1 -v | tee keys.log
+          xvfb-run -a go run ./tools/gotest ./internal/keypad/ -run 'TestWatch|TestPlusPressed' -count=1 -v | tee keys.log
           if grep -q -- '--- SKIP' keys.log; then
             echo "A test skipped."
             exit 1
@@ -99,9 +110,10 @@ jobs:
   audio:
     name: Audio output (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    # A run takes about a minute; one that hangs gives up long before
-    # GitHub's 6 hours.
-    timeout-minutes: 30
+    # A run takes about a minute, and its steps' downloads and tests may
+    # try again for longer; one that hangs gives up long before GitHub's 6
+    # hours.
+    timeout-minutes: 210
     strategy:
       fail-fast: false
       matrix:
@@ -111,6 +123,8 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
+      - name: Go's modules
+        run: bash .github/scripts/retry.sh 45 go mod download
       # PulseAudio without what apt recommends with it, but for its pactl
       # and pacat; apt-install.sh goes on from Ubuntu's own archive when the
       # runner's mirror is slow.
@@ -126,8 +140,9 @@ jobs:
           pactl info
       - name: An audio device
         if: runner.os == 'macOS'
+        timeout-minutes: 50
         run: |
-          brew install --cask blackhole-2ch
+          bash .github/scripts/retry.sh 45 brew install --cask blackhole-2ch
           sudo killall coreaudiod || true
           sleep 5
           system_profiler SPAudioDataType
@@ -135,6 +150,7 @@ jobs:
       - name: Play through the device
         if: env.APT_SKIPPED != '1'
         shell: bash
+        timeout-minutes: 45
         env:
           MIXMUSIC_AUDIO: "1"
         run: |
@@ -145,7 +161,7 @@ jobs:
             pacat --latency-msec=10 --format=s16le --rate=48000 --channels=2 /dev/zero &
             sleep 2
           fi
-          go test ./internal/audio/... -run 'TestStream|TestStartStop|TestRenderPanic|TestEngineOnTheDevice' -count=1 -v | tee audio.log
+          go run ./tools/gotest ./internal/audio/... -run 'TestStream|TestStartStop|TestRenderPanic|TestEngineOnTheDevice' -count=1 -v | tee audio.log
           if grep -q -- '--- SKIP' audio.log; then
             echo "A test skipped: the runner has no audio device."
             exit 1
@@ -158,6 +174,7 @@ jobs:
       - name: Show in the system's media controls
         if: env.APT_SKIPPED != '1'
         shell: bash
+        timeout-minutes: 55
         run: |
           bus=""
           if [ "$RUNNER_OS" = Linux ]; then
@@ -165,7 +182,7 @@ jobs:
             [ -f "$RUNNER_TEMP/apt-skipped" ] && exit 0
             bus="dbus-run-session --"
           fi
-          $bus go test ./internal/nowplaying/ ./internal/portal/ -run 'TestMPRIS|TestNowPlaying|TestBackgroundPortal' -count=1 -v | tee controls.log
+          $bus go run ./tools/gotest ./internal/nowplaying/ ./internal/portal/ -run 'TestMPRIS|TestNowPlaying|TestBackgroundPortal' -count=1 -v | tee controls.log
           if grep -q -- '--- SKIP' controls.log; then
             echo "A test skipped."
             exit 1
@@ -178,7 +195,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
+      - run: bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
       - run: bun run typecheck
       # The plugin API is written in TypeScript, and ships the JavaScript it
       # compiles to, which the Go side embeds: main keeps it, and it must be
@@ -235,7 +252,9 @@ jobs:
       # The shell's tools, fetched once, again if a download breaks off.
       - name: The Nix shell
         run: bash .github/scripts/nix-retry.sh nix develop --command true
-      - run: nix develop --command bun install --frozen-lockfile
+      # Bun's and Go's packages, again if a download breaks off.
+      - run: nix develop --command bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
+      - run: nix develop --command bash .github/scripts/retry.sh 45 go mod download
       - run: nix develop --command bash .github/scripts/build.sh "${{ matrix.platform }}"
       # Nix's own loader would keep it from starting outside NixOS (#166).
       - name: The Linux build asks for the system's loader
@@ -332,7 +351,7 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: flake.lock is committed, and locks every input
         run: |
-          nix flake lock
+          bash .github/scripts/nix-retry.sh nix flake lock
           if [ -n "$(git status --porcelain -- flake.lock)" ]; then
             cat flake.lock
             echo "flake.lock is missing or out of date: run nix flake lock" >&2

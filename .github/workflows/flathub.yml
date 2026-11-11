@@ -67,7 +67,8 @@ jobs:
     name: Build (${{ matrix.arch }})
     needs: sources
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
+    # Its downloads try again for up to 30 or 45 minutes each.
+    timeout-minutes: 270
     strategy:
       fail-fast: false
       matrix:
@@ -100,8 +101,8 @@ jobs:
           cat "work/$APP_ID.yml"
       - name: Flathub's recipes and seccomp profile
         run: |
-          curl -fsSL --retry 5 --retry-delay 10 --retry-max-time 120 --retry-all-errors -o work/.flathub.justfile "$VORARBEITER/justfile"
-          curl -fsSL --retry 5 --retry-delay 10 --retry-max-time 120 --retry-all-errors -o flatpak.seccomp.json "$VORARBEITER/flatpak.seccomp.json"
+          curl -fsSL --retry 15 --retry-all-errors --retry-max-time 1800 -o work/.flathub.justfile "$VORARBEITER/justfile"
+          curl -fsSL --retry 15 --retry-all-errors --retry-max-time 1800 -o flatpak.seccomp.json "$VORARBEITER/flatpak.seccomp.json"
           mkdir -p work/tmp work/.local/state flatpak
           chmod -R 777 work flatpak
       # As on Flathub's runners: flatpak-builder's sandbox makes namespaces.
@@ -116,12 +117,7 @@ jobs:
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
           df -h /
       - name: Pull the linter's image
-        run: |
-          for delay in 0 15 30 60; do
-            sleep "$delay"
-            docker pull "$LINTER" && exit 0
-          done
-          exit 1
+        run: bash .github/scripts/retry.sh 45 docker pull "$LINTER"
       - name: Lint the manifest
         run: |
           docker run --rm \
@@ -133,9 +129,10 @@ jobs:
             -e TMPDIR=/work/tmp -e XDG_STATE_HOME=/work/.local/state \
             "$LINTER" \
             bash -c 'git config --global --add safe.directory "*" && just -f .flathub.justfile validate-manifest "$APP_ID"'
+      # Again if a download breaks off: what came stays in work/.
       - name: Download the sources
         run: |
-          docker run --rm \
+          bash .github/scripts/retry.sh 45 docker run --rm \
             --entrypoint="" \
             --security-opt apparmor=unconfined \
             --security-opt seccomp="$GITHUB_WORKSPACE/flatpak.seccomp.json" \

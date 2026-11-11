@@ -1,0 +1,16 @@
+{"Time":"2026-11-11T21:45:01.2776227+07:00","Action":"start","Package":"example.com/demo/timeout"}
+{"Time":"2026-11-11T21:45:01.2878446+07:00","Action":"run","Package":"example.com/demo/timeout","Test":"TestQuick"}
+{"Time":"2026-11-11T21:45:01.2878446+07:00","Action":"output","Package":"example.com/demo/timeout","Test":"TestQuick","Output":"=== RUN   TestQuick\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:45:01.2878446+07:00","Action":"output","Package":"example.com/demo/timeout","Test":"TestQuick","Output":"--- PASS: TestQuick (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:45:01.2878446+07:00","Action":"pass","Package":"example.com/demo/timeout","Test":"TestQuick","Elapsed":0}
+{"Time":"2026-11-11T21:45:01.2883738+07:00","Action":"run","Package":"example.com/demo/timeout","Test":"TestSlow"}
+{"Time":"2026-11-11T21:45:01.2883738+07:00","Action":"output","Package":"example.com/demo/timeout","Test":"TestSlow","Output":"=== RUN   TestSlow\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:45:01.2883738+07:00","Action":"output","Package":"example.com/demo/timeout","Test":"TestSlow","Output":"--- PASS: TestSlow (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:45:01.2883738+07:00","Action":"pass","Package":"example.com/demo/timeout","Test":"TestSlow","Elapsed":0}
+{"Time":"2026-11-11T21:45:01.2883738+07:00","Action":"run","Package":"example.com/demo/timeout","Test":"TestAfter"}
+{"Time":"2026-11-11T21:45:01.2883738+07:00","Action":"output","Package":"example.com/demo/timeout","Test":"TestAfter","Output":"=== RUN   TestAfter\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:45:01.2883738+07:00","Action":"output","Package":"example.com/demo/timeout","Test":"TestAfter","Output":"--- PASS: TestAfter (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:45:01.2883738+07:00","Action":"pass","Package":"example.com/demo/timeout","Test":"TestAfter","Elapsed":0}
+{"Time":"2026-11-11T21:45:01.2883738+07:00","Action":"output","Package":"example.com/demo/timeout","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:45:01.2889016+07:00","Action":"output","Package":"example.com/demo/timeout","Output":"ok  \texample.com/demo/timeout\t0.011s\n"}
+{"Time":"2026-11-11T21:45:01.2889016+07:00","Action":"pass","Package":"example.com/demo/timeout","Elapsed":0.011}

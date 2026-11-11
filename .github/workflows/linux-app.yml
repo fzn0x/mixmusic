@@ -52,9 +52,10 @@ jobs:
   nix:
     name: The Nix build
     runs-on: ubuntu-latest
-    # A run takes about 4 minutes, more when apt's mirror is slow; one that
-    # hangs gives up long before GitHub's 6 hours.
-    timeout-minutes: 45
+    # A run takes about 4 minutes, more when apt's mirror is slow or a
+    # download tries again; one that hangs gives up long before GitHub's 6
+    # hours.
+    timeout-minutes: 200
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/install-nix
@@ -67,7 +68,8 @@ jobs:
       # one with x11grab: from Ubuntu's archive its libraries were 74 MB,
       # which the runner's mirror once took more than 10 minutes for.
       - name: FFmpeg
-        timeout-minutes: 10
+        # nix-retry.sh tries again for up to 45 minutes.
+        timeout-minutes: 50
         run: |
           bash .github/scripts/nix-retry.sh nix build --no-link --inputs-from . 'nixpkgs#ffmpeg-full^bin'
           ffmpeg="$(nix build --no-link --print-out-paths --inputs-from . 'nixpkgs#ffmpeg-full^bin')"
@@ -104,8 +106,9 @@ jobs:
   release:
     name: The release build on Ubuntu
     runs-on: ubuntu-latest
-    # A run takes about 7 minutes, more when apt's mirror is slow.
-    timeout-minutes: 45
+    # A run takes about 7 minutes, more when apt's mirror is slow or a
+    # download tries again.
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/install-nix
@@ -114,7 +117,9 @@ jobs:
       # The shell's tools, fetched once, again if a download breaks off.
       - name: The Nix shell
         run: bash .github/scripts/nix-retry.sh nix develop --command true
-      - run: nix develop --command bun install --frozen-lockfile
+      # Bun's and Go's packages, again if a download breaks off.
+      - run: nix develop --command bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
+      - run: nix develop --command bash .github/scripts/retry.sh 45 go mod download
       - run: nix develop --command bash .github/scripts/build.sh linux/amd64
       - name: Unpack the archive
         run: |
@@ -123,7 +128,7 @@ jobs:
           find app -type f | head -n 20
       # FFmpeg as the Nix build's job gets it.
       - name: FFmpeg
-        timeout-minutes: 10
+        timeout-minutes: 50
         run: |
           bash .github/scripts/nix-retry.sh nix build --no-link --inputs-from . 'nixpkgs#ffmpeg-full^bin'
           ffmpeg="$(nix build --no-link --print-out-paths --inputs-from . 'nixpkgs#ffmpeg-full^bin')"
@@ -164,22 +169,31 @@ jobs:
   ytdlp:
     name: yt-dlp's start
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # A run takes about a minute; its test and downloads may try again for
+    # longer.
+    timeout-minutes: 210
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
+      - name: Go's modules
+        run: bash .github/scripts/retry.sh 45 go mod download
+      # It downloads yt-dlp: tools/gotest runs it again when it fails, up to
+      # 3 more times.
       - name: MixMusic installs yt-dlp, checks it, and runs it
+        timeout-minutes: 45
         env:
           MIXMUSIC_LIVE: "1"
-        run: go test ./internal/tools/ -run '^TestLiveInstall$' -count=1 -v
+        run: go run ./tools/gotest ./internal/tools/ -run '^TestLiveInstall$' -count=1 -v
       - name: Time yt-dlp_linux and yt-dlp_linux.zip
+        # Each download tries again for up to 30 minutes.
+        timeout-minutes: 100
         run: |
           cd "$RUNNER_TEMP"
           url=https://github.com/yt-dlp/yt-dlp/releases/latest/download
           for f in SHA2-256SUMS yt-dlp_linux yt-dlp_linux.zip; do
-            curl -fsSL --retry 5 --retry-delay 10 --retry-max-time 120 --retry-all-errors -o "$f" "$url/$f"
+            curl -fsSL --retry 15 --retry-all-errors --retry-max-time 1800 -o "$f" "$url/$f"
           done
           grep -E ' (yt-dlp_linux|yt-dlp_linux\.zip)$' SHA2-256SUMS | sha256sum -c -
           chmod +x yt-dlp_linux

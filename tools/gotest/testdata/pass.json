@@ -1,0 +1,13 @@
+{"Time":"2026-11-11T21:44:53.7930327+07:00","Action":"start","Package":"example.com/demo/pass"}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"run","Package":"example.com/demo/pass","Test":"TestOne"}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"output","Package":"example.com/demo/pass","Test":"TestOne","Output":"=== RUN   TestOne\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"output","Package":"example.com/demo/pass","Test":"TestOne","Output":"    pass_test.go:6: one is fine\n"}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"output","Package":"example.com/demo/pass","Test":"TestOne","Output":"--- PASS: TestOne (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"pass","Package":"example.com/demo/pass","Test":"TestOne","Elapsed":0}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"run","Package":"example.com/demo/pass","Test":"TestTwo"}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"output","Package":"example.com/demo/pass","Test":"TestTwo","Output":"=== RUN   TestTwo\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"output","Package":"example.com/demo/pass","Test":"TestTwo","Output":"--- PASS: TestTwo (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"pass","Package":"example.com/demo/pass","Test":"TestTwo","Elapsed":0}
+{"Time":"2026-11-11T21:44:53.802613+07:00","Action":"output","Package":"example.com/demo/pass","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:53.8036467+07:00","Action":"output","Package":"example.com/demo/pass","Output":"ok  \texample.com/demo/pass\t0.010s\n"}
+{"Time":"2026-11-11T21:44:53.8036467+07:00","Action":"pass","Package":"example.com/demo/pass","Elapsed":0.011}

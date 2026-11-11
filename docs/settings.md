@@ -88,6 +88,14 @@ pair with it by a code it shows, and control it; and the computers
 paired, each with **Remove**. [Remote control](remote-control.md) tells
 more.
 
+The **Windows Firewall** group, on Windows: **Connections from your
+network** tells whether other computers and cast devices on your network
+can reach MixMusic, for remote control and casting, and why not when they
+can't, with **allow** when MixMusic's own rules can let them in, and
+**network settings** on a public network.
+[Remote control](remote-control.md#firewalls-and-the-local-network) tells
+more.
+
 The **AI assistants** group: **Let AI assistants control MixMusic**, off
 at first, lets the AI assistants of this computer that speak MCP control
 MixMusic; on, it shows the command an assistant starts and its

@@ -49,6 +49,11 @@ func main() {
 	if relayed, status := relayAssistant(os.Args[1:], userData, os.Stdin, os.Stdout, os.Stderr); relayed {
 		os.Exit(status)
 	}
+	// Windows Firewall's Allow starts MixMusic --allow-firewall as
+	// administrator, to change the firewall's rules and end.
+	if allowed, status := allowFirewall(os.Args[1:], os.Stderr); allowed {
+		os.Exit(status)
+	}
 	if !mygo.App.RequestSingleInstanceLock() {
 		return // the running instance takes over
 	}

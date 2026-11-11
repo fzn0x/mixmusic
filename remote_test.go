@@ -21,6 +21,11 @@ var remoteTiming = remote.Timing{Ping: 100 * time.Millisecond, Silence: 3 * time
 // newRemoteShell is a test shell of the computer named name on the network
 // n: it listens on 127.0.0.1 alone, with a key of its own.
 func newRemoteShell(t *testing.T, n *remotetest.Network, name string) *shell {
+	return newRemoteShellOf(t, n, name, nil)
+}
+
+// newRemoteShellOf is newRemoteShell of an app whose options set changes.
+func newRemoteShellOf(t *testing.T, n *remotetest.Network, name string, set func(o *app.Options)) *shell {
 	t.Helper()
 	id, err := remote.NewIdentity()
 	if err != nil {
@@ -30,6 +35,9 @@ func newRemoteShell(t *testing.T, n *remotetest.Network, name string) *shell {
 	s = newTestShellOf(t, func(o *app.Options) {
 		o.Remote = &app.RemoteOptions{Discovery: n, Listen: remotetest.Listen, Identity: id, Name: name, Timing: remoteTiming,
 			Player: func() *player.Player { return s.p }}
+		if set != nil {
+			set(o)
+		}
 	})
 	return s
 }

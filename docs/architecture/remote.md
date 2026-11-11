@@ -231,7 +231,22 @@ While remote control is on, MixMusic listens on a TCP port the system
 picks, on every network, and on mDNS's UDP port. So the first time, the
 system may ask: Windows Defender Firewall whether MixMusic may take
 connections from the network (allow it on private networks), macOS
-whether it may find and connect to devices on the local network. Tests
+whether it may find and connect to devices on the local network.
+
+On Windows, `internal/firewall` reads what the firewall does to
+MixMusic's executable through its COM interface, `INetFwPolicy2`, which
+needs no administrator: whether it's on for the networks the computer is
+on, whether those are public, whether an organization's policy decides,
+whether it blocks every incoming connection, and the inbound rules of the
+executable. Settings › Desktop › Windows Firewall shows it, read again
+after remote control turns on, after Allow, and at most every 5 seconds
+while the settings show. **Allow** starts MixMusic again with
+`--allow-firewall`, through `ShellExecuteEx`'s `runas`, so Windows asks
+for an administrator's approval; that copy, which `main` runs before the
+single-instance lock, takes private and domain networks off the inbound
+rules that block the executable, adds the rule "MixMusic" that lets it in
+on them, or turns that rule back on, and ends. Its exit status tells the
+settings how it went. Public networks stay closed. Tests
 listen on 127.0.0.1 alone, and find the computers through
 `remotetest`'s fake.
 

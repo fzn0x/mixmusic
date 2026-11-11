@@ -152,6 +152,9 @@ type shell struct {
 	// remote is the page of a computer controlled, and the dialog of the
 	// code this one shows (remote.go).
 	remote remoteView
+	// firewall is what the settings know of Windows Firewall
+	// (settings_firewall.go).
+	firewall firewallView
 	// panel is the side panel shown: "queue", "lyrics" or "".
 	panel string
 	// mini is what the mini player keeps from frame to frame: its panel,

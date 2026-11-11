@@ -73,7 +73,11 @@ cast, your system may ask about it:
 
 - **Windows**: Windows Defender Firewall may ask whether MixMusic may take
   connections from your network. Allow it on private networks, such as the
-  one at home.
+  one at home. When a cast device can't reach MixMusic, **Settings ›
+  Desktop › Windows Firewall** tells why, and its **Allow** lets MixMusic
+  in on private networks, as
+  [remote control's firewall part](remote-control.md#firewalls-and-the-local-network)
+  tells.
 - **macOS**: macOS may ask whether MixMusic may find and connect to
   devices on your local network. Allow it; System Settings › Privacy &
   Security › Local Network changes it later.

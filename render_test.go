@@ -148,6 +148,9 @@ func newTestShellWith(t testing.TB, set func(o *app.Options), svc func(a *app.Ap
 	// Nor its browsers, which a sign-in to YouTube Music opens: a test
 	// gives some.
 	opts.Browsers = &app.BrowserSignIn{Find: func() []browser.Browser { return nil }}
+	// Nor its firewall, which only Windows' settings show: a test gives
+	// one.
+	opts.Firewall = &app.Firewall{}
 	if set != nil {
 		set(&opts)
 	}

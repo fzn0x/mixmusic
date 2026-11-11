@@ -30,6 +30,16 @@
   track's end: MixMusic's own device, given a track with nothing after it,
   may stay on it once it ended, its position counting on (#373). The time
   shown never passes the track's end.
+- **5.1 surround** (`surroundready.go`): a stream plays its 5.1 audio
+  while the settings ask for it, once the app tells it plays at once
+  (`Surrounds.SurroundReady`). Until then the engine plays its stereo
+  audio, while the app makes the 5.1 audio ready
+  (`Surrounds.PrepareSurround`): yt-dlp finding it, and YouTube serving
+  it. Once ready, the engine loads it from where the track is then, as
+  pressing 5.1 does, after a crossfade under way (#457). Another entry,
+  or 5.1 turned off, stops the preparation, and what it finds plays no
+  more; 5.1 audio that can't be had leaves the entry in stereo, as 5.1
+  audio that fails does (`stereoFor`).
 - **Failures** (`failures.go`): the player keeps the last 10 tracks that
   couldn't play, until MixMusic quits (`Failures`, `FailureOf`), and the
   notice of each names its own (`Notice.Failure`). Each holds the steps

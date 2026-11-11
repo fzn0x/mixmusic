@@ -213,6 +213,7 @@ MixMusic plays on the system's default output device, and moves to the new one w
 Some YouTube Music tracks have a 5.1 surround mix beside their stereo one. While one plays, a 5.1 button shows by the player: pressing it plays the surround mix from where the stereo one was, and pressing it again goes back to stereo. The choice stays for later tracks, as "Play 5.1 surround when a track has it" in Settings › Playback › Sound, which the button turns on and off. It's off by default.
 
 - A track doesn't wait to learn whether it has a 5.1 mix: it starts at once, and the 5.1 button may show a moment later, once YouTube has said so. With 5.1 on, the track then plays its surround mix from where it is.
+- Nor does it wait for its surround mix: with 5.1 on, or as you press 5.1, it plays in stereo while the mix is found and YouTube starts serving it, a few seconds the first time, and goes on in 5.1 from where it is then. A mix found before, or in the offline cache, plays at once. A mix that can't be had leaves the track in stereo, and MixMusic says why. Before 0.5.11, the track was silent meanwhile.
 - On a 5.1 output device, the six channels play as they are. On headphones or two speakers, they're mixed down to stereo, as the track's own downmix levels say.
 - While it's on, stereo tracks play on the front left and right speakers of a 5.1 system.
 - The surround mix [needs yt-dlp and a JavaScript runtime](streams.md#surround-mixes-and-what-they-need), which find it in a few seconds the first time the track plays.

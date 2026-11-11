@@ -146,7 +146,7 @@ func (p *Player) moveStream(paused bool) {
 	}
 	p.emit(StateChange)
 	p.report()
-	_ = p.stream.Load(p.audioOf(*src), p.cue(p.s.Position, autoplay))
+	p.loadAudio(*src, p.cue(p.s.Position, autoplay), false)
 }
 
 // cue is how the stream of the current track starts, from start: at the

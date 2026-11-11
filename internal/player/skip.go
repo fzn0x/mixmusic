@@ -240,6 +240,7 @@ func (p *Player) goTo(m *move, i int) {
 // current entry shows loading, and nothing it waited for comes back.
 func (p *Player) hold() {
 	p.loadToken++
+	p.stopReadying()
 	p.retry = retryState{}
 	p.endWait()
 	p.atEnd = false

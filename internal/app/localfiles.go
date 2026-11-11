@@ -281,14 +281,34 @@ func (a *App) openFile(native string) (audio.Source, error) {
 		a.localFiles.Gone(media.ID(media.SourceFile, native))
 		return nil, errFileMissing
 	}
-	return fileSource{f}, nil
+	return newFileSource(f), nil
 }
 
 // fileSource is a file as the engine reads it: all of it is there, so a
 // read never waits, and one that fails is the file's failure, not the
-// network's.
-type fileSource struct{ *os.File }
+// network's. size is the file's when it was opened.
+type fileSource struct {
+	*os.File
+	size int64
+}
+
+func newFileSource(f *os.File) fileSource {
+	s := fileSource{File: f, size: -1}
+	if info, err := f.Stat(); err == nil {
+		s.size = info.Size()
+	}
+	return s
+}
 
 func (fileSource) Wake() {}
 
 func (fileSource) Local() bool { return true }
+
+// Shortened reports whether the file is shorter now than when it was
+// opened: cut short as it played, it ends at the cut, which isn't the end
+// of the track (#456). A file whose tags are written meanwhile is a new one
+// put in its place, and the one open stays whole.
+func (s fileSource) Shortened() bool {
+	info, err := s.Stat()
+	return err == nil && s.size >= 0 && info.Size() < s.size
+}

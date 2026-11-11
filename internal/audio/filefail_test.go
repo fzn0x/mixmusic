@@ -50,3 +50,41 @@ func TestDeckFileFailures(t *testing.T) {
 		})
 	}
 }
+
+// cutSource is a file on this computer that tells whether it was cut short
+// as it played, as cut says.
+type cutSource struct {
+	Source
+	cut bool
+}
+
+func (cutSource) Local() bool       { return true }
+func (s cutSource) Shortened() bool { return s.cut }
+
+// TestDeckFileCutAsItPlays fails a track whose file was cut short as it
+// played, which a FLAC or an MP3 reader reads as the end of the file: its
+// end is the file's failure then, not the track's (#456). A file that
+// wasn't cut ends as a track does.
+func TestDeckFileCutAsItPlays(t *testing.T) {
+	b, err := os.ReadFile(cuesFront)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct {
+		name string
+		cut  bool
+		want error
+	}{{"cut", true, errFile}, {"whole", false, nil}} {
+		t.Run(c.name, func(t *testing.T) {
+			open := func(ctx context.Context, url string, interrupted func() bool) (Source, error) {
+				return cutSource{memSource{bytes.NewReader(b)}, c.cut}, nil
+			}
+			d := newDeck("x", 0, open, func() {})
+			defer d.close()
+			drain(t, d)
+			if err := d.failure(); !errors.Is(err, c.want) || (c.want == nil && err != nil) {
+				t.Errorf("failure %v, want %v", err, c.want)
+			}
+		})
+	}
+}

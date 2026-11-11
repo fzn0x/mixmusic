@@ -8,8 +8,9 @@ type toldSurround struct{ url, surroundURL string }
 // audio, at surroundURL, which YouTube told of only after the stream was
 // found, as its track started without waiting for it. The current entry,
 // when it plays that stream, takes it, which offers its 5.1 audio, and
-// plays it while 5.1 surround is on, from where it is, as turning 5.1 on
-// does; an entry whose stream still loads takes it as it loads.
+// plays it while 5.1 surround is on, from where it is once it is ready, as
+// turning 5.1 on does; an entry whose stream still loads takes it as it
+// loads.
 func (p *Player) SurroundFound(url, surroundURL string) {
 	p.do(func() {
 		p.told = toldSurround{url, surroundURL}
@@ -22,9 +23,7 @@ func (p *Player) SurroundFound(url, surroundURL string) {
 			return
 		}
 		p.s.Source = &s
-		if p.loaded && p.surround && !p.stereoOnly {
-			_ = p.stream.Load(p.audioOf(s), p.cue(p.s.Position, !p.paused))
-		}
+		p.goSurround()
 		p.emit(StateChange)
 	})
 }

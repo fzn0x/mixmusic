@@ -519,6 +519,15 @@ type Player struct {
 	// entry's 5.1 audio failed, which then plays in stereo.
 	surround   bool
 	stereoOnly bool
+	// readying is the preparation of the current entry's 5.1 audio under way
+	// while its stereo audio plays, readySeq counts those started, readyURL
+	// is its 5.1 audio found ready, which plays at once, and inSurround is
+	// set while the engine has its 5.1 audio rather than its stereo audio
+	// (surroundready.go).
+	readying   readying
+	readySeq   int
+	readyURL   string
+	inSurround bool
 	// curve is the volume's curve, as the settings ask: a change has the
 	// device play the volume on the new one.
 	curve volume.Curve

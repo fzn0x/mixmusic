@@ -239,6 +239,9 @@ func open(key, sealed []byte) ([]byte, error) {
 type YouTubeAccount struct {
 	SignedIn bool             `json:"signedIn"`
 	Account  *youtube.Account `json:"account"`
+	// Premium is set once YouTube Music told that the account has
+	// YouTube Music Premium, which YouTube Premium gives too.
+	Premium bool `json:"premium,omitempty"`
 	// Error tells why the account could not be read, if it could not.
 	Error string `json:"error,omitempty"`
 }
@@ -298,7 +301,7 @@ func (a *App) youtubeAccount(ctx context.Context) YouTubeAccount {
 		a.youtubeMe = me
 		a.mu.Unlock()
 	}
-	return YouTubeAccount{SignedIn: true, Account: me}
+	return YouTubeAccount{SignedIn: true, Account: me, Premium: a.youtube.Premium()}
 }
 
 // YouTubeLogin opens a window where the user signs in to Google, and signs

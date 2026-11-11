@@ -24,8 +24,19 @@ func (s *shell) statsPage(c *ui.Context) {
 	for i, r := range statsRanges {
 		labels[i] = r.label
 	}
+	years := s.recapYears()
+	if len(years) > 0 {
+		labels = append(labels, recapLabel)
+	}
+	if s.statsRange >= len(labels) {
+		s.statsRange = 0
+	}
 	s.pageScroll(c, func() {
 		s.pageHeader(c, "Stats", labels, &s.statsRange)
+		if len(years) > 0 && s.statsRange == len(statsRanges) {
+			s.recapView(c, years)
+			return
+		}
 		st := s.svc.Collection.Stats(statsRanges[s.statsRange].days)
 		if st.Plays == 0 {
 			ui.Text(c, k.words("Nothing counted yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)

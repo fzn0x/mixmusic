@@ -197,6 +197,12 @@ func (c *Collection) ClearHistory() error { return c.a.library.ClearHistory() }
 // Stats sums up the plays of the last days, or of all time when days is 0.
 func (c *Collection) Stats(days int) library.Stats { return c.a.library.Stats(days) }
 
+// RecapYears lists the years the history has plays in, the latest first.
+func (c *Collection) RecapYears() []int { return c.a.library.RecapYears() }
+
+// Recap sums up what the user played in a calendar year.
+func (c *Collection) Recap(year int) library.Recap { return c.a.library.Recap(year) }
+
 // Searches returns the recent searches.
 func (c *Collection) Searches() []string { return c.a.library.Searches() }
 

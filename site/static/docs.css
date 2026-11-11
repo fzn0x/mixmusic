@@ -50,6 +50,9 @@
   --important: #c4a5ff;
   --warning: #e3b341;
   --caution: #ff7b72;
+  /* The footer's wordmark, faint, and its one letter in the app's cyan. */
+  --wordmark: rgba(255, 255, 255, 0.18);
+  --wordmark-accent: rgba(0, 189, 227, 0.32);
 
   --font: Figtree, "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "Cascadia Mono", Consolas, "SFMono-Regular", ui-monospace, monospace;
@@ -92,6 +95,8 @@
     --important: #7139c9;
     --warning: #845b00;
     --caution: #b8202a;
+    --wordmark: rgba(32, 26, 27, 0.14);
+    --wordmark-accent: rgba(0, 140, 175, 0.3);
   }
 }
 :root[data-theme="light"] {
@@ -118,6 +123,8 @@
   --important: #7139c9;
   --warning: #845b00;
   --caution: #b8202a;
+  --wordmark: rgba(32, 26, 27, 0.14);
+  --wordmark-accent: rgba(0, 140, 175, 0.3);
 }
 
 *,
@@ -637,13 +644,40 @@ html:not(.js) .theme-toggle { display: none; }
 
 /* Footer. */
 
-.footer { margin-top: 96px; background: var(--surface-low); border-top: 1px solid var(--outline-variant); }
+.footer { margin-top: 96px; background: var(--surface-low); border-top: 1px solid var(--outline-variant); overflow: hidden; }
 .footer-inner { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px 32px; align-items: start; max-width: 1440px; margin: 0 auto; padding: 32px 24px 40px; }
 .footer-inner p { margin: 0; max-width: 70ch; color: var(--on-surface-variant); font-size: 0.875rem; }
 .footer-nav { grid-column: 2; display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 0.875rem; font-weight: 600; }
 .footer-nav a { color: var(--on-surface); text-decoration: none; padding: 6px 0; }
 .footer-nav a:hover { color: var(--primary); text-decoration: underline; }
 .brand-small { height: auto; font-size: 1rem; }
+
+/* The wordmark at the foot, as on the home page (styles.css says how it
+   spans the container), across the footer's 1440px. */
+.footer-wordmark {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+  container-type: inline-size;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.footer-wordmark > span {
+  display: block;
+  margin: 0 0 -0.16em -0.04em;
+  color: var(--wordmark);
+  font: 800 calc(100cqi / 4.15) / 0.8 var(--font);
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent 80%);
+  mask-image: linear-gradient(to bottom, #000 25%, transparent 80%);
+}
+.footer-wordmark-accent { color: var(--wordmark-accent); }
+/* The letters are the spans' ::before, not text, as they are decoration
+   and a logotype, which contrast rules exempt (WCAG 1.4.3): no check or
+   reader takes them for text. */
+.footer-wordmark [data-w]::before { content: attr(data-w); }
 
 /* Medium windows: no room for "On this page"; the drawer lists the page's
    sections under it. */

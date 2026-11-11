@@ -51,6 +51,9 @@
   --scrollbar-hover: #4a4a4a;
   --dot-ring: rgba(255, 255, 255, 0.5);
   --kbd-edge: rgba(0, 0, 0, 0.35);
+  /* The footer's wordmark, faint, and its one letter in the app's cyan. */
+  --wordmark: rgba(255, 255, 255, 0.18);
+  --wordmark-accent: rgba(0, 189, 227, 0.32);
 
   /* Blend's corners: 20px on what is large, 10px on what is small. */
   --radius-card: 20px;
@@ -93,6 +96,8 @@
     --scrollbar-hover: #b8a9ac;
     --dot-ring: rgba(32, 26, 27, 0.3);
     --kbd-edge: rgba(32, 26, 27, 0.16);
+    --wordmark: rgba(32, 26, 27, 0.14);
+    --wordmark-accent: rgba(0, 140, 175, 0.3);
   }
 }
 :root[data-theme="light"] {
@@ -114,6 +119,8 @@
   --scrollbar-hover: #b8a9ac;
   --dot-ring: rgba(32, 26, 27, 0.3);
   --kbd-edge: rgba(32, 26, 27, 0.16);
+  --wordmark: rgba(32, 26, 27, 0.14);
+  --wordmark-accent: rgba(0, 140, 175, 0.3);
 }
 
 *,
@@ -777,7 +784,8 @@ kbd {
 
 /* Footer. */
 
-.footer { margin-top: var(--section); border-top: 1px solid var(--outline); }
+/* The footer crops the wordmark at the page's foot. */
+.footer { margin-top: var(--section); border-top: 1px solid var(--outline); overflow: hidden; }
 .footer-inner {
   display: flex;
   align-items: center;
@@ -787,6 +795,36 @@ kbd {
 }
 .footer-inner p { flex: 1; color: var(--ink-2); font-size: 0.875rem; max-width: 70ch; }
 .brand-small { font-size: 1rem; }
+
+/* The wordmark at the foot, across the content's width at every size: in
+   Figtree's 800 with this tracking, "mixmusic"'s letters span 4.15em from
+   0.04em in, so 100cqi / 4.15, shifted back 0.04em, spans the container.
+   It fades into the page and the footer's edge cuts its foot. Decorative:
+   aria-hidden, and the brand link above stays the footer's link. */
+.footer-wordmark {
+  max-width: calc(var(--max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  container-type: inline-size;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.footer-wordmark > span {
+  display: block;
+  margin: 0 0 -0.16em -0.04em;
+  color: var(--wordmark);
+  font: 800 calc(100cqi / 4.15) / 0.8 var(--font);
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent 80%);
+  mask-image: linear-gradient(to bottom, #000 25%, transparent 80%);
+}
+.footer-wordmark-accent { color: var(--wordmark-accent); }
+/* The letters are the spans' ::before, not text, as they are decoration
+   and a logotype, which contrast rules exempt (WCAG 1.4.3): no check or
+   reader takes them for text. */
+.footer-wordmark [data-w]::before { content: attr(data-w); }
 
 /* The player in the hero: a working copy of MixMusic's window in its
    default look, the Blend layout and the Mix theme, drawn at the app's

@@ -101,6 +101,10 @@ type Options struct {
 	// listen and keep its key in place of the network and the credential
 	// store: tests set it (remote.go).
 	Remote *RemoteOptions
+	// Firewall, when set, reads and changes the firewall in place of
+	// Windows Defender Firewall; one with no Check is none: tests set it
+	// (firewall.go).
+	Firewall *Firewall
 	// OutputDevices, when set, lists the audio output devices in place of
 	// the system: tests set it.
 	OutputDevices func() ([]OutputDevice, error)

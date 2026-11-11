@@ -17,10 +17,12 @@ import (
 // Two albums are versions of one when they come from the same service,
 // are of the same kind (album, single or EP), have the same artists, and
 // the same title once the marks of versions are set aside: a last part in
-// brackets, or after " - ", made of the words of versions only, as
+// brackets, or after " - " or ": ", made of the words of versions only, as
 // "(Clean)", "[Explicit]", "(Super Deluxe Edition)", "(Remastered 2011)" or
-// " - 2011 Remaster". "(Live)", "(Taylor's Version)" or "(Acoustic)" are
-// no such marks: those are albums of their own. Of the albums with a
+// " - 2011 Remaster", or naming an edition with words of its own beside a
+// word only editions have, as ": Expanded Lantern Edition" (#459).
+// "(Live)", "(Taylor's Version)" or "(Acoustic)" are no such marks, nor is
+// ": A New Dawn": those are albums of their own. Of the albums with a
 // title in common, those of the same edition are the same release, as an
 // explicit one and its clean one, when their years and their numbers of
 // tracks agree, where both tell them. Two releases of the album as first
@@ -55,6 +57,9 @@ const (
 	fillerWord
 	// editionWord: words that make a mark of an edition: "deluxe", "remastered".
 	editionWord
+	// namingWord: words of an edition that make a mark of it with words of
+	// its own: "deluxe", "edition", as "Lantern Keeper's Edition".
+	namingWord
 	// cleanWord and explicitWord: words that mark the rating of a version.
 	cleanWord
 	explicitWord
@@ -65,10 +70,10 @@ var versionWords = map[string]int{
 	"clean": cleanWord, "edited": cleanWord, "censored": cleanWord,
 	"explicit": explicitWord,
 
-	"deluxe": editionWord, "remaster": editionWord, "remastered": editionWord, "remasters": editionWord,
-	"expanded": editionWord, "anniversary": editionWord, "edition": editionWord, "reissue": editionWord,
+	"deluxe": namingWord, "remaster": namingWord, "remastered": namingWord, "remasters": namingWord,
+	"expanded": namingWord, "anniversary": namingWord, "edition": namingWord, "reissue": namingWord,
 	"bonus": editionWord, "mono": editionWord, "stereo": editionWord,
-	"édition": editionWord, "edición": editionWord, "edicion": editionWord, "edizione": editionWord,
+	"édition": namingWord, "edición": namingWord, "edicion": namingWord, "edizione": namingWord,
 
 	"version": fillerWord, "versión": fillerWord, "the": fillerWord, "and": fillerWord, "with": fillerWord, "of": fillerWord,
 	"super": fillerWord, "special": fillerWord, "collector's": fillerWord, "collectors": fillerWord, "collector": fillerWord,
@@ -160,7 +165,7 @@ func capitalised(w string) string {
 }
 
 // cutVersionMark cuts the last part of a title that may be a version's mark: in
-// brackets at its end, or after a dash.
+// brackets at its end, or after a dash or a colon, whichever comes last.
 func cutVersionMark(t string) (rest, mark string, ok bool) {
 	for _, b := range [...][2]string{{"(", ")"}, {"[", "]"}, {"（", "）"}} {
 		if !strings.HasSuffix(t, b[1]) {
@@ -172,28 +177,38 @@ func cutVersionMark(t string) (rest, mark string, ok bool) {
 		}
 		return strings.TrimSpace(t[:i]), t[i+len(b[0]) : len(t)-len(b[1])], true
 	}
-	for _, dash := range []string{" - ", " – ", " — "} {
-		if i := strings.LastIndex(t, dash); i > 0 {
-			return strings.TrimSpace(t[:i]), t[i+len(dash):], true
+	at, sep := -1, ""
+	for _, s := range []string{" - ", " – ", " — ", ": ", "：", "： "} {
+		if i := strings.LastIndex(t, s); i > at {
+			at, sep = i, s
 		}
+	}
+	if at > 0 {
+		return strings.TrimSpace(t[:at]), strings.TrimSpace(t[at+len(sep):]), true
 	}
 	return t, "", false
 }
 
-// isVersionMark reports whether m is made of the words of versions' marks
-// alone, and names an edition or a rating: years and ordinals, as of
-// "50th Anniversary", go with them.
+// isVersionMark reports whether m names an edition or a rating: made of
+// the words of versions' marks alone, years and ordinals, as of "50th
+// Anniversary", going with them; or with words of its own beside a word
+// only an edition's name has, as "Expanded Lantern Edition".
 func isVersionMark(m string) bool {
-	marks := false
+	marks, named, own := false, false, false
 	for _, w := range strings.Fields(m) {
 		lw := versionWord(w)
 		switch kind := versionWords[lw]; {
 		case lw == "":
 		case kind == notAVersionWord && !versionNumber(lw):
-			return false
+			own = true
+		case kind == namingWord:
+			marks, named = true, true
 		case kind != fillerWord && kind != notAVersionWord:
 			marks = true
 		}
+	}
+	if own {
+		return named
 	}
 	return marks
 }

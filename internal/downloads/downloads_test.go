@@ -525,10 +525,17 @@ func TestHoldOffline(t *testing.T) {
 	m := open(t, t.TempDir(), Options{Fetcher: f, Network: net})
 	m.Add([]media.Track{yt("ooooooooooo", "Offline")}, "best")
 	m.Start()
-	until(t, "the hold", func() bool { return m.Status().Hold == "Waiting for the network" })
-	if kind(m, "yt:ooooooooooo") != Waiting {
-		t.Errorf("offline, it is %v", kind(m, "yt:ooooooooooo"))
-	}
+	// A try may start before the network check finds it gone: it fails at
+	// once, and the track waits again, as the hold keeps the next from
+	// starting.
+	until(t, "the hold, with the track waiting", func() bool {
+		s := m.Snapshot()
+		st := s.State("yt:ooooooooooo")
+		if st.Kind == Failed {
+			t.Fatalf("offline, it failed: %s", st.Why)
+		}
+		return s.Status().Hold == "Waiting for the network" && st.Kind == Waiting
+	})
 	close(net.up)
 	until(t, "the download", func() bool { return kind(m, "yt:ooooooooooo") == Done })
 }

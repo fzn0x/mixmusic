@@ -7,6 +7,7 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 	"unsafe"
@@ -70,6 +71,9 @@ func TestCheckLive(t *testing.T) {
 func TestAllowLive(t *testing.T) {
 	if os.Getenv("MIXMUSIC_FIREWALL_WRITE") == "" {
 		t.Skip("MIXMUSIC_FIREWALL_WRITE isn't set: this test changes the computer's firewall, as administrator")
+	}
+	if !elevated() {
+		t.Skip("this test changes the firewall's rules, which only an administrator may: run it in a terminal opened as administrator")
 	}
 	exe, err := os.Executable()
 	if err != nil {
@@ -172,5 +176,42 @@ func removeRules(t *testing.T, names ...string) {
 	}
 	if left := named(t, names...); len(left) > 0 {
 		t.Errorf("rules left after the test: %+v", left)
+	}
+}
+
+// elevated reports whether the test runs as administrator, its token
+// elevated (TokenElevation).
+func elevated() bool {
+	const tokenElevation = 20
+	p, err := syscall.GetCurrentProcess()
+	if err != nil {
+		return false
+	}
+	var tok syscall.Token
+	if err := syscall.OpenProcessToken(p, syscall.TOKEN_QUERY, &tok); err != nil {
+		return false
+	}
+	defer tok.Close()
+	var e, n uint32
+	if err := syscall.GetTokenInformation(tok, tokenElevation, (*byte)(unsafe.Pointer(&e)), uint32(unsafe.Sizeof(e)), &n); err != nil {
+		return false
+	}
+	return e != 0
+}
+
+// TestHresultWords tells the HRESULTs met most in words, and the others by
+// number.
+func TestHresultWords(t *testing.T) {
+	if err := hresult(0); err != nil {
+		t.Errorf("S_OK: %v", err)
+	}
+	for r, want := range map[uintptr]string{
+		0x80070005: "access denied: only an administrator may change the firewall's rules (HRESULT 0x80070005)",
+		0x800706d9: "Windows Firewall's service doesn't run (HRESULT 0x800706d9)",
+		0x80004005: "HRESULT 0x80004005",
+	} {
+		if err := hresult(r); err == nil || err.Error() != want {
+			t.Errorf("hresult(%#x) = %v, want %q", r, err, want)
+		}
 	}
 }

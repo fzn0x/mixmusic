@@ -76,6 +76,7 @@
   "keepOnTop": false,
   "miniPanel": "",
   "mediaKeys": true,
+  "assistantControl": false,
   "showOnDiscord": true,
   "discordAppId": "",
   "discordFirstLine": "{title}",

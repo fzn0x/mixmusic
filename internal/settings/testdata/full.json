@@ -102,6 +102,7 @@
   "keepOnTop": true,
   "miniPanel": "lyrics",
   "mediaKeys": false,
+  "assistantControl": true,
   "showOnDiscord": false,
   "discordAppId": "123456789012345678",
   "discordFirstLine": "{artist} · {title}",

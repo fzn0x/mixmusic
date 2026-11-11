@@ -60,7 +60,14 @@
   makes one of the user's collaborative, off their profile, as Spotify
   asks. A playlist is `Mine` when its owner is the user signed in. A 403
   of such a change that isn't one of development mode's refusals is
-  `ErrPlaylistRefused`, which says who may change what.
+  `ErrPlaylistRefused`, which says who may change what. An app in
+  development mode may make all these changes: on 2026-11-11
+  `MIXMUSIC_LIVE=1 MIXMUSIC_SPOTIFY_WRITE=1 MIXMUSIC_SPOTIFY_TOKEN=… go test ./internal/spotify -run LiveCollaboration`
+  made a private playlist (`POST /me/playlists`), added to it, moved a
+  track, made it collaborative and back, and took it out of the library
+  with `DELETE /playlists/{id}/followers`. Spotify lists that route as
+  removed in February 2026, with `DELETE /me/library` in its place; it
+  still answered for that app's Client ID, made before then.
 - **`internal/sysproxy`** picks the proxy of every request MixMusic makes,
   as the `Proxy` of `http.DefaultTransport`, which the clients use or
   clone: the environment's (`HTTPS_PROXY` and the like) when it names

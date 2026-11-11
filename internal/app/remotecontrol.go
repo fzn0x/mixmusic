@@ -109,8 +109,8 @@ func (a *App) relistRemote() bool {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	self := ""
-	if r.id != nil {
-		self = r.id.Fingerprint().ID()
+	if id := r.id.Load(); id != nil {
+		self = id.Fingerprint().ID()
 	}
 	shown := make([]RemoteComputer, 0, len(r.found))
 	for id, f := range r.found {
@@ -219,9 +219,10 @@ func (a *App) paired(id string) (PairedComputer, bool) {
 	return PairedComputer{}, false
 }
 
-// dialer is how this computer pairs and connects. r.mu is held.
-func (a *App) dialer() (*remote.Dialer, error) {
-	id, err := a.identity()
+// dialer is how this computer pairs and connects. r.mu must not be held;
+// wait is identity's.
+func (a *App) dialer(wait bool) (*remote.Dialer, error) {
+	id, err := a.identity(wait)
 	if err != nil {
 		return nil, err
 	}
@@ -365,9 +366,8 @@ func (a *App) connectRemote(ctl *remoteControl, addr string, kept PairedComputer
 		fail(err)
 		return
 	}
-	a.remote.mu.Lock()
-	d, err := a.dialer()
-	a.remote.mu.Unlock()
+	// On a goroutine of its own: it waits for the key another call reads.
+	d, err := a.dialer(true)
 	if err != nil {
 		fail(err)
 		return
@@ -420,6 +420,8 @@ func (rc *Remote) Do(id string, c remote.Command) error {
 func (rc *Remote) Pair(id string) {
 	a := rc.a
 	r := &a.remote
+	// The key first, with r.mu free: see identity.
+	d, err := a.dialer(false)
 	r.mu.Lock()
 	f, ok := r.found[id]
 	if !ok || r.pairing != nil && r.pairing.id == id && r.pairing.step != RemoteUnpaired {
@@ -429,7 +431,6 @@ func (rc *Remote) Pair(id string) {
 	if r.pairing != nil {
 		r.pairing.cancel()
 	}
-	d, err := a.dialer()
 	ctx, cancel := context.WithTimeout(context.Background(), remotePairFor)
 	p := &remotePairing{id: id, name: f.found.Name, step: RemotePairing, codes: make(chan string, 1), cancel: cancel}
 	if err != nil {

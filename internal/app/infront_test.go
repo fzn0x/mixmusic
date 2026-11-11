@@ -24,6 +24,11 @@ type notes struct {
 func newNotes(t *testing.T) *notes {
 	t.Helper()
 	a := newQuietApp(t, nil)
+	// The tests tell the app what plays themselves. The player's own first
+	// report, that nothing plays, which its goroutine sends once it runs,
+	// could come after theirs and forget the track that started, so that
+	// no notification showed: close the player, which waits for it.
+	a.goPlayer.Load().Close()
 	st := a.settings.Get()
 	// The title would wait for MyGo's loop to change.
 	st.Notifications, st.ShowInTitle = true, false

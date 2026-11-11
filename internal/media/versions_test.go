@@ -34,6 +34,17 @@ func TestVersionOf(t *testing.T) {
 		{"恭喜发财（daft punk）", "恭喜发财（daft punk）", "", "", false, false},
 		{"(Deluxe)", "(deluxe)", "", "", false, false},
 		{"Kites  (Deluxe)", "kites", "Deluxe", "", false, false},
+		// After a colon, and with words of their own beside a word only
+		// an edition's name has (#459).
+		{"Harbour Lights: Deluxe Edition", "harbour lights", "Deluxe Edition", "", false, false},
+		{"Harbour Lights (Night Tide): Expanded Lantern Edition", "harbour lights (night tide)", "Expanded Lantern Edition", "", false, false},
+		{"Harbour Lights (Lantern Keeper's Edition) [Clean]", "harbour lights", "Lantern Keeper's Edition", "Clean", true, false},
+		{"Night Drive - Side B: 10th Anniversary", "night drive - side b", "10th Anniversary", "", false, false},
+		{"Harbour Lights：デラックス", "harbour lights：デラックス", "", "", false, false},
+		{"Episode Four: A New Dawn", "episode four: a new dawn", "", "", false, false},
+		{"Paper Planets: Songs from the Ferry", "paper planets: songs from the ferry", "", "", false, false},
+		{"Paper Planets (Lantern's Version)", "paper planets (lantern's version)", "", "", false, false},
+		{"Paper Planets: Live", "paper planets: live", "", "", false, false},
 	} {
 		v := VersionOf(c.title)
 		if v.Base != c.base || v.Edition != c.edition || v.Rating != c.rating || v.Clean != c.clean || v.Explicit != c.explicit {
@@ -113,6 +124,11 @@ func TestGroupVersions(t *testing.T) {
 			album(sp, "remaster", "Kites (Remastered)", "2009", 12, false),
 			album(sp, "super", "Kites (Super Deluxe Edition)", "2019", 40, false),
 		}, [][]string{{"remaster", "super"}}},
+		{"an edition named after a colon, with words of its own", []Album{
+			album(yt, "first", "Kites (Night Tide)", "2024", 0, false),
+			album(yt, "expanded", "Kites (Night Tide): Expanded Lantern Edition", "2025", 0, false),
+			album(yt, "dawn", "Kites (Night Tide): A New Dawn", "2025", 0, false),
+		}, [][]string{{"first", "expanded"}, {"dawn"}}},
 	} {
 		if got := ids(GroupVersions(c.albums)); !slices.EqualFunc(got, c.want, slices.Equal) {
 			t.Errorf("%s: %v, want %v", c.name, got, c.want)

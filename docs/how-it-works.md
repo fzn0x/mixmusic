@@ -97,7 +97,7 @@ MixMusic has no server of its own. Apart from YouTube and Spotify, it
 talks to:
 
 - **Lyrics:** [Better Lyrics](https://betterlyrics.org), for lyrics timed
-  word by word, first, then [Unison](https://unison.boidu.dev), an open,
+  word by word, first, then [Unison](https://unison.betterlyrics.org), an open,
   crowdsourced database of lyrics, then [LRCLIB](https://lrclib.net), then
   YouTube Music's own lyrics. Unison also translates lyrics, through
   Google, and romanizes Arabic, but only while you turn those on.

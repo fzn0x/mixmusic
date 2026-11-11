@@ -29,7 +29,7 @@ Refresh this page (F5, or ⇧⌘R on macOS) asks again. For a podcast episode, t
 MixMusic asks, in order:
 
 1. **[Better Lyrics](https://betterlyrics.org),** whose service keeps lyrics timed word by word, by the track's title, artists, album and length: only for lyrics timed word by word, and only for tracks that have an album and a length, which it needs to find a song. It keeps the songs people have played with Better Lyrics, so it has some that Unison doesn't. When it has none, is busy or can't be reached, MixMusic goes on to Unison after a wait of 3 seconds at most.
-2. **[Unison](https://unison.boidu.dev),** an open, crowdsourced database of lyrics, by the track's video ID, or by its title, artists, album and length. Unison has many lyrics timed word by word. While it's out of reach, MixMusic goes on to LRCLIB after a wait of 3 seconds at most.
+2. **[Unison](https://unison.betterlyrics.org),** an open, crowdsourced database of lyrics, by the track's video ID, or by its title, artists, album and length. Unison has many lyrics timed word by word. While it's out of reach, MixMusic goes on to LRCLIB after a wait of 3 seconds at most.
 3. **[LRCLIB](https://lrclib.net),** the open database of synced lyrics, by the track's title, artists, album and length: when Unison has no lyrics, can't be reached, or has only plain lyrics where LRCLIB has synced ones.
 4. **YouTube Music:** when neither has any lyrics, or both have only plain ones and YouTube Music's are longer.
 
@@ -139,4 +139,4 @@ On a MacBook with a notch, the [notch player's](desktop.md#the-player-around-the
 
 ## Credits
 
-Lyrics from [Unison](https://unison.boidu.dev), an open, crowdsourced database of lyrics, under the Open Database License (ODbL). The lyrics panel ends Unison's lyrics with "lyrics from Unison (https://unison.boidu.dev)", as their licence asks. Synced lyrics also come from [LRCLIB](https://lrclib.net), the open database of synced lyrics. Romaji reads kanji with [kagome](https://github.com/ikawaha/kagome) and the IPA dictionary of [kagome-dict](https://github.com/ikawaha/kagome-dict), made from mecab-ipadic.
+Lyrics from [Unison](https://unison.betterlyrics.org), an open, crowdsourced database of lyrics, under the Open Database License (ODbL). As Unison asks, the lyrics panel ends Unison's lyrics with "lyrics from Unison · submitted by <name>": Unison links to the song's page there, and the name to the page of the person who submitted the lyrics. A lyrics card made from them names both too. Synced lyrics also come from [LRCLIB](https://lrclib.net), the open database of synced lyrics. Romaji reads kanji with [kagome](https://github.com/ikawaha/kagome) and the IPA dictionary of [kagome-dict](https://github.com/ikawaha/kagome-dict), made from mecab-ipadic.

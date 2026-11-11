@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, load, test } from "./page.js";
 
 // The feature cards that act out what they do (#358): the tiles of "New in"
@@ -110,6 +111,20 @@ test("the keyboard's focus holds a card too", async ({ page }) => {
   // window, it would go back to its start.
   await dislikes.evaluate((el) => el.blur());
   await expect.poll(at, { message: "and goes on once the focus left", ...round }).not.toBe(was);
+});
+
+test("the shortcuts card's keys can be read in either scheme", async ({ page }) => {
+  // The card stays dark in the light scheme: its keys must too, not take
+  // the page's light key under the card's white letters. It is read at
+  // rest, as reduced motion shows it: playing, it fades from one picture to
+  // the next, whose colours halfway axe would read.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await load(page, "/");
+  const shortcuts = card(page, "Global shortcuts");
+  await center(shortcuts);
+  await expect(shortcuts.locator("kbd").first()).toBeVisible(round);
+  const result = await new AxeBuilder({ page }).include(".ta-keysact").withRules(["color-contrast"]).analyze();
+  expect(result.violations.flatMap((v) => v.nodes.map((n) => `${n.target.join(" ")}: ${n.any[0]?.message}`))).toEqual([]);
 });
 
 test("on a touch screen the cards play on their own too", async ({ browser, browserName, baseURL }) => {

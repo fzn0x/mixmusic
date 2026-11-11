@@ -56,7 +56,9 @@ func withDownloads(t *testing.T, a *App, recordings matches, tracks ...media.Tra
 	t.Cleanup(a.downloads.Close)
 	a.downloads.Add(tracks, "best")
 	a.downloads.Start()
-	for deadline := time.Now().Add(5 * time.Second); a.downloads.Status().Tracks < len(tracks); time.Sleep(2 * time.Millisecond) {
+	// The manager starts the downloads that ask YouTube for their streams
+	// 3 s apart (startGap), and a busy runner takes a while for each.
+	for deadline := time.Now().Add(20 * time.Second); a.downloads.Status().Tracks < len(tracks); time.Sleep(2 * time.Millisecond) {
 		if time.Now().After(deadline) {
 			t.Fatalf("the downloads didn't finish: %+v", a.downloads.Status())
 		}

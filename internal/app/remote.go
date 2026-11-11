@@ -89,11 +89,15 @@ type remoteState struct {
 	fileErr  error
 	flushing sync.Once
 
-	mu sync.Mutex
-	id *remote.Identity
+	// id is the computer's key, once read or made. idMu is held while it
+	// is read or made, apart from mu: see identity.
+	id   atomic.Pointer[remote.Identity]
+	idMu sync.Mutex
 	// keys keeps the key: the credential store when nil; tests give
-	// theirs.
+	// theirs. idMu is held.
 	keys *secretStore
+
+	mu sync.Mutex
 	// server runs while remote control is on, announced until unannounce.
 	server     *remote.Server
 	unannounce func()
@@ -174,19 +178,39 @@ func (a *App) remoteKept() remoteFile {
 	return f.Get()
 }
 
-// identity returns the computer's key, made and kept at its first use. r.mu
-// is held.
-func (a *App) identity() (*remote.Identity, error) {
+// errKeyBusy is what identity returns while another call reads or makes
+// the key.
+var errKeyBusy = errors.New("this computer's key is being read: try again in a moment")
+
+// identity returns the computer's key, made and kept at its first use.
+//
+// r.mu must not be held, nor any lock a frame takes: on the main thread,
+// mygo reads and keeps a secret on another goroutine and runs the window's
+// events while it waits, and a frame then takes r.mu (Code, View) (#464).
+// For the same reason, a call while another reads or makes the key returns
+// errKeyBusy, unless wait: on the main thread, the other may be this very
+// thread's, under a click it handles meanwhile. Only callers on another
+// goroutine wait.
+func (a *App) identity(wait bool) (*remote.Identity, error) {
 	r := &a.remote
-	if r.id != nil {
-		return r.id, nil
+	if id := r.id.Load(); id != nil {
+		return id, nil
 	}
 	// What runs of remote control, on either side, ends as MixMusic
 	// quits.
 	r.flushing.Do(func() { a.OnFlush(a.closeRemote) })
 	if o := a.opts.Remote; o != nil && o.Identity != nil {
-		r.id = o.Identity
-		return r.id, nil
+		r.id.CompareAndSwap(nil, o.Identity)
+		return r.id.Load(), nil
+	}
+	if wait {
+		r.idMu.Lock()
+	} else if !r.idMu.TryLock() {
+		return nil, errKeyBusy
+	}
+	defer r.idMu.Unlock()
+	if id := r.id.Load(); id != nil {
+		return id, nil
 	}
 	if r.keys == nil {
 		r.keys = newSecretStore(a.opts.DataDir, remoteSecret, "remote-key.json", "remote-key.dpapi")
@@ -194,8 +218,10 @@ func (a *App) identity() (*remote.Identity, error) {
 	keep := jsonSecret[remoteKey]{r.keys}
 	k, err := keep.Load()
 	if err == nil {
-		if r.id, err = remote.IdentityOf(k.Seed); err == nil {
-			return r.id, nil
+		var id *remote.Identity
+		if id, err = remote.IdentityOf(k.Seed); err == nil {
+			r.id.Store(id)
+			return id, nil
 		}
 		log.Printf("mixmusic: the remote control key doesn't read (%v): making another, which the computers paired don't know", err)
 	} else if !errors.Is(err, mygo.ErrSecretNotFound) {
@@ -208,7 +234,7 @@ func (a *App) identity() (*remote.Identity, error) {
 	if err := keep.Save(remoteKey{Seed: id.Seed()}); err != nil {
 		return nil, fmt.Errorf("keeping this computer's key: %w", err)
 	}
-	r.id = id
+	r.id.Store(id)
 	return id, nil
 }
 
@@ -331,6 +357,11 @@ func (a *App) dropControlled(key remote.Fingerprint) {
 
 // startRemote starts the server and announces it, unless it runs.
 func (a *App) startRemote() error {
+	// The key first, with r.mu free: see identity.
+	id, err := a.identity(false)
+	if err != nil {
+		return err
+	}
 	r := &a.remote
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -338,10 +369,6 @@ func (a *App) startRemote() error {
 		return nil
 	}
 	o := a.remoteOptions()
-	id, err := a.identity()
-	if err != nil {
-		return err
-	}
 	ln, err := o.Listen()
 	if err != nil {
 		return fmt.Errorf("remote control can't listen on the network: %w", err)

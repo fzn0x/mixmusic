@@ -259,6 +259,10 @@ func TestInviteCollaborators(t *testing.T) {
 	}
 	asks.hold()
 	click(t, s, tt, "invite")
+	tt.Frame()
+	if !textHolds(tt, "Making Lantern songs unlisted: YouTube Music takes up to half a minute") {
+		t.Errorf("no toast tells the invite waits for the unlisting: %q", tt.Texts())
+	}
 	asks.release()
 	const invited = "Copied the invite link of Lantern songs: whoever opens it can add to it"
 	heard(t, s, invited, false)

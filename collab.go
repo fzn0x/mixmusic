@@ -45,8 +45,9 @@ var (
 )
 
 // collabWait is how long a change of a playlist's collaboration waits for
-// its service.
-const collabWait = 30 * time.Second
+// its service. An invite to a playlist just made unlisted waits for
+// YouTube Music to take that in, which took 18 s on 2026-11-11.
+const collabWait = time.Minute
 
 // collabKey is the key of s.keeping that is set while the service of the
 // playlist id changes its collaboration, or moves one of its tracks.
@@ -127,6 +128,9 @@ func (s *shell) inviteCollaborators(p *media.Playlist) {
 func (s *shell) invite(p *media.Playlist, unlist bool) {
 	id, title := p.ID, p.Title
 	var link string
+	if unlist {
+		s.notes = append(s.notes, notice("Making "+title+" unlisted: YouTube Music takes up to half a minute before it lets collaborators in"))
+	}
 	s.changeCollab(p, func(ctx context.Context) (err error) {
 		link, err = inviteOnYouTube(s, ctx, id, unlist)
 		return err

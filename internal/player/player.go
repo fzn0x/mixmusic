@@ -386,6 +386,10 @@ type retryState struct {
 	// from is where the last try resumed, or where the user seeked to
 	// since: the stream holds once it played on to retryHold past it.
 	from time.Duration
+	// why is why the stream stopped, before the last try, and dur the
+	// longest it told it was, until then.
+	why string
+	dur time.Duration
 }
 
 // savedWindow returns the entries kept of a queue of n, whose current

@@ -624,7 +624,7 @@ func (p *Player) retryStream(why string) {
 	}
 	r.n++
 	token, at, autoplay := p.loadToken, p.s.Position, !p.paused
-	r.from = at
+	r.from, r.why, r.dur = at, why, max(r.dur, p.s.Duration)
 	log.Printf("mixmusic: the audio of %s stopped at %s: %s; trying again in %s, %d of %d",
 		entry.Track.ID, at.Round(time.Second), why, wait, r.n, tries)
 	// Meanwhile the track loads again, as one chosen does: it can't be
@@ -1089,7 +1089,32 @@ func (p *Player) Time(position, duration time.Duration) {
 }
 
 // Ended takes in the end of the stream.
-func (p *Player) Ended() { p.do(func() { p.advance(true) }) }
+func (p *Player) Ended() { p.do(p.onEnded) }
+
+// onEnded moves on from the track that ended. A track that plays without
+// the network, tried again, that ends before it holds broke off again: as
+// a file cut short meanwhile, whose end now comes before where it stopped
+// (#456). That try failed then, unless it resumed near the end the track
+// had before it broke: the try's own length can be the cut file's.
+func (p *Player) onEnded() {
+	if p.retry.n > 0 && p.loaded && p.playsOffline() && !p.endsNear(p.retry.from) {
+		p.retryStream(p.retry.why)
+		return
+	}
+	p.advance(true)
+}
+
+// endsNear reports whether at is within retryHold of the end of the
+// current track's stream before it broke, or of the track's own length
+// without one, or neither is known.
+func (p *Player) endsNear(at time.Duration) bool {
+	dur := p.retry.dur
+	if dur == 0 {
+		entry, _ := p.s.Current()
+		dur = ms(entry.Track.DurationMs)
+	}
+	return dur == 0 || at >= dur-retryHold
+}
 
 // Error takes in a stream that failed.
 func (p *Player) Error(message string) { p.do(func() { p.onStreamError(message) }) }

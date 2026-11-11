@@ -12,6 +12,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/stream"
 	"github.com/fzn0x/mixmusic/internal/tags"
 )
 
@@ -247,5 +248,72 @@ func TestTrackFacts(t *testing.T) {
 		File: &app.TrackFile{Kind: app.FileMusic, Format: audio.Format{Container: "WAV", Codec: "PCM", SampleRate: 96000, BitDepth: 32, Float: true, Channels: 1}}}))
 	if got["Format"] != "PCM in WAV" || got["Bit depth"] != "32-bit floating point" || got["Channels"] != "Mono" || got["Sample rate"] != "96 kHz" {
 		t.Errorf("a WAV file: %q", got)
+	}
+}
+
+// TestTrackInfoTellsHowAStreamWasFound shows the route that found a
+// stream, the arguments of the run of yt-dlp, and whether it was asked
+// for as the account; Copy stream URL copies the address the engine plays,
+// and says it stops working.
+func TestTrackInfoTellsHowAStreamWasFound(t *testing.T) {
+	const address = "https://rr1.example.invalid/audio?expire=4102444800&ip=203.0.113.7"
+	for _, c := range []struct {
+		name    string
+		stream  app.TrackStream
+		want    []string
+		unwant  []string
+		command string
+	}{
+		{"quick", app.TrackStream{Route: stream.RouteQuick, Command: "yt-dlp -J --cookies (hidden)", URL: address},
+			[]string{"With yt-dlp's quick run", "yt-dlp -J --cookies (hidden)", "No: asked for signed out"}, []string{"Yes: asked"}, ""},
+		{"player API", app.TrackStream{Route: stream.RoutePlayerAPI, URL: address},
+			[]string{"through YouTube's player API, with no yt-dlp", "No: asked for signed out"}, []string{"yt-dlp ran"}, ""},
+		{"account", app.TrackStream{Route: stream.RouteAccount, AsAccount: true, Command: "yt-dlp -J", URL: address},
+			[]string{"session of your YouTube Music account", "Yes: asked for as your YouTube Music account"}, []string{"No: asked"}, ""},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			s := newTestShell(t)
+			c.stream.Codec, c.stream.Container = "Opus", "WebM"
+			withTrackInfo(t, app.TrackInfo{Plays: app.PlaysEngine, Stream: &c.stream})
+			var copied string
+			was := copyText
+			copyText = func(text string) { copied = text }
+			t.Cleanup(func() { copyText = was })
+			tt := tester(t, s)
+			s.showTrackInfo(testTracks[0])
+			until(t, s, tt, "the dialog", func() bool { return tt.HasText("Opus in WebM") })
+			if !hasAll(t, tt, c.want...) || !hasAll(t, tt, "stops working after a few hours", "tied to this network") {
+				t.Fatalf("the dialog shows %q", tt.Texts())
+			}
+			for _, w := range c.unwant {
+				if tt.HasText(w) {
+					t.Errorf("the dialog shows %q: %q", w, tt.Texts())
+				}
+			}
+			for _, text := range tt.Texts() {
+				if strings.Contains(text, "203.0.113.7") {
+					t.Errorf("the dialog shows the address: %q", text)
+				}
+			}
+			click(t, s, tt, "copy stream URL")
+			if copied != address {
+				t.Errorf("copied %q, want the stream's address", copied)
+			}
+			until(t, s, tt, "the note", func() bool { return tt.HasText("Copied the stream's address: it stops working after a few hours") })
+		})
+	}
+}
+
+// A stream that plays from a file, or that MixMusic holds none of, has no
+// address to copy and no route to tell.
+func TestTrackInfoWithoutAStreamHasNoAddress(t *testing.T) {
+	s := newTestShell(t)
+	withTrackInfo(t, app.TrackInfo{Plays: app.PlaysEngine,
+		File: &app.TrackFile{Kind: app.FileDownload, Path: "/d/a.webm", Format: audio.Format{Container: "WebM", Codec: "Opus"}}})
+	tt := tester(t, s)
+	s.showTrackInfo(testTracks[0])
+	until(t, s, tt, "the dialog", func() bool { return tt.HasText("Opus in WebM") })
+	if tt.HasText("copy stream URL") || tt.HasText("Signed in") || tt.HasText("Found") {
+		t.Errorf("a download: %q", tt.Texts())
 	}
 }

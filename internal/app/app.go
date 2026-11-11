@@ -93,6 +93,10 @@ type Options struct {
 	// CastBrowse, when set, finds the cast devices on the network in place
 	// of mDNS: tests set it.
 	CastBrowse func(ctx context.Context) ([]cast.Device, error)
+	// Browsers, when set, finds the browsers that sign in to YouTube Music,
+	// and signs in with one, in place of those installed: tests set it
+	// (youtube_browser.go).
+	Browsers *BrowserSignIn
 	// Remote, when set, has remote control find the other computers,
 	// listen and keep its key in place of the network and the credential
 	// store: tests set it (remote.go).

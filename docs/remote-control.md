@@ -105,10 +105,22 @@ about it:
 
 - **Windows**: Windows Defender Firewall asks whether MixMusic may take
   connections from your network. Allow it on private networks, such as the
-  one at home. If your network is set as public, the other computers can't
-  reach MixMusic: in Settings › Network & internet, make it a private
-  network, or allow MixMusic on public networks in the firewall's allowed
-  apps.
+  one at home. MixMusic's **Settings › Desktop › Windows Firewall** then
+  tells whether the other computers on your network can reach it, and why
+  not when they can't:
+  - **Cancel**, or closing the question, makes Windows block MixMusic.
+    **Allow** there lets MixMusic in on private networks, with one approval
+    from Windows: an administrator's, which asks for their password when
+    you aren't one.
+  - **A public network** keeps MixMusic out. If you trust it, as the one at
+    home, make it private: **network settings** opens the page of Windows'
+    settings that does.
+  - **"Block all incoming connections"**, in Windows Security, and a
+    firewall your organization runs keep MixMusic out whatever its rules
+    say: turn the first off, or ask the second's administrators.
+
+  While remote control is on, its group says so too when the firewall
+  keeps the other computers out.
 - **macOS**: macOS asks whether MixMusic may find and connect to devices
   on your local network. Allow it on both computers; System Settings ›
   Privacy & Security › Local Network changes it later. With the macOS

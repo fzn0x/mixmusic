@@ -153,14 +153,15 @@ func TestLyricsTranslated(t *testing.T) {
 // words.
 func TestLyricsCreditTranslated(t *testing.T) {
 	s, texts := lyricsIn(t, "ja", &loaded[translated]{done: true, value: kiteTranslation})
-	s.loads["lyrics:"+testTracks[0].ID].(*loaded[lyrics.Lyrics]).value.SourceURL = lyrics.UnisonURL
+	ly := &s.loads["lyrics:"+testTracks[0].ID].(*loaded[lyrics.Lyrics]).value
+	ly.SourceURL, ly.By, ly.ByURL = lyrics.UnisonURL+"/song/abcdefghijk", "Harbour Keeper", lyrics.UnisonURL+"/curator/0f1e2d3c"
 	s.set.LyricsTranslate = []string{"ja"}
 	s.set.LyricsRomanize = map[string]string{"ja": settings.RomanizeOnly}
 	got := texts()
 	if !slices.Contains(got, "kami no tako") || !slices.Contains(got, "Paper kite") || slices.Contains(got, "紙の凧") {
 		t.Fatalf("not translated, in romaji only: %q", got)
 	}
-	if !slices.Contains(got, "lyrics from Unison ("+lyrics.UnisonURL+")") {
+	if !slices.Contains(got, "lyrics from Unison · submitted by Harbour Keeper") {
 		t.Errorf("Unison's credit: %q", got)
 	}
 }

@@ -57,6 +57,9 @@ type Host interface {
 	State() State
 	// Do runs a command.
 	Do(c Command)
+	// TakeOver plays what the computer of the key fp hands over, in place
+	// of what plays, and tells how it took it.
+	TakeOver(fp Fingerprint, h HandOver) Taken
 	// Watch has fn told, without waiting on it, when the state changes,
 	// until cancel.
 	Watch(fn func()) (cancel func())
@@ -325,7 +328,7 @@ func (s *Server) pair(c *serverConn, name string) {
 // it gets, until either side goes quiet for Silence.
 func (s *Server) session(c *serverConn) {
 	t := s.Timing
-	if err := c.w.send(message{Type: "welcome", Name: s.Name}, t.silence()); err != nil {
+	if err := c.w.send(message{Type: "welcome", Name: s.Name, Features: features}, t.silence()); err != nil {
 		return
 	}
 	changed := make(chan struct{}, 1)
@@ -345,13 +348,21 @@ func (s *Server) session(c *serverConn) {
 			if err != nil {
 				return
 			}
-			if m.Type != "command" || m.Command == nil {
+			command := m.Type == "command" && m.Command != nil
+			handOver := m.Type == "handover" && m.HandOver != nil
+			if !command && !handOver {
 				continue
 			}
 			// A computer removed a moment ago may still have a command
-			// on the way.
+			// or a hand-over on the way.
 			if !s.Host.Allowed(c.peer) {
 				return
+			}
+			if handOver {
+				if s.takeOver(c, *m.HandOver) != nil {
+					return
+				}
+				continue
 			}
 			if cmd, ok := m.Command.clean(); ok {
 				s.Host.Do(cmd)

@@ -31,6 +31,7 @@ type fakeHost struct {
 	keepErr  error
 	state    State
 	commands []Command
+	handed   []HandOver
 	watchers []*func()
 	// shown gets the request of each pairing as its code shows, and ended
 	// how each ended.
@@ -77,6 +78,24 @@ func (h *fakeHost) Do(c Command) {
 	h.mu.Lock()
 	h.commands = append(h.commands, c)
 	h.mu.Unlock()
+}
+
+// TakeOver keeps the hand-over, and takes each of its tracks but the
+// files.
+func (h *fakeHost) TakeOver(_ Fingerprint, ho HandOver) Taken {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.handed = append(h.handed, ho)
+	t := Taken{}
+	for i, tr := range ho.Queue {
+		if tr.Source == "file" {
+			t.Left++
+			t.CurrentLeft = t.CurrentLeft || i == ho.Index
+		} else {
+			t.Kept++
+		}
+	}
+	return t
 }
 
 func (h *fakeHost) Watch(fn func()) func() {

@@ -149,7 +149,8 @@ func TestRemotePairAndControl(t *testing.T) {
 	lt.Frame()
 	click(t, lap, lt, "pair")
 	untilBoth(t, desk, dt, lap, lt, "what plays there", func() bool {
-		return lt.HasText("Midnight City") && lt.HasText("M83 · Hurry Up, We're Dreaming") && lt.HasText("Teardrop - Massive Attack")
+		return lt.HasText("Midnight City") && lt.HasText("M83 · Hurry Up, We're Dreaming") && lt.HasText("Massive Attack") &&
+			lt.HasText("Teardrop")
 	})
 	if dt.HasText(code[:3] + " " + code[3:]) {
 		t.Error("the code still shows once paired")

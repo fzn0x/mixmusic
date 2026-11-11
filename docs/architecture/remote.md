@@ -2,8 +2,9 @@
 
 MixMusic on one computer controls MixMusic on another in the same network
 (#353): it finds it, pairs with it once by a short code the other shows,
-and from then on shows what plays there, with its controls. There is no
-server and no account: the two computers speak to each other alone.
+and from then on shows what plays there, with its controls and its queue,
+and can move what plays here there. There is no server and no account:
+the two computers speak to each other alone.
 
 ## Who it keeps out
 
@@ -50,8 +51,10 @@ and how much.
 - **The windows**: Settings › On the desktop › Remote control turns it on
   and lists the paired computers with Remove; the player bar's devices
   menu, the cast button's, lists the computers found; `/remote/{id}` pairs
-  with one, then shows what plays there with its controls; and a dialog
-  shows the code while another computer pairs with this one.
+  with one, then shows what plays there with its controls and its queue
+  (`remotequeue.go`), and what plays here, to move there
+  (`remotehandover.go`); and a dialog shows the code while another
+  computer pairs with this one.
 
 ## The key
 
@@ -137,17 +140,82 @@ sessions, which it tells that it is off, and the discovery answers.
 
 ## A session
 
-After `hello`, the computer controlled sends what its player does (`state`:
-the track, playing or paused, where it is, how long it is, the volume, and
-up to 20 tracks of the queue after it) as it changes, at most 5 times a
-second, and every 2 s besides; the other sends commands (`command`: play,
-pause, next, previous, seek, volume) and a `ping` every 2 s. Either side
+After `hello`, the computer controlled answers `welcome`, and sends what
+its player does (`state`: the track, playing or paused, where it is, how
+long it is, the volume, and up to 20 tracks of the queue after it) as it
+changes, at most 5 times a second, and every 2 s besides; the other sends
+commands (`command`: play, pause, next, previous, seek, volume, and those
+on the queue below), a hand-over (`handover`, below), and a `ping` every
+2 s. The computer controlled checks, before each command and each
+hand-over, that the one that sends it is still paired. Either side
 drops a connection after 6 s with no message, as from a computer that
 went to sleep or left the network, and the controlling one connects again,
 after 1 s, then 2, then up to 10, while its page shows, and looks for it
 anew, as a computer that started again listens at another port. The page
 moves the position on between two states as the track plays, and the
 session ends 30 s after the page closes.
+
+## What each version can do
+
+The version, 1, which `hello`, discovery's TXT record and TLS's ALPN tell,
+changes only when two MixMusic apps can no longer understand each other:
+then they refuse each other, and say to update both. What is added since
+goes by name, in the `features` of `hello` and `welcome`: `queue` for the
+commands on the queue, `handover` for taking what the other hands over.
+An older MixMusic doesn't know the field, so it tells none, and ignores
+the other's; it skips a message of a type it doesn't know, as `handover`,
+and runs no command it doesn't know. So:
+
+- a newer computer that controls an older one shows what plays there and
+  controls it as before; it sends neither the commands on the queue nor a
+  hand-over, as the older one's `welcome` tells no features, and its page
+  says to update MixMusic there;
+- an older computer that controls a newer one gets states whose tracks
+  name their entries (`entry`), a field it ignores, and the `features` of
+  `welcome`, which it ignores too.
+
+## The queue
+
+A state names the entry of each track in the queue by its UID there
+(`entry`), an ID of the entry, not of the track, which tells apart two
+entries of the same track and stays the same as the queue moves. The
+commands on the queue name entries so, as an index would name another
+entry once the queue moved: `playEntry` plays one, `remove` takes one out,
+`move` moves one to the place of another, as dragging one onto the other
+does in this computer's queue, and `clear` empties the queue after the
+track that plays. Only the entries after the track that plays move or go,
+as only those show; an entry the queue no longer holds changes nothing.
+
+## Handing over
+
+The page of a computer controlled shows what plays here, and Move to
+moves it there: this computer sends `handover`, with its queue, in the
+order it plays, the index of the track that plays, where it is, whether
+it plays, shuffle and repeat, and an ID. The other plays it in place of
+its own, and answers `taken`, with the ID, how many tracks it plays and
+how many it left out, and whether it left out the one that played. This
+computer then pauses, unless the other took nothing. One hand-over runs
+at a time, and this computer waits 30 s at most for the answer.
+
+Each track goes with its service (`youtube`, `spotify` or `file`), its ID
+there, and what shows of it: its title, its artists and album, with their
+IDs, its length, its covers from `https://`, and the podcast of an
+episode. The computer that takes it plays a track of YouTube Music or
+Spotify by its ID, when the ID is one of that service's (a YouTube video
+ID, a Spotify ID of letters and digits), as it plays its own. A file
+goes without its path, its IDs or its cover, which name what is on the
+computer that hands it over: the other plays its own file of the same
+song, of the same title and an artist of the same name, as their tags
+tell, and of the same length give or take 3 s, of the same album first,
+and leaves it out when it has none. It never plays a path the other
+names, and never looks for a file on a service. When the track that
+played was left out, the next track kept plays from its start.
+
+A hand-over holds up to 100 tracks before the one that plays and the rest
+after it, 1,000 tracks at most, and fewer when its message would be
+longer than 1 MiB. The computer that takes it cleans it as it cleans a
+state: control characters out, lengths bounded, IDs of printable ASCII,
+covers from `https://` only, the index in the queue.
 
 ## Listening on the network
 
@@ -159,6 +227,5 @@ whether it may find and connect to devices on the local network. Tests
 listen on 127.0.0.1 alone, and find the computers through
 `remotetest`'s fake.
 
-Not yet: handing what plays here over to the other computer, playing a
-track of the other's queue from here, and seeing more than its 20 next
-tracks.
+Not yet: seeing more than the other's 20 next tracks, and moving what
+plays there to this computer.

@@ -62,6 +62,9 @@ var (
 	ErrLost = errors.New("that computer stopped answering")
 	// ErrVersion: it speaks another version of the protocol.
 	ErrVersion = errors.New("that computer's MixMusic is of another version: update both")
+	// ErrOlder: it speaks this version, but its MixMusic is older, and
+	// can't do what was asked, which its welcome doesn't tell.
+	ErrOlder = errors.New("that computer's MixMusic is older, and can't do that: update it")
 )
 
 // errOf is the error of a reason the other computer gave.
@@ -93,6 +96,9 @@ type message struct {
 	Want    string `json:"want,omitempty"`
 	Name    string `json:"name,omitempty"`
 	Version int    `json:"version,omitempty"`
+	// hello and welcome: what the computer can do beyond the version, as
+	// FeatureQueue. An older MixMusic tells none.
+	Features []string `json:"features,omitempty"`
 	// refused and failed: why.
 	Reason string `json:"reason,omitempty"`
 	// commit and open: a round of pairing, and its commitment or nonce.
@@ -102,6 +108,10 @@ type message struct {
 	// state and command: a session's.
 	State   *State   `json:"state,omitempty"`
 	Command *Command `json:"command,omitempty"`
+	// handover and taken: what the computer that controls hands over to
+	// the one controlled, and how that one took it.
+	HandOver *HandOver `json:"handOver,omitempty"`
+	Taken    *Taken    `json:"taken,omitempty"`
 }
 
 // wire sends and receives messages over a connection: each after its

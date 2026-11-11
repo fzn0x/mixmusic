@@ -139,7 +139,7 @@ func (h remoteHost) State() remote.State {
 
 // remoteStateOf is the state the player's st tells the computer that
 // controls it: the track, where it is, the volume, and the tracks it moves
-// on to.
+// on to, each with its entry's UID, which the commands on the queue name.
 func remoteStateOf(st player.State) remote.State {
 	out := remote.State{Playing: st.Playing || st.Waiting && st.WillPlay, Loading: st.Loading, Live: st.Live,
 		PositionMs: st.Position.Milliseconds(), DurationMs: st.Duration.Milliseconds(), Volume: st.Volume, Muted: st.Muted}
@@ -148,13 +148,16 @@ func remoteStateOf(st player.State) remote.State {
 		return out
 	}
 	t := remoteTrackOf(cur.Track)
+	t.Entry = cur.UID
 	out.Track = &t
 	if out.DurationMs <= 0 && !st.Live {
 		out.DurationMs = int64(cur.Track.DurationMs)
 	}
 	for i := st.Index + 1; i < len(st.Queue) && len(out.Next) < remote.MaxNext; i++ {
 		if st.Queue[i].Skip == "" {
-			out.Next = append(out.Next, remoteTrackOf(st.Queue[i].Track))
+			next := remoteTrackOf(st.Queue[i].Track)
+			next.Entry = st.Queue[i].UID
+			out.Next = append(out.Next, next)
 		}
 	}
 	return out
@@ -192,6 +195,14 @@ func (h remoteHost) Do(c remote.Command) {
 		p.Seek(time.Duration(c.PositionMs) * time.Millisecond)
 	case remote.OpVolume:
 		p.SetVolume(c.Volume)
+	case remote.OpPlayEntry:
+		p.PlayEntry(c.Entry)
+	case remote.OpRemove:
+		p.RemoveEntry(c.Entry)
+	case remote.OpMove:
+		p.MoveEntry(c.Entry, c.To)
+	case remote.OpClear:
+		p.ClearUpcoming()
 	}
 }
 

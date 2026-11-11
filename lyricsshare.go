@@ -124,6 +124,9 @@ func (s *shell) saveLyricsCard(t media.Track, ly lyrics.Lyrics, size sharecard.S
 	if ly.Source != "" {
 		credit = "Lyrics from " + ly.Source
 	}
+	if credit != "" && ly.By != "" {
+		credit += " · submitted by " + ly.By
+	}
 	s.saveCard(t.Title, t.Artwork, size, func(cover image.Image, size sharecard.Size) sharecard.Card {
 		c := sharecard.Card{Size: size, Colors: colors, Cover: cover, CoverAt: sharecard.CoverFoot}
 		for n, text := range lines {
@@ -138,7 +141,7 @@ func (s *shell) saveLyricsCard(t media.Track, ly lyrics.Lyrics, size sharecard.S
 			c.Foot = append(c.Foot, sharecard.Line{Text: artist, Size: 34, Weight: 400, Ink: colors.Muted})
 		}
 		if credit != "" {
-			c.Foot = append(c.Foot, sharecard.Line{Text: credit, Size: 26, Weight: 400, Ink: colors.Muted})
+			c.Foot = append(c.Foot, sharecard.Line{Text: credit, Size: 26, Weight: 400, Ink: colors.Muted, MaxLines: 2})
 		}
 		c.Mark = &sharecard.Mark{Logo: cardLogo(), Name: sharecard.Line{Text: "mixmusic", Size: 30, Weight: 700}}
 		return c

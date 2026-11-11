@@ -81,7 +81,7 @@ func TestLyricsUnisonFirst(t *testing.T) {
 	ls.unison = status(http.StatusOK, unisonSynced)
 	ls.lrclib = status(http.StatusOK, lrclibSynced)
 	l, err := ls.c.Lyrics(context.Background(), aSong)
-	if err != nil || !l.Synced || l.Lines[0].Text != "From Unison" || l.Source != "Unison" || l.SourceURL != "https://unison.boidu.dev" {
+	if err != nil || !l.Synced || l.Lines[0].Text != "From Unison" || l.Source != "Unison" || l.SourceURL != "https://unison.betterlyrics.org" {
 		t.Fatalf("lyrics = %+v, %v", l, err)
 	}
 	if n := ls.lrcAsks.Load(); n != 0 {

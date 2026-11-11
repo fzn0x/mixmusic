@@ -77,13 +77,15 @@ of its own.
 
 - **[Better Lyrics](https://betterlyrics.org)**, whose service keeps
   lyrics timed word by word, which MixMusic asks first. The lyrics panel
-  credits it under each of its lyrics: "lyrics from Better Lyrics
-  (https://betterlyrics.org)".
-- **[Unison](https://unison.boidu.dev)**, the open, crowdsourced database
-  of lyrics, most of them timed word by word, under the
-  [ODbL](https://opendatacommons.org/licenses/odbl/). As its licence asks,
-  the lyrics panel credits it under each of its lyrics: "lyrics from
-  Unison (https://unison.boidu.dev)". Unison also translates lyrics, and
+  credits it under each of its lyrics: "lyrics from Better Lyrics", linked
+  to its site.
+- **[Unison](https://unison.betterlyrics.org)**, the open, crowdsourced
+  database of lyrics, most of them timed word by word, under the
+  [ODbL](https://opendatacommons.org/licenses/odbl/). As Unison asks, the
+  lyrics panel credits it and the person who submitted them under each of
+  its lyrics: "lyrics from Unison · submitted by <name>", with Unison
+  linked to the song's page there and the name to theirs. Unison also
+  translates lyrics, and
   romanizes Arabic, while you turn those on.
 - **[LRCLIB](https://lrclib.net)**, the open database of synced lyrics,
   which MixMusic asks when Unison has none.

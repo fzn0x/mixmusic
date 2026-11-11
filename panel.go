@@ -381,20 +381,36 @@ func lyricsLead(speed float64) time.Duration {
 	return time.Duration(float64(250*time.Millisecond) * speed)
 }
 
-// lyricsCredit names where lyrics come from, with the link to it their
-// licence asks for, as Unison's does: "lyrics from Unison
-// (https://unison.boidu.dev)".
+// lyricsCredit names where lyrics come from, and who gave them to it, as
+// creditParts says.
 func (s *shell) lyricsCredit(c *ui.Context, ly lyrics.Lyrics) {
 	k := &s.lk
-	if ly.SourceURL == "" {
-		ui.Text(c, k.sentence("lyrics from "+ly.Source)).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24)
-		return
-	}
 	ui.RichText(c).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24).Children(func() {
-		ui.Text(c, k.sentence("lyrics from "+ly.Source+" ("))
-		s.linkOf(c, ly.SourceURL, ly.SourceURL)
-		ui.Text(c, ")")
+		s.creditParts(c, ly)
 	})
+}
+
+// creditParts writes the credit of the lyrics ly into a rich text: where
+// they come from, linked to it for sources whose licence asks for the
+// link, and who gave them to it, linked to their page, for sources that
+// ask for that too, as Unison does: "lyrics from Unison · submitted by
+// <name>".
+func (s *shell) creditParts(c *ui.Context, ly lyrics.Lyrics) {
+	k := &s.lk
+	if ly.SourceURL == "" {
+		ui.Text(c, k.sentence("lyrics from "+ly.Source))
+	} else {
+		ui.Text(c, k.sentence("lyrics from "))
+		s.linkOf(c, ly.Source, ly.SourceURL)
+	}
+	switch {
+	case ly.By == "":
+	case ly.ByURL == "":
+		ui.Text(c, " · submitted by "+ly.By)
+	default:
+		ui.Text(c, " · submitted by ")
+		s.linkOf(c, ly.By, ly.ByURL)
+	}
 }
 
 func (s *shell) emptyIn(c *ui.Context, text string) {

@@ -422,24 +422,35 @@ func TestLyricsTwice(t *testing.T) {
 	}
 }
 
-// TestLyricsCredit credits Unison's lyrics with Unison's address, as their
-// licence asks, and LRCLIB's by name.
+// TestLyricsCredit credits Unison's lyrics as Unison asks: Unison, linked
+// to the song's page there, and who submitted them, linked to theirs.
+// LRCLIB's lyrics are credited by name.
 func TestLyricsCredit(t *testing.T) {
 	s := newTestShell(t)
 	key := "lyrics:" + testTracks[0].ID
-	s.loads[key] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "Unison", SourceURL: "https://unison.boidu.dev",
-		Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper kites"}}}}
+	song, curator := "https://unison.betterlyrics.org/song/abcdefghijk", "https://unison.betterlyrics.org/curator/0f1e2d3c"
+	s.loads[key] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "Unison", SourceURL: song,
+		By: "Harbour Keeper", ByURL: curator, Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper kites"}}}}
 	s.p.PlayTracks(testTracks, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	tt := testerOf(t, s, 1280, 900)
 	s.open("/lyrics")
 	tt.Frame()
-	if !tt.HasText("lyrics from Unison (") || !tt.HasText("https://unison.boidu.dev") {
+	if !tt.HasText("lyrics from Unison · submitted by Harbour Keeper") {
 		t.Errorf("Unison's credit: %q", tt.Texts())
+	}
+	for _, link := range []struct{ label, url string }{{"Unison", song}, {"Harbour Keeper", curator}} {
+		if err := tt.Click(link.label); err != nil {
+			t.Fatalf("the credit's link %q: %v", link.label, err)
+		}
+		tt.Frame()
+		if got := tt.OpenedURLs(); !slices.Contains(got, link.url) {
+			t.Errorf("%q opened %q, want %q", link.label, got, link.url)
+		}
 	}
 	s.loads[key] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB", Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper kites"}}}}
 	tt.Frame()
-	if !tt.HasText("lyrics from LRCLIB") || tt.HasText("https://unison.boidu.dev") {
+	if !tt.HasText("lyrics from LRCLIB") || tt.HasText("submitted by") {
 		t.Errorf("LRCLIB's credit: %q", tt.Texts())
 	}
 }

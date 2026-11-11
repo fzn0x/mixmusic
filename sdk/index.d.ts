@@ -140,10 +140,19 @@ export interface Lyrics {
   source: string;
   /**
    * The address of the source, for sources whose licence asks apps that
-   * show their lyrics to credit them with it, as Unison's does: "Lyrics
-   * from Unison (https://unison.boidu.dev)".
+   * show their lyrics to credit them with it, as Unison's does: its page
+   * of the song.
    */
   sourceUrl?: string;
+  /**
+   * Who gave the lyrics to their source, for sources that ask apps to
+   * credit them too, as Unison does. A plugin that shows Unison's lyrics
+   * credits both, linked: "Lyrics from Unison · submitted by <by>", with
+   * Unison linked to sourceUrl and the name to byUrl.
+   */
+  by?: string;
+  /** The address of by's page on the source, when it has one. */
+  byUrl?: string;
   /** The language of the lyrics, as "ja", when known. */
   language?: string;
   /**

@@ -35,7 +35,8 @@ func miniShell(t *testing.T, outputs []app.OutputDevice, casts ...cast.Device) *
 		l := &loaded[lyrics.Lyrics]{done: true, err: lyrics.ErrNotFound}
 		if i == 0 {
 			l = &loaded[lyrics.Lyrics]{done: true,
-				value: lyrics.Lyrics{Synced: true, Source: "Unison", SourceURL: "https://unison.boidu.dev", Language: "en", Lines: lanterns}}
+				value: lyrics.Lyrics{Synced: true, Source: "Unison", SourceURL: "https://unison.betterlyrics.org/song/abcdefghijk",
+					By: "Harbour Keeper", ByURL: "https://unison.betterlyrics.org/curator/0f1e2d3c", Language: "en", Lines: lanterns}}
 		}
 		s.loads["lyrics:"+tr.ID] = l
 	}
@@ -362,7 +363,7 @@ func TestMiniLyricsPanel(t *testing.T) {
 	s.p.Time(2500*time.Millisecond, 200*time.Second)
 	s.settle(t, func(st player.State) bool { return st.Position == 2500*time.Millisecond })
 	tt.Frame()
-	showsAll(t, tt, "the lyrics", "Lanterns drifting home", "Quiet harbour", "https://unison.boidu.dev")
+	showsAll(t, tt, "the lyrics", "Lanterns drifting home", "Quiet harbour", "lyrics from Unison · submitted by Harbour Keeper")
 	sung, ok := tt.Find("Lanterns drifting home")
 	next, _ := tt.Find("Quiet harbour")
 	if !ok || next.Y <= sung.Y {

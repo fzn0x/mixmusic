@@ -467,21 +467,15 @@ func (s *shell) miniLyrics(c *ui.Context) {
 	s.miniCredit(c, ly)
 }
 
-// miniCredit names where the lyrics come from, with the link their licence
-// asks for, as the lyrics panel does, smaller.
+// miniCredit names where the lyrics come from, and who gave them to it,
+// as the lyrics panel does, smaller.
 func (s *shell) miniCredit(c *ui.Context, ly lyrics.Lyrics) {
 	k := &s.lk
 	if ly.Source == "" {
 		return
 	}
-	if ly.SourceURL == "" {
-		ui.Text(c, k.sentence("lyrics from "+ly.Source)).FontSize(k.captionSize()).TextColor(k.muted).Padding(0, 12, 8).Shrink(0)
-		return
-	}
 	ui.RichText(c).FontSize(k.captionSize()).TextColor(k.muted).Padding(0, 12, 8).Shrink(0).Children(func() {
-		ui.Text(c, k.sentence("lyrics from "+ly.Source+" ("))
-		s.linkOf(c, ly.SourceURL, ly.SourceURL)
-		ui.Text(c, ")")
+		s.creditParts(c, ly)
 	})
 }
 

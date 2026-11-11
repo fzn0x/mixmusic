@@ -533,7 +533,7 @@ MixMusic is built on these projects:
   the AppImages.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, which finds the audio of
   the tracks MixMusic can't find itself.
-- **[Unison](https://unison.boidu.dev)**, the open, crowdsourced database of
+- **[Unison](https://unison.betterlyrics.org)**, the open, crowdsourced database of
   lyrics, under the ODbL, and **[LRCLIB](https://lrclib.net)**, the open
   database of synced lyrics.
 - **[kagome](https://github.com/ikawaha/kagome)**, the Japanese

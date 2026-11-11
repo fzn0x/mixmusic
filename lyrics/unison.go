@@ -14,9 +14,11 @@ import (
 
 // UnisonURL is the address of Unison, an open, crowdsourced database of
 // lyrics, most of them synchronized word by word. Its lyrics are under the
-// ODbL, which asks apps that show them to credit them: "Lyrics from Unison
-// (https://unison.boidu.dev)".
-const UnisonURL = "https://unison.boidu.dev"
+// ODbL, and an app that shows them credits Unison and the person who
+// submitted them, both linked: "Lyrics from Unison · submitted by <name>",
+// Unison to the song's page there and the name to theirs. Unison asks apps
+// for that from 7 February 2027.
+const UnisonURL = "https://unison.betterlyrics.org"
 
 // unisonTimeout bounds a lookup on Unison, which answers in a fraction of
 // a second: lyrics never wait long on it, and LRCLIB is asked next.
@@ -44,14 +46,24 @@ type unisonAnswer struct {
 		Format string `json:"format"`
 		// Language is the lyrics' language, as "ja".
 		Language string `json:"language"`
+		// VideoID is the YouTube video the lyrics are of: the credit links
+		// to its page on Unison.
+		VideoID string `json:"videoId"`
+		// Submitter is who gave the lyrics to Unison, its name and the ID
+		// of its page there.
+		Submitter struct {
+			DisplayName string `json:"displayName"`
+			KeyID       string `json:"keyId"`
+		} `json:"submitter"`
 	} `json:"data"`
 }
 
 // Get returns Unison's lyrics of a track: by its video ID when the query
 // has one, else by its title, artist, album and duration, which Unison
-// matches within two seconds. Their Source is "Unison", their SourceURL
-// Unison's address, to credit them with, and their Language the one Unison
-// tells.
+// matches within two seconds. To credit them with, their Source is
+// "Unison", their SourceURL the song's page on Unison, and By and ByURL
+// the name and the page of who submitted them. Their Language is the one
+// Unison tells.
 //
 // A track Unison has no lyrics of is ErrNotFound; Unison down, out of
 // reach or slower than a few seconds is ErrUnavailable.
@@ -103,9 +115,25 @@ func (u *Unison) Get(ctx context.Context, t Query) (Lyrics, error) {
 	if len(l.Lines) == 0 {
 		return Lyrics{}, ErrNotFound
 	}
-	l.Source, l.SourceURL = "Unison", UnisonURL
+	l.Source, l.SourceURL = "Unison", unisonPage("song", ans.Data.VideoID)
+	if name := strings.TrimSpace(ans.Data.Submitter.DisplayName); name != "" {
+		l.By, l.ByURL = name, unisonPage("curator", ans.Data.Submitter.KeyID)
+	}
 	l.Language = languageCode(ans.Data.Language)
 	return l, nil
+}
+
+// unisonPage returns the address of a page of Unison's: a song's
+// (/song/<video ID>) or a submitter's (/curator/<key ID>). With no ID, it
+// is Unison's own address for a song, and "" for a submitter.
+func unisonPage(kind, id string) string {
+	switch {
+	case id != "":
+		return UnisonURL + "/" + kind + "/" + url.PathEscape(id)
+	case kind == "song":
+		return UnisonURL
+	}
+	return ""
 }
 
 // readUnison reads lyrics in the format Unison names, or in the one they

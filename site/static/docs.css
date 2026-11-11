@@ -50,9 +50,9 @@
   --important: #c4a5ff;
   --warning: #e3b341;
   --caution: #ff7b72;
-  /* The footer's wordmark, faint, and its one letter in the app's cyan. */
+  /* The footer's wordmark, faint, and its one letter in the logo's pink. */
   --wordmark: rgba(255, 255, 255, 0.18);
-  --wordmark-accent: rgba(0, 189, 227, 0.32);
+  --wordmark-accent: rgba(230, 0, 126, 0.42);
 
   --font: Figtree, "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "Cascadia Mono", Consolas, "SFMono-Regular", ui-monospace, monospace;
@@ -96,7 +96,7 @@
     --warning: #845b00;
     --caution: #b8202a;
     --wordmark: rgba(32, 26, 27, 0.14);
-    --wordmark-accent: rgba(0, 140, 175, 0.3);
+    --wordmark-accent: rgba(185, 0, 100, 0.3);
   }
 }
 :root[data-theme="light"] {
@@ -124,7 +124,7 @@
   --warning: #845b00;
   --caution: #b8202a;
   --wordmark: rgba(32, 26, 27, 0.14);
-  --wordmark-accent: rgba(0, 140, 175, 0.3);
+  --wordmark-accent: rgba(185, 0, 100, 0.3);
 }
 
 *,

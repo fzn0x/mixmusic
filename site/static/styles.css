@@ -51,9 +51,9 @@
   --scrollbar-hover: #4a4a4a;
   --dot-ring: rgba(255, 255, 255, 0.5);
   --kbd-edge: rgba(0, 0, 0, 0.35);
-  /* The footer's wordmark, faint, and its one letter in the app's cyan. */
+  /* The footer's wordmark, faint, and its one letter in the logo's pink. */
   --wordmark: rgba(255, 255, 255, 0.18);
-  --wordmark-accent: rgba(0, 189, 227, 0.32);
+  --wordmark-accent: rgba(230, 0, 126, 0.42);
 
   /* Blend's corners: 20px on what is large, 10px on what is small. */
   --radius-card: 20px;
@@ -97,7 +97,7 @@
     --dot-ring: rgba(32, 26, 27, 0.3);
     --kbd-edge: rgba(32, 26, 27, 0.16);
     --wordmark: rgba(32, 26, 27, 0.14);
-    --wordmark-accent: rgba(0, 140, 175, 0.3);
+    --wordmark-accent: rgba(185, 0, 100, 0.3);
   }
 }
 :root[data-theme="light"] {
@@ -120,7 +120,7 @@
   --dot-ring: rgba(32, 26, 27, 0.3);
   --kbd-edge: rgba(32, 26, 27, 0.16);
   --wordmark: rgba(32, 26, 27, 0.14);
-  --wordmark-accent: rgba(0, 140, 175, 0.3);
+  --wordmark-accent: rgba(185, 0, 100, 0.3);
 }
 
 *,

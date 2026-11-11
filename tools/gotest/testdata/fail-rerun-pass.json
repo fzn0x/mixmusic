@@ -1,0 +1,8 @@
+{"Time":"2026-11-11T21:44:54.6498182+07:00","Action":"start","Package":"example.com/demo/flaky"}
+{"Time":"2026-11-11T21:44:54.659412+07:00","Action":"run","Package":"example.com/demo/flaky","Test":"TestFlaky"}
+{"Time":"2026-11-11T21:44:54.659412+07:00","Action":"output","Package":"example.com/demo/flaky","Test":"TestFlaky","Output":"=== RUN   TestFlaky\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:54.659412+07:00","Action":"output","Package":"example.com/demo/flaky","Test":"TestFlaky","Output":"--- PASS: TestFlaky (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:54.659412+07:00","Action":"pass","Package":"example.com/demo/flaky","Test":"TestFlaky","Elapsed":0}
+{"Time":"2026-11-11T21:44:54.6610036+07:00","Action":"output","Package":"example.com/demo/flaky","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:54.6610036+07:00","Action":"output","Package":"example.com/demo/flaky","Output":"ok  \texample.com/demo/flaky\t0.011s\n"}
+{"Time":"2026-11-11T21:44:54.6610036+07:00","Action":"pass","Package":"example.com/demo/flaky","Elapsed":0.011}

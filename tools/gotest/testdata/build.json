@@ -1,0 +1,6 @@
+{"ImportPath":"example.com/demo/build [example.com/demo/build.test]","Action":"build-output","Output":"# example.com/demo/build [example.com/demo/build.test]\n"}
+{"ImportPath":"example.com/demo/build [example.com/demo/build.test]","Action":"build-output","Output":"build\\build_test.go:6:14: cannot use \"three\" (untyped string constant) as int value in variable declaration\n"}
+{"ImportPath":"example.com/demo/build [example.com/demo/build.test]","Action":"build-fail"}
+{"Time":"2026-11-11T21:44:57.9553599+07:00","Action":"start","Package":"example.com/demo/build"}
+{"Time":"2026-11-11T21:44:57.9558915+07:00","Action":"output","Package":"example.com/demo/build","Output":"FAIL\texample.com/demo/build [build failed]\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:57.9558915+07:00","Action":"fail","Package":"example.com/demo/build","Elapsed":0.001,"FailedBuild":"example.com/demo/build [example.com/demo/build.test]"}

@@ -1,0 +1,16 @@
+{"Time":"2026-11-11T21:44:57.6924967+07:00","Action":"start","Package":"example.com/demo/testpanic"}
+{"Time":"2026-11-11T21:44:57.7025708+07:00","Action":"run","Package":"example.com/demo/testpanic","Test":"TestBefore"}
+{"Time":"2026-11-11T21:44:57.7025708+07:00","Action":"output","Package":"example.com/demo/testpanic","Test":"TestBefore","Output":"=== RUN   TestBefore\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:57.7025708+07:00","Action":"output","Package":"example.com/demo/testpanic","Test":"TestBefore","Output":"--- PASS: TestBefore (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"pass","Package":"example.com/demo/testpanic","Test":"TestBefore","Elapsed":0}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"run","Package":"example.com/demo/testpanic","Test":"TestPanic"}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"output","Package":"example.com/demo/testpanic","Test":"TestPanic","Output":"=== RUN   TestPanic\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"output","Package":"example.com/demo/testpanic","Test":"TestPanic","Output":"--- PASS: TestPanic (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"pass","Package":"example.com/demo/testpanic","Test":"TestPanic","Elapsed":0}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"run","Package":"example.com/demo/testpanic","Test":"TestAfter"}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"output","Package":"example.com/demo/testpanic","Test":"TestAfter","Output":"=== RUN   TestAfter\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"output","Package":"example.com/demo/testpanic","Test":"TestAfter","Output":"--- PASS: TestAfter (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"pass","Package":"example.com/demo/testpanic","Test":"TestAfter","Elapsed":0}
+{"Time":"2026-11-11T21:44:57.7031093+07:00","Action":"output","Package":"example.com/demo/testpanic","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-11T21:44:57.7041786+07:00","Action":"output","Package":"example.com/demo/testpanic","Output":"ok  \texample.com/demo/testpanic\t0.011s\n"}
+{"Time":"2026-11-11T21:44:57.7041786+07:00","Action":"pass","Package":"example.com/demo/testpanic","Elapsed":0.012}

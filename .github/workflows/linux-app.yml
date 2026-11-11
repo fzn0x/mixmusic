@@ -33,9 +33,12 @@ on:
 permissions:
   contents: read
 
+# A pull request's newer push replaces its older run. Each push to main runs
+# to its end, so that every commit on main shows how it went, rather than
+# show as failed once the next push cancelled it.
 concurrency:
-  group: linux-app-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: linux-app-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   # `nix build`, as PR #133 has Linux users build MixMusic from source,

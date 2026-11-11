@@ -54,6 +54,8 @@ its **details**. The keyboard reaches **details** in the toast with
 - **Google refuses the sign-in window** with "This browser or app may not
   be secure". Google decides this; try again later, or from another
   network. Or sign in with a browser instead, in Settings › Accounts:
+  [sign in with your browser](accounts.md#sign-in-with-your-browser), with
+  a profile of its own,
   [import the session](accounts.md#import-from-a-browser) of a browser you
   signed in to YouTube Music with, or
   [paste the Cookie header](accounts.md#paste-a-cookie-header) of a request

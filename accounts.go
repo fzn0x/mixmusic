@@ -174,6 +174,7 @@ func (s *shell) youtubeAccount(c *ui.Context, yt app.YouTubeAccount) {
 				}
 				s.hint(c, youtubeSession)
 			})
+			s.youtubeBrowserSignIn(c, busy)
 			s.youtubeCookieSignIn(c, busy)
 			return
 		}

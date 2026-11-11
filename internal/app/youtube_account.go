@@ -19,6 +19,7 @@ import (
 
 	"github.com/egoist/mygo"
 
+	"github.com/fzn0x/mixmusic/internal/browser"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/youtube"
@@ -252,6 +253,7 @@ func (a *App) openYouTube() {
 	// found signed out now, so the copy goes.
 	os.Remove(filepath.Join(a.opts.CacheDir, "youtube-cookies.txt"))
 	removeCookieExports()
+	browser.RemoveLeftovers()
 	a.watchYouTube()
 	session, err := a.youtubeStore.Load()
 	if err != nil || len(session.cookies) == 0 {

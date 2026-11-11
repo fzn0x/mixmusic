@@ -125,7 +125,10 @@ AppImage or archive copy's.
 Your Spotify sign-in, your Last.fm connection and the key of your YouTube
 Music session are in the system's credential store, which encrypts them
 for your account. MixMusic never sees your passwords: you sign in on
-Google's, Spotify's and Last.fm's own pages.
+Google's, Spotify's and Last.fm's own pages. Signing in to YouTube Music
+[with your browser](accounts.md#sign-in-with-your-browser) opens it with
+a profile made for that sign-in alone, which MixMusic deletes once it took
+the session; it never reads your own profiles.
 
 Where the credential store can't keep a secret:
 

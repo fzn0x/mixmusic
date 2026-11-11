@@ -148,7 +148,7 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 			}
 		})
 		ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-			ui.Text(c, t.Title).FontSize(k.bodySize()).TextColor(ink).SingleLine()
+			s.queueTitle(c, t, skipped && it.Skip == player.SkipExplicit, ink, sub)
 			ui.Row(c).Gap(6).MinWidth(0).Children(func() {
 				s.sourceMark(c, t.Source, current)
 				s.downloadMark(c, "q-dl-"+it.UID, t, current)
@@ -162,6 +162,8 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 				case skipped && it.Skip == player.SkipMadeWithAI:
 					// A click still plays it.
 					line += " · made with AI"
+				case skipped && it.Skip == player.SkipExplicit:
+					line += " · " + hiddenNote
 				case skipped:
 					line += " · skipped"
 				}

@@ -176,7 +176,8 @@ func (s *shell) suggestions(c *ui.Context) (searches []string, items []media.Ite
 			}
 		}
 		if q != "" {
-			items = s.suggested.Items[:min(len(s.suggested.Items), 5)]
+			items = s.shownItems(s.suggested.Items)
+			items = items[:min(len(items), 5)]
 		}
 	}
 	return searches, items

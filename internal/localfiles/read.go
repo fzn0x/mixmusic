@@ -52,6 +52,7 @@ func (x *Index) readFile(path string, info fs.FileInfo) (e Entry) {
 	}
 	e.Title, e.Artists, e.Album, e.AlbumArtists = t.Title, t.Artists, t.Album, t.AlbumArtists
 	e.Track, e.Disc, e.Year = t.Track, t.Disc, t.Year
+	e.Explicit = t.Explicit
 	if t.Picture != nil {
 		e.Art = x.keepArt(t.Picture.Data, t.Picture.MIME)
 	}

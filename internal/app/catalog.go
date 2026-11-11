@@ -227,6 +227,11 @@ const relayTries = 3
 // them out.
 func (c *Catalog) Radio(ctx context.Context, track media.Track) ([]media.Track, error) {
 	tracks, err := c.radioOf(ctx, track)
+	// While the settings hide explicit content, the radio leaves out its
+	// explicit songs and videos (#427).
+	if err == nil && c.a.settings.Get().HideExplicit {
+		tracks = media.WithoutExplicit(tracks)
+	}
 	if err != nil || !c.a.settings.Get().SkipDisliked {
 		return tracks, err
 	}

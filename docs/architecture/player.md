@@ -19,7 +19,8 @@
   As it moves on by itself it passes over, on one path
   (`skip.go`), the entries the settings skip, but those the user picks:
   songs the user dislikes, and songs YouTube labels as made with AI
-  (`labels.go`). A track whose label the app doesn't know is checked
+  (`labels.go`); and explicit songs while the settings hide them, those
+  the user picks too ([explicit.md](explicit.md)). A track whose label the app doesn't know is checked
   before it's announced, beside the search for its stream, and the next
   track before it's preloaded or crossfaded into.
 - **On a Spotify device** (`connect.go`), the player sends commands and

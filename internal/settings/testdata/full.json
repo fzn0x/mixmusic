@@ -60,6 +60,7 @@
   "skipDisliked": false,
   "skipAi": true,
   "cleanVersions": true,
+  "hideExplicit": true,
   "musicVideos": true,
   "equalizer": {
     "enabled": true,

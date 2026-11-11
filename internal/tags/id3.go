@@ -122,6 +122,8 @@ func readFrames(b []byte, version byte, unsynced bool, t *Tags) {
 			t.setPicture(apic(data))
 		case id == "PIC":
 			t.setPicture(pic(data))
+		case id == "TXXX" || id == "TXX":
+			txxx(data, t)
 		case id3Frames[id] == "genre":
 			values := textFrame(data, version)
 			for i, v := range values {

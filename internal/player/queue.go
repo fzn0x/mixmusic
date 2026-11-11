@@ -27,6 +27,9 @@ func (p *Player) PlayTracks(tracks []media.Track, start int) {
 // none of it.
 func (p *Player) PlayWithRadio(t media.Track) {
 	p.do(func() {
+		if p.refuses(t) {
+			return
+		}
 		p.playTracks([]media.Track{t}, 0)
 		if len(p.s.Queue) == 0 || !p.svc.Settings().Autoplay || spoken(t) || t.Source == media.SourceFile {
 			return
@@ -209,7 +212,7 @@ func (p *Player) items(tracks []media.Track) []Item {
 func (p *Player) chosenItems(tracks []media.Track) []Item {
 	items := p.items(tracks)
 	if len(items) == 1 {
-		items[0].Chosen, items[0].Skip = true, ""
+		items[0].Chosen, items[0].Skip = true, p.keptSkip(items[0].Track)
 	}
 	return items
 }
@@ -220,6 +223,10 @@ func (p *Player) playTracks(tracks []media.Track, start int) {
 	}
 	items := p.items(tracks)
 	first := min(max(start, 0), len(items)-1)
+	// The queue stays as it was when the settings hide the track chosen.
+	if p.refuses(items[first].Track) {
+		return
+	}
 	items[first].Chosen, items[first].Skip = true, ""
 	p.playItems(items, first, false)
 }

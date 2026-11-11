@@ -208,7 +208,7 @@ func (e Entry) albumKey() string {
 
 // track is the entry as a track.
 func (e Entry) track() media.Track {
-	t := media.Track{ID: TrackID(e.Path), Source: media.SourceFile, Title: title(e), DurationMs: e.DurationMs}
+	t := media.Track{ID: TrackID(e.Path), Source: media.SourceFile, Title: title(e), DurationMs: e.DurationMs, Explicit: e.Explicit}
 	t.Artists = refs(e.Artists)
 	if len(t.Artists) == 0 {
 		t.Artists = []media.Ref{{Name: UnknownArtist}}

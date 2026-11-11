@@ -50,6 +50,9 @@ type Tags struct {
 	Genre string
 	// ISRC is the recording's International Standard Recording Code.
 	ISRC string
+	// Explicit is set for a track its content advisory marks explicit
+	// (advisory.go).
+	Explicit bool
 	// Picture is the cover, the front cover when the file tells which.
 	Picture *Picture
 }

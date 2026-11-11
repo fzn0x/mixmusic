@@ -142,6 +142,8 @@ func ilst(meta []byte, t *Tags) {
 							t.set("genre", genreName(strconv.Itoa(n-1), ""))
 						}
 					}
+				case item == "rtng":
+					rtng(value, t)
 				case (key != "" || item == "----") && typ == 1:
 					texts = append(texts, string(value))
 				}
@@ -151,6 +153,8 @@ func ilst(meta []byte, t *Tags) {
 				t.set(key, texts...)
 			case item == "----" && name == "ISRC":
 				t.set("isrc", texts...)
+			case item == "----":
+				t.setAdvisory(name, texts...)
 			}
 		})
 	})

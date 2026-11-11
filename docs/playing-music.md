@@ -77,6 +77,17 @@ Spotify and YouTube Music list an album that came out explicit and clean twice, 
 
 Albums are versions of one when they're of the same service and the same artists, and have the same title once its last part in brackets, or after a dash, is set aside, as long as that part names a version: Clean, Explicit, Edited, Deluxe, Remastered, an anniversary or an edition, with its year. A live album, a re-recording, as "(Taylor's Version)", or remixes are albums of their own. Versions of the same edition are one album only when their years, and their numbers of tracks where the service tells them, agree; and two albums of the same title from different years, as a self-titled album and a live one of that name, stay two tiles. Albums on this computer aren't grouped.
 
+## Hiding explicit content
+
+**Hide explicit content**, in [Settings › Playback](settings.md#playback) › Explicit content and off by default, keeps the songs, albums and videos marked explicit out of MixMusic, as for a child's computer or a shared room. It's kept as `hideExplicit` in settings.json.
+
+- **They don't show** in the search and what the search box suggests, on Home and its shelves, in Explore, on artists' pages, in the playlists and mixes of others, as the mixes YouTube Music makes for you, among the songs suggested for a playlist, among the new releases of the artists you follow, or in radios and autoplay.
+- **Your own lists keep them:** your mixes and playlists, your liked songs, the library, the songs on this computer, an album's page and the queue list them dimmed, with their "e" and "hidden by your settings".
+- **They never play.** The queue passes over them as it moves on, and the play buttons of albums, playlists and mixes start at their first song that isn't explicit. One you pick doesn't play either, and a notice tells why; nor does a list of explicit songs alone.
+- **Albums:** Prefer clean versions is on meanwhile, and can't be turned off. An album that comes explicit and clean shows its clean version, and its page's switch leaves out the explicit one; an album that comes explicit alone doesn't show.
+
+What counts as explicit is what marks it so. Spotify marks its tracks, and YouTube Music badges its songs, music videos and albums. Videos that aren't music have no such mark, and stay, as do podcasts' episodes. Spotify's lists of albums don't tell which album is explicit: those albums show, and their pages list their explicit songs dimmed. A song on this computer is explicit when its tags' content advisory says so (see [Music on this computer](local-music.md#tags-and-covers)); an untagged one isn't.
+
 ## The queue and Up next
 
 The Queue button by the player, or Ctrl+J (⌘J), shows Up next at the right of the window: the track playing, then what plays after it.

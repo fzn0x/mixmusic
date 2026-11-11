@@ -37,6 +37,7 @@
   "skipDisliked": true,
   "skipAi": false,
   "cleanVersions": false,
+  "hideExplicit": false,
   "musicVideos": false,
   "equalizer": {
     "enabled": false,

@@ -60,7 +60,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		res := fetch(s, "search:"+q, func(ctx context.Context) (app.SearchResponse, error) { return s.svc.Catalog.Search(ctx, q) })
 		var counts []int
 		if res.done && res.err == nil {
-			r := mergeResults(res.value, s.searchScope)
+			r := s.shownResults(mergeResults(res.value, s.searchScope))
 			// An album counts once, however many versions it has.
 			albums := len(s.albumGroups("album", r.Albums))
 			counts = []int{-1, len(r.Tracks), len(r.Videos), albums, len(r.Artists), len(r.Playlists), s.podcastCount(q)}
@@ -90,7 +90,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		if len(res.value.Errors) > 0 {
 			ui.Text(c, strings.Join(res.value.Errors, " · ")).FontSize(k.smallSize()).TextColor(k.danger).Margin(0, 0, 16)
 		}
-		r := mergeResults(res.value, s.searchScope)
+		r := s.shownResults(mergeResults(res.value, s.searchScope))
 		pivot := searchPivots[s.searchPivot]
 		if pivot == "all" || pivot == "songs" {
 			tracks := r.Tracks

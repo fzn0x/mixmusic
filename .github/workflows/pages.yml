@@ -21,12 +21,33 @@ permissions:
   pages: write
   id-token: write
 
+# Each push runs to its end, so that every commit on main shows how it
+# went: one whose commit is no longer main's newest builds and deploys
+# nothing, leaving that to the newer one's run. A shared concurrency group
+# would have GitHub cancel the runs waiting in it, which shows as failed.
 concurrency:
-  group: pages
+  group: pages-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
+  newest:
+    name: Main's newest commit
+    # Only a push can be behind a newer one.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      newest: ${{ steps.newest.outputs.newest }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+      - id: newest
+        run: bash .github/scripts/newest.sh
+
   deploy:
+    needs: newest
+    # A run started by hand goes on without that check.
+    if: ${{ !cancelled() && needs.newest.result != 'failure' && needs.newest.outputs.newest != 'false' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -48,5 +69,10 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site/public
+      # Main may have moved on while the site built.
+      - id: still
+        name: Still main's newest commit
+        run: bash .github/scripts/newest.sh
       - id: deployment
+        if: steps.still.outputs.newest == 'true'
         uses: actions/deploy-pages@v5

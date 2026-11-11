@@ -45,11 +45,54 @@ func TestUnisonByVideo(t *testing.T) {
 	if err != nil || !l.Synced || len(l.Lines) != 3 || l.Lines[0].Text != "Paper kites" {
 		t.Fatalf("lyrics = %+v, %v", l, err)
 	}
-	if l.Source != "Unison" || l.SourceURL != "https://unison.boidu.dev" {
-		t.Errorf("credit = %q, %q", l.Source, l.SourceURL)
+	if l.Source != "Unison" || l.SourceURL != "https://unison.betterlyrics.org" || l.By != "" || l.ByURL != "" {
+		t.Errorf("credit = %q, %q, %q, %q", l.Source, l.SourceURL, l.By, l.ByURL)
 	}
 	if l.Language != "en" {
 		t.Errorf("language = %q", l.Language)
+	}
+}
+
+// TestUnisonCredit credits Unison's lyrics as Unison asks: Unison, linked
+// to the song's page there, and who submitted them, linked to their page.
+// A submitter without a page is named alone, and lyrics without a
+// submitter credit Unison alone.
+func TestUnisonCredit(t *testing.T) {
+	for _, tc := range []struct {
+		name                 string
+		data                 map[string]any
+		sourceURL, by, byURL string
+	}{
+		{"submitter", map[string]any{"videoId": "abcdefghijk", "submitter": map[string]any{"displayName": " Harbour Keeper ", "keyId": "0f1e2d3c"}},
+			"https://unison.betterlyrics.org/song/abcdefghijk", "Harbour Keeper", "https://unison.betterlyrics.org/curator/0f1e2d3c"},
+		{"no page", map[string]any{"videoId": "abcdefghijk", "submitter": map[string]any{"displayName": "Harbour Keeper"}},
+			"https://unison.betterlyrics.org/song/abcdefghijk", "Harbour Keeper", ""},
+		{"no submitter", map[string]any{"videoId": "abcdefghijk", "submitter": nil},
+			"https://unison.betterlyrics.org/song/abcdefghijk", "", ""},
+		{"no video", map[string]any{"submitter": map[string]any{"displayName": "Harbour Keeper", "keyId": "0f1e2d3c"}},
+			"https://unison.betterlyrics.org", "Harbour Keeper", "https://unison.betterlyrics.org/curator/0f1e2d3c"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				data := map[string]any{"lyrics": richsync, "format": "ttml", "syncType": "richsync", "language": "en"}
+				for k, v := range tc.data {
+					data[k] = v
+				}
+				json.NewEncoder(w).Encode(map[string]any{"success": true, "data": data})
+			}))
+			t.Cleanup(srv.Close)
+			u := NewUnison("test-agent")
+			u.BaseURL = srv.URL
+			q := song
+			q.VideoID = "abcdefghijk"
+			l, err := u.Get(context.Background(), q)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if l.Source != "Unison" || l.SourceURL != tc.sourceURL || l.By != tc.by || l.ByURL != tc.byURL {
+				t.Errorf("credit = %q, %q, %q, %q; want Unison, %q, %q, %q", l.Source, l.SourceURL, l.By, l.ByURL, tc.sourceURL, tc.by, tc.byURL)
+			}
+		})
 	}
 }
 

@@ -68,6 +68,12 @@ type Lyrics struct {
 	// licence asks apps to credit them with it, as Unison's does; "" for
 	// the others.
 	SourceURL string `json:"sourceUrl,omitempty"`
+	// By names who gave the lyrics to their source, for sources that ask
+	// apps to credit them too, as Unison does its submitters; "" for the
+	// others.
+	By string `json:"by,omitempty"`
+	// ByURL is the address of By's page on the source; "" when it has none.
+	ByURL string `json:"byUrl,omitempty"`
 	// Language is the language of the lyrics, a code of ISO 639-1 as "ja",
 	// when their source tells it or GuessLanguage could; "" when unknown.
 	Language string `json:"language,omitempty"`

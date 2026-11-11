@@ -145,6 +145,7 @@ type App struct {
 	labels       *labelCache
 	lyrics       *lyrics.Client
 	unison       *lyrics.Unison
+	betterLyrics *lyrics.BetterLyrics
 	translations *translations
 	romaji       *romaji.Dictionary
 	addons       *addons.Manager
@@ -337,6 +338,7 @@ func New(opts Options) (*App, error) {
 	userAgent := "MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)"
 	a.lyrics = lyrics.New(userAgent)
 	a.unison = lyrics.NewUnison(userAgent)
+	a.betterLyrics = lyrics.NewBetterLyrics(userAgent)
 	a.translations = newTranslations(filepath.Join(opts.CacheDir, "lyrics-translations"))
 	a.romaji = newRomaji(opts, userAgent)
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)

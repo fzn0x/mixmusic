@@ -406,9 +406,10 @@ func (c *Catalog) videoLength(ctx context.Context, video media.Track) time.Durat
 	return time.Duration(tracks[0].DurationMs) * time.Millisecond
 }
 
-// Lyrics returns the lyrics of a track: Unison's, else LRCLIB's, else
-// YouTube Music's. Synchronized lyrics of a later source win over plain
-// ones of an earlier, and YouTube Music's plain lyrics over shorter ones.
+// Lyrics returns the lyrics of a track: Better Lyrics' when it has them
+// timed word by word, else Unison's, else LRCLIB's, else YouTube Music's.
+// Synchronized lyrics of a later source win over plain ones of an earlier,
+// and YouTube Music's plain lyrics over shorter ones.
 func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, error) {
 	if l, ok := c.a.lyricsMemo.get(track.ID); ok {
 		return l, nil
@@ -419,9 +420,17 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 	}
 	q := lyricsQuery(track)
 	q.VideoID = c.videoID(track)
-	l, err := c.a.unison.Get(ctx, q)
+	// Better Lyrics is asked first, for lyrics timed word by word. Unison
+	// is asked when it has none, or is down or busy.
+	l, err := c.a.betterLyrics.Get(ctx, q)
 	if errors.Is(err, lyrics.ErrUnavailable) {
-		log.Printf("mixmusic: the lyrics of %s, on Unison: %v", track.ID, err)
+		log.Printf("mixmusic: the lyrics of %s, on Better Lyrics: %v", track.ID, err)
+	}
+	if err != nil {
+		l, err = c.a.unison.Get(ctx, q)
+		if errors.Is(err, lyrics.ErrUnavailable) {
+			log.Printf("mixmusic: the lyrics of %s, on Unison: %v", track.ID, err)
+		}
 	}
 	// LRCLIB fills in when Unison has nothing, or is down, and when it
 	// has synchronized lyrics where Unison has plain ones. Unison looks a

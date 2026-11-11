@@ -91,8 +91,8 @@
   also finds the song of a music video, by its title and artists, which
   the video's radio starts from: YouTube Music makes the radio of a video
   out of videos.
-- **`lyrics`** finds synced lyrics on Unison and LRCLIB, reads TTML and LRC,
-  and translates and romanizes lyrics on Unison.
+- **`lyrics`** finds synced lyrics on Better Lyrics, Unison and LRCLIB,
+  reads TTML and LRC, and translates and romanizes lyrics on Unison.
 - **`internal/romaji`** writes Japanese lyrics in Hepburn romaji on the
   computer, as Unison gives none for Japanese: kana from a table, and kanji
   by the readings that kagome's tokenizer finds in its IPA dictionary,

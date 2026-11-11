@@ -63,6 +63,7 @@ For lyrics, see [Share lines](lyrics.md#share-lines).
 - its format, as Opus in WebM, AAC in MP4 or FLAC, its bitrate, sample rate, bit depth (of FLAC and WAV), channels and length;
 - the file it plays from, with its size: a file on this computer, with its tags, its download, or the offline cache's copy. Show in Explorer (Show in Finder on macOS) opens the folder of a file on this computer or of a download;
 - of the track playing, what MixMusic's audio engine plays: from where, its 5.1 surround audio when it plays it, and whether it converts it to 48 kHz;
+- of a YouTube Music track that plays from a stream: how MixMusic found the stream (YouTube's player API, or yt-dlp's quick or full run), the arguments yt-dlp ran with, with your session's file, tokens and home folder hidden, and whether it asked for the stream as your account ([Play audio as your account](#play-audio-as-your-account)) or signed out. **Copy stream URL** copies the address of the audio MixMusic plays: it stops working after a few hours and is tied to this network, and it may carry your IP address, so share it with care. It is there to put in a bug report, or to test a stream in a browser on the same network;
 - how loud it plays: YouTube's measure of it, and how far [Even loudness](#even-loudness-volume-levelling-and-the-volume) turns it down;
 - of a song on this computer with [copies](local-music.md#copies-of-one-song), each copy, the one that plays marked.
 

@@ -40,7 +40,7 @@ jobs:
         run: bash .github/scripts/nix-retry.sh nix develop --command true
       - name: Compile the plugins, and check the registry
         run: |
-          nix develop --command bun install --frozen-lockfile
+          nix develop --command bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
           nix develop --command bun run build:plugins
           nix develop --command go run ./tools/registry -check
       - name: Stage the files apps download
@@ -48,7 +48,7 @@ jobs:
       - name: Publish them to the registry branch
         run: |
           set -euo pipefail
-          git fetch --depth 1 origin registry
+          bash .github/scripts/retry.sh 45 git fetch --depth 1 origin registry
           git worktree add --detach "$RUNNER_TEMP/branch" origin/registry
           cd "$RUNNER_TEMP/branch"
           rm -rf plugins themes

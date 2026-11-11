@@ -110,7 +110,9 @@ jobs:
       # The shell's tools, fetched once, again if a download breaks off.
       - name: The Nix shell
         run: bash .github/scripts/nix-retry.sh nix develop --command true
-      - run: nix develop --command bun install --frozen-lockfile
+      # Bun's and Go's packages, again if a download breaks off.
+      - run: nix develop --command bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
+      - run: nix develop --command bash .github/scripts/retry.sh 45 go mod download
       - run: nix develop --command bash .github/scripts/build.sh linux/amd64
       - name: Unpack the archive
         run: |
@@ -162,6 +164,8 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
+      - name: Go's modules
+        run: bash .github/scripts/retry.sh 45 go mod download
       # It downloads yt-dlp: tools/gotest runs it again when it fails, up to
       # 3 more times.
       - name: MixMusic installs yt-dlp, checks it, and runs it

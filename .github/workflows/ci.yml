@@ -28,6 +28,11 @@ jobs:
       - name: Formatting
         if: runner.os == 'Linux'
         run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      # Go's modules, again if a download breaks off. setup-go's cache has
+      # them, unless go.sum changed.
+      - name: Go's modules
+        shell: bash
+        run: bash .github/scripts/retry.sh 45 go mod download
       - name: Vet for Linux, Windows and macOS
         shell: bash
         run: |
@@ -55,13 +60,15 @@ jobs:
       # registry check reads: main keeps their TypeScript only.
       - uses: oven-sh/setup-bun@v2
       - name: Compile the community plugins
+        shell: bash
         run: |
-          bun install --frozen-lockfile
+          bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
           bun run build:plugins
       # The romaji tests read the IPA dictionary, which the app downloads,
       # from its module, checked against go.sum: the app doesn't build it in.
       - name: Download the dictionary of the romaji tests
-        run: go mod download github.com/ikawaha/kagome-dict/ipa@v1.2.6
+        shell: bash
+        run: bash .github/scripts/retry.sh 45 go mod download github.com/ikawaha/kagome-dict/ipa@v1.2.6
       # tools/gotest runs a test that fails again, up to 3 more times: one
       # that passes then is reported as flaky, and one that fails every
       # time fails the step.
@@ -112,6 +119,8 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
+      - name: Go's modules
+        run: bash .github/scripts/retry.sh 45 go mod download
       # PulseAudio without what apt recommends with it, but for its pactl
       # and pacat; apt-install.sh goes on from Ubuntu's own archive when the
       # runner's mirror is slow.
@@ -125,7 +134,7 @@ jobs:
       - name: An audio device
         if: runner.os == 'macOS'
         run: |
-          brew install --cask blackhole-2ch
+          bash .github/scripts/retry.sh 45 brew install --cask blackhole-2ch
           sudo killall coreaudiod || true
           sleep 5
           system_profiler SPAudioDataType
@@ -173,7 +182,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
+      - run: bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
       - run: bun run typecheck
       # The plugin API is written in TypeScript, and ships the JavaScript it
       # compiles to, which the Go side embeds: main keeps it, and it must be
@@ -230,7 +239,9 @@ jobs:
       # The shell's tools, fetched once, again if a download breaks off.
       - name: The Nix shell
         run: bash .github/scripts/nix-retry.sh nix develop --command true
-      - run: nix develop --command bun install --frozen-lockfile
+      # Bun's and Go's packages, again if a download breaks off.
+      - run: nix develop --command bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
+      - run: nix develop --command bash .github/scripts/retry.sh 45 go mod download
       - run: nix develop --command bash .github/scripts/build.sh "${{ matrix.platform }}"
       # Nix's own loader would keep it from starting outside NixOS (#166).
       - name: The Linux build asks for the system's loader

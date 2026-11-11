@@ -54,6 +54,8 @@ linux=(build/linux-*/)
 [ ${#linux[@]} -eq 0 ] && exit 0
 fetch "$appimagetool_url" "$appimagetool_sha256" "$work/appimagetool"
 chmod +x "$work/appimagetool"
+# nfpm, built once from the module proxy, again if a download breaks off.
+GOBIN="$work" bash "$(dirname "$0")/retry.sh" 45 go install "$nfpm"
 
 for dir in "${linux[@]}"; do
 	arch="$(basename "$dir")"
@@ -105,7 +107,7 @@ for dir in "${linux[@]}"; do
 		echo "    type: symlink"
 	} >"$config"
 	cat "$config"
-	go run "$nfpm" package --config "$config" --packager rpm --target "$out/mixmusic-$v-linux-$arch.rpm"
+	"$work/nfpm" package --config "$config" --packager rpm --target "$out/mixmusic-$v-linux-$arch.rpm"
 	echo "made mixmusic-$v-linux-$arch.rpm"
 
 	# AppImage: the app and the files beside it in usr/bin, and its entry

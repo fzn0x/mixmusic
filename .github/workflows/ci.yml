@@ -338,7 +338,7 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: flake.lock is committed, and locks every input
         run: |
-          nix flake lock
+          bash .github/scripts/nix-retry.sh nix flake lock
           if [ -n "$(git status --porcelain -- flake.lock)" ]; then
             cat flake.lock
             echo "flake.lock is missing or out of date: run nix flake lock" >&2

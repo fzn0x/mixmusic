@@ -3,10 +3,11 @@
 // timed steps. The pictures play on their own, again and again, while
 // they are in the window: the steps, a moment on how they end, back to
 // rest, and a moment at rest. They start a little apart, so that they don't
-// move together. A tile holds where it is while it's hovered or has the
-// keyboard's focus, which is how to stop one, and goes on once the pointer
-// or the focus leaves. The songs and lyric lines are made up. tiles.css has
-// the look.
+// move together. Out of the window a picture goes back to rest, to start
+// from there once back. A tile holds where it is while it's hovered or has
+// the keyboard's focus, which is how to stop one, and goes on once the
+// pointer or the focus leaves. The songs and lyric lines are made up.
+// tiles.css has the look.
 //
 // Under reduced motion nothing plays: the pictures stay at rest, and
 // hovering or focusing a tile changes nothing. Without script the page is as
@@ -199,7 +200,7 @@
     const tile = [...document.querySelectorAll(".bento .tile")].find((t) => t.querySelector("h3")?.textContent.trim() === act.tile);
     if (!tile) continue;
     const { steps, rest, again = [[0, rest]] } = act.art(tile);
-    tiles.push({ tile, round: [...steps, [hold, () => {}], ...again, [pause, () => {}]] });
+    tiles.push({ tile, rest, round: [...steps, [hold, () => {}], ...again, [pause, () => {}]] });
   }
 
   // Under reduced motion the pictures stay at rest, whatever is hovered.
@@ -207,9 +208,10 @@
 
   // A tile plays while it is in the window and the page is shown, unless
   // it's hovered or has the keyboard's focus: then it holds where it is, and
-  // goes on from there.
+  // goes on from there. Out of the window it goes back to rest, and plays
+  // from the start once back.
   const players = new Map();
-  tiles.forEach(({ tile, round }, n) => {
+  tiles.forEach(({ tile, rest, round }, n) => {
     let next = 0; // the change of the round that comes next
     let timer = null;
     let first = n * apart;
@@ -232,7 +234,13 @@
         timer = null;
       }
     };
-    players.set(tile, { now, update });
+    const reset = () => {
+      clearTimeout(timer);
+      timer = null;
+      next = 0;
+      rest();
+    };
+    players.set(tile, { now, update, reset });
 
     // A tile takes the keyboard's focus, which holds it.
     tile.setAttribute("data-act", "");
@@ -260,6 +268,7 @@
       for (const e of entries) {
         const p = players.get(e.target);
         p.now.seen = e.isIntersecting;
+        if (!p.now.seen) p.reset();
         p.update();
       }
     });

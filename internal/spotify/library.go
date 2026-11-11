@@ -27,7 +27,7 @@ func (c *Client) Contains(ctx context.Context, uris ...string) ([]bool, error) {
 
 // AddToPlaylist appends tracks to a playlist the user may edit.
 func (c *Client) AddToPlaylist(ctx context.Context, playlistID string, uris ...string) error {
-	return c.do(ctx, http.MethodPost, "/playlists/"+url.PathEscape(playlistID)+"/items", nil, map[string]any{"uris": uris}, nil)
+	return refusedChange(c.do(ctx, http.MethodPost, "/playlists/"+url.PathEscape(playlistID)+"/items", nil, map[string]any{"uris": uris}, nil))
 }
 
 // FollowPlaylist follows a playlist, which saves it to the user's library,

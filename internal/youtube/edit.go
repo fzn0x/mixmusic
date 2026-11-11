@@ -5,15 +5,27 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+
+	"github.com/fzn0x/mixmusic/internal/media"
 )
 
 // newPlaylistPrivacy keeps a playlist made in MixMusic to the account that
 // made it: the user shares it from YouTube Music when they want to.
-const newPlaylistPrivacy = "PRIVATE"
+const newPlaylistPrivacy = media.Private
 
 // CreatePlaylist makes a playlist on YouTube Music named title, private to
 // the account, holding the videos given, and returns its playlist ID.
 func (c *Client) CreatePlaylist(ctx context.Context, title string, videoIDs []string) (string, error) {
+	return c.CreatePlaylistAs(ctx, title, videoIDs, newPlaylistPrivacy)
+}
+
+// CreatePlaylistAs is CreatePlaylist of a playlist that privacy says who
+// may open: Unlisted, anyone with its link, to share it.
+func (c *Client) CreatePlaylistAs(ctx context.Context, title string, videoIDs []string, privacy media.Privacy) (string, error) {
+	status, ok := privacyStatuses[privacy]
+	if !ok {
+		return "", errors.New("no such privacy of a playlist: " + string(privacy))
+	}
 	if err := c.session(); err != nil {
 		return "", err
 	}
@@ -24,7 +36,7 @@ func (c *Client) CreatePlaylist(ctx context.Context, title string, videoIDs []st
 	case strings.ContainsAny(title, "<>"):
 		return "", errors.New("a playlist's name cannot hold < or >")
 	}
-	body := map[string]any{"title": title, "description": "", "privacyStatus": newPlaylistPrivacy}
+	body := map[string]any{"title": title, "description": "", "privacyStatus": status}
 	// The first tracks go with the playlist itself: YouTube turns down
 	// edits of a playlist made a moment ago.
 	if ids := uniqueIDs(videoIDs); len(ids) > 0 {
@@ -107,21 +119,28 @@ func (c *Client) RemoveFromPlaylist(ctx context.Context, playlistID, entryID, vi
 // isn't the account's, with 401 or 403, which leaves the session as it
 // was.
 func (c *Client) editPlaylist(ctx context.Context, playlistID string, action map[string]any, refused error) error {
+	_, err := c.editPlaylistAnswer(ctx, playlistID, action, refused, errNotYours)
+	return err
+}
+
+// editPlaylistAnswer is editPlaylist, which returns YouTube's answer too,
+// and refuses with denied an edit that YouTube answers with 401 or 403.
+func (c *Client) editPlaylistAnswer(ctx context.Context, playlistID string, action map[string]any, refused, denied error) (node, error) {
 	if err := c.session(); err != nil {
-		return err
+		return node{}, err
 	}
 	playlistID = strings.TrimPrefix(playlistID, "VL")
 	if playlistID == "" {
-		return errors.New("no playlist given")
+		return node{}, errors.New("no playlist given")
 	}
 	n, err := c.call(ctx, "browse/edit_playlist", map[string]any{"playlistId": playlistID, "actions": []any{action}}, nil)
 	if err != nil {
-		return c.refusedOrEnded(ctx, err, errNotYours)
+		return node{}, c.refusedOrEnded(ctx, err, denied)
 	}
 	if !strings.Contains(n.get("status").str(), "SUCCEEDED") {
-		return refusedEdit(n, refused)
+		return n, refusedEdit(n, refused)
 	}
-	return nil
+	return n, nil
 }
 
 // errRefused is a write YouTube answered without making it, as it does for

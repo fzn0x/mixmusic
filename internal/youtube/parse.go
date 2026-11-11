@@ -318,7 +318,7 @@ func markFromMenu(it media.Item, menu node) {
 	if p := it.Playlist; p != nil {
 		p.Deletable, p.Saved = playlistMenu(menu)
 		// Only its owner may delete a playlist, and they may edit it.
-		p.Editable = p.Deletable
+		p.Editable, p.Mine = p.Deletable, p.Deletable
 	}
 }
 

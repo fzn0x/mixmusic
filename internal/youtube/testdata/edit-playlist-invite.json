@@ -1,0 +1,18 @@
+{
+ "_fixture": "Written by hand from the documented shape of YouTube Music's answer to ACTION_CREATE_COLLABORATION_INVITE_LINK, not recorded: MIXMUSIC_LIVE=1 MIXMUSIC_YT_WRITE=1 MIXMUSIC_YT_COOKIES='SAPISID=…; …' MIXMUSIC_YT_RECORD=dir go test ./internal/youtube -run LiveCollaboration -v records it as collab-invite.json, to replace this one once its names and IDs are taken out.",
+ "responseContext": {
+  "serviceTrackingParams": [
+   {
+    "service": "GFEEDBACK",
+    "params": [
+     {
+      "key": "logged_in",
+      "value": "1"
+     }
+    ]
+   }
+  ]
+ },
+ "status": "STATUS_SUCCEEDED",
+ "collaborationInviteLink": "https://music.youtube.com/playlist?list=PLtestOwnPlaylist&jct=testJoinToken01"
+}

@@ -36,6 +36,9 @@ type shareTarget struct {
 	kind, title, subtitle string
 	art                   []media.Image
 	links                 []shareLink
+	// onService, if set, adds the items that put a mix on a service, to
+	// share its link there.
+	onService func(m *ui.Menu)
 }
 
 // songShare is the share of the song t: its link, and where MixMusic
@@ -117,7 +120,10 @@ func (s *shell) shareItem(m *ui.Menu, t shareTarget) {
 				s.notes = append(s.notes, notice("Copied the link"))
 			}
 		}
-		if len(t.links) > 0 {
+		if t.onService != nil {
+			t.onService(m)
+		}
+		if len(t.links) > 0 || t.onService != nil {
 			m.Separator()
 		}
 		if m.Item("Save image…").Chosen() {

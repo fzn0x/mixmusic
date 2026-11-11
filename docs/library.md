@@ -44,6 +44,7 @@ A mix is a playlist of MixMusic's own, which holds tracks of every service.
 - **Make one** with the New mix tile in Library › Mixes, the + beside Your mixes in the sidebar, Add to mix › New mix… in a track's menu, or Save as a new mix in the More menu of an album or a playlist, which copies its tracks.
 - **Add tracks** with Add to mix in a track's menu, then the mix's name. A track the mix holds already stays out, and the toast says Already in, with Add anyway, which adds it a second time.
 - **Copy a service's playlist** with Copy into a mix you can extend, in the playlist's More menu: the mix keeps its tracks, and any track can join them. A long playlist is read whole first, which can take a while.
+- **Share a mix** with Share › As a YouTube Music playlist…, in its More menu, signed in to YouTube Music: it becomes a playlist there that anyone with its link can open, as [Collaborating on playlists](#collaborating-on-playlists) tells.
 - **A mix's page** has Play, Shuffle and Download, the search and Sort of its tracks, and in its More menu Rename and Delete. Deleting asks first; the tracks stay where they came from. Remove from this mix, in a track's menu there, takes it out.
 - **Put a mix in order** by dragging a track onto another, which it takes the place of: a line shows where it goes. From the keyboard, <kbd>Tab</kbd> to a track's play button, then <kbd>Alt</kbd> <kbd>↑</kbd> and <kbd>Alt</kbd> <kbd>↓</kbd> (<kbd>⌥</kbd> <kbd>↑</kbd> and <kbd>⌥</kbd> <kbd>↓</kbd> on macOS) move it a place up or down, and the focus goes with it. The mix keeps its new order at once. While its tracks show sorted or searched, they don't move: choose the mix's own order in Sort and clear the search first.
 
@@ -91,11 +92,22 @@ Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a
 
 ## Spotify playlists, albums and artists
 
-Signed in to Spotify, Library › Spotify has your Playlists, your Albums, the Artists you follow, and Liked on Spotify.
+Signed in to Spotify, Library › Spotify has your Playlists, the Playlists you collaborate on, your Albums, the Artists you follow, and Liked on Spotify.
 
 - **Save** an album or a playlist, and **follow** an artist, from their pages, as for YouTube Music: it happens on Spotify.
-- **Spotify playlists** don't change from MixMusic. To add to one, copy it into a mix.
+- **Add a track** of Spotify's with Add to Spotify playlist in its menu, then one of your playlists, or one you collaborate on, which names who made it. Spotify's playlists hold Spotify's tracks alone: to mix in YouTube Music's, copy the playlist into a mix.
+- **Put a playlist in order** as you do a mix, your own or one you collaborate on, once its tracks are all read: it changes on Spotify too, one move at a time. A playlist that holds what MixMusic doesn't show, as podcast episodes or the local files of Spotify's app, doesn't move. When Spotify refuses a move, a toast says so and the playlist shows as Spotify keeps it.
 - Spotify shows an app in development mode, as your Spotify app is, the tracks of the playlists you own or collaborate on, not of playlists others made: MixMusic tells you when a playlist is one of those. [Spotify](spotify.md#what-spotify-allows-apps) lists the other limits.
+
+## Collaborating on playlists
+
+Others can add to a playlist of yours on YouTube Music or Spotify, from their own apps, once you let them.
+
+- **On YouTube Music,** Invite collaborators, in the More menu of a playlist of yours, turns YouTube Music's collaboration on and copies its invite link: whoever opens it can join the playlist and add to it. Collaborators can't open a private playlist, as the playlists MixMusic makes are at first: MixMusic asks first, then makes it unlisted, which anyone with its link can open, and which shows on none of your pages. Each invite makes a new link. **Stop collaboration**, in the same menu once the playlist has collaborators, or once you invited, turns it off.
+- **On Spotify,** Make collaborative, in the More menu of a playlist of yours, makes it collaborative, as Spotify's own apps do, and copies its link, for those who'll add to it. Spotify keeps collaborative playlists off your profile: for a playlist on it, MixMusic asks first. **Stop collaboration**, in the same menu, makes it yours alone again.
+- **Playlists others made that you collaborate on** have a shelf of their own in Library › Spotify, Playlists you collaborate on, with who made each. Their pages say collaborative, Add to Spotify playlist in a track's menu lists them, and they're put in order as yours are. On YouTube Music, a playlist you joined shows in Library › YouTube Music's Playlists, as YouTube Music lists it.
+- **A mix** becomes a playlist on YouTube Music to share it with Share › As a YouTube Music playlist…, in its More menu: name it, and MixMusic makes it, unlisted, with the mix's tracks, Spotify's found on YouTube Music first, copies its link and opens its page, where Invite collaborators lets others add to it. Save as a YouTube Music playlist, in the same menu, makes a private one instead.
+- **When a service refuses,** the toast says why: Spotify, for instance, lets only a playlist's owner make it collaborative, and an app in development mode, as yours is, only the accounts added to it.
 
 ## Long playlists
 

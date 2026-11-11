@@ -25,7 +25,19 @@
   answer the same add with its check skipped (`DEDUPE_OPTION_SKIP`):
   that, not the answer's words, which are in the account's language,
   tells it from other refusals (`ErrAlreadyInPlaylist`), and
-  `AddToPlaylistAnyway` sends it. It lists the
+  `AddToPlaylistAnyway` sends it. Collaboration on a playlist of the
+  user's goes through the same `browse/edit_playlist`: an action that
+  turns it on answers with an invite link (`InviteCollaborators`),
+  another closes the playlist to contributions (`StopCollaboration`), and
+  a private playlist, which collaborators can't open, is made unlisted
+  first (`SetPlaylistPrivacy`). A playlist page's header tells who may
+  open a playlist of the user's, in its tools, and whether its avatars
+  are its collaborators', by the panel they open: `Mine`, `Privacy` and
+  `Collaborative` of `media.Playlist`. Its tests read hand-written
+  answers of the shapes documented, which
+  `MIXMUSIC_LIVE=1 MIXMUSIC_YT_WRITE=1 go test ./internal/youtube -run LiveCollaboration`
+  records, with a second account in `MIXMUSIC_YT_COOKIES2` to join as a
+  collaborator. It lists the
   Google accounts of the session and their brand channels, from YouTube's
   website, and uses a brand channel by its page ID: one whose page ID the
   list doesn't tell is listed as `Unswitchable`, as without it the account
@@ -42,7 +54,13 @@
   dislike a song and take the dislike back).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
-  library), and controls Spotify Connect devices.
+  library), and controls Spotify Connect devices. It changes the
+  playlists the user may: adds tracks, moves one by its place in the
+  playlist, which only a playlist whose items MixMusic all shows has, and
+  makes one of the user's collaborative, off their profile, as Spotify
+  asks. A playlist is `Mine` when its owner is the user signed in. A 403
+  of such a change that isn't one of development mode's refusals is
+  `ErrPlaylistRefused`, which says who may change what.
 - **`internal/sysproxy`** picks the proxy of every request MixMusic makes,
   as the `Proxy` of `http.DefaultTransport`, which the clients use or
   clone: the environment's (`HTTPS_PROXY` and the like) when it names

@@ -14,7 +14,8 @@ import (
 // Putting a mix in order: the user drags a track of it onto another, which
 // it takes the place of, or moves it a place up or down with Alt+Up and
 // Alt+Down, as the queue's entries are dragged (reorderable). The mix is
-// saved at once. A playlist of the user's on YouTube Music moves there too.
+// saved at once. A playlist of the user's on YouTube Music moves there too,
+// and one on Spotify they may change, there (collab.go).
 
 // rowDrag is a track of a list dragged, by the list's key and its place
 // in the list.
@@ -69,15 +70,18 @@ func (s *shell) movable(row, lead ui.Element, key string, i, n int, move func(fr
 }
 
 // playlistMove is how the page of key moves the tracks of p, as read in
-// r: a mix's, and those of a playlist of the user's on YouTube Music once
-// it's read whole, while the list shows them in their own order. It's nil
-// for the others, which don't move.
+// r: a mix's, and those of a playlist of the user's on YouTube Music, or
+// one on Spotify they may change, once it's read whole, while the list
+// shows them in their own order. It's nil for the others, which don't
+// move.
 func (s *shell) playlistMove(key string, r *playlistRead, p media.Playlist) func(from, to int) {
 	switch {
 	case r.reading || !s.inOwnOrder(key):
 		return nil
 	case p.Source == media.SourceLocal:
 		return func(from, to int) { s.moveInMix(r, p.ID, from, to) }
+	case s.spotifyMovable(r, p):
+		return func(from, to int) { s.moveOnSpotifyPlaylist(key, r, p, from, to) }
 	case p.Source == media.SourceYouTube && p.Editable && s.signedIn(media.SourceYouTube) && placed(r.p.Tracks):
 		return func(from, to int) { s.moveOnYouTubePlaylist(key, r, p, from, to) }
 	}

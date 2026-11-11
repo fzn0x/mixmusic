@@ -302,7 +302,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if n == 0 {
 			n = len(tracks)
 		}
-		facts := texts(owner, plural(n, "track"))
+		facts := texts(owner, collaborativeFact(p), plural(n, "track"))
 		if !r.reading && r.err == nil && len(tracks) > 0 {
 			facts = append(facts, fact{text: longDuration(r.length)})
 		}
@@ -310,7 +310,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if local {
 			importID = ""
 		}
-		menu := s.withShare(s.collectionMenu(p.Title, whole.Tracks, p.URL, p.Source, importID), playlistShare(p))
+		menu := s.withShare(s.collectionMenu(p.Title, whole.Tracks, p.URL, p.Source, importID), s.mixShare(p, whole.Tracks))
 		if local {
 			base := menu
 			menu = func(m *ui.Menu) {
@@ -328,6 +328,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		// The download goes before the delete, which ends the menu.
 		d := playlistDownload(whole)
 		menu = s.withDownload(menu, d)
+		menu = s.withCollab(menu, &res.value)
 		if p.Deletable && p.Source == media.SourceYouTube {
 			base := menu
 			menu = func(m *ui.Menu) {

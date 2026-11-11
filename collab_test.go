@@ -241,8 +241,8 @@ func findFold(tt *ui.Tester, label string) (ui.Rect, bool) {
 
 // TestInviteCollaborators invites collaborators to a playlist of the
 // user's on YouTube Music, asking first to make a private one unlisted,
-// and copies the invite link; then Stop collaboration turns it off. The
-// page tells the playlist is collaborative meanwhile.
+// and copies the invite link; then Stop collaboration, once agreed, turns
+// it off. The page tells the playlist is collaborative meanwhile.
 func TestInviteCollaborators(t *testing.T) {
 	asks := answerCollab(t)
 	copied := copies(t)
@@ -290,8 +290,15 @@ func TestInviteCollaborators(t *testing.T) {
 		t.Errorf("YouTube was asked %q", got)
 	}
 
-	asks.hold()
 	choosePage(t, s, tt, "Stop collaboration")
+	if q := s.asking; q == nil || q.ok != "stop" || !strings.Contains(q.message, "takes the collaborators off Lantern songs") {
+		t.Fatalf("stopping asks %+v", q)
+	}
+	if got := asks.asked(); got[len(got)-1] == "stop yt:PLlanterns" {
+		t.Fatal("stopped before the user agreed")
+	}
+	asks.hold()
+	click(t, s, tt, "stop")
 	asks.release()
 	heard(t, s, "Stopped collaboration on Lantern songs", false)
 	if got := asks.asked(); got[len(got)-1] != "stop yt:PLlanterns" {

@@ -28,6 +28,10 @@
   --ta-panel: #121212;
   --ta-panel-2: #1d1d1d;
   --ta-line: rgba(255, 255, 255, 0.09);
+  /* A key of the shortcuts card: the page's dark key, in the light scheme
+     too, as the card stays dark. */
+  --ta-key: #2a2a2a;
+  --ta-key-edge: rgba(0, 0, 0, 0.35);
   --ta-row: 28px;
 }
 
@@ -404,7 +408,7 @@
 .ta-keysact .ta-win::before { content: ""; position: absolute; left: 10px; top: 9px; width: 30px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); }
 .ta-keysact .ta-win::after { content: ""; position: absolute; left: 10px; right: 14px; top: 24px; height: 28px; border-radius: 4px; background: repeating-linear-gradient(#1c1c1c 0 5px, transparent 5px 11px); }
 .ta-keysact .ta-keys { display: flex; gap: 6px; }
-.ta-keysact kbd { margin: 0; transition: transform 140ms var(--ta-ease), background-color 140ms, color 140ms, box-shadow 140ms; }
+.ta-keysact kbd { margin: 0; background: var(--ta-key); box-shadow: inset 0 -2px 0 var(--ta-key-edge); color: var(--ta-ink); transition: transform 140ms var(--ta-ease), background-color 140ms, color 140ms, box-shadow 140ms; }
 .ta-keysact kbd.is-down { transform: translateY(2px); background: var(--ta-accent); color: #000; box-shadow: inset 0 0 0 transparent; }
 .ta-keysact .ta-np { padding: 8px; border-radius: 12px; background: var(--ta-panel-2); }
 .ta-keysact .ta-flip { display: grid; overflow: hidden; }

@@ -148,8 +148,16 @@ func (s *shell) invite(p *media.Playlist, unlist bool) {
 	})
 }
 
-// stopCollaboration turns YouTube Music's collaboration off for p.
+// stopCollaboration turns YouTube Music's collaboration off for p, once the
+// user agrees: YouTube Music takes its collaborators off it then, keeping
+// what they added, as its own switch warns.
 func (s *shell) stopCollaboration(p *media.Playlist) {
+	s.ask("stop collaboration", "Stopping collaboration takes the collaborators off "+p.Title+
+		", and its invite links stop working. What they added stays.", "stop", func() { s.stopNow(p) })
+}
+
+// stopNow is stopCollaboration, once the user agreed.
+func (s *shell) stopNow(p *media.Playlist) {
 	id, title := p.ID, p.Title
 	s.changeCollab(p, func(ctx context.Context) error { return stopOnYouTube(s, ctx, id) }, func(err error) {
 		if err != nil {

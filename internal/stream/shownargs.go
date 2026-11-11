@@ -8,7 +8,7 @@ import (
 )
 
 // hidden stands where ShownArgs hides a secret.
-const hidden = "<hidden>"
+const hidden = "(hidden)"
 
 // secretFlags are the options of yt-dlp whose next argument is a secret,
 // which ShownArgs hides: the file of the session, and what signs in.
@@ -80,5 +80,5 @@ func hideProxyLogin(addr string) string {
 		return addr
 	}
 	u.User = url.User(hidden)
-	return strings.Replace(u.String(), "%3Chidden%3E", hidden, 1)
+	return u.String()
 }

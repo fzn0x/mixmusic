@@ -35,7 +35,7 @@ func TestShownArgsHidesSecrets(t *testing.T) {
 func TestShownArgsJoinedFormsAndUnix(t *testing.T) {
 	got := strings.Join(shownArgs([]string{"--cookies=/home/someone/c.txt", "--cache-dir=/home/someone/.cache/x",
 		"--password=madeup", "--other-dir", "/home/someone2/x", "/home/someone"}, "/home/someone/"), " ")
-	want := "--cookies=<hidden> --cache-dir=~/.cache/x --password=<hidden> --other-dir /home/someone2/x ~"
+	want := "--cookies=(hidden) --cache-dir=~/.cache/x --password=(hidden) --other-dir /home/someone2/x ~"
 	if got != want {
 		t.Errorf("shown arguments = %q, want %q", got, want)
 	}

@@ -115,6 +115,19 @@ type TrackStream struct {
 	Size     int64
 	Duration time.Duration
 	Live     bool
+	// Route is how MixMusic found it, and Command, of a run of yt-dlp, the
+	// arguments it ran with, as yt-dlp's command line, without the file of
+	// the user's session, tokens, or their home folder (stream.ShownArgs).
+	Route   stream.Route
+	Command string
+	// AsAccount is set when it was asked for as the user's YouTube Music
+	// account, and not signed out.
+	AsAccount bool
+	// URL is the address of the audio, which the engine plays through its
+	// proxy. It stops working after a few hours, it is tied to the network
+	// that asked for it, and it may carry that network's IP address: it is
+	// never logged, and only shown to the user who copies it.
+	URL string
 }
 
 // engineLoaded returns what MixMusic's audio engine plays, while the
@@ -290,12 +303,28 @@ func readTrackFile(kind FileKind, path string, withTags bool) *TrackFile {
 // know its codec and its file by.
 func trackStream(s stream.Stream) *TrackStream {
 	ts := &TrackStream{Codec: codecName(s.Codec), Container: containerName(s.MimeType), Bitrate: s.Bitrate,
-		Size: s.Size, Duration: s.Duration, Live: s.Live}
+		Size: s.Size, Duration: s.Duration, Live: s.Live, Route: s.Route, AsAccount: s.AsAccount, URL: s.URL}
+	if len(s.Args) > 0 {
+		ts.Command = shellLine(append([]string{"yt-dlp"}, stream.ShownArgs(s.Args)...))
+	}
 	if s.Live && ts.Container == "" {
 		// The packed audio of HLS.
 		ts.Codec, ts.Container = "AAC", "ADTS"
 	}
 	return ts
+}
+
+// shellLine writes words as a command line: those with a space, a
+// semicolon or a quote in double quotes.
+func shellLine(words []string) string {
+	parts := make([]string, len(words))
+	for i, w := range words {
+		if w == "" || strings.ContainsAny(w, " \t;&|<>\"'") {
+			w = `"` + strings.ReplaceAll(w, `"`, `\"`) + `"`
+		}
+		parts[i] = w
+	}
+	return strings.Join(parts, " ")
 }
 
 // codecName names a codec as yt-dlp and YouTube's player API name it, as

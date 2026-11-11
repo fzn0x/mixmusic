@@ -154,12 +154,6 @@ func (s *shell) trackInfoBody(c *ui.Context, t media.Track, l *loaded[app.TrackI
 	s.trackCopies(c, t, l.value)
 }
 
-// trackCopies is where a song's copies are to show, side by side, the one
-// that plays marked, once MixMusic links the copies of a song (#340): on
-// Spotify, on YouTube Music, downloaded and on this computer. Until then a
-// song has none, and nothing shows here.
-func (s *shell) trackCopies(c *ui.Context, t media.Track, info app.TrackInfo) {}
-
 // trackByline is the artists and the album of t, as "M83 · Hurry Up,
 // We're Dreaming".
 func trackByline(t media.Track) string {

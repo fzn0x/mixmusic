@@ -55,7 +55,8 @@ songs.
 The [Library page](library.md#the-library-page)'s On this computer pivot
 shows how many tracks your folders hold, and:
 
-- **Songs:** every track, with Play, Shuffle and open files, a box that
+- **Songs:** every track, the [copies of one song](#copies-of-one-song)
+  once, with Play, Shuffle and open files, a box that
   searches the list, and a Sort menu: the list's own order, by album and
   track number, Title, Artist, Length or Plays.
 - **Albums:** the albums your files' tags name, with their covers. An
@@ -150,6 +151,46 @@ Vorbis files, and the tags of M4A files. WAV files can't be edited.
 - **A new cover takes the place of the pictures** the file holds, as a
   back cover, so that it's the one every player shows.
 
+## Copies of one song
+
+A library often holds a song more than once: an MP3 and a FLAC of it, or
+a single and the album's copy. MixMusic takes files of the same title
+and the same artists, in any order and regardless of case and accents,
+whose lengths are three seconds apart at most, as copies of one song:
+
+- **It shows once** in the songs of Library › On this computer, on its
+  artist's page and in the search, which finds it by the album of each
+  copy. Each album's page shows its own file, which plays that copy.
+- **It plays its best copy:** lossless (FLAC or WAV) before lossy, then
+  the higher bitrate, then the higher sample rate; a copy whose file
+  isn't there, as on a drive unplugged, gives way to the next.
+- **Play this copy**, in its menu, plays one of them, each named by its
+  format and its album, as FLAC · 24-bit · 96 kHz · Kites.
+- **2 copies…**, in its menu, shows them side by side, the one that
+  plays marked, with Play, and Unlink to take one out of the song: it
+  shows apart then, and isn't taken as a copy again by its tags. Below,
+  find a song of this computer to link as another copy, whatever its
+  title says, as a live take you count as the same song. A song without
+  copies has **Link a copy…** in its menu instead.
+- **Plays, likes and mixes follow the song**, not one of its files: the
+  history, your liked songs and your mixes keep the song, which counts
+  the plays of all its copies. A song you played, liked or mixed before
+  a copy of it came keeps them. Remove a copy and the song keeps them
+  all, and plays the one left; move the files elsewhere and the song is
+  found again by its title, artists and length. A copy you unlink leaves
+  them to the song.
+- **Edit info…** of a song with copies writes what you change to each of
+  them, so that they stay one song; Move to album… moves the copy that
+  plays. A copy whose tags you change to another song's leaves its song,
+  unless you linked it by hand.
+- [Track info](playing-music.md#track-info) shows its copies too, the
+  one that plays marked.
+
+Files without a title or an artist in their tags, as voice memos, are
+never taken as copies by themselves: link them by hand. MixMusic keeps
+the links in `local-copies.json` in your
+[data folder](data-and-privacy.md#the-data-folder), never in the files.
+
 ## When a file is gone
 
 A track whose file moved, was deleted, or is on a drive that isn't
@@ -194,8 +235,9 @@ a service doesn't apply to them:
 
 Nothing of your music files leaves your computer. MixMusic keeps an index
 of what your folders hold, their paths and tags, in `local-files.json` in
-your [data folder](data-and-privacy.md#the-data-folder), and their covers
-in the cache folder's `local-art`.
+your [data folder](data-and-privacy.md#the-data-folder), the copies of
+one song in `local-copies.json` beside it, and their covers in the cache
+folder's `local-art`.
 
 A track on this computer is treated as any other by the features that send
 what plays, as their settings say:

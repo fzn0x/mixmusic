@@ -52,6 +52,7 @@ func (a *App) openLocalFiles() error {
 		return err
 	}
 	a.localFiles = x
+	a.followCopies()
 	a.localScans.ctx, a.localScans.cancel = context.WithCancel(context.Background())
 	return nil
 }
@@ -240,20 +241,30 @@ func (l *LocalFiles) Open(paths []string) Opened {
 }
 
 // prepareFile is how a local track plays: from its file, in the engine,
-// without the network. One whose file is gone doesn't, and shows as
-// missing from then on.
+// without the network; a song with copies, from its best copy that's
+// there. One whose file is gone doesn't, and shows as missing from then
+// on.
 func (a *App) prepareFile(track media.Track) (PlaybackSource, error) {
-	path, ok := localfiles.PathOf(track.ID)
-	if !ok {
-		return PlaybackSource{}, fmt.Errorf("not a file of this computer: %s", track.ID)
+	for {
+		path, ok := a.localFiles.FileOf(track.ID)
+		switch {
+		case !ok && localfiles.IsSong(track.ID):
+			return PlaybackSource{}, errFileMissing
+		case !ok:
+			return PlaybackSource{}, fmt.Errorf("not a file of this computer: %s", track.ID)
+		}
+		id := localfiles.TrackID(path)
+		if info, err := os.Stat(path); err != nil || info.IsDir() {
+			a.localFiles.Gone(id)
+			if localfiles.IsSong(track.ID) {
+				continue // its next copy
+			}
+			return PlaybackSource{}, errFileMissing
+		}
+		a.localFiles.Found(id)
+		_, native, _ := media.ParseID(id)
+		return PlaybackSource{Mode: PlaybackStream, URL: schemeURL(streamScheme) + "file/" + native, Track: track, Cached: true}, nil
 	}
-	if info, err := os.Stat(path); err != nil || info.IsDir() {
-		a.localFiles.Gone(track.ID)
-		return PlaybackSource{}, errFileMissing
-	}
-	a.localFiles.Found(track.ID)
-	_, native, _ := media.ParseID(track.ID)
-	return PlaybackSource{Mode: PlaybackStream, URL: schemeURL(streamScheme) + "file/" + native, Track: track, Cached: true}, nil
 }
 
 // openFile opens, for the engine, the file of a local track, by the native

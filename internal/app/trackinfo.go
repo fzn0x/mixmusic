@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/audio"
-	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
@@ -140,7 +139,7 @@ func (p *Player) TrackInfo(ctx context.Context, t media.Track, now *player.Sourc
 	st := a.settings.Get()
 	info := TrackInfo{Plays: PlaysEngine, Playing: now != nil, EvenLoudness: st.Loudness, Levelling: st.Normalize}
 	if t.Source == media.SourceFile {
-		path, ok := localfiles.PathOf(t.ID)
+		path, ok := a.localFiles.FileOf(t.ID)
 		if !ok {
 			return TrackInfo{}, errors.New("not a file of this computer: " + t.ID)
 		}

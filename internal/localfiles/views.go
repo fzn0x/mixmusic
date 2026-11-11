@@ -73,8 +73,20 @@ func (x *Index) view() *views {
 	var artistOrder []string
 	for _, e := range entries {
 		t := e.track()
-		v.tracks = append(v.tracks, t)
-		v.text = append(v.text, fold(t.Title+" "+t.ArtistNames()+" "+e.Album+" "+strings.Join(e.AlbumArtists, " ")))
+		// A song with copies shows once, as its best copy, which its
+		// other copies' albums find too; an album shows its own files.
+		song, lead := x.copies.state.ofPath[e.Path], true
+		shown, text := t, t.Title+" "+t.ArtistNames()+" "+e.Album+" "+strings.Join(e.AlbumArtists, " ")
+		if song != nil {
+			lead, shown.ID = x.leadOf(song) == e.Path, song.id
+			for _, p := range song.copies[1:] {
+				text += " " + x.entries[p].Album
+			}
+		}
+		if lead {
+			v.tracks = append(v.tracks, shown)
+			v.text = append(v.text, fold(text))
+		}
 		if t.Album != nil {
 			a, ok := albumOf[t.Album.ID]
 			if !ok {
@@ -104,9 +116,9 @@ func (x *Index) view() *views {
 				artistOf[id] = r
 				artistOrder = append(artistOrder, id)
 			}
-			if slices.ContainsFunc(e.Artists, func(n string) bool { return fold(n) == fold(name) }) &&
-				!slices.ContainsFunc(r.TopTracks, func(t2 media.Track) bool { return t2.ID == t.ID }) {
-				r.TopTracks = append(r.TopTracks, t)
+			if lead && slices.ContainsFunc(e.Artists, func(n string) bool { return fold(n) == fold(name) }) &&
+				!slices.ContainsFunc(r.TopTracks, func(t2 media.Track) bool { return t2.ID == shown.ID }) {
+				r.TopTracks = append(r.TopTracks, shown)
 			}
 			if len(r.Artwork) == 0 {
 				r.Artwork = t.Artwork

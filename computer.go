@@ -356,7 +356,7 @@ func (s *shell) missingFile(t media.Track) bool {
 // localItems are the items of a track's menu of a track on this computer:
 // a way to its file.
 func (s *shell) localItems(m *ui.Menu, t media.Track) {
-	path, ok := localfiles.PathOf(t.ID)
+	path, ok := s.svc.LocalFiles.FileOf(t.ID)
 	if !ok || s.missingFile(t) {
 		return
 	}

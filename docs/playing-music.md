@@ -62,7 +62,8 @@ For lyrics, see [Share lines](lyrics.md#share-lines).
 - its format, as Opus in WebM, AAC in MP4 or FLAC, its bitrate, sample rate, bit depth (of FLAC and WAV), channels and length;
 - the file it plays from, with its size: a file on this computer, with its tags, its download, or the offline cache's copy. Show in Explorer (Show in Finder on macOS) opens the folder of a file on this computer or of a download;
 - of the track playing, what MixMusic's audio engine plays: from where, its 5.1 surround audio when it plays it, and whether it converts it to 48 kHz;
-- how loud it plays: YouTube's measure of it, and how far [Even loudness](#even-loudness-volume-levelling-and-the-volume) turns it down.
+- how loud it plays: YouTube's measure of it, and how far [Even loudness](#even-loudness-volume-levelling-and-the-volume) turns it down;
+- of a song on this computer with [copies](local-music.md#copies-of-one-song), each copy, the one that plays marked.
 
 It tells what MixMusic knows without asking a service: a track that hasn't played yet tells its format once it plays, as MixMusic finds its stream then. A Spotify track that Spotify plays, in MixMusic or on a Connect device, plays at the quality your Spotify account and Spotify's settings choose, and Spotify tells MixMusic nothing of its audio.
 

@@ -60,6 +60,9 @@ AppImage or archive copy's.
   the path, size, time of change and tags of each music file of the
   folders you added. The folders themselves are `musicFolders` in
   `settings.json`.
+- `local-copies.json`: the [copies of one song](local-music.md#copies-of-one-song)
+  among those files, the ones you linked or unlinked by hand, and what
+  each copy's audio is.
 - `queue.json`: up to 500 tracks of the queue, around the one playing,
   and where it was.
 - `positions.json`: where you left the latest 500 podcast episodes.

@@ -38,6 +38,7 @@ func (c *Collection) LikedIDs() []string {
 // Music tracks liked or unliked on YouTube Music. Liking a disliked track
 // takes the dislike back; the player hears of that from the caller.
 func (c *Collection) SetLiked(ctx context.Context, track media.Track, liked bool) error {
+	track = c.a.asSong(track)
 	if err := c.a.library.SetLiked(track, liked); err != nil {
 		return err
 	}
@@ -73,6 +74,7 @@ func (c *Collection) Disliked() []media.Track { return c.a.library.Disliked() }
 // the user's Spotify library, as an unlike does. The player hears of the
 // dislike from the caller, which tells it as the user asks.
 func (c *Collection) SetDisliked(ctx context.Context, track media.Track, disliked bool) error {
+	track = c.a.asSong(track)
 	unliked, err := c.a.library.SetDisliked(track, disliked)
 	if err != nil {
 		return err
@@ -98,7 +100,7 @@ func localID(id string) (string, error) {
 
 // CreatePlaylist makes a playlist, holding tracks.
 func (c *Collection) CreatePlaylist(title, description string, tracks []media.Track) (media.Playlist, error) {
-	return c.a.library.CreatePlaylist(title, description, tracks)
+	return c.a.library.CreatePlaylist(title, description, c.a.asSongs(tracks))
 }
 
 // UpdatePlaylist changes the title and the description of a playlist.
@@ -149,7 +151,7 @@ func (c *Collection) AddToPlaylist(ctx context.Context, id string, tracks []medi
 	if err != nil {
 		return err
 	}
-	return c.a.library.AddToPlaylist(native, tracks)
+	return c.a.library.AddToPlaylist(native, c.a.asSongs(tracks))
 }
 
 // RemoveFromPlaylist removes the track at index from a playlist.
@@ -183,7 +185,7 @@ func (c *Collection) ImportPlaylist(ctx context.Context, id string) (media.Playl
 // RecordPlay adds a track to the history, once it played long enough to
 // count.
 func (c *Collection) RecordPlay(track media.Track) error {
-	err := c.a.library.RecordPlay(track)
+	err := c.a.library.RecordPlay(c.a.asSong(track))
 	c.a.reportYouTubePlay(track)
 	return err
 }

@@ -31,7 +31,7 @@ func (c *Collection) AddToMix(id string, tracks []media.Track) (held []media.Tra
 	if err != nil {
 		return nil, err
 	}
-	held, err = c.a.library.AddNewToPlaylist(native, tracks)
+	held, err = c.a.library.AddNewToPlaylist(native, c.a.asSongs(tracks))
 	if err == nil && len(tracks) > 0 && len(held) == len(tracks) {
 		err = ErrAlreadyInPlaylist
 	}
@@ -45,5 +45,5 @@ func (c *Collection) AddToMixAnyway(id string, tracks []media.Track) error {
 	if err != nil {
 		return err
 	}
-	return c.a.library.AddToPlaylistAgain(native, tracks)
+	return c.a.library.AddToPlaylistAgain(native, c.a.asSongs(tracks))
 }

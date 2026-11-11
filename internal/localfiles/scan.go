@@ -164,6 +164,7 @@ func (x *Index) scan(ctx context.Context, folders []string) error {
 	if err := x.save(); err != nil {
 		log.Printf("mixmusic: keeping the index of the music on this computer: %v", err)
 	}
+	x.relink()
 	return nil
 }
 

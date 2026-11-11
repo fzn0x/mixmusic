@@ -334,6 +334,8 @@ type shell struct {
 	// tagDialogs edit the tags of the music on this computer
 	// (localtags.go).
 	tagDialogs tagDialogs
+	// copies is the dialog of a song's copies (copies.go).
+	copies copiesView
 	// installing is set while yt-dlp installs, which installDone of
 	// installTotal bytes came of.
 	installing                bool

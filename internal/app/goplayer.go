@@ -97,8 +97,8 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 		p.CycleRepeat()
 	case CommandLike:
 		if cur, ok := p.State().Current(); ok {
-			liked := a.library.IsLiked(cur.Track.ID)
-			if !liked && a.library.IsDisliked(cur.Track.ID) {
+			liked := a.IsLiked(cur.Track.ID)
+			if !liked && a.IsDisliked(cur.Track.ID) {
 				// The like takes the dislike back.
 				p.Disliked(cur.Track.ID, false)
 			}
@@ -112,7 +112,7 @@ func (a *App) commandGoPlayer(p *player.Player, cmd PlayerCommand) {
 		}
 	case CommandDislike:
 		if cur, ok := p.State().Current(); ok {
-			a.dislikeGoPlayer(p, cur.Track, !a.library.IsDisliked(cur.Track.ID))
+			a.dislikeGoPlayer(p, cur.Track, !a.IsDisliked(cur.Track.ID))
 		}
 	case CommandPlayTrack:
 		p.PlayID(cmd.TrackID)
@@ -169,7 +169,7 @@ func (s playerServices) Radio(ctx context.Context, t media.Track) ([]media.Track
 // Skip passes over the tracks the user disliked, while the settings skip
 // those.
 func (s playerServices) Skip(t media.Track) string {
-	if s.a.settings.Get().SkipDisliked && s.a.library.IsDisliked(t.ID) {
+	if s.a.settings.Get().SkipDisliked && s.a.IsDisliked(t.ID) {
 		return player.SkipDisliked
 	}
 	return ""
@@ -212,7 +212,7 @@ func (s playerServices) Report(now player.Now) {
 		Speed:      now.Speed,
 	}
 	if now.Track != nil {
-		np.Liked = s.a.library.IsLiked(now.Track.ID)
+		np.Liked = s.a.IsLiked(now.Track.ID)
 	}
 	(&Player{s.a}).Report(np)
 }
@@ -325,10 +325,10 @@ func (a *App) Services() Services {
 }
 
 // IsLiked reports whether a track is among the liked songs.
-func (a *App) IsLiked(id string) bool { return a.library.IsLiked(id) }
+func (a *App) IsLiked(id string) bool { return a.library.IsLiked(a.songID(id)) }
 
 // IsDisliked reports whether the user dislikes a track.
-func (a *App) IsDisliked(id string) bool { return a.library.IsDisliked(id) }
+func (a *App) IsDisliked(id string) bool { return a.library.IsDisliked(a.songID(id)) }
 
 // InstallYTDLP downloads the latest yt-dlp into the app's data, telling
 // progress how much came, for the native interface.

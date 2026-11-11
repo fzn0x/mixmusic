@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"errors"
 	"math"
 	"os"
 	"path/filepath"
@@ -333,9 +334,7 @@ func TestRemoteKeyKept(t *testing.T) {
 	key := func() remote.Fingerprint {
 		a := newQuietApp(t, nil)
 		a.remote.keys = &secretStore{key: remoteSecret, keep: keep}
-		a.remote.mu.Lock()
-		defer a.remote.mu.Unlock()
-		id, err := a.identity()
+		id, err := a.identity(false)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -348,6 +347,113 @@ func TestRemoteKeyKept(t *testing.T) {
 	if _, ok := keep.kept[remoteSecret]; !ok {
 		t.Errorf("the credential store keeps %v", keep.kept)
 	}
+}
+
+// frameKeeper is a credential store that runs a frame as it reads or
+// keeps a secret, as mygo runs the window's events on the main thread
+// while the store answers.
+type frameKeeper struct {
+	*fakeKeeper
+	frame func()
+}
+
+func (k frameKeeper) Get(key string) ([]byte, error) {
+	k.frame()
+	return k.fakeKeeper.Get(key)
+}
+
+func (k frameKeeper) Set(key string, v []byte) error {
+	k.frame()
+	return k.fakeKeeper.Set(key, v)
+}
+
+// TestRemoteKeyWhileFramesRun turns remote control on, as at a start with
+// it on, and pairs, each the first use of the key, while frames run as
+// the key is read and kept: they show the code and the page, and a click
+// asks for the key again, which is told to try again (#464).
+func TestRemoteKeyWhileFramesRun(t *testing.T) {
+	n := remotetest.New()
+	desk := newRemoteApp(t, n, "Desktop")
+	if err := desk.Remote().SetOn(true); err != nil {
+		t.Fatal(err)
+	}
+	deskID := idOf(desk)
+	// frozen is set once a call froze: it holds r.mu for good, which
+	// closing would wait for.
+	frozen := false
+	// app is an app whose key the credential store keeps, which runs
+	// frames as it answers, each telling what the click got.
+	app := func(name string) (*App, *[]error) {
+		a := newQuietApp(t, func(o *Options) {
+			o.Remote = &RemoteOptions{Discovery: n, Listen: remotetest.Listen, Name: name, Timing: fastRemote}
+		})
+		t.Cleanup(func() {
+			if !frozen {
+				a.closeRemote()
+			}
+		})
+		var clicks []error
+		frame := func() {
+			a.Remote().Code()
+			a.Remote().View(deskID)
+			_, err := a.identity(false)
+			clicks = append(clicks, err)
+		}
+		a.remote.keys = &secretStore{key: remoteSecret, keep: frameKeeper{newKeeper(), frame}}
+		return a, &clicks
+	}
+	// unfrozen runs fn, failing if it doesn't return.
+	unfrozen := func(what string, fn func()) {
+		t.Helper()
+		done := make(chan struct{})
+		go func() {
+			defer close(done)
+			fn()
+		}()
+		select {
+		case <-done:
+		case <-time.After(10 * time.Second):
+			frozen = true
+			t.Fatalf("%s froze", what)
+		}
+	}
+	busy := func(clicks []error) {
+		t.Helper()
+		if len(clicks) == 0 {
+			t.Fatal("no frame ran as the key was read")
+		}
+		for _, err := range clicks {
+			if !errors.Is(err, errKeyBusy) {
+				t.Errorf("a click as the key was read got %v", err)
+			}
+		}
+	}
+
+	tab, clicks := app("Tablet")
+	var err error
+	unfrozen("turning remote control on", func() { err = tab.Remote().SetOn(true) })
+	if err != nil {
+		t.Fatal(err)
+	}
+	busy(*clicks)
+	tab.remote.mu.Lock()
+	on := tab.remote.server != nil
+	tab.remote.mu.Unlock()
+	if !on {
+		t.Error("remote control isn't on")
+	}
+
+	lap, clicks := app("Laptop")
+	lap.browseRemote()
+	unfrozen("pairing", func() { lap.Remote().Pair(deskID) })
+	busy(*clicks)
+	untilView(t, lap, deskID, "the code asked", func(v RemoteView) bool { return v.Step == RemoteCodeAsked })
+	code, ok := desk.Remote().Code()
+	if !ok || code.Name != "Laptop" {
+		t.Fatalf("the code shown: %+v, %v", code, ok)
+	}
+	lap.Remote().EnterCode(deskID, code.Code)
+	untilView(t, lap, deskID, "the session", func(v RemoteView) bool { return v.Step == RemoteConnected })
 }
 
 // TestRemoteStateOf tells the track that plays, with its cover only from

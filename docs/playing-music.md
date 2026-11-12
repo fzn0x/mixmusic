@@ -67,7 +67,7 @@ For lyrics, see [Share lines](lyrics.md#share-lines).
 - how loud it plays: YouTube's measure of it, and how far [Even loudness](#even-loudness-volume-levelling-and-the-volume) turns it down;
 - of a song on this computer with [copies](local-music.md#copies-of-one-song), each copy, the one that plays marked.
 
-It tells what MixMusic knows without asking a service: a track that hasn't played yet tells its format once it plays, as MixMusic finds its stream then. A Spotify track that Spotify plays, in MixMusic or on a Connect device, plays at the quality your Spotify account and Spotify's settings choose, and Spotify tells MixMusic nothing of its audio.
+It tells what MixMusic knows without asking a service: play a track to see its format, bitrate and the rest, as MixMusic finds its stream once it plays, and Track info says so until then. A Spotify track that Spotify plays, in MixMusic or on a Connect device, plays at the quality your Spotify account and Spotify's settings choose, and Spotify tells MixMusic nothing of its audio.
 
 ## Versions of an album
 

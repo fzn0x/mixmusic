@@ -177,7 +177,8 @@
       <a class="btn btn-outlined btn-small" href="https://github.com/fzn0x/mixmusic">
         <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg>
         <span>Star on GitHub</span>
-        <span class="stars" data-stars></span>
+        {%- set built_stars = load_data(path="data/stars.json", required=false) %}
+        <span class="stars" data-stars{% if built_stars %}{% if built_stars.count %} data-stars-built="{{ built_stars.count }}"{% endif %}{% endif %}></span>
       </a>
     </div>
   </header>

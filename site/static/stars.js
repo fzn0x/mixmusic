@@ -2,8 +2,11 @@
 // the docs: how many have starred MixMusic on GitHub, asked of GitHub's API
 // and kept in the browser for an hour, so that the pages ask at most once
 // an hour. When GitHub doesn't answer, or limits the requests of the
-// visitor's address, the count stays hidden. Its room is kept while it
-// loads (stars.css), so that nothing moves when it comes.
+// visitor's address, as it does for an address many visitors share, the
+// count is the one this browser kept last, however old, or else the one
+// the site was deployed with (data-stars-built, from site/data/stars.json);
+// with neither, it stays hidden. Its room is kept while it loads
+// (stars.css), so that nothing moves when it comes.
 (() => {
   const slots = document.querySelectorAll("[data-stars]");
   if (!slots.length) return;
@@ -30,6 +33,12 @@
     });
   };
   const hide = () => slots.forEach((slot) => (slot.hidden = true));
+  const built = Number(slots[0].dataset.starsBuilt);
+  const fallback = () => {
+    if (kept && Number.isInteger(kept.count) && kept.count >= 0) show(kept.count);
+    else if (Number.isInteger(built) && built > 0) show(built);
+    else hide();
+  };
 
   // Storage can be missing or refused, as in a private window: then the
   // count is asked for on each page.
@@ -52,5 +61,5 @@
       } catch {}
       show(count);
     })
-    .catch(hide);
+    .catch(fallback);
 })();

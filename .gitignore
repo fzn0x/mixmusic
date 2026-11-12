@@ -9,6 +9,8 @@ node_modules/
 /result-*
 /.mygo/
 /site/public/
+# The star count a deploy writes for the build (pages.yml, cloudflare.yml).
+/site/data/stars.json
 # The docs' pages, which go run ./tools/sitedocs makes from docs/*.md.
 /site/content/docs/*/
 # The Flatpak's inputs, and what flatpak-builder and its action leave.

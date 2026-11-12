@@ -1,0 +1,274 @@
+{
+ "_fixture": "Recorded 2026-11-12 by collab_live_test.go (MIXMUSIC_YT_RECORD, collab-addto-liked): playlist/get_add_to_playlist of Liked Music (playlistId LM), as an account that made no playlist and collaborates on one sees it. Names, IDs, the title and tokens are replaced; tracking parameters are taken out.",
+ "contents": [
+  {
+   "addToPlaylistRenderer": {
+    "actions": [
+     {
+      "buttonRenderer": {
+       "icon": {
+        "iconType": "ADD"
+       },
+       "isDisabled": false,
+       "navigationEndpoint": {
+        "createPlaylistEndpoint": {
+         "createPlaylistDialog": {
+          "createPlaylistDialogRenderer": {
+           "cancelButton": {
+            "buttonRenderer": {
+             "isDisabled": false,
+             "style": "STYLE_LIGHT_TEXT",
+             "text": {
+              "runs": [
+               {
+                "text": "Cancel"
+               }
+              ]
+             }
+            }
+           },
+           "createButton": {
+            "buttonRenderer": {
+             "isDisabled": false,
+             "style": "STYLE_PRIMARY",
+             "text": {
+              "runs": [
+               {
+                "text": "Create"
+               }
+              ]
+             }
+            }
+           },
+           "createPlaylistParamsCollaborationDisabled": "KAA%3D",
+           "createPlaylistParamsCollaborationEnabled": "KAE%3D",
+           "dialogTitle": {
+            "runs": [
+             {
+              "text": "New playlist"
+             }
+            ]
+           },
+           "errorMessages": [
+            {
+             "errorMessage": {
+              "runs": [
+               {
+                "text": "Change privacy to allow collaboration. "
+               },
+               {
+                "navigationEndpoint": {
+                 "urlEndpoint": {
+                  "target": "TARGET_NEW_WINDOW",
+                  "url": "https://support.google.com/youtubemusic/answer/7205933?nohelpkit=1"
+                 }
+                },
+                "text": "Learn more"
+               }
+              ]
+             },
+             "type": "CREATE_PLAYLIST_DIALOG_FIELD_ERROR_MESSAGE_TYPE_VISIBILITY_INVALID"
+            }
+           ],
+           "playlistCollaborateToggle": {
+            "switchListItemViewModel": {
+             "a11yLabelSwitchedOff": "Off",
+             "a11yLabelSwitchedOn": "On",
+             "isDisabled": false,
+             "title": {
+              "content": "Collaborate"
+             }
+            }
+           },
+           "privacyOption": {
+            "dropdownRenderer": {
+             "accessibility": {
+              "label": "Privacy"
+             },
+             "entries": [
+              {
+               "dropdownItemRenderer": {
+                "accessibility": {
+                 "label": "Public"
+                },
+                "descriptionText": {
+                 "runs": [
+                  {
+                   "text": "Anyone can search for and view"
+                  }
+                 ]
+                },
+                "icon": {
+                 "iconType": "PRIVACY_PUBLIC"
+                },
+                "int32Value": 1,
+                "isSelected": true,
+                "label": {
+                 "runs": [
+                  {
+                   "text": "Public"
+                  }
+                 ]
+                }
+               }
+              },
+              {
+               "dropdownItemRenderer": {
+                "accessibility": {
+                 "label": "Unlisted"
+                },
+                "descriptionText": {
+                 "runs": [
+                  {
+                   "text": "Anyone with the link can view"
+                  }
+                 ]
+                },
+                "icon": {
+                 "iconType": "LINK"
+                },
+                "int32Value": 2,
+                "isSelected": false,
+                "label": {
+                 "runs": [
+                  {
+                   "text": "Unlisted"
+                  }
+                 ]
+                }
+               }
+              },
+              {
+               "dropdownItemRenderer": {
+                "accessibility": {
+                 "label": "Private"
+                },
+                "descriptionText": {
+                 "runs": [
+                  {
+                   "text": "Only you can view"
+                  }
+                 ]
+                },
+                "icon": {
+                 "iconType": "LOCK"
+                },
+                "int32Value": 0,
+                "isSelected": false,
+                "label": {
+                 "runs": [
+                  {
+                   "text": "Private"
+                  }
+                 ]
+                }
+               }
+              }
+             ],
+             "label": "Privacy"
+            }
+           },
+           "titlePlaceholder": "Title"
+          }
+         },
+         "params": "CAI%3D",
+         "sourcePlaylistId": "LM"
+        }
+       },
+       "size": "SIZE_DEFAULT",
+       "style": "STYLE_PRIMARY",
+       "text": {
+        "runs": [
+         {
+          "text": "New playlist"
+         }
+        ]
+       }
+      }
+     }
+    ],
+    "playlists": [
+     {
+      "playlistAddToOptionRenderer": {
+       "addToPlaylistServiceEndpoint": {
+        "playlistEditEndpoint": {
+         "actions": [
+          {
+           "action": "ACTION_ADD_PLAYLIST",
+           "addedFullListId": "LM",
+           "dedupeOption": "DEDUPE_OPTION_CHECK"
+          }
+         ],
+         "playlistId": "PLtestCollab01"
+        }
+       },
+       "playlistId": "PLtestCollab01",
+       "shortBylineText": {
+        "runs": [
+         {
+          "text": "1"
+         },
+         {
+          "text": " track"
+         }
+        ]
+       },
+       "thumbnailRenderer": {
+        "musicThumbnailRenderer": {
+         "thumbnail": {
+          "thumbnails": [
+           {
+            "height": 90,
+            "url": "https://i.ytimg.com/vi/BH-SnQ8J1VU/default.jpg",
+            "width": 120
+           },
+           {
+            "height": 180,
+            "url": "https://i.ytimg.com/vi/BH-SnQ8J1VU/mqdefault.jpg",
+            "width": 320
+           },
+           {
+            "height": 360,
+            "url": "https://i.ytimg.com/vi/BH-SnQ8J1VU/hqdefault.jpg",
+            "width": 480
+           }
+          ]
+         },
+         "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+         "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FILL"
+        }
+       },
+       "title": {
+        "runs": [
+         {
+          "text": "Road songs"
+         }
+        ]
+       }
+      }
+     }
+    ],
+    "title": {
+     "runs": [
+      {
+       "text": "Save to playlist"
+      }
+     ]
+    }
+   }
+  }
+ ],
+ "responseContext": {
+  "serviceTrackingParams": [
+   {
+    "service": "GFEEDBACK",
+    "params": [
+     {
+      "key": "logged_in",
+      "value": "1"
+     }
+    ]
+   }
+  ]
+ }
+}

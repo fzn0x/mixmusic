@@ -99,6 +99,10 @@ type Track struct {
 	// EntryID names the track's place in the playlist it was read from,
 	// which taking it out of the playlist names; only YouTube Music sets it.
 	EntryID string `json:"entryId,omitempty"`
+	// Removable is set for a track the user may take out of the YouTube
+	// Music playlist it was read from: each of a playlist of theirs, and
+	// of one they collaborate on, those they added.
+	Removable bool `json:"removable,omitempty"`
 	// Episode is set for a podcast's episode: what it has besides a
 	// track's.
 	Episode *Episode `json:"episode,omitempty"`

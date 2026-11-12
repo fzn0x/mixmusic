@@ -2,7 +2,8 @@
 # preview it, `zola --root site build` to build it into site/public, after
 # `go run ./tools/sitedocs`, which makes the docs' pages from docs/*.md, the
 # folders of docs/ with a README.md, and CONTRIBUTING.md, CODE_OF_CONDUCT.md
-# and SECURITY.md.
+# and SECURITY.md. Then `go run ./tools/sitefinish` makes the landing page
+# in each language of i18n/, the sitemap's alternates and llms.txt.
 #
 # templates/index.html is the landing page; static/ holds its stylesheet,
 # script and assets, copied as they are, and data/faq.toml the questions

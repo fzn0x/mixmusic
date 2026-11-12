@@ -6,6 +6,11 @@
   "use strict";
 
   const REPO = "fzn0x/mixmusic";
+  // The page in another language is a folder down (tools/sitefinish):
+  // its root, "../", leads the addresses of the assets set here.
+  const ROOT = document.documentElement.dataset.root || "";
+  // The words set here, in the page's language (partials/theme.html).
+  const text = window.mmText || ((key, english, vars = {}) => english.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m)));
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -18,6 +23,46 @@
   const raise = () => appbar.classList.toggle("is-raised", scrollY > 8);
   addEventListener("scroll", raise, { passive: true });
   raise();
+
+  // The bar's labels stay on one line inside it in every language. How wide
+  // they are depends on the language and the fonts, so the widths at which
+  // they no longer fit are measured, not set: where they don't, the GitHub
+  // button keeps its star and count (is-compact), and then the sections'
+  // links go (is-tight), as on a phone. It runs again once the fonts are in,
+  // and whenever the bar's width changes, with the window's. It watches
+  // that width alone, which nothing it changes inside the bar can change,
+  // so it can't set itself off. Watching the GitHub button, whose size it
+  // changes, and the window's resize, which WebKit also fires as a
+  // scrollbar comes and goes, could: the bar's check timed out in WebKit on
+  // Linux with them. The star count has its room kept (stars.css), so it
+  // doesn't move the bar's labels when it comes.
+  const bar = $(".appbar-inner", appbar);
+  const overflows = () => {
+    const box = bar.getBoundingClientRect();
+    const style = getComputedStyle(bar);
+    const start = box.left + parseFloat(style.paddingLeft);
+    const end = box.right - parseFloat(style.paddingRight);
+    return [...bar.children].some((el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && (r.left < start - 0.5 || r.right > end + 0.5);
+    });
+  };
+  const fit = () => {
+    appbar.classList.remove("is-compact", "is-tight");
+    if (!overflows()) return;
+    appbar.classList.add("is-compact");
+    if (overflows()) appbar.classList.add("is-tight");
+  };
+  let width = -1;
+  const refit = () => {
+    if (bar.clientWidth === width) return;
+    width = bar.clientWidth;
+    fit();
+  };
+  refit();
+  document.fonts?.ready.then(fit);
+  if ("ResizeObserver" in window) new ResizeObserver(refit).observe(bar);
+  else addEventListener("resize", refit);
 
   // Two images stacked in one frame: the next one fades in over the shown
   // one once it has loaded, so the frame never flashes empty.
@@ -64,7 +109,7 @@
       });
       const panel = $(`#${tab.getAttribute("aria-controls")}`);
       tabs.style.setProperty("--glow", tab.dataset.accent);
-      show(`assets/shots/${panel.dataset.shot}.webp`, panel.dataset.alt);
+      show(`${ROOT}assets/shots/${panel.dataset.shot}.webp`, panel.dataset.alt);
       if (focus) tab.focus();
     };
     list.forEach((tab, i) => {
@@ -78,7 +123,7 @@
       // Warm the next screenshot on the way to it.
       const pre = new Image();
       tab.addEventListener("pointerenter", () => {
-        pre.src = `assets/shots/${$(`#${tab.getAttribute("aria-controls")}`).dataset.shot}.webp`;
+        pre.src = `${ROOT}assets/shots/${$(`#${tab.getAttribute("aria-controls")}`).dataset.shot}.webp`;
       }, { once: true });
     });
   }
@@ -140,7 +185,7 @@
     const toggle = () => (video.paused ? video.play().catch(() => {}) : video.pause());
     const state = () => {
       play.classList.toggle("is-playing", !video.paused);
-      play.setAttribute("aria-label", video.paused ? "Play the video" : "Pause the video");
+      play.setAttribute("aria-label", video.paused ? text("video_play", "Play the video") : text("video_pause", "Pause the video"));
     };
     play.addEventListener("click", toggle);
     video.addEventListener("click", toggle);
@@ -172,7 +217,7 @@
     const name = $("[data-gallery-name]", gallery);
     const desc = $("[data-gallery-desc]", gallery);
     const chips = $$("[data-kind]", gallery);
-    const src = (chip) => `assets/shots/${chip.dataset.kind}-${chip.dataset.id}.webp`;
+    const src = (chip) => `${ROOT}assets/shots/${chip.dataset.kind}-${chip.dataset.id}.webp`;
     chips.forEach((chip) => {
       const pre = new Image();
       chip.addEventListener("pointerenter", () => (pre.src = src(chip)), { once: true });
@@ -184,9 +229,9 @@
           c.classList.toggle("is-current", on);
           c.setAttribute("aria-pressed", String(on));
         });
-        const other = layout ? "the Mix theme" : "the Blend layout";
-        show(src(chip), `MixMusic's home page in the ${chip.dataset.name} ${layout ? "layout" : "theme"} and ${other}.`);
-        name.textContent = `${chip.dataset.name}, in ${other}`;
+        const named = { name: chip.dataset.name };
+        show(src(chip), layout ? text("gallery_layout", "MixMusic's home page in the {name} layout and the Mix theme.", named) : text("gallery_theme", "MixMusic's home page in the {name} theme and the Blend layout.", named));
+        name.textContent = layout ? text("gallery_name_layout", "{name}, in the Mix theme", named) : text("gallery_name_theme", "{name}, in the Blend layout", named);
         desc.textContent = chip.dataset.desc;
         const accent = $(".dots i:nth-child(2)", chip)?.style.background;
         gallery.style.setProperty("--glow", accent || "#cf6e74");
@@ -234,7 +279,7 @@
 
     function drawSong() {
       const t = song();
-      const cover = `assets/covers/cover-${t.cover}.webp`;
+      const cover = `${ROOT}assets/covers/cover-${t.cover}.webp`;
       all("[data-cover]").forEach((img) => (img.src = cover));
       all("[data-cover-alt]").forEach((img) => (img.alt = `A cover made for ${t.title} on this page`));
       all("[data-title]").forEach((e) => (e.textContent = t.title));
@@ -271,7 +316,7 @@
       const b = document.createElement("button");
       b.type = "button";
       b.innerHTML = `<img alt="" width="40" height="40" /><span class="r-text"><b></b><small></small></span><span class="r-time"></span>`;
-      $("img", b).src = `assets/covers/cover-${t.cover}.webp`;
+      $("img", b).src = `${ROOT}assets/covers/cover-${t.cover}.webp`;
       $("b", b).textContent = t.title;
       $("small", b).textContent = ARTIST;
       $(".r-time", b).textContent = clock(t.dur);
@@ -318,7 +363,7 @@
     function load() {
       if (loaded === st.order[st.pos]) return;
       loaded = st.order[st.pos];
-      audio.src = `assets/music/${song().file}.m4a`;
+      audio.src = `${ROOT}assets/music/${song().file}.m4a`;
       audio.playbackRate = SPEEDS[st.speed];
     }
     // A song picked by hand plays, disliked or not.
@@ -708,7 +753,7 @@
         : "other";
   const names = { mac: "macOS", windows: "Windows", linux: "Linux" };
   if (names[os]) {
-    $$("[data-download-label]").forEach((label) => (label.textContent = `Download for ${names[os]}`));
+    $$("[data-download-label]").forEach((label) => (label.textContent = text("download_for", "Download for {os}", { os: names[os] })));
     $(`.system[data-os="${os}"]`)?.classList.add("is-yours");
   }
   if (mac) {

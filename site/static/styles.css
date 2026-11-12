@@ -179,7 +179,7 @@ code {
 
 .skip {
   position: absolute;
-  left: 16px;
+  inset-inline-start: 16px;
   top: -64px;
   z-index: 20;
   padding: 10px 16px;
@@ -269,7 +269,10 @@ code {
   text-decoration: none;
 }
 .brand:hover { color: var(--ink); }
-.appbar-nav { display: flex; gap: 4px; margin-left: auto; }
+/* What follows the brand sits at the bar's far end, in either direction
+   and whichever of it shows. */
+.appbar-inner > .brand { margin-inline-end: auto; }
+.appbar-nav { display: flex; gap: 4px; }
 .appbar-nav a {
   white-space: nowrap;
   padding: 8px 14px;
@@ -291,7 +294,8 @@ code {
   place-items: center;
   width: 40px;
   height: 40px;
-  margin: 0 -12px 0 -8px;
+  margin-block: 0;
+  margin-inline: -8px -12px;
   border: 0;
   border-radius: 50%;
   background: none;
@@ -314,6 +318,57 @@ code {
 .theme-toggle:hover::after { opacity: 0.08; }
 .theme-toggle:active::after { opacity: 0.14; }
 html:not(.js) .theme-toggle { display: none; }
+
+/* The language menu: the landing page in each language, which
+   tools/sitefinish lists. A details element, so it opens without
+   script, beside the theme's button and in its look. */
+.lang-menu { position: relative; flex: none; margin-block: 0; margin-inline: -8px -12px; }
+.lang-menu > summary {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--ink-2);
+  cursor: pointer;
+  list-style: none;
+  transition: color var(--fast) var(--ease), background-color var(--fast) var(--ease);
+}
+.lang-menu > summary::-webkit-details-marker { display: none; }
+.lang-menu > summary:hover,
+.lang-menu[open] > summary { color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.lang-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline-end: 0;
+  z-index: 20;
+  min-width: 210px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  background: var(--surface-1);
+  border: 1px solid var(--outline);
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.2);
+}
+.lang-list a {
+  display: block;
+  padding: 9px 14px;
+  border-radius: 10px;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+.lang-list a:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.lang-list a[aria-current="page"] { font-weight: 800; box-shadow: inset 3px 0 0 currentColor; }
+.lang-list a[aria-current="page"]:dir(rtl) { box-shadow: inset -3px 0 0 currentColor; }
+/* Shut, the list takes no room: some browsers still lay out what a shut
+   <details> holds. */
+.lang-menu:not([open]) > .lang-list { display: none; }
+/* Each name lines up with the list, Urdu's too on a page read left to
+   right. */
+.lang-list a { text-align: match-parent; }
 
 /* Layout. */
 
@@ -664,10 +719,10 @@ kbd {
 .look-group .chips { margin-top: 10px; }
 .look-label { font-weight: 750; font-size: 1.0625rem; }
 .chips-themes { gap: 6px; }
-.chip-theme { padding-left: 10px; }
+.chip-theme { padding-inline-start: 10px; }
 .dots { display: inline-flex; }
 .dots i { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--dot-ring); }
-.dots i + i { margin-left: -3px; }
+.dots i + i { margin-inline-start: -3px; }
 .gallery .chip.is-current { background: var(--ink); color: var(--bg); box-shadow: none; }
 
 .columns {
@@ -723,7 +778,7 @@ kbd {
   display: none;
   position: absolute;
   top: 16px;
-  right: 16px;
+  inset-inline-end: 16px;
   padding: 4px 10px;
   border-radius: 999px;
   background: var(--surface-3);
@@ -794,6 +849,16 @@ kbd {
   padding-bottom: 40px;
 }
 .footer-inner p { flex: 1; color: var(--ink-2); font-size: 0.875rem; max-width: 70ch; }
+/* The landing page's languages, under the footer's line. */
+.footer-langs {
+  max-width: calc(var(--max) + 2 * var(--gutter));
+  margin: -16px auto 0;
+  padding: 0 var(--gutter) 32px;
+}
+.footer-langs ul { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: 0.875rem; }
+.footer-langs a { color: var(--ink-2); text-decoration: none; }
+.footer-langs a:hover { color: var(--ink); text-decoration: underline; }
+.footer-langs a[aria-current="page"] { color: var(--ink); font-weight: 700; }
 .brand-small { font-size: 1rem; }
 
 /* The wordmark at the foot, across the content's width at every size: in
@@ -1293,6 +1358,20 @@ html.no-js .demo-wrap { display: none; }
   }
 }
 
+/* Where a language's words don't fit in the bar at a width (app.js
+   measures it, as the fonts and the words decide it), the GitHub button
+   keeps its star and count, and then the sections' links go, as on a
+   phone. */
+.appbar.is-compact .appbar-inner .btn > span:first-of-type {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.appbar.is-tight .appbar-nav { display: none; }
+
 @media (max-width: 960px) {
   .tab-body,
   .gallery,
@@ -1304,9 +1383,6 @@ html.no-js .demo-wrap { display: none; }
 
 @media (max-width: 760px) {
   .appbar-nav { display: none; }
-  .appbar-inner .btn,
-  .appbar-inner .theme-toggle { margin-left: auto; }
-  html.js .appbar-inner .theme-toggle + .btn { margin-left: 0; }
   .columns,
   .needs dl,
   .links { grid-template-columns: minmax(0, 1fr); }

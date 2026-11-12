@@ -8,6 +8,8 @@
 // tables that scroll sideways take the keyboard's focus, to scroll them.
 (() => {
   const d = document;
+  // The words said here, in the page's language (partials/theme.html).
+  const text = window.mmText || ((key, english, vars = {}) => english.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m)));
   // The docs' tables scroll sideways in a narrow window: the keyboard can
   // reach them, to scroll them with the arrow keys.
   d.querySelectorAll(".prose table").forEach((table) => (table.tabIndex = 0));
@@ -74,7 +76,7 @@
     // A block that scrolls sideways can be scrolled with the arrow keys
     // once the keyboard can reach it.
     pre.tabIndex = 0;
-    const label = pre.dataset.copy || "Copy the code";
+    const label = pre.dataset.copy || text("copy_code", "Copy the code");
     const b = d.createElement("button");
     b.type = "button";
     b.className = "icon-btn copy";
@@ -96,8 +98,8 @@
     b.addEventListener("click", async () => {
       clearTimeout(back);
       if (await copy(code.textContent.replace(/\n$/, ""), b)) {
-        look("done", "Copied");
-        say("Copied");
+        look("done", text("copied", "Copied"));
+        say(text("copied", "Copied"));
       } else {
         // Nothing could copy: the block is selected for the keyboard.
         const range = d.createRange();
@@ -106,8 +108,8 @@
         sel.removeAllRanges();
         sel.addRange(range);
         const keys = mac ? "⌘C" : "Ctrl+C";
-        look("copy", `Press ${keys}`);
-        say(`Selected. Press ${keys} to copy it.`);
+        look("copy", text("press_keys", "Press {keys}", { keys }));
+        say(text("selected_press", "Selected. Press {keys} to copy it.", { keys }));
       }
       back = setTimeout(() => look("copy"), 2000);
     });

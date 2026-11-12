@@ -49,6 +49,24 @@ test.describe("languages", () => {
     expect(await page.evaluate(() => document.documentElement.lang)).toBe("pt-BR");
   });
 
+  // The menu drops from the globe toward the page's middle: leftward on a
+  // page read left to right, rightward on one read right to left.
+  for (const path of ["/", "/ur/"]) {
+    test(`the language menu opens inside the window, on ${path}`, async ({ page }) => {
+      await load(page, path);
+      for (const width of [390, 820, 1280]) {
+        await page.setViewportSize({ width, height: 800 });
+        await page.locator(".lang-menu > summary").click();
+        const r = await page.locator(".lang-list").boundingBox();
+        expect(r, `the menu at ${width}px`).not.toBeNull();
+        expect(r.x, `the menu's left edge at ${width}px`).toBeGreaterThanOrEqual(0);
+        expect(r.x + r.width, `the menu's right edge at ${width}px`).toBeLessThanOrEqual(width);
+        await page.locator(".lang-menu > summary").click();
+        await expect(page.locator(".lang-list")).toBeHidden();
+      }
+    });
+  }
+
   test("the sitemap lists every language's page, and llms.txt the docs", async ({ request }) => {
     const sitemap = await (await request.get("/sitemap.xml")).text();
     for (const l of languages) expect(sitemap).toContain(`/${l.dir}/</loc>`);

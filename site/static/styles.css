@@ -361,7 +361,13 @@ html:not(.js) .theme-toggle { display: none; }
 }
 .lang-list a:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
 .lang-list a[aria-current="page"] { font-weight: 800; box-shadow: inset 3px 0 0 currentColor; }
-.lang-list a[dir="rtl"] { text-align: right; }
+.lang-list a[aria-current="page"]:dir(rtl) { box-shadow: inset -3px 0 0 currentColor; }
+/* Shut, the list takes no room: some browsers still lay out what a shut
+   <details> holds. */
+.lang-menu:not([open]) > .lang-list { display: none; }
+/* Each name lines up with the list, Urdu's too on a page read left to
+   right. */
+.lang-list a { text-align: match-parent; }
 
 /* Layout. */
 

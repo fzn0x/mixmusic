@@ -597,3 +597,70 @@ func TestShareMixOnYouTube(t *testing.T) {
 		t.Error("signed out, Share offers YouTube Music")
 	}
 }
+
+// tideTracks are the tracks of tideList: the user added the second.
+var tideTracks = func() []media.Track {
+	tracks := slices.Clone(laneTracks)
+	tracks[0].EntryID, tracks[1].EntryID, tracks[1].Removable = "E1", "E2", true
+	return tracks
+}()
+
+// tideList is a playlist of another account's on YouTube Music that the
+// user collaborates on, as the library and its page tell.
+var tideList = media.Playlist{ID: "yt:PLtide", Source: media.SourceYouTube, Title: "Tide songs", Owner: "Ana Testwood",
+	Editable: true, Collaborative: true, Saved: true, Tracks: tideTracks, TrackCount: 2,
+	URL: "https://music.youtube.com/playlist?list=PLtide"}
+
+// TestYouTubeCollaboration offers, on the page of a YouTube Music playlist
+// of another's the user collaborates on, to take out only the tracks they
+// added, while every track of a playlist of theirs may go; lists it in the
+// library's shelf of collaborations, apart from theirs; and adds a track
+// to it from the track's menu, which tells whose it is.
+func TestYouTubeCollaboration(t *testing.T) {
+	_, tt := collabShell(t, signedInTo(true, false), tideList)
+	if items := menuOf(t, tt, tideTracks[0].Title); slices.Contains(items, "Remove from this playlist") {
+		t.Errorf("a track of the owner's offers to go: %q", items)
+	}
+	if items := menuOf(t, tt, tideTracks[1].Title); !slices.Contains(items, "Remove from this playlist") {
+		t.Errorf("the track the user added doesn't offer to go: %q", items)
+	}
+	_, tt = collabShell(t, signedInTo(true, false), lanternList)
+	if items := menuOf(t, tt, laneTracks[0].Title); !slices.Contains(items, "Remove from this playlist") {
+		t.Errorf("a track of the user's playlist doesn't offer to go: %q", items)
+	}
+
+	s := newTestShell(t)
+	s.loads["accounts"] = signedInTo(true, false)
+	s.loads["youtube:playlists"] = &loaded[[]media.Playlist]{done: true, value: []media.Playlist{lanternList, tideList}}
+	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true}
+	s.loads["youtube:artists"] = &loaded[[]media.Artist]{done: true}
+	s.loads["youtube:liked"] = &loaded[media.Playlist]{done: true}
+	tt = testerOf(t, s, 1280, 1400)
+	show(s, tt, "/library/youtube")
+	shelf, ok := findFold(tt, "Playlists you collaborate on")
+	if !ok {
+		t.Fatalf("no shelf of collaborations: %q", tt.Texts())
+	}
+	for title, below := range map[string]bool{tideList.Title: true, lanternList.Title: false} {
+		if r, ok := tt.Find(title); !ok || (r.Y > shelf.Y) != below {
+			t.Errorf("%s shows at %v (%v), the shelf of collaborations at %v", title, r, ok, shelf)
+		}
+	}
+
+	f := &fakeAdds{}
+	addsFor(t, f)
+	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: media.Album{ID: "al-x", Title: "Mezzanine", Tracks: testTracks[:2]}}
+	show(s, tt, "/album/al-x")
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", "Tide songs · Ana Testwood"); err != nil {
+		t.Fatal(err)
+	}
+	if !toasted(t, s, tt, "Added "+testTracks[0].Title+" to Tide songs") {
+		t.Errorf("the toast says %q", tt.Texts())
+	}
+	if adds, _ := f.made(); !slices.Equal(adds, []string{"yt:PLtide " + testTracks[0].ID}) {
+		t.Errorf("added %q", adds)
+	}
+	if err := trackMenuChoice(t, tt, "Add to YouTube Music playlist", lanternList.Title); err != nil {
+		t.Errorf("the user's own playlist isn't listed by its title alone: %v", err)
+	}
+}

@@ -381,6 +381,10 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 			}
 		case p.Source == media.SourceYouTube && p.Editable && s.signedIn(media.SourceYouTube):
 			o.menu = func(m *ui.Menu, i int, t media.Track) {
+				// A collaborator takes out the tracks they added alone.
+				if p.Collaborative && !p.Mine && !t.Removable {
+					return
+				}
 				m.Separator()
 				if m.Item("Remove from this playlist").Chosen() {
 					s.edit(key, func(ctx context.Context) error {

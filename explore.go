@@ -186,7 +186,12 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 			m.Separator()
 		}
 		for _, p := range editable {
-			if m.Item(p.Title).Chosen() {
+			// One the user collaborates on tells whose it is.
+			label := p.Title
+			if p.Collaborative && !p.Mine && p.Owner != "" {
+				label += " · " + p.Owner
+			}
+			if m.Item(label).Chosen() {
 				s.addToYouTubePlaylist(p, t)
 			}
 		}

@@ -1,4 +1,4 @@
-<p align="center"><a href="README.md">English</a> · <a href="README.hi.md">हिन्दी</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.ur.md">اردو</a> · <a href="README.pt-BR.md">Português (Brasil)</a> · <a href="README.bn.md">বাংলা</a> · <a href="README.ru.md">Русский</a> · <strong>አማርኛ</strong></p>
+<p align="center"><a href="README.md">English</a> · <a href="README.hi.md">हिन्दी</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.ur.md">اردو</a> · <a href="README.ha.md">Hausa</a> · <a href="README.pt-BR.md">Português (Brasil)</a> · <a href="README.bn.md">বাংলা</a> · <a href="README.ru.md">Русский</a> · <strong>አማርኛ</strong></p>
 
 <p align="center">
   <img src="brand/icon.png" width="112" height="112" alt="የMixMusic አዶ፦ ሁለት ሮዝ ቀለበቶችና በጥቁር ላይ የማጫወቻ ቁልፍ" />
@@ -8,7 +8,7 @@
 
 <p align="center"><strong>ለYouTube Music እና ለSpotify አንድ ማጫወቻ።</strong></p>
 
-<p align="center">ለmacOS፣ Windows እና Linux የYouTube Music እና የSpotify ደንበኛ። YouTube Music ያለ መለያ ይሠራል። አንድ ፍለጋ፣ አንድ ሰልፍ፣ የተቀላቀሉ ፕሌይሊስቶች፣ ከዘፈኑ ጋር የሚሄድ ግጥም፣ ገጽታዎችና ፕለጊኖች።</p>
+<p align="center">ለmacOS፣ Windows እና Linux የYouTube Music እና የSpotify ደንበኛ። YouTube Music ያለ መለያ ይሠራል። አንድ ፍለጋ፣ አንድ ሰልፍ (ወረፋ)፣ የተቀላቀሉ ፕሌይሊስቶች፣ ከዘፈኑ ጋር የሚሄድ ግጥም፣ ገጽታዎችና ፕለጊኖች።</p>
 
 <p align="center"><sub>ይህ የ<a href="README.md">እንግሊዝኛው README</a> ትርጉም ነው። በሁለቱ መካከል ልዩነት ካለ፣ ትክክለኛው የአሁኑ የእንግሊዝኛው ነው።</sub></p>
 
@@ -43,7 +43,7 @@
 
 - **አንድ ፍለጋ።** በYouTube Music እና በSpotify በአንድ ጊዜ ይፈልጋል፣ እያንዳንዱንም
   ውጤት ከየትኛው አገልግሎት እንደመጣ ምልክት ያደርጋል።
-- **አንድ ሰልፍ እና አንድ ቤተ-መጻሕፍት።** የSpotify ትራክ ከYouTube Music ትራክ
+- **አንድ ሰልፍ (ወረፋ) እና አንድ ቤተ-መጻሕፍት።** የSpotify ትራክ ከYouTube Music ትራክ
   በኋላ ወዲያውኑ ሊጫወት ይችላል፣ አንድ ፕሌይሊስትም የሁለቱንም ትራኮች መያዝ ይችላል።
 - **መለያ አያስፈልግም።** YouTube Music መተግበሪያውን እንደከፈቱ ይጫወታል።
   የራስዎን ቤተ-መጻሕፍት ከፈለጉ ብቻ ይግቡ። Spotify አማራጭ ነው።
@@ -63,7 +63,7 @@
   ጎን ለጎን፣ እያንዳንዱ በአገልግሎቱ ምልክት ተደርጎ። የYouTube Music ውጤቶች
   እያንዳንዱ ትራክ ስንት ጊዜ እንደተጫወተ ያሳያሉ፣ ስለዚህ ዋናው ከቨርዥኖች
   (cover) ተለይቶ ይታያል።
-- **አንድ ሰልፍ።** የሁለቱንም አገልግሎቶች ትራኮች ያዋህዱ፣ በመካከላቸው shuffle እና
+- **አንድ ሰልፍ (ወረፋ)።** የሁለቱንም አገልግሎቶች ትራኮች ያዋህዱ፣ በመካከላቸው shuffle እና
   repeat ያድርጉ፣ ሰልፉ ሲያልቅም ራዲዮ እንዲቀጥል ያድርጉ።
 - **አስስ።** አዳዲስ ልቀቶች፣ ተወዳጅ ዘፈኖች፣ ቻርቶች፣ ስሜቶችና ዘውጎች፣ እና
   ለሚጫወተው ዘፈን ተዛማጅ ዘፈኖች።

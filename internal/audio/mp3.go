@@ -93,6 +93,11 @@ type mp3Header struct {
 	// encoder's delay and padding.
 	lame           bool
 	delay, padding int64
+	// vbr is set for a Xing or VBRI header, of a file of a variable
+	// bitrate, and cut for one that counts more frames than the file
+	// holds, as the start of a longer file: its length is of the frames
+	// there then (mp3Frames), as no bitrate tells it.
+	vbr, cut bool
 }
 
 // mp3FrameMin is the fewest bytes a frame of Layer III takes: one of
@@ -118,6 +123,7 @@ func readMP3Header(src io.ReadSeeker) mp3Header {
 	n, _ := readAt(src, at, b[:])
 	m := firstFrameHeader(b[:n])
 	if size, err := src.Seek(0, io.SeekEnd); err != nil || m.frames*mp3FrameMin > size-at {
+		m.cut = err == nil && m.vbr
 		m.frames, m.lame = -1, false
 	}
 	return m
@@ -142,7 +148,10 @@ func firstFrameHeader(f []byte) mp3Header {
 	}
 	none.frame = frame
 	if x := f[min(4+side, len(f)):]; len(x) >= 8 && (string(x[:4]) == "Xing" || string(x[:4]) == "Info") {
-		return xingHeader(x, frame)
+		h := xingHeader(x, frame)
+		// An Info header is of a constant bitrate.
+		h.vbr = string(x[:4]) == "Xing"
+		return h
 	}
 	// A VBRI header is 32 bytes after the frame's header, whatever the
 	// side information's size: "VBRI", its version, 1, the encoder's delay,
@@ -151,7 +160,7 @@ func firstFrameHeader(f []byte) mp3Header {
 	if len(v) < 18 || string(v[:4]) != "VBRI" || binary.BigEndian.Uint16(v[4:]) != 1 {
 		return none
 	}
-	return mp3Header{frames: int64(binary.BigEndian.Uint32(v[14:])), frame: frame}
+	return mp3Header{frames: int64(binary.BigEndian.Uint32(v[14:])), frame: frame, vbr: true}
 }
 
 // xingHeader reads a Xing or Info header, x on, of a file whose frames are

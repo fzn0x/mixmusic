@@ -113,8 +113,13 @@ func TestProbeMP3Length(t *testing.T) {
 		{"VBRI in mono", silentMP3(mp3Mono, vbriHead(1, 40), low...), 960 * ms, 984 * ms},
 		{"constant bitrate without a header", silentMP3(mp3Stereo, nil, sameRate(128, 40)...), 960 * ms, 960 * ms},
 		{"Info without a LAME tag, after ID3", append(id3, silentMP3(mp3Stereo, xingHead("Info", 40, false, 0, 0), sameRate(128, 40)...)...), 960 * ms, 984 * ms},
-		// Of the size then, the header's frame with the others.
+		// Of the frames there then, the header's frame with the others.
 		{"Xing counting more than the file holds", silentMP3(mp3Stereo, xingHead("Xing", 1<<31, true, 576, 1152), sameRate(128, 40)...), 984 * ms, 984 * ms},
+		// The start of a longer file of a variable bitrate: of the frames
+		// there, not of the first frame's bitrate, which tells 264 ms.
+		{"Xing of a longer file, cut short", silentMP3(mp3Stereo, xingHead("Xing", 4000, true, 576, 1152), low...), 984 * ms, 984 * ms},
+		{"VBRI of a longer file, cut short", silentMP3(mp3Stereo, vbriHead(1, 4000), low...), 984 * ms, 984 * ms},
+		{"Xing of a longer file, cut in a frame", silentMP3(mp3Stereo, xingHead("Xing", 4000, true, 576, 1152), low...)[:384+40*96-50], 984 * ms, 984 * ms},
 		// Of the first frame's bitrate then.
 		{"VBRI of another version", silentMP3(mp3Stereo, vbriHead(2, 40), low...), 264 * ms, 984 * ms},
 	} {

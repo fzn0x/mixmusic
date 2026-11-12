@@ -10,6 +10,7 @@ on:
       - "site/**"
       - "docs/**"
       - "tools/sitedocs/**"
+      - "tools/sitefinish/**"
       - "go.mod"
       - "flake.nix"
       - "flake.lock"
@@ -66,6 +67,10 @@ jobs:
         run: nix develop --command go run ./tools/sitedocs
       - name: Build the site
         run: nix develop --command zola --root site build
+      # The landing page in each language, the sitemap's alternates, and
+      # llms.txt for AI agents (tools/sitefinish).
+      - name: Finish the site
+        run: nix develop --command go run ./tools/sitefinish
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site/public

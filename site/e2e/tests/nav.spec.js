@@ -16,12 +16,16 @@ const widths = [480, 600, 700, 761, 800, 820, 860, 900, 960, 1000, 1080, 1100, 1
 for (const { name, path, bar, chromium } of bars) {
   test(`the ${name} page's top bar keeps its labels on one line inside it, at every width`, async ({ page, browserName }) => {
     test.skip(chromium && browserName !== "chromium", "the languages' bars are checked in Chromium");
+    // WebKit on Linux draws the home page's frames slowly, about one a
+    // second with all it moves, and this waits one at each of 14 widths.
+    test.slow(browserName === "webkit", "WebKit draws the home page's frames slowly");
     await load(page, path);
     const bad = [];
     for (const width of widths) {
       await page.setViewportSize({ width, height: 800 });
-      // A frame for the bar to fit itself to the width.
-      await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+      // A frame for the bar to fit itself to the width: app.js fits it as
+      // the frame sees its new width.
+      await page.evaluate(() => new Promise((done) => requestAnimationFrame(done)));
       const found = await page.evaluate((selector) => {
         const box = document.querySelector(selector).getBoundingClientRect();
         const out = [];

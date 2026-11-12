@@ -793,8 +793,11 @@
         ? "linux"
         : "other";
   const names = { mac: "macOS", windows: "Windows", linux: "Linux" };
+  // Words that change in place morph into the new ones where morph.js
+  // runs; without it, they are simply set.
+  const say = (el, words) => (window.MixMorph ? window.MixMorph.say(el, words) : (el.textContent = words));
   if (names[os]) {
-    $$("[data-download-label]").forEach((label) => (label.textContent = text("download_for", "Download for {os}", { os: names[os] })));
+    $$("[data-download-label]").forEach((label) => say(label, text("download_for", "Download for {os}", { os: names[os] })));
     $(`.system[data-os="${os}"]`)?.classList.add("is-yours");
   }
   if (mac) {
@@ -807,7 +810,7 @@
     .then((res) => (res.ok ? res.json() : null))
     .then((rel) => {
       const version = String(rel?.tag_name || "").replace(/^v/, "");
-      if (version) $$("[data-version]").forEach((v) => (v.textContent = version));
+      if (version) $$("[data-version]").forEach((v) => v.textContent.trim() !== version && say(v, version));
     })
     .catch(() => {});
 })();

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -24,14 +25,44 @@ func (c *Collection) YouTubeLiked(ctx context.Context) (media.Playlist, error) {
 // YouTubePlaylists returns the playlists the user made or saved on YouTube
 // Music. Those the user made are Editable, for tracks to go into them: the
 // ones YouTube offers to delete, and the others of the account's name.
+// Those of others the user collaborates on are Editable and Collaborative.
 func (c *Collection) YouTubePlaylists(ctx context.Context) ([]media.Playlist, error) {
 	playlists, err := c.a.youtube.LibraryPlaylists(ctx)
 	if len(playlists) > 0 {
 		if me := c.a.youtubeAccount(ctx).Account; me != nil {
 			markOwn(playlists, me.Name)
 		}
+		c.a.markCollaborations(ctx, playlists)
 	}
 	return playlists, err
+}
+
+// markCollaborations marks Editable and Collaborative the playlists of
+// others that YouTube Music offers to add to: those the user collaborates
+// on. It asks only when the library holds a playlist of another's. Where
+// YouTube doesn't answer, they stay as they are, saved.
+func (a *App) markCollaborations(ctx context.Context, playlists []media.Playlist) {
+	if !slices.ContainsFunc(playlists, othersPlaylist) {
+		return
+	}
+	targets, err := a.youtube.PlaylistsToAddTo(ctx)
+	if err != nil {
+		log.Printf("mixmusic: the YouTube Music playlists to add to: %v", err)
+		return
+	}
+	for i := range playlists {
+		p := &playlists[i]
+		if _, id, _ := media.ParseID(p.ID); othersPlaylist(*p) && targets[id] {
+			p.Editable, p.Collaborative = true, true
+		}
+	}
+}
+
+// othersPlaylist reports whether p, of the user's library on YouTube
+// Music, is a playlist someone else made: one the user may collaborate on.
+func othersPlaylist(p media.Playlist) bool {
+	_, id, _ := media.ParseID(p.ID)
+	return !p.Editable && !p.Mine && strings.HasPrefix(id, "PL")
 }
 
 // markOwn marks Editable the playlists of the library that are the user's

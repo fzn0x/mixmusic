@@ -36,11 +36,18 @@
   up to 45 s. A playlist page's header tells who may
   open a playlist of the user's, in its tools, and whether its avatars
   are its collaborators', by the panel they open: `Mine`, `Privacy` and
-  `Collaborative` of `media.Playlist`. Its tests read hand-written
-  answers of the shapes documented, which
+  `Collaborative` of `media.Playlist`. A collaborator's page has none of
+  the owner's tools, as anyone's, and their library tells a playlist they
+  joined from one they saved by nothing: `PlaylistsToAddTo`, the
+  playlists YouTube Music offers to save Liked Music to
+  (`playlist/get_add_to_playlist`), holds those they collaborate on, so
+  the app marks them `Editable` and `Collaborative`. A collaborator adds,
+  moves any track, and takes out the tracks they added alone, whose menus
+  offer it (`Removable` of `media.Track`). Its tests read hand-written
+  answers of the shapes documented, and answers that
   `MIXMUSIC_LIVE=1 MIXMUSIC_YT_WRITE=1 go test ./internal/youtube -run LiveCollaboration`
-  records, with a second account in `MIXMUSIC_YT_COOKIES2` to join as a
-  collaborator. It lists the
+  recorded, with a second account in `MIXMUSIC_YT_COOKIES2` that joins as
+  a collaborator and tries each edit. It lists the
   Google accounts of the session and their brand channels, from YouTube's
   website, and uses a brand channel by its page ID: one whose page ID the
   list doesn't tell is listed as `Unswitchable`, as without it the account

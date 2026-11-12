@@ -3,10 +3,12 @@ package youtube
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -133,6 +135,14 @@ func joinAsCollaborator(t *testing.T, ctx context.Context, c *Client, id, link s
 		}
 	})
 	page(c, "collab-page-collaborator", func(media.Playlist) bool { return true })
+	inLibrary(t, ctx, c, id, record)
+	editAsCollaborator(t, ctx, c, id, record, page)
+}
+
+// inLibrary waits for the playlist id to show in the library of c, a
+// collaborator's.
+func inLibrary(t *testing.T, ctx context.Context, c *Client, id string, record func(string, node)) {
+	t.Helper()
 	for start := time.Now(); ; time.Sleep(time.Second) {
 		n, err := c.browse(ctx, "FEmusic_liked_playlists")
 		if err != nil {
@@ -153,6 +163,53 @@ func joinAsCollaborator(t *testing.T, ctx context.Context, c *Client, id, link s
 			return
 		}
 	}
+}
+
+// editAsCollaborator finds out what a collaborator may do, as the account
+// of c: whether YouTube Music offers the playlist id to add a song to, and
+// whether it adds one, moves it first, and takes out a song of the
+// owner's, then its own. It keeps each answer.
+func editAsCollaborator(t *testing.T, ctx context.Context, c *Client, id string,
+	record func(string, node), page func(*Client, string, func(media.Playlist) bool) media.Playlist) {
+	t.Helper()
+	const song = "GNCtaWIhdvM" // the second song of testdata/playlist.json
+	if n, err := c.call(ctx, "playlist/get_add_to_playlist", map[string]any{"videoIds": []string{song}}, nil); err != nil {
+		t.Errorf("the playlists to add to: %v", err)
+	} else {
+		record("collab-addto-collaborator", n)
+		data, _ := json.Marshal(n.v)
+		t.Logf("the playlists to add to hold it: %v", strings.Contains(string(data), id))
+	}
+	for name, of := range map[string]string{"collab-addto-liked": "LM", "collab-addto-itself": id} {
+		n, err := c.call(ctx, "playlist/get_add_to_playlist", map[string]any{"playlistId": of}, nil)
+		record(name, n)
+		data, _ := json.Marshal(n.v)
+		t.Logf("%s: holds it %v, err %v", name, strings.Contains(string(data), id), err)
+	}
+	edit := func(name string, action map[string]any) error {
+		t.Helper()
+		n, err := c.editPlaylistAnswer(ctx, id, action, errors.New("refused"), errNotYours)
+		record(name, n)
+		t.Logf("%s: %v", name, err)
+		return err
+	}
+	if err := edit("collab-add-collaborator", map[string]any{"action": "ACTION_ADD_VIDEO", "addedVideoId": song}); err != nil {
+		t.Errorf("a collaborator couldn't add a song: %v", err)
+		return
+	}
+	p := page(c, "collab-page-collaborator-added", func(p media.Playlist) bool { return len(p.Tracks) == 2 })
+	// The song added goes last. YouTube Music may list it, and the owner's,
+	// by another video of theirs.
+	for _, tr := range p.Tracks {
+		t.Logf("track %s, entry %q", tr.ID, tr.EntryID)
+	}
+	owners, own := p.Tracks[0], p.Tracks[1]
+	_, ownersSong, _ := media.ParseID(owners.ID)
+	_, ownSong, _ := media.ParseID(own.ID)
+	edit("collab-move-collaborator", map[string]any{"action": "ACTION_MOVE_VIDEO_BEFORE", "setVideoId": own.EntryID, "movedSetVideoIdSuccessor": owners.EntryID})
+	edit("collab-move-owners", map[string]any{"action": "ACTION_MOVE_VIDEO_BEFORE", "setVideoId": owners.EntryID})
+	edit("collab-remove-owners", map[string]any{"action": "ACTION_REMOVE_VIDEO", "setVideoId": owners.EntryID, "removedVideoId": ownersSong})
+	edit("collab-remove-own", map[string]any{"action": "ACTION_REMOVE_VIDEO", "setVideoId": own.EntryID, "removedVideoId": ownSong})
 }
 
 // signedInClient is a client signed in with the cookies of header, the

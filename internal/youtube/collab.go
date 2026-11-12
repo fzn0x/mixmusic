@@ -57,6 +57,30 @@ var (
 	errPrivacyRefused = errors.New("YouTube Music did not change who can open the playlist")
 )
 
+// PlaylistsToAddTo returns the IDs of the playlists the user may add to:
+// theirs, and those of others they collaborate on, as YouTube Music lists
+// them to save Liked Music to one. A collaborator's library tells no more
+// of a playlist than that someone else made it.
+func (c *Client) PlaylistsToAddTo(ctx context.Context) (map[string]bool, error) {
+	if err := c.session(); err != nil {
+		return nil, err
+	}
+	n, err := c.call(ctx, "playlist/get_add_to_playlist", map[string]any{"playlistId": "LM"}, nil)
+	if err == nil {
+		err = c.session()
+	}
+	if err != nil {
+		return nil, err
+	}
+	ids := map[string]bool{}
+	for _, o := range n.get("contents", 0, "addToPlaylistRenderer", "playlists").list() {
+		if id := o.get("playlistAddToOptionRenderer", "playlistId").str(); id != "" {
+			ids[id] = true
+		}
+	}
+	return ids, nil
+}
+
 // InviteCollaborators turns YouTube Music's collaboration on for a playlist
 // the user made, and returns its invite link: whoever opens it can join
 // the playlist and add to it. Each call makes a new link. Collaborators

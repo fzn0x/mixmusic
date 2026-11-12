@@ -241,3 +241,51 @@ func TestParsePlaylistCollaboration(t *testing.T) {
 		t.Errorf("the owner's page: mine %v, deletable %v", p.Mine, p.Deletable)
 	}
 }
+
+// TestParsePlaylistCollaborator reads the page of a playlist as one of its
+// collaborators sees it, recorded: someone else's, collaborative, without
+// the tools of its owner's, whose tracks the collaborator may take out are
+// those they added alone.
+func TestParsePlaylistCollaborator(t *testing.T) {
+	p, _, err := parsePlaylist(fixture(t, "playlist-collaborator"), "PLtestCollab01")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !p.Collaborative || p.Mine || p.Editable || p.Deletable || p.Owner != "by Ana Testwood and 1 other" || p.Title != "Road songs" {
+		t.Errorf("collaborative %v, mine %v, editable %v, deletable %v, owner %q, title %q",
+			p.Collaborative, p.Mine, p.Editable, p.Deletable, p.Owner, p.Title)
+	}
+	if len(p.Tracks) != 2 {
+		t.Fatalf("%d tracks", len(p.Tracks))
+	}
+	for i, want := range []bool{false, true} {
+		if tr := p.Tracks[i]; tr.Removable != want || tr.EntryID == "" {
+			t.Errorf("track %d, %s: removable %v, entry %q", i, tr.ID, tr.Removable, tr.EntryID)
+		}
+	}
+	other, _, _ := parsePlaylist(fixture(t, "playlist"), "PLx")
+	for _, tr := range other.Tracks {
+		if tr.Removable {
+			t.Errorf("%s of someone else's playlist is removable", tr.ID)
+		}
+	}
+}
+
+// TestPlaylistsToAddTo reads the playlists YouTube Music offers to save
+// Liked Music to, recorded: those the user may add to.
+func TestPlaylistsToAddTo(t *testing.T) {
+	addTo := fixture(t, "add-to-playlist").v
+	c, requests, _ := statusYouTube(t, func(string) (int, any) { return http.StatusOK, addTo })
+	ctx := context.Background()
+	if _, err := c.PlaylistsToAddTo(ctx); !errors.Is(err, ErrSignedOut) {
+		t.Errorf("signed out: %v", err)
+	}
+	c.SetCookies(session)
+	ids, err := c.PlaylistsToAddTo(ctx)
+	if err != nil || len(ids) != 1 || !ids["PLtestCollab01"] {
+		t.Fatalf("PlaylistsToAddTo = %v, %v", ids, err)
+	}
+	if r := requests()[0]; r.path != "/youtubei/v1/playlist/get_add_to_playlist" || r.body["playlistId"] != "LM" {
+		t.Errorf("asked %s with %v", r.path, r.body)
+	}
+}

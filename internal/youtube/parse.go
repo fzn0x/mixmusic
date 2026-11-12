@@ -272,6 +272,9 @@ func parseListItem(item node) (media.Item, bool) {
 	if videoID != "" {
 		t := newTrack(videoID, title, watch, b, thumbs, isExplicit(item))
 		t.EntryID = item.get("playlistItemData", "playlistSetVideoId").str()
+		// Its menu offers to take it out of the playlist, as YouTube Music
+		// does to a collaborator for the tracks they added alone.
+		t.Removable = t.EntryID != "" && item.get("menu").find("removedVideoId").exists()
 		return media.Item{Kind: media.ItemTrack, Track: t}, true
 	}
 	nav := item.get("navigationEndpoint")

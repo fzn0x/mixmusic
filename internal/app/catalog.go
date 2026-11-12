@@ -201,7 +201,16 @@ func (a *App) playlist(ctx context.Context, id string) (media.Playlist, error) {
 	}
 	switch source {
 	case media.SourceYouTube:
-		return a.youtube.Playlist(ctx, native)
+		p, err := a.youtube.Playlist(ctx, native)
+		// YouTube Music shows a collaborator the page of a playlist they
+		// collaborate on without its tools, as to anyone: it offers it to
+		// add to, which tells.
+		if err == nil && p.Collaborative && !p.Mine && !p.Editable {
+			if targets, terr := a.youtube.PlaylistsToAddTo(ctx); terr == nil && targets[native] {
+				p.Editable = true
+			}
+		}
+		return p, err
 	case media.SourceSpotify:
 		p, err := a.spotify.Playlist(ctx, native, a.spotifyUserID(ctx))
 		if err == nil && !p.Editable {

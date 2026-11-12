@@ -24,6 +24,7 @@ var languages = []language{
 	{Dir: "zh-cn", Tag: "zh-Hans", Name: "简体中文", Locale: "zh_CN"},
 	{Dir: "id", Tag: "id", Name: "Bahasa Indonesia", Locale: "id_ID"},
 	{Dir: "ur", Tag: "ur", Name: "اردو", Locale: "ur_PK", RTL: true},
+	{Dir: "ha", Tag: "ha", Name: "Hausa", Locale: "ha_NG"},
 	{Dir: "pt-br", Tag: "pt-BR", Name: "Português (Brasil)", Locale: "pt_BR"},
 	{Dir: "bn", Tag: "bn", Name: "বাংলা", Locale: "bn_BD"},
 	{Dir: "ru", Tag: "ru", Name: "Русский", Locale: "ru_RU"},

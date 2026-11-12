@@ -20,6 +20,7 @@ export const languages = [
   { dir: "zh-cn", tag: "zh-Hans" },
   { dir: "id", tag: "id" },
   { dir: "ur", tag: "ur", rtl: true },
+  { dir: "ha", tag: "ha" },
   { dir: "pt-br", tag: "pt-BR" },
   { dir: "bn", tag: "bn" },
   { dir: "ru", tag: "ru" },

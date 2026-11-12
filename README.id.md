@@ -199,7 +199,7 @@ buka `MixMusic.exe`. Untuk AppImage, jadikan file itu bisa dijalankan
 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`; saat pertama
 kali, Flatpak akan mengambil runtime GNOME dari Flathub.
 
-Segera hadir, setelah tap-nya siap: di Mac, [Homebrew](https://brew.sh)
+Di Mac, [Homebrew](https://brew.sh)
 memasang MixMusic, dan `brew upgrade` memperbaruinya.
 
 ```sh

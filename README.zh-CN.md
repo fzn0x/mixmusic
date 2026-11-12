@@ -131,7 +131,7 @@
 
 安装程序、便携版 zip 和 Linux 压缩包会自行更新。`.deb`、`.rpm`、AppImage 和 Flatpak 无法替换自身的文件，所以有新版本时，MixMusic 会告诉你，并替你下载。AUR 的 `mixmusic-bin` 随你系统的其余软件一起更新。便携版 zip 解压到任意位置，打开 `MixMusic.exe` 即可。AppImage 先加上可执行权限（`chmod +x`），再打开。Flatpak 可以用你的软件中心打开，或者运行 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`；第一次安装时，Flatpak 会从 Flathub 获取 GNOME 运行时。
 
-即将推出，等它的 tap 上线后：在 Mac 上，可以用 [Homebrew](https://brew.sh) 安装 MixMusic，用 `brew upgrade` 更新它。
+在 Mac 上，可以用 [Homebrew](https://brew.sh) 安装 MixMusic，用 `brew upgrade` 更新它。
 
 ```sh
 brew install --cask fzn0x/tap/mixmusic

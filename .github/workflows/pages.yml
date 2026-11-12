@@ -72,7 +72,8 @@ jobs:
       - name: The star count
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api "repos/$GITHUB_REPOSITORY" --jq '{count: .stargazers_count}' > site/data/stars.json || rm -f site/data/stars.json
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY" --jq '{count: .stargazers_count}' > site/data/stars.json || rm -f site/data/stars.json
       - name: Build the site
         run: nix develop --command zola --root site build
       # The landing page in each language, the sitemap's alternates, and

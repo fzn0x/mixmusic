@@ -143,8 +143,8 @@
         <span>MixMusic</span>
       </a>
       <nav class="appbar-nav" aria-label="Sections">
-        <a href="#features">Features</a>
         <a href="#new">New</a>
+        <a href="#features">Features</a>
         <a href="#customize">Layouts and themes</a>
         <a href="#download">Download</a>
         <a href="{{ get_url(path='@/docs/_index.md') }}">Docs</a>
@@ -349,29 +349,75 @@
     </section>
     </div>
 
-    <section class="merge" id="one-queue" aria-labelledby="merge-title" data-merge>
-      <div class="merge-sticky">
-        <div class="merge-head">
-          <h2 id="merge-title">Two services, one queue</h2>
-          <p class="lead">Your Spotify tracks and your YouTube Music tracks no longer need two apps. They line up in one queue, in the order you choose.</p>
-          <p class="merge-note">The tracks and covers here are made up for this page.</p>
-        </div>
-        <div class="merge-stage" dir="ltr" data-merge-stage>
-          <p class="merge-label merge-label-spotify" aria-hidden="true"><span class="mark mark-spotify"></span>Spotify</p>
-          <p class="merge-label merge-label-youtube" aria-hidden="true"><span class="mark mark-youtube"></span>YouTube Music</p>
-          <p class="merge-label merge-label-queue" aria-hidden="true"><svg class="icon" width="16" height="16"><use href="#i-queue" /></svg>Up next in MixMusic</p>
-          <ol class="merge-list" aria-label="One queue of Spotify and YouTube Music tracks (made up for this page)" translate="no">
-            <li class="merge-row" data-src="spotify" style="--row-art: #ec8051"><img src="assets/covers/cover-2.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Paper Planets</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Velvet Ferries</span></span></li>
-            <li class="merge-row" data-src="youtube" style="--row-art: #52e4ea"><img src="assets/covers/cover-1.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Neon Tide</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Kaori Ume</span></span></li>
-            <li class="merge-row" data-src="spotify" style="--row-art: #7769d3"><img src="assets/covers/cover-3.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Slow Static</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Mira Vale</span></span></li>
-            <li class="merge-row" data-src="youtube" style="--row-art: #d96472"><img src="assets/covers/cover-4.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Kitsune Run</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Hoshino Club</span></span></li>
-            <li class="merge-row" data-src="spotify" style="--row-art: #92d369"><img src="assets/covers/cover-5.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Glass Garden</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Juniper Lane</span></span></li>
-            <li class="merge-row" data-src="youtube" style="--row-art: #e99453"><img src="assets/covers/cover-6.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Afterglow Avenue</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Oriel Bloom</span></span></li>
-            <li class="merge-row" data-src="spotify" style="--row-art: #5181ec"><img src="assets/covers/cover-7.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Little Satellites</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Coral &amp; the Comets</span></span></li>
-            <li class="merge-row" data-src="youtube" style="--row-art: #51a8ec"><img src="assets/covers/cover-8.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Summer Signal</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Aoi Kanata</span></span></li>
-          </ol>
-        </div>
+    <section class="section" id="new" aria-labelledby="new-title">
+      <div class="section-head">
+        <h2 id="new-title">New in 0.5.9</h2>
+        <p class="lead">Podcasts, layouts, downloads and lyrics in your language came with the latest release, and more besides. The <a href="https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md">changelog</a> has all of it.</p>
       </div>
+      <ul class="bento">
+        <li class="tile tile-wide">
+          <div class="tile-art tile-art-lyrics" aria-hidden="true">
+            <p class="ly ly-past">朝ごはんを食べた</p>
+            <p class="ly ly-now"><span class="ly-sung">今日は</span>いい天気</p>
+            <p class="ly ly-roman">kyō wa ii tenki</p>
+            <p class="ly ly-trans">The weather is nice today</p>
+          </div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-lyrics" /></svg>Lyrics in your language</h3>
+          <p>Turn on translate beside the lyrics and each line shows its translation under it. Japanese can show in romaji, and Korean, Chinese, Russian, Hindi, Thai and other scripts in Latin letters, made on your computer. Lyrics timed word by word light each word as it's sung.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-mic" /></svg>Podcasts</h3>
+          <p>Shows and episodes from YouTube Music and Spotify, in search and in Library › Podcasts. An episode starts where you left it, on another device too, with a speed of its own.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-download" /></svg>Downloads</h3>
+          <p>Download songs, albums, playlists, mixes and your liked songs, and they play without the network. Songs added to a downloaded playlist later download on their own.</p>
+        </li>
+        <li class="tile tile-tall">
+          <div class="tile-art tile-art-layouts" aria-hidden="true">
+            <span class="mini-look" data-l="blend"><i></i><i></i><i></i></span>
+            <span class="mini-look" data-l="expressive"><i></i><i></i><i></i></span>
+            <span class="mini-look" data-l="crate"><i></i><i></i><i></i></span>
+            <span class="mini-look" data-l="tiles"><i></i><i></i><i></i></span>
+          </div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-layout" /></svg>Layouts</h3>
+          <p>Blend, the new default, Expressive, Crate and Tiles, MixMusic's look until now. Each sets shapes, density, headings and motion apart from the theme, and every theme shows in every layout.</p>
+          <a class="link" href="#customize">See them below</a>
+        </li>
+        <li class="tile">
+          <div class="tile-art tile-art-chip" aria-hidden="true"><span>5.1</span></div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-surround" /></svg>5.1 surround</h3>
+          <p>A track YouTube Music has a 5.1 mix of shows a 5.1 button by the player: six channels on a 5.1 system, mixed down to stereo on headphones.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-cast" /></svg>Casting</h3>
+          <p>Send what plays to a Chromecast, a Google Home or Nest speaker, or a TV with Chromecast built in. The queue stays in MixMusic, and the device's own buttons work.</p>
+        </li>
+        <li class="tile tile-wide">
+          <div class="tile-art tile-art-notch" aria-hidden="true">
+            <span class="notch"><img src="assets/covers/cover-14.webp" width="480" height="480" alt="" loading="lazy" /><i></i><b><s></s><s></s><s></s><s></s></b></span>
+          </div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-notch" /></svg>A player around the notch</h3>
+          <p>On a MacBook with a notch, the black around the camera widens with the cover and bars that move as it plays. Click it for the player, the progress and the line of lyrics sung now, over any app, full screen too.</p>
+        </li>
+        <li class="tile">
+          <div class="tile-art tile-art-chip" aria-hidden="true"><span>1.25×</span></div>
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-speed" /></svg>Speed</h3>
+          <p>From half speed to three times, at the song's own pitch, from the speed button by the player or the command palette.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-keyboard" /></svg>Global shortcuts</h3>
+          <p>Keys of your own that play, skip, change the volume or like a song from any app, recorded in Settings › Shortcuts.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-dislike" /></svg>Dislikes</h3>
+          <p>The thumbs-down passes over a song from then on, in the queue and in radios. Signed in to YouTube Music, your dislikes go there too. Songs YouTube labels as made with AI can be skipped as well.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-radio" /></svg>Live streams and music videos</h3>
+          <p>YouTube's 24/7 radio channels play live, and music videos can show their picture on the now playing page, muted and in step with the sound.</p>
+        </li>
+      </ul>
     </section>
 
     <section class="section" id="features" aria-labelledby="features-title">
@@ -450,75 +496,29 @@
       </div>
     </section>
 
-    <section class="section" id="new" aria-labelledby="new-title">
-      <div class="section-head">
-        <h2 id="new-title">New in 0.5.9</h2>
-        <p class="lead">Podcasts, layouts, downloads and lyrics in your language came with the latest release, and more besides. The <a href="https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md">changelog</a> has all of it.</p>
+    <section class="merge" id="one-queue" aria-labelledby="merge-title" data-merge>
+      <div class="merge-sticky">
+        <div class="merge-head">
+          <h2 id="merge-title">Two services, one queue</h2>
+          <p class="lead">Your Spotify tracks and your YouTube Music tracks no longer need two apps. They line up in one queue, in the order you choose.</p>
+          <p class="merge-note">The tracks and covers here are made up for this page.</p>
+        </div>
+        <div class="merge-stage" dir="ltr" data-merge-stage>
+          <p class="merge-label merge-label-spotify" aria-hidden="true"><span class="mark mark-spotify"></span>Spotify</p>
+          <p class="merge-label merge-label-youtube" aria-hidden="true"><span class="mark mark-youtube"></span>YouTube Music</p>
+          <p class="merge-label merge-label-queue" aria-hidden="true"><svg class="icon" width="16" height="16"><use href="#i-queue" /></svg>Up next in MixMusic</p>
+          <ol class="merge-list" aria-label="One queue of Spotify and YouTube Music tracks (made up for this page)" translate="no">
+            <li class="merge-row" data-src="spotify" style="--row-art: #ec8051"><img src="assets/covers/cover-2.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Paper Planets</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Velvet Ferries</span></span></li>
+            <li class="merge-row" data-src="youtube" style="--row-art: #52e4ea"><img src="assets/covers/cover-1.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Neon Tide</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Kaori Ume</span></span></li>
+            <li class="merge-row" data-src="spotify" style="--row-art: #7769d3"><img src="assets/covers/cover-3.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Slow Static</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Mira Vale</span></span></li>
+            <li class="merge-row" data-src="youtube" style="--row-art: #d96472"><img src="assets/covers/cover-4.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Kitsune Run</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Hoshino Club</span></span></li>
+            <li class="merge-row" data-src="spotify" style="--row-art: #92d369"><img src="assets/covers/cover-5.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Glass Garden</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Juniper Lane</span></span></li>
+            <li class="merge-row" data-src="youtube" style="--row-art: #e99453"><img src="assets/covers/cover-6.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Afterglow Avenue</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Oriel Bloom</span></span></li>
+            <li class="merge-row" data-src="spotify" style="--row-art: #5181ec"><img src="assets/covers/cover-7.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Little Satellites</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Coral &amp; the Comets</span></span></li>
+            <li class="merge-row" data-src="youtube" style="--row-art: #51a8ec"><img src="assets/covers/cover-8.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Summer Signal</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Aoi Kanata</span></span></li>
+          </ol>
+        </div>
       </div>
-      <ul class="bento">
-        <li class="tile tile-wide">
-          <div class="tile-art tile-art-lyrics" aria-hidden="true">
-            <p class="ly ly-past">朝ごはんを食べた</p>
-            <p class="ly ly-now"><span class="ly-sung">今日は</span>いい天気</p>
-            <p class="ly ly-roman">kyō wa ii tenki</p>
-            <p class="ly ly-trans">The weather is nice today</p>
-          </div>
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-lyrics" /></svg>Lyrics in your language</h3>
-          <p>Turn on translate beside the lyrics and each line shows its translation under it. Japanese can show in romaji, and Korean, Chinese, Russian, Hindi, Thai and other scripts in Latin letters, made on your computer. Lyrics timed word by word light each word as it's sung.</p>
-        </li>
-        <li class="tile">
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-mic" /></svg>Podcasts</h3>
-          <p>Shows and episodes from YouTube Music and Spotify, in search and in Library › Podcasts. An episode starts where you left it, on another device too, with a speed of its own.</p>
-        </li>
-        <li class="tile">
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-download" /></svg>Downloads</h3>
-          <p>Download songs, albums, playlists, mixes and your liked songs, and they play without the network. Songs added to a downloaded playlist later download on their own.</p>
-        </li>
-        <li class="tile tile-tall">
-          <div class="tile-art tile-art-layouts" aria-hidden="true">
-            <span class="mini-look" data-l="blend"><i></i><i></i><i></i></span>
-            <span class="mini-look" data-l="expressive"><i></i><i></i><i></i></span>
-            <span class="mini-look" data-l="crate"><i></i><i></i><i></i></span>
-            <span class="mini-look" data-l="tiles"><i></i><i></i><i></i></span>
-          </div>
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-layout" /></svg>Layouts</h3>
-          <p>Blend, the new default, Expressive, Crate and Tiles, MixMusic's look until now. Each sets shapes, density, headings and motion apart from the theme, and every theme shows in every layout.</p>
-          <a class="link" href="#customize">See them below</a>
-        </li>
-        <li class="tile">
-          <div class="tile-art tile-art-chip" aria-hidden="true"><span>5.1</span></div>
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-surround" /></svg>5.1 surround</h3>
-          <p>A track YouTube Music has a 5.1 mix of shows a 5.1 button by the player: six channels on a 5.1 system, mixed down to stereo on headphones.</p>
-        </li>
-        <li class="tile">
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-cast" /></svg>Casting</h3>
-          <p>Send what plays to a Chromecast, a Google Home or Nest speaker, or a TV with Chromecast built in. The queue stays in MixMusic, and the device's own buttons work.</p>
-        </li>
-        <li class="tile tile-wide">
-          <div class="tile-art tile-art-notch" aria-hidden="true">
-            <span class="notch"><img src="assets/covers/cover-14.webp" width="480" height="480" alt="" loading="lazy" /><i></i><b><s></s><s></s><s></s><s></s></b></span>
-          </div>
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-notch" /></svg>A player around the notch</h3>
-          <p>On a MacBook with a notch, the black around the camera widens with the cover and bars that move as it plays. Click it for the player, the progress and the line of lyrics sung now, over any app, full screen too.</p>
-        </li>
-        <li class="tile">
-          <div class="tile-art tile-art-chip" aria-hidden="true"><span>1.25×</span></div>
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-speed" /></svg>Speed</h3>
-          <p>From half speed to three times, at the song's own pitch, from the speed button by the player or the command palette.</p>
-        </li>
-        <li class="tile">
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-keyboard" /></svg>Global shortcuts</h3>
-          <p>Keys of your own that play, skip, change the volume or like a song from any app, recorded in Settings › Shortcuts.</p>
-        </li>
-        <li class="tile">
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-dislike" /></svg>Dislikes</h3>
-          <p>The thumbs-down passes over a song from then on, in the queue and in radios. Signed in to YouTube Music, your dislikes go there too. Songs YouTube labels as made with AI can be skipped as well.</p>
-        </li>
-        <li class="tile">
-          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-radio" /></svg>Live streams and music videos</h3>
-          <p>YouTube's 24/7 radio channels play live, and music videos can show their picture on the now playing page, muted and in step with the sound.</p>
-        </li>
-      </ul>
     </section>
 
     <section class="section walkthrough" id="video" aria-labelledby="video-title" style="--glow: #8f7ce0">

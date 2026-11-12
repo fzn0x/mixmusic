@@ -63,6 +63,18 @@
   --spring: cubic-bezier(0.34, 1.36, 0.64, 1);
   --fast: 150ms;
   --medium: 200ms;
+  /* The bar's glide into a pill, and the text that blurs in: slow to
+     settle, with nothing that overshoots. */
+  --glide: 700ms;
+  --ease-glide: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* The top bar, and the pill it becomes over the page: the night sky's
+     blue-black, frosted, with a hairline edge. */
+  --bar: 64px;
+  --pill: rgba(8, 12, 18, 0.62);
+  --pill-edge: rgba(255, 255, 255, 0.09);
+  --pill-shine: rgba(255, 255, 255, 0.05);
+  --pill-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.7);
 
   --max: 1200px;
   --gutter: clamp(16px, 4vw, 40px);
@@ -98,6 +110,10 @@
     --kbd-edge: rgba(32, 26, 27, 0.16);
     --wordmark: rgba(32, 26, 27, 0.14);
     --wordmark-accent: rgba(185, 0, 100, 0.3);
+    --pill: rgba(255, 248, 248, 0.72);
+    --pill-edge: rgba(32, 26, 27, 0.08);
+    --pill-shine: rgba(255, 255, 255, 0.7);
+    --pill-shadow: 0 12px 32px -16px rgba(80, 30, 50, 0.28);
   }
 }
 :root[data-theme="light"] {
@@ -121,6 +137,10 @@
   --kbd-edge: rgba(32, 26, 27, 0.16);
   --wordmark: rgba(32, 26, 27, 0.14);
   --wordmark-accent: rgba(185, 0, 100, 0.3);
+  --pill: rgba(255, 248, 248, 0.72);
+  --pill-edge: rgba(32, 26, 27, 0.08);
+  --pill-shine: rgba(255, 255, 255, 0.7);
+  --pill-shadow: 0 12px 32px -16px rgba(80, 30, 50, 0.28);
 }
 
 *,
@@ -224,7 +244,7 @@ code {
 }
 .btn:hover::after { opacity: 0.08; }
 .btn:active::after { opacity: 0.14; }
-.btn:active { transform: scale(0.97); }
+.btn:active { transform: scale(0.96); }
 .btn-large { height: 52px; padding: 0 28px 0 22px; font-size: 1rem; }
 .btn-small { height: 36px; padding: 0 16px 0 12px; font-size: 0.875rem; }
 
@@ -239,25 +259,74 @@ code {
 .btn-tonal { background: var(--surface-3); color: var(--ink); }
 .btn-tonal:hover { color: var(--ink); }
 
-/* The top app bar: flat on the page, raised once the page scrolls. */
+/* The top app bar. At the top of the page it has no ground of its own: the
+   hero's night scene (partials/pixel-sky-hero.html) runs up behind it, so
+   the bar and the sky are one picture. Once the page scrolls (is-raised,
+   app.js), the bar draws in to a frosted pill as wide as what it holds,
+   floating over the page: app.js sets that width, --pill-w, in pixels. The
+   bar keeps its padding, and the pill is drawn inside it, 10 px out from
+   what it holds; only the width glides, and at the top it is 100%, so that
+   a window that changes size has nothing to glide. */
 
 .appbar {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--bg);
-  transition: background-color var(--medium) var(--ease), box-shadow var(--medium) var(--ease);
+  height: var(--bar);
 }
-.appbar.is-raised { background: var(--surface-1); box-shadow: 0 1px 0 var(--outline); }
 .appbar-inner {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
   max-width: calc(var(--max) + 2 * var(--gutter));
   margin: 0 auto;
-  padding: 0 var(--gutter);
-  height: 64px;
+  padding-block: 0;
+  padding-inline: var(--gutter);
+  height: var(--bar);
   display: flex;
   align-items: center;
   gap: 24px;
+  transition: width var(--glide) var(--ease-glide);
 }
+.appbar-inner::before {
+  content: "";
+  position: absolute;
+  inset-block: 8px;
+  inset-inline: calc(var(--gutter) - 10px);
+  z-index: -1;
+  border-radius: 999px;
+  background: var(--pill);
+  box-shadow: inset 0 0 0 1px var(--pill-edge), inset 0 1px 0 var(--pill-shine), var(--pill-shadow);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  opacity: 0;
+  transition: opacity 500ms var(--ease-glide);
+  pointer-events: none;
+}
+.appbar.is-raised .appbar-inner { width: var(--pill-w, 100%); }
+.appbar.is-raised .appbar-inner::before { opacity: 1; }
+/* The night scene starts at the top of the window, behind the bar. */
+.appbar ~ main > .pxh {
+  margin-top: calc(-1 * var(--bar));
+  padding-top: var(--bar);
+}
+/* Over it, the night deepens towards the top of the window, so that the
+   stars twinkle clear of the bar's words. The pill takes over as the page
+   scrolls. The light scheme has no night scene, and no need of it. */
+.appbar::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -48px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(4, 5, 7, 0.92), rgba(4, 5, 7, 0.55) 55%, rgba(4, 5, 7, 0));
+  transition: opacity 500ms var(--ease-glide);
+}
+.appbar.is-raised::before { opacity: 0; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .appbar::before { display: none; }
+}
+:root[data-theme="light"] .appbar::before { display: none; }
 .brand {
   display: inline-flex;
   align-items: center;

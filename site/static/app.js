@@ -61,6 +61,50 @@
   if ("ResizeObserver" in window) new ResizeObserver(refit).observe(bar);
   else addEventListener("resize", refit);
 
+  // Raised, the bar draws in to a pill as wide as what it holds
+  // (styles.css): --pill-w is the bar's width then, in pixels, so that it
+  // glides from 100% in every browser. It is what the bar shows, whose
+  // widths the bar's own width doesn't change, so it fits the labels as
+  // the bar above does, with the bar's padding around it; the pill is
+  // drawn 10 px out from what it holds, and a window too narrow for it
+  // gets a pill 12 px in from each side. It is measured again as the
+  // window's width changes, the fonts come in, or the bar's fit hides or
+  // shows something.
+  const PILL_INSET = 10;
+  const BREATH = 32;
+  const pill = () => {
+    const room = appbar.clientWidth;
+    const style = getComputedStyle(bar);
+    const pad = parseFloat(style.paddingInlineStart) || 0;
+    const gap = parseFloat(style.columnGap) || 0;
+    const most = room - 24 + 2 * (pad - PILL_INSET);
+    let need = 2 * pad + BREATH + 2;
+    let shown = 0;
+    for (const el of bar.children) {
+      if (!el.offsetWidth) continue;
+      const s = getComputedStyle(el);
+      // The brand's far margin is the room the bar spreads into: not its own.
+      const margins = el.classList.contains("brand") ? 0 : parseFloat(s.marginInlineStart) + parseFloat(s.marginInlineEnd);
+      need += el.offsetWidth + margins;
+      shown++;
+    }
+    need += gap * Math.max(shown - 1, 0);
+    appbar.style.setProperty("--pill-w", `${Math.ceil(Math.min(need, most))}px`);
+  };
+  let pillAsked = false;
+  const askPill = () => {
+    if (pillAsked) return;
+    pillAsked = true;
+    requestAnimationFrame(() => {
+      pillAsked = false;
+      pill();
+    });
+  };
+  pill();
+  document.fonts?.ready.then(askPill);
+  if ("ResizeObserver" in window) new ResizeObserver(askPill).observe(appbar);
+  if ("MutationObserver" in window) new MutationObserver(askPill).observe(appbar, { attributes: true, attributeFilter: ["class"] });
+
   // Two images stacked in one frame: the next one fades in over the shown
   // one once it has loaded, so the frame never flashes empty.
   function crossfader(first) {

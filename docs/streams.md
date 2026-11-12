@@ -65,8 +65,11 @@ runtime, in Settings › Playback › Tools;
 [how it updates](how-it-works.md#yt-dlp-and-the-javascript-runtime) is on
 the first page of this section. When yt-dlp finds no stream, MixMusic says
 why in plain words, such as "this track is not available in your
-country", "only the members of its channel can play this track" or
-"YouTube plays this track only to signed-in adults, on its own website".
+country", "only the members of its channel can play this track",
+"YouTube plays this track only to signed-in adults, on its own website",
+or "YouTube plays this track only to signed-in viewers", which
+[Play audio as your account](#as-your-account) can play. The log keeps
+each track that couldn't play, with why.
 
 yt-dlp runs twice at most for a track, a quick way first:
 

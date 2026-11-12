@@ -221,9 +221,9 @@ func trackFacts(t media.Track, info app.TrackInfo) []infoRow {
 	case st != nil:
 		rows = append(rows, infoRow{"Format", formatName(st.Codec, st.Container), false})
 	case info.File == nil && t.Source == media.SourceSpotify && info.Recording == nil:
-		rows = append(rows, infoRow{"Format", "MixMusic finds its recording on YouTube Music as it plays, and tells its format then.", false})
+		rows = append(rows, infoRow{"Format", "Play it to see its format, bitrate and the rest: MixMusic finds its recording on YouTube Music as it plays.", false})
 	case info.File == nil:
-		rows = append(rows, infoRow{"Format", "MixMusic finds its stream as it plays, and tells its format then.", false})
+		rows = append(rows, infoRow{"Format", "Play it to see its format, bitrate and the rest: MixMusic finds its stream as it plays.", false})
 	}
 	switch file := info.File; {
 	case st != nil && st.Bitrate > 0:

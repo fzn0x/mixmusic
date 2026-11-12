@@ -216,10 +216,10 @@ func TestTrackFacts(t *testing.T) {
 		}
 	}
 	// Not found yet.
-	if got := values(trackFacts(spotify, app.TrackInfo{Plays: app.PlaysEngine})); got["Format"] != "MixMusic finds its recording on YouTube Music as it plays, and tells its format then." {
+	if got := values(trackFacts(spotify, app.TrackInfo{Plays: app.PlaysEngine})); got["Format"] != "Play it to see its format, bitrate and the rest: MixMusic finds its recording on YouTube Music as it plays." {
 		t.Errorf("a Spotify track not found: %q", got)
 	}
-	if got := values(trackFacts(testTracks[0], app.TrackInfo{Plays: app.PlaysEngine})); got["Format"] != "MixMusic finds its stream as it plays, and tells its format then." {
+	if got := values(trackFacts(testTracks[0], app.TrackInfo{Plays: app.PlaysEngine})); got["Format"] != "Play it to see its format, bitrate and the rest: MixMusic finds its stream as it plays." {
 		t.Errorf("a track not played: %q", got)
 	}
 	// 5.1 surround, from the cache, and a quiet track.

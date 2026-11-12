@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"slices"
 	"sync"
 	"testing"
@@ -135,6 +137,89 @@ func TestYouTubePlaylistsYours(t *testing.T) {
 	}
 }
 
+// addToAnswer is YouTube Music's list of the playlists to add to, of ids.
+func addToAnswer(ids ...string) map[string]any {
+	var options []any
+	for _, id := range ids {
+		options = append(options, map[string]any{"playlistAddToOptionRenderer": map[string]any{"playlistId": id, "title": runs(id)}})
+	}
+	return signedInAnswer(map[string]any{"contents": []any{map[string]any{"addToPlaylistRenderer": map[string]any{"playlists": options}}}})
+}
+
+// TestYouTubePlaylistsCollaborations marks the playlists of others that
+// YouTube Music offers to add to as ones the user collaborates on, which
+// take tracks; not those it doesn't offer. It asks only of a library that
+// holds a playlist of another's, and where it can't, they stay saved.
+func TestYouTubePlaylistsCollaborations(t *testing.T) {
+	addTo := addToAnswer("PLmine", "PLcollab")
+	addToStatus := http.StatusOK
+	a, f := signedInYouTube(t, func(endpoint string) (int, any) {
+		switch endpoint {
+		case "account/account_menu":
+			return http.StatusOK, accountMenuOf("Ada Lovelace")
+		case "playlist/get_add_to_playlist":
+			return addToStatus, addTo
+		}
+		return http.StatusOK, libraryPage(
+			libraryCard("PLmine", "Late night", false, "Ada Lovelace", " • ", "12 tracks"),
+			libraryCard("PLtheirs", "Chill", true, "Lofi Girl", " • ", "200 tracks"),
+			libraryCard("PLcollab", "Road songs", true, "Bo Fieldfare", " • ", "3 tracks"),
+		)
+	})
+	col := &Collection{a: a}
+	playlists, err := col.YouTubePlaylists(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got []string
+	for _, p := range playlists {
+		got = append(got, fmt.Sprintf("%s editable %v collaborative %v owner %s", p.Title, p.Editable, p.Collaborative, p.Owner))
+	}
+	want := []string{
+		"Late night editable true collaborative false owner Ada Lovelace",
+		"Chill editable false collaborative false owner Lofi Girl",
+		"Road songs editable true collaborative true owner Bo Fieldfare",
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("the playlists are %q", got)
+	}
+	var asked *youtubeAsk
+	for _, ask := range f.asked() {
+		if ask.endpoint == "playlist/get_add_to_playlist" {
+			asked = &ask
+		}
+	}
+	if asked == nil || asked.body["playlistId"] != "LM" {
+		t.Errorf("asked for the playlists to add to as %+v", asked)
+	}
+
+	// YouTube doesn't answer: none is another's to add to.
+	addToStatus, addTo = http.StatusInternalServerError, map[string]any{"error": map[string]any{"code": 500}}
+	playlists, err = col.YouTubePlaylists(context.Background())
+	if err != nil || len(playlists) != 3 || playlists[2].Editable || playlists[2].Collaborative || !playlists[2].Saved {
+		t.Errorf("unanswered: %+v, %v", playlists, err)
+	}
+}
+
+// TestYouTubePlaylistsNoneOfOthers doesn't ask which playlists take tracks
+// of a library of the user's own alone.
+func TestYouTubePlaylistsNoneOfOthers(t *testing.T) {
+	a, f := signedInYouTube(t, func(endpoint string) (int, any) {
+		if endpoint == "account/account_menu" {
+			return http.StatusOK, accountMenuOf("Ada Lovelace")
+		}
+		return http.StatusOK, libraryPage(libraryCard("PLmine", "Late night", false, "Ada Lovelace", " • ", "12 tracks"))
+	})
+	if _, err := (&Collection{a: a}).YouTubePlaylists(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	for _, ask := range f.asked() {
+		if ask.endpoint == "playlist/get_add_to_playlist" {
+			t.Errorf("asked for the playlists to add to")
+		}
+	}
+}
+
 // TestCreateYouTubePlaylist makes a playlist on YouTube Music that is the
 // user's, to add to and to delete, as the library would list it.
 func TestCreateYouTubePlaylist(t *testing.T) {
@@ -171,5 +256,48 @@ func TestDeleteYouTubePlaylist(t *testing.T) {
 	asks := f.asked()
 	if len(asks) != 1 || asks[0].endpoint != "playlist/delete" || asks[0].body["playlistId"] != "PLmine" {
 		t.Errorf("asked %+v", asks)
+	}
+}
+
+// recordedYouTube is an answer recorded in ../youtube/testdata.
+func recordedYouTube(t *testing.T, name string) map[string]any {
+	t.Helper()
+	data, err := os.ReadFile("../youtube/testdata/" + name + ".json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var v map[string]any
+	if err := json.Unmarshal(data, &v); err != nil {
+		t.Fatal(err)
+	}
+	return v
+}
+
+// TestCollaboratorPlaylist takes tracks into a playlist of another's that
+// the user collaborates on, whose page YouTube Music shows them without
+// its tools, as it offers it to add to; and not one it doesn't offer.
+func TestCollaboratorPlaylist(t *testing.T) {
+	page, addTo := recordedYouTube(t, "playlist-collaborator"), recordedYouTube(t, "add-to-playlist")
+	a, f := signedInYouTube(t, func(endpoint string) (int, any) {
+		if endpoint == "playlist/get_add_to_playlist" {
+			return http.StatusOK, addTo
+		}
+		return http.StatusOK, page
+	})
+	p, err := a.playlist(context.Background(), "yt:PLtestCollab01")
+	if err != nil || !p.Editable || !p.Collaborative || p.Mine || p.Deletable {
+		t.Fatalf("the collaborator's playlist: %+v, %v", p, err)
+	}
+	if tr := p.Tracks; len(tr) != 2 || tr[0].Removable || !tr[1].Removable {
+		t.Errorf("its tracks: %+v", tr)
+	}
+	asks := f.asked()
+	if len(asks) != 2 || asks[1].endpoint != "playlist/get_add_to_playlist" {
+		t.Errorf("asked %+v", asks)
+	}
+
+	addTo = addToAnswer("PLother")
+	if p, err := a.playlist(context.Background(), "yt:PLtestCollab01"); err != nil || p.Editable {
+		t.Errorf("not offered to add to: editable %v, %v", p.Editable, err)
 	}
 }

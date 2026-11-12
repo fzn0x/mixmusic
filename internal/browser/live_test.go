@@ -8,25 +8,21 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"testing"
 	"time"
 )
 
 // liveBrowser is the browser MIXMUSIC_SIGNIN_BROWSER names, by its
 // program, for the tests that run one; its window shows only while
-// MIXMUSIC_SIGNIN_HEADLESS isn't set. A program named after Firefox or Zen
-// is one made from Firefox.
+// MIXMUSIC_SIGNIN_HEADLESS isn't set: Firefox, Zen, or another made from
+// Firefox.
 func liveBrowser(t *testing.T) Browser {
 	t.Helper()
 	program := os.Getenv("MIXMUSIC_SIGNIN_BROWSER")
 	if program == "" {
 		t.Skip("MIXMUSIC_SIGNIN_BROWSER names no browser to run")
 	}
-	b := Browser{ID: "live", Name: "the browser", Engine: Chromium, Path: program}
-	if name := strings.ToLower(filepath.Base(program)); strings.Contains(name, "firefox") || strings.HasPrefix(name, "zen") {
-		b.Engine = Firefox
-	}
+	b := Browser{ID: "live", Name: "the browser", Engine: Firefox, Path: program}
 	if os.Getenv("MIXMUSIC_SIGNIN_HEADLESS") != "" {
 		saved := extraArgs
 		extraArgs = []string{"--headless"}
@@ -108,7 +104,7 @@ func TestLiveSignIn(t *testing.T) {
 // which leaves Firefox running on macOS: the user quits it there.
 func TestLiveClosed(t *testing.T) {
 	b := liveBrowser(t)
-	if b.Engine == Firefox && runtime.GOOS == "darwin" {
+	if runtime.GOOS == "darwin" {
 		t.Skip("Firefox goes on running on macOS once its last window closes")
 	}
 	srv := signInPage(t)

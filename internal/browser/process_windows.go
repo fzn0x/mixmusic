@@ -10,11 +10,10 @@ import (
 	"unsafe"
 )
 
-// readyCommand readies the command's attributes, which the pipes add to,
-// and its environment, without the compatibility layer a MixMusic run as
-// administrator has (__COMPAT_LAYER=RunAsAdmin): Edge starts again
-// without it, through another process, which would leave the pipes
-// behind.
+// readyCommand readies the command's attributes, and its environment,
+// without the compatibility layer a MixMusic run as administrator has
+// (__COMPAT_LAYER=RunAsAdmin): a browser may start again without it,
+// through another process, apart from the one MixMusic started.
 func readyCommand(cmd *exec.Cmd) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{}
 	cmd.Env = slices.DeleteFunc(os.Environ(), func(kv string) bool {

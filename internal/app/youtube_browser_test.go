@@ -19,7 +19,7 @@ func fakeBrowsers(a *App, found []browser.Browser, signIn func(ctx context.Conte
 }
 
 var foundBrowsers = []browser.Browser{
-	{ID: "edge", Name: "Edge", Engine: browser.Chromium, Path: "msedge"},
+	{ID: "firefox", Name: "Firefox", Engine: browser.Firefox, Path: "firefox"},
 	{ID: "zen", Name: "Zen", Engine: browser.Firefox, Path: "zen"},
 }
 
@@ -28,7 +28,7 @@ func TestYouTubeSignInBrowsers(t *testing.T) {
 	a, _ := cookieApp(t, signedIn(true))
 	fakeBrowsers(a, foundBrowsers, nil)
 	got := (&Accounts{a}).YouTubeSignInBrowsers()
-	if want := []YouTubeBrowser{{ID: "edge", Name: "Edge"}, {ID: "zen", Name: "Zen"}}; !slices.Equal(got, want) {
+	if want := []YouTubeBrowser{{ID: "firefox", Name: "Firefox"}, {ID: "zen", Name: "Zen"}}; !slices.Equal(got, want) {
 		t.Errorf("listed %v, want %v", got, want)
 	}
 }
@@ -90,11 +90,11 @@ func TestBrowserLoginEnds(t *testing.T) {
 		cancel   bool
 		want     string
 	}{
-		{name: "closed", id: "edge", err: browser.ErrClosed, want: "Edge closed before you signed in to YouTube Music"},
-		{name: "time is up", id: "edge", err: context.DeadlineExceeded, want: "signing in to YouTube Music took too long; try again"},
+		{name: "closed", id: "firefox", err: browser.ErrClosed, want: "Firefox closed before you signed in to YouTube Music"},
+		{name: "time is up", id: "firefox", err: context.DeadlineExceeded, want: "signing in to YouTube Music took too long; try again"},
 		{name: "doesn't open", id: "zen", err: errors.New("exec: no such file"), want: "MixMusic couldn't open Zen: exec: no such file"},
 		{name: "not found", id: "brave", want: `MixMusic no longer finds "brave" on this computer`},
-		{name: "cancelled", id: "edge", cancel: true, want: context.Canceled.Error()},
+		{name: "cancelled", id: "firefox", cancel: true, want: context.Canceled.Error()},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			a, requests := cookieApp(t, signedIn(true))

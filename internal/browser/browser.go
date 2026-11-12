@@ -5,11 +5,11 @@
 // them, closes the browser and deletes the profile. It never reads the
 // user's own profiles.
 //
-// It reads the cookies of a browser made from Chromium through the
-// DevTools protocol, over a pipe between MixMusic and the browser, so that
-// nothing listens on the network; and those of a browser made from
-// Firefox from the profile's own cookie store, an SQLite file, which a
-// reader of its own reads (sqlite.go).
+// It reads the cookies of a browser made from Firefox from the profile's
+// own cookie store, an SQLite file, which a reader of its own reads
+// (sqlite.go). It opens no browser made from Chromium: one MixMusic drives
+// tells the pages it opens so (navigator.webdriver), and Google won't sign
+// in to such a browser, "This browser or app may not be secure".
 package browser
 
 import (
@@ -25,16 +25,14 @@ import (
 type Engine int
 
 const (
-	// Chromium is the engine of Chrome, Edge, Brave, Vivaldi and Helium.
-	Chromium Engine = iota + 1
 	// Firefox is the engine of Firefox and Zen.
-	Firefox
+	Firefox Engine = iota + 1
 )
 
 // Browser is a browser installed on this computer.
 type Browser struct {
-	// ID names the browser to MixMusic, as "chrome", and Name to the
-	// user, as "Chrome".
+	// ID names the browser to MixMusic, as "firefox", and Name to the
+	// user, as "Firefox".
 	ID, Name string
 	Engine   Engine
 	// Path is its program.
@@ -87,7 +85,7 @@ type starter func(ctx context.Context, b Browser, dir, url string) (session, err
 var extraArgs []string
 
 // starters start the browsers of each engine. Tests replace them.
-var starters = map[Engine]starter{Chromium: startChromium, Firefox: startFirefox}
+var starters = map[Engine]starter{Firefox: startFirefox}
 
 // SignIn opens b with a new profile at opts.URL, and returns the cookies
 // of the profile once opts.SignedIn tells that the user signed in, and

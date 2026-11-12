@@ -25,8 +25,8 @@ func browserShell(t *testing.T, found []browser.Browser, signIn func(ctx context
 }
 
 var testBrowsers = []browser.Browser{
-	{ID: "chrome", Name: "Chrome", Engine: browser.Chromium, Path: "chrome"},
 	{ID: "firefox", Name: "Firefox", Engine: browser.Firefox, Path: "firefox"},
+	{ID: "zen", Name: "Zen", Engine: browser.Firefox, Path: "zen"},
 }
 
 // TestBrowserSignIn offers the browsers found, signed out, beside the
@@ -46,27 +46,27 @@ func TestBrowserSignIn(t *testing.T) {
 	})
 	tt := testerOf(t, s, 1280, 2600)
 	show(s, tt, "/settings/accounts")
-	for _, want := range []string{"sign in to youtube music", youtubeBrowserTitle, youtubeBrowserAbout, "Chrome", "sign in with Chrome", "Paste a cookie header"} {
+	for _, want := range []string{"sign in to youtube music", youtubeBrowserTitle, youtubeBrowserAbout, "Firefox", "sign in with Firefox", "Paste a cookie header"} {
 		if !tt.HasText(want) {
 			t.Errorf("the accounts don't show %q: %q", want, tt.Texts())
 		}
 	}
 
-	click(t, s, tt, "sign in with Chrome")
+	click(t, s, tt, "sign in with Firefox")
 	<-started
-	if !tt.HasText("waiting for Chrome…") || !tt.HasText("cancel") || s.signingIn != "youtube-browser" {
-		t.Fatalf("a sign-in in Chrome waits as %q: %q", s.signingIn, tt.Texts())
+	if !tt.HasText("waiting for Firefox…") || !tt.HasText("cancel") || s.signingIn != "youtube-browser" {
+		t.Fatalf("a sign-in in Firefox waits as %q: %q", s.signingIn, tt.Texts())
 	}
 	click(t, s, tt, "cancel")
 	until(t, s, tt, "the sign-in to end", func() bool { return s.signingIn == "" })
-	if tt.HasText("MixMusic didn't sign in to YouTube Music") || tt.HasText("waiting for Chrome…") {
+	if tt.HasText("MixMusic didn't sign in to YouTube Music") || tt.HasText("waiting for Firefox…") {
 		t.Errorf("a cancelled sign-in shows %q", tt.Texts())
 	}
 
 	closed = true
-	click(t, s, tt, "sign in with Chrome")
+	click(t, s, tt, "sign in with Firefox")
 	<-started
-	waitText(t, s, tt, "Chrome closed before you signed in to YouTube Music")
+	waitText(t, s, tt, "Firefox closed before you signed in to YouTube Music")
 	if !tt.HasText("MixMusic didn't sign in to YouTube Music") || s.signingIn != "" {
 		t.Errorf("the closed browser isn't told: %q", tt.Texts())
 	}
@@ -95,7 +95,7 @@ func TestSettingsFindBrowserSignIn(t *testing.T) {
 	tt := testerOf(t, s, 1280, 6000)
 	for _, q := range []string{"your browser", "temporary profile", "zen", "google refuses"} {
 		show(s, tt, settingsPath("", q))
-		showsOnly(t, tt, "searching "+q, []string{youtubeBrowserTitle, "sign in with Chrome"}, nil)
+		showsOnly(t, tt, "searching "+q, []string{youtubeBrowserTitle, "sign in with Firefox"}, nil)
 	}
 	show(s, tt, settingsPath("", "crossfade"))
 	showsOnly(t, tt, "searching crossfade", nil, []string{youtubeBrowserTitle})

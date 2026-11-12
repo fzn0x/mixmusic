@@ -1,24 +1,31 @@
 import { expect, load, test } from "./page.js";
+import { languages } from "./pages.js";
 
 // The bar at the top of a page stays on one line, inside itself, at every
 // width, and not only at the phone's and the desktop's (#426): the home
-// page's nav wrapped out of its bar at about 820 px.
+// page's nav wrapped out of its bar at about 820 px. The home page's bar
+// holds in each of its languages too, whose words are longer or shorter
+// than English's (app.js fits it); those run in Chromium alone.
 const bars = [
   { name: "home", path: "/", bar: ".appbar-inner" },
   { name: "docs", path: "/docs/", bar: ".topbar" },
+  ...languages.map((l) => ({ name: `home in ${l.tag}`, path: `/${l.dir}/`, bar: ".appbar-inner", chromium: true })),
 ];
 const widths = [480, 600, 700, 761, 800, 820, 860, 900, 960, 1000, 1080, 1100, 1280, 1440];
 
-for (const { name, path, bar } of bars) {
-  test(`the ${name} page's top bar keeps its labels on one line inside it, at every width`, async ({ page }) => {
+for (const { name, path, bar, chromium } of bars) {
+  test(`the ${name} page's top bar keeps its labels on one line inside it, at every width`, async ({ page, browserName }) => {
+    test.skip(chromium && browserName !== "chromium", "the languages' bars are checked in Chromium");
     await load(page, path);
     const bad = [];
     for (const width of widths) {
       await page.setViewportSize({ width, height: 800 });
+      // A frame for the bar to fit itself to the width.
+      await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
       const found = await page.evaluate((selector) => {
         const box = document.querySelector(selector).getBoundingClientRect();
         const out = [];
-        for (const el of document.querySelector(selector).querySelectorAll("a, button")) {
+        for (const el of document.querySelector(selector).querySelectorAll("a, button, summary")) {
           const r = el.getBoundingClientRect();
           // What is hidden, or clipped to nothing for a screen reader, takes no room.
           if (!r.width || !r.height || r.width <= 1) continue;
@@ -29,6 +36,7 @@ for (const { name, path, bar } of bars) {
           const line = parseFloat(getComputedStyle(el).lineHeight) || parseFloat(getComputedStyle(el).fontSize) * 1.3;
           if (el.matches("nav a") && r.height > line + 24) out.push(`${name} wraps onto ${Math.round(r.height / line)} lines`);
         }
+        if (document.documentElement.scrollWidth > document.documentElement.clientWidth) out.push("the page is wider than the window");
         return out;
       }, bar);
       bad.push(...found.map((f) => `at ${width}px: ${f}`));

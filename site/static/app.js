@@ -24,6 +24,40 @@
   addEventListener("scroll", raise, { passive: true });
   raise();
 
+  // The bar's labels stay on one line inside it in every language. How wide
+  // they are depends on the language and the fonts, so the widths at which
+  // they no longer fit are measured, not set: where they don't, the GitHub
+  // button keeps its star and count (is-compact), and then the sections'
+  // links go (is-tight), as on a phone. It runs again when the window, the
+  // fonts or the star count change.
+  const bar = $(".appbar-inner", appbar);
+  const overflows = () => {
+    const box = bar.getBoundingClientRect();
+    const style = getComputedStyle(bar);
+    const start = box.left + parseFloat(style.paddingLeft);
+    const end = box.right - parseFloat(style.paddingRight);
+    return [...bar.children].some((el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && (r.left < start - 0.5 || r.right > end + 0.5);
+    });
+  };
+  const fit = () => {
+    appbar.classList.remove("is-compact", "is-tight");
+    if (!overflows()) return;
+    appbar.classList.add("is-compact");
+    if (overflows()) appbar.classList.add("is-tight");
+  };
+  fit();
+  addEventListener("resize", fit);
+  document.fonts?.ready.then(fit);
+  if ("ResizeObserver" in window) {
+    // A frame later: changing what it watches inside its own callback
+    // would report a loop.
+    const watch = new ResizeObserver(() => requestAnimationFrame(fit));
+    watch.observe(bar);
+    for (const el of bar.querySelectorAll(".btn")) watch.observe(el);
+  }
+
   // Two images stacked in one frame: the next one fades in over the shown
   // one once it has loaded, so the frame never flashes empty.
   function crossfader(first) {

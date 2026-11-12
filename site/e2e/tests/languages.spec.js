@@ -1,20 +1,11 @@
 import { expect, load, test } from "./page.js";
+import { languages } from "./pages.js";
 
 // The landing page's languages besides English, as tools/sitefinish makes
 // them: each at /<dir>/, its words translated, its lang and dir, its
 // addresses a folder up, the alternates search engines read, and the
 // language menus. These run in Chromium alone: pages.js gives Urdu and
 // Hindi every check in every browser.
-const languages = [
-  { dir: "hi", tag: "hi" },
-  { dir: "zh-cn", tag: "zh-Hans" },
-  { dir: "id", tag: "id" },
-  { dir: "ur", tag: "ur", rtl: true },
-  { dir: "pt-br", tag: "pt-BR" },
-  { dir: "bn", tag: "bn" },
-  { dir: "ru", tag: "ru" },
-  { dir: "am", tag: "am" },
-];
 const all = languages.length + 1;
 
 test.describe("languages", () => {

@@ -269,7 +269,10 @@ code {
   text-decoration: none;
 }
 .brand:hover { color: var(--ink); }
-.appbar-nav { display: flex; gap: 4px; margin-left: auto; }
+/* What follows the brand sits at the bar's far end, in either direction
+   and whichever of it shows. */
+.appbar-inner > .brand { margin-inline-end: auto; }
+.appbar-nav { display: flex; gap: 4px; }
 .appbar-nav a {
   white-space: nowrap;
   padding: 8px 14px;
@@ -1344,6 +1347,20 @@ html.no-js .demo-wrap { display: none; }
   }
 }
 
+/* Where a language's words don't fit in the bar at a width (app.js
+   measures it, as the fonts and the words decide it), the GitHub button
+   keeps its star and count, and then the sections' links go, as on a
+   phone. */
+.appbar.is-compact .appbar-inner .btn > span:first-of-type {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.appbar.is-tight .appbar-nav { display: none; }
+
 @media (max-width: 960px) {
   .tab-body,
   .gallery,
@@ -1355,9 +1372,6 @@ html.no-js .demo-wrap { display: none; }
 
 @media (max-width: 760px) {
   .appbar-nav { display: none; }
-  .appbar-inner .btn,
-  .appbar-inner .theme-toggle { margin-left: auto; }
-  html.js .appbar-inner .theme-toggle + .btn { margin-left: 0; }
   .columns,
   .needs dl,
   .links { grid-template-columns: minmax(0, 1fr); }

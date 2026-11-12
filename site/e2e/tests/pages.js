@@ -12,3 +12,16 @@ export const pages = [
   { name: "docs plugins", path: "/docs/plugins/" },
   { name: "docs troubleshooting", path: "/docs/troubleshooting/" },
 ];
+
+// The home page's languages besides English, as tools/sitefinish makes them
+// (languages.go): each at /<dir>/, with its lang.
+export const languages = [
+  { dir: "hi", tag: "hi" },
+  { dir: "zh-cn", tag: "zh-Hans" },
+  { dir: "id", tag: "id" },
+  { dir: "ur", tag: "ur", rtl: true },
+  { dir: "pt-br", tag: "pt-BR" },
+  { dir: "bn", tag: "bn" },
+  { dir: "ru", tag: "ru" },
+  { dir: "am", tag: "am" },
+];

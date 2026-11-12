@@ -31,11 +31,8 @@
   // links go (is-tight), as on a phone. It runs again once the fonts are in,
   // and whenever the bar's width changes, with the window's. It watches
   // that width alone, which nothing it changes inside the bar can change,
-  // so it can't set itself off. Watching the GitHub button, whose size it
-  // changes, and the window's resize, which WebKit also fires as a
-  // scrollbar comes and goes, could: the bar's check timed out in WebKit on
-  // Linux with them. The star count has its room kept (stars.css), so it
-  // doesn't move the bar's labels when it comes.
+  // so it can't set itself off. The star count has its room kept
+  // (stars.css), so it doesn't move the bar's labels when it comes.
   const bar = $(".appbar-inner", appbar);
   const overflows = () => {
     const box = bar.getBoundingClientRect();

@@ -76,7 +76,16 @@
   <link rel="stylesheet" href="stars.css" />
   <script src="stars.js" defer></script>
   <link rel="stylesheet" href="reveal.css" />
-  <script>if (matchMedia("(prefers-reduced-motion: no-preference)").matches && "IntersectionObserver" in window) document.documentElement.classList.add("rv-on");</script>
+  {#- The hero's entrance (reveal.css) starts once the font is in, or after
+      700 ms at most, so that its words don't change shape as they come in. #}
+  <script>(() => {
+    const root = document.documentElement;
+    if (!matchMedia("(prefers-reduced-motion: no-preference)").matches || !("IntersectionObserver" in window)) return;
+    root.classList.add("rv-on");
+    const go = () => root.classList.add("rv-go");
+    setTimeout(go, 700);
+    document.fonts?.load("850 1em Figtree").then(go, go);
+  })();</script>
   <script src="reveal.js" defer></script>
   <link rel="stylesheet" href="tiles.css" />
   <script src="tiles.js" defer></script>

@@ -124,6 +124,13 @@
     <symbol id="i-dislike" viewBox="0 0 24 24"><path d="M16.5 3.5h4v10h-4zM16.5 3.5H7.2a2 2 0 0 0-2 1.6l-1.6 7a2 2 0 0 0 2 2.4H10V18a2.5 2.5 0 0 0 2.5 2.5l4-7Z" /></symbol>
     <symbol id="i-radio" viewBox="0 0 24 24"><path d="M3.5 5.5h17v13h-17zM10 9v6l5-3z" /></symbol>
     <symbol id="i-noads" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 1 0 0-17zM6 6l12 12" /></symbol>
+    <symbol id="i-remote" viewBox="0 0 24 24"><path d="M2.5 6.5h12v8.5h-12zM8.5 15v3M5.5 18.5h6M16.5 10.5a2.5 2.5 0 0 1 2.5 2.5M16.5 6.5A6.5 6.5 0 0 1 23 13" /></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M10.5 3.5l1.9 5.1 5.1 1.9-5.1 1.9-1.9 5.1-1.9-5.1-5.1-1.9 5.1-1.9zM18 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z" /></symbol>
+    <symbol id="i-year" viewBox="0 0 24 24"><path d="M4.5 20.5V13M9.5 20.5V8M14.5 20.5V11M19.5 20.5V4" /></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h4l2 2.5h8a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18zM10.5 16.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM10.5 16.5V11l4-1" /></symbol>
+    <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M4.5 17v-4a7.5 7.5 0 0 1 15 0v4M4.5 14.5h3v6h-3zM16.5 14.5h3v6h-3z" /></symbol>
+    <symbol id="i-people" viewBox="0 0 24 24"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20a6.5 6.5 0 0 1 13 0M16 4.3a3.5 3.5 0 0 1 0 6.4M18 14a6.5 6.5 0 0 1 3.5 6" /></symbol>
+    <symbol id="i-follow" viewBox="0 0 24 24"><path d="M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6" /></symbol>
     <!-- MixMusic's own icons, as the app draws them (icons.go). -->
     <symbol id="a-home" viewBox="0 0 24 24"><path d="M3.5 11 12 3.5l8.5 7.5M5.5 9.5V20h5v-6h3v6h5V9.5" /></symbol>
     <symbol id="a-search" viewBox="0 0 24 24"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM15.2 15.2 20.5 20.5" /></symbol>
@@ -371,10 +378,38 @@
 
     <section class="section" id="new" aria-labelledby="new-title">
       <div class="section-head">
-        <h2 id="new-title">New in 0.5.9</h2>
-        <p class="lead">Podcasts, layouts, downloads and lyrics in your language came with the latest release, and more besides. The <a href="https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md">changelog</a> has all of it.</p>
+        <h2 id="new-title">What's new in MixMusic</h2>
+        <p class="lead">Remote control, AI assistants, the music on your computer and a look back at your year came with the latest releases, beside lyrics in your language, podcasts and layouts. The <a href="https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md">changelog</a> has all of it.</p>
       </div>
       <ul class="bento">
+        <li class="tile tile-wide">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-remote" /></svg>Remote control</h3>
+          <p>Control MixMusic on another computer of your network from the cast button: pair once with a code of 6 digits, then play, skip, seek, set the volume or move the queue there. There's no server and no account: the two computers talk directly, encrypted.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-spark" /></svg>AI assistants</h3>
+          <p>Let an assistant such as Claude Desktop control MixMusic over MCP: it tells what plays, plays, skips, searches and queues what it finds. Each thing it does shows a toast, and only the assistants of this computer reach it.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-year" /></svg>Your year</h3>
+          <p>Stats › Your year looks back at a year of your listening: the minutes, your top songs, artists and albums, and the new artists you found. Save image makes a card of it, square or tall for a story.</p>
+        </li>
+        <li class="tile tile-wide">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-folder" /></svg>Music on your computer</h3>
+          <p>Add your folders of MP3, FLAC, WAV, M4A, Opus and Vorbis files, and they join Spotify and YouTube Music in one library, one search and one queue. Edit their tags in MixMusic, and copies of one song show once, playing the best of them.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-headphones" /></svg>Output device</h3>
+          <p>Play music on headphones or a DAC while calls and the system's sounds stay on the speakers. A device you unplug gives way to the system's default, and MixMusic goes back to it once it's back.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-people" /></svg>Collaborative playlists</h3>
+          <p>Invite collaborators to a YouTube Music playlist of yours, or make a Spotify one collaborative. Playlists you collaborate on list apart in your library, with who made them, and take your songs too.</p>
+        </li>
+        <li class="tile">
+          <h3><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-follow" /></svg>Follow artists</h3>
+          <p>Follow an artist with or without an account, and their new albums and singles show on Home, in New from artists you follow.</p>
+        </li>
         <li class="tile tile-wide">
           <div class="tile-art tile-art-lyrics" aria-hidden="true">
             <p class="ly ly-past">朝ごはんを食べた</p>

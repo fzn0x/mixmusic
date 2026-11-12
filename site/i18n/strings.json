@@ -295,13 +295,83 @@
     "where": "#top p"
   },
   {
-    "text": "New in 0.5.9",
+    "text": "What's new in MixMusic",
     "kind": "text",
     "where": "h2#new-title"
   },
   {
-    "text": "Podcasts, layouts, downloads and lyrics in your language came with the latest release, and more besides. The \u003ca href=\"https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md\"\u003echangelog\u003c/a\u003e has all of it.",
+    "text": "Remote control, AI assistants, the music on your computer and a look back at your year came with the latest releases, beside lyrics in your language, podcasts and layouts. The \u003ca href=\"https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md\"\u003echangelog\u003c/a\u003e has all of it.",
     "kind": "html",
+    "where": "#new p"
+  },
+  {
+    "text": "Remote control",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Control MixMusic on another computer of your network from the cast button: pair once with a code of 6 digits, then play, skip, seek, set the volume or move the queue there. There's no server and no account: the two computers talk directly, encrypted.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "AI assistants",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Let an assistant such as Claude Desktop control MixMusic over MCP: it tells what plays, plays, skips, searches and queues what it finds. Each thing it does shows a toast, and only the assistants of this computer reach it.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Your year",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Stats › Your year looks back at a year of your listening: the minutes, your top songs, artists and albums, and the new artists you found. Save image makes a card of it, square or tall for a story.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Music on your computer",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Add your folders of MP3, FLAC, WAV, M4A, Opus and Vorbis files, and they join Spotify and YouTube Music in one library, one search and one queue. Edit their tags in MixMusic, and copies of one song show once, playing the best of them.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Output device",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Play music on headphones or a DAC while calls and the system's sounds stay on the speakers. A device you unplug gives way to the system's default, and MixMusic goes back to it once it's back.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Collaborative playlists",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Invite collaborators to a YouTube Music playlist of yours, or make a Spotify one collaborative. Playlists you collaborate on list apart in your library, with who made them, and take your songs too.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Follow artists",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Follow an artist with or without an account, and their new albums and singles show on Home, in New from artists you follow.",
+    "kind": "text",
     "where": "#new p"
   },
   {

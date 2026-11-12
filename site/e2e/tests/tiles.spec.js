@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, load, test } from "./page.js";
 
-// The feature cards that act out what they do (#358): the tiles of "New in"
+// The feature cards that act out what they do (#358): the tiles of "What's new"
 // and the plugin card of "Make it yours". Their pictures play on their own,
 // again and again, while they are well in the window, go back to their
 // start out of it, and hold where they are while hovered or focused. Under
@@ -20,6 +20,13 @@ const held = 3500;
 // it.
 const round = { timeout: 10_000 };
 const headings = [
+  "Remote control",
+  "AI assistants",
+  "Your year",
+  "Music on your computer",
+  "Output device",
+  "Collaborative playlists",
+  "Follow artists",
   "Lyrics in your language",
   "Podcasts",
   "Downloads",

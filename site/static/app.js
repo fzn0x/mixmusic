@@ -28,8 +28,14 @@
   // they are depends on the language and the fonts, so the widths at which
   // they no longer fit are measured, not set: where they don't, the GitHub
   // button keeps its star and count (is-compact), and then the sections'
-  // links go (is-tight), as on a phone. It runs again when the window, the
-  // fonts or the star count change.
+  // links go (is-tight), as on a phone. It runs again once the fonts are in,
+  // and whenever the bar's width changes, with the window's. It watches
+  // that width alone, which nothing it changes inside the bar can change,
+  // so it can't set itself off. Watching the GitHub button, whose size it
+  // changes, and the window's resize, which WebKit also fires as a
+  // scrollbar comes and goes, could: the bar's check timed out in WebKit on
+  // Linux with them. The star count has its room kept (stars.css), so it
+  // doesn't move the bar's labels when it comes.
   const bar = $(".appbar-inner", appbar);
   const overflows = () => {
     const box = bar.getBoundingClientRect();
@@ -47,16 +53,16 @@
     appbar.classList.add("is-compact");
     if (overflows()) appbar.classList.add("is-tight");
   };
-  fit();
-  addEventListener("resize", fit);
+  let width = -1;
+  const refit = () => {
+    if (bar.clientWidth === width) return;
+    width = bar.clientWidth;
+    fit();
+  };
+  refit();
   document.fonts?.ready.then(fit);
-  if ("ResizeObserver" in window) {
-    // A frame later: changing what it watches inside its own callback
-    // would report a loop.
-    const watch = new ResizeObserver(() => requestAnimationFrame(fit));
-    watch.observe(bar);
-    for (const el of bar.querySelectorAll(".btn")) watch.observe(el);
-  }
+  if ("ResizeObserver" in window) new ResizeObserver(refit).observe(bar);
+  else addEventListener("resize", refit);
 
   // Two images stacked in one frame: the next one fades in over the shown
   // one once it has loaded, so the frame never flashes empty.

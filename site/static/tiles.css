@@ -474,6 +474,41 @@
 .ta-live .ta-eq s:nth-child(4) { --lv: 0.95; animation-delay: -120ms !important; }
 .ta-live .ta-eq s:nth-child(5) { --lv: 0.7; animation-delay: -380ms !important; }
 
+/* No ads: songs one after another, the playhead going on into the next. */
+.ta-noads { align-content: center; gap: 12px; padding: 16px 18px; }
+.ta-noads .ta-cover { width: 40px; height: 40px; background: linear-gradient(135deg, var(--tint, #7769d3), color-mix(in srgb, var(--tint, #7769d3) 35%, #12101d)); }
+.ta-noads .ta-text { display: grid; gap: 2px; min-width: 0; }
+.ta-noads .ta-text strong,
+.ta-noads .ta-text small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ta-noads .ta-strip { position: relative; display: flex; gap: 3px; height: 6px; container-type: inline-size; }
+.ta-noads .ta-part { position: relative; flex: var(--grow) 1 0; border-radius: 3px; background: var(--ta-panel-2); overflow: hidden; }
+.ta-noads .ta-part::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tint);
+  opacity: 0.55;
+  transform: scaleX(var(--fill, 0));
+  transform-origin: left;
+  transition: transform var(--glide, 0ms) linear, opacity 300ms;
+}
+.ta-noads .ta-part.is-now::after { opacity: 1; }
+.ta-noads .ta-ph {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--ta-ink);
+  box-shadow: 0 0 0 3px #000;
+  transform: translateX(calc(var(--at, 0) * 100cqi));
+  transition: transform var(--glide, 0ms) linear;
+}
+.ta-noads .ta-lens { display: flex; gap: 3px; }
+.ta-noads .ta-lens small { flex: var(--grow) 1 0; font-size: 0.6875rem; }
+
 /* Add a plugin: the marketplace, Spectrum installed, and its bars. */
 .ta-market { align-content: start; gap: 10px; padding: 14px 16px; }
 .ta-market .ta-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }

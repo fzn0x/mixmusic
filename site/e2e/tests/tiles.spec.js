@@ -31,6 +31,7 @@ const headings = [
   "Global shortcuts",
   "Dislikes",
   "Live streams and music videos",
+  "No ads",
   "Add a plugin",
 ];
 

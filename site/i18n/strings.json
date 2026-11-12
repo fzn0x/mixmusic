@@ -420,6 +420,16 @@
     "where": "#new p"
   },
   {
+    "text": "No ads",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Songs from YouTube Music play one after another, with no ad before or between them. MixMusic has no ads of its own either.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
     "text": "One player for both services",
     "kind": "text",
     "where": "h2#features-title"

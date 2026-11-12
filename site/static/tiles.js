@@ -429,6 +429,48 @@
     },
   });
 
+  // Songs one after another, nothing between them: the playhead fills a
+  // song to its end and goes on into the next at once, as its title takes
+  // the place of the last one's.
+  acts.push({
+    card: "No ads",
+    art: (card) => {
+      const songs = [["Neon Tide", "Kaori Ume", 190, "#52e4ea"], ["Slow Static", "Mira Vale", 178, "#7769d3"], ["Paper Planets", "Velvet Ferries", 204, "#ec8051"]];
+      const el = put(card, art("noads", `
+        <div class="ta-row"><span class="ta-cover"></span><span class="ta-text"><strong></strong><small></small></span></div>
+        <div class="ta-strip">${songs.map(([, , s, c]) => `<span class="ta-part" style="--grow: ${s}; --tint: ${c}"></span>`).join("")}<span class="ta-ph"></span></div>
+        <div class="ta-lens">${songs.map(([, , s]) => `<small style="--grow: ${s}">${clock(s)}</small>`).join("")}</div>`));
+      const strip = q(el, ".ta-strip");
+      const parts = qa(el, ".ta-part");
+      const head = q(el, ".ta-ph");
+      const cover = q(el, ".ta-cover");
+      const [title, artist] = [q(el, ".ta-text strong"), q(el, ".ta-text small")];
+      const glide = 1600;
+      // fill plays f of song i, gliding there in ms: its part fills, and the
+      // playhead moves to where it got, as a share of the strip.
+      const fill = (i, f, ms) => () => {
+        const at = (parts[i].offsetLeft + f * parts[i].offsetWidth) / Math.max(strip.clientWidth, 1);
+        for (const e of [parts[i], head]) e.style.setProperty("--glide", `${ms}ms`);
+        parts[i].style.setProperty("--fill", f);
+        head.style.setProperty("--at", at);
+      };
+      const now = (i) => () => {
+        [title.textContent, artist.textContent] = songs[i];
+        cover.style.setProperty("--tint", songs[i][3]);
+        parts.forEach((p, j) => p.classList.toggle("is-now", j === i));
+      };
+      return {
+        rest: () =>
+          snap(el, () => {
+            now(0)();
+            parts.forEach((p) => p.style.setProperty("--fill", 0));
+            fill(0, 0, 0)();
+          }),
+        steps: [[400, fill(0, 1, glide)], [glide, now(1)], [0, fill(1, 1, glide)], [glide, now(2)], [0, fill(2, 0.6, glide)]],
+      };
+    },
+  });
+
   // The marketplace: Spectrum installed, and its bars on now playing.
   acts.push({
     card: "Add a plugin",

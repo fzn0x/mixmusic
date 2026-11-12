@@ -215,12 +215,12 @@
     "where": "nav @aria-label"
   },
   {
-    "text": "Features",
+    "text": "New",
     "kind": "text",
     "where": "a"
   },
   {
-    "text": "New",
+    "text": "Features",
     "kind": "text",
     "where": "a"
   },
@@ -295,24 +295,129 @@
     "where": "#top p"
   },
   {
-    "text": "Two services, one queue",
+    "text": "New in 0.5.9",
     "kind": "text",
-    "where": "h2#merge-title"
+    "where": "h2#new-title"
   },
   {
-    "text": "Your Spotify tracks and your YouTube Music tracks no longer need two apps. They line up in one queue, in the order you choose.",
-    "kind": "text",
-    "where": "#one-queue p"
+    "text": "Podcasts, layouts, downloads and lyrics in your language came with the latest release, and more besides. The \u003ca href=\"https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md\"\u003echangelog\u003c/a\u003e has all of it.",
+    "kind": "html",
+    "where": "#new p"
   },
   {
-    "text": "The tracks and covers here are made up for this page.",
+    "text": "Lyrics in your language",
     "kind": "text",
-    "where": "#one-queue p"
+    "where": "#new h3"
   },
   {
-    "text": "One queue of Spotify and YouTube Music tracks (made up for this page)",
+    "text": "Turn on translate beside the lyrics and each line shows its translation under it. Japanese can show in romaji, and Korean, Chinese, Russian, Hindi, Thai and other scripts in Latin letters, made on your computer. Lyrics timed word by word light each word as it's sung.",
     "kind": "text",
-    "where": "#one-queue ol @aria-label"
+    "where": "#new p"
+  },
+  {
+    "text": "Podcasts",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Shows and episodes from YouTube Music and Spotify, in search and in Library › Podcasts. An episode starts where you left it, on another device too, with a speed of its own.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Downloads",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Download songs, albums, playlists, mixes and your liked songs, and they play without the network. Songs added to a downloaded playlist later download on their own.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Layouts",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Blend, the new default, Expressive, Crate and Tiles, MixMusic's look until now. Each sets shapes, density, headings and motion apart from the theme, and every theme shows in every layout.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "See them below",
+    "kind": "text",
+    "where": "#new a"
+  },
+  {
+    "text": "5.1 surround",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "A track YouTube Music has a 5.1 mix of shows a 5.1 button by the player: six channels on a 5.1 system, mixed down to stereo on headphones.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Casting",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Send what plays to a Chromecast, a Google Home or Nest speaker, or a TV with Chromecast built in. The queue stays in MixMusic, and the device's own buttons work.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "A player around the notch",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "On a MacBook with a notch, the black around the camera widens with the cover and bars that move as it plays. Click it for the player, the progress and the line of lyrics sung now, over any app, full screen too.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Speed",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "From half speed to three times, at the song's own pitch, from the speed button by the player or the command palette.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Global shortcuts",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "Keys of your own that play, skip, change the volume or like a song from any app, recorded in Settings › Shortcuts.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Dislikes",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "The thumbs-down passes over a song from then on, in the queue and in radios. Signed in to YouTube Music, your dislikes go there too. Songs YouTube labels as made with AI can be skipped as well.",
+    "kind": "text",
+    "where": "#new p"
+  },
+  {
+    "text": "Live streams and music videos",
+    "kind": "text",
+    "where": "#new h3"
+  },
+  {
+    "text": "YouTube's 24/7 radio channels play live, and music videos can show their picture on the now playing page, muted and in step with the sound.",
+    "kind": "text",
+    "where": "#new p"
   },
   {
     "text": "One player for both services",
@@ -525,129 +630,24 @@
     "where": "#panel-accounts p"
   },
   {
-    "text": "New in 0.5.9",
+    "text": "Two services, one queue",
     "kind": "text",
-    "where": "h2#new-title"
+    "where": "h2#merge-title"
   },
   {
-    "text": "Podcasts, layouts, downloads and lyrics in your language came with the latest release, and more besides. The \u003ca href=\"https://github.com/fzn0x/mixmusic/blob/main/CHANGELOG.md\"\u003echangelog\u003c/a\u003e has all of it.",
-    "kind": "html",
-    "where": "#new p"
+    "text": "Your Spotify tracks and your YouTube Music tracks no longer need two apps. They line up in one queue, in the order you choose.",
+    "kind": "text",
+    "where": "#one-queue p"
   },
   {
-    "text": "Lyrics in your language",
+    "text": "The tracks and covers here are made up for this page.",
     "kind": "text",
-    "where": "#new h3"
+    "where": "#one-queue p"
   },
   {
-    "text": "Turn on translate beside the lyrics and each line shows its translation under it. Japanese can show in romaji, and Korean, Chinese, Russian, Hindi, Thai and other scripts in Latin letters, made on your computer. Lyrics timed word by word light each word as it's sung.",
+    "text": "One queue of Spotify and YouTube Music tracks (made up for this page)",
     "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "Podcasts",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "Shows and episodes from YouTube Music and Spotify, in search and in Library › Podcasts. An episode starts where you left it, on another device too, with a speed of its own.",
-    "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "Downloads",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "Download songs, albums, playlists, mixes and your liked songs, and they play without the network. Songs added to a downloaded playlist later download on their own.",
-    "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "Layouts",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "Blend, the new default, Expressive, Crate and Tiles, MixMusic's look until now. Each sets shapes, density, headings and motion apart from the theme, and every theme shows in every layout.",
-    "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "See them below",
-    "kind": "text",
-    "where": "#new a"
-  },
-  {
-    "text": "5.1 surround",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "A track YouTube Music has a 5.1 mix of shows a 5.1 button by the player: six channels on a 5.1 system, mixed down to stereo on headphones.",
-    "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "Casting",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "Send what plays to a Chromecast, a Google Home or Nest speaker, or a TV with Chromecast built in. The queue stays in MixMusic, and the device's own buttons work.",
-    "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "A player around the notch",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "On a MacBook with a notch, the black around the camera widens with the cover and bars that move as it plays. Click it for the player, the progress and the line of lyrics sung now, over any app, full screen too.",
-    "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "Speed",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "From half speed to three times, at the song's own pitch, from the speed button by the player or the command palette.",
-    "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "Global shortcuts",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "Keys of your own that play, skip, change the volume or like a song from any app, recorded in Settings › Shortcuts.",
-    "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "Dislikes",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "The thumbs-down passes over a song from then on, in the queue and in radios. Signed in to YouTube Music, your dislikes go there too. Songs YouTube labels as made with AI can be skipped as well.",
-    "kind": "text",
-    "where": "#new p"
-  },
-  {
-    "text": "Live streams and music videos",
-    "kind": "text",
-    "where": "#new h3"
-  },
-  {
-    "text": "YouTube's 24/7 radio channels play live, and music videos can show their picture on the now playing page, muted and in step with the sound.",
-    "kind": "text",
-    "where": "#new p"
+    "where": "#one-queue ol @aria-label"
   },
   {
     "text": "MixMusic in 80 seconds",

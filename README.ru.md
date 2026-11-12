@@ -196,7 +196,7 @@ MixMusic сообщает, что вышла новая версия, и ска�
 выполните `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`; в
 первый раз Flatpak скачает среду выполнения GNOME с Flathub.
 
-Скоро, когда будет готов его tap: на Mac MixMusic ставит [Homebrew](https://brew.sh),
+На Mac MixMusic ставит [Homebrew](https://brew.sh),
 а `brew upgrade` его обновляет.
 
 ```sh

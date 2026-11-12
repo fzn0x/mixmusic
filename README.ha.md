@@ -196,7 +196,7 @@ cibiyar manhajojin ka, ko ka gudanar da
 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`; a karon farko,
 Flatpak yana ɗauko GNOME runtime daga Flathub.
 
-Nan ba da jimawa ba, idan tap ɗinsa ya tashi: a Mac, [Homebrew](https://brew.sh)
+A Mac, [Homebrew](https://brew.sh)
 yana shigar da MixMusic, kuma `brew upgrade` yana sabunta shi.
 
 ```sh

@@ -182,7 +182,7 @@
 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak` ን ያሂዱ፤ በመጀመሪያው
 ጊዜ Flatpak የGNOME runtime ን ከFlathub ያመጣል።
 
-በቅርቡ ይመጣል፣ tapው ሲነሳ፦ በMac ላይ [Homebrew](https://brew.sh) MixMusic ን
+በMac ላይ [Homebrew](https://brew.sh) MixMusic ን
 ይጭናል፣ `brew upgrade` ደግሞ ያዘምነዋል።
 
 ```sh

@@ -184,7 +184,7 @@ MixMusic आपको बताता है और उसे आपके ल�
 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak` चलाएँ; पहली बार
 Flatpak, Flathub से GNOME runtime लाता है।
 
-जल्द आ रहा है, जैसे ही इसका tap तैयार होगा: Mac पर [Homebrew](https://brew.sh)
+Mac पर [Homebrew](https://brew.sh)
 MixMusic इंस्टॉल करता है, और `brew upgrade` उसे अपडेट करता है।
 
 ```sh

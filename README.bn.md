@@ -186,7 +186,7 @@ zip-এর জন্য, যেকোনো জায়গায় আনজ�
 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`; প্রথমবার
 Flatpak Flathub থেকে GNOME রানটাইম নামিয়ে আনে।
 
-শীঘ্রই আসছে, এর ট্যাপ চালু হলে: Mac-এ [Homebrew](https://brew.sh)
+Mac-এ [Homebrew](https://brew.sh)
 MixMusic ইনস্টল করে, আর `brew upgrade` তা আপডেট করে।
 
 ```sh

@@ -9,10 +9,37 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read # the files a pull request changes, for "What changed"
 
 jobs:
+  # What a pull request changes, so that the jobs below check that alone
+  # (.github/scripts/changes.sh): one that changes only the website, the
+  # docs or the changelog's fragments runs their checks, and one that
+  # changes only files nothing reads, as CONTRIBUTORS.md, none. Pushes to
+  # main and merge queues check everything. The Go jobs, which the branch's
+  # rules require, run either way, and pass at once when nothing is theirs
+  # to check; a job that finds no answer here checks everything.
+  changes:
+    name: What changed
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.changes.outputs.go }}
+      packages: ${{ steps.changes.outputs.packages }}
+      site: ${{ steps.changes.outputs.site }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+      - id: changes
+        run: bash .github/scripts/changes.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+
   go:
     name: Go (${{ matrix.os }})
+    needs: changes
+    if: ${{ !cancelled() }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -20,20 +47,30 @@ jobs:
         # macOS too: its keys, its notch and its media controls, which
         # wait for the main thread, make tests that pass elsewhere fail.
         os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      # What this job checks: full, every check; some, on Linux, the tests
+      # of the packages that read what changed, and the changelog's
+      # fragments; none, nothing.
+      CHECKS: ${{ (needs.changes.outputs.go || 'full') == 'full' && 'full' || (needs.changes.outputs.go == 'some' && matrix.os == 'ubuntu-latest' && 'some' || 'none') }}
+      PACKAGES: ${{ needs.changes.outputs.packages }}
     steps:
       - uses: actions/checkout@v7
+        if: env.CHECKS != 'none'
       - uses: actions/setup-go@v6
+        if: env.CHECKS != 'none'
         with:
           go-version-file: go.mod
       - name: Formatting
-        if: runner.os == 'Linux'
+        if: env.CHECKS == 'full' && runner.os == 'Linux'
         run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
       # Go's modules, again if a download breaks off. setup-go's cache has
       # them, unless go.sum changed.
       - name: Go's modules
+        if: env.CHECKS != 'none'
         shell: bash
         run: bash .github/scripts/retry.sh 45 go mod download
       - name: Vet for Linux, Windows and macOS
+        if: env.CHECKS == 'full'
         shell: bash
         run: |
           go vet ./...
@@ -43,14 +80,14 @@ jobs:
       # The Opus decoder's conformance test decodes the test vectors of RFC
       # 8251. They never change: download them once, and check them.
       - name: Cache the Opus test vectors
-        if: runner.os == 'Linux'
+        if: env.CHECKS == 'full' && runner.os == 'Linux'
         id: opus-vectors
         uses: actions/cache@v6
         with:
           path: ${{ runner.temp }}/opus-vectors
           key: opus-testvectors-rfc8251
       - name: Download the Opus test vectors
-        if: runner.os == 'Linux' && steps.opus-vectors.outputs.cache-hit != 'true'
+        if: env.CHECKS == 'full' && runner.os == 'Linux' && steps.opus-vectors.outputs.cache-hit != 'true'
         run: |
           curl -fsSL --retry 15 --retry-all-errors --retry-max-time 1800 -o "$RUNNER_TEMP/opus-vectors.tar.gz" https://opus-codec.org/static/testvectors/opus_testvectors-rfc8251.tar.gz
           echo "6b26a22f9ba87b2b836906a9bb7afec5f8e54d49553b1200382520ee6fedfa55  $RUNNER_TEMP/opus-vectors.tar.gz" | sha256sum -c -
@@ -59,7 +96,9 @@ jobs:
       # The community plugins' JavaScript, which tests run, and the
       # registry check reads: main keeps their TypeScript only.
       - uses: oven-sh/setup-bun@v2
+        if: env.CHECKS == 'full'
       - name: Compile the community plugins
+        if: env.CHECKS == 'full'
         shell: bash
         run: |
           bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
@@ -67,20 +106,29 @@ jobs:
       # The romaji tests read the IPA dictionary, which the app downloads,
       # from its module, checked against go.sum: the app doesn't build it in.
       - name: Download the dictionary of the romaji tests
+        if: env.CHECKS == 'full'
         shell: bash
         run: bash .github/scripts/retry.sh 45 go mod download github.com/ikawaha/kagome-dict/ipa@v1.2.6
       # tools/gotest runs a test that fails again, up to 3 more times: one
       # that passes then is reported as flaky, and one that fails every
       # time fails the step.
       - name: Test
+        if: env.CHECKS == 'full'
         run: go run ./tools/gotest ./...
         env:
           OPUS_TESTVECTORS: ${{ runner.os == 'Linux' && format('{0}/opus-vectors/opus_newvectors', runner.temp) || '' }}
+      # The tests of the packages that read what changed: the website's
+      # tools for site/ and the docs, internal/colorfile for docs/themes.md,
+      # tools/changelog for its fragments.
+      - name: Test what changed
+        if: env.CHECKS == 'some'
+        shell: bash
+        run: go run ./tools/gotest $PACKAGES
       # MixMusic takes keys MyGo has none for from its GTK window: these
       # press them in one, on a virtual display. A test that skips found no
       # display, GTK or xdotool: here, that fails.
       - name: Keys in a GTK window
-        if: runner.os == 'Linux'
+        if: env.CHECKS == 'full' && runner.os == 'Linux'
         shell: bash
         # apt-install.sh goes on from Ubuntu's own archive when the
         # runner's mirror is slow, and a test that fails runs again, up to
@@ -99,8 +147,10 @@ jobs:
             exit 1
           fi
       - name: Community registry
+        if: env.CHECKS == 'full'
         run: go run ./tools/registry -check
       - name: Changelog fragments
+        if: env.CHECKS != 'none'
         run: go run ./tools/changelog -check
 
   # MixMusic's own audio engine plays through each system's audio output:
@@ -109,6 +159,8 @@ jobs:
   # one does, and BlackHole, a virtual device, stand in for one.
   audio:
     name: Audio output (${{ matrix.os }})
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.outputs.go || 'full') == 'full' }}
     runs-on: ${{ matrix.os }}
     # A run takes about a minute, and its steps' downloads and tests may
     # try again for longer; one that hangs gives up long before GitHub's 6
@@ -191,6 +243,8 @@ jobs:
   # The plugin API's types, and the community's plugins against them.
   sdk:
     name: Plugin SDK
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.outputs.go || 'full') == 'full' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -216,6 +270,8 @@ jobs:
   # the site built with Zola, which fails on a broken link between them.
   site:
     name: Website
+    needs: changes
+    if: ${{ !cancelled() && ((needs.changes.outputs.go || 'full') == 'full' || needs.changes.outputs.site == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -235,7 +291,9 @@ jobs:
   # The release's builds, in the Nix shell release.yml builds them in.
   build:
     name: Build ${{ matrix.platform }}
-    needs: [go, sdk]
+    needs: [changes, go, sdk]
+    # After the Go checks and the SDK's, when they ran and passed.
+    if: ${{ !cancelled() && (needs.changes.outputs.go || 'full') == 'full' && needs.go.result == 'success' && needs.sdk.result == 'success' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -347,6 +405,8 @@ jobs:
   # configuration GoReleaser publishes releases with.
   nix:
     name: Nix
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.outputs.go || 'full') == 'full' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

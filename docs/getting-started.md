@@ -10,7 +10,12 @@ MixMusic puts both services in one window: one search looks through YouTube Musi
 Download the file for your system from the
 [latest release](https://github.com/fzn0x/mixmusic/releases/latest):
 
-- **macOS 12 and later**, on Apple silicon or Intel: `mixmusic-<version>-macos-universal.dmg`. Open it and move MixMusic into your Applications folder.
+- **macOS 12 and later**, on Apple silicon or Intel: `mixmusic-<version>-macos-universal.dmg`. Open it and move MixMusic into your Applications folder. Or let [Homebrew](https://brew.sh) install it, and `brew upgrade` update it:
+
+  ```sh
+  brew install --cask fzn0x/tap/mixmusic
+  ```
+
 - **Windows 10 and 11**, on x64 or Arm: the installer, `mixmusic-<version>-windows-<arch>-setup.exe`, or the portable zip, `mixmusic-<version>-windows-<arch>-portable.zip`, which you unpack anywhere and start with `MixMusic.exe`.
 - **Linux**, on x64 or Arm64: the `.deb` for Debian, Ubuntu and their derivatives, the `.rpm` for Fedora and openSUSE, the AppImage for any Linux (make it executable with `chmod +x`, then open it), the Flatpak for any Linux, or the `.tar.gz` archive with its `install.sh`, which installs MixMusic in your home folder.
 

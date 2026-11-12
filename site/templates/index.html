@@ -1,5 +1,9 @@
 <!doctype html>
-<html lang="en" class="no-js">
+{#- data-base: the address this copy is built for, which links to the
+    site's own pages start with. tools/sitefinish reads it to match them
+    to the translations, which have the canonical address, and takes it
+    out. #}
+<html lang="en" class="no-js" data-base="{{ config.base_url | trim_end(pat='/') }}/">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />

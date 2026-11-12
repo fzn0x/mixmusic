@@ -92,7 +92,13 @@ func run(site string, extractOnly bool) error {
 	if err != nil {
 		return err
 	}
+	// The pieces as the canonical copy has them, whichever copy was built:
+	// the translations are keyed by those.
 	units := extract(doc)
+	built, home := builtFor(doc), slash(cfg.canonical)
+	for i := range units {
+		units[i].Text = rebase(units[i].Text, built, home)
+	}
 	stringsPath := filepath.Join(site, "i18n", "strings.json")
 	if extractOnly {
 		out, err := json.MarshalIndent(units, "", "  ")

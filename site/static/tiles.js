@@ -33,8 +33,9 @@
     return t.content.firstElementChild;
   };
   // The marker data-motion is that of the check of reduced motion
-  // (motion.css, #360): what moves carries it.
-  const art = (kind, inner) => `<div class="tile-art tile-act ta-${kind}" aria-hidden="true" data-motion>${inner}</div>`;
+  // (motion.css, #360): what moves carries it. The pictures are of the
+  // app, in English, so they read left to right on every page.
+  const art = (kind, inner) => `<div class="tile-art tile-act ta-${kind}" aria-hidden="true" dir="ltr" data-motion>${inner}</div>`;
   // put puts a picture in a card: in place of its still one, or before
   // `before`, else first.
   const put = (card, html, before) => {

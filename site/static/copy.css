@@ -4,7 +4,9 @@
  * theirs in docs.css.
  */
 
-.code { position: relative; margin-top: 10px; }
+/* A command reads left to right on a right-to-left page too, with its
+   button at its end. */
+.code { position: relative; margin-top: 10px; direction: ltr; }
 .cmd {
   margin: 0;
   padding: 10px 50px 10px 14px;

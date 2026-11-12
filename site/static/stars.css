@@ -9,9 +9,9 @@
 .js .stars {
   display: inline-block;
   min-width: calc(2.2em + 9px);
-  margin-left: 2px;
-  padding-left: 9px;
-  border-left: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+  margin-inline-start: 2px;
+  padding-inline-start: 9px;
+  border-inline-start: 1px solid color-mix(in srgb, currentColor 34%, transparent);
   line-height: 1.25;
   font-variant-numeric: tabular-nums;
   opacity: 0;

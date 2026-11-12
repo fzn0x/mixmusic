@@ -179,7 +179,7 @@ code {
 
 .skip {
   position: absolute;
-  left: 16px;
+  inset-inline-start: 16px;
   top: -64px;
   z-index: 20;
   padding: 10px 16px;
@@ -294,7 +294,8 @@ code {
   place-items: center;
   width: 40px;
   height: 40px;
-  margin: 0 -12px 0 -8px;
+  margin-block: 0;
+  margin-inline: -8px -12px;
   border: 0;
   border-radius: 50%;
   background: none;
@@ -321,7 +322,7 @@ html:not(.js) .theme-toggle { display: none; }
 /* The language menu: the landing page in each language, which
    tools/sitefinish lists. A details element, so it opens without
    script, beside the theme's button and in its look. */
-.lang-menu { position: relative; flex: none; margin: 0 -12px 0 -8px; }
+.lang-menu { position: relative; flex: none; margin-block: 0; margin-inline: -8px -12px; }
 .lang-menu > summary {
   display: grid;
   place-items: center;
@@ -718,10 +719,10 @@ kbd {
 .look-group .chips { margin-top: 10px; }
 .look-label { font-weight: 750; font-size: 1.0625rem; }
 .chips-themes { gap: 6px; }
-.chip-theme { padding-left: 10px; }
+.chip-theme { padding-inline-start: 10px; }
 .dots { display: inline-flex; }
 .dots i { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--dot-ring); }
-.dots i + i { margin-left: -3px; }
+.dots i + i { margin-inline-start: -3px; }
 .gallery .chip.is-current { background: var(--ink); color: var(--bg); box-shadow: none; }
 
 .columns {
@@ -777,7 +778,7 @@ kbd {
   display: none;
   position: absolute;
   top: 16px;
-  right: 16px;
+  inset-inline-end: 16px;
   padding: 4px 10px;
   border-radius: 999px;
   background: var(--surface-3);

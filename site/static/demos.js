@@ -262,8 +262,10 @@
     template.innerHTML = demo.html().trim();
     const el = template.content.firstElementChild;
     // Decoration for what the text says; the marker is that of the checks
-    // of reduced motion (motion.css, #360).
+    // of reduced motion (motion.css, #360). Like the app it shows, it's in
+    // English, left to right on every page.
     el.setAttribute("aria-hidden", "true");
+    el.setAttribute("dir", "ltr");
     el.setAttribute("data-motion", "");
     host.before(el);
     // data-done is there once it has played to its end, for the checks too.

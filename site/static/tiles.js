@@ -1,4 +1,4 @@
-// Feature cards that act out what they do (#358): the tiles of "New in" and
+// Feature cards that act out what they do (#358): the tiles of "What's new" and
 // the plugin card of "Make it yours", beside the theme's demo (demos.js).
 // For each card below, this draws a
 // picture of a small, simplified piece of the app, in place of the still
@@ -467,6 +467,233 @@
             fill(0, 0, 0)();
           }),
         steps: [[400, fill(0, 1, glide)], [glide, now(1)], [0, fill(1, 1, glide)], [glide, now(2)], [0, fill(2, 0.6, glide)]],
+      };
+    },
+  });
+
+  // Another computer of the network paired with its code of 6 digits, then
+  // played from here: its song, its progress, play and pause.
+  acts.push({
+    card: "Remote control",
+    art: (card) => {
+      const code = "482916";
+      const el = put(card, art("remote", `
+        <div class="ta-rwrap">
+          <div class="ta-rpane">
+            <small>${use("i-remote")}Studio PC</small>
+            <div class="ta-code">${"<b></b>".repeat(code.length)}</div>
+            <span class="ta-rstate">${check}<span data-state></span></span>
+          </div>
+          <span class="ta-rlink"><i></i></span>
+          <div class="ta-rpane ta-rctl">
+            <small>${use("i-cast")}Playing on Studio PC</small>
+            <div class="ta-row"><span class="ta-cover"></span><span class="ta-text"><strong>Neon Tide</strong><small>Kaori Ume</small></span><span class="ta-pp">${use("i-play", 14)}</span></div>
+            <div class="ta-bar"><i></i></div>
+          </div>
+        </div>`));
+      const digits = qa(el, ".ta-code b");
+      const state = q(el, ".ta-rstate");
+      const said = q(el, "[data-state]");
+      const pp = q(el, ".ta-pp use");
+      const bar = q(el, ".ta-bar");
+      const type = (n) => digits.forEach((d, i) => {
+        d.textContent = i < n ? code[i] : "";
+        d.classList.toggle("is-on", i < n);
+      });
+      const paired = (on) => () => {
+        el.classList.toggle("is-paired", on);
+        state.classList.toggle("is-done", on);
+        said.textContent = on ? "Paired" : "Pair with this code";
+      };
+      const playing = (on) => () => pp.setAttribute("href", on ? "#i-pause" : "#i-play");
+      const fill = (f) => () => bar.style.setProperty("--ta-fill", f);
+      return {
+        rest: () => snap(el, () => {
+          type(0);
+          paired(false)();
+          playing(false)();
+          fill(0.08)();
+        }),
+        steps: [...each(code.length, 170, type), [500, paired(true)], [650, playing(true)], [250, fill(0.32)], [900, fill(0.56)], [900, playing(false)]],
+      };
+    },
+  });
+
+  // An assistant asked for something calm: its words, MixMusic's play
+  // that it calls, and the toast of what it played.
+  acts.push({
+    card: "AI assistants",
+    art: (card) => {
+      const ask = "Play something calm to read to";
+      const el = put(card, art("ai", `
+        <p class="ta-ask"><span data-typed></span><i class="ta-caret"></i></p>
+        <p class="ta-call"><span class="ta-pill is-accent">${use("i-spark")}play</span><small>Slow Static · Mira Vale</small></p>
+        <p class="ta-toast">${use("i-spark", 13)}Your assistant played Slow Static</p>`));
+      const typed = q(el, "[data-typed]");
+      const call = q(el, ".ta-call");
+      const toast = q(el, ".ta-toast");
+      const type = (n) => (typed.textContent = ask.slice(0, n));
+      return {
+        rest: () => snap(el, () => {
+          type(0);
+          call.classList.remove("is-in");
+          toast.classList.remove("is-in");
+        }),
+        steps: [...each(ask.length, 45, type), [500, () => call.classList.add("is-in")], [700, () => toast.classList.add("is-in")]],
+      };
+    },
+  });
+
+  // A year looked back at: its minutes counting up, then the top artists.
+  acts.push({
+    card: "Your year",
+    art: (card) => {
+      const minutes = 12480;
+      const top = ["Kaori Ume", "Mira Vale", "Velvet Ferries"];
+      const el = put(card, art("year", `
+        <span class="ta-pill is-accent">${use("i-year")}Your year · 2025</span>
+        <p class="ta-mins"><strong data-minutes></strong><small>minutes listened</small></p>
+        <ol class="ta-top">${top.map((a, i) => `<li><b>${i + 1}</b><span class="ta-av" style="--h: ${190 + i * 70}"></span>${a}</li>`).join("")}</ol>`));
+      const count = q(el, "[data-minutes]");
+      const rows = qa(el, ".ta-top li");
+      // to shows the count after i of 10 steps, slowing as it ends.
+      const to = (i) => (count.textContent = Math.round(minutes * (1 - (1 - i / 10) ** 3)).toLocaleString("en-US"));
+      const show = (n) => rows.forEach((r, i) => r.classList.toggle("is-in", i < n));
+      return {
+        rest: () => snap(el, () => {
+          to(0);
+          show(0);
+        }),
+        steps: [...each(10, 90, to), ...each(top.length, 220, show)],
+      };
+    },
+  });
+
+  // A song of this computer beside the services' songs, and its album
+  // filled in.
+  acts.push({
+    card: "Music on your computer",
+    art: (card) => {
+      const album = "Night Drive";
+      const songs = [
+        ["Neon Tide", "Kaori Ume", `${use("i-folder")}FLAC`, "#52e4ea"],
+        ["Slow Static", "Mira Vale", "YouTube Music", "#7769d3"],
+        ["Paper Planets", "Velvet Ferries", "Spotify", "#ec8051"],
+      ];
+      const el = put(card, art("local", `
+        <div class="ta-lwrap">
+          <ul class="ta-lib">${songs.map(([t, a, s, c], i) => `<li><span class="ta-cover" style="--tint: ${c}"></span><span class="ta-text"><strong>${t}</strong><small>${a}</small></span><span class="ta-src${i ? "" : " is-file"}">${s}</span></li>`).join("")}</ul>
+          <div class="ta-edit">
+            <small>Edit info</small>
+            <span class="ta-field"><small>Title</small><b>Neon Tide</b></span>
+            <span class="ta-field is-on"><small>Album</small><b><span data-typed></span><i class="ta-caret"></i></b></span>
+            <span class="ta-saved">${check}<span>Saved to the file</span></span>
+          </div>
+        </div>`));
+      const rows = qa(el, ".ta-lib li");
+      const edit = q(el, ".ta-edit");
+      const typed = q(el, "[data-typed]");
+      const saved = q(el, ".ta-saved");
+      const by = q(rows[0], "small");
+      const type = (n) => (typed.textContent = album.slice(0, n));
+      const save = (on) => () => {
+        saved.classList.toggle("is-done", on);
+        by.textContent = on ? `Kaori Ume · ${album}` : "Kaori Ume";
+      };
+      return {
+        rest: () => snap(el, () => {
+          rows.forEach((r) => r.classList.remove("is-in"));
+          edit.classList.remove("is-in");
+          type(0);
+          save(false)();
+        }),
+        steps: [[300, () => rows.forEach((r) => r.classList.add("is-in"))], [900, () => edit.classList.add("is-in")], ...each(album.length, 70, type), [450, save(true)]],
+      };
+    },
+  });
+
+  // The devices to play on: headphones picked, then a DAC, with its
+  // levels. The list is Casting's.
+  acts.push({
+    card: "Output device",
+    art: (card) => {
+      const levels = "<b class=\"ta-lv\"><s></s><s></s><s></s></b>";
+      const el = put(card, art("out", `
+        <p class="ta-head">${use("i-headphones", 13)}Output device</p>
+        <div class="ta-devwrap"><span class="ta-sel"></span><ul class="ta-devs">
+          <li>${glyphs.laptop}System default${levels}</li>
+          <li>${use("i-headphones", 16)}Headphones${levels}</li>
+          <li>${glyphs.speaker}USB DAC${levels}</li>
+        </ul></div>`));
+      const wrap = q(el, ".ta-devwrap");
+      const devices = qa(el, ".ta-devs li");
+      const pick = (i) => () => {
+        wrap.style.setProperty("--at", i);
+        devices.forEach((d, j) => d.classList.toggle("is-picked", j === i));
+      };
+      return {
+        rest: () => snap(el, () => {
+          wrap.classList.remove("is-in");
+          pick(0)();
+        }),
+        steps: [[350, () => wrap.classList.add("is-in")], [1000, pick(1)], [1500, pick(2)]],
+        // The devices stay as it plays again: they come in as the card
+        // does.
+        again: [[450, pick(0)]],
+      };
+    },
+  });
+
+  // A playlist with a collaborator: they join, and songs come in from
+  // each of the two.
+  acts.push({
+    card: "Collaborative playlists",
+    art: (card) => {
+      const el = put(card, art("collab", `
+        <div class="ta-row"><span class="ta-cover ta-cover-mix"></span><span class="ta-text"><strong>Road songs</strong><small data-count></small></span><span class="ta-avs"><i style="--h: 330">A</i><i style="--h: 190">B</i></span></div>
+        <ul class="ta-adds">
+          <li><span class="ta-by" style="--h: 190">B</span><strong>Paper Planets</strong><small>added by Bo</small></li>
+          <li><span class="ta-by" style="--h: 330">A</span><strong>Neon Tide</strong><small>added by Ana</small></li>
+        </ul>`));
+      const count = q(el, "[data-count]");
+      const joined = q(el, ".ta-avs i:last-child");
+      const adds = qa(el, ".ta-adds li");
+      const songs = (n) => (count.textContent = `${n} songs · collaborative`);
+      const add = (i) => () => {
+        adds[i].classList.add("is-in");
+        songs(13 + i);
+      };
+      return {
+        rest: () => snap(el, () => {
+          joined.classList.remove("is-in");
+          adds.forEach((a) => a.classList.remove("is-in"));
+          songs(12);
+        }),
+        steps: [[450, () => joined.classList.add("is-in")], [700, add(0)], [700, add(1)]],
+      };
+    },
+  });
+
+  // An artist followed, and their new single on Home.
+  acts.push({
+    card: "Follow artists",
+    art: (card) => {
+      const el = put(card, art("follow", `
+        <div class="ta-row"><span class="ta-av"></span><span class="ta-text"><strong>Kaori Ume</strong><small>Artist</small></span><span class="ta-fbtn">Follow</span></div>
+        <div class="ta-new"><small>New from artists you follow</small><div class="ta-row"><span class="ta-cover"></span><span class="ta-text"><strong>Afterglow</strong><small>Single · Kaori Ume</small></span></div></div>`));
+      const button = q(el, ".ta-fbtn");
+      const fresh = q(el, ".ta-new");
+      const follow = (on) => () => {
+        button.classList.toggle("is-on", on);
+        button.textContent = on ? "Following" : "Follow";
+        if (on) pop(button);
+      };
+      return {
+        rest: () => snap(el, () => {
+          follow(false)();
+          fresh.classList.remove("is-in");
+        }),
+        steps: [[700, follow(true)], [800, () => fresh.classList.add("is-in")]],
       };
     },
   });

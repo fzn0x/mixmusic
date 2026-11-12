@@ -13,3 +13,4 @@ below, whose code, ideas and reports shaped it. Thank you.
 Helped too? Add yourself, or someone you'd like to thank, in a row above,
 with a link to the issues or pull requests, in the same pull request as
 your change or one of its own.
+

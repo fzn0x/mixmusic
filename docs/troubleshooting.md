@@ -142,3 +142,4 @@ its **details**. The keyboard reaches **details** in the toast with
   another copy's: the
   [README](https://github.com/fzn0x/mixmusic#the-flatpak) tells how to
   bring them over.
+

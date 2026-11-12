@@ -76,10 +76,24 @@
   <link rel="stylesheet" href="stars.css" />
   <script src="stars.js" defer></script>
   <link rel="stylesheet" href="reveal.css" />
-  <script>if (matchMedia("(prefers-reduced-motion: no-preference)").matches && "IntersectionObserver" in window) document.documentElement.classList.add("rv-on");</script>
+  {#- The hero's entrance (reveal.css) starts once the font is in, or after
+      700 ms at most, so that its words don't change shape as they come in. #}
+  <script>(() => {
+    const root = document.documentElement;
+    if (!matchMedia("(prefers-reduced-motion: no-preference)").matches || !("IntersectionObserver" in window)) return;
+    root.classList.add("rv-on");
+    const go = () => root.classList.add("rv-go");
+    setTimeout(go, 700);
+    document.fonts?.load("850 1em Figtree").then(go, go);
+  })();</script>
   <script src="reveal.js" defer></script>
   <link rel="stylesheet" href="tiles.css" />
   <script src="tiles.js" defer></script>
+  <link rel="stylesheet" href="memory.css" />
+  <script src="memory.js" defer></script>
+  {#- Text that changes in place, as the download button's label once the
+      visitor's system is known, morphs into its new words (morph.js). #}
+  <script type="module" src="morph.js"></script>
 </head>
 <body>
   <a class="skip" href="#features">Skip to the features</a>
@@ -608,6 +622,36 @@
           <a class="link" href="https://github.com/fzn0x/mixmusic/tree/main/community">Community themes and plugins<svg class="icon" width="16" height="16" aria-hidden="true"><use href="#i-external" /></svg></a>
         </div>
       </div>
+    </section>
+
+    {#- What MixMusic, YouTube Music in Chrome and the Spotify app took of
+        the memory of one Windows PC, measured as the note says (the
+        figures are MB, the mean of the last three minutes' samples).
+        memory.js counts them up and grows the bars; --mem-most is the
+        largest, the bars' full length. #}
+    <section class="section" id="memory" aria-labelledby="memory-title">
+      <div class="section-head">
+        <h2 id="memory-title">Light on memory</h2>
+        <p class="lead">The same song, for ten minutes, on the same Windows PC. MixMusic plays it in a fraction of the memory that YouTube Music in a browser or the Spotify app takes.</p>
+      </div>
+      <ol class="mem" data-mem aria-label="Memory each app used while it played the song, in megabytes" style="--mem-most: 578">
+        <li class="mem-card is-ours" style="--mem: 84">
+          <span class="mem-name"><svg class="brand-mark" width="22" height="22" aria-hidden="true"><use href="#i-rings" /></svg><span translate="no">MixMusic</span></span>
+          <span class="mem-value" translate="no"><b data-count="84">84</b> MB</span>
+          <span class="mem-bar" aria-hidden="true"><span></span></span>
+        </li>
+        <li class="mem-card" data-app="youtube" style="--mem: 399">
+          <span class="mem-name"><span class="mark mark-youtube" aria-hidden="true"></span>YouTube Music in Chrome</span>
+          <span class="mem-value" translate="no"><b data-count="399">399</b> MB</span>
+          <span class="mem-bar" aria-hidden="true"><span></span></span>
+        </li>
+        <li class="mem-card" data-app="spotify" style="--mem: 578">
+          <span class="mem-name"><span class="mark mark-spotify" aria-hidden="true"></span>The Spotify app</span>
+          <span class="mem-value" translate="no"><b data-count="578">578</b> MB</span>
+          <span class="mem-bar" aria-hidden="true"><span></span></span>
+        </li>
+      </ol>
+      <p class="mem-how">Measured on 12 November 2026 on Windows 11, with MixMusic 0.5.10, Chrome 147 and Spotify 1.3.9 each playing Kevin MacLeod's “Local Forecast - Elevator” for ten minutes, muted: the memory Task Manager shows, each app's private working set over all its processes, averaged over the last three minutes. MixMusic and Chrome had no account signed in, and Chrome no other tab; Spotify was signed in, as it has to be to play.</p>
     </section>
 
     <section class="section" id="download" aria-labelledby="download-title">

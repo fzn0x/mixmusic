@@ -3,24 +3,40 @@
  * browser: the hero's heading, text, buttons and player rise in one after
  * another, and each section fades up as it scrolls into the window.
  *
+ * Words come in out of a blur as they rise, as Magic UI's Blur Fade does
+ * (magicui.design, MIT): the hero's, and each section's heading. What is
+ * large, as the player or a grid of cards, only rises: a blur over it
+ * costs more than it shows.
+ *
  * Nothing is hidden by the page itself. Without script, in a browser
  * without IntersectionObserver, with reduced motion, in print and to
  * search engines, everything is there as it is written. The script marks
  * what it will reveal with .rv (it adds the class, the HTML never has it),
  * and the hero's entrance takes the root's .rv-on, which a line in the head
- * sets before the page draws, so that it never shows and then hides.
+ * sets before the page draws, so that it never shows and then hides. The
+ * same line adds .rv-go once the page's font is in, or after 700 ms at
+ * most: the hero waits for it, so that its words don't change shape as
+ * they come in.
  */
 
 @keyframes rv-rise {
   from { opacity: 0; transform: translateY(var(--rv-rise, 24px)); }
 }
-
-/* The hero: one after another, 80 ms apart. */
-.rv-on .hero-copy > *,
-.rv-on .hero > .demo-wrap {
-  animation: rv-rise 640ms var(--ease, cubic-bezier(0.2, 0, 0, 1)) both;
-  animation-delay: calc(var(--rv-step, 0) * 80ms);
+@keyframes rv-blur-in {
+  from { opacity: 0; transform: translateY(var(--rv-rise, 14px)); filter: blur(var(--rv-blur, 8px)); }
 }
+
+/* The hero: one after another, 100 ms apart. */
+.rv-on .hero-copy > * {
+  animation: rv-blur-in 760ms var(--ease-glide, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation-delay: calc(var(--rv-step, 0) * 100ms);
+}
+.rv-on .hero > .demo-wrap {
+  animation: rv-rise 900ms var(--ease-glide, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation-delay: calc(var(--rv-step, 0) * 100ms);
+}
+.rv-on:not(.rv-go) .hero-copy > *,
+.rv-on:not(.rv-go) .hero > .demo-wrap { animation-play-state: paused; }
 .rv-on .hero-copy > :nth-child(1) { --rv-step: 0; }
 .rv-on .hero-copy > :nth-child(2) { --rv-step: 1; }
 .rv-on .hero-copy > :nth-child(3) { --rv-step: 2; }
@@ -32,10 +48,15 @@
   opacity: 0;
   transform: translateY(var(--rv-rise, 24px));
 }
+.section-head.rv { filter: blur(6px); }
 .rv.is-in {
   opacity: 1;
   transform: none;
-  transition: opacity 640ms var(--ease, cubic-bezier(0.2, 0, 0, 1)) var(--rv-delay, 0ms), transform 640ms var(--ease, cubic-bezier(0.2, 0, 0, 1)) var(--rv-delay, 0ms);
+  filter: none;
+  transition:
+    opacity 700ms var(--ease-glide, cubic-bezier(0.22, 1, 0.36, 1)) var(--rv-delay, 0ms),
+    transform 700ms var(--ease-glide, cubic-bezier(0.22, 1, 0.36, 1)) var(--rv-delay, 0ms),
+    filter 700ms var(--ease-glide, cubic-bezier(0.22, 1, 0.36, 1)) var(--rv-delay, 0ms);
 }
 /* What was already above the window when the page came to it, as when a
    link leads past it, is there at once. */
@@ -45,5 +66,5 @@
   .rv-on .hero-copy > *,
   .rv-on .hero > .demo-wrap { animation: none; }
   .rv,
-  .rv.is-in { opacity: 1; transform: none; transition: none; }
+  .rv.is-in { opacity: 1; transform: none; filter: none; transition: none; }
 }

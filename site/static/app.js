@@ -602,10 +602,14 @@
   }
 
   // Two services, one queue: the columns of each service slide together
-  // into one queue as the section scrolls by.
+  // into one queue as the section scrolls by. Every row fits in the window
+  // under the bar: in a lower window the rows are lower, their covers
+  // smaller, and a row too low for the artist's line keeps the title.
+  // Where even that wouldn't fit, as on a phone turned sideways, the
+  // section shows its queue as it is without script, until the window
+  // grows again.
   const merge = $("[data-merge]");
   if (merge && !reduced.matches) {
-    merge.classList.add("is-live");
     const stage = $("[data-merge-stage]", merge);
     const rows = $$(".merge-row", merge);
     const labels = {
@@ -615,14 +619,31 @@
     };
     const ease = (x) => 1 - Math.pow(1 - x, 3);
     const clamp = (x) => Math.min(Math.max(x, 0), 1);
+    const top = 40;
+    // The lowest row: a title's line and the row's padding.
+    const lowest = 30;
+    // live says whether the rows fit, the section laid out to move them.
+    const live = () => {
+      merge.classList.add("is-live");
+      if ((stage.clientHeight - top) / rows.length - 8 >= lowest) return true;
+      merge.classList.remove("is-live");
+      for (const el of [...rows, ...Object.values(labels)]) {
+        for (const p of ["width", "height", "transform", "opacity"]) el.style.removeProperty(p);
+      }
+      return false;
+    };
+    let moving = live();
     let ticking = false;
     const place = () => {
       ticking = false;
+      if (!moving) return;
       const w = stage.clientWidth;
       const h = stage.clientHeight;
-      const top = 40;
       const step = Math.min(64, (h - top) / rows.length);
       const rowH = step - 8;
+      // The cover fills the row inside its padding, 44 px at most.
+      stage.style.setProperty("--cover", `${Math.min(44, rowH - 12)}px`);
+      stage.classList.toggle("is-low", rowH < 44);
       const endW = Math.min(440, w);
       const xEnd = 0;
       const gap = Math.min(96, w * 0.08);
@@ -669,7 +690,10 @@
       }
     };
     addEventListener("scroll", ask, { passive: true });
-    addEventListener("resize", ask);
+    addEventListener("resize", () => {
+      moving = live();
+      ask();
+    });
     place();
   }
 

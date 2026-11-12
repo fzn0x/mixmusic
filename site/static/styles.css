@@ -1243,7 +1243,11 @@ html.no-js .demo-wrap { display: none; }
 }
 .merge.is-live .merge-stage { position: relative; min-height: 0; }
 .merge.is-live .merge-list { position: absolute; inset: 0; width: auto; display: block; }
-.merge.is-live .merge-row { position: absolute; left: 0; top: 0; will-change: transform; }
+.merge.is-live .merge-row { position: absolute; left: 0; top: 0; will-change: transform; grid-template-columns: var(--cover, 44px) minmax(0, 1fr); }
+/* In a lower window the rows are lower (app.js): the cover fills the
+   row, and a row too low for two lines keeps the title. */
+.merge.is-live .merge-row img { width: var(--cover, 44px); height: var(--cover, 44px); border-radius: calc(var(--cover, 44px) * 0.23); }
+.merge.is-live .is-low .merge-text > span { display: none; }
 .merge.is-live .merge-label {
   position: absolute;
   left: 0;

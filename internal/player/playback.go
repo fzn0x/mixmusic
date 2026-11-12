@@ -547,6 +547,9 @@ func (p *Player) fail(message string) {
 	}
 	if ok {
 		why = fmt.Sprintf("Couldn't play %s: %s", cur.Track.Title, why)
+		// The log keeps it too, for a report of the problem: the notice
+		// goes, and the details last until MixMusic closes.
+		log.Printf("mixmusic: couldn't play %s: %s", cur.Track.ID, message)
 	}
 	p.notify(Notice{Message: why, Error: true, Failure: p.keepFailure(message, stop)})
 	if stop {

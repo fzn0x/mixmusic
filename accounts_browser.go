@@ -21,7 +21,7 @@ import (
 const (
 	youtubeBrowserTitle = "Sign in with your browser"
 	youtubeBrowserAbout = "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any browser: MixMusic then takes the session, closes the browser and deletes the profile. Your own profiles stay as they are."
-	youtubeBrowserNone  = "MixMusic found none of the browsers it opens: Chrome, Edge, Brave, Chromium, Vivaldi, Helium, Firefox and Zen."
+	youtubeBrowserNone  = "MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others made from Chromium when MixMusic opens them."
 	youtubeBrowserHint  = "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone, never yours, and keeps the session encrypted on this computer."
 	youtubeBrowserForm  = youtubeBrowserAbout + " " + youtubeBrowserNone + " " + youtubeBrowserHint + " Sign in with. Log in. Temporary profile. Google refuses."
 )

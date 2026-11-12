@@ -24,30 +24,6 @@ type known struct {
 // knownBrowsers are the browsers MixMusic can sign in with, in the order
 // it lists them.
 var knownBrowsers = []known{
-	{"chrome", "Chrome", Chromium,
-		[]string{`Google\Chrome\Application\chrome.exe`},
-		[]string{"Google Chrome.app/Contents/MacOS/Google Chrome"},
-		[]string{"google-chrome-stable", "google-chrome", "/opt/google/chrome/chrome"}},
-	{"edge", "Edge", Chromium,
-		[]string{`Microsoft\Edge\Application\msedge.exe`},
-		[]string{"Microsoft Edge.app/Contents/MacOS/Microsoft Edge"},
-		[]string{"microsoft-edge-stable", "microsoft-edge", "/opt/microsoft/msedge/msedge"}},
-	{"brave", "Brave", Chromium,
-		[]string{`BraveSoftware\Brave-Browser\Application\brave.exe`},
-		[]string{"Brave Browser.app/Contents/MacOS/Brave Browser"},
-		[]string{"brave-browser-stable", "brave-browser", "brave", "/opt/brave.com/brave/brave"}},
-	{"chromium", "Chromium", Chromium,
-		[]string{`Chromium\Application\chrome.exe`},
-		[]string{"Chromium.app/Contents/MacOS/Chromium"},
-		[]string{"chromium", "chromium-browser"}},
-	{"vivaldi", "Vivaldi", Chromium,
-		[]string{`Vivaldi\Application\vivaldi.exe`},
-		[]string{"Vivaldi.app/Contents/MacOS/Vivaldi"},
-		[]string{"vivaldi-stable", "vivaldi", "/opt/vivaldi/vivaldi"}},
-	{"helium", "Helium", Chromium,
-		[]string{`imput\Helium\Application\chrome.exe`},
-		[]string{"Helium.app/Contents/MacOS/Helium"},
-		[]string{"helium"}},
 	{"firefox", "Firefox", Firefox,
 		[]string{`Mozilla Firefox\firefox.exe`},
 		[]string{"Firefox.app/Contents/MacOS/firefox"},
@@ -150,7 +126,7 @@ func findWindows(sys system) map[string]string {
 				add(windowsBrowser(p), p)
 			}
 		}
-		for _, exe := range []string{"chrome.exe", "msedge.exe", "brave.exe", "vivaldi.exe", "firefox.exe", "zen.exe"} {
+		for _, exe := range []string{"firefox.exe", "zen.exe"} {
 			p := commandProgram(expand(sys, sys.value(hive+`\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\`+exe, "")))
 			add(windowsBrowser(p), p)
 		}
@@ -158,32 +134,16 @@ func findWindows(sys system) map[string]string {
 	return found
 }
 
-// windowsBrowser tells which browser a program of Windows is, by its name
-// and, for chrome.exe, which Chromium and Helium name theirs too, by its
-// folder; or "".
+// windowsBrowser tells which browser a program of Windows is, by its name;
+// or "".
 func windowsBrowser(program string) string {
 	p := strings.ToLower(program)
 	i := strings.LastIndexByte(p, '\\')
 	switch p[i+1:] {
-	case "msedge.exe":
-		return "edge"
-	case "brave.exe":
-		return "brave"
-	case "vivaldi.exe":
-		return "vivaldi"
 	case "firefox.exe":
 		return "firefox"
 	case "zen.exe":
 		return "zen"
-	case "chrome.exe":
-		switch {
-		case strings.Contains(p, `\google\chrome\`):
-			return "chrome"
-		case strings.Contains(p, `\chromium\`):
-			return "chromium"
-		case strings.Contains(p, `\helium\`):
-			return "helium"
-		}
 	}
 	return ""
 }
@@ -273,7 +233,7 @@ func findLinux(sys system) map[string]string {
 
 // snapOf returns the name of the snap a browser of Linux runs as, or "":
 // a command of /snap/bin, or a script that starts one, as Ubuntu's
-// firefox and chromium-browser are.
+// firefox is.
 func snapOf(sys system, program string) string {
 	r := sys.resolve(program)
 	switch {

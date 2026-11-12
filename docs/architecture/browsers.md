@@ -11,16 +11,13 @@ music.youtube.com sends. The settings' row is `accounts_browser.go`.
 
 ## Finding the browsers
 
-`browser.Find` looks for Chrome, Edge, Brave, Chromium, Vivaldi, Helium,
-Firefox and Zen, in that order, through a `system` that tests fake, so
+`browser.Find` looks for Firefox and Zen, in that order, through a `system` that tests fake, so
 that each system's search runs on every system:
 
 - **Windows**: where each installer puts the program, under Program Files,
   Program Files (x86) and the user's LOCALAPPDATA, then the programs the
   registry names, under `Clients\StartMenuInternet` (for the default
   browser's choice) and `App Paths`, of the machine and of the user.
-  Chrome, Chromium and Helium all name theirs `chrome.exe`: its folder
-  tells them apart.
 - **macOS**: the apps in /Applications and ~/Applications.
 - **Linux**: the browsers' commands on PATH, then the folders their
   packages install to. A command of /snap/bin, or a script that starts
@@ -44,19 +41,7 @@ its own.
 
 ## Reading the cookies
 
-- **Chromium.** The browser starts with `--remote-debugging-pipe`: the
-  DevTools protocol on two pipes MixMusic gives it, as its file
-  descriptors 3 and 4, or on Windows as handles it inherits, named by
-  `--remote-debugging-io-pipes`. Nothing listens on the network. MixMusic
-  talks to the browser itself, never to a page: `Target.getTargets` tells
-  whether a window is open, as on macOS the browser runs on without one,
-  and `Storage.getCookies` reads the cookies; `Browser.close` closes it.
-  Chrome 136 and later allow this only for a profile other than the
-  user's own, which this is. A MixMusic run as administrator has the
-  browser keep its rights (`--do-not-de-elevate`) and its environment
-  without `__COMPAT_LAYER`, as Chrome and Edge would otherwise start again
-  through another process, which leaves the pipes behind.
-- **Firefox.** The profile's `user.js` skips the first run's pages, and
+The profile's `user.js` skips the first run's pages, and
   the offer to keep the password; `-wait-for-browser` keeps Firefox's first
   process on Windows until the browser it starts ends, and
   `MOZ_DISABLE_UPDATE_PROCESSING` keeps it from applying an update the
@@ -68,6 +53,14 @@ its own.
   those kept for one site embedded in another are left out. WebDriver BiDi
   would read them too, but a Firefox under remote control tells the pages
   so (`navigator.webdriver`), which a sign-in page may refuse.
+
+## No browser made from Chromium
+
+Chrome, Edge, Brave, Chromium, Vivaldi and Helium aren't offered. The
+only way to read their cookies while they run is the DevTools protocol,
+and a Chromium under it tells the pages so (`navigator.webdriver`), even
+over `--remote-debugging-pipe`. Google's sign-in then refuses it: "This
+browser or app may not be secure".
 
 The sign-in is done once the cookies hold YouTube's signing cookie, and
 stopped changing from one read to the next, a second apart, as the site

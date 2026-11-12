@@ -68,7 +68,8 @@ func found(list []Browser) []string {
 // TestFindWindows finds the browsers where their installers put them, and
 // those the registry knows elsewhere: under StartMenuInternet, for the
 // default browser's choice, and App Paths. A program the registry names
-// that isn't there, and Internet Explorer, aren't browsers to sign in with.
+// that isn't there, Internet Explorer, and the browsers made from Chromium
+// aren't browsers to sign in with.
 func TestFindWindows(t *testing.T) {
 	local := `C:\Users\Ada\AppData\Local`
 	sys := fakeSystem{
@@ -93,14 +94,7 @@ func TestFindWindows(t *testing.T) {
 			`HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\vivaldi.exe|`:                `%LOCALAPPDATA%\Vivaldi\Application\vivaldi.exe`,
 		},
 	}
-	want := []string{
-		`chrome=C:\Program Files\Google\Chrome\Application\chrome.exe`,
-		`edge=C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`,
-		`chromium=` + local + `\Chromium\Application\chrome.exe`,
-		`vivaldi=` + local + `\Vivaldi\Application\vivaldi.exe`,
-		`helium=` + local + `\imput\Helium\Application\chrome.exe`,
-		`firefox=D:\Apps\Firefox\firefox.exe`,
-	}
+	want := []string{`firefox=D:\Apps\Firefox\firefox.exe`}
 	if got := found(find(sys.system())); !slices.Equal(got, want) {
 		t.Errorf("found %q, want %q", got, want)
 	}
@@ -113,7 +107,8 @@ func TestFindWindows(t *testing.T) {
 	}
 }
 
-// TestFindMac finds the browsers in /Applications and ~/Applications.
+// TestFindMac finds the browsers in /Applications and ~/Applications: not
+// those made from Chromium, nor Safari.
 func TestFindMac(t *testing.T) {
 	sys := fakeSystem{
 		goos: "darwin",
@@ -128,9 +123,6 @@ func TestFindMac(t *testing.T) {
 		},
 	}
 	want := []string{
-		"chrome=/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-		"brave=/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
-		"helium=/Users/ada/Applications/Helium.app/Contents/MacOS/Helium",
 		"firefox=/Applications/Firefox.app/Contents/MacOS/firefox",
 		"zen=/Applications/Zen Browser.app/Contents/MacOS/zen",
 	}
@@ -141,8 +133,8 @@ func TestFindMac(t *testing.T) {
 
 // TestFindLinux finds the browsers' commands on PATH, or where their
 // packages put them, and tells those that run as a snap: from /snap/bin,
-// or a script that starts one, as Ubuntu's firefox is. MixMusic's Flatpak
-// sees none.
+// or a script that starts one, as Ubuntu's firefox is; not those made
+// from Chromium. MixMusic's Flatpak sees none.
 func TestFindLinux(t *testing.T) {
 	sys := fakeSystem{
 		goos: "linux",
@@ -168,10 +160,6 @@ func TestFindLinux(t *testing.T) {
 		},
 	}
 	want := []string{
-		"chrome=/usr/bin/google-chrome-stable",
-		"brave=/opt/brave.com/brave/brave",
-		"chromium=/snap/bin/chromium (snap chromium)",
-		"vivaldi=/usr/bin/vivaldi-stable",
 		"firefox=/usr/bin/firefox (snap firefox)",
 		"zen=/home/ada/.local/bin/zen",
 	}
@@ -212,7 +200,7 @@ func TestCommandProgram(t *testing.T) {
 
 // TestNames lists every browser MixMusic can sign in with, in its order.
 func TestNames(t *testing.T) {
-	if got := fmt.Sprint(Names()); got != "[Chrome Edge Brave Chromium Vivaldi Helium Firefox Zen]" {
+	if got := fmt.Sprint(Names()); got != "[Firefox Zen]" {
 		t.Errorf("Names() = %s", got)
 	}
 }

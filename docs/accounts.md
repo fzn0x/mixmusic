@@ -35,8 +35,7 @@ again later or from another network, or use one of the ways below.
 ### Sign in with your browser
 
 **Sign in with your browser** lists the browsers MixMusic finds on your
-computer: Chrome, Edge, Brave, Chromium, Vivaldi, Helium, Firefox and Zen.
-Choose one, then **sign in with** it:
+computer: Firefox and Zen. Choose one, then **sign in with** it:
 
 1. The browser opens with a new, empty profile of its own, made for this
    sign-in alone, at YouTube Music's sign-in. Your own profiles, with
@@ -49,22 +48,25 @@ Choose one, then **sign in with** it:
    the window does, closes the browser and deletes the profile.
 
 Closing the browser, or **cancel** beside the button, ends the sign-in, as
-do 10 minutes without one; the profile is deleted then too. On macOS, a
-browser made from Chromium ends it once you close its last window, while
-Firefox and Zen go on running until you quit them.
+do 10 minutes without one; the profile is deleted then too. On macOS,
+Firefox and Zen go on running once you close their last window: quit them
+to end it.
+
+Chrome, Edge and the other browsers made from Chromium aren't offered.
+One that another program opens tells the pages so, and Google then refuses
+the sign-in with "This browser or app may not be secure". To sign in with
+one of them, use **Import from a browser**, below.
 
 - **Where MixMusic looks.** On Windows, where each browser installs, and
   the browsers Windows knows from the registry; on macOS, in Applications
   and the Applications folder of your home; on Linux, the browsers'
-  commands, as `google-chrome` or `firefox`, and the folders their
-  packages install to. Snaps work, as Ubuntu's Firefox and Chromium are.
+  commands, as `firefox` or `zen-browser`, and the folders their packages
+  install to. Snaps work, as Ubuntu's Firefox is.
   Browsers installed from Flathub, and MixMusic's own Flatpak, which sees
   none of your programs, aren't offered: use one of the ways below there.
-- **How it reads the session.** A browser made from Chromium starts with
-  its DevTools protocol on a pipe between MixMusic and the browser, never
-  on the network, which MixMusic asks for the profile's cookies. Firefox
-  and Zen keep them in the profile's own cookie store, which MixMusic
-  reads.
+- **How it reads the session.** Firefox and Zen keep the cookies in the
+  profile's own cookie store, which MixMusic reads. Nothing listens on the
+  network.
 - If MixMusic quits while you sign in, it closes the browser, and deletes
   what's left of the profile at its next start.
 

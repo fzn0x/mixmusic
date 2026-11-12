@@ -37,7 +37,7 @@ func KillAll() {
 }
 
 // startProcess starts the program path with args, once prepare readied
-// its command, as for the pipes of the DevTools protocol.
+// its command, as with the environment it runs in.
 func startProcess(path string, args []string, prepare func(cmd *exec.Cmd)) (*process, error) {
 	cmd := exec.Command(path, args...)
 	readyCommand(cmd)

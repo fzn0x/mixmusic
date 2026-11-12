@@ -57,8 +57,8 @@ func fakeStart(t *testing.T, s *fakeSession, fail error) {
 	for _, v := range []string{"TMPDIR", "TMP", "TEMP"} {
 		t.Setenv(v, tmp)
 	}
-	saved := starters[Chromium]
-	starters[Chromium] = func(_ context.Context, b Browser, dir, url string) (session, error) {
+	saved := starters[Firefox]
+	starters[Firefox] = func(_ context.Context, b Browser, dir, url string) (session, error) {
 		if info, err := os.Stat(dir); err != nil || !info.IsDir() || !strings.HasPrefix(filepath.Base(dir), profilePrefix) {
 			t.Errorf("the profile is %q: %v", dir, err)
 		}
@@ -72,7 +72,7 @@ func fakeStart(t *testing.T, s *fakeSession, fail error) {
 		os.WriteFile(filepath.Join(dir, "Cookies"), []byte("the session"), 0o600)
 		return s, fail
 	}
-	t.Cleanup(func() { starters[Chromium] = saved })
+	t.Cleanup(func() { starters[Firefox] = saved })
 }
 
 func cookie(name, value string) *http.Cookie {
@@ -84,7 +84,7 @@ func signedIn(cookies []*http.Cookie) bool {
 	return slices.ContainsFunc(cookies, func(c *http.Cookie) bool { return c.Name == "SAPISID" })
 }
 
-var testBrowser = Browser{ID: "chrome", Name: "Chrome", Engine: Chromium, Path: "chrome"}
+var testBrowser = Browser{ID: "firefox", Name: "Firefox", Engine: Firefox, Path: "firefox"}
 
 func signIn(ctx context.Context) ([]*http.Cookie, error) {
 	return SignIn(ctx, testBrowser, Options{URL: "https://example.com/sign-in", SignedIn: signedIn, Every: time.Millisecond})
@@ -227,24 +227,9 @@ func TestSnapProfile(t *testing.T) {
 	}
 }
 
-// TestArgs opens each engine with its own profile, apart from the user's
+// TestArgs opens Firefox with its own profile, apart from the user's
 // browser, at the page, without the questions of a first run.
 func TestArgs(t *testing.T) {
-	got := strings.Join(chromiumArgs("windows", `C:\tmp\p`, []string{"--remote-debugging-io-pipes=1,2"}, "https://x/"), " ")
-	for _, want := range []string{"--user-data-dir=C:\\tmp\\p", "--remote-debugging-pipe", "--no-first-run", "--remote-debugging-io-pipes=1,2", "--do-not-de-elevate"} {
-		if !strings.Contains(got, want) {
-			t.Errorf("Chromium's arguments %q lack %q", got, want)
-		}
-	}
-	if !strings.HasSuffix(got, " https://x/") {
-		t.Errorf("Chromium's arguments %q don't end with the page", got)
-	}
-	if got := strings.Join(chromiumArgs("darwin", "/p", nil, "u"), " "); !strings.Contains(got, "--use-mock-keychain") || strings.Contains(got, "--password-store") {
-		t.Errorf("Chromium's arguments on macOS are %q", got)
-	}
-	if got := strings.Join(chromiumArgs("linux", "/p", nil, "u"), " "); !strings.Contains(got, "--password-store=basic") {
-		t.Errorf("Chromium's arguments on Linux are %q", got)
-	}
 	if got := strings.Join(firefoxArgs("windows", `C:\p`, "u"), " "); got != `-no-remote -new-instance -profile C:\p -wait-for-browser u` {
 		t.Errorf("Firefox's arguments on Windows are %q", got)
 	}

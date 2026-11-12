@@ -42,8 +42,7 @@ func (a *App) browsers() BrowserSignIn {
 
 // YouTubeSignInBrowsers returns the browsers installed on this computer
 // that MixMusic can open to sign in to YouTube Music, each with a profile
-// of its own: Chrome, Edge, Brave, Chromium, Vivaldi, Helium, Firefox and
-// Zen, as found.
+// of its own: Firefox and Zen, as found.
 func (s *Accounts) YouTubeSignInBrowsers() []YouTubeBrowser {
 	var list []YouTubeBrowser
 	for _, b := range s.a.browsers().Find() {

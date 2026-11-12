@@ -300,6 +300,29 @@ they're built from changes on main:
   site check the Worker without deploying it, and keep the built site as
   their `site-cloudflare` artifact.
 
+After Zola, [tools/sitefinish](tools/sitefinish) finishes the site:
+
+- **The landing page in each language** of the README's translations, at
+  `/hi/`, `/zh-cn/`, `/id/`, `/ur/` (right to left), `/pt-br/`, `/bn/`,
+  `/ru/` and `/am/`. It replaces each piece of the English page with its
+  translation from `site/i18n/<language>.json`, keyed by its English.
+  [site/i18n/strings.json](site/i18n/strings.json) lists every piece, with
+  where it is. The working copy of the player and the made-up queue keep
+  their English (`translate="no"`), as the app is in English. The docs
+  stay in English.
+- **The alternates search engines read**: each landing page's `hreflang`
+  links, canonical address and Open Graph locale, the language menus, and
+  the sitemap.
+- **`llms.txt` and `llms-full.txt`**, for AI agents: what MixMusic is, and
+  every page of the docs.
+
+After changing the landing page's words, build the site, run
+`go run ./tools/sitefinish -extract` to update strings.json, and translate
+what changed in each language's file (`go test ./tools/sitefinish` checks
+that each translation keeps its piece's tags and placeholders). A piece
+without a translation shows in English, and the build says how many each
+language lacks.
+
 ## The Flatpak
 
 [packaging/flatpak](packaging/flatpak) packs the app of the Linux build

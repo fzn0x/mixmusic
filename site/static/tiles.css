@@ -1,6 +1,6 @@
 /*
  * Feature cards that act out what they do (tiles.js, #358): the tiles of
- * "New in" and the plugin card of "Make it yours". Each card's picture is a
+ * "What's new" and the plugin card of "Make it yours". Each card's picture is a
  * small, simplified piece of the app, drawn in HTML: a lyric line lit word
  * by word, a download ticking its songs off, a gauge stepping up the speed.
  * It plays on its own, again and again, while the card is in the window,
@@ -271,11 +271,16 @@
 .ta-surround .ch.is-on small { color: var(--ta-ink-2); }
 
 /* Casting: the devices come in, the TV is picked, and the cast begins. */
-.ta-cast { align-content: start; gap: 8px; padding: 14px 16px; }
-.ta-cast .ta-head { display: flex; align-items: center; gap: 6px; color: var(--ta-ink-2); font-size: 0.75rem; }
-.ta-cast .ta-devwrap { position: relative; }
-.ta-cast .ta-devs { list-style: none; margin: 0; padding: 0; }
-.ta-cast .ta-devs li {
+.ta-cast,
+.ta-out { align-content: start; gap: 8px; padding: 14px 16px; }
+.ta-cast .ta-head,
+.ta-out .ta-head { display: flex; align-items: center; gap: 6px; color: var(--ta-ink-2); font-size: 0.75rem; }
+.ta-cast .ta-devwrap,
+.ta-out .ta-devwrap { position: relative; }
+.ta-cast .ta-devs,
+.ta-out .ta-devs { list-style: none; margin: 0; padding: 0; }
+.ta-cast .ta-devs li,
+.ta-out .ta-devs li {
   position: relative;
   z-index: 1;
   display: flex;
@@ -287,11 +292,16 @@
   transform: translateY(8px);
   transition: opacity 360ms var(--ta-ease), transform 460ms var(--ta-ease);
 }
-.ta-cast .is-in li { opacity: 1; transform: none; }
-.ta-cast .is-in li:nth-of-type(2) { transition-delay: 120ms; }
-.ta-cast .is-in li:nth-of-type(3) { transition-delay: 240ms; }
-.ta-cast .ta-devs svg { width: 16px; height: 16px; fill: none; stroke: var(--ta-ink-2); stroke-width: 1.8; stroke-linejoin: round; }
-.ta-cast .ta-sel {
+.ta-cast .is-in li,
+.ta-out .is-in li { opacity: 1; transform: none; }
+.ta-cast .is-in li:nth-of-type(2),
+.ta-out .is-in li:nth-of-type(2) { transition-delay: 120ms; }
+.ta-cast .is-in li:nth-of-type(3),
+.ta-out .is-in li:nth-of-type(3) { transition-delay: 240ms; }
+.ta-cast .ta-devs svg,
+.ta-out .ta-devs svg { width: 16px; height: 16px; fill: none; stroke: var(--ta-ink-2); stroke-width: 1.8; stroke-linejoin: round; }
+.ta-cast .ta-sel,
+.ta-out .ta-sel {
   position: absolute;
   left: 0;
   right: 0;
@@ -303,7 +313,8 @@
   transform: translateY(calc(var(--ta-row) * var(--at, 0)));
   transition: transform 520ms var(--ta-spring), opacity 300ms var(--ta-ease);
 }
-.ta-cast .is-in .ta-sel { opacity: 1; }
+.ta-cast .is-in .ta-sel,
+.ta-out .is-in .ta-sel { opacity: 1; }
 .ta-cast .ta-pulse { position: relative; margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: var(--ta-accent); opacity: 0; transition: opacity 200ms; }
 .ta-cast li.is-picked .ta-pulse { opacity: 1; }
 .ta-cast .ta-pulse::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--ta-accent); opacity: 0; }
@@ -508,6 +519,152 @@
 }
 .ta-noads .ta-lens { display: flex; gap: 3px; }
 .ta-noads .ta-lens small { flex: var(--grow) 1 0; font-size: 0.6875rem; }
+
+/* A caret where words are typed, blinking while its card plays. */
+.tile-act .ta-caret { display: inline-block; width: 2px; height: 1.05em; margin-left: 1px; vertical-align: -2px; border-radius: 1px; background: var(--ta-accent); }
+.is-playing .tile-act .ta-caret { animation: ta-blink 1s steps(1) infinite; }
+/* A panel inside a picture, a step lighter than it. */
+.ta-rpane,
+.ta-edit,
+.ta-new { display: grid; gap: 8px; padding: 12px; border-radius: 12px; background: var(--ta-panel); box-shadow: inset 0 0 0 1px var(--ta-line); }
+
+/* Remote control: another computer paired with its code, then played from
+   here. Side by side in a wide card, one above the other in a narrow one. */
+.ta-remote { container-type: inline-size; padding: 16px 18px; }
+.ta-remote .ta-rwrap { display: grid; grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1.25fr); align-items: center; }
+.ta-remote .ta-rpane > small { display: flex; align-items: center; gap: 6px; }
+.ta-remote .ta-code { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
+.ta-remote .ta-code b {
+  display: grid;
+  place-items: center;
+  height: 30px;
+  border-radius: 7px;
+  background: var(--ta-panel-2);
+  color: var(--ta-ink);
+  font-size: 1rem;
+  font-weight: 750;
+}
+.ta-remote .ta-code b.is-on { box-shadow: inset 0 0 0 1px var(--ta-accent); animation: ta-pop 300ms var(--ta-ease) both; }
+.ta-remote .ta-rstate { display: flex; align-items: center; gap: 6px; color: var(--ta-ink-3); font-size: 0.75rem; }
+.ta-remote .ta-rstate.is-done { color: var(--ta-ink); }
+.ta-remote .ta-rlink { position: relative; height: 2px; margin: 0 8px; border-radius: 1px; background: #2c2c2c; overflow: hidden; }
+.ta-remote .ta-rlink i { position: absolute; inset: 0; background: var(--ta-accent); transform: scaleX(0); transform-origin: left; transition: transform 420ms var(--ta-ease); }
+.ta-remote.is-paired .ta-rlink i { transform: none; }
+.ta-remote .ta-rctl { opacity: 0.4; transition: opacity 360ms var(--ta-ease); }
+.ta-remote.is-paired .ta-rctl { opacity: 1; }
+.ta-remote .ta-pp { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ta-ink); color: #000; }
+.ta-remote .ta-bar i { transition-duration: 860ms; }
+@container (max-width: 440px) {
+  .ta-remote .ta-rwrap { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .ta-remote .ta-rlink { display: none; }
+}
+
+/* AI assistants: a request typed, MixMusic's play called, and its toast. */
+.ta-ai { align-content: center; gap: 10px; padding: 16px 18px; }
+.ta-ai .ta-ask { justify-self: end; max-width: 92%; min-height: 34px; margin: 0; padding: 8px 12px; border-radius: 14px 14px 4px 14px; background: var(--ta-panel-2); }
+.ta-ai .ta-call { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; }
+.ta-ai .ta-toast { display: flex; align-items: center; gap: 8px; margin: 0; padding: 7px 10px; border-radius: 10px; background: var(--ta-panel-2); font-size: 0.75rem; }
+.ta-ai .ta-toast .icon { color: var(--ta-accent); }
+.ta-ai .ta-call,
+.ta-ai .ta-toast { opacity: 0; transform: translateY(8px); transition: opacity 360ms var(--ta-ease), transform 480ms var(--ta-ease); }
+.ta-ai .is-in { opacity: 1; transform: none; }
+
+/* Your year: the minutes counting up, then the top artists. */
+.ta-year { align-content: center; gap: 10px; padding: 16px 18px; }
+.ta-year .ta-pill { justify-self: start; }
+.ta-year .ta-mins { display: flex; align-items: baseline; gap: 8px; margin: 0; }
+.ta-year .ta-mins strong { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+.ta-year .ta-top { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ta-year .ta-top li { display: flex; align-items: center; gap: 8px; color: var(--ta-ink-2); opacity: 0; transform: translateY(6px); transition: opacity 320ms var(--ta-ease), transform 420ms var(--ta-ease); }
+.ta-year .ta-top li.is-in { opacity: 1; transform: none; }
+.ta-year .ta-top b { width: 12px; color: var(--ta-accent); }
+.ta-year .ta-av { flex: none; width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, hsl(var(--h) 60% 62%), hsl(calc(var(--h) + 40) 45% 32%)); }
+
+/* Music on your computer: a file beside the services' songs, and its
+   album filled in. Side by side in a wide card, one above the other in a
+   narrow one. */
+.ta-local { container-type: inline-size; padding: 16px 18px; }
+.ta-local .ta-lwrap { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: center; gap: 14px; }
+.ta-local .ta-lib { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ta-local .ta-lib li { display: flex; align-items: center; gap: 10px; min-width: 0; opacity: 0; transform: translateY(6px); transition: opacity 320ms var(--ta-ease), transform 420ms var(--ta-ease); }
+.ta-local .ta-lib li.is-in { opacity: 1; transform: none; }
+.ta-local .ta-lib li:nth-child(2) { transition-delay: 120ms; }
+.ta-local .ta-lib li:nth-child(3) { transition-delay: 240ms; }
+.ta-local .ta-cover { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--tint), color-mix(in srgb, var(--tint) 35%, #12101d)); }
+.ta-local .ta-src { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; background: var(--ta-panel-2); color: var(--ta-ink-2); font-size: 0.6875rem; }
+.ta-local .ta-src.is-file { background: #3a2230; color: var(--ta-accent); }
+.ta-local .ta-edit { opacity: 0; transform: translateY(8px); transition: opacity 360ms var(--ta-ease), transform 480ms var(--ta-ease); }
+.ta-local .ta-edit.is-in { opacity: 1; transform: none; }
+.ta-local .ta-field { display: grid; gap: 3px; }
+.ta-local .ta-field b { min-height: 26px; padding: 4px 8px; border-radius: 6px; background: var(--ta-panel-2); font-weight: 600; overflow: hidden; white-space: nowrap; }
+.ta-local .ta-field.is-on b { box-shadow: inset 0 0 0 1px var(--ta-accent); }
+.ta-local .ta-saved { display: flex; align-items: center; gap: 6px; color: var(--ta-ink-3); font-size: 0.75rem; }
+.ta-local .ta-saved.is-done { color: var(--ta-ink); }
+@container (max-width: 460px) {
+  .ta-local .ta-lwrap { grid-template-columns: minmax(0, 1fr); }
+  .ta-local .ta-lib li:nth-child(3) { display: none; }
+}
+
+/* Output device: Casting's list, with levels beside the device picked. */
+.ta-out .ta-lv { display: flex; align-items: flex-end; gap: 2px; height: 12px; margin-left: auto; opacity: 0; transition: opacity 260ms var(--ta-ease); }
+.ta-out li.is-picked .ta-lv { opacity: 1; }
+.ta-out .ta-lv s { display: block; width: 3px; height: 100%; border-radius: 2px; background: var(--ta-accent); transform: scaleY(0.45); transform-origin: bottom; }
+.is-playing .ta-out li.is-picked .ta-lv s { animation: ta-level 760ms ease-in-out infinite alternate; }
+.ta-out .ta-lv s:nth-child(2) { --lv: 0.9; animation-delay: -260ms !important; }
+.ta-out .ta-lv s:nth-child(3) { --lv: 0.6; animation-delay: -520ms !important; }
+
+/* Collaborative playlists: a collaborator joins, and songs come in from
+   each. */
+.ta-collab { align-content: center; gap: 10px; padding: 16px 18px; }
+.ta-collab .ta-avs { flex: none; display: flex; }
+.ta-collab .ta-avs i,
+.ta-collab .ta-by {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: hsl(var(--h) 55% 62%);
+  color: #000;
+  font-size: 0.6875rem;
+  font-style: normal;
+  font-weight: 750;
+  box-shadow: 0 0 0 2px #000;
+}
+.ta-collab .ta-avs i + i { margin-left: -6px; opacity: 0; transform: scale(0.6); }
+.ta-collab .ta-avs i.is-in { opacity: 1; transform: none; animation: ta-pop 420ms var(--ta-ease) both; }
+.ta-collab .ta-adds { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ta-collab .ta-adds li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: var(--ta-panel);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 360ms var(--ta-ease), transform 480ms var(--ta-ease);
+}
+.ta-collab .ta-adds li.is-in { opacity: 1; transform: none; }
+.ta-collab .ta-by { grid-row: span 2; }
+.ta-collab .ta-adds small { grid-column: 2; }
+
+/* Follow artists: Follow pressed, and the artist's new single on Home. */
+.ta-follow { align-content: center; gap: 12px; padding: 16px 18px; }
+.ta-follow .ta-av { flex: none; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #52e4ea, #7769d3); }
+.ta-follow .ta-fbtn {
+  flex: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px #4a4a4a;
+  font-size: 0.75rem;
+  transition: background-color 260ms var(--ta-ease), color 260ms var(--ta-ease);
+}
+.ta-follow .ta-fbtn.is-on { background: var(--ta-accent); color: #000; box-shadow: none; }
+.ta-follow .ta-new { opacity: 0; transform: translateY(10px); transition: opacity 360ms var(--ta-ease), transform 520ms var(--ta-ease); }
+.ta-follow .ta-new.is-in { opacity: 1; transform: none; }
+.ta-follow .ta-new .ta-cover { background: linear-gradient(135deg, #e99453, #d96472); }
 
 /* Add a plugin: the marketplace, Spectrum installed, and its bars. */
 .ta-market { align-content: start; gap: 10px; padding: 14px 16px; }

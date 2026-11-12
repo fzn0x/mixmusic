@@ -315,6 +315,51 @@ code {
 .theme-toggle:active::after { opacity: 0.14; }
 html:not(.js) .theme-toggle { display: none; }
 
+/* The language menu: the landing page in each language, which
+   tools/sitefinish lists. A details element, so it opens without
+   script, beside the theme's button and in its look. */
+.lang-menu { position: relative; flex: none; margin: 0 -12px 0 -8px; }
+.lang-menu > summary {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--ink-2);
+  cursor: pointer;
+  list-style: none;
+  transition: color var(--fast) var(--ease), background-color var(--fast) var(--ease);
+}
+.lang-menu > summary::-webkit-details-marker { display: none; }
+.lang-menu > summary:hover,
+.lang-menu[open] > summary { color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.lang-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline-end: 0;
+  z-index: 20;
+  min-width: 210px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  background: var(--surface-1);
+  border: 1px solid var(--outline);
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.2);
+}
+.lang-list a {
+  display: block;
+  padding: 9px 14px;
+  border-radius: 10px;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+.lang-list a:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.lang-list a[aria-current="page"] { font-weight: 800; box-shadow: inset 3px 0 0 currentColor; }
+.lang-list a[dir="rtl"] { text-align: right; }
+
 /* Layout. */
 
 /* The glows behind the screenshots and the player reach past the column;
@@ -794,6 +839,16 @@ kbd {
   padding-bottom: 40px;
 }
 .footer-inner p { flex: 1; color: var(--ink-2); font-size: 0.875rem; max-width: 70ch; }
+/* The landing page's languages, under the footer's line. */
+.footer-langs {
+  max-width: calc(var(--max) + 2 * var(--gutter));
+  margin: -16px auto 0;
+  padding: 0 var(--gutter) 32px;
+}
+.footer-langs ul { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: 0.875rem; }
+.footer-langs a { color: var(--ink-2); text-decoration: none; }
+.footer-langs a:hover { color: var(--ink); text-decoration: underline; }
+.footer-langs a[aria-current="page"] { color: var(--ink); font-weight: 700; }
 .brand-small { font-size: 1rem; }
 
 /* The wordmark at the foot, across the content's width at every size: in

@@ -8,6 +8,22 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="theme-color" content="#fff8f8" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)" />
+  {#- The words of the page's scripts. tools/sitefinish translates them
+      in the page of each language; without them, as on the docs, the
+      scripts say them in English. #}
+  <script type="application/json" id="site-text">
+  {"theme_label": "Theme: {theme}. Switch to {next}",
+   "theme_system": "as the system", "theme_light": "light", "theme_dark": "dark",
+   "theme_next_system": "the system's theme", "theme_next_light": "light", "theme_next_dark": "dark",
+   "download_for": "Download for {os}",
+   "video_play": "Play the video", "video_pause": "Pause the video",
+   "gallery_layout": "MixMusic's home page in the {name} layout and the Mix theme.",
+   "gallery_theme": "MixMusic's home page in the {name} theme and the Blend layout.",
+   "gallery_name_layout": "{name}, in the Mix theme",
+   "gallery_name_theme": "{name}, in the Blend layout",
+   "copy_code": "Copy the code", "copied": "Copied",
+   "press_keys": "Press {keys}", "selected_press": "Selected. Press {keys} to copy it."}
+  </script>
   {% include "partials/theme.html" %}
   <link rel="icon" type="image/png" href="assets/icon.png" />
   {%- set home = config.base_url | trim_end(pat='/') ~ '/' %}
@@ -134,6 +150,12 @@
         <a href="{{ get_url(path='@/docs/_index.md') }}">Docs</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Theme: as the system" data-theme-toggle><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-theme-system" /></svg></button>
+      {#- The page in another language: tools/sitefinish fills the list
+          with each language's page, the one shown marked. #}
+      <details class="lang-menu">
+        <summary aria-label="Language" title="Language"><svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-globe" /></svg></summary>
+        <ul class="lang-list" translate="no" data-languages></ul>
+      </details>
       <a class="btn btn-outlined btn-small" href="https://github.com/fzn0x/mixmusic">
         <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg>
         <span>Star on GitHub</span>
@@ -176,7 +198,7 @@
 
       <div class="demo-wrap" data-demo-wrap>
         <div class="app-frame" data-app-frame>
-          <div class="app" role="group" aria-label="A working copy of MixMusic's player in its default look, the Blend layout and the Mix theme" data-app>
+          <div class="app" role="group" aria-label="A working copy of MixMusic's player in its default look, the Blend layout and the Mix theme" translate="no" data-app>
             <header class="app-top">
               <div class="app-brand">
                 <svg class="app-mark" width="26" height="26" aria-hidden="true"><use href="#i-rings" /></svg>
@@ -300,7 +322,7 @@
         </div>
 
         <div class="mini-frame" data-mini-frame>
-          <div class="mini" role="group" aria-label="A working copy of MixMusic's mini player" data-mini>
+          <div class="mini" role="group" aria-label="A working copy of MixMusic's mini player" translate="no" data-mini>
             <img class="mini-art" width="132" height="132" src="assets/covers/cover-10.webp" alt="" data-cover />
             <div class="mini-body">
               <b class="mini-title" data-title>Local Forecast - Elevator</b>
@@ -318,7 +340,7 @@
             </div>
             <span class="mini-progress" aria-hidden="true"><span data-fill-line></span></span>
           </div>
-          <ol class="app-rows mini-queue" aria-label="Up next" data-queue></ol>
+          <ol class="app-rows mini-queue" aria-label="Up next" translate="no" data-queue></ol>
         </div>
 
         <audio preload="none" data-audio></audio>
@@ -338,7 +360,7 @@
           <p class="merge-label merge-label-spotify" aria-hidden="true"><span class="mark mark-spotify"></span>Spotify</p>
           <p class="merge-label merge-label-youtube" aria-hidden="true"><span class="mark mark-youtube"></span>YouTube Music</p>
           <p class="merge-label merge-label-queue" aria-hidden="true"><svg class="icon" width="16" height="16"><use href="#i-queue" /></svg>Up next in MixMusic</p>
-          <ol class="merge-list" aria-label="One queue of Spotify and YouTube Music tracks (made up for this page)">
+          <ol class="merge-list" aria-label="One queue of Spotify and YouTube Music tracks (made up for this page)" translate="no">
             <li class="merge-row" data-src="spotify" style="--row-art: #ec8051"><img src="assets/covers/cover-2.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Paper Planets</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Velvet Ferries</span></span></li>
             <li class="merge-row" data-src="youtube" style="--row-art: #52e4ea"><img src="assets/covers/cover-1.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Neon Tide</strong><span><span class="mark mark-youtube" aria-hidden="true"></span>Kaori Ume</span></span></li>
             <li class="merge-row" data-src="spotify" style="--row-art: #7769d3"><img src="assets/covers/cover-3.webp" width="480" height="480" alt="" loading="lazy" /><span class="merge-text"><strong>Slow Static</strong><span><span class="mark mark-spotify" aria-hidden="true"></span>Mira Vale</span></span></li>
@@ -674,6 +696,7 @@
         <span data-download-label>Download</span>
       </a>
     </div>
+    <nav class="footer-langs" aria-label="Languages"><ul translate="no" data-languages></ul></nav>
     <div class="footer-wordmark" aria-hidden="true"><span><span data-w="mi"></span><span class="footer-wordmark-accent" data-w="x"></span><span data-w="music"></span></span></div>
   </footer>
 

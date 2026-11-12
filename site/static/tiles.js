@@ -277,7 +277,7 @@
   acts.push({
     card: "A player around the notch",
     art: (card) => {
-      const cover = "assets/covers/cover-1.webp";
+      const cover = `${document.documentElement.dataset.root || ""}assets/covers/cover-1.webp`;
       const el = put(card, art("notch", `
         <div class="ta-menubar"><span><i></i><i></i><i></i></span><span><i></i><i></i></span></div>
         <div class="ta-shape">
@@ -477,7 +477,12 @@
   // Each card's picture, and the round it plays again and again.
   const cards = [];
   for (const act of acts) {
-    const card = qa(document, ".bento .tile, .columns .column").find((c) => c.querySelector("h3")?.textContent.trim() === act.card);
+    // A page in another language keeps a heading's English in data-en
+    // (tools/sitefinish).
+    const card = qa(document, ".bento .tile, .columns .column").find((c) => {
+      const h = c.querySelector("h3");
+      return (h?.dataset.en || h?.textContent.trim()) === act.card;
+    });
     if (!card) continue;
     const { steps, rest, again = [[0, rest]], end } = act.art(card);
     rest();

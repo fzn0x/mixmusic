@@ -10,10 +10,22 @@
     (() => {
       const d = document;
       const root = d.documentElement;
+      // The words of the page's scripts, in its language: #site-text,
+      // which tools/sitefinish translates in each language's page. Without
+      // it, as on the docs, they're English. {name} in a text is vars.name.
+      const words = (() => {
+        try {
+          return JSON.parse(d.getElementById("site-text")?.textContent || "{}");
+        } catch {
+          return {};
+        }
+      })();
+      const text = (window.mmText = (key, english, vars = {}) =>
+        (words[key] || english).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m)));
       const KEY = "mixmusic:theme";
       const ORDER = ["system", "light", "dark"];
-      const NAMES = { system: "as the system", light: "light", dark: "dark" };
-      const NEXT = { system: "the system's theme", light: "light", dark: "dark" };
+      const NAMES = { system: text("theme_system", "as the system"), light: text("theme_light", "light"), dark: text("theme_dark", "dark") };
+      const NEXT = { system: text("theme_next_system", "the system's theme"), light: text("theme_next_light", "light"), dark: text("theme_next_dark", "dark") };
       // Each theme-color meta keeps its own colour for its scheme.
       const bars = [...d.querySelectorAll('meta[name="theme-color"]')].map((m) => ({ meta: m, own: m.content, scheme: /light/.test(m.media) ? "light" : "dark" }));
       const colour = (scheme) => bars.find((b) => b.scheme === scheme)?.own;
@@ -34,7 +46,7 @@
         bars.forEach((b) => (b.meta.content = theme === "system" ? b.own : colour(theme)));
         const next = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
         d.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-          const label = `Theme: ${NAMES[theme]}. Switch to ${NEXT[next]}`;
+          const label = text("theme_label", "Theme: {theme}. Switch to {next}", { theme: NAMES[theme], next: NEXT[next] });
           button.setAttribute("aria-label", label);
           button.title = label;
           button.querySelector("use")?.setAttribute("href", `#i-theme-${theme}`);

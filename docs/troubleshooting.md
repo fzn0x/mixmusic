@@ -37,7 +37,9 @@ its **details**. The keyboard reaches **details** in the toast with
 
 - **A YouTube Music track doesn't play.** It says why: some are not
   available in your country, or only to signed-in adults on YouTube's own
-  website. The tracks MixMusic can't find the audio of itself, such as those
+  website. Some YouTube plays only to signed-in viewers:
+  [Play audio as your account](playing-music.md#play-audio-as-your-account)
+  plays those. The log says why too. The tracks MixMusic can't find the audio of itself, such as those
   made for children, [need yt-dlp](streams.md#when-yt-dlp-is-needed): check
   Settings › Playback that it is installed, and a JavaScript runtime found. MixMusic updates the yt-dlp it
   installed every day, as an old one stops finding streams; one of your

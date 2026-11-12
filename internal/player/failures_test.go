@@ -3,7 +3,11 @@ package player
 import (
 	"errors"
 	"iter"
+	"log"
+	"os"
 	"slices"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -74,6 +78,35 @@ func TestFailuresInARow(t *testing.T) {
 		if want := f[len(f)-1-i].ID; n.Failure != want {
 			t.Errorf("notice %d names failure %d, not %d", i, n.Failure, want)
 		}
+	}
+}
+
+// TestFailureLogged writes a track that couldn't play to the log, with
+// why, for a report of the problem: the notice of it goes.
+func TestFailureLogged(t *testing.T) {
+	var logs strings.Builder
+	var mu sync.Mutex
+	log.SetOutput(writerFunc(func(b []byte) (int, error) {
+		mu.Lock()
+		defer mu.Unlock()
+		return logs.Write(b)
+	}))
+	t.Cleanup(func() { log.SetOutput(os.Stderr) })
+	h := newHarness(t, Saved{}, func(f *fakeServices) {
+		f.prepare = func(t media.Track) (Source, error) {
+			if t.ID == "yt:a" {
+				return Source{}, errors.New("YouTube plays this track only to signed-in viewers")
+			}
+			return streamOf(t), nil
+		}
+	})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("b playing", playing("b"))
+	mu.Lock()
+	got := logs.String()
+	mu.Unlock()
+	if want := "mixmusic: couldn't play yt:a: YouTube plays this track only to signed-in viewers"; !strings.Contains(got, want) {
+		t.Errorf("the log lacks %q:\n%s", want, got)
 	}
 }
 

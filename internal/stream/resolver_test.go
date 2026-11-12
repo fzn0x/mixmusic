@@ -130,7 +130,9 @@ func TestPlainError(t *testing.T) {
 		"yt-dlp: w3XzgjlKFjc: Video unavailable":                                                                     {"this track is no longer on YouTube Music", ErrUnavailable},
 		"yt-dlp: pFptt7Cargc: Private video. Sign in if you've been granted access to this video":                    {"this track is private", ErrUnavailable},
 		"yt-dlp: pFptt7Cargc: Join this channel to get access to members-only content like this video":               {"only the members of its channel can play this track", ErrUnavailable},
-		"yt-dlp: unable to download webpage: HTTP Error 500":                                                         {"", nil},
+		"yt-dlp: K8v_DaCcORQ: Please sign in. This helps protect our community. Use --cookies-from-browser":          {"YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it", ErrUnavailable},
+		"Please sign in": {"YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it", ErrUnavailable},
+		"yt-dlp: unable to download webpage: HTTP Error 500": {"", nil},
 	} {
 		if got, kind := plainError(msg); got != want.text || kind != want.kind {
 			t.Errorf("plainError(%q) = %q, %v; want %q, %v", msg, got, kind, want.text, want.kind)

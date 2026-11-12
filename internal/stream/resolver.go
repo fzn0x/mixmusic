@@ -527,6 +527,9 @@ var plainErrors = []struct {
 	{"confirm your age", "YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
 	{"age-restricted", "YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
 	{"inappropriate for some users", "YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
+	// YouTube's LOGIN_REQUIRED of a video it plays only to signed-in
+	// viewers, as M83's "Midnight City", rather than its check of bots.
+	{"please sign in", "YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it", ErrUnavailable},
 	{"in your country", "this track is not available in your country", ErrUnavailable},
 	{"private video", "this track is private", ErrUnavailable},
 	{"members-only", "only the members of its channel can play this track", ErrUnavailable},

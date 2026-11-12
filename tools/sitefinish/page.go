@@ -9,6 +9,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"slices"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -60,6 +61,45 @@ func element(a atom.Atom, attrs ...string) *html.Node {
 		n.Attr = append(n.Attr, html.Attribute{Key: attrs[i], Val: attrs[i+1]})
 	}
 	return n
+}
+
+// builtFor is the address the English page was built for, from its
+// <html data-base>: the GitHub Pages copy's, the Cloudflare copy's, or the
+// site checks' 127.0.0.1. Zola writes the site's own links, as the FAQ's
+// to the docs, with it. Empty when the page doesn't say.
+func builtFor(doc *html.Node) string {
+	root := find(doc, func(n *html.Node) bool { return n.DataAtom == atom.Html })
+	if root == nil || attr(root, "data-base") == "" {
+		return ""
+	}
+	return slash(attr(root, "data-base"))
+}
+
+// slash is the address u with one slash at its end.
+func slash(u string) string {
+	return strings.TrimRight(u, "/") + "/"
+}
+
+// rebase writes the site's own addresses in s at to instead of from: the
+// English of a piece, as one copy of the site has it, as another has it.
+func rebase(s, from, to string) string {
+	if from == "" || to == "" || from == to {
+		return s
+	}
+	return strings.ReplaceAll(s, from, to)
+}
+
+// rebaseTable is table, keyed and translated with the site's addresses at
+// to instead of from.
+func rebaseTable(table map[string]string, from, to string) map[string]string {
+	if from == "" || to == "" || from == to {
+		return table
+	}
+	out := make(map[string]string, len(table))
+	for k, v := range table {
+		out[rebase(k, from, to)] = rebase(v, from, to)
+	}
+	return out
 }
 
 // relative reports whether the address u is relative to the page: not a
@@ -120,6 +160,8 @@ func finish(doc *html.Node, l language, canonical string) {
 	if l.RTL {
 		setAttr(root, "dir", "rtl")
 	}
+	// The address the page was built for has done its work (builtFor).
+	root.Attr = slices.DeleteFunc(root.Attr, func(a html.Attribute) bool { return a.Key == "data-base" })
 	if l.Dir != "" {
 		setAttr(root, "data-root", "../")
 		each(doc, up)
@@ -248,7 +290,7 @@ func replaceText(n *html.Node, text string) {
 
 // page makes the page of l from the English page src, with table, the
 // translations of its units, at canonical: the page, and the English of
-// the units it has no translation for.
+// the units it has no translation for, as the canonical copy has it.
 func page(src []byte, l language, table map[string]string, canonical string) ([]byte, []string, error) {
 	doc, err := parse(src)
 	if err != nil {
@@ -256,7 +298,13 @@ func page(src []byte, l language, table map[string]string, canonical string) ([]
 	}
 	var missing []string
 	if l.Dir != "" {
-		missing = translate(doc, table)
+		// The table is keyed by the English as the canonical copy has it;
+		// a page built for another address has that address in its links.
+		built, home := builtFor(doc), slash(canonical)
+		missing = translate(doc, rebaseTable(table, home, built))
+		for i, m := range missing {
+			missing[i] = rebase(m, built, home)
+		}
 	}
 	finish(doc, l, canonical)
 	out, err := render(doc)

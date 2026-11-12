@@ -213,6 +213,51 @@ func TestEnglishPage(t *testing.T) {
 	}
 }
 
+// TestOtherCopy translates a page built for another copy of the site, as
+// GitHub Pages': its links to the site's own pages start with that copy's
+// address, the table's with the canonical one. The links keep the copy's
+// address, the English of what has no translation is the canonical
+// copy's, and no page keeps the address it was built for.
+func TestOtherCopy(t *testing.T) {
+	const src = `<!doctype html>
+<html lang="en" data-base="https://copy.test/mixmusic"><head><title>T</title></head><body>
+<p>Read <a href="https://copy.test/mixmusic/docs/license/">License</a>.</p>
+<p>See <a href="https://copy.test/mixmusic/docs/">the docs</a>.</p>
+</body></html>`
+	table := map[string]string{
+		"T": "T",
+		`Read <a href="https://example.test/docs/license/">License</a>.`: `Lies <a href="https://example.test/docs/license/">Lizenz</a>.`,
+	}
+	doc, err := parse([]byte(src))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := builtFor(doc); got != "https://copy.test/mixmusic/" {
+		t.Errorf("built for %q", got)
+	}
+	ur := language{Dir: "ur", Tag: "ur", Name: "اردو", Locale: "ur_PK", RTL: true}
+	out, missing, err := page([]byte(src), ur, table, "https://example.test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := string(out)
+	if want := `<p>Lies <a href="https://copy.test/mixmusic/docs/license/">Lizenz</a>.</p>`; !strings.Contains(s, want) {
+		t.Errorf("the page lacks %s:\n%s", want, s)
+	}
+	if want := []string{`See <a href="https://example.test/docs/">the docs</a>.`}; !slices.Equal(missing, want) {
+		t.Errorf("missing %q, want %q", missing, want)
+	}
+	for _, l := range []language{languages[0], ur} {
+		out, _, err := page([]byte(src), l, table, "https://example.test")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if strings.Contains(string(out), "data-base") {
+			t.Errorf("%s: the page keeps data-base", l.Tag)
+		}
+	}
+}
+
 // TestSitemap adds each language's landing page, and the alternates of the
 // landing pages, keeping Zola's pages and their dates.
 func TestSitemap(t *testing.T) {

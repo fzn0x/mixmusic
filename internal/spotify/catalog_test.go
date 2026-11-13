@@ -144,3 +144,14 @@ func TestPlaylistOfOthersIsUnavailable(t *testing.T) {
 		t.Errorf("playlist = %+v, %v", p, err)
 	}
 }
+
+// TestPlaylistNotShown tells Spotify's own playlists, which Spotify answers
+// apps 404 for, from a failure, with their address on Spotify (#530).
+func TestPlaylistNotShown(t *testing.T) {
+	c, _ := newFake(t, map[string]string{})
+	p, err := c.Playlist(context.Background(), "37i9dQZF1DXcBWIGoYBM5M", "me")
+	if !errors.Is(err, ErrPlaylistNotShown) || p.ID != "sp:37i9dQZF1DXcBWIGoYBM5M" || p.Source != media.SourceSpotify ||
+		p.URL != "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M" {
+		t.Errorf("playlist = %+v, %v", p, err)
+	}
+}

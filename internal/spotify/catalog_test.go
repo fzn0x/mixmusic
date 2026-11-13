@@ -59,17 +59,29 @@ func TestSearch(t *testing.T) {
 		"GET /search": `{"tracks": {"items": [` + trackJSON + `]},
 			"albums": {"items": [{"id": "al1", "name": "Discovery", "album_type": "album", "release_date": "2001-03-12", "total_tracks": 14, "artists": [{"id": "a1", "name": "Daft Punk"}], "images": []}]},
 			"artists": {"items": [{"id": "a1", "name": "Daft Punk", "genres": ["french house"], "images": []}]},
-			"playlists": {"items": [null, {"id": "p1", "name": "Mix", "owner": {"id": "u2", "display_name": "Someone"}, "items": {"total": 3}}]}}`,
+			"playlists": {"items": [null, {"id": "p1", "name": "Mix", "owner": {"id": "u2", "display_name": "Someone"}, "items": {"total": 3}},
+				{"id": "p2", "name": "Theirs", "owner": {"id": "u3", "display_name": "Them"}, "items": {"total": 9}},
+				{"id": "p3", "name": "Shared", "owner": {"id": "u3", "display_name": "Them"}, "collaborative": true, "items": {"total": 4}}]}}`,
 	})
-	res, err := c.Search(context.Background(), "daft punk")
+	// Spotify shows apps the tracks of the playlists the user owns or
+	// collaborates on only: the others are left out.
+	res, err := c.Search(context.Background(), "daft punk", "u2")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(api.requests[len(api.requests)-1], "limit=10") {
 		t.Errorf("search asked %s, beyond the limit of development mode", api.requests)
 	}
-	if len(res.Tracks) != 1 || len(res.Albums) != 1 || len(res.Artists) != 1 || len(res.Playlists) != 1 {
+	if len(res.Tracks) != 1 || len(res.Albums) != 1 || len(res.Artists) != 1 || len(res.Playlists) != 2 {
 		t.Fatalf("results = %+v", res)
+	}
+	if res.Playlists[0].ID != "sp:p1" || !res.Playlists[0].Mine || res.Playlists[1].ID != "sp:p3" || !res.Playlists[1].Collaborative {
+		t.Errorf("playlists = %+v", res.Playlists)
+	}
+	// Signed-in user unknown, none can be opened.
+	none, err := c.Search(context.Background(), "daft punk", "")
+	if err != nil || len(none.Playlists) != 0 {
+		t.Errorf("playlists of an unknown user = %+v, %v", none.Playlists, err)
 	}
 	tr := res.Tracks[0]
 	if tr.ID != "sp:t1" || tr.Source != media.SourceSpotify || tr.Album.ID != "sp:al1" || tr.Artists[0].ID != "sp:a1" {
@@ -129,6 +141,17 @@ func TestPlaylistOfOthersIsUnavailable(t *testing.T) {
 	})
 	p, err := c.Playlist(context.Background(), "p2", "me")
 	if !errors.Is(err, ErrPlaylistUnavailable) || p.Title != "Theirs" {
+		t.Errorf("playlist = %+v, %v", p, err)
+	}
+}
+
+// TestPlaylistNotShown tells Spotify's own playlists, which Spotify answers
+// apps 404 for, from a failure, with their address on Spotify (#530).
+func TestPlaylistNotShown(t *testing.T) {
+	c, _ := newFake(t, map[string]string{})
+	p, err := c.Playlist(context.Background(), "37i9dQZF1DXcBWIGoYBM5M", "me")
+	if !errors.Is(err, ErrPlaylistNotShown) || p.ID != "sp:37i9dQZF1DXcBWIGoYBM5M" || p.Source != media.SourceSpotify ||
+		p.URL != "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M" {
 		t.Errorf("playlist = %+v, %v", p, err)
 	}
 }

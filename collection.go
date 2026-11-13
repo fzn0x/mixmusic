@@ -277,6 +277,9 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 	case !res.done:
 		s.pageLoading(c, "playlist")
 		return
+	case hiddenTracks(res.err, res.value):
+		s.hiddenTracksPage(c, key, res)
+		return
 	case res.err != nil:
 		s.pageProblem(c, "playlist", res.err, key)
 		return

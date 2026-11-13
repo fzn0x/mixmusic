@@ -3,6 +3,7 @@ package spotify
 import (
 	"context"
 	"errors"
+	"net/http"
 	"net/url"
 	"slices"
 	"strconv"
@@ -27,6 +28,11 @@ const (
 // ErrPlaylistUnavailable is returned for playlists whose tracks Spotify
 // does not show to apps: those the user neither owns nor collaborates on.
 var ErrPlaylistUnavailable = errors.New("spotify only lets apps read the tracks of playlists you own or collaborate on")
+
+// ErrPlaylistNotShown is returned for playlists Spotify answers apps
+// nothing of, not even their name: its own, as Today's Top Hits (HTTP 404,
+// checked 2026-11-13), and one that doesn't exist.
+var ErrPlaylistNotShown = errors.New("spotify shows apps neither its own playlists nor those deleted or made private")
 
 // Profile is the signed-in user.
 type Profile struct {
@@ -53,8 +59,10 @@ func (c *Client) Me(ctx context.Context) (Profile, error) {
 }
 
 // Search returns the tracks, albums, artists and playlists Spotify finds for
-// query.
-func (c *Client) Search(ctx context.Context, query string) (media.SearchResults, error) {
+// query. Of its playlists, only those Playlist can open for userID, the
+// signed-in user: those they own or collaborate on, not the others, of
+// which Spotify shows apps no track (ErrPlaylistUnavailable).
+func (c *Client) Search(ctx context.Context, query, userID string) (media.SearchResults, error) {
 	var res struct {
 		Tracks    paging[*track]    `json:"tracks"`
 		Albums    paging[*album]    `json:"albums"`
@@ -83,8 +91,11 @@ func (c *Client) Search(ctx context.Context, query string) (media.SearchResults,
 		}
 	}
 	for _, p := range res.Playlists.Items {
-		if p != nil {
-			out.Playlists = append(out.Playlists, toPlaylist(p, ""))
+		if p == nil {
+			continue
+		}
+		if converted := toPlaylist(p, userID); converted.Editable {
+			out.Playlists = append(out.Playlists, converted)
 		}
 	}
 	return out, nil
@@ -199,6 +210,12 @@ func (c *Client) artistAlbums(ctx context.Context, id string, offset int) ([]*al
 func (c *Client) Playlist(ctx context.Context, id, userID string) (media.Playlist, error) {
 	var p playlist
 	if err := c.get(ctx, "/playlists/"+url.PathEscape(id), nil, &p); err != nil {
+		var api *APIError
+		if errors.As(err, &api) && api.Status == http.StatusNotFound {
+			// Its address on Spotify, all there is to tell of it.
+			return media.Playlist{ID: media.ID(media.SourceSpotify, id), Source: media.SourceSpotify,
+				URL: "https://open.spotify.com/playlist/" + url.PathEscape(id)}, ErrPlaylistNotShown
+		}
 		return media.Playlist{}, err
 	}
 	out := toPlaylist(&p, userID)

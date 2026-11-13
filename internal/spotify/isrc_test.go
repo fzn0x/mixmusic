@@ -15,7 +15,7 @@ func TestTrackISRC(t *testing.T) {
 		"GET /albums/al9": `{"id": "al9", "name": "Harbour Lights", "album_type": "album", "images": [], "artists": [{"id": "a9", "name": "Ola Brine"}],
 			"tracks": {"items": [{"id": "t9", "name": "Paper Lanterns", "duration_ms": 201000, "artists": [{"id": "a9", "name": "Ola Brine"}]}]}}`,
 	})
-	res, err := c.Search(context.Background(), "paper lanterns")
+	res, err := c.Search(context.Background(), "paper lanterns", "")
 	if err != nil {
 		t.Fatal(err)
 	}

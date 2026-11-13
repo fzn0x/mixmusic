@@ -147,6 +147,12 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 				}
 			})
 		case "playlists":
+			// Spotify's search lists the playlists of others too, whose
+			// tracks it shows apps none of: they're left out (#530).
+			if s.searchScope == 1 && res.value.SpotifySignedIn {
+				ui.Text(c, "Spotify shows apps the tracks of the playlists you own or collaborate on only, so only those are listed.").
+					FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16)
+			}
 			s.tileWrap(c, func() {
 				for i, p := range r.Playlists {
 					s.playlistTile(c, "playlist-"+count(i), p)

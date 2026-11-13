@@ -63,7 +63,7 @@ func (c *Catalog) search(ctx context.Context, query string) (SearchResponse, err
 	)
 	wg.Go(func() { res.YouTube, ytErr = c.a.youtube.SearchAll(ctx, query) })
 	if res.SpotifySignedIn {
-		wg.Go(func() { res.Spotify, spErr = c.a.spotify.Search(ctx, query) })
+		wg.Go(func() { res.Spotify, spErr = c.a.spotify.Search(ctx, query, c.a.spotifyUserID(ctx)) })
 	}
 	wg.Wait()
 	if ytErr != nil {
@@ -213,7 +213,10 @@ func (a *App) playlist(ctx context.Context, id string) (media.Playlist, error) {
 		return p, err
 	case media.SourceSpotify:
 		p, err := a.spotify.Playlist(ctx, native, a.spotifyUserID(ctx))
-		if err == nil && !p.Editable {
+		// One of others, whose tracks Spotify doesn't show apps, or one of
+		// Spotify's own, which it shows nothing of, keeps the rest of its
+		// page, Save among it.
+		if (err == nil || errors.Is(err, spotify.ErrPlaylistUnavailable) || errors.Is(err, spotify.ErrPlaylistNotShown)) && !p.Editable {
 			p.Saved = a.spotifyHas(ctx, spotify.URI("playlist", native))
 		}
 		return p, err

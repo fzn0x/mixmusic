@@ -115,7 +115,8 @@ Apps in Spotify's development mode, as yours is, have limits:
 - Up to five accounts, added under **Users Management**, can use it.
 - A search returns at most ten results of each kind.
 - Apps see the tracks of the playlists you own or collaborate on, not of
-  playlists others made. MixMusic tells you when a playlist is one of those.
+  playlists others made. A search leaves those out, and one you follow
+  opens with a way to play it on Spotify.
 - Spotify removed the artist top tracks endpoint: MixMusic finds an artist's
   popular tracks with a search instead.
 - Requests are counted against a quota; when MixMusic hits it, Spotify asks it

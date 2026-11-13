@@ -188,7 +188,7 @@ developer dashboard. Spotify limits these apps, more so since February
   in, add them there, or have them make an app of their own.
 - **Smaller answers.** A search gives at most ten results of each kind;
   the app sees the tracks of the playlists you own or collaborate on, not
-  of playlists others made, which MixMusic tells you; Spotify gives no
+  of playlists others made, which a search leaves out; Spotify gives no
   artist's top tracks, which MixMusic finds with a search instead; and
   shows come without their publisher.
 - **A quota.** When MixMusic makes too many requests, Spotify asks it to

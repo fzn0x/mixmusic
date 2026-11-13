@@ -11,6 +11,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // addOnYouTube adds a track to a playlist of the user's on YouTube Music,
@@ -77,18 +78,14 @@ func (s *shell) toldMixAdd(p media.Playlist, tracks, held []media.Track, err err
 	case err != nil:
 		s.notes = append(s.notes, noticeOf(err))
 	case len(held) > 0:
-		were := " were"
-		if len(held) == 1 {
-			were = " was"
-		}
 		s.actionToasts = append(s.actionToasts, actionToast{
-			message: "Added " + plural(len(tracks)-len(held), "track") + " to " + p.Title + ": " + count(len(held)) + were + " in it already",
-			action:  "add anyway",
+			message: locales.AlreadyInHeld(len(tracks)-len(held), p.Title, len(held)),
+			action:  locales.AlreadyInAddAnyway(),
 			run:     func() { s.addToMixAnyway(p, held) },
 		})
 		s.forget("playlist:" + p.ID)
 	default:
-		what := plural(len(tracks), "track")
+		what := locales.AlreadyInTracks(len(tracks))
 		if len(tracks) == 1 {
 			what = tracks[0].Title
 		}
@@ -102,7 +99,7 @@ func (s *shell) addToMixAnyway(p media.Playlist, tracks []media.Track) {
 		s.notes = append(s.notes, noticeOf(err))
 		return
 	}
-	what := plural(len(tracks), "track")
+	what := locales.AlreadyInTracks(len(tracks))
 	if len(tracks) == 1 {
 		what = tracks[0].Title
 	}
@@ -112,15 +109,15 @@ func (s *shell) addToMixAnyway(p media.Playlist, tracks []media.Track) {
 // alreadyIn tells that p holds what was added already, with Add anyway,
 // which anyway does.
 func (s *shell) alreadyIn(p media.Playlist, anyway func()) {
-	s.actionToasts = append(s.actionToasts, actionToast{message: "Already in " + p.Title, action: "add anyway", run: anyway})
+	s.actionToasts = append(s.actionToasts, actionToast{message: locales.AlreadyInMessage(p.Title), action: locales.AlreadyInAddAnyway(), run: anyway})
 }
 
 // added tells that what went into p, again when p held it already, and
 // has p's page show it the next time.
 func (s *shell) added(p media.Playlist, what string, again bool) {
-	message := "Added " + what + " to " + p.Title
+	message := locales.AlreadyInAdded(what, p.Title)
 	if again {
-		message += " again"
+		message = locales.AlreadyInAddedAgain(what, p.Title)
 	}
 	s.notes = append(s.notes, notice(message))
 	s.forget("playlist:" + p.ID)

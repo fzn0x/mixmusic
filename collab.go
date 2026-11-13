@@ -19,6 +19,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The changes of playlists on their services that collaborating asks for;
@@ -76,16 +77,16 @@ func (s *shell) withCollab(menu func(m *ui.Menu), p *media.Playlist) func(m *ui.
 		busy := s.keeping[collabKey(p.ID)]
 		switch p.Source {
 		case media.SourceYouTube:
-			if m.Item("Invite collaborators").Disabled(busy).Chosen() {
+			if m.Item(locales.CollabInviteItem()).Disabled(busy).Chosen() {
 				s.inviteCollaborators(p)
 			}
-			if p.Collaborative && m.Item("Stop collaboration").Disabled(busy).Chosen() {
+			if p.Collaborative && m.Item(locales.CollabStopItem()).Disabled(busy).Chosen() {
 				s.stopCollaboration(p)
 			}
 		case media.SourceSpotify:
-			label := "Make collaborative"
+			label := locales.CollabMakeItem()
 			if p.Collaborative {
-				label = "Stop collaboration"
+				label = locales.CollabStopItem()
 			}
 			if m.Item(label).Disabled(busy).Chosen() {
 				s.setCollaborative(p, !p.Collaborative)
@@ -119,8 +120,8 @@ func (s *shell) inviteCollaborators(p *media.Playlist) {
 		s.invite(p, false)
 		return
 	}
-	s.ask("invite collaborators", "Collaborators can't open a private playlist. Inviting them makes "+p.Title+
-		" unlisted: anyone with its link can open it, and it shows on none of your pages.", "invite", func() { s.invite(p, true) })
+	s.ask(locales.CollabInviteTitle(), locales.CollabInviteBody(p.Title),
+		locales.CollabInviteButton(), func() { s.invite(p, true) })
 }
 
 // invite is inviteCollaborators, which makes p unlisted first when unlist
@@ -129,14 +130,14 @@ func (s *shell) invite(p *media.Playlist, unlist bool) {
 	id, title := p.ID, p.Title
 	var link string
 	if unlist {
-		s.notes = append(s.notes, notice("Making "+title+" unlisted: YouTube Music takes up to half a minute before it lets collaborators in"))
+		s.notes = append(s.notes, notice(locales.CollabUnlisting(title)))
 	}
 	s.changeCollab(p, func(ctx context.Context) (err error) {
 		link, err = inviteOnYouTube(s, ctx, id, unlist)
 		return err
 	}, func(err error) {
 		if err != nil {
-			s.notes = append(s.notes, player.Notice{Message: "Couldn't invite collaborators to " + title + ": " + err.Error(), Error: true})
+			s.notes = append(s.notes, player.Notice{Message: locales.CollabInviteFailed(title, err.Error()), Error: true})
 			if unlist {
 				// It may be unlisted now: its page tells.
 				s.refetch("playlist:" + id)
@@ -148,7 +149,7 @@ func (s *shell) invite(p *media.Playlist, unlist bool) {
 			p.Privacy = media.Unlisted
 		}
 		copyText(link)
-		s.notes = append(s.notes, notice("Copied the invite link of "+title+": whoever opens it can add to it"))
+		s.notes = append(s.notes, notice(locales.CollabInviteCopied(title)))
 	})
 }
 
@@ -156,8 +157,8 @@ func (s *shell) invite(p *media.Playlist, unlist bool) {
 // user agrees: YouTube Music takes its collaborators off it then, keeping
 // what they added, as its own switch warns.
 func (s *shell) stopCollaboration(p *media.Playlist) {
-	s.ask("stop collaboration", "Stopping collaboration takes the collaborators off "+p.Title+
-		", and its invite links stop working. What they added stays.", "stop", func() { s.stopNow(p) })
+	s.ask(locales.CollabStopTitle(), locales.CollabStopBody(p.Title),
+		locales.CollabStopButton(), func() { s.stopNow(p) })
 }
 
 // stopNow is stopCollaboration, once the user agreed.
@@ -165,11 +166,11 @@ func (s *shell) stopNow(p *media.Playlist) {
 	id, title := p.ID, p.Title
 	s.changeCollab(p, func(ctx context.Context) error { return stopOnYouTube(s, ctx, id) }, func(err error) {
 		if err != nil {
-			s.notes = append(s.notes, player.Notice{Message: "Couldn't stop collaboration on " + title + ": " + err.Error(), Error: true})
+			s.notes = append(s.notes, player.Notice{Message: locales.CollabStopFailed(title, err.Error()), Error: true})
 			return
 		}
 		p.Collaborative = false
-		s.notes = append(s.notes, notice("Stopped collaboration on "+title))
+		s.notes = append(s.notes, notice(locales.CollabStopped(title)))
 	})
 }
 
@@ -183,30 +184,30 @@ func (s *shell) setCollaborative(p *media.Playlist, on bool) {
 		s.changeCollab(p, func(ctx context.Context) error { return collaborativeOnSpotify(s, ctx, id, on) }, func(err error) {
 			switch {
 			case err != nil && on:
-				s.notes = append(s.notes, player.Notice{Message: "Couldn't make " + title + " collaborative: " + err.Error(), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.CollabMakeFailed(title, err.Error()), Error: true})
 				return
 			case err != nil:
-				s.notes = append(s.notes, player.Notice{Message: "Couldn't stop collaboration on " + title + ": " + err.Error(), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.CollabStopFailed(title, err.Error()), Error: true})
 				return
 			}
 			p.Collaborative = on
 			s.refetch("spotify:playlists")
 			switch {
 			case !on:
-				s.notes = append(s.notes, notice("Stopped collaboration on "+title))
+				s.notes = append(s.notes, notice(locales.CollabStopped(title)))
 			case link != "":
 				p.Privacy = media.Private
 				copyText(link)
-				s.notes = append(s.notes, notice("Made "+title+" collaborative: copied its link, for those who'll add to it"))
+				s.notes = append(s.notes, notice(locales.CollabMadeLinked(title)))
 			default:
 				p.Privacy = media.Private
-				s.notes = append(s.notes, notice("Made "+title+" collaborative"))
+				s.notes = append(s.notes, notice(locales.CollabMade(title)))
 			}
 		})
 	}
 	if on && p.Privacy == media.Public {
-		s.ask("collaborative playlist", "Spotify keeps collaborative playlists off your profile: "+title+
-			" leaves it. Those you send its link to can then add to it and put it in order.", "make collaborative", run)
+		s.ask(locales.CollabSpotifyTitle(), locales.CollabSpotifyBody(title),
+			locales.CollabMakeButton(), run)
 		return
 	}
 	run()
@@ -223,7 +224,7 @@ func (s *shell) collaborationsShelf(c *ui.Context, key string, playlists []media
 	if !slices.ContainsFunc(playlists, collaboration) {
 		return
 	}
-	s.shelf(c, key+"-collaborations", "Playlists you collaborate on", func() {
+	s.shelf(c, key+"-collaborations", locales.CollabShelfTitle(), func() {
 		for i, p := range playlists {
 			if collaboration(p) {
 				s.playlistTileWith(c, key+"-playlist-"+count(i), p, more)
@@ -254,15 +255,15 @@ func (s *shell) addToSpotifyMenu(m *ui.Menu, tracks []media.Track) {
 		slices.ContainsFunc(tracks, func(t media.Track) bool { return t.Source != media.SourceSpotify || t.IsEpisode() }) {
 		return
 	}
-	m.Submenu("Add to Spotify playlist", func(m *ui.Menu) {
+	m.Submenu(locales.CollabAddToSpotify(), func(m *ui.Menu) {
 		own := s.spotifyPlaylists()
 		switch {
 		case !own.done:
-			m.Item("Loading your playlists…").Disabled(true)
+			m.Item(locales.CollabLoading()).Disabled(true)
 			return
 		case own.err != nil:
 			own.refresh()
-			m.Item("Couldn't load your playlists").Disabled(true)
+			m.Item(locales.CollabLoadFailed()).Disabled(true)
 			return
 		}
 		some := false
@@ -280,7 +281,7 @@ func (s *shell) addToSpotifyMenu(m *ui.Menu, tracks []media.Track) {
 			}
 		}
 		if !some {
-			m.Item("No playlists you can add to").Disabled(true)
+			m.Item(locales.CollabNoneToAdd()).Disabled(true)
 		}
 	})
 }
@@ -290,7 +291,7 @@ func (s *shell) addToSpotifyMenu(m *ui.Menu, tracks []media.Track) {
 func (s *shell) addToSpotifyPlaylist(p media.Playlist, tracks []media.Track) {
 	what := tracks[0].Title
 	if len(tracks) > 1 {
-		what = plural(len(tracks), "track")
+		what = locales.CollabTracks(len(tracks))
 	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), collabWait)
@@ -348,8 +349,8 @@ func (s *shell) mixShare(p media.Playlist, tracks []media.Track) shareTarget {
 	t := playlistShare(p)
 	if p.Source == media.SourceLocal && len(tracks) > 0 && s.signedIn(media.SourceYouTube) {
 		t.onService = func(m *ui.Menu) {
-			if m.Item("As a YouTube Music playlist…").Chosen() {
-				s.promptName("Share as a YouTube Music playlist", "Name", p.Title, "share", func(name string) {
+			if m.Item(locales.CollabShareItem()).Chosen() {
+				s.promptName(locales.CollabShareAsTitle(), locales.CollabNameLabel(), p.Title, locales.CollabShareButton(), func(name string) {
 					s.shareMixOnYouTube(name, tracks)
 				})
 			}
@@ -363,7 +364,7 @@ func (s *shell) mixShare(p media.Playlist, tracks []media.Track) shareTarget {
 // its page, where Invite collaborators lets others add to it.
 func (s *shell) shareMixOnYouTube(title string, tracks []media.Track) {
 	if slices.ContainsFunc(tracks, func(t media.Track) bool { return t.Source != media.SourceYouTube }) {
-		s.notes = append(s.notes, notice("Finding the tracks on YouTube Music…"))
+		s.notes = append(s.notes, notice(locales.CollabFinding()))
 	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
@@ -371,12 +372,12 @@ func (s *shell) shareMixOnYouTube(title string, tracks []media.Track) {
 		p, err := shareOnYouTube(s, ctx, title, tracks)
 		s.update(func() {
 			if err != nil {
-				s.notes = append(s.notes, player.Notice{Message: "Couldn't share " + title + ": " + err.Error(), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.CollabShareFailed(title, err.Error()), Error: true})
 				return
 			}
 			s.keepPlaylist("youtube:playlists", p)
 			copyText(p.URL)
-			s.notes = append(s.notes, notice("Made "+p.Title+" on YouTube Music: copied its link, which anyone can open"))
+			s.notes = append(s.notes, notice(locales.CollabShared(p.Title)))
 			s.navigate(playlistPath(p.ID))
 		})
 	}()

@@ -13,7 +13,7 @@ import (
 // neteaseAccount signs in to NetEase Cloud Music with the QR code of its
 // sign-in page, in a window, and out.
 func (s *shell) neteaseAccount(c *ui.Context, ne app.NetEaseAccount) {
-	s.group(c, "网易云音乐", func() {
+	s.group(c, locales.AccountsNetEaseGroup(), func() {
 		if !ne.SignedIn {
 			s.found(c, locales.AccountSettingsNetEaseSignInTitle(), locales.AccountSettingsNetEaseHint(), func() {
 				s.hint(c, locales.AccountSettingsNetEaseHint())
@@ -60,7 +60,7 @@ func (s *shell) neteaseLibrary(c *ui.Context) {
 		fetch(s, "netease:albums", none),
 		fetch(s, "netease:artists", noArtists),
 		func(c *ui.Context) {
-			s.sectionTitle(c, "Liked on NetEase Cloud Music")
+			s.sectionTitle(c, locales.NeteaseLiked())
 			liked := fetch(s, "netease:liked", col.NetEaseLiked)
 			switch {
 			case !liked.done:
@@ -68,7 +68,7 @@ func (s *shell) neteaseLibrary(c *ui.Context) {
 			case liked.err != nil:
 				s.problem(c, liked.err, func() { s.forget("netease:liked") })
 			default:
-				s.trackList(c, "netease-liked", liked.value.Tracks, trackListOptions{art: true, album: true, empty: "No liked songs on NetEase Cloud Music."})
+				s.trackList(c, "netease-liked", liked.value.Tracks, trackListOptions{art: true, album: true, empty: locales.NeteaseNoLiked()})
 			}
 		})
 }

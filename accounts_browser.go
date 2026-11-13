@@ -14,17 +14,21 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The texts of the sign-in through a browser, and what the search of the
 // settings finds it by: its title, what it says, and the browsers' names.
-const (
-	youtubeBrowserTitle = "Sign in with your browser"
-	youtubeBrowserAbout = "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any browser: MixMusic then takes the session, closes the browser and deletes the profile. Your own profiles stay as they are."
-	youtubeBrowserNone  = "MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others made from Chromium when MixMusic opens them."
-	youtubeBrowserHint  = "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone, never yours, and keeps the session encrypted on this computer."
-	youtubeBrowserForm  = youtubeBrowserAbout + " " + youtubeBrowserNone + " " + youtubeBrowserHint + " Sign in with. Log in. Temporary profile. Google refuses."
-)
+func youtubeBrowserTitle() string { return locales.AccountsBrowserTitle() }
+func youtubeBrowserAbout() string { return locales.AccountsBrowserAbout() }
+func youtubeBrowserNone() string  { return locales.AccountsBrowserNone() }
+func youtubeBrowserHint() string  { return locales.AccountsBrowserHint() }
+
+// youtubeBrowserForm is what the search of the settings finds the sign-in by:
+// its texts, and the English words it is also found by.
+func youtubeBrowserForm() string {
+	return youtubeBrowserAbout() + " " + youtubeBrowserNone() + " " + youtubeBrowserHint() + " Sign in with. Log in. Temporary profile. Google refuses."
+}
 
 // youtubeBrowserSignIn is the state of the sign-in through a browser: the
 // browsers found, once looked for, and their names; the one chosen; while
@@ -55,34 +59,34 @@ func (s *shell) youtubeBrowserSignIn(c *ui.Context, busy bool) {
 			yb.chosen = yb.names[0]
 		}
 	}
-	if !s.findable(youtubeBrowserTitle, youtubeBrowserForm, yb.problem) {
+	if !s.findable(youtubeBrowserTitle(), youtubeBrowserForm(), yb.problem) {
 		return
 	}
 	s.show(c, func() {
 		if yb.problem != "" {
-			s.alert(c, "MixMusic didn't sign in to YouTube Music", yb.problem, nil).Margin(12, 0)
+			s.alert(c, locales.AccountsBrowserFailed(), yb.problem, nil).Margin(12, 0)
 		}
 		if len(yb.names) == 0 {
-			s.row(c, youtubeBrowserTitle, youtubeBrowserNone, func() {})
+			s.row(c, youtubeBrowserTitle(), youtubeBrowserNone(), func() {})
 			return
 		}
-		s.row(c, youtubeBrowserTitle, youtubeBrowserAbout, func() {
-			s.selectOf(c.Key("youtube-sign-in-browser"), &yb.chosen, yb.names).Width(200).Label("Browser to sign in with")
+		s.row(c, youtubeBrowserTitle(), youtubeBrowserAbout(), func() {
+			s.selectOf(c.Key("youtube-sign-in-browser"), &yb.chosen, yb.names).Width(200).Label(locales.AccountsBrowserChoose())
 		})
 		ui.Row(c).Gap(8).Padding(12, 0).Children(func() {
 			waiting := s.signingIn == "youtube-browser"
-			label := "sign in with " + yb.chosen
+			label := locales.AccountsBrowserSignIn(yb.chosen)
 			if waiting {
-				label = "waiting for " + yb.waiting + "…"
+				label = locales.AccountsBrowserWaiting(yb.waiting)
 			}
 			if s.button(c, "youtube-browser-in", label, false).Disabled(busy).Clicked() {
 				s.signInWithBrowser()
 			}
-			if waiting && yb.cancel != nil && s.button(c, "youtube-browser-cancel", "cancel", false).Clicked() {
+			if waiting && yb.cancel != nil && s.button(c, "youtube-browser-cancel", locales.AccountsBrowserCancel(), false).Clicked() {
 				yb.cancel()
 			}
 		})
-		s.hint(c, youtubeBrowserHint)
+		s.hint(c, youtubeBrowserHint())
 	})
 }
 
@@ -101,7 +105,7 @@ func (s *shell) signInWithBrowser() {
 	s.signingIn = "youtube-browser"
 	yb.waiting, yb.cancel, yb.problem = b.Name, cancel, ""
 	s.youtubeCookies.problem, s.youtubePick = "", false
-	s.notes = append(s.notes, notice("Sign in to YouTube Music in "+b.Name))
+	s.notes = append(s.notes, notice(locales.AccountsBrowserOpened(b.Name)))
 	go func() {
 		defer cancel()
 		_, err := s.svc.Accounts.YouTubeBrowserLogin(ctx, b.ID)
@@ -122,7 +126,7 @@ func (s *shell) signInWithBrowser() {
 				s.forget("accounts")
 			default:
 				s.youtubePick = true
-				s.notes = append(s.notes, notice("Signed in to YouTube Music"))
+				s.notes = append(s.notes, notice(locales.AccountsBrowserDone()))
 				clear(s.loads)
 			}
 		})

@@ -466,7 +466,7 @@ func TestMiniErrorPanel(t *testing.T) {
 		t.Fatal("an error's button before a track failed")
 	}
 	s.p.PlayTracks([]media.Track{brokenTrack}, 0)
-	until(t, s, tt, "the error's button", func() bool { _, ok := tt.Find("Why it couldn't play"); return ok })
+	until(t, s, tt, "the error's button", func() bool { _, ok := tt.Find("Why it couldn't play"); return ok && tt.HasText("Broken Song") })
 	click(t, s, tt, "Why it couldn't play")
 	f.settle(t, s)
 	showsAll(t, tt, "the error's panel", "Broken Song, by The Band", "What was tried", "2. yt-dlp: this track is private")

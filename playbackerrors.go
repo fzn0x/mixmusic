@@ -49,10 +49,10 @@ func (s *shell) failureDialog(c *ui.Context) {
 		s.failure.open = false
 		return
 	}
-	s.dialog(c, &s.failure.open, dialogOptions{key: "failure", title: "Why it couldn't play", width: 560}, func() {
+	s.dialog(c, &s.failure.open, dialogOptions{key: "failure", title: locales.FailureTitle(), width: 560}, func() {
 		s.failureDetails(c, f).AutoFocus()
 	}, func() {
-		if s.dialogButton(c, "failure-close", "close", false).Clicked() {
+		if s.dialogButton(c, "failure-close", locales.FailureClose(), false).Clicked() {
 			s.failure.open = false
 		}
 	})
@@ -70,26 +70,26 @@ func (s *shell) failureDetails(c *ui.Context, f player.Failure) ui.Element {
 	ui.Column(c.Key("failure-view-" + strconv.Itoa(f.ID))).Gap(16).MaxWidth(720).Children(func() {
 		ui.Column(c).Gap(4).Children(func() {
 			ui.Text(c, pr.clean(failureTrack(f.Track))).FontSize(k.bodySize()).FontWeight(k.leadWeight()).Selectable()
-			ui.Text(c, sentenceStart(failureFrom(f.Track, pr))+" · "+failureWhen(f.At, c.Now())).
+			ui.Text(c, locales.FailureFromWhen(sentenceStart(failureFrom(f.Track, pr)), failureWhen(f.At, c.Now()))).
 				FontSize(k.smallSize()).TextColor(k.muted).Selectable()
 			if r := f.Recording; r.ID != "" {
-				ui.Text(c, "Played as "+pr.clean(failureTrack(r))+", from "+failureFrom(r, pr)).
+				ui.Text(c, locales.FailurePlayedAs(pr.clean(failureTrack(r)), failureFrom(r, pr))).
 					FontSize(k.smallSize()).TextColor(k.muted).Selectable()
 			}
 		})
 		ui.Column(c).Gap(6).Children(func() {
-			ui.Text(c, "What was tried").FontSize(k.smallSize()).FontWeight(k.leadWeight())
+			ui.Text(c, locales.FailureTried()).FontSize(k.smallSize()).FontWeight(k.leadWeight())
 			for i, st := range f.Steps {
-				ui.Text(c, strconv.Itoa(i+1)+". "+failureStep(st, pr)).FontSize(k.smallSize()).Selectable()
+				ui.Text(c, locales.FailureStepNumbered(i+1, failureStep(st, pr))).FontSize(k.smallSize()).Selectable()
 			}
 			if f.Stopped {
-				ui.Text(c, failureStopped).FontSize(k.smallSize()).TextColor(k.muted)
+				ui.Text(c, failureStopped()).FontSize(k.smallSize()).TextColor(k.muted)
 			}
 		})
-		copied = s.button(c, "failure-copy-"+strconv.Itoa(f.ID), "copy", false).Label("copy the details")
+		copied = s.button(c, "failure-copy-"+strconv.Itoa(f.ID), locales.OverlayCopy(), false).Label(locales.FailureCopyLabel())
 		if copied.Clicked() {
 			copyText(failureReport(f, s.svc.System.Info(), pr))
-			s.notes = append(s.notes, notice("Copied the details, without your accounts' names"))
+			s.notes = append(s.notes, notice(locales.FailureCopied()))
 		}
 	})
 	return copied

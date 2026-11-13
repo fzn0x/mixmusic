@@ -8,13 +8,37 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // librarySections are the library's pivots, by their paths' last part.
-var librarySections = []struct{ id, label string }{
-	{"liked", "Liked"}, {"mixes", "Mixes"}, {"podcasts", "Podcasts"}, {"artists", "Artists"}, {"downloads", "Downloads"},
-	{"computer", "On this computer"}, {"history", "History"},
-	{"disliked", "Disliked"}, {"spotify", "Spotify"}, {"netease", "网易云音乐"},
+var librarySections = []string{"liked", "mixes", "podcasts", "artists", "downloads", "computer", "history", "disliked", "spotify", "netease"}
+
+// librarySectionLabel is the label of the pivot id of the library.
+func librarySectionLabel(id string) string {
+	switch id {
+	case "liked":
+		return locales.LibraryLiked()
+	case "mixes":
+		return locales.LibraryMixes()
+	case "podcasts":
+		return locales.LibraryPodcasts()
+	case "artists":
+		return locales.LibraryArtists()
+	case "downloads":
+		return locales.RailDownloads()
+	case "computer":
+		return locales.LibraryOnThisComputer()
+	case "history":
+		return locales.LibraryHistory()
+	case "disliked":
+		return locales.LibraryDisliked()
+	case "spotify":
+		return "Spotify"
+	case "netease":
+		return "网易云音乐"
+	}
+	return id
 }
 
 // libraryPage shows liked songs, the user's mixes, the history, the songs
@@ -25,12 +49,12 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 	disliked := s.svc.Collection.Disliked()
 	var ids, labels []string
 	for _, sec := range librarySections {
-		if (sec.id == "spotify" && !accounts.Spotify.SignedIn) || (sec.id == "netease" && !accounts.NetEase.SignedIn) ||
-			(sec.id == "disliked" && len(disliked) == 0) {
+		if (sec == "spotify" && !accounts.Spotify.SignedIn) || (sec == "netease" && !accounts.NetEase.SignedIn) ||
+			(sec == "disliked" && len(disliked) == 0) {
 			continue
 		}
-		ids = append(ids, sec.id)
-		labels = append(labels, sec.label)
+		ids = append(ids, sec)
+		labels = append(labels, librarySectionLabel(sec))
 	}
 	selected := 0
 	for i, id := range ids {
@@ -61,7 +85,7 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 				counts[i] = -1
 			}
 		}
-		s.pageHeaderCounts(c, "Library", labels, counts, &selected)
+		s.pageHeaderCounts(c, locales.RailLibrary(), labels, counts, &selected)
 		if selected != before {
 			s.router.Replace("/library/" + ids[selected])
 		}
@@ -99,32 +123,32 @@ func (s *shell) likedSongs(c *ui.Context) {
 	k := &s.lk
 	liked := s.svc.Collection.Liked()
 	if len(liked) == 0 {
-		ui.Text(c, k.words("Nothing liked yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
-		ui.Text(c, "Tap the heart on any track, from Spotify or YouTube Music: they all gather here, in one list.").
+		ui.Text(c, k.words(locales.LibraryNothingLiked())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+		ui.Text(c, locales.LibraryLikedHint()).
 			FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640)
 		return
 	}
 	s.likedHead(c, liked)
 	view := s.trackTools(c, "liked", "list", liked)
 	s.trackList(c, "liked", view.tracks, trackListOptions{art: true, album: true,
-		empty: "No liked song matches “" + s.searching("liked") + "”."})
+		empty: locales.LibraryNoLikedMatch(s.searching("liked"))})
 }
 
 // likedHead plays, shuffles and downloads the liked songs, as a
 // collection's head does, and tells the top bar of it (headed).
 func (s *shell) likedHead(c *ui.Context, liked []media.Track) {
 	d := likedDownload(liked)
-	h := barHead{title: "Liked songs", glyph: solidIcons["heart"], download: d,
+	h := barHead{title: locales.RailLikedSongs(), glyph: solidIcons["heart"], download: d,
 		play:    func() { s.p.PlayAll(liked, false) },
 		shuffle: func() { s.shuffled(liked) },
 	}
 	row := ui.Row(c).Gap(8).Wrap().Margin(0, 0, 16)
 	s.headed(row, h)
 	row.Children(func() {
-		if s.button(c, "liked-play", "play", true).Clicked() {
+		if s.button(c, "liked-play", locales.LibraryPlay(), true).Clicked() {
 			h.play()
 		}
-		if s.button(c, "liked-shuffle", "shuffle", false).Clicked() {
+		if s.button(c, "liked-shuffle", locales.LibraryShuffle(), false).Clicked() {
 			h.shuffle()
 		}
 		s.downloadButton(c, d)
@@ -136,7 +160,7 @@ func (s *shell) likedHead(c *ui.Context, liked []media.Track) {
 func (s *shell) dislikedSongs(c *ui.Context, disliked []media.Track) {
 	view := s.trackTools(c, "disliked", "list", disliked)
 	s.trackList(c, "disliked", view.tracks, trackListOptions{art: true, album: true,
-		empty: "No disliked song matches “" + s.searching("disliked") + "”."})
+		empty: locales.LibraryNoDislikedMatch(s.searching("disliked"))})
 }
 
 func (s *shell) mixTiles(c *ui.Context) {
@@ -155,11 +179,11 @@ func (s *shell) mixTiles(c *ui.Context) {
 // plus where their covers are. It returns whether it was clicked.
 func (s *shell) newMixTile(c *ui.Context) bool {
 	k := &s.lk
-	about := k.sentence("tracks of every service, together")
-	t := s.buttonBase(c.Key("new-mix-tile")).Width(k.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Label("New mix").Cursor(ui.CursorPointer)
+	about := k.sentence(locales.LibraryNewMixAbout())
+	t := s.buttonBase(c.Key("new-mix-tile")).Width(k.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Label(locales.RailNewMix()).Cursor(ui.CursorPointer)
 	if !k.cards {
 		t.Height(k.tileWidth()).Justify(ui.SpaceBetween).Padding(16).Background(k.tile(2)).Radius(k.radius).Children(func() {
-			ui.Text(c, k.words("New mix")).FontSize(k.size(1.5)).FontWeight(k.titleWeight()).Font(k.display).TextColor(k.tileText)
+			ui.Text(c, k.words(locales.RailNewMix())).FontSize(k.size(1.5)).FontWeight(k.titleWeight()).Font(k.display).TextColor(k.tileText)
 			ui.Text(c, about).FontSize(k.smallSize()).TextColor(k.tileText)
 		})
 		return t.Clicked()
@@ -174,7 +198,7 @@ func (s *shell) newMixTile(c *ui.Context) bool {
 			ui.Icon(c, icon("plus")).FontSize(k.cover / 4).TextColor(k.tileText)
 		})
 		ui.Column(c).Width(k.cover).Gap(2).Children(func() {
-			k.labelWeight(ui.Text(c, "New mix").FontSize(k.bodySize()).SingleLine())
+			k.labelWeight(ui.Text(c, locales.RailNewMix()).FontSize(k.bodySize()).SingleLine())
 			ui.Text(c, about).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 		})
 	})
@@ -185,8 +209,8 @@ func (s *shell) history(c *ui.Context) {
 	k := &s.lk
 	plays := s.svc.Collection.History(300)
 	if len(plays) == 0 {
-		ui.Text(c, k.words("No history yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
-		ui.Text(c, "Tracks count once they played for thirty seconds.").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+		ui.Text(c, k.words(locales.LibraryNoHistory())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+		ui.Text(c, locales.LibraryHistoryHint()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		return
 	}
 	tracks := make([]media.Track, len(plays))
@@ -194,11 +218,11 @@ func (s *shell) history(c *ui.Context) {
 		tracks[i] = p.Track
 	}
 	ui.Row(c).Margin(0, 0, 16).Children(func() {
-		if s.button(c, "clear-history", "clear history", false).Clicked() {
+		if s.button(c, "clear-history", locales.LibraryClearHistory(), false).Clicked() {
 			s.clearingHistory = true
 		}
 	})
-	if s.confirm(c, "clear-history", &s.clearingHistory, "clear history", "Forget every track you played? Your stats start over.", "clear") {
+	if s.confirm(c, "clear-history", &s.clearingHistory, locales.LibraryClearHistory(), locales.LibraryClearHistoryQuestion(), locales.LibraryClear()) {
 		if err := s.svc.Collection.ClearHistory(); err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 		}
@@ -228,8 +252,8 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 	var links func()
 	if key == "youtube" && playlists.done && playlists.err == nil {
 		links = func() {
-			if s.link(c, "new-youtube-playlist", "new playlist") {
-				s.promptName("New playlist on YouTube Music", "Name", "", "create", func(name string) {
+			if s.link(c, "new-youtube-playlist", locales.LibraryNewPlaylist()) {
+				s.promptName(locales.LibraryNewYouTubePlaylist(), locales.RailName(), "", locales.RailCreate(), func(name string) {
 					s.createYouTubePlaylist(name, nil, func(p media.Playlist) { s.navigate(playlistPath(p.ID)) })
 				})
 			}
@@ -245,7 +269,7 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 	// The playlists of others the user collaborates on have a shelf of
 	// their own.
 	if slices.ContainsFunc(playlists.value, func(p media.Playlist) bool { return !collaboration(p) }) || links != nil {
-		s.shelfWith(c, key+"-playlists", "Playlists", links, func() {
+		s.shelfWith(c, key+"-playlists", locales.LibraryPlaylists(), links, func() {
 			for i, p := range playlists.value {
 				if !collaboration(p) {
 					s.playlistTileWith(c, key+"-playlist-"+count(i), p, more)
@@ -255,10 +279,10 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 	}
 	s.collaborationsShelf(c, key, playlists.value, more)
 	if len(albums.value) > 0 {
-		s.shelf(c, key+"-albums", "Albums", func() { s.albumTiles(c, key+"-album", albums.value) })
+		s.shelf(c, key+"-albums", locales.LibraryAlbums(), func() { s.albumTiles(c, key+"-album", albums.value) })
 	}
 	if len(artists.value) > 0 {
-		s.shelf(c, key+"-artists", "Artists you follow", func() {
+		s.shelf(c, key+"-artists", locales.LibraryArtistsFollowed(), func() {
 			for i, a := range artists.value {
 				s.artistTile(c, key+"-artist-"+count(i), a)
 			}
@@ -274,7 +298,7 @@ func (s *shell) spotifyLibrary(c *ui.Context) {
 		fetch(s, "spotify:albums", col.SpotifyAlbums),
 		fetch(s, "spotify:artists", col.SpotifyArtists),
 		func(c *ui.Context) {
-			s.sectionTitle(c, "Liked on Spotify")
+			s.sectionTitle(c, locales.LibraryLikedOnSpotify())
 			first := fetch(s, "spotify:liked", func(ctx context.Context) (app.TrackPage, error) { return col.SpotifyLikedTracks(ctx, 0) })
 			switch {
 			case !first.done:
@@ -291,9 +315,9 @@ func (s *shell) spotifyLibrary(c *ui.Context) {
 				s.spotifyLiked, s.spotifyLikedOf, s.spotifyLikedAt = slices.Clip(first.value.Tracks), first, first.answers
 			}
 			tracks := s.spotifyLiked
-			s.trackList(c, "spotify-liked", tracks, trackListOptions{art: true, album: true, empty: "No liked songs on Spotify."})
+			s.trackList(c, "spotify-liked", tracks, trackListOptions{art: true, album: true, empty: locales.LibraryNoSpotifyLiked()})
 			if len(tracks) < first.value.Total {
-				label := "load more · " + count(len(tracks)) + " of " + count(first.value.Total)
+				label := locales.LibraryLoadMore(count(len(tracks)), count(first.value.Total))
 				if s.button(c, "spotify-more", label, false).Disabled(s.loadingMore).Clicked() {
 					s.loadingMore = true
 					go func(at, offset int) {
@@ -326,7 +350,7 @@ func (s *shell) youtubeLibrary(c *ui.Context) {
 		fetch(s, "youtube:artists", col.YouTubeArtists),
 		func(c *ui.Context) {
 			s.youtubeSongsList(c)
-			s.sectionTitle(c, "Liked on YouTube Music")
+			s.sectionTitle(c, locales.LibraryLikedOnYouTube())
 			liked := fetch(s, "youtube:liked", col.YouTubeLiked)
 			switch {
 			case !liked.done:
@@ -338,7 +362,7 @@ func (s *shell) youtubeLibrary(c *ui.Context) {
 				r := s.readOn("youtube:liked", liked)
 				s.readLine(c, r, "list")
 				if len(r.p.Tracks) > 0 || !r.reading {
-					s.trackList(c, "youtube-liked", r.p.Tracks, trackListOptions{art: true, album: true, empty: "No liked songs on YouTube Music."})
+					s.trackList(c, "youtube-liked", r.p.Tracks, trackListOptions{art: true, album: true, empty: locales.LibraryNoYouTubeLiked()})
 				}
 			}
 		})

@@ -1454,5 +1454,4096 @@
   "accountSettingsNetEaseSignedInDesc": "Your daily picks, your playlists and liked songs, and songs as your account may play them.",
   "accountSettingsNetEaseRefused": "NetEase Cloud Music refused the session",
   "accountSettingsNetEaseSignOutTitle": "sign out of NetEase Cloud Music",
-  "accountSettingsNetEaseSignOutBody": "MixMusic forgets your NetEase Cloud Music session; your playlists stay on NetEase Cloud Music."
+  "accountSettingsNetEaseSignOutBody": "MixMusic forgets your NetEase Cloud Music session; your playlists stay on NetEase Cloud Music.",
+  "cmdPlayerToggle": "Play or pause",
+  "cmdPlayerNext": "Next track",
+  "cmdPlayerPrevious": "Previous track",
+  "cmdPlayerForward": "Forward 10 seconds",
+  "cmdPlayerBack": "Back 10 seconds",
+  "cmdPlayerVolumeUp": "Volume up",
+  "cmdPlayerVolumeDown": "Volume down",
+  "cmdPlayerMute": "Mute",
+  "cmdPlayerFaster": "Speed up",
+  "cmdPlayerSlower": "Slow down",
+  "cmdPlayerNormalSpeed": "Normal speed",
+  "cmdPlayerRepeat": "Repeat",
+  "cmdPlayerLike": "Like what plays",
+  "cmdPlayerDislike": "Dislike what plays",
+  "cmdPlayerRadio": "Start a radio of what plays",
+  "cmdPlayFirst": "Play something first",
+  "cmdPlayerOpenFiles": "Open music files…",
+  "cmdGoHome": "Go home",
+  "cmdGoComputer": "On this computer",
+  "cmdGoNowPlaying": "Now playing",
+  "cmdViewQueue": "Show or hide the queue",
+  "cmdViewLyrics": "Show or hide the lyrics",
+  "cmdViewPalette": "Command palette",
+  "cmdViewMini": "Mini player",
+  "cmdViewKeepOnTop": "Keep the window on top, or not",
+  "cmdViewVideo": "Show or hide the video of music videos",
+  "cmdViewSidebar": "Collapse or expand the sidebar",
+  "cmdViewRefresh": "Refresh this page",
+  "cmdViewZoomIn": "Zoom in",
+  "cmdViewZoomOut": "Zoom out",
+  "cmdViewZoomReset": "Reset zoom",
+  "cmdAddonsReload": "Reload add-ons",
+  "cmdAddonsReloaded": "Add-ons reloaded",
+  "cmdSettingsOpenFile": "Open the settings file",
+  "cmdSpeedOwn": "{kind, select, podcasts {Podcasts} other {Songs}} play at their own speed",
+  "@cmdSpeedOwn": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "cmdSpeedOwnWhy": "{kind, select, podcasts {Podcasts} other {Songs}} play at their own speed - {why}",
+  "@cmdSpeedOwnWhy": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "cmdSpeedAt": "{kind, select, podcasts {Podcasts} other {Songs}} play at {speed}",
+  "@cmdSpeedAt": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "cmdSpeedAtWhy": "{kind, select, podcasts {Podcasts} other {Songs}} play at {speed} - {why}",
+  "@cmdSpeedAtWhy": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "speed": {
+        "type": "String"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "cmdSearchFor": "Search for “{query}”",
+  "@cmdSearchFor": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "cmdSearchSettingsFor": "Search the settings for “{query}”",
+  "@cmdSearchSettingsFor": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "cmdPalettePlaceholder": "type a command or a search",
+  "cmdThemeTitle": "Theme: {name}",
+  "@cmdThemeTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cmdGroupPlayback": "playback",
+  "@cmdGroupPlayback": {
+    "description": "The name of a group of commands, lowercase as the groups are."
+  },
+  "cmdGroupGoTo": "go to",
+  "cmdGroupView": "view",
+  "cmdGroupAddons": "add-ons",
+  "cmdGroupSettings": "settings",
+  "cmdGroupPlugins": "plugins",
+  "cmdGroupThemes": "themes",
+  "cmdGroupSearch": "search",
+  "globalKeysGroup": "From any app",
+  "globalKeysHint": "These keys control MixMusic whichever window is in front, and while it runs they do nothing else.",
+  "globalKeysHintLinux": "These keys control MixMusic whichever window is in front, and while it runs they do nothing else. On Wayland your desktop asks you to confirm them, and its keyboard settings can change them.",
+  "globalKeysHintMac": "These keys control MixMusic whichever window is in front, and while it runs they do nothing else. A letter is the key in its place on a US keyboard.",
+  "globalKeysInUse": "If nothing happens, these keys are in use elsewhere.",
+  "globalKeysRecording": "press the keys · esc cancels · backspace removes",
+  "globalKeysEditLabel": "{action} the global shortcut of {title}",
+  "@globalKeysEditLabel": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "globalKeysRemoveLabel": "remove the global shortcut of {title}",
+  "@globalKeysRemoveLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "globalKeysAnnounce": "Press the keys of the global shortcut of {title}. Escape cancels, Backspace removes it.",
+  "@globalKeysAnnounce": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "globalKeysNoGlobal": "{title} has no global shortcut now",
+  "@globalKeysNoGlobal": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "globalKeysShowApp": "Show MixMusic",
+  "onTopStays": "MixMusic stays on top of other windows",
+  "onTopNoLonger": "MixMusic no longer stays on top",
+  "zoomMenuReset": "reset",
+  "dialogMoreOf": "more of {title}",
+  "@dialogMoreOf": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "nativeCrashTitle": "mixmusic quit unexpectedly",
+  "nativeCrashMessage": "It kept a report of what happened, {report}, in its logs folder. Reporting it on GitHub, with that file attached, helps fix it.",
+  "@nativeCrashMessage": {
+    "placeholders": {
+      "report": {
+        "type": "String"
+      }
+    }
+  },
+  "nativeCrashReport": "report it",
+  "pluginUILost": "This page may belong to a plugin that is not enabled.",
+  "pluginUIDrawing": "Drawing",
+  "fontsSelawik": "Selawik, the interface's face",
+  "fontsQuicksand": "Quicksand, Mochi's face",
+  "fontsRoboto": "Roboto Flex, the Material themes' face",
+  "fontsArchivo": "Archivo, the Walnut themes' headings' face",
+  "versionsCount": "{count, plural, one {# version} other {# versions}}",
+  "@versionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "versionsSwitch": "Versions",
+  "releasesNewFrom": "New from artists you follow",
+  "updateOfferInstalled": "MixMusic {version} is installed. It runs once MixMusic restarts.",
+  "@updateOfferInstalled": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateOfferHaveAuto": "You have {version}. To install new versions without this question, turn on install updates without asking in Settings › About.",
+  "@updateOfferHaveAuto": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateOfferHave": "You have {version}. {how}",
+  "@updateOfferHave": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "how": {
+        "type": "String"
+      }
+    }
+  },
+  "updateOfferDownloading": "Downloading…",
+  "updateOfferLater": "later",
+  "updateOfferSkip": "skip this version",
+  "updateOfferInstall": "install {version}",
+  "@updateOfferInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateOfferTitle": "mixmusic {version} is out",
+  "@updateOfferTitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTrackBy": "{title}, by {artists}",
+  "@failureTrackBy": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTrackOn": "{title}, on {album}",
+  "@failureTrackOn": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "album": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTrackByOn": "{title}, by {artists}, on {album}",
+  "@failureTrackByOn": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      },
+      "album": {
+        "type": "String"
+      }
+    }
+  },
+  "failureFileAt": "a file on this computer, {path}",
+  "@failureFileAt": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "failureFile": "a file on this computer",
+  "failureSourceID": "{source}, {id}",
+  "@failureSourceID": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTimes": "{what}, {count, plural, one {# time} other {# times}}",
+  "@failureTimes": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "failureStep": "{what}: {why}",
+  "@failureStep": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "failurePlayedAs": "Played as {track}, from {from}",
+  "@failurePlayedAs": {
+    "placeholders": {
+      "track": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      }
+    }
+  },
+  "failureFromWhen": "{from} · {when}",
+  "@failureFromWhen": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTried": "What was tried",
+  "failureStepNumbered": "{n}. {step}",
+  "@failureStepNumbered": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "failureStopped": "MixMusic stopped playing after it, as the tracks just before it couldn't play either.",
+  "failureReportHead": "MixMusic couldn't play a track\n\n",
+  "failureReportTrack": "Track: {track}",
+  "@failureReportTrack": {
+    "placeholders": {
+      "track": {
+        "type": "String"
+      }
+    }
+  },
+  "failureReportFrom": "From: {from}",
+  "@failureReportFrom": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      }
+    }
+  },
+  "failureReportPlayedAs": "Played as: {track}, from {from}",
+  "@failureReportPlayedAs": {
+    "placeholders": {
+      "track": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      }
+    }
+  },
+  "failureReportWhen": "When: {when}",
+  "@failureReportWhen": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "failureReportTried": "What was tried:",
+  "failureReportSystem": "MixMusic {version} on {platform} {arch}",
+  "@failureReportSystem": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "platform": {
+        "type": "String"
+      },
+      "arch": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTitle": "Why it couldn't play",
+  "failureClose": "close",
+  "failureCopyLabel": "copy the details",
+  "failureCopied": "Copied the details, without your accounts' names",
+  "collectionMore": "More",
+  "@collectionMore": {
+    "description": "Tooltip and label of the round button that opens the menu of a head. The icon is named by the code."
+  },
+  "collectionKindAlbum": "album",
+  "@collectionKindAlbum": {
+    "description": "Page title of an album while it loads or fails. Lowercase."
+  },
+  "collectionKindPlaylist": "playlist",
+  "@collectionKindPlaylist": {
+    "description": "Page title of a playlist while it loads or fails. Lowercase."
+  },
+  "collectionAlbumKind": "{kind, select, single {single} ep {ep} other {album}}",
+  "@collectionAlbumKind": {
+    "description": "The kind of an album shown in its facts: album, single or ep. Lowercase.",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionYourMix": "your mix",
+  "@collectionYourMix": {
+    "description": "The owner of a mix. Lowercase."
+  },
+  "collectionPlaylistEmpty": "This playlist is empty.",
+  "collectionMixEmpty": "This mix is empty: add tracks of any service from their menu.",
+  "collectionPlaylistNoMatch": "Nothing in this playlist matches “{query}”.",
+  "@collectionPlaylistNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionMixNoMatch": "Nothing in this mix matches “{query}”.",
+  "@collectionMixNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionRemoveFromMix": "Remove from this mix",
+  "@collectionRemoveFromMix": {
+    "description": "Track menu item of a mix."
+  },
+  "collectionRemoveFromPlaylist": "Remove from this playlist",
+  "@collectionRemoveFromPlaylist": {
+    "description": "Track menu item of a playlist on YouTube Music."
+  },
+  "collectionRemovedFrom": "Removed {track} from {playlist}",
+  "@collectionRemovedFrom": {
+    "placeholders": {
+      "track": {
+        "type": "String"
+      },
+      "playlist": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionRenameMix": "rename mix",
+  "@collectionRenameMix": {
+    "description": "Title of the rename dialog. Lowercase."
+  },
+  "collectionDeleteMix": "delete mix",
+  "@collectionDeleteMix": {
+    "description": "Title of the question before a mix is deleted. Lowercase."
+  },
+  "collectionDeleteMixQuestion": "Delete {title}? Its tracks stay where they came from.",
+  "@collectionDeleteMixQuestion": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionDeleteYouTube": "Delete from YouTube Music…",
+  "@collectionDeleteYouTube": {
+    "description": "Menu item that deletes a playlist on YouTube Music."
+  },
+  "collectionDeletePlaylist": "delete playlist",
+  "@collectionDeletePlaylist": {
+    "description": "Title of the question before a playlist on YouTube Music is deleted. Lowercase."
+  },
+  "collectionDeleteYouTubeQuestion": "Delete {title} from YouTube Music? It goes from YouTube too, and you can't undo this. To keep its tracks in MixMusic, copy it into a mix first.",
+  "@collectionDeleteYouTubeQuestion": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionDeleteFailed": "Couldn't delete {title}: {error}",
+  "@collectionDeleteFailed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionDeletedYouTube": "Deleted {title} from YouTube Music",
+  "@collectionDeletedYouTube": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionSaveAsMix": "Save as a new mix",
+  "@collectionSaveAsMix": {
+    "description": "Menu item that saves the tracks as a new mix."
+  },
+  "collectionSaveAsYouTube": "Save as a YouTube Music playlist",
+  "@collectionSaveAsYouTube": {
+    "description": "Menu item that saves the tracks as a new playlist on YouTube Music."
+  },
+  "collectionCopyIntoMix": "Copy into a mix you can extend",
+  "@collectionCopyIntoMix": {
+    "description": "Menu item that copies a service's playlist into a mix."
+  },
+  "collectionPivotSongs": "songs",
+  "@collectionPivotSongs": {
+    "description": "Pivot of an artist's page. Lowercase."
+  },
+  "collectionPivotAlbums": "albums",
+  "@collectionPivotAlbums": {
+    "description": "Pivot of an artist's page. Lowercase."
+  },
+  "collectionPivotSingles": "singles",
+  "@collectionPivotSingles": {
+    "description": "Pivot of an artist's page. Lowercase."
+  },
+  "collectionPivotRelated": "related",
+  "@collectionPivotRelated": {
+    "description": "Pivot of an artist's page. Lowercase."
+  },
+  "collectionFollow": "follow",
+  "@collectionFollow": {
+    "description": "Button that follows an artist. Lowercase."
+  },
+  "collectionFollowing": "following",
+  "@collectionFollowing": {
+    "description": "Button of an artist already followed. Lowercase."
+  },
+  "collectionPlayTopSongs": "play top songs",
+  "@collectionPlayTopSongs": {
+    "description": "Play button of an artist's page. Lowercase."
+  },
+  "collectionTopSongs": "Top songs",
+  "@collectionTopSongs": {
+    "description": "Heading of an artist's songs."
+  },
+  "collectionNoArtistSongs": "No songs listed for this artist.",
+  "collectionSinglesShelf": "Singles & EPs",
+  "@collectionSinglesShelf": {
+    "description": "Shelf title of an artist's singles."
+  },
+  "collectionFansAlsoLike": "Fans also like",
+  "@collectionFansAlsoLike": {
+    "description": "Heading of the artists an artist's fans also like."
+  },
+  "computerEmptyTitle": "Nothing on this computer yet",
+  "computerEmptyText": "Add a folder of music, or open files: they play from your computer, beside Spotify and YouTube Music, in your queue and your mixes. Nothing of them is uploaded.",
+  "@computerEmptyText": {
+    "description": "Empty state of Library › On this computer, before any music is found."
+  },
+  "computerScanningTitle": "Looking through your music",
+  "@computerScanningTitle": {
+    "description": "Heading while the first scan of the folders is under way."
+  },
+  "computerNoMusicTitle": "No music found",
+  "computerNoMusicText": "The folders hold no files MixMusic plays: MP3, FLAC, WAV, M4A, Opus or Vorbis.",
+  "computerOpenFiles": "open files",
+  "@computerOpenFiles": {
+    "description": "Button that asks for music files to play. Lowercase."
+  },
+  "computerFromFolders": "From {count, plural, one {# folder} other {# folders}} · ",
+  "@computerFromFolders": {
+    "description": "Line above the songs: the folders the music comes from, then a link to manage them.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "computerManage": "manage",
+  "@computerManage": {
+    "description": "Link to Settings › Playback, from the songs' line. Lowercase."
+  },
+  "computerNoMatch": "No song matches “{query}”.",
+  "@computerNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "computerShowMore": "show more · {shown} of {total}",
+  "@computerShowMore": {
+    "description": "Button that shows more of the albums or artists. Lowercase.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryOnThisComputer": "On this computer",
+  "@libraryOnThisComputer": {
+    "description": "Pivot and shelf title for the music on this computer."
+  },
+  "computerScanStarting": "Looking through your folders…",
+  "computerScanReading": "Reading {read} of {found, plural, one {# file} other {# files}}…",
+  "@computerScanReading": {
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "found": {
+        "type": "int"
+      }
+    }
+  },
+  "computerInLibrary": "{folder} is in the library already",
+  "@computerInLibrary": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "computerReadingFolder": "Reading the music of {folder}",
+  "@computerReadingFolder": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "computerRemoveFolderTitle": "remove folder",
+  "@computerRemoveFolderTitle": {
+    "description": "Title of the question before a music folder leaves the library."
+  },
+  "computerRemoveFolderQuestion": "Take {folder} out of the library? Its files stay where they are, and its tracks stay in your mixes, greyed.",
+  "@computerRemoveFolderQuestion": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "computerCantPlayFile": "MixMusic can't play this file",
+  "computerCantPlayFiles": "MixMusic can't play these files",
+  "computerPlaying": "Playing {title}",
+  "@computerPlaying": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "computerPlayingSkipped": "Playing {title} · {skipped} skipped, which MixMusic can't play",
+  "@computerPlayingSkipped": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "computerPlayingFiles": "Playing {count, plural, one {# file} other {# files}}",
+  "@computerPlayingFiles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "computerPlayingFilesSkipped": "Playing {count, plural, one {# file} other {# files}} · {skipped} skipped, which MixMusic can't play",
+  "@computerPlayingFilesSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "computerShowInExplorer": "Show in Explorer",
+  "@computerShowInExplorer": {
+    "description": "Menu item that shows a file on Windows."
+  },
+  "computerShowInFinder": "Show in Finder",
+  "@computerShowInFinder": {
+    "description": "Menu item that shows a file on macOS."
+  },
+  "computerShowInFolder": "Show in its folder",
+  "@computerShowInFolder": {
+    "description": "Menu item that shows a file on Linux."
+  },
+  "computerUnwatched": "MixMusic can't watch {folder} for changes: {reason}. Rescan to see what changed in it.",
+  "@computerUnwatched": {
+    "description": "Settings line for a music folder that can't be watched. The reason comes from the library and stays English.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsConfirmTitle": "download {count, plural, one {# track} other {# tracks}}",
+  "@downloadsConfirmTitle": {
+    "description": "Title of the question before a big download.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsConfirmMessage": "That's about {size}. They play without the network, and stay until you remove them.",
+  "@downloadsConfirmMessage": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsConfirmOK": "download",
+  "@downloadsConfirmOK": {
+    "description": "Confirm button of a big download. Lowercase."
+  },
+  "downloadsStarting": "{count, plural, one {Downloading # track} other {Downloading # tracks}}",
+  "@downloadsStarting": {
+    "description": "Notice when tracks start downloading.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsStartingTrack": "Downloading {title}",
+  "@downloadsStartingTrack": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsStartingTrackSpotify": "Downloading {title}: its recording on YouTube Music",
+  "@downloadsStartingTrackSpotify": {
+    "description": "Notice when a Spotify track starts downloading from its YouTube Music recording.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsMenuRemove": "Remove download",
+  "@downloadsMenuRemove": {
+    "description": "Track and album menu item."
+  },
+  "downloadsMenuCancel": "Cancel download",
+  "@downloadsMenuCancel": {
+    "description": "Track and album menu item."
+  },
+  "downloadsMenuRetry": "Download again",
+  "@downloadsMenuRetry": {
+    "description": "Track menu item after a failed download."
+  },
+  "downloadsMenuDownload": "Download",
+  "@downloadsMenuDownload": {
+    "description": "Track and album menu item."
+  },
+  "downloadsRemoved": "Removed the download of {title}",
+  "@downloadsRemoved": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsRemoveTitle": "remove download",
+  "@downloadsRemoveTitle": {
+    "description": "Title of the question before a download is removed. Lowercase."
+  },
+  "downloadsButtonDownload": "download",
+  "@downloadsButtonDownload": {
+    "description": "Button of an album or playlist head. Lowercase."
+  },
+  "downloadsButtonProgress": "downloading {kept} of {total}",
+  "@downloadsButtonProgress": {
+    "description": "Button while a collection downloads. Lowercase.",
+    "placeholders": {
+      "kept": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsStopQuestion": "Stop downloading {title}? What downloaded of it goes too, unless another download keeps it.",
+  "@downloadsStopQuestion": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsButtonMore": "download {count} more",
+  "@downloadsButtonMore": {
+    "description": "Button to download the tracks of a collection still missing. Lowercase.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsMenuMore": "Download {count} more",
+  "@downloadsMenuMore": {
+    "description": "Menu item to download the tracks of a collection still missing.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsButtonDone": "downloaded",
+  "@downloadsButtonDone": {
+    "description": "Button of a collection that's all downloaded. Lowercase."
+  },
+  "downloadsRemoveQuestion": "Remove the download of {title}? Its tracks won't play offline any more, unless another download keeps them.",
+  "@downloadsRemoveQuestion": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsNothing": "Nothing here downloads",
+  "@downloadsNothing": {
+    "description": "Notice when the page has nothing to download."
+  },
+  "downloadsCollection": "Downloading {title}",
+  "@downloadsCollection": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsCollectionPartial": "Downloading {title}: the {kept} of its {total} tracks MixMusic reads",
+  "@downloadsCollectionPartial": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "kept": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsMarkDone": "Downloaded",
+  "@downloadsMarkDone": {
+    "description": "Mark on a track's row and its tooltip."
+  },
+  "downloadsMarkWaiting": "Waiting to download",
+  "@downloadsMarkWaiting": {
+    "description": "Mark on a track's row and its tooltip."
+  },
+  "downloadsDownloading": "Downloading",
+  "@downloadsDownloading": {
+    "description": "Mark on a track's row, and the heading of the queue."
+  },
+  "downloadsMarkProgress": "Downloading, {percent}%",
+  "@downloadsMarkProgress": {
+    "description": "Mark on a track's row while it downloads.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsMarkFailed": "Couldn't download: {reason}",
+  "@downloadsMarkFailed": {
+    "description": "Mark on a track's row when its download failed.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsProblemTitle": "Your downloads can't be reached",
+  "@downloadsProblemTitle": {
+    "description": "Alert title when the downloads folder can't be reached."
+  },
+  "downloadsProblemMessage": "{problem}. Tracks stream as before meanwhile.",
+  "@downloadsProblemMessage": {
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsEmptyTitle": "Nothing downloaded yet",
+  "@downloadsEmptyTitle": {
+    "description": "Empty state of the downloads. Lowercase when shown as a word."
+  },
+  "downloadsEmptyLine": "Choose Download in the menu of a track, an album or a playlist, and it plays here without the network.",
+  "@downloadsEmptyLine": {
+    "description": "Empty state of the downloads: how to download."
+  },
+  "downloadsShelfAlbums": "Albums & playlists",
+  "@downloadsShelfAlbums": {
+    "description": "Shelf title of the downloaded albums and playlists."
+  },
+  "downloadsTracks": "Tracks",
+  "@downloadsTracks": {
+    "description": "Heading of the downloaded tracks."
+  },
+  "downloadsShowAll": "show all",
+  "@downloadsShowAll": {
+    "description": "Link that shows all the downloaded tracks again. Lowercase."
+  },
+  "downloadsNothingHere": "Nothing downloaded here yet.",
+  "downloadsNoMatch": "No download matches “{query}”.",
+  "@downloadsNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsRemoveAll": "remove all downloads",
+  "@downloadsRemoveAll": {
+    "description": "Button and question title. Lowercase."
+  },
+  "downloadsRemoveAllQuestion": "Remove all {count, plural, one {# download} other {# downloads}}, {size}? They won't play offline any more.",
+  "@downloadsRemoveAllQuestion": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsRemovedAll": "Removed every download",
+  "downloadsFolderLine": "{count, plural, one {# track} other {# tracks}} · {size} · in {folder}",
+  "@downloadsFolderLine": {
+    "description": "The downloads' size and folder.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      },
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsOpenFolder": "open folder",
+  "@downloadsOpenFolder": {
+    "description": "Link that opens the downloads' folder. Lowercase."
+  },
+  "downloadsSettings": "settings",
+  "@downloadsSettings": {
+    "description": "Link to the downloads' settings. Lowercase."
+  },
+  "downloadsPause": "pause",
+  "@downloadsPause": {
+    "description": "Link that pauses the downloads. Lowercase."
+  },
+  "downloadsResume": "resume",
+  "@downloadsResume": {
+    "description": "Link that resumes the downloads. Lowercase."
+  },
+  "downloadsCancelAll": "cancel all",
+  "@downloadsCancelAll": {
+    "description": "Link that cancels every download. Lowercase."
+  },
+  "downloadsCancelAllTitle": "cancel all downloads",
+  "@downloadsCancelAllTitle": {
+    "description": "Title of the question before every download is cancelled. Lowercase."
+  },
+  "downloadsCancelAllQuestion": "Stop every download under way, and those that wait? What downloaded stays.",
+  "downloadsStop": "stop",
+  "@downloadsStop": {
+    "description": "Confirm button of cancelling every download. Lowercase."
+  },
+  "downloadsRetryFailed": "retry failed",
+  "@downloadsRetryFailed": {
+    "description": "Link that retries the failed downloads. Lowercase."
+  },
+  "downloadsProgressLabel": "Downloads",
+  "@downloadsProgressLabel": {
+    "description": "Label of the progress bar of the downloads."
+  },
+  "downloadsBatchCount": "{done} of {total}",
+  "@downloadsBatchCount": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsAndMore": "and {count} more",
+  "@downloadsAndMore": {
+    "description": "The queue's tail. Lowercase.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsStatusWaiting": "waiting",
+  "@downloadsStatusWaiting": {
+    "description": "Status of a track in the queue. Lowercase."
+  },
+  "downloadsStatusDownloading": "downloading",
+  "@downloadsStatusDownloading": {
+    "description": "Status of a track in the queue. Lowercase."
+  },
+  "downloadsStatusFailed": "couldn't download: {reason}",
+  "@downloadsStatusFailed": {
+    "description": "Status of a track whose download failed. Lowercase.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsRetry": "retry",
+  "@downloadsRetry": {
+    "description": "Link that retries one download. Lowercase."
+  },
+  "downloadsCancelOne": "Cancel the download of {title}",
+  "@downloadsCancelOne": {
+    "description": "Tooltip and label of the button that cancels one download.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsTileTracks": "{count, plural, one {# track} other {# tracks}}",
+  "@downloadsTileTracks": {
+    "description": "Subtitle of a downloaded album, playlist or mix.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsTileKept": "{kept} of {count} tracks",
+  "@downloadsTileKept": {
+    "description": "Subtitle of a downloaded collection that isn't all there. Lowercase words are not needed here.",
+    "placeholders": {
+      "kept": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsTileKeptOfTotal": "{kept} of {count} tracks, of its {total}",
+  "@downloadsTileKeptOfTotal": {
+    "description": "Subtitle of a downloaded collection that isn't all there, of a larger collection.",
+    "placeholders": {
+      "kept": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsTileTracksOfTotal": "{count, plural, one {# track} other {# tracks}}, of its {total}",
+  "@downloadsTileTracksOfTotal": {
+    "description": "Subtitle of a downloaded collection that holds only some of a larger collection.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadsMenuShowTracks": "Show its tracks",
+  "@downloadsMenuShowTracks": {
+    "description": "Menu item of a downloaded album, playlist or mix."
+  },
+  "downloadsMoveTitle": "move downloads",
+  "@downloadsMoveTitle": {
+    "description": "Title of the question before the downloads move. Lowercase."
+  },
+  "downloadsMoveQuestion": "Move {count, plural, one {# download} other {# downloads}}, {size}, to {folder}? They wait meanwhile.",
+  "@downloadsMoveQuestion": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      },
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsMove": "move",
+  "@downloadsMove": {
+    "description": "Confirm button of moving the downloads. Lowercase."
+  },
+  "downloadsMoveFailed": "couldn't move the downloads: {error}",
+  "@downloadsMoveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsMovedTo": "The downloads are in {folder} now",
+  "@downloadsMovedTo": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsOffline": "You're offline: your downloads still play",
+  "@downloadsOffline": {
+    "description": "Toast that tells the downloads still play while offline."
+  },
+  "downloadsOfflineAction": "downloads",
+  "@downloadsOfflineAction": {
+    "description": "Action of the offline toast that opens the downloads. Lowercase."
+  },
+  "downloadSyncWaiting": "{count, plural, one {# track was} other {# tracks were}} added to {title} since you downloaded it. They take about {size}, so they download only once you ask.",
+  "@downloadSyncWaiting": {
+    "description": "Notice when the tracks added to a downloaded collection are too many to download on their own.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadSyncStarted": "{count, plural, one {Downloading # track added to {title}} other {Downloading # tracks added to {title}}}",
+  "@downloadSyncStarted": {
+    "description": "Notice when the tracks added to a downloaded collection start downloading.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "explicitTagLabel": "Explicit",
+  "@explicitTagLabel": {
+    "description": "Accessibility label of the e badge that marks an explicit track."
+  },
+  "explicitTagHidden": "hidden by your settings",
+  "@explicitTagHidden": {
+    "description": "The note on a track's row that the settings hide."
+  },
+  "hiddenWhyOthers": "Spotify shows apps the tracks of the playlists you own or collaborate on only: open this one on Spotify to play it.",
+  "hiddenWhyOwn": "Spotify shows apps nothing of its own playlists, nor of those deleted or made private: open this one on Spotify to play it.",
+  "hiddenSpotifyPlaylist": "Spotify playlist",
+  "@hiddenSpotifyPlaylist": {
+    "description": "Title of a Spotify playlist whose name MixMusic doesn't know."
+  },
+  "hiddenOpenOn": "open on {source}",
+  "@hiddenOpenOn": {
+    "description": "The play button of a page whose tracks open on the service. Lowercase.",
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryLiked": "Liked",
+  "@libraryLiked": {
+    "description": "Library pivot: the songs the user liked."
+  },
+  "libraryMixes": "Mixes",
+  "@libraryMixes": {
+    "description": "Library pivot: the user's mixes."
+  },
+  "libraryPodcasts": "Podcasts",
+  "@libraryPodcasts": {
+    "description": "Library pivot."
+  },
+  "libraryArtists": "Artists",
+  "@libraryArtists": {
+    "description": "Library pivot: the artists the user follows."
+  },
+  "libraryHistory": "History",
+  "@libraryHistory": {
+    "description": "Library pivot."
+  },
+  "libraryDisliked": "Disliked",
+  "@libraryDisliked": {
+    "description": "Library pivot: the songs the user dislikes."
+  },
+  "libraryNothingLiked": "Nothing liked yet",
+  "@libraryNothingLiked": {
+    "description": "Empty state of the liked songs. Lowercase when shown as a word; the heading is set by the interface."
+  },
+  "libraryLikedHint": "Tap the heart on any track, from Spotify or YouTube Music: they all gather here, in one list.",
+  "@libraryLikedHint": {
+    "description": "Empty state of the liked songs: how to like a track."
+  },
+  "libraryNoLikedMatch": "No liked song matches “{query}”.",
+  "@libraryNoLikedMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryNoDislikedMatch": "No disliked song matches “{query}”.",
+  "@libraryNoDislikedMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryNewMixAbout": "tracks of every service, together",
+  "@libraryNewMixAbout": {
+    "description": "The line under New mix on its tile. Lowercase."
+  },
+  "libraryNoHistory": "No history yet",
+  "@libraryNoHistory": {
+    "description": "Empty state of the history. Lowercase when shown as a word."
+  },
+  "libraryHistoryHint": "Tracks count once they played for thirty seconds.",
+  "libraryClearHistory": "clear history",
+  "@libraryClearHistory": {
+    "description": "Button and question title that clear the history. Lowercase."
+  },
+  "libraryClearHistoryQuestion": "Forget every track you played? Your stats start over.",
+  "libraryClear": "clear",
+  "@libraryClear": {
+    "description": "Confirm button of clearing the history. Lowercase."
+  },
+  "libraryNewPlaylist": "new playlist",
+  "@libraryNewPlaylist": {
+    "description": "Link on the playlists shelf of YouTube Music. Lowercase."
+  },
+  "libraryPlaylists": "Playlists",
+  "@libraryPlaylists": {
+    "description": "Shelf title."
+  },
+  "libraryAlbums": "Albums",
+  "@libraryAlbums": {
+    "description": "Shelf title."
+  },
+  "libraryArtistsFollowed": "Artists you follow",
+  "@libraryArtistsFollowed": {
+    "description": "Shelf title."
+  },
+  "libraryLikedOnSpotify": "Liked on Spotify",
+  "@libraryLikedOnSpotify": {
+    "description": "Heading of the liked songs on Spotify."
+  },
+  "libraryNoSpotifyLiked": "No liked songs on Spotify.",
+  "libraryLoadMore": "load more · {loaded} of {total}",
+  "@libraryLoadMore": {
+    "description": "Button that loads more of the liked songs. Lowercase.",
+    "placeholders": {
+      "loaded": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryLikedOnYouTube": "Liked on YouTube Music",
+  "@libraryLikedOnYouTube": {
+    "description": "Heading of the liked songs on YouTube Music."
+  },
+  "libraryNoYouTubeLiked": "No liked songs on YouTube Music.",
+  "librarySongsTitle": "Songs in your library",
+  "@librarySongsTitle": {
+    "description": "Heading of the songs saved to the library on YouTube Music."
+  },
+  "librarySongsEmpty": "No songs in your library on YouTube Music. A song's Add to library keeps it here without liking it.",
+  "@librarySongsEmpty": {
+    "description": "Empty state of the YouTube Music library's songs."
+  },
+  "libraryAddToLibrary": "Add to library",
+  "@libraryAddToLibrary": {
+    "description": "Song menu item that saves a song to the library on YouTube Music without liking it."
+  },
+  "libraryRemoveFromLibrary": "Remove from library",
+  "@libraryRemoveFromLibrary": {
+    "description": "Menu item that takes a song or playlist out of the library on YouTube Music."
+  },
+  "librarySongAdded": "Added {title} to your library on YouTube Music",
+  "@librarySongAdded": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "librarySongRemoved": "Removed {title} from your library on YouTube Music",
+  "@librarySongRemoved": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "localTagsEditInfoItem": "Edit info…",
+  "@localTagsEditInfoItem": {
+    "description": "Menu item that edits the tags of a song on this computer."
+  },
+  "localTagsMoveToAlbumItem": "Move to album…",
+  "@localTagsMoveToAlbumItem": {
+    "description": "Menu item that moves a song to another album on this computer."
+  },
+  "localTagsEditAlbumItem": "Edit album…",
+  "@localTagsEditAlbumItem": {
+    "description": "Menu item that edits the tags of an album on this computer."
+  },
+  "localTagsNoSongs": "the album has no songs",
+  "@localTagsNoSongs": {
+    "description": "Why an album's tags can't be edited. Lowercase."
+  },
+  "localTagsEditInfoTitle": "edit info",
+  "@localTagsEditInfoTitle": {
+    "description": "Title of the Edit info dialog. Lowercase."
+  },
+  "localTagsEditAlbumTitle": "edit album",
+  "@localTagsEditAlbumTitle": {
+    "description": "Title of the Edit album dialog. Lowercase."
+  },
+  "localTagsAboutSong": "The tags of {name}, which MixMusic writes into its file.",
+  "@localTagsAboutSong": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "localTagsAboutAlbum": "What the {count, plural, one {# song} other {# songs}} of {name} share, which MixMusic writes into their files.",
+  "@localTagsAboutAlbum": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "localTagsTitle": "Title",
+  "localTagsArtists": "Artists",
+  "localTagsAlbum": "Album",
+  "localTagsAlbumArtist": "Album artist",
+  "localTagsSeparate": "Separate several artists with ;",
+  "@localTagsSeparate": {
+    "description": "Hint under the artists fields."
+  },
+  "localTagsTrack": "Track",
+  "localTagsDisc": "Disc",
+  "localTagsYear": "Year",
+  "localTagsGenre": "Genre",
+  "localTagsTrackRange": "The track must be a number from {least, number, ::group-off} to {most, number, ::group-off}",
+  "@localTagsTrackRange": {
+    "placeholders": {
+      "least": {
+        "type": "int"
+      },
+      "most": {
+        "type": "int"
+      }
+    }
+  },
+  "localTagsDiscRange": "The disc must be a number from {least, number, ::group-off} to {most, number, ::group-off}",
+  "@localTagsDiscRange": {
+    "placeholders": {
+      "least": {
+        "type": "int"
+      },
+      "most": {
+        "type": "int"
+      }
+    }
+  },
+  "localTagsYearRange": "The year must be a number from {least, number, ::group-off} to {most, number, ::group-off}",
+  "@localTagsYearRange": {
+    "placeholders": {
+      "least": {
+        "type": "int"
+      },
+      "most": {
+        "type": "int"
+      }
+    }
+  },
+  "localTagsSaving": "saving…",
+  "localTagsSavingCount": "saving {done} of {total}…",
+  "@localTagsSavingCount": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "localTagsCover": "Cover",
+  "localTagsNone": "None",
+  "@localTagsNone": {
+    "description": "No cover. Shown in the Cover row."
+  },
+  "localTagsChooseImage": "choose an image…",
+  "@localTagsChooseImage": {
+    "description": "Button that chooses a cover image. Lowercase."
+  },
+  "localTagsRemoveCover": "remove the cover",
+  "@localTagsRemoveCover": {
+    "description": "Button that removes the cover. Lowercase."
+  },
+  "localTagsChooseCoverTitle": "Choose a cover",
+  "@localTagsChooseCoverTitle": {
+    "description": "Title of the file dialog that picks a cover."
+  },
+  "localTagsImages": "Images",
+  "@localTagsImages": {
+    "description": "Name of the file filter for image files in the file dialog."
+  },
+  "localTagsBadImage": "Couldn't use that image: {error}",
+  "@localTagsBadImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "localTagsSavedSome": "Saved {saved} of {total} songs. {problem}",
+  "@localTagsSavedSome": {
+    "placeholders": {
+      "saved": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "localTagsSavedAlbum": "Saved {name}: {count, plural, one {# song} other {# songs}}",
+  "@localTagsSavedAlbum": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "localTagsSavedTags": "Saved the tags of {name}",
+  "@localTagsSavedTags": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "localTagsMoveTitle": "move to album",
+  "@localTagsMoveTitle": {
+    "description": "Title of the Move to album dialog. Lowercase."
+  },
+  "localTagsMoveAbout": "Choose an album of this computer for {title}, or name a new one. MixMusic writes it into the song's file.",
+  "@localTagsMoveAbout": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "localTagsFindAlbum": "find an album, or name a new one",
+  "@localTagsFindAlbum": {
+    "description": "Placeholder of the album search. Lowercase."
+  },
+  "localTagsNoAlbum": "No album of this computer is called that: Move makes a new one.",
+  "localTagsMove": "move",
+  "@localTagsMove": {
+    "description": "Confirm button of Move to album. Lowercase."
+  },
+  "localTagsMoveNew": "move to a new album",
+  "@localTagsMoveNew": {
+    "description": "Confirm button when the album is new. Lowercase."
+  },
+  "localTagsMoving": "moving…",
+  "localTagsMoveNote": "The songs of {album} have no album artist, and are in another folder: they all take {artists} as theirs, so that they stay together.",
+  "@localTagsMoveNote": {
+    "placeholders": {
+      "album": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
+  "localTagsMoved": "Moved {track} to {album}",
+  "@localTagsMoved": {
+    "placeholders": {
+      "track": {
+        "type": "String"
+      },
+      "album": {
+        "type": "String"
+      }
+    }
+  },
+  "outputChoiceSystemDefault": "System default",
+  "@outputChoiceSystemDefault": {
+    "description": "The choice of the system's default output device."
+  },
+  "outputChoiceChosen": "The device chosen",
+  "@outputChoiceChosen": {
+    "description": "Label of the device chosen when it has no name and isn't connected."
+  },
+  "outputChoiceNotConnected": "not connected",
+  "@outputChoiceNotConnected": {
+    "description": "Detail under the device chosen when it isn't connected. Lowercase."
+  },
+  "outputChoiceAsideCast": "Playing on {device}: the device is this computer's",
+  "@outputChoiceAsideCast": {
+    "description": "Why the output device can't play: a cast device is playing.",
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "outputChoiceAsideConnect": "Spotify Connect plays this track on its own device",
+  "@outputChoiceAsideConnect": {
+    "description": "Why the output device can't play: Spotify Connect plays the track."
+  },
+  "outputChoiceAsideSystem": "Spotify plays this track on the system's default device",
+  "@outputChoiceAsideSystem": {
+    "description": "Why the output device can't play: Spotify plays the track on the system's default device."
+  },
+  "outputChoiceLooking": "Looking for devices…",
+  "@outputChoiceLooking": {
+    "description": "Shown in the output menu while the devices are listed."
+  },
+  "outputChoiceButton": "Output device: {device}",
+  "@outputChoiceButton": {
+    "description": "Label of the output device button, with the device's name.",
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "outputChoiceButtonFallback": "Output device: {device}, not connected: the system's default plays",
+  "@outputChoiceButtonFallback": {
+    "description": "Label of the output device button while the device chosen isn't connected.",
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "librarySave": "save",
+  "librarySaved": "saved",
+  "libraryCancel": "cancel",
+  "libraryPlay": "play",
+  "@libraryPlay": {
+    "description": "A button that plays what the page shows. Lowercase."
+  },
+  "libraryShuffle": "shuffle",
+  "@libraryShuffle": {
+    "description": "A button that plays what the page shows shuffled. Lowercase."
+  },
+  "libraryRemove": "remove",
+  "@libraryRemove": {
+    "description": "The confirm button of a removal. Lowercase."
+  },
+  "libraryDelete": "delete",
+  "@libraryDelete": {
+    "description": "The confirm button of a deletion. Lowercase."
+  },
+  "libraryRename": "rename",
+  "@libraryRename": {
+    "description": "The confirm button of a rename. Lowercase."
+  },
+  "libraryRenameItem": "Rename",
+  "@libraryRenameItem": {
+    "description": "Menu item that renames a mix."
+  },
+  "libraryDeleteItem": "Delete",
+  "@libraryDeleteItem": {
+    "description": "Menu item that deletes a mix or playlist."
+  },
+  "libraryTrackCount": "{count, plural, one {# track} other {# tracks}}",
+  "@libraryTrackCount": {
+    "description": "How many tracks a list holds.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryAddToQueue": "Add to queue",
+  "@libraryAddToQueue": {
+    "description": "Menu item that adds the tracks to the queue."
+  },
+  "libraryPlayNext": "Play next",
+  "@libraryPlayNext": {
+    "description": "Menu item that plays the tracks next."
+  },
+  "libraryPlaysNext": "{title} plays next",
+  "@libraryPlaysNext": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryAddedToQueue": "Added {title} to the queue",
+  "@libraryAddedToQueue": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryStartRadio": "Start radio",
+  "@libraryStartRadio": {
+    "description": "Menu item that starts a radio from the tracks."
+  },
+  "libraryOpenOn": "Open on {source}",
+  "@libraryOpenOn": {
+    "description": "Menu item that opens the page on its service. The source is a brand name.",
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryCopiedInto": "Copied into {title}",
+  "@libraryCopiedInto": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryCreated": "Created {title}",
+  "@libraryCreated": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryDeleted": "Deleted {title}",
+  "@libraryDeleted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryNewYouTubePlaylist": "New playlist on YouTube Music",
+  "@libraryNewYouTubePlaylist": {
+    "description": "Title of the prompt that names a new playlist on YouTube Music."
+  },
+  "librarySavedNotice": "{what}: saved",
+  "@librarySavedNotice": {
+    "description": "Notice once a playlist or album is saved to the library.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryUnsavedNotice": "{what}: no longer saved",
+  "@libraryUnsavedNotice": {
+    "description": "Notice once a playlist or album is taken out of the library.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "toolsInstalling": "installing yt-dlp…",
+  "@toolsInstalling": {
+    "description": "Shown while yt-dlp installs. Lowercase."
+  },
+  "toolsInstallFailed": "couldn't install yt-dlp: {error}",
+  "@toolsInstallFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "toolsReady": "yt-dlp {version} is ready",
+  "@toolsReady": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "toolsNeedTitle": "Some tracks need yt-dlp",
+  "@toolsNeedTitle": {
+    "description": "Home notice title when yt-dlp isn't installed."
+  },
+  "toolsNeedMessage": "MixMusic finds the audio of most tracks itself, and asks yt-dlp for the rest, such as tracks made for children. Install it once, and it stays up to date from Settings.",
+  "toolsOutdatedTitle": "Your yt-dlp is out of date",
+  "@toolsOutdatedTitle": {
+    "description": "Home notice title when the user's own yt-dlp is old."
+  },
+  "toolsHowInstalled": "the way you installed it",
+  "@toolsHowInstalled": {
+    "description": "How to update yt-dlp, when no command is known. Lowercase."
+  },
+  "toolsHowWithCommand": "with {command}",
+  "@toolsHowWithCommand": {
+    "description": "How to update yt-dlp: the command that updates it. Lowercase.",
+    "placeholders": {
+      "command": {
+        "type": "String"
+      }
+    }
+  },
+  "toolsOutdatedMessage": "yt-dlp {version} finds the audio of the tracks YouTube won't give MixMusic itself, and {latest} is out. As YouTube changes, an old yt-dlp stops finding it. Update it {how}, or use MixMusic's own, which it keeps up to date.",
+  "@toolsOutdatedMessage": {
+    "description": "Home notice body when the user's own yt-dlp is older than the latest release. {how} is one of the two How messages.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "latest": {
+        "type": "String"
+      },
+      "how": {
+        "type": "String"
+      }
+    }
+  },
+  "toolsNotNow": "not now",
+  "@toolsNotNow": {
+    "description": "Button that dismisses the notice about an old yt-dlp. Lowercase."
+  },
+  "lyricsTranslateTip": "Shows each line's translation under it. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them.",
+  "lyricsRomanizeTip": "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google romanize them.",
+  "lyricsRomaji": "romaji",
+  "lyricsRomajiUnder": "romaji under",
+  "lyricsRomajiOnly": "romaji only",
+  "lyricsRomanize": "romanize",
+  "lyricsRomanizeUnder": "romanized under",
+  "lyricsRomanizeOnly": "romanized only",
+  "lyricsTranslationWaiting": "Translation is on its way…",
+  "lyricsRomanizationWaiting": "Romanization is on its way…",
+  "lyricsTranslationFailed": "Translation isn't available right now.",
+  "lyricsRomanizationFailed": "Romanization isn't available right now.",
+  "lyricsShowAs": "Show lyrics as",
+  "lyricsSynced": "synced",
+  "lyricsPlainText": "plain text",
+  "lyricsTranslate": "translate",
+  "lyricsTranslateLyrics": "Translate lyrics",
+  "lyricsShowInLatin": "Show lyrics in Latin letters",
+  "lyricsLangAfrikaans": "Afrikaans",
+  "lyricsLangArabic": "Arabic",
+  "lyricsLangBulgarian": "Bulgarian",
+  "lyricsLangBengali": "Bengali",
+  "lyricsLangCatalan": "Catalan",
+  "lyricsLangChineseSimplified": "Chinese (Simplified)",
+  "lyricsLangChineseTraditional": "Chinese (Traditional)",
+  "lyricsLangCroatian": "Croatian",
+  "lyricsLangCzech": "Czech",
+  "lyricsLangDanish": "Danish",
+  "lyricsLangDutch": "Dutch",
+  "lyricsLangEnglish": "English",
+  "lyricsLangEstonian": "Estonian",
+  "lyricsLangFilipino": "Filipino",
+  "lyricsLangFinnish": "Finnish",
+  "lyricsLangFrench": "French",
+  "lyricsLangGerman": "German",
+  "lyricsLangGreek": "Greek",
+  "lyricsLangHebrew": "Hebrew",
+  "lyricsLangHindi": "Hindi",
+  "lyricsLangHungarian": "Hungarian",
+  "lyricsLangIndonesian": "Indonesian",
+  "lyricsLangItalian": "Italian",
+  "lyricsLangJapanese": "Japanese",
+  "lyricsLangKorean": "Korean",
+  "lyricsLangLatvian": "Latvian",
+  "lyricsLangLithuanian": "Lithuanian",
+  "lyricsLangMalay": "Malay",
+  "lyricsLangNorwegian": "Norwegian",
+  "lyricsLangPersian": "Persian",
+  "lyricsLangPolish": "Polish",
+  "lyricsLangPortuguese": "Portuguese",
+  "lyricsLangRomanian": "Romanian",
+  "lyricsLangRussian": "Russian",
+  "lyricsLangSerbian": "Serbian",
+  "lyricsLangSlovak": "Slovak",
+  "lyricsLangSlovenian": "Slovenian",
+  "lyricsLangSpanish": "Spanish",
+  "lyricsLangSwahili": "Swahili",
+  "lyricsLangSwedish": "Swedish",
+  "lyricsLangTamil": "Tamil",
+  "lyricsLangTelugu": "Telugu",
+  "lyricsLangThai": "Thai",
+  "lyricsLangTurkish": "Turkish",
+  "lyricsLangUkrainian": "Ukrainian",
+  "lyricsLangUrdu": "Urdu",
+  "lyricsLangVietnamese": "Vietnamese",
+  "lyricsShareHint": "Click the lines to share.",
+  "lyricsShareChosen": "{count, plural, one {# line chosen.} other {# lines chosen.}}",
+  "@lyricsShareChosen": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lyricsShareLines": "share lines",
+  "lyricsShareSave": "save image",
+  "lyricsShareStory": "save for a story",
+  "lyricsShareDone": "done",
+  "lyricsShareCredit": "Lyrics from {source}",
+  "@lyricsShareCredit": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsShareCreditBy": "Lyrics from {source} · submitted by {by}",
+  "@lyricsShareCreditBy": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "by": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsRomajiTip": "Shows the lyrics in romaji too, made on this computer: nothing is sent. The first time, it downloads the dictionary of the readings of kanji, 11.7 MB, from GitHub.",
+  "lyricsRomajiWaiting": "Romaji is on its way…",
+  "lyricsKanjiDownloading": "The readings of kanji are downloading: kanji show as they are until then.",
+  "lyricsKanjiUnavailable": "The readings of kanji couldn't be downloaded: kanji show as they are.",
+  "lyricsLocalTip": "Shows the lyrics in Latin letters too, made on this computer: nothing is sent.",
+  "lyricsUnisonFirstTip": "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google romanize them with the vowels their script leaves out; until they come, or when they can't, they're made on this computer.",
+  "panelClose": "Close {title}",
+  "@panelClose": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "panelUpNext": "Up next",
+  "panelClearQueue": "Clear the queue",
+  "panelClear": "Clear",
+  "nowPlayingTitle": "Now playing",
+  "panelQueueEmpty": "Nothing queued. When the queue runs out, a radio of what you played carries on.",
+  "panelQueueStart": "Play something and the queue shows here.",
+  "panelPlayTrack": "Play {title}",
+  "@panelPlayTrack": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "panelRadioLine": "{line} · radio",
+  "@panelRadioLine": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "panelFileNotFound": "File not found",
+  "panelMadeWithAI": "{line} · made with AI",
+  "@panelMadeWithAI": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "panelHiddenNote": "{line} · hidden by your settings",
+  "@panelHiddenNote": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "panelSkipped": "{line} · skipped",
+  "@panelSkipped": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "panelRemoveTrack": "Remove {title} from the queue",
+  "@panelRemoveTrack": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "panelRemoveFromQueue": "Remove from the queue",
+  "panelPlayNext": "Play next",
+  "panelAddToQueue": "Add to queue",
+  "panelStartRadio": "Start radio",
+  "panelLike": "Add to liked songs",
+  "panelUnlike": "Remove from liked songs",
+  "panelRemoveDislike": "Remove the dislike",
+  "panelGoToArtist": "Go to {name}",
+  "@panelGoToArtist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "panelGoToAlbum": "Go to album",
+  "panelOpenIn": "Open in {source}",
+  "@panelOpenIn": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "panelCopyLink": "Copy link",
+  "panelLinkCopied": "Copied the link",
+  "panelFindMatch": "Find another YouTube Music match",
+  "panelMatchForgotten": "The next play looks for its recording again",
+  "panelRadioSources": "Radios start from tracks of Spotify and YouTube Music",
+  "panelStartingRadio": "Starting a radio of {title}…",
+  "@panelStartingRadio": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "panelPlaysNext": "{title} plays next",
+  "@panelPlaysNext": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "panelAddedToQueue": "Added {title} to the queue",
+  "@panelAddedToQueue": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsPlayToSee": "Play a track to see its lyrics.",
+  "lyricsLooking": "Looking for the lyrics…",
+  "lyricsInstrumental": "This track is instrumental.",
+  "lyricsCreditFrom": "lyrics from {source}",
+  "@lyricsCreditFrom": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsCreditFromLink": "lyrics from ",
+  "lyricsCreditBy": " · submitted by {by}",
+  "@lyricsCreditBy": {
+    "placeholders": {
+      "by": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsCreditByLink": " · submitted by ",
+  "trackInfoTitle": "track info",
+  "trackInfoMenuItem": "Track info",
+  "trackInfoShowInFinder": "Show in Finder",
+  "trackInfoShowInFolder": "Show in its folder",
+  "trackInfoShowInExplorer": "Show in Explorer",
+  "trackInfoClose": "close",
+  "trackInfoReading": "Reading what it holds…",
+  "trackInfoTags": "its tags",
+  "trackInfoSource": "Source",
+  "trackInfoFileSource": "A file on this computer",
+  "trackInfoDownloaded": "{source}, downloaded",
+  "@trackInfoDownloaded": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoPlaysAs": "Plays as",
+  "trackInfoRecording": "{title} · {artists}, on YouTube Music",
+  "@trackInfoRecording": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoPlays": "Plays",
+  "trackInfoPlaysSpotify": "In Spotify's own player, in MixMusic",
+  "trackInfoPlaysConnect": "On a Spotify Connect device",
+  "trackInfoQualitySpotify": "As your Spotify account and Spotify's settings choose: Spotify tells MixMusic nothing of its audio.",
+  "trackInfoLength": "Length",
+  "trackInfoLoudnessSpotify": "Spotify plays it at its own loudness.",
+  "trackInfoLoudness": "Loudness",
+  "trackInfoFormat": "Format",
+  "trackInfoFormatSpotify": "Play it to see its format, bitrate and the rest: MixMusic finds its recording on YouTube Music as it plays.",
+  "trackInfoFormatStream": "Play it to see its format, bitrate and the rest: MixMusic finds its stream as it plays.",
+  "trackInfoCodecIn": "{codec} in {container}",
+  "@trackInfoCodecIn": {
+    "placeholders": {
+      "codec": {
+        "type": "String"
+      },
+      "container": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoHLSPacked": "HLS packed audio",
+  "trackInfoBitrate": "Bitrate",
+  "trackInfoBitrateValue": "{kbps, number, ::group-off} kbit/s",
+  "@trackInfoBitrateValue": {
+    "placeholders": {
+      "kbps": {
+        "type": "int"
+      }
+    }
+  },
+  "trackInfoBitrateAverage": "About {kbps, number, ::group-off} kbit/s, on average",
+  "@trackInfoBitrateAverage": {
+    "placeholders": {
+      "kbps": {
+        "type": "int"
+      }
+    }
+  },
+  "trackInfoSampleRate": "Sample rate",
+  "trackInfoBitDepthLabel": "Bit depth",
+  "trackInfoBitDepth": "{bits}-bit",
+  "@trackInfoBitDepth": {
+    "placeholders": {
+      "bits": {
+        "type": "int"
+      }
+    }
+  },
+  "trackInfoBitDepthFloat": "{bits}-bit floating point",
+  "@trackInfoBitDepthFloat": {
+    "placeholders": {
+      "bits": {
+        "type": "int"
+      }
+    }
+  },
+  "trackInfoChannelsLabel": "Channels",
+  "trackInfoMono": "Mono",
+  "trackInfoStereo": "Stereo",
+  "trackInfoSurround": "5.1 surround",
+  "trackInfoChannels": "{count} channels",
+  "@trackInfoChannels": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackInfoLive": "Live",
+  "trackInfoDownload": "Download",
+  "trackInfoOfflineCopy": "Offline copy",
+  "trackInfoFile": "File",
+  "trackInfoFileProblem": "{path} · {problem}",
+  "@trackInfoFileProblem": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoPlaying": "Playing",
+  "trackInfoEngineOpening": "MixMusic's audio engine is opening it…",
+  "trackInfoEngineLine": "In MixMusic's audio engine, {how}",
+  "@trackInfoEngineLine": {
+    "placeholders": {
+      "how": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoEngineSurround": "its 5.1 surround audio, {from}",
+  "@trackInfoEngineSurround": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoEngineFile": "from its file",
+  "trackInfoEngineDownload": "from its download",
+  "trackInfoEngineCache": "from the offline cache",
+  "trackInfoEngineLive": "live from YouTube",
+  "trackInfoEngineStreamed": "streamed from YouTube",
+  "trackInfoEngineConverted": "{line}, converted to {rate}",
+  "@trackInfoEngineConverted": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoMeasuredOff": "YouTube measured it at {lkfs}. Even loudness is off: it plays at its own level.",
+  "@trackInfoMeasuredOff": {
+    "placeholders": {
+      "lkfs": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoMeasuredTurnDown": "YouTube measured it at {lkfs}. Even loudness turns it down by {db} dB.",
+  "@trackInfoMeasuredTurnDown": {
+    "placeholders": {
+      "lkfs": {
+        "type": "String"
+      },
+      "db": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoMeasuredLeave": "YouTube measured it at {lkfs}. Even loudness leaves it as it is: it isn't louder than {ceiling}.",
+  "@trackInfoMeasuredLeave": {
+    "placeholders": {
+      "lkfs": {
+        "type": "String"
+      },
+      "ceiling": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoFileLoudness": "It plays at its own level: Even loudness turns tracks down from YouTube's measure of each, which a file on this computer hasn't.",
+  "trackInfoNoMeasure": "MixMusic has no measure of it yet: it plays at its own level.",
+  "trackInfoLevelling": "{line} Volume levelling squeezes its loud and quiet moments closer together.",
+  "@trackInfoLevelling": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "trackInfoTagTitle": "Title",
+  "trackInfoTagArtist": "Artist",
+  "trackInfoTagAlbum": "Album",
+  "trackInfoTagAlbumArtist": "Album artist",
+  "trackInfoTagTrack": "Track",
+  "trackInfoTagDisc": "Disc",
+  "trackInfoTagYear": "Year",
+  "trackInfoFound": "Found",
+  "trackInfoRoutePlayerAPI": "Quickly, through YouTube's player API, with no yt-dlp",
+  "trackInfoRouteQuick": "With yt-dlp's quick run, as YouTube's visionOS app alone",
+  "trackInfoRouteFull": "With yt-dlp's full run, with its default clients and a JavaScript runtime",
+  "trackInfoRouteAccount": "With yt-dlp's full run, with the session of your YouTube Music account",
+  "trackInfoYtDlpRan": "yt-dlp ran",
+  "trackInfoSignedIn": "Signed in",
+  "trackInfoSignedOut": "No: asked for signed out, as no one's account.",
+  "trackInfoSignedInYes": "Yes: asked for as your YouTube Music account.",
+  "trackInfoStreamNote": "It stops working after a few hours, and is tied to this network: it may carry your IP address, so share it with care.",
+  "trackInfoCopyURL": "copy stream URL",
+  "trackInfoCopied": "Copied the stream's address: it stops working after a few hours",
+  "nowPlayingNothing": "Nothing playing",
+  "nowPlayingEmpty": "Play a track and it fills this page, with its lyrics.",
+  "nowPlayingWaiting": "waiting for the network",
+  "nowPlayingVisualizer": "Visualizer",
+  "videoPlay": "Play the video",
+  "videoMusicVideo": "Music video: {title}",
+  "@videoMusicVideo": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "videoLoadFailed": "The picture of music videos couldn't load here.",
+  "videoShowVideo": "Show the video",
+  "videoShowCover": "Show the cover",
+  "speedMenuLabel": "Speed: {what}",
+  "@speedMenuLabel": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "speedMenuLockedSpotify": "Spotify plays this one at its own speed",
+  "speedMenuLockedLive": "this live stream plays at its own speed",
+  "volumeMute": "Mute",
+  "volumeUnmute": "Unmute",
+  "miniSeekValue": "{at} of {total}",
+  "@miniSeekValue": {
+    "placeholders": {
+      "at": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "miniWindowTitle": "MixMusic mini player",
+  "miniRowNothingPlaying": "Nothing playing",
+  "miniRowPlaySomething": "play something in MixMusic",
+  "miniRowOpen": "Open MixMusic",
+  "miniRowClose": "Close the mini player",
+  "miniPanelWhy": "Why it couldn't play",
+  "miniPanelEmptyQueue": "Play something and the queue shows here.",
+  "miniPanelPlay": "Play {title}",
+  "@miniPanelPlay": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "miniPanelPlaying": "{title}, playing",
+  "@miniPanelPlaying": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "miniPanelLyricsEmpty": "Play a track to see its lyrics.",
+  "miniPanelLyricsLooking": "Looking for the lyrics…",
+  "miniPanelInstrumental": "This track is instrumental.",
+  "miniPanelDetailsLooking": "Looking for the details…",
+  "miniPanelNoChapters": "No chapters.",
+  "miniPanelSystemDevice": "MixMusic plays on the system's default device.",
+  "miniPanelOnComputer": "On this computer",
+  "miniPanelCast": "Cast",
+  "miniPanelActive": "active",
+  "miniPanelNoFailure": "No track failed to play since MixMusic started.",
+  "miniPanelCloseQueue": "Close the queue",
+  "miniPanelCloseLyrics": "Close the lyrics",
+  "miniPanelCloseOutput": "Close the output devices",
+  "miniPanelCloseError": "Close the details of the error",
+  "miniPanelPlace": "{place} of {count}",
+  "@miniPanelPlace": {
+    "placeholders": {
+      "place": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "castConnecting": "connecting…",
+  "castThisComputer": "This computer",
+  "castToDevice": "Cast to a device",
+  "castPlayingOn": "Playing on {name}",
+  "@castPlayingOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notchPanelWindowTitle": "MixMusic around the notch",
+  "notchPanelOpenPlayer": "Open the player",
+  "notchPanelClosePlayer": "Close the player",
+  "notchPanelOpenMixMusic": "Open MixMusic",
+  "notchPanelPlaying": "Playing",
+  "notchPanelPaused": "Paused",
+  "notchPanelShowPlays": "Show what plays in MixMusic",
+  "notchPanelLyricsLooking": "Looking for the lyrics…",
+  "notchPanelInstrumental": "This track is instrumental.",
+  "notchPanelNoTimed": "No timed lyrics.",
+  "remotePageAway": "{name} isn't on the network now. It shows here while MixMusic runs there, with Settings › Desktop › Remote control on, on the same network as this computer.",
+  "@remotePageAway": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remotePageAskPair": "Pair with {name} to see what plays there and control it from here. {name} shows a code of 6 digits, which you type here.",
+  "@remotePageAskPair": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remotePagePair": "pair",
+  "remotePageAsking": "Asking {name} to pair…",
+  "@remotePageAsking": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remotePageChecking": "Checking the code with {name}…",
+  "@remotePageChecking": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remotePageConnecting": "Connecting to {name}…",
+  "@remotePageConnecting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remotePageTypeCode": "Type the code {name} shows.",
+  "@remotePageTypeCode": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remotePageCode": "Code",
+  "remotePageNothing": "Nothing plays on {name}.",
+  "@remotePageNothing": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteQueueNext": "Next on {name}",
+  "@remoteQueueNext": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteQueueClearLabel": "Clear the queue on {name}",
+  "@remoteQueueClearLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteQueueClear": "Clear",
+  "remoteQueueLine": "{title} - {artists}",
+  "@remoteQueueLine": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteQueueRemove": "Remove from the queue",
+  "remoteQueuePlayOn": "Play {title} on {name}",
+  "@remoteQueuePlayOn": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteQueueRemoveOn": "Remove {title} from the queue on {name}",
+  "@remoteQueueRemoveOn": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteQueueOlder": "MixMusic on {name} is older: update it there to change its queue from here, and to move what plays here to it.",
+  "@remoteQueueOlder": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "handoverOnComputer": "On this computer",
+  "handoverMove": "move to {name}",
+  "@handoverMove": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "handoverMoving": "moving to {name}…",
+  "@handoverMoving": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "handoverNone": "{name} has none of these tracks, files of this computer: they play on here",
+  "@handoverNone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "handoverMovedPaused": "Moved to {name}, and paused here",
+  "@handoverMovedPaused": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "handoverLeft": "Moved to {name}, and paused here, but for {count, plural, one {# track} other {# tracks}}, files of this computer it doesn't have{next, select, yes {: it plays from the next one} other {}}",
+  "@handoverLeft": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "next": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteCodeMessage": "{name} asks to control MixMusic on this computer. To let it, type this code there: {code}",
+  "@remoteCodeMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteCodeTitle": "pair with {name}",
+  "@remoteCodeTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteCodeAsks": "{name} asks to control MixMusic on this computer. To let it, type this code there:",
+  "@remoteCodeAsks": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteCodeLabel": "the code: {code}",
+  "@remoteCodeLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteCodeExpires": "It works once, for 2 minutes. If you didn't ask for it, cancel.",
+  "refreshThisPage": "Refresh this page",
+  "refreshTipShortcut": "Refresh this page ({keys})",
+  "@refreshTipShortcut": {
+    "placeholders": {
+      "keys": {
+        "type": "String"
+      }
+    }
+  },
+  "refreshPageRefreshed": "Page refreshed",
+  "refreshRefreshing": "Refreshing",
+  "refreshFailed": "Couldn't refresh: {error}",
+  "@refreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pullRefreshPull": "pull to refresh",
+  "pullRefreshRelease": "release to refresh",
+  "pullRefreshRefreshing": "refreshing",
+  "compactHeadPlay": "Play {title}",
+  "@compactHeadPlay": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "compactHeadShuffle": "Shuffle {title}",
+  "@compactHeadShuffle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "compactHeadMore": "More for {title}",
+  "@compactHeadMore": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tilesOpen": "Open",
+  "tilesDownload": "Download",
+  "tilesPlay": "Play {title}",
+  "@tilesPlay": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tilesTracks": "{count, plural, one {# track} other {# tracks}}",
+  "@tilesTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tilesNothingToPlay": "Nothing to play here",
+  "tilesScrollBack": "Scroll {title} back",
+  "@tilesScrollBack": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tilesScrollOn": "Scroll {title} on",
+  "@tilesScrollOn": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "accountsBrowserAbout": "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any browser: MixMusic then takes the session, closes the browser and deletes the profile. Your own profiles stay as they are.",
+  "accountsBrowserCancel": "cancel",
+  "accountsBrowserChoose": "Browser to sign in with",
+  "accountsBrowserDone": "Signed in to YouTube Music",
+  "accountsBrowserFailed": "MixMusic didn't sign in to YouTube Music",
+  "accountsBrowserHint": "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone, never yours, and keeps the session encrypted on this computer.",
+  "accountsBrowserNone": "MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others made from Chromium when MixMusic opens them.",
+  "accountsBrowserOpened": "Sign in to YouTube Music in {browser}",
+  "@accountsBrowserOpened": {
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountsBrowserSignIn": "sign in with {browser}",
+  "@accountsBrowserSignIn": {
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountsBrowserTitle": "Sign in with your browser",
+  "accountsBrowserWaiting": "waiting for {browser}…",
+  "@accountsBrowserWaiting": {
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountsClientID": "Client ID",
+  "accountsNetEaseGroup": "NetEase Cloud Music",
+  "alreadyInAddAnyway": "add anyway",
+  "alreadyInAdded": "Added {what} to {title}",
+  "@alreadyInAdded": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "alreadyInAddedAgain": "Added {what} to {title} again",
+  "@alreadyInAddedAgain": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "alreadyInHeld": "Added {added, plural, one {# track} other {# tracks}} to {title}: {held, plural, one {# was} other {# were}} in it already",
+  "@alreadyInHeld": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      },
+      "held": {
+        "type": "int"
+      }
+    }
+  },
+  "alreadyInMessage": "Already in {title}",
+  "@alreadyInMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "alreadyInTracks": "{count, plural, one {# track} other {# tracks}}",
+  "@alreadyInTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "audioAccount2Change": "You can change this in Settings › Playback › Sound.",
+  "audioAccount2NotNow": "not now",
+  "audioAccount2Offer": "Your YouTube Music account has Premium, whose audio has a higher bitrate. MixMusic can ask for each track's audio as your account to play it. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
+  "audioAccount2Title": "play audio as your account",
+  "audioAccount2TurnOn": "turn on",
+  "collabAddToSpotify": "Add to Spotify playlist",
+  "collabFinding": "Finding the tracks on YouTube Music…",
+  "collabInviteBody": "Collaborators can't open a private playlist. Inviting them makes {title} unlisted: anyone with its link can open it, and it shows on none of your pages.",
+  "@collabInviteBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collabInviteButton": "invite",
+  "collabInviteCopied": "Copied the invite link of {title}: whoever opens it can add to it",
+  "@collabInviteCopied": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collabInviteFailed": "Couldn't invite collaborators to {title}: {error}",
+  "@collabInviteFailed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "collabInviteItem": "Invite collaborators",
+  "collabInviteTitle": "invite collaborators",
+  "collabLoadFailed": "Couldn't load your playlists",
+  "collabLoading": "Loading your playlists…",
+  "collabMade": "Made {title} collaborative",
+  "@collabMade": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collabMadeLinked": "Made {title} collaborative: copied its link, for those who'll add to it",
+  "@collabMadeLinked": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collabMakeButton": "make collaborative",
+  "collabMakeFailed": "Couldn't make {title} collaborative: {error}",
+  "@collabMakeFailed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "collabMakeItem": "Make collaborative",
+  "collabNameLabel": "Name",
+  "collabNoneToAdd": "No playlists you can add to",
+  "collabShareAsTitle": "Share as a YouTube Music playlist",
+  "collabShareButton": "share",
+  "collabShareFailed": "Couldn't share {title}: {error}",
+  "@collabShareFailed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "collabShareItem": "As a YouTube Music playlist…",
+  "collabShared": "Made {title} on YouTube Music: copied its link, which anyone can open",
+  "@collabShared": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collabShelfTitle": "Playlists you collaborate on",
+  "collabSpotifyBody": "Spotify keeps collaborative playlists off your profile: {title} leaves it. Those you send its link to can then add to it and put it in order.",
+  "@collabSpotifyBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collabSpotifyTitle": "collaborative playlist",
+  "collabStopBody": "Stopping collaboration takes the collaborators off {title}, and its invite links stop working. What they added stays.",
+  "@collabStopBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collabStopButton": "stop",
+  "collabStopFailed": "Couldn't stop collaboration on {title}: {error}",
+  "@collabStopFailed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "collabStopItem": "Stop collaboration",
+  "collabStopTitle": "stop collaboration",
+  "collabStopped": "Stopped collaboration on {title}",
+  "@collabStopped": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "collabTracks": "{count, plural, one {# track} other {# tracks}}",
+  "@collabTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "collabUnlisting": "Making {title} unlisted: YouTube Music takes up to half a minute before it lets collaborators in",
+  "@collabUnlisting": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "copiesAbout": "Copies of one song show once, and play the best: lossless before lossy, then the higher bitrate and sample rate. What you play, like and mix of them follows the song, and stays when a copy goes.",
+  "copiesAboutBitrate": "about {bitrate, number, ::group-off} kbit/s",
+  "@copiesAboutBitrate": {
+    "placeholders": {
+      "bitrate": {
+        "type": "int"
+      }
+    }
+  },
+  "copiesAudio": "Audio",
+  "copiesClose": "close",
+  "copiesCopyLabel": "Copy",
+  "copiesCount": "{count, plural, one {# copy…} other {# copies…}}",
+  "@copiesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "copiesFindLabel": "Find a song of this computer",
+  "copiesFindPlaceholder": "find a song of this computer",
+  "copiesInfoTitle": "its copies",
+  "copiesLink": "Link a copy…",
+  "copiesLinkAnother": "link another copy",
+  "copiesLinkLabel": "Link {title}, {artists}",
+  "@copiesLinkLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
+  "copiesLinked": "Linked {title} as a copy",
+  "@copiesLinked": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "copiesLinkedByHand": "Linked by hand",
+  "copiesNoMatch": "No other song of this computer matches that.",
+  "copiesPlayButton": "play",
+  "copiesPlayThis": "Play this copy",
+  "copiesPlays": "Plays",
+  "copiesTitle": "copies of {title}",
+  "@copiesTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "copiesUnlinkButton": "unlink",
+  "copiesUnlinkThis": "Unlink this copy",
+  "copiesUnlinked": "Unlinked the copy in {place}",
+  "@copiesUnlinked": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "copySongArtist": "Copy artist",
+  "copySongArtistCopied": "Copied the artist",
+  "copySongArtistTitle": "Copy \"Artist - Title\"",
+  "copySongArtistTitleCopied": "Copied the artist and title",
+  "copySongLink": "Copy link",
+  "copySongLinkCopied": "Copied the link",
+  "copySongMenu": "Copy",
+  "copySongTitle": "Copy title",
+  "copySongTitleCopied": "Copied the title",
+  "exportButton": "export",
+  "exportFailed": "Couldn't export {title}: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "exportFailedSeveral": "Couldn't export {n, plural, one {# track} other {# tracks}}, the first {title}: {error}",
+  "@exportFailedSeveral": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "exportMenu": "Export…",
+  "exportOnlyDownloaded": "Only tracks downloaded or on this computer export",
+  "exportSelected": "Export the selected tracks",
+  "exportShow": "show",
+  "exportTracks": "{count, plural, one {# track} other {# tracks}}",
+  "@exportTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exportedPartial": "Exported {n} of {total, plural, one {# track} other {# tracks}} to {dir}",
+  "@exportedPartial": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "dir": {
+        "type": "String"
+      }
+    }
+  },
+  "exportedTo": "Exported {what} to {dir}",
+  "@exportedTo": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "dir": {
+        "type": "String"
+      }
+    }
+  },
+  "exportingTo": "Exporting {what} to {dir}…",
+  "@exportingTo": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "dir": {
+        "type": "String"
+      }
+    }
+  },
+  "followEmpty": "Follow an artist from their page or their menu, and they wait here.",
+  "followInMixMusic": "{name}: following in MixMusic",
+  "@followInMixMusic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "followIntro": "Follow an artist from their page or their menu, and they wait here, kept in MixMusic: their new albums and singles show here and on Home. Signed in to their service, you follow them there.",
+  "followLabel": "Follow",
+  "followNoLonger": "{name}: no longer following",
+  "@followNoLonger": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "followNothing": "Nothing followed yet",
+  "followOnService": "{name}: following on {service}",
+  "@followOnService": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "service": {
+        "type": "String"
+      }
+    }
+  },
+  "followUnfollow": "Unfollow",
+  "followedInMixMusic": "Followed in MixMusic",
+  "followedOnSpotify": "Followed on Spotify",
+  "followedOnYouTube": "Followed on YouTube Music",
+  "mixCoverCancel": "cancel",
+  "mixCoverChange": "Change cover…",
+  "mixCoverChanged": "Changed the cover of {title}",
+  "@mixCoverChanged": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "mixCoverChooseFor": "Choose a cover for {title}",
+  "@mixCoverChooseFor": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "mixCoverChooseImage": "choose an image…",
+  "mixCoverFailed": "Couldn't change the cover of {title}: {error}",
+  "@mixCoverFailed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mixCoverImages": "Images",
+  "mixCoverIntro": "Choose an image, a PNG, JPEG or WebP, or the cover of one of the songs of {title}. It shows cut to a square.",
+  "@mixCoverIntro": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "mixCoverSongs": "use the songs' covers",
+  "mixCoverSongsAgain": "{title} shows its songs' covers again",
+  "@mixCoverSongsAgain": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "mixCoverTitle": "change cover",
+  "mixCoverUse": "Use the cover of {title}",
+  "@mixCoverUse": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "neteaseLiked": "Liked on NetEase Cloud Music",
+  "neteaseNoLiked": "No liked songs on NetEase Cloud Music.",
+  "playlistReadCut": "MixMusic shows and plays the first {max} tracks of a {noun, select, mix {mix} playlist {playlist} other {list}}: this one has more.",
+  "@playlistReadCut": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      },
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistReadCutOf": "This {noun, select, mix {mix} playlist {playlist} other {list}} has {count} tracks: MixMusic shows and plays its first {n}.",
+  "@playlistReadCutOf": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      },
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistReadLoading": "Loading tracks · {n}",
+  "@playlistReadLoading": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistReadLoadingLabel": "Loading tracks",
+  "playlistReadLoadingOf": "Loading tracks · {n} of {count}",
+  "@playlistReadLoadingOf": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistReadLoadingOfThen": "Loading tracks · {n} of {count} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all here",
+  "@playlistReadLoadingOfThen": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      },
+      "does": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistReadLoadingThen": "Loading tracks · {n} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all here",
+  "@playlistReadLoadingThen": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "does": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistReadPartialFirst": "Only the first {n} tracks of this {noun, select, mix {mix} playlist {playlist} other {list}} could be loaded: {error}",
+  "@playlistReadPartialFirst": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "noun": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistReadPartialOf": "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count} tracks could be loaded: {error}",
+  "@playlistReadPartialOf": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "noun": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "shareCopied": "Copied the link",
+  "shareCopyLink": "Copy link",
+  "shareCopyOn": "Copy the link on {service}",
+  "@shareCopyOn": {
+    "placeholders": {
+      "service": {
+        "type": "String"
+      }
+    }
+  },
+  "shareKindAlbum": "Album",
+  "shareKindEP": "EP",
+  "shareKindEpisode": "Episode",
+  "shareKindMix": "Mix",
+  "shareKindPlaylist": "Playlist",
+  "shareKindSingle": "Single",
+  "shareKindSong": "Song",
+  "shareMenu": "Share",
+  "sharePNGImage": "PNG image",
+  "shareSaveButton": "Save",
+  "shareSaveImage": "Save image…",
+  "shareSaveStory": "Save image for a story…",
+  "shareSaveTitle": "Save the image",
+  "shareSaved": "Saved the image as {file}",
+  "@shareSaved": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestionsAdd": "add",
+  "suggestionsAddLabel": "Add {title} to {playlist}",
+  "@suggestionsAddLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "playlist": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestionsAdded": "Added {title} to {playlist}",
+  "@suggestionsAdded": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "playlist": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestionsLoadFailed": "Couldn't load the suggestions: {error}",
+  "@suggestionsLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestionsLoading": "Loading suggestions",
+  "suggestionsRefresh": "refresh",
+  "suggestionsRefreshFailed": "Couldn't refresh the suggestions: {error}",
+  "@suggestionsRefreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestionsRefreshLabel": "Refresh the suggestions",
+  "suggestionsTitle": "Suggestions",
+  "suggestionsTryAgain": "try again",
+  "trackSelectAddMix": "add to mix",
+  "trackSelectAddMixLabel": "Add the selected tracks to a mix",
+  "trackSelectAddQueue": "add to queue",
+  "trackSelectAddQueueLabel": "Add the selected tracks to the queue",
+  "trackSelectAll": "select all",
+  "trackSelectBar": "Selected tracks",
+  "trackSelectClear": "Clear the selection",
+  "trackSelectCount": "{count} selected",
+  "@trackSelectCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackSelectDeselect": "Deselect",
+  "trackSelectDownload": "download",
+  "trackSelectDownloadLabel": "Download the selected tracks",
+  "trackSelectItem": "Select",
+  "trackSelectQueued": "Added {count, plural, one {# track} other {# tracks}} to the queue",
+  "@trackSelectQueued": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackSelectRow": "Select {title}",
+  "@trackSelectRow": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "trackToolsOrder": "{noun, select, mix {Mix} playlist {Playlist} other {List}} order",
+  "@trackToolsOrder": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "trackToolsSearchLabel": "Search this {noun, select, mix {mix} playlist {playlist} other {list}}",
+  "@trackToolsSearchLabel": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "trackToolsSearchPlaceholder": "search this {noun, select, mix {mix} playlist {playlist} other {list}}",
+  "@trackToolsSearchPlaceholder": {
+    "placeholders": {
+      "noun": {
+        "type": "String"
+      }
+    }
+  },
+  "trackToolsShown": "{shown} of {total}",
+  "@trackToolsShown": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "trackToolsSortArtist": "Artist",
+  "trackToolsSortBy": "Sort by",
+  "trackToolsSortLength": "Length",
+  "trackToolsSortPlays": "Plays",
+  "trackToolsSortTitle": "Title",
+  "tracksEmpty": "No tracks here yet.",
+  "tracksFileNotFound": "File not found",
+  "tracksMoreFor": "More for {title}",
+  "@tracksMoreFor": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tracksPause": "Pause {title}",
+  "@tracksPause": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tracksPlay": "Play {title}",
+  "@tracksPlay": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "formatMinutes": "{count} min",
+  "@formatMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "formatHourMinutes": "{hours} hr {minutes} min",
+  "@formatHourMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "formatMonthDay": "{month} {day}",
+  "@formatMonthDay": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "formatMonthDayYear": "{month} {day}, {year}",
+  "@formatMonthDayYear": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "formatMonthYear": "{month} {year}",
+  "@formatMonthYear": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "formatDayMonth": "{day} {month}",
+  "@formatDayMonth": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "formatWeekdayDayMonth": "{weekday} {day} {month}",
+  "@formatWeekdayDayMonth": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "formatPlays": "{n, plural, one {{count} play} other {{count} plays}}",
+  "@formatPlays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "formatViews": "{n, plural, one {{count} view} other {{count} views}}",
+  "@formatViews": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "formatThisComputer": "this computer",
+  "@formatThisComputer": {
+    "description": "The source name of files on this computer, as in Open on this computer."
+  },
+  "podcastsKind": "podcast",
+  "podcastsEpisodeCount": "{count, plural, one {# episode} other {# episodes}}",
+  "@podcastsEpisodeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "podcastsSpotifyOnlyLead": "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in ",
+  "@podcastsSpotifyOnlyLead": {
+    "description": "Split around the link to Settings › Playback."
+  },
+  "podcastsSettingsPlayback": "Settings › Playback",
+  "podcastsSpotifyOnlyTail": ".",
+  "podcastsNoEpisodes": "No episodes yet.",
+  "podcastsLoadMore": "load more episodes",
+  "podcastsFollow": "follow",
+  "podcastsFollowing": "following",
+  "podcastsResume": "resume",
+  "podcastsPlayTitle": "Play {title}",
+  "@podcastsPlayTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastsPauseTitle": "Pause {title}",
+  "@podcastsPauseTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastsMoreFor": "More for {title}",
+  "@podcastsMoreFor": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastsPlayed": "played",
+  "podcastsLeft": "{time} left",
+  "@podcastsLeft": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastsOpen": "Open",
+  "podcastsPlay": "Play",
+  "podcastsPodcast": "Podcast",
+  "podcastsGoToPodcast": "Go to podcast",
+  "podcastsMarkPlayed": "Mark as played",
+  "podcastsMarkUnplayed": "Mark as unplayed",
+  "podcastsNothingToPlay": "Nothing to play here",
+  "podcastsEpisodes": "Episodes",
+  "podcastsNoMatch": "No episodes match.",
+  "podcastsKeepListening": "Keep listening",
+  "podcastsFollowingTitle": "Following",
+  "podcastsNothingFollowed": "Nothing followed yet",
+  "podcastsFollowHint": "Follow a podcast from its page, from Spotify or YouTube Music, and it waits here.",
+  "podcastsSavedOn": "Saved on {source}",
+  "@podcastsSavedOn": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastsFollowed": "{title}: following",
+  "@podcastsFollowed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "podcastsUnfollowed": "{title}: no longer following",
+  "@podcastsUnfollowed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "episodeLyrics": "Lyrics",
+  "episodeDetails": "Details",
+  "episodeLooking": "Looking for the details…",
+  "episodeTryAgain": "try again",
+  "episodeNoDescription": "This episode has no description.",
+  "episodePlayFrom": "Play from {text}",
+  "@episodePlayFrom": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "episodeNoChapters": "No chapters.",
+  "exploreTabNew": "New",
+  "exploreTabCharts": "Charts",
+  "exploreTabMoods": "Moods & genres",
+  "exploreTitle": "Explore",
+  "exploreNothingHere": "YouTube Music shows nothing here right now.",
+  "exploreMoodPlaylists": "Playlists for {title}",
+  "@exploreMoodPlaylists": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreMood": "Mood",
+  "exploreAddToMix": "Add to mix",
+  "exploreAddToYouTube": "Add to YouTube Music playlist",
+  "exploreNewPlaylist": "New playlist…",
+  "exploreNewYouTubePlaylist": "New playlist on YouTube Music",
+  "exploreLoadingPlaylists": "Loading your playlists…",
+  "exploreLoadPlaylistsFailed": "Couldn't load your playlists",
+  "exploreNoPlaylists": "No playlists of yours",
+  "exploreNewMixItem": "New mix…",
+  "exploreFinding": "Finding the tracks on YouTube Music…",
+  "exploreCouldntCreate": "Couldn't create {title}: {error}",
+  "@exploreCouldntCreate": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreCreatedOnYouTube": "Created {title} on YouTube Music",
+  "@exploreCreatedOnYouTube": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreCreated": "Created {title}",
+  "@exploreCreated": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "recapLabel": "Your year",
+  "recapYouPlayed": "In {year} you played ",
+  "@recapYouPlayed": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "recapTracksPlayed": "{count, plural, one {# track} other {# tracks}}",
+  "@recapTracksPlayed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recapFor": " for ",
+  "recapMinutes": "{minutes} minutes",
+  "@recapMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "recapPeriod": ".",
+  "recapTopSongs": "Top songs",
+  "recapTopArtists": "Top artists",
+  "recapTopAlbums": "Top albums",
+  "recapNothingToRank": "Nothing to rank",
+  "recapMoments": "Moments",
+  "recapShare": "Share",
+  "recapSaveImage": "save image",
+  "recapSaveStory": "save image for a story",
+  "recapDetail": "{detail}, {plays, plural, one {# play} other {# plays}}",
+  "@recapDetail": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      },
+      "plays": {
+        "type": "int"
+      }
+    }
+  },
+  "recapPlays": "{plays, plural, one {# play} other {# plays}}",
+  "@recapPlays": {
+    "placeholders": {
+      "plays": {
+        "type": "int"
+      }
+    }
+  },
+  "recapBusiest": "You listened most in {month}: {minutes, plural, one {# minute} other {# minutes}}.",
+  "@recapBusiest": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "recapBegan": "The year began with {song}, on {day}.",
+  "@recapBegan": {
+    "placeholders": {
+      "song": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "recapRepeated": "You played {song} {times} times on {day}.",
+  "@recapRepeated": {
+    "placeholders": {
+      "song": {
+        "type": "String"
+      },
+      "times": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "recapFound": "You found {count, plural, one {# new artist} other {# new artists}}.",
+  "@recapFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recapSongBy": "“{title}” by {artist}",
+  "@recapSongBy": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "recapCardHeading": "YOUR {year} IN MUSIC",
+  "@recapCardHeading": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "recapCardMinutes": "minutes of music, {plays, plural, one {# track} other {# tracks}}",
+  "@recapCardMinutes": {
+    "placeholders": {
+      "plays": {
+        "type": "int"
+      }
+    }
+  },
+  "homeFilterEverything": "Everything",
+  "homeFilterYours": "Yours",
+  "homeTitle": "Home",
+  "homeEditButton": "edit home",
+  "homeStartHere": "Start here",
+  "homeStartCaption": "Search for something to play",
+  "homeSearchMusic": "Search for music",
+  "homeJumpBack": "Jump back in",
+  "homePlayAgain": "Play {title} again",
+  "@homePlayAgain": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "homeAddSpotify": "Add Spotify",
+  "homeAddSpotifyCaption": "Sign in to search and play your Spotify library here",
+  "homeTrackCount": "{count, plural, one {# track} other {# tracks}}",
+  "@homeTrackCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeMixCount": "{count, plural, one {# mix} other {# mixes}}",
+  "@homeMixCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeOpenDownloads": "open downloads",
+  "homeSpotifyEmpty": "Sign in to Spotify in Settings › Accounts to see your playlists and recent tracks here.",
+  "homeLocalEmpty": "Play some tracks and make a mix: what you collect shows here.",
+  "homeNothingYet": "Nothing here yet.",
+  "homeEditDone": "done",
+  "homeEditAddShelf": "add a shelf",
+  "homeEditReset": "reset home",
+  "homeEditResetBody": "Put Home's shelves back in their own order, show those you hid, and take off those you added?",
+  "homeEditResetButton": "reset",
+  "homeEditHint": "Drag a shelf onto another to move it there, or press Alt+Up or Alt+Down on it. A shelf you hide waits under them, to show again.",
+  "homeEditHidden": "Hidden",
+  "homeEditRowLabel": "{title}, {source}",
+  "@homeEditRowLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "homeEditRemove": "Remove {title} from Home",
+  "@homeEditRemove": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "homeEditHide": "Hide {title}",
+  "@homeEditHide": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "homeEditShow": "show",
+  "homeEditShowTitle": "Show {title}",
+  "@homeEditShowTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "homeEditLoadingPlaylists": "Loading your playlists…",
+  "homeEditLoadFailed": "Couldn't load your playlists",
+  "homeEditNoPlaylists": "No playlists yet",
+  "homeEditSpotifyHidden": "Spotify shows apps the tracks of your own and shared playlists only",
+  "homeEditYouTubePlaylist": "A YouTube Music playlist",
+  "homeEditSpotifyPlaylist": "A Spotify playlist",
+  "homeEditOneMix": "One of your mixes",
+  "homeEditNoMixes": "No mixes yet",
+  "homeEditArtistReleases": "An artist's new releases",
+  "homeEditFollowArtist": "Follow an artist to add their releases",
+  "homeEditNewFrom": "New from {name}",
+  "@homeEditNewFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeEditRecent": "Recently played",
+  "homeEditMostPlayed": "Most played this month",
+  "shelvesNewReleases": "New from artists you follow",
+  "shelvesTopMonth": "Most played this month",
+  "shelvesDownloads": "Downloads",
+  "shelvesNewFrom": "New from {name}",
+  "@shelvesNewFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "searchPivotAll": "all",
+  "searchPivotSongs": "songs",
+  "searchPivotVideos": "videos",
+  "searchPivotAlbums": "albums",
+  "searchPivotArtists": "artists",
+  "searchPivotPlaylists": "playlists",
+  "searchPivotPodcasts": "podcasts",
+  "searchScopeBoth": "both",
+  "searchServices": "Services",
+  "searchNetEaseOnly": "Searching NetEase Cloud Music only. ",
+  "searchSignInSpotify": "Sign in to Spotify",
+  "searchSignInTail": " to search it too.",
+  "searchSongs": "Songs",
+  "searchNoSongs": "No songs match.",
+  "searchVideos": "Videos",
+  "searchNoVideos": "No videos match.",
+  "searchArtists": "Artists",
+  "searchAlbums": "Albums",
+  "searchPlaylists": "Playlists",
+  "searchSpotifyPlaylists": "Spotify shows apps the tracks of the playlists you own or collaborate on only, so only those are listed.",
+  "searchTitle": "Search",
+  "searchFindAnything": "Find anything",
+  "searchIntro": "One search looks through NetEase Cloud Music and, once you sign in, Spotify.",
+  "searchStartTyping": "start typing",
+  "searchRecent": "Recent",
+  "searchClearRecent": "Clear the recent searches",
+  "searchClear": "clear",
+  "statsThisWeek": "This week",
+  "statsThisMonth": "This month",
+  "statsAllTime": "All time",
+  "statsTitle": "Stats",
+  "statsNothingCounted": "Nothing counted yet",
+  "statsCountRule": "Tracks count once they played for thirty seconds.",
+  "statsYouPlayed": "You played ",
+  "statsPlayedTracks": "{count, plural, one {# track} other {# tracks}}",
+  "@statsPlayedTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsFor": " for ",
+  "statsColon": ": ",
+  "statsFromSpotify": "{count} from Spotify",
+  "@statsFromSpotify": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "statsAnd": " and ",
+  "statsFromYouTube": "{count} from YouTube Music",
+  "@statsFromYouTube": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "statsEnd": ".",
+  "statsTheMix": "The mix",
+  "statsTopArtists": "Top artists",
+  "statsTopTracks": "Top tracks",
+  "statsDayByDay": "Day by day",
+  "statsMinutesEachDay": "Minutes listened each day.",
+  "statsMinutesLabel": "Minutes listened each day",
+  "statsArrowKeys": "The arrow keys go from day to day.",
+  "statsShowTable": "Show as a table",
+  "statsToday": "today",
+  "statsColDay": "day",
+  "statsColMinutes": "minutes",
+  "statsColPlays": "plays",
+  "statsDayTip": "{day}: {minutes} min, {plays, plural, one {# play} other {# plays}}",
+  "@statsDayTip": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      },
+      "plays": {
+        "type": "int"
+      }
+    }
+  },
+  "statsVennLabel": "{spotify} plays from Spotify, {youtube} from YouTube Music",
+  "@statsVennLabel": {
+    "placeholders": {
+      "spotify": {
+        "type": "String"
+      },
+      "youtube": {
+        "type": "String"
+      }
+    }
+  },
+  "statsArtistPlays": "{artist}: {plays, plural, one {# play} other {# plays}}",
+  "@statsArtistPlays": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      },
+      "plays": {
+        "type": "int"
+      }
+    }
+  },
+  "marketplaceThemes": "themes",
+  "marketplacePlugins": "plugins",
+  "marketplaceTitle": "Marketplace",
+  "marketplaceCommunity": "Made by the community, reviewed in the open. ",
+  "marketplaceShareYours": "Share yours",
+  "marketplaceShareEnd": ".",
+  "marketplaceNothingHere": "Nothing here yet: be the first to share one.",
+  "marketplaceInstallTitle": "install {name}",
+  "@marketplaceInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceWarning": "Plugins can control the player, change your library and reach the internet, whatever they ask for. Install plugins from authors you trust.",
+  "marketplaceAsksFor": " It asks for: {permissions}.",
+  "@marketplaceAsksFor": {
+    "placeholders": {
+      "permissions": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceInstall": "install",
+  "marketplaceByAuthor": "{version} · by {author}",
+  "@marketplaceByAuthor": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceAsksForList": "asks for {permissions}",
+  "@marketplaceAsksForList": {
+    "placeholders": {
+      "permissions": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceBuiltIn": "built in",
+  "marketplaceRemove": "remove",
+  "marketplaceOlder": "made for an older MixMusic",
+  "marketplaceInstalling": "installing…",
+  "marketplaceUpdateTo": "update to {version}",
+  "@marketplaceUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceUse": "Use {name}",
+  "@marketplaceUse": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceUseIt": "use it",
+  "marketplaceEnable": "enable",
+  "marketplaceInstalled": "Installed {name}",
+  "@marketplaceInstalled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceUpdated": "Updated {name}",
+  "@marketplaceUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "marketplaceRemoved": "Removed {name}",
+  "@marketplaceRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

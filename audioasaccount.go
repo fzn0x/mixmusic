@@ -1,6 +1,10 @@
 package main
 
-import "github.com/egoist/mygo/ui"
+import (
+	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
+)
 
 // audioAsAccountOffer offers, once, to play audio as the account, when the
 // accounts tell that the YouTube Music account has Premium and the switch
@@ -24,18 +28,18 @@ func (s *shell) audioAsAccountOffer(c *ui.Context) {
 		s.save()
 	}
 	open := true
-	s.dialog(c, &open, dialogOptions{key: "audio-as-account-offer", title: "play audio as your account", width: 480, alert: true,
-		message: audioAsAccountOfferText}, func() {
-		ui.Text(c, audioAsAccountOfferText).FontSize(k.bodySize())
-		ui.Text(c, "You can change this in Settings › Playback › Sound.").FontSize(k.smallSize()).TextColor(k.muted)
+	s.dialog(c, &open, dialogOptions{key: "audio-as-account-offer", title: locales.AudioAccount2Title(), width: 480, alert: true,
+		message: audioAsAccountOfferText()}, func() {
+		ui.Text(c, audioAsAccountOfferText()).FontSize(k.bodySize())
+		ui.Text(c, locales.AudioAccount2Change()).FontSize(k.smallSize()).TextColor(k.muted)
 	}, func() {
 		// The offer comes unasked, and takes the focus from where it was:
 		// not now has it, so that a Space pressed for the music or typed
 		// in a search turns nothing on.
-		if s.dialogButton(c, "audio-as-account-not-now", "not now", false).AutoFocus().Clicked() {
+		if s.dialogButton(c, "audio-as-account-not-now", locales.AudioAccount2NotNow(), false).AutoFocus().Clicked() {
 			answer(false)
 		}
-		if s.dialogButton(c, "audio-as-account-on", "turn on", true).Clicked() {
+		if s.dialogButton(c, "audio-as-account-on", locales.AudioAccount2TurnOn(), true).Clicked() {
 			answer(true)
 		}
 	})
@@ -46,6 +50,4 @@ func (s *shell) audioAsAccountOffer(c *ui.Context) {
 
 // audioAsAccountOfferText tells what playing audio as the account brings,
 // and what it risks.
-const audioAsAccountOfferText = "Your YouTube Music account has Premium, whose audio has a higher bitrate. MixMusic can ask " +
-	"for each track's audio as your account to play it. YouTube may flag an account used this way, and tracks may start " +
-	"more slowly. A track it can't get this way plays as before."
+func audioAsAccountOfferText() string { return locales.AudioAccount2Offer() }

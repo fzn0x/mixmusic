@@ -12,6 +12,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -101,7 +102,7 @@ func OpenNotch(a *app.App) *mygo.Window {
 	n := &notch{s: newShell(a, a.GoPlayer()), housing: h}
 	r := h.compact()
 	win := mygo.NewWindow(mygo.WindowOptions{
-		Title:  "MixMusic around the notch",
+		Title:  locales.NotchPanelWindowTitle(),
 		X:      r.X,
 		Y:      r.Y,
 		Width:  r.Width,
@@ -123,7 +124,7 @@ func OpenNotch(a *app.App) *mygo.Window {
 	n.place = func(r mygo.Rectangle) { mygo.App.WhenReady(func() { win.SetBounds(r) }) }
 	win.SetBounds(r)
 	win.SetVisibleOnAllWorkspaces(true)
-	n.s.follow(n.host.close)
+	n.s.follow(n.host.close, mygo.App.OnLocaleChanged(func(string) { win.SetTitle(locales.NotchPanelWindowTitle()) }))
 	win.ShowInactive()
 	return win
 }
@@ -278,16 +279,16 @@ func (n *notch) topRow(c *ui.Context, cx, alpha float32) {
 	top := (hh - art) / 2
 	if alpha > 0 {
 		open := n.s.buttonBase(c.Key("notch-main")).Absolute().Left(cx-hw/2-wing-notchOpenRoom+6).Top((hh-28)/2).
-			Size(28, 28).Radius(14).Label("Open MixMusic").Cursor(ui.CursorPointer).Opacity(alpha).Disabled(!n.open)
+			Size(28, 28).Radius(14).Label(locales.NotchPanelOpenMixMusic()).Cursor(ui.CursorPointer).Opacity(alpha).Disabled(!n.open)
 		n.buttonLook(open, false, false)
 		open.Children(func() { ui.Icon(c, icon("mini")).FontSize(15).TextColor(notchWhite) })
 		if open.Clicked() {
 			n.openMixMusic("")
 		}
 	}
-	label := "Open the player"
+	label := locales.NotchPanelOpenPlayer()
 	if n.open {
-		label = "Close the player"
+		label = locales.NotchPanelClosePlayer()
 	}
 	left := n.s.buttonBase(c.Key("notch-left")).Absolute().Left(cx-hw/2-wing).Top(0).Size(wing, hh).
 		Label(label).Cursor(ui.CursorPointer)
@@ -313,12 +314,12 @@ func (n *notch) topRow(c *ui.Context, cx, alpha float32) {
 	right.Children(func() {
 		box := ui.Box(c).Absolute().Left(wing-notchInset-art).Top(top).Size(art, art).Center()
 		if s.st.Loading || s.st.Waiting && s.st.WillPlay {
-			box.Children(func() { ui.Spinner(c).FontSize(art * 0.7).TextColor(notchWhite).Label("Loading") })
+			box.Children(func() { ui.Spinner(c).FontSize(art * 0.7).TextColor(notchWhite).Label(locales.PlayerLoading()) })
 			return
 		}
 		playing := s.st.Playing
 		moving := playing && !c.Preferences().ReduceMotion
-		box.Label(pick(playing, "Playing", "Paused")).Draw(func(p *ui.Painter, r ui.Rect) {
+		box.Label(pick(playing, locales.NotchPanelPlaying(), locales.NotchPanelPaused())).Draw(func(p *ui.Painter, r ui.Rect) {
 			drawBars(p, r, playing, moving)
 		})
 	})
@@ -363,7 +364,7 @@ func (n *notch) body(c *ui.Context, t media.Track) {
 	ui.Column(c).Width(232).Shrink(0).Gap(8).Children(func() {
 		ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
 			cover := n.s.buttonBase(c.Key("notch-cover")).Size(64, 64).Radius(10).Clip().Shrink(0).
-				Label("Show what plays in MixMusic").Cursor(ui.CursorPointer)
+				Label(locales.NotchPanelShowPlays()).Cursor(ui.CursorPointer)
 			if cover.FocusVisible() {
 				n.keyFocus = true
 			}
@@ -378,7 +379,7 @@ func (n *notch) body(c *ui.Context, t media.Track) {
 		})
 		n.progress(c, t)
 		ui.Row(c).Gap(14).Justify(ui.Center).AlignItems(ui.Center).Children(func() {
-			if n.transport(c, "notch-previous", "previous", "Previous", false, false).Clicked() {
+			if n.transport(c, "notch-previous", "previous", locales.PlayerPrevious(), false, false).Clicked() {
 				s.p.Previous()
 			}
 			name, label := toggleOf(s.st)
@@ -386,7 +387,7 @@ func (n *notch) body(c *ui.Context, t media.Track) {
 			if toggle.Clicked() {
 				s.p.Toggle()
 			}
-			if n.transport(c, "notch-next", "next", "Next", false, false).Clicked() {
+			if n.transport(c, "notch-next", "next", locales.PlayerNext(), false, false).Clicked() {
 				s.p.Next()
 			}
 		})
@@ -460,12 +461,12 @@ func (n *notch) progress(c *ui.Context, t media.Track) {
 			ui.Text(c, text).FontSize(11).TextColor(notchMuted).FontFeatures("tnum").Width(34).TextAlign(ui.Center).Shrink(0)
 		}
 		if s.st.Live {
-			caption("live")
+			caption(locales.PlayerLive())
 		} else {
 			caption(clock(time.Duration(n.seekTo * float64(time.Second))))
 		}
 		seek := ui.SliderBase(c.Key("notch-seek"), &n.seekTo, 0, max(dur.Seconds(), 1)).Grow(1).MinWidth(0).
-			Height(14).PaddingX(4).Label("Seek").Disabled(s.st.Live || s.st.Loading)
+			Height(14).PaddingX(4).Label(locales.PlayerSeek()).Disabled(s.st.Live || s.st.Loading)
 		_, _, held := seek.Dragged()
 		if !held && (n.seeking || seek.Changed()) {
 			s.p.Seek(time.Duration(n.seekTo * float64(time.Second)))
@@ -513,26 +514,26 @@ func (n *notch) lyrics(c *ui.Context, t media.Track) {
 	l := fetch(s, "lyrics:"+t.ID, func(ctx context.Context) (lyrics.Lyrics, error) { return s.svc.Catalog.Lyrics(ctx, t) })
 	switch {
 	case !l.done:
-		note("Looking for the lyrics…")
+		note(locales.NotchPanelLyricsLooking())
 		return
 	case l.err != nil:
 		note(l.err.Error())
 		// A track without lyrics stays so; a failure may pass.
 		if !errors.Is(l.err, lyrics.ErrNotFound) {
 			again := n.s.buttonBase(c.Key("notch-lyrics-retry")).Padding(4, 10).Radius(12).Border(1, notchMuted).
-				AlignSelf(ui.Start).Label("try again").Cursor(ui.CursorPointer)
+				AlignSelf(ui.Start).Label(locales.WidgetsTryAgain()).Cursor(ui.CursorPointer)
 			n.buttonLook(again, false, false)
-			again.Children(func() { ui.Text(c, "try again").FontSize(12).TextColor(notchWhite) })
+			again.Children(func() { ui.Text(c, locales.WidgetsTryAgain()).FontSize(12).TextColor(notchWhite) })
 			if again.Clicked() {
 				s.forget("lyrics:" + t.ID)
 			}
 		}
 		return
 	case l.value.Instrumental:
-		note("This track is instrumental.")
+		note(locales.NotchPanelInstrumental())
 		return
 	case !l.value.Synced || len(l.value.Lines) == 0:
-		note("No timed lyrics.")
+		note(locales.NotchPanelNoTimed())
 		return
 	}
 	lines := l.value.Lines

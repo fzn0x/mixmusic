@@ -1,6 +1,10 @@
 package main
 
-import "github.com/egoist/mygo/ui"
+import (
+	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
+)
 
 // The mini player's transport row (#371): shuffle, previous, play, next
 // and repeat, then the like, dislike and volume buttons. The artwork gives
@@ -82,7 +86,7 @@ func (s *shell) miniHiddenItems(m *ui.Menu) {
 	hid := false
 	if !r.shows(miniShuffle) {
 		hid = true
-		if m.Item("Shuffle").Checked(s.st.Shuffle).Chosen() {
+		if m.Item(locales.PlayerShuffle()).Checked(s.st.Shuffle).Chosen() {
 			s.p.ToggleShuffle()
 		}
 	}
@@ -96,14 +100,14 @@ func (s *shell) miniHiddenItems(m *ui.Menu) {
 	if ok && !r.shows(miniLike) {
 		hid = true
 		liked := s.a.IsLiked(cur.Track.ID)
-		if m.Item("Like").Checked(liked).Chosen() {
+		if m.Item(locales.PlayerLike()).Checked(liked).Chosen() {
 			s.setLiked(cur.Track, !liked)
 		}
 	}
 	if ok && !r.shows(miniDislike) {
 		hid = true
 		disliked := s.a.IsDisliked(cur.Track.ID)
-		if m.Item("Dislike").Checked(disliked).Chosen() {
+		if m.Item(locales.PlayerDislike()).Checked(disliked).Chosen() {
 			s.setDisliked(cur.Track, !disliked)
 		}
 	}

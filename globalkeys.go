@@ -11,6 +11,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // globalRecording starts recording, before a command's ID, while the user
@@ -20,20 +21,45 @@ const globalRecording = "global:"
 
 // globalHint is the first line of the group of global shortcuts on goos.
 func globalHint(goos string) string {
-	hint := "These keys control MixMusic whichever window is in front, and while it runs they do nothing else."
 	switch goos {
 	case "linux":
-		hint += " On Wayland your desktop asks you to confirm them, and its keyboard settings can change them."
+		return locales.GlobalKeysHintLinux()
 	case "darwin":
-		hint += " A letter is the key in its place on a US keyboard."
+		return locales.GlobalKeysHintMac()
 	}
-	return hint
+	return locales.GlobalKeysHint()
+}
+
+// globalCommandTitle names a command of the global shortcuts in the language
+// shown: the title internal/app gives it is English.
+func globalCommandTitle(gc app.GlobalCommand) string {
+	switch gc.ID {
+	case "player.toggle":
+		return locales.CmdPlayerToggle()
+	case "player.next":
+		return locales.CmdPlayerNext()
+	case "player.previous":
+		return locales.CmdPlayerPrevious()
+	case "player.volumeUp":
+		return locales.CmdPlayerVolumeUp()
+	case "player.volumeDown":
+		return locales.CmdPlayerVolumeDown()
+	case "player.mute":
+		return locales.CmdPlayerMute()
+	case "player.like":
+		return locales.CmdPlayerLike()
+	case "player.dislike":
+		return locales.CmdPlayerDislike()
+	case "app.show":
+		return locales.GlobalKeysShowApp()
+	}
+	return gc.Title
 }
 
 // globalShortcutSettings list the commands that global shortcuts run, and
 // their keys, which the user records as the window's shortcuts.
 func (s *shell) globalShortcutSettings(c *ui.Context) {
-	s.group(c, "From any app", func() {
+	s.group(c, locales.GlobalKeysGroup(), func() {
 		s.hint(c, globalHint(runtime.GOOS))
 		for _, gc := range app.GlobalCommands {
 			s.globalShortcutRow(c, gc)
@@ -56,7 +82,7 @@ func (s *shell) globalShortcutRow(c *ui.Context, gc app.GlobalCommand) {
 	if s.find.sifting() {
 		words = []string{"global", shortcutWords(keys)}
 	}
-	if !s.findable(gc.Title, problem, words...) {
+	if !s.findable(globalCommandTitle(gc), problem, words...) {
 		return
 	}
 	s.show(c, func() { s.globalShortcutRowOf(c, gc, keys, problem, recording) })
@@ -67,30 +93,30 @@ func (s *shell) globalShortcutRowOf(c *ui.Context, gc app.GlobalCommand, keys, p
 	k := &s.lk
 	ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
-			ui.Text(c, gc.Title).FontSize(k.bodySize())
+			ui.Text(c, globalCommandTitle(gc)).FontSize(k.bodySize())
 			switch {
 			case recording:
 				// Keys in use elsewhere never reach the window.
-				ui.Text(c, "If nothing happens, these keys are in use elsewhere.").FontSize(k.smallSize()).TextColor(k.muted)
+				ui.Text(c, locales.GlobalKeysInUse()).FontSize(k.smallSize()).TextColor(k.muted)
 			case problem != "":
 				ui.Row(c).Wrap().Gap(12).AlignItems(ui.Center).Children(func() {
 					ui.Text(c, problem).FontSize(k.smallSize()).TextColor(k.danger).MinWidth(0)
-					if s.link(c, "global-retry-"+gc.ID, "try again") {
+					if s.link(c, "global-retry-"+gc.ID, locales.WidgetsTryAgain()) {
 						s.svc.Preferences.RetryGlobalShortcuts()
 					}
 				})
 			}
 		})
 		ui.Row(c).Shrink(0).Gap(8).Children(func() {
-			label, ink, action := shortcutLabel(keys), k.muted, "change"
+			label, ink, action := shortcutLabel(keys), k.muted, locales.ShortcutsChange()
 			switch {
 			case recording:
-				label, ink, action = "press the keys · esc cancels · backspace removes", k.accent, "cancel"
+				label, ink, action = locales.GlobalKeysRecording(), k.accent, locales.ShortcutsCancel()
 			case label == "":
-				label, action = "none", "set"
+				label, action = locales.ShortcutsNone(), locales.ShortcutsSet()
 			}
 			ui.Text(c, label).FontSize(k.smallSize()).TextColor(ink).MinWidth(120).TextAlign(ui.End).AlignSelf(ui.Center)
-			b := s.button(c, "global-edit-"+gc.ID, action, false).Label(action + " the global shortcut of " + gc.Title)
+			b := s.button(c, "global-edit-"+gc.ID, action, false).Label(locales.GlobalKeysEditLabel(action, globalCommandTitle(gc)))
 			if recording {
 				// The keys pressed name the shortcut, until the button
 				// loses the focus, as the window does.
@@ -104,11 +130,11 @@ func (s *shell) globalShortcutRowOf(c *ui.Context, gc app.GlobalCommand, keys, p
 				s.recording, s.recordingFocused = "", false
 				if !recording {
 					s.recording = globalRecording + gc.ID
-					c.Announce("Press the keys of the global shortcut of " + gc.Title + ". Escape cancels, Backspace removes it.")
+					c.Announce(locales.GlobalKeysAnnounce(globalCommandTitle(gc)))
 				}
 			}
 			if keys != "" && !recording &&
-				s.button(c, "global-remove-"+gc.ID, "remove", false).Label("remove the global shortcut of "+gc.Title).Clicked() {
+				s.button(c, "global-remove-"+gc.ID, locales.ComputerSettingsRemove(), false).Label(locales.GlobalKeysRemoveLabel(globalCommandTitle(gc))).Clicked() {
 				s.setGlobalShortcut(gc, "")
 			}
 		})
@@ -166,7 +192,7 @@ func (s *shell) setGlobalShortcut(gc app.GlobalCommand, keys string) {
 	for _, other := range s.commands() {
 		if other.id != gc.ID && sameShortcut(s.shortcutOf(other), keys) {
 			s.set.Shortcuts[other.id] = ""
-			s.notes = append(s.notes, notice(other.title+" has no shortcut now"))
+			s.notes = append(s.notes, notice(locales.ShortcutsDisplaced(other.title)))
 		}
 	}
 	s.set.GlobalShortcuts[gc.ID] = keys
@@ -183,7 +209,7 @@ func (s *shell) giveUpGlobal(id, keys string) {
 	for _, gc := range app.GlobalCommands {
 		if gc.ID != id && sameShortcut(s.set.GlobalShortcuts[gc.ID], keys) {
 			delete(s.set.GlobalShortcuts, gc.ID)
-			s.notes = append(s.notes, notice(gc.Title+" has no global shortcut now"))
+			s.notes = append(s.notes, notice(locales.GlobalKeysNoGlobal(globalCommandTitle(gc))))
 		}
 	}
 }

@@ -15,31 +15,29 @@ import (
 
 // translateLanguages are the languages Settings › Playback offers to
 // translate lyrics to, by their codes of ISO 639-1.
-var translateLanguages = []struct{ code, name string }{
-	{"af", "Afrikaans"}, {"ar", "Arabic"}, {"bg", "Bulgarian"}, {"bn", "Bengali"}, {"ca", "Catalan"},
-	{"zh", "Chinese (Simplified)"}, {"zh-Hant", "Chinese (Traditional)"}, {"hr", "Croatian"}, {"cs", "Czech"},
-	{"da", "Danish"}, {"nl", "Dutch"}, {"en", "English"}, {"et", "Estonian"}, {"tl", "Filipino"},
-	{"fi", "Finnish"}, {"fr", "French"}, {"de", "German"}, {"el", "Greek"}, {"he", "Hebrew"},
-	{"hi", "Hindi"}, {"hu", "Hungarian"}, {"id", "Indonesian"}, {"it", "Italian"}, {"ja", "Japanese"},
-	{"ko", "Korean"}, {"lv", "Latvian"}, {"lt", "Lithuanian"}, {"ms", "Malay"}, {"no", "Norwegian"},
-	{"fa", "Persian"}, {"pl", "Polish"}, {"pt", "Portuguese"}, {"ro", "Romanian"}, {"ru", "Russian"},
-	{"sr", "Serbian"}, {"sk", "Slovak"}, {"sl", "Slovenian"}, {"es", "Spanish"}, {"sw", "Swahili"},
-	{"sv", "Swedish"}, {"ta", "Tamil"}, {"te", "Telugu"}, {"th", "Thai"}, {"tr", "Turkish"},
-	{"uk", "Ukrainian"}, {"ur", "Urdu"}, {"vi", "Vietnamese"},
+var translateLanguages = []struct {
+	code string
+	name func() string
+}{
+	{"af", locales.LyricsLangAfrikaans}, {"ar", locales.LyricsLangArabic}, {"bg", locales.LyricsLangBulgarian}, {"bn", locales.LyricsLangBengali}, {"ca", locales.LyricsLangCatalan},
+	{"zh", locales.LyricsLangChineseSimplified}, {"zh-Hant", locales.LyricsLangChineseTraditional}, {"hr", locales.LyricsLangCroatian}, {"cs", locales.LyricsLangCzech}, {"da", locales.LyricsLangDanish},
+	{"nl", locales.LyricsLangDutch}, {"en", locales.LyricsLangEnglish}, {"et", locales.LyricsLangEstonian}, {"tl", locales.LyricsLangFilipino}, {"fi", locales.LyricsLangFinnish},
+	{"fr", locales.LyricsLangFrench}, {"de", locales.LyricsLangGerman}, {"el", locales.LyricsLangGreek}, {"he", locales.LyricsLangHebrew}, {"hi", locales.LyricsLangHindi},
+	{"hu", locales.LyricsLangHungarian}, {"id", locales.LyricsLangIndonesian}, {"it", locales.LyricsLangItalian}, {"ja", locales.LyricsLangJapanese}, {"ko", locales.LyricsLangKorean},
+	{"lv", locales.LyricsLangLatvian}, {"lt", locales.LyricsLangLithuanian}, {"ms", locales.LyricsLangMalay}, {"no", locales.LyricsLangNorwegian}, {"fa", locales.LyricsLangPersian},
+	{"pl", locales.LyricsLangPolish}, {"pt", locales.LyricsLangPortuguese}, {"ro", locales.LyricsLangRomanian}, {"ru", locales.LyricsLangRussian}, {"sr", locales.LyricsLangSerbian},
+	{"sk", locales.LyricsLangSlovak}, {"sl", locales.LyricsLangSlovenian}, {"es", locales.LyricsLangSpanish}, {"sw", locales.LyricsLangSwahili}, {"sv", locales.LyricsLangSwedish},
+	{"ta", locales.LyricsLangTamil}, {"te", locales.LyricsLangTelugu}, {"th", locales.LyricsLangThai}, {"tr", locales.LyricsLangTurkish}, {"uk", locales.LyricsLangUkrainian},
+	{"ur", locales.LyricsLangUrdu}, {"vi", locales.LyricsLangVietnamese},
 }
 
-// The tips of the switches above the lyrics, which tell what they send,
-// as only they do.
-const (
-	translateTip = "Shows each line's translation under it. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them."
-	romanizeTip  = "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google romanize them."
-)
-
 // romanizeNames are the names of the switch that shows lyrics in Latin
-// letters, and of its ways, for Japanese and for the other languages.
-var romanizeNames = map[bool][3]string{
-	true:  {"romaji", "romaji under", "romaji only"},
-	false: {"romanize", "romanized under", "romanized only"},
+// letters, and of its ways, for Japanese (romaji) and for the other languages.
+func romanizeNames(romaji bool) [3]string {
+	if romaji {
+		return [3]string{locales.LyricsRomaji(), locales.LyricsRomajiUnder(), locales.LyricsRomajiOnly()}
+	}
+	return [3]string{locales.LyricsRomanize(), locales.LyricsRomanizeUnder(), locales.LyricsRomanizeOnly()}
 }
 
 // translateTarget is the language lyrics translate to: the one chosen in
@@ -177,19 +175,19 @@ func (s *shell) lyricsChoices(c *ui.Context, t media.Track, ly lyrics.Lyrics, wh
 	if tr == nil {
 		return x
 	}
-	what := "Romanization"
+	waiting, failed := locales.LyricsRomanizationWaiting(), locales.LyricsRomanizationFailed()
 	if x.translate {
-		what = "Translation"
+		waiting, failed = locales.LyricsTranslationWaiting(), locales.LyricsTranslationFailed()
 	}
 	switch {
 	case !tr.done && (x.translate || x.roman == nil):
-		s.lyricsNote(c, what+" is on its way…")
+		s.lyricsNote(c, waiting)
 	case tr.err != nil && (x.translate || x.local == ""):
 		// One quiet line; the lyrics show all the same.
 		k := &s.lk
 		ui.Row(c).Padding(0, 24, 8).Gap(12).AlignItems(ui.Center).Shrink(0).Children(func() {
-			ui.Text(c, what+" isn't available right now.").FontSize(k.smallSize()).TextColor(k.muted)
-			if s.link(c, "lyrics-translate-again-"+where, "try again") {
+			ui.Text(c, failed).FontSize(k.smallSize()).TextColor(k.muted)
+			if s.link(c, "lyrics-translate-again-"+where, locales.WidgetsTryAgain()) {
 				s.svc.Catalog.TranslateAgain()
 				s.forget(translationKey(t, translationInto(ly, to, x.translate)))
 			}
@@ -236,14 +234,14 @@ func (s *shell) lyricsSwitches(c *ui.Context, ly lyrics.Lyrics, lang, where stri
 			if s.set.LyricsPlain {
 				mode = 1
 			}
-			if s.segmented(c, "lyrics-mode-"+where, "Show lyrics as", &mode, "synced", "plain text") {
+			if s.segmented(c, "lyrics-mode-"+where, locales.LyricsShowAs(), &mode, locales.LyricsSynced(), locales.LyricsPlainText()) {
 				s.set.LyricsPlain = mode == 1
 				s.save()
 			}
 		}
 		if canTranslate {
 			on := x.translate
-			if s.lyricsSwitch(c, "lyrics-translate-"+where, "translate", "Translate lyrics", translateTip, &on) {
+			if s.lyricsSwitch(c, "lyrics-translate-"+where, locales.LyricsTranslate(), locales.LyricsTranslateLyrics(), locales.LyricsTranslateTip(), &on) {
 				x.translate = on
 				s.set.LyricsTranslate = slices.DeleteFunc(slices.Clone(s.set.LyricsTranslate), func(l string) bool { return l == lang })
 				if on {
@@ -258,18 +256,18 @@ func (s *shell) lyricsSwitches(c *ui.Context, ly lyrics.Lyrics, lang, where stri
 		// The switch and its ways go on one line. Japanese is romaji, kept
 		// as "ja" though MixMusic couldn't tell the lyrics' language.
 		ui.Row(c).Gap(16).AlignItems(ui.Center).Shrink(0).Children(func() {
-			as, tip := lang, romanizeTip
+			as, tip := lang, locales.LyricsRomanizeTip()
 			switch {
 			case x.ja:
-				as, tip = "ja", romajiTip
+				as, tip = "ja", locales.LyricsRomajiTip()
 			case unisonFirst[x.local]:
-				as, tip = x.local, unisonFirstTip
+				as, tip = x.local, locales.LyricsUnisonFirstTip()
 			case x.local != "":
-				as, tip = x.local, localTip
+				as, tip = x.local, locales.LyricsLocalTip()
 			}
-			names := romanizeNames[as == "ja"]
+			names := romanizeNames(as == "ja")
 			on := x.romanize != ""
-			if s.lyricsSwitch(c, "lyrics-romanize-"+where, names[0], "Show lyrics in Latin letters", tip, &on) {
+			if s.lyricsSwitch(c, "lyrics-romanize-"+where, names[0], locales.LyricsShowInLatin(), tip, &on) {
 				x.romanize = ""
 				if on {
 					x.romanize = settings.RomanizeUnder
@@ -283,7 +281,7 @@ func (s *shell) lyricsSwitches(c *ui.Context, ly lyrics.Lyrics, lang, where stri
 			if x.romanize == settings.RomanizeOnly {
 				mode = 1
 			}
-			if s.segmented(c, "lyrics-romanize-mode-"+where, "Show lyrics in Latin letters", &mode, names[1], names[2]) {
+			if s.segmented(c, "lyrics-romanize-mode-"+where, locales.LyricsShowInLatin(), &mode, names[1], names[2]) {
 				x.romanize = settings.RomanizeUnder
 				if mode == 1 {
 					x.romanize = settings.RomanizeOnly
@@ -331,12 +329,12 @@ func (s *shell) translateOptions() []string {
 	system := s.systemLanguage()
 	for _, l := range translateLanguages {
 		if l.code == system {
-			system = l.name
+			system = l.name()
 		}
 	}
 	options := []string{locales.LyricsSettingsSystemLanguage(system)}
 	for _, l := range translateLanguages {
-		options = append(options, l.name)
+		options = append(options, l.name())
 	}
 	return options
 }

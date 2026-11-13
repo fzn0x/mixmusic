@@ -8,6 +8,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 const (
@@ -35,7 +36,7 @@ func OpenMini(a *app.App) *mygo.Window {
 	registerFonts()
 	s := newShell(a, a.GoPlayer())
 	s.attach(mygo.NewWindow(mygo.WindowOptions{
-		Title:       "MixMusic mini player",
+		Title:       locales.MiniWindowTitle(),
 		Width:       miniWidth,
 		Height:      miniHeight,
 		MinWidth:    miniMinWidth,
@@ -53,7 +54,7 @@ func OpenMini(a *app.App) *mygo.Window {
 	s.mini.win = nativeMini{s.win}
 	// Closed with its panel open, the window keeps the player's size for
 	// the next time, which opens the panel again.
-	s.follow(append(s.followMiniPanel(), s.win.OnClose(func(*mygo.CloseEvent) { s.compactMini() }))...)
+	s.follow(append(s.followMiniPanel(), mygo.App.OnLocaleChanged(func(string) { s.win.SetTitle(locales.MiniWindowTitle()) }), s.win.OnClose(func(*mygo.CloseEvent) { s.compactMini() }))...)
 	s.captureMiniFromEnv()
 	return s.win
 }
@@ -144,12 +145,12 @@ func (s *shell) miniBody(c *ui.Context, w float32) {
 	cur, ok := s.st.Current()
 	ui.Column(c).Grow(1).MinWidth(0).Padding(2, 0, miniSeekRoom-4).PaddingStart(12).PaddingEnd(4).
 		Gap(4).Justify(ui.Center).Children(func() {
-		title, line := k.words("Nothing playing"), "play something in MixMusic"
+		title, line := k.words(locales.MiniRowNothingPlaying()), locales.MiniRowPlaySomething()
 		if ok {
 			title, line = cur.Track.Title, names(cur.Track.Artists)
 		}
 		if ok && s.st.Waiting {
-			line += " · waiting for the network"
+			line = locales.PlayerWaiting(line)
 		}
 		ui.Column(c).MinWidth(0).Children(func() {
 			ui.Row(c).Gap(2).AlignItems(ui.Center).MinWidth(0).Children(func() {
@@ -158,10 +159,10 @@ func (s *shell) miniBody(c *ui.Context, w float32) {
 				// Both close this window once this frame is drawn: on Linux
 				// the frame draws in the window's GL area, and GTK crashed
 				// finishing it once the window was gone (#37).
-				if s.miniButton(c, "mini-open", "mini", "Open MixMusic", false, 26, 15).Clicked() {
+				if s.miniButton(c, "mini-open", "mini", locales.MiniRowOpen(), false, 26, 15).Clicked() {
 					go s.svc.System.ShowMainWindow()
 				}
-				if s.miniButton(c, "mini-close", "close", "Close the mini player", false, 26, 15).Clicked() {
+				if s.miniButton(c, "mini-close", "close", locales.MiniRowClose(), false, 26, 15).Clicked() {
 					go s.win.Close()
 				}
 			})
@@ -172,7 +173,7 @@ func (s *shell) miniBody(c *ui.Context, w float32) {
 				ui.Text(c, line).FontSize(k.smallSize()).TextColor(k.muted).SingleLine().Grow(1).MinWidth(0)
 				switch {
 				case ok && s.st.Live:
-					ui.Text(c, k.sentence("live")).FontSize(k.captionSize()).TextColor(k.accent).Shrink(0).SingleLine()
+					ui.Text(c, k.sentence(locales.PlayerLive())).FontSize(k.captionSize()).TextColor(k.accent).Shrink(0).SingleLine()
 				case ok:
 					ui.Text(c, clock(s.st.Position)+" / "+clock(s.miniDuration())).FontSize(k.captionSize()).
 						TextColor(k.muted).FontFeatures("tnum").Shrink(0).SingleLine()
@@ -195,12 +196,12 @@ func (s *shell) miniControls(c *ui.Context, w float32) {
 	ui.Row(c).Gap(r.groupGap).AlignItems(ui.Center).Children(func() {
 		ui.Row(c).Gap(r.gap).AlignItems(ui.Center).Children(func() {
 			if r.shows(miniShuffle) {
-				shuffle := s.miniButton(c, "mini-shuffle", "shuffle", "Shuffle", s.st.Shuffle, 28, 16)
+				shuffle := s.miniButton(c, "mini-shuffle", "shuffle", locales.PlayerShuffle(), s.st.Shuffle, 28, 16)
 				if shuffle.Role(ui.RoleToggleButton).Checked(s.st.Shuffle).Size(28, 32).Clicked() {
 					s.p.ToggleShuffle()
 				}
 			}
-			if s.miniButton(c, "mini-previous", "previous", "Previous", false, 30, 18).Size(30, 32).Clicked() {
+			if s.miniButton(c, "mini-previous", "previous", locales.PlayerPrevious(), false, 30, 18).Size(30, 32).Clicked() {
 				s.p.Previous()
 			}
 			name, label := toggleOf(s.st)
@@ -211,7 +212,7 @@ func (s *shell) miniControls(c *ui.Context, w float32) {
 			if toggle.Clicked() {
 				s.p.Toggle()
 			}
-			if s.miniButton(c, "mini-next", "next", "Next", false, 30, 18).Size(30, 32).Clicked() {
+			if s.miniButton(c, "mini-next", "next", locales.PlayerNext(), false, 30, 18).Size(30, 32).Clicked() {
 				s.p.Next()
 			}
 			if r.shows(miniRepeat) {
@@ -244,11 +245,11 @@ func (s *shell) miniButton(c *ui.Context, key, name, label string, on bool, size
 func repeatOf(r player.Repeat) (name, label string) {
 	switch r {
 	case player.RepeatAll:
-		return "repeat", "Repeat: all"
+		return "repeat", locales.PlayerRepeatAll()
 	case player.RepeatOne:
-		return "repeatOne", "Repeat: one"
+		return "repeatOne", locales.PlayerRepeatOne()
 	}
-	return "repeat", "Repeat: off"
+	return "repeat", locales.PlayerRepeatOff()
 }
 
 // miniDuration is the length of the track playing: the engine's, or the
@@ -274,7 +275,7 @@ func (s *shell) applyMiniZoom(c *ui.Context) {
 	c.SetZoom(float32(z))
 	if s.zoomToast {
 		s.zoomToast = false
-		c.Announce("Zoom " + percent(z))
+		c.Announce(locales.MenuZoomTitle(percent(z)))
 	}
 	if z == was || s.win == nil {
 		return

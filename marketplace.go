@@ -8,9 +8,15 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 var marketTabs = []string{"themes", "plugins"}
+
+// marketTabLabels are the names of marketTabs, in the language the app shows.
+func marketTabLabels() []string {
+	return []string{locales.MarketplaceThemes(), locales.MarketplacePlugins()}
+}
 
 // marketplacePage shows the themes and plugins of the community registry.
 func (s *shell) marketplacePage(c *ui.Context, tab string) {
@@ -26,7 +32,7 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 		if reg.done && reg.err == nil {
 			counts = []int{len(reg.value.Themes), len(reg.value.Plugins)}
 		}
-		s.pageHeaderCounts(c, "Marketplace", marketTabs, counts, &selected)
+		s.pageHeaderCounts(c, locales.MarketplaceTitle(), marketTabLabels(), counts, &selected)
 		if selected != before {
 			s.router.Replace("/marketplace/" + marketTabs[selected])
 		}
@@ -35,9 +41,9 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 			kind = addons.KindPlugin
 		}
 		ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 24).Children(func() {
-			ui.Text(c, "Made by the community, reviewed in the open. ")
-			s.linkOf(c, "Share yours", "https://github.com/fzn0x/mixmusic/blob/main/community/README.md")
-			ui.Text(c, ".")
+			ui.Text(c, locales.MarketplaceCommunity())
+			s.linkOf(c, locales.MarketplaceShareYours(), "https://github.com/fzn0x/mixmusic/blob/main/community/README.md")
+			ui.Text(c, locales.MarketplaceShareEnd())
 		})
 		switch {
 		case !reg.done:
@@ -52,7 +58,7 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 			entries = reg.value.Plugins
 		}
 		if len(entries) == 0 {
-			s.emptyLine(c, "Nothing here yet: be the first to share one.")
+			s.emptyLine(c, locales.MarketplaceNothingHere())
 			return
 		}
 		ui.Row(c).Wrap().Gap(10).AlignItems(ui.Start).Children(func() {
@@ -61,9 +67,9 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 			}
 		})
 	})
-	if s.confirm(c, "install-plugin", &s.confirmingPlugin, "install "+s.pluginToInstall.Name,
-		"Plugins can control the player, change your library and reach the internet, whatever they ask for. Install plugins from authors you trust."+permissions(s.pluginToInstall),
-		"install") {
+	if s.confirm(c, "install-plugin", &s.confirmingPlugin, locales.MarketplaceInstallTitle(s.pluginToInstall.Name),
+		locales.MarketplaceWarning()+permissions(s.pluginToInstall),
+		locales.MarketplaceInstall()) {
 		s.install(addons.KindPlugin, s.pluginToInstall)
 	}
 }
@@ -72,7 +78,7 @@ func permissions(e addons.Entry) string {
 	if len(e.Permissions) == 0 {
 		return ""
 	}
-	return " It asks for: " + strings.Join(e.Permissions, ", ") + "."
+	return locales.MarketplaceAsksFor(strings.Join(e.Permissions, ", "))
 }
 
 // installed returns the version of an add-on installed, and whether it's
@@ -132,31 +138,31 @@ func (s *shell) marketCard(c *ui.Context, kind addons.Kind, e addons.Entry, base
 		})
 		ui.Column(c).Padding(16).Gap(6).Children(func() {
 			ui.Text(c, k.words(e.Name)).FontSize(k.size(1.5)).FontWeight(k.titleWeight()).Font(k.display).SingleLine()
-			ui.Text(c, e.Version+" · by "+e.Author).FontSize(k.captionSize()).TextColor(k.muted)
+			ui.Text(c, locales.MarketplaceByAuthor(e.Version, e.Author)).FontSize(k.captionSize()).TextColor(k.muted)
 			if e.Description != "" {
 				ui.Text(c, e.Description).FontSize(k.smallSize()).MaxLines(3)
 			}
 			if len(e.Permissions) > 0 {
-				ui.Text(c, k.sentence("asks for "+strings.Join(e.Permissions, ", "))).FontSize(k.captionSize()).TextColor(k.muted)
+				ui.Text(c, k.sentence(locales.MarketplaceAsksForList(strings.Join(e.Permissions, ", ")))).FontSize(k.captionSize()).TextColor(k.muted)
 			}
 			ui.Row(c).Gap(8).Margin(8, 0, 0).Children(func() {
 				busy := s.installingAddon == e.ID
 				switch {
 				case builtin:
-					ui.Text(c, k.sentence("built in")).FontSize(k.smallSize()).TextColor(k.muted)
+					ui.Text(c, k.sentence(locales.MarketplaceBuiltIn())).FontSize(k.smallSize()).TextColor(k.muted)
 				case has && !outdated:
-					if s.button(c, "remove-"+e.ID, "remove", false).Disabled(busy).Clicked() {
+					if s.button(c, "remove-"+e.ID, locales.MarketplaceRemove(), false).Disabled(busy).Clicked() {
 						s.uninstall(kind, e)
 					}
 				case kind == addons.KindPlugin && e.API != addons.PluginAPI:
-					ui.Text(c, k.sentence("made for an older MixMusic")).FontSize(k.smallSize()).TextColor(k.muted)
+					ui.Text(c, k.sentence(locales.MarketplaceOlder())).FontSize(k.smallSize()).TextColor(k.muted)
 				default:
-					label := "install"
+					label := locales.MarketplaceInstall()
 					switch {
 					case busy:
-						label = "installing…"
+						label = locales.MarketplaceInstalling()
 					case outdated:
-						label = "update to " + e.Version
+						label = locales.MarketplaceUpdateTo(e.Version)
 					}
 					if s.button(c, "install-"+e.ID, label, true).Disabled(busy).Clicked() {
 						if kind == addons.KindPlugin && !outdated {
@@ -169,11 +175,11 @@ func (s *shell) marketCard(c *ui.Context, kind addons.Kind, e addons.Entry, base
 				// The theme shown, which, while the themes follow the system,
 				// is the light or the dark one.
 				if has && kind == addons.KindTheme && s.set.ActiveTheme(s.lk.systemDark) != e.ID {
-					use := s.buttonBase(c.Key("use-" + e.ID)).Label("Use " + e.Name).Cursor(ui.CursorPointer)
+					use := s.buttonBase(c.Key("use-" + e.ID)).Label(locales.MarketplaceUse(e.Name)).Cursor(ui.CursorPointer)
 					if use.Clicked() {
 						s.chooseTheme(e.ID)
 					}
-					use.Children(func() { ui.Text(c, k.sentence("use it")).FontSize(k.smallSize()).TextColor(k.accent) })
+					use.Children(func() { ui.Text(c, k.sentence(locales.MarketplaceUseIt())).FontSize(k.smallSize()).TextColor(k.accent) })
 				}
 			})
 		})
@@ -192,15 +198,15 @@ func (s *shell) install(kind addons.Kind, e addons.Entry) {
 				s.notes = append(s.notes, noticeOf(err))
 				return
 			}
-			verb := "Installed "
+			message := locales.MarketplaceInstalled(e.Name)
 			if had {
-				verb = "Updated "
+				message = locales.MarketplaceUpdated(e.Name)
 			}
 			// What was installed is one click away from use.
 			id := e.ID
-			use := actionToast{message: verb + e.Name, action: "use it", run: func() { s.chooseTheme(id) }}
+			use := actionToast{message: message, action: locales.MarketplaceUseIt(), run: func() { s.chooseTheme(id) }}
 			if kind == addons.KindPlugin {
-				use.action, use.run = "enable", func() {
+				use.action, use.run = locales.MarketplaceEnable(), func() {
 					if !slices.Contains(s.set.EnabledPlugins, id) {
 						s.set.EnabledPlugins = append(slices.Clone(s.set.EnabledPlugins), id)
 						s.save()
@@ -228,5 +234,5 @@ func (s *shell) uninstall(kind addons.Kind, e addons.Entry) {
 		s.notes = append(s.notes, noticeOf(err))
 		return
 	}
-	s.notes = append(s.notes, notice("Removed "+e.Name))
+	s.notes = append(s.notes, notice(locales.MarketplaceRemoved(e.Name)))
 }

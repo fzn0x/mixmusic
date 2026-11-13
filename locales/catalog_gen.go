@@ -6987,3 +6987,11547 @@ func AccountSettingsNetEaseSignOutBody() string {
 func (msgs Messages) AccountSettingsNetEaseSignOutBody() string {
 	return Catalog.Format(msgs.locale, "accountSettingsNetEaseSignOutBody", nil)
 }
+
+// CmdPlayerToggle says "Play or pause"
+// in the language the app shows.
+func CmdPlayerToggle() string { return In(i18n.Locale()).CmdPlayerToggle() }
+
+// CmdPlayerToggle says "Play or pause"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerToggle() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerToggle", nil)
+}
+
+// CmdPlayerNext says "Next track"
+// in the language the app shows.
+func CmdPlayerNext() string { return In(i18n.Locale()).CmdPlayerNext() }
+
+// CmdPlayerNext says "Next track"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerNext() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerNext", nil)
+}
+
+// CmdPlayerPrevious says "Previous track"
+// in the language the app shows.
+func CmdPlayerPrevious() string { return In(i18n.Locale()).CmdPlayerPrevious() }
+
+// CmdPlayerPrevious says "Previous track"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerPrevious() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerPrevious", nil)
+}
+
+// CmdPlayerForward says "Forward 10 seconds"
+// in the language the app shows.
+func CmdPlayerForward() string { return In(i18n.Locale()).CmdPlayerForward() }
+
+// CmdPlayerForward says "Forward 10 seconds"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerForward() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerForward", nil)
+}
+
+// CmdPlayerBack says "Back 10 seconds"
+// in the language the app shows.
+func CmdPlayerBack() string { return In(i18n.Locale()).CmdPlayerBack() }
+
+// CmdPlayerBack says "Back 10 seconds"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerBack() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerBack", nil)
+}
+
+// CmdPlayerVolumeUp says "Volume up"
+// in the language the app shows.
+func CmdPlayerVolumeUp() string { return In(i18n.Locale()).CmdPlayerVolumeUp() }
+
+// CmdPlayerVolumeUp says "Volume up"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerVolumeUp() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerVolumeUp", nil)
+}
+
+// CmdPlayerVolumeDown says "Volume down"
+// in the language the app shows.
+func CmdPlayerVolumeDown() string { return In(i18n.Locale()).CmdPlayerVolumeDown() }
+
+// CmdPlayerVolumeDown says "Volume down"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerVolumeDown() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerVolumeDown", nil)
+}
+
+// CmdPlayerMute says "Mute"
+// in the language the app shows.
+func CmdPlayerMute() string { return In(i18n.Locale()).CmdPlayerMute() }
+
+// CmdPlayerMute says "Mute"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerMute() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerMute", nil)
+}
+
+// CmdPlayerFaster says "Speed up"
+// in the language the app shows.
+func CmdPlayerFaster() string { return In(i18n.Locale()).CmdPlayerFaster() }
+
+// CmdPlayerFaster says "Speed up"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerFaster() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerFaster", nil)
+}
+
+// CmdPlayerSlower says "Slow down"
+// in the language the app shows.
+func CmdPlayerSlower() string { return In(i18n.Locale()).CmdPlayerSlower() }
+
+// CmdPlayerSlower says "Slow down"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerSlower() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerSlower", nil)
+}
+
+// CmdPlayerNormalSpeed says "Normal speed"
+// in the language the app shows.
+func CmdPlayerNormalSpeed() string { return In(i18n.Locale()).CmdPlayerNormalSpeed() }
+
+// CmdPlayerNormalSpeed says "Normal speed"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerNormalSpeed() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerNormalSpeed", nil)
+}
+
+// CmdPlayerRepeat says "Repeat"
+// in the language the app shows.
+func CmdPlayerRepeat() string { return In(i18n.Locale()).CmdPlayerRepeat() }
+
+// CmdPlayerRepeat says "Repeat"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerRepeat() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerRepeat", nil)
+}
+
+// CmdPlayerLike says "Like what plays"
+// in the language the app shows.
+func CmdPlayerLike() string { return In(i18n.Locale()).CmdPlayerLike() }
+
+// CmdPlayerLike says "Like what plays"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerLike() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerLike", nil)
+}
+
+// CmdPlayerDislike says "Dislike what plays"
+// in the language the app shows.
+func CmdPlayerDislike() string { return In(i18n.Locale()).CmdPlayerDislike() }
+
+// CmdPlayerDislike says "Dislike what plays"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerDislike() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerDislike", nil)
+}
+
+// CmdPlayerRadio says "Start a radio of what plays"
+// in the language the app shows.
+func CmdPlayerRadio() string { return In(i18n.Locale()).CmdPlayerRadio() }
+
+// CmdPlayerRadio says "Start a radio of what plays"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerRadio() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerRadio", nil)
+}
+
+// CmdPlayFirst says "Play something first"
+// in the language the app shows.
+func CmdPlayFirst() string { return In(i18n.Locale()).CmdPlayFirst() }
+
+// CmdPlayFirst says "Play something first"
+// in the language of msgs.
+func (msgs Messages) CmdPlayFirst() string {
+	return Catalog.Format(msgs.locale, "cmdPlayFirst", nil)
+}
+
+// CmdPlayerOpenFiles says "Open music files…"
+// in the language the app shows.
+func CmdPlayerOpenFiles() string { return In(i18n.Locale()).CmdPlayerOpenFiles() }
+
+// CmdPlayerOpenFiles says "Open music files…"
+// in the language of msgs.
+func (msgs Messages) CmdPlayerOpenFiles() string {
+	return Catalog.Format(msgs.locale, "cmdPlayerOpenFiles", nil)
+}
+
+// CmdGoHome says "Go home"
+// in the language the app shows.
+func CmdGoHome() string { return In(i18n.Locale()).CmdGoHome() }
+
+// CmdGoHome says "Go home"
+// in the language of msgs.
+func (msgs Messages) CmdGoHome() string {
+	return Catalog.Format(msgs.locale, "cmdGoHome", nil)
+}
+
+// CmdGoComputer says "On this computer"
+// in the language the app shows.
+func CmdGoComputer() string { return In(i18n.Locale()).CmdGoComputer() }
+
+// CmdGoComputer says "On this computer"
+// in the language of msgs.
+func (msgs Messages) CmdGoComputer() string {
+	return Catalog.Format(msgs.locale, "cmdGoComputer", nil)
+}
+
+// CmdGoNowPlaying says "Now playing"
+// in the language the app shows.
+func CmdGoNowPlaying() string { return In(i18n.Locale()).CmdGoNowPlaying() }
+
+// CmdGoNowPlaying says "Now playing"
+// in the language of msgs.
+func (msgs Messages) CmdGoNowPlaying() string {
+	return Catalog.Format(msgs.locale, "cmdGoNowPlaying", nil)
+}
+
+// CmdViewQueue says "Show or hide the queue"
+// in the language the app shows.
+func CmdViewQueue() string { return In(i18n.Locale()).CmdViewQueue() }
+
+// CmdViewQueue says "Show or hide the queue"
+// in the language of msgs.
+func (msgs Messages) CmdViewQueue() string {
+	return Catalog.Format(msgs.locale, "cmdViewQueue", nil)
+}
+
+// CmdViewLyrics says "Show or hide the lyrics"
+// in the language the app shows.
+func CmdViewLyrics() string { return In(i18n.Locale()).CmdViewLyrics() }
+
+// CmdViewLyrics says "Show or hide the lyrics"
+// in the language of msgs.
+func (msgs Messages) CmdViewLyrics() string {
+	return Catalog.Format(msgs.locale, "cmdViewLyrics", nil)
+}
+
+// CmdViewPalette says "Command palette"
+// in the language the app shows.
+func CmdViewPalette() string { return In(i18n.Locale()).CmdViewPalette() }
+
+// CmdViewPalette says "Command palette"
+// in the language of msgs.
+func (msgs Messages) CmdViewPalette() string {
+	return Catalog.Format(msgs.locale, "cmdViewPalette", nil)
+}
+
+// CmdViewMini says "Mini player"
+// in the language the app shows.
+func CmdViewMini() string { return In(i18n.Locale()).CmdViewMini() }
+
+// CmdViewMini says "Mini player"
+// in the language of msgs.
+func (msgs Messages) CmdViewMini() string {
+	return Catalog.Format(msgs.locale, "cmdViewMini", nil)
+}
+
+// CmdViewKeepOnTop says "Keep the window on top, or not"
+// in the language the app shows.
+func CmdViewKeepOnTop() string { return In(i18n.Locale()).CmdViewKeepOnTop() }
+
+// CmdViewKeepOnTop says "Keep the window on top, or not"
+// in the language of msgs.
+func (msgs Messages) CmdViewKeepOnTop() string {
+	return Catalog.Format(msgs.locale, "cmdViewKeepOnTop", nil)
+}
+
+// CmdViewVideo says "Show or hide the video of music videos"
+// in the language the app shows.
+func CmdViewVideo() string { return In(i18n.Locale()).CmdViewVideo() }
+
+// CmdViewVideo says "Show or hide the video of music videos"
+// in the language of msgs.
+func (msgs Messages) CmdViewVideo() string {
+	return Catalog.Format(msgs.locale, "cmdViewVideo", nil)
+}
+
+// CmdViewSidebar says "Collapse or expand the sidebar"
+// in the language the app shows.
+func CmdViewSidebar() string { return In(i18n.Locale()).CmdViewSidebar() }
+
+// CmdViewSidebar says "Collapse or expand the sidebar"
+// in the language of msgs.
+func (msgs Messages) CmdViewSidebar() string {
+	return Catalog.Format(msgs.locale, "cmdViewSidebar", nil)
+}
+
+// CmdViewRefresh says "Refresh this page"
+// in the language the app shows.
+func CmdViewRefresh() string { return In(i18n.Locale()).CmdViewRefresh() }
+
+// CmdViewRefresh says "Refresh this page"
+// in the language of msgs.
+func (msgs Messages) CmdViewRefresh() string {
+	return Catalog.Format(msgs.locale, "cmdViewRefresh", nil)
+}
+
+// CmdViewZoomIn says "Zoom in"
+// in the language the app shows.
+func CmdViewZoomIn() string { return In(i18n.Locale()).CmdViewZoomIn() }
+
+// CmdViewZoomIn says "Zoom in"
+// in the language of msgs.
+func (msgs Messages) CmdViewZoomIn() string {
+	return Catalog.Format(msgs.locale, "cmdViewZoomIn", nil)
+}
+
+// CmdViewZoomOut says "Zoom out"
+// in the language the app shows.
+func CmdViewZoomOut() string { return In(i18n.Locale()).CmdViewZoomOut() }
+
+// CmdViewZoomOut says "Zoom out"
+// in the language of msgs.
+func (msgs Messages) CmdViewZoomOut() string {
+	return Catalog.Format(msgs.locale, "cmdViewZoomOut", nil)
+}
+
+// CmdViewZoomReset says "Reset zoom"
+// in the language the app shows.
+func CmdViewZoomReset() string { return In(i18n.Locale()).CmdViewZoomReset() }
+
+// CmdViewZoomReset says "Reset zoom"
+// in the language of msgs.
+func (msgs Messages) CmdViewZoomReset() string {
+	return Catalog.Format(msgs.locale, "cmdViewZoomReset", nil)
+}
+
+// CmdAddonsReload says "Reload add-ons"
+// in the language the app shows.
+func CmdAddonsReload() string { return In(i18n.Locale()).CmdAddonsReload() }
+
+// CmdAddonsReload says "Reload add-ons"
+// in the language of msgs.
+func (msgs Messages) CmdAddonsReload() string {
+	return Catalog.Format(msgs.locale, "cmdAddonsReload", nil)
+}
+
+// CmdAddonsReloaded says "Add-ons reloaded"
+// in the language the app shows.
+func CmdAddonsReloaded() string { return In(i18n.Locale()).CmdAddonsReloaded() }
+
+// CmdAddonsReloaded says "Add-ons reloaded"
+// in the language of msgs.
+func (msgs Messages) CmdAddonsReloaded() string {
+	return Catalog.Format(msgs.locale, "cmdAddonsReloaded", nil)
+}
+
+// CmdSettingsOpenFile says "Open the settings file"
+// in the language the app shows.
+func CmdSettingsOpenFile() string { return In(i18n.Locale()).CmdSettingsOpenFile() }
+
+// CmdSettingsOpenFile says "Open the settings file"
+// in the language of msgs.
+func (msgs Messages) CmdSettingsOpenFile() string {
+	return Catalog.Format(msgs.locale, "cmdSettingsOpenFile", nil)
+}
+
+// CmdSpeedOwn says "{kind, select, podcasts {Podcasts} other {Songs}} play at their own speed"
+// in the language the app shows.
+func CmdSpeedOwn(kind string) string { return In(i18n.Locale()).CmdSpeedOwn(kind) }
+
+// CmdSpeedOwn says "{kind, select, podcasts {Podcasts} other {Songs}} play at their own speed"
+// in the language of msgs.
+func (msgs Messages) CmdSpeedOwn(kind string) string {
+	return Catalog.Format(msgs.locale, "cmdSpeedOwn", map[string]any{"kind": kind})
+}
+
+// CmdSpeedOwnWhy says "{kind, select, podcasts {Podcasts} other {Songs}} play at their own speed - {why}"
+// in the language the app shows.
+func CmdSpeedOwnWhy(kind string, why string) string {
+	return In(i18n.Locale()).CmdSpeedOwnWhy(kind, why)
+}
+
+// CmdSpeedOwnWhy says "{kind, select, podcasts {Podcasts} other {Songs}} play at their own speed - {why}"
+// in the language of msgs.
+func (msgs Messages) CmdSpeedOwnWhy(kind string, why string) string {
+	return Catalog.Format(msgs.locale, "cmdSpeedOwnWhy", map[string]any{"kind": kind, "why": why})
+}
+
+// CmdSpeedAt says "{kind, select, podcasts {Podcasts} other {Songs}} play at {speed}"
+// in the language the app shows.
+func CmdSpeedAt(kind string, speed string) string { return In(i18n.Locale()).CmdSpeedAt(kind, speed) }
+
+// CmdSpeedAt says "{kind, select, podcasts {Podcasts} other {Songs}} play at {speed}"
+// in the language of msgs.
+func (msgs Messages) CmdSpeedAt(kind string, speed string) string {
+	return Catalog.Format(msgs.locale, "cmdSpeedAt", map[string]any{"kind": kind, "speed": speed})
+}
+
+// CmdSpeedAtWhy says "{kind, select, podcasts {Podcasts} other {Songs}} play at {speed} - {why}"
+// in the language the app shows.
+func CmdSpeedAtWhy(kind string, speed string, why string) string {
+	return In(i18n.Locale()).CmdSpeedAtWhy(kind, speed, why)
+}
+
+// CmdSpeedAtWhy says "{kind, select, podcasts {Podcasts} other {Songs}} play at {speed} - {why}"
+// in the language of msgs.
+func (msgs Messages) CmdSpeedAtWhy(kind string, speed string, why string) string {
+	return Catalog.Format(msgs.locale, "cmdSpeedAtWhy", map[string]any{"kind": kind, "speed": speed, "why": why})
+}
+
+// CmdSearchFor says "Search for “{query}”"
+// in the language the app shows.
+func CmdSearchFor(query string) string { return In(i18n.Locale()).CmdSearchFor(query) }
+
+// CmdSearchFor says "Search for “{query}”"
+// in the language of msgs.
+func (msgs Messages) CmdSearchFor(query string) string {
+	return Catalog.Format(msgs.locale, "cmdSearchFor", map[string]any{"query": query})
+}
+
+// CmdSearchSettingsFor says "Search the settings for “{query}”"
+// in the language the app shows.
+func CmdSearchSettingsFor(query string) string { return In(i18n.Locale()).CmdSearchSettingsFor(query) }
+
+// CmdSearchSettingsFor says "Search the settings for “{query}”"
+// in the language of msgs.
+func (msgs Messages) CmdSearchSettingsFor(query string) string {
+	return Catalog.Format(msgs.locale, "cmdSearchSettingsFor", map[string]any{"query": query})
+}
+
+// CmdPalettePlaceholder says "type a command or a search"
+// in the language the app shows.
+func CmdPalettePlaceholder() string { return In(i18n.Locale()).CmdPalettePlaceholder() }
+
+// CmdPalettePlaceholder says "type a command or a search"
+// in the language of msgs.
+func (msgs Messages) CmdPalettePlaceholder() string {
+	return Catalog.Format(msgs.locale, "cmdPalettePlaceholder", nil)
+}
+
+// CmdThemeTitle says "Theme: {name}"
+// in the language the app shows.
+func CmdThemeTitle(name string) string { return In(i18n.Locale()).CmdThemeTitle(name) }
+
+// CmdThemeTitle says "Theme: {name}"
+// in the language of msgs.
+func (msgs Messages) CmdThemeTitle(name string) string {
+	return Catalog.Format(msgs.locale, "cmdThemeTitle", map[string]any{"name": name})
+}
+
+// CmdGroupPlayback says "playback"
+// in the language the app shows.
+//
+// The name of a group of commands, lowercase as the groups are.
+func CmdGroupPlayback() string { return In(i18n.Locale()).CmdGroupPlayback() }
+
+// CmdGroupPlayback says "playback"
+// in the language of msgs.
+//
+// The name of a group of commands, lowercase as the groups are.
+func (msgs Messages) CmdGroupPlayback() string {
+	return Catalog.Format(msgs.locale, "cmdGroupPlayback", nil)
+}
+
+// CmdGroupGoTo says "go to"
+// in the language the app shows.
+func CmdGroupGoTo() string { return In(i18n.Locale()).CmdGroupGoTo() }
+
+// CmdGroupGoTo says "go to"
+// in the language of msgs.
+func (msgs Messages) CmdGroupGoTo() string {
+	return Catalog.Format(msgs.locale, "cmdGroupGoTo", nil)
+}
+
+// CmdGroupView says "view"
+// in the language the app shows.
+func CmdGroupView() string { return In(i18n.Locale()).CmdGroupView() }
+
+// CmdGroupView says "view"
+// in the language of msgs.
+func (msgs Messages) CmdGroupView() string {
+	return Catalog.Format(msgs.locale, "cmdGroupView", nil)
+}
+
+// CmdGroupAddons says "add-ons"
+// in the language the app shows.
+func CmdGroupAddons() string { return In(i18n.Locale()).CmdGroupAddons() }
+
+// CmdGroupAddons says "add-ons"
+// in the language of msgs.
+func (msgs Messages) CmdGroupAddons() string {
+	return Catalog.Format(msgs.locale, "cmdGroupAddons", nil)
+}
+
+// CmdGroupSettings says "settings"
+// in the language the app shows.
+func CmdGroupSettings() string { return In(i18n.Locale()).CmdGroupSettings() }
+
+// CmdGroupSettings says "settings"
+// in the language of msgs.
+func (msgs Messages) CmdGroupSettings() string {
+	return Catalog.Format(msgs.locale, "cmdGroupSettings", nil)
+}
+
+// CmdGroupPlugins says "plugins"
+// in the language the app shows.
+func CmdGroupPlugins() string { return In(i18n.Locale()).CmdGroupPlugins() }
+
+// CmdGroupPlugins says "plugins"
+// in the language of msgs.
+func (msgs Messages) CmdGroupPlugins() string {
+	return Catalog.Format(msgs.locale, "cmdGroupPlugins", nil)
+}
+
+// CmdGroupThemes says "themes"
+// in the language the app shows.
+func CmdGroupThemes() string { return In(i18n.Locale()).CmdGroupThemes() }
+
+// CmdGroupThemes says "themes"
+// in the language of msgs.
+func (msgs Messages) CmdGroupThemes() string {
+	return Catalog.Format(msgs.locale, "cmdGroupThemes", nil)
+}
+
+// CmdGroupSearch says "search"
+// in the language the app shows.
+func CmdGroupSearch() string { return In(i18n.Locale()).CmdGroupSearch() }
+
+// CmdGroupSearch says "search"
+// in the language of msgs.
+func (msgs Messages) CmdGroupSearch() string {
+	return Catalog.Format(msgs.locale, "cmdGroupSearch", nil)
+}
+
+// GlobalKeysGroup says "From any app"
+// in the language the app shows.
+func GlobalKeysGroup() string { return In(i18n.Locale()).GlobalKeysGroup() }
+
+// GlobalKeysGroup says "From any app"
+// in the language of msgs.
+func (msgs Messages) GlobalKeysGroup() string {
+	return Catalog.Format(msgs.locale, "globalKeysGroup", nil)
+}
+
+// GlobalKeysHint says "These keys control MixMusic whichever window is in front, and while it runs they do nothing else."
+// in the language the app shows.
+func GlobalKeysHint() string { return In(i18n.Locale()).GlobalKeysHint() }
+
+// GlobalKeysHint says "These keys control MixMusic whichever window is in front, and while it runs they do nothing else."
+// in the language of msgs.
+func (msgs Messages) GlobalKeysHint() string {
+	return Catalog.Format(msgs.locale, "globalKeysHint", nil)
+}
+
+// GlobalKeysHintLinux says "These keys control MixMusic whichever window is in front, and while it runs they do nothing else. On Wayland your des…"
+// in the language the app shows.
+func GlobalKeysHintLinux() string { return In(i18n.Locale()).GlobalKeysHintLinux() }
+
+// GlobalKeysHintLinux says "These keys control MixMusic whichever window is in front, and while it runs they do nothing else. On Wayland your des…"
+// in the language of msgs.
+func (msgs Messages) GlobalKeysHintLinux() string {
+	return Catalog.Format(msgs.locale, "globalKeysHintLinux", nil)
+}
+
+// GlobalKeysHintMac says "These keys control MixMusic whichever window is in front, and while it runs they do nothing else. A letter is the key…"
+// in the language the app shows.
+func GlobalKeysHintMac() string { return In(i18n.Locale()).GlobalKeysHintMac() }
+
+// GlobalKeysHintMac says "These keys control MixMusic whichever window is in front, and while it runs they do nothing else. A letter is the key…"
+// in the language of msgs.
+func (msgs Messages) GlobalKeysHintMac() string {
+	return Catalog.Format(msgs.locale, "globalKeysHintMac", nil)
+}
+
+// GlobalKeysInUse says "If nothing happens, these keys are in use elsewhere."
+// in the language the app shows.
+func GlobalKeysInUse() string { return In(i18n.Locale()).GlobalKeysInUse() }
+
+// GlobalKeysInUse says "If nothing happens, these keys are in use elsewhere."
+// in the language of msgs.
+func (msgs Messages) GlobalKeysInUse() string {
+	return Catalog.Format(msgs.locale, "globalKeysInUse", nil)
+}
+
+// GlobalKeysRecording says "press the keys · esc cancels · backspace removes"
+// in the language the app shows.
+func GlobalKeysRecording() string { return In(i18n.Locale()).GlobalKeysRecording() }
+
+// GlobalKeysRecording says "press the keys · esc cancels · backspace removes"
+// in the language of msgs.
+func (msgs Messages) GlobalKeysRecording() string {
+	return Catalog.Format(msgs.locale, "globalKeysRecording", nil)
+}
+
+// GlobalKeysEditLabel says "{action} the global shortcut of {title}"
+// in the language the app shows.
+func GlobalKeysEditLabel(action string, title string) string {
+	return In(i18n.Locale()).GlobalKeysEditLabel(action, title)
+}
+
+// GlobalKeysEditLabel says "{action} the global shortcut of {title}"
+// in the language of msgs.
+func (msgs Messages) GlobalKeysEditLabel(action string, title string) string {
+	return Catalog.Format(msgs.locale, "globalKeysEditLabel", map[string]any{"action": action, "title": title})
+}
+
+// GlobalKeysRemoveLabel says "remove the global shortcut of {title}"
+// in the language the app shows.
+func GlobalKeysRemoveLabel(title string) string {
+	return In(i18n.Locale()).GlobalKeysRemoveLabel(title)
+}
+
+// GlobalKeysRemoveLabel says "remove the global shortcut of {title}"
+// in the language of msgs.
+func (msgs Messages) GlobalKeysRemoveLabel(title string) string {
+	return Catalog.Format(msgs.locale, "globalKeysRemoveLabel", map[string]any{"title": title})
+}
+
+// GlobalKeysAnnounce says "Press the keys of the global shortcut of {title}. Escape cancels, Backspace removes it."
+// in the language the app shows.
+func GlobalKeysAnnounce(title string) string { return In(i18n.Locale()).GlobalKeysAnnounce(title) }
+
+// GlobalKeysAnnounce says "Press the keys of the global shortcut of {title}. Escape cancels, Backspace removes it."
+// in the language of msgs.
+func (msgs Messages) GlobalKeysAnnounce(title string) string {
+	return Catalog.Format(msgs.locale, "globalKeysAnnounce", map[string]any{"title": title})
+}
+
+// GlobalKeysNoGlobal says "{title} has no global shortcut now"
+// in the language the app shows.
+func GlobalKeysNoGlobal(title string) string { return In(i18n.Locale()).GlobalKeysNoGlobal(title) }
+
+// GlobalKeysNoGlobal says "{title} has no global shortcut now"
+// in the language of msgs.
+func (msgs Messages) GlobalKeysNoGlobal(title string) string {
+	return Catalog.Format(msgs.locale, "globalKeysNoGlobal", map[string]any{"title": title})
+}
+
+// GlobalKeysShowApp says "Show MixMusic"
+// in the language the app shows.
+func GlobalKeysShowApp() string { return In(i18n.Locale()).GlobalKeysShowApp() }
+
+// GlobalKeysShowApp says "Show MixMusic"
+// in the language of msgs.
+func (msgs Messages) GlobalKeysShowApp() string {
+	return Catalog.Format(msgs.locale, "globalKeysShowApp", nil)
+}
+
+// OnTopStays says "MixMusic stays on top of other windows"
+// in the language the app shows.
+func OnTopStays() string { return In(i18n.Locale()).OnTopStays() }
+
+// OnTopStays says "MixMusic stays on top of other windows"
+// in the language of msgs.
+func (msgs Messages) OnTopStays() string {
+	return Catalog.Format(msgs.locale, "onTopStays", nil)
+}
+
+// OnTopNoLonger says "MixMusic no longer stays on top"
+// in the language the app shows.
+func OnTopNoLonger() string { return In(i18n.Locale()).OnTopNoLonger() }
+
+// OnTopNoLonger says "MixMusic no longer stays on top"
+// in the language of msgs.
+func (msgs Messages) OnTopNoLonger() string {
+	return Catalog.Format(msgs.locale, "onTopNoLonger", nil)
+}
+
+// ZoomMenuReset says "reset"
+// in the language the app shows.
+func ZoomMenuReset() string { return In(i18n.Locale()).ZoomMenuReset() }
+
+// ZoomMenuReset says "reset"
+// in the language of msgs.
+func (msgs Messages) ZoomMenuReset() string {
+	return Catalog.Format(msgs.locale, "zoomMenuReset", nil)
+}
+
+// DialogMoreOf says "more of {title}"
+// in the language the app shows.
+func DialogMoreOf(title string) string { return In(i18n.Locale()).DialogMoreOf(title) }
+
+// DialogMoreOf says "more of {title}"
+// in the language of msgs.
+func (msgs Messages) DialogMoreOf(title string) string {
+	return Catalog.Format(msgs.locale, "dialogMoreOf", map[string]any{"title": title})
+}
+
+// NativeCrashTitle says "mixmusic quit unexpectedly"
+// in the language the app shows.
+func NativeCrashTitle() string { return In(i18n.Locale()).NativeCrashTitle() }
+
+// NativeCrashTitle says "mixmusic quit unexpectedly"
+// in the language of msgs.
+func (msgs Messages) NativeCrashTitle() string {
+	return Catalog.Format(msgs.locale, "nativeCrashTitle", nil)
+}
+
+// NativeCrashMessage says "It kept a report of what happened, {report}, in its logs folder. Reporting it on GitHub, with that file attached, hel…"
+// in the language the app shows.
+func NativeCrashMessage(report string) string { return In(i18n.Locale()).NativeCrashMessage(report) }
+
+// NativeCrashMessage says "It kept a report of what happened, {report}, in its logs folder. Reporting it on GitHub, with that file attached, hel…"
+// in the language of msgs.
+func (msgs Messages) NativeCrashMessage(report string) string {
+	return Catalog.Format(msgs.locale, "nativeCrashMessage", map[string]any{"report": report})
+}
+
+// NativeCrashReport says "report it"
+// in the language the app shows.
+func NativeCrashReport() string { return In(i18n.Locale()).NativeCrashReport() }
+
+// NativeCrashReport says "report it"
+// in the language of msgs.
+func (msgs Messages) NativeCrashReport() string {
+	return Catalog.Format(msgs.locale, "nativeCrashReport", nil)
+}
+
+// PluginUILost says "This page may belong to a plugin that is not enabled."
+// in the language the app shows.
+func PluginUILost() string { return In(i18n.Locale()).PluginUILost() }
+
+// PluginUILost says "This page may belong to a plugin that is not enabled."
+// in the language of msgs.
+func (msgs Messages) PluginUILost() string {
+	return Catalog.Format(msgs.locale, "pluginUILost", nil)
+}
+
+// PluginUIDrawing says "Drawing"
+// in the language the app shows.
+func PluginUIDrawing() string { return In(i18n.Locale()).PluginUIDrawing() }
+
+// PluginUIDrawing says "Drawing"
+// in the language of msgs.
+func (msgs Messages) PluginUIDrawing() string {
+	return Catalog.Format(msgs.locale, "pluginUIDrawing", nil)
+}
+
+// FontsSelawik says "Selawik, the interface's face"
+// in the language the app shows.
+func FontsSelawik() string { return In(i18n.Locale()).FontsSelawik() }
+
+// FontsSelawik says "Selawik, the interface's face"
+// in the language of msgs.
+func (msgs Messages) FontsSelawik() string {
+	return Catalog.Format(msgs.locale, "fontsSelawik", nil)
+}
+
+// FontsQuicksand says "Quicksand, Mochi's face"
+// in the language the app shows.
+func FontsQuicksand() string { return In(i18n.Locale()).FontsQuicksand() }
+
+// FontsQuicksand says "Quicksand, Mochi's face"
+// in the language of msgs.
+func (msgs Messages) FontsQuicksand() string {
+	return Catalog.Format(msgs.locale, "fontsQuicksand", nil)
+}
+
+// FontsRoboto says "Roboto Flex, the Material themes' face"
+// in the language the app shows.
+func FontsRoboto() string { return In(i18n.Locale()).FontsRoboto() }
+
+// FontsRoboto says "Roboto Flex, the Material themes' face"
+// in the language of msgs.
+func (msgs Messages) FontsRoboto() string {
+	return Catalog.Format(msgs.locale, "fontsRoboto", nil)
+}
+
+// FontsArchivo says "Archivo, the Walnut themes' headings' face"
+// in the language the app shows.
+func FontsArchivo() string { return In(i18n.Locale()).FontsArchivo() }
+
+// FontsArchivo says "Archivo, the Walnut themes' headings' face"
+// in the language of msgs.
+func (msgs Messages) FontsArchivo() string {
+	return Catalog.Format(msgs.locale, "fontsArchivo", nil)
+}
+
+// VersionsCount says "{count, plural, one {# version} other {# versions}}"
+// in the language the app shows.
+func VersionsCount(count int) string { return In(i18n.Locale()).VersionsCount(count) }
+
+// VersionsCount says "{count, plural, one {# version} other {# versions}}"
+// in the language of msgs.
+func (msgs Messages) VersionsCount(count int) string {
+	return Catalog.Format(msgs.locale, "versionsCount", map[string]any{"count": count})
+}
+
+// VersionsSwitch says "Versions"
+// in the language the app shows.
+func VersionsSwitch() string { return In(i18n.Locale()).VersionsSwitch() }
+
+// VersionsSwitch says "Versions"
+// in the language of msgs.
+func (msgs Messages) VersionsSwitch() string {
+	return Catalog.Format(msgs.locale, "versionsSwitch", nil)
+}
+
+// ReleasesNewFrom says "New from artists you follow"
+// in the language the app shows.
+func ReleasesNewFrom() string { return In(i18n.Locale()).ReleasesNewFrom() }
+
+// ReleasesNewFrom says "New from artists you follow"
+// in the language of msgs.
+func (msgs Messages) ReleasesNewFrom() string {
+	return Catalog.Format(msgs.locale, "releasesNewFrom", nil)
+}
+
+// UpdateOfferInstalled says "MixMusic {version} is installed. It runs once MixMusic restarts."
+// in the language the app shows.
+func UpdateOfferInstalled(version string) string {
+	return In(i18n.Locale()).UpdateOfferInstalled(version)
+}
+
+// UpdateOfferInstalled says "MixMusic {version} is installed. It runs once MixMusic restarts."
+// in the language of msgs.
+func (msgs Messages) UpdateOfferInstalled(version string) string {
+	return Catalog.Format(msgs.locale, "updateOfferInstalled", map[string]any{"version": version})
+}
+
+// UpdateOfferHaveAuto says "You have {version}. To install new versions without this question, turn on install updates without asking in Settings…"
+// in the language the app shows.
+func UpdateOfferHaveAuto(version string) string {
+	return In(i18n.Locale()).UpdateOfferHaveAuto(version)
+}
+
+// UpdateOfferHaveAuto says "You have {version}. To install new versions without this question, turn on install updates without asking in Settings…"
+// in the language of msgs.
+func (msgs Messages) UpdateOfferHaveAuto(version string) string {
+	return Catalog.Format(msgs.locale, "updateOfferHaveAuto", map[string]any{"version": version})
+}
+
+// UpdateOfferHave says "You have {version}. {how}"
+// in the language the app shows.
+func UpdateOfferHave(version string, how string) string {
+	return In(i18n.Locale()).UpdateOfferHave(version, how)
+}
+
+// UpdateOfferHave says "You have {version}. {how}"
+// in the language of msgs.
+func (msgs Messages) UpdateOfferHave(version string, how string) string {
+	return Catalog.Format(msgs.locale, "updateOfferHave", map[string]any{"version": version, "how": how})
+}
+
+// UpdateOfferDownloading says "Downloading…"
+// in the language the app shows.
+func UpdateOfferDownloading() string { return In(i18n.Locale()).UpdateOfferDownloading() }
+
+// UpdateOfferDownloading says "Downloading…"
+// in the language of msgs.
+func (msgs Messages) UpdateOfferDownloading() string {
+	return Catalog.Format(msgs.locale, "updateOfferDownloading", nil)
+}
+
+// UpdateOfferLater says "later"
+// in the language the app shows.
+func UpdateOfferLater() string { return In(i18n.Locale()).UpdateOfferLater() }
+
+// UpdateOfferLater says "later"
+// in the language of msgs.
+func (msgs Messages) UpdateOfferLater() string {
+	return Catalog.Format(msgs.locale, "updateOfferLater", nil)
+}
+
+// UpdateOfferSkip says "skip this version"
+// in the language the app shows.
+func UpdateOfferSkip() string { return In(i18n.Locale()).UpdateOfferSkip() }
+
+// UpdateOfferSkip says "skip this version"
+// in the language of msgs.
+func (msgs Messages) UpdateOfferSkip() string {
+	return Catalog.Format(msgs.locale, "updateOfferSkip", nil)
+}
+
+// UpdateOfferInstall says "install {version}"
+// in the language the app shows.
+func UpdateOfferInstall(version string) string { return In(i18n.Locale()).UpdateOfferInstall(version) }
+
+// UpdateOfferInstall says "install {version}"
+// in the language of msgs.
+func (msgs Messages) UpdateOfferInstall(version string) string {
+	return Catalog.Format(msgs.locale, "updateOfferInstall", map[string]any{"version": version})
+}
+
+// UpdateOfferTitle says "mixmusic {version} is out"
+// in the language the app shows.
+func UpdateOfferTitle(version string) string { return In(i18n.Locale()).UpdateOfferTitle(version) }
+
+// UpdateOfferTitle says "mixmusic {version} is out"
+// in the language of msgs.
+func (msgs Messages) UpdateOfferTitle(version string) string {
+	return Catalog.Format(msgs.locale, "updateOfferTitle", map[string]any{"version": version})
+}
+
+// FailureTrackBy says "{title}, by {artists}"
+// in the language the app shows.
+func FailureTrackBy(title string, artists string) string {
+	return In(i18n.Locale()).FailureTrackBy(title, artists)
+}
+
+// FailureTrackBy says "{title}, by {artists}"
+// in the language of msgs.
+func (msgs Messages) FailureTrackBy(title string, artists string) string {
+	return Catalog.Format(msgs.locale, "failureTrackBy", map[string]any{"title": title, "artists": artists})
+}
+
+// FailureTrackOn says "{title}, on {album}"
+// in the language the app shows.
+func FailureTrackOn(title string, album string) string {
+	return In(i18n.Locale()).FailureTrackOn(title, album)
+}
+
+// FailureTrackOn says "{title}, on {album}"
+// in the language of msgs.
+func (msgs Messages) FailureTrackOn(title string, album string) string {
+	return Catalog.Format(msgs.locale, "failureTrackOn", map[string]any{"title": title, "album": album})
+}
+
+// FailureTrackByOn says "{title}, by {artists}, on {album}"
+// in the language the app shows.
+func FailureTrackByOn(title string, artists string, album string) string {
+	return In(i18n.Locale()).FailureTrackByOn(title, artists, album)
+}
+
+// FailureTrackByOn says "{title}, by {artists}, on {album}"
+// in the language of msgs.
+func (msgs Messages) FailureTrackByOn(title string, artists string, album string) string {
+	return Catalog.Format(msgs.locale, "failureTrackByOn", map[string]any{"title": title, "artists": artists, "album": album})
+}
+
+// FailureFileAt says "a file on this computer, {path}"
+// in the language the app shows.
+func FailureFileAt(path string) string { return In(i18n.Locale()).FailureFileAt(path) }
+
+// FailureFileAt says "a file on this computer, {path}"
+// in the language of msgs.
+func (msgs Messages) FailureFileAt(path string) string {
+	return Catalog.Format(msgs.locale, "failureFileAt", map[string]any{"path": path})
+}
+
+// FailureFile says "a file on this computer"
+// in the language the app shows.
+func FailureFile() string { return In(i18n.Locale()).FailureFile() }
+
+// FailureFile says "a file on this computer"
+// in the language of msgs.
+func (msgs Messages) FailureFile() string {
+	return Catalog.Format(msgs.locale, "failureFile", nil)
+}
+
+// FailureSourceID says "{source}, {id}"
+// in the language the app shows.
+func FailureSourceID(source string, id string) string {
+	return In(i18n.Locale()).FailureSourceID(source, id)
+}
+
+// FailureSourceID says "{source}, {id}"
+// in the language of msgs.
+func (msgs Messages) FailureSourceID(source string, id string) string {
+	return Catalog.Format(msgs.locale, "failureSourceID", map[string]any{"source": source, "id": id})
+}
+
+// FailureTimes says "{what}, {count, plural, one {# time} other {# times}}"
+// in the language the app shows.
+func FailureTimes(what string, count int) string { return In(i18n.Locale()).FailureTimes(what, count) }
+
+// FailureTimes says "{what}, {count, plural, one {# time} other {# times}}"
+// in the language of msgs.
+func (msgs Messages) FailureTimes(what string, count int) string {
+	return Catalog.Format(msgs.locale, "failureTimes", map[string]any{"what": what, "count": count})
+}
+
+// FailureStep says "{what}: {why}"
+// in the language the app shows.
+func FailureStep(what string, why string) string { return In(i18n.Locale()).FailureStep(what, why) }
+
+// FailureStep says "{what}: {why}"
+// in the language of msgs.
+func (msgs Messages) FailureStep(what string, why string) string {
+	return Catalog.Format(msgs.locale, "failureStep", map[string]any{"what": what, "why": why})
+}
+
+// FailurePlayedAs says "Played as {track}, from {from}"
+// in the language the app shows.
+func FailurePlayedAs(track string, from string) string {
+	return In(i18n.Locale()).FailurePlayedAs(track, from)
+}
+
+// FailurePlayedAs says "Played as {track}, from {from}"
+// in the language of msgs.
+func (msgs Messages) FailurePlayedAs(track string, from string) string {
+	return Catalog.Format(msgs.locale, "failurePlayedAs", map[string]any{"track": track, "from": from})
+}
+
+// FailureFromWhen says "{from} · {when}"
+// in the language the app shows.
+func FailureFromWhen(from string, when string) string {
+	return In(i18n.Locale()).FailureFromWhen(from, when)
+}
+
+// FailureFromWhen says "{from} · {when}"
+// in the language of msgs.
+func (msgs Messages) FailureFromWhen(from string, when string) string {
+	return Catalog.Format(msgs.locale, "failureFromWhen", map[string]any{"from": from, "when": when})
+}
+
+// FailureTried says "What was tried"
+// in the language the app shows.
+func FailureTried() string { return In(i18n.Locale()).FailureTried() }
+
+// FailureTried says "What was tried"
+// in the language of msgs.
+func (msgs Messages) FailureTried() string {
+	return Catalog.Format(msgs.locale, "failureTried", nil)
+}
+
+// FailureStepNumbered says "{n}. {step}"
+// in the language the app shows.
+func FailureStepNumbered(n int, step string) string {
+	return In(i18n.Locale()).FailureStepNumbered(n, step)
+}
+
+// FailureStepNumbered says "{n}. {step}"
+// in the language of msgs.
+func (msgs Messages) FailureStepNumbered(n int, step string) string {
+	return Catalog.Format(msgs.locale, "failureStepNumbered", map[string]any{"n": n, "step": step})
+}
+
+// FailureStopped says "MixMusic stopped playing after it, as the tracks just before it couldn't play either."
+// in the language the app shows.
+func FailureStopped() string { return In(i18n.Locale()).FailureStopped() }
+
+// FailureStopped says "MixMusic stopped playing after it, as the tracks just before it couldn't play either."
+// in the language of msgs.
+func (msgs Messages) FailureStopped() string {
+	return Catalog.Format(msgs.locale, "failureStopped", nil)
+}
+
+// FailureReportHead says "MixMusic couldn't play a track\n\n"
+// in the language the app shows.
+func FailureReportHead() string { return In(i18n.Locale()).FailureReportHead() }
+
+// FailureReportHead says "MixMusic couldn't play a track\n\n"
+// in the language of msgs.
+func (msgs Messages) FailureReportHead() string {
+	return Catalog.Format(msgs.locale, "failureReportHead", nil)
+}
+
+// FailureReportTrack says "Track: {track}"
+// in the language the app shows.
+func FailureReportTrack(track string) string { return In(i18n.Locale()).FailureReportTrack(track) }
+
+// FailureReportTrack says "Track: {track}"
+// in the language of msgs.
+func (msgs Messages) FailureReportTrack(track string) string {
+	return Catalog.Format(msgs.locale, "failureReportTrack", map[string]any{"track": track})
+}
+
+// FailureReportFrom says "From: {from}"
+// in the language the app shows.
+func FailureReportFrom(from string) string { return In(i18n.Locale()).FailureReportFrom(from) }
+
+// FailureReportFrom says "From: {from}"
+// in the language of msgs.
+func (msgs Messages) FailureReportFrom(from string) string {
+	return Catalog.Format(msgs.locale, "failureReportFrom", map[string]any{"from": from})
+}
+
+// FailureReportPlayedAs says "Played as: {track}, from {from}"
+// in the language the app shows.
+func FailureReportPlayedAs(track string, from string) string {
+	return In(i18n.Locale()).FailureReportPlayedAs(track, from)
+}
+
+// FailureReportPlayedAs says "Played as: {track}, from {from}"
+// in the language of msgs.
+func (msgs Messages) FailureReportPlayedAs(track string, from string) string {
+	return Catalog.Format(msgs.locale, "failureReportPlayedAs", map[string]any{"track": track, "from": from})
+}
+
+// FailureReportWhen says "When: {when}"
+// in the language the app shows.
+func FailureReportWhen(when string) string { return In(i18n.Locale()).FailureReportWhen(when) }
+
+// FailureReportWhen says "When: {when}"
+// in the language of msgs.
+func (msgs Messages) FailureReportWhen(when string) string {
+	return Catalog.Format(msgs.locale, "failureReportWhen", map[string]any{"when": when})
+}
+
+// FailureReportTried says "What was tried:"
+// in the language the app shows.
+func FailureReportTried() string { return In(i18n.Locale()).FailureReportTried() }
+
+// FailureReportTried says "What was tried:"
+// in the language of msgs.
+func (msgs Messages) FailureReportTried() string {
+	return Catalog.Format(msgs.locale, "failureReportTried", nil)
+}
+
+// FailureReportSystem says "MixMusic {version} on {platform} {arch}"
+// in the language the app shows.
+func FailureReportSystem(version string, platform string, arch string) string {
+	return In(i18n.Locale()).FailureReportSystem(version, platform, arch)
+}
+
+// FailureReportSystem says "MixMusic {version} on {platform} {arch}"
+// in the language of msgs.
+func (msgs Messages) FailureReportSystem(version string, platform string, arch string) string {
+	return Catalog.Format(msgs.locale, "failureReportSystem", map[string]any{"version": version, "platform": platform, "arch": arch})
+}
+
+// FailureTitle says "Why it couldn't play"
+// in the language the app shows.
+func FailureTitle() string { return In(i18n.Locale()).FailureTitle() }
+
+// FailureTitle says "Why it couldn't play"
+// in the language of msgs.
+func (msgs Messages) FailureTitle() string {
+	return Catalog.Format(msgs.locale, "failureTitle", nil)
+}
+
+// FailureClose says "close"
+// in the language the app shows.
+func FailureClose() string { return In(i18n.Locale()).FailureClose() }
+
+// FailureClose says "close"
+// in the language of msgs.
+func (msgs Messages) FailureClose() string {
+	return Catalog.Format(msgs.locale, "failureClose", nil)
+}
+
+// FailureCopyLabel says "copy the details"
+// in the language the app shows.
+func FailureCopyLabel() string { return In(i18n.Locale()).FailureCopyLabel() }
+
+// FailureCopyLabel says "copy the details"
+// in the language of msgs.
+func (msgs Messages) FailureCopyLabel() string {
+	return Catalog.Format(msgs.locale, "failureCopyLabel", nil)
+}
+
+// FailureCopied says "Copied the details, without your accounts' names"
+// in the language the app shows.
+func FailureCopied() string { return In(i18n.Locale()).FailureCopied() }
+
+// FailureCopied says "Copied the details, without your accounts' names"
+// in the language of msgs.
+func (msgs Messages) FailureCopied() string {
+	return Catalog.Format(msgs.locale, "failureCopied", nil)
+}
+
+// CollectionMore says "More"
+// in the language the app shows.
+//
+// Tooltip and label of the round button that opens the menu of a head. The
+// icon is named by the code.
+func CollectionMore() string { return In(i18n.Locale()).CollectionMore() }
+
+// CollectionMore says "More"
+// in the language of msgs.
+//
+// Tooltip and label of the round button that opens the menu of a head. The
+// icon is named by the code.
+func (msgs Messages) CollectionMore() string {
+	return Catalog.Format(msgs.locale, "collectionMore", nil)
+}
+
+// CollectionKindAlbum says "album"
+// in the language the app shows.
+//
+// Page title of an album while it loads or fails. Lowercase.
+func CollectionKindAlbum() string { return In(i18n.Locale()).CollectionKindAlbum() }
+
+// CollectionKindAlbum says "album"
+// in the language of msgs.
+//
+// Page title of an album while it loads or fails. Lowercase.
+func (msgs Messages) CollectionKindAlbum() string {
+	return Catalog.Format(msgs.locale, "collectionKindAlbum", nil)
+}
+
+// CollectionKindPlaylist says "playlist"
+// in the language the app shows.
+//
+// Page title of a playlist while it loads or fails. Lowercase.
+func CollectionKindPlaylist() string { return In(i18n.Locale()).CollectionKindPlaylist() }
+
+// CollectionKindPlaylist says "playlist"
+// in the language of msgs.
+//
+// Page title of a playlist while it loads or fails. Lowercase.
+func (msgs Messages) CollectionKindPlaylist() string {
+	return Catalog.Format(msgs.locale, "collectionKindPlaylist", nil)
+}
+
+// CollectionAlbumKind says "{kind, select, single {single} ep {ep} other {album}}"
+// in the language the app shows.
+//
+// The kind of an album shown in its facts: album, single or ep. Lowercase.
+func CollectionAlbumKind(kind string) string { return In(i18n.Locale()).CollectionAlbumKind(kind) }
+
+// CollectionAlbumKind says "{kind, select, single {single} ep {ep} other {album}}"
+// in the language of msgs.
+//
+// The kind of an album shown in its facts: album, single or ep. Lowercase.
+func (msgs Messages) CollectionAlbumKind(kind string) string {
+	return Catalog.Format(msgs.locale, "collectionAlbumKind", map[string]any{"kind": kind})
+}
+
+// CollectionYourMix says "your mix"
+// in the language the app shows.
+//
+// The owner of a mix. Lowercase.
+func CollectionYourMix() string { return In(i18n.Locale()).CollectionYourMix() }
+
+// CollectionYourMix says "your mix"
+// in the language of msgs.
+//
+// The owner of a mix. Lowercase.
+func (msgs Messages) CollectionYourMix() string {
+	return Catalog.Format(msgs.locale, "collectionYourMix", nil)
+}
+
+// CollectionPlaylistEmpty says "This playlist is empty."
+// in the language the app shows.
+func CollectionPlaylistEmpty() string { return In(i18n.Locale()).CollectionPlaylistEmpty() }
+
+// CollectionPlaylistEmpty says "This playlist is empty."
+// in the language of msgs.
+func (msgs Messages) CollectionPlaylistEmpty() string {
+	return Catalog.Format(msgs.locale, "collectionPlaylistEmpty", nil)
+}
+
+// CollectionMixEmpty says "This mix is empty: add tracks of any service from their menu."
+// in the language the app shows.
+func CollectionMixEmpty() string { return In(i18n.Locale()).CollectionMixEmpty() }
+
+// CollectionMixEmpty says "This mix is empty: add tracks of any service from their menu."
+// in the language of msgs.
+func (msgs Messages) CollectionMixEmpty() string {
+	return Catalog.Format(msgs.locale, "collectionMixEmpty", nil)
+}
+
+// CollectionPlaylistNoMatch says "Nothing in this playlist matches “{query}”."
+// in the language the app shows.
+func CollectionPlaylistNoMatch(query string) string {
+	return In(i18n.Locale()).CollectionPlaylistNoMatch(query)
+}
+
+// CollectionPlaylistNoMatch says "Nothing in this playlist matches “{query}”."
+// in the language of msgs.
+func (msgs Messages) CollectionPlaylistNoMatch(query string) string {
+	return Catalog.Format(msgs.locale, "collectionPlaylistNoMatch", map[string]any{"query": query})
+}
+
+// CollectionMixNoMatch says "Nothing in this mix matches “{query}”."
+// in the language the app shows.
+func CollectionMixNoMatch(query string) string { return In(i18n.Locale()).CollectionMixNoMatch(query) }
+
+// CollectionMixNoMatch says "Nothing in this mix matches “{query}”."
+// in the language of msgs.
+func (msgs Messages) CollectionMixNoMatch(query string) string {
+	return Catalog.Format(msgs.locale, "collectionMixNoMatch", map[string]any{"query": query})
+}
+
+// CollectionRemoveFromMix says "Remove from this mix"
+// in the language the app shows.
+//
+// Track menu item of a mix.
+func CollectionRemoveFromMix() string { return In(i18n.Locale()).CollectionRemoveFromMix() }
+
+// CollectionRemoveFromMix says "Remove from this mix"
+// in the language of msgs.
+//
+// Track menu item of a mix.
+func (msgs Messages) CollectionRemoveFromMix() string {
+	return Catalog.Format(msgs.locale, "collectionRemoveFromMix", nil)
+}
+
+// CollectionRemoveFromPlaylist says "Remove from this playlist"
+// in the language the app shows.
+//
+// Track menu item of a playlist on YouTube Music.
+func CollectionRemoveFromPlaylist() string { return In(i18n.Locale()).CollectionRemoveFromPlaylist() }
+
+// CollectionRemoveFromPlaylist says "Remove from this playlist"
+// in the language of msgs.
+//
+// Track menu item of a playlist on YouTube Music.
+func (msgs Messages) CollectionRemoveFromPlaylist() string {
+	return Catalog.Format(msgs.locale, "collectionRemoveFromPlaylist", nil)
+}
+
+// CollectionRemovedFrom says "Removed {track} from {playlist}"
+// in the language the app shows.
+func CollectionRemovedFrom(track string, playlist string) string {
+	return In(i18n.Locale()).CollectionRemovedFrom(track, playlist)
+}
+
+// CollectionRemovedFrom says "Removed {track} from {playlist}"
+// in the language of msgs.
+func (msgs Messages) CollectionRemovedFrom(track string, playlist string) string {
+	return Catalog.Format(msgs.locale, "collectionRemovedFrom", map[string]any{"track": track, "playlist": playlist})
+}
+
+// CollectionRenameMix says "rename mix"
+// in the language the app shows.
+//
+// Title of the rename dialog. Lowercase.
+func CollectionRenameMix() string { return In(i18n.Locale()).CollectionRenameMix() }
+
+// CollectionRenameMix says "rename mix"
+// in the language of msgs.
+//
+// Title of the rename dialog. Lowercase.
+func (msgs Messages) CollectionRenameMix() string {
+	return Catalog.Format(msgs.locale, "collectionRenameMix", nil)
+}
+
+// CollectionDeleteMix says "delete mix"
+// in the language the app shows.
+//
+// Title of the question before a mix is deleted. Lowercase.
+func CollectionDeleteMix() string { return In(i18n.Locale()).CollectionDeleteMix() }
+
+// CollectionDeleteMix says "delete mix"
+// in the language of msgs.
+//
+// Title of the question before a mix is deleted. Lowercase.
+func (msgs Messages) CollectionDeleteMix() string {
+	return Catalog.Format(msgs.locale, "collectionDeleteMix", nil)
+}
+
+// CollectionDeleteMixQuestion says "Delete {title}? Its tracks stay where they came from."
+// in the language the app shows.
+func CollectionDeleteMixQuestion(title string) string {
+	return In(i18n.Locale()).CollectionDeleteMixQuestion(title)
+}
+
+// CollectionDeleteMixQuestion says "Delete {title}? Its tracks stay where they came from."
+// in the language of msgs.
+func (msgs Messages) CollectionDeleteMixQuestion(title string) string {
+	return Catalog.Format(msgs.locale, "collectionDeleteMixQuestion", map[string]any{"title": title})
+}
+
+// CollectionDeleteYouTube says "Delete from YouTube Music…"
+// in the language the app shows.
+//
+// Menu item that deletes a playlist on YouTube Music.
+func CollectionDeleteYouTube() string { return In(i18n.Locale()).CollectionDeleteYouTube() }
+
+// CollectionDeleteYouTube says "Delete from YouTube Music…"
+// in the language of msgs.
+//
+// Menu item that deletes a playlist on YouTube Music.
+func (msgs Messages) CollectionDeleteYouTube() string {
+	return Catalog.Format(msgs.locale, "collectionDeleteYouTube", nil)
+}
+
+// CollectionDeletePlaylist says "delete playlist"
+// in the language the app shows.
+//
+// Title of the question before a playlist on YouTube Music is deleted.
+// Lowercase.
+func CollectionDeletePlaylist() string { return In(i18n.Locale()).CollectionDeletePlaylist() }
+
+// CollectionDeletePlaylist says "delete playlist"
+// in the language of msgs.
+//
+// Title of the question before a playlist on YouTube Music is deleted.
+// Lowercase.
+func (msgs Messages) CollectionDeletePlaylist() string {
+	return Catalog.Format(msgs.locale, "collectionDeletePlaylist", nil)
+}
+
+// CollectionDeleteYouTubeQuestion says "Delete {title} from YouTube Music? It goes from YouTube too, and you can't undo this. To keep its tracks in MixMusic,…"
+// in the language the app shows.
+func CollectionDeleteYouTubeQuestion(title string) string {
+	return In(i18n.Locale()).CollectionDeleteYouTubeQuestion(title)
+}
+
+// CollectionDeleteYouTubeQuestion says "Delete {title} from YouTube Music? It goes from YouTube too, and you can't undo this. To keep its tracks in MixMusic,…"
+// in the language of msgs.
+func (msgs Messages) CollectionDeleteYouTubeQuestion(title string) string {
+	return Catalog.Format(msgs.locale, "collectionDeleteYouTubeQuestion", map[string]any{"title": title})
+}
+
+// CollectionDeleteFailed says "Couldn't delete {title}: {error}"
+// in the language the app shows.
+func CollectionDeleteFailed(title string, error string) string {
+	return In(i18n.Locale()).CollectionDeleteFailed(title, error)
+}
+
+// CollectionDeleteFailed says "Couldn't delete {title}: {error}"
+// in the language of msgs.
+func (msgs Messages) CollectionDeleteFailed(title string, error string) string {
+	return Catalog.Format(msgs.locale, "collectionDeleteFailed", map[string]any{"title": title, "error": error})
+}
+
+// CollectionDeletedYouTube says "Deleted {title} from YouTube Music"
+// in the language the app shows.
+func CollectionDeletedYouTube(title string) string {
+	return In(i18n.Locale()).CollectionDeletedYouTube(title)
+}
+
+// CollectionDeletedYouTube says "Deleted {title} from YouTube Music"
+// in the language of msgs.
+func (msgs Messages) CollectionDeletedYouTube(title string) string {
+	return Catalog.Format(msgs.locale, "collectionDeletedYouTube", map[string]any{"title": title})
+}
+
+// CollectionSaveAsMix says "Save as a new mix"
+// in the language the app shows.
+//
+// Menu item that saves the tracks as a new mix.
+func CollectionSaveAsMix() string { return In(i18n.Locale()).CollectionSaveAsMix() }
+
+// CollectionSaveAsMix says "Save as a new mix"
+// in the language of msgs.
+//
+// Menu item that saves the tracks as a new mix.
+func (msgs Messages) CollectionSaveAsMix() string {
+	return Catalog.Format(msgs.locale, "collectionSaveAsMix", nil)
+}
+
+// CollectionSaveAsYouTube says "Save as a YouTube Music playlist"
+// in the language the app shows.
+//
+// Menu item that saves the tracks as a new playlist on YouTube Music.
+func CollectionSaveAsYouTube() string { return In(i18n.Locale()).CollectionSaveAsYouTube() }
+
+// CollectionSaveAsYouTube says "Save as a YouTube Music playlist"
+// in the language of msgs.
+//
+// Menu item that saves the tracks as a new playlist on YouTube Music.
+func (msgs Messages) CollectionSaveAsYouTube() string {
+	return Catalog.Format(msgs.locale, "collectionSaveAsYouTube", nil)
+}
+
+// CollectionCopyIntoMix says "Copy into a mix you can extend"
+// in the language the app shows.
+//
+// Menu item that copies a service's playlist into a mix.
+func CollectionCopyIntoMix() string { return In(i18n.Locale()).CollectionCopyIntoMix() }
+
+// CollectionCopyIntoMix says "Copy into a mix you can extend"
+// in the language of msgs.
+//
+// Menu item that copies a service's playlist into a mix.
+func (msgs Messages) CollectionCopyIntoMix() string {
+	return Catalog.Format(msgs.locale, "collectionCopyIntoMix", nil)
+}
+
+// CollectionPivotSongs says "songs"
+// in the language the app shows.
+//
+// Pivot of an artist's page. Lowercase.
+func CollectionPivotSongs() string { return In(i18n.Locale()).CollectionPivotSongs() }
+
+// CollectionPivotSongs says "songs"
+// in the language of msgs.
+//
+// Pivot of an artist's page. Lowercase.
+func (msgs Messages) CollectionPivotSongs() string {
+	return Catalog.Format(msgs.locale, "collectionPivotSongs", nil)
+}
+
+// CollectionPivotAlbums says "albums"
+// in the language the app shows.
+//
+// Pivot of an artist's page. Lowercase.
+func CollectionPivotAlbums() string { return In(i18n.Locale()).CollectionPivotAlbums() }
+
+// CollectionPivotAlbums says "albums"
+// in the language of msgs.
+//
+// Pivot of an artist's page. Lowercase.
+func (msgs Messages) CollectionPivotAlbums() string {
+	return Catalog.Format(msgs.locale, "collectionPivotAlbums", nil)
+}
+
+// CollectionPivotSingles says "singles"
+// in the language the app shows.
+//
+// Pivot of an artist's page. Lowercase.
+func CollectionPivotSingles() string { return In(i18n.Locale()).CollectionPivotSingles() }
+
+// CollectionPivotSingles says "singles"
+// in the language of msgs.
+//
+// Pivot of an artist's page. Lowercase.
+func (msgs Messages) CollectionPivotSingles() string {
+	return Catalog.Format(msgs.locale, "collectionPivotSingles", nil)
+}
+
+// CollectionPivotRelated says "related"
+// in the language the app shows.
+//
+// Pivot of an artist's page. Lowercase.
+func CollectionPivotRelated() string { return In(i18n.Locale()).CollectionPivotRelated() }
+
+// CollectionPivotRelated says "related"
+// in the language of msgs.
+//
+// Pivot of an artist's page. Lowercase.
+func (msgs Messages) CollectionPivotRelated() string {
+	return Catalog.Format(msgs.locale, "collectionPivotRelated", nil)
+}
+
+// CollectionFollow says "follow"
+// in the language the app shows.
+//
+// Button that follows an artist. Lowercase.
+func CollectionFollow() string { return In(i18n.Locale()).CollectionFollow() }
+
+// CollectionFollow says "follow"
+// in the language of msgs.
+//
+// Button that follows an artist. Lowercase.
+func (msgs Messages) CollectionFollow() string {
+	return Catalog.Format(msgs.locale, "collectionFollow", nil)
+}
+
+// CollectionFollowing says "following"
+// in the language the app shows.
+//
+// Button of an artist already followed. Lowercase.
+func CollectionFollowing() string { return In(i18n.Locale()).CollectionFollowing() }
+
+// CollectionFollowing says "following"
+// in the language of msgs.
+//
+// Button of an artist already followed. Lowercase.
+func (msgs Messages) CollectionFollowing() string {
+	return Catalog.Format(msgs.locale, "collectionFollowing", nil)
+}
+
+// CollectionPlayTopSongs says "play top songs"
+// in the language the app shows.
+//
+// Play button of an artist's page. Lowercase.
+func CollectionPlayTopSongs() string { return In(i18n.Locale()).CollectionPlayTopSongs() }
+
+// CollectionPlayTopSongs says "play top songs"
+// in the language of msgs.
+//
+// Play button of an artist's page. Lowercase.
+func (msgs Messages) CollectionPlayTopSongs() string {
+	return Catalog.Format(msgs.locale, "collectionPlayTopSongs", nil)
+}
+
+// CollectionTopSongs says "Top songs"
+// in the language the app shows.
+//
+// Heading of an artist's songs.
+func CollectionTopSongs() string { return In(i18n.Locale()).CollectionTopSongs() }
+
+// CollectionTopSongs says "Top songs"
+// in the language of msgs.
+//
+// Heading of an artist's songs.
+func (msgs Messages) CollectionTopSongs() string {
+	return Catalog.Format(msgs.locale, "collectionTopSongs", nil)
+}
+
+// CollectionNoArtistSongs says "No songs listed for this artist."
+// in the language the app shows.
+func CollectionNoArtistSongs() string { return In(i18n.Locale()).CollectionNoArtistSongs() }
+
+// CollectionNoArtistSongs says "No songs listed for this artist."
+// in the language of msgs.
+func (msgs Messages) CollectionNoArtistSongs() string {
+	return Catalog.Format(msgs.locale, "collectionNoArtistSongs", nil)
+}
+
+// CollectionSinglesShelf says "Singles & EPs"
+// in the language the app shows.
+//
+// Shelf title of an artist's singles.
+func CollectionSinglesShelf() string { return In(i18n.Locale()).CollectionSinglesShelf() }
+
+// CollectionSinglesShelf says "Singles & EPs"
+// in the language of msgs.
+//
+// Shelf title of an artist's singles.
+func (msgs Messages) CollectionSinglesShelf() string {
+	return Catalog.Format(msgs.locale, "collectionSinglesShelf", nil)
+}
+
+// CollectionFansAlsoLike says "Fans also like"
+// in the language the app shows.
+//
+// Heading of the artists an artist's fans also like.
+func CollectionFansAlsoLike() string { return In(i18n.Locale()).CollectionFansAlsoLike() }
+
+// CollectionFansAlsoLike says "Fans also like"
+// in the language of msgs.
+//
+// Heading of the artists an artist's fans also like.
+func (msgs Messages) CollectionFansAlsoLike() string {
+	return Catalog.Format(msgs.locale, "collectionFansAlsoLike", nil)
+}
+
+// ComputerEmptyTitle says "Nothing on this computer yet"
+// in the language the app shows.
+func ComputerEmptyTitle() string { return In(i18n.Locale()).ComputerEmptyTitle() }
+
+// ComputerEmptyTitle says "Nothing on this computer yet"
+// in the language of msgs.
+func (msgs Messages) ComputerEmptyTitle() string {
+	return Catalog.Format(msgs.locale, "computerEmptyTitle", nil)
+}
+
+// ComputerEmptyText says "Add a folder of music, or open files: they play from your computer, beside Spotify and YouTube Music, in your queue a…"
+// in the language the app shows.
+//
+// Empty state of Library › On this computer, before any music is found.
+func ComputerEmptyText() string { return In(i18n.Locale()).ComputerEmptyText() }
+
+// ComputerEmptyText says "Add a folder of music, or open files: they play from your computer, beside Spotify and YouTube Music, in your queue a…"
+// in the language of msgs.
+//
+// Empty state of Library › On this computer, before any music is found.
+func (msgs Messages) ComputerEmptyText() string {
+	return Catalog.Format(msgs.locale, "computerEmptyText", nil)
+}
+
+// ComputerScanningTitle says "Looking through your music"
+// in the language the app shows.
+//
+// Heading while the first scan of the folders is under way.
+func ComputerScanningTitle() string { return In(i18n.Locale()).ComputerScanningTitle() }
+
+// ComputerScanningTitle says "Looking through your music"
+// in the language of msgs.
+//
+// Heading while the first scan of the folders is under way.
+func (msgs Messages) ComputerScanningTitle() string {
+	return Catalog.Format(msgs.locale, "computerScanningTitle", nil)
+}
+
+// ComputerNoMusicTitle says "No music found"
+// in the language the app shows.
+func ComputerNoMusicTitle() string { return In(i18n.Locale()).ComputerNoMusicTitle() }
+
+// ComputerNoMusicTitle says "No music found"
+// in the language of msgs.
+func (msgs Messages) ComputerNoMusicTitle() string {
+	return Catalog.Format(msgs.locale, "computerNoMusicTitle", nil)
+}
+
+// ComputerNoMusicText says "The folders hold no files MixMusic plays: MP3, FLAC, WAV, M4A, Opus or Vorbis."
+// in the language the app shows.
+func ComputerNoMusicText() string { return In(i18n.Locale()).ComputerNoMusicText() }
+
+// ComputerNoMusicText says "The folders hold no files MixMusic plays: MP3, FLAC, WAV, M4A, Opus or Vorbis."
+// in the language of msgs.
+func (msgs Messages) ComputerNoMusicText() string {
+	return Catalog.Format(msgs.locale, "computerNoMusicText", nil)
+}
+
+// ComputerOpenFiles says "open files"
+// in the language the app shows.
+//
+// Button that asks for music files to play. Lowercase.
+func ComputerOpenFiles() string { return In(i18n.Locale()).ComputerOpenFiles() }
+
+// ComputerOpenFiles says "open files"
+// in the language of msgs.
+//
+// Button that asks for music files to play. Lowercase.
+func (msgs Messages) ComputerOpenFiles() string {
+	return Catalog.Format(msgs.locale, "computerOpenFiles", nil)
+}
+
+// ComputerFromFolders says "From {count, plural, one {# folder} other {# folders}} · "
+// in the language the app shows.
+//
+// Line above the songs: the folders the music comes from, then a link to
+// manage them.
+func ComputerFromFolders(count int) string { return In(i18n.Locale()).ComputerFromFolders(count) }
+
+// ComputerFromFolders says "From {count, plural, one {# folder} other {# folders}} · "
+// in the language of msgs.
+//
+// Line above the songs: the folders the music comes from, then a link to
+// manage them.
+func (msgs Messages) ComputerFromFolders(count int) string {
+	return Catalog.Format(msgs.locale, "computerFromFolders", map[string]any{"count": count})
+}
+
+// ComputerManage says "manage"
+// in the language the app shows.
+//
+// Link to Settings › Playback, from the songs' line. Lowercase.
+func ComputerManage() string { return In(i18n.Locale()).ComputerManage() }
+
+// ComputerManage says "manage"
+// in the language of msgs.
+//
+// Link to Settings › Playback, from the songs' line. Lowercase.
+func (msgs Messages) ComputerManage() string {
+	return Catalog.Format(msgs.locale, "computerManage", nil)
+}
+
+// ComputerNoMatch says "No song matches “{query}”."
+// in the language the app shows.
+func ComputerNoMatch(query string) string { return In(i18n.Locale()).ComputerNoMatch(query) }
+
+// ComputerNoMatch says "No song matches “{query}”."
+// in the language of msgs.
+func (msgs Messages) ComputerNoMatch(query string) string {
+	return Catalog.Format(msgs.locale, "computerNoMatch", map[string]any{"query": query})
+}
+
+// ComputerShowMore says "show more · {shown} of {total}"
+// in the language the app shows.
+//
+// Button that shows more of the albums or artists. Lowercase.
+func ComputerShowMore(shown int, total int) string {
+	return In(i18n.Locale()).ComputerShowMore(shown, total)
+}
+
+// ComputerShowMore says "show more · {shown} of {total}"
+// in the language of msgs.
+//
+// Button that shows more of the albums or artists. Lowercase.
+func (msgs Messages) ComputerShowMore(shown int, total int) string {
+	return Catalog.Format(msgs.locale, "computerShowMore", map[string]any{"shown": shown, "total": total})
+}
+
+// LibraryOnThisComputer says "On this computer"
+// in the language the app shows.
+//
+// Pivot and shelf title for the music on this computer.
+func LibraryOnThisComputer() string { return In(i18n.Locale()).LibraryOnThisComputer() }
+
+// LibraryOnThisComputer says "On this computer"
+// in the language of msgs.
+//
+// Pivot and shelf title for the music on this computer.
+func (msgs Messages) LibraryOnThisComputer() string {
+	return Catalog.Format(msgs.locale, "libraryOnThisComputer", nil)
+}
+
+// ComputerScanStarting says "Looking through your folders…"
+// in the language the app shows.
+func ComputerScanStarting() string { return In(i18n.Locale()).ComputerScanStarting() }
+
+// ComputerScanStarting says "Looking through your folders…"
+// in the language of msgs.
+func (msgs Messages) ComputerScanStarting() string {
+	return Catalog.Format(msgs.locale, "computerScanStarting", nil)
+}
+
+// ComputerScanReading says "Reading {read} of {found, plural, one {# file} other {# files}}…"
+// in the language the app shows.
+func ComputerScanReading(read int, found int) string {
+	return In(i18n.Locale()).ComputerScanReading(read, found)
+}
+
+// ComputerScanReading says "Reading {read} of {found, plural, one {# file} other {# files}}…"
+// in the language of msgs.
+func (msgs Messages) ComputerScanReading(read int, found int) string {
+	return Catalog.Format(msgs.locale, "computerScanReading", map[string]any{"read": read, "found": found})
+}
+
+// ComputerInLibrary says "{folder} is in the library already"
+// in the language the app shows.
+func ComputerInLibrary(folder string) string { return In(i18n.Locale()).ComputerInLibrary(folder) }
+
+// ComputerInLibrary says "{folder} is in the library already"
+// in the language of msgs.
+func (msgs Messages) ComputerInLibrary(folder string) string {
+	return Catalog.Format(msgs.locale, "computerInLibrary", map[string]any{"folder": folder})
+}
+
+// ComputerReadingFolder says "Reading the music of {folder}"
+// in the language the app shows.
+func ComputerReadingFolder(folder string) string {
+	return In(i18n.Locale()).ComputerReadingFolder(folder)
+}
+
+// ComputerReadingFolder says "Reading the music of {folder}"
+// in the language of msgs.
+func (msgs Messages) ComputerReadingFolder(folder string) string {
+	return Catalog.Format(msgs.locale, "computerReadingFolder", map[string]any{"folder": folder})
+}
+
+// ComputerRemoveFolderTitle says "remove folder"
+// in the language the app shows.
+//
+// Title of the question before a music folder leaves the library.
+func ComputerRemoveFolderTitle() string { return In(i18n.Locale()).ComputerRemoveFolderTitle() }
+
+// ComputerRemoveFolderTitle says "remove folder"
+// in the language of msgs.
+//
+// Title of the question before a music folder leaves the library.
+func (msgs Messages) ComputerRemoveFolderTitle() string {
+	return Catalog.Format(msgs.locale, "computerRemoveFolderTitle", nil)
+}
+
+// ComputerRemoveFolderQuestion says "Take {folder} out of the library? Its files stay where they are, and its tracks stay in your mixes, greyed."
+// in the language the app shows.
+func ComputerRemoveFolderQuestion(folder string) string {
+	return In(i18n.Locale()).ComputerRemoveFolderQuestion(folder)
+}
+
+// ComputerRemoveFolderQuestion says "Take {folder} out of the library? Its files stay where they are, and its tracks stay in your mixes, greyed."
+// in the language of msgs.
+func (msgs Messages) ComputerRemoveFolderQuestion(folder string) string {
+	return Catalog.Format(msgs.locale, "computerRemoveFolderQuestion", map[string]any{"folder": folder})
+}
+
+// ComputerCantPlayFile says "MixMusic can't play this file"
+// in the language the app shows.
+func ComputerCantPlayFile() string { return In(i18n.Locale()).ComputerCantPlayFile() }
+
+// ComputerCantPlayFile says "MixMusic can't play this file"
+// in the language of msgs.
+func (msgs Messages) ComputerCantPlayFile() string {
+	return Catalog.Format(msgs.locale, "computerCantPlayFile", nil)
+}
+
+// ComputerCantPlayFiles says "MixMusic can't play these files"
+// in the language the app shows.
+func ComputerCantPlayFiles() string { return In(i18n.Locale()).ComputerCantPlayFiles() }
+
+// ComputerCantPlayFiles says "MixMusic can't play these files"
+// in the language of msgs.
+func (msgs Messages) ComputerCantPlayFiles() string {
+	return Catalog.Format(msgs.locale, "computerCantPlayFiles", nil)
+}
+
+// ComputerPlaying says "Playing {title}"
+// in the language the app shows.
+func ComputerPlaying(title string) string { return In(i18n.Locale()).ComputerPlaying(title) }
+
+// ComputerPlaying says "Playing {title}"
+// in the language of msgs.
+func (msgs Messages) ComputerPlaying(title string) string {
+	return Catalog.Format(msgs.locale, "computerPlaying", map[string]any{"title": title})
+}
+
+// ComputerPlayingSkipped says "Playing {title} · {skipped} skipped, which MixMusic can't play"
+// in the language the app shows.
+func ComputerPlayingSkipped(title string, skipped int) string {
+	return In(i18n.Locale()).ComputerPlayingSkipped(title, skipped)
+}
+
+// ComputerPlayingSkipped says "Playing {title} · {skipped} skipped, which MixMusic can't play"
+// in the language of msgs.
+func (msgs Messages) ComputerPlayingSkipped(title string, skipped int) string {
+	return Catalog.Format(msgs.locale, "computerPlayingSkipped", map[string]any{"title": title, "skipped": skipped})
+}
+
+// ComputerPlayingFiles says "Playing {count, plural, one {# file} other {# files}}"
+// in the language the app shows.
+func ComputerPlayingFiles(count int) string { return In(i18n.Locale()).ComputerPlayingFiles(count) }
+
+// ComputerPlayingFiles says "Playing {count, plural, one {# file} other {# files}}"
+// in the language of msgs.
+func (msgs Messages) ComputerPlayingFiles(count int) string {
+	return Catalog.Format(msgs.locale, "computerPlayingFiles", map[string]any{"count": count})
+}
+
+// ComputerPlayingFilesSkipped says "Playing {count, plural, one {# file} other {# files}} · {skipped} skipped, which MixMusic can't play"
+// in the language the app shows.
+func ComputerPlayingFilesSkipped(count int, skipped int) string {
+	return In(i18n.Locale()).ComputerPlayingFilesSkipped(count, skipped)
+}
+
+// ComputerPlayingFilesSkipped says "Playing {count, plural, one {# file} other {# files}} · {skipped} skipped, which MixMusic can't play"
+// in the language of msgs.
+func (msgs Messages) ComputerPlayingFilesSkipped(count int, skipped int) string {
+	return Catalog.Format(msgs.locale, "computerPlayingFilesSkipped", map[string]any{"count": count, "skipped": skipped})
+}
+
+// ComputerShowInExplorer says "Show in Explorer"
+// in the language the app shows.
+//
+// Menu item that shows a file on Windows.
+func ComputerShowInExplorer() string { return In(i18n.Locale()).ComputerShowInExplorer() }
+
+// ComputerShowInExplorer says "Show in Explorer"
+// in the language of msgs.
+//
+// Menu item that shows a file on Windows.
+func (msgs Messages) ComputerShowInExplorer() string {
+	return Catalog.Format(msgs.locale, "computerShowInExplorer", nil)
+}
+
+// ComputerShowInFinder says "Show in Finder"
+// in the language the app shows.
+//
+// Menu item that shows a file on macOS.
+func ComputerShowInFinder() string { return In(i18n.Locale()).ComputerShowInFinder() }
+
+// ComputerShowInFinder says "Show in Finder"
+// in the language of msgs.
+//
+// Menu item that shows a file on macOS.
+func (msgs Messages) ComputerShowInFinder() string {
+	return Catalog.Format(msgs.locale, "computerShowInFinder", nil)
+}
+
+// ComputerShowInFolder says "Show in its folder"
+// in the language the app shows.
+//
+// Menu item that shows a file on Linux.
+func ComputerShowInFolder() string { return In(i18n.Locale()).ComputerShowInFolder() }
+
+// ComputerShowInFolder says "Show in its folder"
+// in the language of msgs.
+//
+// Menu item that shows a file on Linux.
+func (msgs Messages) ComputerShowInFolder() string {
+	return Catalog.Format(msgs.locale, "computerShowInFolder", nil)
+}
+
+// ComputerUnwatched says "MixMusic can't watch {folder} for changes: {reason}. Rescan to see what changed in it."
+// in the language the app shows.
+//
+// Settings line for a music folder that can't be watched. The reason comes
+// from the library and stays English.
+func ComputerUnwatched(folder string, reason string) string {
+	return In(i18n.Locale()).ComputerUnwatched(folder, reason)
+}
+
+// ComputerUnwatched says "MixMusic can't watch {folder} for changes: {reason}. Rescan to see what changed in it."
+// in the language of msgs.
+//
+// Settings line for a music folder that can't be watched. The reason comes
+// from the library and stays English.
+func (msgs Messages) ComputerUnwatched(folder string, reason string) string {
+	return Catalog.Format(msgs.locale, "computerUnwatched", map[string]any{"folder": folder, "reason": reason})
+}
+
+// DownloadsConfirmTitle says "download {count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+//
+// Title of the question before a big download.
+func DownloadsConfirmTitle(count int) string { return In(i18n.Locale()).DownloadsConfirmTitle(count) }
+
+// DownloadsConfirmTitle says "download {count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+//
+// Title of the question before a big download.
+func (msgs Messages) DownloadsConfirmTitle(count int) string {
+	return Catalog.Format(msgs.locale, "downloadsConfirmTitle", map[string]any{"count": count})
+}
+
+// DownloadsConfirmMessage says "That's about {size}. They play without the network, and stay until you remove them."
+// in the language the app shows.
+func DownloadsConfirmMessage(size string) string {
+	return In(i18n.Locale()).DownloadsConfirmMessage(size)
+}
+
+// DownloadsConfirmMessage says "That's about {size}. They play without the network, and stay until you remove them."
+// in the language of msgs.
+func (msgs Messages) DownloadsConfirmMessage(size string) string {
+	return Catalog.Format(msgs.locale, "downloadsConfirmMessage", map[string]any{"size": size})
+}
+
+// DownloadsConfirmOK says "download"
+// in the language the app shows.
+//
+// Confirm button of a big download. Lowercase.
+func DownloadsConfirmOK() string { return In(i18n.Locale()).DownloadsConfirmOK() }
+
+// DownloadsConfirmOK says "download"
+// in the language of msgs.
+//
+// Confirm button of a big download. Lowercase.
+func (msgs Messages) DownloadsConfirmOK() string {
+	return Catalog.Format(msgs.locale, "downloadsConfirmOK", nil)
+}
+
+// DownloadsStarting says "{count, plural, one {Downloading # track} other {Downloading # tracks}}"
+// in the language the app shows.
+//
+// Notice when tracks start downloading.
+func DownloadsStarting(count int) string { return In(i18n.Locale()).DownloadsStarting(count) }
+
+// DownloadsStarting says "{count, plural, one {Downloading # track} other {Downloading # tracks}}"
+// in the language of msgs.
+//
+// Notice when tracks start downloading.
+func (msgs Messages) DownloadsStarting(count int) string {
+	return Catalog.Format(msgs.locale, "downloadsStarting", map[string]any{"count": count})
+}
+
+// DownloadsStartingTrack says "Downloading {title}"
+// in the language the app shows.
+func DownloadsStartingTrack(title string) string {
+	return In(i18n.Locale()).DownloadsStartingTrack(title)
+}
+
+// DownloadsStartingTrack says "Downloading {title}"
+// in the language of msgs.
+func (msgs Messages) DownloadsStartingTrack(title string) string {
+	return Catalog.Format(msgs.locale, "downloadsStartingTrack", map[string]any{"title": title})
+}
+
+// DownloadsStartingTrackSpotify says "Downloading {title}: its recording on YouTube Music"
+// in the language the app shows.
+//
+// Notice when a Spotify track starts downloading from its YouTube Music
+// recording.
+func DownloadsStartingTrackSpotify(title string) string {
+	return In(i18n.Locale()).DownloadsStartingTrackSpotify(title)
+}
+
+// DownloadsStartingTrackSpotify says "Downloading {title}: its recording on YouTube Music"
+// in the language of msgs.
+//
+// Notice when a Spotify track starts downloading from its YouTube Music
+// recording.
+func (msgs Messages) DownloadsStartingTrackSpotify(title string) string {
+	return Catalog.Format(msgs.locale, "downloadsStartingTrackSpotify", map[string]any{"title": title})
+}
+
+// DownloadsMenuRemove says "Remove download"
+// in the language the app shows.
+//
+// Track and album menu item.
+func DownloadsMenuRemove() string { return In(i18n.Locale()).DownloadsMenuRemove() }
+
+// DownloadsMenuRemove says "Remove download"
+// in the language of msgs.
+//
+// Track and album menu item.
+func (msgs Messages) DownloadsMenuRemove() string {
+	return Catalog.Format(msgs.locale, "downloadsMenuRemove", nil)
+}
+
+// DownloadsMenuCancel says "Cancel download"
+// in the language the app shows.
+//
+// Track and album menu item.
+func DownloadsMenuCancel() string { return In(i18n.Locale()).DownloadsMenuCancel() }
+
+// DownloadsMenuCancel says "Cancel download"
+// in the language of msgs.
+//
+// Track and album menu item.
+func (msgs Messages) DownloadsMenuCancel() string {
+	return Catalog.Format(msgs.locale, "downloadsMenuCancel", nil)
+}
+
+// DownloadsMenuRetry says "Download again"
+// in the language the app shows.
+//
+// Track menu item after a failed download.
+func DownloadsMenuRetry() string { return In(i18n.Locale()).DownloadsMenuRetry() }
+
+// DownloadsMenuRetry says "Download again"
+// in the language of msgs.
+//
+// Track menu item after a failed download.
+func (msgs Messages) DownloadsMenuRetry() string {
+	return Catalog.Format(msgs.locale, "downloadsMenuRetry", nil)
+}
+
+// DownloadsMenuDownload says "Download"
+// in the language the app shows.
+//
+// Track and album menu item.
+func DownloadsMenuDownload() string { return In(i18n.Locale()).DownloadsMenuDownload() }
+
+// DownloadsMenuDownload says "Download"
+// in the language of msgs.
+//
+// Track and album menu item.
+func (msgs Messages) DownloadsMenuDownload() string {
+	return Catalog.Format(msgs.locale, "downloadsMenuDownload", nil)
+}
+
+// DownloadsRemoved says "Removed the download of {title}"
+// in the language the app shows.
+func DownloadsRemoved(title string) string { return In(i18n.Locale()).DownloadsRemoved(title) }
+
+// DownloadsRemoved says "Removed the download of {title}"
+// in the language of msgs.
+func (msgs Messages) DownloadsRemoved(title string) string {
+	return Catalog.Format(msgs.locale, "downloadsRemoved", map[string]any{"title": title})
+}
+
+// DownloadsRemoveTitle says "remove download"
+// in the language the app shows.
+//
+// Title of the question before a download is removed. Lowercase.
+func DownloadsRemoveTitle() string { return In(i18n.Locale()).DownloadsRemoveTitle() }
+
+// DownloadsRemoveTitle says "remove download"
+// in the language of msgs.
+//
+// Title of the question before a download is removed. Lowercase.
+func (msgs Messages) DownloadsRemoveTitle() string {
+	return Catalog.Format(msgs.locale, "downloadsRemoveTitle", nil)
+}
+
+// DownloadsButtonDownload says "download"
+// in the language the app shows.
+//
+// Button of an album or playlist head. Lowercase.
+func DownloadsButtonDownload() string { return In(i18n.Locale()).DownloadsButtonDownload() }
+
+// DownloadsButtonDownload says "download"
+// in the language of msgs.
+//
+// Button of an album or playlist head. Lowercase.
+func (msgs Messages) DownloadsButtonDownload() string {
+	return Catalog.Format(msgs.locale, "downloadsButtonDownload", nil)
+}
+
+// DownloadsButtonProgress says "downloading {kept} of {total}"
+// in the language the app shows.
+//
+// Button while a collection downloads. Lowercase.
+func DownloadsButtonProgress(kept int, total int) string {
+	return In(i18n.Locale()).DownloadsButtonProgress(kept, total)
+}
+
+// DownloadsButtonProgress says "downloading {kept} of {total}"
+// in the language of msgs.
+//
+// Button while a collection downloads. Lowercase.
+func (msgs Messages) DownloadsButtonProgress(kept int, total int) string {
+	return Catalog.Format(msgs.locale, "downloadsButtonProgress", map[string]any{"kept": kept, "total": total})
+}
+
+// DownloadsStopQuestion says "Stop downloading {title}? What downloaded of it goes too, unless another download keeps it."
+// in the language the app shows.
+func DownloadsStopQuestion(title string) string {
+	return In(i18n.Locale()).DownloadsStopQuestion(title)
+}
+
+// DownloadsStopQuestion says "Stop downloading {title}? What downloaded of it goes too, unless another download keeps it."
+// in the language of msgs.
+func (msgs Messages) DownloadsStopQuestion(title string) string {
+	return Catalog.Format(msgs.locale, "downloadsStopQuestion", map[string]any{"title": title})
+}
+
+// DownloadsButtonMore says "download {count} more"
+// in the language the app shows.
+//
+// Button to download the tracks of a collection still missing. Lowercase.
+func DownloadsButtonMore(count int) string { return In(i18n.Locale()).DownloadsButtonMore(count) }
+
+// DownloadsButtonMore says "download {count} more"
+// in the language of msgs.
+//
+// Button to download the tracks of a collection still missing. Lowercase.
+func (msgs Messages) DownloadsButtonMore(count int) string {
+	return Catalog.Format(msgs.locale, "downloadsButtonMore", map[string]any{"count": count})
+}
+
+// DownloadsMenuMore says "Download {count} more"
+// in the language the app shows.
+//
+// Menu item to download the tracks of a collection still missing.
+func DownloadsMenuMore(count int) string { return In(i18n.Locale()).DownloadsMenuMore(count) }
+
+// DownloadsMenuMore says "Download {count} more"
+// in the language of msgs.
+//
+// Menu item to download the tracks of a collection still missing.
+func (msgs Messages) DownloadsMenuMore(count int) string {
+	return Catalog.Format(msgs.locale, "downloadsMenuMore", map[string]any{"count": count})
+}
+
+// DownloadsButtonDone says "downloaded"
+// in the language the app shows.
+//
+// Button of a collection that's all downloaded. Lowercase.
+func DownloadsButtonDone() string { return In(i18n.Locale()).DownloadsButtonDone() }
+
+// DownloadsButtonDone says "downloaded"
+// in the language of msgs.
+//
+// Button of a collection that's all downloaded. Lowercase.
+func (msgs Messages) DownloadsButtonDone() string {
+	return Catalog.Format(msgs.locale, "downloadsButtonDone", nil)
+}
+
+// DownloadsRemoveQuestion says "Remove the download of {title}? Its tracks won't play offline any more, unless another download keeps them."
+// in the language the app shows.
+func DownloadsRemoveQuestion(title string) string {
+	return In(i18n.Locale()).DownloadsRemoveQuestion(title)
+}
+
+// DownloadsRemoveQuestion says "Remove the download of {title}? Its tracks won't play offline any more, unless another download keeps them."
+// in the language of msgs.
+func (msgs Messages) DownloadsRemoveQuestion(title string) string {
+	return Catalog.Format(msgs.locale, "downloadsRemoveQuestion", map[string]any{"title": title})
+}
+
+// DownloadsNothing says "Nothing here downloads"
+// in the language the app shows.
+//
+// Notice when the page has nothing to download.
+func DownloadsNothing() string { return In(i18n.Locale()).DownloadsNothing() }
+
+// DownloadsNothing says "Nothing here downloads"
+// in the language of msgs.
+//
+// Notice when the page has nothing to download.
+func (msgs Messages) DownloadsNothing() string {
+	return Catalog.Format(msgs.locale, "downloadsNothing", nil)
+}
+
+// DownloadsCollection says "Downloading {title}"
+// in the language the app shows.
+func DownloadsCollection(title string) string { return In(i18n.Locale()).DownloadsCollection(title) }
+
+// DownloadsCollection says "Downloading {title}"
+// in the language of msgs.
+func (msgs Messages) DownloadsCollection(title string) string {
+	return Catalog.Format(msgs.locale, "downloadsCollection", map[string]any{"title": title})
+}
+
+// DownloadsCollectionPartial says "Downloading {title}: the {kept} of its {total} tracks MixMusic reads"
+// in the language the app shows.
+func DownloadsCollectionPartial(title string, kept int, total int) string {
+	return In(i18n.Locale()).DownloadsCollectionPartial(title, kept, total)
+}
+
+// DownloadsCollectionPartial says "Downloading {title}: the {kept} of its {total} tracks MixMusic reads"
+// in the language of msgs.
+func (msgs Messages) DownloadsCollectionPartial(title string, kept int, total int) string {
+	return Catalog.Format(msgs.locale, "downloadsCollectionPartial", map[string]any{"title": title, "kept": kept, "total": total})
+}
+
+// DownloadsMarkDone says "Downloaded"
+// in the language the app shows.
+//
+// Mark on a track's row and its tooltip.
+func DownloadsMarkDone() string { return In(i18n.Locale()).DownloadsMarkDone() }
+
+// DownloadsMarkDone says "Downloaded"
+// in the language of msgs.
+//
+// Mark on a track's row and its tooltip.
+func (msgs Messages) DownloadsMarkDone() string {
+	return Catalog.Format(msgs.locale, "downloadsMarkDone", nil)
+}
+
+// DownloadsMarkWaiting says "Waiting to download"
+// in the language the app shows.
+//
+// Mark on a track's row and its tooltip.
+func DownloadsMarkWaiting() string { return In(i18n.Locale()).DownloadsMarkWaiting() }
+
+// DownloadsMarkWaiting says "Waiting to download"
+// in the language of msgs.
+//
+// Mark on a track's row and its tooltip.
+func (msgs Messages) DownloadsMarkWaiting() string {
+	return Catalog.Format(msgs.locale, "downloadsMarkWaiting", nil)
+}
+
+// DownloadsDownloading says "Downloading"
+// in the language the app shows.
+//
+// Mark on a track's row, and the heading of the queue.
+func DownloadsDownloading() string { return In(i18n.Locale()).DownloadsDownloading() }
+
+// DownloadsDownloading says "Downloading"
+// in the language of msgs.
+//
+// Mark on a track's row, and the heading of the queue.
+func (msgs Messages) DownloadsDownloading() string {
+	return Catalog.Format(msgs.locale, "downloadsDownloading", nil)
+}
+
+// DownloadsMarkProgress says "Downloading, {percent}%"
+// in the language the app shows.
+//
+// Mark on a track's row while it downloads.
+func DownloadsMarkProgress(percent int) string {
+	return In(i18n.Locale()).DownloadsMarkProgress(percent)
+}
+
+// DownloadsMarkProgress says "Downloading, {percent}%"
+// in the language of msgs.
+//
+// Mark on a track's row while it downloads.
+func (msgs Messages) DownloadsMarkProgress(percent int) string {
+	return Catalog.Format(msgs.locale, "downloadsMarkProgress", map[string]any{"percent": percent})
+}
+
+// DownloadsMarkFailed says "Couldn't download: {reason}"
+// in the language the app shows.
+//
+// Mark on a track's row when its download failed.
+func DownloadsMarkFailed(reason string) string { return In(i18n.Locale()).DownloadsMarkFailed(reason) }
+
+// DownloadsMarkFailed says "Couldn't download: {reason}"
+// in the language of msgs.
+//
+// Mark on a track's row when its download failed.
+func (msgs Messages) DownloadsMarkFailed(reason string) string {
+	return Catalog.Format(msgs.locale, "downloadsMarkFailed", map[string]any{"reason": reason})
+}
+
+// DownloadsProblemTitle says "Your downloads can't be reached"
+// in the language the app shows.
+//
+// Alert title when the downloads folder can't be reached.
+func DownloadsProblemTitle() string { return In(i18n.Locale()).DownloadsProblemTitle() }
+
+// DownloadsProblemTitle says "Your downloads can't be reached"
+// in the language of msgs.
+//
+// Alert title when the downloads folder can't be reached.
+func (msgs Messages) DownloadsProblemTitle() string {
+	return Catalog.Format(msgs.locale, "downloadsProblemTitle", nil)
+}
+
+// DownloadsProblemMessage says "{problem}. Tracks stream as before meanwhile."
+// in the language the app shows.
+func DownloadsProblemMessage(problem string) string {
+	return In(i18n.Locale()).DownloadsProblemMessage(problem)
+}
+
+// DownloadsProblemMessage says "{problem}. Tracks stream as before meanwhile."
+// in the language of msgs.
+func (msgs Messages) DownloadsProblemMessage(problem string) string {
+	return Catalog.Format(msgs.locale, "downloadsProblemMessage", map[string]any{"problem": problem})
+}
+
+// DownloadsEmptyTitle says "Nothing downloaded yet"
+// in the language the app shows.
+//
+// Empty state of the downloads. Lowercase when shown as a word.
+func DownloadsEmptyTitle() string { return In(i18n.Locale()).DownloadsEmptyTitle() }
+
+// DownloadsEmptyTitle says "Nothing downloaded yet"
+// in the language of msgs.
+//
+// Empty state of the downloads. Lowercase when shown as a word.
+func (msgs Messages) DownloadsEmptyTitle() string {
+	return Catalog.Format(msgs.locale, "downloadsEmptyTitle", nil)
+}
+
+// DownloadsEmptyLine says "Choose Download in the menu of a track, an album or a playlist, and it plays here without the network."
+// in the language the app shows.
+//
+// Empty state of the downloads: how to download.
+func DownloadsEmptyLine() string { return In(i18n.Locale()).DownloadsEmptyLine() }
+
+// DownloadsEmptyLine says "Choose Download in the menu of a track, an album or a playlist, and it plays here without the network."
+// in the language of msgs.
+//
+// Empty state of the downloads: how to download.
+func (msgs Messages) DownloadsEmptyLine() string {
+	return Catalog.Format(msgs.locale, "downloadsEmptyLine", nil)
+}
+
+// DownloadsShelfAlbums says "Albums & playlists"
+// in the language the app shows.
+//
+// Shelf title of the downloaded albums and playlists.
+func DownloadsShelfAlbums() string { return In(i18n.Locale()).DownloadsShelfAlbums() }
+
+// DownloadsShelfAlbums says "Albums & playlists"
+// in the language of msgs.
+//
+// Shelf title of the downloaded albums and playlists.
+func (msgs Messages) DownloadsShelfAlbums() string {
+	return Catalog.Format(msgs.locale, "downloadsShelfAlbums", nil)
+}
+
+// DownloadsTracks says "Tracks"
+// in the language the app shows.
+//
+// Heading of the downloaded tracks.
+func DownloadsTracks() string { return In(i18n.Locale()).DownloadsTracks() }
+
+// DownloadsTracks says "Tracks"
+// in the language of msgs.
+//
+// Heading of the downloaded tracks.
+func (msgs Messages) DownloadsTracks() string {
+	return Catalog.Format(msgs.locale, "downloadsTracks", nil)
+}
+
+// DownloadsShowAll says "show all"
+// in the language the app shows.
+//
+// Link that shows all the downloaded tracks again. Lowercase.
+func DownloadsShowAll() string { return In(i18n.Locale()).DownloadsShowAll() }
+
+// DownloadsShowAll says "show all"
+// in the language of msgs.
+//
+// Link that shows all the downloaded tracks again. Lowercase.
+func (msgs Messages) DownloadsShowAll() string {
+	return Catalog.Format(msgs.locale, "downloadsShowAll", nil)
+}
+
+// DownloadsNothingHere says "Nothing downloaded here yet."
+// in the language the app shows.
+func DownloadsNothingHere() string { return In(i18n.Locale()).DownloadsNothingHere() }
+
+// DownloadsNothingHere says "Nothing downloaded here yet."
+// in the language of msgs.
+func (msgs Messages) DownloadsNothingHere() string {
+	return Catalog.Format(msgs.locale, "downloadsNothingHere", nil)
+}
+
+// DownloadsNoMatch says "No download matches “{query}”."
+// in the language the app shows.
+func DownloadsNoMatch(query string) string { return In(i18n.Locale()).DownloadsNoMatch(query) }
+
+// DownloadsNoMatch says "No download matches “{query}”."
+// in the language of msgs.
+func (msgs Messages) DownloadsNoMatch(query string) string {
+	return Catalog.Format(msgs.locale, "downloadsNoMatch", map[string]any{"query": query})
+}
+
+// DownloadsRemoveAll says "remove all downloads"
+// in the language the app shows.
+//
+// Button and question title. Lowercase.
+func DownloadsRemoveAll() string { return In(i18n.Locale()).DownloadsRemoveAll() }
+
+// DownloadsRemoveAll says "remove all downloads"
+// in the language of msgs.
+//
+// Button and question title. Lowercase.
+func (msgs Messages) DownloadsRemoveAll() string {
+	return Catalog.Format(msgs.locale, "downloadsRemoveAll", nil)
+}
+
+// DownloadsRemoveAllQuestion says "Remove all {count, plural, one {# download} other {# downloads}}, {size}? They won't play offline any more."
+// in the language the app shows.
+func DownloadsRemoveAllQuestion(count int, size string) string {
+	return In(i18n.Locale()).DownloadsRemoveAllQuestion(count, size)
+}
+
+// DownloadsRemoveAllQuestion says "Remove all {count, plural, one {# download} other {# downloads}}, {size}? They won't play offline any more."
+// in the language of msgs.
+func (msgs Messages) DownloadsRemoveAllQuestion(count int, size string) string {
+	return Catalog.Format(msgs.locale, "downloadsRemoveAllQuestion", map[string]any{"count": count, "size": size})
+}
+
+// DownloadsRemovedAll says "Removed every download"
+// in the language the app shows.
+func DownloadsRemovedAll() string { return In(i18n.Locale()).DownloadsRemovedAll() }
+
+// DownloadsRemovedAll says "Removed every download"
+// in the language of msgs.
+func (msgs Messages) DownloadsRemovedAll() string {
+	return Catalog.Format(msgs.locale, "downloadsRemovedAll", nil)
+}
+
+// DownloadsFolderLine says "{count, plural, one {# track} other {# tracks}} · {size} · in {folder}"
+// in the language the app shows.
+//
+// The downloads' size and folder.
+func DownloadsFolderLine(count int, size string, folder string) string {
+	return In(i18n.Locale()).DownloadsFolderLine(count, size, folder)
+}
+
+// DownloadsFolderLine says "{count, plural, one {# track} other {# tracks}} · {size} · in {folder}"
+// in the language of msgs.
+//
+// The downloads' size and folder.
+func (msgs Messages) DownloadsFolderLine(count int, size string, folder string) string {
+	return Catalog.Format(msgs.locale, "downloadsFolderLine", map[string]any{"count": count, "size": size, "folder": folder})
+}
+
+// DownloadsOpenFolder says "open folder"
+// in the language the app shows.
+//
+// Link that opens the downloads' folder. Lowercase.
+func DownloadsOpenFolder() string { return In(i18n.Locale()).DownloadsOpenFolder() }
+
+// DownloadsOpenFolder says "open folder"
+// in the language of msgs.
+//
+// Link that opens the downloads' folder. Lowercase.
+func (msgs Messages) DownloadsOpenFolder() string {
+	return Catalog.Format(msgs.locale, "downloadsOpenFolder", nil)
+}
+
+// DownloadsSettings says "settings"
+// in the language the app shows.
+//
+// Link to the downloads' settings. Lowercase.
+func DownloadsSettings() string { return In(i18n.Locale()).DownloadsSettings() }
+
+// DownloadsSettings says "settings"
+// in the language of msgs.
+//
+// Link to the downloads' settings. Lowercase.
+func (msgs Messages) DownloadsSettings() string {
+	return Catalog.Format(msgs.locale, "downloadsSettings", nil)
+}
+
+// DownloadsPause says "pause"
+// in the language the app shows.
+//
+// Link that pauses the downloads. Lowercase.
+func DownloadsPause() string { return In(i18n.Locale()).DownloadsPause() }
+
+// DownloadsPause says "pause"
+// in the language of msgs.
+//
+// Link that pauses the downloads. Lowercase.
+func (msgs Messages) DownloadsPause() string {
+	return Catalog.Format(msgs.locale, "downloadsPause", nil)
+}
+
+// DownloadsResume says "resume"
+// in the language the app shows.
+//
+// Link that resumes the downloads. Lowercase.
+func DownloadsResume() string { return In(i18n.Locale()).DownloadsResume() }
+
+// DownloadsResume says "resume"
+// in the language of msgs.
+//
+// Link that resumes the downloads. Lowercase.
+func (msgs Messages) DownloadsResume() string {
+	return Catalog.Format(msgs.locale, "downloadsResume", nil)
+}
+
+// DownloadsCancelAll says "cancel all"
+// in the language the app shows.
+//
+// Link that cancels every download. Lowercase.
+func DownloadsCancelAll() string { return In(i18n.Locale()).DownloadsCancelAll() }
+
+// DownloadsCancelAll says "cancel all"
+// in the language of msgs.
+//
+// Link that cancels every download. Lowercase.
+func (msgs Messages) DownloadsCancelAll() string {
+	return Catalog.Format(msgs.locale, "downloadsCancelAll", nil)
+}
+
+// DownloadsCancelAllTitle says "cancel all downloads"
+// in the language the app shows.
+//
+// Title of the question before every download is cancelled. Lowercase.
+func DownloadsCancelAllTitle() string { return In(i18n.Locale()).DownloadsCancelAllTitle() }
+
+// DownloadsCancelAllTitle says "cancel all downloads"
+// in the language of msgs.
+//
+// Title of the question before every download is cancelled. Lowercase.
+func (msgs Messages) DownloadsCancelAllTitle() string {
+	return Catalog.Format(msgs.locale, "downloadsCancelAllTitle", nil)
+}
+
+// DownloadsCancelAllQuestion says "Stop every download under way, and those that wait? What downloaded stays."
+// in the language the app shows.
+func DownloadsCancelAllQuestion() string { return In(i18n.Locale()).DownloadsCancelAllQuestion() }
+
+// DownloadsCancelAllQuestion says "Stop every download under way, and those that wait? What downloaded stays."
+// in the language of msgs.
+func (msgs Messages) DownloadsCancelAllQuestion() string {
+	return Catalog.Format(msgs.locale, "downloadsCancelAllQuestion", nil)
+}
+
+// DownloadsStop says "stop"
+// in the language the app shows.
+//
+// Confirm button of cancelling every download. Lowercase.
+func DownloadsStop() string { return In(i18n.Locale()).DownloadsStop() }
+
+// DownloadsStop says "stop"
+// in the language of msgs.
+//
+// Confirm button of cancelling every download. Lowercase.
+func (msgs Messages) DownloadsStop() string {
+	return Catalog.Format(msgs.locale, "downloadsStop", nil)
+}
+
+// DownloadsRetryFailed says "retry failed"
+// in the language the app shows.
+//
+// Link that retries the failed downloads. Lowercase.
+func DownloadsRetryFailed() string { return In(i18n.Locale()).DownloadsRetryFailed() }
+
+// DownloadsRetryFailed says "retry failed"
+// in the language of msgs.
+//
+// Link that retries the failed downloads. Lowercase.
+func (msgs Messages) DownloadsRetryFailed() string {
+	return Catalog.Format(msgs.locale, "downloadsRetryFailed", nil)
+}
+
+// DownloadsProgressLabel says "Downloads"
+// in the language the app shows.
+//
+// Label of the progress bar of the downloads.
+func DownloadsProgressLabel() string { return In(i18n.Locale()).DownloadsProgressLabel() }
+
+// DownloadsProgressLabel says "Downloads"
+// in the language of msgs.
+//
+// Label of the progress bar of the downloads.
+func (msgs Messages) DownloadsProgressLabel() string {
+	return Catalog.Format(msgs.locale, "downloadsProgressLabel", nil)
+}
+
+// DownloadsBatchCount says "{done} of {total}"
+// in the language the app shows.
+func DownloadsBatchCount(done int, total int) string {
+	return In(i18n.Locale()).DownloadsBatchCount(done, total)
+}
+
+// DownloadsBatchCount says "{done} of {total}"
+// in the language of msgs.
+func (msgs Messages) DownloadsBatchCount(done int, total int) string {
+	return Catalog.Format(msgs.locale, "downloadsBatchCount", map[string]any{"done": done, "total": total})
+}
+
+// DownloadsAndMore says "and {count} more"
+// in the language the app shows.
+//
+// The queue's tail. Lowercase.
+func DownloadsAndMore(count int) string { return In(i18n.Locale()).DownloadsAndMore(count) }
+
+// DownloadsAndMore says "and {count} more"
+// in the language of msgs.
+//
+// The queue's tail. Lowercase.
+func (msgs Messages) DownloadsAndMore(count int) string {
+	return Catalog.Format(msgs.locale, "downloadsAndMore", map[string]any{"count": count})
+}
+
+// DownloadsStatusWaiting says "waiting"
+// in the language the app shows.
+//
+// Status of a track in the queue. Lowercase.
+func DownloadsStatusWaiting() string { return In(i18n.Locale()).DownloadsStatusWaiting() }
+
+// DownloadsStatusWaiting says "waiting"
+// in the language of msgs.
+//
+// Status of a track in the queue. Lowercase.
+func (msgs Messages) DownloadsStatusWaiting() string {
+	return Catalog.Format(msgs.locale, "downloadsStatusWaiting", nil)
+}
+
+// DownloadsStatusDownloading says "downloading"
+// in the language the app shows.
+//
+// Status of a track in the queue. Lowercase.
+func DownloadsStatusDownloading() string { return In(i18n.Locale()).DownloadsStatusDownloading() }
+
+// DownloadsStatusDownloading says "downloading"
+// in the language of msgs.
+//
+// Status of a track in the queue. Lowercase.
+func (msgs Messages) DownloadsStatusDownloading() string {
+	return Catalog.Format(msgs.locale, "downloadsStatusDownloading", nil)
+}
+
+// DownloadsStatusFailed says "couldn't download: {reason}"
+// in the language the app shows.
+//
+// Status of a track whose download failed. Lowercase.
+func DownloadsStatusFailed(reason string) string {
+	return In(i18n.Locale()).DownloadsStatusFailed(reason)
+}
+
+// DownloadsStatusFailed says "couldn't download: {reason}"
+// in the language of msgs.
+//
+// Status of a track whose download failed. Lowercase.
+func (msgs Messages) DownloadsStatusFailed(reason string) string {
+	return Catalog.Format(msgs.locale, "downloadsStatusFailed", map[string]any{"reason": reason})
+}
+
+// DownloadsRetry says "retry"
+// in the language the app shows.
+//
+// Link that retries one download. Lowercase.
+func DownloadsRetry() string { return In(i18n.Locale()).DownloadsRetry() }
+
+// DownloadsRetry says "retry"
+// in the language of msgs.
+//
+// Link that retries one download. Lowercase.
+func (msgs Messages) DownloadsRetry() string {
+	return Catalog.Format(msgs.locale, "downloadsRetry", nil)
+}
+
+// DownloadsCancelOne says "Cancel the download of {title}"
+// in the language the app shows.
+//
+// Tooltip and label of the button that cancels one download.
+func DownloadsCancelOne(title string) string { return In(i18n.Locale()).DownloadsCancelOne(title) }
+
+// DownloadsCancelOne says "Cancel the download of {title}"
+// in the language of msgs.
+//
+// Tooltip and label of the button that cancels one download.
+func (msgs Messages) DownloadsCancelOne(title string) string {
+	return Catalog.Format(msgs.locale, "downloadsCancelOne", map[string]any{"title": title})
+}
+
+// DownloadsTileTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+//
+// Subtitle of a downloaded album, playlist or mix.
+func DownloadsTileTracks(count int) string { return In(i18n.Locale()).DownloadsTileTracks(count) }
+
+// DownloadsTileTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+//
+// Subtitle of a downloaded album, playlist or mix.
+func (msgs Messages) DownloadsTileTracks(count int) string {
+	return Catalog.Format(msgs.locale, "downloadsTileTracks", map[string]any{"count": count})
+}
+
+// DownloadsTileKept says "{kept} of {count} tracks"
+// in the language the app shows.
+//
+// Subtitle of a downloaded collection that isn't all there. Lowercase words
+// are not needed here.
+func DownloadsTileKept(kept int, count int) string {
+	return In(i18n.Locale()).DownloadsTileKept(kept, count)
+}
+
+// DownloadsTileKept says "{kept} of {count} tracks"
+// in the language of msgs.
+//
+// Subtitle of a downloaded collection that isn't all there. Lowercase words
+// are not needed here.
+func (msgs Messages) DownloadsTileKept(kept int, count int) string {
+	return Catalog.Format(msgs.locale, "downloadsTileKept", map[string]any{"kept": kept, "count": count})
+}
+
+// DownloadsTileKeptOfTotal says "{kept} of {count} tracks, of its {total}"
+// in the language the app shows.
+//
+// Subtitle of a downloaded collection that isn't all there, of a larger
+// collection.
+func DownloadsTileKeptOfTotal(kept int, count int, total int) string {
+	return In(i18n.Locale()).DownloadsTileKeptOfTotal(kept, count, total)
+}
+
+// DownloadsTileKeptOfTotal says "{kept} of {count} tracks, of its {total}"
+// in the language of msgs.
+//
+// Subtitle of a downloaded collection that isn't all there, of a larger
+// collection.
+func (msgs Messages) DownloadsTileKeptOfTotal(kept int, count int, total int) string {
+	return Catalog.Format(msgs.locale, "downloadsTileKeptOfTotal", map[string]any{"kept": kept, "count": count, "total": total})
+}
+
+// DownloadsTileTracksOfTotal says "{count, plural, one {# track} other {# tracks}}, of its {total}"
+// in the language the app shows.
+//
+// Subtitle of a downloaded collection that holds only some of a larger
+// collection.
+func DownloadsTileTracksOfTotal(count int, total int) string {
+	return In(i18n.Locale()).DownloadsTileTracksOfTotal(count, total)
+}
+
+// DownloadsTileTracksOfTotal says "{count, plural, one {# track} other {# tracks}}, of its {total}"
+// in the language of msgs.
+//
+// Subtitle of a downloaded collection that holds only some of a larger
+// collection.
+func (msgs Messages) DownloadsTileTracksOfTotal(count int, total int) string {
+	return Catalog.Format(msgs.locale, "downloadsTileTracksOfTotal", map[string]any{"count": count, "total": total})
+}
+
+// DownloadsMenuShowTracks says "Show its tracks"
+// in the language the app shows.
+//
+// Menu item of a downloaded album, playlist or mix.
+func DownloadsMenuShowTracks() string { return In(i18n.Locale()).DownloadsMenuShowTracks() }
+
+// DownloadsMenuShowTracks says "Show its tracks"
+// in the language of msgs.
+//
+// Menu item of a downloaded album, playlist or mix.
+func (msgs Messages) DownloadsMenuShowTracks() string {
+	return Catalog.Format(msgs.locale, "downloadsMenuShowTracks", nil)
+}
+
+// DownloadsMoveTitle says "move downloads"
+// in the language the app shows.
+//
+// Title of the question before the downloads move. Lowercase.
+func DownloadsMoveTitle() string { return In(i18n.Locale()).DownloadsMoveTitle() }
+
+// DownloadsMoveTitle says "move downloads"
+// in the language of msgs.
+//
+// Title of the question before the downloads move. Lowercase.
+func (msgs Messages) DownloadsMoveTitle() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveTitle", nil)
+}
+
+// DownloadsMoveQuestion says "Move {count, plural, one {# download} other {# downloads}}, {size}, to {folder}? They wait meanwhile."
+// in the language the app shows.
+func DownloadsMoveQuestion(count int, size string, folder string) string {
+	return In(i18n.Locale()).DownloadsMoveQuestion(count, size, folder)
+}
+
+// DownloadsMoveQuestion says "Move {count, plural, one {# download} other {# downloads}}, {size}, to {folder}? They wait meanwhile."
+// in the language of msgs.
+func (msgs Messages) DownloadsMoveQuestion(count int, size string, folder string) string {
+	return Catalog.Format(msgs.locale, "downloadsMoveQuestion", map[string]any{"count": count, "size": size, "folder": folder})
+}
+
+// DownloadsMove says "move"
+// in the language the app shows.
+//
+// Confirm button of moving the downloads. Lowercase.
+func DownloadsMove() string { return In(i18n.Locale()).DownloadsMove() }
+
+// DownloadsMove says "move"
+// in the language of msgs.
+//
+// Confirm button of moving the downloads. Lowercase.
+func (msgs Messages) DownloadsMove() string {
+	return Catalog.Format(msgs.locale, "downloadsMove", nil)
+}
+
+// DownloadsMoveFailed says "couldn't move the downloads: {error}"
+// in the language the app shows.
+func DownloadsMoveFailed(error string) string { return In(i18n.Locale()).DownloadsMoveFailed(error) }
+
+// DownloadsMoveFailed says "couldn't move the downloads: {error}"
+// in the language of msgs.
+func (msgs Messages) DownloadsMoveFailed(error string) string {
+	return Catalog.Format(msgs.locale, "downloadsMoveFailed", map[string]any{"error": error})
+}
+
+// DownloadsMovedTo says "The downloads are in {folder} now"
+// in the language the app shows.
+func DownloadsMovedTo(folder string) string { return In(i18n.Locale()).DownloadsMovedTo(folder) }
+
+// DownloadsMovedTo says "The downloads are in {folder} now"
+// in the language of msgs.
+func (msgs Messages) DownloadsMovedTo(folder string) string {
+	return Catalog.Format(msgs.locale, "downloadsMovedTo", map[string]any{"folder": folder})
+}
+
+// DownloadsOffline says "You're offline: your downloads still play"
+// in the language the app shows.
+//
+// Toast that tells the downloads still play while offline.
+func DownloadsOffline() string { return In(i18n.Locale()).DownloadsOffline() }
+
+// DownloadsOffline says "You're offline: your downloads still play"
+// in the language of msgs.
+//
+// Toast that tells the downloads still play while offline.
+func (msgs Messages) DownloadsOffline() string {
+	return Catalog.Format(msgs.locale, "downloadsOffline", nil)
+}
+
+// DownloadsOfflineAction says "downloads"
+// in the language the app shows.
+//
+// Action of the offline toast that opens the downloads. Lowercase.
+func DownloadsOfflineAction() string { return In(i18n.Locale()).DownloadsOfflineAction() }
+
+// DownloadsOfflineAction says "downloads"
+// in the language of msgs.
+//
+// Action of the offline toast that opens the downloads. Lowercase.
+func (msgs Messages) DownloadsOfflineAction() string {
+	return Catalog.Format(msgs.locale, "downloadsOfflineAction", nil)
+}
+
+// DownloadSyncWaiting says "{count, plural, one {# track was} other {# tracks were}} added to {title} since you downloaded it. They take about {s…"
+// in the language the app shows.
+//
+// Notice when the tracks added to a downloaded collection are too many to
+// download on their own.
+func DownloadSyncWaiting(count int, title string, size string) string {
+	return In(i18n.Locale()).DownloadSyncWaiting(count, title, size)
+}
+
+// DownloadSyncWaiting says "{count, plural, one {# track was} other {# tracks were}} added to {title} since you downloaded it. They take about {s…"
+// in the language of msgs.
+//
+// Notice when the tracks added to a downloaded collection are too many to
+// download on their own.
+func (msgs Messages) DownloadSyncWaiting(count int, title string, size string) string {
+	return Catalog.Format(msgs.locale, "downloadSyncWaiting", map[string]any{"count": count, "title": title, "size": size})
+}
+
+// DownloadSyncStarted says "{count, plural, one {Downloading # track added to {title}} other {Downloading # tracks added to {title}}}"
+// in the language the app shows.
+//
+// Notice when the tracks added to a downloaded collection start
+// downloading.
+func DownloadSyncStarted(count int, title string) string {
+	return In(i18n.Locale()).DownloadSyncStarted(count, title)
+}
+
+// DownloadSyncStarted says "{count, plural, one {Downloading # track added to {title}} other {Downloading # tracks added to {title}}}"
+// in the language of msgs.
+//
+// Notice when the tracks added to a downloaded collection start
+// downloading.
+func (msgs Messages) DownloadSyncStarted(count int, title string) string {
+	return Catalog.Format(msgs.locale, "downloadSyncStarted", map[string]any{"count": count, "title": title})
+}
+
+// ExplicitTagLabel says "Explicit"
+// in the language the app shows.
+//
+// Accessibility label of the e badge that marks an explicit track.
+func ExplicitTagLabel() string { return In(i18n.Locale()).ExplicitTagLabel() }
+
+// ExplicitTagLabel says "Explicit"
+// in the language of msgs.
+//
+// Accessibility label of the e badge that marks an explicit track.
+func (msgs Messages) ExplicitTagLabel() string {
+	return Catalog.Format(msgs.locale, "explicitTagLabel", nil)
+}
+
+// ExplicitTagHidden says "hidden by your settings"
+// in the language the app shows.
+//
+// The note on a track's row that the settings hide.
+func ExplicitTagHidden() string { return In(i18n.Locale()).ExplicitTagHidden() }
+
+// ExplicitTagHidden says "hidden by your settings"
+// in the language of msgs.
+//
+// The note on a track's row that the settings hide.
+func (msgs Messages) ExplicitTagHidden() string {
+	return Catalog.Format(msgs.locale, "explicitTagHidden", nil)
+}
+
+// HiddenWhyOthers says "Spotify shows apps the tracks of the playlists you own or collaborate on only: open this one on Spotify to play it."
+// in the language the app shows.
+func HiddenWhyOthers() string { return In(i18n.Locale()).HiddenWhyOthers() }
+
+// HiddenWhyOthers says "Spotify shows apps the tracks of the playlists you own or collaborate on only: open this one on Spotify to play it."
+// in the language of msgs.
+func (msgs Messages) HiddenWhyOthers() string {
+	return Catalog.Format(msgs.locale, "hiddenWhyOthers", nil)
+}
+
+// HiddenWhyOwn says "Spotify shows apps nothing of its own playlists, nor of those deleted or made private: open this one on Spotify to pl…"
+// in the language the app shows.
+func HiddenWhyOwn() string { return In(i18n.Locale()).HiddenWhyOwn() }
+
+// HiddenWhyOwn says "Spotify shows apps nothing of its own playlists, nor of those deleted or made private: open this one on Spotify to pl…"
+// in the language of msgs.
+func (msgs Messages) HiddenWhyOwn() string {
+	return Catalog.Format(msgs.locale, "hiddenWhyOwn", nil)
+}
+
+// HiddenSpotifyPlaylist says "Spotify playlist"
+// in the language the app shows.
+//
+// Title of a Spotify playlist whose name MixMusic doesn't know.
+func HiddenSpotifyPlaylist() string { return In(i18n.Locale()).HiddenSpotifyPlaylist() }
+
+// HiddenSpotifyPlaylist says "Spotify playlist"
+// in the language of msgs.
+//
+// Title of a Spotify playlist whose name MixMusic doesn't know.
+func (msgs Messages) HiddenSpotifyPlaylist() string {
+	return Catalog.Format(msgs.locale, "hiddenSpotifyPlaylist", nil)
+}
+
+// HiddenOpenOn says "open on {source}"
+// in the language the app shows.
+//
+// The play button of a page whose tracks open on the service. Lowercase.
+func HiddenOpenOn(source string) string { return In(i18n.Locale()).HiddenOpenOn(source) }
+
+// HiddenOpenOn says "open on {source}"
+// in the language of msgs.
+//
+// The play button of a page whose tracks open on the service. Lowercase.
+func (msgs Messages) HiddenOpenOn(source string) string {
+	return Catalog.Format(msgs.locale, "hiddenOpenOn", map[string]any{"source": source})
+}
+
+// LibraryLiked says "Liked"
+// in the language the app shows.
+//
+// Library pivot: the songs the user liked.
+func LibraryLiked() string { return In(i18n.Locale()).LibraryLiked() }
+
+// LibraryLiked says "Liked"
+// in the language of msgs.
+//
+// Library pivot: the songs the user liked.
+func (msgs Messages) LibraryLiked() string {
+	return Catalog.Format(msgs.locale, "libraryLiked", nil)
+}
+
+// LibraryMixes says "Mixes"
+// in the language the app shows.
+//
+// Library pivot: the user's mixes.
+func LibraryMixes() string { return In(i18n.Locale()).LibraryMixes() }
+
+// LibraryMixes says "Mixes"
+// in the language of msgs.
+//
+// Library pivot: the user's mixes.
+func (msgs Messages) LibraryMixes() string {
+	return Catalog.Format(msgs.locale, "libraryMixes", nil)
+}
+
+// LibraryPodcasts says "Podcasts"
+// in the language the app shows.
+//
+// Library pivot.
+func LibraryPodcasts() string { return In(i18n.Locale()).LibraryPodcasts() }
+
+// LibraryPodcasts says "Podcasts"
+// in the language of msgs.
+//
+// Library pivot.
+func (msgs Messages) LibraryPodcasts() string {
+	return Catalog.Format(msgs.locale, "libraryPodcasts", nil)
+}
+
+// LibraryArtists says "Artists"
+// in the language the app shows.
+//
+// Library pivot: the artists the user follows.
+func LibraryArtists() string { return In(i18n.Locale()).LibraryArtists() }
+
+// LibraryArtists says "Artists"
+// in the language of msgs.
+//
+// Library pivot: the artists the user follows.
+func (msgs Messages) LibraryArtists() string {
+	return Catalog.Format(msgs.locale, "libraryArtists", nil)
+}
+
+// LibraryHistory says "History"
+// in the language the app shows.
+//
+// Library pivot.
+func LibraryHistory() string { return In(i18n.Locale()).LibraryHistory() }
+
+// LibraryHistory says "History"
+// in the language of msgs.
+//
+// Library pivot.
+func (msgs Messages) LibraryHistory() string {
+	return Catalog.Format(msgs.locale, "libraryHistory", nil)
+}
+
+// LibraryDisliked says "Disliked"
+// in the language the app shows.
+//
+// Library pivot: the songs the user dislikes.
+func LibraryDisliked() string { return In(i18n.Locale()).LibraryDisliked() }
+
+// LibraryDisliked says "Disliked"
+// in the language of msgs.
+//
+// Library pivot: the songs the user dislikes.
+func (msgs Messages) LibraryDisliked() string {
+	return Catalog.Format(msgs.locale, "libraryDisliked", nil)
+}
+
+// LibraryNothingLiked says "Nothing liked yet"
+// in the language the app shows.
+//
+// Empty state of the liked songs. Lowercase when shown as a word; the
+// heading is set by the interface.
+func LibraryNothingLiked() string { return In(i18n.Locale()).LibraryNothingLiked() }
+
+// LibraryNothingLiked says "Nothing liked yet"
+// in the language of msgs.
+//
+// Empty state of the liked songs. Lowercase when shown as a word; the
+// heading is set by the interface.
+func (msgs Messages) LibraryNothingLiked() string {
+	return Catalog.Format(msgs.locale, "libraryNothingLiked", nil)
+}
+
+// LibraryLikedHint says "Tap the heart on any track, from Spotify or YouTube Music: they all gather here, in one list."
+// in the language the app shows.
+//
+// Empty state of the liked songs: how to like a track.
+func LibraryLikedHint() string { return In(i18n.Locale()).LibraryLikedHint() }
+
+// LibraryLikedHint says "Tap the heart on any track, from Spotify or YouTube Music: they all gather here, in one list."
+// in the language of msgs.
+//
+// Empty state of the liked songs: how to like a track.
+func (msgs Messages) LibraryLikedHint() string {
+	return Catalog.Format(msgs.locale, "libraryLikedHint", nil)
+}
+
+// LibraryNoLikedMatch says "No liked song matches “{query}”."
+// in the language the app shows.
+func LibraryNoLikedMatch(query string) string { return In(i18n.Locale()).LibraryNoLikedMatch(query) }
+
+// LibraryNoLikedMatch says "No liked song matches “{query}”."
+// in the language of msgs.
+func (msgs Messages) LibraryNoLikedMatch(query string) string {
+	return Catalog.Format(msgs.locale, "libraryNoLikedMatch", map[string]any{"query": query})
+}
+
+// LibraryNoDislikedMatch says "No disliked song matches “{query}”."
+// in the language the app shows.
+func LibraryNoDislikedMatch(query string) string {
+	return In(i18n.Locale()).LibraryNoDislikedMatch(query)
+}
+
+// LibraryNoDislikedMatch says "No disliked song matches “{query}”."
+// in the language of msgs.
+func (msgs Messages) LibraryNoDislikedMatch(query string) string {
+	return Catalog.Format(msgs.locale, "libraryNoDislikedMatch", map[string]any{"query": query})
+}
+
+// LibraryNewMixAbout says "tracks of every service, together"
+// in the language the app shows.
+//
+// The line under New mix on its tile. Lowercase.
+func LibraryNewMixAbout() string { return In(i18n.Locale()).LibraryNewMixAbout() }
+
+// LibraryNewMixAbout says "tracks of every service, together"
+// in the language of msgs.
+//
+// The line under New mix on its tile. Lowercase.
+func (msgs Messages) LibraryNewMixAbout() string {
+	return Catalog.Format(msgs.locale, "libraryNewMixAbout", nil)
+}
+
+// LibraryNoHistory says "No history yet"
+// in the language the app shows.
+//
+// Empty state of the history. Lowercase when shown as a word.
+func LibraryNoHistory() string { return In(i18n.Locale()).LibraryNoHistory() }
+
+// LibraryNoHistory says "No history yet"
+// in the language of msgs.
+//
+// Empty state of the history. Lowercase when shown as a word.
+func (msgs Messages) LibraryNoHistory() string {
+	return Catalog.Format(msgs.locale, "libraryNoHistory", nil)
+}
+
+// LibraryHistoryHint says "Tracks count once they played for thirty seconds."
+// in the language the app shows.
+func LibraryHistoryHint() string { return In(i18n.Locale()).LibraryHistoryHint() }
+
+// LibraryHistoryHint says "Tracks count once they played for thirty seconds."
+// in the language of msgs.
+func (msgs Messages) LibraryHistoryHint() string {
+	return Catalog.Format(msgs.locale, "libraryHistoryHint", nil)
+}
+
+// LibraryClearHistory says "clear history"
+// in the language the app shows.
+//
+// Button and question title that clear the history. Lowercase.
+func LibraryClearHistory() string { return In(i18n.Locale()).LibraryClearHistory() }
+
+// LibraryClearHistory says "clear history"
+// in the language of msgs.
+//
+// Button and question title that clear the history. Lowercase.
+func (msgs Messages) LibraryClearHistory() string {
+	return Catalog.Format(msgs.locale, "libraryClearHistory", nil)
+}
+
+// LibraryClearHistoryQuestion says "Forget every track you played? Your stats start over."
+// in the language the app shows.
+func LibraryClearHistoryQuestion() string { return In(i18n.Locale()).LibraryClearHistoryQuestion() }
+
+// LibraryClearHistoryQuestion says "Forget every track you played? Your stats start over."
+// in the language of msgs.
+func (msgs Messages) LibraryClearHistoryQuestion() string {
+	return Catalog.Format(msgs.locale, "libraryClearHistoryQuestion", nil)
+}
+
+// LibraryClear says "clear"
+// in the language the app shows.
+//
+// Confirm button of clearing the history. Lowercase.
+func LibraryClear() string { return In(i18n.Locale()).LibraryClear() }
+
+// LibraryClear says "clear"
+// in the language of msgs.
+//
+// Confirm button of clearing the history. Lowercase.
+func (msgs Messages) LibraryClear() string {
+	return Catalog.Format(msgs.locale, "libraryClear", nil)
+}
+
+// LibraryNewPlaylist says "new playlist"
+// in the language the app shows.
+//
+// Link on the playlists shelf of YouTube Music. Lowercase.
+func LibraryNewPlaylist() string { return In(i18n.Locale()).LibraryNewPlaylist() }
+
+// LibraryNewPlaylist says "new playlist"
+// in the language of msgs.
+//
+// Link on the playlists shelf of YouTube Music. Lowercase.
+func (msgs Messages) LibraryNewPlaylist() string {
+	return Catalog.Format(msgs.locale, "libraryNewPlaylist", nil)
+}
+
+// LibraryPlaylists says "Playlists"
+// in the language the app shows.
+//
+// Shelf title.
+func LibraryPlaylists() string { return In(i18n.Locale()).LibraryPlaylists() }
+
+// LibraryPlaylists says "Playlists"
+// in the language of msgs.
+//
+// Shelf title.
+func (msgs Messages) LibraryPlaylists() string {
+	return Catalog.Format(msgs.locale, "libraryPlaylists", nil)
+}
+
+// LibraryAlbums says "Albums"
+// in the language the app shows.
+//
+// Shelf title.
+func LibraryAlbums() string { return In(i18n.Locale()).LibraryAlbums() }
+
+// LibraryAlbums says "Albums"
+// in the language of msgs.
+//
+// Shelf title.
+func (msgs Messages) LibraryAlbums() string {
+	return Catalog.Format(msgs.locale, "libraryAlbums", nil)
+}
+
+// LibraryArtistsFollowed says "Artists you follow"
+// in the language the app shows.
+//
+// Shelf title.
+func LibraryArtistsFollowed() string { return In(i18n.Locale()).LibraryArtistsFollowed() }
+
+// LibraryArtistsFollowed says "Artists you follow"
+// in the language of msgs.
+//
+// Shelf title.
+func (msgs Messages) LibraryArtistsFollowed() string {
+	return Catalog.Format(msgs.locale, "libraryArtistsFollowed", nil)
+}
+
+// LibraryLikedOnSpotify says "Liked on Spotify"
+// in the language the app shows.
+//
+// Heading of the liked songs on Spotify.
+func LibraryLikedOnSpotify() string { return In(i18n.Locale()).LibraryLikedOnSpotify() }
+
+// LibraryLikedOnSpotify says "Liked on Spotify"
+// in the language of msgs.
+//
+// Heading of the liked songs on Spotify.
+func (msgs Messages) LibraryLikedOnSpotify() string {
+	return Catalog.Format(msgs.locale, "libraryLikedOnSpotify", nil)
+}
+
+// LibraryNoSpotifyLiked says "No liked songs on Spotify."
+// in the language the app shows.
+func LibraryNoSpotifyLiked() string { return In(i18n.Locale()).LibraryNoSpotifyLiked() }
+
+// LibraryNoSpotifyLiked says "No liked songs on Spotify."
+// in the language of msgs.
+func (msgs Messages) LibraryNoSpotifyLiked() string {
+	return Catalog.Format(msgs.locale, "libraryNoSpotifyLiked", nil)
+}
+
+// LibraryLoadMore says "load more · {loaded} of {total}"
+// in the language the app shows.
+//
+// Button that loads more of the liked songs. Lowercase.
+func LibraryLoadMore(loaded string, total string) string {
+	return In(i18n.Locale()).LibraryLoadMore(loaded, total)
+}
+
+// LibraryLoadMore says "load more · {loaded} of {total}"
+// in the language of msgs.
+//
+// Button that loads more of the liked songs. Lowercase.
+func (msgs Messages) LibraryLoadMore(loaded string, total string) string {
+	return Catalog.Format(msgs.locale, "libraryLoadMore", map[string]any{"loaded": loaded, "total": total})
+}
+
+// LibraryLikedOnYouTube says "Liked on YouTube Music"
+// in the language the app shows.
+//
+// Heading of the liked songs on YouTube Music.
+func LibraryLikedOnYouTube() string { return In(i18n.Locale()).LibraryLikedOnYouTube() }
+
+// LibraryLikedOnYouTube says "Liked on YouTube Music"
+// in the language of msgs.
+//
+// Heading of the liked songs on YouTube Music.
+func (msgs Messages) LibraryLikedOnYouTube() string {
+	return Catalog.Format(msgs.locale, "libraryLikedOnYouTube", nil)
+}
+
+// LibraryNoYouTubeLiked says "No liked songs on YouTube Music."
+// in the language the app shows.
+func LibraryNoYouTubeLiked() string { return In(i18n.Locale()).LibraryNoYouTubeLiked() }
+
+// LibraryNoYouTubeLiked says "No liked songs on YouTube Music."
+// in the language of msgs.
+func (msgs Messages) LibraryNoYouTubeLiked() string {
+	return Catalog.Format(msgs.locale, "libraryNoYouTubeLiked", nil)
+}
+
+// LibrarySongsTitle says "Songs in your library"
+// in the language the app shows.
+//
+// Heading of the songs saved to the library on YouTube Music.
+func LibrarySongsTitle() string { return In(i18n.Locale()).LibrarySongsTitle() }
+
+// LibrarySongsTitle says "Songs in your library"
+// in the language of msgs.
+//
+// Heading of the songs saved to the library on YouTube Music.
+func (msgs Messages) LibrarySongsTitle() string {
+	return Catalog.Format(msgs.locale, "librarySongsTitle", nil)
+}
+
+// LibrarySongsEmpty says "No songs in your library on YouTube Music. A song's Add to library keeps it here without liking it."
+// in the language the app shows.
+//
+// Empty state of the YouTube Music library's songs.
+func LibrarySongsEmpty() string { return In(i18n.Locale()).LibrarySongsEmpty() }
+
+// LibrarySongsEmpty says "No songs in your library on YouTube Music. A song's Add to library keeps it here without liking it."
+// in the language of msgs.
+//
+// Empty state of the YouTube Music library's songs.
+func (msgs Messages) LibrarySongsEmpty() string {
+	return Catalog.Format(msgs.locale, "librarySongsEmpty", nil)
+}
+
+// LibraryAddToLibrary says "Add to library"
+// in the language the app shows.
+//
+// Song menu item that saves a song to the library on YouTube Music without
+// liking it.
+func LibraryAddToLibrary() string { return In(i18n.Locale()).LibraryAddToLibrary() }
+
+// LibraryAddToLibrary says "Add to library"
+// in the language of msgs.
+//
+// Song menu item that saves a song to the library on YouTube Music without
+// liking it.
+func (msgs Messages) LibraryAddToLibrary() string {
+	return Catalog.Format(msgs.locale, "libraryAddToLibrary", nil)
+}
+
+// LibraryRemoveFromLibrary says "Remove from library"
+// in the language the app shows.
+//
+// Menu item that takes a song or playlist out of the library on YouTube
+// Music.
+func LibraryRemoveFromLibrary() string { return In(i18n.Locale()).LibraryRemoveFromLibrary() }
+
+// LibraryRemoveFromLibrary says "Remove from library"
+// in the language of msgs.
+//
+// Menu item that takes a song or playlist out of the library on YouTube
+// Music.
+func (msgs Messages) LibraryRemoveFromLibrary() string {
+	return Catalog.Format(msgs.locale, "libraryRemoveFromLibrary", nil)
+}
+
+// LibrarySongAdded says "Added {title} to your library on YouTube Music"
+// in the language the app shows.
+func LibrarySongAdded(title string) string { return In(i18n.Locale()).LibrarySongAdded(title) }
+
+// LibrarySongAdded says "Added {title} to your library on YouTube Music"
+// in the language of msgs.
+func (msgs Messages) LibrarySongAdded(title string) string {
+	return Catalog.Format(msgs.locale, "librarySongAdded", map[string]any{"title": title})
+}
+
+// LibrarySongRemoved says "Removed {title} from your library on YouTube Music"
+// in the language the app shows.
+func LibrarySongRemoved(title string) string { return In(i18n.Locale()).LibrarySongRemoved(title) }
+
+// LibrarySongRemoved says "Removed {title} from your library on YouTube Music"
+// in the language of msgs.
+func (msgs Messages) LibrarySongRemoved(title string) string {
+	return Catalog.Format(msgs.locale, "librarySongRemoved", map[string]any{"title": title})
+}
+
+// LocalTagsEditInfoItem says "Edit info…"
+// in the language the app shows.
+//
+// Menu item that edits the tags of a song on this computer.
+func LocalTagsEditInfoItem() string { return In(i18n.Locale()).LocalTagsEditInfoItem() }
+
+// LocalTagsEditInfoItem says "Edit info…"
+// in the language of msgs.
+//
+// Menu item that edits the tags of a song on this computer.
+func (msgs Messages) LocalTagsEditInfoItem() string {
+	return Catalog.Format(msgs.locale, "localTagsEditInfoItem", nil)
+}
+
+// LocalTagsMoveToAlbumItem says "Move to album…"
+// in the language the app shows.
+//
+// Menu item that moves a song to another album on this computer.
+func LocalTagsMoveToAlbumItem() string { return In(i18n.Locale()).LocalTagsMoveToAlbumItem() }
+
+// LocalTagsMoveToAlbumItem says "Move to album…"
+// in the language of msgs.
+//
+// Menu item that moves a song to another album on this computer.
+func (msgs Messages) LocalTagsMoveToAlbumItem() string {
+	return Catalog.Format(msgs.locale, "localTagsMoveToAlbumItem", nil)
+}
+
+// LocalTagsEditAlbumItem says "Edit album…"
+// in the language the app shows.
+//
+// Menu item that edits the tags of an album on this computer.
+func LocalTagsEditAlbumItem() string { return In(i18n.Locale()).LocalTagsEditAlbumItem() }
+
+// LocalTagsEditAlbumItem says "Edit album…"
+// in the language of msgs.
+//
+// Menu item that edits the tags of an album on this computer.
+func (msgs Messages) LocalTagsEditAlbumItem() string {
+	return Catalog.Format(msgs.locale, "localTagsEditAlbumItem", nil)
+}
+
+// LocalTagsNoSongs says "the album has no songs"
+// in the language the app shows.
+//
+// Why an album's tags can't be edited. Lowercase.
+func LocalTagsNoSongs() string { return In(i18n.Locale()).LocalTagsNoSongs() }
+
+// LocalTagsNoSongs says "the album has no songs"
+// in the language of msgs.
+//
+// Why an album's tags can't be edited. Lowercase.
+func (msgs Messages) LocalTagsNoSongs() string {
+	return Catalog.Format(msgs.locale, "localTagsNoSongs", nil)
+}
+
+// LocalTagsEditInfoTitle says "edit info"
+// in the language the app shows.
+//
+// Title of the Edit info dialog. Lowercase.
+func LocalTagsEditInfoTitle() string { return In(i18n.Locale()).LocalTagsEditInfoTitle() }
+
+// LocalTagsEditInfoTitle says "edit info"
+// in the language of msgs.
+//
+// Title of the Edit info dialog. Lowercase.
+func (msgs Messages) LocalTagsEditInfoTitle() string {
+	return Catalog.Format(msgs.locale, "localTagsEditInfoTitle", nil)
+}
+
+// LocalTagsEditAlbumTitle says "edit album"
+// in the language the app shows.
+//
+// Title of the Edit album dialog. Lowercase.
+func LocalTagsEditAlbumTitle() string { return In(i18n.Locale()).LocalTagsEditAlbumTitle() }
+
+// LocalTagsEditAlbumTitle says "edit album"
+// in the language of msgs.
+//
+// Title of the Edit album dialog. Lowercase.
+func (msgs Messages) LocalTagsEditAlbumTitle() string {
+	return Catalog.Format(msgs.locale, "localTagsEditAlbumTitle", nil)
+}
+
+// LocalTagsAboutSong says "The tags of {name}, which MixMusic writes into its file."
+// in the language the app shows.
+func LocalTagsAboutSong(name string) string { return In(i18n.Locale()).LocalTagsAboutSong(name) }
+
+// LocalTagsAboutSong says "The tags of {name}, which MixMusic writes into its file."
+// in the language of msgs.
+func (msgs Messages) LocalTagsAboutSong(name string) string {
+	return Catalog.Format(msgs.locale, "localTagsAboutSong", map[string]any{"name": name})
+}
+
+// LocalTagsAboutAlbum says "What the {count, plural, one {# song} other {# songs}} of {name} share, which MixMusic writes into their files."
+// in the language the app shows.
+func LocalTagsAboutAlbum(count int, name string) string {
+	return In(i18n.Locale()).LocalTagsAboutAlbum(count, name)
+}
+
+// LocalTagsAboutAlbum says "What the {count, plural, one {# song} other {# songs}} of {name} share, which MixMusic writes into their files."
+// in the language of msgs.
+func (msgs Messages) LocalTagsAboutAlbum(count int, name string) string {
+	return Catalog.Format(msgs.locale, "localTagsAboutAlbum", map[string]any{"count": count, "name": name})
+}
+
+// LocalTagsTitle says "Title"
+// in the language the app shows.
+func LocalTagsTitle() string { return In(i18n.Locale()).LocalTagsTitle() }
+
+// LocalTagsTitle says "Title"
+// in the language of msgs.
+func (msgs Messages) LocalTagsTitle() string {
+	return Catalog.Format(msgs.locale, "localTagsTitle", nil)
+}
+
+// LocalTagsArtists says "Artists"
+// in the language the app shows.
+func LocalTagsArtists() string { return In(i18n.Locale()).LocalTagsArtists() }
+
+// LocalTagsArtists says "Artists"
+// in the language of msgs.
+func (msgs Messages) LocalTagsArtists() string {
+	return Catalog.Format(msgs.locale, "localTagsArtists", nil)
+}
+
+// LocalTagsAlbum says "Album"
+// in the language the app shows.
+func LocalTagsAlbum() string { return In(i18n.Locale()).LocalTagsAlbum() }
+
+// LocalTagsAlbum says "Album"
+// in the language of msgs.
+func (msgs Messages) LocalTagsAlbum() string {
+	return Catalog.Format(msgs.locale, "localTagsAlbum", nil)
+}
+
+// LocalTagsAlbumArtist says "Album artist"
+// in the language the app shows.
+func LocalTagsAlbumArtist() string { return In(i18n.Locale()).LocalTagsAlbumArtist() }
+
+// LocalTagsAlbumArtist says "Album artist"
+// in the language of msgs.
+func (msgs Messages) LocalTagsAlbumArtist() string {
+	return Catalog.Format(msgs.locale, "localTagsAlbumArtist", nil)
+}
+
+// LocalTagsSeparate says "Separate several artists with ;"
+// in the language the app shows.
+//
+// Hint under the artists fields.
+func LocalTagsSeparate() string { return In(i18n.Locale()).LocalTagsSeparate() }
+
+// LocalTagsSeparate says "Separate several artists with ;"
+// in the language of msgs.
+//
+// Hint under the artists fields.
+func (msgs Messages) LocalTagsSeparate() string {
+	return Catalog.Format(msgs.locale, "localTagsSeparate", nil)
+}
+
+// LocalTagsTrack says "Track"
+// in the language the app shows.
+func LocalTagsTrack() string { return In(i18n.Locale()).LocalTagsTrack() }
+
+// LocalTagsTrack says "Track"
+// in the language of msgs.
+func (msgs Messages) LocalTagsTrack() string {
+	return Catalog.Format(msgs.locale, "localTagsTrack", nil)
+}
+
+// LocalTagsDisc says "Disc"
+// in the language the app shows.
+func LocalTagsDisc() string { return In(i18n.Locale()).LocalTagsDisc() }
+
+// LocalTagsDisc says "Disc"
+// in the language of msgs.
+func (msgs Messages) LocalTagsDisc() string {
+	return Catalog.Format(msgs.locale, "localTagsDisc", nil)
+}
+
+// LocalTagsYear says "Year"
+// in the language the app shows.
+func LocalTagsYear() string { return In(i18n.Locale()).LocalTagsYear() }
+
+// LocalTagsYear says "Year"
+// in the language of msgs.
+func (msgs Messages) LocalTagsYear() string {
+	return Catalog.Format(msgs.locale, "localTagsYear", nil)
+}
+
+// LocalTagsGenre says "Genre"
+// in the language the app shows.
+func LocalTagsGenre() string { return In(i18n.Locale()).LocalTagsGenre() }
+
+// LocalTagsGenre says "Genre"
+// in the language of msgs.
+func (msgs Messages) LocalTagsGenre() string {
+	return Catalog.Format(msgs.locale, "localTagsGenre", nil)
+}
+
+// LocalTagsTrackRange says "The track must be a number from {least, number, ::group-off} to {most, number, ::group-off}"
+// in the language the app shows.
+func LocalTagsTrackRange(least int, most int) string {
+	return In(i18n.Locale()).LocalTagsTrackRange(least, most)
+}
+
+// LocalTagsTrackRange says "The track must be a number from {least, number, ::group-off} to {most, number, ::group-off}"
+// in the language of msgs.
+func (msgs Messages) LocalTagsTrackRange(least int, most int) string {
+	return Catalog.Format(msgs.locale, "localTagsTrackRange", map[string]any{"least": least, "most": most})
+}
+
+// LocalTagsDiscRange says "The disc must be a number from {least, number, ::group-off} to {most, number, ::group-off}"
+// in the language the app shows.
+func LocalTagsDiscRange(least int, most int) string {
+	return In(i18n.Locale()).LocalTagsDiscRange(least, most)
+}
+
+// LocalTagsDiscRange says "The disc must be a number from {least, number, ::group-off} to {most, number, ::group-off}"
+// in the language of msgs.
+func (msgs Messages) LocalTagsDiscRange(least int, most int) string {
+	return Catalog.Format(msgs.locale, "localTagsDiscRange", map[string]any{"least": least, "most": most})
+}
+
+// LocalTagsYearRange says "The year must be a number from {least, number, ::group-off} to {most, number, ::group-off}"
+// in the language the app shows.
+func LocalTagsYearRange(least int, most int) string {
+	return In(i18n.Locale()).LocalTagsYearRange(least, most)
+}
+
+// LocalTagsYearRange says "The year must be a number from {least, number, ::group-off} to {most, number, ::group-off}"
+// in the language of msgs.
+func (msgs Messages) LocalTagsYearRange(least int, most int) string {
+	return Catalog.Format(msgs.locale, "localTagsYearRange", map[string]any{"least": least, "most": most})
+}
+
+// LocalTagsSaving says "saving…"
+// in the language the app shows.
+func LocalTagsSaving() string { return In(i18n.Locale()).LocalTagsSaving() }
+
+// LocalTagsSaving says "saving…"
+// in the language of msgs.
+func (msgs Messages) LocalTagsSaving() string {
+	return Catalog.Format(msgs.locale, "localTagsSaving", nil)
+}
+
+// LocalTagsSavingCount says "saving {done} of {total}…"
+// in the language the app shows.
+func LocalTagsSavingCount(done int, total int) string {
+	return In(i18n.Locale()).LocalTagsSavingCount(done, total)
+}
+
+// LocalTagsSavingCount says "saving {done} of {total}…"
+// in the language of msgs.
+func (msgs Messages) LocalTagsSavingCount(done int, total int) string {
+	return Catalog.Format(msgs.locale, "localTagsSavingCount", map[string]any{"done": done, "total": total})
+}
+
+// LocalTagsCover says "Cover"
+// in the language the app shows.
+func LocalTagsCover() string { return In(i18n.Locale()).LocalTagsCover() }
+
+// LocalTagsCover says "Cover"
+// in the language of msgs.
+func (msgs Messages) LocalTagsCover() string {
+	return Catalog.Format(msgs.locale, "localTagsCover", nil)
+}
+
+// LocalTagsNone says "None"
+// in the language the app shows.
+//
+// No cover. Shown in the Cover row.
+func LocalTagsNone() string { return In(i18n.Locale()).LocalTagsNone() }
+
+// LocalTagsNone says "None"
+// in the language of msgs.
+//
+// No cover. Shown in the Cover row.
+func (msgs Messages) LocalTagsNone() string {
+	return Catalog.Format(msgs.locale, "localTagsNone", nil)
+}
+
+// LocalTagsChooseImage says "choose an image…"
+// in the language the app shows.
+//
+// Button that chooses a cover image. Lowercase.
+func LocalTagsChooseImage() string { return In(i18n.Locale()).LocalTagsChooseImage() }
+
+// LocalTagsChooseImage says "choose an image…"
+// in the language of msgs.
+//
+// Button that chooses a cover image. Lowercase.
+func (msgs Messages) LocalTagsChooseImage() string {
+	return Catalog.Format(msgs.locale, "localTagsChooseImage", nil)
+}
+
+// LocalTagsRemoveCover says "remove the cover"
+// in the language the app shows.
+//
+// Button that removes the cover. Lowercase.
+func LocalTagsRemoveCover() string { return In(i18n.Locale()).LocalTagsRemoveCover() }
+
+// LocalTagsRemoveCover says "remove the cover"
+// in the language of msgs.
+//
+// Button that removes the cover. Lowercase.
+func (msgs Messages) LocalTagsRemoveCover() string {
+	return Catalog.Format(msgs.locale, "localTagsRemoveCover", nil)
+}
+
+// LocalTagsChooseCoverTitle says "Choose a cover"
+// in the language the app shows.
+//
+// Title of the file dialog that picks a cover.
+func LocalTagsChooseCoverTitle() string { return In(i18n.Locale()).LocalTagsChooseCoverTitle() }
+
+// LocalTagsChooseCoverTitle says "Choose a cover"
+// in the language of msgs.
+//
+// Title of the file dialog that picks a cover.
+func (msgs Messages) LocalTagsChooseCoverTitle() string {
+	return Catalog.Format(msgs.locale, "localTagsChooseCoverTitle", nil)
+}
+
+// LocalTagsImages says "Images"
+// in the language the app shows.
+//
+// Name of the file filter for image files in the file dialog.
+func LocalTagsImages() string { return In(i18n.Locale()).LocalTagsImages() }
+
+// LocalTagsImages says "Images"
+// in the language of msgs.
+//
+// Name of the file filter for image files in the file dialog.
+func (msgs Messages) LocalTagsImages() string {
+	return Catalog.Format(msgs.locale, "localTagsImages", nil)
+}
+
+// LocalTagsBadImage says "Couldn't use that image: {error}"
+// in the language the app shows.
+func LocalTagsBadImage(error string) string { return In(i18n.Locale()).LocalTagsBadImage(error) }
+
+// LocalTagsBadImage says "Couldn't use that image: {error}"
+// in the language of msgs.
+func (msgs Messages) LocalTagsBadImage(error string) string {
+	return Catalog.Format(msgs.locale, "localTagsBadImage", map[string]any{"error": error})
+}
+
+// LocalTagsSavedSome says "Saved {saved} of {total} songs. {problem}"
+// in the language the app shows.
+func LocalTagsSavedSome(saved int, total int, problem string) string {
+	return In(i18n.Locale()).LocalTagsSavedSome(saved, total, problem)
+}
+
+// LocalTagsSavedSome says "Saved {saved} of {total} songs. {problem}"
+// in the language of msgs.
+func (msgs Messages) LocalTagsSavedSome(saved int, total int, problem string) string {
+	return Catalog.Format(msgs.locale, "localTagsSavedSome", map[string]any{"saved": saved, "total": total, "problem": problem})
+}
+
+// LocalTagsSavedAlbum says "Saved {name}: {count, plural, one {# song} other {# songs}}"
+// in the language the app shows.
+func LocalTagsSavedAlbum(name string, count int) string {
+	return In(i18n.Locale()).LocalTagsSavedAlbum(name, count)
+}
+
+// LocalTagsSavedAlbum says "Saved {name}: {count, plural, one {# song} other {# songs}}"
+// in the language of msgs.
+func (msgs Messages) LocalTagsSavedAlbum(name string, count int) string {
+	return Catalog.Format(msgs.locale, "localTagsSavedAlbum", map[string]any{"name": name, "count": count})
+}
+
+// LocalTagsSavedTags says "Saved the tags of {name}"
+// in the language the app shows.
+func LocalTagsSavedTags(name string) string { return In(i18n.Locale()).LocalTagsSavedTags(name) }
+
+// LocalTagsSavedTags says "Saved the tags of {name}"
+// in the language of msgs.
+func (msgs Messages) LocalTagsSavedTags(name string) string {
+	return Catalog.Format(msgs.locale, "localTagsSavedTags", map[string]any{"name": name})
+}
+
+// LocalTagsMoveTitle says "move to album"
+// in the language the app shows.
+//
+// Title of the Move to album dialog. Lowercase.
+func LocalTagsMoveTitle() string { return In(i18n.Locale()).LocalTagsMoveTitle() }
+
+// LocalTagsMoveTitle says "move to album"
+// in the language of msgs.
+//
+// Title of the Move to album dialog. Lowercase.
+func (msgs Messages) LocalTagsMoveTitle() string {
+	return Catalog.Format(msgs.locale, "localTagsMoveTitle", nil)
+}
+
+// LocalTagsMoveAbout says "Choose an album of this computer for {title}, or name a new one. MixMusic writes it into the song's file."
+// in the language the app shows.
+func LocalTagsMoveAbout(title string) string { return In(i18n.Locale()).LocalTagsMoveAbout(title) }
+
+// LocalTagsMoveAbout says "Choose an album of this computer for {title}, or name a new one. MixMusic writes it into the song's file."
+// in the language of msgs.
+func (msgs Messages) LocalTagsMoveAbout(title string) string {
+	return Catalog.Format(msgs.locale, "localTagsMoveAbout", map[string]any{"title": title})
+}
+
+// LocalTagsFindAlbum says "find an album, or name a new one"
+// in the language the app shows.
+//
+// Placeholder of the album search. Lowercase.
+func LocalTagsFindAlbum() string { return In(i18n.Locale()).LocalTagsFindAlbum() }
+
+// LocalTagsFindAlbum says "find an album, or name a new one"
+// in the language of msgs.
+//
+// Placeholder of the album search. Lowercase.
+func (msgs Messages) LocalTagsFindAlbum() string {
+	return Catalog.Format(msgs.locale, "localTagsFindAlbum", nil)
+}
+
+// LocalTagsNoAlbum says "No album of this computer is called that: Move makes a new one."
+// in the language the app shows.
+func LocalTagsNoAlbum() string { return In(i18n.Locale()).LocalTagsNoAlbum() }
+
+// LocalTagsNoAlbum says "No album of this computer is called that: Move makes a new one."
+// in the language of msgs.
+func (msgs Messages) LocalTagsNoAlbum() string {
+	return Catalog.Format(msgs.locale, "localTagsNoAlbum", nil)
+}
+
+// LocalTagsMove says "move"
+// in the language the app shows.
+//
+// Confirm button of Move to album. Lowercase.
+func LocalTagsMove() string { return In(i18n.Locale()).LocalTagsMove() }
+
+// LocalTagsMove says "move"
+// in the language of msgs.
+//
+// Confirm button of Move to album. Lowercase.
+func (msgs Messages) LocalTagsMove() string {
+	return Catalog.Format(msgs.locale, "localTagsMove", nil)
+}
+
+// LocalTagsMoveNew says "move to a new album"
+// in the language the app shows.
+//
+// Confirm button when the album is new. Lowercase.
+func LocalTagsMoveNew() string { return In(i18n.Locale()).LocalTagsMoveNew() }
+
+// LocalTagsMoveNew says "move to a new album"
+// in the language of msgs.
+//
+// Confirm button when the album is new. Lowercase.
+func (msgs Messages) LocalTagsMoveNew() string {
+	return Catalog.Format(msgs.locale, "localTagsMoveNew", nil)
+}
+
+// LocalTagsMoving says "moving…"
+// in the language the app shows.
+func LocalTagsMoving() string { return In(i18n.Locale()).LocalTagsMoving() }
+
+// LocalTagsMoving says "moving…"
+// in the language of msgs.
+func (msgs Messages) LocalTagsMoving() string {
+	return Catalog.Format(msgs.locale, "localTagsMoving", nil)
+}
+
+// LocalTagsMoveNote says "The songs of {album} have no album artist, and are in another folder: they all take {artists} as theirs, so that they…"
+// in the language the app shows.
+func LocalTagsMoveNote(album string, artists string) string {
+	return In(i18n.Locale()).LocalTagsMoveNote(album, artists)
+}
+
+// LocalTagsMoveNote says "The songs of {album} have no album artist, and are in another folder: they all take {artists} as theirs, so that they…"
+// in the language of msgs.
+func (msgs Messages) LocalTagsMoveNote(album string, artists string) string {
+	return Catalog.Format(msgs.locale, "localTagsMoveNote", map[string]any{"album": album, "artists": artists})
+}
+
+// LocalTagsMoved says "Moved {track} to {album}"
+// in the language the app shows.
+func LocalTagsMoved(track string, album string) string {
+	return In(i18n.Locale()).LocalTagsMoved(track, album)
+}
+
+// LocalTagsMoved says "Moved {track} to {album}"
+// in the language of msgs.
+func (msgs Messages) LocalTagsMoved(track string, album string) string {
+	return Catalog.Format(msgs.locale, "localTagsMoved", map[string]any{"track": track, "album": album})
+}
+
+// OutputChoiceSystemDefault says "System default"
+// in the language the app shows.
+//
+// The choice of the system's default output device.
+func OutputChoiceSystemDefault() string { return In(i18n.Locale()).OutputChoiceSystemDefault() }
+
+// OutputChoiceSystemDefault says "System default"
+// in the language of msgs.
+//
+// The choice of the system's default output device.
+func (msgs Messages) OutputChoiceSystemDefault() string {
+	return Catalog.Format(msgs.locale, "outputChoiceSystemDefault", nil)
+}
+
+// OutputChoiceChosen says "The device chosen"
+// in the language the app shows.
+//
+// Label of the device chosen when it has no name and isn't connected.
+func OutputChoiceChosen() string { return In(i18n.Locale()).OutputChoiceChosen() }
+
+// OutputChoiceChosen says "The device chosen"
+// in the language of msgs.
+//
+// Label of the device chosen when it has no name and isn't connected.
+func (msgs Messages) OutputChoiceChosen() string {
+	return Catalog.Format(msgs.locale, "outputChoiceChosen", nil)
+}
+
+// OutputChoiceNotConnected says "not connected"
+// in the language the app shows.
+//
+// Detail under the device chosen when it isn't connected. Lowercase.
+func OutputChoiceNotConnected() string { return In(i18n.Locale()).OutputChoiceNotConnected() }
+
+// OutputChoiceNotConnected says "not connected"
+// in the language of msgs.
+//
+// Detail under the device chosen when it isn't connected. Lowercase.
+func (msgs Messages) OutputChoiceNotConnected() string {
+	return Catalog.Format(msgs.locale, "outputChoiceNotConnected", nil)
+}
+
+// OutputChoiceAsideCast says "Playing on {device}: the device is this computer's"
+// in the language the app shows.
+//
+// Why the output device can't play: a cast device is playing.
+func OutputChoiceAsideCast(device string) string {
+	return In(i18n.Locale()).OutputChoiceAsideCast(device)
+}
+
+// OutputChoiceAsideCast says "Playing on {device}: the device is this computer's"
+// in the language of msgs.
+//
+// Why the output device can't play: a cast device is playing.
+func (msgs Messages) OutputChoiceAsideCast(device string) string {
+	return Catalog.Format(msgs.locale, "outputChoiceAsideCast", map[string]any{"device": device})
+}
+
+// OutputChoiceAsideConnect says "Spotify Connect plays this track on its own device"
+// in the language the app shows.
+//
+// Why the output device can't play: Spotify Connect plays the track.
+func OutputChoiceAsideConnect() string { return In(i18n.Locale()).OutputChoiceAsideConnect() }
+
+// OutputChoiceAsideConnect says "Spotify Connect plays this track on its own device"
+// in the language of msgs.
+//
+// Why the output device can't play: Spotify Connect plays the track.
+func (msgs Messages) OutputChoiceAsideConnect() string {
+	return Catalog.Format(msgs.locale, "outputChoiceAsideConnect", nil)
+}
+
+// OutputChoiceAsideSystem says "Spotify plays this track on the system's default device"
+// in the language the app shows.
+//
+// Why the output device can't play: Spotify plays the track on the system's
+// default device.
+func OutputChoiceAsideSystem() string { return In(i18n.Locale()).OutputChoiceAsideSystem() }
+
+// OutputChoiceAsideSystem says "Spotify plays this track on the system's default device"
+// in the language of msgs.
+//
+// Why the output device can't play: Spotify plays the track on the system's
+// default device.
+func (msgs Messages) OutputChoiceAsideSystem() string {
+	return Catalog.Format(msgs.locale, "outputChoiceAsideSystem", nil)
+}
+
+// OutputChoiceLooking says "Looking for devices…"
+// in the language the app shows.
+//
+// Shown in the output menu while the devices are listed.
+func OutputChoiceLooking() string { return In(i18n.Locale()).OutputChoiceLooking() }
+
+// OutputChoiceLooking says "Looking for devices…"
+// in the language of msgs.
+//
+// Shown in the output menu while the devices are listed.
+func (msgs Messages) OutputChoiceLooking() string {
+	return Catalog.Format(msgs.locale, "outputChoiceLooking", nil)
+}
+
+// OutputChoiceButton says "Output device: {device}"
+// in the language the app shows.
+//
+// Label of the output device button, with the device's name.
+func OutputChoiceButton(device string) string { return In(i18n.Locale()).OutputChoiceButton(device) }
+
+// OutputChoiceButton says "Output device: {device}"
+// in the language of msgs.
+//
+// Label of the output device button, with the device's name.
+func (msgs Messages) OutputChoiceButton(device string) string {
+	return Catalog.Format(msgs.locale, "outputChoiceButton", map[string]any{"device": device})
+}
+
+// OutputChoiceButtonFallback says "Output device: {device}, not connected: the system's default plays"
+// in the language the app shows.
+//
+// Label of the output device button while the device chosen isn't
+// connected.
+func OutputChoiceButtonFallback(device string) string {
+	return In(i18n.Locale()).OutputChoiceButtonFallback(device)
+}
+
+// OutputChoiceButtonFallback says "Output device: {device}, not connected: the system's default plays"
+// in the language of msgs.
+//
+// Label of the output device button while the device chosen isn't
+// connected.
+func (msgs Messages) OutputChoiceButtonFallback(device string) string {
+	return Catalog.Format(msgs.locale, "outputChoiceButtonFallback", map[string]any{"device": device})
+}
+
+// LibrarySave says "save"
+// in the language the app shows.
+func LibrarySave() string { return In(i18n.Locale()).LibrarySave() }
+
+// LibrarySave says "save"
+// in the language of msgs.
+func (msgs Messages) LibrarySave() string {
+	return Catalog.Format(msgs.locale, "librarySave", nil)
+}
+
+// LibrarySaved says "saved"
+// in the language the app shows.
+func LibrarySaved() string { return In(i18n.Locale()).LibrarySaved() }
+
+// LibrarySaved says "saved"
+// in the language of msgs.
+func (msgs Messages) LibrarySaved() string {
+	return Catalog.Format(msgs.locale, "librarySaved", nil)
+}
+
+// LibraryCancel says "cancel"
+// in the language the app shows.
+func LibraryCancel() string { return In(i18n.Locale()).LibraryCancel() }
+
+// LibraryCancel says "cancel"
+// in the language of msgs.
+func (msgs Messages) LibraryCancel() string {
+	return Catalog.Format(msgs.locale, "libraryCancel", nil)
+}
+
+// LibraryPlay says "play"
+// in the language the app shows.
+//
+// A button that plays what the page shows. Lowercase.
+func LibraryPlay() string { return In(i18n.Locale()).LibraryPlay() }
+
+// LibraryPlay says "play"
+// in the language of msgs.
+//
+// A button that plays what the page shows. Lowercase.
+func (msgs Messages) LibraryPlay() string {
+	return Catalog.Format(msgs.locale, "libraryPlay", nil)
+}
+
+// LibraryShuffle says "shuffle"
+// in the language the app shows.
+//
+// A button that plays what the page shows shuffled. Lowercase.
+func LibraryShuffle() string { return In(i18n.Locale()).LibraryShuffle() }
+
+// LibraryShuffle says "shuffle"
+// in the language of msgs.
+//
+// A button that plays what the page shows shuffled. Lowercase.
+func (msgs Messages) LibraryShuffle() string {
+	return Catalog.Format(msgs.locale, "libraryShuffle", nil)
+}
+
+// LibraryRemove says "remove"
+// in the language the app shows.
+//
+// The confirm button of a removal. Lowercase.
+func LibraryRemove() string { return In(i18n.Locale()).LibraryRemove() }
+
+// LibraryRemove says "remove"
+// in the language of msgs.
+//
+// The confirm button of a removal. Lowercase.
+func (msgs Messages) LibraryRemove() string {
+	return Catalog.Format(msgs.locale, "libraryRemove", nil)
+}
+
+// LibraryDelete says "delete"
+// in the language the app shows.
+//
+// The confirm button of a deletion. Lowercase.
+func LibraryDelete() string { return In(i18n.Locale()).LibraryDelete() }
+
+// LibraryDelete says "delete"
+// in the language of msgs.
+//
+// The confirm button of a deletion. Lowercase.
+func (msgs Messages) LibraryDelete() string {
+	return Catalog.Format(msgs.locale, "libraryDelete", nil)
+}
+
+// LibraryRename says "rename"
+// in the language the app shows.
+//
+// The confirm button of a rename. Lowercase.
+func LibraryRename() string { return In(i18n.Locale()).LibraryRename() }
+
+// LibraryRename says "rename"
+// in the language of msgs.
+//
+// The confirm button of a rename. Lowercase.
+func (msgs Messages) LibraryRename() string {
+	return Catalog.Format(msgs.locale, "libraryRename", nil)
+}
+
+// LibraryRenameItem says "Rename"
+// in the language the app shows.
+//
+// Menu item that renames a mix.
+func LibraryRenameItem() string { return In(i18n.Locale()).LibraryRenameItem() }
+
+// LibraryRenameItem says "Rename"
+// in the language of msgs.
+//
+// Menu item that renames a mix.
+func (msgs Messages) LibraryRenameItem() string {
+	return Catalog.Format(msgs.locale, "libraryRenameItem", nil)
+}
+
+// LibraryDeleteItem says "Delete"
+// in the language the app shows.
+//
+// Menu item that deletes a mix or playlist.
+func LibraryDeleteItem() string { return In(i18n.Locale()).LibraryDeleteItem() }
+
+// LibraryDeleteItem says "Delete"
+// in the language of msgs.
+//
+// Menu item that deletes a mix or playlist.
+func (msgs Messages) LibraryDeleteItem() string {
+	return Catalog.Format(msgs.locale, "libraryDeleteItem", nil)
+}
+
+// LibraryTrackCount says "{count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+//
+// How many tracks a list holds.
+func LibraryTrackCount(count int) string { return In(i18n.Locale()).LibraryTrackCount(count) }
+
+// LibraryTrackCount says "{count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+//
+// How many tracks a list holds.
+func (msgs Messages) LibraryTrackCount(count int) string {
+	return Catalog.Format(msgs.locale, "libraryTrackCount", map[string]any{"count": count})
+}
+
+// LibraryAddToQueue says "Add to queue"
+// in the language the app shows.
+//
+// Menu item that adds the tracks to the queue.
+func LibraryAddToQueue() string { return In(i18n.Locale()).LibraryAddToQueue() }
+
+// LibraryAddToQueue says "Add to queue"
+// in the language of msgs.
+//
+// Menu item that adds the tracks to the queue.
+func (msgs Messages) LibraryAddToQueue() string {
+	return Catalog.Format(msgs.locale, "libraryAddToQueue", nil)
+}
+
+// LibraryPlayNext says "Play next"
+// in the language the app shows.
+//
+// Menu item that plays the tracks next.
+func LibraryPlayNext() string { return In(i18n.Locale()).LibraryPlayNext() }
+
+// LibraryPlayNext says "Play next"
+// in the language of msgs.
+//
+// Menu item that plays the tracks next.
+func (msgs Messages) LibraryPlayNext() string {
+	return Catalog.Format(msgs.locale, "libraryPlayNext", nil)
+}
+
+// LibraryPlaysNext says "{title} plays next"
+// in the language the app shows.
+func LibraryPlaysNext(title string) string { return In(i18n.Locale()).LibraryPlaysNext(title) }
+
+// LibraryPlaysNext says "{title} plays next"
+// in the language of msgs.
+func (msgs Messages) LibraryPlaysNext(title string) string {
+	return Catalog.Format(msgs.locale, "libraryPlaysNext", map[string]any{"title": title})
+}
+
+// LibraryAddedToQueue says "Added {title} to the queue"
+// in the language the app shows.
+func LibraryAddedToQueue(title string) string { return In(i18n.Locale()).LibraryAddedToQueue(title) }
+
+// LibraryAddedToQueue says "Added {title} to the queue"
+// in the language of msgs.
+func (msgs Messages) LibraryAddedToQueue(title string) string {
+	return Catalog.Format(msgs.locale, "libraryAddedToQueue", map[string]any{"title": title})
+}
+
+// LibraryStartRadio says "Start radio"
+// in the language the app shows.
+//
+// Menu item that starts a radio from the tracks.
+func LibraryStartRadio() string { return In(i18n.Locale()).LibraryStartRadio() }
+
+// LibraryStartRadio says "Start radio"
+// in the language of msgs.
+//
+// Menu item that starts a radio from the tracks.
+func (msgs Messages) LibraryStartRadio() string {
+	return Catalog.Format(msgs.locale, "libraryStartRadio", nil)
+}
+
+// LibraryOpenOn says "Open on {source}"
+// in the language the app shows.
+//
+// Menu item that opens the page on its service. The source is a brand name.
+func LibraryOpenOn(source string) string { return In(i18n.Locale()).LibraryOpenOn(source) }
+
+// LibraryOpenOn says "Open on {source}"
+// in the language of msgs.
+//
+// Menu item that opens the page on its service. The source is a brand name.
+func (msgs Messages) LibraryOpenOn(source string) string {
+	return Catalog.Format(msgs.locale, "libraryOpenOn", map[string]any{"source": source})
+}
+
+// LibraryCopiedInto says "Copied into {title}"
+// in the language the app shows.
+func LibraryCopiedInto(title string) string { return In(i18n.Locale()).LibraryCopiedInto(title) }
+
+// LibraryCopiedInto says "Copied into {title}"
+// in the language of msgs.
+func (msgs Messages) LibraryCopiedInto(title string) string {
+	return Catalog.Format(msgs.locale, "libraryCopiedInto", map[string]any{"title": title})
+}
+
+// LibraryCreated says "Created {title}"
+// in the language the app shows.
+func LibraryCreated(title string) string { return In(i18n.Locale()).LibraryCreated(title) }
+
+// LibraryCreated says "Created {title}"
+// in the language of msgs.
+func (msgs Messages) LibraryCreated(title string) string {
+	return Catalog.Format(msgs.locale, "libraryCreated", map[string]any{"title": title})
+}
+
+// LibraryDeleted says "Deleted {title}"
+// in the language the app shows.
+func LibraryDeleted(title string) string { return In(i18n.Locale()).LibraryDeleted(title) }
+
+// LibraryDeleted says "Deleted {title}"
+// in the language of msgs.
+func (msgs Messages) LibraryDeleted(title string) string {
+	return Catalog.Format(msgs.locale, "libraryDeleted", map[string]any{"title": title})
+}
+
+// LibraryNewYouTubePlaylist says "New playlist on YouTube Music"
+// in the language the app shows.
+//
+// Title of the prompt that names a new playlist on YouTube Music.
+func LibraryNewYouTubePlaylist() string { return In(i18n.Locale()).LibraryNewYouTubePlaylist() }
+
+// LibraryNewYouTubePlaylist says "New playlist on YouTube Music"
+// in the language of msgs.
+//
+// Title of the prompt that names a new playlist on YouTube Music.
+func (msgs Messages) LibraryNewYouTubePlaylist() string {
+	return Catalog.Format(msgs.locale, "libraryNewYouTubePlaylist", nil)
+}
+
+// LibrarySavedNotice says "{what}: saved"
+// in the language the app shows.
+//
+// Notice once a playlist or album is saved to the library.
+func LibrarySavedNotice(what string) string { return In(i18n.Locale()).LibrarySavedNotice(what) }
+
+// LibrarySavedNotice says "{what}: saved"
+// in the language of msgs.
+//
+// Notice once a playlist or album is saved to the library.
+func (msgs Messages) LibrarySavedNotice(what string) string {
+	return Catalog.Format(msgs.locale, "librarySavedNotice", map[string]any{"what": what})
+}
+
+// LibraryUnsavedNotice says "{what}: no longer saved"
+// in the language the app shows.
+//
+// Notice once a playlist or album is taken out of the library.
+func LibraryUnsavedNotice(what string) string { return In(i18n.Locale()).LibraryUnsavedNotice(what) }
+
+// LibraryUnsavedNotice says "{what}: no longer saved"
+// in the language of msgs.
+//
+// Notice once a playlist or album is taken out of the library.
+func (msgs Messages) LibraryUnsavedNotice(what string) string {
+	return Catalog.Format(msgs.locale, "libraryUnsavedNotice", map[string]any{"what": what})
+}
+
+// ToolsInstalling says "installing yt-dlp…"
+// in the language the app shows.
+//
+// Shown while yt-dlp installs. Lowercase.
+func ToolsInstalling() string { return In(i18n.Locale()).ToolsInstalling() }
+
+// ToolsInstalling says "installing yt-dlp…"
+// in the language of msgs.
+//
+// Shown while yt-dlp installs. Lowercase.
+func (msgs Messages) ToolsInstalling() string {
+	return Catalog.Format(msgs.locale, "toolsInstalling", nil)
+}
+
+// ToolsInstallFailed says "couldn't install yt-dlp: {error}"
+// in the language the app shows.
+func ToolsInstallFailed(error string) string { return In(i18n.Locale()).ToolsInstallFailed(error) }
+
+// ToolsInstallFailed says "couldn't install yt-dlp: {error}"
+// in the language of msgs.
+func (msgs Messages) ToolsInstallFailed(error string) string {
+	return Catalog.Format(msgs.locale, "toolsInstallFailed", map[string]any{"error": error})
+}
+
+// ToolsReady says "yt-dlp {version} is ready"
+// in the language the app shows.
+func ToolsReady(version string) string { return In(i18n.Locale()).ToolsReady(version) }
+
+// ToolsReady says "yt-dlp {version} is ready"
+// in the language of msgs.
+func (msgs Messages) ToolsReady(version string) string {
+	return Catalog.Format(msgs.locale, "toolsReady", map[string]any{"version": version})
+}
+
+// ToolsNeedTitle says "Some tracks need yt-dlp"
+// in the language the app shows.
+//
+// Home notice title when yt-dlp isn't installed.
+func ToolsNeedTitle() string { return In(i18n.Locale()).ToolsNeedTitle() }
+
+// ToolsNeedTitle says "Some tracks need yt-dlp"
+// in the language of msgs.
+//
+// Home notice title when yt-dlp isn't installed.
+func (msgs Messages) ToolsNeedTitle() string {
+	return Catalog.Format(msgs.locale, "toolsNeedTitle", nil)
+}
+
+// ToolsNeedMessage says "MixMusic finds the audio of most tracks itself, and asks yt-dlp for the rest, such as tracks made for children. Insta…"
+// in the language the app shows.
+func ToolsNeedMessage() string { return In(i18n.Locale()).ToolsNeedMessage() }
+
+// ToolsNeedMessage says "MixMusic finds the audio of most tracks itself, and asks yt-dlp for the rest, such as tracks made for children. Insta…"
+// in the language of msgs.
+func (msgs Messages) ToolsNeedMessage() string {
+	return Catalog.Format(msgs.locale, "toolsNeedMessage", nil)
+}
+
+// ToolsOutdatedTitle says "Your yt-dlp is out of date"
+// in the language the app shows.
+//
+// Home notice title when the user's own yt-dlp is old.
+func ToolsOutdatedTitle() string { return In(i18n.Locale()).ToolsOutdatedTitle() }
+
+// ToolsOutdatedTitle says "Your yt-dlp is out of date"
+// in the language of msgs.
+//
+// Home notice title when the user's own yt-dlp is old.
+func (msgs Messages) ToolsOutdatedTitle() string {
+	return Catalog.Format(msgs.locale, "toolsOutdatedTitle", nil)
+}
+
+// ToolsHowInstalled says "the way you installed it"
+// in the language the app shows.
+//
+// How to update yt-dlp, when no command is known. Lowercase.
+func ToolsHowInstalled() string { return In(i18n.Locale()).ToolsHowInstalled() }
+
+// ToolsHowInstalled says "the way you installed it"
+// in the language of msgs.
+//
+// How to update yt-dlp, when no command is known. Lowercase.
+func (msgs Messages) ToolsHowInstalled() string {
+	return Catalog.Format(msgs.locale, "toolsHowInstalled", nil)
+}
+
+// ToolsHowWithCommand says "with {command}"
+// in the language the app shows.
+//
+// How to update yt-dlp: the command that updates it. Lowercase.
+func ToolsHowWithCommand(command string) string {
+	return In(i18n.Locale()).ToolsHowWithCommand(command)
+}
+
+// ToolsHowWithCommand says "with {command}"
+// in the language of msgs.
+//
+// How to update yt-dlp: the command that updates it. Lowercase.
+func (msgs Messages) ToolsHowWithCommand(command string) string {
+	return Catalog.Format(msgs.locale, "toolsHowWithCommand", map[string]any{"command": command})
+}
+
+// ToolsOutdatedMessage says "yt-dlp {version} finds the audio of the tracks YouTube won't give MixMusic itself, and {latest} is out. As YouTube ch…"
+// in the language the app shows.
+//
+// Home notice body when the user's own yt-dlp is older than the latest
+// release. {how} is one of the two How messages.
+func ToolsOutdatedMessage(version string, latest string, how string) string {
+	return In(i18n.Locale()).ToolsOutdatedMessage(version, latest, how)
+}
+
+// ToolsOutdatedMessage says "yt-dlp {version} finds the audio of the tracks YouTube won't give MixMusic itself, and {latest} is out. As YouTube ch…"
+// in the language of msgs.
+//
+// Home notice body when the user's own yt-dlp is older than the latest
+// release. {how} is one of the two How messages.
+func (msgs Messages) ToolsOutdatedMessage(version string, latest string, how string) string {
+	return Catalog.Format(msgs.locale, "toolsOutdatedMessage", map[string]any{"version": version, "latest": latest, "how": how})
+}
+
+// ToolsNotNow says "not now"
+// in the language the app shows.
+//
+// Button that dismisses the notice about an old yt-dlp. Lowercase.
+func ToolsNotNow() string { return In(i18n.Locale()).ToolsNotNow() }
+
+// ToolsNotNow says "not now"
+// in the language of msgs.
+//
+// Button that dismisses the notice about an old yt-dlp. Lowercase.
+func (msgs Messages) ToolsNotNow() string {
+	return Catalog.Format(msgs.locale, "toolsNotNow", nil)
+}
+
+// LyricsTranslateTip says "Shows each line's translation under it. While it's on, the lyrics of the track playing and its video ID go to Unison,…"
+// in the language the app shows.
+func LyricsTranslateTip() string { return In(i18n.Locale()).LyricsTranslateTip() }
+
+// LyricsTranslateTip says "Shows each line's translation under it. While it's on, the lyrics of the track playing and its video ID go to Unison,…"
+// in the language of msgs.
+func (msgs Messages) LyricsTranslateTip() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslateTip", nil)
+}
+
+// LyricsRomanizeTip says "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, …"
+// in the language the app shows.
+func LyricsRomanizeTip() string { return In(i18n.Locale()).LyricsRomanizeTip() }
+
+// LyricsRomanizeTip says "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, …"
+// in the language of msgs.
+func (msgs Messages) LyricsRomanizeTip() string {
+	return Catalog.Format(msgs.locale, "lyricsRomanizeTip", nil)
+}
+
+// LyricsRomaji says "romaji"
+// in the language the app shows.
+func LyricsRomaji() string { return In(i18n.Locale()).LyricsRomaji() }
+
+// LyricsRomaji says "romaji"
+// in the language of msgs.
+func (msgs Messages) LyricsRomaji() string {
+	return Catalog.Format(msgs.locale, "lyricsRomaji", nil)
+}
+
+// LyricsRomajiUnder says "romaji under"
+// in the language the app shows.
+func LyricsRomajiUnder() string { return In(i18n.Locale()).LyricsRomajiUnder() }
+
+// LyricsRomajiUnder says "romaji under"
+// in the language of msgs.
+func (msgs Messages) LyricsRomajiUnder() string {
+	return Catalog.Format(msgs.locale, "lyricsRomajiUnder", nil)
+}
+
+// LyricsRomajiOnly says "romaji only"
+// in the language the app shows.
+func LyricsRomajiOnly() string { return In(i18n.Locale()).LyricsRomajiOnly() }
+
+// LyricsRomajiOnly says "romaji only"
+// in the language of msgs.
+func (msgs Messages) LyricsRomajiOnly() string {
+	return Catalog.Format(msgs.locale, "lyricsRomajiOnly", nil)
+}
+
+// LyricsRomanize says "romanize"
+// in the language the app shows.
+func LyricsRomanize() string { return In(i18n.Locale()).LyricsRomanize() }
+
+// LyricsRomanize says "romanize"
+// in the language of msgs.
+func (msgs Messages) LyricsRomanize() string {
+	return Catalog.Format(msgs.locale, "lyricsRomanize", nil)
+}
+
+// LyricsRomanizeUnder says "romanized under"
+// in the language the app shows.
+func LyricsRomanizeUnder() string { return In(i18n.Locale()).LyricsRomanizeUnder() }
+
+// LyricsRomanizeUnder says "romanized under"
+// in the language of msgs.
+func (msgs Messages) LyricsRomanizeUnder() string {
+	return Catalog.Format(msgs.locale, "lyricsRomanizeUnder", nil)
+}
+
+// LyricsRomanizeOnly says "romanized only"
+// in the language the app shows.
+func LyricsRomanizeOnly() string { return In(i18n.Locale()).LyricsRomanizeOnly() }
+
+// LyricsRomanizeOnly says "romanized only"
+// in the language of msgs.
+func (msgs Messages) LyricsRomanizeOnly() string {
+	return Catalog.Format(msgs.locale, "lyricsRomanizeOnly", nil)
+}
+
+// LyricsTranslationWaiting says "Translation is on its way…"
+// in the language the app shows.
+func LyricsTranslationWaiting() string { return In(i18n.Locale()).LyricsTranslationWaiting() }
+
+// LyricsTranslationWaiting says "Translation is on its way…"
+// in the language of msgs.
+func (msgs Messages) LyricsTranslationWaiting() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslationWaiting", nil)
+}
+
+// LyricsRomanizationWaiting says "Romanization is on its way…"
+// in the language the app shows.
+func LyricsRomanizationWaiting() string { return In(i18n.Locale()).LyricsRomanizationWaiting() }
+
+// LyricsRomanizationWaiting says "Romanization is on its way…"
+// in the language of msgs.
+func (msgs Messages) LyricsRomanizationWaiting() string {
+	return Catalog.Format(msgs.locale, "lyricsRomanizationWaiting", nil)
+}
+
+// LyricsTranslationFailed says "Translation isn't available right now."
+// in the language the app shows.
+func LyricsTranslationFailed() string { return In(i18n.Locale()).LyricsTranslationFailed() }
+
+// LyricsTranslationFailed says "Translation isn't available right now."
+// in the language of msgs.
+func (msgs Messages) LyricsTranslationFailed() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslationFailed", nil)
+}
+
+// LyricsRomanizationFailed says "Romanization isn't available right now."
+// in the language the app shows.
+func LyricsRomanizationFailed() string { return In(i18n.Locale()).LyricsRomanizationFailed() }
+
+// LyricsRomanizationFailed says "Romanization isn't available right now."
+// in the language of msgs.
+func (msgs Messages) LyricsRomanizationFailed() string {
+	return Catalog.Format(msgs.locale, "lyricsRomanizationFailed", nil)
+}
+
+// LyricsShowAs says "Show lyrics as"
+// in the language the app shows.
+func LyricsShowAs() string { return In(i18n.Locale()).LyricsShowAs() }
+
+// LyricsShowAs says "Show lyrics as"
+// in the language of msgs.
+func (msgs Messages) LyricsShowAs() string {
+	return Catalog.Format(msgs.locale, "lyricsShowAs", nil)
+}
+
+// LyricsSynced says "synced"
+// in the language the app shows.
+func LyricsSynced() string { return In(i18n.Locale()).LyricsSynced() }
+
+// LyricsSynced says "synced"
+// in the language of msgs.
+func (msgs Messages) LyricsSynced() string {
+	return Catalog.Format(msgs.locale, "lyricsSynced", nil)
+}
+
+// LyricsPlainText says "plain text"
+// in the language the app shows.
+func LyricsPlainText() string { return In(i18n.Locale()).LyricsPlainText() }
+
+// LyricsPlainText says "plain text"
+// in the language of msgs.
+func (msgs Messages) LyricsPlainText() string {
+	return Catalog.Format(msgs.locale, "lyricsPlainText", nil)
+}
+
+// LyricsTranslate says "translate"
+// in the language the app shows.
+func LyricsTranslate() string { return In(i18n.Locale()).LyricsTranslate() }
+
+// LyricsTranslate says "translate"
+// in the language of msgs.
+func (msgs Messages) LyricsTranslate() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslate", nil)
+}
+
+// LyricsTranslateLyrics says "Translate lyrics"
+// in the language the app shows.
+func LyricsTranslateLyrics() string { return In(i18n.Locale()).LyricsTranslateLyrics() }
+
+// LyricsTranslateLyrics says "Translate lyrics"
+// in the language of msgs.
+func (msgs Messages) LyricsTranslateLyrics() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslateLyrics", nil)
+}
+
+// LyricsShowInLatin says "Show lyrics in Latin letters"
+// in the language the app shows.
+func LyricsShowInLatin() string { return In(i18n.Locale()).LyricsShowInLatin() }
+
+// LyricsShowInLatin says "Show lyrics in Latin letters"
+// in the language of msgs.
+func (msgs Messages) LyricsShowInLatin() string {
+	return Catalog.Format(msgs.locale, "lyricsShowInLatin", nil)
+}
+
+// LyricsLangAfrikaans says "Afrikaans"
+// in the language the app shows.
+func LyricsLangAfrikaans() string { return In(i18n.Locale()).LyricsLangAfrikaans() }
+
+// LyricsLangAfrikaans says "Afrikaans"
+// in the language of msgs.
+func (msgs Messages) LyricsLangAfrikaans() string {
+	return Catalog.Format(msgs.locale, "lyricsLangAfrikaans", nil)
+}
+
+// LyricsLangArabic says "Arabic"
+// in the language the app shows.
+func LyricsLangArabic() string { return In(i18n.Locale()).LyricsLangArabic() }
+
+// LyricsLangArabic says "Arabic"
+// in the language of msgs.
+func (msgs Messages) LyricsLangArabic() string {
+	return Catalog.Format(msgs.locale, "lyricsLangArabic", nil)
+}
+
+// LyricsLangBulgarian says "Bulgarian"
+// in the language the app shows.
+func LyricsLangBulgarian() string { return In(i18n.Locale()).LyricsLangBulgarian() }
+
+// LyricsLangBulgarian says "Bulgarian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangBulgarian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangBulgarian", nil)
+}
+
+// LyricsLangBengali says "Bengali"
+// in the language the app shows.
+func LyricsLangBengali() string { return In(i18n.Locale()).LyricsLangBengali() }
+
+// LyricsLangBengali says "Bengali"
+// in the language of msgs.
+func (msgs Messages) LyricsLangBengali() string {
+	return Catalog.Format(msgs.locale, "lyricsLangBengali", nil)
+}
+
+// LyricsLangCatalan says "Catalan"
+// in the language the app shows.
+func LyricsLangCatalan() string { return In(i18n.Locale()).LyricsLangCatalan() }
+
+// LyricsLangCatalan says "Catalan"
+// in the language of msgs.
+func (msgs Messages) LyricsLangCatalan() string {
+	return Catalog.Format(msgs.locale, "lyricsLangCatalan", nil)
+}
+
+// LyricsLangChineseSimplified says "Chinese (Simplified)"
+// in the language the app shows.
+func LyricsLangChineseSimplified() string { return In(i18n.Locale()).LyricsLangChineseSimplified() }
+
+// LyricsLangChineseSimplified says "Chinese (Simplified)"
+// in the language of msgs.
+func (msgs Messages) LyricsLangChineseSimplified() string {
+	return Catalog.Format(msgs.locale, "lyricsLangChineseSimplified", nil)
+}
+
+// LyricsLangChineseTraditional says "Chinese (Traditional)"
+// in the language the app shows.
+func LyricsLangChineseTraditional() string { return In(i18n.Locale()).LyricsLangChineseTraditional() }
+
+// LyricsLangChineseTraditional says "Chinese (Traditional)"
+// in the language of msgs.
+func (msgs Messages) LyricsLangChineseTraditional() string {
+	return Catalog.Format(msgs.locale, "lyricsLangChineseTraditional", nil)
+}
+
+// LyricsLangCroatian says "Croatian"
+// in the language the app shows.
+func LyricsLangCroatian() string { return In(i18n.Locale()).LyricsLangCroatian() }
+
+// LyricsLangCroatian says "Croatian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangCroatian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangCroatian", nil)
+}
+
+// LyricsLangCzech says "Czech"
+// in the language the app shows.
+func LyricsLangCzech() string { return In(i18n.Locale()).LyricsLangCzech() }
+
+// LyricsLangCzech says "Czech"
+// in the language of msgs.
+func (msgs Messages) LyricsLangCzech() string {
+	return Catalog.Format(msgs.locale, "lyricsLangCzech", nil)
+}
+
+// LyricsLangDanish says "Danish"
+// in the language the app shows.
+func LyricsLangDanish() string { return In(i18n.Locale()).LyricsLangDanish() }
+
+// LyricsLangDanish says "Danish"
+// in the language of msgs.
+func (msgs Messages) LyricsLangDanish() string {
+	return Catalog.Format(msgs.locale, "lyricsLangDanish", nil)
+}
+
+// LyricsLangDutch says "Dutch"
+// in the language the app shows.
+func LyricsLangDutch() string { return In(i18n.Locale()).LyricsLangDutch() }
+
+// LyricsLangDutch says "Dutch"
+// in the language of msgs.
+func (msgs Messages) LyricsLangDutch() string {
+	return Catalog.Format(msgs.locale, "lyricsLangDutch", nil)
+}
+
+// LyricsLangEnglish says "English"
+// in the language the app shows.
+func LyricsLangEnglish() string { return In(i18n.Locale()).LyricsLangEnglish() }
+
+// LyricsLangEnglish says "English"
+// in the language of msgs.
+func (msgs Messages) LyricsLangEnglish() string {
+	return Catalog.Format(msgs.locale, "lyricsLangEnglish", nil)
+}
+
+// LyricsLangEstonian says "Estonian"
+// in the language the app shows.
+func LyricsLangEstonian() string { return In(i18n.Locale()).LyricsLangEstonian() }
+
+// LyricsLangEstonian says "Estonian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangEstonian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangEstonian", nil)
+}
+
+// LyricsLangFilipino says "Filipino"
+// in the language the app shows.
+func LyricsLangFilipino() string { return In(i18n.Locale()).LyricsLangFilipino() }
+
+// LyricsLangFilipino says "Filipino"
+// in the language of msgs.
+func (msgs Messages) LyricsLangFilipino() string {
+	return Catalog.Format(msgs.locale, "lyricsLangFilipino", nil)
+}
+
+// LyricsLangFinnish says "Finnish"
+// in the language the app shows.
+func LyricsLangFinnish() string { return In(i18n.Locale()).LyricsLangFinnish() }
+
+// LyricsLangFinnish says "Finnish"
+// in the language of msgs.
+func (msgs Messages) LyricsLangFinnish() string {
+	return Catalog.Format(msgs.locale, "lyricsLangFinnish", nil)
+}
+
+// LyricsLangFrench says "French"
+// in the language the app shows.
+func LyricsLangFrench() string { return In(i18n.Locale()).LyricsLangFrench() }
+
+// LyricsLangFrench says "French"
+// in the language of msgs.
+func (msgs Messages) LyricsLangFrench() string {
+	return Catalog.Format(msgs.locale, "lyricsLangFrench", nil)
+}
+
+// LyricsLangGerman says "German"
+// in the language the app shows.
+func LyricsLangGerman() string { return In(i18n.Locale()).LyricsLangGerman() }
+
+// LyricsLangGerman says "German"
+// in the language of msgs.
+func (msgs Messages) LyricsLangGerman() string {
+	return Catalog.Format(msgs.locale, "lyricsLangGerman", nil)
+}
+
+// LyricsLangGreek says "Greek"
+// in the language the app shows.
+func LyricsLangGreek() string { return In(i18n.Locale()).LyricsLangGreek() }
+
+// LyricsLangGreek says "Greek"
+// in the language of msgs.
+func (msgs Messages) LyricsLangGreek() string {
+	return Catalog.Format(msgs.locale, "lyricsLangGreek", nil)
+}
+
+// LyricsLangHebrew says "Hebrew"
+// in the language the app shows.
+func LyricsLangHebrew() string { return In(i18n.Locale()).LyricsLangHebrew() }
+
+// LyricsLangHebrew says "Hebrew"
+// in the language of msgs.
+func (msgs Messages) LyricsLangHebrew() string {
+	return Catalog.Format(msgs.locale, "lyricsLangHebrew", nil)
+}
+
+// LyricsLangHindi says "Hindi"
+// in the language the app shows.
+func LyricsLangHindi() string { return In(i18n.Locale()).LyricsLangHindi() }
+
+// LyricsLangHindi says "Hindi"
+// in the language of msgs.
+func (msgs Messages) LyricsLangHindi() string {
+	return Catalog.Format(msgs.locale, "lyricsLangHindi", nil)
+}
+
+// LyricsLangHungarian says "Hungarian"
+// in the language the app shows.
+func LyricsLangHungarian() string { return In(i18n.Locale()).LyricsLangHungarian() }
+
+// LyricsLangHungarian says "Hungarian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangHungarian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangHungarian", nil)
+}
+
+// LyricsLangIndonesian says "Indonesian"
+// in the language the app shows.
+func LyricsLangIndonesian() string { return In(i18n.Locale()).LyricsLangIndonesian() }
+
+// LyricsLangIndonesian says "Indonesian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangIndonesian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangIndonesian", nil)
+}
+
+// LyricsLangItalian says "Italian"
+// in the language the app shows.
+func LyricsLangItalian() string { return In(i18n.Locale()).LyricsLangItalian() }
+
+// LyricsLangItalian says "Italian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangItalian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangItalian", nil)
+}
+
+// LyricsLangJapanese says "Japanese"
+// in the language the app shows.
+func LyricsLangJapanese() string { return In(i18n.Locale()).LyricsLangJapanese() }
+
+// LyricsLangJapanese says "Japanese"
+// in the language of msgs.
+func (msgs Messages) LyricsLangJapanese() string {
+	return Catalog.Format(msgs.locale, "lyricsLangJapanese", nil)
+}
+
+// LyricsLangKorean says "Korean"
+// in the language the app shows.
+func LyricsLangKorean() string { return In(i18n.Locale()).LyricsLangKorean() }
+
+// LyricsLangKorean says "Korean"
+// in the language of msgs.
+func (msgs Messages) LyricsLangKorean() string {
+	return Catalog.Format(msgs.locale, "lyricsLangKorean", nil)
+}
+
+// LyricsLangLatvian says "Latvian"
+// in the language the app shows.
+func LyricsLangLatvian() string { return In(i18n.Locale()).LyricsLangLatvian() }
+
+// LyricsLangLatvian says "Latvian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangLatvian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangLatvian", nil)
+}
+
+// LyricsLangLithuanian says "Lithuanian"
+// in the language the app shows.
+func LyricsLangLithuanian() string { return In(i18n.Locale()).LyricsLangLithuanian() }
+
+// LyricsLangLithuanian says "Lithuanian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangLithuanian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangLithuanian", nil)
+}
+
+// LyricsLangMalay says "Malay"
+// in the language the app shows.
+func LyricsLangMalay() string { return In(i18n.Locale()).LyricsLangMalay() }
+
+// LyricsLangMalay says "Malay"
+// in the language of msgs.
+func (msgs Messages) LyricsLangMalay() string {
+	return Catalog.Format(msgs.locale, "lyricsLangMalay", nil)
+}
+
+// LyricsLangNorwegian says "Norwegian"
+// in the language the app shows.
+func LyricsLangNorwegian() string { return In(i18n.Locale()).LyricsLangNorwegian() }
+
+// LyricsLangNorwegian says "Norwegian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangNorwegian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangNorwegian", nil)
+}
+
+// LyricsLangPersian says "Persian"
+// in the language the app shows.
+func LyricsLangPersian() string { return In(i18n.Locale()).LyricsLangPersian() }
+
+// LyricsLangPersian says "Persian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangPersian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangPersian", nil)
+}
+
+// LyricsLangPolish says "Polish"
+// in the language the app shows.
+func LyricsLangPolish() string { return In(i18n.Locale()).LyricsLangPolish() }
+
+// LyricsLangPolish says "Polish"
+// in the language of msgs.
+func (msgs Messages) LyricsLangPolish() string {
+	return Catalog.Format(msgs.locale, "lyricsLangPolish", nil)
+}
+
+// LyricsLangPortuguese says "Portuguese"
+// in the language the app shows.
+func LyricsLangPortuguese() string { return In(i18n.Locale()).LyricsLangPortuguese() }
+
+// LyricsLangPortuguese says "Portuguese"
+// in the language of msgs.
+func (msgs Messages) LyricsLangPortuguese() string {
+	return Catalog.Format(msgs.locale, "lyricsLangPortuguese", nil)
+}
+
+// LyricsLangRomanian says "Romanian"
+// in the language the app shows.
+func LyricsLangRomanian() string { return In(i18n.Locale()).LyricsLangRomanian() }
+
+// LyricsLangRomanian says "Romanian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangRomanian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangRomanian", nil)
+}
+
+// LyricsLangRussian says "Russian"
+// in the language the app shows.
+func LyricsLangRussian() string { return In(i18n.Locale()).LyricsLangRussian() }
+
+// LyricsLangRussian says "Russian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangRussian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangRussian", nil)
+}
+
+// LyricsLangSerbian says "Serbian"
+// in the language the app shows.
+func LyricsLangSerbian() string { return In(i18n.Locale()).LyricsLangSerbian() }
+
+// LyricsLangSerbian says "Serbian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangSerbian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangSerbian", nil)
+}
+
+// LyricsLangSlovak says "Slovak"
+// in the language the app shows.
+func LyricsLangSlovak() string { return In(i18n.Locale()).LyricsLangSlovak() }
+
+// LyricsLangSlovak says "Slovak"
+// in the language of msgs.
+func (msgs Messages) LyricsLangSlovak() string {
+	return Catalog.Format(msgs.locale, "lyricsLangSlovak", nil)
+}
+
+// LyricsLangSlovenian says "Slovenian"
+// in the language the app shows.
+func LyricsLangSlovenian() string { return In(i18n.Locale()).LyricsLangSlovenian() }
+
+// LyricsLangSlovenian says "Slovenian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangSlovenian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangSlovenian", nil)
+}
+
+// LyricsLangSpanish says "Spanish"
+// in the language the app shows.
+func LyricsLangSpanish() string { return In(i18n.Locale()).LyricsLangSpanish() }
+
+// LyricsLangSpanish says "Spanish"
+// in the language of msgs.
+func (msgs Messages) LyricsLangSpanish() string {
+	return Catalog.Format(msgs.locale, "lyricsLangSpanish", nil)
+}
+
+// LyricsLangSwahili says "Swahili"
+// in the language the app shows.
+func LyricsLangSwahili() string { return In(i18n.Locale()).LyricsLangSwahili() }
+
+// LyricsLangSwahili says "Swahili"
+// in the language of msgs.
+func (msgs Messages) LyricsLangSwahili() string {
+	return Catalog.Format(msgs.locale, "lyricsLangSwahili", nil)
+}
+
+// LyricsLangSwedish says "Swedish"
+// in the language the app shows.
+func LyricsLangSwedish() string { return In(i18n.Locale()).LyricsLangSwedish() }
+
+// LyricsLangSwedish says "Swedish"
+// in the language of msgs.
+func (msgs Messages) LyricsLangSwedish() string {
+	return Catalog.Format(msgs.locale, "lyricsLangSwedish", nil)
+}
+
+// LyricsLangTamil says "Tamil"
+// in the language the app shows.
+func LyricsLangTamil() string { return In(i18n.Locale()).LyricsLangTamil() }
+
+// LyricsLangTamil says "Tamil"
+// in the language of msgs.
+func (msgs Messages) LyricsLangTamil() string {
+	return Catalog.Format(msgs.locale, "lyricsLangTamil", nil)
+}
+
+// LyricsLangTelugu says "Telugu"
+// in the language the app shows.
+func LyricsLangTelugu() string { return In(i18n.Locale()).LyricsLangTelugu() }
+
+// LyricsLangTelugu says "Telugu"
+// in the language of msgs.
+func (msgs Messages) LyricsLangTelugu() string {
+	return Catalog.Format(msgs.locale, "lyricsLangTelugu", nil)
+}
+
+// LyricsLangThai says "Thai"
+// in the language the app shows.
+func LyricsLangThai() string { return In(i18n.Locale()).LyricsLangThai() }
+
+// LyricsLangThai says "Thai"
+// in the language of msgs.
+func (msgs Messages) LyricsLangThai() string {
+	return Catalog.Format(msgs.locale, "lyricsLangThai", nil)
+}
+
+// LyricsLangTurkish says "Turkish"
+// in the language the app shows.
+func LyricsLangTurkish() string { return In(i18n.Locale()).LyricsLangTurkish() }
+
+// LyricsLangTurkish says "Turkish"
+// in the language of msgs.
+func (msgs Messages) LyricsLangTurkish() string {
+	return Catalog.Format(msgs.locale, "lyricsLangTurkish", nil)
+}
+
+// LyricsLangUkrainian says "Ukrainian"
+// in the language the app shows.
+func LyricsLangUkrainian() string { return In(i18n.Locale()).LyricsLangUkrainian() }
+
+// LyricsLangUkrainian says "Ukrainian"
+// in the language of msgs.
+func (msgs Messages) LyricsLangUkrainian() string {
+	return Catalog.Format(msgs.locale, "lyricsLangUkrainian", nil)
+}
+
+// LyricsLangUrdu says "Urdu"
+// in the language the app shows.
+func LyricsLangUrdu() string { return In(i18n.Locale()).LyricsLangUrdu() }
+
+// LyricsLangUrdu says "Urdu"
+// in the language of msgs.
+func (msgs Messages) LyricsLangUrdu() string {
+	return Catalog.Format(msgs.locale, "lyricsLangUrdu", nil)
+}
+
+// LyricsLangVietnamese says "Vietnamese"
+// in the language the app shows.
+func LyricsLangVietnamese() string { return In(i18n.Locale()).LyricsLangVietnamese() }
+
+// LyricsLangVietnamese says "Vietnamese"
+// in the language of msgs.
+func (msgs Messages) LyricsLangVietnamese() string {
+	return Catalog.Format(msgs.locale, "lyricsLangVietnamese", nil)
+}
+
+// LyricsShareHint says "Click the lines to share."
+// in the language the app shows.
+func LyricsShareHint() string { return In(i18n.Locale()).LyricsShareHint() }
+
+// LyricsShareHint says "Click the lines to share."
+// in the language of msgs.
+func (msgs Messages) LyricsShareHint() string {
+	return Catalog.Format(msgs.locale, "lyricsShareHint", nil)
+}
+
+// LyricsShareChosen says "{count, plural, one {# line chosen.} other {# lines chosen.}}"
+// in the language the app shows.
+func LyricsShareChosen(count int) string { return In(i18n.Locale()).LyricsShareChosen(count) }
+
+// LyricsShareChosen says "{count, plural, one {# line chosen.} other {# lines chosen.}}"
+// in the language of msgs.
+func (msgs Messages) LyricsShareChosen(count int) string {
+	return Catalog.Format(msgs.locale, "lyricsShareChosen", map[string]any{"count": count})
+}
+
+// LyricsShareLines says "share lines"
+// in the language the app shows.
+func LyricsShareLines() string { return In(i18n.Locale()).LyricsShareLines() }
+
+// LyricsShareLines says "share lines"
+// in the language of msgs.
+func (msgs Messages) LyricsShareLines() string {
+	return Catalog.Format(msgs.locale, "lyricsShareLines", nil)
+}
+
+// LyricsShareSave says "save image"
+// in the language the app shows.
+func LyricsShareSave() string { return In(i18n.Locale()).LyricsShareSave() }
+
+// LyricsShareSave says "save image"
+// in the language of msgs.
+func (msgs Messages) LyricsShareSave() string {
+	return Catalog.Format(msgs.locale, "lyricsShareSave", nil)
+}
+
+// LyricsShareStory says "save for a story"
+// in the language the app shows.
+func LyricsShareStory() string { return In(i18n.Locale()).LyricsShareStory() }
+
+// LyricsShareStory says "save for a story"
+// in the language of msgs.
+func (msgs Messages) LyricsShareStory() string {
+	return Catalog.Format(msgs.locale, "lyricsShareStory", nil)
+}
+
+// LyricsShareDone says "done"
+// in the language the app shows.
+func LyricsShareDone() string { return In(i18n.Locale()).LyricsShareDone() }
+
+// LyricsShareDone says "done"
+// in the language of msgs.
+func (msgs Messages) LyricsShareDone() string {
+	return Catalog.Format(msgs.locale, "lyricsShareDone", nil)
+}
+
+// LyricsShareCredit says "Lyrics from {source}"
+// in the language the app shows.
+func LyricsShareCredit(source string) string { return In(i18n.Locale()).LyricsShareCredit(source) }
+
+// LyricsShareCredit says "Lyrics from {source}"
+// in the language of msgs.
+func (msgs Messages) LyricsShareCredit(source string) string {
+	return Catalog.Format(msgs.locale, "lyricsShareCredit", map[string]any{"source": source})
+}
+
+// LyricsShareCreditBy says "Lyrics from {source} · submitted by {by}"
+// in the language the app shows.
+func LyricsShareCreditBy(source string, by string) string {
+	return In(i18n.Locale()).LyricsShareCreditBy(source, by)
+}
+
+// LyricsShareCreditBy says "Lyrics from {source} · submitted by {by}"
+// in the language of msgs.
+func (msgs Messages) LyricsShareCreditBy(source string, by string) string {
+	return Catalog.Format(msgs.locale, "lyricsShareCreditBy", map[string]any{"source": source, "by": by})
+}
+
+// LyricsRomajiTip says "Shows the lyrics in romaji too, made on this computer: nothing is sent. The first time, it downloads the dictionary o…"
+// in the language the app shows.
+func LyricsRomajiTip() string { return In(i18n.Locale()).LyricsRomajiTip() }
+
+// LyricsRomajiTip says "Shows the lyrics in romaji too, made on this computer: nothing is sent. The first time, it downloads the dictionary o…"
+// in the language of msgs.
+func (msgs Messages) LyricsRomajiTip() string {
+	return Catalog.Format(msgs.locale, "lyricsRomajiTip", nil)
+}
+
+// LyricsRomajiWaiting says "Romaji is on its way…"
+// in the language the app shows.
+func LyricsRomajiWaiting() string { return In(i18n.Locale()).LyricsRomajiWaiting() }
+
+// LyricsRomajiWaiting says "Romaji is on its way…"
+// in the language of msgs.
+func (msgs Messages) LyricsRomajiWaiting() string {
+	return Catalog.Format(msgs.locale, "lyricsRomajiWaiting", nil)
+}
+
+// LyricsKanjiDownloading says "The readings of kanji are downloading: kanji show as they are until then."
+// in the language the app shows.
+func LyricsKanjiDownloading() string { return In(i18n.Locale()).LyricsKanjiDownloading() }
+
+// LyricsKanjiDownloading says "The readings of kanji are downloading: kanji show as they are until then."
+// in the language of msgs.
+func (msgs Messages) LyricsKanjiDownloading() string {
+	return Catalog.Format(msgs.locale, "lyricsKanjiDownloading", nil)
+}
+
+// LyricsKanjiUnavailable says "The readings of kanji couldn't be downloaded: kanji show as they are."
+// in the language the app shows.
+func LyricsKanjiUnavailable() string { return In(i18n.Locale()).LyricsKanjiUnavailable() }
+
+// LyricsKanjiUnavailable says "The readings of kanji couldn't be downloaded: kanji show as they are."
+// in the language of msgs.
+func (msgs Messages) LyricsKanjiUnavailable() string {
+	return Catalog.Format(msgs.locale, "lyricsKanjiUnavailable", nil)
+}
+
+// LyricsLocalTip says "Shows the lyrics in Latin letters too, made on this computer: nothing is sent."
+// in the language the app shows.
+func LyricsLocalTip() string { return In(i18n.Locale()).LyricsLocalTip() }
+
+// LyricsLocalTip says "Shows the lyrics in Latin letters too, made on this computer: nothing is sent."
+// in the language of msgs.
+func (msgs Messages) LyricsLocalTip() string {
+	return Catalog.Format(msgs.locale, "lyricsLocalTip", nil)
+}
+
+// LyricsUnisonFirstTip says "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, …"
+// in the language the app shows.
+func LyricsUnisonFirstTip() string { return In(i18n.Locale()).LyricsUnisonFirstTip() }
+
+// LyricsUnisonFirstTip says "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, …"
+// in the language of msgs.
+func (msgs Messages) LyricsUnisonFirstTip() string {
+	return Catalog.Format(msgs.locale, "lyricsUnisonFirstTip", nil)
+}
+
+// PanelClose says "Close {title}"
+// in the language the app shows.
+func PanelClose(title string) string { return In(i18n.Locale()).PanelClose(title) }
+
+// PanelClose says "Close {title}"
+// in the language of msgs.
+func (msgs Messages) PanelClose(title string) string {
+	return Catalog.Format(msgs.locale, "panelClose", map[string]any{"title": title})
+}
+
+// PanelUpNext says "Up next"
+// in the language the app shows.
+func PanelUpNext() string { return In(i18n.Locale()).PanelUpNext() }
+
+// PanelUpNext says "Up next"
+// in the language of msgs.
+func (msgs Messages) PanelUpNext() string {
+	return Catalog.Format(msgs.locale, "panelUpNext", nil)
+}
+
+// PanelClearQueue says "Clear the queue"
+// in the language the app shows.
+func PanelClearQueue() string { return In(i18n.Locale()).PanelClearQueue() }
+
+// PanelClearQueue says "Clear the queue"
+// in the language of msgs.
+func (msgs Messages) PanelClearQueue() string {
+	return Catalog.Format(msgs.locale, "panelClearQueue", nil)
+}
+
+// PanelClear says "Clear"
+// in the language the app shows.
+func PanelClear() string { return In(i18n.Locale()).PanelClear() }
+
+// PanelClear says "Clear"
+// in the language of msgs.
+func (msgs Messages) PanelClear() string {
+	return Catalog.Format(msgs.locale, "panelClear", nil)
+}
+
+// NowPlayingTitle says "Now playing"
+// in the language the app shows.
+func NowPlayingTitle() string { return In(i18n.Locale()).NowPlayingTitle() }
+
+// NowPlayingTitle says "Now playing"
+// in the language of msgs.
+func (msgs Messages) NowPlayingTitle() string {
+	return Catalog.Format(msgs.locale, "nowPlayingTitle", nil)
+}
+
+// PanelQueueEmpty says "Nothing queued. When the queue runs out, a radio of what you played carries on."
+// in the language the app shows.
+func PanelQueueEmpty() string { return In(i18n.Locale()).PanelQueueEmpty() }
+
+// PanelQueueEmpty says "Nothing queued. When the queue runs out, a radio of what you played carries on."
+// in the language of msgs.
+func (msgs Messages) PanelQueueEmpty() string {
+	return Catalog.Format(msgs.locale, "panelQueueEmpty", nil)
+}
+
+// PanelQueueStart says "Play something and the queue shows here."
+// in the language the app shows.
+func PanelQueueStart() string { return In(i18n.Locale()).PanelQueueStart() }
+
+// PanelQueueStart says "Play something and the queue shows here."
+// in the language of msgs.
+func (msgs Messages) PanelQueueStart() string {
+	return Catalog.Format(msgs.locale, "panelQueueStart", nil)
+}
+
+// PanelPlayTrack says "Play {title}"
+// in the language the app shows.
+func PanelPlayTrack(title string) string { return In(i18n.Locale()).PanelPlayTrack(title) }
+
+// PanelPlayTrack says "Play {title}"
+// in the language of msgs.
+func (msgs Messages) PanelPlayTrack(title string) string {
+	return Catalog.Format(msgs.locale, "panelPlayTrack", map[string]any{"title": title})
+}
+
+// PanelRadioLine says "{line} · radio"
+// in the language the app shows.
+func PanelRadioLine(line string) string { return In(i18n.Locale()).PanelRadioLine(line) }
+
+// PanelRadioLine says "{line} · radio"
+// in the language of msgs.
+func (msgs Messages) PanelRadioLine(line string) string {
+	return Catalog.Format(msgs.locale, "panelRadioLine", map[string]any{"line": line})
+}
+
+// PanelFileNotFound says "File not found"
+// in the language the app shows.
+func PanelFileNotFound() string { return In(i18n.Locale()).PanelFileNotFound() }
+
+// PanelFileNotFound says "File not found"
+// in the language of msgs.
+func (msgs Messages) PanelFileNotFound() string {
+	return Catalog.Format(msgs.locale, "panelFileNotFound", nil)
+}
+
+// PanelMadeWithAI says "{line} · made with AI"
+// in the language the app shows.
+func PanelMadeWithAI(line string) string { return In(i18n.Locale()).PanelMadeWithAI(line) }
+
+// PanelMadeWithAI says "{line} · made with AI"
+// in the language of msgs.
+func (msgs Messages) PanelMadeWithAI(line string) string {
+	return Catalog.Format(msgs.locale, "panelMadeWithAI", map[string]any{"line": line})
+}
+
+// PanelHiddenNote says "{line} · hidden by your settings"
+// in the language the app shows.
+func PanelHiddenNote(line string) string { return In(i18n.Locale()).PanelHiddenNote(line) }
+
+// PanelHiddenNote says "{line} · hidden by your settings"
+// in the language of msgs.
+func (msgs Messages) PanelHiddenNote(line string) string {
+	return Catalog.Format(msgs.locale, "panelHiddenNote", map[string]any{"line": line})
+}
+
+// PanelSkipped says "{line} · skipped"
+// in the language the app shows.
+func PanelSkipped(line string) string { return In(i18n.Locale()).PanelSkipped(line) }
+
+// PanelSkipped says "{line} · skipped"
+// in the language of msgs.
+func (msgs Messages) PanelSkipped(line string) string {
+	return Catalog.Format(msgs.locale, "panelSkipped", map[string]any{"line": line})
+}
+
+// PanelRemoveTrack says "Remove {title} from the queue"
+// in the language the app shows.
+func PanelRemoveTrack(title string) string { return In(i18n.Locale()).PanelRemoveTrack(title) }
+
+// PanelRemoveTrack says "Remove {title} from the queue"
+// in the language of msgs.
+func (msgs Messages) PanelRemoveTrack(title string) string {
+	return Catalog.Format(msgs.locale, "panelRemoveTrack", map[string]any{"title": title})
+}
+
+// PanelRemoveFromQueue says "Remove from the queue"
+// in the language the app shows.
+func PanelRemoveFromQueue() string { return In(i18n.Locale()).PanelRemoveFromQueue() }
+
+// PanelRemoveFromQueue says "Remove from the queue"
+// in the language of msgs.
+func (msgs Messages) PanelRemoveFromQueue() string {
+	return Catalog.Format(msgs.locale, "panelRemoveFromQueue", nil)
+}
+
+// PanelPlayNext says "Play next"
+// in the language the app shows.
+func PanelPlayNext() string { return In(i18n.Locale()).PanelPlayNext() }
+
+// PanelPlayNext says "Play next"
+// in the language of msgs.
+func (msgs Messages) PanelPlayNext() string {
+	return Catalog.Format(msgs.locale, "panelPlayNext", nil)
+}
+
+// PanelAddToQueue says "Add to queue"
+// in the language the app shows.
+func PanelAddToQueue() string { return In(i18n.Locale()).PanelAddToQueue() }
+
+// PanelAddToQueue says "Add to queue"
+// in the language of msgs.
+func (msgs Messages) PanelAddToQueue() string {
+	return Catalog.Format(msgs.locale, "panelAddToQueue", nil)
+}
+
+// PanelStartRadio says "Start radio"
+// in the language the app shows.
+func PanelStartRadio() string { return In(i18n.Locale()).PanelStartRadio() }
+
+// PanelStartRadio says "Start radio"
+// in the language of msgs.
+func (msgs Messages) PanelStartRadio() string {
+	return Catalog.Format(msgs.locale, "panelStartRadio", nil)
+}
+
+// PanelLike says "Add to liked songs"
+// in the language the app shows.
+func PanelLike() string { return In(i18n.Locale()).PanelLike() }
+
+// PanelLike says "Add to liked songs"
+// in the language of msgs.
+func (msgs Messages) PanelLike() string {
+	return Catalog.Format(msgs.locale, "panelLike", nil)
+}
+
+// PanelUnlike says "Remove from liked songs"
+// in the language the app shows.
+func PanelUnlike() string { return In(i18n.Locale()).PanelUnlike() }
+
+// PanelUnlike says "Remove from liked songs"
+// in the language of msgs.
+func (msgs Messages) PanelUnlike() string {
+	return Catalog.Format(msgs.locale, "panelUnlike", nil)
+}
+
+// PanelRemoveDislike says "Remove the dislike"
+// in the language the app shows.
+func PanelRemoveDislike() string { return In(i18n.Locale()).PanelRemoveDislike() }
+
+// PanelRemoveDislike says "Remove the dislike"
+// in the language of msgs.
+func (msgs Messages) PanelRemoveDislike() string {
+	return Catalog.Format(msgs.locale, "panelRemoveDislike", nil)
+}
+
+// PanelGoToArtist says "Go to {name}"
+// in the language the app shows.
+func PanelGoToArtist(name string) string { return In(i18n.Locale()).PanelGoToArtist(name) }
+
+// PanelGoToArtist says "Go to {name}"
+// in the language of msgs.
+func (msgs Messages) PanelGoToArtist(name string) string {
+	return Catalog.Format(msgs.locale, "panelGoToArtist", map[string]any{"name": name})
+}
+
+// PanelGoToAlbum says "Go to album"
+// in the language the app shows.
+func PanelGoToAlbum() string { return In(i18n.Locale()).PanelGoToAlbum() }
+
+// PanelGoToAlbum says "Go to album"
+// in the language of msgs.
+func (msgs Messages) PanelGoToAlbum() string {
+	return Catalog.Format(msgs.locale, "panelGoToAlbum", nil)
+}
+
+// PanelOpenIn says "Open in {source}"
+// in the language the app shows.
+func PanelOpenIn(source string) string { return In(i18n.Locale()).PanelOpenIn(source) }
+
+// PanelOpenIn says "Open in {source}"
+// in the language of msgs.
+func (msgs Messages) PanelOpenIn(source string) string {
+	return Catalog.Format(msgs.locale, "panelOpenIn", map[string]any{"source": source})
+}
+
+// PanelCopyLink says "Copy link"
+// in the language the app shows.
+func PanelCopyLink() string { return In(i18n.Locale()).PanelCopyLink() }
+
+// PanelCopyLink says "Copy link"
+// in the language of msgs.
+func (msgs Messages) PanelCopyLink() string {
+	return Catalog.Format(msgs.locale, "panelCopyLink", nil)
+}
+
+// PanelLinkCopied says "Copied the link"
+// in the language the app shows.
+func PanelLinkCopied() string { return In(i18n.Locale()).PanelLinkCopied() }
+
+// PanelLinkCopied says "Copied the link"
+// in the language of msgs.
+func (msgs Messages) PanelLinkCopied() string {
+	return Catalog.Format(msgs.locale, "panelLinkCopied", nil)
+}
+
+// PanelFindMatch says "Find another YouTube Music match"
+// in the language the app shows.
+func PanelFindMatch() string { return In(i18n.Locale()).PanelFindMatch() }
+
+// PanelFindMatch says "Find another YouTube Music match"
+// in the language of msgs.
+func (msgs Messages) PanelFindMatch() string {
+	return Catalog.Format(msgs.locale, "panelFindMatch", nil)
+}
+
+// PanelMatchForgotten says "The next play looks for its recording again"
+// in the language the app shows.
+func PanelMatchForgotten() string { return In(i18n.Locale()).PanelMatchForgotten() }
+
+// PanelMatchForgotten says "The next play looks for its recording again"
+// in the language of msgs.
+func (msgs Messages) PanelMatchForgotten() string {
+	return Catalog.Format(msgs.locale, "panelMatchForgotten", nil)
+}
+
+// PanelRadioSources says "Radios start from tracks of Spotify and YouTube Music"
+// in the language the app shows.
+func PanelRadioSources() string { return In(i18n.Locale()).PanelRadioSources() }
+
+// PanelRadioSources says "Radios start from tracks of Spotify and YouTube Music"
+// in the language of msgs.
+func (msgs Messages) PanelRadioSources() string {
+	return Catalog.Format(msgs.locale, "panelRadioSources", nil)
+}
+
+// PanelStartingRadio says "Starting a radio of {title}…"
+// in the language the app shows.
+func PanelStartingRadio(title string) string { return In(i18n.Locale()).PanelStartingRadio(title) }
+
+// PanelStartingRadio says "Starting a radio of {title}…"
+// in the language of msgs.
+func (msgs Messages) PanelStartingRadio(title string) string {
+	return Catalog.Format(msgs.locale, "panelStartingRadio", map[string]any{"title": title})
+}
+
+// PanelPlaysNext says "{title} plays next"
+// in the language the app shows.
+func PanelPlaysNext(title string) string { return In(i18n.Locale()).PanelPlaysNext(title) }
+
+// PanelPlaysNext says "{title} plays next"
+// in the language of msgs.
+func (msgs Messages) PanelPlaysNext(title string) string {
+	return Catalog.Format(msgs.locale, "panelPlaysNext", map[string]any{"title": title})
+}
+
+// PanelAddedToQueue says "Added {title} to the queue"
+// in the language the app shows.
+func PanelAddedToQueue(title string) string { return In(i18n.Locale()).PanelAddedToQueue(title) }
+
+// PanelAddedToQueue says "Added {title} to the queue"
+// in the language of msgs.
+func (msgs Messages) PanelAddedToQueue(title string) string {
+	return Catalog.Format(msgs.locale, "panelAddedToQueue", map[string]any{"title": title})
+}
+
+// LyricsPlayToSee says "Play a track to see its lyrics."
+// in the language the app shows.
+func LyricsPlayToSee() string { return In(i18n.Locale()).LyricsPlayToSee() }
+
+// LyricsPlayToSee says "Play a track to see its lyrics."
+// in the language of msgs.
+func (msgs Messages) LyricsPlayToSee() string {
+	return Catalog.Format(msgs.locale, "lyricsPlayToSee", nil)
+}
+
+// LyricsLooking says "Looking for the lyrics…"
+// in the language the app shows.
+func LyricsLooking() string { return In(i18n.Locale()).LyricsLooking() }
+
+// LyricsLooking says "Looking for the lyrics…"
+// in the language of msgs.
+func (msgs Messages) LyricsLooking() string {
+	return Catalog.Format(msgs.locale, "lyricsLooking", nil)
+}
+
+// LyricsInstrumental says "This track is instrumental."
+// in the language the app shows.
+func LyricsInstrumental() string { return In(i18n.Locale()).LyricsInstrumental() }
+
+// LyricsInstrumental says "This track is instrumental."
+// in the language of msgs.
+func (msgs Messages) LyricsInstrumental() string {
+	return Catalog.Format(msgs.locale, "lyricsInstrumental", nil)
+}
+
+// LyricsCreditFrom says "lyrics from {source}"
+// in the language the app shows.
+func LyricsCreditFrom(source string) string { return In(i18n.Locale()).LyricsCreditFrom(source) }
+
+// LyricsCreditFrom says "lyrics from {source}"
+// in the language of msgs.
+func (msgs Messages) LyricsCreditFrom(source string) string {
+	return Catalog.Format(msgs.locale, "lyricsCreditFrom", map[string]any{"source": source})
+}
+
+// LyricsCreditFromLink says "lyrics from "
+// in the language the app shows.
+func LyricsCreditFromLink() string { return In(i18n.Locale()).LyricsCreditFromLink() }
+
+// LyricsCreditFromLink says "lyrics from "
+// in the language of msgs.
+func (msgs Messages) LyricsCreditFromLink() string {
+	return Catalog.Format(msgs.locale, "lyricsCreditFromLink", nil)
+}
+
+// LyricsCreditBy says " · submitted by {by}"
+// in the language the app shows.
+func LyricsCreditBy(by string) string { return In(i18n.Locale()).LyricsCreditBy(by) }
+
+// LyricsCreditBy says " · submitted by {by}"
+// in the language of msgs.
+func (msgs Messages) LyricsCreditBy(by string) string {
+	return Catalog.Format(msgs.locale, "lyricsCreditBy", map[string]any{"by": by})
+}
+
+// LyricsCreditByLink says " · submitted by "
+// in the language the app shows.
+func LyricsCreditByLink() string { return In(i18n.Locale()).LyricsCreditByLink() }
+
+// LyricsCreditByLink says " · submitted by "
+// in the language of msgs.
+func (msgs Messages) LyricsCreditByLink() string {
+	return Catalog.Format(msgs.locale, "lyricsCreditByLink", nil)
+}
+
+// TrackInfoTitle says "track info"
+// in the language the app shows.
+func TrackInfoTitle() string { return In(i18n.Locale()).TrackInfoTitle() }
+
+// TrackInfoTitle says "track info"
+// in the language of msgs.
+func (msgs Messages) TrackInfoTitle() string {
+	return Catalog.Format(msgs.locale, "trackInfoTitle", nil)
+}
+
+// TrackInfoMenuItem says "Track info"
+// in the language the app shows.
+func TrackInfoMenuItem() string { return In(i18n.Locale()).TrackInfoMenuItem() }
+
+// TrackInfoMenuItem says "Track info"
+// in the language of msgs.
+func (msgs Messages) TrackInfoMenuItem() string {
+	return Catalog.Format(msgs.locale, "trackInfoMenuItem", nil)
+}
+
+// TrackInfoShowInFinder says "Show in Finder"
+// in the language the app shows.
+func TrackInfoShowInFinder() string { return In(i18n.Locale()).TrackInfoShowInFinder() }
+
+// TrackInfoShowInFinder says "Show in Finder"
+// in the language of msgs.
+func (msgs Messages) TrackInfoShowInFinder() string {
+	return Catalog.Format(msgs.locale, "trackInfoShowInFinder", nil)
+}
+
+// TrackInfoShowInFolder says "Show in its folder"
+// in the language the app shows.
+func TrackInfoShowInFolder() string { return In(i18n.Locale()).TrackInfoShowInFolder() }
+
+// TrackInfoShowInFolder says "Show in its folder"
+// in the language of msgs.
+func (msgs Messages) TrackInfoShowInFolder() string {
+	return Catalog.Format(msgs.locale, "trackInfoShowInFolder", nil)
+}
+
+// TrackInfoShowInExplorer says "Show in Explorer"
+// in the language the app shows.
+func TrackInfoShowInExplorer() string { return In(i18n.Locale()).TrackInfoShowInExplorer() }
+
+// TrackInfoShowInExplorer says "Show in Explorer"
+// in the language of msgs.
+func (msgs Messages) TrackInfoShowInExplorer() string {
+	return Catalog.Format(msgs.locale, "trackInfoShowInExplorer", nil)
+}
+
+// TrackInfoClose says "close"
+// in the language the app shows.
+func TrackInfoClose() string { return In(i18n.Locale()).TrackInfoClose() }
+
+// TrackInfoClose says "close"
+// in the language of msgs.
+func (msgs Messages) TrackInfoClose() string {
+	return Catalog.Format(msgs.locale, "trackInfoClose", nil)
+}
+
+// TrackInfoReading says "Reading what it holds…"
+// in the language the app shows.
+func TrackInfoReading() string { return In(i18n.Locale()).TrackInfoReading() }
+
+// TrackInfoReading says "Reading what it holds…"
+// in the language of msgs.
+func (msgs Messages) TrackInfoReading() string {
+	return Catalog.Format(msgs.locale, "trackInfoReading", nil)
+}
+
+// TrackInfoTags says "its tags"
+// in the language the app shows.
+func TrackInfoTags() string { return In(i18n.Locale()).TrackInfoTags() }
+
+// TrackInfoTags says "its tags"
+// in the language of msgs.
+func (msgs Messages) TrackInfoTags() string {
+	return Catalog.Format(msgs.locale, "trackInfoTags", nil)
+}
+
+// TrackInfoSource says "Source"
+// in the language the app shows.
+func TrackInfoSource() string { return In(i18n.Locale()).TrackInfoSource() }
+
+// TrackInfoSource says "Source"
+// in the language of msgs.
+func (msgs Messages) TrackInfoSource() string {
+	return Catalog.Format(msgs.locale, "trackInfoSource", nil)
+}
+
+// TrackInfoFileSource says "A file on this computer"
+// in the language the app shows.
+func TrackInfoFileSource() string { return In(i18n.Locale()).TrackInfoFileSource() }
+
+// TrackInfoFileSource says "A file on this computer"
+// in the language of msgs.
+func (msgs Messages) TrackInfoFileSource() string {
+	return Catalog.Format(msgs.locale, "trackInfoFileSource", nil)
+}
+
+// TrackInfoDownloaded says "{source}, downloaded"
+// in the language the app shows.
+func TrackInfoDownloaded(source string) string { return In(i18n.Locale()).TrackInfoDownloaded(source) }
+
+// TrackInfoDownloaded says "{source}, downloaded"
+// in the language of msgs.
+func (msgs Messages) TrackInfoDownloaded(source string) string {
+	return Catalog.Format(msgs.locale, "trackInfoDownloaded", map[string]any{"source": source})
+}
+
+// TrackInfoPlaysAs says "Plays as"
+// in the language the app shows.
+func TrackInfoPlaysAs() string { return In(i18n.Locale()).TrackInfoPlaysAs() }
+
+// TrackInfoPlaysAs says "Plays as"
+// in the language of msgs.
+func (msgs Messages) TrackInfoPlaysAs() string {
+	return Catalog.Format(msgs.locale, "trackInfoPlaysAs", nil)
+}
+
+// TrackInfoRecording says "{title} · {artists}, on YouTube Music"
+// in the language the app shows.
+func TrackInfoRecording(title string, artists string) string {
+	return In(i18n.Locale()).TrackInfoRecording(title, artists)
+}
+
+// TrackInfoRecording says "{title} · {artists}, on YouTube Music"
+// in the language of msgs.
+func (msgs Messages) TrackInfoRecording(title string, artists string) string {
+	return Catalog.Format(msgs.locale, "trackInfoRecording", map[string]any{"title": title, "artists": artists})
+}
+
+// TrackInfoPlays says "Plays"
+// in the language the app shows.
+func TrackInfoPlays() string { return In(i18n.Locale()).TrackInfoPlays() }
+
+// TrackInfoPlays says "Plays"
+// in the language of msgs.
+func (msgs Messages) TrackInfoPlays() string {
+	return Catalog.Format(msgs.locale, "trackInfoPlays", nil)
+}
+
+// TrackInfoPlaysSpotify says "In Spotify's own player, in MixMusic"
+// in the language the app shows.
+func TrackInfoPlaysSpotify() string { return In(i18n.Locale()).TrackInfoPlaysSpotify() }
+
+// TrackInfoPlaysSpotify says "In Spotify's own player, in MixMusic"
+// in the language of msgs.
+func (msgs Messages) TrackInfoPlaysSpotify() string {
+	return Catalog.Format(msgs.locale, "trackInfoPlaysSpotify", nil)
+}
+
+// TrackInfoPlaysConnect says "On a Spotify Connect device"
+// in the language the app shows.
+func TrackInfoPlaysConnect() string { return In(i18n.Locale()).TrackInfoPlaysConnect() }
+
+// TrackInfoPlaysConnect says "On a Spotify Connect device"
+// in the language of msgs.
+func (msgs Messages) TrackInfoPlaysConnect() string {
+	return Catalog.Format(msgs.locale, "trackInfoPlaysConnect", nil)
+}
+
+// TrackInfoQualitySpotify says "As your Spotify account and Spotify's settings choose: Spotify tells MixMusic nothing of its audio."
+// in the language the app shows.
+func TrackInfoQualitySpotify() string { return In(i18n.Locale()).TrackInfoQualitySpotify() }
+
+// TrackInfoQualitySpotify says "As your Spotify account and Spotify's settings choose: Spotify tells MixMusic nothing of its audio."
+// in the language of msgs.
+func (msgs Messages) TrackInfoQualitySpotify() string {
+	return Catalog.Format(msgs.locale, "trackInfoQualitySpotify", nil)
+}
+
+// TrackInfoLength says "Length"
+// in the language the app shows.
+func TrackInfoLength() string { return In(i18n.Locale()).TrackInfoLength() }
+
+// TrackInfoLength says "Length"
+// in the language of msgs.
+func (msgs Messages) TrackInfoLength() string {
+	return Catalog.Format(msgs.locale, "trackInfoLength", nil)
+}
+
+// TrackInfoLoudnessSpotify says "Spotify plays it at its own loudness."
+// in the language the app shows.
+func TrackInfoLoudnessSpotify() string { return In(i18n.Locale()).TrackInfoLoudnessSpotify() }
+
+// TrackInfoLoudnessSpotify says "Spotify plays it at its own loudness."
+// in the language of msgs.
+func (msgs Messages) TrackInfoLoudnessSpotify() string {
+	return Catalog.Format(msgs.locale, "trackInfoLoudnessSpotify", nil)
+}
+
+// TrackInfoLoudness says "Loudness"
+// in the language the app shows.
+func TrackInfoLoudness() string { return In(i18n.Locale()).TrackInfoLoudness() }
+
+// TrackInfoLoudness says "Loudness"
+// in the language of msgs.
+func (msgs Messages) TrackInfoLoudness() string {
+	return Catalog.Format(msgs.locale, "trackInfoLoudness", nil)
+}
+
+// TrackInfoFormat says "Format"
+// in the language the app shows.
+func TrackInfoFormat() string { return In(i18n.Locale()).TrackInfoFormat() }
+
+// TrackInfoFormat says "Format"
+// in the language of msgs.
+func (msgs Messages) TrackInfoFormat() string {
+	return Catalog.Format(msgs.locale, "trackInfoFormat", nil)
+}
+
+// TrackInfoFormatSpotify says "Play it to see its format, bitrate and the rest: MixMusic finds its recording on YouTube Music as it plays."
+// in the language the app shows.
+func TrackInfoFormatSpotify() string { return In(i18n.Locale()).TrackInfoFormatSpotify() }
+
+// TrackInfoFormatSpotify says "Play it to see its format, bitrate and the rest: MixMusic finds its recording on YouTube Music as it plays."
+// in the language of msgs.
+func (msgs Messages) TrackInfoFormatSpotify() string {
+	return Catalog.Format(msgs.locale, "trackInfoFormatSpotify", nil)
+}
+
+// TrackInfoFormatStream says "Play it to see its format, bitrate and the rest: MixMusic finds its stream as it plays."
+// in the language the app shows.
+func TrackInfoFormatStream() string { return In(i18n.Locale()).TrackInfoFormatStream() }
+
+// TrackInfoFormatStream says "Play it to see its format, bitrate and the rest: MixMusic finds its stream as it plays."
+// in the language of msgs.
+func (msgs Messages) TrackInfoFormatStream() string {
+	return Catalog.Format(msgs.locale, "trackInfoFormatStream", nil)
+}
+
+// TrackInfoCodecIn says "{codec} in {container}"
+// in the language the app shows.
+func TrackInfoCodecIn(codec string, container string) string {
+	return In(i18n.Locale()).TrackInfoCodecIn(codec, container)
+}
+
+// TrackInfoCodecIn says "{codec} in {container}"
+// in the language of msgs.
+func (msgs Messages) TrackInfoCodecIn(codec string, container string) string {
+	return Catalog.Format(msgs.locale, "trackInfoCodecIn", map[string]any{"codec": codec, "container": container})
+}
+
+// TrackInfoHLSPacked says "HLS packed audio"
+// in the language the app shows.
+func TrackInfoHLSPacked() string { return In(i18n.Locale()).TrackInfoHLSPacked() }
+
+// TrackInfoHLSPacked says "HLS packed audio"
+// in the language of msgs.
+func (msgs Messages) TrackInfoHLSPacked() string {
+	return Catalog.Format(msgs.locale, "trackInfoHLSPacked", nil)
+}
+
+// TrackInfoBitrate says "Bitrate"
+// in the language the app shows.
+func TrackInfoBitrate() string { return In(i18n.Locale()).TrackInfoBitrate() }
+
+// TrackInfoBitrate says "Bitrate"
+// in the language of msgs.
+func (msgs Messages) TrackInfoBitrate() string {
+	return Catalog.Format(msgs.locale, "trackInfoBitrate", nil)
+}
+
+// TrackInfoBitrateValue says "{kbps, number, ::group-off} kbit/s"
+// in the language the app shows.
+func TrackInfoBitrateValue(kbps int) string { return In(i18n.Locale()).TrackInfoBitrateValue(kbps) }
+
+// TrackInfoBitrateValue says "{kbps, number, ::group-off} kbit/s"
+// in the language of msgs.
+func (msgs Messages) TrackInfoBitrateValue(kbps int) string {
+	return Catalog.Format(msgs.locale, "trackInfoBitrateValue", map[string]any{"kbps": kbps})
+}
+
+// TrackInfoBitrateAverage says "About {kbps, number, ::group-off} kbit/s, on average"
+// in the language the app shows.
+func TrackInfoBitrateAverage(kbps int) string { return In(i18n.Locale()).TrackInfoBitrateAverage(kbps) }
+
+// TrackInfoBitrateAverage says "About {kbps, number, ::group-off} kbit/s, on average"
+// in the language of msgs.
+func (msgs Messages) TrackInfoBitrateAverage(kbps int) string {
+	return Catalog.Format(msgs.locale, "trackInfoBitrateAverage", map[string]any{"kbps": kbps})
+}
+
+// TrackInfoSampleRate says "Sample rate"
+// in the language the app shows.
+func TrackInfoSampleRate() string { return In(i18n.Locale()).TrackInfoSampleRate() }
+
+// TrackInfoSampleRate says "Sample rate"
+// in the language of msgs.
+func (msgs Messages) TrackInfoSampleRate() string {
+	return Catalog.Format(msgs.locale, "trackInfoSampleRate", nil)
+}
+
+// TrackInfoBitDepthLabel says "Bit depth"
+// in the language the app shows.
+func TrackInfoBitDepthLabel() string { return In(i18n.Locale()).TrackInfoBitDepthLabel() }
+
+// TrackInfoBitDepthLabel says "Bit depth"
+// in the language of msgs.
+func (msgs Messages) TrackInfoBitDepthLabel() string {
+	return Catalog.Format(msgs.locale, "trackInfoBitDepthLabel", nil)
+}
+
+// TrackInfoBitDepth says "{bits}-bit"
+// in the language the app shows.
+func TrackInfoBitDepth(bits int) string { return In(i18n.Locale()).TrackInfoBitDepth(bits) }
+
+// TrackInfoBitDepth says "{bits}-bit"
+// in the language of msgs.
+func (msgs Messages) TrackInfoBitDepth(bits int) string {
+	return Catalog.Format(msgs.locale, "trackInfoBitDepth", map[string]any{"bits": bits})
+}
+
+// TrackInfoBitDepthFloat says "{bits}-bit floating point"
+// in the language the app shows.
+func TrackInfoBitDepthFloat(bits int) string { return In(i18n.Locale()).TrackInfoBitDepthFloat(bits) }
+
+// TrackInfoBitDepthFloat says "{bits}-bit floating point"
+// in the language of msgs.
+func (msgs Messages) TrackInfoBitDepthFloat(bits int) string {
+	return Catalog.Format(msgs.locale, "trackInfoBitDepthFloat", map[string]any{"bits": bits})
+}
+
+// TrackInfoChannelsLabel says "Channels"
+// in the language the app shows.
+func TrackInfoChannelsLabel() string { return In(i18n.Locale()).TrackInfoChannelsLabel() }
+
+// TrackInfoChannelsLabel says "Channels"
+// in the language of msgs.
+func (msgs Messages) TrackInfoChannelsLabel() string {
+	return Catalog.Format(msgs.locale, "trackInfoChannelsLabel", nil)
+}
+
+// TrackInfoMono says "Mono"
+// in the language the app shows.
+func TrackInfoMono() string { return In(i18n.Locale()).TrackInfoMono() }
+
+// TrackInfoMono says "Mono"
+// in the language of msgs.
+func (msgs Messages) TrackInfoMono() string {
+	return Catalog.Format(msgs.locale, "trackInfoMono", nil)
+}
+
+// TrackInfoStereo says "Stereo"
+// in the language the app shows.
+func TrackInfoStereo() string { return In(i18n.Locale()).TrackInfoStereo() }
+
+// TrackInfoStereo says "Stereo"
+// in the language of msgs.
+func (msgs Messages) TrackInfoStereo() string {
+	return Catalog.Format(msgs.locale, "trackInfoStereo", nil)
+}
+
+// TrackInfoSurround says "5.1 surround"
+// in the language the app shows.
+func TrackInfoSurround() string { return In(i18n.Locale()).TrackInfoSurround() }
+
+// TrackInfoSurround says "5.1 surround"
+// in the language of msgs.
+func (msgs Messages) TrackInfoSurround() string {
+	return Catalog.Format(msgs.locale, "trackInfoSurround", nil)
+}
+
+// TrackInfoChannels says "{count} channels"
+// in the language the app shows.
+func TrackInfoChannels(count int) string { return In(i18n.Locale()).TrackInfoChannels(count) }
+
+// TrackInfoChannels says "{count} channels"
+// in the language of msgs.
+func (msgs Messages) TrackInfoChannels(count int) string {
+	return Catalog.Format(msgs.locale, "trackInfoChannels", map[string]any{"count": count})
+}
+
+// TrackInfoLive says "Live"
+// in the language the app shows.
+func TrackInfoLive() string { return In(i18n.Locale()).TrackInfoLive() }
+
+// TrackInfoLive says "Live"
+// in the language of msgs.
+func (msgs Messages) TrackInfoLive() string {
+	return Catalog.Format(msgs.locale, "trackInfoLive", nil)
+}
+
+// TrackInfoDownload says "Download"
+// in the language the app shows.
+func TrackInfoDownload() string { return In(i18n.Locale()).TrackInfoDownload() }
+
+// TrackInfoDownload says "Download"
+// in the language of msgs.
+func (msgs Messages) TrackInfoDownload() string {
+	return Catalog.Format(msgs.locale, "trackInfoDownload", nil)
+}
+
+// TrackInfoOfflineCopy says "Offline copy"
+// in the language the app shows.
+func TrackInfoOfflineCopy() string { return In(i18n.Locale()).TrackInfoOfflineCopy() }
+
+// TrackInfoOfflineCopy says "Offline copy"
+// in the language of msgs.
+func (msgs Messages) TrackInfoOfflineCopy() string {
+	return Catalog.Format(msgs.locale, "trackInfoOfflineCopy", nil)
+}
+
+// TrackInfoFile says "File"
+// in the language the app shows.
+func TrackInfoFile() string { return In(i18n.Locale()).TrackInfoFile() }
+
+// TrackInfoFile says "File"
+// in the language of msgs.
+func (msgs Messages) TrackInfoFile() string {
+	return Catalog.Format(msgs.locale, "trackInfoFile", nil)
+}
+
+// TrackInfoFileProblem says "{path} · {problem}"
+// in the language the app shows.
+func TrackInfoFileProblem(path string, problem string) string {
+	return In(i18n.Locale()).TrackInfoFileProblem(path, problem)
+}
+
+// TrackInfoFileProblem says "{path} · {problem}"
+// in the language of msgs.
+func (msgs Messages) TrackInfoFileProblem(path string, problem string) string {
+	return Catalog.Format(msgs.locale, "trackInfoFileProblem", map[string]any{"path": path, "problem": problem})
+}
+
+// TrackInfoPlaying says "Playing"
+// in the language the app shows.
+func TrackInfoPlaying() string { return In(i18n.Locale()).TrackInfoPlaying() }
+
+// TrackInfoPlaying says "Playing"
+// in the language of msgs.
+func (msgs Messages) TrackInfoPlaying() string {
+	return Catalog.Format(msgs.locale, "trackInfoPlaying", nil)
+}
+
+// TrackInfoEngineOpening says "MixMusic's audio engine is opening it…"
+// in the language the app shows.
+func TrackInfoEngineOpening() string { return In(i18n.Locale()).TrackInfoEngineOpening() }
+
+// TrackInfoEngineOpening says "MixMusic's audio engine is opening it…"
+// in the language of msgs.
+func (msgs Messages) TrackInfoEngineOpening() string {
+	return Catalog.Format(msgs.locale, "trackInfoEngineOpening", nil)
+}
+
+// TrackInfoEngineLine says "In MixMusic's audio engine, {how}"
+// in the language the app shows.
+func TrackInfoEngineLine(how string) string { return In(i18n.Locale()).TrackInfoEngineLine(how) }
+
+// TrackInfoEngineLine says "In MixMusic's audio engine, {how}"
+// in the language of msgs.
+func (msgs Messages) TrackInfoEngineLine(how string) string {
+	return Catalog.Format(msgs.locale, "trackInfoEngineLine", map[string]any{"how": how})
+}
+
+// TrackInfoEngineSurround says "its 5.1 surround audio, {from}"
+// in the language the app shows.
+func TrackInfoEngineSurround(from string) string {
+	return In(i18n.Locale()).TrackInfoEngineSurround(from)
+}
+
+// TrackInfoEngineSurround says "its 5.1 surround audio, {from}"
+// in the language of msgs.
+func (msgs Messages) TrackInfoEngineSurround(from string) string {
+	return Catalog.Format(msgs.locale, "trackInfoEngineSurround", map[string]any{"from": from})
+}
+
+// TrackInfoEngineFile says "from its file"
+// in the language the app shows.
+func TrackInfoEngineFile() string { return In(i18n.Locale()).TrackInfoEngineFile() }
+
+// TrackInfoEngineFile says "from its file"
+// in the language of msgs.
+func (msgs Messages) TrackInfoEngineFile() string {
+	return Catalog.Format(msgs.locale, "trackInfoEngineFile", nil)
+}
+
+// TrackInfoEngineDownload says "from its download"
+// in the language the app shows.
+func TrackInfoEngineDownload() string { return In(i18n.Locale()).TrackInfoEngineDownload() }
+
+// TrackInfoEngineDownload says "from its download"
+// in the language of msgs.
+func (msgs Messages) TrackInfoEngineDownload() string {
+	return Catalog.Format(msgs.locale, "trackInfoEngineDownload", nil)
+}
+
+// TrackInfoEngineCache says "from the offline cache"
+// in the language the app shows.
+func TrackInfoEngineCache() string { return In(i18n.Locale()).TrackInfoEngineCache() }
+
+// TrackInfoEngineCache says "from the offline cache"
+// in the language of msgs.
+func (msgs Messages) TrackInfoEngineCache() string {
+	return Catalog.Format(msgs.locale, "trackInfoEngineCache", nil)
+}
+
+// TrackInfoEngineLive says "live from YouTube"
+// in the language the app shows.
+func TrackInfoEngineLive() string { return In(i18n.Locale()).TrackInfoEngineLive() }
+
+// TrackInfoEngineLive says "live from YouTube"
+// in the language of msgs.
+func (msgs Messages) TrackInfoEngineLive() string {
+	return Catalog.Format(msgs.locale, "trackInfoEngineLive", nil)
+}
+
+// TrackInfoEngineStreamed says "streamed from YouTube"
+// in the language the app shows.
+func TrackInfoEngineStreamed() string { return In(i18n.Locale()).TrackInfoEngineStreamed() }
+
+// TrackInfoEngineStreamed says "streamed from YouTube"
+// in the language of msgs.
+func (msgs Messages) TrackInfoEngineStreamed() string {
+	return Catalog.Format(msgs.locale, "trackInfoEngineStreamed", nil)
+}
+
+// TrackInfoEngineConverted says "{line}, converted to {rate}"
+// in the language the app shows.
+func TrackInfoEngineConverted(line string, rate string) string {
+	return In(i18n.Locale()).TrackInfoEngineConverted(line, rate)
+}
+
+// TrackInfoEngineConverted says "{line}, converted to {rate}"
+// in the language of msgs.
+func (msgs Messages) TrackInfoEngineConverted(line string, rate string) string {
+	return Catalog.Format(msgs.locale, "trackInfoEngineConverted", map[string]any{"line": line, "rate": rate})
+}
+
+// TrackInfoMeasuredOff says "YouTube measured it at {lkfs}. Even loudness is off: it plays at its own level."
+// in the language the app shows.
+func TrackInfoMeasuredOff(lkfs string) string { return In(i18n.Locale()).TrackInfoMeasuredOff(lkfs) }
+
+// TrackInfoMeasuredOff says "YouTube measured it at {lkfs}. Even loudness is off: it plays at its own level."
+// in the language of msgs.
+func (msgs Messages) TrackInfoMeasuredOff(lkfs string) string {
+	return Catalog.Format(msgs.locale, "trackInfoMeasuredOff", map[string]any{"lkfs": lkfs})
+}
+
+// TrackInfoMeasuredTurnDown says "YouTube measured it at {lkfs}. Even loudness turns it down by {db} dB."
+// in the language the app shows.
+func TrackInfoMeasuredTurnDown(lkfs string, db string) string {
+	return In(i18n.Locale()).TrackInfoMeasuredTurnDown(lkfs, db)
+}
+
+// TrackInfoMeasuredTurnDown says "YouTube measured it at {lkfs}. Even loudness turns it down by {db} dB."
+// in the language of msgs.
+func (msgs Messages) TrackInfoMeasuredTurnDown(lkfs string, db string) string {
+	return Catalog.Format(msgs.locale, "trackInfoMeasuredTurnDown", map[string]any{"lkfs": lkfs, "db": db})
+}
+
+// TrackInfoMeasuredLeave says "YouTube measured it at {lkfs}. Even loudness leaves it as it is: it isn't louder than {ceiling}."
+// in the language the app shows.
+func TrackInfoMeasuredLeave(lkfs string, ceiling string) string {
+	return In(i18n.Locale()).TrackInfoMeasuredLeave(lkfs, ceiling)
+}
+
+// TrackInfoMeasuredLeave says "YouTube measured it at {lkfs}. Even loudness leaves it as it is: it isn't louder than {ceiling}."
+// in the language of msgs.
+func (msgs Messages) TrackInfoMeasuredLeave(lkfs string, ceiling string) string {
+	return Catalog.Format(msgs.locale, "trackInfoMeasuredLeave", map[string]any{"lkfs": lkfs, "ceiling": ceiling})
+}
+
+// TrackInfoFileLoudness says "It plays at its own level: Even loudness turns tracks down from YouTube's measure of each, which a file on this compu…"
+// in the language the app shows.
+func TrackInfoFileLoudness() string { return In(i18n.Locale()).TrackInfoFileLoudness() }
+
+// TrackInfoFileLoudness says "It plays at its own level: Even loudness turns tracks down from YouTube's measure of each, which a file on this compu…"
+// in the language of msgs.
+func (msgs Messages) TrackInfoFileLoudness() string {
+	return Catalog.Format(msgs.locale, "trackInfoFileLoudness", nil)
+}
+
+// TrackInfoNoMeasure says "MixMusic has no measure of it yet: it plays at its own level."
+// in the language the app shows.
+func TrackInfoNoMeasure() string { return In(i18n.Locale()).TrackInfoNoMeasure() }
+
+// TrackInfoNoMeasure says "MixMusic has no measure of it yet: it plays at its own level."
+// in the language of msgs.
+func (msgs Messages) TrackInfoNoMeasure() string {
+	return Catalog.Format(msgs.locale, "trackInfoNoMeasure", nil)
+}
+
+// TrackInfoLevelling says "{line} Volume levelling squeezes its loud and quiet moments closer together."
+// in the language the app shows.
+func TrackInfoLevelling(line string) string { return In(i18n.Locale()).TrackInfoLevelling(line) }
+
+// TrackInfoLevelling says "{line} Volume levelling squeezes its loud and quiet moments closer together."
+// in the language of msgs.
+func (msgs Messages) TrackInfoLevelling(line string) string {
+	return Catalog.Format(msgs.locale, "trackInfoLevelling", map[string]any{"line": line})
+}
+
+// TrackInfoTagTitle says "Title"
+// in the language the app shows.
+func TrackInfoTagTitle() string { return In(i18n.Locale()).TrackInfoTagTitle() }
+
+// TrackInfoTagTitle says "Title"
+// in the language of msgs.
+func (msgs Messages) TrackInfoTagTitle() string {
+	return Catalog.Format(msgs.locale, "trackInfoTagTitle", nil)
+}
+
+// TrackInfoTagArtist says "Artist"
+// in the language the app shows.
+func TrackInfoTagArtist() string { return In(i18n.Locale()).TrackInfoTagArtist() }
+
+// TrackInfoTagArtist says "Artist"
+// in the language of msgs.
+func (msgs Messages) TrackInfoTagArtist() string {
+	return Catalog.Format(msgs.locale, "trackInfoTagArtist", nil)
+}
+
+// TrackInfoTagAlbum says "Album"
+// in the language the app shows.
+func TrackInfoTagAlbum() string { return In(i18n.Locale()).TrackInfoTagAlbum() }
+
+// TrackInfoTagAlbum says "Album"
+// in the language of msgs.
+func (msgs Messages) TrackInfoTagAlbum() string {
+	return Catalog.Format(msgs.locale, "trackInfoTagAlbum", nil)
+}
+
+// TrackInfoTagAlbumArtist says "Album artist"
+// in the language the app shows.
+func TrackInfoTagAlbumArtist() string { return In(i18n.Locale()).TrackInfoTagAlbumArtist() }
+
+// TrackInfoTagAlbumArtist says "Album artist"
+// in the language of msgs.
+func (msgs Messages) TrackInfoTagAlbumArtist() string {
+	return Catalog.Format(msgs.locale, "trackInfoTagAlbumArtist", nil)
+}
+
+// TrackInfoTagTrack says "Track"
+// in the language the app shows.
+func TrackInfoTagTrack() string { return In(i18n.Locale()).TrackInfoTagTrack() }
+
+// TrackInfoTagTrack says "Track"
+// in the language of msgs.
+func (msgs Messages) TrackInfoTagTrack() string {
+	return Catalog.Format(msgs.locale, "trackInfoTagTrack", nil)
+}
+
+// TrackInfoTagDisc says "Disc"
+// in the language the app shows.
+func TrackInfoTagDisc() string { return In(i18n.Locale()).TrackInfoTagDisc() }
+
+// TrackInfoTagDisc says "Disc"
+// in the language of msgs.
+func (msgs Messages) TrackInfoTagDisc() string {
+	return Catalog.Format(msgs.locale, "trackInfoTagDisc", nil)
+}
+
+// TrackInfoTagYear says "Year"
+// in the language the app shows.
+func TrackInfoTagYear() string { return In(i18n.Locale()).TrackInfoTagYear() }
+
+// TrackInfoTagYear says "Year"
+// in the language of msgs.
+func (msgs Messages) TrackInfoTagYear() string {
+	return Catalog.Format(msgs.locale, "trackInfoTagYear", nil)
+}
+
+// TrackInfoFound says "Found"
+// in the language the app shows.
+func TrackInfoFound() string { return In(i18n.Locale()).TrackInfoFound() }
+
+// TrackInfoFound says "Found"
+// in the language of msgs.
+func (msgs Messages) TrackInfoFound() string {
+	return Catalog.Format(msgs.locale, "trackInfoFound", nil)
+}
+
+// TrackInfoRoutePlayerAPI says "Quickly, through YouTube's player API, with no yt-dlp"
+// in the language the app shows.
+func TrackInfoRoutePlayerAPI() string { return In(i18n.Locale()).TrackInfoRoutePlayerAPI() }
+
+// TrackInfoRoutePlayerAPI says "Quickly, through YouTube's player API, with no yt-dlp"
+// in the language of msgs.
+func (msgs Messages) TrackInfoRoutePlayerAPI() string {
+	return Catalog.Format(msgs.locale, "trackInfoRoutePlayerAPI", nil)
+}
+
+// TrackInfoRouteQuick says "With yt-dlp's quick run, as YouTube's visionOS app alone"
+// in the language the app shows.
+func TrackInfoRouteQuick() string { return In(i18n.Locale()).TrackInfoRouteQuick() }
+
+// TrackInfoRouteQuick says "With yt-dlp's quick run, as YouTube's visionOS app alone"
+// in the language of msgs.
+func (msgs Messages) TrackInfoRouteQuick() string {
+	return Catalog.Format(msgs.locale, "trackInfoRouteQuick", nil)
+}
+
+// TrackInfoRouteFull says "With yt-dlp's full run, with its default clients and a JavaScript runtime"
+// in the language the app shows.
+func TrackInfoRouteFull() string { return In(i18n.Locale()).TrackInfoRouteFull() }
+
+// TrackInfoRouteFull says "With yt-dlp's full run, with its default clients and a JavaScript runtime"
+// in the language of msgs.
+func (msgs Messages) TrackInfoRouteFull() string {
+	return Catalog.Format(msgs.locale, "trackInfoRouteFull", nil)
+}
+
+// TrackInfoRouteAccount says "With yt-dlp's full run, with the session of your YouTube Music account"
+// in the language the app shows.
+func TrackInfoRouteAccount() string { return In(i18n.Locale()).TrackInfoRouteAccount() }
+
+// TrackInfoRouteAccount says "With yt-dlp's full run, with the session of your YouTube Music account"
+// in the language of msgs.
+func (msgs Messages) TrackInfoRouteAccount() string {
+	return Catalog.Format(msgs.locale, "trackInfoRouteAccount", nil)
+}
+
+// TrackInfoYtDlpRan says "yt-dlp ran"
+// in the language the app shows.
+func TrackInfoYtDlpRan() string { return In(i18n.Locale()).TrackInfoYtDlpRan() }
+
+// TrackInfoYtDlpRan says "yt-dlp ran"
+// in the language of msgs.
+func (msgs Messages) TrackInfoYtDlpRan() string {
+	return Catalog.Format(msgs.locale, "trackInfoYtDlpRan", nil)
+}
+
+// TrackInfoSignedIn says "Signed in"
+// in the language the app shows.
+func TrackInfoSignedIn() string { return In(i18n.Locale()).TrackInfoSignedIn() }
+
+// TrackInfoSignedIn says "Signed in"
+// in the language of msgs.
+func (msgs Messages) TrackInfoSignedIn() string {
+	return Catalog.Format(msgs.locale, "trackInfoSignedIn", nil)
+}
+
+// TrackInfoSignedOut says "No: asked for signed out, as no one's account."
+// in the language the app shows.
+func TrackInfoSignedOut() string { return In(i18n.Locale()).TrackInfoSignedOut() }
+
+// TrackInfoSignedOut says "No: asked for signed out, as no one's account."
+// in the language of msgs.
+func (msgs Messages) TrackInfoSignedOut() string {
+	return Catalog.Format(msgs.locale, "trackInfoSignedOut", nil)
+}
+
+// TrackInfoSignedInYes says "Yes: asked for as your YouTube Music account."
+// in the language the app shows.
+func TrackInfoSignedInYes() string { return In(i18n.Locale()).TrackInfoSignedInYes() }
+
+// TrackInfoSignedInYes says "Yes: asked for as your YouTube Music account."
+// in the language of msgs.
+func (msgs Messages) TrackInfoSignedInYes() string {
+	return Catalog.Format(msgs.locale, "trackInfoSignedInYes", nil)
+}
+
+// TrackInfoStreamNote says "It stops working after a few hours, and is tied to this network: it may carry your IP address, so share it with care."
+// in the language the app shows.
+func TrackInfoStreamNote() string { return In(i18n.Locale()).TrackInfoStreamNote() }
+
+// TrackInfoStreamNote says "It stops working after a few hours, and is tied to this network: it may carry your IP address, so share it with care."
+// in the language of msgs.
+func (msgs Messages) TrackInfoStreamNote() string {
+	return Catalog.Format(msgs.locale, "trackInfoStreamNote", nil)
+}
+
+// TrackInfoCopyURL says "copy stream URL"
+// in the language the app shows.
+func TrackInfoCopyURL() string { return In(i18n.Locale()).TrackInfoCopyURL() }
+
+// TrackInfoCopyURL says "copy stream URL"
+// in the language of msgs.
+func (msgs Messages) TrackInfoCopyURL() string {
+	return Catalog.Format(msgs.locale, "trackInfoCopyURL", nil)
+}
+
+// TrackInfoCopied says "Copied the stream's address: it stops working after a few hours"
+// in the language the app shows.
+func TrackInfoCopied() string { return In(i18n.Locale()).TrackInfoCopied() }
+
+// TrackInfoCopied says "Copied the stream's address: it stops working after a few hours"
+// in the language of msgs.
+func (msgs Messages) TrackInfoCopied() string {
+	return Catalog.Format(msgs.locale, "trackInfoCopied", nil)
+}
+
+// NowPlayingNothing says "Nothing playing"
+// in the language the app shows.
+func NowPlayingNothing() string { return In(i18n.Locale()).NowPlayingNothing() }
+
+// NowPlayingNothing says "Nothing playing"
+// in the language of msgs.
+func (msgs Messages) NowPlayingNothing() string {
+	return Catalog.Format(msgs.locale, "nowPlayingNothing", nil)
+}
+
+// NowPlayingEmpty says "Play a track and it fills this page, with its lyrics."
+// in the language the app shows.
+func NowPlayingEmpty() string { return In(i18n.Locale()).NowPlayingEmpty() }
+
+// NowPlayingEmpty says "Play a track and it fills this page, with its lyrics."
+// in the language of msgs.
+func (msgs Messages) NowPlayingEmpty() string {
+	return Catalog.Format(msgs.locale, "nowPlayingEmpty", nil)
+}
+
+// NowPlayingWaiting says "waiting for the network"
+// in the language the app shows.
+func NowPlayingWaiting() string { return In(i18n.Locale()).NowPlayingWaiting() }
+
+// NowPlayingWaiting says "waiting for the network"
+// in the language of msgs.
+func (msgs Messages) NowPlayingWaiting() string {
+	return Catalog.Format(msgs.locale, "nowPlayingWaiting", nil)
+}
+
+// NowPlayingVisualizer says "Visualizer"
+// in the language the app shows.
+func NowPlayingVisualizer() string { return In(i18n.Locale()).NowPlayingVisualizer() }
+
+// NowPlayingVisualizer says "Visualizer"
+// in the language of msgs.
+func (msgs Messages) NowPlayingVisualizer() string {
+	return Catalog.Format(msgs.locale, "nowPlayingVisualizer", nil)
+}
+
+// VideoPlay says "Play the video"
+// in the language the app shows.
+func VideoPlay() string { return In(i18n.Locale()).VideoPlay() }
+
+// VideoPlay says "Play the video"
+// in the language of msgs.
+func (msgs Messages) VideoPlay() string {
+	return Catalog.Format(msgs.locale, "videoPlay", nil)
+}
+
+// VideoMusicVideo says "Music video: {title}"
+// in the language the app shows.
+func VideoMusicVideo(title string) string { return In(i18n.Locale()).VideoMusicVideo(title) }
+
+// VideoMusicVideo says "Music video: {title}"
+// in the language of msgs.
+func (msgs Messages) VideoMusicVideo(title string) string {
+	return Catalog.Format(msgs.locale, "videoMusicVideo", map[string]any{"title": title})
+}
+
+// VideoLoadFailed says "The picture of music videos couldn't load here."
+// in the language the app shows.
+func VideoLoadFailed() string { return In(i18n.Locale()).VideoLoadFailed() }
+
+// VideoLoadFailed says "The picture of music videos couldn't load here."
+// in the language of msgs.
+func (msgs Messages) VideoLoadFailed() string {
+	return Catalog.Format(msgs.locale, "videoLoadFailed", nil)
+}
+
+// VideoShowVideo says "Show the video"
+// in the language the app shows.
+func VideoShowVideo() string { return In(i18n.Locale()).VideoShowVideo() }
+
+// VideoShowVideo says "Show the video"
+// in the language of msgs.
+func (msgs Messages) VideoShowVideo() string {
+	return Catalog.Format(msgs.locale, "videoShowVideo", nil)
+}
+
+// VideoShowCover says "Show the cover"
+// in the language the app shows.
+func VideoShowCover() string { return In(i18n.Locale()).VideoShowCover() }
+
+// VideoShowCover says "Show the cover"
+// in the language of msgs.
+func (msgs Messages) VideoShowCover() string {
+	return Catalog.Format(msgs.locale, "videoShowCover", nil)
+}
+
+// SpeedMenuLabel says "Speed: {what}"
+// in the language the app shows.
+func SpeedMenuLabel(what string) string { return In(i18n.Locale()).SpeedMenuLabel(what) }
+
+// SpeedMenuLabel says "Speed: {what}"
+// in the language of msgs.
+func (msgs Messages) SpeedMenuLabel(what string) string {
+	return Catalog.Format(msgs.locale, "speedMenuLabel", map[string]any{"what": what})
+}
+
+// SpeedMenuLockedSpotify says "Spotify plays this one at its own speed"
+// in the language the app shows.
+func SpeedMenuLockedSpotify() string { return In(i18n.Locale()).SpeedMenuLockedSpotify() }
+
+// SpeedMenuLockedSpotify says "Spotify plays this one at its own speed"
+// in the language of msgs.
+func (msgs Messages) SpeedMenuLockedSpotify() string {
+	return Catalog.Format(msgs.locale, "speedMenuLockedSpotify", nil)
+}
+
+// SpeedMenuLockedLive says "this live stream plays at its own speed"
+// in the language the app shows.
+func SpeedMenuLockedLive() string { return In(i18n.Locale()).SpeedMenuLockedLive() }
+
+// SpeedMenuLockedLive says "this live stream plays at its own speed"
+// in the language of msgs.
+func (msgs Messages) SpeedMenuLockedLive() string {
+	return Catalog.Format(msgs.locale, "speedMenuLockedLive", nil)
+}
+
+// VolumeMute says "Mute"
+// in the language the app shows.
+func VolumeMute() string { return In(i18n.Locale()).VolumeMute() }
+
+// VolumeMute says "Mute"
+// in the language of msgs.
+func (msgs Messages) VolumeMute() string {
+	return Catalog.Format(msgs.locale, "volumeMute", nil)
+}
+
+// VolumeUnmute says "Unmute"
+// in the language the app shows.
+func VolumeUnmute() string { return In(i18n.Locale()).VolumeUnmute() }
+
+// VolumeUnmute says "Unmute"
+// in the language of msgs.
+func (msgs Messages) VolumeUnmute() string {
+	return Catalog.Format(msgs.locale, "volumeUnmute", nil)
+}
+
+// MiniSeekValue says "{at} of {total}"
+// in the language the app shows.
+func MiniSeekValue(at string, total string) string { return In(i18n.Locale()).MiniSeekValue(at, total) }
+
+// MiniSeekValue says "{at} of {total}"
+// in the language of msgs.
+func (msgs Messages) MiniSeekValue(at string, total string) string {
+	return Catalog.Format(msgs.locale, "miniSeekValue", map[string]any{"at": at, "total": total})
+}
+
+// MiniWindowTitle says "MixMusic mini player"
+// in the language the app shows.
+func MiniWindowTitle() string { return In(i18n.Locale()).MiniWindowTitle() }
+
+// MiniWindowTitle says "MixMusic mini player"
+// in the language of msgs.
+func (msgs Messages) MiniWindowTitle() string {
+	return Catalog.Format(msgs.locale, "miniWindowTitle", nil)
+}
+
+// MiniRowNothingPlaying says "Nothing playing"
+// in the language the app shows.
+func MiniRowNothingPlaying() string { return In(i18n.Locale()).MiniRowNothingPlaying() }
+
+// MiniRowNothingPlaying says "Nothing playing"
+// in the language of msgs.
+func (msgs Messages) MiniRowNothingPlaying() string {
+	return Catalog.Format(msgs.locale, "miniRowNothingPlaying", nil)
+}
+
+// MiniRowPlaySomething says "play something in MixMusic"
+// in the language the app shows.
+func MiniRowPlaySomething() string { return In(i18n.Locale()).MiniRowPlaySomething() }
+
+// MiniRowPlaySomething says "play something in MixMusic"
+// in the language of msgs.
+func (msgs Messages) MiniRowPlaySomething() string {
+	return Catalog.Format(msgs.locale, "miniRowPlaySomething", nil)
+}
+
+// MiniRowOpen says "Open MixMusic"
+// in the language the app shows.
+func MiniRowOpen() string { return In(i18n.Locale()).MiniRowOpen() }
+
+// MiniRowOpen says "Open MixMusic"
+// in the language of msgs.
+func (msgs Messages) MiniRowOpen() string {
+	return Catalog.Format(msgs.locale, "miniRowOpen", nil)
+}
+
+// MiniRowClose says "Close the mini player"
+// in the language the app shows.
+func MiniRowClose() string { return In(i18n.Locale()).MiniRowClose() }
+
+// MiniRowClose says "Close the mini player"
+// in the language of msgs.
+func (msgs Messages) MiniRowClose() string {
+	return Catalog.Format(msgs.locale, "miniRowClose", nil)
+}
+
+// MiniPanelWhy says "Why it couldn't play"
+// in the language the app shows.
+func MiniPanelWhy() string { return In(i18n.Locale()).MiniPanelWhy() }
+
+// MiniPanelWhy says "Why it couldn't play"
+// in the language of msgs.
+func (msgs Messages) MiniPanelWhy() string {
+	return Catalog.Format(msgs.locale, "miniPanelWhy", nil)
+}
+
+// MiniPanelEmptyQueue says "Play something and the queue shows here."
+// in the language the app shows.
+func MiniPanelEmptyQueue() string { return In(i18n.Locale()).MiniPanelEmptyQueue() }
+
+// MiniPanelEmptyQueue says "Play something and the queue shows here."
+// in the language of msgs.
+func (msgs Messages) MiniPanelEmptyQueue() string {
+	return Catalog.Format(msgs.locale, "miniPanelEmptyQueue", nil)
+}
+
+// MiniPanelPlay says "Play {title}"
+// in the language the app shows.
+func MiniPanelPlay(title string) string { return In(i18n.Locale()).MiniPanelPlay(title) }
+
+// MiniPanelPlay says "Play {title}"
+// in the language of msgs.
+func (msgs Messages) MiniPanelPlay(title string) string {
+	return Catalog.Format(msgs.locale, "miniPanelPlay", map[string]any{"title": title})
+}
+
+// MiniPanelPlaying says "{title}, playing"
+// in the language the app shows.
+func MiniPanelPlaying(title string) string { return In(i18n.Locale()).MiniPanelPlaying(title) }
+
+// MiniPanelPlaying says "{title}, playing"
+// in the language of msgs.
+func (msgs Messages) MiniPanelPlaying(title string) string {
+	return Catalog.Format(msgs.locale, "miniPanelPlaying", map[string]any{"title": title})
+}
+
+// MiniPanelLyricsEmpty says "Play a track to see its lyrics."
+// in the language the app shows.
+func MiniPanelLyricsEmpty() string { return In(i18n.Locale()).MiniPanelLyricsEmpty() }
+
+// MiniPanelLyricsEmpty says "Play a track to see its lyrics."
+// in the language of msgs.
+func (msgs Messages) MiniPanelLyricsEmpty() string {
+	return Catalog.Format(msgs.locale, "miniPanelLyricsEmpty", nil)
+}
+
+// MiniPanelLyricsLooking says "Looking for the lyrics…"
+// in the language the app shows.
+func MiniPanelLyricsLooking() string { return In(i18n.Locale()).MiniPanelLyricsLooking() }
+
+// MiniPanelLyricsLooking says "Looking for the lyrics…"
+// in the language of msgs.
+func (msgs Messages) MiniPanelLyricsLooking() string {
+	return Catalog.Format(msgs.locale, "miniPanelLyricsLooking", nil)
+}
+
+// MiniPanelInstrumental says "This track is instrumental."
+// in the language the app shows.
+func MiniPanelInstrumental() string { return In(i18n.Locale()).MiniPanelInstrumental() }
+
+// MiniPanelInstrumental says "This track is instrumental."
+// in the language of msgs.
+func (msgs Messages) MiniPanelInstrumental() string {
+	return Catalog.Format(msgs.locale, "miniPanelInstrumental", nil)
+}
+
+// MiniPanelDetailsLooking says "Looking for the details…"
+// in the language the app shows.
+func MiniPanelDetailsLooking() string { return In(i18n.Locale()).MiniPanelDetailsLooking() }
+
+// MiniPanelDetailsLooking says "Looking for the details…"
+// in the language of msgs.
+func (msgs Messages) MiniPanelDetailsLooking() string {
+	return Catalog.Format(msgs.locale, "miniPanelDetailsLooking", nil)
+}
+
+// MiniPanelNoChapters says "No chapters."
+// in the language the app shows.
+func MiniPanelNoChapters() string { return In(i18n.Locale()).MiniPanelNoChapters() }
+
+// MiniPanelNoChapters says "No chapters."
+// in the language of msgs.
+func (msgs Messages) MiniPanelNoChapters() string {
+	return Catalog.Format(msgs.locale, "miniPanelNoChapters", nil)
+}
+
+// MiniPanelSystemDevice says "MixMusic plays on the system's default device."
+// in the language the app shows.
+func MiniPanelSystemDevice() string { return In(i18n.Locale()).MiniPanelSystemDevice() }
+
+// MiniPanelSystemDevice says "MixMusic plays on the system's default device."
+// in the language of msgs.
+func (msgs Messages) MiniPanelSystemDevice() string {
+	return Catalog.Format(msgs.locale, "miniPanelSystemDevice", nil)
+}
+
+// MiniPanelOnComputer says "On this computer"
+// in the language the app shows.
+func MiniPanelOnComputer() string { return In(i18n.Locale()).MiniPanelOnComputer() }
+
+// MiniPanelOnComputer says "On this computer"
+// in the language of msgs.
+func (msgs Messages) MiniPanelOnComputer() string {
+	return Catalog.Format(msgs.locale, "miniPanelOnComputer", nil)
+}
+
+// MiniPanelCast says "Cast"
+// in the language the app shows.
+func MiniPanelCast() string { return In(i18n.Locale()).MiniPanelCast() }
+
+// MiniPanelCast says "Cast"
+// in the language of msgs.
+func (msgs Messages) MiniPanelCast() string {
+	return Catalog.Format(msgs.locale, "miniPanelCast", nil)
+}
+
+// MiniPanelActive says "active"
+// in the language the app shows.
+func MiniPanelActive() string { return In(i18n.Locale()).MiniPanelActive() }
+
+// MiniPanelActive says "active"
+// in the language of msgs.
+func (msgs Messages) MiniPanelActive() string {
+	return Catalog.Format(msgs.locale, "miniPanelActive", nil)
+}
+
+// MiniPanelNoFailure says "No track failed to play since MixMusic started."
+// in the language the app shows.
+func MiniPanelNoFailure() string { return In(i18n.Locale()).MiniPanelNoFailure() }
+
+// MiniPanelNoFailure says "No track failed to play since MixMusic started."
+// in the language of msgs.
+func (msgs Messages) MiniPanelNoFailure() string {
+	return Catalog.Format(msgs.locale, "miniPanelNoFailure", nil)
+}
+
+// MiniPanelCloseQueue says "Close the queue"
+// in the language the app shows.
+func MiniPanelCloseQueue() string { return In(i18n.Locale()).MiniPanelCloseQueue() }
+
+// MiniPanelCloseQueue says "Close the queue"
+// in the language of msgs.
+func (msgs Messages) MiniPanelCloseQueue() string {
+	return Catalog.Format(msgs.locale, "miniPanelCloseQueue", nil)
+}
+
+// MiniPanelCloseLyrics says "Close the lyrics"
+// in the language the app shows.
+func MiniPanelCloseLyrics() string { return In(i18n.Locale()).MiniPanelCloseLyrics() }
+
+// MiniPanelCloseLyrics says "Close the lyrics"
+// in the language of msgs.
+func (msgs Messages) MiniPanelCloseLyrics() string {
+	return Catalog.Format(msgs.locale, "miniPanelCloseLyrics", nil)
+}
+
+// MiniPanelCloseOutput says "Close the output devices"
+// in the language the app shows.
+func MiniPanelCloseOutput() string { return In(i18n.Locale()).MiniPanelCloseOutput() }
+
+// MiniPanelCloseOutput says "Close the output devices"
+// in the language of msgs.
+func (msgs Messages) MiniPanelCloseOutput() string {
+	return Catalog.Format(msgs.locale, "miniPanelCloseOutput", nil)
+}
+
+// MiniPanelCloseError says "Close the details of the error"
+// in the language the app shows.
+func MiniPanelCloseError() string { return In(i18n.Locale()).MiniPanelCloseError() }
+
+// MiniPanelCloseError says "Close the details of the error"
+// in the language of msgs.
+func (msgs Messages) MiniPanelCloseError() string {
+	return Catalog.Format(msgs.locale, "miniPanelCloseError", nil)
+}
+
+// MiniPanelPlace says "{place} of {count}"
+// in the language the app shows.
+func MiniPanelPlace(place int, count int) string {
+	return In(i18n.Locale()).MiniPanelPlace(place, count)
+}
+
+// MiniPanelPlace says "{place} of {count}"
+// in the language of msgs.
+func (msgs Messages) MiniPanelPlace(place int, count int) string {
+	return Catalog.Format(msgs.locale, "miniPanelPlace", map[string]any{"place": place, "count": count})
+}
+
+// CastConnecting says "connecting…"
+// in the language the app shows.
+func CastConnecting() string { return In(i18n.Locale()).CastConnecting() }
+
+// CastConnecting says "connecting…"
+// in the language of msgs.
+func (msgs Messages) CastConnecting() string {
+	return Catalog.Format(msgs.locale, "castConnecting", nil)
+}
+
+// CastThisComputer says "This computer"
+// in the language the app shows.
+func CastThisComputer() string { return In(i18n.Locale()).CastThisComputer() }
+
+// CastThisComputer says "This computer"
+// in the language of msgs.
+func (msgs Messages) CastThisComputer() string {
+	return Catalog.Format(msgs.locale, "castThisComputer", nil)
+}
+
+// CastToDevice says "Cast to a device"
+// in the language the app shows.
+func CastToDevice() string { return In(i18n.Locale()).CastToDevice() }
+
+// CastToDevice says "Cast to a device"
+// in the language of msgs.
+func (msgs Messages) CastToDevice() string {
+	return Catalog.Format(msgs.locale, "castToDevice", nil)
+}
+
+// CastPlayingOn says "Playing on {name}"
+// in the language the app shows.
+func CastPlayingOn(name string) string { return In(i18n.Locale()).CastPlayingOn(name) }
+
+// CastPlayingOn says "Playing on {name}"
+// in the language of msgs.
+func (msgs Messages) CastPlayingOn(name string) string {
+	return Catalog.Format(msgs.locale, "castPlayingOn", map[string]any{"name": name})
+}
+
+// NotchPanelWindowTitle says "MixMusic around the notch"
+// in the language the app shows.
+func NotchPanelWindowTitle() string { return In(i18n.Locale()).NotchPanelWindowTitle() }
+
+// NotchPanelWindowTitle says "MixMusic around the notch"
+// in the language of msgs.
+func (msgs Messages) NotchPanelWindowTitle() string {
+	return Catalog.Format(msgs.locale, "notchPanelWindowTitle", nil)
+}
+
+// NotchPanelOpenPlayer says "Open the player"
+// in the language the app shows.
+func NotchPanelOpenPlayer() string { return In(i18n.Locale()).NotchPanelOpenPlayer() }
+
+// NotchPanelOpenPlayer says "Open the player"
+// in the language of msgs.
+func (msgs Messages) NotchPanelOpenPlayer() string {
+	return Catalog.Format(msgs.locale, "notchPanelOpenPlayer", nil)
+}
+
+// NotchPanelClosePlayer says "Close the player"
+// in the language the app shows.
+func NotchPanelClosePlayer() string { return In(i18n.Locale()).NotchPanelClosePlayer() }
+
+// NotchPanelClosePlayer says "Close the player"
+// in the language of msgs.
+func (msgs Messages) NotchPanelClosePlayer() string {
+	return Catalog.Format(msgs.locale, "notchPanelClosePlayer", nil)
+}
+
+// NotchPanelOpenMixMusic says "Open MixMusic"
+// in the language the app shows.
+func NotchPanelOpenMixMusic() string { return In(i18n.Locale()).NotchPanelOpenMixMusic() }
+
+// NotchPanelOpenMixMusic says "Open MixMusic"
+// in the language of msgs.
+func (msgs Messages) NotchPanelOpenMixMusic() string {
+	return Catalog.Format(msgs.locale, "notchPanelOpenMixMusic", nil)
+}
+
+// NotchPanelPlaying says "Playing"
+// in the language the app shows.
+func NotchPanelPlaying() string { return In(i18n.Locale()).NotchPanelPlaying() }
+
+// NotchPanelPlaying says "Playing"
+// in the language of msgs.
+func (msgs Messages) NotchPanelPlaying() string {
+	return Catalog.Format(msgs.locale, "notchPanelPlaying", nil)
+}
+
+// NotchPanelPaused says "Paused"
+// in the language the app shows.
+func NotchPanelPaused() string { return In(i18n.Locale()).NotchPanelPaused() }
+
+// NotchPanelPaused says "Paused"
+// in the language of msgs.
+func (msgs Messages) NotchPanelPaused() string {
+	return Catalog.Format(msgs.locale, "notchPanelPaused", nil)
+}
+
+// NotchPanelShowPlays says "Show what plays in MixMusic"
+// in the language the app shows.
+func NotchPanelShowPlays() string { return In(i18n.Locale()).NotchPanelShowPlays() }
+
+// NotchPanelShowPlays says "Show what plays in MixMusic"
+// in the language of msgs.
+func (msgs Messages) NotchPanelShowPlays() string {
+	return Catalog.Format(msgs.locale, "notchPanelShowPlays", nil)
+}
+
+// NotchPanelLyricsLooking says "Looking for the lyrics…"
+// in the language the app shows.
+func NotchPanelLyricsLooking() string { return In(i18n.Locale()).NotchPanelLyricsLooking() }
+
+// NotchPanelLyricsLooking says "Looking for the lyrics…"
+// in the language of msgs.
+func (msgs Messages) NotchPanelLyricsLooking() string {
+	return Catalog.Format(msgs.locale, "notchPanelLyricsLooking", nil)
+}
+
+// NotchPanelInstrumental says "This track is instrumental."
+// in the language the app shows.
+func NotchPanelInstrumental() string { return In(i18n.Locale()).NotchPanelInstrumental() }
+
+// NotchPanelInstrumental says "This track is instrumental."
+// in the language of msgs.
+func (msgs Messages) NotchPanelInstrumental() string {
+	return Catalog.Format(msgs.locale, "notchPanelInstrumental", nil)
+}
+
+// NotchPanelNoTimed says "No timed lyrics."
+// in the language the app shows.
+func NotchPanelNoTimed() string { return In(i18n.Locale()).NotchPanelNoTimed() }
+
+// NotchPanelNoTimed says "No timed lyrics."
+// in the language of msgs.
+func (msgs Messages) NotchPanelNoTimed() string {
+	return Catalog.Format(msgs.locale, "notchPanelNoTimed", nil)
+}
+
+// RemotePageAway says "{name} isn't on the network now. It shows here while MixMusic runs there, with Settings › Desktop › Remote contro…"
+// in the language the app shows.
+func RemotePageAway(name string) string { return In(i18n.Locale()).RemotePageAway(name) }
+
+// RemotePageAway says "{name} isn't on the network now. It shows here while MixMusic runs there, with Settings › Desktop › Remote contro…"
+// in the language of msgs.
+func (msgs Messages) RemotePageAway(name string) string {
+	return Catalog.Format(msgs.locale, "remotePageAway", map[string]any{"name": name})
+}
+
+// RemotePageAskPair says "Pair with {name} to see what plays there and control it from here. {name} shows a code of 6 digits, which you type here."
+// in the language the app shows.
+func RemotePageAskPair(name string) string { return In(i18n.Locale()).RemotePageAskPair(name) }
+
+// RemotePageAskPair says "Pair with {name} to see what plays there and control it from here. {name} shows a code of 6 digits, which you type here."
+// in the language of msgs.
+func (msgs Messages) RemotePageAskPair(name string) string {
+	return Catalog.Format(msgs.locale, "remotePageAskPair", map[string]any{"name": name})
+}
+
+// RemotePagePair says "pair"
+// in the language the app shows.
+func RemotePagePair() string { return In(i18n.Locale()).RemotePagePair() }
+
+// RemotePagePair says "pair"
+// in the language of msgs.
+func (msgs Messages) RemotePagePair() string {
+	return Catalog.Format(msgs.locale, "remotePagePair", nil)
+}
+
+// RemotePageAsking says "Asking {name} to pair…"
+// in the language the app shows.
+func RemotePageAsking(name string) string { return In(i18n.Locale()).RemotePageAsking(name) }
+
+// RemotePageAsking says "Asking {name} to pair…"
+// in the language of msgs.
+func (msgs Messages) RemotePageAsking(name string) string {
+	return Catalog.Format(msgs.locale, "remotePageAsking", map[string]any{"name": name})
+}
+
+// RemotePageChecking says "Checking the code with {name}…"
+// in the language the app shows.
+func RemotePageChecking(name string) string { return In(i18n.Locale()).RemotePageChecking(name) }
+
+// RemotePageChecking says "Checking the code with {name}…"
+// in the language of msgs.
+func (msgs Messages) RemotePageChecking(name string) string {
+	return Catalog.Format(msgs.locale, "remotePageChecking", map[string]any{"name": name})
+}
+
+// RemotePageConnecting says "Connecting to {name}…"
+// in the language the app shows.
+func RemotePageConnecting(name string) string { return In(i18n.Locale()).RemotePageConnecting(name) }
+
+// RemotePageConnecting says "Connecting to {name}…"
+// in the language of msgs.
+func (msgs Messages) RemotePageConnecting(name string) string {
+	return Catalog.Format(msgs.locale, "remotePageConnecting", map[string]any{"name": name})
+}
+
+// RemotePageTypeCode says "Type the code {name} shows."
+// in the language the app shows.
+func RemotePageTypeCode(name string) string { return In(i18n.Locale()).RemotePageTypeCode(name) }
+
+// RemotePageTypeCode says "Type the code {name} shows."
+// in the language of msgs.
+func (msgs Messages) RemotePageTypeCode(name string) string {
+	return Catalog.Format(msgs.locale, "remotePageTypeCode", map[string]any{"name": name})
+}
+
+// RemotePageCode says "Code"
+// in the language the app shows.
+func RemotePageCode() string { return In(i18n.Locale()).RemotePageCode() }
+
+// RemotePageCode says "Code"
+// in the language of msgs.
+func (msgs Messages) RemotePageCode() string {
+	return Catalog.Format(msgs.locale, "remotePageCode", nil)
+}
+
+// RemotePageNothing says "Nothing plays on {name}."
+// in the language the app shows.
+func RemotePageNothing(name string) string { return In(i18n.Locale()).RemotePageNothing(name) }
+
+// RemotePageNothing says "Nothing plays on {name}."
+// in the language of msgs.
+func (msgs Messages) RemotePageNothing(name string) string {
+	return Catalog.Format(msgs.locale, "remotePageNothing", map[string]any{"name": name})
+}
+
+// RemoteQueueNext says "Next on {name}"
+// in the language the app shows.
+func RemoteQueueNext(name string) string { return In(i18n.Locale()).RemoteQueueNext(name) }
+
+// RemoteQueueNext says "Next on {name}"
+// in the language of msgs.
+func (msgs Messages) RemoteQueueNext(name string) string {
+	return Catalog.Format(msgs.locale, "remoteQueueNext", map[string]any{"name": name})
+}
+
+// RemoteQueueClearLabel says "Clear the queue on {name}"
+// in the language the app shows.
+func RemoteQueueClearLabel(name string) string { return In(i18n.Locale()).RemoteQueueClearLabel(name) }
+
+// RemoteQueueClearLabel says "Clear the queue on {name}"
+// in the language of msgs.
+func (msgs Messages) RemoteQueueClearLabel(name string) string {
+	return Catalog.Format(msgs.locale, "remoteQueueClearLabel", map[string]any{"name": name})
+}
+
+// RemoteQueueClear says "Clear"
+// in the language the app shows.
+func RemoteQueueClear() string { return In(i18n.Locale()).RemoteQueueClear() }
+
+// RemoteQueueClear says "Clear"
+// in the language of msgs.
+func (msgs Messages) RemoteQueueClear() string {
+	return Catalog.Format(msgs.locale, "remoteQueueClear", nil)
+}
+
+// RemoteQueueLine says "{title} - {artists}"
+// in the language the app shows.
+func RemoteQueueLine(title string, artists string) string {
+	return In(i18n.Locale()).RemoteQueueLine(title, artists)
+}
+
+// RemoteQueueLine says "{title} - {artists}"
+// in the language of msgs.
+func (msgs Messages) RemoteQueueLine(title string, artists string) string {
+	return Catalog.Format(msgs.locale, "remoteQueueLine", map[string]any{"title": title, "artists": artists})
+}
+
+// RemoteQueueRemove says "Remove from the queue"
+// in the language the app shows.
+func RemoteQueueRemove() string { return In(i18n.Locale()).RemoteQueueRemove() }
+
+// RemoteQueueRemove says "Remove from the queue"
+// in the language of msgs.
+func (msgs Messages) RemoteQueueRemove() string {
+	return Catalog.Format(msgs.locale, "remoteQueueRemove", nil)
+}
+
+// RemoteQueuePlayOn says "Play {title} on {name}"
+// in the language the app shows.
+func RemoteQueuePlayOn(title string, name string) string {
+	return In(i18n.Locale()).RemoteQueuePlayOn(title, name)
+}
+
+// RemoteQueuePlayOn says "Play {title} on {name}"
+// in the language of msgs.
+func (msgs Messages) RemoteQueuePlayOn(title string, name string) string {
+	return Catalog.Format(msgs.locale, "remoteQueuePlayOn", map[string]any{"title": title, "name": name})
+}
+
+// RemoteQueueRemoveOn says "Remove {title} from the queue on {name}"
+// in the language the app shows.
+func RemoteQueueRemoveOn(title string, name string) string {
+	return In(i18n.Locale()).RemoteQueueRemoveOn(title, name)
+}
+
+// RemoteQueueRemoveOn says "Remove {title} from the queue on {name}"
+// in the language of msgs.
+func (msgs Messages) RemoteQueueRemoveOn(title string, name string) string {
+	return Catalog.Format(msgs.locale, "remoteQueueRemoveOn", map[string]any{"title": title, "name": name})
+}
+
+// RemoteQueueOlder says "MixMusic on {name} is older: update it there to change its queue from here, and to move what plays here to it."
+// in the language the app shows.
+func RemoteQueueOlder(name string) string { return In(i18n.Locale()).RemoteQueueOlder(name) }
+
+// RemoteQueueOlder says "MixMusic on {name} is older: update it there to change its queue from here, and to move what plays here to it."
+// in the language of msgs.
+func (msgs Messages) RemoteQueueOlder(name string) string {
+	return Catalog.Format(msgs.locale, "remoteQueueOlder", map[string]any{"name": name})
+}
+
+// HandoverOnComputer says "On this computer"
+// in the language the app shows.
+func HandoverOnComputer() string { return In(i18n.Locale()).HandoverOnComputer() }
+
+// HandoverOnComputer says "On this computer"
+// in the language of msgs.
+func (msgs Messages) HandoverOnComputer() string {
+	return Catalog.Format(msgs.locale, "handoverOnComputer", nil)
+}
+
+// HandoverMove says "move to {name}"
+// in the language the app shows.
+func HandoverMove(name string) string { return In(i18n.Locale()).HandoverMove(name) }
+
+// HandoverMove says "move to {name}"
+// in the language of msgs.
+func (msgs Messages) HandoverMove(name string) string {
+	return Catalog.Format(msgs.locale, "handoverMove", map[string]any{"name": name})
+}
+
+// HandoverMoving says "moving to {name}…"
+// in the language the app shows.
+func HandoverMoving(name string) string { return In(i18n.Locale()).HandoverMoving(name) }
+
+// HandoverMoving says "moving to {name}…"
+// in the language of msgs.
+func (msgs Messages) HandoverMoving(name string) string {
+	return Catalog.Format(msgs.locale, "handoverMoving", map[string]any{"name": name})
+}
+
+// HandoverNone says "{name} has none of these tracks, files of this computer: they play on here"
+// in the language the app shows.
+func HandoverNone(name string) string { return In(i18n.Locale()).HandoverNone(name) }
+
+// HandoverNone says "{name} has none of these tracks, files of this computer: they play on here"
+// in the language of msgs.
+func (msgs Messages) HandoverNone(name string) string {
+	return Catalog.Format(msgs.locale, "handoverNone", map[string]any{"name": name})
+}
+
+// HandoverMovedPaused says "Moved to {name}, and paused here"
+// in the language the app shows.
+func HandoverMovedPaused(name string) string { return In(i18n.Locale()).HandoverMovedPaused(name) }
+
+// HandoverMovedPaused says "Moved to {name}, and paused here"
+// in the language of msgs.
+func (msgs Messages) HandoverMovedPaused(name string) string {
+	return Catalog.Format(msgs.locale, "handoverMovedPaused", map[string]any{"name": name})
+}
+
+// HandoverLeft says "Moved to {name}, and paused here, but for {count, plural, one {# track} other {# tracks}}, files of this computer it …"
+// in the language the app shows.
+func HandoverLeft(name string, count int, next string) string {
+	return In(i18n.Locale()).HandoverLeft(name, count, next)
+}
+
+// HandoverLeft says "Moved to {name}, and paused here, but for {count, plural, one {# track} other {# tracks}}, files of this computer it …"
+// in the language of msgs.
+func (msgs Messages) HandoverLeft(name string, count int, next string) string {
+	return Catalog.Format(msgs.locale, "handoverLeft", map[string]any{"name": name, "count": count, "next": next})
+}
+
+// RemoteCodeMessage says "{name} asks to control MixMusic on this computer. To let it, type this code there: {code}"
+// in the language the app shows.
+func RemoteCodeMessage(name string, code string) string {
+	return In(i18n.Locale()).RemoteCodeMessage(name, code)
+}
+
+// RemoteCodeMessage says "{name} asks to control MixMusic on this computer. To let it, type this code there: {code}"
+// in the language of msgs.
+func (msgs Messages) RemoteCodeMessage(name string, code string) string {
+	return Catalog.Format(msgs.locale, "remoteCodeMessage", map[string]any{"name": name, "code": code})
+}
+
+// RemoteCodeTitle says "pair with {name}"
+// in the language the app shows.
+func RemoteCodeTitle(name string) string { return In(i18n.Locale()).RemoteCodeTitle(name) }
+
+// RemoteCodeTitle says "pair with {name}"
+// in the language of msgs.
+func (msgs Messages) RemoteCodeTitle(name string) string {
+	return Catalog.Format(msgs.locale, "remoteCodeTitle", map[string]any{"name": name})
+}
+
+// RemoteCodeAsks says "{name} asks to control MixMusic on this computer. To let it, type this code there:"
+// in the language the app shows.
+func RemoteCodeAsks(name string) string { return In(i18n.Locale()).RemoteCodeAsks(name) }
+
+// RemoteCodeAsks says "{name} asks to control MixMusic on this computer. To let it, type this code there:"
+// in the language of msgs.
+func (msgs Messages) RemoteCodeAsks(name string) string {
+	return Catalog.Format(msgs.locale, "remoteCodeAsks", map[string]any{"name": name})
+}
+
+// RemoteCodeLabel says "the code: {code}"
+// in the language the app shows.
+func RemoteCodeLabel(code string) string { return In(i18n.Locale()).RemoteCodeLabel(code) }
+
+// RemoteCodeLabel says "the code: {code}"
+// in the language of msgs.
+func (msgs Messages) RemoteCodeLabel(code string) string {
+	return Catalog.Format(msgs.locale, "remoteCodeLabel", map[string]any{"code": code})
+}
+
+// RemoteCodeExpires says "It works once, for 2 minutes. If you didn't ask for it, cancel."
+// in the language the app shows.
+func RemoteCodeExpires() string { return In(i18n.Locale()).RemoteCodeExpires() }
+
+// RemoteCodeExpires says "It works once, for 2 minutes. If you didn't ask for it, cancel."
+// in the language of msgs.
+func (msgs Messages) RemoteCodeExpires() string {
+	return Catalog.Format(msgs.locale, "remoteCodeExpires", nil)
+}
+
+// RefreshThisPage says "Refresh this page"
+// in the language the app shows.
+func RefreshThisPage() string { return In(i18n.Locale()).RefreshThisPage() }
+
+// RefreshThisPage says "Refresh this page"
+// in the language of msgs.
+func (msgs Messages) RefreshThisPage() string {
+	return Catalog.Format(msgs.locale, "refreshThisPage", nil)
+}
+
+// RefreshTipShortcut says "Refresh this page ({keys})"
+// in the language the app shows.
+func RefreshTipShortcut(keys string) string { return In(i18n.Locale()).RefreshTipShortcut(keys) }
+
+// RefreshTipShortcut says "Refresh this page ({keys})"
+// in the language of msgs.
+func (msgs Messages) RefreshTipShortcut(keys string) string {
+	return Catalog.Format(msgs.locale, "refreshTipShortcut", map[string]any{"keys": keys})
+}
+
+// RefreshPageRefreshed says "Page refreshed"
+// in the language the app shows.
+func RefreshPageRefreshed() string { return In(i18n.Locale()).RefreshPageRefreshed() }
+
+// RefreshPageRefreshed says "Page refreshed"
+// in the language of msgs.
+func (msgs Messages) RefreshPageRefreshed() string {
+	return Catalog.Format(msgs.locale, "refreshPageRefreshed", nil)
+}
+
+// RefreshRefreshing says "Refreshing"
+// in the language the app shows.
+func RefreshRefreshing() string { return In(i18n.Locale()).RefreshRefreshing() }
+
+// RefreshRefreshing says "Refreshing"
+// in the language of msgs.
+func (msgs Messages) RefreshRefreshing() string {
+	return Catalog.Format(msgs.locale, "refreshRefreshing", nil)
+}
+
+// RefreshFailed says "Couldn't refresh: {error}"
+// in the language the app shows.
+func RefreshFailed(error string) string { return In(i18n.Locale()).RefreshFailed(error) }
+
+// RefreshFailed says "Couldn't refresh: {error}"
+// in the language of msgs.
+func (msgs Messages) RefreshFailed(error string) string {
+	return Catalog.Format(msgs.locale, "refreshFailed", map[string]any{"error": error})
+}
+
+// PullRefreshPull says "pull to refresh"
+// in the language the app shows.
+func PullRefreshPull() string { return In(i18n.Locale()).PullRefreshPull() }
+
+// PullRefreshPull says "pull to refresh"
+// in the language of msgs.
+func (msgs Messages) PullRefreshPull() string {
+	return Catalog.Format(msgs.locale, "pullRefreshPull", nil)
+}
+
+// PullRefreshRelease says "release to refresh"
+// in the language the app shows.
+func PullRefreshRelease() string { return In(i18n.Locale()).PullRefreshRelease() }
+
+// PullRefreshRelease says "release to refresh"
+// in the language of msgs.
+func (msgs Messages) PullRefreshRelease() string {
+	return Catalog.Format(msgs.locale, "pullRefreshRelease", nil)
+}
+
+// PullRefreshRefreshing says "refreshing"
+// in the language the app shows.
+func PullRefreshRefreshing() string { return In(i18n.Locale()).PullRefreshRefreshing() }
+
+// PullRefreshRefreshing says "refreshing"
+// in the language of msgs.
+func (msgs Messages) PullRefreshRefreshing() string {
+	return Catalog.Format(msgs.locale, "pullRefreshRefreshing", nil)
+}
+
+// CompactHeadPlay says "Play {title}"
+// in the language the app shows.
+func CompactHeadPlay(title string) string { return In(i18n.Locale()).CompactHeadPlay(title) }
+
+// CompactHeadPlay says "Play {title}"
+// in the language of msgs.
+func (msgs Messages) CompactHeadPlay(title string) string {
+	return Catalog.Format(msgs.locale, "compactHeadPlay", map[string]any{"title": title})
+}
+
+// CompactHeadShuffle says "Shuffle {title}"
+// in the language the app shows.
+func CompactHeadShuffle(title string) string { return In(i18n.Locale()).CompactHeadShuffle(title) }
+
+// CompactHeadShuffle says "Shuffle {title}"
+// in the language of msgs.
+func (msgs Messages) CompactHeadShuffle(title string) string {
+	return Catalog.Format(msgs.locale, "compactHeadShuffle", map[string]any{"title": title})
+}
+
+// CompactHeadMore says "More for {title}"
+// in the language the app shows.
+func CompactHeadMore(title string) string { return In(i18n.Locale()).CompactHeadMore(title) }
+
+// CompactHeadMore says "More for {title}"
+// in the language of msgs.
+func (msgs Messages) CompactHeadMore(title string) string {
+	return Catalog.Format(msgs.locale, "compactHeadMore", map[string]any{"title": title})
+}
+
+// TilesOpen says "Open"
+// in the language the app shows.
+func TilesOpen() string { return In(i18n.Locale()).TilesOpen() }
+
+// TilesOpen says "Open"
+// in the language of msgs.
+func (msgs Messages) TilesOpen() string {
+	return Catalog.Format(msgs.locale, "tilesOpen", nil)
+}
+
+// TilesDownload says "Download"
+// in the language the app shows.
+func TilesDownload() string { return In(i18n.Locale()).TilesDownload() }
+
+// TilesDownload says "Download"
+// in the language of msgs.
+func (msgs Messages) TilesDownload() string {
+	return Catalog.Format(msgs.locale, "tilesDownload", nil)
+}
+
+// TilesPlay says "Play {title}"
+// in the language the app shows.
+func TilesPlay(title string) string { return In(i18n.Locale()).TilesPlay(title) }
+
+// TilesPlay says "Play {title}"
+// in the language of msgs.
+func (msgs Messages) TilesPlay(title string) string {
+	return Catalog.Format(msgs.locale, "tilesPlay", map[string]any{"title": title})
+}
+
+// TilesTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+func TilesTracks(count int) string { return In(i18n.Locale()).TilesTracks(count) }
+
+// TilesTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+func (msgs Messages) TilesTracks(count int) string {
+	return Catalog.Format(msgs.locale, "tilesTracks", map[string]any{"count": count})
+}
+
+// TilesNothingToPlay says "Nothing to play here"
+// in the language the app shows.
+func TilesNothingToPlay() string { return In(i18n.Locale()).TilesNothingToPlay() }
+
+// TilesNothingToPlay says "Nothing to play here"
+// in the language of msgs.
+func (msgs Messages) TilesNothingToPlay() string {
+	return Catalog.Format(msgs.locale, "tilesNothingToPlay", nil)
+}
+
+// TilesScrollBack says "Scroll {title} back"
+// in the language the app shows.
+func TilesScrollBack(title string) string { return In(i18n.Locale()).TilesScrollBack(title) }
+
+// TilesScrollBack says "Scroll {title} back"
+// in the language of msgs.
+func (msgs Messages) TilesScrollBack(title string) string {
+	return Catalog.Format(msgs.locale, "tilesScrollBack", map[string]any{"title": title})
+}
+
+// TilesScrollOn says "Scroll {title} on"
+// in the language the app shows.
+func TilesScrollOn(title string) string { return In(i18n.Locale()).TilesScrollOn(title) }
+
+// TilesScrollOn says "Scroll {title} on"
+// in the language of msgs.
+func (msgs Messages) TilesScrollOn(title string) string {
+	return Catalog.Format(msgs.locale, "tilesScrollOn", map[string]any{"title": title})
+}
+
+// AccountsBrowserAbout says "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any …"
+// in the language the app shows.
+func AccountsBrowserAbout() string { return In(i18n.Locale()).AccountsBrowserAbout() }
+
+// AccountsBrowserAbout says "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any …"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserAbout() string {
+	return Catalog.Format(msgs.locale, "accountsBrowserAbout", nil)
+}
+
+// AccountsBrowserCancel says "cancel"
+// in the language the app shows.
+func AccountsBrowserCancel() string { return In(i18n.Locale()).AccountsBrowserCancel() }
+
+// AccountsBrowserCancel says "cancel"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserCancel() string {
+	return Catalog.Format(msgs.locale, "accountsBrowserCancel", nil)
+}
+
+// AccountsBrowserChoose says "Browser to sign in with"
+// in the language the app shows.
+func AccountsBrowserChoose() string { return In(i18n.Locale()).AccountsBrowserChoose() }
+
+// AccountsBrowserChoose says "Browser to sign in with"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserChoose() string {
+	return Catalog.Format(msgs.locale, "accountsBrowserChoose", nil)
+}
+
+// AccountsBrowserDone says "Signed in to YouTube Music"
+// in the language the app shows.
+func AccountsBrowserDone() string { return In(i18n.Locale()).AccountsBrowserDone() }
+
+// AccountsBrowserDone says "Signed in to YouTube Music"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserDone() string {
+	return Catalog.Format(msgs.locale, "accountsBrowserDone", nil)
+}
+
+// AccountsBrowserFailed says "MixMusic didn't sign in to YouTube Music"
+// in the language the app shows.
+func AccountsBrowserFailed() string { return In(i18n.Locale()).AccountsBrowserFailed() }
+
+// AccountsBrowserFailed says "MixMusic didn't sign in to YouTube Music"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserFailed() string {
+	return Catalog.Format(msgs.locale, "accountsBrowserFailed", nil)
+}
+
+// AccountsBrowserHint says "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone,…"
+// in the language the app shows.
+func AccountsBrowserHint() string { return In(i18n.Locale()).AccountsBrowserHint() }
+
+// AccountsBrowserHint says "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone,…"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserHint() string {
+	return Catalog.Format(msgs.locale, "accountsBrowserHint", nil)
+}
+
+// AccountsBrowserNone says "MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others …"
+// in the language the app shows.
+func AccountsBrowserNone() string { return In(i18n.Locale()).AccountsBrowserNone() }
+
+// AccountsBrowserNone says "MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others …"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserNone() string {
+	return Catalog.Format(msgs.locale, "accountsBrowserNone", nil)
+}
+
+// AccountsBrowserOpened says "Sign in to YouTube Music in {browser}"
+// in the language the app shows.
+func AccountsBrowserOpened(browser string) string {
+	return In(i18n.Locale()).AccountsBrowserOpened(browser)
+}
+
+// AccountsBrowserOpened says "Sign in to YouTube Music in {browser}"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserOpened(browser string) string {
+	return Catalog.Format(msgs.locale, "accountsBrowserOpened", map[string]any{"browser": browser})
+}
+
+// AccountsBrowserSignIn says "sign in with {browser}"
+// in the language the app shows.
+func AccountsBrowserSignIn(browser string) string {
+	return In(i18n.Locale()).AccountsBrowserSignIn(browser)
+}
+
+// AccountsBrowserSignIn says "sign in with {browser}"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserSignIn(browser string) string {
+	return Catalog.Format(msgs.locale, "accountsBrowserSignIn", map[string]any{"browser": browser})
+}
+
+// AccountsBrowserTitle says "Sign in with your browser"
+// in the language the app shows.
+func AccountsBrowserTitle() string { return In(i18n.Locale()).AccountsBrowserTitle() }
+
+// AccountsBrowserTitle says "Sign in with your browser"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserTitle() string {
+	return Catalog.Format(msgs.locale, "accountsBrowserTitle", nil)
+}
+
+// AccountsBrowserWaiting says "waiting for {browser}…"
+// in the language the app shows.
+func AccountsBrowserWaiting(browser string) string {
+	return In(i18n.Locale()).AccountsBrowserWaiting(browser)
+}
+
+// AccountsBrowserWaiting says "waiting for {browser}…"
+// in the language of msgs.
+func (msgs Messages) AccountsBrowserWaiting(browser string) string {
+	return Catalog.Format(msgs.locale, "accountsBrowserWaiting", map[string]any{"browser": browser})
+}
+
+// AccountsClientID says "Client ID"
+// in the language the app shows.
+func AccountsClientID() string { return In(i18n.Locale()).AccountsClientID() }
+
+// AccountsClientID says "Client ID"
+// in the language of msgs.
+func (msgs Messages) AccountsClientID() string {
+	return Catalog.Format(msgs.locale, "accountsClientID", nil)
+}
+
+// AccountsNetEaseGroup says "NetEase Cloud Music"
+// in the language the app shows.
+func AccountsNetEaseGroup() string { return In(i18n.Locale()).AccountsNetEaseGroup() }
+
+// AccountsNetEaseGroup says "NetEase Cloud Music"
+// in the language of msgs.
+func (msgs Messages) AccountsNetEaseGroup() string {
+	return Catalog.Format(msgs.locale, "accountsNetEaseGroup", nil)
+}
+
+// AlreadyInAddAnyway says "add anyway"
+// in the language the app shows.
+func AlreadyInAddAnyway() string { return In(i18n.Locale()).AlreadyInAddAnyway() }
+
+// AlreadyInAddAnyway says "add anyway"
+// in the language of msgs.
+func (msgs Messages) AlreadyInAddAnyway() string {
+	return Catalog.Format(msgs.locale, "alreadyInAddAnyway", nil)
+}
+
+// AlreadyInAdded says "Added {what} to {title}"
+// in the language the app shows.
+func AlreadyInAdded(what string, title string) string {
+	return In(i18n.Locale()).AlreadyInAdded(what, title)
+}
+
+// AlreadyInAdded says "Added {what} to {title}"
+// in the language of msgs.
+func (msgs Messages) AlreadyInAdded(what string, title string) string {
+	return Catalog.Format(msgs.locale, "alreadyInAdded", map[string]any{"what": what, "title": title})
+}
+
+// AlreadyInAddedAgain says "Added {what} to {title} again"
+// in the language the app shows.
+func AlreadyInAddedAgain(what string, title string) string {
+	return In(i18n.Locale()).AlreadyInAddedAgain(what, title)
+}
+
+// AlreadyInAddedAgain says "Added {what} to {title} again"
+// in the language of msgs.
+func (msgs Messages) AlreadyInAddedAgain(what string, title string) string {
+	return Catalog.Format(msgs.locale, "alreadyInAddedAgain", map[string]any{"what": what, "title": title})
+}
+
+// AlreadyInHeld says "Added {added, plural, one {# track} other {# tracks}} to {title}: {held, plural, one {# was} other {# were}} in it al…"
+// in the language the app shows.
+func AlreadyInHeld(added int, title string, held int) string {
+	return In(i18n.Locale()).AlreadyInHeld(added, title, held)
+}
+
+// AlreadyInHeld says "Added {added, plural, one {# track} other {# tracks}} to {title}: {held, plural, one {# was} other {# were}} in it al…"
+// in the language of msgs.
+func (msgs Messages) AlreadyInHeld(added int, title string, held int) string {
+	return Catalog.Format(msgs.locale, "alreadyInHeld", map[string]any{"added": added, "title": title, "held": held})
+}
+
+// AlreadyInMessage says "Already in {title}"
+// in the language the app shows.
+func AlreadyInMessage(title string) string { return In(i18n.Locale()).AlreadyInMessage(title) }
+
+// AlreadyInMessage says "Already in {title}"
+// in the language of msgs.
+func (msgs Messages) AlreadyInMessage(title string) string {
+	return Catalog.Format(msgs.locale, "alreadyInMessage", map[string]any{"title": title})
+}
+
+// AlreadyInTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+func AlreadyInTracks(count int) string { return In(i18n.Locale()).AlreadyInTracks(count) }
+
+// AlreadyInTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+func (msgs Messages) AlreadyInTracks(count int) string {
+	return Catalog.Format(msgs.locale, "alreadyInTracks", map[string]any{"count": count})
+}
+
+// AudioAccount2Change says "You can change this in Settings › Playback › Sound."
+// in the language the app shows.
+func AudioAccount2Change() string { return In(i18n.Locale()).AudioAccount2Change() }
+
+// AudioAccount2Change says "You can change this in Settings › Playback › Sound."
+// in the language of msgs.
+func (msgs Messages) AudioAccount2Change() string {
+	return Catalog.Format(msgs.locale, "audioAccount2Change", nil)
+}
+
+// AudioAccount2NotNow says "not now"
+// in the language the app shows.
+func AudioAccount2NotNow() string { return In(i18n.Locale()).AudioAccount2NotNow() }
+
+// AudioAccount2NotNow says "not now"
+// in the language of msgs.
+func (msgs Messages) AudioAccount2NotNow() string {
+	return Catalog.Format(msgs.locale, "audioAccount2NotNow", nil)
+}
+
+// AudioAccount2Offer says "Your YouTube Music account has Premium, whose audio has a higher bitrate. MixMusic can ask for each track's audio as …"
+// in the language the app shows.
+func AudioAccount2Offer() string { return In(i18n.Locale()).AudioAccount2Offer() }
+
+// AudioAccount2Offer says "Your YouTube Music account has Premium, whose audio has a higher bitrate. MixMusic can ask for each track's audio as …"
+// in the language of msgs.
+func (msgs Messages) AudioAccount2Offer() string {
+	return Catalog.Format(msgs.locale, "audioAccount2Offer", nil)
+}
+
+// AudioAccount2Title says "play audio as your account"
+// in the language the app shows.
+func AudioAccount2Title() string { return In(i18n.Locale()).AudioAccount2Title() }
+
+// AudioAccount2Title says "play audio as your account"
+// in the language of msgs.
+func (msgs Messages) AudioAccount2Title() string {
+	return Catalog.Format(msgs.locale, "audioAccount2Title", nil)
+}
+
+// AudioAccount2TurnOn says "turn on"
+// in the language the app shows.
+func AudioAccount2TurnOn() string { return In(i18n.Locale()).AudioAccount2TurnOn() }
+
+// AudioAccount2TurnOn says "turn on"
+// in the language of msgs.
+func (msgs Messages) AudioAccount2TurnOn() string {
+	return Catalog.Format(msgs.locale, "audioAccount2TurnOn", nil)
+}
+
+// CollabAddToSpotify says "Add to Spotify playlist"
+// in the language the app shows.
+func CollabAddToSpotify() string { return In(i18n.Locale()).CollabAddToSpotify() }
+
+// CollabAddToSpotify says "Add to Spotify playlist"
+// in the language of msgs.
+func (msgs Messages) CollabAddToSpotify() string {
+	return Catalog.Format(msgs.locale, "collabAddToSpotify", nil)
+}
+
+// CollabFinding says "Finding the tracks on YouTube Music…"
+// in the language the app shows.
+func CollabFinding() string { return In(i18n.Locale()).CollabFinding() }
+
+// CollabFinding says "Finding the tracks on YouTube Music…"
+// in the language of msgs.
+func (msgs Messages) CollabFinding() string {
+	return Catalog.Format(msgs.locale, "collabFinding", nil)
+}
+
+// CollabInviteBody says "Collaborators can't open a private playlist. Inviting them makes {title} unlisted: anyone with its link can open it, …"
+// in the language the app shows.
+func CollabInviteBody(title string) string { return In(i18n.Locale()).CollabInviteBody(title) }
+
+// CollabInviteBody says "Collaborators can't open a private playlist. Inviting them makes {title} unlisted: anyone with its link can open it, …"
+// in the language of msgs.
+func (msgs Messages) CollabInviteBody(title string) string {
+	return Catalog.Format(msgs.locale, "collabInviteBody", map[string]any{"title": title})
+}
+
+// CollabInviteButton says "invite"
+// in the language the app shows.
+func CollabInviteButton() string { return In(i18n.Locale()).CollabInviteButton() }
+
+// CollabInviteButton says "invite"
+// in the language of msgs.
+func (msgs Messages) CollabInviteButton() string {
+	return Catalog.Format(msgs.locale, "collabInviteButton", nil)
+}
+
+// CollabInviteCopied says "Copied the invite link of {title}: whoever opens it can add to it"
+// in the language the app shows.
+func CollabInviteCopied(title string) string { return In(i18n.Locale()).CollabInviteCopied(title) }
+
+// CollabInviteCopied says "Copied the invite link of {title}: whoever opens it can add to it"
+// in the language of msgs.
+func (msgs Messages) CollabInviteCopied(title string) string {
+	return Catalog.Format(msgs.locale, "collabInviteCopied", map[string]any{"title": title})
+}
+
+// CollabInviteFailed says "Couldn't invite collaborators to {title}: {error}"
+// in the language the app shows.
+func CollabInviteFailed(title string, error string) string {
+	return In(i18n.Locale()).CollabInviteFailed(title, error)
+}
+
+// CollabInviteFailed says "Couldn't invite collaborators to {title}: {error}"
+// in the language of msgs.
+func (msgs Messages) CollabInviteFailed(title string, error string) string {
+	return Catalog.Format(msgs.locale, "collabInviteFailed", map[string]any{"title": title, "error": error})
+}
+
+// CollabInviteItem says "Invite collaborators"
+// in the language the app shows.
+func CollabInviteItem() string { return In(i18n.Locale()).CollabInviteItem() }
+
+// CollabInviteItem says "Invite collaborators"
+// in the language of msgs.
+func (msgs Messages) CollabInviteItem() string {
+	return Catalog.Format(msgs.locale, "collabInviteItem", nil)
+}
+
+// CollabInviteTitle says "invite collaborators"
+// in the language the app shows.
+func CollabInviteTitle() string { return In(i18n.Locale()).CollabInviteTitle() }
+
+// CollabInviteTitle says "invite collaborators"
+// in the language of msgs.
+func (msgs Messages) CollabInviteTitle() string {
+	return Catalog.Format(msgs.locale, "collabInviteTitle", nil)
+}
+
+// CollabLoadFailed says "Couldn't load your playlists"
+// in the language the app shows.
+func CollabLoadFailed() string { return In(i18n.Locale()).CollabLoadFailed() }
+
+// CollabLoadFailed says "Couldn't load your playlists"
+// in the language of msgs.
+func (msgs Messages) CollabLoadFailed() string {
+	return Catalog.Format(msgs.locale, "collabLoadFailed", nil)
+}
+
+// CollabLoading says "Loading your playlists…"
+// in the language the app shows.
+func CollabLoading() string { return In(i18n.Locale()).CollabLoading() }
+
+// CollabLoading says "Loading your playlists…"
+// in the language of msgs.
+func (msgs Messages) CollabLoading() string {
+	return Catalog.Format(msgs.locale, "collabLoading", nil)
+}
+
+// CollabMade says "Made {title} collaborative"
+// in the language the app shows.
+func CollabMade(title string) string { return In(i18n.Locale()).CollabMade(title) }
+
+// CollabMade says "Made {title} collaborative"
+// in the language of msgs.
+func (msgs Messages) CollabMade(title string) string {
+	return Catalog.Format(msgs.locale, "collabMade", map[string]any{"title": title})
+}
+
+// CollabMadeLinked says "Made {title} collaborative: copied its link, for those who'll add to it"
+// in the language the app shows.
+func CollabMadeLinked(title string) string { return In(i18n.Locale()).CollabMadeLinked(title) }
+
+// CollabMadeLinked says "Made {title} collaborative: copied its link, for those who'll add to it"
+// in the language of msgs.
+func (msgs Messages) CollabMadeLinked(title string) string {
+	return Catalog.Format(msgs.locale, "collabMadeLinked", map[string]any{"title": title})
+}
+
+// CollabMakeButton says "make collaborative"
+// in the language the app shows.
+func CollabMakeButton() string { return In(i18n.Locale()).CollabMakeButton() }
+
+// CollabMakeButton says "make collaborative"
+// in the language of msgs.
+func (msgs Messages) CollabMakeButton() string {
+	return Catalog.Format(msgs.locale, "collabMakeButton", nil)
+}
+
+// CollabMakeFailed says "Couldn't make {title} collaborative: {error}"
+// in the language the app shows.
+func CollabMakeFailed(title string, error string) string {
+	return In(i18n.Locale()).CollabMakeFailed(title, error)
+}
+
+// CollabMakeFailed says "Couldn't make {title} collaborative: {error}"
+// in the language of msgs.
+func (msgs Messages) CollabMakeFailed(title string, error string) string {
+	return Catalog.Format(msgs.locale, "collabMakeFailed", map[string]any{"title": title, "error": error})
+}
+
+// CollabMakeItem says "Make collaborative"
+// in the language the app shows.
+func CollabMakeItem() string { return In(i18n.Locale()).CollabMakeItem() }
+
+// CollabMakeItem says "Make collaborative"
+// in the language of msgs.
+func (msgs Messages) CollabMakeItem() string {
+	return Catalog.Format(msgs.locale, "collabMakeItem", nil)
+}
+
+// CollabNameLabel says "Name"
+// in the language the app shows.
+func CollabNameLabel() string { return In(i18n.Locale()).CollabNameLabel() }
+
+// CollabNameLabel says "Name"
+// in the language of msgs.
+func (msgs Messages) CollabNameLabel() string {
+	return Catalog.Format(msgs.locale, "collabNameLabel", nil)
+}
+
+// CollabNoneToAdd says "No playlists you can add to"
+// in the language the app shows.
+func CollabNoneToAdd() string { return In(i18n.Locale()).CollabNoneToAdd() }
+
+// CollabNoneToAdd says "No playlists you can add to"
+// in the language of msgs.
+func (msgs Messages) CollabNoneToAdd() string {
+	return Catalog.Format(msgs.locale, "collabNoneToAdd", nil)
+}
+
+// CollabShareAsTitle says "Share as a YouTube Music playlist"
+// in the language the app shows.
+func CollabShareAsTitle() string { return In(i18n.Locale()).CollabShareAsTitle() }
+
+// CollabShareAsTitle says "Share as a YouTube Music playlist"
+// in the language of msgs.
+func (msgs Messages) CollabShareAsTitle() string {
+	return Catalog.Format(msgs.locale, "collabShareAsTitle", nil)
+}
+
+// CollabShareButton says "share"
+// in the language the app shows.
+func CollabShareButton() string { return In(i18n.Locale()).CollabShareButton() }
+
+// CollabShareButton says "share"
+// in the language of msgs.
+func (msgs Messages) CollabShareButton() string {
+	return Catalog.Format(msgs.locale, "collabShareButton", nil)
+}
+
+// CollabShareFailed says "Couldn't share {title}: {error}"
+// in the language the app shows.
+func CollabShareFailed(title string, error string) string {
+	return In(i18n.Locale()).CollabShareFailed(title, error)
+}
+
+// CollabShareFailed says "Couldn't share {title}: {error}"
+// in the language of msgs.
+func (msgs Messages) CollabShareFailed(title string, error string) string {
+	return Catalog.Format(msgs.locale, "collabShareFailed", map[string]any{"title": title, "error": error})
+}
+
+// CollabShareItem says "As a YouTube Music playlist…"
+// in the language the app shows.
+func CollabShareItem() string { return In(i18n.Locale()).CollabShareItem() }
+
+// CollabShareItem says "As a YouTube Music playlist…"
+// in the language of msgs.
+func (msgs Messages) CollabShareItem() string {
+	return Catalog.Format(msgs.locale, "collabShareItem", nil)
+}
+
+// CollabShared says "Made {title} on YouTube Music: copied its link, which anyone can open"
+// in the language the app shows.
+func CollabShared(title string) string { return In(i18n.Locale()).CollabShared(title) }
+
+// CollabShared says "Made {title} on YouTube Music: copied its link, which anyone can open"
+// in the language of msgs.
+func (msgs Messages) CollabShared(title string) string {
+	return Catalog.Format(msgs.locale, "collabShared", map[string]any{"title": title})
+}
+
+// CollabShelfTitle says "Playlists you collaborate on"
+// in the language the app shows.
+func CollabShelfTitle() string { return In(i18n.Locale()).CollabShelfTitle() }
+
+// CollabShelfTitle says "Playlists you collaborate on"
+// in the language of msgs.
+func (msgs Messages) CollabShelfTitle() string {
+	return Catalog.Format(msgs.locale, "collabShelfTitle", nil)
+}
+
+// CollabSpotifyBody says "Spotify keeps collaborative playlists off your profile: {title} leaves it. Those you send its link to can then add to…"
+// in the language the app shows.
+func CollabSpotifyBody(title string) string { return In(i18n.Locale()).CollabSpotifyBody(title) }
+
+// CollabSpotifyBody says "Spotify keeps collaborative playlists off your profile: {title} leaves it. Those you send its link to can then add to…"
+// in the language of msgs.
+func (msgs Messages) CollabSpotifyBody(title string) string {
+	return Catalog.Format(msgs.locale, "collabSpotifyBody", map[string]any{"title": title})
+}
+
+// CollabSpotifyTitle says "collaborative playlist"
+// in the language the app shows.
+func CollabSpotifyTitle() string { return In(i18n.Locale()).CollabSpotifyTitle() }
+
+// CollabSpotifyTitle says "collaborative playlist"
+// in the language of msgs.
+func (msgs Messages) CollabSpotifyTitle() string {
+	return Catalog.Format(msgs.locale, "collabSpotifyTitle", nil)
+}
+
+// CollabStopBody says "Stopping collaboration takes the collaborators off {title}, and its invite links stop working. What they added stays."
+// in the language the app shows.
+func CollabStopBody(title string) string { return In(i18n.Locale()).CollabStopBody(title) }
+
+// CollabStopBody says "Stopping collaboration takes the collaborators off {title}, and its invite links stop working. What they added stays."
+// in the language of msgs.
+func (msgs Messages) CollabStopBody(title string) string {
+	return Catalog.Format(msgs.locale, "collabStopBody", map[string]any{"title": title})
+}
+
+// CollabStopButton says "stop"
+// in the language the app shows.
+func CollabStopButton() string { return In(i18n.Locale()).CollabStopButton() }
+
+// CollabStopButton says "stop"
+// in the language of msgs.
+func (msgs Messages) CollabStopButton() string {
+	return Catalog.Format(msgs.locale, "collabStopButton", nil)
+}
+
+// CollabStopFailed says "Couldn't stop collaboration on {title}: {error}"
+// in the language the app shows.
+func CollabStopFailed(title string, error string) string {
+	return In(i18n.Locale()).CollabStopFailed(title, error)
+}
+
+// CollabStopFailed says "Couldn't stop collaboration on {title}: {error}"
+// in the language of msgs.
+func (msgs Messages) CollabStopFailed(title string, error string) string {
+	return Catalog.Format(msgs.locale, "collabStopFailed", map[string]any{"title": title, "error": error})
+}
+
+// CollabStopItem says "Stop collaboration"
+// in the language the app shows.
+func CollabStopItem() string { return In(i18n.Locale()).CollabStopItem() }
+
+// CollabStopItem says "Stop collaboration"
+// in the language of msgs.
+func (msgs Messages) CollabStopItem() string {
+	return Catalog.Format(msgs.locale, "collabStopItem", nil)
+}
+
+// CollabStopTitle says "stop collaboration"
+// in the language the app shows.
+func CollabStopTitle() string { return In(i18n.Locale()).CollabStopTitle() }
+
+// CollabStopTitle says "stop collaboration"
+// in the language of msgs.
+func (msgs Messages) CollabStopTitle() string {
+	return Catalog.Format(msgs.locale, "collabStopTitle", nil)
+}
+
+// CollabStopped says "Stopped collaboration on {title}"
+// in the language the app shows.
+func CollabStopped(title string) string { return In(i18n.Locale()).CollabStopped(title) }
+
+// CollabStopped says "Stopped collaboration on {title}"
+// in the language of msgs.
+func (msgs Messages) CollabStopped(title string) string {
+	return Catalog.Format(msgs.locale, "collabStopped", map[string]any{"title": title})
+}
+
+// CollabTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+func CollabTracks(count int) string { return In(i18n.Locale()).CollabTracks(count) }
+
+// CollabTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+func (msgs Messages) CollabTracks(count int) string {
+	return Catalog.Format(msgs.locale, "collabTracks", map[string]any{"count": count})
+}
+
+// CollabUnlisting says "Making {title} unlisted: YouTube Music takes up to half a minute before it lets collaborators in"
+// in the language the app shows.
+func CollabUnlisting(title string) string { return In(i18n.Locale()).CollabUnlisting(title) }
+
+// CollabUnlisting says "Making {title} unlisted: YouTube Music takes up to half a minute before it lets collaborators in"
+// in the language of msgs.
+func (msgs Messages) CollabUnlisting(title string) string {
+	return Catalog.Format(msgs.locale, "collabUnlisting", map[string]any{"title": title})
+}
+
+// CopiesAbout says "Copies of one song show once, and play the best: lossless before lossy, then the higher bitrate and sample rate. What…"
+// in the language the app shows.
+func CopiesAbout() string { return In(i18n.Locale()).CopiesAbout() }
+
+// CopiesAbout says "Copies of one song show once, and play the best: lossless before lossy, then the higher bitrate and sample rate. What…"
+// in the language of msgs.
+func (msgs Messages) CopiesAbout() string {
+	return Catalog.Format(msgs.locale, "copiesAbout", nil)
+}
+
+// CopiesAboutBitrate says "about {bitrate, number, ::group-off} kbit/s"
+// in the language the app shows.
+func CopiesAboutBitrate(bitrate int) string { return In(i18n.Locale()).CopiesAboutBitrate(bitrate) }
+
+// CopiesAboutBitrate says "about {bitrate, number, ::group-off} kbit/s"
+// in the language of msgs.
+func (msgs Messages) CopiesAboutBitrate(bitrate int) string {
+	return Catalog.Format(msgs.locale, "copiesAboutBitrate", map[string]any{"bitrate": bitrate})
+}
+
+// CopiesAudio says "Audio"
+// in the language the app shows.
+func CopiesAudio() string { return In(i18n.Locale()).CopiesAudio() }
+
+// CopiesAudio says "Audio"
+// in the language of msgs.
+func (msgs Messages) CopiesAudio() string {
+	return Catalog.Format(msgs.locale, "copiesAudio", nil)
+}
+
+// CopiesClose says "close"
+// in the language the app shows.
+func CopiesClose() string { return In(i18n.Locale()).CopiesClose() }
+
+// CopiesClose says "close"
+// in the language of msgs.
+func (msgs Messages) CopiesClose() string {
+	return Catalog.Format(msgs.locale, "copiesClose", nil)
+}
+
+// CopiesCopyLabel says "Copy"
+// in the language the app shows.
+func CopiesCopyLabel() string { return In(i18n.Locale()).CopiesCopyLabel() }
+
+// CopiesCopyLabel says "Copy"
+// in the language of msgs.
+func (msgs Messages) CopiesCopyLabel() string {
+	return Catalog.Format(msgs.locale, "copiesCopyLabel", nil)
+}
+
+// CopiesCount says "{count, plural, one {# copy…} other {# copies…}}"
+// in the language the app shows.
+func CopiesCount(count int) string { return In(i18n.Locale()).CopiesCount(count) }
+
+// CopiesCount says "{count, plural, one {# copy…} other {# copies…}}"
+// in the language of msgs.
+func (msgs Messages) CopiesCount(count int) string {
+	return Catalog.Format(msgs.locale, "copiesCount", map[string]any{"count": count})
+}
+
+// CopiesFindLabel says "Find a song of this computer"
+// in the language the app shows.
+func CopiesFindLabel() string { return In(i18n.Locale()).CopiesFindLabel() }
+
+// CopiesFindLabel says "Find a song of this computer"
+// in the language of msgs.
+func (msgs Messages) CopiesFindLabel() string {
+	return Catalog.Format(msgs.locale, "copiesFindLabel", nil)
+}
+
+// CopiesFindPlaceholder says "find a song of this computer"
+// in the language the app shows.
+func CopiesFindPlaceholder() string { return In(i18n.Locale()).CopiesFindPlaceholder() }
+
+// CopiesFindPlaceholder says "find a song of this computer"
+// in the language of msgs.
+func (msgs Messages) CopiesFindPlaceholder() string {
+	return Catalog.Format(msgs.locale, "copiesFindPlaceholder", nil)
+}
+
+// CopiesInfoTitle says "its copies"
+// in the language the app shows.
+func CopiesInfoTitle() string { return In(i18n.Locale()).CopiesInfoTitle() }
+
+// CopiesInfoTitle says "its copies"
+// in the language of msgs.
+func (msgs Messages) CopiesInfoTitle() string {
+	return Catalog.Format(msgs.locale, "copiesInfoTitle", nil)
+}
+
+// CopiesLink says "Link a copy…"
+// in the language the app shows.
+func CopiesLink() string { return In(i18n.Locale()).CopiesLink() }
+
+// CopiesLink says "Link a copy…"
+// in the language of msgs.
+func (msgs Messages) CopiesLink() string {
+	return Catalog.Format(msgs.locale, "copiesLink", nil)
+}
+
+// CopiesLinkAnother says "link another copy"
+// in the language the app shows.
+func CopiesLinkAnother() string { return In(i18n.Locale()).CopiesLinkAnother() }
+
+// CopiesLinkAnother says "link another copy"
+// in the language of msgs.
+func (msgs Messages) CopiesLinkAnother() string {
+	return Catalog.Format(msgs.locale, "copiesLinkAnother", nil)
+}
+
+// CopiesLinkLabel says "Link {title}, {artists}"
+// in the language the app shows.
+func CopiesLinkLabel(title string, artists string) string {
+	return In(i18n.Locale()).CopiesLinkLabel(title, artists)
+}
+
+// CopiesLinkLabel says "Link {title}, {artists}"
+// in the language of msgs.
+func (msgs Messages) CopiesLinkLabel(title string, artists string) string {
+	return Catalog.Format(msgs.locale, "copiesLinkLabel", map[string]any{"title": title, "artists": artists})
+}
+
+// CopiesLinked says "Linked {title} as a copy"
+// in the language the app shows.
+func CopiesLinked(title string) string { return In(i18n.Locale()).CopiesLinked(title) }
+
+// CopiesLinked says "Linked {title} as a copy"
+// in the language of msgs.
+func (msgs Messages) CopiesLinked(title string) string {
+	return Catalog.Format(msgs.locale, "copiesLinked", map[string]any{"title": title})
+}
+
+// CopiesLinkedByHand says "Linked by hand"
+// in the language the app shows.
+func CopiesLinkedByHand() string { return In(i18n.Locale()).CopiesLinkedByHand() }
+
+// CopiesLinkedByHand says "Linked by hand"
+// in the language of msgs.
+func (msgs Messages) CopiesLinkedByHand() string {
+	return Catalog.Format(msgs.locale, "copiesLinkedByHand", nil)
+}
+
+// CopiesNoMatch says "No other song of this computer matches that."
+// in the language the app shows.
+func CopiesNoMatch() string { return In(i18n.Locale()).CopiesNoMatch() }
+
+// CopiesNoMatch says "No other song of this computer matches that."
+// in the language of msgs.
+func (msgs Messages) CopiesNoMatch() string {
+	return Catalog.Format(msgs.locale, "copiesNoMatch", nil)
+}
+
+// CopiesPlayButton says "play"
+// in the language the app shows.
+func CopiesPlayButton() string { return In(i18n.Locale()).CopiesPlayButton() }
+
+// CopiesPlayButton says "play"
+// in the language of msgs.
+func (msgs Messages) CopiesPlayButton() string {
+	return Catalog.Format(msgs.locale, "copiesPlayButton", nil)
+}
+
+// CopiesPlayThis says "Play this copy"
+// in the language the app shows.
+func CopiesPlayThis() string { return In(i18n.Locale()).CopiesPlayThis() }
+
+// CopiesPlayThis says "Play this copy"
+// in the language of msgs.
+func (msgs Messages) CopiesPlayThis() string {
+	return Catalog.Format(msgs.locale, "copiesPlayThis", nil)
+}
+
+// CopiesPlays says "Plays"
+// in the language the app shows.
+func CopiesPlays() string { return In(i18n.Locale()).CopiesPlays() }
+
+// CopiesPlays says "Plays"
+// in the language of msgs.
+func (msgs Messages) CopiesPlays() string {
+	return Catalog.Format(msgs.locale, "copiesPlays", nil)
+}
+
+// CopiesTitle says "copies of {title}"
+// in the language the app shows.
+func CopiesTitle(title string) string { return In(i18n.Locale()).CopiesTitle(title) }
+
+// CopiesTitle says "copies of {title}"
+// in the language of msgs.
+func (msgs Messages) CopiesTitle(title string) string {
+	return Catalog.Format(msgs.locale, "copiesTitle", map[string]any{"title": title})
+}
+
+// CopiesUnlinkButton says "unlink"
+// in the language the app shows.
+func CopiesUnlinkButton() string { return In(i18n.Locale()).CopiesUnlinkButton() }
+
+// CopiesUnlinkButton says "unlink"
+// in the language of msgs.
+func (msgs Messages) CopiesUnlinkButton() string {
+	return Catalog.Format(msgs.locale, "copiesUnlinkButton", nil)
+}
+
+// CopiesUnlinkThis says "Unlink this copy"
+// in the language the app shows.
+func CopiesUnlinkThis() string { return In(i18n.Locale()).CopiesUnlinkThis() }
+
+// CopiesUnlinkThis says "Unlink this copy"
+// in the language of msgs.
+func (msgs Messages) CopiesUnlinkThis() string {
+	return Catalog.Format(msgs.locale, "copiesUnlinkThis", nil)
+}
+
+// CopiesUnlinked says "Unlinked the copy in {place}"
+// in the language the app shows.
+func CopiesUnlinked(place string) string { return In(i18n.Locale()).CopiesUnlinked(place) }
+
+// CopiesUnlinked says "Unlinked the copy in {place}"
+// in the language of msgs.
+func (msgs Messages) CopiesUnlinked(place string) string {
+	return Catalog.Format(msgs.locale, "copiesUnlinked", map[string]any{"place": place})
+}
+
+// CopySongArtist says "Copy artist"
+// in the language the app shows.
+func CopySongArtist() string { return In(i18n.Locale()).CopySongArtist() }
+
+// CopySongArtist says "Copy artist"
+// in the language of msgs.
+func (msgs Messages) CopySongArtist() string {
+	return Catalog.Format(msgs.locale, "copySongArtist", nil)
+}
+
+// CopySongArtistCopied says "Copied the artist"
+// in the language the app shows.
+func CopySongArtistCopied() string { return In(i18n.Locale()).CopySongArtistCopied() }
+
+// CopySongArtistCopied says "Copied the artist"
+// in the language of msgs.
+func (msgs Messages) CopySongArtistCopied() string {
+	return Catalog.Format(msgs.locale, "copySongArtistCopied", nil)
+}
+
+// CopySongArtistTitle says "Copy \"Artist - Title\""
+// in the language the app shows.
+func CopySongArtistTitle() string { return In(i18n.Locale()).CopySongArtistTitle() }
+
+// CopySongArtistTitle says "Copy \"Artist - Title\""
+// in the language of msgs.
+func (msgs Messages) CopySongArtistTitle() string {
+	return Catalog.Format(msgs.locale, "copySongArtistTitle", nil)
+}
+
+// CopySongArtistTitleCopied says "Copied the artist and title"
+// in the language the app shows.
+func CopySongArtistTitleCopied() string { return In(i18n.Locale()).CopySongArtistTitleCopied() }
+
+// CopySongArtistTitleCopied says "Copied the artist and title"
+// in the language of msgs.
+func (msgs Messages) CopySongArtistTitleCopied() string {
+	return Catalog.Format(msgs.locale, "copySongArtistTitleCopied", nil)
+}
+
+// CopySongLink says "Copy link"
+// in the language the app shows.
+func CopySongLink() string { return In(i18n.Locale()).CopySongLink() }
+
+// CopySongLink says "Copy link"
+// in the language of msgs.
+func (msgs Messages) CopySongLink() string {
+	return Catalog.Format(msgs.locale, "copySongLink", nil)
+}
+
+// CopySongLinkCopied says "Copied the link"
+// in the language the app shows.
+func CopySongLinkCopied() string { return In(i18n.Locale()).CopySongLinkCopied() }
+
+// CopySongLinkCopied says "Copied the link"
+// in the language of msgs.
+func (msgs Messages) CopySongLinkCopied() string {
+	return Catalog.Format(msgs.locale, "copySongLinkCopied", nil)
+}
+
+// CopySongMenu says "Copy"
+// in the language the app shows.
+func CopySongMenu() string { return In(i18n.Locale()).CopySongMenu() }
+
+// CopySongMenu says "Copy"
+// in the language of msgs.
+func (msgs Messages) CopySongMenu() string {
+	return Catalog.Format(msgs.locale, "copySongMenu", nil)
+}
+
+// CopySongTitle says "Copy title"
+// in the language the app shows.
+func CopySongTitle() string { return In(i18n.Locale()).CopySongTitle() }
+
+// CopySongTitle says "Copy title"
+// in the language of msgs.
+func (msgs Messages) CopySongTitle() string {
+	return Catalog.Format(msgs.locale, "copySongTitle", nil)
+}
+
+// CopySongTitleCopied says "Copied the title"
+// in the language the app shows.
+func CopySongTitleCopied() string { return In(i18n.Locale()).CopySongTitleCopied() }
+
+// CopySongTitleCopied says "Copied the title"
+// in the language of msgs.
+func (msgs Messages) CopySongTitleCopied() string {
+	return Catalog.Format(msgs.locale, "copySongTitleCopied", nil)
+}
+
+// ExportButton says "export"
+// in the language the app shows.
+func ExportButton() string { return In(i18n.Locale()).ExportButton() }
+
+// ExportButton says "export"
+// in the language of msgs.
+func (msgs Messages) ExportButton() string {
+	return Catalog.Format(msgs.locale, "exportButton", nil)
+}
+
+// ExportFailed says "Couldn't export {title}: {error}"
+// in the language the app shows.
+func ExportFailed(title string, error string) string {
+	return In(i18n.Locale()).ExportFailed(title, error)
+}
+
+// ExportFailed says "Couldn't export {title}: {error}"
+// in the language of msgs.
+func (msgs Messages) ExportFailed(title string, error string) string {
+	return Catalog.Format(msgs.locale, "exportFailed", map[string]any{"title": title, "error": error})
+}
+
+// ExportFailedSeveral says "Couldn't export {n, plural, one {# track} other {# tracks}}, the first {title}: {error}"
+// in the language the app shows.
+func ExportFailedSeveral(n int, title string, error string) string {
+	return In(i18n.Locale()).ExportFailedSeveral(n, title, error)
+}
+
+// ExportFailedSeveral says "Couldn't export {n, plural, one {# track} other {# tracks}}, the first {title}: {error}"
+// in the language of msgs.
+func (msgs Messages) ExportFailedSeveral(n int, title string, error string) string {
+	return Catalog.Format(msgs.locale, "exportFailedSeveral", map[string]any{"n": n, "title": title, "error": error})
+}
+
+// ExportMenu says "Export…"
+// in the language the app shows.
+func ExportMenu() string { return In(i18n.Locale()).ExportMenu() }
+
+// ExportMenu says "Export…"
+// in the language of msgs.
+func (msgs Messages) ExportMenu() string {
+	return Catalog.Format(msgs.locale, "exportMenu", nil)
+}
+
+// ExportOnlyDownloaded says "Only tracks downloaded or on this computer export"
+// in the language the app shows.
+func ExportOnlyDownloaded() string { return In(i18n.Locale()).ExportOnlyDownloaded() }
+
+// ExportOnlyDownloaded says "Only tracks downloaded or on this computer export"
+// in the language of msgs.
+func (msgs Messages) ExportOnlyDownloaded() string {
+	return Catalog.Format(msgs.locale, "exportOnlyDownloaded", nil)
+}
+
+// ExportSelected says "Export the selected tracks"
+// in the language the app shows.
+func ExportSelected() string { return In(i18n.Locale()).ExportSelected() }
+
+// ExportSelected says "Export the selected tracks"
+// in the language of msgs.
+func (msgs Messages) ExportSelected() string {
+	return Catalog.Format(msgs.locale, "exportSelected", nil)
+}
+
+// ExportShow says "show"
+// in the language the app shows.
+func ExportShow() string { return In(i18n.Locale()).ExportShow() }
+
+// ExportShow says "show"
+// in the language of msgs.
+func (msgs Messages) ExportShow() string {
+	return Catalog.Format(msgs.locale, "exportShow", nil)
+}
+
+// ExportTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+func ExportTracks(count int) string { return In(i18n.Locale()).ExportTracks(count) }
+
+// ExportTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+func (msgs Messages) ExportTracks(count int) string {
+	return Catalog.Format(msgs.locale, "exportTracks", map[string]any{"count": count})
+}
+
+// ExportedPartial says "Exported {n} of {total, plural, one {# track} other {# tracks}} to {dir}"
+// in the language the app shows.
+func ExportedPartial(n int, total int, dir string) string {
+	return In(i18n.Locale()).ExportedPartial(n, total, dir)
+}
+
+// ExportedPartial says "Exported {n} of {total, plural, one {# track} other {# tracks}} to {dir}"
+// in the language of msgs.
+func (msgs Messages) ExportedPartial(n int, total int, dir string) string {
+	return Catalog.Format(msgs.locale, "exportedPartial", map[string]any{"n": n, "total": total, "dir": dir})
+}
+
+// ExportedTo says "Exported {what} to {dir}"
+// in the language the app shows.
+func ExportedTo(what string, dir string) string { return In(i18n.Locale()).ExportedTo(what, dir) }
+
+// ExportedTo says "Exported {what} to {dir}"
+// in the language of msgs.
+func (msgs Messages) ExportedTo(what string, dir string) string {
+	return Catalog.Format(msgs.locale, "exportedTo", map[string]any{"what": what, "dir": dir})
+}
+
+// ExportingTo says "Exporting {what} to {dir}…"
+// in the language the app shows.
+func ExportingTo(what string, dir string) string { return In(i18n.Locale()).ExportingTo(what, dir) }
+
+// ExportingTo says "Exporting {what} to {dir}…"
+// in the language of msgs.
+func (msgs Messages) ExportingTo(what string, dir string) string {
+	return Catalog.Format(msgs.locale, "exportingTo", map[string]any{"what": what, "dir": dir})
+}
+
+// FollowEmpty says "Follow an artist from their page or their menu, and they wait here."
+// in the language the app shows.
+func FollowEmpty() string { return In(i18n.Locale()).FollowEmpty() }
+
+// FollowEmpty says "Follow an artist from their page or their menu, and they wait here."
+// in the language of msgs.
+func (msgs Messages) FollowEmpty() string {
+	return Catalog.Format(msgs.locale, "followEmpty", nil)
+}
+
+// FollowInMixMusic says "{name}: following in MixMusic"
+// in the language the app shows.
+func FollowInMixMusic(name string) string { return In(i18n.Locale()).FollowInMixMusic(name) }
+
+// FollowInMixMusic says "{name}: following in MixMusic"
+// in the language of msgs.
+func (msgs Messages) FollowInMixMusic(name string) string {
+	return Catalog.Format(msgs.locale, "followInMixMusic", map[string]any{"name": name})
+}
+
+// FollowIntro says "Follow an artist from their page or their menu, and they wait here, kept in MixMusic: their new albums and singles sh…"
+// in the language the app shows.
+func FollowIntro() string { return In(i18n.Locale()).FollowIntro() }
+
+// FollowIntro says "Follow an artist from their page or their menu, and they wait here, kept in MixMusic: their new albums and singles sh…"
+// in the language of msgs.
+func (msgs Messages) FollowIntro() string {
+	return Catalog.Format(msgs.locale, "followIntro", nil)
+}
+
+// FollowLabel says "Follow"
+// in the language the app shows.
+func FollowLabel() string { return In(i18n.Locale()).FollowLabel() }
+
+// FollowLabel says "Follow"
+// in the language of msgs.
+func (msgs Messages) FollowLabel() string {
+	return Catalog.Format(msgs.locale, "followLabel", nil)
+}
+
+// FollowNoLonger says "{name}: no longer following"
+// in the language the app shows.
+func FollowNoLonger(name string) string { return In(i18n.Locale()).FollowNoLonger(name) }
+
+// FollowNoLonger says "{name}: no longer following"
+// in the language of msgs.
+func (msgs Messages) FollowNoLonger(name string) string {
+	return Catalog.Format(msgs.locale, "followNoLonger", map[string]any{"name": name})
+}
+
+// FollowNothing says "Nothing followed yet"
+// in the language the app shows.
+func FollowNothing() string { return In(i18n.Locale()).FollowNothing() }
+
+// FollowNothing says "Nothing followed yet"
+// in the language of msgs.
+func (msgs Messages) FollowNothing() string {
+	return Catalog.Format(msgs.locale, "followNothing", nil)
+}
+
+// FollowOnService says "{name}: following on {service}"
+// in the language the app shows.
+func FollowOnService(name string, service string) string {
+	return In(i18n.Locale()).FollowOnService(name, service)
+}
+
+// FollowOnService says "{name}: following on {service}"
+// in the language of msgs.
+func (msgs Messages) FollowOnService(name string, service string) string {
+	return Catalog.Format(msgs.locale, "followOnService", map[string]any{"name": name, "service": service})
+}
+
+// FollowUnfollow says "Unfollow"
+// in the language the app shows.
+func FollowUnfollow() string { return In(i18n.Locale()).FollowUnfollow() }
+
+// FollowUnfollow says "Unfollow"
+// in the language of msgs.
+func (msgs Messages) FollowUnfollow() string {
+	return Catalog.Format(msgs.locale, "followUnfollow", nil)
+}
+
+// FollowedInMixMusic says "Followed in MixMusic"
+// in the language the app shows.
+func FollowedInMixMusic() string { return In(i18n.Locale()).FollowedInMixMusic() }
+
+// FollowedInMixMusic says "Followed in MixMusic"
+// in the language of msgs.
+func (msgs Messages) FollowedInMixMusic() string {
+	return Catalog.Format(msgs.locale, "followedInMixMusic", nil)
+}
+
+// FollowedOnSpotify says "Followed on Spotify"
+// in the language the app shows.
+func FollowedOnSpotify() string { return In(i18n.Locale()).FollowedOnSpotify() }
+
+// FollowedOnSpotify says "Followed on Spotify"
+// in the language of msgs.
+func (msgs Messages) FollowedOnSpotify() string {
+	return Catalog.Format(msgs.locale, "followedOnSpotify", nil)
+}
+
+// FollowedOnYouTube says "Followed on YouTube Music"
+// in the language the app shows.
+func FollowedOnYouTube() string { return In(i18n.Locale()).FollowedOnYouTube() }
+
+// FollowedOnYouTube says "Followed on YouTube Music"
+// in the language of msgs.
+func (msgs Messages) FollowedOnYouTube() string {
+	return Catalog.Format(msgs.locale, "followedOnYouTube", nil)
+}
+
+// MixCoverCancel says "cancel"
+// in the language the app shows.
+func MixCoverCancel() string { return In(i18n.Locale()).MixCoverCancel() }
+
+// MixCoverCancel says "cancel"
+// in the language of msgs.
+func (msgs Messages) MixCoverCancel() string {
+	return Catalog.Format(msgs.locale, "mixCoverCancel", nil)
+}
+
+// MixCoverChange says "Change cover…"
+// in the language the app shows.
+func MixCoverChange() string { return In(i18n.Locale()).MixCoverChange() }
+
+// MixCoverChange says "Change cover…"
+// in the language of msgs.
+func (msgs Messages) MixCoverChange() string {
+	return Catalog.Format(msgs.locale, "mixCoverChange", nil)
+}
+
+// MixCoverChanged says "Changed the cover of {title}"
+// in the language the app shows.
+func MixCoverChanged(title string) string { return In(i18n.Locale()).MixCoverChanged(title) }
+
+// MixCoverChanged says "Changed the cover of {title}"
+// in the language of msgs.
+func (msgs Messages) MixCoverChanged(title string) string {
+	return Catalog.Format(msgs.locale, "mixCoverChanged", map[string]any{"title": title})
+}
+
+// MixCoverChooseFor says "Choose a cover for {title}"
+// in the language the app shows.
+func MixCoverChooseFor(title string) string { return In(i18n.Locale()).MixCoverChooseFor(title) }
+
+// MixCoverChooseFor says "Choose a cover for {title}"
+// in the language of msgs.
+func (msgs Messages) MixCoverChooseFor(title string) string {
+	return Catalog.Format(msgs.locale, "mixCoverChooseFor", map[string]any{"title": title})
+}
+
+// MixCoverChooseImage says "choose an image…"
+// in the language the app shows.
+func MixCoverChooseImage() string { return In(i18n.Locale()).MixCoverChooseImage() }
+
+// MixCoverChooseImage says "choose an image…"
+// in the language of msgs.
+func (msgs Messages) MixCoverChooseImage() string {
+	return Catalog.Format(msgs.locale, "mixCoverChooseImage", nil)
+}
+
+// MixCoverFailed says "Couldn't change the cover of {title}: {error}"
+// in the language the app shows.
+func MixCoverFailed(title string, error string) string {
+	return In(i18n.Locale()).MixCoverFailed(title, error)
+}
+
+// MixCoverFailed says "Couldn't change the cover of {title}: {error}"
+// in the language of msgs.
+func (msgs Messages) MixCoverFailed(title string, error string) string {
+	return Catalog.Format(msgs.locale, "mixCoverFailed", map[string]any{"title": title, "error": error})
+}
+
+// MixCoverImages says "Images"
+// in the language the app shows.
+func MixCoverImages() string { return In(i18n.Locale()).MixCoverImages() }
+
+// MixCoverImages says "Images"
+// in the language of msgs.
+func (msgs Messages) MixCoverImages() string {
+	return Catalog.Format(msgs.locale, "mixCoverImages", nil)
+}
+
+// MixCoverIntro says "Choose an image, a PNG, JPEG or WebP, or the cover of one of the songs of {title}. It shows cut to a square."
+// in the language the app shows.
+func MixCoverIntro(title string) string { return In(i18n.Locale()).MixCoverIntro(title) }
+
+// MixCoverIntro says "Choose an image, a PNG, JPEG or WebP, or the cover of one of the songs of {title}. It shows cut to a square."
+// in the language of msgs.
+func (msgs Messages) MixCoverIntro(title string) string {
+	return Catalog.Format(msgs.locale, "mixCoverIntro", map[string]any{"title": title})
+}
+
+// MixCoverSongs says "use the songs' covers"
+// in the language the app shows.
+func MixCoverSongs() string { return In(i18n.Locale()).MixCoverSongs() }
+
+// MixCoverSongs says "use the songs' covers"
+// in the language of msgs.
+func (msgs Messages) MixCoverSongs() string {
+	return Catalog.Format(msgs.locale, "mixCoverSongs", nil)
+}
+
+// MixCoverSongsAgain says "{title} shows its songs' covers again"
+// in the language the app shows.
+func MixCoverSongsAgain(title string) string { return In(i18n.Locale()).MixCoverSongsAgain(title) }
+
+// MixCoverSongsAgain says "{title} shows its songs' covers again"
+// in the language of msgs.
+func (msgs Messages) MixCoverSongsAgain(title string) string {
+	return Catalog.Format(msgs.locale, "mixCoverSongsAgain", map[string]any{"title": title})
+}
+
+// MixCoverTitle says "change cover"
+// in the language the app shows.
+func MixCoverTitle() string { return In(i18n.Locale()).MixCoverTitle() }
+
+// MixCoverTitle says "change cover"
+// in the language of msgs.
+func (msgs Messages) MixCoverTitle() string {
+	return Catalog.Format(msgs.locale, "mixCoverTitle", nil)
+}
+
+// MixCoverUse says "Use the cover of {title}"
+// in the language the app shows.
+func MixCoverUse(title string) string { return In(i18n.Locale()).MixCoverUse(title) }
+
+// MixCoverUse says "Use the cover of {title}"
+// in the language of msgs.
+func (msgs Messages) MixCoverUse(title string) string {
+	return Catalog.Format(msgs.locale, "mixCoverUse", map[string]any{"title": title})
+}
+
+// NeteaseLiked says "Liked on NetEase Cloud Music"
+// in the language the app shows.
+func NeteaseLiked() string { return In(i18n.Locale()).NeteaseLiked() }
+
+// NeteaseLiked says "Liked on NetEase Cloud Music"
+// in the language of msgs.
+func (msgs Messages) NeteaseLiked() string {
+	return Catalog.Format(msgs.locale, "neteaseLiked", nil)
+}
+
+// NeteaseNoLiked says "No liked songs on NetEase Cloud Music."
+// in the language the app shows.
+func NeteaseNoLiked() string { return In(i18n.Locale()).NeteaseNoLiked() }
+
+// NeteaseNoLiked says "No liked songs on NetEase Cloud Music."
+// in the language of msgs.
+func (msgs Messages) NeteaseNoLiked() string {
+	return Catalog.Format(msgs.locale, "neteaseNoLiked", nil)
+}
+
+// PlaylistReadCut says "MixMusic shows and plays the first {max} tracks of a {noun, select, mix {mix} playlist {playlist} other {list}}: this…"
+// in the language the app shows.
+func PlaylistReadCut(max string, noun string) string {
+	return In(i18n.Locale()).PlaylistReadCut(max, noun)
+}
+
+// PlaylistReadCut says "MixMusic shows and plays the first {max} tracks of a {noun, select, mix {mix} playlist {playlist} other {list}}: this…"
+// in the language of msgs.
+func (msgs Messages) PlaylistReadCut(max string, noun string) string {
+	return Catalog.Format(msgs.locale, "playlistReadCut", map[string]any{"max": max, "noun": noun})
+}
+
+// PlaylistReadCutOf says "This {noun, select, mix {mix} playlist {playlist} other {list}} has {count} tracks: MixMusic shows and plays its firs…"
+// in the language the app shows.
+func PlaylistReadCutOf(noun string, count string, n string) string {
+	return In(i18n.Locale()).PlaylistReadCutOf(noun, count, n)
+}
+
+// PlaylistReadCutOf says "This {noun, select, mix {mix} playlist {playlist} other {list}} has {count} tracks: MixMusic shows and plays its firs…"
+// in the language of msgs.
+func (msgs Messages) PlaylistReadCutOf(noun string, count string, n string) string {
+	return Catalog.Format(msgs.locale, "playlistReadCutOf", map[string]any{"noun": noun, "count": count, "n": n})
+}
+
+// PlaylistReadLoading says "Loading tracks · {n}"
+// in the language the app shows.
+func PlaylistReadLoading(n string) string { return In(i18n.Locale()).PlaylistReadLoading(n) }
+
+// PlaylistReadLoading says "Loading tracks · {n}"
+// in the language of msgs.
+func (msgs Messages) PlaylistReadLoading(n string) string {
+	return Catalog.Format(msgs.locale, "playlistReadLoading", map[string]any{"n": n})
+}
+
+// PlaylistReadLoadingLabel says "Loading tracks"
+// in the language the app shows.
+func PlaylistReadLoadingLabel() string { return In(i18n.Locale()).PlaylistReadLoadingLabel() }
+
+// PlaylistReadLoadingLabel says "Loading tracks"
+// in the language of msgs.
+func (msgs Messages) PlaylistReadLoadingLabel() string {
+	return Catalog.Format(msgs.locale, "playlistReadLoadingLabel", nil)
+}
+
+// PlaylistReadLoadingOf says "Loading tracks · {n} of {count}"
+// in the language the app shows.
+func PlaylistReadLoadingOf(n string, count string) string {
+	return In(i18n.Locale()).PlaylistReadLoadingOf(n, count)
+}
+
+// PlaylistReadLoadingOf says "Loading tracks · {n} of {count}"
+// in the language of msgs.
+func (msgs Messages) PlaylistReadLoadingOf(n string, count string) string {
+	return Catalog.Format(msgs.locale, "playlistReadLoadingOf", map[string]any{"n": n, "count": count})
+}
+
+// PlaylistReadLoadingOfThen says "Loading tracks · {n} of {count} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all…"
+// in the language the app shows.
+func PlaylistReadLoadingOfThen(n string, count string, does string) string {
+	return In(i18n.Locale()).PlaylistReadLoadingOfThen(n, count, does)
+}
+
+// PlaylistReadLoadingOfThen says "Loading tracks · {n} of {count} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all…"
+// in the language of msgs.
+func (msgs Messages) PlaylistReadLoadingOfThen(n string, count string, does string) string {
+	return Catalog.Format(msgs.locale, "playlistReadLoadingOfThen", map[string]any{"n": n, "count": count, "does": does})
+}
+
+// PlaylistReadLoadingThen says "Loading tracks · {n} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all here"
+// in the language the app shows.
+func PlaylistReadLoadingThen(n string, does string) string {
+	return In(i18n.Locale()).PlaylistReadLoadingThen(n, does)
+}
+
+// PlaylistReadLoadingThen says "Loading tracks · {n} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all here"
+// in the language of msgs.
+func (msgs Messages) PlaylistReadLoadingThen(n string, does string) string {
+	return Catalog.Format(msgs.locale, "playlistReadLoadingThen", map[string]any{"n": n, "does": does})
+}
+
+// PlaylistReadPartialFirst says "Only the first {n} tracks of this {noun, select, mix {mix} playlist {playlist} other {list}} could be loaded: {error}"
+// in the language the app shows.
+func PlaylistReadPartialFirst(n string, noun string, error string) string {
+	return In(i18n.Locale()).PlaylistReadPartialFirst(n, noun, error)
+}
+
+// PlaylistReadPartialFirst says "Only the first {n} tracks of this {noun, select, mix {mix} playlist {playlist} other {list}} could be loaded: {error}"
+// in the language of msgs.
+func (msgs Messages) PlaylistReadPartialFirst(n string, noun string, error string) string {
+	return Catalog.Format(msgs.locale, "playlistReadPartialFirst", map[string]any{"n": n, "noun": noun, "error": error})
+}
+
+// PlaylistReadPartialOf says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count} tracks could be loaded: {error}"
+// in the language the app shows.
+func PlaylistReadPartialOf(n string, noun string, count string, error string) string {
+	return In(i18n.Locale()).PlaylistReadPartialOf(n, noun, count, error)
+}
+
+// PlaylistReadPartialOf says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count} tracks could be loaded: {error}"
+// in the language of msgs.
+func (msgs Messages) PlaylistReadPartialOf(n string, noun string, count string, error string) string {
+	return Catalog.Format(msgs.locale, "playlistReadPartialOf", map[string]any{"n": n, "noun": noun, "count": count, "error": error})
+}
+
+// ShareCopied says "Copied the link"
+// in the language the app shows.
+func ShareCopied() string { return In(i18n.Locale()).ShareCopied() }
+
+// ShareCopied says "Copied the link"
+// in the language of msgs.
+func (msgs Messages) ShareCopied() string {
+	return Catalog.Format(msgs.locale, "shareCopied", nil)
+}
+
+// ShareCopyLink says "Copy link"
+// in the language the app shows.
+func ShareCopyLink() string { return In(i18n.Locale()).ShareCopyLink() }
+
+// ShareCopyLink says "Copy link"
+// in the language of msgs.
+func (msgs Messages) ShareCopyLink() string {
+	return Catalog.Format(msgs.locale, "shareCopyLink", nil)
+}
+
+// ShareCopyOn says "Copy the link on {service}"
+// in the language the app shows.
+func ShareCopyOn(service string) string { return In(i18n.Locale()).ShareCopyOn(service) }
+
+// ShareCopyOn says "Copy the link on {service}"
+// in the language of msgs.
+func (msgs Messages) ShareCopyOn(service string) string {
+	return Catalog.Format(msgs.locale, "shareCopyOn", map[string]any{"service": service})
+}
+
+// ShareKindAlbum says "Album"
+// in the language the app shows.
+func ShareKindAlbum() string { return In(i18n.Locale()).ShareKindAlbum() }
+
+// ShareKindAlbum says "Album"
+// in the language of msgs.
+func (msgs Messages) ShareKindAlbum() string {
+	return Catalog.Format(msgs.locale, "shareKindAlbum", nil)
+}
+
+// ShareKindEP says "EP"
+// in the language the app shows.
+func ShareKindEP() string { return In(i18n.Locale()).ShareKindEP() }
+
+// ShareKindEP says "EP"
+// in the language of msgs.
+func (msgs Messages) ShareKindEP() string {
+	return Catalog.Format(msgs.locale, "shareKindEP", nil)
+}
+
+// ShareKindEpisode says "Episode"
+// in the language the app shows.
+func ShareKindEpisode() string { return In(i18n.Locale()).ShareKindEpisode() }
+
+// ShareKindEpisode says "Episode"
+// in the language of msgs.
+func (msgs Messages) ShareKindEpisode() string {
+	return Catalog.Format(msgs.locale, "shareKindEpisode", nil)
+}
+
+// ShareKindMix says "Mix"
+// in the language the app shows.
+func ShareKindMix() string { return In(i18n.Locale()).ShareKindMix() }
+
+// ShareKindMix says "Mix"
+// in the language of msgs.
+func (msgs Messages) ShareKindMix() string {
+	return Catalog.Format(msgs.locale, "shareKindMix", nil)
+}
+
+// ShareKindPlaylist says "Playlist"
+// in the language the app shows.
+func ShareKindPlaylist() string { return In(i18n.Locale()).ShareKindPlaylist() }
+
+// ShareKindPlaylist says "Playlist"
+// in the language of msgs.
+func (msgs Messages) ShareKindPlaylist() string {
+	return Catalog.Format(msgs.locale, "shareKindPlaylist", nil)
+}
+
+// ShareKindSingle says "Single"
+// in the language the app shows.
+func ShareKindSingle() string { return In(i18n.Locale()).ShareKindSingle() }
+
+// ShareKindSingle says "Single"
+// in the language of msgs.
+func (msgs Messages) ShareKindSingle() string {
+	return Catalog.Format(msgs.locale, "shareKindSingle", nil)
+}
+
+// ShareKindSong says "Song"
+// in the language the app shows.
+func ShareKindSong() string { return In(i18n.Locale()).ShareKindSong() }
+
+// ShareKindSong says "Song"
+// in the language of msgs.
+func (msgs Messages) ShareKindSong() string {
+	return Catalog.Format(msgs.locale, "shareKindSong", nil)
+}
+
+// ShareMenu says "Share"
+// in the language the app shows.
+func ShareMenu() string { return In(i18n.Locale()).ShareMenu() }
+
+// ShareMenu says "Share"
+// in the language of msgs.
+func (msgs Messages) ShareMenu() string {
+	return Catalog.Format(msgs.locale, "shareMenu", nil)
+}
+
+// SharePNGImage says "PNG image"
+// in the language the app shows.
+func SharePNGImage() string { return In(i18n.Locale()).SharePNGImage() }
+
+// SharePNGImage says "PNG image"
+// in the language of msgs.
+func (msgs Messages) SharePNGImage() string {
+	return Catalog.Format(msgs.locale, "sharePNGImage", nil)
+}
+
+// ShareSaveButton says "Save"
+// in the language the app shows.
+func ShareSaveButton() string { return In(i18n.Locale()).ShareSaveButton() }
+
+// ShareSaveButton says "Save"
+// in the language of msgs.
+func (msgs Messages) ShareSaveButton() string {
+	return Catalog.Format(msgs.locale, "shareSaveButton", nil)
+}
+
+// ShareSaveImage says "Save image…"
+// in the language the app shows.
+func ShareSaveImage() string { return In(i18n.Locale()).ShareSaveImage() }
+
+// ShareSaveImage says "Save image…"
+// in the language of msgs.
+func (msgs Messages) ShareSaveImage() string {
+	return Catalog.Format(msgs.locale, "shareSaveImage", nil)
+}
+
+// ShareSaveStory says "Save image for a story…"
+// in the language the app shows.
+func ShareSaveStory() string { return In(i18n.Locale()).ShareSaveStory() }
+
+// ShareSaveStory says "Save image for a story…"
+// in the language of msgs.
+func (msgs Messages) ShareSaveStory() string {
+	return Catalog.Format(msgs.locale, "shareSaveStory", nil)
+}
+
+// ShareSaveTitle says "Save the image"
+// in the language the app shows.
+func ShareSaveTitle() string { return In(i18n.Locale()).ShareSaveTitle() }
+
+// ShareSaveTitle says "Save the image"
+// in the language of msgs.
+func (msgs Messages) ShareSaveTitle() string {
+	return Catalog.Format(msgs.locale, "shareSaveTitle", nil)
+}
+
+// ShareSaved says "Saved the image as {file}"
+// in the language the app shows.
+func ShareSaved(file string) string { return In(i18n.Locale()).ShareSaved(file) }
+
+// ShareSaved says "Saved the image as {file}"
+// in the language of msgs.
+func (msgs Messages) ShareSaved(file string) string {
+	return Catalog.Format(msgs.locale, "shareSaved", map[string]any{"file": file})
+}
+
+// SuggestionsAdd says "add"
+// in the language the app shows.
+func SuggestionsAdd() string { return In(i18n.Locale()).SuggestionsAdd() }
+
+// SuggestionsAdd says "add"
+// in the language of msgs.
+func (msgs Messages) SuggestionsAdd() string {
+	return Catalog.Format(msgs.locale, "suggestionsAdd", nil)
+}
+
+// SuggestionsAddLabel says "Add {title} to {playlist}"
+// in the language the app shows.
+func SuggestionsAddLabel(title string, playlist string) string {
+	return In(i18n.Locale()).SuggestionsAddLabel(title, playlist)
+}
+
+// SuggestionsAddLabel says "Add {title} to {playlist}"
+// in the language of msgs.
+func (msgs Messages) SuggestionsAddLabel(title string, playlist string) string {
+	return Catalog.Format(msgs.locale, "suggestionsAddLabel", map[string]any{"title": title, "playlist": playlist})
+}
+
+// SuggestionsAdded says "Added {title} to {playlist}"
+// in the language the app shows.
+func SuggestionsAdded(title string, playlist string) string {
+	return In(i18n.Locale()).SuggestionsAdded(title, playlist)
+}
+
+// SuggestionsAdded says "Added {title} to {playlist}"
+// in the language of msgs.
+func (msgs Messages) SuggestionsAdded(title string, playlist string) string {
+	return Catalog.Format(msgs.locale, "suggestionsAdded", map[string]any{"title": title, "playlist": playlist})
+}
+
+// SuggestionsLoadFailed says "Couldn't load the suggestions: {error}"
+// in the language the app shows.
+func SuggestionsLoadFailed(error string) string {
+	return In(i18n.Locale()).SuggestionsLoadFailed(error)
+}
+
+// SuggestionsLoadFailed says "Couldn't load the suggestions: {error}"
+// in the language of msgs.
+func (msgs Messages) SuggestionsLoadFailed(error string) string {
+	return Catalog.Format(msgs.locale, "suggestionsLoadFailed", map[string]any{"error": error})
+}
+
+// SuggestionsLoading says "Loading suggestions"
+// in the language the app shows.
+func SuggestionsLoading() string { return In(i18n.Locale()).SuggestionsLoading() }
+
+// SuggestionsLoading says "Loading suggestions"
+// in the language of msgs.
+func (msgs Messages) SuggestionsLoading() string {
+	return Catalog.Format(msgs.locale, "suggestionsLoading", nil)
+}
+
+// SuggestionsRefresh says "refresh"
+// in the language the app shows.
+func SuggestionsRefresh() string { return In(i18n.Locale()).SuggestionsRefresh() }
+
+// SuggestionsRefresh says "refresh"
+// in the language of msgs.
+func (msgs Messages) SuggestionsRefresh() string {
+	return Catalog.Format(msgs.locale, "suggestionsRefresh", nil)
+}
+
+// SuggestionsRefreshFailed says "Couldn't refresh the suggestions: {error}"
+// in the language the app shows.
+func SuggestionsRefreshFailed(error string) string {
+	return In(i18n.Locale()).SuggestionsRefreshFailed(error)
+}
+
+// SuggestionsRefreshFailed says "Couldn't refresh the suggestions: {error}"
+// in the language of msgs.
+func (msgs Messages) SuggestionsRefreshFailed(error string) string {
+	return Catalog.Format(msgs.locale, "suggestionsRefreshFailed", map[string]any{"error": error})
+}
+
+// SuggestionsRefreshLabel says "Refresh the suggestions"
+// in the language the app shows.
+func SuggestionsRefreshLabel() string { return In(i18n.Locale()).SuggestionsRefreshLabel() }
+
+// SuggestionsRefreshLabel says "Refresh the suggestions"
+// in the language of msgs.
+func (msgs Messages) SuggestionsRefreshLabel() string {
+	return Catalog.Format(msgs.locale, "suggestionsRefreshLabel", nil)
+}
+
+// SuggestionsTitle says "Suggestions"
+// in the language the app shows.
+func SuggestionsTitle() string { return In(i18n.Locale()).SuggestionsTitle() }
+
+// SuggestionsTitle says "Suggestions"
+// in the language of msgs.
+func (msgs Messages) SuggestionsTitle() string {
+	return Catalog.Format(msgs.locale, "suggestionsTitle", nil)
+}
+
+// SuggestionsTryAgain says "try again"
+// in the language the app shows.
+func SuggestionsTryAgain() string { return In(i18n.Locale()).SuggestionsTryAgain() }
+
+// SuggestionsTryAgain says "try again"
+// in the language of msgs.
+func (msgs Messages) SuggestionsTryAgain() string {
+	return Catalog.Format(msgs.locale, "suggestionsTryAgain", nil)
+}
+
+// TrackSelectAddMix says "add to mix"
+// in the language the app shows.
+func TrackSelectAddMix() string { return In(i18n.Locale()).TrackSelectAddMix() }
+
+// TrackSelectAddMix says "add to mix"
+// in the language of msgs.
+func (msgs Messages) TrackSelectAddMix() string {
+	return Catalog.Format(msgs.locale, "trackSelectAddMix", nil)
+}
+
+// TrackSelectAddMixLabel says "Add the selected tracks to a mix"
+// in the language the app shows.
+func TrackSelectAddMixLabel() string { return In(i18n.Locale()).TrackSelectAddMixLabel() }
+
+// TrackSelectAddMixLabel says "Add the selected tracks to a mix"
+// in the language of msgs.
+func (msgs Messages) TrackSelectAddMixLabel() string {
+	return Catalog.Format(msgs.locale, "trackSelectAddMixLabel", nil)
+}
+
+// TrackSelectAddQueue says "add to queue"
+// in the language the app shows.
+func TrackSelectAddQueue() string { return In(i18n.Locale()).TrackSelectAddQueue() }
+
+// TrackSelectAddQueue says "add to queue"
+// in the language of msgs.
+func (msgs Messages) TrackSelectAddQueue() string {
+	return Catalog.Format(msgs.locale, "trackSelectAddQueue", nil)
+}
+
+// TrackSelectAddQueueLabel says "Add the selected tracks to the queue"
+// in the language the app shows.
+func TrackSelectAddQueueLabel() string { return In(i18n.Locale()).TrackSelectAddQueueLabel() }
+
+// TrackSelectAddQueueLabel says "Add the selected tracks to the queue"
+// in the language of msgs.
+func (msgs Messages) TrackSelectAddQueueLabel() string {
+	return Catalog.Format(msgs.locale, "trackSelectAddQueueLabel", nil)
+}
+
+// TrackSelectAll says "select all"
+// in the language the app shows.
+func TrackSelectAll() string { return In(i18n.Locale()).TrackSelectAll() }
+
+// TrackSelectAll says "select all"
+// in the language of msgs.
+func (msgs Messages) TrackSelectAll() string {
+	return Catalog.Format(msgs.locale, "trackSelectAll", nil)
+}
+
+// TrackSelectBar says "Selected tracks"
+// in the language the app shows.
+func TrackSelectBar() string { return In(i18n.Locale()).TrackSelectBar() }
+
+// TrackSelectBar says "Selected tracks"
+// in the language of msgs.
+func (msgs Messages) TrackSelectBar() string {
+	return Catalog.Format(msgs.locale, "trackSelectBar", nil)
+}
+
+// TrackSelectClear says "Clear the selection"
+// in the language the app shows.
+func TrackSelectClear() string { return In(i18n.Locale()).TrackSelectClear() }
+
+// TrackSelectClear says "Clear the selection"
+// in the language of msgs.
+func (msgs Messages) TrackSelectClear() string {
+	return Catalog.Format(msgs.locale, "trackSelectClear", nil)
+}
+
+// TrackSelectCount says "{count} selected"
+// in the language the app shows.
+func TrackSelectCount(count int) string { return In(i18n.Locale()).TrackSelectCount(count) }
+
+// TrackSelectCount says "{count} selected"
+// in the language of msgs.
+func (msgs Messages) TrackSelectCount(count int) string {
+	return Catalog.Format(msgs.locale, "trackSelectCount", map[string]any{"count": count})
+}
+
+// TrackSelectDeselect says "Deselect"
+// in the language the app shows.
+func TrackSelectDeselect() string { return In(i18n.Locale()).TrackSelectDeselect() }
+
+// TrackSelectDeselect says "Deselect"
+// in the language of msgs.
+func (msgs Messages) TrackSelectDeselect() string {
+	return Catalog.Format(msgs.locale, "trackSelectDeselect", nil)
+}
+
+// TrackSelectDownload says "download"
+// in the language the app shows.
+func TrackSelectDownload() string { return In(i18n.Locale()).TrackSelectDownload() }
+
+// TrackSelectDownload says "download"
+// in the language of msgs.
+func (msgs Messages) TrackSelectDownload() string {
+	return Catalog.Format(msgs.locale, "trackSelectDownload", nil)
+}
+
+// TrackSelectDownloadLabel says "Download the selected tracks"
+// in the language the app shows.
+func TrackSelectDownloadLabel() string { return In(i18n.Locale()).TrackSelectDownloadLabel() }
+
+// TrackSelectDownloadLabel says "Download the selected tracks"
+// in the language of msgs.
+func (msgs Messages) TrackSelectDownloadLabel() string {
+	return Catalog.Format(msgs.locale, "trackSelectDownloadLabel", nil)
+}
+
+// TrackSelectItem says "Select"
+// in the language the app shows.
+func TrackSelectItem() string { return In(i18n.Locale()).TrackSelectItem() }
+
+// TrackSelectItem says "Select"
+// in the language of msgs.
+func (msgs Messages) TrackSelectItem() string {
+	return Catalog.Format(msgs.locale, "trackSelectItem", nil)
+}
+
+// TrackSelectQueued says "Added {count, plural, one {# track} other {# tracks}} to the queue"
+// in the language the app shows.
+func TrackSelectQueued(count int) string { return In(i18n.Locale()).TrackSelectQueued(count) }
+
+// TrackSelectQueued says "Added {count, plural, one {# track} other {# tracks}} to the queue"
+// in the language of msgs.
+func (msgs Messages) TrackSelectQueued(count int) string {
+	return Catalog.Format(msgs.locale, "trackSelectQueued", map[string]any{"count": count})
+}
+
+// TrackSelectRow says "Select {title}"
+// in the language the app shows.
+func TrackSelectRow(title string) string { return In(i18n.Locale()).TrackSelectRow(title) }
+
+// TrackSelectRow says "Select {title}"
+// in the language of msgs.
+func (msgs Messages) TrackSelectRow(title string) string {
+	return Catalog.Format(msgs.locale, "trackSelectRow", map[string]any{"title": title})
+}
+
+// TrackToolsOrder says "{noun, select, mix {Mix} playlist {Playlist} other {List}} order"
+// in the language the app shows.
+func TrackToolsOrder(noun string) string { return In(i18n.Locale()).TrackToolsOrder(noun) }
+
+// TrackToolsOrder says "{noun, select, mix {Mix} playlist {Playlist} other {List}} order"
+// in the language of msgs.
+func (msgs Messages) TrackToolsOrder(noun string) string {
+	return Catalog.Format(msgs.locale, "trackToolsOrder", map[string]any{"noun": noun})
+}
+
+// TrackToolsSearchLabel says "Search this {noun, select, mix {mix} playlist {playlist} other {list}}"
+// in the language the app shows.
+func TrackToolsSearchLabel(noun string) string { return In(i18n.Locale()).TrackToolsSearchLabel(noun) }
+
+// TrackToolsSearchLabel says "Search this {noun, select, mix {mix} playlist {playlist} other {list}}"
+// in the language of msgs.
+func (msgs Messages) TrackToolsSearchLabel(noun string) string {
+	return Catalog.Format(msgs.locale, "trackToolsSearchLabel", map[string]any{"noun": noun})
+}
+
+// TrackToolsSearchPlaceholder says "search this {noun, select, mix {mix} playlist {playlist} other {list}}"
+// in the language the app shows.
+func TrackToolsSearchPlaceholder(noun string) string {
+	return In(i18n.Locale()).TrackToolsSearchPlaceholder(noun)
+}
+
+// TrackToolsSearchPlaceholder says "search this {noun, select, mix {mix} playlist {playlist} other {list}}"
+// in the language of msgs.
+func (msgs Messages) TrackToolsSearchPlaceholder(noun string) string {
+	return Catalog.Format(msgs.locale, "trackToolsSearchPlaceholder", map[string]any{"noun": noun})
+}
+
+// TrackToolsShown says "{shown} of {total}"
+// in the language the app shows.
+func TrackToolsShown(shown int, total int) string {
+	return In(i18n.Locale()).TrackToolsShown(shown, total)
+}
+
+// TrackToolsShown says "{shown} of {total}"
+// in the language of msgs.
+func (msgs Messages) TrackToolsShown(shown int, total int) string {
+	return Catalog.Format(msgs.locale, "trackToolsShown", map[string]any{"shown": shown, "total": total})
+}
+
+// TrackToolsSortArtist says "Artist"
+// in the language the app shows.
+func TrackToolsSortArtist() string { return In(i18n.Locale()).TrackToolsSortArtist() }
+
+// TrackToolsSortArtist says "Artist"
+// in the language of msgs.
+func (msgs Messages) TrackToolsSortArtist() string {
+	return Catalog.Format(msgs.locale, "trackToolsSortArtist", nil)
+}
+
+// TrackToolsSortBy says "Sort by"
+// in the language the app shows.
+func TrackToolsSortBy() string { return In(i18n.Locale()).TrackToolsSortBy() }
+
+// TrackToolsSortBy says "Sort by"
+// in the language of msgs.
+func (msgs Messages) TrackToolsSortBy() string {
+	return Catalog.Format(msgs.locale, "trackToolsSortBy", nil)
+}
+
+// TrackToolsSortLength says "Length"
+// in the language the app shows.
+func TrackToolsSortLength() string { return In(i18n.Locale()).TrackToolsSortLength() }
+
+// TrackToolsSortLength says "Length"
+// in the language of msgs.
+func (msgs Messages) TrackToolsSortLength() string {
+	return Catalog.Format(msgs.locale, "trackToolsSortLength", nil)
+}
+
+// TrackToolsSortPlays says "Plays"
+// in the language the app shows.
+func TrackToolsSortPlays() string { return In(i18n.Locale()).TrackToolsSortPlays() }
+
+// TrackToolsSortPlays says "Plays"
+// in the language of msgs.
+func (msgs Messages) TrackToolsSortPlays() string {
+	return Catalog.Format(msgs.locale, "trackToolsSortPlays", nil)
+}
+
+// TrackToolsSortTitle says "Title"
+// in the language the app shows.
+func TrackToolsSortTitle() string { return In(i18n.Locale()).TrackToolsSortTitle() }
+
+// TrackToolsSortTitle says "Title"
+// in the language of msgs.
+func (msgs Messages) TrackToolsSortTitle() string {
+	return Catalog.Format(msgs.locale, "trackToolsSortTitle", nil)
+}
+
+// TracksEmpty says "No tracks here yet."
+// in the language the app shows.
+func TracksEmpty() string { return In(i18n.Locale()).TracksEmpty() }
+
+// TracksEmpty says "No tracks here yet."
+// in the language of msgs.
+func (msgs Messages) TracksEmpty() string {
+	return Catalog.Format(msgs.locale, "tracksEmpty", nil)
+}
+
+// TracksFileNotFound says "File not found"
+// in the language the app shows.
+func TracksFileNotFound() string { return In(i18n.Locale()).TracksFileNotFound() }
+
+// TracksFileNotFound says "File not found"
+// in the language of msgs.
+func (msgs Messages) TracksFileNotFound() string {
+	return Catalog.Format(msgs.locale, "tracksFileNotFound", nil)
+}
+
+// TracksMoreFor says "More for {title}"
+// in the language the app shows.
+func TracksMoreFor(title string) string { return In(i18n.Locale()).TracksMoreFor(title) }
+
+// TracksMoreFor says "More for {title}"
+// in the language of msgs.
+func (msgs Messages) TracksMoreFor(title string) string {
+	return Catalog.Format(msgs.locale, "tracksMoreFor", map[string]any{"title": title})
+}
+
+// TracksPause says "Pause {title}"
+// in the language the app shows.
+func TracksPause(title string) string { return In(i18n.Locale()).TracksPause(title) }
+
+// TracksPause says "Pause {title}"
+// in the language of msgs.
+func (msgs Messages) TracksPause(title string) string {
+	return Catalog.Format(msgs.locale, "tracksPause", map[string]any{"title": title})
+}
+
+// TracksPlay says "Play {title}"
+// in the language the app shows.
+func TracksPlay(title string) string { return In(i18n.Locale()).TracksPlay(title) }
+
+// TracksPlay says "Play {title}"
+// in the language of msgs.
+func (msgs Messages) TracksPlay(title string) string {
+	return Catalog.Format(msgs.locale, "tracksPlay", map[string]any{"title": title})
+}
+
+// FormatMinutes says "{count} min"
+// in the language the app shows.
+func FormatMinutes(count string) string { return In(i18n.Locale()).FormatMinutes(count) }
+
+// FormatMinutes says "{count} min"
+// in the language of msgs.
+func (msgs Messages) FormatMinutes(count string) string {
+	return Catalog.Format(msgs.locale, "formatMinutes", map[string]any{"count": count})
+}
+
+// FormatHourMinutes says "{hours} hr {minutes} min"
+// in the language the app shows.
+func FormatHourMinutes(hours string, minutes string) string {
+	return In(i18n.Locale()).FormatHourMinutes(hours, minutes)
+}
+
+// FormatHourMinutes says "{hours} hr {minutes} min"
+// in the language of msgs.
+func (msgs Messages) FormatHourMinutes(hours string, minutes string) string {
+	return Catalog.Format(msgs.locale, "formatHourMinutes", map[string]any{"hours": hours, "minutes": minutes})
+}
+
+// FormatMonthDay says "{month} {day}"
+// in the language the app shows.
+func FormatMonthDay(month string, day string) string {
+	return In(i18n.Locale()).FormatMonthDay(month, day)
+}
+
+// FormatMonthDay says "{month} {day}"
+// in the language of msgs.
+func (msgs Messages) FormatMonthDay(month string, day string) string {
+	return Catalog.Format(msgs.locale, "formatMonthDay", map[string]any{"month": month, "day": day})
+}
+
+// FormatMonthDayYear says "{month} {day}, {year}"
+// in the language the app shows.
+func FormatMonthDayYear(month string, day string, year string) string {
+	return In(i18n.Locale()).FormatMonthDayYear(month, day, year)
+}
+
+// FormatMonthDayYear says "{month} {day}, {year}"
+// in the language of msgs.
+func (msgs Messages) FormatMonthDayYear(month string, day string, year string) string {
+	return Catalog.Format(msgs.locale, "formatMonthDayYear", map[string]any{"month": month, "day": day, "year": year})
+}
+
+// FormatMonthYear says "{month} {year}"
+// in the language the app shows.
+func FormatMonthYear(month string, year string) string {
+	return In(i18n.Locale()).FormatMonthYear(month, year)
+}
+
+// FormatMonthYear says "{month} {year}"
+// in the language of msgs.
+func (msgs Messages) FormatMonthYear(month string, year string) string {
+	return Catalog.Format(msgs.locale, "formatMonthYear", map[string]any{"month": month, "year": year})
+}
+
+// FormatDayMonth says "{day} {month}"
+// in the language the app shows.
+func FormatDayMonth(day string, month string) string {
+	return In(i18n.Locale()).FormatDayMonth(day, month)
+}
+
+// FormatDayMonth says "{day} {month}"
+// in the language of msgs.
+func (msgs Messages) FormatDayMonth(day string, month string) string {
+	return Catalog.Format(msgs.locale, "formatDayMonth", map[string]any{"day": day, "month": month})
+}
+
+// FormatWeekdayDayMonth says "{weekday} {day} {month}"
+// in the language the app shows.
+func FormatWeekdayDayMonth(weekday string, day string, month string) string {
+	return In(i18n.Locale()).FormatWeekdayDayMonth(weekday, day, month)
+}
+
+// FormatWeekdayDayMonth says "{weekday} {day} {month}"
+// in the language of msgs.
+func (msgs Messages) FormatWeekdayDayMonth(weekday string, day string, month string) string {
+	return Catalog.Format(msgs.locale, "formatWeekdayDayMonth", map[string]any{"weekday": weekday, "day": day, "month": month})
+}
+
+// FormatPlays says "{n, plural, one {{count} play} other {{count} plays}}"
+// in the language the app shows.
+func FormatPlays(n int, count string) string { return In(i18n.Locale()).FormatPlays(n, count) }
+
+// FormatPlays says "{n, plural, one {{count} play} other {{count} plays}}"
+// in the language of msgs.
+func (msgs Messages) FormatPlays(n int, count string) string {
+	return Catalog.Format(msgs.locale, "formatPlays", map[string]any{"n": n, "count": count})
+}
+
+// FormatViews says "{n, plural, one {{count} view} other {{count} views}}"
+// in the language the app shows.
+func FormatViews(n int, count string) string { return In(i18n.Locale()).FormatViews(n, count) }
+
+// FormatViews says "{n, plural, one {{count} view} other {{count} views}}"
+// in the language of msgs.
+func (msgs Messages) FormatViews(n int, count string) string {
+	return Catalog.Format(msgs.locale, "formatViews", map[string]any{"n": n, "count": count})
+}
+
+// FormatThisComputer says "this computer"
+// in the language the app shows.
+//
+// The source name of files on this computer, as in Open on this computer.
+func FormatThisComputer() string { return In(i18n.Locale()).FormatThisComputer() }
+
+// FormatThisComputer says "this computer"
+// in the language of msgs.
+//
+// The source name of files on this computer, as in Open on this computer.
+func (msgs Messages) FormatThisComputer() string {
+	return Catalog.Format(msgs.locale, "formatThisComputer", nil)
+}
+
+// PodcastsKind says "podcast"
+// in the language the app shows.
+func PodcastsKind() string { return In(i18n.Locale()).PodcastsKind() }
+
+// PodcastsKind says "podcast"
+// in the language of msgs.
+func (msgs Messages) PodcastsKind() string {
+	return Catalog.Format(msgs.locale, "podcastsKind", nil)
+}
+
+// PodcastsEpisodeCount says "{count, plural, one {# episode} other {# episodes}}"
+// in the language the app shows.
+func PodcastsEpisodeCount(count int) string { return In(i18n.Locale()).PodcastsEpisodeCount(count) }
+
+// PodcastsEpisodeCount says "{count, plural, one {# episode} other {# episodes}}"
+// in the language of msgs.
+func (msgs Messages) PodcastsEpisodeCount(count int) string {
+	return Catalog.Format(msgs.locale, "podcastsEpisodeCount", map[string]any{"count": count})
+}
+
+// PodcastsSpotifyOnlyLead says "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in "
+// in the language the app shows.
+//
+// Split around the link to Settings › Playback.
+func PodcastsSpotifyOnlyLead() string { return In(i18n.Locale()).PodcastsSpotifyOnlyLead() }
+
+// PodcastsSpotifyOnlyLead says "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in "
+// in the language of msgs.
+//
+// Split around the link to Settings › Playback.
+func (msgs Messages) PodcastsSpotifyOnlyLead() string {
+	return Catalog.Format(msgs.locale, "podcastsSpotifyOnlyLead", nil)
+}
+
+// PodcastsSettingsPlayback says "Settings › Playback"
+// in the language the app shows.
+func PodcastsSettingsPlayback() string { return In(i18n.Locale()).PodcastsSettingsPlayback() }
+
+// PodcastsSettingsPlayback says "Settings › Playback"
+// in the language of msgs.
+func (msgs Messages) PodcastsSettingsPlayback() string {
+	return Catalog.Format(msgs.locale, "podcastsSettingsPlayback", nil)
+}
+
+// PodcastsSpotifyOnlyTail says "."
+// in the language the app shows.
+func PodcastsSpotifyOnlyTail() string { return In(i18n.Locale()).PodcastsSpotifyOnlyTail() }
+
+// PodcastsSpotifyOnlyTail says "."
+// in the language of msgs.
+func (msgs Messages) PodcastsSpotifyOnlyTail() string {
+	return Catalog.Format(msgs.locale, "podcastsSpotifyOnlyTail", nil)
+}
+
+// PodcastsNoEpisodes says "No episodes yet."
+// in the language the app shows.
+func PodcastsNoEpisodes() string { return In(i18n.Locale()).PodcastsNoEpisodes() }
+
+// PodcastsNoEpisodes says "No episodes yet."
+// in the language of msgs.
+func (msgs Messages) PodcastsNoEpisodes() string {
+	return Catalog.Format(msgs.locale, "podcastsNoEpisodes", nil)
+}
+
+// PodcastsLoadMore says "load more episodes"
+// in the language the app shows.
+func PodcastsLoadMore() string { return In(i18n.Locale()).PodcastsLoadMore() }
+
+// PodcastsLoadMore says "load more episodes"
+// in the language of msgs.
+func (msgs Messages) PodcastsLoadMore() string {
+	return Catalog.Format(msgs.locale, "podcastsLoadMore", nil)
+}
+
+// PodcastsFollow says "follow"
+// in the language the app shows.
+func PodcastsFollow() string { return In(i18n.Locale()).PodcastsFollow() }
+
+// PodcastsFollow says "follow"
+// in the language of msgs.
+func (msgs Messages) PodcastsFollow() string {
+	return Catalog.Format(msgs.locale, "podcastsFollow", nil)
+}
+
+// PodcastsFollowing says "following"
+// in the language the app shows.
+func PodcastsFollowing() string { return In(i18n.Locale()).PodcastsFollowing() }
+
+// PodcastsFollowing says "following"
+// in the language of msgs.
+func (msgs Messages) PodcastsFollowing() string {
+	return Catalog.Format(msgs.locale, "podcastsFollowing", nil)
+}
+
+// PodcastsResume says "resume"
+// in the language the app shows.
+func PodcastsResume() string { return In(i18n.Locale()).PodcastsResume() }
+
+// PodcastsResume says "resume"
+// in the language of msgs.
+func (msgs Messages) PodcastsResume() string {
+	return Catalog.Format(msgs.locale, "podcastsResume", nil)
+}
+
+// PodcastsPlayTitle says "Play {title}"
+// in the language the app shows.
+func PodcastsPlayTitle(title string) string { return In(i18n.Locale()).PodcastsPlayTitle(title) }
+
+// PodcastsPlayTitle says "Play {title}"
+// in the language of msgs.
+func (msgs Messages) PodcastsPlayTitle(title string) string {
+	return Catalog.Format(msgs.locale, "podcastsPlayTitle", map[string]any{"title": title})
+}
+
+// PodcastsPauseTitle says "Pause {title}"
+// in the language the app shows.
+func PodcastsPauseTitle(title string) string { return In(i18n.Locale()).PodcastsPauseTitle(title) }
+
+// PodcastsPauseTitle says "Pause {title}"
+// in the language of msgs.
+func (msgs Messages) PodcastsPauseTitle(title string) string {
+	return Catalog.Format(msgs.locale, "podcastsPauseTitle", map[string]any{"title": title})
+}
+
+// PodcastsMoreFor says "More for {title}"
+// in the language the app shows.
+func PodcastsMoreFor(title string) string { return In(i18n.Locale()).PodcastsMoreFor(title) }
+
+// PodcastsMoreFor says "More for {title}"
+// in the language of msgs.
+func (msgs Messages) PodcastsMoreFor(title string) string {
+	return Catalog.Format(msgs.locale, "podcastsMoreFor", map[string]any{"title": title})
+}
+
+// PodcastsPlayed says "played"
+// in the language the app shows.
+func PodcastsPlayed() string { return In(i18n.Locale()).PodcastsPlayed() }
+
+// PodcastsPlayed says "played"
+// in the language of msgs.
+func (msgs Messages) PodcastsPlayed() string {
+	return Catalog.Format(msgs.locale, "podcastsPlayed", nil)
+}
+
+// PodcastsLeft says "{time} left"
+// in the language the app shows.
+func PodcastsLeft(time_ string) string { return In(i18n.Locale()).PodcastsLeft(time_) }
+
+// PodcastsLeft says "{time} left"
+// in the language of msgs.
+func (msgs Messages) PodcastsLeft(time_ string) string {
+	return Catalog.Format(msgs.locale, "podcastsLeft", map[string]any{"time": time_})
+}
+
+// PodcastsOpen says "Open"
+// in the language the app shows.
+func PodcastsOpen() string { return In(i18n.Locale()).PodcastsOpen() }
+
+// PodcastsOpen says "Open"
+// in the language of msgs.
+func (msgs Messages) PodcastsOpen() string {
+	return Catalog.Format(msgs.locale, "podcastsOpen", nil)
+}
+
+// PodcastsPlay says "Play"
+// in the language the app shows.
+func PodcastsPlay() string { return In(i18n.Locale()).PodcastsPlay() }
+
+// PodcastsPlay says "Play"
+// in the language of msgs.
+func (msgs Messages) PodcastsPlay() string {
+	return Catalog.Format(msgs.locale, "podcastsPlay", nil)
+}
+
+// PodcastsPodcast says "Podcast"
+// in the language the app shows.
+func PodcastsPodcast() string { return In(i18n.Locale()).PodcastsPodcast() }
+
+// PodcastsPodcast says "Podcast"
+// in the language of msgs.
+func (msgs Messages) PodcastsPodcast() string {
+	return Catalog.Format(msgs.locale, "podcastsPodcast", nil)
+}
+
+// PodcastsGoToPodcast says "Go to podcast"
+// in the language the app shows.
+func PodcastsGoToPodcast() string { return In(i18n.Locale()).PodcastsGoToPodcast() }
+
+// PodcastsGoToPodcast says "Go to podcast"
+// in the language of msgs.
+func (msgs Messages) PodcastsGoToPodcast() string {
+	return Catalog.Format(msgs.locale, "podcastsGoToPodcast", nil)
+}
+
+// PodcastsMarkPlayed says "Mark as played"
+// in the language the app shows.
+func PodcastsMarkPlayed() string { return In(i18n.Locale()).PodcastsMarkPlayed() }
+
+// PodcastsMarkPlayed says "Mark as played"
+// in the language of msgs.
+func (msgs Messages) PodcastsMarkPlayed() string {
+	return Catalog.Format(msgs.locale, "podcastsMarkPlayed", nil)
+}
+
+// PodcastsMarkUnplayed says "Mark as unplayed"
+// in the language the app shows.
+func PodcastsMarkUnplayed() string { return In(i18n.Locale()).PodcastsMarkUnplayed() }
+
+// PodcastsMarkUnplayed says "Mark as unplayed"
+// in the language of msgs.
+func (msgs Messages) PodcastsMarkUnplayed() string {
+	return Catalog.Format(msgs.locale, "podcastsMarkUnplayed", nil)
+}
+
+// PodcastsNothingToPlay says "Nothing to play here"
+// in the language the app shows.
+func PodcastsNothingToPlay() string { return In(i18n.Locale()).PodcastsNothingToPlay() }
+
+// PodcastsNothingToPlay says "Nothing to play here"
+// in the language of msgs.
+func (msgs Messages) PodcastsNothingToPlay() string {
+	return Catalog.Format(msgs.locale, "podcastsNothingToPlay", nil)
+}
+
+// PodcastsEpisodes says "Episodes"
+// in the language the app shows.
+func PodcastsEpisodes() string { return In(i18n.Locale()).PodcastsEpisodes() }
+
+// PodcastsEpisodes says "Episodes"
+// in the language of msgs.
+func (msgs Messages) PodcastsEpisodes() string {
+	return Catalog.Format(msgs.locale, "podcastsEpisodes", nil)
+}
+
+// PodcastsNoMatch says "No episodes match."
+// in the language the app shows.
+func PodcastsNoMatch() string { return In(i18n.Locale()).PodcastsNoMatch() }
+
+// PodcastsNoMatch says "No episodes match."
+// in the language of msgs.
+func (msgs Messages) PodcastsNoMatch() string {
+	return Catalog.Format(msgs.locale, "podcastsNoMatch", nil)
+}
+
+// PodcastsKeepListening says "Keep listening"
+// in the language the app shows.
+func PodcastsKeepListening() string { return In(i18n.Locale()).PodcastsKeepListening() }
+
+// PodcastsKeepListening says "Keep listening"
+// in the language of msgs.
+func (msgs Messages) PodcastsKeepListening() string {
+	return Catalog.Format(msgs.locale, "podcastsKeepListening", nil)
+}
+
+// PodcastsFollowingTitle says "Following"
+// in the language the app shows.
+func PodcastsFollowingTitle() string { return In(i18n.Locale()).PodcastsFollowingTitle() }
+
+// PodcastsFollowingTitle says "Following"
+// in the language of msgs.
+func (msgs Messages) PodcastsFollowingTitle() string {
+	return Catalog.Format(msgs.locale, "podcastsFollowingTitle", nil)
+}
+
+// PodcastsNothingFollowed says "Nothing followed yet"
+// in the language the app shows.
+func PodcastsNothingFollowed() string { return In(i18n.Locale()).PodcastsNothingFollowed() }
+
+// PodcastsNothingFollowed says "Nothing followed yet"
+// in the language of msgs.
+func (msgs Messages) PodcastsNothingFollowed() string {
+	return Catalog.Format(msgs.locale, "podcastsNothingFollowed", nil)
+}
+
+// PodcastsFollowHint says "Follow a podcast from its page, from Spotify or YouTube Music, and it waits here."
+// in the language the app shows.
+func PodcastsFollowHint() string { return In(i18n.Locale()).PodcastsFollowHint() }
+
+// PodcastsFollowHint says "Follow a podcast from its page, from Spotify or YouTube Music, and it waits here."
+// in the language of msgs.
+func (msgs Messages) PodcastsFollowHint() string {
+	return Catalog.Format(msgs.locale, "podcastsFollowHint", nil)
+}
+
+// PodcastsSavedOn says "Saved on {source}"
+// in the language the app shows.
+func PodcastsSavedOn(source string) string { return In(i18n.Locale()).PodcastsSavedOn(source) }
+
+// PodcastsSavedOn says "Saved on {source}"
+// in the language of msgs.
+func (msgs Messages) PodcastsSavedOn(source string) string {
+	return Catalog.Format(msgs.locale, "podcastsSavedOn", map[string]any{"source": source})
+}
+
+// PodcastsFollowed says "{title}: following"
+// in the language the app shows.
+func PodcastsFollowed(title string) string { return In(i18n.Locale()).PodcastsFollowed(title) }
+
+// PodcastsFollowed says "{title}: following"
+// in the language of msgs.
+func (msgs Messages) PodcastsFollowed(title string) string {
+	return Catalog.Format(msgs.locale, "podcastsFollowed", map[string]any{"title": title})
+}
+
+// PodcastsUnfollowed says "{title}: no longer following"
+// in the language the app shows.
+func PodcastsUnfollowed(title string) string { return In(i18n.Locale()).PodcastsUnfollowed(title) }
+
+// PodcastsUnfollowed says "{title}: no longer following"
+// in the language of msgs.
+func (msgs Messages) PodcastsUnfollowed(title string) string {
+	return Catalog.Format(msgs.locale, "podcastsUnfollowed", map[string]any{"title": title})
+}
+
+// EpisodeLyrics says "Lyrics"
+// in the language the app shows.
+func EpisodeLyrics() string { return In(i18n.Locale()).EpisodeLyrics() }
+
+// EpisodeLyrics says "Lyrics"
+// in the language of msgs.
+func (msgs Messages) EpisodeLyrics() string {
+	return Catalog.Format(msgs.locale, "episodeLyrics", nil)
+}
+
+// EpisodeDetails says "Details"
+// in the language the app shows.
+func EpisodeDetails() string { return In(i18n.Locale()).EpisodeDetails() }
+
+// EpisodeDetails says "Details"
+// in the language of msgs.
+func (msgs Messages) EpisodeDetails() string {
+	return Catalog.Format(msgs.locale, "episodeDetails", nil)
+}
+
+// EpisodeLooking says "Looking for the details…"
+// in the language the app shows.
+func EpisodeLooking() string { return In(i18n.Locale()).EpisodeLooking() }
+
+// EpisodeLooking says "Looking for the details…"
+// in the language of msgs.
+func (msgs Messages) EpisodeLooking() string {
+	return Catalog.Format(msgs.locale, "episodeLooking", nil)
+}
+
+// EpisodeTryAgain says "try again"
+// in the language the app shows.
+func EpisodeTryAgain() string { return In(i18n.Locale()).EpisodeTryAgain() }
+
+// EpisodeTryAgain says "try again"
+// in the language of msgs.
+func (msgs Messages) EpisodeTryAgain() string {
+	return Catalog.Format(msgs.locale, "episodeTryAgain", nil)
+}
+
+// EpisodeNoDescription says "This episode has no description."
+// in the language the app shows.
+func EpisodeNoDescription() string { return In(i18n.Locale()).EpisodeNoDescription() }
+
+// EpisodeNoDescription says "This episode has no description."
+// in the language of msgs.
+func (msgs Messages) EpisodeNoDescription() string {
+	return Catalog.Format(msgs.locale, "episodeNoDescription", nil)
+}
+
+// EpisodePlayFrom says "Play from {text}"
+// in the language the app shows.
+func EpisodePlayFrom(text string) string { return In(i18n.Locale()).EpisodePlayFrom(text) }
+
+// EpisodePlayFrom says "Play from {text}"
+// in the language of msgs.
+func (msgs Messages) EpisodePlayFrom(text string) string {
+	return Catalog.Format(msgs.locale, "episodePlayFrom", map[string]any{"text": text})
+}
+
+// EpisodeNoChapters says "No chapters."
+// in the language the app shows.
+func EpisodeNoChapters() string { return In(i18n.Locale()).EpisodeNoChapters() }
+
+// EpisodeNoChapters says "No chapters."
+// in the language of msgs.
+func (msgs Messages) EpisodeNoChapters() string {
+	return Catalog.Format(msgs.locale, "episodeNoChapters", nil)
+}
+
+// ExploreTabNew says "New"
+// in the language the app shows.
+func ExploreTabNew() string { return In(i18n.Locale()).ExploreTabNew() }
+
+// ExploreTabNew says "New"
+// in the language of msgs.
+func (msgs Messages) ExploreTabNew() string {
+	return Catalog.Format(msgs.locale, "exploreTabNew", nil)
+}
+
+// ExploreTabCharts says "Charts"
+// in the language the app shows.
+func ExploreTabCharts() string { return In(i18n.Locale()).ExploreTabCharts() }
+
+// ExploreTabCharts says "Charts"
+// in the language of msgs.
+func (msgs Messages) ExploreTabCharts() string {
+	return Catalog.Format(msgs.locale, "exploreTabCharts", nil)
+}
+
+// ExploreTabMoods says "Moods & genres"
+// in the language the app shows.
+func ExploreTabMoods() string { return In(i18n.Locale()).ExploreTabMoods() }
+
+// ExploreTabMoods says "Moods & genres"
+// in the language of msgs.
+func (msgs Messages) ExploreTabMoods() string {
+	return Catalog.Format(msgs.locale, "exploreTabMoods", nil)
+}
+
+// ExploreTitle says "Explore"
+// in the language the app shows.
+func ExploreTitle() string { return In(i18n.Locale()).ExploreTitle() }
+
+// ExploreTitle says "Explore"
+// in the language of msgs.
+func (msgs Messages) ExploreTitle() string {
+	return Catalog.Format(msgs.locale, "exploreTitle", nil)
+}
+
+// ExploreNothingHere says "YouTube Music shows nothing here right now."
+// in the language the app shows.
+func ExploreNothingHere() string { return In(i18n.Locale()).ExploreNothingHere() }
+
+// ExploreNothingHere says "YouTube Music shows nothing here right now."
+// in the language of msgs.
+func (msgs Messages) ExploreNothingHere() string {
+	return Catalog.Format(msgs.locale, "exploreNothingHere", nil)
+}
+
+// ExploreMoodPlaylists says "Playlists for {title}"
+// in the language the app shows.
+func ExploreMoodPlaylists(title string) string { return In(i18n.Locale()).ExploreMoodPlaylists(title) }
+
+// ExploreMoodPlaylists says "Playlists for {title}"
+// in the language of msgs.
+func (msgs Messages) ExploreMoodPlaylists(title string) string {
+	return Catalog.Format(msgs.locale, "exploreMoodPlaylists", map[string]any{"title": title})
+}
+
+// ExploreMood says "Mood"
+// in the language the app shows.
+func ExploreMood() string { return In(i18n.Locale()).ExploreMood() }
+
+// ExploreMood says "Mood"
+// in the language of msgs.
+func (msgs Messages) ExploreMood() string {
+	return Catalog.Format(msgs.locale, "exploreMood", nil)
+}
+
+// ExploreAddToMix says "Add to mix"
+// in the language the app shows.
+func ExploreAddToMix() string { return In(i18n.Locale()).ExploreAddToMix() }
+
+// ExploreAddToMix says "Add to mix"
+// in the language of msgs.
+func (msgs Messages) ExploreAddToMix() string {
+	return Catalog.Format(msgs.locale, "exploreAddToMix", nil)
+}
+
+// ExploreAddToYouTube says "Add to YouTube Music playlist"
+// in the language the app shows.
+func ExploreAddToYouTube() string { return In(i18n.Locale()).ExploreAddToYouTube() }
+
+// ExploreAddToYouTube says "Add to YouTube Music playlist"
+// in the language of msgs.
+func (msgs Messages) ExploreAddToYouTube() string {
+	return Catalog.Format(msgs.locale, "exploreAddToYouTube", nil)
+}
+
+// ExploreNewPlaylist says "New playlist…"
+// in the language the app shows.
+func ExploreNewPlaylist() string { return In(i18n.Locale()).ExploreNewPlaylist() }
+
+// ExploreNewPlaylist says "New playlist…"
+// in the language of msgs.
+func (msgs Messages) ExploreNewPlaylist() string {
+	return Catalog.Format(msgs.locale, "exploreNewPlaylist", nil)
+}
+
+// ExploreNewYouTubePlaylist says "New playlist on YouTube Music"
+// in the language the app shows.
+func ExploreNewYouTubePlaylist() string { return In(i18n.Locale()).ExploreNewYouTubePlaylist() }
+
+// ExploreNewYouTubePlaylist says "New playlist on YouTube Music"
+// in the language of msgs.
+func (msgs Messages) ExploreNewYouTubePlaylist() string {
+	return Catalog.Format(msgs.locale, "exploreNewYouTubePlaylist", nil)
+}
+
+// ExploreLoadingPlaylists says "Loading your playlists…"
+// in the language the app shows.
+func ExploreLoadingPlaylists() string { return In(i18n.Locale()).ExploreLoadingPlaylists() }
+
+// ExploreLoadingPlaylists says "Loading your playlists…"
+// in the language of msgs.
+func (msgs Messages) ExploreLoadingPlaylists() string {
+	return Catalog.Format(msgs.locale, "exploreLoadingPlaylists", nil)
+}
+
+// ExploreLoadPlaylistsFailed says "Couldn't load your playlists"
+// in the language the app shows.
+func ExploreLoadPlaylistsFailed() string { return In(i18n.Locale()).ExploreLoadPlaylistsFailed() }
+
+// ExploreLoadPlaylistsFailed says "Couldn't load your playlists"
+// in the language of msgs.
+func (msgs Messages) ExploreLoadPlaylistsFailed() string {
+	return Catalog.Format(msgs.locale, "exploreLoadPlaylistsFailed", nil)
+}
+
+// ExploreNoPlaylists says "No playlists of yours"
+// in the language the app shows.
+func ExploreNoPlaylists() string { return In(i18n.Locale()).ExploreNoPlaylists() }
+
+// ExploreNoPlaylists says "No playlists of yours"
+// in the language of msgs.
+func (msgs Messages) ExploreNoPlaylists() string {
+	return Catalog.Format(msgs.locale, "exploreNoPlaylists", nil)
+}
+
+// ExploreNewMixItem says "New mix…"
+// in the language the app shows.
+func ExploreNewMixItem() string { return In(i18n.Locale()).ExploreNewMixItem() }
+
+// ExploreNewMixItem says "New mix…"
+// in the language of msgs.
+func (msgs Messages) ExploreNewMixItem() string {
+	return Catalog.Format(msgs.locale, "exploreNewMixItem", nil)
+}
+
+// ExploreFinding says "Finding the tracks on YouTube Music…"
+// in the language the app shows.
+func ExploreFinding() string { return In(i18n.Locale()).ExploreFinding() }
+
+// ExploreFinding says "Finding the tracks on YouTube Music…"
+// in the language of msgs.
+func (msgs Messages) ExploreFinding() string {
+	return Catalog.Format(msgs.locale, "exploreFinding", nil)
+}
+
+// ExploreCouldntCreate says "Couldn't create {title}: {error}"
+// in the language the app shows.
+func ExploreCouldntCreate(title string, error string) string {
+	return In(i18n.Locale()).ExploreCouldntCreate(title, error)
+}
+
+// ExploreCouldntCreate says "Couldn't create {title}: {error}"
+// in the language of msgs.
+func (msgs Messages) ExploreCouldntCreate(title string, error string) string {
+	return Catalog.Format(msgs.locale, "exploreCouldntCreate", map[string]any{"title": title, "error": error})
+}
+
+// ExploreCreatedOnYouTube says "Created {title} on YouTube Music"
+// in the language the app shows.
+func ExploreCreatedOnYouTube(title string) string {
+	return In(i18n.Locale()).ExploreCreatedOnYouTube(title)
+}
+
+// ExploreCreatedOnYouTube says "Created {title} on YouTube Music"
+// in the language of msgs.
+func (msgs Messages) ExploreCreatedOnYouTube(title string) string {
+	return Catalog.Format(msgs.locale, "exploreCreatedOnYouTube", map[string]any{"title": title})
+}
+
+// ExploreCreated says "Created {title}"
+// in the language the app shows.
+func ExploreCreated(title string) string { return In(i18n.Locale()).ExploreCreated(title) }
+
+// ExploreCreated says "Created {title}"
+// in the language of msgs.
+func (msgs Messages) ExploreCreated(title string) string {
+	return Catalog.Format(msgs.locale, "exploreCreated", map[string]any{"title": title})
+}
+
+// RecapLabel says "Your year"
+// in the language the app shows.
+func RecapLabel() string { return In(i18n.Locale()).RecapLabel() }
+
+// RecapLabel says "Your year"
+// in the language of msgs.
+func (msgs Messages) RecapLabel() string {
+	return Catalog.Format(msgs.locale, "recapLabel", nil)
+}
+
+// RecapYouPlayed says "In {year} you played "
+// in the language the app shows.
+func RecapYouPlayed(year string) string { return In(i18n.Locale()).RecapYouPlayed(year) }
+
+// RecapYouPlayed says "In {year} you played "
+// in the language of msgs.
+func (msgs Messages) RecapYouPlayed(year string) string {
+	return Catalog.Format(msgs.locale, "recapYouPlayed", map[string]any{"year": year})
+}
+
+// RecapTracksPlayed says "{count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+func RecapTracksPlayed(count int) string { return In(i18n.Locale()).RecapTracksPlayed(count) }
+
+// RecapTracksPlayed says "{count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+func (msgs Messages) RecapTracksPlayed(count int) string {
+	return Catalog.Format(msgs.locale, "recapTracksPlayed", map[string]any{"count": count})
+}
+
+// RecapFor says " for "
+// in the language the app shows.
+func RecapFor() string { return In(i18n.Locale()).RecapFor() }
+
+// RecapFor says " for "
+// in the language of msgs.
+func (msgs Messages) RecapFor() string {
+	return Catalog.Format(msgs.locale, "recapFor", nil)
+}
+
+// RecapMinutes says "{minutes} minutes"
+// in the language the app shows.
+func RecapMinutes(minutes string) string { return In(i18n.Locale()).RecapMinutes(minutes) }
+
+// RecapMinutes says "{minutes} minutes"
+// in the language of msgs.
+func (msgs Messages) RecapMinutes(minutes string) string {
+	return Catalog.Format(msgs.locale, "recapMinutes", map[string]any{"minutes": minutes})
+}
+
+// RecapPeriod says "."
+// in the language the app shows.
+func RecapPeriod() string { return In(i18n.Locale()).RecapPeriod() }
+
+// RecapPeriod says "."
+// in the language of msgs.
+func (msgs Messages) RecapPeriod() string {
+	return Catalog.Format(msgs.locale, "recapPeriod", nil)
+}
+
+// RecapTopSongs says "Top songs"
+// in the language the app shows.
+func RecapTopSongs() string { return In(i18n.Locale()).RecapTopSongs() }
+
+// RecapTopSongs says "Top songs"
+// in the language of msgs.
+func (msgs Messages) RecapTopSongs() string {
+	return Catalog.Format(msgs.locale, "recapTopSongs", nil)
+}
+
+// RecapTopArtists says "Top artists"
+// in the language the app shows.
+func RecapTopArtists() string { return In(i18n.Locale()).RecapTopArtists() }
+
+// RecapTopArtists says "Top artists"
+// in the language of msgs.
+func (msgs Messages) RecapTopArtists() string {
+	return Catalog.Format(msgs.locale, "recapTopArtists", nil)
+}
+
+// RecapTopAlbums says "Top albums"
+// in the language the app shows.
+func RecapTopAlbums() string { return In(i18n.Locale()).RecapTopAlbums() }
+
+// RecapTopAlbums says "Top albums"
+// in the language of msgs.
+func (msgs Messages) RecapTopAlbums() string {
+	return Catalog.Format(msgs.locale, "recapTopAlbums", nil)
+}
+
+// RecapNothingToRank says "Nothing to rank"
+// in the language the app shows.
+func RecapNothingToRank() string { return In(i18n.Locale()).RecapNothingToRank() }
+
+// RecapNothingToRank says "Nothing to rank"
+// in the language of msgs.
+func (msgs Messages) RecapNothingToRank() string {
+	return Catalog.Format(msgs.locale, "recapNothingToRank", nil)
+}
+
+// RecapMoments says "Moments"
+// in the language the app shows.
+func RecapMoments() string { return In(i18n.Locale()).RecapMoments() }
+
+// RecapMoments says "Moments"
+// in the language of msgs.
+func (msgs Messages) RecapMoments() string {
+	return Catalog.Format(msgs.locale, "recapMoments", nil)
+}
+
+// RecapShare says "Share"
+// in the language the app shows.
+func RecapShare() string { return In(i18n.Locale()).RecapShare() }
+
+// RecapShare says "Share"
+// in the language of msgs.
+func (msgs Messages) RecapShare() string {
+	return Catalog.Format(msgs.locale, "recapShare", nil)
+}
+
+// RecapSaveImage says "save image"
+// in the language the app shows.
+func RecapSaveImage() string { return In(i18n.Locale()).RecapSaveImage() }
+
+// RecapSaveImage says "save image"
+// in the language of msgs.
+func (msgs Messages) RecapSaveImage() string {
+	return Catalog.Format(msgs.locale, "recapSaveImage", nil)
+}
+
+// RecapSaveStory says "save image for a story"
+// in the language the app shows.
+func RecapSaveStory() string { return In(i18n.Locale()).RecapSaveStory() }
+
+// RecapSaveStory says "save image for a story"
+// in the language of msgs.
+func (msgs Messages) RecapSaveStory() string {
+	return Catalog.Format(msgs.locale, "recapSaveStory", nil)
+}
+
+// RecapDetail says "{detail}, {plays, plural, one {# play} other {# plays}}"
+// in the language the app shows.
+func RecapDetail(detail string, plays int) string {
+	return In(i18n.Locale()).RecapDetail(detail, plays)
+}
+
+// RecapDetail says "{detail}, {plays, plural, one {# play} other {# plays}}"
+// in the language of msgs.
+func (msgs Messages) RecapDetail(detail string, plays int) string {
+	return Catalog.Format(msgs.locale, "recapDetail", map[string]any{"detail": detail, "plays": plays})
+}
+
+// RecapPlays says "{plays, plural, one {# play} other {# plays}}"
+// in the language the app shows.
+func RecapPlays(plays int) string { return In(i18n.Locale()).RecapPlays(plays) }
+
+// RecapPlays says "{plays, plural, one {# play} other {# plays}}"
+// in the language of msgs.
+func (msgs Messages) RecapPlays(plays int) string {
+	return Catalog.Format(msgs.locale, "recapPlays", map[string]any{"plays": plays})
+}
+
+// RecapBusiest says "You listened most in {month}: {minutes, plural, one {# minute} other {# minutes}}."
+// in the language the app shows.
+func RecapBusiest(month string, minutes int) string {
+	return In(i18n.Locale()).RecapBusiest(month, minutes)
+}
+
+// RecapBusiest says "You listened most in {month}: {minutes, plural, one {# minute} other {# minutes}}."
+// in the language of msgs.
+func (msgs Messages) RecapBusiest(month string, minutes int) string {
+	return Catalog.Format(msgs.locale, "recapBusiest", map[string]any{"month": month, "minutes": minutes})
+}
+
+// RecapBegan says "The year began with {song}, on {day}."
+// in the language the app shows.
+func RecapBegan(song string, day string) string { return In(i18n.Locale()).RecapBegan(song, day) }
+
+// RecapBegan says "The year began with {song}, on {day}."
+// in the language of msgs.
+func (msgs Messages) RecapBegan(song string, day string) string {
+	return Catalog.Format(msgs.locale, "recapBegan", map[string]any{"song": song, "day": day})
+}
+
+// RecapRepeated says "You played {song} {times} times on {day}."
+// in the language the app shows.
+func RecapRepeated(song string, times string, day string) string {
+	return In(i18n.Locale()).RecapRepeated(song, times, day)
+}
+
+// RecapRepeated says "You played {song} {times} times on {day}."
+// in the language of msgs.
+func (msgs Messages) RecapRepeated(song string, times string, day string) string {
+	return Catalog.Format(msgs.locale, "recapRepeated", map[string]any{"song": song, "times": times, "day": day})
+}
+
+// RecapFound says "You found {count, plural, one {# new artist} other {# new artists}}."
+// in the language the app shows.
+func RecapFound(count int) string { return In(i18n.Locale()).RecapFound(count) }
+
+// RecapFound says "You found {count, plural, one {# new artist} other {# new artists}}."
+// in the language of msgs.
+func (msgs Messages) RecapFound(count int) string {
+	return Catalog.Format(msgs.locale, "recapFound", map[string]any{"count": count})
+}
+
+// RecapSongBy says "“{title}” by {artist}"
+// in the language the app shows.
+func RecapSongBy(title string, artist string) string {
+	return In(i18n.Locale()).RecapSongBy(title, artist)
+}
+
+// RecapSongBy says "“{title}” by {artist}"
+// in the language of msgs.
+func (msgs Messages) RecapSongBy(title string, artist string) string {
+	return Catalog.Format(msgs.locale, "recapSongBy", map[string]any{"title": title, "artist": artist})
+}
+
+// RecapCardHeading says "YOUR {year} IN MUSIC"
+// in the language the app shows.
+func RecapCardHeading(year string) string { return In(i18n.Locale()).RecapCardHeading(year) }
+
+// RecapCardHeading says "YOUR {year} IN MUSIC"
+// in the language of msgs.
+func (msgs Messages) RecapCardHeading(year string) string {
+	return Catalog.Format(msgs.locale, "recapCardHeading", map[string]any{"year": year})
+}
+
+// RecapCardMinutes says "minutes of music, {plays, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+func RecapCardMinutes(plays int) string { return In(i18n.Locale()).RecapCardMinutes(plays) }
+
+// RecapCardMinutes says "minutes of music, {plays, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+func (msgs Messages) RecapCardMinutes(plays int) string {
+	return Catalog.Format(msgs.locale, "recapCardMinutes", map[string]any{"plays": plays})
+}
+
+// HomeFilterEverything says "Everything"
+// in the language the app shows.
+func HomeFilterEverything() string { return In(i18n.Locale()).HomeFilterEverything() }
+
+// HomeFilterEverything says "Everything"
+// in the language of msgs.
+func (msgs Messages) HomeFilterEverything() string {
+	return Catalog.Format(msgs.locale, "homeFilterEverything", nil)
+}
+
+// HomeFilterYours says "Yours"
+// in the language the app shows.
+func HomeFilterYours() string { return In(i18n.Locale()).HomeFilterYours() }
+
+// HomeFilterYours says "Yours"
+// in the language of msgs.
+func (msgs Messages) HomeFilterYours() string {
+	return Catalog.Format(msgs.locale, "homeFilterYours", nil)
+}
+
+// HomeTitle says "Home"
+// in the language the app shows.
+func HomeTitle() string { return In(i18n.Locale()).HomeTitle() }
+
+// HomeTitle says "Home"
+// in the language of msgs.
+func (msgs Messages) HomeTitle() string {
+	return Catalog.Format(msgs.locale, "homeTitle", nil)
+}
+
+// HomeEditButton says "edit home"
+// in the language the app shows.
+func HomeEditButton() string { return In(i18n.Locale()).HomeEditButton() }
+
+// HomeEditButton says "edit home"
+// in the language of msgs.
+func (msgs Messages) HomeEditButton() string {
+	return Catalog.Format(msgs.locale, "homeEditButton", nil)
+}
+
+// HomeStartHere says "Start here"
+// in the language the app shows.
+func HomeStartHere() string { return In(i18n.Locale()).HomeStartHere() }
+
+// HomeStartHere says "Start here"
+// in the language of msgs.
+func (msgs Messages) HomeStartHere() string {
+	return Catalog.Format(msgs.locale, "homeStartHere", nil)
+}
+
+// HomeStartCaption says "Search for something to play"
+// in the language the app shows.
+func HomeStartCaption() string { return In(i18n.Locale()).HomeStartCaption() }
+
+// HomeStartCaption says "Search for something to play"
+// in the language of msgs.
+func (msgs Messages) HomeStartCaption() string {
+	return Catalog.Format(msgs.locale, "homeStartCaption", nil)
+}
+
+// HomeSearchMusic says "Search for music"
+// in the language the app shows.
+func HomeSearchMusic() string { return In(i18n.Locale()).HomeSearchMusic() }
+
+// HomeSearchMusic says "Search for music"
+// in the language of msgs.
+func (msgs Messages) HomeSearchMusic() string {
+	return Catalog.Format(msgs.locale, "homeSearchMusic", nil)
+}
+
+// HomeJumpBack says "Jump back in"
+// in the language the app shows.
+func HomeJumpBack() string { return In(i18n.Locale()).HomeJumpBack() }
+
+// HomeJumpBack says "Jump back in"
+// in the language of msgs.
+func (msgs Messages) HomeJumpBack() string {
+	return Catalog.Format(msgs.locale, "homeJumpBack", nil)
+}
+
+// HomePlayAgain says "Play {title} again"
+// in the language the app shows.
+func HomePlayAgain(title string) string { return In(i18n.Locale()).HomePlayAgain(title) }
+
+// HomePlayAgain says "Play {title} again"
+// in the language of msgs.
+func (msgs Messages) HomePlayAgain(title string) string {
+	return Catalog.Format(msgs.locale, "homePlayAgain", map[string]any{"title": title})
+}
+
+// HomeAddSpotify says "Add Spotify"
+// in the language the app shows.
+func HomeAddSpotify() string { return In(i18n.Locale()).HomeAddSpotify() }
+
+// HomeAddSpotify says "Add Spotify"
+// in the language of msgs.
+func (msgs Messages) HomeAddSpotify() string {
+	return Catalog.Format(msgs.locale, "homeAddSpotify", nil)
+}
+
+// HomeAddSpotifyCaption says "Sign in to search and play your Spotify library here"
+// in the language the app shows.
+func HomeAddSpotifyCaption() string { return In(i18n.Locale()).HomeAddSpotifyCaption() }
+
+// HomeAddSpotifyCaption says "Sign in to search and play your Spotify library here"
+// in the language of msgs.
+func (msgs Messages) HomeAddSpotifyCaption() string {
+	return Catalog.Format(msgs.locale, "homeAddSpotifyCaption", nil)
+}
+
+// HomeTrackCount says "{count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+func HomeTrackCount(count int) string { return In(i18n.Locale()).HomeTrackCount(count) }
+
+// HomeTrackCount says "{count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+func (msgs Messages) HomeTrackCount(count int) string {
+	return Catalog.Format(msgs.locale, "homeTrackCount", map[string]any{"count": count})
+}
+
+// HomeMixCount says "{count, plural, one {# mix} other {# mixes}}"
+// in the language the app shows.
+func HomeMixCount(count int) string { return In(i18n.Locale()).HomeMixCount(count) }
+
+// HomeMixCount says "{count, plural, one {# mix} other {# mixes}}"
+// in the language of msgs.
+func (msgs Messages) HomeMixCount(count int) string {
+	return Catalog.Format(msgs.locale, "homeMixCount", map[string]any{"count": count})
+}
+
+// HomeOpenDownloads says "open downloads"
+// in the language the app shows.
+func HomeOpenDownloads() string { return In(i18n.Locale()).HomeOpenDownloads() }
+
+// HomeOpenDownloads says "open downloads"
+// in the language of msgs.
+func (msgs Messages) HomeOpenDownloads() string {
+	return Catalog.Format(msgs.locale, "homeOpenDownloads", nil)
+}
+
+// HomeSpotifyEmpty says "Sign in to Spotify in Settings › Accounts to see your playlists and recent tracks here."
+// in the language the app shows.
+func HomeSpotifyEmpty() string { return In(i18n.Locale()).HomeSpotifyEmpty() }
+
+// HomeSpotifyEmpty says "Sign in to Spotify in Settings › Accounts to see your playlists and recent tracks here."
+// in the language of msgs.
+func (msgs Messages) HomeSpotifyEmpty() string {
+	return Catalog.Format(msgs.locale, "homeSpotifyEmpty", nil)
+}
+
+// HomeLocalEmpty says "Play some tracks and make a mix: what you collect shows here."
+// in the language the app shows.
+func HomeLocalEmpty() string { return In(i18n.Locale()).HomeLocalEmpty() }
+
+// HomeLocalEmpty says "Play some tracks and make a mix: what you collect shows here."
+// in the language of msgs.
+func (msgs Messages) HomeLocalEmpty() string {
+	return Catalog.Format(msgs.locale, "homeLocalEmpty", nil)
+}
+
+// HomeNothingYet says "Nothing here yet."
+// in the language the app shows.
+func HomeNothingYet() string { return In(i18n.Locale()).HomeNothingYet() }
+
+// HomeNothingYet says "Nothing here yet."
+// in the language of msgs.
+func (msgs Messages) HomeNothingYet() string {
+	return Catalog.Format(msgs.locale, "homeNothingYet", nil)
+}
+
+// HomeEditDone says "done"
+// in the language the app shows.
+func HomeEditDone() string { return In(i18n.Locale()).HomeEditDone() }
+
+// HomeEditDone says "done"
+// in the language of msgs.
+func (msgs Messages) HomeEditDone() string {
+	return Catalog.Format(msgs.locale, "homeEditDone", nil)
+}
+
+// HomeEditAddShelf says "add a shelf"
+// in the language the app shows.
+func HomeEditAddShelf() string { return In(i18n.Locale()).HomeEditAddShelf() }
+
+// HomeEditAddShelf says "add a shelf"
+// in the language of msgs.
+func (msgs Messages) HomeEditAddShelf() string {
+	return Catalog.Format(msgs.locale, "homeEditAddShelf", nil)
+}
+
+// HomeEditReset says "reset home"
+// in the language the app shows.
+func HomeEditReset() string { return In(i18n.Locale()).HomeEditReset() }
+
+// HomeEditReset says "reset home"
+// in the language of msgs.
+func (msgs Messages) HomeEditReset() string {
+	return Catalog.Format(msgs.locale, "homeEditReset", nil)
+}
+
+// HomeEditResetBody says "Put Home's shelves back in their own order, show those you hid, and take off those you added?"
+// in the language the app shows.
+func HomeEditResetBody() string { return In(i18n.Locale()).HomeEditResetBody() }
+
+// HomeEditResetBody says "Put Home's shelves back in their own order, show those you hid, and take off those you added?"
+// in the language of msgs.
+func (msgs Messages) HomeEditResetBody() string {
+	return Catalog.Format(msgs.locale, "homeEditResetBody", nil)
+}
+
+// HomeEditResetButton says "reset"
+// in the language the app shows.
+func HomeEditResetButton() string { return In(i18n.Locale()).HomeEditResetButton() }
+
+// HomeEditResetButton says "reset"
+// in the language of msgs.
+func (msgs Messages) HomeEditResetButton() string {
+	return Catalog.Format(msgs.locale, "homeEditResetButton", nil)
+}
+
+// HomeEditHint says "Drag a shelf onto another to move it there, or press Alt+Up or Alt+Down on it. A shelf you hide waits under them, to …"
+// in the language the app shows.
+func HomeEditHint() string { return In(i18n.Locale()).HomeEditHint() }
+
+// HomeEditHint says "Drag a shelf onto another to move it there, or press Alt+Up or Alt+Down on it. A shelf you hide waits under them, to …"
+// in the language of msgs.
+func (msgs Messages) HomeEditHint() string {
+	return Catalog.Format(msgs.locale, "homeEditHint", nil)
+}
+
+// HomeEditHidden says "Hidden"
+// in the language the app shows.
+func HomeEditHidden() string { return In(i18n.Locale()).HomeEditHidden() }
+
+// HomeEditHidden says "Hidden"
+// in the language of msgs.
+func (msgs Messages) HomeEditHidden() string {
+	return Catalog.Format(msgs.locale, "homeEditHidden", nil)
+}
+
+// HomeEditRowLabel says "{title}, {source}"
+// in the language the app shows.
+func HomeEditRowLabel(title string, source string) string {
+	return In(i18n.Locale()).HomeEditRowLabel(title, source)
+}
+
+// HomeEditRowLabel says "{title}, {source}"
+// in the language of msgs.
+func (msgs Messages) HomeEditRowLabel(title string, source string) string {
+	return Catalog.Format(msgs.locale, "homeEditRowLabel", map[string]any{"title": title, "source": source})
+}
+
+// HomeEditRemove says "Remove {title} from Home"
+// in the language the app shows.
+func HomeEditRemove(title string) string { return In(i18n.Locale()).HomeEditRemove(title) }
+
+// HomeEditRemove says "Remove {title} from Home"
+// in the language of msgs.
+func (msgs Messages) HomeEditRemove(title string) string {
+	return Catalog.Format(msgs.locale, "homeEditRemove", map[string]any{"title": title})
+}
+
+// HomeEditHide says "Hide {title}"
+// in the language the app shows.
+func HomeEditHide(title string) string { return In(i18n.Locale()).HomeEditHide(title) }
+
+// HomeEditHide says "Hide {title}"
+// in the language of msgs.
+func (msgs Messages) HomeEditHide(title string) string {
+	return Catalog.Format(msgs.locale, "homeEditHide", map[string]any{"title": title})
+}
+
+// HomeEditShow says "show"
+// in the language the app shows.
+func HomeEditShow() string { return In(i18n.Locale()).HomeEditShow() }
+
+// HomeEditShow says "show"
+// in the language of msgs.
+func (msgs Messages) HomeEditShow() string {
+	return Catalog.Format(msgs.locale, "homeEditShow", nil)
+}
+
+// HomeEditShowTitle says "Show {title}"
+// in the language the app shows.
+func HomeEditShowTitle(title string) string { return In(i18n.Locale()).HomeEditShowTitle(title) }
+
+// HomeEditShowTitle says "Show {title}"
+// in the language of msgs.
+func (msgs Messages) HomeEditShowTitle(title string) string {
+	return Catalog.Format(msgs.locale, "homeEditShowTitle", map[string]any{"title": title})
+}
+
+// HomeEditLoadingPlaylists says "Loading your playlists…"
+// in the language the app shows.
+func HomeEditLoadingPlaylists() string { return In(i18n.Locale()).HomeEditLoadingPlaylists() }
+
+// HomeEditLoadingPlaylists says "Loading your playlists…"
+// in the language of msgs.
+func (msgs Messages) HomeEditLoadingPlaylists() string {
+	return Catalog.Format(msgs.locale, "homeEditLoadingPlaylists", nil)
+}
+
+// HomeEditLoadFailed says "Couldn't load your playlists"
+// in the language the app shows.
+func HomeEditLoadFailed() string { return In(i18n.Locale()).HomeEditLoadFailed() }
+
+// HomeEditLoadFailed says "Couldn't load your playlists"
+// in the language of msgs.
+func (msgs Messages) HomeEditLoadFailed() string {
+	return Catalog.Format(msgs.locale, "homeEditLoadFailed", nil)
+}
+
+// HomeEditNoPlaylists says "No playlists yet"
+// in the language the app shows.
+func HomeEditNoPlaylists() string { return In(i18n.Locale()).HomeEditNoPlaylists() }
+
+// HomeEditNoPlaylists says "No playlists yet"
+// in the language of msgs.
+func (msgs Messages) HomeEditNoPlaylists() string {
+	return Catalog.Format(msgs.locale, "homeEditNoPlaylists", nil)
+}
+
+// HomeEditSpotifyHidden says "Spotify shows apps the tracks of your own and shared playlists only"
+// in the language the app shows.
+func HomeEditSpotifyHidden() string { return In(i18n.Locale()).HomeEditSpotifyHidden() }
+
+// HomeEditSpotifyHidden says "Spotify shows apps the tracks of your own and shared playlists only"
+// in the language of msgs.
+func (msgs Messages) HomeEditSpotifyHidden() string {
+	return Catalog.Format(msgs.locale, "homeEditSpotifyHidden", nil)
+}
+
+// HomeEditYouTubePlaylist says "A YouTube Music playlist"
+// in the language the app shows.
+func HomeEditYouTubePlaylist() string { return In(i18n.Locale()).HomeEditYouTubePlaylist() }
+
+// HomeEditYouTubePlaylist says "A YouTube Music playlist"
+// in the language of msgs.
+func (msgs Messages) HomeEditYouTubePlaylist() string {
+	return Catalog.Format(msgs.locale, "homeEditYouTubePlaylist", nil)
+}
+
+// HomeEditSpotifyPlaylist says "A Spotify playlist"
+// in the language the app shows.
+func HomeEditSpotifyPlaylist() string { return In(i18n.Locale()).HomeEditSpotifyPlaylist() }
+
+// HomeEditSpotifyPlaylist says "A Spotify playlist"
+// in the language of msgs.
+func (msgs Messages) HomeEditSpotifyPlaylist() string {
+	return Catalog.Format(msgs.locale, "homeEditSpotifyPlaylist", nil)
+}
+
+// HomeEditOneMix says "One of your mixes"
+// in the language the app shows.
+func HomeEditOneMix() string { return In(i18n.Locale()).HomeEditOneMix() }
+
+// HomeEditOneMix says "One of your mixes"
+// in the language of msgs.
+func (msgs Messages) HomeEditOneMix() string {
+	return Catalog.Format(msgs.locale, "homeEditOneMix", nil)
+}
+
+// HomeEditNoMixes says "No mixes yet"
+// in the language the app shows.
+func HomeEditNoMixes() string { return In(i18n.Locale()).HomeEditNoMixes() }
+
+// HomeEditNoMixes says "No mixes yet"
+// in the language of msgs.
+func (msgs Messages) HomeEditNoMixes() string {
+	return Catalog.Format(msgs.locale, "homeEditNoMixes", nil)
+}
+
+// HomeEditArtistReleases says "An artist's new releases"
+// in the language the app shows.
+func HomeEditArtistReleases() string { return In(i18n.Locale()).HomeEditArtistReleases() }
+
+// HomeEditArtistReleases says "An artist's new releases"
+// in the language of msgs.
+func (msgs Messages) HomeEditArtistReleases() string {
+	return Catalog.Format(msgs.locale, "homeEditArtistReleases", nil)
+}
+
+// HomeEditFollowArtist says "Follow an artist to add their releases"
+// in the language the app shows.
+func HomeEditFollowArtist() string { return In(i18n.Locale()).HomeEditFollowArtist() }
+
+// HomeEditFollowArtist says "Follow an artist to add their releases"
+// in the language of msgs.
+func (msgs Messages) HomeEditFollowArtist() string {
+	return Catalog.Format(msgs.locale, "homeEditFollowArtist", nil)
+}
+
+// HomeEditNewFrom says "New from {name}"
+// in the language the app shows.
+func HomeEditNewFrom(name string) string { return In(i18n.Locale()).HomeEditNewFrom(name) }
+
+// HomeEditNewFrom says "New from {name}"
+// in the language of msgs.
+func (msgs Messages) HomeEditNewFrom(name string) string {
+	return Catalog.Format(msgs.locale, "homeEditNewFrom", map[string]any{"name": name})
+}
+
+// HomeEditRecent says "Recently played"
+// in the language the app shows.
+func HomeEditRecent() string { return In(i18n.Locale()).HomeEditRecent() }
+
+// HomeEditRecent says "Recently played"
+// in the language of msgs.
+func (msgs Messages) HomeEditRecent() string {
+	return Catalog.Format(msgs.locale, "homeEditRecent", nil)
+}
+
+// HomeEditMostPlayed says "Most played this month"
+// in the language the app shows.
+func HomeEditMostPlayed() string { return In(i18n.Locale()).HomeEditMostPlayed() }
+
+// HomeEditMostPlayed says "Most played this month"
+// in the language of msgs.
+func (msgs Messages) HomeEditMostPlayed() string {
+	return Catalog.Format(msgs.locale, "homeEditMostPlayed", nil)
+}
+
+// ShelvesNewReleases says "New from artists you follow"
+// in the language the app shows.
+func ShelvesNewReleases() string { return In(i18n.Locale()).ShelvesNewReleases() }
+
+// ShelvesNewReleases says "New from artists you follow"
+// in the language of msgs.
+func (msgs Messages) ShelvesNewReleases() string {
+	return Catalog.Format(msgs.locale, "shelvesNewReleases", nil)
+}
+
+// ShelvesTopMonth says "Most played this month"
+// in the language the app shows.
+func ShelvesTopMonth() string { return In(i18n.Locale()).ShelvesTopMonth() }
+
+// ShelvesTopMonth says "Most played this month"
+// in the language of msgs.
+func (msgs Messages) ShelvesTopMonth() string {
+	return Catalog.Format(msgs.locale, "shelvesTopMonth", nil)
+}
+
+// ShelvesDownloads says "Downloads"
+// in the language the app shows.
+func ShelvesDownloads() string { return In(i18n.Locale()).ShelvesDownloads() }
+
+// ShelvesDownloads says "Downloads"
+// in the language of msgs.
+func (msgs Messages) ShelvesDownloads() string {
+	return Catalog.Format(msgs.locale, "shelvesDownloads", nil)
+}
+
+// ShelvesNewFrom says "New from {name}"
+// in the language the app shows.
+func ShelvesNewFrom(name string) string { return In(i18n.Locale()).ShelvesNewFrom(name) }
+
+// ShelvesNewFrom says "New from {name}"
+// in the language of msgs.
+func (msgs Messages) ShelvesNewFrom(name string) string {
+	return Catalog.Format(msgs.locale, "shelvesNewFrom", map[string]any{"name": name})
+}
+
+// SearchPivotAll says "all"
+// in the language the app shows.
+func SearchPivotAll() string { return In(i18n.Locale()).SearchPivotAll() }
+
+// SearchPivotAll says "all"
+// in the language of msgs.
+func (msgs Messages) SearchPivotAll() string {
+	return Catalog.Format(msgs.locale, "searchPivotAll", nil)
+}
+
+// SearchPivotSongs says "songs"
+// in the language the app shows.
+func SearchPivotSongs() string { return In(i18n.Locale()).SearchPivotSongs() }
+
+// SearchPivotSongs says "songs"
+// in the language of msgs.
+func (msgs Messages) SearchPivotSongs() string {
+	return Catalog.Format(msgs.locale, "searchPivotSongs", nil)
+}
+
+// SearchPivotVideos says "videos"
+// in the language the app shows.
+func SearchPivotVideos() string { return In(i18n.Locale()).SearchPivotVideos() }
+
+// SearchPivotVideos says "videos"
+// in the language of msgs.
+func (msgs Messages) SearchPivotVideos() string {
+	return Catalog.Format(msgs.locale, "searchPivotVideos", nil)
+}
+
+// SearchPivotAlbums says "albums"
+// in the language the app shows.
+func SearchPivotAlbums() string { return In(i18n.Locale()).SearchPivotAlbums() }
+
+// SearchPivotAlbums says "albums"
+// in the language of msgs.
+func (msgs Messages) SearchPivotAlbums() string {
+	return Catalog.Format(msgs.locale, "searchPivotAlbums", nil)
+}
+
+// SearchPivotArtists says "artists"
+// in the language the app shows.
+func SearchPivotArtists() string { return In(i18n.Locale()).SearchPivotArtists() }
+
+// SearchPivotArtists says "artists"
+// in the language of msgs.
+func (msgs Messages) SearchPivotArtists() string {
+	return Catalog.Format(msgs.locale, "searchPivotArtists", nil)
+}
+
+// SearchPivotPlaylists says "playlists"
+// in the language the app shows.
+func SearchPivotPlaylists() string { return In(i18n.Locale()).SearchPivotPlaylists() }
+
+// SearchPivotPlaylists says "playlists"
+// in the language of msgs.
+func (msgs Messages) SearchPivotPlaylists() string {
+	return Catalog.Format(msgs.locale, "searchPivotPlaylists", nil)
+}
+
+// SearchPivotPodcasts says "podcasts"
+// in the language the app shows.
+func SearchPivotPodcasts() string { return In(i18n.Locale()).SearchPivotPodcasts() }
+
+// SearchPivotPodcasts says "podcasts"
+// in the language of msgs.
+func (msgs Messages) SearchPivotPodcasts() string {
+	return Catalog.Format(msgs.locale, "searchPivotPodcasts", nil)
+}
+
+// SearchScopeBoth says "both"
+// in the language the app shows.
+func SearchScopeBoth() string { return In(i18n.Locale()).SearchScopeBoth() }
+
+// SearchScopeBoth says "both"
+// in the language of msgs.
+func (msgs Messages) SearchScopeBoth() string {
+	return Catalog.Format(msgs.locale, "searchScopeBoth", nil)
+}
+
+// SearchServices says "Services"
+// in the language the app shows.
+func SearchServices() string { return In(i18n.Locale()).SearchServices() }
+
+// SearchServices says "Services"
+// in the language of msgs.
+func (msgs Messages) SearchServices() string {
+	return Catalog.Format(msgs.locale, "searchServices", nil)
+}
+
+// SearchNetEaseOnly says "Searching NetEase Cloud Music only. "
+// in the language the app shows.
+func SearchNetEaseOnly() string { return In(i18n.Locale()).SearchNetEaseOnly() }
+
+// SearchNetEaseOnly says "Searching NetEase Cloud Music only. "
+// in the language of msgs.
+func (msgs Messages) SearchNetEaseOnly() string {
+	return Catalog.Format(msgs.locale, "searchNetEaseOnly", nil)
+}
+
+// SearchSignInSpotify says "Sign in to Spotify"
+// in the language the app shows.
+func SearchSignInSpotify() string { return In(i18n.Locale()).SearchSignInSpotify() }
+
+// SearchSignInSpotify says "Sign in to Spotify"
+// in the language of msgs.
+func (msgs Messages) SearchSignInSpotify() string {
+	return Catalog.Format(msgs.locale, "searchSignInSpotify", nil)
+}
+
+// SearchSignInTail says " to search it too."
+// in the language the app shows.
+func SearchSignInTail() string { return In(i18n.Locale()).SearchSignInTail() }
+
+// SearchSignInTail says " to search it too."
+// in the language of msgs.
+func (msgs Messages) SearchSignInTail() string {
+	return Catalog.Format(msgs.locale, "searchSignInTail", nil)
+}
+
+// SearchSongs says "Songs"
+// in the language the app shows.
+func SearchSongs() string { return In(i18n.Locale()).SearchSongs() }
+
+// SearchSongs says "Songs"
+// in the language of msgs.
+func (msgs Messages) SearchSongs() string {
+	return Catalog.Format(msgs.locale, "searchSongs", nil)
+}
+
+// SearchNoSongs says "No songs match."
+// in the language the app shows.
+func SearchNoSongs() string { return In(i18n.Locale()).SearchNoSongs() }
+
+// SearchNoSongs says "No songs match."
+// in the language of msgs.
+func (msgs Messages) SearchNoSongs() string {
+	return Catalog.Format(msgs.locale, "searchNoSongs", nil)
+}
+
+// SearchVideos says "Videos"
+// in the language the app shows.
+func SearchVideos() string { return In(i18n.Locale()).SearchVideos() }
+
+// SearchVideos says "Videos"
+// in the language of msgs.
+func (msgs Messages) SearchVideos() string {
+	return Catalog.Format(msgs.locale, "searchVideos", nil)
+}
+
+// SearchNoVideos says "No videos match."
+// in the language the app shows.
+func SearchNoVideos() string { return In(i18n.Locale()).SearchNoVideos() }
+
+// SearchNoVideos says "No videos match."
+// in the language of msgs.
+func (msgs Messages) SearchNoVideos() string {
+	return Catalog.Format(msgs.locale, "searchNoVideos", nil)
+}
+
+// SearchArtists says "Artists"
+// in the language the app shows.
+func SearchArtists() string { return In(i18n.Locale()).SearchArtists() }
+
+// SearchArtists says "Artists"
+// in the language of msgs.
+func (msgs Messages) SearchArtists() string {
+	return Catalog.Format(msgs.locale, "searchArtists", nil)
+}
+
+// SearchAlbums says "Albums"
+// in the language the app shows.
+func SearchAlbums() string { return In(i18n.Locale()).SearchAlbums() }
+
+// SearchAlbums says "Albums"
+// in the language of msgs.
+func (msgs Messages) SearchAlbums() string {
+	return Catalog.Format(msgs.locale, "searchAlbums", nil)
+}
+
+// SearchPlaylists says "Playlists"
+// in the language the app shows.
+func SearchPlaylists() string { return In(i18n.Locale()).SearchPlaylists() }
+
+// SearchPlaylists says "Playlists"
+// in the language of msgs.
+func (msgs Messages) SearchPlaylists() string {
+	return Catalog.Format(msgs.locale, "searchPlaylists", nil)
+}
+
+// SearchSpotifyPlaylists says "Spotify shows apps the tracks of the playlists you own or collaborate on only, so only those are listed."
+// in the language the app shows.
+func SearchSpotifyPlaylists() string { return In(i18n.Locale()).SearchSpotifyPlaylists() }
+
+// SearchSpotifyPlaylists says "Spotify shows apps the tracks of the playlists you own or collaborate on only, so only those are listed."
+// in the language of msgs.
+func (msgs Messages) SearchSpotifyPlaylists() string {
+	return Catalog.Format(msgs.locale, "searchSpotifyPlaylists", nil)
+}
+
+// SearchTitle says "Search"
+// in the language the app shows.
+func SearchTitle() string { return In(i18n.Locale()).SearchTitle() }
+
+// SearchTitle says "Search"
+// in the language of msgs.
+func (msgs Messages) SearchTitle() string {
+	return Catalog.Format(msgs.locale, "searchTitle", nil)
+}
+
+// SearchFindAnything says "Find anything"
+// in the language the app shows.
+func SearchFindAnything() string { return In(i18n.Locale()).SearchFindAnything() }
+
+// SearchFindAnything says "Find anything"
+// in the language of msgs.
+func (msgs Messages) SearchFindAnything() string {
+	return Catalog.Format(msgs.locale, "searchFindAnything", nil)
+}
+
+// SearchIntro says "One search looks through NetEase Cloud Music and, once you sign in, Spotify."
+// in the language the app shows.
+func SearchIntro() string { return In(i18n.Locale()).SearchIntro() }
+
+// SearchIntro says "One search looks through NetEase Cloud Music and, once you sign in, Spotify."
+// in the language of msgs.
+func (msgs Messages) SearchIntro() string {
+	return Catalog.Format(msgs.locale, "searchIntro", nil)
+}
+
+// SearchStartTyping says "start typing"
+// in the language the app shows.
+func SearchStartTyping() string { return In(i18n.Locale()).SearchStartTyping() }
+
+// SearchStartTyping says "start typing"
+// in the language of msgs.
+func (msgs Messages) SearchStartTyping() string {
+	return Catalog.Format(msgs.locale, "searchStartTyping", nil)
+}
+
+// SearchRecent says "Recent"
+// in the language the app shows.
+func SearchRecent() string { return In(i18n.Locale()).SearchRecent() }
+
+// SearchRecent says "Recent"
+// in the language of msgs.
+func (msgs Messages) SearchRecent() string {
+	return Catalog.Format(msgs.locale, "searchRecent", nil)
+}
+
+// SearchClearRecent says "Clear the recent searches"
+// in the language the app shows.
+func SearchClearRecent() string { return In(i18n.Locale()).SearchClearRecent() }
+
+// SearchClearRecent says "Clear the recent searches"
+// in the language of msgs.
+func (msgs Messages) SearchClearRecent() string {
+	return Catalog.Format(msgs.locale, "searchClearRecent", nil)
+}
+
+// SearchClear says "clear"
+// in the language the app shows.
+func SearchClear() string { return In(i18n.Locale()).SearchClear() }
+
+// SearchClear says "clear"
+// in the language of msgs.
+func (msgs Messages) SearchClear() string {
+	return Catalog.Format(msgs.locale, "searchClear", nil)
+}
+
+// StatsThisWeek says "This week"
+// in the language the app shows.
+func StatsThisWeek() string { return In(i18n.Locale()).StatsThisWeek() }
+
+// StatsThisWeek says "This week"
+// in the language of msgs.
+func (msgs Messages) StatsThisWeek() string {
+	return Catalog.Format(msgs.locale, "statsThisWeek", nil)
+}
+
+// StatsThisMonth says "This month"
+// in the language the app shows.
+func StatsThisMonth() string { return In(i18n.Locale()).StatsThisMonth() }
+
+// StatsThisMonth says "This month"
+// in the language of msgs.
+func (msgs Messages) StatsThisMonth() string {
+	return Catalog.Format(msgs.locale, "statsThisMonth", nil)
+}
+
+// StatsAllTime says "All time"
+// in the language the app shows.
+func StatsAllTime() string { return In(i18n.Locale()).StatsAllTime() }
+
+// StatsAllTime says "All time"
+// in the language of msgs.
+func (msgs Messages) StatsAllTime() string {
+	return Catalog.Format(msgs.locale, "statsAllTime", nil)
+}
+
+// StatsTitle says "Stats"
+// in the language the app shows.
+func StatsTitle() string { return In(i18n.Locale()).StatsTitle() }
+
+// StatsTitle says "Stats"
+// in the language of msgs.
+func (msgs Messages) StatsTitle() string {
+	return Catalog.Format(msgs.locale, "statsTitle", nil)
+}
+
+// StatsNothingCounted says "Nothing counted yet"
+// in the language the app shows.
+func StatsNothingCounted() string { return In(i18n.Locale()).StatsNothingCounted() }
+
+// StatsNothingCounted says "Nothing counted yet"
+// in the language of msgs.
+func (msgs Messages) StatsNothingCounted() string {
+	return Catalog.Format(msgs.locale, "statsNothingCounted", nil)
+}
+
+// StatsCountRule says "Tracks count once they played for thirty seconds."
+// in the language the app shows.
+func StatsCountRule() string { return In(i18n.Locale()).StatsCountRule() }
+
+// StatsCountRule says "Tracks count once they played for thirty seconds."
+// in the language of msgs.
+func (msgs Messages) StatsCountRule() string {
+	return Catalog.Format(msgs.locale, "statsCountRule", nil)
+}
+
+// StatsYouPlayed says "You played "
+// in the language the app shows.
+func StatsYouPlayed() string { return In(i18n.Locale()).StatsYouPlayed() }
+
+// StatsYouPlayed says "You played "
+// in the language of msgs.
+func (msgs Messages) StatsYouPlayed() string {
+	return Catalog.Format(msgs.locale, "statsYouPlayed", nil)
+}
+
+// StatsPlayedTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+func StatsPlayedTracks(count int) string { return In(i18n.Locale()).StatsPlayedTracks(count) }
+
+// StatsPlayedTracks says "{count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+func (msgs Messages) StatsPlayedTracks(count int) string {
+	return Catalog.Format(msgs.locale, "statsPlayedTracks", map[string]any{"count": count})
+}
+
+// StatsFor says " for "
+// in the language the app shows.
+func StatsFor() string { return In(i18n.Locale()).StatsFor() }
+
+// StatsFor says " for "
+// in the language of msgs.
+func (msgs Messages) StatsFor() string {
+	return Catalog.Format(msgs.locale, "statsFor", nil)
+}
+
+// StatsColon says ": "
+// in the language the app shows.
+func StatsColon() string { return In(i18n.Locale()).StatsColon() }
+
+// StatsColon says ": "
+// in the language of msgs.
+func (msgs Messages) StatsColon() string {
+	return Catalog.Format(msgs.locale, "statsColon", nil)
+}
+
+// StatsFromSpotify says "{count} from Spotify"
+// in the language the app shows.
+func StatsFromSpotify(count string) string { return In(i18n.Locale()).StatsFromSpotify(count) }
+
+// StatsFromSpotify says "{count} from Spotify"
+// in the language of msgs.
+func (msgs Messages) StatsFromSpotify(count string) string {
+	return Catalog.Format(msgs.locale, "statsFromSpotify", map[string]any{"count": count})
+}
+
+// StatsAnd says " and "
+// in the language the app shows.
+func StatsAnd() string { return In(i18n.Locale()).StatsAnd() }
+
+// StatsAnd says " and "
+// in the language of msgs.
+func (msgs Messages) StatsAnd() string {
+	return Catalog.Format(msgs.locale, "statsAnd", nil)
+}
+
+// StatsFromYouTube says "{count} from YouTube Music"
+// in the language the app shows.
+func StatsFromYouTube(count string) string { return In(i18n.Locale()).StatsFromYouTube(count) }
+
+// StatsFromYouTube says "{count} from YouTube Music"
+// in the language of msgs.
+func (msgs Messages) StatsFromYouTube(count string) string {
+	return Catalog.Format(msgs.locale, "statsFromYouTube", map[string]any{"count": count})
+}
+
+// StatsEnd says "."
+// in the language the app shows.
+func StatsEnd() string { return In(i18n.Locale()).StatsEnd() }
+
+// StatsEnd says "."
+// in the language of msgs.
+func (msgs Messages) StatsEnd() string {
+	return Catalog.Format(msgs.locale, "statsEnd", nil)
+}
+
+// StatsTheMix says "The mix"
+// in the language the app shows.
+func StatsTheMix() string { return In(i18n.Locale()).StatsTheMix() }
+
+// StatsTheMix says "The mix"
+// in the language of msgs.
+func (msgs Messages) StatsTheMix() string {
+	return Catalog.Format(msgs.locale, "statsTheMix", nil)
+}
+
+// StatsTopArtists says "Top artists"
+// in the language the app shows.
+func StatsTopArtists() string { return In(i18n.Locale()).StatsTopArtists() }
+
+// StatsTopArtists says "Top artists"
+// in the language of msgs.
+func (msgs Messages) StatsTopArtists() string {
+	return Catalog.Format(msgs.locale, "statsTopArtists", nil)
+}
+
+// StatsTopTracks says "Top tracks"
+// in the language the app shows.
+func StatsTopTracks() string { return In(i18n.Locale()).StatsTopTracks() }
+
+// StatsTopTracks says "Top tracks"
+// in the language of msgs.
+func (msgs Messages) StatsTopTracks() string {
+	return Catalog.Format(msgs.locale, "statsTopTracks", nil)
+}
+
+// StatsDayByDay says "Day by day"
+// in the language the app shows.
+func StatsDayByDay() string { return In(i18n.Locale()).StatsDayByDay() }
+
+// StatsDayByDay says "Day by day"
+// in the language of msgs.
+func (msgs Messages) StatsDayByDay() string {
+	return Catalog.Format(msgs.locale, "statsDayByDay", nil)
+}
+
+// StatsMinutesEachDay says "Minutes listened each day."
+// in the language the app shows.
+func StatsMinutesEachDay() string { return In(i18n.Locale()).StatsMinutesEachDay() }
+
+// StatsMinutesEachDay says "Minutes listened each day."
+// in the language of msgs.
+func (msgs Messages) StatsMinutesEachDay() string {
+	return Catalog.Format(msgs.locale, "statsMinutesEachDay", nil)
+}
+
+// StatsMinutesLabel says "Minutes listened each day"
+// in the language the app shows.
+func StatsMinutesLabel() string { return In(i18n.Locale()).StatsMinutesLabel() }
+
+// StatsMinutesLabel says "Minutes listened each day"
+// in the language of msgs.
+func (msgs Messages) StatsMinutesLabel() string {
+	return Catalog.Format(msgs.locale, "statsMinutesLabel", nil)
+}
+
+// StatsArrowKeys says "The arrow keys go from day to day."
+// in the language the app shows.
+func StatsArrowKeys() string { return In(i18n.Locale()).StatsArrowKeys() }
+
+// StatsArrowKeys says "The arrow keys go from day to day."
+// in the language of msgs.
+func (msgs Messages) StatsArrowKeys() string {
+	return Catalog.Format(msgs.locale, "statsArrowKeys", nil)
+}
+
+// StatsShowTable says "Show as a table"
+// in the language the app shows.
+func StatsShowTable() string { return In(i18n.Locale()).StatsShowTable() }
+
+// StatsShowTable says "Show as a table"
+// in the language of msgs.
+func (msgs Messages) StatsShowTable() string {
+	return Catalog.Format(msgs.locale, "statsShowTable", nil)
+}
+
+// StatsToday says "today"
+// in the language the app shows.
+func StatsToday() string { return In(i18n.Locale()).StatsToday() }
+
+// StatsToday says "today"
+// in the language of msgs.
+func (msgs Messages) StatsToday() string {
+	return Catalog.Format(msgs.locale, "statsToday", nil)
+}
+
+// StatsColDay says "day"
+// in the language the app shows.
+func StatsColDay() string { return In(i18n.Locale()).StatsColDay() }
+
+// StatsColDay says "day"
+// in the language of msgs.
+func (msgs Messages) StatsColDay() string {
+	return Catalog.Format(msgs.locale, "statsColDay", nil)
+}
+
+// StatsColMinutes says "minutes"
+// in the language the app shows.
+func StatsColMinutes() string { return In(i18n.Locale()).StatsColMinutes() }
+
+// StatsColMinutes says "minutes"
+// in the language of msgs.
+func (msgs Messages) StatsColMinutes() string {
+	return Catalog.Format(msgs.locale, "statsColMinutes", nil)
+}
+
+// StatsColPlays says "plays"
+// in the language the app shows.
+func StatsColPlays() string { return In(i18n.Locale()).StatsColPlays() }
+
+// StatsColPlays says "plays"
+// in the language of msgs.
+func (msgs Messages) StatsColPlays() string {
+	return Catalog.Format(msgs.locale, "statsColPlays", nil)
+}
+
+// StatsDayTip says "{day}: {minutes} min, {plays, plural, one {# play} other {# plays}}"
+// in the language the app shows.
+func StatsDayTip(day string, minutes string, plays int) string {
+	return In(i18n.Locale()).StatsDayTip(day, minutes, plays)
+}
+
+// StatsDayTip says "{day}: {minutes} min, {plays, plural, one {# play} other {# plays}}"
+// in the language of msgs.
+func (msgs Messages) StatsDayTip(day string, minutes string, plays int) string {
+	return Catalog.Format(msgs.locale, "statsDayTip", map[string]any{"day": day, "minutes": minutes, "plays": plays})
+}
+
+// StatsVennLabel says "{spotify} plays from Spotify, {youtube} from YouTube Music"
+// in the language the app shows.
+func StatsVennLabel(spotify string, youtube string) string {
+	return In(i18n.Locale()).StatsVennLabel(spotify, youtube)
+}
+
+// StatsVennLabel says "{spotify} plays from Spotify, {youtube} from YouTube Music"
+// in the language of msgs.
+func (msgs Messages) StatsVennLabel(spotify string, youtube string) string {
+	return Catalog.Format(msgs.locale, "statsVennLabel", map[string]any{"spotify": spotify, "youtube": youtube})
+}
+
+// StatsArtistPlays says "{artist}: {plays, plural, one {# play} other {# plays}}"
+// in the language the app shows.
+func StatsArtistPlays(artist string, plays int) string {
+	return In(i18n.Locale()).StatsArtistPlays(artist, plays)
+}
+
+// StatsArtistPlays says "{artist}: {plays, plural, one {# play} other {# plays}}"
+// in the language of msgs.
+func (msgs Messages) StatsArtistPlays(artist string, plays int) string {
+	return Catalog.Format(msgs.locale, "statsArtistPlays", map[string]any{"artist": artist, "plays": plays})
+}
+
+// MarketplaceThemes says "themes"
+// in the language the app shows.
+func MarketplaceThemes() string { return In(i18n.Locale()).MarketplaceThemes() }
+
+// MarketplaceThemes says "themes"
+// in the language of msgs.
+func (msgs Messages) MarketplaceThemes() string {
+	return Catalog.Format(msgs.locale, "marketplaceThemes", nil)
+}
+
+// MarketplacePlugins says "plugins"
+// in the language the app shows.
+func MarketplacePlugins() string { return In(i18n.Locale()).MarketplacePlugins() }
+
+// MarketplacePlugins says "plugins"
+// in the language of msgs.
+func (msgs Messages) MarketplacePlugins() string {
+	return Catalog.Format(msgs.locale, "marketplacePlugins", nil)
+}
+
+// MarketplaceTitle says "Marketplace"
+// in the language the app shows.
+func MarketplaceTitle() string { return In(i18n.Locale()).MarketplaceTitle() }
+
+// MarketplaceTitle says "Marketplace"
+// in the language of msgs.
+func (msgs Messages) MarketplaceTitle() string {
+	return Catalog.Format(msgs.locale, "marketplaceTitle", nil)
+}
+
+// MarketplaceCommunity says "Made by the community, reviewed in the open. "
+// in the language the app shows.
+func MarketplaceCommunity() string { return In(i18n.Locale()).MarketplaceCommunity() }
+
+// MarketplaceCommunity says "Made by the community, reviewed in the open. "
+// in the language of msgs.
+func (msgs Messages) MarketplaceCommunity() string {
+	return Catalog.Format(msgs.locale, "marketplaceCommunity", nil)
+}
+
+// MarketplaceShareYours says "Share yours"
+// in the language the app shows.
+func MarketplaceShareYours() string { return In(i18n.Locale()).MarketplaceShareYours() }
+
+// MarketplaceShareYours says "Share yours"
+// in the language of msgs.
+func (msgs Messages) MarketplaceShareYours() string {
+	return Catalog.Format(msgs.locale, "marketplaceShareYours", nil)
+}
+
+// MarketplaceShareEnd says "."
+// in the language the app shows.
+func MarketplaceShareEnd() string { return In(i18n.Locale()).MarketplaceShareEnd() }
+
+// MarketplaceShareEnd says "."
+// in the language of msgs.
+func (msgs Messages) MarketplaceShareEnd() string {
+	return Catalog.Format(msgs.locale, "marketplaceShareEnd", nil)
+}
+
+// MarketplaceNothingHere says "Nothing here yet: be the first to share one."
+// in the language the app shows.
+func MarketplaceNothingHere() string { return In(i18n.Locale()).MarketplaceNothingHere() }
+
+// MarketplaceNothingHere says "Nothing here yet: be the first to share one."
+// in the language of msgs.
+func (msgs Messages) MarketplaceNothingHere() string {
+	return Catalog.Format(msgs.locale, "marketplaceNothingHere", nil)
+}
+
+// MarketplaceInstallTitle says "install {name}"
+// in the language the app shows.
+func MarketplaceInstallTitle(name string) string {
+	return In(i18n.Locale()).MarketplaceInstallTitle(name)
+}
+
+// MarketplaceInstallTitle says "install {name}"
+// in the language of msgs.
+func (msgs Messages) MarketplaceInstallTitle(name string) string {
+	return Catalog.Format(msgs.locale, "marketplaceInstallTitle", map[string]any{"name": name})
+}
+
+// MarketplaceWarning says "Plugins can control the player, change your library and reach the internet, whatever they ask for. Install plugins fr…"
+// in the language the app shows.
+func MarketplaceWarning() string { return In(i18n.Locale()).MarketplaceWarning() }
+
+// MarketplaceWarning says "Plugins can control the player, change your library and reach the internet, whatever they ask for. Install plugins fr…"
+// in the language of msgs.
+func (msgs Messages) MarketplaceWarning() string {
+	return Catalog.Format(msgs.locale, "marketplaceWarning", nil)
+}
+
+// MarketplaceAsksFor says " It asks for: {permissions}."
+// in the language the app shows.
+func MarketplaceAsksFor(permissions string) string {
+	return In(i18n.Locale()).MarketplaceAsksFor(permissions)
+}
+
+// MarketplaceAsksFor says " It asks for: {permissions}."
+// in the language of msgs.
+func (msgs Messages) MarketplaceAsksFor(permissions string) string {
+	return Catalog.Format(msgs.locale, "marketplaceAsksFor", map[string]any{"permissions": permissions})
+}
+
+// MarketplaceInstall says "install"
+// in the language the app shows.
+func MarketplaceInstall() string { return In(i18n.Locale()).MarketplaceInstall() }
+
+// MarketplaceInstall says "install"
+// in the language of msgs.
+func (msgs Messages) MarketplaceInstall() string {
+	return Catalog.Format(msgs.locale, "marketplaceInstall", nil)
+}
+
+// MarketplaceByAuthor says "{version} · by {author}"
+// in the language the app shows.
+func MarketplaceByAuthor(version string, author string) string {
+	return In(i18n.Locale()).MarketplaceByAuthor(version, author)
+}
+
+// MarketplaceByAuthor says "{version} · by {author}"
+// in the language of msgs.
+func (msgs Messages) MarketplaceByAuthor(version string, author string) string {
+	return Catalog.Format(msgs.locale, "marketplaceByAuthor", map[string]any{"version": version, "author": author})
+}
+
+// MarketplaceAsksForList says "asks for {permissions}"
+// in the language the app shows.
+func MarketplaceAsksForList(permissions string) string {
+	return In(i18n.Locale()).MarketplaceAsksForList(permissions)
+}
+
+// MarketplaceAsksForList says "asks for {permissions}"
+// in the language of msgs.
+func (msgs Messages) MarketplaceAsksForList(permissions string) string {
+	return Catalog.Format(msgs.locale, "marketplaceAsksForList", map[string]any{"permissions": permissions})
+}
+
+// MarketplaceBuiltIn says "built in"
+// in the language the app shows.
+func MarketplaceBuiltIn() string { return In(i18n.Locale()).MarketplaceBuiltIn() }
+
+// MarketplaceBuiltIn says "built in"
+// in the language of msgs.
+func (msgs Messages) MarketplaceBuiltIn() string {
+	return Catalog.Format(msgs.locale, "marketplaceBuiltIn", nil)
+}
+
+// MarketplaceRemove says "remove"
+// in the language the app shows.
+func MarketplaceRemove() string { return In(i18n.Locale()).MarketplaceRemove() }
+
+// MarketplaceRemove says "remove"
+// in the language of msgs.
+func (msgs Messages) MarketplaceRemove() string {
+	return Catalog.Format(msgs.locale, "marketplaceRemove", nil)
+}
+
+// MarketplaceOlder says "made for an older MixMusic"
+// in the language the app shows.
+func MarketplaceOlder() string { return In(i18n.Locale()).MarketplaceOlder() }
+
+// MarketplaceOlder says "made for an older MixMusic"
+// in the language of msgs.
+func (msgs Messages) MarketplaceOlder() string {
+	return Catalog.Format(msgs.locale, "marketplaceOlder", nil)
+}
+
+// MarketplaceInstalling says "installing…"
+// in the language the app shows.
+func MarketplaceInstalling() string { return In(i18n.Locale()).MarketplaceInstalling() }
+
+// MarketplaceInstalling says "installing…"
+// in the language of msgs.
+func (msgs Messages) MarketplaceInstalling() string {
+	return Catalog.Format(msgs.locale, "marketplaceInstalling", nil)
+}
+
+// MarketplaceUpdateTo says "update to {version}"
+// in the language the app shows.
+func MarketplaceUpdateTo(version string) string {
+	return In(i18n.Locale()).MarketplaceUpdateTo(version)
+}
+
+// MarketplaceUpdateTo says "update to {version}"
+// in the language of msgs.
+func (msgs Messages) MarketplaceUpdateTo(version string) string {
+	return Catalog.Format(msgs.locale, "marketplaceUpdateTo", map[string]any{"version": version})
+}
+
+// MarketplaceUse says "Use {name}"
+// in the language the app shows.
+func MarketplaceUse(name string) string { return In(i18n.Locale()).MarketplaceUse(name) }
+
+// MarketplaceUse says "Use {name}"
+// in the language of msgs.
+func (msgs Messages) MarketplaceUse(name string) string {
+	return Catalog.Format(msgs.locale, "marketplaceUse", map[string]any{"name": name})
+}
+
+// MarketplaceUseIt says "use it"
+// in the language the app shows.
+func MarketplaceUseIt() string { return In(i18n.Locale()).MarketplaceUseIt() }
+
+// MarketplaceUseIt says "use it"
+// in the language of msgs.
+func (msgs Messages) MarketplaceUseIt() string {
+	return Catalog.Format(msgs.locale, "marketplaceUseIt", nil)
+}
+
+// MarketplaceEnable says "enable"
+// in the language the app shows.
+func MarketplaceEnable() string { return In(i18n.Locale()).MarketplaceEnable() }
+
+// MarketplaceEnable says "enable"
+// in the language of msgs.
+func (msgs Messages) MarketplaceEnable() string {
+	return Catalog.Format(msgs.locale, "marketplaceEnable", nil)
+}
+
+// MarketplaceInstalled says "Installed {name}"
+// in the language the app shows.
+func MarketplaceInstalled(name string) string { return In(i18n.Locale()).MarketplaceInstalled(name) }
+
+// MarketplaceInstalled says "Installed {name}"
+// in the language of msgs.
+func (msgs Messages) MarketplaceInstalled(name string) string {
+	return Catalog.Format(msgs.locale, "marketplaceInstalled", map[string]any{"name": name})
+}
+
+// MarketplaceUpdated says "Updated {name}"
+// in the language the app shows.
+func MarketplaceUpdated(name string) string { return In(i18n.Locale()).MarketplaceUpdated(name) }
+
+// MarketplaceUpdated says "Updated {name}"
+// in the language of msgs.
+func (msgs Messages) MarketplaceUpdated(name string) string {
+	return Catalog.Format(msgs.locale, "marketplaceUpdated", map[string]any{"name": name})
+}
+
+// MarketplaceRemoved says "Removed {name}"
+// in the language the app shows.
+func MarketplaceRemoved(name string) string { return In(i18n.Locale()).MarketplaceRemoved(name) }
+
+// MarketplaceRemoved says "Removed {name}"
+// in the language of msgs.
+func (msgs Messages) MarketplaceRemoved(name string) string {
+	return Catalog.Format(msgs.locale, "marketplaceRemoved", map[string]any{"name": name})
+}

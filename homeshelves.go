@@ -15,6 +15,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // readHomePlaylist and readHomeArtist read the playlist and the artist of
@@ -74,7 +75,7 @@ func (s *shell) homeGroups(layout []settings.HomeShelf) []*homeGroup {
 	// The new releases of the artists followed show at once too, as the
 	// last run found them, until this run's look comes.
 	if len(s.newReleases()) > 0 {
-		yours.shelves = append(yours.shelves, homeShelf{key: homeReleases, ui: "home-releases", title: "New from artists you follow", build: s.releasesShelf})
+		yours.shelves = append(yours.shelves, homeShelf{key: homeReleases, ui: "home-releases", title: locales.ShelvesNewReleases(), build: s.releasesShelf})
 	}
 	groups := []*homeGroup{yours}
 	// Each service's shelves come on their own: one that fails leaves the
@@ -205,9 +206,9 @@ func (s *shell) addedGroup(e settings.HomeShelf) *homeGroup {
 	var items []media.Item
 	switch {
 	case e.Key == homeTopMonth:
-		title, items = "Most played this month", s.topMonthItems()
+		title, items = locales.ShelvesTopMonth(), s.topMonthItems()
 	case e.Key == homeDownloads:
-		title, items = "Downloads", s.downloadedItems()
+		title, items = locales.ShelvesDownloads(), s.downloadedItems()
 	case strings.HasPrefix(e.Key, homePlaylist):
 		id := strings.TrimPrefix(e.Key, homePlaylist)
 		if g.source == media.SourceLocal {
@@ -228,7 +229,7 @@ func (s *shell) addedGroup(e settings.HomeShelf) *homeGroup {
 		l := fetch(s, e.Key, func(ctx context.Context) (media.Artist, error) { return readHomeArtist(s, ctx, id) })
 		g.done, g.err = l.done, l.err
 		if l.done && l.err == nil {
-			title, items = "New from "+l.value.Name, newestItems(l.value)
+			title, items = locales.ShelvesNewFrom(l.value.Name), newestItems(l.value)
 		}
 	}
 	g.title = title

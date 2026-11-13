@@ -70,13 +70,13 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 				func() { ui.Text(c, locales.AccountSettingsSpotifyPaste()) },
 			)
 			var clientID *draft
-			s.row(c, "Client ID", "", func() {
+			s.row(c, locales.AccountsClientID(), "", func() {
 				var in ui.Element
 				in, clientID = s.settingInput(c, "client-id", s.set.SpotifyClientID, func(id string) {
 					s.set.SpotifyClientID = id
 					s.save()
 				})
-				in.Placeholder(locales.AccountSettingsCharsPlaceholder()).Width(260).Label("Client ID")
+				in.Placeholder(locales.AccountSettingsCharsPlaceholder()).Width(260).Label(locales.AccountsClientID())
 			})
 			busy := s.signingIn == "spotify"
 			label := locales.AccountSettingsSignInSpotify()

@@ -11,6 +11,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/sharecard"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Your year, a tab of the Stats page, looks back at one calendar year of
@@ -19,7 +20,7 @@ import (
 // story, with the share cards' renderer (internal/sharecard).
 
 // recapLabel is the name of the tab.
-const recapLabel = "Your year"
+func recapLabel() string { return locales.RecapLabel() }
 
 // recapClock is the time the recap goes by; tests set it.
 var recapClock = time.Now
@@ -54,11 +55,11 @@ func (s *shell) recapView(c *ui.Context, years []int) {
 	r := s.svc.Collection.Recap(years[s.recapPick])
 	size := k.subtitleSize()
 	ui.RichText(c,
-		ui.Span{Text: "In " + strconv.Itoa(r.Year) + " you played ", Size: size, Weight: 300},
-		ui.Span{Text: plural(r.Plays, "track"), Size: size, Weight: 400},
-		ui.Span{Text: " for ", Size: size, Weight: 300},
-		ui.Span{Text: thousands(r.Minutes) + " minutes", Size: size, Weight: 400},
-		ui.Span{Text: ".", Size: size, Weight: 300},
+		ui.Span{Text: locales.RecapYouPlayed(strconv.Itoa(r.Year)), Size: size, Weight: 300},
+		ui.Span{Text: locales.RecapTracksPlayed(r.Plays), Size: size, Weight: 400},
+		ui.Span{Text: locales.RecapFor(), Size: size, Weight: 300},
+		ui.Span{Text: locales.RecapMinutes(thousands(r.Minutes)), Size: size, Weight: 400},
+		ui.Span{Text: locales.RecapPeriod(), Size: size, Weight: 300},
 	).MaxWidth(760).Margin(0, 0, 32)
 
 	ui.Row(c).Gap(24).Wrap().AlignItems(ui.Start).Margin(0, 0, 40).Children(func() {
@@ -74,13 +75,13 @@ func (s *shell) recapView(c *ui.Context, years []int) {
 		for i, a := range r.TopAlbums {
 			albums[i] = recapRow{a.Album.Name, a.Artist, a.Plays}
 		}
-		s.recapList(c, "Top songs", songs)
-		s.recapList(c, "Top artists", artists)
-		s.recapList(c, "Top albums", albums)
+		s.recapList(c, locales.RecapTopSongs(), songs)
+		s.recapList(c, locales.RecapTopArtists(), artists)
+		s.recapList(c, locales.RecapTopAlbums(), albums)
 	})
 
 	if facts := recapFacts(r); len(facts) > 0 {
-		s.sectionTitle(c, "Moments")
+		s.sectionTitle(c, locales.RecapMoments())
 		ui.Column(c).Gap(8).Margin(0, 0, 40).Children(func() {
 			for _, f := range facts {
 				ui.Text(c, f).FontSize(k.bodySize()).MaxWidth(760)
@@ -88,12 +89,12 @@ func (s *shell) recapView(c *ui.Context, years []int) {
 		})
 	}
 
-	s.sectionTitle(c, "Share")
+	s.sectionTitle(c, locales.RecapShare())
 	ui.Row(c).Gap(8).Wrap().Margin(0, 0, 24).Children(func() {
-		if s.button(c, "recap-save", "save image", true).Clicked() {
+		if s.button(c, "recap-save", locales.RecapSaveImage(), true).Clicked() {
 			s.saveCard(recapFileName(r, sharecard.Square), nil, sharecard.Square, s.recapCard(r))
 		}
-		if s.button(c, "recap-save-story", "save image for a story", false).Clicked() {
+		if s.button(c, "recap-save-story", locales.RecapSaveStory(), false).Clicked() {
 			s.saveCard(recapFileName(r, sharecard.Story), nil, sharecard.Story, s.recapCard(r))
 		}
 	})
@@ -112,7 +113,7 @@ func (s *shell) recapList(c *ui.Context, title string, rows []recapRow) {
 	ui.Column(c).Grow(1).Basis(240).MinWidth(0).Gap(10).Children(func() {
 		s.sectionTitle(c, title)
 		if len(rows) == 0 {
-			ui.Text(c, "Nothing to rank").FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, locales.RecapNothingToRank()).FontSize(k.smallSize()).TextColor(k.muted)
 			return
 		}
 		for i, row := range rows {
@@ -120,9 +121,9 @@ func (s *shell) recapList(c *ui.Context, title string, rows []recapRow) {
 				ui.Text(c, strconv.Itoa(i+1)).FontSize(k.bodySize()).TextColor(k.muted).FontFeatures("tnum").Width(20)
 				ui.Column(c).Grow(1).Basis(0).MinWidth(0).Children(func() {
 					ui.Text(c, row.name).FontSize(k.bodySize()).SingleLine()
-					detail := plural(row.plays, "play")
+					detail := locales.RecapPlays(row.plays)
 					if row.detail != "" {
-						detail = row.detail + ", " + detail
+						detail = locales.RecapDetail(row.detail, row.plays)
 					}
 					ui.Text(c, detail).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 				})
@@ -135,18 +136,18 @@ func (s *shell) recapList(c *ui.Context, title string, rows []recapRow) {
 func recapFacts(r library.Recap) []string {
 	var out []string
 	if r.BusiestMonth > 0 {
-		out = append(out, fmt.Sprintf("You listened most in %s: %s.", r.BusiestMonth, plural(r.BusiestMinutes, "minute")))
+		out = append(out, locales.RecapBusiest(monthName(time.Date(r.Year, r.BusiestMonth, 1, 0, 0, 0, 0, time.UTC), true), r.BusiestMinutes))
 	}
 	if r.First != nil {
-		out = append(out, fmt.Sprintf("The year began with %s, on %s.", quoted(r.First.Track.Title, names(r.First.Track.Artists)),
-			r.First.PlayedAt.In(recapClock().Location()).Format("2 January")))
+		out = append(out, locales.RecapBegan(quoted(r.First.Track.Title, names(r.First.Track.Artists)),
+			dayMonth(r.First.PlayedAt.In(recapClock().Location()), true)))
 	}
 	if r.Repeated != nil {
-		out = append(out, fmt.Sprintf("You played %s %d times on %s.", quoted(r.Repeated.Track.Title, names(r.Repeated.Track.Artists)),
-			r.Repeated.Plays, recapDay(r.Repeated.Date)))
+		out = append(out, locales.RecapRepeated(quoted(r.Repeated.Track.Title, names(r.Repeated.Track.Artists)),
+			strconv.Itoa(r.Repeated.Plays), recapDay(r.Repeated.Date)))
 	}
 	if r.NewKnown {
-		out = append(out, fmt.Sprintf("You found %s.", plural(r.NewArtists, "new artist")))
+		out = append(out, locales.RecapFound(r.NewArtists))
 	}
 	return out
 }
@@ -156,7 +157,7 @@ func quoted(title, artist string) string {
 	if artist == "" {
 		return "\u201c" + title + "\u201d"
 	}
-	return "\u201c" + title + "\u201d by " + artist
+	return locales.RecapSongBy(title, artist)
 }
 
 // recapDay writes a day of the recap as "5 March".
@@ -165,7 +166,7 @@ func recapDay(date string) string {
 	if err != nil {
 		return date
 	}
-	return t.Format("2 January")
+	return dayMonth(t, true)
 }
 
 // recapFileName is what the card of r in size is called at first: the
@@ -188,9 +189,9 @@ func recapCardOf(r library.Recap, colors sharecard.Colors) cardBuilder {
 		c := sharecard.Card{
 			Size: size, Colors: colors,
 			Lines: []sharecard.Line{
-				{Text: fmt.Sprintf("YOUR %d IN MUSIC", r.Year), Size: 34, Weight: 600, Ink: colors.Accent},
+				{Text: locales.RecapCardHeading(strconv.Itoa(r.Year)), Size: 34, Weight: 600, Ink: colors.Accent},
 				{Text: thousands(r.Minutes), Size: 170, Weight: 700, Gap: 10},
-				{Text: "minutes of music, " + plural(r.Plays, "track"), Size: 42, Weight: 400, Ink: colors.Muted, MaxLines: 2},
+				{Text: locales.RecapCardMinutes(r.Plays), Size: 42, Weight: 400, Ink: colors.Muted, MaxLines: 2},
 			},
 			Foot: []sharecard.Line{{Text: "MixMusic", Size: 34, Weight: 600, Ink: colors.Accent}},
 		}
@@ -211,7 +212,7 @@ func recapCardOf(r library.Recap, colors sharecard.Colors) cardBuilder {
 		for _, t := range r.TopTracks {
 			songs = append(songs, recapRow{t.Track.Title, names(t.Track.Artists), t.Plays})
 		}
-		section("Top songs", songs)
+		section(locales.RecapTopSongs(), songs)
 		if size.H > size.W {
 			for _, a := range r.TopArtists {
 				artists = append(artists, recapRow{name: a.Artist.Name, plays: a.Plays})
@@ -219,8 +220,8 @@ func recapCardOf(r library.Recap, colors sharecard.Colors) cardBuilder {
 			for _, a := range r.TopAlbums {
 				albums = append(albums, recapRow{a.Album.Name, a.Artist, a.Plays})
 			}
-			section("Top artists", artists)
-			section("Top albums", albums)
+			section(locales.RecapTopArtists(), artists)
+			section(locales.RecapTopAlbums(), albums)
 		}
 		return c
 	}

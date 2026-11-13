@@ -11,6 +11,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // A mix's cover is its tracks' covers, until the user chooses one of their
@@ -46,7 +47,7 @@ func (s *shell) changeCoverItem(m *ui.Menu, p media.Playlist) {
 	if p.Source != media.SourceLocal {
 		return
 	}
-	if m.Item("Change cover…").Chosen() {
+	if m.Item(locales.MixCoverChange()).Chosen() {
 		s.covering = mixCovering{open: true, id: p.ID, title: p.Title, chosen: chosenCover(p.Artwork)}
 	}
 }
@@ -58,9 +59,8 @@ func (s *shell) coverDialog(c *ui.Context) {
 	k := &s.lk
 	cv := s.covering
 	key := "playlist:" + cv.id
-	s.dialog(c, &s.covering.open, dialogOptions{key: "mix-cover", title: "change cover", width: 560}, func() {
-		ui.Text(c, "Choose an image, a PNG, JPEG or WebP, or the cover of one of the songs of "+cv.title+
-			". It shows cut to a square.").FontSize(k.bodySize()).TextColor(k.muted)
+	s.dialog(c, &s.covering.open, dialogOptions{key: "mix-cover", title: locales.MixCoverTitle(), width: 560}, func() {
+		ui.Text(c, locales.MixCoverIntro(cv.title)).FontSize(k.bodySize()).TextColor(k.muted)
 		res := fetch(s, key, func(ctx context.Context) (media.Playlist, error) { return s.svc.Catalog.PlaylistStart(ctx, cv.id) })
 		covers := songCovers(res.value.Tracks)
 		if len(covers) == 0 {
@@ -68,7 +68,7 @@ func (s *shell) coverDialog(c *ui.Context) {
 		}
 		ui.Row(c).Wrap().Gap(8).Margin(16, 0, 0).Children(func() {
 			for i, t := range covers {
-				b := s.buttonBase(c.Key("mix-cover-" + count(i))).Radius(k.radiusSm).Label("Use the cover of " + t.Title).
+				b := s.buttonBase(c.Key("mix-cover-" + count(i))).Radius(k.radiusSm).Label(locales.MixCoverUse(t.Title)).
 					Cursor(ui.CursorPointer)
 				if b.Clicked() {
 					s.covering.open = false
@@ -78,14 +78,14 @@ func (s *shell) coverDialog(c *ui.Context) {
 			}
 		})
 	}, func() {
-		if cv.chosen && s.dialogButton(c, "mix-cover-songs", "use the songs' covers", false).Clicked() {
+		if cv.chosen && s.dialogButton(c, "mix-cover-songs", locales.MixCoverSongs(), false).Clicked() {
 			s.covering.open = false
 			s.useSongsCovers(cv)
 		}
-		if s.dialogButton(c, "mix-cover-cancel", "cancel", false).Clicked() {
+		if s.dialogButton(c, "mix-cover-cancel", locales.MixCoverCancel(), false).Clicked() {
 			s.covering.open = false
 		}
-		if s.dialogButton(c, "mix-cover-file", "choose an image…", true).Clicked() {
+		if s.dialogButton(c, "mix-cover-file", locales.MixCoverChooseImage(), true).Clicked() {
 			s.covering.open = false
 			s.coverOfFile(cv)
 		}
@@ -115,8 +115,8 @@ func songCovers(tracks []media.Track) []media.Track {
 func (s *shell) coverOfFile(cv mixCovering) {
 	win := s.win
 	go func() {
-		paths, err := openFileDialog(mygo.OpenDialogOptions{Parent: win, Title: "Choose a cover for " + cv.title,
-			Filters: []mygo.FileFilter{{Name: "Images", Extensions: []string{"png", "jpg", "jpeg", "webp"}}}})
+		paths, err := openFileDialog(mygo.OpenDialogOptions{Parent: win, Title: locales.MixCoverChooseFor(cv.title),
+			Filters: []mygo.FileFilter{{Name: locales.MixCoverImages(), Extensions: []string{"png", "jpg", "jpeg", "webp"}}}})
 		if err == nil && len(paths) == 0 {
 			return
 		}
@@ -144,7 +144,7 @@ func (s *shell) useSongsCovers(cv mixCovering) {
 		return
 	}
 	s.refetch("playlist:" + cv.id)
-	s.notes = append(s.notes, notice(cv.title+" shows its songs' covers again"))
+	s.notes = append(s.notes, notice(locales.MixCoverSongsAgain(cv.title)))
 }
 
 // coverChanged tells how changing the cover of the mix of cv went, from
@@ -152,11 +152,11 @@ func (s *shell) useSongsCovers(cv mixCovering) {
 func (s *shell) coverChanged(cv mixCovering, err error) {
 	s.update(func() {
 		if err != nil {
-			s.notes = append(s.notes, player.Notice{Message: "Couldn't change the cover of " + cv.title + ": " + err.Error(), Error: true})
+			s.notes = append(s.notes, player.Notice{Message: locales.MixCoverFailed(cv.title, err.Error()), Error: true})
 			return
 		}
 		s.refetch("playlist:" + cv.id)
-		s.notes = append(s.notes, notice("Changed the cover of "+cv.title))
+		s.notes = append(s.notes, notice(locales.MixCoverChanged(cv.title)))
 	})
 }
 

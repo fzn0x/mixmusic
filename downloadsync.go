@@ -5,8 +5,6 @@ package main
 // shows them, unless Settings › Playback › Downloads says not to.
 
 import (
-	"fmt"
-
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -60,16 +58,11 @@ func (s *shell) syncDownload(d *downloadHead) {
 		return
 	}
 	if size, big := s.downloadSize(added); big {
-		were := "were"
-		if len(added) == 1 {
-			were = "was"
-		}
-		s.notes = append(s.notes, notice(fmt.Sprintf("%s %s added to %s since you downloaded it. They take about %s, so they download only once you ask.",
-			plural(len(added), "track"), were, d.c.Title, byteSize(size))))
+		s.notes = append(s.notes, notice(locales.DownloadSyncWaiting(len(added), d.c.Title, byteSize(size))))
 		return
 	}
 	if n := s.svc.Downloads.SyncCollection(d.c, tracks); n > 0 {
-		s.notes = append(s.notes, notice(fmt.Sprintf("Downloading %s added to %s", plural(n, "track"), d.c.Title)))
+		s.notes = append(s.notes, notice(locales.DownloadSyncStarted(n, d.c.Title)))
 	}
 }
 

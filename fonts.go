@@ -8,6 +8,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The interface's face is Selawik, as the web interface's was, in
@@ -80,21 +81,34 @@ func registerFonts() {
 	})
 }
 
+// fontLicenses are the texts of the licenses of the faces MixMusic
+// includes, by file: they are read once.
+var fontLicenses = sync.OnceValue(func() map[string]string {
+	texts := map[string]string{}
+	for _, file := range []string{"fonts/OFL.txt", "fonts/quicksand-OFL.txt", "fonts/robotoflex-OFL.txt", "fonts/archivo-OFL.txt"} {
+		if text, err := fontFiles.ReadFile(file); err == nil {
+			texts[file] = string(text)
+		}
+	}
+	return texts
+})
+
 // fontNotices are the licenses of the faces MixMusic includes, which its
 // copies must reproduce, as those of its code. Settings › About shows them
 // in every frame, and every section does while the user searches the
-// settings: they are read once.
-var fontNotices = sync.OnceValue(func() []app.Notice {
+// settings, in the language shown.
+func fontNotices() []app.Notice {
+	texts := fontLicenses()
 	var notices []app.Notice
 	for _, f := range []struct{ name, file string }{
-		{"Selawik, the interface's face", "fonts/OFL.txt"},
-		{"Quicksand, Mochi's face", "fonts/quicksand-OFL.txt"},
-		{"Roboto Flex, the Material themes' face", "fonts/robotoflex-OFL.txt"},
-		{"Archivo, the Walnut themes' headings' face", "fonts/archivo-OFL.txt"},
+		{locales.FontsSelawik(), "fonts/OFL.txt"},
+		{locales.FontsQuicksand(), "fonts/quicksand-OFL.txt"},
+		{locales.FontsRoboto(), "fonts/robotoflex-OFL.txt"},
+		{locales.FontsArchivo(), "fonts/archivo-OFL.txt"},
 	} {
-		if text, err := fontFiles.ReadFile(f.file); err == nil {
-			notices = append(notices, app.Notice{Name: f.name, Text: string(text)})
+		if text, ok := texts[f.file]; ok {
+			notices = append(notices, app.Notice{Name: f.name, Text: text})
 		}
 	}
 	return notices
-})
+}

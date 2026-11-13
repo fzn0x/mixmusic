@@ -13,6 +13,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The details of a track that couldn't play (#351), as text: what the
@@ -92,14 +93,17 @@ func (pr privacy) inHome(text string) string {
 // failureTrack names the track of a failure: its title, its artists and
 // its album.
 func failureTrack(t media.Track) string {
-	line := t.Title
-	if a := names(t.Artists); a != "" {
-		line += ", by " + a
+	a := names(t.Artists)
+	on := t.Album != nil && t.Album.Name != "" && t.Album.Name != t.Title
+	switch {
+	case a != "" && on:
+		return locales.FailureTrackByOn(t.Title, a, t.Album.Name)
+	case a != "":
+		return locales.FailureTrackBy(t.Title, a)
+	case on:
+		return locales.FailureTrackOn(t.Title, t.Album.Name)
 	}
-	if t.Album != nil && t.Album.Name != "" && t.Album.Name != t.Title {
-		line += ", on " + t.Album.Name
-	}
-	return line
+	return t.Title
 }
 
 // failureFrom tells where a track of a failure comes from: its service,
@@ -108,25 +112,25 @@ func failureTrack(t media.Track) string {
 func failureFrom(t media.Track, pr privacy) string {
 	if t.Source == media.SourceFile {
 		if path, ok := localfiles.PathOf(t.ID); ok {
-			return "a file on this computer, " + pr.inHome(path)
+			return locales.FailureFileAt(pr.inHome(path))
 		}
-		return "a file on this computer"
+		return locales.FailureFile()
 	}
-	return sourceName(t.Source) + ", " + t.ID
+	return locales.FailureSourceID(sourceName(t.Source), t.ID)
 }
 
 // failureStep tells a step of a failure: what it tried, how many times,
 // and why it failed.
 func failureStep(st player.Step, pr privacy) string {
-	what := st.What
+	what := sentenceStart(st.What)
 	if st.Times > 1 {
-		what += fmt.Sprintf(", %d times", st.Times)
+		what = locales.FailureTimes(what, st.Times)
 	}
-	return sentenceStart(what) + ": " + pr.clean(st.Why)
+	return locales.FailureStep(what, pr.clean(st.Why))
 }
 
 // failureStopped tells that the player stopped after a failure.
-const failureStopped = "MixMusic stopped playing after it, as the tracks just before it couldn't play either."
+func failureStopped() string { return locales.FailureStopped() }
 
 // failureWhen is the time of a failure, as the details show it: its
 // time of day, and its day too when it isn't today.
@@ -142,21 +146,21 @@ func failureWhen(at, now time.Time) string {
 // version of MixMusic and the system it ran on.
 func failureReport(f player.Failure, info app.Info, pr privacy) string {
 	var b strings.Builder
-	b.WriteString("MixMusic couldn't play a track\n\n")
-	fmt.Fprintf(&b, "- Track: %s\n", pr.clean(failureTrack(f.Track)))
-	fmt.Fprintf(&b, "- From: %s\n", failureFrom(f.Track, pr))
+	b.WriteString(locales.FailureReportHead())
+	fmt.Fprintf(&b, "- %s\n", locales.FailureReportTrack(pr.clean(failureTrack(f.Track))))
+	fmt.Fprintf(&b, "- %s\n", locales.FailureReportFrom(failureFrom(f.Track, pr)))
 	if r := f.Recording; r.ID != "" {
-		fmt.Fprintf(&b, "- Played as: %s, from %s\n", pr.clean(failureTrack(r)), failureFrom(r, pr))
+		fmt.Fprintf(&b, "- %s\n", locales.FailureReportPlayedAs(pr.clean(failureTrack(r)), failureFrom(r, pr)))
 	}
-	fmt.Fprintf(&b, "- When: %s\n", f.At.Format("2006-01-02 15:04:05 -07:00"))
-	b.WriteString("- What was tried:\n")
+	fmt.Fprintf(&b, "- %s\n", locales.FailureReportWhen(f.At.Format("2006-01-02 15:04:05 -07:00")))
+	fmt.Fprintf(&b, "- %s\n", locales.FailureReportTried())
 	for i, st := range f.Steps {
-		fmt.Fprintf(&b, "  %d. %s\n", i+1, failureStep(st, pr))
+		fmt.Fprintf(&b, "  %s\n", locales.FailureStepNumbered(i+1, failureStep(st, pr)))
 	}
 	if f.Stopped {
-		fmt.Fprintf(&b, "- %s\n", failureStopped)
+		fmt.Fprintf(&b, "- %s\n", failureStopped())
 	}
-	fmt.Fprintf(&b, "- MixMusic %s on %s %s\n", info.Version, info.Platform, info.Arch)
+	fmt.Fprintf(&b, "- %s\n", locales.FailureReportSystem(info.Version, info.Platform, info.Arch))
 	return b.String()
 }
 

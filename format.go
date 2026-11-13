@@ -8,7 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/egoist/mygo/i18n"
+
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // clock writes a duration as 3:28 or 1:02:03.
@@ -28,9 +31,9 @@ func clock(d time.Duration) string {
 func longDuration(d time.Duration) string {
 	min := int((d + 30*time.Second) / time.Minute)
 	if min < 60 {
-		return fmt.Sprintf("%d min", min)
+		return locales.FormatMinutes(strconv.Itoa(min))
 	}
-	return fmt.Sprintf("%d hr %d min", min/60, min%60)
+	return locales.FormatHourMinutes(strconv.Itoa(min/60), strconv.Itoa(min%60))
 }
 
 // plural writes a count with its noun: "1 track", "12 tracks".
@@ -94,7 +97,7 @@ func sourceName(s media.Source) string {
 	case media.SourceNetEase:
 		return "网易云音乐"
 	case media.SourceFile:
-		return "this computer"
+		return locales.FormatThisComputer()
 	}
 	return "MixMusic"
 }
@@ -138,17 +141,53 @@ func compactCount(n int64) string {
 // many views a video has, as "905M views", or "" where its service says
 // not.
 func playsLabel(t media.Track) string {
-	noun := "plays"
-	if t.Video {
-		noun = "views"
-	}
 	switch {
 	case t.Plays <= 0:
 		return ""
-	case t.Plays == 1:
-		noun = strings.TrimSuffix(noun, "s")
+	case t.Video:
+		return locales.FormatViews(int(t.Plays), compactCount(t.Plays))
 	}
-	return compactCount(t.Plays) + " " + noun
+	return locales.FormatPlays(int(t.Plays), compactCount(t.Plays))
+}
+
+// monthName writes the month of t in the app's language: "Oct", or in full
+// "October"; "10月" in Chinese.
+func monthName(t time.Time, full bool) string {
+	skeleton := "MMM"
+	if full {
+		skeleton = "MMMM"
+	}
+	return i18n.FormatDate(i18n.Locale(), t, i18n.DateOptions{Skeleton: skeleton})
+}
+
+// weekdayName writes the weekday of t in the app's language: "Tue", "周二".
+func weekdayName(t time.Time) string {
+	return i18n.FormatDate(i18n.Locale(), t, i18n.DateOptions{Skeleton: "E"})
+}
+
+// dayMonth writes the day and month of t: "20 Oct", or in full "20 October".
+func dayMonth(t time.Time, full bool) string {
+	return locales.FormatDayMonth(strconv.Itoa(t.Day()), monthName(t, full))
+}
+
+// monthDay writes the month and day of t, as "Oct 20".
+func monthDay(t time.Time) string {
+	return locales.FormatMonthDay(monthName(t, false), strconv.Itoa(t.Day()))
+}
+
+// monthDayYear writes the date of t with its year, as "Oct 20, 2025".
+func monthDayYear(t time.Time) string {
+	return locales.FormatMonthDayYear(monthName(t, false), strconv.Itoa(t.Day()), strconv.Itoa(t.Year()))
+}
+
+// monthYear writes the month and year of t, as "Oct 2025".
+func monthYear(t time.Time) string {
+	return locales.FormatMonthYear(monthName(t, false), strconv.Itoa(t.Year()))
+}
+
+// weekdayDayMonth writes the weekday, day and month of t, as "Tue 20 Oct".
+func weekdayDayMonth(t time.Time) string {
+	return locales.FormatWeekdayDayMonth(weekdayName(t), strconv.Itoa(t.Day()), monthName(t, false))
 }
 
 // ms is v milliseconds.

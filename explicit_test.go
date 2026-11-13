@@ -237,7 +237,7 @@ func TestHideExplicitOwnLists(t *testing.T) {
 
 	show(s, tt, playlistPath(mix.ID))
 	until(t, s, tt, "the mix", func() bool { return showsExactly(tt, "Paper Boats") })
-	if !showsExactly(tt, "Salt on the Wind") || textCount(tt, hiddenNote) != 1 {
+	if !showsExactly(tt, "Salt on the Wind") || textCount(tt, hiddenNote()) != 1 {
 		t.Errorf("the mix doesn't list Salt on the Wind dimmed: %q", tt.Texts())
 	}
 	click(t, s, tt, "Play Salt on the Wind")
@@ -250,13 +250,13 @@ func TestHideExplicitOwnLists(t *testing.T) {
 
 	show(s, tt, "/library/liked")
 	until(t, s, tt, "the liked songs", func() bool { return showsExactly(tt, "Salt Spray") })
-	if textCount(tt, hiddenNote) != 1 {
+	if textCount(tt, hiddenNote()) != 1 {
 		t.Errorf("the liked songs don't list Salt Spray dimmed: %q", tt.Texts())
 	}
 
 	show(s, tt, playlistPath(other.ID))
 	until(t, s, tt, "the playlist", func() bool { return showsExactly(tt, "Low Water") })
-	for _, hidden := range []string{"Salt on the Wind", "Salt Spray", hiddenNote} {
+	for _, hidden := range []string{"Salt on the Wind", "Salt Spray", hiddenNote()} {
 		if showsExactly(tt, hidden) {
 			t.Errorf("another's playlist shows %q: %q", hidden, tt.Texts())
 		}
@@ -274,7 +274,7 @@ func TestHideExplicitQueue(t *testing.T) {
 	s.settle(t, playingTrack(paperBoats))
 	s.showPanel("queue")
 	until(t, s, tt, "the queue", func() bool { return tt.HasText("Salt on the Wind") })
-	if !tt.HasText("Ada Field · " + hiddenNote) {
+	if !tt.HasText("Ada Field · " + hiddenNote()) {
 		t.Errorf("the queue doesn't note Salt on the Wind hidden: %q", tt.Texts())
 	}
 	s.p.Next()

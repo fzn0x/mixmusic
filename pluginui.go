@@ -8,6 +8,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/plugins"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // hosts are the plugin hosts of the apps, one each: plugins run as long as
@@ -121,7 +122,7 @@ func (s *shell) sweepViews() {
 func (s *shell) pluginPage(c *ui.Context, path string) {
 	page := s.plugins.Page(path)
 	if page == nil {
-		s.lost(c, "This page may belong to a plugin that is not enabled.")
+		s.lost(c, locales.PluginUILost())
 		return
 	}
 	s.pageScroll(c, func() {
@@ -280,7 +281,7 @@ func (s *shell) pluginTile(c *ui.Context, key string, v *plugins.View, n plugins
 // size changes.
 func (s *shell) pluginCanvas(c *ui.Context, key string, v *plugins.View, n plugins.Node) {
 	cv := v.Canvas(n.Canvas)
-	box := ui.Box(c.Key(key)).Height(n.Height).FillWidth().Label("Drawing")
+	box := ui.Box(c.Key(key)).Height(n.Height).FillWidth().Label(locales.PluginUIDrawing())
 	if n.Width > 0 {
 		box.MaxWidth(n.Width)
 	}

@@ -9,6 +9,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // tileSpan is how many columns and rows of the tile grid a tile takes.
@@ -201,7 +202,7 @@ func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, sub
 			}
 			if playable && rise > 0.01 {
 				p := s.buttonBase(c.Key(key+"-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().Right(8).Bottom(8).
-					Label("Play " + title).Cursor(ui.CursorPointer)
+					Label(locales.TilesPlay(title)).Cursor(ui.CursorPointer)
 				if rise < 1 {
 					p.Translate(0, 12*(1-rise)).Opacity(min(1, rise))
 				}
@@ -250,10 +251,10 @@ func (s *shell) shelfWith(c *ui.Context, key, title string, links, tiles func())
 			if links != nil {
 				links()
 			}
-			if s.iconButton(c, key+"-back", "back", "Scroll "+title+" back", false, 18).Clicked() {
+			if s.iconButton(c, key+"-back", "back", locales.TilesScrollBack(title), false, 18).Clicked() {
 				st.ScrollTo(max(st.X-step, 0), 0, ui.Smooth)
 			}
-			if s.iconButton(c, key+"-on", "forward", "Scroll "+title+" on", false, 18).Clicked() {
+			if s.iconButton(c, key+"-on", "forward", locales.TilesScrollOn(title), false, 18).Clicked() {
 				st.ScrollTo(min(st.X+step, st.MaxX), 0, ui.Smooth)
 			}
 		})
@@ -293,13 +294,13 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 		parts = append(parts, n)
 	}
 	open, play := s.artTile(c, key, a.Artwork, a.Title, strings.Join(parts, " · "), a.Source, false, false, true, func(m *ui.Menu) {
-		if m.Item("Open").Chosen() {
+		if m.Item(locales.TilesOpen()).Chosen() {
 			s.openAlbum(a.ID)
 		}
-		if m.Item("Play").Chosen() {
+		if m.Item(locales.PlayerPlay()).Chosen() {
 			s.playAlbum(a.ID)
 		}
-		if a.Source != media.SourceLocal && a.Source != media.SourceFile && m.Item("Download").Chosen() {
+		if a.Source != media.SourceLocal && a.Source != media.SourceFile && m.Item(locales.TilesDownload()).Chosen() {
 			s.downloadAlbum(a.ID)
 		}
 		s.editAlbumItem(m, a)
@@ -325,17 +326,17 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 		parts = append(parts, p.Owner)
 	}
 	if p.TrackCount > 0 {
-		parts = append(parts, plural(p.TrackCount, "track"))
+		parts = append(parts, locales.TilesTracks(p.TrackCount))
 	}
 	hidden := tracksHidden(p)
 	open, play := s.artTile(c, key, p.Artwork, p.Title, strings.Join(parts, " · "), p.Source, false, false, !hidden, func(m *ui.Menu) {
-		if m.Item("Open").Chosen() {
+		if m.Item(locales.TilesOpen()).Chosen() {
 			s.navigate(playlistPath(p.ID))
 		}
-		if !hidden && m.Item("Play").Chosen() {
+		if !hidden && m.Item(locales.PlayerPlay()).Chosen() {
 			s.playPlaylist(p.ID)
 		}
-		if !hidden && m.Item("Download").Chosen() {
+		if !hidden && m.Item(locales.TilesDownload()).Chosen() {
 			s.downloadPlaylist(p.ID)
 		}
 		s.copyLinkItem(m, p.URL)
@@ -356,10 +357,10 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 func (s *shell) artistTile(c *ui.Context, key string, a media.Artist) {
 	sub := a.Subtitle
 	if sub == "" {
-		sub = "Artist"
+		sub = locales.TopbarKindArtist()
 	}
 	open, _ := s.artTile(c, key, a.Artwork, a.Name, sub, a.Source, true, false, false, func(m *ui.Menu) {
-		if m.Item("Open").Chosen() {
+		if m.Item(locales.TilesOpen()).Chosen() {
 			s.navigate(artistPath(a.ID))
 		}
 		s.followItem(m, a)
@@ -419,7 +420,7 @@ func (s *shell) playCollection(load func(ctx context.Context) ([]media.Track, er
 			case err != nil:
 				s.notes = append(s.notes, noticeOf(err))
 			case len(tracks) == 0:
-				s.notes = append(s.notes, player.Notice{Message: "Nothing to play here"})
+				s.notes = append(s.notes, player.Notice{Message: locales.TilesNothingToPlay()})
 			default:
 				s.p.PlayAll(tracks, false)
 			}

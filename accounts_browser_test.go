@@ -47,7 +47,7 @@ func TestBrowserSignIn(t *testing.T) {
 	})
 	tt := testerOf(t, s, 1280, 2600)
 	show(s, tt, "/settings/accounts")
-	for _, want := range []string{"sign in to youtube music", youtubeBrowserTitle, youtubeBrowserAbout, "Firefox", "sign in with Firefox", "Paste a cookie header"} {
+	for _, want := range []string{"sign in to youtube music", youtubeBrowserTitle(), youtubeBrowserAbout(), "Firefox", "sign in with Firefox", "Paste a cookie header"} {
 		if !tt.HasText(want) {
 			t.Errorf("the accounts don't show %q: %q", want, tt.Texts())
 		}
@@ -80,7 +80,7 @@ func TestBrowserSignInNone(t *testing.T) {
 	s := browserShell(t, nil, func(context.Context) error { t.Error("a browser opened"); return nil })
 	tt := testerOf(t, s, 1280, 2600)
 	show(s, tt, "/settings/accounts")
-	if !tt.HasText(youtubeBrowserNone) {
+	if !tt.HasText(youtubeBrowserNone()) {
 		t.Errorf("no browser shows %q", tt.Texts())
 	}
 	for _, text := range tt.Texts() {
@@ -98,8 +98,8 @@ func TestSettingsFindBrowserSignIn(t *testing.T) {
 	tt := testerOf(t, s, 1280, 6000)
 	for _, q := range []string{"your browser", "temporary profile", "zen", "google refuses"} {
 		show(s, tt, settingsPath("", q))
-		showsOnly(t, tt, "searching "+q, []string{youtubeBrowserTitle, "sign in with Firefox"}, nil)
+		showsOnly(t, tt, "searching "+q, []string{youtubeBrowserTitle(), "sign in with Firefox"}, nil)
 	}
 	show(s, tt, settingsPath("", "crossfade"))
-	showsOnly(t, tt, "searching crossfade", nil, []string{youtubeBrowserTitle})
+	showsOnly(t, tt, "searching crossfade", nil, []string{youtubeBrowserTitle()})
 }

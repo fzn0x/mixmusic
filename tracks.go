@@ -4,6 +4,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // trackListOptions say what a track list shows.
@@ -30,7 +31,7 @@ func (s *shell) trackList(c *ui.Context, key string, tracks []media.Track, o tra
 	if len(tracks) == 0 {
 		empty := o.empty
 		if empty == "" {
-			empty = "No tracks here yet."
+			empty = locales.TracksEmpty()
 		}
 		s.emptyLine(c, empty)
 		return
@@ -100,9 +101,9 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 	row.Children(func() {
 		s.pickBox(c, key, i, t, tracks)
 		lead := s.buttonBase(c.Key(key+"-lead-"+count(i))).Size(art, art).Shrink(0).Cursor(ui.CursorPointer)
-		label := "Play " + t.Title
+		label := locales.TracksPlay(t.Title)
 		if current && s.st.Playing {
-			label = "Pause " + t.Title
+			label = locales.TracksPause(t.Title)
 		}
 		lead.Label(label)
 		if lead.Clicked() {
@@ -140,7 +141,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 				s.explicitMark(c, t, sub)
 			})
 			if missing {
-				ui.Text(c, "File not found").FontSize(k.smallSize()).TextColor(sub).SingleLine()
+				ui.Text(c, locales.TracksFileNotFound()).FontSize(k.smallSize()).TextColor(sub).SingleLine()
 			} else {
 				s.artistLine(c, key+"-artists-"+count(i), t, sub)
 			}
@@ -190,7 +191,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 		// on, or while its focus shows a ring, as Tab's does, and kept in
 		// its place on the others. The focus a click leaves on it shows
 		// none, and it goes with the pointer.
-		more := s.iconButton(c, key+"-more-"+count(i), "more", "More for "+t.Title, false, 18).Menu(menu)
+		more := s.iconButton(c, key+"-more-"+count(i), "more", locales.TracksMoreFor(t.Title), false, 18).Menu(menu)
 		if !hovered && !more.FocusVisible() {
 			more.Opacity(0)
 		}

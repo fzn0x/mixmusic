@@ -11,6 +11,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // headProps are what the head of an album, a playlist or an artist shows.
@@ -106,13 +107,13 @@ func (s *shell) collectionHead(c *ui.Context, h headProps) {
 				if h.play != nil {
 					label := h.playLabel
 					if label == "" {
-						label = "play"
+						label = locales.LibraryPlay()
 					}
 					if s.button(c, "head-play", label, true).Clicked() {
 						h.play()
 					}
 				}
-				if h.shuffle != nil && s.button(c, "head-shuffle", "shuffle", false).Clicked() {
+				if h.shuffle != nil && s.button(c, "head-shuffle", locales.LibraryShuffle(), false).Clicked() {
 					h.shuffle()
 				}
 				if h.keep != nil {
@@ -128,7 +129,7 @@ func (s *shell) collectionHead(c *ui.Context, h headProps) {
 					s.downloadButton(c, h.download)
 				}
 				if h.menu != nil {
-					s.roundButton(c, "head-more", "more", "More", false, false).Menu(h.menu)
+					s.roundButton(c, "head-more", "more", locales.CollectionMore(), false, false).Menu(h.menu)
 				}
 			})
 		})
@@ -195,7 +196,7 @@ func (s *shell) edit(key string, do func(ctx context.Context) error) {
 // keep saves or follows what the page of key shows, what, on its service:
 // kept, the page's own, tells so at once, and goes back if the service
 // refuses. Once it did, the library's list, of list, shows it.
-func (s *shell) keep(key, list, what, label string, kept *bool, on bool, do func(ctx context.Context) error) {
+func (s *shell) keep(key, list, what string, kept *bool, on bool, do func(ctx context.Context) error) {
 	*kept = on
 	s.keeping[key] = true
 	go func() {
@@ -211,9 +212,9 @@ func (s *shell) keep(key, list, what, label string, kept *bool, on bool, do func
 			}
 			s.forget(list)
 			if on {
-				s.notes = append(s.notes, notice(what+": "+label))
+				s.notes = append(s.notes, notice(locales.LibrarySavedNotice(what)))
 			} else {
-				s.notes = append(s.notes, notice(what+": no longer "+label))
+				s.notes = append(s.notes, notice(locales.LibraryUnsavedNotice(what)))
 			}
 		})
 	}()
@@ -223,31 +224,28 @@ func (s *shell) albumPage(c *ui.Context, page string) {
 	// An album with versions shows the one chosen (versions.go).
 	id, waiting := s.versionShown(page)
 	if waiting {
-		s.pageLoading(c, "album")
+		s.pageLoading(c, locales.CollectionKindAlbum())
 		return
 	}
 	key := "album:" + id
 	res := fetch(s, key, func(ctx context.Context) (media.Album, error) { return s.svc.Catalog.Album(ctx, id) })
 	switch {
 	case !res.done:
-		s.pageLoading(c, "album")
+		s.pageLoading(c, locales.CollectionKindAlbum())
 		return
 	case res.err != nil:
-		s.pageProblem(c, "album", res.err, key)
+		s.pageProblem(c, locales.CollectionKindAlbum(), res.err, key)
 		return
 	}
 	a := res.value
 	s.pageScroll(c, func() {
 		s.pageHeader(c, a.Title, nil, nil)
-		kind := string(a.Kind)
-		if kind == "" {
-			kind = "album"
-		}
+		kind := locales.CollectionAlbumKind(string(a.Kind))
 		n := a.TrackCount
 		if n == 0 {
 			n = len(a.Tracks)
 		}
-		facts := []fact{{text: kind}, {text: a.Year}, {artists: a.Artists}, {text: plural(n, "track")}}
+		facts := []fact{{text: kind}, {text: a.Year}, {artists: a.Artists}, {text: locales.LibraryTrackCount(n)}}
 		if len(a.Tracks) > 0 {
 			facts = append(facts, fact{text: longDuration(total(a.Tracks))})
 		}
@@ -259,9 +257,9 @@ func (s *shell) albumPage(c *ui.Context, page string) {
 			menu:     s.withDownload(s.withShare(s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""), albumShare(a)), d),
 		}
 		if s.signedIn(a.Source) {
-			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, "save", "saved", s.keeping[key]
+			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, locales.LibrarySave(), locales.LibrarySaved(), s.keeping[key]
 			h.onKeep = func(on bool) {
-				s.keep(key, string(a.Source)+":albums", a.Title, "saved", &res.value.Saved, on, func(ctx context.Context) error {
+				s.keep(key, string(a.Source)+":albums", a.Title, &res.value.Saved, on, func(ctx context.Context) error {
 					return s.svc.Collection.SetSaved(ctx, "album", a.ID, a.PlaylistID, on)
 				})
 			}
@@ -277,13 +275,13 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 	res := fetch(s, key, func(ctx context.Context) (media.Playlist, error) { return s.svc.Catalog.PlaylistStart(ctx, id) })
 	switch {
 	case !res.done:
-		s.pageLoading(c, "playlist")
+		s.pageLoading(c, locales.CollectionKindPlaylist())
 		return
 	case hiddenTracks(res.err, res.value):
 		s.hiddenTracksPage(c, key, res)
 		return
 	case res.err != nil:
-		s.pageProblem(c, "playlist", res.err, key)
+		s.pageProblem(c, locales.CollectionKindPlaylist(), res.err, key)
 		return
 	}
 	p := res.value
@@ -303,13 +301,13 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		s.pageHeader(c, p.Title, nil, nil)
 		owner := p.Owner
 		if local {
-			owner = "your mix"
+			owner = locales.CollectionYourMix()
 		}
 		n := r.p.TrackCount
 		if n == 0 {
 			n = len(tracks)
 		}
-		facts := texts(owner, collaborativeFact(p), plural(n, "track"))
+		facts := texts(owner, collaborativeFact(p), locales.LibraryTrackCount(n))
 		if !r.reading && r.err == nil && len(tracks) > 0 {
 			facts = append(facts, fact{text: longDuration(r.length)})
 		}
@@ -323,11 +321,11 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 			menu = func(m *ui.Menu) {
 				base(m)
 				m.Separator()
-				if m.Item("Rename").Chosen() {
+				if m.Item(locales.LibraryRenameItem()).Chosen() {
 					s.renaming, s.renameTo, s.renameID = true, p.Title, p.ID
 				}
 				s.changeCoverItem(m, p)
-				if m.Item("Delete").Chosen() {
+				if m.Item(locales.LibraryDeleteItem()).Chosen() {
 					s.deleting, s.deleteID, s.deleteTitle = true, p.ID, p.Title
 				}
 			}
@@ -349,9 +347,9 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 			h.shuffle = func() { s.whenRead(r, "shuffles", s.shuffled) }
 		}
 		if !local && !p.Editable && s.signedIn(p.Source) {
-			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, "save", "saved", s.keeping[key]
+			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, locales.LibrarySave(), locales.LibrarySaved(), s.keeping[key]
 			h.onKeep = func(on bool) {
-				s.keep(key, string(p.Source)+":playlists", p.Title, "saved", &res.value.Saved, on, func(ctx context.Context) error {
+				s.keep(key, string(p.Source)+":playlists", p.Title, &res.value.Saved, on, func(ctx context.Context) error {
 					return s.svc.Collection.SetSaved(ctx, "playlist", p.ID, "", on)
 				})
 			}
@@ -363,19 +361,21 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		}
 		s.readLine(c, r, noun)
 		view := s.trackTools(c, key, noun, tracks)
-		empty := "This playlist is empty."
+		empty := locales.CollectionPlaylistEmpty()
 		switch {
+		case s.searching(key) != "" && local:
+			empty = locales.CollectionMixNoMatch(s.searching(key))
 		case s.searching(key) != "":
-			empty = "Nothing in this " + noun + " matches “" + s.searching(key) + "”."
+			empty = locales.CollectionPlaylistNoMatch(s.searching(key))
 		case local:
-			empty = "This mix is empty: add tracks of any service from their menu."
+			empty = locales.CollectionMixEmpty()
 		}
 		o := trackListOptions{art: true, album: true, empty: empty}
 		switch {
 		case local:
 			o.menu = func(m *ui.Menu, i int, t media.Track) {
 				m.Separator()
-				if m.Item("Remove from this mix").Chosen() {
+				if m.Item(locales.CollectionRemoveFromMix()).Chosen() {
 					// The list shown may be sorted or searched: the mix's own
 					// place of the track is what goes.
 					if err := s.svc.Collection.RemoveFromPlaylist(p.ID, view.indices[i]); err != nil {
@@ -391,12 +391,12 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 					return
 				}
 				m.Separator()
-				if m.Item("Remove from this playlist").Chosen() {
+				if m.Item(locales.CollectionRemoveFromPlaylist()).Chosen() {
 					s.edit(key, func(ctx context.Context) error {
 						if err := s.svc.Collection.RemoveFromYouTubePlaylist(ctx, p.ID, t); err != nil {
 							return err
 						}
-						s.update(func() { s.notes = append(s.notes, notice("Removed "+t.Title+" from "+p.Title)) })
+						s.update(func() { s.notes = append(s.notes, notice(locales.CollectionRemovedFrom(t.Title, p.Title))) })
 						return nil
 					})
 				}
@@ -416,13 +416,13 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 // mixDialogs rename and delete mixes.
 func (s *shell) mixDialogs(c *ui.Context, key string) {
 	var in ui.Element
-	s.dialog(c, &s.renaming, dialogOptions{key: "rename", title: "rename mix"}, func() {
-		in = ui.TextInput(c.Key("rename"), &s.renameTo).AutoFocus().Label("Name").Width(360)
+	s.dialog(c, &s.renaming, dialogOptions{key: "rename", title: locales.CollectionRenameMix()}, func() {
+		in = ui.TextInput(c.Key("rename"), &s.renameTo).AutoFocus().Label(locales.RailName()).Width(360)
 	}, func() {
-		if s.dialogButton(c, "rename-cancel", "cancel", false).Clicked() {
+		if s.dialogButton(c, "rename-cancel", locales.LibraryCancel(), false).Clicked() {
 			s.renaming = false
 		}
-		if s.dialogButton(c, "rename-ok", "rename", true).Clicked() || in.Submitted() {
+		if s.dialogButton(c, "rename-ok", locales.LibraryRename(), true).Clicked() || in.Submitted() {
 			if t := strings.TrimSpace(s.renameTo); t != "" {
 				if err := s.svc.Collection.UpdatePlaylist(s.renameID, t, ""); err != nil {
 					s.notes = append(s.notes, noticeOf(err))
@@ -432,11 +432,11 @@ func (s *shell) mixDialogs(c *ui.Context, key string) {
 			s.renaming = false
 		}
 	})
-	if s.confirm(c, "delete-mix", &s.deleting, "delete mix", "Delete "+s.deleteTitle+"? Its tracks stay where they came from.", "delete") {
+	if s.confirm(c, "delete-mix", &s.deleting, locales.CollectionDeleteMix(), locales.CollectionDeleteMixQuestion(s.deleteTitle), locales.LibraryDelete()) {
 		if err := s.svc.Collection.DeletePlaylist(s.deleteID); err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 		} else {
-			s.notes = append(s.notes, player.Notice{Message: "Deleted " + s.deleteTitle})
+			s.notes = append(s.notes, player.Notice{Message: locales.LibraryDeleted(s.deleteTitle)})
 			s.navigate("/library/mixes")
 		}
 	}
@@ -462,7 +462,7 @@ func (s *shell) deleteYouTubeItem(m *ui.Menu, p media.Playlist) {
 		return
 	}
 	m.Separator()
-	if m.Item("Delete from YouTube Music…").Disabled(s.keeping["delete:"+p.ID]).Chosen() {
+	if m.Item(locales.CollectionDeleteYouTube()).Disabled(s.keeping["delete:"+p.ID]).Chosen() {
 		s.deleteYouTubePlaylist(p)
 	}
 }
@@ -476,7 +476,7 @@ func (s *shell) youtubeLibraryItems(m *ui.Menu, p media.Playlist) {
 		s.deleteYouTubeItem(m, p)
 	case p.Saved && p.Source == media.SourceYouTube && s.signedIn(media.SourceYouTube):
 		m.Separator()
-		if m.Item("Remove from library").Disabled(s.keeping["remove:"+p.ID]).Chosen() {
+		if m.Item(locales.LibraryRemoveFromLibrary()).Disabled(s.keeping["remove:"+p.ID]).Chosen() {
 			s.removeYouTubePlaylist(p)
 		}
 	}
@@ -489,30 +489,30 @@ func (s *shell) youtubeLibraryItems(m *ui.Menu, p media.Playlist) {
 // Refused, the library reads its playlists again, in case it went from
 // another device.
 func (s *shell) deleteYouTubePlaylist(p media.Playlist) {
-	s.ask("delete playlist", "Delete "+p.Title+" from YouTube Music? It goes from YouTube too, and you can't undo this. "+
-		"To keep its tracks in MixMusic, copy it into a mix first.", "delete", func() {
-		key := "delete:" + p.ID
-		s.keeping[key] = true
-		go func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-			defer cancel()
-			err := deleteOnYouTube(s, ctx, p.ID)
-			s.update(func() {
-				delete(s.keeping, key)
-				if err != nil {
-					s.notes = append(s.notes, player.Notice{Message: "Couldn't delete " + p.Title + ": " + err.Error(), Error: true})
-					s.refetch("youtube:playlists")
-					return
-				}
-				s.dropPlaylist("youtube:playlists", p.ID)
-				s.forget("playlist:" + p.ID)
-				s.notes = append(s.notes, notice("Deleted "+p.Title+" from YouTube Music"))
-				if s.router.Path() == playlistPath(p.ID) {
-					s.router.Replace("/library/youtube")
-				}
-			})
-		}()
-	})
+	s.ask(locales.CollectionDeletePlaylist(), locales.CollectionDeleteYouTubeQuestion(p.Title),
+		locales.LibraryDelete(), func() {
+			key := "delete:" + p.ID
+			s.keeping[key] = true
+			go func() {
+				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				defer cancel()
+				err := deleteOnYouTube(s, ctx, p.ID)
+				s.update(func() {
+					delete(s.keeping, key)
+					if err != nil {
+						s.notes = append(s.notes, player.Notice{Message: locales.CollectionDeleteFailed(p.Title, err.Error()), Error: true})
+						s.refetch("youtube:playlists")
+						return
+					}
+					s.dropPlaylist("youtube:playlists", p.ID)
+					s.forget("playlist:" + p.ID)
+					s.notes = append(s.notes, notice(locales.CollectionDeletedYouTube(p.Title)))
+					if s.router.Path() == playlistPath(p.ID) {
+						s.router.Replace("/library/youtube")
+					}
+				})
+			}()
+		})
 }
 
 // removeYouTubePlaylist takes a playlist the user saved out of their
@@ -532,7 +532,7 @@ func (s *shell) removeYouTubePlaylist(p media.Playlist) {
 			}
 			s.dropPlaylist("youtube:playlists", p.ID)
 			s.forget("playlist:" + p.ID)
-			s.notes = append(s.notes, notice(p.Title+": no longer saved"))
+			s.notes = append(s.notes, notice(locales.LibraryUnsavedNotice(p.Title)))
 		})
 	}()
 }
@@ -577,39 +577,39 @@ func (s *shell) keepPlaylist(key string, p media.Playlist) {
 func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string, source media.Source, importID string) func(m *ui.Menu) {
 	return func(m *ui.Menu) {
 		if len(tracks) > 0 {
-			if m.Item("Play next").Chosen() {
+			if m.Item(locales.LibraryPlayNext()).Chosen() {
 				s.p.PlayNext(tracks)
-				s.notes = append(s.notes, player.Notice{Message: title + " plays next"})
+				s.notes = append(s.notes, player.Notice{Message: locales.LibraryPlaysNext(title)})
 			}
-			if m.Item("Add to queue").Chosen() {
+			if m.Item(locales.LibraryAddToQueue()).Chosen() {
 				s.p.Enqueue(tracks)
-				s.notes = append(s.notes, player.Notice{Message: "Added " + title + " to the queue"})
+				s.notes = append(s.notes, player.Notice{Message: locales.LibraryAddedToQueue(title)})
 			}
-			if source != media.SourceFile && m.Item("Start radio").Chosen() {
+			if source != media.SourceFile && m.Item(locales.LibraryStartRadio()).Chosen() {
 				s.startRadio(tracks[0])
 			}
-			if m.Item("Save as a new mix").Chosen() {
-				s.promptName("New mix", "Name", title, "create", func(name string) {
+			if m.Item(locales.CollectionSaveAsMix()).Chosen() {
+				s.promptName(locales.RailNewMix(), locales.RailName(), title, locales.RailCreate(), func(name string) {
 					p, err := s.svc.Collection.CreatePlaylist(name, "", tracks)
 					if err != nil {
 						s.notes = append(s.notes, noticeOf(err))
 						return
 					}
-					s.notes = append(s.notes, notice("Created "+p.Title))
+					s.notes = append(s.notes, notice(locales.LibraryCreated(p.Title)))
 				})
 			}
-			if s.accounts().YouTube.SignedIn && source != media.SourceFile && m.Item("Save as a YouTube Music playlist").Chosen() {
-				s.promptName("New playlist on YouTube Music", "Name", title, "create", func(name string) {
+			if s.accounts().YouTube.SignedIn && source != media.SourceFile && m.Item(locales.CollectionSaveAsYouTube()).Chosen() {
+				s.promptName(locales.LibraryNewYouTubePlaylist(), locales.RailName(), title, locales.RailCreate(), func(name string) {
 					s.createYouTubePlaylist(name, tracks, func(p media.Playlist) { s.navigate(playlistPath(p.ID)) })
 				})
 			}
 			s.editAlbumOf(m, source, tracks)
 		}
-		if importID != "" && m.Item("Copy into a mix you can extend").Chosen() {
+		if importID != "" && m.Item(locales.CollectionCopyIntoMix()).Chosen() {
 			s.importPlaylist(importID)
 		}
 		if rawURL != "" {
-			if m.Item("Open on " + sourceName(source)).Chosen() {
+			if m.Item(locales.LibraryOpenOn(sourceName(source))).Chosen() {
 				go s.svc.System.OpenExternal(rawURL)
 			}
 			s.copyLinkItem(m, rawURL)
@@ -629,7 +629,7 @@ func (s *shell) importPlaylist(id string) {
 				s.notes = append(s.notes, noticeOf(err))
 				return
 			}
-			s.notes = append(s.notes, notice("Copied into "+p.Title))
+			s.notes = append(s.notes, notice(locales.LibraryCopiedInto(p.Title)))
 			s.navigate(playlistPath(p.ID))
 		})
 	}()
@@ -661,7 +661,11 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 			}
 		}
 		before := s.artistPivot
-		s.pageHeader(c, a.Name, pivots, &s.artistPivot)
+		labels := make([]string, len(pivots))
+		for i, p := range pivots {
+			labels[i] = artistPivotLabel(p)
+		}
+		s.pageHeader(c, a.Name, labels, &s.artistPivot)
 		// A pivot goes to its section, in the frame it is chosen.
 		jump := ""
 		if s.artistPivot != before {
@@ -673,13 +677,13 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 			}
 		}
 		h := headProps{title: a.Name, art: a.Artwork, round: true, source: a.Source, facts: texts(a.Subtitle), description: a.Description,
-			playLabel: "play top songs",
+			playLabel: locales.CollectionPlayTopSongs(),
 			menu: func(m *ui.Menu) {
 				s.followItem(m, a)
-				if len(a.TopTracks) > 0 && a.Source != media.SourceFile && m.Item("Start radio").Chosen() {
+				if len(a.TopTracks) > 0 && a.Source != media.SourceFile && m.Item(locales.LibraryStartRadio()).Chosen() {
 					s.startRadio(a.TopTracks[0])
 				}
-				if a.URL != "" && m.Item("Open on "+sourceName(a.Source)).Chosen() {
+				if a.URL != "" && m.Item(locales.LibraryOpenOn(sourceName(a.Source))).Chosen() {
 					go s.svc.System.OpenExternal(a.URL)
 				}
 				s.copyLinkItem(m, a.URL)
@@ -692,24 +696,24 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 		// An artist of the music on this computer has no releases to follow.
 		following := s.followsArtist(a)
 		if a.Source != media.SourceFile {
-			h.keep, h.keepLabel, h.keptLabel, h.keeping = &following, "follow", "following", s.keeping[key]
+			h.keep, h.keepLabel, h.keptLabel, h.keeping = &following, locales.CollectionFollow(), locales.CollectionFollowing(), s.keeping[key]
 			h.onKeep = func(on bool) { s.followArtist(a, on) }
 		}
 		s.collectionHead(c, h)
 		section("songs", func() {
-			s.sectionTitle(c, "Top songs")
+			s.sectionTitle(c, locales.CollectionTopSongs())
 			ui.Column(c).Margin(0, 0, 48).Children(func() {
-				s.trackList(c, "top", a.TopTracks, trackListOptions{art: true, album: true, empty: "No songs listed for this artist."})
+				s.trackList(c, "top", a.TopTracks, trackListOptions{art: true, album: true, empty: locales.CollectionNoArtistSongs()})
 			})
 		})
 		if len(a.Albums) > 0 {
 			section("albums", func() {
-				s.shelf(c, "albums", "Albums", func() { s.albumTiles(c, "album", a.Albums) })
+				s.shelf(c, "albums", locales.LibraryAlbums(), func() { s.albumTiles(c, "album", a.Albums) })
 			})
 		}
 		if len(a.Singles) > 0 {
 			section("singles", func() {
-				s.shelf(c, "singles", "Singles & EPs", func() { s.albumTiles(c, "single", a.Singles) })
+				s.shelf(c, "singles", locales.CollectionSinglesShelf(), func() { s.albumTiles(c, "single", a.Singles) })
 			})
 		}
 		if len(a.Related) > 0 {
@@ -718,9 +722,22 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 	})
 }
 
+// artistPivotLabel is the label of an artist's pivot, which is named by its section.
+func artistPivotLabel(section string) string {
+	switch section {
+	case "albums":
+		return locales.CollectionPivotAlbums()
+	case "singles":
+		return locales.CollectionPivotSingles()
+	case "related":
+		return locales.CollectionPivotRelated()
+	}
+	return locales.CollectionPivotSongs()
+}
+
 // relatedArtists are chips of the artists the fans of one also like.
 func (s *shell) relatedArtists(c *ui.Context, related []media.Ref) {
-	s.sectionTitle(c, "Fans also like")
+	s.sectionTitle(c, locales.CollectionFansAlsoLike())
 	ui.Row(c).Wrap().Gap(8).Children(func() {
 		for i, r := range related {
 			if r.ID == "" {

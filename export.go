@@ -9,13 +9,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // chooseExportFolder asks the user for the folder to export to, "" when
@@ -39,7 +39,7 @@ type exportMemo struct {
 // exportItem is Export… in the menu of a track downloaded or on this
 // computer.
 func (s *shell) exportItem(m *ui.Menu, t media.Track) {
-	if s.svc.Downloads.Exportable(t) && m.Item("Export…").Chosen() {
+	if s.svc.Downloads.Exportable(t) && m.Item(locales.ExportMenu()).Chosen() {
 		s.exportTracks([]media.Track{t})
 	}
 }
@@ -60,7 +60,7 @@ func (s *shell) exportPicked(c *ui.Context, tracks []media.Track) {
 		}
 		e.seq, e.kept, e.local, e.known = s.picks.seq, kept, local, true
 	}
-	if e.any && s.button(c, "picks-export", "export", false).Label("Export the selected tracks").Clicked() {
+	if e.any && s.button(c, "picks-export", locales.ExportButton(), false).Label(locales.ExportSelected()).Clicked() {
 		s.exportTracks(tracks)
 	}
 }
@@ -75,7 +75,7 @@ func (s *shell) exportTracks(tracks []media.Track) {
 		}
 	}
 	if len(out) == 0 {
-		s.notes = append(s.notes, notice("Only tracks downloaded or on this computer export"))
+		s.notes = append(s.notes, notice(locales.ExportOnlyDownloaded()))
 		return
 	}
 	go func() {
@@ -97,13 +97,13 @@ func exportNoun(tracks []media.Track) string {
 	if len(tracks) == 1 {
 		return tracks[0].Title
 	}
-	return plural(len(tracks), "track")
+	return locales.ExportTracks(len(tracks))
 }
 
 // exportTo writes copies of tracks to dir, beside the main thread, and
 // tells how it went.
 func (s *shell) exportTo(tracks []media.Track, dir string) {
-	s.notes = append(s.notes, notice(fmt.Sprintf("Exporting %s to %s…", exportNoun(tracks), dir)))
+	s.notes = append(s.notes, notice(locales.ExportingTo(exportNoun(tracks), dir)))
 	go func() {
 		res := s.svc.Downloads.Export(context.Background(), tracks, dir, app.ExportOptions{
 			Album: func(ctx context.Context, id string) (media.Album, error) { return exportAlbum(s, ctx, id) },
@@ -117,19 +117,18 @@ func (s *shell) exportTo(tracks []media.Track, dir string) {
 func (s *shell) exported(tracks []media.Track, dir string, res app.ExportResult) {
 	if len(res.Files) > 0 {
 		first := res.Files[0]
-		msg := fmt.Sprintf("Exported %s to %s", exportNoun(tracks), dir)
+		msg := locales.ExportedTo(exportNoun(tracks), dir)
 		if len(res.Failed) > 0 {
-			msg = fmt.Sprintf("Exported %d of %s to %s", len(res.Files), plural(len(tracks), "track"), dir)
+			msg = locales.ExportedPartial(len(res.Files), len(tracks), dir)
 		}
-		s.actionToasts = append(s.actionToasts, actionToast{msg, "show", func() { showInFolder(first) }})
+		s.actionToasts = append(s.actionToasts, actionToast{msg, locales.ExportShow(), func() { showInFolder(first) }})
 	}
 	switch n := len(res.Failed); {
 	case n == 1:
 		f := res.Failed[0]
-		s.notes = append(s.notes, player.Notice{Message: "Couldn't export " + f.Track.Title + ": " + f.Err.Error(), Error: true})
+		s.notes = append(s.notes, player.Notice{Message: locales.ExportFailed(f.Track.Title, f.Err.Error()), Error: true})
 	case n > 1:
 		f := res.Failed[0]
-		s.notes = append(s.notes, player.Notice{Message: fmt.Sprintf("Couldn't export %s, the first %s: %v", plural(n, "track"),
-			f.Track.Title, f.Err), Error: true})
+		s.notes = append(s.notes, player.Notice{Message: locales.ExportFailedSeveral(n, f.Track.Title, f.Err.Error()), Error: true})
 	}
 }

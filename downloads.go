@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"image"
 	"math"
@@ -66,8 +67,8 @@ func (s *shell) confirmDownload(tracks []media.Track, run func()) {
 		run()
 		return
 	}
-	s.ask("download "+plural(len(tracks), "track"), "That's about "+byteSize(size)+". They play without the network, and stay until you remove them.",
-		"download", run)
+	s.ask(locales.DownloadsConfirmTitle(len(tracks)), locales.DownloadsConfirmMessage(byteSize(size)),
+		locales.DownloadsConfirmOK(), run)
 }
 
 // downloadSize is about how many bytes tracks take, downloaded, and
@@ -85,11 +86,11 @@ func (s *shell) download(tracks []media.Track) {
 	}
 	s.confirmDownload(tracks, func() {
 		s.svc.Downloads.Add(tracks)
-		msg := "Downloading " + plural(len(tracks), "track")
+		msg := locales.DownloadsStarting(len(tracks))
 		if len(tracks) == 1 {
-			msg = "Downloading " + tracks[0].Title
+			msg = locales.DownloadsStartingTrack(tracks[0].Title)
 			if tracks[0].Source == media.SourceSpotify {
-				msg += ": its recording on YouTube Music"
+				msg = locales.DownloadsStartingTrackSpotify(tracks[0].Title)
 			}
 		}
 		s.notes = append(s.notes, notice(msg))
@@ -104,23 +105,23 @@ func (s *shell) downloadItems(m *ui.Menu, t media.Track) {
 	}
 	switch s.kept.State(t.ID).Kind {
 	case downloads.Done:
-		if m.Item("Remove download").Chosen() {
+		if m.Item(locales.DownloadsMenuRemove()).Chosen() {
 			s.svc.Downloads.Remove(t.ID)
-			s.notes = append(s.notes, notice("Removed the download of "+t.Title))
+			s.notes = append(s.notes, notice(locales.DownloadsRemoved(t.Title)))
 		}
 	case downloads.Waiting, downloads.Downloading:
-		if m.Item("Cancel download").Chosen() {
+		if m.Item(locales.DownloadsMenuCancel()).Chosen() {
 			s.svc.Downloads.Remove(t.ID)
 		}
 	case downloads.Failed:
-		if m.Item("Download again").Chosen() {
+		if m.Item(locales.DownloadsMenuRetry()).Chosen() {
 			s.svc.Downloads.Retry(t.ID)
 		}
-		if m.Item("Cancel download").Chosen() {
+		if m.Item(locales.DownloadsMenuCancel()).Chosen() {
 			s.svc.Downloads.Remove(t.ID)
 		}
 	default:
-		if m.Item("Download").Chosen() {
+		if m.Item(locales.DownloadsMenuDownload()).Chosen() {
 			s.download([]media.Track{t})
 		}
 	}
@@ -166,25 +167,25 @@ func (s *shell) downloadOf(d *downloadHead) downloadAction {
 	title := d.c.Title
 	remove := func(question string) func() {
 		return func() {
-			s.ask("remove download", question, "remove", func() {
+			s.ask(locales.DownloadsRemoveTitle(), question, locales.LibraryRemove(), func() {
 				s.svc.Downloads.RemoveCollection(d.c.ID)
-				s.notes = append(s.notes, notice("Removed the download of "+title))
+				s.notes = append(s.notes, notice(locales.DownloadsRemoved(title)))
 			})
 		}
 	}
 	switch {
 	case !held:
-		return downloadAction{"download", "Download", false, func() { s.downloadCollection(d) }}
+		return downloadAction{locales.DownloadsButtonDownload(), locales.DownloadsMenuDownload(), false, func() { s.downloadCollection(d) }}
 	case v.Waiting > 0:
-		return downloadAction{fmt.Sprintf("downloading %d of %d", v.Kept, len(v.Tracks)), "Cancel download", false,
-			remove("Stop downloading " + title + "? What downloaded of it goes too, unless another download keeps it.")}
+		return downloadAction{locales.DownloadsButtonProgress(v.Kept, len(v.Tracks)), locales.DownloadsMenuCancel(), false,
+			remove(locales.DownloadsStopQuestion(title))}
 	}
 	if more := s.missing(d); more > 0 {
-		return downloadAction{fmt.Sprintf("download %d more", more), fmt.Sprintf("Download %d more", more), false,
+		return downloadAction{locales.DownloadsButtonMore(more), locales.DownloadsMenuMore(more), false,
 			func() { s.downloadCollection(d) }}
 	}
-	return downloadAction{"downloaded", "Remove download", true,
-		remove("Remove the download of " + title + "? Its tracks won't play offline any more, unless another download keeps them.")}
+	return downloadAction{locales.DownloadsButtonDone(), locales.DownloadsMenuRemove(), true,
+		remove(locales.DownloadsRemoveQuestion(title))}
 }
 
 // missingMemo is how many tracks of a page its download misses, as counted
@@ -224,14 +225,14 @@ func (s *shell) missing(d *downloadHead) int {
 func (s *shell) downloadCollection(d *downloadHead) {
 	tracks := s.downloadableOf(d.tracks)
 	if len(tracks) == 0 {
-		s.notes = append(s.notes, notice("Nothing here downloads"))
+		s.notes = append(s.notes, notice(locales.DownloadsNothing()))
 		return
 	}
 	s.confirmDownload(tracks, func() {
 		s.svc.Downloads.AddCollection(d.c, tracks)
-		msg := "Downloading " + d.c.Title
+		msg := locales.DownloadsCollection(d.c.Title)
 		if d.c.Total > len(d.tracks) {
-			msg += fmt.Sprintf(": the %d of its %d tracks MixMusic reads", len(d.tracks), d.c.Total)
+			msg = locales.DownloadsCollectionPartial(d.c.Title, len(d.tracks), d.c.Total)
 		}
 		s.notes = append(s.notes, notice(msg))
 	})
@@ -318,19 +319,19 @@ func (s *shell) downloadMark(c *ui.Context, key string, t media.Track, on bool) 
 	}
 	switch st.Kind {
 	case downloads.Done:
-		box.Label("Downloaded").Tooltip("Downloaded").Children(func() {
+		box.Label(locales.DownloadsMarkDone()).Tooltip(locales.DownloadsMarkDone()).Children(func() {
 			ui.Icon(c, icon("download")).FontSize(13).TextColor(ink)
 		})
 	case downloads.Waiting:
-		box.Label("Waiting to download").Tooltip("Waiting to download").Draw(func(p *ui.Painter, r ui.Rect) {
+		box.Label(locales.DownloadsMarkWaiting()).Tooltip(locales.DownloadsMarkWaiting()).Draw(func(p *ui.Painter, r ui.Rect) {
 			var ring ui.Path
 			ring.Circle(r.X+7, r.Y+7, 5.5)
 			p.StrokePath(&ring, 1.5, track)
 		})
 	case downloads.Downloading:
-		label := "Downloading"
+		label := locales.DownloadsDownloading()
 		if st.Progress >= 0 {
-			label = fmt.Sprintf("Downloading, %d%%", int(math.Round(st.Progress*100)))
+			label = locales.DownloadsMarkProgress(int(math.Round(st.Progress * 100)))
 		}
 		v := float32(max(st.Progress, 0.04))
 		box.Label(label).Tooltip(label).Draw(func(p *ui.Painter, r ui.Rect) {
@@ -342,7 +343,7 @@ func (s *shell) downloadMark(c *ui.Context, key string, t media.Track, on bool) 
 			p.StrokePath(&arc, 1.5, accent)
 		})
 	case downloads.Failed:
-		label := "Couldn't download: " + st.Why
+		label := locales.DownloadsMarkFailed(st.Why)
 		box.Label(label).Tooltip(label).Children(func() {
 			ui.Icon(c, icon("alert")).FontSize(13).TextColor(danger)
 		})
@@ -402,14 +403,14 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 	}
 	problem := func() {
 		if st.Problem != "" {
-			s.alert(c, "Your downloads can't be reached", st.Problem+". Tracks stream as before meanwhile.", nil).Margin(0, 0, 32)
+			s.alert(c, locales.DownloadsProblemTitle(), locales.DownloadsProblemMessage(st.Problem), nil).Margin(0, 0, 32)
 		}
 	}
 	if st.Tracks == 0 && st.Waiting == 0 && st.Failed == 0 {
 		// A folder that can't be reached tells nothing of what it holds.
 		if st.Problem == "" {
-			ui.Text(c, k.words("Nothing downloaded yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
-			ui.Text(c, "Choose Download in the menu of a track, an album or a playlist, and it plays here without the network.").
+			ui.Text(c, k.words(locales.DownloadsEmptyTitle())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+			ui.Text(c, locales.DownloadsEmptyLine()).
 				FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640).Margin(0, 0, 24)
 		}
 		s.downloadsFolderLine(c, st)
@@ -422,7 +423,7 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 		s.downloadQueue(c, st)
 	}
 	if cols := s.kept.Collections(); len(cols) > 0 {
-		s.shelf(c, "downloaded", "Albums & playlists", func() {
+		s.shelf(c, "downloaded", locales.DownloadsShelfAlbums(), func() {
 			// The tiles far to either side take their room, and build
 			// nothing.
 			n := len(cols)
@@ -440,38 +441,38 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 		})
 	}
 	tracks := s.downloadedTracks()
-	title := "Tracks"
+	title := locales.DownloadsTracks()
 	if col, ok := s.kept.Collection(s.downloadsOf); ok {
 		title = col.Title
 	}
 	s.sectionHead(c, title, func() {
-		if s.downloadsOf != "" && s.link(c, "downloads-all", "show all") {
+		if s.downloadsOf != "" && s.link(c, "downloads-all", locales.DownloadsShowAll()) {
 			s.downloadsOf = ""
 		}
 	})
 	if len(tracks) > 0 {
 		ui.Row(c).Gap(8).Margin(0, 0, 16).Children(func() {
-			if s.button(c, "downloads-play", "play", true).Clicked() {
+			if s.button(c, "downloads-play", locales.LibraryPlay(), true).Clicked() {
 				s.p.PlayAll(tracks, false)
 			}
-			if s.button(c, "downloads-shuffle", "shuffle", false).Clicked() {
+			if s.button(c, "downloads-shuffle", locales.LibraryShuffle(), false).Clicked() {
 				s.shuffled(tracks)
 			}
 		})
 	}
 	view := s.trackTools(c, "downloads", "list", tracks)
-	empty := "Nothing downloaded here yet."
+	empty := locales.DownloadsNothingHere()
 	if q := s.searching("downloads"); q != "" {
-		empty = "No download matches “" + q + "”."
+		empty = locales.DownloadsNoMatch(q)
 	}
 	s.trackList(c, "downloads", view.tracks, trackListOptions{art: true, album: true, empty: empty})
 	if st.Tracks > 0 {
 		ui.Row(c).Margin(32, 0, 0).Children(func() {
-			if s.button(c, "downloads-remove-all", "remove all downloads", false).Clicked() {
-				s.ask("remove all downloads", fmt.Sprintf("Remove all %s, %s? They won't play offline any more.", plural(st.Tracks, "download"), byteSize(st.Bytes)),
-					"remove", func() {
+			if s.button(c, "downloads-remove-all", locales.DownloadsRemoveAll(), false).Clicked() {
+				s.ask(locales.DownloadsRemoveAll(), locales.DownloadsRemoveAllQuestion(st.Tracks, byteSize(st.Bytes)),
+					locales.LibraryRemove(), func() {
 						s.svc.Downloads.RemoveAll()
-						s.notes = append(s.notes, notice("Removed every download"))
+						s.notes = append(s.notes, notice(locales.DownloadsRemovedAll()))
 					})
 			}
 		})
@@ -483,11 +484,11 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 func (s *shell) downloadsFolderLine(c *ui.Context, st downloads.Status) {
 	k := &s.lk
 	ui.Row(c).Gap(16).Wrap().AlignItems(ui.Center).Margin(0, 0, 24).Children(func() {
-		ui.Text(c, plural(st.Tracks, "track")+" · "+byteSize(st.Bytes)+" · in "+st.Folder).FontSize(k.smallSize()).TextColor(k.muted).MinWidth(0)
-		if s.link(c, "downloads-open", "open folder") {
+		ui.Text(c, locales.DownloadsFolderLine(st.Tracks, byteSize(st.Bytes), st.Folder)).FontSize(k.smallSize()).TextColor(k.muted).MinWidth(0)
+		if s.link(c, "downloads-open", locales.DownloadsOpenFolder()) {
 			s.openDownloads()
 		}
-		if s.link(c, "downloads-settings", "settings") {
+		if s.link(c, "downloads-settings", locales.DownloadsSettings()) {
 			s.navigate("/settings/playback")
 		}
 	})
@@ -507,28 +508,28 @@ func (s *shell) openDownloads() {
 func (s *shell) downloadQueue(c *ui.Context, st downloads.Status) {
 	k := &s.lk
 	ui.Column(c).Margin(0, 0, 48).Children(func() {
-		s.sectionHead(c, "Downloading", func() {
+		s.sectionHead(c, locales.DownloadsDownloading(), func() {
 			if st.Waiting > 0 {
-				label := "pause"
+				label := locales.DownloadsPause()
 				if st.Paused {
-					label = "resume"
+					label = locales.DownloadsResume()
 				}
 				if s.link(c, "downloads-pause", label) {
 					s.svc.Downloads.SetPaused(!st.Paused)
 				}
-				if s.link(c, "downloads-cancel", "cancel all") {
-					s.ask("cancel all downloads", "Stop every download under way, and those that wait? What downloaded stays.", "stop", s.svc.Downloads.CancelAll)
+				if s.link(c, "downloads-cancel", locales.DownloadsCancelAll()) {
+					s.ask(locales.DownloadsCancelAllTitle(), locales.DownloadsCancelAllQuestion(), locales.DownloadsStop(), s.svc.Downloads.CancelAll)
 				}
 			}
-			if st.Failed > 0 && s.link(c, "downloads-retry", "retry failed") {
+			if st.Failed > 0 && s.link(c, "downloads-retry", locales.DownloadsRetryFailed()) {
 				s.svc.Downloads.RetryFailed()
 			}
 		})
 		if st.Waiting > 0 {
 			total := st.BatchDone + st.Waiting
 			ui.Row(c).Gap(12).AlignItems(ui.Center).Margin(0, 0, 12).Children(func() {
-				ui.Progress(c, float64(st.BatchDone)/float64(total)).Width(240).Label("Downloads")
-				ui.Text(c, fmt.Sprintf("%d of %d", st.BatchDone, total)).FontSize(k.smallSize()).TextColor(k.muted).FontFeatures("tnum")
+				ui.Progress(c, float64(st.BatchDone)/float64(total)).Width(240).Label(locales.DownloadsProgressLabel())
+				ui.Text(c, locales.DownloadsBatchCount(st.BatchDone, total)).FontSize(k.smallSize()).TextColor(k.muted).FontFeatures("tnum")
 			})
 		}
 		if st.Hold != "" {
@@ -538,7 +539,7 @@ func (s *shell) downloadQueue(c *ui.Context, st downloads.Status) {
 			s.jobRow(c, j)
 		}
 		if listed := len(st.Jobs); st.Waiting > listed {
-			ui.Text(c, k.sentence(fmt.Sprintf("and %d more", st.Waiting-listed))).FontSize(k.smallSize()).TextColor(k.muted).Padding(8, 8)
+			ui.Text(c, k.sentence(locales.DownloadsAndMore(st.Waiting-listed))).FontSize(k.smallSize()).TextColor(k.muted).Padding(8, 8)
 		}
 		for _, j := range st.FailedJobs {
 			s.jobRow(c, j)
@@ -557,23 +558,23 @@ func (s *shell) jobRow(c *ui.Context, j downloads.Job) {
 			ui.Text(c, t.Title).FontSize(k.bodySize()).SingleLine()
 			ui.Text(c, names(t.Artists)).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 		})
-		status, ink := "waiting", k.muted
+		status, ink := locales.DownloadsStatusWaiting(), k.muted
 		switch st.Kind {
 		case downloads.Downloading:
-			status = "downloading"
+			status = locales.DownloadsStatusDownloading()
 			if j.Phase != "" {
 				status = j.Phase
 			} else if st.Progress >= 0 {
 				status = fmt.Sprintf("%d%%", int(math.Round(st.Progress*100)))
 			}
 		case downloads.Failed:
-			status, ink = "couldn't download: "+st.Why, k.danger
+			status, ink = locales.DownloadsStatusFailed(st.Why), k.danger
 		}
 		ui.Text(c, k.sentence(status)).FontSize(k.smallSize()).TextColor(ink).MaxWidth(360).MaxLines(2).Shrink(1)
-		if st.Kind == downloads.Failed && s.link(c, "job-retry-"+t.ID, "retry") {
+		if st.Kind == downloads.Failed && s.link(c, "job-retry-"+t.ID, locales.DownloadsRetry()) {
 			s.svc.Downloads.Retry(t.ID)
 		}
-		if s.iconButton(c, "job-cancel-"+t.ID, "close", "Cancel the download of "+t.Title, false, 14).Clicked() {
+		if s.iconButton(c, "job-cancel-"+t.ID, "close", locales.DownloadsCancelOne(t.Title), false, 14).Clicked() {
 			s.svc.Downloads.Remove(t.ID)
 		}
 	})
@@ -582,21 +583,25 @@ func (s *shell) jobRow(c *ui.Context, j downloads.Job) {
 // downloadedTile is an album, a playlist or a mix downloaded, which shows
 // its tracks below when chosen.
 func (s *shell) downloadedTile(c *ui.Context, key string, v downloads.CollectionView) {
-	sub := plural(len(v.Tracks), "track")
-	if v.Kept < len(v.Tracks) {
-		sub = fmt.Sprintf("%d of %d tracks", v.Kept, len(v.Tracks))
-	}
-	if v.Total > len(v.Tracks) {
-		sub += fmt.Sprintf(", of its %d", v.Total)
+	var sub string
+	switch {
+	case v.Kept < len(v.Tracks) && v.Total > len(v.Tracks):
+		sub = locales.DownloadsTileKeptOfTotal(v.Kept, len(v.Tracks), v.Total)
+	case v.Kept < len(v.Tracks):
+		sub = locales.DownloadsTileKept(v.Kept, len(v.Tracks))
+	case v.Total > len(v.Tracks):
+		sub = locales.DownloadsTileTracksOfTotal(len(v.Tracks), v.Total)
+	default:
+		sub = locales.DownloadsTileTracks(len(v.Tracks))
 	}
 	art := v.Artwork
 	open, play := s.artTile(c, key, art, v.Title, sub, v.Source, false, s.downloadsOf == v.ID, true, func(m *ui.Menu) {
-		if m.Item("Show its tracks").Chosen() {
+		if m.Item(locales.DownloadsMenuShowTracks()).Chosen() {
 			s.downloadsOf = v.ID
 		}
-		if m.Item("Remove download").Chosen() {
-			s.ask("remove download", "Remove the download of "+v.Title+"? Its tracks won't play offline any more, unless another download keeps them.",
-				"remove", func() { s.svc.Downloads.RemoveCollection(v.ID) })
+		if m.Item(locales.DownloadsMenuRemove()).Chosen() {
+			s.ask(locales.DownloadsRemoveTitle(), locales.DownloadsRemoveQuestion(v.Title),
+				locales.LibraryRemove(), func() { s.svc.Downloads.RemoveCollection(v.ID) })
 		}
 	})
 	switch {
@@ -701,8 +706,8 @@ func (s *shell) askMoveDownloads(dir string, st downloads.Status) {
 		s.moveDownloads(dir)
 		return
 	}
-	s.ask("move downloads", fmt.Sprintf("Move %s, %s, to %s? They wait meanwhile.", plural(st.Tracks, "download"), byteSize(st.Bytes), dir),
-		"move", func() { s.moveDownloads(dir) })
+	s.ask(locales.DownloadsMoveTitle(), locales.DownloadsMoveQuestion(st.Tracks, byteSize(st.Bytes), dir),
+		locales.DownloadsMove(), func() { s.moveDownloads(dir) })
 }
 
 // moveDownloads moves the downloads to dir, showing how far it came, and
@@ -717,12 +722,12 @@ func (s *shell) moveDownloads(dir string) {
 		s.update(func() {
 			s.movingDownloads = false
 			if err != nil {
-				s.notes = append(s.notes, noticeOf(fmt.Errorf("couldn't move the downloads: %w", err)))
+				s.notes = append(s.notes, noticeOf(errors.New(locales.DownloadsMoveFailed(err.Error()))))
 				return
 			}
 			s.set.DownloadsFolder = got
 			s.save()
-			s.notes = append(s.notes, notice("The downloads are in "+s.svc.Downloads.Folder()+" now"))
+			s.notes = append(s.notes, notice(locales.DownloadsMovedTo(s.svc.Downloads.Folder())))
 		})
 	}()
 }
@@ -753,6 +758,6 @@ func (s *shell) followNetwork(online bool) {
 	if online || s.svc.Downloads.Snapshot().Status().Tracks == 0 {
 		return
 	}
-	s.actionToasts = append(s.actionToasts, actionToast{"You're offline: your downloads still play", "downloads",
+	s.actionToasts = append(s.actionToasts, actionToast{locales.DownloadsOffline(), locales.DownloadsOfflineAction(),
 		func() { s.navigate("/library/downloads") }})
 }

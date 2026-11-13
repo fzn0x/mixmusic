@@ -15,6 +15,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // hides reports whether the settings hide the track t: an explicit song or
@@ -107,11 +108,11 @@ func (s *shell) shownGroup(g []media.Album) []media.Album {
 // explicitBadge is the "e" of an explicit track, in ink.
 func (s *shell) explicitBadge(c *ui.Context, ink ui.Color) {
 	ui.Text(c, "e").FontSize(s.lk.captionSize()).TextColor(ink).Padding(0, 4).Border(1, ink).
-		Radius(2).Label("Explicit").Shrink(0)
+		Radius(2).Label(locales.ExplicitTagLabel()).Shrink(0)
 }
 
 // hiddenNote is the note of a row of a track the settings hide.
-const hiddenNote = "hidden by your settings"
+func hiddenNote() string { return locales.ExplicitTagHidden() }
 
 // explicitMark marks the row of an explicit track, after its title: its
 // "e".
@@ -132,7 +133,7 @@ func (s *shell) artistLine(c *ui.Context, key string, t media.Track, ink ui.Colo
 	ui.Row(c).MinWidth(0).Gap(k.smallSize() / 4).Children(func() {
 		s.artistLinks(c, key, t.Artists, ink)
 		ui.Text(c, "·").FontSize(k.smallSize()).TextColor(ink).Shrink(0)
-		ui.Text(c, hiddenNote).FontSize(k.smallSize()).TextColor(ink).SingleLine().Shrink(0)
+		ui.Text(c, hiddenNote()).FontSize(k.smallSize()).TextColor(ink).SingleLine().Shrink(0)
 	})
 }
 

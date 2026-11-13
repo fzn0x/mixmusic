@@ -24,6 +24,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/plugins"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Open opens the native interface's main window, hidden when asked.
@@ -533,7 +534,7 @@ func (s *shell) refresh() {
 	s.themeCommands = s.themeCommands[:0]
 	for _, t := range s.inv.Themes {
 		id := t.ID
-		s.themeCommands = append(s.themeCommands, command{"theme." + id, "Theme: " + t.Name, "", "themes", func() { s.chooseTheme(id) }})
+		s.themeCommands = append(s.themeCommands, command{"theme." + id, locales.CmdThemeTitle(t.Name), "", "themes", func() { s.chooseTheme(id) }})
 	}
 	s.refetch("accounts")
 	if s.offer == nil {
@@ -689,7 +690,7 @@ func (s *shell) promptDialog(c *ui.Context) {
 		in = ui.TextInput(c.Key("prompt"), &p.value).AutoFocus().Label(p.label).Width(360)
 	}, func() {
 		name := strings.TrimSpace(p.value)
-		if s.dialogButton(c, "prompt-cancel", "cancel", false).Clicked() {
+		if s.dialogButton(c, "prompt-cancel", locales.ShortcutsCancel(), false).Clicked() {
 			s.naming = nil
 		}
 		if (s.dialogButton(c, "prompt-ok", p.confirm, true).Disabled(name == "").Clicked() || in.Submitted()) && name != "" {
@@ -710,9 +711,9 @@ func (s *shell) offerCrashReport() {
 		return
 	}
 	s.asking = &question{
-		title:   "mixmusic quit unexpectedly",
-		message: "It kept a report of what happened, " + report + ", in its logs folder. Reporting it on GitHub, with that file attached, helps fix it.",
-		ok:      "report it",
+		title:   locales.NativeCrashTitle(),
+		message: locales.NativeCrashMessage(report),
+		ok:      locales.NativeCrashReport(),
 		run: func() {
 			s.svc.System.DismissCrash()
 			go func() {

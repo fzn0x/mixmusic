@@ -8,12 +8,25 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
-var (
-	searchPivots = []string{"all", "songs", "videos", "albums", "artists", "playlists", "podcasts"}
-	searchScopes = []string{"both", "Spotify", "网易云音乐"}
-)
+var searchPivots = []string{"all", "songs", "videos", "albums", "artists", "playlists", "podcasts"}
+
+// searchPivotLabels are the names of searchPivots, in the language the app
+// shows.
+func searchPivotLabels() []string {
+	return []string{
+		locales.SearchPivotAll(), locales.SearchPivotSongs(), locales.SearchPivotVideos(), locales.SearchPivotAlbums(),
+		locales.SearchPivotArtists(), locales.SearchPivotPlaylists(), locales.SearchPivotPodcasts(),
+	}
+}
+
+// searchScopeLabels are the names of the services a search covers: both,
+// Spotify, NetEase Cloud Music.
+func searchScopeLabels() []string {
+	return []string{locales.SearchScopeBoth(), "Spotify", "网易云音乐"}
+}
 
 // interleave alternates the items of two lists, so both services lead.
 func interleave[T any](a, b []T) []T {
@@ -65,9 +78,9 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 			albums := len(s.albumGroups("album", r.Albums))
 			counts = []int{-1, len(r.Tracks), len(r.Videos), albums, len(r.Artists), len(r.Playlists), s.podcastCount(q)}
 		}
-		s.pageHeaderCounts(c, q, searchPivots, counts, &s.searchPivot)
+		s.pageHeaderCounts(c, q, searchPivotLabels(), counts, &s.searchPivot)
 		ui.Row(c).Margin(0, 0, 24).Children(func() {
-			s.segmented(c, "scope", "Services", &s.searchScope, searchScopes...)
+			s.segmented(c, "scope", locales.SearchServices(), &s.searchScope, searchScopeLabels()...)
 		})
 		if s.searchScope == 0 {
 			s.computerResults(c, q, searchPivots[s.searchPivot])
@@ -82,9 +95,9 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		}
 		if !res.value.SpotifySignedIn && s.searchScope != 2 {
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).Children(func() {
-				ui.Text(c, "Searching NetEase Cloud Music only. ")
-				s.linkOf(c, "Sign in to Spotify", "/settings/accounts")
-				ui.Text(c, " to search it too.")
+				ui.Text(c, locales.SearchNetEaseOnly())
+				s.linkOf(c, locales.SearchSignInSpotify(), "/settings/accounts")
+				ui.Text(c, locales.SearchSignInTail())
 			})
 		}
 		if len(res.value.Errors) > 0 {
@@ -95,11 +108,11 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		if pivot == "all" || pivot == "songs" {
 			tracks := r.Tracks
 			if pivot == "all" {
-				s.sectionTitle(c, "Songs")
+				s.sectionTitle(c, locales.SearchSongs())
 				tracks = tracks[:min(len(tracks), 10)]
 			}
 			ui.Column(c).Margin(0, 0, 48).Children(func() {
-				s.trackList(c, "results", tracks, trackListOptions{art: true, album: true, plays: true, empty: "No songs match."})
+				s.trackList(c, "results", tracks, trackListOptions{art: true, album: true, plays: true, empty: locales.SearchNoSongs()})
 			})
 		}
 		// Videos are YouTube's own, as DJ sets and live recordings, which
@@ -108,13 +121,10 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		if (pivot == "all" && len(r.Videos) > 0) || pivot == "videos" {
 			videos := r.Videos
 			if pivot == "all" {
-				s.sectionTitle(c, "Videos")
+				s.sectionTitle(c, locales.SearchVideos())
 				videos = videos[:min(len(videos), 5)]
 			}
-			empty := "No videos match."
-			if s.searchScope == 1 {
-				empty = "No videos match."
-			}
+			empty := locales.SearchNoVideos()
 			ui.Column(c).Margin(0, 0, 48).Children(func() {
 				s.trackList(c, "video-results", videos, trackListOptions{art: true, plays: true, empty: empty})
 			})
@@ -122,17 +132,17 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		switch pivot {
 		case "all":
 			if len(r.Artists) > 0 {
-				s.shelf(c, "artists", "Artists", func() {
+				s.shelf(c, "artists", locales.SearchArtists(), func() {
 					for i, a := range r.Artists {
 						s.artistTile(c, "artist-"+count(i), a)
 					}
 				})
 			}
 			if len(r.Albums) > 0 {
-				s.shelf(c, "albums", "Albums", func() { s.albumTiles(c, "album", r.Albums) })
+				s.shelf(c, "albums", locales.SearchAlbums(), func() { s.albumTiles(c, "album", r.Albums) })
 			}
 			if len(r.Playlists) > 0 {
-				s.shelf(c, "playlists", "Playlists", func() {
+				s.shelf(c, "playlists", locales.SearchPlaylists(), func() {
 					for i, p := range r.Playlists {
 						s.playlistTile(c, "playlist-"+count(i), p)
 					}
@@ -150,7 +160,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 			// Spotify's search lists the playlists of others too, whose
 			// tracks it shows apps none of: they're left out (#530).
 			if s.searchScope == 1 && res.value.SpotifySignedIn {
-				ui.Text(c, "Spotify shows apps the tracks of the playlists you own or collaborate on only, so only those are listed.").
+				ui.Text(c, locales.SearchSpotifyPlaylists()).
 					FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16)
 			}
 			s.tileWrap(c, func() {
@@ -172,12 +182,12 @@ func (s *shell) tileWrap(c *ui.Context, tiles func()) {
 // recentSearches invites a search, and lists the recent ones.
 func (s *shell) recentSearches(c *ui.Context) {
 	k := &s.lk
-	s.pageHeader(c, "Search", nil, nil)
+	s.pageHeader(c, locales.SearchTitle(), nil, nil)
 	ui.Column(c).Gap(16).Margin(0, 0, 48).Children(func() {
-		ui.Text(c, k.words("Find anything")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
-		ui.Text(c, "One search looks through NetEase Cloud Music and, once you sign in, Spotify.").
+		ui.Text(c, k.words(locales.SearchFindAnything())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+		ui.Text(c, locales.SearchIntro()).
 			FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640)
-		if s.button(c, "start-typing", "start typing", true).Clicked() {
+		if s.button(c, "start-typing", locales.SearchStartTyping(), true).Clicked() {
 			s.searchBox.Focus()
 		}
 	})
@@ -186,7 +196,7 @@ func (s *shell) recentSearches(c *ui.Context) {
 		return
 	}
 	ui.Row(c).Justify(ui.SpaceBetween).Children(func() {
-		ui.Column(c).Grow(1).Children(func() { s.sectionTitle(c, "Recent") })
+		ui.Column(c).Grow(1).Children(func() { s.sectionTitle(c, locales.SearchRecent()) })
 	})
 	ui.Row(c).Wrap().Gap(8).Children(func() {
 		for i, q := range searches {
@@ -209,11 +219,11 @@ func (s *shell) recentSearches(c *ui.Context) {
 			chip.Children(func() { ui.Text(c, q).FontSize(k.smallSize()).SingleLine() })
 		}
 	})
-	clear := s.buttonBase(c.Key("clear-searches")).Margin(16, 0, 0).AlignSelf(ui.Start).Label("Clear the recent searches").Cursor(ui.CursorPointer)
+	clear := s.buttonBase(c.Key("clear-searches")).Margin(16, 0, 0).AlignSelf(ui.Start).Label(locales.SearchClearRecent()).Cursor(ui.CursorPointer)
 	if clear.Clicked() {
 		if err := s.svc.Collection.ClearSearches(); err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 		}
 	}
-	clear.Children(func() { ui.Text(c, "clear").FontSize(k.smallSize()).TextColor(k.accent) })
+	clear.Children(func() { ui.Text(c, locales.SearchClear()).FontSize(k.smallSize()).TextColor(k.accent) })
 }

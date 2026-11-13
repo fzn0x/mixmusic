@@ -14,6 +14,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 func podcastPath(id string) string { return "/podcast/" + url.PathEscape(id) }
@@ -119,35 +120,35 @@ func (s *shell) podcastPage(c *ui.Context, id string) {
 	k := &s.lk
 	s.pageScroll(c, func() {
 		s.pageHeader(c, p.Title, nil, nil)
-		facts := []fact{{text: "podcast"}, {artists: p.Authors}}
+		facts := []fact{{text: locales.PodcastsKind()}, {artists: p.Authors}}
 		if p.EpisodeCount > 0 {
-			facts = append(facts, fact{text: plural(p.EpisodeCount, "episode")})
+			facts = append(facts, fact{text: locales.PodcastsEpisodeCount(p.EpisodeCount)})
 		}
 		following := s.followsPodcast(p)
 		h := headProps{art: p.Artwork, source: p.Source, facts: facts, description: p.Description,
-			keep: &following, keepLabel: "follow", keptLabel: "following", keeping: s.keeping[key],
+			keep: &following, keepLabel: locales.PodcastsFollow(), keptLabel: locales.PodcastsFollowing(), keeping: s.keeping[key],
 			onKeep: func(on bool) { s.followPodcast(key, p, &res.value.Saved, on) },
 			menu:   s.collectionMenu(p.Title, nil, p.URL, p.Source, ""),
 		}
 		if len(episodes) > 0 {
 			h.play = func() { s.p.PlayTracks(episodes, 0) }
 			if i := s.resumeIndex(pages); i >= 0 {
-				h.playLabel = "resume"
+				h.playLabel = locales.PodcastsResume()
 				h.play = func() { s.p.PlayTracks(episodes, i) }
 			}
 		}
 		s.collectionHead(c, h)
 		if p.Source == media.SourceSpotify && !s.svc.Catalog.SpotifyEpisodesPlay() {
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).Children(func() {
-				ui.Text(c, "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in ")
-				s.linkOf(c, "Settings › Playback", "/settings/playback")
-				ui.Text(c, ".")
+				ui.Text(c, locales.PodcastsSpotifyOnlyLead())
+				s.linkOf(c, locales.PodcastsSettingsPlayback(), "/settings/playback")
+				ui.Text(c, locales.PodcastsSpotifyOnlyTail())
 			})
 		}
-		s.episodeList(c, "episodes", episodes, episodeListOptions{empty: "No episodes yet."})
+		s.episodeList(c, "episodes", episodes, episodeListOptions{empty: locales.PodcastsNoEpisodes()})
 		if pages.more != "" {
 			ui.Row(c).Margin(16, 0, 0).Children(func() {
-				if s.button(c, "more-episodes", "load more episodes", false).Disabled(pages.loading).Clicked() {
+				if s.button(c, "more-episodes", locales.PodcastsLoadMore(), false).Disabled(pages.loading).Clicked() {
 					s.loadMoreEpisodes(pages, media.Ref{ID: p.ID, Name: p.Title})
 				}
 			})
@@ -195,9 +196,9 @@ func (s *shell) followPodcast(key string, p media.Podcast, saved *bool, on bool)
 				return
 			}
 			if on {
-				s.notes = append(s.notes, notice(p.Title+": following"))
+				s.notes = append(s.notes, notice(locales.PodcastsFollowed(p.Title)))
 			} else {
-				s.notes = append(s.notes, notice(p.Title+": no longer following"))
+				s.notes = append(s.notes, notice(locales.PodcastsUnfollowed(p.Title)))
 			}
 			if s.signedIn(p.Source) {
 				*saved = on
@@ -302,9 +303,9 @@ func (s *shell) episodeRow(c *ui.Context, key string, i int, episodes []media.Tr
 	const art = 48
 	row.Children(func() {
 		lead := s.buttonBase(c.Key(key+"-lead-"+count(i))).Size(art, art).Shrink(0).Cursor(ui.CursorPointer)
-		label := "Play " + t.Title
+		label := locales.PodcastsPlayTitle(t.Title)
 		if current && s.st.Playing {
-			label = "Pause " + t.Title
+			label = locales.PodcastsPauseTitle(t.Title)
 		}
 		if lead.Label(label).Clicked() {
 			play()
@@ -331,7 +332,7 @@ func (s *shell) episodeRow(c *ui.Context, key string, i int, episodes []media.Tr
 			duration = clock(ms(t.DurationMs))
 		}
 		ui.Text(c, duration).FontSize(k.smallSize()).TextColor(sub).FontFeatures("tnum").Width(64).TextAlign(ui.End).Shrink(0)
-		more := s.iconButton(c, key+"-more-"+count(i), "more", "More for "+t.Title, false, 18).Menu(menu)
+		more := s.iconButton(c, key+"-more-"+count(i), "more", locales.PodcastsMoreFor(t.Title), false, 18).Menu(menu)
 		if !hovered && !more.FocusVisible() {
 			more.Opacity(0)
 		}
@@ -357,12 +358,12 @@ func (s *shell) episodeLine(t media.Track, show bool, now time.Time) string {
 	if pos, ok := s.svc.Collection.Position(t.ID); ok {
 		switch {
 		case pos.Played:
-			parts = append(parts, "played")
+			parts = append(parts, locales.PodcastsPlayed())
 		case pos.Left() > 0:
-			parts = append(parts, longDuration(pos.Left())+" left")
+			parts = append(parts, locales.PodcastsLeft(longDuration(pos.Left())))
 		}
 	} else if e := t.Episode; e != nil && e.Played {
-		parts = append(parts, "played")
+		parts = append(parts, locales.PodcastsPlayed())
 	}
 	return strings.Join(parts, " · ")
 }
@@ -373,12 +374,12 @@ func (s *shell) episodeLine(t media.Track, show bool, now time.Time) string {
 func releasedLabel(day string, now time.Time) string {
 	if t, err := time.Parse(time.DateOnly, day); err == nil {
 		if t.Year() == now.Year() {
-			return t.Format("Jan 2")
+			return monthDay(t)
 		}
-		return t.Format("Jan 2, 2006")
+		return monthDayYear(t)
 	}
 	if t, err := time.Parse("2006-01", day); err == nil {
-		return t.Format("Jan 2006")
+		return monthYear(t)
 	}
 	return day
 }
@@ -389,16 +390,16 @@ func (s *shell) episodeItems(m *ui.Menu, t media.Track) {
 	if t.Episode == nil {
 		return
 	}
-	if id := t.Episode.Show.ID; id != "" && m.Item("Go to podcast").Chosen() {
+	if id := t.Episode.Show.ID; id != "" && m.Item(locales.PodcastsGoToPodcast()).Chosen() {
 		s.navigate(podcastPath(id))
 	}
 	played := t.Episode.Played
 	if pos, ok := s.svc.Collection.Position(t.ID); ok {
 		played = pos.Played
 	}
-	label := "Mark as played"
+	label := locales.PodcastsMarkPlayed()
 	if played {
-		label = "Mark as unplayed"
+		label = locales.PodcastsMarkUnplayed()
 	}
 	if m.Item(label).Chosen() {
 		s.svc.Collection.SetPlayed(t, !played)
@@ -410,13 +411,13 @@ func (s *shell) episodeItems(m *ui.Menu, t media.Track) {
 func (s *shell) podcastTile(c *ui.Context, key string, p media.Podcast) {
 	sub := names(p.Authors)
 	if sub == "" {
-		sub = "Podcast"
+		sub = locales.PodcastsPodcast()
 	}
 	open, play := s.artTile(c, key, p.Artwork, p.Title, sub, p.Source, false, false, true, func(m *ui.Menu) {
-		if m.Item("Open").Chosen() {
+		if m.Item(locales.PodcastsOpen()).Chosen() {
 			s.navigate(podcastPath(p.ID))
 		}
-		if m.Item("Play").Chosen() {
+		if m.Item(locales.PodcastsPlay()).Chosen() {
 			s.playPodcast(p.ID)
 		}
 		s.copyLinkItem(m, p.URL)
@@ -441,7 +442,7 @@ func (s *shell) playPodcast(id string) {
 			case err != nil:
 				s.notes = append(s.notes, noticeOf(err))
 			case len(p.Episodes) == 0:
-				s.notes = append(s.notes, notice("Nothing to play here"))
+				s.notes = append(s.notes, notice(locales.PodcastsNothingToPlay()))
 			default:
 				s.p.PlayTracks(p.Episodes, max(s.resumable(p.Episodes), 0))
 			}
@@ -476,8 +477,8 @@ func (s *shell) podcastSearch(c *ui.Context, q string) {
 			})
 		})
 	}
-	s.sectionTitle(c, "Episodes")
-	s.episodeList(c, "search-episodes", r.Episodes, episodeListOptions{show: true, empty: "No episodes match."})
+	s.sectionTitle(c, locales.PodcastsEpisodes())
+	s.episodeList(c, "search-episodes", r.Episodes, episodeListOptions{show: true, empty: locales.PodcastsNoMatch()})
 }
 
 // mergedPodcasts are the podcasts of res of the services of the search's
@@ -519,18 +520,18 @@ func (s *shell) podcastCount(q string) int {
 func (s *shell) podcastLibrary(c *ui.Context) {
 	k := &s.lk
 	if listening := s.listening(); len(listening) > 0 {
-		s.sectionTitle(c, "Keep listening")
+		s.sectionTitle(c, locales.PodcastsKeepListening())
 		ui.Column(c).Margin(0, 0, 48).Children(func() {
 			s.episodeList(c, "keep-listening", listening, episodeListOptions{show: true})
 		})
 	}
 	following := s.svc.Collection.Podcasts()
 	if len(following) == 0 {
-		ui.Text(c, k.words("Nothing followed yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
-		ui.Text(c, "Follow a podcast from its page, from Spotify or YouTube Music, and it waits here.").
+		ui.Text(c, k.words(locales.PodcastsNothingFollowed())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+		ui.Text(c, locales.PodcastsFollowHint()).
 			FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640).Margin(0, 0, 48)
 	} else {
-		s.sectionTitle(c, "Following")
+		s.sectionTitle(c, locales.PodcastsFollowingTitle())
 		ui.Column(c).Margin(0, 0, 48).Children(func() {
 			s.tileWrap(c, func() {
 				for i, p := range following {
@@ -541,10 +542,10 @@ func (s *shell) podcastLibrary(c *ui.Context) {
 	}
 	accounts := s.accounts()
 	if accounts.Spotify.SignedIn {
-		s.savedPodcasts(c, "spotify", "Saved on Spotify", s.savedOn(media.SourceSpotify))
+		s.savedPodcasts(c, "spotify", locales.PodcastsSavedOn(sourceName(media.SourceSpotify)), s.savedOn(media.SourceSpotify))
 	}
 	if accounts.YouTube.SignedIn {
-		s.savedPodcasts(c, "youtube", "Saved on YouTube Music", s.savedOn(media.SourceYouTube))
+		s.savedPodcasts(c, "youtube", locales.PodcastsSavedOn(sourceName(media.SourceYouTube)), s.savedOn(media.SourceYouTube))
 	}
 }
 

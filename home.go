@@ -7,13 +7,16 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
-// homeFilters are the home page's pivots, and the sources they keep.
-var homeFilters = []struct {
-	label  string
-	source media.Source
-}{{"Everything", ""}, {"Yours", media.SourceLocal}, {"Spotify", media.SourceSpotify}, {"网易云音乐", media.SourceNetEase}}
+// homeFilters are the home page's pivots, and the sources they keep;
+// homeFilterLabels are their names, in the language the app shows.
+var homeFilters = []media.Source{"", media.SourceLocal, media.SourceSpotify, media.SourceNetEase}
+
+func homeFilterLabels() []string {
+	return []string{locales.HomeFilterEverything(), locales.HomeFilterYours(), "Spotify", "网易云音乐"}
+}
 
 // networkOnline tells whether the network answers, as last checked; tests
 // answer for it.
@@ -26,15 +29,11 @@ func (s *shell) homePage(c *ui.Context) {
 	k := &s.lk
 	s.pageScroll(c, func() {
 		if s.home.editing {
-			s.pageHeader(c, "Home", nil, nil)
+			s.pageHeader(c, locales.HomeTitle(), nil, nil)
 			s.homeEditor(c)
 			return
 		}
-		labels := make([]string, len(homeFilters))
-		for i, f := range homeFilters {
-			labels[i] = f.label
-		}
-		s.pageHeader(c, "Home", labels, &s.homeFilter)
+		s.pageHeader(c, locales.HomeTitle(), homeFilterLabels(), &s.homeFilter)
 		s.toolProblems(c)
 		accounts := fetch(s, "accounts", func(ctx context.Context) (app.AccountsStatus, error) { return s.svc.Accounts.Status(ctx), nil })
 
@@ -49,15 +48,15 @@ func (s *shell) homePage(c *ui.Context) {
 			last = nil // the settings hide it (explicit.go)
 		}
 		ui.Row(c).Justify(ui.End).Margin(0, 0, 16).Children(func() {
-			if s.button(c, "home-edit", "edit home", false).Clicked() {
+			if s.button(c, "home-edit", locales.HomeEditButton(), false).Clicked() {
 				s.home.editing = true
 			}
 		})
 		s.tileGrid(c, func(columns int) {
-			title, caption, label := "Start here", k.words("Search for something to play"), "Search for music"
+			title, caption, label := locales.HomeStartHere(), k.words(locales.HomeStartCaption()), locales.HomeSearchMusic()
 			var art []media.Image
 			if last != nil {
-				title, caption, label = "Jump back in", trackLine(*last), "Play "+last.Title+" again"
+				title, caption, label = locales.HomeJumpBack(), trackLine(*last), locales.HomePlayAgain(last.Title)
 				art = last.Artwork
 			}
 			if s.flatTile(c, "tile-last", 0, tileLarge, columns, title, caption, label, icon("search"), art) {
@@ -71,21 +70,21 @@ func (s *shell) homePage(c *ui.Context) {
 			span := tileWide
 			if offer {
 				span = tileSmall
-				if s.flatTile(c, "tile-spotify", 3, tileTall, columns, "Add Spotify", k.words("Sign in to search and play your Spotify library here"), "Add Spotify", icon("plus"), nil) {
+				if s.flatTile(c, "tile-spotify", 3, tileTall, columns, locales.HomeAddSpotify(), k.words(locales.HomeAddSpotifyCaption()), locales.HomeAddSpotify(), icon("plus"), nil) {
 					s.navigate("/settings/accounts")
 				}
 			}
-			if s.flatTile(c, "tile-liked", 1, span, columns, "Liked songs", plural(len(s.svc.Collection.Liked()), "track"), "Liked songs", solidIcons["heart"], nil) {
+			if s.flatTile(c, "tile-liked", 1, span, columns, locales.RailLikedSongs(), locales.HomeTrackCount(len(s.svc.Collection.Liked())), locales.RailLikedSongs(), solidIcons["heart"], nil) {
 				s.navigate("/library/liked")
 			}
-			if s.flatTile(c, "tile-mixes", 2, span, columns, "Your mixes", plural(len(s.svc.Collection.Playlists()), "mix", "mixes"), "Your mixes", icon("queue"), nil) {
+			if s.flatTile(c, "tile-mixes", 2, span, columns, locales.RailYourMixes(), locales.HomeMixCount(len(s.svc.Collection.Playlists())), locales.RailYourMixes(), icon("queue"), nil) {
 				s.navigate("/library/mixes")
 			}
 		})
 		// The user's own shelves show at once, then those of each service
 		// once they came: one that still loads holds back those after it,
 		// which would move once it came (homePlaces).
-		source := homeFilters[s.homeFilter].source
+		source := homeFilters[s.homeFilter]
 		layout := s.set.HomeShelves
 		shown, failed := 0, false
 		for _, p := range homePlaces(layout, s.homeGroups(layout), source) {
@@ -111,7 +110,7 @@ func (s *shell) homePage(c *ui.Context) {
 				// under the first service that failed.
 				if !failed && !networkOnline(s) && s.kept.Status().Tracks > 0 {
 					ui.Row(c).Margin(16, 0, 0).Children(func() {
-						if s.button(c, "home-downloads", "open downloads", true).Clicked() {
+						if s.button(c, "home-downloads", locales.HomeOpenDownloads(), true).Clicked() {
 							s.navigate("/library/downloads")
 						}
 					})
@@ -122,11 +121,11 @@ func (s *shell) homePage(c *ui.Context) {
 		if shown == 0 && !failed {
 			switch source {
 			case media.SourceSpotify:
-				s.emptyLine(c, "Sign in to Spotify in Settings › Accounts to see your playlists and recent tracks here.")
+				s.emptyLine(c, locales.HomeSpotifyEmpty())
 			case media.SourceLocal:
-				s.emptyLine(c, "Play some tracks and make a mix: what you collect shows here.")
+				s.emptyLine(c, locales.HomeLocalEmpty())
 			default:
-				s.emptyLine(c, "Nothing here yet.")
+				s.emptyLine(c, locales.HomeNothingYet())
 			}
 		}
 	})

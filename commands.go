@@ -6,80 +6,106 @@ import (
 	"strings"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // command is something the user can do from anywhere: by its shortcut, or
 // from the command palette. Its id and shortcut are the web interface's,
-// so the shortcuts the user set apply to both.
+// so the shortcuts the user set apply to both. Its group is an ID too: the
+// group's name in the language shown is commandGroup's.
 type command struct {
 	id, title, shortcut, group string
 	run                        func()
+}
+
+// commandGroup names a group of commands in the language shown.
+func commandGroup(group string) string {
+	switch group {
+	case "playback":
+		return locales.CmdGroupPlayback()
+	case "go to":
+		return locales.CmdGroupGoTo()
+	case "view":
+		return locales.CmdGroupView()
+	case "add-ons":
+		return locales.CmdGroupAddons()
+	case "settings":
+		return locales.CmdGroupSettings()
+	case "plugins":
+		return locales.CmdGroupPlugins()
+	case "themes":
+		return locales.CmdGroupThemes()
+	case "search":
+		return locales.CmdGroupSearch()
+	}
+	return group
 }
 
 // commands are MixMusic's own commands, and those of plugins.
 func (s *shell) commands() []command {
 	cur, playing := s.st.Current()
 	cmds := []command{
-		{"player.toggle", "Play or pause", "Space", "playback", s.p.Toggle},
-		{"player.next", "Next track", "Mod+ArrowRight", "playback", s.p.Next},
-		{"player.previous", "Previous track", "Mod+ArrowLeft", "playback", s.p.Previous},
-		{"player.forward", "Forward 10 seconds", "ArrowRight", "playback", func() { s.p.Seek(s.st.Position + 10e9) }},
-		{"player.back", "Back 10 seconds", "ArrowLeft", "playback", func() { s.p.Seek(s.st.Position - 10e9) }},
-		{"player.volumeUp", "Volume up", "ArrowUp", "playback", func() { s.p.SetVolume(s.st.Volume + 0.05) }},
-		{"player.volumeDown", "Volume down", "ArrowDown", "playback", func() { s.p.SetVolume(s.st.Volume - 0.05) }},
-		{"player.mute", "Mute", "M", "playback", s.p.ToggleMute},
-		{"player.faster", "Speed up", "", "playback", func() { s.stepSpeed(1) }},
-		{"player.slower", "Slow down", "", "playback", func() { s.stepSpeed(-1) }},
-		{"player.normalSpeed", "Normal speed", "", "playback", func() { s.changeSpeed(1) }},
-		{"player.shuffle", "Shuffle", "Mod+S", "playback", s.p.ToggleShuffle},
-		{"player.repeat", "Repeat", "Mod+R", "playback", s.p.CycleRepeat},
-		{"player.like", "Like what plays", "Mod+L", "playback", func() {
+		{"player.toggle", locales.CmdPlayerToggle(), "Space", "playback", s.p.Toggle},
+		{"player.next", locales.CmdPlayerNext(), "Mod+ArrowRight", "playback", s.p.Next},
+		{"player.previous", locales.CmdPlayerPrevious(), "Mod+ArrowLeft", "playback", s.p.Previous},
+		{"player.forward", locales.CmdPlayerForward(), "ArrowRight", "playback", func() { s.p.Seek(s.st.Position + 10e9) }},
+		{"player.back", locales.CmdPlayerBack(), "ArrowLeft", "playback", func() { s.p.Seek(s.st.Position - 10e9) }},
+		{"player.volumeUp", locales.CmdPlayerVolumeUp(), "ArrowUp", "playback", func() { s.p.SetVolume(s.st.Volume + 0.05) }},
+		{"player.volumeDown", locales.CmdPlayerVolumeDown(), "ArrowDown", "playback", func() { s.p.SetVolume(s.st.Volume - 0.05) }},
+		{"player.mute", locales.CmdPlayerMute(), "M", "playback", s.p.ToggleMute},
+		{"player.faster", locales.CmdPlayerFaster(), "", "playback", func() { s.stepSpeed(1) }},
+		{"player.slower", locales.CmdPlayerSlower(), "", "playback", func() { s.stepSpeed(-1) }},
+		{"player.normalSpeed", locales.CmdPlayerNormalSpeed(), "", "playback", func() { s.changeSpeed(1) }},
+		{"player.shuffle", locales.PlayerShuffle(), "Mod+S", "playback", s.p.ToggleShuffle},
+		{"player.repeat", locales.CmdPlayerRepeat(), "Mod+R", "playback", s.p.CycleRepeat},
+		{"player.like", locales.CmdPlayerLike(), "Mod+L", "playback", func() {
 			if playing {
 				s.setLiked(cur.Track, !s.a.IsLiked(cur.Track.ID))
 			}
 		}},
-		{"player.dislike", "Dislike what plays", "Mod+D", "playback", func() {
+		{"player.dislike", locales.CmdPlayerDislike(), "Mod+D", "playback", func() {
 			if playing {
 				s.setDisliked(cur.Track, !s.a.IsDisliked(cur.Track.ID))
 			}
 		}},
-		{"player.radio", "Start a radio of what plays", "", "playback", func() {
+		{"player.radio", locales.CmdPlayerRadio(), "", "playback", func() {
 			if playing {
 				s.startRadio(cur.Track)
 			} else {
-				s.notes = append(s.notes, notice("Play something first"))
+				s.notes = append(s.notes, notice(locales.CmdPlayFirst()))
 			}
 		}},
-		{"player.openFiles", "Open music files…", "Mod+O", "playback", s.openMusicFiles},
-		{"go.home", "Go home", "Alt+1", "go to", func() { s.navigate("/") }},
-		{"go.search", "Search", "Mod+F", "go to", func() { s.searchBox.Focus() }},
-		{"go.explore", "Explore", "Alt+5", "go to", func() { s.navigate("/explore") }},
-		{"go.library", "Library", "Alt+2", "go to", func() { s.navigate("/library") }},
-		{"go.liked", "Liked songs", "Alt+3", "go to", func() { s.navigate("/library/liked") }},
-		{"go.downloads", "Downloads", "", "go to", func() { s.navigate("/library/downloads") }},
-		{"go.computer", "On this computer", "", "go to", func() { s.navigate("/library/computer") }},
-		{"go.nowPlaying", "Now playing", "Alt+4", "go to", func() { s.navigate("/now-playing") }},
-		{"go.stats", "Stats", "", "go to", func() { s.navigate("/stats") }},
-		{"go.marketplace", "Marketplace", "", "go to", func() { s.navigate("/marketplace") }},
-		{"go.settings", "Settings", "Mod+,", "go to", func() { s.navigate("/settings") }},
-		{"go.settingsSearch", "Search the settings", "", "go to", s.searchSettings},
-		{"view.queue", "Show or hide the queue", "Mod+J", "view", func() { s.togglePanel("queue") }},
-		{"view.lyrics", "Show or hide the lyrics", "Mod+Shift+L", "view", func() { s.togglePanel("lyrics") }},
-		{"view.palette", "Command palette", "Mod+K", "view", func() { s.paletteOpen = !s.paletteOpen }},
-		{"view.mini", "Mini player", "Mod+M", "view", s.showMini},
-		{"view.keepOnTop", "Keep the window on top, or not", "", "view", s.toggleOnTop},
-		{"view.video", "Show or hide the video of music videos", "", "view", s.toggleVideos},
-		{"view.sidebar", "Collapse or expand the sidebar", "Mod+B", "view", s.toggleRail},
-		{"view.refresh", "Refresh this page", refreshKeys, "view", s.refreshPage},
-		{"view.zoomIn", "Zoom in", "Mod+=", "view", func() { s.zoomBy(1) }},
-		{"view.zoomOut", "Zoom out", "Mod+-", "view", func() { s.zoomBy(-1) }},
-		{"view.zoomReset", "Reset zoom", "Mod+0", "view", func() { s.setZoom(1) }},
-		{"addons.reload", "Reload add-ons", "", "add-ons", func() {
+		{"player.openFiles", locales.CmdPlayerOpenFiles(), "Mod+O", "playback", s.openMusicFiles},
+		{"go.home", locales.CmdGoHome(), "Alt+1", "go to", func() { s.navigate("/") }},
+		{"go.search", locales.RailSearch(), "Mod+F", "go to", func() { s.searchBox.Focus() }},
+		{"go.explore", locales.RailExplore(), "Alt+5", "go to", func() { s.navigate("/explore") }},
+		{"go.library", locales.RailLibrary(), "Alt+2", "go to", func() { s.navigate("/library") }},
+		{"go.liked", locales.RailLikedSongs(), "Alt+3", "go to", func() { s.navigate("/library/liked") }},
+		{"go.downloads", locales.RailDownloads(), "", "go to", func() { s.navigate("/library/downloads") }},
+		{"go.computer", locales.CmdGoComputer(), "", "go to", func() { s.navigate("/library/computer") }},
+		{"go.nowPlaying", locales.CmdGoNowPlaying(), "Alt+4", "go to", func() { s.navigate("/now-playing") }},
+		{"go.stats", locales.RailStats(), "", "go to", func() { s.navigate("/stats") }},
+		{"go.marketplace", locales.RailMarketplace(), "", "go to", func() { s.navigate("/marketplace") }},
+		{"go.settings", locales.RailSettings(), "Mod+,", "go to", func() { s.navigate("/settings") }},
+		{"go.settingsSearch", locales.SettingsSearchLabel(), "", "go to", s.searchSettings},
+		{"view.queue", locales.CmdViewQueue(), "Mod+J", "view", func() { s.togglePanel("queue") }},
+		{"view.lyrics", locales.CmdViewLyrics(), "Mod+Shift+L", "view", func() { s.togglePanel("lyrics") }},
+		{"view.palette", locales.CmdViewPalette(), "Mod+K", "view", func() { s.paletteOpen = !s.paletteOpen }},
+		{"view.mini", locales.CmdViewMini(), "Mod+M", "view", s.showMini},
+		{"view.keepOnTop", locales.CmdViewKeepOnTop(), "", "view", s.toggleOnTop},
+		{"view.video", locales.CmdViewVideo(), "", "view", s.toggleVideos},
+		{"view.sidebar", locales.CmdViewSidebar(), "Mod+B", "view", s.toggleRail},
+		{"view.refresh", locales.CmdViewRefresh(), refreshKeys, "view", s.refreshPage},
+		{"view.zoomIn", locales.CmdViewZoomIn(), "Mod+=", "view", func() { s.zoomBy(1) }},
+		{"view.zoomOut", locales.CmdViewZoomOut(), "Mod+-", "view", func() { s.zoomBy(-1) }},
+		{"view.zoomReset", locales.CmdViewZoomReset(), "Mod+0", "view", func() { s.setZoom(1) }},
+		{"addons.reload", locales.CmdAddonsReload(), "", "add-ons", func() {
 			s.plugins.Retry()
 			s.svc.Addons.Reload()
-			s.notes = append(s.notes, notice("Add-ons reloaded"))
+			s.notes = append(s.notes, notice(locales.CmdAddonsReloaded()))
 		}},
-		{"settings.openFile", "Open the settings file", "", "settings", s.openSettingsFile},
+		{"settings.openFile", locales.CmdSettingsOpenFile(), "", "settings", s.openSettingsFile},
 	}
 	cmds = append(cmds, s.themeCommands...)
 	for _, pc := range s.plugins.Commands() {
@@ -108,16 +134,20 @@ func (s *shell) stepSpeed(dir int) {
 func (s *shell) changeSpeed(v float64) {
 	s.setSpeed(v)
 	speed, podcasts := s.playingSpeed()
-	kind := "Songs"
+	kind := "songs"
 	if podcasts {
-		kind = "Podcasts"
+		kind = "podcasts"
 	}
-	msg := kind + " play at their own speed"
-	if *speed != 1 {
-		msg = kind + " play at " + speedLabel(*speed)
-	}
-	if why := s.speedLocked(); why != "" {
-		msg += " - " + why
+	var msg string
+	switch why := s.speedLocked(); {
+	case *speed == 1 && why == "":
+		msg = locales.CmdSpeedOwn(kind)
+	case *speed == 1:
+		msg = locales.CmdSpeedOwnWhy(kind, why)
+	case why == "":
+		msg = locales.CmdSpeedAt(kind, speedLabel(*speed))
+	default:
+		msg = locales.CmdSpeedAtWhy(kind, speedLabel(*speed), why)
 	}
 	s.notes = append(s.notes, notice(msg))
 }
@@ -350,26 +380,26 @@ func (s *shell) palette(c *ui.Context) {
 		if cmd.id == "view.palette" {
 			continue
 		}
-		if q == "" || strings.Contains(strings.ToLower(cmd.title), q) || strings.Contains(cmd.group, q) {
+		if q == "" || strings.Contains(strings.ToLower(cmd.title), q) || strings.Contains(commandGroup(cmd.group), q) {
 			found = append(found, cmd)
 		}
 	}
 	if query := strings.TrimSpace(s.paletteQuery); query != "" {
 		// Enter searches what was typed; the arrows reach the commands.
-		search := command{"search", "Search for “" + query + "”", "", "search", func() { s.navigate(searchPath(query)) }}
+		search := command{"search", locales.CmdSearchFor(query), "", "search", func() { s.navigate(searchPath(query)) }}
 		// Last, the search of the settings: with no command found, Down
 		// reaches it.
-		settings := command{"settings.find", "Search the settings for “" + query + "”", "", "settings", func() {
+		settings := command{"settings.find", locales.CmdSearchSettingsFor(query), "", "settings", func() {
 			s.navigate(settingsPath("", query))
 			s.find.focus = true
 		}}
 		found = append(append([]command{search}, found...), settings)
 	}
 	s.paletteAt = min(max(s.paletteAt, 0), max(len(found)-1, 0))
-	s.dialogFrame(c, &s.paletteOpen, dialogOptions{key: "palette", title: "Command palette", width: 640}, func(panel ui.Element) {
+	s.dialogFrame(c, &s.paletteOpen, dialogOptions{key: "palette", title: locales.CmdViewPalette(), width: 640}, func(panel ui.Element) {
 		panel.Padding(24).Gap(12)
-		in := ui.TextInputBase(c.Key("palette-input"), &s.paletteQuery).Placeholder(k.sentence("type a command or a search")).AutoFocus().
-			Label("Command palette").FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).TextColor(k.accent).Padding(8, 0).Shrink(0)
+		in := ui.TextInputBase(c.Key("palette-input"), &s.paletteQuery).Placeholder(k.sentence(locales.CmdPalettePlaceholder())).AutoFocus().
+			Label(locales.CmdViewPalette()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).TextColor(k.accent).Padding(8, 0).Shrink(0)
 		if in.Changed() {
 			s.paletteAt, s.paletteMoved = 0, true
 		}
@@ -405,7 +435,7 @@ func (s *shell) palette(c *ui.Context) {
 						run(cmd)
 					}
 					row.Children(func() {
-						ui.Text(c, cmd.group).FontSize(k.captionSize()).TextColor(ink.Alpha(0.6)).Width(72).Shrink(0).SingleLine()
+						ui.Text(c, commandGroup(cmd.group)).FontSize(k.captionSize()).TextColor(ink.Alpha(0.6)).Width(72).Shrink(0).SingleLine()
 						ui.Text(c, cmd.title).FontSize(k.bodySize()).TextColor(ink).SingleLine().Grow(1).MinWidth(0)
 						ui.Text(c, shortcutLabel(s.shortcutOf(cmd))).FontSize(k.captionSize()).TextColor(ink.Alpha(0.7))
 					})

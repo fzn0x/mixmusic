@@ -10,6 +10,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -46,7 +47,7 @@ func (s *shell) panelHead(c *ui.Context, title string, actions func()) {
 		if actions != nil {
 			actions()
 		}
-		if s.iconButton(c, "close-panel", "close", "Close "+title, false, 16).Clicked() {
+		if s.iconButton(c, "close-panel", "close", locales.PanelClose(title), false, 16).Clicked() {
 			s.showPanel("")
 		}
 	})
@@ -60,24 +61,24 @@ func (s *shell) queuePanel(c *ui.Context) {
 	if at+1 < len(q) {
 		upcoming = len(q) - at - 1
 	}
-	s.panelHead(c, "Up next", func() {
+	s.panelHead(c, locales.PanelUpNext(), func() {
 		if upcoming > 0 {
-			clear := s.buttonBase(c.Key("clear-queue")).Label("Clear the queue").Cursor(ui.CursorPointer)
+			clear := s.buttonBase(c.Key("clear-queue")).Label(locales.PanelClearQueue()).Cursor(ui.CursorPointer)
 			if clear.Clicked() {
 				s.p.ClearUpcoming()
 			}
-			clear.Children(func() { ui.Text(c, k.words("Clear")).FontSize(k.smallSize()).TextColor(k.accent) })
+			clear.Children(func() { ui.Text(c, k.words(locales.PanelClear())).FontSize(k.smallSize()).TextColor(k.accent) })
 		}
 	})
 	ui.Scroll(c).Grow(1).MinHeight(0).Padding(0, 12, 24).Children(func() {
 		if cur, ok := s.st.Current(); ok {
-			ui.Text(c, k.words("Now playing")).FontSize(k.smallSize()).TextColor(k.accent).Padding(0, 8, 6)
+			ui.Text(c, k.words(locales.NowPlayingTitle())).FontSize(k.smallSize()).TextColor(k.accent).Padding(0, 8, 6)
 			s.queueRow(c, at, cur, true)
 		}
 		if upcoming == 0 {
-			text := "Nothing queued. When the queue runs out, a radio of what you played carries on."
+			text := locales.PanelQueueEmpty()
 			if at < 0 {
-				text = "Play something and the queue shows here."
+				text = locales.PanelQueueStart()
 			}
 			ui.Text(c, text).FontSize(k.bodySize()).TextColor(k.muted).Padding(16, 8)
 			return
@@ -131,7 +132,7 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 	}
 	hovered := row.Hovered()
 	row.Children(func() {
-		art := s.buttonBase(c.Key("q-art-"+it.UID)).Size(40, 40).Shrink(0).Label("Play " + t.Title).Cursor(ui.CursorPointer)
+		art := s.buttonBase(c.Key("q-art-"+it.UID)).Size(40, 40).Shrink(0).Label(locales.PanelPlayTrack(t.Title)).Cursor(ui.CursorPointer)
 		if art.Clicked() {
 			if current {
 				s.p.Toggle()
@@ -154,18 +155,18 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 				s.downloadMark(c, "q-dl-"+it.UID, t, current)
 				line := names(t.Artists)
 				if it.Radio {
-					line += " · radio"
+					line = locales.PanelRadioLine(line)
 				}
 				switch {
 				case missing:
-					line = "File not found"
+					line = locales.PanelFileNotFound()
 				case skipped && it.Skip == player.SkipMadeWithAI:
 					// A click still plays it.
-					line += " · made with AI"
+					line = locales.PanelMadeWithAI(line)
 				case skipped && it.Skip == player.SkipExplicit:
-					line += " · " + hiddenNote
+					line = locales.PanelHiddenNote(line)
 				case skipped:
-					line += " · skipped"
+					line = locales.PanelSkipped(line)
 				}
 				ui.Text(c, line).FontSize(k.smallSize()).TextColor(sub).SingleLine().MinWidth(0)
 			})
@@ -174,7 +175,7 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 			ui.Text(c, clock(ms(t.DurationMs))).FontSize(k.captionSize()).TextColor(sub).FontFeatures("tnum")
 		}
 		if !current && hovered {
-			if s.iconButton(c, "q-remove-"+it.UID, "close", "Remove "+t.Title+" from the queue", false, 14).Clicked() {
+			if s.iconButton(c, "q-remove-"+it.UID, "close", locales.PanelRemoveTrack(t.Title), false, 14).Clicked() {
 				s.p.RemoveAt(i)
 			}
 		}
@@ -248,7 +249,7 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 	}
 	cur, ok := s.st.Current()
 	if !ok {
-		s.emptyIn(c, "Play a track to see its lyrics.")
+		s.emptyIn(c, locales.LyricsPlayToSee())
 		return
 	}
 	t := cur.Track
@@ -260,21 +261,21 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 	l := fetch(s, "lyrics:"+t.ID, func(ctx context.Context) (lyrics.Lyrics, error) { return s.svc.Catalog.Lyrics(ctx, t) })
 	switch {
 	case !l.done:
-		s.emptyIn(c, "Looking for the lyrics…")
+		s.emptyIn(c, locales.LyricsLooking())
 		return
 	case l.err != nil:
 		s.emptyIn(c, l.err.Error())
 		// A track without lyrics stays so; a failure may pass.
 		if !errors.Is(l.err, lyrics.ErrNotFound) {
 			ui.Row(c).Padding(0, 24, 8).Children(func() {
-				if s.button(c, "lyrics-retry-"+where, "try again", false).Clicked() {
+				if s.button(c, "lyrics-retry-"+where, locales.WidgetsTryAgain(), false).Clicked() {
 					s.forget("lyrics:" + t.ID)
 				}
 			})
 		}
 		return
 	case l.value.Instrumental:
-		s.emptyIn(c, "This track is instrumental.")
+		s.emptyIn(c, locales.LyricsInstrumental())
 		return
 	}
 	ly := l.value
@@ -396,17 +397,17 @@ func (s *shell) lyricsCredit(c *ui.Context, ly lyrics.Lyrics) {
 func (s *shell) creditParts(c *ui.Context, ly lyrics.Lyrics) {
 	k := &s.lk
 	if ly.SourceURL == "" {
-		ui.Text(c, k.sentence("lyrics from "+ly.Source))
+		ui.Text(c, k.sentence(locales.LyricsCreditFrom(ly.Source)))
 	} else {
-		ui.Text(c, k.sentence("lyrics from "))
+		ui.Text(c, k.sentence(locales.LyricsCreditFromLink()))
 		s.linkOf(c, ly.Source, ly.SourceURL)
 	}
 	switch {
 	case ly.By == "":
 	case ly.ByURL == "":
-		ui.Text(c, " · submitted by "+ly.By)
+		ui.Text(c, locales.LyricsCreditBy(ly.By))
 	default:
-		ui.Text(c, " · submitted by ")
+		ui.Text(c, locales.LyricsCreditByLink())
 		s.linkOf(c, ly.By, ly.ByURL)
 	}
 }
@@ -427,41 +428,41 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	one := []media.Track{t}
 	switch {
 	case queued >= 0:
-		if m.Item("Play").Chosen() {
+		if m.Item(locales.PlayerPlay()).Chosen() {
 			s.p.PlayAt(queued)
 		}
-		if queued != s.st.Index && m.Item("Remove from the queue").Chosen() {
+		if queued != s.st.Index && m.Item(locales.PanelRemoveFromQueue()).Chosen() {
 			s.p.RemoveAt(queued)
 		}
 	default:
-		if m.Item("Play").Chosen() {
+		if m.Item(locales.PlayerPlay()).Chosen() {
 			s.p.PlayTracks(one, 0)
 		}
-		if m.Item("Play next").Chosen() {
+		if m.Item(locales.PanelPlayNext()).Chosen() {
 			s.p.PlayNext(one)
-			s.notes = append(s.notes, notice(t.Title+" plays next"))
+			s.notes = append(s.notes, notice(locales.PanelPlaysNext(t.Title)))
 		}
-		if m.Item("Add to queue").Chosen() {
+		if m.Item(locales.PanelAddToQueue()).Chosen() {
 			s.p.Enqueue(one)
-			s.notes = append(s.notes, notice("Added "+t.Title+" to the queue"))
+			s.notes = append(s.notes, notice(locales.PanelAddedToQueue(t.Title)))
 		}
 	}
-	if !t.IsEpisode() && t.Source != media.SourceFile && m.Item("Start radio").Chosen() {
+	if !t.IsEpisode() && t.Source != media.SourceFile && m.Item(locales.PanelStartRadio()).Chosen() {
 		s.startRadio(t)
 	}
 	m.Separator()
 	liked := s.a.IsLiked(t.ID)
-	label := "Add to liked songs"
+	label := locales.PanelLike()
 	if liked {
-		label = "Remove from liked songs"
+		label = locales.PanelUnlike()
 	}
 	if m.Item(label).Chosen() {
 		s.setLiked(t, !liked)
 	}
 	disliked := s.a.IsDisliked(t.ID)
-	label = "Dislike"
+	label = locales.PlayerDislike()
 	if disliked {
-		label = "Remove the dislike"
+		label = locales.PanelRemoveDislike()
 	}
 	if m.Item(label).Chosen() {
 		s.setDisliked(t, !disliked)
@@ -479,32 +480,32 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 	m.Separator()
 	for _, a := range t.Artists {
 		if a.ID != "" {
-			if m.Item("Go to " + a.Name).Chosen() {
+			if m.Item(locales.PanelGoToArtist(a.Name)).Chosen() {
 				s.navigate(artistPath(a.ID))
 			}
 			break
 		}
 	}
 	if t.Album != nil && t.Album.ID != "" {
-		if m.Item("Go to album").Chosen() {
+		if m.Item(locales.PanelGoToAlbum()).Chosen() {
 			s.navigate(albumPath(t.Album.ID))
 		}
 	}
 	s.episodeItems(m, t)
 	if t.URL != "" {
 		u := t.URL
-		if m.Item("Open in " + sourceName(t.Source)).Chosen() {
+		if m.Item(locales.PanelOpenIn(sourceName(t.Source))).Chosen() {
 			go s.svc.System.OpenExternal(u)
 		}
 	}
 	s.copySongItems(m, t)
 	s.shareItem(m, s.songShare(t))
 	if t.Source == media.SourceSpotify && !t.IsEpisode() {
-		if m.Item("Find another YouTube Music match").Chosen() {
+		if m.Item(locales.PanelFindMatch()).Chosen() {
 			if err := s.svc.Player.ForgetMatch(t.ID); err != nil {
 				s.notes = append(s.notes, noticeOf(err))
 			} else {
-				s.notes = append(s.notes, notice("The next play looks for its recording again"))
+				s.notes = append(s.notes, notice(locales.PanelMatchForgotten()))
 			}
 		}
 	}
@@ -523,19 +524,19 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 // rawURL: it copies that link, which anyone can open. Without a link, the
 // menu has no such item.
 func (s *shell) copyLinkItem(m *ui.Menu, rawURL string) {
-	if rawURL != "" && m.Item("Copy link").Chosen() {
+	if rawURL != "" && m.Item(locales.PanelCopyLink()).Chosen() {
 		copyText(rawURL)
-		s.notes = append(s.notes, notice("Copied the link"))
+		s.notes = append(s.notes, notice(locales.PanelLinkCopied()))
 	}
 }
 
 // startRadio plays track, then tracks like it.
 func (s *shell) startRadio(t media.Track) {
 	if t.Source == media.SourceFile {
-		s.notes = append(s.notes, notice("Radios start from tracks of Spotify and YouTube Music"))
+		s.notes = append(s.notes, notice(locales.PanelRadioSources()))
 		return
 	}
-	s.notes = append(s.notes, notice("Starting a radio of "+t.Title+"…"))
+	s.notes = append(s.notes, notice(locales.PanelStartingRadio(t.Title)))
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()

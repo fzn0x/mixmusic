@@ -8,6 +8,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // hiddenTracks reports whether err is Spotify's refusal to show apps the
@@ -31,9 +32,9 @@ func tracksHidden(p media.Playlist) bool {
 // to open it on Spotify and to save it, rather than an error.
 func (s *shell) hiddenTracksPage(c *ui.Context, key string, res *loaded[media.Playlist]) {
 	p := res.value
-	why := "Spotify shows apps the tracks of the playlists you own or collaborate on only: open this one on Spotify to play it."
+	why := locales.HiddenWhyOthers()
 	if errors.Is(res.err, spotify.ErrPlaylistNotShown) {
-		why = "Spotify shows apps nothing of its own playlists, nor of those deleted or made private: open this one on Spotify to play it."
+		why = locales.HiddenWhyOwn()
 		if l, ok := s.loads["spotify:playlists"].(*loaded[[]media.Playlist]); ok {
 			for _, known := range l.value {
 				if known.ID == p.ID {
@@ -42,25 +43,25 @@ func (s *shell) hiddenTracksPage(c *ui.Context, key string, res *loaded[media.Pl
 			}
 		}
 		if p.Title == "" {
-			p.Title = "Spotify playlist"
+			p.Title = locales.HiddenSpotifyPlaylist()
 		}
 	}
 	s.pageScroll(c, func() {
 		s.pageHeader(c, p.Title, nil, nil)
 		facts := texts(p.Owner, collaborativeFact(p))
 		if p.TrackCount > 0 {
-			facts = append(facts, fact{text: plural(p.TrackCount, "track")})
+			facts = append(facts, fact{text: locales.LibraryTrackCount(p.TrackCount)})
 		}
 		h := headProps{title: p.Title, art: p.Artwork, source: p.Source, facts: facts, description: p.Description,
 			menu: s.collectionMenu(p.Title, nil, p.URL, p.Source, "")}
 		if p.URL != "" {
-			h.playLabel = "open on " + sourceName(p.Source)
+			h.playLabel = locales.HiddenOpenOn(sourceName(p.Source))
 			h.play = func() { go s.svc.System.OpenExternal(p.URL) }
 		}
 		if s.signedIn(p.Source) {
-			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, "save", "saved", s.keeping[key]
+			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, locales.LibrarySave(), locales.LibrarySaved(), s.keeping[key]
 			h.onKeep = func(on bool) {
-				s.keep(key, string(p.Source)+":playlists", p.Title, "saved", &res.value.Saved, on, func(ctx context.Context) error {
+				s.keep(key, string(p.Source)+":playlists", p.Title, &res.value.Saved, on, func(ctx context.Context) error {
 					return s.svc.Collection.SetSaved(ctx, "playlist", p.ID, "", on)
 				})
 			}

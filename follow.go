@@ -12,6 +12,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // followOnService follows an artist on their service, or stops; tests
@@ -55,9 +56,9 @@ func (s *shell) followArtist(a media.Artist, on bool) {
 		s.releasesFollowed(a, on)
 		if !there {
 			if on {
-				s.notes = append(s.notes, notice(a.Name+": following in MixMusic"))
+				s.notes = append(s.notes, notice(locales.FollowInMixMusic(a.Name)))
 			} else {
-				s.notes = append(s.notes, notice(a.Name+": no longer following"))
+				s.notes = append(s.notes, notice(locales.FollowNoLonger(a.Name)))
 			}
 			return
 		}
@@ -87,9 +88,9 @@ func (s *shell) followArtist(a media.Artist, on bool) {
 			s.followedOn(a, on)
 			s.releasesFollowed(a, on)
 			if on {
-				s.notes = append(s.notes, notice(a.Name+": following on "+sourceName(a.Source)))
+				s.notes = append(s.notes, notice(locales.FollowOnService(a.Name, sourceName(a.Source))))
 			} else {
-				s.notes = append(s.notes, notice(a.Name+": no longer following"))
+				s.notes = append(s.notes, notice(locales.FollowNoLonger(a.Name)))
 			}
 		})
 	}()
@@ -124,9 +125,9 @@ func (s *shell) followItem(m *ui.Menu, a media.Artist) {
 		return // no releases to follow
 	}
 	on := !s.followsArtist(a)
-	label := "Follow"
+	label := locales.FollowLabel()
 	if !on {
-		label = "Unfollow"
+		label = locales.FollowUnfollow()
 	}
 	if m.Item(label).Disabled(s.keeping["artist:"+a.ID]).Chosen() {
 		s.followArtist(a, on)
@@ -142,22 +143,21 @@ func (s *shell) artistLibrary(c *ui.Context) {
 	accounts := s.accounts()
 	var services []serviceArtists
 	if accounts.Spotify.SignedIn {
-		services = append(services, serviceArtists{"spotify", "Followed on Spotify", fetch(s, "spotify:artists", col.SpotifyArtists)})
+		services = append(services, serviceArtists{"spotify", locales.FollowedOnSpotify(), fetch(s, "spotify:artists", col.SpotifyArtists)})
 	}
 	if accounts.YouTube.SignedIn {
-		services = append(services, serviceArtists{"youtube", "Followed on YouTube Music", fetch(s, "youtube:artists", col.YouTubeArtists)})
+		services = append(services, serviceArtists{"youtube", locales.FollowedOnYouTube(), fetch(s, "youtube:artists", col.YouTubeArtists)})
 	}
 	here := col.FollowedArtists()
 	if len(here) == 0 && len(services) == 0 {
-		ui.Text(c, k.words("Nothing followed yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
-		ui.Text(c, "Follow an artist from their page or their menu, and they wait here, kept in MixMusic: "+
-			"their new albums and singles show here and on Home. Signed in to their service, you follow them there.").
+		ui.Text(c, k.words(locales.FollowNothing())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+		ui.Text(c, locales.FollowIntro()).
 			FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640).Margin(0, 0, 48)
 		return
 	}
 	s.releasesShelf(c, "library-releases", "")
 	if len(here) > 0 {
-		s.sectionTitle(c, "Followed in MixMusic")
+		s.sectionTitle(c, locales.FollowedInMixMusic())
 		ui.Column(c).Margin(0, 0, 48).Children(func() {
 			s.tileWrap(c, func() {
 				for i, a := range here {
@@ -171,7 +171,7 @@ func (s *shell) artistLibrary(c *ui.Context) {
 		shown += s.serviceArtistShelf(c, sv)
 	}
 	if shown == 0 && !slices.ContainsFunc(services, func(sv serviceArtists) bool { return !sv.artists.done }) {
-		s.emptyLine(c, "Follow an artist from their page or their menu, and they wait here.")
+		s.emptyLine(c, locales.FollowEmpty())
 	}
 }
 

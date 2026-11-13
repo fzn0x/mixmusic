@@ -13,6 +13,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // wholeWait is how long what takes a whole playlist waits for it to be
@@ -136,29 +137,31 @@ func (s *shell) readLine(c *ui.Context, r *playlistRead, noun string) {
 	n, count := len(r.p.Tracks), r.p.TrackCount
 	switch {
 	case r.reading:
-		text := "Loading tracks · " + thousands(n)
-		if count > n {
-			text += " of " + thousands(count)
-		}
-		if r.then != nil {
-			text += " · " + r.does + " once they're all here"
+		text := locales.PlaylistReadLoading(thousands(n))
+		switch {
+		case count > n && r.then != nil:
+			text = locales.PlaylistReadLoadingOfThen(thousands(n), thousands(count), r.does)
+		case count > n:
+			text = locales.PlaylistReadLoadingOf(thousands(n), thousands(count))
+		case r.then != nil:
+			text = locales.PlaylistReadLoadingThen(thousands(n), r.does)
 		}
 		ui.Row(c).Gap(8).Margin(0, 0, 16).Children(func() {
-			ui.Spinner(c).Size(16, 16).Label("Loading tracks")
+			ui.Spinner(c).Size(16, 16).Label(locales.PlaylistReadLoadingLabel())
 			ui.Text(c, text).FontSize(k.smallSize()).TextColor(k.muted).FontFeatures("tnum")
 		})
 	case r.err != nil:
-		what := "Only the first " + thousands(n) + " tracks of this " + noun
+		msg := locales.PlaylistReadPartialFirst(thousands(n), noun, r.err.Error())
 		if count > n {
-			what = "Only " + thousands(n) + " of this " + noun + "'s " + thousands(count) + " tracks"
+			msg = locales.PlaylistReadPartialOf(thousands(n), noun, thousands(count), r.err.Error())
 		}
 		ui.Column(c).Margin(0, 0, 16).Children(func() {
-			s.problem(c, errors.New(what+" could be loaded: "+r.err.Error()), func() { s.readRest(r) })
+			s.problem(c, errors.New(msg), func() { s.readRest(r) })
 		})
 	case r.p.Cut:
-		text := "MixMusic shows and plays the first " + thousands(media.MaxTracks) + " tracks of a " + noun + ": this one has more."
+		text := locales.PlaylistReadCut(thousands(media.MaxTracks), noun)
 		if count > n {
-			text = "This " + noun + " has " + thousands(count) + " tracks: MixMusic shows and plays its first " + thousands(n) + "."
+			text = locales.PlaylistReadCutOf(noun, thousands(count), thousands(n))
 		}
 		ui.Text(c, text).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).MaxWidth(640)
 	}

@@ -19,7 +19,7 @@ func TestSearchTellsOfSpotifyPlaylists(t *testing.T) {
 	if tt.HasText(note) {
 		t.Errorf("both services' playlists tell of Spotify's: %q", tt.Texts())
 	}
-	s.searchScope = slices.Index(searchScopes, "Spotify")
+	s.searchScope = slices.Index(searchScopeLabels(), "Spotify")
 	tt.Frame()
 	if !tt.HasText(note) {
 		t.Errorf("Spotify's playlists don't tell why: %q", tt.Texts())

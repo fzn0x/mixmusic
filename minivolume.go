@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // miniVolumeLinger is how long the mini player's volume slider stays once
@@ -68,7 +70,7 @@ func (s *shell) miniVolume(c *ui.Context) {
 			}
 			// A click leaves the focus where it was, as the player bar's
 			// does: the slider closes once the pointer leaves it.
-			slider := ui.Slider(c.Key("mini-volume"), &v, 0, 1).Width(112).KeepFocus().Label("Volume")
+			slider := ui.Slider(c.Key("mini-volume"), &v, 0, 1).Width(112).KeepFocus().Label(locales.VolumeCurveGroup())
 			if slider.Changed() {
 				s.p.SetVolume(v)
 			}

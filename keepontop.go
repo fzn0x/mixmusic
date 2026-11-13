@@ -71,9 +71,9 @@ func (s *shell) followOnTop() {
 func (s *shell) toggleOnTop() {
 	s.set.KeepOnTop = !s.set.KeepOnTop
 	s.save()
-	msg := "MixMusic stays on top of other windows"
+	msg := locales.OnTopStays()
 	if !s.set.KeepOnTop {
-		msg = "MixMusic no longer stays on top"
+		msg = locales.OnTopNoLonger()
 	}
 	s.notes = append(s.notes, notice(msg))
 }

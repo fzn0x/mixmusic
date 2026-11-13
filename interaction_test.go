@@ -1523,7 +1523,7 @@ func TestDayChart(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	days := s.svc.Collection.Stats(statsRanges[0].days).Daily
+	days := s.svc.Collection.Stats(statsRanges[0]).Daily
 	n := len(days)
 	tt := testerOf(t, s, 1280, 1600)
 	show(s, tt, "/stats")
@@ -1761,7 +1761,7 @@ func TestKeepAtOnce(t *testing.T) {
 	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true}
 	answer := make(chan error)
 	kept := false
-	s.keep(key, "youtube:albums", "Untrue", "saved", &kept, true, func(context.Context) error { return <-answer })
+	s.keep(key, "youtube:albums", "Untrue", &kept, true, func(context.Context) error { return <-answer })
 	if !kept || !s.keeping[key] {
 		t.Fatalf("saving waits for the service: kept %v, waiting %v", kept, s.keeping[key])
 	}
@@ -1770,7 +1770,7 @@ func TestKeepAtOnce(t *testing.T) {
 	if _, ok := s.loads["youtube:albums"]; !kept || ok || !slices.ContainsFunc(s.notes, func(n player.Notice) bool { return n.Message == "Untrue: saved" }) {
 		t.Errorf("once saved: kept %v, the library's albums kept %v, notes %+v", kept, ok, s.notes)
 	}
-	s.keep(key, "youtube:albums", "Untrue", "saved", &kept, false, func(context.Context) error { return errors.New("the service refused") })
+	s.keep(key, "youtube:albums", "Untrue", &kept, false, func(context.Context) error { return errors.New("the service refused") })
 	s.settle(t, func(player.State) bool { return !s.keeping[key] })
 	if !kept {
 		t.Error("what the service refused stays")

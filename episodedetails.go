@@ -16,15 +16,16 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // lyricsTitle names what shows where the lyrics do: an episode's details,
 // or the lyrics of a song.
 func (s *shell) lyricsTitle() string {
 	if cur, ok := s.st.Current(); ok && cur.Track.IsEpisode() {
-		return "Details"
+		return locales.EpisodeDetails()
 	}
-	return "Lyrics"
+	return locales.EpisodeLyrics()
 }
 
 // lyricsIcon is the icon of the button that shows the lyrics, or an
@@ -59,14 +60,14 @@ func (s *shell) episodeDetails(c *ui.Context, t media.Track, large bool) {
 	if !l.done || l.err != nil {
 		s.episodeFacts(c, t, media.EpisodeDetails{})
 		if !l.done {
-			s.emptyIn(c, "Looking for the details…")
+			s.emptyIn(c, locales.EpisodeLooking())
 			return
 		}
 		s.emptyIn(c, l.err.Error())
 		// An episode without details stays so; a failure may pass.
 		if !errors.Is(l.err, app.ErrNoEpisodeDetails) {
 			ui.Row(c).Padding(0, 24, 8).Children(func() {
-				if s.button(c, "details-retry-"+where, "try again", false).Clicked() {
+				if s.button(c, "details-retry-"+where, locales.EpisodeTryAgain(), false).Clicked() {
 					s.forget(key)
 				}
 			})
@@ -88,7 +89,7 @@ func (s *shell) episodeDetails(c *ui.Context, t media.Track, large bool) {
 			case i == 0:
 				s.episodeFacts(c, t, d)
 			case len(lines) == 0:
-				s.emptyIn(c, "This episode has no description.")
+				s.emptyIn(c, locales.EpisodeNoDescription())
 			case blankLine(lines[i-1]):
 				ui.Box(c).Height(8)
 			default:
@@ -166,7 +167,7 @@ func (s *shell) descriptionLine(c *ui.Context, line []media.TextRun, ink ui.Colo
 			case r.Seek && ms(r.AtMs) < limit:
 				// An episode that loads isn't moved, as the lyrics don't move a
 				// song that loads.
-				if s.linkOf(c, r.Text, "").Label("Play from "+r.Text).Clicked() && !s.st.Loading {
+				if s.linkOf(c, r.Text, "").Label(locales.EpisodePlayFrom(r.Text)).Clicked() && !s.st.Loading {
 					s.p.Seek(ms(r.AtMs))
 				}
 			default:
@@ -222,15 +223,15 @@ func (n *notch) chapters(c *ui.Context, t media.Track) {
 	key, l := s.episodeDetailsOf(t)
 	switch {
 	case !l.done:
-		note("Looking for the details…")
+		note(locales.EpisodeLooking())
 		return
 	case l.err != nil:
 		note(l.err.Error())
 		if !errors.Is(l.err, app.ErrNoEpisodeDetails) {
 			again := s.buttonBase(c.Key("notch-details-retry")).Padding(4, 10).Radius(12).Border(1, notchMuted).
-				AlignSelf(ui.Start).Label("try again").Cursor(ui.CursorPointer)
+				AlignSelf(ui.Start).Label(locales.EpisodeTryAgain()).Cursor(ui.CursorPointer)
 			n.buttonLook(again, false, false)
-			again.Children(func() { ui.Text(c, "try again").FontSize(12).TextColor(notchWhite) })
+			again.Children(func() { ui.Text(c, locales.EpisodeTryAgain()).FontSize(12).TextColor(notchWhite) })
 			if again.Clicked() {
 				s.forget(key)
 			}
@@ -240,7 +241,7 @@ func (n *notch) chapters(c *ui.Context, t media.Track) {
 	chapters, limit := l.value.Chapters, s.seekLimit(t, l.value)
 	in := chapterAt(chapters, max(limit, 0), limit) + 1
 	if in == 0 {
-		note("No chapters.")
+		note(locales.EpisodeNoChapters())
 		return
 	}
 	at := max(chapterAt(chapters[:in], s.st.Position+lyricsLead(s.st.Speed), limit), 0)

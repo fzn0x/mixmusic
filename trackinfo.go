@@ -9,7 +9,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"runtime"
 	"strconv"
 	"strings"
@@ -22,6 +21,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // trackInfoView is the dialog of Track info: whether it shows, the track
@@ -49,7 +49,7 @@ var trackInfoOf = func(s *shell, ctx context.Context, t media.Track, now *player
 
 // trackInfoItem is the item of a track's menu that shows its Track info.
 func (s *shell) trackInfoItem(m *ui.Menu, t media.Track) {
-	if m.Item("Track info").Chosen() {
+	if m.Item(locales.TrackInfoMenuItem()).Chosen() {
 		s.showTrackInfo(t)
 	}
 }
@@ -95,7 +95,7 @@ func (s *shell) trackInfoDialog(c *ui.Context) {
 		v.asked = at
 		s.refetch(key)
 	}
-	s.dialog(c, &v.open, dialogOptions{key: "track-info", title: "track info", width: 560}, func() {
+	s.dialog(c, &v.open, dialogOptions{key: "track-info", title: locales.TrackInfoTitle(), width: 560}, func() {
 		s.trackInfoBody(c, t, l)
 	}, func() {
 		if f := l.value.File; l.done && f != nil && f.Kind != app.FileCache && f.Problem != "File not found" {
@@ -103,7 +103,7 @@ func (s *shell) trackInfoDialog(c *ui.Context) {
 				showInFolder(f.Path)
 			}
 		}
-		if s.dialogButton(c, "track-info-close", "close", true).AutoFocus().Clicked() {
+		if s.dialogButton(c, "track-info-close", locales.TrackInfoClose(), true).AutoFocus().Clicked() {
 			v.open = false
 		}
 	})
@@ -121,11 +121,11 @@ func waitsForEngine(info app.TrackInfo, now *player.Source) bool {
 func showInFolderLabel() string {
 	switch runtime.GOOS {
 	case "darwin":
-		return "Show in Finder"
+		return locales.TrackInfoShowInFinder()
 	case "linux":
-		return "Show in its folder"
+		return locales.TrackInfoShowInFolder()
 	}
-	return "Show in Explorer"
+	return locales.TrackInfoShowInExplorer()
 }
 
 // trackInfoBody is what the dialog of Track info tells of t: its title
@@ -140,7 +140,7 @@ func (s *shell) trackInfoBody(c *ui.Context, t media.Track, l *loaded[app.TrackI
 	})
 	switch {
 	case !l.done:
-		ui.Text(c, "Reading what it holds…").FontSize(k.smallSize()).TextColor(k.muted)
+		ui.Text(c, locales.TrackInfoReading()).FontSize(k.smallSize()).TextColor(k.muted)
 		return
 	case l.err != nil:
 		ui.Text(c, l.err.Error()).FontSize(k.smallSize()).TextColor(k.danger)
@@ -149,7 +149,7 @@ func (s *shell) trackInfoBody(c *ui.Context, t media.Track, l *loaded[app.TrackI
 	s.infoRows(c, trackFacts(t, l.value))
 	s.streamCopy(c, l.value.Stream)
 	if rows := tagRows(l.value); len(rows) > 0 {
-		ui.Text(c, k.sentence("its tags")).FontSize(k.smallSize()).FontWeight(k.leadWeight()).Margin(8, 0, 0)
+		ui.Text(c, k.sentence(locales.TrackInfoTags())).FontSize(k.smallSize()).FontWeight(k.leadWeight()).Margin(8, 0, 0)
 		s.infoRows(c, rows)
 	}
 	s.trackCopies(c, t, l.value)
@@ -196,74 +196,74 @@ func (s *shell) infoRows(c *ui.Context, rows []infoRow) {
 // plays it, what its audio is, the file it plays from, what the engine
 // plays of it while it plays, and how loud.
 func trackFacts(t media.Track, info app.TrackInfo) []infoRow {
-	rows := []infoRow{{"Source", sourceLine(t, info), false}}
+	rows := []infoRow{{locales.TrackInfoSource(), sourceLine(t, info), false}}
 	if r := info.Recording; r != nil {
-		rows = append(rows, infoRow{"Plays as", r.Title + " · " + names(r.Artists) + ", on YouTube Music", false})
+		rows = append(rows, infoRow{locales.TrackInfoPlaysAs(), locales.TrackInfoRecording(r.Title, names(r.Artists)), false})
 	}
 	switch info.Plays {
 	case app.PlaysSpotify, app.PlaysConnect:
-		where := "In Spotify's own player, in MixMusic"
+		where := locales.TrackInfoPlaysSpotify()
 		if info.Plays == app.PlaysConnect {
-			where = "On a Spotify Connect device"
+			where = locales.TrackInfoPlaysConnect()
 		}
-		rows = append(rows, infoRow{"Plays", where, false},
-			infoRow{"Quality", "As your Spotify account and Spotify's settings choose: Spotify tells MixMusic nothing of its audio.", false})
+		rows = append(rows, infoRow{locales.TrackInfoPlays(), where, false},
+			infoRow{locales.PlaybackQuality(), locales.TrackInfoQualitySpotify(), false})
 		if t.DurationMs > 0 {
-			rows = append(rows, infoRow{"Length", clock(ms(t.DurationMs)), false})
+			rows = append(rows, infoRow{locales.TrackInfoLength(), clock(ms(t.DurationMs)), false})
 		}
-		return append(rows, infoRow{"Loudness", "Spotify plays it at its own loudness.", false})
+		return append(rows, infoRow{locales.TrackInfoLoudness(), locales.TrackInfoLoudnessSpotify(), false})
 	}
 	f, ok := formatOf(info)
 	st := info.Stream
 	switch {
 	case ok:
-		rows = append(rows, infoRow{"Format", formatName(f.Codec, f.Container), false})
+		rows = append(rows, infoRow{locales.TrackInfoFormat(), formatName(f.Codec, f.Container), false})
 	case st != nil:
-		rows = append(rows, infoRow{"Format", formatName(st.Codec, st.Container), false})
+		rows = append(rows, infoRow{locales.TrackInfoFormat(), formatName(st.Codec, st.Container), false})
 	case info.File == nil && t.Source == media.SourceSpotify && info.Recording == nil:
-		rows = append(rows, infoRow{"Format", "Play it to see its format, bitrate and the rest: MixMusic finds its recording on YouTube Music as it plays.", false})
+		rows = append(rows, infoRow{locales.TrackInfoFormat(), locales.TrackInfoFormatSpotify(), false})
 	case info.File == nil:
-		rows = append(rows, infoRow{"Format", "Play it to see its format, bitrate and the rest: MixMusic finds its stream as it plays.", false})
+		rows = append(rows, infoRow{locales.TrackInfoFormat(), locales.TrackInfoFormatStream(), false})
 	}
 	switch file := info.File; {
 	case st != nil && st.Bitrate > 0:
-		rows = append(rows, infoRow{"Bitrate", strconv.Itoa(int(st.Bitrate+0.5)) + " kbit/s", false})
+		rows = append(rows, infoRow{locales.TrackInfoBitrate(), locales.TrackInfoBitrateValue(int(st.Bitrate + 0.5)), false})
 	case file != nil && file.Bitrate() > 0:
-		rows = append(rows, infoRow{"Bitrate", "About " + strconv.Itoa(int(file.Bitrate()+0.5)) + " kbit/s, on average", false})
+		rows = append(rows, infoRow{locales.TrackInfoBitrate(), locales.TrackInfoBitrateAverage(int(file.Bitrate() + 0.5)), false})
 	}
 	if ok && f.SampleRate > 0 {
-		rows = append(rows, infoRow{"Sample rate", kilohertz(f.SampleRate), false})
+		rows = append(rows, infoRow{locales.TrackInfoSampleRate(), kilohertz(f.SampleRate), false})
 	}
 	if ok && f.BitDepth > 0 {
-		depth := strconv.Itoa(f.BitDepth) + "-bit"
+		depth := locales.TrackInfoBitDepth(f.BitDepth)
 		if f.Float {
-			depth += " floating point"
+			depth = locales.TrackInfoBitDepthFloat(f.BitDepth)
 		}
-		rows = append(rows, infoRow{"Bit depth", depth, false})
+		rows = append(rows, infoRow{locales.TrackInfoBitDepthLabel(), depth, false})
 	}
 	if ok && f.Channels > 0 {
-		rows = append(rows, infoRow{"Channels", channelsName(f.Channels), false})
+		rows = append(rows, infoRow{locales.TrackInfoChannelsLabel(), channelsName(f.Channels), false})
 	}
 	if length := lengthOf(t, info, f); length != "" {
-		rows = append(rows, infoRow{"Length", length, false})
+		rows = append(rows, infoRow{locales.TrackInfoLength(), length, false})
 	}
 	if file := info.File; file != nil {
 		value := file.Path
 		if file.Problem != "" {
-			value += " · " + file.Problem
+			value = locales.TrackInfoFileProblem(file.Path, file.Problem)
 		}
 		rows = append(rows, infoRow{fileLabel(file.Kind), value, file.Problem != ""})
 		if file.Size > 0 {
-			rows = append(rows, infoRow{"Size", byteSize(file.Size), false})
+			rows = append(rows, infoRow{locales.CacheSettingsSize(), byteSize(file.Size), false})
 		}
 	} else if st != nil && st.Size > 0 {
-		rows = append(rows, infoRow{"Size", byteSize(st.Size), false})
+		rows = append(rows, infoRow{locales.CacheSettingsSize(), byteSize(st.Size), false})
 	}
 	rows = append(rows, streamRows(st)...)
 	if info.Playing {
-		rows = append(rows, infoRow{"Playing", playingLine(info), false})
+		rows = append(rows, infoRow{locales.TrackInfoPlaying(), playingLine(info), false})
 	}
-	return append(rows, infoRow{"Loudness", loudnessLine(t, info), false})
+	return append(rows, infoRow{locales.TrackInfoLoudness(), loudnessLine(t, info), false})
 }
 
 // formatOf is what a track's audio is: what the engine plays of the track
@@ -282,11 +282,11 @@ func formatOf(info app.TrackInfo) (audio.Format, bool) {
 // from its download, or this computer.
 func sourceLine(t media.Track, info app.TrackInfo) string {
 	if t.Source == media.SourceFile {
-		return "A file on this computer"
+		return locales.TrackInfoFileSource()
 	}
 	line := sourceName(t.Source)
 	if f := info.File; f != nil && f.Kind == app.FileDownload {
-		line += ", downloaded"
+		line = locales.TrackInfoDownloaded(line)
 	}
 	return line
 }
@@ -298,9 +298,9 @@ func formatName(codec, container string) string {
 	case "", codec:
 		return codec
 	case "ADTS":
-		container = "HLS packed audio"
+		container = locales.TrackInfoHLSPacked()
 	}
-	return codec + " in " + container
+	return locales.TrackInfoCodecIn(codec, container)
 }
 
 // kilohertz writes a sample rate as "44.1 kHz".
@@ -313,13 +313,13 @@ func kilohertz(hz int) string {
 func channelsName(n int) string {
 	switch n {
 	case 1:
-		return "Mono"
+		return locales.TrackInfoMono()
 	case 2:
-		return "Stereo"
+		return locales.TrackInfoStereo()
 	case 6:
-		return "5.1 surround"
+		return locales.TrackInfoSurround()
 	}
-	return strconv.Itoa(n) + " channels"
+	return locales.TrackInfoChannels(n)
 }
 
 // lengthOf is how long t plays: as its audio tells, else its stream, else
@@ -327,7 +327,7 @@ func channelsName(n int) string {
 func lengthOf(t media.Track, info app.TrackInfo, f audio.Format) string {
 	switch st := info.Stream; {
 	case st != nil && st.Live:
-		return "Live"
+		return locales.TrackInfoLive()
 	case f.Duration > 0:
 		return clock(f.Duration)
 	case st != nil && st.Duration > 0:
@@ -342,11 +342,11 @@ func lengthOf(t media.Track, info app.TrackInfo, f audio.Format) string {
 func fileLabel(kind app.FileKind) string {
 	switch kind {
 	case app.FileDownload:
-		return "Download"
+		return locales.TrackInfoDownload()
 	case app.FileCache:
-		return "Offline copy"
+		return locales.TrackInfoOfflineCopy()
 	}
-	return "File"
+	return locales.TrackInfoFile()
 }
 
 // playingLine tells what MixMusic's audio engine plays of the track
@@ -354,26 +354,25 @@ func fileLabel(kind app.FileKind) string {
 func playingLine(info app.TrackInfo) string {
 	e := info.Engine
 	if e == nil || !e.Ready {
-		return "MixMusic's audio engine is opening it…"
+		return locales.TrackInfoEngineOpening()
 	}
-	line := "In MixMusic's audio engine, "
-	if info.Surround {
-		line += "its 5.1 surround audio, "
-	}
+	how := locales.TrackInfoEngineStreamed()
 	switch f := info.File; {
 	case f != nil && f.Kind == app.FileMusic:
-		line += "from its file"
+		how = locales.TrackInfoEngineFile()
 	case f != nil && f.Kind == app.FileDownload:
-		line += "from its download"
+		how = locales.TrackInfoEngineDownload()
 	case f != nil && f.Kind == app.FileCache:
-		line += "from the offline cache"
+		how = locales.TrackInfoEngineCache()
 	case info.Stream != nil && info.Stream.Live:
-		line += "live from YouTube"
-	default:
-		line += "streamed from YouTube"
+		how = locales.TrackInfoEngineLive()
 	}
+	if info.Surround {
+		how = locales.TrackInfoEngineSurround(how)
+	}
+	line := locales.TrackInfoEngineLine(how)
 	if r := e.Format.SampleRate; r > 0 && r != audio.Rate {
-		line += ", converted to " + kilohertz(audio.Rate)
+		line = locales.TrackInfoEngineConverted(line, kilohertz(audio.Rate))
 	}
 	return line
 }
@@ -384,18 +383,18 @@ func loudnessLine(t media.Track, info app.TrackInfo) string {
 	var line string
 	switch {
 	case info.Measured && !info.EvenLoudness:
-		line = "YouTube measured it at " + lkfs(info.LKFS) + ". Even loudness is off: it plays at its own level."
+		line = locales.TrackInfoMeasuredOff(lkfs(info.LKFS))
 	case info.Measured && info.Trim < -0.05:
-		line = fmt.Sprintf("YouTube measured it at %s. Even loudness turns it down by %.1f dB.", lkfs(info.LKFS), -info.Trim)
+		line = locales.TrackInfoMeasuredTurnDown(lkfs(info.LKFS), strconv.FormatFloat(-info.Trim, 'f', 1, 64))
 	case info.Measured:
-		line = "YouTube measured it at " + lkfs(info.LKFS) + ". Even loudness leaves it as it is: it isn't louder than " + lkfs(-14) + "."
+		line = locales.TrackInfoMeasuredLeave(lkfs(info.LKFS), lkfs(-14))
 	case t.Source == media.SourceFile:
-		line = "It plays at its own level: Even loudness turns tracks down from YouTube's measure of each, which a file on this computer hasn't."
+		line = locales.TrackInfoFileLoudness()
 	default:
-		line = "MixMusic has no measure of it yet: it plays at its own level."
+		line = locales.TrackInfoNoMeasure()
 	}
 	if info.Levelling {
-		line += " Volume levelling squeezes its loud and quiet moments closer together."
+		line = locales.TrackInfoLevelling(line)
 	}
 	return line
 }
@@ -425,12 +424,12 @@ func tagRows(info app.TrackInfo) []infoRow {
 		}
 		return strconv.Itoa(n)
 	}
-	add("Title", tg.Title)
-	add("Artist", strings.Join(tg.Artists, ", "))
-	add("Album", tg.Album)
-	add("Album artist", strings.Join(tg.AlbumArtists, ", "))
-	add("Track", number(tg.Track))
-	add("Disc", number(tg.Disc))
-	add("Year", number(tg.Year))
+	add(locales.TrackInfoTagTitle(), tg.Title)
+	add(locales.TrackInfoTagArtist(), strings.Join(tg.Artists, ", "))
+	add(locales.TrackInfoTagAlbum(), tg.Album)
+	add(locales.TrackInfoTagAlbumArtist(), strings.Join(tg.AlbumArtists, ", "))
+	add(locales.TrackInfoTagTrack(), number(tg.Track))
+	add(locales.TrackInfoTagDisc(), number(tg.Disc))
+	add(locales.TrackInfoTagYear(), number(tg.Year))
 	return rows
 }

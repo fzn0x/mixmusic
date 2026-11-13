@@ -20,12 +20,6 @@ import (
 // no rule can tell; the computer's shows until it comes, and when it
 // can't.
 
-// The tips of the romanize switch of lyrics romanized on the computer.
-const (
-	localTip       = "Shows the lyrics in Latin letters too, made on this computer: nothing is sent."
-	unisonFirstTip = "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google romanize them with the vowels their script leaves out; until they come, or when they can't, they're made on this computer."
-)
-
 // unisonFirst are the languages romanized on the computer whose lines in
 // Latin letters are Unison's, once they come, as they're better: those
 // romanizedFirst names, of a script that writes no short vowels.

@@ -11,7 +11,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"slices"
 	"strconv"
 	"strings"
@@ -22,6 +21,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/tagwrite"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // tagDialogs are the dialogs that change tags, and seq counts their
@@ -89,10 +89,10 @@ func (s *shell) tagItems(m *ui.Menu, t media.Track) {
 	if s.mini.win != nil || t.Source != media.SourceFile {
 		return
 	}
-	if m.Item("Edit info…").Chosen() {
+	if m.Item(locales.LocalTagsEditInfoItem()).Chosen() {
 		s.editInfo(t)
 	}
-	if m.Item("Move to album…").Chosen() {
+	if m.Item(locales.LocalTagsMoveToAlbumItem()).Chosen() {
 		s.moveToAlbum(t)
 	}
 }
@@ -111,7 +111,7 @@ func (s *shell) editAlbumItem(m *ui.Menu, a media.Album) {
 	if s.mini.win != nil || a.Source != media.SourceFile {
 		return
 	}
-	if m.Item("Edit album…").Chosen() {
+	if m.Item(locales.LocalTagsEditAlbumItem()).Chosen() {
 		s.editAlbum(a.ID)
 	}
 }
@@ -151,7 +151,7 @@ func (s *shell) editAlbum(id string) {
 			ids = append(ids, t.ID)
 		}
 		if err == nil && len(ids) == 0 {
-			err = errors.New("the album has no songs")
+			err = errors.New(locales.LocalTagsNoSongs())
 		}
 		if err == nil {
 			err = s.svc.LocalFiles.Editable(ids)
@@ -194,14 +194,14 @@ func (f tagForm) tags(was tagForm) (tagwrite.Tags, tagwrite.Fields, error) {
 	var t tagwrite.Tags
 	var fields tagwrite.Fields
 	differs := func(a, b string) bool { return strings.TrimSpace(a) != strings.TrimSpace(b) }
-	number := func(s, what string, least, most int) (int, error) {
+	number := func(s string, bad func(least, most int) string, least, most int) (int, error) {
 		s = strings.TrimSpace(s)
 		if s == "" {
 			return 0, nil
 		}
 		n, err := strconv.Atoi(s)
 		if err != nil || n < least || n > most {
-			return 0, fmt.Errorf("%s must be a number from %d to %d", what, least, most)
+			return 0, errors.New(bad(least, most))
 		}
 		return n, nil
 	}
@@ -219,19 +219,19 @@ func (f tagForm) tags(was tagForm) (tagwrite.Tags, tagwrite.Fields, error) {
 	}
 	var err error
 	if differs(f.track, was.track) {
-		if t.Track, err = number(f.track, "The track", 1, 9999); err != nil {
+		if t.Track, err = number(f.track, locales.LocalTagsTrackRange, 1, 9999); err != nil {
 			return t, 0, err
 		}
 		fields |= tagwrite.Track
 	}
 	if differs(f.disc, was.disc) {
-		if t.Disc, err = number(f.disc, "The disc", 1, 9999); err != nil {
+		if t.Disc, err = number(f.disc, locales.LocalTagsDiscRange, 1, 9999); err != nil {
 			return t, 0, err
 		}
 		fields |= tagwrite.Disc
 	}
 	if differs(f.year, was.year) {
-		if t.Year, err = number(f.year, "The year", 1000, 9999); err != nil {
+		if t.Year, err = number(f.year, locales.LocalTagsYearRange, 1000, 9999); err != nil {
 			return t, 0, err
 		}
 		fields |= tagwrite.Year
@@ -260,15 +260,15 @@ func (s *shell) tagDialog(c *ui.Context) {
 		return
 	}
 	k := &s.lk
-	title := "edit info"
+	title := locales.LocalTagsEditInfoTitle()
 	if e.album {
-		title = "edit album"
+		title = locales.LocalTagsEditAlbumTitle()
 	}
 	submitted := false
 	s.dialog(c, &e.open, dialogOptions{key: "tags", title: title, width: 560, alert: e.saving}, func() {
-		about := "The tags of " + e.name + ", which MixMusic writes into its file."
+		about := locales.LocalTagsAboutSong(e.name)
 		if e.album {
-			about = "What the " + plural(len(e.ids), "song") + " of " + e.name + " share, which MixMusic writes into their files."
+			about = locales.LocalTagsAboutAlbum(len(e.ids), e.name)
 		}
 		ui.Text(c, about).FontSize(k.bodySize()).TextColor(k.muted)
 		ui.Column(c).Gap(12).Children(func() {
@@ -283,19 +283,19 @@ func (s *shell) tagDialog(c *ui.Context) {
 				})
 			}
 			if !e.album {
-				field("title", "Title", &e.form.title, 360, true)
-				field("artists", "Artists", &e.form.artists, 360, false)
+				field("title", locales.LocalTagsTitle(), &e.form.title, 360, true)
+				field("artists", locales.LocalTagsArtists(), &e.form.artists, 360, false)
 			}
-			field("album", "Album", &e.form.album, 360, e.album)
-			field("album-artists", "Album artist", &e.form.albumArtists, 360, false)
-			ui.Text(c, "Separate several artists with ;").FontSize(k.captionSize()).TextColor(k.muted).Margin(0, 0, 0, 128)
+			field("album", locales.LocalTagsAlbum(), &e.form.album, 360, e.album)
+			field("album-artists", locales.LocalTagsAlbumArtist(), &e.form.albumArtists, 360, false)
+			ui.Text(c, locales.LocalTagsSeparate()).FontSize(k.captionSize()).TextColor(k.muted).Margin(0, 0, 0, 128)
 			if !e.album {
-				field("track", "Track", &e.form.track, 96, false)
-				field("disc", "Disc", &e.form.disc, 96, false)
+				field("track", locales.LocalTagsTrack(), &e.form.track, 96, false)
+				field("disc", locales.LocalTagsDisc(), &e.form.disc, 96, false)
 			}
-			field("year", "Year", &e.form.year, 96, false)
+			field("year", locales.LocalTagsYear(), &e.form.year, 96, false)
 			if !e.album {
-				field("genre", "Genre", &e.form.genre, 360, false)
+				field("genre", locales.LocalTagsGenre(), &e.form.genre, 360, false)
 			}
 			s.tagCover(c, e)
 		})
@@ -303,14 +303,14 @@ func (s *shell) tagDialog(c *ui.Context) {
 			ui.Text(c, e.problem).FontSize(k.smallSize()).TextColor(k.danger)
 		}
 	}, func() {
-		if s.dialogButton(c, "tags-cancel", "cancel", false).Disabled(e.saving).Clicked() {
+		if s.dialogButton(c, "tags-cancel", locales.LibraryCancel(), false).Disabled(e.saving).Clicked() {
 			e.open = false
 		}
-		label := "save"
+		label := locales.LibrarySave()
 		if e.saving {
-			label = "saving…"
+			label = locales.LocalTagsSaving()
 			if len(e.ids) > 1 {
-				label = fmt.Sprintf("saving %d of %d…", e.done+1, len(e.ids))
+				label = locales.LocalTagsSavingCount(e.done+1, len(e.ids))
 			}
 		}
 		if (s.dialogButton(c, "tags-save", label, true).Disabled(e.saving).Clicked() || submitted) && !e.saving {
@@ -324,17 +324,17 @@ func (s *shell) tagDialog(c *ui.Context) {
 func (s *shell) tagCover(c *ui.Context, e *tagEditor) {
 	k := &s.lk
 	ui.Row(c).Gap(16).AlignItems(ui.Center).Children(func() {
-		ui.Text(c, "Cover").FontSize(k.smallSize()).TextColor(k.muted).Width(112).Shrink(0)
+		ui.Text(c, locales.LocalTagsCover()).FontSize(k.smallSize()).TextColor(k.muted).Width(112).Shrink(0)
 		if e.cover != nil {
 			s.cover(c, "tags-cover-art", []media.Image{{URL: e.coverURL}}, 72, false)
 		} else {
-			ui.Text(c, "None").FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, locales.LocalTagsNone()).FontSize(k.smallSize()).TextColor(k.muted)
 		}
 		ui.Column(c).Gap(8).Children(func() {
-			if s.dialogButton(c, "tags-cover-choose", "choose an image…", false).Disabled(e.saving).Clicked() {
+			if s.dialogButton(c, "tags-cover-choose", locales.LocalTagsChooseImage(), false).Disabled(e.saving).Clicked() {
 				s.chooseTagCover(e.seq)
 			}
-			if e.cover != nil && s.dialogButton(c, "tags-cover-remove", "remove the cover", false).Disabled(e.saving).Clicked() {
+			if e.cover != nil && s.dialogButton(c, "tags-cover-remove", locales.LocalTagsRemoveCover(), false).Disabled(e.saving).Clicked() {
 				e.cover, e.coverURL, e.coverSet = nil, "", true
 			}
 		})
@@ -347,8 +347,8 @@ func (s *shell) tagCover(c *ui.Context, e *tagEditor) {
 func (s *shell) chooseTagCover(seq int) {
 	win := s.win
 	go func() {
-		paths, err := openFileDialog(mygo.OpenDialogOptions{Parent: win, Title: "Choose a cover",
-			Filters: []mygo.FileFilter{{Name: "Images", Extensions: []string{"jpg", "jpeg", "png"}}}})
+		paths, err := openFileDialog(mygo.OpenDialogOptions{Parent: win, Title: locales.LocalTagsChooseCoverTitle(),
+			Filters: []mygo.FileFilter{{Name: locales.LocalTagsImages(), Extensions: []string{"jpg", "jpeg", "png"}}}})
 		if err == nil && len(paths) == 0 {
 			return
 		}
@@ -363,7 +363,7 @@ func (s *shell) chooseTagCover(seq int) {
 				return
 			}
 			if err != nil {
-				e.problem = "Couldn't use that image: " + err.Error()
+				e.problem = locales.LocalTagsBadImage(err.Error())
 				return
 			}
 			e.cover, e.coverURL, e.coverSet, e.problem = &pic, url, true, ""
@@ -410,7 +410,7 @@ func (s *shell) saveTags() {
 			case err != nil && mine:
 				e.problem = sentenceOf(err.Error())
 				if n > 0 {
-					e.problem = fmt.Sprintf("Saved %d of %d songs. %s", n, len(ids), e.problem)
+					e.problem = locales.LocalTagsSavedSome(n, len(ids), e.problem)
 				}
 			case err != nil:
 				s.notes = append(s.notes, noticeOf(err))
@@ -418,12 +418,12 @@ func (s *shell) saveTags() {
 				if mine {
 					e.open = false
 				}
-				s.notes = append(s.notes, notice("Saved "+name+": "+plural(n, "song")))
+				s.notes = append(s.notes, notice(locales.LocalTagsSavedAlbum(name, n)))
 			default:
 				if mine {
 					e.open = false
 				}
-				s.notes = append(s.notes, notice("Saved the tags of "+name))
+				s.notes = append(s.notes, notice(locales.LocalTagsSavedTags(name)))
 			}
 		})
 	}()
@@ -521,11 +521,11 @@ func (s *shell) moveDialog(c *ui.Context) {
 	k := &s.lk
 	var in ui.Element
 	query := strings.TrimSpace(mv.query)
-	s.dialog(c, &mv.open, dialogOptions{key: "move-album", title: "move to album", width: 520, alert: mv.saving}, func() {
-		ui.Text(c, "Choose an album of this computer for "+mv.track.Title+", or name a new one. MixMusic writes it into the song's file.").
+	s.dialog(c, &mv.open, dialogOptions{key: "move-album", title: locales.LocalTagsMoveTitle(), width: 520, alert: mv.saving}, func() {
+		ui.Text(c, locales.LocalTagsMoveAbout(mv.track.Title)).
 			FontSize(k.bodySize()).TextColor(k.muted)
-		in = ui.TextInput(c.Key("move-album-find"), &mv.query).AutoFocus().Label("Album").
-			Placeholder(k.sentence("find an album, or name a new one")).Width(400)
+		in = ui.TextInput(c.Key("move-album-find"), &mv.query).AutoFocus().Label(locales.LocalTagsAlbum()).
+			Placeholder(k.sentence(locales.LocalTagsFindAlbum())).Width(400)
 		found := s.moveFound(mv)
 		ui.Column(c).Gap(4).Children(func() {
 			for i, a := range found {
@@ -552,7 +552,7 @@ func (s *shell) moveDialog(c *ui.Context) {
 			}
 		})
 		if len(found) == 0 && query != "" {
-			ui.Text(c, "No album of this computer is called that: Move makes a new one.").FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, locales.LocalTagsNoAlbum()).FontSize(k.smallSize()).TextColor(k.muted)
 		}
 		if mv.note != "" {
 			ui.Text(c, mv.note).FontSize(k.smallSize()).TextColor(k.muted)
@@ -561,15 +561,15 @@ func (s *shell) moveDialog(c *ui.Context) {
 			ui.Text(c, mv.problem).FontSize(k.smallSize()).TextColor(k.danger)
 		}
 	}, func() {
-		if s.dialogButton(c, "move-album-cancel", "cancel", false).Disabled(mv.saving).Clicked() {
+		if s.dialogButton(c, "move-album-cancel", locales.LibraryCancel(), false).Disabled(mv.saving).Clicked() {
 			mv.open = false
 		}
-		label := "move"
+		label := locales.LocalTagsMove()
 		if mv.chosen == "" {
-			label = "move to a new album"
+			label = locales.LocalTagsMoveNew()
 		}
 		if mv.saving {
-			label = "moving…"
+			label = locales.LocalTagsMoving()
 		}
 		ready := !mv.saving && (mv.chosen != "" || query != "")
 		if (s.dialogButton(c, "move-album-ok", label, true).Disabled(!ready).Clicked() || in.Submitted()) && ready {
@@ -586,8 +586,7 @@ func (s *shell) moveNote(t media.Track, a media.Album) string {
 	if err != nil || len(plan.Others) == 0 {
 		return ""
 	}
-	return "The songs of " + a.Title + " have no album artist, and are in another folder: they all take " +
-		strings.Join(plan.AlbumArtists, ", ") + " as theirs, so that they stay together."
+	return locales.LocalTagsMoveNote(a.Title, strings.Join(plan.AlbumArtists, ", "))
 }
 
 // moveSong moves the song of the dialog, beside the main thread, to the
@@ -628,7 +627,7 @@ func (s *shell) moveSong() {
 					mv.open = false
 				}
 				s.retagged([]string{t.ID}, from)
-				s.notes = append(s.notes, notice("Moved "+t.Title+" to "+title))
+				s.notes = append(s.notes, notice(locales.LocalTagsMoved(t.Title, title)))
 			}
 		})
 	}()

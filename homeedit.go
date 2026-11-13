@@ -13,6 +13,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // homeArrange is Home's own state: whether it shows as the user edits it,
@@ -83,12 +84,13 @@ func homeArrangement(layout []settings.HomeShelf, groups []*homeGroup) (full []s
 // homeSourceLabel names where the shelves of source come from, as Home's
 // pivots do: "Yours" for the user's own.
 func homeSourceLabel(source media.Source) string {
-	for _, f := range homeFilters {
-		if f.source == source {
-			return f.label
+	labels := homeFilterLabels()
+	for i, f := range homeFilters {
+		if f == source {
+			return labels[i]
 		}
 	}
-	return homeFilters[1].label
+	return labels[1]
 }
 
 // homeEditor is Home as the user edits it, as the package's comment
@@ -110,15 +112,15 @@ func (s *shell) homeEditor(c *ui.Context) {
 		}
 	}
 	ui.Row(c).Gap(8).Wrap().Margin(0, 0, 16).Children(func() {
-		if s.button(c, "home-done", "done", true).Clicked() {
+		if s.button(c, "home-done", locales.HomeEditDone(), true).Clicked() {
 			s.home.editing = false
 		}
-		s.button(c, "home-add", "add a shelf", false).Menu(func(m *ui.Menu) { s.addShelfMenu(m, full) })
-		if s.button(c, "home-reset", "reset home", false).Disabled(len(layout) == 0).Clicked() {
+		s.button(c, "home-add", locales.HomeEditAddShelf(), false).Menu(func(m *ui.Menu) { s.addShelfMenu(m, full) })
+		if s.button(c, "home-reset", locales.HomeEditReset(), false).Disabled(len(layout) == 0).Clicked() {
 			s.home.resetting = true
 		}
 	})
-	ui.Text(c, "Drag a shelf onto another to move it there, or press Alt+Up or Alt+Down on it. A shelf you hide waits under them, to show again.").
+	ui.Text(c, locales.HomeEditHint()).
 		FontSize(k.bodySize()).TextColor(k.muted).MaxWidth(640).Margin(0, 0, 24)
 	ui.Column(c.Key("home-shelves")).Gap(4).Margin(0, 0, k.sections()).Children(func() {
 		for i, e := range shown {
@@ -132,15 +134,15 @@ func (s *shell) homeEditor(c *ui.Context) {
 		}
 	}
 	if len(hidden) > 0 {
-		s.sectionTitle(c, "Hidden")
+		s.sectionTitle(c, locales.HomeEditHidden())
 		ui.Column(c.Key("home-hidden")).Gap(4).Children(func() {
 			for _, e := range hidden {
 				s.homeHiddenRow(c, e, full)
 			}
 		})
 	}
-	if s.confirm(c, "home-reset", &s.home.resetting, "reset home",
-		"Put Home's shelves back in their own order, show those you hid, and take off those you added?", "reset") {
+	if s.confirm(c, "home-reset", &s.home.resetting, locales.HomeEditReset(),
+		locales.HomeEditResetBody(), locales.HomeEditResetButton()) {
 		s.setHomeShelves(nil)
 	}
 }
@@ -152,7 +154,7 @@ func (s *shell) homeEditRow(c *ui.Context, i int, e settings.HomeShelf, shown, f
 	k := &s.lk
 	from := homeSourceLabel(keySource(e.Key))
 	row := ui.Row(c.Key("home-row-"+e.Key)).Height(56).Padding(0, 8, 0, 16).Gap(12).Radius(k.radiusSm).
-		Background(k.surface2).Label(e.Title + ", " + from).Focusable().Cursor(ui.CursorGrab)
+		Background(k.surface2).Label(locales.HomeEditRowLabel(e.Title, from)).Focusable().Cursor(ui.CursorGrab)
 	if row.Hovered() {
 		row.Background(k.surface2.Mix(k.text, 0.06))
 	}
@@ -191,10 +193,10 @@ func (s *shell) homeEditRow(c *ui.Context, i int, e settings.HomeShelf, shown, f
 			ui.Text(c, from).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 		})
 		if addedKind(e.Key) {
-			if s.iconButton(c, "home-remove-"+e.Key, "trash", "Remove "+e.Title+" from Home", false, 16).Clicked() {
+			if s.iconButton(c, "home-remove-"+e.Key, "trash", locales.HomeEditRemove(e.Title), false, 16).Clicked() {
 				s.setHomeShelves(withoutShelf(full, e.Key))
 			}
-		} else if s.iconButton(c, "home-hide-"+e.Key, "close", "Hide "+e.Title, false, 16).Clicked() {
+		} else if s.iconButton(c, "home-hide-"+e.Key, "close", locales.HomeEditHide(e.Title), false, 16).Clicked() {
 			s.setHomeShelves(withHidden(full, e.Key, true))
 		}
 	})
@@ -209,7 +211,7 @@ func (s *shell) homeHiddenRow(c *ui.Context, e settings.HomeShelf, full []settin
 			ui.Text(c, e.Title).FontSize(k.bodySize()).TextColor(k.muted).SingleLine().MinWidth(0)
 			ui.Text(c, homeSourceLabel(keySource(e.Key))).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 		})
-		if s.button(c, "home-show-"+e.Key, "show", false).Label("Show " + e.Title).Clicked() {
+		if s.button(c, "home-show-"+e.Key, locales.HomeEditShow(), false).Label(locales.HomeEditShowTitle(e.Title)).Clicked() {
 			s.setHomeShelves(withHidden(full, e.Key, false))
 		}
 	})
@@ -248,10 +250,12 @@ func (s *shell) fetchShelfChoices() {
 // checked while Home shows it, and choosing it again takes it off; one
 // added goes first, where the user sees it.
 func (s *shell) addShelfMenu(m *ui.Menu, full []settings.HomeShelf) {
-	item := func(m *ui.Menu, key, title string) {
+	// item is a shelf's entry: label is what the menu shows, title what the
+	// layout keeps, as English.
+	item := func(m *ui.Menu, key, label, title string) {
 		i := shelfAt(full, key)
 		on := i >= 0 && !full[i].Hidden
-		if !m.Item(title).Checked(on).Chosen() {
+		if !m.Item(label).Checked(on).Chosen() {
 			return
 		}
 		switch {
@@ -263,13 +267,13 @@ func (s *shell) addShelfMenu(m *ui.Menu, full []settings.HomeShelf) {
 			s.setHomeShelves(withHidden(full, key, true))
 		}
 	}
-	m.Submenu("One of your mixes", func(m *ui.Menu) {
+	m.Submenu(locales.HomeEditOneMix(), func(m *ui.Menu) {
 		mixes := s.svc.Collection.Playlists()
 		if len(mixes) == 0 {
-			m.Item("No mixes yet").Disabled(true)
+			m.Item(locales.HomeEditNoMixes()).Disabled(true)
 		}
 		for _, p := range mixes {
-			item(m, homePlaylist+p.ID, p.Title)
+			item(m, homePlaylist+p.ID, p.Title, p.Title)
 		}
 	})
 	accounts := s.accounts()
@@ -277,11 +281,11 @@ func (s *shell) addShelfMenu(m *ui.Menu, full []settings.HomeShelf) {
 		m.Submenu(title, func(m *ui.Menu) {
 			switch {
 			case !l.done:
-				m.Item("Loading your playlists…").Disabled(true)
+				m.Item(locales.HomeEditLoadingPlaylists()).Disabled(true)
 			case l.err != nil:
-				m.Item("Couldn't load your playlists").Disabled(true)
+				m.Item(locales.HomeEditLoadFailed()).Disabled(true)
 			case len(l.value) == 0:
-				m.Item("No playlists yet").Disabled(true)
+				m.Item(locales.HomeEditNoPlaylists()).Disabled(true)
 			}
 			hidden := 0
 			for _, p := range l.value {
@@ -289,32 +293,32 @@ func (s *shell) addShelfMenu(m *ui.Menu, full []settings.HomeShelf) {
 					hidden++
 					continue
 				}
-				item(m, homePlaylist+p.ID, p.Title)
+				item(m, homePlaylist+p.ID, p.Title, p.Title)
 			}
 			if hidden > 0 {
-				m.Item("Spotify shows apps the tracks of your own and shared playlists only").Disabled(true)
+				m.Item(locales.HomeEditSpotifyHidden()).Disabled(true)
 			}
 		})
 	}
 	if accounts.YouTube.SignedIn {
-		playlists("A YouTube Music playlist", s.youtubePlaylists())
+		playlists(locales.HomeEditYouTubePlaylist(), s.youtubePlaylists())
 	}
 	if accounts.Spotify.SignedIn {
-		playlists("A Spotify playlist", fetch(s, "spotify:playlists", s.svc.Collection.SpotifyPlaylists))
+		playlists(locales.HomeEditSpotifyPlaylist(), fetch(s, "spotify:playlists", s.svc.Collection.SpotifyPlaylists))
 	}
-	m.Submenu("An artist's new releases", func(m *ui.Menu) {
+	m.Submenu(locales.HomeEditArtistReleases(), func(m *ui.Menu) {
 		artists := s.followedEverywhere()
 		if len(artists) == 0 {
-			m.Item("Follow an artist to add their releases").Disabled(true)
+			m.Item(locales.HomeEditFollowArtist()).Disabled(true)
 		}
 		for _, a := range artists {
-			item(m, homeArtist+a.ID, "New from "+a.Name)
+			item(m, homeArtist+a.ID, locales.HomeEditNewFrom(a.Name), "New from "+a.Name)
 		}
 	})
 	m.Separator()
-	item(m, homeRecent, "Recently played")
-	item(m, homeTopMonth, "Most played this month")
-	item(m, homeDownloads, "Downloads")
+	item(m, homeRecent, locales.HomeEditRecent(), "Recently played")
+	item(m, homeTopMonth, locales.HomeEditMostPlayed(), "Most played this month")
+	item(m, homeDownloads, locales.RailDownloads(), "Downloads")
 }
 
 // followedEverywhere returns the artists the user follows, in MixMusic,

@@ -79,7 +79,7 @@ func TestAudioAsAccountOffer(t *testing.T) {
 		s := premiumShell(t, true)
 		tt := tester(t, s)
 		tt.Frame()
-		if !tt.HasText(audioAsAccountOfferText) || !tt.HasText("play audio as your account") {
+		if !tt.HasText(audioAsAccountOfferText()) || !tt.HasText("play audio as your account") {
 			t.Fatalf("%s: no offer: %q", answer, tt.Texts())
 		}
 		if !tt.Focused("not now") {
@@ -100,14 +100,14 @@ func TestAudioAsAccountOffer(t *testing.T) {
 			t.Errorf("%s: audioAsAccount %v, offered %v", answer, set.AudioAsAccount, set.AudioAsAccountOffered)
 		}
 		tt.Frame()
-		if tt.HasText(audioAsAccountOfferText) {
+		if tt.HasText(audioAsAccountOfferText()) {
 			t.Errorf("%s: the offer shows again", answer)
 		}
 		// Turned off afterwards, it's not offered again.
 		s.set.AudioAsAccount = false
 		s.save()
 		tt.Frame()
-		if tt.HasText(audioAsAccountOfferText) {
+		if tt.HasText(audioAsAccountOfferText()) {
 			t.Errorf("%s: the offer shows again once the switch is off", answer)
 		}
 	}
@@ -120,7 +120,7 @@ func TestAudioAsAccountNotOffered(t *testing.T) {
 	s := premiumShell(t, false)
 	tt := tester(t, s)
 	tt.Frame()
-	if tt.HasText(audioAsAccountOfferText) {
+	if tt.HasText(audioAsAccountOfferText()) {
 		t.Error("offered without Premium")
 	}
 
@@ -129,7 +129,7 @@ func TestAudioAsAccountNotOffered(t *testing.T) {
 	s.save()
 	tt = tester(t, s)
 	tt.Frame()
-	if tt.HasText(audioAsAccountOfferText) {
+	if tt.HasText(audioAsAccountOfferText()) {
 		t.Error("offered while on")
 	}
 
@@ -138,12 +138,12 @@ func TestAudioAsAccountNotOffered(t *testing.T) {
 	s.ask("another question", "Something else first.", "ok", func() { asked = true })
 	tt = tester(t, s)
 	tt.Frame()
-	if tt.HasText(audioAsAccountOfferText) || !tt.HasText("Something else first.") {
+	if tt.HasText(audioAsAccountOfferText()) || !tt.HasText("Something else first.") {
 		t.Fatalf("the offer didn't wait for the other question: %q", tt.Texts())
 	}
 	click(t, s, tt, "ok")
 	tt.Frame()
-	if !asked || !tt.HasText(audioAsAccountOfferText) {
+	if !asked || !tt.HasText(audioAsAccountOfferText()) {
 		t.Errorf("the offer didn't come after the other question, answered %v: %q", asked, tt.Texts())
 	}
 }

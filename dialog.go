@@ -1,6 +1,10 @@
 package main
 
-import "github.com/egoist/mygo/ui"
+import (
+	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
+)
 
 // dialogMargin is the least room a dialog leaves to each edge of the
 // window.
@@ -124,7 +128,7 @@ func (s *shell) dialog(c *ui.Context, open *bool, o dialogOptions, body, actions
 		// the panel would cut.
 		b := ui.Scroll(c.Key(o.key + "-body")).MarginX(4).TrackScroll(sc)
 		if over {
-			b.Focusable().Label("more of " + o.title)
+			b.Focusable().Label(locales.DialogMoreOf(o.title))
 		}
 		bottom := float32(32)
 		if actions != nil {
@@ -160,7 +164,7 @@ func (s *shell) confirm(c *ui.Context, key string, open *bool, title, message, o
 	s.dialog(c, open, dialogOptions{key: key, title: title, width: 480, alert: true, message: message}, func() {
 		ui.Text(c, message).FontSize(s.lk.bodySize())
 	}, func() {
-		if s.dialogButton(c, key+"-cancel", "cancel", false).Clicked() {
+		if s.dialogButton(c, key+"-cancel", locales.ShortcutsCancel(), false).Clicked() {
 			*open = false
 		}
 		if s.dialogButton(c, key+"-ok", ok, true).AutoFocus().Clicked() {

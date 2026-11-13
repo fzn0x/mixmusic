@@ -6,6 +6,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // nowPlayingPage gives the track playing the whole pane: its sleeve under
@@ -16,9 +17,9 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 	cur, ok := s.st.Current()
 	s.pageScroll(c, func() {
 		if !ok {
-			s.pageHeader(c, "Now playing", nil, nil)
-			ui.Text(c, k.words("Nothing playing")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
-			ui.Text(c, "Play a track and it fills this page, with its lyrics.").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+			s.pageHeader(c, locales.NowPlayingTitle(), nil, nil)
+			ui.Text(c, k.words(locales.NowPlayingNothing())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+			ui.Text(c, locales.NowPlayingEmpty()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 			return
 		}
 		t := cur.Track
@@ -50,7 +51,7 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 					}
 					if s.st.Waiting {
 						ui.Text(c, "·").FontSize(k.smallSize()).TextColor(k.muted)
-						ui.Text(c, k.sentence("waiting for the network")).FontSize(k.smallSize()).TextColor(k.muted)
+						ui.Text(c, k.sentence(locales.NowPlayingWaiting())).FontSize(k.smallSize()).TextColor(k.muted)
 					}
 				})
 				s.progress(c)
@@ -59,7 +60,7 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 					if s.roundButton(c, "now-toggle", name, label, true, s.st.Loading).Clicked() {
 						s.p.Toggle()
 					}
-					if s.roundButton(c, "now-next", "next", "Next", false, false).Clicked() {
+					if s.roundButton(c, "now-next", "next", locales.PlayerNext(), false, false).Clicked() {
 						s.p.Next()
 					}
 					ui.Row(c).Children(func() {
@@ -94,7 +95,7 @@ func (s *shell) related(c *ui.Context, t media.Track) {
 // nothing, as of a Spotify device elsewhere, it draws nothing.
 func (s *shell) visualizer(c *ui.Context, size float32) {
 	k := &s.lk
-	ui.Box(c).Absolute().Left(0).Bottom(0).Size(size, size/3).PassThrough().Label("Visualizer").Draw(func(p *ui.Painter, r ui.Rect) {
+	ui.Box(c).Absolute().Left(0).Bottom(0).Size(size, size/3).PassThrough().Label(locales.NowPlayingVisualizer()).Draw(func(p *ui.Painter, r ui.Rect) {
 		p.AnimationFrame()
 		bins := s.svc.Player.NativeAnalyser(false, false).Bytes
 		const bars = 48

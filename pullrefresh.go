@@ -18,6 +18,8 @@ import (
 	"time"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 const (
@@ -213,12 +215,12 @@ func (s *shell) pullStrip(c *ui.Context) {
 	p.shown = h
 	strip.Height(h).Opacity(min(1, h/(pullBar*0.75)))
 	far, gone := p.was >= pullFar, min(p.was/pullFar, 1)
-	label, ink := "pull to refresh", k.muted
+	label, ink := locales.PullRefreshPull(), k.muted
 	switch {
 	case far && p.by > 0:
-		label, ink = "release to refresh", k.accentText
+		label, ink = locales.PullRefreshRelease(), k.accentText
 	case far:
-		label, ink = "refreshing", k.accentText
+		label, ink = locales.PullRefreshRefreshing(), k.accentText
 	}
 	strip.Children(func() {
 		ui.Row(c).Gap(10).AlignItems(ui.Center).Children(func() {

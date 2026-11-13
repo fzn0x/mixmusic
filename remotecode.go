@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // remoteCodeDialog shows the code this computer shows while another pairs
@@ -23,14 +25,14 @@ func (s *shell) remoteCodeDialog(c *ui.Context) {
 	}
 	k := &s.lk
 	shown := code.Code[:3] + " " + code.Code[3:]
-	message := code.Name + " asks to control MixMusic on this computer. To let it, type this code there: " + shown
-	s.dialog(c, &v.codeOpen, dialogOptions{key: "remote-code", title: "pair with " + code.Name, width: 460, alert: true, message: message}, func() {
-		ui.Text(c, code.Name+" asks to control MixMusic on this computer. To let it, type this code there:").FontSize(k.bodySize())
+	message := locales.RemoteCodeMessage(code.Name, shown)
+	s.dialog(c, &v.codeOpen, dialogOptions{key: "remote-code", title: locales.RemoteCodeTitle(code.Name), width: 460, alert: true, message: message}, func() {
+		ui.Text(c, locales.RemoteCodeAsks(code.Name)).FontSize(k.bodySize())
 		ui.Text(c, shown).FontSize(k.size(2.5)).FontWeight(k.titleWeight()).FontFeatures("tnum").Selectable().
-			Label("the code: " + shown)
-		ui.Text(c, "It works once, for 2 minutes. If you didn't ask for it, cancel.").FontSize(k.smallSize()).TextColor(k.muted)
+			Label(locales.RemoteCodeLabel(shown))
+		ui.Text(c, locales.RemoteCodeExpires()).FontSize(k.smallSize()).TextColor(k.muted)
 	}, func() {
-		if s.dialogButton(c, "remote-code-cancel", "cancel", false).AutoFocus().Clicked() {
+		if s.dialogButton(c, "remote-code-cancel", locales.ShortcutsCancel(), false).AutoFocus().Clicked() {
 			v.codeOpen = false
 		}
 	})

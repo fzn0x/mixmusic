@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"slices"
 	"strconv"
 	"time"
@@ -33,7 +33,7 @@ func (s *shell) installButton(c *ui.Context, key, label string) {
 				v = float64(s.installDone) / float64(s.installTotal)
 			}
 			ui.Progress(c, v).Width(200)
-			ui.Text(c, k.sentence("installing yt-dlp…")).FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, k.sentence(locales.ToolsInstalling())).FontSize(k.smallSize()).TextColor(k.muted)
 		})
 		return
 	}
@@ -49,7 +49,7 @@ func (s *shell) installButton(c *ui.Context, key, label string) {
 				s.installing = false
 				s.forget("tools")
 				if err != nil {
-					s.notes = append(s.notes, noticeOf(fmt.Errorf("couldn't install yt-dlp: %w", err)))
+					s.notes = append(s.notes, noticeOf(errors.New(locales.ToolsInstallFailed(err.Error()))))
 					return
 				}
 				if s.set.YTDLPPath != "" {
@@ -57,7 +57,7 @@ func (s *shell) installButton(c *ui.Context, key, label string) {
 					s.set.YTDLPPath = ""
 					s.save()
 				}
-				s.notes = append(s.notes, notice("yt-dlp "+st.YTDLP.Version+" is ready"))
+				s.notes = append(s.notes, notice(locales.ToolsReady(st.YTDLP.Version)))
 			})
 		}()
 	}
@@ -74,19 +74,17 @@ func (s *shell) toolProblems(c *ui.Context) {
 	panel := func(title, message string, actions func()) { s.alert(c, title, message, actions).Margin(0, 0, 32) }
 	switch {
 	case !y.Found:
-		panel("Some tracks need yt-dlp",
-			"MixMusic finds the audio of most tracks itself, and asks yt-dlp for the rest, such as tracks made for children. Install it once, and it stays up to date from Settings.",
-			func() { s.installButton(c, "install-ytdlp", "install yt-dlp") })
+		panel(locales.ToolsNeedTitle(), locales.ToolsNeedMessage(),
+			func() { s.installButton(c, "install-ytdlp", locales.ToolSettingsInstall()) })
 	case outdated(y) && s.set.SkippedYTDLP != y.Latest:
-		how := "the way you installed it"
+		how := locales.ToolsHowInstalled()
 		if y.UpdateCommand != "" {
-			how = "with " + y.UpdateCommand
+			how = locales.ToolsHowWithCommand(y.UpdateCommand)
 		}
-		panel("Your yt-dlp is out of date",
-			fmt.Sprintf("yt-dlp %s finds the audio of the tracks YouTube won't give MixMusic itself, and %s is out. As YouTube changes, an old yt-dlp stops finding it. Update it %s, or use MixMusic's own, which it keeps up to date.", y.Version, y.Latest, how),
+		panel(locales.ToolsOutdatedTitle(), locales.ToolsOutdatedMessage(y.Version, y.Latest, how),
 			func() {
-				s.installButton(c, "use-ours", "use MixMusic's yt-dlp")
-				if s.button(c, "not-now", "not now", false).Clicked() {
+				s.installButton(c, "use-ours", locales.ToolSettingsUseOurs())
+				if s.button(c, "not-now", locales.ToolsNotNow(), false).Clicked() {
 					s.set.SkippedYTDLP = y.Latest
 					s.save()
 				}

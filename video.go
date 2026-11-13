@@ -25,6 +25,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 const (
@@ -376,7 +377,7 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 		case !asked:
 			// No motion the user didn't ask for: a play button asks.
 			b := s.buttonBase(c.Key("sleeve-video-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().
-				Right(8).Bottom(8).Label("Play the video").Tooltip("Play the video").Cursor(ui.CursorPointer)
+				Right(8).Bottom(8).Label(locales.VideoPlay()).Tooltip(locales.VideoPlay()).Cursor(ui.CursorPointer)
 			if b.Clicked() {
 				if v.played == nil {
 					v.played = map[string]bool{}
@@ -395,7 +396,7 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 			return
 		}
 		shown := v.status.Src == src.Src && v.status.Shown
-		web := ui.WebView(c.Key("video "+src.Src), v.view).Absolute().Left(0).Top(0).Size(w, h).Label("Music video: " + t.Title)
+		web := ui.WebView(c.Key("video "+src.Src), v.view).Absolute().Left(0).Top(0).Size(w, h).Label(locales.VideoMusicVideo(t.Title))
 		target := float32(0)
 		if shown {
 			target = 1
@@ -510,7 +511,7 @@ func (s *shell) makeVideoView() {
 		s.update(func() {
 			v.making = false
 			if err != nil {
-				v.problem = "The picture of music videos couldn't load here."
+				v.problem = locales.VideoLoadFailed()
 				log.Printf("mixmusic: the picture of music videos can't show: %v", err)
 				if web != nil {
 					go web.Destroy()
@@ -664,9 +665,9 @@ func (s *shell) videoToggle(c *ui.Context) {
 	if !hasPicture(s.st) || s.videoProblem() != "" {
 		return
 	}
-	label := "Show the video"
+	label := locales.VideoShowVideo()
 	if s.set.MusicVideos {
-		label = "Show the cover"
+		label = locales.VideoShowCover()
 	}
 	if s.iconButton(c, "now-video", "video", label, s.set.MusicVideos, 18).Clicked() {
 		s.toggleVideos()

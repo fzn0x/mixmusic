@@ -7,6 +7,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // roomCast is the width the cast button takes in the player bar, beside
@@ -36,14 +37,14 @@ func (s *shell) castButton(c *ui.Context) {
 	}
 	devices := s.svc.Player.CastDevices()
 	casting, on := s.svc.Player.CastingTo()
-	label := "Cast to a device"
+	label := locales.CastToDevice()
 	if on {
-		label = "Playing on " + casting.Name
+		label = locales.CastPlayingOn(casting.Name)
 	}
 	b := s.iconButton(c, "cast", "cast", label, on, 18)
 	b.Menu(func(m *ui.Menu) {
 		starting, connecting := s.svc.Player.CastStarting()
-		if m.Item("This computer").Radio(!on).Disabled(connecting).Chosen() && on {
+		if m.Item(locales.CastThisComputer()).Radio(!on).Disabled(connecting).Chosen() && on {
 			go s.svc.Player.StopCasting()
 		}
 		for _, d := range devices {
@@ -52,7 +53,7 @@ func (s *shell) castButton(c *ui.Context) {
 				label += " · " + d.Model
 			}
 			if connecting && starting.ID == d.ID {
-				label += " · connecting…"
+				label += " · " + locales.CastConnecting()
 			}
 			if m.Item(label).Radio(on && casting.ID == d.ID).Disabled(connecting).Chosen() {
 				s.castTo(d)

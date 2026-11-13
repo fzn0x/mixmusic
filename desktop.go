@@ -117,7 +117,7 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 	}
 	s.globalShortcutSettings(c)
 	for _, g := range groups {
-		s.group(c, g, func() {
+		s.group(c, commandGroup(g), func() {
 			for _, cmd := range byGroup[g] {
 				current := s.shortcutOf(cmd)
 				recording := s.recording == cmd.id
@@ -430,16 +430,16 @@ func (s *shell) updateOffer(c *ui.Context) {
 	open := true
 	body := func() {
 		if s.updated != "" {
-			ui.Text(c, "MixMusic "+s.updated+" is installed. It runs once MixMusic restarts.").FontSize(k.bodySize())
+			ui.Text(c, locales.UpdateOfferInstalled(s.updated)).FontSize(k.bodySize())
 		} else {
 			if offer.Notes != "" {
 				ui.Text(c, offer.Notes).FontSize(k.bodySize()).MaxLines(8).MaxWidth(520)
 			}
-			hint := "You have " + s.svc.System.Info().Version + ". "
+			var hint string
 			if u.Enabled {
-				hint += "To install new versions without this question, turn on install updates without asking in Settings › About."
+				hint = locales.UpdateOfferHaveAuto(s.svc.System.Info().Version)
 			} else {
-				hint += replacing(u.Kind, offer.File)
+				hint = locales.UpdateOfferHave(s.svc.System.Info().Version, replacing(u.Kind, offer.File))
 			}
 			ui.Text(c, hint).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(520)
 		}
@@ -449,7 +449,7 @@ func (s *shell) updateOffer(c *ui.Context) {
 				v = float64(s.updateDone) / float64(s.updateTotal)
 			}
 			ui.Progress(c, v).Width(320)
-			ui.Text(c, "Downloading…").FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, locales.UpdateOfferDownloading()).FontSize(k.smallSize()).TextColor(k.muted)
 		}
 	}
 	// The offer comes unasked, and takes the focus from where it was:
@@ -457,26 +457,26 @@ func (s *shell) updateOffer(c *ui.Context) {
 	// pressed for the music or typed in a search skips nothing.
 	actions := func() {
 		if s.updated != "" {
-			if s.dialogButton(c, "offer-later", "later", false).AutoFocus().Clicked() {
+			if s.dialogButton(c, "offer-later", locales.UpdateOfferLater(), false).AutoFocus().Clicked() {
 				s.offer = nil
 			}
-			if s.dialogButton(c, "offer-restart", "restart now", true).Clicked() {
+			if s.dialogButton(c, "offer-restart", locales.UpdatesRestartNow(), true).Clicked() {
 				go s.svc.System.Restart()
 			}
 			return
 		}
-		if s.dialogButton(c, "offer-skip", "skip this version", false).Clicked() {
+		if s.dialogButton(c, "offer-skip", locales.UpdateOfferSkip(), false).Clicked() {
 			s.dismissOffer(true)
 		}
-		if offer.Page != "" && s.dialogButton(c, "offer-notes", "what's new", false).Clicked() {
+		if offer.Page != "" && s.dialogButton(c, "offer-notes", locales.UpdatesWhatsNew(), false).Clicked() {
 			go s.svc.System.OpenExternal(offer.Page)
 		}
-		if s.dialogButton(c, "offer-later", "later", false).AutoFocus().Clicked() {
+		if s.dialogButton(c, "offer-later", locales.UpdateOfferLater(), false).AutoFocus().Clicked() {
 			s.dismissOffer(false)
 		}
 		switch {
 		case u.Enabled:
-			if s.dialogButton(c, "offer-install", "install "+offer.Version, true).Clicked() {
+			if s.dialogButton(c, "offer-install", locales.UpdateOfferInstall(offer.Version), true).Clicked() {
 				s.installUpdate()
 			}
 		case offer.Download != "":
@@ -488,7 +488,7 @@ func (s *shell) updateOffer(c *ui.Context) {
 	if s.updating {
 		actions = nil
 	}
-	s.dialog(c, &open, dialogOptions{key: "offer", title: "mixmusic " + offer.Version + " is out", width: 560}, body, actions)
+	s.dialog(c, &open, dialogOptions{key: "offer", title: locales.UpdateOfferTitle(offer.Version), width: 560}, body, actions)
 	if !open && !s.updating {
 		s.dismissOffer(false)
 	}

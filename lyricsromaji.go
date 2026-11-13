@@ -8,12 +8,9 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/romaji"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
-
-// romajiTip is the tip of the romaji switch above Japanese lyrics, which
-// sends nothing.
-const romajiTip = "Shows the lyrics in romaji too, made on this computer: nothing is sent. The first time, it downloads the dictionary of the readings of kanji, 11.7 MB, from GitHub."
 
 // romajiView is what the lyrics views know of romaji: whether the lyrics
 // of the lines of, n of them, are Japanese, which ja tells; whether they
@@ -59,7 +56,7 @@ func (s *shell) lyricsRomaji(c *ui.Context, t media.Track, ly lyrics.Lyrics, whe
 	r := fetch(s, key, func(ctx context.Context) (romaji.Lines, error) { return s.svc.Catalog.LyricsRomaji(ctx, ly) })
 	switch {
 	case !r.done:
-		s.lyricsNote(c, "Romaji is on its way…")
+		s.lyricsNote(c, locales.LyricsRomajiWaiting())
 		return nil
 	case r.err != nil || len(r.value.Romaji) != len(ly.Lines):
 		// The romaji of other lyrics of the track.
@@ -73,13 +70,13 @@ func (s *shell) lyricsRomaji(c *ui.Context, t media.Track, ly lyrics.Lyrics, whe
 	}
 	switch r.value.Readings {
 	case romaji.Downloading:
-		s.lyricsNote(c, "The readings of kanji are downloading: kanji show as they are until then.")
+		s.lyricsNote(c, locales.LyricsKanjiDownloading())
 		s.awaitRomaji(key)
 	case romaji.Unavailable:
 		k := &s.lk
 		ui.Row(c).Padding(0, 24, 8).Gap(12).AlignItems(ui.Center).Shrink(0).Children(func() {
-			ui.Text(c, "The readings of kanji couldn't be downloaded: kanji show as they are.").FontSize(k.smallSize()).TextColor(k.muted)
-			if s.link(c, "lyrics-romaji-again-"+where, "try again") {
+			ui.Text(c, locales.LyricsKanjiUnavailable()).FontSize(k.smallSize()).TextColor(k.muted)
+			if s.link(c, "lyrics-romaji-again-"+where, locales.WidgetsTryAgain()) {
 				s.svc.Catalog.RomajiAgain()
 				s.refetch(key)
 			}

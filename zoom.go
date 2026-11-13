@@ -71,7 +71,7 @@ func (s *shell) applyZoom(c *ui.Context) {
 	if s.zoomToast {
 		s.zoomToast = false
 		c.AddToast(ui.Toast{ID: "zoom", Title: locales.MenuZoomTitle(percent(s.set.Zoom)), Description: s.zoomLimit(),
-			Action: "reset", OnAction: func() { s.setZoom(1) }})
+			Action: locales.ZoomMenuReset(), OnAction: func() { s.setZoom(1) }})
 	}
 }
 

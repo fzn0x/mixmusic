@@ -208,7 +208,7 @@ func TestFailureReport(t *testing.T) {
 		"  2. Spotify in MixMusic: the player sent Bearer (hidden), api_key=(hidden)\n" +
 		"  3. The stream: GET https://rr1.googlevideo.com/videoplayback: dial tcp (address) and (address) refused, token=(hidden) Cookie: (hidden)\n" +
 		"  4. The stream, tried again, 3 times: the file " + inHome + " of (account) is gone\n" +
-		"- " + failureStopped + "\n" +
+		"- " + failureStopped() + "\n" +
 		"- MixMusic 0.5.11 on windows amd64\n"
 	if got != want {
 		t.Errorf("the report is\n%s\nwant\n%s", got, want)

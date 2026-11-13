@@ -12,9 +12,16 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
-var exploreTabs = []struct{ id, label string }{{"new", "New"}, {"charts", "Charts"}, {"moods", "Moods & genres"}}
+// exploreTabs are the tabs of Explore, by their ids; exploreTabLabels are
+// their names, in the language the app shows.
+var exploreTabs = []string{"new", "charts", "moods"}
+
+func exploreTabLabels() []string {
+	return []string{locales.ExploreTabNew(), locales.ExploreTabCharts(), locales.ExploreTabMoods()}
+}
 
 // moodPath is the page of a mood or a genre.
 func moodPath(params string) string { return "/mood/" + url.PathEscape(params) }
@@ -22,21 +29,14 @@ func moodPath(params string) string { return "/mood/" + url.PathEscape(params) }
 // explorePage shows what is new on YouTube Music, its charts, and its
 // moods and genres, each opening on playlists of its own.
 func (s *shell) explorePage(c *ui.Context, tab string) {
-	labels := make([]string, len(exploreTabs))
-	selected := 0
-	for i, t := range exploreTabs {
-		labels[i] = t.label
-		if t.id == tab {
-			selected = i
-		}
-	}
+	selected := max(slices.Index(exploreTabs, tab), 0)
 	s.pageScroll(c, func() {
 		before := selected
-		s.pageHeader(c, "Explore", labels, &selected)
+		s.pageHeader(c, locales.ExploreTitle(), exploreTabLabels(), &selected)
 		if selected != before {
-			s.router.Replace("/explore/" + exploreTabs[selected].id)
+			s.router.Replace("/explore/" + exploreTabs[selected])
 		}
-		switch exploreTabs[selected].id {
+		switch exploreTabs[selected] {
 		case "new":
 			s.shelvesOf(c, "explore", "what is new", s.svc.Catalog.Explore)
 		case "charts":
@@ -56,7 +56,7 @@ func (s *shell) shelvesOf(c *ui.Context, key, what string, load func(ctx context
 	case res.err != nil:
 		s.problem(c, res.err, func() { s.forget(key) })
 	case len(res.value) == 0:
-		s.emptyLine(c, "YouTube Music shows nothing here right now.")
+		s.emptyLine(c, locales.ExploreNothingHere())
 	default:
 		s.shelves(c, key, res.value)
 	}
@@ -96,7 +96,7 @@ func (s *shell) moodColumns(c *ui.Context) int {
 func (s *shell) moodTile(c *ui.Context, key string, tone int, m youtube.Mood) bool {
 	k := &s.lk
 	t := s.buttonBase(c.Key(key)).Height(96).Padding(12).AlignItems(ui.Start).Justify(ui.Start).Background(k.tile(tone)).
-		Radius(k.radius).Label("Playlists for " + m.Title).Cursor(ui.CursorPointer)
+		Radius(k.radius).Label(locales.ExploreMoodPlaylists(m.Title)).Cursor(ui.CursorPointer)
 	if k.moves() {
 		s.pressMotion(t, 0.97)
 	} else if t.Pressed() {
@@ -113,7 +113,7 @@ func (s *shell) moodPage(c *ui.Context, params string) {
 	key := "mood:" + params
 	res := fetch(s, key, func(ctx context.Context) (app.MoodPage, error) { return s.svc.Catalog.Mood(ctx, params) })
 	s.pageScroll(c, func() {
-		title := "Mood"
+		title := locales.ExploreMood()
 		if res.done && res.err == nil && res.value.Title != "" {
 			title = res.value.Title
 		}
@@ -157,14 +157,14 @@ func (s *shell) keepYouTubePlaylists() {
 // addToMenus are the track menu's ways to keep a track: in a mix, or in a
 // YouTube Music playlist of the user's.
 func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
-	m.Submenu("Add to mix", func(m *ui.Menu) { s.mixItems(m, tracks) })
+	m.Submenu(locales.ExploreAddToMix(), func(m *ui.Menu) { s.mixItems(m, tracks) })
 	if !s.accounts().YouTube.SignedIn || len(tracks) != 1 || tracks[0].Source == media.SourceFile {
 		return
 	}
 	t := tracks[0]
-	m.Submenu("Add to YouTube Music playlist", func(m *ui.Menu) {
-		if m.Item("New playlist…").Chosen() {
-			s.promptName("New playlist on YouTube Music", "Name", t.Title, "create", func(name string) {
+	m.Submenu(locales.ExploreAddToYouTube(), func(m *ui.Menu) {
+		if m.Item(locales.ExploreNewPlaylist()).Chosen() {
+			s.promptName(locales.ExploreNewYouTubePlaylist(), locales.RailName(), t.Title, locales.RailCreate(), func(name string) {
 				s.createYouTubePlaylist(name, []media.Track{t}, nil)
 			})
 		}
@@ -172,13 +172,13 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 		switch {
 		case !own.done:
 			// Only until the answer the window asked for ahead comes.
-			m.Item("Loading your playlists…").Disabled(true)
+			m.Item(locales.ExploreLoadingPlaylists()).Disabled(true)
 			return
 		case own.err != nil:
 			// Asked again, as a refresh asks, unless they already are:
 			// they may be there the next time the menu opens.
 			own.refresh()
-			m.Item("Couldn't load your playlists").Disabled(true)
+			m.Item(locales.ExploreLoadPlaylistsFailed()).Disabled(true)
 			return
 		}
 		editable := slices.DeleteFunc(slices.Clone(own.value), func(p media.Playlist) bool { return !p.Editable })
@@ -196,7 +196,7 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 			}
 		}
 		if len(editable) == 0 {
-			m.Item("No playlists of yours").Disabled(true)
+			m.Item(locales.ExploreNoPlaylists()).Disabled(true)
 		}
 	})
 }
@@ -204,7 +204,7 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 // mixItems are the items of Add to mix, of a track's menu or of the bar
 // of the tracks selected: New mix…, then the user's mixes.
 func (s *shell) mixItems(m *ui.Menu, tracks []media.Track) {
-	if m.Item("New mix…").Chosen() {
+	if m.Item(locales.ExploreNewMixItem()).Chosen() {
 		s.newMixOf(tracks)
 	}
 	mixes := s.svc.Collection.Playlists()
@@ -231,7 +231,7 @@ func (s *shell) addToMix(p media.Playlist, tracks []media.Track) {
 // title, and runs done with it, if any.
 func (s *shell) createYouTubePlaylist(title string, tracks []media.Track, done func(media.Playlist)) {
 	if slices.ContainsFunc(tracks, func(t media.Track) bool { return t.Source != media.SourceYouTube }) {
-		s.notes = append(s.notes, notice("Finding the tracks on YouTube Music…"))
+		s.notes = append(s.notes, notice(locales.ExploreFinding()))
 	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
@@ -239,11 +239,11 @@ func (s *shell) createYouTubePlaylist(title string, tracks []media.Track, done f
 		p, err := s.svc.Collection.CreateYouTubePlaylist(ctx, title, tracks)
 		s.update(func() {
 			if err != nil {
-				s.notes = append(s.notes, player.Notice{Message: "Couldn't create " + title + ": " + err.Error(), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.ExploreCouldntCreate(title, err.Error()), Error: true})
 				return
 			}
 			s.keepPlaylist("youtube:playlists", p)
-			s.notes = append(s.notes, notice("Created "+p.Title+" on YouTube Music"))
+			s.notes = append(s.notes, notice(locales.ExploreCreatedOnYouTube(p.Title)))
 			if done != nil {
 				done(p)
 			}
@@ -258,12 +258,12 @@ func (s *shell) newMixOf(tracks []media.Track) {
 	if len(tracks) > 0 {
 		value = tracks[0].Title
 	}
-	s.promptName("New mix", "Name", value, "create", func(name string) {
+	s.promptName(locales.RailNewMix(), locales.RailName(), value, locales.RailCreate(), func(name string) {
 		p, err := s.svc.Collection.CreatePlaylist(name, "", tracks)
 		if err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 			return
 		}
-		s.notes = append(s.notes, notice("Created "+p.Title))
+		s.notes = append(s.notes, notice(locales.ExploreCreated(p.Title)))
 	})
 }

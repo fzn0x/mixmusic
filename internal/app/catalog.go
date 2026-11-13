@@ -213,9 +213,10 @@ func (a *App) playlist(ctx context.Context, id string) (media.Playlist, error) {
 		return p, err
 	case media.SourceSpotify:
 		p, err := a.spotify.Playlist(ctx, native, a.spotifyUserID(ctx))
-		// One of others, whose tracks Spotify doesn't show apps, keeps
-		// the rest of its page, Save among it.
-		if (err == nil || errors.Is(err, spotify.ErrPlaylistUnavailable)) && !p.Editable {
+		// One of others, whose tracks Spotify doesn't show apps, or one of
+		// Spotify's own, which it shows nothing of, keeps the rest of its
+		// page, Save among it.
+		if (err == nil || errors.Is(err, spotify.ErrPlaylistUnavailable) || errors.Is(err, spotify.ErrPlaylistNotShown)) && !p.Editable {
 			p.Saved = a.spotifyHas(ctx, spotify.URI("playlist", native))
 		}
 		return p, err

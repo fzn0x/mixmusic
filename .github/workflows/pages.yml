@@ -2,13 +2,19 @@ name: Pages
 
 # Builds the site in site/ with Zola, in flake.nix's shell, and publishes it
 # to GitHub Pages whenever what it is built from changes on main: the site,
-# and the docs, which tools/sitedocs makes its /docs/ pages of.
+# and the docs, which tools/sitedocs makes its /docs/ pages of. Those are
+# docs/ and the root's Markdown files that name their place, as
+# CONTRIBUTING.md does: tools/sitedocs's tests check that the paths below
+# list each of those.
 on:
   push:
     branches: [main]
     paths:
       - "site/**"
       - "docs/**"
+      - "CONTRIBUTING.md"
+      - "CODE_OF_CONDUCT.md"
+      - "SECURITY.md"
       - "tools/sitedocs/**"
       - "tools/sitefinish/**"
       - "go.mod"

@@ -12,6 +12,9 @@ on:
     paths:
       - "site/**"
       - "docs/**"
+      - "CONTRIBUTING.md"
+      - "CODE_OF_CONDUCT.md"
+      - "SECURITY.md"
       - "tools/sitedocs/**"
       - "tools/sitefinish/**"
       - "flake.nix"
@@ -21,6 +24,9 @@ on:
     paths:
       - "site/**"
       - "docs/**"
+      - "CONTRIBUTING.md"
+      - "CODE_OF_CONDUCT.md"
+      - "SECURITY.md"
       - "tools/sitedocs/**"
       - "tools/sitefinish/**"
       - "flake.nix"

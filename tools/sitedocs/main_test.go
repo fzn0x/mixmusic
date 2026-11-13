@@ -375,6 +375,39 @@ func TestRoot(t *testing.T) {
 	}
 }
 
+// TestWorkflowsWatchRootPages checks that each workflow that builds the
+// site runs for a change of every Markdown file of the repository's root
+// that is a page, as it does for docs/: one its paths miss goes live only
+// with the next change of the site.
+func TestWorkflowsWatchRootPages(t *testing.T) {
+	root := filepath.Join("..", "..")
+	files, err := filepath.Glob(filepath.Join(root, "*.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var pages []string
+	for _, f := range files {
+		if namesPlace(readFile(t, f)) {
+			pages = append(pages, filepath.Base(f))
+		}
+	}
+	if len(pages) == 0 {
+		t.Fatal("no Markdown file of the root is a page")
+	}
+	for _, name := range []string{"pages.yml", "cloudflare.yml", "site-pages.yml"} {
+		text := strings.ReplaceAll(readFile(t, filepath.Join(root, ".github", "workflows", name)), "\r\n", "\n")
+		lists := strings.Count(text, "\n    paths:\n")
+		if lists == 0 {
+			t.Errorf("%s has no paths", name)
+		}
+		for _, page := range pages {
+			if n := strings.Count(text, "\n      - \""+page+"\"\n"); n != lists {
+				t.Errorf("%s lists %s in %d of its %d paths", name, page, n, lists)
+			}
+		}
+	}
+}
+
 // TestImages gives the size of each image beside a page, by its path as
 // the page's links have it.
 func TestImages(t *testing.T) {

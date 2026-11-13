@@ -21,7 +21,8 @@ checksum:
 
 release:
   github:
-    owner: fzn0x
+    # The repository the workflow runs in: a fork releases on its own.
+    owner: "{{ .Env.GITHUB_REPOSITORY_OWNER }}"
     name: mixmusic
   name_template: "MixMusic {{ .Tag }}"
   make_latest: true

@@ -6,6 +6,44 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-13
+
+NetEase Cloud Music (网易云音乐) takes YouTube Music's place, and Roam
+(漫游), in the sidebar, plays it by era, language or genre. MixMusic
+speaks Simplified Chinese.
+
+### Added
+
+- NetEase Cloud Music (网易云音乐) takes YouTube Music's place: search,
+  Home's daily picks, playlists and charts, albums, artists, radio, lyrics
+  and playback come from it. Settings › Accounts signs in with the QR code
+  of its sign-in page, scanned with the NetEase Cloud Music app, and
+  Library › 网易云音乐 shows your playlists and liked songs.
+- Roam (漫游), in the sidebar, plays NetEase Cloud Music by era, language or
+  genre: a tile shuffles up to 100 songs from three of the tag's hottest
+  playlists.
+- MixMusic speaks Simplified Chinese: Settings › Appearance › Language
+  chooses English or 简体中文, and a computer in Chinese starts in it. Every
+  page is translated, from Home, Search and the library to the lyrics, the
+  queue, the mini player and the command palette, and dates follow the
+  language too.
+
+### Fixed
+
+- A search lists only the Spotify playlists MixMusic can open: Spotify
+  shows apps the tracks of the playlists you own or collaborate on only,
+  and those of others failed with an error. One you follow shows its
+  name, cover and owner, with Save and a way to play it on Spotify; its
+  tile no longer offers Play or Download, nor Home a shelf of it, which
+  failed the same way. Spotify's own playlists, as a Daily Mix, which
+  Spotify shows apps nothing of, open the same way rather than with
+  "Resource not found" (#530).
+- On macOS, an update no longer has the Keychain ask again whether
+  MixMusic may use your sign-ins, as Spotify's: every release is signed
+  with the same certificate, by which the Keychain knows an update for
+  the app it replaces. The update to this version asks one last time
+  (#532).
+
 ## [0.5.11] - 2026-11-13
 
 Control MixMusic on another computer of your network, and let AI
@@ -1731,7 +1769,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.11...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/fzn0x/mixmusic/compare/v0.5.11...v0.6.0
 [0.5.11]: https://github.com/fzn0x/mixmusic/compare/v0.5.10...v0.5.11
 [0.5.10]: https://github.com/fzn0x/mixmusic/compare/v0.5.9...v0.5.10
 [0.5.9]: https://github.com/fzn0x/mixmusic/compare/v0.5.8...v0.5.9

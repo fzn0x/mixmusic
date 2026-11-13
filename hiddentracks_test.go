@@ -82,3 +82,28 @@ func TestHiddenTracksTile(t *testing.T) {
 		t.Errorf("Home doesn't offer %s: %v", roadList.Title, err)
 	}
 }
+
+// TestNotShownPage shows a playlist of Spotify's own, which Spotify tells
+// apps nothing of, by what the user's library tells of it, or by its
+// address alone, with a way to open it on Spotify (#530).
+func TestNotShownPage(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = signedInTo(false, true)
+	daily := media.Playlist{ID: "sp:daily", Source: media.SourceSpotify, Title: "Daily Mix 1", Owner: "Spotify"}
+	s.loads["spotify:playlists"] = &loaded[[]media.Playlist]{done: true, value: []media.Playlist{roadList, daily}}
+	for id, title := range map[string]string{daily.ID: "Daily Mix 1", "sp:gone": "Spotify playlist"} {
+		p := media.Playlist{ID: id, Source: media.SourceSpotify, URL: "https://open.spotify.com/playlist/" + id[3:]}
+		s.loads["playlist:"+id] = &loaded[media.Playlist]{done: true, value: p, err: spotify.ErrPlaylistNotShown}
+		tt := tester(t, s)
+		show(s, tt, playlistPath(id))
+		until(t, s, tt, "the page of "+title, func() bool { return tt.HasText("open on Spotify") })
+		for _, want := range []string{strings.ToLower(title), "Spotify shows apps nothing of its own playlists, nor of those deleted or made private: open this one on Spotify to play it."} {
+			if !tt.HasText(want) {
+				t.Errorf("the page of %s lacks %q: %q", id, want, tt.Texts())
+			}
+		}
+		if tt.HasText("try again") {
+			t.Errorf("the page of %s shows an error: %q", id, tt.Texts())
+		}
+	}
+}

@@ -156,7 +156,7 @@ jobs:
             identity="$(security find-identity -v -p codesigning "$keychain" | awk '/"/{ print $2; exit }')"
             if [ -z "$identity" ]; then
               cert="$RUNNER_TEMP/signing.pem"
-              openssl pkcs12 -in "$p12" -clcerts -nokeys -passin env:MACOS_CERTIFICATE_PASSWORD -out "$cert"
+              security find-certificate -a -p "$keychain" > "$cert"
               # A trust of the user's own asks in a window: the system's
               # doesn't, with sudo. Without an answer in a minute, none.
               perl -e 'alarm 60; exec @ARGV' sudo security add-trusted-cert -d -r trustRoot -p codeSign \

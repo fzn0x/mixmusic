@@ -68,7 +68,7 @@ func renderFollows(t *testing.T, dir string, layout settings.Layout, theme strin
 			Source: media.SourceYouTube, Title: r.title, Kind: r.kind, Artists: []media.Ref{ref}, Artwork: art(10 + i)}})
 	}
 	s.loads["releases"] = &loaded[[]media.Release]{done: true, value: releases}
-	for _, key := range []string{"home:spotify", "home:youtube"} {
+	for _, key := range []string{"home:spotify", "home:netease"} {
 		s.loads[key] = &loaded[[]media.Shelf]{done: true}
 	}
 	name := string(layout) + "-" + theme

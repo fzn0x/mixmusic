@@ -32,7 +32,7 @@ func shelves(n, albums int) []media.Shelf {
 	out := make([]media.Shelf, n)
 	for i := range out {
 		out[i].Title = "Shelf " + count(i)
-		out[i].Source = media.SourceYouTube
+		out[i].Source = media.SourceNetEase
 		for j := range albums {
 			a := media.Album{ID: fmt.Sprintf("al-%d-%d", i, j), Source: media.SourceYouTube, Title: "Album " + count(j),
 				Artists: []media.Ref{{ID: "ar-m83", Name: "M83"}}, Year: "2011"}
@@ -85,7 +85,7 @@ func BenchmarkScroll(b *testing.B) {
 	b.Run("home", func(b *testing.B) {
 		s := newTestShell(b)
 		tt := testerOf(b, s, 1280, 820)
-		s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
+		s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
 		show(s, tt, "/")
 		scrollFrames(b, tt)
 	})
@@ -115,7 +115,7 @@ func BenchmarkScroll(b *testing.B) {
 			s.set.Layout = c.layout
 			wear(s, c.theme, nil)
 			tt := testerOf(b, s, 1280, 820)
-			s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
+			s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
 			show(s, tt, "/")
 			scrollFrames(b, tt)
 		})
@@ -182,7 +182,7 @@ func settled(t *testing.T, tt *ui.Tester) {
 func TestFarShelvesBuildNothing(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 820)
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(12, 6)}
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: shelves(12, 6)}
 	show(s, tt, "/")
 	if !tt.HasText("Shelf 0") || tt.HasText("Shelf 11") {
 		t.Fatalf("at the top, the window shows %q", tt.Texts())
@@ -203,7 +203,7 @@ func TestFarShelvesBuildNothing(t *testing.T) {
 func TestFarTilesBuildNothing(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 820)
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 40)}
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 40)}
 	show(s, tt, "/")
 	if !tt.HasText("Album 0") || tt.HasText("Album 39") {
 		t.Fatalf("at the start, the shelf shows %q", tt.Texts())

@@ -42,6 +42,7 @@ type SpotifyAccount struct {
 type AccountsStatus struct {
 	Spotify SpotifyAccount `json:"spotify"`
 	YouTube YouTubeAccount `json:"youtube"`
+	NetEase NetEaseAccount `json:"netease"`
 	Lastfm  LastfmAccount  `json:"lastfm"`
 }
 
@@ -58,8 +59,8 @@ const profileRetry = time.Minute
 // profileErrors is why the profiles read in the background could not be
 // read, and when they were.
 type profileErrors struct {
-	spotify, youtube string
-	at               time.Time
+	spotify, youtube, netease string
+	at                        time.Time
 }
 
 // waits reports whether a profile that could not be read, for err, waits
@@ -83,11 +84,12 @@ func (s *Accounts) Status(ctx context.Context) AccountsStatus {
 // background.
 func (a *App) knownAccountsStatus() AccountsStatus {
 	a.mu.Lock()
-	spotifyMe, youtubeMe, errs := a.spotifyMe, a.youtubeMe, a.profileErrs
+	spotifyMe, youtubeMe, neteaseMe, errs := a.spotifyMe, a.youtubeMe, a.neteaseMe, a.profileErrs
 	a.mu.Unlock()
 	status := AccountsStatus{
 		Spotify: a.spotifyAccount(),
 		YouTube: YouTubeAccount{SignedIn: a.youtube.SignedIn(), Account: youtubeMe},
+		NetEase: NetEaseAccount{SignedIn: a.netease.SignedIn(), Profile: neteaseMe},
 		Lastfm:  a.lastfmAccount(),
 	}
 	status.Spotify.Profile = spotifyMe
@@ -99,6 +101,10 @@ func (a *App) knownAccountsStatus() AccountsStatus {
 	if status.YouTube.SignedIn && youtubeMe == nil {
 		status.YouTube.Error = errs.youtube
 		read = read || !errs.waits(errs.youtube)
+	}
+	if status.NetEase.SignedIn && neteaseMe == nil {
+		status.NetEase.Error = errs.netease
+		read = read || !errs.waits(errs.netease)
 	}
 	if read {
 		a.readProfiles()
@@ -118,7 +124,7 @@ func (a *App) readProfiles() {
 		// why of those it could not read.
 		status := a.accountsStatus(context.Background())
 		a.mu.Lock()
-		a.profileErrs = profileErrors{spotify: status.Spotify.Error, youtube: status.YouTube.Error, at: time.Now()}
+		a.profileErrs = profileErrors{spotify: status.Spotify.Error, youtube: status.YouTube.Error, netease: status.NetEase.Error, at: time.Now()}
 		a.mu.Unlock()
 		notify()
 	}()
@@ -146,7 +152,7 @@ func (a *App) accountsStatus(ctx context.Context) AccountsStatus {
 			sp.Profile = &me
 		}
 	}
-	return AccountsStatus{Spotify: sp, YouTube: a.youtubeAccount(ctx), Lastfm: a.lastfmAccount()}
+	return AccountsStatus{Spotify: sp, YouTube: a.youtubeAccount(ctx), NetEase: a.neteaseAccount(ctx), Lastfm: a.lastfmAccount()}
 }
 
 // spotifyProfile returns the signed-in Spotify user, asking Spotify once.

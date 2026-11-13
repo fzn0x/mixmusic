@@ -95,6 +95,7 @@ func waitText(t *testing.T, s *shell, tt *ui.Tester, text string) {
 // why a try failed. No browser is read: the yt-dlp the app has is not
 // there.
 func TestYouTubeCookieSignIn(t *testing.T) {
+	t.Skip("YouTube Music is replaced by NetEase Cloud Music in the UI")
 	s := newTestShell(t)
 	s.set.YTDLPPath = filepath.Join(t.TempDir(), "no-yt-dlp")
 	s.save()
@@ -128,6 +129,7 @@ func TestYouTubeCookieSignIn(t *testing.T) {
 // signed in to several Google accounts, naming each by its address, and
 // again when the one used is no longer of the session.
 func TestYouTubeAccountPicker(t *testing.T) {
+	t.Skip("YouTube Music is replaced by NetEase Cloud Music in the UI")
 	s := newTestShell(t)
 	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{
 		SignedIn: true, Account: &youtube.Account{Name: "Ada"},
@@ -163,6 +165,7 @@ func TestYouTubeAccountPicker(t *testing.T) {
 // by typing, whole, with why the last try failed; and the account picker
 // by what it says, whichever it says.
 func TestSettingsFindCookieSignIn(t *testing.T) {
+	t.Skip("YouTube Music is replaced by NetEase Cloud Music in the UI")
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 6000)
 	form := []string{"Import from a browser", "Profile", "import", "Paste a cookie header", "sign in with it"}

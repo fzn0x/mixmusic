@@ -13,7 +13,7 @@ import (
 var homeFilters = []struct {
 	label  string
 	source media.Source
-}{{"Everything", ""}, {"Yours", media.SourceLocal}, {"Spotify", media.SourceSpotify}, {"YouTube Music", media.SourceYouTube}}
+}{{"Everything", ""}, {"Yours", media.SourceLocal}, {"Spotify", media.SourceSpotify}, {"网易云音乐", media.SourceNetEase}}
 
 // networkOnline tells whether the network answers, as last checked; tests
 // answer for it.

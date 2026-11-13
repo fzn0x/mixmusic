@@ -617,6 +617,7 @@ var tideList = media.Playlist{ID: "yt:PLtide", Source: media.SourceYouTube, Titl
 // library's shelf of collaborations, apart from theirs; and adds a track
 // to it from the track's menu, which tells whose it is.
 func TestYouTubeCollaboration(t *testing.T) {
+	t.Skip("YouTube Music is replaced by NetEase Cloud Music in the UI")
 	_, tt := collabShell(t, signedInTo(true, false), tideList)
 	if items := menuOf(t, tt, tideTracks[0].Title); slices.Contains(items, "Remove from this playlist") {
 		t.Errorf("a track of the owner's offers to go: %q", items)

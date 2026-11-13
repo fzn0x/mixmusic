@@ -125,7 +125,7 @@ func (p *Player) PrepareStream(ctx context.Context, track media.Track) (Playback
 		}
 		yt = found
 	}
-	_, videoID, err := media.ParseID(yt.ID)
+	videoID, err := streamKey(yt)
 	if err != nil {
 		return PlaybackSource{}, err
 	}
@@ -227,7 +227,7 @@ func (p *Player) learnLoudness(videoID string) {
 // returned, failed to load: in plain words, or "" when its audio arrived,
 // and the engine could not play it.
 func (p *Player) StreamFailure(track media.Track) string {
-	_, videoID, err := media.ParseID(track.ID)
+	videoID, err := streamKey(track)
 	if err != nil {
 		return ""
 	}

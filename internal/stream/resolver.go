@@ -75,12 +75,30 @@ const resolveTimeout = 90 * time.Second
 // again, so that a track started near the expiry plays to its end.
 const expiryMargin = 30 * time.Minute
 
-var videoIDRe = regexp.MustCompile(`^[A-Za-z0-9_-]{11}$`)
+var videoIDRe = regexp.MustCompile(`^(?:[A-Za-z0-9_-]{11}|ne[0-9]{1,19})$`)
+
+// netEaseRe matches the key of a NetEase Cloud Music song: "ne" and the
+// song's ID. One of 11 characters could be a YouTube video's ID too; NetEase
+// took YouTube's place, so it is NetEase's.
+var netEaseRe = regexp.MustCompile(`^ne[0-9]{1,19}$`)
+
+// NetEaseKey returns the key the proxy, the cache and the downloads know a
+// NetEase Cloud Music song's audio by, in place of a video's ID.
+func NetEaseKey(songID string) string { return "ne" + songID }
+
+// NetEaseSong returns the song ID of a NetEase key, if it is one.
+func NetEaseSong(key string) (string, bool) {
+	if !netEaseRe.MatchString(key) {
+		return "", false
+	}
+	return key[2:], true
+}
 
 // ErrBadVideoID is returned for strings that are not YouTube video IDs.
 var ErrBadVideoID = errors.New("stream: not a YouTube video id")
 
-// ValidVideoID reports whether id is a YouTube video ID.
+// ValidVideoID reports whether id is a YouTube video ID, or the key of a
+// NetEase Cloud Music song (NetEaseKey).
 func ValidVideoID(id string) bool { return videoIDRe.MatchString(id) }
 
 // Stream is the audio stream of a video.
@@ -188,6 +206,9 @@ type Resolver struct {
 	// session that yt-dlp asks for streams as, while SetAsAccount asks for
 	// that: nil asks signed out.
 	Session func() []*http.Cookie
+	// NetEase, when set, finds the audio of NetEase Cloud Music songs, by
+	// their song ID.
+	NetEase func(ctx context.Context, songID string) (Stream, error)
 
 	mu      sync.Mutex
 	quality Quality
@@ -373,6 +394,9 @@ func (r *Resolver) Forget(videoID string) {
 // log tells when it took a while, and why and how yt-dlp found it, never
 // the stream's URL, which carries the user's IP address.
 func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality) (Stream, error) {
+	if song, ok := NetEaseSong(videoID); ok && r.NetEase != nil {
+		return r.NetEase(ctx, song)
+	}
 	if s, ok := r.accountStream(ctx, videoID, quality); ok {
 		return s, nil
 	}

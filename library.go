@@ -14,7 +14,7 @@ import (
 var librarySections = []struct{ id, label string }{
 	{"liked", "Liked"}, {"mixes", "Mixes"}, {"podcasts", "Podcasts"}, {"artists", "Artists"}, {"downloads", "Downloads"},
 	{"computer", "On this computer"}, {"history", "History"},
-	{"disliked", "Disliked"}, {"spotify", "Spotify"}, {"youtube", "YouTube Music"},
+	{"disliked", "Disliked"}, {"spotify", "Spotify"}, {"netease", "网易云音乐"},
 }
 
 // libraryPage shows liked songs, the user's mixes, the history, the songs
@@ -25,7 +25,7 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 	disliked := s.svc.Collection.Disliked()
 	var ids, labels []string
 	for _, sec := range librarySections {
-		if (sec.id == "spotify" && !accounts.Spotify.SignedIn) || (sec.id == "youtube" && !accounts.YouTube.SignedIn) ||
+		if (sec.id == "spotify" && !accounts.Spotify.SignedIn) || (sec.id == "netease" && !accounts.NetEase.SignedIn) ||
 			(sec.id == "disliked" && len(disliked) == 0) {
 			continue
 		}
@@ -84,8 +84,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 			s.dislikedSongs(c, disliked)
 		case "spotify":
 			s.spotifyLibrary(c)
-		case "youtube":
-			s.youtubeLibrary(c)
+		case "netease":
+			s.neteaseLibrary(c)
 		}
 	})
 }

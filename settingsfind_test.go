@@ -344,18 +344,18 @@ func TestSettingsFindForms(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 6000)
 	show(s, tt, settingsPath("", "sign in"))
-	showsOnly(t, tt, "searching sign in", []string{"Client ID", "sign in to spotify", "sign in to youtube music"}, nil)
+	showsOnly(t, tt, "searching sign in", []string{"Client ID", "sign in to spotify", "sign in to netease cloud music"}, nil)
 	show(s, tt, settingsPath("", "connect"))
 	showsOnly(t, tt, "searching connect", []string{"API key", "Shared secret", "connect to last.fm"}, nil)
 
 	// Signed in, the rows of the accounts are found by their buttons.
 	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{
-		Spotify: app.SpotifyAccount{SignedIn: true}, YouTube: app.YouTubeAccount{SignedIn: true},
+		Spotify: app.SpotifyAccount{SignedIn: true}, NetEase: app.NetEaseAccount{SignedIn: true},
 		Lastfm: app.LastfmAccount{Connected: true, Name: "someone"},
 	}}
 	s.loads["channels"] = &loaded[[]youtube.AccountChannel]{done: true}
 	show(s, tt, settingsPath("", "sign out"))
-	showsOnly(t, tt, "signed in, searching sign out", []string{"Search, your library and playback of Spotify.", "Your home feed, your library, and likes that reach YouTube Music.", "disconnect"}, []string{"Client ID"})
+	showsOnly(t, tt, "signed in, searching sign out", []string{"Search, your library and playback of Spotify.", "Your daily picks, your playlists and liked songs, and songs as your account may play them.", "disconnect"}, []string{"Client ID"})
 	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true}
 
 	// The button reads the Client ID's draft, which its row made.

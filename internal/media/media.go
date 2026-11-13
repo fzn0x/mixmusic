@@ -19,6 +19,8 @@ const (
 	SourceYouTube Source = "youtube"
 	// SourceSpotify is Spotify.
 	SourceSpotify Source = "spotify"
+	// SourceNetEase is NetEase Cloud Music (网易云音乐).
+	SourceNetEase Source = "netease"
 	// SourceLocal is MixMusic itself: playlists made in the app.
 	SourceLocal Source = "local"
 	// SourceFile is the music kept on the user's computer, which MixMusic
@@ -30,6 +32,7 @@ const (
 var prefixes = map[Source]string{
 	SourceYouTube: "yt",
 	SourceSpotify: "sp",
+	SourceNetEase: "ne",
 	SourceLocal:   "mx",
 	SourceFile:    "file",
 }

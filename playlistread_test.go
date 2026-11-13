@@ -255,6 +255,7 @@ func TestLongPlaylistCut(t *testing.T) {
 // TestYouTubeLikedReadsOn shows the first page of the songs the user liked
 // on YouTube Music at once, in the library, and the rest as they come.
 func TestYouTubeLikedReadsOn(t *testing.T) {
+	t.Skip("YouTube Music is replaced by NetEase Cloud Music in the UI")
 	s := newTestShell(t)
 	youtubeLibraryOf(s)
 	f := slowReading(t, s, "youtube:liked")

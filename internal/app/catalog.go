@@ -27,7 +27,9 @@ type Catalog struct{ a *App }
 
 // SearchResponse holds what each service found.
 type SearchResponse struct {
+	// YouTube is unused since NetEase took YouTube Music's place: empty.
 	YouTube media.SearchResults `json:"youtube"`
+	NetEase media.SearchResults `json:"netease"`
 	Spotify media.SearchResults `json:"spotify"`
 	// SpotifySignedIn tells whether Spotify was searched.
 	SpotifySignedIn bool `json:"spotifySignedIn"`
@@ -49,33 +51,33 @@ func (c *Catalog) Search(ctx context.Context, query string) (SearchResponse, err
 	return res, err
 }
 
-// search searches YouTube Music, and Spotify when the user signed in: an
-// AI assistant's searches aren't the user's own.
+// search searches NetEase Cloud Music, and Spotify when the user signed
+// in: an AI assistant's searches aren't the user's own.
 func (c *Catalog) search(ctx context.Context, query string) (SearchResponse, error) {
 	query = strings.TrimSpace(query)
-	res := SearchResponse{YouTube: emptyResults(), Spotify: emptyResults(), SpotifySignedIn: c.a.spotify.SignedIn(), Errors: []string{}}
+	res := SearchResponse{YouTube: emptyResults(), NetEase: emptyResults(), Spotify: emptyResults(), SpotifySignedIn: c.a.spotify.SignedIn(), Errors: []string{}}
 	if query == "" {
 		return res, nil
 	}
 	var (
 		wg           sync.WaitGroup
-		ytErr, spErr error
+		neErr, spErr error
 	)
-	wg.Go(func() { res.YouTube, ytErr = c.a.youtube.SearchAll(ctx, query) })
+	wg.Go(func() { res.NetEase, neErr = c.a.netease.Search(ctx, query) })
 	if res.SpotifySignedIn {
 		wg.Go(func() { res.Spotify, spErr = c.a.spotify.Search(ctx, query, c.a.spotifyUserID(ctx)) })
 	}
 	wg.Wait()
-	if ytErr != nil {
-		res.YouTube = emptyResults()
-		res.Errors = append(res.Errors, ytErr.Error())
+	if neErr != nil {
+		res.NetEase = emptyResults()
+		res.Errors = append(res.Errors, neErr.Error())
 	}
 	if spErr != nil {
 		res.Spotify = emptyResults()
 		res.Errors = append(res.Errors, spErr.Error())
 	}
-	if ytErr != nil && (spErr != nil || !res.SpotifySignedIn) {
-		return res, ytErr
+	if neErr != nil && (spErr != nil || !res.SpotifySignedIn) {
+		return res, neErr
 	}
 	return res, nil
 }
@@ -84,10 +86,9 @@ func (c *Catalog) search(ctx context.Context, query string) (SearchResponse, err
 // Music's searches, songs, albums, artists and playlists, or the recent
 // searches while nothing is typed.
 func (c *Catalog) Suggestions(ctx context.Context, input string) (media.Suggestions, error) {
-	if strings.TrimSpace(input) == "" {
-		return media.Suggestions{Searches: c.a.library.Searches()}, nil
-	}
-	return c.a.youtube.Suggestions(ctx, input)
+	// shortcut: the recent searches alone, as NetEase has no suggestions
+	// read yet; ask its /search/suggest/web once missed.
+	return media.Suggestions{Searches: c.a.library.Searches()}, nil
 }
 
 // SpotifyHome returns Spotify's shelves of the home page, made of the
@@ -107,12 +108,13 @@ func (c *Catalog) SpotifyHome(ctx context.Context) ([]media.Shelf, error) {
 	return c.a.spotify.Home(ctx, me.ID)
 }
 
-// YouTubeHome returns YouTube Music's shelves of the home page: the
-// user's own there once they signed in.
-func (c *Catalog) YouTubeHome(ctx context.Context) ([]media.Shelf, error) {
+// NetEaseHome returns NetEase Cloud Music's shelves of the home page: the
+// user's daily songs, recommended playlists and own playlists once they
+// signed in, and the charts.
+func (c *Catalog) NetEaseHome(ctx context.Context) ([]media.Shelf, error) {
 	ctx, cancel := context.WithTimeout(ctx, shelfTimeout)
 	defer cancel()
-	return c.a.youtube.Home(ctx)
+	return c.a.netease.Home(ctx, c.a.neteaseUserID(ctx))
 }
 
 // LocalShelves returns the shelves of what the user played and made, as
@@ -146,6 +148,8 @@ func (c *Catalog) Album(ctx context.Context, id string) (media.Album, error) {
 	switch source {
 	case media.SourceYouTube:
 		return c.a.youtube.Album(ctx, native)
+	case media.SourceNetEase:
+		return c.a.netease.Album(ctx, native)
 	case media.SourceSpotify:
 		a, err := c.a.spotify.Album(ctx, native)
 		if err == nil {
@@ -170,6 +174,8 @@ func (c *Catalog) Artist(ctx context.Context, id string) (media.Artist, error) {
 	switch source {
 	case media.SourceYouTube:
 		return c.a.youtube.Artist(ctx, native)
+	case media.SourceNetEase:
+		return c.a.netease.Artist(ctx, native)
 	case media.SourceSpotify:
 		a, err := c.a.spotify.Artist(ctx, native)
 		if err == nil {
@@ -220,6 +226,8 @@ func (a *App) playlist(ctx context.Context, id string) (media.Playlist, error) {
 			p.Saved = a.spotifyHas(ctx, spotify.URI("playlist", native))
 		}
 		return p, err
+	case media.SourceNetEase:
+		return a.netease.Playlist(ctx, native, a.neteaseUserID(ctx))
 	case media.SourceLocal:
 		return a.library.Playlist(native)
 	}
@@ -314,11 +322,15 @@ func (c *Catalog) radioOf(ctx context.Context, track media.Track) ([]media.Track
 // radio returns YouTube Music's radio of seed, without the tracks whose
 // IDs are in skip.
 func (c *Catalog) radio(ctx context.Context, seed media.Track, skip []string) ([]media.Track, error) {
-	_, videoID, err := media.ParseID(seed.ID)
+	source, videoID, err := media.ParseID(seed.ID)
 	if err != nil {
 		return nil, err
 	}
-	tracks, err := c.a.youtube.Radio(ctx, videoID)
+	radio := c.a.youtube.Radio
+	if source == media.SourceNetEase {
+		radio = c.a.netease.Similar
+	}
+	tracks, err := radio(ctx, videoID)
 	if err != nil {
 		return nil, err
 	}
@@ -439,6 +451,12 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 	// A file of no artist, as a voice memo, is looked for nowhere.
 	if localfiles.NoArtist(track) {
 		return lyrics.Lyrics{}, lyricsError{"No lyrics found for this track.", lyrics.ErrNotFound}
+	}
+	// NetEase Cloud Music's own come first, of its songs and of the
+	// tracks matched to one.
+	if l, ok := c.neteaseLyrics(ctx, track); ok {
+		c.a.lyricsMemo.put(track.ID, l)
+		return l, nil
 	}
 	q := lyricsQuery(track)
 	q.VideoID = c.videoID(track)
@@ -627,4 +645,26 @@ func (c *Catalog) Related(ctx context.Context, track media.Track) ([]media.Shelf
 	}
 	c.a.related.put(seed.ID, shelves)
 	return shelves, nil
+}
+
+// neteaseLyrics returns NetEase Cloud Music's synchronized lyrics of a
+// track, if it has them: of the track itself, or of its match there.
+func (c *Catalog) neteaseLyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, bool) {
+	ne, ok := c.a.matcher.Matched(track)
+	if !ok || ne.Source != media.SourceNetEase {
+		return lyrics.Lyrics{}, false
+	}
+	_, native, _ := media.ParseID(ne.ID)
+	lrc, _, err := c.a.netease.Lyrics(ctx, native)
+	if err != nil {
+		log.Printf("mixmusic: the lyrics of %s, on NetEase Cloud Music: %v", track.ID, err)
+		return lyrics.Lyrics{}, false
+	}
+	lines := lyrics.ParseLRC(lrc)
+	if len(lines) < 2 {
+		return lyrics.Lyrics{}, false
+	}
+	l := lyrics.Lyrics{Synced: true, Lines: lines, Source: "NetEase Cloud Music"}
+	l.Language = lyrics.GuessLanguage(l.Lines)
+	return l, true
 }

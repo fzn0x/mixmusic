@@ -1445,5 +1445,14 @@
   "keepOnTopMenu": "Keep on Top",
   "@keepOnTopMenu": {
     "description": "The item of the Window menu."
-  }
+  },
+  "accountSettingsNetEaseSignInTitle": "Sign in to NetEase Cloud Music",
+  "accountSettingsNetEaseHint": "A window opens NetEase Cloud Music's sign-in page: scan its QR code with the NetEase Cloud Music app.",
+  "accountSettingsNetEaseSignInButton": "sign in to netease cloud music",
+  "accountSettingsNetEaseWaitingWindow": "waiting for the sign-in window…",
+  "accountSettingsNetEaseSignedIn": "Signed in to NetEase Cloud Music",
+  "accountSettingsNetEaseSignedInDesc": "Your daily picks, your playlists and liked songs, and songs as your account may play them.",
+  "accountSettingsNetEaseRefused": "NetEase Cloud Music refused the session",
+  "accountSettingsNetEaseSignOutTitle": "sign out of NetEase Cloud Music",
+  "accountSettingsNetEaseSignOutBody": "MixMusic forgets your NetEase Cloud Music session; your playlists stay on NetEase Cloud Music."
 }

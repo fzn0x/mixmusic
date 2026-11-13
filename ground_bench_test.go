@@ -16,7 +16,7 @@ func BenchmarkGround(b *testing.B) {
 			s := newTestShell(b)
 			wear(s, theme, nil)
 			tt := testerOf(b, s, 1280, 820)
-			s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
+			s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: shelves(10, 25)}
 			show(s, tt, "/")
 			scrollFrames(b, tt)
 		})

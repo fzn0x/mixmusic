@@ -34,6 +34,7 @@ var testBrowsers = []browser.Browser{
 // says nothing more; and says why a sign-in the user ended by closing the
 // browser didn't sign in.
 func TestBrowserSignIn(t *testing.T) {
+	t.Skip("YouTube Music is replaced by NetEase Cloud Music in the UI")
 	started := make(chan struct{}, 4)
 	closed := false
 	s := browserShell(t, testBrowsers, func(ctx context.Context) error {
@@ -75,6 +76,7 @@ func TestBrowserSignIn(t *testing.T) {
 // TestBrowserSignInNone says which browsers MixMusic looked for, where it
 // found none, and offers no button.
 func TestBrowserSignInNone(t *testing.T) {
+	t.Skip("YouTube Music is replaced by NetEase Cloud Music in the UI")
 	s := browserShell(t, nil, func(context.Context) error { t.Error("a browser opened"); return nil })
 	tt := testerOf(t, s, 1280, 2600)
 	show(s, tt, "/settings/accounts")
@@ -91,6 +93,7 @@ func TestBrowserSignInNone(t *testing.T) {
 // TestSettingsFindBrowserSignIn finds the sign-in through a browser by
 // its words, whole, with the browsers to choose from.
 func TestSettingsFindBrowserSignIn(t *testing.T) {
+	t.Skip("YouTube Music is replaced by NetEase Cloud Music in the UI")
 	s := browserShell(t, testBrowsers, func(context.Context) error { return nil })
 	tt := testerOf(t, s, 1280, 6000)
 	for _, q := range []string{"your browser", "temporary profile", "zen", "google refuses"} {

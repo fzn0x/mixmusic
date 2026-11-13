@@ -58,7 +58,7 @@ func TestLayoutDesignsLayOut(t *testing.T) {
 	} {
 		t.Run(string(c.layout)+"-"+c.theme, func(t *testing.T) {
 			s, tt := themed(t, c.theme, c.layout)
-			s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
+			s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
 			show(s, tt, "/")
 			if !tt.HasText(c.title) || !tt.HasText(c.pivot) {
 				t.Errorf("the home page doesn't say %q and %q: %q", c.title, c.pivot, tt.Texts())
@@ -182,7 +182,7 @@ func TestSpringsSettle(t *testing.T) {
 	} {
 		t.Run(string(c.layout)+"-"+c.theme, func(t *testing.T) {
 			s, tt := themed(t, c.theme, c.layout)
-			s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
+			s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: shelves(1, 4)}
 			show(s, tt, "/")
 			r, ok := tt.Find("Album 1")
 			if !ok {

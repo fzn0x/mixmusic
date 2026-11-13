@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fzn0x/mixmusic/internal/netease"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 )
@@ -38,6 +39,8 @@ func TestSearchListsSpotifyPlaylistsItOpens(t *testing.T) {
 	client.SetToken(spotify.Token{AccessToken: "ACCESS", Expiry: time.Now().Add(time.Hour)})
 	a := &App{auth: spotify.NewAuth("client"), spotify: client, youtube: youtube.New()}
 	a.youtube.BaseURL = yt.URL
+	a.netease = netease.New()
+	a.netease.BaseURL = yt.URL
 
 	res, err := (&Catalog{a: a}).search(context.Background(), "thailand")
 	if err != nil {

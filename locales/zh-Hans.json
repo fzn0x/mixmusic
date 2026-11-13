@@ -665,5 +665,14 @@
   "pluginSettingsEnableBody": "插件可以控制播放器、更改你的音乐库并访问互联网，无论它们请求什么权限。请只启用你信任的作者的插件。",
   "pluginSettingsEnableAsks": "插件可以控制播放器、更改你的音乐库并访问互联网，无论它们请求什么权限。请只启用你信任的作者的插件。它请求：{permissions}。",
   "pluginSettingsEnableButton": "启用",
-  "keepOnTopMenu": "窗口置顶"
+  "keepOnTopMenu": "窗口置顶",
+  "accountSettingsNetEaseSignInTitle": "登录网易云音乐",
+  "accountSettingsNetEaseHint": "将打开网易云音乐的登录页：用网易云音乐 App 扫描二维码。",
+  "accountSettingsNetEaseSignInButton": "登录网易云音乐",
+  "accountSettingsNetEaseWaitingWindow": "正在等待登录窗口…",
+  "accountSettingsNetEaseSignedIn": "已登录网易云音乐",
+  "accountSettingsNetEaseSignedInDesc": "每日推荐、你的歌单与喜欢的音乐，按你的账号权限播放。",
+  "accountSettingsNetEaseRefused": "网易云音乐拒绝了该会话",
+  "accountSettingsNetEaseSignOutTitle": "退出网易云音乐登录",
+  "accountSettingsNetEaseSignOutBody": "MixMusic 会忘记你的网易云音乐会话；你的歌单仍保留在网易云音乐中。"
 }

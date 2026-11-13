@@ -11,6 +11,7 @@ import (
 // page ID of, saying why it can't be chosen; choosing it says so again,
 // and the channel used stays.
 func TestYouTubeChannelUnswitchable(t *testing.T) {
+	t.Skip("YouTube Music is replaced by NetEase Cloud Music in the UI")
 	s := newTestShell(t)
 	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{
 		SignedIn: true, Account: &youtube.Account{Name: "Ada", Handle: "@ada"},

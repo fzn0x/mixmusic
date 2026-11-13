@@ -19,7 +19,7 @@ func TestSearchShowsPlays(t *testing.T) {
 	}
 	spotify := media.Track{ID: "sp-1", Source: media.SourceSpotify, Title: "Instant Crush (Spotify)", Artists: []media.Ref{{Name: "Daft Punk"}}}
 	s.loads["search:crush"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
-		YouTube: media.SearchResults{Tracks: tracks}, Spotify: media.SearchResults{Tracks: []media.Track{spotify}}, SpotifySignedIn: true}}
+		NetEase: media.SearchResults{Tracks: tracks}, Spotify: media.SearchResults{Tracks: []media.Track{spotify}}, SpotifySignedIn: true}}
 	tt := testerOf(t, s, 1280, 1800)
 	show(s, tt, searchPath("crush"))
 	for _, want := range []string{"1.2B plays", "905M views", "2K plays"} {

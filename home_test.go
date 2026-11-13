@@ -60,7 +60,7 @@ func TestHomeYoursAlone(t *testing.T) {
 		t.Fatal(err)
 	}
 	tt := tester(t, s)
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{}
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{}
 	s.homeFilter = 1
 	show(s, tt, "/")
 	if !shelfShows(tt, "Recently played") {
@@ -78,7 +78,7 @@ func TestHomeServiceFails(t *testing.T) {
 	tt := testerOf(t, s, 1280, 1600)
 	youtube := &loaded[[]media.Shelf]{done: true, value: shelves(1, 3)}
 	s.loads["home:spotify"] = &loaded[[]media.Shelf]{done: true, err: errors.New("spotify: the service is down")}
-	s.loads["home:youtube"] = youtube
+	s.loads["home:netease"] = youtube
 	show(s, tt, "/")
 	if !tt.HasText("spotify: the service is down") || !shelfShows(tt, "Shelf 0") {
 		t.Fatalf("Home with Spotify down: %q", tt.Texts())
@@ -87,7 +87,7 @@ func TestHomeServiceFails(t *testing.T) {
 	if l, ok := s.loads["home:spotify"].(*loaded[[]media.Shelf]); !ok || l.err != nil && l.done {
 		t.Errorf("try again didn't ask Spotify again: %+v", s.loads["home:spotify"])
 	}
-	if s.loads["home:youtube"] != youtube {
+	if s.loads["home:netease"] != youtube {
 		t.Error("try again asked YouTube Music again too")
 	}
 }

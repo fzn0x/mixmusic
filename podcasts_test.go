@@ -208,7 +208,7 @@ func TestEpisodeMenu(t *testing.T) {
 func TestPodcastSearch(t *testing.T) {
 	s := newPodcastShell(t)
 	s.loads["search:night"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
-		YouTube: media.SearchResults{Tracks: []media.Track{}, Albums: []media.Album{}, Artists: []media.Artist{}, Playlists: []media.Playlist{}},
+		NetEase: media.SearchResults{Tracks: []media.Track{}, Albums: []media.Album{}, Artists: []media.Artist{}, Playlists: []media.Playlist{}},
 		Spotify: media.SearchResults{Tracks: []media.Track{}, Albums: []media.Album{}, Artists: []media.Artist{}, Playlists: []media.Playlist{}}}}
 	s.loads["search-podcasts:night"] = &loaded[app.PodcastSearch]{done: true, value: app.PodcastSearch{
 		YouTube: media.PodcastResults{Podcasts: []media.Podcast{testShow.Summary()}, Episodes: testShow.Episodes[:2]},

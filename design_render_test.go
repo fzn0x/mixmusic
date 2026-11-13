@@ -146,7 +146,7 @@ func renderDesign(t *testing.T, dir string, layout settings.Layout, theme string
 	for i := range tracks {
 		trackItems = append(trackItems, media.Item{Kind: media.ItemTrack, Track: &tracks[i]})
 	}
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
 		{Title: "Listen again", Source: media.SourceYouTube, Items: trackItems},
 		{Title: "Albums for you", Source: media.SourceYouTube, Items: albums},
 	}}
@@ -173,7 +173,7 @@ func renderDesign(t *testing.T, dir string, layout settings.Layout, theme string
 		}
 	}
 	s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
-		YouTube: media.SearchResults{Tracks: tracks[:3], Albums: []media.Album{album, *albums[0].Album, *albums[1].Album},
+		NetEase: media.SearchResults{Tracks: tracks[:3], Albums: []media.Album{album, *albums[0].Album, *albums[1].Album},
 			Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube, Artwork: art(3)}}},
 		Spotify: media.SearchResults{Tracks: tracks[3:]}, SpotifySignedIn: true}}
 	s.loads["moods"] = &loaded[[]youtube.MoodGroup]{done: true, value: []youtube.MoodGroup{

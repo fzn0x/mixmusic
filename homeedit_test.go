@@ -63,7 +63,7 @@ func homeShell(t *testing.T, feed []media.Shelf) (*shell, *ui.Tester) {
 func homeWindow(t *testing.T, s *shell, feed []media.Shelf) *ui.Tester {
 	t.Helper()
 	tt := testerOf(t, s, 1280, 2400)
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: feed}
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: feed}
 	show(s, tt, "/")
 	return tt
 }
@@ -77,7 +77,7 @@ func homeShelfOrder(tt *ui.Tester, titles ...string) []string {
 // homeRowOrder returns the titles, of those given, of the rows the edit of
 // Home lists, from the top down, of shelves of YouTube Music.
 func homeRowOrder(tt *ui.Tester, titles ...string) []string {
-	return byTop(tt, titles, func(title string) string { return title + ", YouTube Music" })
+	return byTop(tt, titles, func(title string) string { return title + ", 网易云音乐" })
 }
 
 // byTop returns those of titles whose element, labelled label(title),
@@ -158,9 +158,9 @@ func TestHomeKeepsItsArrangement(t *testing.T) {
 	}
 
 	arrangeHome(s,
-		settings.HomeShelf{Key: "youtube:title:Shelf 2", Title: "Shelf 2"},
-		settings.HomeShelf{Key: "youtube:FEmusic_listen_again", Title: "Listen again"},
-		settings.HomeShelf{Key: "youtube:title:Shelf 0", Title: "Shelf 0", Hidden: true})
+		settings.HomeShelf{Key: "netease:title:Shelf 2", Title: "Shelf 2"},
+		settings.HomeShelf{Key: "netease:FEmusic_listen_again", Title: "Listen again"},
+		settings.HomeShelf{Key: "netease:title:Shelf 0", Title: "Shelf 0", Hidden: true})
 	tt.Frame()
 	if got, want := homeShelfOrder(tt, "Shelf 0", "Listen again", "Shelf 2"), []string{"Shelf 2", "Listen again"}; !slices.Equal(got, want) {
 		t.Errorf("Home arranged shows %q, want %q", got, want)
@@ -170,7 +170,7 @@ func TestHomeKeepsItsArrangement(t *testing.T) {
 	next := append(shelves(1, 2), feed...)
 	next[0].Title = "New today"
 	next[2].Title = "Écouter à nouveau"
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: next}
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: next}
 	tt.Frame()
 	if got, want := homeShelfOrder(tt, "New today", "Shelf 0", "Écouter à nouveau", "Shelf 2"), []string{"Shelf 2", "Écouter à nouveau", "New today"}; !slices.Equal(got, want) {
 		t.Errorf("the next day, Home shows %q, want %q", got, want)
@@ -193,7 +193,7 @@ func TestEditHomeHides(t *testing.T) {
 		t.Error("the shelves show while Home is edited")
 	}
 	click(t, s, tt, "Hide Shelf 1")
-	if got, want := keysOf(homeKept(t, s)), []string{"youtube:title:Shelf 0", "-youtube:title:Shelf 1", "youtube:title:Shelf 2"}; !slices.Equal(got, want) {
+	if got, want := keysOf(homeKept(t, s)), []string{"netease:title:Shelf 0", "-netease:title:Shelf 1", "netease:title:Shelf 2"}; !slices.Equal(got, want) {
 		t.Errorf("hidden, settings.json keeps %q, want %q", got, want)
 	}
 	if got, want := homeRowOrder(tt, "Shelf 0", "Shelf 1", "Shelf 2"), []string{"Shelf 0", "Shelf 2"}; !slices.Equal(got, want) {
@@ -209,7 +209,7 @@ func TestEditHomeHides(t *testing.T) {
 	if got, want := homeRowOrder(tt, "Shelf 0", "Shelf 1", "Shelf 2"), []string{"Shelf 0", "Shelf 1", "Shelf 2"}; !slices.Equal(got, want) {
 		t.Errorf("shown again, the edit lists %q, want %q", got, want)
 	}
-	if got := keysOf(s.svc.Preferences.Get().HomeShelves); slices.Contains(got, "-youtube:title:Shelf 1") {
+	if got := keysOf(s.svc.Preferences.Get().HomeShelves); slices.Contains(got, "-netease:title:Shelf 1") {
 		t.Errorf("shown again, the settings keep %q", got)
 	}
 }
@@ -218,8 +218,8 @@ func TestEditHomeHides(t *testing.T) {
 // shelf titled onto, in the edit of Home.
 func dragHomeRow(t *testing.T, s *shell, tt *ui.Tester, from, onto string) {
 	t.Helper()
-	a, ok := tt.Find(from + ", YouTube Music")
-	b, ok2 := tt.Find(onto + ", YouTube Music")
+	a, ok := tt.Find(from + ", 网易云音乐")
+	b, ok2 := tt.Find(onto + ", 网易云音乐")
 	if !ok || !ok2 {
 		t.Fatalf("the edit doesn't list %q and %q: %q", from, onto, tt.Texts())
 	}
@@ -249,7 +249,7 @@ func TestEditHomeDrags(t *testing.T) {
 		t.Errorf("dragged down, the edit lists %q, want %q", got, want)
 	}
 	dragHomeRow(t, s, tt, "Shelf 0", "Shelf 1")
-	want := []string{"youtube:title:Shelf 1", "youtube:title:Shelf 0", "youtube:title:Shelf 2"}
+	want := []string{"netease:title:Shelf 1", "netease:title:Shelf 0", "netease:title:Shelf 2"}
 	if got := keysOf(homeKept(t, s)); !slices.Equal(got, want) {
 		t.Errorf("settings.json keeps %q, want %q", got, want)
 	}
@@ -266,7 +266,7 @@ func TestEditHomeKeys(t *testing.T) {
 	s, tt := homeShell(t, shelves(3, 2))
 	titles := []string{"Shelf 0", "Shelf 1", "Shelf 2"}
 	openHomeEdit(t, s, tt, titles...)
-	row := "Shelf 0, YouTube Music"
+	row := "Shelf 0, 网易云音乐"
 	click(t, s, tt, row)
 	if info, _ := tt.Access(row); !info.Focused {
 		t.Fatal("a click doesn't give the row the focus")
@@ -291,7 +291,7 @@ func TestEditHomeKeys(t *testing.T) {
 	}
 	press(ui.KeyUp)
 	press(ui.KeyUp)
-	if got, want := keysOf(s.svc.Preferences.Get().HomeShelves), []string{"youtube:title:Shelf 0", "youtube:title:Shelf 1", "youtube:title:Shelf 2"}; !slices.Equal(got, want) {
+	if got, want := keysOf(s.svc.Preferences.Get().HomeShelves), []string{"netease:title:Shelf 0", "netease:title:Shelf 1", "netease:title:Shelf 2"}; !slices.Equal(got, want) {
 		t.Errorf("past the top, the settings keep %q, want %q", got, want)
 	}
 }
@@ -422,8 +422,8 @@ func TestHomeAddedPlaylist(t *testing.T) {
 func TestEditHomeResets(t *testing.T) {
 	s := newTestShell(t)
 	arrangeHome(s,
-		settings.HomeShelf{Key: "youtube:title:Shelf 1", Title: "Shelf 1"},
-		settings.HomeShelf{Key: "youtube:title:Shelf 0", Title: "Shelf 0", Hidden: true})
+		settings.HomeShelf{Key: "netease:title:Shelf 1", Title: "Shelf 1"},
+		settings.HomeShelf{Key: "netease:title:Shelf 0", Title: "Shelf 0", Hidden: true})
 	tt := homeWindow(t, s, shelves(2, 2))
 	openHomeEdit(t, s, tt, "Shelf 1")
 	click(t, s, tt, "reset home")

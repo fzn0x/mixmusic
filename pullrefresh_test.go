@@ -236,7 +236,7 @@ func TestPullMomentum(t *testing.T) {
 func TestPullSideways(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 1600)
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: shelves(2, 25)}
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: shelves(2, 25)}
 	show(s, tt, "/")
 	r, ok := tt.Find("Album 3")
 	if !ok {
@@ -248,7 +248,7 @@ func TestPullSideways(t *testing.T) {
 		tt.Scroll(x, y, 60, -20)
 		tt.Advance(16 * time.Millisecond)
 	}
-	if st := s.shelfScroll["/ home:youtube-0"]; st == nil || st.X <= 0 {
+	if st := s.shelfScroll["/ home:netease-0"]; st == nil || st.X <= 0 {
 		t.Errorf("the shelf didn't scroll sideways: %+v", st)
 	}
 	if shown, _ := pulling(tt); shown {

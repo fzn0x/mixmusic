@@ -265,7 +265,7 @@ func TestSpaceAfterClicks(t *testing.T) {
 func TestSpaceAfterSearch(t *testing.T) {
 	s := playing(t)
 	s.loads["search:lua"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
-		YouTube: media.SearchResults{Tracks: testTracks[:3]}}}
+		NetEase: media.SearchResults{Tracks: testTracks[:3]}}}
 	tt := testerOf(t, s, 1600, 1000)
 	tt.Key(ui.Cmd, ui.KeyF)
 	tt.Frame()

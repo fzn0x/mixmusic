@@ -199,7 +199,7 @@ func TestLocalFollowSignedIn(t *testing.T) {
 // as search finds it, and stops.
 func TestFollowArtistFromTile(t *testing.T) {
 	s, tt, _ := newFollowShell(t, false)
-	s.loads["search:harbour"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{YouTube: media.SearchResults{
+	s.loads["search:harbour"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{NetEase: media.SearchResults{
 		Artists: []media.Artist{{ID: testArtist.ID, Source: media.SourceYouTube, Name: testArtist.Name}}}}}
 	show(s, tt, searchPath("harbour"))
 	for _, want := range []struct{ item, other string }{{"Follow", "Unfollow"}, {"Unfollow", "Follow"}} {
@@ -234,7 +234,7 @@ func TestNewReleasesShelf(t *testing.T) {
 	releases := []media.Release{
 		{Album: media.Album{ID: "sp:week", Source: media.SourceSpotify, Title: "Low Tide", Kind: media.AlbumKindSingle, Artists: []media.Ref{dunes}},
 			Released: "2026-11-01", Of: dunes},
-		{Album: media.Album{ID: "yt:MPREpier", Source: media.SourceYouTube, Title: "Pier at Night", Kind: media.AlbumKindAlbum, Artists: []media.Ref{harbour}},
+		{Album: media.Album{ID: "ne:1", Source: media.SourceNetEase, Title: "Pier at Night", Kind: media.AlbumKindAlbum, Artists: []media.Ref{harbour}},
 			Released: "2026", Of: harbour},
 	}
 	s.loads["releases"] = &loaded[[]media.Release]{}
@@ -253,11 +253,11 @@ func TestNewReleasesShelf(t *testing.T) {
 		label  string
 		source media.Source
 	}) bool {
-		return f.source == media.SourceYouTube
+		return f.source == media.SourceNetEase
 	})
 	tt.Frame()
 	if tt.HasText("Low Tide") || !tt.HasText("Pier at Night") {
-		t.Errorf("Home › YouTube Music shows %q", tt.Texts())
+		t.Errorf("Home › 网易云音乐 shows %q", tt.Texts())
 	}
 	s.homeFilter = 0
 	// This run's look found one.

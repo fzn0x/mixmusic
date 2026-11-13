@@ -6883,3 +6883,107 @@ func KeepOnTopMenu() string { return In(i18n.Locale()).KeepOnTopMenu() }
 func (msgs Messages) KeepOnTopMenu() string {
 	return Catalog.Format(msgs.locale, "keepOnTopMenu", nil)
 }
+
+// AccountSettingsNetEaseSignInTitle says "Sign in to NetEase Cloud Music"
+// in the language the app shows.
+func AccountSettingsNetEaseSignInTitle() string {
+	return In(i18n.Locale()).AccountSettingsNetEaseSignInTitle()
+}
+
+// AccountSettingsNetEaseSignInTitle says "Sign in to NetEase Cloud Music"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsNetEaseSignInTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsNetEaseSignInTitle", nil)
+}
+
+// AccountSettingsNetEaseHint says "A window opens NetEase Cloud Music's sign-in page: scan its QR code with the NetEase Cloud Music app."
+// in the language the app shows.
+func AccountSettingsNetEaseHint() string { return In(i18n.Locale()).AccountSettingsNetEaseHint() }
+
+// AccountSettingsNetEaseHint says "A window opens NetEase Cloud Music's sign-in page: scan its QR code with the NetEase Cloud Music app."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsNetEaseHint() string {
+	return Catalog.Format(msgs.locale, "accountSettingsNetEaseHint", nil)
+}
+
+// AccountSettingsNetEaseSignInButton says "sign in to netease cloud music"
+// in the language the app shows.
+func AccountSettingsNetEaseSignInButton() string {
+	return In(i18n.Locale()).AccountSettingsNetEaseSignInButton()
+}
+
+// AccountSettingsNetEaseSignInButton says "sign in to netease cloud music"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsNetEaseSignInButton() string {
+	return Catalog.Format(msgs.locale, "accountSettingsNetEaseSignInButton", nil)
+}
+
+// AccountSettingsNetEaseWaitingWindow says "waiting for the sign-in window…"
+// in the language the app shows.
+func AccountSettingsNetEaseWaitingWindow() string {
+	return In(i18n.Locale()).AccountSettingsNetEaseWaitingWindow()
+}
+
+// AccountSettingsNetEaseWaitingWindow says "waiting for the sign-in window…"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsNetEaseWaitingWindow() string {
+	return Catalog.Format(msgs.locale, "accountSettingsNetEaseWaitingWindow", nil)
+}
+
+// AccountSettingsNetEaseSignedIn says "Signed in to NetEase Cloud Music"
+// in the language the app shows.
+func AccountSettingsNetEaseSignedIn() string {
+	return In(i18n.Locale()).AccountSettingsNetEaseSignedIn()
+}
+
+// AccountSettingsNetEaseSignedIn says "Signed in to NetEase Cloud Music"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsNetEaseSignedIn() string {
+	return Catalog.Format(msgs.locale, "accountSettingsNetEaseSignedIn", nil)
+}
+
+// AccountSettingsNetEaseSignedInDesc says "Your daily picks, your playlists and liked songs, and songs as your account may play them."
+// in the language the app shows.
+func AccountSettingsNetEaseSignedInDesc() string {
+	return In(i18n.Locale()).AccountSettingsNetEaseSignedInDesc()
+}
+
+// AccountSettingsNetEaseSignedInDesc says "Your daily picks, your playlists and liked songs, and songs as your account may play them."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsNetEaseSignedInDesc() string {
+	return Catalog.Format(msgs.locale, "accountSettingsNetEaseSignedInDesc", nil)
+}
+
+// AccountSettingsNetEaseRefused says "NetEase Cloud Music refused the session"
+// in the language the app shows.
+func AccountSettingsNetEaseRefused() string { return In(i18n.Locale()).AccountSettingsNetEaseRefused() }
+
+// AccountSettingsNetEaseRefused says "NetEase Cloud Music refused the session"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsNetEaseRefused() string {
+	return Catalog.Format(msgs.locale, "accountSettingsNetEaseRefused", nil)
+}
+
+// AccountSettingsNetEaseSignOutTitle says "sign out of NetEase Cloud Music"
+// in the language the app shows.
+func AccountSettingsNetEaseSignOutTitle() string {
+	return In(i18n.Locale()).AccountSettingsNetEaseSignOutTitle()
+}
+
+// AccountSettingsNetEaseSignOutTitle says "sign out of NetEase Cloud Music"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsNetEaseSignOutTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsNetEaseSignOutTitle", nil)
+}
+
+// AccountSettingsNetEaseSignOutBody says "MixMusic forgets your NetEase Cloud Music session; your playlists stay on NetEase Cloud Music."
+// in the language the app shows.
+func AccountSettingsNetEaseSignOutBody() string {
+	return In(i18n.Locale()).AccountSettingsNetEaseSignOutBody()
+}
+
+// AccountSettingsNetEaseSignOutBody says "MixMusic forgets your NetEase Cloud Music session; your playlists stay on NetEase Cloud Music."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsNetEaseSignOutBody() string {
+	return Catalog.Format(msgs.locale, "accountSettingsNetEaseSignOutBody", nil)
+}

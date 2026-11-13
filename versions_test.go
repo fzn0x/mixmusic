@@ -142,7 +142,7 @@ func TestAlbumVersionsSearchAndLibrary(t *testing.T) {
 	other := media.Album{ID: "yt:lights-kites", Source: media.SourceYouTube, Title: "Kites", Year: "2021",
 		Artists: []media.Ref{{Name: "Harbour Lights"}}}
 	found := append(artist.Albums, other)
-	s.loads["search:kites"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{YouTube: media.SearchResults{Albums: found}}}
+	s.loads["search:kites"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{NetEase: media.SearchResults{Albums: found}}}
 	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
 	s.loads["youtube:playlists"] = &loaded[[]media.Playlist]{done: true}
 	s.loads["youtube:albums"] = &loaded[[]media.Album]{done: true, value: artist.Albums}
@@ -159,10 +159,6 @@ func TestAlbumVersionsSearchAndLibrary(t *testing.T) {
 	click(t, s, tt, "albums")
 	if n := tilesOf(tt, "Kites"); n != 2 {
 		t.Errorf("the Albums pivot shows %d tiles of Kites: %q", n, tt.Texts())
-	}
-	show(s, tt, "/library/youtube")
-	if n := tilesOf(tt, "Kites"); n != 1 || !tt.HasText("2019 · 3 versions · Ada Field") {
-		t.Errorf("the library shows %d tiles of Kites: %q", n, tt.Texts())
 	}
 }
 

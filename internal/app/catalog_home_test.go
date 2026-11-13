@@ -41,9 +41,6 @@ func TestHomeOfEachService(t *testing.T) {
 	c := &Catalog{a: a}
 	ctx := context.Background()
 
-	if shelves, err := c.YouTubeHome(ctx); err == nil {
-		t.Errorf("YouTube Music down gave %d shelves and no error", len(shelves))
-	}
 	if shelves, err := c.SpotifyHome(ctx); err == nil {
 		t.Errorf("Spotify down gave %d shelves and no error", len(shelves))
 	}

@@ -142,6 +142,8 @@ func keySource(key string) media.Source {
 		return media.SourceSpotify
 	case string(media.SourceYouTube):
 		return media.SourceYouTube
+	case string(media.SourceNetEase):
+		return media.SourceNetEase
 	case "playlist", "artist":
 		if source, _, err := media.ParseID(rest); err == nil {
 			return source

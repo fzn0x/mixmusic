@@ -27,6 +27,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/netease"
 	"github.com/fzn0x/mixmusic/internal/nowplaying"
 	"github.com/fzn0x/mixmusic/internal/online"
 	"github.com/fzn0x/mixmusic/internal/player"
@@ -133,6 +134,8 @@ type App struct {
 	library      *library.Library
 	positions    *library.Positions
 	youtube      *youtube.Client
+	netease      *netease.Client
+	neteaseStore jsonSecret[string]
 	auth         *spotify.Auth
 	spotify      *spotify.Client
 	tokens       tokenStore
@@ -238,6 +241,7 @@ type App struct {
 	lastfm     *scrobbles
 	youtubeMe  *youtube.Account
 	spotifyMe  *spotify.Profile
+	neteaseMe  *netease.Profile
 	nowPlaying NowPlaying
 	// started is the ID of the track whose start the reports told last
 	// (startOf).
@@ -292,7 +296,7 @@ func New(opts Options) (*App, error) {
 		return nil, fmt.Errorf("opening the update preferences: %w", err)
 	}
 	a.checkUpdates = make(chan struct{}, 1)
-	matches, err := store.Open(filepath.Join(opts.CacheDir, "matches.json"), map[string]media.Track{})
+	matches, err := store.Open(filepath.Join(opts.CacheDir, "matches-netease.json"), map[string]media.Track{})
 	if err != nil {
 		return nil, fmt.Errorf("opening matches: %w", err)
 	}
@@ -307,6 +311,8 @@ func New(opts Options) (*App, error) {
 	s := a.settings.Get().Clean()
 
 	a.youtube = youtube.New()
+	a.netease = netease.New()
+	a.neteaseStore = jsonSecret[string]{newSecretStore(opts.DataDir, neteaseSecret, "netease-session.json", "netease-session.dpapi")}
 	a.auth = spotify.NewAuth(s.SpotifyClientID)
 	a.spotify = spotify.NewClient(a.auth)
 	a.tokens = tokenStore{newSecretStore(opts.DataDir, tokenSecret, "spotify-token.json", "spotify-token.dpapi")}
@@ -337,6 +343,7 @@ func New(opts Options) (*App, error) {
 	a.loudness = newLoudnessBook(direct.Loudness, loudness)
 	a.cache = stream.NewCache(filepath.Join(opts.CacheDir, "audio"), 0)
 	a.proxy = stream.NewProxy(a.resolver)
+	a.openNetEase()
 	// The player asks whether the network answers, which audio coming
 	// tells too.
 	a.online = online.New(online.Probe)
@@ -344,7 +351,7 @@ func New(opts Options) (*App, error) {
 	a.youtubeStore = newYouTubeStore(opts.DataDir)
 	a.openYouTube()
 	a.proxy.Cache = a.cache
-	a.matcher = match.New(a.youtube, matches)
+	a.matcher = match.New(neteaseSearcher{a.netease}, matches)
 	a.labels = newLabelCache(a.youtube.MadeWithAI, aiLabels, time.Now)
 	userAgent := "MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)"
 	a.lyrics = lyrics.New(userAgent)

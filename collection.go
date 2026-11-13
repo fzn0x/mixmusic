@@ -170,6 +170,8 @@ func (s *shell) signedIn(source media.Source) bool {
 		return st.Spotify.SignedIn
 	case media.SourceYouTube:
 		return st.YouTube.SignedIn
+	case media.SourceNetEase:
+		return st.NetEase.SignedIn
 	}
 	return false
 }

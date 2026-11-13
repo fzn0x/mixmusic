@@ -233,7 +233,7 @@ func TestRender(t *testing.T) {
 	for i := range testTracks {
 		trackItems = append(trackItems, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
 	}
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
 		{Title: "Listen again", Source: media.SourceYouTube, Items: trackItems},
 		{Title: "Albums for you", Source: media.SourceYouTube, Items: items},
 	}}
@@ -292,7 +292,7 @@ func TestRender(t *testing.T) {
 	s.panel = ""
 
 	s.loads["search:midnight"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{
-		YouTube: media.SearchResults{Tracks: testTracks[:3], Albums: []media.Album{album}, Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube}}},
+		NetEase: media.SearchResults{Tracks: testTracks[:3], Albums: []media.Album{album}, Artists: []media.Artist{{ID: "ar-m83", Name: "M83", Source: media.SourceYouTube}}},
 		Spotify: media.SearchResults{Tracks: testTracks[3:]}, SpotifySignedIn: true}}
 	s.navigate(searchPath("midnight"))
 	renderTo(t, s, tt, dir, "search")
@@ -345,7 +345,7 @@ func TestRenderThemes(t *testing.T) {
 	for i := range testTracks {
 		items = append(items, media.Item{Kind: media.ItemTrack, Track: &testTracks[i]})
 	}
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{{Title: "Listen again", Source: media.SourceYouTube, Items: items}}}
 	s.p.PlayTracks(testTracks, 1)
 	s.settle(t, func(st player.State) bool { return st.Playing })
 	for _, theme := range []struct {

@@ -63,7 +63,7 @@ func playingTrack(t media.Track) func(player.State) bool {
 // and the clean version of an album, stay.
 func TestHideExplicitSearch(t *testing.T) {
 	s := newTestShell(t)
-	s.loads["search:salt"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{YouTube: media.SearchResults{
+	s.loads["search:salt"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{NetEase: media.SearchResults{
 		Tracks: []media.Track{saltWind, paperBoats}, Videos: []media.Track{saltVideo, pierVideo},
 		Albums: []media.Album{kitesExplicit, kitesClean, tidewater}}}}
 	tt := testerOf(t, s, 1280, 1600)
@@ -142,11 +142,11 @@ func TestHideExplicitHome(t *testing.T) {
 		}
 	}
 	tt := testerOf(t, s, 1280, 2400)
-	s.loads["home:youtube"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
-		{Title: "Quick picks", Source: media.SourceYouTube, Items: []media.Item{
+	s.loads["home:netease"] = &loaded[[]media.Shelf]{done: true, value: []media.Shelf{
+		{Title: "Quick picks", Source: media.SourceNetEase, Items: []media.Item{
 			{Kind: media.ItemTrack, Track: &saltSpray}, {Kind: media.ItemTrack, Track: &lowWater}, {Kind: media.ItemAlbum, Album: &kitesExplicit},
 			{Kind: media.ItemAlbum, Album: &kitesClean}}},
-		{Title: "Late night", Source: media.SourceYouTube, Items: []media.Item{{Kind: media.ItemAlbum, Album: &tidewater}}},
+		{Title: "Late night", Source: media.SourceNetEase, Items: []media.Item{{Kind: media.ItemAlbum, Album: &tidewater}}},
 	}}
 	show(s, tt, "/")
 	until(t, s, tt, "Home's shelves", func() bool { return tt.HasText("Late night") && tt.HasText("Quick picks") })

@@ -479,14 +479,14 @@ func (s *shell) sourceMark(c *ui.Context, source media.Source, on bool) {
 		ink = k.accentText
 	case source == media.SourceSpotify:
 		ink = k.spotify
-	case source == media.SourceYouTube:
+	case source == media.SourceYouTube, source == media.SourceNetEase:
 		ink = k.youtube
 	}
 	ui.Box(c).Size(10, 10).Shrink(0).Label(sourceName(source)).Draw(func(p *ui.Painter, r ui.Rect) {
 		switch source {
 		case media.SourceSpotify:
 			p.Fill(ui.Rect{X: r.X + 0.8, Y: r.Y + 0.8, W: 8.4, H: 8.4}, ink, 4.2)
-		case media.SourceYouTube:
+		case media.SourceYouTube, media.SourceNetEase:
 			p.Fill(ui.Rect{X: r.X + 1, Y: r.Y + 1, W: 8, H: 8}, ink, 0)
 		case media.SourceFile:
 			// A disc of a record, with its hole, for the music on the

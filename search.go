@@ -12,7 +12,7 @@ import (
 
 var (
 	searchPivots = []string{"all", "songs", "videos", "albums", "artists", "playlists", "podcasts"}
-	searchScopes = []string{"both", "Spotify", "YouTube Music"}
+	searchScopes = []string{"both", "Spotify", "网易云音乐"}
 )
 
 // interleave alternates the items of two lists, so both services lead.
@@ -30,20 +30,20 @@ func interleave[T any](a, b []T) []T {
 }
 
 // mergeResults are the results of the services of scope: 0 both, 1
-// Spotify, 2 YouTube Music.
+// Spotify, 2 NetEase Cloud Music.
 func mergeResults(r app.SearchResponse, scope int) media.SearchResults {
 	switch scope {
 	case 1:
 		return r.Spotify
 	case 2:
-		return r.YouTube
+		return r.NetEase
 	}
 	return media.SearchResults{
-		Tracks:    interleave(r.Spotify.Tracks, r.YouTube.Tracks),
-		Videos:    interleave(r.Spotify.Videos, r.YouTube.Videos),
-		Albums:    interleave(r.Spotify.Albums, r.YouTube.Albums),
-		Artists:   interleave(r.Spotify.Artists, r.YouTube.Artists),
-		Playlists: interleave(r.Spotify.Playlists, r.YouTube.Playlists),
+		Tracks:    interleave(r.Spotify.Tracks, r.NetEase.Tracks),
+		Videos:    interleave(r.Spotify.Videos, r.NetEase.Videos),
+		Albums:    interleave(r.Spotify.Albums, r.NetEase.Albums),
+		Artists:   interleave(r.Spotify.Artists, r.NetEase.Artists),
+		Playlists: interleave(r.Spotify.Playlists, r.NetEase.Playlists),
 	}
 }
 
@@ -82,7 +82,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		}
 		if !res.value.SpotifySignedIn && s.searchScope != 2 {
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).Children(func() {
-				ui.Text(c, "Searching YouTube Music only. ")
+				ui.Text(c, "Searching NetEase Cloud Music only. ")
 				s.linkOf(c, "Sign in to Spotify", "/settings/accounts")
 				ui.Text(c, " to search it too.")
 			})
@@ -113,7 +113,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 			}
 			empty := "No videos match."
 			if s.searchScope == 1 {
-				empty = "Only YouTube Music has videos."
+				empty = "No videos match."
 			}
 			ui.Column(c).Margin(0, 0, 48).Children(func() {
 				s.trackList(c, "video-results", videos, trackListOptions{art: true, plays: true, empty: empty})
@@ -175,7 +175,7 @@ func (s *shell) recentSearches(c *ui.Context) {
 	s.pageHeader(c, "Search", nil, nil)
 	ui.Column(c).Gap(16).Margin(0, 0, 48).Children(func() {
 		ui.Text(c, k.words("Find anything")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
-		ui.Text(c, "One search looks through YouTube Music and, once you sign in, Spotify.").
+		ui.Text(c, "One search looks through NetEase Cloud Music and, once you sign in, Spotify.").
 			FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640)
 		if s.button(c, "start-typing", "start typing", true).Clicked() {
 			s.searchBox.Focus()

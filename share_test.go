@@ -67,7 +67,7 @@ func TestShareMenus(t *testing.T) {
 	list := media.Playlist{ID: "pl-x", Title: "Rainy Day Mix", Source: media.SourceYouTube, URL: "https://music.youtube.com/playlist?list=PLrainy"}
 	bare := media.Playlist{ID: "pl-y", Title: "Mixtape"}
 	s.loads["album:al-x"] = &loaded[media.Album]{done: true, value: album}
-	s.loads["search:pier"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{YouTube: media.SearchResults{
+	s.loads["search:pier"] = &loaded[app.SearchResponse]{done: true, value: app.SearchResponse{NetEase: media.SearchResults{
 		Albums: []media.Album{album}, Playlists: []media.Playlist{list, bare}}}}
 	tt := testerOf(t, s, 1280, 1800)
 	dir := t.TempDir()

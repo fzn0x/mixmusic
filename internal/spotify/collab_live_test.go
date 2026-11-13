@@ -68,7 +68,7 @@ func TestLiveCollaboration(t *testing.T) {
 	})
 
 	// Two tracks of a royalty-free composer, by search.
-	found, err := c.Search(ctx, "Kevin MacLeod")
+	found, err := c.Search(ctx, "Kevin MacLeod", "")
 	if err != nil || len(found.Tracks) < 2 {
 		t.Fatalf("searching: %d tracks, %v", len(found.Tracks), err)
 	}

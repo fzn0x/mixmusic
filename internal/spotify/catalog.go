@@ -53,8 +53,10 @@ func (c *Client) Me(ctx context.Context) (Profile, error) {
 }
 
 // Search returns the tracks, albums, artists and playlists Spotify finds for
-// query.
-func (c *Client) Search(ctx context.Context, query string) (media.SearchResults, error) {
+// query. Of its playlists, only those Playlist can open for userID, the
+// signed-in user: those they own or collaborate on, not the others, of
+// which Spotify shows apps no track (ErrPlaylistUnavailable).
+func (c *Client) Search(ctx context.Context, query, userID string) (media.SearchResults, error) {
 	var res struct {
 		Tracks    paging[*track]    `json:"tracks"`
 		Albums    paging[*album]    `json:"albums"`
@@ -83,8 +85,11 @@ func (c *Client) Search(ctx context.Context, query string) (media.SearchResults,
 		}
 	}
 	for _, p := range res.Playlists.Items {
-		if p != nil {
-			out.Playlists = append(out.Playlists, toPlaylist(p, ""))
+		if p == nil {
+			continue
+		}
+		if converted := toPlaylist(p, userID); converted.Editable {
+			out.Playlists = append(out.Playlists, converted)
 		}
 	}
 	return out, nil

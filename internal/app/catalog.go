@@ -63,7 +63,7 @@ func (c *Catalog) search(ctx context.Context, query string) (SearchResponse, err
 	)
 	wg.Go(func() { res.YouTube, ytErr = c.a.youtube.SearchAll(ctx, query) })
 	if res.SpotifySignedIn {
-		wg.Go(func() { res.Spotify, spErr = c.a.spotify.Search(ctx, query) })
+		wg.Go(func() { res.Spotify, spErr = c.a.spotify.Search(ctx, query, c.a.spotifyUserID(ctx)) })
 	}
 	wg.Wait()
 	if ytErr != nil {

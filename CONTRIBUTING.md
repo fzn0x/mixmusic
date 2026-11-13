@@ -211,16 +211,18 @@ release has no update files and apps stay on the version they have.
 The workflow signs and notarizes the macOS app, signs the Windows apps and
 installers, and updates the Homebrew cask, each once its secrets are in the
 repository; without them it says so in a notice and skips that part, and
-the release goes out as before. Some of the macOS secrets without the
-others stop the build. `mygo build` signs, before it makes the update
-archives, so that updates install the signed app too: see the comments of
-[mygo.config.ts](mygo.config.ts) and of the workflow.
+the release goes out as before. The macOS certificate signs alone, with a
+certificate of our own, or with the notary key, with a Developer ID; any
+other part of the macOS secrets stops the build. `mygo build` signs,
+before it makes the update archives, so that updates install the signed
+app too: see the comments of [mygo.config.ts](mygo.config.ts) and of the
+workflow.
 
 | Secret | What it holds |
 |---|---|
-| `MACOS_CERTIFICATE` | the Developer ID Application certificate and its private key, as a `.p12`, in base64 |
+| `MACOS_CERTIFICATE` | the certificate that signs the macOS app and its private key, as a `.p12`, in base64: a Developer ID Application certificate, or one of our own, self-signed |
 | `MACOS_CERTIFICATE_PASSWORD` | the password of the `.p12` |
-| `APPLE_API_KEY` | an App Store Connect API key, the `AuthKey_<key ID>.p8` file as it is, which notarizes |
+| `APPLE_API_KEY` | an App Store Connect API key, the `AuthKey_<key ID>.p8` file as it is, which notarizes, with a Developer ID only |
 | `APPLE_API_KEY_ID`, `APPLE_API_ISSUER` | its key ID and its issuer ID |
 | `WINDOWS_CERTIFICATE` | a code signing certificate and its private key, as a `.pfx`, in base64 |
 | `WINDOWS_CERTIFICATE_PASSWORD` | its password, if it has one |
@@ -241,6 +243,34 @@ What only the maintainer can do, once:
    gh secret set APPLE_API_KEY < AuthKey_XXXXXXXXXX.p8
    gh secret set APPLE_API_KEY_ID
    gh secret set APPLE_API_ISSUER
+   ```
+
+   Without the Apple Developer Program, a certificate of our own signs
+   instead, which costs nothing. Gatekeeper doesn't know it, so macOS
+   still asks before the app's first launch, as the README tells, but the
+   Keychain knows each update for the app it replaces, as it can't of an
+   app signed ad hoc, and stops asking for the Spotify sign-in after
+   every update. Keep the certificate: another one asks once more. Make it
+   with OpenSSL 1.1 or LibreSSL, whose `.p12` macOS reads (OpenSSL 3 needs
+   `-legacy`), and put it in place of the Developer ID:
+
+   ```sh
+   cat > cert.cnf <<'EOF'
+   [req]
+   distinguished_name = dn
+   x509_extensions = ext
+   prompt = no
+   [dn]
+   CN = MixMusic self-signed release
+   [ext]
+   basicConstraints = critical, CA:FALSE
+   keyUsage = critical, digitalSignature
+   extendedKeyUsage = critical, codeSigning
+   EOF
+   openssl req -x509 -newkey rsa:3072 -sha256 -days 3650 -nodes -keyout key.pem -out cert.pem -config cert.cnf
+   openssl pkcs12 -export -inkey key.pem -in cert.pem -name "MixMusic self-signed release" -out signing.p12
+   base64 -i signing.p12 | gh secret set MACOS_CERTIFICATE
+   gh secret set MACOS_CERTIFICATE_PASSWORD
    ```
 2. **Windows.** Get a code signing certificate that comes as a `.pfx`,
    then:

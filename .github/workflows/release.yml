@@ -95,11 +95,16 @@ jobs:
           else
             nix develop --command bun install --frozen-lockfile
           fi
-      # The Developer ID certificate, and the App Store Connect key that
-      # notarizes, in a keychain of their own, which mygo build signs and
-      # notarizes with (mygo.config.ts). Without the secrets the app is
-      # signed ad hoc, as before; with some of them only, the build stops.
-      - name: The Developer ID and the notary key
+      # The certificate that signs the app, in a keychain of its own, which
+      # mygo build signs with (mygo.config.ts): a Developer ID, with the App
+      # Store Connect key that notarizes, or a certificate of our own,
+      # self-signed, alone. Either signs every release alike, so that the
+      # Keychain, which asks again of an app signed otherwise, lets each
+      # update read what the one before kept, as the Spotify sign-in, and
+      # macOS's privacy settings hold. Ad hoc, each build is another app to
+      # them. Without the secrets the app is signed ad hoc, as before; with
+      # the notary key or the certificate only in part, the build stops.
+      - name: The signing certificate and the notary key
         if: matrix.name == 'macOS'
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
@@ -108,18 +113,26 @@ jobs:
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         run: |
-          missing=""
+          have=""
           for name in MACOS_CERTIFICATE MACOS_CERTIFICATE_PASSWORD APPLE_API_KEY APPLE_API_KEY_ID APPLE_API_ISSUER; do
-            [ -n "${!name}" ] || missing="$missing $name"
+            [ -z "${!name}" ] || have="$have $name"
           done
-          if [ "$missing" = " MACOS_CERTIFICATE MACOS_CERTIFICATE_PASSWORD APPLE_API_KEY APPLE_API_KEY_ID APPLE_API_ISSUER" ]; then
-            echo "::notice::No Developer ID secrets: the macOS app is signed ad hoc, and not notarized"
+          case "$have" in
+          "")
+            echo "::notice::No macOS signing secrets: the macOS app is signed ad hoc, and not notarized"
             exit 0
-          fi
-          if [ -n "$missing" ]; then
-            echo "::error::Signing and notarizing the macOS app needs these secrets too:$missing"
+            ;;
+          " MACOS_CERTIFICATE MACOS_CERTIFICATE_PASSWORD")
+            notarize=false
+            ;;
+          " MACOS_CERTIFICATE MACOS_CERTIFICATE_PASSWORD APPLE_API_KEY APPLE_API_KEY_ID APPLE_API_ISSUER")
+            notarize=true
+            ;;
+          *)
+            echo "::error::The macOS secrets are MACOS_CERTIFICATE and MACOS_CERTIFICATE_PASSWORD, which sign, and APPLE_API_KEY, APPLE_API_KEY_ID and APPLE_API_ISSUER with them, which notarize: there are only$have"
             exit 1
-          fi
+            ;;
+          esac
           umask 077
           keychain="$RUNNER_TEMP/signing.keychain-db"
           password="$(openssl rand -base64 24)"
@@ -127,24 +140,48 @@ jobs:
           security create-keychain -p "$password" "$keychain"
           security set-keychain-settings -lut 21600 "$keychain"
           security unlock-keychain -p "$password" "$keychain"
-          echo "$MACOS_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/developer-id.p12"
-          security import "$RUNNER_TEMP/developer-id.p12" -k "$keychain" \
-            -P "$MACOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          rm "$RUNNER_TEMP/developer-id.p12"
+          p12="$RUNNER_TEMP/signing.p12"
+          echo "$MACOS_CERTIFICATE" | base64 --decode > "$p12"
+          security import "$p12" -k "$keychain" -P "$MACOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k "$password" "$keychain" > /dev/null
           security list-keychains -d user -s "$keychain" login.keychain
+          if [ "$notarize" = true ]; then
+            identity="$(security find-identity -v -p codesigning "$keychain" | awk '/"Developer ID Application: /{ print $2; exit }')"
+            what="Developer ID Application"
+          else
+            # codesign takes only an identity the Mac trusts, which Apple's
+            # are, and one of our own once the runner trusts it: a user's
+            # Mac needs not, as it checks the app against the certificate
+            # it was signed with, by its hash, rather than Apple's.
+            identity="$(security find-identity -v -p codesigning "$keychain" | awk '/"/{ print $2; exit }')"
+            if [ -z "$identity" ]; then
+              cert="$RUNNER_TEMP/signing.pem"
+              security find-certificate -a -p "$keychain" > "$cert"
+              # A trust of the user's own asks in a window: the system's
+              # doesn't, with sudo. Without an answer in a minute, none.
+              perl -e 'alarm 60; exec @ARGV' sudo security add-trusted-cert -d -r trustRoot -p codeSign \
+                -k /Library/Keychains/System.keychain "$cert"
+              identity="$(security find-identity -v -p codesigning "$keychain" | awk '/"/{ print $2; exit }')"
+            fi
+            what="code signing"
+          fi
+          rm "$p12"
           # codesign signs with the identity's SHA-1, which names no other.
-          identity="$(security find-identity -v -p codesigning "$keychain" | awk '/"Developer ID Application: /{ print $2; exit }')"
           if [ -z "$identity" ]; then
-            echo "::error::MACOS_CERTIFICATE holds no Developer ID Application identity"
-            security find-identity -v -p codesigning "$keychain"
+            echo "::error::MACOS_CERTIFICATE holds no $what identity this Mac takes"
+            security find-identity -p codesigning "$keychain"
             exit 1
           fi
           security find-identity -v -p codesigning "$keychain" | grep "$identity"
-          # The profile that mygo build notarizes with, checked with Apple.
-          printf '%s\n' "$APPLE_API_KEY" > "$RUNNER_TEMP/notary-key.p8"
-          xcrun notarytool store-credentials mixmusic-notary --keychain "$keychain" \
-            --key "$RUNNER_TEMP/notary-key.p8" --key-id "$APPLE_API_KEY_ID" --issuer "$APPLE_API_ISSUER"
+          if [ "$notarize" = true ]; then
+            # The profile that mygo build notarizes with, checked with Apple.
+            printf '%s\n' "$APPLE_API_KEY" > "$RUNNER_TEMP/notary-key.p8"
+            xcrun notarytool store-credentials mixmusic-notary --keychain "$keychain" \
+              --key "$RUNNER_TEMP/notary-key.p8" --key-id "$APPLE_API_KEY_ID" --issuer "$APPLE_API_ISSUER"
+            echo "NOTARY_KEYCHAIN=$keychain" >> "$GITHUB_ENV"
+          else
+            echo "::notice::MACOS_CERTIFICATE signs the macOS app, without notarizing it: no APPLE_API_KEY"
+          fi
           # Nix's shell has an xcrun of its own, with the SDK of nixpkgs as
           # DEVELOPER_DIR: build.sh puts the Mac's own first, with Xcode's.
           tools="$RUNNER_TEMP/apple-tools"
@@ -154,7 +191,6 @@ jobs:
           chmod 755 "$tools" "$tools/xcrun"
           {
             echo "MACOS_SIGNING_IDENTITY=$identity"
-            echo "NOTARY_KEYCHAIN=$keychain"
             echo "APPLE_TOOLS=$tools"
           } >> "$GITHUB_ENV"
       # The code signing certificate, which mygo build signs the apps, the
@@ -180,11 +216,34 @@ jobs:
           MYGO_WINDOWS_CERTIFICATE_PASSWORD: ${{ matrix.name == 'Windows' && secrets.WINDOWS_CERTIFICATE_PASSWORD || '' }}
         # A build per platform, each Linux one asking for the system's loader.
         run: nix develop --command bash .github/scripts/build.sh "${{ matrix.platform }}"
+      # The app the build signed with a certificate of our own: a valid
+      # signature, whose designated requirement names the certificate, not
+      # the build, so that the Keychain lets each update read what the one
+      # before kept. Gatekeeper still asks before its first launch.
+      - name: The app's signature
+        if: matrix.name == 'macOS' && env.MACOS_SIGNING_IDENTITY != '' && env.NOTARY_KEYCHAIN == ''
+        run: |
+          app=build/darwin-universal/MixMusic.app
+          # A tag from before signing, built again, signs ad hoc.
+          if codesign -dv "$app" 2>&1 | grep -q '^Signature=adhoc'; then
+            echo "::warning::The mygo.config.ts of $TAG signs ad hoc"
+            exit 0
+          fi
+          codesign --verify --deep --strict --verbose=2 "$app"
+          requirement="$(codesign -d -r- "$app" 2>&1 | grep '^designated => ')"
+          echo "$requirement"
+          case "$requirement" in
+          *'certificate leaf = H"'*) ;;
+          *)
+            echo "::error::The app's designated requirement doesn't name its certificate"
+            exit 1
+            ;;
+          esac
       # Gatekeeper's verdict on the app the build signed with the Developer
       # ID: a valid signature, and the ticket of its notarization stapled to
       # the app and to the disk image.
       - name: Gatekeeper accepts the app
-        if: matrix.name == 'macOS' && env.MACOS_SIGNING_IDENTITY != ''
+        if: matrix.name == 'macOS' && env.NOTARY_KEYCHAIN != ''
         run: |
           app=build/darwin-universal/MixMusic.app
           dmg="$(ls build/darwin-universal/*.dmg)"
@@ -451,8 +510,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
           TAP: fzn0x/homebrew-tap
-          # With these secrets, the macOS build notarizes or fails.
-          NOTARIZED: ${{ secrets.MACOS_CERTIFICATE != '' }}
+          # With this secret, the macOS build notarizes or fails: without
+          # it, a certificate of our own signs, if any, which Gatekeeper
+          # doesn't know.
+          NOTARIZED: ${{ secrets.APPLE_API_KEY != '' }}
         run: |
           set -euo pipefail
           v="${TAG#v}"

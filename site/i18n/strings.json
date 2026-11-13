@@ -265,7 +265,7 @@
     "where": "#top p"
   },
   {
-    "text": "Version \u003cspan data-version=\"\"\u003e0.5.10\u003c/span\u003e · MIT or GPLv3 · macOS, Windows and Linux · YouTube Music needs no account",
+    "text": "Version \u003cspan data-version=\"\"\u003e0.5.11\u003c/span\u003e · MIT or GPLv3 · macOS, Windows and Linux · YouTube Music needs no account",
     "kind": "html",
     "where": "#top p"
   },
@@ -1085,7 +1085,7 @@
     "where": "h2#download-title"
   },
   {
-    "text": "Free for macOS, Windows and Linux. Version \u003cspan data-version=\"\"\u003e0.5.10\u003c/span\u003e; every file is on the GitHub releases page.",
+    "text": "Free for macOS, Windows and Linux. Version \u003cspan data-version=\"\"\u003e0.5.11\u003c/span\u003e; every file is on the GitHub releases page.",
     "kind": "html",
     "where": "#download p"
   },

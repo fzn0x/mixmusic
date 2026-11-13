@@ -1,1 +1,0 @@
-- Lyrics are asked first of Better Lyrics, for lyrics timed word by word, which it has for some songs Unison doesn't; Unison and LRCLIB follow when it has none, is busy or can't be reached, and the line under the lyrics says which one they came from. It's asked only for tracks that have an album and a length (#473).

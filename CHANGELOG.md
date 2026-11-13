@@ -6,6 +6,388 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.11] - 2026-11-13
+
+Control MixMusic on another computer of your network, and let AI
+assistants control it over MCP (#353, #477). Edit the tags of the music
+on this computer, export tracks to a folder, and select several tracks
+at once (#339, #341). Choose the output device (#343), see what a track
+is and how it plays in Track info (#342), and share songs, albums and
+lyrics as image cards (#356). Collaborate on playlists on YouTube Music
+and Spotify (#355), arrange Home (#346), and look back at your year in
+Stats (#354). The mini player has a panel for the queue, the lyrics and
+the devices (#371). Sign in to YouTube Music through Firefox or Zen
+where Google refuses the window (#472), and install MixMusic on a Mac
+with Homebrew (#476). Remote control no longer freezes MixMusic as it
+starts (#464), and YouTube Music tracks start sooner
+(#377, #378, #379). MixMusic 0.3.0 and later offer this version in
+Settings › About, except the Linux x64 copies of 0.5.6, which don't
+start: install it from the release page.
+
+### Added
+
+- Edit the tags of the music on this computer: Edit info…, in a song's
+  menu, changes its title, artists, album, album artist, track and disc
+  numbers, year, genre and cover; Edit album…, in an album's menu, what
+  its songs share; and Move to album… files a song under another album
+  of your library, or a new one. MixMusic writes ID3v2 to MP3, Vorbis
+  comments to FLAC, Opus and Vorbis, and the tags of M4A files, leaving
+  the audio as it was: it writes the new file beside the old one and
+  renames it over it, so that a failure leaves the file as it was, and
+  says why. A read-only file or folder, or a WAV file, says so first.
+  The library and the queue show the new tags at once (#339).
+- Copies of one song on this computer, as an MP3 and a FLAC of it, or a
+  single and the album's copy, show once in Library › On this computer
+  and in the search, and play the best: lossless before lossy, then the
+  higher bitrate, then the higher sample rate. Files of the same title
+  and artists, three seconds apart at most, are copies; Play this copy,
+  in the song's menu, plays one, and "2 copies…" shows them side by
+  side, to unlink one or link another by hand. Plays, likes and mixes
+  follow the song, those of before too, and stay when a copy goes. The
+  links are kept in the data folder, never in the files (#340).
+- Export tracks to a folder, to take them to a phone or another player:
+  Export…, in the menu of a track downloaded or on this computer, or
+  export in the bar of the tracks selected, writes a copy of each, named
+  "Artist - Title", with its title, artists, album, track number, year,
+  ISRC where Spotify gives one, and cover. Downloads keep their format,
+  their Opus becoming Ogg Opus, which carries tags; songs on this
+  computer go as they are. A taken name gets a number, and the downloads
+  stay as they were (#341).
+- Select several tracks of a list: Ctrl-click (⌘-click on macOS) their
+  rows, Shift-click to select a range, or Select in a track's menu, after
+  which the rows show check boxes. A bar above the player bar tells how
+  many are selected, selects all, and adds them to the queue or a mix, or
+  downloads them, in the list's order. Escape lets them go (#341).
+- Track info, in every track's menu, tells what a track is and how it
+  plays: where it comes from (Spotify, YouTube Music, a download or a
+  file on this computer), its format, bitrate, sample rate, bit depth,
+  channels and length, the file it plays from with its size, and of a
+  file on this computer its tags, with Show in Explorer or Finder. Of the
+  track playing, it tells what MixMusic's audio engine plays, and how
+  far Even loudness turns it down. A Spotify track that Spotify plays
+  tells only that: Spotify tells MixMusic nothing of its audio (#342).
+- Choose the output device MixMusic plays on, to play music on
+  headphones or a DAC while calls and the system's sounds stay on the
+  speakers: Output device in Settings › Playback › Sound, or the speaker
+  button beside the volume, where the window has room for it. System
+  default, as before, follows the device your system plays on. A device
+  that goes away, as headphones you unplug, gives way to the system's
+  default with a note, and MixMusic goes back to it once it's back. 5.1
+  surround, the visualizer and Even loudness work on any device. Spotify
+  tracks that Spotify plays itself, in MixMusic or on Spotify Connect,
+  play where Spotify plays them, and a cast on the cast device (#343).
+- Show what plays in the overlay of a stream: turn on Now playing for
+  overlays in Settings › Desktop, and add the address it shows as a
+  browser source in OBS, for a card with the cover, the title and a
+  progress bar. It listens on this computer only, at a port you can
+  change, takes no commands, and also tells what plays as JSON, the cover
+  and Server-Sent Events, for an overlay of your own (#344).
+- One tile for each album, however many versions of it Spotify or YouTube
+  Music lists: an album that came out explicit and clean, and its deluxe
+  or remastered editions, show as one tile on an artist's page, in the
+  search and in the library, which says how many versions it has. Its
+  page opens on the explicit version, and a switch under its head goes to
+  the others, named as their titles name them: Explicit, Clean, Deluxe
+  Edition and so on. Prefer clean versions, in Settings › Playback ›
+  Explicit content, opens the clean one instead; it's kept as
+  `cleanVersions` in settings.json (#345).
+- Arrange Home: Edit home, at its top, lists its shelves, which you drag
+  into the order you like, or move with Alt+Up and Alt+Down (⌥↑ and ⌥↓
+  on macOS). Hide the ones you don't want, and bring them back from the
+  hidden ones' list. Add a shelf adds one of your mixes, a playlist of
+  your library on YouTube Music or Spotify, an artist's new releases,
+  Most played this month or your downloads. Your shelves keep their
+  places as YouTube Music and Spotify change theirs, whose new shelves
+  come after yours; Reset home puts Home back as it comes. settings.json
+  keeps it, as `homeShelves` (#346).
+- Choose a cover for a mix: Change cover…, in the More menu of its page
+  or the menu of its tile, takes a PNG, JPEG or WebP image of yours, or
+  the cover of one of its songs, and Use the songs' covers goes back.
+  MixMusic keeps a copy, cut to a square, in `mix-covers` in the data
+  folder, and shows it wherever the mix shows its cover (#347).
+- MixMusic watches your folders of music while it runs: a file you add,
+  change, rename or remove in them shows in the library within a few
+  seconds, without a rescan, and a folder you copy in is read once, as
+  the copy settles. It hears of them as Windows, macOS and Linux tell of
+  changes. A folder it can't watch, as one on a network drive, says why
+  in Settings › Playback › Music on this computer, and shows what changed
+  after a rescan, as before (#348).
+- Sort a list of songs by Plays, the songs you played most in MixMusic
+  first, as your history counts them: liked and disliked songs, mixes,
+  playlists, downloads and the music on this computer. And put a mix in
+  order: drag a song onto another, or press Alt+Up and Alt+Down on its
+  play button (⌥↑ and ⌥↓ on macOS), and the mix keeps the new order at
+  once. A playlist of yours on YouTube Music moves its songs there too
+  (#349).
+- Keep MixMusic's main window above your other windows: Keep on top in
+  Settings › Desktop, Keep the window on top, or not in the command
+  palette, and Keep on Top in macOS's Window menu. MixMusic remembers it
+  between starts, as `keepOnTop` in settings.json. The mini player stays
+  on top either way (#350).
+- The toast of a track that couldn't play has Details: what MixMusic
+  tried, in turn, and why each try failed, such as YouTube's player API,
+  yt-dlp, the stream, a download or the file, with the time. Copy puts
+  them on the clipboard as text ready for an issue, without your
+  accounts' names, cookies, tokens or your home folder's name. Settings ›
+  About › Recent playback errors keeps the last 10 until MixMusic closes
+  (#351).
+- Choose what your Discord status shows, in Settings › Desktop under Show
+  what plays on Discord: its two lines, from placeholders such as
+  `{title}`, `{artist} · {album}` and `{service}`, the cover, a badge of
+  YouTube Music, Spotify or a file on your computer at the cover's corner,
+  the time left, and a Listen button that opens the track on its service.
+  Keep while paused keeps a paused track, marked as paused, where a pause
+  cleared it. A preview, as Discord's card has it, follows what you choose
+  and type. At first it shows what it always did (#352).
+- Control MixMusic on another computer of the same network: turn on
+  Settings › Desktop › Remote control there, and it shows in the devices
+  menu of the cast button here. Choose it, pair once with the code of 6
+  digits it shows, and its page here shows what plays there, with play,
+  pause, next, previous, seeking, the volume and the tracks after it.
+  Settings › Desktop › Remote control lists the computers paired, each
+  with Remove. There is no server and no account: the two computers find
+  each other on the network and talk directly, encrypted, each sure of
+  the other's key since the pairing (#353).
+- On the page of another computer that MixMusic controls, its queue works
+  as this computer's does: play a track of it, drag one onto another to
+  move it, take one out, or clear it. The page's Move to button moves
+  what plays here to that computer: the queue, the track and where it is,
+  with shuffle and repeat, and pauses it here. Its tracks of YouTube Music
+  and Spotify play there as that computer plays them; a music file of
+  this computer plays from that computer's own file of the same song, by
+  its tags, or is left out, which this computer tells (#353).
+- Stats has a Your year tab, which looks back at a year of your own
+  history: the minutes you listened, your top five songs, artists and
+  albums, the month you listened most, the song the year began with, the
+  song you played most often in a day, and the new artists you found.
+  It shows for past years that have plays, and for the current year from
+  December. Save image makes a card of it in your theme's colours, as a
+  square or, with your top artists and albums too, as a tall one for a
+  story (#354).
+- Collaborate on playlists through YouTube Music and Spotify: Invite
+  collaborators, in the More menu of a playlist of yours on YouTube
+  Music, turns its collaboration on and copies the invite link, asking
+  first to make a private playlist unlisted, which collaborators need,
+  and Stop collaboration turns it off; Make collaborative does the same
+  for a playlist of yours on Spotify, as Spotify's own apps do. Library ›
+  YouTube Music and Library › Spotify list the playlists of others you
+  collaborate on, with who made them, apart from yours. Add to YouTube
+  Music playlist and Add to Spotify playlist, in a track's menu, add it
+  to one of yours or one you collaborate on, and both are put in order by
+  dragging, as a mix is; of a YouTube Music playlist you collaborate on,
+  you take out the tracks you added. A mix's Share › As a YouTube
+  Music playlist… makes it an unlisted playlist there, and copies its
+  link (#355).
+- Share, in the menu of a song, an album, a playlist or a mix, copies the
+  link to its page, or to both its pages for a Spotify song MixMusic
+  found on YouTube Music, and saves an image card of its cover, title
+  and artist in your theme's colours, as a square for a chat or a tall one
+  for a story. On the lyrics, Share lines saves the lines you choose as a
+  card, with the song's cover, title and artist at its foot, and
+  MixMusic's logo and name at its bottom right (#356).
+- The mini player has a panel, one at a time, which its window grows to
+  show, under it or above it at the foot of the screen, and opens with
+  the next time: the queue, with your place in it, where a click plays a
+  track and a right click opens its menu; the line of the lyrics sung
+  now, word by word, and the next; the output devices, with the cast and
+  Spotify Connect devices; and, after a track couldn't play, why, with
+  Copy. It has shuffle and repeat too, and its progress seeks: click or
+  drag it, or use its arrow keys, with the time under the pointer. Tab
+  reaches every control, and Escape closes the panel (#371).
+- Below the songs of a YouTube Music playlist of yours, Suggestions has
+  five songs YouTube Music suggests adding to it, each with Add, and
+  Refresh for five more. A song added joins the playlist at once, and
+  the suggestions never play with the playlist (#380).
+- A wavy progress bar: with Wavy progress bar on in Settings ›
+  Appearance › Colour and type, the played part of the seek bar, in the
+  player bar and on the now playing page, is a gentle wave that moves
+  along while music plays and eases flat when you pause. It holds still
+  while your system asks for less motion, and seeking works as before.
+  It's off at first, and kept as `wavyProgress` in settings.json (#382).
+- Choose the volume's curve: Volume curve in Settings › Playback ›
+  Volume. Natural, the default, gives the slider even steps of loudness,
+  each tenth of it 6 dB, as before; on Linear, the level grows evenly
+  along the slider, so that its middle is 6 dB down rather than 30. The
+  slider stays where it was when the curve changes. Spotify tracks play
+  on the same curve, in MixMusic and on Spotify Connect, and so do the
+  volume keys and the mini player's volume. It's kept as `volumeCurve`
+  in settings.json (#383).
+- Record memory use, in Settings › About, for a report of MixMusic taking
+  too much memory: while it's on, MixMusic writes how it uses its memory
+  to `memory.log` in the logs folder each minute, its Go heap's and the
+  whole app's as the system tells it, and saves a heap profile there once
+  it passes 1 GB, or when you press save a heap profile. They hold only
+  how MixMusic uses its memory, nothing of your music or accounts, and
+  Report a problem tells of them. It's off again at the next start
+  (#384).
+- Hide explicit content, beside Prefer clean versions in Settings ›
+  Playback › Explicit content, and off at first: the songs, albums and
+  videos Spotify or YouTube Music mark explicit don't show in the search
+  and its suggestions, on Home, in Explore, on artists' pages, in the
+  playlists and mixes of others, or in radios and autoplay, and never
+  play, not even one you pick. Your own playlists, liked songs, library
+  and queue list them dimmed, with a note, and Prefer clean versions
+  stays on meanwhile, its albums' switch without the explicit version.
+  Songs on this computer are explicit when their tags' content advisory
+  says so. It's kept as `hideExplicit` in settings.json (#427).
+- Play audio as your account, in Settings › Playback › Sound beside
+  Quality, and off at first: while you're signed in to YouTube Music,
+  MixMusic asks yt-dlp for each track's audio as your account, so a
+  YouTube Music Premium account hears Premium's higher bitrate, Opus of
+  format 774 or AAC-LC of 141, near 256 kbit/s. YouTube may flag an
+  account used this way, and tracks may start more slowly, as the switch
+  says. A track it can't get this way, or whose audio YouTube refuses,
+  plays as before, found signed out. When MixMusic sees your account has
+  Premium, it offers the switch once, and never turns it on by itself.
+  It's kept as `audioAsAccount` in settings.json (#471).
+- Sign in to YouTube Music with your own browser, where Google refuses
+  the sign-in window: Settings › Accounts › YouTube Music lists the
+  browsers found, of Firefox and Zen. The one you choose opens with a
+  new, empty profile of its own at YouTube Music's sign-in; once you
+  signed in there, MixMusic takes the session, closes the browser and
+  deletes the profile, and keeps the session encrypted, as the window
+  does. Closing the browser, cancel, or 10 minutes end it, and the
+  profile goes too. Your own profiles are never read (#472).
+- Lyrics are asked first of Better Lyrics, for lyrics timed word by word,
+  which it has for some songs Unison doesn't; Unison and LRCLIB follow
+  when it has none, is busy or can't be reached, and the line under the
+  lyrics says which one they came from. It's asked only for tracks that
+  have an album and a length (#473).
+- A song's menu has a Copy submenu: Copy link (moved there), Copy title,
+  Copy artist, which copies all of its artists separated by commas, and
+  Copy "Artist - Title" (#474).
+- Track info of a YouTube Music track tells how its stream was found:
+  through YouTube's player API, or yt-dlp's quick or full run, with the
+  arguments yt-dlp ran with, your session's file, tokens and home folder
+  hidden, and whether it was asked for as your account or signed out.
+  Copy stream URL copies the address of the audio MixMusic plays, which
+  stops working after a few hours and is tied to this network (#475).
+- Homebrew installs MixMusic on a Mac, and `brew upgrade` updates it:
+  `brew install --cask fzn0x/tap/mixmusic` (#476).
+- Let AI assistants control MixMusic over MCP, the Model Context
+  Protocol: turn on Let AI assistants control MixMusic in Settings ›
+  Desktop, and add the command it shows, MixMusic with --mcp, to an
+  assistant such as Claude Desktop. It can tell what plays and what comes
+  next, play, pause, skip, go back, seek, set the volume, search and play
+  or queue what it finds, and play your liked songs, mixes and
+  playlists. Each thing it does shows a toast. Only the assistants of this
+  computer reach it, with a key MixMusic keeps in its data folder, and
+  turning it off ends every session at once (#477).
+- On Windows, Settings › Desktop › Windows Firewall tells whether other
+  computers and cast devices on your network can reach MixMusic, for
+  remote control and casting, and why not when they can't: Cancel on
+  Windows' question, a public network, "Block all incoming connections"
+  or an organization's firewall. **Allow** lets MixMusic in on private
+  networks with one approval from Windows, an administrator's, which a
+  user who isn't one can get too; **network settings** opens the page that
+  makes a network private. Remote control's group says so while it's on,
+  and a cast device that can't reach MixMusic points there (#496).
+- Settings › Playback › Spotify tracks tells how to hear Spotify in
+  lossless: Spotify streams it only to its own apps and some Spotify
+  Connect devices, so it plays with On Spotify Connect alone, once it's on
+  in the Spotify app (profile picture › Settings and privacy › Media
+  quality › Lossless), or, for another Spotify device, from the phone's
+  devices menu › Change quality settings › Lossless. It needs Premium, or
+  Premium Platinum where Spotify sells Lite, Standard and Platinum plans
+  (#498).
+
+### Changed
+
+- When YouTube's player API gives MixMusic no stream, as while it rests,
+  yt-dlp first finds the track's audio a quick way: as YouTube's app for
+  visionOS alone, which needs no JavaScript challenge solved, rather than
+  the several seconds of the computer's time the full way takes. The full
+  way runs when the quick one finds no audio, and for 5.1 surround mixes.
+  The log tells which way found the stream, and how long each took (#378).
+- When YouTube's player API refuses three tracks in a row, MixMusic asks
+  for the third once more with a new visitor ID, then leaves it alone for
+  2 minutes rather than 30, and twice as long each time it's refused
+  again, up to 30 minutes: tracks found by the slower yt-dlp meanwhile
+  were a delay that lasted half an hour. A track the player API doesn't
+  answer for in time counts as a refusal, and the next waits 2 seconds
+  for it rather than 4. The log says how long it rests (#379).
+- Adding a song to a YouTube Music playlist or a mix that holds it
+  already says "Already in" the playlist, with Add anyway, which adds it
+  a second time, as YouTube Music does. Other refusals say what they
+  are, rather than that the song may be in the playlist already (#381).
+- Unison's lyrics now credit the person who submitted them, as Unison
+  asks of apps from 7 February 2027: "lyrics from Unison · submitted by
+  <name>", with Unison linked to the song's page there and the name to
+  their page. A lyrics card made from them names both too. Other sources'
+  credits link their names rather than print their addresses, and
+  MixMusic asks Unison at its new address, unison.betterlyrics.org (#494).
+
+### Fixed
+
+- A song or a folder of music whose name isn't valid UTF-8, as on some
+  Linux drives, plays and stays in the library after a restart. Such a
+  song no longer fails as File not found until the scan ends, nor reads
+  again in every scan, and such a folder no longer shows as not there:
+  settings.json and the index of the music on this computer keep their
+  paths in base64. So do the downloads folder, the color file and the
+  yt-dlp of your own (#367).
+- A folder of music whose subfolder can't be read, as one MixMusic isn't
+  allowed to read, or whose drive is unplugged partway through a scan,
+  keeps its songs in the library until a scan reads it again: a song
+  leaves only once its file is truly gone. Settings › Playback › Music on
+  this computer tells how many folders in it can't be read (#368).
+- A downloaded song, or one on this computer, whose file can't be read
+  no longer waits for the network while you're offline, which wouldn't
+  help: it's tried again at once, and then skipped, saying why, as File
+  not found or Can't read the file, rather than that the network failed
+  (#369).
+- An MP3 on this computer of a variable bitrate, whose Xing or VBRI
+  header counts its frames but which has no LAME tag, shows its real
+  length in the library and as it starts to play: MixMusic took its first
+  frame's bitrate for the whole file, which can be far off. A header that
+  counts more frames than the file could hold no longer makes a track
+  hours long. The music on this computer is read once more after the
+  update, so the songs already there get their real length too (#370).
+- A Spotify track played in MixMusic no longer runs on past its end when
+  a YouTube Music song comes after it in the queue: its time counted on
+  past the track's length, and the next song never played. Now the next
+  song plays, and the time stops at the track's end (#373).
+- YouTube Music tracks no longer start up to half a second late while
+  MixMusic waits to learn whether they have a 5.1 surround mix, which on
+  a slow connection often came late or not at all. A track starts as
+  soon as its stereo audio is found, whether 5.1 surround is on or off,
+  and the 5.1 button shows a moment later, once YouTube says the track
+  has a mix; with 5.1 on, the track then plays it from where it is (#377).
+- Installing an update no longer fails when GitHub's address of the
+  newest release's files times out (504 Gateway Timeout) while the
+  release itself answers: MixMusic reads the update from the release's
+  own address instead (#412).
+- Installing or updating yt-dlp no longer fails when GitHub's address of
+  the newest release's files fails while the release itself answers:
+  MixMusic downloads it from the release's own address instead (#431).
+- A song on this computer whose file is cut short while it plays now
+  says "Can't read the file" and moves on, instead of ending at the cut
+  as if the song were over. Seen with FLAC and MP3 files
+  (#456, #466).
+- With "Play 5.1 surround when a track has it" on, a YouTube Music track
+  with a 5.1 surround mix no longer sits silent for some 5 seconds while
+  yt-dlp finds its mix and YouTube starts serving it, and turning 5.1 on
+  mid-track no longer silences it either. The track plays in stereo
+  meanwhile and goes on in 5.1 from where it is once the mix is ready; a
+  mix that can't be had leaves it in stereo, saying why. A mix found
+  before, or in the offline cache, still plays at once (#457).
+- Stats › Your year's story card starts with a file name of its own,
+  "MixMusic 2025 story.png", so that saving it beside the square card
+  no longer offers to replace that one (#458).
+- An album's edition named after a colon, as "…: Deluxe Edition", or with
+  words of its own beside a word such as Deluxe, Expanded, Anniversary or
+  Edition, now joins its album's tile, as other editions do (#459).
+- MixMusic with remote control on no longer freezes as it starts, and
+  turning remote control on or pairing for the first time no longer can
+  either (#464).
+- A track YouTube plays only to signed-in viewers, as M83's "Midnight City"
+  signed out, says so in plain words, and that Play audio as your account
+  can play it, rather than yt-dlp's advice on cookies; and the log keeps
+  each track that couldn't play, with why, for a report of the problem
+  (#511).
+- An MP3 of a variable bitrate cut short, as the start of a longer file,
+  lists as long as it plays, rather than less than half of it (#514).
+
 ## [0.5.10] - 2026-11-08
 
 Play the music files on your computer beside Spotify and YouTube Music
@@ -1349,7 +1731,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.10...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.11...HEAD
+[0.5.11]: https://github.com/fzn0x/mixmusic/compare/v0.5.10...v0.5.11
 [0.5.10]: https://github.com/fzn0x/mixmusic/compare/v0.5.9...v0.5.10
 [0.5.9]: https://github.com/fzn0x/mixmusic/compare/v0.5.8...v0.5.9
 [0.5.8]: https://github.com/fzn0x/mixmusic/compare/v0.5.7...v0.5.8

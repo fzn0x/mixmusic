@@ -278,7 +278,11 @@ code {
   position: relative;
   isolation: isolate;
   width: 100%;
-  max-width: calc(var(--max) + 2 * var(--gutter));
+  /* Never wider than the window, even while it glides: a glide back to
+     100% that the window's narrowing caught midway, from the wider bar it
+     left, ran a few pixels past the window's edge, and the page scrolled
+     sideways for a moment. */
+  max-width: min(100%, calc(var(--max) + 2 * var(--gutter)));
   margin: 0 auto;
   padding-block: 0;
   padding-inline: var(--gutter);

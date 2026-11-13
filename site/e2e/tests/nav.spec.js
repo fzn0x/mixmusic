@@ -40,7 +40,22 @@ for (const { name, path, bar, chromium } of bars) {
           const line = parseFloat(getComputedStyle(el).lineHeight) || parseFloat(getComputedStyle(el).fontSize) * 1.3;
           if (el.matches("nav a") && r.height > line + 24) out.push(`${name} wraps onto ${Math.round(r.height / line)} lines`);
         }
-        if (document.documentElement.scrollWidth > document.documentElement.clientWidth) out.push("the page is wider than the window");
+        if (document.documentElement.scrollWidth > document.documentElement.clientWidth) {
+          // What makes it wider: the outermost of what reaches past the
+          // window's edge, but what a box that ends inside it clips.
+          const clipped = (el) => {
+            for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+              if (getComputedStyle(a).overflowX !== "visible" && a.getBoundingClientRect().right <= innerWidth + 0.5) return true;
+            }
+            return false;
+          };
+          const past = (el) => el.getBoundingClientRect().right > innerWidth + 0.5;
+          const wide = [...document.body.querySelectorAll("*")]
+            .filter((el) => el.getBoundingClientRect().width > 0 && past(el) && !past(el.parentElement) && !clipped(el))
+            .slice(0, 3)
+            .map((el) => `${el.localName}${el.id ? `#${el.id}` : ""}${[...el.classList].map((c) => `.${c}`).join("")} to ${Math.round(el.getBoundingClientRect().right)}`);
+          out.push(`the page is wider than the window${wide.length ? ` (${wide.join(", ")})` : ""}`);
+        }
         return out;
       }, bar);
       bad.push(...found.map((f) => `at ${width}px: ${f}`));

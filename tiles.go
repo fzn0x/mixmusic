@@ -327,14 +327,15 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 	if p.TrackCount > 0 {
 		parts = append(parts, plural(p.TrackCount, "track"))
 	}
-	open, play := s.artTile(c, key, p.Artwork, p.Title, strings.Join(parts, " · "), p.Source, false, false, true, func(m *ui.Menu) {
+	hidden := tracksHidden(p)
+	open, play := s.artTile(c, key, p.Artwork, p.Title, strings.Join(parts, " · "), p.Source, false, false, !hidden, func(m *ui.Menu) {
 		if m.Item("Open").Chosen() {
 			s.navigate(playlistPath(p.ID))
 		}
-		if m.Item("Play").Chosen() {
+		if !hidden && m.Item("Play").Chosen() {
 			s.playPlaylist(p.ID)
 		}
-		if m.Item("Download").Chosen() {
+		if !hidden && m.Item("Download").Chosen() {
 			s.downloadPlaylist(p.ID)
 		}
 		s.copyLinkItem(m, p.URL)

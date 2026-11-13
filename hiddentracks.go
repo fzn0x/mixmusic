@@ -16,6 +16,14 @@ func hiddenTracks(err error, p media.Playlist) bool {
 	return errors.Is(err, spotify.ErrPlaylistUnavailable) && p.Title != ""
 }
 
+// tracksHidden reports whether p is a Spotify playlist of others, as the
+// user's library lists those they follow, which Spotify shows apps no
+// track of: its tile neither plays nor downloads it, and Home doesn't
+// offer it as a shelf (#530).
+func tracksHidden(p media.Playlist) bool {
+	return p.Source == media.SourceSpotify && !p.Editable
+}
+
 // hiddenTracksPage is the page of a Spotify playlist of others, whose
 // tracks Spotify shows apps none of: what it tells of the playlist, with
 // a way to open it in Spotify and to save it, rather than an error.

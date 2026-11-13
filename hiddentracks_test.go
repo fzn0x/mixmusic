@@ -3,8 +3,10 @@ package main
 import (
 	"errors"
 	"slices"
+	"strings"
 	"testing"
 
+	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 )
@@ -39,5 +41,44 @@ func TestHiddenTracksPage(t *testing.T) {
 	tt.Frame()
 	if !tt.HasText("try again") {
 		t.Errorf("another error shows %q", tt.Texts())
+	}
+}
+
+// TestHiddenTracksTile has the tile of a Spotify playlist of others, as
+// the library lists those the user follows, neither play nor download it,
+// and Home not offer it as a shelf (#530).
+func TestHiddenTracksTile(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = signedInTo(false, true)
+	s.loads["spotify:playlists"] = &loaded[[]media.Playlist]{done: true, value: []media.Playlist{roadList, followedList}}
+	s.loads["spotify:albums"] = &loaded[[]media.Album]{done: true}
+	s.loads["spotify:artists"] = &loaded[[]media.Artist]{done: true}
+	s.loads["spotify:liked"] = &loaded[app.TrackPage]{done: true}
+	tt := testerOf(t, s, 1280, 1400)
+	show(s, tt, "/library/spotify")
+	for title, plays := range map[string]bool{roadList.Title: true, followedList.Title: false} {
+		if err := tt.RightClick(title); err != nil {
+			t.Fatal(err)
+		}
+		menu := tt.Menu()
+		tt.CloseMenu()
+		if !slices.Contains(menu, "Open") || slices.Contains(menu, "Play") != plays || slices.Contains(menu, "Download") != plays {
+			t.Errorf("the menu of %s holds %q", title, menu)
+		}
+	}
+
+	tt = homeWindow(t, s, nil)
+	click(t, s, tt, "edit home")
+	click(t, s, tt, "add a shelf")
+	if err := tt.ChooseMenuItem("A Spotify playlist", followedList.Title); err == nil {
+		t.Errorf("Home offers %s as a shelf", followedList.Title)
+	}
+	click(t, s, tt, "add a shelf")
+	if err := tt.ChooseMenuItem("A Spotify playlist", "Spotify shows apps the tracks of your own and shared playlists only"); err == nil || !strings.Contains(err.Error(), "disabled") {
+		t.Errorf("Home doesn't tell why: %v", err)
+	}
+	click(t, s, tt, "add a shelf")
+	if err := tt.ChooseMenuItem("A Spotify playlist", roadList.Title); err != nil {
+		t.Errorf("Home doesn't offer %s: %v", roadList.Title, err)
 	}
 }

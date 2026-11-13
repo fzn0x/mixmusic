@@ -5072,6 +5072,26 @@
       }
     }
   },
+  "roamTitle": "Roam",
+  "roamByEra": "By era",
+  "roamByLanguage": "By language",
+  "roamByGenre": "By genre",
+  "roamStarting": "Roaming {tag}…",
+  "@roamStarting": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "roamNothing": "NetEase Cloud Music has no songs to roam in {tag} right now.",
+  "@roamNothing": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
   "exploreMood": "Mood",
   "exploreAddToMix": "Add to mix",
   "exploreAddToYouTube": "Add to YouTube Music playlist",

@@ -3,6 +3,7 @@ package netease
 import (
 	"context"
 	"encoding/json"
+	"math/rand/v2"
 	"strconv"
 	"time"
 
@@ -512,4 +513,43 @@ func (c *Client) SongAudio(ctx context.Context, native, level string) (Audio, er
 		expi = 1200
 	}
 	return Audio{URL: d.URL, Size: d.Size, Type: d.Type, Expires: time.Now().Add(time.Duration(expi) * time.Second)}, nil
+}
+
+// RoamTags are the tags of NetEase's playlist catalogue to roam by, as
+// NetEase names them: by era, by language and by genre.
+var RoamTags = [3][]string{
+	{"70后", "80后", "90后", "00后"},
+	{"华语", "欧美", "日语", "韩语", "粤语"},
+	{"流行", "摇滚", "民谣", "电子", "说唱", "R&B/Soul", "爵士", "古典", "轻音乐", "古风", "金属", "后摇"},
+}
+
+// Roam returns up to 100 songs of tag, shuffled: some of those of three
+// playlists picked at random among its hottest.
+func (c *Client) Roam(ctx context.Context, tag string) ([]media.Track, error) {
+	var list struct {
+		Playlists []playlist `json:"playlists"`
+	}
+	if err := c.call(ctx, "/playlist/list", map[string]any{"cat": tag, "order": "hot", "limit": 50, "offset": 0, "total": true}, &list); err != nil {
+		return nil, err
+	}
+	picked := list.Playlists
+	rand.Shuffle(len(picked), func(i, j int) { picked[i], picked[j] = picked[j], picked[i] })
+	seen := map[int64]bool{}
+	var ids []int64
+	for _, p := range picked[:min(3, len(picked))] {
+		var r struct {
+			Playlist playlist `json:"playlist"`
+		}
+		if err := c.call(ctx, "/v6/playlist/detail", map[string]any{"id": p.ID, "n": 0, "s": 0}, &r); err != nil {
+			return nil, err
+		}
+		for _, t := range r.Playlist.TrackIDs {
+			if !seen[t.ID] {
+				seen[t.ID] = true
+				ids = append(ids, t.ID)
+			}
+		}
+	}
+	rand.Shuffle(len(ids), func(i, j int) { ids[i], ids[j] = ids[j], ids[i] })
+	return c.songs(ctx, ids[:min(100, len(ids))])
 }

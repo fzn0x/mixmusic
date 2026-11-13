@@ -11,16 +11,15 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
-	"github.com/fzn0x/mixmusic/internal/youtube"
 	"github.com/fzn0x/mixmusic/locales"
 )
 
 // exploreTabs are the tabs of Explore, by their ids; exploreTabLabels are
 // their names, in the language the app shows.
-var exploreTabs = []string{"new", "charts", "moods"}
+var exploreTabs = []string{"new", "charts", "moods", "roam"}
 
 func exploreTabLabels() []string {
-	return []string{locales.ExploreTabNew(), locales.ExploreTabCharts(), locales.ExploreTabMoods()}
+	return []string{locales.ExploreTabNew(), locales.ExploreTabCharts(), locales.ExploreTabMoods(), locales.RoamTitle()}
 }
 
 // moodPath is the page of a mood or a genre.
@@ -43,6 +42,8 @@ func (s *shell) explorePage(c *ui.Context, tab string) {
 			s.shelvesOf(c, "charts", "the charts", s.svc.Catalog.Charts)
 		case "moods":
 			s.moods(c)
+		case "roam":
+			s.roamTags(c)
 		}
 	})
 }
@@ -81,7 +82,7 @@ func (s *shell) moods(c *ui.Context) {
 			for mi, m := range g.Moods {
 				tone := n % 4
 				n++
-				if s.moodTile(c, "mood-"+count(gi)+"-"+count(mi), tone, m) {
+				if s.moodTile(c, "mood-"+count(gi)+"-"+count(mi), tone, m.Title, locales.ExploreMoodPlaylists(m.Title)) {
 					s.navigate(moodPath(m.Params))
 				}
 			}
@@ -93,17 +94,18 @@ func (s *shell) moodColumns(c *ui.Context) int {
 	return max(2, int(s.paneWidth(c)-2*s.lk.gutter)/180)
 }
 
-func (s *shell) moodTile(c *ui.Context, key string, tone int, m youtube.Mood) bool {
+// moodTile is a flat tile of title, label telling what it opens.
+func (s *shell) moodTile(c *ui.Context, key string, tone int, title, label string) bool {
 	k := &s.lk
 	t := s.buttonBase(c.Key(key)).Height(96).Padding(12).AlignItems(ui.Start).Justify(ui.Start).Background(k.tile(tone)).
-		Radius(k.radius).Label(locales.ExploreMoodPlaylists(m.Title)).Cursor(ui.CursorPointer)
+		Radius(k.radius).Label(label).Cursor(ui.CursorPointer)
 	if k.moves() {
 		s.pressMotion(t, 0.97)
 	} else if t.Pressed() {
 		t.Scale(0.97, 0.97)
 	}
 	t.Children(func() {
-		ui.Text(c, k.words(m.Title)).FontSize(k.size(1.375)).FontWeight(k.titleWeight()).Font(k.display).TextColor(k.tileText).MaxLines(2)
+		ui.Text(c, k.words(title)).FontSize(k.size(1.375)).FontWeight(k.titleWeight()).Font(k.display).TextColor(k.tileText).MaxLines(2)
 	})
 	return t.Clicked()
 }

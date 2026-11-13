@@ -233,3 +233,19 @@ func (c *Collection) NetEaseLiked(ctx context.Context) (media.Playlist, error) {
 	}
 	return media.Playlist{Source: media.SourceNetEase, Tracks: []media.Track{}}, nil
 }
+
+// Roam returns songs of a tag of netease.RoamTags to play shuffled, but
+// those the settings hide, as a radio leaves them out.
+func (c *Catalog) Roam(ctx context.Context, tag string) ([]media.Track, error) {
+	tracks, err := c.a.netease.Roam(ctx, tag)
+	if err != nil {
+		return nil, err
+	}
+	if c.a.settings.Get().HideExplicit {
+		tracks = media.WithoutExplicit(tracks)
+	}
+	if c.a.settings.Get().SkipDisliked {
+		tracks = withoutDisliked(tracks, c.a.library.Disliked())
+	}
+	return tracks, nil
+}

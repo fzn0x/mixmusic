@@ -16882,6 +16882,66 @@ func (msgs Messages) ExploreMoodPlaylists(title string) string {
 	return Catalog.Format(msgs.locale, "exploreMoodPlaylists", map[string]any{"title": title})
 }
 
+// RoamTitle says "Roam"
+// in the language the app shows.
+func RoamTitle() string { return In(i18n.Locale()).RoamTitle() }
+
+// RoamTitle says "Roam"
+// in the language of msgs.
+func (msgs Messages) RoamTitle() string {
+	return Catalog.Format(msgs.locale, "roamTitle", nil)
+}
+
+// RoamByEra says "By era"
+// in the language the app shows.
+func RoamByEra() string { return In(i18n.Locale()).RoamByEra() }
+
+// RoamByEra says "By era"
+// in the language of msgs.
+func (msgs Messages) RoamByEra() string {
+	return Catalog.Format(msgs.locale, "roamByEra", nil)
+}
+
+// RoamByLanguage says "By language"
+// in the language the app shows.
+func RoamByLanguage() string { return In(i18n.Locale()).RoamByLanguage() }
+
+// RoamByLanguage says "By language"
+// in the language of msgs.
+func (msgs Messages) RoamByLanguage() string {
+	return Catalog.Format(msgs.locale, "roamByLanguage", nil)
+}
+
+// RoamByGenre says "By genre"
+// in the language the app shows.
+func RoamByGenre() string { return In(i18n.Locale()).RoamByGenre() }
+
+// RoamByGenre says "By genre"
+// in the language of msgs.
+func (msgs Messages) RoamByGenre() string {
+	return Catalog.Format(msgs.locale, "roamByGenre", nil)
+}
+
+// RoamStarting says "Roaming {tag}…"
+// in the language the app shows.
+func RoamStarting(tag string) string { return In(i18n.Locale()).RoamStarting(tag) }
+
+// RoamStarting says "Roaming {tag}…"
+// in the language of msgs.
+func (msgs Messages) RoamStarting(tag string) string {
+	return Catalog.Format(msgs.locale, "roamStarting", map[string]any{"tag": tag})
+}
+
+// RoamNothing says "NetEase Cloud Music has no songs to roam in {tag} right now."
+// in the language the app shows.
+func RoamNothing(tag string) string { return In(i18n.Locale()).RoamNothing(tag) }
+
+// RoamNothing says "NetEase Cloud Music has no songs to roam in {tag} right now."
+// in the language of msgs.
+func (msgs Messages) RoamNothing(tag string) string {
+	return Catalog.Format(msgs.locale, "roamNothing", map[string]any{"tag": tag})
+}
+
 // ExploreMood says "Mood"
 // in the language the app shows.
 func ExploreMood() string { return In(i18n.Locale()).ExploreMood() }

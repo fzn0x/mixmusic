@@ -30,6 +30,9 @@ func TestLive(t *testing.T) {
 	if shelves, err := c.Home(ctx, ""); err != nil || len(shelves) == 0 {
 		t.Fatalf("Home: %v", err)
 	}
+	if roam, err := c.Roam(ctx, RoamTags[0][1]); err != nil || len(roam) == 0 {
+		t.Fatalf("Roam: %v, %d tracks", err, len(roam))
+	}
 	a, err := c.SongAudio(ctx, "1859245776", "exhigh") // a free song
 	t.Logf("audio: %+v %v", a.Type, err)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/tools"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // toolStatus is what MixMusic knows of yt-dlp and the JavaScript runtime,
@@ -98,7 +99,7 @@ func init() { addSettings("playback", 90, (*shell).toolSettings) }
 // toolSettings show the tools MixMusic runs, and install yt-dlp.
 func (s *shell) toolSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, "Tools", func() {
+	s.group(c, locales.ToolSettingsGroup(), func() {
 		st := s.toolStatus()
 		if !st.done {
 			// The search of the settings finds the tools once known.
@@ -108,38 +109,29 @@ func (s *shell) toolSettings(c *ui.Context) {
 			return
 		}
 		y, js := st.value.YTDLP, st.value.JSRuntime
-		desc := "Not found. Some YouTube Music tracks play only with it."
+		desc := locales.ToolSettingsNotFound()
 		if y.Found {
-			desc = "yt-dlp " + y.Version + " at " + y.Path
-			if y.Managed {
-				desc += ", MixMusic's own, which it keeps up to date"
-			}
-			if y.Bundled {
-				desc += ", which comes with MixMusic and updates with it"
-			}
-			if outdated(y) {
-				desc += ". " + y.Latest + " is out."
-			}
+			desc = locales.ToolSettingsFound(y.Version, y.Path, yesNo(y.Managed), yesNo(y.Bundled), yesNo(outdated(y)), y.Latest)
 		}
 		s.row(c, "yt-dlp", desc, func() {
 			switch {
 			case !y.Found:
-				s.installButton(c, "install-ytdlp-settings", "install yt-dlp")
+				s.installButton(c, "install-ytdlp-settings", locales.ToolSettingsInstall())
 			case y.Managed:
-				s.installButton(c, "update-ytdlp", "update yt-dlp")
+				s.installButton(c, "update-ytdlp", locales.ToolSettingsUpdate())
 			case outdated(y):
-				s.installButton(c, "use-ours-settings", "use MixMusic's yt-dlp")
+				s.installButton(c, "use-ours-settings", locales.ToolSettingsUseOurs())
 			}
 		})
 		flatpak := s.svc.System.Info().Flatpak
-		s.row(c, "JavaScript runtime", jsRuntimeHelp(js, flatpak), func() {
+		s.row(c, locales.ToolSettingsJSRuntime(), jsRuntimeHelp(js, flatpak), func() {
 			ids := []string{"", "deno", "node", "bun", "quickjs"}
-			labels := []string{"Find one", "Deno", "Node.js", "Bun", "QuickJS"}
+			labels := []string{locales.ToolSettingsFindOne(), "Deno", "Node.js", "Bun", "QuickJS"}
 			chosen := s.set.JSRuntime
 			if i := slices.Index(ids, s.set.JSRuntime); i >= 0 {
 				chosen = labels[i]
 			}
-			if s.selectOf(c.Key("js-runtime"), &chosen, labels).Width(160).Label("JavaScript runtime").Changed() {
+			if s.selectOf(c.Key("js-runtime"), &chosen, labels).Width(160).Label(locales.ToolSettingsJSRuntime()).Changed() {
 				if i := slices.Index(labels, chosen); i >= 0 {
 					s.set.JSRuntime = ids[i]
 					s.save()
@@ -148,16 +140,24 @@ func (s *shell) toolSettings(c *ui.Context) {
 				}
 			}
 		}, "Deno Node.js Bun QuickJS")
-		s.row(c, "Own yt-dlp", ownYTDLPHelp(flatpak), func() {
+		s.row(c, locales.ToolSettingsOwn(), ownYTDLPHelp(flatpak), func() {
 			in, _ := s.settingInput(c, "ytdlp-path", s.set.YTDLPPath, func(path string) {
 				s.set.YTDLPPath = path
 				s.save()
 				s.refetch("tools")
 			})
-			in.Placeholder("path to yt-dlp").Width(260).Label("Own yt-dlp")
+			in.Placeholder(locales.ToolSettingsOwnPath()).Width(260).Label(locales.ToolSettingsOwn())
 		}, "path to yt-dlp")
 		_ = k
 	})
+}
+
+// yesNo is the word of a flag, for the messages that take one.
+func yesNo(b bool) string {
+	if b {
+		return "yes"
+	}
+	return "no"
 }
 
 // jsRuntimeHelp describes yt-dlp's JavaScript runtime, js, or tells how to
@@ -166,20 +166,20 @@ func (s *shell) toolSettings(c *ui.Context) {
 func jsRuntimeHelp(js tools.Tool, flatpak bool) string {
 	switch {
 	case js.Found:
-		return js.Name + " " + js.Version + " · yt-dlp uses it to solve YouTube's challenges."
+		return locales.ToolSettingsJSRuntimeFound(js.Name, js.Version)
 	case flatpak:
-		return "yt-dlp needs a JavaScript runtime to read most YouTube streams. The Flatpak has Node.js, and no other: choose Find one."
+		return locales.ToolSettingsJSRuntimeFlatpak(locales.ToolSettingsFindOne())
 	}
-	return "yt-dlp needs Deno, Node.js, Bun or QuickJS to read most YouTube streams. Install one, and MixMusic finds it."
+	return locales.ToolSettingsJSRuntimeNone()
 }
 
 // ownYTDLPHelp describes the setting of a yt-dlp of the user's own, which
 // a Flatpak finds only in its own folders.
 func ownYTDLPHelp(flatpak bool) string {
 	if flatpak {
-		return "Use a yt-dlp of your own instead. The Flatpak sees only its own folders: put it in ~/.var/app/io.github.fzn0x.mixmusic."
+		return locales.ToolSettingsOwnFlatpak()
 	}
-	return "Use a yt-dlp of your own, such as your package manager's, instead."
+	return locales.ToolSettingsOwnHelp()
 }
 
 func init() { addSettings("playback", 70, (*shell).cacheSettings) }
@@ -187,26 +187,26 @@ func init() { addSettings("playback", 70, (*shell).cacheSettings) }
 // cacheSettings show what the offline cache holds, and bound it.
 func (s *shell) cacheSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, "Offline cache", func() {
+	s.group(c, locales.CacheSettingsGroup(), func() {
 		// The cache's folder is read for what it holds in every frame the
 		// row shows: the search of the settings finds the row by what it
 		// always says, without reading it.
-		const kept = "Tracks you played play again without the network. Downloads are kept apart, and clearing the cache leaves them."
-		if s.findable("Tracks kept", kept) {
+		kept := locales.CacheSettingsKept()
+		if s.findable(locales.CacheSettingsTracks(), kept) {
 			use := s.svc.System.CacheUsage()
-			s.row(c, "Tracks kept", fmt.Sprintf("%s in %s. "+kept, plural(use.Tracks, "track"), byteSize(use.Bytes)), func() {
-				if s.button(c, "clear-cache", "clear", false).Label("Clear tracks").Disabled(use.Tracks == 0).Clicked() {
+			s.row(c, locales.CacheSettingsTracks(), locales.CacheSettingsTracksLine(use.Tracks, byteSize(use.Bytes)), func() {
+				if s.button(c, "clear-cache", locales.CacheSettingsClear(), false).Label(locales.CacheSettingsClearTracks()).Disabled(use.Tracks == 0).Clicked() {
 					if err := s.svc.System.ClearCache(); err != nil {
 						s.notes = append(s.notes, noticeOf(err))
 					} else {
-						s.notes = append(s.notes, notice("Cache cleared"))
+						s.notes = append(s.notes, notice(locales.CacheSettingsCleared()))
 					}
 				}
 			})
 		}
 		covers := s.svc.System.ArtworkUsage()
-		s.row(c, "Covers kept", fmt.Sprintf("%s in %s. Covers you saw show again without the network.", plural(covers.Images, "cover"), byteSize(covers.Bytes)), func() {
-			if s.button(c, "clear-covers", "clear", false).Label("Clear covers").Disabled(covers.Images == 0 || s.clearingCovers).Clicked() {
+		s.row(c, locales.CacheSettingsCovers(), locales.CacheSettingsCoversLine(covers.Images, byteSize(covers.Bytes)), func() {
+			if s.button(c, "clear-covers", locales.CacheSettingsClear(), false).Label(locales.CacheSettingsClearCovers()).Disabled(covers.Images == 0 || s.clearingCovers).Clicked() {
 				// Thousands of files may go: beside the main thread.
 				s.clearingCovers = true
 				go func() {
@@ -216,7 +216,7 @@ func (s *shell) cacheSettings(c *ui.Context) {
 						if err != nil {
 							s.notes = append(s.notes, noticeOf(err))
 						} else {
-							s.notes = append(s.notes, notice("Covers cleared"))
+							s.notes = append(s.notes, notice(locales.CacheSettingsCoversCleared()))
 						}
 					})
 				}()
@@ -233,12 +233,12 @@ func (s *shell) cacheSettings(c *ui.Context) {
 			labels[i] = cacheSizeLabel(mb)
 		}
 		chosen := cacheSizeLabel(s.set.CacheSizeMB)
-		what := "Off: MixMusic keeps no tracks."
+		what := locales.CacheSettingsOff()
 		if s.set.CacheSizeMB > 0 {
-			what = chosen + " at most."
+			what = locales.CacheSettingsLimit(chosen)
 		}
-		s.row(c, "Size", what, func() {
-			if s.selectOf(c.Key("cache-size"), &chosen, labels).Width(160).Label("Cache size").Changed() {
+		s.row(c, locales.CacheSettingsSize(), what, func() {
+			if s.selectOf(c.Key("cache-size"), &chosen, labels).Width(160).Label(locales.CacheSettingsSizeLabel()).Changed() {
 				if i := slices.Index(labels, chosen); i >= 0 {
 					s.set.CacheSizeMB = sizes[i]
 					s.save()
@@ -256,7 +256,7 @@ var cacheSizes = []int{0, 512, 1024, 4096, 16384}
 func cacheSizeLabel(mb int) string {
 	switch {
 	case mb == 0:
-		return "Off"
+		return locales.CacheSettingsSizeOff()
 	case mb%1024 == 0:
 		return strconv.Itoa(mb/1024) + " GB"
 	}

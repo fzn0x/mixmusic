@@ -218,10 +218,8 @@ func (s *shell) lyricsPanel(c *ui.Context) {
 type lyricsState struct {
 	track       string
 	panel, page lyricsScroll
-	// system is the system's language, and languages the choices of the
-	// language lyrics translate to, once asked for.
-	system    string
-	languages []string
+	// system is the system's language, once asked for.
+	system string
 	// romaji is what they know of the romaji of Japanese lyrics.
 	romaji romajiView
 	// local is what they know of the lyrics romanized on the computer.

@@ -22,7 +22,7 @@ func TestVolumeCurveRow(t *testing.T) {
 		t.Fatalf("the row doesn't come into view: %q", tt.Texts())
 	}
 	var above float32
-	for _, text := range []string{"Spotify notes", "Volume curve", volumeCurveDescription, "Translate lyrics to"} {
+	for _, text := range []string{"Spotify notes", "Volume curve", volumeCurveDescription(), "Translate lyrics to"} {
 		r, ok := tt.Find(text)
 		if !ok || r.H <= 0 || r.Y <= above {
 			t.Fatalf("Settings › Playback shows %q out of place, at %v: %q", text, r, tt.Texts())

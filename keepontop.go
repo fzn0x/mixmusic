@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Keep on top keeps the main window above the other windows, while the
@@ -14,15 +16,13 @@ func init() { addSettings(desktopRows, 15, (*shell).keepOnTopRow) }
 
 // keepOnTopTitle and keepOnTopDescription tell of the setting, in Settings
 // › On the desktop.
-const (
-	keepOnTopTitle       = "Keep on top"
-	keepOnTopDescription = "MixMusic's window stays above your other windows. The mini player stays on top either way."
-)
+func keepOnTopTitle() string       { return locales.KeepOnTopTitle() }
+func keepOnTopDescription() string { return locales.KeepOnTopDescription() }
 
 // keepOnTopRow turns keeping the main window on top on and off.
 func (s *shell) keepOnTopRow(c *ui.Context) {
-	s.row(c, keepOnTopTitle, keepOnTopDescription, func() {
-		if s.switchOf(c.Key("keep-on-top"), &s.set.KeepOnTop).Label(keepOnTopTitle).Changed() {
+	s.row(c, keepOnTopTitle(), keepOnTopDescription(), func() {
+		if s.switchOf(c.Key("keep-on-top"), &s.set.KeepOnTop).Label(keepOnTopTitle()).Changed() {
 			s.save()
 		}
 	}, "always on top float pin above other windows")
@@ -83,7 +83,7 @@ func (s *shell) toggleOnTop() {
 // the item's label is known before, and its check follows the setting
 // (followOnTop).
 func (s *shell) windowMenu() *mygo.MenuItem {
-	s.onTop.item = &mygo.MenuItem{Label: "Keep on Top", Type: mygo.MenuItemCheckbox, Checked: s.set.KeepOnTop,
+	s.onTop.item = &mygo.MenuItem{Label: locales.KeepOnTopMenu(), Type: mygo.MenuItemCheckbox, Checked: s.set.KeepOnTop,
 		// MyGo checks it, or not, before it calls Click.
 		Click: func(item *mygo.MenuItem, _ *mygo.Window) {
 			on := item.IsChecked()

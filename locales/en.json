@@ -1,0 +1,1449 @@
+{
+  "@@locale": "en",
+  "languageTitle": "Language",
+  "languageDescription": "The language MixMusic shows its words in.",
+  "settingsTitle": "Settings",
+  "settingsTabAppearance": "appearance",
+  "@settingsTabAppearance": {
+    "description": "A section of the settings, lowercase as the pivots are."
+  },
+  "settingsTabPlayback": "playback",
+  "settingsTabAccounts": "accounts",
+  "settingsTabPlugins": "plugins",
+  "settingsTabDesktop": "desktop",
+  "settingsTabShortcuts": "shortcuts",
+  "settingsTabAbout": "about",
+  "settingsNoMatch": "No setting matches “{query}”.",
+  "@settingsNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsNoMatchSpoken": "No setting matches {query}",
+  "@settingsNoMatchSpoken": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsMatches": "{count, plural, one {# match} other {# matches}}",
+  "@settingsMatches": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsAddonProblem": "The {kind, select, plugin {plugin} other {theme}} in “{folder}” did not load: {error}",
+  "@settingsAddonProblem": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "folder": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShowIn": "show in {section}",
+  "@settingsShowIn": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShowGroupIn": "Show {group} in {section}",
+  "@settingsShowGroupIn": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      },
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSearchPlaceholder": "search the settings",
+  "settingsSearchLabel": "Search the settings",
+  "railHome": "Home",
+  "railSearch": "Search",
+  "railExplore": "Explore",
+  "railLibrary": "Library",
+  "railStats": "Stats",
+  "railMarketplace": "Marketplace",
+  "railSettings": "Settings",
+  "railCollapse": "Collapse the sidebar",
+  "railExpand": "Expand the sidebar",
+  "railYourMixes": "Your mixes",
+  "railNewMix": "New mix",
+  "railLikedSongs": "Liked songs",
+  "railDownloads": "Downloads",
+  "railName": "Name",
+  "railCreate": "create",
+  "railMixCreated": "Created {title}: add tracks of any service to it",
+  "@railMixCreated": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "railNothingPlaying": "Nothing playing yet",
+  "railOpenNowPlaying": "Open now playing",
+  "railUpNext": "Up next",
+  "topbarBack": "Back",
+  "topbarForward": "Forward",
+  "topbarPalette": "Open the command palette",
+  "topbarSearchPlaceholder": "Search Spotify and YouTube Music",
+  "topbarSearch": "Search",
+  "topbarKindSong": "Song",
+  "topbarKindVideo": "Video",
+  "topbarKindEpisode": "Episode",
+  "topbarKindSingle": "Single",
+  "topbarKindEP": "EP",
+  "topbarKindAlbum": "Album",
+  "topbarKindArtist": "Artist",
+  "topbarKindPlaylist": "Playlist",
+  "topbarKindPodcast": "Podcast",
+  "playerPickSomething": "Pick something to play",
+  "playerOpenNowPlaying": "Open now playing",
+  "playerViaYouTube": "{line} · via YouTube Music",
+  "@playerViaYouTube": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "playerOnSpotify": "{line} · on Spotify",
+  "@playerOnSpotify": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "playerSpeed": "{line} · {speed}",
+  "@playerSpeed": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      },
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "playerWaiting": "{line} · waiting for the network",
+  "@playerWaiting": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "playerUpNextLine": "next · {title} - {artists}",
+  "@playerUpNextLine": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
+  "playerLike": "Like",
+  "playerUnlike": "Remove from liked songs",
+  "playerDislike": "Dislike",
+  "playerUndislike": "Remove the dislike",
+  "playerDisliked": "Disliked {title}",
+  "@playerDisliked": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playerUndo": "undo",
+  "playerShuffle": "Shuffle",
+  "playerPrevious": "Previous",
+  "playerNext": "Next",
+  "playerRepeatOff": "Repeat: off",
+  "playerRepeatAll": "Repeat: all",
+  "playerRepeatOne": "Repeat: one",
+  "playerPauseWaiting": "Pause, waiting for the network",
+  "playerPlayWaiting": "Play once the network is back",
+  "playerLoading": "Loading",
+  "playerPause": "Pause",
+  "playerPlay": "Play",
+  "playerLive": "live",
+  "playerNoSeeking": "Live: no seeking",
+  "playerSeek": "Seek",
+  "playerQueue": "Queue",
+  "playerMiniPlayer": "Open the mini player",
+  "playerSurroundOff": "5.1 surround: off",
+  "playerSurroundOn": "5.1 surround: on",
+  "playerDevices": "Spotify Connect devices",
+  "playerDeviceDefault": "The active device",
+  "playerLooking": "Looking for devices…",
+  "playerNoDevices": "Open Spotify on a device to see it here",
+  "playerDeviceActive": "{name} · active",
+  "@playerDeviceActive": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerVolume": "Volume",
+  "shellTitleHome": "Home",
+  "shellTitleSearch": "Search",
+  "shellLostWhy": "This page isn't one of MixMusic's.",
+  "shellLost": "Lost",
+  "shellNothingHere": "Nothing lives here",
+  "shellGoHome": "go home",
+  "widgetsLoading": "Loading",
+  "widgetsTryAgain": "try again",
+  "settingsFileMistake": "settings.json has a mistake",
+  "settingsFileKeeps": "{problem} MixMusic keeps the settings it had until you fix it.",
+  "@settingsFileKeeps": {
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsFileGoesOn": "{problem} MixMusic goes on with the settings it had, and saves what you change here once the file reads again.",
+  "@settingsFileGoesOn": {
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsFileDidntRead": "settings.json didn't read",
+  "settingsFileStarted": "{problem} MixMusic started with the settings of a new install, and kept your file as settings.json.broken.",
+  "@settingsFileStarted": {
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsFileNotUTF8Title": "settings.json isn't UTF-8",
+  "settingsFileApplied": "Applied settings.json",
+  "settingsFileOpen": "open",
+  "settingsFileShow": "show",
+  "settingsFileOpenJSON": "open settings.json",
+  "settingsFileNotUTF8": "It isn't UTF-8, so letters outside ASCII read as � in it: save it as UTF-8.",
+  "settingsFileUnknown": "MixMusic doesn't know {names}: its next save drops {count, plural, one {it} other {them}}.",
+  "@settingsFileUnknown": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsFileAdjusted": "Put {names} back in range.",
+  "@settingsFileAdjusted": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsFileListSep": ", ",
+  "settingsFileAnd": "{head} and {last}",
+  "@settingsFileAnd": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "menuZoomTitle": "Zoom {percent}",
+  "@menuZoomTitle": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "menuZoomRoom": "This window has room for {percent}.",
+  "@menuZoomRoom": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "menuZoomKeysBoth": "{zoomIn} and {zoomOut} change it",
+  "@menuZoomKeysBoth": {
+    "placeholders": {
+      "zoomIn": {
+        "type": "String"
+      },
+      "zoomOut": {
+        "type": "String"
+      }
+    }
+  },
+  "menuZoomKeysIn": "{zoomIn} zooms in",
+  "@menuZoomKeysIn": {
+    "placeholders": {
+      "zoomIn": {
+        "type": "String"
+      }
+    }
+  },
+  "menuZoomKeysOut": "{zoomOut} zooms out",
+  "@menuZoomKeysOut": {
+    "placeholders": {
+      "zoomOut": {
+        "type": "String"
+      }
+    }
+  },
+  "menuZoomKeysReset": "{reset} resets it",
+  "@menuZoomKeysReset": {
+    "placeholders": {
+      "reset": {
+        "type": "String"
+      }
+    }
+  },
+  "menuZoomKeysSep": ", ",
+  "menuZoomKeysEnd": ".",
+  "menuZoomDescription": "Makes everything larger or smaller: text, buttons and artwork.",
+  "menuZoomLabel": "Zoom",
+  "menuZoomIn": "Zoom In",
+  "menuZoomOut": "Zoom Out",
+  "menuActualSize": "Actual Size",
+  "menuRefreshPage": "Refresh This Page",
+  "menuView": "View",
+  "appearanceLayoutBlendDescription": "Expressive's rounded shapes and springy motion, on Crate's dense rows, big covers in cards and bold headings. The default.",
+  "appearanceLayoutExpressiveDescription": "Playful and colourful: tonal fills, big rounded shapes, pill buttons, a floating player bar and springy motion. The Material themes go with it, their colours made of the cover's.",
+  "appearanceLayoutCrateDescription": "Restrained: dense rows, big covers in cards and bold, tight headings, so that the covers do the work.",
+  "appearanceLayoutTilesDescription": "Flat tiles, giant light lowercase words and outlined boxes, as MixMusic first was.",
+  "appearanceLayoutTitle": "Layout",
+  "appearanceThemeTitle": "Theme",
+  "appearanceGetMoreThemes": "get more themes",
+  "appearanceOpenThemesFolder": "open themes folder",
+  "appearanceFollowComputer": "Follow the computer",
+  "appearanceFollowComputerDescription": "Show one theme while the computer is in light mode and another in dark mode. The theme you pick below is the one for the mode it is in now.",
+  "appearanceFollowComputerOneModeDescription": "Show one theme in light mode and another in dark mode. Your colour file's colours are light or dark, so the theme of their mode shows.",
+  "appearanceInLightMode": "In light mode",
+  "appearanceInDarkMode": "In dark mode",
+  "appearanceThemeInLightMode": "Theme in light mode",
+  "appearanceThemeInDarkMode": "Theme in dark mode",
+  "appearanceColourFileSetsColours": "Your colour file sets the colours. The theme sets the type, corners and effects.",
+  "appearanceThemeBuiltIn": "built in",
+  "appearanceThemeBy": "by {author}",
+  "@appearanceThemeBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "appearanceThemeOptions": "{name} options",
+  "@appearanceThemeOptions": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "appearanceThemeChoice": "{name} ({scheme, select, light {light} dark {dark} other {{scheme}}})",
+  "@appearanceThemeChoice": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "scheme": {
+        "type": "String"
+      }
+    }
+  },
+  "appearanceColourAndType": "Colour and type",
+  "appearanceArtworkAccent": "Take the accent colour from the artwork of what plays.",
+  "appearanceArtworkAccentOverFile": "Take the accent colour from the artwork of what plays, over your colour file's.",
+  "appearanceAccentFallback": "Replaces the theme's accent when the artwork does not set it.",
+  "appearanceAccentFallbackOverFile": "Replaces your colour file's accent when the artwork does not set it.",
+  "appearanceFollowArtwork": "Follow the artwork",
+  "appearanceAccentColour": "Accent colour",
+  "appearanceUseTheme": "use the theme's",
+  "appearanceUseFile": "use the file's",
+  "appearanceTextSize": "Text size",
+  "appearanceDensity": "Density",
+  "appearanceDensityDescription": "Compact fits more rows on the screen.",
+  "appearanceDensityComfortable": "comfortable",
+  "appearanceDensityCompact": "compact",
+  "appearanceIconsOnlySidebar": "Icons only in the sidebar",
+  "appearanceIconsOnlySidebarDescription": "The sidebar shows its pages as icons. It does in narrow windows too, until you unfold it there.",
+  "colorFileSourceOff": "Off",
+  "colorFileSourceFile": "A file of your own",
+  "colorFileSourceTitle": "Colours from a file",
+  "colorFileSourceDescription": "Take the colours from pywal or matugen, and follow them as they change. The theme keeps its type, corners and effects.",
+  "colorFileTitle": "Colour file",
+  "colorFileHelpLink": "how to set it up",
+  "colorFileCopyTemplate": "copy the template",
+  "colorFileTemplateCopied": "Template copied",
+  "colorFilePathPlaceholder": "path to a colour file",
+  "colorFileChoose": "choose",
+  "colorFileChooseTitle": "Choose a colour file",
+  "colorFileFilterColours": "Colour files",
+  "colorFileFilterAll": "All files",
+  "colorFileNoPath": "Choose a file: pywal's colors.json, what matugen --json prints, or a theme.json.",
+  "colorFileReading": "Reading it…",
+  "colorFileMissingPywal": "It isn't there yet: pywal writes it when you run wal.",
+  "colorFileMissingMatugen": "It isn't there yet: add MixMusic's template to matugen's config.toml, and run matugen.",
+  "colorFileMissing": "It isn't there. The theme's colours show until it is.",
+  "colorFileUnreadKept": "It can't be read: {error}. MixMusic keeps the colours it read at {time}.",
+  "@colorFileUnreadKept": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "colorFileUnread": "It can't be read: {error}. The theme's colours show.",
+  "@colorFileUnread": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "colorFileRead": "Read at {time}, and followed as it changes.",
+  "@colorFileRead": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "wavyProgressTitle": "Wavy progress bar",
+  "wavyProgressDescription": "The played part of the seek bar is a gentle wave that moves while music plays and lies flat while it's paused. It holds still while your system asks for less motion.",
+  "notchTitle": "Player around the notch",
+  "notchDescription": "While a track is loaded, the black around the camera shows its cover, and bars that move with the music. Click it for the player and the lyrics, over any app and on every Space.",
+  "overlayTitle": "Now playing for overlays",
+  "overlayAbout": "Tells what plays, as a page for the browser source of OBS or another streaming program, and as data for an overlay of your own. It listens on this computer only, and takes no commands.",
+  "overlayLabel": "Serve what plays to overlays",
+  "overlayPortTitle": "Overlay port",
+  "overlayPortDescription": "The port the server listens on, 1024 to 65535. Another port, while it's on, applies at once.",
+  "overlayPortReset": "reset",
+  "overlayPortRange": "the overlay port is a number from 1024 to 65535",
+  "overlayAddressTitle": "Overlay address",
+  "overlayAddressProblem": "{error} Choose another port above.",
+  "@overlayAddressProblem": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "overlayBrowserSourceTitle": "Browser source address",
+  "overlayBrowserSourceNote": ". Paste this as the URL of a browser source in OBS.",
+  "overlayDataTitle": "Data address",
+  "overlayDataNote": ". JSON of what plays; /events streams each change, and /cover is the cover.",
+  "overlayCopy": "copy",
+  "keepOnTopTitle": "Keep on top",
+  "keepOnTopDescription": "MixMusic's window stays above your other windows. The mini player stays on top either way.",
+  "discordPreview": "Preview",
+  "discordFirstLine": "First line",
+  "discordSecondLine": "Second line",
+  "discordLineLabel": "{title} on Discord",
+  "@discordLineLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "discordLinePlaceholder": "nothing",
+  "discordLineReset": "reset",
+  "discordPlaceholders": "Placeholders: {names}. Empty, the line shows nothing.",
+  "@discordPlaceholders": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "discordUnknownNote": "{count, plural, one { {names} isn't a placeholder, and shows as typed.} other { {names} aren't placeholders, and show as typed.}}",
+  "@discordUnknownNote": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "discordCover": "Cover",
+  "discordCoverLabel": "Show the cover on Discord",
+  "discordCoverDescription": "Discord shows the cover of what plays, where its service has one online: a file on your computer shows none.",
+  "discordServiceBadge": "Service badge",
+  "discordServiceBadgeLabel": "Show the service's badge on Discord",
+  "discordServiceBadgeDescription": "A small mark of YouTube Music, Spotify or a file on your computer, at the cover's corner, or in its place.",
+  "discordTimeLeft": "Time left",
+  "discordTimeLeftLabel": "Show the time left on Discord",
+  "discordTimeLeftDescription": "How long the track has played, and how long it has left.",
+  "discordListenButton": "Listen button",
+  "discordListenButtonLabel": "Show a Listen button on Discord",
+  "discordListenButtonDescription": "A button that opens the track on YouTube Music or Spotify, which the others who see your profile can click. A file on your computer has none.",
+  "discordKeepWhilePaused": "Keep while paused",
+  "discordKeepWhilePausedLabel": "Keep the Discord status while paused",
+  "discordKeepWhilePausedDescription": "A paused track stays, marked as paused, without its time. Off, pausing clears the status.",
+  "discordPreviewPausedNote": "While paused, your profile shows nothing: this shows once the track plays again.",
+  "discordYourApplication": "your application",
+  "discordListeningTo": "Listening to {name}",
+  "@discordListeningTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "discordPreviewCardLabel": "Preview of the Discord status",
+  "discordNothingPlays": "Nothing plays: this is how a song would show.",
+  "discordElapsed": "{time} elapsed",
+  "@discordElapsed": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "discordTimeBarLabel": "Time played",
+  "discordSampleTitle": "Song title",
+  "discordSampleArtist": "Artist",
+  "discordSampleAlbum": "Album",
+  "playbackSpotifyTracks": "Spotify tracks",
+  "playbackSpotifyHere": "MixMusic plays them itself, at Spotify's own quality, and shows among your Spotify devices. Needs Spotify Premium, and no Spotify app.",
+  "playbackSpotifyNoWebKit": "This computer's webview, WebKitGTK, can't play Spotify's protected audio, so MixMusic can't play Spotify itself.",
+  "playbackHowSpotifyPlays": "How Spotify tracks play",
+  "playbackFromSpotify": "In MixMusic, from Spotify",
+  "playbackOnConnect": "On Spotify Connect",
+  "playbackOnConnectDesc": "Your Spotify app, or another Spotify device, plays them, at Spotify's own quality. Needs Spotify Premium and a device with Spotify open.",
+  "playbackFromYouTube": "In MixMusic, from YouTube Music",
+  "playbackFromYouTubeDesc": "MixMusic plays their recording on YouTube Music, with the equalizer, crossfade and visualizer. Works without Premium.",
+  "playbackSignInSpotify": "Sign in to Spotify in accounts to play your Spotify library.",
+  "playbackSignInSpotifyLead": "Sign in to Spotify in ",
+  "playbackSignInSpotifyTail": " to play your Spotify library.",
+  "playbackSignInAgainTitle": "Sign in to Spotify again",
+  "playbackSignInAgainBody": "You signed in before MixMusic played Spotify itself, which your sign-in doesn't allow yet. Until you sign in again, Spotify tracks play from YouTube Music.",
+  "playbackSignInAgain": "sign in again",
+  "playbackWaitingBrowser": "waiting for the browser…",
+  "playbackFinishSignIn": "Finish signing in in your browser",
+  "playbackSignedInSpotify": "Signed in to Spotify",
+  "playbackLosslessConnect": "Lossless: the device plays it once it's on there, in up to 24-bit quality. It needs Spotify Premium, or Premium Platinum in the countries where Spotify sells Lite, Standard and Platinum plans. In the Spotify app, choose your profile picture › Settings and privacy › Media quality › Lossless (the desktop app 1.2.67 or later). For another Spotify device, in Spotify on your phone, tap the devices button while it plays, choose the device, then Change quality settings › Lossless.",
+  "playbackLosslessOther": "Lossless: Spotify streams it only to its own apps and some Spotify Connect devices, so it plays only with On Spotify Connect, with the Spotify app open. It needs Spotify Premium, or Premium Platinum in the countries where Spotify sells Lite, Standard and Platinum plans. In the Spotify app, choose your profile picture › Settings and privacy › Media quality › Lossless (the desktop app 1.2.67 or later). For another Spotify device, in Spotify on your phone, tap the devices button while it plays, choose the device, then Change quality settings › Lossless.",
+  "playbackDevice": "Device",
+  "playbackDeviceDesc": "Where Spotify tracks play. Open Spotify on a device for it to show here.",
+  "playbackActiveDevice": "The active device",
+  "playbackDeviceMissing": "a device not found now",
+  "playbackLookAgain": "Look for devices again",
+  "playbackSound": "Sound",
+  "playbackQuality": "Quality",
+  "playbackQualityDesc": "Data saver streams smaller files of YouTube Music.",
+  "playbackQualityBest": "best",
+  "playbackQualitySaver": "data saver",
+  "playbackAutoplay": "Autoplay",
+  "playbackAutoplayDesc": "When the queue runs out, a radio of what you played carries on.",
+  "equalizerTitle": "Equalizer",
+  "equalizerDesc": "Shape the sound of YouTube Music with ten bands and a preamp.",
+  "equalizerPreset": "Preset",
+  "equalizerCustom": "Custom",
+  "equalizerPresetFlat": "Flat",
+  "equalizerPresetBass": "Bass boost",
+  "equalizerPresetTreble": "Treble boost",
+  "equalizerPresetVocal": "Vocal",
+  "equalizerPresetElectronic": "Electronic",
+  "equalizerPresetRock": "Rock",
+  "equalizerPresetAcoustic": "Acoustic",
+  "equalizerPresetLateNight": "Late night",
+  "equalizerPresetLoFi": "Lo-fi",
+  "equalizerBands": "Bands",
+  "equalizerBandsDesc": "The ten bands of the equalizer and its preamp, in dB: pre 32 64 125 250 500 1k 2k 4k 8k 16k Hz.",
+  "equalizerPreamp": "pre",
+  "equalizerBandDB": "{band} dB",
+  "@equalizerBandDB": {
+    "placeholders": {
+      "band": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerSpotifyNote": "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: Spotify notes that its audio settings can't change while another device plays it.",
+  "equalizerSpotifyLead": "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: ",
+  "equalizerSpotifyNotes": "Spotify notes",
+  "equalizerSpotifyTail": " that its audio settings can't change while another device plays it.",
+  "speedTitle": "Speed",
+  "speedHint": "Speed changes what MixMusic plays itself: YouTube Music, and Spotify tracks played from it. Tracks and episodes Spotify plays, in MixMusic or on Spotify Connect, keep their own speed. So do live streams, which play as they're broadcast. The speed button by the player changes it too, for the kind of track that plays.",
+  "speedOwn": "Their own speed.",
+  "speedAt": "{speed}, at their own pitch.",
+  "@speedAt": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "speedNormal": "normal",
+  "speedSongs": "Songs",
+  "speedOfSongs": "Speed of songs",
+  "speedPodcasts": "Podcasts",
+  "speedOfPodcasts": "Speed of podcasts",
+  "outputDevice": "Output device",
+  "outputDescription": "The speakers or headphones MixMusic plays on. System default follows the device your system plays on; a device that's unplugged gives way to it until it's back.",
+  "outputDescriptionGone": "The speakers or headphones MixMusic plays on. System default follows the device your system plays on; a device that's unplugged gives way to it until it's back. {device} isn't connected now: the system's default plays.",
+  "@outputDescriptionGone": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "outputLookAgain": "Look for devices again",
+  "loudnessEven": "Even loudness",
+  "loudnessEvenDesc": "Turns loud tracks down to one level, from YouTube's measure of each, so none jumps out. Quiet recordings keep their level.",
+  "loudnessEvenDescSpotify": "Turns loud tracks down to one level, from YouTube's measure of each, so none jumps out. Quiet recordings keep their level. Spotify plays its own tracks at its own loudness.",
+  "loudnessLevelling": "Volume levelling",
+  "loudnessLevellingDesc": "Squeezes loud and quiet moments closer together as they play, and lifts quiet recordings.",
+  "audioAsAccountTitle": "Play audio as your account",
+  "audioAsAccountDesc": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
+  "audioAsAccountSignIn": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before. Sign in to YouTube Music in accounts first.",
+  "volumeCurveGroup": "Volume",
+  "volumeCurveTitle": "Volume curve",
+  "volumeCurveDescription": "Natural gives the volume slider even steps of loudness: each tenth of it is 6 dB. On Linear, the level grows evenly along the slider, so its middle is half the level, 6 dB down. Spotify tracks play on the same curve.",
+  "volumeCurveNatural": "natural",
+  "volumeCurveLinear": "linear",
+  "dislikeSkip": "Skip songs you dislike",
+  "dislikeSkipDesc": "Songs you dislike don't play when the queue moves on, and radios leave them out.",
+  "dislikeNote": "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic.",
+  "dislikeNoteSee": "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic. See the songs you dislike.",
+  "dislikeSee": "See the songs you dislike",
+  "dislikeSeeEnd": ".",
+  "cleanVersionsGroup": "Explicit content",
+  "cleanVersionsPrefer": "Prefer clean versions",
+  "cleanVersionsDesc": "An album that comes explicit and clean shows its clean version, and its page opens on it. Its version switch still has the explicit one.",
+  "cleanVersionsFixed": "On while explicit content is hidden: an album that comes explicit and clean shows its clean version alone.",
+  "videosGroup": "Music videos",
+  "videosDesc": "On the now playing page, a music video plays its picture in place of the cover, muted and in time with the sound. The picture takes about 3 MB a minute more, under 1 MB with data saver.",
+  "videosShow": "Show the video of music videos",
+  "surroundTitle": "Play 5.1 surround when a track has it",
+  "surroundDescription": "Some tracks have a 5.1 surround mix beside their stereo one. It plays on six speakers where your output has them, else mixed down to stereo. The 5.1 button by the player turns it on and off too.",
+  "crossfadeTitle": "Crossfade",
+  "crossfadeOff": "Off: tracks follow each other.",
+  "crossfadeOverlap": "Tracks overlap by {seconds} seconds.",
+  "@crossfadeOverlap": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "skipAITitle": "Skip songs made with AI",
+  "skipAIDesc": "Skips the tracks YouTube labels as made with AI. YouTube labels only some of them, so others still play.",
+  "explicitHideTitle": "Hide explicit content",
+  "explicitHideDesc": "Songs, albums and videos marked explicit don't show in the search, on Home, on artists' pages or in radios, and never play. Your playlists, liked songs, library and queue list them dimmed.",
+  "lyricsSettingsGroup": "Lyrics",
+  "lyricsSettingsTranslate": "Translate lyrics to",
+  "lyricsSettingsDesc": "The translate switch beside the lyrics shows them in this language. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them; nothing is sent while it's off. Lyrics in other scripts show in Latin letters made on this computer, which sends nothing: Japanese in romaji, and the others by the standard of their language. Only Arabic's go to Unison, which romanizes them with the vowels Arabic doesn't write.",
+  "lyricsSettingsSystemLanguage": "System language ({language})",
+  "@lyricsSettingsSystemLanguage": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "toolSettingsGroup": "Tools",
+  "toolSettingsNotFound": "Not found. Some YouTube Music tracks play only with it.",
+  "toolSettingsFound": "yt-dlp {version} at {path}{managed, select, yes {, MixMusic's own, which it keeps up to date} other {}}{bundled, select, yes {, which comes with MixMusic and updates with it} other {}}{outdated, select, yes {. {latest} is out.} other {}}",
+  "@toolSettingsFound": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "path": {
+        "type": "String"
+      },
+      "managed": {
+        "type": "String"
+      },
+      "bundled": {
+        "type": "String"
+      },
+      "outdated": {
+        "type": "String"
+      },
+      "latest": {
+        "type": "String"
+      }
+    }
+  },
+  "toolSettingsInstall": "install yt-dlp",
+  "toolSettingsUpdate": "update yt-dlp",
+  "toolSettingsUseOurs": "use MixMusic's yt-dlp",
+  "toolSettingsJSRuntime": "JavaScript runtime",
+  "toolSettingsJSRuntimeFound": "{name} {version} · yt-dlp uses it to solve YouTube's challenges.",
+  "@toolSettingsJSRuntimeFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "toolSettingsJSRuntimeFlatpak": "yt-dlp needs a JavaScript runtime to read most YouTube streams. The Flatpak has Node.js, and no other: choose {find}.",
+  "@toolSettingsJSRuntimeFlatpak": {
+    "placeholders": {
+      "find": {
+        "type": "String"
+      }
+    }
+  },
+  "toolSettingsJSRuntimeNone": "yt-dlp needs Deno, Node.js, Bun or QuickJS to read most YouTube streams. Install one, and MixMusic finds it.",
+  "toolSettingsFindOne": "Find one",
+  "toolSettingsOwn": "Own yt-dlp",
+  "toolSettingsOwnFlatpak": "Use a yt-dlp of your own instead. The Flatpak sees only its own folders: put it in ~/.var/app/io.github.fzn0x.mixmusic.",
+  "toolSettingsOwnHelp": "Use a yt-dlp of your own, such as your package manager's, instead.",
+  "toolSettingsOwnPath": "path to yt-dlp",
+  "cacheSettingsGroup": "Offline cache",
+  "cacheSettingsKept": "Tracks you played play again without the network. Downloads are kept apart, and clearing the cache leaves them.",
+  "cacheSettingsTracks": "Tracks kept",
+  "cacheSettingsTracksLine": "{count, plural, one {# track} other {# tracks}} in {size}. Tracks you played play again without the network. Downloads are kept apart, and clearing the cache leaves them.",
+  "@cacheSettingsTracksLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheSettingsClear": "clear",
+  "cacheSettingsClearTracks": "Clear tracks",
+  "cacheSettingsCovers": "Covers kept",
+  "cacheSettingsCoversLine": "{count, plural, one {# cover} other {# covers}} in {size}. Covers you saw show again without the network.",
+  "@cacheSettingsCoversLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheSettingsClearCovers": "Clear covers",
+  "cacheSettingsCleared": "Cache cleared",
+  "cacheSettingsCoversCleared": "Covers cleared",
+  "cacheSettingsSize": "Size",
+  "cacheSettingsOff": "Off: MixMusic keeps no tracks.",
+  "cacheSettingsLimit": "{size} at most.",
+  "@cacheSettingsLimit": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheSettingsSizeOff": "Off",
+  "cacheSettingsSizeLabel": "Cache size",
+  "downloadSettingsTitle": "Downloads",
+  "downloadSettingsLine": "{count, plural, one {# track} other {# tracks}} in {size}. They take the quality above, play without the network, and stay until you remove them.",
+  "@downloadSettingsLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadSettingsShow": "show",
+  "downloadSettingsShowLabel": "Show downloads",
+  "downloadSettingsFolder": "Folder",
+  "downloadSettingsProblem": ". {problem}",
+  "@downloadSettingsProblem": {
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadSettingsMoving": "Moving the downloads",
+  "downloadSettingsMovingNow": "moving…",
+  "downloadSettingsOpen": "open",
+  "downloadSettingsOpenLabel": "Open the folder of the downloads",
+  "downloadSettingsChange": "change",
+  "downloadSettingsChangeLabel": "Change the folder of the downloads",
+  "downloadSettingsUseDefault": "use the default",
+  "downloadSettingsMetered": "Download on metered connections",
+  "downloadSettingsMeteredDesc": "Off: downloads wait on a metered connection, such as a phone's hotspot.",
+  "downloadAddedRowTitle": "Download songs added later",
+  "downloadAddedAbout": "When a playlist, an album, a mix or the liked songs you downloaded gain songs, they download too as you open its page. Over a hundred at once, or a gigabyte, wait for you to ask. Off: its page offers them.",
+  "computerSettingsGroup": "Music on this computer",
+  "computerSettingsAbout": "Folders of music files MixMusic plays from your computer: MP3, FLAC, WAV, M4A, Opus and Vorbis. Nothing of them is uploaded.",
+  "computerSettingsFolders": "Folders",
+  "computerSettingsAddFolder": "add a folder",
+  "computerSettingsAddFolderLabel": "Add a folder of music",
+  "computerSettingsRescan": "rescan",
+  "computerSettingsRescanLabel": "Read the folders again",
+  "computerSettingsProblem": "{problem}. Its tracks show greyed until it's back.",
+  "@computerSettingsProblem": {
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "computerSettingsReading": "Reading…",
+  "computerSettingsTracks": "{count, plural, one {# track} other {# tracks}}",
+  "@computerSettingsTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "computerSettingsTracksSkipped": "{count, plural, one {# track} other {# tracks}} · {skipped} skipped, of kinds MixMusic can't play or broken",
+  "@computerSettingsTracksSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "String"
+      }
+    }
+  },
+  "computerSettingsUnread": "{count, plural, one {# folder} other {# folders}} in it can't be read: {count, plural, one {its tracks} other {their tracks}} stay as they were",
+  "@computerSettingsUnread": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "computerSettingsRemove": "remove",
+  "computerSettingsRemoveLabel": "Remove {folder}",
+  "@computerSettingsRemoveLabel": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutVersion": "Version",
+  "aboutDescription": "Spotify and YouTube Music in one player, open source under the MIT license or the GNU GPL, version 3. Your data lives in {dir}.",
+  "@aboutDescription": {
+    "placeholders": {
+      "dir": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutSourceCode": "source code",
+  "aboutContribute": "contribute",
+  "aboutReport": "report a problem",
+  "aboutOpenLogs": "open logs folder",
+  "aboutLicenses": "Licenses",
+  "aboutShow": "show",
+  "aboutHide": "hide",
+  "memoryUse": "Memory use",
+  "memoryRecordTitle": "Record memory use",
+  "memoryRecordAbout": "Writes how MixMusic uses its memory to memory.log in the logs folder, once a minute, and saves a heap profile there once it passes 1 GB, for a report of a problem. They hold only how MixMusic uses its memory, nothing of your music or accounts. It's off again at the next start.",
+  "memoryHeapTitle": "Heap profile",
+  "memoryHeapAbout": "Saves where MixMusic's Go code holds memory now, as heap-<time>.pprof beside memory.log. The newest five are kept.",
+  "memorySaveHeap": "save a heap profile",
+  "memoryOpenLogs": "open logs folder",
+  "memorySaved": "Saved {name} in the logs folder",
+  "@memorySaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteTitle": "Remote control",
+  "remoteSwitch": "Allow remote control",
+  "remoteAbout": "Other computers on this network with MixMusic can find this one, as “{name}”, pair with it by a code it shows, and control what it plays. What they send goes encrypted, between the two alone.",
+  "@remoteAbout": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteFirewallHint": "Windows Firewall keeps the other computers from reaching this one. Windows Firewall, below, tells why, and how to let them in.",
+  "remoteNoPaired": "No computer is paired yet. To control another computer, choose it in the player bar's devices menu, the cast button's.",
+  "remoteCanControl": "Can control this computer",
+  "remoteControlled": "You control it from here",
+  "remoteBothWays": "Can control this computer; You control it from here",
+  "remotePaired": "{about}. Paired {date}.",
+  "@remotePaired": {
+    "placeholders": {
+      "about": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteRemove": "remove",
+  "remoteRemoveLabel": "Remove {name}",
+  "@remoteRemoveLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteRemoved": "Removed {name}",
+  "@remoteRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "firewallTitle": "Windows Firewall",
+  "firewallRow": "Connections from your network",
+  "firewallReading": "Reading whether Windows Firewall lets other computers and cast devices on this network reach MixMusic…",
+  "firewallError": "MixMusic couldn't read Windows Firewall: {detail}.",
+  "@firewallError": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "firewallOff": "Windows Firewall is off for this network, so other computers and cast devices on it reach MixMusic, for remote control and casting.",
+  "firewallLetsIn": "Windows Firewall lets other computers and cast devices on this network reach MixMusic, for remote control and casting.",
+  "firewallManaged": "Windows Firewall keeps other computers and cast devices on this network from reaching MixMusic, and your organization's policy decides what it lets in. Its administrators can let MixMusic in.",
+  "firewallShielded": "Windows Firewall blocks every incoming connection on this network, those of the apps it allows too, so other computers and cast devices can't reach MixMusic. Windows Security turns that off, in Firewall & network protection.",
+  "firewallPublic": "Windows counts this network as public, so Windows Firewall keeps other computers and cast devices on it from reaching MixMusic. If you trust the network, as the one at home, make it private in Windows' network settings.",
+  "firewallBlocked": "Windows Firewall keeps other computers and cast devices on this network from reaching MixMusic, as it does once its question about MixMusic is answered with Cancel. Allow lets them in on private networks, with an administrator's approval.",
+  "firewallAsks": "Windows Firewall doesn't let other computers and cast devices reach MixMusic yet: it asks the first time remote control or casting starts. Allow lets them in on private networks now, with an administrator's approval.",
+  "firewallDefault": "Windows Firewall keeps other computers and cast devices on this network from reaching MixMusic, and doesn't ask about apps. Allow lets them in on private networks, with an administrator's approval.",
+  "firewallAllow": "allow",
+  "firewallAllowing": "allowing…",
+  "firewallAllowLabel": "Allow MixMusic in Windows Firewall",
+  "firewallNetworkSettings": "network settings",
+  "firewallAllowed": "Windows Firewall lets MixMusic in on private networks",
+  "firewallNotChanged": "Windows Firewall wasn't changed: {reason}",
+  "@firewallNotChanged": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsTitle": "AI assistants",
+  "assistantsSwitch": "Let AI assistants control MixMusic",
+  "assistantsAbout": "AI assistants on this computer that speak MCP, the Model Context Protocol, can tell what plays, play, pause, skip, search, and play your playlists. Each thing one does shows here. Nothing on the network can reach it.",
+  "assistantsProblemTitle": "AI assistants can't connect",
+  "assistantsProblem": "{problem}.",
+  "@assistantsProblem": {
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsCommand": "Command",
+  "assistantsCommandNote": ". An assistant starts it, as a server of MCP that runs a command (stdio), to reach MixMusic while it runs.",
+  "assistantsCopy": "copy",
+  "assistantsCopyCommand": "Copy the command",
+  "assistantsConfiguration": "Configuration",
+  "assistantsConfigNote": "For the assistants that keep their servers in a JSON file, as mcpServers. ",
+  "assistantsHowTo": "How to add MixMusic to an assistant",
+  "assistantsCopyConfig": "Copy the configuration",
+  "assistantsNone": "None now. Turning this off ends every session at once.",
+  "assistantsConnected": "{list}. Turning this off ends their sessions at once.",
+  "@assistantsConnected": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsNameSeparator": ", ",
+  "assistantsConnectedTitle": "Connected",
+  "playbackErrorsGroup": "Recent playback errors",
+  "playbackErrorsNone": "No track failed to play since MixMusic started. The last few that do are listed here until MixMusic closes, with what was tried.",
+  "playbackErrorsDetails": "details",
+  "playbackErrorsDetailsOf": "details of {title}",
+  "@playbackErrorsDetailsOf": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "desktopSettingsGroup": "On the desktop",
+  "desktopSettingsTrayTitle": "Close to the tray",
+  "desktopSettingsTrayAbout": "Closing the window keeps the music playing; quit from the tray icon.",
+  "desktopSettingsMediaKeysTitle": "Media keys",
+  "desktopSettingsMediaKeysAbout": "The keyboard's play, next and previous keys control MixMusic. Keys of your own that work everywhere are in Settings › Shortcuts.",
+  "desktopSettingsNotificationsTitle": "Notifications",
+  "desktopSettingsNotificationsAbout": "Tell what starts playing while MixMusic is in the background.",
+  "desktopSettingsTitleTitle": "Show what plays in the window title",
+  "desktopSettingsTitleAbout": "The window's title names the track that plays, for the taskbar, the window switcher and screen readers.",
+  "desktopSettingsDiscordTitle": "Show what plays on Discord",
+  "desktopSettingsDiscordAbout": "While Discord runs, your profile says what you listen to: you choose its lines, cover, time and button.",
+  "desktopSettingsDiscordBefore": "Discord shows the name of MixMusic's application. To show another, create one in the ",
+  "desktopSettingsDiscordPortal": "developer portal",
+  "desktopSettingsDiscordAfter": " and paste its application ID.",
+  "desktopSettingsDiscordAppID": "Discord application ID",
+  "desktopSettingsDiscordPlaceholder": "MixMusic's",
+  "desktopSettingsLogin": "Start at login",
+  "desktopSettingsSettingsFile": "Settings file",
+  "desktopSettingsSettingsFileAbout": "Your settings, as settings.json in your data folder. Save it while MixMusic runs, and they apply at once.",
+  "desktopSettingsOpen": "open",
+  "desktopSettingsShowInFolder": "show in folder",
+  "desktopSettingsReset": "Reset settings",
+  "desktopSettingsResetAbout": "Puts back the settings of a new install; your accounts, library and add-ons stay.",
+  "desktopSettingsResetButton": "reset",
+  "desktopSettingsResetTitle": "reset settings",
+  "desktopSettingsResetConfirm": "Put back every setting as it was on a new install?",
+  "shortcutsCommandPalette": "the command palette",
+  "shortcutsCommandPaletteKeys": "the command palette, {keys},",
+  "@shortcutsCommandPaletteKeys": {
+    "placeholders": {
+      "keys": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutsHint": "Shortcuts of a single key work while you are not typing; {palette} lists every command, those of plugins too.",
+  "@shortcutsHint": {
+    "placeholders": {
+      "palette": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutsResetAll": "reset all",
+  "shortcutsRecording": "press the keys · esc cancels · backspace removes",
+  "shortcutsChange": "change",
+  "shortcutsCancel": "cancel",
+  "shortcutsNone": "none",
+  "shortcutsSet": "set",
+  "shortcutsEditLabel": "{action} the shortcut of {title}",
+  "@shortcutsEditLabel": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutsAnnounce": "Press the keys of the shortcut of {title}. Escape cancels, Backspace removes it.",
+  "@shortcutsAnnounce": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutsReset": "reset",
+  "shortcutsResetLabel": "reset the shortcut of {title}",
+  "@shortcutsResetLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutsDisplaced": "{title} has no shortcut now",
+  "@shortcutsDisplaced": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesGroup": "Updates",
+  "updatesCheckAbout": "At start and every few hours, from the releases on GitHub.{asks}{last}",
+  "@updatesCheckAbout": {
+    "placeholders": {
+      "asks": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesAsks": " A new version asks to install.",
+  "updatesFlathub": " A new version comes from Flathub, through your software center.",
+  "updatesOffers": " A new version offers its download.",
+  "updatesLastChecked": " Last checked {time}.",
+  "@updatesLastChecked": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesCheckTitle": "Check for updates",
+  "updatesInstallTitle": "Install updates without asking",
+  "updatesInstallAbout": "New versions download in the background and run at the next launch.",
+  "updatesInstalledTitle": "MixMusic {version} is installed",
+  "@updatesInstalledTitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesRestartHint": "It runs once MixMusic restarts.",
+  "updatesRestartNow": "restart now",
+  "updatesLooking": "Looking for a newer version…",
+  "updatesCouldntLook": "Couldn't look for a newer version",
+  "updatesOutSince": "Out since {date}.",
+  "@updatesOutSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesOutSinceHow": "Out since {date}. {how}",
+  "@updatesOutSinceHow": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "how": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesOut": "MixMusic {version} is out",
+  "@updatesOut": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesWhatsNew": "what's new",
+  "updatesCheckAgain": "check again",
+  "updatesInstallVersion": "install {version}",
+  "@updatesInstallVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesDownloadingPercent": "downloading {percent}%",
+  "@updatesDownloadingPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "updatesDownloading": "downloading…",
+  "updatesNewest": "This is the newest version",
+  "updatesBuildInstaller": "installed with the setup",
+  "updatesBuildPortable": "portable",
+  "updatesBuildApp": "app",
+  "updatesBuildArchive": "installed with install.sh",
+  "updatesBuildDeb": ".deb package",
+  "updatesBuildRpm": ".rpm package",
+  "updatesBuildPacman": "AUR package",
+  "updatesBuildAppImage": "AppImage",
+  "updatesBuildFlatpak": "Flatpak",
+  "updatesBuildFlathub": "Flathub",
+  "updatesBuildDevelopment": "development build",
+  "updatesDownloadInstaller": "download the installer",
+  "updatesDownloadPortable": "download the portable zip",
+  "updatesDownloadApp": "download the disk image",
+  "updatesDownloadArchive": "download the archive",
+  "updatesDownloadDeb": "download the .deb",
+  "updatesDownloadRpm": "download the .rpm",
+  "updatesDownloadAppImage": "download the AppImage",
+  "updatesDownloadFlatpak": "download the Flatpak",
+  "updatesDownloadAny": "download it",
+  "updatesReplaceDeb": "Open {file} with your software center, or run sudo apt install ./{file}. Your library and settings stay.",
+  "@updatesReplaceDeb": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesReplaceRpm": "Open {file} with your software center, or run sudo dnf install ./{file}. Your library and settings stay.",
+  "@updatesReplaceRpm": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesReplacePacman": "Update it as you update your system, with your AUR helper, such as yay -Syu, or with makepkg -si in its AUR folder. Your library and settings stay.",
+  "updatesReplaceAppImage": "Make {file} executable and use it in place of this AppImage. Your library and settings stay.",
+  "@updatesReplaceAppImage": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesReplaceFlatpak": "Open {file} with your software center, or run flatpak install ./{file}. Your library and settings stay.",
+  "@updatesReplaceFlatpak": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesReplaceFlathub": "Your software center, such as GNOME Software or KDE Discover, installs it from Flathub with your other updates, once Flathub has built it, or run flatpak update. Your library and settings stay.",
+  "updatesReplaceDevelopment": "Development builds don't update themselves.",
+  "updatesReplaceOther": "MixMusic can't write where it is installed, so it can't replace itself: run {file}. Your library and settings stay.",
+  "@updatesReplaceOther": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSignedIn": "Signed in",
+  "accountSettingsSignedInAs": "Signed in as {name}",
+  "@accountSettingsSignedInAs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSignOut": "sign out",
+  "accountSettingsSpotifyDesc": "Search, your library and playback of Spotify.",
+  "accountSettingsSpotifyRefused": "Spotify refused the sign-in",
+  "accountSettingsSpotifySignIn": "Sign in to Spotify",
+  "accountSettingsSpotifyForm": "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium. Add this redirect URI to it. In its settings, under Users Management, add your name and the email of the Spotify account you sign in with. Paste the app's Client ID here, and sign in to Spotify. Log in. Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
+  "accountSettingsSpotifyHint": "Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
+  "accountSettingsSpotifyStep1": "Create an app in the ",
+  "accountSettingsSpotifyDashboard": "Spotify developer dashboard",
+  "accountSettingsSpotifyStep1Tail": ", with the Web API, signed in with a Spotify account that has Premium.",
+  "accountSettingsSpotifyRedirect": "Add this redirect URI to it: ",
+  "accountSettingsCopy": "copy",
+  "accountSettingsCopiedRedirect": "Copied the redirect URI",
+  "accountSettingsSpotifyUsers": "In its settings, under Users Management, add your name and the email of the Spotify account you sign in with.",
+  "accountSettingsSpotifyPaste": "Paste the app's Client ID here, and sign in.",
+  "accountSettingsCharsPlaceholder": "32 letters and digits",
+  "accountSettingsSignInSpotify": "sign in to spotify",
+  "accountSettingsWaitingBrowser": "waiting for the browser…",
+  "accountSettingsFinishSpotify": "Finish signing in in your browser",
+  "accountSettingsSignedInSpotify": "Signed in to Spotify",
+  "accountSettingsSpotifySignOutTitle": "sign out of Spotify",
+  "accountSettingsSpotifySignOutBody": "MixMusic forgets your Spotify sign-in.",
+  "accountSettingsYouTubeSignInTitle": "Sign in to YouTube Music",
+  "accountSettingsYouTubeForm": "Sign in to YouTube Music. Log in. Google account. YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out: your session never goes to yt-dlp. You sign in on Google's own page, in a window of MixMusic: MixMusic never sees your password, and keeps the session encrypted on this computer. YouTube Music does not offer this to apps officially, so it may stop working when YouTube changes.",
+  "accountSettingsYouTubeHint": "YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out: your session never goes to yt-dlp.",
+  "accountSettingsYouTubeSession": "You sign in on Google's own page, in a window of MixMusic: MixMusic never sees your password, and keeps the session encrypted on this computer. YouTube Music does not offer this to apps officially, so it may stop working when YouTube changes.",
+  "accountSettingsYouTubeSignInButton": "sign in to youtube music",
+  "accountSettingsYouTubeWaitingWindow": "waiting for the sign-in window…",
+  "accountSettingsYouTubeSignedIn": "Signed in to YouTube Music",
+  "accountSettingsYouTubeRefused": "YouTube Music refused the sign-in",
+  "accountSettingsYouTubeRefusedAgain": "{error}. Sign out, then sign in again.",
+  "@accountSettingsYouTubeRefusedAgain": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsYouTubeSignedInDesc": "Your home feed, your library, and likes that reach YouTube Music.",
+  "accountSettingsYouTubeSignOutTitle": "sign out of YouTube Music",
+  "accountSettingsYouTubeSignOutBody": "MixMusic forgets your YouTube Music session; your library stays on YouTube Music.",
+  "accountSettingsYouTubeHistoryTitle": "Add what you play to your history",
+  "accountSettingsYouTubeHistoryDesc": "YouTube Music makes its home and its radios of your history. Tracks join it once they played a while, as they do on Last.fm, and episodes keep where you left them, for YouTube Music to go on from there on your other devices.",
+  "accountSettingsYouTubeHistorySwitch": "Add what you play to your YouTube Music history",
+  "accountSettingsYouTubeCookieTitle": "Sign in to YouTube Music with a browser's cookies",
+  "accountSettingsYouTubeCookieForm": "Import from a browser. Sign in with the session of a browser you signed in to YouTube Music with. Browser. Profile. Another profile than the browser's own, by its name or its folder. MixMusic finds those of Zen, Helium and the browsers installed as Flatpaks in their folders. Import. MixMusic reads the browser's cookies with yt-dlp, keeps YouTube's alone, encrypted on this computer, and deletes the rest at once. Close the browser first: while it's open, it may hold its cookies, or not have saved a new sign-in yet. Recent Chrome on Windows seals its cookies against other programs: use Firefox there, or paste a cookie header. Paste a cookie header. In a tab signed in to music.youtube.com, open the developer tools, and copy the Cookie header of a request to music.youtube.com from the Network panel. The text of a cookies.txt file will do too. Sign in with it. Log in. A cookie header is as good as your password: paste it here alone. YouTube may end a session that goes on in the browser; one from a private window you then close lasts longest.",
+  "accountSettingsYouTubeImport": "Sign in with the session of a browser you signed in to YouTube Music with.",
+  "accountSettingsYouTubeProfile": "Another profile than the browser's own, by its name or its folder. MixMusic finds those of Zen, Helium and the browsers installed as Flatpaks in their folders.",
+  "accountSettingsYouTubeImportHint": "MixMusic reads the browser's cookies with yt-dlp, keeps YouTube's alone, encrypted on this computer, and deletes the rest at once. Close the browser first: while it's open, it may hold its cookies, or not have saved a new sign-in yet. Recent Chrome on Windows seals its cookies against other programs: use Firefox there, or paste a cookie header.",
+  "accountSettingsYouTubePaste": "In a tab signed in to music.youtube.com, open the developer tools, and copy the Cookie header of a request to music.youtube.com from the Network panel. The text of a cookies.txt file will do too.",
+  "accountSettingsYouTubePasteHint": "A cookie header is as good as your password: paste it here alone. YouTube may end a session that goes on in the browser; one from a private window you then close lasts longest.",
+  "accountSettingsImportFromBrowser": "Import from a browser",
+  "accountSettingsBrowser": "Browser",
+  "accountSettingsProfile": "Profile",
+  "accountSettingsProfileOwn": "the browser's own",
+  "accountSettingsImport": "import",
+  "accountSettingsImporting": "importing…",
+  "accountSettingsPasteCookie": "Paste a cookie header",
+  "accountSettingsCookieHeader": "Cookie header",
+  "accountSettingsSignInWithIt": "sign in with it",
+  "accountSettingsSigningIn": "signing in…",
+  "accountSettingsYouTubeCookieProblem": "MixMusic didn't sign in to YouTube Music",
+  "accountSettingsChannel": "Channel",
+  "accountSettingsChannelAbout": "Brand channels of your account have their own home feed, library and likes.",
+  "accountSettingsAccountChannel": "Account and channel",
+  "accountSettingsAccountChannelAbout": "Each Google account of the session, and each of their brand channels, has its own home feed, library and likes.",
+  "accountSettingsUnswitchable": "YouTube doesn't let MixMusic switch to this channel",
+  "accountSettingsChannelGone": "The account or channel MixMusic used is no longer one of this session: choose one.",
+  "accountSettingsChannelMany": "Your session reaches more than one account or channel. MixMusic uses the first account: choose another here.",
+  "accountSettingsSwitchNotice": "YouTube doesn't let MixMusic switch to {name}",
+  "@accountSettingsSwitchNotice": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsUsingAs": "Using YouTube Music as {name}",
+  "@accountSettingsUsingAs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsLastfmGone": "Last.fm no longer accepts this connection",
+  "accountSettingsLastfmAgain": "Disconnect, then connect again to go on scrobbling.",
+  "accountSettingsScrobblingAs": "Scrobbling as {name}",
+  "@accountSettingsScrobblingAs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsScrobbleDesc": "What you listen to joins your Last.fm profile: a track counts once half of it played, or four minutes.",
+  "accountSettingsScrobbleSwitch": "Scrobble to Last.fm",
+  "accountSettingsDisconnect": "disconnect",
+  "accountSettingsDisconnectAskTitle": "disconnect Last.fm",
+  "accountSettingsDisconnectAskBody": "MixMusic forgets your Last.fm connection; your scrobbles stay on Last.fm.",
+  "accountSettingsConnectLastfm": "Connect to Last.fm",
+  "accountSettingsLastfmForm": "Create an API account on Last.fm; any name and description will do, and the callback URL can stay empty. Paste its API key and shared secret here, and connect. Approve MixMusic on the page that opens in your browser. Connect to Last.fm. Scrobble, scrobbling. Sign in, log in. MixMusic keeps them in your system's credential store, with the connection.",
+  "accountSettingsLastfmStep1A": "Create an API account on ",
+  "accountSettingsLastfmStep1B": "; any name and description will do, and the callback URL can stay empty.",
+  "accountSettingsLastfmStep2": "Paste its API key and shared secret here, and connect.",
+  "accountSettingsLastfmStep3": "Approve MixMusic on the page that opens in your browser.",
+  "accountSettingsAPIKey": "API key",
+  "accountSettingsSharedSecret": "Shared secret",
+  "accountSettingsConnectButton": "connect to last.fm",
+  "accountSettingsWaitingLastfm": "waiting for Last.fm…",
+  "accountSettingsApproveLastfm": "Approve MixMusic on Last.fm, in your browser",
+  "accountSettingsConnectedLastfm": "Connected to Last.fm",
+  "accountSettingsLastfmHint": "MixMusic keeps them in your system's credential store, with the connection.",
+  "pluginSettingsGroup": "Installed plugins",
+  "pluginSettingsGetPlugins": "get plugins",
+  "pluginSettingsOpenFolder": "open plugins folder",
+  "pluginSettingsReload": "reload",
+  "pluginSettingsNone": "No plugins yet. The marketplace has some, and docs/plugins.md tells how to write one.",
+  "pluginSettingsBy": "by {author}",
+  "@pluginSettingsBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSettingsDescribed": "{description} by {author}",
+  "@pluginSettingsDescribed": {
+    "placeholders": {
+      "description": {
+        "type": "String"
+      },
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSettingsFailed": "{desc} · failed: {failure}",
+  "@pluginSettingsFailed": {
+    "placeholders": {
+      "desc": {
+        "type": "String"
+      },
+      "failure": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSettingsEnable": "Enable {name}",
+  "@pluginSettingsEnable": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSettingsRemoveLabel": "Remove {name}",
+  "@pluginSettingsRemoveLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSettingsRemoveTitle": "remove {name}",
+  "@pluginSettingsRemoveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSettingsRemoveBody": "The plugin and its files are deleted; what it stored stays.",
+  "pluginSettingsRemove": "remove",
+  "pluginSettingsEnableTitle": "enable {name}",
+  "@pluginSettingsEnableTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSettingsEnableBody": "Plugins can control the player, change your library and reach the internet, whatever they ask for. Enable plugins from authors you trust.",
+  "pluginSettingsEnableAsks": "Plugins can control the player, change your library and reach the internet, whatever they ask for. Enable plugins from authors you trust. It asks for: {permissions}.",
+  "@pluginSettingsEnableAsks": {
+    "placeholders": {
+      "permissions": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginSettingsEnableButton": "enable",
+  "keepOnTopMenu": "Keep on Top",
+  "@keepOnTopMenu": {
+    "description": "The item of the Window menu."
+  }
+}

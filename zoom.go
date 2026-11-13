@@ -15,6 +15,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/keypad"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The room the main window needs at 100%, in DIPs of the window: the rail
@@ -69,7 +70,7 @@ func (s *shell) applyZoom(c *ui.Context) {
 	c.SetZoom(float32(s.zoom))
 	if s.zoomToast {
 		s.zoomToast = false
-		c.AddToast(ui.Toast{ID: "zoom", Title: "Zoom " + percent(s.set.Zoom), Description: s.zoomLimit(),
+		c.AddToast(ui.Toast{ID: "zoom", Title: locales.MenuZoomTitle(percent(s.set.Zoom)), Description: s.zoomLimit(),
 			Action: "reset", OnAction: func() { s.setZoom(1) }})
 	}
 }
@@ -80,7 +81,7 @@ func (s *shell) zoomLimit() string {
 	if s.zoom >= s.set.Zoom {
 		return ""
 	}
-	return "This window has room for " + percent(s.zoom) + "."
+	return locales.MenuZoomRoom(percent(s.zoom))
 }
 
 // zoomBy goes a step of the zooms in, when dir is 1, or out, when -1. Out
@@ -168,19 +169,19 @@ func (s *shell) zoomKeys() string {
 	var parts []string
 	switch {
 	case in != "" && out != "":
-		parts = append(parts, in+" and "+out+" change it")
+		parts = append(parts, locales.MenuZoomKeysBoth(in, out))
 	case in != "":
-		parts = append(parts, in+" zooms in")
+		parts = append(parts, locales.MenuZoomKeysIn(in))
 	case out != "":
-		parts = append(parts, out+" zooms out")
+		parts = append(parts, locales.MenuZoomKeysOut(out))
 	}
 	if reset != "" {
-		parts = append(parts, reset+" resets it")
+		parts = append(parts, locales.MenuZoomKeysReset(reset))
 	}
 	if len(parts) == 0 {
 		return ""
 	}
-	return strings.Join(parts, ", ") + "."
+	return strings.Join(parts, locales.MenuZoomKeysSep()) + locales.MenuZoomKeysEnd()
 }
 
 // wordJoiner joins the characters on either side of it into one word,
@@ -197,14 +198,14 @@ func init() { addSettings(colorTypeRows, 30, (*shell).zoomRow) }
 
 // zoomRow is the setting of the zoom, in Settings › Appearance.
 func (s *shell) zoomRow(c *ui.Context) {
-	description := "Makes everything larger or smaller: text, buttons and artwork."
+	description := locales.MenuZoomDescription()
 	if keys := s.zoomKeys(); keys != "" {
 		description += " " + keys
 	}
 	if limit := s.zoomLimit(); limit != "" {
 		description += " " + limit
 	}
-	s.row(c, "Zoom", description, func() {
+	s.row(c, locales.MenuZoomLabel(), description, func() {
 		labels := make([]string, len(settings.ZoomSteps))
 		chosen := ""
 		for i, z := range settings.ZoomSteps {
@@ -213,7 +214,7 @@ func (s *shell) zoomRow(c *ui.Context) {
 				chosen = labels[i]
 			}
 		}
-		if s.selectOf(c.Key("zoom"), &chosen, labels).Width(120).Label("Zoom").Changed() {
+		if s.selectOf(c.Key("zoom"), &chosen, labels).Width(120).Label(locales.MenuZoomLabel()).Changed() {
 			for i, l := range labels {
 				if l == chosen {
 					s.setZoom(settings.ZoomSteps[i])
@@ -234,26 +235,34 @@ func (s *shell) useMenuBar() {
 	if runtime.GOOS != "darwin" {
 		return
 	}
+	s.setMenuBar()
+	// The labels are the language's, so the menu is made again when it changes.
+	mygo.App.OnLocaleChanged(func(string) { s.setMenuBar() })
+}
+
+// setMenuBar sets the menu bar, its labels in the language shown.
+func (s *shell) setMenuBar() {
 	run := func(fn func()) func(*mygo.MenuItem, *mygo.Window) {
 		return func(*mygo.MenuItem, *mygo.Window) { s.update(fn) }
 	}
-	s.zoomIn = &mygo.MenuItem{Label: "Zoom In", Click: run(func() { s.zoomBy(1) })}
+	s.zoomIn = &mygo.MenuItem{Label: locales.MenuZoomIn(), Click: run(func() { s.zoomBy(1) })}
 	mygo.App.SetMenu(mygo.NewMenu([]*mygo.MenuItem{
 		{Role: mygo.RoleAppMenu},
 		{Role: mygo.RoleFileMenu},
 		{Role: mygo.RoleEditMenu},
-		{Label: "View", Submenu: []*mygo.MenuItem{
-			{Label: "Refresh This Page", Click: run(s.refreshPage)},
+		{Label: locales.MenuView(), Submenu: []*mygo.MenuItem{
+			{Label: locales.MenuRefreshPage(), Click: run(s.refreshPage)},
 			{Role: mygo.RoleToggleDevTools},
 			mygo.Separator(),
-			{Label: "Actual Size", Click: run(func() { s.setZoom(1) })},
+			{Label: locales.MenuActualSize(), Click: run(func() { s.setZoom(1) })},
 			s.zoomIn,
-			{Label: "Zoom Out", Click: run(func() { s.zoomBy(-1) })},
+			{Label: locales.MenuZoomOut(), Click: run(func() { s.zoomBy(-1) })},
 			mygo.Separator(),
 			{Role: mygo.RoleToggleFullScreen},
 		}},
 		s.windowMenu(),
 	}))
+	s.zoomInAccelerator = ""
 	s.zoomInKey()
 }
 

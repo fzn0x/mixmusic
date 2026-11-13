@@ -328,7 +328,7 @@ func TestOutputDeviceSetting(t *testing.T) {
 	tt := testerOf(t, s, 1280, 3200)
 	show(s, tt, "/settings/playback")
 	settleOutput(t, s, tt)
-	if !tt.HasText("Output device") || !tt.HasText(outputDescription) {
+	if !tt.HasText("Output device") || !tt.HasText(outputDescription()) {
 		t.Fatalf("no output device row: %q", tt.Texts())
 	}
 	click(t, s, tt, "System default · Speakers")

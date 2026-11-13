@@ -27,6 +27,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	// The tests read the English the views are written in, whatever the
+	// languages of the computer that runs them.
+	os.Setenv("MYGO_LOCALE", "en")
 	isDark = func() bool { return true }
 	setAppearance = func(mygo.ThemeSource) {}
 	copyText = func(string) {}

@@ -10,6 +10,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // syncMemo is the tracks of a page that its collection's download took
@@ -77,13 +78,12 @@ func init() { addSettings(downloadRows, 10, (*shell).downloadAddedRow) }
 // downloadAddedRow chooses whether the tracks added to the collections
 // downloaded download on their own, in Settings › Playback › Downloads.
 func (s *shell) downloadAddedRow(c *ui.Context) {
-	s.row(c, "Download songs added later", downloadAddedAbout, func() {
-		if s.switchOf(c.Key("download-added"), &s.set.DownloadAdded).Label("Download songs added later").Changed() {
+	s.row(c, locales.DownloadAddedRowTitle(), downloadAddedAbout(), func() {
+		if s.switchOf(c.Key("download-added"), &s.set.DownloadAdded).Label(locales.DownloadAddedRowTitle()).Changed() {
 			s.save()
 		}
 	}, "sync", "new", "automatically")
 }
 
 // downloadAddedAbout is what the row of Download songs added later says.
-const downloadAddedAbout = "When a playlist, an album, a mix or the liked songs you downloaded gain songs, they download too as you open its page. " +
-	"Over a hundred at once, or a gigabyte, wait for you to ask. Off: its page offers them."
+func downloadAddedAbout() string { return locales.DownloadAddedAbout() }

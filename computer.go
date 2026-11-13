@@ -17,6 +17,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // computerViews are the sections of Library › On this computer.
@@ -194,17 +195,17 @@ func init() { addSettings("playback", 85, (*shell).computerSettings) }
 func (s *shell) computerSettings(c *ui.Context) {
 	k := &s.lk
 	st := s.svc.LocalFiles.Status()
-	s.group(c, "Music on this computer", func() {
-		about := "Folders of music files MixMusic plays from your computer: MP3, FLAC, WAV, M4A, Opus and Vorbis. Nothing of them is uploaded."
+	s.group(c, locales.ComputerSettingsGroup(), func() {
+		about := locales.ComputerSettingsAbout()
 		if st.Scanning {
 			about = scanLine(st)
 		}
-		s.row(c, "Folders", about, func() {
-			if s.button(c, "computer-folder-add", "add a folder", false).Label("Add a folder of music").Clicked() {
+		s.row(c, locales.ComputerSettingsFolders(), about, func() {
+			if s.button(c, "computer-folder-add", locales.ComputerSettingsAddFolder(), false).Label(locales.ComputerSettingsAddFolderLabel()).Clicked() {
 				s.addMusicFolder()
 			}
-			if len(s.set.MusicFolders) > 0 && s.button(c, "computer-rescan", "rescan", false).Disabled(st.Scanning).
-				Label("Read the folders again").Clicked() {
+			if len(s.set.MusicFolders) > 0 && s.button(c, "computer-rescan", locales.ComputerSettingsRescan(), false).Disabled(st.Scanning).
+				Label(locales.ComputerSettingsRescanLabel()).Clicked() {
 				s.svc.LocalFiles.Rescan()
 			}
 		}, "local", "files", "library", "music", "mp3", "flac")
@@ -213,13 +214,13 @@ func (s *shell) computerSettings(c *ui.Context) {
 			s.rowWith(c, folder, func() {
 				switch {
 				case f.Problem != "":
-					ui.Text(c, f.Problem+". Its tracks show greyed until it's back.").TextColor(k.danger)
+					ui.Text(c, locales.ComputerSettingsProblem(f.Problem)).TextColor(k.danger)
 				case st.Scanning && f.Tracks == 0:
-					ui.Text(c, "Reading…")
+					ui.Text(c, locales.ComputerSettingsReading())
 				default:
-					line := plural(f.Tracks, "track")
+					line := locales.ComputerSettingsTracks(f.Tracks)
 					if f.Skipped > 0 {
-						line += fmt.Sprintf(" · %d skipped, of kinds MixMusic can't play or broken", f.Skipped)
+						line = locales.ComputerSettingsTracksSkipped(f.Tracks, count(f.Skipped))
 					}
 					ui.Text(c, line)
 					if len(f.Unread) > 0 {
@@ -227,7 +228,7 @@ func (s *shell) computerSettings(c *ui.Context) {
 					}
 				}
 			}, func() {
-				if s.button(c, "computer-folder-remove-"+count(i), "remove", false).Label("Remove " + folder).Clicked() {
+				if s.button(c, "computer-folder-remove-"+count(i), locales.ComputerSettingsRemove(), false).Label(locales.ComputerSettingsRemoveLabel(folder)).Clicked() {
 					s.removeMusicFolder(folder)
 				}
 			}, folder)
@@ -238,12 +239,7 @@ func (s *shell) computerSettings(c *ui.Context) {
 
 // unreadLine tells of the n folders in a folder of music that the last
 // scan couldn't read, whose tracks the library keeps as they were.
-func unreadLine(n int) string {
-	if n == 1 {
-		return "1 folder in it can't be read: its tracks stay as they were"
-	}
-	return plural(n, "folder") + " in it can't be read: their tracks stay as they were"
-}
+func unreadLine(n int) string { return locales.ComputerSettingsUnread(n) }
 
 // folderStatus is what the last scan found of folder.
 func folderStatus(st localfiles.Status, folder string) localfiles.Folder {

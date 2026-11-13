@@ -9,10 +9,32 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // settingsTabs are the settings' sections, by their paths' last part.
 var settingsTabs = []string{"appearance", "playback", "accounts", "plugins", "desktop", "shortcuts", "about"}
+
+// settingsTabName names a section of settingsTabs, in the language shown.
+func settingsTabName(tab string) string {
+	switch tab {
+	case "appearance":
+		return locales.SettingsTabAppearance()
+	case "playback":
+		return locales.SettingsTabPlayback()
+	case "accounts":
+		return locales.SettingsTabAccounts()
+	case "plugins":
+		return locales.SettingsTabPlugins()
+	case "desktop":
+		return locales.SettingsTabDesktop()
+	case "shortcuts":
+		return locales.SettingsTabShortcuts()
+	case "about":
+		return locales.SettingsTabAbout()
+	}
+	return tab
+}
 
 // settingsPage shows the settings, by section, or, searched for q, what
 // every section holds of it.
@@ -36,7 +58,11 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 			pick = -1
 		}
 		before := pick
-		s.pageHeader(c, "Settings", settingsTabs, &pick)
+		names := make([]string, len(settingsTabs))
+		for i, t := range settingsTabs {
+			names[i] = settingsTabName(t)
+		}
+		s.pageHeader(c, locales.SettingsTitle(), names, &pick)
 		if pick != before {
 			s.router.Replace(settingsPath(settingsTabs[pick], ""))
 		}
@@ -56,7 +82,7 @@ func (s *shell) settingsPage(c *ui.Context, tab, q string) {
 			}
 			f.section = ""
 			if f.found == 0 {
-				s.emptyLine(c, "No setting matches “"+strings.TrimSpace(q)+"”.")
+				s.emptyLine(c, locales.SettingsNoMatch(strings.TrimSpace(q)))
 			}
 		})
 		if current {
@@ -239,7 +265,7 @@ func (s *shell) problems(c *ui.Context, kind addons.Kind) {
 	}
 	for _, p := range s.inv.Problems {
 		if p.Kind == kind {
-			text := "The " + what + " in “" + p.Folder + "” did not load: " + p.Error
+			text := locales.SettingsAddonProblem(what, p.Folder, p.Error)
 			s.found(c, "", text, func() {
 				ui.Text(c, text).FontSize(s.lk.smallSize()).TextColor(s.lk.danger).Padding(8, 0)
 			})

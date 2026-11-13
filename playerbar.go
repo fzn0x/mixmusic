@@ -9,6 +9,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // playerBar shows what plays, the transport and where it is in the track,
@@ -50,7 +51,7 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 	k := &s.lk
 	cur, ok := s.st.Current()
 	if !ok {
-		ui.Text(c, k.words("Pick something to play")).FontSize(k.smallSize()).TextColor(k.muted)
+		ui.Text(c, k.words(locales.PlayerPickSomething())).FontSize(k.smallSize()).TextColor(k.muted)
 		return
 	}
 	t := cur.Track
@@ -59,7 +60,7 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 	if k.player < 80 {
 		size = k.player - 16
 	}
-	art := s.buttonBase(c.Key("player-art")).Size(size, size).Shrink(0).Label("Open now playing").Cursor(ui.CursorPointer)
+	art := s.buttonBase(c.Key("player-art")).Size(size, size).Shrink(0).Label(locales.PlayerOpenNowPlaying()).Cursor(ui.CursorPointer)
 	art.ContextMenu(func(m *ui.Menu) { s.trackMenu(m, t) })
 	if art.Clicked() {
 		s.navigate("/now-playing")
@@ -81,23 +82,23 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 			if src := s.st.Source; src != nil {
 				switch {
 				case src.Mode == player.ModeStream && src.Track.ID != t.ID:
-					line += " · via YouTube Music"
+					line = locales.PlayerViaYouTube(line)
 				case src.Mode == player.ModeConnect:
-					line += " · on Spotify"
+					line = locales.PlayerOnSpotify(line)
 				}
 			}
 			// While MixMusic plays it at another speed than its own.
 			if sp := s.st.Speed; sp > 0 && sp != 1 && s.st.Source != nil {
-				line += " · " + speedLabel(sp)
+				line = locales.PlayerSpeed(line, speedLabel(sp))
 			}
 			if s.st.Waiting {
-				line += " · waiting for the network"
+				line = locales.PlayerWaiting(line)
 			}
 			ui.Text(c, line).FontSize(k.smallSize()).TextColor(k.muted).SingleLine().MinWidth(0)
 		})
 		if next, ok := s.st.UpNext(); ok && next.Track.ID != t.ID && s.panel != "queue" {
 			if w, _ := c.Size(); w >= 1100 {
-				ui.Text(c, "next · "+next.Track.Title+" - "+names(next.Track.Artists)).FontSize(k.captionSize()).
+				ui.Text(c, locales.PlayerUpNextLine(next.Track.Title, names(next.Track.Artists))).FontSize(k.captionSize()).
 					TextColor(k.muted).SingleLine()
 			}
 		}
@@ -111,9 +112,9 @@ func (s *shell) nowPlayingInfo(c *ui.Context) {
 // likeButton likes a track, or no longer.
 func (s *shell) likeButton(c *ui.Context, key string, t media.Track, size float32) {
 	on := s.a.IsLiked(t.ID)
-	label := "Like"
+	label := locales.PlayerLike()
 	if on {
-		label = "Remove from liked songs"
+		label = locales.PlayerUnlike()
 	}
 	if s.ratingButton(c, key, "heart", label, on, size) {
 		s.setLiked(t, !on)
@@ -123,9 +124,9 @@ func (s *shell) likeButton(c *ui.Context, key string, t media.Track, size float3
 // dislikeButton dislikes a track, or no longer.
 func (s *shell) dislikeButton(c *ui.Context, key string, t media.Track, size float32) {
 	on := s.a.IsDisliked(t.ID)
-	label := "Dislike"
+	label := locales.PlayerDislike()
 	if on {
-		label = "Remove the dislike"
+		label = locales.PlayerUndislike()
 	}
 	if s.ratingButton(c, key, "dislike", label, on, size) {
 		s.setDisliked(t, !on)
@@ -208,7 +209,7 @@ func (s *shell) setDisliked(t media.Track, on bool) {
 		playing := s.st.Playing || s.st.Loading || s.st.Waiting && s.st.WillPlay
 		back = func() { s.p.Return(uid, at, playing) }
 	}
-	s.actionToasts = append(s.actionToasts, actionToast{"Disliked " + t.Title, "undo", func() {
+	s.actionToasts = append(s.actionToasts, actionToast{locales.PlayerDisliked(t.Title), locales.PlayerUndo(), func() {
 		s.p.Disliked(t.ID, false)
 		if liked {
 			s.setLiked(t, true)
@@ -223,10 +224,10 @@ func (s *shell) transport(c *ui.Context) {
 	k := &s.lk
 	_, hasTrack := s.st.Current()
 	ui.Row(c).Gap(12).Children(func() {
-		if s.iconButton(c, "shuffle", "shuffle", "Shuffle", s.st.Shuffle, 18).Clicked() {
+		if s.iconButton(c, "shuffle", "shuffle", locales.PlayerShuffle(), s.st.Shuffle, 18).Clicked() {
 			s.p.ToggleShuffle()
 		}
-		if s.roundButton(c, "previous", "previous", "Previous", false, false).Clicked() {
+		if s.roundButton(c, "previous", "previous", locales.PlayerPrevious(), false, false).Clicked() {
 			s.p.Previous()
 		}
 		name, label := toggleOf(s.st)
@@ -237,15 +238,15 @@ func (s *shell) transport(c *ui.Context) {
 		if main.Clicked() {
 			s.p.Toggle()
 		}
-		if s.roundButton(c, "next", "next", "Next", false, false).Clicked() {
+		if s.roundButton(c, "next", "next", locales.PlayerNext(), false, false).Clicked() {
 			s.p.Next()
 		}
-		rep, label := "repeat", "Repeat: off"
+		rep, label := "repeat", locales.PlayerRepeatOff()
 		switch s.st.Repeat {
 		case player.RepeatAll:
-			label = "Repeat: all"
+			label = locales.PlayerRepeatAll()
 		case player.RepeatOne:
-			rep, label = "repeatOne", "Repeat: one"
+			rep, label = "repeatOne", locales.PlayerRepeatOne()
 		}
 		if s.iconButton(c, "repeat", rep, label, s.st.Repeat != player.RepeatOff, 18).Clicked() {
 			s.p.CycleRepeat()
@@ -260,15 +261,15 @@ func (s *shell) transport(c *ui.Context) {
 func toggleOf(st player.State) (name, label string) {
 	switch {
 	case st.Waiting && st.WillPlay:
-		return "pause", "Pause, waiting for the network"
+		return "pause", locales.PlayerPauseWaiting()
 	case st.Waiting:
-		return "play", "Play once the network is back"
+		return "play", locales.PlayerPlayWaiting()
 	case st.Loading:
-		return "play", "Loading"
+		return "play", locales.PlayerLoading()
 	case st.Playing:
-		return "pause", "Pause"
+		return "pause", locales.PlayerPause()
 	}
-	return "play", "Play"
+	return "play", locales.PlayerPlay()
 }
 
 // pulses reports whether the play button pulses: while the track buffers,
@@ -283,9 +284,9 @@ func (s *shell) progress(c *ui.Context) {
 	if s.st.Live {
 		s.seeking = false
 		ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
-			ui.Text(c, k.sentence("live")).FontSize(k.captionSize()).TextColor(k.accent).Width(44).TextAlign(ui.End)
+			ui.Text(c, k.sentence(locales.PlayerLive())).FontSize(k.captionSize()).TextColor(k.accent).Width(44).TextAlign(ui.End)
 			edge := 1.0
-			ui.Slider(c.Key("seek"), &edge, 0, 1).Grow(1).MinWidth(0).Label("Live: no seeking").Disabled(true)
+			ui.Slider(c.Key("seek"), &edge, 0, 1).Grow(1).MinWidth(0).Label(locales.PlayerNoSeeking()).Disabled(true)
 			ui.Box(c).Width(44)
 		})
 		return
@@ -302,7 +303,7 @@ func (s *shell) progress(c *ui.Context) {
 		ui.Text(c, clock(time.Duration(s.seekTo*float64(time.Second)))).FontSize(k.captionSize()).TextColor(k.muted).
 			FontFeatures("tnum").Width(44).TextAlign(ui.End)
 		seek := s.seekSlider(c, &s.seekTo, max(dur.Seconds(), 1)).Grow(1).MinWidth(0).KeepFocus().
-			Label("Seek").Disabled(!ok || s.st.Loading)
+			Label(locales.PlayerSeek()).Disabled(!ok || s.st.Loading)
 		_, _, held := seek.Dragged()
 		if ok && !held && (s.seeking || seek.Changed()) {
 			s.p.Seek(time.Duration(s.seekTo * float64(time.Second)))
@@ -320,7 +321,7 @@ func (s *shell) playerSide(c *ui.Context) {
 	if s.iconButton(c, "lyrics", s.lyricsIcon(), s.lyricsTitle(), s.panel == "lyrics", 18).Clicked() {
 		s.togglePanel("lyrics")
 	}
-	if s.iconButton(c, "queue", "queue", "Queue", s.panel == "queue", 18).Clicked() {
+	if s.iconButton(c, "queue", "queue", locales.PlayerQueue(), s.panel == "queue", 18).Clicked() {
 		s.togglePanel("queue")
 	}
 	s.castButton(c)
@@ -330,7 +331,7 @@ func (s *shell) playerSide(c *ui.Context) {
 	s.speedButton(c)
 	s.outputButton(c, room)
 	s.volumeControl(c)
-	if s.iconButton(c, "mini", "mini", "Open the mini player", false, 18).Clicked() {
+	if s.iconButton(c, "mini", "mini", locales.PlayerMiniPlayer(), false, 18).Clicked() {
 		s.showMini()
 	}
 }
@@ -349,9 +350,9 @@ func hasSurround(st player.State) bool {
 func (s *shell) surroundButton(c *ui.Context) {
 	k := &s.lk
 	on := s.set.Surround
-	label := "5.1 surround: off"
+	label := locales.PlayerSurroundOff()
 	if on {
-		label = "5.1 surround: on"
+		label = locales.PlayerSurroundOn()
 	}
 	b := s.buttonBase(c.Key("surround")).Height(32).PaddingX(6).Radius(k.round(32)).Label(label).Tooltip(label).
 		Cursor(ui.CursorPointer)
@@ -407,7 +408,7 @@ func (s *shell) volumeControl(c *ui.Context) {
 			s.p.ToggleMute()
 		}
 		s.volume = v
-		if ui.Slider(c.Key("volume"), &s.volume, 0, 1).Grow(1).MinWidth(0).KeepFocus().Label("Volume").Changed() {
+		if ui.Slider(c.Key("volume"), &s.volume, 0, 1).Grow(1).MinWidth(0).KeepFocus().Label(locales.PlayerVolume()).Changed() {
 			s.p.SetVolume(s.volume)
 		}
 	})
@@ -416,25 +417,25 @@ func (s *shell) volumeControl(c *ui.Context) {
 // devicesButton chooses the Spotify Connect device that plays Spotify
 // tracks.
 func (s *shell) devicesButton(c *ui.Context) {
-	b := s.iconButton(c, "devices", "devices", "Spotify Connect devices", false, 18)
+	b := s.iconButton(c, "devices", "devices", locales.PlayerDevices(), false, 18)
 	b.Menu(func(m *ui.Menu) {
 		chosen := s.set.SpotifyDevice
 		devices := fetch(s, "devices", s.svc.Player.Devices)
-		if m.Item("The active device").Checked(chosen == "").Chosen() {
+		if m.Item(locales.PlayerDeviceDefault()).Checked(chosen == "").Chosen() {
 			s.setDevice("")
 		}
 		switch {
 		case !devices.done:
-			m.Item("Looking for devices…").Disabled(true)
+			m.Item(locales.PlayerLooking()).Disabled(true)
 		case devices.err != nil:
 			m.Item(devices.err.Error()).Disabled(true)
 		case len(devices.value) == 0:
-			m.Item("Open Spotify on a device to see it here").Disabled(true)
+			m.Item(locales.PlayerNoDevices()).Disabled(true)
 		}
 		for _, d := range devices.value {
 			label := d.Name
 			if d.Active {
-				label += " · active"
+				label = locales.PlayerDeviceActive(label)
 			}
 			if m.Item(label).Checked(chosen == d.ID).Disabled(d.Restricted).Chosen() {
 				s.setDevice(d.ID)

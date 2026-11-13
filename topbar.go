@@ -8,6 +8,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // topBar holds the history arrows, the refresh button and the search box,
@@ -23,17 +24,17 @@ func (s *shell) topBar(c *ui.Context) {
 	}
 	row.Children(func() {
 		ui.Row(c).Gap(4).Children(func() {
-			if s.iconButton(c, "back", "back", "Back", false, 18).Disabled(!s.router.CanGoBack()).Clicked() {
+			if s.iconButton(c, "back", "back", locales.TopbarBack(), false, 18).Disabled(!s.router.CanGoBack()).Clicked() {
 				s.router.Back()
 			}
-			if s.iconButton(c, "forward", "forward", "Forward", false, 18).Disabled(!s.router.CanGoForward()).Clicked() {
+			if s.iconButton(c, "forward", "forward", locales.TopbarForward(), false, 18).Disabled(!s.router.CanGoForward()).Clicked() {
 				s.router.Forward()
 			}
 			s.refreshButton(c)
 		})
 		s.searchField(c)
 		s.topBarHead(c)
-		palette := s.buttonBase(c.Key("palette")).Height(32).PaddingX(8).Radius(k.round(32)).Label("Open the command palette").Cursor(ui.CursorPointer)
+		palette := s.buttonBase(c.Key("palette")).Height(32).PaddingX(8).Radius(k.round(32)).Label(locales.TopbarPalette()).Cursor(ui.CursorPointer)
 		ink := k.muted
 		if palette.Hovered() {
 			palette.Background(k.hover)
@@ -95,8 +96,8 @@ func (s *shell) searchField(c *ui.Context) {
 			cb.SetOpen(*show)
 			s.showSuggestions = nil
 		}
-		in := cb.Input.Placeholder(k.words("Search Spotify and YouTube Music")).Grow(1).MinWidth(0).Bind(&s.searchBox).
-			Label("Search").FontSize(k.bodySize())
+		in := cb.Input.Placeholder(k.words(locales.TopbarSearchPlaceholder())).Grow(1).MinWidth(0).Bind(&s.searchBox).
+			Label(locales.TopbarSearch()).FontSize(k.bodySize())
 		if in.Changed() {
 			s.queryAt = c.Now()
 		}
@@ -219,7 +220,7 @@ func suggestedOf(items []media.Item, value string) (media.Item, bool) {
 func (s *shell) suggestedItem(c *ui.Context, cb ui.ComboboxParts, it media.Item) {
 	k := &s.lk
 	key := suggestedKey(it)
-	title, line, art := s.suggestedLine(it)
+	title, _, line, art := s.suggestedLine(it)
 	item := cb.Item(key).Height(48).PaddingX(8).Gap(12).AlignItems(ui.Center).Radius(k.radiusSm).Cursor(ui.CursorPointer).
 		Label(title + ", " + line)
 	ink, mark := k.text, k.muted
@@ -236,48 +237,75 @@ func (s *shell) suggestedItem(c *ui.Context, cb ui.ComboboxParts, it media.Item)
 	})
 }
 
-// suggestedLine is the title of an item the box suggests, what it is and
+// suggestedLine is the title of an item the box suggests, its kind, as
+// suggestedKind names it in English, what it is in the language shown and
 // by whom, as "Song · Daft Punk", and its artwork.
-func (s *shell) suggestedLine(it media.Item) (title, line string, art []media.Image) {
+func (s *shell) suggestedLine(it media.Item) (title, kind, line string, art []media.Image) {
 	k := &s.lk
-	kind, by := "", ""
+	by := ""
 	switch {
 	case it.Track != nil:
 		t := it.Track
 		title, art, by = t.Title, t.Artwork, names(t.Artists)
 		switch {
 		case t.IsEpisode():
-			kind = "Episode"
+			kind = "episode"
 		case t.Video:
-			kind = "Video"
+			kind = "video"
 		default:
-			kind = "Song"
+			kind = "song"
 		}
 	case it.Album != nil:
 		a := it.Album
 		title, art, by = a.Title, a.Artwork, names(a.Artists)
 		switch a.Kind {
 		case media.AlbumKindSingle:
-			kind = "Single"
+			kind = "single"
 		case media.AlbumKindEP:
-			kind = "EP"
+			kind = "ep"
 		default:
-			kind = "Album"
+			kind = "album"
 		}
 	case it.Artist != nil:
-		title, art, kind = it.Artist.Name, it.Artist.Artwork, "Artist"
+		title, art, kind = it.Artist.Name, it.Artist.Artwork, "artist"
 	case it.Playlist != nil:
 		p := it.Playlist
-		title, art, kind, by = p.Title, p.Artwork, "Playlist", p.Owner
+		title, art, kind, by = p.Title, p.Artwork, "playlist", p.Owner
 	case it.Podcast != nil:
 		p := it.Podcast
-		title, art, kind, by = p.Title, p.Artwork, "Podcast", names(p.Authors)
+		title, art, kind, by = p.Title, p.Artwork, "podcast", names(p.Authors)
 	}
-	line = k.words(kind)
+	line = k.words(suggestedKindName(kind))
 	if by != "" {
 		line += " · " + by
 	}
-	return title, line, art
+	return title, kind, line, art
+}
+
+// suggestedKindName names a kind of item the box suggests, as suggestedLine
+// writes it, in the language shown.
+func suggestedKindName(kind string) string {
+	switch kind {
+	case "song":
+		return locales.TopbarKindSong()
+	case "video":
+		return locales.TopbarKindVideo()
+	case "episode":
+		return locales.TopbarKindEpisode()
+	case "single":
+		return locales.TopbarKindSingle()
+	case "ep":
+		return locales.TopbarKindEP()
+	case "album":
+		return locales.TopbarKindAlbum()
+	case "artist":
+		return locales.TopbarKindArtist()
+	case "playlist":
+		return locales.TopbarKindPlaylist()
+	case "podcast":
+		return locales.TopbarKindPodcast()
+	}
+	return ""
 }
 
 // typeSearch has the search box hold text as typed, with the focus and
@@ -293,8 +321,8 @@ func (s *shell) typeSearch(text string) {
 // capture mode.
 func (s *shell) chooseSuggested(kind string) {
 	for _, it := range s.suggested.Items {
-		_, line, _ := s.suggestedLine(it)
-		if strings.HasPrefix(strings.ToLower(line), kind) {
+		_, k, _, _ := s.suggestedLine(it)
+		if k == kind {
 			show := false
 			s.showSuggestions = &show
 			s.openSuggested(it)

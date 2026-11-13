@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 func init() { addSettings("accounts", 10, (*shell).accountSettings) }
@@ -23,83 +25,49 @@ func (s *shell) accountSettings(c *ui.Context) {
 	s.lastfmAccount(c, st.Lastfm)
 }
 
-// The hints of the sign-ins, and what the search of the settings finds
-// their forms by: their steps, fields, buttons and hints. Each form shows
-// whole, or not at all.
-const (
-	spotifyHint = "Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps."
-	spotifyForm = "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium. " +
-		"Add this redirect URI to it. In its settings, under Users Management, add your name and the email of the Spotify account you sign in with. " +
-		"Paste the app's Client ID here, and sign in to Spotify. Log in. " + spotifyHint
-
-	youtubeHint    = "YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out: your session never goes to yt-dlp."
-	youtubeSession = "You sign in on Google's own page, in a window of MixMusic: MixMusic never sees your password, and keeps the session encrypted on this computer. YouTube Music does not offer this to apps officially, so it may stop working when YouTube changes."
-	youtubeForm    = "Sign in to YouTube Music. Log in. Google account. " + youtubeHint + " " + youtubeSession
-
-	youtubeImport       = "Sign in with the session of a browser you signed in to YouTube Music with."
-	youtubeProfile      = "Another profile than the browser's own, by its name or its folder. MixMusic finds those of Zen, Helium and the browsers installed as Flatpaks in their folders."
-	youtubeImportHint   = "MixMusic reads the browser's cookies with yt-dlp, keeps YouTube's alone, encrypted on this computer, and deletes the rest at once. Close the browser first: while it's open, it may hold its cookies, or not have saved a new sign-in yet. Recent Chrome on Windows seals its cookies against other programs: use Firefox there, or paste a cookie header."
-	youtubePaste        = "In a tab signed in to music.youtube.com, open the developer tools, and copy the Cookie header of a request to music.youtube.com from the Network panel. The text of a cookies.txt file will do too."
-	youtubePasteHint    = "A cookie header is as good as your password: paste it here alone. YouTube may end a session that goes on in the browser; one from a private window you then close lasts longest."
-	youtubeCookieTitle  = "Sign in to YouTube Music with a browser's cookies"
-	youtubeCookieForm   = "Import from a browser. " + youtubeImport + " Browser. Profile. " + youtubeProfile + " Import. " + youtubeImportHint + " Paste a cookie header. " + youtubePaste + " Sign in with it. Log in. " + youtubePasteHint
-	youtubeChannelTitle = "Channel"
-	youtubeChannelAbout = "Brand channels of your account have their own home feed, library and likes."
-	youtubeAccountTitle = "Account and channel"
-	youtubeAccountAbout = "Each Google account of the session, and each of their brand channels, has its own home feed, library and likes."
-	// youtubeUnswitchable follows a brand channel YouTube lists without its
-	// page ID, which can't be chosen.
-	youtubeUnswitchable = "YouTube doesn't let MixMusic switch to this channel"
-
-	lastfmHint = "MixMusic keeps them in your system's credential store, with the connection."
-	lastfmForm = "Create an API account on Last.fm; any name and description will do, and the callback URL can stay empty. " +
-		"Paste its API key and shared secret here, and connect. Approve MixMusic on the page that opens in your browser. " +
-		"Connect to Last.fm. Scrobble, scrobbling. Sign in, log in. " + lastfmHint
-)
-
 func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 	s.group(c, "Spotify", func() {
 		if sp.SignedIn && sp.Error == "" {
-			who := "Signed in"
+			who := locales.AccountSettingsSignedIn()
 			if sp.Profile != nil {
-				who = "Signed in as " + sp.Profile.Name
+				who = locales.AccountSettingsSignedInAs(sp.Profile.Name)
 			}
-			s.row(c, who, "Search, your library and playback of Spotify.", func() {
-				if s.button(c, "spotify-out", "sign out", false).Clicked() {
+			s.row(c, who, locales.AccountSettingsSpotifyDesc(), func() {
+				if s.button(c, "spotify-out", locales.AccountSettingsSignOut(), false).Clicked() {
 					s.signOutOfSpotify()
 				}
 			}, "sign out, log out")
 			return
 		}
 		if sp.Error != "" {
-			s.found(c, "Spotify refused the sign-in", sp.Error, func() {
-				s.alert(c, "Spotify refused the sign-in", sp.Error, nil).Margin(12, 0)
+			s.found(c, locales.AccountSettingsSpotifyRefused(), sp.Error, func() {
+				s.alert(c, locales.AccountSettingsSpotifyRefused(), sp.Error, nil).Margin(12, 0)
 			})
 		}
 		// The form shows whole, as its button needs its field.
-		s.found(c, "Sign in to Spotify", spotifyForm, func() {
+		s.found(c, locales.AccountSettingsSpotifySignIn(), locales.AccountSettingsSpotifyForm(), func() {
 			if sp.RedirectURI == "" {
 				sp.RedirectURI = s.svc.System.Info().RedirectURI
 			}
 			s.steps(c,
 				func() {
-					ui.Text(c, "Create an app in the ")
-					s.linkOf(c, "Spotify developer dashboard", "https://developer.spotify.com/dashboard")
-					ui.Text(c, ", with the Web API, signed in with a Spotify account that has Premium.")
+					ui.Text(c, locales.AccountSettingsSpotifyStep1())
+					s.linkOf(c, locales.AccountSettingsSpotifyDashboard(), "https://developer.spotify.com/dashboard")
+					ui.Text(c, locales.AccountSettingsSpotifyStep1Tail())
 				},
 				func() {
-					ui.Text(c, "Add this redirect URI to it: ")
+					ui.Text(c, locales.AccountSettingsSpotifyRedirect())
 					ui.Text(c, sp.RedirectURI).Font(monospace())
 					ui.Text(c, " ")
-					if s.linkOf(c, "copy", "").Clicked() {
+					if s.linkOf(c, locales.AccountSettingsCopy(), "").Clicked() {
 						c.WriteClipboard(sp.RedirectURI)
-						s.notes = append(s.notes, notice("Copied the redirect URI"))
+						s.notes = append(s.notes, notice(locales.AccountSettingsCopiedRedirect()))
 					}
 				},
 				func() {
-					ui.Text(c, "In its settings, under Users Management, add your name and the email of the Spotify account you sign in with.")
+					ui.Text(c, locales.AccountSettingsSpotifyUsers())
 				},
-				func() { ui.Text(c, "Paste the app's Client ID here, and sign in.") },
+				func() { ui.Text(c, locales.AccountSettingsSpotifyPaste()) },
 			)
 			var clientID *draft
 			s.row(c, "Client ID", "", func() {
@@ -108,12 +76,12 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 					s.set.SpotifyClientID = id
 					s.save()
 				})
-				in.Placeholder("32 letters and digits").Width(260).Label("Client ID")
+				in.Placeholder(locales.AccountSettingsCharsPlaceholder()).Width(260).Label("Client ID")
 			})
 			busy := s.signingIn == "spotify"
-			label := "sign in to spotify"
+			label := locales.AccountSettingsSignInSpotify()
 			if busy {
-				label = "waiting for the browser…"
+				label = locales.AccountSettingsWaitingBrowser()
 			}
 			ui.Row(c).Gap(8).Padding(12, 0).Children(func() {
 				// The Client ID's draft, which its row's control made, unless
@@ -130,26 +98,26 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 						s.set.SpotifyClientID = id
 						s.save()
 					}
-					s.notes = append(s.notes, notice("Finish signing in in your browser"))
-					s.account("spotify", "Signed in to Spotify", func(ctx context.Context) error {
+					s.notes = append(s.notes, notice(locales.AccountSettingsFinishSpotify()))
+					s.account("spotify", locales.AccountSettingsSignedInSpotify(), func(ctx context.Context) error {
 						_, err := s.svc.Accounts.SpotifyLogin(ctx)
 						return err
 					})
 				}
 				// A sign-in Spotify refused stays until the user drops it: every
 				// request of Spotify fails meanwhile.
-				if sp.SignedIn && s.button(c, "spotify-out", "sign out", false).Disabled(busy).Clicked() {
+				if sp.SignedIn && s.button(c, "spotify-out", locales.AccountSettingsSignOut(), false).Disabled(busy).Clicked() {
 					s.signOutOfSpotify()
 				}
 			})
-			s.hint(c, spotifyHint)
+			s.hint(c, locales.AccountSettingsSpotifyHint())
 		})
 	})
 }
 
 // signOutOfSpotify asks, then has MixMusic forget the Spotify sign-in.
 func (s *shell) signOutOfSpotify() {
-	s.ask("sign out of Spotify", "MixMusic forgets your Spotify sign-in.", "sign out", func() {
+	s.ask(locales.AccountSettingsSpotifySignOutTitle(), locales.AccountSettingsSpotifySignOutBody(), locales.AccountSettingsSignOut(), func() {
 		s.account("", "", func(context.Context) error { return s.svc.Accounts.SpotifyLogout() })
 	})
 }
@@ -159,46 +127,46 @@ func (s *shell) youtubeAccount(c *ui.Context, yt app.YouTubeAccount) {
 		if !yt.SignedIn {
 			// One sign-in at a time, of the three ways.
 			busy := strings.HasPrefix(s.signingIn, "youtube")
-			s.found(c, "Sign in to YouTube Music", youtubeForm, func() {
-				s.hint(c, youtubeHint)
-				label := "sign in to youtube music"
+			s.found(c, locales.AccountSettingsYouTubeSignInTitle(), locales.AccountSettingsYouTubeForm(), func() {
+				s.hint(c, locales.AccountSettingsYouTubeHint())
+				label := locales.AccountSettingsYouTubeSignInButton()
 				if s.signingIn == "youtube" {
-					label = "waiting for the sign-in window…"
+					label = locales.AccountSettingsYouTubeWaitingWindow()
 				}
 				if s.button(c, "youtube-in", label, true).Disabled(busy).Clicked() {
 					s.youtubeCookies.problem, s.youtubePick = "", false
-					s.account("youtube", "Signed in to YouTube Music", func(ctx context.Context) error {
+					s.account("youtube", locales.AccountSettingsYouTubeSignedIn(), func(ctx context.Context) error {
 						_, err := s.svc.Accounts.YouTubeLogin(ctx)
 						return err
 					})
 				}
-				s.hint(c, youtubeSession)
+				s.hint(c, locales.AccountSettingsYouTubeSession())
 			})
 			s.youtubeBrowserSignIn(c, busy)
 			s.youtubeCookieSignIn(c, busy)
 			return
 		}
 		if yt.Error != "" {
-			again := yt.Error + ". Sign out, then sign in again."
-			s.found(c, "YouTube Music refused the sign-in", again, func() {
-				s.alert(c, "YouTube Music refused the sign-in", again, nil).Margin(12, 0)
+			again := locales.AccountSettingsYouTubeRefusedAgain(yt.Error)
+			s.found(c, locales.AccountSettingsYouTubeRefused(), again, func() {
+				s.alert(c, locales.AccountSettingsYouTubeRefused(), again, nil).Margin(12, 0)
 			})
 		}
-		who := "Signed in"
+		who := locales.AccountSettingsSignedIn()
 		if yt.Account != nil {
-			who = "Signed in as " + yt.Account.Name
+			who = locales.AccountSettingsSignedInAs(yt.Account.Name)
 		}
-		s.row(c, who, "Your home feed, your library, and likes that reach YouTube Music.", func() {
-			if s.button(c, "youtube-out", "sign out", false).Clicked() {
-				s.ask("sign out of YouTube Music", "MixMusic forgets your YouTube Music session; your library stays on YouTube Music.", "sign out", func() {
+		s.row(c, who, locales.AccountSettingsYouTubeSignedInDesc(), func() {
+			if s.button(c, "youtube-out", locales.AccountSettingsSignOut(), false).Clicked() {
+				s.ask(locales.AccountSettingsYouTubeSignOutTitle(), locales.AccountSettingsYouTubeSignOutBody(), locales.AccountSettingsSignOut(), func() {
 					s.youtubePick = false
 					s.account("", "", func(ctx context.Context) error { return s.svc.Accounts.YouTubeLogout(ctx) })
 				})
 			}
 		}, "sign out, log out")
 		s.youtubeChannels(c)
-		s.row(c, "Add what you play to your history", "YouTube Music makes its home and its radios of your history. Tracks join it once they played a while, as they do on Last.fm, and episodes keep where you left them, for YouTube Music to go on from there on your other devices.", func() {
-			if s.switchOf(c.Key("youtube-history"), &s.set.YouTubeHistory).Label("Add what you play to your YouTube Music history").Changed() {
+		s.row(c, locales.AccountSettingsYouTubeHistoryTitle(), locales.AccountSettingsYouTubeHistoryDesc(), func() {
+			if s.switchOf(c.Key("youtube-history"), &s.set.YouTubeHistory).Label(locales.AccountSettingsYouTubeHistorySwitch()).Changed() {
 				s.save()
 			}
 		})
@@ -220,24 +188,24 @@ func (s *shell) youtubeCookieSignIn(c *ui.Context, busy bool) {
 		yc.browser = yc.names[0]
 		yc.words = strings.Join(yc.names, " ")
 	}
-	if !s.findable(youtubeCookieTitle, youtubeCookieForm, yc.words, yc.problem) {
+	if !s.findable(locales.AccountSettingsYouTubeCookieTitle(), locales.AccountSettingsYouTubeCookieForm(), yc.words, yc.problem) {
 		return
 	}
 	s.show(c, func() {
 		if yc.problem != "" {
-			s.alert(c, "MixMusic didn't sign in to YouTube Music", yc.problem, nil).Margin(12, 0)
+			s.alert(c, locales.AccountSettingsYouTubeCookieProblem(), yc.problem, nil).Margin(12, 0)
 		}
-		s.row(c, "Import from a browser", youtubeImport, func() {
+		s.row(c, locales.AccountSettingsImportFromBrowser(), locales.AccountSettingsYouTubeImport(), func() {
 			// Wide enough for "Chromium (Flatpak)".
-			s.selectOf(c.Key("youtube-browser"), &yc.browser, yc.names).Width(200).Label("Browser")
+			s.selectOf(c.Key("youtube-browser"), &yc.browser, yc.names).Width(200).Label(locales.AccountSettingsBrowser())
 		})
-		s.row(c, "Profile", youtubeProfile, func() {
-			ui.TextInput(c.Key("youtube-profile"), &yc.profile).Placeholder(k.sentence("the browser's own")).Width(260).Label("Profile")
+		s.row(c, locales.AccountSettingsProfile(), locales.AccountSettingsYouTubeProfile(), func() {
+			ui.TextInput(c.Key("youtube-profile"), &yc.profile).Placeholder(k.sentence(locales.AccountSettingsProfileOwn())).Width(260).Label(locales.AccountSettingsProfile())
 		})
 		ui.Row(c).Padding(12, 0).Children(func() {
-			label := "import"
+			label := locales.AccountSettingsImport()
 			if s.signingIn == "youtube-import" {
-				label = "importing…"
+				label = locales.AccountSettingsImporting()
 			}
 			if s.button(c, "youtube-import", label, false).Disabled(busy).Clicked() {
 				browser, profile := "", yc.profile
@@ -250,15 +218,15 @@ func (s *shell) youtubeCookieSignIn(c *ui.Context, busy bool) {
 				})
 			}
 		})
-		s.hint(c, youtubeImportHint)
+		s.hint(c, locales.AccountSettingsYouTubeImportHint())
 		ui.Column(c).Gap(8).Padding(14, 0).Children(func() {
-			ui.Text(c, "Paste a cookie header").FontSize(k.bodySize())
-			ui.Text(c, youtubePaste).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(720)
-			ui.TextArea(c.Key("youtube-cookies"), &yc.pasted).Placeholder("SAPISID=…; SID=…").Height(88).MaxWidth(720).Label("Cookie header").
+			ui.Text(c, locales.AccountSettingsPasteCookie()).FontSize(k.bodySize())
+			ui.Text(c, locales.AccountSettingsYouTubePaste()).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(720)
+			ui.TextArea(c.Key("youtube-cookies"), &yc.pasted).Placeholder("SAPISID=…; SID=…").Height(88).MaxWidth(720).Label(locales.AccountSettingsCookieHeader()).
 				HandleInput(s.scrollsInside)
-			label := "sign in with it"
+			label := locales.AccountSettingsSignInWithIt()
 			if s.signingIn == "youtube-paste" {
-				label = "signing in…"
+				label = locales.AccountSettingsSigningIn()
 			}
 			if s.button(c, "youtube-paste", label, false).Disabled(busy || strings.TrimSpace(yc.pasted) == "").Clicked() {
 				pasted := yc.pasted
@@ -269,7 +237,7 @@ func (s *shell) youtubeCookieSignIn(c *ui.Context, busy bool) {
 				})
 			}
 		})
-		s.hint(c, youtubePasteHint)
+		s.hint(c, locales.AccountSettingsYouTubePasteHint())
 	})
 }
 
@@ -298,7 +266,7 @@ func (s *shell) youtubeSignIn(kind string, do func(ctx context.Context) error) {
 				return
 			}
 			s.youtubePick = true
-			s.notes = append(s.notes, notice("Signed in to YouTube Music"))
+			s.notes = append(s.notes, notice(locales.AccountSettingsYouTubeSignedIn()))
 			clear(s.loads)
 		})
 	}()
@@ -310,7 +278,10 @@ func (s *shell) youtubeSignIn(kind string, do func(ctx context.Context) error) {
 func (s *shell) youtubeChannels(c *ui.Context) {
 	// The search of the settings finds the row by what it says, whichever
 	// it says, without asking YouTube for the session's channels.
-	const words = youtubeChannelTitle + " " + youtubeChannelAbout + " " + youtubeAccountTitle + " " + youtubeAccountAbout
+	words := strings.Join([]string{
+		locales.AccountSettingsChannel(), locales.AccountSettingsChannelAbout(),
+		locales.AccountSettingsAccountChannel(), locales.AccountSettingsAccountChannelAbout(),
+	}, " ")
 	if _, asked := s.loads["channels"]; !asked && !s.findable("", "", words) {
 		return
 	}
@@ -331,21 +302,21 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 			labels[i] += " · " + ch.Email
 		}
 		if ch.Unswitchable {
-			labels[i] += " · " + youtubeUnswitchable
+			labels[i] += " · " + locales.AccountSettingsUnswitchable()
 		}
 		if i == current {
 			chosen = labels[i]
 		}
 	}
-	title, about := youtubeChannelTitle, youtubeChannelAbout
+	title, about := locales.AccountSettingsChannel(), locales.AccountSettingsChannelAbout()
 	if accounts {
-		title, about = youtubeAccountTitle, youtubeAccountAbout
+		title, about = locales.AccountSettingsAccountChannel(), locales.AccountSettingsAccountChannelAbout()
 	}
 	switch {
 	case current < 0:
-		about = "The account or channel MixMusic used is no longer one of this session: choose one."
+		about = locales.AccountSettingsChannelGone()
 	case s.youtubePick:
-		about = "Your session reaches more than one account or channel. MixMusic uses the first account: choose another here."
+		about = locales.AccountSettingsChannelMany()
 	}
 	s.row(c, title, about, func() {
 		if s.selectOf(c.Key("channel"), &chosen, labels).Width(260).Label(title).Changed() {
@@ -353,13 +324,13 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 			case i < 0:
 			case list[i].Unswitchable:
 				// It stays listed, and the one used stays chosen.
-				s.notes = append(s.notes, noticeOf(fmt.Errorf("YouTube doesn't let MixMusic switch to %s", list[i].Name)))
+				s.notes = append(s.notes, noticeOf(errors.New(locales.AccountSettingsSwitchNotice(list[i].Name))))
 			default:
 				ch := list[i]
 				s.youtubePick = false
 				// The notice names the channel once switched, unless YouTube
 				// Music answered as the account itself, which the app tells.
-				s.account("", "Using YouTube Music as "+ch.Name, func(ctx context.Context) error {
+				s.account("", locales.AccountSettingsUsingAs(ch.Name), func(ctx context.Context) error {
 					_, err := s.svc.Accounts.SetYouTubeChannel(ctx, ch)
 					return err
 				})
@@ -372,18 +343,18 @@ func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
 	s.group(c, "Last.fm", func() {
 		if lf.Connected {
 			if lf.Expired {
-				const title, again = "Last.fm no longer accepts this connection", "Disconnect, then connect again to go on scrobbling."
+				title, again := locales.AccountSettingsLastfmGone(), locales.AccountSettingsLastfmAgain()
 				s.found(c, title, again, func() { s.alert(c, title, again, nil).Margin(12, 0) })
 			}
-			s.row(c, "Scrobbling as "+lf.Name, "What you listen to joins your Last.fm profile: a track counts once half of it played, or four minutes.", func() {
-				if s.switchOf(c.Key("scrobbling"), &s.set.Scrobbling).Label("Scrobble to Last.fm").Changed() {
+			s.row(c, locales.AccountSettingsScrobblingAs(lf.Name), locales.AccountSettingsScrobbleDesc(), func() {
+				if s.switchOf(c.Key("scrobbling"), &s.set.Scrobbling).Label(locales.AccountSettingsScrobbleSwitch()).Changed() {
 					s.save()
 				}
 			})
-			s.found(c, "disconnect", "sign out log out of Last.fm", func() {
+			s.found(c, locales.AccountSettingsDisconnect(), "sign out log out of Last.fm", func() {
 				ui.Row(c).Padding(12, 0).Children(func() {
-					if s.button(c, "lastfm-out", "disconnect", false).Clicked() {
-						s.ask("disconnect Last.fm", "MixMusic forgets your Last.fm connection; your scrobbles stay on Last.fm.", "disconnect", func() {
+					if s.button(c, "lastfm-out", locales.AccountSettingsDisconnect(), false).Clicked() {
+						s.ask(locales.AccountSettingsDisconnectAskTitle(), locales.AccountSettingsDisconnectAskBody(), locales.AccountSettingsDisconnect(), func() {
 							s.account("", "", func(ctx context.Context) error { return s.svc.Accounts.LastfmLogout(ctx) })
 						})
 					}
@@ -392,38 +363,38 @@ func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
 			return
 		}
 		// The form shows whole, as its button needs its fields.
-		s.found(c, "Connect to Last.fm", lastfmForm, func() {
+		s.found(c, locales.AccountSettingsConnectLastfm(), locales.AccountSettingsLastfmForm(), func() {
 			s.steps(c,
 				func() {
-					ui.Text(c, "Create an API account on ")
+					ui.Text(c, locales.AccountSettingsLastfmStep1A())
 					s.linkOf(c, "Last.fm", "https://www.last.fm/api/account/create")
-					ui.Text(c, "; any name and description will do, and the callback URL can stay empty.")
+					ui.Text(c, locales.AccountSettingsLastfmStep1B())
 				},
-				func() { ui.Text(c, "Paste its API key and shared secret here, and connect.") },
-				func() { ui.Text(c, "Approve MixMusic on the page that opens in your browser.") },
+				func() { ui.Text(c, locales.AccountSettingsLastfmStep2()) },
+				func() { ui.Text(c, locales.AccountSettingsLastfmStep3()) },
 			)
-			s.row(c, "API key", "", func() {
-				ui.TextInput(c.Key("lastfm-key"), &s.lastfmKey).Placeholder("32 letters and digits").Width(260).Label("API key")
+			s.row(c, locales.AccountSettingsAPIKey(), "", func() {
+				ui.TextInput(c.Key("lastfm-key"), &s.lastfmKey).Placeholder(locales.AccountSettingsCharsPlaceholder()).Width(260).Label(locales.AccountSettingsAPIKey())
 			})
-			s.row(c, "Shared secret", "", func() {
-				ui.TextInput(c.Key("lastfm-secret"), &s.lastfmSecret).Password().Placeholder("32 letters and digits").Width(260).Label("Shared secret")
+			s.row(c, locales.AccountSettingsSharedSecret(), "", func() {
+				ui.TextInput(c.Key("lastfm-secret"), &s.lastfmSecret).Password().Placeholder(locales.AccountSettingsCharsPlaceholder()).Width(260).Label(locales.AccountSettingsSharedSecret())
 			})
 			busy := s.signingIn == "lastfm"
-			label := "connect to last.fm"
+			label := locales.AccountSettingsConnectButton()
 			if busy {
-				label = "waiting for Last.fm…"
+				label = locales.AccountSettingsWaitingLastfm()
 			}
 			ui.Row(c).Padding(12, 0).Children(func() {
 				key, secret := strings.TrimSpace(s.lastfmKey), strings.TrimSpace(s.lastfmSecret)
 				if s.button(c, "lastfm-in", label, true).Disabled(busy || key == "" || secret == "").Clicked() {
-					s.notes = append(s.notes, notice("Approve MixMusic on Last.fm, in your browser"))
-					s.account("lastfm", "Connected to Last.fm", func(ctx context.Context) error {
+					s.notes = append(s.notes, notice(locales.AccountSettingsApproveLastfm()))
+					s.account("lastfm", locales.AccountSettingsConnectedLastfm(), func(ctx context.Context) error {
 						_, err := s.svc.Accounts.LastfmLogin(ctx, key, secret)
 						return err
 					})
 				}
 			})
-			s.hint(c, lastfmHint)
+			s.hint(c, locales.AccountSettingsLastfmHint())
 		})
 	})
 }

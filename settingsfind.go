@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // settingsFind is the search of the settings: what the user typed, and,
@@ -96,7 +98,7 @@ func (f *settingsFind) holds(title, text, more string) bool {
 	k := findKey{f.q, f.section, f.group, title, text, more}
 	m, ok := f.seen[k]
 	if !ok {
-		m = allIn(f.cur, searchFold(k.section+" "+k.group+" "+title+" "+text+" "+more))
+		m = allIn(f.cur, searchFold(k.section+" "+settingsTabName(k.section)+" "+k.group+" "+title+" "+text+" "+more))
 		f.seen[k] = m
 	}
 	return m
@@ -183,8 +185,9 @@ func (s *shell) findHead(c *ui.Context) {
 	s.sectionHead(c, group, func() {
 		// Screen readers hear the group in the link's name, as the
 		// groups of a section show a link each.
-		in := s.linkOf(c.Key("find-in-"+section), "show in "+section, "").FontSize(s.lk.smallSize()).
-			Label("Show " + s.lk.words(group) + " in " + section)
+		name := settingsTabName(section)
+		in := s.linkOf(c.Key("find-in-"+section), locales.SettingsShowIn(name), "").FontSize(s.lk.smallSize()).
+			Label(locales.SettingsShowGroupIn(s.lk.words(group), name))
 		if in.Clicked() {
 			f.reveal = group
 			s.navigate(settingsPath(section, ""))
@@ -252,7 +255,7 @@ func (s *shell) findBox(c *ui.Context, tab, q string, current bool) {
 		if focus {
 			f.focus = false
 		}
-		in := s.filterBox(c, "settings-find", "search the settings", "Search the settings", query, focus, func() {
+		in := s.filterBox(c, "settings-find", locales.SettingsSearchPlaceholder(), locales.SettingsSearchLabel(), query, focus, func() {
 			f.query, f.route = "", ""
 			s.router.Replace(settingsPath(tab, ""))
 		})
@@ -300,8 +303,8 @@ func (s *shell) findTell(c *ui.Context) {
 	switch {
 	case !f.on():
 	case f.found == 0:
-		c.Announce("No setting matches " + q)
+		c.Announce(locales.SettingsNoMatchSpoken(q))
 	default:
-		c.Announce(plural(f.found, "match", "matches"))
+		c.Announce(locales.SettingsMatches(f.found))
 	}
 }

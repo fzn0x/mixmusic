@@ -320,8 +320,6 @@ type shell struct {
 	cardLooks  map[string]*look
 	cardThemes []addons.Theme
 	cardLayout settings.Layout
-	// lowLayoutChoices are the layout designs' choices in Tiles' words.
-	lowLayoutChoices []choice
 	// find is the search of the settings.
 	find settingsFind
 

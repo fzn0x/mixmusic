@@ -11,6 +11,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/firewall"
 	"github.com/fzn0x/mixmusic/internal/remote/remotetest"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // fakeFirewall is a firewall whose state a test sets, which Allow lets
@@ -59,7 +60,7 @@ func firewallShell(t *testing.T, f *fakeFirewall) (*shell, *ui.Tester) {
 // firewallShows waits until the firewall's row tells about.
 func firewallShows(t *testing.T, s *shell, tt *ui.Tester, about string) {
 	t.Helper()
-	until(t, s, tt, "the firewall's row tells "+about, func() bool { return tt.HasText(firewallTitle) && tt.HasText(about) })
+	until(t, s, tt, "the firewall's row tells "+about, func() bool { return tt.HasText(locales.FirewallTitle()) && tt.HasText(about) })
 }
 
 // reread has the settings read the firewall again at the next frame.
@@ -139,7 +140,7 @@ func TestFirewallStates(t *testing.T) {
 	}
 	// The search of the settings finds it.
 	show(s, tt, "/settings?q=firewall")
-	until(t, s, tt, "the search", func() bool { return tt.HasText(firewallRow) })
+	until(t, s, tt, "the search", func() bool { return tt.HasText(locales.FirewallRow()) })
 }
 
 // TestFirewallNone shows no Windows Firewall where MixMusic doesn't read
@@ -148,7 +149,7 @@ func TestFirewallNone(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 2400)
 	show(s, tt, "/settings/desktop")
-	if tt.HasText(firewallTitle) || tt.HasText(firewallRow) {
+	if tt.HasText(locales.FirewallTitle()) || tt.HasText(locales.FirewallRow()) {
 		t.Errorf("Settings › Desktop shows the firewall: %q", tt.Texts())
 	}
 }
@@ -166,7 +167,7 @@ func TestRemoteFirewallHint(t *testing.T) {
 	if tt.HasText(hint) {
 		t.Error("the hint shows while remote control is off")
 	}
-	toggle(t, s, tt, remoteSwitch, remoteAbout("Desktop"))
+	toggle(t, s, tt, locales.RemoteSwitch(), locales.RemoteAbout("Desktop"))
 	until(t, s, tt, "the hint", func() bool { return s.a.Remote().On() && tt.HasText(hint) })
 	f.set(firewall.State{On: true, Allowed: true, Asks: true})
 	reread(s)

@@ -10,6 +10,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/discord"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // What the Discord status shows is chosen under Show what plays on Discord
@@ -32,9 +33,9 @@ func (s *shell) discordStatusRows(c *ui.Context) {
 		return
 	}
 	shown := s.discordLook()
-	s.found(c, "Preview", discordPreviewWords, func() { s.discordPreview(c, shown) })
-	s.discordLineRow(c, discordFirstLineKey, "First line", &s.set.DiscordFirstLine, settings.DefaultDiscordFirstLine)
-	s.discordLineRow(c, discordSecondLineKey, "Second line", &s.set.DiscordSecondLine, settings.DefaultDiscordSecondLine)
+	s.found(c, locales.DiscordPreview(), discordPreviewWords, func() { s.discordPreview(c, shown) })
+	s.discordLineRow(c, discordFirstLineKey, locales.DiscordFirstLine(), &s.set.DiscordFirstLine, settings.DefaultDiscordFirstLine)
+	s.discordLineRow(c, discordSecondLineKey, locales.DiscordSecondLine(), &s.set.DiscordSecondLine, settings.DefaultDiscordSecondLine)
 	toggle := func(key, title, label, description string, v *bool) {
 		s.row(c, title, description, func() {
 			if s.switchOf(c.Key(key), v).Label(label).Changed() {
@@ -42,11 +43,11 @@ func (s *shell) discordStatusRows(c *ui.Context) {
 			}
 		}, "discord status rich presence")
 	}
-	toggle("discord-cover", "Cover", "Show the cover on Discord", "Discord shows the cover of what plays, where its service has one online: a file on your computer shows none.", &s.set.DiscordCover)
-	toggle("discord-badge", "Service badge", "Show the service's badge on Discord", "A small mark of YouTube Music, Spotify or a file on your computer, at the cover's corner, or in its place.", &s.set.DiscordServiceBadge)
-	toggle("discord-time", "Time left", "Show the time left on Discord", "How long the track has played, and how long it has left.", &s.set.DiscordTimeLeft)
-	toggle("discord-listen", "Listen button", "Show a Listen button on Discord", "A button that opens the track on YouTube Music or Spotify, which the others who see your profile can click. A file on your computer has none.", &s.set.DiscordListenButton)
-	toggle("discord-paused", "Keep while paused", "Keep the Discord status while paused", "A paused track stays, marked as paused, without its time. Off, pausing clears the status.", &s.set.DiscordKeepWhilePaused)
+	toggle("discord-cover", locales.DiscordCover(), locales.DiscordCoverLabel(), locales.DiscordCoverDescription(), &s.set.DiscordCover)
+	toggle("discord-badge", locales.DiscordServiceBadge(), locales.DiscordServiceBadgeLabel(), locales.DiscordServiceBadgeDescription(), &s.set.DiscordServiceBadge)
+	toggle("discord-time", locales.DiscordTimeLeft(), locales.DiscordTimeLeftLabel(), locales.DiscordTimeLeftDescription(), &s.set.DiscordTimeLeft)
+	toggle("discord-listen", locales.DiscordListenButton(), locales.DiscordListenButtonLabel(), locales.DiscordListenButtonDescription(), &s.set.DiscordListenButton)
+	toggle("discord-paused", locales.DiscordKeepWhilePaused(), locales.DiscordKeepWhilePausedLabel(), locales.DiscordKeepWhilePausedDescription(), &s.set.DiscordKeepWhilePaused)
 	// The preview came before the lines: what was typed since shows in
 	// the next frame.
 	if typed := s.discordLook(); typed.DiscordFirstLine != shown.DiscordFirstLine || typed.DiscordSecondLine != shown.DiscordSecondLine {
@@ -79,20 +80,17 @@ func (s *shell) discordLineRow(c *ui.Context, key, title string, line *string, d
 		text = dr.text
 	}
 	describe := func() {
-		ui.Text(c, "Placeholders: ")
+		names := make([]string, len(app.DiscordPlaceholders))
 		for i, name := range app.DiscordPlaceholders {
-			if i > 0 {
-				ui.Text(c, ", ")
-			}
-			ui.Text(c, "{"+name+"}").TextColor(k.text)
+			names[i] = "{" + name + "}"
 		}
-		ui.Text(c, ". Empty, the line shows nothing.")
+		ui.Text(c, locales.DiscordPlaceholders(strings.Join(names, ", ")))
 		if unknown := app.UnknownDiscordPlaceholders(text); len(unknown) > 0 {
-			ui.Text(c, " "+discordUnknownNote(unknown)).TextColor(k.danger)
+			ui.Text(c, discordUnknownNote(unknown)).TextColor(k.danger)
 		}
 	}
 	s.rowWith(c, title, describe, func() {
-		if *line != def && s.link(c, key+"-reset", "reset") {
+		if *line != def && s.link(c, key+"-reset", locales.DiscordLineReset()) {
 			*line = def
 			delete(s.drafts, key)
 			s.save()
@@ -101,7 +99,7 @@ func (s *shell) discordLineRow(c *ui.Context, key, title string, line *string, d
 			*line = v
 			s.save()
 		})
-		in.Placeholder("nothing").Width(260).MaxLength(settings.DiscordLineMax).Label(title + " on Discord")
+		in.Placeholder(locales.DiscordLinePlaceholder()).Width(260).MaxLength(settings.DiscordLineMax).Label(locales.DiscordLineLabel(title))
 	}, "discord status rich presence template placeholders title artist album service")
 }
 
@@ -111,15 +109,14 @@ func discordUnknownNote(names []string) string {
 	for i, n := range names {
 		braced[i] = "{" + n + "}"
 	}
-	if len(braced) == 1 {
-		return braced[0] + " isn't a placeholder, and shows as typed."
-	}
-	return strings.Join(braced, ", ") + " aren't placeholders, and show as typed."
+	return locales.DiscordUnknownNote(len(braced), strings.Join(braced, ", "))
 }
 
 // discordSample is the track the preview shows while nothing plays.
-var discordSample = media.Track{ID: "yt:sample", Source: media.SourceYouTube, Title: "Song title",
-	Artists: []media.Ref{{Name: "Artist"}}, Album: &media.Ref{Name: "Album"}, DurationMs: 214000}
+func discordSample() media.Track {
+	return media.Track{ID: "yt:sample", Source: media.SourceYouTube, Title: locales.DiscordSampleTitle(),
+		Artists: []media.Ref{{Name: locales.DiscordSampleArtist()}}, Album: &media.Ref{Name: locales.DiscordSampleAlbum()}, DurationMs: 214000}
+}
 
 // discordPreview shows what Discord shows of what plays, as d chooses, as
 // a card of Discord's: the application's name, the cover with its badge,
@@ -132,7 +129,7 @@ func (s *shell) discordPreview(c *ui.Context, d settings.Desktop) {
 	now := time.Now()
 	a := app.DiscordActivity(d, np, now)
 	if a == nil {
-		note = "While paused, your profile shows nothing: this shows once the track plays again."
+		note = locales.DiscordPreviewPausedNote()
 		np.Playing = true
 		a = app.DiscordActivity(d, np, now)
 	}
@@ -141,14 +138,14 @@ func (s *shell) discordPreview(c *ui.Context, d settings.Desktop) {
 	}
 	name := "MixMusic"
 	if d.DiscordAppID != "" {
-		name = "your application"
+		name = locales.DiscordYourApplication()
 	}
 	ui.Column(c).Gap(10).Padding(16, 0).Children(func() {
-		ui.Text(c, "Preview").FontSize(k.bodySize())
+		ui.Text(c, locales.DiscordPreview()).FontSize(k.bodySize())
 		card := ui.Column(c.Key("discord-preview")).Gap(12).Padding(16).Width(360).MaxWidth(360).Shrink(1).
-			Background(k.surface2).Radius(k.radius).Label("Preview of the Discord status")
+			Background(k.surface2).Radius(k.radius).Label(locales.DiscordPreviewCardLabel())
 		card.Children(func() {
-			ui.Text(c, "Listening to "+name).FontSize(k.captionSize()).FontWeight(600).TextColor(k.muted)
+			ui.Text(c, locales.DiscordListeningTo(name)).FontSize(k.captionSize()).FontWeight(600).TextColor(k.muted)
 			ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
 				if a.LargeImage != "" {
 					s.discordPicture(c, a)
@@ -181,9 +178,9 @@ func (s *shell) discordPreview(c *ui.Context, d settings.Desktop) {
 func (s *shell) discordNowPlaying() (app.NowPlaying, string) {
 	cur, ok := s.st.Current()
 	if !ok {
-		t := discordSample
+		t := discordSample()
 		return app.NowPlaying{Track: &t, Playing: true, PositionMs: 72000},
-			"Nothing plays: this is how a song would show."
+			locales.DiscordNothingPlays()
 	}
 	t := cur.Track
 	return app.NowPlaying{Track: &t, Playing: s.st.Playing, Loading: s.st.Loading,
@@ -273,7 +270,7 @@ func (s *shell) discordTimes(c *ui.Context, a *discord.Activity, now time.Time) 
 	}
 	played := now.Sub(a.Start)
 	if a.End.IsZero() {
-		ui.Text(c, clock(played)+" elapsed").FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
+		ui.Text(c, locales.DiscordElapsed(clock(played))).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
 		return
 	}
 	length := a.End.Sub(a.Start)
@@ -283,7 +280,7 @@ func (s *shell) discordTimes(c *ui.Context, a *discord.Activity, now time.Time) 
 	}
 	ui.Row(c).Gap(8).AlignItems(ui.Center).Margin(4, 0, 0).Children(func() {
 		ui.Text(c, clock(played)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
-		ui.Box(c).Grow(1).Height(4).Label("Time played").Draw(func(p *ui.Painter, r ui.Rect) {
+		ui.Box(c).Grow(1).Height(4).Label(locales.DiscordTimeBarLabel()).Draw(func(p *ui.Painter, r ui.Rect) {
 			p.Fill(r, k.border, r.H/2)
 			p.Fill(ui.Rect{X: r.X, Y: r.Y, W: r.W * f, H: r.H}, k.text, r.H/2)
 		})

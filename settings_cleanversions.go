@@ -1,6 +1,10 @@
 package main
 
-import "github.com/egoist/mygo/ui"
+import (
+	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
+)
 
 func init() { addSettings("playback", 45, (*shell).explicitContentSettings) }
 
@@ -12,7 +16,7 @@ const explicitRows = "playback › Explicit content"
 // an album that comes explicit and clean shows, and whether explicit
 // content shows at all.
 func (s *shell) explicitContentSettings(c *ui.Context) {
-	s.group(c, "Explicit content", func() { s.settingsOf(c, explicitRows) })
+	s.group(c, locales.CleanVersionsGroup(), func() { s.settingsOf(c, explicitRows) })
 }
 
 func init() { addSettings(explicitRows, 10, (*shell).cleanVersionsRow) }
@@ -21,13 +25,13 @@ func init() { addSettings(explicitRows, 10, (*shell).cleanVersionsRow) }
 // clean shows and opens on (versions.go): the clean one, and no other,
 // while explicit content is hidden (explicit.go).
 func (s *shell) cleanVersionsRow(c *ui.Context) {
-	description := "An album that comes explicit and clean shows its clean version, and its page opens on it. Its version switch still has the explicit one."
+	description := locales.CleanVersionsDesc()
 	on, fixed := s.set.PrefersClean(), s.set.HideExplicit
 	if fixed {
-		description = "On while explicit content is hidden: an album that comes explicit and clean shows its clean version alone."
+		description = locales.CleanVersionsFixed()
 	}
-	s.row(c, "Prefer clean versions", description, func() {
-		if s.switchOf(c.Key("clean-versions"), &on).Label("Prefer clean versions").Disabled(fixed).Changed() && !fixed {
+	s.row(c, locales.CleanVersionsPrefer(), description, func() {
+		if s.switchOf(c.Key("clean-versions"), &on).Label(locales.CleanVersionsPrefer()).Disabled(fixed).Changed() && !fixed {
 			s.set.CleanVersions = on
 			s.save()
 		}

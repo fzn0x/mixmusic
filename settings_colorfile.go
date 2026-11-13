@@ -11,19 +11,26 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The colours from a file, in Settings › Appearance › Colour and type.
 
-// colorSources are the choices of Colours from a file.
-var colorSources = []struct {
+// colorSource is a choice of Colours from a file, and its label.
+type colorSource struct {
 	source settings.ColorSource
 	label  string
-}{
-	{settings.ColorsTheme, "Off"},
-	{settings.ColorsPywal, "pywal"},
-	{settings.ColorsMatugen, "matugen"},
-	{settings.ColorsFile, "A file of your own"},
+}
+
+// colorSources are the choices of Colours from a file. A function, so that
+// their labels show in the language chosen.
+func colorSources() []colorSource {
+	return []colorSource{
+		{settings.ColorsTheme, locales.ColorFileSourceOff()},
+		{settings.ColorsPywal, "pywal"},
+		{settings.ColorsMatugen, "matugen"},
+		{settings.ColorsFile, locales.ColorFileSourceFile()},
+	}
 }
 
 // colorFileHelp is where docs/themes.md tells how to set up a colour file.
@@ -34,18 +41,19 @@ func init() { addSettings(colorTypeRows, 10, (*shell).colorFileSettings) }
 // colorFileSettings chooses where the colours come from, and tells what
 // MixMusic read of the file.
 func (s *shell) colorFileSettings(c *ui.Context) {
-	labels := make([]string, len(colorSources))
+	sources := colorSources()
+	labels := make([]string, len(sources))
 	chosen := labels[0]
-	for i, cs := range colorSources {
+	for i, cs := range sources {
 		labels[i] = cs.label
 		if cs.source == s.set.ColorSource {
 			chosen = cs.label
 		}
 	}
-	s.row(c, "Colours from a file", "Take the colours from pywal or matugen, and follow them as they change. The theme keeps its type, corners and effects.", func() {
-		if s.selectOf(c.Key("color-source"), &chosen, labels).Width(200).Label("Colours from a file").Changed() {
-			if i := slices.Index(labels, chosen); i >= 0 && colorSources[i].source != s.set.ColorSource {
-				s.set.ColorSource = colorSources[i].source
+	s.row(c, locales.ColorFileSourceTitle(), locales.ColorFileSourceDescription(), func() {
+		if s.selectOf(c.Key("color-source"), &chosen, labels).Width(200).Label(locales.ColorFileSourceTitle()).Changed() {
+			if i := slices.Index(labels, chosen); i >= 0 && sources[i].source != s.set.ColorSource {
+				s.set.ColorSource = sources[i].source
 				s.save()
 			}
 		}
@@ -68,7 +76,7 @@ func (s *shell) colorFileSettings(c *ui.Context) {
 	case settings.ColorsFile:
 		words = append(words, s.set.ColorFile, "choose")
 	}
-	if !s.findable("Colour file", note, words...) {
+	if !s.findable(locales.ColorFileTitle(), note, words...) {
 		return
 	}
 	s.show(c, func() { s.colorFileRow(c, source, shown, note, bad) })
@@ -80,7 +88,7 @@ func (s *shell) colorFileRow(c *ui.Context, source settings.ColorSource, shown, 
 	k := &s.lk
 	ui.Row(c).Gap(24).Padding(14, 0).Children(func() {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
-			ui.Text(c, "Colour file").FontSize(k.bodySize())
+			ui.Text(c, locales.ColorFileTitle()).FontSize(k.bodySize())
 			if shown != "" {
 				ui.Text(c, shown).FontSize(k.smallSize()).TextColor(k.muted)
 			}
@@ -90,12 +98,12 @@ func (s *shell) colorFileRow(c *ui.Context, source settings.ColorSource, shown, 
 			}
 			ui.Text(c, note).FontSize(k.smallSize()).TextColor(ink)
 			ui.Row(c).Gap(16).Padding(4, 0, 0).Children(func() {
-				if s.link(c, "color-file-help", "how to set it up") {
+				if s.link(c, "color-file-help", locales.ColorFileHelpLink()) {
 					go s.svc.System.OpenExternal(colorFileHelp)
 				}
-				if source == settings.ColorsMatugen && s.link(c, "copy-template", "copy the template") {
+				if source == settings.ColorsMatugen && s.link(c, "copy-template", locales.ColorFileCopyTemplate()) {
 					copyText(colorfile.MatugenTemplate)
-					s.notes = append(s.notes, notice("Template copied"))
+					s.notes = append(s.notes, notice(locales.ColorFileTemplateCopied()))
 				}
 			})
 		})
@@ -107,8 +115,8 @@ func (s *shell) colorFileRow(c *ui.Context, source settings.ColorSource, shown, 
 				s.set.ColorFile = settings.CleanPath(path)
 				s.save()
 			})
-			in.Placeholder(k.sentence("path to a colour file")).Width(260).Label("Colour file")
-			if s.button(c, "choose-color-file", "choose", false).Label("Choose a colour file").Clicked() {
+			in.Placeholder(k.sentence(locales.ColorFilePathPlaceholder())).Width(260).Label(locales.ColorFileTitle())
+			if s.button(c, "choose-color-file", locales.ColorFileChoose(), false).Label(locales.ColorFileChooseTitle()).Clicked() {
 				s.chooseColorFile()
 			}
 		})
@@ -121,21 +129,21 @@ func colorFileNote(st app.ColorFileStatus, set settings.Settings, now time.Time)
 	source := set.ColorSource
 	switch {
 	case source == settings.ColorsFile && set.ColorFile == "":
-		return "Choose a file: pywal's colors.json, what matugen --json prints, or a theme.json.", false
+		return locales.ColorFileNoPath(), false
 	case st.Source != source || st.Path == "" && st.Err == "":
-		return "Reading it…", false
+		return locales.ColorFileReading(), false
 	case st.Missing && source == settings.ColorsPywal:
-		return "It isn't there yet: pywal writes it when you run wal.", true
+		return locales.ColorFileMissingPywal(), true
 	case st.Missing && source == settings.ColorsMatugen:
-		return "It isn't there yet: add MixMusic's template to matugen's config.toml, and run matugen.", true
+		return locales.ColorFileMissingMatugen(), true
 	case st.Missing:
-		return "It isn't there. The theme's colours show until it is.", true
+		return locales.ColorFileMissing(), true
 	case st.Err != "" && !st.Colors.Empty():
-		return "It can't be read: " + strings.TrimSuffix(st.Err, ".") + ". MixMusic keeps the colours it read at " + clockOf(st.ReadAt, now) + ".", true
+		return locales.ColorFileUnreadKept(strings.TrimSuffix(st.Err, "."), clockOf(st.ReadAt, now)), true
 	case st.Err != "":
-		return "It can't be read: " + strings.TrimSuffix(st.Err, ".") + ". The theme's colours show.", true
+		return locales.ColorFileUnread(strings.TrimSuffix(st.Err, ".")), true
 	}
-	return "Read at " + clockOf(st.ReadAt, now) + ", and followed as it changes.", false
+	return locales.ColorFileRead(clockOf(st.ReadAt, now)), false
 }
 
 // clockOf is the time of t, with its day unless it is now's.
@@ -155,8 +163,8 @@ var openFileDialog = func(opts mygo.OpenDialogOptions) ([]string, error) { retur
 func (s *shell) chooseColorFile() {
 	win := s.win
 	go func() {
-		paths, err := openFileDialog(mygo.OpenDialogOptions{Parent: win, Title: "Choose a colour file", ShowHiddenFiles: true,
-			Filters: []mygo.FileFilter{{Name: "Colour files", Extensions: []string{"json"}}, {Name: "All files", Extensions: []string{"*"}}}})
+		paths, err := openFileDialog(mygo.OpenDialogOptions{Parent: win, Title: locales.ColorFileChooseTitle(), ShowHiddenFiles: true,
+			Filters: []mygo.FileFilter{{Name: locales.ColorFileFilterColours(), Extensions: []string{"json"}}, {Name: locales.ColorFileFilterAll(), Extensions: []string{"*"}}}})
 		s.update(func() {
 			switch {
 			case err != nil:

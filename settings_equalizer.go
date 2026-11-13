@@ -7,22 +7,47 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
-// eqPresets are the equalizer's presets, the web interface's.
+// eqPresets are the equalizer's presets, the web interface's, by id: the
+// names they show are eqPresetLabel's.
 var eqPresets = []struct {
-	id, label string
-	gains     [10]float64
+	id    string
+	gains [10]float64
 }{
-	{"flat", "Flat", [10]float64{}},
-	{"bass", "Bass boost", [10]float64{6, 5, 4, 2, 0, 0, 0, 0, 0, 0}},
-	{"treble", "Treble boost", [10]float64{0, 0, 0, 0, 0, 1, 2, 4, 5, 6}},
-	{"vocal", "Vocal", [10]float64{-2, -1, 0, 2, 4, 4, 3, 1, 0, -1}},
-	{"electronic", "Electronic", [10]float64{5, 4, 1, 0, -1, 1, 0, 1, 4, 5}},
-	{"rock", "Rock", [10]float64{4, 3, 2, 0, -1, 0, 2, 3, 4, 4}},
-	{"acoustic", "Acoustic", [10]float64{3, 2, 1, 1, 2, 1, 2, 2, 2, 1}},
-	{"late-night", "Late night", [10]float64{4, 3, 1, 0, 0, 0, 0, 1, 2, 3}},
-	{"lofi", "Lo-fi", [10]float64{-3, 0, 3, 4, 2, 0, -2, -4, -6, -8}},
+	{"flat", [10]float64{}},
+	{"bass", [10]float64{6, 5, 4, 2, 0, 0, 0, 0, 0, 0}},
+	{"treble", [10]float64{0, 0, 0, 0, 0, 1, 2, 4, 5, 6}},
+	{"vocal", [10]float64{-2, -1, 0, 2, 4, 4, 3, 1, 0, -1}},
+	{"electronic", [10]float64{5, 4, 1, 0, -1, 1, 0, 1, 4, 5}},
+	{"rock", [10]float64{4, 3, 2, 0, -1, 0, 2, 3, 4, 4}},
+	{"acoustic", [10]float64{3, 2, 1, 1, 2, 1, 2, 2, 2, 1}},
+	{"late-night", [10]float64{4, 3, 1, 0, 0, 0, 0, 1, 2, 3}},
+	{"lofi", [10]float64{-3, 0, 3, 4, 2, 0, -2, -4, -6, -8}},
+}
+
+// eqPresetLabel names the preset of id, in the language shown.
+func eqPresetLabel(id string) string {
+	switch id {
+	case "bass":
+		return locales.EqualizerPresetBass()
+	case "treble":
+		return locales.EqualizerPresetTreble()
+	case "vocal":
+		return locales.EqualizerPresetVocal()
+	case "electronic":
+		return locales.EqualizerPresetElectronic()
+	case "rock":
+		return locales.EqualizerPresetRock()
+	case "acoustic":
+		return locales.EqualizerPresetAcoustic()
+	case "late-night":
+		return locales.EqualizerPresetLateNight()
+	case "lofi":
+		return locales.EqualizerPresetLoFi()
+	}
+	return locales.EqualizerPresetFlat()
 }
 
 func init() { addSettings("playback", 50, (*shell).equalizerSettings) }
@@ -31,25 +56,25 @@ func init() { addSettings("playback", 50, (*shell).equalizerSettings) }
 func (s *shell) equalizerSettings(c *ui.Context) {
 	k := &s.lk
 	eq := &s.set.Equalizer
-	s.group(c, "Equalizer", func() {
-		s.row(c, "Equalizer", "Shape the sound of YouTube Music with ten bands and a preamp.", func() {
-			if s.switchOf(c.Key("eq-on"), &eq.Enabled).Label("Equalizer").Changed() {
+	s.group(c, locales.EqualizerTitle(), func() {
+		s.row(c, locales.EqualizerTitle(), locales.EqualizerDesc(), func() {
+			if s.switchOf(c.Key("eq-on"), &eq.Enabled).Label(locales.EqualizerTitle()).Changed() {
 				s.save()
 			}
 		})
 		labels := make([]string, len(eqPresets))
 		// Bands of the user's own, as once a slider moved, show as Custom,
 		// which is no preset to choose.
-		chosen := "Custom"
+		chosen := locales.EqualizerCustom()
 		for i, p := range eqPresets {
-			labels[i] = p.label
+			labels[i] = eqPresetLabel(p.id)
 			if p.id == eq.Preset {
-				chosen = p.label
+				chosen = labels[i]
 			}
 		}
 		// A preset's name finds it, as "bass".
-		s.row(c, "Preset", "", func() {
-			if s.selectOf(c.Key("eq-preset"), &chosen, labels).Width(200).Label("Preset").Changed() {
+		s.row(c, locales.EqualizerPreset(), "", func() {
+			if s.selectOf(c.Key("eq-preset"), &chosen, labels).Width(200).Label(locales.EqualizerPreset()).Changed() {
 				i := slices.Index(labels, chosen)
 				if i >= 0 {
 					// Choosing how it sounds turns the equalizer on.
@@ -59,12 +84,12 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 				}
 			}
 		}, labels...)
-		s.found(c, "Bands", "The ten bands of the equalizer and its preamp, in dB: pre 32 64 125 250 500 1k 2k 4k 8k 16k Hz.", func() {
+		s.found(c, locales.EqualizerBands(), locales.EqualizerBandsDesc(), func() {
 			ui.Row(c).Gap(12).Padding(16, 0).Children(func() {
 				band := func(key, label string, v *float64) {
 					ui.Column(c).Gap(6).AlignItems(ui.Center).Children(func() {
 						ui.Text(c, fmt.Sprintf("%+.0f", *v)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
-						if s.bandSlider(c, key, label+" dB", v, -12, 12).Changed() {
+						if s.bandSlider(c, key, locales.EqualizerBandDB(label), v, -12, 12).Changed() {
 							if key != "eq-preamp" {
 								eq.Preset = "custom"
 							}
@@ -73,7 +98,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 						ui.Text(c, label).FontSize(k.captionSize()).TextColor(k.muted)
 					})
 				}
-				band("eq-preamp", "pre", &eq.Preamp)
+				band("eq-preamp", locales.EqualizerPreamp(), &eq.Preamp)
 				for i := range eq.Gains {
 					hz := settings.Bands[i]
 					label := fmt.Sprint(hz)
@@ -86,18 +111,15 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 		})
 		// Spotify's audio plays in Spotify's own player, which no app may
 		// change: only the system's equalizer reaches it.
-		s.found(c, "", spotifyEqualizerNote, func() {
+		s.found(c, "", locales.EqualizerSpotifyNote(), func() {
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
-				ui.Text(c, "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: ")
-				s.linkOf(c, "Spotify notes", spotifyEqualizer)
-				ui.Text(c, " that its audio settings can't change while another device plays it.")
+				ui.Text(c, locales.EqualizerSpotifyLead())
+				s.linkOf(c, locales.EqualizerSpotifyNotes(), spotifyEqualizer)
+				ui.Text(c, locales.EqualizerSpotifyTail())
 			})
 		})
 	})
 }
-
-// spotifyEqualizerNote is what the equalizer's note on Spotify says.
-const spotifyEqualizerNote = "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: Spotify notes that its audio settings can't change while another device plays it."
 
 // spotifyEqualizer is Spotify's page on its equalizer, which says that its
 // audio settings can't change while Spotify Connect plays on another device.

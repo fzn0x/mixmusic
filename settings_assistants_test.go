@@ -11,6 +11,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // assistantOf connects an AI assistant to the shell's app through the
@@ -73,7 +74,7 @@ func TestAssistantRows(t *testing.T) {
 	t.Cleanup(s.p.Notices(func(n player.Notice) { s.update(func() { s.notes = append(s.notes, n) }) }))
 	tt := testerOf(t, s, 1280, 4000)
 	show(s, tt, "/settings/desktop")
-	if !tt.HasText(assistantTitle) || !tt.HasText(assistantSwitch) {
+	if !tt.HasText(locales.AssistantsTitle()) || !tt.HasText(locales.AssistantsSwitch()) {
 		t.Fatalf("Settings › Desktop doesn't show AI assistants: %q", tt.Texts())
 	}
 	st := s.svc.System.AssistantStatus()
@@ -82,7 +83,7 @@ func TestAssistantRows(t *testing.T) {
 	}
 	// The switch's label is its row's title, which a click would find
 	// first: the keys reach it, as remote control's.
-	toggle(t, s, tt, assistantSwitch, assistantAbout)
+	toggle(t, s, tt, locales.AssistantsSwitch(), locales.AssistantsAbout())
 	if st = s.svc.System.AssistantStatus(); !s.svc.Preferences.Get().AssistantControl || !st.On {
 		t.Fatalf("the switch didn't let assistants in: %+v", st)
 	}
@@ -117,11 +118,11 @@ func TestAssistantRows(t *testing.T) {
 	})
 
 	show(s, tt, settingsPath("", "mcp"))
-	if !tt.HasText(assistantSwitch) {
+	if !tt.HasText(locales.AssistantsSwitch()) {
 		t.Errorf("searching mcp doesn't find the switch: %q", tt.Texts())
 	}
 	show(s, tt, "/settings/desktop")
-	toggle(t, s, tt, assistantSwitch, assistantAbout)
+	toggle(t, s, tt, locales.AssistantsSwitch(), locales.AssistantsAbout())
 	select {
 	case status := <-ended:
 		if status != 0 {

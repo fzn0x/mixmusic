@@ -9,15 +9,13 @@ import (
 	"strings"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 func init() { addSettings("desktop", 20, (*shell).assistantSettings) }
 
 const (
-	assistantTitle  = "AI assistants"
-	assistantSwitch = "Let AI assistants control MixMusic"
-	assistantAbout  = "AI assistants on this computer that speak MCP, the Model Context Protocol, can tell what plays, " +
-		"play, pause, skip, search, and play your playlists. Each thing one does shows here. Nothing on the network can reach it."
 	assistantWords = "ai assistant assistants mcp model context protocol agent llm chat chatbot claude control command server"
 	// assistantHelp is where docs/ai-assistants.md tells how to add
 	// MixMusic to an assistant.
@@ -29,9 +27,9 @@ const (
 // and the assistants connected.
 func (s *shell) assistantSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, assistantTitle, func() {
-		s.row(c, assistantSwitch, assistantAbout, func() {
-			if s.switchOf(c.Key("assistant-control"), &s.set.AssistantControl).Label(assistantSwitch).Changed() {
+	s.group(c, locales.AssistantsTitle(), func() {
+		s.row(c, locales.AssistantsSwitch(), locales.AssistantsAbout(), func() {
+			if s.switchOf(c.Key("assistant-control"), &s.set.AssistantControl).Label(locales.AssistantsSwitch()).Changed() {
 				s.save()
 			}
 		}, assistantWords)
@@ -40,34 +38,34 @@ func (s *shell) assistantSettings(c *ui.Context) {
 		}
 		st := s.svc.System.AssistantStatus()
 		if st.Problem != "" {
-			s.rowWith(c, "AI assistants can't connect", func() {
-				ui.Text(c, st.Problem+".").TextColor(k.danger)
+			s.rowWith(c, locales.AssistantsProblemTitle(), func() {
+				ui.Text(c, locales.AssistantsProblem(st.Problem)).TextColor(k.danger)
 			}, func() {}, assistantWords)
 			return
 		}
-		s.rowWith(c, "Command", func() {
+		s.rowWith(c, locales.AssistantsCommand(), func() {
 			ui.Text(c, st.Command).TextColor(k.text)
-			ui.Text(c, ". An assistant starts it, as a server of MCP that runs a command (stdio), to reach MixMusic while it runs.")
+			ui.Text(c, locales.AssistantsCommandNote())
 		}, func() {
-			if s.button(c, "assistant-command", "copy", false).Label("Copy the command").Clicked() {
+			if s.button(c, "assistant-command", locales.AssistantsCopy(), false).Label(locales.AssistantsCopyCommand()).Clicked() {
 				copyText(st.Command)
 			}
 		}, assistantWords)
-		s.rowWith(c, "Configuration", func() {
-			ui.Text(c, "For the assistants that keep their servers in a JSON file, as mcpServers. ")
-			s.linkOf(c, "How to add MixMusic to an assistant", assistantHelp)
+		s.rowWith(c, locales.AssistantsConfiguration(), func() {
+			ui.Text(c, locales.AssistantsConfigNote())
+			s.linkOf(c, locales.AssistantsHowTo(), assistantHelp)
 		}, func() {
-			if s.button(c, "assistant-config", "copy", false).Label("Copy the configuration").Clicked() {
+			if s.button(c, "assistant-config", locales.AssistantsCopy(), false).Label(locales.AssistantsCopyConfig()).Clicked() {
 				copyText(st.Config)
 			}
 		}, assistantWords)
 		s.found(c, "", st.Config, func() {
 			ui.Text(c, st.Config).FontSize(k.captionSize()).Font(monospace()).TextColor(k.muted).Padding(0, 0, 12).Selectable()
 		})
-		connected := "None now. Turning this off ends every session at once."
+		connected := locales.AssistantsNone()
 		if len(st.Connected) > 0 {
-			connected = strings.Join(st.Connected, ", ") + ". Turning this off ends their sessions at once."
+			connected = locales.AssistantsConnected(strings.Join(st.Connected, locales.AssistantsNameSeparator()))
 		}
-		s.row(c, "Connected", connected, func() {}, assistantWords)
+		s.row(c, locales.AssistantsConnectedTitle(), connected, func() {}, assistantWords)
 	})
 }

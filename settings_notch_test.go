@@ -38,7 +38,7 @@ func TestNotchRow(t *testing.T) {
 	if !s.svc.Preferences.Get().NotchPlayer {
 		t.Fatal("off at first")
 	}
-	focused := func() bool { return tt.Focused(label) && !tt.Focused(notchDescription) }
+	focused := func() bool { return tt.Focused(label) && !tt.Focused(notchDescription()) }
 	for i := 0; i < 200 && !focused(); i++ {
 		tt.Key(0, ui.KeyTab)
 	}

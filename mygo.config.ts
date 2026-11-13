@@ -21,6 +21,7 @@ export default defineConfig({
   // client, so `mygo dev` writes it out of the way.
   frontendDist: "public",
   bindings: ".mygo/bindings.ts",
+  i18n: { dir: "locales", source: "en" },
   out: "build",
   urlSchemes: ["mixmusic"],
   // Apps update themselves from the releases of the repository, signed with

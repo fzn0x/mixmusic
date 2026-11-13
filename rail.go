@@ -11,21 +11,25 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // navItem is a page of the rail.
 type navItem struct {
-	id, label, icon, path string
+	id    string
+	label func() string
+	icon  string
+	path  string
 }
 
 var nav = []navItem{
-	{"home", "Home", "home", "/"},
-	{"search", "Search", "search", "/search"},
-	{"explore", "Explore", "compass", "/explore"},
-	{"library", "Library", "library", "/library"},
-	{"stats", "Stats", "stats", "/stats"},
-	{"marketplace", "Marketplace", "store", "/marketplace"},
-	{"settings", "Settings", "settings", "/settings"},
+	{"home", locales.RailHome, "home", "/"},
+	{"search", locales.RailSearch, "search", "/search"},
+	{"explore", locales.RailExplore, "compass", "/explore"},
+	{"library", locales.RailLibrary, "library", "/library"},
+	{"stats", locales.RailStats, "stats", "/stats"},
+	{"marketplace", locales.RailMarketplace, "store", "/marketplace"},
+	{"settings", locales.RailSettings, "settings", "/settings"},
 }
 
 // section is the rail's item of path: its first part, with a mood's page
@@ -106,7 +110,7 @@ func (s *shell) rail(c *ui.Context) {
 		// nothing into the rest, the entries give some of their height.
 		ui.Column(c).Gap(4).MinHeight(navLeast).Children(func() {
 			for _, n := range nav {
-				s.navEntry(c, "nav-"+n.id, k.words(n.label), icon(n.icon), n.path, n.id == current)
+				s.navEntry(c, "nav-"+n.id, k.words(n.label()), icon(n.icon), n.path, n.id == current)
 			}
 			for _, it := range items {
 				s.navEntry(c, "plugin-"+it.ID, k.words(it.Label), s.svgOf(it.Icon), it.Path, path == it.Path)
@@ -213,9 +217,9 @@ func (s *shell) logo(c *ui.Context, room float32) {
 
 // railButton folds or unfolds the rail.
 func (s *shell) railButton(c *ui.Context, collapsed bool) {
-	label := "Collapse the sidebar"
+	label := locales.RailCollapse()
 	if collapsed {
-		label = "Expand the sidebar"
+		label = locales.RailExpand()
 	}
 	if s.iconButton(c, "collapse", "sidebar", label, false, 18).Clicked() {
 		s.toggleRail()
@@ -374,15 +378,15 @@ func (s *shell) mixes(c *ui.Context, path string) {
 	k := &s.lk
 	ui.Column(c).Grow(1).MinHeight(mixesLeast).Children(func() {
 		ui.Row(c).Justify(ui.SpaceBetween).Margin(0, 0, 8).Children(func() {
-			ui.Text(c, k.words("Your mixes")).FontSize(k.bodySize()).TextColor(k.accent)
-			if s.iconButton(c, "new-mix", "plus", "New mix", false, 18).Clicked() {
+			ui.Text(c, k.words(locales.RailYourMixes())).FontSize(k.bodySize()).TextColor(k.accent)
+			if s.iconButton(c, "new-mix", "plus", locales.RailNewMix(), false, 18).Clicked() {
 				s.newMix()
 			}
 		})
 		ui.Scroll(c).Grow(1).MinHeight(0).Children(func() {
-			s.sideLink(c, "liked", k.words("Liked songs"), len(s.svc.Collection.Liked()), "/library/liked", path)
+			s.sideLink(c, "liked", k.words(locales.RailLikedSongs()), len(s.svc.Collection.Liked()), "/library/liked", path)
 			if s.kept.Any() {
-				s.sideLink(c, "downloads", k.words("Downloads"), s.kept.Status().Tracks, "/library/downloads", path)
+				s.sideLink(c, "downloads", k.words(locales.RailDownloads()), s.kept.Status().Tracks, "/library/downloads", path)
 			}
 			for _, m := range s.svc.Collection.Playlists() {
 				s.sideLink(c, "mix-"+m.ID, m.Title, m.TrackCount, playlistPath(m.ID), path)
@@ -409,13 +413,13 @@ func (s *shell) sideLink(c *ui.Context, key, title string, n int, to, path strin
 
 // newMix asks for the name of a mix, makes it and opens it.
 func (s *shell) newMix() {
-	s.promptName("New mix", "Name", "", "create", func(name string) {
+	s.promptName(locales.RailNewMix(), locales.RailName(), "", locales.RailCreate(), func(name string) {
 		p, err := s.svc.Collection.CreatePlaylist(name, "", nil)
 		if err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 			return
 		}
-		s.notes = append(s.notes, player.Notice{Message: "Created " + p.Title + ": add tracks of any service to it"})
+		s.notes = append(s.notes, player.Notice{Message: locales.RailMixCreated(p.Title)})
 		s.navigate(playlistPath(p.ID))
 	})
 }
@@ -436,7 +440,7 @@ func (s *shell) liveTile(c *ui.Context, collapsed bool) {
 	if !ok {
 		if !collapsed {
 			ui.Column(c).Padding(12, 0).BorderWidth(1, 0, 0, 0).BorderColor(k.rule).Shrink(0).Children(func() {
-				ui.Text(c, k.words("Nothing playing yet")).FontSize(k.smallSize()).TextColor(k.muted)
+				ui.Text(c, k.words(locales.RailNothingPlaying())).FontSize(k.smallSize()).TextColor(k.muted)
 			})
 		}
 		return
@@ -453,7 +457,7 @@ func (s *shell) liveTile(c *ui.Context, collapsed bool) {
 	case s.liveSince.IsZero():
 		s.liveSince = c.Now()
 	}
-	tile := s.buttonBase(c.Key("live")).Gap(12).Justify(ui.Start).Shrink(0).Label("Open now playing").Cursor(ui.CursorPointer)
+	tile := s.buttonBase(c.Key("live")).Gap(12).Justify(ui.Start).Shrink(0).Label(locales.RailOpenNowPlaying()).Cursor(ui.CursorPointer)
 	if tile.Clicked() {
 		s.navigate("/now-playing")
 	}
@@ -511,7 +515,7 @@ func (s *shell) liveCard(c *ui.Context, t, next media.Track, size float32) {
 			return
 		}
 		ui.Column(c).Fill().Radius(k.radiusSm).Justify(ui.SpaceBetween).Padding(6, 7).Background(k.tile(0)).Children(func() {
-			ui.Text(c, k.words("Up next")).FontSize(11).LineHeight(1).TextColor(k.tileText)
+			ui.Text(c, k.words(locales.RailUpNext())).FontSize(11).LineHeight(1).TextColor(k.tileText)
 			ui.Text(c, next.Title).FontSize(12).LineHeight(1.15).MaxLines(3).TextColor(k.tileText)
 		})
 	})

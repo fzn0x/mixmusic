@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/egoist/mygo/ui"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // TestRecordMemoryRow records MixMusic's memory use from Settings › About:
@@ -20,7 +21,7 @@ func TestRecordMemoryRow(t *testing.T) {
 	tt := testerOf(t, s, 1280, 2400)
 	show(s, tt, "/settings/about")
 	var above float32
-	for _, text := range []string{"report a problem", recordMemoryTitle, recordMemoryAbout, "licenses"} {
+	for _, text := range []string{"report a problem", locales.MemoryRecordTitle(), locales.MemoryRecordAbout(), "licenses"} {
 		r, ok := tt.Find(text)
 		if !ok || r.Y <= above {
 			t.Fatalf("Settings › About shows %q out of place: %q", text, tt.Texts())
@@ -30,7 +31,9 @@ func TestRecordMemoryRow(t *testing.T) {
 	if s.svc.System.RecordingMemory() || tt.HasText("save a heap profile") {
 		t.Fatal("recording at first")
 	}
-	focused := func() bool { return tt.Focused(recordMemoryTitle) && !tt.Focused(recordMemoryAbout) }
+	focused := func() bool {
+		return tt.Focused(locales.MemoryRecordTitle()) && !tt.Focused(locales.MemoryRecordAbout())
+	}
 	for i := 0; i < 200 && !focused(); i++ {
 		tt.Key(0, ui.KeyTab)
 	}
@@ -65,7 +68,7 @@ func TestRecordMemoryRow(t *testing.T) {
 	}
 	for _, q := range []string{"memory", "heap profile"} {
 		show(s, tt, settingsPath("", q))
-		if !tt.HasText(recordMemoryTitle) {
+		if !tt.HasText(locales.MemoryRecordTitle()) {
 			t.Errorf("searching %q doesn't find the row: %q", q, tt.Texts())
 		}
 	}

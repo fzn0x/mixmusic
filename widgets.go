@@ -8,6 +8,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // iconButton is a 32px button of an icon, in muted ink, which turns to ink
@@ -604,7 +605,7 @@ func (s *shell) zoomOf() float32 {
 
 // loading shows that a page waits for what it shows.
 func (s *shell) loading(c *ui.Context) {
-	ui.Row(c).PaddingY(24).Children(func() { ui.Spinner(c).Label("Loading") })
+	ui.Row(c).PaddingY(24).Children(func() { ui.Spinner(c).Label(locales.WidgetsLoading()) })
 }
 
 // problem tells why a page can't show what it should, in coral, with a way
@@ -614,7 +615,7 @@ func (s *shell) problem(c *ui.Context, err error, retry func()) {
 	ui.Column(c).Padding(16).Gap(12).Background(k.danger.Alpha(0.12).Over(k.bg)).Border(1, k.danger.Alpha(0.45)).
 		Radius(k.radiusSm).AlignSelf(ui.Stretch).Children(func() {
 		ui.Text(c, err.Error()).FontSize(k.bodySize()).TextColor(k.text)
-		if retry != nil && s.button(c, "retry", "try again", false).Clicked() {
+		if retry != nil && s.button(c, "retry", locales.WidgetsTryAgain(), false).Clicked() {
 			retry()
 		}
 	})

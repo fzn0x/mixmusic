@@ -318,7 +318,7 @@ func TestReplacing(t *testing.T) {
 	if got := downloadLabel("flatpak"); got != "download the Flatpak" {
 		t.Errorf("the Flatpak's download is %q", got)
 	}
-	if got := buildNames["flatpak"]; got != "Flatpak" {
+	if got, _ := buildName("flatpak"); got != "Flatpak" {
 		t.Errorf("About calls a Flatpak %q", got)
 	}
 }
@@ -1665,7 +1665,7 @@ func TestAboutRelease(t *testing.T) {
 			t.Errorf("About doesn't show %q: %q", text, tt.Texts())
 		}
 	}
-	if build := buildNames[u.Kind]; build != "" && !tt.HasText(build) {
+	if build, _ := buildName(u.Kind); build != "" && !tt.HasText(build) {
 		t.Errorf("About doesn't say the copy is a %s", build)
 	}
 	s.loads["release"] = &loaded[app.Release]{done: true, value: app.Release{Version: "0.4.0"}}

@@ -12,6 +12,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/remote/remotetest"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // remoteTiming is the protocol's timing in these tests.
@@ -215,22 +216,22 @@ func TestRemoteSettings(t *testing.T) {
 	s := newRemoteShell(t, n, "Desktop")
 	tt := testerOf(t, s, 1280, 2400)
 	show(s, tt, "/settings/desktop")
-	if !tt.HasText(remoteSwitch) || !tt.HasText("No computer is paired yet.") {
+	if !tt.HasText(locales.RemoteSwitch()) || !tt.HasText("No computer is paired yet.") {
 		t.Fatalf("Settings › Desktop shows %q", tt.Texts())
 	}
-	toggle(t, s, tt, remoteSwitch, remoteAbout("Desktop"))
+	toggle(t, s, tt, locales.RemoteSwitch(), locales.RemoteAbout("Desktop"))
 	until(t, s, tt, "remote control on", func() bool { return s.a.Remote().On() && s.remote.turning == nil })
 	if n.Announced() != 1 {
 		t.Errorf("%d computers announced", n.Announced())
 	}
-	toggle(t, s, tt, remoteSwitch, remoteAbout("Desktop"))
+	toggle(t, s, tt, locales.RemoteSwitch(), locales.RemoteAbout("Desktop"))
 	until(t, s, tt, "remote control off", func() bool { return !s.a.Remote().On() && s.remote.turning == nil })
 	if n.Announced() != 0 {
 		t.Errorf("%d computers announced", n.Announced())
 	}
 	// The search of the settings finds it.
 	show(s, tt, "/settings?q=remote")
-	until(t, s, tt, "the search", func() bool { return tt.HasText(remoteSwitch) })
+	until(t, s, tt, "the search", func() bool { return tt.HasText(locales.RemoteSwitch()) })
 }
 
 // TestRemotePosition moves the position on while the track plays there,

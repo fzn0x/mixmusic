@@ -9,6 +9,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -325,30 +326,27 @@ func (s *shell) lyricsNote(c *ui.Context, text string) {
 }
 
 // translateOptions are the choices of "Translate lyrics to", the system's
-// language first, made once.
+// language first. They are built on each frame: the language may change.
 func (s *shell) translateOptions() []string {
-	ls := &s.lyricsView
-	if ls.languages == nil {
-		system := s.systemLanguage()
-		for _, l := range translateLanguages {
-			if l.code == system {
-				system = l.name
-			}
-		}
-		ls.languages = []string{"System language (" + system + ")"}
-		for _, l := range translateLanguages {
-			ls.languages = append(ls.languages, l.name)
+	system := s.systemLanguage()
+	for _, l := range translateLanguages {
+		if l.code == system {
+			system = l.name
 		}
 	}
-	return ls.languages
+	options := []string{locales.LyricsSettingsSystemLanguage(system)}
+	for _, l := range translateLanguages {
+		options = append(options, l.name)
+	}
+	return options
 }
 
 func init() { addSettings("playback", 60, (*shell).lyricsSettings) }
 
 // lyricsSettings chooses the language lyrics translate to.
 func (s *shell) lyricsSettings(c *ui.Context) {
-	s.group(c, "Lyrics", func() {
-		s.row(c, "Translate lyrics to", "The translate switch beside the lyrics shows them in this language. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them; nothing is sent while it's off. Lyrics in other scripts show in Latin letters made on this computer, which sends nothing: Japanese in romaji, and the others by the standard of their language. Only Arabic's go to Unison, which romanizes them with the vowels Arabic doesn't write.", func() {
+	s.group(c, locales.LyricsSettingsGroup(), func() {
+		s.row(c, locales.LyricsSettingsTranslate(), locales.LyricsSettingsDesc(), func() {
 			options := s.translateOptions()
 			chosen := options[0]
 			for i, l := range translateLanguages {
@@ -356,7 +354,7 @@ func (s *shell) lyricsSettings(c *ui.Context) {
 					chosen = options[i+1]
 				}
 			}
-			if s.selectOf(c.Key("translate-to"), &chosen, options).Width(220).Label("Translate lyrics to").Changed() {
+			if s.selectOf(c.Key("translate-to"), &chosen, options).Width(220).Label(locales.LyricsSettingsTranslate()).Changed() {
 				s.set.LyricsTranslateTo = ""
 				if i := slices.Index(options, chosen); i > 0 {
 					s.set.LyricsTranslateTo = translateLanguages[i-1].code

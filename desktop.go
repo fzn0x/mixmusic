@@ -3,13 +3,12 @@ package main
 import (
 	"cmp"
 	"context"
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 func init() { addSettings("desktop", 10, (*shell).desktopSettings) }
@@ -19,7 +18,7 @@ func init() { addSettings("desktop", 10, (*shell).desktopSettings) }
 const desktopRows = "desktop › On the desktop"
 
 func (s *shell) desktopSettings(c *ui.Context) {
-	s.group(c, "On the desktop", func() {
+	s.group(c, locales.DesktopSettingsGroup(), func() {
 		toggle := func(key, title, description string, v *bool, words ...string) {
 			s.row(c, title, description, func() {
 				if s.switchOf(c.Key(key), v).Label(title).Changed() {
@@ -27,31 +26,31 @@ func (s *shell) desktopSettings(c *ui.Context) {
 				}
 			}, words...)
 		}
-		toggle("tray", "Close to the tray", "Closing the window keeps the music playing; quit from the tray icon.", &s.set.CloseToTray, "minimize background")
-		toggle("media-keys", "Media keys", "The keyboard's play, next and previous keys control MixMusic. Keys of your own that work everywhere are in Settings › Shortcuts.", &s.set.MediaKeys)
-		toggle("notifications", "Notifications", "Tell what starts playing while MixMusic is in the background.", &s.set.Notifications)
-		toggle("title", "Show what plays in the window title", "The window's title names the track that plays, for the taskbar, the window switcher and screen readers.", &s.set.ShowInTitle)
-		toggle("discord", "Show what plays on Discord", "While Discord runs, your profile says what you listen to: you choose its lines, cover, time and button.", &s.set.DiscordPresence)
+		toggle("tray", locales.DesktopSettingsTrayTitle(), locales.DesktopSettingsTrayAbout(), &s.set.CloseToTray, "minimize background")
+		toggle("media-keys", locales.DesktopSettingsMediaKeysTitle(), locales.DesktopSettingsMediaKeysAbout(), &s.set.MediaKeys)
+		toggle("notifications", locales.DesktopSettingsNotificationsTitle(), locales.DesktopSettingsNotificationsAbout(), &s.set.Notifications)
+		toggle("title", locales.DesktopSettingsTitleTitle(), locales.DesktopSettingsTitleAbout(), &s.set.ShowInTitle)
+		toggle("discord", locales.DesktopSettingsDiscordTitle(), locales.DesktopSettingsDiscordAbout(), &s.set.DiscordPresence)
 		if s.set.DiscordPresence {
 			describe := func() {
-				ui.Text(c, "Discord shows the name of MixMusic's application. To show another, create one in the ")
-				s.linkOf(c, "developer portal", "https://discord.com/developers/applications")
-				ui.Text(c, " and paste its application ID.")
+				ui.Text(c, locales.DesktopSettingsDiscordBefore())
+				s.linkOf(c, locales.DesktopSettingsDiscordPortal(), "https://discord.com/developers/applications")
+				ui.Text(c, locales.DesktopSettingsDiscordAfter())
 			}
-			s.rowWith(c, "Discord application ID", describe, func() {
+			s.rowWith(c, locales.DesktopSettingsDiscordAppID(), describe, func() {
 				in, _ := s.settingInput(c, "discord-app", s.set.DiscordAppID, func(id string) {
 					s.set.DiscordAppID = id
 					s.save()
 				})
-				in.Placeholder("MixMusic's").Width(260).Label("Discord application ID")
+				in.Placeholder(locales.DesktopSettingsDiscordPlaceholder()).Width(260).Label(locales.DesktopSettingsDiscordAppID())
 			}, "Discord shows the name of MixMusic's application. To show another, create one in the developer portal and paste its application ID.")
 		}
 		s.settingsOf(c, desktopRows)
-		s.row(c, "Start at login", "", func() {
+		s.row(c, locales.DesktopSettingsLogin(), "", func() {
 			// The system says, beside the main thread.
 			login := fetch(s, "openAtLogin", func(context.Context) (bool, error) { return s.svc.Preferences.OpenAtLogin(), nil })
 			on := login.value
-			if s.switchOf(c.Key("login"), &on).Label("Start at login").Disabled(!login.done).Changed() {
+			if s.switchOf(c.Key("login"), &on).Label(locales.DesktopSettingsLogin()).Disabled(!login.done).Changed() {
 				login.value = on
 				go func() {
 					err := s.svc.Preferences.SetOpenAtLogin(on)
@@ -64,21 +63,21 @@ func (s *shell) desktopSettings(c *ui.Context) {
 				}()
 			}
 		}, "startup launch")
-		s.row(c, "Settings file", "Your settings, as settings.json in your data folder. Save it while MixMusic runs, and they apply at once.", func() {
-			if s.button(c, "settings-file-open", "open", false).Clicked() {
+		s.row(c, locales.DesktopSettingsSettingsFile(), locales.DesktopSettingsSettingsFileAbout(), func() {
+			if s.button(c, "settings-file-open", locales.DesktopSettingsOpen(), false).Clicked() {
 				s.openSettingsFile()
 			}
-			if s.button(c, "settings-file-show", "show in folder", false).Clicked() {
+			if s.button(c, "settings-file-show", locales.DesktopSettingsShowInFolder(), false).Clicked() {
 				s.showSettingsFile()
 			}
 		}, "settings.json json config")
-		s.row(c, "Reset settings", "Puts back the settings of a new install; your accounts, library and add-ons stay.", func() {
-			if s.button(c, "reset", "reset", false).Clicked() {
+		s.row(c, locales.DesktopSettingsReset(), locales.DesktopSettingsResetAbout(), func() {
+			if s.button(c, "reset", locales.DesktopSettingsResetButton(), false).Clicked() {
 				s.resetting = true
 			}
 		}, "defaults")
 	})
-	if s.confirm(c, "reset-settings", &s.resetting, "reset settings", "Put back every setting as it was on a new install?", "reset") {
+	if s.confirm(c, "reset-settings", &s.resetting, locales.DesktopSettingsResetTitle(), locales.DesktopSettingsResetConfirm(), locales.DesktopSettingsResetButton()) {
 		if _, err := s.svc.Preferences.Reset(); err != nil {
 			s.notes = append(s.notes, noticeOf(err))
 		}
@@ -94,23 +93,23 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 	k := &s.lk
 	groups := []string{}
 	byGroup := map[string][]command{}
-	palette := "the command palette"
+	palette := locales.ShortcutsCommandPalette()
 	for _, cmd := range s.commands() {
 		if _, ok := byGroup[cmd.group]; !ok {
 			groups = append(groups, cmd.group)
 		}
 		byGroup[cmd.group] = append(byGroup[cmd.group], cmd)
 		if keys := shortcutLabel(s.shortcutOf(cmd)); cmd.id == "view.palette" && keys != "" {
-			palette += ", " + keys + ","
+			palette = locales.ShortcutsCommandPaletteKeys(keys)
 		}
 	}
 	// The search of the settings shows the commands it finds without the
 	// section's introduction.
 	if !s.find.on() {
 		ui.Row(c).Gap(24).AlignItems(ui.Center).Margin(0, 0, 32).Children(func() {
-			ui.Text(c, "Shortcuts of a single key work while you are not typing; "+palette+" lists every command, those of plugins too.").
+			ui.Text(c, locales.ShortcutsHint(palette)).
 				FontSize(k.smallSize()).TextColor(k.muted).Grow(1).MinWidth(0).MaxWidth(640)
-			if (len(s.set.Shortcuts) > 0 || len(s.set.GlobalShortcuts) > 0) && s.link(c, "shortcuts-reset", "reset all") {
+			if (len(s.set.Shortcuts) > 0 || len(s.set.GlobalShortcuts) > 0) && s.link(c, "shortcuts-reset", locales.ShortcutsResetAll()) {
 				s.set.Shortcuts, s.set.GlobalShortcuts, s.recording = nil, nil, ""
 				s.save()
 			}
@@ -128,15 +127,15 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 					keys = []string{shortcutWords(current)}
 				}
 				s.row(c, cmd.title, "", func() {
-					label, ink, action := shortcutLabel(current), k.muted, "change"
+					label, ink, action := shortcutLabel(current), k.muted, locales.ShortcutsChange()
 					switch {
 					case recording:
-						label, ink, action = "press the keys · esc cancels · backspace removes", k.accent, "cancel"
+						label, ink, action = locales.ShortcutsRecording(), k.accent, locales.ShortcutsCancel()
 					case label == "":
-						label, action = "none", "set"
+						label, action = locales.ShortcutsNone(), locales.ShortcutsSet()
 					}
 					ui.Text(c, label).FontSize(k.smallSize()).TextColor(ink).MinWidth(120).TextAlign(ui.End).AlignSelf(ui.Center)
-					b := s.button(c, "shortcut-edit-"+cmd.id, action, false).Label(action + " the shortcut of " + cmd.title)
+					b := s.button(c, "shortcut-edit-"+cmd.id, action, false).Label(locales.ShortcutsEditLabel(action, cmd.title))
 					if recording {
 						// The keys pressed name the shortcut rather than run
 						// commands, until the button loses the focus.
@@ -150,13 +149,13 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 						s.recording, s.recordingFocused = "", false
 						if !recording {
 							s.recording = cmd.id
-							c.Announce("Press the keys of the shortcut of " + cmd.title + ". Escape cancels, Backspace removes it.")
+							c.Announce(locales.ShortcutsAnnounce(cmd.title))
 						}
 					}
 					// Reset puts the command's own keys back, which a command
 					// the user gave them to gives up, as when they're recorded.
 					if _, custom := s.set.Shortcuts[cmd.id]; custom && !recording &&
-						s.button(c, "shortcut-reset-"+cmd.id, "reset", false).Label("reset the shortcut of "+cmd.title).Clicked() {
+						s.button(c, "shortcut-reset-"+cmd.id, locales.ShortcutsReset(), false).Label(locales.ShortcutsResetLabel(cmd.title)).Clicked() {
 						s.setShortcut(cmd, cmd.shortcut)
 					}
 				}, keys...)
@@ -198,7 +197,7 @@ func (s *shell) setShortcut(cmd command, keys string) {
 		for _, other := range s.commands() {
 			if other.id != cmd.id && sameShortcut(s.shortcutOf(other), keys) {
 				s.set.Shortcuts[other.id] = ""
-				s.notes = append(s.notes, notice(other.title+" has no shortcut now"))
+				s.notes = append(s.notes, notice(locales.ShortcutsDisplaced(other.title)))
 			}
 		}
 	}
@@ -218,11 +217,11 @@ func (s *shell) updateSettings(c *ui.Context) {
 	if u.Kind == "development" {
 		return
 	}
-	s.group(c, "Updates", func() {
+	s.group(c, locales.UpdatesGroup(), func() {
 		asks := newVersionDoes(u)
 		last := ""
 		if t, err := time.Parse(time.RFC3339, u.LastCheck); err == nil {
-			last = " Last checked " + t.Local().Format("2 Jan 2006, 15:04") + "."
+			last = locales.UpdatesLastChecked(t.Local().Format("2 Jan 2006, 15:04"))
 		}
 		checks, downloads := u.AutomaticChecks, u.AutomaticChecks && u.AutomaticDownloads
 		set := func(checks, downloads bool) {
@@ -230,14 +229,14 @@ func (s *shell) updateSettings(c *ui.Context) {
 				s.notes = append(s.notes, noticeOf(err))
 			}
 		}
-		s.row(c, "Check for updates", "At start and every few hours, from the releases on GitHub."+asks+last, func() {
-			if s.switchOf(c.Key("update-checks"), &checks).Label("Check for updates").Changed() {
+		s.row(c, locales.UpdatesCheckTitle(), locales.UpdatesCheckAbout(asks, last), func() {
+			if s.switchOf(c.Key("update-checks"), &checks).Label(locales.UpdatesCheckTitle()).Changed() {
 				set(checks, u.AutomaticDownloads)
 			}
 		})
 		if u.Enabled {
-			s.row(c, "Install updates without asking", "New versions download in the background and run at the next launch.", func() {
-				if s.switchOf(c.Key("update-downloads"), &downloads).Label("Install updates without asking").Changed() {
+			s.row(c, locales.UpdatesInstallTitle(), locales.UpdatesInstallAbout(), func() {
+				if s.switchOf(c.Key("update-downloads"), &downloads).Label(locales.UpdatesInstallTitle()).Changed() {
 					set(u.AutomaticChecks || downloads, downloads)
 				}
 			})
@@ -251,21 +250,43 @@ func (s *shell) updateSettings(c *ui.Context) {
 func newVersionDoes(u app.UpdateStatus) string {
 	switch {
 	case u.Enabled && !u.AutomaticDownloads:
-		return " A new version asks to install."
+		return locales.UpdatesAsks()
 	case u.Kind == "flathub":
-		return " A new version comes from Flathub, through your software center."
+		return locales.UpdatesFlathub()
 	case !u.Enabled:
-		return " A new version offers its download."
+		return locales.UpdatesOffers()
 	}
 	return ""
 }
 
-// buildNames tell how a copy of each kind was installed, as
-// UpdateStatus.Kind says.
-var buildNames = map[string]string{
-	"installer": "installed with the setup", "portable": "portable", "app": "app", "archive": "installed with install.sh",
-	"deb": ".deb package", "rpm": ".rpm package", "pacman": "AUR package", "appimage": "AppImage", "flatpak": "Flatpak",
-	"flathub": "Flathub", "development": "development build",
+// buildName tells how a copy of kind was installed, as UpdateStatus.Kind
+// says; ok is false for a kind it doesn't know.
+func buildName(kind string) (name string, ok bool) {
+	switch kind {
+	case "installer":
+		return locales.UpdatesBuildInstaller(), true
+	case "portable":
+		return locales.UpdatesBuildPortable(), true
+	case "app":
+		return locales.UpdatesBuildApp(), true
+	case "archive":
+		return locales.UpdatesBuildArchive(), true
+	case "deb":
+		return locales.UpdatesBuildDeb(), true
+	case "rpm":
+		return locales.UpdatesBuildRpm(), true
+	case "pacman":
+		return locales.UpdatesBuildPacman(), true
+	case "appimage":
+		return locales.UpdatesBuildAppImage(), true
+	case "flatpak":
+		return locales.UpdatesBuildFlatpak(), true
+	case "flathub":
+		return locales.UpdatesBuildFlathub(), true
+	case "development":
+		return locales.UpdatesBuildDevelopment(), true
+	}
+	return "", false
 }
 
 // releaseRow tells whether a newer version is out, and installs it, or
@@ -273,8 +294,8 @@ var buildNames = map[string]string{
 // installed, it restarts MixMusic.
 func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 	if installed := cmp.Or(s.updated, u.Installed); installed != "" {
-		s.row(c, "MixMusic "+installed+" is installed", "It runs once MixMusic restarts.", func() {
-			if s.button(c, "restart", "restart now", true).Clicked() {
+		s.row(c, locales.UpdatesInstalledTitle(installed), locales.UpdatesRestartHint(), func() {
+			if s.button(c, "restart", locales.UpdatesRestartNow(), true).Clicked() {
 				go s.svc.System.Restart()
 			}
 		})
@@ -288,36 +309,42 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 	}
 	r := fetch(s, "release", s.svc.System.LatestRelease)
 	again := func() {
-		if !s.updating && s.link(c, "release-again", "check again") {
+		if !s.updating && s.link(c, "release-again", locales.UpdatesCheckAgain()) {
 			s.forget("release")
 		}
 	}
 	switch rel := r.value; {
 	case !r.done:
-		s.row(c, "Looking for a newer version…", "", func() {}, words)
+		s.row(c, locales.UpdatesLooking(), "", func() {}, words)
 	case r.err != nil:
-		s.row(c, "Couldn't look for a newer version", r.err.Error(), again, words)
+		s.row(c, locales.UpdatesCouldntLook(), r.err.Error(), again, words)
 	case rel.Newer:
-		var describe []string
+		var date string
 		if t, err := time.Parse(time.RFC3339, rel.Date); err == nil {
-			describe = append(describe, "Out since "+t.Local().Format("2 Jan 2006")+".")
+			date = t.Local().Format("2 Jan 2006")
 		}
-		if !u.Enabled {
-			describe = append(describe, replacing(u.Kind, rel.File))
+		var describe string
+		switch {
+		case date != "" && !u.Enabled:
+			describe = locales.UpdatesOutSinceHow(date, replacing(u.Kind, rel.File))
+		case date != "":
+			describe = locales.UpdatesOutSince(date)
+		case !u.Enabled:
+			describe = replacing(u.Kind, rel.File)
 		}
-		s.row(c, "MixMusic "+rel.Version+" is out", strings.Join(describe, " "), func() {
+		s.row(c, locales.UpdatesOut(rel.Version), describe, func() {
 			again()
-			if rel.Page != "" && s.button(c, "release-notes", "what's new", false).Clicked() {
+			if rel.Page != "" && s.button(c, "release-notes", locales.UpdatesWhatsNew(), false).Clicked() {
 				go s.svc.System.OpenExternal(rel.Page)
 			}
 			switch {
 			case u.Enabled:
-				label := "install " + rel.Version
+				label := locales.UpdatesInstallVersion(rel.Version)
 				switch {
 				case s.updating && s.updateTotal > 0:
-					label = fmt.Sprintf("downloading %d%%", 100*s.updateDone/s.updateTotal)
+					label = locales.UpdatesDownloadingPercent(int(100 * s.updateDone / s.updateTotal))
 				case s.updating:
-					label = "downloading…"
+					label = locales.UpdatesDownloading()
 				}
 				if s.button(c, "release-install", label, true).Disabled(s.updating).Clicked() {
 					s.installUpdate()
@@ -329,24 +356,32 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 			}
 		}, words)
 	default:
-		s.row(c, "This is the newest version", "", again, words)
+		s.row(c, locales.UpdatesNewest(), "", again, words)
 	}
 }
 
-// downloadLabels name the download of a release that replaces a copy of
-// each kind, as UpdateStatus.Kind says.
-var downloadLabels = map[string]string{
-	"installer": "download the installer", "portable": "download the portable zip", "app": "download the disk image",
-	"archive": "download the archive", "deb": "download the .deb", "rpm": "download the .rpm", "appimage": "download the AppImage",
-	"flatpak": "download the Flatpak",
-}
-
-// downloadLabel names the download that replaces a copy of kind.
+// downloadLabel names the download that replaces a copy of kind, as
+// UpdateStatus.Kind says.
 func downloadLabel(kind string) string {
-	if l, ok := downloadLabels[kind]; ok {
-		return l
+	switch kind {
+	case "installer":
+		return locales.UpdatesDownloadInstaller()
+	case "portable":
+		return locales.UpdatesDownloadPortable()
+	case "app":
+		return locales.UpdatesDownloadApp()
+	case "archive":
+		return locales.UpdatesDownloadArchive()
+	case "deb":
+		return locales.UpdatesDownloadDeb()
+	case "rpm":
+		return locales.UpdatesDownloadRpm()
+	case "appimage":
+		return locales.UpdatesDownloadAppImage()
+	case "flatpak":
+		return locales.UpdatesDownloadFlatpak()
 	}
-	return "download it"
+	return locales.UpdatesDownloadAny()
 }
 
 // replacing tells how file, a release's download, takes the place of a
@@ -354,33 +389,33 @@ func downloadLabel(kind string) string {
 func replacing(kind, file string) string {
 	switch kind {
 	case "deb":
-		return "Open " + file + " with your software center, or run sudo apt install ./" + file + ". Your library and settings stay."
+		return locales.UpdatesReplaceDeb(file)
 	case "rpm":
-		return "Open " + file + " with your software center, or run sudo dnf install ./" + file + ". Your library and settings stay."
+		return locales.UpdatesReplaceRpm(file)
 	case "pacman":
 		// The AUR's mixmusic-bin updates with the system, as pacman's
 		// packages do: no download of the release replaces it.
-		return "Update it as you update your system, with your AUR helper, such as yay -Syu, or with makepkg -si in its AUR folder. Your library and settings stay."
+		return locales.UpdatesReplacePacman()
 	case "appimage":
-		return "Make " + file + " executable and use it in place of this AppImage. Your library and settings stay."
+		return locales.UpdatesReplaceAppImage(file)
 	case "flatpak":
 		// A bundle's copy updates only from the next bundle: flatpak
 		// update doesn't know where it came from.
 		if file == "" {
 			return ""
 		}
-		return "Open " + file + " with your software center, or run flatpak install ./" + file + ". Your library and settings stay."
+		return locales.UpdatesReplaceFlatpak(file)
 	case "flathub":
 		// Flathub builds each release, and the software center installs
 		// it with the updates of the other apps: no download replaces it.
-		return "Your software center, such as GNOME Software or KDE Discover, installs it from Flathub with your other updates, once Flathub has built it, or run flatpak update. Your library and settings stay."
+		return locales.UpdatesReplaceFlathub()
 	case "development":
-		return "Development builds don't update themselves."
+		return locales.UpdatesReplaceDevelopment()
 	}
 	if file == "" {
 		return ""
 	}
-	return "MixMusic can't write where it is installed, so it can't replace itself: run " + file + ". Your library and settings stay."
+	return locales.UpdatesReplaceOther(file)
 }
 
 // updateOffer offers a new version: to install it, where this copy

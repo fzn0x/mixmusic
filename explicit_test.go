@@ -307,7 +307,7 @@ func TestHideExplicitSetting(t *testing.T) {
 	} else if p, _ := tt.Find("Prefer clean versions"); r.Y < p.Y {
 		t.Errorf("%s comes before Prefer clean versions", label)
 	}
-	focused := func() bool { return tt.Focused(label) && !tt.Focused(hideExplicitDescription) }
+	focused := func() bool { return tt.Focused(label) && !tt.Focused(hideExplicitDescription()) }
 	for i := 0; i < 200 && !focused(); i++ {
 		tt.Key(0, ui.KeyTab)
 	}

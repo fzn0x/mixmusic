@@ -19,7 +19,7 @@ func TestWavyProgressRow(t *testing.T) {
 	if s.svc.Preferences.Get().WavyProgress {
 		t.Fatal("on at first")
 	}
-	focused := func() bool { return tt.Focused("Wavy progress bar") && !tt.Focused(wavyProgressDescription) }
+	focused := func() bool { return tt.Focused("Wavy progress bar") && !tt.Focused(wavyProgressDescription()) }
 	for i := 0; i < 300 && !focused(); i++ {
 		tt.Key(0, ui.KeyTab)
 	}
@@ -28,7 +28,7 @@ func TestWavyProgressRow(t *testing.T) {
 	}
 	tt.Advance(time.Second)
 	var above float32
-	for _, text := range []string{"Icons only in the sidebar", "Wavy progress bar", wavyProgressDescription} {
+	for _, text := range []string{"Icons only in the sidebar", "Wavy progress bar", wavyProgressDescription()} {
 		r, ok := tt.Find(text)
 		if !ok || r.H <= 0 || r.Y <= above {
 			t.Fatalf("Settings › Appearance shows %q out of place, at %v: %q", text, r, tt.Texts())

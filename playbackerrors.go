@@ -8,6 +8,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The details of the tracks that couldn't play (#351): the toast that
@@ -108,9 +109,9 @@ func init() { addSettings("about", 25, (*shell).playbackErrorSettings) }
 // Recent playback errors.
 func (s *shell) playbackErrorSettings(c *ui.Context) {
 	failures := s.p.Failures()
-	s.group(c, "Recent playback errors", func() {
+	s.group(c, locales.PlaybackErrorsGroup(), func() {
 		if len(failures) == 0 {
-			s.hint(c, noFailures)
+			s.hint(c, locales.PlaybackErrorsNone())
 			return
 		}
 		pr := s.privacy()
@@ -121,13 +122,10 @@ func (s *shell) playbackErrorSettings(c *ui.Context) {
 				line += " · " + pr.clean(f.Steps[n-1].Why)
 			}
 			s.row(c, title, line, func() {
-				if s.button(c, "failure-details-"+strconv.Itoa(f.ID), "details", false).Label("details of " + title).Clicked() {
+				if s.button(c, "failure-details-"+strconv.Itoa(f.ID), locales.PlaybackErrorsDetails(), false).Label(locales.PlaybackErrorsDetailsOf(title)).Clicked() {
 					s.showFailure(f.ID)
 				}
 			}, "playback errors failed couldn't play details copy report")
 		}
 	})
 }
-
-// noFailures tells that no track failed to play.
-const noFailures = "No track failed to play since MixMusic started. The last few that do are listed here until MixMusic closes, with what was tried."

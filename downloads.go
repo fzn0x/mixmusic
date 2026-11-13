@@ -19,6 +19,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // bigDownload is how many tracks, or bytes, a download takes before
@@ -622,19 +623,18 @@ func init() { addSettings("playback", 80, (*shell).downloadSettings) }
 // hold, their folder, and whether they go on over a metered connection.
 func (s *shell) downloadSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, "Downloads", func() {
+	s.group(c, locales.DownloadSettingsTitle(), func() {
 		st := s.kept.Status()
-		s.row(c, "Downloads", fmt.Sprintf("%s in %s. They take the quality above, play without the network, and stay until you remove them.",
-			plural(st.Tracks, "track"), byteSize(st.Bytes)), func() {
-			if s.button(c, "show-downloads", "show", false).Label("Show downloads").Clicked() {
+		s.row(c, locales.DownloadSettingsTitle(), locales.DownloadSettingsLine(st.Tracks, byteSize(st.Bytes)), func() {
+			if s.button(c, "show-downloads", locales.DownloadSettingsShow(), false).Label(locales.DownloadSettingsShowLabel()).Clicked() {
 				s.navigate("/library/downloads")
 			}
 		}, "offline")
 		folder, def := st.Folder, s.svc.Downloads.Default()
-		s.rowWith(c, "Folder", func() {
+		s.rowWith(c, locales.DownloadSettingsFolder(), func() {
 			ui.Text(c, folder)
 			if st.Problem != "" {
-				ui.Text(c, ". "+st.Problem)
+				ui.Text(c, locales.DownloadSettingsProblem(st.Problem))
 			}
 		}, func() {
 			if s.movingDownloads {
@@ -642,22 +642,22 @@ func (s *shell) downloadSettings(c *ui.Context) {
 				if s.moveTotal > 0 {
 					v = float64(s.moveDone) / float64(s.moveTotal)
 				}
-				ui.Progress(c, v).Width(160).Label("Moving the downloads")
-				ui.Text(c, k.sentence("moving…")).FontSize(k.smallSize()).TextColor(k.muted)
+				ui.Progress(c, v).Width(160).Label(locales.DownloadSettingsMoving())
+				ui.Text(c, k.sentence(locales.DownloadSettingsMovingNow())).FontSize(k.smallSize()).TextColor(k.muted)
 				return
 			}
-			if s.button(c, "downloads-folder-open", "open", false).Label("Open the folder of the downloads").Clicked() {
+			if s.button(c, "downloads-folder-open", locales.DownloadSettingsOpen(), false).Label(locales.DownloadSettingsOpenLabel()).Clicked() {
 				s.openDownloads()
 			}
-			if s.button(c, "downloads-folder-change", "change", false).Label("Change the folder of the downloads").Clicked() {
+			if s.button(c, "downloads-folder-change", locales.DownloadSettingsChange(), false).Label(locales.DownloadSettingsChangeLabel()).Clicked() {
 				s.chooseDownloadsFolder(st)
 			}
-			if !samePath(folder, def) && s.link(c, "downloads-folder-default", "use the default") {
+			if !samePath(folder, def) && s.link(c, "downloads-folder-default", locales.DownloadSettingsUseDefault()) {
 				s.askMoveDownloads(def, st)
 			}
 		}, folder, st.Problem)
-		s.row(c, "Download on metered connections", "Off: downloads wait on a metered connection, such as a phone's hotspot.", func() {
-			if s.switchOf(c.Key("download-metered"), &s.set.DownloadOnMetered).Label("Download on metered connections").Changed() {
+		s.row(c, locales.DownloadSettingsMetered(), locales.DownloadSettingsMeteredDesc(), func() {
+			if s.switchOf(c.Key("download-metered"), &s.set.DownloadOnMetered).Label(locales.DownloadSettingsMetered()).Changed() {
 				s.save()
 			}
 		})

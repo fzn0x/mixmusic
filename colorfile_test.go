@@ -437,7 +437,7 @@ func TestColorFileSettingsViewed(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, follow := range []bool{false, true} {
-		for _, c := range colorSources {
+		for _, c := range colorSources() {
 			st := s.svc.Preferences.Get()
 			st.FollowSystem, st.ColorSource, st.ColorFile, st.Accent = follow, c.source, abs, "#123456"
 			if _, err := s.svc.Preferences.Set(st); err != nil {

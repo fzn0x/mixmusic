@@ -13,15 +13,10 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/firewall"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 func init() { addSettings("desktop", 17, (*shell).firewallSettings) }
-
-// The title of the group, and of its row.
-const (
-	firewallTitle = "Windows Firewall"
-	firewallRow   = "Connections from your network"
-)
 
 // firewallStale is how long what the firewall does is kept before it's
 // read again, at the next frame: the user may answer Windows' question, or
@@ -87,21 +82,21 @@ func (s *shell) firewallSettings(c *ui.Context) {
 	}
 	s.readFirewall(fw)
 	v := &s.firewall
-	s.group(c, firewallTitle, func() {
-		s.row(c, firewallRow, firewallAbout(v), func() {
+	s.group(c, locales.FirewallTitle(), func() {
+		s.row(c, locales.FirewallRow(), firewallAbout(v), func() {
 			switch st := v.state; {
 			case !v.known():
 			case st.CanAllow() || v.allowing:
-				label := "allow"
+				label := locales.FirewallAllow()
 				if v.allowing {
-					label = "allowing…"
+					label = locales.FirewallAllowing()
 				}
-				b := s.button(c, "firewall-allow", label, true).Label("Allow MixMusic in Windows Firewall")
+				b := s.button(c, "firewall-allow", label, true).Label(locales.FirewallAllowLabel())
 				if b.Clicked() && !v.allowing {
 					s.allowFirewall(fw)
 				}
 			case st.Public && !st.LetsIn() && !st.Managed && !st.Shielded:
-				s.linkOf(c, "network settings", networkSettings)
+				s.linkOf(c, locales.FirewallNetworkSettings(), networkSettings)
 			}
 		}, "windows firewall network connections allow blocked incoming remote control cast public private administrator")
 	})
@@ -113,25 +108,25 @@ func firewallAbout(v *firewallView) string {
 	st := v.state
 	switch {
 	case v.read.IsZero():
-		return "Reading whether Windows Firewall lets other computers and cast devices on this network reach MixMusic…"
+		return locales.FirewallReading()
 	case v.err != nil:
-		return "MixMusic couldn't read Windows Firewall: " + v.err.Error() + "."
+		return locales.FirewallError(v.err.Error())
 	case !st.On:
-		return "Windows Firewall is off for this network, so other computers and cast devices on it reach MixMusic, for remote control and casting."
+		return locales.FirewallOff()
 	case st.LetsIn():
-		return "Windows Firewall lets other computers and cast devices on this network reach MixMusic, for remote control and casting."
+		return locales.FirewallLetsIn()
 	case st.Managed:
-		return "Windows Firewall keeps other computers and cast devices on this network from reaching MixMusic, and your organization's policy decides what it lets in. Its administrators can let MixMusic in."
+		return locales.FirewallManaged()
 	case st.Shielded:
-		return "Windows Firewall blocks every incoming connection on this network, those of the apps it allows too, so other computers and cast devices can't reach MixMusic. Windows Security turns that off, in Firewall & network protection."
+		return locales.FirewallShielded()
 	case st.Public:
-		return "Windows counts this network as public, so Windows Firewall keeps other computers and cast devices on it from reaching MixMusic. If you trust the network, as the one at home, make it private in Windows' network settings."
+		return locales.FirewallPublic()
 	case st.Blocked:
-		return "Windows Firewall keeps other computers and cast devices on this network from reaching MixMusic, as it does once its question about MixMusic is answered with Cancel. Allow lets them in on private networks, with an administrator's approval."
+		return locales.FirewallBlocked()
 	case st.Asks:
-		return "Windows Firewall doesn't let other computers and cast devices reach MixMusic yet: it asks the first time remote control or casting starts. Allow lets them in on private networks now, with an administrator's approval."
+		return locales.FirewallAsks()
 	}
-	return "Windows Firewall keeps other computers and cast devices on this network from reaching MixMusic, and doesn't ask about apps. Allow lets them in on private networks, with an administrator's approval."
+	return locales.FirewallDefault()
 }
 
 // firewallKeepsOut reports whether the firewall, read, keeps other
@@ -152,9 +147,9 @@ func (s *shell) allowFirewall(fw *app.Firewall) {
 			v.reread()
 			switch {
 			case err == nil:
-				s.notes = append(s.notes, notice("Windows Firewall lets MixMusic in on private networks"))
+				s.notes = append(s.notes, notice(locales.FirewallAllowed()))
 			case errors.Is(err, firewall.ErrDeclined):
-				s.notes = append(s.notes, notice("Windows Firewall wasn't changed: "+firewall.ErrDeclined.Error()))
+				s.notes = append(s.notes, notice(locales.FirewallNotChanged(firewall.ErrDeclined.Error())))
 			default:
 				s.notes = append(s.notes, noticeOf(err))
 			}

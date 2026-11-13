@@ -30,10 +30,11 @@ export default defineConfig({
     publicKey: "y/g7m+MircfXqdGupUFNygznyyR/Y41D1YAOYw41ISU=",
     github: "fzn0x/mixmusic",
   },
-  // The release workflow signs with the Developer ID and the App Store
-  // Connect key of its secrets, which it puts in a keychain of its own:
-  // `mygo build` signs the app with the hardened runtime and a timestamp,
-  // has Apple notarize the disk image, and staples the ticket to both.
+  // The release workflow signs with the certificate of its secrets, which
+  // it puts in a keychain of its own: `mygo build` signs the app with the
+  // hardened runtime and a timestamp, and, with a Developer ID and the App
+  // Store Connect key, has Apple notarize the disk image and staples the
+  // ticket to both. A certificate of our own, self-signed, only signs.
   // MixMusic needs no entitlements: it isn't sandboxed, uses no microphone
   // or camera, sends no Apple events and loads only the system's
   // frameworks; its plugins run in sobek, which makes no machine code, and

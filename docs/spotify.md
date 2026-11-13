@@ -117,6 +117,8 @@ Apps in Spotify's development mode, as yours is, have limits:
 - Apps see the tracks of the playlists you own or collaborate on, not of
   playlists others made. A search leaves those out, and one you follow
   opens with a way to play it on Spotify.
+- Spotify shows apps nothing of its own playlists, as Today's Top Hits or
+  a Daily Mix: one you follow opens with a way to play it on Spotify too.
 - Spotify removed the artist top tracks endpoint: MixMusic finds an artist's
   popular tracks with a search instead.
 - Requests are counted against a quota; when MixMusic hits it, Spotify asks it

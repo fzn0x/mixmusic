@@ -283,8 +283,16 @@ func (s *shell) addShelfMenu(m *ui.Menu, full []settings.HomeShelf) {
 			case len(l.value) == 0:
 				m.Item("No playlists yet").Disabled(true)
 			}
+			hidden := 0
 			for _, p := range l.value {
+				if tracksHidden(p) {
+					hidden++
+					continue
+				}
 				item(m, homePlaylist+p.ID, p.Title)
+			}
+			if hidden > 0 {
+				m.Item("Spotify shows apps the tracks of your own and shared playlists only").Disabled(true)
 			}
 		})
 	}

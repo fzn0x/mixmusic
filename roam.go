@@ -10,8 +10,15 @@ import (
 	"github.com/fzn0x/mixmusic/locales"
 )
 
-// roamTags shows NetEase's tags by era, language and genre, as Explore's
-// Roam tab; a tag plays its songs, shuffled.
+// roamPage shows NetEase's tags by era, language and genre; a tag plays
+// its songs, shuffled.
+func (s *shell) roamPage(c *ui.Context) {
+	s.pageScroll(c, func() {
+		s.pageHeader(c, locales.RoamTitle(), nil, nil)
+		s.roamTags(c)
+	})
+}
+
 func (s *shell) roamTags(c *ui.Context) {
 	titles := [3]string{locales.RoamByEra(), locales.RoamByLanguage(), locales.RoamByGenre()}
 	n := 0

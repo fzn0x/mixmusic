@@ -16,10 +16,10 @@ import (
 
 // exploreTabs are the tabs of Explore, by their ids; exploreTabLabels are
 // their names, in the language the app shows.
-var exploreTabs = []string{"new", "charts", "moods", "roam"}
+var exploreTabs = []string{"new", "charts", "moods"}
 
 func exploreTabLabels() []string {
-	return []string{locales.ExploreTabNew(), locales.ExploreTabCharts(), locales.ExploreTabMoods(), locales.RoamTitle()}
+	return []string{locales.ExploreTabNew(), locales.ExploreTabCharts(), locales.ExploreTabMoods()}
 }
 
 // moodPath is the page of a mood or a genre.
@@ -42,8 +42,6 @@ func (s *shell) explorePage(c *ui.Context, tab string) {
 			s.shelvesOf(c, "charts", "the charts", s.svc.Catalog.Charts)
 		case "moods":
 			s.moods(c)
-		case "roam":
-			s.roamTags(c)
 		}
 	})
 }

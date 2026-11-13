@@ -118,6 +118,9 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 		s.explorePage(c, r.Param("tab"))
 	case r.Match("/mood/{params}"):
 		s.moodPage(c, r.Param("params"))
+	case r.Match("/roam"):
+		r.Title(locales.RoamTitle())
+		s.roamPage(c)
 	case r.Match("/stats"):
 		s.statsPage(c)
 	case r.Match("/plugin/{plugin}/{page}"):

@@ -242,9 +242,10 @@ func TestFloatingPanelRoom(t *testing.T) {
 // player bar, or not at all, in every layout design, the rail folded or
 // not, under macOS's window buttons or not, in windows down to 650 tall:
 // Expressive's rail, of taller entries, ran on under its floating bar in
-// macOS's default window of 1280×787 (#258). The tile shows there in
-// every design, as in Windows' 1280×757 inside, and the entries keep
-// their height in a window of 1536×870, where nothing ran on, beside a
+// macOS's default window of 1280×787 (#258). Since Roam made the rail's
+// eighth entry, the tile shows from 1280×812 under macOS's buttons in
+// every design, and from 1280×772 without them, and the entries keep
+// their height in a window of 1536×910, where nothing ran on, beside a
 // long list of mixes.
 func TestLiveTileRoom(t *testing.T) {
 	for _, layout := range settings.Layouts {
@@ -255,7 +256,7 @@ func TestLiveTileRoom(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			tt := testerOf(t, s, 1536, 870)
+			tt := testerOf(t, s, 1536, 910)
 			natural := float32(42)
 			if s.lk.tonal {
 				natural = s.lk.tonalEntry()
@@ -269,7 +270,7 @@ func TestLiveTileRoom(t *testing.T) {
 				s.refresh()
 				for _, bar := range []ui.TitleBar{{}, macTitleBar} {
 					tt.SetTitleBar(bar)
-					for _, size := range [][2]int{{1536, 870}, {1280, 787}, {1280, 757}, {1280, 720}, {1280, 700}, {1280, 650}} {
+					for _, size := range [][2]int{{1536, 910}, {1280, 812}, {1280, 787}, {1280, 772}, {1280, 757}, {1280, 720}, {1280, 700}, {1280, 650}} {
 						w, h := size[0], size[1]
 						tt.SetSize(w, h)
 						show(s, tt, "/")
@@ -282,11 +283,11 @@ func TestLiveTileRoom(t *testing.T) {
 						switch {
 						case tile && (r.H != liveSize(folded) || r.Y+r.H > top):
 							t.Errorf("%s: the live tile shows at %+v, the player bar from %v", what, r, top)
-						case !tile && (h >= 787 || h == 757 && bar.Left == 0):
+						case !tile && (h >= 812 || h == 772 && bar.Left == 0):
 							t.Errorf("%s: no live tile", what)
 						}
 						entry, _ := tt.Find(s.lk.words("Settings"))
-						if h == 870 && entry.H != natural {
+						if h == 910 && entry.H != natural {
 							t.Errorf("%s: the entries are %v tall, want %v", what, entry.H, natural)
 						}
 						if mixes, ok := tt.Find(s.lk.words("Your mixes")); !folded && (!ok || mixes.Y < entry.Y+entry.H) {

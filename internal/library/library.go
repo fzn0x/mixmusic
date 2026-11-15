@@ -101,7 +101,7 @@ func Open(path string) (*Library, error) {
 
 // Version counts the library's changes: what was made of it holds until
 // the version changes.
-func (l *Library) Version() uint64 { return l.file.Version() }
+func (l *Library) Version() uint64 { return l.file.Version() + l.plays.rewritten() }
 
 // Liked returns the liked tracks, the last liked first.
 func (l *Library) Liked() []media.Track {

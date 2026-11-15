@@ -93,6 +93,9 @@ type playLog struct {
 	// whole is set when the file is to be written whole, rather than
 	// appended to: it doesn't hold what memory holds.
 	whole bool
+	// rewrites counts the changes to the plays that don't come with a
+	// change to the history: of the tracks a retarget moved.
+	rewrites uint64
 }
 
 // openPlayLog reads the play log kept at path; found tells whether the
@@ -147,6 +150,14 @@ func (g *playLog) intern(l playLine) int32 {
 	if i, ok := g.byKey[key]; ok {
 		return i
 	}
+	i := int32(len(g.tracks))
+	g.tracks = append(g.tracks, l.track())
+	g.byKey[key] = i
+	return i
+}
+
+// track returns the track of a line, as the stats see it.
+func (l playLine) track() loggedTrack {
 	t := loggedTrack{Track: media.Track{ID: l.ID, Source: l.Source, Title: l.Title, Artists: l.Artists, Album: l.Album,
 		DurationMs: l.DurationMs, Video: l.Video}, year: l.Year}
 	if t.Artists == nil {
@@ -155,10 +166,7 @@ func (g *playLog) intern(l playLine) int32 {
 	if l.Episode {
 		t.Episode = &media.Episode{}
 	}
-	i := int32(len(g.tracks))
-	g.tracks = append(g.tracks, t)
-	g.byKey[key] = i
-	return i
+	return t
 }
 
 // key names what a line tells of its track: the lines of a track that

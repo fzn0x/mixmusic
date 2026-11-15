@@ -313,3 +313,38 @@ func TestPlayLogFromHistory(t *testing.T) {
 		t.Errorf("the log was filled again: %q", got)
 	}
 }
+
+// TestPlayLogRetarget moves the plays of files that became copies of a
+// song to the song, each when it played, those older than the history
+// too, which moves the library's version.
+func TestPlayLogRetarget(t *testing.T) {
+	dir := t.TempDir()
+	l := openIn(t, dir)
+	mp3, flac := tr("file:bXAz", media.SourceFile, "Ada Field"), tr("file:ZmxhYw", media.SourceFile, "Ada Field")
+	song := tr("file:song:ZmxhYw", media.SourceFile, "Ada Field")
+	other := tr("yt:other", media.SourceYouTube, "Orin Vale")
+	start := time.Date(2024, 3, 1, 20, 0, 0, 0, time.UTC)
+	withLog(t, l, []Play{{Track: mp3, PlayedAt: start}, {Track: other, PlayedAt: start.Add(time.Hour)}, {Track: flac, PlayedAt: start.Add(2 * time.Hour)}})
+	v := l.Version()
+	if err := l.Retarget(map[string]media.Track{mp3.ID: song, flac.ID: song}); err != nil {
+		t.Fatal(err)
+	}
+	if l.Version() == v {
+		t.Error("a retarget of the log alone kept the library's version")
+	}
+	want := []string{song.ID, other.ID, song.ID}
+	if got := loggedIDs(l); !slices.Equal(got, want) {
+		t.Errorf("the log holds %q, want %q", got, want)
+	}
+	again := openIn(t, dir)
+	if got := loggedIDs(again); !slices.Equal(got, want) {
+		t.Errorf("after a restart, the log holds %q, want %q", got, want)
+	}
+	if at := time.Unix(again.plays.plays[2].at, 0); !at.Equal(start.Add(2 * time.Hour)) {
+		t.Errorf("the third play counted at %v", at)
+	}
+	v = again.Version()
+	if err := again.Retarget(map[string]media.Track{mp3.ID: song}); err != nil || again.Version() != v {
+		t.Errorf("a retarget of nothing held: %v, version %d, was %d", err, again.Version(), v)
+	}
+}

@@ -308,7 +308,7 @@ func (s *shell) progress(c *ui.Context) {
 			s.p.Seek(time.Duration(s.seekTo * float64(time.Second)))
 		}
 		s.seeking = held
-		ui.Text(c, clock(dur)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum").Width(44)
+		ui.Text(c, clockLength(dur)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum").Width(44)
 	})
 }
 

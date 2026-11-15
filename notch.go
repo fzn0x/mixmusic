@@ -491,7 +491,7 @@ func (n *notch) progress(c *ui.Context, t media.Track) {
 		if s.st.Live {
 			caption("")
 		} else {
-			caption(clock(dur))
+			caption(clockLength(dur))
 		}
 	})
 }

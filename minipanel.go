@@ -388,7 +388,7 @@ func (s *shell) miniQueueEntry(c *ui.Context, i int, it player.Item, current boo
 			ui.Text(c, names(t.Artists)).FontSize(k.captionSize()).TextColor(sub).SingleLine().MinWidth(0)
 		})
 		if t.DurationMs > 0 {
-			ui.Text(c, clock(ms(t.DurationMs))).FontSize(k.captionSize()).TextColor(sub).FontFeatures("tnum").Shrink(0)
+			ui.Text(c, clockLength(ms(t.DurationMs))).FontSize(k.captionSize()).TextColor(sub).FontFeatures("tnum").Shrink(0)
 		}
 	})
 }

@@ -171,7 +171,7 @@ func (s *shell) queueRow(c *ui.Context, i int, it player.Item, current bool) {
 			})
 		})
 		if t.DurationMs > 0 {
-			ui.Text(c, clock(ms(t.DurationMs))).FontSize(k.captionSize()).TextColor(sub).FontFeatures("tnum")
+			ui.Text(c, clockLength(ms(t.DurationMs))).FontSize(k.captionSize()).TextColor(sub).FontFeatures("tnum")
 		}
 		if !current && hovered {
 			if s.iconButton(c, "q-remove-"+it.UID, "close", "Remove "+t.Title+" from the queue", false, 14).Clicked() {

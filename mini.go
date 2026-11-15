@@ -174,7 +174,7 @@ func (s *shell) miniBody(c *ui.Context, w float32) {
 				case ok && s.st.Live:
 					ui.Text(c, k.sentence("live")).FontSize(k.captionSize()).TextColor(k.accent).Shrink(0).SingleLine()
 				case ok:
-					ui.Text(c, clock(s.st.Position)+" / "+clock(s.miniDuration())).FontSize(k.captionSize()).
+					ui.Text(c, clock(s.st.Position)+" / "+clockLength(s.miniDuration())).FontSize(k.captionSize()).
 						TextColor(k.muted).FontFeatures("tnum").Shrink(0).SingleLine()
 				}
 				s.miniPanelButtons(c)

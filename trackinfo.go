@@ -209,7 +209,7 @@ func trackFacts(t media.Track, info app.TrackInfo) []infoRow {
 		rows = append(rows, infoRow{"Plays", where, false},
 			infoRow{"Quality", "As your Spotify account and Spotify's settings choose: Spotify tells MixMusic nothing of its audio.", false})
 		if t.DurationMs > 0 {
-			rows = append(rows, infoRow{"Length", clock(ms(t.DurationMs)), false})
+			rows = append(rows, infoRow{"Length", clockLength(ms(t.DurationMs)), false})
 		}
 		return append(rows, infoRow{"Loudness", "Spotify plays it at its own loudness.", false})
 	}
@@ -329,11 +329,11 @@ func lengthOf(t media.Track, info app.TrackInfo, f audio.Format) string {
 	case st != nil && st.Live:
 		return "Live"
 	case f.Duration > 0:
-		return clock(f.Duration)
+		return clockLength(f.Duration)
 	case st != nil && st.Duration > 0:
-		return clock(st.Duration)
+		return clockLength(st.Duration)
 	case t.DurationMs > 0:
-		return clock(ms(t.DurationMs))
+		return clockLength(ms(t.DurationMs))
 	}
 	return ""
 }

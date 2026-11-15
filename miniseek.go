@@ -36,7 +36,7 @@ func (s *shell) miniSeek(c *ui.Context, w float32) {
 	hi := max(dur.Seconds(), 1)
 	at := time.Duration(s.seekTo * float64(time.Second))
 	seek := ui.SliderBase(c.Key("mini-seek"), &s.seekTo, 0, hi).Absolute().Left(0).Bottom(0).Size(w, miniSeekRoom).
-		Label("Seek").Value(clock(at) + " of " + clock(dur)).Disabled(s.st.Loading).Cursor(ui.CursorPointer)
+		Label("Seek").Value(clock(at) + " of " + clockLength(dur)).Disabled(s.st.Loading).Cursor(ui.CursorPointer)
 	_, _, held := seek.Dragged()
 	if !held && (s.seeking || seek.Changed()) {
 		s.p.Seek(time.Duration(s.seekTo * float64(time.Second)))

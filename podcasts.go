@@ -328,7 +328,7 @@ func (s *shell) episodeRow(c *ui.Context, key string, i int, episodes []media.Tr
 		s.sourceMark(c, t.Source, current)
 		duration := ""
 		if t.DurationMs > 0 {
-			duration = clock(ms(t.DurationMs))
+			duration = clockLength(ms(t.DurationMs))
 		}
 		ui.Text(c, duration).FontSize(k.smallSize()).TextColor(sub).FontFeatures("tnum").Width(64).TextAlign(ui.End).Shrink(0)
 		more := s.iconButton(c, key+"-more-"+count(i), "more", "More for "+t.Title, false, 18).Menu(menu)

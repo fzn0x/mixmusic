@@ -273,12 +273,12 @@ func (s *shell) addShelfMenu(m *ui.Menu, full []settings.HomeShelf) {
 		}
 	})
 	accounts := s.accounts()
-	playlists := func(title string, l *loaded[[]media.Playlist]) {
+	playlists := func(title string, source media.Source, l *loaded[[]media.Playlist]) {
 		m.Submenu(title, func(m *ui.Menu) {
 			switch {
 			case !l.done:
 				m.Item("Loading your playlists…").Disabled(true)
-			case l.err != nil:
+			case !listCame(l.err):
 				m.Item("Couldn't load your playlists").Disabled(true)
 			case len(l.value) == 0:
 				m.Item("No playlists yet").Disabled(true)
@@ -294,13 +294,15 @@ func (s *shell) addShelfMenu(m *ui.Menu, full []settings.HomeShelf) {
 			if hidden > 0 {
 				m.Item("Spotify shows apps the tracks of your own and shared playlists only").Disabled(true)
 			}
+			// Of a list that came in part, those that came, and how many.
+			s.shortListItem(m, string(source)+":playlists", "playlists", source, l.err)
 		})
 	}
 	if accounts.YouTube.SignedIn {
-		playlists("A YouTube Music playlist", s.youtubePlaylists())
+		playlists("A YouTube Music playlist", media.SourceYouTube, s.youtubePlaylists())
 	}
 	if accounts.Spotify.SignedIn {
-		playlists("A Spotify playlist", fetch(s, "spotify:playlists", s.svc.Collection.SpotifyPlaylists))
+		playlists("A Spotify playlist", media.SourceSpotify, fetch(s, "spotify:playlists", s.svc.Collection.SpotifyPlaylists))
 	}
 	m.Submenu("An artist's new releases", func(m *ui.Menu) {
 		artists := s.followedEverywhere()
@@ -318,7 +320,8 @@ func (s *shell) addShelfMenu(m *ui.Menu, full []settings.HomeShelf) {
 }
 
 // followedEverywhere returns the artists the user follows, in MixMusic,
-// then on the services they signed in to, as those were read, each once.
+// then on the services they signed in to, as those were read, whole or in
+// part, each once.
 func (s *shell) followedEverywhere() []media.Artist {
 	artists := s.svc.Collection.FollowedArtists()
 	seen := map[string]bool{}
@@ -326,7 +329,7 @@ func (s *shell) followedEverywhere() []media.Artist {
 		seen[a.ID] = true
 	}
 	for _, key := range []string{"youtube:artists", "spotify:artists"} {
-		if l, ok := s.loads[key].(*loaded[[]media.Artist]); ok && l.done && l.err == nil && s.signedIn(keySource(key)) {
+		if l, ok := s.loads[key].(*loaded[[]media.Artist]); ok && l.done && listCame(l.err) && s.signedIn(keySource(key)) {
 			for _, a := range l.value {
 				if !seen[a.ID] {
 					seen[a.ID] = true

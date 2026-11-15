@@ -92,6 +92,35 @@ func TestAddToSpotifyPlaylistInPart(t *testing.T) {
 	}
 }
 
+// TestAddAShelfInPart offers in Add a shelf the playlists and artists of
+// lists that came in part, and how many playlists of how many came, which
+// asks for the list again.
+func TestAddAShelfInPart(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = signedInTo(false, true)
+	playlists := &loaded[[]media.Playlist]{done: true, value: []media.Playlist{roadList}, err: partOf(1, 120)}
+	s.loads["spotify:playlists"] = playlists
+	s.loads["spotify:artists"] = &loaded[[]media.Artist]{done: true, err: partOf(1, 90),
+		value: []media.Artist{{ID: "sp:dunes", Source: media.SourceSpotify, Name: "Dunes"}}}
+	tt := homeWindow(t, s, nil)
+	click(t, s, tt, "edit home")
+	choose := func(path ...string) {
+		t.Helper()
+		click(t, s, tt, "add a shelf")
+		if err := tt.ChooseMenuItem(path...); err != nil {
+			t.Fatalf("choosing %q: %v", path, err)
+		}
+		s.drain()
+		tt.Frame()
+	}
+	choose("An artist's new releases", "New from Dunes")
+	choose("A Spotify playlist", roadList.Title)
+	choose("A Spotify playlist", "Showing 1 of 120 playlists · Try again")
+	if playlists.asks != 1 {
+		t.Errorf("Try again asked %d times", playlists.asks)
+	}
+}
+
 // TestPodcastLibraryInPart shows in Library › Podcasts the shows saved on
 // Spotify of a list that came in part, says how many of how many, and
 // tells a show of it as followed on its page.

@@ -47,11 +47,11 @@ func (l *Library) Retarget(to map[string]media.Track) error {
 // retarget gives the plays of the tracks of the IDs of to the track each
 // became, each when it played, and writes the log anew. Nothing is written
 // when the log holds none of them; while the file can't be written, the
-// log stays as it was.
+// next play writes it anew.
 func (g *playLog) retarget(to map[string]media.Track) error {
 	g.mu.Lock()
-	defer g.mu.Unlock()
 	if !slices.ContainsFunc(g.tracks, func(t loggedTrack) bool { _, ok := to[t.ID]; return ok }) {
+		g.mu.Unlock()
 		return nil
 	}
 	tracks := slices.Clone(g.tracks)
@@ -62,14 +62,13 @@ func (g *playLog) retarget(to map[string]media.Track) error {
 		}
 		byKey[lineOf(time.Time{}, 0, tracks[i]).key()] = int32(i)
 	}
-	if err := g.writeWhole(g.plays, tracks); err != nil {
-		return err
-	}
 	g.tracks, g.byKey = tracks, byKey
-	g.pending, g.torn, g.whole = nil, false, false
 	g.changes++
 	g.rewrites++
-	return nil
+	v, done := g.write()
+	defer done()
+	g.whole = true
+	return g.flush(v)
 }
 
 // rewritten counts the changes to the plays that don't come with a change

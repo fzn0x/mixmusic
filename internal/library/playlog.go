@@ -83,6 +83,10 @@ type loggedTrack struct {
 // playLog is the log of the plays, in memory as in its file. Plays and
 // tracks only grow, but for a clear or a retarget, which put new slices in
 // their place: a view of them stays as it was.
+//
+// mu guards memory, and io the file, which a change locks before it
+// unlocks mu: the file takes the changes in their order, while the stats
+// read memory as the file is written.
 type playLog struct {
 	path string
 
@@ -91,6 +95,14 @@ type playLog struct {
 	tracks []loggedTrack
 	// byKey finds a track of tracks by what its lines hold.
 	byKey map[string]int32
+	// changes counts the changes to the plays, for what is made of them
+	// to hold until they change.
+	changes uint64
+	// rewrites counts the changes to the plays that don't come with a
+	// change to the history: of the tracks a retarget moved.
+	rewrites uint64
+
+	io sync.Mutex
 	// pending holds the lines whose append failed, which go with the next.
 	pending []byte
 	// torn is set when the file may end partway through a line, which a
@@ -99,12 +111,6 @@ type playLog struct {
 	// whole is set when the file is to be written whole, rather than
 	// appended to: it doesn't hold what memory holds.
 	whole bool
-	// changes counts the changes to the plays, for what is made of them
-	// to hold until they change.
-	changes uint64
-	// rewrites counts the changes to the plays that don't come with a
-	// change to the history: of the tracks a retarget moved.
-	rewrites uint64
 }
 
 // playsView is the log as it was at a moment, which no change alters
@@ -120,8 +126,23 @@ type playsView struct {
 func (g *playLog) view() playsView {
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	return g.viewLocked()
+}
+
+// viewLocked returns the log as it is, while mu is locked.
+func (g *playLog) viewLocked() playsView {
 	return playsView{plays: g.plays[:len(g.plays):len(g.plays)], tracks: g.tracks[:len(g.tracks):len(g.tracks)],
 		changes: g.changes}
+}
+
+// write takes the file's lock, and gives up memory's, which a change
+// locked, for the change to reach the file: v is memory then, and done
+// unlocks the file.
+func (g *playLog) write() (v playsView, done func()) {
+	v = g.viewLocked()
+	g.io.Lock()
+	g.mu.Unlock()
+	return v, g.io.Unlock
 }
 
 // openPlayLog reads the play log kept at path; found tells whether the
@@ -295,12 +316,13 @@ func (l playLine) encode() []byte {
 // add logs a play of t at at: in memory at once, and in the file.
 func (g *playLog) add(at time.Time, t media.Track) error {
 	g.mu.Lock()
-	defer g.mu.Unlock()
 	l := lineOf(at, 0, loggedTrack{Track: t})
 	g.plays = append(g.plays, loggedPlay{at: at.Unix(), track: g.intern(l.trackLine)})
 	g.changes++
+	v, done := g.write()
+	defer done()
 	g.pending = append(g.pending, l.encode()...)
-	return g.flush()
+	return g.flush(v)
 }
 
 // fill makes a new log hold the plays of the history, which is the latest
@@ -309,32 +331,34 @@ func (g *playLog) add(at time.Time, t media.Track) error {
 // can't be written, the next play tries again.
 func (g *playLog) fill(history []Play) error {
 	g.mu.Lock()
-	defer g.mu.Unlock()
 	for _, p := range slices.Backward(history) {
 		l := lineOf(p.PlayedAt, 0, loggedTrack{Track: p.Track})
 		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(l.trackLine)})
 	}
-	g.whole = true
 	g.changes++
-	return g.flush()
+	v, done := g.write()
+	defer done()
+	g.whole = true
+	return g.flush(v)
 }
 
 // clear forgets every play. While the file can't be written, the next
 // play writes it anew, holding only what played since.
 func (g *playLog) clear() error {
 	g.mu.Lock()
-	defer g.mu.Unlock()
 	g.plays, g.tracks, g.byKey = nil, nil, map[string]int32{}
-	g.pending, g.torn, g.whole = nil, false, true
 	g.changes++
-	return g.flush()
+	v, done := g.write()
+	defer done()
+	g.pending, g.torn, g.whole = nil, false, true
+	return g.flush(v)
 }
 
 // flush writes what the file doesn't hold yet: the lines pending, or the
-// whole log.
-func (g *playLog) flush() error {
+// whole log, as v holds it.
+func (g *playLog) flush(v playsView) error {
 	if g.whole {
-		if err := g.writeWhole(g.plays, g.tracks); err != nil {
+		if err := g.writeWhole(v.plays, v.tracks); err != nil {
 			return err
 		}
 		g.whole, g.pending, g.torn = false, nil, false

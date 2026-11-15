@@ -117,3 +117,23 @@ func TestStatsWhilePlaysCount(t *testing.T) {
 		t.Errorf("the stats count %d plays of 40", s.Plays)
 	}
 }
+
+// TestStatsDontWaitForTheFile counts the stats while the log's file is
+// being written, as a play's append and its sync take a while, so that a
+// page asking in each frame doesn't stall.
+func TestStatsDontWaitForTheFile(t *testing.T) {
+	l := open(t)
+	l.RecordPlay(tr("yt:a", media.SourceYouTube, "A"))
+	l.plays.io.Lock() // a write going on
+	defer l.plays.io.Unlock()
+	done := make(chan Stats)
+	go func() { done <- l.Stats(0) }()
+	select {
+	case s := <-done:
+		if s.Plays != 1 {
+			t.Errorf("the stats count %d plays", s.Plays)
+		}
+	case <-time.After(10 * time.Second):
+		t.Fatal("the stats waited for the file")
+	}
+}

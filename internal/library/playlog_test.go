@@ -222,13 +222,13 @@ func TestPlayLogAppendCutShort(t *testing.T) {
 			if err := os.WriteFile(path, append(before, second[:n]...), 0o600); err != nil {
 				t.Fatal(err)
 			}
-			l.plays.mu.Lock()
+			l.plays.io.Lock()
 			l.plays.pending = slices.Clone(second)
 			l.plays.wrote(n, true)
 			if !l.plays.torn || !bytes.Equal(l.plays.pending, second) {
 				t.Errorf("after %d bytes of %d: torn %v, pending %q", n, len(second), l.plays.torn, l.plays.pending)
 			}
-			l.plays.mu.Unlock()
+			l.plays.io.Unlock()
 			if err := l.RecordPlay(tr("yt:c", media.SourceYouTube, "C")); err != nil {
 				t.Fatal(err)
 			}

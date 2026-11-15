@@ -331,7 +331,8 @@ bot", which it asks of a visitor it doesn't trust.
   track says "YouTube is turning down requests from this network for
   now".
 - **What to do.** Wait a while and play the track again. Signing in to
-  YouTube Music doesn't change it, as MixMusic asks for streams signed
-  out. An old yt-dlp fails more often as YouTube changes: Settings ›
+  YouTube Music alone doesn't change it, as MixMusic asks for streams
+  signed out. With Play audio as your account on, yt-dlp asks as your
+  account first, at the best quality. An old yt-dlp fails more often as YouTube changes: Settings ›
   Playback › Tools shows whether yours is up to date.
   [Troubleshooting](troubleshooting.md) has more.

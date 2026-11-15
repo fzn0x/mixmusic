@@ -68,6 +68,7 @@
   "cleanVersions": true,
   "hideExplicit": true,
   "musicVideos": true,
+  "movingCovers": true,
   "equalizer": {
     "enabled": true,
     "preset": "bass",
@@ -88,6 +89,7 @@
   "volumeCurve": "linear",
   "volume": 0.5,
   "cacheSizeMb": 4096,
+  "movingCoversMb": 512,
   "lyricsTranslateTo": "ja",
   "downloadsFolder": "/home/me/Music",
   "downloadOnMetered": true,

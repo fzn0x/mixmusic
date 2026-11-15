@@ -409,7 +409,7 @@ ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
-lyrics/              synced lyrics from Unison and LRCLIB, and translations
+lyrics/              synced lyrics from Better Lyrics, Unison and LRCLIB, and translations
 brand/               MixMusic's logo, for code that draws it
 ```
 
@@ -463,6 +463,8 @@ talks to:
 - **Spotify,** once you sign in: your library, your Spotify Connect devices,
   and Spotify's player, loaded from `sdk.scdn.co`, when Spotify plays in
   MixMusic.
+- **Better Lyrics:** the title, first artist, album and length of the track
+  that plays, to find its lyrics, once it has an album and a length.
 - **Unison:** the video ID of the track that plays, or, without one, its
   title, artists, album and length, to find its lyrics. Only while you
   turn on translate, or romanize, beside the lyrics, the lyrics of the
@@ -533,8 +535,10 @@ MixMusic is built on these projects:
   the AppImages.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, which finds the audio of
   the tracks MixMusic can't find itself.
+- **[Better Lyrics](https://betterlyrics.org)**, whose service keeps lyrics
+  timed word by word.
 - **[Unison](https://unison.betterlyrics.org)**, the open, crowdsourced database of
-  lyrics, under the ODbL, and **[LRCLIB](https://lrclib.net)**, the open
+  lyrics, under the Unison Community License, and **[LRCLIB](https://lrclib.net)**, the open
   database of synced lyrics.
 - **[kagome](https://github.com/ikawaha/kagome)**, the Japanese
   morphological analyser that reads the kanji of lyrics for their romaji,

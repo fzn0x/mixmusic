@@ -31,6 +31,9 @@ type HomeShelf struct {
 	Hidden bool `json:"hidden,omitempty"`
 }
 
+// ArrangeKey is the key the shelf moves by, in Edit home.
+func (sh HomeShelf) ArrangeKey() string { return sh.Key }
+
 // These bound what HomeShelves holds: how many shelves, and how long a
 // key and a title may be, in bytes.
 const (

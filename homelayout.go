@@ -83,15 +83,20 @@ func arranged(layout []settings.HomeShelf, rows []homeRow, gone func(key string)
 	return out
 }
 
+// arrangeable is an item of a list the user arranges by dragging, told
+// apart by its key: a shelf of Home, or a source of lyrics
+// (settings_lyricssources.go).
+type arrangeable interface{ ArrangeKey() string }
+
 // shelfAt returns where layout has the shelf of key, or -1.
-func shelfAt(layout []settings.HomeShelf, key string) int {
-	return slices.IndexFunc(layout, func(e settings.HomeShelf) bool { return e.Key == key })
+func shelfAt[E arrangeable](layout []E, key string) int {
+	return slices.IndexFunc(layout, func(e E) bool { return e.ArrangeKey() == key })
 }
 
 // movedOnto returns layout with the shelf of key moved onto the shelf of
 // onto, as a drag drops it: after it, from above it, and before it, from
 // below.
-func movedOnto(layout []settings.HomeShelf, key, onto string) []settings.HomeShelf {
+func movedOnto[E arrangeable](layout []E, key, onto string) []E {
 	from, to := shelfAt(layout, key), shelfAt(layout, onto)
 	if from < 0 || to < 0 || from == to {
 		return layout

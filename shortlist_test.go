@@ -42,3 +42,22 @@ func TestSpotifyLibraryInPart(t *testing.T) {
 		t.Errorf("a list cut shows %q", tt.Texts())
 	}
 }
+
+// TestArtistLibraryInPart shows in Library › Artists the artists followed
+// on Spotify of a list that came in part, and says how many of how many.
+func TestArtistLibraryInPart(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = signedInTo(false, true)
+	artists := &loaded[[]media.Artist]{done: true, err: partOf(1, 120),
+		value: []media.Artist{{ID: "sp:dunes", Source: media.SourceSpotify, Name: "Dunes"}}}
+	s.loads["spotify:artists"] = artists
+	tt := tester(t, s)
+	show(s, tt, "/library/artists")
+	if !tt.HasText("Showing 1 of 120 artists") || !tt.HasText("Dunes") || tt.HasText(artists.err.Error()) {
+		t.Fatalf("Library › Artists shows %q", tt.Texts())
+	}
+	click(t, s, tt, "try again")
+	if artists.asks != 1 {
+		t.Errorf("Try again asked %d times", artists.asks)
+	}
+}

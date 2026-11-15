@@ -77,9 +77,11 @@ uses. It needs no account and no API key:
   liked songs, playlists, albums, subscriptions, likes, dislikes and
   saved shows. It can act as one of your brand channels.
 
-Audio is a separate matter: MixMusic always finds streams signed out, even
-while you're signed in, as YouTube gives an account's requests fewer
-streams.
+Audio is a separate matter: MixMusic finds streams signed out, even while
+you're signed in, as YouTube gives an account's requests fewer streams.
+The exception is [Play audio as your account](playing-music.md#play-audio-as-your-account),
+off at first: with it on, yt-dlp asks as your account first, at the best
+quality, for Premium's higher bitrate.
 
 ## Spotify
 

@@ -62,7 +62,8 @@ type Server struct {
 	Identity *remote.Identity
 	// Name is the host's name in rooms, which the guests show.
 	Name string
-	// Code is the room's code, and Secret its invite link's secret.
+	// Code is the room's code, and Secret its invite link's secret, as it
+	// opens: SetCode changes them.
 	Code   string
 	Secret []byte
 	Host   Host
@@ -646,6 +647,15 @@ func compareKeys(a, b remote.Fingerprint) int {
 		}
 	}
 	return 0
+}
+
+// SetCode gives the room a new code and a new secret for its invite link:
+// the old ones let no one in from then on, a computer the host removed or
+// blocked under another key too. The guests stay.
+func (s *Server) SetCode(code string, secret []byte) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.Code, s.Secret = code, secret
 }
 
 // Remove removes the guest of key from the room: it is told so, and joins

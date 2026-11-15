@@ -375,16 +375,21 @@ func TestScrobblerStopsWhenTheSessionExpires(t *testing.T) {
 	}
 	wantQueue(t, s, Play{a, t0}) // kept for the next session
 
-	// It tells once, then neither counts nor sends.
-	if p.load("b", song("B", 3*time.Minute)) {
+	// It tells once, then sends nothing, but what is heard still waits.
+	bTrack := song("B", 3*time.Minute)
+	if p.load("b", bTrack) {
 		t.Error("something to send with an expired session")
 	}
+	bStart := p.now
 	p.run(90 * time.Second)
 	if err := s.Send(ctx); err != nil {
 		t.Errorf("second Send: %v", err)
 	}
-	wantQueue(t, s, Play{a, t0})
+	wantQueue(t, s, Play{a, t0}, Play{bTrack, bStart})
 	api.wantCalls(t, "nowPlaying SK A", "scrobble SK 1")
+	if !s.Expired() {
+		t.Error("not expired")
+	}
 
 	// The user connects again: the queue goes out with the new key, and
 	// the track playing is announced.
@@ -398,8 +403,48 @@ func TestScrobblerStopsWhenTheSessionExpires(t *testing.T) {
 	if err := s.Send(ctx); err != nil {
 		t.Fatal(err)
 	}
-	api.wantCalls(t, "nowPlaying SK A", "scrobble SK 1", "scrobble SK2 1", "nowPlaying SK2 B")
+	api.wantCalls(t, "nowPlaying SK A", "scrobble SK 1", "scrobble SK2 2", "nowPlaying SK2 B")
 	wantQueue(t, s)
+}
+
+// TestScrobblerDiscard drops what waits, and saves that.
+func TestScrobblerDiscard(t *testing.T) {
+	s := NewScrobbler(&fakeAPI{}, "SK")
+	var saved [][]Play
+	s.OnQueue = func(p []Play) { saved = append(saved, p) }
+	a := song("A", 3*time.Minute)
+	p := newPlayer(s)
+	p.load("a", a)
+	p.run(90 * time.Second)
+	wantQueue(t, s, Play{a, t0})
+	s.Discard()
+	wantQueue(t, s)
+	if len(saved) != 2 || len(saved[1]) != 0 {
+		t.Errorf("saved %v", saved)
+	}
+}
+
+// TestScrobblerNoSessionQueuesNothing: without any key plays aren't kept.
+func TestScrobblerNoSessionQueuesNothing(t *testing.T) {
+	s := NewScrobbler(&fakeAPI{}, "")
+	p := newPlayer(s)
+	p.load("a", song("A", 3*time.Minute))
+	p.run(90 * time.Second)
+	wantQueue(t, s)
+}
+
+// TestScrobblerQueueCap drops the oldest plays past the cap.
+func TestScrobblerQueueCap(t *testing.T) {
+	s := NewScrobbler(&fakeAPI{}, "SK")
+	s.queue = make([]Play, maxQueue)
+	s.queue[0].Track.Title = "oldest"
+	p := newPlayer(s)
+	p.load("a", song("A", 3*time.Minute))
+	p.run(90 * time.Second)
+	q := s.Queue()
+	if len(q) != maxQueue || q[0].Track.Title == "oldest" || q[maxQueue-1].Track.Title != "A" {
+		t.Errorf("%d plays, first %q, last %q", len(q), q[0].Track.Title, q[maxQueue-1].Track.Title)
+	}
 }
 
 // TestScrobblerCountsAtSpeed counts how much of the track was heard: half

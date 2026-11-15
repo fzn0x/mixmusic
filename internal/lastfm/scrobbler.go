@@ -30,6 +30,10 @@ const (
 	// startWindow is how close to its beginning a track must be, after it
 	// had played further, to be played again.
 	startWindow = 5 * time.Second
+	// maxQueue is how many scrobbles wait at most, the oldest dropped
+	// first, so that a refused session cannot grow the saved queue
+	// without end.
+	maxQueue = 5000
 )
 
 // Scrobbler decides, from what the player reports, which plays count as
@@ -120,6 +124,24 @@ func (s *Scrobbler) SetQueue(plays []Play) {
 	s.tryQueue = true
 }
 
+// Discard drops the scrobbles waiting to be sent, such as when the user
+// chose not to send them to the account that took the place of theirs.
+func (s *Scrobbler) Discard() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.queue = nil
+	s.gen++
+	s.saveQueue()
+}
+
+// Expired reports whether the service refused the session key, so that
+// plays wait in the queue until SetSession gives a new one.
+func (s *Scrobbler) Expired() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.expired
+}
+
 // Observe tells the Scrobbler what the player does at now: id identifies the
 // loaded track and is empty when none is, t describes it, playing reports
 // whether it plays, position is how far into the track it is, and rate is
@@ -171,11 +193,16 @@ func (s *Scrobbler) count() {
 		return
 	}
 	c.scrobbled = true
-	if !s.active() {
+	if s.session == "" {
 		return
 	}
+	// A refused session still queues: the plays go out once a new session
+	// is set.
 	s.queue = append(s.queue, Play{Track: c.track, Start: c.start})
-	s.tryQueue = true
+	if len(s.queue) > maxQueue {
+		s.queue = slices.Delete(s.queue, 0, len(s.queue)-maxQueue)
+	}
+	s.tryQueue = s.active()
 	s.saveQueue()
 }
 
@@ -189,7 +216,8 @@ func (s *Scrobbler) count() {
 // scrobble of a new play, which joins the queue behind them. Scrobbles that
 // Last.fm rejects for another reason are dropped. When Last.fm rejects the
 // session key, Send returns ErrSessionExpired, once, and the Scrobbler
-// neither counts nor sends anything until SetSession gives it a new key.
+// does not send anything until SetSession gives it a new key; plays go on
+// joining the queue meanwhile.
 //
 // Send returns at once while another Send runs.
 func (s *Scrobbler) Send(ctx context.Context) error {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"slices"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -246,4 +247,18 @@ func TestPartCacheKeepsDownloadsFirst(t *testing.T) {
 	if _, ok := again.Known("oldest", false); ok {
 		t.Error("more than partsKept were kept")
 	}
+}
+
+// TestNoticesCreditSponsorBlock lists SponsorBlock's data among the
+// licenses, under CC BY-NC-SA 4.0, as its attribution asks.
+func TestNoticesCreditSponsorBlock(t *testing.T) {
+	for _, n := range (&System{}).Notices() {
+		if strings.HasPrefix(n.Name, "SponsorBlock") {
+			if !strings.Contains(n.Text, "CC BY-NC-SA 4.0") || !strings.Contains(n.Text, "https://sponsor.ajay.app/") {
+				t.Errorf("the notice doesn't credit SponsorBlock: %s", n.Text)
+			}
+			return
+		}
+	}
+	t.Error("no notice of SponsorBlock's data")
 }

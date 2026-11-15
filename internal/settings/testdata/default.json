@@ -42,6 +42,16 @@
   "podcastSpeed": 1,
   "skipDisliked": true,
   "skipAi": false,
+  "skipParts": {
+    "on": false,
+    "kinds": [
+      "music_offtopic",
+      "sponsor",
+      "selfpromo"
+    ],
+    "highlight": true,
+    "server": ""
+  },
   "cleanVersions": false,
   "hideExplicit": false,
   "musicVideos": false,

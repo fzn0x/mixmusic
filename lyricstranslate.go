@@ -357,9 +357,14 @@ func (s *shell) translateOptions() []string {
 	return ls.languages
 }
 
+// lyricsRows are the rows of Settings › Playback › Lyrics after
+// Translate lyrics to, which register from their features' files.
+const lyricsRows = "playback › Lyrics"
+
 func init() { addSettings("playback", 60, (*shell).lyricsSettings) }
 
-// lyricsSettings chooses the language lyrics translate to.
+// lyricsSettings chooses the language lyrics translate to, and shows the
+// other rows of the lyrics.
 func (s *shell) lyricsSettings(c *ui.Context) {
 	s.group(c, "Lyrics", func() {
 		s.row(c, "Translate lyrics to", "The translate switch beside the lyrics shows them in this language. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them; nothing is sent while it's off. Lyrics in other scripts show in Latin letters made on this computer, which sends nothing: Japanese in romaji, and the others by the standard of their language. Only Arabic's go to Unison, which romanizes them with the vowels Arabic doesn't write.", func() {
@@ -378,5 +383,6 @@ func (s *shell) lyricsSettings(c *ui.Context) {
 				s.save()
 			}
 		})
+		s.settingsOf(c, lyricsRows)
 	})
 }

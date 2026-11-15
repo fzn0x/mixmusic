@@ -161,11 +161,19 @@ func controlsArtwork(images []media.Image) string {
 }
 
 // coverBytes returns the cover at an address, for the system's media
-// controls: one the index keeps from its file, else the artwork store's,
-// which downloads it unless it has it.
+// controls: one the index of the music on the computer or the downloads
+// keep from its file, else the artwork store's, which downloads it unless
+// it has it.
 func (a *App) coverBytes(ctx context.Context, rawURL string) ([]byte, error) {
 	if path, ok := a.localFiles.ArtFile(rawURL); ok {
 		return os.ReadFile(path)
+	}
+	if path, ok := a.downloads.ArtworkFile(rawURL); ok {
+		// A downloads folder on a drive that isn't plugged in has no file to
+		// read: the store has the cover, or downloads it.
+		if data, err := os.ReadFile(path); err == nil {
+			return data, nil
+		}
 	}
 	return a.artStore.Bytes(ctx, rawURL)
 }

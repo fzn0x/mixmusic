@@ -15,8 +15,13 @@ import (
 // Filler, and credits SponsorBlock: off, the group is its switch alone.
 func TestSkipPartsSettings(t *testing.T) {
 	s := newTestShell(t)
-	tt := testerOf(t, s, 1280, 4000)
+	// The window's own height: the page scrolls to the group, wherever the
+	// groups above it put it.
+	tt := tester(t, s)
 	show(s, tt, "/settings/playback")
+	if !reveal(tt, "Skip the parts SponsorBlock marks") {
+		t.Fatalf("the group doesn't come into view: %q", tt.Texts())
+	}
 	credited := slices.ContainsFunc(tt.Texts(), func(s string) bool {
 		return strings.HasPrefix(s, "Uses SponsorBlock data licensed under CC BY-NC-SA 4.0 from https://sponsor.ajay.app/.")
 	})
@@ -48,6 +53,9 @@ func TestSkipPartsSettings(t *testing.T) {
 	}
 	if !tt.HasText("Tangents and jokes beside the topic. It skips a lot, so it's off at first.") {
 		t.Error("Filler doesn't warn that it skips a lot")
+	}
+	if !reveal(tt, "Filler") {
+		t.Fatalf("Filler doesn't come into view: %q", tt.Texts())
 	}
 	filler, _ := tt.Access("Skip Filler")
 	tt.ClickAt(filler.Bounds.X+filler.Bounds.W/2, filler.Bounds.Y+filler.Bounds.H/2)

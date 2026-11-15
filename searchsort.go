@@ -45,13 +45,22 @@ func searchSortOptions(pivot string, scope int) []string {
 	return nil
 }
 
-// searchSortChosen is the choice of the pivot for the search q, which
-// goes back to Best match on each new search and when the pivot or the
-// services don't offer what it was.
-func (s *shell) searchSortChosen(q, pivot string, options []string) *string {
+// sortSelect is the Sort by select, beside Services, for the options of
+// the pivot, and what it chose. The choices go back to Best match on each
+// new search, and the shared one where only Spotify is chosen, which has
+// no counts; the pivots with no order (artists, podcasts) show no select
+// and keep them.
+func (s *shell) sortSelect(c *ui.Context, q, pivot string, scope int) string {
 	st := &s.searchSort
 	if st.query != q {
 		*st = searchSorting{query: q}
+	}
+	options := searchSortOptions(pivot, scope)
+	if len(options) == 0 {
+		if scope == 1 {
+			st.general = sortBestMatch
+		}
+		return sortBestMatch
 	}
 	chosen := &st.general
 	if pivot == "albums" {
@@ -60,17 +69,6 @@ func (s *shell) searchSortChosen(q, pivot string, options []string) *string {
 	if !slices.Contains(options, *chosen) {
 		*chosen = sortBestMatch
 	}
-	return chosen
-}
-
-// sortSelect is the Sort by select, beside Services, for the options of
-// the pivot, and what it chose; it shows nothing where only Best match is.
-func (s *shell) sortSelect(c *ui.Context, q, pivot string, scope int) string {
-	options := searchSortOptions(pivot, scope)
-	if len(options) == 0 {
-		return sortBestMatch
-	}
-	chosen := s.searchSortChosen(q, pivot, options)
 	s.selectOf(c.Key("sort"), chosen, options).Width(170).Label("Sort by")
 	return *chosen
 }

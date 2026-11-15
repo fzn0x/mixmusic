@@ -95,9 +95,27 @@ func parsePlaylist(n node, playlistID string) (media.Playlist, string, error) {
 }
 
 // continuationToken returns the token of a continuationItemRenderer, the
-// last item of a list that has more.
+// last item of a list that has more. A playlist sorted by Top voted wraps
+// its continuationCommand in a commandExecutorCommand, beside a command
+// that refreshes the votes: of its commands, the first that continues a
+// browse holds the token, or else the first that continues at all.
 func continuationToken(item node) string {
-	return item.get("continuationItemRenderer", "continuationEndpoint", "continuationCommand", "token").str()
+	end := item.get("continuationItemRenderer", "continuationEndpoint")
+	if token := end.get("continuationCommand", "token").str(); token != "" {
+		return token
+	}
+	first := ""
+	for _, command := range end.get("commandExecutorCommand", "commands").list() {
+		next := command.get("continuationCommand")
+		token := next.get("token").str()
+		if token != "" && next.get("request").str() == "CONTINUATION_REQUEST_TYPE_BROWSE" {
+			return token
+		}
+		if first == "" {
+			first = token
+		}
+	}
+	return first
 }
 
 // continuationItems returns the items of a continuation response and the

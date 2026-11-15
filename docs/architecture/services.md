@@ -15,7 +15,11 @@
 - **`internal/youtube`** reads YouTube Music through the API its website uses:
   search, suggestions (searches, then songs, albums, artists and
   playlists), the home and explore pages, charts, moods and genres, albums,
-  artists, playlists, related tracks, radios and plain lyrics. Below a
+  artists, playlists, related tracks, radios and plain lyrics. A page of
+  a list that has more ends in an item with the token of the next: a
+  playlist sorted by Top voted wraps it in a `commandExecutorCommand`,
+  beside a command that refreshes the votes, and `continuationToken`
+  reads either (#626). Below a
   playlist the user owns, YouTube Music suggests songs to add, five at a
   time: the playlist's `Suggest` is the token of the first, and each
   answer has the token of a refresh, for the next (`PlaylistSuggestions`).

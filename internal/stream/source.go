@@ -53,6 +53,11 @@ type Source struct {
 	closed bool
 	pos    int64
 
+	// first is the download from the start, which goes on beside dl once
+	// whole is set and a read far ahead started dl (KeepWhole).
+	first *download
+	whole bool
+
 	// local is set when the last download's audio came from this
 	// computer: from what is kept, as a download, or from the cache.
 	local bool
@@ -107,11 +112,16 @@ func (p *Proxy) open(ctx context.Context, videoID, path string, interrupted func
 	return s, nil
 }
 
-// fetch starts downloading from off, in place of the download under way.
-// Its caller holds mu.
+// fetch starts downloading from off, in place of the download under way:
+// beside it, when it is the download from the start the source keeps
+// whole. Its caller holds mu.
 func (s *Source) fetch(off int64) (*sourceWriter, chan struct{}) {
-	if s.dl != nil {
-		s.dl.cancel()
+	switch d := s.dl; {
+	case d == nil:
+	case s.whole && s.first == nil && d.start == 0 && off > 0:
+		s.first = d
+	default:
+		d.cancel()
 	}
 	ctx, cancel := context.WithCancel(s.ctx)
 	d := &download{start: off, at: off, cancel: cancel}
@@ -139,6 +149,11 @@ func (s *Source) fetch(off int64) (*sourceWriter, chan struct{}) {
 func (s *Source) finish(d *download) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if s.first == d {
+		// What it brought is kept; another serves the reads.
+		s.first = nil
+		return
+	}
 	if s.dl != d {
 		return // closed, or another took over
 	}
@@ -244,6 +259,17 @@ func (s *Source) Seek(offset int64, whence int) (int64, error) {
 	return offset, nil
 }
 
+// KeepWhole has the source download its audio from the start to its end
+// from now on, as audio.Whole asks: a read far ahead starts a download
+// there beside it, rather than in its place, so that the track goes to
+// the cache as one played through does. The engine asks it of a track it
+// passes over parts of (#548).
+func (s *Source) KeepWhole() {
+	s.mu.Lock()
+	s.whole = true
+	s.mu.Unlock()
+}
+
 // Wake makes a Read that waits check its interrupted function again.
 func (s *Source) Wake() {
 	s.mu.Lock()
@@ -256,7 +282,7 @@ func (s *Source) Close() error {
 	s.cancel()
 	s.mu.Lock()
 	s.closed = true
-	s.dl = nil
+	s.dl, s.first = nil, nil
 	s.cond.Broadcast()
 	s.mu.Unlock()
 	return nil
@@ -338,7 +364,8 @@ func (w *sourceWriter) Write(b []byte) (int, error) {
 	s, d := w.s, w.d
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.dl != d {
+	kept := s.first == d
+	if s.dl != d && !kept {
 		return 0, errDropped // closed, or another took over: the proxy stops
 	}
 	if w.status != http.StatusOK && w.status != http.StatusPartialContent {
@@ -347,7 +374,7 @@ func (w *sourceWriter) Write(b []byte) (int, error) {
 	s.put(d.at, b)
 	d.at += int64(len(b))
 	s.cond.Broadcast()
-	if d.at < s.size && s.reach(d.at) == s.size {
+	if !kept && d.at < s.size && s.reach(d.at) == s.size {
 		return len(b), errDropped // the rest came already
 	}
 	return len(b), nil

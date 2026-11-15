@@ -1,8 +1,10 @@
 package audio
 
 import (
+	"context"
 	"fmt"
 	"slices"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -242,5 +244,42 @@ func TestEngineCrossfadesPastAPart(t *testing.T) {
 	rec.waitFor(t, "skipped "+speech+" 0s 1s")
 	if p := e.Position(); p < time.Second {
 		t.Errorf("position %v of the track faded into", p)
+	}
+}
+
+// wholeSource is a file's Source that records being asked to keep its
+// download whole.
+type wholeSource struct {
+	Source
+	kept *atomic.Bool
+}
+
+func (s wholeSource) KeepWhole() { s.kept.Store(true) }
+
+// TestDeckKeepsTheDownloadWhole asks the source of a track the deck passes
+// over parts of to go on downloading it from its start, and not that of a
+// track it passes over nothing of.
+func TestDeckKeepsTheDownloadWhole(t *testing.T) {
+	for _, skips := range [][]Skip{nil, {{From: time.Second, To: 2 * time.Second}}} {
+		var kept atomic.Bool
+		open := func(ctx context.Context, url string, interrupted func() bool) (Source, error) {
+			src, err := fileOpener(ctx, url, interrupted)
+			return wholeSource{src, &kept}, err
+		}
+		d := newDeckSkipping(cuesFront, 0, skips, open, func() {})
+		deadline := time.Now().Add(5 * time.Second)
+		for {
+			if _, ready := d.info(); ready {
+				break
+			}
+			if time.Now().After(deadline) {
+				t.Fatal("the deck didn't open the track")
+			}
+			time.Sleep(time.Millisecond)
+		}
+		if kept.Load() != (skips != nil) {
+			t.Errorf("parts %v: kept whole %v", skips, kept.Load())
+		}
+		d.close()
 	}
 }

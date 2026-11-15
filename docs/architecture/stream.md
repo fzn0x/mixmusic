@@ -12,6 +12,10 @@
   A `Source` tells whether its audio comes from this computer, a download
   or the cache (`Source.Local`), whose failure the engine words as the
   file's.
+  A read far ahead of the download starts it again there, which would
+  leave the track out of the cache; of a track the engine passes over
+  parts of (#548), the download from the start goes on beside the one
+  from there (`Source.KeepWhole`), so that it still goes to the cache.
   YouTube lists no 5.1 surround audio to the visionOS app, so the direct
   route asks as YouTube's app for Samsung's TVs too, at once, which it
   tells of a video's AC-3 and E-AC-3 (formats 380 and 328). The stream

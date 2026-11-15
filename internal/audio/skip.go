@@ -170,6 +170,10 @@ func (d *deck) replan() {
 		d.plan.Store(nil)
 		return
 	}
+	// The download from the start goes on past the parts, for the cache.
+	if w, ok := d.src.(Whole); ok {
+		w.KeepWhole()
+	}
 	old := d.plan.Load()
 	p := &skipPlan{spans: make([]skipSpan, len(spans))}
 	for i, s := range spans {

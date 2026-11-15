@@ -43,6 +43,14 @@ type Shortened interface {
 	Shortened() bool
 }
 
+// Whole is a Source that can keep downloading its track whole, from its
+// start, while a deck reads far ahead of it: as a deck that passes over
+// parts of its track (skip.go) asks it to, so that the track goes to the
+// cache as one played through does.
+type Whole interface {
+	KeepWhole()
+}
+
 // Opener opens the Source of a track's URL, whose reads stop waiting when
 // interrupted returns true. Its errors say why in the words of the
 // interface, as the player shows them.

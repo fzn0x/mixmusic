@@ -232,7 +232,8 @@ func (c *Client) Playlist(ctx context.Context, id, userID string) (media.Playlis
 	if err := c.get(ctx, "/playlists/"+url.PathEscape(id)+"/items?limit="+strconv.Itoa(pageLimit), nil, &page); err != nil {
 		return media.Playlist{}, err
 	}
-	out.Tracks, out.More, out.TrackCount = playlistTracks(page.Items), page.Next, max(out.TrackCount, page.Total)
+	out.Tracks, out.Unplayable = playlistTracks(page.Items)
+	out.More, out.TrackCount = page.Next, max(out.TrackCount, page.Total)
 	return out, nil
 }
 
@@ -240,14 +241,22 @@ func (c *Client) Playlist(ctx context.Context, id, userID string) (media.Playlis
 // by the address of More, and the address of the page after it, "" after
 // the last. It asks only the API for them.
 func (c *Client) PlaylistPage(ctx context.Context, next string) ([]media.Track, string, error) {
+	tracks, after, _, err := c.PlaylistPageCounting(ctx, next)
+	return tracks, after, err
+}
+
+// PlaylistPageCounting is PlaylistPage that also counts the items of the
+// page it leaves out, by kind.
+func (c *Client) PlaylistPageCounting(ctx context.Context, next string) ([]media.Track, string, media.Unplayable, error) {
 	if !strings.HasPrefix(next, strings.TrimRight(c.BaseURL, "/")+"/") {
-		return nil, "", errors.New("spotify: the next page of the playlist is not the API's")
+		return nil, "", media.Unplayable{}, errors.New("spotify: the next page of the playlist is not the API's")
 	}
 	var page paging[playlistItem]
 	if err := c.get(ctx, next, nil, &page); err != nil {
-		return nil, "", err
+		return nil, "", media.Unplayable{}, err
 	}
-	return playlistTracks(page.Items), page.Next, nil
+	tracks, left := playlistTracks(page.Items)
+	return tracks, page.Next, left, nil
 }
 
 // MyPlaylists returns the playlists the user made or follows.

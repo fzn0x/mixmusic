@@ -27,17 +27,21 @@ func (c *Catalog) ReadOn(ctx context.Context, p media.Playlist, onPage func(medi
 }
 
 func (a *App) readOn(ctx context.Context, p media.Playlist, onPage func(media.Playlist)) (media.Playlist, error) {
-	var read media.PageFunc
+	var read media.CountedPageFunc
 	switch p.Source {
 	case media.SourceYouTube:
-		read = a.youtube.PlaylistPage
+		youtube := a.youtube.PlaylistPage
+		read = func(ctx context.Context, token string) ([]media.Track, string, media.Unplayable, error) {
+			tracks, next, err := youtube(ctx, token)
+			return tracks, next, media.Unplayable{}, err
+		}
 	case media.SourceSpotify:
-		read = a.spotify.PlaylistPage
+		read = a.spotify.PlaylistPageCounting
 	}
 	if read == nil || p.More == "" {
 		return p, nil
 	}
-	err := p.ReadOn(ctx, read, onPage)
+	err := p.ReadOnCounting(ctx, read, onPage)
 	return p, err
 }
 

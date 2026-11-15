@@ -234,6 +234,29 @@ type Playlist struct {
 	// Cut is set for a playlist of more tracks than MixMusic reads,
 	// MaxTracks: it holds the first of them.
 	Cut bool `json:"-"`
+	// Unplayable counts the items of the playlist its service lists that
+	// are left out of Tracks, by kind, as far as they were read: the page
+	// says why its count is above its rows.
+	Unplayable Unplayable `json:"-"`
+}
+
+// Unplayable counts the items of a playlist that can't play in MixMusic,
+// by kind. Any service fills what it has.
+type Unplayable struct {
+	// Local counts local files, which only the app that has them plays.
+	Local int
+	// Episodes counts podcast episodes.
+	Episodes int
+	// Gone counts items with no track: removed, or unavailable.
+	Gone int
+}
+
+// Total is how many items there are.
+func (u Unplayable) Total() int { return u.Local + u.Episodes + u.Gone }
+
+// Add returns the sum of u and v.
+func (u Unplayable) Add(v Unplayable) Unplayable {
+	return Unplayable{u.Local + v.Local, u.Episodes + v.Episodes, u.Gone + v.Gone}
 }
 
 // ItemKind is the kind of an Item.

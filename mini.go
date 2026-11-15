@@ -280,10 +280,27 @@ func (s *shell) applyMiniZoom(c *ui.Context) {
 	if z == was || s.win == nil {
 		return
 	}
+	// As it opens, the window has the size its last run left, which suits
+	// the zoom that run ended at, or its size at this zoom when it keeps
+	// none (OpenMini): scaled from that zoom, it suits this one (#717).
+	from := was
+	if from == 0 {
+		from = s.set.MiniZoom
+	}
 	// After the frame, as closing it is (#37), and in turn with the moves
 	// of the panel's window, which read its size.
 	win := s.win
-	mygo.App.WhenReady(func() { fitMini(win, was, z, s.miniLimits()) })
+	mygo.App.WhenReady(func() { fitMini(win, from, z, s.miniLimits()) })
+	s.keepMiniZoom(z)
+}
+
+// keepMiniZoom keeps the zoom z the mini player's window is now sized
+// for, which the size the window keeps for its next run suits (#717).
+func (s *shell) keepMiniZoom(z float64) {
+	if s.set.MiniZoom != z {
+		s.set.MiniZoom = z
+		s.save()
+	}
 }
 
 // miniSize is the size of the mini player's window at the zoom z, and its
@@ -298,8 +315,8 @@ func miniSize(z float64) (w, h, minW, minH, maxH int) {
 }
 
 // fitMini sizes the mini player's window for the zoom z, from the zoom
-// was, 0 when it just opened: at the size its last run left it. Its least
-// and largest heights are lim's, at 100%.
+// was its size suits, 0 for one not known: it keeps the size then, but
+// for its least and largest. Those heights are lim's, at 100%.
 func fitMini(win *mygo.Window, was, z float64, lim miniLimit) {
 	scale := func(n float32) int { return int(float64(n)*z + 0.5) }
 	win.SetMinimumSize(scale(miniMinWidth), scale(lim.min))

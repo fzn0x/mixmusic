@@ -1,10 +1,48 @@
 package media
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 )
+
+// TestTryPage reads a page again after each of PageWaits while it fails,
+// and stops trying once the context ends.
+func TestTryPage(t *testing.T) {
+	quickTries(t)
+	down := errors.New("HTTP 503")
+	tries := 0
+	failing := func(n int) func(context.Context) error {
+		return func(context.Context) error {
+			if tries++; tries <= n {
+				return down
+			}
+			return nil
+		}
+	}
+	if err := TryPage(context.Background(), failing(len(PageWaits))); err != nil || tries != len(PageWaits)+1 {
+		t.Errorf("a page that fails %d times: %v after %d tries", len(PageWaits), err, tries)
+	}
+	tries = 0
+	if err := TryPage(context.Background(), failing(len(PageWaits)+1)); !errors.Is(err, down) || tries != len(PageWaits)+1 {
+		t.Errorf("a page that always fails: %v after %d tries", err, tries)
+	}
+
+	// A read dropped stops at once, with what failed.
+	PageWaits = []time.Duration{time.Hour}
+	ctx, cancel := context.WithCancel(context.Background())
+	tries = 0
+	err := TryPage(ctx, func(context.Context) error {
+		tries++
+		cancel()
+		return down
+	})
+	if !errors.Is(err, down) || tries != 1 {
+		t.Errorf("a read dropped: %v after %d tries", err, tries)
+	}
+}
 
 // TestShortList tells how much of a list came and why the rest didn't,
 // and is found in an error that wraps it.

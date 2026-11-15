@@ -1,9 +1,28 @@
 package media
 
 import (
+	"context"
 	"errors"
 	"strconv"
+	"time"
 )
+
+// TryPage reads a page of a long list with read, and while it fails,
+// tries again after each of PageWaits, as a page of tracks is, unless ctx
+// ends. It returns the error of the last try.
+func TryPage(ctx context.Context, read func(ctx context.Context) error) error {
+	for try := 0; ; try++ {
+		err := read(ctx)
+		if err == nil || try == len(PageWaits) || ctx.Err() != nil {
+			return err
+		}
+		select {
+		case <-time.After(PageWaits[try]):
+		case <-ctx.Done():
+			return err
+		}
+	}
+}
 
 // ShortList is the error of a list of the user's library on a service, as
 // their playlists or the artists they follow, that came in part: Got of

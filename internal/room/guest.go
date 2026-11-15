@@ -286,6 +286,15 @@ func (s *Session) Offset() (time.Duration, bool) {
 	return off, ok
 }
 
+// RoundTrip returns the round trip of the ping whose answer Offset takes,
+// within half of which the estimate is.
+func (s *Session) RoundTrip() time.Duration {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	_, rtt, _ := s.offset.Get()
+	return rtt
+}
+
 // Now is the guest's clock's time.
 func (s *Session) Now() time.Duration { return s.clock.Now() }
 

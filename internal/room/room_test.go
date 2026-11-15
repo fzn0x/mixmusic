@@ -416,7 +416,7 @@ func TestManyGuestsKnowTheHostsClock(t *testing.T) {
 		t.Cleanup(j.s.Close)
 	}
 	waitFor(t, "every guest here", func() bool { return r.server.Listeners() == guests })
-	worst := time.Duration(0)
+	var worst, worstRTT time.Duration
 	for _, j := range out {
 		waitFor(t, "the state and the clock", func() bool {
 			_, ok := j.s.State()
@@ -425,12 +425,16 @@ func TestManyGuestsKnowTheHostsClock(t *testing.T) {
 		})
 		// Both clocks count from their starts: the host's is ahead of the
 		// guest's by how much earlier it started.
+		// The estimate is within half the round trip of the ping it took,
+		// however long a busy computer held it.
 		off, _ := j.s.Offset()
+		rtt := j.s.RoundTrip()
 		d := off - j.start.Sub(hostStart)
-		worst = max(worst, d, -d)
+		d = max(d, -d)
+		if d > rtt/2+time.Millisecond || d > 250*time.Millisecond {
+			t.Errorf("an estimate of the host's clock off by %v, over a round trip of %v", d, rtt)
+		}
+		worst, worstRTT = max(worst, d), max(worstRTT, rtt)
 	}
-	t.Logf("the worst estimate of the host's clock was off by %v", worst)
-	if worst > 30*time.Millisecond {
-		t.Fatalf("an estimate of the host's clock off by %v", worst)
-	}
+	t.Logf("the worst estimate of the host's clock was off by %v; the longest round trip it took was %v", worst, worstRTT)
 }

@@ -53,11 +53,9 @@ type Host interface {
 	// one.
 	Allowed(fp Fingerprint) bool
 	// Pairing shows req's code while its pairing runs, or returns an
-	// error, as ErrOff, which refuses it. The server calls done once, with
-	// how the pairing ended: nil once both computers proved the code, when
-	// done keeps the other computer as paired, and returns an error if it
-	// can't, which fails the pairing.
-	Pairing(req PairRequest) (done func(err error) error, err error)
+	// error, as ErrOff, which refuses it. The server ends it with the
+	// PairEnd's calls.
+	Pairing(req PairRequest) (PairEnd, error)
 	// State is what the player does now.
 	State() State
 	// Do runs a command.
@@ -79,6 +77,21 @@ type PairRequest struct {
 	// Cancel ends the pairing, as the user of the computer controlled
 	// refused it.
 	Cancel func()
+}
+
+// PairEnd is how the host ends a pairing whose code it shows: it keeps
+// the other computer once both proved the code, then hears how the
+// pairing ended, so that both computers end it the same way.
+type PairEnd struct {
+	// Keep keeps the other computer as paired, once both computers proved
+	// the code, and returns an error if it can't, which fails the pairing.
+	// The other may control this one from then on: it is told so after.
+	Keep func() error
+	// Done is told once, last, how the pairing ended: nil once the other
+	// computer was told it is paired. An error after Keep kept it, as the
+	// other stopped answering before it was told, has Done drop what Keep
+	// kept, since the other keeps nothing either.
+	Done func(err error)
 }
 
 // Server is the computer controlled's: it pairs with the computers that
@@ -293,7 +306,7 @@ func (s *Server) pair(c *serverConn, name string) {
 	value, _ := CodeValue(code)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	done, err := s.Host.Pairing(PairRequest{Name: name, Peer: c.peer, Code: code, Cancel: cancel})
+	end, err := s.Host.Pairing(PairRequest{Name: name, Peer: c.peer, Code: code, Cancel: cancel})
 	if err != nil {
 		reason := reasonOff
 		if errors.Is(err, ErrBusy) {
@@ -303,23 +316,18 @@ func (s *Server) pair(c *serverConn, name string) {
 		refuse(reason)
 		return
 	}
-	// finish tells the host how the pairing ended, once, and ends it here,
-	// returning what keeping it said.
-	var (
-		once sync.Once
-		kept error
-	)
-	finish := func(err error) error {
+	// finish tells the host how the pairing ended, once, and ends it here.
+	var once sync.Once
+	finish := func(err error) {
 		once.Do(func() {
 			if errors.Is(err, ErrWrongCode) {
 				s.mu.Lock()
 				s.rested = time.Now()
 				s.mu.Unlock()
 			}
-			kept = done(err)
+			end.Done(err)
 			release()
 		})
-		return kept
 	}
 	// The user refusing it ends it, then closes the connection, which ends
 	// the rounds.
@@ -346,11 +354,16 @@ func (s *Server) pair(c *serverConn, name string) {
 		finish(err)
 		return
 	}
-	if err := finish(nil); err != nil {
+	// Both proved the code: this computer keeps the other, and only then
+	// tells it, which keeps this one as it hears. When that doesn't go,
+	// neither keeps the other.
+	if err := end.Keep(); err != nil {
+		finish(err)
 		_ = c.w.send(message{Type: "failed", Reason: reasonKeep}, t.silence())
 		return
 	}
-	_ = c.w.send(message{Type: "paired", Name: s.Name}, t.silence())
+	release()
+	finish(c.w.send(message{Type: "paired", Name: s.Name}, t.silence()))
 }
 
 // session runs a session with the computer paired at the other end of c:

@@ -32,7 +32,7 @@ const (
 		"Add this redirect URI to it. In its settings, under Users Management, add your name and the email of the Spotify account you sign in with. " +
 		"Paste the app's Client ID here, and sign in to Spotify. Log in. " + spotifyHint
 
-	youtubeHint    = "YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out: your session never goes to yt-dlp."
+	youtubeHint    = "YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out, unless Play audio as your account is on: then yt-dlp asks as your account first."
 	youtubeSession = "You sign in on Google's own page, in a window of MixMusic: MixMusic never sees your password, and keeps the session encrypted on this computer. YouTube Music does not offer this to apps officially, so it may stop working when YouTube changes."
 	youtubeForm    = "Sign in to YouTube Music. Log in. Google account. " + youtubeHint + " " + youtubeSession
 

@@ -33,6 +33,9 @@ page, as **Invite link**, it does too.
 Five wrong codes from a computer, and it waits a minute before it may try
 again; 30 wrong codes in a minute from anyone, and the room takes no code
 for a minute, though invite links and guests who come back still get in.
+Then the room says it isn't taking codes for a minute, and the host is
+told someone is guessing the code: the invite link, or a new code, gets
+friends in.
 
 ## In a room
 
@@ -74,7 +77,8 @@ joined, left, or was removed or blocked.
 Remove and block go by the computer's key, which someone can make anew:
 then they can knock again with the code, or the link, they still have.
 **new code** gives the room a new code and a new invite link: the old
-ones let no one in, and your guests stay.
+ones let no one in, those who proved the old code and haven't joined yet
+included, and your guests stay.
 
 ## Dropping off
 

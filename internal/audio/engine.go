@@ -72,6 +72,8 @@ type Engine struct {
 	levels    [2]ramp // fade the decks in and out as they play and pause
 	active    int
 	fading    bool
+	fadeFor   time.Duration // how long a crossfade lasts
+	fadeHeld  bool          // whether it holds, as the track fading in has no audio
 	paused    bool
 	normalize bool
 	loudness  bool
@@ -198,7 +200,8 @@ func (e *Engine) Preload(url string) {
 
 // Crossfade plays url on the idle deck from its start, at cue's Speed,
 // while the active one fades out at its own, over d: the idle deck becomes
-// the active one.
+// the active one. The fade starts as url's audio comes (followFade), and
+// ends as the track fading out faded out or ended.
 func (e *Engine) Crossfade(url string, d time.Duration, cue Cue) error {
 	e.mu.Lock()
 	from, to := e.active, 1-e.active
@@ -209,14 +212,14 @@ func (e *Engine) Crossfade(url string, d time.Duration, cue Cue) error {
 	} else if dk.position() != 0 {
 		dk.seek(0)
 	}
-	if e.decks[from] != nil {
-		e.decks[from].gain.to(0, d)
+	if out := e.decks[from]; out != nil {
+		out.gain.to(out.gain.value, 0) // until url's audio comes
 	}
 	e.decks[to].gain = ramp{}
-	e.decks[to].gain.to(1, d)
 	e.decks[to].speed = clampSpeed(cue.Speed)
 	e.levels[to] = ramp{value: 1, target: 1}
 	e.fading = true
+	e.fadeFor, e.fadeHeld = d, true
 	e.active = to
 	e.reported.ended, e.reported.failed = nil, nil
 	e.paused = true
@@ -224,6 +227,59 @@ func (e *Engine) Crossfade(url string, d time.Duration, cue Cue) error {
 	closeDecks(stale)
 	return e.Play()
 }
+
+// followFade holds the crossfade while in, the track fading in, has no
+// audio, of which it read n frames into a quantum from r: both tracks keep
+// their gains, the one fading out at full volume until in's audio first
+// comes. As it comes, in fades in from silence, and both fade over the
+// fade, or what is left of the track fading out when that is shorter;
+// with under lateFade of it left, in starts at full volume. A track that
+// failed, or ended, holds nothing, nor does a fade whose track fading out
+// is gone. On the audio thread.
+func (e *Engine) followFade(in *deck, r *ring, n int) {
+	out := e.decks[1-e.active]
+	switch {
+	case out.faded():
+		e.endHold()
+	case n == 0 && !r.done.Load():
+		if !e.fadeHeld {
+			e.fadeHeld = true
+			in.gain = ramp{}
+			out.gain.to(out.gain.value, 0)
+		}
+	case n > 0 && e.fadeHeld:
+		e.fadeHeld = false
+		span := frames(e.fadeFor)
+		left, known := out.left()
+		if known {
+			span = min(span, left)
+		}
+		out.gain.over(0, span)
+		in.gain = ramp{}
+		if known && left < frames(lateFade) {
+			in.gain = ramp{value: 1, target: 1}
+		} else {
+			in.gain.over(1, span)
+		}
+	}
+}
+
+// endHold has the track fading in play at full volume, if the fade held
+// it: the track fading out is gone.
+func (e *Engine) endHold() {
+	if !e.fadeHeld {
+		return
+	}
+	e.fadeHeld = false
+	if in := e.decks[e.active]; in != nil {
+		in.gain = ramp{value: 1, target: 1}
+	}
+}
+
+// lateFade is how much of the track fading out must be left as the track
+// fading in has its audio for that one to fade in: with less, it starts at
+// full volume, as a fade so short sounds like a jump.
+const lateFade = 500 * time.Millisecond
 
 // Play plays the active deck, and the one fading out with it.
 func (e *Engine) Play() error {
@@ -556,7 +612,10 @@ func (e *Engine) renderQuantum() {
 	buf := e.quantumBuf[:ch*quantum]
 	clear(buf)
 	sounding := false
-	for i, d := range e.decks {
+	// The active deck first: as a crossfade into it holds, so does the
+	// deck fading out.
+	for _, i := range [2]int{e.active, 1 - e.active} {
+		d := e.decks[i]
 		level := &e.levels[i]
 		if d == nil || (level.value == 0 && level.target == 0) {
 			continue
@@ -567,6 +626,9 @@ func (e *Engine) renderQuantum() {
 		// equalizer and the analyser too, takes what is heard.
 		dch := r.channels
 		n := d.read(r, e.deckBuf[:dch*quantum])
+		if i == e.active && e.fading {
+			e.followFade(d, r, n)
+		}
 		trim := e.trimOf(d, n > 0)
 		var m *[2][6]float32
 		if dch > ch {
@@ -657,11 +719,12 @@ func (e *Engine) report() {
 	e.mu.Lock()
 	var stale *deck
 	// A crossfade ends as the track fading out faded out or ended, which a
-	// pause holds.
+	// pause holds, as followFade does a track fading in that has no audio.
 	if other := 1 - e.active; e.fading && e.decks[other].faded() {
 		e.fading = false
 		stale, e.decks[other] = e.decks[other], nil
 		e.levels[other] = ramp{}
+		e.endHold()
 	}
 	d := e.decks[e.active]
 	var (

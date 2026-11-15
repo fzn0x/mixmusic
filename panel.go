@@ -432,6 +432,10 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 		if m.Item("Play").Chosen() {
 			s.p.PlayAt(queued)
 		}
+		if queued != s.st.Index && m.Item("Play next").Chosen() {
+			s.p.PlayNextAt(queued)
+			s.notes = append(s.notes, notice(t.Title+" plays next"))
+		}
 		if queued != s.st.Index && m.Item("Remove from the queue").Chosen() {
 			s.p.RemoveAt(queued)
 		}

@@ -54,6 +54,14 @@ func main() {
 	if allowed, status := allowFirewall(os.Args[1:], os.Stderr); allowed {
 		os.Exit(status)
 	}
+	// A Stream Deck key or a script starts MixMusic --next and the like,
+	// for the MixMusic that runs to do. Should this one take the single
+	// instance's lock, none runs: it ends all the same, and the lock it
+	// leaves goes to the next start, as one a crash left does.
+	handOver := func() bool { return !mygo.App.RequestSingleInstanceLock() }
+	if controlled, status := controlRunning(os.Args[1:], handOver, os.Stderr); controlled {
+		os.Exit(status)
+	}
 	if !mygo.App.RequestSingleInstanceLock() {
 		return // the running instance takes over
 	}

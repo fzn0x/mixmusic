@@ -304,6 +304,47 @@ portal, which may ask you first.
 MixMusic pauses as the computer goes to sleep, and stays paused when it
 wakes, ready where it was. A Spotify Connect device elsewhere plays on.
 
+## Control from a key or a script
+
+A Stream Deck key, a keyboard macro or a script can play, pause and skip
+in the MixMusic that runs, with no window coming forward: with a
+[link](#mixmusic-links), as `mixmusic://next`, or with the flag of the
+same name, given to MixMusic's program.
+
+| Flag | What it does |
+|---|---|
+| `--toggle`, `--play`, `--pause` | plays or pauses, plays, pauses |
+| `--next`, `--previous` | skips to the next track, goes back |
+| `--volume-up`, `--volume-down`, `--mute` | turns the volume up or down by 5%, as the global shortcuts do, mutes or unmutes |
+| `--shuffle`, `--repeat` | turns shuffle on or off, goes from off to Repeat: all, to Repeat: one, and back to off |
+
+The program is in a place of its own on each system:
+
+- **Windows**: `MixMusic.exe`, which the installer puts in
+  `%LocalAppData%\Programs\MixMusic`, as in
+  `"%LocalAppData%\Programs\MixMusic\MixMusic.exe" --next`. A batch file
+  waits for it, and finds its status in `%ERRORLEVEL%`.
+- **macOS**: the program inside the app, as in
+  `/Applications/MixMusic.app/Contents/MacOS/MixMusic --next`: `open`
+  gives an app its flags only as it starts it. A script opens a link
+  with `open -g mixmusic://next`, which leaves MixMusic in the
+  background.
+- **Linux**: `mixmusic --next` with the `.deb` or the `.rpm`, or the
+  AppImage itself with `--next` after it.
+
+With no MixMusic running, a flag prints `MixMusic isn't running` and ends
+with status 1, without starting MixMusic. A link starts it, as any link
+does.
+
+A Stream Deck key needs no plugin. On Windows, its **Open** action takes
+the program and a flag as its App / File:
+`"C:\Users\you\AppData\Local\Programs\MixMusic\MixMusic.exe" --next`. On
+Windows and macOS, its **Website** action takes a link as its URL:
+`mixmusic://next`.
+
+Liking or disliking what plays has no link or flag: any web page can
+open a link, once the browser asks, and a like changes your account.
+
 ## mixmusic:// links
 
 Links that start with `mixmusic://` open a page of MixMusic, or play a
@@ -315,6 +356,10 @@ track, from a browser or another app:
 | `mixmusic://album/<id>`, `mixmusic://artist/<id>`, `mixmusic://playlist/<id>` | opens an album, an artist or a playlist |
 | `mixmusic://library`, `mixmusic://explore`, `mixmusic://stats`, `mixmusic://marketplace`, `mixmusic://settings` | opens that page |
 | `mixmusic://play/<track id>` | plays a track |
+| `mixmusic://toggle`, `mixmusic://play`, `mixmusic://pause` | plays or pauses, plays, pauses, with no window coming forward |
+| `mixmusic://next`, `mixmusic://previous` | skips to the next track, goes back, with no window coming forward |
+| `mixmusic://volume-up`, `mixmusic://volume-down`, `mixmusic://mute` | turns the volume up or down by 5%, mutes or unmutes, with no window coming forward |
+| `mixmusic://shuffle`, `mixmusic://repeat` | turns shuffle on or off, goes to the next repeat, with no window coming forward |
 
 An ID is MixMusic's own: the service's ID after `yt:` for YouTube Music or
 `sp:` for Spotify. Opening MixMusic a second time, or a link while it runs,

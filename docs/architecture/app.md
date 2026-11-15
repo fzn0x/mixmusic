@@ -4,6 +4,17 @@
   them when the settings, the accounts, the add-ons or the updates change
   (`App.Watch`), makes the player, and puts MixMusic on the desktop: the
   tray, media keys, global shortcuts, deep links, notifications, updates.
+- **Control links and flags** (`internal/app/controlcommands.go`,
+  `controlcommand.go`): `mixmusic://next` and `--next`, and the others of
+  `namedCommands`, run their command through `App.command`, as the media
+  keys do, and show no window. A link reaches `HandleURL`: on macOS as an
+  Apple Event, on Windows and Linux as the command line of a second
+  start, which MyGo's single instance lock hands to the MixMusic that
+  runs. `SecondInstance` runs the flags of that command line, and shows
+  the main window only for a start that asks for no command. `main`
+  hands a flag over through the lock before anything else starts; a copy
+  that takes the lock itself finds none running, says so, and ends with
+  status 1.
 - **`internal/nowplaying`** shows what the engine plays in the system's media
   controls, and passes on what they ask: Now Playing on macOS, through
   MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both

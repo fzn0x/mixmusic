@@ -449,7 +449,19 @@ func (s *shell) itemShelf(c *ui.Context, key string, sh media.Shelf) {
 			tracks = append(tracks, *it.Track)
 		}
 	}
-	s.shelf(c, key, sh.Title, func() {
+	var links func()
+	if len(tracks) > 0 {
+		// The buttons play what the page's buttons do: PlayAll, in order.
+		links = func() {
+			if s.iconButton(c, key+"-play", "play", "Play "+sh.Title, false, 18).Clicked() {
+				s.p.PlayAll(tracks, false)
+			}
+			if len(tracks) > 1 && s.iconButton(c, key+"-shuffle", "shuffle", "Shuffle "+sh.Title, false, 18).Clicked() {
+				s.shuffled(tracks)
+			}
+		}
+	}
+	s.shelfWith(c, key, sh.Title, links, func() {
 		// The tiles far to either side take their room, and build nothing.
 		n := len(sh.Items)
 		from, to := s.nearTiles(c, key, n)

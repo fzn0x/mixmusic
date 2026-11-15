@@ -3,6 +3,37 @@
   "baseUrl": "https://raw.githubusercontent.com/fzn0x/mixmusic/registry/",
   "themes": [
     {
+      "id": "dracula",
+      "name": "Dracula",
+      "version": "1.0.0",
+      "author": "abuamar142",
+      "description": "The classic Dracula palette: violet accent, pink and cyan tiles on a deep charcoal ground.",
+      "path": "themes/dracula",
+      "files": [
+        "theme.json"
+      ],
+      "colors": {
+        "accent": "#bd93f9",
+        "accent-text": "#282a36",
+        "bg": "#282a36",
+        "border": "rgba(248, 248, 242, 0.16)",
+        "danger": "#ff5555",
+        "spotify": "#1ed760",
+        "success": "#50fa7b",
+        "surface": "#21222c",
+        "surface-2": "#343746",
+        "surface-3": "#44475a",
+        "text": "#f8f8f2",
+        "text-muted": "#9aa5cc",
+        "tile-1": "#bd93f9",
+        "tile-2": "#ff79c6",
+        "tile-3": "#8be9fd",
+        "tile-4": "#50fa7b",
+        "tile-text": "#282a36",
+        "youtube": "#ff5555"
+      }
+    },
+    {
       "id": "neon-nights",
       "name": "Neon Nights",
       "version": "1.1.0",

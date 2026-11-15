@@ -55,6 +55,7 @@ func (s *shell) shortListItem(m *ui.Menu, key, noun string, source media.Source,
 	if !ok {
 		return
 	}
+	m.Separator()
 	text := shortListText(short, noun, source)
 	if short.Cut {
 		m.Item(text).Disabled(true)

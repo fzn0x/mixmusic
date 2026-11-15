@@ -62,6 +62,36 @@ func TestArtistLibraryInPart(t *testing.T) {
 	}
 }
 
+// TestAddToSpotifyPlaylistInPart offers in a track's Add to Spotify
+// playlist the playlists of a list that came in part, then how many of
+// how many came, which asks for the list again.
+func TestAddToSpotifyPlaylistInPart(t *testing.T) {
+	answerCollab(t)
+	s, tt := collabShell(t, signedInTo(false, true), followedList, roadList, bandPractice)
+	l := s.loads["spotify:playlists"].(*loaded[[]media.Playlist])
+	l.err = partOf(2, 120)
+	track := followedList.Tracks[0]
+	choose := func(item string) error {
+		t.Helper()
+		if err := tt.RightClick(track.Title); err != nil {
+			t.Fatal(err)
+		}
+		defer tt.CloseMenu()
+		return tt.ChooseMenuItem("Add to Spotify playlist", item)
+	}
+	if err := choose(roadList.Title); err != nil {
+		t.Fatal(err)
+	}
+	if err := choose("Showing 2 of 120 playlists · Try again"); err != nil {
+		t.Fatal(err)
+	}
+	s.drain()
+	tt.Frame()
+	if l.asks != 1 {
+		t.Errorf("Try again asked %d times", l.asks)
+	}
+}
+
 // TestPodcastLibraryInPart shows in Library › Podcasts the shows saved on
 // Spotify of a list that came in part, says how many of how many, and
 // tells a show of it as followed on its page.

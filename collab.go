@@ -265,7 +265,7 @@ func (s *shell) addToSpotifyMenu(m *ui.Menu, tracks []media.Track) {
 		case !own.done:
 			m.Item("Loading your playlists…").Disabled(true)
 			return
-		case own.err != nil:
+		case !listCame(own.err):
 			own.refresh()
 			m.Item("Couldn't load your playlists").Disabled(true)
 			return
@@ -287,6 +287,8 @@ func (s *shell) addToSpotifyMenu(m *ui.Menu, tracks []media.Track) {
 		if !some {
 			m.Item("No playlists you can add to").Disabled(true)
 		}
+		// Of a list that came in part, those that came, and how many.
+		s.shortListItem(m, "spotify:playlists", "playlists", media.SourceSpotify, own.err)
 	})
 }
 

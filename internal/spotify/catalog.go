@@ -295,23 +295,19 @@ func (c *Client) SavedTracks(ctx context.Context, offset int) ([]media.Track, in
 	return toTracks(tracks, nil), res.Total, nil
 }
 
-// SavedAlbums returns the albums the user saved.
+// SavedAlbums returns the albums the user saved, all of them: those of a
+// list that stopped short come with a media.ShortList.
 func (c *Client) SavedAlbums(ctx context.Context) ([]media.Album, error) {
-	var res paging[struct {
-		Album *album `json:"album"`
-	}]
-	if err := c.get(ctx, "/me/albums", url.Values{"limit": {strconv.Itoa(pageLimit)}}, &res); err != nil {
+	items, err := readList(ctx, c, "/me/albums", func(it savedAlbum) string {
+		if it.Album == nil {
+			return ""
+		}
+		return it.Album.ID
+	})
+	if !came(err) {
 		return nil, err
 	}
-	out := []media.Album{}
-	for _, it := range res.Items {
-		if it.Album != nil {
-			al := toAlbum(it.Album)
-			al.Tracks = []media.Track{}
-			out = append(out, al)
-		}
-	}
-	return out, nil
+	return savedAlbums(items), err
 }
 
 // FollowedArtists returns the artists the user follows.

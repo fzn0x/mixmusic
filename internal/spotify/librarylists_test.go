@@ -277,3 +277,26 @@ func TestListEndsWithItsRead(t *testing.T) {
 		t.Errorf("a read dropped: %d playlists, %v, after %v", len(got), err, time.Since(start))
 	}
 }
+
+// TestSavedAlbumsReadsEveryPage reads all of the user's 250 saved albums,
+// and of 120 whose second page fails, the first 50, saying so.
+func TestSavedAlbumsReadsEveryPage(t *testing.T) {
+	quickPages(t)
+	ids := func(albums []media.Album) []string {
+		out := []string{}
+		for _, al := range albums {
+			out = append(out, al.ID)
+		}
+		return out
+	}
+	c := libraryServer(t, map[string]*fakeList{"/me/albums": {total: 250, item: savedAlbumAt}})
+	got, err := c.SavedAlbums(context.Background())
+	if err != nil || !inOrder(ids(got), "sp:al", 250) || got[0].Tracks == nil {
+		t.Fatalf("SavedAlbums = %d albums, %v", len(got), err)
+	}
+	c = libraryServer(t, map[string]*fakeList{"/me/albums": {total: 120, item: savedAlbumAt, fails: map[int]int{50: 100}}})
+	got, err = c.SavedAlbums(context.Background())
+	if s, ok := media.Short(err); !ok || s.Got != 50 || s.Total != 120 || !inOrder(ids(got), "sp:al", 50) {
+		t.Errorf("SavedAlbums of a page that fails = %d albums, %v", len(got), err)
+	}
+}

@@ -120,6 +120,7 @@ A radio plays tracks like one you choose, from YouTube Music.
 - **Crossfade,** in Settings › Playback › Sound: tracks overlap by 0 to 12 seconds, the next fading in as the one before fades out. It's off by default.
 - **With Crossfade off,** the next track starts as the one before ends: MixMusic finds the next track a second into the one playing and loads it ahead, so skipping ahead is quick too.
 - **A pause in a song's last seconds** holds, with Crossfade on: the next song doesn't fade in a moment later.
+- **A next song that loads late** holds the fade: the song playing keeps its volume until the next one's audio comes, and the next fades in from silence then, or starts at full volume with under half a second of the one before left. A pause during the fade holds it too, however long.
 - **Spotify songs that play in MixMusic itself** follow one another without a gap, as Spotify goes on to the next by itself, and a YouTube Music song after them starts without a wait.
 - Podcast episodes never crossfade, and tracks don't crossfade on a [cast device](casting.md).
 

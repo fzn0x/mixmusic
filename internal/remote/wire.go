@@ -55,6 +55,9 @@ var (
 	ErrWrongCode = errors.New("the code isn't the one that computer showed")
 	// ErrCanceled: its user canceled the pairing.
 	ErrCanceled = errors.New("the pairing was canceled on that computer")
+	// ErrNotKept: it couldn't keep the pairing, so neither computer keeps
+	// the other.
+	ErrNotKept = errors.New("that computer couldn't keep the pairing")
 	// ErrNotSame: a computer with another key answered where the one
 	// paired was.
 	ErrNotSame = errors.New("another computer answered in place of the one paired")
@@ -80,6 +83,8 @@ func errOf(reason string) error {
 		return ErrWrongCode
 	case reasonCanceled:
 		return ErrCanceled
+	case reasonKeep:
+		return ErrNotKept
 	case reasonVersion:
 		return ErrVersion
 	}

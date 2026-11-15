@@ -539,6 +539,8 @@ func remoteProblem(name string, err error) string {
 		return name + " is pairing with another computer: try again in a moment."
 	case errors.Is(err, remote.ErrCanceled):
 		return "The pairing was canceled on " + name + "."
+	case errors.Is(err, remote.ErrNotKept):
+		return name + " couldn't keep the pairing, and tells why there. Pair again."
 	case errors.Is(err, remote.ErrNotPaired):
 		return name + " removed this computer: pair again to control it."
 	case errors.Is(err, remote.ErrNotSame):

@@ -569,8 +569,9 @@ MixMusic dibangun di atas proyek-proyek berikut:
   AppImage.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, yang menemukan audio
   lagu-lagu yang tidak bisa ditemukan MixMusic sendiri.
+- **[Better Lyrics](https://betterlyrics.org)**, layanan yang menyimpan lirik dengan waktu per kata.
 - **[Unison](https://unison.betterlyrics.org)**, database lirik terbuka
-  hasil urunan banyak orang, di bawah ODbL, dan
+  hasil urunan banyak orang, di bawah Unison Community License, dan
   **[LRCLIB](https://lrclib.net)**, database terbuka berisi lirik
   tersinkron.
 - **[kagome](https://github.com/ikawaha/kagome)**, penganalisis morfologi

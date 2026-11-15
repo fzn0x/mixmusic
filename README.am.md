@@ -523,7 +523,8 @@ MixMusic የተገነባው በእነዚህ ፕሮጀክቶች ላይ ነው፦
   [appimagetool](https://github.com/AppImage/appimagetool)፣ AppImageዎችን።
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**፣ MixMusic ራሱ ማግኘት
   የማይችላቸውን ትራኮች ድምፅ የሚያገኝ።
-- **[Unison](https://unison.betterlyrics.org)**፣ በODbL ስር ያለ ክፍት፣ በህዝብ
+- **[Better Lyrics](https://betterlyrics.org)**.
+- **[Unison](https://unison.betterlyrics.org)**፣ በUnison Community License ስር ያለ ክፍት፣ በህዝብ
   ተሳትፎ የሚሞላ የግጥም ዳታቤዝ፣ እና **[LRCLIB](https://lrclib.net)**፣ ክፍት
   የተመሳሰሉ ግጥሞች ዳታቤዝ።
 - **[kagome](https://github.com/ikawaha/kagome)**፣ የግጥሞችን ካንጂ ለሮማጂያቸው

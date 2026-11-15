@@ -527,8 +527,9 @@ MixMusic इन प्रोजेक्ट पर बना है:
   [appimagetool](https://github.com/AppImage/appimagetool), AppImage बनाने वाला।
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, जो उन गानों का ऑडियो ढूँढता है
   जिन्हें MixMusic खुद नहीं ढूँढ पाता।
+- **[Better Lyrics](https://betterlyrics.org)**, शब्द-दर-शब्द समय वाले lyrics रखने वाली सेवा.
 - **[Unison](https://unison.betterlyrics.org)**, lyrics का खुला, crowdsourced
-  डेटाबेस, ODbL के तहत, और **[LRCLIB](https://lrclib.net)**, सिंक होने वाले
+  डेटाबेस, Unison Community License के तहत, और **[LRCLIB](https://lrclib.net)**, सिंक होने वाले
   lyrics का खुला डेटाबेस।
 - **[kagome](https://github.com/ikawaha/kagome)**, जापानी morphological analyser
   जो romaji के लिए lyrics के kanji पढ़ता है, [kagome-dict](https://github.com/ikawaha/kagome-dict)

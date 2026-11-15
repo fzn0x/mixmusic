@@ -534,8 +534,9 @@ MixMusic এই প্রজেক্টগুলোর ওপর দাঁড�
   [appimagetool](https://github.com/AppImage/appimagetool), AppImage-গুলো।
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp),** যা সেসব গানের অডিও খুঁজে
   দেয় যা MixMusic নিজে খুঁজে পায় না।
+- **[Better Lyrics](https://betterlyrics.org)**.
 - **[Unison](https://unison.betterlyrics.org),** লিরিক্সের ওপেন, ক্রাউডসোর্সড
-  ডেটাবেস, ODbL-এর অধীনে, এবং **[LRCLIB](https://lrclib.net),** সিঙ্ক করা
+  ডেটাবেস, Unison Community License-এর অধীনে, এবং **[LRCLIB](https://lrclib.net),** সিঙ্ক করা
   লিরিক্সের ওপেন ডেটাবেস।
 - **[kagome](https://github.com/ikawaha/kagome),** জাপানি মর্ফোলজিক্যাল
   অ্যানালাইজার, যা লিরিক্সের কানজি পড়ে তার romaji-র জন্য, সঙ্গে

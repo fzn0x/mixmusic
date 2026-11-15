@@ -553,8 +553,9 @@ MixMusic построен на этих проектах:
   который делает AppImage.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, который находит звук
   треков, которые MixMusic не может найти сам.
+- **[Better Lyrics](https://betterlyrics.org)**, сервис с текстами, синхронизированными по словам.
 - **[Unison](https://unison.betterlyrics.org)**, открытая база текстов
-  песен, собираемая сообществом, под ODbL, и **[LRCLIB](https://lrclib.net)**,
+  песен, собираемая сообществом, под Unison Community License, и **[LRCLIB](https://lrclib.net)**,
   открытая база синхронизированных текстов песен.
 - **[kagome](https://github.com/ikawaha/kagome)**, японский
   морфологический анализатор, который читает кандзи в текстах для их

@@ -10,6 +10,8 @@ Home is where MixMusic opens: your own tiles first, then shelves of what you pla
 - **Spotify's**, once you [signed in](accounts.md): what you played there lately, your top tracks, your playlists and your saved albums.
 - **YouTube Music's** home: its own shelves, as Quick picks, mixes and new releases, which are yours once you signed in.
 
+A shelf of songs, on Home, Explore and the now playing page, has **Play** and **Shuffle** buttons in its title row, before the arrows that scroll it. Play queues the shelf's songs in the order shown and starts at the first one the queue doesn't pass over; Shuffle queues the same songs with shuffle on, from one at random. Shuffle shows from two songs on. Songs that Hide explicit content leaves out stay out. A shelf that mixes songs with albums, playlists, artists or podcasts plays only its songs, and a shelf with no songs has no buttons; its tiles keep their own play circle.
+
 The pivots at the top keep Everything, only Yours, only Spotify's or only YouTube Music's.
 
 ## Arrange Home

@@ -16,6 +16,15 @@ import (
 // seeks.
 const miniSeekRoom = 10
 
+// miniWaveHeight is how far the wave of the mini player's progress rises
+// above its line and falls below it at rest, and miniWaveHeightActive
+// under the pointer or with the keyboard's focus, in DIPs: the wave stays
+// within the strip.
+const (
+	miniWaveHeight       = 1
+	miniWaveHeightActive = 1.5
+)
+
 // miniSeek is the progress along the foot of the player, w wide, which
 // seeks.
 func (s *shell) miniSeek(c *ui.Context, w float32) {
@@ -39,18 +48,54 @@ func (s *shell) miniSeek(c *ui.Context, w float32) {
 	done := float32(min(max(s.seekTo/hi, 0), 1))
 	rtl := c.Direction() == ui.RightToLeft
 	rest, thick := k.accent, k.border
+	// With Wavy progress bar on, the played part is a wave while the track
+	// plays, and lies flat as it pauses, as the seek bar's does.
+	wavy := s.set.WavyProgress
+	rise := float32(0)
+	if wavy {
+		rise = seek.Animate("wave", b2f(s.st.Playing && !s.st.Loading), waveEase)
+	}
+	still := c.Preferences().ReduceMotion
+	points := ui.Local(seek, "wave", func() [][2]float32 { return nil })
 	seek.Draw(func(p *ui.Painter, r ui.Rect) {
 		x, part := r.X, r.W*done
 		if rtl {
 			x = r.X + r.W - part
 		}
+		line, amp := float32(2), float32(miniWaveHeight)
+		if active {
+			line, amp = 4, miniWaveHeightActive
+		}
+		// The wave is worked out left to right, and mirrored.
+		mirror := func(x float32) float32 {
+			if rtl {
+				return r.X + r.W - (x - r.X)
+			}
+			return x
+		}
+		waving := rise > 0 && part > line
+		y := r.Y + r.H - line
+		if waving {
+			// The track shows only where the wave isn't.
+			rx := r.X + part - line/2
+			if rtl {
+				rx = r.X
+			}
+			if active {
+				p.Fill(ui.Rect{X: rx, Y: y, W: r.W - part + line/2, H: line}, thick, 2)
+			}
+			strokeWave(p, points, r.X+line/2, r.X+part-line/2, y+line/2-amp, line, rise*amp, still, mirror, rest)
+		}
 		if !active {
-			p.Fill(ui.Rect{X: x, Y: r.Y + r.H - 2, W: part, H: 2}, rest, 0)
+			if !waving {
+				p.Fill(ui.Rect{X: x, Y: y, W: part, H: 2}, rest, 0)
+			}
 			return
 		}
-		y := r.Y + r.H - 4
-		p.Fill(ui.Rect{X: r.X, Y: y, W: r.W, H: 4}, thick, 2)
-		p.Fill(ui.Rect{X: x, Y: y, W: part, H: 4}, rest, 2)
+		if !waving {
+			p.Fill(ui.Rect{X: r.X, Y: y, W: r.W, H: 4}, thick, 2)
+			p.Fill(ui.Rect{X: x, Y: y, W: part, H: 4}, rest, 2)
+		}
 		knob := r.X + part
 		if rtl {
 			knob = r.X + r.W - part

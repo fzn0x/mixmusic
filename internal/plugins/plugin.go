@@ -11,6 +11,7 @@ import (
 	"math"
 	"path"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -44,6 +45,9 @@ type plugin struct {
 	runtime atomic.Pointer[sobek.Runtime]
 	ctx     context.Context
 	cancel  context.CancelFunc
+	// work counts the calls of the API at work beside the loop, which only
+	// the loop starts.
+	work sync.WaitGroup
 
 	vm               *sobek.Runtime
 	parse, stringify jsFunc
@@ -345,6 +349,18 @@ func (pl *plugin) shutdown() {
 	pl.stopping = true
 }
 
+// ended is closed once the plugin's loop ran its last job, and the work
+// of the API it started, such as what it keeps in storage, is done.
+func (pl *plugin) ended() <-chan struct{} {
+	ch := make(chan struct{})
+	go func() {
+		<-pl.loop.done
+		pl.work.Wait()
+		close(ch)
+	}()
+	return ch
+}
+
 // fromGo turns a value of Go into JavaScript's, through JSON: tracks,
 // albums and the like, as the plugin API names their fields.
 func (pl *plugin) fromGo(v any) sobek.Value {
@@ -381,10 +397,12 @@ func (pl *plugin) toGo(v sobek.Value, out any) {
 // convert when given.
 func (pl *plugin) async(work func(ctx context.Context) (any, error), convert ...func(any) sobek.Value) sobek.Value {
 	promise, resolve, reject := pl.vm.NewPromise()
+	pl.work.Add(1)
 	go func() {
 		ctx, cancel := context.WithTimeout(pl.ctx, asyncTimeout)
 		v, err := work(ctx)
 		cancel()
+		pl.work.Done()
 		pl.loop.post(func() {
 			if pl.stopping {
 				return

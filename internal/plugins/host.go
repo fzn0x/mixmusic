@@ -46,6 +46,8 @@ type Host struct {
 	mu       sync.Mutex
 	running  map[string]*plugin
 	failures map[string]failure
+	// closed is set once Close stopped the plugins, for good.
+	closed   bool
 	ui       UI
 	theme    Theme
 	items    []*SidebarItem
@@ -122,13 +124,16 @@ func (h *Host) changed() {
 
 // Sync runs the plugins enabled among those installed: it starts those
 // that don't run, stops those no longer enabled or installed, and starts
-// again those of another version.
+// again those of another version. Once the host closed, it starts none.
 func (h *Host) Sync(enabled []string, installed []addons.Plugin) {
 	if h == nil {
 		return
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if h.closed {
+		return
+	}
 	byID := map[string]addons.Plugin{}
 	for _, p := range installed {
 		byID[p.ID] = p
@@ -165,15 +170,31 @@ func (h *Host) Retry() {
 	h.mu.Unlock()
 }
 
-// Close stops every plugin.
+// Close stops every plugin, as MixMusic quits, and waits for their
+// cleanups to run, and for the work of the API they started to end, such
+// as what they keep in storage, stopWait at most in all: a plugin that
+// takes longer is interrupted, and Close returns without it.
 func (h *Host) Close() {
 	if h == nil {
 		return
 	}
 	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.closed = true
+	stopping := make([]*plugin, 0, len(h.running))
 	for _, pl := range h.running {
 		h.stopLocked(pl)
+		stopping = append(stopping, pl)
+	}
+	h.mu.Unlock()
+	// The cleanups run without the lock, as they may toast.
+	deadline := time.NewTimer(stopWait)
+	defer deadline.Stop()
+	for _, pl := range stopping {
+		select {
+		case <-pl.ended():
+		case <-deadline.C:
+			return
+		}
 	}
 }
 

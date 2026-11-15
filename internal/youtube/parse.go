@@ -394,6 +394,7 @@ func browseItem(pageType, browseID, title string, b byline, thumbs []media.Image
 			Source:  media.SourceYouTube,
 			Title:   title,
 			Owner:   owner,
+			Views:   b.plays(),
 			Artwork: thumbs,
 			Tracks:  []media.Track{},
 			URL:     "https://music.youtube.com/playlist?list=" + id,

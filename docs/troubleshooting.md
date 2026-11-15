@@ -127,7 +127,9 @@ its **details**. The keyboard reaches **details** in the toast with
   owner has Premium, and lets them read less: search shows ten results of
   each kind, and the tracks of playlists you do not own stay hidden.
 - Tracks YouTube restricts to some countries, to signed-in adults or to a
-  channel's members do not play, as streams are found signed out.
+  channel's members do not play, as streams are found signed out while
+  Play audio as your account is off. With it on, yt-dlp asks as your
+  account first, at the best quality, which may play some of them.
 - The macOS app is not notarized and the Windows installer is not signed
   yet, so the first launch asks you to allow it.
 - The portable zip does not register

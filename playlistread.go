@@ -161,5 +161,7 @@ func (s *shell) readLine(c *ui.Context, r *playlistRead, noun string) {
 			text = "This " + noun + " has " + thousands(count) + " tracks: MixMusic shows and plays its first " + thousands(n) + "."
 		}
 		ui.Text(c, text).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).MaxWidth(640)
+	case readShort(r.p):
+		s.shortLine(c, r, noun)
 	}
 }

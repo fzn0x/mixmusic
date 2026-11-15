@@ -3,6 +3,7 @@ package lyrics
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -34,6 +35,9 @@ type BetterLyrics struct {
 	HTTP      *http.Client
 	BaseURL   string
 	UserAgent string
+
+	// wait is the time it may be asked again, after it answered 429.
+	wait holdoff
 }
 
 // NewBetterLyrics returns a client of Better Lyrics' API introducing
@@ -59,6 +63,9 @@ func (b *BetterLyrics) Get(ctx context.Context, t Query) (Lyrics, error) {
 	q.Set("a", t.Artist)
 	q.Set("al", t.Album)
 	q.Set("d", strconv.Itoa(int(math.Round(t.Duration.Seconds()))))
+	if b.wait.active() {
+		return Lyrics{}, betterLyricsDown{errors.New("HTTP 429, asking too fast")}
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, b.BaseURL+"/getLyrics?"+q.Encode(), nil)
 	if err != nil {
 		return Lyrics{}, err
@@ -74,8 +81,12 @@ func (b *BetterLyrics) Get(ctx context.Context, t Query) (Lyrics, error) {
 	case http.StatusNotFound, http.StatusUnauthorized, http.StatusUnprocessableEntity:
 		// 401 is a song it hasn't kept and would need a key to fetch.
 		return Lyrics{}, ErrNotFound
+	case http.StatusTooManyRequests:
+		// MixMusic asking too fast: keep off it as long as it says.
+		b.wait.set(res.Header.Get("Retry-After"))
+		return Lyrics{}, betterLyricsDown{fmt.Errorf("HTTP %d", res.StatusCode)}
 	default:
-		// 429 is MixMusic asking too fast, 5xx the service failing.
+		// 5xx is the service failing.
 		return Lyrics{}, betterLyricsDown{fmt.Errorf("HTTP %d", res.StatusCode)}
 	}
 	var ans struct {

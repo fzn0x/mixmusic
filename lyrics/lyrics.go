@@ -124,7 +124,15 @@ type Client struct {
 	HTTP      *http.Client
 	BaseURL   string
 	UserAgent string
+
+	// wait is the time LRCLIB may be asked again, after it answered 429.
+	wait holdoff
 }
+
+// errTooManyRequests is LRCLIB asking apps to slow down, or MixMusic
+// keeping off it for that: ErrUnavailable, but LRCLIB's other addresses
+// count against the same limit, so none is tried.
+var errTooManyRequests = fmt.Errorf("%w: HTTP 429, asking too fast", ErrUnavailable)
 
 // New returns a client of LRCLIB introducing itself as userAgent, as
 // LRCLIB asks apps to.
@@ -174,7 +182,7 @@ func (c *Client) Get(ctx context.Context, t Query) (Lyrics, error) {
 	var rec record
 	busy := false
 	err := c.get(ctx, "/get", q, &rec)
-	if errors.Is(err, ErrUnavailable) {
+	if errors.Is(err, ErrUnavailable) && !errors.Is(err, errTooManyRequests) {
 		if cached := c.get(ctx, "/get-cached", q, &rec); !errors.Is(cached, ErrUnavailable) {
 			err, busy = cached, true
 		}
@@ -242,6 +250,9 @@ func closest(records []record, ms int) (record, bool) {
 }
 
 func (c *Client) get(ctx context.Context, path string, q url.Values, out any) error {
+	if c.wait.active() {
+		return errTooManyRequests
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+path+"?"+q.Encode(), nil)
 	if err != nil {
 		return err
@@ -260,6 +271,11 @@ func (c *Client) get(ctx context.Context, path string, q url.Values, out any) er
 		return nil
 	case http.StatusNotFound:
 		return ErrNotFound
+	case http.StatusTooManyRequests:
+		// LRCLIB's docs: wait the seconds Retry-After gives, and a little
+		// more, or be banned for a while.
+		c.wait.set(res.Header.Get("Retry-After"))
+		return errTooManyRequests
 	}
 	return fmt.Errorf("%w: HTTP %d", ErrUnavailable, res.StatusCode)
 }

@@ -65,6 +65,7 @@ func (s *shell) commands() []command {
 		{"go.settingsSearch", "Search the settings", "", "go to", s.searchSettings},
 		{"view.queue", "Show or hide the queue", "Mod+J", "view", func() { s.togglePanel("queue") }},
 		{"view.lyrics", "Show or hide the lyrics", "Mod+Shift+L", "view", func() { s.togglePanel("lyrics") }},
+		{"view.lyricsStage", "Show or hide the full-screen lyrics", "Mod+Shift+F", "view", s.toggleStage},
 		{"view.palette", "Command palette", "Mod+K", "view", func() { s.paletteOpen = !s.paletteOpen }},
 		{"view.mini", "Mini player", "Mod+M", "view", s.showMini},
 		{"view.keepOnTop", "Keep the window on top, or not", "", "view", s.toggleOnTop},
@@ -82,6 +83,7 @@ func (s *shell) commands() []command {
 		{"settings.openFile", "Open the settings file", "", "settings", s.openSettingsFile},
 	}
 	cmds = append(cmds, s.themeCommands...)
+	cmds = append(cmds, s.lyricStyleCommands()...)
 	for _, pc := range s.plugins.Commands() {
 		cmds = append(cmds, command{pc.ID, pc.Title, pc.Shortcut, "plugins", pc.Run})
 	}

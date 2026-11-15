@@ -43,20 +43,53 @@ func (s *shell) lyricsText(c *ui.Context, text string, size float32, ink ui.Colo
 // its words up as they are sung: the part sung in lit, the rest in dim. A
 // line in Latin letters under its line lights so too (lyricsromanize.go).
 func (s *shell) sungText(c *ui.Context, e ui.Element, text string, font ui.Font, lit, dim ui.Color, words []lyrics.Word, padX, padY float32) ui.Element {
+	return s.sungTextWith(c, e, text, font, lit, dim, words, padX, padY, sungOptions{})
+}
+
+// sungOptions say what more a line lit word by word does. Its zero value is
+// what sungText does.
+type sungOptions struct {
+	// ball has a ball hop over the words as they are sung: the line tells the
+	// ball's rig where they lie (lyricsballrig.go), and an overlay paints it.
+	ball *ballFeed
+	// state is the state of a player the line follows, in place of the real
+	// one: the preview in Settings plays a made-up song.
+	state *player.State
+}
+
+// sungTextWith is sungText for the options o.
+func (s *shell) sungTextWith(c *ui.Context, e ui.Element, text string, font ui.Font, lit, dim ui.Color, words []lyrics.Word, padX, padY float32, o sungOptions) ui.Element {
+	st := s.st
+	if o.state != nil {
+		st = *o.state
+	}
 	l := ui.Local(e, "sung", func() sungLine { return sungLine{} })
-	clock := l.follow(s.st, c.Now())
+	clock := l.follow(st, c.Now())
 	dir, still := c.Direction(), c.Preferences().ReduceMotion
 	return e.Font(font.Family).FontWeight(font.Weight).TextColor(lit.Alpha(0)).Draw(func(p *ui.Painter, r ui.Rect) {
 		g := l.layout(sungKey{text, font, r.W - 2*padX, dir}, words)
-		fill, next := l.light(words, clock.at(p.Now()), still)
+		at := clock.at(p.Now())
+		fill, next := l.light(words, at, still)
 		g.paint(p, r.X+padX, r.Y+padY, fill, lit, dim, &l.buf)
+		wake := next
+		if o.ball != nil {
+			// The ball asks for frames while it moves, and wakes the line for
+			// its next hop.
+			// Where the line lies is read from the frame before, in the window's
+			// DIPs: what it paints is in its layer's own while it fades.
+			if box := e.Bounds(); box.W > 0 {
+				if b := l.publishBall(p, g, box.X+padX, box.Y+padY, font, dir, words, clock, o.ball, still); b >= 0 && (wake < 0 || b < wake) {
+					wake = b
+				}
+			}
+		}
 		switch {
-		case !clock.moving || next < 0:
-		case next == 0:
+		case !clock.moving || wake < 0:
+		case wake == 0:
 			// A fill sweeps as slowly as a level meter moves.
 			p.AnimationFrameRate(60)
 		default:
-			p.After(clock.wall(next))
+			p.After(clock.wall(wake))
 		}
 	})
 }
@@ -68,6 +101,12 @@ type sungLine struct {
 	shaped *sungLayout
 	fill   []float32
 	buf    stretches
+	// spots is where the words lie, for the ball (lyricsballrig.go), and
+	// nextShaped and nextSpots the layout of the next line, and where its first
+	// word lies.
+	spots      []ballPoint
+	nextShaped *sungLayout
+	nextSpots  []ballPoint
 }
 
 // songClock is the time of the song, as the view last saw the player tell
@@ -165,16 +204,20 @@ type sungLayout struct {
 	key  sungKey
 	tl   *ui.TextLayout
 	rows []sungRow
-	// width is that of each word, on all its rows.
+	// width is that of each word, on all its rows, and rise how high the
+	// tallest letter of each stands over its row's baseline, against the size
+	// of the font.
 	width []float32
+	rise  []float32
 }
 
-// sungRow is a row of the layout: its box, whether it reads right to
-// left, and the parts of words on it, in the order it reads.
+// sungRow is a row of the layout: its box, the y of its baseline, whether it
+// reads right to left, and the parts of words on it, in the order it reads.
 type sungRow struct {
-	box   ui.Rect
-	rtl   bool
-	cells []sungCell
+	box      ui.Rect
+	baseline float32
+	rtl      bool
+	cells    []sungCell
 }
 
 // sungCell is the part of a word on a row: the word, the left and right
@@ -186,10 +229,13 @@ type sungCell struct {
 
 // shapeSung lays out the line of key, with its words.
 func shapeSung(key sungKey, words []lyrics.Word) *sungLayout {
-	g := &sungLayout{key: key, width: make([]float32, len(words))}
+	g := &sungLayout{key: key, width: make([]float32, len(words)), rise: make([]float32, len(words))}
+	for i, w := range words {
+		g.rise[i] = glyphRise(w.Text)
+	}
 	g.tl = ui.ShapeRichTextWith([]ui.Span{{Text: key.text}}, key.font, ui.TextShape{Width: key.width, Direction: key.dir})
 	for _, line := range g.tl.Lines() {
-		g.rows = append(g.rows, sungRow{box: line.Rect, rtl: line.RTL})
+		g.rows = append(g.rows, sungRow{box: line.Rect, baseline: line.Baseline, rtl: line.RTL})
 	}
 	// The layout counts in UTF-16.
 	from, units := 0, 0

@@ -233,6 +233,8 @@ type shell struct {
 	paletteAt    int
 	paletteMoved bool
 	lyricsView   lyricsState
+	// stage is the full-screen lyrics' (lyricsstage.go).
+	stage stageState
 	// pagePath is the path of the page being built.
 	pagePath string
 	// shown are the keys of what the page shown and the side panel fetched

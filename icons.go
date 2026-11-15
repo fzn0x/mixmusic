@@ -31,6 +31,7 @@ var iconPaths = map[string]string{
 	"back":         "M14.5 5.5 8 12l6.5 6.5M8.5 12H20",
 	"forward":      "M9.5 5.5 16 12l-6.5 6.5M15.5 12H4",
 	"mini":         "M3.5 5h17v14h-17zM11.5 12h7v5h-7z",
+	"expand":       "M4.5 9V4.5H9M15 4.5h4.5V9M19.5 15v4.5H15M9 19.5H4.5V15",
 	"check":        "M4.5 12.5 9.5 17.5 19.5 6.5",
 	"chevronRight": "M9.5 5.5 16 12l-6.5 6.5",
 	"chevronDown":  "M5.5 9.5 12 16l6.5-6.5",

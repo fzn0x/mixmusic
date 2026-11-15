@@ -26,6 +26,7 @@ How MixMusic looks; [Look and feel](look-and-feel.md) tells all of it.
 | [Layout](look-and-feel.md#layouts) | Blend, Expressive, Crate or Tiles. |
 | [Theme](look-and-feel.md#themes) | **Follow the computer**, with **In light mode** and **In dark mode**; a card for each theme; **get more themes**, which opens the marketplace, and **open themes folder**. Themes that didn't load are listed with the reason. |
 | [*Theme* options](look-and-feel.md#theme-options) | The options of a built-in theme that has some, as Aurora's drifting lights and glass blur. |
+| [Lyrics style](lyrics.md#full-screen-lyrics) | The style of the full-screen lyrics: Spotlight (the default), Glow, Focus, Simple, Bold or Calm; the size of their text; the bouncing ball and how it goes from a line to the next; a small preview of them; and a button that shows the lyrics. |
 | Colour and type | **[Colours from a file](look-and-feel.md#colours-from-a-file)** (pywal, matugen or a file of your own) and its **Colour file**, **[Follow the artwork](look-and-feel.md#the-accent-and-the-artwork)**, **Accent colour**, **[Zoom](look-and-feel.md#density-text-size-and-zoom)**, **Text size**, **Density**, **Icons only in the sidebar** and **Wavy progress bar**. |
 
 ### Playback
@@ -306,6 +307,7 @@ while you're not typing in a text field. The ID is the command's name in
 | Command palette | <kbd>Ctrl</kbd> <kbd>K</kbd> | <kbd>⌘</kbd> <kbd>K</kbd> | `view.palette` |
 | Show or hide the queue | <kbd>Ctrl</kbd> <kbd>J</kbd> | <kbd>⌘</kbd> <kbd>J</kbd> | `view.queue` |
 | Show or hide the lyrics | <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>L</kbd> | <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>L</kbd> | `view.lyrics` |
+| Show or hide the [full-screen lyrics](lyrics.md#full-screen-lyrics) | <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>F</kbd> | <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>F</kbd> | `view.lyricsStage` |
 | Mini player | <kbd>Ctrl</kbd> <kbd>M</kbd> | <kbd>⌘</kbd> <kbd>M</kbd> | `view.mini` |
 | [Keep the window on top, or not](desktop.md#keep-the-window-on-top) | none | none | `view.keepOnTop` |
 | Collapse or expand the sidebar | <kbd>Ctrl</kbd> <kbd>B</kbd> | <kbd>⌘</kbd> <kbd>B</kbd> | `view.sidebar` |
@@ -322,6 +324,7 @@ while you're not typing in a text field. The ID is the command's name in
 | Reload add-ons | none | none | `addons.reload` |
 | Open the settings file | none | none | `settings.openFile` |
 | Theme: *name*, one for each theme | none | none | `theme.<theme id>` |
+| Lyrics style: *name*, one for each [style of the full-screen lyrics](lyrics.md#full-screen-lyrics) | none | none | `lyrics.style.<style id>` |
 
 Plugins' commands follow, with the keys their plugin gives them, if any.
 

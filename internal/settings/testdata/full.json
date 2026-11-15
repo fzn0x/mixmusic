@@ -20,6 +20,10 @@
   "wavyProgress": true,
   "panel": "lyrics",
   "lyricsPlain": true,
+  "lyricsStyle": "bold",
+  "lyricsSize": 1.3,
+  "lyricsBall": false,
+  "lyricsBallMotion": "boomerang",
   "lyricsTranslate": [
     "ja",
     ""

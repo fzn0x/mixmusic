@@ -18,16 +18,15 @@ const librarySongs = "FEmusic_liked_videos"
 var errNoSaveToggle = errors.New("YouTube Music offers no way to save this track to your library")
 
 // LibrarySongs returns the songs the user saved to their library on
-// YouTube Music, the last saved first.
+// YouTube Music, the last saved first, all of them: those of a list that
+// stopped short come with a media.ShortList.
 func (c *Client) LibrarySongs(ctx context.Context) ([]media.Track, error) {
-	items, err := c.libraryItems(ctx, librarySongs)
-	tracks := []media.Track{}
-	for _, it := range items {
-		if it.Kind == media.ItemTrack {
-			tracks = append(tracks, *it.Track)
+	return libraryList(ctx, c, librarySongs, func(it media.Item) (media.Track, string, bool) {
+		if it.Kind != media.ItemTrack {
+			return media.Track{}, "", false
 		}
-	}
-	return tracks, err
+		return *it.Track, it.Track.ID, true
+	})
 }
 
 // SongSaved reports whether a song, by its video ID, is in the user's

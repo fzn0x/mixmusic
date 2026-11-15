@@ -60,6 +60,18 @@ func controlFlag(arg string) (PlayerCommand, bool) {
 	return c, ok
 }
 
+// HasControlFlag reports whether args, a command line, give the flag of a
+// command, as --next: main hands them over to the MixMusic that runs, and
+// starts none.
+func HasControlFlag(args []string) bool {
+	for _, arg := range args {
+		if _, ok := controlFlag(arg); ok {
+			return true
+		}
+	}
+	return false
+}
+
 // controlLink reports whether arg, an argument of the command line, is
 // the link of a command.
 func controlLink(arg string) bool {

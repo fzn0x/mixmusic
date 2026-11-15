@@ -171,6 +171,25 @@ func TestSecondStartFlags(t *testing.T) {
 	})
 }
 
+// TestHasControlFlag tells the command lines main hands over to the
+// MixMusic that runs: each command's flag, anywhere among them, and
+// nothing else.
+func TestHasControlFlag(t *testing.T) {
+	for name := range namedCommands {
+		if !HasControlFlag([]string{"--" + name}) {
+			t.Errorf("--%s isn't a command's flag", name)
+		}
+	}
+	if !HasControlFlag([]string{"--some-flag", "--next"}) {
+		t.Error("--next after another flag isn't one")
+	}
+	for _, args := range [][]string{nil, {"--like"}, {"--dislike"}, {"--mcp"}, {"--allow-firewall"}, {"mixmusic://next"}, {"next"}, {"-next"}} {
+		if HasControlFlag(args) {
+			t.Errorf("%q has a command's flag", args)
+		}
+	}
+}
+
 // TestSecondStartLinks starts MixMusic again with a link, as a browser,
 // a key or a script does on Windows and Linux. A command's link brings no
 // window forward, and its command is HandleURL's, which MyGo hands the

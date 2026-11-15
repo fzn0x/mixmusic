@@ -536,7 +536,11 @@ func roomProblem(name string, err error) string {
 	case errors.Is(err, room.ErrWrongCode):
 		return "That isn't the code of " + name + "'s room."
 	case errors.Is(err, room.ErrWait):
-		return "Too many wrong codes: try again in a minute."
+		return "Too many wrong codes from this computer: try again in a minute."
+	case errors.Is(err, room.ErrLocked):
+		return name + "'s room isn't taking codes for a minute: ask " + name + " for the invite link."
+	case errors.Is(err, room.ErrNewCode):
+		return name + "'s room has a new code: ask " + name + " for it, or for the new invite link."
 	case errors.Is(err, room.ErrBusy):
 		return name + "'s room checks other codes: try again in a moment."
 	case errors.Is(err, room.ErrBlocked):

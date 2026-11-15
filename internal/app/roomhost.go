@@ -65,6 +65,10 @@ func membersOf(ms []room.Member) []RoomMember {
 	return out
 }
 
+// roomGuessed is what the host is told as its room takes no code for a
+// while, after too many wrong ones.
+const roomGuessed = "Someone on the network is guessing your room's code. Friends can still join with the invite link, or give the room a new code."
+
 // errInRoom: this computer is a guest of a room, and hosts none meanwhile.
 var errInRoom = errors.New("Leave the room you're in to start one")
 
@@ -103,7 +107,7 @@ func (rs *Rooms) Start() error {
 	}
 	h := &hostedRoom{key: id.Fingerprint(), code: code, link: room.Invite{Code: code, Host: id.Fingerprint(), Secret: secret}.Link(), told: time.Now()}
 	srv := &room.Server{Identity: id, Name: a.roomName(), Code: code, Secret: secret, Host: roomHostPlayer{a}, Clock: a.roomClock(),
-		Timing: o.Timing, Changed: func() { a.roomChanged(h) }}
+		Timing: o.Timing, Changed: func() { a.roomChanged(h) }, Guessing: func() { a.notifyRooms(roomGuessed) }}
 	h.server = srv
 	go func() {
 		if err := srv.Serve(ln); err != nil {

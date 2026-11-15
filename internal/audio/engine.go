@@ -72,7 +72,6 @@ type Engine struct {
 	levels    [2]ramp // fade the decks in and out as they play and pause
 	active    int
 	fading    bool
-	fadeEnd   time.Time
 	paused    bool
 	normalize bool
 	loudness  bool
@@ -218,7 +217,6 @@ func (e *Engine) Crossfade(url string, d time.Duration, cue Cue) error {
 	e.decks[to].speed = clampSpeed(cue.Speed)
 	e.levels[to] = ramp{value: 1, target: 1}
 	e.fading = true
-	e.fadeEnd = time.Now().Add(d + 50*time.Millisecond)
 	e.active = to
 	e.reported.ended, e.reported.failed = nil, nil
 	e.paused = true
@@ -658,9 +656,10 @@ func (e *Engine) loop() {
 func (e *Engine) report() {
 	e.mu.Lock()
 	var stale *deck
-	if e.fading && time.Now().After(e.fadeEnd) {
+	// A crossfade ends as the track fading out faded out or ended, which a
+	// pause holds.
+	if other := 1 - e.active; e.fading && e.decks[other].faded() {
 		e.fading = false
-		other := 1 - e.active
 		stale, e.decks[other] = e.decks[other], nil
 		e.levels[other] = ramp{}
 	}

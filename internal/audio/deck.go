@@ -248,6 +248,17 @@ func (d *deck) heard() int64 {
 // the audio thread.
 func (d *deck) pending(r *ring) bool { return d.stretch.pending(r) }
 
+// faded reports whether the deck, as it fades out, is silent for good: its
+// gain reached 0, or its track ended, or failed, or there is no deck. On
+// the audio thread.
+func (d *deck) faded() bool {
+	if d == nil {
+		return true
+	}
+	r := d.ring.Load()
+	return d.gain.value == 0 && d.gain.target == 0 || r.done.Load() && r.readable() == 0 && !d.pending(r)
+}
+
 // failure returns why the deck failed, or nil.
 func (d *deck) failure() error {
 	d.mu.Lock()

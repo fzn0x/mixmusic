@@ -204,7 +204,7 @@ Music videos can show their picture on the now playing page, in place of the cov
 
 A cover that's a GIF can move. Turn on "Show moving covers" in Settings › Playback › Moving covers, or use the command "Show or hide moving covers". It's off at first.
 
-- **Which covers move:** a mix's cover you chose as a GIF, with [Change cover…](library.md#a-mixs-cover), and the GIF of music on this computer: inside its file, or beside it as `cover.gif`, `folder.gif`, `front.gif` or `album.gif`, when no still of that name is there.
+- **Which covers move:** a mix's cover you chose as a GIF, with [Change cover…](library.md#mixes), and the GIF of music on this computer: inside its file, or beside it as `cover.gif`, `folder.gif`, `front.gif` or `album.gif`, when no still of that name is there.
 - **Where they move:** in the now playing page's sleeve, where the GIF pauses with the music, and in the head of the mix's page. Everywhere else, as on tiles, the first frame shows.
 - **When they stay still:** while your system asks for less motion, until the GIF has been read, and for a GIF that takes more than 24 MB decoded, as one of hundreds of large frames. Nothing moves, and nothing is drawn, while the window is hidden or minimized, or the page doesn't show the cover.
 - **What it costs:** a GIF is read once, and its frames are drawn as they come due, with no web view. A GIF of 60 frames of 600 pixels square, the largest a mix keeps, takes about 22 MB while its page shows, and about half a millisecond of the processor a frame. A GIF no page showed for half a minute is let go.

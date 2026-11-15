@@ -12,7 +12,7 @@ import (
 // SponsorBlock marks (#548): the switch, the kinds of parts skipped, the
 // highlight, the server, and SponsorBlock's credit.
 
-func init() { addSettings("playback", 65, (*shell).skipPartsSettings) }
+func init() { addSettings("playback", 75, (*shell).skipPartsSettings) }
 
 // partRows are the rows of Settings › Playback › Skip parts of videos,
 // which register from their features' files.

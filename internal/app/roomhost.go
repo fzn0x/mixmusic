@@ -23,8 +23,11 @@ import (
 // invite link, and the announcement that has the others find it.
 type hostedRoom struct {
 	server     *room.Server
-	code, link string
+	key        remote.Fingerprint
 	unannounce func()
+	// code and link are the room's, which NewCode changes.
+	codeMu     sync.Mutex
+	code, link string
 	// told is when the last activity the windows were told of happened.
 	toldMu sync.Mutex
 	told   time.Time
@@ -98,7 +101,7 @@ func (rs *Rooms) Start() error {
 	if err != nil {
 		return fmt.Errorf("The room can't listen on the network: %w", err)
 	}
-	h := &hostedRoom{code: code, link: room.Invite{Code: code, Host: id.Fingerprint(), Secret: secret}.Link(), told: time.Now()}
+	h := &hostedRoom{key: id.Fingerprint(), code: code, link: room.Invite{Code: code, Host: id.Fingerprint(), Secret: secret}.Link(), told: time.Now()}
 	srv := &room.Server{Identity: id, Name: a.roomName(), Code: code, Secret: secret, Host: roomHostPlayer{a}, Clock: a.roomClock(),
 		Timing: o.Timing, Changed: func() { a.roomChanged(h) }}
 	h.server = srv
@@ -155,8 +158,37 @@ func (rs *Rooms) Hosted() (HostedRoom, bool) {
 	if h == nil {
 		return HostedRoom{}, false
 	}
-	return HostedRoom{Code: h.code, Link: h.link, Guests: membersOf(h.server.Members()), Blocked: membersOf(h.server.Blocked()),
+	h.codeMu.Lock()
+	code, link := h.code, h.link
+	h.codeMu.Unlock()
+	return HostedRoom{Code: code, Link: link, Guests: membersOf(h.server.Members()), Blocked: membersOf(h.server.Blocked()),
 		Activity: h.server.Activity(), Waiting: h.server.Waiting()}, true
+}
+
+// NewCode gives the room this computer hosts a new code and invite link:
+// the old ones let no one in from then on, a computer removed or blocked
+// that comes back under another key too. The guests stay.
+func (rs *Rooms) NewCode() error {
+	a := rs.a
+	h := a.hostedRoom()
+	if h == nil {
+		return nil
+	}
+	code, err := room.NewCode()
+	if err != nil {
+		return err
+	}
+	secret, err := room.NewSecret()
+	if err != nil {
+		return err
+	}
+	h.server.SetCode(code, secret)
+	h.codeMu.Lock()
+	h.code, h.link = code, room.Invite{Code: code, Host: h.key, Secret: secret}.Link()
+	h.codeMu.Unlock()
+	log.Print("mixmusic: room: a new code")
+	a.notifyRooms("")
+	return nil
 }
 
 func (a *App) hostedRoom() *hostedRoom {

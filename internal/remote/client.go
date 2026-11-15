@@ -19,6 +19,10 @@ type Dialer struct {
 	Timing Timing
 	// Dial connects to an address, as net.Dialer does when nil.
 	Dial func(ctx context.Context, network, addr string) (net.Conn, error)
+
+	// older, for tests, pairs as a MixMusic before FeatureKeep did: its
+	// hello to pair tells no features, and it waits a silence for paired.
+	older bool
 }
 
 // Peer is a computer paired with: its key, and its name, as it told it.
@@ -93,7 +97,14 @@ func (d *Dialer) Pair(ctx context.Context, addr string, code func(ctx context.Co
 		}
 		return Peer{}, err
 	}
-	if err := w.send(message{Type: "hello", Want: wantPair, Name: d.Name, Version: version}, t.silence()); err != nil {
+	hello := message{Type: "hello", Want: wantPair, Name: d.Name, Version: version, Features: pairFeatures}
+	// The other keeps the pairing before it says paired, which may take it
+	// Keep.
+	waitPaired := t.keep() + t.silence()
+	if d.older {
+		hello.Features, waitPaired = nil, t.silence()
+	}
+	if err := w.send(hello, t.silence()); err != nil {
 		return fail(err)
 	}
 	if _, err := w.expect("code", t.silence()); err != nil {
@@ -117,7 +128,7 @@ func (d *Dialer) Pair(ctx context.Context, addr string, code func(ctx context.Co
 	if err := w.send(message{Type: "confirm"}, t.silence()); err != nil {
 		return fail(err)
 	}
-	paired, err := w.expect("paired", t.silence())
+	paired, err := w.expect("paired", waitPaired)
 	if err != nil {
 		return fail(err)
 	}

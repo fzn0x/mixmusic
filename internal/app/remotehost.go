@@ -122,7 +122,11 @@ func (h remoteHost) Pairing(req remote.PairRequest) (remote.PairEnd, error) {
 				// nothing: neither does this one.
 				unkeep()
 				log.Printf("mixmusic: remote control: the pairing with %s didn't finish: %v", req.Name, err)
-				note = "Didn't pair with " + req.Name + ": the pairing didn't finish, as it stopped answering"
+				why := "it stopped answering"
+				if errors.Is(err, remote.ErrNotKept) {
+					why = "keeping it took longer than " + req.Name + " waits"
+				}
+				note = "Didn't pair with " + req.Name + ": the pairing didn't finish, as " + why
 			case errors.Is(err, remote.ErrCanceled):
 			case errors.Is(err, remote.ErrWrongCode):
 				log.Printf("mixmusic: remote control: %s typed another code", req.Name)

@@ -81,6 +81,14 @@ func TestRemoteKeptUnheard(t *testing.T) {
 	if host.Allowed(laptop) || host.Allowed(phone) || !host.Allowed(tablet) {
 		t.Error("what may control the desktop changed")
 	}
+	// Kept later than the other waits.
+	start(laptop, "Laptop").Done(remote.ErrNotKept)
+	if got := desk.Remote().Paired(); !slices.EqualFunc(got, before, same) {
+		t.Errorf("kept %+v, not %+v", got, before)
+	}
+	if !notes.has("Didn't pair with Laptop: the pairing didn't finish, as keeping it took longer than Laptop waits") {
+		t.Errorf("told %q", notes.told)
+	}
 
 	start(laptop, "Laptop").Done(nil)
 	if got := desk.Remote().Paired(); len(got) != 3 || got[2].ID != laptop.ID() || !got[2].ControlsThis {

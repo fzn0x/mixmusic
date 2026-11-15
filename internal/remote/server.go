@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"net"
+	"slices"
 	"sync"
 	"time"
 )
@@ -20,6 +21,10 @@ type Timing struct {
 	Silence time.Duration
 	// Code is how long a code holds, while its user types it: 2 minutes.
 	Code time.Duration
+	// Keep is how long the computer controlled may take to keep a pairing,
+	// once both proved the code, as on a slow or busy disk: 30 s. The other
+	// waits that long for paired, and a silence more.
+	Keep time.Duration
 	// StateEvery is how often at most the computer controlled sends its
 	// state as it changes: 200 ms.
 	StateEvery time.Duration
@@ -36,6 +41,7 @@ type Timing struct {
 func (t Timing) ping() time.Duration       { return or(t.Ping, 2*time.Second) }
 func (t Timing) silence() time.Duration    { return or(t.Silence, 6*time.Second) }
 func (t Timing) code() time.Duration       { return or(t.Code, 2*time.Minute) }
+func (t Timing) keep() time.Duration       { return or(t.Keep, 30*time.Second) }
 func (t Timing) stateEvery() time.Duration { return or(t.StateEvery, 200*time.Millisecond) }
 func (t Timing) rest() time.Duration       { return or(t.Rest, 3*time.Second) }
 
@@ -89,8 +95,9 @@ type PairEnd struct {
 	Keep func() error
 	// Done is told once, last, how the pairing ended: nil once the other
 	// computer was told it is paired. An error after Keep kept it, as the
-	// other stopped answering before it was told, has Done drop what Keep
-	// kept, since the other keeps nothing either.
+	// other stopped answering before it was told, or ErrNotKept, as Keep
+	// took longer than the other waits, has Done drop what Keep kept, since
+	// the other keeps nothing either.
 	Done func(err error)
 }
 
@@ -243,7 +250,7 @@ func (s *Server) handle(raw net.Conn) {
 	}
 	switch hello.Want {
 	case wantPair:
-		s.pair(c, cleanName(hello.Name))
+		s.pair(c, hello)
 	case wantControl:
 		if !s.Host.Allowed(peer) {
 			_ = c.w.send(message{Type: "refused", Reason: reasonNotPaired}, t.silence())
@@ -272,10 +279,12 @@ func (s *Server) remove(c *serverConn) {
 	s.mu.Unlock()
 }
 
-// pair runs a pairing with the computer named name, at the other end of
-// c: one at a time, and none for a moment after a code that didn't match.
-func (s *Server) pair(c *serverConn, name string) {
+// pair runs a pairing with the computer at the other end of c, which said
+// hello: one at a time, and none for a moment after a code that didn't
+// match.
+func (s *Server) pair(c *serverConn, hello message) {
 	t := s.Timing
+	name := cleanName(hello.Name)
 	refuse := func(reason string) { _ = c.w.send(message{Type: "refused", Reason: reason}, t.silence()) }
 	s.mu.Lock()
 	if s.pairing || time.Since(s.rested) < t.rest() {
@@ -356,14 +365,31 @@ func (s *Server) pair(c *serverConn, name string) {
 	}
 	// Both proved the code: this computer keeps the other, and only then
 	// tells it, which keeps this one as it hears. When that doesn't go,
-	// neither keeps the other.
-	if err := end.Keep(); err != nil {
+	// neither keeps the other: kept later than the other waits, it isn't.
+	began := time.Now()
+	err = end.Keep()
+	if err == nil && time.Since(began) > t.keepFor(hello.Features) {
+		err = ErrNotKept
+	}
+	if err != nil {
 		finish(err)
 		_ = c.w.send(message{Type: "failed", Reason: reasonKeep}, t.silence())
 		return
 	}
 	release()
 	finish(c.w.send(message{Type: "paired", Name: s.Name}, t.silence()))
+}
+
+// keepFor is how long the computer controlled may take to keep a pairing
+// with the computer whose hello told the features told: Keep, for one that
+// waits for paired so long (FeatureKeep). An older one waits a silence for
+// it, from when it sent confirm: half of it, the other half for confirm
+// and paired on the way.
+func (t Timing) keepFor(told []string) time.Duration {
+	if slices.Contains(told, FeatureKeep) {
+		return t.keep()
+	}
+	return t.silence() / 2
 }
 
 // session runs a session with the computer paired at the other end of c:

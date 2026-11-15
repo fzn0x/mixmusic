@@ -111,6 +111,21 @@ func (s *shell) startRoom() {
 	}()
 }
 
+// newRoomCode gives the room a new code and invite link beside the main
+// thread, and tells why it can't.
+func (s *shell) newRoomCode() {
+	go func() {
+		err := s.a.Rooms().NewCode()
+		s.update(func() {
+			if err != nil {
+				s.notes = append(s.notes, noticeOf(err))
+				return
+			}
+			s.notes = append(s.notes, notice("The room has a new code: the old code and link no longer let anyone in"))
+		})
+	}()
+}
+
 // followRooms redraws the window as rooms change, and tells what they
 // say, as a guest that joined.
 func (s *shell) followRooms() func() {

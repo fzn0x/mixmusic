@@ -127,10 +127,15 @@ func (s *shell) hostedRoom(c *ui.Context, h app.HostedRoom) {
 			copyText(h.Link)
 			s.notes = append(s.notes, notice("Copied the invite link"))
 		}
+		if s.button(c, "room-new-code", "new code", false).Clicked() {
+			s.newRoomCode()
+		}
 		if s.button(c, "room-end", "end room", false).Clicked() {
 			rs.End()
 		}
 	})
+	ui.Text(c, "Removed and blocked guests can't come back with the code or the link they have under a new name: a new code, and a new link, shut them out, and your guests stay.").
+		FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 	if h.Waiting {
 		ui.Text(c, "The next track waits for your guests to have it ready.").FontSize(k.smallSize()).TextColor(k.muted)
 	}

@@ -160,3 +160,21 @@ func TestRoomPasteInviteLink(t *testing.T) {
 	click(t, lap, lt, "open the link")
 	untilBoth(t, desk, dt, lap, lt, "the preview", func() bool { return lt.HasText("Desk hosts this room.") })
 }
+
+// TestRoomNewCodeButton gives the room a new code from its page, which
+// shows it.
+func TestRoomNewCodeButton(t *testing.T) {
+	n := roomtest.New()
+	s := newRoomShell(t, n, "Desk")
+	tt := tester(t, s)
+	if err := s.a.Rooms().Start(); err != nil {
+		t.Fatal(err)
+	}
+	old, _ := s.a.Rooms().Hosted()
+	show(s, tt, roomsPath)
+	click(t, s, tt, "new code")
+	until(t, s, tt, "the new code", func() bool {
+		h, _ := s.a.Rooms().Hosted()
+		return h.Code != old.Code && tt.HasText(room.ShowCode(h.Code)) && !tt.HasText(room.ShowCode(old.Code))
+	})
+}

@@ -90,11 +90,11 @@ type Engine struct {
 	vol   float64
 	curve volume.Curve
 	// The audio thread's buffers: a quantum, the rest of the last one, and
-	// a deck's frames. bus is the channels of the quantum, as the output
+	// each deck's frames. bus is the channels of the quantum, as the output
 	// asked for them last.
 	quantumBuf [maxChannels * quantum]float32
 	pending    []float32
-	deckBuf    [maxChannels * quantum]float32
+	deckBuf    [2][maxChannels * quantum]float32
 	bus        int
 	silentFor  int64 // the frames rendered since a deck last played
 	// What the audio thread saw, for the event loop.
@@ -621,23 +621,33 @@ func (e *Engine) renderQuantum() {
 	buf := e.quantumBuf[:ch*quantum]
 	clear(buf)
 	sounding := false
-	// The active deck first: as a crossfade into it holds, so does the
-	// deck fading out.
+	// Each deck that plays reads its frames, the active one first: a
+	// crossfade into it holds while it has none, before either deck plays.
+	// They mix in their own order, by which a fused multiply-add rounds
+	// their sum.
+	var rings [2]*ring
+	var read [2]int
 	for _, i := range [2]int{e.active, 1 - e.active} {
-		d := e.decks[i]
-		level := &e.levels[i]
+		d, level := e.decks[i], e.levels[i]
 		if d == nil || (level.value == 0 && level.target == 0) {
 			continue
 		}
-		sounding = true
-		r := d.ring.Load()
 		// At the deck's speed, of its ring's channels: what follows, the
 		// equalizer and the analyser too, takes what is heard.
-		dch := r.channels
-		n := d.read(r, e.deckBuf[:dch*quantum])
+		r := d.ring.Load()
+		rings[i], read[i] = r, d.read(r, e.deckBuf[i][:r.channels*quantum])
 		if i == e.active && e.fading {
-			e.followFade(d, r, n)
+			e.followFade(d, r, read[i])
 		}
+	}
+	for i, d := range e.decks {
+		r, n := rings[i], read[i]
+		if r == nil {
+			continue
+		}
+		sounding = true
+		level := &e.levels[i]
+		dch := r.channels
 		trim := e.trimOf(d, n > 0)
 		var m *[2][6]float32
 		if dch > ch {
@@ -650,7 +660,7 @@ func (e *Engine) renderQuantum() {
 			if f >= n {
 				continue
 			}
-			src, dst := e.deckBuf[dch*f:dch*f+dch], buf[ch*f:ch*f+ch]
+			src, dst := e.deckBuf[i][dch*f:dch*f+dch], buf[ch*f:ch*f+ch]
 			switch {
 			case dch == ch:
 				for c, v := range src {

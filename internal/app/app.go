@@ -101,6 +101,10 @@ type Options struct {
 	// listen and keep its key in place of the network and the credential
 	// store: tests set it (remote.go).
 	Remote *RemoteOptions
+	// Room, when set, has the rooms of Listen with friends find each other
+	// and listen in place of the network, and play in step without the
+	// engine: tests set it (room.go).
+	Room *RoomOptions
 	// Firewall, when set, reads and changes the firewall in place of
 	// Windows Defender Firewall; one with no Check is none: tests set it
 	// (firewall.go).
@@ -198,6 +202,9 @@ type App struct {
 	// remote is remote control's: the server, the computers found and
 	// paired, and the one controlled (remote.go).
 	remote remoteState
+	// room is Listen with friends': the room this computer hosts, the one
+	// it is a guest of, and the rooms found (room.go).
+	room roomState
 	// output is the audio output device the engine plays on.
 	output outputState
 	// videoPage is the page of the main window that plays the picture of

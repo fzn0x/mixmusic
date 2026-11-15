@@ -465,7 +465,7 @@ ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
-lyrics/              synced lyrics from Unison and LRCLIB, and translations
+lyrics/              synced lyrics from Better Lyrics, Unison and LRCLIB, and translations
 brand/               MixMusic's logo, for code that draws it
 ```
 
@@ -590,8 +590,9 @@ MixMusic ان پروجیکٹس پر بنا ہے:
   [appimagetool](https://github.com/AppImage/appimagetool)، AppImages۔
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)،** جو ان ٹریکس کی آواز ڈھونڈتا
   ہے جو MixMusic خود نہیں ڈھونڈ پاتا۔
+- **[Better Lyrics](https://betterlyrics.org)**.
 - **[Unison](https://unison.betterlyrics.org)،** بولوں کا کھلا، عوامی تعاون سے
-  بنا ڈیٹا بیس، ODbL کے تحت، اور **[LRCLIB](https://lrclib.net)،** ہم وقت
+  بنا ڈیٹا بیس، Unison Community License کے تحت، اور **[LRCLIB](https://lrclib.net)،** ہم وقت
   بولوں کا کھلا ڈیٹا بیس۔
 - **[kagome](https://github.com/ikawaha/kagome)،** جاپانی morphological
   analyser جو بولوں کے kanji کو ان کے romaji کے لیے پڑھتا ہے، اور

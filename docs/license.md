@@ -65,12 +65,14 @@ Settings › About › Licenses shows each of them in the app.
 
 ## What MixMusic doesn't include
 
-- **Lyrics** come from Unison, LRCLIB and YouTube Music as you play, and
-  aren't part of MixMusic. Unison's are under the
-  [Open Database License](https://opendatacommons.org/licenses/odbl/),
-  which asks apps that show them to credit them. Unison asks for the
-  person who submitted them too, and the lyrics panel credits both: "lyrics
-  from Unison · submitted by <name>", linked to their pages on Unison.
+- **Lyrics** come from Better Lyrics, Unison, LRCLIB and YouTube Music as
+  you play, and aren't part of MixMusic. Unison's data is under the
+  [Unison Community License](https://github.com/better-lyrics/unison/blob/main/LICENSE-DATA.md),
+  which lets people, non-profits and open-source projects like MixMusic
+  use it, and asks apps that show it to credit Unison. Unison asks for the
+  person who submitted the lyrics too, and the lyrics panel credits both:
+  "lyrics from Unison · submitted by <name>", linked to their pages on
+  Unison. Better Lyrics is credited under its own lyrics too.
 - **yt-dlp and the JavaScript runtimes** are programs of their own, which
   MixMusic runs, under their own licences. MixMusic downloads yt-dlp from
   its releases when you install it.

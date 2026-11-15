@@ -426,7 +426,7 @@ ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
-lyrics/              synced lyrics from Unison and LRCLIB, and translations
+lyrics/              synced lyrics from Better Lyrics, Unison and LRCLIB, and translations
 brand/               MixMusic's logo, for code that draws it
 ```
 
@@ -555,8 +555,9 @@ MixMusic построен на этих проектах:
   который делает AppImage.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, который находит звук
   треков, которые MixMusic не может найти сам.
+- **[Better Lyrics](https://betterlyrics.org)**, сервис с текстами, синхронизированными по словам.
 - **[Unison](https://unison.betterlyrics.org)**, открытая база текстов
-  песен, собираемая сообществом, под ODbL, и **[LRCLIB](https://lrclib.net)**,
+  песен, собираемая сообществом, под Unison Community License, и **[LRCLIB](https://lrclib.net)**,
   открытая база синхронизированных текстов песен.
 - **[kagome](https://github.com/ikawaha/kagome)**, японский
   морфологический анализатор, который читает кандзи в текстах для их

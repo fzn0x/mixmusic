@@ -14,11 +14,12 @@ import (
 )
 
 // UnisonURL is the address of Unison, an open, crowdsourced database of
-// lyrics, most of them synchronized word by word. Its lyrics are under the
-// ODbL, and an app that shows them credits Unison and the person who
-// submitted them, both linked: "Lyrics from Unison · submitted by <name>",
-// Unison to the song's page there and the name to theirs. Unison asks apps
-// for that from 7 February 2027.
+// lyrics, most of them synchronized word by word. Its data is under the
+// Unison Community License 1.0, which lets open-source projects like this
+// one use it, and an app that shows the lyrics credits Unison and the
+// person who submitted them, both linked: "Lyrics from Unison · submitted
+// by <name>", Unison to the song's page there and the name to theirs.
+// Unison asks apps for that from 7 February 2027.
 const UnisonURL = "https://unison.betterlyrics.org"
 
 // unisonTimeout bounds a lookup on Unison, which answers in a fraction of

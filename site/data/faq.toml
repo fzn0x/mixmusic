@@ -39,7 +39,7 @@ question = "What does MixMusic collect?"
 answer = '''
 Nothing for itself: MixMusic has no account, server, analytics or
 telemetry of its own. It talks to the services you use: YouTube Music,
-Spotify and Last.fm, Unison and LRCLIB for the lyrics of the track that
+Spotify and Last.fm, Better Lyrics, Unison and LRCLIB for the lyrics of the track that
 plays, and GitHub for updates, yt-dlp and the marketplace. Your library,
 history and searches stay on your computer.
 [Your data and privacy](@/docs/data-and-privacy/index.md#what-each-feature-sends-where)

@@ -1,6 +1,6 @@
-// Package lyrics finds the lyrics of tracks on Unison and LRCLIB, open
-// databases of lyrics synchronized to the music, and reads the TTML and
-// LRC formats they come in.
+// Package lyrics finds the lyrics of tracks on Better Lyrics, Unison and
+// LRCLIB, databases of lyrics synchronized to the music, and reads the
+// TTML and LRC formats they come in.
 package lyrics
 
 import (

@@ -286,7 +286,7 @@ ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
-lyrics/              synced lyrics from Unison and LRCLIB, and translations
+lyrics/              synced lyrics from Better Lyrics, Unison and LRCLIB, and translations
 brand/               MixMusic's logo, for code that draws it
 ```
 
@@ -349,7 +349,8 @@ MixMusic 基于以下项目构建：
 - **[Zola](https://www.getzola.org)**：构建网站。
 - **[NSIS](https://nsis.sourceforge.io)**：制作 Windows 安装程序；[appimagetool](https://github.com/AppImage/appimagetool) 则用来制作 AppImage。
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**：为 MixMusic 自己找不到音频的歌曲找到音频。
-- **[Unison](https://unison.betterlyrics.org)**：开放的、由众包建立的歌词数据库，采用 ODbL 许可；**[LRCLIB](https://lrclib.net)**：开放的同步歌词数据库。
+- **[Better Lyrics](https://betterlyrics.org)**：提供逐字同步歌词的服务
+- **[Unison](https://unison.betterlyrics.org)**：开放的、由众包建立的歌词数据库，采用 Unison Community License 许可；**[LRCLIB](https://lrclib.net)**：开放的同步歌词数据库。
 - **[kagome](https://github.com/ikawaha/kagome)**：日语形态分析器，读出歌词中的汉字以生成罗马音；搭配 [kagome-dict](https://github.com/ikawaha/kagome-dict) 的 IPA 词典，它由 mecab-ipadic 制成，MixMusic 在第一次打开罗马音时下载。
 - **[libopus](https://opus-codec.org)**：MixMusic 的 Opus 解码器移植自它的解码器。**[SharpJaad](https://github.com/jimm98y/SharpJaad)**：[JAAD](https://sourceforge.net/projects/jaadec/) 的 C# 移植版，MixMusic 的 AAC 解码器就源自它。
 - **[FFmpeg](https://ffmpeg.org)**：解码器的测试以它作为对照。

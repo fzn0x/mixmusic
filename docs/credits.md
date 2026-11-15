@@ -80,9 +80,12 @@ of its own.
   credits it under each of its lyrics: "lyrics from Better Lyrics", linked
   to its site.
 - **[Unison](https://unison.betterlyrics.org)**, the open, crowdsourced
-  database of lyrics, most of them timed word by word, under the
-  [ODbL](https://opendatacommons.org/licenses/odbl/). As Unison asks, the
-  lyrics panel credits it and the person who submitted them under each of
+  database of lyrics, most of them timed word by word. Its data is under
+  the [Unison Community License](https://github.com/better-lyrics/unison/blob/main/LICENSE-DATA.md),
+  which lets a person, a non-profit or an open-source project use it, as
+  MixMusic does, and asks for "Lyrics from Unison
+  (https://unison.betterlyrics.org)" wherever the lyrics show. As Unison
+  asks, the lyrics panel credits it and the person who submitted them under each of
   its lyrics: "lyrics from Unison · submitted by <name>", with Unison
   linked to the song's page there and the name to theirs. Unison also
   translates lyrics, and

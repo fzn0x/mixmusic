@@ -1,15 +1,20 @@
 package app
 
-// Control from outside the window (#590): a link, as mixmusic://next, has
-// the MixMusic that runs do a command of the player, as the media keys and
-// the global shortcuts do, and brings no window forward. So a Stream Deck
-// key, a keyboard macro or a script can pause, skip or turn shuffle on.
+// Control from outside the window (#590): a link, as mixmusic://next, or a
+// flag given to MixMusic started again, as --next, has the MixMusic that
+// runs do a command of the player, as the media keys and the global
+// shortcuts do, and brings no window forward. So a Stream Deck key, a
+// keyboard macro or a script can pause, skip or turn shuffle on.
 
-import "net/url"
+import (
+	"net/url"
+	"strings"
+)
 
-// namedCommands are the commands of the links, by name:
-// mixmusic://<name>. Like and dislike aren't among them: any web page can
-// open a link, once the browser asks, and a like changes the account.
+// namedCommands are the commands of the links and the flags, by name:
+// mixmusic://<name>, --<name>. Like and dislike aren't among them: any web
+// page can open a link, once the browser asks, and a like changes the
+// account.
 var namedCommands = map[string]PlayerCommand{
 	"toggle":      {Command: CommandToggle},
 	"play":        {Command: CommandPlay},
@@ -42,4 +47,44 @@ func (a *App) followControl(u *url.URL) bool {
 		a.command(c)
 	}
 	return ok
+}
+
+// controlFlag returns the command of a flag of the command line, as
+// --next.
+func controlFlag(arg string) (PlayerCommand, bool) {
+	name, ok := strings.CutPrefix(arg, "--")
+	if !ok {
+		return PlayerCommand{}, false
+	}
+	c, ok := namedCommands[name]
+	return c, ok
+}
+
+// controlLink reports whether arg, an argument of the command line, is
+// the link of a command.
+func controlLink(arg string) bool {
+	u, err := url.Parse(arg)
+	if err != nil {
+		return false
+	}
+	_, ok := controlOf(u)
+	return ok
+}
+
+// controlled does the commands of the flags among args, those of a second
+// start of MixMusic, and reports whether args asked for any, with a flag
+// or a link, whose command HandleURL does as MyGo hands it the link. The
+// main window doesn't come forward then: a key's press pulls none in
+// front.
+func (a *App) controlled(args []string) bool {
+	asked := false
+	for _, arg := range args {
+		if c, ok := controlFlag(arg); ok {
+			a.command(c)
+			asked = true
+		} else if controlLink(arg) {
+			asked = true
+		}
+	}
+	return asked
 }

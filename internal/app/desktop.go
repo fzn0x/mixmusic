@@ -359,8 +359,16 @@ func (a *App) OnNavigate(fn func(target string)) (cancel func()) {
 	}
 }
 
-// SecondInstance shows the main window when the user starts MixMusic again.
-func (a *App) SecondInstance([]string, string) { whenReady(a.showMain) }
+// SecondInstance shows the main window when the user starts MixMusic again,
+// unless the start asks for commands of the player, as --next or
+// mixmusic://next do: they run with no window coming forward (#590).
+func (a *App) SecondInstance(args []string, _ string) {
+	whenReady(func() {
+		if !a.controlled(args) {
+			a.showMain()
+		}
+	})
+}
 
 // Activate shows the main window when the app is activated without it in
 // view, as by a click on its Dock icon after it was closed to the tray, or

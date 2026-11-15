@@ -135,3 +135,79 @@ func TestControlLinkCommands(t *testing.T) {
 		}
 	}
 }
+
+// TestSecondStartFlags starts MixMusic again with flags, as a key or a
+// script does on every system (on macOS, the program in the bundle): MyGo
+// hands the command line to the MixMusic that runs, whose player does
+// each command, and no window opens.
+func TestSecondStartFlags(t *testing.T) {
+	a, p := newControlledApp(t)
+	start := func(args ...string) {
+		t.Helper()
+		if !a.controlled(args) {
+			t.Fatalf("%q asked for no command", args)
+		}
+	}
+	start("--next")
+	waitPlayer(t, p, "B playing", trackPlays("yt:b"))
+	start("--previous")
+	waitPlayer(t, p, "A playing again", trackPlays("yt:a"))
+	start("--pause")
+	waitPlayer(t, p, "paused", func(s player.State) bool { return !s.Playing })
+	start("--toggle")
+	waitPlayer(t, p, "playing after a toggle", func(s player.State) bool { return s.Playing })
+	start("--pause")
+	waitPlayer(t, p, "paused again", func(s player.State) bool { return !s.Playing })
+	start("--play")
+	waitPlayer(t, p, "playing", func(s player.State) bool { return s.Playing })
+	// Each flag counts, in its order.
+	start("--volume-up", "--volume-up", "--volume-down")
+	waitPlayer(t, p, "5% louder", func(s player.State) bool { return math.Abs(s.Volume-0.55) < 1e-9 })
+	start("--volume-down", "--volume-down")
+	waitPlayer(t, p, "5% quieter", func(s player.State) bool { return math.Abs(s.Volume-0.45) < 1e-9 })
+	start("--mute", "--shuffle", "--repeat")
+	waitPlayer(t, p, "muted, shuffled, repeating all", func(s player.State) bool {
+		return s.Muted && s.Shuffle && s.Repeat == player.RepeatAll
+	})
+}
+
+// TestSecondStartLinks starts MixMusic again with a link, as a browser,
+// a key or a script does on Windows and Linux. A command's link brings no
+// window forward, and its command is HandleURL's, which MyGo hands the
+// link to after: done here too, it would be done twice. A page, a track
+// to play or no link at all shows the main window, as before.
+func TestSecondStartLinks(t *testing.T) {
+	a, p := newControlledApp(t)
+	for _, args := range [][]string{
+		{"mixmusic://pause"},
+		{"mixmusic://pause/"},
+		{"--some-flag", "mixmusic://pause"},
+	} {
+		if !a.controlled(args) {
+			t.Errorf("%q asked for no command", args)
+		}
+	}
+	// The player does its commands in order: muted, it would have paused
+	// before, had the link's command been done here.
+	a.command(PlayerCommand{Command: CommandMute})
+	waitPlayer(t, p, "muted", func(s player.State) bool { return s.Muted })
+	if !p.State().Playing {
+		t.Error("the second start did the link's command, which HandleURL does")
+	}
+	for _, args := range [][]string{
+		nil,
+		{"mixmusic://library"},
+		{"mixmusic://play/yt:b"},
+		{"mixmusic://like"},
+		{"--like"},
+		{"--dislike"},
+		{"-next"},
+		{"next"},
+		{"--Next"},
+		{"--mcp"},
+	} {
+		if a.controlled(args) {
+			t.Errorf("%q asked for a command, and would show no window", args)
+		}
+	}
+}

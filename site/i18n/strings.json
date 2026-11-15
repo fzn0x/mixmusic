@@ -135,7 +135,7 @@
     "where": "structured data Question.name"
   },
   {
-    "text": "Nothing for itself: MixMusic has no account, server, analytics or telemetry of its own. It talks to the services you use: YouTube Music, Spotify and Last.fm, Unison and LRCLIB for the lyrics of the track that plays, and GitHub for updates, yt-dlp and the marketplace. Your library, history and searches stay on your computer. \u003ca href=\"https://mixmusic.functionx.dev/docs/data-and-privacy/#what-each-feature-sends-where\"\u003eYour data and privacy\u003c/a\u003e lists what each feature sends, and where.",
+    "text": "Nothing for itself: MixMusic has no account, server, analytics or telemetry of its own. It talks to the services you use: YouTube Music, Spotify and Last.fm, Better Lyrics, Unison and LRCLIB for the lyrics of the track that plays, and GitHub for updates, yt-dlp and the marketplace. Your library, history and searches stay on your computer. \u003ca href=\"https://mixmusic.functionx.dev/docs/data-and-privacy/#what-each-feature-sends-where\"\u003eYour data and privacy\u003c/a\u003e lists what each feature sends, and where.",
     "kind": "text",
     "where": "structured data Answer.text"
   },
@@ -645,7 +645,7 @@
     "where": "#panel-lyrics h3"
   },
   {
-    "text": "Synced lyrics from Unison, LRCLIB and YouTube Music light up line by line, or word by word where they're timed so, on now playing or beside any page. Translate them, or show Japanese, Korean, Chinese, Russian and many other scripts in Latin letters.",
+    "text": "Synced lyrics from Better Lyrics, Unison, LRCLIB and YouTube Music light up line by line, or word by word where they're timed so, on now playing or beside any page. Translate them, or show Japanese, Korean, Chinese, Russian and many other scripts in Latin letters.",
     "kind": "text",
     "where": "#panel-lyrics p"
   },

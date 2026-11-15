@@ -94,6 +94,9 @@ AppImage or archive copy's.
 - `loudness.json`: how loud YouTube measured the tracks you played.
 - `ai-labels.json`: the videos YouTube labels as made with AI, kept 30
   days, while you skip them.
+- `sponsorblock.json`: the parts SponsorBlock marks of the videos you
+  played, 5,000 videos at most, those you downloaded first, while you skip
+  them: asked again after 7 days, and used however old offline.
 - `releases.json`: the releases of the last year of the artists you
   follow, for [New from artists you follow](library.md#new-releases).
 - `lyrics-translations/`: the translations of lyrics you turned on, by
@@ -153,6 +156,7 @@ Where the credential store can't keep a secret:
 | The audio of a track, while "Play audio as your account" is on | yt-dlp, which asks YouTube (`www.youtube.com`, `music.youtube.com`) | the video's ID, with your YouTube Music session's cookies, in a file of yours alone that goes once yt-dlp ran |
 | Your YouTube Music history, signed in, while "Add what you play to your YouTube Music history" is on | YouTube Music | the tracks you play, once they played a while, and how far you got in episodes |
 | Skip songs made with AI, while it's on | YouTube (`www.youtube.com`), signed out | the video's ID, once a video |
+| Skip the parts SponsorBlock marks, while it's on | SponsorBlock (`sponsor.ajay.app`), or the mirror you name | only the first 4 characters of the SHA-256 hash of the video's ID, once a video, never the ID: SponsorBlock answers with the parts of all the videos whose hash starts so, some 65,000 of them, and MixMusic keeps the video's. Nothing is sent of what you skip |
 | Covers | the image servers of YouTube, Google and Spotify | the image asked for |
 | Spotify, once you sign in | Spotify (`accounts.spotify.com`, `api.spotify.com`) | what you search and open, your library's changes, and the commands of what plays |
 | Spotify in MixMusic | Spotify's player, loaded from `sdk.scdn.co` | what Spotify's own player sends |

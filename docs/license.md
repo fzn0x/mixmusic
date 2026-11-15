@@ -73,6 +73,13 @@ Settings › About › Licenses shows each of them in the app.
   person who submitted the lyrics too, and the lyrics panel credits both:
   "lyrics from Unison · submitted by <name>", linked to their pages on
   Unison. Better Lyrics is credited under its own lyrics too.
+- **The parts of videos MixMusic skips** come from SponsorBlock as you
+  play, while you turn it on, and aren't part of MixMusic. SponsorBlock's
+  data is under
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/),
+  which MixMusic credits as SponsorBlock asks, in Settings › Playback ›
+  Skip parts of videos and Settings › About › Licenses: "Uses SponsorBlock
+  data licensed under CC BY-NC-SA 4.0 from https://sponsor.ajay.app/".
 - **yt-dlp and the JavaScript runtimes** are programs of their own, which
   MixMusic runs, under their own licences. MixMusic downloads yt-dlp from
   its releases when you install it.

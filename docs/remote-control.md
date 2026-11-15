@@ -32,6 +32,12 @@ The code works once, for 2 minutes. If you didn't ask for it, **Cancel**
 on the computer that shows it refuses the pairing. A code typed wrong
 fails the pairing on both computers: click **Pair** again for a new one.
 
+Both computers end a pairing the same way. When the one you control can't
+keep it, as when its disk is full or takes longer than 30 seconds, or this
+one stops answering before it hears that it went, neither keeps the
+other, and the one you control says the pairing didn't finish. Click
+**Pair** again.
+
 The two computers remember each other from then on, and pair no more.
 
 ## Control it
@@ -140,6 +146,9 @@ about it:
 - **"Couldn't reach …"**: the computer may be asleep, or its firewall may
   turn MixMusic away (see above).
 - **"That isn't the code … showed"**: click **Pair** again, for a new code.
+- **"… couldn't keep the pairing"**: MixMusic there couldn't keep this
+  computer among those paired, and tells why there, as a disk that is
+  full or too slow. Pair again.
 - **"… removed this computer"**: it was removed there. Pair again.
 - **"Another computer answered in place of …"**: something else on the
   network answers at the address of the computer paired. MixMusic doesn't

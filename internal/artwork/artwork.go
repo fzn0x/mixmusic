@@ -85,7 +85,7 @@ func Pick(img image.Image) color.RGBA {
 			avg[0], avg[1], avg[2] = avg[0]+fr, avg[1]+fg, avg[2]+fb
 			count++
 			h, s, v := hsv(fr, fg, fb)
-			if s < 0.25 || v < 0.2 || v > 0.98 {
+			if s < 0.25 || v < 0.2 || (v > 0.98 && s < 0.4) {
 				continue // greys, near blacks and near whites make no accent
 			}
 			i := int(h/10) % buckets

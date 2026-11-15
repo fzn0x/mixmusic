@@ -251,10 +251,12 @@ home Anda. MixMusic menyimpan pengaturan dan pustakanya di
 `~/.var/app/io.github.fzn0x.mixmusic`, terpisah dari instalasi `.deb`,
 `.rpm`, AppImage, atau arsip, dan keduanya bisa berjalan bersamaan. Untuk
 memindahkan pengaturan dan pustaka dari instalasi lain, tutup keduanya,
-salin `settings.json`, `library.json`, `queue.json`, dan folder `addons`
-dari `~/.config/MixMusic` ke
-`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`, lalu masuk lagi ke
-akun-akun Anda: data login tetap tersimpan di keyring instalasi yang lain.
+salin `settings.json`, `library.json`, `queue.json`, `positions.json`, dan
+folder `addons` serta `mix-covers` dari `~/.config/MixMusic` ke
+`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`. Tutup keduanya lebih
+dulu: MixMusic yang berjalan menyimpan `library.json` dan sebagian besar
+berkas lain di memori, lalu menimpa berkas salinan saat penyimpanan
+berikutnya. Setelah itu masuk lagi ke akun-akun Anda: data login tetap tersimpan di keyring instalasi yang lain.
 
 Di Flatpak, fitur berjalan otomatis saat login diatur lewat desktop Anda,
 yang mungkin akan meminta izin Anda terlebih dahulu, dan yt-dlp milik Anda

@@ -244,9 +244,12 @@ configurações e sua biblioteca em `~/.var/app/io.github.fzn0x.mixmusic`,
 separado de uma cópia em `.deb`, `.rpm`, AppImage ou arquivo compactado, e
 as duas podem rodar ao mesmo tempo. Para trazer as configurações e a
 biblioteca de uma cópia, feche as duas, copie `settings.json`,
-`library.json`, `queue.json` e a pasta `addons` de `~/.config/MixMusic` para
-`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic` e entre nas suas
-contas de novo: as contas ficam no chaveiro da outra cópia.
+`library.json`, `queue.json`, `positions.json` e as pastas `addons` e
+`mix-covers` de `~/.config/MixMusic` para
+`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`. Feche as duas antes:
+um MixMusic em execução mantém `library.json` e a maioria dos outros
+arquivos na memória e sobrescreve o arquivo copiado no próximo salvamento.
+Depois entre nas suas contas de novo: as contas ficam no chaveiro da outra cópia.
 
 No Flatpak, o início junto com o sistema passa pelo seu desktop, que pode
 perguntar antes, e um yt-dlp seu precisa estar em

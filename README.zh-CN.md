@@ -157,7 +157,7 @@ brew install --cask fzn0x/tap/mixmusic
 
 ### Flatpak 版
 
-Flatpak 版在沙盒中运行 MixMusic。沙盒能访问网络、声音服务器、显示和 GPU，但完全看不到你的主文件夹。MixMusic 把设置和音乐库保存在 `~/.var/app/io.github.fzn0x.mixmusic` 中，与 `.deb`、`.rpm`、AppImage 或压缩包安装的那一份分开，两者可以同时运行。如果要把另一份的设置和音乐库搬过来，先退出两者，把 `settings.json`、`library.json`、`queue.json` 和 `addons` 文件夹从 `~/.config/MixMusic` 复制到 `~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`，然后重新登录你的账号：登录信息留在另一份所用的密钥环中，不会跟着过来。
+Flatpak 版在沙盒中运行 MixMusic。沙盒能访问网络、声音服务器、显示和 GPU，但完全看不到你的主文件夹。MixMusic 把设置和音乐库保存在 `~/.var/app/io.github.fzn0x.mixmusic` 中，与 `.deb`、`.rpm`、AppImage 或压缩包安装的那一份分开，两者可以同时运行。如果要把另一份的设置和音乐库搬过来，先退出两者（运行中的 MixMusic 会把 `library.json` 和其他大多数文件保存在内存里，下次保存时会覆盖复制过来的文件），把 `settings.json`、`library.json`、`queue.json`、`positions.json` 以及 `addons` 和 `mix-covers` 文件夹从 `~/.config/MixMusic` 复制到 `~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`，然后重新登录你的账号：登录信息留在另一份所用的密钥环中，不会跟着过来。
 
 在 Flatpak 版中，开机自启要经过你的桌面环境，它可能会先征求你的同意；如果要用你自己的 yt-dlp，它必须放在 `~/.var/app/io.github.fzn0x.mixmusic` 中，因为沙盒看不到其他文件夹。不是 Flatpak 版的 Discord 应用，只有在 MixMusic 启动时已经在运行，才会显示正在播放的内容，而且 Discord 重启后就不再显示；Flatpak 版的 Discord 则不受此限制。Flatpak 版刚推出不久：欢迎在 [issue](https://github.com/fzn0x/mixmusic/issues) 中告诉我们它在你的桌面上运行得怎么样。
 

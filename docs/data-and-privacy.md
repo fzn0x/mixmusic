@@ -215,7 +215,12 @@ the Flatpak, quit both copies, copy `settings.json`, `library.json`,
 `queue.json`, `positions.json` and the `addons` and `mix-covers` folders
 into the other copy's data folder, and sign in to your accounts again
 there: sign-ins stay in the credential store of the computer they were
-made on.
+made on. Both must be quit, because a running MixMusic keeps
+`library.json` and most other files in memory and writes over a copied
+one at its next save. The cache folder is safe to leave out, as is `bin/`
+(MixMusic downloads its yt-dlp again). `remote.json` is no use on the
+other computer, as its key stays in the credential store, and `mcp.json`
+is made anew each time the assistants' port turns on.
 
 **To keep everything in one folder**, as for a portable copy or a test
 run, start MixMusic with the environment variable

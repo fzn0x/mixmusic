@@ -377,9 +377,10 @@ func (c *Client) TopTracks(ctx context.Context) ([]media.Track, error) {
 }
 
 // Home returns shelves made of the user's Spotify library: their
-// playlists, recent and top tracks, and saved albums. Shelves whose
-// requests fail are left out; once all of them failed, the error tells
-// why.
+// playlists, recent and top tracks, and saved albums, of the playlists
+// and albums the first page alone, so that Home doesn't wait. Shelves
+// whose requests fail are left out; once all of them failed, the error
+// tells why.
 func (c *Client) Home(ctx context.Context, userID string) ([]media.Shelf, error) {
 	var (
 		playlists   []media.Playlist
@@ -388,10 +389,10 @@ func (c *Client) Home(ctx context.Context, userID string) ([]media.Shelf, error)
 		errs        [4]error
 		wg          sync.WaitGroup
 	)
-	wg.Go(func() { playlists, errs[0] = c.MyPlaylists(ctx, userID) })
+	wg.Go(func() { playlists, errs[0] = c.homePlaylists(ctx, userID) })
 	wg.Go(func() { recent, errs[1] = c.RecentlyPlayed(ctx) })
 	wg.Go(func() { top, errs[2] = c.TopTracks(ctx) })
-	wg.Go(func() { albums, errs[3] = c.SavedAlbums(ctx) })
+	wg.Go(func() { albums, errs[3] = c.homeAlbums(ctx) })
 	wg.Wait()
 	if errs[0] != nil && errs[1] != nil && errs[2] != nil && errs[3] != nil {
 		return nil, errs[0]

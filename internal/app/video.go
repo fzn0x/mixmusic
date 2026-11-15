@@ -107,6 +107,10 @@ func (a *App) videoHandler() http.Handler {
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}
+		if strings.HasPrefix(r.URL.Path, clipPath) {
+			a.serveClip(w, r)
+			return
+		}
 		a.proxy.ServeVideo(w, r)
 	})
 }

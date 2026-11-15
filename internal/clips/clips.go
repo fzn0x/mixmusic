@@ -158,6 +158,20 @@ func (s *Store) File(key string) (string, bool) {
 	return filepath.Join(s.dir, m.File), true
 }
 
+// Path returns the path of a clip's file by its name, as its match gives
+// it, while the store keeps it.
+func (s *Store) Path(name string) (string, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.load()
+	for _, m := range s.index {
+		if !m.Miss() && m.File == name {
+			return filepath.Join(s.dir, name), true
+		}
+	}
+	return "", false
+}
+
 // Keep keeps the clip r reads as the album of key's, of the type and the
 // size m tells, in place of what the store kept of it, and returns its
 // match. A clip of more than MaxClip bytes isn't kept.

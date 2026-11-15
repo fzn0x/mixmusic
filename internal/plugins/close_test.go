@@ -23,6 +23,18 @@ export default (api) => () => api.ui.toast("stopped");`})
 	}
 }
 
+func TestCloseKeepsWhatStopFunctionsStore(t *testing.T) {
+	h := newTestHost(t)
+	h.install("keeper", manifest("keeper"), map[string]string{"index.js": `
+export default (api) => () => { api.storage.set("last", "stopped"); api.storage.setJSON("count", 3) };`})
+	h.enable("keeper")
+	h.Close()
+	values, err := h.a.Services().Addons.Storage("keeper")
+	if err != nil || values["last"] != "stopped" || values["count"] != "3" {
+		t.Errorf("after Close, the plugin keeps %q, %v", values, err)
+	}
+}
+
 func TestCloseBoundsStuckStopFunctions(t *testing.T) {
 	stopWait = 50 * time.Millisecond
 	t.Cleanup(func() { stopWait = 3 * time.Second })

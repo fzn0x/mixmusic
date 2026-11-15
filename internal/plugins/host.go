@@ -166,8 +166,9 @@ func (h *Host) Retry() {
 }
 
 // Close stops every plugin, as MixMusic quits, and waits for their
-// cleanups to run, stopWait at most in all: a plugin that takes longer is
-// interrupted, and Close returns without it.
+// cleanups to run, and for the work of the API they started to end, such
+// as what they keep in storage, stopWait at most in all: a plugin that
+// takes longer is interrupted, and Close returns without it.
 func (h *Host) Close() {
 	if h == nil {
 		return
@@ -184,7 +185,7 @@ func (h *Host) Close() {
 	defer deadline.Stop()
 	for _, pl := range stopping {
 		select {
-		case <-pl.loop.done:
+		case <-pl.ended():
 		case <-deadline.C:
 			return
 		}

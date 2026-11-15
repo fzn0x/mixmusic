@@ -232,11 +232,15 @@ The Flatpak runs MixMusic in a sandbox, which sees the network, the sound
 server, the display and the GPU, and none of your home folder. MixMusic
 keeps its settings and library in `~/.var/app/io.github.fzn0x.mixmusic`,
 apart from a `.deb`, `.rpm`, AppImage or archive copy, and both can run at
-once. To bring a copy's settings and library over, quit both, copy
-`settings.json`, `library.json`, `queue.json` and the `addons` folder from
-`~/.config/MixMusic` into `~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`,
-and sign in to your accounts again: sign-ins stay in the other copy's
-keyring.
+once. To bring a copy's settings and library over, quit both, then copy
+`settings.json`, `library.json`, `queue.json`, `positions.json` and the
+`addons` and `mix-covers` folders from `~/.config/MixMusic` into
+`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`. Quit both first:
+a running MixMusic keeps `library.json` and most other files in memory
+and writes over a copied one at its next save. Then sign in to your
+accounts again: sign-ins stay in the other copy's keyring. The
+[data and privacy page](docs/data-and-privacy.md#the-data-folder) says
+what each file holds.
 
 In the Flatpak, start at login goes through your desktop, which may ask
 you first, and a yt-dlp of your own must be in

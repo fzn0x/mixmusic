@@ -153,6 +153,11 @@ func lastfmTrack(np NowPlaying) (string, lastfm.Track) {
 	case t.Duration == 0:
 		t.Duration = time.Duration(np.Track.DurationMs) * time.Millisecond
 	}
+	// The parts the player passes over count for nothing: a scrobble takes
+	// half of what is left.
+	if skipped := time.Duration(np.SkippedMs) * time.Millisecond; t.Duration > skipped {
+		t.Duration -= skipped
+	}
 	return np.Track.ID, t
 }
 

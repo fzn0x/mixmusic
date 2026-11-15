@@ -32,6 +32,9 @@ type NowPlaying struct {
 	// Live is set for a live stream, which has no length: PositionMs is
 	// how long it played.
 	Live bool `json:"live,omitempty"`
+	// SkippedMs is how long the parts of the track the player passes over
+	// last, which scrobbles leave out (#548): the windows don't hear it.
+	SkippedMs int `json:"-"`
 	// Speed is the speed the track plays at, 1 its own, as is 0: the
 	// position is the track's own time, which moves on at it.
 	Speed float64 `json:"speed,omitempty"`

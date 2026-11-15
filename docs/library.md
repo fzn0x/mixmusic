@@ -117,6 +117,7 @@ MixMusic reads playlists of up to 20,000 tracks, and the songs you liked on YouT
 - Play and Shuffle, pressed meanwhile, wait for all of them. The menu's queue items and the download show once they're read.
 - A page of the playlist that fails is tried again a few times. Then the playlist says how many of its tracks loaded, with Try again. One past 20,000 tracks says where it was cut.
 - Once all of it is read, a muted line under the header says why its count may be above the rows: how many of its items can't play here, of what kind (on Spotify, local files, podcast episodes, and removed or unavailable items), and how many songs Hide explicit content leaves out of a playlist of someone else's. The count shown equals the rows plus what the line names.
+- A YouTube Music playlist whose header counts more than 100 songs, but that ended with fewer than 90% of them, says "Only 100 of this playlist's 1,527 tracks came from YouTube Music." under the header, with Try again, which loads it again from its first page. A smaller gap stays quiet, since YouTube Music's count may hold videos that are hidden or no longer available.
 - Playing a long playlist from its tile, downloading it or copying it into a mix reads all of it first, which can take a while.
 
 ## The header that stays

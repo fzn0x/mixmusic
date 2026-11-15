@@ -19,6 +19,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -210,6 +211,21 @@ func (g *playLog) add(at time.Time, t media.Track) error {
 	l := lineOf(at, 0, loggedTrack{Track: t})
 	g.plays = append(g.plays, loggedPlay{at: at.Unix(), track: g.intern(l)})
 	g.pending = append(g.pending, l.encode()...)
+	return g.flush()
+}
+
+// fill makes a new log hold the plays of the history, which is the latest
+// first, and writes it whole: once, as the log is made, so that the plays
+// counted before there was a log still count, each once. While the file
+// can't be written, the next play tries again.
+func (g *playLog) fill(history []Play) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	for _, p := range slices.Backward(history) {
+		l := lineOf(p.PlayedAt, 0, loggedTrack{Track: p.Track})
+		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(l)})
+	}
+	g.whole = true
 	return g.flush()
 }
 

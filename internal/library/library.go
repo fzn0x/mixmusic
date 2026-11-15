@@ -8,6 +8,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"log"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -84,9 +85,14 @@ func Open(path string) (*Library, error) {
 	if err != nil {
 		return nil, err
 	}
-	plays, _, err := openPlayLog(filepath.Join(filepath.Dir(path), playLogName))
+	plays, found, err := openPlayLog(filepath.Join(filepath.Dir(path), playLogName))
 	if err != nil {
 		return nil, err
+	}
+	if !found {
+		if err := plays.fill(f.Get().History); err != nil {
+			log.Printf("mixmusic: writing the plays of the history to the play log, which the next play tries again: %v", err)
+		}
 	}
 	l := &Library{file: f, plays: plays, now: time.Now}
 	l.indexDisliked()

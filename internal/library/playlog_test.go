@@ -277,3 +277,39 @@ func TestPlayLogClear(t *testing.T) {
 		t.Errorf("after a clear that failed and a play, the log reads %q", got)
 	}
 }
+
+// TestPlayLogFromHistory fills a new log with the history's plays, once:
+// the plays counted before there was a log count, each once, after a
+// restart too.
+func TestPlayLogFromHistory(t *testing.T) {
+	dir := t.TempDir()
+	old := openIn(t, dir)
+	start := time.Date(2025, 6, 1, 8, 0, 0, 0, time.UTC)
+	a, b := tr("yt:a", media.SourceYouTube, "A"), tr("sp:b", media.SourceSpotify, "B")
+	withHistory(t, old, []Play{{Track: a, PlayedAt: start}, {Track: b, PlayedAt: start.Add(time.Hour)}, {Track: a, PlayedAt: start.Add(2 * time.Hour)}})
+	// As a library.json from before the log was kept.
+	if err := os.Remove(filepath.Join(dir, playLogName)); err != nil {
+		t.Fatal(err)
+	}
+
+	l := openIn(t, dir)
+	if got := loggedIDs(l); !slices.Equal(got, []string{"yt:a", "sp:b", "yt:a"}) {
+		t.Fatalf("the log made from the history reads %q", got)
+	}
+	if at := time.Unix(l.plays.plays[1].at, 0); !at.Equal(start.Add(time.Hour)) {
+		t.Errorf("the second play counted at %v", at)
+	}
+	clockFrom(l, start.Add(3*time.Hour))
+	if err := l.RecordPlay(b); err != nil {
+		t.Fatal(err)
+	}
+	again := openIn(t, dir)
+	if got := loggedIDs(again); !slices.Equal(got, []string{"yt:a", "sp:b", "yt:a", "sp:b"}) {
+		t.Errorf("after a play and a restart, the log reads %q", got)
+	}
+	// A log there is never filled again, from what the history holds.
+	withHistory(t, again, []Play{{Track: a, PlayedAt: start}})
+	if got := loggedIDs(openIn(t, dir)); len(got) != 4 {
+		t.Errorf("the log was filled again: %q", got)
+	}
+}

@@ -204,7 +204,9 @@ func (s *Store) Keep(key string, m Match, r io.Reader) (Match, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.load()
-	sum := sha256.Sum256([]byte(key))
+	// A name of the album and the rendition: another rendition of the
+	// same album is another clip to the page that plays it.
+	sum := sha256.Sum256([]byte(key + "|" + m.Source))
 	m.File = hex.EncodeToString(sum[:12]) + ext(m.Mime)
 	m.Bytes, m.Found, m.Played = n, s.now(), s.now()
 	if err := os.Rename(tmp.Name(), filepath.Join(s.dir, m.File)); err != nil {

@@ -80,7 +80,20 @@
   dislike a song and take the dislike back).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
-  library), and controls Spotify Connect devices. It changes the
+  library), and controls Spotify Connect devices. The lists of the
+  user's library are read whole (`librarylists.go`): their playlists,
+  saved albums and shows by offset, the first page, then the pages its
+  count tells of, 3 at a time, as a 429 is waited out once, and on while
+  the last names a next, up to the offset bound of 100,000; the artists
+  they follow by cursor, a page at a time. A page past the first that
+  fails is tried again on `media.PageWaits` (`media.TryPage`), and each
+  item comes once, by its ID. A list that stops short, at a page that
+  fails, at a page of nothing or of nothing new that names a next, or at
+  the bound, comes with what was read and a `media.ShortList`, which
+  tells how many of how many came; `shortlist.go` shows it, as "Showing
+  200 of 250 playlists" with Try again, in the library and its menus, for
+  any service's list. Home reads one page of the playlists and of the
+  albums, so as not to wait. It changes the
   playlists the user may: adds tracks, moves one by its place in the
   playlist, which only a playlist whose items MixMusic all shows has, and
   makes one of the user's collaborative, off their profile, as Spotify

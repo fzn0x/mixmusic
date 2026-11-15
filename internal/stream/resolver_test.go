@@ -322,6 +322,9 @@ func selectFormat(t *testing.T, selector string, formats []ytdlpFormat) string {
 					ok = ok && f.acodec == strings.TrimPrefix(filter, "acodec=")
 				case filter == "audio_channels<=?2":
 					ok = ok && f.channels <= 2
+				case strings.HasPrefix(filter, "language_preference>="):
+					// None of these videos has several tracks.
+					ok = false
 				case strings.HasPrefix(filter, "format_id!*="):
 					ok = ok && !strings.Contains(f.id, strings.TrimPrefix(filter, "format_id!*="))
 				default:

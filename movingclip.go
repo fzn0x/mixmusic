@@ -105,8 +105,8 @@ func (s *shell) clipSource(t media.Track) *loaded[app.VideoSource] {
 // and reports whether it was that clip: it is looked for again, leaving
 // it out, once; then the track keeps its cover, and the clip goes.
 func (s *shell) clipTold(st videoStatus) bool {
-	cur := s.st.Source
-	if cur == nil {
+	cur, ok := s.st.Current()
+	if !ok {
 		return false
 	}
 	t := cur.Track

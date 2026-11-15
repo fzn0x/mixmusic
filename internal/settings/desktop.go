@@ -29,6 +29,10 @@ type Desktop struct {
 	// MiniPanel is the panel the mini player shows beside it as it opens
 	// (#371): MiniQueue, MiniLyrics or MiniOutput, or "" for none.
 	MiniPanel string `json:"miniPanel"`
+	// MiniZoom is the zoom the mini player's window was last sized for:
+	// the size the window keeps of its last run suits it, and the mini
+	// player scales it to the zoom as it opens (#717). 0 before it opened.
+	MiniZoom float64 `json:"miniZoom"`
 	// MediaKeys has the keyboard's play, next and previous keys control
 	// MixMusic.
 	MediaKeys bool `json:"mediaKeys"`
@@ -88,9 +92,10 @@ func defaultDesktop() Desktop {
 
 // clean is d without a Discord application ID that isn't one, with lines of
 // the Discord status that Discord takes, and with a panel of the mini
-// player it has.
+// player it has, and a zoom of it that is one.
 func (d Desktop) clean() Desktop {
 	d.MiniPanel = cleanMiniPanel(d.MiniPanel)
+	d.MiniZoom = zoomStep(d.MiniZoom, 0)
 	if d.DiscordAppID = strings.TrimSpace(d.DiscordAppID); !discordIDRe.MatchString(d.DiscordAppID) {
 		d.DiscordAppID = ""
 	}

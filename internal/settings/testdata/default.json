@@ -79,6 +79,7 @@
   "showInTitle": true,
   "keepOnTop": false,
   "miniPanel": "",
+  "miniZoom": 0,
   "mediaKeys": true,
   "assistantControl": false,
   "showOnDiscord": true,

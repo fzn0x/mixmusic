@@ -94,7 +94,7 @@ What counts as explicit is what marks it so. Spotify marks its tracks, and YouTu
 
 The Queue button by the player, or Ctrl+J (⌘J), shows Up next at the right of the window: the track playing, then what plays after it.
 
-- **Play next,** in a track's or a list's menu, puts it right after the track playing. **Add to queue** puts it after the tracks you added, and before those of the radio.
+- **Play next,** in a track's or a list's menu, puts it right after the track playing. **Add to queue** puts it after the tracks you added, and before those of the radio. During an album or a playlist, that is after the rest of the list too. To bring a track already in Up next forward, use **Play next** in its menu: it moves the track right after the one playing, and a radio track moved so counts as one you added.
 - **Drag** a track in Up next to move it, and use the × on its row to take it out. Clear takes out every track after the one playing. Double-click a track to play it.
 - **Marks** after the artists tell what a track is: "radio" for those a radio added, "skipped" for a song the queue passes over as you dislike it, and "made with AI" for one it passes over as YouTube labels it so. Clicking a skipped track's cover still plays it.
 - **In a wide window,** the player bar shows the track that plays next under the one playing, while Up next is closed.

@@ -1,8 +1,9 @@
 # The library and downloads
 
 - **`internal/library`** keeps liked and disliked songs, mixes, the history
-  and stats, and the artists followed in MixMusic
-  ([Following artists](follows.md)), in `library.json`. A mix's cover
+  and the artists followed in MixMusic ([Following artists](follows.md)),
+  in `library.json`, and every play, for the stats, in the play log
+  below. A mix's cover
   that the user chose is a file of `mix-covers/` in the data folder,
   which the mix names (`Playlist.Cover`): its centre square, at most 600
   pixels across, a JPEG, or a PNG where it isn't opaque, under a name of
@@ -11,6 +12,31 @@
   then `mixcover:<name>`, which the windows read from the file, as
   they read the local covers (`localArt`); deleting the mix, or going
   back to its songs' covers, removes the file (`mixcover.go`).
+- **The play log** (`internal/library/playlog.go`): the history of
+  `library.json` keeps the last 1,000 plays, for History and Recently
+  played, and the file is written whole on each change; every play that
+  counts goes to `plays.jsonl` too, beside it, a line of JSON each, the
+  oldest first, with no cap: when it counted, to the second, the
+  track's ID, source, title, artists and album with their IDs and its
+  listed length, with room for the album's year and the time heard
+  (#544), and no covers. A line of a real track is some 270 bytes, so
+  the log grows by about 1 MB a year at 10 plays a day. `RecordPlay`
+  appends to it: a play whose append failed waits in memory for the
+  next, a line cut short is written again after a line break, and the
+  reader skips a line that doesn't read, as one a crash tore, and a play
+  that is the one before it again. Clear history, and the copies of a
+  song (`Retarget`), write it anew, whole (`store.Replace`). The first
+  start without it fills it from the history, once: a log that is there
+  is never filled again. It is read as the library opens, a line at a
+  time, into memory, where each track is kept once: a line holds its
+  track after the play's time, alike in each line of the track, so that
+  one read before needs no decoding. `Stats`, `Recap`, `RecapYears` and
+  `PlayCounts` sum it, and keep their sums (`statsmemo.go`) until the
+  log or the library changes, and the stats of the last days for a
+  minute. A top track takes its cover and the rest from the history,
+  the liked or disliked songs or a mix that holds it.
+  `BenchmarkPlayLogOpen` and `BenchmarkPlayLogStats` measure them over
+  years of made-up plays.
 - **`internal/localfiles`** keeps the index of the music on the user's
   computer, `local-files.json`: the music files of the folders the
   settings name (`musicFolders`), by path, with their size, time of

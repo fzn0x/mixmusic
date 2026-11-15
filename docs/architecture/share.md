@@ -44,10 +44,10 @@ go to the services' pages, and cards are drawn on this computer.
   index. While it is on for the track playing, `pickLine` makes a click
   choose a line instead of seeking, and `saveLyricsCard` makes the card.
 - **The yearly recap** (`recap.go`, `internal/library/recap.go`):
-  `Library.Recap(year)` sums the history for one calendar year in the
+  `Library.Recap(year)` sums the play log for one calendar year in the
   user's time zone, and `RecapYears` lists the years it has plays in.
-  The history keeps only the last 1,000 plays, so a recap covers what
-  that still holds; new artists are counted only when the history reaches
+  The log keeps every play since it was made, and the last 1,000 of the
+  history before it; new artists are counted only when the log reaches
   back before the year. `recapYears` offers the past years, and the
   current one from December, going by `recapClock`, which tests replace.
   The card is built by `recapCardOf` for `saveCard`, with no cover: a

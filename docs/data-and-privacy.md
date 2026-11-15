@@ -52,9 +52,14 @@ AppImage or archive copy's.
 - `settings.json`: your settings. You can edit it while MixMusic runs, and
   what you save applies at once.
 - `library.json`: your liked and disliked songs, your mixes, the last
-  1,000 tracks you played, which the history and the stats read, your
+  1,000 tracks you played, which the history reads, your
   last 20 searches, the shows you follow, and the artists you follow
   in MixMusic.
+- `plays.jsonl`: every track you played, once it counted, a line each,
+  which the stats, Your year and the Plays sort read: when, and the
+  track's ID, service, title, artists, album and length, without covers.
+  It grows by about 1 MB a year at 10 plays a day. Clear history empties
+  it.
 - `mix-covers/`: the covers you chose for your mixes, cut to a square.
 - `local-files.json`: the index of the [music on this computer](local-music.md):
   the path, size, time of change and tags of each music file of the
@@ -198,7 +203,8 @@ Where the credential store can't keep a secret:
 
 ## Clear, move or reset
 
-- **Your history:** the library's history page clears what you played.
+- **Your history:** the library's history page clears what you played,
+  and the plays the stats count.
 - **The cache:** Settings › Playback › Offline cache › Clear tracks and
   Clear covers.
 - **A sign-in:** signing out of a service in Settings › Accounts deletes

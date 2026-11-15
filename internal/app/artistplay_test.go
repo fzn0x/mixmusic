@@ -99,15 +99,19 @@ func (as *artistSongs) told(t *testing.T, text string) player.Notice {
 func TestPlayArtistSongs(t *testing.T) {
 	as := newArtistSongs(t, nil)
 	g := as.gate(t, "P1")
-	if err := as.c.PlayArtist(context.Background(), as.p, as.artist, false); err != nil {
-		t.Fatal(err)
-	}
+	done := make(chan error, 1)
+	go func() { done <- as.c.PlayArtist(context.Background(), as.p, as.artist, false) }()
 	head := trackIDs(as.whole[:2])
 	waitPlayer(t, as.p, "the first page playing", func(s player.State) bool { return slices.Equal(queueIDs(s), head) && s.Index == 0 })
 	<-g.asked
 	g.let()
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
 	want := trackIDs(as.whole)
-	waitPlayer(t, as.p, "all the songs queued", func(s player.State) bool { return slices.Equal(queueIDs(s), want) })
+	if got := queueIDs(as.p.State()); !slices.Equal(got, want) {
+		t.Errorf("the queue is %v, want %v", got, want)
+	}
 	if cur, _ := as.p.State().Current(); cur.Track.ID != want[0] {
 		t.Errorf("%s plays", cur.Track.ID)
 	}
@@ -247,22 +251,23 @@ func TestArtistSongsAfterAnother(t *testing.T) {
 // isn't asked for.
 func TestArtistSongsReplaced(t *testing.T) {
 	as := newArtistSongs(t, nil)
-	first, err := as.c.PlaylistStart(context.Background(), longID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	l := as.p.PlayList(first.Tracks, false)
+	g := as.gate(t, "P1")
+	done := make(chan error, 1)
+	go func() { done <- as.c.PlayArtist(context.Background(), as.p, as.artist, false) }()
 	waitPlayer(t, as.p, "the first page", func(s player.State) bool { return len(s.Queue) == 2 && s.Index == 0 })
+	<-g.asked
 	as.p.PlayTracks([]media.Track{{ID: "yt:other", Source: media.SourceYouTube, Title: "Other"}}, 0)
 	waitPlayer(t, as.p, "the other track", func(s player.State) bool { return len(s.Queue) == 1 })
-	as.l.mu.Lock()
-	as.l.asked = nil
-	as.l.mu.Unlock()
-	as.c.a.readArtistSongs(as.p, l, first, as.c.a.songsKept(), "Someone")
+	g.let()
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
 	if got := queueIDs(as.p.State()); !slices.Equal(got, []string{"yt:other"}) {
 		t.Errorf("the queue is %v", got)
 	}
-	if !slices.Equal(as.l.asked, []string{"P1"}) {
+	as.l.mu.Lock()
+	defer as.l.mu.Unlock()
+	if !slices.Equal(as.l.asked, []string{"", "P1"}) {
 		t.Errorf("asked for the pages %q", as.l.asked)
 	}
 }

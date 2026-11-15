@@ -119,6 +119,11 @@
   with `DELETE /playlists/{id}/followers`. Spotify lists that route as
   removed in February 2026, with `DELETE /me/library` in its place; it
   still answered for that app's Client ID, made before then.
+  `FollowPlaylist` saves and removes through `PUT` and `DELETE /me/library`
+  with the playlist's URI, as `Save` and `Remove` do for the other items,
+  and falls back to `/playlists/{id}/followers` when the new route
+  answers 403 or 404; both failing is one error naming both answers.
+  `LiveCollaboration` logs which route answered.
   A 429 waits for its Retry-After once, if it is 5 seconds or less. A
   background read of a long list (`media.WithPageWait`, as the playlist
   page does) waits up to `media.MaxPageWait`, 60 seconds, once for each

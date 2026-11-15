@@ -44,6 +44,12 @@ type LastfmAccount struct {
 	Name      string `json:"name,omitempty"`
 	// Expired is set when Last.fm no longer accepts the session.
 	Expired bool `json:"expired,omitempty"`
+	// Waiting is how many scrobbles wait to be sent.
+	Waiting int `json:"waiting,omitempty"`
+	// Other is the name of another Last.fm user who approved a new
+	// connection while scrobbles wait: they go to that account, or are
+	// dropped, as the user chooses.
+	Other string `json:"other,omitempty"`
 }
 
 // scrobbles is a scrobbler and where its queue of plays to send is kept.
@@ -52,6 +58,9 @@ type scrobbles struct {
 	scrobbler *lastfm.Scrobbler
 	name      string
 	expired   bool
+	// other is the connection another user approved, which waits for the
+	// user to say what becomes of the waiting scrobbles.
+	other *lastfmCredentials
 }
 
 // openLastfm connects to Last.fm with the credentials kept, if any.
@@ -75,18 +84,23 @@ func (a *App) startScrobbling(c lastfmCredentials) {
 			s.SetQueue(plays)
 		}
 	}
-	s.OnQueue = func(plays []lastfm.Play) {
+	s.OnQueue = a.lastfmQueueSaver(queue)
+	a.mu.Lock()
+	a.lastfm = &scrobbles{client: client, scrobbler: s, name: c.Session.Name}
+	a.mu.Unlock()
+}
+
+// lastfmQueueSaver returns what keeps the scrobbles waiting in the file.
+func (a *App) lastfmQueueSaver(file string) func([]lastfm.Play) {
+	return func(plays []lastfm.Play) {
 		data, err := json.Marshal(plays)
 		if err == nil {
-			err = store.WriteFile(queue, data)
+			err = store.WriteFile(file, data)
 		}
 		if err != nil {
 			log.Printf("mixmusic: keeping the scrobbles to send: %v", err)
 		}
 	}
-	a.mu.Lock()
-	a.lastfm = &scrobbles{client: client, scrobbler: s, name: c.Session.Name}
-	a.mu.Unlock()
 }
 
 func (a *App) lastfmAccount() LastfmAccount {
@@ -95,7 +109,11 @@ func (a *App) lastfmAccount() LastfmAccount {
 	if a.lastfm == nil {
 		return LastfmAccount{}
 	}
-	return LastfmAccount{Connected: true, Name: a.lastfm.name, Expired: a.lastfm.expired}
+	acc := LastfmAccount{Connected: true, Name: a.lastfm.name, Expired: a.lastfm.expired, Waiting: len(a.lastfm.scrobbler.Queue())}
+	if a.lastfm.other != nil {
+		acc.Other = a.lastfm.other.Session.Name
+	}
+	return acc
 }
 
 // scrobble feeds what plays to the scrobbler, and sends what it has to.
@@ -156,6 +174,35 @@ func lastfmTrack(np NowPlaying) (string, lastfm.Track) {
 	return np.Track.ID, t
 }
 
+// lastfmApprove has the user approve MixMusic on Last.fm, in their browser,
+// with the API account of apiKey and secret, and returns the session.
+func lastfmApprove(ctx context.Context, apiKey, secret string) (lastfm.Session, error) {
+	ctx, cancel := context.WithTimeout(ctx, loginTimeout)
+	defer cancel()
+	client := lastfm.NewClient(apiKey, secret)
+	token, err := client.Token(ctx)
+	if err != nil {
+		return lastfm.Session{}, err
+	}
+	if err := mygo.Shell.OpenExternal(client.AuthURL(token)); err != nil {
+		return lastfm.Session{}, err
+	}
+	for {
+		session, err := client.Session(ctx, token)
+		if err == nil {
+			return session, nil
+		}
+		if !errors.Is(err, lastfm.ErrNotAuthorized) {
+			return lastfm.Session{}, err
+		}
+		select {
+		case <-ctx.Done():
+			return lastfm.Session{}, errors.New("Last.fm did not hear from you in time: approve MixMusic in the browser, then connect again")
+		case <-time.After(lastfmPoll):
+		}
+	}
+}
+
 // LastfmLogin connects MixMusic to the user's Last.fm account, with the
 // API account they made on Last.fm: the user approves in their browser,
 // and MixMusic waits for it.
@@ -164,30 +211,9 @@ func (s *Accounts) LastfmLogin(ctx context.Context, apiKey, secret string) (Acco
 	if apiKey == "" || secret == "" {
 		return AccountsStatus{}, errors.New("paste the API key and the shared secret of your Last.fm API account")
 	}
-	ctx, cancel := context.WithTimeout(ctx, loginTimeout)
-	defer cancel()
-	client := lastfm.NewClient(apiKey, secret)
-	token, err := client.Token(ctx)
+	session, err := lastfmApprove(ctx, apiKey, secret)
 	if err != nil {
 		return AccountsStatus{}, err
-	}
-	if err := mygo.Shell.OpenExternal(client.AuthURL(token)); err != nil {
-		return AccountsStatus{}, err
-	}
-	var session lastfm.Session
-	for {
-		session, err = client.Session(ctx, token)
-		if err == nil {
-			break
-		}
-		if !errors.Is(err, lastfm.ErrNotAuthorized) {
-			return AccountsStatus{}, err
-		}
-		select {
-		case <-ctx.Done():
-			return AccountsStatus{}, errors.New("Last.fm did not hear from you in time: approve MixMusic in the browser, then connect again")
-		case <-time.After(lastfmPoll):
-		}
 	}
 	c := lastfmCredentials{APIKey: apiKey, Secret: secret, Session: session}
 	if err := s.a.lastfmStore.Save(c); err != nil {
@@ -202,7 +228,82 @@ func (s *Accounts) LastfmLogin(ctx context.Context, apiKey, secret string) (Acco
 	return status, nil
 }
 
-// LastfmLogout disconnects MixMusic from Last.fm.
+// LastfmReconnect has the user approve MixMusic on Last.fm again, with the
+// API account kept, and gives the new session to the running scrobbler,
+// which keeps the scrobbles waiting and sends them. When another user
+// approves while scrobbles wait, nothing changes until LastfmResolve.
+func (s *Accounts) LastfmReconnect(ctx context.Context) error {
+	c, err := s.a.lastfmStore.Load()
+	if err != nil || c.APIKey == "" {
+		return errors.New("connect to Last.fm first")
+	}
+	session, err := lastfmApprove(ctx, c.APIKey, c.Secret)
+	if err != nil {
+		return err
+	}
+	if w := mygo.CallerWindow(ctx); w != nil {
+		w.Show() // back from the browser
+	}
+	return s.a.lastfmNewSession(c, session)
+}
+
+// lastfmNewSession gives the running scrobbler the session the user
+// approved, or holds it when it is another user's and scrobbles wait.
+func (a *App) lastfmNewSession(c lastfmCredentials, session lastfm.Session) error {
+	a.mu.Lock()
+	l := a.lastfm
+	a.mu.Unlock()
+	if l == nil {
+		return errors.New("connect to Last.fm first")
+	}
+	c.Session = session
+	a.mu.Lock()
+	name := l.name
+	a.mu.Unlock()
+	if session.Name != name && len(l.scrobbler.Queue()) > 0 {
+		a.mu.Lock()
+		l.other = &c
+		a.mu.Unlock()
+		notify()
+		return nil
+	}
+	return a.lastfmSwitch(l, c)
+}
+
+// lastfmSwitch makes c's session the one l scrobbles with.
+func (a *App) lastfmSwitch(l *scrobbles, c lastfmCredentials) error {
+	if err := a.lastfmStore.Save(c); err != nil {
+		return err
+	}
+	l.scrobbler.SetSession(c.Session.Key)
+	a.mu.Lock()
+	l.name, l.expired, l.other = c.Session.Name, false, nil
+	a.mu.Unlock()
+	notify()
+	return nil
+}
+
+// LastfmResolve settles what a connection of another Last.fm user does to
+// the scrobbles waiting: send them to that account, or drop them.
+func (s *Accounts) LastfmResolve(ctx context.Context, send bool) error {
+	s.a.mu.Lock()
+	l := s.a.lastfm
+	var c *lastfmCredentials
+	if l != nil {
+		c = l.other
+	}
+	s.a.mu.Unlock()
+	if c == nil {
+		return nil
+	}
+	if !send {
+		l.scrobbler.Discard()
+	}
+	return s.a.lastfmSwitch(l, *c)
+}
+
+// LastfmLogout disconnects MixMusic from Last.fm, and drops the scrobbles
+// that wait to be sent.
 func (s *Accounts) LastfmLogout(ctx context.Context) error {
 	s.a.mu.Lock()
 	s.a.lastfm = nil

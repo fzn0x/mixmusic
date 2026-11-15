@@ -536,7 +536,7 @@ MixMusic এই প্রজেক্টগুলোর ওপর দাঁড�
   [appimagetool](https://github.com/AppImage/appimagetool), AppImage-গুলো।
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp),** যা সেসব গানের অডিও খুঁজে
   দেয় যা MixMusic নিজে খুঁজে পায় না।
-- **[Better Lyrics](https://betterlyrics.org)**.
+- **[Better Lyrics](https://betterlyrics.org),** শব্দে শব্দে সিঙ্ক করা লিরিক্স রাখে এমন একটি সেবা।
 - **[Unison](https://unison.betterlyrics.org),** লিরিক্সের ওপেন, ক্রাউডসোর্সড
   ডেটাবেস, Unison Community License-এর অধীনে, এবং **[LRCLIB](https://lrclib.net),** সিঙ্ক করা
   লিরিক্সের ওপেন ডেটাবেস।

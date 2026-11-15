@@ -255,11 +255,15 @@ Flatpak، MixMusic کو ایک سینڈ باکس میں چلاتا ہے، جسے
 سیٹنگز اور لائبریری `~/.var/app/io.github.fzn0x.mixmusic` میں رکھتا ہے، جو
 `.deb`، `.rpm`، AppImage یا آرکائیو والی کاپی سے الگ ہے، اور دونوں ایک ساتھ
 چل سکتی ہیں۔ کسی کاپی کی سیٹنگز اور لائبریری ساتھ لانے کے لیے دونوں بند
-کریں، `settings.json`، `library.json`، `queue.json` اور `addons` فولڈر کو
-`~/.config/MixMusic` سے
-`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic` میں کاپی کریں، اور
-اپنے اکاؤنٹس میں دوبارہ سائن اِن کریں: سائن اِنز دوسری کاپی کی keyring میں
-رہتے ہیں۔
+کریں، پھر `settings.json`، `library.json`، `queue.json`، `positions.json`
+اور `addons` و `mix-covers` فولڈرز کو `~/.config/MixMusic` سے
+`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic` میں کاپی کریں۔ پہلے
+دونوں بند کریں: چلتا ہوا MixMusic `library.json` اور زیادہ تر دوسری فائلیں
+میموری میں رکھتا ہے اور اگلی بار محفوظ کرتے وقت کاپی کی گئی فائل کی جگہ
+اپنی فائل لکھ دیتا ہے۔ پھر اپنے اکاؤنٹس میں دوبارہ سائن اِن کریں: سائن اِنز
+دوسری کاپی کی keyring میں رہتے ہیں۔
+[ڈیٹا اور پرائیویسی کا صفحہ](docs/data-and-privacy.md#the-data-folder) بتاتا
+ہے کہ ہر فائل میں کیا ہوتا ہے۔
 
 Flatpak میں لاگ اِن پر شروع ہونا آپ کے ڈیسک ٹاپ کے ذریعے ہوتا ہے، جو پہلے
 آپ سے پوچھ سکتا ہے، اور آپ کا اپنا yt-dlp
@@ -590,7 +594,7 @@ MixMusic ان پروجیکٹس پر بنا ہے:
   [appimagetool](https://github.com/AppImage/appimagetool)، AppImages۔
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)،** جو ان ٹریکس کی آواز ڈھونڈتا
   ہے جو MixMusic خود نہیں ڈھونڈ پاتا۔
-- **[Better Lyrics](https://betterlyrics.org)**.
+- **[Better Lyrics](https://betterlyrics.org)،** ایک سروس جو بول لفظ بہ لفظ ہم وقت رکھتی ہے۔
 - **[Unison](https://unison.betterlyrics.org)،** بولوں کا کھلا، عوامی تعاون سے
   بنا ڈیٹا بیس، Unison Community License کے تحت، اور **[LRCLIB](https://lrclib.net)،** ہم وقت
   بولوں کا کھلا ڈیٹا بیس۔

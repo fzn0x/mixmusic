@@ -229,10 +229,14 @@ Flatpak MixMusic ን በሳንድቦክስ ውስጥ ያሠራዋል፣ ይህ�
 MixMusic ቅንብሮቹንና ቤተ-መጻሕፍቱን በ`~/.var/app/io.github.fzn0x.mixmusic`
 ውስጥ ያቆያል፣ ከ`.deb`፣ `.rpm`፣ AppImage ወይም ማህደር ቅጂ የተለየ፣ ሁለቱም
 በአንድ ጊዜ ሊሠሩ ይችላሉ። የአንድ ቅጂ ቅንብሮችንና ቤተ-መጻሕፍት ለማምጣት፣
-ሁለቱንም ዝጉ፣ `settings.json`፣ `library.json`፣ `queue.json` እና
-`addons` ፎልደርን ከ`~/.config/MixMusic` ወደ
-`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic` ገልብጡ፣ እና ወደ
+ሁለቱንም ዝጉ፣ ከዚያ `settings.json`፣ `library.json`፣ `queue.json`፣
+`positions.json`ን እንዲሁም `addons` እና `mix-covers` ፎልደሮችን ከ`~/.config/MixMusic` ወደ
+`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic` ገልብጡ። መጀመሪያ ሁለቱንም
+ዝጉ፦ እየሠራ ያለ MixMusic `library.json`ንና አብዛኞቹን ሌሎች ፋይሎች በሜሞሪ ውስጥ
+ያቆያል፣ በሚቀጥለው ሲያስቀምጥም የተገለበጠውን ፋይል ይተካዋል። ከዚያ ወደ
 መለያዎችዎ እንደገና ይግቡ፦ መግቢያዎች በሌላው ቅጂ keyring ውስጥ ይቀራሉ።
+[የዳታና የግላዊነት ገጹ](docs/data-and-privacy.md#the-data-folder) እያንዳንዱ ፋይል
+ምን እንደሚይዝ ይናገራል።
 
 በFlatpak ውስጥ፣ ሲገቡ መጀመር በዴስክቶፕዎ በኩል ይሄዳል፣ መጀመሪያ ሊጠይቅዎ
 ይችላል፣ የራስዎ yt-dlp ደግሞ በ`~/.var/app/io.github.fzn0x.mixmusic` ውስጥ
@@ -523,7 +527,7 @@ MixMusic የተገነባው በእነዚህ ፕሮጀክቶች ላይ ነው፦
   [appimagetool](https://github.com/AppImage/appimagetool)፣ AppImageዎችን።
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**፣ MixMusic ራሱ ማግኘት
   የማይችላቸውን ትራኮች ድምፅ የሚያገኝ።
-- **[Better Lyrics](https://betterlyrics.org)**.
+- **[Better Lyrics](https://betterlyrics.org)**፣ ቃል በቃል የተመሳሰሉ ግጥሞችን የሚያቆይ አገልግሎት።
 - **[Unison](https://unison.betterlyrics.org)**፣ በUnison Community License ስር ያለ ክፍት፣ በህዝብ
   ተሳትፎ የሚሞላ የግጥም ዳታቤዝ፣ እና **[LRCLIB](https://lrclib.net)**፣ ክፍት
   የተመሳሰሉ ግጥሞች ዳታቤዝ።

@@ -480,10 +480,15 @@ func (n *notch) progress(c *ui.Context, t media.Track) {
 			done = float32(min(max(n.seekTo/d, 0), 1))
 		}
 		thumb := held || keys || seek.Hovered()
+		// The bar fills from the left, as the marks go.
+		s.markTip(seek, dur, 4, false)
 		seek.Draw(func(p *ui.Painter, r ui.Rect) {
 			x, y, w := r.X+4, r.Y+r.H/2, r.W-8
 			p.Fill(ui.Rect{X: x, Y: y - 1.5, W: w, H: 3}, ui.RGBA(255, 255, 255, 0.25), 1.5)
 			p.Fill(ui.Rect{X: x, Y: y - 1.5, W: w * done, H: 3}, notchWhite, 1.5)
+			if !s.st.Live {
+				s.paintMarks(p, ui.Rect{X: x, Y: y - 1.5, W: w, H: 3}, dur, false)
+			}
 			if thumb {
 				p.Fill(ui.Rect{X: x + w*done - 4.5, Y: y - 4.5, W: 9, H: 9}, notchWhite, 4.5)
 			}

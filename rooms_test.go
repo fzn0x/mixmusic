@@ -136,3 +136,27 @@ func TestRoomSettingsStartARoom(t *testing.T) {
 	show(s, tt, "/settings/desktop")
 	until(t, s, tt, "the room open", func() bool { return tt.HasText("Your room is open") })
 }
+
+// TestRoomPasteInviteLink opens a room from its invite link, pasted on the
+// rooms' page.
+func TestRoomPasteInviteLink(t *testing.T) {
+	n := roomtest.New()
+	desk := newRoomShell(t, n, "Desk")
+	lap := newRoomShell(t, n, "Lap")
+	dt, lt := tester(t, desk), tester(t, lap)
+	if err := desk.a.Rooms().Start(); err != nil {
+		t.Fatal(err)
+	}
+	hosted, _ := desk.a.Rooms().Hosted()
+	foundRoom(t, lap, "Desk")
+	show(lap, lt, roomsPath)
+	if !lt.HasText("Desk's room") {
+		t.Fatalf("the rooms on the network don't show: %q", lt.Texts())
+	}
+	click(t, lap, lt, "Invite link")
+	lt.Type(hosted.Link)
+	lap.drain()
+	lt.Frame()
+	click(t, lap, lt, "open the link")
+	untilBoth(t, desk, dt, lap, lt, "the preview", func() bool { return lt.HasText("Desk hosts this room.") })
+}

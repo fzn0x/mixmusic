@@ -81,6 +81,20 @@ func (s *shell) roomsLanding(c *ui.Context) {
 	if s.button(c, "room-start", "start a room", true).Disabled(s.rooms.starting).Clicked() {
 		s.startRoom()
 	}
+	ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
+		v := &s.rooms
+		in := ui.TextInput(c.Key("room-link"), &v.link).Width(320).Label("Invite link").Placeholder("mixmusic://join/…")
+		_, err := room.ParseLink(v.link)
+		open := in.Submitted()
+		if s.button(c, "room-open-link", "open the link", false).Disabled(err != nil).Clicked() {
+			open = true
+		}
+		if open && err == nil {
+			if rs.OpenLink(v.link) == nil {
+				v.link = ""
+			}
+		}
+	})
 	found := rs.Found()
 	if len(found) == 0 {
 		ui.Text(c, "No room is on the network now. Rooms show here, and in the player bar's devices menu, while MixMusic hosts one on this network.").

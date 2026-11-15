@@ -17,8 +17,9 @@ import (
 
 // roomView is what the window keeps of rooms from frame to frame.
 type roomView struct {
-	// code is what the user typed of a room's code.
-	code string
+	// code is what the user typed of a room's code, and link the invite
+	// link they pasted.
+	code, link string
 	// starting is set while a room opens.
 	starting bool
 }

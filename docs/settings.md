@@ -39,11 +39,12 @@ How MixMusic plays; [Playing music](playing-music.md) tells all of it.
 | Sound | **[Output device](playing-music.md#the-output-device)** (System default, or a device by name), **[Quality](playing-music.md#data-saver)** (best, or data saver), **[Play audio as your account](playing-music.md#play-audio-as-your-account)** (off at first, for YouTube Music Premium's higher bitrate), **[Crossfade](playing-music.md#crossfade-and-gapless-playback)** (off, or 1 to 12 seconds), **[Even loudness](playing-music.md#even-loudness-volume-levelling-and-the-volume)**, **Volume levelling**, **Play 5.1 surround when a track has it**, **[Autoplay](playing-music.md#autoplay-and-radios)**, **[Skip songs made with AI](playing-music.md#skipping-songs-made-with-ai)** and **[Skip songs you dislike](playing-music.md#dislikes-and-skipping)**. |
 | [Speed](playing-music.md#speed) | **Songs** and **Podcasts**, each from 0.5× to 3×, at the tracks' own pitch, with **normal** to go back to 1×. |
 | [Music videos](playing-music.md#the-picture-of-music-videos) | **Show the video of music videos**, on the now playing page. |
+| [Moving covers](playing-music.md#moving-covers) | **Show moving covers**: GIF covers move on the now playing page and a mix's page. Off at first. |
 | [Explicit content](playing-music.md#hiding-explicit-content) | **[Prefer clean versions](playing-music.md#versions-of-an-album)**: an album that comes explicit and clean shows its clean version, and opens on it. **[Hide explicit content](playing-music.md#hiding-explicit-content)**: the songs, albums and videos marked explicit don't show where the services list music, and never play; Prefer clean versions stays on meanwhile. |
 | [Equalizer](playing-music.md#the-equalizer) | The **Equalizer** switch, a **Preset** (Flat, Bass boost, Treble boost, Vocal, Electronic, Rock, Acoustic, Late night or Lo-fi), and the preamp and ten bands, from −12 to +12 dB. |
 | [Volume](playing-music.md#even-loudness-volume-levelling-and-the-volume) | **Volume curve**: Natural, even steps of loudness, or Linear, where the level grows evenly along the slider. |
 | [Lyrics](lyrics.md#translate) | **Translate lyrics to**: the language the translate switch beside the lyrics shows them in. |
-| [Offline cache](library.md#the-offline-cache) | **Tracks kept** and **Covers kept**, each with **clear**, and the cache's **Size**: off, 512 MB, 1 GB, 4 GB or 16 GB. |
+| [Offline cache](library.md#the-offline-cache) | **Tracks kept** and **Covers kept**, each with **clear**, and the cache's **Size**: off, 512 MB, 1 GB, 4 GB or 16 GB. Once albums' moving covers come, **Moving covers kept**, with **clear**, and the **Size of moving covers**: Off, 64, 128, 256 or 512 MB, 1, 2, 4 or 8 GB, or Unlimited. |
 | [Downloads](library.md#where-they-are) | How many tracks are downloaded and how much room they take, with **show**; their **Folder**, with **open** and **change**; **Download on metered connections** and **Download songs added later**. |
 | [Music on this computer](local-music.md#add-a-folder) | **Folders**, with **add a folder** and **rescan**, then each folder of music, with how many tracks it holds, how many files were skipped and how many folders in it can't be read, and **remove**. Under the folders, each one MixMusic can't watch for changes, as one on a network drive, says why: its changes show after a **rescan**. |
 | [Tools](how-it-works.md#yt-dlp-and-the-javascript-runtime) | **yt-dlp**, which MixMusic installs and keeps up to date, the **JavaScript runtime** it runs with (found by itself, or Deno, Node.js, Bun or QuickJS), and **Own yt-dlp**, the path to one of yours. |
@@ -316,6 +317,7 @@ while you're not typing in a text field. The ID is the command's name in
 | Zoom out | <kbd>Ctrl</kbd> <kbd>-</kbd> | <kbd>⌘</kbd> <kbd>-</kbd> | `view.zoomOut` |
 | Reset zoom | <kbd>Ctrl</kbd> <kbd>0</kbd> | <kbd>⌘</kbd> <kbd>0</kbd> | `view.zoomReset` |
 | Show or hide the video of music videos | none | none | `view.video` |
+| Show or hide [moving covers](playing-music.md#moving-covers) | none | none | `view.movingCovers` |
 
 ### Add-ons and settings
 

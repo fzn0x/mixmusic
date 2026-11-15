@@ -24,7 +24,9 @@ and `App.ReloadSettings` applies an edit as Settings applies a change, then
 tells the windows (`App.Watch`). A file with a mistake is told of after a
 second, and kept as `settings.json.broken` if MixMusic quits before it is
 fixed; a `settings.json` that is a link stays one. The
-cache folder holds audio, the covers shown (`artwork/`), the covers of
+cache folder holds audio, the covers shown (`artwork/`), the clips of
+albums' moving covers and each album's match (`moving-covers/`,
+`internal/clips`), the covers of
 the music on the computer (`local-art/`), on Linux the
 cover the desktop's media controls show (`now-playing/`), matches, how loud
 YouTube measured the tracks played (`loudness.json`), the videos YouTube

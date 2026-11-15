@@ -55,7 +55,8 @@ AppImage or archive copy's.
   1,000 tracks you played, which the history and the stats read, your
   last 20 searches, the shows you follow, and the artists you follow
   in MixMusic.
-- `mix-covers/`: the covers you chose for your mixes, cut to a square.
+- `mix-covers/`: the covers you chose for your mixes, cut to a square,
+  and the GIF beside the still of one that moves.
 - `local-files.json`: the index of the [music on this computer](local-music.md):
   the path, size, time of change and tags of each music file of the
   folders you added. The folders themselves are `musicFolders` in
@@ -86,6 +87,9 @@ AppImage or archive copy's.
 - `audio/`: the offline cache, the tracks you played, as much as
   Settings › Playback › Offline cache allows (1 GB by default).
 - `artwork/`: the covers you saw, up to 256 MB.
+- `moving-covers/`: the clips of albums' moving covers that played, as
+  much as Settings › Playback › Offline cache allows (256 MB by default),
+  and which albums have one, once a source of them is chosen.
 - `local-art/`: a copy of the covers of the music on this computer, which
   a file holds or that is beside it, by its hash.
 - `now-playing/`, on Linux: the cover of what plays, for the desktop's

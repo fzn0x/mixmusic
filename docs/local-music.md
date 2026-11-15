@@ -108,8 +108,10 @@ list.
   keeps those from playing.
 - **Covers:** the cover a file holds, the front cover when it holds
   several, else an image beside it named cover, folder, front or album
-  (`.jpg`, `.png` or `.webp`). MixMusic keeps a copy of each in its cache
-  folder, never beside your music.
+  (`.jpg`, `.png` or `.webp`, else `.gif`). MixMusic keeps a copy of each
+  in its cache folder, never beside your music. A GIF, in the file or
+  beside it, moves on the now playing page while
+  [Show moving covers](playing-music.md#moving-covers) is on.
 
 MixMusic changes a file only when you edit its tags, as below.
 

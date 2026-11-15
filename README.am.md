@@ -527,7 +527,7 @@ MixMusic የተገነባው በእነዚህ ፕሮጀክቶች ላይ ነው፦
   [appimagetool](https://github.com/AppImage/appimagetool)፣ AppImageዎችን።
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**፣ MixMusic ራሱ ማግኘት
   የማይችላቸውን ትራኮች ድምፅ የሚያገኝ።
-- **[Better Lyrics](https://betterlyrics.org)**.
+- **[Better Lyrics](https://betterlyrics.org)**፣ ቃል በቃል የተመሳሰሉ ግጥሞችን የሚያቆይ አገልግሎት።
 - **[Unison](https://unison.betterlyrics.org)**፣ በUnison Community License ስር ያለ ክፍት፣ በህዝብ
   ተሳትፎ የሚሞላ የግጥም ዳታቤዝ፣ እና **[LRCLIB](https://lrclib.net)**፣ ክፍት
   የተመሳሰሉ ግጥሞች ዳታቤዝ።

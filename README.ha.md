@@ -555,7 +555,7 @@ An gina MixMusic a kan waɗannan ayyuka:
   AppImage.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, wanda yake samo sautin
   waƙoƙin da MixMusic ba zai iya samowa da kansa ba.
-- **[Better Lyrics](https://betterlyrics.org)**.
+- **[Better Lyrics](https://betterlyrics.org)**, sabis da ke adana kalmomin waƙa masu daidaita kalma bayan kalma.
 - **[Unison](https://unison.betterlyrics.org)**, buɗaɗɗen maʼajiyar kalmomin
   waƙa da jamaʼa ke bayarwa, a ƙarƙashin Unison Community License, da **[LRCLIB](https://lrclib.net)**,
   buɗaɗɗiyar maʼajiyar kalmomin waƙa masu daidaita da waƙar.

@@ -594,7 +594,7 @@ MixMusic ان پروجیکٹس پر بنا ہے:
   [appimagetool](https://github.com/AppImage/appimagetool)، AppImages۔
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)،** جو ان ٹریکس کی آواز ڈھونڈتا
   ہے جو MixMusic خود نہیں ڈھونڈ پاتا۔
-- **[Better Lyrics](https://betterlyrics.org)**.
+- **[Better Lyrics](https://betterlyrics.org)،** ایک سروس جو بول لفظ بہ لفظ ہم وقت رکھتی ہے۔
 - **[Unison](https://unison.betterlyrics.org)،** بولوں کا کھلا، عوامی تعاون سے
   بنا ڈیٹا بیس، Unison Community License کے تحت، اور **[LRCLIB](https://lrclib.net)،** ہم وقت
   بولوں کا کھلا ڈیٹا بیس۔

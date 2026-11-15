@@ -28,10 +28,23 @@ type Frames struct {
 	conn net.Conn
 	r    *bufio.Reader
 	mu   sync.Mutex
+	// limit bounds the messages read, when not 0 (Limit).
+	limit uint32
 }
 
 // NewFrames frames the messages of conn.
 func NewFrames(conn net.Conn) *Frames { return &Frames{conn: conn, r: bufio.NewReader(conn)} }
+
+// Limit bounds the messages Read takes to n bytes, as a server does before
+// the other computer proved who it is: a longer one is refused from its
+// length, before it is read. 0, as at first, or more than MaxMessage, is
+// MaxMessage. Call it between reads.
+func (f *Frames) Limit(n int) {
+	f.limit = 0
+	if n > 0 && n < maxMessage {
+		f.limit = uint32(n)
+	}
+}
 
 // Send sends v, giving up after wait.
 func (f *Frames) Send(v any, wait time.Duration) error {
@@ -63,7 +76,7 @@ func (f *Frames) Read(v any) error {
 		return quiet(err)
 	}
 	n := binary.BigEndian.Uint32(head[:])
-	if n > maxMessage {
+	if n > maxMessage || f.limit > 0 && n > f.limit {
 		return fmt.Errorf("remote: a message of %d bytes", n)
 	}
 	data := make([]byte, n)

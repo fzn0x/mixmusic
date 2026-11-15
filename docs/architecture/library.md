@@ -7,14 +7,14 @@
   which the mix names (`Playlist.Cover`): its centre square, at most 600
   pixels across, a JPEG, or a PNG where it isn't opaque, under a name of
   its own each time, so that the windows never show an older image of
-  the same address (`internal/app/mixcovers.go`). The mix's artwork is
+  the same address (`internal/app/mixcovers.go`). A GIF that moves keeps
+  its centre square, every frame, as a GIF of the same name beside the
+  still of its first frame (`artwork.SquareGIF`,
+  `Collection.MovingMixCover`), which moves in the head of the mix's
+  page (`movingcover.go`). The mix's artwork is
   then `mixcover:<name>`, which the windows read from the file, as
   they read the local covers (`localArt`); deleting the mix, or going
-  back to its songs' covers, removes the file (`mixcover.go`). A GIF
-  that moves keeps its centre square, every frame, as a GIF of the
-  same name beside the still of its first frame (`artwork.SquareGIF`,
-  `Collection.MovingMixCover`), which moves in the head of the mix's
-  page (`movingcover.go`).
+  back to its songs' covers, removes the file (`mixcover.go`).
 - **`internal/localfiles`** keeps the index of the music on the user's
   computer, `local-files.json`: the music files of the folders the
   settings name (`musicFolders`), by path, with their size, time of

@@ -55,8 +55,9 @@ AppImage or archive copy's.
   1,000 tracks you played, which the history and the stats read, your
   last 20 searches, the shows you follow, and the artists you follow
   in MixMusic.
-- `mix-covers/`: the covers you chose for your mixes, cut to a square,
-  and the GIF beside the still of one that moves.
+- `mix-covers/`: the covers you chose for your mixes, cut to a square.
+- A GIF in `mix-covers/`, beside the still of a mix's cover, for one that
+  moves.
 - `local-files.json`: the index of the [music on this computer](local-music.md):
   the path, size, time of change and tags of each music file of the
   folders you added. The folders themselves are `musicFolders` in

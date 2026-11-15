@@ -6,6 +6,13 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 )
 
+// listCame tells whether a list of the user's library came, whole or in
+// part, by the error it came with: none, or a media.ShortList.
+func listCame(err error) bool {
+	_, short := media.Short(err)
+	return err == nil || short
+}
+
 // shortListText tells how much of a list of the user's library, of noun,
 // as "playlists", came from the service of source: "Showing 200 of 250
 // playlists".

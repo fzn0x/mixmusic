@@ -61,3 +61,30 @@ func TestArtistLibraryInPart(t *testing.T) {
 		t.Errorf("Try again asked %d times", artists.asks)
 	}
 }
+
+// TestPodcastLibraryInPart shows in Library › Podcasts the shows saved on
+// Spotify of a list that came in part, says how many of how many, and
+// tells a show of it as followed on its page.
+func TestPodcastLibraryInPart(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = signedInTo(false, true)
+	sp := media.Podcast{ID: "sp:s1", Source: media.SourceSpotify, Title: "The Daily Thing", Authors: []media.Ref{}, Episodes: []media.Track{}}
+	saved := &loaded[[]media.Podcast]{done: true, value: []media.Podcast{sp}, err: partOf(1, 120)}
+	s.loads["spotify:podcasts"] = saved
+	tt := testerOf(t, s, 1280, 1000)
+	show(s, tt, "/library/podcasts")
+	if !tt.HasText("Showing 1 of 120 podcasts") || !tt.HasText(sp.Title) || tt.HasText(saved.err.Error()) {
+		t.Fatalf("Library › Podcasts shows %q", tt.Texts())
+	}
+	click(t, s, tt, "try again")
+	if saved.asks != 1 {
+		t.Errorf("Try again asked %d times", saved.asks)
+	}
+
+	s.loads["spotify:podcasts"] = &loaded[[]media.Podcast]{done: true, value: []media.Podcast{sp}, err: partOf(1, 120)}
+	s.loads["podcast:sp:s1"] = &loaded[media.Podcast]{done: true, value: sp}
+	show(s, tt, podcastPath("sp:s1"))
+	if _, ok := tt.Find("following"); !ok {
+		t.Errorf("a show saved on Spotify, of a list that came in part: %q", tt.Texts())
+	}
+}

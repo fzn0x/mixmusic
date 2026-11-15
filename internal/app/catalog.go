@@ -535,12 +535,9 @@ func (e lyricsError) Unwrap() error { return e.err }
 // youtubeLyrics returns YouTube Music's lyrics of a track, or of its
 // recording there.
 func (c *Catalog) youtubeLyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, error) {
-	yt := track
-	if track.Source != media.SourceYouTube {
-		var err error
-		if yt, err = c.a.matcher.Match(ctx, track); err != nil {
-			return lyrics.Lyrics{}, err
-		}
+	yt, err := c.youtubeRecording(ctx, track)
+	if err != nil {
+		return lyrics.Lyrics{}, err
 	}
 	_, videoID, err := media.ParseID(yt.ID)
 	if err != nil {
@@ -551,6 +548,15 @@ func (c *Catalog) youtubeLyrics(ctx context.Context, track media.Track) (lyrics.
 		return lyrics.Lyrics{}, err
 	}
 	return lyrics.Plain(text, strings.TrimPrefix(source, "Source: ")), nil
+}
+
+// youtubeRecording returns the recording of a track on YouTube: the track
+// itself, or the one matched to it there.
+func (c *Catalog) youtubeRecording(ctx context.Context, track media.Track) (media.Track, error) {
+	if track.Source == media.SourceYouTube {
+		return track, nil
+	}
+	return c.a.matcher.Match(ctx, track)
 }
 
 // Explore returns YouTube Music's new albums and singles, trending songs

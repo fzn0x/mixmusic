@@ -10,6 +10,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/match"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/stream"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
@@ -40,6 +41,7 @@ var lyricsLookups = map[string]lyricsLookup{
 	settings.LyricsYouTubeMusic: func(c *Catalog, ctx context.Context, track media.Track, _ lyrics.Query) (lyrics.Lyrics, error) {
 		return c.youtubeLyrics(ctx, track)
 	},
+	settings.LyricsCaptions: (*Catalog).captionLyrics,
 }
 
 // errNotAsked is a source of lyrics a track isn't looked up on, as Better
@@ -114,7 +116,7 @@ func betterLyrics(l, best lyrics.Lyrics, words bool) bool {
 // track, or wasn't asked for them, rather than that it couldn't answer.
 func lyricsNone(err error) bool {
 	return errors.Is(err, lyrics.ErrNotFound) || errors.Is(err, errNotAsked) ||
-		errors.Is(err, youtube.ErrNotFound) || errors.Is(err, match.ErrNoMatch)
+		errors.Is(err, youtube.ErrNotFound) || errors.Is(err, match.ErrNoMatch) || errors.Is(err, stream.ErrNoCaptions)
 }
 
 // lookupFailure is why no source had the lyrics of a track, of the errors

@@ -22,8 +22,8 @@ const (
 	// frameless window's borders take 8 DIPs of it at the sides and the
 	// foot.
 	miniRoom = 280
-	// The mini player's window at 100%: the size it opens at, and the
-	// least it takes.
+	// The mini player's window at 100%: the size it opens at, scaled by
+	// the zoom (miniSize), and the least it takes.
 	miniWidth, miniHeight       = 420, 132
 	miniMinWidth, miniMinHeight = 340, 112
 )
@@ -34,13 +34,14 @@ const (
 func OpenMini(a *app.App) *mygo.Window {
 	registerFonts()
 	s := newShell(a, a.GoPlayer())
+	w, h, minW, minH, maxH := miniSize(s.set.Zoom)
 	s.attach(mygo.NewWindow(mygo.WindowOptions{
 		Title:       "MixMusic mini player",
-		Width:       miniWidth,
-		Height:      miniHeight,
-		MinWidth:    miniMinWidth,
-		MinHeight:   miniMinHeight,
-		MaxHeight:   miniArt,
+		Width:       w,
+		Height:      h,
+		MinWidth:    minW,
+		MinHeight:   minH,
+		MaxHeight:   maxH,
 		Frameless:   true,
 		AlwaysOnTop: true,
 		// The whole window drags it: a double click on it doesn't spread
@@ -283,6 +284,17 @@ func (s *shell) applyMiniZoom(c *ui.Context) {
 	// of the panel's window, which read its size.
 	win := s.win
 	mygo.App.WhenReady(func() { fitMini(win, was, z, s.miniLimits()) })
+}
+
+// miniSize is the size of the mini player's window at the zoom z, and its
+// least and largest, which it opens at when it keeps no size of its own,
+// as the first time it opens (#717).
+func miniSize(z float64) (w, h, minW, minH, maxH int) {
+	if z <= 0 {
+		z = 1
+	}
+	scale := func(n float32) int { return int(float64(n)*z + 0.5) }
+	return scale(miniWidth), scale(miniHeight), scale(miniMinWidth), scale(miniMinHeight), scale(miniArt)
 }
 
 // fitMini sizes the mini player's window for the zoom z, from the zoom

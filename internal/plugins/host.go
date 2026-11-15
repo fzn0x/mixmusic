@@ -165,15 +165,29 @@ func (h *Host) Retry() {
 	h.mu.Unlock()
 }
 
-// Close stops every plugin.
+// Close stops every plugin, as MixMusic quits, and waits for their
+// cleanups to run, stopWait at most in all: a plugin that takes longer is
+// interrupted, and Close returns without it.
 func (h *Host) Close() {
 	if h == nil {
 		return
 	}
 	h.mu.Lock()
-	defer h.mu.Unlock()
+	stopping := make([]*plugin, 0, len(h.running))
 	for _, pl := range h.running {
 		h.stopLocked(pl)
+		stopping = append(stopping, pl)
+	}
+	h.mu.Unlock()
+	// The cleanups run without the lock, as they may toast.
+	deadline := time.NewTimer(stopWait)
+	defer deadline.Stop()
+	for _, pl := range stopping {
+		select {
+		case <-pl.loop.done:
+		case <-deadline.C:
+			return
+		}
 	}
 }
 

@@ -70,6 +70,7 @@ func (s *shell) view(c *ui.Context) {
 	s.sweepDialogs()
 	s.sweepViews()
 	s.followVideo()
+	s.sweepMovingCovers()
 	s.keepShown(c)
 }
 

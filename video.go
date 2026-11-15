@@ -330,16 +330,17 @@ func (s *shell) videoTrack() (media.Track, bool) {
 	return s.st.Source.Track, true
 }
 
-// sleeve is the now playing page's sleeve, size wide: the cover, with the
-// visualizer over its foot while it plays, or the picture of the music
-// video that plays.
+// sleeve is the now playing page's sleeve, size wide: the cover, which
+// moves while it plays when it's a GIF that moves (movingcover.go), with
+// the visualizer over its foot, or the picture of the music video that
+// plays.
 func (s *shell) sleeve(c *ui.Context, t media.Track, size float32) {
 	if rec, ok := s.videoTrack(); ok {
 		s.videoSleeve(c, t, rec, size)
 		return
 	}
 	ui.Box(c).Size(size, size).Shrink(0).Children(func() {
-		s.cover(c, "sleeve", t.Artwork, size, false)
+		s.movingCover(c, "sleeve", t.Artwork, size, s.st.Playing && !s.st.Buffering, "Moving cover: "+t.Title)
 		if s.st.Playing {
 			s.visualizer(c, size)
 		}

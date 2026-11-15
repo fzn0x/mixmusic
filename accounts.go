@@ -368,12 +368,62 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 	}, words)
 }
 
+// lastfmExpiredText tells what to do when Last.fm refuses the connection.
+func lastfmExpiredText(lf app.LastfmAccount) string {
+	text := "Connect again to go on scrobbling."
+	if lf.Waiting > 0 {
+		text += " " + plural(lf.Waiting, "scrobble waits", "scrobbles wait") + " to be sent."
+	}
+	return text
+}
+
+// lastfmOtherText asks what becomes of the waiting scrobbles when another
+// Last.fm user approved the new connection.
+func lastfmOtherText(lf app.LastfmAccount) string {
+	return plural(lf.Waiting, "scrobble was", "scrobbles were") + " heard as " + lf.Name + " and not sent yet. Send them to " +
+		lf.Other + "'s profile, or drop them."
+}
+
+// lastfmDisconnectText is the question disconnecting asks.
+func lastfmDisconnectText(lf app.LastfmAccount) string {
+	text := "MixMusic forgets your Last.fm connection; your scrobbles stay on Last.fm."
+	if lf.Waiting > 0 {
+		text += " " + plural(lf.Waiting, "scrobble", "scrobbles") + " not sent yet will be dropped."
+	}
+	return text
+}
+
 func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
 	s.group(c, "Last.fm", func() {
 		if lf.Connected {
-			if lf.Expired {
-				const title, again = "Last.fm no longer accepts this connection", "Disconnect, then connect again to go on scrobbling."
-				s.found(c, title, again, func() { s.alert(c, title, again, nil).Margin(12, 0) })
+			if lf.Other != "" {
+				title, text := "Send the waiting scrobbles to "+lf.Other+"?", lastfmOtherText(lf)
+				s.found(c, title, text, func() {
+					s.alert(c, title, text, func() {
+						if s.button(c, "lastfm-send", "send them", true).Clicked() {
+							s.account("", "Connected to Last.fm", func(ctx context.Context) error { return s.svc.Accounts.LastfmResolve(ctx, true) })
+						}
+						if s.button(c, "lastfm-drop", "drop them", false).Clicked() {
+							s.account("", "Connected to Last.fm", func(ctx context.Context) error { return s.svc.Accounts.LastfmResolve(ctx, false) })
+						}
+					}).Margin(12, 0)
+				})
+			} else if lf.Expired {
+				const title = "Last.fm no longer accepts this connection"
+				text := lastfmExpiredText(lf)
+				s.found(c, title, text, func() {
+					s.alert(c, title, text, func() {
+						busy := s.signingIn == "lastfm"
+						label := "connect again"
+						if busy {
+							label = "waiting for Last.fm…"
+						}
+						if s.button(c, "lastfm-again", label, true).Disabled(busy).Clicked() {
+							s.notes = append(s.notes, notice("Approve MixMusic on Last.fm, in your browser"))
+							s.account("lastfm", "Connected to Last.fm", func(ctx context.Context) error { return s.svc.Accounts.LastfmReconnect(ctx) })
+						}
+					}).Margin(12, 0)
+				})
 			}
 			s.row(c, "Scrobbling as "+lf.Name, "What you listen to joins your Last.fm profile: a track counts once half of it played, or four minutes.", func() {
 				if s.switchOf(c.Key("scrobbling"), &s.set.Scrobbling).Label("Scrobble to Last.fm").Changed() {
@@ -383,7 +433,7 @@ func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
 			s.found(c, "disconnect", "sign out log out of Last.fm", func() {
 				ui.Row(c).Padding(12, 0).Children(func() {
 					if s.button(c, "lastfm-out", "disconnect", false).Clicked() {
-						s.ask("disconnect Last.fm", "MixMusic forgets your Last.fm connection; your scrobbles stay on Last.fm.", "disconnect", func() {
+						s.ask("disconnect Last.fm", lastfmDisconnectText(lf), "disconnect", func() {
 							s.account("", "", func(ctx context.Context) error { return s.svc.Accounts.LastfmLogout(ctx) })
 						})
 					}

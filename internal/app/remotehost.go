@@ -66,49 +66,78 @@ func (h remoteHost) Allowed(fp remote.Fingerprint) bool {
 
 // Pairing shows the code of req, one pairing at a time, while remote
 // control is on.
-func (h remoteHost) Pairing(req remote.PairRequest) (func(error) error, error) {
+func (h remoteHost) Pairing(req remote.PairRequest) (remote.PairEnd, error) {
 	a := h.a
 	if !a.remoteKept().On {
-		return nil, remote.ErrOff
+		return remote.PairEnd{}, remote.ErrOff
 	}
 	r := &a.remote
 	r.mu.Lock()
 	if r.code != nil {
 		r.mu.Unlock()
-		return nil, remote.ErrBusy
+		return remote.PairEnd{}, remote.ErrBusy
 	}
 	code := &RemoteCode{Name: req.Name, Code: req.Code, Until: time.Now().Add(remoteCodeHolds(a)), cancel: req.Cancel}
 	r.code = code
 	r.mu.Unlock()
 	log.Printf("mixmusic: remote control: %s asks to pair", req.Name)
 	a.notifyRemote("")
-	return func(err error) error {
+	// The code shows no more once both proved it, so that the next pairing
+	// can show its own as soon as the other computer hears how this went.
+	unshow := func() {
 		r.mu.Lock()
 		if r.code == code {
 			r.code = nil
 		}
 		r.mu.Unlock()
-		note := ""
-		switch {
-		case err == nil:
-			if err = a.keepPaired(req.Peer, req.Name, true); err != nil {
-				log.Printf("mixmusic: remote control: keeping %s: %v", req.Name, err)
-				note = "Couldn't keep " + req.Name + " as paired: " + err.Error()
-				break
+	}
+	// What Keep did, which Done reads: the server calls one after the
+	// other.
+	var (
+		keepErr error
+		unkeep  func()
+	)
+	return remote.PairEnd{
+		Keep: func() error {
+			unshow()
+			was := a.remoteKept().Computers
+			if keepErr = a.keepPaired(req.Peer, req.Name, true); keepErr != nil {
+				return keepErr
 			}
-			log.Printf("mixmusic: remote control: paired with %s, which may control this computer", req.Name)
-			note = "Paired with " + req.Name + ": it can control MixMusic on this computer"
-		case errors.Is(err, remote.ErrCanceled):
-		case errors.Is(err, remote.ErrWrongCode):
-			log.Printf("mixmusic: remote control: %s typed another code", req.Name)
-			note = "Didn't pair with " + req.Name + ": the code typed there wasn't the one shown"
-		default:
-			log.Printf("mixmusic: remote control: pairing with %s: %v", req.Name, err)
-			note = "Didn't pair with " + req.Name + ": it stopped answering"
-		}
-		a.relistRemote()
-		a.notifyRemote(note)
-		return err
+			unkeep = func() { a.unkeepPaired(req.Peer, was) }
+			return nil
+		},
+		Done: func(err error) {
+			unshow()
+			note := ""
+			switch {
+			case err == nil:
+				log.Printf("mixmusic: remote control: paired with %s, which may control this computer", req.Name)
+				note = "Paired with " + req.Name + ": it can control MixMusic on this computer"
+			case keepErr != nil:
+				log.Printf("mixmusic: remote control: keeping %s: %v", req.Name, keepErr)
+				note = "Couldn't keep " + req.Name + " as paired: " + keepErr.Error()
+			case unkeep != nil:
+				// Kept, but the other computer didn't hear it, and keeps
+				// nothing: neither does this one.
+				unkeep()
+				log.Printf("mixmusic: remote control: the pairing with %s didn't finish: %v", req.Name, err)
+				why := "it stopped answering"
+				if errors.Is(err, remote.ErrNotKept) {
+					why = "keeping it took longer than " + req.Name + " waits"
+				}
+				note = "Didn't pair with " + req.Name + ": the pairing didn't finish, as " + why
+			case errors.Is(err, remote.ErrCanceled):
+			case errors.Is(err, remote.ErrWrongCode):
+				log.Printf("mixmusic: remote control: %s typed another code", req.Name)
+				note = "Didn't pair with " + req.Name + ": the code typed there wasn't the one shown"
+			default:
+				log.Printf("mixmusic: remote control: pairing with %s: %v", req.Name, err)
+				note = "Didn't pair with " + req.Name + ": it stopped answering"
+			}
+			a.relistRemote()
+			a.notifyRemote(note)
+		},
 	}, nil
 }
 

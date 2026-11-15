@@ -49,22 +49,33 @@ func (h *fakeHost) Allowed(fp Fingerprint) bool {
 	return h.allowed[fp]
 }
 
-func (h *fakeHost) Pairing(req PairRequest) (func(error) error, error) {
+func (h *fakeHost) Pairing(req PairRequest) (PairEnd, error) {
 	h.mu.Lock()
 	off := h.off
 	h.mu.Unlock()
 	if off {
-		return nil, ErrOff
+		return PairEnd{}, ErrOff
 	}
 	h.shown <- req
-	return func(err error) error {
-		h.mu.Lock()
-		defer h.mu.Unlock()
-		if err == nil && h.keepErr == nil {
-			h.allowed[req.Peer] = true
-		}
-		h.ended <- err
-		return h.keepErr
+	kept := false
+	return PairEnd{
+		Keep: func() error {
+			h.mu.Lock()
+			defer h.mu.Unlock()
+			if h.keepErr != nil {
+				return h.keepErr
+			}
+			h.allowed[req.Peer], kept = true, true
+			return nil
+		},
+		Done: func(err error) {
+			h.mu.Lock()
+			defer h.mu.Unlock()
+			if err != nil && kept {
+				delete(h.allowed, req.Peer)
+			}
+			h.ended <- err
+		},
 	}, nil
 }
 

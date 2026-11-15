@@ -332,6 +332,42 @@ func (a *App) keepPaired(key remote.Fingerprint, name string, controlsThis bool)
 	})
 }
 
+// unkeepPaired undoes keepPaired's keeping the computer of key as one that
+// controls this one, for a pairing that didn't finish: was is what
+// remote.json kept before, whose entry of it comes back, at its place, or
+// goes, when it had none. Whether this computer controls that one, which
+// the pairing didn't change, stays.
+func (a *App) unkeepPaired(key remote.Fingerprint, was []PairedComputer) {
+	f, err := a.remoteFile()
+	if err != nil {
+		return
+	}
+	err = f.Update(func(v *remoteFile) error {
+		of := func(o PairedComputer) bool { return o.Key == key.String() }
+		cs := slices.Clone(v.Computers)
+		i := slices.IndexFunc(cs, of)
+		if i < 0 {
+			return nil
+		}
+		switch j := slices.IndexFunc(was, of); {
+		case j >= 0:
+			c := was[j]
+			c.Controlled = cs[i].Controlled
+			cs = slices.Delete(cs, i, i+1)
+			cs = slices.Insert(cs, min(j, len(cs)), c)
+		case cs[i].Controlled:
+			cs[i].ControlsThis = false
+		default:
+			cs = slices.Delete(cs, i, i+1)
+		}
+		v.Computers = cs
+		return nil
+	})
+	if err != nil {
+		log.Printf("mixmusic: remote control: dropping the pairing that didn't finish: %v", err)
+	}
+}
+
 // dropControlled keeps that this computer no longer controls the one of
 // key, which removed it: what that one may do to this one stays.
 func (a *App) dropControlled(key remote.Fingerprint) {

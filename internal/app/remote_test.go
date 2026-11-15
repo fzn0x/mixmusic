@@ -140,9 +140,10 @@ func TestRemoteControlBetweenApps(t *testing.T) {
 	waitPlayer(t, p, "a playing", func(s player.State) bool { return s.Playing })
 
 	pairApps(t, lap, desk)
-	if !lapNotes.has("Paired with Desktop") || !deskNotes.has("Paired with Laptop") {
-		t.Errorf("told %q and %q", lapNotes.told, deskNotes.told)
-	}
+	// The desktop says so once the laptop was told, which may hear first.
+	until(t, `"Paired with" on both`, func() bool {
+		return lapNotes.has("Paired with Desktop") && deskNotes.has("Paired with Laptop")
+	})
 	if got := desk.Remote().Paired(); len(got) != 1 || got[0].ID != lapID || got[0].Name != "Laptop" || !got[0].ControlsThis || got[0].Controlled {
 		t.Errorf("the desktop keeps %+v", got)
 	}

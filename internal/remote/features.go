@@ -21,6 +21,14 @@ const (
 // features are those of this MixMusic.
 var features = []string{FeatureQueue, FeatureHandOver}
 
+// FeatureKeep: the computer that pairs, which tells it in its hello to
+// pair, waits for paired as long as the one controlled may take to keep
+// the pairing (Keep), and a silence more. An older one waits a silence.
+const FeatureKeep = "keep"
+
+// pairFeatures are what this MixMusic tells as it pairs.
+var pairFeatures = []string{FeatureKeep}
+
 // cleanFeatures are the names of the features a computer told, at most 32
 // of them, each of at most 32 bytes: those this MixMusic doesn't know are
 // no use, but harmless.

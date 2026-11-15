@@ -139,6 +139,19 @@ Then the computer paired with keeps the other's fingerprint, ID and name
 in its paired computers, as one that may control it, and the other keeps
 its fingerprint, ID and name, as one it controls.
 
+Both end the pairing the same way (#537). The computer paired with keeps
+the other first, in `remote.json`, and only then sends `paired`, on
+which the other keeps it. A slow or busy disk can make that keeping
+take seconds, so the other waits for `paired` 30 s and a silence more,
+not a silence alone. Kept within those 30 s, the pairing goes. Slower, or
+when it can't send `paired`, as the other stopped answering or remote
+control turned off meanwhile, the computer paired with drops what it
+kept, the entry of a computer paired before coming back as it was, and
+says the pairing didn't finish; told `failed` (`keep`), the other says
+that computer couldn't keep the pairing. What neither can tell is a
+`paired` sent that never arrives: the connection would have to fail in
+that moment.
+
 ## Removing
 
 Remove, in Settings › Remote control, forgets a paired computer: its
@@ -169,8 +182,9 @@ The version, 1, which `hello`, discovery's TXT record and TLS's ALPN tell,
 changes only when two MixMusic apps can no longer understand each other:
 then they refuse each other, and say to update both. What is added since
 goes by name, in the `features` of `hello` and `welcome`: `queue` for the
-commands on the queue, `handover` for taking what the other hands over.
-An older MixMusic doesn't know the field, so it tells none, and ignores
+commands on the queue, `handover` for taking what the other hands over,
+and `keep`, in the `hello` that asks to pair, for waiting for `paired`
+while the other keeps the pairing. An older MixMusic doesn't know the field, so it tells none, and ignores
 the other's; it skips a message of a type it doesn't know, as `handover`,
 and runs no command it doesn't know. So:
 
@@ -178,6 +192,15 @@ and runs no command it doesn't know. So:
   controls it as before; it sends neither the commands on the queue nor a
   hand-over, as the older one's `welcome` tells no features, and its page
   says to update MixMusic there;
+- a newer computer that pairs with an older one waits 30 s more for
+  `paired`, which the older one sends once it kept the pairing, however
+  long that took: the two disagree only past those 30 s, not past a
+  silence;
+- an older computer that pairs with a newer one tells no `keep`, and
+  waits a silence alone for `paired`: the newer one keeps the pairing
+  only if that took at most half of it, 3 s, the other half for the
+  messages on the way, and drops it when slower, which the older one
+  shows as "Couldn't reach …" or "… stopped answering";
 - an older computer that controls a newer one gets states whose tracks
   name their entries (`entry`), a field it ignores, and the `features` of
   `welcome`, which it ignores too.

@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"net"
+	"slices"
 	"sync"
 	"time"
 )
@@ -20,6 +21,10 @@ type Timing struct {
 	Silence time.Duration
 	// Code is how long a code holds, while its user types it: 2 minutes.
 	Code time.Duration
+	// Keep is how long the computer controlled may take to keep a pairing,
+	// once both proved the code, as on a slow or busy disk: 30 s. The other
+	// waits that long for paired, and a silence more.
+	Keep time.Duration
 	// StateEvery is how often at most the computer controlled sends its
 	// state as it changes: 200 ms.
 	StateEvery time.Duration
@@ -36,6 +41,7 @@ type Timing struct {
 func (t Timing) ping() time.Duration       { return or(t.Ping, 2*time.Second) }
 func (t Timing) silence() time.Duration    { return or(t.Silence, 6*time.Second) }
 func (t Timing) code() time.Duration       { return or(t.Code, 2*time.Minute) }
+func (t Timing) keep() time.Duration       { return or(t.Keep, 30*time.Second) }
 func (t Timing) stateEvery() time.Duration { return or(t.StateEvery, 200*time.Millisecond) }
 func (t Timing) rest() time.Duration       { return or(t.Rest, 3*time.Second) }
 
@@ -53,11 +59,9 @@ type Host interface {
 	// one.
 	Allowed(fp Fingerprint) bool
 	// Pairing shows req's code while its pairing runs, or returns an
-	// error, as ErrOff, which refuses it. The server calls done once, with
-	// how the pairing ended: nil once both computers proved the code, when
-	// done keeps the other computer as paired, and returns an error if it
-	// can't, which fails the pairing.
-	Pairing(req PairRequest) (done func(err error) error, err error)
+	// error, as ErrOff, which refuses it. The server ends it with the
+	// PairEnd's calls.
+	Pairing(req PairRequest) (PairEnd, error)
 	// State is what the player does now.
 	State() State
 	// Do runs a command.
@@ -79,6 +83,22 @@ type PairRequest struct {
 	// Cancel ends the pairing, as the user of the computer controlled
 	// refused it.
 	Cancel func()
+}
+
+// PairEnd is how the host ends a pairing whose code it shows: it keeps
+// the other computer once both proved the code, then hears how the
+// pairing ended, so that both computers end it the same way.
+type PairEnd struct {
+	// Keep keeps the other computer as paired, once both computers proved
+	// the code, and returns an error if it can't, which fails the pairing.
+	// The other may control this one from then on: it is told so after.
+	Keep func() error
+	// Done is told once, last, how the pairing ended: nil once the other
+	// computer was told it is paired. An error after Keep kept it, as the
+	// other stopped answering before it was told, or ErrNotKept, as Keep
+	// took longer than the other waits, has Done drop what Keep kept, since
+	// the other keeps nothing either.
+	Done func(err error)
 }
 
 // Server is the computer controlled's: it pairs with the computers that
@@ -230,7 +250,7 @@ func (s *Server) handle(raw net.Conn) {
 	}
 	switch hello.Want {
 	case wantPair:
-		s.pair(c, cleanName(hello.Name))
+		s.pair(c, hello)
 	case wantControl:
 		if !s.Host.Allowed(peer) {
 			_ = c.w.send(message{Type: "refused", Reason: reasonNotPaired}, t.silence())
@@ -259,10 +279,12 @@ func (s *Server) remove(c *serverConn) {
 	s.mu.Unlock()
 }
 
-// pair runs a pairing with the computer named name, at the other end of
-// c: one at a time, and none for a moment after a code that didn't match.
-func (s *Server) pair(c *serverConn, name string) {
+// pair runs a pairing with the computer at the other end of c, which said
+// hello: one at a time, and none for a moment after a code that didn't
+// match.
+func (s *Server) pair(c *serverConn, hello message) {
 	t := s.Timing
+	name := cleanName(hello.Name)
 	refuse := func(reason string) { _ = c.w.send(message{Type: "refused", Reason: reason}, t.silence()) }
 	s.mu.Lock()
 	if s.pairing || time.Since(s.rested) < t.rest() {
@@ -293,7 +315,7 @@ func (s *Server) pair(c *serverConn, name string) {
 	value, _ := CodeValue(code)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	done, err := s.Host.Pairing(PairRequest{Name: name, Peer: c.peer, Code: code, Cancel: cancel})
+	end, err := s.Host.Pairing(PairRequest{Name: name, Peer: c.peer, Code: code, Cancel: cancel})
 	if err != nil {
 		reason := reasonOff
 		if errors.Is(err, ErrBusy) {
@@ -303,23 +325,18 @@ func (s *Server) pair(c *serverConn, name string) {
 		refuse(reason)
 		return
 	}
-	// finish tells the host how the pairing ended, once, and ends it here,
-	// returning what keeping it said.
-	var (
-		once sync.Once
-		kept error
-	)
-	finish := func(err error) error {
+	// finish tells the host how the pairing ended, once, and ends it here.
+	var once sync.Once
+	finish := func(err error) {
 		once.Do(func() {
 			if errors.Is(err, ErrWrongCode) {
 				s.mu.Lock()
 				s.rested = time.Now()
 				s.mu.Unlock()
 			}
-			kept = done(err)
+			end.Done(err)
 			release()
 		})
-		return kept
 	}
 	// The user refusing it ends it, then closes the connection, which ends
 	// the rounds.
@@ -346,11 +363,33 @@ func (s *Server) pair(c *serverConn, name string) {
 		finish(err)
 		return
 	}
-	if err := finish(nil); err != nil {
+	// Both proved the code: this computer keeps the other, and only then
+	// tells it, which keeps this one as it hears. When that doesn't go,
+	// neither keeps the other: kept later than the other waits, it isn't.
+	began := time.Now()
+	err = end.Keep()
+	if err == nil && time.Since(began) > t.keepFor(hello.Features) {
+		err = ErrNotKept
+	}
+	if err != nil {
+		finish(err)
 		_ = c.w.send(message{Type: "failed", Reason: reasonKeep}, t.silence())
 		return
 	}
-	_ = c.w.send(message{Type: "paired", Name: s.Name}, t.silence())
+	release()
+	finish(c.w.send(message{Type: "paired", Name: s.Name}, t.silence()))
+}
+
+// keepFor is how long the computer controlled may take to keep a pairing
+// with the computer whose hello told the features told: Keep, for one that
+// waits for paired so long (FeatureKeep). An older one waits a silence for
+// it, from when it sent confirm: half of it, the other half for confirm
+// and paired on the way.
+func (t Timing) keepFor(told []string) time.Duration {
+	if slices.Contains(told, FeatureKeep) {
+		return t.keep()
+	}
+	return t.silence() / 2
 }
 
 // session runs a session with the computer paired at the other end of c:

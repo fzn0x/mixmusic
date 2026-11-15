@@ -9,4 +9,4 @@
   style, with a small preview. The lyrics glide up to each line as it is
   sung. Open them with the full-screen button of the lyrics panel or of
   the now playing page, with Ctrl+Shift+F (⇧⌘F on macOS), or from
-  Settings.
+  Settings (#688).

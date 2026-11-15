@@ -28,6 +28,10 @@ func pluginHost(a *app.App, p *player.Player) *plugins.Host {
 	if h == nil {
 		h = plugins.New(a, p)
 		hosts.m[a] = h
+		// The plugins stop as MixMusic quits, so that their stop functions
+		// run, before the player keeps the queue and the volume. Close
+		// waits for them a few seconds at most.
+		a.OnFlush(h.Close)
 	}
 	return h
 }

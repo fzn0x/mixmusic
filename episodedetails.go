@@ -80,11 +80,15 @@ func (s *shell) episodeDetails(c *ui.Context, t media.Track, large bool) {
 		playing = d.Chapters[at].Line
 	}
 	lines := d.Description
+	// The transcript, from the episode's captions, follows the description.
+	tr, desc := s.transcriptOf(t), max(len(lines), 1)
 	box := ui.Column(c.Key("details-" + where + "-" + t.ID)).Grow(1).MinHeight(0)
 	list := ui.Local(box, "list", func() ui.ListState { return ui.ListState{} })
 	box.Children(func() {
-		ui.List(c.Key("details-list-"+where), list, 1+max(len(lines), 1), func(i int) {
+		ui.List(c.Key("details-list-"+where), list, 1+desc+transcriptRows(tr), func(i int) {
 			switch {
+			case i > desc:
+				s.transcriptRow(c, i-1-desc, tr, limit)
 			case i == 0:
 				s.episodeFacts(c, t, d)
 			case len(lines) == 0:

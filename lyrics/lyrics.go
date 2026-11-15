@@ -110,6 +110,10 @@ func timedLyrics(lines []Line, source string) Lyrics {
 	return Lyrics{Lines: lines, Source: source}.Untimed()
 }
 
+// Timed makes lyrics of lines with times, by the rule of timedLyrics:
+// synced when they can be followed in time, else plain.
+func Timed(lines []Line, source string) Lyrics { return timedLyrics(lines, source) }
+
 // Plain makes lyrics of text without times.
 func Plain(text, source string) Lyrics {
 	l := Lyrics{Lines: []Line{}, Source: source}

@@ -1,0 +1,239 @@
+package library
+
+import (
+	"bytes"
+	"os"
+	"path/filepath"
+	"slices"
+	"testing"
+	"time"
+
+	"github.com/fzn0x/mixmusic/internal/media"
+)
+
+// openIn opens the library of dir, as the app does on each start.
+func openIn(t *testing.T, dir string) *Library {
+	t.Helper()
+	l, err := Open(filepath.Join(dir, "library.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return l
+}
+
+// loggedIDs lists the tracks of the plays the log holds, the oldest first.
+func loggedIDs(l *Library) []string {
+	l.plays.mu.Lock()
+	defer l.plays.mu.Unlock()
+	var out []string
+	for _, p := range l.plays.plays {
+		out = append(out, l.plays.tracks[p.track].ID)
+	}
+	return out
+}
+
+// clockFrom makes l's clock tick a minute each time it's read, from start.
+func clockFrom(l *Library, start time.Time) {
+	at := start
+	l.now = func() time.Time { at = at.Add(time.Minute); return at }
+}
+
+// withLog puts plays, the oldest first, in the log of l, written whole,
+// as the log of a user who played them would be.
+func withLog(t *testing.T, l *Library, plays []Play) {
+	t.Helper()
+	g := l.plays
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	for _, p := range plays {
+		line := lineOf(p.PlayedAt, 0, loggedTrack{Track: p.Track})
+		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(line)})
+	}
+	if err := g.writeWhole(g.plays, g.tracks); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// TestPlayLogKeepsEveryPlay keeps the plays past the history's 1,000, in
+// order, with what the stats count of their tracks, after a restart too.
+func TestPlayLogKeepsEveryPlay(t *testing.T) {
+	dir := t.TempDir()
+	l := openIn(t, dir)
+	start := time.Date(2026, 1, 1, 8, 0, 0, 0, time.UTC)
+	a, b := tr("yt:a", media.SourceYouTube, "A"), tr("sp:b", media.SourceSpotify, "B")
+	a.Album = &media.Ref{ID: "yt:MPREb_a", Name: "Album A"}
+	var plays []Play
+	for i := range maxHistory {
+		plays = append(plays, Play{Track: []media.Track{a, b}[i%2], PlayedAt: start.Add(time.Duration(i) * time.Minute)})
+	}
+	withHistory(t, l, plays)
+	withLog(t, l, plays)
+	clockFrom(l, start.Add(maxHistory*time.Minute))
+	for range 5 {
+		if err := l.RecordPlay(a); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if n := len(l.History(0)); n != maxHistory {
+		t.Errorf("the history holds %d plays, want %d", n, maxHistory)
+	}
+	again := openIn(t, dir)
+	got := loggedIDs(again)
+	if len(got) != maxHistory+5 || got[0] != a.ID || got[1] != b.ID || got[len(got)-1] != a.ID {
+		t.Fatalf("the log holds %d plays, from %q to %q", len(got), got[:2], got[len(got)-1])
+	}
+	if n := len(again.plays.tracks); n != 2 {
+		t.Errorf("the log keeps %d tracks for 2", n)
+	}
+	first := again.plays.tracks[again.plays.plays[0].track]
+	if first.Title != a.Title || first.Source != a.Source || first.Artists[0].Name != "A" || first.Album.Name != "Album A" ||
+		first.DurationMs != a.DurationMs {
+		t.Errorf("the first play's track = %+v", first.Track)
+	}
+	if at := time.Unix(again.plays.plays[0].at, 0); !at.Equal(start) {
+		t.Errorf("the first play counted at %v, want %v", at, start)
+	}
+}
+
+// TestPlayLogLines writes a line of JSON a play, without the covers, an
+// episode marked as one.
+func TestPlayLogLines(t *testing.T) {
+	dir := t.TempDir()
+	l := openIn(t, dir)
+	l.now = func() time.Time { return time.Date(2026, 3, 5, 21, 4, 5, 0, time.FixedZone("UTC+7", 7*60*60)) }
+	song := media.Track{ID: "yt:dQw4w9WgXcQ", Source: media.SourceYouTube, Title: "Glass Harbor",
+		Artists:    []media.Ref{{ID: "yt:UCnorth", Name: "North Pier"}},
+		Album:      &media.Ref{ID: "yt:MPREb_paper", Name: "Paper Lanterns"},
+		DurationMs: 213000, Artwork: []media.Image{{URL: "https://img/glass"}}}
+	l.RecordPlay(song)
+	l.RecordPlay(episode("yt:e"))
+	data, err := os.ReadFile(filepath.Join(dir, playLogName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := `{"at":"2026-03-05T21:04:05+07:00","id":"yt:dQw4w9WgXcQ","source":"youtube","title":"Glass Harbor",` +
+		`"artists":[{"id":"yt:UCnorth","name":"North Pier"}],"album":{"id":"yt:MPREb_paper","name":"Paper Lanterns"},` +
+		`"durationMs":213000}` + "\n" +
+		`{"at":"2026-03-05T21:04:05+07:00","id":"yt:e","source":"youtube","title":"yt:e","durationMs":3600000,"episode":true}` + "\n"
+	if string(data) != want {
+		t.Errorf("the log holds\n%s\nwant\n%s", data, want)
+	}
+	if ep := openIn(t, dir).plays.tracks[1]; !ep.IsEpisode() {
+		t.Errorf("the episode reads as %+v", ep.Track)
+	}
+}
+
+// TestPlayLogTornLine skips a line a crash cut short, and starts the next
+// play on a line of its own.
+func TestPlayLogTornLine(t *testing.T) {
+	dir := t.TempDir()
+	l := openIn(t, dir)
+	clockFrom(l, time.Date(2026, 1, 1, 8, 0, 0, 0, time.UTC))
+	l.RecordPlay(tr("yt:a", media.SourceYouTube, "A"))
+	l.RecordPlay(tr("yt:b", media.SourceYouTube, "B"))
+	path := filepath.Join(dir, playLogName)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The second line, cut short.
+	if err := os.WriteFile(path, data[:len(data)-20], 0o600); err != nil {
+		t.Fatal(err)
+	}
+	l = openIn(t, dir)
+	if got := loggedIDs(l); !slices.Equal(got, []string{"yt:a"}) {
+		t.Errorf("a torn line read: %q", got)
+	}
+	clockFrom(l, time.Date(2026, 1, 2, 8, 0, 0, 0, time.UTC))
+	if err := l.RecordPlay(tr("yt:c", media.SourceYouTube, "C")); err != nil {
+		t.Fatal(err)
+	}
+	if got := loggedIDs(openIn(t, dir)); !slices.Equal(got, []string{"yt:a", "yt:c"}) {
+		t.Errorf("after a play that followed a torn line, the log reads %q", got)
+	}
+}
+
+// TestPlayLogRetriesFailedAppend writes a play whose append failed with
+// the next play, in order.
+func TestPlayLogRetriesFailedAppend(t *testing.T) {
+	dir := t.TempDir()
+	l := openIn(t, dir)
+	clockFrom(l, time.Date(2026, 1, 1, 8, 0, 0, 0, time.UTC))
+	l.RecordPlay(tr("yt:a", media.SourceYouTube, "A"))
+	path := filepath.Join(dir, playLogName)
+	// A folder in the file's place fails the append.
+	if err := os.Rename(path, path+".aside"); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(path, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := l.RecordPlay(tr("yt:b", media.SourceYouTube, "B")); err == nil {
+		t.Error("an append that failed told no error")
+	}
+	if got := loggedIDs(l); !slices.Equal(got, []string{"yt:a", "yt:b"}) {
+		t.Errorf("while the file can't be written, the log counts %q", got)
+	}
+	if err := os.Remove(path); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Rename(path+".aside", path); err != nil {
+		t.Fatal(err)
+	}
+	if err := l.RecordPlay(tr("yt:c", media.SourceYouTube, "C")); err != nil {
+		t.Fatal(err)
+	}
+	if got := loggedIDs(openIn(t, dir)); !slices.Equal(got, []string{"yt:a", "yt:b", "yt:c"}) {
+		t.Errorf("after the file came back, the log reads %q", got)
+	}
+}
+
+// TestPlayLogAppendCutShort writes again, on a line of its own, a line an
+// append wrote only part of, and counts once one it wrote but for its line
+// break.
+func TestPlayLogAppendCutShort(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		// cut is how much of the second line reached the file.
+		cut func(line []byte) int
+	}{
+		{"partway", func(line []byte) int { return 10 }},
+		{"but its line break", func(line []byte) int { return len(line) - 1 }},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			l := openIn(t, dir)
+			clockFrom(l, time.Date(2026, 1, 1, 8, 0, 0, 0, time.UTC))
+			l.RecordPlay(tr("yt:a", media.SourceYouTube, "A"))
+			path := filepath.Join(dir, playLogName)
+			before, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			l.RecordPlay(tr("yt:b", media.SourceYouTube, "B"))
+			after, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			// As if the second append failed after cut bytes.
+			second := bytes.TrimPrefix(after, before)
+			n := tc.cut(second)
+			if err := os.WriteFile(path, append(before, second[:n]...), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			l.plays.mu.Lock()
+			l.plays.pending = slices.Clone(second)
+			l.plays.wrote(n, true)
+			if !l.plays.torn || !bytes.Equal(l.plays.pending, second) {
+				t.Errorf("after %d bytes of %d: torn %v, pending %q", n, len(second), l.plays.torn, l.plays.pending)
+			}
+			l.plays.mu.Unlock()
+			if err := l.RecordPlay(tr("yt:c", media.SourceYouTube, "C")); err != nil {
+				t.Fatal(err)
+			}
+			if got := loggedIDs(openIn(t, dir)); !slices.Equal(got, []string{"yt:a", "yt:b", "yt:c"}) {
+				t.Errorf("the log reads %q", got)
+			}
+		})
+	}
+}

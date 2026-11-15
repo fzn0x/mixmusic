@@ -8,6 +8,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"path/filepath"
 	"slices"
 	"strings"
 	"sync"
@@ -65,23 +66,29 @@ type Data struct {
 	Podcasts []media.Podcast `json:"podcasts,omitempty"`
 }
 
-// Library is the user's library, kept in a file.
+// Library is the user's library, kept in a file, and the log of every
+// play, in a file of its own beside it (playlog.go).
 type Library struct {
-	file *store.File[Data]
-	now  func() time.Time
+	file  *store.File[Data]
+	plays *playLog
+	now   func() time.Time
 	// disliked holds the IDs of the disliked tracks, for lists to ask of
 	// each of their rows as they draw; indexing orders its changes.
 	disliked atomic.Pointer[map[string]bool]
 	indexing sync.Mutex
 }
 
-// Open opens the library kept at path.
+// Open opens the library kept at path, and the play log beside it.
 func Open(path string) (*Library, error) {
 	f, err := store.Open(path, Data{})
 	if err != nil {
 		return nil, err
 	}
-	l := &Library{file: f, now: time.Now}
+	plays, _, err := openPlayLog(filepath.Join(filepath.Dir(path), playLogName))
+	if err != nil {
+		return nil, err
+	}
+	l := &Library{file: f, plays: plays, now: time.Now}
 	l.indexDisliked()
 	return l, nil
 }
@@ -291,15 +298,18 @@ func (l *Library) MoveInPlaylist(id string, from, to int) error {
 	})
 }
 
-// RecordPlay adds a track to the history.
+// RecordPlay adds a track to the history, which keeps the last plays, and
+// to the play log, which keeps them all.
 func (l *Library) RecordPlay(t media.Track) error {
-	return l.file.Update(func(d *Data) error {
-		d.History = slices.Insert(d.History, 0, Play{Track: t, PlayedAt: l.now()})
+	at := l.now()
+	err := l.file.Update(func(d *Data) error {
+		d.History = slices.Insert(d.History, 0, Play{Track: t, PlayedAt: at})
 		if len(d.History) > maxHistory {
 			d.History = d.History[:maxHistory]
 		}
 		return nil
 	})
+	return errors.Join(err, l.plays.add(at, t))
 }
 
 // History returns the last plays, the latest first, at most limit.

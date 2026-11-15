@@ -108,6 +108,11 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 		s.nowPlayingPage(c)
 	case r.Match("/remote/{id}"):
 		s.remotePage(c, r.Param("id"))
+	case r.Match(roomsPath):
+		r.Title(roomsTitle)
+		s.roomPage(c)
+	case r.Match(roomsPath + "/{id}"):
+		s.roomFoundPage(c, r.Param("id"))
 	case r.Match("/settings"):
 		s.settingsPage(c, "", r.Query("q"))
 	case r.Match("/settings/{tab}"):

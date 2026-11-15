@@ -152,6 +152,8 @@ type shell struct {
 	// remote is the page of a computer controlled, and the dialog of the
 	// code this one shows (remote.go).
 	remote remoteView
+	// rooms is the rooms' page's: the code the user types (rooms.go).
+	rooms roomView
 	// firewall is what the settings know of Windows Firewall
 	// (settings_firewall.go).
 	firewall firewallView
@@ -442,6 +444,7 @@ func (s *shell) start() {
 		s.a.OnNavigate(func(target string) { s.update(func() { s.open(target) }) }),
 		s.followCast(),
 		s.followRemote(),
+		s.followRooms(),
 		s.followOutput(),
 		s.a.OnGlobalShortcut(s.globalPress),
 		s.a.OnFlush(s.keepColors),

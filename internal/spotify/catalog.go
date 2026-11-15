@@ -310,11 +310,21 @@ func (c *Client) SavedAlbums(ctx context.Context) ([]media.Album, error) {
 	return savedAlbums(items), err
 }
 
-// FollowedArtists returns the artists the user follows.
+// FollowedArtists returns the artists the user follows, all of them, a
+// page at a time by the cursor of the page before, each tried again on
+// media.PageWaits past the first: those of a list that stopped short, at
+// a page that fails, a page of nothing or of nothing new, or a cursor
+// that doesn't move, come with a media.ShortList.
 func (c *Client) FollowedArtists(ctx context.Context) ([]media.Artist, error) {
-	out := []media.Artist{}
-	after := ""
-	for page := 0; page < 4; page++ {
+	l := &listReading[*artist]{id: func(a *artist) string {
+		if a == nil {
+			return ""
+		}
+		return a.ID
+	}, seen: map[string]bool{}}
+	total, after := 0, ""
+	var end error
+	for page := 0; ; page++ {
 		var res struct {
 			Artists paging[*artist] `json:"artists"`
 		}
@@ -322,22 +332,34 @@ func (c *Client) FollowedArtists(ctx context.Context) ([]media.Artist, error) {
 		if after != "" {
 			q.Set("after", after)
 		}
-		if err := c.get(ctx, "/me/following", q, &res); err != nil {
-			if page == 0 {
+		read := func(ctx context.Context) error {
+			res.Artists = paging[*artist]{}
+			return c.get(ctx, "/me/following", q, &res)
+		}
+		if page == 0 {
+			if err := read(ctx); err != nil {
 				return nil, err
 			}
+			total = res.Artists.Total
+		} else if end = media.TryPage(ctx, read); end != nil {
 			break
 		}
-		for _, a := range res.Artists.Items {
-			if a != nil {
-				out = append(out, toArtist(a))
-			}
+		more, stop := l.take(res.Artists)
+		if cursor := res.Artists.Cursors.After; more && (cursor == "" || cursor == after) {
+			more, stop = false, errListEnded
+		} else {
+			after = cursor
 		}
-		if after = res.Artists.Cursors.After; after == "" || res.Artists.Next == "" {
+		if !more {
+			end = stop
 			break
 		}
 	}
-	return out, nil
+	out := []media.Artist{}
+	for _, a := range l.items {
+		out = append(out, toArtist(a))
+	}
+	return out, shortList(len(out), total, end)
 }
 
 // RecentlyPlayed returns the tracks the user played last on Spotify.

@@ -114,13 +114,18 @@ func readList[T any](ctx context.Context, c *Client, path string, id func(T) str
 		}
 		offset += n * pageLimit
 	}
-	if end == errListEnded && first.Total > 0 && len(l.items) >= first.Total {
-		end = nil // all its count tells of came, whatever the page after
+	return l.items, shortList(len(l.items), first.Total, end)
+}
+
+// shortList is the error of a list of the library that came in part, got
+// of its total items, as end, why the reading stopped, tells: none for
+// one read to its end, or of which all its count tells of came before a
+// page that ended it early.
+func shortList(got, total int, end error) error {
+	if end == nil || end == errListEnded && total > 0 && got >= total {
+		return nil
 	}
-	if end != nil {
-		return l.items, &media.ShortList{Got: len(l.items), Total: first.Total, Cut: end == errListBound, Err: end}
-	}
-	return l.items, nil
+	return &media.ShortList{Got: got, Total: total, Cut: end == errListBound, Err: end}
 }
 
 // came tells whether a list of the library came, whole or in part, by the

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -321,5 +322,46 @@ func TestSavedShowsReadsEveryPage(t *testing.T) {
 	got, err = c.SavedShows(context.Background())
 	if s, ok := media.Short(err); !ok || s.Got != 50 || s.Total != 120 || !inOrder(ids(got), "sp:s", 50) {
 		t.Errorf("SavedShows of a page that fails = %d shows, %v", len(got), err)
+	}
+}
+
+// TestFollowedArtistsReadsEveryPage follows the cursor of each page of
+// the user's 250 artists, a page at a time, trying a page that fails
+// again, and of 120 whose second page fails, gives the first 50, saying
+// so.
+func TestFollowedArtistsReadsEveryPage(t *testing.T) {
+	quickPages(t)
+	ids := func(artists []media.Artist) []string {
+		out := []string{}
+		for _, a := range artists {
+			out = append(out, a.ID)
+		}
+		return out
+	}
+	list := &fakeList{total: 250, item: artistAt, cursor: true, fails: map[int]int{100: 1}}
+	c := libraryServer(t, map[string]*fakeList{"/me/following": list})
+	got, err := c.FollowedArtists(context.Background())
+	if err != nil || !inOrder(ids(got), "sp:a", 250) {
+		t.Fatalf("FollowedArtists = %d artists, %v", len(got), err)
+	}
+	list.mu.Lock()
+	asked := slices.Clone(list.asked)
+	list.mu.Unlock()
+	if len(asked) != 5+1 || list.atOnce() != 1 || !strings.Contains(asked[1], "after=a49") {
+		t.Errorf("asked for %q, at most %d at once", asked, list.atOnce())
+	}
+
+	c = libraryServer(t, map[string]*fakeList{"/me/following": {total: 120, item: artistAt, cursor: true, fails: map[int]int{50: 100}}})
+	got, err = c.FollowedArtists(context.Background())
+	if s, ok := media.Short(err); !ok || s.Got != 50 || s.Total != 120 || !inOrder(ids(got), "sp:a", 50) {
+		t.Errorf("FollowedArtists of a page that fails = %d artists, %v", len(got), err)
+	}
+
+	// A cursor that goes back to the first page ends the list there.
+	again := func(i int) string { return artistAt(i % pageLimit) }
+	c = libraryServer(t, map[string]*fakeList{"/me/following": {total: 120, item: again, cursor: true}})
+	got, err = c.FollowedArtists(context.Background())
+	if s, ok := media.Short(err); !ok || s.Got != 50 || !inOrder(ids(got), "sp:a", 50) {
+		t.Errorf("FollowedArtists of a page of what came before = %d artists, %v", len(got), err)
 	}
 }

@@ -307,6 +307,10 @@ type Stream interface {
 	Load(url string, cue audio.Cue) error
 	Preload(url string)
 	Crossfade(url string, d time.Duration, cue audio.Cue) error
+	// Fading reports whether the crossfade Crossfade started plays on, as
+	// the engine's does: a next track whose audio is late, or a pause,
+	// holds it past its seconds.
+	Fading() bool
 	Play() error
 	Pause()
 	Stop()

@@ -248,6 +248,34 @@ func (d *deck) heard() int64 {
 // the audio thread.
 func (d *deck) pending(r *ring) bool { return d.stretch.pending(r) }
 
+// left returns the frames heard, at the deck's rate, of its track left to
+// play, and whether it knows them: from the end of its ring, once that
+// holds the rest of the track, else from the track's duration. On the
+// audio thread.
+func (d *deck) left() (int64, bool) {
+	r := d.ring.Load()
+	var end int64
+	if r.done.Load() {
+		end = r.start + r.write.Load()
+	} else if total, ready := d.info(); ready && total > 0 {
+		end = frames(total)
+	} else {
+		return 0, false
+	}
+	return int64(float64(max(0, end-d.heard())) / d.rate()), true
+}
+
+// faded reports whether the deck, as it fades out, is silent for good: its
+// gain reached 0, or its track ended, or failed, or there is no deck. On
+// the audio thread.
+func (d *deck) faded() bool {
+	if d == nil {
+		return true
+	}
+	r := d.ring.Load()
+	return d.gain.value == 0 && d.gain.target == 0 || r.done.Load() && r.readable() == 0 && !d.pending(r)
+}
+
 // failure returns why the deck failed, or nil.
 func (d *deck) failure() error {
 	d.mu.Lock()
@@ -484,9 +512,12 @@ type ramp struct {
 }
 
 // to starts a ramp to target over d; at once when d is 0.
-func (r *ramp) to(target float64, d time.Duration) {
+func (r *ramp) to(target float64, d time.Duration) { r.over(target, frames(d)) }
+
+// over starts a ramp to target over n frames; at once when n is 0.
+func (r *ramp) over(target float64, n int64) {
 	r.target = target
-	if n := frames(d); n > 0 {
+	if n > 0 {
 		r.step = (target - r.value) / float64(n)
 		return
 	}

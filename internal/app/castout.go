@@ -282,6 +282,9 @@ func (o *castOut) Crossfade(url string, _ time.Duration, cue audio.Cue) error {
 	return o.Load(url, cue)
 }
 
+// Fading is false: a cast device fades nothing.
+func (o *castOut) Fading() bool { return false }
+
 func (o *castOut) Play() error {
 	o.mu.Lock()
 	idle, rawURL, cue := o.idle, o.loadedURL, o.loadedCue

@@ -20,6 +20,8 @@ func (Stream) Preload(string) {}
 
 func (Stream) Crossfade(string, time.Duration, audio.Cue) error { return nil }
 
+func (Stream) Fading() bool { return false }
+
 func (Stream) Play() error { return nil }
 
 func (Stream) Pause() {}

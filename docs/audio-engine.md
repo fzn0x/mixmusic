@@ -209,6 +209,15 @@ seconds; at 0, the default, it is off.
 
 - The next track starts on the other deck while the one playing fades
   out: one goes down and the other up, evenly, over the seconds you set.
+- A next track whose audio comes late holds the fade, a live stream's
+  too: the one playing keeps its volume until the audio is there, then
+  the next fades in from silence, over the seconds you set or what is
+  left of the one playing, if less. With under half a second of it left,
+  or once it ended, the next track starts at full volume. The engine
+  checks for the audio every 2.7 ms, and holds the fade the same way when
+  the next track's audio runs out midway.
+- A pause during the fade holds it, however long: played again, both
+  tracks go on from where they were.
 - The seconds are those you hear: at 2×, a fade of 5 seconds starts 10
   seconds of the track before its end.
 - A track doesn't crossfade when it is shorter than three times the fade,

@@ -30,6 +30,11 @@
   track's end: MixMusic's own device, given a track with nothing after it,
   may stay on it once it ended, its position counting on (#373). The time
   shown never passes the track's end.
+- **Crossfades** (`crossfadeTo`): the next track fades in on the
+  engine's other deck, and the crossfade ends once the engine's did
+  (`Stream.Fading`), which a next track whose audio is late, or a pause,
+  holds past its seconds. Until then the player starts no other, nor
+  loads 5.1 audio, which would cut the track fading out off (#549).
 - **5.1 surround** (`surroundready.go`): a stream plays its 5.1 audio
   while the settings ask for it, once the app tells it plays at once
   (`Surrounds.SurroundReady`). Until then the engine plays its stereo

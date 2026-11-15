@@ -736,6 +736,23 @@ func (p *Player) preload(next Item) {
 	})
 }
 
+// fadeCheck is how often the player asks whether the engine's crossfade
+// ended, once its seconds passed.
+const fadeCheck = 250 * time.Millisecond
+
+// fadeEnded ends the crossfade once the engine's did: a next track whose
+// audio is late, or a pause, holds that past its seconds, and the 5.1
+// audio made ready meanwhile, which loads the track again, would cut the
+// track fading out off (#549).
+func (p *Player) fadeEnded() {
+	if p.stream.Fading() {
+		p.after(fadeCheck, p.fadeEnded)
+		return
+	}
+	p.crossfading = false
+	p.toSurround() // 5.1 audio made ready during the fade
+}
+
 // crossfadeTo plays next while the current track fades out, over fade. A
 // remote output plays one stream at a time: next starts there as the
 // current track ends.
@@ -753,10 +770,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 			p.crossfading = false
 			return
 		}
-		p.after(fade, func() {
-			p.crossfading = false
-			p.toSurround() // 5.1 audio made ready during the fade
-		})
+		p.after(fade, p.fadeEnded)
 		// A track the user chose meanwhile, or a Connect track, starts as
 		// the current one ends.
 		if err != nil || token != p.loadToken || src.Mode != ModeStream || src.URL == "" {

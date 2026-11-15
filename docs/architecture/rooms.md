@@ -18,8 +18,8 @@ any message on it. So:
 - a guest that came by a link speaks to the host the link names, and not
   to someone who takes its name or its address;
 - no one else reads what plays in the room, or changes it;
-- each try of a code checks one code, online: an address that tried 5
-  wrong ones waits a minute.
+- each try of a code checks one code, online, and the room counts the
+  tries ([Admission](#admission)): guessing the code takes decades.
 
 Nothing listens unless a room is open: the host's server starts with the
 room and ends with it, and a guest listens nowhere.
@@ -88,10 +88,12 @@ between the two has a TLS connection with each, whose exported bytes
 differ, so the confirmations of one don't check on the other.
 
 1. The guest sends its message, pA, in `hello`.
-2. The host, unless it refuses the guest (blocked, a full room, an
-   address that waits), sends its message, pB, in `spake`.
-3. The guest sends its confirmation, cA, in `confirm`. A wrong one counts
-   against the guest's address: 5 wrong ones, and it waits a minute.
+2. The host, unless it refuses the guest (blocked, a full room, a
+   source or a room that waits, or a room busy with other codes), counts
+   the try ([Admission](#admission)), and sends its message, pB, in
+   `spake`.
+3. The guest sends its confirmation, cA, in `confirm`, which the host
+   checks: a wrong one counts as wrong, a right one not at all.
 4. The host sends its own, cB, in `welcome`, with a preview: who hosts,
    what plays and how many listen. The guest checks cB.
 5. The guest's user sees the preview, and joins (`join`), or not: the
@@ -99,6 +101,36 @@ differ, so the confirmations of one don't check on the other.
    members, its queue and its state.
 
 A room takes 200 guests.
+
+## Admission
+
+The code is all that keeps someone on the network out, and SPAKE2 has
+each try check one code, online: so the room counts the tries, and holds
+few computers that proved nothing yet (`admit.go`).
+
+- **By source.** A source is an IPv4 address, or the /64 of an IPv6 one,
+  within which one computer changes its address as it likes. A source
+  tries 5 codes, then waits a minute.
+- **Room-wide.** The room takes 30 wrong codes a minute in all, from
+  whatever sources: past them, it checks no code until the minute is over.
+  At 30 a minute, 43,200 a day, the 33^6, about 1.29 billion, codes take
+  82 years, half of them 41; a room lasts an evening. A link's secret,
+  of 128 bits, isn't guessed, and isn't counted: link holders, and guests
+  that come back by their keys, get in while codes wait.
+- **Before it runs.** A try counts as it starts, under the server's lock,
+  before SPAKE2 runs: tries at once count too. Those under way count
+  against both limits without making anyone wait, as they may be right:
+  one more than the limits take is told the room is busy (`busy`), and
+  tries again in a moment. A right code doesn't count; a try that ends
+  before its code was checked, as the guest went, checked none.
+- **Bounded.** The room counts 4096 sources at most, and forgets those that
+  tried a minute ago and neither wait nor try.
+- **The unproven.** A connection holds one of 32 places in the room, 4 of a
+  source, from its accepting until it proved the code, the link or its
+  key, or ended: past them, it is closed at once, before TLS. Until then,
+  its messages are of 4 KiB at most, refused from their length before
+  any of them is read (`Frames.Limit`); a hello is a few hundred bytes.
+  Once proven, a guest's messages take remote control's 1 MiB.
 
 ## Coming back, removing, blocking
 
@@ -110,7 +142,11 @@ computer wakes; the room ended, for it, once it ran out of tries.
 
 The host removes a guest, which is told so (`ended`, `removed`), and joins
 again only by the code or the link; or blocks it, by its key, which can't
-join, even with the code, until the host unblocks it. Ending the room
+join, even with the code, until the host unblocks it. Both go by the key:
+a computer that makes a new key knocks again with the code, or the link,
+it has. **New code** gives the room a new code and a new link's secret
+(`SetCode`), which shuts it out, and the guests in the room stay. Ending
+the room
 tells each guest (`ended`, `ended`), and stops the server and the
 announcement. A guest that leaves says so (`leave`), and the host no
 longer keeps its place.

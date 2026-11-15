@@ -31,7 +31,8 @@ then shows the same, with **join**. Pasted on the Listen with friends
 page, as **Invite link**, it does too.
 
 Five wrong codes from a computer, and it waits a minute before it may try
-again.
+again; 30 wrong codes in a minute from anyone, and the room takes no code
+for a minute, though invite links and guests who come back still get in.
 
 ## In a room
 
@@ -70,6 +71,11 @@ and it can join again only with the code or the link; **block** keeps it
 out, even with the code, until you **unblock** it. **Activity** tells who
 joined, left, or was removed or blocked.
 
+Remove and block go by the computer's key, which someone can make anew:
+then they can knock again with the code, or the link, they still have.
+**new code** gives the room a new code and a new invite link: the old
+ones let no one in, and your guests stay.
+
 ## Dropping off
 
 A guest whose computer sleeps, or loses the network, comes back by
@@ -84,8 +90,9 @@ queue comes back.
 What the computers of a room send is encrypted, and only they can read
 it. The code is never sent: each guest and the host prove to each other
 that they know it, and someone who tries codes has one chance in more than
-a billion each time. An invite link names the host's key, so it only
-opens that computer's room. [How it works inside](architecture/rooms.md)
+a billion each time. As the room takes 30 wrong codes a minute at most,
+trying them all would take decades. An invite link names the host's key,
+so it only opens that computer's room. [How it works inside](architecture/rooms.md)
 tells more.
 
 ## Firewalls and the local network

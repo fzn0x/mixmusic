@@ -55,7 +55,7 @@ func NewBetterLyrics(userAgent string) *BetterLyrics {
 // a key, is ErrNotFound; Better Lyrics down, busy or out of reach is
 // ErrUnavailable. A nil client finds nothing.
 func (b *BetterLyrics) Get(ctx context.Context, t Query) (Lyrics, error) {
-	if b == nil || t.Title == "" || t.Artist == "" || t.Album == "" || t.Duration <= 0 {
+	if !b.Asks(t) {
 		return Lyrics{}, ErrNotFound
 	}
 	q := url.Values{}
@@ -103,16 +103,23 @@ func (b *BetterLyrics) Get(ctx context.Context, t Query) (Lyrics, error) {
 		// Lyrics MixMusic can't read are as good as none.
 		return Lyrics{}, fmt.Errorf("%w: %w", ErrNotFound, err)
 	}
-	if !wordTimed(l) {
+	if !l.WordTimed() {
 		return Lyrics{}, ErrNotFound
 	}
 	l.Source, l.SourceURL = "Better Lyrics", BetterLyricsSite
 	return l, nil
 }
 
-// wordTimed reports whether some line of l is timed word by word, which
+// Asks reports whether Get asks Better Lyrics for the track t: whether
+// there is a client, and t has a title, an artist, an album and a
+// duration.
+func (b *BetterLyrics) Asks(t Query) bool {
+	return b != nil && t.Title != "" && t.Artist != "" && t.Album != "" && t.Duration > 0
+}
+
+// WordTimed reports whether some line of l is timed word by word, which
 // is what Better Lyrics is asked for.
-func wordTimed(l Lyrics) bool {
+func (l Lyrics) WordTimed() bool {
 	if !l.Synced {
 		return false
 	}

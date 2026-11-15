@@ -255,5 +255,5 @@ func wordSynced(doc, source string) (Lyrics, bool) {
 		return Lyrics{}, false
 	}
 	l := timedLyrics(lines, source)
-	return l, wordTimed(l)
+	return l, l.WordTimed()
 }

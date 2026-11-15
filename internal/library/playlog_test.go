@@ -237,3 +237,43 @@ func TestPlayLogAppendCutShort(t *testing.T) {
 		})
 	}
 }
+
+// TestPlayLogClear forgets every play with the history, also when the file
+// can't be written then: the next play writes it anew.
+func TestPlayLogClear(t *testing.T) {
+	dir := t.TempDir()
+	l := openIn(t, dir)
+	clockFrom(l, time.Date(2026, 1, 1, 8, 0, 0, 0, time.UTC))
+	l.RecordPlay(tr("yt:a", media.SourceYouTube, "A"))
+	l.RecordPlay(tr("yt:b", media.SourceYouTube, "B"))
+	if err := l.ClearHistory(); err != nil {
+		t.Fatal(err)
+	}
+	if got := loggedIDs(openIn(t, dir)); len(got) != 0 {
+		t.Errorf("after a clear, the log reads %q", got)
+	}
+
+	l.RecordPlay(tr("yt:c", media.SourceYouTube, "C"))
+	path := filepath.Join(dir, playLogName)
+	if err := os.Rename(path, path+".aside"); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(path, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := l.ClearHistory(); err == nil {
+		t.Error("a clear that couldn't write the log told no error")
+	}
+	if err := os.Remove(path); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Rename(path+".aside", path); err != nil {
+		t.Fatal(err)
+	}
+	if err := l.RecordPlay(tr("yt:d", media.SourceYouTube, "D")); err != nil {
+		t.Fatal(err)
+	}
+	if got := loggedIDs(openIn(t, dir)); !slices.Equal(got, []string{"yt:d"}) {
+		t.Errorf("after a clear that failed and a play, the log reads %q", got)
+	}
+}

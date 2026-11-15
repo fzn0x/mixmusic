@@ -213,6 +213,16 @@ func (g *playLog) add(at time.Time, t media.Track) error {
 	return g.flush()
 }
 
+// clear forgets every play. While the file can't be written, the next
+// play writes it anew, holding only what played since.
+func (g *playLog) clear() error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.plays, g.tracks, g.byKey = nil, nil, map[string]int32{}
+	g.pending, g.torn, g.whole = nil, false, true
+	return g.flush()
+}
+
 // flush writes what the file doesn't hold yet: the lines pending, or the
 // whole log.
 func (g *playLog) flush() error {

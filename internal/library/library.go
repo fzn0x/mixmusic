@@ -337,9 +337,11 @@ func (l *Library) RecentTracks(limit int) []media.Track {
 	return out
 }
 
-// ClearHistory forgets what the user played.
+// ClearHistory forgets what the user played: the history, and the play
+// log, which the stats count.
 func (l *Library) ClearHistory() error {
-	return l.file.Update(func(d *Data) error { d.History = nil; return nil })
+	err := l.file.Update(func(d *Data) error { d.History = nil; return nil })
+	return errors.Join(err, l.plays.clear())
 }
 
 // AddSearch records a search, moving it first if it was there.

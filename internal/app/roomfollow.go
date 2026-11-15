@@ -69,13 +69,18 @@ func (f *follower) follow(s *room.Session) {
 
 // stop stops following: the guest's settings hold again.
 func (f *follower) stop() {
+	f.halt()
+	f.a.followHost(false)
+}
+
+// halt stops following the host, and leaves the player as it is.
+func (f *follower) halt() {
 	f.mu.Lock()
+	defer f.mu.Unlock()
 	if f.stopCh != nil && !f.stopped {
 		close(f.stopCh)
 		f.stopped = true
 	}
-	f.mu.Unlock()
-	f.a.followHost(false)
 }
 
 // followHost has the player follow a host, or no longer: its settings'

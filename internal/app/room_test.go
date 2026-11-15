@@ -443,3 +443,30 @@ func TestRoomEndReleasesTheStart(t *testing.T) {
 		t.Fatal("the room is still announced")
 	}
 }
+
+// TestRoomQuitKeepsTheOwnQueue quits MixMusic while in a room: the host
+// hears the guest left, and queue.json keeps the guest's own queue, which
+// the next start plays.
+func TestRoomQuitKeepsTheOwnQueue(t *testing.T) {
+	n := roomtest.New()
+	desk := newRoomApp(t, n, "Desk")
+	lap := newRoomApp(t, n, "Lap")
+	lp := lap.GoPlayer()
+	lp.PlayTracks(tracksOf("x", "y"), 1)
+	waitPlayer(t, lp, "y playing", func(s player.State) bool { return s.Playing })
+	desk.GoPlayer().PlayTracks(tracksOf("a"), 0)
+	if err := desk.Rooms().Start(); err != nil {
+		t.Fatal(err)
+	}
+	joinRoom(t, lap, desk)
+	waitPlayer(t, lp, "a on the guest", func(s player.State) bool { cur, ok := s.Current(); return ok && cur.Track.ID == vid("a") })
+	lap.closeRooms()
+	lp.Flush()
+	if saved := lap.queue.Get(); len(saved.Tracks) != 2 || saved.Tracks[saved.Index].ID != vid("y") {
+		t.Fatalf("queue.json keeps %+v", saved)
+	}
+	until(t, "the host to see the guest leave", func() bool {
+		h, _ := desk.Rooms().Hosted()
+		return len(h.Guests) == 0
+	})
+}

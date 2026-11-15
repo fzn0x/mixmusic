@@ -479,6 +479,29 @@ func (g *guestRoom) end(a *App, err error) {
 	}
 }
 
+// quit ends this computer's stay in the room of g as MixMusic quits: the
+// host hears it left, and the player still keeps no queue, so that
+// queue.json keeps the user's own, which the next start plays.
+func (g *guestRoom) quit(a *App) {
+	r := &a.room
+	r.mu.Lock()
+	s, f, retry, cancel := g.session, g.follow, g.retry, g.cancel
+	g.session, g.follow, g.retry = nil, nil, nil
+	r.mu.Unlock()
+	if cancel != nil {
+		cancel()
+	}
+	if retry != nil {
+		retry.Stop()
+	}
+	if f != nil {
+		f.halt()
+	}
+	if s != nil {
+		s.Leave()
+	}
+}
+
 // drop ends a knock that gave way to another, or a room that ended.
 func (g *guestRoom) drop() {
 	if g.cancel != nil {

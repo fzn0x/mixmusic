@@ -127,7 +127,7 @@ func (a *App) closeRooms() {
 		h.close()
 	}
 	if g != nil {
-		g.end(a, nil)
+		g.quit(a)
 	}
 }
 

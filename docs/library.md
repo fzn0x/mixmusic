@@ -113,9 +113,10 @@ Others can add to a playlist of yours on YouTube Music or Spotify, from their ow
 
 MixMusic reads playlists of up to 20,000 tracks, and the songs you liked on YouTube Music as far.
 
-- The first hundred tracks or so show at once, and the rest load beside them, as "Loading tracks" above the list says, with how many came.
+- The first hundred tracks or so show at once on YouTube Music, and the first 50 on Spotify, and the rest load beside them, as "Loading tracks" above the list says, with how many came.
 - Play and Shuffle, pressed meanwhile, wait for all of them. The menu's queue items and the download show once they're read.
 - A page of the playlist that fails is tried again a few times. Then the playlist says how many of its tracks loaded, with Try again. One past 20,000 tracks says where it was cut.
+- Once all of it is read, a muted line under the header says why its count may be above the rows: how many of its items can't play here, of what kind (on Spotify, local files, podcast episodes, and removed or unavailable items), and how many songs Hide explicit content leaves out of a playlist of someone else's. The count shown equals the rows plus what the line names.
 - Playing a long playlist from its tile, downloading it or copying it into a mix reads all of it first, which can take a while.
 
 ## The header that stays

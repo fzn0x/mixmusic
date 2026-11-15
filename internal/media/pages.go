@@ -14,6 +14,10 @@ const MaxTracks = 20000
 // tracks, and the token of the page after it, "" after the last.
 type PageFunc func(ctx context.Context, token string) ([]Track, string, error)
 
+// CountedPageFunc is a PageFunc that also tells what its page left out
+// because it can't play here.
+type CountedPageFunc func(ctx context.Context, token string) ([]Track, string, Unplayable, error)
+
 // PageWaits are how long a page of tracks that failed waits before each
 // new try: it's tried once, then once after each wait. Tests shorten them.
 var PageWaits = []time.Duration{time.Second, 2 * time.Second, 4 * time.Second}
@@ -27,15 +31,28 @@ const maxEmptyPages = 100
 // ReadPage reads the page of token with read, and while it fails, tries
 // again after each of PageWaits, unless ctx ends.
 func ReadPage(ctx context.Context, read PageFunc, token string) ([]Track, string, error) {
-	for try := 0; ; try++ {
+	tracks, next, _, err := readCounted(ctx, counted(read), token)
+	return tracks, next, err
+}
+
+// counted is read as a CountedPageFunc that leaves nothing out.
+func counted(read PageFunc) CountedPageFunc {
+	return func(ctx context.Context, token string) ([]Track, string, Unplayable, error) {
 		tracks, next, err := read(ctx, token)
+		return tracks, next, Unplayable{}, err
+	}
+}
+
+func readCounted(ctx context.Context, read CountedPageFunc, token string) ([]Track, string, Unplayable, error) {
+	for try := 0; ; try++ {
+		tracks, next, left, err := read(ctx, token)
 		if err == nil || try == len(PageWaits) || ctx.Err() != nil {
-			return tracks, next, err
+			return tracks, next, left, err
 		}
 		select {
 		case <-time.After(PageWaits[try]):
 		case <-ctx.Done():
-			return nil, "", err
+			return nil, "", Unplayable{}, err
 		}
 	}
 }
@@ -49,16 +66,23 @@ func ReadPage(ctx context.Context, read PageFunc, token string) ([]Track, string
 // from. A playlist read whole that didn't say how many tracks it has
 // counts those it holds.
 func (p *Playlist) ReadOn(ctx context.Context, read PageFunc, onPage func(Playlist)) error {
+	return p.ReadOnCounting(ctx, counted(read), onPage)
+}
+
+// ReadOnCounting is ReadOn with a read that tells what each page left
+// out: p's Unplayable adds up the pages read.
+func (p *Playlist) ReadOnCounting(ctx context.Context, read CountedPageFunc, onPage func(Playlist)) error {
 	// The tracks p holds may be shared with whoever gave it, and with
 	// what onPage was given: the pages go after them, never into their
 	// room.
 	p.Tracks = slices.Clip(p.Tracks)
 	p.bound()
 	for empty := 0; p.More != ""; {
-		tracks, next, err := ReadPage(ctx, read, p.More)
+		tracks, next, left, err := readCounted(ctx, read, p.More)
 		if err != nil {
 			return err
 		}
+		p.Unplayable = p.Unplayable.Add(left)
 		if len(tracks) == 0 {
 			empty++
 		} else {

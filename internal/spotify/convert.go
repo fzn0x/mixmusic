@@ -233,17 +233,30 @@ func toPlaylist(p *playlist, userID string) media.Playlist {
 	}
 	if e := p.entries(); e != nil {
 		out.TrackCount = e.Total
-		out.Tracks = playlistTracks(e.Items)
+		out.Tracks, out.Unplayable = playlistTracks(e.Items)
 	}
 	return out
 }
 
-func playlistTracks(items []playlistItem) []media.Track {
+// playlistTracks converts the items of a page of a playlist, and counts
+// those it leaves out, by kind.
+func playlistTracks(items []playlistItem) ([]media.Track, media.Unplayable) {
 	out := []media.Track{}
+	var left media.Unplayable
 	for _, it := range items {
-		if mt, ok := toTrack(it.track(), nil); ok {
+		t := it.track()
+		if mt, ok := toTrack(t, nil); ok {
 			out = append(out, mt)
+			continue
+		}
+		switch {
+		case t != nil && t.IsLocal:
+			left.Local++
+		case t != nil && t.Type == "episode":
+			left.Episodes++
+		default:
+			left.Gone++
 		}
 	}
-	return out
+	return out, left
 }

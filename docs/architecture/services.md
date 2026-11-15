@@ -7,7 +7,11 @@
   `Playlist.ReadOn` reads on a page at a time, asks again after 1, 2 and
   4 seconds for a page that fails, and stops at `MaxTracks`, 20,000, past
   which the playlist is `Cut`. `Catalog.Playlist` reads one whole, for
-  what takes all of it, as a download or a plugin.
+  what takes all of it, as a download or a plugin. A service that leaves
+  items out of a page, as Spotify's local files, tells how many by kind
+  in `Playlist.Unplayable` (`ReadOnCounting` adds the pages up), and
+  `playlistgap.go` shows them under the header with the explicit songs
+  the settings hide, for a playlist of any service.
 - **`internal/youtube`** reads YouTube Music through the API its website uses:
   search, suggestions (searches, then songs, albums, artists and
   playlists), the home and explore pages, charts, moods and genres, albums,

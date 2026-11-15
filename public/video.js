@@ -13,6 +13,12 @@
 // shows, and fetches nothing while the sound is paused or the page isn't
 // shown.
 //
+// In its loop mode, the page plays the clip of an album's moving cover
+// (movingclip.go, in the root package): fetched whole from the proxy, as a
+// blob, it loops muted, cut to fill the square, follows no clock, and
+// pauses with the sound. A clip that shows no new frame for STALL seconds
+// while it plays has failed, which the Go side hears.
+//
 // Without a document, as in MixMusic's tests, it only defines mvLogic: the
 // parts of it that decide, which take no browser.
 (function (root) {
@@ -30,6 +36,8 @@
   const TRIES = 3;
   /** DRIFT_WINDOW is how many seconds of the drift drift() tells of. */
   const DRIFT_WINDOW = 5;
+  /** STALL is how many seconds a clip that loops may play without a new frame. */
+  const STALL = 5;
 
   /** covered tells whether ranges, [start, end] pairs in seconds, hold time t. */
   function covered(ranges, t) {
@@ -93,7 +101,16 @@
     return ranges.length > 0 && ranges[0][0] < before - 1 ? before : 0;
   }
 
-  const logic = { covered, nextPart, target, correction, stale, AHEAD, BEHIND, JUMP, NEAR };
+  /**
+   * stalled tells whether a clip that loops failed at now, in milliseconds:
+   * it played since frameAt, when its last frame showed or it started
+   * playing, for more than STALL seconds.
+   */
+  function stalled(frameAt, now) {
+    return frameAt > 0 && now - frameAt > STALL * 1000;
+  }
+
+  const logic = { covered, nextPart, target, correction, stale, stalled, AHEAD, BEHIND, JUMP, NEAR, STALL };
   if (typeof document === "undefined") {
     root.mvLogic = logic;
     return;
@@ -186,6 +203,10 @@
 
   /** load starts playing the picture desc tells of, in place of cur's. */
   function load(desc) {
+    if (desc.loop) {
+      loadLoop(desc);
+      return;
+    }
     unload();
     const ms = new MediaSource();
     const c = { desc, ms, sb: null, ready: false, fetching: null, failed: "", shown: false };
@@ -208,6 +229,37 @@
     })().catch((e) => fail(c, e));
   }
 
+  /**
+   * loadLoop starts looping the clip desc tells of, in place of cur's: the
+   * whole of it, fetched as a blob, which every web view plays.
+   */
+  function loadLoop(desc) {
+    unload();
+    const c = { desc, ms: null, sb: null, ready: false, fetching: null, failed: "", shown: false, loop: true, url: "", frameAt: 0 };
+    cur = c;
+    tries = new Map();
+    drifts = [];
+    video.loop = true;
+    video.playbackRate = 1;
+    video.style.objectFit = "cover";
+    (async () => {
+      c.fetching = new AbortController();
+      let blob;
+      try {
+        const res = await fetch(desc.src, { signal: c.fetching.signal });
+        if (!res.ok) throw new Error("MixMusic's proxy answered HTTP " + res.status);
+        blob = await res.blob();
+      } finally {
+        c.fetching = null;
+      }
+      if (cur !== c) return;
+      c.url = URL.createObjectURL(blob);
+      video.src = c.url;
+      c.ready = true;
+      hold();
+    })().catch((e) => fail(c, e));
+  }
+
   /** unload stops playing cur, and drops it. */
   function unload() {
     const c = cur;
@@ -217,6 +269,9 @@
     video.pause();
     video.removeAttribute("src");
     video.load();
+    if (c.url) URL.revokeObjectURL(c.url);
+    video.loop = false;
+    video.style.objectFit = "";
   }
 
   /** fail gives up the picture of c, telling the Go side why when it asks. */
@@ -291,6 +346,10 @@
   /** hold plays the picture, or pauses it at the sound's time, as clock says. */
   function hold() {
     if (!cur || !cur.ready) return;
+    if (cur.loop) {
+      holdLoop(cur);
+      return;
+    }
     if (!wanted()) {
       stop(cur);
       if (!video.paused) video.pause();
@@ -306,6 +365,29 @@
     if (video.paused) video.play().catch(() => {});
     pump(cur);
   }
+
+  /**
+   * holdLoop plays the clip of c while the Go side shows it and the sound
+   * plays, from when it was paused, and pauses it else: no clock to follow.
+   */
+  function holdLoop(c) {
+    if (!wanted()) {
+      c.frameAt = 0;
+      if (!video.paused) video.pause();
+      return;
+    }
+    if (c.frameAt === 0) c.frameAt = now();
+    if (video.paused) video.play().catch(() => {});
+  }
+
+  /** watchLoop fails a clip that shows no new frame while it plays. */
+  function watchLoop() {
+    const c = cur;
+    if (c && c.loop && c.ready && !c.failed && wanted() && stalled(c.frameAt, now())) {
+      fail(c, new Error("the clip showed no new frame for " + STALL + " seconds"));
+    }
+  }
+  setInterval(watchLoop, 1000);
 
   /**
    * adjust closes the gap d by which the picture runs ahead of the sound, at
@@ -330,6 +412,10 @@
     video.requestVideoFrameCallback(onFrame);
     if (!cur) return;
     cur.shown = true;
+    if (cur.loop) {
+      if (cur.frameAt > 0) cur.frameAt = now();
+      return;
+    }
     if (!wanted()) return;
     const t = target(clock, performance.timeOrigin + meta.expectedDisplayTime);
     adjust(meta.mediaTime - t, t);
@@ -338,16 +424,21 @@
   if ("requestVideoFrameCallback" in video) {
     video.requestVideoFrameCallback(onFrame);
   } else {
-    // Older WebKit: a few times a second, less closely.
+    // Older WebKit: a few times a second, less closely, and a clip that
+    // loops moves on.
     video.addEventListener("timeupdate", () => {
-      if (cur && wanted()) adjust(video.currentTime - target(clock, now()), target(clock, now()));
+      if (cur && cur.loop) {
+        if (cur.frameAt > 0) cur.frameAt = now();
+      } else if (cur && wanted()) {
+        adjust(video.currentTime - target(clock, now()), target(clock, now()));
+      }
     });
   }
   video.addEventListener("loadeddata", () => {
     if (cur) cur.shown = true;
   });
   video.addEventListener("timeupdate", () => {
-    if (cur && wanted()) pump(cur);
+    if (cur && !cur.loop && wanted()) pump(cur);
   });
   video.addEventListener("error", () => {
     if (cur && video.error) fail(cur, new Error(video.error.message || "the picture doesn't decode (" + video.error.code + ")"));
@@ -411,10 +502,10 @@
   }
 
   /**
-   * mv is what the Go side calls. load plays a picture, sync tells the
-   * sound's time, the rate it moves at and whether the picture shows ({at,
-   * sentAt, playing, active, filter, rate}), clear stops; each returns
-   * status().
+   * mv is what the Go side calls. load plays a picture, or loops a clip
+   * when its desc says loop, sync tells the sound's time, the rate it
+   * moves at and whether the picture shows ({at, sentAt, playing, active,
+   * filter, rate}), clear stops; each returns status().
    */
   root.mv = {
     codecs,

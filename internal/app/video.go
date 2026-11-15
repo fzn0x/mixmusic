@@ -39,6 +39,9 @@ type VideoSource struct {
 	// Segments are the parts of the stream the page appends whole: their
 	// time and duration in seconds, and their first and last bytes.
 	Segments [][4]float64 `json:"segments"`
+	// Loop is set on the clip of a moving cover, which the page fetches
+	// whole and loops, following no clock (movingcovers.go).
+	Loop bool `json:"loop,omitempty"`
 }
 
 // errNotMusicVideo is returned for the picture of a track that is no music

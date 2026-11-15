@@ -68,19 +68,6 @@ type ClipRendition struct {
 // ErrNoClip tells an album has no clip, or none plays here now.
 var ErrNoClip = errors.New("no moving cover")
 
-// CoverClip is the clip of a moving cover, for the page that loops it.
-type CoverClip struct {
-	// Src is where the page fetches it, whole: the stream scheme.
-	Src  string `json:"src"`
-	Mime string `json:"mime"`
-	// Width and Height are in pixels.
-	Width  int `json:"width"`
-	Height int `json:"height"`
-	// Loop tells the page to loop it, muted, rather than follow the
-	// engine's clock.
-	Loop bool `json:"loop"`
-}
-
 // CoverClipOptions are how MovingCover looks for a clip.
 type CoverClipOptions struct {
 	// Px is the width of the sleeve in pixels, which the rendition is
@@ -99,11 +86,11 @@ func (p *Player) HasClips() bool { return p.a.opts.Clips != nil }
 // kept, else the one its source gives, fetched whole and kept, unless
 // data saver is on, the connection is metered or the network is gone, as
 // only kept clips play then. ErrNoClip tells there is none.
-func (p *Player) MovingCover(ctx context.Context, t media.Track, o CoverClipOptions) (CoverClip, error) {
+func (p *Player) MovingCover(ctx context.Context, t media.Track, o CoverClipOptions) (VideoSource, error) {
 	a := p.a
 	key := clipKey(t)
 	if key == "" || a.opts.Clips == nil {
-		return CoverClip{}, ErrNoClip
+		return VideoSource{}, ErrNoClip
 	}
 	var tried []string
 	if o.Failed != "" {
@@ -114,32 +101,32 @@ func (p *Player) MovingCover(ctx context.Context, t media.Track, o CoverClipOpti
 	}
 	if m, ok := a.clips.Match(key); ok {
 		if m.Miss() {
-			return CoverClip{}, ErrNoClip
+			return VideoSource{}, ErrNoClip
 		}
 		a.clips.Played(key)
 		return coverClip(m), nil
 	}
 	if a.settings.Get().Quality == settings.QualitySaver || a.metered.Load() || a.online != nil && a.online.Offline() {
-		return CoverClip{}, ErrNoClip
+		return VideoSource{}, ErrNoClip
 	}
 	rs, err := a.opts.Clips.Clips(ctx, clipQuery(t))
 	switch {
 	case errors.Is(err, ErrNoClip):
 		a.clips.Miss(key)
-		return CoverClip{}, ErrNoClip
+		return VideoSource{}, ErrNoClip
 	case err != nil:
-		return CoverClip{}, err
+		return VideoSource{}, err
 	}
 	r, ok := pickRendition(rs, o.Px, tried)
 	if !ok {
 		if len(tried) == 0 {
 			a.clips.Miss(key)
 		}
-		return CoverClip{}, ErrNoClip
+		return VideoSource{}, ErrNoClip
 	}
 	m, err := a.fetchClip(ctx, key, r)
 	if err != nil {
-		return CoverClip{}, err
+		return VideoSource{}, err
 	}
 	return coverClip(m), nil
 }
@@ -179,9 +166,10 @@ func (a *App) fetchClip(ctx context.Context, key string, r ClipRendition) (clips
 	return a.clips.Keep(key, clips.Match{Mime: mime, Width: r.Width, Height: r.Height, Source: r.URL}, res.Body)
 }
 
-// coverClip is the clip of m, for the page.
-func coverClip(m clips.Match) CoverClip {
-	return CoverClip{Src: schemeURL(streamScheme) + strings.TrimPrefix(clipPath, "/") + m.File, Mime: m.Mime,
+// coverClip is the clip of m, for the page of the picture to loop: it
+// fetches it whole from the stream scheme.
+func coverClip(m clips.Match) VideoSource {
+	return VideoSource{Src: schemeURL(streamScheme) + strings.TrimPrefix(clipPath, "/") + m.File, MimeType: m.Mime,
 		Width: m.Width, Height: m.Height, Loop: true}
 }
 

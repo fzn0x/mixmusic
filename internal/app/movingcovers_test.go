@@ -137,13 +137,13 @@ func TestMovingCover(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !clip.Loop || clip.Mime != "video/mp4" || clip.Width != 720 || !strings.HasPrefix(clip.Src, schemeURL(streamScheme)+"moving-cover/") {
+	if !clip.Loop || clip.MimeType != "video/mp4" || clip.Width != 720 || !strings.HasPrefix(clip.Src, schemeURL(streamScheme)+"moving-cover/") {
 		t.Errorf("the clip is %+v", clip)
 	}
 	if q := src.asked[0]; q.Title != "Kites" || q.Album != "Paper" || q.Artists[0] != "Ada  Field" || q.Length.Seconds() != 211 {
 		t.Errorf("the source was asked %+v", q)
 	}
-	if again, err := p.MovingCover(context.Background(), clipTrack(), CoverClipOptions{Px: 600}); err != nil || again != clip || src.asks() != 1 {
+	if again, err := p.MovingCover(context.Background(), clipTrack(), CoverClipOptions{Px: 600}); err != nil || again.Src != clip.Src || src.asks() != 1 {
 		t.Errorf("again: %+v, %v, %d asks", again, err, src.asks())
 	}
 	if u := (&System{a}).MovingCoverUsage(); u.Clips != 1 || u.Bytes != int64(len("clip of /kites-720.mp4")) {

@@ -23,6 +23,13 @@
   the user picks too ([explicit.md](explicit.md)). A track whose label the app doesn't know is checked
   before it's announced, beside the search for its stream, and the next
   track before it's preloaded or crossfaded into.
+- **On a Spotify device** (`connect.go`), the player sends commands and
+  asks what the device plays, and waits for its reports, which lag the
+  commands, to settle. A track ends when the device stops on it, goes back
+  to its start, plays another track, or tells it plays on well past the
+  track's end: MixMusic's own device, given a track with nothing after it,
+  may stay on it once it ended, its position counting on (#373). The time
+  shown never passes the track's end.
 - **Lists that play while they're read** (`queue_list.go`, #543):
   `PlayList` plays the first part of a list as `PlayAll` does, and
   returns a `List`, whose `Add` adds each part after it as it comes: in
@@ -31,13 +38,6 @@
   the radio's (`scatter`). Once none of the list's entries is left in the
   queue, as when another queue replaced it, `Add` adds nothing and says
   so, which stops the reading.
-- **On a Spotify device** (`connect.go`), the player sends commands and
-  asks what the device plays, and waits for its reports, which lag the
-  commands, to settle. A track ends when the device stops on it, goes back
-  to its start, plays another track, or tells it plays on well past the
-  track's end: MixMusic's own device, given a track with nothing after it,
-  may stay on it once it ended, its position counting on (#373). The time
-  shown never passes the track's end.
 - **Crossfades** (`crossfadeTo`): the next track fades in on the
   engine's other deck, and the crossfade ends once the engine's did
   (`Stream.Fading`), which a next track whose audio is late, or a pause,

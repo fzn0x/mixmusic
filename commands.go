@@ -70,6 +70,7 @@ func (s *shell) commands() []command {
 		{"view.mini", "Mini player", "Mod+M", "view", s.showMini},
 		{"view.keepOnTop", "Keep the window on top, or not", "", "view", s.toggleOnTop},
 		{"view.video", "Show or hide the video of music videos", "", "view", s.toggleVideos},
+		{"view.movingCovers", "Show or hide moving covers", "", "view", s.toggleMovingCovers},
 		{"view.sidebar", "Collapse or expand the sidebar", "Mod+B", "view", s.toggleRail},
 		{"view.refresh", "Refresh this page", refreshKeys, "view", s.refreshPage},
 		{"view.zoomIn", "Zoom in", "Mod+=", "view", func() { s.zoomBy(1) }},

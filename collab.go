@@ -220,15 +220,20 @@ func collaboration(p media.Playlist) bool { return p.Collaborative && !p.Mine &&
 // playlists, that the user collaborates on, in the library of the service
 // of key, when there are any; more ends their tiles' menus, if set.
 func (s *shell) collaborationsShelf(c *ui.Context, key string, playlists []media.Playlist, more func(m *ui.Menu, p media.Playlist)) {
-	if !slices.ContainsFunc(playlists, collaboration) {
+	var ours []int
+	for i, p := range playlists {
+		if collaboration(p) {
+			ours = append(ours, i)
+		}
+	}
+	if len(ours) == 0 {
 		return
 	}
 	s.shelf(c, key+"-collaborations", "Playlists you collaborate on", func() {
-		for i, p := range playlists {
-			if collaboration(p) {
-				s.playlistTileWith(c, key+"-playlist-"+count(i), p, more)
-			}
-		}
+		s.nearShelfTiles(c, key+"-collaborations", len(ours), func(j int) {
+			i := ours[j]
+			s.playlistTileWith(c, key+"-playlist-"+count(i), playlists[i], more)
+		})
 	})
 }
 

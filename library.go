@@ -248,25 +248,36 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 		more = s.youtubeLibraryItems
 	}
 	// The playlists of others the user collaborates on have a shelf of
-	// their own.
-	if slices.ContainsFunc(playlists.value, func(p media.Playlist) bool { return !collaboration(p) }) || links != nil {
+	// their own. Each shelf builds the tiles near the view alone, for a
+	// library of hundreds.
+	var own []int
+	for i, p := range playlists.value {
+		if !collaboration(p) {
+			own = append(own, i)
+		}
+	}
+	if len(own) > 0 || links != nil {
 		s.shelfWith(c, key+"-playlists", "Playlists", links, func() {
-			for i, p := range playlists.value {
-				if !collaboration(p) {
-					s.playlistTileWith(c, key+"-playlist-"+count(i), p, more)
-				}
-			}
+			s.nearShelfTiles(c, key+"-playlists", len(own), func(j int) {
+				i := own[j]
+				s.playlistTileWith(c, key+"-playlist-"+count(i), playlists.value[i], more)
+			})
 		})
 	}
 	s.collaborationsShelf(c, key, playlists.value, more)
 	if len(albums.value) > 0 {
-		s.shelf(c, key+"-albums", "Albums", func() { s.albumTiles(c, key+"-album", albums.value) })
+		s.shelf(c, key+"-albums", "Albums", func() {
+			groups := s.albumGroups(key+"-album", albums.value)
+			s.nearShelfTiles(c, key+"-albums", len(groups), func(i int) {
+				s.albumTile(c, key+"-album-"+count(i), s.preferredVersion(groups[i]))
+			})
+		})
 	}
 	if len(artists.value) > 0 {
 		s.shelf(c, key+"-artists", "Artists you follow", func() {
-			for i, a := range artists.value {
-				s.artistTile(c, key+"-artist-"+count(i), a)
-			}
+			s.nearShelfTiles(c, key+"-artists", len(artists.value), func(i int) {
+				s.artistTile(c, key+"-artist-"+count(i), artists.value[i])
+			})
 		})
 	}
 	liked(c)

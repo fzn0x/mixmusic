@@ -493,3 +493,20 @@ func (s *shell) nearTiles(c *ui.Context, key string, n int) (from, to int) {
 	to = min(max(int(math.Ceil(float64((x+2*w)/step))), from), n)
 	return from, to
 }
+
+// nearShelfTiles builds, of the n art tiles of the shelf keyed key, those
+// near the view (nearTiles) with tile, which is given each one's place:
+// those far to either side take their room, and build nothing.
+func (s *shell) nearShelfTiles(c *ui.Context, key string, n int, tile func(i int)) {
+	from, to := s.nearTiles(c, key, n)
+	step := s.lk.tileWidth() + s.lk.gap
+	if from > 0 {
+		ui.Box(c).Width(float32(from)*step - s.lk.gap).Shrink(0)
+	}
+	for i := from; i < to; i++ {
+		tile(i)
+	}
+	if to < n {
+		ui.Box(c).Width(float32(n-to)*step - s.lk.gap).Shrink(0)
+	}
+}

@@ -195,14 +195,17 @@ type Artist struct {
 // Playlist is a list of tracks curated by someone. Lists of playlists
 // leave Tracks empty.
 type Playlist struct {
-	ID          string  `json:"id"`
-	Source      Source  `json:"source"`
-	Title       string  `json:"title"`
-	Description string  `json:"description,omitempty"`
-	Owner       string  `json:"owner,omitempty"`
-	Artwork     []Image `json:"artwork"`
-	TrackCount  int     `json:"trackCount,omitempty"`
-	Tracks      []Track `json:"tracks"`
+	ID          string `json:"id"`
+	Source      Source `json:"source"`
+	Title       string `json:"title"`
+	Description string `json:"description,omitempty"`
+	Owner       string `json:"owner,omitempty"`
+	// Views is how many times the playlist was viewed, as YouTube Music
+	// says in a search result. 0 is unknown.
+	Views      int64   `json:"views,omitempty"`
+	Artwork    []Image `json:"artwork"`
+	TrackCount int     `json:"trackCount,omitempty"`
+	Tracks     []Track `json:"tracks"`
 	// Editable is set for playlists the user may change.
 	Editable bool   `json:"editable,omitempty"`
 	URL      string `json:"url,omitempty"`

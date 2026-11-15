@@ -215,6 +215,8 @@ type shell struct {
 	artistPivot int
 	artistOf    string
 	searchScope int
+	// searchSort is the order chosen for the search results (searchsort.go).
+	searchSort  searchSorting
 	libraryTab  int
 	settingsTab int
 	statsRange  int

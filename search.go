@@ -76,11 +76,18 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 			pivots, pivotSel = nil, nil
 		}
 		s.pageHeaderCounts(c, q, pivots, counts, pivotSel)
-		ui.Row(c).Margin(0, 0, 24).Children(func() {
+		// YouTube's own search lists videos, so it orders them as the Videos pivot does.
+		sortPivot := searchPivots[s.searchPivot]
+		if s.searchScope == youtubeScope {
+			sortPivot = "videos"
+		}
+		order := sortBestMatch
+		ui.Row(c).Margin(0, 0, 24).Wrap().GapX(16).GapY(12).AlignItems(ui.Center).Children(func() {
 			s.segmented(c, "scope", "Services", &s.searchScope, searchScopes...)
+			order = s.sortSelect(c, q, sortPivot, s.searchScope)
 		})
 		if s.searchScope == youtubeScope {
-			s.youtubeResults(c, q)
+			s.youtubeResults(c, q, order)
 			return
 		}
 		if s.searchScope == 0 {
@@ -105,6 +112,12 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 			ui.Text(c, strings.Join(res.value.Errors, " · ")).FontSize(k.smallSize()).TextColor(k.danger).Margin(0, 0, 16)
 		}
 		r := s.shownResults(mergeResults(res.value, s.searchScope))
+		if order == sortMostPlayed {
+			r = playedResults(res.value, s.searchScope, s.shownResults)
+			if s.searchScope == 0 && res.value.SpotifySignedIn {
+				s.sortNote(c)
+			}
+		}
 		pivot := searchPivots[s.searchPivot]
 		if pivot == "all" || pivot == "songs" {
 			tracks := r.Tracks
@@ -153,7 +166,13 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 				})
 			}
 		case "albums":
-			s.tileWrap(c, func() { s.albumTiles(c, "album", r.Albums) })
+			s.tileWrap(c, func() {
+				if s.searchSort.albums == sortNewest {
+					s.newestAlbumTiles(c, "album", r.Albums)
+					return
+				}
+				s.albumTiles(c, "album", r.Albums)
+			})
 		case "artists":
 			s.tileWrap(c, func() {
 				for i, a := range r.Artists {
@@ -181,7 +200,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 // youtubeResults shows what YouTube's own search found: videos only, in
 // the order it ranks them. It is asked apart from the music catalog's
 // search, so that a slow or blocked youtube.com never holds that one up.
-func (s *shell) youtubeResults(c *ui.Context, q string) {
+func (s *shell) youtubeResults(c *ui.Context, q, order string) {
 	res := fetch(s, "searchweb:"+q, func(ctx context.Context) (media.SearchResults, error) {
 		return s.svc.Catalog.SearchYouTube(ctx, q)
 	})
@@ -194,6 +213,9 @@ func (s *shell) youtubeResults(c *ui.Context, q string) {
 		return
 	}
 	videos := s.shownResults(res.value).Videos
+	if order == sortMostPlayed {
+		videos = sortTracks(videos)
+	}
 	ui.Column(c).Margin(0, 0, 48).Children(func() {
 		s.trackList(c, "youtube-results", videos, trackListOptions{art: true, plays: true, empty: "No videos match."})
 	})

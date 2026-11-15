@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"slices"
 
 	"github.com/egoist/mygo/ui"
@@ -63,7 +64,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 			ui.Row(c).Gap(12).Padding(16, 0).Children(func() {
 				band := func(key, label string, v *float64) {
 					ui.Column(c).Gap(6).AlignItems(ui.Center).Children(func() {
-						ui.Text(c, fmt.Sprintf("%+.0f", *v)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
+						ui.Text(c, eqGainLabel(*v)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
 						if s.bandSlider(c, key, label+" dB", v, -12, 12).Changed() {
 							if key != "eq-preamp" {
 								eq.Preset = "custom"
@@ -102,6 +103,18 @@ const spotifyEqualizerNote = "The equalizer works only on YouTube Music, which M
 // spotifyEqualizer is Spotify's page on its equalizer, which says that its
 // audio settings can't change while Spotify Connect plays on another device.
 const spotifyEqualizer = "https://support.spotify.com/us/article/equalizer/"
+
+// eqGainLabel is the number above a band: its gain in dB with a sign, whole
+// as +2 and with one decimal for a half step, as +1.5.
+func eqGainLabel(v float64) string {
+	if v == 0 {
+		return "+0"
+	}
+	if v == math.Trunc(v) {
+		return fmt.Sprintf("%+.0f", v)
+	}
+	return fmt.Sprintf("%+.1f", v)
+}
 
 // bandSlider is the slider of an equalizer's band, which goes up from lo at
 // its foot to hi at its head, by half a decibel. SliderBase draws nothing

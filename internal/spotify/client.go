@@ -14,6 +14,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/fzn0x/mixmusic/internal/media"
 )
 
 const apiURL = "https://api.spotify.com/v1"
@@ -21,6 +23,10 @@ const apiURL = "https://api.spotify.com/v1"
 // maxRetryAfter is the longest Retry-After the client waits for once;
 // longer waits fail with the rate limit error.
 const maxRetryAfter = 5 * time.Second
+
+// retryAfterShorter divides the waits Retry-After asks for; tests set it
+// above 1 to not wait for seconds.
+var retryAfterShorter time.Duration = 1
 
 // ErrNotSignedIn is returned by calls made before the user signed in.
 var ErrNotSignedIn = errors.New("spotify: not signed in")
@@ -41,6 +47,9 @@ type APIError struct {
 	// Reason is set for some errors, such as PREMIUM_REQUIRED or
 	// QUOTA_EXCEEDED.
 	Reason string
+	// RetryAfter is the wait Spotify asked for with a 429, 0 if it
+	// didn't say.
+	RetryAfter time.Duration
 }
 
 func (e *APIError) Error() string {
@@ -197,6 +206,7 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 		u += "?" + query.Encode()
 	}
 	refreshed, waited := false, false
+	var retryAfter time.Duration
 	for {
 		token, err := c.accessToken(ctx, false)
 		if err != nil {
@@ -233,17 +243,32 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 		case res.StatusCode == http.StatusTooManyRequests && !waited:
 			waited = true
 			wait, _ := strconv.Atoi(res.Header.Get("Retry-After"))
-			if d := time.Duration(wait) * time.Second; d <= maxRetryAfter {
+			retryAfter = time.Duration(wait) * time.Second
+			if retryAfter <= maxRetryAfter {
 				select {
-				case <-time.After(max(d, 500*time.Millisecond)):
+				case <-time.After(max(retryAfter/retryAfterShorter, 500*time.Millisecond/retryAfterShorter)):
 					continue
 				case <-ctx.Done():
 					return ctx.Err()
 				}
 			}
+			// A read in the background waits as long as Spotify asks,
+			// within a limit, once for each page.
+			if ok, err := media.PageWait(ctx, retryAfter, retryAfter/retryAfterShorter); err != nil {
+				return err
+			} else if ok {
+				continue
+			}
+		case res.StatusCode == http.StatusTooManyRequests:
+			wait, _ := strconv.Atoi(res.Header.Get("Retry-After"))
+			retryAfter = time.Duration(wait) * time.Second
 		}
 		if res.StatusCode >= 300 {
-			return apiError(res.StatusCode, data)
+			err := apiError(res.StatusCode, data)
+			if e, ok := err.(*APIError); ok {
+				e.RetryAfter = retryAfter
+			}
+			return err
 		}
 		if out == nil || len(bytes.TrimSpace(data)) == 0 {
 			return nil

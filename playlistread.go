@@ -37,6 +37,9 @@ type playlistRead struct {
 	// comes, and err tells why the reading stopped before the end.
 	p       media.Playlist
 	reading bool
+	// waiting is set while the service asked for a wait, which the read
+	// keeps.
+	waiting bool
 	err     error
 	// length is how long the tracks last, summed once they're all read.
 	length time.Duration
@@ -79,8 +82,19 @@ func (s *shell) readOn(key string, of *loaded[media.Playlist]) *playlistRead {
 // that the loads no longer keep, after another account signed in, stops.
 func (s *shell) readRest(r *playlistRead) {
 	ctx, cancel := context.WithCancel(context.Background())
-	r.reading, r.err, r.cancel = true, nil, cancel
+	r.reading, r.waiting, r.err, r.cancel = true, false, nil, cancel
 	from := r.p
+	// The read waits as long as the service asks, within a limit, and
+	// stops waiting once the loads no longer keep it.
+	ctx = media.WithPageWait(ctx, func(left time.Duration) {
+		s.update(func() {
+			if s.loads[r.key] != r {
+				cancel()
+				return
+			}
+			r.waiting = left > 0
+		})
+	})
 	go func() {
 		defer cancel()
 		p, err := readPlaylistOn(s, ctx, from, func(p media.Playlist) {
@@ -104,7 +118,7 @@ func (s *shell) readRest(r *playlistRead) {
 // it stopped short, if it did. What the user asked to play meanwhile plays
 // what was read.
 func (s *shell) readDone(r *playlistRead, p media.Playlist, err error) {
-	r.p, r.err, r.reading, r.cancel = p, err, false, nil
+	r.p, r.err, r.reading, r.waiting, r.cancel = p, err, false, false, nil
 	if err == nil {
 		r.length = total(p.Tracks)
 	}
@@ -137,6 +151,9 @@ func (s *shell) readLine(c *ui.Context, r *playlistRead, noun string) {
 	switch {
 	case r.reading:
 		text := "Loading tracks · " + thousands(n)
+		if r.waiting {
+			text = "Spotify asked MixMusic to wait · " + thousands(n)
+		}
 		if count > n {
 			text += " of " + thousands(count)
 		}

@@ -90,6 +90,11 @@
   with `DELETE /playlists/{id}/followers`. Spotify lists that route as
   removed in February 2026, with `DELETE /me/library` in its place; it
   still answered for that app's Client ID, made before then.
+  A 429 waits for its Retry-After once, if it is 5 seconds or less. A
+  background read of a long list (`media.WithPageWait`, as the playlist
+  page does) waits up to `media.MaxPageWait`, 60 seconds, once for each
+  page, tells the time left, and stops with its context. `APIError.RetryAfter`
+  keeps what Spotify asked. A 403 in plain text is a refusal, never a wait.
 - **`internal/sysproxy`** picks the proxy of every request MixMusic makes,
   as the `Proxy` of `http.DefaultTransport`, which the clients use or
   clone: the environment's (`HTTPS_PROXY` and the like) when it names

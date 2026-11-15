@@ -112,3 +112,46 @@ func TestLRCLIB503StillAsksGetCached(t *testing.T) {
 		t.Fatal("a 503 held LRCLIB off")
 	}
 }
+
+func TestOtherSources429HoldOff(t *testing.T) {
+	q := Query{Title: "a", Artist: "b", Album: "c", Duration: 3 * time.Minute}
+	now := time.Date(2026, 11, 15, 12, 0, 0, 0, time.UTC)
+	t.Run("Better Lyrics", func(t *testing.T) {
+		srv, asked := countingServer(t, http.StatusTooManyRequests, "30")
+		b := NewBetterLyrics("test")
+		b.BaseURL = srv.URL
+		b.wait.now = func() time.Time { return now }
+		for range 2 {
+			if _, err := b.Get(context.Background(), q); !errors.Is(err, ErrUnavailable) {
+				t.Fatalf("Get = %v, want ErrUnavailable", err)
+			}
+		}
+		if got := asked(); len(got) != 1 {
+			t.Fatalf("asked %v, want one request", got)
+		}
+		now = now.Add(time.Minute)
+		b.Get(context.Background(), q)
+		if got := asked(); len(got) != 2 {
+			t.Fatalf("asked %v after the wait, want a second request", got)
+		}
+	})
+	t.Run("Unison", func(t *testing.T) {
+		srv, asked := countingServer(t, http.StatusTooManyRequests, "30")
+		u := NewUnison("test")
+		u.BaseURL = srv.URL
+		u.wait.now = func() time.Time { return now }
+		for range 2 {
+			if _, err := u.Get(context.Background(), q); !errors.Is(err, ErrUnavailable) {
+				t.Fatalf("Get = %v, want ErrUnavailable", err)
+			}
+		}
+		if got := asked(); len(got) != 1 {
+			t.Fatalf("asked %v, want one request", got)
+		}
+		now = now.Add(time.Minute)
+		u.Get(context.Background(), q)
+		if got := asked(); len(got) != 2 {
+			t.Fatalf("asked %v after the wait, want a second request", got)
+		}
+	})
+}

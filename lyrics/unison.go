@@ -3,6 +3,7 @@ package lyrics
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -29,6 +30,9 @@ type Unison struct {
 	HTTP      *http.Client
 	BaseURL   string
 	UserAgent string
+
+	// wait is the time it may be asked again, after it answered 429.
+	wait holdoff
 }
 
 // NewUnison returns a client of Unison introducing itself as userAgent.
@@ -85,6 +89,9 @@ func (u *Unison) Get(ctx context.Context, t Query) (Lyrics, error) {
 		// Unison looks songs up by title and artist together.
 		return Lyrics{}, ErrNotFound
 	}
+	if u.wait.active() {
+		return Lyrics{}, unisonDown{errors.New("HTTP 429, asking too fast")}
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.BaseURL+"/lyrics?"+q.Encode(), nil)
 	if err != nil {
 		return Lyrics{}, err
@@ -95,6 +102,9 @@ func (u *Unison) Get(ctx context.Context, t Query) (Lyrics, error) {
 		return Lyrics{}, unisonDown{err}
 	}
 	defer res.Body.Close()
+	if res.StatusCode == http.StatusTooManyRequests {
+		u.wait.set(res.Header.Get("Retry-After"))
+	}
 	var ans unisonAnswer
 	decodeErr := json.NewDecoder(res.Body).Decode(&ans)
 	switch {

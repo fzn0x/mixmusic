@@ -40,6 +40,28 @@ func (s *shell) songInLibrary(id string) bool {
 	return l.done && slices.ContainsFunc(l.value, func(t media.Track) bool { return t.ID == id })
 }
 
+// askSavedOnYouTube asks YouTube Music whether a song is in the user's
+// library there; tests answer for YouTube.
+var askSavedOnYouTube = func(s *shell, ctx context.Context, t media.Track) (bool, error) {
+	return s.svc.Collection.SongSaved(ctx, t)
+}
+
+// songSavedKey is the load of whether YouTube Music tells of a song, by
+// its ID, that it is in the user's library.
+func songSavedKey(id string) string { return "youtube:saved:" + id }
+
+// savedApart reports whether YouTube Music tells of a song that it is in
+// the user's library, while the songs fetched may lack it: as they come,
+// or of a list that came in part, or not at all. It asks once, as the
+// song's menu opens; until the answer comes, the song isn't.
+func (s *shell) savedApart(t media.Track) bool {
+	if l := s.youtubeSongs(); l.done && l.err == nil {
+		return false
+	}
+	l := fetch(s, songSavedKey(t.ID), func(ctx context.Context) (bool, error) { return askSavedOnYouTube(s, ctx, t) })
+	return l.done && l.err == nil && l.value
+}
+
 // librarySongItem is the item of a YouTube Music song's menu that saves it
 // to the user's library there, without liking it, or takes it out, for a
 // user signed in. It waits while a change of the song goes.
@@ -47,7 +69,7 @@ func (s *shell) librarySongItem(m *ui.Menu, t media.Track) {
 	if t.Source != media.SourceYouTube || t.IsEpisode() || !s.signedIn(media.SourceYouTube) {
 		return
 	}
-	saved := s.songInLibrary(t.ID)
+	saved := s.songInLibrary(t.ID) || s.savedApart(t)
 	label := "Add to library"
 	if saved {
 		label = "Remove from library"
@@ -87,6 +109,10 @@ func (s *shell) saveSong(t media.Track, on bool) {
 // listSong puts a song first among those fetched of the user's library,
 // or takes it out of them. Songs still on their way are asked for again.
 func (s *shell) listSong(t media.Track, on bool) {
+	// What YouTube Music told of the song apart from them follows too.
+	if _, asked := s.loads[songSavedKey(t.ID)]; asked {
+		s.loads[songSavedKey(t.ID)] = &loaded[bool]{value: on, done: true}
+	}
 	l, ok := s.loads[youtubeSongsKey].(*loaded[[]media.Track])
 	switch {
 	case !ok:

@@ -1,0 +1,34 @@
+{
+  "id": "dracula",
+  "name": "Dracula",
+  "version": "1.0.0",
+  "author": "abuamar142",
+  "description": "The classic Dracula palette: violet accent, pink and cyan tiles on a deep charcoal ground.",
+  "scheme": "dark",
+  "colors": {
+    "bg": "#282a36",
+    "surface": "#21222c",
+    "surface-2": "#343746",
+    "surface-3": "#44475a",
+    "border": "rgba(248, 248, 242, 0.16)",
+    "text": "#f8f8f2",
+    "text-muted": "#9aa5cc",
+    "accent": "#bd93f9",
+    "accent-text": "#282a36",
+    "danger": "#ff5555",
+    "success": "#50fa7b",
+    "youtube": "#ff5555",
+    "spotify": "#1ed760",
+    "tile-1": "#bd93f9",
+    "tile-2": "#ff79c6",
+    "tile-3": "#8be9fd",
+    "tile-4": "#50fa7b",
+    "tile-text": "#282a36"
+  },
+  "fonts": {
+    "body": "Selawik, 'Segoe UI', 'Noto Sans', system-ui, sans-serif",
+    "display": "Selawik, 'Segoe UI', 'Noto Sans', system-ui, sans-serif"
+  },
+  "radius": "8px",
+  "files": ["theme.json"]
+}

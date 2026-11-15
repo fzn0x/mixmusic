@@ -44,7 +44,8 @@ enabling it.
 ## The module
 
 The module's default export is called with the API when the user enables
-the plugin, and may return a function MixMusic calls when it stops it:
+the plugin, and may return a function MixMusic calls when it stops it: when
+the user turns it off, updates or removes it, and as MixMusic quits:
 
 ```ts
 import type { MixMusicAPI } from "./sdk"; // sdk/index.d.ts, copied beside it
@@ -71,6 +72,15 @@ export default function activate(api: MixMusicAPI) {
 Everything a plugin adds through the API (pages, sidebar items, commands,
 track actions, widgets and listeners) is removed for it when it stops, and
 its timers stop: return a function only for what else you started.
+
+Make that function quick, and have it do its work at once. MixMusic waits
+3 seconds for it, then interrupts it; as it quits, it waits 3 seconds for
+all the plugins together, then ends. What the function keeps with
+`api.storage` is saved, even as MixMusic quits, but nothing else it starts
+that takes time finishes: the plugin has stopped, so the promises the API
+gives never settle and an `await` goes no further, its requests (`fetch`,
+`api.catalog`) are cancelled, and its timers never fire. To keep several
+values, call `api.storage.set` for each without awaiting it.
 
 A plugin runs in a JavaScript engine of MixMusic's own, not in a browser:
 the language is all there, with `async` functions, classes and the rest, as

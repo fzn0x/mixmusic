@@ -4,7 +4,8 @@
 //
 // A plugin's module exports a default function that MixMusic calls with the
 // API when the user enables the plugin. It may return a function, which
-// MixMusic calls when the plugin is disabled, updated or removed:
+// MixMusic calls when the plugin is disabled, updated or removed, and as
+// MixMusic quits:
 //
 //   import type { MixMusicAPI } from "./sdk";
 //

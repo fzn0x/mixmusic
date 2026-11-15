@@ -12,7 +12,10 @@
   JavaScript runtime of its own, [sobek](https://github.com/grafana/sobek)
   (a fork of goja with ES modules), on a goroutine of its own: their
   modules, `console`, timers and `fetch`, and the API of
-  [plugins.md](../plugins.md), built in `api.js` over Go natives. What they add
+  [plugins.md](../plugins.md), built in `api.js` over Go natives. The host
+  stops them as MixMusic quits, with what the app saves then (`pluginui.go`
+  hands `Host.Close` to `App.OnFlush`), and waits for their stop functions
+  and what they keep in storage, 3 seconds at most. What they add
   to the interface the windows show: pages and widgets as views of
   elements, which the windows draw in their own styles, and canvases, whose
   drawing calls the plugin records and the window paints.

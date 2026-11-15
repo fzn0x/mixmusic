@@ -64,13 +64,17 @@ func (c *Client) Color(ctx context.Context, rawURL string) (string, error) {
 	return Hex(Pick(img)), nil
 }
 
+// minShare is the share of a cover a hue needs to set the accent.
+const minShare = 0.01
+
 // Pick returns the color that best represents an image as an accent: the
-// most common vivid hue, weighted by how vivid it is, or the image's
-// average when nothing in it is vivid.
+// most vivid hue among those that cover over 1% of the image, or the
+// image's average when none does.
 func Pick(img image.Image) color.RGBA {
 	const buckets = 36 // hues of 10 degrees
 	var (
 		weight  [buckets]float64
+		samples [buckets]float64 // vivid samples per hue
 		r, g, b [buckets]float64
 		avg     [3]float64
 		count   float64
@@ -85,18 +89,25 @@ func Pick(img image.Image) color.RGBA {
 			avg[0], avg[1], avg[2] = avg[0]+fr, avg[1]+fg, avg[2]+fb
 			count++
 			h, s, v := hsv(fr, fg, fb)
-			if s < 0.25 || v < 0.2 || v > 0.98 {
+			if s < 0.25 || v < 0.2 || (v > 0.98 && s < 0.4) {
 				continue // greys, near blacks and near whites make no accent
 			}
 			i := int(h/10) % buckets
 			w := s * s * v
 			weight[i] += w
+			samples[i]++
 			r[i], g[i], b[i] = r[i]+fr*w, g[i]+fg*w, b[i]+fb*w
 		}
 	}
-	// Smooth over neighbouring hues, so one hue split in two still wins.
+	// Smooth over neighbouring hues, so one hue split in two still wins. A
+	// hue counts only when it and its two neighbours, a window of 30
+	// degrees, hold over 1% of all samples, greys included: a small mark on
+	// a black or grey cover sets no accent.
 	best, bestWeight := -1, 0.0
 	for i := range buckets {
+		if samples[i]+samples[(i+buckets-1)%buckets]+samples[(i+1)%buckets] <= count*minShare {
+			continue
+		}
 		w := weight[i] + 0.5*(weight[(i+buckets-1)%buckets]+weight[(i+1)%buckets])
 		if w > bestWeight {
 			best, bestWeight = i, w

@@ -101,7 +101,10 @@ Two rows of Settings › Appearance › Colour and type set the accent, the
 colour of what is chosen, of links and of the progress bars:
 
 - **Follow the artwork**, on by default, takes the accent from the cover of
-  what plays, and changes it with each track.
+  what plays, and changes it with each track. The most vivid colour that
+  covers more than 1% of the cover sets it, pure colours included. A cover
+  without one, black or grey with a small mark, gives its own average,
+  a readable grey.
 - **Accent colour** is a colour of your own, which replaces the theme's when
   the artwork doesn't set it: while nothing plays, or with Follow the
   artwork off. "use the theme's" beside it puts the theme's back.

@@ -138,6 +138,11 @@ quality.
 Of a video's audio, MixMusic picks:
 
 - **The original audio track**, before a dub, and audio descriptions last.
+  On the player API route MixMusic ranks the tracks itself. Of what
+  yt-dlp finds, it asks for the track yt-dlp marks with a language
+  preference of 10, then YouTube's default of 5, then any: yt-dlp sorts
+  by quality before language, so data saver's smallest Opus would be a
+  dub's. The 5.1 mix is of the original track the same way.
 - **Stereo or mono.** A 5.1 surround format is never picked as a track's
   stereo stream, though it is the best of them; it comes beside it.
 - **The original dynamics.** YouTube also serves a few videos in a

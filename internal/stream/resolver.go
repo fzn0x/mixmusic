@@ -50,12 +50,29 @@ const (
 // one the engine plays comes beside the stereo one, as the Stream's
 // Surround, from the formats yt-dlp lists.
 var formats = map[Quality]string{
-	QualityBest: "bestaudio[acodec=opus][audio_channels<=?2][format_id!*=drc]/bestaudio[acodec=opus][audio_channels<=?2]/" +
-		"bestaudio[acodec=mp4a.40.2][audio_channels<=?2][format_id!*=drc]/bestaudio[acodec=mp4a.40.2][audio_channels<=?2]/" +
-		"234/233/bestaudio",
-	QualitySaver: "worstaudio[acodec=opus][audio_channels<=?2][format_id!*=drc]/worstaudio[acodec=opus][audio_channels<=?2]/" +
-		"worstaudio[acodec=mp4a.40.2][audio_channels<=?2][format_id!*=drc]/worstaudio[acodec=mp4a.40.2][audio_channels<=?2]/" +
-		"233/234/worstaudio",
+	QualityBest:  trackTiers("bestaudio") + "234/233/bestaudio",
+	QualitySaver: trackTiers("worstaudio") + "233/234/worstaudio",
+}
+
+// trackTiers returns the selectors of one choice of which (bestaudio or
+// worstaudio) for each audio track rank, with the stereo codecs in the
+// order formats tells: the original track's (yt-dlp's language preference
+// of 10), then YouTube's default (5), then any track: yt-dlp's filters
+// take no negative number, so a dub (-1) and an audio description (-10)
+// share the last tier, which also takes a video of one track, with no
+// language preference. yt-dlp sorts by quality before language, and a
+// smaller Opus is the same in every track, so without the tiers data saver
+// took the track yt-dlp ranks lowest: a dub, or an audio description. Each
+// selector ends in a "/".
+func trackTiers(which string) string {
+	var b strings.Builder
+	for _, track := range []string{"[language_preference>=10]", "[language_preference>=5]", ""} {
+		for _, codec := range []string{"opus", "mp4a.40.2"} {
+			plain := which + "[acodec=" + codec + "][audio_channels<=?2]" + track
+			b.WriteString(plain + "[format_id!*=drc]/" + plain + "/")
+		}
+	}
+	return b.String()
 }
 
 // liveFormats are the itags of the audio of a live video, in the order
@@ -592,18 +609,22 @@ type info struct {
 
 // ytFormat is what yt-dlp prints of a format.
 type ytFormat struct {
-	FormatID       string            `json:"format_id"`
-	URL            string            `json:"url"`
-	Ext            string            `json:"ext"`
-	Protocol       string            `json:"protocol"`
-	ACodec         string            `json:"acodec"`
-	VCodec         string            `json:"vcodec"`
-	ABR            float64           `json:"abr"`
-	AudioChannels  int               `json:"audio_channels"`
-	Filesize       int64             `json:"filesize"`
-	FilesizeApprox int64             `json:"filesize_approx"`
-	Headers        map[string]string `json:"http_headers"`
-	AvailableAt    float64           `json:"available_at"` // Unix seconds
+	FormatID      string  `json:"format_id"`
+	URL           string  `json:"url"`
+	Ext           string  `json:"ext"`
+	Protocol      string  `json:"protocol"`
+	ACodec        string  `json:"acodec"`
+	VCodec        string  `json:"vcodec"`
+	ABR           float64 `json:"abr"`
+	AudioChannels int     `json:"audio_channels"`
+	// LanguagePreference ranks the audio track: 10 for the original, 5 for
+	// YouTube's default, -1 for any other, -10 for an audio description;
+	// 0 when a video has one track and yt-dlp tells none.
+	LanguagePreference int               `json:"language_preference"`
+	Filesize           int64             `json:"filesize"`
+	FilesizeApprox     int64             `json:"filesize_approx"`
+	Headers            map[string]string `json:"http_headers"`
+	AvailableAt        float64           `json:"available_at"` // Unix seconds
 	// HasDRM is true, false or "maybe".
 	HasDRM any `json:"has_drm"`
 	// Width, Height, FPS and TBR are a video format's, which the now
@@ -634,6 +655,19 @@ func (f ytFormat) surround() bool {
 	return surroundRank(f.ACodec) > 0 && f.AudioChannels == 6 && (f.VCodec == "" || f.VCodec == "none") &&
 		(f.Ext == "m4a" || f.Ext == "mp4") && (f.Protocol == "" || f.Protocol == "https") &&
 		f.URL != "" && f.HasDRM != true && f.HasDRM != "maybe" && !strings.Contains(f.FormatID, "drc")
+}
+
+// betterSurround reports whether the surround format f is a better pick
+// than o: of a better audio track, then of a better codec, then of more
+// bits.
+func (f ytFormat) betterSurround(o ytFormat) bool {
+	switch {
+	case f.LanguagePreference != o.LanguagePreference:
+		return f.LanguagePreference > o.LanguagePreference
+	case surroundRank(f.ACodec) != surroundRank(o.ACodec):
+		return surroundRank(f.ACodec) > surroundRank(o.ACodec)
+	}
+	return f.ABR > o.ABR
 }
 
 // stream returns the Stream of f, of a video of duration seconds.
@@ -685,8 +719,7 @@ func parseInfo(out []byte) (Stream, error) {
 		if !f.surround() {
 			continue
 		}
-		if best == nil || surroundRank(f.ACodec) > surroundRank(best.ACodec) ||
-			surroundRank(f.ACodec) == surroundRank(best.ACodec) && f.ABR > best.ABR {
+		if best == nil || f.betterSurround(*best) {
 			best = &in.Formats[i]
 		}
 	}

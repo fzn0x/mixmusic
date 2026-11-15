@@ -19,9 +19,9 @@ func TestArtistPlaysAllSongs(t *testing.T) {
 		shuffled bool
 	}
 	var plays []played
-	was := playArtist
-	playArtist = func(_ *shell, a media.Artist, shuffled bool) { plays = append(plays, played{a.ID, shuffled}) }
-	t.Cleanup(func() { playArtist = was })
+	was := playAllSongs
+	playAllSongs = func(_ *shell, a media.Artist, shuffled bool) { plays = append(plays, played{a.ID, shuffled}) }
+	t.Cleanup(func() { playAllSongs = was })
 	all := media.Artist{ID: "yt:UCall", Source: media.SourceYouTube, Name: "Harbour Lights", TopTracks: testTracks[:2],
 		SongsID: "yt:OLAK5uy_all"}
 	s.loads["artist:"+all.ID] = &loaded[media.Artist]{done: true, value: all}

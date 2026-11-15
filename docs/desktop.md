@@ -36,7 +36,7 @@ accent along its foot for the progress. Its buttons:
   is over it. <kbd>Tab</kbd> reaches the button and then the slider, whose
   arrow keys set the volume; <kbd>Escape</kbd> closes it.
 
-![The mini player playing アイドル by YOASOBI: the cover on the left, the title, the artist with the mark of YouTube Music, 0:17 of 3:33, previous, pause and next, the heart, the thumbs-down and the volume, and at the top right the buttons that open the main window and close the mini player](shots/mini-player.webp)
+![The mini player playing アイドル by YOASOBI: the cover on the left, the title, the artist with the mark of YouTube Music, 1:20 of 3:33 and the buttons of the queue, the lyrics and the output device beside it, shuffle, previous, pause, next and repeat, the heart, the thumbs-down and the volume, at the top right the buttons that open the main window and close the mini player, and along its foot the line of the progress in the accent, under the cover and a little past it](shots/mini-player.webp)
 
 The line along its foot seeks: click it or drag it, or reach it with
 <kbd>Tab</kbd> and use the arrow keys. Under the pointer it thickens, and
@@ -72,6 +72,8 @@ it when it's at the foot of the screen, one at a time:
   player opened: why, as its toast's
   [details](troubleshooting.md#tracks-that-fail-to-play) tell, with
   **copy**. Once you close it, the sign goes until another track fails.
+
+![The mini player with its queue open under it: Up next, 1 of 20, with アイドル by YOASOBI playing at the top in the accent, then the songs after it with their covers, artists and lengths, and at the panel's top right the × that closes it; the queue's button beside the time is in the accent while the panel shows](shots/mini-player-queue.webp)
 
 The window grows to show the panel, and shrinks back as it closes, the
 mini player staying where it is. Its button again, the × at the panel's

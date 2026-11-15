@@ -454,7 +454,7 @@ func TestGlyphRise(t *testing.T) {
 		// Beyond ASCII, a letter is as tall as a capital, or has a mark over it, or
 		// is an ascender; the others stand as high as an x.
 		{"öu", riseTall}, {"ñu", riseTall}, {"ça", riseX}, {"preço", riseX}, {"Привет", riseTall}, {"сердце", riseX}, {"шла", riseX},
-		{"йод", riseTall}, {"και", riseX}, {"άνα", riseTall}, {"σε", riseX}, {"שלום", riseTall}, {"מם", riseX}, {"نم", riseX}, {"ال", riseTall},
+		{"йод", riseTall}, {"και", riseX}, {"άνα", riseTall}, {"σε", riseX}, {"שלום", riseTall}, {"מם", riseTall}, {"नमस्ते", riseWide}, {"สวัสดี", riseWide}, {"نم", riseX}, {"ال", riseTall},
 	} {
 		if got := glyphRise(c.word); got != c.want {
 			t.Errorf("%q rises %v, not %v", c.word, got, c.want)

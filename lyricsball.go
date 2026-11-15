@@ -367,12 +367,11 @@ const (
 
 // tallLetters are the lowercase letters, beyond ASCII's, that stand as high as
 // a capital: those with a mark over them, and the ascenders, of the Latin,
-// Greek, Cyrillic, Hebrew and Arabic scripts. The other lowercase letters,
+// Greek, Cyrillic and Arabic scripts. The other lowercase letters,
 // as the Cyrillic "сердце" or the Greek "και", stand as high as an x.
 const tallLetters = "àáâãäåāăćĉċčďéèêëēĕėěĝğġĥíìîïĩīĭįĵĺľłńňñòóôõöōŏőŕřśŝšťùúûüũūŭůűýÿźżžßðþħ" +
 	"άέήίόύώΐΰϊϋβδζθλξφψ" +
 	"бйёђћфљњїќў" +
-	"ל" +
 	"اأإآلكطظ"
 
 // glyphRise is how high the tallest letter of a word stands over its
@@ -381,8 +380,13 @@ func glyphRise(word string) float32 {
 	rise := float32(riseX)
 	for _, r := range word {
 		switch {
-		case r >= 0x2E80:
+		case r >= 0x2E80, r >= 0x0900 && r <= 0x0A7F, r >= 0x0E00 && r <= 0x0EFF:
+			// Ideographs fill their square; the letters of Devanagari, Bengali and
+			// Gurmukhi hang from a line at their top, and Thai stands tall.
 			return riseWide
+		case r >= 0x0590 && r <= 0x05FF:
+			// Hebrew letters stand about as high as a capital.
+			rise = riseTall
 		case r < 0x80:
 			if unicode.IsUpper(r) || unicode.IsDigit(r) || strings.ContainsRune("bdfhijklt'\"!?", r) {
 				rise = riseTall

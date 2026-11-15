@@ -182,7 +182,7 @@ func (s *shell) lyricsChoicesWith(c *ui.Context, t media.Track, ly lyrics.Lyrics
 		s.lyricsSwitches(c, ly, lang, where, canTranslate, canRomanize, &x)
 	}
 	if x.ja && x.romanize != "" {
-		x.romaji = s.lyricsRomaji(c, t, ly, where)
+		x.romaji = s.lyricsRomaji(c, t, ly, where, o.quiet)
 	}
 	if x.local != "" && x.romanize != "" {
 		x.roman = s.lyricsRomanized(t, ly, x.local)

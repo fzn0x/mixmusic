@@ -348,9 +348,9 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 	if d := active - view.scrolled; o.stage != nil && active >= 0 && view.scrolled >= 0 && d != 0 && d >= -4 && d <= 4 && time.Since(view.userAt) > lyricsPause {
 		glide = true
 	}
-	// The ball, and the room each line keeps for it, are for lyrics with words
-	// timed: the others have no ball to keep room for.
-	ball := o.stage != nil && s.set.LyricsBall && slices.ContainsFunc(ly.Lines, func(l lyrics.Line) bool { return len(l.Words) > 0 })
+	// The ball, and the room each line keeps for it, are for synced lyrics with
+	// words timed: the others have no ball to keep room for.
+	ball := o.stage != nil && s.set.LyricsBall && synced && slices.ContainsFunc(ly.Lines, func(l lyrics.Line) bool { return len(l.Words) > 0 })
 	n := len(ly.Lines) + 1
 	list := ui.List(c.Key("lyrics-"+where+"-"+t.ID), &view.list, n, func(i int) {
 		if i == len(ly.Lines) {

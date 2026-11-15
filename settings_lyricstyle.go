@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"slices"
 
 	"github.com/egoist/mygo/ui"
@@ -42,7 +43,11 @@ func (s *shell) lyricStyleSettings(c *ui.Context) {
 		}
 		s.found(c, "Preview of the lyrics", "how the full-screen lyrics look in the style, size and ball set", func() { s.lyricPreview(c) })
 		s.row(c, "Lyrics text size", fmt.Sprintf("%d%%", int(s.set.LyricsSize*100+0.5)), func() {
-			if ui.StepSlider(c.Key("lyric-size"), &s.set.LyricsSize, settings.MinLyricsSize, settings.MaxLyricsSize, settings.LyricsSizeStep).Width(200).Label("Lyrics text size").Changed() {
+			// The slider goes by whole percents: stepping from 0.6 to 1.8 by 0.1
+			// reaches 1.8000000000000003, past its end, which it steps back from.
+			pct := math.Round(s.set.LyricsSize * 100)
+			if ui.StepSlider(c.Key("lyric-size"), &pct, settings.MinLyricsSize*100, settings.MaxLyricsSize*100, settings.LyricsSizeStep*100).Width(200).Label("Lyrics text size").Changed() {
+				s.set.LyricsSize = pct / 100
 				s.save()
 			}
 		}, "font")

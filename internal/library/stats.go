@@ -2,6 +2,7 @@ package library
 
 import (
 	"cmp"
+	"maps"
 	"math"
 	"slices"
 	"time"
@@ -111,21 +112,24 @@ func countStats(v playsView, now time.Time, days int) Stats {
 	}
 	s.Daily = daily
 	tracks, artists := tops(v, counts, order)
-	for _, tp := range tracks {
-		s.TopTracks = append(s.TopTracks, *tp)
-	}
-	for _, ap := range artists {
-		s.TopArtists = append(s.TopArtists, *ap)
-	}
-	slices.SortFunc(s.TopTracks, func(a, b TrackPlays) int {
+	s.TopTracks = topOf(tracks, topCount, func(a, b *TrackPlays) int {
 		return cmp.Or(b.Plays-a.Plays, cmp.Compare(a.Track.Title, b.Track.Title))
 	})
-	slices.SortFunc(s.TopArtists, func(a, b ArtistPlays) int {
+	s.TopArtists = topOf(artists, topCount, func(a, b *ArtistPlays) int {
 		return cmp.Or(b.Plays-a.Plays, cmp.Compare(a.Artist.Name, b.Artist.Name))
 	})
-	s.TopTracks = s.TopTracks[:min(len(s.TopTracks), topCount)]
-	s.TopArtists = s.TopArtists[:min(len(s.TopArtists), topCount)]
 	return s
+}
+
+// topOf returns the first n of the sums of m, in the order of rank: of
+// years of plays, it sorts thousands of tracks, and keeps ten.
+func topOf[V any](m map[string]*V, n int, rank func(a, b *V) int) []V {
+	all := slices.SortedFunc(maps.Values(m), rank)
+	out := make([]V, 0, min(n, len(all)))
+	for _, v := range all[:min(n, len(all))] {
+		out = append(out, *v)
+	}
+	return out
 }
 
 // tops sums up the plays counted of each track of v, by its ID, and of

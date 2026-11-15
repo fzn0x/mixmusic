@@ -181,26 +181,14 @@ func countRecap(v playsView, loc *time.Location, year int) Recap {
 			}
 		}
 	}
-	for _, tp := range tracks {
-		r.TopTracks = append(r.TopTracks, *tp)
-	}
-	for _, ap := range artists {
-		r.TopArtists = append(r.TopArtists, *ap)
-	}
-	for _, ap := range albums {
-		r.TopAlbums = append(r.TopAlbums, *ap)
-	}
-	slices.SortFunc(r.TopTracks, func(a, b TrackPlays) int {
+	r.TopTracks = topOf(tracks, recapTop, func(a, b *TrackPlays) int {
 		return cmp.Or(b.Plays-a.Plays, cmp.Compare(a.Track.Title, b.Track.Title), cmp.Compare(a.Track.ID, b.Track.ID))
 	})
-	slices.SortFunc(r.TopArtists, func(a, b ArtistPlays) int {
+	r.TopArtists = topOf(artists, recapTop, func(a, b *ArtistPlays) int {
 		return cmp.Or(b.Plays-a.Plays, cmp.Compare(a.Artist.Name, b.Artist.Name))
 	})
-	slices.SortFunc(r.TopAlbums, func(a, b AlbumPlays) int {
+	r.TopAlbums = topOf(albums, recapTop, func(a, b *AlbumPlays) int {
 		return cmp.Or(b.Plays-a.Plays, cmp.Compare(a.Album.Name, b.Album.Name), cmp.Compare(a.Album.ID, b.Album.ID))
 	})
-	r.TopTracks = r.TopTracks[:min(len(r.TopTracks), recapTop)]
-	r.TopArtists = r.TopArtists[:min(len(r.TopArtists), recapTop)]
-	r.TopAlbums = r.TopAlbums[:min(len(r.TopAlbums), recapTop)]
 	return r
 }

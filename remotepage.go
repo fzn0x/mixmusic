@@ -188,7 +188,7 @@ func (s *shell) remoteProgress(c *ui.Context, id string, v app.RemoteView) {
 			r.seekAt = now
 		}
 		r.seeking = held
-		ui.Text(c, clock(dur)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum").Width(44)
+		ui.Text(c, clockLength(dur)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum").Width(44)
 	})
 }
 

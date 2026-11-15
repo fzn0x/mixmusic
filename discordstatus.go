@@ -287,6 +287,6 @@ func (s *shell) discordTimes(c *ui.Context, a *discord.Activity, now time.Time) 
 			p.Fill(r, k.border, r.H/2)
 			p.Fill(ui.Rect{X: r.X, Y: r.Y, W: r.W * f, H: r.H}, k.text, r.H/2)
 		})
-		ui.Text(c, clock(length)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
+		ui.Text(c, clockLength(length)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
 	})
 }

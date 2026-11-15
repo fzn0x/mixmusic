@@ -34,7 +34,7 @@ func (s *shell) remoteSettings(c *ui.Context) {
 			if sw.Changed() {
 				s.setRemote(on)
 			}
-		}, "remote control another computer laptop desktop network pair phone")
+		}, "remote control another computer laptop desktop network pair")
 		if fw := s.a.Firewall(); on && fw != nil {
 			s.readFirewall(fw)
 			if s.firewallKeepsOut() {

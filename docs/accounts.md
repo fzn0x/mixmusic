@@ -148,14 +148,16 @@ the first account until you choose another there.
 | Podcasts | | the shows you follow are saved on YouTube Music, and episodes [start where you left them](podcasts.md#with-youtube-music) on another device |
 | History | | what you play joins your YouTube Music history |
 
-Tracks play the same signed in or out: your session never goes to
-[yt-dlp](streams.md#when-yt-dlp-is-needed), which finds some tracks' audio.
-So tracks YouTube keeps for signed-in adults, or for a channel's members,
-don't play either way. Only
-[Play audio as your account](playing-music.md#play-audio-as-your-account),
-off at first, hands yt-dlp your session, for YouTube Music Premium's
-higher bitrate; when MixMusic sees your account has Premium, it offers it
-once.
+While
+[Play audio as your account](playing-music.md#play-audio-as-your-account)
+is off, as it is at first, tracks play the same signed in or out: your
+session never goes to [yt-dlp](streams.md#when-yt-dlp-is-needed), which
+finds some tracks' audio, so tracks YouTube keeps for signed-in adults,
+or for a channel's members, don't play either way. With it on, yt-dlp
+asks for each track as your account first, for YouTube Music Premium's
+higher bitrate, at the best quality only: data saver never asks as your
+account. A track it can't get that way is found signed out. When MixMusic
+sees your account has Premium, it offers the switch once.
 
 ### Your YouTube Music history
 

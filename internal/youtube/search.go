@@ -3,6 +3,7 @@ package youtube
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -49,6 +50,80 @@ func (c *Client) Search(ctx context.Context, query string, filter Filter) ([]med
 		return nil, err
 	}
 	return parseSearch(n), nil
+}
+
+// SearchWeb searches all of YouTube, not only its music catalog: the
+// videos of the website's own search, as tutorials, vlogs and live
+// streams, which YouTube Music doesn't list. It speaks as the website,
+// against YouTube's own origin, as a visitor YouTube doesn't know: it
+// sends neither the account's cookies nor its visitor ID, and keeps
+// none of the answer's.
+func (c *Client) SearchWeb(ctx context.Context, query string) (media.SearchResults, error) {
+	n, err := c.callWith(ctx, webClient, "search", map[string]any{"query": query}, nil, callOptions{
+		baseURL:   webBaseURL,
+		anonymous: true,
+	})
+	if err != nil {
+		return media.SearchResults{}, err
+	}
+	return media.SearchResults{
+		Tracks:    []media.Track{},
+		Videos:    parseWebSearch(n),
+		Albums:    []media.Album{},
+		Artists:   []media.Artist{},
+		Playlists: []media.Playlist{},
+	}, nil
+}
+
+// parseWebSearch reads the videos of the website's search response, in
+// the order it ranks them.
+func parseWebSearch(n node) []media.Track {
+	tracks := []media.Track{}
+	sections := n.get("contents", "twoColumnSearchResultsRenderer", "primaryContents", "sectionListRenderer", "contents")
+	for _, s := range sections.list() {
+		for _, item := range s.get("itemSectionRenderer", "contents").list() {
+			if r := item.get("videoRenderer"); r.exists() {
+				if t, ok := parseVideoRenderer(r); ok {
+					tracks = append(tracks, t)
+				}
+			}
+		}
+	}
+	return tracks
+}
+
+// parseVideoRenderer reads a videoRenderer: a video of YouTube's own
+// search, with its channel, its length and its views.
+func parseVideoRenderer(r node) (media.Track, bool) {
+	id := r.get("videoId").str()
+	title := strings.TrimSpace(r.get("title").text())
+	if id == "" || title == "" {
+		return media.Track{}, false
+	}
+	var artists []media.Ref
+	if runs := r.get("ownerText").runs(); len(runs) > 0 {
+		name := strings.TrimSpace(runs[0].get("text").str())
+		channel := runs[0].get("navigationEndpoint", "browseEndpoint", "browseId").str()
+		if name != "" {
+			ref := media.Ref{Name: name}
+			if channel != "" {
+				ref.ID = media.ID(media.SourceYouTube, channel)
+			}
+			artists = []media.Ref{ref}
+		}
+	}
+	plays, _ := parsePlays(r.get("viewCountText", "simpleText").str())
+	return media.Track{
+		ID:         media.ID(media.SourceYouTube, id),
+		Source:     media.SourceYouTube,
+		Title:      title,
+		Artists:    artists,
+		DurationMs: parseDuration(r.get("lengthText", "simpleText").str()),
+		Artwork:    artwork(r.get("thumbnail", "thumbnails")),
+		Video:      true,
+		Plays:      plays,
+		URL:        "https://www.youtube.com/watch?v=" + id,
+	}, true
 }
 
 // parseSearch reads the items of every shelf of a search response.

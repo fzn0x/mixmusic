@@ -80,6 +80,18 @@ func (c *Catalog) search(ctx context.Context, query string) (SearchResponse, err
 	return res, nil
 }
 
+// SearchYouTube searches YouTube itself, not its music catalog: the videos
+// of the website, as tutorials, vlogs and live streams, which YouTube Music
+// doesn't list. It is asked apart from Search, so that a slow or blocked
+// youtube.com never holds up a search of the music catalog.
+func (c *Catalog) SearchYouTube(ctx context.Context, query string) (media.SearchResults, error) {
+	query = strings.TrimSpace(query)
+	if query == "" {
+		return emptyResults(), nil
+	}
+	return c.a.youtube.SearchWeb(ctx, query)
+}
+
 // Suggestions returns what to suggest for what the user typed: YouTube
 // Music's searches, songs, albums, artists and playlists, or the recent
 // searches while nothing is typed.

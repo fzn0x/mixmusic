@@ -94,22 +94,28 @@ func wavySlider(c *ui.Context, v *float64, lo, hi float64, moving bool) ui.Eleme
 				rest.X = mirror(track.X + track.W)
 			}
 			p.Fill(rest, t.Border, h/2)
-			phase := float32(0)
-			if !still {
-				phase = wavePhase(p.Now())
-				p.AnimationFrameRate(waveRate)
-			}
-			*points = wavePoints((*points)[:0], track.X+h/2, x-h/2, cy, rise*waveHeight, phase)
-			if rtl {
-				for i := range *points {
-					(*points)[i][0] = mirror((*points)[i][0])
-				}
-			}
-			p.StrokePolyline(*points, h, t.Accent)
+			strokeWave(p, points, track.X+h/2, x-h/2, cy, h, rise*waveHeight, still, mirror, t.Accent)
 		}
 		paintKnob(p, t, k, held, focus)
 	})
 	return sl
+}
+
+// strokeWave paints a wave of thick DIPs along cy from x0 to x1, rising
+// height above cy and falling as far below it, in col, reusing *points. It
+// moves along from the frame's time unless still is set, and mirror maps
+// the x of a point, to run it right to left.
+func strokeWave(p *ui.Painter, points *[][2]float32, x0, x1, cy, thick, height float32, still bool, mirror func(float32) float32, col ui.Color) {
+	phase := float32(0)
+	if !still {
+		phase = wavePhase(p.Now())
+		p.AnimationFrameRate(waveRate)
+	}
+	*points = wavePoints((*points)[:0], x0, x1, cy, height, phase)
+	for i := range *points {
+		(*points)[i][0] = mirror((*points)[i][0])
+	}
+	p.StrokePolyline(*points, thick, col)
 }
 
 // wavePhase is how far the wave has moved along at now, in waves, from 0

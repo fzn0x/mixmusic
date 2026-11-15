@@ -233,9 +233,11 @@ Flatpak MixMusic-কে একটি স্যান্ডবক্সে চা
 তার সেটিংস ও লাইব্রেরি রাখে `~/.var/app/io.github.fzn0x.mixmusic`-এ,
 `.deb`, `.rpm`, AppImage বা আর্কাইভ কপি থেকে আলাদাভাবে, আর দুটিই একসঙ্গে
 চলতে পারে। কোনো কপির সেটিংস ও লাইব্রেরি নিয়ে আসতে, দুটিই বন্ধ করুন,
-`~/.config/MixMusic` থেকে `settings.json`, `library.json`, `queue.json` ও
-`addons` ফোল্ডার কপি করে
-`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`-এ রাখুন, এবং আপনার
+`~/.config/MixMusic` থেকে `settings.json`, `library.json`, `queue.json`,
+`positions.json` এবং `addons` ও `mix-covers` ফোল্ডার কপি করে
+`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`-এ রাখুন। আগে দুটিই বন্ধ
+করুন: চলমান MixMusic `library.json` ও বেশিরভাগ ফাইল মেমরিতে রাখে এবং পরের সেভে
+কপি করা ফাইল ওভাররাইট করে দেয়। তারপর আপনার
 অ্যাকাউন্টগুলোতে আবার সাইন ইন করুন: সাইন-ইন থাকে অন্য কপির কীরিংয়ে।
 
 Flatpak-এ লগইনের সময় চালু হওয়া আপনার ডেস্কটপের মাধ্যমে যায়, যা আগে

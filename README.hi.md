@@ -231,9 +231,11 @@ Flatpak, MixMusic को एक सैंडबॉक्स में चला�
 सेटिंग और लाइब्रेरी `~/.var/app/io.github.fzn0x.mixmusic` में रखता है, जो
 `.deb`, `.rpm`, AppImage या आर्काइव वाली कॉपी से अलग है, और दोनों एक साथ चल सकती
 हैं। किसी कॉपी की सेटिंग और लाइब्रेरी लाने के लिए, दोनों बंद करें,
-`~/.config/MixMusic` से `settings.json`, `library.json`, `queue.json` और
-`addons` फ़ोल्डर को
-`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic` में कॉपी करें, और अपने
+`~/.config/MixMusic` से `settings.json`, `library.json`, `queue.json`,
+`positions.json` और `addons` व `mix-covers` फ़ोल्डर
+`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic` में कॉपी करें। पहले दोनों
+बंद करें: चलता हुआ MixMusic `library.json` और ज़्यादातर फ़ाइलें मेमोरी में रखता है
+और अगली बार सहेजते समय कॉपी की गई फ़ाइल को अधिलेखित कर देता है। फिर अपने
 अकाउंट में दोबारा साइन इन करें: साइन-इन दूसरी कॉपी की keyring में ही रहते हैं।
 
 Flatpak में, लॉगिन पर शुरू होना आपके डेस्कटॉप से होकर जाता है, जो पहले आपसे

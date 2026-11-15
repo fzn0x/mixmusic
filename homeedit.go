@@ -234,7 +234,7 @@ func (s *shell) fetchShelfChoices() {
 	col := s.svc.Collection
 	if accounts.YouTube.SignedIn {
 		s.youtubePlaylists()
-		fetch(s, "youtube:artists", col.YouTubeArtists)
+		s.youtubeArtists()
 	}
 	if accounts.Spotify.SignedIn {
 		fetch(s, "spotify:playlists", col.SpotifyPlaylists)

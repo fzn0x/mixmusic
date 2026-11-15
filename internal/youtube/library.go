@@ -15,9 +15,18 @@ var ErrSignedOut = errors.New("youtube music: sign in to YouTube Music first")
 // stopped accepting the session.
 var ErrSessionRejected = errors.New("YouTube Music no longer accepts this sign-in")
 
-// maxLibraryPages bounds how many pages of a library list are read, of
-// about two dozen playlists, albums or artists each.
-const maxLibraryPages = 40
+// maxLibraryPages bounds how many pages of a list of the user's library
+// are read, of about two dozen playlists, albums, artists, songs or
+// podcasts each: 1,000 pages, some 24,000 items. A list that goes on past
+// it comes Cut. Tests lower it.
+var maxLibraryPages = 1000
+
+// errLibraryBound is why a list of the library stopped at maxLibraryPages.
+var errLibraryBound = errors.New("youtube music: MixMusic reads no more pages of a list")
+
+// errPagesGoRound is why a list of the library stopped at a page whose
+// token names a page read before: read on, it would be read forever.
+var errPagesGoRound = errors.New("youtube music: the pages of the list came round to one read before")
 
 // likedSongs is the playlist ID of the user's liked songs.
 const likedSongs = "LM"
@@ -70,71 +79,111 @@ func (c *Client) LikedSongs(ctx context.Context) (media.Playlist, error) {
 	return p, err
 }
 
-// LibraryPlaylists returns the playlists the user made or saved.
+// LibraryPlaylists returns the playlists the user made or saved, all of
+// them: those of a list that stopped short come with a media.ShortList.
 func (c *Client) LibraryPlaylists(ctx context.Context) ([]media.Playlist, error) {
-	items, err := c.libraryItems(ctx, "FEmusic_liked_playlists")
-	playlists := []media.Playlist{}
-	for _, it := range items {
+	return libraryList(ctx, c, "FEmusic_liked_playlists", func(it media.Item) (media.Playlist, string, bool) {
 		// Liked songs have a place of their own.
-		if it.Kind == media.ItemPlaylist && it.Playlist.ID != media.ID(media.SourceYouTube, likedSongs) {
-			playlists = append(playlists, *it.Playlist)
+		if it.Kind != media.ItemPlaylist || it.Playlist.ID == media.ID(media.SourceYouTube, likedSongs) {
+			return media.Playlist{}, "", false
 		}
-	}
-	return playlists, err
+		return *it.Playlist, it.Playlist.ID, true
+	})
 }
 
-// LibraryAlbums returns the albums the user saved.
+// LibraryAlbums returns the albums the user saved, all of them: those of
+// a list that stopped short come with a media.ShortList.
 func (c *Client) LibraryAlbums(ctx context.Context) ([]media.Album, error) {
-	items, err := c.libraryItems(ctx, "FEmusic_liked_albums")
-	albums := []media.Album{}
-	for _, it := range items {
-		if it.Kind == media.ItemAlbum {
-			albums = append(albums, *it.Album)
+	return libraryList(ctx, c, "FEmusic_liked_albums", func(it media.Item) (media.Album, string, bool) {
+		if it.Kind != media.ItemAlbum {
+			return media.Album{}, "", false
 		}
-	}
-	return albums, err
+		return *it.Album, it.Album.ID, true
+	})
 }
 
-// LibraryArtists returns the artists the user subscribes to.
+// LibraryArtists returns the artists the user subscribes to, all of them:
+// those of a list that stopped short come with a media.ShortList.
 func (c *Client) LibraryArtists(ctx context.Context) ([]media.Artist, error) {
-	items, err := c.libraryItems(ctx, "FEmusic_library_corpus_artists")
-	artists := []media.Artist{}
-	for _, it := range items {
-		if it.Kind == media.ItemArtist {
-			artists = append(artists, *it.Artist)
+	return libraryList(ctx, c, "FEmusic_library_corpus_artists", func(it media.Item) (media.Artist, string, bool) {
+		if it.Kind != media.ItemArtist {
+			return media.Artist{}, "", false
 		}
-	}
-	return artists, err
+		return *it.Artist, it.Artist.ID, true
+	})
 }
 
-// libraryItems returns the items of a list of the user's library, page
-// after page.
-func (c *Client) libraryItems(ctx context.Context, browseID string) ([]media.Item, error) {
+// libraryList returns what pick takes of the items of a list of the user's
+// library, browseID's, page after page, each once by the ID pick tells
+// ("" keeps an item without telling it from the others). A page past the
+// first that fails is tried again on media.PageWaits. A list that stops
+// short, at a page that still fails, at a page whose token names one read
+// before, or at maxLibraryPages, which Cut tells, comes in part, with a
+// media.ShortList: YouTube Music tells no count of the list, so it has no
+// Total. One whose first page failed, as signed out, comes with the error
+// alone.
+func libraryList[T any](ctx context.Context, c *Client, browseID string, pick func(media.Item) (T, string, bool)) ([]T, error) {
+	out := []T{}
 	if err := c.session(); err != nil {
-		return nil, err
+		return out, err
 	}
 	n, err := c.browse(ctx, browseID)
 	if err == nil {
 		err = c.session()
 	}
 	if err != nil {
-		return nil, err
+		return out, err
 	}
-	var items []media.Item
-	for _, s := range parseShelves(n) {
-		items = append(items, s.Items...)
-	}
-	token := listToken(n)
-	for page := 1; token != "" && page < maxLibraryPages; page++ {
-		more, err := c.call(ctx, "browse", map[string]any{"continuation": token}, nil)
-		if err != nil {
-			break // keep the items read so far
+	seen := map[string]bool{}
+	take := func(items []media.Item) {
+		for _, it := range items {
+			v, id, ok := pick(it)
+			if !ok || id != "" && seen[id] {
+				continue
+			}
+			seen[id] = true
+			out = append(out, v)
 		}
-		var contents []node
-		contents, token = listContinuation(more)
-		items = append(items, parseItems(contents)...)
 	}
-	return items, nil
+	for _, s := range parseShelves(n) {
+		take(s.Items)
+	}
+	token, asked := listToken(n), map[string]bool{}
+	var end error
+	for pages := 1; token != ""; pages++ {
+		if pages >= maxLibraryPages {
+			end = errLibraryBound
+			break
+		}
+		if asked[token] {
+			end = errPagesGoRound
+			break
+		}
+		asked[token] = true
+		var contents []node
+		next := ""
+		end = media.TryPage(ctx, func(ctx context.Context) error {
+			more, err := c.call(ctx, "browse", map[string]any{"continuation": token}, nil)
+			if err == nil {
+				contents, next = listContinuation(more)
+			}
+			return err
+		})
+		if end == nil {
+			// An answer as to a visitor ended the session: what it holds
+			// isn't the user's.
+			end = c.session()
+		}
+		if end != nil {
+			break
+		}
+		take(parseItems(contents))
+		token = next
+	}
+	if end == nil {
+		return out, nil
+	}
+	return out, &media.ShortList{Got: len(out), Cut: end == errLibraryBound, Err: end}
 }
 
 // listToken returns the token of the next page of the grid or the list of

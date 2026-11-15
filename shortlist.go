@@ -21,7 +21,13 @@ func shortListText(short *media.ShortList, noun string, source media.Source) str
 	if short.Total <= short.Got {
 		text = "Showing the first " + thousands(short.Got) + " " + noun
 	}
-	if short.Cut {
+	switch {
+	case !short.Cut:
+	case source == media.SourceYouTube:
+		// YouTube Music gives as many pages as are asked for: MixMusic
+		// stops at a bound of its own.
+		text += ", as far as MixMusic reads a list"
+	default:
 		text += ", the most " + sourceName(source) + " gives apps"
 	}
 	return text

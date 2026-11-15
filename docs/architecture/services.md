@@ -28,7 +28,19 @@
   liked songs, playlists, albums, subscriptions, likes, dislikes and
   saves, songs saved to the library apart from likes, by the feedback
   tokens of their menus in the queue of their "next", and it deletes the playlists the user made, which it tells from
-  those they saved by the menus YouTube sends with them. An add of a
+  those they saved by the menus YouTube sends with them. The lists of
+  the library, its playlists, albums, artists, songs and podcasts, are
+  read a page at a time by their continuation tokens, up to 1,000 pages
+  (`libraryList`, `maxLibraryPages`); a page past the first that fails
+  is tried again on `media.PageWaits` (`media.TryPage`), and each item
+  comes once, by its ID. A list that stops short, at a page that still
+  fails, at a token that names a page read before, or at the bound
+  (`Cut`), comes with what was read and a `media.ShortList` with no
+  `Total`, as YouTube Music counts none of these lists; `shortlist.go`
+  shows it as "Showing the first 1,200 songs", with Try again. The app
+  gives these lists 20 minutes to come rather than fetch's minute
+  (`wholeList`), and while Songs in your library isn't whole, a song's
+  menu asks `SongSaved` of the song as it opens (`savedApart`). An add of a
   video the playlist holds already YouTube refuses, offering in its
   answer the same add with its check skipped (`DEDUPE_OPTION_SKIP`):
   that, not the answer's words, which are in the account's language,

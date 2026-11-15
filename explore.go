@@ -139,7 +139,7 @@ var listOnYouTube = func(s *shell, ctx context.Context) ([]media.Playlist, error
 // Music, which the library shows and the track menu adds to.
 func (s *shell) youtubePlaylists() *loaded[[]media.Playlist] {
 	list := listOnYouTube
-	return fetch(s, "youtube:playlists", func(ctx context.Context) ([]media.Playlist, error) { return list(s, ctx) })
+	return wholeList(s, "youtube:playlists", func(ctx context.Context) ([]media.Playlist, error) { return list(s, ctx) })
 }
 
 // keepYouTubePlaylists fetches the user's playlists on YouTube Music once
@@ -174,7 +174,7 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 			// Only until the answer the window asked for ahead comes.
 			m.Item("Loading your playlists…").Disabled(true)
 			return
-		case own.err != nil:
+		case !listCame(own.err):
 			// Asked again, as a refresh asks, unless they already are:
 			// they may be there the next time the menu opens.
 			own.refresh()
@@ -198,6 +198,8 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 		if len(editable) == 0 {
 			m.Item("No playlists of yours").Disabled(true)
 		}
+		// Of a list that came in part, those that came, and how many.
+		s.shortListItem(m, "youtube:playlists", "playlists", media.SourceYouTube, own.err)
 	})
 }
 

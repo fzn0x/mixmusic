@@ -145,7 +145,7 @@ func (s *shell) artistLibrary(c *ui.Context) {
 		services = append(services, serviceArtists{"spotify", "Followed on Spotify", fetch(s, "spotify:artists", col.SpotifyArtists)})
 	}
 	if accounts.YouTube.SignedIn {
-		services = append(services, serviceArtists{"youtube", "Followed on YouTube Music", fetch(s, "youtube:artists", col.YouTubeArtists)})
+		services = append(services, serviceArtists{"youtube", "Followed on YouTube Music", s.youtubeArtists()})
 	}
 	here := col.FollowedArtists()
 	if len(here) == 0 && len(services) == 0 {

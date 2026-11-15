@@ -112,16 +112,16 @@ func (c *Client) PodcastEpisodes(ctx context.Context, show media.Ref, more strin
 	return media.EpisodePage{Episodes: episodesOf(contents, show), More: next}, nil
 }
 
-// LibraryPodcasts returns the podcasts the user saved on YouTube Music.
+// LibraryPodcasts returns the podcasts the user saved on YouTube Music,
+// all of them: those of a list that stopped short come with a
+// media.ShortList.
 func (c *Client) LibraryPodcasts(ctx context.Context) ([]media.Podcast, error) {
-	items, err := c.libraryItems(ctx, libraryPodcasts)
-	podcasts := []media.Podcast{}
-	for _, it := range items {
-		if it.Podcast != nil {
-			podcasts = append(podcasts, *it.Podcast)
+	return libraryList(ctx, c, libraryPodcasts, func(it media.Item) (media.Podcast, string, bool) {
+		if it.Podcast == nil {
+			return media.Podcast{}, "", false
 		}
-	}
-	return podcasts, err
+		return *it.Podcast, it.Podcast.ID, true
+	})
 }
 
 // episodesOf reads the episodes among a show's rows, which the show names.

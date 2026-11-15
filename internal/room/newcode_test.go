@@ -42,3 +42,27 @@ func TestNewCodeShutsOutTheOldOne(t *testing.T) {
 		t.Fatalf("members %+v", m)
 	}
 }
+
+// TestNewCodeEndsTheWaitToJoin proves the old code, and waits to join:
+// a new code ends the wait, and Join is refused.
+func TestNewCodeEndsTheWaitToJoin(t *testing.T) {
+	r := newTestRoom(t)
+	g := newGuest(t, "Early")
+	s, err := g.Knock(context.Background(), r.addr, nil, []byte("ABC123"), false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	secret, _ := NewSecret()
+	r.server.SetCode("XYZ789", secret)
+	if err := s.Join(context.Background()); !errors.Is(err, ErrNewCode) && !errors.Is(err, ErrLost) {
+		t.Fatalf("joining after a new code: %v", err)
+	}
+	<-s.Done()
+	if !errors.Is(s.Err(), ErrNewCode) {
+		t.Fatalf("the wait ended with %v", s.Err())
+	}
+	if len(r.server.Members()) != 0 {
+		t.Fatal("it joined with the old code")
+	}
+}

@@ -49,6 +49,8 @@ const (
 	reasonCode    = "code"
 	reasonWait    = "wait"
 	reasonBusy    = "busy"
+	reasonLocked  = "locked"
+	reasonNewCode = "new code"
 	reasonBlocked = "blocked"
 	reasonFull    = "full"
 	reasonGone    = "not a guest"
@@ -63,9 +65,15 @@ var (
 	// ErrWrongCode: the code typed isn't the room's, or the link isn't of
 	// this room, or someone stood between the two.
 	ErrWrongCode = errors.New("that isn't the room's code")
-	// ErrWait: this computer, or the room, tried too many wrong codes, and
-	// waits a minute.
-	ErrWait = errors.New("too many wrong codes: try again in a minute")
+	// ErrWait: this computer tried too many wrong codes, and waits a
+	// minute.
+	ErrWait = errors.New("too many wrong codes from this computer: try again in a minute")
+	// ErrLocked: the room took too many wrong codes, from whoever tried
+	// them, and takes none for a minute: its invite link still opens it.
+	ErrLocked = errors.New("the room isn't taking codes for a minute: ask its host for the invite link")
+	// ErrNewCode: the host gave the room a new code, and invite link,
+	// since this computer proved the old one.
+	ErrNewCode = errors.New("the room has a new code: ask its host for it")
 	// ErrBusy: so many try codes at once that the room takes no more for
 	// a moment.
 	ErrBusy = errors.New("the room checks other codes: try again in a moment")
@@ -100,6 +108,10 @@ func errOf(reason string) error {
 		return ErrWait
 	case reasonBusy:
 		return ErrBusy
+	case reasonLocked:
+		return ErrLocked
+	case reasonNewCode:
+		return ErrNewCode
 	case reasonBlocked:
 		return ErrBlocked
 	case reasonFull:
@@ -125,6 +137,9 @@ type Timing struct {
 	// Silence is how long a side waits for a message before it takes the
 	// other for gone: 6 s.
 	Silence time.Duration
+	// Prove is how long a connection has, from its accepting, to prove the
+	// code, the link or its key, in all: 5 s.
+	Prove time.Duration
 	// Keep is how long the host keeps the place of a guest that dropped
 	// off: 15 minutes.
 	Keep time.Duration
@@ -143,6 +158,7 @@ type Timing struct {
 
 func (t Timing) ping() time.Duration    { return or(t.Ping, 2*time.Second) }
 func (t Timing) silence() time.Duration { return or(t.Silence, 6*time.Second) }
+func (t Timing) prove() time.Duration   { return or(t.Prove, 5*time.Second) }
 func (t Timing) keep() time.Duration    { return or(t.Keep, 15*time.Minute) }
 func (t Timing) gate() time.Duration    { return or(t.Gate, 5*time.Second) }
 func (t Timing) lead() time.Duration    { return or(t.Lead, 350*time.Millisecond) }

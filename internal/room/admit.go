@@ -14,8 +14,10 @@ package room
 // codes would take 82 years, half of them 41. A room lasts an evening.
 //
 // Before they prove anything, the room holds a few connections at once,
-// from all and from each source, and takes messages of a handshake's size
-// from them.
+// from all and from each source, a few seconds in all, and takes messages
+// of a handshake's size from them. A new one takes the place of the oldest,
+// so that connections held open keep no one out; a guest that comes back by
+// its key gives its place back once TLS tells its key.
 
 import (
 	"net"
@@ -80,57 +82,86 @@ type tries struct {
 	since, until, last time.Time
 }
 
-// try is what a try of a code may do: run, or not, as too many wrong ones
-// were tried (tryWaits), or as so many run that, all wrong, they would be
-// too many (tryBusy).
+// try is what a try of a code may do: run, or not, as its source tried too
+// many wrong ones (tryWaits), or the room did (tryLocked), or as so many
+// run that, all wrong, they would be too many (tryBusy).
 type try int
 
 const (
 	tryRuns try = iota
 	tryWaits
 	tryBusy
+	tryLocked
 )
 
 // admission counts the codes tried, and the connections that proved
-// nothing yet. Server.mu guards it.
+// nothing yet, oldest first. Server.mu guards it.
 type admission struct {
 	caps     caps
 	sources  map[string]*tries
 	room     tries
-	unproven int
-	from     map[string]int
+	unproven []*unproven
 }
 
-// letIn takes a connection of src that proves nothing yet, unless the room
-// holds as many as it takes, from all or from src.
-func (a *admission) letIn(src string) bool {
-	if a.unproven >= a.caps.unproven || a.from[src] >= a.caps.unprovenFrom {
-		return false
-	}
-	if a.from == nil {
-		a.from = map[string]int{}
-	}
-	a.unproven++
-	a.from[src]++
-	return true
+// unproven is a connection of src that proved nothing yet, which close
+// closes.
+type unproven struct {
+	src   string
+	close func()
+	gone  bool
 }
 
-// proven lets go of a connection of src that proved the code, the link
-// or its key, or ended.
-func (a *admission) proven(src string) {
-	a.unproven = max(a.unproven-1, 0)
-	if a.from[src] <= 1 {
-		delete(a.from, src)
-	} else {
-		a.from[src]--
+// letIn takes a connection of src that proves nothing yet, which close
+// closes, and returns those it takes the place of: the oldest of src, when
+// the room holds as many of src as it takes, and the oldest of all, when it
+// holds as many as it takes in all. The caller closes them.
+func (a *admission) letIn(src string, close func()) (*unproven, []*unproven) {
+	var out []*unproven
+	n := 0
+	for _, u := range a.unproven {
+		if u.src == src {
+			n++
+		}
+	}
+	if n >= a.caps.unprovenFrom {
+		for _, u := range a.unproven {
+			if u.src == src {
+				out = append(out, u)
+				a.proven(u)
+				break
+			}
+		}
+	}
+	if len(a.unproven) >= a.caps.unproven && len(a.unproven) > 0 {
+		u := a.unproven[0]
+		out = append(out, u)
+		a.proven(u)
+	}
+	u := &unproven{src: src, close: close}
+	a.unproven = append(a.unproven, u)
+	return u, out
+}
+
+// proven lets go of a connection that proved the code, the link or its
+// key, or ended, or gave its place to another.
+func (a *admission) proven(u *unproven) {
+	if u.gone {
+		return
+	}
+	u.gone = true
+	for i, o := range a.unproven {
+		if o == u {
+			a.unproven = append(a.unproven[:i:i], a.unproven[i+1:]...)
+			return
+		}
 	}
 }
 
 // check is what t, which may try limit wrong codes each wait, lets a try
 // do at now.
 func (t *tries) check(limit int, now time.Time, wait time.Duration) try {
-	if !t.until.IsZero() && !now.Before(t.until) || t.until.IsZero() && t.running == 0 && now.Sub(t.since) >= wait {
-		// The wait, or the window, is over.
+	if !t.until.IsZero() && !now.Before(t.until) || t.until.IsZero() && now.Sub(t.since) >= wait {
+		// The wait, or the window, is over; the tries under way go on.
 		*t = tries{since: now, last: t.last, running: t.running}
 	}
 	switch {
@@ -149,8 +180,11 @@ func (t *tries) check(limit int, now time.Time, wait time.Duration) try {
 // src, or the room, waits after too many wrong ones, or so many run that,
 // all wrong, they would be. endTry ends it.
 func (a *admission) tryCode(src string, now time.Time, wait time.Duration) try {
-	if v := a.room.check(a.caps.roomTries, now, wait); v != tryRuns {
-		return v
+	switch a.room.check(a.caps.roomTries, now, wait) {
+	case tryWaits:
+		return tryLocked
+	case tryBusy:
+		return tryBusy
 	}
 	t := a.sources[src]
 	if t == nil {
@@ -197,6 +231,15 @@ func (a *admission) endTry(src string, wrong bool, now time.Time, wait time.Dura
 	if t := a.sources[src]; t != nil {
 		t.end(wrong, a.caps.tries, now, wait)
 	}
+}
+
+// locked returns until when the room takes no code, after too many wrong
+// ones, or the zero time.
+func (a *admission) locked(now time.Time) time.Time {
+	if now.Before(a.room.until) {
+		return a.room.until
+	}
+	return time.Time{}
 }
 
 // sweep forgets the sources that tried longer than wait ago, and neither

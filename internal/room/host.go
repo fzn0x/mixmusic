@@ -32,6 +32,9 @@ const (
 	Left    = "left"
 	Removed = "removed"
 	Blocked = "blocked"
+	// Guessed: someone tried so many wrong codes that the room takes none
+	// for a while.
+	Guessed = "tried too many wrong codes"
 )
 
 // Activity is something that happened in the room: a guest named Name
@@ -73,6 +76,10 @@ type Server struct {
 	// Changed, when set, is told, without waiting on it, as guests join,
 	// leave, drop off and come back, or are removed.
 	Changed func()
+	// Guessing, when set, is told, without waiting on it, once each time
+	// the room takes no code for a while, as too many wrong ones came:
+	// someone guesses the code.
+	Guessing func()
 
 	mu      sync.Mutex
 	ln      net.Listener
@@ -86,6 +93,12 @@ type Server struct {
 	adm      admission
 	caps     *caps
 	activity []Activity
+	// gen counts the codes the room had (SetCode), and previews are the
+	// connections that proved one and wait to join, by its count. toldLock
+	// is the end of the last wait for codes Guessing was told of.
+	gen      int
+	previews map[*conn]int
+	toldLock time.Time
 	// seq counts the track changes, and gate is the one that waits for
 	// the guests; starting is the state of its start, which the guests
 	// are told until the host's track plays.
@@ -184,17 +197,15 @@ func (s *Server) Serve(ln net.Listener) error {
 			}
 			return err
 		}
-		// A connection that proves nothing yet waits for a place among
-		// those the room holds, or is closed at once.
-		src := sourceOf(raw.RemoteAddr().String())
+		// A connection that proves nothing yet takes a place among those
+		// the room holds, of the oldest when they are all taken.
 		s.mu.Lock()
-		ok := s.adm.letIn(src)
+		u, gone := s.adm.letIn(sourceOf(raw.RemoteAddr().String()), func() { raw.Close() })
 		s.mu.Unlock()
-		if !ok {
-			raw.Close()
-			continue
+		for _, o := range gone {
+			o.close()
 		}
-		go s.handle(raw, src)
+		go s.handle(raw, u)
 	}
 }
 
@@ -253,21 +264,22 @@ func (s *Server) Close() error {
 	return nil
 }
 
-// handle runs a connection of the source src: TLS, then a hello, then a
-// guest's proof and stay, or its coming back. Until it proved the code,
-// the link or its key, it holds a place among the unproven, and its
-// messages are of a handshake's size.
-func (s *Server) handle(raw net.Conn, src string) {
+// handle runs a connection, of the place u among the unproven: TLS, then a
+// hello, then a guest's proof and stay, or its coming back. Until it proved
+// the code, the link or its key, it holds its place, Prove at most from its
+// accepting, in all, and its messages are of a handshake's size.
+func (s *Server) handle(raw net.Conn, u *unproven) {
 	defer raw.Close()
 	proven := sync.OnceFunc(func() {
 		s.mu.Lock()
-		s.adm.proven(src)
+		s.adm.proven(u)
 		s.mu.Unlock()
 	})
 	defer proven()
 	t := s.Timing
+	proveBy := time.Now().Add(t.prove())
 	tc := tls.Server(raw, s.Identity.ServerTLS(alpn))
-	ctx, cancel := context.WithTimeout(context.Background(), t.silence())
+	ctx, cancel := context.WithDeadline(context.Background(), proveBy)
 	err := tc.HandshakeContext(ctx)
 	cancel()
 	if err != nil {
@@ -277,7 +289,12 @@ func (s *Server) handle(raw net.Conn, src string) {
 	if err != nil {
 		return
 	}
-	c := &conn{raw: tc, f: remote.NewFrames(tc), key: key, src: src, out: make(chan message, outQueue), gone: make(chan struct{})}
+	// A guest the room keeps, which comes back by its key, competes for no
+	// place: it proves its key with its hello.
+	if s.keeps(key) {
+		proven()
+	}
+	c := &conn{raw: tc, f: remote.NewFrames(tc), key: key, src: u.src, out: make(chan message, outQueue), gone: make(chan struct{})}
 	c.f.Limit(handshakeMessage)
 	if !s.add(c) {
 		return
@@ -285,7 +302,7 @@ func (s *Server) handle(raw net.Conn, src string) {
 	defer s.removeConn(c)
 	defer c.close()
 	var hello message
-	if err := c.f.Receive(&hello, t.silence()); err != nil || hello.Type != "hello" {
+	if err := c.f.Receive(&hello, until(proveBy)); err != nil || hello.Type != "hello" {
 		return
 	}
 	refuse := func(reason string) { _ = c.f.Send(message{Type: "refused", Reason: reason}, t.silence()) }
@@ -303,7 +320,7 @@ func (s *Server) handle(raw net.Conn, src string) {
 		proven()
 		c.f.Limit(0)
 	case wantJoin:
-		if !s.join(c, hello, name, refuse, proven) {
+		if !s.join(c, hello, name, refuse, proven, proveBy) {
 			return
 		}
 	default:
@@ -311,6 +328,18 @@ func (s *Server) handle(raw net.Conn, src string) {
 	}
 	go c.write(t.silence())
 	s.stay(c)
+}
+
+// until is how long until by, a moment at least.
+func until(by time.Time) time.Duration { return max(time.Until(by), time.Millisecond) }
+
+// keeps reports whether the room keeps the place of the guest of key, and
+// doesn't block it.
+func (s *Server) keeps(key remote.Fingerprint) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	_, blocked := s.blocked[key]
+	return s.guests[key] != nil && !blocked
 }
 
 func (s *Server) add(c *conn) bool {
@@ -358,13 +387,16 @@ func (s *Server) refusal(key remote.Fingerprint) string {
 	return ""
 }
 
-// join runs a guest's proof of the code or the link's secret, then waits
-// for it to join, as its user chooses to once they saw the room: proven is
-// told once it proved it. It reports whether the guest joined.
-func (s *Server) join(c *conn, hello message, name string, refuse func(string), proven func()) bool {
+// join runs a guest's proof of the code or the link's secret, by proveBy,
+// then waits for it to join, as its user chooses to once they saw the
+// room: proven is told once it proved it. It reports whether the guest
+// joined. A new code (SetCode) ends a proof of the old one, and a wait to
+// join after it.
+func (s *Server) join(c *conn, hello message, name string, refuse func(string), proven func(), proveBy time.Time) bool {
 	t := s.Timing
 	byCode := hello.By == byCode
 	s.mu.Lock()
+	gen := s.gen
 	password := []byte(s.Code)
 	if hello.By == byLink {
 		password = s.Secret
@@ -383,9 +415,12 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 			reason = reasonWait
 		case tryBusy:
 			reason = reasonBusy
+		case tryLocked:
+			reason = reasonLocked
 		}
 	}
 	s.mu.Unlock()
+	s.tellLock()
 	// endTry ends the try, once: one that ends before its code was
 	// checked, as the guest went, tried none.
 	ended := false
@@ -397,6 +432,7 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 		s.mu.Lock()
 		s.adm.endTry(c.src, wrong, time.Now(), t.wait())
 		s.mu.Unlock()
+		s.tellLock()
 	}
 	defer endTry(false)
 	if reason != "" {
@@ -419,11 +455,11 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 		refuse(reasonCode)
 		return false
 	}
-	if err := c.f.Send(message{Type: "spake", Spake: sp.msg}, t.silence()); err != nil {
+	if err := c.f.Send(message{Type: "spake", Spake: sp.msg}, until(proveBy)); err != nil {
 		return false
 	}
 	var confirm message
-	if err := c.f.Receive(&confirm, t.silence()); err != nil || confirm.Type != "confirm" {
+	if err := c.f.Receive(&confirm, until(proveBy)); err != nil || confirm.Type != "confirm" {
 		return false
 	}
 	if !hmac.Equal(confirm.MAC, keys.ca) {
@@ -434,9 +470,27 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 	}
 	endTry(false)
 	// Proven: its place among the unproven goes to another, and its
-	// messages are a guest's.
+	// messages are a guest's; until it joins, a new code ends it.
 	proven()
 	c.f.Limit(0)
+	s.mu.Lock()
+	newCode := s.gen != gen
+	if !newCode {
+		if s.previews == nil {
+			s.previews = map[*conn]int{}
+		}
+		s.previews[c] = gen
+	}
+	s.mu.Unlock()
+	if newCode {
+		refuse(reasonNewCode)
+		return false
+	}
+	defer func() {
+		s.mu.Lock()
+		delete(s.previews, c)
+		s.mu.Unlock()
+	}()
 	preview := s.preview()
 	if err := c.f.Send(message{Type: "welcome", MAC: keys.cb, Preview: &preview, Features: features}, t.silence()); err != nil {
 		return false
@@ -460,7 +514,11 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 		}
 		st := s.Host.State()
 		s.mu.Lock()
-		if reason := s.refusal(c.key); reason != "" || s.closed {
+		reason := s.refusal(c.key)
+		if reason == "" && s.gen != gen {
+			reason = reasonNewCode
+		}
+		if reason != "" || s.closed {
 			s.mu.Unlock()
 			refuse(reason)
 			return false
@@ -651,11 +709,43 @@ func compareKeys(a, b remote.Fingerprint) int {
 
 // SetCode gives the room a new code and a new secret for its invite link:
 // the old ones let no one in from then on, a computer the host removed or
-// blocked under another key too. The guests stay.
+// blocked under another key too. Those that proved the old ones and wait
+// to join are told so, and those proving them are refused. The guests
+// stay.
 func (s *Server) SetCode(code string, secret []byte) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
 	s.Code, s.Secret = code, secret
+	s.gen++
+	var ended []*conn
+	for c := range s.previews {
+		ended = append(ended, c)
+	}
+	s.previews = nil
+	s.mu.Unlock()
+	for _, c := range ended {
+		go func() {
+			_ = c.f.Send(message{Type: "ended", Reason: reasonNewCode}, time.Second)
+			c.close()
+		}()
+	}
+}
+
+// tellLock tells Guessing, once, that the room takes no code for a while.
+func (s *Server) tellLock() {
+	s.mu.Lock()
+	lock := s.adm.locked(time.Now())
+	tell := !lock.IsZero() && !lock.Equal(s.toldLock)
+	if tell {
+		s.toldLock = lock
+		s.note("Someone", Guessed)
+	}
+	s.mu.Unlock()
+	if tell {
+		if fn := s.Guessing; fn != nil {
+			fn()
+		}
+		s.changed(false)
+	}
 }
 
 // Remove removes the guest of key from the room: it is told so, and joins

@@ -101,7 +101,7 @@ func TestRoomWideTriesHoldAcrossSources(t *testing.T) {
 	if checked != RoomTries {
 		t.Fatalf("the room checked %d codes in %v, from 200 sources", checked, 20*time.Second)
 	}
-	if v := a.tryCode("10.9.9.9", now, wait); v != tryWaits {
+	if v := a.tryCode("10.9.9.9", now, wait); v != tryLocked {
 		t.Fatalf("a new source, as the room waits: %v", v)
 	}
 	// The wait over, codes are checked again.
@@ -159,80 +159,199 @@ func TestSourcesStayBounded(t *testing.T) {
 	}
 }
 
-// TestUnprovenConnectionsAreCapped holds connections that prove nothing:
-// past maxUnprovenFrom of one source, the room closes the next at once;
-// a guest that proves the code gives its place back.
-func TestUnprovenConnectionsAreCapped(t *testing.T) {
-	r := newTestRoom(t)
-	var idle []net.Conn
-	for range maxUnprovenFrom - 1 {
+// unprovenNow is how many places of the unproven the room holds.
+func (r *testRoom) unprovenNow() int {
+	r.server.mu.Lock()
+	defer r.server.mu.Unlock()
+	return len(r.server.adm.unproven)
+}
+
+// closedSoon reports whether c's other end closed it within a second.
+func closedSoon(c net.Conn) bool {
+	c.SetReadDeadline(time.Now().Add(time.Second))
+	_, err := c.Read(make([]byte, 1))
+	return err != nil && !isTimeout(err)
+}
+
+// openIdle opens n connections to the room, which send nothing.
+func (r *testRoom) openIdle(n int) []net.Conn {
+	r.t.Helper()
+	var out []net.Conn
+	for range n {
 		c, err := net.Dial("tcp", r.addr)
 		if err != nil {
-			t.Fatal(err)
+			r.t.Fatal(err)
 		}
-		t.Cleanup(func() { c.Close() })
-		idle = append(idle, c)
+		r.t.Cleanup(func() { c.Close() })
+		out = append(out, c)
+		// One at a time, so that the room takes them in the order opened.
+		limits := r.server.caps.orDefault()
+		want := min(len(out), limits.unprovenFrom, limits.unproven)
+		waitFor(r.t, "the connection held", func() bool { return r.unprovenNow() >= want })
 	}
-	waitFor(t, "the idle connections held", func() bool {
-		r.server.mu.Lock()
-		defer r.server.mu.Unlock()
-		return r.server.adm.unproven == maxUnprovenFrom-1
-	})
-	// A guest takes the last place, proves the code, and gives it back:
-	// another does too.
-	r.join(newGuest(t, "One"))
-	r.join(newGuest(t, "Two"))
-	full, err := net.Dial("tcp", r.addr)
-	if err != nil {
-		t.Fatal(err)
+	return out
+}
+
+// TestNewConnectionTakesTheOldestPlace opens one connection more than a
+// source may hold before proving anything: the oldest is closed, the new
+// one held, so that connections held open keep no one out.
+func TestNewConnectionTakesTheOldestPlace(t *testing.T) {
+	r := newTestRoom(t)
+	idle := r.openIdle(maxUnprovenFrom)
+	newest := r.openIdle(1)[0]
+	if !closedSoon(idle[0]) {
+		t.Fatal("the oldest connection of the source wasn't closed")
 	}
-	defer full.Close()
-	waitFor(t, "the last place held", func() bool {
-		r.server.mu.Lock()
-		defer r.server.mu.Unlock()
-		return r.server.adm.unproven == maxUnprovenFrom
-	})
-	over, err := net.Dial("tcp", r.addr)
-	if err != nil {
-		t.Fatal(err)
+	newest.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
+	if _, err := newest.Read(make([]byte, 1)); !isTimeout(err) {
+		t.Fatalf("the newest connection: %v", err)
 	}
-	defer over.Close()
-	over.SetReadDeadline(time.Now().Add(time.Second))
-	if _, err := over.Read(make([]byte, 1)); err == nil || isTimeout(err) {
-		t.Fatalf("a connection past the cap: %v, not closed at once", err)
-	}
-	// Those held stay open, until their silence.
-	idle[0].SetReadDeadline(time.Now().Add(100 * time.Millisecond))
-	if _, err := idle[0].Read(make([]byte, 1)); !isTimeout(err) {
-		t.Fatalf("a connection within the cap: %v", err)
+	if n := r.unprovenNow(); n != maxUnprovenFrom {
+		t.Fatalf("%d places held", n)
 	}
 }
 
-// TestRoomWideUnprovenCap closes a connection past the room's cap of the
-// unproven, from whatever source.
-func TestRoomWideUnprovenCap(t *testing.T) {
+// TestRoomWidePlacesTakeTheOldest opens one connection more than the room
+// holds before proving anything, from whatever source: the oldest is
+// closed.
+func TestRoomWidePlacesTakeTheOldest(t *testing.T) {
 	r := newTestRoomWith(t, func(s *Server) { s.caps = &caps{unproven: 3, unprovenFrom: 100, tries: Tries, roomTries: RoomTries} })
-	for range 3 {
-		c, err := net.Dial("tcp", r.addr)
-		if err != nil {
-			t.Fatal(err)
-		}
-		t.Cleanup(func() { c.Close() })
+	idle := r.openIdle(3)
+	r.openIdle(1)
+	if !closedSoon(idle[0]) {
+		t.Fatal("the oldest connection wasn't closed")
 	}
-	waitFor(t, "the room full of the unproven", func() bool {
-		r.server.mu.Lock()
-		defer r.server.mu.Unlock()
-		return r.server.adm.unproven == 3
+	if n := r.unprovenNow(); n != 3 {
+		t.Fatalf("%d places held", n)
+	}
+}
+
+// TestFullRoomStillLetsInLinksAndGuests fills every place of the unproven
+// with connections held open: a link holder still joins, and a guest that
+// dropped off still comes back by its key.
+func TestFullRoomStillLetsInLinksAndGuests(t *testing.T) {
+	// All come from 127.0.0.1: the source holds as many as the room.
+	r := newTestRoomWith(t, func(s *Server) {
+		s.caps = &caps{unproven: maxUnproven, unprovenFrom: maxUnproven, tries: Tries, roomTries: RoomTries}
 	})
-	over, err := net.Dial("tcp", r.addr)
+	back := newGuest(t, "Back")
+	r.join(back).Close()
+	waitFor(t, "the guest away", func() bool { m := r.server.Members(); return len(m) == 1 && !m[0].Here })
+	r.openIdle(maxUnproven)
+	link := newGuest(t, "Link")
+	s, err := link.Knock(context.Background(), r.addr, &r.key, r.server.Secret, true)
+	if err != nil {
+		t.Fatalf("a link holder, with every place taken: %v", err)
+	}
+	if err := s.Join(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	s.Close()
+	again, err := back.Rejoin(context.Background(), r.addr, r.key)
+	if err != nil {
+		t.Fatalf("a guest that comes back, with every place taken: %v", err)
+	}
+	again.Close()
+}
+
+// TestProofHasOneDeadline gives a connection Prove in all, from its
+// accepting, to prove anything: one that took TLS and sends nothing more
+// is closed then, not a Silence after each step.
+func TestProofHasOneDeadline(t *testing.T) {
+	timing := testTiming
+	timing.Prove = 300 * time.Millisecond
+	r := newTestRoomWith(t, func(s *Server) { s.Timing = timing })
+	id, _ := remote.NewIdentity()
+	raw, err := net.Dial("tcp", r.addr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer over.Close()
-	over.SetReadDeadline(time.Now().Add(time.Second))
-	if _, err := over.Read(make([]byte, 1)); err == nil || isTimeout(err) {
-		t.Fatalf("a connection past the room's cap: %v, not closed at once", err)
+	defer raw.Close()
+	start := time.Now()
+	tc := tls.Client(raw, id.ClientTLS(alpn, nil, nil))
+	if err := tc.Handshake(); err != nil {
+		t.Fatal(err)
 	}
+	tc.SetReadDeadline(time.Now().Add(testTiming.Silence))
+	if _, err := tc.Read(make([]byte, 1)); err == nil || isTimeout(err) {
+		t.Fatalf("a connection that proved nothing: %v", err)
+	}
+	if took := time.Since(start); took > 2*time.Second {
+		t.Fatalf("closed after %v: more than Prove", took)
+	}
+	waitFor(t, "its place let go", func() bool { return r.unprovenNow() == 0 })
+}
+
+// TestRoomWindowRollsWithATryUnderWay keeps a try of a code under way past
+// the room's minute: the minute rolls all the same, and its wrong codes
+// count no more.
+func TestRoomWindowRollsWithATryUnderWay(t *testing.T) {
+	a := newAdmission()
+	now := time.Unix(1_000_000, 0)
+	const wait = time.Minute
+	if a.tryCode("10.0.0.1", now, wait) != tryRuns {
+		t.Fatal("the first try")
+	}
+	for i := range RoomTries - 1 {
+		src := fmt.Sprintf("10.0.1.%d", i)
+		if a.tryCode(src, now, wait) != tryRuns {
+			t.Fatalf("try %d", i)
+		}
+		a.endTry(src, true, now, wait)
+	}
+	if v := a.tryCode("10.0.2.1", now, wait); v != tryBusy {
+		t.Fatalf("one more, with 29 wrong and one under way: %v", v)
+	}
+	// A minute on, the first try still under way, the minute rolled.
+	now = now.Add(wait + time.Second)
+	if v := a.tryCode("10.0.2.1", now, wait); v != tryRuns {
+		t.Fatalf("a minute on: %v", v)
+	}
+	if a.room.running != 2 || a.room.wrong != 0 {
+		t.Fatalf("the room counts %d under way and %d wrong", a.room.running, a.room.wrong)
+	}
+}
+
+// TestRoomLockTellsTheHostOnce tries wrong codes until the room takes none:
+// the host hears it once, the activity tells it, the next knock is told
+// the room takes no code, without its own wrong ones, and a link still
+// opens the room.
+func TestRoomLockTellsTheHostOnce(t *testing.T) {
+	told := make(chan struct{}, 10)
+	r := newTestRoomWith(t, func(s *Server) {
+		s.caps = &caps{unproven: maxUnproven, unprovenFrom: maxUnproven, tries: 100, roomTries: 3}
+		s.Guessing = func() { told <- struct{}{} }
+	})
+	g := newGuest(t, "Guesser")
+	for i := range 3 {
+		if _, err := g.Knock(context.Background(), r.addr, nil, fmt.Appendf(nil, "ZZZ%03d", i), false); !errors.Is(err, ErrWrongCode) {
+			t.Fatalf("wrong code %d: %v", i, err)
+		}
+	}
+	other := newGuest(t, "Friend")
+	for range 2 {
+		if _, err := other.Knock(context.Background(), r.addr, nil, []byte("ABC123"), false); !errors.Is(err, ErrLocked) {
+			t.Fatalf("the right code, as the room takes none: %v", err)
+		}
+	}
+	waitFor(t, "the host told", func() bool { return len(told) >= 1 })
+	if n := len(told); n != 1 {
+		t.Fatalf("the host was told %d times", n)
+	}
+	guessed := 0
+	for _, a := range r.server.Activity() {
+		if a.What == Guessed {
+			guessed++
+		}
+	}
+	if guessed != 1 {
+		t.Fatalf("the activity tells it %d times: %+v", guessed, r.server.Activity())
+	}
+	s, err := other.Knock(context.Background(), r.addr, &r.key, r.server.Secret, true)
+	if err != nil {
+		t.Fatalf("a link, as the room takes no code: %v", err)
+	}
+	s.Close()
 }
 
 // TestHandshakeTakesNoLongMessage sends, before proving anything, the

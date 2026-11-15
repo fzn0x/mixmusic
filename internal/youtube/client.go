@@ -92,6 +92,10 @@ type innerClient struct{ name, id, major string }
 // musicClient is YouTube Music's website, which MixMusic speaks as.
 var musicClient = innerClient{name: clientName, id: clientNameID, major: "1"}
 
+// webBaseURL is YouTube's own origin, where the website's search lives.
+// webClient, the website's client, is declared in channels.go.
+const webBaseURL = "https://www.youtube.com"
+
 // version returns a version of the client that YouTube accepts: its build
 // of a few days ago.
 func (ic innerClient) version(now time.Time) string {
@@ -117,6 +121,9 @@ type callOptions struct {
 	// the visitor ID, and keeping neither the cookies nor the visitor ID of
 	// the answer, as yt-dlp finds streams.
 	anonymous bool
+	// baseURL is the origin to ask, when it isn't the client's: YouTube's
+	// own, for the website's search.
+	baseURL string
 }
 
 // callWith is callAs, asking as o says.
@@ -148,15 +155,19 @@ func (c *Client) callWith(ctx context.Context, ic innerClient, endpoint string, 
 		query = url.Values{}
 	}
 	query.Set("prettyPrint", "false")
-	u := strings.TrimRight(c.BaseURL, "/") + "/youtubei/v1/" + endpoint + "?" + query.Encode()
+	base := c.BaseURL
+	if o.baseURL != "" {
+		base = o.baseURL
+	}
+	u := strings.TrimRight(base, "/") + "/youtubei/v1/" + endpoint + "?" + query.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, bytes.NewReader(data))
 	if err != nil {
 		return node{}, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", userAgent)
-	req.Header.Set("Origin", defaultBaseURL)
-	req.Header.Set("Referer", defaultBaseURL+"/")
+	req.Header.Set("Origin", base)
+	req.Header.Set("Referer", strings.TrimRight(base, "/")+"/")
 	req.Header.Set("X-YouTube-Client-Name", ic.id)
 	req.Header.Set("X-YouTube-Client-Version", version)
 	for k, vs := range o.header {

@@ -12,8 +12,12 @@ import (
 
 var (
 	searchPivots = []string{"all", "songs", "videos", "albums", "artists", "playlists", "podcasts"}
-	searchScopes = []string{"both", "Spotify", "YouTube Music"}
+	searchScopes = []string{"both", "Spotify", "YouTube Music", "YouTube"}
 )
+
+// youtubeScope is the index of YouTube's own search in searchScopes: the
+// website's videos, which YouTube Music doesn't list.
+const youtubeScope = 3
 
 // interleave alternates the items of two lists, so both services lead.
 func interleave[T any](a, b []T) []T {
@@ -30,7 +34,8 @@ func interleave[T any](a, b []T) []T {
 }
 
 // mergeResults are the results of the services of scope: 0 both, 1
-// Spotify, 2 YouTube Music.
+// Spotify, 2 YouTube Music. YouTube's own search is asked apart, by
+// youtubeResults.
 func mergeResults(r app.SearchResponse, scope int) media.SearchResults {
 	switch scope {
 	case 1:
@@ -59,16 +64,25 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		}
 		res := fetch(s, "search:"+q, func(ctx context.Context) (app.SearchResponse, error) { return s.svc.Catalog.Search(ctx, q) })
 		var counts []int
-		if res.done && res.err == nil {
+		if res.done && res.err == nil && s.searchScope != youtubeScope {
 			r := s.shownResults(mergeResults(res.value, s.searchScope))
 			// An album counts once, however many versions it has.
 			albums := len(s.albumGroups("album", r.Albums))
 			counts = []int{-1, len(r.Tracks), len(r.Videos), albums, len(r.Artists), len(r.Playlists), s.podcastCount(q)}
 		}
-		s.pageHeaderCounts(c, q, searchPivots, counts, &s.searchPivot)
+		// YouTube's own search lists videos only, so it has no pivots.
+		pivots, pivotSel := searchPivots, &s.searchPivot
+		if s.searchScope == youtubeScope {
+			pivots, pivotSel = nil, nil
+		}
+		s.pageHeaderCounts(c, q, pivots, counts, pivotSel)
 		ui.Row(c).Margin(0, 0, 24).Children(func() {
 			s.segmented(c, "scope", "Services", &s.searchScope, searchScopes...)
 		})
+		if s.searchScope == youtubeScope {
+			s.youtubeResults(c, q)
+			return
+		}
 		if s.searchScope == 0 {
 			s.computerResults(c, q, searchPivots[s.searchPivot])
 		}
@@ -80,7 +94,7 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 			s.problem(c, res.err, func() { s.forget("search:" + q) })
 			return
 		}
-		if !res.value.SpotifySignedIn && s.searchScope != 2 {
+		if !res.value.SpotifySignedIn && s.searchScope != 2 && s.searchScope != youtubeScope {
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).Children(func() {
 				ui.Text(c, "Searching YouTube Music only. ")
 				s.linkOf(c, "Sign in to Spotify", "/settings/accounts")
@@ -161,6 +175,27 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		case "podcasts":
 			s.podcastSearch(c, q)
 		}
+	})
+}
+
+// youtubeResults shows what YouTube's own search found: videos only, in
+// the order it ranks them. It is asked apart from the music catalog's
+// search, so that a slow or blocked youtube.com never holds that one up.
+func (s *shell) youtubeResults(c *ui.Context, q string) {
+	res := fetch(s, "searchweb:"+q, func(ctx context.Context) (media.SearchResults, error) {
+		return s.svc.Catalog.SearchYouTube(ctx, q)
+	})
+	switch {
+	case !res.done:
+		s.loading(c)
+		return
+	case res.err != nil:
+		s.problem(c, res.err, func() { s.forget("searchweb:" + q) })
+		return
+	}
+	videos := s.shownResults(res.value).Videos
+	ui.Column(c).Margin(0, 0, 48).Children(func() {
+		s.trackList(c, "youtube-results", videos, trackListOptions{art: true, plays: true, empty: "No videos match."})
 	})
 }
 

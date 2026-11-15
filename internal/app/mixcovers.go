@@ -3,7 +3,9 @@ package app
 // The covers the user chooses for mixes: an image file of theirs, or the
 // cover of one of the mix's tracks, kept in the data folder's mix-covers,
 // its centre square at most mixCoverSize pixels across, as a JPEG, or a
-// PNG where it isn't opaque.
+// PNG where it isn't opaque. A GIF that moves is kept so too, its first
+// frame as the still the tiles show, and the GIF of the same name beside
+// it, which moves on the mix's page (#569).
 
 import (
 	"bytes"
@@ -16,6 +18,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/library"
@@ -32,13 +35,13 @@ const (
 )
 
 // errNotCover is an image file MixMusic doesn't make covers of.
-var errNotCover = errors.New("a cover is a PNG, JPEG or WebP image")
+var errNotCover = errors.New("a cover is a PNG, JPEG, GIF or WebP image")
 
 // mixCovers is the folder of the covers chosen for mixes.
 func (a *App) mixCovers() string { return filepath.Join(a.opts.DataDir, "mix-covers") }
 
-// SetMixCover gives a mix the picture of an image file, a PNG, a JPEG or
-// a WebP, in place of its tracks' covers.
+// SetMixCover gives a mix the picture of an image file, a PNG, a JPEG, a
+// GIF or a WebP, in place of its tracks' covers.
 func (c *Collection) SetMixCover(id, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
@@ -93,6 +96,26 @@ func (c *Collection) MixCoverFile(url string) (string, bool) {
 	return filepath.Join(c.a.mixCovers(), name), true
 }
 
+// MovingMixCover returns the GIF beside the cover chosen for a mix, by
+// the cover's address, when it moves.
+func (c *Collection) MovingMixCover(url string) (string, bool) {
+	still, ok := c.MixCoverFile(url)
+	if !ok {
+		return "", false
+	}
+	path := movingCoverFile(still)
+	if info, err := os.Stat(path); err != nil || !info.Mode().IsRegular() {
+		return "", false
+	}
+	return path, true
+}
+
+// movingCoverFile is the file of the GIF beside the still of a mix's
+// cover: the same name, a GIF's.
+func movingCoverFile(still string) string {
+	return strings.TrimSuffix(still, filepath.Ext(still)) + ".gif"
+}
+
 // keepMixCover makes a mix's cover of an encoded image: it keeps its
 // centre square in a file of a name of its own, which the windows show at
 // once rather than an older image of the same address, and removes the
@@ -107,14 +130,19 @@ func (a *App) keepMixCover(id string, data []byte) error {
 	}
 	cfg, format, err := image.DecodeConfig(bytes.NewReader(data))
 	switch {
-	case err != nil || format != "png" && format != "jpeg" && format != "webp":
+	case err != nil || format != "png" && format != "jpeg" && format != "webp" && format != "gif":
 		return errNotCover
 	case cfg.Width*cfg.Height > maxCoverPixels:
 		return errors.New("the image is too large for a cover")
 	}
-	square, err := artwork.Square(data, mixCoverSize)
+	var square, moving []byte
+	if format == "gif" {
+		moving, square, err = squareGIF(data)
+	} else if square, err = artwork.Square(data, mixCoverSize); err != nil {
+		err = errNotCover
+	}
 	if err != nil {
-		return errNotCover
+		return err
 	}
 	ext := ".jpg"
 	if _, format, _ := image.DecodeConfig(bytes.NewReader(square)); format == "png" {
@@ -130,22 +158,49 @@ func (a *App) keepMixCover(id string, data []byte) error {
 	if err := os.WriteFile(path, square, 0o644); err != nil {
 		return err
 	}
+	if moving != nil {
+		if err := os.WriteFile(movingCoverFile(path), moving, 0o644); err != nil {
+			os.Remove(path)
+			return err
+		}
+	}
 	old, err := a.library.SetPlaylistCover(native, name)
 	if err != nil {
 		os.Remove(path)
+		os.Remove(movingCoverFile(path))
 		return err
 	}
 	a.removeMixCover(old)
 	return nil
 }
 
-// removeMixCover removes the file of a cover no mix shows any more.
+// squareGIF makes a mix's cover of a GIF: the GIF of its centre square,
+// unless it has a frame alone, and its first frame as the still. One of
+// too many pixels to decode isn't read.
+func squareGIF(data []byte) (moving, still []byte, err error) {
+	size, err := artwork.SizeOfGIF(data)
+	switch {
+	case err != nil:
+		return nil, nil, errNotCover
+	case size.Pixels > maxCoverPixels:
+		return nil, nil, errors.New("the GIF is too large for a cover: choose one of fewer or smaller frames")
+	}
+	moving, still, err = artwork.SquareGIF(data, mixCoverSize)
+	if err != nil {
+		return nil, nil, errNotCover
+	}
+	return moving, still, nil
+}
+
+// removeMixCover removes the files of a cover no mix shows any more: its
+// still, and its GIF.
 func (a *App) removeMixCover(name string) {
 	if name == "" {
 		return
 	}
 	if path, ok := (&Collection{a}).MixCoverFile(library.CoverImage(name).URL); ok {
 		os.Remove(path)
+		os.Remove(movingCoverFile(path))
 	}
 }
 

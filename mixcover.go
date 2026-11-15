@@ -59,7 +59,7 @@ func (s *shell) coverDialog(c *ui.Context) {
 	cv := s.covering
 	key := "playlist:" + cv.id
 	s.dialog(c, &s.covering.open, dialogOptions{key: "mix-cover", title: "change cover", width: 560}, func() {
-		ui.Text(c, "Choose an image, a PNG, JPEG or WebP, or the cover of one of the songs of "+cv.title+
+		ui.Text(c, "Choose an image, a PNG, JPEG, GIF or WebP, or the cover of one of the songs of "+cv.title+
 			". It shows cut to a square.").FontSize(k.bodySize()).TextColor(k.muted)
 		res := fetch(s, key, func(ctx context.Context) (media.Playlist, error) { return s.svc.Catalog.PlaylistStart(ctx, cv.id) })
 		covers := songCovers(res.value.Tracks)
@@ -116,7 +116,7 @@ func (s *shell) coverOfFile(cv mixCovering) {
 	win := s.win
 	go func() {
 		paths, err := openFileDialog(mygo.OpenDialogOptions{Parent: win, Title: "Choose a cover for " + cv.title,
-			Filters: []mygo.FileFilter{{Name: "Images", Extensions: []string{"png", "jpg", "jpeg", "webp"}}}})
+			Filters: []mygo.FileFilter{{Name: "Images", Extensions: []string{"png", "jpg", "jpeg", "gif", "webp"}}}})
 		if err == nil && len(paths) == 0 {
 			return
 		}

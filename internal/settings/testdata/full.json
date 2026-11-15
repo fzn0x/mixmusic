@@ -108,6 +108,8 @@
   "miniZoom": 1.25,
   "mediaKeys": false,
   "assistantControl": true,
+  "roomName": "Ana",
+  "roomFollowVolume": true,
   "showOnDiscord": false,
   "discordAppId": "123456789012345678",
   "discordFirstLine": "{artist} · {title}",

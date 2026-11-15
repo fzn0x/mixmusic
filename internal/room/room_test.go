@@ -71,7 +71,11 @@ type testRoom struct {
 	key    remote.Fingerprint
 }
 
-func newTestRoom(t *testing.T) *testRoom {
+func newTestRoom(t *testing.T) *testRoom { return newTestRoomWith(t, nil) }
+
+// newTestRoomWith is newTestRoom of a server that set changes before it
+// serves.
+func newTestRoomWith(t *testing.T, set func(*Server)) *testRoom {
 	t.Helper()
 	id, err := remote.NewIdentity()
 	if err != nil {
@@ -82,6 +86,9 @@ func newTestRoom(t *testing.T) *testRoom {
 	host.play("e1", "First song", 0)
 	secret, _ := NewSecret()
 	srv := &Server{Identity: id, Name: "Desk", Code: "ABC123", Secret: secret, Host: host, Clock: clock, Timing: testTiming}
+	if set != nil {
+		set(srv)
+	}
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
@@ -374,7 +381,8 @@ func TestPrepareWithNoGuestStartsAtOnce(t *testing.T) {
 // host's track is, and its estimate of the host's clock is within a few
 // milliseconds, under the race detector or a busy computer too.
 func TestManyGuestsKnowTheHostsClock(t *testing.T) {
-	r := newTestRoom(t)
+	// All of them come from 127.0.0.1, at once: the room takes them all.
+	r := newTestRoomWith(t, func(s *Server) { s.caps = &caps{unproven: 1000, unprovenFrom: 1000, tries: 1000, roomTries: 1000} })
 	hostStart := time.Now().Add(-r.server.Clock.Now())
 	const guests = 100
 	type joined struct {

@@ -48,6 +48,7 @@ const (
 	reasonVersion = "version"
 	reasonCode    = "code"
 	reasonWait    = "wait"
+	reasonBusy    = "busy"
 	reasonBlocked = "blocked"
 	reasonFull    = "full"
 	reasonGone    = "not a guest"
@@ -62,9 +63,12 @@ var (
 	// ErrWrongCode: the code typed isn't the room's, or the link isn't of
 	// this room, or someone stood between the two.
 	ErrWrongCode = errors.New("that isn't the room's code")
-	// ErrWait: this computer tried too many wrong codes, and waits a
-	// minute.
+	// ErrWait: this computer, or the room, tried too many wrong codes, and
+	// waits a minute.
 	ErrWait = errors.New("too many wrong codes: try again in a minute")
+	// ErrBusy: so many try codes at once that the room takes no more for
+	// a moment.
+	ErrBusy = errors.New("the room checks other codes: try again in a moment")
 	// ErrBlocked: the host blocked this computer.
 	ErrBlocked = errors.New("the host blocked this computer")
 	// ErrFull: the room has as many guests as it takes.
@@ -94,6 +98,8 @@ func errOf(reason string) error {
 		return ErrWrongCode
 	case reasonWait:
 		return ErrWait
+	case reasonBusy:
+		return ErrBusy
 	case reasonBlocked:
 		return ErrBlocked
 	case reasonFull:
@@ -150,7 +156,8 @@ func or(d, def time.Duration) time.Duration {
 	return def
 }
 
-// Tries is how many wrong codes an address may try before it waits.
+// Tries is how many wrong codes a source, an IPv4 address or an IPv6 /64,
+// may try before it waits (admit.go).
 const Tries = 5
 
 // MaxGuests bounds a room's guests.

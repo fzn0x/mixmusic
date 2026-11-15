@@ -73,14 +73,17 @@ type Server struct {
 	// leave, drop off and come back, or are removed.
 	Changed func()
 
-	mu       sync.Mutex
-	ln       net.Listener
-	started  bool
-	closed   bool
-	conns    map[*conn]bool
-	guests   map[remote.Fingerprint]*guest
-	blocked  map[remote.Fingerprint]string
-	tries    map[string]*tries
+	mu      sync.Mutex
+	ln      net.Listener
+	started bool
+	closed  bool
+	conns   map[*conn]bool
+	guests  map[remote.Fingerprint]*guest
+	blocked map[remote.Fingerprint]string
+	// adm counts the codes tried, and the connections that proved nothing
+	// yet (admit.go); caps, for tests, are its bounds.
+	adm      admission
+	caps     *caps
 	activity []Activity
 	// seq counts the track changes, and gate is the one that waits for
 	// the guests; starting is the state of its start, which the guests
@@ -104,19 +107,13 @@ type guest struct {
 	away time.Time
 }
 
-// tries are the wrong codes an address tried, and until when it waits.
-type tries struct {
-	n     int
-	until time.Time
-}
-
-// conn is a connection the server has: the key and the address of its
-// other end, and the messages that wait to go to it.
+// conn is a connection the server has: the key and the source of its
+// other end (sourceOf), and the messages that wait to go to it.
 type conn struct {
 	raw  net.Conn
 	f    *remote.Frames
 	key  remote.Fingerprint
-	addr string
+	src  string
 	out  chan message
 	once sync.Once
 	gone chan struct{}
@@ -168,6 +165,7 @@ func (s *Server) Serve(ln net.Listener) error {
 		return nil
 	}
 	s.ln = ln
+	s.adm.caps = s.caps.orDefault()
 	s.start()
 	s.mu.Unlock()
 	for {
@@ -185,7 +183,17 @@ func (s *Server) Serve(ln net.Listener) error {
 			}
 			return err
 		}
-		go s.handle(raw)
+		// A connection that proves nothing yet waits for a place among
+		// those the room holds, or is closed at once.
+		src := sourceOf(raw.RemoteAddr().String())
+		s.mu.Lock()
+		ok := s.adm.letIn(src)
+		s.mu.Unlock()
+		if !ok {
+			raw.Close()
+			continue
+		}
+		go s.handle(raw, src)
 	}
 }
 
@@ -244,10 +252,18 @@ func (s *Server) Close() error {
 	return nil
 }
 
-// handle runs a connection: TLS, then a hello, then a guest's proof and
-// stay, or its coming back.
-func (s *Server) handle(raw net.Conn) {
+// handle runs a connection of the source src: TLS, then a hello, then a
+// guest's proof and stay, or its coming back. Until it proved the code,
+// the link or its key, it holds a place among the unproven, and its
+// messages are of a handshake's size.
+func (s *Server) handle(raw net.Conn, src string) {
 	defer raw.Close()
+	proven := sync.OnceFunc(func() {
+		s.mu.Lock()
+		s.adm.proven(src)
+		s.mu.Unlock()
+	})
+	defer proven()
 	t := s.Timing
 	tc := tls.Server(raw, s.Identity.ServerTLS(alpn))
 	ctx, cancel := context.WithTimeout(context.Background(), t.silence())
@@ -260,8 +276,8 @@ func (s *Server) handle(raw net.Conn) {
 	if err != nil {
 		return
 	}
-	addr, _, _ := net.SplitHostPort(raw.RemoteAddr().String())
-	c := &conn{raw: tc, f: remote.NewFrames(tc), key: key, addr: addr, out: make(chan message, outQueue), gone: make(chan struct{})}
+	c := &conn{raw: tc, f: remote.NewFrames(tc), key: key, src: src, out: make(chan message, outQueue), gone: make(chan struct{})}
+	c.f.Limit(handshakeMessage)
 	if !s.add(c) {
 		return
 	}
@@ -283,8 +299,10 @@ func (s *Server) handle(raw net.Conn) {
 			refuse(reason)
 			return
 		}
+		proven()
+		c.f.Limit(0)
 	case wantJoin:
-		if !s.join(c, hello, name, refuse) {
+		if !s.join(c, hello, name, refuse, proven) {
 			return
 		}
 	default:
@@ -340,23 +358,46 @@ func (s *Server) refusal(key remote.Fingerprint) string {
 }
 
 // join runs a guest's proof of the code or the link's secret, then waits
-// for it to join, as its user chooses to once they saw the room. It
-// reports whether the guest joined.
-func (s *Server) join(c *conn, hello message, name string, refuse func(string)) bool {
+// for it to join, as its user chooses to once they saw the room: proven is
+// told once it proved it. It reports whether the guest joined.
+func (s *Server) join(c *conn, hello message, name string, refuse func(string), proven func()) bool {
 	t := s.Timing
+	byCode := hello.By == byCode
 	s.mu.Lock()
-	reason := s.refusal(c.key)
-	if tr := s.tries[c.addr]; reason == "" && tr != nil && time.Now().Before(tr.until) {
-		reason = reasonWait
-	}
-	s.mu.Unlock()
 	password := []byte(s.Code)
 	if hello.By == byLink {
 		password = s.Secret
 	}
-	if reason == "" && (hello.By != byCode && hello.By != byLink || len(password) == 0) {
+	reason := s.refusal(c.key)
+	if reason == "" && (!byCode && hello.By != byLink || len(password) == 0) {
 		reason = reasonCode
 	}
+	// A try of a code counts before it runs, so that tries at once count.
+	tried := false
+	if reason == "" && byCode {
+		switch s.adm.tryCode(c.src, time.Now(), t.wait()) {
+		case tryRuns:
+			tried = true
+		case tryWaits:
+			reason = reasonWait
+		case tryBusy:
+			reason = reasonBusy
+		}
+	}
+	s.mu.Unlock()
+	// endTry ends the try, once: one that ends before its code was
+	// checked, as the guest went, tried none.
+	ended := false
+	endTry := func(wrong bool) {
+		if !tried || ended {
+			return
+		}
+		ended = true
+		s.mu.Lock()
+		s.adm.endTry(c.src, wrong, time.Now(), t.wait())
+		s.mu.Unlock()
+	}
+	defer endTry(false)
 	if reason != "" {
 		refuse(reason)
 		return false
@@ -373,7 +414,7 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string)) 
 	}
 	keys, err := sp.finish(hello.Spake, aad)
 	if err != nil {
-		s.wrong(c.addr)
+		endTry(true)
 		refuse(reasonCode)
 		return false
 	}
@@ -386,13 +427,15 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string)) 
 	}
 	if !hmac.Equal(confirm.MAC, keys.ca) {
 		// One code tried, and wrong.
-		s.wrong(c.addr)
+		endTry(true)
 		refuse(reasonCode)
 		return false
 	}
-	s.mu.Lock()
-	delete(s.tries, c.addr)
-	s.mu.Unlock()
+	endTry(false)
+	// Proven: its place among the unproven goes to another, and its
+	// messages are a guest's.
+	proven()
+	c.f.Limit(0)
 	preview := s.preview()
 	if err := c.f.Send(message{Type: "welcome", MAC: keys.cb, Preview: &preview, Features: features}, t.silence()); err != nil {
 		return false
@@ -431,24 +474,6 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string)) 
 // exportLabel is the label of the bytes a room's TLS connection exports
 // (RFC 8446, 7.5), which bind its SPAKE2 to it.
 const exportLabel = "EXPORTER-MixMusic-room"
-
-// wrong counts a wrong code from addr, which waits once it tried Tries.
-func (s *Server) wrong(addr string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if s.tries == nil {
-		s.tries = map[string]*tries{}
-	}
-	tr := s.tries[addr]
-	if tr == nil || !tr.until.IsZero() && time.Now().After(tr.until) {
-		tr = &tries{}
-		s.tries[addr] = tr
-	}
-	tr.n++
-	if tr.n >= Tries {
-		tr.until = time.Now().Add(s.Timing.wait())
-	}
-}
 
 // comeBack lets a guest whose place the room keeps back in, by its key,
 // or returns why not.

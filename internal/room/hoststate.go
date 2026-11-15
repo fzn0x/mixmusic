@@ -91,9 +91,11 @@ func (s *Server) stateOf(st State) State {
 	return st
 }
 
-// expire forgets the guests that dropped off longer than Keep ago.
+// expire forgets the guests that dropped off longer than Keep ago, and the
+// sources that tried codes a while ago.
 func (s *Server) expire() {
 	s.mu.Lock()
+	s.adm.sweep(time.Now(), s.Timing.wait())
 	gone := false
 	for k, g := range s.guests {
 		if g.conn == nil && !g.away.IsZero() && time.Since(g.away) > s.Timing.keep() {

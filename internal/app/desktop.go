@@ -312,6 +312,11 @@ func (a *App) HandleURL(raw string) {
 	}
 	path := "/" + u.Host + strings.TrimSuffix(u.Path, "/")
 	mygo.App.WhenReady(func() {
+		// mixmusic://next and the like control the player, and show
+		// nothing.
+		if a.followControl(u) {
+			return
+		}
 		if id, ok := strings.CutPrefix(path, "/play/"); ok {
 			a.command(PlayerCommand{Command: CommandPlayTrack, TrackID: id})
 			return

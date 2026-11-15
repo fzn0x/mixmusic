@@ -49,8 +49,12 @@ func TestRecordMemoryRow(t *testing.T) {
 	}
 	click(t, s, tt, "save a heap profile")
 	until(t, s, tt, "the profile", func() bool { return tt.HasText(".pprof in the logs folder") })
+	// The recording saves a profile of its own as it starts, past
+	// diag.MemoryThreshold, where the whole package's tests can take the
+	// test binary: the one the button saved is the newest.
 	files := s.svc.System.MemoryFiles()
-	if len(files) != 2 || files[0] != "memory.log" || !strings.HasPrefix(files[1], "heap-") || !tt.HasText("Saved "+files[1]) {
+	n := len(files)
+	if n < 2 || n > 3 || files[0] != "memory.log" || !strings.HasPrefix(files[n-1], "heap-") || !tt.HasText("Saved "+files[n-1]) {
 		t.Errorf("the files %q; the window shows %q", files, tt.Texts())
 	}
 	// The click gave the button the focus.

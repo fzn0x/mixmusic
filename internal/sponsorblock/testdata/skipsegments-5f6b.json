@@ -1,0 +1,159 @@
+[
+ {
+  "videoID": "1yRWqE5jrkM",
+  "segments": [
+   {
+    "category": "music_offtopic",
+    "actionType": "skip",
+    "segment": [
+     188.341,
+     191.46083
+    ],
+    "UUID": "852cd5191e566adda6e7fb278dc2ffd5aa7d382f1587734993a4df51b5f209777",
+    "videoDuration": 191.46083,
+    "locked": 0,
+    "votes": 0,
+    "description": ""
+   },
+   {
+    "category": "poi_highlight",
+    "actionType": "poi",
+    "segment": [
+     72.781,
+     72.781
+    ],
+    "UUID": "1a103b8c9760d5ec3714b5163d40a06e86c54804467e335381351010c3b5f9f27",
+    "videoDuration": 191.46083,
+    "locked": 0,
+    "votes": -1,
+    "description": ""
+   }
+  ]
+ },
+ {
+  "videoID": "eXjGWlJOhWg",
+  "segments": [
+   {
+    "category": "intro",
+    "actionType": "skip",
+    "segment": [
+     0,
+     14.827
+    ],
+    "UUID": "5d683910148aa799a608c4f0b36670af90526cc89f05aa824f7c563f384a1f667",
+    "videoDuration": 3238.835,
+    "locked": 0,
+    "votes": 0,
+    "description": ""
+   }
+  ]
+ },
+ {
+  "videoID": "3KQzuNkJih8",
+  "segments": [
+   {
+    "category": "preview",
+    "actionType": "skip",
+    "segment": [
+     0,
+     16.921
+    ],
+    "UUID": "62a3001f2c86fbadcff03394acaa3909e6e1de036a4df376533fb433d0ca88526",
+    "videoDuration": 1215.021,
+    "locked": 0,
+    "votes": 0,
+    "description": ""
+   }
+  ]
+ },
+ {
+  "videoID": "aQp-iM0bCs4",
+  "segments": [
+   {
+    "category": "sponsor",
+    "actionType": "skip",
+    "segment": [
+     0,
+     31.861
+    ],
+    "UUID": "b772d4b75ca73ce63940fa982d051c031964160941efd93bd6ed1bbe9327a46e",
+    "videoDuration": 361,
+    "locked": 0,
+    "votes": 0,
+    "description": ""
+   }
+  ]
+ },
+ {
+  "videoID": "ADbuFoWx9Nk",
+  "segments": [
+   {
+    "category": "outro",
+    "actionType": "skip",
+    "segment": [
+     290.254,
+     311.781
+    ],
+    "UUID": "3fb08ba50f86408e0a48ab29aa1358a7b2a14289e03ab48fe09739ef681420877",
+    "videoDuration": 311.781,
+    "locked": 0,
+    "votes": 0,
+    "description": ""
+   }
+  ]
+ },
+ {
+  "videoID": "WEaQkJwGQRE",
+  "segments": [
+   {
+    "category": "interaction",
+    "actionType": "skip",
+    "segment": [
+     0.409,
+     12.225
+    ],
+    "UUID": "69396f24de6a7141ddea165fa1171d41a7205d07064dfd33db6a4dc8695642737",
+    "videoDuration": 539.821,
+    "locked": 0,
+    "votes": 0,
+    "description": ""
+   }
+  ]
+ },
+ {
+  "videoID": "vV4P9dcQQtU",
+  "segments": [
+   {
+    "category": "selfpromo",
+    "actionType": "skip",
+    "segment": [
+     91.24,
+     98
+    ],
+    "UUID": "c6109600b99688641aafb397eff5f1727b25f1f423e518a7f5bc82eb432fa8047",
+    "videoDuration": 98,
+    "locked": 0,
+    "votes": 0,
+    "description": ""
+   }
+  ]
+ },
+ {
+  "videoID": "fjNRPNF_FHs",
+  "segments": [
+   {
+    "category": "filler",
+    "actionType": "skip",
+    "segment": [
+     716.923,
+     737.415
+    ],
+    "UUID": "850d79b7ef99d34be5ec97d189c3fe36211e8b962fb3fb12417610bff5d341397",
+    "videoDuration": 792.42737,
+    "locked": 0,
+    "votes": 0,
+    "description": ""
+   }
+  ]
+ }
+]

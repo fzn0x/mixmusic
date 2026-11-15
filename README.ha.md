@@ -244,10 +244,15 @@ hanyar sadarwa, sabar sauti, allo da GPU, amma ba ya ganin babban fayil ɗin
 gidanka ko kaɗan. MixMusic yana adana saitunansa da ɗakin waƙoƙinsa a
 `~/.var/app/io.github.fzn0x.mixmusic`, a keɓe daga kwafin `.deb`, `.rpm`,
 AppImage ko kundi, kuma duka biyun na iya gudana a lokaci guda. Don kawo
-saituna da ɗakin waƙoƙin wani kwafi, rufe duka biyun, kwafi `settings.json`,
-`library.json`, `queue.json` da babban fayil ɗin `addons` daga
-`~/.config/MixMusic` zuwa `~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`,
-sannan ka sake shiga asusunka: shigarwa suna nan a keyring na ɗayan kwafin.
+saituna da ɗakin waƙoƙin wani kwafi, rufe duka biyun, sannan ka kwafi
+`settings.json`, `library.json`, `queue.json`, `positions.json` da manyan
+fayilolin `addons` da `mix-covers` daga `~/.config/MixMusic` zuwa
+`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`. Ka rufe duka biyun da
+farko: MixMusic da ke aiki yana riƙe `library.json` da yawancin sauran
+fayiloli a cikin ƙwaƙwalwa, kuma idan ya sake adanawa yana rubutawa a kan
+fayil ɗin da aka kwafa. Sannan ka sake shiga asusunka: shigarwa suna nan a
+keyring na ɗayan kwafin. [Shafin bayanai da sirri](docs/data-and-privacy.md#the-data-folder)
+yana bayyana abin da kowane fayil yake ɗauke da shi.
 
 A Flatpak, farawa idan ka shiga kwamfuta yana bi ta kwamfutarka, wadda za ta
 iya tambayarka da farko, kuma yt-dlp naka na kanka dole ne ya kasance a

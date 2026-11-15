@@ -55,9 +55,14 @@ func (c *Client) Search(ctx context.Context, query string, filter Filter) ([]med
 // SearchWeb searches all of YouTube, not only its music catalog: the
 // videos of the website's own search, as tutorials, vlogs and live
 // streams, which YouTube Music doesn't list. It speaks as the website,
-// against YouTube's own origin, and needs no account.
+// against YouTube's own origin, as a visitor YouTube doesn't know: it
+// sends neither the account's cookies nor its visitor ID, and keeps
+// none of the answer's.
 func (c *Client) SearchWeb(ctx context.Context, query string) (media.SearchResults, error) {
-	n, err := c.callWith(ctx, webClient, "search", map[string]any{"query": query}, nil, callOptions{baseURL: webBaseURL})
+	n, err := c.callWith(ctx, webClient, "search", map[string]any{"query": query}, nil, callOptions{
+		baseURL:   webBaseURL,
+		anonymous: true,
+	})
 	if err != nil {
 		return media.SearchResults{}, err
 	}

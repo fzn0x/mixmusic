@@ -15,13 +15,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"slices"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -41,7 +41,13 @@ type playLine struct {
 	// HeardMs is how long the play's audio sounded, in milliseconds: room
 	// for #544 to write. 0 is unknown, and the stats count the listed
 	// length.
-	HeardMs int          `json:"heardMs,omitempty"`
+	HeardMs int `json:"heardMs,omitempty"`
+	trackLine
+}
+
+// trackLine is what a line holds of its track, after what it holds of the
+// play: the same in each line of a track that didn't change.
+type trackLine struct {
 	ID      string       `json:"id"`
 	Source  media.Source `json:"source,omitempty"`
 	Title   string       `json:"title,omitempty"`
@@ -116,25 +122,44 @@ func (g *playLog) view() playsView {
 // file was there.
 func openPlayLog(path string) (g *playLog, found bool, err error) {
 	g = &playLog{path: path, byKey: map[string]int32{}}
-	data, err := store.ReadFile(path)
+	f, err := store.OpenShared(path)
 	if errors.Is(err, fs.ErrNotExist) {
 		return g, false, nil
 	}
 	if err != nil {
 		return nil, false, err
 	}
+	defer f.Close()
+	// A line at a time, the file never whole in memory.
+	r := bufio.NewReaderSize(f, 64<<10)
+	var long []byte
 	skipped := 0
-	for rest := data; len(rest) > 0; {
-		var line []byte
-		line, rest, _ = bytes.Cut(rest, []byte{'\n'})
+	for {
+		chunk, err := r.ReadSlice('\n')
+		if errors.Is(err, bufio.ErrBufferFull) {
+			long = append(long, chunk...)
+			continue
+		}
+		line := chunk
+		if long != nil {
+			line, long = append(long, chunk...), nil
+		}
+		if len(line) > 0 {
+			g.torn = line[len(line)-1] != '\n'
+		}
 		if line = bytes.TrimSpace(line); len(line) > 0 && !g.read(line) {
 			skipped++
+		}
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return nil, false, err
 		}
 	}
 	if skipped > 0 {
 		log.Printf("mixmusic: %s: skipped %d lines that don't read, as one a crash cut short", path, skipped)
 	}
-	g.torn = len(data) > 0 && data[len(data)-1] != '\n'
 	return g, true, nil
 }
 
@@ -142,15 +167,24 @@ func openPlayLog(path string) (g *playLog, found bool, err error) {
 // that is the one before it again, as one written again after its append
 // failed partway, counts once.
 func (g *playLog) read(line []byte) bool {
-	var l playLine
-	if err := json.Unmarshal(line, &l); err != nil || l.ID == "" {
-		return false
+	at, heardMs, track, split := splitLine(line)
+	i, known := g.byKey[string(track)]
+	if !split || !known {
+		var l playLine
+		if err := json.Unmarshal(line, &l); err != nil || l.ID == "" {
+			return false
+		}
+		t, err := time.Parse(time.RFC3339, l.At)
+		if err != nil {
+			return false
+		}
+		key := string(track)
+		if !split {
+			key = l.key()
+		}
+		at, heardMs, i = t.Unix(), l.HeardMs, g.internAs(key, l.trackLine)
 	}
-	at, err := time.Parse(time.RFC3339, l.At)
-	if err != nil {
-		return false
-	}
-	p := loggedPlay{at: at.Unix(), heardMs: int32(l.HeardMs), track: g.intern(l)}
+	p := loggedPlay{at: at, heardMs: int32(heardMs), track: i}
 	if n := len(g.plays); n > 0 && g.plays[n-1] == p {
 		return true
 	}
@@ -158,9 +192,48 @@ func (g *playLog) read(line []byte) bool {
 	return true
 }
 
+// splitLine splits a line as the log writes it into the play's time, how
+// long it was heard, and the rest, which tells the track: alike in each
+// line of a track that didn't change, so that the line of a track read
+// before needs no decoding, and the log reads fast. split is false for a
+// line written otherwise.
+func splitLine(line []byte) (at int64, heardMs int, track []byte, split bool) {
+	rest, ok := bytes.CutPrefix(line, []byte(`{"at":"`))
+	if !ok {
+		return 0, 0, nil, false
+	}
+	stamp, rest, ok := bytes.Cut(rest, []byte{'"'})
+	if !ok {
+		return 0, 0, nil, false
+	}
+	if r, ok := bytes.CutPrefix(rest, []byte(`,"heardMs":`)); ok {
+		i := bytes.IndexByte(r, ',')
+		if i < 0 {
+			return 0, 0, nil, false
+		}
+		n, err := strconv.Atoi(string(r[:i]))
+		if err != nil {
+			return 0, 0, nil, false
+		}
+		heardMs, rest = n, r[i:]
+	}
+	track, ok = bytes.CutPrefix(rest, []byte{','})
+	if !ok {
+		return 0, 0, nil, false
+	}
+	t, err := time.Parse(time.RFC3339, string(stamp))
+	if err != nil {
+		return 0, 0, nil, false
+	}
+	return t.Unix(), heardMs, track, true
+}
+
 // intern returns the track of a line, which tracks keeps once.
-func (g *playLog) intern(l playLine) int32 {
-	key := l.key()
+func (g *playLog) intern(l trackLine) int32 { return g.internAs(l.key(), l) }
+
+// internAs returns the track of a line, found by key, what the line holds
+// of it as the log writes it.
+func (g *playLog) internAs(key string, l trackLine) int32 {
 	if i, ok := g.byKey[key]; ok {
 		return i
 	}
@@ -171,7 +244,7 @@ func (g *playLog) intern(l playLine) int32 {
 }
 
 // track returns the track of a line, as the stats see it.
-func (l playLine) track() loggedTrack {
+func (l trackLine) track() loggedTrack {
 	t := loggedTrack{Track: media.Track{ID: l.ID, Source: l.Source, Title: l.Title, Artists: l.Artists, Album: l.Album,
 		DurationMs: l.DurationMs, Video: l.Video}, year: l.Year}
 	if t.Artists == nil {
@@ -183,34 +256,21 @@ func (l playLine) track() loggedTrack {
 	return t
 }
 
-// key names what a line tells of its track: the lines of a track that
-// didn't change share it.
-func (l playLine) key() string {
-	var b strings.Builder
-	field := func(s string) { b.WriteString(s); b.WriteByte(0) }
-	field(l.ID)
-	field(string(l.Source))
-	field(l.Title)
-	for _, a := range l.Artists {
-		field(a.ID)
-		field(a.Name)
+// key is what a line holds of its track, as the log writes it: the end
+// of the line, from the track's ID on.
+func (l trackLine) key() string {
+	b, err := json.Marshal(l)
+	if err != nil || len(b) == 0 {
+		return "" // strings, numbers and booleans always marshal
 	}
-	b.WriteByte(1)
-	if l.Album != nil {
-		field(l.Album.ID)
-		field(l.Album.Name)
-	}
-	field(l.Year)
-	field(strconv.Itoa(l.DurationMs))
-	field(strconv.FormatBool(l.Video))
-	field(strconv.FormatBool(l.Episode))
-	return b.String()
+	return string(b[1:])
 }
 
 // lineOf returns the line of a play of t at at.
 func lineOf(at time.Time, heardMs int, t loggedTrack) playLine {
-	l := playLine{At: at.Format(time.RFC3339), HeardMs: heardMs, ID: t.ID, Source: t.Source, Title: t.Title,
-		Artists: t.Artists, Album: t.Album, Year: t.year, DurationMs: t.DurationMs, Video: t.Video, Episode: t.IsEpisode()}
+	l := playLine{At: at.Format(time.RFC3339), HeardMs: heardMs, trackLine: trackLine{ID: t.ID, Source: t.Source,
+		Title: t.Title, Artists: t.Artists, Album: t.Album, Year: t.year, DurationMs: t.DurationMs, Video: t.Video,
+		Episode: t.IsEpisode()}}
 	if l.Album != nil && l.Album.ID == "" && l.Album.Name == "" {
 		l.Album = nil
 	}
@@ -231,7 +291,7 @@ func (g *playLog) add(at time.Time, t media.Track) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	l := lineOf(at, 0, loggedTrack{Track: t})
-	g.plays = append(g.plays, loggedPlay{at: at.Unix(), track: g.intern(l)})
+	g.plays = append(g.plays, loggedPlay{at: at.Unix(), track: g.intern(l.trackLine)})
 	g.pending = append(g.pending, l.encode()...)
 	return g.flush()
 }
@@ -245,7 +305,7 @@ func (g *playLog) fill(history []Play) error {
 	defer g.mu.Unlock()
 	for _, p := range slices.Backward(history) {
 		l := lineOf(p.PlayedAt, 0, loggedTrack{Track: p.Track})
-		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(l)})
+		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(l.trackLine)})
 	}
 	g.whole = true
 	return g.flush()

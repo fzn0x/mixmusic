@@ -48,7 +48,7 @@ func withLog(t *testing.T, l *Library, plays []Play) {
 	g.plays, g.tracks, g.byKey = nil, nil, map[string]int32{}
 	for _, p := range plays {
 		line := lineOf(p.PlayedAt, 0, loggedTrack{Track: p.Track})
-		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(line)})
+		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(line.trackLine)})
 	}
 	if err := g.writeWhole(g.plays, g.tracks); err != nil {
 		t.Fatal(err)

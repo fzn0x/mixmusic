@@ -105,6 +105,7 @@
   "showInTitle": false,
   "keepOnTop": true,
   "miniPanel": "lyrics",
+  "miniZoom": 1.25,
   "mediaKeys": false,
   "assistantControl": true,
   "showOnDiscord": false,

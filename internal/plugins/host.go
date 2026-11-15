@@ -46,6 +46,8 @@ type Host struct {
 	mu       sync.Mutex
 	running  map[string]*plugin
 	failures map[string]failure
+	// closed is set once Close stopped the plugins, for good.
+	closed   bool
 	ui       UI
 	theme    Theme
 	items    []*SidebarItem
@@ -122,13 +124,16 @@ func (h *Host) changed() {
 
 // Sync runs the plugins enabled among those installed: it starts those
 // that don't run, stops those no longer enabled or installed, and starts
-// again those of another version.
+// again those of another version. Once the host closed, it starts none.
 func (h *Host) Sync(enabled []string, installed []addons.Plugin) {
 	if h == nil {
 		return
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if h.closed {
+		return
+	}
 	byID := map[string]addons.Plugin{}
 	for _, p := range installed {
 		byID[p.ID] = p
@@ -174,6 +179,7 @@ func (h *Host) Close() {
 		return
 	}
 	h.mu.Lock()
+	h.closed = true
 	stopping := make([]*plugin, 0, len(h.running))
 	for _, pl := range h.running {
 		h.stopLocked(pl)

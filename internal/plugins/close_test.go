@@ -23,6 +23,17 @@ export default (api) => () => api.ui.toast("stopped");`})
 	}
 }
 
+func TestNothingStartsAfterClose(t *testing.T) {
+	h := newTestHost(t)
+	h.install("late", manifest("late"), map[string]string{"index.js": `
+export default (api) => api.ui.toast("started");`})
+	h.Close()
+	h.enable("late")
+	if h.Running("late") {
+		t.Error("a plugin started after Close")
+	}
+}
+
 func TestCloseKeepsWhatStopFunctionsStore(t *testing.T) {
 	h := newTestHost(t)
 	h.install("keeper", manifest("keeper"), map[string]string{"index.js": `

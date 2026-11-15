@@ -98,6 +98,20 @@ type playLog struct {
 	rewrites uint64
 }
 
+// playsView is the log as it was at a moment, which no change alters
+// after.
+type playsView struct {
+	plays  []loggedPlay
+	tracks []loggedTrack
+}
+
+// view returns the log as it is.
+func (g *playLog) view() playsView {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return playsView{plays: g.plays[:len(g.plays):len(g.plays)], tracks: g.tracks[:len(g.tracks):len(g.tracks)]}
+}
+
 // openPlayLog reads the play log kept at path; found tells whether the
 // file was there.
 func openPlayLog(path string) (g *playLog, found bool, err error) {

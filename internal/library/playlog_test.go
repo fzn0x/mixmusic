@@ -38,13 +38,14 @@ func clockFrom(l *Library, start time.Time) {
 	l.now = func() time.Time { at = at.Add(time.Minute); return at }
 }
 
-// withLog puts plays, the oldest first, in the log of l, written whole,
-// as the log of a user who played them would be.
+// withLog makes the log of l the plays given, the oldest first, written
+// whole, as the log of a user who played them would be.
 func withLog(t *testing.T, l *Library, plays []Play) {
 	t.Helper()
 	g := l.plays
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	g.plays, g.tracks, g.byKey = nil, nil, map[string]int32{}
 	for _, p := range plays {
 		line := lineOf(p.PlayedAt, 0, loggedTrack{Track: p.Track})
 		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(line)})
@@ -67,7 +68,6 @@ func TestPlayLogKeepsEveryPlay(t *testing.T) {
 		plays = append(plays, Play{Track: []media.Track{a, b}[i%2], PlayedAt: start.Add(time.Duration(i) * time.Minute)})
 	}
 	withHistory(t, l, plays)
-	withLog(t, l, plays)
 	clockFrom(l, start.Add(maxHistory*time.Minute))
 	for range 5 {
 		if err := l.RecordPlay(a); err != nil {
@@ -308,7 +308,7 @@ func TestPlayLogFromHistory(t *testing.T) {
 		t.Errorf("after a play and a restart, the log reads %q", got)
 	}
 	// A log there is never filled again, from what the history holds.
-	withHistory(t, again, []Play{{Track: a, PlayedAt: start}})
+	again.file.Update(func(d *Data) error { d.History = append(d.History, Play{Track: a, PlayedAt: start}); return nil })
 	if got := loggedIDs(openIn(t, dir)); len(got) != 4 {
 		t.Errorf("the log was filled again: %q", got)
 	}
@@ -346,5 +346,51 @@ func TestPlayLogRetarget(t *testing.T) {
 	v = again.Version()
 	if err := again.Retarget(map[string]media.Track{mp3.ID: song}); err != nil || again.Version() != v {
 		t.Errorf("a retarget of nothing held: %v, version %d, was %d", err, again.Version(), v)
+	}
+}
+
+// TestStatsCountEveryPlay counts every play the log holds, years of them,
+// far past the history's 1,000: All time, Your year of each year, whole,
+// and the Plays sort. A top track has its cover from the library, which
+// the log leaves out.
+func TestStatsCountEveryPlay(t *testing.T) {
+	l := open(t)
+	l.now = func() time.Time { return time.Date(2027, 1, 1, 0, 30, 0, 0, time.UTC) }
+	liked := tr("yt:liked", media.SourceYouTube, "North Pier")
+	songs := []media.Track{liked, tr("yt:b", media.SourceYouTube, "Quiet Tide"), tr("sp:c", media.SourceSpotify, "Low Orchard")}
+	var plays []Play
+	for d := time.Date(2024, 1, 1, 9, 0, 0, 0, time.UTC); d.Year() < 2027; d = d.AddDate(0, 0, 1) {
+		plays = append(plays, Play{Track: songs[0], PlayedAt: d}, Play{Track: songs[len(plays)/2%3], PlayedAt: d.Add(30 * time.Minute)})
+	}
+	withLog(t, l, plays)
+	if err := l.SetLiked(liked, true); err != nil {
+		t.Fatal(err)
+	}
+	days := 366 + 365 + 365
+	s := l.Stats(0)
+	if s.Plays != 2*days || s.Minutes != 3*2*days || s.YouTube+s.Spotify != 2*days {
+		t.Errorf("all time: %d plays, %d minutes, %d+%d", s.Plays, s.Minutes, s.YouTube, s.Spotify)
+	}
+	if top := s.TopTracks[0]; top.Track.ID != liked.ID || top.Plays < days || len(top.Track.Artwork) == 0 {
+		t.Errorf("the top track = %+v", top)
+	}
+	if week := l.Stats(7); week.Plays != 14 {
+		t.Errorf("the last 7 days count %d plays, want 14", week.Plays)
+	}
+	if got := l.RecapYears(); !slices.Equal(got, []int{2026, 2025, 2024}) {
+		t.Errorf("years %v", got)
+	}
+	if r := l.Recap(2024); r.Plays != 2*366 || r.First == nil || !r.First.PlayedAt.Equal(time.Date(2024, 1, 1, 9, 0, 0, 0, time.UTC)) || r.NewKnown {
+		t.Errorf("2024: %d plays, first %+v, new known %v", r.Plays, r.First, r.NewKnown)
+	}
+	if r := l.Recap(2025); r.Plays != 2*365 || !r.NewKnown || r.NewArtists != 0 {
+		t.Errorf("2025: %d plays, new artists %d, known %v", r.Plays, r.NewArtists, r.NewKnown)
+	}
+	total := 0
+	for _, n := range l.PlayCounts() {
+		total += n
+	}
+	if total != 2*days {
+		t.Errorf("the Plays sort counts %d plays, want %d", total, 2*days)
 	}
 }

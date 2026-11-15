@@ -1,0 +1,104 @@
+# Listen with friends
+<!-- docs: group=using order=76 -->
+
+With MixMusic on several computers of the same network, friends at home
+can all hear what one of them plays, at the same moment: one starts a
+room, the others join it, and each computer plays the host's music, in
+step, on its own speakers. Your audio is never sent: each computer plays
+the same track from where it can. There is no server and no account.
+
+## Start a room
+
+Open the [cast button](casting.md)'s menu in the player bar and choose
+**Start a room**, or click **start a room** in Settings › Desktop ›
+Listen with friends. The room's page shows its code, of 6 letters and
+digits, **copy invite link**, and **end room**.
+
+Friends join with the code, or with the invite link, which you send them
+as you like. The room lasts until you end it, or quit MixMusic.
+
+## Join a room
+
+1. Open the cast button's menu. Below the devices, it lists the rooms on
+   your network, as "Desk's room".
+2. Choose one, and type the code its host's page shows. Its letters may be
+   in either case; O counts as 0, and I and L as 1.
+3. The room shows who hosts it, what plays and how many listen. Click
+   **join**.
+
+An invite link, `mixmusic://join/…`, opens the room in MixMusic, which
+then shows the same, with **join**. Pasted on the Listen with friends
+page, as **Invite link**, it does too.
+
+Five wrong codes from a computer, and it waits a minute before it may try
+again.
+
+## In a room
+
+Your computer plays what the host plays, from where the host is: each
+track, as it pauses, plays and seeks. When the host changes track, it
+waits for everyone to have the next one ready, 5 seconds at most, then
+all start at once. Your computer keeps itself within about 50
+milliseconds of the host's: a little faster or slower, at the same pitch,
+when it drifts, and a jump when it's far off.
+
+- **Spotify tracks** play on your Spotify as your settings play them, or
+  from YouTube Music when you have no Spotify. Those Spotify plays itself
+  only jump, as it plays at its own speed.
+- **The host's music files** play from your own file of the same song, as
+  its title, artist and length tell, or the page says **Can't play here**.
+- **Explicit songs**, while your settings hide them, stay silent, with a
+  note.
+- Your **volume**, output device and equalizer stay yours, unless you turn
+  on **Follow the host's volume** in Settings › Desktop › Listen with
+  friends.
+- Your **crossfade**, **autoplay** and **speeds**, and the skipping of
+  songs you dislike and songs made with AI, rest while you're in a room.
+
+The room's page shows what plays, who listens, and what comes next. Click
+**leave room** to leave: your own queue comes back, paused where it was.
+If MixMusic quits while you're in a room, your queue is back at the next
+start.
+
+The others see you by your name in rooms, which Settings › Desktop ›
+Listen with friends sets: your computer's name when you set none.
+
+## Running a room
+
+The host's page lists the guests: **remove** takes one out of the room,
+and it can join again only with the code or the link; **block** keeps it
+out, even with the code, until you **unblock** it. **Activity** tells who
+joined, left, or was removed or blocked.
+
+## Dropping off
+
+A guest whose computer sleeps, or loses the network, comes back by
+itself, without the code: after a second, then a little longer each
+time, up to half a minute, 15 times, and as soon as its computer wakes.
+The host keeps its place 15 minutes. When the host ends the room, or
+can't be reached, the guest's page says **The room ended**, and its own
+queue comes back.
+
+## Safe on a shared network
+
+What the computers of a room send is encrypted, and only they can read
+it. The code is never sent: each guest and the host prove to each other
+that they know it, and someone who tries codes has one chance in more than
+a billion each time. An invite link names the host's key, so it only
+opens that computer's room. [How it works inside](architecture/rooms.md)
+tells more.
+
+## Firewalls and the local network
+
+While a room is open, MixMusic listens for the guests on your local
+network, as for remote control: the first time, your system may ask
+about it. [Remote control](remote-control.md#firewalls-and-the-local-network)
+tells what to answer, on Windows, macOS and Linux. Guests listen for
+nothing.
+
+## Not yet
+
+- Songs from guests, guests controlling the playback, asking before
+  someone joins, and moving the room to a guest.
+- Phones and browsers joining a room, which waits for the phone page
+  (#560).

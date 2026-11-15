@@ -208,6 +208,7 @@ func (p *Player) SettingsChanged(s settings.Settings) {
 		}
 		// The queue passes over explicit songs while they're hidden.
 		p.hideChanged(s)
+		p.partSettings(s.SkipParts)
 		moved := s.SpotifyPlayback != p.spotifyMode
 		if moved || s.SkipDisliked != p.skipDisliked || s.SkipAI != p.skipAI {
 			// A Spotify track that plays on a device isn't passed over for
@@ -365,6 +366,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 	p.s.Buffering = true
 	p.s.Loading = autoplay
 	p.s.Source = nil
+	p.clearParts()
 	// What the engine played stops now: finding the track's stream may take
 	// a while, or fail.
 	p.loaded = false
@@ -685,11 +687,12 @@ func (p *Player) onProgress() {
 	// half: a live stream, or one its list didn't tell the length of, as
 	// the home page's shelves, until its stream tells it. The engine tells
 	// the time as a stream opens, before its length.
+	heard, length := p.withoutParts(pos, dur)
 	count := countAfter
-	if dur > 0 {
-		count = min(countAfter, dur/2)
+	if length > 0 {
+		count = min(countAfter, length/2)
 	}
-	if p.counted != entry.UID && pos >= count {
+	if p.counted != entry.UID && heard >= count {
 		p.counted = entry.UID
 		go p.svc.RecordPlay(entry.Track)
 	}
@@ -699,7 +702,11 @@ func (p *Player) onProgress() {
 		// audio waits until this track has played a while, so that skipping
 		// through a queue doesn't download every track.
 		p.prepared = next.UID
-		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(Source, error) {})
+		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
+			if err == nil {
+				p.lookUp(src) // its parts, as its stream is found
+			}
+		})
 	}
 	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter && p.retry.n == 0 {
 		p.prefetched = next.UID
@@ -710,7 +717,7 @@ func (p *Player) onProgress() {
 	// tells, waits to play again.
 	fade := time.Duration(p.svc.Settings().Crossfade) * time.Second
 	if fade > 0 && !p.crossfading && !p.paused && p.s.Source != nil && p.s.Source.Mode == ModeStream &&
-		hasNext && next.UID != entry.UID && dur > 0 && p.heard(dur-pos) <= fade && p.heard(dur) > 3*fade && p.mayStart(next) &&
+		hasNext && next.UID != entry.UID && dur > 0 && p.heard(p.endOf(dur)-pos) <= fade && p.heard(dur) > 3*fade && p.mayStart(next) &&
 		!spoken(entry.Track) && !spoken(next.Track) {
 		p.crossfadeTo(next, fade)
 	}
@@ -728,6 +735,7 @@ func (p *Player) preload(next Item) {
 		// behind its live edge by then. Nor is an episode, which the
 		// engine would hold whole beside the track that plays.
 		if err == nil && src.Mode == ModeStream && src.URL != "" && !src.Live && !spoken(next.Track) {
+			p.partsFor(src.audio(p.surround), src)
 			p.stream.Preload(src.audio(p.surround))
 		}
 		if errors.Is(err, ErrOffline) {
@@ -807,6 +815,7 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		p.knowReady(src)
 		url := p.audioOf(src)
 		p.inSurround = src.SurroundURL != "" && url == src.SurroundURL
+		p.currentParts(url, src)
 		_ = p.stream.Crossfade(url, fade, p.cue(0, false))
 		p.readySurround()
 	})
@@ -942,7 +951,8 @@ func (p *Player) stopAtEnd(ended bool) {
 // previous goes back to the start of the track, or to the entry before it,
 // past those the queue passes over, early in it as heard at its speed.
 func (p *Player) previous() {
-	heard, i := p.heard(p.s.Position), p.s.Index
+	at, _ := p.withoutParts(p.s.Position, p.s.Duration)
+	heard, i := p.heard(at), p.s.Index
 	if p.s.Live {
 		// A live stream has no start to go back to: the track before
 		// plays.
@@ -1006,6 +1016,7 @@ func (p *Player) now() Now {
 		Loading:  p.s.Loading,
 		Position: p.s.Position,
 		Duration: p.s.Duration,
+		Skipped:  p.skippedLength(),
 		Live:     p.s.Live,
 		Volume:   p.s.Volume,
 		Shuffle:  p.s.Shuffle,
@@ -1161,6 +1172,7 @@ func (p *Player) onTime(position, duration time.Duration) {
 	if duration > 0 && !p.s.Live {
 		p.s.Duration = duration
 	}
+	p.refitLength()
 	// The engine's time moves once it sounds: the log tells how long a
 	// stream took, when long, to tell why tracks start late. A time of the
 	// track before comes before the engine has this one.

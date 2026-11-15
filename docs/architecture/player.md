@@ -23,6 +23,21 @@
   the user picks too ([explicit.md](explicit.md)). A track whose label the app doesn't know is checked
   before it's announced, beside the search for its stream, and the next
   track before it's preloaded or crossfaded into.
+- **Parts of videos** (`parts.go`, #548): while Skip the parts
+  SponsorBlock marks is on, the player asks the app for the parts of each
+  stream (`Marked`) as it is found, the next track's as it is prepared,
+  and tells the engine those of the kinds ticked before it loads,
+  preloads or crossfades into it (`Skipper`, `audio.Engine.SetSkips`):
+  playback never waits for them, and those that come late apply from
+  then on. `State.Parts` and `State.Highlight` are the current track's,
+  fitted to its length as the engine fits them, for the seek bars. Each
+  part the engine passed over is told (`Notice.Undo` goes back to it, which
+  then plays), but for one that ended the track. Plays count, and
+  Previous's 3 seconds go, by what played without the parts, and half the
+  length without them; the app hears how long they last (`Now.Skipped`)
+  for Last.fm. A crossfade takes the start of a part that reaches the end
+  as the track's end. Nothing is asked for while it's off, nor of a live
+  stream, a Spotify device's track, or a cast device's, which plays them.
 - **On a Spotify device** (`connect.go`), the player sends commands and
   asks what the device plays, and waits for its reports, which lag the
   commands, to settle. A track ends when the device stops on it, goes back

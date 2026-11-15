@@ -128,6 +128,12 @@ type State struct {
 	// stream was found: it plays without a length, can't seek, and never
 	// ends of itself, but when its broadcast does.
 	Live bool
+	// Parts are the parts of the current track the player passes over, as
+	// SponsorBlock marks them and the settings skip them, in order, once
+	// known (parts.go); Highlight is where its highlight is, while the
+	// settings show it, or 0.
+	Parts     []Part
+	Highlight time.Duration
 	// Speed is the speed the current track plays at, at its own pitch: 1 is
 	// its own speed. What MixMusic's own engine plays takes the settings'
 	// speed of its kind; Spotify plays its own tracks at their own.
@@ -199,6 +205,8 @@ type Notice struct {
 	Failure int
 	// Settings is set when the playback settings change what it tells.
 	Settings bool
+	// Undo, when set, takes back what it tells, as the user asks.
+	Undo func()
 }
 
 // Now is what plays, as the app tells the tray, notifications and the
@@ -211,6 +219,9 @@ type Now struct {
 	Loading  bool
 	Position time.Duration
 	Duration time.Duration
+	// Skipped is how long the parts of the track that the player passes
+	// over last, which plays and scrobbles leave out (parts.go).
+	Skipped time.Duration
 	// Live is set for a live stream, which has no length: Position is how
 	// long it played.
 	Live bool
@@ -522,6 +533,9 @@ type Player struct {
 	// passing is what the player keeps of passing over entries as it moves
 	// on.
 	passing passState
+	// parts is what it keeps of the parts of tracks it passes over
+	// (parts.go).
+	parts partState
 	// surround is whether streams play their 5.1 surround audio, as the
 	// settings ask, when they have some; stereoOnly is set once the current
 	// entry's 5.1 audio failed, which then plays in stereo.
@@ -566,6 +580,7 @@ func New(svc Services, stream Stream, device Device, saved Saved) *Player {
 	p.s = State{Index: -1, Repeat: RepeatOff, Volume: volume.Of(st.Volume), Speed: 1}
 	p.spotifyMode, p.skipDisliked, p.skipAI = st.SpotifyPlayback, st.SkipDisliked, st.SkipAI
 	p.hideExplicit = st.HideExplicit
+	p.parts.settings = st.SkipParts
 	p.surround = st.Surround
 	p.curve = st.VolumeCurve
 	if len(saved.Tracks) > 0 {

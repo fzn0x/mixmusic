@@ -77,6 +77,7 @@ func (p *Player) loadAudio(src Source, cue audio.Cue, again bool) {
 	if again {
 		url += "?retry=" + strconv.FormatInt(time.Now().UnixMilli(), 10)
 	}
+	p.currentParts(url, src)
 	_ = p.stream.Load(url, cue)
 }
 

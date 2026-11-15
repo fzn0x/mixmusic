@@ -42,3 +42,28 @@ func TestServiceLibraryBuildsNearTiles(t *testing.T) {
 		t.Errorf("at the end, the shelf shows %q", tt.Texts())
 	}
 }
+
+// TestFollowedAndSavedBuildNearTiles builds of the shelves of the artists
+// followed and the shows saved on Spotify, in Library › Artists and
+// Podcasts, the tiles near the view alone.
+func TestFollowedAndSavedBuildNearTiles(t *testing.T) {
+	const n = 40
+	var artists []media.Artist
+	var shows []media.Podcast
+	for i := range n {
+		artists = append(artists, media.Artist{ID: "sp:a" + count(i), Source: media.SourceSpotify, Name: "Artist " + count(i)})
+		shows = append(shows, media.Podcast{ID: "sp:s" + count(i), Source: media.SourceSpotify, Title: "Show " + count(i),
+			Authors: []media.Ref{}, Episodes: []media.Track{}})
+	}
+	s := newTestShell(t)
+	s.loads["accounts"] = signedInTo(false, true)
+	s.loads["spotify:artists"] = &loaded[[]media.Artist]{done: true, value: artists}
+	s.loads["spotify:podcasts"] = &loaded[[]media.Podcast]{done: true, value: shows}
+	tt := testerOf(t, s, 1280, 1000)
+	for path, kind := range map[string]string{"/library/artists": "Artist ", "/library/podcasts": "Show "} {
+		show(s, tt, path)
+		if !tt.HasText(kind+"0") || tt.HasText(kind+count(n-1)) {
+			t.Errorf("%s shows %q", path, tt.Texts())
+		}
+	}
+}

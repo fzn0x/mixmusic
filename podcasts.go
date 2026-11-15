@@ -561,21 +561,20 @@ func (s *shell) savedPodcasts(c *ui.Context, key, title string, saved *loaded[[]
 			return
 		}
 	}
-	n := 0
-	for _, p := range saved.value {
+	var shown []int
+	for i, p := range saved.value {
 		if !s.svc.Collection.Follows(p.ID) {
-			n++
+			shown = append(shown, i)
 		}
 	}
-	if n == 0 {
+	if len(shown) == 0 {
 		return
 	}
 	s.shelf(c, key+"-podcasts", title, func() {
-		for i, p := range saved.value {
-			if !s.svc.Collection.Follows(p.ID) {
-				s.podcastTile(c, key+"-podcast-"+count(i), p)
-			}
-		}
+		s.nearShelfTiles(c, key+"-podcasts", len(shown), func(j int) {
+			i := shown[j]
+			s.podcastTile(c, key+"-podcast-"+count(i), saved.value[i])
+		})
 	})
 }
 

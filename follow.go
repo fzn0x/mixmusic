@@ -205,9 +205,9 @@ func (s *shell) serviceArtistShelf(c *ui.Context, sv serviceArtists) int {
 	}
 	if len(shown) > 0 {
 		s.shelf(c, sv.key+"-followed", sv.title, func() {
-			for i, a := range shown {
-				s.artistTile(c, sv.key+"-followed-"+count(i), a)
-			}
+			s.nearShelfTiles(c, sv.key+"-followed", len(shown), func(i int) {
+				s.artistTile(c, sv.key+"-followed-"+count(i), shown[i])
+			})
 		})
 	}
 	return len(shown)

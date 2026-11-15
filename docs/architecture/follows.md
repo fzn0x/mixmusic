@@ -36,8 +36,9 @@ they put out lately, for Home and Library › Artists.
 - **The file.** `releases.json`, in the cache folder, keeps for each
   artist when it was asked and when it answered, and their releases of
   the last year. A look forgets the artists no longer followed, but those
-  of a service whose list didn't read; one the user stops following from
-  MixMusic goes at once (`releaseBook.forget`).
+  of a service whose list didn't read, or came in part (a
+  `media.ShortList`); one the user stops following from MixMusic goes at
+  once (`releaseBook.forget`).
 - **New** (`newReleases`): `media.Release.Span` reads `Released`, a day, a
   month or a year, as the first and the last day the release may have
   come out on. A release is new while its last day is within

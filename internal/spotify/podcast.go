@@ -166,28 +166,27 @@ func (c *Client) ShowEpisodes(ctx context.Context, of media.Ref, more string) (m
 	return toEpisodePage(&page, of, offset), nil
 }
 
-// SavedShows returns the shows the user saved, the last saved first.
+// SavedShows returns the shows the user saved, the last saved first, all
+// of them: those of a list that stopped short come with a
+// media.ShortList.
 func (c *Client) SavedShows(ctx context.Context) ([]media.Podcast, error) {
-	out := []media.Podcast{}
-	next := "/me/shows?limit=" + strconv.Itoa(pageLimit)
-	for page := 0; next != "" && page < 4; page++ {
-		var res paging[struct {
-			Show *show `json:"show"`
-		}]
-		if err := c.get(ctx, next, nil, &res); err != nil {
-			if page == 0 {
-				return nil, err
-			}
-			break
-		}
-		for _, it := range res.Items {
-			if it.Show != nil && it.Show.ID != "" {
-				out = append(out, toPodcast(it.Show).Summary())
-			}
-		}
-		next = res.Next
+	type saved struct {
+		Show *show `json:"show"`
 	}
-	return out, nil
+	items, err := readList(ctx, c, "/me/shows", func(it saved) string {
+		if it.Show == nil {
+			return ""
+		}
+		return it.Show.ID
+	})
+	if !came(err) {
+		return nil, err
+	}
+	out := []media.Podcast{}
+	for _, it := range items {
+		out = append(out, toPodcast(it.Show).Summary())
+	}
+	return out, err
 }
 
 // TrackURI returns the Spotify URI of a Spotify track, or of an episode,

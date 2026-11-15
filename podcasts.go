@@ -173,10 +173,10 @@ func (s *shell) followsPodcast(p media.Podcast) bool {
 		return s.svc.Collection.Follows(p.ID)
 	}
 	// The list is asked for as the page shows, before the user follows or
-	// stops, which then goes into it.
+	// stops, which then goes into it: what came of it, if not all.
 	saved := s.savedOn(p.Source)
 	return s.svc.Collection.Follows(p.ID) || p.Saved ||
-		saved.done && saved.err == nil && slices.ContainsFunc(saved.value, func(x media.Podcast) bool { return x.ID == p.ID })
+		saved.done && listCame(saved.err) && slices.ContainsFunc(saved.value, func(x media.Podcast) bool { return x.ID == p.ID })
 }
 
 // followPodcast follows the podcast of the page of key, or stops: in
@@ -549,30 +549,32 @@ func (s *shell) podcastLibrary(c *ui.Context) {
 }
 
 // savedPodcasts is a shelf of the podcasts saved on a service, past those
-// the user follows in MixMusic, which show above.
+// the user follows in MixMusic, which show above. A list that came in
+// part shows what came, and says how much, with Try again.
 func (s *shell) savedPodcasts(c *ui.Context, key, title string, saved *loaded[[]media.Podcast]) {
 	switch {
 	case !saved.done:
 		return
 	case saved.err != nil:
-		s.problem(c, saved.err, func() { s.forget(key + ":podcasts") })
-		return
-	}
-	n := 0
-	for _, p := range saved.value {
-		if !s.svc.Collection.Follows(p.ID) {
-			n++
+		if !s.shortListLine(c, key+"-podcasts", "podcasts", media.Source(key), saved.err, func() { s.refetch(key + ":podcasts") }) {
+			s.problem(c, saved.err, func() { s.forget(key + ":podcasts") })
+			return
 		}
 	}
-	if n == 0 {
+	var shown []int
+	for i, p := range saved.value {
+		if !s.svc.Collection.Follows(p.ID) {
+			shown = append(shown, i)
+		}
+	}
+	if len(shown) == 0 {
 		return
 	}
 	s.shelf(c, key+"-podcasts", title, func() {
-		for i, p := range saved.value {
-			if !s.svc.Collection.Follows(p.ID) {
-				s.podcastTile(c, key+"-podcast-"+count(i), p)
-			}
-		}
+		s.nearShelfTiles(c, key+"-podcasts", len(shown), func(j int) {
+			i := shown[j]
+			s.podcastTile(c, key+"-podcast-"+count(i), saved.value[i])
+		})
 	})
 }
 

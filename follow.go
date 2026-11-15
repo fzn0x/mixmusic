@@ -183,16 +183,19 @@ type serviceArtists struct {
 }
 
 // serviceArtistShelf is a shelf of the artists followed on a service,
-// past those followed in MixMusic, which show above. It returns how many
-// it shows.
+// past those followed in MixMusic, which show above. A list that came in
+// part shows what came, and says how much, with Try again. It returns how
+// many it shows.
 func (s *shell) serviceArtistShelf(c *ui.Context, sv serviceArtists) int {
 	switch l := sv.artists; {
 	case !l.done:
 		s.loading(c)
 		return 0
 	case l.err != nil:
-		s.problem(c, l.err, func() { s.forget(sv.key + ":artists") })
-		return 0
+		if !s.shortListLine(c, sv.key+"-followed", "artists", media.Source(sv.key), l.err, func() { s.refetch(sv.key + ":artists") }) {
+			s.problem(c, l.err, func() { s.forget(sv.key + ":artists") })
+			return 0
+		}
 	}
 	var shown []media.Artist
 	for _, a := range sv.artists.value {
@@ -202,9 +205,9 @@ func (s *shell) serviceArtistShelf(c *ui.Context, sv serviceArtists) int {
 	}
 	if len(shown) > 0 {
 		s.shelf(c, sv.key+"-followed", sv.title, func() {
-			for i, a := range shown {
-				s.artistTile(c, sv.key+"-followed-"+count(i), a)
-			}
+			s.nearShelfTiles(c, sv.key+"-followed", len(shown), func(i int) {
+				s.artistTile(c, sv.key+"-followed-"+count(i), shown[i])
+			})
 		})
 	}
 	return len(shown)

@@ -259,26 +259,23 @@ func (c *Client) PlaylistPageCounting(ctx context.Context, next string) ([]media
 	return tracks, page.Next, left, nil
 }
 
-// MyPlaylists returns the playlists the user made or follows.
+// MyPlaylists returns the playlists the user made or follows, all of
+// them: those of a list that stopped short come with a media.ShortList.
 func (c *Client) MyPlaylists(ctx context.Context, userID string) ([]media.Playlist, error) {
-	out := []media.Playlist{}
-	next := "/me/playlists?limit=" + strconv.Itoa(pageLimit)
-	for page := 0; next != "" && page < 4; page++ {
-		var res paging[*playlist]
-		if err := c.get(ctx, next, nil, &res); err != nil {
-			if page == 0 {
-				return nil, err
-			}
-			break
+	items, err := readList(ctx, c, "/me/playlists", func(p *playlist) string {
+		if p == nil {
+			return ""
 		}
-		for _, p := range res.Items {
-			if p != nil {
-				out = append(out, toPlaylist(p, userID))
-			}
-		}
-		next = res.Next
+		return p.ID
+	})
+	if !came(err) {
+		return nil, err
 	}
-	return out, nil
+	out := []media.Playlist{}
+	for _, p := range items {
+		out = append(out, toPlaylist(p, userID))
+	}
+	return out, err
 }
 
 // SavedTracks returns a page of the user's liked songs, from offset, and
@@ -298,30 +295,36 @@ func (c *Client) SavedTracks(ctx context.Context, offset int) ([]media.Track, in
 	return toTracks(tracks, nil), res.Total, nil
 }
 
-// SavedAlbums returns the albums the user saved.
+// SavedAlbums returns the albums the user saved, all of them: those of a
+// list that stopped short come with a media.ShortList.
 func (c *Client) SavedAlbums(ctx context.Context) ([]media.Album, error) {
-	var res paging[struct {
-		Album *album `json:"album"`
-	}]
-	if err := c.get(ctx, "/me/albums", url.Values{"limit": {strconv.Itoa(pageLimit)}}, &res); err != nil {
+	items, err := readList(ctx, c, "/me/albums", func(it savedAlbum) string {
+		if it.Album == nil {
+			return ""
+		}
+		return it.Album.ID
+	})
+	if !came(err) {
 		return nil, err
 	}
-	out := []media.Album{}
-	for _, it := range res.Items {
-		if it.Album != nil {
-			al := toAlbum(it.Album)
-			al.Tracks = []media.Track{}
-			out = append(out, al)
-		}
-	}
-	return out, nil
+	return savedAlbums(items), err
 }
 
-// FollowedArtists returns the artists the user follows.
+// FollowedArtists returns the artists the user follows, all of them, a
+// page at a time by the cursor of the page before, each tried again on
+// media.PageWaits past the first: those of a list that stopped short, at
+// a page that fails, a page of nothing or of nothing new, or a cursor
+// that doesn't move, come with a media.ShortList.
 func (c *Client) FollowedArtists(ctx context.Context) ([]media.Artist, error) {
-	out := []media.Artist{}
-	after := ""
-	for page := 0; page < 4; page++ {
+	l := &listReading[*artist]{id: func(a *artist) string {
+		if a == nil {
+			return ""
+		}
+		return a.ID
+	}, seen: map[string]bool{}}
+	total, after := 0, ""
+	var end error
+	for page := 0; ; page++ {
 		var res struct {
 			Artists paging[*artist] `json:"artists"`
 		}
@@ -329,22 +332,34 @@ func (c *Client) FollowedArtists(ctx context.Context) ([]media.Artist, error) {
 		if after != "" {
 			q.Set("after", after)
 		}
-		if err := c.get(ctx, "/me/following", q, &res); err != nil {
-			if page == 0 {
+		read := func(ctx context.Context) error {
+			res.Artists = paging[*artist]{}
+			return c.get(ctx, "/me/following", q, &res)
+		}
+		if page == 0 {
+			if err := read(ctx); err != nil {
 				return nil, err
 			}
+			total = res.Artists.Total
+		} else if end = media.TryPage(ctx, read); end != nil {
 			break
 		}
-		for _, a := range res.Artists.Items {
-			if a != nil {
-				out = append(out, toArtist(a))
-			}
+		more, stop := l.take(res.Artists)
+		if cursor := res.Artists.Cursors.After; more && (cursor == "" || cursor == after) {
+			more, stop = false, errListEnded
+		} else {
+			after = cursor
 		}
-		if after = res.Artists.Cursors.After; after == "" || res.Artists.Next == "" {
+		if !more {
+			end = stop
 			break
 		}
 	}
-	return out, nil
+	out := []media.Artist{}
+	for _, a := range l.items {
+		out = append(out, toArtist(a))
+	}
+	return out, shortList(len(out), total, end)
 }
 
 // RecentlyPlayed returns the tracks the user played last on Spotify.
@@ -377,9 +392,10 @@ func (c *Client) TopTracks(ctx context.Context) ([]media.Track, error) {
 }
 
 // Home returns shelves made of the user's Spotify library: their
-// playlists, recent and top tracks, and saved albums. Shelves whose
-// requests fail are left out; once all of them failed, the error tells
-// why.
+// playlists, recent and top tracks, and saved albums, of the playlists
+// and albums the first page alone, so that Home doesn't wait. Shelves
+// whose requests fail are left out; once all of them failed, the error
+// tells why.
 func (c *Client) Home(ctx context.Context, userID string) ([]media.Shelf, error) {
 	var (
 		playlists   []media.Playlist
@@ -388,10 +404,10 @@ func (c *Client) Home(ctx context.Context, userID string) ([]media.Shelf, error)
 		errs        [4]error
 		wg          sync.WaitGroup
 	)
-	wg.Go(func() { playlists, errs[0] = c.MyPlaylists(ctx, userID) })
+	wg.Go(func() { playlists, errs[0] = c.homePlaylists(ctx, userID) })
 	wg.Go(func() { recent, errs[1] = c.RecentlyPlayed(ctx) })
 	wg.Go(func() { top, errs[2] = c.TopTracks(ctx) })
-	wg.Go(func() { albums, errs[3] = c.SavedAlbums(ctx) })
+	wg.Go(func() { albums, errs[3] = c.homeAlbums(ctx) })
 	wg.Wait()
 	if errs[0] != nil && errs[1] != nil && errs[2] != nil && errs[3] != nil {
 		return nil, errs[0]

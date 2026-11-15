@@ -220,15 +220,20 @@ func collaboration(p media.Playlist) bool { return p.Collaborative && !p.Mine &&
 // playlists, that the user collaborates on, in the library of the service
 // of key, when there are any; more ends their tiles' menus, if set.
 func (s *shell) collaborationsShelf(c *ui.Context, key string, playlists []media.Playlist, more func(m *ui.Menu, p media.Playlist)) {
-	if !slices.ContainsFunc(playlists, collaboration) {
+	var ours []int
+	for i, p := range playlists {
+		if collaboration(p) {
+			ours = append(ours, i)
+		}
+	}
+	if len(ours) == 0 {
 		return
 	}
 	s.shelf(c, key+"-collaborations", "Playlists you collaborate on", func() {
-		for i, p := range playlists {
-			if collaboration(p) {
-				s.playlistTileWith(c, key+"-playlist-"+count(i), p, more)
-			}
-		}
+		s.nearShelfTiles(c, key+"-collaborations", len(ours), func(j int) {
+			i := ours[j]
+			s.playlistTileWith(c, key+"-playlist-"+count(i), playlists[i], more)
+		})
 	})
 }
 
@@ -260,7 +265,7 @@ func (s *shell) addToSpotifyMenu(m *ui.Menu, tracks []media.Track) {
 		case !own.done:
 			m.Item("Loading your playlists…").Disabled(true)
 			return
-		case own.err != nil:
+		case !listCame(own.err):
 			own.refresh()
 			m.Item("Couldn't load your playlists").Disabled(true)
 			return
@@ -282,6 +287,8 @@ func (s *shell) addToSpotifyMenu(m *ui.Menu, tracks []media.Track) {
 		if !some {
 			m.Item("No playlists you can add to").Disabled(true)
 		}
+		// Of a list that came in part, those that came, and how many.
+		s.shortListItem(m, "spotify:playlists", "playlists", media.SourceSpotify, own.err)
 	})
 }
 

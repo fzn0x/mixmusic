@@ -50,6 +50,7 @@ func withLog(t *testing.T, l *Library, plays []Play) {
 		line := lineOf(p.PlayedAt, 0, loggedTrack{Track: p.Track})
 		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(line.trackLine)})
 	}
+	g.changes++
 	if err := g.writeWhole(g.plays, g.tracks); err != nil {
 		t.Fatal(err)
 	}

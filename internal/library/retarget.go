@@ -67,6 +67,7 @@ func (g *playLog) retarget(to map[string]media.Track) error {
 	}
 	g.tracks, g.byKey = tracks, byKey
 	g.pending, g.torn, g.whole = nil, false, false
+	g.changes++
 	g.rewrites++
 	return nil
 }

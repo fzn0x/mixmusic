@@ -72,7 +72,9 @@ type Data struct {
 type Library struct {
 	file  *store.File[Data]
 	plays *playLog
-	now   func() time.Time
+	// memo keeps the stats until the log or the library changes.
+	memo statsMemo
+	now  func() time.Time
 	// disliked holds the IDs of the disliked tracks, for lists to ask of
 	// each of their rows as they draw; indexing orders its changes.
 	disliked atomic.Pointer[map[string]bool]

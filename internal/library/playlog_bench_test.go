@@ -125,7 +125,7 @@ func BenchmarkPlayLogOpen(b *testing.B) {
 
 // BenchmarkPlayLogStats counts the stats over the whole log, each time
 // anew, as after a play: All time, the last 30 days, Your year, its years
-// and the Plays sort.
+// and the Plays sort; and All time again, as kept until the log changes.
 func BenchmarkPlayLogStats(b *testing.B) {
 	for _, size := range playLogSizes {
 		dir := logOfYears(b, size.years, size.perDay, size.songs)
@@ -143,7 +143,9 @@ func BenchmarkPlayLogStats(b *testing.B) {
 			{"30-days", func() { countStats(v, now, 30) }},
 			{"recap", func() { countRecap(v, time.UTC, 2026) }},
 			{"recap-years", func() { recapYears(v, time.UTC) }},
-			{"play-counts", func() { l.PlayCounts() }},
+			{"play-counts", func() { playCounts(v) }},
+			// As the Stats page asks in each frame, the log unchanged.
+			{"all-time-kept", func() { l.Stats(0) }},
 		} {
 			b.Run(fmt.Sprintf("%s/%s", size.name, bench.name), func(b *testing.B) {
 				for b.Loop() {

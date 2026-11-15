@@ -57,9 +57,13 @@ type Stats struct {
 // Stats sums up the plays of the last days, or of all the play log holds
 // when days is 0.
 func (l *Library) Stats(days int) Stats {
-	s := countStats(l.plays.view(), l.now(), days)
-	l.completeTracks(s.TopTracks)
-	return s
+	now, v := l.now(), l.plays.view()
+	key := statsKey{days: days, minute: now.Unix() / 60, loc: now.Location()}
+	return memoized(&l.memo, l.stampOf(v), &l.memo.stats, key, func() Stats {
+		s := countStats(v, now, days)
+		l.completeTracks(s.TopTracks)
+		return s
+	}).clone()
 }
 
 // countStats sums up the plays of v of the last days up to now, or all of

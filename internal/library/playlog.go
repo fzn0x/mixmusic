@@ -99,6 +99,9 @@ type playLog struct {
 	// whole is set when the file is to be written whole, rather than
 	// appended to: it doesn't hold what memory holds.
 	whole bool
+	// changes counts the changes to the plays, for what is made of them
+	// to hold until they change.
+	changes uint64
 	// rewrites counts the changes to the plays that don't come with a
 	// change to the history: of the tracks a retarget moved.
 	rewrites uint64
@@ -109,13 +112,16 @@ type playLog struct {
 type playsView struct {
 	plays  []loggedPlay
 	tracks []loggedTrack
+	// changes is the log's count of changes then.
+	changes uint64
 }
 
 // view returns the log as it is.
 func (g *playLog) view() playsView {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	return playsView{plays: g.plays[:len(g.plays):len(g.plays)], tracks: g.tracks[:len(g.tracks):len(g.tracks)]}
+	return playsView{plays: g.plays[:len(g.plays):len(g.plays)], tracks: g.tracks[:len(g.tracks):len(g.tracks)],
+		changes: g.changes}
 }
 
 // openPlayLog reads the play log kept at path; found tells whether the
@@ -292,6 +298,7 @@ func (g *playLog) add(at time.Time, t media.Track) error {
 	defer g.mu.Unlock()
 	l := lineOf(at, 0, loggedTrack{Track: t})
 	g.plays = append(g.plays, loggedPlay{at: at.Unix(), track: g.intern(l.trackLine)})
+	g.changes++
 	g.pending = append(g.pending, l.encode()...)
 	return g.flush()
 }
@@ -308,6 +315,7 @@ func (g *playLog) fill(history []Play) error {
 		g.plays = append(g.plays, loggedPlay{at: p.PlayedAt.Unix(), track: g.intern(l.trackLine)})
 	}
 	g.whole = true
+	g.changes++
 	return g.flush()
 }
 
@@ -318,6 +326,7 @@ func (g *playLog) clear() error {
 	defer g.mu.Unlock()
 	g.plays, g.tracks, g.byKey = nil, nil, map[string]int32{}
 	g.pending, g.torn, g.whole = nil, false, true
+	g.changes++
 	return g.flush()
 }
 

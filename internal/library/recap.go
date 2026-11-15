@@ -55,7 +55,10 @@ type Repeated struct {
 
 // RecapYears lists the years the play log has plays of music in, the
 // latest first. It doesn't know which of them are over: the app decides.
-func (l *Library) RecapYears() []int { return recapYears(l.plays.view(), l.now().Location()) }
+func (l *Library) RecapYears() []int {
+	loc, v := l.now().Location(), l.plays.view()
+	return slices.Clone(memoized(&l.memo, l.stampOf(v), &l.memo.years, loc, func() []int { return recapYears(v, loc) }))
+}
 
 // recapYears lists the years of loc that v has plays of music in, the
 // latest first.
@@ -81,7 +84,12 @@ func recapYears(v playsView, loc *time.Location) []int {
 }
 
 // Recap sums up the plays of year.
-func (l *Library) Recap(year int) Recap { return countRecap(l.plays.view(), l.now().Location(), year) }
+func (l *Library) Recap(year int) Recap {
+	loc, v := l.now().Location(), l.plays.view()
+	return memoized(&l.memo, l.stampOf(v), &l.memo.recaps, recapKey{year, loc}, func() Recap {
+		return countRecap(v, loc, year)
+	}).clone()
+}
 
 // countRecap sums up the plays of v in year, of loc.
 func countRecap(v playsView, loc *time.Location, year int) Recap {

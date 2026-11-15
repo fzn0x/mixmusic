@@ -53,8 +53,10 @@ func (s *shell) clipSleeve(c *ui.Context, t media.Track, size float32) bool {
 	v := &s.video
 	asked := !c.Preferences().ReduceMotion || m.played[t.ID]
 	playing := s.st.Playing && !s.st.Buffering
+	shown := v.status.Src == src.Src && v.status.Shown
 	ui.Box(c.Key("sleeve-clip")).Size(size, size).Shrink(0).Radius(k.radiusSm).Clip().Children(func() {
-		s.movingCover(c, "sleeve", t.Artwork, size, playing, "Moving cover: "+t.Title)
+		// A GIF cover holds still under the clip that shows.
+		s.movingCover(c, "sleeve", t.Artwork, size, playing && !shown, "Moving cover: "+t.Title)
 		switch {
 		case !asked:
 			b := s.buttonBase(c.Key("sleeve-clip-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().
@@ -72,7 +74,7 @@ func (s *shell) clipSleeve(c *ui.Context, t media.Track, size float32) bool {
 			return
 		}
 		target := float32(0)
-		if v.status.Src == src.Src && v.status.Shown {
+		if shown {
 			target = 1
 		}
 		web := ui.WebView(c.Key("clip "+src.Src), v.view).Absolute().Left(0).Top(0).Size(size, size).Label("Album clip: " + t.Title)

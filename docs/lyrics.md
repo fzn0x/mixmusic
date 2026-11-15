@@ -3,7 +3,7 @@
 
 MixMusic shows synced and word-by-word lyrics for Spotify and YouTube Music tracks, and can translate them or show them in Latin letters.
 
-Lyrics come from Unison, LRCLIB and YouTube Music, for the track that plays, whichever service it's from. Nothing needs setting up. The lyrics themselves go to Unison, for their translation or for the romanization of Arabic, only while you turn those on.
+Lyrics come from Better Lyrics, Unison, LRCLIB and YouTube Music, for the track that plays, whichever service it's from. Nothing needs setting up. The lyrics themselves go to Unison, for their translation or for the romanization of Arabic, only while you turn those on.
 
 ## Where lyrics show
 
@@ -139,4 +139,4 @@ On a MacBook with a notch, the [notch player's](desktop.md#the-player-around-the
 
 ## Credits
 
-Lyrics from [Unison](https://unison.betterlyrics.org), an open, crowdsourced database of lyrics, under the Open Database License (ODbL). As Unison asks, the lyrics panel ends Unison's lyrics with "lyrics from Unison · submitted by <name>": Unison links to the song's page there, and the name to the page of the person who submitted the lyrics. A lyrics card made from them names both too. Synced lyrics also come from [LRCLIB](https://lrclib.net), the open database of synced lyrics. Romaji reads kanji with [kagome](https://github.com/ikawaha/kagome) and the IPA dictionary of [kagome-dict](https://github.com/ikawaha/kagome-dict), made from mecab-ipadic.
+Lyrics from [Better Lyrics](https://betterlyrics.org), whose service keeps lyrics timed word by word, and from [Unison](https://unison.betterlyrics.org), an open, crowdsourced database of lyrics, whose data is under the [Unison Community License](https://github.com/better-lyrics/unison/blob/main/LICENSE-DATA.md): MixMusic, an open-source project, may use it, and shows "Lyrics from Unison (https://unison.betterlyrics.org)" with its lyrics. As Unison asks, the lyrics panel ends Unison's lyrics with "lyrics from Unison · submitted by <name>": Unison links to the song's page there, and the name to the page of the person who submitted the lyrics. A lyrics card made from them names both too. Synced lyrics also come from [LRCLIB](https://lrclib.net), the open database of synced lyrics. Romaji reads kanji with [kagome](https://github.com/ikawaha/kagome) and the IPA dictionary of [kagome-dict](https://github.com/ikawaha/kagome-dict), made from mecab-ipadic.

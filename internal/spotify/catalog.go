@@ -259,26 +259,23 @@ func (c *Client) PlaylistPageCounting(ctx context.Context, next string) ([]media
 	return tracks, page.Next, left, nil
 }
 
-// MyPlaylists returns the playlists the user made or follows.
+// MyPlaylists returns the playlists the user made or follows, all of
+// them: those of a list that stopped short come with a media.ShortList.
 func (c *Client) MyPlaylists(ctx context.Context, userID string) ([]media.Playlist, error) {
-	out := []media.Playlist{}
-	next := "/me/playlists?limit=" + strconv.Itoa(pageLimit)
-	for page := 0; next != "" && page < 4; page++ {
-		var res paging[*playlist]
-		if err := c.get(ctx, next, nil, &res); err != nil {
-			if page == 0 {
-				return nil, err
-			}
-			break
+	items, err := readList(ctx, c, "/me/playlists", func(p *playlist) string {
+		if p == nil {
+			return ""
 		}
-		for _, p := range res.Items {
-			if p != nil {
-				out = append(out, toPlaylist(p, userID))
-			}
-		}
-		next = res.Next
+		return p.ID
+	})
+	if !came(err) {
+		return nil, err
 	}
-	return out, nil
+	out := []media.Playlist{}
+	for _, p := range items {
+		out = append(out, toPlaylist(p, userID))
+	}
+	return out, err
 }
 
 // SavedTracks returns a page of the user's liked songs, from offset, and

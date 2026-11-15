@@ -2,6 +2,7 @@ package spotify
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -23,9 +24,11 @@ type fakeList struct {
 	item   func(i int) string
 	cursor bool
 	fails  map[int]int
-	// next, when set, writes the next page's address in place of the
-	// real one, as a service that goes wrong might.
-	next func(offset int) string
+	// ends, when set, is where the items end, though the count and the
+	// pages' next go on, as of a service that goes wrong.
+	ends int
+	// asking, when set, is told the offset of each page asked for.
+	asking func(offset int)
 
 	mu        sync.Mutex
 	asked     []string
@@ -40,6 +43,9 @@ func (f *fakeList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		offset++
 	}
 	limit, _ := strconv.Atoi(q.Get("limit"))
+	if f.asking != nil {
+		f.asking(offset)
+	}
 	f.mu.Lock()
 	f.asked = append(f.asked, r.URL.RawQuery)
 	f.now++
@@ -61,15 +67,14 @@ func (f *fakeList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var items []string
 	for i := offset; i < min(offset+limit, f.total); i++ {
-		items = append(items, f.item(i))
+		if f.ends == 0 || i < f.ends {
+			items = append(items, f.item(i))
+		}
 	}
 	next, after := "null", ""
 	if offset+limit < f.total {
 		next = `"http://` + r.Host + r.URL.Path + "?offset=" + strconv.Itoa(offset+limit) + "&limit=" + strconv.Itoa(limit) + `"`
 		after = "a" + strconv.Itoa(offset+limit-1)
-	}
-	if f.next != nil {
-		next = f.next(offset)
 	}
 	page := `{"items": [` + strings.Join(items, ", ") + `], "total": ` + strconv.Itoa(f.total) + `, "next": ` + next +
 		`, "cursors": {"after": "` + after + `"}}`
@@ -84,6 +89,13 @@ func (f *fakeList) pages() int {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return len(f.asked)
+}
+
+// atOnce returns the most pages answered at once.
+func (f *fakeList) atOnce() int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return f.most
 }
 
 func playlistAt(i int) string {
@@ -138,5 +150,130 @@ func TestHomeReadsOnePage(t *testing.T) {
 	}
 	if got["playlists"] != pageLimit || got["albums"] != pageLimit || playlists.pages() != 1 || albums.pages() != 1 {
 		t.Errorf("Home shows %v, of %d and %d pages asked for", got, playlists.pages(), albums.pages())
+	}
+}
+
+// playlistIDs are the IDs of the playlists in their order.
+func playlistIDs(ps []media.Playlist) []string {
+	out := []string{}
+	for _, p := range ps {
+		out = append(out, p.ID)
+	}
+	return out
+}
+
+// inOrder reports whether ids are those of the first n items of a list,
+// of prefix, each once.
+func inOrder(ids []string, prefix string, n int) bool {
+	if len(ids) != n {
+		return false
+	}
+	for i, id := range ids {
+		if id != prefix+strconv.Itoa(i) {
+			return false
+		}
+	}
+	return true
+}
+
+// TestMyPlaylistsReadsEveryPage reads all of the user's 250 playlists, in
+// their order, each once, at most listPagesAtOnce pages at a time, and
+// tries a page that fails again.
+func TestMyPlaylistsReadsEveryPage(t *testing.T) {
+	quickPages(t)
+	list := &fakeList{total: 250, item: playlistAt, fails: map[int]int{100: 2}}
+	c := libraryServer(t, map[string]*fakeList{"/me/playlists": list})
+	got, err := c.MyPlaylists(context.Background(), "me")
+	if err != nil || !inOrder(playlistIDs(got), "sp:p", 250) {
+		t.Fatalf("MyPlaylists = %d playlists, %v", len(got), err)
+	}
+	if list.pages() != 5+2 || list.atOnce() > listPagesAtOnce {
+		t.Errorf("%d pages asked for, at most %d at once", list.pages(), list.atOnce())
+	}
+}
+
+// TestMyPlaylistsInPart gives the playlists that came of a list whose
+// second page fails each time it's tried, with the error that tells how
+// many of how many came.
+func TestMyPlaylistsInPart(t *testing.T) {
+	quickPages(t)
+	list := &fakeList{total: 120, item: playlistAt, fails: map[int]int{50: 100}}
+	c := libraryServer(t, map[string]*fakeList{"/me/playlists": list})
+	got, err := c.MyPlaylists(context.Background(), "me")
+	short, ok := media.Short(err)
+	if !ok || short.Got != 50 || short.Total != 120 || short.Cut || !inOrder(playlistIDs(got), "sp:p", 50) {
+		t.Fatalf("MyPlaylists = %d playlists, %v", len(got), err)
+	}
+	var api *APIError
+	if !errors.As(err, &api) || api.Status != http.StatusServiceUnavailable {
+		t.Errorf("the error doesn't tell why: %v", err)
+	}
+
+	// Its first page failing, nothing came.
+	list.mu.Lock()
+	list.fails = map[int]int{0: 1}
+	list.mu.Unlock()
+	if got, err := c.MyPlaylists(context.Background(), "me"); got != nil || err == nil {
+		t.Errorf("a first page that fails gives %d playlists, %v", len(got), err)
+	} else if _, ok := media.Short(err); ok {
+		t.Errorf("nothing came, but the list is short: %v", err)
+	}
+}
+
+// TestListStopsShort stops a list at a page of nothing, or of nothing new,
+// that names a page after it, as at Spotify's last offset, and says so;
+// an item that comes again as the list moves comes once.
+func TestListStopsShort(t *testing.T) {
+	quickPages(t)
+	read := func(list *fakeList) ([]string, error) {
+		t.Helper()
+		c := libraryServer(t, map[string]*fakeList{"/me/playlists": list})
+		got, err := c.MyPlaylists(context.Background(), "me")
+		return playlistIDs(got), err
+	}
+	short := func(err error, got, total int, cut bool) bool {
+		s, ok := media.Short(err)
+		return ok && s.Got == got && s.Total == total && s.Cut == cut
+	}
+
+	if ids, err := read(&fakeList{total: 120, item: playlistAt, ends: 50}); !short(err, 50, 120, false) || !inOrder(ids, "sp:p", 50) {
+		t.Errorf("a page of nothing: %d playlists, %v", len(ids), err)
+	}
+	again := func(i int) string { return playlistAt(i % pageLimit) }
+	if ids, err := read(&fakeList{total: 250, item: again}); !short(err, 50, 250, false) || !inOrder(ids, "sp:p", 50) {
+		t.Errorf("a page of what came before: %d playlists, %v", len(ids), err)
+	}
+	// A playlist added at the top as the list is read moves the others
+	// one down: the last of a page comes again as the first of the next.
+	moved := func(i int) string { return playlistAt(max(i-i/pageLimit, 0)) }
+	if ids, err := read(&fakeList{total: 250, item: moved}); err != nil || !inOrder(ids, "sp:p", 246) {
+		t.Errorf("a list that moved: %d playlists, %v", len(ids), err)
+	}
+
+	bound := maxListOffset
+	maxListOffset = 100
+	t.Cleanup(func() { maxListOffset = bound })
+	if ids, err := read(&fakeList{total: 250, item: playlistAt}); !short(err, 150, 250, true) || !inOrder(ids, "sp:p", 150) {
+		t.Errorf("past Spotify's last offset: %d playlists, %v", len(ids), err)
+	}
+}
+
+// TestListEndsWithItsRead stops reading the pages of a list once the read
+// is dropped, without waiting to try a page again.
+func TestListEndsWithItsRead(t *testing.T) {
+	waits := media.PageWaits
+	media.PageWaits = []time.Duration{time.Hour}
+	t.Cleanup(func() { media.PageWaits = waits })
+	ctx, cancel := context.WithCancel(context.Background())
+	list := &fakeList{total: 250, item: playlistAt, fails: map[int]int{50: 1}, asking: func(offset int) {
+		if offset == 50 {
+			cancel()
+		}
+	}}
+	c := libraryServer(t, map[string]*fakeList{"/me/playlists": list})
+	start := time.Now()
+	got, err := c.MyPlaylists(ctx, "me")
+	if s, ok := media.Short(err); !ok || s.Got != 50 || len(got) != 50 || time.Since(start) > time.Minute {
+		t.Errorf("a read dropped: %d playlists, %v, after %v", len(got), err, time.Since(start))
 	}
 }

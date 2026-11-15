@@ -109,10 +109,15 @@ func (s *shell) youtubeSongsList(c *ui.Context) {
 	switch {
 	case !songs.done:
 		s.loading(c)
+		return
 	case songs.err != nil:
-		s.problem(c, songs.err, func() { s.forget(youtubeSongsKey) })
-	default:
-		s.trackList(c, "youtube-songs", songs.value, trackListOptions{art: true, album: true,
-			empty: "No songs in your library on YouTube Music. A song's Add to library keeps it here without liking it."})
+		// A list that came in part shows what came, and says how much,
+		// with Try again.
+		if !s.shortListLine(c, "youtube-songs", "songs", media.SourceYouTube, songs.err, func() { s.refetch(youtubeSongsKey) }) {
+			s.problem(c, songs.err, func() { s.forget(youtubeSongsKey) })
+			return
+		}
 	}
+	s.trackList(c, "youtube-songs", songs.value, trackListOptions{art: true, album: true,
+		empty: "No songs in your library on YouTube Music. A song's Add to library keeps it here without liking it."})
 }

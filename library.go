@@ -229,9 +229,10 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 	if !playlists.done || !albums.done || !artists.done {
 		s.loading(c)
 	}
-	// The user makes playlists on YouTube Music: theirs show, if none yet.
+	// The user makes playlists on YouTube Music: theirs show, if none yet,
+	// or those that came of a list that came in part.
 	var links func()
-	if key == "youtube" && playlists.done && playlists.err == nil {
+	if key == "youtube" && playlists.done && listCame(playlists.err) {
 		links = func() {
 			if s.link(c, "new-youtube-playlist", "new playlist") {
 				s.promptName("New playlist on YouTube Music", "Name", "", "create", func(name string) {

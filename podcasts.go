@@ -220,13 +220,14 @@ func (s *shell) savedOn(source media.Source) *loaded[[]media.Podcast] {
 // savedChanged writes into the podcasts saved on p's service, as fetched,
 // that the user followed p there or stopped, rather than read the list
 // again, which the service may answer as it was a moment before. A list
-// still on its way, or that failed, is asked for again, once it's needed.
+// still on its way, or that failed, is asked for again, once it's needed;
+// one that came in part takes the change too.
 func (s *shell) savedChanged(p media.Podcast, on bool) {
 	key := string(p.Source) + ":podcasts"
 	l, ok := s.loads[key].(*loaded[[]media.Podcast])
 	switch {
 	case !ok:
-	case !l.done || l.err != nil:
+	case !l.done || !listCame(l.err):
 		s.refetch(key)
 	default:
 		saved := slices.DeleteFunc(slices.Clone(l.value), func(x media.Podcast) bool { return x.ID == p.ID })

@@ -555,12 +555,12 @@ func (s *shell) dropPlaylist(key, id string) {
 // fetched for key, where the library and the track menus show it at once,
 // rather than read the list again, which YouTube may answer as it was a
 // moment before, as for dropPlaylist. A list still on its way, or one that
-// failed, is asked for again.
+// failed, is asked for again; one that came in part takes it too.
 func (s *shell) keepPlaylist(key string, p media.Playlist) {
 	l, ok := s.loads[key].(*loaded[[]media.Playlist])
 	switch {
 	case !ok:
-	case !l.done, l.err != nil:
+	case !l.done, !listCame(l.err):
 		s.refetch(key)
 	default:
 		l.value = slices.Insert(slices.Clone(l.value), 0, p)

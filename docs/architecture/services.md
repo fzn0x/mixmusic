@@ -12,6 +12,19 @@
   in `Playlist.Unplayable` (`ReadOnCounting` adds the pages up), and
   `playlistgap.go` shows them under the header with the explicit songs
   the settings hide, for a playlist of any service.
+- **All of an artist's songs** (`internal/app/artistsongs.go`, #543).
+  YouTube Music lists them in a playlist, which the title of an artist's
+  Top songs and its Show all open as a `VL…` browse ID of a playlist page
+  (`songsList`): `media.Artist.SongsID` keeps it. The playlist reads
+  whole without the link's params, with which YouTube answers not
+  found; live, in November 2026, it held at most 150 songs.
+  `Catalog.PlayArtist` plays its first page once it comes, tried again
+  on `media.PageWaits` (`media.TryPage`), and reads the rest beside it
+  into a `player.List`, each song once and none the settings hide, until
+  the queue no longer holds the list. A page that still fails stops the
+  reading, and a notice tells how many songs came. An artist without a
+  list, or whose list's first page failed, plays their top songs: for an
+  artist of the music on this computer, all of theirs.
 - **`internal/youtube`** reads YouTube Music through the API its website uses:
   search, suggestions (searches, then songs, albums, artists and
   playlists), the home and explore pages, charts, moods and genres, albums,

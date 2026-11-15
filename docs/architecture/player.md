@@ -23,6 +23,14 @@
   the user picks too ([explicit.md](explicit.md)). A track whose label the app doesn't know is checked
   before it's announced, beside the search for its stream, and the next
   track before it's preloaded or crossfaded into.
+- **Lists that play while they're read** (`queue_list.go`, #543):
+  `PlayList` plays the first part of a list as `PlayAll` does, and
+  returns a `List`, whose `Add` adds each part after it as it comes: in
+  the queue's own order after the list's last entry and the current one,
+  and shuffled at random among the entries after the current one, before
+  the radio's (`scatter`). Once none of the list's entries is left in the
+  queue, as when another queue replaced it, `Add` adds nothing and says
+  so, which stops the reading.
 - **On a Spotify device** (`connect.go`), the player sends commands and
   asks what the device plays, and waits for its reports, which lag the
   commands, to settle. A track ends when the device stops on it, goes back

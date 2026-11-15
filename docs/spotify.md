@@ -107,6 +107,16 @@ Settings › Playback chooses:
 [How Spotify tracks play](spotify-playback.md), under How it works, tells
 what each way does inside.
 
+## Play on an artist
+
+Play on a Spotify artist's page plays all of their songs, not the ten of
+Top songs: MixMusic reads every page of their albums and singles, then
+the tracks of each release, three at a time. Sound starts with the first
+release, and the others join the end of the queue as they are read. A
+song on a single and on its album plays once. A release that can't be
+read is passed over, and a toast says how many came; when none can, their
+top songs play instead.
+
 ## What Spotify allows apps
 
 Apps in Spotify's development mode, as yours is, have limits:
@@ -120,6 +130,7 @@ Apps in Spotify's development mode, as yours is, have limits:
 - Spotify shows apps nothing of its own playlists, as Today's Top Hits or
   a Daily Mix: one you follow opens with a way to play it on Spotify too.
 - Spotify removed the artist top tracks endpoint: MixMusic finds an artist's
-  popular tracks with a search instead.
+  popular tracks with a search instead, at most ten. Play on an artist's page
+  reads their releases instead: [Play on an artist](#play-on-an-artist).
 - Requests are counted against a quota; when MixMusic hits it, Spotify asks it
   to wait, and MixMusic says so.

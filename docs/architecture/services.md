@@ -92,7 +92,15 @@
   dislike a song and take the dislike back).
 - **`internal/spotify`** signs in with PKCE on a loopback callback, refreshes
   tokens, reads the Web API (search, albums, artists, playlists, the
-  library), and controls Spotify Connect devices. The lists of the
+  library), and controls Spotify Connect devices. `Client.ArtistSongs`
+  (`artistsongs.go`) reads the songs of all of an artist's albums and
+  singles: every page of the releases, then each release with `Album`, 3
+  at a time, each page or release tried again on `media.PageWaits`, a
+  song on two releases once by title, artists and length in seconds, and
+  `each` given the new songs of each release in order. A release that
+  fails leaves a `media.ShortList` of releases. `app.Catalog.ArtistSongs`
+  routes by service; the artist page's Play (`artistsongs.go`) plays the
+  first batch and enqueues the rest. The lists of the
   user's library are read whole (`librarylists.go`): their playlists,
   saved albums and shows by offset, the first page, then the pages its
   count tells of, 3 at a time, as a 429 is waited out once, and on while

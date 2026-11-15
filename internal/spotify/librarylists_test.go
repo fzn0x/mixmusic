@@ -300,3 +300,26 @@ func TestSavedAlbumsReadsEveryPage(t *testing.T) {
 		t.Errorf("SavedAlbums of a page that fails = %d albums, %v", len(got), err)
 	}
 }
+
+// TestSavedShowsReadsEveryPage reads all of the user's 250 saved shows,
+// and of 120 whose second page fails, the first 50, saying so.
+func TestSavedShowsReadsEveryPage(t *testing.T) {
+	quickPages(t)
+	ids := func(shows []media.Podcast) []string {
+		out := []string{}
+		for _, p := range shows {
+			out = append(out, p.ID)
+		}
+		return out
+	}
+	c := libraryServer(t, map[string]*fakeList{"/me/shows": {total: 250, item: savedShowAt}})
+	got, err := c.SavedShows(context.Background())
+	if err != nil || !inOrder(ids(got), "sp:s", 250) {
+		t.Fatalf("SavedShows = %d shows, %v", len(got), err)
+	}
+	c = libraryServer(t, map[string]*fakeList{"/me/shows": {total: 120, item: savedShowAt, fails: map[int]int{50: 100}}})
+	got, err = c.SavedShows(context.Background())
+	if s, ok := media.Short(err); !ok || s.Got != 50 || s.Total != 120 || !inOrder(ids(got), "sp:s", 50) {
+		t.Errorf("SavedShows of a page that fails = %d shows, %v", len(got), err)
+	}
+}

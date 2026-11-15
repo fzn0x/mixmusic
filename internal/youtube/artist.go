@@ -49,6 +49,7 @@ func parseArtist(n node, channelID string) (media.Artist, error) {
 	for _, s := range sections.list() {
 		if shelf := s.get("musicShelfRenderer"); shelf.exists() && len(a.TopTracks) == 0 {
 			a.TopTracks = tracksOf(parseItems(shelf.get("contents").list()))
+			a.SongsID = songsList(shelf)
 			continue
 		}
 		carousel := s.get("musicCarouselShelfRenderer")

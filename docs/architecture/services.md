@@ -145,7 +145,19 @@
   the video's radio starts from: YouTube Music makes the radio of a video
   out of videos.
 - **`lyrics`** finds synced lyrics on Better Lyrics, Unison and LRCLIB,
-  reads TTML and LRC, and translates and romanizes lyrics on Unison.
+  reads TTML and LRC, and LRCLIB's Lyricsfile, the YAML whose words are
+  timed (`readLyricsfile`), and translates and romanizes lyrics on Unison.
+  `Catalog.Lyrics` (`internal/app/lyricssources.go`) asks the sources one
+  at a time, in the order of `settings.Lyrics.SourceOrder`, those on, and
+  keeps the best answer: synced over plain, word by word over line by
+  line while `LyricsPreferWords` is on, the longer of two plain answers.
+  Each source is a `lyricsLookup` of `lyricsLookups`, by its key in
+  `settings.LyricsSourceKeys`; YouTube captions come through
+  `stream.Direct.Captions` (`lyricscaptions.go`), as does an episode's
+  transcript (`Catalog.Transcript`). The lyrics kept of a track are kept
+  by its sources' setup (`lyricsSetup`), so that a change looks it up
+  again. The music video's timing (`lrclibLyrics`, `keepsTime`) stays in
+  `catalog.go`, apart from the sources.
 - **`internal/romaji`** writes Japanese lyrics in Hepburn romaji on the
   computer, as Unison gives none for Japanese: kana from a table, and kanji
   by the readings that kagome's tokenizer finds in its IPA dictionary,

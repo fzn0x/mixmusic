@@ -101,8 +101,10 @@ talks to:
 - **Lyrics:** [Better Lyrics](https://betterlyrics.org), for lyrics timed
   word by word, first, then [Unison](https://unison.betterlyrics.org), an open,
   crowdsourced database of lyrics, then [LRCLIB](https://lrclib.net), then
-  YouTube Music's own lyrics. Unison also translates lyrics, through
-  Google, and romanizes Arabic, but only while you turn those on.
+  YouTube Music's own lyrics, then the captions of the video on YouTube:
+  Settings › Playback › Lyrics changes the order, and switches sources
+  off. Unison also translates lyrics, through Google, and romanizes
+  Arabic, but only while you turn those on.
 - **Latin letters for lyrics** are made on your computer for every other
   script. Japanese romaji reads kanji with a dictionary MixMusic downloads
   from GitHub the first time you turn romaji on (11.7 MB); the readings of

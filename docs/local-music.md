@@ -254,8 +254,9 @@ what plays, as their settings say:
   title and artists, or [the lines you chose](desktop.md#what-your-discord-status-shows),
   without a cover or a Listen button: with the service's badge on, a
   record's badge takes the cover's place.
-- **[Lyrics](lyrics.md)**, when you show them, are looked for on Better Lyrics,
-  Unison and LRCLIB by its title, artists, album and length.
+- **[Lyrics](lyrics.md)**, when you show them, are looked for on the
+  [sources](lyrics.md#choose-and-order-the-sources) that are on, by its
+  title, artists, album and length, but never in YouTube's captions.
 
 A file that names no artist, as a voice memo, shows by its file's name,
 which may be anything: Last.fm and the lyrics hear nothing of it.

@@ -339,8 +339,8 @@ func (s *shell) youtubeLibrary(c *ui.Context) {
 	col := s.svc.Collection
 	s.serviceLibrary(c, "youtube",
 		s.youtubePlaylists(),
-		fetch(s, "youtube:albums", col.YouTubeAlbums),
-		fetch(s, "youtube:artists", col.YouTubeArtists),
+		s.youtubeAlbums(),
+		s.youtubeArtists(),
 		func(c *ui.Context) {
 			s.youtubeSongsList(c)
 			s.sectionTitle(c, "Liked on YouTube Music")

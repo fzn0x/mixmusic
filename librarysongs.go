@@ -20,7 +20,7 @@ var saveOnYouTube = func(s *shell, ctx context.Context, t media.Track, on bool) 
 const youtubeSongsKey = "youtube:songs"
 
 func (s *shell) youtubeSongs() *loaded[[]media.Track] {
-	return fetch(s, youtubeSongsKey, s.svc.Collection.YouTubeSongs)
+	return wholeList(s, youtubeSongsKey, s.svc.Collection.YouTubeSongs)
 }
 
 // keepYouTubeSongs fetches the songs of the user's library on YouTube

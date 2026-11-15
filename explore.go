@@ -139,7 +139,7 @@ var listOnYouTube = func(s *shell, ctx context.Context) ([]media.Playlist, error
 // Music, which the library shows and the track menu adds to.
 func (s *shell) youtubePlaylists() *loaded[[]media.Playlist] {
 	list := listOnYouTube
-	return fetch(s, "youtube:playlists", func(ctx context.Context) ([]media.Playlist, error) { return list(s, ctx) })
+	return wholeList(s, "youtube:playlists", func(ctx context.Context) ([]media.Playlist, error) { return list(s, ctx) })
 }
 
 // keepYouTubePlaylists fetches the user's playlists on YouTube Music once

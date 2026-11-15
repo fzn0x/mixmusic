@@ -210,11 +210,10 @@ func (s *shell) followPodcast(key string, p media.Podcast, saved *bool, on bool)
 // savedOn returns the podcasts the user saved on the service source, asked
 // for once for Library › Podcasts and the shows' pages.
 func (s *shell) savedOn(source media.Source) *loaded[[]media.Podcast] {
-	get := s.svc.Collection.YouTubePodcasts
 	if source == media.SourceSpotify {
-		get = s.svc.Collection.SpotifyPodcasts
+		return fetch(s, "spotify:podcasts", s.svc.Collection.SpotifyPodcasts)
 	}
-	return fetch(s, string(source)+":podcasts", get)
+	return wholeList(s, "youtube:podcasts", s.svc.Collection.YouTubePodcasts)
 }
 
 // savedChanged writes into the podcasts saved on p's service, as fetched,

@@ -165,6 +165,10 @@ type fakeStream struct {
 	calls  []string
 	paused bool
 	url    string
+	// fading holds a crossfade, as the engine does while the next track's
+	// audio is late, and fadeAsks counts the player's asks whether it does.
+	fading   bool
+	fadeAsks int
 	// from is where the stream loaded last starts, and fresh is set until
 	// it first plays, when it loaded to play. The streams of silent URLs,
 	// tried again or not, never sound.
@@ -205,6 +209,15 @@ func (s *fakeStream) Preload(url string) { s.record("preload %s", url) }
 func (s *fakeStream) Crossfade(url string, d time.Duration, cue audio.Cue) error {
 	s.record("crossfade %s %v%s", url, d, atSpeed(cue.Speed))
 	return nil
+}
+
+// Fading tells a crossfade over by its seconds, as the engine does once
+// the next track's audio is there at once, unless the test holds it.
+func (s *fakeStream) Fading() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.fadeAsks++
+	return s.fading
 }
 
 func (s *fakeStream) SetSpeed(speed float64) { s.record("set speed %v", speed) }

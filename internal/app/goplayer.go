@@ -249,6 +249,8 @@ func (s engineStream) Crossfade(url string, d time.Duration, cue audio.Cue) erro
 	return nil
 }
 
+func (s engineStream) Fading() bool { return s.e.Fading() }
+
 func (s engineStream) Stop() {
 	s.e.Stop()
 	s.a.setNative(false)

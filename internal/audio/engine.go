@@ -228,6 +228,15 @@ func (e *Engine) Crossfade(url string, d time.Duration, cue Cue) error {
 	return e.Play()
 }
 
+// Fading reports whether the crossfade that Crossfade started plays on:
+// until the track fading out faded out or ended. A pause holds it, as a
+// track fading in does while its audio hasn't come.
+func (e *Engine) Fading() bool {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	return e.fading
+}
+
 // followFade holds the crossfade while in, the track fading in, has no
 // audio, of which it read n frames into a quantum from r: both tracks keep
 // their gains, the one fading out at full volume until in's audio first

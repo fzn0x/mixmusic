@@ -672,7 +672,6 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 			}
 		}
 		h := headProps{title: a.Name, art: a.Artwork, round: true, source: a.Source, facts: texts(a.Subtitle), description: a.Description,
-			playLabel: "play top songs",
 			menu: func(m *ui.Menu) {
 				s.followItem(m, a)
 				if len(a.TopTracks) > 0 && a.Source != media.SourceFile && m.Item("Start radio").Chosen() {
@@ -684,9 +683,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 				s.copyLinkItem(m, a.URL)
 			},
 		}
-		if len(a.TopTracks) > 0 {
-			h.play = func() { s.p.PlayAll(a.TopTracks, false) }
-		}
+		s.artistPlay(&h, a)
 		// Signed out of the artist's service, they're followed in MixMusic.
 		// An artist of the music on this computer has no releases to follow.
 		following := s.followsArtist(a)
@@ -696,7 +693,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 		}
 		s.collectionHead(c, h)
 		section("songs", func() {
-			s.sectionTitle(c, "Top songs")
+			s.topSongsTitle(c, a)
 			ui.Column(c).Margin(0, 0, 48).Children(func() {
 				s.trackList(c, "top", a.TopTracks, trackListOptions{art: true, album: true, empty: "No songs listed for this artist."})
 			})

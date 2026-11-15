@@ -183,7 +183,12 @@
   and ask Unison for none, but Arabic's, whose romanization by Google
   has the vowels Arabic doesn't write.
 - **`internal/lastfm`** signs in to Last.fm with the user's API account and
-  scrobbles by Last.fm's rules, keeping what fails offline for later.
+  scrobbles by Last.fm's rules, keeping what fails offline for later. The
+  `Scrobbler` queue holds plays not yet accepted and carries nothing of
+  Last.fm but its `API`: plays keep joining it (up to 5000) while the
+  service refuses the session, `SetSession` sends them with the new key,
+  and `Discard` drops them. The app saves it in `lastfm-queue.json`;
+  disconnecting is the only thing that deletes the file.
 - **`internal/discord`** shows what plays on the user's Discord profile, over
   Discord's local pipe or socket: an activity's lines, times, picture, the
   small image at its corner and up to two buttons, fitted to Discord's

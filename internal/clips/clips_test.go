@@ -25,7 +25,7 @@ func testStore(t *testing.T, limit int64) *Store {
 
 func keep(t *testing.T, s *Store, key string, n int) Match {
 	t.Helper()
-	m, err := s.Keep(key, Match{Mime: "video/mp4", Width: 600, Height: 600}, bytes.NewReader(make([]byte, n)))
+	m, err := s.Keep(key, Match{Mime: "video/mp4", Width: 600, Height: 600, Source: "https://clips.example/" + key + ".mp4"}, bytes.NewReader(make([]byte, n)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,7 +57,7 @@ func TestKeep(t *testing.T) {
 	}
 
 	again := NewStore(s.dir, -1)
-	if m, ok := again.Match("ada field|kites"); !ok || m.Bytes != 1000 {
+	if m, ok := again.Match("ada field|kites"); !ok || m.Bytes != 1000 || m.Source != "https://clips.example/ada field|kites.mp4" {
 		t.Errorf("started again, the clip is %+v", m)
 	}
 	if m, ok := again.Match("orin vale|paper"); !ok || !m.Miss() {

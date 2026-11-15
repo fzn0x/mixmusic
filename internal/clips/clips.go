@@ -50,6 +50,9 @@ type Match struct {
 	Height int    `json:"height,omitempty"`
 	// Bytes is the size of the file.
 	Bytes int64 `json:"bytes,omitempty"`
+	// Source is where the clip came from: the address of the rendition
+	// its source gave, which isn't tried again once it failed.
+	Source string `json:"source,omitempty"`
 	// Found is when the album was looked for, and Played when its clip
 	// last played.
 	Found  time.Time `json:"found"`

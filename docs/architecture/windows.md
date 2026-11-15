@@ -190,6 +190,63 @@ belongs to its main thread: what finishes elsewhere comes back through
   fill in frames that only paint again; Reduce Motion lights each word
   whole as it starts. Lines shown in Latin letters in their place light
   whole.
+- **The full-screen lyrics** (`lyricsstage.go`) are a `DialogBase` whose
+  panel fills the window, so that no click falls on its backdrop, and
+  that shows the lyrics of the panel and of the now playing page, which
+  `lyricsWith` builds for `lyricsOptions{stage: &style}`: the same fetch,
+  states, translation and romanization (`lyricsChoicesWith` with `quiet`,
+  which draws no switches) and scroll (`lyricsState.stage`), each line
+  drawn by `stageLine` in the style of `lyricsstyles.go`, a table that
+  `settings.LyricStyles` and a test keep the same. Their ink is white, not
+  the theme's, over the track's cover stretched from a 64-pixel bitmap, as
+  the grounds of `groundLights` are: the GPU blends between its pixels, so
+  no blur of the window is drawn in a frame. A line away from the one sung
+  fades (`Opacity`) and blurs (`Blur`) by its distance, in whole pixels
+  (`blurAt`), and, as it stays so, keeps the layer it blurred (`Cache`),
+  so that only the line sung, which asks for frames, is drawn again. Both
+  move with `Animate`, and, in the frame the song goes on to a line within
+  four of the one before, the line sung asks the list to glide to the
+  middle (`ScrollIntoView`, `stageGlide`); from further, at first, and
+  when a style or a size changes the height of the lines (`stageLook`),
+  the list jumps (`ScrollTo`), as the panel's does. A line is built by
+  `stageLineView` (`lyricsstageline.go`), which takes a scale, so that
+  the preview in Settings (`lyricspreview.go`) draws the same lines, small,
+  on a made-up song's clock (`sungOptions.state`, rebuilt every 250 ms
+  while it shows). The style, the size of the text (`Lyrics.LyricsSize`)
+  and the ball (`Lyrics.LyricsBall`) are Settings' alone: the stage has no
+  keys of its own. Its glow is a blurred copy of its lit part under it, as
+  the Terminal theme's: `Blur` includes what a `Draw` paints, so the copy
+  follows the words as they light. The ball is not painted by the line it
+  is on: a line blurs and fades as it becomes the line sung, which is when
+  the ball lands on it, and the list clips what flies past its edges. The
+  crisp copy's `Draw` only tells a rig (`ballRig`, `lyricsballrig.go`)
+  where the words lie (`sungLayout.spots`: the middle of each word, at the
+  top of its letters over the row's baseline, `glyphRise`), in the window's
+  DIPs from `Element.Bounds`, and where and when the first word of the next
+  line lands; one overlay over the lyrics (`ballOverlay`, absolute and
+  `PassThrough`) paints the ball from it. `ballPlan.pose`
+  (`lyricsball.go`) is a pure function of the song's time and the plan:
+  the ball rests on a word, hops to the next in the last 460 ms before it
+  starts, squashes and rings as it lands, and, from the last word, flies to
+  the next line along the legs of a motion (`lyricsballmotion.go`: hop,
+  boomerang, loop, dive and ricochet, or the mix, which takes them in turn
+  by the line's place among those whose least time fits the pause;
+  `Lyrics.LyricsBallMotion`). The trail is the poses a moment before. The
+  rig keeps the plan of the line before for as long as its flight lasts,
+  moved by how far the lyrics glided, as the next line is sung 250 ms
+  early (`lyricsLead`). The overlay asks for its frames itself
+  (`ballRig.wakeIn`), as a frame that only paints again runs the drawings
+  that asked for it. While the ball is on and the lyrics have words timed,
+  every line keeps room above it for the ball, so that the lines don't
+  change height as the song goes on; the ball switch is in `stageLook`, so
+  that the line sung is centered again when it changes. At the left of the
+  cover are the player's buttons, and at the right the covers of the
+  queue's next entries (`lyricsstageside.go`, the entries of `s.st.Queue`
+  after `s.st.Index`, played with `PlayAt` by their place in the whole
+  queue), whose strip keeps its width when it is empty, so that the lyrics
+  don't wrap anew as the queue runs out. The panel runs the window's
+  shortcuts itself, `c.Shortcut` being false behind a dialog. It is built
+  before the command palette, which therefore shows over it.
 - **The mini player's volume** (`minivolume.go`) is a button that mutes,
   and the player bar's slider above it, in a popover that shows while the
   pointer is over either, a drag holds it or the keyboard's focus is on

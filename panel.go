@@ -207,7 +207,16 @@ func (s *shell) reorderable(row ui.Element, uid string, i int) {
 // lyricsPanel shows the lyrics of the track playing, or the details of an
 // episode.
 func (s *shell) lyricsPanel(c *ui.Context) {
-	s.panelHead(c, s.lyricsTitle(), nil)
+	// An episode has details, not lyrics: nothing to show full screen.
+	var actions func()
+	if cur, ok := s.st.Current(); ok && !cur.Track.IsEpisode() {
+		actions = func() {
+			if s.iconButton(c, "lyrics-stage", "expand", "Full-screen lyrics", false, 16).Clicked() {
+				s.toggleStage()
+			}
+		}
+	}
+	s.panelHead(c, s.lyricsTitle(), actions)
 	s.lyrics(c, false)
 }
 
@@ -218,6 +227,12 @@ func (s *shell) lyricsPanel(c *ui.Context) {
 type lyricsState struct {
 	track       string
 	panel, page lyricsScroll
+	// stage is the full-screen lyrics' (lyricsstage.go).
+	stage lyricsScroll
+	// previewAt is when the preview's made-up song started, in Settings
+	// (lyricspreview.go), and previewBall what its line tells its ball.
+	previewAt   time.Time
+	previewBall ballRig
 	// system is the system's language, and languages the choices of the
 	// language lyrics translate to, once asked for.
 	system    string
@@ -241,33 +256,54 @@ const lyricsPause = 4 * time.Second
 
 // lyrics follows the track playing: synchronized lines light up as they
 // are sung. large sets them at the size of the now playing page.
-func (s *shell) lyrics(c *ui.Context, large bool) {
+func (s *shell) lyrics(c *ui.Context, large bool) { s.lyricsWith(c, lyricsOptions{large: large}) }
+
+// lyricsOptions say how lyricsWith shows the lyrics. Its zero value is the
+// panel's.
+type lyricsOptions struct {
+	// large sets them at the size of the now playing page.
+	large bool
+	// stage, when set, shows them as the full-screen lyrics do
+	// (lyricsstage.go), each line drawn in the style: with no switches,
+	// share bar or note above them, and no way to choose lines to share.
+	stage *lyricStyle
+}
+
+// lyricsWith is lyrics for the options o.
+func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 	k := &s.lk
 	ls := &s.lyricsView
 	view, where := &ls.panel, "panel"
-	if large {
+	switch {
+	case o.stage != nil:
+		view, where = &ls.stage, "stage"
+	case o.large:
 		view, where = &ls.page, "page"
 	}
 	cur, ok := s.st.Current()
 	if !ok {
-		s.emptyIn(c, "Play a track to see its lyrics.")
+		s.lyricsEmpty(c, o, "Play a track to see its lyrics.")
 		return
 	}
 	t := cur.Track
 	if t.IsEpisode() {
-		// An episode has its details in their place (episodedetails.go).
-		s.episodeDetails(c, t, large)
+		// An episode has its details in their place (episodedetails.go); the
+		// full-screen lyrics close for it (lyricsstage.go).
+		if o.stage == nil {
+			s.episodeDetails(c, t, o.large)
+		}
 		return
 	}
 	l := fetch(s, "lyrics:"+t.ID, func(ctx context.Context) (lyrics.Lyrics, error) { return s.svc.Catalog.Lyrics(ctx, t) })
 	switch {
 	case !l.done:
-		s.emptyIn(c, "Looking for the lyrics…")
+		s.lyricsEmpty(c, o, "Looking for the lyrics…")
 		return
 	case l.err != nil:
-		s.emptyIn(c, l.err.Error())
-		// A track without lyrics stays so; a failure may pass.
-		if !errors.Is(l.err, lyrics.ErrNotFound) {
+		s.lyricsEmpty(c, o, l.err.Error())
+		// A track without lyrics stays so; a failure may pass. The
+		// full-screen lyrics refresh with the page (F5) instead.
+		if !errors.Is(l.err, lyrics.ErrNotFound) && o.stage == nil {
 			ui.Row(c).Padding(0, 24, 8).Children(func() {
 				if s.button(c, "lyrics-retry-"+where, "try again", false).Clicked() {
 					s.forget("lyrics:" + t.ID)
@@ -276,18 +312,20 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		}
 		return
 	case l.value.Instrumental:
-		s.emptyIn(c, "This track is instrumental.")
+		s.lyricsEmpty(c, o, "This track is instrumental.")
 		return
 	}
 	ly := l.value
 	if ls.track != t.ID {
-		ls.track, ls.panel.scrolled, ls.page.scrolled = t.ID, -1, -1
+		ls.track, ls.panel.scrolled, ls.page.scrolled, ls.stage.scrolled = t.ID, -1, -1, -1
 	}
 	synced := ly.Synced && !s.set.LyricsPlain
-	x := s.lyricsChoices(c, t, ly, where)
-	s.lyricsShareBar(c, t, ly, where)
-	if ly.Note != "" {
-		s.lyricsNote(c, ly.Note)
+	x := s.lyricsChoicesWith(c, t, ly, where, lyricsChoiceOptions{quiet: o.stage != nil})
+	if o.stage == nil {
+		s.lyricsShareBar(c, t, ly, where)
+		if ly.Note != "" {
+			s.lyricsNote(c, ly.Note)
+		}
 	}
 	active := -1
 	if synced {
@@ -301,13 +339,26 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		}
 	}
 	size, sub := k.bodySize(), k.smallSize()
-	if large {
+	if o.large {
 		size, sub = k.size(2), k.bodySize()
 	}
+	// The full-screen lyrics glide to the line sung when the song goes on to
+	// it from a line near; from afar, or at first, they jump (lyricsstage.go).
+	glide := false
+	if d := active - view.scrolled; o.stage != nil && active >= 0 && view.scrolled >= 0 && d != 0 && d >= -4 && d <= 4 && time.Since(view.userAt) > lyricsPause {
+		glide = true
+	}
+	// The ball, and the room each line keeps for it, are for lyrics with words
+	// timed: the others have no ball to keep room for.
+	ball := o.stage != nil && s.set.LyricsBall && slices.ContainsFunc(ly.Lines, func(l lyrics.Line) bool { return len(l.Words) > 0 })
 	n := len(ly.Lines) + 1
 	list := ui.List(c.Key("lyrics-"+where+"-"+t.ID), &view.list, n, func(i int) {
 		if i == len(ly.Lines) {
-			s.lyricsCredit(c, ly)
+			if o.stage != nil {
+				s.stageCredit(c, ly)
+			} else {
+				s.lyricsCredit(c, ly)
+			}
 			return
 		}
 		line := ly.Lines[i]
@@ -328,6 +379,32 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 		var words, romanWords []lyrics.Word
 		if synced && i == active {
 			words, romanWords = x.words(i, line, text, roman)
+		}
+		if o.stage != nil {
+			// The ball goes on from the line sung to the next, if its words have
+			// times.
+			var next ballNext
+			if ball && synced && i == active && i+1 < len(ly.Lines) {
+				nl := ly.Lines[i+1]
+				ntext, nroman, _ := x.line(i+1, nl.Text)
+				if ntext == "" {
+					ntext = "♪"
+				}
+				if shown, _ := x.words(i+1, nl, ntext, nroman); len(shown) > 0 {
+					// The ball lands on the word that starts first: a second voice
+					// may be listed after the main one's words, and start before them.
+					first := shown[0]
+					for _, w := range shown[1:] {
+						if w.StartMs < first.StartMs {
+							first = w
+						}
+					}
+					next = ballNext{ok: true, text: ntext, word: first}
+				}
+			}
+			s.stageLine(c, stageLine{style: *o.stage, index: i, active: active, line: line, text: text, roman: roman, meaning: meaning,
+				words: words, synced: synced, reading: time.Since(view.userAt) <= lyricsPause, glide: glide, ball: ball, next: next})
+			return
 		}
 		var p ui.Element
 		if roman == "" && meaning == "" {
@@ -356,6 +433,12 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 			}
 		}
 	}).Grow(1).MinHeight(0)
+	if o.stage != nil {
+		// Room above the first line and below the last, so that the line sung
+		// can sit in the middle of the window even at the song's ends.
+		_, wh := c.Size()
+		list.Padding(0.38*wh, 0)
+	}
 	// Lyrics the user scrolls, to read back say, stop following the song
 	// for a while, and never pull the page they're on.
 	list.HandleInput(func(ev ui.InputEvent) bool {
@@ -366,8 +449,13 @@ func (s *shell) lyrics(c *ui.Context, large bool) {
 	})
 	if synced && active >= 0 && active != view.scrolled && time.Since(view.userAt) > lyricsPause {
 		view.scrolled = active
-		view.list.ScrollTo(active, ui.Center)
+		// The line sung asked the full-screen lyrics to glide to it: they
+		// don't jump there too.
+		if !s.stage.glided {
+			view.list.ScrollTo(active, ui.Center)
+		}
 	}
+	s.stage.glided = false
 }
 
 // lyricsLead is how far ahead of the position synced lyrics light up, at

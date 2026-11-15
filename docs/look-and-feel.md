@@ -191,6 +191,10 @@ or animations turned off on a Linux desktop), MixMusic moves less:
   goes flat at once when you pause.
 - Lyrics timed [word by word](lyrics.md#word-by-word) light each word
   whole as it starts, rather than filling it as it's sung.
+- The [full-screen lyrics](lyrics.md#full-screen-lyrics) jump to each line as
+  the song goes on, and their lines fade and blur at once, rather than
+  glide. Their ball doesn't hop or fly, squash or leave rings: it sits on the
+  word being sung, and on the first word of the next line as it starts.
 - What moves on springs, as a button you press or the mark of the page
   you're on, goes where it goes at once, and the head of a playlist or an
   album shows in the top bar at once as you scroll.

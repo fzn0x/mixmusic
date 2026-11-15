@@ -9,6 +9,7 @@ Lyrics come from Unison, LRCLIB and YouTube Music, for the track that plays, whi
 
 - **The lyrics panel** opens at the right of the window, beside the page you're on, from the Lyrics button by the player (beside Queue), or with Ctrl+Shift+L (⇧⌘L on macOS). The same keys or button close it.
 - **The now playing page** shows them larger, under the player: open it from the cover in the player bar, the card at the foot of the sidebar, or Alt+4 (⌥4).
+- **The [full-screen lyrics](#full-screen-lyrics)** cover the window with the lyrics over the cover of the track, blurred, in a style you choose: from the full-screen button of the lyrics panel, or of the now playing page, or with Ctrl+Shift+F (⇧⌘F on macOS).
 - **The [notch player](desktop.md#the-player-around-the-notch),** on a MacBook with a notch, shows the line sung now, with the line before and the line after, in Latin letters when you show the lyrics so.
 
 ![The lyrics panel at the right of the window, beside Library › Liked: its Synced and Plain text choice, the Translate and Romaji switches, and the lyrics of アイドル by YOASOBI, the line sung now lighting up in the accent colour](shots/lyrics.webp)
@@ -54,6 +55,30 @@ Lyrics timed word by word, as Unison has many, light each word of the line sung 
 - background vocals light the same way.
 
 Lines shown in Latin letters made on your computer light word by word too. Romaji, and Arabic's romanization from Unison, don't: shown in place of the line, they light a whole line at a time, as lyrics timed line by line do. While your system asks for [less motion](look-and-feel.md#reduced-motion), each word lights whole as it starts.
+
+## Full-screen lyrics
+
+The full-screen lyrics cover the window with the lyrics of the track playing. Its cover, blurred and darkened, is the ground. At the left are the buttons of the player (the previous track, play or pause, and the next track), the cover, and under it the title and the artist. In the middle are the lyrics: the line sung now large and white, lit word by word where its words have times, with a ball hopping over its words, and the lines away from it dimmer and, in most styles, blurrier the farther they lie. At the right, beside the lyrics' scroll bar, are the covers of the tracks next in the queue. The ink is white whatever your theme, as the ground is dark.
+
+- **Open them** with the full-screen button of the lyrics panel's head, beside its close button, or of the now playing page, with Ctrl+Shift+F (⇧⌘F on macOS), with "Show or hide the full-screen lyrics" in the [command palette](settings.md#the-command-palette), or with **show** in Settings › Appearance › Lyrics style. Escape, the close button at the top right, or the same shortcut closes them. A podcast episode has no lyrics, so they don't open for one, and close when one starts.
+- **The queue.** The covers at the right are those of the tracks after the one playing, as the queue panel lists them: click one to play it. In a window narrower than 760 pixels they give way to the lyrics, and, narrower than 600, so do the buttons.
+- **The style, the size and the ball** are Settings', and the full-screen lyrics have no controls for them. Settings › Appearance › Lyrics style has the styles (Spotlight, the default, and five others, below), **Lyrics text size**, from 60% to 180% in steps of 10%, the **Bouncing ball** switch, **Ball between lines** (below), and a small preview that moves as you change them, so that you see what each does. "Lyrics style: …" in the [command palette](settings.md#the-command-palette) chooses a style too.
+- **The bouncing ball.** For lyrics timed word by word, a ball hops from word to word over the line sung. It waits on a word until the last moments before the next one starts, hops, and lands as it starts, with a squash and a ring that spreads over the word: it touches the tops of the letters, as high as the tall ones or as low as the small ones of the word. Lines timed only line by line have no ball. The switch is on at first. While your system asks for [less motion](look-and-feel.md#reduced-motion) the ball doesn't hop: it sits on the word being sung.
+- **Ball between lines.** From the last word of a line the ball goes to the first word of the next, landing on it as it starts, in a motion Settings › Appearance › Lyrics style chooses while the ball is on: **Mix** (the default), a different one for each line, in turn, and the next that fits where the pause is short; **Hop**, one arc; **Boomerang**, thrown out past the end of the line and curved back to the next; **Loop**, a loop over the last word and a swoop down; **Dive**, a small rise and a drop; or **Ricochet**, off the right edge of the lyrics and their floor and up to the next line. A motion needs time, which the pause between two lines gives: where it is too short for the one chosen, the ball hops, and where there is no time for a hop it waits for the next line. The fast motions leave a short trail. The ball flies over the lyrics, past their edges, and is the same in the preview.
+- **The motion.** As the song goes on to the next line, the lyrics glide up to it slowly, and the lines fade and blur to where their distance puts them, rather than jump. A new style or size centers the line sung again at once. While your system asks for [less motion](look-and-feel.md#reduced-motion), they jump.
+- **What they show** is what you chose in the lyrics panel: synced or plain, translated, in Latin letters. The switches are in the panel, not here. A click on a line of synced lyrics plays the song from there. Scroll them to read back, and they stay where you put them for a few seconds, with nothing blurred, before they follow again.
+- **The keys.** The full-screen lyrics have none of their own: Space, the arrows, the volume, <kbd>Ctrl</kbd> <kbd>K</kbd> and the other shortcuts work as they do elsewhere. Reduce Motion lights each word whole, as it does in the panel.
+
+| Style | Set in | What it looks like |
+|---|---|---|
+| **Spotlight**, the default | Selawik Bold | Very big letters. Only the line sung is sharp: the others blur. |
+| **Glow** | Quicksand Bold | Round, bold letters with a soft glow on the words as they are sung. The other lines blur. |
+| **Focus** | Roboto Flex Bold | Bold, even letters. The farther a line is from the one sung, the more it fades and blurs. |
+| **Simple** | Selawik Semibold | Plain letters, as in the rest of MixMusic. No blur: the other lines only fade. |
+| **Bold** | Archivo SemiCondensed ExtraBold | Big, heavy, tight letters, like a poster. |
+| **Calm** | Roboto Flex Medium | Small, quiet letters, with a light fade and almost no blur, for a relaxed mood. |
+
+The styles use the faces MixMusic brings, so they look the same on every computer. They set the type and the blur; the theme and the [layout](look-and-feel.md#layouts) don't change them.
 
 ## Translate
 

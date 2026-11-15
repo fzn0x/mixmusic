@@ -135,6 +135,20 @@ func (x lyricsExtra) line(i int, words string) (text, roman, meaning string) {
 // their translation loads or when it fails, says so. It tells what their
 // lines show besides their words.
 func (s *shell) lyricsChoices(c *ui.Context, t media.Track, ly lyrics.Lyrics, where string) lyricsExtra {
+	return s.lyricsChoicesWith(c, t, ly, where, lyricsChoiceOptions{})
+}
+
+// lyricsChoiceOptions say what lyricsChoicesWith shows. Its zero value
+// shows what lyricsChoices does.
+type lyricsChoiceOptions struct {
+	// quiet tells what the lines show without drawing the switches and the
+	// notes above them, as the full-screen lyrics (lyricsstage.go) have
+	// none: they show what the user chose in the panel.
+	quiet bool
+}
+
+// lyricsChoicesWith is lyricsChoices for the options o.
+func (s *shell) lyricsChoicesWith(c *ui.Context, t media.Track, ly lyrics.Lyrics, where string, o lyricsChoiceOptions) lyricsExtra {
 	lang, to := ly.Language, s.translateTarget()
 	// Lyrics of a language MixMusic can't tell may be in another.
 	canTranslate := lang != to
@@ -164,7 +178,7 @@ func (s *shell) lyricsChoices(c *ui.Context, t media.Track, ly lyrics.Lyrics, wh
 	if canRomanize {
 		x.romanize = romanize
 	}
-	if ly.Synced || canTranslate || canRomanize {
+	if !o.quiet && (ly.Synced || canTranslate || canRomanize) {
 		s.lyricsSwitches(c, ly, lang, where, canTranslate, canRomanize, &x)
 	}
 	if x.ja && x.romanize != "" {
@@ -173,7 +187,7 @@ func (s *shell) lyricsChoices(c *ui.Context, t media.Track, ly lyrics.Lyrics, wh
 	if x.local != "" && x.romanize != "" {
 		x.roman = s.lyricsRomanized(t, ly, x.local)
 	}
-	if tr == nil {
+	if tr == nil || o.quiet {
 		return x
 	}
 	what := "Romanization"

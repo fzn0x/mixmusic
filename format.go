@@ -24,6 +24,15 @@ func clock(d time.Duration) string {
 	return fmt.Sprintf("%d:%02d", m, s)
 }
 
+// clockLength writes how long a track or an episode lasts, as clock does,
+// but rounded up to the whole second, as YouTube Music lists lengths: a
+// stream 213.26 s long is 3:34, as its row in a list says, where clock
+// would say 3:33 (#718). Less than a millisecond past a second, as a
+// decoder's length may be, doesn't count. Positions keep clock.
+func clockLength(d time.Duration) string {
+	return clock((d.Truncate(time.Millisecond) + time.Second - time.Millisecond).Truncate(time.Second))
+}
+
 // longDuration writes a duration as "1 hr 12 min" or "42 min".
 func longDuration(d time.Duration) string {
 	min := int((d + 30*time.Second) / time.Minute)

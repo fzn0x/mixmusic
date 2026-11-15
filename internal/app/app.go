@@ -402,7 +402,8 @@ func (a *App) apply(s settings.Settings) {
 	a.applyOverlay(s)
 	a.applyAssistants(s)
 	if p := a.goPlayer.Load(); p != nil {
-		p.SettingsChanged(s)
+		// A guest of a room plays as its host does (roomfollow.go).
+		p.SettingsChanged(a.roomSettings(s))
 		a.applyEngine(s)
 	}
 	if s.SpotifyPlayback != settings.SpotifyPlaybackHere {

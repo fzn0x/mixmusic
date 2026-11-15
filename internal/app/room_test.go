@@ -470,3 +470,28 @@ func TestRoomQuitKeepsTheOwnQueue(t *testing.T) {
 		return len(h.Guests) == 0
 	})
 }
+
+// TestRoomSettingsRestWhileFollowing changes the settings while a guest
+// follows its host: the player still hears them as a guest's.
+func TestRoomSettingsRestWhileFollowing(t *testing.T) {
+	n := roomtest.New()
+	desk := newRoomApp(t, n, "Desk")
+	lap := newRoomApp(t, n, "Lap")
+	desk.GoPlayer().PlayTracks(tracksOf("a"), 0)
+	if err := desk.Rooms().Start(); err != nil {
+		t.Fatal(err)
+	}
+	joinRoom(t, lap, desk)
+	lp := lap.GoPlayer()
+	waitPlayer(t, lp, "a on the guest", func(s player.State) bool { return s.Playing })
+	st := lap.settings.Get()
+	st.SongSpeed = 1.5
+	lap.apply(st)
+	// The player takes its tasks in turn: once it took a volume set after
+	// the settings, it took them.
+	lp.SetVolume(0.42)
+	waitPlayer(t, lp, "the volume after the settings", func(s player.State) bool { return s.Volume == 0.42 })
+	if sp := lp.State().Speed; sp != 1 {
+		t.Fatalf("the guest plays at %v, its own speed, while it follows the host", sp)
+	}
+}

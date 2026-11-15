@@ -84,13 +84,15 @@ func (p *Player) asksParts(src Source) bool {
 }
 
 // lookUp asks the app for the parts of src, unless the player knows them,
-// or asks already: they apply as they come.
+// or asks already: they apply as they come. A stream found without parts
+// is asked of again, of the app, which knows it a while: as offline, the
+// app may have known nothing of it.
 func (p *Player) lookUp(src Source) {
 	if !p.asksParts(src) {
 		return
 	}
 	st := &p.parts
-	if _, ok := st.known[src.URL]; ok || st.asking[src.URL] {
+	if segs := st.known[src.URL]; len(segs) > 0 || st.asking[src.URL] {
 		return
 	}
 	m, _ := p.marked()
@@ -302,10 +304,11 @@ func (p *Player) Skipped(url string, from, to time.Duration) {
 
 // onSkipped tells the user of a part the engine passed over of the current
 // entry, with undo, which goes back to it: it plays then, as each part is
-// passed over once a play. A part that ended the track has no undo.
+// passed over once a play. A part that ended the track has no undo, and
+// one a track loaded paused starts past, as at start, goes untold.
 func (p *Player) onSkipped(url string, from, to time.Duration) {
 	cur, ok := p.s.Current()
-	if !ok || url != p.parts.url || p.parts.url == "" {
+	if !ok || url != p.parts.url || p.parts.url == "" || p.paused {
 		return
 	}
 	n := Notice{Message: "Skipped " + p.partWords(from, to)}

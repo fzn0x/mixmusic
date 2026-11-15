@@ -252,3 +252,37 @@ func TestJumpToHighlight(t *testing.T) {
 	h.p.JumpToHighlight()
 	h.wait("at the highlight", func(*Player) bool { return h.stream.has(fmt.Sprintf("seek %v", 5*sec)) })
 }
+
+// TestNoSkippedNoticeWhilePaused tells nothing of a part passed over by a
+// track that loaded paused, as one the queue holds at start.
+func TestNoSkippedNoticeWhilePaused(t *testing.T) {
+	h, _ := newMarking(t, map[string][]sponsorblock.Segment{"yt:a": sponsorRead}, "yt:a")
+	h.p.PlayTracks(tracks("a"), 0)
+	h.wait("a playing", playing("a"))
+	h.p.Pause()
+	h.wait("a paused", func(p *Player) bool { return p.paused })
+	h.p.Skipped("url:yt:a", 10*sec, 20*sec)
+	h.on(func(*Player) {})
+	for _, n := range h.notices() {
+		if strings.HasPrefix(n.Message, "Skipped") {
+			t.Errorf("told %q while paused", n.Message)
+		}
+	}
+}
+
+// TestPartsAskedAgainOfAStreamWithout asks the app again of a stream it
+// found without parts, as it loads again: the app knows it, or knew
+// nothing of it, as offline.
+func TestPartsAskedAgainOfAStreamWithout(t *testing.T) {
+	h, m := newMarking(t, map[string][]sponsorblock.Segment{})
+	h.p.PlayTracks(tracks("a", "b"), 0)
+	h.wait("a playing", playing("a"))
+	h.wait("a asked for", func(*Player) bool { return len(m.askedFor()) == 1 })
+	m.mmu.Lock()
+	m.known["yt:a"] = false
+	m.mmu.Unlock()
+	h.next()
+	h.p.Previous()
+	h.wait("a playing again", playing("a"))
+	h.wait("a asked for again", func(*Player) bool { return slices.Equal(m.askedFor(), []string{"yt:a", "yt:b", "yt:a"}) })
+}

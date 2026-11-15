@@ -57,6 +57,8 @@ type movingCovers struct {
 	sweep *time.Timer
 	// now is time.Now, which tests replace.
 	now func() time.Time
+	// clips are the albums' clips (movingclip.go).
+	clips movingClips
 }
 
 // gifCover is the GIF of a cover, as it plays.

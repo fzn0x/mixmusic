@@ -602,6 +602,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 			}
 		}
 	}
+	s.movingCoverItem(m, t)
 	// What plugins add to the menu of every track.
 	if actions := s.plugins.TrackActions(); len(actions) > 0 {
 		m.Separator()

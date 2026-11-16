@@ -99,8 +99,8 @@ func (a *App) followHost(on bool) {
 }
 
 // roomSettings are the settings s as the player of a guest that follows a
-// host takes them: the host decides when tracks change, and how fast they
-// play.
+// host takes them: the host decides when tracks change, how fast they
+// play, and which parts of them it passes over.
 func (a *App) roomSettings(s settings.Settings) settings.Settings {
 	if !a.room.following.Load() {
 		return s
@@ -108,6 +108,9 @@ func (a *App) roomSettings(s settings.Settings) settings.Settings {
 	s.Crossfade, s.Autoplay = 0, false
 	s.SongSpeed, s.PodcastSpeed = 1, 1
 	s.SkipDisliked, s.SkipAI = false, false
+	// The host's player skips the parts its settings skip, which a seek
+	// tells the guests (#548).
+	s.SkipParts.On = false
 	return s
 }
 

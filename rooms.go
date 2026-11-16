@@ -23,6 +23,10 @@ type roomView struct {
 	// addr and addrCode are the address and the code of a room the user
 	// joins at an address (rooms_anywhere.go).
 	addr, addrCode string
+	// suggestAsk is set as the user lets friends outside this network join
+	// while Ask me before someone joins is off, which the room's page then
+	// suggests, until they take it or not (rooms_anywhere.go).
+	suggestAsk bool
 	// starting is set while a room opens.
 	starting bool
 }

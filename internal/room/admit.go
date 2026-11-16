@@ -119,8 +119,10 @@ type unproven struct {
 
 // letIn takes a connection of src that proves nothing yet, which close
 // closes, and returns those it takes the place of: the oldest of src, when
-// the room holds as many of src as it takes, and the oldest of all, when it
-// holds as many as it takes in all. The caller closes them.
+// the room holds as many of src as it takes, and, when it holds as many as
+// it takes in all, the oldest of the source that holds the most, so that
+// sources that each flood the room take each other's places, not those of
+// a guest on its way in. The caller closes them.
 func (a *admission) letIn(src string, close func()) (*unproven, []*unproven) {
 	var out []*unproven
 	n := 0
@@ -139,13 +141,30 @@ func (a *admission) letIn(src string, close func()) (*unproven, []*unproven) {
 		}
 	}
 	if len(a.unproven) >= a.caps.unproven && len(a.unproven) > 0 {
-		u := a.unproven[0]
+		u := a.crowding()
 		out = append(out, u)
 		a.proven(u)
 	}
 	u := &unproven{src: src, close: close}
 	a.unproven = append(a.unproven, u)
 	return u, out
+}
+
+// crowding is the oldest unproven connection of the source that holds the
+// most of them, the oldest of those that hold as many.
+func (a *admission) crowding() *unproven {
+	held := map[string]int{}
+	most := 0
+	for _, u := range a.unproven {
+		held[u.src]++
+		most = max(most, held[u.src])
+	}
+	for _, u := range a.unproven {
+		if held[u.src] == most {
+			return u
+		}
+	}
+	return a.unproven[0]
 }
 
 // proven lets go of a connection that proved the code, the link or its

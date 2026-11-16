@@ -386,3 +386,26 @@ func isTimeout(err error) bool {
 	var ne net.Error
 	return errors.As(err, &ne) && ne.Timeout()
 }
+
+// TestFullRoomMakesRoomFromTheMostCrowdedSource fills the places of the
+// unproven from sources that each hold a few, beside a guest's one on its
+// way in: new connections of those sources take each other's places, and
+// never the guest's.
+func TestFullRoomMakesRoomFromTheMostCrowdedSource(t *testing.T) {
+	a := newAdmission()
+	guest, _ := a.letIn("198.51.100.7", func() {})
+	for i := range 200 {
+		_, gone := a.letIn(fmt.Sprintf("203.0.113.%d", i%9), func() {})
+		for _, u := range gone {
+			if u == guest {
+				t.Fatalf("connection %d took the guest's place", i)
+			}
+		}
+		if len(a.unproven) > maxUnproven {
+			t.Fatalf("%d unproven", len(a.unproven))
+		}
+	}
+	if guest.gone {
+		t.Fatal("the guest lost its place")
+	}
+}

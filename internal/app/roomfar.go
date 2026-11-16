@@ -59,18 +59,21 @@ func (a *App) linkRoom(id string) (room.Found, bool) {
 
 // roomDial connects to the room this computer knocks at, or comes back
 // to, at addr, and at the addresses of its invite link beside it, keeping
-// the first that answers.
+// the first that answers. A room of the network alone is dialed as
+// before.
 func (a *App) roomDial(ctx context.Context, network, addr string) (net.Conn, error) {
-	addrs := []string{addr}
+	var link []string
 	if g := a.guestRoom(); g != nil {
-		for _, x := range a.linkAddrs(g.id) {
-			if !slices.Contains(addrs, x) {
-				addrs = append(addrs, x)
-			}
-		}
+		link = a.linkAddrs(g.id)
 	}
-	if len(addrs) == 1 {
+	if len(link) == 0 {
 		return (&net.Dialer{}).DialContext(ctx, network, addr)
+	}
+	addrs := []string{addr}
+	for _, x := range link {
+		if !slices.Contains(addrs, x) {
+			addrs = append(addrs, x)
+		}
 	}
 	return room.DialFirst(ctx, nil, addrs)
 }

@@ -243,7 +243,7 @@ func (a *App) knock(ctx context.Context, g *guestRoom, wasFound bool, by knockBy
 			g.name = f.Name
 		}
 	})
-	s, err := a.roomGuest(id).Knock(ctx, f.Addr, by.pinned, by.password, by.link)
+	s, err := a.knockFound(ctx, id, f, by)
 	if err != nil {
 		fail(err)
 		return
@@ -262,6 +262,31 @@ func (a *App) knock(ctx context.Context, g *guestRoom, wasFound bool, by knockBy
 			}
 		})
 	}()
+}
+
+// knockFound knocks at the room found at f, by by. With the host's key,
+// its other addresses are tried beside the first (roomElsewhere); by a
+// code, each in turn while none answers as a room, as discovery found the
+// room at each. All failing, the first's failure, of this network's
+// address, tells why.
+func (a *App) knockFound(ctx context.Context, id *remote.Identity, f room.Found, by knockBy) (*room.Session, error) {
+	g := a.roomGuest(id)
+	addrs := []string{f.Addr}
+	if by.pinned == nil {
+		addrs = append(addrs, f.Others...)
+	}
+	var first error
+	for _, at := range addrs {
+		s, err := g.Knock(ctx, at, by.pinned, by.password, by.link)
+		var ue *room.UnreachableError
+		if err == nil || !errors.As(err, &ue) || ctx.Err() != nil {
+			return s, err
+		}
+		if first == nil {
+			first = err
+		}
+	}
+	return nil, first
 }
 
 // errRoomAway: the room isn't on the network.

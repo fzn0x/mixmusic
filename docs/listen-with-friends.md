@@ -97,24 +97,35 @@ Listen with friends:
   most, and a notification tells you while MixMusic is in the
   background: clicking it opens the page. A guest adds 10 songs a minute
   at most, and none your settings would hide or your computer can't play.
+  Your computer finds each song by its ID, on YouTube Music, or Spotify
+  while you're signed in to it, and shows it, plays it and tells Discord
+  and your scrobbles of it as the service tells it, not as the guest
+  does. A file of a guest's plays your own file of the same song, which
+  your computer looks for as you accept it.
 - **Guests can control playback**, off at first: they play, pause and
   skip, 5 times at once at most, then once a second.
 - **Ask me before someone joins**, off at first: each friend who joins
   with the code or the link waits on the room's page, 2 minutes at most,
-  until you **let in** or **turn away**. Guests who come back after a
-  drop aren't asked about.
+  until you **let in** or **turn away**. Each shows its name, the start
+  of its computer's key, which tells two of the same name apart, and
+  whether it joins from your network or from the internet. Guests who
+  come back after a drop aren't asked about.
 
 Your computer checks each of these as a guest asks, whatever the guest's
 MixMusic says.
 
 **make host**, beside a guest, moves the room to that guest's computer, if
-the others, and yours, can reach it: it opens a room of its own, which
-keeps everyone's place, and each computer tries it. Once all reach it,
-that guest's player takes the room's queue, where yours played it, and
-you and the others are guests of it, as after a drop. When one can't
-reach it, or it takes longer than 10 seconds, the room stays with you,
-and you're told why. The new host's room has a new code and invite link,
-and keeps the computers you blocked out.
+its user agrees and the others, and yours, can reach it. The guest's page
+asks **host the room** or **decline**, for 50 seconds; once they agree,
+their computer opens a room of its own, which keeps everyone's place, and
+each computer tries it. Once all reach it, that guest's player takes the
+room's queue, where yours played it, in place of their own, and you and
+the others are guests of it, as after a drop. When they decline, or one
+can't reach it, or it takes longer than 10 seconds, or you remove or
+block someone meanwhile, the room stays with you, and you're told why.
+No one joins while the room moves. The new host's room has a new code and
+invite link, keeps the computers you blocked out, and, when it asks
+before someone joins, asks about each guest too as they come back.
 
 ## Dropping off
 

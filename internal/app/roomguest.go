@@ -119,7 +119,7 @@ func (a *App) guestRoom() *guestRoom {
 
 // roomGuest is this computer as a guest of rooms.
 func (a *App) roomGuest(id *remote.Identity) *room.Guest {
-	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing}
+	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing, Dial: a.roomDial}
 }
 
 // Knock knocks at the room of the host id, found on the network, with the
@@ -147,6 +147,10 @@ func (rs *Rooms) OpenLink(link string) error {
 // openInvite knocks at the room of the invite in.
 func (a *App) openInvite(in room.Invite) {
 	key := in.Host
+	if a.backByInvite(in) {
+		return
+	}
+	a.keepLinkAddrs(key.ID(), in.Addrs)
 	a.startKnock(key.ID(), &key, knockBy{password: in.Secret, link: true, pinned: &key}, nil)
 }
 
@@ -559,6 +563,8 @@ func roomProblem(name string, err error) string {
 		return "Another computer answered in place of " + name + ": the link isn't of its room."
 	case errors.Is(err, errRoomAway):
 		return name + "'s room isn't on the network now."
+	case farUnreachable(err):
+		return farProblem(name)
 	case errors.Is(err, room.ErrNotLink):
 		return "That isn't a link to a room."
 	case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):

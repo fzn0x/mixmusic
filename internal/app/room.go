@@ -268,6 +268,10 @@ func (a *App) foundRoom(id string, look bool) (room.Found, bool) {
 		f, ok = r.found[id]
 		r.mu.Unlock()
 	}
+	if !ok {
+		// Where its invite link reaches it, from outside the network.
+		return a.linkRoom(id)
+	}
 	return f.found, ok
 }
 

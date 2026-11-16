@@ -201,7 +201,7 @@ func TestFoundFontDrawsItsLetters(t *testing.T) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "NotoSansArmenian-Regular.ttf"), data, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "NotoSans-Regular.ttf"), data, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	fam := family(t)

@@ -17,6 +17,9 @@ type State struct {
 	Live       bool  `json:"live,omitempty"`
 	PositionMs int64 `json:"positionMs,omitempty"`
 	DurationMs int64 `json:"durationMs,omitempty"`
+	// Parts are the parts of the track its player passes over, and its
+	// highlight (parts.go): an older MixMusic tells none.
+	Parts []Part `json:"parts,omitempty"`
 	// Volume is from 0 to 1, without Muted.
 	Volume float64 `json:"volume"`
 	Muted  bool    `json:"muted,omitempty"`
@@ -127,6 +130,7 @@ func cleanState(s State) State {
 	}
 	s.Volume = min(max(s.Volume, 0), 1)
 	s.PositionMs, s.DurationMs = max(s.PositionMs, 0), max(s.DurationMs, 0)
+	s.Parts = cleanParts(s.Parts, s.DurationMs)
 	return s
 }
 

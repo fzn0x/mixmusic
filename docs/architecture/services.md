@@ -226,10 +226,12 @@
   compared by normalized correlation, each band's mean taken away, at
   every shift of the plan (`NewPlan`): three windows of the song, at a
   fifth, half and four fifths of it, searched 120 s either way of the
-  lengths' difference. `Plan.Shift` takes a shift and a speed when two
-  windows or more match clearly: it fits a line through where they land,
-  video time = shift + song time × speed, by least squares, and takes it
-  when each lands within 100 ms of it and the speed is within 1% of 1.
+  lengths' difference. `Plan.Shift` takes a shift when two windows or
+  more match clearly. When all three do, it fits a line through where
+  they land, video time = shift + song time × speed, by least squares,
+  and takes it when each lands within 100 ms of it and the speed is
+  within 1% of 1. When only two do, which any line fits, they agree
+  within 100 ms, at a speed within 1%, and the speed is 1.
   `internal/align/aligntest` makes audio from seeds, drums, a bass and a
   tune, to test it on, and `MIXMUSIC_LIVE=1 go test ./internal/app -run
   LiveLyricsTiming -v` measures music videos on YouTube.

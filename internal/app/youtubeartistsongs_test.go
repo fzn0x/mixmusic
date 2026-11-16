@@ -47,6 +47,10 @@ func TestYouTubeArtistSongs(t *testing.T) {
 	if err != nil || len(songs) != 6 || !slices.Equal(given, []int{2, 2, 2}) {
 		t.Errorf("%d songs, given %v, %v", len(songs), given, err)
 	}
+	// ArtistSongs routes YouTube Music's artists here.
+	if routed, err := c.ArtistSongs(context.Background(), "yt:UCbM50mQtG58vhLZonicYUrQ", func([]media.Track) {}); err != nil || len(routed) != 6 {
+		t.Errorf("ArtistSongs gave %d songs, %v", len(routed), err)
+	}
 	if _, err := c.YouTubeArtistSongs(context.Background(), "sp:a1", nil); err == nil {
 		t.Error("a Spotify artist's songs came")
 	}

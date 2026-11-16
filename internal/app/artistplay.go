@@ -26,13 +26,55 @@ type songsRead func(ctx context.Context, each func([]media.Track)) ([]media.Trac
 // plays their top songs, which for the music on this computer are all
 // theirs. It returns once the reading ended (playArtistSongs).
 func (c *Catalog) PlayArtist(ctx context.Context, p *player.Player, a media.Artist, shuffled bool) error {
-	var read songsRead
-	if source, list, err := media.ParseID(a.SongsID); err == nil && source == media.SourceYouTube {
-		read = func(ctx context.Context, each func([]media.Track)) ([]media.Track, error) {
+	return c.a.playArtistSongs(ctx, p, a, shuffled, c.songsReader(a))
+}
+
+// songsReader returns how to read all the songs of the artist a: a
+// Spotify artist with releases from those (ArtistSongs), a YouTube Music
+// artist from the list their page links, and nil for any other, whose top
+// songs are all there are to play.
+func (c *Catalog) songsReader(a media.Artist) songsRead {
+	source, list, _ := media.ParseID(a.SongsID)
+	switch {
+	case a.Source == media.SourceSpotify && len(a.Albums)+len(a.Singles) > 0:
+		return func(ctx context.Context, each func([]media.Track)) ([]media.Track, error) {
+			return c.ArtistSongs(ctx, a.ID, each)
+		}
+	case source == media.SourceYouTube:
+		return func(ctx context.Context, each func([]media.Track)) ([]media.Track, error) {
 			return c.a.youtube.SongList(ctx, list, each)
 		}
 	}
-	return c.a.playArtistSongs(ctx, p, a, shuffled, read)
+	return nil
+}
+
+// PlayArtistID plays all the songs of the artist with the id given, as
+// PlayArtist does, after reading the artist as their page does: a tile
+// doesn't hold their songs.
+func (c *Catalog) PlayArtistID(ctx context.Context, p *player.Player, id string, shuffled bool) error {
+	a, err := c.Artist(ctx, id)
+	if err != nil {
+		return fmt.Errorf("the artist couldn't be opened: %w", err)
+	}
+	return c.PlayArtist(ctx, p, a, shuffled)
+}
+
+// AllSongs reads all the songs of the artist a, in order and each once,
+// for what plays them elsewhere than PlayArtist: the assistants'. An
+// artist whose songs can't be read all plays their top songs; a read that
+// came in part gives what came.
+func (c *Catalog) AllSongs(ctx context.Context, a media.Artist) ([]media.Track, error) {
+	read := c.songsReader(a)
+	if read == nil {
+		return a.TopTracks, nil
+	}
+	keep := c.a.songsKept()
+	var songs []media.Track
+	_, err := read(ctx, func(part []media.Track) { songs = append(songs, keep(part)...) })
+	if len(songs) == 0 {
+		return a.TopTracks, err
+	}
+	return songs, nil
 }
 
 // playArtistSongs plays the songs of the artist a that read reads on p, in
@@ -78,9 +120,14 @@ func (a *App) playArtistSongs(ctx context.Context, p *player.Player, artist medi
 		return nil
 	case l != nil:
 		if short, ok := media.Short(err); ok && l.Add(nil) {
-			what := fmt.Sprintf("Only the first %d of %s's songs", short.Got, artist.Name)
+			// Spotify's artists are read a release at a time.
+			unit := "songs"
+			if artist.Source == media.SourceSpotify {
+				unit = "albums and singles"
+			}
+			what := fmt.Sprintf("Only the first %d of %s's %s", short.Got, artist.Name, unit)
 			if short.Total > short.Got {
-				what = fmt.Sprintf("Only %d of %s's %d songs", short.Got, artist.Name, short.Total)
+				what = fmt.Sprintf("Only %d of %s's %d %s", short.Got, artist.Name, short.Total, unit)
 			}
 			p.Tell(player.Notice{Message: what + " could be loaded: " + short.Err.Error(), Error: true})
 		}

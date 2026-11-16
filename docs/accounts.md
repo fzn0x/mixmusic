@@ -227,8 +227,14 @@ back online. Last.fm hears that a [live stream](playing-music.md#live-streams)
 plays, but it isn't scrobbled, and [podcasts' episodes](podcasts.md#not-counted)
 aren't either.
 
-When Last.fm no longer accepts the connection, Settings › Accounts says so:
-disconnect, then connect again.
+When Last.fm no longer accepts the connection, Settings › Accounts says so.
+Plays you hear meanwhile still count and wait with the earlier ones. Choose
+**connect again** and approve MixMusic in your browser: the connection
+returns with the API key and secret kept, and every waiting scrobble is
+sent. If you approve as another Last.fm user, MixMusic asks whether to send
+the waiting scrobbles to that profile or drop them. **Disconnect** forgets
+the connection and drops the scrobbles not sent yet, and its question says
+how many.
 
 ## Signing out
 

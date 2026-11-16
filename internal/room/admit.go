@@ -65,6 +65,9 @@ func sourceOf(addr string) string {
 type caps struct {
 	unproven, unprovenFrom int
 	tries, roomTries       int
+	// rate bounds the messages read of a connection each second
+	// (limits.go): maxRate when 0.
+	rate int
 }
 
 func (c *caps) orDefault() caps {

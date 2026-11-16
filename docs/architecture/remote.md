@@ -120,7 +120,31 @@ refused. Go's TLS sends no early data (0-RTT), which could be repeated.
 
 The messages are JSON objects, each after its length in 4 bytes, of at
 most 1 MiB. The first is the connecting computer's `hello`, which asks to
-pair or to control.
+pair or to control. A message's bytes are kept as they come, in room
+that grows with them (`Frames`): a length alone, with nothing after it,
+holds no room for the message it tells.
+
+A computer that isn't paired may pair, or is refused; so it is held to
+little, however many connections it opens (#736):
+
+- **Its messages.** Its key is known once TLS ends. Until `Host.Allowed`
+  says it is paired, its messages are of 4 KiB at most, refused from
+  their length, which ends the connection (`Frames.Limit`): a hello, a
+  pairing's commit and open, and a confirm are a few hundred bytes. A
+  paired computer's are of 1 MiB at most, as a hand-over may be.
+- **Its connections** (`admit.go`). A connection holds one of 32 places
+  in the server, 4 of a source (an IPv4 address, or the /64 of an IPv6
+  one, a network's), from its accepting until its key is known as
+  paired, or it ends: TLS handshakes, and computers not paired, share
+  them. A new one takes the place of the oldest of its source, when the
+  source holds 4, and of the oldest of the source that holds the most,
+  when the server holds 32, as a room's unproven do
+  ([rooms.md](rooms.md)): a computer that floods the server ends its own
+  connections, not those of a paired computer on its way in. The one
+  pairing that runs gives its place back, so no flood ends it; the
+  others that ask to pair meanwhile are refused as busy. The rooms'
+  admission is copied, not shared: `internal/room` imports this package,
+  and its admission counts a room's codes and the internet's sources too.
 
 ## Pairing
 

@@ -7,7 +7,7 @@ import (
 )
 
 // playCounter counts how many times each track was played in MixMusic,
-// by its ID, from the history, which the library's version tells the
+// by its ID, from the play log, which the library's version tells the
 // changes of: app.Collection.
 type playCounter interface {
 	Version() uint64

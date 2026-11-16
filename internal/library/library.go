@@ -8,6 +8,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"log"
+	"path/filepath"
 	"slices"
 	"strings"
 	"sync"
@@ -65,9 +67,13 @@ type Data struct {
 	Podcasts []media.Podcast `json:"podcasts,omitempty"`
 }
 
-// Library is the user's library, kept in a file.
+// Library is the user's library, kept in a file, and the log of every
+// play, in a file of its own beside it (playlog.go).
 type Library struct {
-	file *store.File[Data]
+	file  *store.File[Data]
+	plays *playLog
+	// memo keeps the stats until the log or the library changes.
+	memo statsMemo
 	now  func() time.Time
 	// disliked holds the IDs of the disliked tracks, for lists to ask of
 	// each of their rows as they draw; indexing orders its changes.
@@ -75,20 +81,29 @@ type Library struct {
 	indexing sync.Mutex
 }
 
-// Open opens the library kept at path.
+// Open opens the library kept at path, and the play log beside it.
 func Open(path string) (*Library, error) {
 	f, err := store.Open(path, Data{})
 	if err != nil {
 		return nil, err
 	}
-	l := &Library{file: f, now: time.Now}
+	plays, found, err := openPlayLog(filepath.Join(filepath.Dir(path), playLogName))
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		if err := plays.fill(f.Get().History); err != nil {
+			log.Printf("mixmusic: writing the plays of the history to the play log, which the next play tries again: %v", err)
+		}
+	}
+	l := &Library{file: f, plays: plays, now: time.Now}
 	l.indexDisliked()
 	return l, nil
 }
 
 // Version counts the library's changes: what was made of it holds until
 // the version changes.
-func (l *Library) Version() uint64 { return l.file.Version() }
+func (l *Library) Version() uint64 { return l.file.Version() + l.plays.rewritten() }
 
 // Liked returns the liked tracks, the last liked first.
 func (l *Library) Liked() []media.Track {
@@ -291,15 +306,18 @@ func (l *Library) MoveInPlaylist(id string, from, to int) error {
 	})
 }
 
-// RecordPlay adds a track to the history.
+// RecordPlay adds a track to the history, which keeps the last plays, and
+// to the play log, which keeps them all.
 func (l *Library) RecordPlay(t media.Track) error {
-	return l.file.Update(func(d *Data) error {
-		d.History = slices.Insert(d.History, 0, Play{Track: t, PlayedAt: l.now()})
+	at := l.now()
+	err := l.file.Update(func(d *Data) error {
+		d.History = slices.Insert(d.History, 0, Play{Track: t, PlayedAt: at})
 		if len(d.History) > maxHistory {
 			d.History = d.History[:maxHistory]
 		}
 		return nil
 	})
+	return errors.Join(err, l.plays.add(at, t))
 }
 
 // History returns the last plays, the latest first, at most limit.
@@ -327,9 +345,11 @@ func (l *Library) RecentTracks(limit int) []media.Track {
 	return out
 }
 
-// ClearHistory forgets what the user played.
+// ClearHistory forgets what the user played: the history, and the play
+// log, which the stats count.
 func (l *Library) ClearHistory() error {
-	return l.file.Update(func(d *Data) error { d.History = nil; return nil })
+	err := l.file.Update(func(d *Data) error { d.History = nil; return nil })
+	return errors.Join(err, l.plays.clear())
 }
 
 // AddSearch records a search, moving it first if it was there.

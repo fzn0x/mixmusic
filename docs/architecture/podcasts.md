@@ -64,7 +64,8 @@ the user left them.
 - **The player.** Episodes never crossfade, the next episode's audio
   isn't fetched ahead, and the queue that ends on an episode stops rather
   than start a radio. Episodes don't scrobble, and the stats leave them
-  out: the history keeps them.
+  out: the history and the play log keep them, which the Plays sort
+  counts.
 - **Speed.** Episodes play at a speed of their own, `podcastSpeed`, and
   songs at `songSpeed`: the player's `speedOf` picks by the track that
   becomes current. The speed button by the player, the mini player's

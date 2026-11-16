@@ -6,20 +6,23 @@ package library
 // the song rather than one of its files, and stay when a copy goes.
 
 import (
+	"errors"
 	"slices"
+	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 )
 
 // Retarget gives what the library keeps of the tracks of the IDs of to
-// the track each became: in the liked and disliked songs, the mixes and
-// the history, which keeps when each played. A track that becomes one the
-// list holds already stays where that one is: a song liked as two of its
-// files is liked once. One liked and disliked stays liked. Nothing is
-// written when the library holds none of them.
+// the track each became: in the liked and disliked songs, the mixes, the
+// history and the play log, which keep when each played. A track that
+// becomes one the list holds already stays where that one is: a song
+// liked as two of its files is liked once. One liked and disliked stays
+// liked. Nothing is written when the library holds none of them.
 func (l *Library) Retarget(to map[string]media.Track) error {
+	logged := l.plays.retarget(to)
 	if len(to) == 0 || !holdsAny(l.file.Get(), to) {
-		return nil
+		return logged
 	}
 	err := l.file.Update(func(d *Data) error {
 		d.Liked = retargetList(d.Liked, to)
@@ -38,7 +41,42 @@ func (l *Library) Retarget(to map[string]media.Track) error {
 		return nil
 	})
 	l.indexDisliked()
-	return err
+	return errors.Join(err, logged)
+}
+
+// retarget gives the plays of the tracks of the IDs of to the track each
+// became, each when it played, and writes the log anew. Nothing is written
+// when the log holds none of them; while the file can't be written, the
+// next play writes it anew.
+func (g *playLog) retarget(to map[string]media.Track) error {
+	g.mu.Lock()
+	if !slices.ContainsFunc(g.tracks, func(t loggedTrack) bool { _, ok := to[t.ID]; return ok }) {
+		g.mu.Unlock()
+		return nil
+	}
+	tracks := slices.Clone(g.tracks)
+	byKey := make(map[string]int32, len(tracks))
+	for i, t := range tracks {
+		if n, ok := to[t.ID]; ok {
+			tracks[i] = lineOf(time.Time{}, 0, loggedTrack{Track: n}).track()
+		}
+		byKey[lineOf(time.Time{}, 0, tracks[i]).key()] = int32(i)
+	}
+	g.tracks, g.byKey = tracks, byKey
+	g.changes++
+	g.rewrites++
+	v, done := g.write()
+	defer done()
+	g.whole = true
+	return g.flush(v)
+}
+
+// rewritten counts the changes to the plays that don't come with a change
+// to the history, for the library's version.
+func (g *playLog) rewritten() uint64 {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.rewrites
 }
 
 // retargetList gives the tracks of list the tracks of to, leaving out

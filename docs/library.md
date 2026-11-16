@@ -27,7 +27,7 @@ Like a track with the heart in the player bar, on the now playing page, in the [
 - **Signed in, a like reaches the service too:** a Spotify track is saved to your Spotify library, and a YouTube Music track is liked on YouTube Music.
 - **Liking a song you disliked** takes the dislike back.
 - **The list** has Play, Shuffle and Download, a box that searches it and a Sort menu: the list's own order, Title, Artist, Length or Plays. What you search shows how many tracks of the list match.
-- **Plays** puts the songs you played most in MixMusic first, as your [history](#history-and-recently-played) counts them, over its last 1,000 plays; songs played as often, and those not played, keep the list's order. The list follows the plays as they're counted.
+- **Plays** puts the songs you played most in MixMusic first, as the [stats](#stats) count them, every play; songs played as often, and those not played, keep the list's order. The list follows the plays as they're counted.
 
 The songs you liked on a service before, or in its own app, are in that service's pivot of the library: Liked on Spotify, in pages that Load more adds to, and Liked on YouTube Music.
 
@@ -145,7 +145,7 @@ The Stats page, in the sidebar, shows what you listened to, This week, This mont
 - The mix, two rings of each service's share;
 - your top artists, as circles, and your top tracks.
 
-Tracks count as in the history. Podcast episodes stay out of the stats, and clearing the history starts them over.
+Tracks count as in the history, every play: MixMusic keeps each in `plays.jsonl` in your [data folder](data-and-privacy.md#the-data-folder), which grows by about 1 MB a year at 10 plays a day. Of the plays before MixMusic kept them all, the stats count the last 1,000, which the history held. Podcast episodes stay out of the stats, and clearing the history starts them over.
 
 ### Your year
 
@@ -153,9 +153,9 @@ Next to Stats' ranges, Your year looks back at one calendar year of your history
 
 - how many tracks you played and the minutes you listened;
 - your top five songs, artists and albums;
-- the month you listened most, the song the year began with, the song you played most often in one day, and how many new artists you found, which are those you hadn't played before the year, when your history reaches back that far.
+- the month you listened most, the song the year began with, the song you played most often in one day, and how many new artists you found, which are those you hadn't played before the year, when your plays reach back that far.
 
-**Save image** saves a card of the year as a PNG, a square for a chat or a feed, and **Save image for a story** a tall one, with your top artists and albums too. Both are in your theme's colours. The history keeps your last 1,000 plays, so an older year shows what that still holds.
+**Save image** saves a card of the year as a PNG, a square for a chat or a feed, and **Save image for a story** a tall one, with your top artists and albums too. Both are in your theme's colours. Your year counts every play of the year, as the stats do; a year before MixMusic kept every play shows what the last 1,000 plays of the history held of it.
 
 ## Downloads
 

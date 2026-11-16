@@ -16,7 +16,8 @@ func recapTrack(id, title, artist, album string, minutes int) media.Track {
 	return t
 }
 
-// withHistory makes the history of l the plays given, oldest first.
+// withHistory makes the history and the play log of l the plays given,
+// oldest first.
 func withHistory(t *testing.T, l *Library, plays []Play) {
 	t.Helper()
 	err := l.file.Update(func(d *Data) error {
@@ -29,6 +30,7 @@ func withHistory(t *testing.T, l *Library, plays []Play) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	withLog(t, l, plays)
 }
 
 func day(y int, m time.Month, d, h int) time.Time { return time.Date(y, m, d, h, 0, 0, 0, time.UTC) }

@@ -2,6 +2,8 @@ package library
 
 import (
 	"cmp"
+	"maps"
+	"math"
 	"slices"
 	"time"
 
@@ -53,72 +55,143 @@ type Stats struct {
 	Daily []DayPlays `json:"daily"`
 }
 
-// Stats sums up the plays of the last days, or of the whole history when
-// days is 0.
+// Stats sums up the plays of the last days, or of all the play log holds
+// when days is 0.
 func (l *Library) Stats(days int) Stats {
+	now, v := l.now(), l.plays.view()
+	key := statsKey{days: days, minute: now.Unix() / 60, loc: now.Location()}
+	return memoized(&l.memo, l.stampOf(v), &l.memo.stats, key, func() Stats {
+		s := countStats(v, now, days)
+		l.completeTracks(s.TopTracks)
+		return s
+	}).clone()
+}
+
+// countStats sums up the plays of v of the last days up to now, or all of
+// them when days is 0.
+func countStats(v playsView, now time.Time, days int) Stats {
 	s := Stats{TopTracks: []TrackPlays{}, TopArtists: []ArtistPlays{}, Days: days}
-	since := time.Time{}
+	since := int64(math.MinInt64)
 	if days > 0 {
-		since = l.now().AddDate(0, 0, -days)
+		since = now.AddDate(0, 0, -days).Unix()
 	}
-	tracks := map[string]*TrackPlays{}
-	artists := map[string]*ArtistPlays{}
-	daily, dayIndex := dailyDays(l.now(), cmp.Or(days, dailyAllTime))
+	daily, dayIndex := dailyDays(now, cmp.Or(days, dailyAllTime))
+	y, m, d := now.Date()
+	dailyFrom := time.Date(y, m, d-(len(daily)-1), 0, 0, 0, 0, now.Location()).Unix()
 	dayMs := make([]int, len(daily))
+	counts := make([]int, len(v.tracks))
+	var order []int32
 	ms := 0
-	for _, p := range l.file.Get().History {
-		if p.PlayedAt.Before(since) {
-			break // the history is newest first
-		}
-		if p.Track.IsEpisode() {
-			continue // the stats are of music; the history keeps episodes
+	for _, p := range slices.Backward(v.plays) {
+		t := &v.tracks[p.track]
+		if p.at < since || t.IsEpisode() {
+			continue // the stats are of music; the log keeps episodes for the Plays sort
 		}
 		s.Plays++
-		ms += p.Track.DurationMs
-		if i, ok := dayIndex[p.PlayedAt.In(l.now().Location()).Format(time.DateOnly)]; ok {
-			daily[i].Plays++
-			dayMs[i] += p.Track.DurationMs
+		ms += t.DurationMs
+		if p.at >= dailyFrom {
+			if i, ok := dayIndex[time.Unix(p.at, 0).In(now.Location()).Format(time.DateOnly)]; ok {
+				daily[i].Plays++
+				dayMs[i] += t.DurationMs
+			}
 		}
-		switch p.Track.Source {
+		switch t.Source {
 		case media.SourceYouTube:
 			s.YouTube++
 		case media.SourceSpotify:
 			s.Spotify++
 		}
-		if tp := tracks[p.Track.ID]; tp != nil {
-			tp.Plays++
-		} else {
-			tracks[p.Track.ID] = &TrackPlays{Track: p.Track, Plays: 1}
+		if counts[p.track] == 0 {
+			order = append(order, p.track)
 		}
-		for _, a := range p.Track.Artists {
-			// Services spell the same artist alike, not with the same ID.
-			if ap := artists[a.Name]; ap != nil {
-				ap.Plays++
-			} else {
-				artists[a.Name] = &ArtistPlays{Artist: a, Plays: 1}
-			}
-		}
+		counts[p.track]++
 	}
 	s.Minutes = ms / 60000
 	for i := range daily {
 		daily[i].Minutes = dayMs[i] / 60000
 	}
 	s.Daily = daily
-	for _, tp := range tracks {
-		s.TopTracks = append(s.TopTracks, *tp)
-	}
-	for _, ap := range artists {
-		s.TopArtists = append(s.TopArtists, *ap)
-	}
-	slices.SortFunc(s.TopTracks, func(a, b TrackPlays) int {
+	tracks, artists := tops(v, counts, order)
+	s.TopTracks = topOf(tracks, topCount, func(a, b *TrackPlays) int {
 		return cmp.Or(b.Plays-a.Plays, cmp.Compare(a.Track.Title, b.Track.Title))
 	})
-	slices.SortFunc(s.TopArtists, func(a, b ArtistPlays) int {
+	s.TopArtists = topOf(artists, topCount, func(a, b *ArtistPlays) int {
 		return cmp.Or(b.Plays-a.Plays, cmp.Compare(a.Artist.Name, b.Artist.Name))
 	})
-	s.TopTracks = s.TopTracks[:min(len(s.TopTracks), topCount)]
-	s.TopArtists = s.TopArtists[:min(len(s.TopArtists), topCount)]
 	return s
+}
+
+// topOf returns the first n of the sums of m, in the order of rank: of
+// years of plays, it sorts thousands of tracks, and keeps ten.
+func topOf[V any](m map[string]*V, n int, rank func(a, b *V) int) []V {
+	all := slices.SortedFunc(maps.Values(m), rank)
+	out := make([]V, 0, min(n, len(all)))
+	for _, v := range all[:min(n, len(all))] {
+		out = append(out, *v)
+	}
+	return out
+}
+
+// tops sums up the plays counted of each track of v, by its ID, and of
+// each artist, by name: counts holds the plays of each track of v, and
+// order the tracks counted, by their latest play first, whose track and
+// artists the sums show, as the history newest first had them.
+func tops(v playsView, counts []int, order []int32) (map[string]*TrackPlays, map[string]*ArtistPlays) {
+	tracks := map[string]*TrackPlays{}
+	artists := map[string]*ArtistPlays{}
+	for _, i := range order {
+		t, n := v.tracks[i].Track, counts[i]
+		if tp := tracks[t.ID]; tp != nil {
+			tp.Plays += n
+		} else {
+			tracks[t.ID] = &TrackPlays{Track: t, Plays: n}
+		}
+		for _, a := range t.Artists {
+			// Services spell the same artist alike, not with the same ID.
+			if ap := artists[a.Name]; ap != nil {
+				ap.Plays += n
+			} else {
+				artists[a.Name] = &ArtistPlays{Artist: a, Plays: n}
+			}
+		}
+	}
+	return tracks, artists
+}
+
+// completeTracks gives the tracks of tops what the play log leaves out of
+// them, as their covers: each as the history, the liked or disliked songs
+// or a mix holds it. One the library no longer holds stays as the log has
+// it.
+func (l *Library) completeTracks(tops []TrackPlays) {
+	want := make(map[string]int, len(tops))
+	for i, tp := range tops {
+		want[tp.Track.ID] = i
+	}
+	take := func(t media.Track) bool {
+		if i, ok := want[t.ID]; ok {
+			tops[i].Track = t
+			delete(want, t.ID)
+		}
+		return len(want) == 0
+	}
+	if len(want) == 0 {
+		return
+	}
+	d := l.file.Get()
+	for _, p := range d.History {
+		if take(p.Track) {
+			return
+		}
+	}
+	lists := [][]media.Track{d.Liked, d.Disliked}
+	for _, p := range d.Playlists {
+		lists = append(lists, p.Tracks)
+	}
+	for _, list := range lists {
+		if slices.ContainsFunc(list, take) {
+			return
+		}
+	}
 }
 
 // dailyDays returns the last n days up to now's, in now's time zone, the

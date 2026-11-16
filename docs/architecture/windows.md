@@ -117,7 +117,7 @@ belongs to its main thread: what finishes elsewhere comes back through
   scans a list for this in a frame.
 
 - **Sorting by plays and putting a mix in order.** A list of tracks
-  sorted by plays (`trackplays.go`) counts them from the history
+  sorted by plays (`trackplays.go`) counts them from the play log
   (`Collection.PlayCounts`), and sorts again once the library's version
   changes. A mix, and a playlist of the user's on YouTube Music read
   whole, move their tracks while they show in their own order

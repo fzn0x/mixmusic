@@ -47,6 +47,18 @@ type Desktop struct {
 	// RoomFollowVolume has a guest of a room play at the host's volume,
 	// rather than its own. It is off at first.
 	RoomFollowVolume bool `json:"roomFollowVolume"`
+	// RoomAnywhere lets friends outside this network join the user's room
+	// (#562): MixMusic asks the router to forward the room's port, and the
+	// invite link carries where they reach it. It is off at first.
+	RoomAnywhere bool `json:"roomAnywhere"`
+	// RoomPort is the TCP port rooms listen on, kept so that a forward
+	// made by hand keeps working: picked at random from 1024 to 65535 as
+	// the first room opens, 0 before.
+	RoomPort int `json:"roomPort"`
+	// RoomAddress is the address invites carry in place of those MixMusic
+	// finds, as a VPN's both sides run or a forward made by hand: a host,
+	// with a port or not. "" has MixMusic find them.
+	RoomAddress string `json:"roomAddress"`
 	// DiscordPresence shows what plays on the user's Discord profile, as
 	// the Discord application of DiscordAppID, or MixMusic's own when it
 	// is empty.
@@ -103,6 +115,7 @@ func defaultDesktop() Desktop {
 func (d Desktop) clean() Desktop {
 	d.MiniPanel = cleanMiniPanel(d.MiniPanel)
 	d.MiniZoom = zoomStep(d.MiniZoom, 0)
+	d.RoomPort, d.RoomAddress = cleanRoomPort(d.RoomPort), cleanRoomAddress(d.RoomAddress)
 	d.RoomName = cleanRoomName(d.RoomName)
 	if d.DiscordAppID = strings.TrimSpace(d.DiscordAppID); !discordIDRe.MatchString(d.DiscordAppID) {
 		d.DiscordAppID = ""

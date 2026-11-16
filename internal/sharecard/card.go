@@ -17,11 +17,6 @@ import (
 	"unicode"
 
 	xdraw "golang.org/x/image/draw"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
-	"golang.org/x/image/font/sfnt"
-	"golang.org/x/image/math/fixed"
-	"golang.org/x/text/unicode/bidi"
 )
 
 // Size is the size of a card, in pixels.
@@ -39,7 +34,7 @@ var (
 // regular and 700 bold.
 type Face struct {
 	Weight int
-	Font   *sfnt.Font
+	Font   *Font
 }
 
 // Family is the faces a card's text is set in. A line takes the face
@@ -49,27 +44,7 @@ type Face struct {
 // Selawik, so the letter leaves a gap.
 type Family struct {
 	Faces    []Face
-	Fallback []*sfnt.Font
-}
-
-// ParseFont reads a TrueType or OpenType font.
-func ParseFont(data []byte) (*sfnt.Font, error) { return opentype.Parse(data) }
-
-// ParseCollectionFonts reads the fonts of a TrueType collection, a .ttc.
-func ParseCollectionFonts(data []byte) ([]*sfnt.Font, error) {
-	c, err := opentype.ParseCollection(data)
-	if err != nil {
-		return nil, err
-	}
-	var out []*sfnt.Font
-	for i := range c.NumFonts() {
-		f, err := c.Font(i)
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, f)
-	}
-	return out, nil
+	Fallback []*Font
 }
 
 // Colors are the colours of a card, which the app takes from its theme.
@@ -183,8 +158,7 @@ func (c Card) Render(fam Family) (*image.NRGBA, error) {
 		margin = math.Round(h * 0.09)
 	}
 	inner := w - 2*margin
-	r := &typesetter{fam: fam, faces: map[faceKey]font.Face{}}
-	defer r.close()
+	r := newTypesetter(fam)
 
 	// A card about as wide as it is tall puts the cover beside its lines; a
 	// taller one puts it above them, across their width.
@@ -378,47 +352,41 @@ type setLine struct {
 	rtl             bool
 }
 
-// row is one row of a wrapped line, in the order it shows, left to right.
+// row is one row of a wrapped line, in the order of its text.
 type row struct {
 	text  string
 	width float64
 }
 
-type faceKey struct {
-	font *sfnt.Font
-	size int
-}
-
-// typesetter measures and draws text in a family, keeping the faces it
-// made.
+// typesetter measures and draws text in a family, keeping the texts it
+// shaped and the fonts it read until the card is drawn.
 type typesetter struct {
-	fam   Family
-	faces map[faceKey]font.Face
-	buf   sfnt.Buffer
+	fam    Family
+	sh     *shaper
+	shapes map[shapeKey]*shaped
+	fonts  map[*Font]*fontData
 }
 
-func (t *typesetter) close() {
-	for _, f := range t.faces {
-		f.Close()
-	}
+func newTypesetter(fam Family) *typesetter {
+	return &typesetter{fam: fam, sh: newShaper(), shapes: map[shapeKey]*shaped{}, fonts: map[*Font]*fontData{}}
 }
 
-// face is the face of f at size px.
-func (t *typesetter) face(f *sfnt.Font, px float64) font.Face {
-	k := faceKey{f, int(math.Round(px * 64))}
-	if fc, ok := t.faces[k]; ok {
-		return fc
+// data is what f draws with, kept for the card, or nil when it can't be
+// read.
+func (t *typesetter) data(f *Font) *fontData {
+	d, ok := t.fonts[f]
+	if !ok {
+		d = f.load()
+		t.fonts[f] = d
 	}
-	fc, err := opentype.NewFace(f, &opentype.FaceOptions{Size: px, DPI: 72, Hinting: font.HintingNone})
-	if err != nil {
-		return nil
-	}
-	t.faces[k] = fc
-	return fc
+	return d
 }
+
+// has reports whether f has a glyph for r and can draw it.
+func (t *typesetter) has(f *Font, r rune) bool { return f.covers(r) && t.data(f) != nil }
 
 // primary is the face of the family nearest weight.
-func (t *typesetter) primary(weight int) *sfnt.Font {
+func (t *typesetter) primary(weight int) *Font {
 	best := t.fam.Faces[0]
 	for _, f := range t.fam.Faces[1:] {
 		if abs(f.Weight-weight) < abs(best.Weight-weight) {
@@ -435,35 +403,10 @@ func abs(n int) int {
 	return n
 }
 
-// fontFor is the font that draws r: the primary one, or the first
-// fallback that has a glyph for it.
-func (t *typesetter) fontFor(primary *sfnt.Font, r rune) *sfnt.Font {
-	if r < 0x20 {
-		return primary
-	}
-	if i, err := primary.GlyphIndex(&t.buf, r); err == nil && i != 0 {
-		return primary
-	}
-	for _, f := range t.fam.Fallback {
-		if i, err := f.GlyphIndex(&t.buf, r); err == nil && i != 0 {
-			return f
-		}
-	}
-	return primary
-}
-
-// advance is the width of text at px, in pixels.
-func (t *typesetter) advance(primary *sfnt.Font, px float64, text string) float64 {
-	var w fixed.Int26_6
-	for _, r := range text {
-		fc := t.face(t.fontFor(primary, r), px)
-		if fc == nil {
-			continue
-		}
-		a, _ := fc.GlyphAdvance(r)
-		w += a
-	}
-	return float64(w) / 64
+// advance is the width of text at px, in pixels, shaped as a row of a
+// line that reads right to left when rtl is set.
+func (t *typesetter) advance(prim *Font, weight int, px float64, text string, rtl bool) float64 {
+	return t.shape(prim, weight, text, rtl).width(px)
 }
 
 // set lays out lines at scale, wrapped to width pixels. With gaps set, the
@@ -491,8 +434,9 @@ func (t *typesetter) set(c Card, lines []Line, scale, width float64, gaps bool) 
 		}
 		maxLines := max(l.MaxLines, 1)
 		prim := t.primary(weight)
-		rows := t.wrap(prim, px, text, width, maxLines)
-		sl := setLine{rows: rows, ink: ink, weight: weight, px: px, height: px * 1.25, rtl: isRTL(text)}
+		rtl := isRTL(text)
+		rows := t.wrap(prim, weight, px, text, rtl, width, maxLines)
+		sl := setLine{rows: rows, ink: ink, weight: weight, px: px, height: px * 1.25, rtl: rtl}
 		if len(out) > 0 {
 			sl.gap = l.Gap * scale
 		}
@@ -502,12 +446,13 @@ func (t *typesetter) set(c Card, lines []Line, scale, width float64, gaps bool) 
 }
 
 // wrap breaks text into at most maxLines rows no wider than width at px,
-// at spaces, or anywhere in a word too long, and ends the last row with an
-// ellipsis if text goes on.
-func (t *typesetter) wrap(prim *sfnt.Font, px float64, text string, width float64, maxLines int) []row {
+// at spaces, or between any two clusters of a word too long, and ends the
+// last row with an ellipsis if text goes on. A cluster, a letter with its
+// marks or a conjunct, never breaks.
+func (t *typesetter) wrap(prim *Font, weight int, px float64, text string, rtl bool, width float64, maxLines int) []row {
 	var rows []row
-	text = shapeArabic(text)
-	rs := []rune(text)
+	m := t.measure(prim, weight, text, rtl)
+	rs := m.rs
 	i := 0
 	for i < len(rs) && len(rows) < maxLines {
 		for i < len(rs) && rs[i] == ' ' && len(rows) > 0 {
@@ -517,54 +462,66 @@ func (t *typesetter) wrap(prim *sfnt.Font, px float64, text string, width float6
 			break
 		}
 		last := len(rows) == maxLines-1
-		end, w := t.fit(prim, px, rs[i:], width, last)
-		line := string(rs[i : i+end])
-		if last && i+end < len(rs) {
-			line = strings.TrimRight(line, " ") + "…"
-			w = t.advance(prim, px, line)
-			// The ellipsis may overflow a row that was filled.
-			for w > width && len([]rune(line)) > 1 {
-				rr := []rune(line)
-				line = strings.TrimRight(string(rr[:len(rr)-2]), " ") + "…"
-				w = t.advance(prim, px, line)
+		end := t.fit(m, px, i, width, last)
+		line := func(end int) string {
+			s := strings.TrimRight(string(rs[i:end]), " ")
+			if last && end < len(rs) {
+				s += "…"
 			}
-		} else {
-			line = strings.TrimRight(line, " ")
-			w = t.advance(prim, px, line)
+			return s
 		}
-		rows = append(rows, row{text: line, width: w})
-		i += end
+		// A row shaped alone may come out wider than its clusters measured
+		// in the whole text, as the ellipsis does, so it gives back a
+		// cluster at a time until it fits.
+		cut := end
+		s := line(cut)
+		w := t.advance(prim, weight, px, s, rtl)
+		for w > width+0.5 && cut > i && (last && end < len(rs) || cut > m.cluster(i)) {
+			cut = m.back(cut, i)
+			s = line(cut)
+			w = t.advance(prim, weight, px, s, rtl)
+		}
+		if cut > i {
+			end = cut
+		}
+		rows = append(rows, row{text: s, width: w})
+		i = end
 	}
 	return rows
 }
 
-// fit is how many of rs fit a row of width: up to the last space that
-// fits, or as many letters as fit when no space does. With last set, the
-// row takes as many as fit, leaving room for an ellipsis if rs goes on.
-func (t *typesetter) fit(prim *sfnt.Font, px float64, rs []rune, width float64, last bool) (int, float64) {
+// fit is where a row that starts at from ends: after the last space that
+// fits width, or after as many clusters as fit when no space does. With
+// last set, the row takes as many clusters as fit.
+func (t *typesetter) fit(m measure, px float64, from int, width float64, last bool) int {
+	rs := m.rs
 	var w float64
-	lastSpace, n := -1, 0
+	lastSpace, n := -1, from
 	for n < len(rs) {
-		a := t.advance(prim, px, string(rs[n]))
-		if w+a > width && n > 0 {
+		e := m.cluster(n)
+		var a float64
+		for _, adv := range m.adv[n:e] {
+			a += adv * px
+		}
+		if w+a > width && n > from {
 			break
 		}
 		w += a
 		if rs[n] == ' ' {
 			lastSpace = n
 		}
-		n++
+		n = e
 	}
 	if n == len(rs) {
-		return n, w
+		return n
 	}
 	// Break at the last space, unless the letters are of a script written
 	// without them, which breaks anywhere, or the row is the last, which
 	// takes all that fits.
-	if lastSpace > 0 && !last && !unspaced(rs[n]) && !unspaced(rs[n-1]) {
-		return lastSpace + 1, w
+	if lastSpace > from && !last && !unspaced(rs[n]) && !unspaced(rs[n-1]) {
+		return lastSpace + 1
 	}
-	return n, w
+	return n
 }
 
 // unspaced reports whether r is of a script written without spaces.
@@ -604,7 +561,7 @@ func (t *typesetter) fitHeight(lines []setLine, room float64) []setLine {
 			r := &last.rows[len(last.rows)-1]
 			if !strings.HasSuffix(r.text, "…") {
 				r.text = strings.TrimRight(r.text, " ") + "…"
-				r.width = t.advance(t.primary(last.weight), last.px, r.text)
+				r.width = t.advance(t.primary(last.weight), last.weight, last.px, r.text, last.rtl)
 			}
 			continue
 		}
@@ -620,77 +577,39 @@ func (t *typesetter) draw(img *image.NRGBA, lines []setLine, left, top, width fl
 	for _, l := range lines {
 		y += l.gap
 		prim := t.primary(l.weight)
-		face := t.face(prim, l.px)
-		if face == nil {
+		d := t.data(prim)
+		if d == nil {
 			continue
 		}
-		m := face.Metrics()
-		ascent := float64(m.Ascent) / 64
-		descent := float64(m.Descent) / 64
+		ext, _ := t.sh.face(d, l.weight).FontHExtents()
+		ascent := float64(ext.Ascender) / d.upem * l.px
+		descent := -float64(ext.Descender) / d.upem * l.px
 		lead := (l.height - ascent - descent) / 2
 		for _, r := range l.rows {
 			x := left
-			rtl := l.rtl
 			switch {
 			case align == AlignCenter:
 				x = left + (width-r.width)/2
-			case align == AlignAuto && rtl:
+			case align == AlignAuto && l.rtl:
 				x = left + width - r.width
 			}
-			t.drawRow(img, prim, l.px, visual(r.text), x, y+lead+ascent, l.ink)
+			t.drawRow(img, prim, l.weight, l.px, r.text, l.rtl, x, y+lead+ascent, l.ink)
 			y += l.height
 		}
 	}
 }
 
-// visual is text in the order it shows, left to right: the runs that read
-// right to left, of Hebrew and Arabic, reversed.
-func visual(text string) string {
-	hasRTL := false
-	for _, r := range text {
-		if unicode.In(r, unicode.Hebrew, unicode.Arabic, unicode.Syriac, unicode.Thaana) {
-			hasRTL = true
-			break
+// drawRow draws text, shaped, with its baseline at y, from x.
+func (t *typesetter) drawRow(img *image.NRGBA, prim *Font, weight int, px float64, text string, rtl bool, x, y float64, ink color.NRGBA) {
+	pen := x
+	for _, r := range t.shape(prim, weight, text, rtl).runs {
+		fc := t.sh.face(r.data, weight)
+		scale := px / r.data.upem
+		for _, g := range r.glyphs {
+			gx := pen + float64(g.XOffset)/64*scale
+			gy := y - float64(g.YOffset)/64*scale
+			t.sh.drawGlyph(img, r.data, fc, g.GlyphID, scale, gx, gy, ink)
+			pen += float64(g.Advance) / 64 * scale
 		}
-	}
-	if !hasRTL {
-		return text
-	}
-	var p bidi.Paragraph
-	if _, err := p.SetString(text); err != nil {
-		return text
-	}
-	o, err := p.Order()
-	if err != nil {
-		return text
-	}
-	var sb strings.Builder
-	for i := range o.NumRuns() {
-		run := o.Run(i)
-		if run.Direction() == bidi.RightToLeft {
-			sb.WriteString(bidi.ReverseString(run.String()))
-		} else {
-			sb.WriteString(run.String())
-		}
-	}
-	return sb.String()
-}
-
-// drawRow draws text with its baseline at y, from x.
-func (t *typesetter) drawRow(img *image.NRGBA, prim *sfnt.Font, px float64, text string, x, y float64, ink color.NRGBA) {
-	src := image.NewUniform(ink)
-	dot := fixed.P(0, 0)
-	dot.X = fixed.Int26_6(math.Round(x * 64))
-	dot.Y = fixed.Int26_6(math.Round(y * 64))
-	for _, r := range text {
-		fc := t.face(t.fontFor(prim, r), px)
-		if fc == nil {
-			continue
-		}
-		dr, mask, maskp, adv, ok := fc.Glyph(dot, r)
-		if ok {
-			draw.DrawMask(img, dr, src, image.Point{}, mask, maskp, draw.Over)
-		}
-		dot.X += adv
 	}
 }

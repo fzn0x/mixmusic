@@ -11,9 +11,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"golang.org/x/image/font/sfnt"
-	"golang.org/x/image/math/fixed"
 )
 
 // The bundled faces have Latin letters, and Selawik, the default, has
@@ -165,63 +162,34 @@ var fontconfigFile = func(lang string) string {
 
 var (
 	fallbackOnce  sync.Once
-	fallbackFonts []*sfnt.Font
+	fallbackFonts []*Font
 )
 
 // SystemFallback returns the fonts of the system that have letters the
-// bundled faces lack, which it reads once, and none when there are none.
-func SystemFallback() []*sfnt.Font {
+// bundled faces lack, and none when there are none. It reads which letters
+// each has once, and a font's glyphs the first time a card needs them.
+func SystemFallback() []*Font {
 	fallbackOnce.Do(func() {
 		fallbackFonts = loadFonts(systemFontFiles(runtime.GOOS))
 	})
 	return fallbackFonts
 }
 
-// loadFonts reads the fonts of files, skipping the ones it can't read or
+// loadFonts opens the fonts of files, skipping the ones it can't read or
 // can't draw, and the same font twice.
-func loadFonts(files []string) []*sfnt.Font {
-	var out []*sfnt.Font
+func loadFonts(files []string) []*Font {
+	var out []*Font
 	seen := map[string]bool{}
 	for _, file := range files {
 		if seen[file] {
 			continue
 		}
 		seen[file] = true
-		data, err := os.ReadFile(file)
-		if err != nil || len(data) > 64<<20 {
-			continue
-		}
-		var f *sfnt.Font
-		if strings.HasSuffix(strings.ToLower(file), ".ttc") {
-			if fonts, err := ParseCollectionFonts(data); err == nil && len(fonts) > 0 {
-				f = fonts[0]
-			}
-		} else if font, err := ParseFont(data); err == nil {
-			f = font
-		}
-		if f != nil && drawable(f) {
+		if f := openFont(file); f != nil {
 			out = append(out, f)
 		}
 	}
 	return out
-}
-
-// drawable reports whether the outlines of f can be read. Fonts whose
-// outlines are in a CFF2 table, such as a variable CJK font, parse but
-// have none that golang.org/x/image can draw, so they would leave letters
-// blank that a later fallback could draw.
-func drawable(f *sfnt.Font) bool {
-	var buf sfnt.Buffer
-	for i := 1; i < f.NumGlyphs() && i < 64; i++ {
-		segs, err := f.LoadGlyph(&buf, sfnt.GlyphIndex(i), fixed.I(16), nil)
-		if err != nil {
-			return false
-		}
-		if len(segs) > 0 {
-			return true
-		}
-	}
-	return f.NumGlyphs() > 1
 }
 
 // systemFontFiles are the paths of the files of fallback fonts on goos.

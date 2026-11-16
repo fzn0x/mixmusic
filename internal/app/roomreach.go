@@ -270,6 +270,24 @@ func (r *roomReach) addrs() []string {
 	return out
 }
 
+// reachAddrs are where friends outside the network reach the room that
+// listens now, as its invite link would carry them, once the routers first
+// answered, wait at most: none while they may not join (Make host's).
+func (a *App) reachAddrs(wait time.Duration) []string {
+	r := a.room.far.reach.Load()
+	if r == nil {
+		return nil
+	}
+	for deadline := time.Now().Add(wait); ; time.Sleep(50 * time.Millisecond) {
+		r.mu.Lock()
+		k := r.keeper
+		r.mu.Unlock()
+		if k == nil || !k.Reach().Asking || time.Now().After(deadline) {
+			return r.addrs()
+		}
+	}
+}
+
 // changed takes in what the routers answered: the room's addresses, once
 // they first answered, are those of its link, and the user is told when
 // they change, so that they send friends the new link.

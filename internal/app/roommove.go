@@ -223,10 +223,17 @@ func (a *App) hostAsked(g *guestRoom, s *room.Session, seats room.Seats) {
 	g.pending = h
 	r.mu.Unlock()
 	time.AfterFunc(2*room.MoveFor, func() { a.unhost(g, h) })
-	if err := s.Hosting(port); err != nil {
+	// Where the room is reached from outside the network, as the router
+	// forwards a port, which may be another: the guests outside reach it
+	// there (#562).
+	if err := s.Hosting(port, a.reachAddrs(moveReachWait)...); err != nil {
 		a.unhost(g, h)
 	}
 }
+
+// moveReachWait is how long a room opened for a move waits, at most, for
+// the routers to answer, before it tells the host where it listens.
+const moveReachWait = 5 * time.Second
 
 // unhost closes h, the room opened for the room of g to move to, unless it
 // hosts it now.

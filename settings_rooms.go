@@ -39,6 +39,9 @@ func (s *shell) roomSettings(c *ui.Context) {
 				}
 			}, "listen with friends room party together host")
 		}
+		// Join a room…, and the rows of friends outside this network
+		// (settings_roomsanywhere.go).
+		s.settingsOf(c, roomRows)
 		s.row(c, "Your name in rooms", "What the host and the other guests see you as: of at most 50 characters. Empty, it's this computer's name.", func() {
 			in, _ := s.settingInput(c, "room-name", s.set.RoomName, func(name string) {
 				s.set.RoomName = name

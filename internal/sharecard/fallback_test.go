@@ -210,9 +210,14 @@ func TestFoundFontDrawsItsLetters(t *testing.T) {
 	if fallbackFor(fam, greek) {
 		t.Fatal("the bundled face has Greek letters, so this proves nothing")
 	}
-	fam.Fallback = loadFonts(systemFontFiles("linux"))
+	// The system's own fonts may be there too; the user's come first.
+	files := systemFontFiles("linux")
+	if len(files) == 0 || !strings.HasPrefix(files[0], dir) {
+		t.Fatalf("found %v, want the font put in %s first", files, dir)
+	}
+	fam.Fallback = loadFonts(files[:1])
 	if len(fam.Fallback) != 1 {
-		t.Fatalf("found %d fonts, want the one put there", len(fam.Fallback))
+		t.Fatalf("read %d fonts, want the one put there", len(fam.Fallback))
 	}
 	if !fallbackFor(fam, greek) {
 		t.Fatal("the found font doesn't draw Greek letters")

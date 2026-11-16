@@ -280,8 +280,15 @@ func (rs *Rooms) Join() {
 	r.mu.Unlock()
 	a.notifyRooms("")
 	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), roomKnockFor)
+		// The host may ask its user to let this computer in first.
+		ctx, cancel := context.WithTimeout(context.Background(), roomKnockFor+room.AskFor)
+		stop := s.Watch(func(e room.Event) {
+			if e.Kind == room.Asking {
+				a.notifyRooms("")
+			}
+		})
 		err := s.Join(ctx)
+		stop()
 		cancel()
 		if err != nil {
 			a.setGuest(g, func() { g.step, g.problem, g.session = RoomEnded, roomProblem(g.name, err), nil })
@@ -319,6 +326,7 @@ func (a *App) entered(g *guestRoom, s *room.Session, own bool) {
 		a.notifyRooms("You joined " + g.name + "'s room")
 	}
 	f.follow(s)
+	a.watchRoomAsks(s, g.name)
 	go func() {
 		<-s.Done()
 		a.dropped(g, s)
@@ -547,6 +555,10 @@ func roomProblem(name string, err error) string {
 		return name + " blocked this computer from the room."
 	case errors.Is(err, room.ErrRemoved):
 		return name + " removed you from the room."
+	case errors.Is(err, room.ErrDeclined):
+		return name + " didn't let you in."
+	case errors.Is(err, room.ErrManyAsk):
+		return "So many wait to join " + name + "'s room that it takes no more for now: try again later."
 	case errors.Is(err, room.ErrFull):
 		return name + "'s room is full."
 	case errors.Is(err, room.ErrNotGuest):

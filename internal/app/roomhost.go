@@ -109,6 +109,7 @@ func (rs *Rooms) Start() error {
 	srv := &room.Server{Identity: id, Name: a.roomName(), Code: code, Secret: secret, Host: roomHostPlayer{a}, Clock: a.roomClock(),
 		Timing: o.Timing, Changed: func() { a.roomChanged(h) }, Guessing: func() { a.notifyRooms(roomGuessed) }}
 	h.server = srv
+	srv.Guests = a.roomGuests()
 	go func() {
 		if err := srv.Serve(ln); err != nil {
 			log.Printf("mixmusic: room: %v", err)
@@ -246,6 +247,8 @@ func (a *App) roomChanged(h *hostedRoom) {
 			notes = append(notes, act.Name+" joined the room")
 		case room.Left:
 			notes = append(notes, act.Name+" left the room")
+		case room.Added:
+			notes = append(notes, act.Name+" added "+act.Song)
 		}
 	}
 	h.toldMu.Unlock()

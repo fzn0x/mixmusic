@@ -121,3 +121,23 @@ func TestRemoveStopsAMove(t *testing.T) {
 		t.Fatal("still moving")
 	}
 }
+
+// TestMoveAfterRemoveSeatsNoOneRemoved starts a move once a guest was
+// removed: the seats it tells are of the guests the room has then.
+func TestMoveAfterRemoveSeatsNoOneRemoved(t *testing.T) {
+	r := newTestRoom(t)
+	ana, bo := newGuest(t, "Ana"), newGuest(t, "Bo")
+	sa := r.join(ana)
+	r.join(bo)
+	ch := events(sa)
+	r.server.Remove(bo.Identity.Fingerprint())
+	if err := r.server.MakeHost(ana.Identity.Fingerprint(), nil); err != nil {
+		t.Fatal(err)
+	}
+	e := next(t, ch, HostAsked)
+	for _, m := range e.Seats.Guests {
+		if m.Key == bo.Identity.Fingerprint() {
+			t.Fatal("the guest removed has a seat")
+		}
+	}
+}

@@ -46,7 +46,8 @@ const (
 
 // sourceOf is the source of the address addr ("host:port", or a host): its
 // IPv4 address, or the /56 of its IPv6 address, as a home's router has
-// from its provider, 256 networks of /64 (#562).
+// from its provider, 256 networks of /64 (#562); or a loopback address
+// whole, this computer's own.
 func sourceOf(addr string) string {
 	host, _, err := net.SplitHostPort(addr)
 	if err != nil {
@@ -57,7 +58,7 @@ func sourceOf(addr string) string {
 		return host
 	}
 	ip = ip.Unmap().WithZone("")
-	if ip.Is4() {
+	if ip.Is4() || ip.IsLoopback() {
 		return ip.String()
 	}
 	p, err := ip.Prefix(56)

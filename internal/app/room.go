@@ -43,6 +43,10 @@ type RoomOptions struct {
 	// addresses (roomreach.go): without Router, nothing is asked.
 	Router *portmap.Client
 	IPv6   func() []netip.Addr
+	// DialFar dials the addresses links and hosts tell in place of
+	// room.FarDialer, which refuses this computer's own: tests', whose
+	// rooms all listen on 127.0.0.1.
+	DialFar func(ctx context.Context, network, addr string) (net.Conn, error)
 	// Timing is the protocol's.
 	Timing room.Timing
 	// Song finds a song a guest adds by its ID, in place of its service

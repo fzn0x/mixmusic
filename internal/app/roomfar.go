@@ -9,6 +9,7 @@ package app
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"net"
 	"net/netip"
@@ -22,17 +23,20 @@ import (
 // network, as the link it was knocked at by, of the secret secret, or the
 // address the user typed, tells: the knock that follows proves the link,
 // and only a link of the same secret changes them (backByInvite), so that
-// a link made up of the host's key alone moves no guest elsewhere.
+// a link made up of the host's key alone moves no guest elsewhere. typed
+// is set when the user typed them, which are dialled as they are
+// (roomDial).
 type farLink struct {
 	id     string
 	secret []byte
 	addrs  []string
+	typed  bool
 }
 
 // knock takes in the knock at the room of the host id, by by, which
 // starts: its addresses are the room's from then on. a.room.mu is held.
 func (f *roomFar) knock(id string, by knockBy) {
-	f.link = farLink{id: id, addrs: slices.Clone(by.addrs)}
+	f.link = farLink{id: id, addrs: slices.Clone(by.addrs), typed: by.typed}
 	if by.link {
 		f.link.secret = slices.Clone(by.password)
 	}
@@ -84,6 +88,37 @@ func (a *App) roomElsewhere() []string {
 	return out
 }
 
+// roomDial connects to a room's address: as it is, where discovery found a
+// room on the network, or the user typed it; by room.FarDialer, which
+// connects to neither this computer nor an address of no one, where a link
+// or a host told it, as anyone may make those up.
+func (a *App) roomDial(ctx context.Context, network, addr string) (net.Conn, error) {
+	if a.asIs(addr) {
+		return (&net.Dialer{}).DialContext(ctx, network, addr)
+	}
+	if o := a.opts.Room; o != nil && o.DialFar != nil {
+		return o.DialFar(ctx, network, addr)
+	}
+	return room.FarDialer().DialContext(ctx, network, addr)
+}
+
+// asIs reports whether addr is dialled as it is: where discovery found a
+// room, or the address the user typed to join one at.
+func (a *App) asIs(addr string) bool {
+	r := &a.room
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.far.link.typed && slices.Contains(r.far.link.addrs, addr) {
+		return true
+	}
+	for _, f := range r.found {
+		if f.found.Addr == addr || slices.Contains(f.found.Others, addr) {
+			return true
+		}
+	}
+	return false
+}
+
 // KnockAt knocks at the room at addr, an address typed with its port, as
 // a VPN's or the host's router's, with the code the user typed.
 func (rs *Rooms) KnockAt(addr, code string) {
@@ -98,7 +133,7 @@ func (rs *Rooms) KnockAt(addr, code string) {
 		a.startKnock(at, nil, knockBy{}, errors.New("A room's code is 6 letters and digits."))
 		return
 	}
-	a.startKnock(at, nil, knockBy{password: []byte(parsed), addrs: []string{at}}, nil)
+	a.startKnock(at, nil, knockBy{password: []byte(parsed), addrs: []string{at}, typed: true}, nil)
 }
 
 // backByInvite takes a new invite link of the host this computer is a

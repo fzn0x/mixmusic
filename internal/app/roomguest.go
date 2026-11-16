@@ -131,7 +131,8 @@ func (a *App) guestRoom() *guestRoom {
 
 // roomGuest is this computer as a guest of rooms.
 func (a *App) roomGuest(id *remote.Identity) *room.Guest {
-	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing, Elsewhere: a.roomElsewhere}
+	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing, Elsewhere: a.roomElsewhere,
+		Dial: a.roomDial}
 }
 
 // Knock knocks at the room of the host id, found on the network, with the
@@ -171,8 +172,10 @@ type knockBy struct {
 	link     bool
 	pinned   *remote.Fingerprint
 	// addrs are where the room is reached from outside the network, as
-	// its link, or the user, tells them (roomfar.go).
+	// its link, or the user, tells them (roomfar.go): the user's, when
+	// typed.
 	addrs []string
+	typed bool
 }
 
 // startKnock starts knocking at the room of the host id, of the key key
@@ -636,6 +639,8 @@ func roomProblem(name string, err error) string {
 		return name + "'s room isn't on the network now."
 	case farUnreachable(err):
 		return farProblem(name)
+	case errors.Is(err, room.ErrFarAddr):
+		return roomFarProblem
 	case errors.Is(err, room.ErrNotLink):
 		return "That isn't a link to a room."
 	case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):
@@ -646,6 +651,10 @@ func roomProblem(name string, err error) string {
 	}
 	return "Couldn't reach " + name + ": it may be asleep, or a firewall may turn MixMusic away."
 }
+
+// roomFarProblem is what a guest is told of a link, or a host, that named
+// this computer, or an address of no one (room.FarDialer).
+const roomFarProblem = "The link names an address of this computer, or of no one: ask its host for the link again."
 
 // isNetErr reports whether err is the network's.
 func isNetErr(err error) bool {

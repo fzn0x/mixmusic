@@ -154,7 +154,7 @@ func newRoomApp(t *testing.T, n *roomtest.Network, name string) *roomApp {
 	dir := t.TempDir()
 	opts := Options{DataDir: filepath.Join(dir, "data"), CacheDir: filepath.Join(dir, "cache"), Builtin: builtin.FS, Version: "test",
 		Remote: &RemoteOptions{Discovery: remotetest.New(), Listen: remotetest.Listen, Identity: id, Name: name, Timing: fastRemote},
-		Room: &RoomOptions{Discovery: n, Timing: fastRoom, Heard: ra.engine.heard, SetSpeed: ra.engine.setSpeed,
+		Room: &RoomOptions{Discovery: n, Timing: fastRoom, Heard: ra.engine.heard, SetSpeed: ra.engine.setSpeed, DialFar: (&net.Dialer{}).DialContext,
 			Listen: func() (net.Listener, error) {
 				ln, err := roomtest.Listen()
 				if err != nil {

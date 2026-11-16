@@ -16,7 +16,7 @@ func TestKnocksBounded(t *testing.T) {
 	key := func() remote.Fingerprint { id, _ := remote.NewIdentity(); return id.Fingerprint() }
 	now := time.Now()
 	k, tell := s.knock(key(), "192.168.1.2", "Ana", now)
-	if k == nil || !tell || !k.Local || len(k.Key) != 8 {
+	if k == nil || !tell || len(k.Key) != 8 {
 		t.Fatalf("the first knock %+v, told %v", k, tell)
 	}
 	if k, tell := s.knock(key(), "192.168.1.2", "Ana again", now); k == nil || tell {
@@ -26,7 +26,7 @@ func TestKnocksBounded(t *testing.T) {
 		t.Fatal("a third knock of a source kept")
 	}
 	for i := 3; len(s.asks.knocks) < maxKnocks; i++ {
-		if k, tell := s.knock(key(), "203.0.113."+strconv.Itoa(i), "Someone", now); k == nil || !tell || k.Local {
+		if k, tell := s.knock(key(), "203.0.113."+strconv.Itoa(i), "Someone", now); k == nil || !tell {
 			t.Fatalf("a knock from the internet %+v, told %v", k, tell)
 		}
 	}
@@ -57,16 +57,9 @@ func TestKnocksBounded(t *testing.T) {
 }
 
 // TestKnocksNearby tells, of the addresses a knock comes from, those of
-// networks of the host's own kind, this computer's loopback of IPv6 too,
-// from the internet's, the providers' shared range too.
+// this computer itself, of both families, whose knocks aren't counted by
+// source (nearby_test.go tells those of its networks).
 func TestKnocksNearby(t *testing.T) {
-	for addr, want := range map[string]bool{"192.168.1.2:5": true, "10.0.0.1:5": true, "127.0.0.1:5": true, "[::1]:5": true,
-		"100.100.1.1:5": false, "[fd00:1:2:3::9]:5": true, "[fe80::9%eth0]:5": true, "203.0.113.7:5": false,
-		"[2001:db8:1:2::9]:5": false} {
-		if got := localSource(sourceOf(addr)); got != want {
-			t.Errorf("localSource(sourceOf(%q)) = %v", addr, got)
-		}
-	}
 	for addr, want := range map[string]bool{"127.0.0.1:5": true, "[::1]:5": true, "192.168.1.2:5": false, "[fe80::9]:5": false} {
 		if got := knocksHere(sourceOf(addr)); got != want {
 			t.Errorf("knocksHere(sourceOf(%q)) = %v", addr, got)

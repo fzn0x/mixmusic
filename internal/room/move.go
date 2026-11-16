@@ -151,13 +151,15 @@ type Move struct {
 
 // move is a move under way, to the guest of to, named name, whose
 // connection conn asked it to host; addr is where its room listens once it
-// told, and waiting the guests yet to say they reach it, and self whether
-// the host is.
+// told, as conn reached it, and far where it is reached from outside its
+// network; waiting are the guests yet to say they reach it, and self
+// whether the host is.
 type move struct {
 	to      remote.Fingerprint
 	name    string
 	conn    *conn
 	addr    string
+	far     []string
 	waiting map[remote.Fingerprint]bool
 	self    bool
 	timer   *time.Timer
@@ -243,16 +245,17 @@ func (s *Server) hosting(c *conn, m message) {
 		host = c.raw.RemoteAddr().String()
 	}
 	mv.addr = net.JoinHostPort(host, strconv.Itoa(m.Port))
+	mv.far = farAddrs(m.Addrs)
 	mv.waiting, mv.self = map[remote.Fingerprint]bool{}, true
 	mv.timer.Stop()
 	mv.timer = time.AfterFunc(moveFor, func() { s.notMoved(mv, fmt.Errorf("not everyone reached %s's computer in time", mv.name)) })
 	for k, g := range s.guests {
 		if k != mv.to && g.conn != nil {
 			mv.waiting[k] = true
-			g.conn.send(message{Type: "reach", Key: mv.to.String(), Addr: mv.addr})
+			g.conn.send(message{Type: "reach", Key: mv.to.String(), Addr: mv.addrFor(g.conn.near)})
 		}
 	}
-	addr, to := mv.addr, mv.to
+	addr, to := mv.addrFor(true), mv.to
 	s.mu.Unlock()
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), moveFor)
@@ -318,21 +321,51 @@ func (s *Server) reached(mv *move, who *Member, ok bool) {
 			conns = append(conns, g.conn)
 		}
 	}
-	done := Move{Key: mv.to, Name: mv.name, Addr: mv.addr}
+	done := Move{Key: mv.to, Name: mv.name, Addr: mv.addrFor(true)}
 	s.mu.Unlock()
-	// Each is told before anything else ends its connection.
+	// Each is told before anything else ends its connection, where it
+	// reached the room.
 	var wg sync.WaitGroup
 	for _, c := range conns {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			_ = c.f.Send(message{Type: "moved", Key: done.Key.String(), Name: done.Name, Addr: done.Addr}, time.Second)
+			_ = c.f.Send(message{Type: "moved", Key: done.Key.String(), Name: done.Name, Addr: mv.addrFor(c.near)}, time.Second)
 		}()
 	}
 	wg.Wait()
 	if mv.done != nil {
 		mv.done(done, nil)
 	}
+}
+
+// addrFor is where a guest, of this computer's own networks when near, or
+// the host, near too, reaches the room of mv: at addr, the address of the
+// guest it moves to, as the host's connection with it tells it, with the
+// port its room listens on, while both are of the host's networks; else
+// where its room is reached from outside its network, as its router
+// forwards a port, which may be another (#562).
+func (mv *move) addrFor(near bool) string {
+	if near && mv.conn.near || len(mv.far) == 0 {
+		return mv.addr
+	}
+	return mv.far[0]
+}
+
+// farAddrs are the addresses a guest that hosts a room for a move tells it
+// is reached at from outside its network, as an invite link's are, each
+// once, MaxAddrs at most: what isn't an address is left out.
+func farAddrs(addrs []string) []string {
+	var out []string
+	for _, a := range addrs {
+		if len(out) == MaxAddrs {
+			break
+		}
+		if c, ok := cleanAddr(a); ok && !slices.Contains(out, c) {
+			out = append(out, c)
+		}
+	}
+	return out
 }
 
 // reasonMoving: the room moves, or moved, and lets no one in.
@@ -380,9 +413,29 @@ func (s *Server) notMoved(mv *move, why error) {
 		s.mu.Unlock()
 		return
 	}
-	s.asks.move = nil
-	mv.timer.Stop()
+	s.takeMove()
 	s.mu.Unlock()
+	s.moveEnded(mv, why)
+}
+
+// takeMove ends the move under way, if any, and returns it, whose end
+// moveEnded tells once s.mu is let go. s.mu is held.
+func (s *Server) takeMove() *move {
+	mv := s.asks.move
+	if mv != nil {
+		s.asks.move = nil
+		mv.timer.Stop()
+	}
+	return mv
+}
+
+// moveEnded tells of mv, a move takeMove ended, if any, that the room
+// didn't move, for why: the guest it was to closes its room, and done is
+// told why.
+func (s *Server) moveEnded(mv *move, why error) {
+	if mv == nil {
+		return
+	}
 	mv.conn.send(message{Type: "unhost"})
 	if mv.done != nil {
 		mv.done(Move{}, why)
@@ -416,11 +469,12 @@ const (
 )
 
 // Hosting tells the host that this guest opened a room for it to move to,
-// at port, or couldn't, at 0.
-func (s *Session) Hosting(port int) error {
-	m := message{Type: "hosting", Port: port}
+// at port, and reached from outside its network at addrs, or couldn't, at
+// 0.
+func (s *Session) Hosting(port int, addrs ...string) error {
+	m := message{Type: "hosting", Port: port, Addrs: addrs}
 	if port <= 0 {
-		m.Port, m.Reason = 0, "can't"
+		m.Port, m.Reason, m.Addrs = 0, "can't", nil
 	}
 	return s.f.Send(m, s.timing.silence())
 }

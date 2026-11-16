@@ -11,7 +11,6 @@ package room
 
 import (
 	"net"
-	"net/netip"
 	"sync"
 	"time"
 
@@ -170,27 +169,11 @@ func (f *frames) Receive(v any, wait time.Duration) error {
 	return f.Frames.Receive(v, wait)
 }
 
-// roomOf is the room-wide count of the tries of src: those of the room's
-// own network, or of the internet.
-func (a *admission) roomOf(src string) *tries {
-	if localSource(src) {
+// roomOf is the room-wide count of the tries of this computer's own
+// networks, when near (nearby.go), or of the internet.
+func (a *admission) roomOf(near bool) *tries {
+	if near {
 		return &a.local
 	}
 	return &a.room
-}
-
-// localSource reports whether src, a source as sourceOf tells it, is of a
-// network of this computer's own kind: private, loopback or link-local,
-// as the internet never is. The providers' shared range, 100.64.0.0/10,
-// which VPNs give their computers too, isn't.
-func localSource(src string) bool {
-	ip, err := netip.ParseAddr(src)
-	if err != nil {
-		p, perr := netip.ParsePrefix(src)
-		if perr != nil {
-			return false
-		}
-		ip = p.Addr()
-	}
-	return ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast()
 }

@@ -122,12 +122,15 @@ func (s *Server) addSong(c *conn, m message) {
 		reason = TooMany
 	case !file && (s.asks.looks >= maxLooks || s.asks.looking[c.key] >= maxLooksEach):
 		reason = TooMany
-	case !s.takes(c, func(l *limits) *bucket { return &l.songs }, songsPerMinute, time.Minute/songsPerMinute):
+	// The room's lookups are asked first, so that a room that takes none
+	// spends nothing of the guest's songs.
+	case !file && !s.asks.lookRate.has(time.Now(), lookBurst, lookEvery):
 		reason = TooMany
-	case !file && !s.asks.lookRate.take(time.Now(), lookBurst, lookEvery):
+	case !s.takes(c, func(l *limits) *bucket { return &l.songs }, songsPerMinute, time.Minute/songsPerMinute):
 		reason = TooMany
 	}
 	if reason == "" && !file {
+		s.asks.lookRate.take(time.Now(), lookBurst, lookEvery)
 		s.looking(c.key, 1)
 	}
 	s.mu.Unlock()

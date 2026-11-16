@@ -206,6 +206,18 @@ them out, as on your network.
   forwarded by hand. **Port for rooms** keeps the port rooms listen on,
   picked at random the first time and kept, so that a forward made by
   hand keeps working.
+- **A VPN you both run**, such as Tailscale, reaches the room even with
+  the switch off: a friend on it uses **Join a room…** with your
+  computer's address on the VPN, the room's port, which **Port for
+  rooms** shows, and the code. With the switch on, put that address in
+  **Address for invites**, and the invite link carries it. Both
+  computers must be on the VPN, and its rules must let the port through.
+- **Tunnels.** An **Address for invites** that is a TCP tunnel's, which
+  hands the connections over to this computer from 127.0.0.1, has every
+  guest come from that one address, this computer's own: the room counts
+  them as one guest of your network, whose wrong codes share one count,
+  and the limits of one address, as its 32 connections at once, hold for
+  them all.
 - **A new address.** If your router's internet address changes, the
   room's page says so and offers the new link to send. Friends who
   dropped off come back as they open it.

@@ -88,7 +88,7 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 	s.mu.Lock()
 	k, tell := s.knock(c.key, c.src, name, time.Now())
 	if k != nil {
-		k.conn = c
+		k.conn, k.Local = c, c.near
 	}
 	s.mu.Unlock()
 	if k == nil {
@@ -208,7 +208,7 @@ func (s *Server) knock(key remote.Fingerprint, src, name string, now time.Time) 
 		return nil, false
 	}
 	s.asks.next++
-	k := &Knock{ID: s.asks.next, Name: name, At: now, Key: key.ID()[:8], Local: localSource(src), answer: make(chan bool, 1), src: src}
+	k := &Knock{ID: s.asks.next, Name: name, At: now, Key: key.ID()[:8], answer: make(chan bool, 1), src: src}
 	s.asks.knocks = append(s.asks.knocks, k)
 	tell := from == 0 && now.Sub(s.asks.knockTold[src]) >= knockTellEvery
 	if tell {

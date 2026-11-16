@@ -223,10 +223,17 @@ func (a *App) hostAsked(g *guestRoom, s *room.Session, seats room.Seats) {
 	g.pending = h
 	r.mu.Unlock()
 	time.AfterFunc(2*room.MoveFor, func() { a.unhost(g, h) })
-	if err := s.Hosting(port); err != nil {
+	// Where the room is reached from outside the network, as the router
+	// forwards a port, which may be another: the guests outside reach it
+	// there (#562).
+	if err := s.Hosting(port, a.reachAddrs(moveReachWait)...); err != nil {
 		a.unhost(g, h)
 	}
 }
+
+// moveReachWait is how long a room opened for a move waits, at most, for
+// the routers to answer, before it tells the host where it listens.
+const moveReachWait = 5 * time.Second
 
 // unhost closes h, the room opened for the room of g to move to, unless it
 // hosts it now.
@@ -448,7 +455,7 @@ func (a *App) openRoom(seats *room.Seats) (*hostedRoom, int, error) {
 	}
 	h := &hostedRoom{key: id.Fingerprint(), code: code, link: room.Invite{Code: code, Host: id.Fingerprint(), Secret: secret}.Link(), told: time.Now()}
 	srv := &room.Server{Identity: id, Name: a.roomName(), Code: code, Secret: secret, Host: roomHostPlayer{a}, Clock: a.roomClock(),
-		Timing: o.Timing, Changed: func() { a.roomChanged(h) }, Guessing: func() { a.notifyRooms(roomGuessed) }, Guests: a.roomGuests(), Seats: seats}
+		Timing: o.Timing, Nearby: &a.room.far.near, Changed: func() { a.roomChanged(h) }, Guessing: func() { a.notifyRooms(roomGuessed) }, Guests: a.roomGuests(), Seats: seats}
 	h.server = srv
 	go func() {
 		if err := srv.Serve(ln); err != nil {

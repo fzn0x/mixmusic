@@ -3,7 +3,8 @@ package room
 // The previews: computers that proved the code or the link and wait to
 // join, as their users look at who hosts and what plays. A link may be
 // forwarded beyond the friends it was sent to (#562), so a room holds few
-// previews at once, maxPreviewsFrom of a source and maxPreviews in all: a
+// previews at once, maxPreviewsFrom of a source, as many as a household
+// behind one address knocks with at once, and maxPreviews in all: a
 // new one takes the place of the oldest of its source, or, when the room
 // holds as many as it takes, of the oldest of the source that holds the
 // most. And each waits Timing.Preview at most. The guests, and those that
@@ -17,7 +18,7 @@ import (
 
 const (
 	maxPreviews     = 32
-	maxPreviewsFrom = 4
+	maxPreviewsFrom = 8
 )
 
 // reasonPreviewEnded: the computer waited too long to join, or others of

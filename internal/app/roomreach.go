@@ -39,12 +39,10 @@ type roomFar struct {
 	// end, which MixMusic waits for as it quits (flushing).
 	stopping sync.WaitGroup
 	flushing sync.Once
-	// nets are the networks of this computer's interfaces, as read at
-	// netsAt, which a room takes connections of alone while friends
-	// outside may not join (reachListener).
-	netsMu sync.Mutex
-	nets   []netip.Prefix
-	netsAt time.Time
+	// near tells the connections of this computer's own networks, which
+	// a room takes alone while friends outside may not join
+	// (reachListener), as its server counts their codes apart.
+	near room.Nearby
 	// link is where the room this computer knocks at, or is a guest of,
 	// is reached from outside the network (roomfar.go). a.room.mu guards
 	// it.
@@ -165,66 +163,11 @@ func (l *reachListener) Accept() (net.Conn, error) {
 	}
 }
 
-// nearby reports whether addr is of this computer's own networks: a
-// private, loopback or link-local address, or one of the networks of its
-// interfaces, which it reads again each half minute.
-func (a *App) nearby(addr net.Addr) bool {
-	ap, err := netip.ParseAddrPort(addr.String())
-	if err != nil {
-		return false
-	}
-	far := &a.room.far
-	far.netsMu.Lock()
-	if time.Since(far.netsAt) > 30*time.Second {
-		far.nets, far.netsAt = interfaceNets(), time.Now()
-	}
-	nets := far.nets
-	far.netsMu.Unlock()
-	return nearbyOf(ap.Addr(), nets)
-}
-
-// nearbyOf reports whether ip is private, loopback or link-local, or of
-// one of nets.
-func nearbyOf(ip netip.Addr, nets []netip.Prefix) bool {
-	ip = ip.Unmap().WithZone("")
-	if ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() {
-		return true
-	}
-	for _, p := range nets {
-		if p.Contains(ip) {
-			return true
-		}
-	}
-	return false
-}
-
-// interfaceNets are the networks of this computer's interfaces, but those
-// of one address alone, as a VPN's of /32, which tell nothing of who else
-// is on them.
-func interfaceNets() []netip.Prefix {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return nil
-	}
-	var out []netip.Prefix
-	for _, a := range addrs {
-		ipn, ok := a.(*net.IPNet)
-		if !ok {
-			continue
-		}
-		ip, ok := netip.AddrFromSlice(ipn.IP)
-		ones, bits := ipn.Mask.Size()
-		if !ok || ones == bits || bits == 0 {
-			continue
-		}
-		ip = ip.Unmap()
-		if ip.Is4() && bits == 128 {
-			ones -= 96
-		}
-		out = append(out, netip.PrefixFrom(ip, ones).Masked())
-	}
-	return out
-}
+// nearby reports whether addr is of this computer's own networks, as its
+// rooms' servers tell them (room.Nearby): a private, loopback or
+// link-local address, one of the networks of its interfaces, or the
+// providers' shared range while one of them is in it, as a VPN's is.
+func (a *App) nearby(addr net.Addr) bool { return a.room.far.near.Of(addr.String()) }
 
 func (l *reachListener) Close() error {
 	l.once.Do(func() {
@@ -325,6 +268,24 @@ func (r *roomReach) addrs() []string {
 		out = append(out, netip.AddrPortFrom(reach.IPv6, uint16(r.port)).String())
 	}
 	return out
+}
+
+// reachAddrs are where friends outside the network reach the room that
+// listens now, as its invite link would carry them, once the routers first
+// answered, wait at most: none while they may not join (Make host's).
+func (a *App) reachAddrs(wait time.Duration) []string {
+	r := a.room.far.reach.Load()
+	if r == nil {
+		return nil
+	}
+	for deadline := time.Now().Add(wait); ; time.Sleep(50 * time.Millisecond) {
+		r.mu.Lock()
+		k := r.keeper
+		r.mu.Unlock()
+		if k == nil || !k.Reach().Asking || time.Now().After(deadline) {
+			return r.addrs()
+		}
+	}
 }
 
 // changed takes in what the routers answered: the room's addresses, once

@@ -5,6 +5,7 @@ import (
 	"net/netip"
 	"testing"
 
+	"github.com/fzn0x/mixmusic/internal/room"
 	"github.com/fzn0x/mixmusic/internal/room/roomtest"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
@@ -18,8 +19,8 @@ func TestNearbyOf(t *testing.T) {
 		"::ffff:192.168.1.20": true, "198.51.100.77": true, "2001:db8:5::99": true,
 		"203.0.113.7": false, "100.101.102.103": false, "2001:db8:6::1": false,
 	} {
-		if got := nearbyOf(netip.MustParseAddr(a), nets); got != want {
-			t.Errorf("nearbyOf(%s) = %v", a, got)
+		if got := room.NearbyOf(netip.MustParseAddr(a), nets); got != want {
+			t.Errorf("NearbyOf(%s) = %v", a, got)
 		}
 	}
 }

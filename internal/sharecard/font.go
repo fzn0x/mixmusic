@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"sync"
+	"time"
 	"weak"
 
 	gotext "github.com/go-text/typesetting/font"
@@ -19,8 +20,9 @@ import (
 // outlines. A font parsed from its data, as the bundled faces are, is read
 // whole. A font of the system is read in two steps: the letters it has up
 // front, and the rest when a card needs one of them. The rest is held
-// weakly: once no card uses it, it goes, and the next card that needs it
-// reads it again, so a font a card used once doesn't stay in memory.
+// weakly, and kept a minute after the last card that read it: then it
+// goes, and the next card that needs it reads it again, so a font a card
+// used once doesn't stay in memory.
 type Font struct {
 	cmap gotext.Cmap
 	// colour is set when the font has glyphs in colour.
@@ -242,6 +244,38 @@ func (f *Font) load() *fontData {
 	}
 	f.weak = weak.Make(d)
 	return d
+}
+
+// keepFor is how long the system fonts the last card read stay after it,
+// so that cards drawn one after another, as the recap's two, read them
+// once.
+const keepFor = time.Minute
+
+// kept holds the system fonts the last card read, until keepFor after it.
+var kept struct {
+	mu    sync.Mutex
+	fonts []*fontData
+	timer *time.Timer
+}
+
+// keep holds ds, the system fonts a card read, in place of the last card's,
+// until keepFor after it.
+func keep(ds []*fontData) {
+	kept.mu.Lock()
+	defer kept.mu.Unlock()
+	kept.fonts = ds
+	if kept.timer == nil {
+		kept.timer = time.AfterFunc(keepFor, letGo)
+	} else {
+		kept.timer.Reset(keepFor)
+	}
+}
+
+// letGo lets the fonts the last card read go.
+func letGo() {
+	kept.mu.Lock()
+	defer kept.mu.Unlock()
+	kept.fonts = nil
 }
 
 // covers reports whether the font has a glyph for r.

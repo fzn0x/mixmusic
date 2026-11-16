@@ -159,6 +159,7 @@ func (c Card) Render(fam Family) (*image.NRGBA, error) {
 	}
 	inner := w - 2*margin
 	r := newTypesetter(fam)
+	defer r.keep()
 
 	// A card about as wide as it is tall puts the cover beside its lines; a
 	// taller one puts it above them, across their width.
@@ -380,6 +381,20 @@ func (t *typesetter) data(f *Font) *fontData {
 		t.fonts[f] = d
 	}
 	return d
+}
+
+// keep holds the system fonts the card read for the cards after it. A card
+// that read none, as one of Latin letters only, leaves the last card's.
+func (t *typesetter) keep() {
+	var ds []*fontData
+	for f, d := range t.fonts {
+		if f.read != nil && d != nil {
+			ds = append(ds, d)
+		}
+	}
+	if len(ds) > 0 {
+		keep(ds)
+	}
 }
 
 // has reports whether f has a glyph for r and can draw it.

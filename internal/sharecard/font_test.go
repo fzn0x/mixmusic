@@ -4,12 +4,14 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"testing"
 )
 
 // TestSystemFontReadWhenNeeded opens a font as a system one: it knows its
-// letters at once, reads the rest only when a card draws one of them, and
-// lets the rest go once no card uses it, reading it again for the next.
+// letters at once, reads the rest only when a card draws one of them,
+// keeps it for the next card a while, then lets it go, and reads it again
+// for the card after.
 func TestSystemFontReadWhenNeeded(t *testing.T) {
 	data, err := os.ReadFile(filepath.Join("testdata", "fonts", "NotoSansThai-subset.ttf"))
 	if err != nil {
@@ -35,9 +37,14 @@ func TestSystemFontReadWhenNeeded(t *testing.T) {
 		t.Fatal("the font's letters draw nothing")
 	}
 	runtime.GC()
+	if d := f.weak.Value(); d == nil || !slices.Contains(kept.fonts, d) {
+		t.Error("the font wasn't kept for the next card")
+	}
+	letGo()
+	runtime.GC()
 	runtime.GC()
 	if f.weak.Value() != nil {
-		t.Error("the font stayed in memory after the card")
+		t.Error("the font stayed in memory after it was let go")
 	}
 	if again := drawThai(t, f); again != ink {
 		t.Errorf("read again, the font draws %d pixels, not %d", again, ink)

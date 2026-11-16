@@ -16808,6 +16808,46 @@ func (msgs Messages) RoomReachMoved() string {
 	return Catalog.Format(msgs.locale, "roomReachMoved", nil)
 }
 
+// RoomReachSuggestAsk says "Turn on Ask me before someone joins, and whoever comes with the link or the code waits until you let them in."
+// in the language the app shows.
+func RoomReachSuggestAsk() string { return In(i18n.Locale()).RoomReachSuggestAsk() }
+
+// RoomReachSuggestAsk says "Turn on Ask me before someone joins, and whoever comes with the link or the code waits until you let them in."
+// in the language of msgs.
+func (msgs Messages) RoomReachSuggestAsk() string {
+	return Catalog.Format(msgs.locale, "roomReachSuggestAsk", nil)
+}
+
+// RoomReachSuggestAskLabel says "Turn on Ask me before someone joins"
+// in the language the app shows.
+func RoomReachSuggestAskLabel() string { return In(i18n.Locale()).RoomReachSuggestAskLabel() }
+
+// RoomReachSuggestAskLabel says "Turn on Ask me before someone joins"
+// in the language of msgs.
+func (msgs Messages) RoomReachSuggestAskLabel() string {
+	return Catalog.Format(msgs.locale, "roomReachSuggestAskLabel", nil)
+}
+
+// RoomReachSuggestAskNo says "not now"
+// in the language the app shows.
+func RoomReachSuggestAskNo() string { return In(i18n.Locale()).RoomReachSuggestAskNo() }
+
+// RoomReachSuggestAskNo says "not now"
+// in the language of msgs.
+func (msgs Messages) RoomReachSuggestAskNo() string {
+	return Catalog.Format(msgs.locale, "roomReachSuggestAskNo", nil)
+}
+
+// RoomReachSuggestAskYes says "turn it on"
+// in the language the app shows.
+func RoomReachSuggestAskYes() string { return In(i18n.Locale()).RoomReachSuggestAskYes() }
+
+// RoomReachSuggestAskYes says "turn it on"
+// in the language of msgs.
+func (msgs Messages) RoomReachSuggestAskYes() string {
+	return Catalog.Format(msgs.locale, "roomReachSuggestAskYes", nil)
+}
+
 // RoomReachTestNote says "MixMusic can't test the port from outside: ask a friend to open the link. A friend who can't connect is told the like…"
 // in the language the app shows.
 func RoomReachTestNote() string { return In(i18n.Locale()).RoomReachTestNote() }

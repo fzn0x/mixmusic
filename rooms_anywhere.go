@@ -85,15 +85,15 @@ func (s *shell) suggestAskJoin(c *ui.Context) {
 		return
 	}
 	k := &s.lk
-	ui.Text(c, "Turn on Ask me before someone joins, and whoever comes with the link or the code waits until you let them in.").
+	ui.Text(c, locales.RoomReachSuggestAsk()).
 		FontSize(k.bodySize()).MaxWidth(640)
 	ui.Row(c).Gap(8).Children(func() {
-		if s.button(c, "room-suggest-ask", "turn it on", false).Label("Turn on Ask me before someone joins").Clicked() {
+		if s.button(c, "room-suggest-ask", locales.RoomReachSuggestAskYes(), false).Label(locales.RoomReachSuggestAskLabel()).Clicked() {
 			s.set.RoomAskJoin = true
 			s.saveRoomRules()
 			v.suggestAsk = false
 		}
-		if s.button(c, "room-suggest-ask-no", "not now", false).Clicked() {
+		if s.button(c, "room-suggest-ask-no", locales.RoomReachSuggestAskNo(), false).Clicked() {
 			v.suggestAsk = false
 		}
 	})

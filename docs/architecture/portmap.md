@@ -27,9 +27,13 @@ the router's internet address from its answer.
    actions of that service: AddPortMapping, GetExternalIPAddress and
    DeletePortMapping. Whatever answers the search can name any address,
    so only a description and a control at the address of the one that
-   answered are asked, each read up to 256 KiB. A router that takes
-   forwards for good alone (error 725) gets one, which the end of the room
-   removes; a port another computer has (718) has another tried.
+   answered are asked, each read up to 256 KiB, and only of a default
+   gateway: any other device may answer the search, and the address it
+   told would go in the links. A router that takes forwards for good
+   alone (error 725) is refused, as a forward left after a crash would
+   stay, to whatever computer later has this one's address: the page asks
+   for a forward made by hand. A port another computer has (718) has
+   another tried.
 
 PCP and NAT-PMP go to the default gateways, which Go has no call for:
 `/proc/net/route` and `/proc/net/ipv6_route` on Linux,
@@ -53,7 +57,10 @@ comes in unasked, as most do. `Client.Open` asks the router of IPv6 by
 PCP, over IPv6 to its link-local address, to let the port of that
 address in. `PublicIPv6` takes the global unicast addresses of the
 networks that are up, but unique local ones and those of the
-documentation, Teredo and 6to4, which guests seldom reach.
+documentation, Teredo and 6to4, which guests seldom reach, and those
+made of the network card's hardware address (EUI-64), which a link
+forwarded beyond friends would tell: temporary and privacy addresses
+alone.
 
 ## Behind another router
 
@@ -62,7 +69,9 @@ share among their customers (RFC 6598), or in a private range, sits
 behind another router, most often the provider's, that no one asked:
 the internet doesn't reach the forward (`Shared`). `Keeper` removes it,
 and tells why (`SharedError`). A VPN both sides run is the way then, with
-its address typed for invites.
+its address typed for invites. An internet address that is multicast,
+broadcast or reserved isn't one (`Unicast`): the forward goes too, and
+the router counts as having refused.
 
 ## Keeping it
 

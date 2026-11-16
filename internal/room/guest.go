@@ -246,6 +246,9 @@ type Session struct {
 	err      error
 	done     chan struct{}
 	once     sync.Once
+	// leaving is set once the guest said it leaves: the connection the
+	// host then ends ends the session as Leave does.
+	leaving bool
 }
 
 // Host returns the key of the room's host.
@@ -366,10 +369,36 @@ func (s *Session) Err() error {
 	return s.err
 }
 
-// Leave leaves the room: the host no longer keeps the guest's place.
+// Leave leaves the room: the host no longer keeps the guest's place. It
+// waits a moment for the host to end the connection, as it does once it
+// read the leave, reading what still comes meanwhile: closed at once, with
+// the host's messages unread, the connection would be reset, which may drop
+// the leave the host had yet to read, and the host would keep the guest's
+// place, as of one that dropped off.
 func (s *Session) Leave() {
-	_ = s.f.Send(message{Type: "leave"}, time.Second)
+	s.mu.Lock()
+	s.leaving = true
+	s.mu.Unlock()
+	if s.f.Send(message{Type: "leave"}, time.Second) == nil {
+		select {
+		case <-s.done:
+		case <-time.After(time.Second):
+		}
+	}
 	s.end(net.ErrClosed)
+}
+
+// lost ends the session as the host went quiet, or ended the connection:
+// as Leave does, once the guest said it leaves.
+func (s *Session) lost() {
+	s.mu.Lock()
+	leaving := s.leaving
+	s.mu.Unlock()
+	if leaving {
+		s.end(net.ErrClosed)
+		return
+	}
+	s.end(ErrLost)
 }
 
 // Close ends the session; the host keeps the guest's place a while.
@@ -400,7 +429,7 @@ func (s *Session) read() {
 			select {
 			case <-s.done:
 			default:
-				s.end(ErrLost)
+				s.lost()
 			}
 			return
 		}
@@ -465,7 +494,7 @@ func (s *Session) ping() {
 	}
 	for i := range firstPings {
 		if !send() {
-			s.end(ErrLost)
+			s.lost()
 			return
 		}
 		if i < firstPings-1 {
@@ -484,7 +513,7 @@ func (s *Session) ping() {
 			return
 		case <-tick.C:
 			if !send() {
-				s.end(ErrLost)
+				s.lost()
 				return
 			}
 		}

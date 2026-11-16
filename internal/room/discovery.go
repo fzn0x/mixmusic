@@ -31,10 +31,13 @@ type Announcement struct {
 }
 
 // Found is a room found: its host's ID and name, as it tells them, and the
-// address of its server. What discovery tells can't be trusted: the code,
-// or the link's key, decides who answers there.
+// address of its server, of this computer's network when its host told
+// several, and Others, the others it told, as of a VPN both are on. What
+// discovery tells can't be trusted: the code, or the link's key, decides
+// who answers there.
 type Found struct {
 	ID, Name, Addr string
+	Others         []string
 }
 
 // MDNS is Discovery on the network, by DNS-SD over mDNS.
@@ -79,7 +82,11 @@ func foundOf(insts []dnssd.Instance) []Found {
 		if id == "" || len(id) > 32 || in.Text["v"] != strconv.Itoa(version) {
 			continue
 		}
-		out = append(out, Found{ID: strings.ToLower(id), Name: CleanName(in.Text["name"]), Addr: in.Addr()})
+		f := Found{ID: strings.ToLower(id), Name: CleanName(in.Text["name"]), Addr: in.Addr()}
+		for _, h := range in.Others {
+			f.Others = append(f.Others, net.JoinHostPort(h, strconv.Itoa(in.Port)))
+		}
+		out = append(out, f)
 	}
 	return out
 }

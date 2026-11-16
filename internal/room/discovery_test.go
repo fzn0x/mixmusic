@@ -1,6 +1,7 @@
 package room
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/fzn0x/mixmusic/internal/dnssd"
@@ -16,7 +17,7 @@ func TestFoundOfKeepsRoomsOfThisVersion(t *testing.T) {
 		{Name: "d", Host: "192.168.1.5", Port: 4003, Text: map[string]string{"id": "has space", "v": "1"}},
 	}
 	got := foundOf(insts)
-	if len(got) != 1 || got[0] != (Found{ID: "abcdef", Name: "Desk", Addr: "192.168.1.2:4000"}) {
+	if len(got) != 1 || !reflect.DeepEqual(got[0], Found{ID: "abcdef", Name: "Desk", Addr: "192.168.1.2:4000"}) {
 		t.Fatalf("found %+v", got)
 	}
 }

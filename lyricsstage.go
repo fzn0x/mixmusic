@@ -164,7 +164,8 @@ func (s *shell) lyricStage(c *ui.Context) {
 // stageGround paints the ground of the stage on its panel: the track's cover,
 // blurred to a wash of its colours (as coverBackdrop's is), overhanging the
 // panel by three sigma so the blur's transparent rim falls outside it, under
-// the scrim. Stretched alone, a small cover shows its pixels on a big window.
+// the scrim; under the stage's other children, as absolute ones paint
+// above those in the flow. Stretched alone, a small cover shows its pixels on a big window.
 func (s *shell) stageGround(c *ui.Context, panel ui.Element, t media.Track, st lyricStyle) {
 	const sigma, size = 60, 96 // the blur hides detail: a small bitmap does
 	var b *ui.Bitmap
@@ -177,8 +178,8 @@ func (s *shell) stageGround(c *ui.Context, panel ui.Element, t media.Track, st l
 		panel.Draw(func(p *ui.Painter, r ui.Rect) { paintStageGround(p, r, nil, accent, st.scrim) })
 		return
 	}
-	ui.Image(c.Key("stage-ground"), b).Absolute().Top(-3 * sigma).Right(-3 * sigma).Bottom(-3 * sigma).Left(-3 * sigma).Fit(ui.Cover).Blur(sigma).PassThrough()
-	ui.Box(c.Key("stage-veil")).Absolute().Top(0).Right(0).Bottom(0).Left(0).PassThrough().Draw(func(p *ui.Painter, r ui.Rect) { paintStageVeil(p, r, st.scrim) })
+	ui.Image(c.Key("stage-ground"), b).Absolute().Top(-3 * sigma).Right(-3 * sigma).Bottom(-3 * sigma).Left(-3 * sigma).Fit(ui.Cover).Blur(sigma).PassThrough().ZIndex(-1)
+	ui.Box(c.Key("stage-veil")).Absolute().Top(0).Right(0).Bottom(0).Left(0).PassThrough().ZIndex(-1).Draw(func(p *ui.Painter, r ui.Rect) { paintStageVeil(p, r, st.scrim) })
 }
 
 // paintStageGround paints the ground of the stage on r: the cover b,

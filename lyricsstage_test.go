@@ -636,3 +636,23 @@ func coversLoad(t *testing.T, s *shell, tt *ui.Tester) {
 		}
 	}
 }
+
+// TestStageGroundUnderTheLyrics finds the line sung painted white over the
+// blurred cover, not hidden under it: absolute elements paint above those in
+// the flow unless told otherwise.
+func TestStageGroundUnderTheLyrics(t *testing.T) {
+	_, tt := stageOn(t, stageSong, 15200*time.Millisecond, true)
+	r, ok := tt.Find("Slow wind over the pier")
+	if !ok {
+		t.Fatalf("the stage doesn't show the line sung: %q", tt.Texts())
+	}
+	img := tt.Image()
+	for x := int(r.X); x < int(r.X+r.W); x++ {
+		for y := int(r.Y); y < int(r.Y+r.H); y++ {
+			if c := img.RGBAAt(x, y); c.R > 240 && c.G > 240 && c.B > 240 {
+				return
+			}
+		}
+	}
+	t.Error("no white pixel where the line sung is: the ground covers the lyrics")
+}

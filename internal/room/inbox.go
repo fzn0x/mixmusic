@@ -17,12 +17,13 @@ type sent struct {
 	Sent   time.Duration      `json:"sent,omitempty"`
 	Do     string             `json:"do,omitempty"`
 	Port   int                `json:"port,omitempty"`
+	Addrs  []string           `json:"addrs,omitempty"`
 	Reason string             `json:"reason,omitempty"`
 	OK     bool               `json:"ok,omitempty"`
 }
 
 func (m sent) message() message {
-	return message{Type: m.Type, Seq: m.Seq, Track: m.Track, Sent: m.Sent, Do: m.Do, Port: m.Port, Reason: m.Reason, OK: m.OK}
+	return message{Type: m.Type, Seq: m.Seq, Track: m.Track, Sent: m.Sent, Do: m.Do, Port: m.Port, Addrs: m.Addrs, Reason: m.Reason, OK: m.OK}
 }
 
 // messages are what c sends, as they come, read on a goroutine of their

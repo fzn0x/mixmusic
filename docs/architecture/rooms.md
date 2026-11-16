@@ -211,7 +211,10 @@ join, which are told the room has a new code (`new code`). Ending
 the room
 tells each guest (`ended`, `ended`), and stops the server and the
 announcement. A guest that leaves says so (`leave`), and the host no
-longer keeps its place.
+longer keeps its place. The guest then waits a moment for the host to end
+the connection, reading what still comes: closed at once, with the host's
+messages unread, the connection would be reset, and the system may drop
+the leave before the host read it.
 
 ## The host's rules
 

@@ -470,18 +470,23 @@ func (rs *Rooms) Leave() {
 	if g == nil {
 		return
 	}
-	if s := g.sessionNow(a); s != nil {
-		s.Leave()
+	// The host hears it beside the caller, the window's thread: Leave
+	// waits a moment for the host to end the connection.
+	if s := g.takeSession(a); s != nil {
+		go s.Leave()
 	}
 	g.end(a, nil)
 	a.notifyRooms("")
 }
 
-func (g *guestRoom) sessionNow(a *App) *room.Session {
+// takeSession takes the session of g, which end then doesn't close.
+func (g *guestRoom) takeSession(a *App) *room.Session {
 	r := &a.room
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	return g.session
+	s := g.session
+	g.session = nil
+	return s
 }
 
 // end ends this computer's stay in the room of g, for err: it no longer

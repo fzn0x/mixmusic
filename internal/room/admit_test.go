@@ -19,9 +19,18 @@ import (
 // address then waits, the right code too.
 func TestWrongCodesAtOnceTryFive(t *testing.T) {
 	// The room holds all 40 connections, so that the tries are what
-	// stops them.
-	r := newTestRoomWith(t, func(s *Server) { s.caps = &caps{unproven: 100, unprovenFrom: 100, tries: Tries, roomTries: RoomTries} })
+	// stops them. The address waits a minute, as a room's does: the
+	// 400 ms of the tests' timing would end its wait, and roll its window,
+	// while slow handshakes still come, under the race detector or on a
+	// busy computer, and 5 more codes would be checked. Each side waits
+	// for the other's handshake longer too, so that a slow one is still
+	// answered, not cut off.
+	r := newTestRoomWith(t, func(s *Server) {
+		s.caps = &caps{unproven: 100, unprovenFrom: 100, tries: Tries, roomTries: RoomTries}
+		s.Timing.Wait, s.Timing.Prove, s.Timing.Silence = time.Minute, 30*time.Second, 30*time.Second
+	})
 	g := newGuest(t, "Guesser")
+	g.Timing.Silence = 30 * time.Second
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	results := map[string]int{}
@@ -232,9 +241,13 @@ func TestRoomWidePlacesTakeTheOldest(t *testing.T) {
 // with connections held open: a link holder still joins, and a guest that
 // dropped off still comes back by its key.
 func TestFullRoomStillLetsInLinksAndGuests(t *testing.T) {
-	// All come from 127.0.0.1: the source holds as many as the room.
+	// All come from 127.0.0.1: the source holds as many as the room. The
+	// room keeps the place of the guest that dropped off a minute: the
+	// second of the tests' timing ran out, on a busy computer, while the
+	// connections opened and the link holder joined, before it came back.
 	r := newTestRoomWith(t, func(s *Server) {
 		s.caps = &caps{unproven: maxUnproven, unprovenFrom: maxUnproven, tries: Tries, roomTries: RoomTries}
+		s.Timing.Keep = time.Minute
 	})
 	back := newGuest(t, "Back")
 	r.join(back).Close()

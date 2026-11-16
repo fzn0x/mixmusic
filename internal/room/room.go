@@ -112,6 +112,8 @@ func errOf(reason string) error {
 		return ErrLocked
 	case reasonNewCode:
 		return ErrNewCode
+	case reasonPreviewEnded:
+		return ErrPreviewEnded
 	case reasonBlocked:
 		return ErrBlocked
 	case reasonFull:
@@ -144,6 +146,9 @@ type Timing struct {
 	// Prove is how long a connection has, from its accepting, to prove the
 	// code, the link or its key, in all: 5 s.
 	Prove time.Duration
+	// Preview is how long a computer that proved the code or the link may
+	// wait before it joins: 5 minutes (previews.go).
+	Preview time.Duration
 	// Keep is how long the host keeps the place of a guest that dropped
 	// off: 15 minutes.
 	Keep time.Duration
@@ -163,6 +168,7 @@ type Timing struct {
 func (t Timing) ping() time.Duration    { return or(t.Ping, 2*time.Second) }
 func (t Timing) silence() time.Duration { return or(t.Silence, 6*time.Second) }
 func (t Timing) prove() time.Duration   { return or(t.Prove, 5*time.Second) }
+func (t Timing) preview() time.Duration { return or(t.Preview, 5*time.Minute) }
 func (t Timing) keep() time.Duration    { return or(t.Keep, 15*time.Minute) }
 func (t Timing) gate() time.Duration    { return or(t.Gate, 5*time.Second) }
 func (t Timing) lead() time.Duration    { return or(t.Lead, 350*time.Millisecond) }

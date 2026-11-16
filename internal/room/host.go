@@ -141,6 +141,7 @@ type conn struct {
 	f    *frames
 	key  remote.Fingerprint
 	src  string
+	held time.Time // when it proved the code or the link, while it waits to join (previews.go)
 	out  chan message
 	once sync.Once
 	gone chan struct{}
@@ -501,6 +502,7 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 			s.previews = map[*conn]int{}
 		}
 		s.previews[c] = gen
+		s.holdPreview(c)
 	}
 	s.mu.Unlock()
 	if newCode {

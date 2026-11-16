@@ -567,6 +567,8 @@ func roomProblem(name string, err error) string {
 		return name + "'s room isn't taking codes for a minute: ask " + name + " for the invite link."
 	case errors.Is(err, room.ErrNewCode):
 		return name + "'s room has a new code: ask " + name + " for it, or for the new invite link."
+	case errors.Is(err, room.ErrPreviewEnded):
+		return "You waited long to join " + name + "'s room, or many others knocked at once: open its link, or type its code, again."
 	case errors.Is(err, room.ErrBusy):
 		return name + "'s room checks other codes: try again in a moment."
 	case errors.Is(err, room.ErrBlocked):

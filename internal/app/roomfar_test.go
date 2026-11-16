@@ -116,3 +116,10 @@ func TestFarProblem(t *testing.T) {
 		t.Fatalf("near: %q", got)
 	}
 }
+
+// TestPreviewEndedProblem tells a guest whose preview ended what to do.
+func TestPreviewEndedProblem(t *testing.T) {
+	if got := roomProblem("Desk", room.ErrPreviewEnded); !strings.Contains(got, "Desk's room") || !strings.Contains(got, "again") {
+		t.Fatalf("problem %q", got)
+	}
+}

@@ -75,6 +75,11 @@ type caps struct {
 	// burst of acceptBurst (limits.go): none when 0, as in tests of other
 	// bounds.
 	accepts int
+	// previews and previewsFrom bound the computers that proved the code
+	// or the link and wait to join, room-wide and of one source
+	// (previews.go): when 0, maxPreviews and maxPreviewsFrom, or the caps
+	// of the unproven when more.
+	previews, previewsFrom int
 }
 
 func (c *caps) orDefault() caps {

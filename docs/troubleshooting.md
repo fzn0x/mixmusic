@@ -105,6 +105,12 @@ its **details**. The keyboard reaches **details** in the toast with
   `libayatana-appindicator3` and a desktop that shows AppIndicator icons;
   GNOME needs its AppIndicator extension. Without it, closing the window
   quits MixMusic.
+- **Chinese, Japanese or Korean letters are blank on Linux.** No font on
+  the system has them, and MixMusic bundles none. Install one, such as
+  `fonts-noto-cjk` on Debian and Ubuntu, `google-noto-sans-cjk-vf-fonts` on
+  Fedora or `noto-fonts-cjk` on Arch, then restart MixMusic, as
+  [Getting started](getting-started.md#the-first-launch) says. Thai and
+  the Indic scripts need a system font too.
 - **Linux does not start it.** Install GTK 3, as
   [Getting started](getting-started.md#the-first-launch) says.
 - **macOS cannot check the app,** as it is not notarized yet: open it from

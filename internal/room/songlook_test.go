@@ -114,3 +114,29 @@ func TestAcceptAfterBlock(t *testing.T) {
 		t.Fatal("added the song of a guest blocked since it asked")
 	}
 }
+
+// TestSongsOfNoTitleFindNothing refuses songs of no title before they take
+// a place among those the host finds: as many as it finds at once leave
+// room for the next.
+func TestSongsOfNoTitleFindNothing(t *testing.T) {
+	r, f := newRuledRoom(t, Rules{Songs: SongsAdd})
+	for i := range 2 {
+		s := r.join(newGuest(t, "Guest "+strconv.Itoa(i)))
+		c := events(s)
+		for range maxLooks / 2 {
+			s.AddSong(remote.QueueTrack{Source: "youtube", ID: song("a").ID})
+			if e := next(t, c, SongAnswered); e.Reason != CantPlay {
+				t.Fatalf("a song of no title: %q", e.Reason)
+			}
+		}
+	}
+	s := r.join(newGuest(t, "Bo"))
+	c := events(s)
+	s.AddSong(song("b"))
+	if e := next(t, c, SongAnswered); e.Reason != "" {
+		t.Fatalf("a song once those of no title were refused: %q", e.Reason)
+	}
+	if len(f.addedNow()) != 1 {
+		t.Fatal("not added")
+	}
+}

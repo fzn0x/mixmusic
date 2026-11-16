@@ -105,6 +105,8 @@ func (s *Server) addSong(c *conn, m message) {
 	switch {
 	case rules.Songs == SongsOff || gs == nil || gs.Add == nil || gs.Look == nil:
 		reason = SongsAreOff
+	case t.Title == "":
+		reason = CantPlay
 	case rules.Songs == SongsAsk && waiting >= MaxWaiting, s.asks.looks >= maxLooks:
 		reason = TooMany
 	case !s.takes(c, func(l *limits) *bucket { return &l.songs }, songsPerMinute, time.Minute/songsPerMinute):
@@ -115,9 +117,6 @@ func (s *Server) addSong(c *conn, m message) {
 		s.looking(c.key, 1)
 	}
 	s.mu.Unlock()
-	if reason == "" && t.Title == "" {
-		reason = CantPlay
-	}
 	switch {
 	case reason != "":
 		answer(reason)

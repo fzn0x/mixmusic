@@ -188,7 +188,7 @@ type serviceArtists struct {
 // many it shows.
 func (s *shell) serviceArtistShelf(c *ui.Context, sv serviceArtists) int {
 	switch l := sv.artists; {
-	case !l.done:
+	case l.waiting():
 		s.loading(c)
 		return 0
 	case l.err != nil:
@@ -198,7 +198,7 @@ func (s *shell) serviceArtistShelf(c *ui.Context, sv serviceArtists) int {
 		}
 	}
 	var shown []media.Artist
-	for _, a := range sv.artists.value {
+	for _, a := range sv.artists.shown() {
 		if !s.svc.Collection.FollowsArtist(a.ID) {
 			shown = append(shown, a)
 		}
@@ -209,6 +209,9 @@ func (s *shell) serviceArtistShelf(c *ui.Context, sv serviceArtists) int {
 				s.artistTile(c, sv.key+"-followed-"+count(i), shown[i])
 			})
 		})
+	}
+	if sv.artists.growing() {
+		s.moreComing(c, sv.key+"-followed")
 	}
 	return len(shown)
 }

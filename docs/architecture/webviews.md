@@ -32,3 +32,11 @@ Three web pages still show, and only while they're needed:
   and follows the engine's time (`Player.Clock`), which the window sends
   it four times a second with the moment it read it. A box over the web
   view keeps the pointer and the keyboard in the native interface.
+  Its loop mode plays the clip of an album's moving cover
+  (`movingclip.go`, `internal/app/movingcovers.go`), once a source of
+  clips is set (`Options.Clips`): the page fetches the clip whole from
+  the stream scheme, which serves it from the store of clips, as a blob,
+  loops it muted and cut to the sleeve's square, follows no clock, and
+  fails a clip that shows no new frame for 5 seconds. GIF covers move
+  with no web view (`movingcover.go`): MyGo's GIF decoder draws each
+  frame into a bitmap that a `Draw` closure paints as it comes due.

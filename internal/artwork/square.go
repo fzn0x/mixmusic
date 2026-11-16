@@ -28,6 +28,12 @@ func Square(data []byte, px int) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("artwork: %w", err)
 	}
+	return squareOf(img, px)
+}
+
+// squareOf encodes the centre square of img, at most px across, as Square
+// does.
+func squareOf(img image.Image, px int) ([]byte, error) {
 	b := img.Bounds()
 	side := min(b.Dx(), b.Dy())
 	if side <= 0 || px <= 0 {
@@ -43,6 +49,7 @@ func Square(data []byte, px int) ([]byte, error) {
 		draw.CatmullRom.Scale(dst, dst.Bounds(), img, crop, draw.Src, nil)
 	}
 	var out bytes.Buffer
+	var err error
 	if dst.Opaque() {
 		err = jpeg.Encode(&out, dst, &jpeg.Options{Quality: 90})
 	} else {

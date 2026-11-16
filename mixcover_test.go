@@ -117,7 +117,7 @@ func TestMixCoverFromFile(t *testing.T) {
 	click(t, s, tt, "choose an image…")
 	select {
 	case opts := <-chose:
-		if len(opts.Filters) != 1 || !slices.Equal(opts.Filters[0].Extensions, []string{"png", "jpg", "jpeg", "webp"}) {
+		if len(opts.Filters) != 1 || !slices.Equal(opts.Filters[0].Extensions, []string{"png", "jpg", "jpeg", "gif", "webp"}) {
 			t.Errorf("the dialog asks for %+v", opts.Filters)
 		}
 	case <-time.After(5 * time.Second):

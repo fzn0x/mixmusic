@@ -95,6 +95,11 @@ type Playback struct {
 	// page, in place of their cover. It is off at first: it fetches more
 	// than the sound, and shows a web page there.
 	MusicVideos bool `json:"musicVideos"`
+	// MovingCovers plays the covers that move on the now playing page and
+	// a mix's page: the GIF of a mix or of the music on the computer, and
+	// an album's clip once a source of them is chosen (#569). It is off
+	// at first, as MusicVideos is.
+	MovingCovers bool `json:"movingCovers"`
 	// Equalizer shapes the sound of MixMusic's own player.
 	Equalizer Equalizer `json:"equalizer"`
 	// VolumeCurve is how the positions of the volume slider sound, in

@@ -48,6 +48,7 @@
   "cleanVersions": false,
   "hideExplicit": false,
   "musicVideos": false,
+  "movingCovers": false,
   "equalizer": {
     "enabled": false,
     "preset": "flat",
@@ -68,6 +69,7 @@
   "volumeCurve": "natural",
   "volume": 0.8,
   "cacheSizeMb": 1024,
+  "movingCoversMb": 256,
   "lyricsTranslateTo": "",
   "downloadsFolder": "",
   "downloadOnMetered": false,

@@ -21,6 +21,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/cast"
+	"github.com/fzn0x/mixmusic/internal/clips"
 	"github.com/fzn0x/mixmusic/internal/diag"
 	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/library"
@@ -90,6 +91,9 @@ type Options struct {
 	// romaji downloads, comes from: romaji.DictionaryURL when empty. Tests
 	// give their own.
 	RomajiURL string
+	// Clips finds the clips of the albums' moving covers: none while it's
+	// nil, as until a source of them is chosen (#569).
+	Clips ClipSource
 	// CastBrowse, when set, finds the cast devices on the network in place
 	// of mDNS: tests set it.
 	CastBrowse func(ctx context.Context) ([]cast.Device, error)
@@ -164,6 +168,7 @@ type App struct {
 	related      *memo[[]media.Shelf]
 	artwork      *artwork.Client
 	artStore     *artwork.Store
+	clips        *clips.Store // the clips of moving covers (movingcovers.go)
 	colors       *memo[string]
 	// colorFile follows the colour file the settings name.
 	colorFile colorFile
@@ -359,6 +364,7 @@ func New(opts Options) (*App, error) {
 	a.related = newMemo[[]media.Shelf](100)
 	a.episodeDetails = newMemo[media.EpisodeDetails](100)
 	a.artStore = artwork.NewStore(filepath.Join(opts.CacheDir, "artwork"), artworkLimit)
+	a.clips = clips.NewStore(filepath.Join(opts.CacheDir, "moving-covers"), clipLimit(s.MovingCoversMB))
 	a.artwork = artwork.New()
 	a.artwork.Store = a.artStore
 	a.colors = newMemo[string](500)
@@ -378,6 +384,7 @@ func (a *App) apply(s settings.Settings) {
 	a.resolver.SetQuality(stream.Quality(s.Quality))
 	a.resolver.SetAsAccount(s.AudioAsAccount)
 	a.cache.SetLimit(int64(s.CacheSizeMB) << 20)
+	a.clips.SetLimit(clipLimit(s.MovingCoversMB))
 	a.downloads.SetMetered(a.metered.Load(), s.DownloadOnMetered)
 	a.followLocalFiles(s)
 	if a.auth.ClientID() != s.SpotifyClientID {

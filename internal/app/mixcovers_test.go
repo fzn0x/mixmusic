@@ -7,7 +7,6 @@ import (
 	"errors"
 	"image"
 	"image/color"
-	"image/gif"
 	"os"
 	"path/filepath"
 	"testing"
@@ -146,15 +145,11 @@ func TestMixCoverWebP(t *testing.T) {
 	}
 }
 
-// TestMixCoverRefused makes no cover of what isn't a PNG, a JPEG or a
-// WebP, nor for what isn't a mix, and keeps no file of them.
+// TestMixCoverRefused makes no cover of what isn't a PNG, a JPEG, a GIF
+// or a WebP, nor for what isn't a mix, and keeps no file of them.
 func TestMixCoverRefused(t *testing.T) {
 	c, p, _ := coverMix(t)
-	var g bytes.Buffer
-	if err := gif.Encode(&g, image.NewPaletted(image.Rect(0, 0, 4, 4), color.Palette{color.Black}), nil); err != nil {
-		t.Fatal(err)
-	}
-	for name, data := range map[string][]byte{"notes.txt": []byte("not an image"), "moving.gif": g.Bytes()} {
+	for name, data := range map[string][]byte{"notes.txt": []byte("not an image"), "broken.gif": testGIF(t, 8, 8, 2)[:30]} {
 		if err := c.SetMixCover(p.ID, writeImage(t, name, data)); !errors.Is(err, errNotCover) {
 			t.Errorf("%s: %v", name, err)
 		}

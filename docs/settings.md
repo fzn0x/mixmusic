@@ -39,6 +39,7 @@ How MixMusic plays; [Playing music](playing-music.md) tells all of it.
 | Sound | **[Output device](playing-music.md#the-output-device)** (System default, or a device by name), **[Quality](playing-music.md#data-saver)** (best, or data saver), **[Play audio as your account](playing-music.md#play-audio-as-your-account)** (off at first, for YouTube Music Premium's higher bitrate), **[Crossfade](playing-music.md#crossfade-and-gapless-playback)** (off, or 1 to 12 seconds), **[Even loudness](playing-music.md#even-loudness-volume-levelling-and-the-volume)**, **Volume levelling**, **Play 5.1 surround when a track has it**, **[Autoplay](playing-music.md#autoplay-and-radios)**, **[Skip songs made with AI](playing-music.md#skipping-songs-made-with-ai)** and **[Skip songs you dislike](playing-music.md#dislikes-and-skipping)**. |
 | [Speed](playing-music.md#speed) | **Songs** and **Podcasts**, each from 0.5× to 3×, at the tracks' own pitch, with **normal** to go back to 1×. |
 | [Music videos](playing-music.md#the-picture-of-music-videos) | **Show the video of music videos**, on the now playing page. |
+| [Moving covers](playing-music.md#moving-covers) | **Show moving covers**: GIF covers move on the now playing page and a mix's page. Off at first. |
 | [Explicit content](playing-music.md#hiding-explicit-content) | **[Prefer clean versions](playing-music.md#versions-of-an-album)**: an album that comes explicit and clean shows its clean version, and opens on it. **[Hide explicit content](playing-music.md#hiding-explicit-content)**: the songs, albums and videos marked explicit don't show where the services list music, and never play; Prefer clean versions stays on meanwhile. |
 | [Equalizer](playing-music.md#the-equalizer) | The **Equalizer** switch, a **Preset** (Flat, Bass boost, Treble boost, Vocal, Electronic, Rock, Acoustic, Late night or Lo-fi), and the preamp and ten bands, from −12 to +12 dB. |
 | [Volume](playing-music.md#even-loudness-volume-levelling-and-the-volume) | **Volume curve**: Natural, even steps of loudness, or Linear, where the level grows evenly along the slider. |
@@ -316,6 +317,7 @@ while you're not typing in a text field. The ID is the command's name in
 | Zoom out | <kbd>Ctrl</kbd> <kbd>-</kbd> | <kbd>⌘</kbd> <kbd>-</kbd> | `view.zoomOut` |
 | Reset zoom | <kbd>Ctrl</kbd> <kbd>0</kbd> | <kbd>⌘</kbd> <kbd>0</kbd> | `view.zoomReset` |
 | Show or hide the video of music videos | none | none | `view.video` |
+| Show or hide [moving covers](playing-music.md#moving-covers) | none | none | `view.movingCovers` |
 
 ### Add-ons and settings
 

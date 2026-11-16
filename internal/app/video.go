@@ -39,6 +39,9 @@ type VideoSource struct {
 	// Segments are the parts of the stream the page appends whole: their
 	// time and duration in seconds, and their first and last bytes.
 	Segments [][4]float64 `json:"segments"`
+	// Loop is set on the clip of a moving cover, which the page fetches
+	// whole and loops, following no clock (movingcovers.go).
+	Loop bool `json:"loop,omitempty"`
 }
 
 // errNotMusicVideo is returned for the picture of a track that is no music
@@ -105,6 +108,10 @@ func (a *App) videoHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if page := a.videoPage.Load(); page == nil || callerPage(r.Context()) != page {
 			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
+		if strings.HasPrefix(r.URL.Path, clipPath) {
+			a.serveClip(w, r)
 			return
 		}
 		a.proxy.ServeVideo(w, r)

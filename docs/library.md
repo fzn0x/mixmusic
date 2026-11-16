@@ -54,8 +54,9 @@ Your mixes show in the sidebar under Your mixes, with how many tracks each holds
 
 A mix shows the cover of its first song that has one, until you choose another.
 
-- **Change cover…**, in the More menu of the mix's page, or in the menu of its tile in Library › Mixes and on Home, opens a dialog: **choose an image…** opens a PNG, JPEG or WebP file of yours, and the covers of the mix's songs below are a click away.
+- **Change cover…**, in the More menu of the mix's page, or in the menu of its tile in Library › Mixes and on Home, opens a dialog: **choose an image…** opens a PNG, JPEG, GIF or WebP file of yours, and the covers of the mix's songs below are a click away.
 - **The cover** shows cut to a centred square, on the mix's page and its tiles. MixMusic keeps a copy of it, at most 600 pixels across, in `mix-covers` in your [data folder](data-and-privacy.md#the-data-folder): the file you chose can move or go.
+- **A GIF that moves** is kept so too, every frame of it, beside a still of its first frame, which the tiles show. With [Show moving covers](playing-music.md#moving-covers) on, it moves in the head of the mix's page.
 - **Use the songs' covers**, in the same dialog, goes back to them. Deleting the mix deletes its cover too.
 
 ## Artists you follow
@@ -221,5 +222,6 @@ Apart from downloads, MixMusic keeps the tracks you played, so that they play ag
 - **Tracks kept:** how many tracks the cache holds and their size, with Clear. Clearing the cache leaves your downloads.
 - **Covers kept:** the covers you saw, up to 256 MB, which show again without the network, with Clear.
 - **Size:** Off, 512 MB, 1 GB (the default), 4 GB or 16 GB. Off keeps no tracks.
+- **Moving covers kept**, once albums' [moving covers](playing-music.md#moving-covers) come: the clips that played, which loop again without the network, with Clear, in a store of their own, so that they never push covers out. Each album's clip is looked for once, and so is an album found to have none. Their **Size** is Off, 64, 128, 256 (the default) or 512 MB, 1, 2, 4 or 8 GB, or Unlimited; Off keeps only the clip that plays.
 
 The cache keeps how loud YouTube measured each track too, for [Even loudness](playing-music.md#even-loudness-volume-levelling-and-the-volume) offline. Live streams aren't kept in it, and a track's 5.1 surround mix is kept beside its stereo audio. [The audio engine](audio-engine.md#the-offline-cache) tells how it fills and empties.

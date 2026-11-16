@@ -184,6 +184,11 @@ func ownYTDLPHelp(flatpak bool) string {
 
 func init() { addSettings("playback", 70, (*shell).cacheSettings) }
 
+// cacheRows are the rows of Settings › Playback › Offline cache that
+// register from their features' files, between the covers kept and the
+// cache's size.
+const cacheRows = "playback › Offline cache"
+
 // cacheSettings show what the offline cache holds, and bound it.
 func (s *shell) cacheSettings(c *ui.Context) {
 	k := &s.lk
@@ -222,6 +227,7 @@ func (s *shell) cacheSettings(c *ui.Context) {
 				}()
 			}
 		})
+		s.settingsOf(c, cacheRows)
 		// The sizes the web interface offered, and one of the user's own.
 		sizes := cacheSizes
 		if !slices.Contains(sizes, s.set.CacheSizeMB) {

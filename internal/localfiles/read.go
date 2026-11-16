@@ -113,8 +113,16 @@ func (x *Index) keepArt(data []byte, mime string) string {
 	return name
 }
 
+// coverKinds are the images beside a file that may be its album's cover,
+// by their extensions: the stills first, then a GIF, which moves on the
+// now playing page (#569), where no still of its name is.
+var coverKinds = []map[string]string{
+	{".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"},
+	{".gif": "image/gif"},
+}
+
 // coverBeside keeps the image beside a file that is its album's cover, as
-// cover.jpg or folder.png: "" when there is none.
+// cover.jpg, folder.png or cover.gif: "" when there is none.
 func (x *Index) coverBeside(path string) string {
 	dir := filepath.Dir(path)
 	entries, err := os.ReadDir(dir)
@@ -122,27 +130,38 @@ func (x *Index) coverBeside(path string) string {
 		return ""
 	}
 	for _, want := range coverNames {
-		for _, d := range entries {
-			name := strings.ToLower(d.Name())
-			ext := filepath.Ext(name)
-			if d.IsDir() || strings.TrimSuffix(name, ext) != want {
-				continue
+		for _, kinds := range coverKinds {
+			if name := x.coverNamed(dir, entries, want, kinds); name != "" {
+				return name
 			}
-			mime := map[string]string{".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}[ext]
-			if mime == "" {
-				continue
-			}
-			f, err := os.Open(filepath.Join(dir, d.Name()))
-			if err != nil {
-				continue
-			}
-			data, err := io.ReadAll(io.LimitReader(f, maxCover+1))
-			f.Close()
-			if err != nil || len(data) > maxCover {
-				continue
-			}
-			return x.keepArt(data, mime)
 		}
+	}
+	return ""
+}
+
+// coverNamed keeps the image of entries, those of dir, named want, of one
+// of kinds: "" when there is none.
+func (x *Index) coverNamed(dir string, entries []os.DirEntry, want string, kinds map[string]string) string {
+	for _, d := range entries {
+		name := strings.ToLower(d.Name())
+		ext := filepath.Ext(name)
+		if d.IsDir() || strings.TrimSuffix(name, ext) != want {
+			continue
+		}
+		mime := kinds[ext]
+		if mime == "" {
+			continue
+		}
+		f, err := os.Open(filepath.Join(dir, d.Name()))
+		if err != nil {
+			continue
+		}
+		data, err := io.ReadAll(io.LimitReader(f, maxCover+1))
+		f.Close()
+		if err != nil || len(data) > maxCover {
+			continue
+		}
+		return x.keepArt(data, mime)
 	}
 	return ""
 }

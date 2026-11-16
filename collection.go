@@ -20,6 +20,7 @@ type headProps struct {
 	// shows none for a head without.
 	title       string
 	art         []media.Image
+	moving      bool // art plays when it's a GIF that moves (movingcover.go)
 	round       bool
 	source      media.Source
 	facts       []fact
@@ -69,7 +70,11 @@ func (s *shell) collectionHead(c *ui.Context, h headProps) {
 			download: h.download, menu: h.menu})
 	}
 	head.Children(func() {
-		s.cover(c, "head-cover", h.art, size, h.round)
+		if h.moving {
+			s.movingCover(c, "head-cover", h.art, size, true, "Moving cover: "+h.title)
+		} else {
+			s.cover(c, "head-cover", h.art, size, h.round)
+		}
 		ui.Column(c).Grow(1).MinWidth(0).Gap(12).Children(func() {
 			ui.Row(c).Gap(6).Wrap().Children(func() {
 				s.sourceMark(c, h.source, false)
@@ -342,6 +347,7 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 			}
 		}
 		h := headProps{title: p.Title, art: p.Artwork, source: p.Source, facts: facts, description: p.Description, download: d, menu: menu}
+		h.moving = local
 		if len(tracks) > 0 {
 			h.play = func() { s.whenRead(r, "plays", func(t []media.Track) { s.p.PlayAll(t, false) }) }
 			h.shuffle = func() { s.whenRead(r, "shuffles", s.shuffled) }

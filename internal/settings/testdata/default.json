@@ -87,6 +87,8 @@
   "miniZoom": 0,
   "mediaKeys": true,
   "assistantControl": false,
+  "roomName": "",
+  "roomFollowVolume": false,
   "showOnDiscord": true,
   "discordAppId": "",
   "discordFirstLine": "{title}",

@@ -25,7 +25,8 @@ three minutes after it was last seen. Groups of speakers aren't listed.
 
 Below the devices, the menu lists the other computers with MixMusic's
 [remote control](remote-control.md) on, which you control from here
-rather than play on.
+rather than play on, and the rooms of
+[Listen with friends](listen-with-friends.md), which you start or join.
 
 ## What plays on the device
 

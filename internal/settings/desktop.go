@@ -40,6 +40,13 @@ type Desktop struct {
 	// MixMusic over MCP (#477), through the command they start. It is off
 	// at first.
 	AssistantControl bool `json:"assistantControl"`
+	// RoomName is the user's name in the rooms of Listen with friends
+	// (#561), which the host and the other guests show, of at most 50
+	// characters: "" is the computer's name.
+	RoomName string `json:"roomName"`
+	// RoomFollowVolume has a guest of a room play at the host's volume,
+	// rather than its own. It is off at first.
+	RoomFollowVolume bool `json:"roomFollowVolume"`
 	// DiscordPresence shows what plays on the user's Discord profile, as
 	// the Discord application of DiscordAppID, or MixMusic's own when it
 	// is empty.
@@ -96,6 +103,7 @@ func defaultDesktop() Desktop {
 func (d Desktop) clean() Desktop {
 	d.MiniPanel = cleanMiniPanel(d.MiniPanel)
 	d.MiniZoom = zoomStep(d.MiniZoom, 0)
+	d.RoomName = cleanRoomName(d.RoomName)
 	if d.DiscordAppID = strings.TrimSpace(d.DiscordAppID); !discordIDRe.MatchString(d.DiscordAppID) {
 		d.DiscordAppID = ""
 	}

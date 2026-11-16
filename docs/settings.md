@@ -90,6 +90,12 @@ pair with it by a code it shows, and control it; and the computers
 paired, each with **Remove**. [Remote control](remote-control.md) tells
 more.
 
+The **Listen with friends** group: **start a room**, or open the room you
+host or are in; **Your name in rooms**, what the others see you as, your
+computer's name when empty; and **Follow the host's volume**, off at
+first, which plays a room's tracks at its host's volume.
+[Listen with friends](listen-with-friends.md) tells more.
+
 The **Windows Firewall** group, on Windows: **Connections from your
 network** tells whether other computers and cast devices on your network
 can reach MixMusic, for remote control and casting, and why not when they

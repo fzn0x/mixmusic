@@ -78,6 +78,7 @@ func (a *App) Start() {
 	a.watchNetwork()
 	a.watchCast()
 	a.watchRemote()
+	a.watchRooms()
 	a.downloads.Start()
 	a.startLocalFiles()
 	go a.keepYTDLPCurrent()
@@ -319,6 +320,10 @@ func (a *App) HandleURL(raw string) {
 		}
 		if id, ok := strings.CutPrefix(path, "/play/"); ok {
 			a.command(PlayerCommand{Command: CommandPlayTrack, TrackID: id})
+			return
+		}
+		// mixmusic://join/<code>#… opens a room's invite (room.go).
+		if a.followRoomLink(u, a.showMain) {
 			return
 		}
 		if !deepLinkPathRe.MatchString(path) {

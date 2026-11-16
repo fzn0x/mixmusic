@@ -1,15 +1,10 @@
 package remote
 
 import (
-	"bufio"
-	"encoding/binary"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net"
 	"strings"
-	"sync"
 	"time"
 	"unicode"
 )
@@ -119,56 +114,27 @@ type message struct {
 	Taken    *Taken    `json:"taken,omitempty"`
 }
 
-// wire sends and receives messages over a connection: each after its
-// length, in 4 bytes. Sends may come from any goroutine.
-type wire struct {
-	conn net.Conn
-	r    *bufio.Reader
-	mu   sync.Mutex
-}
+// wire sends and receives messages over a connection, as Frames does.
+// Sends may come from any goroutine.
+type wire struct{ f *Frames }
 
-func newWire(conn net.Conn) *wire { return &wire{conn: conn, r: bufio.NewReader(conn)} }
+func newWire(conn net.Conn) *wire { return &wire{f: NewFrames(conn)} }
 
 // send sends m, giving up after wait.
-func (w *wire) send(m message, wait time.Duration) error {
-	data, err := json.Marshal(m)
-	if err != nil {
-		return err
-	}
-	b := binary.BigEndian.AppendUint32(make([]byte, 0, 4+len(data)), uint32(len(data)))
-	b = append(b, data...)
-	w.mu.Lock()
-	defer w.mu.Unlock()
-	w.conn.SetWriteDeadline(time.Now().Add(wait))
-	_, err = w.conn.Write(b)
-	return err
-}
+func (w *wire) send(m message, wait time.Duration) error { return w.f.Send(m, wait) }
 
 // receive waits up to wait for the next message.
 func (w *wire) receive(wait time.Duration) (message, error) {
-	w.conn.SetReadDeadline(time.Now().Add(wait))
-	return w.read()
+	var m message
+	err := w.f.Receive(&m, wait)
+	return m, err
 }
 
 // read reads the next message, until the connection's read deadline.
 func (w *wire) read() (message, error) {
 	var m message
-	var head [4]byte
-	if _, err := io.ReadFull(w.r, head[:]); err != nil {
-		return m, quiet(err)
-	}
-	n := binary.BigEndian.Uint32(head[:])
-	if n > maxMessage {
-		return m, fmt.Errorf("remote: a message of %d bytes", n)
-	}
-	data := make([]byte, n)
-	if _, err := io.ReadFull(w.r, data); err != nil {
-		return m, quiet(err)
-	}
-	if err := json.Unmarshal(data, &m); err != nil {
-		return m, fmt.Errorf("remote: a message that isn't JSON: %w", err)
-	}
-	return m, nil
+	err := w.f.Read(&m)
+	return m, err
 }
 
 // quiet is ErrLost for a read that waited too long.

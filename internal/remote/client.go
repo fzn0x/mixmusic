@@ -44,26 +44,9 @@ func (d *Dialer) connect(ctx context.Context, addr string, pinned *Fingerprint) 
 	if err != nil {
 		return nil, Fingerprint{}, err
 	}
+	// No chain is checked: the key is, as the handshake runs.
 	var peer Fingerprint
-	tc := tls.Client(raw, &tls.Config{
-		Certificates: []tls.Certificate{d.Identity.cert},
-		// No chain is checked: the key is, below.
-		InsecureSkipVerify: true,
-		MinVersion:         tls.VersionTLS13,
-		NextProtos:         []string{alpn},
-		ServerName:         "mixmusic",
-		VerifyConnection: func(cs tls.ConnectionState) error {
-			fp, err := peerKey(cs)
-			if err != nil {
-				return err
-			}
-			if pinned != nil && fp != *pinned {
-				return ErrNotSame
-			}
-			peer = fp
-			return nil
-		},
-	})
+	tc := tls.Client(raw, d.Identity.ClientTLS(alpn, pinned, &peer))
 	if err := tc.HandshakeContext(ctx); err != nil {
 		raw.Close()
 		if errors.Is(err, ErrNotSame) {

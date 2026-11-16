@@ -201,23 +201,9 @@ func (s *Server) Sessions() int {
 	return len(s.conns)
 }
 
-func (s *Server) tlsConfig() *tls.Config {
-	return &tls.Config{
-		Certificates: []tls.Certificate{s.Identity.cert},
-		// Any key may connect: whether it may control, Host tells, or it
-		// asks to pair.
-		ClientAuth: tls.RequireAnyClientCert,
-		MinVersion: tls.VersionTLS13,
-		NextProtos: []string{alpn},
-		VerifyConnection: func(cs tls.ConnectionState) error {
-			if cs.NegotiatedProtocol != alpn {
-				return errors.New("remote: not MixMusic's protocol")
-			}
-			_, err := peerKey(cs)
-			return err
-		},
-	}
-}
+// tlsConfig lets any key connect: whether it may control, Host tells, or
+// it asks to pair.
+func (s *Server) tlsConfig() *tls.Config { return s.Identity.ServerTLS(alpn) }
 
 // handle runs a connection: TLS, then a hello, then a pairing or a
 // session.

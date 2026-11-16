@@ -42,6 +42,9 @@ and how much.
   session. Its `Discovery` interface finds and announces the computers:
   `MDNS` on the network, and `remotetest`'s fake, which tests use, in
   memory.
+  Its transport (`transport.go`): the key's certificate, TLS between two
+  keys, and the framing of the messages, is the one the rooms of Listen
+  with friends speak over too ([rooms.md](rooms.md)).
 - **The app** (`internal/app/remote*.go`) keeps the settings and the
   paired computers in `remote.json`, and the key in the system's
   credential store; runs the server while remote control is on; answers

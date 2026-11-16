@@ -37,7 +37,8 @@ func (a *App) startGoPlayer() (*player.Player, error) {
 		return nil, err
 	}
 	a.queue = queue
-	p := player.New(playerServices{a}, engineStream{a, e}, connectDevice{a}, queue.Get())
+	// A room this computer hosts holds the starts for its guests (roomhost.go).
+	p := player.New(playerServices{a}, roomStream{engineStream{a, e}, a}, connectDevice{a}, queue.Get())
 	if spotifyPlaysHere {
 		p.SpotifyHere(hereDevice{&a.here})
 	}
@@ -190,7 +191,11 @@ func (s playerServices) Online(ctx context.Context) bool      { return s.a.onlin
 func (s playerServices) WaitOnline(ctx context.Context) error { return s.a.online.Wait(ctx) }
 func (s playerServices) KickOnline()                          { s.a.online.Kick() }
 
-func (s playerServices) Settings() settings.Settings { return s.a.settings.Get().Clean() }
+// Settings are the user's, but while following the host of a room
+// (roomfollow.go).
+func (s playerServices) Settings() settings.Settings {
+	return s.a.roomSettings(s.a.settings.Get().Clean())
+}
 
 func (s playerServices) SaveVolume(v float64) {
 	if _, err := (&Preferences{s.a}).Update(func(st *settings.Settings) { st.Volume = v }); err != nil {
@@ -218,6 +223,10 @@ func (s playerServices) Report(now player.Now) {
 }
 
 func (s playerServices) SaveQueue(saved player.Saved) {
+	// The queue of a room's host isn't the user's: theirs stays.
+	if !s.a.keepsQueue() {
+		return
+	}
 	if err := s.a.queue.Update(func(v *player.Saved) error {
 		*v = saved
 		return nil

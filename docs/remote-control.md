@@ -105,9 +105,10 @@ tells more.
 
 ## Firewalls and the local network
 
-While remote control is on, MixMusic listens for the other computers on
-your local network. So the first time you turn it on, your system may ask
-about it:
+While remote control is on, or a room of
+[Listen with friends](listen-with-friends.md) is open, MixMusic listens
+for the other computers on your local network. So the first time you turn
+it on, your system may ask about it:
 
 - **Windows**: Windows Defender Firewall asks whether MixMusic may take
   connections from your network. Allow it on private networks, such as the

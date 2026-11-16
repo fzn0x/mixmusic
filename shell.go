@@ -32,7 +32,7 @@ func (s *shell) view(c *ui.Context) {
 	s.zoomInKey()
 	s.followOnTop()
 	k := &s.lk
-	root := ui.Column(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body)
+	root := ui.Column(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body).DrawOver(s.notePixels)
 	s.ground(c, root)
 	root.Children(func() {
 		ui.Row(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Children(func() {

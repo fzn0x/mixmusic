@@ -25,6 +25,9 @@ type assistantCatalog interface {
 	Search(ctx context.Context, query string) (SearchResponse, error)
 	Album(ctx context.Context, id string) (media.Album, error)
 	Artist(ctx context.Context, id string) (media.Artist, error)
+	// ArtistSongs returns all the songs of the artist, their top songs
+	// when it can't read them all.
+	ArtistSongs(ctx context.Context, a media.Artist) ([]media.Track, error)
 	// Playlist returns a playlist with all its tracks.
 	Playlist(ctx context.Context, id string) (media.Playlist, error)
 	// Playlists are the user's: their mixes, then their playlists of the
@@ -47,6 +50,10 @@ func (c appCatalog) Album(ctx context.Context, id string) (media.Album, error) {
 
 func (c appCatalog) Artist(ctx context.Context, id string) (media.Artist, error) {
 	return (&Catalog{c.a}).Artist(ctx, id)
+}
+
+func (c appCatalog) ArtistSongs(ctx context.Context, a media.Artist) ([]media.Track, error) {
+	return (&Catalog{c.a}).AllSongs(ctx, a)
 }
 
 func (c appCatalog) Playlist(ctx context.Context, id string) (media.Playlist, error) {
@@ -251,7 +258,7 @@ func (a *App) toolSearch(ctx context.Context, args json.RawMessage) (mcp.Result,
 }
 
 // foundTracks finds the tracks of what a tool told of: a song's own, an
-// album's, an artist's top tracks, a playlist's, the liked songs.
+// album's, all of an artist's songs, a playlist's, the liked songs.
 func (a *App) foundTracks(ctx context.Context, id string, f assistantFound) ([]media.Track, string, error) {
 	cat := a.toolCatalog()
 	switch f.Kind {
@@ -262,7 +269,16 @@ func (a *App) foundTracks(ctx context.Context, id string, f assistantFound) ([]m
 		return al.Tracks, "the album “" + oneLine(f.Title) + "”", err
 	case kindArtist:
 		ar, err := cat.Artist(ctx, id)
-		return ar.TopTracks, "the top tracks of " + oneLine(f.Title), err
+		if err != nil {
+			return nil, "the artist " + oneLine(f.Title), err
+		}
+		// All their songs, as their page's Play plays; the top songs when
+		// they can't be read. A read that came in part gives what came.
+		songs, err := cat.ArtistSongs(ctx, ar)
+		if len(songs) > 0 {
+			err = nil
+		}
+		return songs, "all the songs of " + oneLine(f.Title), err
 	}
 	if id == likedID {
 		return cat.Liked(), "your liked songs", nil

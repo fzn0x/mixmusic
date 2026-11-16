@@ -28,6 +28,7 @@ type fakeCatalog struct {
 	found     SearchResponse
 	albums    map[string]media.Album
 	artists   map[string]media.Artist
+	songsOf   map[string][]media.Track // all the songs of an artist, by their ID
 	playlists map[string]media.Playlist
 	mine      []media.Playlist
 	mineErrs  []error
@@ -383,6 +384,7 @@ func TestAssistantSearchAndPlay(t *testing.T) {
 		},
 		albums:  map[string]media.Album{album.ID: album},
 		artists: map[string]media.Artist{"yt:UC1": {ID: "yt:UC1", Name: "Made Up", TopTracks: []media.Track{song("top", "Top Song", "Made Up")}}},
+		songsOf: map[string][]media.Track{"yt:UC1": {song("top", "Top Song", "Made Up"), song("deep", "Deep Cut", "Made Up")}},
 	}
 	a, toasts := newAssistantApp(t, cat)
 	c := connectAssistant(t, a)
@@ -414,8 +416,8 @@ func TestAssistantSearchAndPlay(t *testing.T) {
 	toasts.wait(t, "put the album “Made Up Album” next")
 	toasts.wait(t, "added “Spotify Song” by Someone to the queue")
 	c.ok("play_result", map[string]any{"id": "yt:UC1"})
-	waitPlayer(t, p, "the artist's top tracks", func(s player.State) bool { return slices.Equal(queueIDs(s), []string{"yt:top"}) })
-	toasts.wait(t, "played the top tracks of Made Up")
+	waitPlayer(t, p, "the artist's songs", func(s player.State) bool { return slices.Equal(queueIDs(s), []string{"yt:top", "yt:deep"}) })
+	toasts.wait(t, "played all the songs of Made Up")
 
 	if text := c.fails("play_result", map[string]any{"id": "yt:nope"}); !strings.Contains(text, "search") {
 		t.Errorf("an unknown id: %s", text)

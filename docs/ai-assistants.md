@@ -69,7 +69,7 @@ Other assistants take the same command and argument in their own words.
 | `seek` | Moves the track to a time, or forward or back by some seconds. |
 | `set_volume` | Sets the volume, or turns it up or down by some percent. |
 | `search` | Searches YouTube Music, and Spotify once you signed in, for songs, music videos, albums, artists and playlists. While explicit content is hidden, it finds none. |
-| `play_result` | Plays a song, an album, an artist's top tracks or a playlist that a search found, or puts it next, or at the end of the queue. |
+| `play_result` | Plays a song, an album, all of an artist's songs or a playlist that a search found, or puts it next, or at the end of the queue. An artist's songs are read first, which takes a moment for a long list. |
 | `list_playlists` | Lists your liked songs, your mixes, and your playlists on YouTube Music and Spotify. |
 | `play_playlist` | Plays one of them, by its name or its ID, shuffled if you like. |
 

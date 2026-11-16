@@ -690,11 +690,7 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 				s.copyLinkItem(m, a.URL)
 			},
 		}
-		switch {
-		case artistPlaysAll(a):
-			h.playLabel = "play"
-			h.play = func() { s.playArtist(a, s.svc.Catalog.ArtistSongs) }
-		case len(a.TopTracks) > 0:
+		if len(a.TopTracks) > 0 {
 			h.play = func() { s.p.PlayAll(a.TopTracks, false) }
 		}
 		s.artistPlay(&h, a)

@@ -44,7 +44,7 @@ func TestCatalogArtistSongs(t *testing.T) {
 	if err != nil || !slices.Equal(given, []string{"sp:t1", "sp:t2"}) || len(songs) != 2 {
 		t.Errorf("songs %v, given %v, error %v", songs, given, err)
 	}
-	if _, err := c.ArtistSongs(context.Background(), "yt:UC1", nil); !errors.Is(err, ErrNoArtistSongs) {
-		t.Errorf("an artist of YouTube Music: %v", err)
+	if _, err := c.ArtistSongs(context.Background(), "file:a1", nil); !errors.Is(err, ErrNoArtistSongs) {
+		t.Errorf("an artist of music on this computer: %v", err)
 	}
 }

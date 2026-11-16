@@ -17682,14 +17682,14 @@ func (msgs Messages) SearchRecent() string {
 	return Catalog.Format(msgs.locale, "searchRecent", nil)
 }
 
-// SearchScopeBoth says "both"
+// SearchScopeAllMusic says "all music"
 // in the language the app shows.
-func SearchScopeBoth() string { return In(i18n.Locale()).SearchScopeBoth() }
+func SearchScopeAllMusic() string { return In(i18n.Locale()).SearchScopeAllMusic() }
 
-// SearchScopeBoth says "both"
+// SearchScopeAllMusic says "all music"
 // in the language of msgs.
-func (msgs Messages) SearchScopeBoth() string {
-	return Catalog.Format(msgs.locale, "searchScopeBoth", nil)
+func (msgs Messages) SearchScopeAllMusic() string {
+	return Catalog.Format(msgs.locale, "searchScopeAllMusic", nil)
 }
 
 // SearchServices says "Services"

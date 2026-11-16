@@ -15,8 +15,9 @@ import (
 var (
 	searchPivots = []string{"all", "songs", "videos", "albums", "artists", "playlists", "podcasts"}
 	// searchScopes are the services a search covers, by their names: the
-	// product names stay as they are, and searchScopeLabels translates "both".
-	searchScopes = []string{"both", "Spotify", "YouTube Music", "YouTube"}
+	// product names stay as they are, and searchScopeLabels translates "all
+	// music", the first: Spotify, YouTube Music and this computer's music.
+	searchScopes = []string{"all music", "Spotify", "YouTube Music", "YouTube"}
 )
 
 // searchPivotLabels are the names of searchPivots, in the language the app
@@ -32,7 +33,7 @@ func searchPivotLabels() []string {
 // shows.
 func searchScopeLabels() []string {
 	labels := slices.Clone(searchScopes)
-	labels[0] = locales.SearchScopeBoth()
+	labels[0] = locales.SearchScopeAllMusic()
 	return labels
 }
 

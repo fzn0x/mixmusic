@@ -51,4 +51,9 @@ func TestSearchScopesNameYouTube(t *testing.T) {
 	if len(searchScopes) != 4 {
 		t.Errorf("scopes = %v", searchScopes)
 	}
+	// The first covers every service and this computer's music: with four
+	// scopes, "both" no longer named it (#690).
+	if got := searchScopeLabels()[0]; got != "all music" {
+		t.Errorf("the first scope is %q, want all music", got)
+	}
 }

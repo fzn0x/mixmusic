@@ -194,6 +194,14 @@ anew, as a computer that started again listens at another port. The page
 moves the position on between two states as the track plays, and the
 session ends 30 s after the page closes.
 
+A state also tells the parts of the track that the player passes over, as
+SponsorBlock marks them, and its highlight (`parts`, #735), as the seek
+bars of that computer mark them: the page marks them on its seek bar
+with the same helper (`seekparts.go`), and its Jump to the highlight
+sends `seek` there, which every version takes. The computer that gets
+them cleans them as the rest of a state: the kinds this MixMusic knows,
+within the track, 64 at most, one highlight, with no length.
+
 ## What each version can do
 
 The version, 1, which `hello`, discovery's TXT record and TLS's ALPN tell,
@@ -209,7 +217,8 @@ and runs no command it doesn't know. So:
 - a newer computer that controls an older one shows what plays there and
   controls it as before; it sends neither the commands on the queue nor a
   hand-over, as the older one's `welcome` tells no features, and its page
-  says to update MixMusic there;
+  says to update MixMusic there; the older one's states tell no `parts`,
+  so the page's seek bar marks none;
 - a newer computer that pairs with an older one waits 30 s more for
   `paired`, which the older one sends once it kept the pairing, however
   long that took: the two disagree only past those 30 s, not past a
@@ -220,8 +229,9 @@ and runs no command it doesn't know. So:
   messages on the way, and drops it when slower, which the older one
   shows as "Couldn't reach …" or "… stopped answering";
 - an older computer that controls a newer one gets states whose tracks
-  name their entries (`entry`), a field it ignores, and the `features` of
-  `welcome`, which it ignores too.
+  name their entries (`entry`), and that tell the parts the player passes
+  over (`parts`), fields it ignores, and the `features` of `welcome`,
+  which it ignores too.
 
 ## The queue
 

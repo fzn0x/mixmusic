@@ -46,8 +46,12 @@ The page of a computer paired shows what plays there: the cover, the
 title, the artists and the album, where the track is, which moves on as
 it plays, and the tracks after it. Under them:
 
-- **Previous**, **Play** or **Pause**, and **Next**;
-- the seek bar, which seeks once you let go of it;
+- **Previous**, **Play** or **Pause**, and **Next**, with **Jump to the
+  highlight** when the track that plays there has one;
+- the seek bar, which seeks once you let go of it, and marks the parts
+  that computer [skips](playing-music.md#skipping-parts-of-videos) as its
+  own seek bar does, with their kinds and times under the pointer: a
+  computer with an older MixMusic tells none;
 - the volume of that computer.
 
 Its queue, under **Next on …**, works as this computer's does: click a

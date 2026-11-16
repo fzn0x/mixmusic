@@ -113,6 +113,9 @@ type Server struct {
 	mu    sync.Mutex
 	ln    net.Listener
 	conns map[*serverConn]bool
+	// adm holds the places of the connections not known as paired
+	// (admit.go).
+	adm admission
 	// pairing is set while a pairing runs: one at a time. rested is when
 	// the last code that didn't match was tried.
 	pairing bool
@@ -126,6 +129,8 @@ type serverConn struct {
 	conn net.Conn
 	w    *wire
 	peer Fingerprint
+	// place is its place among the connections not known as paired.
+	place *unproven
 }
 
 // Serve takes the connections ln accepts until Close, and returns nil
@@ -154,7 +159,15 @@ func (s *Server) Serve(ln net.Listener) error {
 			}
 			return err
 		}
-		go s.handle(c)
+		// A connection not known as paired takes a place among those the
+		// server holds, of the oldest when they are all taken.
+		s.mu.Lock()
+		u, gone := s.adm.letIn(sourceOf(c.RemoteAddr().String()), func() { c.Close() })
+		s.mu.Unlock()
+		for _, o := range gone {
+			o.close()
+		}
+		go s.handle(c, u)
 	}
 }
 
@@ -205,10 +218,12 @@ func (s *Server) Sessions() int {
 // it asks to pair.
 func (s *Server) tlsConfig() *tls.Config { return s.Identity.ServerTLS(alpn) }
 
-// handle runs a connection: TLS, then a hello, then a pairing or a
-// session.
-func (s *Server) handle(raw net.Conn) {
+// handle runs a connection, of the place u: TLS, then a hello, then a
+// pairing or a session. It holds its place until its key is paired, or it
+// pairs.
+func (s *Server) handle(raw net.Conn, u *unproven) {
 	defer raw.Close()
+	defer s.letGo(u)
 	t := s.Timing
 	tc := tls.Server(raw, s.tlsConfig())
 	ctx, cancel := context.WithTimeout(context.Background(), t.silence())
@@ -221,10 +236,13 @@ func (s *Server) handle(raw net.Conn) {
 	if err != nil {
 		return
 	}
-	c := &serverConn{conn: tc, w: newWire(tc), peer: peer}
+	c := &serverConn{conn: tc, w: newWire(tc), peer: peer, place: u}
 	// A computer not paired may pair, or is refused: its messages are of a
-	// pairing's size until its key is paired.
-	if !s.Host.Allowed(peer) {
+	// pairing's size until its key is paired. A paired one gives its place
+	// back.
+	if s.Host.Allowed(peer) {
+		s.letGo(u)
+	} else {
 		c.w.f.Limit(unpairedMessage)
 	}
 	if !s.add(c) {
@@ -249,6 +267,7 @@ func (s *Server) handle(raw net.Conn) {
 		}
 		// Its key is paired, as Allowed told after TLS, or since: its
 		// hand-overs may be long.
+		s.letGo(u)
 		c.w.f.Limit(0)
 		s.session(c)
 	}
@@ -287,6 +306,9 @@ func (s *Server) pair(c *serverConn, hello message) {
 		return
 	}
 	s.pairing = true
+	// The one pairing that runs keeps its connection: no new one takes its
+	// place.
+	s.adm.proven(c.place)
 	s.mu.Unlock()
 	// The pairing ends here before the other computer hears how it went:
 	// that computer may start the next one at once, which must not find

@@ -137,6 +137,12 @@ func (a *App) tellWaiting(sc *scrobbling) {
 	}
 }
 
+// userAgent is how MixMusic introduces itself to the services it asks of
+// lyrics, parts to skip or scrobbles: with its version and its address.
+func (a *App) userAgent() string {
+	return "MixMusic/" + a.opts.Version + " (https://github.com/fzn0x/mixmusic)"
+}
+
 // stopScrobbling stops the scrobblers' sends, as the app closes.
 func (a *App) stopScrobbling() {
 	a.mu.Lock()

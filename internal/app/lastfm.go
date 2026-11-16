@@ -75,6 +75,7 @@ func (a *App) openLastfm() {
 // of plays not sent yet.
 func (a *App) startScrobbling(c lastfmCredentials) {
 	client := lastfm.NewClient(c.APIKey, c.Secret)
+	client.UserAgent = a.userAgent()
 	s := scrobble.New(client, c.Session.Key, scrobble.Options{})
 	queue := filepath.Join(a.opts.DataDir, "lastfm-queue.json")
 	if data, err := os.ReadFile(queue); err == nil {
@@ -171,10 +172,11 @@ func lastfmTrack(np NowPlaying) (string, lastfm.Track) {
 
 // lastfmApprove has the user approve MixMusic on Last.fm, in their browser,
 // with the API account of apiKey and secret, and returns the session.
-func lastfmApprove(ctx context.Context, apiKey, secret string) (lastfm.Session, error) {
+func (a *App) lastfmApprove(ctx context.Context, apiKey, secret string) (lastfm.Session, error) {
 	ctx, cancel := context.WithTimeout(ctx, loginTimeout)
 	defer cancel()
 	client := lastfm.NewClient(apiKey, secret)
+	client.UserAgent = a.userAgent()
 	token, err := client.Token(ctx)
 	if err != nil {
 		return lastfm.Session{}, err
@@ -206,7 +208,7 @@ func (s *Accounts) LastfmLogin(ctx context.Context, apiKey, secret string) (Acco
 	if apiKey == "" || secret == "" {
 		return AccountsStatus{}, errors.New("paste the API key and the shared secret of your Last.fm API account")
 	}
-	session, err := lastfmApprove(ctx, apiKey, secret)
+	session, err := s.a.lastfmApprove(ctx, apiKey, secret)
 	if err != nil {
 		return AccountsStatus{}, err
 	}
@@ -232,7 +234,7 @@ func (s *Accounts) LastfmReconnect(ctx context.Context) error {
 	if err != nil || c.APIKey == "" {
 		return errors.New("connect to Last.fm first")
 	}
-	session, err := lastfmApprove(ctx, c.APIKey, c.Secret)
+	session, err := s.a.lastfmApprove(ctx, c.APIKey, c.Secret)
 	if err != nil {
 		return err
 	}

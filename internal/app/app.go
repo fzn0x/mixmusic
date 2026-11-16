@@ -365,7 +365,7 @@ func New(opts Options) (*App, error) {
 	a.proxy.Cache = a.cache
 	a.matcher = match.New(a.youtube, matches)
 	a.labels = newLabelCache(a.youtube.MadeWithAI, aiLabels, time.Now)
-	userAgent := "MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)"
+	userAgent := a.userAgent()
 	a.parts = a.newSponsorBlock(userAgent, marked)
 	a.lyrics = lyrics.New(userAgent)
 	a.unison = lyrics.NewUnison(userAgent)

@@ -118,6 +118,9 @@ type Client struct {
 	// BaseURL is the API's address, replaced in tests. When empty, it is
 	// https://ws.audioscrobbler.com/2.0/.
 	BaseURL string
+	// UserAgent introduces MixMusic to Last.fm; when empty, as
+	// "MixMusic".
+	UserAgent string
 }
 
 // NewClient returns a client of the API account of apiKey and secret.
@@ -143,7 +146,11 @@ func (c *Client) call(ctx context.Context, method string, params url.Values, out
 		return err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("User-Agent", "MixMusic")
+	agent := c.UserAgent
+	if agent == "" {
+		agent = "MixMusic"
+	}
+	req.Header.Set("User-Agent", agent)
 	hc := c.HTTP
 	if hc == nil {
 		hc = defaultHTTP

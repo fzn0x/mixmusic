@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"os"
 	"strconv"
 	"testing"
 	"time"
 
+	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
@@ -271,5 +273,76 @@ func TestRightToLeftStats(t *testing.T) {
 	show(s, tt, "/stats")
 	if today := placeOf(t, tt, locales.StatsToday()); today.X < 1280/2 {
 		t.Errorf("today is at %+v, at the left of the chart", today)
+	}
+}
+
+// TestRightToLeftPseudoLocale shows the main screens in MyGo's pseudo
+// language ar-XB, English words written right to left in a window laid out
+// right to left, as a translation into Arabic would be: the rail is on the
+// right, and the transport left to right.
+func TestRightToLeftPseudoLocale(t *testing.T) {
+	was := i18n.Locale()
+	i18n.SetLocaleFunc(func() string { return i18n.PseudoBidi })
+	t.Cleanup(func() { i18n.SetLocaleFunc(func() string { return was }) })
+	xb := locales.In(i18n.PseudoBidi)
+	s := rtlShell(t, settings.LayoutBlend)
+	s.panel = "lyrics"
+	tt := rtlTester(s, 1280, 820, ui.RightToLeft)
+	tt.SetLocale(i18n.PseudoBidi)
+	for _, p := range []string{"/", "/library/liked", "/now-playing", "/settings/playback", "/stats"} {
+		show(s, tt, p)
+		if r := placeOf(t, tt, xb.RailCollapse()); r.X < 1280/2 {
+			t.Errorf("%s: the rail is at %+v, not at the right", p, r)
+		}
+		inOrder(t, tt, p+": the player bar", xb.PlayerPrevious(), xb.PlayerPause(), xb.PlayerNext())
+	}
+	mini := ui.NewTester(s.miniView, 420, 132)
+	mini.SetDirection(ui.RightToLeft)
+	mini.SetLocale(i18n.PseudoBidi)
+	inOrder(t, mini, "the mini player", xb.PlayerPrevious(), xb.PlayerPause(), xb.PlayerNext())
+}
+
+// TestRenderRightToLeft draws the main screens left to right, right to left
+// and in ar-XB to MIXMUSIC_RENDER, for a look.
+func TestRenderRightToLeft(t *testing.T) {
+	dir := os.Getenv("MIXMUSIC_RENDER")
+	if dir == "" {
+		t.Skip("MIXMUSIC_RENDER names no folder")
+	}
+	for _, run := range []struct {
+		name   string
+		d      ui.Direction
+		locale string
+	}{{"ltr", ui.LeftToRight, ""}, {"rtl", ui.RightToLeft, ""}, {"ar-XB", ui.RightToLeft, i18n.PseudoBidi}} {
+		if run.locale != "" {
+			was := i18n.Locale()
+			i18n.SetLocaleFunc(func() string { return run.locale })
+			t.Cleanup(func() { i18n.SetLocaleFunc(func() string { return was }) })
+		}
+		for _, layout := range []settings.Layout{settings.LayoutBlend, settings.LayoutTiles} {
+			s := rtlShell(t, layout)
+			name := run.name + "-" + string(layout)
+			tt := rtlTester(s, 1280, 820, run.d)
+			tall := rtlTester(s, 1280, 1700, run.d)
+			mini := ui.NewTester(s.miniView, 420, 132)
+			mini.SetDirection(run.d)
+			if run.locale != "" {
+				tt.SetLocale(run.locale)
+				tall.SetLocale(run.locale)
+				mini.SetLocale(run.locale)
+			}
+			for _, page := range []struct{ name, path, panel string }{
+				{"home", "/", ""}, {"home-queue", "/", "queue"}, {"library-liked", "/library/liked", "lyrics"},
+				{"now-playing", "/now-playing", ""}, {"stats", "/stats", ""},
+			} {
+				s.panel = page.panel
+				s.navigate(page.path)
+				renderTo(t, s, tt, dir, name+"-"+page.name)
+			}
+			s.panel = ""
+			s.navigate("/settings/playback")
+			renderTo(t, s, tall, dir, name+"-settings-playback")
+			renderTo(t, s, mini, dir, name+"-mini")
+		}
 	}
 }

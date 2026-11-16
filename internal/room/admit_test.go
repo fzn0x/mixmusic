@@ -241,9 +241,13 @@ func TestRoomWidePlacesTakeTheOldest(t *testing.T) {
 // with connections held open: a link holder still joins, and a guest that
 // dropped off still comes back by its key.
 func TestFullRoomStillLetsInLinksAndGuests(t *testing.T) {
-	// All come from 127.0.0.1: the source holds as many as the room.
+	// All come from 127.0.0.1: the source holds as many as the room. The
+	// room keeps the place of the guest that dropped off a minute: the
+	// second of the tests' timing ran out, on a busy computer, while the
+	// connections opened and the link holder joined, before it came back.
 	r := newTestRoomWith(t, func(s *Server) {
 		s.caps = &caps{unproven: maxUnproven, unprovenFrom: maxUnproven, tries: Tries, roomTries: RoomTries}
+		s.Timing.Keep = time.Minute
 	})
 	back := newGuest(t, "Back")
 	r.join(back).Close()

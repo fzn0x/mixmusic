@@ -8,6 +8,7 @@ package app
 // to come back at the host's new address.
 
 import (
+	"bytes"
 	"errors"
 	"net"
 	"net/netip"
@@ -17,33 +18,36 @@ import (
 	"github.com/fzn0x/mixmusic/internal/room"
 )
 
-// maxLinks bounds the rooms of invite links whose addresses are kept.
-const maxLinks = 16
-
-// keepLinkAddrs keeps addrs, where the room of the host id is reached from
-// outside its network, as its invite link carries them: none forgets them.
-func (a *App) keepLinkAddrs(id string, addrs []string) {
-	r := &a.room
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	far := &r.far
-	if len(addrs) == 0 {
-		delete(far.links, id)
-		return
-	}
-	if far.links == nil || len(far.links) >= maxLinks {
-		far.links = map[string][]string{}
-	}
-	far.links[id] = slices.Clone(addrs)
+// farLink is where the room of the host id is reached from outside the
+// network, as the link it was knocked at by, of the secret secret, or the
+// address the user typed, tells: the knock that follows proves the link,
+// and only a link of the same secret changes them (backByInvite), so that
+// a link made up of the host's key alone moves no guest elsewhere.
+type farLink struct {
+	id     string
+	secret []byte
+	addrs  []string
 }
 
-// linkAddrs are the addresses of the room of the host id that its invite
-// link carried.
+// knock takes in the knock at the room of the host id, by by, which
+// starts: its addresses are the room's from then on. a.room.mu is held.
+func (f *roomFar) knock(id string, by knockBy) {
+	f.link = farLink{id: id, addrs: slices.Clone(by.addrs)}
+	if by.link {
+		f.link.secret = slices.Clone(by.password)
+	}
+}
+
+// linkAddrs are the addresses of the room of the host id, outside the
+// network, while it's the room this computer knocks at, or is a guest of.
 func (a *App) linkAddrs(id string) []string {
 	r := &a.room
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	return slices.Clone(r.far.links[id])
+	if r.far.link.id != id {
+		return nil
+	}
+	return slices.Clone(r.far.link.addrs)
 }
 
 // linkRoom is the room of the host id as its invite link tells it, when it
@@ -82,14 +86,15 @@ func (rs *Rooms) KnockAt(addr, code string) {
 		a.startKnock(at, nil, knockBy{}, errors.New("A room's code is 6 letters and digits."))
 		return
 	}
-	a.keepLinkAddrs(at, []string{at})
-	a.startKnock(at, nil, knockBy{password: []byte(parsed)}, nil)
+	a.startKnock(at, nil, knockBy{password: []byte(parsed), addrs: []string{at}}, nil)
 }
 
 // backByInvite takes a new invite link of the host this computer is a
-// guest of: it keeps the link's addresses, and a guest that dropped off
-// tries to come back there at once, as the host's address changed. It
-// reports whether the link was the host's.
+// guest of: a guest that dropped off tries to come back at once, at the
+// link's addresses, as the host's address changed, when the link is of the
+// secret of the one it joined by; one of another secret, which anyone who
+// knows the host's key can make, moves it nowhere, and one with no address
+// keeps those it has. It reports whether the link was the host's.
 func (a *App) backByInvite(in room.Invite) bool {
 	r := &a.room
 	r.mu.Lock()
@@ -99,15 +104,13 @@ func (a *App) backByInvite(in room.Invite) bool {
 	if away && g.retry != nil {
 		g.retry.Stop()
 	}
-	var id string
-	if mine {
-		id = g.id
+	if l := &r.far.link; mine && l.id == g.id && len(l.secret) > 0 && bytes.Equal(l.secret, in.Secret) && len(in.Addrs) > 0 {
+		l.addrs = slices.Clone(in.Addrs)
 	}
 	r.mu.Unlock()
 	if !mine {
 		return false
 	}
-	a.keepLinkAddrs(id, in.Addrs)
 	if away {
 		go a.comeBack(g)
 	}

@@ -155,8 +155,7 @@ func (a *App) openInvite(in room.Invite) {
 	if a.backByInvite(in) {
 		return
 	}
-	a.keepLinkAddrs(key.ID(), in.Addrs)
-	a.startKnock(key.ID(), &key, knockBy{password: in.Secret, link: true, pinned: &key}, nil)
+	a.startKnock(key.ID(), &key, knockBy{password: in.Secret, link: true, pinned: &key, addrs: in.Addrs}, nil)
 }
 
 // knockBy is how a knock proves the guest may join.
@@ -164,6 +163,9 @@ type knockBy struct {
 	password []byte
 	link     bool
 	pinned   *remote.Fingerprint
+	// addrs are where the room is reached from outside the network, as
+	// its link, or the user, tells them (roomfar.go).
+	addrs []string
 }
 
 // startKnock starts knocking at the room of the host id, of the key key
@@ -198,6 +200,7 @@ func (a *App) startKnock(id string, key *remote.Fingerprint, by knockBy, failed 
 	ctx, cancel := context.WithTimeout(context.Background(), roomKnockFor)
 	g.cancel = cancel
 	r.guest = g
+	r.far.knock(id, by)
 	r.mu.Unlock()
 	if old != nil {
 		old.drop()

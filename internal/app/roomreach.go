@@ -39,9 +39,10 @@ type roomFar struct {
 	// end, which MixMusic waits for as it quits (flushing).
 	stopping sync.WaitGroup
 	flushing sync.Once
-	// links are the addresses of the rooms of invite links, by their
-	// hosts' IDs (roomfar.go). a.room.mu guards them.
-	links map[string][]string
+	// link is where the room this computer knocks at, or is a guest of,
+	// is reached from outside the network (roomfar.go). a.room.mu guards
+	// it.
+	link farLink
 }
 
 // roomPort is the port rooms listen on: the one kept in the settings, or

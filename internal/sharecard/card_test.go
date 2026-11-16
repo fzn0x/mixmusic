@@ -16,7 +16,7 @@ import (
 
 // family is Selawik, as the app sets its cards in it, read from the
 // fonts the app bundles.
-func family(t *testing.T) Family {
+func family(t testing.TB) Family {
 	t.Helper()
 	var fam Family
 	for _, f := range []struct {

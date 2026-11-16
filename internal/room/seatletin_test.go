@@ -18,6 +18,7 @@ func TestSeatsLetInFirst(t *testing.T) {
 		s.Guests = f.guests()
 		s.Seats = &Seats{Guests: []Member{{Key: ana.Identity.Fingerprint(), Name: "Ana"}, {Key: bo.Identity.Fingerprint(), Name: "Bo"}}}
 	})
+	r.server.Open()
 	type back struct {
 		s   *Session
 		err error

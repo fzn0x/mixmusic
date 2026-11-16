@@ -71,6 +71,7 @@ type asks struct {
 	sent         *Rules
 	move         *move
 	moved        bool
+	open         bool
 	seated       map[remote.Fingerprint]bool
 }
 

@@ -338,9 +338,21 @@ func (s *Server) reached(mv *move, who *Member, ok bool) {
 // reasonMoving: the room moves, or moved, and lets no one in.
 const reasonMoving = "moving"
 
-// moves reports whether a move is under way, or the room moved. s.mu is
+// moves reports whether a move is under way, or the room moved, or this
+// room, of seats a room that moves keeps, isn't open yet (Open). s.mu is
 // held.
-func (s *Server) moves() bool { return s.asks.move != nil || s.asks.moved }
+func (s *Server) moves() bool {
+	return s.asks.move != nil || s.asks.moved || s.Seats != nil && !s.asks.open
+}
+
+// Open lets in the computers of the seats of a room that moved here, and
+// the others, once it moved: until then, they're told to try again in a
+// moment, though another tells them where it listens.
+func (s *Server) Open() {
+	s.mu.Lock()
+	s.asks.open = true
+	s.mu.Unlock()
+}
 
 // errDropped: the host removed or blocked someone as the room moved, whose
 // place the room it moved to would keep.

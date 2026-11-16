@@ -381,6 +381,8 @@ func (a *App) hostMoved(g *guestRoom, s *room.Session) {
 		f.stop()
 	}
 	a.takeRoom(s)
+	// The others come back to it from now on.
+	h.server.Open()
 	log.Print("mixmusic: room: hosting the room that moved here")
 	a.notifyRooms("You host the room now")
 }

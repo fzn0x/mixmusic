@@ -117,6 +117,11 @@ func TestMakeHostMoves(t *testing.T) {
 		t.Fatalf("moved %+v", got.m)
 	}
 	srv := <-opened
+	// Until the room that moved there opens, none comes back to it.
+	if _, err := bo.Rejoin(context.Background(), got.m.Addr, got.m.Key); !errors.Is(err, ErrRoomMoves) {
+		t.Fatalf("Bo coming back before the room opened: %v", err)
+	}
+	srv.Open()
 	for _, s := range []*Session{sa, sb} {
 		select {
 		case <-s.Done():

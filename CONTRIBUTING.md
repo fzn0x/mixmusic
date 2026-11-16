@@ -391,8 +391,9 @@ Every word of the interface is a message of
 `locales`, generated of the catalogs as `locales/catalog_gen.go`. A pull
 request that adds or changes a text adds or changes its English message
 alone, and runs `bunx mygo generate`; translators fill in the other
-languages, and the release workflow fails while a shipped language lacks a
-message. Keys start with their feature, as `accountSettingsSignOut`, and
+languages. A message a language lacks shows in English:
+`go run ./tools/translations` lists them, and the release workflow says
+them in its warnings. Keys start with their feature, as `accountSettingsSignOut`, and
 stay in sorted order. A sentence is one message, with named placeholders
 for what goes in it, as `Couldn't invite collaborators to {title}: {error}`,
 and a count is a plural, as `{count, plural, one {# song} other {# songs}}`,

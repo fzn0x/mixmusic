@@ -168,6 +168,12 @@ func (k *look) sections() float32 { return 3 * k.gap }
 // circle. It tells whether it was opened or its play circle clicked. In a
 // theme of filled cards, it is a card, a step lighter while hovered.
 func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, subtitle string, source media.Source, round, active, playable bool, menu func(m *ui.Menu)) (open, play bool) {
+	return s.artTileWith(c, key, art, title, subtitle, source, round, active, playable, "play", "Play ", menu)
+}
+
+// artTileWith is artTile with the icon and the label of its circle: the
+// label, with the title after it, is what screen readers hear.
+func (s *shell) artTileWith(c *ui.Context, key string, art []media.Image, title, subtitle string, source media.Source, round, active, playable bool, circle, circleLabel string, menu func(m *ui.Menu)) (open, play bool) {
 	k := &s.lk
 	size := k.cover
 	tile := s.buttonBase(c.Key(key)).Width(k.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Gap(8).Label(title).Cursor(ui.CursorPointer)
@@ -201,14 +207,14 @@ func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, sub
 			}
 			if playable && rise > 0.01 {
 				p := s.buttonBase(c.Key(key+"-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().Right(8).Bottom(8).
-					Label("Play " + title).Cursor(ui.CursorPointer)
+					Label(circleLabel + title).Cursor(ui.CursorPointer)
 				if rise < 1 {
 					p.Translate(0, 12*(1-rise)).Opacity(min(1, rise))
 				}
 				if p.Clicked() {
 					play = true
 				}
-				p.Children(func() { ui.Icon(c, icon("play")).FontSize(18).TextColor(k.accentText) })
+				p.Children(func() { ui.Icon(c, icon(circle)).FontSize(18).TextColor(k.accentText) })
 			}
 		})
 		ui.Column(c).Width(size).Gap(2).Children(func() {
@@ -358,14 +364,24 @@ func (s *shell) artistTile(c *ui.Context, key string, a media.Artist) {
 	if sub == "" {
 		sub = "Artist"
 	}
-	open, _ := s.artTile(c, key, a.Artwork, a.Name, sub, a.Source, true, false, false, func(m *ui.Menu) {
+	// The circle shuffles all the artist's songs, as their page's does.
+	open, shuffle := s.artTileWith(c, key, a.Artwork, a.Name, sub, a.Source, true, false, true, "shuffle", "Shuffle ", func(m *ui.Menu) {
 		if m.Item("Open").Chosen() {
 			s.navigate(artistPath(a.ID))
+		}
+		if m.Item("Play").Chosen() {
+			playArtistID(s, a.ID, false)
+		}
+		if m.Item("Shuffle").Chosen() {
+			playArtistID(s, a.ID, true)
 		}
 		s.followItem(m, a)
 		s.copyLinkItem(m, a.URL)
 	})
-	if open {
+	switch {
+	case shuffle:
+		playArtistID(s, a.ID, true)
+	case open:
 		s.navigate(artistPath(a.ID))
 	}
 }

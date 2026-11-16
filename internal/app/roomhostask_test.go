@@ -10,7 +10,8 @@ import (
 // TestRoomHostAskDeclined asks the guest's user before its computer hosts
 // the room: declined, the room stays, and the host is told; a host that
 // asks again at once is declined unasked; one the user doesn't answer is
-// declined in time.
+// declined in time; and a host declined twice is declined unasked from
+// then on.
 func TestRoomHostAskDeclined(t *testing.T) {
 	was := hostAskFor
 	hostAskFor = 300 * time.Millisecond
@@ -63,6 +64,19 @@ func TestRoomHostAskDeclined(t *testing.T) {
 	}
 	if _, ok := desk.Rooms().Hosted(); !ok {
 		t.Fatal("the room moved")
+	}
+	// Declined twice, the host asks no more for the rest of the stay, a
+	// while after too.
+	lap.room.mu.Lock()
+	lap.room.guest.askedAt = time.Time{}
+	lap.room.mu.Unlock()
+	until(t, "the move over", func() bool { _, moving := desk.Rooms().Moving(); return !moving })
+	if err := desk.Rooms().MakeHost(lapKey); err != nil {
+		t.Fatal(err)
+	}
+	until(t, "declined unasked again", func() bool { return countNotes(deskNotes(), stays) == 4 })
+	if n := countNotes(lapNotes(), "Desk asks you to host the room"); n != 2 {
+		t.Fatalf("Lap's user was asked %d times", n)
 	}
 }
 

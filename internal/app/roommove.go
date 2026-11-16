@@ -102,6 +102,11 @@ var (
 	hostAskEvery = time.Minute
 )
 
+// maxDeclines is how many asks of a host the user declines, or leaves
+// unanswered, before that host's asks are declined unasked, for the rest
+// of the stay.
+const maxDeclines = 2
+
 // hostAsk is the host's ask, in session, that this computer host its
 // room, which keeps seats, while it waits for the user.
 type hostAsk struct {
@@ -117,11 +122,11 @@ func (a *App) askToHost(g *guestRoom, s *room.Session, seats room.Seats) {
 	r := &a.room
 	r.mu.Lock()
 	ok := r.guest == g && g.session == s && g.step == RoomIn && r.hosted == nil && g.pending == nil && g.ask == nil &&
-		time.Since(g.askedAt) >= hostAskEvery
+		time.Since(g.askedAt) >= hostAskEvery && g.declined < maxDeclines
 	var ask *hostAsk
 	if ok {
 		ask = &hostAsk{session: s, seats: seats}
-		ask.timer = time.AfterFunc(hostAskFor, func() { a.answerHost(g, ask, false) })
+		ask.timer = time.AfterFunc(hostAskFor, func() { a.answerHost(g, ask, false, true) })
 		g.ask, g.askedAt = ask, time.Now()
 	}
 	name := g.name
@@ -135,14 +140,18 @@ func (a *App) askToHost(g *guestRoom, s *room.Session, seats room.Seats) {
 }
 
 // answerHost answers the host's ask, opening a room for the room of g to
-// move to, if yes.
-func (a *App) answerHost(g *guestRoom, ask *hostAsk, yes bool) {
+// move to, if yes: a no counts against the host, when the user said it or
+// let the ask go unanswered, not when the host took it back.
+func (a *App) answerHost(g *guestRoom, ask *hostAsk, yes, counts bool) {
 	r := &a.room
 	r.mu.Lock()
 	mine := g.ask == ask
 	if mine {
 		g.ask = nil
 		ask.timer.Stop()
+		if !yes && counts {
+			g.declined++
+		}
 	}
 	r.mu.Unlock()
 	if !mine {
@@ -182,7 +191,7 @@ func (rs *Rooms) AnswerHost(yes bool) {
 	}
 	r.mu.Unlock()
 	if ask != nil {
-		go rs.a.answerHost(g, ask, yes)
+		go rs.a.answerHost(g, ask, yes, true)
 	}
 }
 
@@ -258,29 +267,34 @@ func (g *reachGate) take(now time.Time) bool {
 }
 
 // reach tells the host, with answer, whether this computer reaches the
-// room of key it moves to: where discovery finds it, or at addr. A no
-// comes reachFailsAfter after the ask.
+// room of key it moves to: where discovery finds it, or at addr. Its tries
+// all end by reachFailsAfter after the ask, as a no comes then, whether
+// nothing listened there or nothing answered.
 func (a *App) reach(answer func(bool) error, key remote.Fingerprint, addr string) {
-	asked := time.Now()
-	ok := a.reaches(key, addr)
-	if !ok {
-		<-time.After(time.Until(asked.Add(reachFailsAfter)))
+	ctx, cancel := context.WithTimeout(context.Background(), reachFailsAfter)
+	defer cancel()
+	got := make(chan bool, 1)
+	go func() { got <- a.reaches(ctx, key, addr) }()
+	select {
+	case ok := <-got:
+		if ok {
+			_ = answer(true)
+			return
+		}
+		<-ctx.Done()
+	case <-ctx.Done():
 	}
-	_ = answer(ok)
+	_ = answer(false)
 }
 
-// reaches reports whether this computer reaches the room of key: where
-// discovery finds it, or at addr.
-func (a *App) reaches(key remote.Fingerprint, addr string) bool {
+// reaches reports whether this computer reaches the room of key, by ctx:
+// where discovery finds it, or at addr.
+func (a *App) reaches(ctx context.Context, key remote.Fingerprint, addr string) bool {
 	id, err := a.identity(true)
 	if err != nil {
 		return false
 	}
-	try := func(at string) bool {
-		ctx, cancel := context.WithTimeout(context.Background(), room.MoveFor/3)
-		defer cancel()
-		return a.roomGuest(id).Reach(ctx, at, key) == nil
-	}
+	try := func(at string) bool { return ctx.Err() == nil && a.roomGuest(id).Reach(ctx, at, key) == nil }
 	ok := false
 	if f, found := a.foundRoom(key.ID(), true); found {
 		ok = try(f.Addr)
@@ -310,7 +324,7 @@ func (a *App) watchMove(g *guestRoom, s *room.Session) {
 				go a.unhost(g, h)
 			}
 			if ask != nil && ask.session == s {
-				go a.answerHost(g, ask, false)
+				go a.answerHost(g, ask, false, false)
 			}
 		case room.Reach:
 			if reaching.take(time.Now()) {
@@ -331,6 +345,7 @@ func (a *App) moved(g *guestRoom, s *room.Session, m room.Move) {
 	log.Printf("mixmusic: room: moved to %s", m.Name)
 	if a.setGuest(g, func() {
 		g.id, g.name, g.key, g.hasKey, g.hint = m.Key.ID(), m.Name, m.Key, true, m.Addr
+		g.declined, g.askedAt = 0, time.Time{} // of another host
 		g.step, g.session, g.tries = RoomAway, nil, 0
 	}) {
 		a.notifyRooms("The room moved to " + m.Name + "'s computer")
@@ -366,6 +381,8 @@ func (a *App) hostMoved(g *guestRoom, s *room.Session) {
 		f.stop()
 	}
 	a.takeRoom(s)
+	// The others come back to it from now on.
+	h.server.Open()
 	log.Print("mixmusic: room: hosting the room that moved here")
 	a.notifyRooms("You host the room now")
 }

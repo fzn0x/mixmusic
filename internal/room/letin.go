@@ -36,35 +36,12 @@ const (
 	knockTellEvery = time.Minute
 )
 
-// knockAddr is the address of the source src (sourceOf), and whether it's
-// one.
-func knockAddr(src string) (netip.Addr, bool) {
-	ip, err := netip.ParseAddr(src)
-	if err != nil {
-		p, err := netip.ParsePrefix(src)
-		if err != nil {
-			return netip.Addr{}, false
-		}
-		ip = p.Addr()
-	}
-	return ip, true
-}
-
-// knocksNearby reports whether the source src (sourceOf) is of a network
-// of the host's own kind: a private, loopback or link-local address, as
-// the internet's never are. The providers' shared range, 100.64.0.0/10,
-// which VPNs give their computers too, isn't.
-func knocksNearby(src string) bool {
-	ip, ok := knockAddr(src)
-	return ok && (ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast())
-}
-
-// knocksHere reports whether the source src is this computer itself, of
-// a loopback address: its own user, whose knocks aren't counted by
-// source.
+// knocksHere reports whether the source src (sourceOf) is this computer
+// itself, of a loopback address: its own user, whose knocks aren't counted
+// by source.
 func knocksHere(src string) bool {
-	ip, ok := knockAddr(src)
-	return ok && ip.IsLoopback()
+	ip, err := netip.ParseAddr(src)
+	return err == nil && ip.IsLoopback()
 }
 
 // Why the host turns a computer away that asks to join: reasonLeft is
@@ -95,9 +72,10 @@ type Knock struct {
 	Key   string
 	Local bool
 	// answer takes the host's user's answer; src is the source it knocks
-	// from (sourceOf).
+	// from (sourceOf), and conn its connection.
 	answer chan bool
 	src    string
+	conn   *conn
 }
 
 // letIn has the host's user let in c, of the computer named name, which
@@ -109,6 +87,9 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 	}
 	s.mu.Lock()
 	k, tell := s.knock(c.key, c.src, name, time.Now())
+	if k != nil {
+		k.conn = c
+	}
 	s.mu.Unlock()
 	if k == nil {
 		return reasonManyAsk
@@ -227,7 +208,7 @@ func (s *Server) knock(key remote.Fingerprint, src, name string, now time.Time) 
 		return nil, false
 	}
 	s.asks.next++
-	k := &Knock{ID: s.asks.next, Name: name, At: now, Key: key.ID()[:8], Local: knocksNearby(src), answer: make(chan bool, 1), src: src}
+	k := &Knock{ID: s.asks.next, Name: name, At: now, Key: key.ID()[:8], Local: localSource(src), answer: make(chan bool, 1), src: src}
 	s.asks.knocks = append(s.asks.knocks, k)
 	tell := from == 0 && now.Sub(s.asks.knockTold[src]) >= knockTellEvery
 	if tell {
@@ -237,6 +218,18 @@ func (s *Server) knock(key remote.Fingerprint, src, name string, now time.Time) 
 		s.asks.knockTold[src] = now
 	}
 	return k, tell
+}
+
+// knocking reports whether c waits for the host's user to let it in: its
+// preview's place, and its time, are its knock's then (previews.go). s.mu
+// is held.
+func (s *Server) knocking(c *conn) bool {
+	for _, k := range s.asks.knocks {
+		if k.conn == c {
+			return true
+		}
+	}
+	return false
 }
 
 // Knocks returns the computers that wait for the host's user to let them

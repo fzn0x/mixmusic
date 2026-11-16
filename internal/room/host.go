@@ -645,11 +645,16 @@ func (s *Server) stay(c *conn) {
 		case "leave":
 			s.mu.Lock()
 			g := s.guests[c.key]
-			if g != nil && g.conn == c {
+			left := g != nil && g.conn == c
+			if left {
 				delete(s.guests, c.key)
 				s.note(g.Name, Left)
 			}
 			s.mu.Unlock()
+			if left {
+				// Its seat in the room a move goes to would stay (move.go).
+				s.stopMove(errLeft)
+			}
 			s.changed(true)
 			return
 		default:
@@ -818,12 +823,11 @@ func (s *Server) Unblock(key remote.Fingerprint) {
 
 // drop ends the stay of the guest of key, telling it why.
 func (s *Server) drop(key remote.Fingerprint, reason, what string) {
-	// A move under way keeps the seats it was asked with (move.go).
-	s.stopMove(errDropped)
 	s.mu.Lock()
 	g := s.guests[key]
 	if g == nil {
 		s.mu.Unlock()
+		s.stopMove(errDropped)
 		s.changed(false)
 		return
 	}
@@ -832,6 +836,9 @@ func (s *Server) drop(key remote.Fingerprint, reason, what string) {
 	c := g.conn
 	gate := s.gate
 	s.mu.Unlock()
+	// A move under way keeps the seats and blocks it was asked with, once
+	// the guest went, so that no move starts between (move.go).
+	s.stopMove(errDropped)
 	if c != nil {
 		go func() {
 			_ = c.f.Send(message{Type: "ended", Reason: reason}, time.Second)

@@ -9,9 +9,10 @@ import (
 // Song returns the song or video of videoID as YouTube Music tells it: its
 // title, artists, album, length, covers and whether it's explicit. A
 // room's host reads a guest's song so, rather than trust what the guest
-// says of it (#734).
+// says of it (#734): signed out, as a visitor YouTube doesn't know, as the
+// guest chooses the song, not the user.
 func (c *Client) Song(ctx context.Context, videoID string) (media.Track, error) {
-	n, err := c.call(ctx, "next", map[string]any{"videoId": videoID, "isAudioOnly": true}, nil)
+	n, err := c.callWith(ctx, musicClient, "next", map[string]any{"videoId": videoID, "isAudioOnly": true}, nil, callOptions{anonymous: true})
 	if err != nil {
 		return media.Track{}, err
 	}

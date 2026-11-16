@@ -234,13 +234,15 @@ page, which nothing waits on.
   `songsPerMinute` songs, 10, at most, ten at once then one each 6 s, and
   has `MaxWaiting`, 10, wait at most. The host takes a guest's word on a
   song for nothing but its ID and its kind: it finds each by its ID
-  (`Guests.Look`), on YouTube Music, on Spotify while signed in to it, or
-  among its own files, and shows, plays and tells Discord and the
-  scrobblers of the song as that tells it, its covers and whether it's
-  explicit included. It finds them beside the guest's messages, 16 at
-  once in the room (`maxLooks`), 10 s each at most. A Spotify song it
-  can't find keeps only covers of the services' own hosts, and is refused
-  while the host hides explicit content. In Ask me first, a file of the
+  (`Guests.Look`), on YouTube Music, signed out, on Spotify while signed
+  in to it, or among its own files, and shows, plays and tells Discord
+  and the scrobblers of the song as that tells it, its covers and whether
+  it's explicit included. A Spotify song is refused while the host isn't
+  signed in to Spotify, as nothing else tells what it is. It finds them
+  beside the guest's messages, 16 at once in the room (`maxLooks`), 4 of
+  a guest (`maxLooksEach`), 10 at once then one a second (`lookBurst`,
+  `lookEvery`), 10 s each at most; a song of no title it refuses first.
+  In Ask me first, a file of the
   guest's waits for the host's user, who finds it among their files as
   they accept it, so that the guest learns nothing of the host's files
   meanwhile; and a song the host's settings hide is refused as its user
@@ -280,18 +282,21 @@ the hello's features):
    keys and names of the other guests and of itself, and the keys it
    blocked, 2,048 at most (`maxBlocked`).
 2. The guest's user is asked whether this computer hosts the room, 50 s
-   at most: declined, or unanswered, or asked again within a minute, it
-   says so (`hosting`, `declined`). The host waits a minute for that
-   (`AnswerFor`). Once its user agreed, the guest opens a room of its own, of a new code and link, which
-   keeps those places as of guests that dropped off and blocks those
-   keys (`Seats`), and says at which port (`hosting`).
+   at most: declined, or unanswered, or asked again within a minute, or
+   by a host declined twice in the stay, it says so (`hosting`,
+   `declined`). The host waits a minute for that (`AnswerFor`). Once its
+   user agreed, the guest opens a room of its own, of a new code and link,
+   which keeps those places as of guests that dropped off and blocks
+   those keys (`Seats`), and says at which port (`hosting`). That room
+   lets no one in until the room moved there (`Open`).
 3. The host tells each other guest where (`reach`): the new host's key,
    and its address, as the host's connection with it tells, with that
    port. Each tries a TLS connection to that key, where discovery finds it
    or at that address, and says whether it got one (`reach`); the host
-   tries it too. A guest tries once each 10 s at most, and says it didn't
-   3 s after it was asked, however soon it knew, so that a host can't use
-   its guests to knock at address after address.
+   tries it too. A guest tries once each 10 s at most, at that address
+   and where discovery finds that key alone, its tries all ending by 3 s
+   after it was asked, as it says it didn't then, however soon it knew,
+   so that a host can't use its guests to knock at address after address.
 4. Once all did, the host tells them all the room moved (`moved`), before
    it ends the room: each comes back to the new host by its key, as after
    a drop, the host too. The new host's player takes the room's queue,
@@ -301,8 +306,8 @@ One that can't reach it, or no answer in 10 s once the guest opened its
 room (`MoveFor`), keeps the room where it is: the guest is told to close
 the room it opened (`unhost`), which it also closes by itself after twice
 that. So does a Remove or a Block meanwhile, as the room it would move to
-keeps the seats and blocks of its asking, and the guest it moves to
-leaving. As it moves, and once it moved, the room lets no one join, or
+keeps the seats and blocks of its asking, a guest that leaves, and the
+guest it moves to leaving. As it moves, and once it moved, the room lets no one join, or
 come back (`moving`), as their places wouldn't move with it. A guest takes
 a seat only of a key, 201 at most.
 

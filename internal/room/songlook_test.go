@@ -62,39 +62,70 @@ func TestFileSongsWaitForTheHost(t *testing.T) {
 	}
 }
 
-// TestSongsFoundFewAtOnce finds maxLooks songs at once in the room: more
-// are refused until those are found.
+// TestSongsFoundFewAtOnce finds maxLooksEach songs of a guest at once,
+// and maxLooks in the room: more are refused until those are found.
 func TestSongsFoundFewAtOnce(t *testing.T) {
+	was := lookBurst
+	lookBurst = 100
+	t.Cleanup(func() { lookBurst = was })
 	r, f := newRuledRoom(t, Rules{Songs: SongsAdd})
 	f.gate = make(chan struct{})
-	ana, bo := r.join(newGuest(t, "Ana")), r.join(newGuest(t, "Bo"))
-	ca, cb := events(ana), events(bo)
-	for i := range songsPerMinute {
-		ana.AddSong(song(strconv.Itoa(i)))
-		bo.AddSong(song(strconv.Itoa(i)))
+	answers := make(chan string, 64)
+	const guests, each = 5, maxLooksEach + 1
+	for i := range guests {
+		s := r.join(newGuest(t, "Guest "+strconv.Itoa(i)))
+		s.Watch(func(e Event) {
+			if e.Kind == SongAnswered {
+				answers <- e.Reason
+			}
+		})
+		for j := range each {
+			s.AddSong(song(strconv.Itoa(j)))
+		}
 	}
-	// Those past the first maxLooks are refused at once; the others wait.
+	// Those past the first of each guest, and of the room, are refused at
+	// once; the others wait to be found.
 	refused := 0
 	deadline := time.After(5 * time.Second)
-	for refused < 2*songsPerMinute-maxLooks {
+	for refused < guests*each-maxLooks {
 		select {
-		case e := <-ca:
-			if e.Kind == SongAnswered && e.Reason == TooMany {
-				refused++
+		case reason := <-answers:
+			if reason != TooMany {
+				t.Fatalf("answered %q while they're found", reason)
 			}
-		case e := <-cb:
-			if e.Kind == SongAnswered && e.Reason == TooMany {
-				refused++
-			}
+			refused++
 		case <-deadline:
 			t.Fatalf("%d refused", refused)
 		}
 	}
-	if got := len(f.addedNow()); got != 0 {
-		t.Fatalf("%d added while they're found", got)
-	}
 	close(f.gate)
 	waitFor(t, "the songs found added", func() bool { return len(f.addedNow()) == maxLooks })
+}
+
+// TestSongsFoundFewAMinute finds lookBurst of the guests' songs at once,
+// then one each lookEvery, of all the guests.
+func TestSongsFoundFewAMinute(t *testing.T) {
+	was := lookEvery
+	lookEvery = time.Hour
+	t.Cleanup(func() { lookEvery = was })
+	r, _ := newRuledRoom(t, Rules{Songs: SongsAdd})
+	add := func(s *Session, ch <-chan Event, id string) string {
+		s.AddSong(song(id))
+		return next(t, ch, SongAnswered).Reason
+	}
+	for i, n := range []int{lookBurst / 2, lookBurst - lookBurst/2} {
+		s := r.join(newGuest(t, "Guest "+strconv.Itoa(i)))
+		ch := events(s)
+		for j := range n {
+			if reason := add(s, ch, strconv.Itoa(j)); reason != "" {
+				t.Fatalf("guest %d's song %d: %q", i, j, reason)
+			}
+		}
+	}
+	s := r.join(newGuest(t, "One more"))
+	if reason := add(s, events(s), "x"); reason != TooMany {
+		t.Fatalf("one past the room's: %q", reason)
+	}
 }
 
 // TestAcceptAfterBlock adds nothing of a guest blocked since it asked.
@@ -112,5 +143,31 @@ func TestAcceptAfterBlock(t *testing.T) {
 	}
 	if len(f.addedNow()) != 0 {
 		t.Fatal("added the song of a guest blocked since it asked")
+	}
+}
+
+// TestSongsOfNoTitleFindNothing refuses songs of no title before they take
+// a place among those the host finds: as many as it finds at once leave
+// room for the next.
+func TestSongsOfNoTitleFindNothing(t *testing.T) {
+	r, f := newRuledRoom(t, Rules{Songs: SongsAdd})
+	for i := range 2 {
+		s := r.join(newGuest(t, "Guest "+strconv.Itoa(i)))
+		c := events(s)
+		for range maxLooks / 2 {
+			s.AddSong(remote.QueueTrack{Source: "youtube", ID: song("a").ID})
+			if e := next(t, c, SongAnswered); e.Reason != CantPlay {
+				t.Fatalf("a song of no title: %q", e.Reason)
+			}
+		}
+	}
+	s := r.join(newGuest(t, "Bo"))
+	c := events(s)
+	s.AddSong(song("b"))
+	if e := next(t, c, SongAnswered); e.Reason != "" {
+		t.Fatalf("a song once those of no title were refused: %q", e.Reason)
+	}
+	if len(f.addedNow()) != 1 {
+		t.Fatal("not added")
 	}
 }

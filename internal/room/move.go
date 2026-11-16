@@ -338,13 +338,29 @@ func (s *Server) reached(mv *move, who *Member, ok bool) {
 // reasonMoving: the room moves, or moved, and lets no one in.
 const reasonMoving = "moving"
 
-// moves reports whether a move is under way, or the room moved. s.mu is
+// moves reports whether a move is under way, or the room moved, or this
+// room, of seats a room that moves keeps, isn't open yet (Open). s.mu is
 // held.
-func (s *Server) moves() bool { return s.asks.move != nil || s.asks.moved }
+func (s *Server) moves() bool {
+	return s.asks.move != nil || s.asks.moved || s.Seats != nil && !s.asks.open
+}
+
+// Open lets in the computers of the seats of a room that moved here, and
+// the others, once it moved: until then, they're told to try again in a
+// moment, though another tells them where it listens.
+func (s *Server) Open() {
+	s.mu.Lock()
+	s.asks.open = true
+	s.mu.Unlock()
+}
 
 // errDropped: the host removed or blocked someone as the room moved, whose
 // place the room it moved to would keep.
 var errDropped = errors.New("you removed or blocked someone while it moved")
+
+// errLeft: a guest left as the room moved, whose place the room it moved
+// to would keep.
+var errLeft = errors.New("someone left while it moved")
 
 // stopMove ends the move under way, if any, for why.
 func (s *Server) stopMove(why error) {
@@ -374,9 +390,12 @@ func (s *Server) notMoved(mv *move, why error) {
 }
 
 // Reach reports, with nil, whether the guest reaches the room of the host
-// of key at addr: TLS, with that key, then nothing.
+// of key at addr: TLS, with that key, then nothing; at addr alone, not
+// where Elsewhere tells the room the guest is in is reached.
 func (g *Guest) Reach(ctx context.Context, addr string, key remote.Fingerprint) error {
-	tc, _, err := g.connect(ctx, addr, &key)
+	one := *g
+	one.Elsewhere = nil
+	tc, _, err := one.connect(ctx, addr, &key)
 	if err != nil {
 		return err
 	}

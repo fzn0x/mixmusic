@@ -56,16 +56,20 @@ func TestKnocksBounded(t *testing.T) {
 	}
 }
 
-// TestKnocksNearby tells the networks of the host's own kind from the
-// internet's, the providers' shared range too.
+// TestKnocksNearby tells, of the addresses a knock comes from, those of
+// networks of the host's own kind, this computer's loopback of IPv6 too,
+// from the internet's, the providers' shared range too.
 func TestKnocksNearby(t *testing.T) {
-	for src, want := range map[string]bool{"192.168.1.2": true, "10.0.0.1": true, "127.0.0.1": true, "100.100.1.1": false,
-		"fd00:1:2:3::/64": true, "fe80::/64": true, "203.0.113.7": false, "2001:db8:1:2::/64": false, "nonsense": false} {
-		if got := knocksNearby(src); got != want {
-			t.Errorf("knocksNearby(%q) = %v", src, got)
+	for addr, want := range map[string]bool{"192.168.1.2:5": true, "10.0.0.1:5": true, "127.0.0.1:5": true, "[::1]:5": true,
+		"100.100.1.1:5": false, "[fd00:1:2:3::9]:5": true, "[fe80::9%eth0]:5": true, "203.0.113.7:5": false,
+		"[2001:db8:1:2::9]:5": false} {
+		if got := localSource(sourceOf(addr)); got != want {
+			t.Errorf("localSource(sourceOf(%q)) = %v", addr, got)
 		}
 	}
-	if !knocksHere("127.0.0.1") || !knocksHere("::1") || knocksHere("192.168.1.2") {
-		t.Error("this computer's own sources")
+	for addr, want := range map[string]bool{"127.0.0.1:5": true, "[::1]:5": true, "192.168.1.2:5": false, "[fe80::9]:5": false} {
+		if got := knocksHere(sourceOf(addr)); got != want {
+			t.Errorf("knocksHere(sourceOf(%q)) = %v", addr, got)
+		}
 	}
 }

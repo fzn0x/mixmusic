@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -117,6 +118,11 @@ func TestMakeHostMoves(t *testing.T) {
 		t.Fatalf("moved %+v", got.m)
 	}
 	srv := <-opened
+	// Until the room that moved there opens, none comes back to it.
+	if _, err := bo.Rejoin(context.Background(), got.m.Addr, got.m.Key); !errors.Is(err, ErrRoomMoves) {
+		t.Fatalf("Bo coming back before the room opened: %v", err)
+	}
+	srv.Open()
 	for _, s := range []*Session{sa, sb} {
 		select {
 		case <-s.Done():
@@ -260,5 +266,34 @@ func TestBlockedSeatsBeyondTheGuests(t *testing.T) {
 	data, err := json.Marshal(message{Type: "host", Seats: all[:MaxGuests+1], Blocked: all})
 	if err != nil || len(data) > remote.MaxMessage {
 		t.Fatalf("the host message takes %d bytes: %v", len(data), err)
+	}
+}
+
+// TestReachGoesNowhereElse reaches the room a host moves to at its
+// address alone: not where Elsewhere tells the room the guest is in is.
+func TestReachGoesNowhereElse(t *testing.T) {
+	r := newTestRoom(t)
+	g := newGuest(t, "Ana")
+	var mu sync.Mutex
+	var dialed []string
+	g.Elsewhere = func() []string { return []string{"127.0.0.1:1"} }
+	g.Dial = func(ctx context.Context, network, addr string) (net.Conn, error) {
+		mu.Lock()
+		dialed = append(dialed, addr)
+		mu.Unlock()
+		if addr == r.addr {
+			// Slower than the stagger, after which another address would
+			// be tried too.
+			time.Sleep(2 * dialStagger)
+		}
+		return (&net.Dialer{}).DialContext(ctx, network, addr)
+	}
+	if err := g.Reach(context.Background(), r.addr, r.key); err != nil {
+		t.Fatal(err)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if len(dialed) != 1 || dialed[0] != r.addr {
+		t.Fatalf("dialed %q", dialed)
 	}
 }

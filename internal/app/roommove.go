@@ -304,7 +304,11 @@ func (a *App) reaches(ctx context.Context, key remote.Fingerprint, addr string) 
 	try := func(at string) bool { return ctx.Err() == nil && a.roomGuest(id).Reach(ctx, at, key) == nil }
 	ok := false
 	if f, found := a.foundRoom(key.ID(), true); found {
-		ok = try(f.Addr)
+		for _, at := range append([]string{f.Addr}, f.Others...) {
+			if ok = try(at); ok {
+				break
+			}
+		}
 	}
 	if !ok && addr != "" {
 		ok = try(addr)

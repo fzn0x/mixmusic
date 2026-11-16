@@ -17,12 +17,16 @@ var mdnsGroup = &net.UDPAddr{IP: net.IPv4(224, 0, 0, 251), Port: 5353}
 
 // An Instance is an instance of a service, found on the network: its name,
 // as "Desktop", the address of its host and its port, and the keys and
-// values of its TXT record, whose keys are lowercased.
+// values of its TXT record, whose keys are lowercased. Others are the other
+// addresses its host's answers told, as a host answers a question with its
+// address on the network it came on, one of a VPN's too: Host is the one
+// of this computer's networks, when one is.
 type Instance struct {
-	Name string
-	Host string
-	Port int
-	Text map[string]string
+	Name   string
+	Host   string
+	Port   int
+	Text   map[string]string
+	Others []string
 }
 
 // Addr is the instance's host and port, for net.Dial.
@@ -122,7 +126,7 @@ func Browse(ctx context.Context, service string, opts BrowseOptions) ([]Instance
 		}
 		found.read(buf[:n], addr.IP)
 	}
-	return found.instances(), nil
+	return found.instances(ownNets()), nil
 }
 
 // queryID returns an ID for a query, which a one-shot querier's answers
@@ -205,7 +209,7 @@ type findings struct {
 	shown map[string]string
 	srv   map[string]record
 	txt   map[string][]string
-	hosts map[string]net.IP
+	hosts map[string][]net.IP
 	// from is the address each instance's answer came from, which is the
 	// host's own when no record tells its address.
 	from map[string]net.IP
@@ -213,7 +217,7 @@ type findings struct {
 
 func newFindings(service string) *findings {
 	return &findings{service: service, shown: map[string]string{}, srv: map[string]record{},
-		txt: map[string][]string{}, hosts: map[string]net.IP{}, from: map[string]net.IP{}}
+		txt: map[string][]string{}, hosts: map[string][]net.IP{}, from: map[string]net.IP{}}
 }
 
 // read takes in an answer from the address from: a responder may put its
@@ -241,7 +245,13 @@ func (f *findings) read(msg []byte, from net.IP) {
 		case typeTXT:
 			f.txt[name] = r.txt
 		case typeA:
-			f.hosts[name] = r.ip
+			// Each answer may tell another address of the host, as on
+			// each network it was asked on: none goes in place of another,
+			// and maxHostAddrs are kept at most, as anyone on the network
+			// may answer for the host's name.
+			if len(f.hosts[name]) < maxHostAddrs && !slices.ContainsFunc(f.hosts[name], r.ip.Equal) {
+				f.hosts[name] = append(f.hosts[name], r.ip)
+			}
 			continue
 		}
 		if f.from[name] == nil {
@@ -262,7 +272,7 @@ func (f *findings) missing() []question {
 		if _, ok := f.txt[name]; !ok {
 			qs = append(qs, question{name: name, qtype: typeTXT})
 		}
-		if ok && f.hosts[srv.target] == nil {
+		if ok && len(f.hosts[srv.target]) == 0 {
 			qs = append(qs, question{name: srv.target, qtype: typeA})
 		}
 	}
@@ -270,24 +280,68 @@ func (f *findings) missing() []question {
 }
 
 // instances returns the instances found whole, each where its service is,
-// sorted by name.
-func (f *findings) instances() []Instance {
+// of this computer's networks nets first (nearestFirst), sorted by name.
+func (f *findings) instances(nets []*net.IPNet) []Instance {
 	var out []Instance
 	for _, name := range f.names {
 		srv, ok := f.srv[name]
 		if !ok {
 			continue
 		}
-		host := f.hosts[srv.target]
-		if host == nil {
-			host = f.from[name]
+		hosts := nearestFirst(f.hosts[srv.target], nets)
+		if len(hosts) == 0 && f.from[name] != nil {
+			hosts = []net.IP{f.from[name]}
 		}
-		if host == nil {
+		if len(hosts) == 0 {
 			continue
 		}
-		out = append(out, Instance{Name: f.shown[name], Host: host.String(), Port: int(srv.port), Text: txtValues(f.txt[name])})
+		in := Instance{Name: f.shown[name], Host: hosts[0].String(), Port: int(srv.port), Text: txtValues(f.txt[name])}
+		for _, h := range hosts[1:] {
+			in.Others = append(in.Others, h.String())
+		}
+		out = append(out, in)
 	}
 	slices.SortFunc(out, func(a, b Instance) int { return strings.Compare(strings.ToLower(a.Name), strings.ToLower(b.Name)) })
+	return out
+}
+
+// maxHostAddrs bounds the addresses of a host a browse keeps: one of each
+// network it was asked on, of a few.
+const maxHostAddrs = 8
+
+// sharedNet is the range providers share among their customers (RFC 6598),
+// which VPNs such as Tailscale give their computers too.
+var sharedNet = &net.IPNet{IP: net.IPv4(100, 64, 0, 0).To4(), Mask: net.CIDRMask(10, 32)}
+
+// nearestFirst is ips with those of nets first, networks of this computer
+// that others are on, as against a VPN's interface of its one address,
+// and of those, the providers' shared range, a VPN's too, last: the
+// network this computer reaches the host on directly comes first. The
+// others stay in the order they came.
+func nearestFirst(ips []net.IP, nets []*net.IPNet) []net.IP {
+	rank := func(ip net.IP) int {
+		for _, n := range nets {
+			if ones, bits := n.Mask.Size(); ones < bits && n.Contains(ip) {
+				if sharedNet.Contains(ip) {
+					return 1
+				}
+				return 0
+			}
+		}
+		return 2
+	}
+	out := slices.Clone(ips)
+	slices.SortStableFunc(out, func(a, b net.IP) int { return rank(a) - rank(b) })
+	return out
+}
+
+// ownNets are the networks of this computer that take multicast, which
+// Browse asks on.
+func ownNets() []*net.IPNet {
+	var out []*net.IPNet
+	for _, n := range multicastNetworks() {
+		out = append(out, n.net)
+	}
 	return out
 }
 

@@ -131,7 +131,8 @@ func (a *App) guestRoom() *guestRoom {
 
 // roomGuest is this computer as a guest of rooms.
 func (a *App) roomGuest(id *remote.Identity) *room.Guest {
-	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing, Elsewhere: a.roomElsewhere}
+	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing, Elsewhere: a.roomElsewhere,
+		Dial: a.roomDial}
 }
 
 // Knock knocks at the room of the host id, found on the network, with the
@@ -171,8 +172,10 @@ type knockBy struct {
 	link     bool
 	pinned   *remote.Fingerprint
 	// addrs are where the room is reached from outside the network, as
-	// its link, or the user, tells them (roomfar.go).
+	// its link, or the user, tells them (roomfar.go): the user's, when
+	// typed.
 	addrs []string
+	typed bool
 }
 
 // startKnock starts knocking at the room of the host id, of the key key
@@ -243,7 +246,7 @@ func (a *App) knock(ctx context.Context, g *guestRoom, wasFound bool, by knockBy
 			g.name = f.Name
 		}
 	})
-	s, err := a.roomGuest(id).Knock(ctx, f.Addr, by.pinned, by.password, by.link)
+	s, err := a.knockFound(ctx, id, f, by)
 	if err != nil {
 		fail(err)
 		return
@@ -262,6 +265,31 @@ func (a *App) knock(ctx context.Context, g *guestRoom, wasFound bool, by knockBy
 			}
 		})
 	}()
+}
+
+// knockFound knocks at the room found at f, by by. With the host's key,
+// its other addresses are tried beside the first (roomElsewhere); by a
+// code, each in turn while none answers as a room, as discovery found the
+// room at each. All failing, the first's failure, of this network's
+// address, tells why.
+func (a *App) knockFound(ctx context.Context, id *remote.Identity, f room.Found, by knockBy) (*room.Session, error) {
+	g := a.roomGuest(id)
+	addrs := []string{f.Addr}
+	if by.pinned == nil {
+		addrs = append(addrs, f.Others...)
+	}
+	var first error
+	for _, at := range addrs {
+		s, err := g.Knock(ctx, at, by.pinned, by.password, by.link)
+		var ue *room.UnreachableError
+		if err == nil || !errors.As(err, &ue) || ctx.Err() != nil {
+			return s, err
+		}
+		if first == nil {
+			first = err
+		}
+	}
+	return nil, first
 }
 
 // errRoomAway: the room isn't on the network.
@@ -588,7 +616,12 @@ func roomProblem(name string, err error) string {
 	case errors.Is(err, room.ErrBusy):
 		return name + "'s room checks other codes: try again in a moment."
 	case errors.Is(err, room.ErrBlocked):
-		return name + " blocked this computer from the room."
+		if name == "" || name == "The room" {
+			// A room known by its address alone, whose host's name the
+			// knock never learned.
+			return "This room blocked this computer."
+		}
+		return name + " blocked this computer."
 	case errors.Is(err, room.ErrRemoved):
 		return name + " removed you from the room."
 	case errors.Is(err, room.ErrDeclined):
@@ -611,6 +644,8 @@ func roomProblem(name string, err error) string {
 		return name + "'s room isn't on the network now."
 	case farUnreachable(err):
 		return farProblem(name)
+	case errors.Is(err, room.ErrFarAddr):
+		return roomFarProblem
 	case errors.Is(err, room.ErrNotLink):
 		return "That isn't a link to a room."
 	case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):
@@ -621,6 +656,10 @@ func roomProblem(name string, err error) string {
 	}
 	return "Couldn't reach " + name + ": it may be asleep, or a firewall may turn MixMusic away."
 }
+
+// roomFarProblem is what a guest is told of a link, or a host, that named
+// this computer, or an address of no one (room.FarDialer).
+const roomFarProblem = "The link names an address of this computer, or of no one: ask its host for the link again."
 
 // isNetErr reports whether err is the network's.
 func isNetErr(err error) bool {

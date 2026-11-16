@@ -186,7 +186,9 @@ func TestGuestFarAwayJoinsThroughAFlood(t *testing.T) {
 func TestGuestJoinsThroughAFloodOfPreviews(t *testing.T) {
 	r := newFloodRoom(t)
 	back := newGuest(t, "Back")
-	back.Dial = func(ctx context.Context, _, addr string) (net.Conn, error) { return dialFrom(ctx, addr, "198.51.100.9") }
+	back.Dial = func(ctx context.Context, _, addr string) (net.Conn, error) {
+		return dialFrom(ctx, addr, "198.51.100.9")
+	}
 	r.join(back).Close()
 	waitFor(t, "the guest away", func() bool { m := r.server.Members(); return len(m) == 1 && !m[0].Here })
 	stop := make(chan struct{})
@@ -228,7 +230,9 @@ func TestGuestJoinsThroughAFloodOfPreviews(t *testing.T) {
 			t.Fatalf("%d previews held", n)
 		}
 		g := newGuest(t, "Friend")
-		g.Dial = func(ctx context.Context, _, addr string) (net.Conn, error) { return dialFrom(ctx, addr, "198.51.100.7") }
+		g.Dial = func(ctx context.Context, _, addr string) (net.Conn, error) {
+			return dialFrom(ctx, addr, "198.51.100.7")
+		}
 		s, err := g.Knock(context.Background(), r.addr, &r.key, r.server.Secret, true)
 		if err != nil {
 			t.Fatalf("knock %d through the previews: %v", i, err)

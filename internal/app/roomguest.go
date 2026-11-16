@@ -124,7 +124,7 @@ func (a *App) guestRoom() *guestRoom {
 
 // roomGuest is this computer as a guest of rooms.
 func (a *App) roomGuest(id *remote.Identity) *room.Guest {
-	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing, Dial: a.roomDial}
+	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing, Elsewhere: a.roomElsewhere}
 }
 
 // Knock knocks at the room of the host id, found on the network, with the

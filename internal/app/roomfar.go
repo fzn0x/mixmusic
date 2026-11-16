@@ -8,7 +8,6 @@ package app
 // to come back at the host's new address.
 
 import (
-	"context"
 	"errors"
 	"net"
 	"net/netip"
@@ -57,25 +56,16 @@ func (a *App) linkRoom(id string) (room.Found, bool) {
 	return room.Found{ID: id, Name: "The room", Addr: addrs[0]}, true
 }
 
-// roomDial connects to the room this computer knocks at, or comes back
-// to, at addr, and at the addresses of its invite link beside it, keeping
-// the first that answers. A room of the network alone is dialed as
-// before.
-func (a *App) roomDial(ctx context.Context, network, addr string) (net.Conn, error) {
-	var link []string
+// roomElsewhere tells where else the room this computer knocks at, or
+// comes back to, is reached: the addresses of its invite link, which a
+// connection to its host's key tries beside the one found on the network,
+// keeping the first that is the host (room.Guest.Elsewhere). With none,
+// the room is of the network alone.
+func (a *App) roomElsewhere() []string {
 	if g := a.guestRoom(); g != nil {
-		link = a.linkAddrs(g.id)
+		return a.linkAddrs(g.id)
 	}
-	if len(link) == 0 {
-		return (&net.Dialer{}).DialContext(ctx, network, addr)
-	}
-	addrs := []string{addr}
-	for _, x := range link {
-		if !slices.Contains(addrs, x) {
-			addrs = append(addrs, x)
-		}
-	}
-	return room.DialFirst(ctx, nil, addrs)
+	return nil
 }
 
 // KnockAt knocks at the room at addr, an address typed with its port, as

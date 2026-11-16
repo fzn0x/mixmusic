@@ -21,10 +21,11 @@ import (
 var (
 	// roomRetry is how long after dropping off a guest tries to come
 	// back, at first, and roomRetryMost at most, doubling between, for
-	// roomTries tries.
+	// roomTries tries: about 15 minutes, as long as the host keeps its
+	// place, after a sleep or a change of network on either side.
 	roomRetry     = time.Second
 	roomRetryMost = 32 * time.Second
-	roomTries     = 15
+	roomTries     = 32
 	// roomKnockFor bounds a knock, and joining after it.
 	roomKnockFor = 30 * time.Second
 )

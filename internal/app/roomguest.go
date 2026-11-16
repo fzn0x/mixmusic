@@ -75,6 +75,9 @@ type guestRoom struct {
 	pending *hostedRoom
 	ask     *hostAsk
 	askedAt time.Time
+	// declined counts the host's asks the user declined, or left
+	// unanswered: past maxDeclines, it asks no more (roommove.go).
+	declined int
 }
 
 // GuestView is the room this computer is a guest of, for its page: the

@@ -2,6 +2,7 @@ package room
 
 import (
 	"context"
+	"net"
 	"strconv"
 	"strings"
 
@@ -40,17 +41,24 @@ type Found struct {
 type MDNS struct{}
 
 // Announce answers the questions about the room on mDNS's port, on each of
-// the computer's networks, until stop. Its instance and its host are named
-// after its host's ID, which no other computer has.
+// the computer's networks, until stop, on a socket it keeps working: one
+// opened before macOS let MixMusic use the local network is put back once
+// it may (#725). Its instance and its host are named after its host's ID,
+// which no other computer has.
 func (MDNS) Announce(a Announcement) (func(), error) {
-	conn, err := dnssd.ListenMulticast()
-	if err != nil {
-		return nil, err
-	}
-	r := &dnssd.Responder{Service: Service, Instance: "MixMusic room " + a.ID, Host: "mixmusic-room-" + a.ID + ".local.", Port: a.Port,
+	return responderOf(a).Keep(func() (net.PacketConn, error) {
+		conn, err := dnssd.ListenMulticast()
+		if err != nil {
+			return nil, err
+		}
+		return conn, nil
+	})
+}
+
+// responderOf is what answers the questions about the room a announces.
+func responderOf(a Announcement) *dnssd.Responder {
+	return &dnssd.Responder{Service: Service, Instance: "MixMusic room " + a.ID, Host: "mixmusic-room-" + a.ID + ".local.", Port: a.Port,
 		Text: []string{"id=" + a.ID, "name=" + truncate(CleanName(a.Name), 200), "v=" + strconv.Itoa(version)}}
-	go r.Serve(conn)
-	return func() { conn.Close() }, nil
 }
 
 // Browse asks the network for the rooms, for a second.

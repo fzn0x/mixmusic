@@ -390,9 +390,12 @@ func (s *Server) notMoved(mv *move, why error) {
 }
 
 // Reach reports, with nil, whether the guest reaches the room of the host
-// of key at addr: TLS, with that key, then nothing.
+// of key at addr: TLS, with that key, then nothing; at addr alone, not
+// where Elsewhere tells the room the guest is in is reached.
 func (g *Guest) Reach(ctx context.Context, addr string, key remote.Fingerprint) error {
-	tc, _, err := g.connect(ctx, addr, &key)
+	one := *g
+	one.Elsewhere = nil
+	tc, _, err := one.connect(ctx, addr, &key)
 	if err != nil {
 		return err
 	}

@@ -12,12 +12,9 @@ import (
 	"context"
 	"errors"
 	"log"
-	"net/url"
-	"slices"
 
 	"github.com/egoist/mygo"
 
-	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/room"
@@ -76,10 +73,8 @@ func (a *App) lookGuestSong(ctx context.Context, t remote.QueueTrack) (remote.Qu
 }
 
 // findSong finds t, a track of a service, by its ID, as its service tells
-// it. Spotify's tells it only while the user is signed in to it: until
-// then, t is taken as it is, but for its covers, but those of the
-// services' own hosts, and none at all while the settings hide explicit
-// content, as nothing tells whether it is.
+// it: none of Spotify's while the user isn't signed in to it, as nothing
+// else tells what it is.
 func (a *App) findSong(ctx context.Context, t media.Track) (media.Track, error) {
 	if o := a.opts.Room; o != nil && o.Song != nil {
 		return o.Song(ctx, t)
@@ -94,14 +89,7 @@ func (a *App) findSong(ctx context.Context, t media.Track) (media.Track, error) 
 	case t.Source == media.SourceSpotify && a.spotify.SignedIn():
 		return a.spotify.Track(ctx, native)
 	}
-	if a.settings.Get().HideExplicit {
-		return media.Track{}, errCantPlaySong
-	}
-	t.Artwork = slices.DeleteFunc(slices.Clone(t.Artwork), func(img media.Image) bool {
-		u, err := url.Parse(img.URL)
-		return err != nil || !artwork.CoverHost(u.Hostname())
-	})
-	return t, nil
+	return media.Track{}, errCantPlaySong
 }
 
 // addGuestSong adds the song t, which the guest from added, as

@@ -41,24 +41,15 @@ func TestRoomSongsAsTheServiceTells(t *testing.T) {
 	toldNote(t, lapNotes, "Desk can't play Song e")
 }
 
-// TestRoomSpotifySongUnfound takes a guest's Spotify song, which nothing
-// finds while the host isn't signed in to Spotify, as the guest tells it
-// but for its covers of other hosts than the services'; and none while
-// the host's settings hide explicit content, as nothing tells whether it
-// is.
+// TestRoomSpotifySongUnfound refuses a guest's Spotify song while the host
+// isn't signed in to Spotify, as nothing else tells what it is: the
+// guest's title would play, matched on YouTube Music, and reach Discord
+// and the scrobblers.
 func TestRoomSpotifySongUnfound(t *testing.T) {
 	a := newRoomApp(t, roomtest.New(), "Desk")
 	q := remote.QueueTrack{Source: "spotify", ID: "sp:4uLU6hMCjMI75M1A2tKUQC", Title: "A song", Artists: []remote.Ref{{Name: "Band"}},
-		Artwork: []remote.Image{{URL: "https://i.scdn.co/image/ab67616d"}, {URL: "https://192.168.1.1/admin.png"}}}
-	got, err := a.lookGuestSong(context.Background(), q)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got.Title != "A song" || len(got.Artwork) != 1 || got.Artwork[0].URL != "https://i.scdn.co/image/ab67616d" {
-		t.Fatalf("found %+v", got)
-	}
-	setRules(t, a.App, func(s *settings.Settings) { s.HideExplicit = true })
+		Artwork: []remote.Image{{URL: "https://i.scdn.co/image/ab67616d"}}}
 	if _, err := a.lookGuestSong(context.Background(), q); err == nil {
-		t.Fatal("took a song unfound while the settings hide explicit content")
+		t.Fatal("took a Spotify song nothing found")
 	}
 }

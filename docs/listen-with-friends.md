@@ -84,8 +84,8 @@ included, and your guests stay.
 
 A guest whose computer sleeps, or loses the network, comes back by
 itself, without the code: after a second, then a little longer each
-time, up to half a minute, 15 times, and as soon as its computer wakes.
-The host keeps its place 15 minutes. When the host ends the room, or
+time, up to half a minute, for about 15 minutes, and as soon as its
+computer wakes. The host keeps its place 15 minutes. When the host ends the room, or
 can't be reached, the guest's page says **The room ended**, and its own
 queue comes back.
 
@@ -106,6 +106,58 @@ network, as for remote control: the first time, your system may ask
 about it. [Remote control](remote-control.md#firewalls-and-the-local-network)
 tells what to answer, on Windows, macOS and Linux. Guests listen for
 nothing.
+
+## Friends outside your network
+
+Friends who live apart join a room too: MixMusic has no server, so they
+reach your computer directly.
+
+1. On your room's page, turn on **Let friends outside this network
+   join**. MixMusic asks your router to forward the room's port, and the
+   page says what it set up: "Your router forwards port 41234 of its
+   internet address, …, to this computer", or why it couldn't.
+2. Send friends the invite link: **copy invite link**, or **copy web
+   link**, an `https://mixmusic.functionx.dev/join/#…` address, for chat
+   apps that don't open `mixmusic://` links. Its page opens the room in
+   MixMusic, or offers the download. The room's code and address stay
+   after the `#`, which browsers never send to the website.
+3. Friends open the link, or paste it as **Invite link** on their Listen
+   with friends page.
+
+MixMusic can't test the port from outside: ask a friend to try the link.
+A friend who can't connect is told the likely causes. Anyone with the
+link, or the code, may knock: **remove**, **block** and **new code** keep
+them out, as on your network.
+
+- **Routers.** MixMusic asks by UPnP, NAT-PMP or PCP, for that one TCP
+  port alone, renews the forward while the room lasts and removes it as
+  it ends. A router with all three off answers nothing: turn UPnP on in
+  its settings, or forward the port to this computer by hand.
+- **Behind another router.** A router whose own internet address starts
+  with 100.64 to 100.127, or is private, sits behind another, most often
+  your provider's, out of reach from outside. A VPN you both run, such as
+  Tailscale, is the way then.
+- **IPv6.** A computer with a public IPv6 address is reached there by
+  friends with IPv6 too, where your router lets the port in: MixMusic
+  asks it to by PCP.
+- **Address for invites**, in Settings › Desktop › Listen with friends,
+  takes an address in place of what your router tells: this computer's
+  address on a VPN you both run, or your router's, with a port you
+  forwarded by hand. **Port for rooms** keeps the port rooms listen on,
+  picked at random the first time and kept, so that a forward made by
+  hand keeps working.
+- **A new address.** If your router's internet address changes, the
+  room's page says so and offers the new link to send. Friends who
+  dropped off come back as they open it.
+- **Joining at an address.** **Join a room…**, in the cast button's menu
+  and in Settings › Desktop › Listen with friends, opens the Listen with
+  friends page, which takes an invite link, or a room's address, with its
+  port, and its code.
+- **Firewalls.** On Windows, the rule that Settings › Desktop › Windows
+  Firewall adds lets in any address on private and domain networks, so a
+  forwarded port works. On macOS, the firewall must allow MixMusic's
+  incoming connections, and on Linux, ufw or firewalld must let the port
+  in, as `sudo ufw allow 41234/tcp` does, with your room's port.
 
 ## Not yet
 

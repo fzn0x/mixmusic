@@ -4,15 +4,17 @@ package app
 // are its song's, from LRCLIB, timed for the song, MixMusic finds where
 // the song starts in the video, comparing stretches of the two
 // recordings' audio on this computer (internal/align), and moves each
-// line by that shift: a video that opens with a scene before the song
-// gets its lyrics in time, and one longer only by its outro keeps their
-// times. Both recordings come from YouTube, a block at a time as they are
-// read (stream.Ranges), never the whole song, and reading them reports
-// no play. One measurement runs at a time; its result is kept in
-// lyrics-timing.json in the cache folder, by video and song: a shift for
-// timedFor, no clear match for unmatchedFor. A measurement that fails, as
-// a download that fails or takes over timingWait, keeps nothing, and the
-// video's lyrics show as the song has them for timingHold.
+// line by that shift, at the speed the video plays the song, which may be
+// a little off its own (#748): a video that opens with a scene before the
+// song gets its lyrics in time, and one longer only by its outro keeps
+// their times. Both recordings come from YouTube, a block at a time as
+// they are read (stream.Ranges), never the whole song, and reading them
+// reports no play. One measurement runs at a time; its result is kept in
+// lyrics-timing.json in the cache folder, by video and song: a shift and
+// a speed for timedFor, no clear match for unmatchedFor. A measurement
+// that fails, as a download that fails or takes over timingWait, keeps
+// nothing, and the video's lyrics show as the song has them for
+// timingHold.
 //
 // YouTube Music's own map of a video and its song, the counterpart and
 // segmentMap of the "next" answer signed in, isn't read: no recorded
@@ -29,6 +31,7 @@ import (
 	"math"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -46,13 +49,23 @@ import (
 const timingNote = "Timing these lyrics to the video…"
 
 // timedNote is the note of lyrics timed to a music video the song starts
-// shift into.
-func timedNote(shift time.Duration) string {
+// shift into, at speed, as align.Result has it: the note names how much
+// slower or faster the video plays the song, to a hundredth of a percent,
+// when it isn't 1 at that (#748).
+func timedNote(shift time.Duration, speed float64) string {
 	s := math.Round(shift.Seconds()*10) / 10
 	if s == 0 {
 		s = 0 // not -0
 	}
-	return fmt.Sprintf("Timed to this video (%+.1f s)", s)
+	off := math.Round(math.Abs(speed-1)*1e4) / 100
+	if off == 0 {
+		return fmt.Sprintf("Timed to this video (%+.1f s)", s)
+	}
+	pace := "slower"
+	if speed < 1 {
+		pace = "faster"
+	}
+	return fmt.Sprintf("Timed to this video (%+.1f s, %s%% %s)", s, strconv.FormatFloat(off, 'f', -1, 64), pace)
 }
 
 // These are the times of the timing of lyrics; tests shorten some.
@@ -80,9 +93,21 @@ type keptTiming struct {
 	// ShiftMs milliseconds into it.
 	Matched bool  `json:"matched"`
 	ShiftMs int64 `json:"shiftMs,omitempty"`
+	// Speed is how many seconds of the video a second of the song lasts,
+	// as align.Result has it; 0, as #565 kept none, is 1 (#748).
+	Speed float64 `json:"speed,omitempty"`
 }
 
 func (k keptTiming) shift() time.Duration { return time.Duration(k.ShiftMs) * time.Millisecond }
+
+// speed returns the speed k was found at: 1 for a record without one, or
+// with one past align.MaxSpeed, which align never finds.
+func (k keptTiming) speed() float64 {
+	if k.Speed > 1-align.MaxSpeed && k.Speed < 1+align.MaxSpeed {
+		return k.Speed
+	}
+	return 1
+}
 
 // fresh reports whether k is still taken as it is at now.
 func (k keptTiming) fresh(now time.Time) bool {
@@ -159,17 +184,17 @@ func (a *App) OnLyricsTimed(fn func(trackID string)) (cancel func()) {
 }
 
 // videoLyrics returns the synced lyrics l of song, a music video's song,
-// as they show with the video: moved by where the song starts in it once
-// that is measured, with a note that says so; while it is, as the song
-// has them, with timingNote; else as the song has them while they keep
-// time with the video, and without their times, with videoNote, when
-// they don't.
+// as they show with the video: moved by where the song starts in it, at
+// the speed it plays there, once that is measured, with a note that says
+// so; while it is, as the song has them, with timingNote; else as the
+// song has them while they keep time with the video, and without their
+// times, with videoNote, when they don't.
 func (c *Catalog) videoLyrics(ctx context.Context, video, song media.Track, l lyrics.Lyrics) lyrics.Lyrics {
 	if c.a.settings.Get().LyricsTimeVideos {
-		switch shift, state := c.a.videoTiming(video, song); state {
+		switch k, state := c.a.videoTiming(video, song); state {
 		case timingFound:
-			l = l.Shifted(shift, 1)
-			l.Note = timedNote(shift)
+			l = l.Shifted(k.shift(), k.speed())
+			l.Note = timedNote(k.shift(), k.speed())
 			return l
 		case timingUnderWay:
 			if !c.keepsTime(ctx, video, song) {
@@ -187,20 +212,20 @@ func (c *Catalog) videoLyrics(ctx context.Context, video, song media.Track, l ly
 }
 
 // videoTiming returns how the lyrics of song are timed to video, its music
-// video: the shift found, else whether it is being measured, which it
+// video: the timing found, else whether it is being measured, which it
 // starts when nothing is known of it. A measurement asked for while
 // another runs waits for it while the other's video plays, and the other
 // gives way else; one that waited gives way to it.
-func (a *App) videoTiming(video, song media.Track) (time.Duration, timingState) {
+func (a *App) videoTiming(video, song media.Track) (keptTiming, timingState) {
 	_, videoID, err := media.ParseID(video.ID)
 	_, songID, err2 := media.ParseID(song.ID)
 	if err != nil || err2 != nil || !stream.ValidVideoID(videoID) || !stream.ValidVideoID(songID) {
-		return 0, timingNone
+		return keptTiming{}, timingNone
 	}
 	playing := a.playingID()
 	t := &a.lyricsTiming
 	t.mu.Lock()
-	shift, state, dropped := a.timingLocked(videoID+" "+songID, video.ID, videoID, songID, playing)
+	k, state, dropped := a.timingLocked(videoID+" "+songID, video.ID, videoID, songID, playing)
 	told := t.told
 	t.mu.Unlock()
 	if dropped != nil {
@@ -209,28 +234,28 @@ func (a *App) videoTiming(video, song media.Track) (time.Duration, timingState) 
 			(*fn)(dropped.trackID)
 		}
 	}
-	return shift, state
+	return k, state
 }
 
 // timingLocked is videoTiming of the timing of key, with t.mu held, which
 // returns the measurement that waited and gives way, if any.
-func (a *App) timingLocked(key, trackID, videoID, songID, playing string) (time.Duration, timingState, *timingRun) {
+func (a *App) timingLocked(key, trackID, videoID, songID, playing string) (keptTiming, timingState, *timingRun) {
 	t := &a.lyricsTiming
 	a.loadTimings()
 	now := time.Now()
 	if k, ok := t.kept[key]; ok && k.fresh(now) {
 		if k.Matched {
-			return k.shift(), timingFound, nil
+			return k, timingFound, nil
 		}
-		return 0, timingNone, nil
+		return keptTiming{}, timingNone, nil
 	}
 	for _, r := range []*timingRun{t.running, t.next} {
 		if r != nil && r.key == key {
-			return 0, timingUnderWay, nil
+			return keptTiming{}, timingUnderWay, nil
 		}
 	}
 	if until, ok := t.held[key]; ok && now.Before(until) || t.closed {
-		return 0, timingNone, nil
+		return keptTiming{}, timingNone, nil
 	}
 	open := t.open
 	if open == nil && a.proxy != nil {
@@ -239,19 +264,19 @@ func (a *App) timingLocked(key, trackID, videoID, songID, playing string) (time.
 		}
 	}
 	if open == nil {
-		return 0, timingNone, nil
+		return keptTiming{}, timingNone, nil
 	}
 	r := &timingRun{key: key, trackID: trackID, video: videoID, song: songID, open: open}
 	if t.running == nil {
 		t.start(a, r)
-		return 0, timingUnderWay, nil
+		return keptTiming{}, timingUnderWay, nil
 	}
 	if t.running.trackID != playing {
 		t.running.cancel() // it no longer plays: it gives way
 	}
 	dropped := t.next
 	t.next = r
-	return 0, timingUnderWay, dropped
+	return keptTiming{}, timingUnderWay, dropped
 }
 
 // lyricsStay reports whether the lyrics of the track trackID, looked up
@@ -323,8 +348,8 @@ func (a *App) runTiming(r *timingRun) {
 	stored := true
 	switch {
 	case err == nil:
-		t.kept[r.key] = keptTiming{At: now.Unix(), Matched: true, ShiftMs: found.Shift.Milliseconds()}
-		log.Printf("mixmusic: timed the lyrics of %s to it in %v: its song, %s, starts %+.3fs into it (%s)", r.video, time.Since(start).Round(time.Millisecond), r.song, found.Shift.Seconds(), found.Windows)
+		t.kept[r.key] = keptTiming{At: now.Unix(), Matched: true, ShiftMs: found.Shift.Milliseconds(), Speed: found.Speed}
+		log.Printf("mixmusic: timed the lyrics of %s to it in %v: its song, %s, starts %+.3fs into it, a second of it lasting %.6fs there (%s)", r.video, time.Since(start).Round(time.Millisecond), r.song, found.Shift.Seconds(), found.Speed, found.Windows)
 	case errors.Is(err, align.ErrNoMatch):
 		t.kept[r.key] = keptTiming{At: now.Unix()}
 		log.Printf("mixmusic: the lyrics of %s keep the times of its song, %s: %v", r.video, r.song, err)

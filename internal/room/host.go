@@ -564,6 +564,7 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 		}
 		s.admit(c, name, st)
 		s.mu.Unlock()
+		s.tellRules(c)
 		s.changed(true)
 		return true
 	}
@@ -594,6 +595,7 @@ func (s *Server) comeBack(c *conn, name string) string {
 	}
 	s.admit(c, name, st)
 	s.mu.Unlock()
+	s.tellRules(c)
 	s.changed(true)
 	return ""
 }
@@ -618,7 +620,6 @@ func (s *Server) admit(c *conn, name string, st State) {
 	}
 	st = s.stateOf(st)
 	c.send(message{Type: "state", State: &st})
-	s.tellRules(c)
 }
 
 // note keeps an activity. s.mu is held.

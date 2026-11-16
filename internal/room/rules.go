@@ -98,7 +98,8 @@ func (s *Server) RulesChanged() {
 	}
 }
 
-// tellRules tells c, a guest let in, the host's rules. s.mu is held.
+// tellRules tells c, a guest let in, the host's rules. s.mu isn't held, as
+// Guests' funcs are called without it.
 func (s *Server) tellRules(c *conn) {
 	r := s.rules()
 	c.send(message{Type: "rules", Rules: &r})

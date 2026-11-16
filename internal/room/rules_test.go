@@ -163,3 +163,24 @@ func TestBucketRefills(t *testing.T) {
 		t.Fatal("refused after an hour")
 	}
 }
+
+// TestRulesWithoutTheLock asks the host's app its rules without the
+// server's lock, as Guests' funcs are: rules that read the room's members
+// let a guest join.
+func TestRulesWithoutTheLock(t *testing.T) {
+	var srv *Server
+	r := newTestRoomWith(t, func(s *Server) {
+		srv = s
+		s.Guests = &Guests{Rules: func() Rules {
+			srv.Members()
+			return Rules{Songs: SongsAdd}
+		}}
+	})
+	s := r.join(newGuest(t, "Ana"))
+	waitFor(t, "the rules", func() bool { got, ok := s.Rules(); return ok && got.Songs == SongsAdd })
+	back, err := newGuest(t, "Bo").Knock(context.Background(), r.addr, nil, []byte("ABC123"), false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	back.Close()
+}

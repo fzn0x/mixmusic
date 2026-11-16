@@ -85,6 +85,16 @@ answers from mDNS's port, 5353, which it shares with the system's own
 responder. The others look for it as they look for cast devices: a few
 seconds after start, every 45 s, and as the devices menu opens.
 
+The socket it answers on is kept working (`Responder.Keep`, #725). Five
+seconds after start, then every minute, it sends mDNS's group a question
+no one answers, which it hears back. A socket that can't send it, or
+hears nothing, is checked against a fresh one, which takes its place if
+it passes; a fresh one that does no better is closed, and the next check
+comes within seconds, half a minute apart at most. A responder that
+stopped on an error is put back the same way. On macOS, a socket opened
+before the user let MixMusic use the local network stayed deaf after it,
+and the computer wasn't found until it restarted.
+
 What discovery tells is only where to connect: anyone can answer. The key
 decides who answers there.
 

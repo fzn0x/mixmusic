@@ -129,8 +129,9 @@ about it:
   keeps the other computers out.
 - **macOS**: macOS asks whether MixMusic may find and connect to devices
   on your local network. Allow it on both computers; System Settings ›
-  Privacy & Security › Local Network changes it later. With the macOS
-  firewall on, allow MixMusic's incoming connections too.
+  Privacy & Security › Local Network changes it later. Once you allow it,
+  the other computers find this one within a minute, without a restart.
+  With the macOS firewall on, allow MixMusic's incoming connections too.
 - **Linux**: a firewall such as ufw or firewalld must let in the port
   MixMusic picks, which changes each start, and mDNS's, UDP 5353: allow
   incoming connections from your local network, as

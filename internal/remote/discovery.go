@@ -2,6 +2,7 @@ package remote
 
 import (
 	"context"
+	"net"
 	"strconv"
 
 	"github.com/fzn0x/mixmusic/internal/dnssd"
@@ -38,17 +39,20 @@ type Found struct {
 type MDNS struct{}
 
 // Announce answers the questions about this computer on mDNS's port, on
-// each of the computer's networks, until stop. Its instance and its host
-// are named after its ID, which no other computer has.
+// each of the computer's networks, until stop, on a socket it keeps
+// working: one opened before macOS let MixMusic use the local network is
+// put back once it may (#725). Its instance and its host are named after
+// its ID, which no other computer has.
 func (MDNS) Announce(a Announcement) (func(), error) {
-	conn, err := dnssd.ListenMulticast()
-	if err != nil {
-		return nil, err
-	}
 	r := &dnssd.Responder{Service: Service, Instance: "MixMusic " + a.ID, Host: "mixmusic-" + a.ID + ".local.", Port: a.Port,
 		Text: []string{"id=" + a.ID, "name=" + truncate(a.Name, 200), "v=" + strconv.Itoa(version)}}
-	go r.Serve(conn)
-	return func() { conn.Close() }, nil
+	return r.Keep(func() (net.PacketConn, error) {
+		conn, err := dnssd.ListenMulticast()
+		if err != nil {
+			return nil, err
+		}
+		return conn, nil
+	})
 }
 
 // Browse asks the network for the computers with remote control on, for a

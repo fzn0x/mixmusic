@@ -60,7 +60,13 @@
   shows it as "Showing the first 1,200 songs", with Try again. The app
   gives these lists 20 minutes to come rather than fetch's minute
   (`wholeList`), and while Songs in your library isn't whole, a song's
-  menu asks `SongSaved` of the song as it opens (`savedApart`). An add of a
+  menu asks `SongSaved` of the song as it opens (`savedApart`). Each page
+  read goes to the window as it comes: `libraryList` hands what it has
+  read to the func a context holds (`media.WithPartial`, `media.Partial`),
+  `fetchAs` sets it for these lists, and the window shows `loaded.part`
+  (`loaded.shown`) with "Loading more…" under it while `coming` is set.
+  What needs the whole list reads it without that func, or waits for
+  `done`: new releases (`followedArtists`) and `savedApart`. An add of a
   video the playlist holds already YouTube refuses, offering in its
   answer the same add with its check skipped (`DEDUPE_OPTION_SKIP`):
   that, not the answer's words, which are in the account's language,

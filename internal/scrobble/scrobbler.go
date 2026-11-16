@@ -85,6 +85,10 @@ type Scrobbler struct {
 	// size is how many plays the next Scrobble call takes, fewer than
 	// batch while a rejected batch is split to find the play at fault.
 	size int
+	// wake has Run send: something waits to be sent.
+	wake chan struct{}
+	// after is time.After, which tests replace.
+	after func(time.Duration) <-chan time.Time
 }
 
 // listen is the play of the track the player has loaded.
@@ -113,7 +117,7 @@ func New(api Service, key string, o Options) *Scrobbler {
 	if batch <= 0 {
 		batch = defaultBatch
 	}
-	return &Scrobbler{api: api, batch: batch, size: batch, session: key, tryQueue: key != ""}
+	return &Scrobbler{api: api, batch: batch, size: batch, session: key, tryQueue: key != "", wake: make(chan struct{}, 1), after: time.After}
 }
 
 // SetSession changes the session key calls are made with, such as after the
@@ -126,6 +130,7 @@ func (s *Scrobbler) SetSession(key string) {
 	if key == "" {
 		s.nowPlaying = nil
 	}
+	s.woken()
 }
 
 // Queue returns the scrobbles waiting to be sent, oldest first.
@@ -144,6 +149,7 @@ func (s *Scrobbler) SetQueue(plays []Play) {
 	s.gen++
 	s.size = s.batch
 	s.tryQueue = true
+	s.woken()
 }
 
 // Discard drops the scrobbles waiting to be sent, such as when the user
@@ -173,7 +179,7 @@ func (s *Scrobbler) Expired() bool {
 // seconds, to as much of the track as it played at the rate of the first:
 // at 2×, a second plays two of the track. The track plays again when the
 // position goes back near 0 after it had advanced, or after another one.
-// Observe reports whether Send has something to send.
+// Observe reports whether Send has something to send, which wakes Run.
 func (s *Scrobbler) Observe(now time.Time, id string, t Track, playing bool, position time.Duration, rate float64) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -190,7 +196,7 @@ func (s *Scrobbler) Observe(now time.Time, id string, t Track, playing bool, pos
 		s.cur = listen{id: id}
 	}
 	if id == "" {
-		return s.pending()
+		return s.woken()
 	}
 	c.track, c.playing, c.position, c.rate, c.seen = t, playing, position, rate, now
 	if playing && c.start.IsZero() {
@@ -202,7 +208,7 @@ func (s *Scrobbler) Observe(now time.Time, id string, t Track, playing bool, pos
 		s.nowPlaying = &t
 	}
 	s.count()
-	return s.pending()
+	return s.woken()
 }
 
 // count queues the current play as a scrobble once it has been listened to

@@ -27,7 +27,7 @@ func init() {
 	guestAsks["hosting"] = (*Server).hosting
 	guestAsks["reach"] = func(s *Server, c *conn, m message) { s.reachedBy(c, m.OK) }
 	hostTells["host"] = func(s *Session, m message) {
-		s.tell(Event{Kind: HostAsked, Seats: Seats{Guests: membersOfSeats(m.Seats), Blocked: membersOfSeats(m.Blocked)}})
+		s.tell(Event{Kind: HostAsked, Seats: Seats{Guests: membersOfSeats(m.Seats, MaxGuests+1), Blocked: membersOfSeats(m.Blocked, maxBlocked)}})
 	}
 	hostTells["unhost"] = func(s *Session, m message) { s.tell(Event{Kind: Unhosted}) }
 	hostTells["reach"] = func(s *Session, m message) {
@@ -75,18 +75,25 @@ func seatsOf(ms []Member) []Seat {
 	return out
 }
 
-// membersOfSeats are the seats a host told, MaxGuests and one more at
-// most, of keys that are keys, as members.
-func membersOfSeats(seats []Seat) []Member {
-	if len(seats) > MaxGuests+1 {
-		seats = seats[:MaxGuests+1]
+// maxBlocked bounds the keys a room that moves tells blocked: more than
+// its guests, as a host blocks those who left too, and few enough that
+// their message, with the seats, takes less than the protocol's MiB.
+const maxBlocked = 2048
+
+// membersOfSeats are the seats a host told, n at most, of keys that are
+// keys, once each, as members.
+func membersOfSeats(seats []Seat, n int) []Member {
+	if len(seats) > n {
+		seats = seats[:n]
 	}
 	var out []Member
+	seen := map[remote.Fingerprint]bool{}
 	for _, st := range seats {
 		key, err := remote.ParseFingerprint(st.Key)
-		if err != nil || slices.ContainsFunc(out, func(m Member) bool { return m.Key == key }) {
+		if err != nil || seen[key] {
 			continue
 		}
+		seen[key] = true
 		out = append(out, Member{Key: key, Name: CleanName(st.Name)})
 	}
 	return out
@@ -175,6 +182,8 @@ func (s *Server) MakeHost(key remote.Fingerprint, done func(Move, error)) error 
 	for k, name := range s.blocked {
 		blocked = append(blocked, Member{Key: k, Name: name})
 	}
+	slices.SortFunc(blocked, func(a, b Member) int { return compareKeys(a.Key, b.Key) })
+	blocked = blocked[:min(len(blocked), maxBlocked)]
 	mv := &move{to: key, name: g.Name, conn: g.conn, done: done}
 	mv.timer = time.AfterFunc(moveFor, func() { s.notMoved(mv, fmt.Errorf("%s's computer didn't open the room in time", mv.name)) })
 	s.asks.move = mv

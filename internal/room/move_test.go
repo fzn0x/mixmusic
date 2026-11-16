@@ -2,6 +2,7 @@ package room
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net"
 	"strings"
@@ -209,8 +210,31 @@ func TestSeatsOfAHost(t *testing.T) {
 		other, _ := remote.NewIdentity()
 		seats = append(seats, Seat{Key: other.Fingerprint().String(), Name: "Guest"})
 	}
-	got := membersOfSeats(seats)
+	got := membersOfSeats(seats, MaxGuests+1)
 	if len(got) != MaxGuests-1 || got[0].Key != id.Fingerprint() || got[0].Name != "Ana" {
 		t.Fatalf("%d seats, the first %+v", len(got), got[0])
+	}
+}
+
+// TestBlockedSeatsBeyondTheGuests keeps more blocked keys than a room
+// takes guests, as a host blocks those who left too.
+func TestBlockedSeatsBeyondTheGuests(t *testing.T) {
+	var seats []Seat
+	for range maxBlocked + 10 {
+		id, _ := remote.NewIdentity()
+		seats = append(seats, Seat{Key: id.Fingerprint().String(), Name: "Blocked"})
+	}
+	if got := membersOfSeats(seats, maxBlocked); len(got) != maxBlocked {
+		t.Fatalf("%d blocked kept", len(got))
+	}
+	// Their message, with every seat, takes what the protocol takes.
+	long := strings.Repeat("\U0001F600", MaxName)
+	all := make([]Seat, maxBlocked)
+	for i := range all {
+		all[i] = Seat{Key: seats[i].Key, Name: long}
+	}
+	data, err := json.Marshal(message{Type: "host", Seats: all[:MaxGuests+1], Blocked: all})
+	if err != nil || len(data) > remote.MaxMessage {
+		t.Fatalf("the host message takes %d bytes: %v", len(data), err)
 	}
 }

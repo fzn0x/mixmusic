@@ -56,7 +56,7 @@ Share, in the menu of a song, an album, a playlist or a mix, has what to send to
 - **Copy link** copies the page of the song, album or playlist on its service. A Spotify song that MixMusic has found on YouTube Music, as it does when the song plays or downloads, has both: Copy the link on Spotify and Copy the link on YouTube Music. A mix and a file on this computer have no page, so they have no link to copy.
 - **Save image…** saves a square card, for a chat or a feed, as a PNG. **Save image for a story…** saves a tall one, 1080 by 1920 pixels. The system's dialog asks where. The card has the cover, the kind (Song, Album, Single, EP, Playlist or Mix), the title and the artist, in the colours of the theme you use now, in its typeface where MixMusic has it. Titles that don't fit end with an ellipsis.
 
-Letters the typeface lacks, such as Hebrew, Arabic, Thai, Hindi, Chinese, Japanese and Korean, come from the fonts your system has. MixMusic doesn't carry them, so a computer without one shows those letters blank: on Linux, install one as [Getting started](getting-started.md#the-first-launch) says. Cards draw each letter on its own, so letters that join, as in Hindi and the other Indian scripts, show apart, and emoji show without their colours or not at all.
+Letters the typeface lacks, such as Hebrew, Arabic, Thai, Hindi, Chinese, Japanese and Korean, come from the fonts your system has. MixMusic doesn't carry them, so a computer without one shows those letters blank: on Linux, install one as [Getting started](getting-started.md#the-first-launch) says. Cards join letters as the window does, as in Hindi and the other Indian scripts, and draw emoji in colour from your system's emoji font.
 
 For lyrics, see [Share lines](lyrics.md#share-lines).
 

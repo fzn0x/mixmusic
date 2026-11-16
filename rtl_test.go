@@ -137,3 +137,28 @@ func TestRightToLeftTitleBar(t *testing.T) {
 		}
 	}
 }
+
+// TestLineIconTurns turns the icons that point along the line right to
+// left, and only those.
+func TestLineIconTurns(t *testing.T) {
+	for _, d := range []ui.Direction{ui.LeftToRight, ui.RightToLeft} {
+		got := map[string]*ui.SVG{}
+		tt := ui.NewTester(func(c *ui.Context) {
+			ui.Row(c).Children(func() {
+				for _, name := range []string{"back", "forward", "sidebar", "next", "play", "search"} {
+					got[name] = lineIcon(c, name)
+				}
+			})
+		}, 100, 100)
+		tt.SetDirection(d)
+		for name, svg := range got {
+			want := icon(name)
+			if m, ok := mirroredIcons[name]; ok && d == ui.RightToLeft {
+				want = m
+			}
+			if svg != want {
+				t.Errorf("%v: the icon %q isn't the one that points the way the line reads", d, name)
+			}
+		}
+	}
+}

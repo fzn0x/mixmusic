@@ -35,7 +35,7 @@ func (s *shell) untippedIconButton(c *ui.Context, key, name, label string, on bo
 		b.Background(k.hover)
 	}
 	s.pressMotion(b, 0.9)
-	b.Children(func() { ui.Icon(c, icon(name)).FontSize(size).TextColor(ink) })
+	b.Children(func() { ui.Icon(c, lineIcon(c, name)).FontSize(size).TextColor(ink) })
 	return b
 }
 

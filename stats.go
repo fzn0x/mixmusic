@@ -288,13 +288,18 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 }
 
 // disclosure draws the arrow of a disclosure as MyGo's Collapsible draws
-// its own: pointing right, turned by deg degrees clockwise.
+// its own: pointing right, turned by deg degrees clockwise, or right to
+// left mirrored, pointing left.
 func disclosure(c *ui.Context, deg float32, ink ui.Color) {
+	mirror := float32(1)
+	if c.Direction() == ui.RightToLeft {
+		mirror = -1
+	}
 	ui.Box(c).Size(16, 16).Shrink(0).Draw(func(p *ui.Painter, r ui.Rect) {
 		cx, cy, d := r.X+r.W/2, r.Y+r.H/2, r.W/8
 		sin, cos := math.Sincos(float64(deg) * math.Pi / 180)
 		at := func(x, y float32) (float32, float32) {
-			return cx + x*float32(cos) - y*float32(sin), cy + x*float32(sin) + y*float32(cos)
+			return cx + mirror*(x*float32(cos)-y*float32(sin)), cy + x*float32(sin) + y*float32(cos)
 		}
 		var path ui.Path
 		path.MoveTo(at(-d, -2*d)).LineTo(at(d, 0)).LineTo(at(-d, 2*d))

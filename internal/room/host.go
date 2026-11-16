@@ -645,11 +645,16 @@ func (s *Server) stay(c *conn) {
 		case "leave":
 			s.mu.Lock()
 			g := s.guests[c.key]
-			if g != nil && g.conn == c {
+			left := g != nil && g.conn == c
+			if left {
 				delete(s.guests, c.key)
 				s.note(g.Name, Left)
 			}
 			s.mu.Unlock()
+			if left {
+				// Its seat in the room a move goes to would stay (move.go).
+				s.stopMove(errLeft)
+			}
 			s.changed(true)
 			return
 		default:

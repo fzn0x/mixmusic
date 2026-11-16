@@ -141,3 +141,22 @@ func TestMoveAfterRemoveSeatsNoOneRemoved(t *testing.T) {
 		}
 	}
 }
+
+// TestLeaveStopsAMove keeps the room where it is when a guest leaves as it
+// moves, whose seat the room it moves to would keep.
+func TestLeaveStopsAMove(t *testing.T) {
+	r := newTestRoom(t)
+	ana, bo := newGuest(t, "Ana"), newGuest(t, "Bo")
+	sa, sb := r.join(ana), r.join(bo)
+	release := make(chan struct{})
+	t.Cleanup(func() { close(release) })
+	hostWhenAsked(t, ana, sa, release)
+	done := make(chan error, 1)
+	if err := r.server.MakeHost(ana.Identity.Fingerprint(), func(_ Move, err error) { done <- err }); err != nil {
+		t.Fatal(err)
+	}
+	sb.Leave()
+	if err := <-done; !errors.Is(err, errLeft) {
+		t.Fatalf("moved: %v", err)
+	}
+}

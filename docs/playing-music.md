@@ -183,6 +183,21 @@ A song is liked or disliked, not both: disliking a liked song unlikes it, on Spo
 - MixMusic asks YouTube about each song once, signed out, and keeps the answer for 30 days. That can add up to half a second before a song you skip to starts; a song YouTube doesn't answer for within 10 seconds plays.
 - Spotify songs are checked by their recording on YouTube Music, when they play from there.
 
+## Skipping parts of videos
+
+"Skip the parts SponsorBlock marks", in Settings › Playback › Skip parts of videos and off by default, passes over the parts of videos that [SponsorBlock](https://sponsor.ajay.app)'s community marks: music videos that open with a spoken scene, uploads and episodes with sponsor reads. Plain songs seldom have any.
+
+- Once it's on, a box for each kind says what it skips: **Non-music parts**, **Sponsor** and **Self-promotion**, ticked at first, and **Reminders to like or subscribe**, **Intro**, **Outro**, **Preview or recap**, **Hook or greeting** and **Filler**, which skips a lot, so it's off at first.
+- A part at the start of a track is passed over with no gap as the track starts, also when it's preloaded or crossfaded into. One in the middle is jumped over as it comes, on screen, minimized or in the tray. One that reaches the end ends the track there, and a crossfade takes its start for the track's end.
+- A toast tells of each, such as "Skipped the intro", with **undo**, which goes back to it. Each part is skipped once a play, so seeking back into one plays it.
+- The seek bar marks each part it skips, in a colour of the theme for its kind, in the player bar, on the now playing page, in the mini player and around the notch; the pointer over one tells its kind and times.
+- **Highlight**, ticked at first, marks the moment SponsorBlock calls a video's best with a dot; **Jump to the highlight**, on the now playing page and in the command palette, plays from there.
+- Skipped parts count for nothing: a play counts at 30 seconds, or half the track, of what played without them, Last.fm scrobbles take half of the track without them, and Previous's first 3 seconds leave them out.
+- MixMusic asks SponsorBlock of the YouTube recording that plays, a Spotify track's too, as its stream is found, the next track's before it plays, and playback never waits for the answer: one that comes late applies from then on. It never asks of songs on this computer, of tracks Spotify plays, or of live streams, and nothing while it's off. It sends only the first 4 characters of the hash of the video's ID ([what each feature sends](data-and-privacy.md#what-each-feature-sends-where)), and never sends parts or votes.
+- A part marked on a video since cut, whose length is more than 2 seconds off the audio's, is left out, as are parts under a second. Answers are kept, those of downloads first, so downloads skip their parts offline too. **Server** takes the https address of a mirror of SponsorBlock.
+- A cast device plays the parts: only MixMusic's own player skips them.
+- SponsorBlock's data is under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/): "Uses SponsorBlock data licensed under CC BY-NC-SA 4.0 from https://sponsor.ajay.app/" ([Credits](credits.md)).
+
 ## Live streams
 
 YouTube's live streams play, such as its 24/7 radio channels, from about 15 seconds behind the broadcast, for as long as it goes on. [Where the audio streams come from](streams.md#live-streams) tells how they play.

@@ -43,6 +43,14 @@ type Shortened interface {
 	Shortened() bool
 }
 
+// Whole is a Source that can keep downloading its track whole, from its
+// start, while a deck reads far ahead of it: as a deck that passes over
+// parts of its track (skip.go) asks it to, so that the track goes to the
+// cache as one played through does.
+type Whole interface {
+	KeepWhole()
+}
+
 // Opener opens the Source of a track's URL, whose reads stop waiting when
 // interrupted returns true. Its errors say why in the words of the
 // interface, as the player shows them.
@@ -115,6 +123,16 @@ type deck struct {
 	// thread's.
 	speed   float64
 	stretch stretcher
+	// plan is what the deck passes over of its track (skip.go), once it
+	// knows the track's length: nil for nothing. jump is the part of it
+	// the audio thread found the deck in, until the engine's loop moves it
+	// past, and cut is set once it reached the one that ends the track,
+	// where it holds silent, ended, until a seek.
+	plan atomic.Pointer[skipPlan]
+	jump atomic.Pointer[skipSpan]
+	cut  atomic.Bool
+	// sought is set once the deck was sought.
+	sought atomic.Bool
 
 	cancel context.CancelFunc
 	done   chan struct{}
@@ -130,11 +148,21 @@ type deck struct {
 	ready    bool // whether the headers were read
 	// holds is what the track holds, once they were.
 	holds Format
+	// skips are the parts of the track the deck passes over, as the
+	// engine was told, and passes those it passed over that the engine's
+	// loop hasn't told of yet.
+	skips, passes []Skip
 }
 
 // newDeck starts a deck of url at start. notify is called, from the deck's
 // goroutine, when its state changes.
 func newDeck(url string, start time.Duration, open Opener, notify func()) *deck {
+	return newDeckSkipping(url, start, nil, open, notify)
+}
+
+// newDeckSkipping is newDeck of a deck that passes over skips of its
+// track: from the end of the one it starts in, if any.
+func newDeckSkipping(url string, start time.Duration, skips []Skip, open Opener, notify func()) *deck {
 	ctx, cancel := context.WithCancel(context.Background())
 	d := &deck{
 		url:      url,
@@ -146,6 +174,7 @@ func newDeck(url string, start time.Duration, open Opener, notify func()) *deck 
 		changed:  make(chan struct{}, 1),
 		seekTo:   -1,
 		channels: 2,
+		skips:    skips,
 	}
 	d.lkfs.Store(math.Float64bits(math.NaN()))
 	d.ring.Store(newRing(frames(start), 2))
@@ -181,10 +210,19 @@ func (d *deck) seek(t time.Duration) {
 		return
 	}
 	t = max(0, t)
+	// A seek once the track ended plays it again, its parts passed over
+	// again; one into a part passed over plays it.
+	if r := d.ring.Load(); d.cut.Load() || r.done.Load() && r.readable() == 0 {
+		d.replay()
+	}
+	d.sought.Store(true)
 	d.mu.Lock()
 	d.seekTo = t
 	d.ring.Store(newRing(frames(t), d.channels))
 	d.mu.Unlock()
+	// A part the deck held at gives way once the new ring is there.
+	d.jump.Store(nil)
+	d.cut.Store(false)
 	d.wake()
 }
 
@@ -269,7 +307,7 @@ func (d *deck) left() (int64, bool) {
 // gain reached 0, or its track ended, or failed, or there is no deck. On
 // the audio thread.
 func (d *deck) faded() bool {
-	if d == nil {
+	if d == nil || d.cut.Load() {
 		return true
 	}
 	r := d.ring.Load()
@@ -363,6 +401,17 @@ func (d *deck) play(ctx context.Context, start time.Duration, cur **ring, open O
 		nr := newRing(r.start, ch)
 		d.ring.Store(nr)
 		if *cur == r {
+			*cur = nr
+		}
+	}
+	// Its length tells what the deck passes over of it: a part it starts
+	// in, it starts at the end of, unless a seek came meanwhile.
+	d.replan()
+	if r := d.ring.Load(); r == *cur && d.seekTo < 0 {
+		if past := d.passStart(start); past != start {
+			start = past
+			nr := newRing(frames(start), ch)
+			d.ring.Store(nr)
 			*cur = nr
 		}
 	}

@@ -84,6 +84,9 @@ type Playback struct {
 	// SkipAI passes over the tracks YouTube labels as made with AI, as the
 	// player moves on by itself.
 	SkipAI bool `json:"skipAi"`
+	// SkipParts passes over the parts of videos SponsorBlock marks, as
+	// sponsor reads and intros, while it's on (#548).
+	SkipParts SkipParts `json:"skipParts"`
 	// CleanVersions shows and opens the clean version of an album that
 	// comes explicit and clean, in place of the explicit one (#345).
 	CleanVersions bool `json:"cleanVersions"`
@@ -119,6 +122,7 @@ func defaultPlayback() Playback {
 	p.SongSpeed = 1
 	p.PodcastSpeed = 1
 	p.SkipDisliked = true
+	p.SkipParts = defaultSkipParts()
 	p.Equalizer = defaultEqualizer()
 	p.VolumeCurve = volume.Natural
 	p.Volume = 0.8
@@ -151,6 +155,7 @@ func (p Playback) clean(d Playback) Playback {
 	p.OutputDevice = p.OutputDevice.clean()
 	p.SongSpeed = CleanSpeed(p.SongSpeed)
 	p.PodcastSpeed = CleanSpeed(p.PodcastSpeed)
+	p.SkipParts = p.SkipParts.clean()
 	p.Volume = min(max(p.Volume, 0), 1)
 	p.VolumeCurve = cleanVolumeCurve(p.VolumeCurve, d.VolumeCurve)
 	p.Equalizer = p.Equalizer.clean()

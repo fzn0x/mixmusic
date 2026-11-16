@@ -61,6 +61,7 @@ func (a *App) flush() {
 		log.Printf("mixmusic: keeping where episodes were left: %v", err)
 	}
 	a.labels.save()
+	a.parts.save()
 	if err := a.settings.Flush(); err != nil {
 		log.Printf("mixmusic: saving settings.json: %v", err)
 	}

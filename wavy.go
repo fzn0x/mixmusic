@@ -34,12 +34,17 @@ const (
 
 // seekSlider is the seek bar's slider of *at, from 0 to most seconds: the
 // theme's, or the wavy one while the settings ask for it, which waves
-// while the track plays.
+// while the track plays, and which marks the parts the player passes over
+// (seekparts.go), flat unless it waves.
 func (s *shell) seekSlider(c *ui.Context, at *float64, most float64) ui.Element {
-	if !s.set.WavyProgress {
+	if !s.set.WavyProgress && !s.hasMarks() {
 		return ui.Slider(c.Key("seek"), at, 0, most)
 	}
-	return wavySlider(c.Key("seek"), at, 0, most, s.st.Playing && !s.st.Loading)
+	dur := time.Duration(most * float64(time.Second))
+	marks := func(p *ui.Painter, line ui.Rect, rtl bool) { s.paintMarks(p, line, dur, rtl) }
+	sl := wavySliderMarked(c.Key("seek"), at, 0, most, s.set.WavyProgress && s.st.Playing && !s.st.Loading, marks)
+	s.markTip(sl, dur, c.Theme().Space(5)/2, c.Direction() == ui.RightToLeft)
+	return sl
 }
 
 // wavySlider is a slider of *v from lo to hi, which looks as the theme's
@@ -48,6 +53,13 @@ func (s *shell) seekSlider(c *ui.Context, at *float64, most float64) ui.Element 
 // unless the computer asks for less motion, and lies flat once it isn't.
 // It drags and takes the keys as the theme's does.
 func wavySlider(c *ui.Context, v *float64, lo, hi float64, moving bool) ui.Element {
+	return wavySliderMarked(c, v, lo, hi, moving, nil)
+}
+
+// wavySliderMarked is wavySlider, which marks paints on, over its track
+// and under its knob: line is where the knob's centre goes, from lo to
+// hi.
+func wavySliderMarked(c *ui.Context, v *float64, lo, hi float64, moving bool, marks func(p *ui.Painter, line ui.Rect, rtl bool)) ui.Element {
 	t := c.Theme()
 	kw := t.Space(5)
 	// The knob moves across the content box, half of it inside the
@@ -95,6 +107,9 @@ func wavySlider(c *ui.Context, v *float64, lo, hi float64, moving bool) ui.Eleme
 			}
 			p.Fill(rest, t.Border, h/2)
 			strokeWave(p, points, track.X+h/2, x-h/2, cy, h, rise*waveHeight, still, mirror, t.Accent)
+		}
+		if marks != nil {
+			marks(p, ui.Rect{X: r.X + kw/2, Y: track.Y, W: r.W - kw, H: h}, rtl)
 		}
 		paintKnob(p, t, k, held, focus)
 	})

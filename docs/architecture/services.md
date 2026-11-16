@@ -174,6 +174,19 @@
   also finds the song of a music video, by its title and artists, which
   the video's radio starts from: YouTube Music makes the radio of a video
   out of videos.
+- **`internal/sponsorblock`** asks SponsorBlock which parts of a video it
+  marks, as sponsor reads, intros and the parts of music videos without
+  music, and its highlight (#548): by the first 4 hex characters of the
+  SHA-256 of the video's ID, keeping the video's parts of the answer, so
+  that SponsorBlock never learns which video plays. A lookup reads 2 MB
+  at most, gives up after 8 seconds, goes through the system's proxy, and
+  asks the mirror the settings name in place of SponsorBlock's server; it
+  never sends parts or votes. `internal/app/sponsorblock.go` keeps the
+  answers as the labels of AI are kept: the videos with parts in
+  `sponsorblock.json`, 5,000 at most, those downloaded first, for 7 days,
+  and offline however old; those without, in memory for a day; a failed
+  lookup not at all. It asks of the recording a stream plays, a Spotify
+  track's too, never of a file on this computer.
 - **`lyrics`** finds synced lyrics on Better Lyrics, Unison and LRCLIB,
   reads TTML and LRC, and LRCLIB's Lyricsfile, the YAML whose words are
   timed (`readLyricsfile`), and translates and romanizes lyrics on Unison.

@@ -90,12 +90,14 @@ func (s *shell) miniSeek(c *ui.Context, w float32) {
 			if !waving {
 				p.Fill(ui.Rect{X: x, Y: y, W: part, H: 2}, rest, 0)
 			}
+			s.paintMarks(p, ui.Rect{X: r.X, Y: y, W: r.W, H: 2}, dur, rtl)
 			return
 		}
 		if !waving {
 			p.Fill(ui.Rect{X: r.X, Y: y, W: r.W, H: 4}, thick, 2)
 			p.Fill(ui.Rect{X: x, Y: y, W: part, H: 4}, rest, 2)
 		}
+		s.paintMarks(p, ui.Rect{X: r.X, Y: y, W: r.W, H: line}, dur, rtl)
 		knob := r.X + part
 		if rtl {
 			knob = r.X + r.W - part
@@ -115,10 +117,15 @@ func (s *shell) miniSeek(c *ui.Context, w float32) {
 		}
 		tip = time.Duration(float64(f) * float64(dur))
 	}
-	const tw, th = 52, 20
+	tw, th := float32(52), float32(20)
+	label := clock(tip)
+	// Over a part the player passes over, its kind too.
+	if mark, ok := s.markAt(float64(tip)/float64(max(dur, 1)), dur, float64(6/max(w, 1))); ok {
+		label, tw = mark, max(min(220, w-4), tw)
+	}
 	x := min(max(px-tw/2, 2), w-tw-2)
 	ui.Box(c.Key("mini-seek-time")).Absolute().Left(x).Bottom(miniSeekRoom+2).Size(tw, th).Radius(k.radiusSm).
 		Background(k.raised).Border(1, k.border).Center().PassThrough().AccessHidden(true).Children(func() {
-		ui.Text(c, clock(tip)).FontSize(k.captionSize()).FontFeatures("tnum").TextColor(k.text).SingleLine()
+		ui.Text(c, label).FontSize(k.captionSize()).FontFeatures("tnum").TextColor(k.text).SingleLine()
 	})
 }

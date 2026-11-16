@@ -475,6 +475,9 @@ talks to:
   track that plays, with its video ID, which Unison has Google translate.
 - **LRCLIB:** the title, artists, album and length of the track that plays,
   to find its lyrics.
+- **SponsorBlock,** while you turn on Skip the parts SponsorBlock marks:
+  the first 4 characters of the hash of each video's ID, never the ID, to
+  find the parts it marks.
 - **GitHub:** a check for a new version at start and every few hours,
   which you can turn off in Settings › About; the community registry when
   you open the marketplace; the downloads of yt-dlp; and, the first time

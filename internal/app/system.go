@@ -16,6 +16,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/romaji"
 	"github.com/fzn0x/mixmusic/internal/romanize"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/internal/sponsorblock"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/tools"
 	"github.com/fzn0x/mixmusic/opus"
@@ -107,6 +108,7 @@ func (s *System) Notices() []Notice {
 		{Name: "jfreymuth/vorbis, which decodes the Vorbis files on this computer", Text: audio.VorbisLicense},
 		{Name: "Chromium's Web Audio, which shapes the sound", Text: audio.License},
 		{Name: "Material Color Utilities, which make the Material themes' colours", Text: hct.License},
+		{Name: "SponsorBlock's data, the parts of videos MixMusic skips", Text: sponsorblock.License},
 		{Name: "Unihan, whose readings of Chinese characters write Chinese lyrics in pinyin", Text: romanize.UnihanLicense},
 		{Name: "pinyin-data and phrase-pinyin-data, the readings of Chinese characters and words in pinyin", Text: romanize.PinyinLicense},
 		{Name: "kagome, which reads the kanji of Japanese lyrics for their romaji", Text: romaji.License},

@@ -159,6 +159,7 @@ type App struct {
 	loudness     *loudnessBook
 	matcher      *match.Matcher
 	labels       *labelCache
+	parts        *partCache
 	lyrics       *lyrics.Client
 	unison       *lyrics.Unison
 	betterLyrics *lyrics.BetterLyrics
@@ -318,6 +319,10 @@ func New(opts Options) (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("opening AI labels: %w", err)
 	}
+	marked, err := store.Open(filepath.Join(opts.CacheDir, "sponsorblock.json"), map[string]keptParts{})
+	if err != nil {
+		return nil, fmt.Errorf("opening the parts SponsorBlock marks: %w", err)
+	}
 	s := a.settings.Get().Clean()
 
 	a.youtube = youtube.New()
@@ -361,6 +366,7 @@ func New(opts Options) (*App, error) {
 	a.matcher = match.New(a.youtube, matches)
 	a.labels = newLabelCache(a.youtube.MadeWithAI, aiLabels, time.Now)
 	userAgent := "MixMusic/" + opts.Version + " (https://github.com/fzn0x/mixmusic)"
+	a.parts = a.newSponsorBlock(userAgent, marked)
 	a.lyrics = lyrics.New(userAgent)
 	a.unison = lyrics.NewUnison(userAgent)
 	a.betterLyrics = lyrics.NewBetterLyrics(userAgent)

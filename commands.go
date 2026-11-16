@@ -25,6 +25,7 @@ func (s *shell) commands() []command {
 		{"player.previous", "Previous track", "Mod+ArrowLeft", "playback", s.p.Previous},
 		{"player.forward", "Forward 10 seconds", "ArrowRight", "playback", func() { s.p.Seek(s.st.Position + 10e9) }},
 		{"player.back", "Back 10 seconds", "ArrowLeft", "playback", func() { s.p.Seek(s.st.Position - 10e9) }},
+		{"player.highlight", "Jump to the highlight", "", "playback", s.jumpToHighlight},
 		{"player.volumeUp", "Volume up", "ArrowUp", "playback", func() { s.p.SetVolume(s.st.Volume + 0.05) }},
 		{"player.volumeDown", "Volume down", "ArrowDown", "playback", func() { s.p.SetVolume(s.st.Volume - 0.05) }},
 		{"player.mute", "Mute", "M", "playback", s.p.ToggleMute},

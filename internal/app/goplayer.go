@@ -210,6 +210,7 @@ func (s playerServices) Report(now player.Now) {
 		Loading:    now.Loading,
 		PositionMs: int(now.Position / time.Millisecond),
 		DurationMs: int(now.Duration / time.Millisecond),
+		SkippedMs:  int(now.Skipped / time.Millisecond),
 		Live:       now.Live,
 		Volume:     now.Volume,
 		Shuffle:    now.Shuffle,

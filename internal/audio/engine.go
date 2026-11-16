@@ -77,6 +77,9 @@ type Engine struct {
 	paused    bool
 	normalize bool
 	loudness  bool
+	// skips are the parts of the tracks the decks pass over, by URL, as
+	// SetSkips told (skip.go).
+	skips map[string][]Skip
 	// surround is whether the output plays six channels where the device
 	// has them, for 5.1 surround tracks, rather than two; outChannels is
 	// what the output that plays was asked for.
@@ -157,7 +160,7 @@ func (e *Engine) Load(url string, cue Cue) error {
 	var stale []*deck
 	e.fading = false
 	other := 1 - e.active
-	if d := e.decks[other]; d != nil && d.url == url && cue.Start == 0 && d.position() == 0 {
+	if d := e.decks[other]; d != nil && d.url == url && cue.Start == 0 && d.fresh() {
 		// The preloaded track: the decks swap.
 		stale = append(stale, e.decks[e.active])
 		e.decks[e.active] = nil
@@ -165,7 +168,7 @@ func (e *Engine) Load(url string, cue Cue) error {
 	} else {
 		stale = append(stale, e.decks[e.active], e.decks[other])
 		e.decks[other] = nil
-		e.decks[e.active] = newDeck(url, cue.Start, e.open, e.wake)
+		e.decks[e.active] = newDeckSkipping(url, cue.Start, e.skips[url], e.open, e.wake)
 	}
 	d := e.decks[e.active]
 	d.gain = ramp{value: 1, target: 1}
@@ -192,7 +195,7 @@ func (e *Engine) Preload(url string) {
 		return
 	}
 	stale := e.decks[other]
-	e.decks[other] = newDeck(url, 0, e.open, e.wake)
+	e.decks[other] = newDeckSkipping(url, 0, e.skips[url], e.open, e.wake)
 	e.levels[other] = ramp{}
 	e.mu.Unlock()
 	closeDecks([]*deck{stale})
@@ -208,8 +211,8 @@ func (e *Engine) Crossfade(url string, d time.Duration, cue Cue) error {
 	var stale []*deck
 	if dk := e.decks[to]; dk == nil || dk.url != url {
 		stale = append(stale, dk)
-		e.decks[to] = newDeck(url, 0, e.open, e.wake)
-	} else if dk.position() != 0 {
+		e.decks[to] = newDeckSkipping(url, 0, e.skips[url], e.open, e.wake)
+	} else if !dk.fresh() {
 		dk.seek(0)
 	}
 	if out := e.decks[from]; out != nil {
@@ -632,6 +635,12 @@ func (e *Engine) renderQuantum() {
 		if d == nil || (level.value == 0 && level.target == 0) {
 			continue
 		}
+		// A part the deck passes over isn't heard: it holds silent until
+		// the loop moves it past.
+		if d.holdsStill() {
+			e.wake()
+			continue
+		}
 		// At the deck's speed, of its ring's channels: what follows, the
 		// equalizer and the analyser too, takes what is heard.
 		r := d.ring.Load()
@@ -735,6 +744,16 @@ func (e *Engine) loop() {
 }
 
 func (e *Engine) report() {
+	// A deck that reached a part it passes over goes past it, outside mu:
+	// the audio thread doesn't wait for the seek.
+	e.mu.Lock()
+	decks := e.decks
+	e.mu.Unlock()
+	for _, d := range decks {
+		if d != nil {
+			d.passOver()
+		}
+	}
 	e.mu.Lock()
 	var stale *deck
 	// A crossfade ends as the track fading out faded out or ended, which a
@@ -750,6 +769,7 @@ func (e *Engine) report() {
 		position, total time.Duration
 		ended, failed   bool
 		failure         error
+		passes          []Skip
 		outFailure      = e.outFailure
 		buffering       = e.underrun && !e.paused
 		idle            = e.out != nil && e.silentFor >= frames(idleTime) && !e.fading
@@ -759,10 +779,12 @@ func (e *Engine) report() {
 	if d != nil {
 		position = e.position()
 		total, _ = d.info()
+		passes = d.passed()
 		r := d.ring.Load()
-		// A stretch plays what it holds after the ring ran out.
-		if r.done.Load() && r.readable() == 0 && !d.pending(r) {
-			if failure = d.failure(); failure != nil {
+		// A stretch plays what it holds after the ring ran out; a deck cut
+		// at a part that ends its track ends there.
+		if cut := d.cut.Load(); cut || r.done.Load() && r.readable() == 0 && !d.pending(r) {
+			if failure = d.failure(); failure != nil && !cut {
 				failed = e.reported.failed != r
 				e.reported.failed = r
 			} else {
@@ -794,6 +816,11 @@ func (e *Engine) report() {
 	}
 	if reportBuffering {
 		e.events.Buffering(buffering)
+	}
+	if s, ok := e.events.(SkipEvents); ok {
+		for _, p := range passes {
+			s.Skipped(d.url, p.From, p.To)
+		}
 	}
 	switch {
 	case failed:

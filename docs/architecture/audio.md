@@ -36,7 +36,10 @@
   (`Spans`). Each is passed over once a play, so that seeking back into
   one plays it, and the events hear of each (`SkipEvents`).
   `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio -run StretchListen`
-  writes the test files at each speed, to listen to.
+  writes the test files at each speed, to listen to. `Stretches`
+  decodes stretches of a file as a deck plays them, from the frame a seek
+  plays from, mixed down to mono, for measuring rather than playing:
+  where a song starts in its music video, to time its lyrics (#565).
   `MIXMUSIC_LIVE=1 go test ./internal/audio -run Live` plays songs of both
   codecs, and a 24/7 live stream, as the app finds them on YouTube,
   against ffmpeg's decode. `Probe` tells whether a deck plays a file, and

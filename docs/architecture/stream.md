@@ -12,6 +12,10 @@
   A `Source` tells whether its audio comes from this computer, a download
   or the cache (`Source.Local`), whose failure the engine words as the
   file's.
+  `Proxy.OpenRanges` reads a video's audio a block at a time instead, as
+  it is read, with range requests of 64 KB that grow to 1 MB as the reads
+  go on: the stretches of a song that time its music video's lyrics
+  (#565), never the rest of it.
   A read far ahead of the download starts it again there, which would
   leave the track out of the cache; of a track the engine passes over
   parts of (#548), the download from the start goes on beside the one

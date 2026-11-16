@@ -31,7 +31,8 @@ albums' moving covers and each album's match (`moving-covers/`,
 the music on the computer (`local-art/`), on Linux the
 cover the desktop's media controls show (`now-playing/`), matches, how loud
 YouTube measured the tracks played (`loudness.json`), the videos YouTube
-labels as made with AI, for 30 days (`ai-labels.json`), the releases of
+labels as made with AI, for 30 days (`ai-labels.json`), where the songs
+of music videos start in them (`lyrics-timing.json`), the releases of
 the artists followed (`releases.json`), the dictionary of
 the readings of kanji romaji downloads (`romaji/`), and yt-dlp's cache,
 and the logs folder the log and the crash reports. The downloads are in a

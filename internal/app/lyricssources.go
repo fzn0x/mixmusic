@@ -162,7 +162,8 @@ func (e unreached) Unwrap() []error      { return e }
 func (e unreached) Is(target error) bool { return target == lyrics.ErrUnavailable }
 
 // lyricsSetup is what of the settings set changes the lyrics a track
-// gets: its sources' order and switches, and whether words come first.
+// gets: its sources' order and switches, whether words come first, and
+// whether music videos' lyrics are timed to them.
 // The lyrics kept of a track are kept by it, so that a change looks the
 // track up again.
 func lyricsSetup(set settings.Lyrics) string {
@@ -176,6 +177,9 @@ func lyricsSetup(set settings.Lyrics) string {
 	}
 	if set.LyricsPreferWords {
 		b.WriteString("words ")
+	}
+	if set.LyricsTimeVideos {
+		b.WriteString("timed ")
 	}
 	b.WriteString(set.LyricsCaptionLanguage)
 	return b.String()

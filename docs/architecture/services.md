@@ -205,7 +205,31 @@
   transcript (`Catalog.Transcript`). The lyrics kept of a track are kept
   by its sources' setup (`lyricsSetup`), so that a change looks it up
   again. The music video's timing (`lrclibLyrics`, `keepsTime`) stays in
-  `catalog.go`, apart from the sources.
+  `catalog.go`, apart from the sources, and `videoLyrics`
+  (`lyricsvideo.go`, #565) times a video's song's lyrics to the video:
+  once `internal/align` found where the song starts in it, the lines move
+  by that shift (`Lyrics.Shifted`). The first lookup starts the
+  measurement (`videoTiming`), one at a time, which reads both
+  recordings through the proxy a block at a time (`Proxy.OpenRanges`)
+  and decodes their stretches (`audio.Stretches`); meanwhile the lyrics
+  show as the song has them, with a note, and aren't kept, and as it ends
+  the windows look them up again (`App.OnLyricsTimed`). A shift is kept
+  in `lyrics-timing.json` in the cache folder for 180 days, no clear match
+  for 7, 400 videos at most; a failure keeps nothing, and holds the video
+  off for 10 minutes. YouTube Music's own map of a video and its song,
+  the `counterpart` and `segmentMap` of the "next" answer signed in,
+  isn't read yet: no recorded answer holds them.
+- **`internal/align`** finds where a stretch of one recording's audio is
+  in another's, on the computer: the envelopes of both, the level of
+  each third of an octave from 100 Hz to 3.2 kHz every 10 ms (`Levels`),
+  compared by normalized correlation, each band's mean taken away, at
+  every shift of the plan (`NewPlan`): three windows of the song, at a
+  fifth, half and four fifths of it, searched 120 s either way of the
+  lengths' difference. `Plan.Shift` takes a shift when two windows or
+  more match clearly and agree within 100 ms, at a speed within 1%.
+  `internal/align/aligntest` makes audio from seeds, drums, a bass and a
+  tune, to test it on, and `MIXMUSIC_LIVE=1 go test ./internal/app -run
+  LiveLyricsTiming -v` measures music videos on YouTube.
 - **`internal/romaji`** writes Japanese lyrics in Hepburn romaji on the
   computer, as Unison gives none for Japanese: kana from a table, and kanji
   by the readings that kagome's tokenizer finds in its IPA dictionary,

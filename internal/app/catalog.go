@@ -454,6 +454,7 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 	}
 	q := lyricsQuery(track)
 	q.VideoID = c.videoID(track)
+	seen := c.a.lyricsTiming.version.Load()
 	l, err := c.askLyrics(ctx, track, q, set)
 	if err != nil {
 		// A track LRCLIB was too busy to look everywhere for, or that a
@@ -468,14 +469,16 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 	if l.Language == "" {
 		l.Language = lyrics.GuessLanguage(l.Lines)
 	}
-	c.a.lyricsMemo.put(kept, l)
+	// A music video's lyrics change once timed to it (lyricsvideo.go).
+	if c.a.lyricsStay(track.ID, seen) {
+		c.a.lyricsMemo.put(kept, l)
+	}
 	return l, nil
 }
 
 // lrclibLyrics returns LRCLIB's lyrics of a track. Unison looks a music
 // video up by its own ID, but LRCLIB has the lyrics of its song, timed for
-// the song (#290): those that don't keep time with the video show without
-// their times, with videoNote.
+// the song (#290), which show timed to the video (videoLyrics).
 func (c *Catalog) lrclibLyrics(ctx context.Context, track media.Track, q lyrics.Query) (lyrics.Lyrics, error) {
 	song, ofSong := media.Track{}, false
 	if track.Video && q.VideoID != "" {
@@ -484,9 +487,8 @@ func (c *Catalog) lrclibLyrics(ctx context.Context, track media.Track, q lyrics.
 		}
 	}
 	l, err := c.a.lyrics.Get(ctx, q)
-	if err == nil && l.Synced && ofSong && !c.keepsTime(ctx, track, song) {
-		l = l.Untimed()
-		l.Note = videoNote
+	if err == nil && l.Synced && ofSong {
+		l = c.videoLyrics(ctx, track, song, l)
 	}
 	return l, err
 }

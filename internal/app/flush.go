@@ -30,6 +30,7 @@ func (a *App) Close() {
 	a.artStore.Close()
 	a.stopScrobbling()
 	a.stopMemory()
+	a.stopLyricsTiming()
 	a.stopOverlay()
 	a.flush()
 }

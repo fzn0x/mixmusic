@@ -117,6 +117,10 @@ AppImage or archive copy's.
   follow, for [New from artists you follow](library.md#new-releases).
 - `lyrics-translations/`: the translations of lyrics you turned on, by
   track and language.
+- `lyrics-timing.json`: where the songs of the music videos you played
+  start in them, for [their lyrics](lyrics.md#music-videos), kept 180
+  days, and the videos whose song has no clear match, kept 7, 400 videos
+  at most.
 - `romaji/`: the dictionary of the readings of kanji, once you turn on
   romaji (11.7 MB).
 - `yt-dlp/`: what yt-dlp keeps of YouTube's player.
@@ -179,6 +183,7 @@ Where the credential store can't keep a secret:
 | Lyrics, from the [sources](lyrics.md#choose-and-order-the-sources) on in Settings › Playback › Lyrics, one at a time in their order, until one has synced lyrics | Better Lyrics (`api.betterlyrics.org`) | the title, first artist, album and length of the track that plays, once it has an album and a length |
 | Lyrics, the same way | Unison (`unison.betterlyrics.org`) | the video ID of the track that plays, or, without one, its title, artists, album and length |
 | Lyrics, the same way | LRCLIB (`lrclib.net`) | the title, artists, album and length of the track that plays; of a music video, its song's |
+| [Lyrics timed to a music video](lyrics.md#music-videos), while "Time lyrics to music videos" is on | YouTube's player API (`www.youtube.com`) and media servers, signed out | the video IDs of the music video and of its song, once a video, for stretches of their audio: of the song, only those compared. No play is reported |
 | Lyrics, the same way | YouTube Music | the video ID of the track that plays, or of its recording there |
 | Lyrics, the same way, and the transcript of a podcast episode | YouTube (`www.youtube.com`), signed out | the video ID of the track that plays, or of its recording there, for its captions |
 | Lyrics of a track on this computer | the sources on, but YouTube captions | its title, artists, album and length, as its tags tell, unless they name no artist; never its file |

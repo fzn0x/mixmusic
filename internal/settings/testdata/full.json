@@ -33,6 +33,7 @@
     }
   ],
   "lyricsPreferWords": true,
+  "lyricsTimeVideos": false,
   "lyricsCaptionLanguage": "de",
   "lyricsStyle": "bold",
   "lyricsSize": 1.3,

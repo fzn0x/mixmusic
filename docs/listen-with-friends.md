@@ -164,7 +164,10 @@ reach your computer directly.
 1. On your room's page, turn on **Let friends outside this network
    join**. MixMusic asks your router to forward the room's port, and the
    page says what it set up: "Your router forwards port 41234 of its
-   internet address, …, to this computer", or why it couldn't.
+   internet address, …, to this computer", or why it couldn't. While
+   **Ask me before someone joins** is off, the page suggests it: **turn
+   it on**, and whoever comes with the link or the code waits until you
+   let them in, or **not now**.
 2. Send friends the invite link: **copy invite link**, or **copy web
    link**, an `https://mixmusic.functionx.dev/join/#…` address, for chat
    apps that don't open `mixmusic://` links. Its page opens the room in

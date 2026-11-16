@@ -41,6 +41,19 @@ The installers, the portable zip and the Linux archive update themselves: MixMus
   sudo dnf install gtk3 pulseaudio-libs webkit2gtk4.1 libayatana-appindicator-gtk3 libsecret
   ```
 
+  MixMusic carries no font for Chinese, Japanese and Korean letters, and on Linux a letter that no installed font has shows as blank space. The `.deb` and the `.rpm` ask for one (`fonts-noto-cjk`, or a font that provides `font(notosanscjkjp)`), and the AUR package lists `noto-fonts-cjk` as optional. `dpkg -i` skips what a package only recommends, and pacman only prints what is optional, so for those, the AppImage, the archive and the Flatpak, install a font yourself and restart MixMusic:
+
+  ```sh
+  # Debian and Ubuntu
+  sudo apt install fonts-noto-cjk
+  # Fedora
+  sudo dnf install google-noto-sans-cjk-vf-fonts
+  # Arch
+  sudo pacman -S noto-fonts-cjk
+  ```
+
+  The Flatpak reads the fonts of your system too. `fc-list :lang=ja` prints the fonts you have for Japanese; it prints nothing when there is none.
+
 - **yt-dlp, on every system.** MixMusic finds the audio of most YouTube Music tracks itself. For the rest, such as tracks made for children, it runs [yt-dlp](https://github.com/yt-dlp/yt-dlp). Until yt-dlp is there, Home says "Some tracks need yt-dlp", with a button that installs it; Settings › Playback › Tools installs it too, and MixMusic keeps the copy it installed up to date. yt-dlp needs a JavaScript runtime: [Deno](https://deno.com), Node.js, Bun or QuickJS, which MixMusic finds once you install one. The Flatpak has Node.js. [Where the audio streams come from](streams.md#when-yt-dlp-is-needed) tells which tracks need it.
 
 MixMusic opens on Home in the [Blend layout](look-and-feel.md#layouts). Your settings and library stay in a [data folder](data-and-privacy.md#the-data-folder) of your own: `%AppData%\MixMusic` on Windows, `~/Library/Application Support/MixMusic` on macOS and `~/.config/MixMusic` on Linux.

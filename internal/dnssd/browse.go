@@ -246,8 +246,10 @@ func (f *findings) read(msg []byte, from net.IP) {
 			f.txt[name] = r.txt
 		case typeA:
 			// Each answer may tell another address of the host, as on
-			// each network it was asked on: none goes in place of another.
-			if !slices.ContainsFunc(f.hosts[name], r.ip.Equal) {
+			// each network it was asked on: none goes in place of another,
+			// and maxHostAddrs are kept at most, as anyone on the network
+			// may answer for the host's name.
+			if len(f.hosts[name]) < maxHostAddrs && !slices.ContainsFunc(f.hosts[name], r.ip.Equal) {
 				f.hosts[name] = append(f.hosts[name], r.ip)
 			}
 			continue
@@ -302,6 +304,10 @@ func (f *findings) instances(nets []*net.IPNet) []Instance {
 	slices.SortFunc(out, func(a, b Instance) int { return strings.Compare(strings.ToLower(a.Name), strings.ToLower(b.Name)) })
 	return out
 }
+
+// maxHostAddrs bounds the addresses of a host a browse keeps: one of each
+// network it was asked on, of a few.
+const maxHostAddrs = 8
 
 // sharedNet is the range providers share among their customers (RFC 6598),
 // which VPNs such as Tailscale give their computers too.

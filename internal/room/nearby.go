@@ -6,9 +6,12 @@ package room
 // of the network alone, which takes connections of this computer's
 // networks alone while friends outside it may not join: a private,
 // loopback or link-local address, one of the networks of its interfaces,
-// as a network of public addresses is, and, while one of its interfaces is
-// in it, the providers' shared range, 100.64.0.0/10, which VPNs such as
-// Tailscale give their computers, each an address of its own.
+// as a network of public addresses is, and, while one of its VPN tunnels
+// is in it, the providers' shared range, 100.64.0.0/10, which VPNs such as
+// Tailscale give their computers, each an address of its own. A network of
+// the range on another interface, as a modem's of the provider's own
+// network, counts as itself alone: the provider's other customers aren't
+// this computer's network.
 
 import (
 	"net"
@@ -23,9 +26,9 @@ var sharedNet = netip.MustParsePrefix("100.64.0.0/10")
 
 // NearbyOf reports whether ip is of this computer's own networks, as nets,
 // its interfaces' (InterfaceNets), tell them: private, loopback or
-// link-local, of one of nets, or of the providers' shared range while one
-// of nets is in it, as a VPN's address is: the others on the VPN reach this
-// computer there, and only they do.
+// link-local, of one of nets, or of the providers' shared range while a
+// VPN tunnel's address is in it, an address of one alone (/32): the others
+// on the VPN reach this computer there, and only they do.
 func NearbyOf(ip netip.Addr, nets []netip.Prefix) bool {
 	ip = ip.Unmap().WithZone("")
 	if ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() {
@@ -33,7 +36,7 @@ func NearbyOf(ip netip.Addr, nets []netip.Prefix) bool {
 	}
 	shared := sharedNet.Contains(ip)
 	for _, p := range nets {
-		if p.Contains(ip) || shared && sharedNet.Contains(p.Addr()) {
+		if p.Contains(ip) || shared && p.Bits() == 32 && sharedNet.Contains(p.Addr()) {
 			return true
 		}
 	}
@@ -41,29 +44,44 @@ func NearbyOf(ip netip.Addr, nets []netip.Prefix) bool {
 }
 
 // InterfaceNets are the networks of this computer's interfaces, those of
-// one address alone too, as a VPN's of /32: they tell nothing of who else
-// is on them, but that this computer is on the VPN.
+// one address alone too, as a VPN tunnel's of /32: they tell nothing of
+// who else is on them, but that this computer is on the VPN.
 func InterfaceNets() []netip.Prefix {
-	addrs, err := net.InterfaceAddrs()
+	ifaces, err := net.Interfaces()
 	if err != nil {
 		return nil
 	}
 	var out []netip.Prefix
-	for _, a := range addrs {
-		ipn, ok := a.(*net.IPNet)
-		if !ok {
+	for _, ifi := range ifaces {
+		addrs, err := ifi.Addrs()
+		if err != nil {
 			continue
 		}
-		ip, ok := netip.AddrFromSlice(ipn.IP)
-		ones, bits := ipn.Mask.Size()
-		if !ok || bits == 0 {
-			continue
+		for _, a := range addrs {
+			if ipn, ok := a.(*net.IPNet); ok {
+				out = append(out, addrNets(ipn, ifi.Flags&net.FlagPointToPoint != 0)...)
+			}
 		}
-		ip = ip.Unmap()
-		if ip.Is4() && bits == 128 {
-			ones -= 96
-		}
-		out = append(out, netip.PrefixFrom(ip, ones).Masked())
+	}
+	return out
+}
+
+// addrNets are the networks an interface's address ipn tells: its own, and,
+// of a tunnel's (pointToPoint) of IPv4, its address alone too, which marks
+// it a VPN's whatever its mask (NearbyOf).
+func addrNets(ipn *net.IPNet, pointToPoint bool) []netip.Prefix {
+	ip, ok := netip.AddrFromSlice(ipn.IP)
+	ones, bits := ipn.Mask.Size()
+	if !ok || bits == 0 {
+		return nil
+	}
+	ip = ip.Unmap()
+	if ip.Is4() && bits == 128 {
+		ones -= 96
+	}
+	out := []netip.Prefix{netip.PrefixFrom(ip, ones).Masked()}
+	if pointToPoint && ip.Is4() && ones != 32 {
+		out = append(out, netip.PrefixFrom(ip, 32))
 	}
 	return out
 }

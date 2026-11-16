@@ -12,9 +12,13 @@ name: Rerun
 #
 # A pull request's run is rerun only while its commit is still the head of
 # the pull request, and the pull request is open: a newer commit has a run
-# of its own. A run that was rerun by hand meanwhile is left to that rerun.
-# The release and the publishing workflows aren't in the list: rerunning
-# them is a decision. Pages and Cloudflare deploy only main's newest
+# of its own. A run from a fork doesn't name its pull request, so it is
+# found by the fork's owner and branch; a run whose pull request can't be
+# found isn't rerun. A run that was rerun by hand meanwhile is left to that
+# rerun. When GitHub refuses a rerun, as for a run whose pull request
+# closed before any job started, it says so in a warning and ends green:
+# the run stays red on its own. The release and the publishing workflows
+# aren't in the list: rerunning them is a decision. Pages and Cloudflare deploy only main's newest
 # commit, which their own "Still main's newest commit" step checks, so a
 # rerun of an older commit's run deploys nothing.
 #
@@ -53,6 +57,8 @@ jobs:
           SHA: ${{ github.event.workflow_run.head_sha }}
           NAME: ${{ github.event.workflow_run.name }}
           PR: ${{ github.event.workflow_run.pull_requests[0].number }}
+          HEAD_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
           set -euo pipefail
           budget=$((5 * 3600))
@@ -60,6 +66,19 @@ jobs:
           if [ "$ATTEMPT" -ge 40 ] || [ "$age" -ge "$budget" ]; then
             echo "::warning::$NAME failed $ATTEMPT times over $((age / 60)) minutes: it isn't rerun again."
             exit 0
+          fi
+
+          # A fork's run names no pull request: find the newest one of its
+          # head, the fork's owner and branch.
+          if [ "$EVENT" = pull_request ] && [ -z "$PR" ]; then
+            if [ -n "$HEAD_OWNER" ] && [ -n "$HEAD_BRANCH" ]; then
+              PR="$(gh api -X GET "repos/$REPO/pulls" -f state=all -f head="$HEAD_OWNER:$HEAD_BRANCH" \
+                --jq '.[0].number // empty' || true)"
+            fi
+            if [ -z "$PR" ]; then
+              echo "::notice::$NAME ran for a pull request that can't be found (head ${HEAD_OWNER:-?}:${HEAD_BRANCH:-?}): it isn't rerun."
+              exit 0
+            fi
           fi
 
           # still says whether the run should still be rerun: not rerun by
@@ -76,7 +95,7 @@ jobs:
               local pr
               pr="$(gh api "repos/$REPO/pulls/$PR" --jq '.state + " " + .head.sha')"
               if [ "$pr" != "open $SHA" ]; then
-                echo "Pull request #$PR moved on ($pr): its newer run counts."
+                echo "Pull request #$PR is no longer open at this commit ($pr): it isn't rerun."
                 return 1
               fi
             fi
@@ -89,5 +108,8 @@ jobs:
           still || exit 0
           sleep "$wait"
           still || exit 0
-          gh run rerun "$RUN" --failed -R "$REPO"
+          if ! out="$(gh run rerun "$RUN" --failed -R "$REPO" 2>&1)"; then
+            echo "::warning::GitHub refused to rerun $NAME: $(echo "$out" | tr '\n' ' ')"
+            exit 0
+          fi
           echo "Rerunning the failed jobs of $NAME: https://github.com/$REPO/actions/runs/$RUN"

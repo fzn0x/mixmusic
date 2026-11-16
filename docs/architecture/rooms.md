@@ -432,9 +432,13 @@ no relay: guests reach the host's computer directly.
   in any address on private and domain networks, which a forwarded port
   is; macOS's firewall must allow MixMusic's incoming connections, and on
   Linux ufw or firewalld must let the port in.
-- **Not yet.** Turning the switch on is to suggest **Ask me before
-  someone joins**, which waits for that setting (#734). Checking the
-  forward on a real router waits for a running app.
+- **Asking first.** Turned on while **Ask me before someone joins** is
+  off ([Asking before a join](#asking-before-a-join)), the switch has the
+  page suggest it, as anyone the link reaches may knock: the user turns
+  it on, or not now, and the suggestion goes, as it does once the rule is
+  on (`rooms_anywhere.go`).
+- **Not yet.** Checking the forward on a real router waits for a running
+  app.
 
 ## Two copies against each other
 

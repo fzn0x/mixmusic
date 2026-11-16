@@ -207,16 +207,17 @@
   again. The music video's timing (`lrclibLyrics`, `keepsTime`) stays in
   `catalog.go`, apart from the sources, and `videoLyrics`
   (`lyricsvideo.go`, #565) times a video's song's lyrics to the video:
-  once `internal/align` found where the song starts in it, the lines move
-  by that shift (`Lyrics.Shifted`). The first lookup starts the
-  measurement (`videoTiming`), one at a time, which reads both
-  recordings through the proxy a block at a time (`Proxy.OpenRanges`)
-  and decodes their stretches (`audio.Stretches`); meanwhile the lyrics
-  show as the song has them, with a note, and aren't kept, and as it ends
-  the windows look them up again (`App.OnLyricsTimed`). A shift is kept
-  in `lyrics-timing.json` in the cache folder for 180 days, no clear match
-  for 7, 400 videos at most; a failure keeps nothing, and holds the video
-  off for 10 minutes. YouTube Music's own map of a video and its song,
+  once `internal/align` found where the song starts in it and how fast it
+  plays there, each line moves to the shift plus its time at that speed
+  (`Lyrics.Shifted`, #748). The first lookup starts the measurement
+  (`videoTiming`), one at a time, which reads both recordings through the
+  proxy a block at a time (`Proxy.OpenRanges`) and decodes their
+  stretches (`audio.Stretches`); meanwhile the lyrics show as the song
+  has them, with a note, and aren't kept, and as it ends the windows look
+  them up again (`App.OnLyricsTimed`). A shift and a speed are kept in
+  `lyrics-timing.json` in the cache folder for 180 days, a record without
+  a speed reading as 1, no clear match for 7, 400 videos at most; a
+  failure keeps nothing, and holds the video off for 10 minutes. YouTube Music's own map of a video and its song,
   the `counterpart` and `segmentMap` of the "next" answer signed in,
   isn't read yet: no recorded answer holds them.
 - **`internal/align`** finds where a stretch of one recording's audio is
@@ -225,8 +226,10 @@
   compared by normalized correlation, each band's mean taken away, at
   every shift of the plan (`NewPlan`): three windows of the song, at a
   fifth, half and four fifths of it, searched 120 s either way of the
-  lengths' difference. `Plan.Shift` takes a shift when two windows or
-  more match clearly and agree within 100 ms, at a speed within 1%.
+  lengths' difference. `Plan.Shift` takes a shift and a speed when two
+  windows or more match clearly: it fits a line through where they land,
+  video time = shift + song time × speed, by least squares, and takes it
+  when each lands within 100 ms of it and the speed is within 1% of 1.
   `internal/align/aligntest` makes audio from seeds, drums, a bass and a
   tune, to test it on, and `MIXMUSIC_LIVE=1 go test ./internal/app -run
   LiveLyricsTiming -v` measures music videos on YouTube.

@@ -118,9 +118,9 @@ AppImage or archive copy's.
 - `lyrics-translations/`: the translations of lyrics you turned on, by
   track and language.
 - `lyrics-timing.json`: where the songs of the music videos you played
-  start in them, for [their lyrics](lyrics.md#music-videos), kept 180
-  days, and the videos whose song has no clear match, kept 7, 400 videos
-  at most.
+  start in them, and how fast they play there, for
+  [their lyrics](lyrics.md#music-videos), kept 180 days, and the videos
+  whose song has no clear match, kept 7, 400 videos at most.
 - `romaji/`: the dictionary of the readings of kanji, once you turn on
   romaji (11.7 MB).
 - `yt-dlp/`: what yt-dlp keeps of YouTube's player.

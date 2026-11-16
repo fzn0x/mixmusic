@@ -66,6 +66,10 @@ type guestRoom struct {
 	// tries counts the tries to come back, and retry waits for the next.
 	tries int
 	retry *time.Timer
+	// hint is where the room moved, as its old host reached it, and
+	// pending the room opened for it to move here (roommove.go).
+	hint    string
+	pending *hostedRoom
 }
 
 // GuestView is the room this computer is a guest of, for its page: the
@@ -327,6 +331,7 @@ func (a *App) entered(g *guestRoom, s *room.Session, own bool) {
 	}
 	f.follow(s)
 	a.watchRoomAsks(s, g.name)
+	a.watchMove(g, s)
 	go func() {
 		<-s.Done()
 		a.dropped(g, s)
@@ -342,6 +347,10 @@ func (a *App) dropped(g *guestRoom, s *room.Session) {
 	mine := r.guest == g && g.session == s
 	r.mu.Unlock()
 	if !mine || errors.Is(err, net.ErrClosed) {
+		return
+	}
+	if m, ok := s.Moved(); ok && errors.Is(err, room.ErrMoved) {
+		a.moved(g, s, m)
 		return
 	}
 	if !errors.Is(err, room.ErrLost) {
@@ -393,6 +402,10 @@ func (a *App) comeBack(g *guestRoom) {
 		return
 	}
 	f, found := a.foundRoom(g.id, true)
+	if !found && g.hint != "" {
+		// Where the room moved, as its old host reached it.
+		f, found = room.Found{ID: g.id, Addr: g.hint}, true
+	}
 	if !found {
 		a.comeBackLater(g)
 		return

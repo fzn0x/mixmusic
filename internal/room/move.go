@@ -228,6 +228,11 @@ func (s *Server) hosting(c *conn, m message) {
 		s.mu.Unlock()
 		return
 	}
+	if m.Reason == reasonDeclined {
+		s.mu.Unlock()
+		s.notMoved(mv, fmt.Errorf("%s doesn't host the room", mv.name))
+		return
+	}
 	if m.Reason != "" || m.Port <= 0 || m.Port > 65535 {
 		s.mu.Unlock()
 		s.notMoved(mv, fmt.Errorf("%s's computer couldn't open the room", mv.name))
@@ -399,6 +404,12 @@ func (s *Session) Hosting(port int) error {
 		m.Port, m.Reason = 0, "can't"
 	}
 	return s.f.Send(m, s.timing.silence())
+}
+
+// DeclineHost tells the host that this guest's user doesn't host the
+// room.
+func (s *Session) DeclineHost() error {
+	return s.f.Send(message{Type: "hosting", Reason: reasonDeclined}, s.timing.silence())
 }
 
 // Reached tells the host whether this guest reaches the room it moves to.

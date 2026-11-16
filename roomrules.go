@@ -56,7 +56,7 @@ func (s *shell) roomWaiting(c *ui.Context) {
 	k := &s.lk
 	rs := s.a.Rooms()
 	if name, ok := rs.Moving(); ok {
-		ui.Text(c, "The room moves to "+name+"'s computer…").FontSize(k.bodySize())
+		ui.Text(c, "Waiting for "+name+" to host the room…").FontSize(k.bodySize())
 	}
 	if knocks := rs.Knocks(); len(knocks) > 0 {
 		ui.Text(c, "Asking to join").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
@@ -133,11 +133,24 @@ func (s *shell) makeHostButton(c *ui.Context, g app.RoomMember) {
 	}
 }
 
-// roomGuestRows show a guest what the host lets it do: add songs from a
-// song's menu, and control the host's player.
+// roomGuestRows show a guest the host's ask that it host the room, while
+// it waits, and what the host lets it do: add songs from a song's menu,
+// and control the host's player.
 func (s *shell) roomGuestRows(c *ui.Context, g app.GuestView) {
 	k := &s.lk
 	rs := s.a.Rooms()
+	if host, ok := rs.HostAsk(); ok {
+		ui.Text(c, host+" asks you to host the room: this computer would play the room's queue, in place of yours, and the others would join it here.").
+			FontSize(k.bodySize()).MaxWidth(640)
+		ui.Row(c).Gap(8).Children(func() {
+			if s.button(c, "room-host-yes", "host the room", true).Clicked() {
+				rs.AnswerHost(true)
+			}
+			if s.button(c, "room-host-no", "decline", false).Label("Don't host the room").Clicked() {
+				rs.AnswerHost(false)
+			}
+		})
+	}
 	r, ok := rs.RoomRules()
 	if !ok || g.Step != app.RoomIn {
 		return

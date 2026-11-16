@@ -67,10 +67,14 @@ type guestRoom struct {
 	// tries counts the tries to come back, and retry waits for the next.
 	tries int
 	retry *time.Timer
-	// hint is where the room moved, as its old host reached it, and
-	// pending the room opened for it to move here (roommove.go).
+	// hint is where the room moved, as its old host reached it; pending
+	// the room opened for it to move here, once the user agreed; ask the
+	// host's ask that waits for the user, and askedAt when it last asked
+	// (roommove.go).
 	hint    string
 	pending *hostedRoom
+	ask     *hostAsk
+	askedAt time.Time
 }
 
 // GuestView is the room this computer is a guest of, for its page: the

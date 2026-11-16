@@ -135,6 +135,7 @@ func TestRoomMakeHostFromThePage(t *testing.T) {
 	desk := newRoomShell(t, n, "Desk")
 	lap := newRoomShell(t, n, "Lap")
 	dt, lt := tester(t, desk), tester(t, lap)
+	quietRooms(t, lap)
 	if err := desk.a.Rooms().Start(); err != nil {
 		t.Fatal(err)
 	}
@@ -143,6 +144,11 @@ func TestRoomMakeHostFromThePage(t *testing.T) {
 	show(lap, lt, roomsPath)
 	untilBoth(t, desk, dt, lap, lt, "Lap on the host's page", func() bool { return dt.HasText("Lap") && lt.HasText("In Desk's room") })
 	click(t, desk, dt, "Make Lap the host")
+	untilBoth(t, desk, dt, lap, lt, "the ask", func() bool {
+		return lt.HasText("Desk asks you to host the room: this computer would play the room's queue, in place of yours, and the others would join it here.") &&
+			dt.HasText("Waiting for Lap to host the room…")
+	})
+	click(t, lap, lt, "host the room")
 	untilBoth(t, desk, dt, lap, lt, "the room moved", func() bool {
 		_, hosts := lap.a.Rooms().Hosted()
 		return hosts && lt.HasText("copy invite link") && dt.HasText("In Lap's room")

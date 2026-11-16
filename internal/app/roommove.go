@@ -94,6 +94,98 @@ func (a *App) movedTo(h *hostedRoom, m room.Move) {
 	go a.comeBack(g)
 }
 
+// The host's asks that this computer host its room: the user has
+// hostAskFor to answer, less than the host waits, and a host asks once
+// each hostAskEvery at most. Tests shorten them.
+var (
+	hostAskFor   = room.AnswerFor * 5 / 6
+	hostAskEvery = time.Minute
+)
+
+// hostAsk is the host's ask, in session, that this computer host its
+// room, which keeps seats, while it waits for the user.
+type hostAsk struct {
+	session *room.Session
+	seats   room.Seats
+	timer   *time.Timer
+}
+
+// askToHost asks the user whether this computer hosts the room of g, as
+// its host asks in the session s: it declines at once a host that asks
+// again within hostAskEvery, and after hostAskFor.
+func (a *App) askToHost(g *guestRoom, s *room.Session, seats room.Seats) {
+	r := &a.room
+	r.mu.Lock()
+	ok := r.guest == g && g.session == s && g.step == RoomIn && r.hosted == nil && g.pending == nil && g.ask == nil &&
+		time.Since(g.askedAt) >= hostAskEvery
+	var ask *hostAsk
+	if ok {
+		ask = &hostAsk{session: s, seats: seats}
+		ask.timer = time.AfterFunc(hostAskFor, func() { a.answerHost(g, ask, false) })
+		g.ask, g.askedAt = ask, time.Now()
+	}
+	name := g.name
+	r.mu.Unlock()
+	if !ok {
+		_ = s.DeclineHost()
+		return
+	}
+	log.Printf("mixmusic: room: %s asks this computer to host the room", name)
+	a.roomAsks(name + " asks you to host the room")
+}
+
+// answerHost answers the host's ask, opening a room for the room of g to
+// move to, if yes.
+func (a *App) answerHost(g *guestRoom, ask *hostAsk, yes bool) {
+	r := &a.room
+	r.mu.Lock()
+	mine := g.ask == ask
+	if mine {
+		g.ask = nil
+		ask.timer.Stop()
+	}
+	r.mu.Unlock()
+	if !mine {
+		return
+	}
+	a.notifyRooms("")
+	if !yes {
+		_ = ask.session.DeclineHost()
+		return
+	}
+	a.hostAsked(g, ask.session, ask.seats)
+}
+
+// HostAsk returns the name of the host of the room this computer is in,
+// while it asks this computer to host the room, which the user answers
+// with AnswerHost.
+func (rs *Rooms) HostAsk() (string, bool) {
+	r := &rs.a.room
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	g := r.guest
+	if g == nil || g.ask == nil || g.ask.session != g.session || g.step != RoomIn {
+		return "", false
+	}
+	return g.name, true
+}
+
+// AnswerHost answers the host's ask that this computer host the room:
+// it opens a room for the room to move to, if yes.
+func (rs *Rooms) AnswerHost(yes bool) {
+	r := &rs.a.room
+	r.mu.Lock()
+	g := r.guest
+	var ask *hostAsk
+	if g != nil {
+		ask = g.ask
+	}
+	r.mu.Unlock()
+	if ask != nil {
+		go rs.a.answerHost(g, ask, yes)
+	}
+}
+
 // hostAsked opens a room for the room of g to move to, which keeps seats,
 // and tells its host where, in the session s; it closes once the room
 // stays where it is, or by itself after a while.
@@ -170,23 +262,21 @@ func (a *App) reach(s *room.Session, key remote.Fingerprint, addr string) {
 // its host asks, until the session ends: one of each at a time, whatever
 // the host asks.
 func (a *App) watchMove(g *guestRoom, s *room.Session) {
-	var opening, reaching atomic.Bool
+	var reaching atomic.Bool
 	s.Watch(func(e room.Event) {
 		switch e.Kind {
 		case room.HostAsked:
-			if opening.CompareAndSwap(false, true) {
-				go func() {
-					defer opening.Store(false)
-					a.hostAsked(g, s, e.Seats)
-				}()
-			}
+			go a.askToHost(g, s, e.Seats)
 		case room.Unhosted:
 			r := &a.room
 			r.mu.Lock()
-			h := g.pending
+			h, ask := g.pending, g.ask
 			r.mu.Unlock()
 			if h != nil {
 				go a.unhost(g, h)
+			}
+			if ask != nil && ask.session == s {
+				go a.answerHost(g, ask, false)
 			}
 		case room.Reach:
 			if reaching.CompareAndSwap(false, true) {

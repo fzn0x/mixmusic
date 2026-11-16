@@ -10,6 +10,14 @@ import (
 	"github.com/fzn0x/mixmusic/internal/room/roomtest"
 )
 
+// answerHost has the user of g answer the host's ask that it host the
+// room, once it asks.
+func answerHost(t *testing.T, g *roomApp, yes bool) {
+	t.Helper()
+	until(t, g.opts.Remote.Name+" asked to host", func() bool { _, ok := g.Rooms().HostAsk(); return ok })
+	g.Rooms().AnswerHost(yes)
+}
+
 // TestRoomMakeHost moves the room to a guest the other reaches: it hosts
 // it, its player playing the room's queue, and the other guest and the old
 // host are guests of it, in step with it.
@@ -41,6 +49,7 @@ func TestRoomMakeHost(t *testing.T) {
 	if err := desk.Rooms().MakeHost(lapKey); err != nil {
 		t.Fatal(err)
 	}
+	answerHost(t, lap, true)
 	toldNote(t, lapNotes, "You host the room now")
 	toldNote(t, deskNotes, "The room moved to Lap's computer: you're a guest in it now")
 	if _, ok := lap.Rooms().Hosted(); !ok {
@@ -116,6 +125,7 @@ func TestRoomMakeHostUnreached(t *testing.T) {
 	if err := desk.Rooms().MakeHost(lap.opts.Remote.Identity.Fingerprint().String()); err != nil {
 		t.Fatal(err)
 	}
+	answerHost(t, lap, true)
 	until(t, "the move refused", func() bool {
 		for _, note := range deskNotes() {
 			if strings.HasPrefix(note, "The room stays here: this computer can't reach Lap's") {

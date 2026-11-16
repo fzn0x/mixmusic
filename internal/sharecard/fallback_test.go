@@ -38,7 +38,11 @@ func TestSystemScripts(t *testing.T) {
 	for _, s := range scriptTitles {
 		t.Run(s.script, func(t *testing.T) {
 			if !fallbackFor(fam, s.title) {
-				t.Fatalf("no font has every letter of %q", s.title)
+				// A runner may ship no font for a script, as Windows
+				// Server has no Nirmala UI: the fonts of the machine
+				// decide, and the test below proves the lookup.
+				t.Skipf("this %s has no font with every letter of %q (looked for %s)",
+					runtime.GOOS, s.title, strings.Join(systemFonts[runtime.GOOS], ", "))
 			}
 			c := Card{Size: Square, Colors: dark, Lines: []Line{{Text: s.title, Size: 80, Weight: 400}}}
 			img, err := c.Render(fam)
@@ -174,5 +178,52 @@ func TestLoadFontsSkipsTheUnreadable(t *testing.T) {
 	}
 	if got := loadFonts(files); len(got) != 1 {
 		t.Errorf("read %d fonts, want 1", len(got))
+	}
+}
+
+// TestFoundFontDrawsItsLetters puts a font in a user's fonts folder under
+// the name of a Noto font, which does not depend on the fonts of the
+// machine, and finds it, reads it and sets Greek letters in it that the
+// bundled face lacks.
+func TestFoundFontDrawsItsLetters(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("XDG_DATA_HOME", filepath.Join(home, "data"))
+	t.Setenv("XDG_DATA_DIRS", t.TempDir())
+	old := fontconfigFile
+	t.Cleanup(func() { fontconfigFile = old })
+	fontconfigFile = func(string) string { return "" }
+	data, err := os.ReadFile(filepath.Join("..", "..", "fonts", "robotoflex-regular.ttf"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := filepath.Join(home, "data", "fonts")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "NotoSansArmenian-Regular.ttf"), data, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	fam := family(t)
+	fam.Fallback = nil
+	const greek = "Ελλάδα"
+	if fallbackFor(fam, greek) {
+		t.Fatal("the bundled face has Greek letters, so this proves nothing")
+	}
+	fam.Fallback = loadFonts(systemFontFiles("linux"))
+	if len(fam.Fallback) != 1 {
+		t.Fatalf("found %d fonts, want the one put there", len(fam.Fallback))
+	}
+	if !fallbackFor(fam, greek) {
+		t.Fatal("the found font doesn't draw Greek letters")
+	}
+	c := Card{Size: Square, Colors: dark, Lines: []Line{{Text: greek, Size: 80, Weight: 400}}}
+	img, err := c.Render(fam)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ground, _ := Card{Size: Square, Colors: dark}.Render(fam)
+	if got := ink(img, ground); got < 800 {
+		t.Errorf("the letters draw %d pixels", got)
 	}
 }

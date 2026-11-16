@@ -67,6 +67,7 @@ type asks struct {
 	sourceLimits map[string]*limits
 	looking      map[remote.Fingerprint]int
 	looks        int
+	lookRate     bucket
 	sent         *Rules
 	move         *move
 	moved        bool

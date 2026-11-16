@@ -87,6 +87,11 @@ func TestSongsAskFirst(t *testing.T) {
 // TestSongsWaitingBounded lets MaxWaiting songs of a guest wait: the next
 // is refused until the host's user answers one.
 func TestSongsWaitingBounded(t *testing.T) {
+	// More songs than the room finds at once, of its rate: those it finds a
+	// minute are another test's.
+	was := lookBurst
+	lookBurst = 100
+	t.Cleanup(func() { lookBurst = was })
 	r, _ := newRuledRoom(t, Rules{Songs: SongsAsk})
 	s := r.join(newGuest(t, "Ana"))
 	ch := events(s)

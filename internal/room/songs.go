@@ -41,9 +41,17 @@ const (
 	// once, then one each six seconds.
 	songsPerMinute = 10
 	// maxLooks bounds the songs the host finds at once, of all its guests,
-	// and lookFor how long it finds one.
-	maxLooks = 16
-	lookFor  = 10 * time.Second
+	// maxLooksEach those of a guest, and lookFor how long it finds one.
+	maxLooks     = 16
+	maxLooksEach = 4
+	lookFor      = 10 * time.Second
+)
+
+// The host finds lookBurst of its guests' songs at once, then one each
+// lookEvery, about 60 a minute, as each asks a service. Tests change them.
+var (
+	lookBurst = 10
+	lookEvery = time.Second
 )
 
 // What the activity of a room tells of a guest that added a song, whose
@@ -101,18 +109,24 @@ func (s *Server) addSong(c *conn, m message) {
 		}
 	}
 	gs := s.Guests
+	// A file of the guest's, in Ask me first, waits for the host's user to
+	// find it.
+	file := t.Source == "file" && rules.Songs == SongsAsk
 	reason := ""
 	switch {
 	case rules.Songs == SongsOff || gs == nil || gs.Add == nil || gs.Look == nil:
 		reason = SongsAreOff
 	case t.Title == "":
 		reason = CantPlay
-	case rules.Songs == SongsAsk && waiting >= MaxWaiting, s.asks.looks >= maxLooks:
+	case rules.Songs == SongsAsk && waiting >= MaxWaiting:
+		reason = TooMany
+	case !file && (s.asks.looks >= maxLooks || s.asks.looking[c.key] >= maxLooksEach):
 		reason = TooMany
 	case !s.takes(c, func(l *limits) *bucket { return &l.songs }, songsPerMinute, time.Minute/songsPerMinute):
 		reason = TooMany
+	case !file && !s.asks.lookRate.take(time.Now(), lookBurst, lookEvery):
+		reason = TooMany
 	}
-	file := t.Source == "file" && rules.Songs == SongsAsk
 	if reason == "" && !file {
 		s.looking(c.key, 1)
 	}

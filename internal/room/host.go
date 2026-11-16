@@ -803,6 +803,8 @@ func (s *Server) Unblock(key remote.Fingerprint) {
 
 // drop ends the stay of the guest of key, telling it why.
 func (s *Server) drop(key remote.Fingerprint, reason, what string) {
+	// A move under way keeps the seats it was asked with (move.go).
+	s.stopMove(errDropped)
 	s.mu.Lock()
 	g := s.guests[key]
 	if g == nil {

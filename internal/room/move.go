@@ -203,7 +203,7 @@ func (s *Server) CanHost(key remote.Fingerprint) bool {
 func (s *Server) hosting(c *conn, m message) {
 	s.mu.Lock()
 	mv := s.asks.move
-	if mv == nil || mv.conn != c || mv.addr != "" {
+	if mv == nil || mv.conn != c || mv.addr != "" || s.guestOf(c) == nil {
 		s.mu.Unlock()
 		return
 	}
@@ -275,6 +275,12 @@ func (s *Server) reached(mv *move, who *Member, ok bool) {
 		s.mu.Unlock()
 		return
 	}
+	if s.guestOf(mv.conn) == nil {
+		// The guest it moves to went meanwhile.
+		s.mu.Unlock()
+		s.notMoved(mv, fmt.Errorf("%s left the room", mv.name))
+		return
+	}
 	s.asks.move = nil
 	mv.timer.Stop()
 	var conns []*conn
@@ -297,6 +303,20 @@ func (s *Server) reached(mv *move, who *Member, ok bool) {
 	wg.Wait()
 	if mv.done != nil {
 		mv.done(done, nil)
+	}
+}
+
+// errDropped: the host removed or blocked someone as the room moved, whose
+// place the room it moved to would keep.
+var errDropped = errors.New("you removed or blocked someone while it moved")
+
+// stopMove ends the move under way, if any, for why.
+func (s *Server) stopMove(why error) {
+	s.mu.Lock()
+	mv := s.asks.move
+	s.mu.Unlock()
+	if mv != nil {
+		s.notMoved(mv, why)
 	}
 }
 

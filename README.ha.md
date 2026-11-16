@@ -489,6 +489,10 @@ da:
   Unison yake sa Google ta fassara.
 - **LRCLIB:** taken waƙar da ake kunnawa, mawaƙanta, albam ɗinta da tsawonta,
   don samo kalmomin waƙarta.
+- **SponsorBlock:** sai yayin da ka kunna Skip the parts SponsorBlock marks
+  (Tsallake sassan da SponsorBlock ya yi wa alama): haruffa 4 na farko na
+  hash ɗin ID ɗin kowane bidiyo, ba ID ɗin kansa ba, don samo sassan da ya
+  yi wa alama.
 - **GitHub:** duba sabuwar sigar a farawa da kuma bayan kowane ƴan saʼoʼi,
   wanda za ka iya kashewa a Settings › About (Saituna › Game da); rajistar
   alʼumma idan ka buɗe kasuwa; abubuwan zazzagewa na yt-dlp; kuma, a karon

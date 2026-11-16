@@ -125,7 +125,7 @@ type guest struct {
 // other end (sourceOf), and the messages that wait to go to it.
 type conn struct {
 	raw  net.Conn
-	f    *remote.Frames
+	f    *frames
 	key  remote.Fingerprint
 	src  string
 	out  chan message
@@ -178,6 +178,7 @@ func (s *Server) Serve(ln net.Listener) error {
 		ln.Close()
 		return nil
 	}
+	ln = limited(ln, s.caps.orDefault())
 	s.ln = ln
 	s.adm.caps = s.caps.orDefault()
 	s.start()
@@ -294,7 +295,7 @@ func (s *Server) handle(raw net.Conn, u *unproven) {
 	if s.keeps(key) {
 		proven()
 	}
-	c := &conn{raw: tc, f: remote.NewFrames(tc), key: key, src: u.src, out: make(chan message, outQueue), gone: make(chan struct{})}
+	c := &conn{raw: tc, f: newFrames(tc, s.adm.caps.messageRate()), key: key, src: u.src, out: make(chan message, outQueue), gone: make(chan struct{})}
 	c.f.Limit(handshakeMessage)
 	if !s.add(c) {
 		return

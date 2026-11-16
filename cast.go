@@ -61,6 +61,7 @@ func (s *shell) castButton(c *ui.Context) {
 		}
 		s.remoteItems(m)
 		s.roomItems(m)
+		s.joinRoomItem(m)
 	})
 	if b.Clicked() {
 		// The menu opens on what was found, and finds again beside it.

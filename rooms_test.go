@@ -64,7 +64,7 @@ func TestRoomJoinFromDevicesMenu(t *testing.T) {
 	f := foundRoom(t, lap, "Desk")
 	lt.Frame()
 	click(t, lap, lt, "Cast to a device")
-	want := []string{"This computer", "-", "Start a room", "Desk's room"}
+	want := []string{"This computer", "-", "Start a room", "Desk's room", "Join a room…"}
 	if got := lt.Menu(); !slices.Equal(got, want) {
 		t.Errorf("menu %q, want %q", got, want)
 	}

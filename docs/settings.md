@@ -99,6 +99,15 @@ computer's name when empty; and **Follow the host's volume**, off at
 first, which plays a room's tracks at its host's volume.
 [Listen with friends](listen-with-friends.md) tells more.
 
+In it too, for friends outside your network: **Join a room…**, which
+opens the page that takes an invite link, or a room's address and code;
+**Port for rooms**, the TCP port your rooms listen on, picked at random
+as your first room opens and kept; and **Address for invites**, empty at
+first, which invites carry in place of what your router tells, as an
+address on a VPN you both run.
+[Friends outside your network](listen-with-friends.md#friends-outside-your-network)
+tells more.
+
 The **Windows Firewall** group, on Windows: **Connections from your
 network** tells whether other computers and cast devices on your network
 can reach MixMusic, for remote control and casting, and why not when they

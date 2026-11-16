@@ -24,6 +24,11 @@ any message on it. So:
 Nothing listens unless a room is open: the host's server starts with the
 room and ends with it, and a guest listens nowhere.
 
+A room that friends outside the network join faces anyone on the internet
+who knocks ([Friends outside the network](#friends-outside-the-network)):
+the same admission holds, with limits of what comes in on top
+([Admission](#admission)).
+
 ## The parts
 
 - **`internal/room`** is the protocol, apart from the app: the codes and
@@ -73,7 +78,14 @@ O, about 1.3 billion codes: read in either case, O as 0 and I and L as 1.
 The invite link is `mixmusic://join/<code>#<key>.<secret>`: the host's
 key in hex, which the guest pins, as TLS has it, and a secret of 16 bytes
 from `crypto/rand`, in base64url, which the guest proves in place of the
-code. What follows `#` stays in the app that opens it.
+code; then, while friends outside may join, `@` and where they reach the
+host, 4 at most, between commas, IPv6 in brackets escaped
+(`weblink.go`). What follows `#` stays in the app that opens it. The
+link's https form, `https://mixmusic.functionx.dev/join/#<code>.<key>.<secret>`
+and the rest, opens a page of the website, for chat apps that don't open
+`mixmusic://` links, which opens the app's link or offers the download:
+the code and the rest stay after the `#`, which the browser never sends
+to the website.
 
 A short code that stays the room's can't be proved as remote control
 proves its own, bit by bit: each failure would tell a bit, and the code
@@ -131,6 +143,15 @@ few computers that proved nothing yet (`admit.go`).
   before its code was checked, as the guest went, checked none.
 - **Bounded.** The room counts 4096 sources at most, and forgets those that
   tried a minute ago and neither wait nor try.
+- **What comes in** (`limits.go`), as anyone on the internet may knock
+  once friends outside join: a source holds 32 connections at once at
+  most, proven or not, and the room 512, past which a connection is
+  closed as it comes, each more than the places of the unproven, so that
+  a new connection takes the place of the oldest rather than be closed;
+  and a connection's messages past 60 a second, after a burst of as many,
+  wait to be read, so that its sender's sends wait in turn. A guest takes the
+  host's messages of 4 KiB at most, too, until the host's welcome proved
+  the code: at an address typed in, anyone may answer.
 - **The unproven.** A connection holds one of 32 places in the room, 4 of a
   source, from its accepting until it proved the code, the link or its
   key, or ended, 5 s at most in all (`Prove`), not a Silence for each
@@ -150,7 +171,9 @@ A guest that drops off, as a computer that sleeps or a network that went,
 keeps its place 15 minutes: it comes back by its key alone, with `hello`
 wanting to `rejoin`, to the host's key it pinned. It tries after 1 s,
 then twice as long each time up to 32 s, 15 times, and at once as its
-computer wakes; the room ended, for it, once it ran out of tries.
+computer wakes, 32 times: about 15 minutes, as long as the host keeps
+its place, after a sleep or a change of network on either side. The room
+ended, for it, once it ran out of tries.
 
 The host removes a guest, which is told so (`ended`, `removed`), and joins
 again only by the code or the link; or blocks it, by its key, which can't
@@ -230,10 +253,49 @@ device and equalizer stay its own, unless **Follow the host's volume**.
 
 ## Listening on the network
 
-While a room is open, MixMusic listens on a TCP port the system picks, on
-every network, and on mDNS's UDP port, as remote control does: the
-firewall notes of [Remote control](remote.md#listening-on-the-network)
-hold for rooms too.
+While a room is open, MixMusic listens on a TCP port, on every network,
+and on mDNS's UDP port, as remote control does: the firewall notes of
+[Remote control](remote.md#listening-on-the-network) hold for rooms too.
+The port is kept from room to room (`RoomPort`), picked at random from
+1024 to 65535 as the first opens, so that a port forwarded by hand keeps
+working; when another program has it, the room listens at one the system
+picks, and its page says so.
+
+## Friends outside the network
+
+The switch of the room's page, **Let friends outside this network join**,
+off at first (`RoomAnywhere`), has the room reached from the internet
+(`internal/app`'s `roomreach.go` and `roomfar.go`). There is no server and
+no relay: guests reach the host's computer directly.
+
+- **The host.** Its listener asks the router, while the switch is on, to
+  forward the room's port ([Port mapping](portmap.md)), and opens it at
+  the router of IPv6 by PCP. The invite link carries the router's
+  internet address, the port it forwards, and this computer's IPv6
+  address: or, in place of both, the address the user typed for invites
+  (`RoomAddress`), as a VPN's both sides run, or a router's with a port
+  forwarded by hand, which nothing asks of the router. The forward goes
+  as the switch goes off or the room ends. The page tells what was set
+  up, or why nothing reaches the room, as a router behind another, and
+  that the port can't be tested from outside; and once the addresses
+  changed since the link was copied, as after the router's internet
+  address changed, it tells the host to send the new link.
+- **The guest.** It dials the address discovery found, and the link's,
+  each 250 ms after the one before, and keeps the first that answers
+  (`DialFirst`), as it knocks and as it comes back: a guest on the host's
+  network gets there, with no hairpin through the router. A link of the
+  host's that a guest which dropped off opens brings it back at once, to
+  the new address. Join a room takes an address and a code, which the
+  guest proves as on the network. One that can't reach a room outside is
+  told the likely causes: a router that doesn't forward the port, a
+  firewall, or a room that ended.
+- **Firewalls.** The rule of Settings › Desktop › Windows Firewall lets
+  in any address on private and domain networks, which a forwarded port
+  is; macOS's firewall must allow MixMusic's incoming connections, and on
+  Linux ufw or firewalld must let the port in.
+- **Not yet.** Turning the switch on is to suggest **Ask me before
+  someone joins**, which waits for that setting (#734). Checking the
+  forward on a real router waits for a running app.
 
 ## Two copies against each other
 

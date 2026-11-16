@@ -20,6 +20,9 @@ type roomView struct {
 	// code is what the user typed of a room's code, and link the invite
 	// link they pasted.
 	code, link string
+	// addr and addrCode are the address and the code of a room the user
+	// joins at an address (rooms_anywhere.go).
+	addr, addrCode string
 	// starting is set while a room opens.
 	starting bool
 }

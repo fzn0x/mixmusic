@@ -50,14 +50,24 @@ func TestDialFirstTakesTheOneThatAnswers(t *testing.T) {
 	}
 }
 
-// TestDialFirstTellsWhatItTried dials addresses that all refuse: it tells
-// them.
+// TestDialFirstTellsWhatItTried dials addresses that all refuse, or never
+// answer: it tells them.
 func TestDialFirstTellsWhatItTried(t *testing.T) {
 	addrs := []string{closedAddr(t), closedAddr(t)}
 	_, err := DialFirst(context.Background(), nil, addrs)
 	var ue *UnreachableError
 	if !errors.As(err, &ue) || len(ue.Addrs) != 2 {
 		t.Fatalf("DialFirst: %v", err)
+	}
+	silent := func(ctx context.Context, _, _ string) (net.Conn, error) {
+		<-ctx.Done()
+		return nil, ctx.Err()
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+	_, err = DialFirst(ctx, silent, []string{"192.0.2.1:9"})
+	if !errors.As(err, &ue) || !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("DialFirst of an address that never answers: %v", err)
 	}
 }
 
@@ -66,7 +76,9 @@ func TestDialFirstTellsWhatItTried(t *testing.T) {
 func TestKnockOverAddresses(t *testing.T) {
 	r := newTestRoom(t)
 	g := newGuest(t, "Far")
-	s, err := g.Over([]string{closedAddr(t), r.addr}).Knock(context.Background(), "unused", &r.key, r.server.Secret, true)
+	addrs := []string{closedAddr(t), r.addr}
+	g.Dial = func(ctx context.Context, _, _ string) (net.Conn, error) { return DialFirst(ctx, nil, addrs) }
+	s, err := g.Knock(context.Background(), addrs[0], &r.key, r.server.Secret, true)
 	if err != nil {
 		t.Fatal(err)
 	}

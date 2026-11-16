@@ -94,16 +94,9 @@ func DialFirst(ctx context.Context, dial func(ctx context.Context, network, addr
 					}
 				}
 			}(started - failed)
-			return nil, ctx.Err()
+			// The addresses that never answered, as a port no router
+			// forwards drops what comes.
+			return nil, &UnreachableError{Addrs: addrs, Err: errors.Join(append(errs, ctx.Err())...)}
 		}
 	}
-}
-
-// Over returns g, connecting to the first of addrs that answers
-// (DialFirst), in place of the address its calls are given.
-func (g *Guest) Over(addrs []string) *Guest {
-	over := *g
-	dial := g.Dial
-	over.Dial = func(ctx context.Context, _, _ string) (net.Conn, error) { return DialFirst(ctx, dial, addrs) }
-	return &over
 }

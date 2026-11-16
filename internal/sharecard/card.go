@@ -44,8 +44,9 @@ type Face struct {
 
 // Family is the faces a card's text is set in. A line takes the face
 // nearest the weight it asks for; a letter the face lacks, a Chinese
-// character say, comes from the first of Fallback that has it, and from
-// the family's own .notdef box when none does.
+// character say, comes from the first of Fallback that has it, and when
+// none does, from the family's own .notdef glyph, which is blank in
+// Selawik, so the letter leaves a gap.
 type Family struct {
 	Faces    []Face
 	Fallback []*sfnt.Font

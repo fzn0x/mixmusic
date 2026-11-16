@@ -3,8 +3,8 @@ package room
 // Admission: what a room takes of the computers that proved nothing yet.
 // The code is the only thing between someone on the network and the room,
 // and SPAKE2 has each try check one code, online: so the tries are what the
-// room counts. Each source, an IPv4 address or the /64 of an IPv6 one,
-// which one computer changes within as it likes, tries Tries codes, then
+// room counts. Each source, an IPv4 address or the /56 of an IPv6 one,
+// which one home changes within as it likes, tries Tries codes, then
 // waits; the whole room takes RoomTries wrong ones each Wait, then takes no
 // code until the wait is over. A try counts as it starts, before SPAKE2
 // runs, so that tries at once count too. Links, of a secret too long to
@@ -42,7 +42,8 @@ const (
 )
 
 // sourceOf is the source of the address addr ("host:port", or a host): its
-// IPv4 address, or the /64 of its IPv6 address.
+// IPv4 address, or the /56 of its IPv6 address, as a home's router has
+// from its provider, 256 networks of /64 (#562).
 func sourceOf(addr string) string {
 	host, _, err := net.SplitHostPort(addr)
 	if err != nil {
@@ -56,7 +57,7 @@ func sourceOf(addr string) string {
 	if ip.Is4() {
 		return ip.String()
 	}
-	p, err := ip.Prefix(64)
+	p, err := ip.Prefix(56)
 	if err != nil {
 		return ip.String()
 	}

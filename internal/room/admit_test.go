@@ -54,11 +54,13 @@ func TestWrongCodesAtOnceTryFive(t *testing.T) {
 	}
 }
 
-// TestSourceOfKeepsIPv6ToItsSlash64 counts an IPv4 address alone, and an
-// IPv6 address by its /64, which one computer changes within as it likes.
-func TestSourceOfKeepsIPv6ToItsSlash64(t *testing.T) {
+// TestSourceOfKeepsIPv6ToItsSlash56 counts an IPv4 address alone, and an
+// IPv6 address by its /56, as a home's router has from its provider: its
+// 256 networks of /64 are one source.
+func TestSourceOfKeepsIPv6ToItsSlash56(t *testing.T) {
 	same := [][2]string{
 		{"[2001:db8:1:2::1]:4000", "[2001:db8:1:2:ffff:ffff:ffff:fffe]:5000"},
+		{"[2001:db8:1:200::1]:4000", "[2001:db8:1:2ff::1]:4000"},
 		{"[fe80::1%eth0]:4000", "[fe80::2%eth1]:4000"},
 		{"192.168.1.20:4000", "[::ffff:192.168.1.20]:4001"},
 	}
@@ -68,7 +70,7 @@ func TestSourceOfKeepsIPv6ToItsSlash64(t *testing.T) {
 		}
 	}
 	apart := [][2]string{
-		{"[2001:db8:1:2::1]:4000", "[2001:db8:1:3::1]:4000"},
+		{"[2001:db8:1:200::1]:4000", "[2001:db8:1:300::1]:4000"},
 		{"192.168.1.20:4000", "192.168.1.21:4000"},
 	}
 	for _, p := range apart {

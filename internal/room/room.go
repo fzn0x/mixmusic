@@ -176,7 +176,7 @@ func or(d, def time.Duration) time.Duration {
 	return def
 }
 
-// Tries is how many wrong codes a source, an IPv4 address or an IPv6 /64,
+// Tries is how many wrong codes a source, an IPv4 address or an IPv6 /56,
 // may try before it waits (admit.go).
 const Tries = 5
 

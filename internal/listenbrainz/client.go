@@ -93,19 +93,20 @@ type Client struct {
 	// OnRecording hears the MessyBrainz ID that the server gave the
 	// recording of a track announced as playing, when it gave one.
 	OnRecording func(t Track, msid string)
+	// Gap is the least time from the start of a call to the next: a
+	// second, which tests shorten.
+	Gap time.Duration
 
 	mu sync.Mutex
 	// next is when the next call may start.
 	next time.Time
-	// gap is minGap, which tests shorten.
-	gap time.Duration
 }
 
 // New returns a client of the server at the address server, as
 // ParseServer gives it, which introduces itself as userAgent and tells
 // MixMusic's version.
 func New(server, userAgent, version string) *Client {
-	return &Client{Server: server, UserAgent: userAgent, Version: version, HTTP: &http.Client{Timeout: 20 * time.Second}, gap: minGap}
+	return &Client{Server: server, UserAgent: userAgent, Version: version, HTTP: &http.Client{Timeout: 20 * time.Second}, Gap: minGap}
 }
 
 // turn waits until the client may make a call: a second after the call
@@ -117,7 +118,7 @@ func (c *Client) turn(ctx context.Context) error {
 	if at.Before(now) {
 		at = now
 	}
-	c.next = at.Add(c.gap)
+	c.next = at.Add(c.Gap)
 	c.mu.Unlock()
 	wait := at.Sub(now)
 	if wait <= 0 {
@@ -190,7 +191,7 @@ func (c *Client) call(ctx context.Context, method, path, token string, query url
 		return ErrTokenRefused
 	case res.StatusCode == http.StatusTooManyRequests:
 		wait := resetIn(res.Header)
-		c.hold(max(wait, c.gap))
+		c.hold(max(wait, c.Gap))
 		return &APIError{Status: res.StatusCode, Message: message(data), Wait: wait}
 	case res.StatusCode >= 300:
 		return &APIError{Status: res.StatusCode, Message: message(data)}

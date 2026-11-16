@@ -64,3 +64,13 @@ func (c *Client) Scrobble(ctx context.Context, sessionKey string, plays []Play) 
 func seconds(d time.Duration) int {
 	return int(d.Round(time.Second) / time.Second)
 }
+
+// Love loves t for the user of sessionKey, which their profile shows, or
+// takes the love back: track.love, or track.unlove.
+func (c *Client) Love(ctx context.Context, sessionKey string, t Track, loved bool) error {
+	method := "track.unlove"
+	if loved {
+		method = "track.love"
+	}
+	return c.call(ctx, method, url.Values{"sk": {sessionKey}, "artist": {t.Artist}, "track": {t.Title}}, nil)
+}

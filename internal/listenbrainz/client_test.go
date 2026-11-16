@@ -59,7 +59,7 @@ func newServer(t *testing.T, answer func(r request) (int, http.Header, string)) 
 	}))
 	t.Cleanup(s.srv.Close)
 	c := New(s.srv.URL, "MixMusic/1.2.3 (https://github.com/fzn0x/mixmusic)", "1.2.3")
-	c.gap = 0
+	c.Gap = 0
 	return s, c
 }
 
@@ -166,7 +166,7 @@ func TestScrobbleSingleAndImport(t *testing.T) {
 
 func TestErrors(t *testing.T) {
 	c := New("", "MixMusic", "1.2.3")
-	c.gap = 0
+	c.Gap = 0
 	for _, cs := range []struct {
 		name     string
 		status   int
@@ -223,7 +223,7 @@ func TestErrors(t *testing.T) {
 // after a 429.
 func TestOneCallASecond(t *testing.T) {
 	_, c := newServer(t, ok(fixture(t, "validate-valid.json")))
-	c.gap = 40 * time.Millisecond
+	c.Gap = 40 * time.Millisecond
 	start := time.Now()
 	for range 3 {
 		if _, err := c.ValidateToken(context.Background(), token); err != nil {

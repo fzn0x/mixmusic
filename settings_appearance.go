@@ -13,17 +13,20 @@ import (
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The groups of Settings › Appearance.
 
 // layoutChoices are the layout designs, in the order of settings.Layouts,
 // as Settings › Appearance offers them.
-var layoutChoices = []choice{
-	{"Blend", "Expressive's rounded shapes and springy motion, on Crate's dense rows, big covers in cards and bold headings. The default.", false},
-	{"Expressive", "Playful and colourful: tonal fills, big rounded shapes, pill buttons, a floating player bar and springy motion. The Material themes go with it, their colours made of the cover's.", false},
-	{"Crate", "Restrained: dense rows, big covers in cards and bold, tight headings, so that the covers do the work.", false},
-	{"Tiles", "Flat tiles, giant light lowercase words and outlined boxes, as MixMusic first was.", false},
+func layoutChoices() []choice {
+	return []choice{
+		{locales.AppearanceLayoutBlend(), locales.AppearanceLayoutBlendDescription(), false},
+		{locales.AppearanceLayoutExpressive(), locales.AppearanceLayoutExpressiveDescription(), false},
+		{locales.AppearanceLayoutCrate(), locales.AppearanceLayoutCrateDescription(), false},
+		{locales.AppearanceLayoutTiles(), locales.AppearanceLayoutTilesDescription(), false},
+	}
 }
 
 func init() { addSettings("appearance", 10, (*shell).layoutSettings) }
@@ -31,19 +34,19 @@ func init() { addSettings("appearance", 10, (*shell).layoutSettings) }
 // layoutSettings choose the layout design.
 func (s *shell) layoutSettings(c *ui.Context) {
 	k := &s.lk
-	s.group(c, "Layout", func() {
+	s.group(c, locales.AppearanceLayoutTitle(), func() {
 		layout := slices.Index(settings.Layouts, s.set.Layout)
-		options := layoutChoices
+		options := layoutChoices()
 		if k.headings == headingsLight {
 			// Tiles' own words are lowercase, as its other choices.
 			options = s.lowLayoutChoices[:0]
-			for _, o := range layoutChoices {
+			for _, o := range layoutChoices() {
 				o.title = k.words(o.title)
 				options = append(options, o)
 			}
 			s.lowLayoutChoices = options
 		}
-		if s.choices(c, "layout", "Layout", &layout, options) {
+		if s.choices(c, "layout", locales.AppearanceLayoutTitle(), &layout, options) {
 			s.set.Layout = settings.Layouts[layout]
 			s.save()
 		}
@@ -55,29 +58,29 @@ func init() { addSettings("appearance", 20, (*shell).themeSettings) }
 // themeSettings choose the theme, or one for each mode of the computer.
 func (s *shell) themeSettings(c *ui.Context) {
 	k := &s.lk
-	s.groupWith(c, "Theme", func() {
-		if s.link(c, "more-themes", "get more themes") {
+	s.groupWith(c, locales.AppearanceThemeTitle(), func() {
+		if s.link(c, "more-themes", locales.AppearanceGetMoreThemes()) {
 			s.navigate("/marketplace/themes")
 		}
-		if s.link(c, "themes-folder", "open themes folder") {
+		if s.link(c, "themes-folder", locales.AppearanceOpenThemesFolder()) {
 			s.openFolder(addons.KindTheme)
 		}
 	}, func() {
-		follow := "Show one theme while the computer is in light mode and another in dark mode. The theme you pick below is the one for the mode it is in now."
+		follow := locales.AppearanceFollowComputerDescription()
 		if s.oneMode {
-			follow = "Show one theme in light mode and another in dark mode. Your colour file's colours are light or dark, so the theme of their mode shows."
+			follow = locales.AppearanceFollowComputerOneModeDescription()
 		}
-		s.row(c, "Follow the computer", follow, func() {
-			if s.switchOf(c.Key("follow"), &s.set.FollowSystem).Label("Follow the computer").Changed() {
+		s.row(c, locales.AppearanceFollowComputer(), follow, func() {
+			if s.switchOf(c.Key("follow"), &s.set.FollowSystem).Label(locales.AppearanceFollowComputer()).Changed() {
 				s.save()
 			}
 		})
 		if s.set.FollowSystem {
-			s.row(c, "In light mode", "", func() { s.themeSelect(c, "light-theme", "Theme in light mode", &s.set.LightTheme) })
-			s.row(c, "In dark mode", "", func() { s.themeSelect(c, "dark-theme", "Theme in dark mode", &s.set.DarkTheme) })
+			s.row(c, locales.AppearanceInLightMode(), "", func() { s.themeSelect(c, "light-theme", locales.AppearanceThemeInLightMode(), &s.set.LightTheme) })
+			s.row(c, locales.AppearanceInDarkMode(), "", func() { s.themeSelect(c, "dark-theme", locales.AppearanceThemeInDarkMode(), &s.set.DarkTheme) })
 		}
 		if !s.wornColors().Empty() {
-			s.hint(c, "Your colour file sets the colours. The theme sets the type, corners and effects.")
+			s.hint(c, locales.AppearanceColourFileSetsColours())
 		}
 		// The search finds a theme's card by the theme's name, who made it,
 		// and whether it is light or dark.
@@ -110,7 +113,7 @@ func init() { addSettings("appearance", 30, (*shell).themeOptionSettings) }
 // effects the native interface draws itself.
 func (s *shell) themeOptionSettings(c *ui.Context) {
 	if th, ok := s.activeTheme(); ok && th.Builtin && len(th.Options) > 0 {
-		s.group(c, th.Name+" options", func() {
+		s.group(c, locales.AppearanceThemeOptions(th.Name), func() {
 			for _, o := range th.Options {
 				s.themeOption(c, th, o)
 			}
@@ -126,32 +129,32 @@ func init() { addSettings("appearance", 40, (*shell).colorTypeSettings) }
 
 // colorTypeSettings show the rows of colour and type.
 func (s *shell) colorTypeSettings(c *ui.Context) {
-	s.group(c, "Colour and type", func() { s.settingsOf(c, colorTypeRows) })
+	s.group(c, locales.AppearanceColourAndType(), func() { s.settingsOf(c, colorTypeRows) })
 }
 
 func init() { addSettings(colorTypeRows, 20, (*shell).accentRows) }
 
 // accentRows choose where the accent colour comes from.
 func (s *shell) accentRows(c *ui.Context) {
-	artwork, accent := "Take the accent colour from the artwork of what plays.", "Replaces the theme's accent when the artwork does not set it."
+	artwork, accent := locales.AppearanceArtworkAccent(), locales.AppearanceAccentFallback()
 	if s.set.ColorSource != settings.ColorsTheme {
-		artwork = "Take the accent colour from the artwork of what plays, over your colour file's."
-		accent = "Replaces your colour file's accent when the artwork does not set it."
+		artwork = locales.AppearanceArtworkAccentOverFile()
+		accent = locales.AppearanceAccentFallbackOverFile()
 	}
-	s.row(c, "Follow the artwork", artwork, func() {
-		if s.switchOf(c.Key("dynamic-accent"), &s.set.DynamicAccent).Label("Follow the artwork").Changed() {
+	s.row(c, locales.AppearanceFollowArtwork(), artwork, func() {
+		if s.switchOf(c.Key("dynamic-accent"), &s.set.DynamicAccent).Label(locales.AppearanceFollowArtwork()).Changed() {
 			s.save()
 		}
 	})
-	s.row(c, "Accent colour", accent, func() { s.accentControl(c) })
+	s.row(c, locales.AppearanceAccentColour(), accent, func() { s.accentControl(c) })
 }
 
 func init() { addSettings(colorTypeRows, 40, (*shell).textSizeRow) }
 
 // textSizeRow scales the text.
 func (s *shell) textSizeRow(c *ui.Context) {
-	s.row(c, "Text size", fmt.Sprintf("%d%%", int(s.set.FontScale*100+0.5)), func() {
-		if ui.StepSlider(c.Key("font-scale"), &s.set.FontScale, 0.85, 1.3, 0.05).Width(200).Label("Text size").Changed() {
+	s.row(c, locales.AppearanceTextSize(), fmt.Sprintf("%d%%", int(s.set.FontScale*100+0.5)), func() {
+		if ui.StepSlider(c.Key("font-scale"), &s.set.FontScale, 0.85, 1.3, 0.05).Width(200).Label(locales.AppearanceTextSize()).Changed() {
 			s.save()
 		}
 	}, "font")
@@ -161,12 +164,12 @@ func init() { addSettings(colorTypeRows, 50, (*shell).densityRow) }
 
 // densityRow chooses how much room the interface gives each element.
 func (s *shell) densityRow(c *ui.Context) {
-	s.row(c, "Density", "Compact fits more rows on the screen.", func() {
+	s.row(c, locales.AppearanceDensity(), locales.AppearanceDensityDescription(), func() {
 		compact := 0
 		if s.set.Density == settings.DensityCompact {
 			compact = 1
 		}
-		if s.segmented(c, "density", "Density", &compact, "comfortable", "compact") {
+		if s.segmented(c, "density", locales.AppearanceDensity(), &compact, locales.AppearanceDensityComfortable(), locales.AppearanceDensityCompact()) {
 			s.set.Density = settings.DensityComfortable
 			if compact == 1 {
 				s.set.Density = settings.DensityCompact
@@ -180,8 +183,8 @@ func init() { addSettings(colorTypeRows, 60, (*shell).sidebarRow) }
 
 // sidebarRow shows the sidebar as icons only.
 func (s *shell) sidebarRow(c *ui.Context) {
-	s.row(c, "Icons only in the sidebar", "The sidebar shows its pages as icons. It does in narrow windows too, until you unfold it there.", func() {
-		if s.switchOf(c.Key("collapsed"), &s.set.SidebarCollapsed).Label("Icons only in the sidebar").Changed() {
+	s.row(c, locales.AppearanceIconsOnlySidebar(), locales.AppearanceIconsOnlySidebarDescription(), func() {
+		if s.switchOf(c.Key("collapsed"), &s.set.SidebarCollapsed).Label(locales.AppearanceIconsOnlySidebar()).Changed() {
 			s.save()
 		}
 	}, "collapse")
@@ -220,7 +223,7 @@ func (s *shell) themeSelect(c *ui.Context, key, label string, id *string) {
 	labels := make([]string, len(themes))
 	chosen := ""
 	for i, t := range themes {
-		labels[i] = t.Name + " (" + t.Scheme + ")"
+		labels[i] = locales.AppearanceThemeChoice(t.Name, t.Scheme)
 		if t.ID == *id {
 			chosen = labels[i]
 		}
@@ -264,9 +267,9 @@ func (s *shell) themeCard(c *ui.Context, t addons.Theme, current bool) {
 // themeBy tells who made a theme: "built in", or "by" its author.
 func themeBy(t addons.Theme) string {
 	if t.Builtin {
-		return "built in"
+		return locales.AppearanceThemeBuiltIn()
 	}
-	return "by " + t.Author
+	return locales.AppearanceThemeBy(t.Author)
 }
 
 // cardLook is the look of theme id's card, made once for the themes
@@ -291,10 +294,10 @@ func (s *shell) cardLook(id string) *look {
 
 // accentControl chooses the accent colour.
 func (s *shell) accentControl(c *ui.Context) {
-	s.colorControl(c, "accent", "Accent colour", s.chosenAccent(), func(hex string) { s.set.Accent = hex })
-	whose := "use the theme's"
+	s.colorControl(c, "accent", locales.AppearanceAccentColour(), s.chosenAccent(), func(hex string) { s.set.Accent = hex })
+	whose := locales.AppearanceUseTheme()
 	if !s.wornColors().Empty() {
-		whose = "use the file's"
+		whose = locales.AppearanceUseFile()
 	}
 	if s.set.Accent != "" && s.link(c, "accent-theme", whose) {
 		s.set.Accent = ""
@@ -378,27 +381,28 @@ func (s *shell) themeOption(c *ui.Context, th addons.Theme, o addons.Option) {
 		s.save()
 	}
 	key := "option-" + th.ID + "-" + o.ID
+	label := optionLabel(th, o.ID, o.Label)
 	desc := ""
 	if o.Type == addons.OptionRange {
 		desc = value + o.Unit
 	}
-	s.row(c, o.Label, desc, func() {
+	s.row(c, label, desc, func() {
 		switch o.Type {
 		case addons.OptionToggle:
 			on := value == "true"
-			if s.switchOf(c.Key(key), &on).Label(o.Label).Changed() {
+			if s.switchOf(c.Key(key), &on).Label(label).Changed() {
 				set(strconv.FormatBool(on))
 			}
 		case addons.OptionSelect:
 			labels := make([]string, len(o.Choices))
 			chosen := value
 			for i, ch := range o.Choices {
-				labels[i] = ch.Label
+				labels[i] = optionLabel(th, o.ID+"/"+ch.Value, ch.Label)
 				if ch.Value == value {
-					chosen = ch.Label
+					chosen = labels[i]
 				}
 			}
-			if s.selectOf(c.Key(key), &chosen, labels).Width(200).Label(o.Label).Changed() {
+			if s.selectOf(c.Key(key), &chosen, labels).Width(200).Label(label).Changed() {
 				if i := slices.Index(labels, chosen); i >= 0 {
 					set(o.Choices[i].Value)
 				}
@@ -412,7 +416,7 @@ func (s *shell) themeOption(c *ui.Context, th addons.Theme, o addons.Option) {
 			if step <= 0 {
 				step = 1
 			}
-			if ui.StepSlider(c.Key(key), &v, o.Min, top, step).Width(200).Label(o.Label).Changed() {
+			if ui.StepSlider(c.Key(key), &v, o.Min, top, step).Width(200).Label(label).Changed() {
 				set(strconv.FormatFloat(v, 'f', -1, 64))
 			}
 		case addons.OptionColor:
@@ -420,7 +424,7 @@ func (s *shell) themeOption(c *ui.Context, th addons.Theme, o addons.Option) {
 			if !ok {
 				current, _ = parseColor(o.Default)
 			}
-			s.colorControl(c, key, o.Label, col(current), func(hex string) { s.setThemeOption(th.ID, o.ID, hex) })
+			s.colorControl(c, key, label, col(current), func(hex string) { s.setThemeOption(th.ID, o.ID, hex) })
 		}
 	})
 }
@@ -457,4 +461,37 @@ func (s *shell) wornColors() colorfile.Colors {
 		return colorfile.Colors{}
 	}
 	return s.colorFile.Colors
+}
+
+// builtinOptionLabels say the labels of the built-in themes' options, by
+// "theme/option" and "theme/option/choice", in the language shown; a
+// community theme's labels are its own.
+var builtinOptionLabels = map[string]func() string{
+	"anime/screentone":    locales.ThemeOptionAnimeScreentone,
+	"anime/speedlines":    locales.ThemeOptionAnimeSpeedlines,
+	"aurora/blur":         locales.ThemeOptionAuroraBlur,
+	"aurora/motion":       locales.ThemeOptionAuroraMotion,
+	"aurora/tint":         locales.ThemeOptionAuroraTint,
+	"glasshouse/blur":     locales.ThemeOptionGlasshouseBlur,
+	"glasshouse/cover":    locales.ThemeOptionGlasshouseCover,
+	"greenroom/wash":      locales.ThemeOptionGreenroomWash,
+	"mix/texture":         locales.ThemeOptionMixTexture,
+	"mix/texture/dots":    locales.ThemeOptionMixTextureDots,
+	"mix/texture/none":    locales.ThemeOptionMixTextureNone,
+	"mix/texture/slashes": locales.ThemeOptionMixTextureSlashes,
+	"mix/texture/stripes": locales.ThemeOptionMixTextureStripes,
+	"mix/white-tiles":     locales.ThemeOptionMixWhiteTiles,
+	"mochi/sparkles":      locales.ThemeOptionMochiSparkles,
+	"sakura/petals":       locales.ThemeOptionSakuraPetals,
+	"terminal/glow":       locales.ThemeOptionTerminalGlow,
+	"terminal/scanlines":  locales.ThemeOptionTerminalScanlines,
+}
+
+// optionLabel is the label of an option of th, or of one of its choices,
+// in the language shown where th is built in.
+func optionLabel(th addons.Theme, path, label string) string {
+	if f, ok := builtinOptionLabels[th.ID+"/"+path]; ok && th.Builtin {
+		return f()
+	}
+	return label
 }

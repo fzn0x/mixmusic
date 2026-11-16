@@ -5,32 +5,25 @@ package main
 // control it, and the computers paired, each with Remove.
 
 import (
-	"strings"
-
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 func init() { addSettings("desktop", 15, (*shell).remoteSettings) }
-
-// remoteTitle is the title of the group, and remoteSwitch of its switch.
-const (
-	remoteTitle  = "Remote control"
-	remoteSwitch = "Allow remote control"
-)
 
 // remoteSettings turn remote control on and off, and list the computers
 // paired, with Remove.
 func (s *shell) remoteSettings(c *ui.Context) {
 	rc := s.a.Remote()
-	s.group(c, remoteTitle, func() {
+	s.group(c, locales.RemoteTitle(), func() {
 		on := rc.On()
 		if s.remote.turning != nil {
 			on = *s.remote.turning
 		}
-		s.row(c, remoteSwitch, remoteAbout(rc.Name()), func() {
-			sw := s.switchOf(c.Key("remote-control"), &on).Label(remoteSwitch).Disabled(s.remote.turning != nil)
+		s.row(c, locales.RemoteSwitch(), locales.RemoteAbout(rc.Name()), func() {
+			sw := s.switchOf(c.Key("remote-control"), &on).Label(locales.RemoteSwitch()).Disabled(s.remote.turning != nil)
 			if sw.Changed() {
 				s.setRemote(on)
 			}
@@ -38,17 +31,17 @@ func (s *shell) remoteSettings(c *ui.Context) {
 		if fw := s.a.Firewall(); on && fw != nil {
 			s.readFirewall(fw)
 			if s.firewallKeepsOut() {
-				s.hint(c, "Windows Firewall keeps the other computers from reaching this one. Windows Firewall, below, tells why, and how to let them in.")
+				s.hint(c, locales.RemoteFirewallHint())
 			}
 		}
 		paired := rc.Paired()
 		if len(paired) == 0 {
-			s.hint(c, "No computer is paired yet. To control another computer, choose it in the player bar's devices menu, the cast button's.")
+			s.hint(c, locales.RemoteNoPaired())
 			return
 		}
 		for _, p := range paired {
 			s.row(c, p.Name, pairedAbout(p), func() {
-				if s.button(c, "remote-remove-"+p.ID, "remove", false).Label("Remove " + p.Name).Clicked() {
+				if s.button(c, "remote-remove-"+p.ID, locales.RemoteRemove(), false).Label(locales.RemoteRemoveLabel(p.Name)).Clicked() {
 					s.forgetPaired(p)
 				}
 			}, "paired computer remove forget")
@@ -56,25 +49,20 @@ func (s *shell) remoteSettings(c *ui.Context) {
 	})
 }
 
-// remoteAbout tells what remote control does, of the computer named name.
-func remoteAbout(name string) string {
-	return "Other computers on this network with MixMusic can find this one, as “" + name +
-		"”, pair with it by a code it shows, and control what it plays. What they send goes encrypted, between the two alone."
-}
-
 // pairedAbout tells what a computer paired does to this one, and this one
 // to it.
 func pairedAbout(p app.PairedComputer) string {
-	var what []string
-	if p.ControlsThis {
-		what = append(what, "Can control this computer")
+	var about string
+	switch {
+	case p.ControlsThis && p.Controlled:
+		about = locales.RemoteBothWays()
+	case p.ControlsThis:
+		about = locales.RemoteCanControl()
+	case p.Controlled:
+		about = locales.RemoteControlled()
 	}
-	if p.Controlled {
-		what = append(what, "You control it from here")
-	}
-	about := strings.Join(what, "; ")
 	if !p.Paired.IsZero() {
-		about += ". Paired " + p.Paired.Local().Format("2 January 2006") + "."
+		about = locales.RemotePaired(about, p.Paired.Local().Format("2 January 2006"))
 	}
 	return about
 }
@@ -107,7 +95,7 @@ func (s *shell) forgetPaired(p app.PairedComputer) {
 				s.notes = append(s.notes, noticeOf(err))
 				return
 			}
-			s.notes = append(s.notes, notice("Removed "+p.Name))
+			s.notes = append(s.notes, notice(locales.RemoteRemoved(p.Name)))
 		})
 	}()
 }

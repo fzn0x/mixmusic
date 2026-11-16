@@ -20,6 +20,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // trackPicks are the tracks selected in a track list: of the list of key
@@ -193,7 +194,7 @@ func (s *shell) pickBox(c *ui.Context, key string, i int, t media.Track, tracks 
 	k := &s.lk
 	p := &s.picks
 	on := p.ids[t.ID]
-	box := s.pointerKeys(ui.CheckboxBase(c.Key(key+"-pick-"+count(i)), &on)).Label("Select "+t.Title).
+	box := s.pointerKeys(ui.CheckboxBase(c.Key(key+"-pick-"+count(i)), &on)).Label(locales.TrackSelectRow(t.Title)).
 		Size(24, 24).Center().Cursor(ui.CursorPointer)
 	if box.Changed() {
 		if box.ClickModifiers()&ui.Shift != 0 {
@@ -223,12 +224,12 @@ func (s *shell) pickBox(c *ui.Context, key string, i int, t media.Track, tracks 
 func (s *shell) pickItem(m *ui.Menu, key string, t media.Track) {
 	m.Separator()
 	if s.picking(key) && s.picks.ids[t.ID] {
-		if m.Item("Deselect").Chosen() {
+		if m.Item(locales.TrackSelectDeselect()).Chosen() {
 			s.picks.set(t, false)
 		}
 		return
 	}
-	if m.Item("Select").Chosen() {
+	if m.Item(locales.TrackSelectItem()).Chosen() {
 		s.pickIn(key)
 		s.picks.set(t, true)
 		s.picks.anchor = t.ID
@@ -299,11 +300,11 @@ func (s *shell) picksBar(c *ui.Context) {
 		Justify(ui.Center).PassThrough().Children(func() {
 		bar := ui.Row(c.Key("picks-bar")).MinHeight(pickBar).Padding(8, 8, 8, 20).Gap(8).Wrap().AlignItems(ui.Center).
 			Justify(ui.Center).Radius(k.round(pickBar)).Background(k.raised).Border(1, k.border).
-			Shadow(0, 6, 20, -6, ui.RGBA(0, 0, 0, 0.3)).Shrink(1).MinWidth(0).Label("Selected tracks")
+			Shadow(0, 6, 20, -6, ui.RGBA(0, 0, 0, 0.3)).Shrink(1).MinWidth(0).Label(locales.TrackSelectBar())
 		bar.Children(func() {
-			ui.Text(c, k.sentence(fmt.Sprintf("%d selected", len(tracks)))).FontSize(k.bodySize()).FontFeatures("tnum").
+			ui.Text(c, k.sentence(locales.TrackSelectCount(len(tracks)))).FontSize(k.bodySize()).FontFeatures("tnum").
 				SingleLine().Shrink(0).Margin(0, 8, 0, 0)
-			if p.inShown < len(p.shown) && s.link(c, "picks-all", "select all") {
+			if p.inShown < len(p.shown) && s.link(c, "picks-all", locales.TrackSelectAll()) {
 				for _, t := range p.shown {
 					p.set(t, true)
 				}
@@ -311,7 +312,7 @@ func (s *shell) picksBar(c *ui.Context) {
 			for _, a := range pickActions {
 				a.build(s, c, tracks)
 			}
-			if s.iconButton(c, "picks-clear", "close", "Clear the selection", false, 16).Clicked() {
+			if s.iconButton(c, "picks-clear", "close", locales.TrackSelectClear(), false, 16).Clicked() {
 				s.clearPicks()
 			}
 		})
@@ -322,9 +323,9 @@ func init() { addPickAction(10, (*shell).queuePicked) }
 
 // queuePicked is the bar's Add to queue.
 func (s *shell) queuePicked(c *ui.Context, tracks []media.Track) {
-	if s.button(c, "picks-queue", "add to queue", false).Label("Add the selected tracks to the queue").Clicked() {
+	if s.button(c, "picks-queue", locales.TrackSelectAddQueue(), false).Label(locales.TrackSelectAddQueueLabel()).Clicked() {
 		s.p.Enqueue(tracks)
-		s.notes = append(s.notes, notice("Added "+plural(len(tracks), "track")+" to the queue"))
+		s.notes = append(s.notes, notice(locales.TrackSelectQueued(len(tracks))))
 	}
 }
 
@@ -333,7 +334,7 @@ func init() { addPickAction(20, (*shell).mixPicked) }
 // mixPicked is the bar's Add to mix: a new mix of the tracks, or one of
 // the user's.
 func (s *shell) mixPicked(c *ui.Context, tracks []media.Track) {
-	s.button(c, "picks-mix", "add to mix", false).Label("Add the selected tracks to a mix").Menu(func(m *ui.Menu) { s.mixItems(m, tracks) })
+	s.button(c, "picks-mix", locales.TrackSelectAddMix(), false).Label(locales.TrackSelectAddMixLabel()).Menu(func(m *ui.Menu) { s.mixItems(m, tracks) })
 }
 
 func init() { addPickAction(30, (*shell).downloadPicked) }
@@ -348,7 +349,7 @@ func (s *shell) downloadPicked(c *ui.Context, tracks []media.Track) {
 		})
 		p.todoAt, p.todoKept = p.seq, v
 	}
-	if len(p.todo) > 0 && s.button(c, "picks-download", "download", false).Label("Download the selected tracks").Clicked() {
+	if len(p.todo) > 0 && s.button(c, "picks-download", locales.TrackSelectDownload(), false).Label(locales.TrackSelectDownloadLabel()).Clicked() {
 		s.download(p.todo)
 	}
 }

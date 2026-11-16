@@ -334,11 +334,11 @@ After Zola, [tools/sitefinish](tools/sitefinish) finishes the site:
 
 - **The landing page in each language** of the README's translations, at
   `/hi/`, `/zh-cn/`, `/id/`, `/ur/` (right to left), `/pt-br/`, `/bn/`,
-  `/ru/` and `/am/`. It replaces each piece of the English page with its
+  `/ru/`, `/am/` and `/ha/`. It replaces each piece of the English page with its
   translation from `site/i18n/<language>.json`, keyed by its English.
   [site/i18n/strings.json](site/i18n/strings.json) lists every piece, with
   where it is. The working copy of the player and the made-up queue keep
-  their English (`translate="no"`), as the app is in English. The docs
+  their English (`translate="no"`). The docs
   stay in English.
 - **The alternates search engines read**: each landing page's `hreflang`
   links, canonical address and Open Graph locale, the language menus, and
@@ -384,14 +384,37 @@ support: the manifest's `runtime-version`, the `gnome-<version>` image of
 ci.yml and release.yml, and the Node.js extension's branch move together;
 the image must be published for both architectures, as Flathub's are.
 
+## Translations of the interface
+
+Every word of the interface is a message of
+[locales/en.json](locales/en.json), which the app says through package
+`locales`, generated of the catalogs as `locales/catalog_gen.go`. A pull
+request that adds or changes a text adds or changes its English message
+alone, and runs `bunx mygo generate`; translators fill in the other
+languages, and the release workflow fails while a shipped language lacks a
+message. Keys start with their feature, as `accountSettingsSignOut`, and
+stay in sorted order. A sentence is one message, with named placeholders
+for what goes in it, as `Couldn't invite collaborators to {title}: {error}`,
+and a count is a plural, as `{count, plural, one {# song} other {# songs}}`,
+so that a translation can order its words. Logs, the failure details
+**Copy** puts on the clipboard, requests to the services and the tool
+descriptions for AI assistants stay in English.
+
+CI checks the catalogs: a message that doesn't parse, a placeholder or
+plural case unlike the English, a key nothing says, keys out of order, or
+a stale `catalog_gen.go`. `go test -run TestPseudoLocale .` shows the pages
+in MyGo's pseudo-language, `en-XA`, and fails on English written in the
+code or a sentence joined from pieces; with `MIXMUSIC_RENDER=<folder>` it
+saves each page, a third longer, to look for cut words.
+
 ## Translations of the README
 
 [README.hi.md](README.hi.md) (Hindi), [README.zh-CN.md](README.zh-CN.md)
 (Simplified Chinese), [README.id.md](README.id.md) (Indonesian),
 [README.ur.md](README.ur.md) (Urdu), [README.pt-BR.md](README.pt-BR.md)
 (Brazilian Portuguese), [README.bn.md](README.bn.md) (Bengali),
-[README.ru.md](README.ru.md) (Russian) and [README.am.md](README.am.md)
-(Amharic) translate [README.md](README.md), which stays the one that's
+[README.ru.md](README.ru.md) (Russian), [README.am.md](README.am.md)
+(Amharic) and [README.ha.md](README.ha.md) (Hausa) translate [README.md](README.md), which stays the one that's
 current. A pull request
 that changes the README needn't change them: say in it which sections
 changed, so that a translator can follow. Corrections and new languages are

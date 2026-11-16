@@ -8,7 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/egoist/mygo/i18n"
+
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // clock writes a duration as 3:28 or 1:02:03.
@@ -37,9 +40,9 @@ func clockLength(d time.Duration) string {
 func longDuration(d time.Duration) string {
 	min := int((d + 30*time.Second) / time.Minute)
 	if min < 60 {
-		return fmt.Sprintf("%d min", min)
+		return locales.FormatMinutes(strconv.Itoa(min))
 	}
-	return fmt.Sprintf("%d hr %d min", min/60, min%60)
+	return locales.FormatHourMinutes(strconv.Itoa(min/60), strconv.Itoa(min%60))
 }
 
 // plural writes a count with its noun: "1 track", "12 tracks".
@@ -66,6 +69,16 @@ func thousands(n int) string {
 		s = "-" + s
 	}
 	return s
+}
+
+// weekdayName writes the weekday of t in the app's language: "Tue".
+func weekdayName(t time.Time) string {
+	return i18n.FormatDate(i18n.Locale(), t, i18n.DateOptions{Skeleton: "E"})
+}
+
+// monthName writes the month of t in the app's language: "Oct".
+func monthName(t time.Time) string {
+	return i18n.FormatDate(i18n.Locale(), t, i18n.DateOptions{Skeleton: "MMM"})
 }
 
 // names joins the names of artists.
@@ -101,7 +114,7 @@ func sourceName(s media.Source) string {
 	case media.SourceYouTube:
 		return "YouTube Music"
 	case media.SourceFile:
-		return "this computer"
+		return locales.FormatThisComputer()
 	}
 	return "MixMusic"
 }
@@ -145,17 +158,13 @@ func compactCount(n int64) string {
 // many views a video has, as "905M views", or "" where its service says
 // not.
 func playsLabel(t media.Track) string {
-	noun := "plays"
-	if t.Video {
-		noun = "views"
-	}
 	switch {
 	case t.Plays <= 0:
 		return ""
-	case t.Plays == 1:
-		noun = strings.TrimSuffix(noun, "s")
+	case t.Video:
+		return locales.FormatViews(int(t.Plays), compactCount(t.Plays))
 	}
-	return compactCount(t.Plays) + " " + noun
+	return locales.FormatPlays(int(t.Plays), compactCount(t.Plays))
 }
 
 // ms is v milliseconds.

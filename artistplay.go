@@ -13,6 +13,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // playAllSongs plays all the songs of a, an artist's page, shuffled or
@@ -49,7 +50,7 @@ var playArtistID = func(s *shell, id string, shuffled bool) {
 func (s *shell) artistPlay(h *headProps, a media.Artist) {
 	if a.SongsID != "" || a.Source == media.SourceFile && len(a.TopTracks) > 0 ||
 		a.Source == media.SourceSpotify && len(a.Albums)+len(a.Singles) > 0 {
-		h.playLabel = "play"
+		h.playLabel = locales.LibraryPlay()
 		h.play = func() { playAllSongs(s, a, false) }
 		h.shuffle = func() { playAllSongs(s, a, true) }
 	}
@@ -59,11 +60,11 @@ func (s *shell) artistPlay(h *headProps, a media.Artist) {
 // the list of all their songs, where they have one.
 func (s *shell) topSongsTitle(c *ui.Context, a media.Artist) {
 	if a.SongsID == "" {
-		s.sectionTitle(c, "Top songs")
+		s.sectionTitle(c, locales.CollectionTopSongs())
 		return
 	}
-	s.sectionHead(c, "Top songs", func() {
-		if s.link(c, "artist-songs", "show all") {
+	s.sectionHead(c, locales.CollectionTopSongs(), func() {
+		if s.link(c, "artist-songs", locales.DownloadsShowAll()) {
 			s.navigate(playlistPath(a.SongsID))
 		}
 	})

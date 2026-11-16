@@ -7,6 +7,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -78,9 +79,9 @@ func (s *shell) toggleStage() {
 	cur, ok := s.st.Current()
 	switch {
 	case !ok:
-		s.notes = append(s.notes, notice("Play something first"))
+		s.notes = append(s.notes, notice(locales.CmdPlayFirst()))
 	case cur.Track.IsEpisode():
-		s.notes = append(s.notes, notice("Podcast episodes have no lyrics"))
+		s.notes = append(s.notes, notice(locales.LyricsStagePodcast()))
 	default:
 		s.stage.open = true
 	}
@@ -122,13 +123,13 @@ func (s *shell) lyricStage(c *ui.Context) {
 	ui.DialogBase(c, &s.stage.open, func(_, panel ui.Element) {
 		// The panel fills the window, so that no click falls on the backdrop,
 		// which would close the stage.
-		panel.Size(w, h).Label("Full-screen lyrics").Clip()
+		panel.Size(w, h).Label(locales.LyricsFullScreen()).Clip()
 		// The focus starts on a point that is nothing to press, without a
 		// ring, so that Enter, pressed by a user who opened the stage with
 		// its keys, doesn't press the close button, which would have the
 		// focus. Not the panel: DialogBase makes it clickable, and a click
 		// takes Space, which plays and pauses.
-		ui.Box(c.Key("stage-focus")).Absolute().Top(0).Left(0).Size(1, 1).Label("Full-screen lyrics").Focusable().AutoFocus().FocusRing(false)
+		ui.Box(c.Key("stage-focus")).Absolute().Top(0).Left(0).Size(1, 1).Label(locales.LyricsFullScreen()).Focusable().AutoFocus().FocusRing(false)
 		s.stageGround(c, panel, t, style)
 		s.stageKeys(c)
 		margin := max(24, 0.03*w)
@@ -206,7 +207,7 @@ func (s *shell) stageCover(c *ui.Context, t media.Track, size float32, st lyricS
 
 // stageClose is the button that closes the stage, at its top right.
 func (s *shell) stageClose(c *ui.Context) {
-	b := s.buttonBase(c.Key("stage-close")).Absolute().Top(20).Right(20).Size(40, 40).Radius(20).Label("Close full-screen lyrics").Cursor(ui.CursorPointer).Tooltip("Close")
+	b := s.buttonBase(c.Key("stage-close")).Absolute().Top(20).Right(20).Size(40, 40).Radius(20).Label(locales.LyricsStageClose()).Cursor(ui.CursorPointer).Tooltip(locales.LyricsStageCloseTip())
 	if b.Hovered() {
 		b.Background(stageInk.Alpha(0.16))
 	}
@@ -239,7 +240,7 @@ func (s *shell) lyricsEmpty(c *ui.Context, o lyricsOptions, text string) {
 func (s *shell) lyricStyleCommands() []command {
 	cmds := make([]command, 0, len(lyricStyles))
 	for _, st := range lyricStyles {
-		cmds = append(cmds, command{"lyrics.style." + string(st.id), "Lyrics style: " + st.name, "", "lyrics", func() {
+		cmds = append(cmds, command{"lyrics.style." + string(st.id), locales.LyricsStageStyle(st.title()), "", locales.CmdGroupLyrics(), func() {
 			s.set.LyricsStyle = st.id
 			s.save()
 		}})

@@ -1,6 +1,10 @@
 package main
 
-import "github.com/egoist/mygo/ui"
+import (
+	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
+)
 
 // unwatchedFolders tells, in Settings › Playback › Music on this computer,
 // of each folder of music MixMusic can't watch for changes, as one on a
@@ -17,5 +21,5 @@ func (s *shell) unwatchedFolders(c *ui.Context) {
 
 // unwatchedLine tells that MixMusic can't watch folder, and why.
 func unwatchedLine(folder, why string) string {
-	return "MixMusic can't watch " + folder + " for changes: " + why + ". Rescan to see what changed in it."
+	return locales.ComputerUnwatched(folder, why)
 }

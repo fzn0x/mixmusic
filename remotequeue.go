@@ -13,6 +13,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/remote"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // remoteDrag is an entry of another computer's queue dragged, by its name
@@ -30,15 +31,15 @@ func (s *shell) remoteQueue(c *ui.Context, id string, v app.RemoteView) {
 	if len(v.State.Next) == 0 {
 		return
 	}
-	s.sectionHead(c, "Next on "+name, func() {
+	s.sectionHead(c, locales.RemoteQueueNext(name), func() {
 		if !v.CanQueue {
 			return
 		}
-		clear := s.buttonBase(c.Key("remote-clear")).Label("Clear the queue on " + name).Cursor(ui.CursorPointer)
+		clear := s.buttonBase(c.Key("remote-clear")).Label(locales.RemoteQueueClearLabel(name)).Cursor(ui.CursorPointer)
 		if clear.Clicked() {
 			s.remoteDo(id, remote.Command{Op: remote.OpClear})
 		}
-		clear.Children(func() { ui.Text(c, k.words("Clear")).FontSize(k.smallSize()).TextColor(k.accent) })
+		clear.Children(func() { ui.Text(c, k.words(locales.RemoteQueueClear())).FontSize(k.smallSize()).TextColor(k.accent) })
 	})
 	ui.Column(c).Gap(2).MaxWidth(640).Children(func() {
 		for _, t := range v.State.Next {
@@ -48,7 +49,7 @@ func (s *shell) remoteQueue(c *ui.Context, id string, v app.RemoteView) {
 			}
 			line := t.Title
 			if len(t.Artists) > 0 {
-				line += " - " + strings.Join(t.Artists, ", ")
+				line = locales.RemoteQueueLine(t.Title, strings.Join(t.Artists, ", "))
 			}
 			ui.Text(c, line).FontSize(k.smallSize()).SingleLine().MinWidth(0)
 		}
@@ -67,10 +68,10 @@ func (s *shell) remoteQueueRow(c *ui.Context, id, name string, t remote.Track) {
 		row.Background(k.hover)
 	}
 	row.ContextMenu(func(m *ui.Menu) {
-		if m.Item("Play").Chosen() {
+		if m.Item(locales.PlayerPlay()).Chosen() {
 			play()
 		}
-		if m.Item("Remove from the queue").Chosen() {
+		if m.Item(locales.RemoteQueueRemove()).Chosen() {
 			remove()
 		}
 	})
@@ -89,7 +90,7 @@ func (s *shell) remoteQueueRow(c *ui.Context, id, name string, t remote.Track) {
 	}
 	hovered := row.Hovered()
 	row.Children(func() {
-		art := s.buttonBase(c.Key("rq-art-"+t.Entry)).Size(40, 40).Shrink(0).Label("Play " + t.Title + " on " + name).
+		art := s.buttonBase(c.Key("rq-art-"+t.Entry)).Size(40, 40).Shrink(0).Label(locales.RemoteQueuePlayOn(t.Title, name)).
 			Cursor(ui.CursorPointer)
 		if art.Clicked() {
 			play()
@@ -113,7 +114,7 @@ func (s *shell) remoteQueueRow(c *ui.Context, id, name string, t remote.Track) {
 			}
 		})
 		if hovered {
-			if s.iconButton(c, "rq-remove-"+t.Entry, "close", "Remove "+t.Title+" from the queue on "+name, false, 14).Clicked() {
+			if s.iconButton(c, "rq-remove-"+t.Entry, "close", locales.RemoteQueueRemoveOn(t.Title, name), false, 14).Clicked() {
 				remove()
 			}
 		}
@@ -126,6 +127,6 @@ func (s *shell) remoteOlder(c *ui.Context, v app.RemoteView) {
 	if v.CanQueue && v.CanHandOver {
 		return
 	}
-	ui.Text(c, "MixMusic on "+v.Computer.Name+" is older: update it there to change its queue from here, and to move what plays here to it.").
+	ui.Text(c, locales.RemoteQueueOlder(v.Computer.Name)).
 		FontSize(s.lk.smallSize()).TextColor(s.lk.muted).MaxWidth(640)
 }

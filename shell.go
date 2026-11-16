@@ -7,6 +7,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // view builds the main window: the rail, the top bar over the main pane
@@ -88,10 +89,10 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 	s.collecting = r.Path() == s.router.Path()
 	switch {
 	case r.Match("/"):
-		r.Title("Home")
+		r.Title(locales.ShellTitleHome())
 		s.homePage(c)
 	case r.Match("/search"):
-		r.Title("Search")
+		r.Title(locales.ShellTitleSearch())
 		s.searchPage(c, r.Query("q"))
 	case r.Match("/album/{id}"):
 		s.albumPage(c, r.Param("id"))
@@ -110,7 +111,7 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 	case r.Match("/remote/{id}"):
 		s.remotePage(c, r.Param("id"))
 	case r.Match(roomsPath):
-		r.Title(roomsTitle)
+		r.Title(roomsTitle())
 		s.roomPage(c)
 	case r.Match(roomsPath + "/{id}"):
 		s.roomFoundPage(c, r.Param("id"))
@@ -133,7 +134,7 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 	case r.Match("/marketplace/{tab}"):
 		s.marketplacePage(c, r.Param("tab"))
 	default:
-		s.lost(c, "This page isn't one of MixMusic's.")
+		s.lost(c, locales.ShellLostWhy())
 	}
 	s.collecting = false
 }
@@ -142,10 +143,10 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 func (s *shell) lost(c *ui.Context, why string) {
 	k := &s.lk
 	s.pageScroll(c, func() {
-		s.pageHeader(c, "Lost", nil, nil)
-		ui.Text(c, k.words("Nothing lives here")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+		s.pageHeader(c, locales.ShellLost(), nil, nil)
+		ui.Text(c, k.words(locales.ShellNothingHere())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
 		ui.Text(c, why).FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).Margin(0, 0, 24)
-		if s.button(c, "go-home", "go home", true).Clicked() {
+		if s.button(c, "go-home", locales.ShellGoHome(), true).Clicked() {
 			s.navigate("/")
 		}
 	})
@@ -156,9 +157,9 @@ func (s *shell) toasts(c *ui.Context) {
 	for _, n := range s.notes {
 		switch {
 		case n.Settings:
-			c.ToastAction(n.Message, "settings", func() { s.navigate("/settings/playback") })
+			c.ToastAction(n.Message, locales.ShellToastSettings(), func() { s.navigate("/settings/playback") })
 		case n.Undo != nil:
-			c.ToastAction(n.Message, "undo", n.Undo)
+			c.ToastAction(n.Message, locales.PlayerUndo(), n.Undo)
 		case n.Failure != 0:
 			s.failureToast(c, n)
 		case n.Error:

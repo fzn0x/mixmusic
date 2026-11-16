@@ -22,6 +22,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // movingClips is what the window keeps of the clips of the tracks played,
@@ -56,11 +57,11 @@ func (s *shell) clipSleeve(c *ui.Context, t media.Track, size float32) bool {
 	shown := v.status.Src == src.Src && v.status.Shown
 	ui.Box(c.Key("sleeve-clip")).Size(size, size).Shrink(0).Radius(k.radiusSm).Clip().Children(func() {
 		// A GIF cover holds still under the clip that shows.
-		s.movingCover(c, "sleeve", t.Artwork, size, playing && !shown, "Moving cover: "+t.Title)
+		s.movingCover(c, "sleeve", t.Artwork, size, playing && !shown, locales.CollectionMovingCover(t.Title))
 		switch {
 		case !asked:
 			b := s.buttonBase(c.Key("sleeve-clip-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().
-				Right(8).Bottom(8).Label("Play the moving cover").Tooltip("Play the moving cover").Cursor(ui.CursorPointer)
+				Right(8).Bottom(8).Label(locales.MovingClipPlay()).Tooltip(locales.MovingClipPlay()).Cursor(ui.CursorPointer)
 			if b.Clicked() {
 				if m.played == nil {
 					m.played = map[string]bool{}
@@ -77,7 +78,7 @@ func (s *shell) clipSleeve(c *ui.Context, t media.Track, size float32) bool {
 		if shown {
 			target = 1
 		}
-		web := ui.WebView(c.Key("clip "+src.Src), v.view).Absolute().Left(0).Top(0).Size(size, size).Label("Album clip: " + t.Title)
+		web := ui.WebView(c.Key("clip "+src.Src), v.view).Absolute().Left(0).Top(0).Size(size, size).Label(locales.MovingClipAlbum(t.Title))
 		// Until its first frame, the page shows nothing over the cover.
 		web.Opacity(web.Animate("fade", target, videoFade))
 		ui.Box(c.Key("sleeve-clip-over")).Absolute().Left(0).Top(0).Size(size, size).ContextMenu(func(m *ui.Menu) { s.trackMenu(m, t) })
@@ -143,12 +144,12 @@ func (s *shell) movingCoverItem(m *ui.Menu, t media.Track) {
 	if !s.set.MovingCovers || !s.svc.Player.HasClips() || t.IsEpisode() {
 		return
 	}
-	if m.Item("Find the moving cover again").Chosen() {
+	if m.Item(locales.MovingClipFindAgain()).Chosen() {
 		s.svc.Player.ForgetMovingCover(t)
 		c := &s.moving.clips
 		delete(c.failed, t.ID)
 		delete(c.broken, t.ID)
 		s.forget(clipKey(t.ID))
-		s.notes = append(s.notes, notice("Looking for the moving cover of "+t.Title+" again"))
+		s.notes = append(s.notes, notice(locales.MovingClipLooking(t.Title)))
 	}
 }

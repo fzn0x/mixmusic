@@ -16,6 +16,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/room"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // roomSongChoices are what becomes of guests' songs, as the settings name
@@ -25,20 +26,20 @@ var roomSongChoices = []string{settings.RoomSongsAdd, settings.RoomSongsAsk, set
 // roomRuleRows are the rows of the host's rules: Songs from guests, Guests
 // can control playback, and Ask me before someone joins.
 func (s *shell) roomRuleRows(c *ui.Context) {
-	s.row(c, "Songs from guests", "What becomes of the songs your guests add from a song's menu: added to your queue, each waiting for you to accept it, or none.", func() {
+	s.row(c, locales.RoomRulesSongsTitle(), locales.RoomRulesSongsAbout(), func() {
 		chosen := slices.Index(roomSongChoices, s.set.RoomSongs)
-		if s.segmented(c, "room-songs", "Songs from guests", &chosen, "add them", "ask me first", "off") && chosen >= 0 {
+		if s.segmented(c, "room-songs", locales.RoomRulesSongsTitle(), &chosen, locales.RoomRulesSongsAdd(), locales.RoomRulesSongsAsk(), locales.RoomRulesSongsOff()) && chosen >= 0 {
 			s.set.RoomSongs = roomSongChoices[chosen]
 			s.saveRoomRules()
 		}
 	}, "guests songs requests queue add room")
-	s.row(c, "Guests can control playback", "Your guests can play, pause and skip the tracks of your room.", func() {
-		if s.switchOf(c.Key("room-guest-control"), &s.set.RoomGuestControl).Label("Guests can control playback").Changed() {
+	s.row(c, locales.RoomRulesControlTitle(), locales.RoomRulesControlAbout(), func() {
+		if s.switchOf(c.Key("room-guest-control"), &s.set.RoomGuestControl).Label(locales.RoomRulesControlTitle()).Changed() {
 			s.saveRoomRules()
 		}
 	}, "guests control play pause skip room")
-	s.row(c, "Ask me before someone joins", "Each friend who joins with the code or the invite link waits for you to let them in.", func() {
-		if s.switchOf(c.Key("room-ask-join"), &s.set.RoomAskJoin).Label("Ask me before someone joins").Changed() {
+	s.row(c, locales.RoomRulesAskTitle(), locales.RoomRulesAskAbout(), func() {
+		if s.switchOf(c.Key("room-ask-join"), &s.set.RoomAskJoin).Label(locales.RoomRulesAskTitle()).Changed() {
 			s.saveRoomRules()
 		}
 	}, "join ask let in knock guests room")
@@ -56,32 +57,32 @@ func (s *shell) roomWaiting(c *ui.Context) {
 	k := &s.lk
 	rs := s.a.Rooms()
 	if name, ok := rs.Moving(); ok {
-		ui.Text(c, "Waiting for "+name+" to host the room…").FontSize(k.bodySize())
+		ui.Text(c, locales.RoomRulesMoving(name)).FontSize(k.bodySize())
 	}
 	if knocks := rs.Knocks(); len(knocks) > 0 {
-		ui.Text(c, "Asking to join").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+		ui.Text(c, locales.RoomRulesAskingJoin()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		for _, kn := range knocks {
 			id := strconv.FormatInt(kn.ID, 10)
 			ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-				where := "from the internet"
+				where := locales.RoomRulesKnockInternet(kn.Key)
 				if kn.Local {
-					where = "on this network"
+					where = locales.RoomRulesKnockNetwork(kn.Key)
 				}
 				ui.Column(c).Grow(1).MinWidth(0).Children(func() {
 					ui.Text(c, kn.Name).FontSize(k.bodySize())
-					ui.Text(c, kn.Key+" · "+where).FontSize(k.smallSize()).TextColor(k.muted)
+					ui.Text(c, where).FontSize(k.smallSize()).TextColor(k.muted)
 				})
-				if s.button(c, "room-let-in-"+id, "let in", true).Label("Let " + kn.Name + " in").Clicked() {
+				if s.button(c, "room-let-in-"+id, locales.RoomRulesLetIn(), true).Label(locales.RoomRulesLetInName(kn.Name)).Clicked() {
 					rs.LetIn(kn.ID, true)
 				}
-				if s.button(c, "room-turn-away-"+id, "turn away", false).Label("Turn " + kn.Name + " away").Clicked() {
+				if s.button(c, "room-turn-away-"+id, locales.RoomRulesTurnAway(), false).Label(locales.RoomRulesTurnAwayName(kn.Name)).Clicked() {
 					rs.LetIn(kn.ID, false)
 				}
 			})
 		}
 	}
 	if reqs := rs.Requests(); len(reqs) > 0 {
-		ui.Text(c, "Songs from guests").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+		ui.Text(c, locales.RoomRulesSongsTitle()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		for _, r := range reqs {
 			id := strconv.FormatInt(r.ID, 10)
 			ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
@@ -91,12 +92,12 @@ func (s *shell) roomWaiting(c *ui.Context) {
 				}
 				ui.Column(c).Grow(1).MinWidth(0).Children(func() {
 					ui.Text(c, line).FontSize(k.bodySize())
-					ui.Text(c, "From "+r.From).FontSize(k.smallSize()).TextColor(k.muted)
+					ui.Text(c, locales.RoomRulesFrom(r.From)).FontSize(k.smallSize()).TextColor(k.muted)
 				})
-				if s.button(c, "room-accept-"+id, "accept", true).Label("Accept " + r.Title).Clicked() {
+				if s.button(c, "room-accept-"+id, locales.RoomRulesAccept(), true).Label(locales.RoomRulesAcceptName(r.Title)).Clicked() {
 					s.acceptSong(r.ID)
 				}
-				if s.button(c, "room-decline-"+id, "decline", false).Label("Decline " + r.Title).Clicked() {
+				if s.button(c, "room-decline-"+id, locales.RoomRulesDecline(), false).Label(locales.RoomRulesDeclineName(r.Title)).Clicked() {
 					rs.Decline(r.ID)
 				}
 			})
@@ -108,7 +109,7 @@ func (s *shell) roomWaiting(c *ui.Context) {
 // room's page.
 func (s *shell) hostRules(c *ui.Context) {
 	k := &s.lk
-	ui.Text(c, "What guests can do").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+	ui.Text(c, locales.RoomRulesWhatGuests()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 	s.roomRuleRows(c)
 }
 
@@ -132,7 +133,7 @@ func (s *shell) makeHostButton(c *ui.Context, g app.RoomMember) {
 	if !g.Here || !rs.CanHost(g.Key) {
 		return
 	}
-	if s.button(c, "room-make-host-"+g.Key, "make host", false).Label("Make " + g.Name + " the host").Clicked() {
+	if s.button(c, "room-make-host-"+g.Key, locales.RoomRulesMakeHost(), false).Label(locales.RoomRulesMakeHostName(g.Name)).Clicked() {
 		key := g.Key
 		go func() {
 			err := s.a.Rooms().MakeHost(key)
@@ -152,13 +153,13 @@ func (s *shell) roomGuestRows(c *ui.Context, g app.GuestView) {
 	k := &s.lk
 	rs := s.a.Rooms()
 	if host, ok := rs.HostAsk(); ok {
-		ui.Text(c, host+" asks you to host the room: this computer would play the room's queue, in place of yours, and the others would join it here.").
+		ui.Text(c, locales.RoomRulesHostAsk(host)).
 			FontSize(k.bodySize()).MaxWidth(640)
 		ui.Row(c).Gap(8).Children(func() {
-			if s.button(c, "room-host-yes", "host the room", true).Clicked() {
+			if s.button(c, "room-host-yes", locales.RoomRulesHostYes(), true).Clicked() {
 				rs.AnswerHost(true)
 			}
-			if s.button(c, "room-host-no", "decline", false).Label("Don't host the room").Clicked() {
+			if s.button(c, "room-host-no", locales.RoomRulesDecline(), false).Label(locales.RoomRulesDontHost()).Clicked() {
 				rs.AnswerHost(false)
 			}
 		})
@@ -169,9 +170,9 @@ func (s *shell) roomGuestRows(c *ui.Context, g app.GuestView) {
 	}
 	switch r.Songs {
 	case room.SongsAdd:
-		ui.Text(c, "Add songs to the room from a song's menu.").FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
+		ui.Text(c, locales.RoomRulesAddSongs()).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 	case room.SongsAsk:
-		ui.Text(c, "Add songs to the room from a song's menu: "+g.Host+" accepts each first.").FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
+		ui.Text(c, locales.RoomRulesAskSongs(g.Host)).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 	}
 	if !r.Control {
 		return
@@ -184,13 +185,13 @@ func (s *shell) roomGuestRows(c *ui.Context, g app.GuestView) {
 		}
 	}
 	ui.Row(c).Gap(8).Children(func() {
-		control("room-previous", "previous", room.Previous)
+		control("room-previous", locales.RoomRulesPrevious(), room.Previous)
 		if g.HasState && g.State.Playing {
-			control("room-pause", "pause", room.Pause)
+			control("room-pause", locales.RoomRulesPause(), room.Pause)
 		} else {
-			control("room-play", "play", room.Play)
+			control("room-play", locales.RoomRulesPlay(), room.Play)
 		}
-		control("room-next", "next", room.Next)
+		control("room-next", locales.RoomRulesNext(), room.Next)
 	})
 }
 
@@ -201,9 +202,9 @@ func (s *shell) roomSongItem(m *ui.Menu, t media.Track) {
 	if !ok || r.Songs == room.SongsOff {
 		return
 	}
-	label := "Add to the room"
+	label := locales.RoomRulesAddToRoom()
 	if r.Songs == room.SongsAsk {
-		label = "Ask to add to the room"
+		label = locales.RoomRulesAskToAddToRoom()
 	}
 	if m.Item(label).Chosen() {
 		if err := s.a.Rooms().AddSong(t); err != nil {
@@ -216,9 +217,9 @@ func (s *shell) roomSongItem(m *ui.Menu, t media.Track) {
 // user lets it in first, when they do.
 func (s *shell) joiningLine(host string) string {
 	if s.a.Rooms().Asking() {
-		return "Waiting for " + host + " to let you in…"
+		return locales.RoomRulesWaitingToJoin(host)
 	}
-	return "Joining " + host + "'s room…"
+	return locales.RoomRulesJoining(host)
 }
 
 // activitySong names the song an activity tells of, if any.

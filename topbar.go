@@ -8,6 +8,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // topBar holds the history arrows, the refresh button and the search box,
@@ -23,17 +24,17 @@ func (s *shell) topBar(c *ui.Context) {
 	}
 	row.Children(func() {
 		ui.Row(c).Gap(4).Children(func() {
-			if s.iconButton(c, "back", "back", "Back", false, 18).Disabled(!s.router.CanGoBack()).Clicked() {
+			if s.iconButton(c, "back", "back", locales.TopbarBack(), false, 18).Disabled(!s.router.CanGoBack()).Clicked() {
 				s.router.Back()
 			}
-			if s.iconButton(c, "forward", "forward", "Forward", false, 18).Disabled(!s.router.CanGoForward()).Clicked() {
+			if s.iconButton(c, "forward", "forward", locales.TopbarForward(), false, 18).Disabled(!s.router.CanGoForward()).Clicked() {
 				s.router.Forward()
 			}
 			s.refreshButton(c)
 		})
 		s.searchField(c)
 		s.topBarHead(c)
-		palette := s.buttonBase(c.Key("palette")).Height(32).PaddingX(8).Radius(k.round(32)).Label("Open the command palette").Cursor(ui.CursorPointer)
+		palette := s.buttonBase(c.Key("palette")).Height(32).PaddingX(8).Radius(k.round(32)).Label(locales.TopbarPalette()).Cursor(ui.CursorPointer)
 		ink := k.muted
 		if palette.Hovered() {
 			palette.Background(k.hover)
@@ -95,8 +96,8 @@ func (s *shell) searchField(c *ui.Context) {
 			cb.SetOpen(*show)
 			s.showSuggestions = nil
 		}
-		in := cb.Input.Placeholder(k.words("Search Spotify and YouTube Music")).Grow(1).MinWidth(0).Bind(&s.searchBox).
-			Label("Search").FontSize(k.bodySize())
+		in := cb.Input.Placeholder(k.words(locales.TopbarSearchPlaceholder())).Grow(1).MinWidth(0).Bind(&s.searchBox).
+			Label(locales.TopbarSearch()).FontSize(k.bodySize())
 		if in.Changed() {
 			s.queryAt = c.Now()
 		}
@@ -221,7 +222,7 @@ func (s *shell) suggestedItem(c *ui.Context, cb ui.ComboboxParts, it media.Item)
 	key := suggestedKey(it)
 	title, line, art := s.suggestedLine(it)
 	item := cb.Item(key).Height(48).PaddingX(8).Gap(12).AlignItems(ui.Center).Radius(k.radiusSm).Cursor(ui.CursorPointer).
-		Label(title + ", " + line)
+		Label(locales.TopbarSuggestedLabel(title, line))
 	ink, mark := k.text, k.muted
 	if item.Highlighted() {
 		item.Background(k.accent)
@@ -247,31 +248,31 @@ func (s *shell) suggestedLine(it media.Item) (title, line string, art []media.Im
 		title, art, by = t.Title, t.Artwork, names(t.Artists)
 		switch {
 		case t.IsEpisode():
-			kind = "Episode"
+			kind = locales.TopbarKindEpisode()
 		case t.Video:
-			kind = "Video"
+			kind = locales.TopbarKindVideo()
 		default:
-			kind = "Song"
+			kind = locales.TopbarKindSong()
 		}
 	case it.Album != nil:
 		a := it.Album
 		title, art, by = a.Title, a.Artwork, names(a.Artists)
 		switch a.Kind {
 		case media.AlbumKindSingle:
-			kind = "Single"
+			kind = locales.TopbarKindSingle()
 		case media.AlbumKindEP:
-			kind = "EP"
+			kind = locales.TopbarKindEP()
 		default:
-			kind = "Album"
+			kind = locales.TopbarKindAlbum()
 		}
 	case it.Artist != nil:
-		title, art, kind = it.Artist.Name, it.Artist.Artwork, "Artist"
+		title, art, kind = it.Artist.Name, it.Artist.Artwork, locales.TopbarKindArtist()
 	case it.Playlist != nil:
 		p := it.Playlist
-		title, art, kind, by = p.Title, p.Artwork, "Playlist", p.Owner
+		title, art, kind, by = p.Title, p.Artwork, locales.TopbarKindPlaylist(), p.Owner
 	case it.Podcast != nil:
 		p := it.Podcast
-		title, art, kind, by = p.Title, p.Artwork, "Podcast", names(p.Authors)
+		title, art, kind, by = p.Title, p.Artwork, locales.TopbarKindPodcast(), names(p.Authors)
 	}
 	line = k.words(kind)
 	if by != "" {

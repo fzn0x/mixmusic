@@ -48,13 +48,13 @@ func TestSurroundSetting(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 3200)
 	show(s, tt, "/settings/playback")
-	if !tt.HasText("Play 5.1 surround when a track has it") || !tt.HasText(surroundDescription) {
+	if !tt.HasText("Play 5.1 surround when a track has it") || !tt.HasText(surroundDescription()) {
 		t.Fatalf("no 5.1 surround row: %q", tt.Texts())
 	}
 	// The row's title shows its label too: the switch is to its right,
 	// beside the title or halfway down the row.
 	title, _ := tt.Find("Play 5.1 surround when a track has it")
-	desc, _ := tt.Find(surroundDescription)
+	desc, _ := tt.Find(surroundDescription())
 	for _, want := range []bool{true, false} {
 		for x := title.X + title.W; x < 1280 && s.svc.Preferences.Get().Surround != want; x += 6 {
 			for _, y := range []float32{title.Y + title.H/2, (title.Y + desc.Y + desc.H) / 2} {

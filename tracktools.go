@@ -2,7 +2,6 @@ package main
 
 import (
 	"cmp"
-	"fmt"
 	"slices"
 	"strings"
 	"unicode"
@@ -12,12 +11,12 @@ import (
 	"golang.org/x/text/unicode/norm"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // trackSorts are the orders a list of tracks shows in, the list's own
 // first, and their labels after it.
 var trackSorts = []string{"order", "title", "artist", "length", "plays"}
-var trackSortLabels = []string{"", "Title", "Artist", "Length", "Plays"}
 
 // trackTool is how the user sorted a list of tracks, and what they search
 // in it.
@@ -78,17 +77,16 @@ func (s *shell) trackTools(c *ui.Context, key, noun string, tracks []media.Track
 	row, pin := s.pinRow(c, key+"-tools")
 	query, sort := tool.query, tool.sort
 	row.Gap(12).Children(func() {
-		s.filterBox(c, key+"-search", "search this "+noun, "Search this "+noun, &tool.query, false, func() { tool.query = "" })
-		labels := slices.Clone(trackSortLabels)
-		labels[0] = strings.ToUpper(noun[:1]) + noun[1:] + " order"
+		s.filterBox(c, key+"-search", locales.TrackToolsSearchPlaceholder(noun), locales.TrackToolsSearchLabel(noun), &tool.query, false, func() { tool.query = "" })
+		labels := []string{locales.TrackToolsOrder(noun), locales.TrackToolsSortTitle(), locales.TrackToolsSortArtist(), locales.TrackToolsSortLength(), locales.TrackToolsSortPlays()}
 		chosen := labels[max(slices.Index(trackSorts, tool.sort), 0)]
-		if s.selectOf(c.Key(key+"-sort"), &chosen, labels).Width(180).Label("Sort by").Changed() {
+		if s.selectOf(c.Key(key+"-sort"), &chosen, labels).Width(180).Label(locales.TrackToolsSortBy()).Changed() {
 			if i := slices.Index(labels, chosen); i >= 0 {
 				tool.sort = trackSorts[i]
 			}
 		}
 		if strings.TrimSpace(tool.query) != "" {
-			ui.Text(c, fmt.Sprintf("%d of %d", len(view.tracks), len(tracks))).FontSize(k.smallSize()).TextColor(k.muted).
+			ui.Text(c, locales.TrackToolsShown(len(view.tracks), len(tracks))).FontSize(k.smallSize()).TextColor(k.muted).
 				FontFeatures("tnum")
 		}
 	})

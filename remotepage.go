@@ -9,6 +9,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/remote"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // remotePage is the page of the computer id, with MixMusic's remote control
@@ -31,26 +32,24 @@ func (s *shell) remotePage(c *ui.Context, id string) {
 			}
 			switch v.Step {
 			case app.RemoteAway:
-				say(name + " isn't on the network now. It shows here while MixMusic runs there, with Settings › Desktop › " +
-					"Remote control on, on the same network as this computer.")
+				say(locales.RemotePageAway(name))
 			case app.RemoteUnpaired:
-				say("Pair with " + name + " to see what plays there and control it from here. " +
-					name + " shows a code of 6 digits, which you type here.")
-				if s.button(c, "remote-pair", "pair", true).Clicked() {
+				say(locales.RemotePageAskPair(name))
+				if s.button(c, "remote-pair", locales.RemotePagePair(), true).Clicked() {
 					rc.Pair(id)
 				}
 			case app.RemotePairing:
-				say("Asking " + name + " to pair…")
+				say(locales.RemotePageAsking(name))
 				s.remoteCancel(c, id)
 			case app.RemoteCodeAsked:
 				s.remoteCodeEntry(c, id, name)
 			case app.RemoteChecking:
-				say("Checking the code with " + name + "…")
+				say(locales.RemotePageChecking(name))
 			case app.RemoteConnecting:
-				say("Connecting to " + name + "…")
+				say(locales.RemotePageConnecting(name))
 			case app.RemoteConnected:
 				if !v.HasState {
-					say("Connecting to " + name + "…")
+					say(locales.RemotePageConnecting(name))
 					return
 				}
 				s.remotePlayer(c, id, v)
@@ -61,7 +60,7 @@ func (s *shell) remotePage(c *ui.Context, id string) {
 
 // remoteCancel is the button that ends a pairing under way.
 func (s *shell) remoteCancel(c *ui.Context, id string) {
-	if s.button(c, "remote-cancel", "cancel", false).Clicked() {
+	if s.button(c, "remote-cancel", locales.ShortcutsCancel(), false).Clicked() {
 		s.a.Remote().CancelPairing(id)
 		s.remote.code = ""
 	}
@@ -70,14 +69,14 @@ func (s *shell) remoteCancel(c *ui.Context, id string) {
 // remoteCodeEntry asks for the code the computer named name shows.
 func (s *shell) remoteCodeEntry(c *ui.Context, id, name string) {
 	k := &s.lk
-	ui.Text(c, "Type the code "+name+" shows.").FontSize(k.bodySize())
+	ui.Text(c, locales.RemotePageTypeCode(name)).FontSize(k.bodySize())
 	v := &s.remote
 	var pair bool
 	ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-		in := ui.TextInput(c.Key("remote-code"), &v.code).Width(160).Label("Code").Placeholder("000 000").AutoFocus()
+		in := ui.TextInput(c.Key("remote-code"), &v.code).Width(160).Label(locales.RemotePageCode()).Placeholder("000 000").AutoFocus()
 		pair = in.Submitted()
 		_, ok := remote.CodeValue(v.code)
-		if s.button(c, "remote-code-pair", "pair", true).Disabled(!ok).Clicked() {
+		if s.button(c, "remote-code-pair", locales.RemotePagePair(), true).Disabled(!ok).Clicked() {
 			pair = true
 		}
 		s.remoteCancel(c, id)
@@ -97,7 +96,7 @@ func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 	k := &s.lk
 	st := v.State
 	if st.Track == nil {
-		ui.Text(c, "Nothing plays on "+v.Computer.Name+".").FontSize(k.bodySize())
+		ui.Text(c, locales.RemotePageNothing(v.Computer.Name)).FontSize(k.bodySize())
 	} else {
 		t := *st.Track
 		ui.Row(c).Gap(20).AlignItems(ui.Center).Children(func() {
@@ -119,17 +118,17 @@ func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 	s.remoteProgress(c, id, v)
 	ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
 		has := st.Track != nil
-		if s.roundButton(c, "remote-previous", "previous", "Previous", false, !has).Clicked() {
+		if s.roundButton(c, "remote-previous", "previous", locales.PlayerPrevious(), false, !has).Clicked() {
 			s.remoteDo(id, remote.Command{Op: remote.OpPrevious})
 		}
-		name, label, op := "play", "Play", remote.OpPlay
+		name, label, op := "play", locales.PlayerPlay(), remote.OpPlay
 		if st.Playing {
-			name, label, op = "pause", "Pause", remote.OpPause
+			name, label, op = "pause", locales.PlayerPause(), remote.OpPause
 		}
 		if s.roundButton(c, "remote-toggle", name, label, true, !has || st.Loading).Clicked() {
 			s.remoteDo(id, remote.Command{Op: op})
 		}
-		if s.roundButton(c, "remote-next", "next", "Next", false, !has).Clicked() {
+		if s.roundButton(c, "remote-next", "next", locales.PlayerNext(), false, !has).Clicked() {
 			s.remoteDo(id, remote.Command{Op: remote.OpNext})
 		}
 		ui.Box(c).Width(24)
@@ -176,9 +175,9 @@ func (s *shell) remoteProgress(c *ui.Context, id string, v app.RemoteView) {
 	ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
 		ui.Text(c, clock(time.Duration(r.seekTo*float64(time.Second)))).FontSize(k.captionSize()).TextColor(k.muted).
 			FontFeatures("tnum").Width(44).TextAlign(ui.End)
-		label := "Seek"
+		label := locales.PlayerSeek()
 		if st.Live {
-			label = "Live: no seeking"
+			label = locales.PlayerNoSeeking()
 		}
 		seek := ui.Slider(c.Key("remote-seek"), &r.seekTo, 0, max(dur.Seconds(), 1)).Grow(1).MinWidth(0).KeepFocus().
 			Label(label).Disabled(st.Track == nil || st.Live || dur <= 0)
@@ -208,7 +207,7 @@ func (s *shell) remoteVolume(c *ui.Context, id string, st remote.State) {
 				r.volume = 0
 			}
 		}
-		if ui.Slider(c.Key("remote-volume"), &r.volume, 0, 1).Grow(1).MinWidth(0).KeepFocus().Label("Volume").Changed() {
+		if ui.Slider(c.Key("remote-volume"), &r.volume, 0, 1).Grow(1).MinWidth(0).KeepFocus().Label(locales.PlayerVolume()).Changed() {
 			s.remoteDo(id, remote.Command{Op: remote.OpVolume, Volume: r.volume})
 			r.volumeAt = c.Now()
 			c.After(remoteHold)

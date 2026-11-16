@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/fzn0x/mixmusic/locales"
+)
 
 // TestRemoteFindPhone searches the settings for remote control: a phone
 // can't use it, so "phone" doesn't find it, and the words that describe
@@ -12,11 +16,11 @@ func TestRemoteFindPhone(t *testing.T) {
 		q         string
 		want, not []string
 	}{
-		{"phone", nil, []string{remoteSwitch}},
-		{"remote control", []string{remoteSwitch}, nil},
-		{"laptop", []string{remoteSwitch}, nil},
-		{"pair", []string{remoteSwitch}, nil},
-		{"network", []string{remoteSwitch}, nil},
+		{"phone", nil, []string{locales.RemoteSwitch()}},
+		{"remote control", []string{locales.RemoteSwitch()}, nil},
+		{"laptop", []string{locales.RemoteSwitch()}, nil},
+		{"pair", []string{locales.RemoteSwitch()}, nil},
+		{"network", []string{locales.RemoteSwitch()}, nil},
 	} {
 		show(s, tt, settingsPath("", c.q))
 		showsOnly(t, tt, "searching "+c.q, c.want, c.not)

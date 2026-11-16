@@ -21,6 +21,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // copiesView is the dialog of a song's copies: the track it opened of, a
@@ -53,7 +54,7 @@ func (s *shell) copyItems(m *ui.Menu, t media.Track) {
 	song, ok := s.svc.LocalFiles.Song(t.ID)
 	if ok && len(song.Copies) > 1 {
 		labels := copyLabels(song.Copies)
-		m.Submenu("Play this copy", func(m *ui.Menu) {
+		m.Submenu(locales.CopiesPlayThis(), func(m *ui.Menu) {
 			for i, cp := range song.Copies {
 				if m.Item(labels[i]).Chosen() {
 					s.p.PlayTracks([]media.Track{cp.Track}, 0)
@@ -68,14 +69,14 @@ func (s *shell) copyItems(m *ui.Menu, t media.Track) {
 	if s.mini.win != nil || s.missingFile(t) {
 		return
 	}
-	if _, file := localfiles.PathOf(t.ID); (file || ok) && m.Item("Link a copy…").Chosen() {
+	if _, file := localfiles.PathOf(t.ID); (file || ok) && m.Item(locales.CopiesLink()).Chosen() {
 		s.openCopies(t)
 	}
 }
 
 // copiesLabel is the item of a song's menu that opens its copies: "2
 // copies…".
-func copiesLabel(n int) string { return strconv.Itoa(n) + " copies…" }
+func copiesLabel(n int) string { return locales.CopiesCount(n) }
 
 // openCopies opens the dialog of the copies of t.
 func (s *shell) openCopies(t media.Track) {
@@ -97,7 +98,7 @@ func copyFormat(cp localfiles.Copy) string {
 		parts = append(parts, kilohertz(cp.SampleRate))
 	}
 	if cp.Lossless() && cp.BitDepth == 0 && cp.SampleRate == 0 && cp.Bitrate > 0 {
-		parts = append(parts, "about "+strconv.Itoa(cp.Bitrate)+" kbit/s")
+		parts = append(parts, locales.CopiesAboutBitrate(cp.Bitrate))
 	}
 	return strings.Join(parts, " · ")
 }
@@ -109,7 +110,7 @@ func codecLabel(codec string) string {
 	case "PCM":
 		return "WAV"
 	case "":
-		return "Audio"
+		return locales.CopiesAudio()
 	}
 	return codec
 }
@@ -184,17 +185,17 @@ func (s *shell) copiesDialog(c *ui.Context) {
 	} else if p, ok := localfiles.PathOf(v.track.ID); ok {
 		copies = []localfiles.Copy{{Track: v.track, Path: p, Best: true}}
 	}
-	s.dialog(c, &v.open, dialogOptions{key: "copies", title: "copies of " + title, width: 600}, func() {
-		about := "Copies of one song show once, and play the best: lossless before lossy, then the higher bitrate and sample rate. What you play, like and mix of them follows the song, and stays when a copy goes."
+	s.dialog(c, &v.open, dialogOptions{key: "copies", title: locales.CopiesTitle(title), width: 600}, func() {
+		about := locales.CopiesAbout()
 		ui.Text(c, about).FontSize(k.smallSize()).TextColor(k.muted)
 		ui.Column(c).Gap(8).Children(func() {
 			for i, cp := range copies {
 				s.copyRow(c, i, cp, len(copies) > 1)
 			}
 		})
-		ui.Text(c, k.sentence("link another copy")).FontSize(k.bodySize()).FontWeight(k.leadWeight()).Margin(8, 0, 0)
-		ui.TextInput(c.Key("copies-find"), &v.query).Label("Find a song of this computer").
-			Placeholder(k.sentence("find a song of this computer")).Width(400)
+		ui.Text(c, k.sentence(locales.CopiesLinkAnother())).FontSize(k.bodySize()).FontWeight(k.leadWeight()).Margin(8, 0, 0)
+		ui.TextInput(c.Key("copies-find"), &v.query).Label(locales.CopiesFindLabel()).
+			Placeholder(k.sentence(locales.CopiesFindPlaceholder())).Width(400)
 		found := s.copiesFound(v, own)
 		ui.Column(c).Gap(4).Children(func() {
 			for i, t := range found {
@@ -202,13 +203,13 @@ func (s *shell) copiesDialog(c *ui.Context) {
 			}
 		})
 		if len(found) == 0 && strings.TrimSpace(v.query) != "" {
-			ui.Text(c, "No other song of this computer matches that.").FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, locales.CopiesNoMatch()).FontSize(k.smallSize()).TextColor(k.muted)
 		}
 		if v.problem != "" {
 			ui.Text(c, v.problem).FontSize(k.smallSize()).TextColor(k.danger)
 		}
 	}, func() {
-		if s.dialogButton(c, "copies-close", "close", true).AutoFocus().Clicked() {
+		if s.dialogButton(c, "copies-close", locales.CopiesClose(), true).AutoFocus().Clicked() {
 			v.open = false
 		}
 	})
@@ -225,22 +226,22 @@ func (s *shell) copyRow(c *ui.Context, i int, cp localfiles.Copy, unlink bool) {
 			ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
 				ui.Text(c, copyFormat(cp)).FontSize(k.bodySize()).SingleLine().MinWidth(0)
 				if cp.Best && unlink {
-					ui.Text(c, "Plays").FontSize(k.captionSize()).TextColor(k.accent).Padding(0, 6).
+					ui.Text(c, locales.CopiesPlays()).FontSize(k.captionSize()).TextColor(k.accent).Padding(0, 6).
 						Border(1, k.accent).Radius(k.radiusSm).Shrink(0)
 				}
 				if cp.Linked {
-					ui.Text(c, "Linked by hand").FontSize(k.captionSize()).TextColor(k.muted).Shrink(0)
+					ui.Text(c, locales.CopiesLinkedByHand()).FontSize(k.captionSize()).TextColor(k.muted).Shrink(0)
 				}
 			})
 			ui.Text(c, copyPlace(cp)).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 			ui.Text(c, cp.Path).FontSize(k.captionSize()).TextColor(k.muted).Selectable()
 		})
-		if s.button(c, "copy-play-"+count(i), "play", false).Label("Play this copy").Clicked() {
+		if s.button(c, "copy-play-"+count(i), locales.CopiesPlayButton(), false).Label(locales.CopiesPlayThis()).Clicked() {
 			s.p.PlayTracks([]media.Track{cp.Track}, 0)
 		}
-		if unlink && s.button(c, "copy-unlink-"+count(i), "unlink", false).Disabled(v.busy).
-			Label("Unlink this copy").Clicked() && !v.busy {
-			s.copyChange(func() error { return s.svc.LocalFiles.Unlink(cp.Track.ID) }, "Unlinked the copy in "+copyPlace(cp))
+		if unlink && s.button(c, "copy-unlink-"+count(i), locales.CopiesUnlinkButton(), false).Disabled(v.busy).
+			Label(locales.CopiesUnlinkThis()).Clicked() && !v.busy {
+			s.copyChange(func() error { return s.svc.LocalFiles.Unlink(cp.Track.ID) }, locales.CopiesUnlinked(copyPlace(cp)))
 		}
 	})
 }
@@ -250,13 +251,13 @@ func (s *shell) copyChoice(c *ui.Context, i int, t media.Track) {
 	k := &s.lk
 	v := &s.copies
 	b := s.buttonBase(c.Key("copy-link-"+count(i))).Radius(k.radiusSm).Padding(8, 12).Justify(ui.Start).
-		Cursor(ui.CursorPointer).Label("Link " + t.Title + ", " + names(t.Artists)).Disabled(v.busy)
+		Cursor(ui.CursorPointer).Label(locales.CopiesLinkLabel(t.Title, names(t.Artists))).Disabled(v.busy)
 	if b.Hovered() {
 		b.Background(k.surface2)
 	}
 	if b.Clicked() && !v.busy {
 		from := v.track.ID
-		s.copyChange(func() error { return s.svc.LocalFiles.Link([]string{from, t.ID}) }, "Linked "+t.Title+" as a copy")
+		s.copyChange(func() error { return s.svc.LocalFiles.Link([]string{from, t.ID}) }, locales.CopiesLinked(t.Title))
 	}
 	b.Children(func() {
 		ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
@@ -305,12 +306,12 @@ func (s *shell) trackCopies(c *ui.Context, t media.Track, _ app.TrackInfo) {
 		return
 	}
 	k := &s.lk
-	ui.Text(c, k.sentence("its copies")).FontSize(k.smallSize()).FontWeight(k.leadWeight()).Margin(8, 0, 0)
+	ui.Text(c, k.sentence(locales.CopiesInfoTitle())).FontSize(k.smallSize()).FontWeight(k.leadWeight()).Margin(8, 0, 0)
 	rows := make([]infoRow, len(song.Copies))
 	for i, cp := range song.Copies {
-		label := "Copy"
+		label := locales.CopiesCopyLabel()
 		if cp.Best {
-			label = "Plays"
+			label = locales.CopiesPlays()
 		}
 		rows[i] = infoRow{label, copyFormat(cp) + " · " + copyPlace(cp) + "\n" + cp.Path, false}
 	}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The orders of a search's results (#630). Best match is the services'
@@ -69,8 +70,29 @@ func (s *shell) sortSelect(c *ui.Context, q, pivot string, scope int) string {
 	if !slices.Contains(options, *chosen) {
 		*chosen = sortBestMatch
 	}
-	s.selectOf(c.Key("sort"), chosen, options).Width(170).Label("Sort by")
+	labels := make([]string, len(options))
+	for i, o := range options {
+		labels[i] = sortLabel(o)
+	}
+	shown := sortLabel(*chosen)
+	if s.selectOf(c.Key("sort"), &shown, labels).Width(170).Label(locales.TrackToolsSortBy()).Changed() {
+		if i := slices.Index(labels, shown); i >= 0 {
+			*chosen = options[i]
+		}
+	}
 	return *chosen
+}
+
+// sortLabel is the name of an order in the language shown: the orders
+// themselves stay as their English names, which the searches hold by.
+func sortLabel(order string) string {
+	switch order {
+	case sortMostPlayed:
+		return locales.SearchSortMostPlayed()
+	case sortNewest:
+		return locales.SearchSortNewest()
+	}
+	return locales.SearchSortBestMatch()
 }
 
 // byPlayed orders by the count of plays or views, the most first, and
@@ -149,6 +171,6 @@ func (s *shell) newestAlbumTiles(c *ui.Context, key string, albums []media.Album
 // sortNote tells, while Most played orders the results of both services,
 // where Spotify's go.
 func (s *shell) sortNote(c *ui.Context) {
-	ui.Text(c, "Spotify gives apps no play counts, so its results come after YouTube Music's.").
+	ui.Text(c, locales.SearchSortSpotifyNote()).
 		FontSize(s.lk.smallSize()).TextColor(s.lk.muted).Margin(0, 0, 16)
 }

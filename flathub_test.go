@@ -11,7 +11,7 @@ import (
 // Flathub's build updates through the software center: About names it, and
 // tells where a new version comes from, without a download.
 func TestFlathubUpdates(t *testing.T) {
-	if got := buildNames["flathub"]; got != "Flathub" {
+	if got, _ := buildName("flathub"); got != "Flathub" {
 		t.Errorf("About calls Flathub's build %q", got)
 	}
 	u := app.UpdateStatus{Kind: "flathub", AutomaticChecks: true}

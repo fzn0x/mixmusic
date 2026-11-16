@@ -13,6 +13,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // albumVersions is what the lists of albums found of their versions, and
@@ -96,7 +97,7 @@ func (s *shell) preferredVersion(versions []media.Album) media.Album {
 func (s *shell) versionsLabel(id string) string {
 	// Those the settings hide don't count (explicit.go).
 	if n := len(s.shownGroup(s.versions.of[id])); n > 1 {
-		return plural(n, "version")
+		return locales.VersionsCount(n)
 	}
 	return ""
 }
@@ -188,7 +189,7 @@ func (s *shell) versionSwitch(c *ui.Context, id, shown string) {
 	at := slices.IndexFunc(g, func(a media.Album) bool { return a.ID == shown })
 	labels := media.VersionLabels(versions)
 	ui.Row(c).Margin(0, 0, 24).Children(func() {
-		if s.segmented(c, "versions", "Versions", &at, labels...) && at >= 0 {
+		if s.segmented(c, "versions", locales.VersionsSwitch(), &at, labels...) && at >= 0 {
 			if s.versions.shown == nil {
 				s.versions.shown = map[string]string{}
 			}

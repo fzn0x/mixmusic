@@ -12,6 +12,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // gapText says what the playlist leaves out of its count: the items of
@@ -22,28 +23,20 @@ func gapText(noun string, left media.Unplayable, hidden int) string {
 	if n := left.Total(); n > 0 {
 		var kinds []string
 		if left.Local > 0 {
-			kinds = append(kinds, plural(left.Local, "local file"))
+			kinds = append(kinds, locales.PlaylistGapLocalFiles(left.Local))
 		}
 		if left.Episodes > 0 {
-			kinds = append(kinds, plural(left.Episodes, "episode"))
+			kinds = append(kinds, locales.PlaylistGapEpisodes(left.Episodes))
 		}
 		if left.Gone > 0 {
-			kinds = append(kinds, plural(left.Gone, "removed or unavailable item", "removed or unavailable items"))
+			kinds = append(kinds, locales.PlaylistGapGone(left.Gone))
 		}
-		parts = append(parts, thousands(n)+" of this "+noun+"'s items can't play here: "+joinAnd(kinds)+".")
+		parts = append(parts, locales.PlaylistGapCantPlay(thousands(n), noun, and(kinds)))
 	}
 	if hidden > 0 {
-		parts = append(parts, plural(hidden, "explicit song")+" "+map[bool]string{true: "is", false: "are"}[hidden == 1]+" hidden by your settings.")
+		parts = append(parts, locales.PlaylistGapHidden(hidden))
 	}
 	return strings.Join(parts, " ")
-}
-
-// joinAnd lists words as "a, b and c".
-func joinAnd(words []string) string {
-	if len(words) < 2 {
-		return strings.Join(words, "")
-	}
-	return strings.Join(words[:len(words)-1], ", ") + " and " + words[len(words)-1]
 }
 
 // gapLine shows gapText under the header of the playlist r reads, once all
@@ -85,10 +78,10 @@ func readShort(p media.Playlist) bool {
 // is left to read on from.
 func (s *shell) shortLine(c *ui.Context, r *playlistRead, noun string) {
 	k := &s.lk
-	text := "Only " + thousands(len(r.p.Tracks)) + " of this " + noun + "'s " + thousands(r.p.TrackCount) + " tracks came from YouTube Music."
+	text := locales.PlaylistGapShort(thousands(len(r.p.Tracks)), noun, thousands(r.p.TrackCount))
 	ui.Row(c).Gap(12).Margin(0, 0, 16).Children(func() {
 		ui.Text(c, text).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
-		if s.button(c, "retry", "try again", false).Clicked() {
+		if s.button(c, "retry", locales.WidgetsTryAgain(), false).Clicked() {
 			s.refetch(strings.TrimSuffix(r.key, " read"))
 		}
 	})

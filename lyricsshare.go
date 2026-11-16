@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	"slices"
 	"sync"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/sharecard"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -76,26 +76,26 @@ func (s *shell) lyricsShareBar(c *ui.Context, t media.Track, ly lyrics.Lyrics, w
 	}
 	ui.Row(c.Key("lyrics-share-"+where)).Gap(8).AlignItems(ui.Center).Wrap().Padding(0, 24, 8).Children(func() {
 		if !pick.picking(t.ID) {
-			if s.button(c, "lyrics-share-start-"+where, "share lines", false).Clicked() {
+			if s.button(c, "lyrics-share-start-"+where, locales.LyricsShareLines(), false).Clicked() {
 				*pick = lyricsPick{on: true, track: t.ID}
 			}
 			return
 		}
 		n := len(pick.lines)
-		hint := "Click the lines to share."
+		hint := locales.LyricsShareHint()
 		if n > 0 {
-			hint = fmt.Sprintf("%s chosen.", plural(n, "line"))
+			hint = locales.LyricsShareChosen(n)
 		}
 		ui.Text(c, hint).FontSize(k.smallSize()).TextColor(k.muted)
 		if n > 0 {
-			if s.button(c, "lyrics-share-save-"+where, "save image", true).Clicked() {
+			if s.button(c, "lyrics-share-save-"+where, locales.LyricsShareSave(), true).Clicked() {
 				s.saveLyricsCard(t, ly, sharecard.Square)
 			}
-			if s.button(c, "lyrics-share-story-"+where, "save for a story", false).Clicked() {
+			if s.button(c, "lyrics-share-story-"+where, locales.LyricsShareStory(), false).Clicked() {
 				s.saveLyricsCard(t, ly, sharecard.Story)
 			}
 		}
-		if s.button(c, "lyrics-share-cancel-"+where, "done", false).Clicked() {
+		if s.button(c, "lyrics-share-cancel-"+where, locales.LyricsShareDone(), false).Clicked() {
 			*pick = lyricsPick{}
 		}
 	})
@@ -121,11 +121,12 @@ func (s *shell) saveLyricsCard(t media.Track, ly lyrics.Lyrics, size sharecard.S
 	colors := s.lk.cardColors()
 	artist := names(t.Artists)
 	credit := ""
-	if ly.Source != "" {
-		credit = "Lyrics from " + ly.Source
-	}
-	if credit != "" && ly.By != "" {
-		credit += " · submitted by " + ly.By
+	switch {
+	case ly.Source == "":
+	case ly.By == "":
+		credit = locales.LyricsShareCredit(ly.Source)
+	default:
+		credit = locales.LyricsShareCreditBy(ly.Source, ly.By)
 	}
 	s.saveCard(t.Title, t.Artwork, size, func(cover image.Image, size sharecard.Size) sharecard.Card {
 		c := sharecard.Card{Size: size, Colors: colors, Cover: cover, CoverAt: sharecard.CoverFoot}

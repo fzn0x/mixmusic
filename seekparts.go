@@ -14,6 +14,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/sponsorblock"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // hasMarks reports whether the seek bars mark anything of the track that
@@ -76,7 +77,7 @@ func (s *shell) markAt(f float64, dur time.Duration, near float64) (string, bool
 	}
 	t := time.Duration(f * float64(dur))
 	if h := s.st.Highlight; h > 0 && (t-h).Abs() <= time.Duration(near*float64(dur)) {
-		return sponsorblock.Highlight.Name() + ", " + clock(h), true
+		return locales.SeekHighlightTip(partKindName(sponsorblock.Highlight), clock(h)), true
 	}
 	for _, part := range s.st.Parts {
 		if t >= part.From && t < part.To {
@@ -88,7 +89,7 @@ func (s *shell) markAt(f float64, dur time.Duration, near float64) (string, bool
 
 // partTip tells a part's kind and times: "Sponsor, 1:20 to 2:05".
 func partTip(part player.Part) string {
-	return part.Kind.Name() + ", " + clock(part.From) + " to " + clock(part.To)
+	return locales.SeekPartTip(partKindName(part.Kind), clock(part.From), clock(part.To))
 }
 
 // markTip has a seek bar tell, under the pointer, what is marked there:

@@ -9,10 +9,11 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/room"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // roomsTitle is the title of the rooms' page and of their settings.
-const roomsTitle = "Listen with friends"
+func roomsTitle() string { return locales.RoomPageTitle() }
 
 // roomPage is the page of rooms: the room this computer hosts, with its
 // code, its invite link and its guests; or the one it is a guest of, with
@@ -20,7 +21,7 @@ const roomsTitle = "Listen with friends"
 func (s *shell) roomPage(c *ui.Context) {
 	rs := s.a.Rooms()
 	s.pageScroll(c, func() {
-		s.pageHeader(c, roomsTitle, nil, nil)
+		s.pageHeader(c, roomsTitle(), nil, nil)
 		ui.Column(c).MaxWidth(720).Gap(16).Children(func() {
 			if h, ok := rs.Hosted(); ok {
 				s.hostedRoom(c, h)
@@ -43,7 +44,7 @@ func (s *shell) roomFoundPage(c *ui.Context, id string) {
 		s.roomPage(c)
 		return
 	}
-	name := "That computer"
+	name := locales.RoomPageThatComputer()
 	for _, f := range rs.Found() {
 		if f.ID == id {
 			name = f.Name
@@ -51,15 +52,15 @@ func (s *shell) roomFoundPage(c *ui.Context, id string) {
 	}
 	k := &s.lk
 	s.pageScroll(c, func() {
-		s.pageHeader(c, name+"'s room", nil, nil)
+		s.pageHeader(c, locales.RoomPageNameRoom(name), nil, nil)
 		ui.Column(c).MaxWidth(720).Gap(16).Children(func() {
-			ui.Text(c, "Type the code "+name+"'s room shows, of 6 letters and digits.").FontSize(k.bodySize()).MaxWidth(640)
+			ui.Text(c, locales.RoomPageTypeCode(name)).FontSize(k.bodySize()).MaxWidth(640)
 			v := &s.rooms
 			ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-				in := ui.TextInput(c.Key("room-code"), &v.code).Width(160).Label("Room code").Placeholder("ABC 123").AutoFocus()
+				in := ui.TextInput(c.Key("room-code"), &v.code).Width(160).Label(locales.RoomPageRoomCode()).Placeholder("ABC 123").AutoFocus()
 				_, ok := room.ParseCode(v.code)
 				knock := in.Submitted()
-				if s.button(c, "room-knock", "join", true).Disabled(!ok).Clicked() {
+				if s.button(c, "room-knock", locales.RoomPageJoin(), true).Disabled(!ok).Clicked() {
 					knock = true
 				}
 				if knock && ok {
@@ -76,17 +77,17 @@ func (s *shell) roomFoundPage(c *ui.Context, id string) {
 func (s *shell) roomsLanding(c *ui.Context) {
 	k := &s.lk
 	rs := s.a.Rooms()
-	ui.Text(c, "Friends on this network hear what you play, in step, on their own computers: start a room, and they join it with its code or its invite link. Each plays the same track from where it can; your audio is never sent.").
+	ui.Text(c, locales.RoomPageIntro()).
 		FontSize(k.bodySize()).MaxWidth(640)
-	if s.button(c, "room-start", "start a room", true).Disabled(s.rooms.starting).Clicked() {
+	if s.button(c, "room-start", locales.RoomPageStartRoom(), true).Disabled(s.rooms.starting).Clicked() {
 		s.startRoom()
 	}
 	ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
 		v := &s.rooms
-		in := ui.TextInput(c.Key("room-link"), &v.link).Width(320).Label("Invite link").Placeholder("mixmusic://join/…")
+		in := ui.TextInput(c.Key("room-link"), &v.link).Width(320).Label(locales.RoomPageInviteLink()).Placeholder("mixmusic://join/…")
 		_, err := room.ParseLink(v.link)
 		open := in.Submitted()
-		if s.button(c, "room-open-link", "open the link", false).Disabled(err != nil).Clicked() {
+		if s.button(c, "room-open-link", locales.RoomPageOpenLink(), false).Disabled(err != nil).Clicked() {
 			open = true
 		}
 		if open && err == nil {
@@ -98,15 +99,15 @@ func (s *shell) roomsLanding(c *ui.Context) {
 	s.joinAtAddress(c)
 	found := rs.Found()
 	if len(found) == 0 {
-		ui.Text(c, "No room is on the network now. Rooms show here, and in the player bar's devices menu, while MixMusic hosts one on this network.").
+		ui.Text(c, locales.RoomPageNoRooms()).
 			FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 		return
 	}
-	ui.Text(c, "Rooms on the network").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+	ui.Text(c, locales.RoomPageRoomsOnNetwork()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 	for _, f := range found {
 		ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
-			ui.Text(c, f.Name+"'s room").FontSize(k.bodySize()).Grow(1)
-			if s.button(c, "room-open-"+f.ID, "join", false).Label("Join " + f.Name + "'s room").Clicked() {
+			ui.Text(c, locales.RoomPageNameRoom(f.Name)).FontSize(k.bodySize()).Grow(1)
+			if s.button(c, "room-open-"+f.ID, locales.RoomPageJoin(), false).Label(locales.RoomPageJoinRoom(f.Name)).Clicked() {
 				s.navigate(roomPath(f.ID))
 			}
 		})
@@ -119,67 +120,67 @@ func (s *shell) roomsLanding(c *ui.Context) {
 func (s *shell) hostedRoom(c *ui.Context, h app.HostedRoom) {
 	k := &s.lk
 	rs := s.a.Rooms()
-	ui.Text(c, "Friends on this network join from the player bar's devices menu, the cast button's, with this code, or with the invite link.").
+	ui.Text(c, locales.RoomPageJoinHint()).
 		FontSize(k.bodySize()).MaxWidth(640)
 	shown := room.ShowCode(h.Code)
-	ui.Text(c, shown).FontSize(k.size(2.5)).FontWeight(k.titleWeight()).FontFeatures("tnum").Selectable().Label("The room's code: " + shown)
+	ui.Text(c, shown).FontSize(k.size(2.5)).FontWeight(k.titleWeight()).FontFeatures("tnum").Selectable().Label(locales.RoomPageCodeLabel(shown))
 	ui.Row(c).Gap(8).Children(func() {
-		if s.button(c, "room-copy-link", "copy invite link", true).Clicked() {
+		if s.button(c, "room-copy-link", locales.RoomPageCopyLink(), true).Clicked() {
 			copyText(h.Link)
 			rs.LinkCopied()
-			s.notes = append(s.notes, notice("Copied the invite link"))
+			s.notes = append(s.notes, notice(locales.RoomPageCopiedLink()))
 		}
-		if s.button(c, "room-new-code", "new code", false).Clicked() {
+		if s.button(c, "room-new-code", locales.RoomPageNewCode(), false).Clicked() {
 			s.newRoomCode()
 		}
-		if s.button(c, "room-end", "end room", false).Clicked() {
+		if s.button(c, "room-end", locales.RoomPageEndRoom(), false).Clicked() {
 			rs.End()
 		}
 	})
 	// Friends outside this network (rooms_anywhere.go).
 	s.roomReach(c, h)
-	ui.Text(c, "Removed and blocked guests can't come back with the code or the link they have under a new name: a new code, and a new link, shut them out, and your guests stay.").
+	ui.Text(c, locales.RoomPageRemovedNote()).
 		FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 	if h.Waiting {
-		ui.Text(c, "The next track waits for your guests to have it ready.").FontSize(k.smallSize()).TextColor(k.muted)
+		ui.Text(c, locales.RoomPageWaitingGuests()).FontSize(k.smallSize()).TextColor(k.muted)
 	}
 	s.roomWaiting(c)
-	ui.Text(c, "Guests").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+	ui.Text(c, locales.RoomPageGuests()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 	if len(h.Guests) == 0 {
-		ui.Text(c, "No one joined yet.").FontSize(k.smallSize()).TextColor(k.muted)
+		ui.Text(c, locales.RoomPageNoGuests()).FontSize(k.smallSize()).TextColor(k.muted)
 	}
 	for _, g := range h.Guests {
 		ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
 			name := g.Name
 			if !g.Here {
-				name += " · away"
+				name = locales.RoomPageAway(g.Name)
 			}
 			ui.Text(c, name).FontSize(k.bodySize()).Grow(1).MinWidth(0)
-			if s.button(c, "room-remove-"+g.Key, "remove", false).Label("Remove " + g.Name).Clicked() {
+			if s.button(c, "room-remove-"+g.Key, locales.RoomPageRemove(), false).Label(locales.RoomPageRemoveGuest(g.Name)).Clicked() {
 				rs.Remove(g.Key)
 			}
-			if s.button(c, "room-block-"+g.Key, "block", false).Label("Block " + g.Name).Clicked() {
+			if s.button(c, "room-block-"+g.Key, locales.RoomPageBlock(), false).Label(locales.RoomPageBlockGuest(g.Name)).Clicked() {
 				rs.Block(g.Key)
 			}
 			s.makeHostButton(c, g)
 		})
 	}
 	if len(h.Blocked) > 0 {
-		ui.Text(c, "Blocked").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+		ui.Text(c, locales.RoomPageBlocked()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		for _, g := range h.Blocked {
 			ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
 				ui.Text(c, g.Name).FontSize(k.bodySize()).Grow(1).MinWidth(0)
-				if s.button(c, "room-unblock-"+g.Key, "unblock", false).Label("Unblock " + g.Name).Clicked() {
+				if s.button(c, "room-unblock-"+g.Key, locales.RoomPageUnblock(), false).Label(locales.RoomPageUnblockGuest(g.Name)).Clicked() {
 					rs.Unblock(g.Key)
 				}
 			})
 		}
 	}
 	if len(h.Activity) > 0 {
-		ui.Text(c, "Activity").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+		ui.Text(c, locales.RoomPageActivity()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		for i := len(h.Activity) - 1; i >= 0 && i >= len(h.Activity)-20; i-- {
 			act := h.Activity[i]
-			ui.Text(c, act.Name+" "+act.What+activitySong(act)+" · "+act.At.Local().Format("15:04")).FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, locales.RoomPageActivityLine(act.Name, roomActivityWhat(act.What), activitySong(act), act.At.Local().Format("15:04"))).FontSize(k.smallSize()).TextColor(k.muted)
 		}
 	}
 	s.hostRules(c)
@@ -197,26 +198,26 @@ func (s *shell) guestRoom(c *ui.Context, g app.GuestView) {
 	}
 	switch g.Step {
 	case app.RoomKnocking:
-		say("Checking the code with " + g.Host + "…")
-		if s.button(c, "room-cancel", "cancel", false).Clicked() {
+		say(locales.RoomPageChecking(g.Host))
+		if s.button(c, "room-cancel", locales.LibraryCancel(), false).Clicked() {
 			rs.Leave()
 		}
 	case app.RoomPreview:
 		p := g.Preview
-		say(p.Host + " hosts this room.")
+		say(locales.RoomPageHosts(p.Host))
 		if p.Title != "" {
-			line := "Plays " + p.Title
+			line := locales.RoomPagePlays(p.Title)
 			if p.Artists != "" {
-				line += " · " + p.Artists
+				line = locales.RoomPagePlaysArtists(p.Title, p.Artists)
 			}
 			say(line)
 		}
-		say(listening(p.Listeners) + ". Joining plays what " + p.Host + " plays, here, in step; your queue comes back as you leave.")
+		say(locales.RoomPageJoinPlays(listening(p.Listeners), p.Host))
 		ui.Row(c).Gap(8).Children(func() {
-			if s.button(c, "room-join", "join", true).Clicked() {
+			if s.button(c, "room-join", locales.RoomPageJoin(), true).Clicked() {
 				rs.Join()
 			}
-			if s.button(c, "room-cancel", "cancel", false).Clicked() {
+			if s.button(c, "room-cancel", locales.LibraryCancel(), false).Clicked() {
 				rs.Leave()
 			}
 		})
@@ -225,7 +226,7 @@ func (s *shell) guestRoom(c *ui.Context, g app.GuestView) {
 	case app.RoomIn, app.RoomAway:
 		s.inRoom(c, g)
 	case app.RoomEnded:
-		if s.button(c, "room-close", "close", false).Clicked() {
+		if s.button(c, "room-close", locales.CopiesClose(), false).Clicked() {
 			rs.Dismiss()
 		}
 	}
@@ -236,14 +237,14 @@ func (s *shell) guestRoom(c *ui.Context, g app.GuestView) {
 func (s *shell) inRoom(c *ui.Context, g app.GuestView) {
 	k := &s.lk
 	rs := s.a.Rooms()
-	title := "In " + g.Host + "'s room"
+	title := locales.RoomPageInRoom(g.Host)
 	if g.Step == app.RoomAway {
-		title = g.Host + " stopped answering: coming back…"
+		title = locales.RoomPageStopped(g.Host)
 	}
 	ui.Text(c, title).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 	st := g.State
 	if !g.HasState || st.Track == nil {
-		ui.Text(c, "Nothing plays in the room.").FontSize(k.bodySize())
+		ui.Text(c, locales.RoomPageNothingPlays()).FontSize(k.bodySize())
 	} else {
 		t := *st.Track
 		ui.Row(c).Gap(20).AlignItems(ui.Center).Children(func() {
@@ -256,7 +257,7 @@ func (s *shell) inRoom(c *ui.Context, g app.GuestView) {
 				ui.Text(c, t.Title).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 				ui.Text(c, roomArtists(t)).FontSize(k.smallSize()).TextColor(k.muted)
 				if !st.Playing {
-					ui.Text(c, "Paused").FontSize(k.smallSize()).TextColor(k.muted)
+					ui.Text(c, locales.NotchPanelPaused()).FontSize(k.smallSize()).TextColor(k.muted)
 				}
 			})
 		})
@@ -265,17 +266,17 @@ func (s *shell) inRoom(c *ui.Context, g app.GuestView) {
 		ui.Text(c, g.Note).FontSize(k.bodySize()).TextColor(k.muted).MaxWidth(640)
 	}
 	if len(g.Members) > 0 {
-		ui.Text(c, "Listening: "+strings.Join(g.Members, ", ")).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
+		ui.Text(c, locales.RoomPageListening(strings.Join(g.Members, ", "))).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 	}
 	s.roomGuestRows(c, g)
-	if s.button(c, "room-leave", "leave room", false).Clicked() {
+	if s.button(c, "room-leave", locales.RoomPageLeaveRoom(), false).Clicked() {
 		rs.Leave()
 	}
 	q := g.Queue
 	if len(q.Tracks) > q.Index+1 {
-		ui.Text(c, "Next in the room").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+		ui.Text(c, locales.RoomPageNextInRoom()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		for _, t := range q.Tracks[q.Index+1 : min(len(q.Tracks), q.Index+11)] {
-			ui.Text(c, t.Title+" · "+roomArtists(t)).FontSize(k.smallSize()).MaxWidth(640)
+			ui.Text(c, locales.RoomPageTitleArtists(t.Title, roomArtists(t))).FontSize(k.smallSize()).MaxWidth(640)
 		}
 	}
 }
@@ -287,4 +288,21 @@ func roomArtists(t remote.QueueTrack) string {
 		names = append(names, a.Name)
 	}
 	return strings.Join(names, ", ")
+}
+
+// roomActivityWhat names what a guest did in the room, as the room's activity tells it.
+func roomActivityWhat(what string) string {
+	switch what {
+	case room.Joined:
+		return locales.RoomPageJoinedActivity()
+	case room.Left:
+		return locales.RoomPageLeftActivity()
+	case room.Removed:
+		return locales.RoomPageRemovedActivity()
+	case room.Blocked:
+		return locales.RoomPageBlockedActivity()
+	case room.Guessed:
+		return locales.RoomPageGuessedActivity()
+	}
+	return what
 }

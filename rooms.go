@@ -8,11 +8,11 @@ package main
 
 import (
 	"net/url"
-	"strconv"
 
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // roomView is what the window keeps of rooms from frame to frame.
@@ -60,7 +60,7 @@ func (s *shell) roomItems(m *ui.Menu) {
 	in := isGuest && guest.Step != app.RoomEnded
 	switch {
 	case hosts:
-		label := "Your room"
+		label := locales.RoomMenuYourRoom()
 		if n := len(hosted.Guests); n > 0 {
 			label += " · " + listening(n)
 		}
@@ -68,11 +68,11 @@ func (s *shell) roomItems(m *ui.Menu) {
 			s.navigate(roomsPath)
 		}
 	case in:
-		if m.Item("In " + guest.Host + "'s room").Chosen() {
+		if m.Item(locales.RoomPageInRoom(guest.Host)).Chosen() {
 			s.navigate(roomsPath)
 		}
 	default:
-		if m.Item("Start a room").Disabled(s.rooms.starting).Chosen() {
+		if m.Item(locales.RoomSettingsStartRoom()).Disabled(s.rooms.starting).Chosen() {
 			s.startRoom()
 		}
 	}
@@ -80,7 +80,7 @@ func (s *shell) roomItems(m *ui.Menu) {
 		if in && f.ID == guest.ID {
 			continue
 		}
-		if m.Item(f.Name + "'s room").Disabled(hosts || in).Chosen() {
+		if m.Item(locales.RoomPageNameRoom(f.Name)).Disabled(hosts || in).Chosen() {
 			s.navigate(roomPath(f.ID))
 		}
 	}
@@ -88,10 +88,7 @@ func (s *shell) roomItems(m *ui.Menu) {
 
 // listening tells how many guests listen.
 func listening(n int) string {
-	if n == 1 {
-		return "1 listening"
-	}
-	return strconv.Itoa(n) + " listening"
+	return locales.RoomMenuListening(n)
 }
 
 // startRoom opens a room beside the main thread, which may read the key,
@@ -124,7 +121,7 @@ func (s *shell) newRoomCode() {
 				s.notes = append(s.notes, noticeOf(err))
 				return
 			}
-			s.notes = append(s.notes, notice("The room has a new code: the old code and link no longer let anyone in"))
+			s.notes = append(s.notes, notice(locales.RoomMenuNewCode()))
 		})
 	}()
 }

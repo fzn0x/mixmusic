@@ -106,7 +106,7 @@ func TestLyricStylesTable(t *testing.T) {
 		if st.id != settings.LyricStyles[i] {
 			t.Errorf("style %d is %q, the settings' is %q", i, st.id, settings.LyricStyles[i])
 		}
-		if st.name == "" || st.about == "" {
+		if st.title() == "" || st.about() == "" {
 			t.Errorf("%q has no name or no description", st.id)
 		}
 		if !slices.Contains([]string{face, faceRound, faceMaterial, faceArchivo}, st.family) {
@@ -320,8 +320,8 @@ func TestLyricStyleSettings(t *testing.T) {
 	show(s, tt, "/settings/appearance")
 	// The tests wear the Tiles layout, whose words are lowercase.
 	for _, st := range lyricStyles {
-		if !tt.HasText(s.lk.words(st.name)) {
-			t.Errorf("Settings doesn't list the style %q: %q", st.name, tt.Texts())
+		if !tt.HasText(s.lk.words(st.title())) {
+			t.Errorf("Settings doesn't list the style %q: %q", st.title(), tt.Texts())
 		}
 	}
 	click(t, s, tt, s.lk.words("Glow"))

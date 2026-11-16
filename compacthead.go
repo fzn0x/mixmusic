@@ -11,6 +11,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // shownPage is what the window knows of the page it shows, for the top
@@ -213,10 +214,10 @@ func (s *shell) topBarHead(c *ui.Context) {
 		name := ui.Text(c, k.words(h.title)).FontSize(k.bodySize()).Font(k.display).SingleLine().MinWidth(0).
 			Margin(0, 8, 0, 6)
 		k.labelWeight(name)
-		if h.play != nil && s.round(c, "bar-play", "play", "Play "+h.title, true, false, 32, 16).Shrink(0).Clicked() {
+		if h.play != nil && s.round(c, "bar-play", "play", locales.CompactHeadPlay(h.title), true, false, 32, 16).Shrink(0).Clicked() {
 			h.play()
 		}
-		if h.shuffle != nil && s.iconButton(c, "bar-shuffle", "shuffle", "Shuffle "+h.title, false, 18).Shrink(0).Clicked() {
+		if h.shuffle != nil && s.iconButton(c, "bar-shuffle", "shuffle", locales.CompactHeadShuffle(h.title), false, 18).Shrink(0).Clicked() {
 			h.shuffle()
 		}
 		if download && wide {
@@ -226,7 +227,7 @@ func (s *shell) topBarHead(c *ui.Context) {
 			}
 		}
 		if menu != nil {
-			s.iconButton(c, "bar-more", "more", "More for "+h.title, false, 18).Shrink(0).Menu(menu)
+			s.iconButton(c, "bar-more", "more", locales.CompactHeadMore(h.title), false, 18).Shrink(0).Menu(menu)
 		}
 	})
 }

@@ -318,22 +318,22 @@ func TestBallLegs(t *testing.T) {
 			start, _ := path.at(c.a, 0, time.Second)
 			end, _ := path.at(c.a, 1, time.Second)
 			if !ballNear(start.x, c.a.x) || !ballNear(start.y, c.a.y) {
-				t.Errorf("%s, %s: it starts at %+v, not %+v", m.name, c.name, start, c.a)
+				t.Errorf("%s, %s: it starts at %+v, not %+v", m.name(), c.name, start, c.a)
 			}
 			if !ballNear(end.x, c.b.x) || !ballNear(end.y, c.b.y) {
-				t.Errorf("%s, %s: it ends at %+v, not %+v", m.name, c.name, end, c.b)
+				t.Errorf("%s, %s: it ends at %+v, not %+v", m.name(), c.name, end, c.b)
 			}
 			prev := start
 			for i := 1; i <= 400; i++ {
 				p, _ := path.at(c.a, float32(i)/400, time.Second)
 				if math.IsNaN(float64(p.x)) || math.IsNaN(float64(p.y)) {
-					t.Fatalf("%s, %s: a NaN at %d/400", m.name, c.name, i)
+					t.Fatalf("%s, %s: a NaN at %d/400", m.name(), c.name, i)
 				}
 				if d := math.Hypot(float64(p.x-prev.x), float64(p.y-prev.y)); d > 0.3*size {
-					t.Errorf("%s, %s: it jumps %.1f at %d/400", m.name, c.name, d, i)
+					t.Errorf("%s, %s: it jumps %.1f at %d/400", m.name(), c.name, d, i)
 				}
 				if p.x < field.X-4*size || p.x > field.X+field.W+4*size || p.y < field.Y-4*size || p.y > field.Y+field.H+size {
-					t.Errorf("%s, %s: it strays to %+v at %d/400", m.name, c.name, p, i)
+					t.Errorf("%s, %s: it strays to %+v at %d/400", m.name(), c.name, p, i)
 				}
 				prev = p
 			}
@@ -428,10 +428,10 @@ func TestBallMotionsTable(t *testing.T) {
 		if m.id != settings.LyricBallMotions[i] {
 			t.Errorf("motion %d is %q, and the settings list %q", i, m.id, settings.LyricBallMotions[i])
 		}
-		if m.name == "" || m.about == "" || names[m.name] {
-			t.Errorf("motion %q has the name %q and says %q", m.id, m.name, m.about)
+		if m.name() == "" || m.about() == "" || names[m.name()] {
+			t.Errorf("motion %q has the name %q and says %q", m.id, m.name(), m.about())
 		}
-		names[m.name] = true
+		names[m.name()] = true
 		if (m.legs == nil) != (m.id == settings.LyricBallMix) {
 			t.Errorf("motion %q has legs: %v", m.id, m.legs != nil)
 		}

@@ -92,7 +92,7 @@ func TestLyricsSourcesRows(t *testing.T) {
 	if got := sourceRowOrder(tt); !slices.Equal(got, want) {
 		t.Fatalf("rows %q, want %q", got, want)
 	}
-	if !tt.HasText(lyricsSourceText[settings.LyricsCaptions].sent) || !tt.HasText(lyricsSourcesAbout) {
+	if !tt.HasText(lyricsSourceText()[settings.LyricsCaptions].sent) || !tt.HasText(lyricsSourcesAbout()) {
 		t.Errorf("the rows don't say what each source gets: %q", tt.Texts())
 	}
 	if info, ok := tt.Access("reset to default"); !ok || !info.Disabled {

@@ -11,6 +11,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // newReleases returns what the artists the user follows put out lately,
@@ -38,7 +39,7 @@ func (s *shell) releasesShelf(c *ui.Context, key string, source media.Source) in
 	if len(shown) == 0 {
 		return 0
 	}
-	s.shelf(c, key, "New from artists you follow", func() {
+	s.shelf(c, key, locales.ReleasesNewFrom(), func() {
 		// The tiles far to either side take their room, and build nothing.
 		n := len(shown)
 		from, to := s.nearTiles(c, key, n)

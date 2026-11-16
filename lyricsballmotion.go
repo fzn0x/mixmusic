@@ -7,6 +7,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The motions of the ball from the last word of a line to the first of the
@@ -21,7 +22,7 @@ import (
 // ballMotion is a motion of the ball between lines.
 type ballMotion struct {
 	id          settings.LyricBallMotion
-	name, about string
+	name, about func() string
 	// takes is how long it lasts when it has room, and least the least it can
 	// be squeezed to.
 	takes, least time.Duration
@@ -40,16 +41,16 @@ type ballGeo struct {
 // ballMotions are the motions, in the order of settings.LyricBallMotions,
 // which a test holds them to.
 var ballMotions = []ballMotion{
-	{id: settings.LyricBallMix, name: "Mix", about: "A different motion for each line, in turn."},
-	{id: settings.LyricBallHop, name: "Hop", about: "One arc, as the hops between words are.",
+	{id: settings.LyricBallMix, name: locales.LyricBallMixName, about: locales.LyricBallMixAbout},
+	{id: settings.LyricBallHop, name: locales.LyricBallHopName, about: locales.LyricBallHopAbout,
 		takes: 560 * time.Millisecond, least: 200 * time.Millisecond, legs: hopLegs},
-	{id: settings.LyricBallBoomerang, name: "Boomerang", about: "Thrown out past the end of the line, it curves back to the next.",
+	{id: settings.LyricBallBoomerang, name: locales.LyricBallBoomerangName, about: locales.LyricBallBoomerangAbout,
 		takes: 1100 * time.Millisecond, least: 600 * time.Millisecond, legs: boomerangLegs},
-	{id: settings.LyricBallLoop, name: "Loop", about: "A loop over the last word, then a swoop to the next line.",
+	{id: settings.LyricBallLoop, name: locales.LyricBallLoopName, about: locales.LyricBallLoopAbout,
 		takes: 1200 * time.Millisecond, least: 700 * time.Millisecond, legs: loopLegs},
-	{id: settings.LyricBallDive, name: "Dive", about: "It rises a little, as to gather itself, and drops to the next line.",
+	{id: settings.LyricBallDive, name: locales.LyricBallDiveName, about: locales.LyricBallDiveAbout,
 		takes: 850 * time.Millisecond, least: 320 * time.Millisecond, legs: diveLegs},
-	{id: settings.LyricBallRicochet, name: "Ricochet", about: "It bounces off the right edge of the lyrics and their floor.",
+	{id: settings.LyricBallRicochet, name: locales.LyricBallRicochetName, about: locales.LyricBallRicochetAbout,
 		takes: 1500 * time.Millisecond, least: 900 * time.Millisecond, legs: ricochetLegs},
 }
 

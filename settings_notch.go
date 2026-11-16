@@ -7,6 +7,8 @@ import (
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 func init() { addSettings(desktopRows, 10, (*shell).notchRow) }
@@ -17,17 +19,15 @@ func (s *shell) notchRow(c *ui.Context) {
 	if !hasNotch() {
 		return
 	}
-	const title = "Player around the notch"
-	s.row(c, title, notchDescription, func() {
-		if s.switchOf(c.Key("notch"), &s.set.NotchPlayer).Label(title).Changed() {
+	s.row(c, locales.NotchTitle(), notchDescription(), func() {
+		if s.switchOf(c.Key("notch"), &s.set.NotchPlayer).Label(locales.NotchTitle()).Changed() {
 			s.save()
 		}
 	}, "notch dynamic island menu bar camera")
 }
 
 // notchDescription tells what the player around the notch does.
-const notchDescription = "While a track is loaded, the black around the camera shows its cover, and bars that move with the music. " +
-	"Click it for the player and the lyrics, over any app and on every Space."
+func notchDescription() string { return locales.NotchDescription() }
 
 // hasNotch reports whether the built-in screen has a camera housing, which
 // the settings ask in every frame: tests set it.

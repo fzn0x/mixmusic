@@ -1,20 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"slices"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 func init() { addSettings(cacheRows, 10, (*shell).movingClipsRow) }
-
-// movingClipsKept is what the row of the clips of moving covers kept
-// always says.
-const movingClipsKept = "Albums' moving covers that played loop again without the network."
 
 // movingClipsRow shows the clips of moving covers kept, in Settings ›
 // Playback › Offline cache, with Clear moving covers, and bounds them,
@@ -25,10 +21,10 @@ func (s *shell) movingClipsRow(c *ui.Context) {
 	}
 	// The store's index is read for what it holds in every frame the row
 	// shows: the search finds the row by what it always says.
-	if s.findable("Moving covers kept", movingClipsKept, "clips animated") {
+	if s.findable(locales.MovingClipsTitle(), locales.MovingClipsKept(), "clips animated") {
 		use := s.svc.System.MovingCoverUsage()
-		s.row(c, "Moving covers kept", fmt.Sprintf("%s in %s. "+movingClipsKept, plural(use.Clips, "clip"), byteSize(use.Bytes)), func() {
-			if s.button(c, "clear-moving-covers", "clear", false).Label("Clear moving covers").Disabled(use.Clips == 0).Clicked() {
+		s.row(c, locales.MovingClipsTitle(), locales.MovingClipsLine(use.Clips, byteSize(use.Bytes)), func() {
+			if s.button(c, "clear-moving-covers", locales.CacheSettingsClear(), false).Label(locales.MovingClipsClearLabel()).Disabled(use.Clips == 0).Clicked() {
 				s.clearMovingClips()
 			}
 		}, "clips animated")
@@ -43,15 +39,15 @@ func (s *shell) movingClipsRow(c *ui.Context) {
 		labels[i] = movingClipSizeLabel(mb)
 	}
 	chosen := movingClipSizeLabel(s.set.MovingCoversMB)
-	what := chosen + " at most."
+	what := locales.MovingClipsAtMost(chosen)
 	switch s.set.MovingCoversMB {
 	case 0:
-		what = "Off: MixMusic keeps only the clip that plays."
+		what = locales.MovingClipsOff()
 	case settings.UnlimitedMovingCovers:
-		what = "Unlimited: every clip that played stays."
+		what = locales.MovingClipsUnlimitedDesc()
 	}
-	s.row(c, "Size of moving covers", what, func() {
-		if s.selectOf(c.Key("moving-covers-size"), &chosen, labels).Width(160).Label("Size of moving covers").Changed() {
+	s.row(c, locales.MovingClipsSize(), what, func() {
+		if s.selectOf(c.Key("moving-covers-size"), &chosen, labels).Width(160).Label(locales.MovingClipsSize()).Changed() {
 			if i := slices.Index(labels, chosen); i >= 0 {
 				s.set.MovingCoversMB = sizes[i]
 				s.save()
@@ -75,7 +71,7 @@ func clipOrder(mb int) int {
 // movingClipSizeLabel names a size of the clips of moving covers.
 func movingClipSizeLabel(mb int) string {
 	if mb < 0 {
-		return "Unlimited"
+		return locales.MovingClipsUnlimited()
 	}
 	return cacheSizeLabel(mb)
 }
@@ -95,7 +91,7 @@ func (s *shell) clearMovingClips() {
 					s.forget(key)
 				}
 			}
-			s.notes = append(s.notes, notice("Moving covers cleared"))
+			s.notes = append(s.notes, notice(locales.MovingClipsCleared()))
 		})
 	}()
 }

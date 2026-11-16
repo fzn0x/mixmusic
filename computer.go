@@ -6,7 +6,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"path/filepath"
 	"runtime"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // computerViews are the sections of Library › On this computer.
@@ -47,21 +47,20 @@ func (s *shell) computerLibrary(c *ui.Context) {
 	st := lf.Status()
 	tracks := lf.Tracks()
 	if len(tracks) == 0 {
-		title, text := "Nothing on this computer yet",
-			"Add a folder of music, or open files: they play from your computer, beside Spotify and YouTube Music, in your queue and your mixes. Nothing of them is uploaded."
+		title, text := locales.ComputerEmptyTitle(), locales.ComputerEmptyText()
 		switch {
 		case st.Scanning:
-			title, text = "Looking through your music", scanLine(st)
+			title, text = locales.ComputerScanningTitle(), scanLine(st)
 		case len(s.set.MusicFolders) > 0:
-			title, text = "No music found", "The folders hold no files MixMusic plays: MP3, FLAC, WAV, M4A, Opus or Vorbis."
+			title, text = locales.ComputerNoMusicTitle(), locales.ComputerNoMusicText()
 		}
 		ui.Text(c, k.words(title)).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
 		ui.Text(c, text).FontSize(k.subtitleSize()).FontWeight(k.leadWeight()).MaxWidth(640).Margin(0, 0, 24)
 		ui.Row(c).Gap(8).Wrap().Children(func() {
-			if s.button(c, "computer-add", "add a folder", true).Clicked() {
+			if s.button(c, "computer-add", locales.ComputerSettingsAddFolder(), true).Clicked() {
 				s.addMusicFolder()
 			}
-			if s.button(c, "computer-open", "open files", false).Clicked() {
+			if s.button(c, "computer-open", locales.ComputerOpenFiles(), false).Clicked() {
 				s.openMusicFiles()
 			}
 		})
@@ -75,27 +74,27 @@ func (s *shell) computerLibrary(c *ui.Context) {
 			if st.Scanning {
 				ui.Text(c, scanLine(st)+" · ")
 			} else {
-				ui.Text(c, "From "+plural(len(st.Folders), "folder")+" · ")
+				ui.Text(c, locales.ComputerFromFolders(len(st.Folders)))
 			}
-			s.linkOf(c, k.sentence("manage"), "/settings/playback")
+			s.linkOf(c, k.sentence(locales.ComputerManage()), "/settings/playback")
 		})
 	})
 	switch computerViews[page.view] {
 	case "songs":
 		ui.Row(c).Gap(8).Margin(0, 0, 16).Children(func() {
-			if s.button(c, "computer-play", "play", true).Clicked() {
+			if s.button(c, "computer-play", locales.LibraryPlay(), true).Clicked() {
 				s.p.PlayAll(tracks, false)
 			}
-			if s.button(c, "computer-shuffle", "shuffle", false).Clicked() {
+			if s.button(c, "computer-shuffle", locales.LibraryShuffle(), false).Clicked() {
 				s.shuffled(tracks)
 			}
-			if s.button(c, "computer-open-files", "open files", false).Clicked() {
+			if s.button(c, "computer-open-files", locales.ComputerOpenFiles(), false).Clicked() {
 				s.openMusicFiles()
 			}
 		})
 		view := s.trackTools(c, "computer", "list", tracks)
 		s.trackList(c, "computer", view.tracks, trackListOptions{art: true, album: true,
-			empty: "No song matches “" + s.searching("computer") + "”."})
+			empty: locales.ComputerNoMatch(s.searching("computer"))})
 	case "albums":
 		page.tiles = max(page.tiles, computerTiles)
 		s.tileWrap(c, func() {
@@ -122,7 +121,7 @@ func (s *shell) moreTiles(c *ui.Context, n int) {
 		return
 	}
 	ui.Row(c).Margin(24, 0, 0).Children(func() {
-		if s.button(c, "computer-more", fmt.Sprintf("show more · %d of %d", page.tiles, n), false).Clicked() {
+		if s.button(c, "computer-more", locales.ComputerShowMore(page.tiles, n), false).Clicked() {
 			page.tiles += computerTiles
 		}
 	})
@@ -143,13 +142,13 @@ func (s *shell) computerResults(c *ui.Context, q, pivot string) {
 		if pivot == "all" {
 			tracks = tracks[:min(len(tracks), 5)]
 		}
-		s.sectionTitle(c, "On this computer")
+		s.sectionTitle(c, locales.LibraryOnThisComputer())
 		ui.Column(c).Margin(0, 0, 48).Children(func() {
 			s.trackList(c, "computer-results", tracks, trackListOptions{art: true, album: true})
 		})
 	case "albums":
 		if len(found.Albums) > 0 {
-			s.shelf(c, "computer-albums", "On this computer", func() {
+			s.shelf(c, "computer-albums", locales.LibraryOnThisComputer(), func() {
 				for i, a := range found.Albums {
 					s.albumTile(c, "computer-album-"+count(i), a)
 				}
@@ -157,7 +156,7 @@ func (s *shell) computerResults(c *ui.Context, q, pivot string) {
 		}
 	case "artists":
 		if len(found.Artists) > 0 {
-			s.shelf(c, "computer-artists", "On this computer", func() {
+			s.shelf(c, "computer-artists", locales.LibraryOnThisComputer(), func() {
 				for i, a := range found.Artists {
 					s.artistTile(c, "computer-artist-"+count(i), a)
 				}
@@ -180,9 +179,9 @@ func (s *shell) computerSearch(q string) media.SearchResults {
 // scanLine tells how far a scan of the folders came.
 func scanLine(st localfiles.Status) string {
 	if st.Found == 0 {
-		return "Looking through your folders…"
+		return locales.ComputerScanStarting()
 	}
-	return fmt.Sprintf("Reading %d of %s…", st.Read, plural(st.Found, "file"))
+	return locales.ComputerScanReading(st.Read, st.Found)
 }
 
 func init() { addSettings("playback", 85, (*shell).computerSettings) }
@@ -194,17 +193,17 @@ func init() { addSettings("playback", 85, (*shell).computerSettings) }
 func (s *shell) computerSettings(c *ui.Context) {
 	k := &s.lk
 	st := s.svc.LocalFiles.Status()
-	s.group(c, "Music on this computer", func() {
-		about := "Folders of music files MixMusic plays from your computer: MP3, FLAC, WAV, M4A, Opus and Vorbis. Nothing of them is uploaded."
+	s.group(c, locales.ComputerSettingsGroup(), func() {
+		about := locales.ComputerSettingsAbout()
 		if st.Scanning {
 			about = scanLine(st)
 		}
-		s.row(c, "Folders", about, func() {
-			if s.button(c, "computer-folder-add", "add a folder", false).Label("Add a folder of music").Clicked() {
+		s.row(c, locales.ComputerSettingsFolders(), about, func() {
+			if s.button(c, "computer-folder-add", locales.ComputerSettingsAddFolder(), false).Label(locales.ComputerSettingsAddFolderLabel()).Clicked() {
 				s.addMusicFolder()
 			}
-			if len(s.set.MusicFolders) > 0 && s.button(c, "computer-rescan", "rescan", false).Disabled(st.Scanning).
-				Label("Read the folders again").Clicked() {
+			if len(s.set.MusicFolders) > 0 && s.button(c, "computer-rescan", locales.ComputerSettingsRescan(), false).Disabled(st.Scanning).
+				Label(locales.ComputerSettingsRescanLabel()).Clicked() {
 				s.svc.LocalFiles.Rescan()
 			}
 		}, "local", "files", "library", "music", "mp3", "flac")
@@ -213,13 +212,13 @@ func (s *shell) computerSettings(c *ui.Context) {
 			s.rowWith(c, folder, func() {
 				switch {
 				case f.Problem != "":
-					ui.Text(c, f.Problem+". Its tracks show greyed until it's back.").TextColor(k.danger)
+					ui.Text(c, locales.ComputerSettingsProblem(f.Problem)).TextColor(k.danger)
 				case st.Scanning && f.Tracks == 0:
-					ui.Text(c, "Reading…")
+					ui.Text(c, locales.ComputerSettingsReading())
 				default:
-					line := plural(f.Tracks, "track")
+					line := locales.ComputerSettingsTracks(f.Tracks)
 					if f.Skipped > 0 {
-						line += fmt.Sprintf(" · %d skipped, of kinds MixMusic can't play or broken", f.Skipped)
+						line = locales.ComputerSettingsTracksSkipped(f.Tracks, count(f.Skipped))
 					}
 					ui.Text(c, line)
 					if len(f.Unread) > 0 {
@@ -227,7 +226,7 @@ func (s *shell) computerSettings(c *ui.Context) {
 					}
 				}
 			}, func() {
-				if s.button(c, "computer-folder-remove-"+count(i), "remove", false).Label("Remove " + folder).Clicked() {
+				if s.button(c, "computer-folder-remove-"+count(i), locales.ComputerSettingsRemove(), false).Label(locales.ComputerSettingsRemoveLabel(folder)).Clicked() {
 					s.removeMusicFolder(folder)
 				}
 			}, folder)
@@ -239,10 +238,7 @@ func (s *shell) computerSettings(c *ui.Context) {
 // unreadLine tells of the n folders in a folder of music that the last
 // scan couldn't read, whose tracks the library keeps as they were.
 func unreadLine(n int) string {
-	if n == 1 {
-		return "1 folder in it can't be read: its tracks stay as they were"
-	}
-	return plural(n, "folder") + " in it can't be read: their tracks stay as they were"
+	return locales.ComputerSettingsUnread(n)
 }
 
 // folderStatus is what the last scan found of folder.
@@ -267,13 +263,13 @@ func (s *shell) addMusicFolder() {
 			case dir != "":
 				for _, f := range s.set.MusicFolders {
 					if settings.SamePath(f, dir) {
-						s.notes = append(s.notes, notice(filepath.Base(dir)+" is in the library already"))
+						s.notes = append(s.notes, notice(locales.ComputerInLibrary(filepath.Base(dir))))
 						return
 					}
 				}
 				s.set.MusicFolders = append(append([]string{}, s.set.MusicFolders...), dir)
 				s.save()
-				s.notes = append(s.notes, notice("Reading the music of "+filepath.Base(dir)))
+				s.notes = append(s.notes, notice(locales.ComputerReadingFolder(filepath.Base(dir))))
 			}
 		})
 	}()
@@ -282,8 +278,8 @@ func (s *shell) addMusicFolder() {
 // removeMusicFolder takes a folder out of the library, after asking: its
 // files stay where they are.
 func (s *shell) removeMusicFolder(folder string) {
-	s.ask("remove folder", "Take "+folder+" out of the library? Its files stay where they are, and its tracks stay in your mixes, greyed.",
-		"remove", func() {
+	s.ask(locales.ComputerRemoveFolderTitle(), locales.ComputerRemoveFolderQuestion(folder),
+		locales.LibraryRemove(), func() {
 			var keep []string
 			for _, f := range s.set.MusicFolders {
 				if !settings.SamePath(f, folder) {
@@ -328,21 +324,25 @@ func (s *shell) playFiles(paths []string) {
 func (s *shell) playOpened(o app.Opened) {
 	switch {
 	case len(o.Tracks) == 0 && o.Skipped == 1:
-		s.notes = append(s.notes, noticeOf(errors.New("MixMusic can't play this file")))
+		s.notes = append(s.notes, noticeOf(errors.New(locales.ComputerCantPlayFile())))
 		return
 	case len(o.Tracks) == 0 && o.Skipped > 1:
-		s.notes = append(s.notes, noticeOf(errors.New("MixMusic can't play these files")))
+		s.notes = append(s.notes, noticeOf(errors.New(locales.ComputerCantPlayFiles())))
 		return
 	case len(o.Tracks) == 0:
 		return
 	}
 	s.p.PlayAll(o.Tracks, false)
-	msg := "Playing " + o.Tracks[0].Title
-	if len(o.Tracks) > 1 {
-		msg = fmt.Sprintf("Playing %s", plural(len(o.Tracks), "file"))
-	}
-	if o.Skipped > 0 {
-		msg += fmt.Sprintf(" · %d skipped, which MixMusic can't play", o.Skipped)
+	var msg string
+	switch {
+	case len(o.Tracks) > 1 && o.Skipped > 0:
+		msg = locales.ComputerPlayingFilesSkipped(len(o.Tracks), o.Skipped)
+	case len(o.Tracks) > 1:
+		msg = locales.ComputerPlayingFiles(len(o.Tracks))
+	case o.Skipped > 0:
+		msg = locales.ComputerPlayingSkipped(o.Tracks[0].Title, o.Skipped)
+	default:
+		msg = locales.ComputerPlaying(o.Tracks[0].Title)
 	}
 	s.notes = append(s.notes, notice(msg))
 }
@@ -360,12 +360,12 @@ func (s *shell) localItems(m *ui.Menu, t media.Track) {
 	if !ok || s.missingFile(t) {
 		return
 	}
-	label := "Show in Explorer"
+	label := locales.ComputerShowInExplorer()
 	switch runtime.GOOS {
 	case "darwin":
-		label = "Show in Finder"
+		label = locales.ComputerShowInFinder()
 	case "linux":
-		label = "Show in its folder"
+		label = locales.ComputerShowInFolder()
 	}
 	if m.Item(label).Chosen() {
 		mygo.Shell.ShowItemInFolder(path)

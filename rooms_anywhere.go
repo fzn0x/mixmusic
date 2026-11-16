@@ -12,6 +12,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/room"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // roomReach shows, on the page of the room this computer hosts, whether
@@ -25,11 +26,11 @@ func (s *shell) roomReach(c *ui.Context, h app.HostedRoom) {
 	}
 	ui.Row(c).Gap(16).AlignItems(ui.Center).Children(func() {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
-			ui.Text(c, "Let friends outside this network join").FontSize(k.bodySize())
-			ui.Text(c, "MixMusic asks your router to forward the room's port, and the invite link carries where friends reach this computer. Anyone with the link or the code may knock: Remove and Block keep them out.").
+			ui.Text(c, locales.RoomReachTitle()).FontSize(k.bodySize())
+			ui.Text(c, locales.RoomReachDesc()).
 				FontSize(k.smallSize()).TextColor(k.muted)
 		})
-		if s.switchOf(c.Key("room-anywhere"), &s.set.RoomAnywhere).Label("Let friends outside this network join").Changed() {
+		if s.switchOf(c.Key("room-anywhere"), &s.set.RoomAnywhere).Label(locales.RoomReachTitle()).Changed() {
 			s.save()
 			rs.SetAnywhere(s.set.RoomAnywhere)
 		}
@@ -39,7 +40,7 @@ func (s *shell) roomReach(c *ui.Context, h app.HostedRoom) {
 	}
 	note := func(text string) { ui.Text(c, text).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640) }
 	if reach.Asking {
-		note("Asking your router to forward the room's port…")
+		note(locales.RoomReachAsking())
 	}
 	for _, d := range reach.Done {
 		ui.Text(c, d).FontSize(k.bodySize()).MaxWidth(640)
@@ -48,23 +49,23 @@ func (s *shell) roomReach(c *ui.Context, h app.HostedRoom) {
 		ui.Text(c, reach.Problem).FontSize(k.bodySize()).TextColor(k.danger).MaxWidth(640)
 	}
 	if reach.Moved {
-		ui.Text(c, "The room's internet address changed since you copied its link: friends outside need the new one.").
+		ui.Text(c, locales.RoomReachMoved()).
 			FontSize(k.bodySize()).TextColor(k.danger).MaxWidth(640)
 	}
 	ui.Row(c).Gap(8).Children(func() {
-		label := "copy web link"
+		label := locales.RoomReachCopyWebLink()
 		if reach.Moved {
-			label = "copy the new web link"
+			label = locales.RoomReachCopyNewWebLink()
 		}
 		if s.button(c, "room-copy-web-link", label, reach.Moved).Clicked() {
 			if in, err := room.ParseLink(h.Link); err == nil {
 				copyText(in.WebLink())
 				rs.LinkCopied()
-				s.notes = append(s.notes, notice("Copied the web link: it opens the room in MixMusic, or offers the download"))
+				s.notes = append(s.notes, notice(locales.RoomReachCopied()))
 			}
 		}
 	})
-	note("MixMusic can't test the port from outside: ask a friend to open the link. A friend who can't connect is told the likely causes.")
+	note(locales.RoomReachTestNote())
 }
 
 // joinAtAddress joins a room at an address, as a VPN's or a router's, with
@@ -72,15 +73,15 @@ func (s *shell) roomReach(c *ui.Context, h app.HostedRoom) {
 func (s *shell) joinAtAddress(c *ui.Context) {
 	k := &s.lk
 	v := &s.rooms
-	ui.Text(c, "Or join a room at an address, with its code: its host's address on a VPN you both run, or its router's, with the port.").
+	ui.Text(c, locales.RoomReachAddressIntro()).
 		FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 	ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-		ui.TextInput(c.Key("room-at-addr"), &v.addr).Width(220).Label("Room's address").Placeholder("203.0.113.7:41234")
-		in := ui.TextInput(c.Key("room-at-code"), &v.addrCode).Width(120).Label("Room code").Placeholder("ABC 123")
+		ui.TextInput(c.Key("room-at-addr"), &v.addr).Width(220).Label(locales.RoomReachAddressLabel()).Placeholder("203.0.113.7:41234")
+		in := ui.TextInput(c.Key("room-at-code"), &v.addrCode).Width(120).Label(locales.RoomReachCodeLabel()).Placeholder("ABC 123")
 		_, codeOK := room.ParseCode(v.addrCode)
 		_, addrOK := room.InviteAddr(v.addr, 0)
 		knock := in.Submitted()
-		if s.button(c, "room-knock-at", "join", false).Label("Join at the address").Disabled(!codeOK || !addrOK).Clicked() {
+		if s.button(c, "room-knock-at", locales.RoomReachJoinButton(), false).Label(locales.RoomReachJoinAtAddress()).Disabled(!codeOK || !addrOK).Clicked() {
 			knock = true
 		}
 		if knock && codeOK && addrOK {
@@ -103,7 +104,7 @@ func (s *shell) joinRoomItem(m *ui.Menu) {
 	if !s.roomsShown() {
 		m.Separator()
 	}
-	if m.Item("Join a room…").Chosen() {
+	if m.Item(locales.RoomReachJoinMenu()).Chosen() {
 		s.navigate(roomsPath)
 	}
 }

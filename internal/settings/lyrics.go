@@ -92,6 +92,17 @@ var LyricBallMotions = []LyricBallMotion{LyricBallMix, LyricBallHop, LyricBallBo
 type Lyrics struct {
 	// LyricsPlain shows synchronized lyrics as plain text.
 	LyricsPlain bool `json:"lyricsPlain"`
+	// LyricsSources are the sources of lyrics as the user put them in
+	// order and switched them off, by their keys; none asks every source,
+	// in their own order (SourceOrder).
+	LyricsSources []LyricsSource `json:"lyricsSources"`
+	// LyricsPreferWords has lyrics timed word by word from a later source
+	// win over lyrics timed line by line from an earlier one.
+	LyricsPreferWords bool `json:"lyricsPreferWords"`
+	// LyricsCaptionLanguage is the language of the captions lyrics come
+	// from, a code of ISO 639-1 as "ja", when the video has captions in
+	// it; "" is the video's own.
+	LyricsCaptionLanguage string `json:"lyricsCaptionLanguage"`
 	// LyricsStyle is the style of the full-screen lyrics, one of
 	// LyricStyles.
 	LyricsStyle LyricStyle `json:"lyricsStyle"`
@@ -117,6 +128,7 @@ type Lyrics struct {
 // defaultLyrics is how a new install shows the lyrics.
 func defaultLyrics() Lyrics {
 	var l Lyrics
+	l.LyricsSources = []LyricsSource{}
 	l.LyricsStyle = LyricStyles[0]
 	l.LyricsSize = 1
 	l.LyricsBall = true
@@ -128,6 +140,10 @@ func defaultLyrics() Lyrics {
 
 // clean is l without the languages that aren't one.
 func (l Lyrics) clean() Lyrics {
+	l.LyricsSources = cleanSources(l.LyricsSources)
+	if !languageRe.MatchString(l.LyricsCaptionLanguage) {
+		l.LyricsCaptionLanguage = ""
+	}
 	if !slices.Contains(LyricStyles, l.LyricsStyle) {
 		l.LyricsStyle = LyricStyles[0]
 	}

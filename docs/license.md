@@ -65,8 +65,9 @@ Settings › About › Licenses shows each of them in the app.
 
 ## What MixMusic doesn't include
 
-- **Lyrics** come from Better Lyrics, Unison, LRCLIB and YouTube Music as
-  you play, and aren't part of MixMusic. Unison's data is under the
+- **Lyrics** come from Better Lyrics, Unison, LRCLIB, YouTube Music and
+  the captions of videos on YouTube as you play, and aren't part of
+  MixMusic. Unison's data is under the
   [Unison Community License](https://github.com/better-lyrics/unison/blob/main/LICENSE-DATA.md),
   which lets people, non-profits and open-source projects like MixMusic
   use it, and asks apps that show it to credit Unison. Unison asks for the

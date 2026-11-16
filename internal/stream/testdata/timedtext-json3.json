@@ -1,0 +1,43 @@
+{
+  "wireMagic": "pb3",
+  "pens": [ {
+
+  } ],
+  "wsWinStyles": [ {
+
+  } ],
+  "wpWinPositions": [ {
+
+  } ],
+  "events": [ {
+    "tStartMs": 1360,
+    "dDurationMs": 1680,
+    "segs": [ {
+      "utf8": "[♪♪♪]"
+    } ]
+  }, {
+    "tStartMs": 18640,
+    "dDurationMs": 3240,
+    "segs": [ {
+      "utf8": "♪ Paper kites over the bay ♪"
+    } ]
+  }, {
+    "tStartMs": 22640,
+    "dDurationMs": 2120,
+    "segs": [ {
+      "utf8": "♪ I'll wait for you\nin the night ♪"
+    } ]
+  }, {
+    "tStartMs": 25000,
+    "dDurationMs": 1000,
+    "segs": [ {
+      "utf8": "\n"
+    } ]
+  }, {
+    "tStartMs": 27200,
+    "dDurationMs": 4000,
+    "segs": [ {
+      "utf8": "(crowd cheering)"
+    } ]
+  } ]
+}

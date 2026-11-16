@@ -86,7 +86,9 @@ the user left them.
   12:34 or 1:02:03. Lines that start or end with a time are chapters
   (`media.ChaptersOf`): the panel lights the one that plays, and the notch
   shows it. Links open only web pages, http and https, and times past the
-  episode's length don't seek.
+  episode's length don't seek. Under the description, the episode's
+  captions on YouTube show as its transcript (`episodetranscript.go`,
+  `Catalog.Transcript`), rows of the same list after the description's.
 - **Follows.** `library.json` keeps the shows the user follows, without
   their episodes, signed in or not; following one saves it on its service
   too, where the user signed in. Signed in, a show saved there, as from

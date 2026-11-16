@@ -662,6 +662,8 @@ type playerAnswer struct {
 		// in HLS, of the master playlist of HLSManifestURL.
 		IsLive bool `json:"isLive"`
 	} `json:"videoDetails"`
+	// Captions lists the video's captions (captions.go).
+	Captions     captionList `json:"captions"`
 	PlayerConfig struct {
 		// AudioConfig tells how loud the video is, as YouTube measured it
 		// with ITU-R BS.1770, and the level its apps play it at.

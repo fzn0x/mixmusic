@@ -91,7 +91,8 @@ of its own.
   translates lyrics, and
   romanizes Arabic, while you turn those on.
 - **[LRCLIB](https://lrclib.net)**, the open database of synced lyrics,
-  which MixMusic asks when Unison has none.
+  which MixMusic asks when Unison has none, and whose words timed one by
+  one light as they are sung.
 - **[kagome](https://github.com/ikawaha/kagome)**, by ikawaha, the
   Japanese morphological analyser that reads the kanji of lyrics for
   their romaji, with the IPA dictionary of

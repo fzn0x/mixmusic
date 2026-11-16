@@ -20,6 +20,20 @@
   "wavyProgress": true,
   "panel": "lyrics",
   "lyricsPlain": true,
+  "lyricsSources": [
+    {
+      "key": "lrclib"
+    },
+    {
+      "key": "betterlyrics",
+      "off": true
+    },
+    {
+      "key": "unison"
+    }
+  ],
+  "lyricsPreferWords": true,
+  "lyricsCaptionLanguage": "de",
   "lyricsStyle": "bold",
   "lyricsSize": 1.3,
   "lyricsBall": false,

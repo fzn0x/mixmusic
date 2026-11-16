@@ -154,6 +154,8 @@ type App struct {
 	lyrics       *lyrics.Client
 	unison       *lyrics.Unison
 	betterLyrics *lyrics.BetterLyrics
+	// captions reads the captions of videos, which lyrics come from too.
+	captions     *stream.Direct
 	translations *translations
 	romaji       *romaji.Dictionary
 	addons       *addons.Manager
@@ -350,6 +352,7 @@ func New(opts Options) (*App, error) {
 	a.lyrics = lyrics.New(userAgent)
 	a.unison = lyrics.NewUnison(userAgent)
 	a.betterLyrics = lyrics.NewBetterLyrics(userAgent)
+	a.captions = direct
 	a.translations = newTranslations(filepath.Join(opts.CacheDir, "lyrics-translations"))
 	a.romaji = newRomaji(opts, userAgent)
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)

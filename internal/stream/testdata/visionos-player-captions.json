@@ -1,0 +1,86 @@
+{
+  "playabilityStatus": {
+    "status": "OK"
+  },
+  "responseContext": {
+    "visitorData": "CgtUZXN0VmlzaXRvcijAgICABjIKCgJVUxIEGgAgAA%3D%3D"
+  },
+  "videoDetails": {
+    "videoId": "3IUqoyTxEU8",
+    "lengthSeconds": "200"
+  },
+  "captions": {
+    "playerCaptionsTracklistRenderer": {
+      "captionTracks": [
+        {
+          "baseUrl": "{{timedtext}}/api/timedtext?v=3IUqoyTxEU8&ei=test&caps=asr&opi=1&xoaf=5&hl=en&ip=0.0.0.0&ipbits=0&expire=1800000000&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=test&key=yt8&lang=en",
+          "name": {
+            "runs": [
+              {
+                "text": "English"
+              }
+            ]
+          },
+          "vssId": ".en",
+          "languageCode": "en",
+          "isTranslatable": true,
+          "trackName": ""
+        },
+        {
+          "baseUrl": "{{timedtext}}/api/timedtext?v=3IUqoyTxEU8&ei=test&caps=asr&opi=1&xoaf=5&hl=en&ip=0.0.0.0&ipbits=0&expire=1800000000&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=test&key=yt8&kind=asr&lang=en",
+          "name": {
+            "runs": [
+              {
+                "text": "English (auto-generated)"
+              }
+            ]
+          },
+          "vssId": "a.en",
+          "languageCode": "en",
+          "kind": "asr",
+          "isTranslatable": true,
+          "trackName": ""
+        },
+        {
+          "baseUrl": "{{timedtext}}/api/timedtext?v=3IUqoyTxEU8&ei=test&caps=asr&opi=1&xoaf=5&hl=en&ip=0.0.0.0&ipbits=0&expire=1800000000&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=test&key=yt8&lang=de-DE",
+          "name": {
+            "runs": [
+              {
+                "text": "German (Germany)"
+              }
+            ]
+          },
+          "vssId": ".de-DE",
+          "languageCode": "de-DE",
+          "isTranslatable": true,
+          "trackName": ""
+        }
+      ],
+      "audioTracks": [
+        {
+          "captionTrackIndices": [
+            0,
+            2,
+            1
+          ],
+          "defaultCaptionTrackIndex": 0,
+          "hasDefaultTrack": true,
+          "captionsInitialState": "CAPTIONS_INITIAL_STATE_OFF_RECOMMENDED"
+        }
+      ],
+      "translationLanguages": [
+        {
+          "languageCode": "de",
+          "languageName": {
+            "runs": [
+              {
+                "text": "German"
+              }
+            ]
+          }
+        }
+      ],
+      "defaultAudioTrackIndex": 0
+    }
+  }
+}

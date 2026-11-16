@@ -35,6 +35,7 @@ func detailsShell(t *testing.T, d *loaded[media.EpisodeDetails]) *shell {
 	t.Helper()
 	s := newTestShell(t)
 	s.loads["episode-details:"+detailsEpisode.ID] = d
+	s.loads["transcript:"+detailsEpisode.ID] = &loaded[lyrics.Lyrics]{done: true, err: lyrics.ErrNotFound}
 	s.loads["related-"+detailsEpisode.ID] = &loaded[[]media.Shelf]{done: true}
 	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{Synced: true, Source: "LRCLIB",
 		Lines: []lyrics.Line{{TimeMs: 0, Text: "Paper boats on the river"}}}}

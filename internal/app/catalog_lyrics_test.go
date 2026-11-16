@@ -20,9 +20,10 @@ import (
 // test has them, for a catalog asking them for lyrics.
 type lyricsSources struct {
 	c *Catalog
-	// unison and lrclib answer the lookups, which the counts count.
-	unison, lrclib      http.HandlerFunc
-	unisonAsks, lrcAsks atomic.Int32
+	// unison and lrclib answer the lookups, which the counts count, and
+	// youtube YouTube Music's requests.
+	unison, lrclib, youtube http.HandlerFunc
+	unisonAsks, lrcAsks     atomic.Int32
 	// unisonQuery is the query of Unison's last lookup.
 	unisonQuery atomic.Value
 }
@@ -32,6 +33,8 @@ func newLyricsSources(t *testing.T) *lyricsSources {
 	ls := &lyricsSources{
 		unison: status(http.StatusNotFound, `{"success":false,"code":"NOT_FOUND"}`),
 		lrclib: status(http.StatusNotFound, ""),
+		// YouTube Music has no lyrics.
+		youtube: status(http.StatusOK, "{}"),
 	}
 	unison := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ls.unisonAsks.Add(1)
@@ -44,10 +47,9 @@ func newLyricsSources(t *testing.T) *lyricsSources {
 		ls.lrclib(w, r)
 	}))
 	t.Cleanup(lrclib.Close)
-	// YouTube Music has no lyrics.
-	yt := httptest.NewServer(status(http.StatusNotFound, ""))
+	yt := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { ls.youtube(w, r) }))
 	t.Cleanup(yt.Close)
-	a := &App{lyrics: lyrics.New("test"), unison: lyrics.NewUnison("test"), youtube: youtube.New(), lyricsMemo: newMemo[lyrics.Lyrics](4)}
+	a := &App{lyrics: lyrics.New("test"), unison: lyrics.NewUnison("test"), youtube: youtube.New(), lyricsMemo: newMemo[lyrics.Lyrics](4), settings: testSettings(t)}
 	a.lyrics.BaseURL = lrclib.URL
 	a.unison.BaseURL = unison.URL
 	a.youtube.BaseURL = yt.URL
@@ -142,26 +144,34 @@ func TestLyricsInPlainWords(t *testing.T) {
 		none = "No lyrics found for this track."
 		cant = "Lyrics can't be loaded right now. Check your connection, or try again in a moment."
 	)
+	youtubeDown := status(http.StatusBadGateway, "")
 	for _, c := range []struct {
-		name           string
-		unison, lrclib http.HandlerFunc
-		text           string
-		is             error
+		name                    string
+		unison, lrclib, youtube http.HandlerFunc
+		text                    string
+		is                      error
 	}{
-		// Neither could be reached.
-		{"both down", status(http.StatusBadGateway, unisonDown), lrclibBusy, cant, lyrics.ErrUnavailable},
+		// None could be reached.
+		{"all down", status(http.StatusBadGateway, unisonDown), lrclibBusy, youtubeDown, cant, lyrics.ErrUnavailable},
+		// Some couldn't be reached, and the others have none: none found,
+		// though trying again may find some.
+		{"both down", status(http.StatusBadGateway, unisonDown), lrclibBusy, nil, none, lyrics.ErrNotFoundYet},
+		{"YouTube Music down", status(http.StatusNotFound, unisonMiss), status(http.StatusNotFound, ""), youtubeDown, none, lyrics.ErrNotFoundYet},
 		// One has none, the other couldn't be asked: none found, though
 		// trying again may find some.
-		{"LRCLIB down", status(http.StatusNotFound, unisonMiss), lrclibBusy, none, lyrics.ErrNotFoundYet},
-		{"Unison down", status(http.StatusBadGateway, unisonDown), status(http.StatusNotFound, ""), none, lyrics.ErrNotFoundYet},
-		{"Unison out of reach", nil, status(http.StatusNotFound, ""), none, lyrics.ErrNotFoundYet},
-		{"none anywhere", status(http.StatusNotFound, unisonMiss), status(http.StatusNotFound, ""), none, lyrics.ErrNotFound},
+		{"LRCLIB down", status(http.StatusNotFound, unisonMiss), lrclibBusy, nil, none, lyrics.ErrNotFoundYet},
+		{"Unison down", status(http.StatusBadGateway, unisonDown), status(http.StatusNotFound, ""), nil, none, lyrics.ErrNotFoundYet},
+		{"Unison out of reach", nil, status(http.StatusNotFound, ""), nil, none, lyrics.ErrNotFoundYet},
+		{"none anywhere", status(http.StatusNotFound, unisonMiss), status(http.StatusNotFound, ""), nil, none, lyrics.ErrNotFound},
 	} {
 		ls := newLyricsSources(t)
 		if c.unison == nil {
 			ls.c.a.unison.BaseURL = "http://127.0.0.1:1"
 		}
 		ls.unison, ls.lrclib = c.unison, c.lrclib
+		if c.youtube != nil {
+			ls.youtube = c.youtube
+		}
 		_, err := ls.c.Lyrics(context.Background(), aSong)
 		if err == nil || err.Error() != c.text || !errors.Is(err, c.is) {
 			t.Errorf("%s: %v", c.name, err)

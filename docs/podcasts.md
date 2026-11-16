@@ -77,6 +77,7 @@ Where a song shows its lyrics, an episode shows its details: in the [side panel]
 - **Links** open in your browser.
 - **Chapters:** lines that start or end with a time are chapters, and the chapter that plays lights up as the episode goes on. On a MacBook with a notch, the [notch player](desktop.md#the-player-around-the-notch) shows it, with the chapters before and after it.
 - **Where they come from:** YouTube Music's Details tab, or Spotify, asked for the first time they show, and kept: a refresh doesn't ask again.
+- **Transcript:** under the description, an episode of YouTube Music shows its captions on YouTube as a transcript, made from speech when it has no other, while [YouTube captions](lyrics.md#choose-and-order-the-sources) is on in Settings › Playback › Lyrics. Each line shows its time, the line said now lights up, and a click on a line plays the episode from there.
 
 ![Now playing an episode of the Lex Fridman Podcast, at 1:09 of 3:34:26: its cover with the visualizer on the left, and under the player its details: the show, 1.3M views, Oct 26 and 3 hr 34 min, then its description with its links](shots/episode.webp)
 

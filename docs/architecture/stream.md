@@ -77,7 +77,10 @@
   and passwords, and the home folder. Which account's answers tell Premium, the youtube
   package reads (`Client.Premium`).
   The player API also tells how loud YouTube measured each video
-  (`Stream.Loudness`, `Direct.Loudness`). Both list the streams of a
+  (`Stream.Loudness`, `Direct.Loudness`), and lists its captions
+  (`Direct.Captions`, `captions.go`), whose timedtext addresses answer the
+  visionOS client without a proof-of-origin token, and which
+  `Direct.CaptionText` reads in json3. Both list the streams of a
   video's picture beside its audio (`Stream.Videos`), which the now
   playing page plays (`Proxy.Picture`, `Proxy.ServeVideo`): a cluster or
   fragment at a time, as the index at the start of YouTube's DASH

@@ -110,6 +110,10 @@ func timedLyrics(lines []Line, source string) Lyrics {
 	return Lyrics{Lines: lines, Source: source}.Untimed()
 }
 
+// Timed makes lyrics of lines with times, by the rule of timedLyrics:
+// synced when they can be followed in time, else plain.
+func Timed(lines []Line, source string) Lyrics { return timedLyrics(lines, source) }
+
 // Plain makes lyrics of text without times.
 func Plain(text, source string) Lyrics {
 	l := Lyrics{Lines: []Line{}, Source: source}
@@ -148,6 +152,11 @@ type record struct {
 	Instrumental bool    `json:"instrumental"`
 	PlainLyrics  string  `json:"plainLyrics"`
 	SyncedLyrics string  `json:"syncedLyrics"`
+	// HasWordSync tells that Lyricsfile has the words of its lines timed
+	// (lyricsfile.go).
+	HasWordSync bool `json:"hasWordSync"`
+	// Lyricsfile is the record as a Lyricsfile, a YAML document.
+	Lyricsfile string `json:"lyricsfile"`
 }
 
 // Query names the track whose lyrics to find.
@@ -210,6 +219,13 @@ func (c *Client) Get(ctx context.Context, t Query) (Lyrics, error) {
 }
 
 func (r record) lyrics() (Lyrics, error) {
+	// Lyrics timed word by word light each word as it's sung; those
+	// MixMusic can't read show as syncedLyrics times them.
+	if r.HasWordSync && !r.Instrumental {
+		if l, ok := wordSynced(r.Lyricsfile, "LRCLIB"); ok {
+			return l, nil
+		}
+	}
 	switch {
 	case r.Instrumental:
 		return Lyrics{Instrumental: true, Lines: []Line{}, Source: "LRCLIB"}, nil

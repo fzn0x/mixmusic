@@ -368,6 +368,12 @@ func (s *shell) youtubeChannels(c *ui.Context) {
 	}, words)
 }
 
+// waitingText says how many plays wait to be sent to a scrobbling
+// service, by the word it names them by.
+func waitingText(n int, word, service string) string {
+	return plural(n, word+" waits", word+"s wait") + " to be sent, and will go once " + service + " answers."
+}
+
 // lastfmExpiredText tells what to do when Last.fm refuses the connection.
 func lastfmExpiredText(lf app.LastfmAccount) string {
 	text := "Connect again to go on scrobbling."
@@ -427,6 +433,14 @@ func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
 			}
 			s.row(c, "Scrobbling as "+lf.Name, "What you listen to joins your Last.fm profile: a track counts once half of it played, or four minutes.", func() {
 				if s.switchOf(c.Key("scrobbling"), &s.set.Scrobbling).Label("Scrobble to Last.fm").Changed() {
+					s.save()
+				}
+			})
+			if lf.Waiting > 0 && !lf.Expired && lf.Other == "" {
+				s.hint(c, waitingText(lf.Waiting, "scrobble", "Last.fm"))
+			}
+			s.row(c, "Send likes as loves", "A like loves the song on Last.fm, and an unlike takes the love back.", func() {
+				if s.switchOf(c.Key("lastfm-loves"), &s.set.LastfmLoves).Label("Send likes to Last.fm as loves").Changed() {
 					s.save()
 				}
 			})

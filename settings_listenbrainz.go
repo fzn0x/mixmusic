@@ -190,12 +190,6 @@ func listenbrainzAbout(lb app.ListenBrainzAccount) string {
 	return "What you listen to joins " + where + ": a track counts once half of it played, or four minutes."
 }
 
-// waitingText says how many plays wait to be sent to a service, by the
-// word it names them by.
-func waitingText(n int, word, service string) string {
-	return plural(n, word+" waits", word+"s wait") + " to be sent, and will go once " + service + " answers."
-}
-
 // listenbrainzExpiredText tells what to do when the server refuses the
 // token.
 func listenbrainzExpiredText(lb app.ListenBrainzAccount) string {

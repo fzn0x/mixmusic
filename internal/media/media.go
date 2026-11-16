@@ -187,6 +187,10 @@ type Artist struct {
 	Singles     []Album `json:"singles"`
 	Related     []Ref   `json:"related"`
 	URL         string  `json:"url,omitempty"`
+	// SongsID is the ID of the playlist of all the artist's songs, where
+	// their service has one, as YouTube Music links from the title of an
+	// artist's Top songs; only an artist page says so.
+	SongsID string `json:"songsId,omitempty"`
 	// Following is set when the user follows the artist on its service;
 	// only an artist page says so.
 	Following bool `json:"following,omitempty"`

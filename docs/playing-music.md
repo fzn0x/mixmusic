@@ -35,6 +35,10 @@ The [command palette](settings.md#the-command-palette) (Ctrl+K) searches too: ty
 
 A track that loads can't be paused or moved until you hear it: the play button shows that it loads, and the keys and media controls wait too. Choosing another track still leaves it.
 
+## All of an artist's songs
+
+On a YouTube Music artist's page, Play and Shuffle play all of the artist's songs: the list of them that Show all, beside Top songs, opens. The first hundred or so start at once, and the rest join the queue as they load, scattered among the songs still to play when you shuffle. A song the list holds twice plays once, and Hide explicit content leaves its explicit songs out. When the list doesn't load, the top songs play, and a notice says so; an artist YouTube Music has no list of has Play top songs alone. An artist of the music on this computer has Play and Shuffle of all their songs too. Start radio, in an artist's More menu, starts from their first top song.
+
 ## Selecting tracks
 
 Select several tracks of a list to act on them all at once:

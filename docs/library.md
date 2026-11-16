@@ -124,7 +124,7 @@ MixMusic reads playlists of up to 20,000 tracks, and the songs you liked on YouT
 
 ## The header that stays
 
-Scrolled down a playlist, an album, an artist or your liked songs, the top bar shows what you're in: its cover, its name, and Play, Shuffle and Download, which fade in as the page's head scrolls away. In a narrow window, the name shortens, and Download moves into the bar's menu.
+Scrolled down a playlist, an album, an artist or your liked songs, the top bar shows what you're in: its cover, its name, and Play, Shuffle and Download, which fade in as the page's head scrolls away. An artist's has no Download, and a Spotify artist's, whose Play plays their top songs, no Shuffle. In a narrow window, the name shortens, and Download moves into the bar's menu.
 
 The search and Sort of a playlist's tracks, and of your liked and disliked songs, stay pinned under the top bar while the list scrolls, and what you search or sort there shows from the list's start.
 

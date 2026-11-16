@@ -50,28 +50,33 @@ func (p *Player) PlayWithRadio(t media.Track) {
 // label of AI the app doesn't know yet is checked first.
 func (p *Player) PlayAll(tracks []media.Track, shuffled bool) {
 	tracks = slices.Clone(tracks)
-	p.do(func() {
-		if len(tracks) == 0 {
-			return
+	p.do(func() { p.playAll(tracks, shuffled) })
+}
+
+// playAll is PlayAll on the player's goroutine. It returns the entries it
+// queued, none when it changed nothing.
+func (p *Player) playAll(tracks []media.Track, shuffled bool) []Item {
+	if len(tracks) == 0 {
+		return nil
+	}
+	items := p.items(tracks)
+	var open []int
+	for i, it := range items {
+		if it.Skip == "" {
+			open = append(open, i)
 		}
-		items := p.items(tracks)
-		var open []int
-		for i, it := range items {
-			if it.Skip == "" {
-				open = append(open, i)
-			}
-		}
-		if len(open) == 0 {
-			p.notify(Notice{Message: allPassedOver(items), Settings: true})
-			return
-		}
-		first := open[0]
-		if shuffled {
-			first = open[rand.IntN(len(open))]
-			p.s.Shuffle = true
-		}
-		p.playItems(items, first, true)
-	})
+	}
+	if len(open) == 0 {
+		p.notify(Notice{Message: allPassedOver(items), Settings: true})
+		return nil
+	}
+	first := open[0]
+	if shuffled {
+		first = open[rand.IntN(len(open))]
+		p.s.Shuffle = true
+	}
+	p.playItems(items, first, true)
+	return items
 }
 
 // PlayNext puts tracks right after the current one. A track put there by

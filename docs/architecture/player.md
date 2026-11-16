@@ -30,6 +30,14 @@
   track's end: MixMusic's own device, given a track with nothing after it,
   may stay on it once it ended, its position counting on (#373). The time
   shown never passes the track's end.
+- **Lists that play while they're read** (`queue_list.go`, #543):
+  `PlayList` plays the first part of a list as `PlayAll` does, and
+  returns a `List`, whose `Add` adds each part after it as it comes: in
+  the queue's own order after the list's last entry and the current one,
+  and shuffled at random among the entries after the current one, before
+  the radio's (`scatter`). Once none of the list's entries is left in the
+  queue, as when another queue replaced it, `Add` adds nothing and says
+  so, which stops the reading.
 - **Crossfades** (`crossfadeTo`): the next track fades in on the
   engine's other deck, and the crossfade ends once the engine's did
   (`Stream.Fading`), which a next track whose audio is late, or a pause,

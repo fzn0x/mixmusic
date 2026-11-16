@@ -86,6 +86,8 @@ export interface Artist {
   singles: Album[];
   related: Ref[];
   url?: string;
+  /** The ID of the playlist of all the artist's songs, where their service has one, as YouTube Music does: `catalog.playlist` reads it. */
+  songsId?: string;
 }
 
 export interface Playlist {

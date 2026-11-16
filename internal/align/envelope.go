@@ -1,14 +1,16 @@
 // Package align finds where a stretch of one recording's audio is in
 // another recording's: where a song starts in its music video, which may
-// open with a scene before it or leave out its first seconds, so that the
-// song's synced lyrics keep time with the video (#565). It compares the
-// two recordings' envelopes: how loud each third of an octave from 100 Hz
-// to 3.2 kHz is, every 10 ms, which a mastering of its own, the video's
-// sound effects and the encoders' noise leave much alike where the
-// waveforms would differ. A band louder or quieter throughout, as another
-// mastering's equalizer leaves it, changes nothing, as the comparison
-// takes away each band's mean. It all runs on the computer, in a few
-// hundred milliseconds of work for a video of some minutes.
+// open with a scene before it or leave out its first seconds, and how fast
+// the video plays it, which may be a little off the song's own speed
+// (#748), so that the song's synced lyrics keep time with the video
+// (#565). It compares the two recordings' envelopes: how loud each third
+// of an octave from 100 Hz to 3.2 kHz is, every 10 ms, which a mastering
+// of its own, the video's sound effects and the encoders' noise leave much
+// alike where the waveforms would differ. A band louder or quieter
+// throughout, as another mastering's equalizer leaves it, changes
+// nothing, as the comparison takes away each band's mean. It all runs on
+// the computer, in a few hundred milliseconds of work for a video of some
+// minutes.
 package align
 
 import (

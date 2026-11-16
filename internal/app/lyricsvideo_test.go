@@ -275,8 +275,8 @@ func TestLyricsTimingOneAtATime(t *testing.T) {
 		t.Fatalf("the second: %v", state)
 	}
 	tv.waitToldOf(t, first.ID, instantCrushVideo.ID)
-	if shift, state := tv.c.a.videoTiming(instantCrushVideo, instantCrushSong); state != timingFound || shift < 12490*time.Millisecond || shift > 12510*time.Millisecond {
-		t.Errorf("the second: %v, %v", shift, state)
+	if k, state := tv.c.a.videoTiming(instantCrushVideo, instantCrushSong); state != timingFound || k.ShiftMs < 12490 || k.ShiftMs > 12510 {
+		t.Errorf("the second: %+v, %v", k, state)
 	}
 	if _, state := tv.c.a.videoTiming(first, firstSong); state != timingUnderWay {
 		t.Errorf("the first, given way, isn't measured when asked again: %v", state)
@@ -317,7 +317,7 @@ func TestTimedNote(t *testing.T) {
 		-7500 * time.Millisecond: "Timed to this video (-7.5 s)",
 		-20 * time.Millisecond:   "Timed to this video (+0.0 s)",
 	} {
-		if got := timedNote(shift); got != want {
+		if got := timedNote(shift, 1); got != want {
 			t.Errorf("timedNote(%v) = %q, want %q", shift, got, want)
 		}
 	}

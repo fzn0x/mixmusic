@@ -91,7 +91,11 @@ func newFloodRoom(t *testing.T) *testRoom {
 	host := &fakeHost{clock: clock}
 	host.play("e1", "First song", 0)
 	secret, _ := NewSecret()
-	srv := &Server{Identity: id, Name: "Desk", Code: "ABC123", Secret: secret, Host: host, Clock: clock, Timing: testTiming}
+	// A guest's place is kept longer than a flood lasts, on a busy
+	// computer too.
+	timing := testTiming
+	timing.Keep = time.Minute
+	srv := &Server{Identity: id, Name: "Desk", Code: "ABC123", Secret: secret, Host: host, Clock: clock, Timing: timing}
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)

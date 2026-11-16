@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/netip"
 	"testing"
 )
@@ -35,13 +36,46 @@ func TestNearbyOfItsKind(t *testing.T) {
 }
 
 // TestNearbyOfItsNetworks counts the networks of this computer's
-// interfaces as its own, as a network of public addresses.
+// interfaces as its own: a network of public addresses, and the
+// providers' shared range once one of its interfaces is in it, as a
+// VPN's address of /32 is.
 func TestNearbyOfItsNetworks(t *testing.T) {
 	lan := netsOf("198.51.100.0/24", "2001:db8:5::/64")
 	for addr, want := range map[string]bool{"198.51.100.77": true, "[2001:db8:5::99]:5": true, "198.51.101.1": false,
 		"[2001:db8:6::1]:5": false, "100.101.102.103": false} {
 		if got := lan.Of(addr); got != want {
 			t.Errorf("on a LAN of public addresses, Of(%q) = %v", addr, got)
+		}
+	}
+	vpn := netsOf("192.168.1.0/24", "100.70.1.2/32")
+	for addr, want := range map[string]bool{"100.101.102.103:41234": true, "100.64.0.1": true, "100.127.255.254": true,
+		"100.128.0.1": false, "100.63.255.255": false, "203.0.113.7": false} {
+		if got := vpn.Of(addr); got != want {
+			t.Errorf("on a VPN of the shared range, Of(%q) = %v", addr, got)
+		}
+	}
+}
+
+// TestInterfaceNetsKeepOneAddress reads this computer's networks: none is
+// left out for being of one address alone, as a VPN's is.
+func TestInterfaceNetsKeepOneAddress(t *testing.T) {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		t.Skip(err)
+	}
+	nets := InterfaceNets()
+	for _, a := range addrs {
+		ipn, ok := a.(*net.IPNet)
+		if !ok {
+			continue
+		}
+		ip, _ := netip.AddrFromSlice(ipn.IP)
+		found := false
+		for _, p := range nets {
+			found = found || p.Contains(ip.Unmap())
+		}
+		if !found {
+			t.Errorf("%v isn't in any of %v", a, nets)
 		}
 	}
 }

@@ -5,8 +5,10 @@ package room
 // codes (admit.go), the label of the knocks (letin.go), and the app's room
 // of the network alone, which takes connections of this computer's
 // networks alone while friends outside it may not join: a private,
-// loopback or link-local address, or one of the networks of its
-// interfaces, as a network of public addresses is.
+// loopback or link-local address, one of the networks of its interfaces,
+// as a network of public addresses is, and, while one of its interfaces is
+// in it, the providers' shared range, 100.64.0.0/10, which VPNs such as
+// Tailscale give their computers, each an address of its own.
 
 import (
 	"net"
@@ -15,25 +17,32 @@ import (
 	"time"
 )
 
+// sharedNet is the range providers share among their customers (RFC 6598),
+// which VPNs give their computers too.
+var sharedNet = netip.MustParsePrefix("100.64.0.0/10")
+
 // NearbyOf reports whether ip is of this computer's own networks, as nets,
 // its interfaces' (InterfaceNets), tell them: private, loopback or
-// link-local, or of one of nets.
+// link-local, of one of nets, or of the providers' shared range while one
+// of nets is in it, as a VPN's address is: the others on the VPN reach this
+// computer there, and only they do.
 func NearbyOf(ip netip.Addr, nets []netip.Prefix) bool {
 	ip = ip.Unmap().WithZone("")
 	if ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() {
 		return true
 	}
+	shared := sharedNet.Contains(ip)
 	for _, p := range nets {
-		if p.Contains(ip) {
+		if p.Contains(ip) || shared && sharedNet.Contains(p.Addr()) {
 			return true
 		}
 	}
 	return false
 }
 
-// InterfaceNets are the networks of this computer's interfaces, but those
-// of one address alone, as a VPN's of /32, which tell nothing of who else
-// is on them.
+// InterfaceNets are the networks of this computer's interfaces, those of
+// one address alone too, as a VPN's of /32: they tell nothing of who else
+// is on them, but that this computer is on the VPN.
 func InterfaceNets() []netip.Prefix {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
@@ -47,7 +56,7 @@ func InterfaceNets() []netip.Prefix {
 		}
 		ip, ok := netip.AddrFromSlice(ipn.IP)
 		ones, bits := ipn.Mask.Size()
-		if !ok || ones == bits || bits == 0 {
+		if !ok || bits == 0 {
 			continue
 		}
 		ip = ip.Unmap()

@@ -1,9 +1,10 @@
 package room
 
 // The host's rules for its guests (#734): what becomes of the songs they
-// add (songs.go), and whether they may control its player (control.go).
-// The host checks each ask of a guest as it comes, by the rules of that
-// moment: whose it is, how often it asks, and how much.
+// add (songs.go), whether they may control its player (control.go), and
+// whether its user lets in each computer that joins (letin.go). The host
+// checks each ask of a guest as it comes, by the rules of that moment:
+// whose it is, how often it asks, and how much.
 
 import (
 	"time"
@@ -19,6 +20,10 @@ type Rules struct {
 	// Control lets the guests play, pause, and move to the next or the
 	// last track of the host's queue.
 	Control bool `json:"control,omitempty"`
+	// Ask has the host's user let in each computer that joins, by the code
+	// or the link: guests that come back by their keys aren't asked about.
+	// The guests aren't told.
+	Ask bool `json:"-"`
 }
 
 func (r Rules) clean() Rules {
@@ -51,6 +56,7 @@ type Guests struct {
 type asks struct {
 	next     int64
 	requests []*Request
+	knocks   []*Knock
 	limits   map[remote.Fingerprint]*limits
 	sent     *Rules
 }
@@ -139,6 +145,7 @@ type sessionAsks struct {
 	hasRules bool
 	seq      int64
 	songs    map[int64]remote.QueueTrack
+	asking   bool
 }
 
 // Rules returns what the host lets its guests do, and whether it told.

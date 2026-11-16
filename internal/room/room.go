@@ -116,6 +116,10 @@ func errOf(reason string) error {
 		return ErrBlocked
 	case reasonFull:
 		return ErrFull
+	case reasonDeclined:
+		return ErrDeclined
+	case reasonManyAsk:
+		return ErrManyAsk
 	case reasonGone:
 		return ErrNotGuest
 	case reasonRemoved:

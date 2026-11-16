@@ -525,6 +525,11 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 		default:
 			continue
 		}
+		// The host's user lets it in, when the rules ask them.
+		if reason := s.letIn(c, name, msgs); reason != "" {
+			refuse(reason)
+			return false
+		}
 		st := s.Host.State()
 		s.mu.Lock()
 		reason := s.refusal(c.key)

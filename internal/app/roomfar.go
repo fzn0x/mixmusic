@@ -61,11 +61,11 @@ func (a *App) linkRoom(id string) (room.Found, bool) {
 }
 
 // roomElsewhere tells where else the room this computer knocks at, or
-// comes back to, is reached: the addresses of its invite link, and the
-// others its host told discovery, as on a VPN, which a connection to its
-// host's key tries beside the one found on the network, keeping the first
-// that is the host (room.Guest.Elsewhere). With none, the room is of the
-// network alone.
+// comes back to, is reached: the addresses of its invite link, the others
+// its host told discovery, as on a VPN, and where it moved, as its old
+// host reached it, which a connection to its host's key tries beside the
+// one found on the network, keeping the first that is the host
+// (room.Guest.Elsewhere). With none, the room is of the network alone.
 func (a *App) roomElsewhere() []string {
 	g := a.guestRoom()
 	if g == nil {
@@ -77,6 +77,9 @@ func (a *App) roomElsewhere() []string {
 	defer r.mu.Unlock()
 	if f, ok := r.found[g.id]; ok {
 		out = append(out, f.found.Others...)
+	}
+	if g.hint != "" {
+		out = append(out, g.hint)
 	}
 	return out
 }

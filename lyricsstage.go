@@ -161,28 +161,40 @@ func (s *shell) lyricStage(c *ui.Context) {
 	})
 }
 
-// stageGround paints the ground of the stage on its panel, from the track's
-// cover, small, which the GPU blends between the pixels of as it stretches
-// it (as the grounds of Aurora and Glasshouse are: groundLights).
+// stageGround paints the ground of the stage on its panel: the track's cover,
+// blurred to a wash of its colours (as coverBackdrop's is), overhanging the
+// panel by three sigma so the blur's transparent rim falls outside it, under
+// the scrim. Stretched alone, a small cover shows its pixels on a big window.
 func (s *shell) stageGround(c *ui.Context, panel ui.Element, t media.Track, st lyricStyle) {
+	const sigma, size = 60, 96 // the blur hides detail: a small bitmap does
 	var b *ui.Bitmap
 	if len(t.Artwork) > 0 {
-		b = s.art.get(c, artworkURL(t.Artwork, 64), 64)
+		b = s.art.get(c, artworkURL(t.Artwork, size), size)
 	}
-	accent := s.lk.accent
-	panel.Background(ui.Color{A: 255}).Draw(func(p *ui.Painter, r ui.Rect) { paintStageGround(p, r, b, accent, st.scrim) })
+	panel.Background(ui.Color{A: 255})
+	if b == nil {
+		accent := s.lk.accent
+		panel.Draw(func(p *ui.Painter, r ui.Rect) { paintStageGround(p, r, nil, accent, st.scrim) })
+		return
+	}
+	ui.Image(c.Key("stage-ground"), b).Absolute().Top(-3 * sigma).Right(-3 * sigma).Bottom(-3 * sigma).Left(-3 * sigma).Fit(ui.Cover).Blur(sigma).PassThrough()
+	ui.Box(c.Key("stage-veil")).Absolute().Top(0).Right(0).Bottom(0).Left(0).PassThrough().Draw(func(p *ui.Painter, r ui.Rect) { paintStageVeil(p, r, st.scrim) })
 }
 
 // paintStageGround paints the ground of the stage on r: the cover b,
-// stretched over it, then a dark layer of the scrim's strength, and a
-// gradient that darkens its foot. Without a cover, the accent's light stands
-// in for it.
+// stretched over it, then the veil. Without a cover, the accent's light
+// stands in for it.
 func paintStageGround(p *ui.Painter, r ui.Rect, b *ui.Bitmap, accent ui.Color, scrim float32) {
 	if b != nil {
 		p.Image(b, r, ui.Cover)
 	} else {
 		p.Fill(r, accent.Alpha(0.4), 0)
 	}
+	paintStageVeil(p, r, scrim)
+}
+
+// paintStageVeil darkens r by the scrim's strength, and its foot more.
+func paintStageVeil(p *ui.Painter, r ui.Rect, scrim float32) {
 	p.Fill(r, ui.Color{A: uint8(255 * scrim)}, 0)
 	p.FillGradient(r, ui.LinearGradient{From: ui.Color{}, To: ui.Color{A: 120}, Angle: 180}, 0)
 }

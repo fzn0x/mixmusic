@@ -55,10 +55,10 @@ const (
 // counts once.
 //
 // The app calls Observe about once a second and on every change of the
-// player, and Send when Observe reports something to send. Scrobbles wait in
-// a queue until the service accepts them; the app saves the queue with OnQueue
-// and restores it with SetQueue. The methods of a Scrobbler are safe for
-// concurrent use.
+// player, and runs Run beside it, which calls Send whenever something
+// waits to be sent. Scrobbles wait in a queue until the service accepts
+// them; the app saves the queue with OnQueue and restores it with
+// SetQueue. The methods of a Scrobbler are safe for concurrent use.
 type Scrobbler struct {
 	// OnQueue is called with the scrobbles waiting to be sent each time they
 	// change, to save them for the next run. It is called while the

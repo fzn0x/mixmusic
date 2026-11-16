@@ -11,6 +11,9 @@ Copyright 2022 The Noto Project Authors (https://github.com/notofonts/thai)
 NotoSansArabic-subset.ttf, from Noto Sans Arabic:
 Copyright 2015-2020 Google LLC. All Rights Reserved.
 
+NotoSansCJKjp-VF-subset.otf, from the variable Noto Sans CJK JP:
+© 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 http://scripts.sil.org/OFL

@@ -7,6 +7,7 @@ import (
 	"github.com/go-text/typesetting/bidi"
 	"github.com/go-text/typesetting/di"
 	gotext "github.com/go-text/typesetting/font"
+	ot "github.com/go-text/typesetting/font/opentype"
 	"github.com/go-text/typesetting/shaping"
 	"golang.org/x/image/math/fixed"
 	"golang.org/x/image/vector"
@@ -29,20 +30,29 @@ type shaper struct {
 	mask   []byte
 }
 
-// face is a font's face.
+// face is a font's face, set to a weight when the font is variable.
 type face struct {
 	*gotext.Face
+	weight int
 }
 
 func newShaper() *shaper { return &shaper{faces: map[*fontData]*face{}} }
 
-// face is the face of d for a line of weight. A font is shaped through one
-// face, which HarfBuzz's caches keep.
+// wght is the tag of the weight axis.
+var wght = ot.MustNewTag("wght")
+
+// face is the face of d set to weight. A font is shaped through one face,
+// which HarfBuzz's caches keep, and a variable one is set to the weight of
+// the line before it is shaped or drawn.
 func (s *shaper) face(d *fontData, weight int) *face {
 	fc, ok := s.faces[d]
 	if !ok {
 		fc = &face{Face: gotext.NewFace(d.font)}
 		s.faces[d] = fc
+	}
+	if d.variable && fc.weight != weight {
+		fc.SetVariations([]gotext.Variation{{Tag: wght, Value: float32(weight)}})
+		fc.weight = weight
 	}
 	return fc
 }

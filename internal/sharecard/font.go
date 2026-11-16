@@ -13,7 +13,8 @@ import (
 )
 
 // Font is a font a card's text can be set in, read with go-text, which
-// shapes text by the font's rules. A font parsed from its data, as the bundled faces are, is read
+// shapes text by the font's rules and reads TrueType, CFF and CFF2
+// outlines. A font parsed from its data, as the bundled faces are, is read
 // whole. A font of the system is read in two steps: the letters it has up
 // front, and the rest when a card needs one of them. The rest is held
 // weakly: once no card uses it, it goes, and the next card that needs it
@@ -34,6 +35,9 @@ type Font struct {
 type fontData struct {
 	font *gotext.Font
 	upem float64
+	// variable is set when the font has axes, as a weight's, so that a
+	// face is set to the weight of the line it draws.
+	variable bool
 }
 
 // errNoUnits is the error of a font that sets no units per em.
@@ -83,7 +87,7 @@ func readFont(ld *ot.Loader) (*fontData, error) {
 	if f.Upem() == 0 {
 		return nil, errNoUnits
 	}
-	return &fontData{font: f, upem: float64(f.Upem())}, nil
+	return &fontData{font: f, upem: float64(f.Upem()), variable: ld.HasTable(ot.MustNewTag("fvar"))}, nil
 }
 
 // openFont reads which letters the font of file has, the first font of a
@@ -121,9 +125,9 @@ func openFont(file string) *Font {
 }
 
 // drawable reports whether the font of ld has outlines a card can draw:
-// TrueType or CFF ones.
+// TrueType, CFF or CFF2 ones.
 func drawable(ld *ot.Loader) bool {
-	for _, tag := range []string{"glyf", "CFF "} {
+	for _, tag := range []string{"glyf", "CFF ", "CFF2"} {
 		if ld.HasTable(ot.MustNewTag(tag)) {
 			return true
 		}

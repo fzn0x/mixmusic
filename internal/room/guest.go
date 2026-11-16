@@ -195,8 +195,12 @@ type Event struct {
 	Seq   int64
 	Entry string
 	Track remote.QueueTrack
-	// Reason is of what the host tells beside what it plays (rules.go).
+	// Reason, Seats, Key and Addr are of the host's rules and of a move
+	// (rules.go, move.go).
 	Reason string
+	Seats  Seats
+	Key    remote.Fingerprint
+	Addr   string
 }
 
 // Session is a guest's stay in a room: what the host plays, and who

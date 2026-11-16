@@ -59,6 +59,7 @@ type asks struct {
 	knocks   []*Knock
 	limits   map[remote.Fingerprint]*limits
 	sent     *Rules
+	move     *move
 }
 
 // rules are the host's rules now: with no Guests, guests add no songs,
@@ -146,6 +147,7 @@ type sessionAsks struct {
 	seq      int64
 	songs    map[int64]remote.QueueTrack
 	asking   bool
+	moved    *Move
 }
 
 // Rules returns what the host lets its guests do, and whether it told.

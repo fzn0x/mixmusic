@@ -86,6 +86,10 @@ type Server struct {
 	// app does as they ask (rules.go): without, guests add no songs,
 	// control nothing, and join without asking.
 	Guests *Guests
+	// Seats, when set, are of the room this one moved from (move.go): it
+	// keeps the places of its guests and its host as it opens, and blocks
+	// the keys it blocked.
+	Seats *Seats
 
 	mu      sync.Mutex
 	ln      net.Listener
@@ -140,9 +144,11 @@ type conn struct {
 	out  chan message
 	once sync.Once
 	gone chan struct{}
-	// in are its messages, once it proved who it is (messages).
-	inOnce sync.Once
-	in     chan message
+	// features are what the other end's hello said it can do; in are its
+	// messages, once it proved who it is (messages).
+	features []string
+	inOnce   sync.Once
+	in       chan message
 }
 
 // outQueue is how many messages may wait to go to a guest: one slower
@@ -192,6 +198,7 @@ func (s *Server) Serve(ln net.Listener) error {
 	}
 	s.ln = ln
 	s.adm.caps = s.caps.orDefault()
+	s.seat()
 	s.start()
 	s.mu.Unlock()
 	for {
@@ -323,6 +330,7 @@ func (s *Server) handle(raw net.Conn, u *unproven) {
 		return
 	}
 	name := CleanName(hello.Name)
+	c.features = hello.Features
 	switch hello.Want {
 	case wantRejoin:
 		if reason := s.comeBack(c, name); reason != "" {

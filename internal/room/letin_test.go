@@ -75,10 +75,11 @@ func TestLetInFirst(t *testing.T) {
 	back.Close()
 }
 
-// TestLetInBounded turns away a computer once maxKnocks wait.
+// TestLetInBounded turns away a computer once maxKnocksFrom of its source
+// wait.
 func TestLetInBounded(t *testing.T) {
 	r, _ := newRuledRoom(t, Rules{Ask: true})
-	for i := range maxKnocks {
+	for i := range maxKnocksFrom {
 		joining(r.knockByLink(newGuest(t, "Guest")))
 		waitFor(t, "the knock", func() bool { return len(r.server.Knocks()) == i+1 })
 	}

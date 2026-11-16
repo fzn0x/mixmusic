@@ -136,7 +136,8 @@ func TestRoomLetInFromThePage(t *testing.T) {
 	show(desk, dt, roomsPath)
 	joinByLink(t, desk, dt, lap, lt)
 	untilBoth(t, desk, dt, lap, lt, "the knock", func() bool {
-		return lt.HasText("Waiting for Desk to let you in…") && dt.HasText("Asking to join")
+		return lt.HasText("Waiting for Desk to let you in…") && dt.HasText("Asking to join") &&
+			len(desk.a.Rooms().Knocks()) == 1 && dt.HasText(desk.a.Rooms().Knocks()[0].Key+" · on this network")
 	})
 	click(t, desk, dt, "Let Lap in")
 	untilBoth(t, desk, dt, lap, lt, "in the room", func() bool { return lt.HasText("In Desk's room") })

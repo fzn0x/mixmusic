@@ -62,6 +62,7 @@ type asks struct {
 	next         int64
 	requests     []*Request
 	knocks       []*Knock
+	knockTold    map[string]time.Time
 	limits       map[remote.Fingerprint]*limits
 	sourceLimits map[string]*limits
 	looking      map[remote.Fingerprint]int

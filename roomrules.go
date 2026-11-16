@@ -63,7 +63,14 @@ func (s *shell) roomWaiting(c *ui.Context) {
 		for _, kn := range knocks {
 			id := strconv.FormatInt(kn.ID, 10)
 			ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, kn.Name).FontSize(k.bodySize()).Grow(1).MinWidth(0)
+				where := "from the internet"
+				if kn.Local {
+					where = "on this network"
+				}
+				ui.Column(c).Grow(1).MinWidth(0).Children(func() {
+					ui.Text(c, kn.Name).FontSize(k.bodySize())
+					ui.Text(c, kn.Key+" · "+where).FontSize(k.smallSize()).TextColor(k.muted)
+				})
 				if s.button(c, "room-let-in-"+id, "let in", true).Label("Let " + kn.Name + " in").Clicked() {
 					rs.LetIn(kn.ID, true)
 				}

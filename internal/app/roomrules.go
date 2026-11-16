@@ -207,10 +207,14 @@ func (rs *Rooms) Decline(id int64) {
 }
 
 // RoomKnock is a computer that asks to join the room this computer hosts:
-// its ID, as LetIn names it, and its name in rooms.
+// its ID, as LetIn names it, its name in rooms, the start of its key's ID,
+// which tells two of one name apart, and whether it knocks from this
+// computer's own networks.
 type RoomKnock struct {
-	ID   int64
-	Name string
+	ID    int64
+	Name  string
+	Key   string
+	Local bool
 }
 
 // Knocks returns the computers that wait for the user to let them in, the
@@ -222,7 +226,7 @@ func (rs *Rooms) Knocks() []RoomKnock {
 	}
 	var out []RoomKnock
 	for _, k := range h.server.Knocks() {
-		out = append(out, RoomKnock{ID: k.ID, Name: k.Name})
+		out = append(out, RoomKnock{ID: k.ID, Name: k.Name, Key: k.Key, Local: k.Local})
 	}
 	return out
 }

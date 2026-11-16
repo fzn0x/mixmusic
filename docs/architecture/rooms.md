@@ -127,10 +127,16 @@ few computers that proved nothing yet (`admit.go`).
   as a home's router has from its provider, within which one home changes
   its addresses as it likes. A source tries 5 codes, then waits a minute.
 - **Room-wide.** The room takes 30 wrong codes a minute in all, from
-  whatever sources of the internet, and 30 more of its own network,
-  private, loopback or link-local, apart, so that wrong codes from the
-  internet lock no code out on the network: past them, it checks no code
-  of those until the minute is over.
+  whatever sources of the internet, and 30 more of this computer's own
+  networks apart (`nearby.go`), so that wrong codes from the internet
+  lock no code out on the network: past them, it checks no code of those
+  until the minute is over. Its own networks are private, loopback and
+  link-local addresses, the networks of its interfaces, of public
+  addresses too, and the providers' shared range, 100.64.0.0/10, while
+  one of its interfaces is in it, as a VPN's such as Tailscale's: each
+  connection is told one or the other as it comes, by its whole address,
+  and the room of the network (below) and the knocks' label tell them
+  alike.
   At 30 a minute, 43,200 a day, the 33^6, about 1.29 billion, codes take
   82 years, half of them 41; a room lasts an evening. A link's secret,
   of 128 bits, isn't guessed, and isn't counted: link holders, and guests
@@ -164,7 +170,8 @@ few computers that proved nothing yet (`admit.go`).
   of this computer's networks alone, before TLS.
 - **The previews** (`previews.go`): those that proved the code or the
   link and wait to join, as a link forwarded beyond its friends brings.
-  The room holds 4 of a source and 32 in all: a new one takes the place
+  The room holds 8 of a source, as many as a household behind one
+  address knocks with at once, and 32 in all: a new one takes the place
   of the oldest of its source, or of the source that holds the most, and
   each waits 5 minutes at most (`Preview`), then is told the preview
   ended. One that waits for the host's user to let it in
@@ -241,7 +248,8 @@ page, which nothing waits on.
   signed in to Spotify, as nothing else tells what it is. It finds them
   beside the guest's messages, 16 at once in the room (`maxLooks`), 4 of
   a guest (`maxLooksEach`), 10 at once then one a second (`lookBurst`,
-  `lookEvery`), 10 s each at most; a song of no title it refuses first.
+  `lookEvery`), 10 s each at most; a song of no title it refuses first,
+  and one the room finds no more of for now spends none of the guest's.
   In Ask me first, a file of the
   guest's waits for the host's user, who finds it among their files as
   they accept it, so that the guest learns nothing of the host's files
@@ -287,27 +295,33 @@ the hello's features):
    `declined`). The host waits a minute for that (`AnswerFor`). Once its
    user agreed, the guest opens a room of its own, of a new code and link,
    which keeps those places as of guests that dropped off and blocks
-   those keys (`Seats`), and says at which port (`hosting`). That room
+   those keys (`Seats`), and says at which port, and, while friends
+   outside its network may join, where they reach it, as its router
+   forwards a port, which may be another (`hosting`, `Addrs`). That room
    lets no one in until the room moved there (`Open`).
 3. The host tells each other guest where (`reach`): the new host's key,
    and its address, as the host's connection with it tells, with that
-   port. Each tries a TLS connection to that key, where discovery finds it
-   or at that address, and says whether it got one (`reach`); the host
-   tries it too. A guest tries once each 10 s at most, at that address
-   and where discovery finds that key alone, its tries all ending by 3 s
-   after it was asked, as it says it didn't then, however soon it knew,
-   so that a host can't use its guests to knock at address after address.
-4. Once all did, the host tells them all the room moved (`moved`), before
-   it ends the room: each comes back to the new host by its key, as after
-   a drop, the host too. The new host's player takes the room's queue,
-   where the host played it.
+   port; or, to a guest outside the host's networks, or each guest when
+   the new host is outside them, where it is reached from outside its
+   network, as the host itself tries it. Each tries a TLS connection to
+   that key, where discovery finds it or at that address, and says
+   whether it got one (`reach`); the host tries it too. A guest tries
+   once each 10 s at most, at that address and where discovery finds
+   that key alone, its tries all ending by 3 s after it was asked, as it
+   says it didn't then, however soon it knew, so that a host can't use
+   its guests to knock at address after address.
+4. Once all did, the host tells them all the room moved (`moved`), each
+   at the address it tried, before it ends the room: each comes back to
+   the new host by its key, as after a drop, the host too. The new
+   host's player takes the room's queue, where the host played it.
 
 One that can't reach it, or no answer in 10 s once the guest opened its
 room (`MoveFor`), keeps the room where it is: the guest is told to close
 the room it opened (`unhost`), which it also closes by itself after twice
 that. So does a Remove or a Block meanwhile, as the room it would move to
-keeps the seats and blocks of its asking, a guest that leaves, and the
-guest it moves to leaving. As it moves, and once it moved, the room lets no one join, or
+keeps the seats and blocks of its asking, under the lock that takes the
+guest out, so that the move can't go on between, a guest that leaves,
+and the guest it moves to leaving. As it moves, and once it moved, the room lets no one join, or
 come back (`moving`), as their places wouldn't move with it. A guest takes
 a seat only of a key, 201 at most.
 

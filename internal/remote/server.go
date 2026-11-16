@@ -222,6 +222,11 @@ func (s *Server) handle(raw net.Conn) {
 		return
 	}
 	c := &serverConn{conn: tc, w: newWire(tc), peer: peer}
+	// A computer not paired may pair, or is refused: its messages are of a
+	// pairing's size until its key is paired.
+	if !s.Host.Allowed(peer) {
+		c.w.f.Limit(unpairedMessage)
+	}
 	if !s.add(c) {
 		return
 	}
@@ -242,6 +247,9 @@ func (s *Server) handle(raw net.Conn) {
 			_ = c.w.send(message{Type: "refused", Reason: reasonNotPaired}, t.silence())
 			return
 		}
+		// Its key is paired, as Allowed told after TLS, or since: its
+		// hand-overs may be long.
+		c.w.f.Limit(0)
 		s.session(c)
 	}
 }

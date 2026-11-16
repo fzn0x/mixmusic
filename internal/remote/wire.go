@@ -18,6 +18,12 @@ const alpn = "mixmusic-remote/1"
 // maxMessage bounds a message, in bytes.
 const maxMessage = 1 << 20
 
+// unpairedMessage bounds a message of a computer whose key the server
+// doesn't know as paired, in bytes: a hello, a pairing's commit and open,
+// and a confirm are a few hundred (#736). A paired computer's hand-over
+// may take maxMessage.
+const unpairedMessage = 4 << 10
+
 // What a hello wants.
 const (
 	wantPair    = "pair"

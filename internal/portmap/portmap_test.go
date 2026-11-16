@@ -280,8 +280,14 @@ func TestReachableIPv6(t *testing.T) {
 		}
 	}
 	for _, a := range PublicIPv6() {
-		if !reachableIPv6(a) {
+		if !reachableIPv6(a) || eui64(a) {
 			t.Errorf("PublicIPv6 tells %s", a)
+		}
+	}
+	// An address made of a hardware address tells it.
+	for a, want := range map[string]bool{"2a01:4f8::21a:2bff:fe3c:4d5e": true, "2a01:4f8::9d3c:7a11:52e0:1b6f": false} {
+		if got := eui64(netip.MustParseAddr(a)); got != want {
+			t.Errorf("eui64(%s) = %v", a, got)
 		}
 	}
 }

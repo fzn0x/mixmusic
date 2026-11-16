@@ -178,3 +178,69 @@ func TestGuestFarAwayJoinsThroughAFlood(t *testing.T) {
 		s.Leave()
 	}
 }
+
+// TestGuestJoinsThroughAFloodOfPreviews has 16 sources knock with the
+// link, as fast as the room takes them, and never join, as someone the
+// link reached might: the room holds 32 previews at most, and a guest
+// knocking meanwhile joins, as one that comes back does.
+func TestGuestJoinsThroughAFloodOfPreviews(t *testing.T) {
+	r := newFloodRoom(t)
+	back := newGuest(t, "Back")
+	back.Dial = func(ctx context.Context, _, addr string) (net.Conn, error) { return dialFrom(ctx, addr, "198.51.100.9") }
+	r.join(back).Close()
+	waitFor(t, "the guest away", func() bool { m := r.server.Members(); return len(m) == 1 && !m[0].Here })
+	stop := make(chan struct{})
+	var wg sync.WaitGroup
+	for i := range 16 {
+		for range 8 {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				g := newGuest(t, "Looker")
+				src := fmt.Sprintf("203.0.113.%d", i+1)
+				g.Dial = func(ctx context.Context, _, addr string) (net.Conn, error) { return dialFrom(ctx, addr, src) }
+				for {
+					select {
+					case <-stop:
+						return
+					default:
+					}
+					s, err := g.Knock(context.Background(), r.addr, &r.key, r.server.Secret, true)
+					if err != nil {
+						continue
+					}
+					select {
+					case <-stop:
+					case <-s.Done():
+					}
+					s.Close()
+				}
+			}()
+		}
+	}
+	defer func() {
+		close(stop)
+		wg.Wait()
+	}()
+	waitFor(t, "the previews full", func() bool { return previewsHeld(r) >= maxPreviews })
+	for i := range 3 {
+		if n := previewsHeld(r); n > maxPreviews {
+			t.Fatalf("%d previews held", n)
+		}
+		g := newGuest(t, "Friend")
+		g.Dial = func(ctx context.Context, _, addr string) (net.Conn, error) { return dialFrom(ctx, addr, "198.51.100.7") }
+		s, err := g.Knock(context.Background(), r.addr, &r.key, r.server.Secret, true)
+		if err != nil {
+			t.Fatalf("knock %d through the previews: %v", i, err)
+		}
+		if err := s.Join(context.Background()); err != nil {
+			t.Fatalf("join %d through the previews: %v", i, err)
+		}
+		s.Leave()
+	}
+	again, err := back.Rejoin(context.Background(), r.addr, r.key)
+	if err != nil {
+		t.Fatalf("a guest that comes back through the previews: %v", err)
+	}
+	again.Close()
+}

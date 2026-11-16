@@ -7,7 +7,7 @@ YouTube Music's podcasts play with no account. Spotify's play [from Spotify itse
 
 ## Find shows and episodes
 
-[Search](playing-music.md#search) for a show or an episode, then choose the Podcasts pivot of the results. It shows the shows found as tiles, then the episodes found, each with its show's name. The services choice above the results keeps both services, only Spotify's or only YouTube Music's. MixMusic asks the services for podcasts only once you open the pivot.
+[Search](playing-music.md#search) for a show or an episode, then choose the Podcasts pivot of the results. It shows the shows found as tiles, then the episodes found, each with its show's name. The services choice above the results keeps both services with All music, only Spotify's or only YouTube Music's. MixMusic asks the services for podcasts only once you open the pivot.
 
 - **A show's tile** opens its page. Its play button plays the episode you left partway, or else the newest one. Its menu has Open, Play and Copy link.
 - **An episode's row** plays it, with the episodes after it in the list: double-click the row, or click its cover.

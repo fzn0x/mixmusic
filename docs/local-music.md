@@ -73,7 +73,7 @@ manage opens Settings.
 ## Search
 
 The search finds the music on this computer too, in its own section, On
-this computer, above the results of the services, with both services
+this computer, above the results of the services, with All music
 chosen. It finds tracks by their titles, artists and albums, regardless
 of case and accents, and shows even without the network.
 

@@ -109,6 +109,9 @@ both services in one player:
 - `mixmusic://` links.
 - **Last.fm:** every track you hear joins your profile, and scrobbles made
   offline are sent once you are back online.
+- **ListenBrainz:** the same, beside Last.fm or without it, to
+  ListenBrainz or a server of your own, such as Maloja. Likes can go to
+  either as loves.
 - **Discord:** your profile shows what plays, with its artwork and the time
   left.
 - **Updates:** MixMusic checks for a new release at start and every few
@@ -270,6 +273,9 @@ desktop.
   [last.fm/api/account/create](https://www.last.fm/api/account/create)
   (any name, no callback URL), paste its API key and shared secret in
   Settings › Accounts, and approve MixMusic in your browser.
+- **ListenBrainz:** paste the user token of your
+  [ListenBrainz settings](https://listenbrainz.org/settings/), or of your
+  own server, in Settings › Accounts.
 - **Discord:** while the Discord app runs, your profile shows what you
   listen to. Turn it off in Settings › Desktop.
 
@@ -485,6 +491,8 @@ talks to:
   readings of kanji (11.7 MB). Romaji is made on your computer: the
   lyrics aren't sent.
 - **Last.fm,** once you connect it: what you play.
+- **ListenBrainz,** or your own server of its API, once you connect it:
+  what you play.
 - **Discord,** unless you turn it off: what plays, sent to the Discord app
   on your computer, which shows it on your profile.
 

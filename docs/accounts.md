@@ -1,12 +1,12 @@
 # Accounts
 <!-- docs: group=start order=20 -->
 
-Sign in to YouTube Music, Spotify and Last.fm in MixMusic, all optional:
+Sign in to YouTube Music, Spotify, Last.fm and ListenBrainz in MixMusic, all optional:
 the sign-in window, your own browser, a browser's session, brand channels, scrobbling and signing out.
 
 MixMusic needs no account: YouTube Music's search, artists, albums,
 playlists and radios work signed out, as soon as you open it. Sign in for
-your own library and recommendations. All three accounts are in Settings ›
+your own library and recommendations. Every account is in Settings ›
 Accounts, and MixMusic keeps each sign-in in your system's
 [credential store](data-and-privacy.md#sign-ins) (the keyring on Linux): on
 Windows, one the Credential Manager can't keep goes in a file encrypted for
@@ -223,9 +223,16 @@ Last.fm API account of your own:
 Settings › Accounts then says **Scrobbling as** your name, with a switch
 that pauses scrobbling and starts it again. A track counts once half of it
 played, or four minutes, and scrobbles made offline are sent once you're
-back online. Last.fm hears that a [live stream](playing-music.md#live-streams)
-plays, but it isn't scrobbled, and [podcasts' episodes](podcasts.md#not-counted)
-aren't either.
+back online: as soon as MixMusic hears the network again, and after a send
+that failed, again after 15 seconds, then twice as long each time, up to
+every 5 minutes. While scrobbles wait, a line under **Scrobbling as** says
+how many. When Last.fm rejects a batch of scrobbles, MixMusic sends it
+again in halves, so that only the one at fault is dropped. Last.fm hears
+that a [live stream](playing-music.md#live-streams) plays, but it isn't
+scrobbled, and [podcasts' episodes](podcasts.md#not-counted) aren't either.
+
+**Send likes as loves**, off at first, sends each song you like to Last.fm
+as a love, and each you unlike as the love taken back.
 
 When Last.fm no longer accepts the connection, Settings › Accounts says so.
 Plays you hear meanwhile still count and wait with the earlier ones. Choose
@@ -236,6 +243,64 @@ the waiting scrobbles to that profile or drop them. **Disconnect** forgets
 the connection and drops the scrobbles not sent yet, and its question says
 how many.
 
+## ListenBrainz
+
+MixMusic scrobbles to [ListenBrainz](https://listenbrainz.org) too, beside
+Last.fm or without it, with the user token of your free account, or to a
+server of your own that speaks its API:
+
+1. Copy your **user token** from
+   [listenbrainz.org/settings](https://listenbrainz.org/settings/), or
+   from your own server's settings.
+2. Paste it in Settings › Accounts › ListenBrainz, and choose **connect to
+   listenbrainz**.
+
+MixMusic checks the token with the server, and shows **Scrobbling as** the
+name the server knows you by. A token the server refuses, or on
+ListenBrainz itself one that isn't one of its tokens of 36 characters,
+says "ListenBrainz doesn't accept this token", and nothing is kept. A good
+one goes in your system's credential store, as Last.fm's connection does,
+until you disconnect.
+
+**Server** stays empty for ListenBrainz itself
+(`https://api.listenbrainz.org`). A ListenBrainz of your own takes its
+address, and [Maloja](https://github.com/krateng/maloja) its address
+followed by `/apis/listenbrainz`. A server's address must be `https://`,
+but on your local network: there, plain `http://` works too, and
+MixMusic warns that the token travels to it unencrypted, for anyone on the
+network to read.
+
+What counts is what counts on Last.fm: a track over 30 seconds, once half
+of it or 4 minutes played, without the parts
+[SponsorBlock skips](playing-music.md#skipping-parts-of-videos).
+Episodes, files that name no artist and live streams are left out. When a
+track starts, ListenBrainz hears that it plays; once it counts, it gets
+the listen, with its title, first artist and album, how long it is, that
+MixMusic sent and played it, and for YouTube Music and Spotify tracks the
+service and the track's page there, with Spotify's address and the
+recording's ISRC where they're known. Listens that wait, offline or while
+the server doesn't answer, are kept, and go as Last.fm's do: up to 1,000
+at a time, one request a second at most, as ListenBrainz asks, and after
+the wait it asks for when it has had too many. A line under **Scrobbling
+as** says how many wait.
+
+When the server no longer accepts the token, as after you made a new one,
+Settings › Accounts asks for a new token. Plays you hear meanwhile still
+count and wait with the others; a new token sends them all. If the new
+token is another user's, MixMusic asks whether to send the waiting listens
+to that account or drop them. **Disconnect** forgets the token and drops
+the listens not sent yet, and its question says how many.
+
+**Send likes as loves**, off at first, sends each song you like to
+ListenBrainz as a love, and each you unlike as the love taken back, on the
+recording its play was heard as. A song that didn't play since you
+connected is looked for in ListenBrainz's metadata, and left out when
+nothing matches.
+
+If you also linked Spotify to your account on ListenBrainz's site, it
+hears your Spotify plays from Spotify as well: they count twice. Turn one
+of the two off.
+
 ## Signing out
 
 Each account has its button in Settings › Accounts, which asks first:
@@ -245,6 +310,8 @@ Each account has its button in Settings › Accounts, which asks first:
 - **Spotify: sign out.** MixMusic forgets your Spotify sign-in.
 - **Last.fm: disconnect.** MixMusic forgets the connection; your scrobbles
   stay on Last.fm.
+- **ListenBrainz: disconnect.** MixMusic forgets the token; your listens
+  stay on ListenBrainz, or on your server.
 
 Signing out deletes the sign-in from your computer. What MixMusic keeps
 itself, your [liked songs, mixes and history](library.md), stays. The YouTube Music

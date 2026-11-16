@@ -158,6 +158,12 @@ func (k *Keeper) ask() time.Duration {
 		// now.
 		m4, err = c.Map(ctx, k.Port, life)
 	}
+	if err == nil && !Unicast(m4.External.Addr()) {
+		// A router that tells no address of the internet: what it says
+		// can't go in a link.
+		_ = c.Delete(ctx, m4)
+		err, m4 = &RefusedError{Method: m4.Method, Reason: "it told " + m4.External.Addr().String() + " as its internet address, which isn't one"}, nil
+	}
 	if err == nil && Shared(m4.External.Addr()) {
 		// A forward that the internet doesn't reach helps no one.
 		_ = c.Delete(ctx, m4)

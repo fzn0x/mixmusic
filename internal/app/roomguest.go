@@ -124,7 +124,7 @@ func (a *App) guestRoom() *guestRoom {
 
 // roomGuest is this computer as a guest of rooms.
 func (a *App) roomGuest(id *remote.Identity) *room.Guest {
-	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing, Dial: a.roomDial}
+	return &room.Guest{Identity: id, Name: a.roomName(), Clock: a.roomClock(), Timing: a.roomOptions().Timing, Elsewhere: a.roomElsewhere}
 }
 
 // Knock knocks at the room of the host id, found on the network, with the
@@ -155,8 +155,7 @@ func (a *App) openInvite(in room.Invite) {
 	if a.backByInvite(in) {
 		return
 	}
-	a.keepLinkAddrs(key.ID(), in.Addrs)
-	a.startKnock(key.ID(), &key, knockBy{password: in.Secret, link: true, pinned: &key}, nil)
+	a.startKnock(key.ID(), &key, knockBy{password: in.Secret, link: true, pinned: &key, addrs: in.Addrs}, nil)
 }
 
 // knockBy is how a knock proves the guest may join.
@@ -164,6 +163,9 @@ type knockBy struct {
 	password []byte
 	link     bool
 	pinned   *remote.Fingerprint
+	// addrs are where the room is reached from outside the network, as
+	// its link, or the user, tells them (roomfar.go).
+	addrs []string
 }
 
 // startKnock starts knocking at the room of the host id, of the key key
@@ -198,6 +200,7 @@ func (a *App) startKnock(id string, key *remote.Fingerprint, by knockBy, failed 
 	ctx, cancel := context.WithTimeout(context.Background(), roomKnockFor)
 	g.cancel = cancel
 	r.guest = g
+	r.far.knock(id, by)
 	r.mu.Unlock()
 	if old != nil {
 		old.drop()
@@ -567,6 +570,8 @@ func roomProblem(name string, err error) string {
 		return name + "'s room isn't taking codes for a minute: ask " + name + " for the invite link."
 	case errors.Is(err, room.ErrNewCode):
 		return name + "'s room has a new code: ask " + name + " for it, or for the new invite link."
+	case errors.Is(err, room.ErrPreviewEnded):
+		return "You waited long to join " + name + "'s room, or many others knocked at once: open its link, or type its code, again."
 	case errors.Is(err, room.ErrBusy):
 		return name + "'s room checks other codes: try again in a moment."
 	case errors.Is(err, room.ErrBlocked):

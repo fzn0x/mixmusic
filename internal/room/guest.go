@@ -26,12 +26,19 @@ type Guest struct {
 	Timing Timing
 	// Dial connects to an address, as net.Dialer does when nil.
 	Dial func(ctx context.Context, network, addr string) (net.Conn, error)
+	// Elsewhere, when set, tells where else the room is reached, as its
+	// invite link does: a connection to a pinned host tries those too
+	// (dial.go).
+	Elsewhere func() []string
 }
 
 // connect connects to the room at addr over TLS, and returns the
 // connection and the host's key, which must be pinned, unless pinned is
 // nil.
 func (g *Guest) connect(ctx context.Context, addr string, pinned *remote.Fingerprint) (*tls.Conn, remote.Fingerprint, error) {
+	if g.Elsewhere != nil {
+		return g.connectFirst(ctx, g.addrsOf(addr, pinned), pinned)
+	}
 	dial := g.Dial
 	if dial == nil {
 		dial = (&net.Dialer{}).DialContext

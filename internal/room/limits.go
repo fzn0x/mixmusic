@@ -11,6 +11,7 @@ package room
 
 import (
 	"net"
+	"net/netip"
 	"sync"
 	"time"
 
@@ -27,6 +28,13 @@ const (
 	// maxRate bounds the messages read of a connection each second: a
 	// guest sends a few, a ping each 2 s.
 	maxRate = 60
+	// acceptRate bounds the connections a source opens each second, after
+	// a burst of acceptBurst, past which one is closed as it comes, before
+	// TLS: a guest opens one as it knocks, and one each time it comes
+	// back. maxBuckets bounds the sources whose connections are counted.
+	acceptRate  = 3
+	acceptBurst = 8
+	maxBuckets  = 4096
 )
 
 func (c caps) messageRate() int {
@@ -42,16 +50,48 @@ func (c caps) messageRate() int {
 // all, so that a new connection can take the place of the oldest
 // (admission.letIn) rather than be closed.
 func limited(ln net.Listener, c caps) net.Listener {
-	return &limitListener{Listener: ln, most: max(maxConnsFrom, c.unprovenFrom+1), all: max(maxConns, c.unproven+1), from: map[string]int{}}
+	return &limitListener{Listener: ln, most: max(maxConnsFrom, c.unprovenFrom+1), all: max(maxConns, c.unproven+1), from: map[string]int{},
+		rate: float64(c.accepts), buckets: map[string]*bucket{}}
 }
 
 type limitListener struct {
 	net.Listener
 	most, all int
+	// rate is how many connections a source opens a second, none when 0.
+	rate float64
 
-	mu   sync.Mutex
-	from map[string]int
-	n    int
+	mu      sync.Mutex
+	from    map[string]int
+	n       int
+	buckets map[string]*bucket
+}
+
+// opens reports whether src may open a connection at now, and takes it:
+// a bucket, as the rules' (rules.go), of acceptBurst. l.mu is held.
+func (l *limitListener) opens(src string, now time.Time) bool {
+	if l.rate <= 0 {
+		return true
+	}
+	every := time.Duration(float64(time.Second) / l.rate)
+	b := l.buckets[src]
+	if b == nil {
+		if len(l.buckets) >= maxBuckets {
+			// Those whose bursts are whole again carry nothing.
+			for s, o := range l.buckets {
+				if now.Sub(o.at) >= acceptBurst*every {
+					delete(l.buckets, s)
+				}
+			}
+		}
+		if len(l.buckets) >= maxBuckets {
+			// So many sources at once that counting each says nothing:
+			// the places of the unproven still bound them.
+			return true
+		}
+		b = &bucket{}
+		l.buckets[src] = b
+	}
+	return b.take(now, acceptBurst, every)
 }
 
 func (l *limitListener) Accept() (net.Conn, error) {
@@ -62,7 +102,7 @@ func (l *limitListener) Accept() (net.Conn, error) {
 		}
 		src := sourceOf(c.RemoteAddr().String())
 		l.mu.Lock()
-		full := l.from[src] >= l.most || l.n >= l.all
+		full := l.from[src] >= l.most || l.n >= l.all || !l.opens(src, time.Now())
 		if !full {
 			l.from[src]++
 			l.n++
@@ -128,4 +168,29 @@ func (f *frames) Receive(v any, wait time.Duration) error {
 	}
 	f.tokens--
 	return f.Frames.Receive(v, wait)
+}
+
+// roomOf is the room-wide count of the tries of src: those of the room's
+// own network, or of the internet.
+func (a *admission) roomOf(src string) *tries {
+	if localSource(src) {
+		return &a.local
+	}
+	return &a.room
+}
+
+// localSource reports whether src, a source as sourceOf tells it, is of a
+// network of this computer's own kind: private, loopback or link-local,
+// as the internet never is. The providers' shared range, 100.64.0.0/10,
+// which VPNs give their computers too, isn't.
+func localSource(src string) bool {
+	ip, err := netip.ParseAddr(src)
+	if err != nil {
+		p, perr := netip.ParsePrefix(src)
+		if perr != nil {
+			return false
+		}
+		ip = p.Addr()
+	}
+	return ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast()
 }

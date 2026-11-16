@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/netip"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -201,8 +202,15 @@ func (c *Client) mapUPnP(ctx context.Context, port uint16, lifetime time.Duratio
 	if err != nil {
 		return nil, err
 	}
+	// Only a router this computer sends through: any other device of the
+	// network may answer the search, and would tell an address of its
+	// choice for the links.
+	gateways, _ := c.gateways()
 	err = errSilent
 	for i, loc := range locations {
+		if !slices.Contains(gateways, hosts[i]) {
+			continue
+		}
 		gw, gerr := c.gatewayAt(ctx, hosts[i], loc)
 		if gerr != nil {
 			err = gerr
@@ -233,10 +241,15 @@ func (c *Client) mapUPnP(ctx context.Context, port uint16, lifetime time.Duratio
 }
 
 // renewUPnP asks m's router to forward its port, as AddPortMapping does
-// again of a forward it has, for lifetime, or for good when it takes no
-// lease, and reads the router's internet address.
+// again of a forward it has, for lifetime, and reads the router's internet
+// address. A router that takes forwards for good alone (725) is refused:
+// a MixMusic that ended at once, or a question cut short, would leave one
+// for good, to whatever computer has this one's address next.
 func (c *Client) renewUPnP(ctx context.Context, m *Mapping, lifetime time.Duration) (*Mapping, error) {
 	lease := uint32(lifetime / time.Second)
+	if lease == 0 {
+		lease = 1
+	}
 	add := func(lease uint32) error {
 		_, err := c.soap(ctx, m, "AddPortMapping", [][2]string{
 			{"NewRemoteHost", ""},
@@ -250,15 +263,7 @@ func (c *Client) renewUPnP(ctx context.Context, m *Mapping, lifetime time.Durati
 		})
 		return err
 	}
-	err := add(lease)
-	var re *RefusedError
-	if errors.As(err, &re) && re.Code == 725 {
-		// OnlyPermanentLeasesSupported: one for good, which Delete
-		// removes.
-		lease = 0
-		err = add(0)
-	}
-	if err != nil {
+	if err := add(lease); err != nil {
 		return nil, err
 	}
 	out := *m
@@ -292,7 +297,7 @@ func upnpReason(code int, text string) string {
 	case 724:
 		return "the router forwards a port to the same port alone"
 	case 725:
-		return "the router takes forwards for good alone"
+		return "it takes only forwards that last for good, which MixMusic doesn't leave behind"
 	case 729:
 		return "the router has no room for another forward"
 	}

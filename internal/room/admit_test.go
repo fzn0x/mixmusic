@@ -54,11 +54,13 @@ func TestWrongCodesAtOnceTryFive(t *testing.T) {
 	}
 }
 
-// TestSourceOfKeepsIPv6ToItsSlash64 counts an IPv4 address alone, and an
-// IPv6 address by its /64, which one computer changes within as it likes.
-func TestSourceOfKeepsIPv6ToItsSlash64(t *testing.T) {
+// TestSourceOfKeepsIPv6ToItsSlash56 counts an IPv4 address alone, and an
+// IPv6 address by its /56, as a home's router has from its provider: its
+// 256 networks of /64 are one source.
+func TestSourceOfKeepsIPv6ToItsSlash56(t *testing.T) {
 	same := [][2]string{
 		{"[2001:db8:1:2::1]:4000", "[2001:db8:1:2:ffff:ffff:ffff:fffe]:5000"},
+		{"[2001:db8:1:200::1]:4000", "[2001:db8:1:2ff::1]:4000"},
 		{"[fe80::1%eth0]:4000", "[fe80::2%eth1]:4000"},
 		{"192.168.1.20:4000", "[::ffff:192.168.1.20]:4001"},
 	}
@@ -68,7 +70,7 @@ func TestSourceOfKeepsIPv6ToItsSlash64(t *testing.T) {
 		}
 	}
 	apart := [][2]string{
-		{"[2001:db8:1:2::1]:4000", "[2001:db8:1:3::1]:4000"},
+		{"[2001:db8:1:200::1]:4000", "[2001:db8:1:300::1]:4000"},
 		{"192.168.1.20:4000", "192.168.1.21:4000"},
 	}
 	for _, p := range apart {
@@ -307,8 +309,9 @@ func TestRoomWindowRollsWithATryUnderWay(t *testing.T) {
 	if v := a.tryCode("10.0.2.1", now, wait); v != tryRuns {
 		t.Fatalf("a minute on: %v", v)
 	}
-	if a.room.running != 2 || a.room.wrong != 0 {
-		t.Fatalf("the room counts %d under way and %d wrong", a.room.running, a.room.wrong)
+	// The sources are of the network: its count is the room's.
+	if a.local.running != 2 || a.local.wrong != 0 {
+		t.Fatalf("the room counts %d under way and %d wrong", a.local.running, a.local.wrong)
 	}
 }
 
@@ -383,4 +386,27 @@ func TestHandshakeTakesNoLongMessage(t *testing.T) {
 func isTimeout(err error) bool {
 	var ne net.Error
 	return errors.As(err, &ne) && ne.Timeout()
+}
+
+// TestFullRoomMakesRoomFromTheMostCrowdedSource fills the places of the
+// unproven from sources that each hold a few, beside a guest's one on its
+// way in: new connections of those sources take each other's places, and
+// never the guest's.
+func TestFullRoomMakesRoomFromTheMostCrowdedSource(t *testing.T) {
+	a := newAdmission()
+	guest, _ := a.letIn("198.51.100.7", func() {})
+	for i := range 200 {
+		_, gone := a.letIn(fmt.Sprintf("203.0.113.%d", i%9), func() {})
+		for _, u := range gone {
+			if u == guest {
+				t.Fatalf("connection %d took the guest's place", i)
+			}
+		}
+		if len(a.unproven) > maxUnproven {
+			t.Fatalf("%d unproven", len(a.unproven))
+		}
+	}
+	if guest.gone {
+		t.Fatal("the guest lost its place")
+	}
 }

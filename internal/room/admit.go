@@ -3,15 +3,18 @@ package room
 // Admission: what a room takes of the computers that proved nothing yet.
 // The code is the only thing between someone on the network and the room,
 // and SPAKE2 has each try check one code, online: so the tries are what the
-// room counts. Each source, an IPv4 address or the /64 of an IPv6 one,
-// which one computer changes within as it likes, tries Tries codes, then
+// room counts. Each source, an IPv4 address or the /56 of an IPv6 one,
+// which one home changes within as it likes, tries Tries codes, then
 // waits; the whole room takes RoomTries wrong ones each Wait, then takes no
-// code until the wait is over. A try counts as it starts, before SPAKE2
+// code until the wait is over: as many from its own network apart, so that
+// wrong codes from the internet lock no code out on the network (#562),
+// nor the other way. A try counts as it starts, before SPAKE2
 // runs, so that tries at once count too. Links, of a secret too long to
 // guess, and guests that come back by their keys, aren't counted.
 //
 // At 30 codes a minute, the room tries 43,200 a day: the 1.29 billion
-// codes would take 82 years, half of them 41. A room lasts an evening.
+// codes would take 82 years, half of them 41, or 41 and 20 with the
+// network's 30 beside the internet's. A room lasts an evening.
 //
 // Before they prove anything, the room holds a few connections at once,
 // from all and from each source, a few seconds in all, and takes messages
@@ -42,7 +45,8 @@ const (
 )
 
 // sourceOf is the source of the address addr ("host:port", or a host): its
-// IPv4 address, or the /64 of its IPv6 address.
+// IPv4 address, or the /56 of its IPv6 address, as a home's router has
+// from its provider, 256 networks of /64 (#562).
 func sourceOf(addr string) string {
 	host, _, err := net.SplitHostPort(addr)
 	if err != nil {
@@ -56,7 +60,7 @@ func sourceOf(addr string) string {
 	if ip.Is4() {
 		return ip.String()
 	}
-	p, err := ip.Prefix(64)
+	p, err := ip.Prefix(56)
 	if err != nil {
 		return ip.String()
 	}
@@ -70,11 +74,20 @@ type caps struct {
 	// rate bounds the messages read of a connection each second
 	// (limits.go): maxRate when 0.
 	rate int
+	// accepts bounds the connections a source opens each second, after a
+	// burst of acceptBurst (limits.go): none when 0, as in tests of other
+	// bounds.
+	accepts int
+	// previews and previewsFrom bound the computers that proved the code
+	// or the link and wait to join, room-wide and of one source
+	// (previews.go): when 0, maxPreviews and maxPreviewsFrom, or the caps
+	// of the unproven when more.
+	previews, previewsFrom int
 }
 
 func (c *caps) orDefault() caps {
 	if c == nil {
-		return caps{unproven: maxUnproven, unprovenFrom: maxUnprovenFrom, tries: Tries, roomTries: RoomTries}
+		return caps{unproven: maxUnproven, unprovenFrom: maxUnprovenFrom, tries: Tries, roomTries: RoomTries, accepts: acceptRate}
 	}
 	return *c
 }
@@ -105,6 +118,7 @@ type admission struct {
 	caps     caps
 	sources  map[string]*tries
 	room     tries
+	local    tries // of the room's own network, apart (localSource)
 	unproven []*unproven
 }
 
@@ -118,8 +132,10 @@ type unproven struct {
 
 // letIn takes a connection of src that proves nothing yet, which close
 // closes, and returns those it takes the place of: the oldest of src, when
-// the room holds as many of src as it takes, and the oldest of all, when it
-// holds as many as it takes in all. The caller closes them.
+// the room holds as many of src as it takes, and, when it holds as many as
+// it takes in all, the oldest of the source that holds the most, so that
+// sources that each flood the room take each other's places, not those of
+// a guest on its way in. The caller closes them.
 func (a *admission) letIn(src string, close func()) (*unproven, []*unproven) {
 	var out []*unproven
 	n := 0
@@ -138,13 +154,30 @@ func (a *admission) letIn(src string, close func()) (*unproven, []*unproven) {
 		}
 	}
 	if len(a.unproven) >= a.caps.unproven && len(a.unproven) > 0 {
-		u := a.unproven[0]
+		u := a.crowding()
 		out = append(out, u)
 		a.proven(u)
 	}
 	u := &unproven{src: src, close: close}
 	a.unproven = append(a.unproven, u)
 	return u, out
+}
+
+// crowding is the oldest unproven connection of the source that holds the
+// most of them, the oldest of those that hold as many.
+func (a *admission) crowding() *unproven {
+	held := map[string]int{}
+	most := 0
+	for _, u := range a.unproven {
+		held[u.src]++
+		most = max(most, held[u.src])
+	}
+	for _, u := range a.unproven {
+		if held[u.src] == most {
+			return u
+		}
+	}
+	return a.unproven[0]
 }
 
 // proven lets go of a connection that proved the code, the link or its
@@ -185,7 +218,8 @@ func (t *tries) check(limit int, now time.Time, wait time.Duration) try {
 // src, or the room, waits after too many wrong ones, or so many run that,
 // all wrong, they would be. endTry ends it.
 func (a *admission) tryCode(src string, now time.Time, wait time.Duration) try {
-	switch a.room.check(a.caps.roomTries, now, wait) {
+	room := a.roomOf(src)
+	switch room.check(a.caps.roomTries, now, wait) {
 	case tryWaits:
 		return tryLocked
 	case tryBusy:
@@ -212,7 +246,7 @@ func (a *admission) tryCode(src string, now time.Time, wait time.Duration) try {
 	}
 	t.running++
 	t.last = now
-	a.room.running++
+	room.running++
 	return tryRuns
 }
 
@@ -232,7 +266,7 @@ func (t *tries) end(wrong bool, limit int, now time.Time, wait time.Duration) {
 // endTry ends the try of a code from src that tryCode started: wrong, or
 // the code, or none at all, as one that ended before it was checked.
 func (a *admission) endTry(src string, wrong bool, now time.Time, wait time.Duration) {
-	a.room.end(wrong, a.caps.roomTries, now, wait)
+	a.roomOf(src).end(wrong, a.caps.roomTries, now, wait)
 	if t := a.sources[src]; t != nil {
 		t.end(wrong, a.caps.tries, now, wait)
 	}
@@ -241,8 +275,10 @@ func (a *admission) endTry(src string, wrong bool, now time.Time, wait time.Dura
 // locked returns until when the room takes no code, after too many wrong
 // ones, or the zero time.
 func (a *admission) locked(now time.Time) time.Time {
-	if now.Before(a.room.until) {
-		return a.room.until
+	for _, t := range []*tries{&a.room, &a.local} {
+		if now.Before(t.until) {
+			return t.until
+		}
 	}
 	return time.Time{}
 }

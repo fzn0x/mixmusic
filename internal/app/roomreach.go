@@ -39,9 +39,16 @@ type roomFar struct {
 	// end, which MixMusic waits for as it quits (flushing).
 	stopping sync.WaitGroup
 	flushing sync.Once
-	// links are the addresses of the rooms of invite links, by their
-	// hosts' IDs (roomfar.go). a.room.mu guards them.
-	links map[string][]string
+	// nets are the networks of this computer's interfaces, as read at
+	// netsAt, which a room takes connections of alone while friends
+	// outside may not join (reachListener).
+	netsMu sync.Mutex
+	nets   []netip.Prefix
+	netsAt time.Time
+	// link is where the room this computer knocks at, or is a guest of,
+	// is reached from outside the network (roomfar.go). a.room.mu guards
+	// it.
+	link farLink
 }
 
 // roomPort is the port rooms listen on: the one kept in the settings, or
@@ -132,10 +139,91 @@ func (a *App) waitForRouters() {
 }
 
 // reachListener is the room's listener, whose closing ends its reach.
+// While friends outside the network may not join, it takes connections of
+// the network alone, before TLS: the kept port listens on every network,
+// which, without a router that turns away what comes in unasked, as some
+// of IPv6 have none, the internet may reach.
 type reachListener struct {
 	net.Listener
 	r    *roomReach
 	once sync.Once
+}
+
+func (l *reachListener) Accept() (net.Conn, error) {
+	for {
+		c, err := l.Listener.Accept()
+		if err != nil {
+			return nil, err
+		}
+		l.r.mu.Lock()
+		on := l.r.on
+		l.r.mu.Unlock()
+		if on || l.r.a.nearby(c.RemoteAddr()) {
+			return c, nil
+		}
+		c.Close()
+	}
+}
+
+// nearby reports whether addr is of this computer's own networks: a
+// private, loopback or link-local address, or one of the networks of its
+// interfaces, which it reads again each half minute.
+func (a *App) nearby(addr net.Addr) bool {
+	ap, err := netip.ParseAddrPort(addr.String())
+	if err != nil {
+		return false
+	}
+	far := &a.room.far
+	far.netsMu.Lock()
+	if time.Since(far.netsAt) > 30*time.Second {
+		far.nets, far.netsAt = interfaceNets(), time.Now()
+	}
+	nets := far.nets
+	far.netsMu.Unlock()
+	return nearbyOf(ap.Addr(), nets)
+}
+
+// nearbyOf reports whether ip is private, loopback or link-local, or of
+// one of nets.
+func nearbyOf(ip netip.Addr, nets []netip.Prefix) bool {
+	ip = ip.Unmap().WithZone("")
+	if ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() {
+		return true
+	}
+	for _, p := range nets {
+		if p.Contains(ip) {
+			return true
+		}
+	}
+	return false
+}
+
+// interfaceNets are the networks of this computer's interfaces, but those
+// of one address alone, as a VPN's of /32, which tell nothing of who else
+// is on them.
+func interfaceNets() []netip.Prefix {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return nil
+	}
+	var out []netip.Prefix
+	for _, a := range addrs {
+		ipn, ok := a.(*net.IPNet)
+		if !ok {
+			continue
+		}
+		ip, ok := netip.AddrFromSlice(ipn.IP)
+		ones, bits := ipn.Mask.Size()
+		if !ok || ones == bits || bits == 0 {
+			continue
+		}
+		ip = ip.Unmap()
+		if ip.Is4() && bits == 128 {
+			ones -= 96
+		}
+		out = append(out, netip.PrefixFrom(ip, ones).Masked())
+	}
+	return out
 }
 
 func (l *reachListener) Close() error {

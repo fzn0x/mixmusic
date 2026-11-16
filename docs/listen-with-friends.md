@@ -167,8 +167,16 @@ them out, as on your network.
 
 - **Routers.** MixMusic asks by UPnP, NAT-PMP or PCP, for that one TCP
   port alone, renews the forward while the room lasts and removes it as
-  it ends. A router with all three off answers nothing: turn UPnP on in
-  its settings, or forward the port to this computer by hand.
+  it ends: each forward goes by itself within 30 minutes, even if
+  MixMusic stops at once. A router with all three off answers nothing,
+  and one that takes only forwards that last for good is refused: turn
+  UPnP on in its settings, or forward the port to this computer by hand.
+- **Who knocks.** Anyone the link reaches may knock, as links shared in
+  chats go further than the friends they're sent to. The room holds a
+  few knocks of an address at once, and each waits 5 minutes at most to
+  join, so that no one crowds friends out; wrong codes from the internet
+  don't stop codes on your network. While the switch is off, the room
+  takes no one from outside your network.
 - **Behind another router.** A router whose own internet address starts
   with 100.64 to 100.127, or is private, sits behind another, most often
   your provider's, out of reach from outside. A VPN you both run, such as

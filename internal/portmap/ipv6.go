@@ -8,7 +8,9 @@ import (
 // PublicIPv6 returns the IPv6 addresses of this computer that the internet
 // may reach: global unicast ones of the networks that are up, but unique
 // local ones (fc00::/7), the documentation's (2001:db8::/32), Teredo's
-// (2001::/32) and 6to4's (2002::/16), which guests seldom reach.
+// (2001::/32) and 6to4's (2002::/16), which guests seldom reach, and those
+// made of the network card's hardware address (EUI-64), which an invite
+// link would tell: temporary and privacy addresses alone.
 func PublicIPv6() []netip.Addr {
 	ifs, err := net.Interfaces()
 	if err != nil {
@@ -29,7 +31,7 @@ func PublicIPv6() []netip.Addr {
 				continue
 			}
 			ip, ok := netip.AddrFromSlice(ipn.IP)
-			if ok && reachableIPv6(ip) {
+			if ok && reachableIPv6(ip) && !eui64(ip) {
 				out = append(out, ip)
 			}
 		}
@@ -49,4 +51,11 @@ func reachableIPv6(ip netip.Addr) bool {
 		}
 	}
 	return true
+}
+
+// eui64 reports whether ip's interface identifier is made of a hardware
+// address, as ff:fe in its middle tells (RFC 4291, appendix A).
+func eui64(ip netip.Addr) bool {
+	a := ip.As16()
+	return a[11] == 0xff && a[12] == 0xfe
 }

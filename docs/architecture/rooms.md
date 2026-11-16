@@ -123,11 +123,14 @@ The code is all that keeps someone on the network out, and SPAKE2 has
 each try check one code, online: so the room counts the tries, and holds
 few computers that proved nothing yet (`admit.go`).
 
-- **By source.** A source is an IPv4 address, or the /64 of an IPv6 one,
-  within which one computer changes its address as it likes. A source
-  tries 5 codes, then waits a minute.
+- **By source.** A source is an IPv4 address, or the /56 of an IPv6 one,
+  as a home's router has from its provider, within which one home changes
+  its addresses as it likes. A source tries 5 codes, then waits a minute.
 - **Room-wide.** The room takes 30 wrong codes a minute in all, from
-  whatever sources: past them, it checks no code until the minute is over.
+  whatever sources of the internet, and 30 more of its own network,
+  private, loopback or link-local, apart, so that wrong codes from the
+  internet lock no code out on the network: past them, it checks no code
+  of those until the minute is over.
   At 30 a minute, 43,200 a day, the 33^6, about 1.29 billion, codes take
   82 years, half of them 41; a room lasts an evening. A link's secret,
   of 128 bits, isn't guessed, and isn't counted: link holders, and guests
@@ -150,18 +153,32 @@ few computers that proved nothing yet (`admit.go`).
   once friends outside join: a source holds 32 connections at once at
   most, proven or not, and the room 512, past which a connection is
   closed as it comes, each more than the places of the unproven, so that
-  a new connection takes the place of the oldest rather than be closed;
-  and a connection's messages past 60 a second, after a burst of as many,
-  wait to be read, so that its sender's sends wait in turn. A guest takes the
-  host's messages of 4 KiB at most, too, until the host's welcome proved
-  the code: at an address typed in, anyone may answer.
+  a new connection takes the place of the oldest rather than be closed.
+  A source opens 3 connections a second, after a burst of 8, past which
+  one is closed before TLS, so that no source has the host run TLS as
+  often as it likes. A connection's messages past 60 a second, after a
+  burst of as many, wait to be read, so that its sender's sends wait in
+  turn. A guest takes the host's messages of 4 KiB at most, too, until
+  the host's welcome proved the code: at an address typed in, anyone may
+  answer. While friends outside may not join, the room takes connections
+  of this computer's networks alone, before TLS.
+- **The previews** (`previews.go`): those that proved the code or the
+  link and wait to join, as a link forwarded beyond its friends brings.
+  The room holds 4 of a source and 32 in all: a new one takes the place
+  of the oldest of its source, or of the source that holds the most, and
+  each waits 5 minutes at most (`Preview`), then is told the preview
+  ended. One that waits for the host's user to let it in
+  ([Asking before a join](#asking-before-a-join)) is a preview too.
+  Guests, and those that come back by their keys, take no preview's
+  place.
 - **The unproven.** A connection holds one of 32 places in the room, 4 of a
   source, from its accepting until it proved the code, the link or its
   key, or ended, 5 s at most in all (`Prove`), not a Silence for each
   step. A new one takes the place of the oldest of its source, when the
-  source holds 4, and of the oldest of all, when the room holds 32: held
-  open, connections keep no one out, and an attacker must open them
-  faster than a proof takes. A guest the room keeps, which comes back by
+  source holds 4, and of the oldest of the source that holds the most,
+  when the room holds 32: held open, connections keep no one out, and a
+  flood of many sources takes its own places, not a far guest's; it must
+  open them faster than a proof takes. A guest the room keeps, which comes back by
   its key, gives its place back as soon as TLS tells its key. Until it
   proved something, a connection's messages are of 4 KiB at most, refused
   from their length before any of them is read (`Frames.Limit`); a hello
@@ -359,15 +376,20 @@ no relay: guests reach the host's computer directly.
   that the port can't be tested from outside; and once the addresses
   changed since the link was copied, as after the router's internet
   address changed, it tells the host to send the new link.
-- **The guest.** It dials the address discovery found, and the link's,
-  each 250 ms after the one before, and keeps the first that answers
-  (`DialFirst`), as it knocks and as it comes back: a guest on the host's
-  network gets there, with no hairpin through the router. A link of the
-  host's that a guest which dropped off opens brings it back at once, to
-  the new address. Join a room takes an address and a code, which the
-  guest proves as on the network. One that can't reach a room outside is
-  told the likely causes: a router that doesn't forward the port, a
-  firewall, or a room that ended.
+- **The guest.** Knowing the host's key, by the link or from its stay,
+  it connects to the address discovery found and to the link's, each
+  250 ms after the one before, TLS and the key's pin too, and keeps the
+  first that is the host (`connectFirst`), as it knocks and as it comes
+  back: a guest on the host's network gets there, with no hairpin
+  through the router, and an address gone stale, or another's, that
+  answers first wins nothing. By a code alone, it connects where it was
+  told. The addresses are those of the knock that started, which proves
+  the link: a link of the host's of the same secret, which a guest that
+  dropped off opens, brings it back at once to the new address, and one
+  of another secret, or of none, leaves them. Join a room takes an
+  address and a code, which the guest proves as on the network. One that
+  can't reach a room outside is told the likely causes: a router that
+  doesn't forward the port, a firewall, or a room that ended.
 - **Firewalls.** The rule of Settings › Desktop › Windows Firewall lets
   in any address on private and domain networks, which a forwarded port
   is; macOS's firewall must allow MixMusic's incoming connections, and on

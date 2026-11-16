@@ -2,6 +2,7 @@ package app
 
 import (
 	"net"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -16,12 +17,13 @@ import (
 // the address its link carries, the one its host typed for invites; drops
 // off, and comes back there.
 func TestGuestJoinsAtTheLinksAddress(t *testing.T) {
-	desk := newRoomApp(t, roomtest.New(), "Desk")
-	// Another network: the guest finds no room on it.
-	lap := newRoomApp(t, roomtest.New(), "Lap")
+	// Set before the apps, so that it is put back once they closed.
 	was := roomRetry
 	roomRetry = 20 * time.Millisecond
 	t.Cleanup(func() { roomRetry = was })
+	desk := newRoomApp(t, roomtest.New(), "Desk")
+	// Another network: the guest finds no room on it.
+	lap := newRoomApp(t, roomtest.New(), "Lap")
 	if err := desk.Rooms().Start(); err != nil {
 		t.Fatal(err)
 	}
@@ -65,11 +67,12 @@ func TestKnockAtAnAddress(t *testing.T) {
 // TestNewLinkBringsAGuestBack has a guest drop off where its host's
 // address is no longer: the host's new link brings it back at once.
 func TestNewLinkBringsAGuestBack(t *testing.T) {
-	desk := newRoomApp(t, roomtest.New(), "Desk")
-	lap := newRoomApp(t, roomtest.New(), "Lap")
+	// Set before the apps, so that it is put back once they closed.
 	was := roomRetry
 	roomRetry = 20 * time.Millisecond
 	t.Cleanup(func() { roomRetry = was })
+	desk := newRoomApp(t, roomtest.New(), "Desk")
+	lap := newRoomApp(t, roomtest.New(), "Lap")
 	if err := desk.Rooms().Start(); err != nil {
 		t.Fatal(err)
 	}
@@ -91,9 +94,8 @@ func TestNewLinkBringsAGuestBack(t *testing.T) {
 	}
 	dead := ln.Addr().String()
 	ln.Close()
-	g := lap.guestRoom()
-	lap.keepLinkAddrs(g.id, []string{dead})
 	lap.room.mu.Lock()
+	lap.room.far.link.addrs = []string{dead}
 	lap.room.found = nil
 	lap.room.mu.Unlock()
 	desk.ln.kill()
@@ -115,4 +117,76 @@ func TestFarProblem(t *testing.T) {
 	if got := roomProblem("Desk", near); strings.Contains(got, "internet") {
 		t.Fatalf("near: %q", got)
 	}
+}
+
+// TestPreviewEndedProblem tells a guest whose preview ended what to do.
+func TestPreviewEndedProblem(t *testing.T) {
+	if got := roomProblem("Desk", room.ErrPreviewEnded); !strings.Contains(got, "Desk's room") || !strings.Contains(got, "again") {
+		t.Fatalf("problem %q", got)
+	}
+}
+
+// TestMadeUpLinkMovesNoGuest has a guest of a room outside its network
+// drop off, then open links made of the host's key alone, of another
+// secret, one with an address of no room and one with none: its addresses
+// stay, and it comes back there. Another host's link changes nothing
+// either, as the guest stays in its room.
+func TestMadeUpLinkMovesNoGuest(t *testing.T) {
+	// Set before the apps, so that it is put back once they closed.
+	was := roomRetry
+	roomRetry = 20 * time.Millisecond
+	t.Cleanup(func() { roomRetry = was })
+	desk := newRoomApp(t, roomtest.New(), "Desk")
+	lap := newRoomApp(t, roomtest.New(), "Lap")
+	if err := desk.Rooms().Start(); err != nil {
+		t.Fatal(err)
+	}
+	setRooms(t, desk.App, func(s *settings.Settings) { s.RoomAddress = "127.0.0.1" })
+	desk.Rooms().SetAnywhere(true)
+	untilReach(t, desk.App, "the address typed", func(v RoomReach) bool { return len(v.Addrs) == 1 })
+	hosted, _ := desk.Rooms().Hosted()
+	if err := lap.Rooms().OpenLink(hosted.Link); err != nil {
+		t.Fatal(err)
+	}
+	untilGuest(t, lap.App, "the preview", func(v GuestView) bool { return v.Step == RoomPreview })
+	lap.Rooms().Join()
+	untilGuest(t, lap.App, "the room", func(v GuestView) bool { return v.Step == RoomIn })
+	real := lap.linkAddrs(lap.guestRoom().id)
+	in, err := room.ParseLink(hosted.Link)
+	if err != nil {
+		t.Fatal(err)
+	}
+	other, _ := room.NewSecret()
+	for _, addrs := range [][]string{{"203.0.113.66:41234"}, nil} {
+		madeUp := room.Invite{Code: in.Code, Host: in.Host, Secret: other, Addrs: addrs}
+		if err := lap.Rooms().OpenLink(madeUp.Link()); err != nil {
+			t.Fatal(err)
+		}
+		if got := lap.linkAddrs(lap.guestRoom().id); !slices.Equal(got, real) {
+			t.Fatalf("a made-up link of %v left %v, want %v", addrs, got, real)
+		}
+	}
+	// The same secret, no address: the addresses stay too.
+	same := in
+	same.Addrs = nil
+	if err := lap.Rooms().OpenLink(same.Link()); err != nil {
+		t.Fatal(err)
+	}
+	if got := lap.linkAddrs(lap.guestRoom().id); !slices.Equal(got, real) {
+		t.Fatalf("a link of no address left %v", got)
+	}
+	// Another host's link, while in the room.
+	stranger := newRoomApp(t, roomtest.New(), "Stranger")
+	if err := stranger.Rooms().Start(); err != nil {
+		t.Fatal(err)
+	}
+	sh, _ := stranger.Rooms().Hosted()
+	if err := lap.Rooms().OpenLink(sh.Link); err != nil {
+		t.Fatal(err)
+	}
+	if got := lap.linkAddrs(lap.guestRoom().id); !slices.Equal(got, real) {
+		t.Fatalf("another host's link left %v", got)
+	}
+	desk.ln.kill()
+	untilGuest(t, lap.App, "back", func(v GuestView) bool { return v.Step == RoomIn && v.Host == "Desk" })
 }

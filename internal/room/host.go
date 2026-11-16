@@ -131,6 +131,9 @@ type conn struct {
 	out  chan message
 	once sync.Once
 	gone chan struct{}
+	// in are its messages, once it proved who it is (messages).
+	inOnce sync.Once
+	in     chan message
 }
 
 // outQueue is how many messages may wait to go to a guest: one slower
@@ -497,9 +500,10 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 	}
 	// The guest's user sees the room, and joins it, or not: the guest
 	// pings meanwhile.
+	msgs := c.messages(t.silence())
 	for {
-		var m message
-		if err := c.f.Receive(&m, t.silence()); err != nil {
+		m, ok := <-msgs
+		if !ok {
 			return false
 		}
 		switch m.Type {
@@ -593,12 +597,7 @@ func (s *Server) note(name, what string) {
 // that it has a track ready, and lets it leave, until either side goes
 // quiet.
 func (s *Server) stay(c *conn) {
-	t := s.Timing
-	for {
-		var m message
-		if err := c.f.Receive(&m, t.silence()); err != nil {
-			return
-		}
+	for m := range c.messages(s.Timing.silence()) {
 		switch m.Type {
 		case "ping":
 			c.send(message{Type: "pong", Sent: m.Sent, HostAt: s.Clock.Now()})

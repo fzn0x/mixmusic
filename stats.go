@@ -152,7 +152,9 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 	s.sectionTitle(c, locales.StatsDayByDay())
 	ui.Text(c, locales.StatsMinutesEachDay()).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 12)
 	ui.Text(c, locales.FormatMinutes(fmt.Sprintf("%.0f", top))).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
-	plot := ui.Box(c).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).
+	// The chart reads left to right in every language, as it draws, and
+	// so do its days under it.
+	plot := ui.Box(c).Direction(ui.LeftToRight).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).
 		Label(locales.StatsMinutesLabel()).Description(locales.StatsArrowKeys()).Focusable().
 		Draw(func(p *ui.Painter, r ui.Rect) {
 			w := r.W / float32(n)
@@ -236,7 +238,7 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 			})
 		})
 	}
-	ui.Row(c).FillWidth().Margin(4, 0, 12).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).FillWidth().Margin(4, 0, 12).Children(func() {
 		for i, d := range days {
 			label := ""
 			switch {

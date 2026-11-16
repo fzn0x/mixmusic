@@ -262,3 +262,14 @@ func TestRightToLeftNotch(t *testing.T) {
 		t.Errorf("the button that closes the panel is at %+v, at the left of the housing", r)
 	}
 }
+
+// TestRightToLeftStats keeps the chart of Stats left to right, as it draws,
+// with today at its right under it.
+func TestRightToLeftStats(t *testing.T) {
+	s := rtlShell(t, settings.LayoutTiles)
+	tt := rtlTester(s, 1280, 1600, ui.RightToLeft)
+	show(s, tt, "/stats")
+	if today := placeOf(t, tt, locales.StatsToday()); today.X < 1280/2 {
+		t.Errorf("today is at %+v, at the left of the chart", today)
+	}
+}

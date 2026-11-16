@@ -68,6 +68,12 @@ nor what plays. It answers on a socket `dnssd`'s `Keep` keeps working, as
 remote control's announcement does: a room opened before macOS let
 MixMusic use the local network is found once the user lets it (#725). The others look for rooms as they look for cast devices:
 a few seconds after start, every 45 s, and as the devices menu opens.
+A host asked on several networks, as on a VPN's too, tells its address
+on each, which the guest keeps, its own network's first
+([Finding the computers](remote.md#finding-the-computers)), and tries
+in turn, the next as one turns it away, by the code too, as discovery
+found the room at each: a room of the network turns away, before TLS,
+an address it takes for the internet's, as of a VPN it isn't on.
 
 ## Joining
 
@@ -193,7 +199,9 @@ few computers that proved nothing yet (`admit.go`).
 
 A guest that drops off, as a computer that sleeps or a network that went,
 keeps its place 15 minutes: it comes back by its key alone, with `hello`
-wanting to `rejoin`, to the host's key it pinned. It tries after 1 s,
+wanting to `rejoin`, to the host's key it pinned, where discovery finds
+the host, at each address it told, at its link's, and, after the room
+moved, where it moved, as its old host reached it. It tries after 1 s,
 then twice as long each time up to 32 s, 15 times, and at once as its
 computer wakes, 32 times: about 15 minutes, as long as the host keeps
 its place, after a sleep or a change of network on either side. The room

@@ -86,7 +86,12 @@ record with its ID (`id`), its name (`name`) and the protocol's version
 (`v=1`), and the A record of its address on the asker's network. It
 answers from mDNS's port, 5353, which it shares with the system's own
 responder. The others look for it as they look for cast devices: a few
-seconds after start, every 45 s, and as the devices menu opens.
+seconds after start, every 45 s, and as the devices menu opens. A
+computer asked on each of its networks, a VPN's interface too, answers
+with its address on each: the one that looks keeps them all, those of
+the networks it is on itself first, the providers' shared range of VPNs
+and interfaces of one address after (`dnssd`'s `nearestFirst`), and
+dials the first.
 
 The socket it answers on is kept working (`Responder.Keep`, #725). Five
 seconds after start, then every minute, it sends mDNS's group a question

@@ -380,9 +380,29 @@ func (s *Server) notMoved(mv *move, why error) {
 		s.mu.Unlock()
 		return
 	}
-	s.asks.move = nil
-	mv.timer.Stop()
+	s.takeMove()
 	s.mu.Unlock()
+	s.moveEnded(mv, why)
+}
+
+// takeMove ends the move under way, if any, and returns it, whose end
+// moveEnded tells once s.mu is let go. s.mu is held.
+func (s *Server) takeMove() *move {
+	mv := s.asks.move
+	if mv != nil {
+		s.asks.move = nil
+		mv.timer.Stop()
+	}
+	return mv
+}
+
+// moveEnded tells of mv, a move takeMove ended, if any, that the room
+// didn't move, for why: the guest it was to closes its room, and done is
+// told why.
+func (s *Server) moveEnded(mv *move, why error) {
+	if mv == nil {
+		return
+	}
 	mv.conn.send(message{Type: "unhost"})
 	if mv.done != nil {
 		mv.done(Move{}, why)

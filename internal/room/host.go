@@ -816,23 +816,11 @@ func (s *Server) tellLock() {
 
 // Remove removes the guest of key from the room: it is told so, and joins
 // again only by the code or the link.
-func (s *Server) Remove(key remote.Fingerprint) { s.drop(key, reasonRemoved, Removed) }
+func (s *Server) Remove(key remote.Fingerprint) { s.drop(key, reasonRemoved, Removed, false) }
 
 // Block removes the guest of key, and keeps it out, by its key, until
 // Unblock.
-func (s *Server) Block(key remote.Fingerprint) {
-	s.mu.Lock()
-	if s.blocked == nil {
-		s.blocked = map[remote.Fingerprint]string{}
-	}
-	name := "Someone"
-	if g := s.guests[key]; g != nil {
-		name = g.Name
-	}
-	s.blocked[key] = name
-	s.mu.Unlock()
-	s.drop(key, reasonBlocked, Blocked)
-}
+func (s *Server) Block(key remote.Fingerprint) { s.drop(key, reasonBlocked, Blocked, true) }
 
 // Unblock lets the computer of key join again, by the code or the link.
 func (s *Server) Unblock(key remote.Fingerprint) {
@@ -842,13 +830,28 @@ func (s *Server) Unblock(key remote.Fingerprint) {
 	s.changed(false)
 }
 
-// drop ends the stay of the guest of key, telling it why.
-func (s *Server) drop(key remote.Fingerprint, reason, what string) {
+// drop ends the stay of the guest of key, telling it why, and blocks its
+// key when block.
+func (s *Server) drop(key remote.Fingerprint, reason, what string, block bool) {
 	s.mu.Lock()
 	g := s.guests[key]
+	if block {
+		if s.blocked == nil {
+			s.blocked = map[remote.Fingerprint]string{}
+		}
+		name := "Someone"
+		if g != nil {
+			name = g.Name
+		}
+		s.blocked[key] = name
+	}
+	// A move under way keeps the seats and blocks it was asked with: it
+	// ends under the same lock, so that none commits between, with the
+	// guest's seat, or without its block (move.go).
+	mv := s.takeMove()
 	if g == nil {
 		s.mu.Unlock()
-		s.stopMove(errDropped)
+		s.moveEnded(mv, errDropped)
 		s.changed(false)
 		return
 	}
@@ -857,9 +860,7 @@ func (s *Server) drop(key remote.Fingerprint, reason, what string) {
 	c := g.conn
 	gate := s.gate
 	s.mu.Unlock()
-	// A move under way keeps the seats and blocks it was asked with, once
-	// the guest went, so that no move starts between (move.go).
-	s.stopMove(errDropped)
+	s.moveEnded(mv, errDropped)
 	if c != nil {
 		go func() {
 			_ = c.f.Send(message{Type: "ended", Reason: reason}, time.Second)

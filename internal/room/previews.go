@@ -51,7 +51,9 @@ func (s *Server) holdPreview(c *conn) {
 		n, mine := 0, 0
 		held := map[string]int{}
 		for o := range s.previews {
-			if o == c {
+			// A computer that waits for the host's user to let it in keeps
+			// its place: maxKnocks bound those (letin.go).
+			if o == c || s.knocking(o) {
 				continue
 			}
 			n++
@@ -84,6 +86,10 @@ func (s *Server) holdPreview(c *conn) {
 			// It joined meanwhile.
 			waits = false
 		}
+		if waits && s.knocking(c) {
+			// It waits for the host's user, AskFor at most.
+			waits = false
+		}
 		if waits {
 			delete(s.previews, c)
 		}
@@ -99,7 +105,7 @@ func (s *Server) holdPreview(c *conn) {
 func (s *Server) oldestPreview(which func(*conn) bool, c *conn) *conn {
 	var out *conn
 	for o := range s.previews {
-		if o != c && which(o) && (out == nil || o.held.Before(out.held)) {
+		if o != c && !s.knocking(o) && which(o) && (out == nil || o.held.Before(out.held)) {
 			out = o
 		}
 	}

@@ -139,3 +139,32 @@ func TestFullPreviewsMakeRoomFromTheMostCrowdedSource(t *testing.T) {
 		}
 	}
 }
+
+// TestKnocksKeepTheirPreviews keeps the preview of a computer that waits
+// for the host's user to let it in, however many previews of its source,
+// or of others, come after it.
+func TestKnocksKeepTheirPreviews(t *testing.T) {
+	s := &Server{Timing: Timing{Preview: time.Minute}, previews: map[*conn]int{}}
+	s.adm.caps = (*caps)(nil).orDefault()
+	knocker := previewConn(t, "203.0.113.1")
+	s.mu.Lock()
+	s.previews[knocker] = 0
+	s.holdPreview(knocker)
+	s.asks.knocks = append(s.asks.knocks, &Knock{ID: 1, conn: knocker, src: knocker.src})
+	s.mu.Unlock()
+	for i := range 200 {
+		src := "203.0.113.1"
+		if i%2 == 1 {
+			src = fmt.Sprintf("198.51.100.%d", i%7)
+		}
+		c := previewConn(t, src)
+		s.mu.Lock()
+		s.previews[c] = 0
+		s.holdPreview(c)
+		_, kept := s.previews[knocker]
+		s.mu.Unlock()
+		if !kept {
+			t.Fatalf("preview %d took the place of one that knocks", i)
+		}
+	}
+}

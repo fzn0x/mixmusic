@@ -95,9 +95,10 @@ type Knock struct {
 	Key   string
 	Local bool
 	// answer takes the host's user's answer; src is the source it knocks
-	// from (sourceOf).
+	// from (sourceOf), and conn its connection.
 	answer chan bool
 	src    string
+	conn   *conn
 }
 
 // letIn has the host's user let in c, of the computer named name, which
@@ -109,6 +110,9 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 	}
 	s.mu.Lock()
 	k, tell := s.knock(c.key, c.src, name, time.Now())
+	if k != nil {
+		k.conn = c
+	}
 	s.mu.Unlock()
 	if k == nil {
 		return reasonManyAsk
@@ -237,6 +241,18 @@ func (s *Server) knock(key remote.Fingerprint, src, name string, now time.Time) 
 		s.asks.knockTold[src] = now
 	}
 	return k, tell
+}
+
+// knocking reports whether c waits for the host's user to let it in: its
+// preview's place, and its time, are its knock's then (previews.go). s.mu
+// is held.
+func (s *Server) knocking(c *conn) bool {
+	for _, k := range s.asks.knocks {
+		if k.conn == c {
+			return true
+		}
+	}
+	return false
 }
 
 // Knocks returns the computers that wait for the host's user to let them

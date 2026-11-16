@@ -117,6 +117,9 @@ biyu. MixMusic yana haɗa ayyukan biyu a cikin mai kunnawa guda ɗaya:
 - Hanyoyin `mixmusic://`.
 - **Last.fm:** kowace waƙa da ka ji tana shiga bayananka, kuma scrobbles da
   aka yi ba tare da intanet ba ana aika su idan ka dawo kan intanet.
+- **ListenBrainz:** haka ma, tare da Last.fm ko ba tare da shi ba, zuwa
+  ListenBrainz ko sabarka ta kanka, kamar Maloja. Waƙoƙin da ka so za su
+  iya zuwa kowanne daga cikinsu a matsayin loves.
 - **Discord:** bayananka suna nuna abin da ake kunnawa, tare da hotonsa da
   lokacin da ya rage.
 - **Sabuntawa:** MixMusic yana duba sabuwar fitarwa a farawa da kuma bayan
@@ -282,6 +285,9 @@ yake aiki a kwamfutarka.
   [last.fm/api/account/create](https://www.last.fm/api/account/create)
   (kowane suna, ba callback URL), liƙa API key da shared secret ɗinsa a
   Settings › Accounts, sannan ka amince da MixMusic a burauzarka.
+- **ListenBrainz:** liƙa user token na
+  [saitunan ListenBrainz ɗinka](https://listenbrainz.org/settings/), ko na
+  sabarka ta kanka, a Settings › Accounts.
 - **Discord:** muddin manhajar Discord tana aiki, bayananka suna nuna abin da
   kake saurara. Kashe shi a Settings › Desktop.
 
@@ -500,6 +506,8 @@ da:
   karatun kanji (11.7 MB). Ana yin romaji a kwamfutarka: ba a aika kalmomin
   waƙar.
 - **Last.fm,** da zarar ka haɗa shi: abin da kake kunnawa.
+- **ListenBrainz,** ko sabarka ta kanka mai API ɗinsa, da zarar ka haɗa
+  shi: abin da kake kunnawa.
 - **Discord,** sai dai ka kashe shi: abin da ake kunnawa, ana aika shi zuwa
   manhajar Discord a kwamfutarka, wadda take nuna shi a bayananka.
 

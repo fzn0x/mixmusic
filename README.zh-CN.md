@@ -85,6 +85,7 @@
 - 托盘控制、切换到新歌曲时的通知，以及开机自启。
 - `mixmusic://` 链接。
 - **Last.fm**：你听的每首歌都会记录到你的个人资料中，离线时产生的 scrobble 会在恢复联网后补发。
+- **ListenBrainz**：同样如此，可以和 Last.fm 一起用，也可以单独用，记录到 ListenBrainz 或你自己的服务器，例如 Maloja。喜欢的歌曲也可以作为 love 发送到其中任意一个。
 - **Discord**：你的个人资料上会显示正在播放的歌曲，以及它的封面和剩余时间。
 - **更新**：MixMusic 在启动时以及之后每隔几小时检查一次新版本，验证它的签名，在你确认后安装；你也可以选择让它自动安装。
 
@@ -166,6 +167,7 @@ Flatpak 版在沙盒中运行 MixMusic。沙盒能访问网络、声音服务器
 - **YouTube Music**：在 Settings › Accounts（设置 › 账号）中选择 Sign in to YouTube Music（登录 YouTube Music），然后在弹出的窗口中登录 Google。你输入的内容只会发送给 Google。MixMusic 会加密保存登录会话；系统有密钥环时，密钥就存放在密钥环中。如果那个窗口打不开，或者 Google 拒绝它，可以用你自己的浏览器登录，MixMusic 会用一个它自己的新配置文件打开浏览器，你登录完成后再把这个配置文件删除；也可以导入你已登录的某个浏览器的会话（MixMusic 用它的 yt-dlp 读取，并且只保留 YouTube 的 cookie）；或者粘贴已登录的 music.youtube.com 标签页的 Cookie 请求头。
 - **Spotify**：Spotify 规定一个应用最多只能服务五个用户，而且只有在应用的所有者订阅了 Premium 时才行，所以你需要用自己创建的 Spotify 应用登录。只需两分钟：[docs/spotify.md](docs/spotify.md) 会一步步带你完成。
 - **Last.fm**：在 [last.fm/api/account/create](https://www.last.fm/api/account/create) 创建一个 API 账号（名称随意，不用填回调 URL），把它的 API key 和 shared secret 粘贴到 Settings › Accounts 中，然后在浏览器中授权 MixMusic。
+- **ListenBrainz**：把你的 [ListenBrainz 设置](https://listenbrainz.org/settings/)中的 user token，或你自己服务器上的 user token，粘贴到 Settings › Accounts 中。
 - **Discord**：Discord 应用运行时，你的个人资料上会显示你正在听的内容。可以在 Settings › Desktop（设置 › 桌面）中关闭。
 
 遇到问题？[docs/troubleshooting.md](docs/troubleshooting.md) 列出了常见问题和已知问题。
@@ -322,6 +324,7 @@ MixMusic 没有自己的账号体系、服务器、统计分析或遥测。它�
 - **SponsorBlock**：只有在你打开 Skip the parts SponsorBlock marks（跳过 SponsorBlock 标记的片段）时，才会发送每个视频 ID 的哈希值的前 4 个字符，从不发送 ID 本身，用来查找它标记的片段。
 - **GitHub**：启动时以及之后每隔几小时检查一次新版本，可以在 Settings › About（设置 › 关于）中关闭；打开市场时获取社区注册表；下载 yt-dlp；以及第一次在日文歌词旁打开罗马音时，下载汉字读音词典（11.7 MB）。罗马音在你的电脑上生成：歌词不会被发送出去。
 - **Last.fm**（连接之后）：你播放的内容。
+- **ListenBrainz** 或你自己的兼容其 API 的服务器（连接之后）：你播放的内容。
 - **Discord**（除非你关闭）：正在播放的内容，发送给你电脑上的 Discord 应用，由它显示在你的个人资料上。
 
 它在你电脑上保存的内容：

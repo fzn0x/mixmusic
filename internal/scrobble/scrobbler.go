@@ -82,6 +82,9 @@ type Scrobbler struct {
 	// it.
 	tryQueue bool
 	sending  bool
+	// size is how many plays the next Scrobble call takes, fewer than
+	// batch while a rejected batch is split to find the play at fault.
+	size int
 }
 
 // listen is the play of the track the player has loaded.
@@ -110,7 +113,7 @@ func New(api Service, key string, o Options) *Scrobbler {
 	if batch <= 0 {
 		batch = defaultBatch
 	}
-	return &Scrobbler{api: api, batch: batch, session: key, tryQueue: key != ""}
+	return &Scrobbler{api: api, batch: batch, size: batch, session: key, tryQueue: key != ""}
 }
 
 // SetSession changes the session key calls are made with, such as after the
@@ -139,6 +142,7 @@ func (s *Scrobbler) SetQueue(plays []Play) {
 	defer s.mu.Unlock()
 	s.queue = slices.Clone(plays)
 	s.gen++
+	s.size = s.batch
 	s.tryQueue = true
 }
 
@@ -149,6 +153,7 @@ func (s *Scrobbler) Discard() {
 	defer s.mu.Unlock()
 	s.queue = nil
 	s.gen++
+	s.size = s.batch
 	s.saveQueue()
 }
 
@@ -233,8 +238,9 @@ func (s *Scrobbler) count() {
 // an error that keeps them, as the network's, stay in the queue and are
 // sent again after the next call the service answers: a now-playing
 // update, or the scrobble of a new play, which joins the queue behind
-// them. Scrobbles that the service rejects, as IsRejected tells, are
-// dropped. When the service refuses the key, Send returns an error that is
+// them. A batch the service rejects, as IsRejected tells, is split in
+// halves and sent again, until the play at fault goes alone: that one is
+// dropped, and Send returns the error. When the service refuses the key, Send returns an error that is
 // ErrKeyRefused, once, and the Scrobbler does not send anything until
 // SetSession gives it a new key; plays go on joining the queue meanwhile.
 //
@@ -261,16 +267,25 @@ func (s *Scrobbler) Send(ctx context.Context) error {
 			s.tryQueue = false
 			return nil
 		}
-		batch := slices.Clone(s.queue[:min(len(s.queue), s.batch)])
+		batch := slices.Clone(s.queue[:min(len(s.queue), s.size)])
 		gen := s.gen
 		err := s.unlocked(func() error { return s.api.Scrobble(ctx, key, batch) })
-		if err != nil && !IsRejected(err) {
+		switch {
+		case err != nil && !IsRejected(err):
 			return s.failed(key, err)
+		case gen != s.gen:
+			continue // the queue was replaced meanwhile: its head goes next
+		case err != nil && len(batch) > 1:
+			// One play of the batch or more is at fault: half as many go
+			// at once, until the one at fault goes alone.
+			s.size = len(batch) / 2
+			continue
 		}
-		if gen == s.gen {
-			s.queue = slices.Delete(s.queue, 0, len(batch))
-			s.saveQueue()
+		s.queue = slices.Delete(s.queue, 0, len(batch))
+		if err != nil || len(s.queue) == 0 {
+			s.size = s.batch
 		}
+		s.saveQueue()
 		if err != nil {
 			return err
 		}

@@ -167,8 +167,9 @@ func (h remoteHost) State() remote.State {
 }
 
 // remoteStateOf is the state the player's st tells the computer that
-// controls it: the track, where it is, the volume, and the tracks it moves
-// on to, each with its entry's UID, which the commands on the queue name.
+// controls it: the track, where it is, the parts it passes over, the
+// volume, and the tracks it moves on to, each with its entry's UID, which
+// the commands on the queue name.
 func remoteStateOf(st player.State) remote.State {
 	out := remote.State{Playing: st.Playing || st.Waiting && st.WillPlay, Loading: st.Loading, Live: st.Live,
 		PositionMs: st.Position.Milliseconds(), DurationMs: st.Duration.Milliseconds(), Volume: st.Volume, Muted: st.Muted}
@@ -182,6 +183,7 @@ func remoteStateOf(st player.State) remote.State {
 	if out.DurationMs <= 0 && !st.Live {
 		out.DurationMs = int64(cur.Track.DurationMs)
 	}
+	out.Parts = remotePartsOf(st)
 	for i := st.Index + 1; i < len(st.Queue) && len(out.Next) < remote.MaxNext; i++ {
 		if st.Queue[i].Skip == "" {
 			next := remoteTrackOf(st.Queue[i].Track)

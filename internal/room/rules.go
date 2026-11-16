@@ -7,6 +7,7 @@ package room
 // whose it is, how often it asks, and how much.
 
 import (
+	"context"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/remote"
@@ -39,9 +40,13 @@ func (r Rules) clean() Rules {
 type Guests struct {
 	// Rules are the host's rules now, which each ask is checked against.
 	Rules func() Rules
-	// Playable reports whether the host can play t, a song a guest adds.
-	Playable func(t remote.QueueTrack) bool
-	// Add adds t, which from added, to the host's queue.
+	// Look is the song t a guest adds as the host finds it, by its ID and
+	// its kind alone, on its service or among its own files, or why it
+	// finds none: the guest's word on its title, artists, covers and
+	// whether it's explicit is taken for nothing. It may ask the network.
+	Look func(ctx context.Context, t remote.QueueTrack) (remote.QueueTrack, error)
+	// Add adds t, as Look found it, which from added, to the host's queue,
+	// or tells why it doesn't, as its settings hide it.
 	Add func(from Member, t remote.QueueTrack) error
 	// Control has the host's player do what from asks: Play, Pause, Next
 	// or Previous.
@@ -54,12 +59,18 @@ type Guests struct {
 // asks are what the guests asked and what waits for the host's user, as
 // the files of each keep them. Server.mu guards them.
 type asks struct {
-	next     int64
-	requests []*Request
-	knocks   []*Knock
-	limits   map[remote.Fingerprint]*limits
-	sent     *Rules
-	move     *move
+	next         int64
+	requests     []*Request
+	knocks       []*Knock
+	knockTold    map[string]time.Time
+	limits       map[remote.Fingerprint]*limits
+	sourceLimits map[string]*limits
+	looking      map[remote.Fingerprint]int
+	looks        int
+	sent         *Rules
+	move         *move
+	moved        bool
+	seated       map[remote.Fingerprint]bool
 }
 
 // rules are the host's rules now: with no Guests, guests add no songs,
@@ -87,7 +98,8 @@ func (s *Server) RulesChanged() {
 	}
 }
 
-// tellRules tells c, a guest let in, the host's rules. s.mu is held.
+// tellRules tells c, a guest let in, the host's rules. s.mu isn't held, as
+// Guests' funcs are called without it.
 func (s *Server) tellRules(c *conn) {
 	r := s.rules()
 	c.send(message{Type: "rules", Rules: &r})
@@ -201,6 +213,43 @@ func (s *Server) limitsOf(key remote.Fingerprint) *limits {
 	if l == nil {
 		l = &limits{}
 		a.limits[key] = l
+	}
+	return l
+}
+
+// takes reports whether the guest of c may ask once more, by the bucket
+// of limits each, which take, of size at once and one each every: its
+// key's, and its source's (sourceOf), of twice as many, so that a computer
+// that makes new keys asks no more. s.mu is held.
+func (s *Server) takes(c *conn, bucketOf func(*limits) *bucket, size int, every time.Duration) bool {
+	now := time.Now()
+	return bucketOf(s.limitsOf(c.key)).take(now, size, every) && bucketOf(s.limitsFrom(c.src)).take(now, 2*size, every/2)
+}
+
+// limitsFrom are what the guests of the source src may still ask, of
+// sources the room has guests of. s.mu is held.
+func (s *Server) limitsFrom(src string) *limits {
+	a := &s.asks
+	if len(a.sourceLimits) > 2*MaxGuests {
+		here := map[string]bool{}
+		for _, g := range s.guests {
+			if g.conn != nil {
+				here[g.conn.src] = true
+			}
+		}
+		for src := range a.sourceLimits {
+			if !here[src] {
+				delete(a.sourceLimits, src)
+			}
+		}
+	}
+	if a.sourceLimits == nil {
+		a.sourceLimits = map[string]*limits{}
+	}
+	l := a.sourceLimits[src]
+	if l == nil {
+		l = &limits{}
+		a.sourceLimits[src] = l
 	}
 	return l
 }

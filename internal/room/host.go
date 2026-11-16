@@ -335,12 +335,21 @@ func (s *Server) handle(raw net.Conn, u *unproven) {
 	c.features = hello.Features
 	switch hello.Want {
 	case wantRejoin:
+		// A seat of a room that moved here is let in first, when the rules
+		// ask it, as a join is (letin.go).
+		reason, asked := s.letInSeat(c, name)
+		if reason != "" {
+			refuse(reason)
+			return
+		}
 		if reason := s.comeBack(c, name); reason != "" {
 			refuse(reason)
 			return
 		}
 		proven()
-		c.f.Limit(guestMessage)
+		if !asked {
+			c.f.Limit(guestMessage)
+		}
 	case wantJoin:
 		if !s.join(c, hello, name, refuse, proven, proveBy) {
 			return
@@ -397,11 +406,14 @@ func (s *Server) removeConn(c *conn) {
 	}
 }
 
-// refusal is why the host refuses the key now, or "": blocked, or a
-// room full of other guests.
+// refusal is why the host refuses the key now, or "": blocked, a room
+// that moves or moved (move.go), or a room full of other guests.
 func (s *Server) refusal(key remote.Fingerprint) string {
 	if _, ok := s.blocked[key]; ok {
 		return reasonBlocked
+	}
+	if s.moves() {
+		return reasonMoving
 	}
 	if _, ok := s.guests[key]; !ok && len(s.guests) >= MaxGuests {
 		return reasonFull
@@ -554,6 +566,7 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 		}
 		s.admit(c, name, st)
 		s.mu.Unlock()
+		s.tellRules(c)
 		s.changed(true)
 		return true
 	}
@@ -584,6 +597,7 @@ func (s *Server) comeBack(c *conn, name string) string {
 	}
 	s.admit(c, name, st)
 	s.mu.Unlock()
+	s.tellRules(c)
 	s.changed(true)
 	return ""
 }
@@ -608,7 +622,6 @@ func (s *Server) admit(c *conn, name string, st State) {
 	}
 	st = s.stateOf(st)
 	c.send(message{Type: "state", State: &st})
-	s.tellRules(c)
 }
 
 // note keeps an activity. s.mu is held.
@@ -805,6 +818,8 @@ func (s *Server) Unblock(key remote.Fingerprint) {
 
 // drop ends the stay of the guest of key, telling it why.
 func (s *Server) drop(key remote.Fingerprint, reason, what string) {
+	// A move under way keeps the seats it was asked with (move.go).
+	s.stopMove(errDropped)
 	s.mu.Lock()
 	g := s.guests[key]
 	if g == nil {

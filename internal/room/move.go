@@ -6,8 +6,9 @@ package room
 // room of its own, which keeps them, and says where (hosting). The host
 // asks each other guest whether it reaches that room (reach), and tries it
 // itself; once all did, it tells them all the room moved (moved), and they
-// come back to the new host by their keys, as after a drop. One that can't
-// reach it, or no answer in MoveFor, keeps the room where it is.
+// come back to the new host by their keys, as after a drop. The guest's
+// user is asked first, AnswerFor at most; one that can't reach the room,
+// or no answer in MoveFor, keeps the room where it is.
 
 import (
 	"context"
@@ -27,7 +28,7 @@ func init() {
 	guestAsks["hosting"] = (*Server).hosting
 	guestAsks["reach"] = func(s *Server, c *conn, m message) { s.reachedBy(c, m.OK) }
 	hostTells["host"] = func(s *Session, m message) {
-		s.tell(Event{Kind: HostAsked, Seats: Seats{Guests: membersOfSeats(m.Seats), Blocked: membersOfSeats(m.Blocked)}})
+		s.tell(Event{Kind: HostAsked, Seats: Seats{Guests: membersOfSeats(m.Seats, MaxGuests+1), Blocked: membersOfSeats(m.Blocked, maxBlocked)}})
 	}
 	hostTells["unhost"] = func(s *Session, m message) { s.tell(Event{Kind: Unhosted}) }
 	hostTells["reach"] = func(s *Session, m message) {
@@ -41,11 +42,15 @@ func init() {
 // featureMove: the guest can host the room it is in (MakeHost).
 const featureMove = "move"
 
-// MoveFor bounds a move: the guest opening its room, and the others
-// reaching it. Tests shorten moveFor.
-const MoveFor = 10 * time.Second
+// AnswerFor bounds the wait for the guest asked to host, whose user says
+// whether it does, and MoveFor the others reaching its room then. Tests
+// shorten answerFor and moveFor.
+const (
+	AnswerFor = time.Minute
+	MoveFor   = 10 * time.Second
+)
 
-var moveFor = MoveFor
+var answerFor, moveFor = AnswerFor, MoveFor
 
 var (
 	// ErrCantHost: the guest is away, or its MixMusic can't host the room.
@@ -54,6 +59,9 @@ var (
 	ErrMoving = errors.New("the room moves to another guest already")
 	// ErrMoved: the room moved to another computer (Session.Moved).
 	ErrMoved = errors.New("the room moved to another computer")
+	// ErrRoomMoves: the room moves to another computer, or moved: it
+	// lets no one in meanwhile, as their places wouldn't move with it.
+	ErrRoomMoves = errors.New("the room is moving to another computer: try again in a moment")
 )
 
 // Seat is a place a room keeps, as the host that moves it tells: a key, in
@@ -72,18 +80,25 @@ func seatsOf(ms []Member) []Seat {
 	return out
 }
 
-// membersOfSeats are the seats a host told, MaxGuests and one more at
-// most, of keys that are keys, as members.
-func membersOfSeats(seats []Seat) []Member {
-	if len(seats) > MaxGuests+1 {
-		seats = seats[:MaxGuests+1]
+// maxBlocked bounds the keys a room that moves tells blocked: more than
+// its guests, as a host blocks those who left too, and few enough that
+// their message, with the seats, takes less than the protocol's MiB.
+const maxBlocked = 2048
+
+// membersOfSeats are the seats a host told, n at most, of keys that are
+// keys, once each, as members.
+func membersOfSeats(seats []Seat, n int) []Member {
+	if len(seats) > n {
+		seats = seats[:n]
 	}
 	var out []Member
+	seen := map[remote.Fingerprint]bool{}
 	for _, st := range seats {
 		key, err := remote.ParseFingerprint(st.Key)
-		if err != nil || slices.ContainsFunc(out, func(m Member) bool { return m.Key == key }) {
+		if err != nil || seen[key] {
 			continue
 		}
+		seen[key] = true
 		out = append(out, Member{Key: key, Name: CleanName(st.Name)})
 	}
 	return out
@@ -113,6 +128,10 @@ func (s *Server) seat() {
 		}
 		// In the order they joined the room they come from.
 		s.guests[m.Key] = &guest{Member: Member{Key: m.Key, Name: m.Name, Joined: now.Add(time.Duration(i))}, away: now}
+		if s.asks.seated == nil {
+			s.asks.seated = map[remote.Fingerprint]bool{}
+		}
+		s.asks.seated[m.Key] = true
 	}
 	for _, m := range s.Seats.Blocked {
 		if s.blocked == nil {
@@ -172,8 +191,10 @@ func (s *Server) MakeHost(key remote.Fingerprint, done func(Move, error)) error 
 	for k, name := range s.blocked {
 		blocked = append(blocked, Member{Key: k, Name: name})
 	}
+	slices.SortFunc(blocked, func(a, b Member) int { return compareKeys(a.Key, b.Key) })
+	blocked = blocked[:min(len(blocked), maxBlocked)]
 	mv := &move{to: key, name: g.Name, conn: g.conn, done: done}
-	mv.timer = time.AfterFunc(moveFor, func() { s.notMoved(mv, fmt.Errorf("%s's computer didn't open the room in time", mv.name)) })
+	mv.timer = time.AfterFunc(answerFor, func() { s.notMoved(mv, fmt.Errorf("%s didn't answer in time", mv.name)) })
 	s.asks.move = mv
 	g.conn.send(message{Type: "host", Seats: seatsOf(seats), Blocked: seatsOf(blocked)})
 	return nil
@@ -203,8 +224,13 @@ func (s *Server) CanHost(key remote.Fingerprint) bool {
 func (s *Server) hosting(c *conn, m message) {
 	s.mu.Lock()
 	mv := s.asks.move
-	if mv == nil || mv.conn != c || mv.addr != "" {
+	if mv == nil || mv.conn != c || mv.addr != "" || s.guestOf(c) == nil {
 		s.mu.Unlock()
+		return
+	}
+	if m.Reason == reasonDeclined {
+		s.mu.Unlock()
+		s.notMoved(mv, fmt.Errorf("%s doesn't host the room", mv.name))
 		return
 	}
 	if m.Reason != "" || m.Port <= 0 || m.Port > 65535 {
@@ -218,6 +244,8 @@ func (s *Server) hosting(c *conn, m message) {
 	}
 	mv.addr = net.JoinHostPort(host, strconv.Itoa(m.Port))
 	mv.waiting, mv.self = map[remote.Fingerprint]bool{}, true
+	mv.timer.Stop()
+	mv.timer = time.AfterFunc(moveFor, func() { s.notMoved(mv, fmt.Errorf("not everyone reached %s's computer in time", mv.name)) })
 	for k, g := range s.guests {
 		if k != mv.to && g.conn != nil {
 			mv.waiting[k] = true
@@ -275,7 +303,14 @@ func (s *Server) reached(mv *move, who *Member, ok bool) {
 		s.mu.Unlock()
 		return
 	}
+	if s.guestOf(mv.conn) == nil {
+		// The guest it moves to went meanwhile.
+		s.mu.Unlock()
+		s.notMoved(mv, fmt.Errorf("%s left the room", mv.name))
+		return
+	}
 	s.asks.move = nil
+	s.asks.moved = true
 	mv.timer.Stop()
 	var conns []*conn
 	for _, g := range s.guests {
@@ -297,6 +332,27 @@ func (s *Server) reached(mv *move, who *Member, ok bool) {
 	wg.Wait()
 	if mv.done != nil {
 		mv.done(done, nil)
+	}
+}
+
+// reasonMoving: the room moves, or moved, and lets no one in.
+const reasonMoving = "moving"
+
+// moves reports whether a move is under way, or the room moved. s.mu is
+// held.
+func (s *Server) moves() bool { return s.asks.move != nil || s.asks.moved }
+
+// errDropped: the host removed or blocked someone as the room moved, whose
+// place the room it moved to would keep.
+var errDropped = errors.New("you removed or blocked someone while it moved")
+
+// stopMove ends the move under way, if any, for why.
+func (s *Server) stopMove(why error) {
+	s.mu.Lock()
+	mv := s.asks.move
+	s.mu.Unlock()
+	if mv != nil {
+		s.notMoved(mv, why)
 	}
 }
 
@@ -348,6 +404,12 @@ func (s *Session) Hosting(port int) error {
 		m.Port, m.Reason = 0, "can't"
 	}
 	return s.f.Send(m, s.timing.silence())
+}
+
+// DeclineHost tells the host that this guest's user doesn't host the
+// room.
+func (s *Session) DeclineHost() error {
+	return s.f.Send(message{Type: "hosting", Reason: reasonDeclined}, s.timing.silence())
 }
 
 // Reached tells the host whether this guest reaches the room it moves to.

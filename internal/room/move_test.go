@@ -2,6 +2,7 @@ package room
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net"
 	"strings"
@@ -171,13 +172,13 @@ func TestMakeHostStays(t *testing.T) {
 	}
 }
 
-// TestMakeHostInTime keeps the room where it is when the guest doesn't open
-// a room in time; and refuses a move to a guest away, or one while another
+// TestMakeHostInTime keeps the room where it is when the guest doesn't
+// answer in time; and refuses a move to a guest away, or one while another
 // is under way.
 func TestMakeHostInTime(t *testing.T) {
-	was := moveFor
-	moveFor = 300 * time.Millisecond
-	t.Cleanup(func() { moveFor = was })
+	was := answerFor
+	answerFor = 300 * time.Millisecond
+	t.Cleanup(func() { answerFor = was })
 	r := newTestRoom(t)
 	ana, bo := newGuest(t, "Ana"), newGuest(t, "Bo")
 	r.join(ana)
@@ -189,13 +190,37 @@ func TestMakeHostInTime(t *testing.T) {
 	if err := r.server.MakeHost(bo.Identity.Fingerprint(), nil); !errors.Is(err, ErrMoving) {
 		t.Fatalf("a second move: %v", err)
 	}
-	if err := <-done; err == nil || err.Error() != "Ana's computer didn't open the room in time" {
+	if err := <-done; err == nil || err.Error() != "Ana didn't answer in time" {
 		t.Fatalf("moved: %v", err)
 	}
 	sb.Close()
 	waitFor(t, "Bo away", func() bool { return !r.server.CanHost(bo.Identity.Fingerprint()) })
 	if err := r.server.MakeHost(bo.Identity.Fingerprint(), nil); !errors.Is(err, ErrCantHost) {
 		t.Fatalf("a move to a guest away: %v", err)
+	}
+}
+
+// TestMakeHostReachedInTime gives the guest asked to host longer than the
+// others to reach its room, and keeps the room where it is when they don't
+// in time.
+func TestMakeHostReachedInTime(t *testing.T) {
+	wasAnswer, wasMove := answerFor, moveFor
+	answerFor, moveFor = 5*time.Second, 300*time.Millisecond
+	t.Cleanup(func() { answerFor, moveFor = wasAnswer, wasMove })
+	r := newTestRoom(t)
+	ana, bo := newGuest(t, "Ana"), newGuest(t, "Bo")
+	sa, sb := r.join(ana), r.join(bo)
+	// Ana answers after more than moveFor; Bo never says it reaches.
+	later := make(chan struct{})
+	hostWhenAsked(t, ana, sa, later)
+	reachWhenAsked(t, bo, sb, make(chan struct{}))
+	done := make(chan error, 1)
+	if err := r.server.MakeHost(ana.Identity.Fingerprint(), func(_ Move, err error) { done <- err }); err != nil {
+		t.Fatal(err)
+	}
+	time.AfterFunc(2*moveFor, func() { close(later) })
+	if err := <-done; err == nil || err.Error() != "not everyone reached Ana's computer in time" {
+		t.Fatalf("moved: %v", err)
 	}
 }
 
@@ -209,8 +234,31 @@ func TestSeatsOfAHost(t *testing.T) {
 		other, _ := remote.NewIdentity()
 		seats = append(seats, Seat{Key: other.Fingerprint().String(), Name: "Guest"})
 	}
-	got := membersOfSeats(seats)
+	got := membersOfSeats(seats, MaxGuests+1)
 	if len(got) != MaxGuests-1 || got[0].Key != id.Fingerprint() || got[0].Name != "Ana" {
 		t.Fatalf("%d seats, the first %+v", len(got), got[0])
+	}
+}
+
+// TestBlockedSeatsBeyondTheGuests keeps more blocked keys than a room
+// takes guests, as a host blocks those who left too.
+func TestBlockedSeatsBeyondTheGuests(t *testing.T) {
+	var seats []Seat
+	for range maxBlocked + 10 {
+		id, _ := remote.NewIdentity()
+		seats = append(seats, Seat{Key: id.Fingerprint().String(), Name: "Blocked"})
+	}
+	if got := membersOfSeats(seats, maxBlocked); len(got) != maxBlocked {
+		t.Fatalf("%d blocked kept", len(got))
+	}
+	// Their message, with every seat, takes what the protocol takes.
+	long := strings.Repeat("\U0001F600", MaxName)
+	all := make([]Seat, maxBlocked)
+	for i := range all {
+		all[i] = Seat{Key: seats[i].Key, Name: long}
+	}
+	data, err := json.Marshal(message{Type: "host", Seats: all[:MaxGuests+1], Blocked: all})
+	if err != nil || len(data) > remote.MaxMessage {
+		t.Fatalf("the host message takes %d bytes: %v", len(data), err)
 	}
 }

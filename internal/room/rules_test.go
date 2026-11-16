@@ -1,6 +1,8 @@
 package room
 
 import (
+	"context"
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -9,13 +11,18 @@ import (
 )
 
 // fakeGuests is a host's app for its guests' asks: the rules it has, the
-// songs it adds, and what it tells its user.
+// songs it finds, by their IDs, and those it adds, and what it tells its
+// user. A song it finds has the title titles names, or its own, and no
+// cover; gate, when set, holds each find until it closes.
 type fakeGuests struct {
-	mu    sync.Mutex
-	rules Rules
-	cant  map[string]bool
-	added []remote.QueueTrack
-	notes []string
+	mu     sync.Mutex
+	rules  Rules
+	cant   map[string]bool
+	titles map[string]string
+	gate   chan struct{}
+	looks  int
+	added  []remote.QueueTrack
+	notes  []string
 }
 
 func (f *fakeGuests) set(r Rules) {
@@ -27,10 +34,24 @@ func (f *fakeGuests) set(r Rules) {
 func (f *fakeGuests) guests() *Guests {
 	return &Guests{
 		Rules: func() Rules { f.mu.Lock(); defer f.mu.Unlock(); return f.rules },
-		Playable: func(t remote.QueueTrack) bool {
+		Look: func(_ context.Context, t remote.QueueTrack) (remote.QueueTrack, error) {
+			f.mu.Lock()
+			gate := f.gate
+			f.looks++
+			f.mu.Unlock()
+			if gate != nil {
+				<-gate
+			}
 			f.mu.Lock()
 			defer f.mu.Unlock()
-			return !f.cant[t.ID]
+			if f.cant[t.ID] {
+				return remote.QueueTrack{}, errors.New("not found")
+			}
+			title := t.Title
+			if name, ok := f.titles[t.ID]; ok {
+				title = name
+			}
+			return remote.QueueTrack{Source: t.Source, ID: t.ID, Title: title}, nil
 		},
 		Add: func(_ Member, t remote.QueueTrack) error {
 			f.mu.Lock()
@@ -141,4 +162,25 @@ func TestBucketRefills(t *testing.T) {
 	if !b.take(now.Add(time.Hour), 5, time.Second) {
 		t.Fatal("refused after an hour")
 	}
+}
+
+// TestRulesWithoutTheLock asks the host's app its rules without the
+// server's lock, as Guests' funcs are: rules that read the room's members
+// let a guest join.
+func TestRulesWithoutTheLock(t *testing.T) {
+	var srv *Server
+	r := newTestRoomWith(t, func(s *Server) {
+		srv = s
+		s.Guests = &Guests{Rules: func() Rules {
+			srv.Members()
+			return Rules{Songs: SongsAdd}
+		}}
+	})
+	s := r.join(newGuest(t, "Ana"))
+	waitFor(t, "the rules", func() bool { got, ok := s.Rules(); return ok && got.Songs == SongsAdd })
+	back, err := newGuest(t, "Bo").Knock(context.Background(), r.addr, nil, []byte("ABC123"), false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	back.Close()
 }

@@ -185,7 +185,9 @@ few computers that proved nothing yet (`admit.go`).
   is a few hundred bytes. Once proven, a guest's messages are of 64 KiB at
   most (`guestMessage`): a song it adds is the largest, of a few KiB.
   From then on its messages are read on a goroutine of their own
-  (`messages`), so that the host waits on them and on its user at once.
+  (`messages`), so that the host waits on them and on its user at once,
+  into the fields of a guest's messages alone (`sent`): a guest's message
+  of the host's fields builds nothing of them.
 
 ## Coming back, removing, blocking
 
@@ -230,14 +232,28 @@ page, which nothing waits on.
   accepts or declines it (`SongsAsk`, as at first), or refuses
   (`SongsOff`); the guest is told which (`added`). A guest adds
   `songsPerMinute` songs, 10, at most, ten at once then one each 6 s, and
-  has `MaxWaiting`, 10, wait at most; the host takes none it can't play,
-  or whose explicit content its settings hide. The songs that wait go with
-  their guest, as it leaves or is removed.
+  has `MaxWaiting`, 10, wait at most. The host takes a guest's word on a
+  song for nothing but its ID and its kind: it finds each by its ID
+  (`Guests.Look`), on YouTube Music, on Spotify while signed in to it, or
+  among its own files, and shows, plays and tells Discord and the
+  scrobblers of the song as that tells it, its covers and whether it's
+  explicit included. It finds them beside the guest's messages, 16 at
+  once in the room (`maxLooks`), 10 s each at most. A Spotify song it
+  can't find keeps only covers of the services' own hosts, and is refused
+  while the host hides explicit content. In Ask me first, a file of the
+  guest's waits for the host's user, who finds it among their files as
+  they accept it, so that the guest learns nothing of the host's files
+  meanwhile; and a song the host's settings hide is refused as its user
+  accepts it. The songs that wait go with their guest, as it leaves or is
+  removed or blocked.
 - **Controls** (`control.go`). While the rules let them, a guest has the
   host's player play, pause, go to the next track or the last (`control`):
   5 at once at most, then one a second; one the rules don't let through,
   or past that, is refused (`control`, with why). The activity tells who
   did what.
+- **Each source too.** Songs and controls are counted by the guest's key,
+  and by its source, an IPv4 address or IPv6 /64, which takes twice as
+  many: a computer that proved the code makes new keys as it likes.
 
 ### Asking before a join
 
@@ -246,8 +262,13 @@ computer that proved the code or the link and asks to join until its
 user says so: it tells the guest it asks (`asking`), answers its pings
 meanwhile, and lets it in, or turns it away (`refused`, `declined`), as
 its user answers, or after 2 minutes (`AskFor`). 20 wait at most
-(`maxKnocks`): one more is refused (`many asking`). Guests that come back
-by their keys aren't asked about, and a new code ends those that wait.
+(`maxKnocks`), 2 of a source (`maxKnocksFrom`): one more is refused
+(`many asking`). The host's user is told of a source's first knock, and of
+none of it again within a minute; each shows the start of its key's ID,
+which tells two of one name apart, and whether it comes from the host's
+own networks or the internet. Guests that come back by their keys aren't
+asked about, but for the seats of a room that moved here, the first time
+(`letInSeat`): turned away, a seat goes. A new code ends those that wait.
 
 ## Make host
 
@@ -257,24 +278,33 @@ the hello's features):
 
 1. The host asks the guest to host (`host`), with the seats to keep: the
    keys and names of the other guests and of itself, and the keys it
-   blocked.
-2. The guest opens a room of its own, of a new code and link, which
+   blocked, 2,048 at most (`maxBlocked`).
+2. The guest's user is asked whether this computer hosts the room, 50 s
+   at most: declined, or unanswered, or asked again within a minute, it
+   says so (`hosting`, `declined`). The host waits a minute for that
+   (`AnswerFor`). Once its user agreed, the guest opens a room of its own, of a new code and link, which
    keeps those places as of guests that dropped off and blocks those
    keys (`Seats`), and says at which port (`hosting`).
 3. The host tells each other guest where (`reach`): the new host's key,
    and its address, as the host's connection with it tells, with that
    port. Each tries a TLS connection to that key, where discovery finds it
    or at that address, and says whether it got one (`reach`); the host
-   tries it too.
+   tries it too. A guest tries once each 10 s at most, and says it didn't
+   3 s after it was asked, however soon it knew, so that a host can't use
+   its guests to knock at address after address.
 4. Once all did, the host tells them all the room moved (`moved`), before
    it ends the room: each comes back to the new host by its key, as after
    a drop, the host too. The new host's player takes the room's queue,
    where the host played it.
 
-One that can't reach it, or no answer in 10 s (`MoveFor`), keeps the room
-where it is: the guest is told to close the room it opened (`unhost`),
-which it also closes by itself after twice that. A guest takes a seat
-only of a key, 201 at most.
+One that can't reach it, or no answer in 10 s once the guest opened its
+room (`MoveFor`), keeps the room where it is: the guest is told to close
+the room it opened (`unhost`), which it also closes by itself after twice
+that. So does a Remove or a Block meanwhile, as the room it would move to
+keeps the seats and blocks of its asking, and the guest it moves to
+leaving. As it moves, and once it moved, the room lets no one join, or
+come back (`moving`), as their places wouldn't move with it. A guest takes
+a seat only of a key, 201 at most.
 
 ## Keeping in step
 

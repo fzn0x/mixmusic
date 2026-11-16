@@ -7,8 +7,11 @@ package room
 
 import (
 	"errors"
+	"net/netip"
 	"slices"
 	"time"
+
+	"github.com/fzn0x/mixmusic/internal/remote"
 )
 
 func init() {
@@ -25,13 +28,51 @@ func init() {
 const AskFor = 2 * time.Minute
 
 // maxKnocks bounds the computers that wait for the host's user to let them
-// in.
-const maxKnocks = 20
+// in, and maxKnocksFrom those of a source; knockTellEvery is how often at
+// most the host's user is told a source knocks.
+const (
+	maxKnocks      = 20
+	maxKnocksFrom  = 2
+	knockTellEvery = time.Minute
+)
 
-// Why the host turns a computer away that asks to join.
+// knockAddr is the address of the source src (sourceOf), and whether it's
+// one.
+func knockAddr(src string) (netip.Addr, bool) {
+	ip, err := netip.ParseAddr(src)
+	if err != nil {
+		p, err := netip.ParsePrefix(src)
+		if err != nil {
+			return netip.Addr{}, false
+		}
+		ip = p.Addr()
+	}
+	return ip, true
+}
+
+// knocksNearby reports whether the source src (sourceOf) is of a network
+// of the host's own kind: a private, loopback or link-local address, as
+// the internet's never are. The providers' shared range, 100.64.0.0/10,
+// which VPNs give their computers too, isn't.
+func knocksNearby(src string) bool {
+	ip, ok := knockAddr(src)
+	return ok && (ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast())
+}
+
+// knocksHere reports whether the source src is this computer itself, of
+// a loopback address: its own user, whose knocks aren't counted by
+// source.
+func knocksHere(src string) bool {
+	ip, ok := knockAddr(src)
+	return ok && ip.IsLoopback()
+}
+
+// Why the host turns a computer away that asks to join: reasonLeft is
+// that it went meanwhile.
 const (
 	reasonDeclined = "declined"
 	reasonManyAsk  = "many asking"
+	reasonLeft     = "left"
 )
 
 var (
@@ -48,8 +89,15 @@ type Knock struct {
 	ID   int64
 	Name string
 	At   time.Time
-	// answer takes the host's user's answer.
+	// Key is the start of the computer's key's ID, which tells two of the
+	// same name apart, and Local whether it knocks from the host's own
+	// networks, not from the internet.
+	Key   string
+	Local bool
+	// answer takes the host's user's answer; src is the source it knocks
+	// from (sourceOf).
 	answer chan bool
+	src    string
 }
 
 // letIn has the host's user let in c, of the computer named name, which
@@ -60,14 +108,11 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 		return ""
 	}
 	s.mu.Lock()
-	if len(s.asks.knocks) >= maxKnocks {
-		s.mu.Unlock()
+	k, tell := s.knock(c.key, c.src, name, time.Now())
+	s.mu.Unlock()
+	if k == nil {
 		return reasonManyAsk
 	}
-	s.asks.next++
-	k := &Knock{ID: s.asks.next, Name: name, At: time.Now(), answer: make(chan bool, 1)}
-	s.asks.knocks = append(s.asks.knocks, k)
-	s.mu.Unlock()
 	defer func() {
 		s.mu.Lock()
 		s.asks.knocks = slices.DeleteFunc(s.asks.knocks, func(o *Knock) bool { return o == k })
@@ -78,7 +123,7 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 	if c.f.Send(message{Type: "asking"}, t.silence()) != nil {
 		return reasonDeclined
 	}
-	if gs := s.Guests; gs != nil && gs.Asks != nil {
+	if gs := s.Guests; tell && gs != nil && gs.Asks != nil {
 		gs.Asks(name + " asks to join your room")
 	}
 	s.changed(false)
@@ -88,7 +133,7 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 		select {
 		case m, ok := <-msgs:
 			if !ok {
-				return reasonDeclined
+				return reasonLeft
 			}
 			if m.Type == "ping" && c.f.Send(message{Type: "pong", Sent: m.Sent, HostAt: s.Clock.Now()}, t.silence()) != nil {
 				return reasonDeclined
@@ -104,6 +149,96 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 	}
 }
 
+// letInSeat has the host's user let in c, of the computer named name,
+// which comes back by its key to a seat of the room that moved here
+// (move.go), when the rules ask them, as a join is; a seat turned away
+// goes, and joins again only by the code or the link. It returns why not, or "", and
+// whether it asked, which reads c's messages from then on.
+func (s *Server) letInSeat(c *conn, name string) (string, bool) {
+	s.mu.Lock()
+	g := s.guests[c.key]
+	seated := s.asks.seated[c.key] && g != nil && g.conn == nil && s.refusal(c.key) == ""
+	s.mu.Unlock()
+	if !seated {
+		return "", false
+	}
+	if !s.rules().Ask {
+		s.unseat(c.key, false)
+		return "", false
+	}
+	c.f.Limit(guestMessage)
+	reason := s.letIn(c, name, c.messages(s.Timing.silence()))
+	if reason != reasonLeft {
+		s.unseat(c.key, reason != "")
+	}
+	return reason, true
+}
+
+// unseat takes the seat of key as let in, or turned away, when gone: its
+// place goes then.
+func (s *Server) unseat(key remote.Fingerprint, gone bool) {
+	s.mu.Lock()
+	delete(s.asks.seated, key)
+	g := s.guests[key]
+	gone = gone && g != nil && g.conn == nil
+	if gone {
+		delete(s.guests, key)
+		s.note(g.Name, Removed)
+	}
+	s.mu.Unlock()
+	if gone {
+		s.changed(true)
+	}
+}
+
+// letIn waits, on a session of a computer that comes back to the seat of
+// a room that moved, for the host's user to let it in, AskFor at most.
+func (s *Session) letIn() (*Session, error) {
+	s.mu.Lock()
+	s.asks.asking = true
+	s.mu.Unlock()
+	s.start()
+	wait := time.NewTimer(AskFor + s.timing.silence())
+	defer wait.Stop()
+	select {
+	case <-s.joinedCh:
+		return s, nil
+	case <-s.done:
+		return nil, s.Err()
+	case <-wait.C:
+		s.Close()
+		return nil, ErrDeclined
+	}
+}
+
+// knock keeps the knock of the computer of key, named name, from the source
+// src, at now, and reports whether to tell the host's user of it: of a
+// source's first knock, and of none of it again for a while, however it
+// knocks. It keeps none past maxKnocks, or maxKnocksFrom of src, unless
+// src is this computer itself. s.mu is held.
+func (s *Server) knock(key remote.Fingerprint, src, name string, now time.Time) (*Knock, bool) {
+	from := 0
+	for _, o := range s.asks.knocks {
+		if o.src == src {
+			from++
+		}
+	}
+	if len(s.asks.knocks) >= maxKnocks || from >= maxKnocksFrom && !knocksHere(src) {
+		return nil, false
+	}
+	s.asks.next++
+	k := &Knock{ID: s.asks.next, Name: name, At: now, Key: key.ID()[:8], Local: knocksNearby(src), answer: make(chan bool, 1), src: src}
+	s.asks.knocks = append(s.asks.knocks, k)
+	tell := from == 0 && now.Sub(s.asks.knockTold[src]) >= knockTellEvery
+	if tell {
+		if s.asks.knockTold == nil || len(s.asks.knockTold) >= maxSources {
+			s.asks.knockTold = map[string]time.Time{}
+		}
+		s.asks.knockTold[src] = now
+	}
+	return k, tell
+}
+
 // Knocks returns the computers that wait for the host's user to let them
 // in, the oldest first.
 func (s *Server) Knocks() []Knock {
@@ -111,7 +246,7 @@ func (s *Server) Knocks() []Knock {
 	defer s.mu.Unlock()
 	out := make([]Knock, len(s.asks.knocks))
 	for i, k := range s.asks.knocks {
-		out[i] = Knock{ID: k.ID, Name: k.Name, At: k.At}
+		out[i] = Knock{ID: k.ID, Name: k.Name, At: k.At, Key: k.Key, Local: k.Local}
 	}
 	return out
 }

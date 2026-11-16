@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"sync/atomic"
+	"sync"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -94,6 +94,98 @@ func (a *App) movedTo(h *hostedRoom, m room.Move) {
 	go a.comeBack(g)
 }
 
+// The host's asks that this computer host its room: the user has
+// hostAskFor to answer, less than the host waits, and a host asks once
+// each hostAskEvery at most. Tests shorten them.
+var (
+	hostAskFor   = room.AnswerFor * 5 / 6
+	hostAskEvery = time.Minute
+)
+
+// hostAsk is the host's ask, in session, that this computer host its
+// room, which keeps seats, while it waits for the user.
+type hostAsk struct {
+	session *room.Session
+	seats   room.Seats
+	timer   *time.Timer
+}
+
+// askToHost asks the user whether this computer hosts the room of g, as
+// its host asks in the session s: it declines at once a host that asks
+// again within hostAskEvery, and after hostAskFor.
+func (a *App) askToHost(g *guestRoom, s *room.Session, seats room.Seats) {
+	r := &a.room
+	r.mu.Lock()
+	ok := r.guest == g && g.session == s && g.step == RoomIn && r.hosted == nil && g.pending == nil && g.ask == nil &&
+		time.Since(g.askedAt) >= hostAskEvery
+	var ask *hostAsk
+	if ok {
+		ask = &hostAsk{session: s, seats: seats}
+		ask.timer = time.AfterFunc(hostAskFor, func() { a.answerHost(g, ask, false) })
+		g.ask, g.askedAt = ask, time.Now()
+	}
+	name := g.name
+	r.mu.Unlock()
+	if !ok {
+		_ = s.DeclineHost()
+		return
+	}
+	log.Printf("mixmusic: room: %s asks this computer to host the room", name)
+	a.roomAsks(name + " asks you to host the room")
+}
+
+// answerHost answers the host's ask, opening a room for the room of g to
+// move to, if yes.
+func (a *App) answerHost(g *guestRoom, ask *hostAsk, yes bool) {
+	r := &a.room
+	r.mu.Lock()
+	mine := g.ask == ask
+	if mine {
+		g.ask = nil
+		ask.timer.Stop()
+	}
+	r.mu.Unlock()
+	if !mine {
+		return
+	}
+	a.notifyRooms("")
+	if !yes {
+		_ = ask.session.DeclineHost()
+		return
+	}
+	a.hostAsked(g, ask.session, ask.seats)
+}
+
+// HostAsk returns the name of the host of the room this computer is in,
+// while it asks this computer to host the room, which the user answers
+// with AnswerHost.
+func (rs *Rooms) HostAsk() (string, bool) {
+	r := &rs.a.room
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	g := r.guest
+	if g == nil || g.ask == nil || g.ask.session != g.session || g.step != RoomIn {
+		return "", false
+	}
+	return g.name, true
+}
+
+// AnswerHost answers the host's ask that this computer host the room:
+// it opens a room for the room to move to, if yes.
+func (rs *Rooms) AnswerHost(yes bool) {
+	r := &rs.a.room
+	r.mu.Lock()
+	g := r.guest
+	var ask *hostAsk
+	if g != nil {
+		ask = g.ask
+	}
+	r.mu.Unlock()
+	if ask != nil {
+		go rs.a.answerHost(g, ask, yes)
+	}
+}
+
 // hostAsked opens a room for the room of g to move to, which keeps seats,
 // and tells its host where, in the session s; it closes once the room
 // stays where it is, or by itself after a while.
@@ -142,13 +234,47 @@ func (a *App) unhost(g *guestRoom, h *hostedRoom) {
 	}
 }
 
-// reach tells the host of the session s whether this computer reaches the
-// room of key it moves to: where discovery finds it, or at addr.
-func (a *App) reach(s *room.Session, key remote.Fingerprint, addr string) {
+// reachFailsAfter is how long after the host asked a guest tells it
+// doesn't reach the room it moves to: however soon it knew, so that the
+// host learns nothing of the address by when it's told. Tests shorten it.
+var reachFailsAfter = 3 * time.Second
+
+// reachGate lets a guest try the room its host moves to once each MoveFor
+// at most, so that a host can't have it knock at address after address.
+type reachGate struct {
+	mu   sync.Mutex
+	last time.Time
+}
+
+// take reports whether a try may start at now, and counts it.
+func (g *reachGate) take(now time.Time) bool {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	if !g.last.IsZero() && now.Sub(g.last) < room.MoveFor {
+		return false
+	}
+	g.last = now
+	return true
+}
+
+// reach tells the host, with answer, whether this computer reaches the
+// room of key it moves to: where discovery finds it, or at addr. A no
+// comes reachFailsAfter after the ask.
+func (a *App) reach(answer func(bool) error, key remote.Fingerprint, addr string) {
+	asked := time.Now()
+	ok := a.reaches(key, addr)
+	if !ok {
+		<-time.After(time.Until(asked.Add(reachFailsAfter)))
+	}
+	_ = answer(ok)
+}
+
+// reaches reports whether this computer reaches the room of key: where
+// discovery finds it, or at addr.
+func (a *App) reaches(key remote.Fingerprint, addr string) bool {
 	id, err := a.identity(true)
 	if err != nil {
-		_ = s.Reached(false)
-		return
+		return false
 	}
 	try := func(at string) bool {
 		ctx, cancel := context.WithTimeout(context.Background(), room.MoveFor/3)
@@ -162,38 +288,33 @@ func (a *App) reach(s *room.Session, key remote.Fingerprint, addr string) {
 	if !ok && addr != "" {
 		ok = try(addr)
 	}
-	_ = s.Reached(ok)
+	return ok
 }
 
 // watchMove has this computer, a guest of the room of g in the session s,
 // open a room for it to move to, or try to reach the one it moves to, as
-// its host asks, until the session ends: one of each at a time, whatever
-// the host asks.
+// its host asks, until the session ends: one try each MoveFor at most,
+// whatever the host asks.
 func (a *App) watchMove(g *guestRoom, s *room.Session) {
-	var opening, reaching atomic.Bool
+	var reaching reachGate
 	s.Watch(func(e room.Event) {
 		switch e.Kind {
 		case room.HostAsked:
-			if opening.CompareAndSwap(false, true) {
-				go func() {
-					defer opening.Store(false)
-					a.hostAsked(g, s, e.Seats)
-				}()
-			}
+			go a.askToHost(g, s, e.Seats)
 		case room.Unhosted:
 			r := &a.room
 			r.mu.Lock()
-			h := g.pending
+			h, ask := g.pending, g.ask
 			r.mu.Unlock()
 			if h != nil {
 				go a.unhost(g, h)
 			}
+			if ask != nil && ask.session == s {
+				go a.answerHost(g, ask, false)
+			}
 		case room.Reach:
-			if reaching.CompareAndSwap(false, true) {
-				go func() {
-					defer reaching.Store(false)
-					a.reach(s, e.Key, e.Addr)
-				}()
+			if reaching.take(time.Now()) {
+				go a.reach(s.Reached, e.Key, e.Addr)
 			}
 		}
 	})

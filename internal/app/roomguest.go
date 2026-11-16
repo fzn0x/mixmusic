@@ -67,10 +67,14 @@ type guestRoom struct {
 	// tries counts the tries to come back, and retry waits for the next.
 	tries int
 	retry *time.Timer
-	// hint is where the room moved, as its old host reached it, and
-	// pending the room opened for it to move here (roommove.go).
+	// hint is where the room moved, as its old host reached it; pending
+	// the room opened for it to move here, once the user agreed; ask the
+	// host's ask that waits for the user, and askedAt when it last asked
+	// (roommove.go).
 	hint    string
 	pending *hostedRoom
+	ask     *hostAsk
+	askedAt time.Time
 }
 
 // GuestView is the room this computer is a guest of, for its page: the
@@ -424,7 +428,8 @@ func (a *App) comeBack(g *guestRoom) {
 	switch {
 	case err == nil:
 		a.entered(g, s, false)
-	case errors.Is(err, room.ErrNotGuest), errors.Is(err, room.ErrBlocked), errors.Is(err, room.ErrVersion):
+	case errors.Is(err, room.ErrNotGuest), errors.Is(err, room.ErrBlocked), errors.Is(err, room.ErrVersion),
+		errors.Is(err, room.ErrDeclined):
 		g.end(a, err)
 	default:
 		a.comeBackLater(g)
@@ -580,6 +585,8 @@ func roomProblem(name string, err error) string {
 		return name + " removed you from the room."
 	case errors.Is(err, room.ErrDeclined):
 		return name + " didn't let you in."
+	case errors.Is(err, room.ErrRoomMoves):
+		return name + "'s room is moving to another computer: try again in a moment."
 	case errors.Is(err, room.ErrManyAsk):
 		return "So many wait to join " + name + "'s room that it takes no more for now: try again later."
 	case errors.Is(err, room.ErrFull):

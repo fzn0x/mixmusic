@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"slices"
 	"strings"
 	"testing"
@@ -9,9 +10,25 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/remote/remotetest"
 	"github.com/fzn0x/mixmusic/internal/room/roomtest"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
+
+// newSongRoomShell is newRoomShell, whose rooms find their guests' songs
+// as they are, in place of the services.
+func newSongRoomShell(t *testing.T, n *roomtest.Network, name string) *shell {
+	t.Helper()
+	s := newRemoteShellOf(t, remotetest.New(), name, func(o *app.Options) {
+		o.Room = &app.RoomOptions{Discovery: n, Listen: roomtest.Listen, Timing: roomTiming,
+			Song: func(_ context.Context, t media.Track) (media.Track, error) { return t, nil }}
+	})
+	t.Cleanup(func() {
+		s.a.Rooms().End()
+		s.a.Rooms().Leave()
+	})
+	return s
+}
 
 // quietRooms has s show no notifications, which the tests' windows can't.
 func quietRooms(t *testing.T, s *shell) {
@@ -68,7 +85,7 @@ func TestRoomRuleRows(t *testing.T) {
 // guest is told.
 func TestRoomSongFromTheMenu(t *testing.T) {
 	n := roomtest.New()
-	desk := newRoomShell(t, n, "Desk")
+	desk := newSongRoomShell(t, n, "Desk")
 	lap := newRoomShell(t, n, "Lap")
 	dt, lt := tester(t, desk), tester(t, lap)
 	quietRooms(t, desk)
@@ -119,7 +136,8 @@ func TestRoomLetInFromThePage(t *testing.T) {
 	show(desk, dt, roomsPath)
 	joinByLink(t, desk, dt, lap, lt)
 	untilBoth(t, desk, dt, lap, lt, "the knock", func() bool {
-		return lt.HasText("Waiting for Desk to let you in…") && dt.HasText("Asking to join")
+		return lt.HasText("Waiting for Desk to let you in…") && dt.HasText("Asking to join") &&
+			len(desk.a.Rooms().Knocks()) == 1 && dt.HasText(desk.a.Rooms().Knocks()[0].Key+" · on this network")
 	})
 	click(t, desk, dt, "Let Lap in")
 	untilBoth(t, desk, dt, lap, lt, "in the room", func() bool { return lt.HasText("In Desk's room") })
@@ -135,6 +153,7 @@ func TestRoomMakeHostFromThePage(t *testing.T) {
 	desk := newRoomShell(t, n, "Desk")
 	lap := newRoomShell(t, n, "Lap")
 	dt, lt := tester(t, desk), tester(t, lap)
+	quietRooms(t, lap)
 	if err := desk.a.Rooms().Start(); err != nil {
 		t.Fatal(err)
 	}
@@ -143,6 +162,11 @@ func TestRoomMakeHostFromThePage(t *testing.T) {
 	show(lap, lt, roomsPath)
 	untilBoth(t, desk, dt, lap, lt, "Lap on the host's page", func() bool { return dt.HasText("Lap") && lt.HasText("In Desk's room") })
 	click(t, desk, dt, "Make Lap the host")
+	untilBoth(t, desk, dt, lap, lt, "the ask", func() bool {
+		return lt.HasText("Desk asks you to host the room: this computer would play the room's queue, in place of yours, and the others would join it here.") &&
+			dt.HasText("Waiting for Lap to host the room…")
+	})
+	click(t, lap, lt, "host the room")
 	untilBoth(t, desk, dt, lap, lt, "the room moved", func() bool {
 		_, hosts := lap.a.Rooms().Hosted()
 		return hosts && lt.HasText("copy invite link") && dt.HasText("In Lap's room")

@@ -56,14 +56,21 @@ func (s *shell) roomWaiting(c *ui.Context) {
 	k := &s.lk
 	rs := s.a.Rooms()
 	if name, ok := rs.Moving(); ok {
-		ui.Text(c, "The room moves to "+name+"'s computer…").FontSize(k.bodySize())
+		ui.Text(c, "Waiting for "+name+" to host the room…").FontSize(k.bodySize())
 	}
 	if knocks := rs.Knocks(); len(knocks) > 0 {
 		ui.Text(c, "Asking to join").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		for _, kn := range knocks {
 			id := strconv.FormatInt(kn.ID, 10)
 			ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, kn.Name).FontSize(k.bodySize()).Grow(1).MinWidth(0)
+				where := "from the internet"
+				if kn.Local {
+					where = "on this network"
+				}
+				ui.Column(c).Grow(1).MinWidth(0).Children(func() {
+					ui.Text(c, kn.Name).FontSize(k.bodySize())
+					ui.Text(c, kn.Key+" · "+where).FontSize(k.smallSize()).TextColor(k.muted)
+				})
 				if s.button(c, "room-let-in-"+id, "let in", true).Label("Let " + kn.Name + " in").Clicked() {
 					rs.LetIn(kn.ID, true)
 				}
@@ -105,12 +112,17 @@ func (s *shell) hostRules(c *ui.Context) {
 	s.roomRuleRows(c)
 }
 
-// acceptSong adds the song of the request id to the queue, and tells why
-// it can't.
+// acceptSong adds the song of the request id to the queue beside the main
+// thread, as it may find it first, and tells why it can't.
 func (s *shell) acceptSong(id int64) {
-	if err := s.a.Rooms().Accept(id); err != nil {
-		s.notes = append(s.notes, noticeOf(err))
-	}
+	go func() {
+		err := s.a.Rooms().Accept(id)
+		s.update(func() {
+			if err != nil {
+				s.notes = append(s.notes, noticeOf(err))
+			}
+		})
+	}()
 }
 
 // makeHostButton moves the room to the guest g, once its MixMusic can
@@ -133,11 +145,24 @@ func (s *shell) makeHostButton(c *ui.Context, g app.RoomMember) {
 	}
 }
 
-// roomGuestRows show a guest what the host lets it do: add songs from a
-// song's menu, and control the host's player.
+// roomGuestRows show a guest the host's ask that it host the room, while
+// it waits, and what the host lets it do: add songs from a song's menu,
+// and control the host's player.
 func (s *shell) roomGuestRows(c *ui.Context, g app.GuestView) {
 	k := &s.lk
 	rs := s.a.Rooms()
+	if host, ok := rs.HostAsk(); ok {
+		ui.Text(c, host+" asks you to host the room: this computer would play the room's queue, in place of yours, and the others would join it here.").
+			FontSize(k.bodySize()).MaxWidth(640)
+		ui.Row(c).Gap(8).Children(func() {
+			if s.button(c, "room-host-yes", "host the room", true).Clicked() {
+				rs.AnswerHost(true)
+			}
+			if s.button(c, "room-host-no", "decline", false).Label("Don't host the room").Clicked() {
+				rs.AnswerHost(false)
+			}
+		})
+	}
 	r, ok := rs.RoomRules()
 	if !ok || g.Step != app.RoomIn {
 		return

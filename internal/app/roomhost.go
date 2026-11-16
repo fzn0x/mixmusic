@@ -286,6 +286,7 @@ func (h roomHostPlayer) State() room.State {
 	out.Playing = st.Playing || st.Loading
 	out.Loading = st.Loading || st.Buffering && st.Playing || st.Waiting
 	out.Position, out.At = a.heardNow(st), a.roomClock().Now()
+	a.fadeHeld(&out)
 	return out
 }
 
@@ -439,11 +440,6 @@ func (s roomStream) Load(url string, cue audio.Cue) error {
 		time.AfterFunc(max(at-clock.Now(), 0), func() { held.start(seq) })
 	})
 	return nil
-}
-
-func (s roomStream) Crossfade(url string, d time.Duration, cue audio.Cue) error {
-	s.a.room.held.release(false)
-	return s.Stream.Crossfade(url, d, cue)
 }
 
 func (s roomStream) Unload() {

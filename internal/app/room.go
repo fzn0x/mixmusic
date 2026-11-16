@@ -66,6 +66,8 @@ type roomState struct {
 	// (roomfollow.go).
 	held      heldStart
 	following atomic.Bool
+	// fade is the crossfade that waits for the guests (roomfade.go).
+	fade heldFade
 }
 
 // Rooms is Listen with friends, for the windows.

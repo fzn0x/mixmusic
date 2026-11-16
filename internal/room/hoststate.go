@@ -128,6 +128,18 @@ type gate struct {
 // guests start at too. With no guest here, start is called at once, with
 // now. A track change that waits gives way to the next.
 func (s *Server) Prepare(entry string, track remote.QueueTrack, from time.Duration, start func(at time.Duration)) {
+	s.prepare(entry, track, from, s.Timing.gate(), start)
+}
+
+// PrepareFade is Prepare for a crossfade of fade, as the track that ends
+// plays on: the guests are waited for half the fade at most, less Lead,
+// so that it plays until they all start the next.
+func (s *Server) PrepareFade(entry string, track remote.QueueTrack, from, fade time.Duration, start func(at time.Duration)) {
+	s.prepare(entry, track, from, min(max(fade/2-s.Timing.lead(), 0), s.Timing.gate()), start)
+}
+
+// prepare is Prepare, waiting within at most for the guests.
+func (s *Server) prepare(entry string, track remote.QueueTrack, from, within time.Duration, start func(at time.Duration)) {
 	track = track.Clean()
 	s.mu.Lock()
 	if old := s.gate; old != nil {
@@ -149,7 +161,7 @@ func (s *Server) Prepare(entry string, track remote.QueueTrack, from time.Durati
 	}
 	g := &gate{seq: s.seq, entry: entry, from: from, waiting: waiting, start: start}
 	s.gate = g
-	g.timer = time.AfterFunc(s.Timing.gate(), func() { s.release(g) })
+	g.timer = time.AfterFunc(within, func() { s.release(g) })
 	for k := range waiting {
 		s.guests[k].conn.send(message{Type: "prepare", Seq: g.seq, Entry: entry, Track: &track})
 	}

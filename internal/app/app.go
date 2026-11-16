@@ -170,6 +170,8 @@ type App struct {
 	addons       *addons.Manager
 	storage      *addons.Storage
 	lyricsMemo   *memo[lyrics.Lyrics]
+	// lyricsTiming times music videos' lyrics to them (lyricsvideo.go).
+	lyricsTiming lyricsTiming
 	related      *memo[[]media.Shelf]
 	artwork      *artwork.Client
 	artStore     *artwork.Store

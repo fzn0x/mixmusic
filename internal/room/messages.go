@@ -34,6 +34,21 @@ type message struct {
 	State   *State   `json:"state,omitempty"`
 	Queue   *Queue   `json:"queue,omitempty"`
 	Members []string `json:"members,omitempty"`
+	// rules: what the host lets its guests do (rules.go). add and added
+	// tell a song a guest adds, in Track, by its number, in Seq, and what
+	// became of it, in Reason (songs.go).
+	Rules *Rules `json:"rules,omitempty"`
+	// control: what a guest asks the host's player to do (control.go).
+	Do string `json:"do,omitempty"`
+	// host, hosting, reach and moved: the room moving to a guest
+	// (move.go), of the key Key, in hex, whose room listens at Port, at
+	// Addr, and keeps Seats and Blocked; OK tells a guest reaches it.
+	Key     string `json:"key,omitempty"`
+	Addr    string `json:"addr,omitempty"`
+	Port    int    `json:"port,omitempty"`
+	Seats   []Seat `json:"seats,omitempty"`
+	Blocked []Seat `json:"blocked,omitempty"`
+	OK      bool   `json:"ok,omitempty"`
 	// prepare and ready: a track change, which the host starts once its
 	// guests have it ready.
 	Seq   int64              `json:"seq,omitempty"`

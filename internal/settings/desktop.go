@@ -44,6 +44,15 @@ type Desktop struct {
 	// (#561), which the host and the other guests show, of at most 50
 	// characters: "" is the computer's name.
 	RoomName string `json:"roomName"`
+	// RoomSongs is what becomes of the songs the guests of the user's room
+	// add (#734): RoomSongsAdd, RoomSongsAsk, as at first, or RoomSongsOff.
+	RoomSongs string `json:"roomSongs"`
+	// RoomGuestControl lets the guests of the user's room play, pause and
+	// change its tracks. It is off at first.
+	RoomGuestControl bool `json:"roomGuestControl"`
+	// RoomAskJoin has the user let in each computer that joins their room.
+	// It is off at first.
+	RoomAskJoin bool `json:"roomAskJoin"`
 	// RoomFollowVolume has a guest of a room play at the host's volume,
 	// rather than its own. It is off at first.
 	RoomFollowVolume bool `json:"roomFollowVolume"`
@@ -102,6 +111,7 @@ func defaultDesktop() Desktop {
 	d.Notifications = true
 	d.ShowInTitle = true
 	d.MediaKeys = true
+	d.RoomSongs = RoomSongsAsk
 	d.DiscordPresence = true
 	d.DiscordFirstLine, d.DiscordSecondLine = DefaultDiscordFirstLine, DefaultDiscordSecondLine
 	d.DiscordCover, d.DiscordTimeLeft = true, true
@@ -117,6 +127,7 @@ func (d Desktop) clean() Desktop {
 	d.MiniZoom = zoomStep(d.MiniZoom, 0)
 	d.RoomPort, d.RoomAddress = cleanRoomPort(d.RoomPort), cleanRoomAddress(d.RoomAddress)
 	d.RoomName = cleanRoomName(d.RoomName)
+	d.RoomSongs = cleanRoomSongs(d.RoomSongs)
 	if d.DiscordAppID = strings.TrimSpace(d.DiscordAppID); !discordIDRe.MatchString(d.DiscordAppID) {
 		d.DiscordAppID = ""
 	}

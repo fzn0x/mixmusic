@@ -109,6 +109,7 @@ func (rs *Rooms) Start() error {
 	srv := &room.Server{Identity: id, Name: a.roomName(), Code: code, Secret: secret, Host: roomHostPlayer{a}, Clock: a.roomClock(),
 		Timing: o.Timing, Changed: func() { a.roomChanged(h) }, Guessing: func() { a.notifyRooms(roomGuessed) }}
 	h.server = srv
+	srv.Guests = a.roomGuests()
 	go func() {
 		if err := srv.Serve(ln); err != nil {
 			log.Printf("mixmusic: room: %v", err)
@@ -248,6 +249,8 @@ func (a *App) roomChanged(h *hostedRoom) {
 			notes = append(notes, act.Name+" joined the room")
 		case room.Left:
 			notes = append(notes, act.Name+" left the room")
+		case room.Added:
+			notes = append(notes, act.Name+" added "+act.Song)
 		}
 	}
 	h.toldMu.Unlock()
@@ -285,6 +288,7 @@ func (h roomHostPlayer) State() room.State {
 	out.Playing = st.Playing || st.Loading
 	out.Loading = st.Loading || st.Buffering && st.Playing || st.Waiting
 	out.Position, out.At = a.heardNow(st), a.roomClock().Now()
+	a.fadeHeld(&out)
 	return out
 }
 
@@ -438,11 +442,6 @@ func (s roomStream) Load(url string, cue audio.Cue) error {
 		time.AfterFunc(max(at-clock.Now(), 0), func() { held.start(seq) })
 	})
 	return nil
-}
-
-func (s roomStream) Crossfade(url string, d time.Duration, cue audio.Cue) error {
-	s.a.room.held.release(false)
-	return s.Stream.Crossfade(url, d, cue)
 }
 
 func (s roomStream) Unload() {

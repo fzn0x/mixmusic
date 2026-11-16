@@ -64,7 +64,9 @@ apart from remote control's service: an instance named after its ID, an
 SRV record with the port of its server, a TXT record with its ID (`id`),
 its name in rooms (`name`) and the protocol's version (`v=1`), and the A
 record of its address on the asker's network. It tells neither the code
-nor what plays. The others look for rooms as they look for cast devices:
+nor what plays. It answers on a socket `dnssd`'s `Keep` keeps working, as
+remote control's announcement does: a room opened before macOS let
+MixMusic use the local network is found once the user lets it (#725). The others look for rooms as they look for cast devices:
 a few seconds after start, every 45 s, and as the devices menu opens.
 
 ## Joining
@@ -110,7 +112,8 @@ differ, so the confirmations of one don't check on the other.
    what plays and how many listen. The guest checks cB.
 5. The guest's user sees the preview, and joins (`join`), or not: the
    guest pings meanwhile. The host lets it in, with `joined`, the
-   members, its queue and its state.
+   members, its queue, its state and its rules (`rules`); or first asks
+   its user to, when they ask it to ([Asking before a join](#asking-before-a-join)).
 
 A room takes 200 guests.
 
@@ -162,8 +165,10 @@ few computers that proved nothing yet (`admit.go`).
   its key, gives its place back as soon as TLS tells its key. Until it
   proved something, a connection's messages are of 4 KiB at most, refused
   from their length before any of them is read (`Frames.Limit`); a hello
-  is a few hundred bytes. Once proven, a guest's messages take remote
-  control's 1 MiB.
+  is a few hundred bytes. Once proven, a guest's messages are of 64 KiB at
+  most (`guestMessage`): a song it adds is the largest, of a few KiB.
+  From then on its messages are read on a goroutine of their own
+  (`messages`), so that the host waits on them and on its user at once.
 
 ## Coming back, removing, blocking
 
@@ -188,6 +193,71 @@ the room
 tells each guest (`ended`, `ended`), and stops the server and the
 announcement. A guest that leaves says so (`leave`), and the host no
 longer keeps its place.
+
+## The host's rules
+
+What guests may do is the host's to say, as its settings choose
+(`Rules`, `rules.go`), and the host checks each ask of a guest as it
+comes, by the rules of that moment: a guest's MixMusic, which shows only
+what the rules let it do, decides nothing. Each ask is of a guest the
+room has now, on its connection; what isn't a guest's ask is ignored.
+The guests are told the rules as they join, and as they change
+(`RulesChanged`, and every 2 s besides). The app adds the songs, has its
+player do the controls, and tells its user what waits for them
+(`Guests`): in the windows, and in a notification that opens the room's
+page, which nothing waits on.
+
+- **Songs from guests** (`songs.go`). A guest adds a song (`add`, its
+  number and the track, cleaned as a hand-over's), which the host adds to
+  the end of its queue at once (`SongsAdd`), or keeps until its user
+  accepts or declines it (`SongsAsk`, as at first), or refuses
+  (`SongsOff`); the guest is told which (`added`). A guest adds
+  `songsPerMinute` songs, 10, at most, ten at once then one each 6 s, and
+  has `MaxWaiting`, 10, wait at most; the host takes none it can't play,
+  or whose explicit content its settings hide. The songs that wait go with
+  their guest, as it leaves or is removed.
+- **Controls** (`control.go`). While the rules let them, a guest has the
+  host's player play, pause, go to the next track or the last (`control`):
+  5 at once at most, then one a second; one the rules don't let through,
+  or past that, is refused (`control`, with why). The activity tells who
+  did what.
+
+### Asking before a join
+
+While its user asks to (`Rules.Ask`, `letin.go`), the host lets in no
+computer that proved the code or the link and asks to join until its
+user says so: it tells the guest it asks (`asking`), answers its pings
+meanwhile, and lets it in, or turns it away (`refused`, `declined`), as
+its user answers, or after 2 minutes (`AskFor`). 20 wait at most
+(`maxKnocks`): one more is refused (`many asking`). Guests that come back
+by their keys aren't asked about, and a new code ends those that wait.
+
+## Make host
+
+The host moves the room to a guest, if the others can reach it
+(`move.go`), and only to one whose MixMusic says it can (`move`, among
+the hello's features):
+
+1. The host asks the guest to host (`host`), with the seats to keep: the
+   keys and names of the other guests and of itself, and the keys it
+   blocked.
+2. The guest opens a room of its own, of a new code and link, which
+   keeps those places as of guests that dropped off and blocks those
+   keys (`Seats`), and says at which port (`hosting`).
+3. The host tells each other guest where (`reach`): the new host's key,
+   and its address, as the host's connection with it tells, with that
+   port. Each tries a TLS connection to that key, where discovery finds it
+   or at that address, and says whether it got one (`reach`); the host
+   tries it too.
+4. Once all did, the host tells them all the room moved (`moved`), before
+   it ends the room: each comes back to the new host by its key, as after
+   a drop, the host too. The new host's player takes the room's queue,
+   where the host played it.
+
+One that can't reach it, or no answer in 10 s (`MoveFor`), keeps the room
+where it is: the guest is told to close the room it opened (`unhost`),
+which it also closes by itself after twice that. A guest takes a seat
+only of a key, 201 at most.
 
 ## Keeping in step
 
@@ -223,6 +293,13 @@ Each computer's clock for rooms is monotonic, from when MixMusic started
   passed, the host starts them all at one moment 350 ms ahead, by its
   clock (a `state` that `Starts`), and its own engine plays then. A guest
   wakes at that moment, not at its next comparison.
+- **A crossfade.** As the host's player crossfades into the next track,
+  the engine loads it on its other deck (`Preload`), the track that ends
+  plays on, and the guests are told the next is loading, at its start,
+  as a track change does (`roomfade.go`): they ready it, and the fade
+  starts at the moment they all start it. The host waits half the fade at
+  most, less the lead (`PrepareFade`), so that the track that ends still
+  plays then.
 
 The tests run the follower against a fake engine, by a fake clock, whose
 sound card's clock drifts by up to 200 ppm, a play sounds 120 ms after it
@@ -245,7 +322,9 @@ settings hide explicit content, an explicit track stays silent, with a
 note.
 
 While it follows a host, the guest's crossfade, autoplay, speeds and skips
-of disliked songs and songs made with AI rest (`roomSettings`), and its
+of disliked songs, songs made with AI and the parts SponsorBlock marks
+rest (`roomSettings`): the host's own skips, which it hears as seeks,
+are the room's, and its
 player keeps no queue: `queue.json` keeps the user's own, as it was as
 they joined, which comes back, paused, as they leave, or the room ends,
 and at the next start if MixMusic quit in the room. Its volume, output
@@ -316,13 +395,11 @@ Output device chooses, tells them apart.
 
 ## Not yet
 
-- **Songs from guests** (Add them, Ask me first, Off), **Guests can
-  control playback**, **Ask me before someone joins**, the requests on
-  the room's page with a notification, and **Make host**.
 - **Phones and browsers**: the page the host would serve to browsers,
   which waits for the decision on the phone page's plain HTTP (#560).
-- The announcement keeps one socket, as remote control's did before
-  #725: once `dnssd`'s `Keep` is on main, a room announces through it.
+- A guest's **Sound mood** (#547) and **Skip silence** (#552), once they
+  are on main, rest through `roomSettings` too.
 - A guest that drops off plays on alone, until it comes back.
-- A crossfade on the host starts the next track at once; its guests
-  join it in step, without the wait for them.
+- A guest away as the room moves comes back to the old host, which is
+  gone: its place in the new room waits for it 15 minutes, but it finds
+  the room only by the code or the link.

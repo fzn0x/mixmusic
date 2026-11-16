@@ -539,6 +539,7 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 			s.p.Enqueue(one)
 			s.notes = append(s.notes, notice("Added "+t.Title+" to the queue"))
 		}
+		s.roomSongItem(m, t)
 	}
 	if !t.IsEpisode() && t.Source != media.SourceFile && m.Item("Start radio").Chosen() {
 		s.startRadio(t)

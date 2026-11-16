@@ -143,6 +143,7 @@ func (s *shell) hostedRoom(c *ui.Context, h app.HostedRoom) {
 	if h.Waiting {
 		ui.Text(c, "The next track waits for your guests to have it ready.").FontSize(k.smallSize()).TextColor(k.muted)
 	}
+	s.roomWaiting(c)
 	ui.Text(c, "Guests").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 	if len(h.Guests) == 0 {
 		ui.Text(c, "No one joined yet.").FontSize(k.smallSize()).TextColor(k.muted)
@@ -160,6 +161,7 @@ func (s *shell) hostedRoom(c *ui.Context, h app.HostedRoom) {
 			if s.button(c, "room-block-"+g.Key, "block", false).Label("Block " + g.Name).Clicked() {
 				rs.Block(g.Key)
 			}
+			s.makeHostButton(c, g)
 		})
 	}
 	if len(h.Blocked) > 0 {
@@ -177,9 +179,10 @@ func (s *shell) hostedRoom(c *ui.Context, h app.HostedRoom) {
 		ui.Text(c, "Activity").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		for i := len(h.Activity) - 1; i >= 0 && i >= len(h.Activity)-20; i-- {
 			act := h.Activity[i]
-			ui.Text(c, act.Name+" "+act.What+" · "+act.At.Local().Format("15:04")).FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, act.Name+" "+act.What+activitySong(act)+" · "+act.At.Local().Format("15:04")).FontSize(k.smallSize()).TextColor(k.muted)
 		}
 	}
+	s.hostRules(c)
 }
 
 // guestRoom shows the room this computer is a guest of, or knocks at: who
@@ -218,7 +221,7 @@ func (s *shell) guestRoom(c *ui.Context, g app.GuestView) {
 			}
 		})
 	case app.RoomJoining:
-		say("Joining " + g.Host + "'s room…")
+		say(s.joiningLine(g.Host))
 	case app.RoomIn, app.RoomAway:
 		s.inRoom(c, g)
 	case app.RoomEnded:
@@ -264,6 +267,7 @@ func (s *shell) inRoom(c *ui.Context, g app.GuestView) {
 	if len(g.Members) > 0 {
 		ui.Text(c, "Listening: "+strings.Join(g.Members, ", ")).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 	}
+	s.roomGuestRows(c, g)
 	if s.button(c, "room-leave", "leave room", false).Clicked() {
 		rs.Leave()
 	}

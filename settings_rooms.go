@@ -49,6 +49,8 @@ func (s *shell) roomSettings(c *ui.Context) {
 			})
 			in.Placeholder(rs.Name()).Width(220).Label("Your name in rooms")
 		}, "name guest room")
+		// What the guests of the user's room can do (roomrules.go).
+		s.roomRuleRows(c)
 		s.row(c, "Follow the host's volume", "As a guest, play at the host's volume rather than your own.", func() {
 			if s.switchOf(c.Key("room-follow-volume"), &s.set.RoomFollowVolume).Label("Follow the host's volume").Changed() {
 				s.save()

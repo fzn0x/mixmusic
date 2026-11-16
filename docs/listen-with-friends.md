@@ -42,7 +42,8 @@ friends in.
 Your computer plays what the host plays, from where the host is: each
 track, as it pauses, plays and seeks. When the host changes track, it
 waits for everyone to have the next one ready, 5 seconds at most, then
-all start at once. Your computer keeps itself within about 50
+all start at once. With crossfade on, the host's track plays on while the
+next waits, half the fade at most, and the fade starts as all start. Your computer keeps itself within about 50
 milliseconds of the host's: a little faster or slower, at the same pitch,
 when it drifts, and a jump when it's far off.
 
@@ -57,7 +58,14 @@ when it drifts, and a jump when it's far off.
   on **Follow the host's volume** in Settings › Desktop › Listen with
   friends.
 - Your **crossfade**, **autoplay** and **speeds**, and the skipping of
-  songs you dislike and songs made with AI, rest while you're in a room.
+  songs you dislike, songs made with AI and the parts SponsorBlock marks,
+  rest while you're in a room. The host's own skips are heard by all.
+- **Songs of your own**: while the host takes songs from guests, a song's
+  menu has **Add to the room**, or **Ask to add to the room** when the
+  host accepts each first. A note tells you what became of it.
+- **Controls**: while the host lets guests control playback, the room's
+  page has **previous**, **play** or **pause**, and **next**, which the
+  host's player does.
 
 The room's page shows what plays, who listens, and what comes next. Click
 **leave room** to leave: your own queue comes back, paused where it was.
@@ -79,6 +87,34 @@ then they can knock again with the code, or the link, they still have.
 **new code** gives the room a new code and a new invite link: the old
 ones let no one in, those who proved the old code and haven't joined yet
 included, and your guests stay.
+
+What guests can do, on the room's page and in Settings › Desktop ›
+Listen with friends:
+
+- **Songs from guests**: **add them** to the end of your queue at once,
+  **ask me first**, as at first, or **off**. Asked first, each song waits
+  on the room's page, with **accept** and **decline**, 10 of a guest at
+  most, and a notification tells you while MixMusic is in the
+  background: clicking it opens the page. A guest adds 10 songs a minute
+  at most, and none your settings would hide or your computer can't play.
+- **Guests can control playback**, off at first: they play, pause and
+  skip, 5 times at once at most, then once a second.
+- **Ask me before someone joins**, off at first: each friend who joins
+  with the code or the link waits on the room's page, 2 minutes at most,
+  until you **let in** or **turn away**. Guests who come back after a
+  drop aren't asked about.
+
+Your computer checks each of these as a guest asks, whatever the guest's
+MixMusic says.
+
+**make host**, beside a guest, moves the room to that guest's computer, if
+the others, and yours, can reach it: it opens a room of its own, which
+keeps everyone's place, and each computer tries it. Once all reach it,
+that guest's player takes the room's queue, where yours played it, and
+you and the others are guests of it, as after a drop. When one can't
+reach it, or it takes longer than 10 seconds, the room stays with you,
+and you're told why. The new host's room has a new code and invite link,
+and keeps the computers you blocked out.
 
 ## Dropping off
 
@@ -161,7 +197,7 @@ them out, as on your network.
 
 ## Not yet
 
-- Songs from guests, guests controlling the playback, asking before
-  someone joins, and moving the room to a guest.
 - Phones and browsers joining a room, which waits for the phone page
   (#560).
+- A guest's sound mood (#547) and Skip silence (#552) resting in a
+  room, once they're in MixMusic.

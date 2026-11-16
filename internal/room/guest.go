@@ -199,6 +199,12 @@ type Event struct {
 	Seq   int64
 	Entry string
 	Track remote.QueueTrack
+	// Reason, Seats, Key and Addr are of the host's rules and of a move
+	// (rules.go, move.go).
+	Reason string
+	Seats  Seats
+	Key    remote.Fingerprint
+	Addr   string
 }
 
 // Session is a guest's stay in a room: what the host plays, and who
@@ -219,6 +225,8 @@ type Session struct {
 	queue    Queue
 	members  []string
 	offset   Offset
+	// asks are what the host tells beside what it plays (rules.go).
+	asks     sessionAsks
 	watchers []*func(Event)
 	err      error
 	done     chan struct{}
@@ -426,6 +434,8 @@ func (s *Session) read() {
 		case "ended", "refused":
 			s.end(errOf(m.Reason))
 			return
+		default:
+			s.fromHost(m)
 		}
 	}
 }

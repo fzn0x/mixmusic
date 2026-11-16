@@ -35,8 +35,10 @@ const (
 	maxUnproven     = 32
 	maxUnprovenFrom = 4
 	// handshakeMessage bounds a message before its sender proved the code,
-	// the link or its key: a hello is a few hundred bytes.
+	// the link or its key: a hello is a few hundred bytes. guestMessage
+	// bounds one after: a song a guest adds is the largest, a few KiB.
 	handshakeMessage = 4 << 10
+	guestMessage     = 64 << 10
 )
 
 // sourceOf is the source of the address addr ("host:port", or a host): its

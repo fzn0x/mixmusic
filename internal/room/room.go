@@ -24,8 +24,8 @@ const version = 1
 const alpn = "mixmusic-room/1"
 
 // features are what this MixMusic can do in a room beyond the version, as
-// hello and welcome tell them: none yet. A guest or a host that doesn't
-// know one ignores it.
+// hello and welcome tell them, which the files of each add. A guest or a
+// host that doesn't know one ignores it.
 var features []string
 
 // What a hello wants: to join by the code or the link, which it proves,
@@ -116,6 +116,10 @@ func errOf(reason string) error {
 		return ErrBlocked
 	case reasonFull:
 		return ErrFull
+	case reasonDeclined:
+		return ErrDeclined
+	case reasonManyAsk:
+		return ErrManyAsk
 	case reasonGone:
 		return ErrNotGuest
 	case reasonRemoved:

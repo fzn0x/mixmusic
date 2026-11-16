@@ -43,6 +43,8 @@ type Activity struct {
 	At   time.Time
 	Name string
 	What string
+	// Song is the title of the song a guest added, or asked to.
+	Song string
 }
 
 // maxActivity bounds the activity a room keeps.
@@ -80,6 +82,14 @@ type Server struct {
 	// the room takes no code for a while, as too many wrong ones came:
 	// someone guesses the code.
 	Guessing func()
+	// Guests, when set, are the host's rules for its guests, and what its
+	// app does as they ask (rules.go): without, guests add no songs,
+	// control nothing, and join without asking.
+	Guests *Guests
+	// Seats, when set, are of the room this one moved from (move.go): it
+	// keeps the places of its guests and its host as it opens, and blocks
+	// the keys it blocked.
+	Seats *Seats
 
 	mu      sync.Mutex
 	ln      net.Listener
@@ -99,6 +109,9 @@ type Server struct {
 	gen      int
 	previews map[*conn]int
 	toldLock time.Time
+	// asks are what the guests asked and what waits for the host's user,
+	// and a move (rules.go).
+	asks asks
 	// seq counts the track changes, and gate is the one that waits for
 	// the guests; starting is the state of its start, which the guests
 	// are told until the host's track plays.
@@ -131,6 +144,11 @@ type conn struct {
 	out  chan message
 	once sync.Once
 	gone chan struct{}
+	// features are what the other end's hello said it can do; in are its
+	// messages, once it proved who it is (messages).
+	features []string
+	inOnce   sync.Once
+	in       chan message
 }
 
 // outQueue is how many messages may wait to go to a guest: one slower
@@ -181,6 +199,7 @@ func (s *Server) Serve(ln net.Listener) error {
 	ln = limited(ln, s.caps.orDefault())
 	s.ln = ln
 	s.adm.caps = s.caps.orDefault()
+	s.seat()
 	s.start()
 	s.mu.Unlock()
 	for {
@@ -312,6 +331,7 @@ func (s *Server) handle(raw net.Conn, u *unproven) {
 		return
 	}
 	name := CleanName(hello.Name)
+	c.features = hello.Features
 	switch hello.Want {
 	case wantRejoin:
 		if reason := s.comeBack(c, name); reason != "" {
@@ -319,7 +339,7 @@ func (s *Server) handle(raw net.Conn, u *unproven) {
 			return
 		}
 		proven()
-		c.f.Limit(0)
+		c.f.Limit(guestMessage)
 	case wantJoin:
 		if !s.join(c, hello, name, refuse, proven, proveBy) {
 			return
@@ -473,7 +493,7 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 	// Proven: its place among the unproven goes to another, and its
 	// messages are a guest's; until it joins, a new code ends it.
 	proven()
-	c.f.Limit(0)
+	c.f.Limit(guestMessage)
 	s.mu.Lock()
 	newCode := s.gen != gen
 	if !newCode {
@@ -498,9 +518,10 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 	}
 	// The guest's user sees the room, and joins it, or not: the guest
 	// pings meanwhile.
+	msgs := c.messages(t.silence())
 	for {
-		var m message
-		if err := c.f.Receive(&m, t.silence()); err != nil {
+		m, ok := <-msgs
+		if !ok {
 			return false
 		}
 		switch m.Type {
@@ -512,6 +533,11 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 		case "join":
 		default:
 			continue
+		}
+		// The host's user lets it in, when the rules ask them.
+		if reason := s.letIn(c, name, msgs); reason != "" {
+			refuse(reason)
+			return false
 		}
 		st := s.Host.State()
 		s.mu.Lock()
@@ -580,6 +606,7 @@ func (s *Server) admit(c *conn, name string, st State) {
 	}
 	st = s.stateOf(st)
 	c.send(message{Type: "state", State: &st})
+	s.tellRules(c)
 }
 
 // note keeps an activity. s.mu is held.
@@ -592,14 +619,9 @@ func (s *Server) note(name, what string) {
 
 // stay runs a guest's stay in the room: it answers its pings, takes in
 // that it has a track ready, and lets it leave, until either side goes
-// quiet.
+// quiet; and takes in what it asks (fromGuest).
 func (s *Server) stay(c *conn) {
-	t := s.Timing
-	for {
-		var m message
-		if err := c.f.Receive(&m, t.silence()); err != nil {
-			return
-		}
+	for m := range c.messages(s.Timing.silence()) {
 		switch m.Type {
 		case "ping":
 			c.send(message{Type: "pong", Sent: m.Sent, HostAt: s.Clock.Now()})
@@ -615,6 +637,8 @@ func (s *Server) stay(c *conn) {
 			s.mu.Unlock()
 			s.changed(true)
 			return
+		default:
+			s.fromGuest(c, m)
 		}
 	}
 }

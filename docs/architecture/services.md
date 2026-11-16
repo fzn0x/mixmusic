@@ -242,13 +242,50 @@
   each track's romanization once, with its lyrics (`lyricsromanize.go`),
   and ask Unison for none, but Arabic's, whose romanization by Google
   has the vowels Arabic doesn't write.
-- **`internal/lastfm`** signs in to Last.fm with the user's API account and
-  scrobbles by Last.fm's rules, keeping what fails offline for later. The
-  `Scrobbler` queue holds plays not yet accepted and carries nothing of
-  Last.fm but its `API`: plays keep joining it (up to 5000) while the
-  service refuses the session, `SetSession` sends them with the new key,
-  and `Discard` drops them. The app saves it in `lastfm-queue.json`;
-  disconnecting is the only thing that deletes the file.
+- **`internal/scrobble`** is what every scrobbling service shares (#568).
+  `Scrobbler` decides from the player's reports which plays count, by
+  Last.fm's rules: a track over 30 seconds, once half of it or 4 minutes
+  played, each play once. It keeps those not taken yet in a queue, up to
+  5000, the oldest dropped first, and sends them to a `Service` with its
+  now-playing updates, `Options.Batch` at a time. A service's errors tell
+  what becomes of the plays: `ErrKeyRefused` keeps them, and the plays
+  heard meanwhile, until `SetSession` gives a new key; `Rejected` drops
+  them, once the batch has gone again in halves until the play at fault
+  went alone; any other error keeps them. `Run` sends beside the app: at
+  once when something waits, after a failure again after 15 seconds,
+  twice as long each time up to 5 minutes, or after the service's
+  `RetryAfter`, and at once on `Retry`. `internal/app/scrobbles.go` feeds
+  every connected service the same `scrobbleTrack`, starts each one's
+  `Run` with the first play it hears of, calls `Retry` when
+  `online.Watch` tells the network came back, stops it on disconnect and
+  in `App.Close` before its files go, and has the windows told how many
+  plays wait only while sends fail, and once none do (`waitingTold`).
+- **`internal/lastfm`** signs in to Last.fm with the user's API account,
+  and is a `scrobble.Service`: now-playing updates and scrobbles, and
+  loves (`track.love`, `track.unlove`). The app saves its queue in
+  `lastfm-queue.json`; disconnecting is the only thing that deletes the
+  file.
+- **`internal/listenbrainz`** calls ListenBrainz's API, or a server that
+  speaks it, as Maloja at `/apis/listenbrainz`: `validate-token`;
+  `submit-listens`, `playing_now` with `return_msid`, `single` for one
+  listen and `import` for more, up to 1,000 a request; recording feedback,
+  and the metadata lookup. Each listen tells, in `additional_info`,
+  MixMusic as its client and player, the service and the track's page,
+  its length, and Spotify's address and the ISRC where known. It makes a
+  call a second at most (`Client.Gap`) and holds every call after a 429
+  for its `X-RateLimit-Reset-In`; a 401 is `scrobble.ErrKeyRefused`, a 400
+  rejects the listens, and any other answer keeps them, as a server of the
+  user's that is down or moved. `ParseServer` reads the address the user
+  writes, and `Local` allows plain http to a host of the local network
+  alone: loopback, private, link-local and unique local addresses, a name
+  of one label or under `.local`, `.lan`, `.home.arpa` or `.internal`,
+  or a name all of whose addresses are of those. The app
+  (`internal/app/listenbrainz.go`) keeps the server, the token and the
+  user's name in the credential store, the queue in
+  `listenbrainz-queue.json`, and the MessyBrainz IDs of the recordings of
+  the latest 5,000 tracks announced in `listenbrainz-recordings.json`
+  (`recordingBook`), which `loves.go` sends a like's feedback by, or else
+  by the MusicBrainz ID the lookup finds.
 - **`internal/discord`** shows what plays on the user's Discord profile, over
   Discord's local pipe or socket: an activity's lines, times, picture, the
   small image at its corner and up to two buttons, fitted to Discord's

@@ -89,4 +89,4 @@ While an episode plays, the speed button by the player, the command palette's Sp
 
 ## Not counted
 
-Episodes don't scrobble to [Last.fm](accounts.md), and the [stats](library.md#stats) leave them out. The [history](library.md#history-and-recently-played) keeps them.
+Episodes don't scrobble to [Last.fm or ListenBrainz](accounts.md), and the [stats](library.md#stats) leave them out. The [history](library.md#history-and-recently-played) keeps them.

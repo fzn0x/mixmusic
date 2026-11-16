@@ -19,8 +19,8 @@ func (a *App) OnFlush(fn func()) (cancel func()) {
 	}
 }
 
-// Close waits for the downloads and the covers fetched beside the app's
-// callers to stop, then saves at once what waits to be saved, as flush
+// Close waits for the downloads, the covers fetched beside the app's
+// callers and the scrobblers' sends to stop, then saves at once what waits to be saved, as flush
 // does. It is for an app whose folders go as it ends, as a test's do, once
 // its player closed: MixMusic itself quits with flush, which waits on none
 // of them.
@@ -28,6 +28,7 @@ func (a *App) Close() {
 	a.downloads.Close()
 	a.closeLocalFiles()
 	a.artStore.Close()
+	a.stopScrobbling()
 	a.stopMemory()
 	a.stopOverlay()
 	a.flush()

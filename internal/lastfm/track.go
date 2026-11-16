@@ -5,37 +5,21 @@ import (
 	"net/url"
 	"slices"
 	"strconv"
-	"strings"
 	"time"
+
+	"github.com/fzn0x/mixmusic/internal/scrobble"
 )
 
 // maxBatch is the most plays one track.scrobble call takes.
 const maxBatch = 50
 
-// Track is a song as Last.fm knows it.
-type Track struct {
-	// Artist and Title name the track. Tracks without both are neither
-	// announced nor scrobbled.
-	Artist string `json:"artist"`
-	Title  string `json:"title"`
-	// Album is empty when it is not known.
-	Album string `json:"album,omitempty"`
-	// Duration is the length of the track, or 0 when it is not known. In
-	// JSON it is a number of nanoseconds.
-	Duration time.Duration `json:"duration,omitempty"`
-}
-
-// complete reports whether t has the artist and title Last.fm needs.
-func (t Track) complete() bool {
-	return strings.TrimSpace(t.Artist) != "" && strings.TrimSpace(t.Title) != ""
-}
+// Track is a song as Last.fm knows it, as every scrobbling service does.
+type Track = scrobble.Track
 
 // Play is a listen to a track: the track and when it started playing.
-type Play struct {
-	Track
-	// Start is when the track started playing.
-	Start time.Time `json:"start"`
-}
+type Play = scrobble.Play
+
+var _ scrobble.Service = (*Client)(nil)
 
 // NowPlaying tells Last.fm that the user of sessionKey started listening to
 // t, which their profile shows until the track ends or another one starts.
@@ -79,4 +63,14 @@ func (c *Client) Scrobble(ctx context.Context, sessionKey string, plays []Play) 
 // seconds returns d in whole seconds, rounded.
 func seconds(d time.Duration) int {
 	return int(d.Round(time.Second) / time.Second)
+}
+
+// Love loves t for the user of sessionKey, which their profile shows, or
+// takes the love back: track.love, or track.unlove.
+func (c *Client) Love(ctx context.Context, sessionKey string, t Track, loved bool) error {
+	method := "track.unlove"
+	if loved {
+		method = "track.love"
+	}
+	return c.call(ctx, method, url.Values{"sk": {sessionKey}, "artist": {t.Artist}, "track": {t.Title}}, nil)
 }

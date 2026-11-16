@@ -15,6 +15,15 @@ type Accounts struct {
 	SpotifyClientID string `json:"spotifyClientId"`
 	// Scrobbling sends what plays to Last.fm, once the user connected it.
 	Scrobbling bool `json:"scrobbling"`
+	// LastfmLoves sends the user's likes to Last.fm as loves, and their
+	// unlikes as unloves, once they connected it.
+	LastfmLoves bool `json:"lastfmLoves"`
+	// ListenBrainzScrobbling sends what plays to ListenBrainz, or to the
+	// user's own server of its API, once they connected it.
+	ListenBrainzScrobbling bool `json:"listenbrainzScrobbling"`
+	// ListenBrainzLoves sends the user's likes to ListenBrainz as loves,
+	// and their unlikes as the loves taken back, once they connected it.
+	ListenBrainzLoves bool `json:"listenbrainzLoves"`
 	// YouTubeChannel is the brand channel the user uses YouTube Music as,
 	// by its page ID; "" is the account itself.
 	YouTubeChannel string `json:"youtubeChannel"`
@@ -28,6 +37,7 @@ type Accounts struct {
 func defaultAccounts() Accounts {
 	var a Accounts
 	a.Scrobbling = true
+	a.ListenBrainzScrobbling = true
 	a.YouTubeHistory = true
 	return a
 }

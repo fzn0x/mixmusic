@@ -32,3 +32,19 @@ func TestLastfmAccountTexts(t *testing.T) {
 		t.Errorf("disconnect with none waiting: %q", got)
 	}
 }
+
+// TestLastfmWaitingAndLoves says how many scrobbles wait under Scrobbling
+// as, and offers Send likes as loves.
+func TestLastfmWaitingAndLoves(t *testing.T) {
+	_, texts := showAccounts(t, app.AccountsStatus{Lastfm: app.LastfmAccount{Connected: true, Name: "ann", Waiting: 4}})
+	got := texts()
+	for _, want := range []string{"Scrobbling as ann", "4 scrobbles wait to be sent, and will go once Last.fm answers.", "Send likes as loves", "A like loves the song on Last.fm"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("the Last.fm group lacks %q: %q", want, got)
+		}
+	}
+	_, texts = showAccounts(t, app.AccountsStatus{Lastfm: app.LastfmAccount{Connected: true, Name: "ann", Waiting: 4, Expired: true}})
+	if got := texts(); strings.Contains(got, "will go once") || !strings.Contains(got, "4 scrobbles wait to be sent.") {
+		t.Errorf("expired: %q", got)
+	}
+}

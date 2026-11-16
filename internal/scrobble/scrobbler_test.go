@@ -1,4 +1,4 @@
-package lastfm
+package scrobble
 
 import (
 	"context"
@@ -10,6 +10,15 @@ import (
 	"testing"
 	"time"
 )
+
+// errBusy is an error that keeps the plays for later, as the network's.
+var errBusy = errors.New("busy")
+
+// rejection is the error of plays the service refuses for what they hold.
+type rejection struct{ msg string }
+
+func (r rejection) Error() string { return r.msg }
+func (rejection) Rejected() bool  { return true }
 
 // fakeAPI records the calls of a Scrobbler and fails them as told.
 type fakeAPI struct {
@@ -124,7 +133,7 @@ func samePlays(a, b []Play) bool {
 }
 
 func TestScrobblerCountsHalfTheTrack(t *testing.T) {
-	s := NewScrobbler(&fakeAPI{}, "SK")
+	s := New(&fakeAPI{}, "SK", Options{})
 	p := newPlayer(s)
 	a := song("A", 3*time.Minute)
 	p.load("a", a)
@@ -137,7 +146,7 @@ func TestScrobblerCountsHalfTheTrack(t *testing.T) {
 }
 
 func TestScrobblerCountsFourMinutes(t *testing.T) {
-	s := NewScrobbler(&fakeAPI{}, "SK")
+	s := New(&fakeAPI{}, "SK", Options{})
 	p := newPlayer(s)
 	long := song("Long", 10*time.Minute)
 	p.load("long", long)
@@ -148,7 +157,7 @@ func TestScrobblerCountsFourMinutes(t *testing.T) {
 }
 
 func TestScrobblerSkipsShortTracks(t *testing.T) {
-	s := NewScrobbler(&fakeAPI{}, "SK")
+	s := New(&fakeAPI{}, "SK", Options{})
 	p := newPlayer(s)
 	p.load("short", song("Short", 30*time.Second))
 	p.run(30 * time.Second)
@@ -166,7 +175,7 @@ func TestScrobblerSkipsShortTracks(t *testing.T) {
 }
 
 func TestScrobblerDoesNotCountPauses(t *testing.T) {
-	s := NewScrobbler(&fakeAPI{}, "SK")
+	s := New(&fakeAPI{}, "SK", Options{})
 	p := newPlayer(s)
 	a := song("A", 3*time.Minute)
 	p.load("a", a)
@@ -181,7 +190,7 @@ func TestScrobblerDoesNotCountPauses(t *testing.T) {
 }
 
 func TestScrobblerCapsGaps(t *testing.T) {
-	s := NewScrobbler(&fakeAPI{}, "SK")
+	s := New(&fakeAPI{}, "SK", Options{})
 	p := newPlayer(s)
 	a := song("A", 3*time.Minute)
 	p.load("a", a)
@@ -199,7 +208,7 @@ func TestScrobblerCapsGaps(t *testing.T) {
 }
 
 func TestScrobblerStartsOverWithAnotherTrack(t *testing.T) {
-	s := NewScrobbler(&fakeAPI{}, "SK")
+	s := New(&fakeAPI{}, "SK", Options{})
 	p := newPlayer(s)
 	a := song("A", 3*time.Minute)
 	p.load("a", a)
@@ -216,7 +225,7 @@ func TestScrobblerStartsOverWithAnotherTrack(t *testing.T) {
 
 func TestScrobblerCountsReplays(t *testing.T) {
 	api := &fakeAPI{}
-	s := NewScrobbler(api, "SK")
+	s := New(api, "SK", Options{})
 	p := newPlayer(s)
 	a := song("A", 3*time.Minute)
 	ctx := context.Background()
@@ -247,7 +256,7 @@ func TestScrobblerCountsReplays(t *testing.T) {
 
 func TestScrobblerAnnouncesNowPlayingOnce(t *testing.T) {
 	api := &fakeAPI{}
-	s := NewScrobbler(api, "SK")
+	s := New(api, "SK", Options{})
 	p := newPlayer(s)
 	ctx := context.Background()
 	p.id, p.track = "a", song("A", 3*time.Minute)
@@ -279,7 +288,7 @@ func TestScrobblerAnnouncesNowPlayingOnce(t *testing.T) {
 
 func TestScrobblerRetriesTheQueue(t *testing.T) {
 	api := &fakeAPI{}
-	s := NewScrobbler(api, "SK")
+	s := New(api, "SK", Options{})
 	var saved []byte
 	s.OnQueue = func(q []Play) {
 		var err error
@@ -315,9 +324,9 @@ func TestScrobblerRetriesTheQueue(t *testing.T) {
 		t.Errorf("saved %d plays, %v", len(got), err)
 	}
 
-	// Last.fm fails the first batch for a moment: everything stays queued.
-	api.errs = []error{nil, &APIError{Code: 16, Message: "There was a temporary error processing your request. Please try again", Status: 200}}
-	if err := s.Send(ctx); !IsTemporary(err) {
+	// The service fails the first batch for a moment: everything stays queued.
+	api.errs = []error{nil, errBusy}
+	if err := s.Send(ctx); !errors.Is(err, errBusy) {
 		t.Fatalf("err = %v", err)
 	}
 	wantQueue(t, s, queue...)
@@ -350,27 +359,26 @@ func TestScrobblerRetriesTheQueue(t *testing.T) {
 }
 
 func TestScrobblerDropsRejectedScrobbles(t *testing.T) {
-	api := &fakeAPI{errs: []error{nil, &APIError{Code: 6, Message: "Invalid parameters - Your request is missing a required parameter", Status: 400}}}
-	s := NewScrobbler(api, "SK")
+	api := &fakeAPI{errs: []error{nil, rejection{"invalid parameters"}}}
+	s := New(api, "SK", Options{})
 	p := newPlayer(s)
 	p.load("a", song("A", 3*time.Minute))
 	p.run(90 * time.Second)
-	var apiErr *APIError
-	if err := s.Send(context.Background()); !errors.As(err, &apiErr) || apiErr.Code != 6 {
+	if err := s.Send(context.Background()); !IsRejected(err) {
 		t.Fatalf("err = %v", err)
 	}
 	wantQueue(t, s)
 }
 
 func TestScrobblerStopsWhenTheSessionExpires(t *testing.T) {
-	api := &fakeAPI{errs: []error{nil, ErrSessionExpired}}
-	s := NewScrobbler(api, "SK")
+	api := &fakeAPI{errs: []error{nil, ErrKeyRefused}}
+	s := New(api, "SK", Options{})
 	p := newPlayer(s)
 	ctx := context.Background()
 	a := song("A", 3*time.Minute)
 	p.load("a", a)
 	p.run(90 * time.Second)
-	if err := s.Send(ctx); !errors.Is(err, ErrSessionExpired) {
+	if err := s.Send(ctx); !errors.Is(err, ErrKeyRefused) {
 		t.Fatalf("err = %v", err)
 	}
 	wantQueue(t, s, Play{a, t0}) // kept for the next session
@@ -409,7 +417,7 @@ func TestScrobblerStopsWhenTheSessionExpires(t *testing.T) {
 
 // TestScrobblerDiscard drops what waits, and saves that.
 func TestScrobblerDiscard(t *testing.T) {
-	s := NewScrobbler(&fakeAPI{}, "SK")
+	s := New(&fakeAPI{}, "SK", Options{})
 	var saved [][]Play
 	s.OnQueue = func(p []Play) { saved = append(saved, p) }
 	a := song("A", 3*time.Minute)
@@ -426,7 +434,7 @@ func TestScrobblerDiscard(t *testing.T) {
 
 // TestScrobblerNoSessionQueuesNothing: without any key plays aren't kept.
 func TestScrobblerNoSessionQueuesNothing(t *testing.T) {
-	s := NewScrobbler(&fakeAPI{}, "")
+	s := New(&fakeAPI{}, "", Options{})
 	p := newPlayer(s)
 	p.load("a", song("A", 3*time.Minute))
 	p.run(90 * time.Second)
@@ -435,7 +443,7 @@ func TestScrobblerNoSessionQueuesNothing(t *testing.T) {
 
 // TestScrobblerQueueCap drops the oldest plays past the cap.
 func TestScrobblerQueueCap(t *testing.T) {
-	s := NewScrobbler(&fakeAPI{}, "SK")
+	s := New(&fakeAPI{}, "SK", Options{})
 	s.queue = make([]Play, maxQueue)
 	s.queue[0].Track.Title = "oldest"
 	p := newPlayer(s)
@@ -455,7 +463,7 @@ func TestScrobblerCountsAtSpeed(t *testing.T) {
 		rate  float64
 		after time.Duration
 	}{{2, time.Minute}, {3, 40 * time.Second}, {0.5, 4 * time.Minute}} {
-		s := NewScrobbler(&fakeAPI{}, "SK")
+		s := New(&fakeAPI{}, "SK", Options{})
 		p := newPlayer(s)
 		p.rate = c.rate
 		p.load("a", a)
@@ -465,7 +473,7 @@ func TestScrobblerCountsAtSpeed(t *testing.T) {
 		wantQueue(t, s, Play{a, t0})
 	}
 	// Played from a minute in at 2×, it started half a minute before.
-	s := NewScrobbler(&fakeAPI{}, "SK")
+	s := New(&fakeAPI{}, "SK", Options{})
 	p := newPlayer(s)
 	p.rate = 2
 	p.id, p.track, p.playing, p.pos = "a", a, true, time.Minute
@@ -473,7 +481,7 @@ func TestScrobblerCountsAtSpeed(t *testing.T) {
 	p.run(time.Minute)
 	wantQueue(t, s, Play{a, t0.Add(-30 * time.Second)})
 	// Half a minute at 1×, then at 3×: what each played counts.
-	s = NewScrobbler(&fakeAPI{}, "SK")
+	s = New(&fakeAPI{}, "SK", Options{})
 	p = newPlayer(s)
 	p.load("a", a)
 	p.run(30 * time.Second)

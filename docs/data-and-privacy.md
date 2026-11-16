@@ -76,6 +76,10 @@ AppImage or archive copy's.
   joined. A room keeps nothing else.
 - `positions.json`: where you left the latest 500 podcast episodes.
 - `lastfm-queue.json`: the scrobbles still to send, as while offline.
+- `listenbrainz-queue.json`: the same for ListenBrainz, and
+  `listenbrainz-recordings.json` the IDs ListenBrainz gave the recordings
+  of the latest 5,000 tracks that played, which likes send their loves by.
+  Disconnecting deletes both.
 - `updater.json`: your choices of updates.
 - `remote.json`: whether [remote control](remote-control.md) is on, and
   the computers paired with this one, by their names and their keys'
@@ -137,8 +141,8 @@ AppImage or archive copy's.
 
 ### Sign-ins
 
-Your Spotify sign-in, your Last.fm connection and the key of your YouTube
-Music session are in the system's credential store, which encrypts them
+Your Spotify sign-in, your Last.fm and ListenBrainz connections and the key
+of your YouTube Music session are in the system's credential store, which encrypts them
 for your account. MixMusic never sees your passwords: you sign in on
 Google's, Spotify's and Last.fm's own pages. Signing in to YouTube Music
 [with your browser](accounts.md#sign-in-with-your-browser) opens it with
@@ -149,11 +153,11 @@ Where the credential store can't keep a secret:
 
 - **On Windows**, as in a session without credentials, the secret is
   encrypted for your Windows account with DPAPI, in
-  `spotify-token.dpapi`, `lastfm.dpapi` or `youtube-session-key.dpapi` in
-  the data folder.
+  `spotify-token.dpapi`, `lastfm.dpapi`, `listenbrainz.dpapi` or
+  `youtube-session-key.dpapi` in the data folder.
 - **On Linux without a Secret Service**, the secrets are in files only
-  your user can read: `spotify-token.json`, `lastfm.json` and
-  `youtube-session.json`.
+  your user can read: `spotify-token.json`, `lastfm.json`,
+  `listenbrainz.json` and `youtube-session.json`.
 - Once the store can keep them, MixMusic moves them into it, and deletes
   the files.
 
@@ -180,7 +184,8 @@ Where the credential store can't keep a secret:
 | Lyrics of a track on this computer | the sources on, but YouTube captions | its title, artists, album and length, as its tags tell, unless they name no artist; never its file |
 | Translate, or romanized Arabic, while it's on beside the lyrics | Unison, which has Google translate them | the lyrics of the track that plays, with its video ID |
 | Romaji, the first time you turn it on | GitHub | a download of the dictionary of kanji readings; the lyrics stay on your computer |
-| Last.fm, once you connect it | Last.fm | the title, artists, album and length of what you play, and when |
+| Last.fm, once you connect it | Last.fm | the title, artists, album and length of what you play, and when; with Send likes as loves on, the songs you like and unlike |
+| ListenBrainz, once you connect it | ListenBrainz (`api.listenbrainz.org`), or the server you name | the title, first artist, album and length of what you play, and when, that MixMusic sent it, and for YouTube Music and Spotify tracks the service, the track's page, and Spotify's address and the ISRC where known; with Send likes as loves on, the songs you like and unlike, and the title, artist and album of a song looked up for its love |
 | Discord, unless you turn it off in Settings › Desktop | the Discord app on your computer | the title, artists, album and cover address of what plays, and its times, as you choose them; with the Listen button, the track's link on its service |
 | Casting | the cast device you choose, on your network | the title, artist and cover of what plays; the device fetches the audio from MixMusic while you cast |
 | AI assistants, while you let them control MixMusic | the assistant on your computer, and from it the AI model it uses, which may be on the internet | what plays and the queue, the results of its searches, and the names of your playlists and mixes, as it asks for them |
@@ -203,8 +208,8 @@ Where the credential store can't keep a secret:
 
 - Your settings, your library, your history and your searches.
 - The [music on this computer](local-music.md#privacy): MixMusic plays it
-  from its files, and sends no file anywhere. Last.fm and Discord hear of
-  what plays as of any track, as their settings say.
+  from its files, and sends no file anywhere. Last.fm, ListenBrainz and
+  Discord hear of what plays as of any track, as their settings say.
 - Latin letters for lyrics, Japanese romaji included: MixMusic makes them
   itself, and sends no lyrics for them. Only Arabic's come from Unison,
   while romanize is on.

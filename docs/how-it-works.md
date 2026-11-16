@@ -110,6 +110,8 @@ talks to:
   from GitHub the first time you turn romaji on (11.7 MB); the readings of
   Chinese are built in.
 - **Last.fm**, once you connect it: what you play, to scrobble.
+- **ListenBrainz**, or a server of yours that speaks its API, once you
+  connect it: what you play, to scrobble.
 - **Discord**, through the Discord app on your computer, over its local
   pipe or socket: what plays, for your profile.
 - **Cast devices** on your network, such as Chromecasts and Nest

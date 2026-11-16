@@ -38,7 +38,7 @@ func privacyOf(st app.AccountsStatus, home string) privacy {
 	if a := st.YouTube.Account; a != nil {
 		pr.names = append(pr.names, a.Name, a.Handle, strings.TrimPrefix(a.Handle, "@"))
 	}
-	pr.names = append(pr.names, st.Lastfm.Name)
+	pr.names = append(pr.names, st.Lastfm.Name, st.ListenBrainz.Name)
 	// The longest first, as a handle holds the name without its @.
 	pr.names = slices.DeleteFunc(pr.names, func(n string) bool { return len([]rune(strings.TrimSpace(n))) < 3 })
 	slices.SortFunc(pr.names, func(a, b string) int { return len(b) - len(a) })

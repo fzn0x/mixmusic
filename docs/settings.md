@@ -52,9 +52,11 @@ How MixMusic plays; [Playing music](playing-music.md) tells all of it.
 
 ### Accounts
 
-Your YouTube Music, Spotify and Last.fm accounts: signing in and out, the
-YouTube Music channel you use, the switch that adds what you play to your
-YouTube Music history, and the switch that pauses scrobbling.
+Your YouTube Music, Spotify, Last.fm and ListenBrainz accounts: signing in
+and out, the YouTube Music channel you use, the switch that adds what you
+play to your YouTube Music history, and for each scrobbling service the
+switch that pauses scrobbling, how many scrobbles wait, and **Send likes as
+loves**.
 [Accounts](accounts.md) tells each step.
 
 ### Plugins

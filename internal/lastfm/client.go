@@ -1,9 +1,9 @@
 // Package lastfm scrobbles what MixMusic plays to Last.fm.
 //
 // Client calls the Last.fm API 2.0: it connects the user's account with
-// desktop authentication, and sends now-playing updates and scrobbles.
-// Scrobbler follows what the player does and decides which plays count as
-// scrobbles.
+// desktop authentication, and sends now-playing updates and scrobbles. It
+// is the scrobble.Service of a scrobble.Scrobbler, which follows what the
+// player does and decides which plays count as scrobbles.
 package lastfm
 
 import (
@@ -19,6 +19,8 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/fzn0x/mixmusic/internal/scrobble"
 )
 
 const apiURL = "https://ws.audioscrobbler.com/2.0/"
@@ -34,8 +36,13 @@ const (
 
 // ErrSessionExpired is returned when Last.fm no longer accepts a session key,
 // such as after the user revoked MixMusic's access. The user must connect
-// again.
-var ErrSessionExpired = errors.New("lastfm: the session expired, connect to Last.fm again")
+// again. It is scrobble.ErrKeyRefused.
+var ErrSessionExpired error = sessionExpired{}
+
+type sessionExpired struct{}
+
+func (sessionExpired) Error() string        { return "lastfm: the session expired, connect to Last.fm again" }
+func (sessionExpired) Is(target error) bool { return target == scrobble.ErrKeyRefused }
 
 // ErrNotAuthorized is returned by Session while the user has not approved
 // the token in the browser yet.
@@ -73,6 +80,10 @@ func (e *APIError) temporary() bool {
 	return e.Status >= 500 || e.Status == http.StatusTooManyRequests
 }
 
+// Rejected reports whether Last.fm refused the call for what it holds,
+// which sending it again won't change: what isn't temporary.
+func (e *APIError) Rejected() bool { return !e.temporary() }
+
 // netError is a call that got no answer.
 type netError struct{ err error }
 
@@ -107,6 +118,9 @@ type Client struct {
 	// BaseURL is the API's address, replaced in tests. When empty, it is
 	// https://ws.audioscrobbler.com/2.0/.
 	BaseURL string
+	// UserAgent introduces MixMusic to Last.fm; when empty, as
+	// "MixMusic".
+	UserAgent string
 }
 
 // NewClient returns a client of the API account of apiKey and secret.
@@ -132,7 +146,11 @@ func (c *Client) call(ctx context.Context, method string, params url.Values, out
 		return err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("User-Agent", "MixMusic")
+	agent := c.UserAgent
+	if agent == "" {
+		agent = "MixMusic"
+	}
+	req.Header.Set("User-Agent", agent)
 	hc := c.HTTP
 	if hc == nil {
 		hc = defaultHTTP

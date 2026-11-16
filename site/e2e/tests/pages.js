@@ -1,7 +1,7 @@
 // The pages the checks load: the home page, in English and in two of its
 // other languages (Urdu, read right to left, and Hindi), and some docs pages
 // of the kinds there are (an index, a long page of tables, one of code, one
-// of images).
+// of images), and the page that opens invite links to rooms.
 export const pages = [
   { name: "home", path: "/" },
   { name: "home in Urdu", path: "/ur/" },
@@ -11,6 +11,7 @@ export const pages = [
   { name: "docs settings", path: "/docs/settings/" },
   { name: "docs plugins", path: "/docs/plugins/" },
   { name: "docs troubleshooting", path: "/docs/troubleshooting/" },
+  { name: "join a room", path: "/join/" },
 ];
 
 // The home page's languages besides English, as tools/sitefinish makes them

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{#- The page an invite link's https form opens (#562), for the chat apps
+    that don't open mixmusic:// links: it opens the app's link, of the
+    room's code and what follows it, all after the #, which a browser never
+    sends to this website, or offers the download. internal/room's
+    weblink.go writes the links. #}
+
+{%- block title %}Join a room · MixMusic{% endblock title %}
+{%- block description %}{{ page.description }}{% endblock description %}
+{%- block meta %}
+  <meta name="robots" content="noindex" />
+{%- endblock meta %}
+{%- block head %}
+  <style>.join [hidden] { display: none !important; }</style>
+{%- endblock head %}
+
+{%- block body %}
+  {%- set home = config.base_url | trim_end(pat='/') ~ '/' %}
+  <main id="content" class="missing join">
+    <h1>Join a room</h1>
+    <div data-invite>
+      <p>A friend invites you to listen with them: what they play plays on your computer too, in step, from your own MixMusic.</p>
+      <div class="missing-actions">
+        <a class="btn btn-filled" href="{{ home }}" data-open hidden>Open in MixMusic</a>
+        <a class="btn btn-tonal" href="{{ home }}#download">Download MixMusic</a>
+      </div>
+      <p>Nothing opens? Copy this page's address, and paste it in MixMusic as the invite link, in Listen with friends.</p>
+    </div>
+    <div data-broken hidden>
+      <p>This invite link isn't whole: ask your friend to copy it again, from their room's page in MixMusic.</p>
+      <div class="missing-actions">
+        <a class="btn btn-tonal" href="{{ home }}#download">Download MixMusic</a>
+      </div>
+    </div>
+    <p>The room's code and address stay in this page's address after the #, which your browser never sends to this website.</p>
+  </main>
+  <script>
+    // The room's code, a dot, then what follows the # of the app's link:
+    // the host's key, a dot, the secret, and @ and the addresses when it
+    // has them.
+    (() => {
+      const hash = location.hash.slice(1);
+      const dot = hash.indexOf(".");
+      const code = hash.slice(0, dot);
+      const rest = hash.slice(dot + 1);
+      const whole = dot > 0 && /^[0-9A-Za-z]{6}$/.test(code) && /^[0-9a-f]{64}\.[A-Za-z0-9_-]{22}(@[A-Za-z0-9.:%,\-\[\]]+)?$/.test(rest);
+      document.querySelector("[data-invite]").hidden = !whole;
+      document.querySelector("[data-broken]").hidden = whole;
+      if (!whole) return;
+      const open = document.querySelector("[data-open]");
+      open.href = "mixmusic://join/" + code + "#" + rest;
+      open.hidden = false;
+    })();
+  </script>
+{%- endblock body %}

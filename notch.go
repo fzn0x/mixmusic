@@ -270,7 +270,8 @@ func (n *notch) closing(c *ui.Context, root ui.Element) {
 // or the arrow that closes the panel in its place, with the button that
 // opens MixMusic left of it; on the right the bars that move with the
 // music, or a spinner while the track loads. Nothing is drawn under the
-// camera. Clicking either side opens the panel, or closes it.
+// camera. Clicking either side opens the panel, or closes it. Right to
+// left, as the panel's body below, the sides swap.
 func (n *notch) topRow(c *ui.Context, cx, alpha float32) {
 	s := n.s
 	h := n.housing
@@ -278,7 +279,7 @@ func (n *notch) topRow(c *ui.Context, cx, alpha float32) {
 	wing, art := float32(h.wing()), float32(h.art())
 	top := (hh - art) / 2
 	if alpha > 0 {
-		open := n.s.buttonBase(c.Key("notch-main")).Absolute().Left(cx-hw/2-wing-notchOpenRoom+6).Top((hh-28)/2).
+		open := n.s.buttonBase(c.Key("notch-main")).Absolute().Start(cx-hw/2-wing-notchOpenRoom+6).Top((hh-28)/2).
 			Size(28, 28).Radius(14).Label(locales.NotchPanelOpenMixMusic()).Cursor(ui.CursorPointer).Opacity(alpha).Disabled(!n.open)
 		n.buttonLook(open, false, false)
 		open.Children(func() { ui.Icon(c, icon("mini")).FontSize(15).TextColor(notchWhite) })
@@ -290,17 +291,17 @@ func (n *notch) topRow(c *ui.Context, cx, alpha float32) {
 	if n.open {
 		label = locales.NotchPanelClosePlayer()
 	}
-	left := n.s.buttonBase(c.Key("notch-left")).Absolute().Left(cx-hw/2-wing).Top(0).Size(wing, hh).
+	left := n.s.buttonBase(c.Key("notch-left")).Absolute().Start(cx-hw/2-wing).Top(0).Size(wing, hh).
 		Label(label).Cursor(ui.CursorPointer)
 	if left.FocusVisible() {
 		n.keyFocus = true
 	}
 	left.Children(func() {
 		if alpha < 1 {
-			n.cover(c, "notch-small", art).Absolute().Left(notchInset).Top(top).Radius(art / 5).Opacity(1 - alpha)
+			n.cover(c, "notch-small", art).Absolute().Start(notchInset).Top(top).Radius(art / 5).Opacity(1 - alpha)
 		}
 		if alpha > 0 {
-			ui.Box(c).Absolute().Left(notchInset).Top(top).Size(art, art).Center().Opacity(alpha).Children(func() {
+			ui.Box(c).Absolute().Start(notchInset).Top(top).Size(art, art).Center().Opacity(alpha).Children(func() {
 				ui.Icon(c, notchCollapse).FontSize(art * 0.8).TextColor(notchWhite)
 			})
 		}
@@ -310,9 +311,9 @@ func (n *notch) topRow(c *ui.Context, cx, alpha float32) {
 	}
 	// The right side opens and closes the panel too, for the pointer: the
 	// left is the keyboard's.
-	right := ui.Box(c.Key("notch-right")).Absolute().Left(cx+hw/2).Top(0).Size(wing, hh).Cursor(ui.CursorPointer)
+	right := ui.Box(c.Key("notch-right")).Absolute().Start(cx+hw/2).Top(0).Size(wing, hh).Cursor(ui.CursorPointer)
 	right.Children(func() {
-		box := ui.Box(c).Absolute().Left(wing-notchInset-art).Top(top).Size(art, art).Center()
+		box := ui.Box(c).Absolute().Start(wing-notchInset-art).Top(top).Size(art, art).Center()
 		if s.st.Loading || s.st.Waiting && s.st.WillPlay {
 			box.Children(func() { ui.Spinner(c).FontSize(art * 0.7).TextColor(notchWhite).Label(locales.PlayerLoading()) })
 			return

@@ -242,3 +242,23 @@ func TestRightToLeftRemote(t *testing.T) {
 	lap.drain()
 	desk.settle(t, func(st player.State) bool { return st.Position > 40*time.Second && st.Position < 65*time.Second })
 }
+
+// TestRightToLeftNotch swaps the sides of the player around the notch right
+// to left, as its panel's body below: the button that opens it is at the
+// right of the housing, and the transport in the open panel reads left to
+// right.
+func TestRightToLeftNotch(t *testing.T) {
+	x := playingNotch(t, testHousing)
+	x.tt.SetDirection(ui.RightToLeft)
+	x.frame()
+	w, _ := x.size()
+	if r := placeOf(t, x.tt, locales.NotchPanelOpenPlayer()); r.X < float32(w)/2 {
+		t.Errorf("the button that opens the panel is at %+v, at the left of the housing", r)
+	}
+	x.click(locales.NotchPanelOpenPlayer())
+	x.advance(time.Second)
+	inOrder(t, x.tt, "the notch", locales.PlayerPrevious(), locales.PlayerPause(), locales.PlayerNext())
+	if r := placeOf(t, x.tt, locales.NotchPanelClosePlayer()); r.X < float32(w)/2 {
+		t.Errorf("the button that closes the panel is at %+v, at the left of the housing", r)
+	}
+}

@@ -321,6 +321,13 @@ jobs:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
       options: --privileged
     steps:
+      # As in ci.yml: flatpak-builder's update of the runtimes renames
+      # their old checkouts away, which the image's overlayfs layer
+      # refuses on some runners.
+      - name: The runtimes on the runner's disk
+        run: |
+          cp -a /var/lib/flatpak "$RUNNER_TEMP/flatpak"
+          echo "FLATPAK_SYSTEM_DIR=$RUNNER_TEMP/flatpak" >> "$GITHUB_ENV"
       - uses: actions/checkout@v7
         with:
           ref: ${{ env.TAG }}

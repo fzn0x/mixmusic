@@ -362,6 +362,19 @@ jobs:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
       options: --privileged
     steps:
+      # The image installs the GNOME runtimes in /var/lib/flatpak, in a
+      # layer of the container's overlayfs, and flatpak-builder updates
+      # them to Flathub's newest. An update moves each runtime's old
+      # checkout away with rename(2), which overlayfs refuses for a
+      # directory of a lower layer unless it redirects directories: some
+      # ubuntu-latest runners don't, and the build stopped there on
+      # "Invalid cross-device link". A copy of the installation on the
+      # runner's disk renames as any disk does: FLATPAK_SYSTEM_DIR points
+      # flatpak and flatpak-builder at it, as the image has no mount(8).
+      - name: The runtimes on the runner's disk
+        run: |
+          cp -a /var/lib/flatpak "$RUNNER_TEMP/flatpak"
+          echo "FLATPAK_SYSTEM_DIR=$RUNNER_TEMP/flatpak" >> "$GITHUB_ENV"
       - uses: actions/checkout@v7
         with:
           submodules: true # Flathub's shared modules

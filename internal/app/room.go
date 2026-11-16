@@ -212,6 +212,7 @@ func (a *App) browseRooms() {
 	if err != nil {
 		log.Printf("mixmusic: looking for rooms: %v", err)
 	}
+	found = a.nearFound(found)
 	now := time.Now()
 	r.mu.Lock()
 	r.browsing, r.browsed = false, now
@@ -230,6 +231,36 @@ func (a *App) browseRooms() {
 	if a.relistRooms() {
 		a.notifyRooms("")
 	}
+}
+
+// nearFound are the rooms found, each at those of its addresses of this
+// computer's own networks (nearby), room.MaxAddrs besides the first at
+// most, in their order: anyone on the network may answer for a host, with
+// as many addresses as it likes, but none rightly names one of the
+// internet. A room at none of them is left out.
+func (a *App) nearFound(found []room.Found) []room.Found {
+	var out []room.Found
+	for _, f := range found {
+		var kept []string
+		for _, at := range append([]string{f.Addr}, f.Others...) {
+			ap, err := netip.ParseAddrPort(at)
+			if err == nil && a.nearby(net.TCPAddrFromAddrPort(ap)) && !slices.Contains(kept, at) {
+				kept = append(kept, at)
+			}
+			if len(kept) > room.MaxAddrs {
+				break
+			}
+		}
+		if len(kept) == 0 {
+			continue
+		}
+		f.Addr, f.Others = kept[0], nil
+		if len(kept) > 1 {
+			f.Others = kept[1:]
+		}
+		out = append(out, f)
+	}
+	return out
 }
 
 // relistRooms makes the list the windows show of the rooms found, and

@@ -42,8 +42,9 @@ go to the services' pages, and cards are drawn on this computer.
   language, so a font the user set counts whatever its file is called. A
   collection gives its first face. Where none has the letter, it stays
   blank. Fonts are read with go-text (`font.go`): which letters a system
-  font has is read up front, the rest when a card needs one of them, and
-  held weakly, so it goes once the card is drawn.
+  font has is read up front, the rest when a card needs one of them. The
+  rest is held weakly and kept a minute after the last card that read
+  it, so cards drawn one after another read it once, and it goes after.
 - **Shaping** (`shape.go`). go-text's segmenter splits a row into runs of
   one direction and script, and the fallback order splits those by font,
   a mark, a joiner, a variation selector or a space staying in the font

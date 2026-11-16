@@ -3,6 +3,9 @@ package room
 import (
 	"strconv"
 	"testing"
+	"time"
+
+	"github.com/fzn0x/mixmusic/internal/remote"
 )
 
 // TestSongsBoundedBySource bounds the songs of a source's guests, however
@@ -29,5 +32,31 @@ func TestSongsBoundedBySource(t *testing.T) {
 	}
 	if refused != songsPerMinute || len(f.addedNow()) != 2*songsPerMinute {
 		t.Fatalf("%d refused, %d added", refused, len(f.addedNow()))
+	}
+}
+
+// TestSourceRefusalSpendsNoKeyToken refuses a guest's ask its source's
+// bucket refuses without spending its key's: once the source's fills
+// again, the guest asks as many as its key's allow.
+func TestSourceRefusalSpendsNoKeyToken(t *testing.T) {
+	s := &Server{}
+	c := &conn{src: "192.168.1.2"}
+	songs := func(l *limits) *bucket { return &l.songs }
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// Two other keys of the source took all of the source's.
+	for i := range 2 {
+		other := &conn{key: remote.Fingerprint{byte(i + 1)}, src: c.src}
+		for range songsPerMinute {
+			if !s.takes(other, songs, songsPerMinute, time.Hour) {
+				t.Fatal("refused within the source's")
+			}
+		}
+	}
+	if s.takes(c, songs, songsPerMinute, time.Hour) {
+		t.Fatal("past the source's")
+	}
+	if got := s.limitsOf(c.key).songs.tokens; got != songsPerMinute {
+		t.Fatalf("the key's bucket has %v left", got)
 	}
 }

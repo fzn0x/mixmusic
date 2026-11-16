@@ -184,17 +184,22 @@ type bucket struct {
 
 // take reports whether an ask may go through at now, and counts it.
 func (b *bucket) take(now time.Time, size int, every time.Duration) bool {
+	if !b.has(now, size, every) {
+		return false
+	}
+	b.tokens--
+	return true
+}
+
+// has reports whether an ask may go through at now, without counting it.
+func (b *bucket) has(now time.Time, size int, every time.Duration) bool {
 	if b.at.IsZero() {
 		b.tokens = float64(size)
 	} else {
 		b.tokens = min(float64(size), b.tokens+float64(now.Sub(b.at))/float64(every))
 	}
 	b.at = now
-	if b.tokens < 1 {
-		return false
-	}
-	b.tokens--
-	return true
+	return b.tokens >= 1
 }
 
 // limitsOf are what the guest of key may still ask, forgetting those of
@@ -225,7 +230,12 @@ func (s *Server) limitsOf(key remote.Fingerprint) *limits {
 // that makes new keys asks no more. s.mu is held.
 func (s *Server) takes(c *conn, bucketOf func(*limits) *bucket, size int, every time.Duration) bool {
 	now := time.Now()
-	return bucketOf(s.limitsOf(c.key)).take(now, size, every) && bucketOf(s.limitsFrom(c.src)).take(now, 2*size, every/2)
+	key, src := bucketOf(s.limitsOf(c.key)), bucketOf(s.limitsFrom(c.src))
+	// Either refuses without the other's counting it.
+	if !key.has(now, size, every) || !src.has(now, 2*size, every/2) {
+		return false
+	}
+	return key.take(now, size, every) && src.take(now, 2*size, every/2)
 }
 
 // limitsFrom are what the guests of the source src may still ask, of

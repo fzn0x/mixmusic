@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"sync/atomic"
+	"sync"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -234,13 +234,47 @@ func (a *App) unhost(g *guestRoom, h *hostedRoom) {
 	}
 }
 
-// reach tells the host of the session s whether this computer reaches the
-// room of key it moves to: where discovery finds it, or at addr.
-func (a *App) reach(s *room.Session, key remote.Fingerprint, addr string) {
+// reachFailsAfter is how long after the host asked a guest tells it
+// doesn't reach the room it moves to: however soon it knew, so that the
+// host learns nothing of the address by when it's told. Tests shorten it.
+var reachFailsAfter = 3 * time.Second
+
+// reachGate lets a guest try the room its host moves to once each MoveFor
+// at most, so that a host can't have it knock at address after address.
+type reachGate struct {
+	mu   sync.Mutex
+	last time.Time
+}
+
+// take reports whether a try may start at now, and counts it.
+func (g *reachGate) take(now time.Time) bool {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	if !g.last.IsZero() && now.Sub(g.last) < room.MoveFor {
+		return false
+	}
+	g.last = now
+	return true
+}
+
+// reach tells the host, with answer, whether this computer reaches the
+// room of key it moves to: where discovery finds it, or at addr. A no
+// comes reachFailsAfter after the ask.
+func (a *App) reach(answer func(bool) error, key remote.Fingerprint, addr string) {
+	asked := time.Now()
+	ok := a.reaches(key, addr)
+	if !ok {
+		<-time.After(time.Until(asked.Add(reachFailsAfter)))
+	}
+	_ = answer(ok)
+}
+
+// reaches reports whether this computer reaches the room of key: where
+// discovery finds it, or at addr.
+func (a *App) reaches(key remote.Fingerprint, addr string) bool {
 	id, err := a.identity(true)
 	if err != nil {
-		_ = s.Reached(false)
-		return
+		return false
 	}
 	try := func(at string) bool {
 		ctx, cancel := context.WithTimeout(context.Background(), room.MoveFor/3)
@@ -254,15 +288,15 @@ func (a *App) reach(s *room.Session, key remote.Fingerprint, addr string) {
 	if !ok && addr != "" {
 		ok = try(addr)
 	}
-	_ = s.Reached(ok)
+	return ok
 }
 
 // watchMove has this computer, a guest of the room of g in the session s,
 // open a room for it to move to, or try to reach the one it moves to, as
-// its host asks, until the session ends: one of each at a time, whatever
-// the host asks.
+// its host asks, until the session ends: one try each MoveFor at most,
+// whatever the host asks.
 func (a *App) watchMove(g *guestRoom, s *room.Session) {
-	var reaching atomic.Bool
+	var reaching reachGate
 	s.Watch(func(e room.Event) {
 		switch e.Kind {
 		case room.HostAsked:
@@ -279,11 +313,8 @@ func (a *App) watchMove(g *guestRoom, s *room.Session) {
 				go a.answerHost(g, ask, false)
 			}
 		case room.Reach:
-			if reaching.CompareAndSwap(false, true) {
-				go func() {
-					defer reaching.Store(false)
-					a.reach(s, e.Key, e.Addr)
-				}()
+			if reaching.take(time.Now()) {
+				go a.reach(s.Reached, e.Key, e.Addr)
 			}
 		}
 	})

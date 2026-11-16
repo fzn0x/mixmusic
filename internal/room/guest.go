@@ -88,6 +88,9 @@ func (g *Guest) Knock(ctx context.Context, addr string, pinned *remote.Fingerpri
 		return fail(err)
 	}
 	f := remote.NewFrames(tc)
+	// Until the host proved the code, its messages are of a handshake's
+	// size: at an address typed in, anyone may answer.
+	f.Limit(handshakeMessage)
 	by := byCode
 	if link {
 		by = byLink
@@ -115,6 +118,7 @@ func (g *Guest) Knock(ctx context.Context, addr string, pinned *remote.Fingerpri
 		// The host let in a code it doesn't know: it isn't the room's.
 		return fail(ErrWrongCode)
 	}
+	f.Limit(0)
 	s := g.session(tc, f, host)
 	if welcome.Preview != nil {
 		s.preview = welcome.Preview.clean()

@@ -59,16 +59,17 @@ type Guests struct {
 // asks are what the guests asked and what waits for the host's user, as
 // the files of each keep them. Server.mu guards them.
 type asks struct {
-	next     int64
-	requests []*Request
-	knocks   []*Knock
-	limits   map[remote.Fingerprint]*limits
-	looking  map[remote.Fingerprint]int
-	looks    int
-	sent     *Rules
-	move     *move
-	moved    bool
-	seated   map[remote.Fingerprint]bool
+	next         int64
+	requests     []*Request
+	knocks       []*Knock
+	limits       map[remote.Fingerprint]*limits
+	sourceLimits map[string]*limits
+	looking      map[remote.Fingerprint]int
+	looks        int
+	sent         *Rules
+	move         *move
+	moved        bool
+	seated       map[remote.Fingerprint]bool
 }
 
 // rules are the host's rules now: with no Guests, guests add no songs,
@@ -210,6 +211,43 @@ func (s *Server) limitsOf(key remote.Fingerprint) *limits {
 	if l == nil {
 		l = &limits{}
 		a.limits[key] = l
+	}
+	return l
+}
+
+// takes reports whether the guest of c may ask once more, by the bucket
+// of limits each, which take, of size at once and one each every: its
+// key's, and its source's (sourceOf), of twice as many, so that a computer
+// that makes new keys asks no more. s.mu is held.
+func (s *Server) takes(c *conn, bucketOf func(*limits) *bucket, size int, every time.Duration) bool {
+	now := time.Now()
+	return bucketOf(s.limitsOf(c.key)).take(now, size, every) && bucketOf(s.limitsFrom(c.src)).take(now, 2*size, every/2)
+}
+
+// limitsFrom are what the guests of the source src may still ask, of
+// sources the room has guests of. s.mu is held.
+func (s *Server) limitsFrom(src string) *limits {
+	a := &s.asks
+	if len(a.sourceLimits) > 2*MaxGuests {
+		here := map[string]bool{}
+		for _, g := range s.guests {
+			if g.conn != nil {
+				here[g.conn.src] = true
+			}
+		}
+		for src := range a.sourceLimits {
+			if !here[src] {
+				delete(a.sourceLimits, src)
+			}
+		}
+	}
+	if a.sourceLimits == nil {
+		a.sourceLimits = map[string]*limits{}
+	}
+	l := a.sourceLimits[src]
+	if l == nil {
+		l = &limits{}
+		a.sourceLimits[src] = l
 	}
 	return l
 }

@@ -73,7 +73,7 @@ func (s *Server) control(c *conn, m message) {
 	switch {
 	case !rules.Control || gs == nil || gs.Control == nil:
 		reason = NoControl
-	case !s.limitsOf(c.key).controls.take(time.Now(), controls, controlEvery):
+	case !s.takes(c, func(l *limits) *bucket { return &l.controls }, controls, controlEvery):
 		reason = TooMany
 	default:
 		s.note(from.Name, doneOf(m.Do))

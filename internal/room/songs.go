@@ -107,7 +107,7 @@ func (s *Server) addSong(c *conn, m message) {
 		reason = SongsAreOff
 	case rules.Songs == SongsAsk && waiting >= MaxWaiting, s.asks.looks >= maxLooks:
 		reason = TooMany
-	case !s.limitsOf(c.key).songs.take(time.Now(), songsPerMinute, time.Minute/songsPerMinute):
+	case !s.takes(c, func(l *limits) *bucket { return &l.songs }, songsPerMinute, time.Minute/songsPerMinute):
 		reason = TooMany
 	}
 	file := t.Source == "file" && rules.Songs == SongsAsk

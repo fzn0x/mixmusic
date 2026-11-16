@@ -200,6 +200,7 @@ Take your downloads, and the music on this computer, to a phone or another playe
 - Each copy is named "Artist - Title", made safe for file names on Windows, macOS and Linux. A name that's taken gets a number, as "Artist - Title (2)", so that nothing in the folder is written over.
 - A download's copy holds its title, artists and album, the cover the downloads keep, and, from its album's page, the year, the album's artists and its track number, which need the network. Spotify songs from a playlist, your liked songs or a search also carry their ISRC.
 - A download keeps its format: an M4A file stays M4A, and Opus, which YouTube serves in WebM, a container few players read tags from, becomes an Ogg Opus file (`.opus`), with the same audio, packet for packet.
+- With [Leave marked parts out of exports](playing-music.md#skipping-parts-of-videos) on, an Opus copy leaves out the parts SponsorBlock marks that the player skips: one at the start or the end to the sample, one between to the nearest 10 ms, without changing the sound. An export asks SponsorBlock of the downloads whose parts MixMusic doesn't know yet, as playing them would, and a copy whose parts can't be found goes whole. M4A copies keep their parts.
 - A song on this computer is copied as it is, with its own tags and cover; of a song with copies, its best copy.
 - The downloads and your files stay as they are. A toast tells when the copies are written, with show, which shows them in their folder.
 

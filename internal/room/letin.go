@@ -9,6 +9,8 @@ import (
 	"errors"
 	"slices"
 	"time"
+
+	"github.com/fzn0x/mixmusic/internal/remote"
 )
 
 func init() {
@@ -28,10 +30,12 @@ const AskFor = 2 * time.Minute
 // in.
 const maxKnocks = 20
 
-// Why the host turns a computer away that asks to join.
+// Why the host turns a computer away that asks to join: reasonLeft is
+// that it went meanwhile.
 const (
 	reasonDeclined = "declined"
 	reasonManyAsk  = "many asking"
+	reasonLeft     = "left"
 )
 
 var (
@@ -88,7 +92,7 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 		select {
 		case m, ok := <-msgs:
 			if !ok {
-				return reasonDeclined
+				return reasonLeft
 			}
 			if m.Type == "ping" && c.f.Send(message{Type: "pong", Sent: m.Sent, HostAt: s.Clock.Now()}, t.silence()) != nil {
 				return reasonDeclined
@@ -101,6 +105,68 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 		case <-wait.C:
 			return reasonDeclined
 		}
+	}
+}
+
+// letInSeat has the host's user let in c, of the computer named name,
+// which comes back by its key to a seat of the room that moved here
+// (move.go), when the rules ask them, as a join is; a seat turned away
+// goes, and joins again only by the code or the link. It returns why not, or "", and
+// whether it asked, which reads c's messages from then on.
+func (s *Server) letInSeat(c *conn, name string) (string, bool) {
+	s.mu.Lock()
+	g := s.guests[c.key]
+	seated := s.asks.seated[c.key] && g != nil && g.conn == nil && s.refusal(c.key) == ""
+	s.mu.Unlock()
+	if !seated {
+		return "", false
+	}
+	if !s.rules().Ask {
+		s.unseat(c.key, false)
+		return "", false
+	}
+	c.f.Limit(guestMessage)
+	reason := s.letIn(c, name, c.messages(s.Timing.silence()))
+	if reason != reasonLeft {
+		s.unseat(c.key, reason != "")
+	}
+	return reason, true
+}
+
+// unseat takes the seat of key as let in, or turned away, when gone: its
+// place goes then.
+func (s *Server) unseat(key remote.Fingerprint, gone bool) {
+	s.mu.Lock()
+	delete(s.asks.seated, key)
+	g := s.guests[key]
+	gone = gone && g != nil && g.conn == nil
+	if gone {
+		delete(s.guests, key)
+		s.note(g.Name, Removed)
+	}
+	s.mu.Unlock()
+	if gone {
+		s.changed(true)
+	}
+}
+
+// letIn waits, on a session of a computer that comes back to the seat of
+// a room that moved, for the host's user to let it in, AskFor at most.
+func (s *Session) letIn() (*Session, error) {
+	s.mu.Lock()
+	s.asks.asking = true
+	s.mu.Unlock()
+	s.start()
+	wait := time.NewTimer(AskFor + s.timing.silence())
+	defer wait.Stop()
+	select {
+	case <-s.joinedCh:
+		return s, nil
+	case <-s.done:
+		return nil, s.Err()
+	case <-wait.C:
+		s.Close()
+		return nil, ErrDeclined
 	}
 }
 

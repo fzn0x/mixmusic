@@ -61,6 +61,7 @@ type asks struct {
 	sent     *Rules
 	move     *move
 	moved    bool
+	seated   map[remote.Fingerprint]bool
 }
 
 // rules are the host's rules now: with no Guests, guests add no songs,

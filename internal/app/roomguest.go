@@ -421,7 +421,8 @@ func (a *App) comeBack(g *guestRoom) {
 	switch {
 	case err == nil:
 		a.entered(g, s, false)
-	case errors.Is(err, room.ErrNotGuest), errors.Is(err, room.ErrBlocked), errors.Is(err, room.ErrVersion):
+	case errors.Is(err, room.ErrNotGuest), errors.Is(err, room.ErrBlocked), errors.Is(err, room.ErrVersion),
+		errors.Is(err, room.ErrDeclined):
 		g.end(a, err)
 	default:
 		a.comeBackLater(g)

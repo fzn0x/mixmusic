@@ -123,6 +123,10 @@ func (s *Server) seat() {
 		}
 		// In the order they joined the room they come from.
 		s.guests[m.Key] = &guest{Member: Member{Key: m.Key, Name: m.Name, Joined: now.Add(time.Duration(i))}, away: now}
+		if s.asks.seated == nil {
+			s.asks.seated = map[remote.Fingerprint]bool{}
+		}
+		s.asks.seated[m.Key] = true
 	}
 	for _, m := range s.Seats.Blocked {
 		if s.blocked == nil {

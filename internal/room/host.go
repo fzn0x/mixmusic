@@ -334,12 +334,21 @@ func (s *Server) handle(raw net.Conn, u *unproven) {
 	c.features = hello.Features
 	switch hello.Want {
 	case wantRejoin:
+		// A seat of a room that moved here is let in first, when the rules
+		// ask it, as a join is (letin.go).
+		reason, asked := s.letInSeat(c, name)
+		if reason != "" {
+			refuse(reason)
+			return
+		}
 		if reason := s.comeBack(c, name); reason != "" {
 			refuse(reason)
 			return
 		}
 		proven()
-		c.f.Limit(guestMessage)
+		if !asked {
+			c.f.Limit(guestMessage)
+		}
 	case wantJoin:
 		if !s.join(c, hello, name, refuse, proven, proveBy) {
 			return

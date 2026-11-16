@@ -141,23 +141,31 @@ func (g *Guest) Rejoin(ctx context.Context, addr string, host remote.Fingerprint
 		tc.Close()
 		return nil, err
 	}
-	joined, err := expect(f, "joined", t.silence())
+	joined, err := expect(f, "joined", t.silence(), "asking")
 	if err != nil {
 		tc.Close()
 		return nil, err
 	}
 	s := g.session(tc, f, host)
+	if joined.Type == "asking" {
+		// The room moved here, and its host's user lets this computer in
+		// first (letin.go).
+		return s.letIn()
+	}
 	s.joined, s.preview.Host = true, CleanName(joined.Name)
 	s.start()
 	return s, nil
 }
 
-// expect receives the next message, which must be of type typ: a refused
-// or ended message is its reason's error.
-func expect(f *remote.Frames, typ string, wait time.Duration) (message, error) {
+// expect receives the next message, which must be of type typ, or of one
+// of or: a refused or ended message is its reason's error.
+func expect(f *remote.Frames, typ string, wait time.Duration, or ...string) (message, error) {
 	var m message
 	if err := f.Receive(&m, wait); err != nil {
 		return m, err
+	}
+	if slices.Contains(or, m.Type) {
+		return m, nil
 	}
 	switch m.Type {
 	case typ:

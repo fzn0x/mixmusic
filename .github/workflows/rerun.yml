@@ -15,8 +15,10 @@ name: Rerun
 # of its own. A run from a fork doesn't name its pull request, so it is
 # found by the fork's owner and branch; a run whose pull request can't be
 # found isn't rerun. A run that was rerun by hand meanwhile is left to that
-# rerun. The release and the publishing workflows aren't in the list:
-# rerunning them is a decision. Pages and Cloudflare deploy only main's newest
+# rerun. When GitHub refuses a rerun, as for a run whose pull request
+# closed before any job started, it says so in a warning and ends green:
+# the run stays red on its own. The release and the publishing workflows
+# aren't in the list: rerunning them is a decision. Pages and Cloudflare deploy only main's newest
 # commit, which their own "Still main's newest commit" step checks, so a
 # rerun of an older commit's run deploys nothing.
 #
@@ -106,5 +108,8 @@ jobs:
           still || exit 0
           sleep "$wait"
           still || exit 0
-          gh run rerun "$RUN" --failed -R "$REPO"
+          if ! out="$(gh run rerun "$RUN" --failed -R "$REPO" 2>&1)"; then
+            echo "::warning::GitHub refused to rerun $NAME: $(echo "$out" | tr '\n' ' ')"
+            exit 0
+          fi
           echo "Rerunning the failed jobs of $NAME: https://github.com/$REPO/actions/runs/$RUN"

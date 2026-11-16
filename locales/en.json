@@ -3181,6 +3181,37 @@
   "lyricsStyleSpotlightAbout": "Very big letters. Only the line sung is sharp: the others blur.",
   "lyricsSynced": "synced",
   "lyricsTimeVideosDescription": "When a music video's lyrics are its song's, MixMusic finds where the song starts in the video, comparing the audio of the two from YouTube on this computer, and moves the lines there. Off, they keep the song's times, and show without them when the video is longer or shorter than the song.",
+  "lyricsTimeVideosNoteTimed": "Timed to this video ({shift} s)",
+  "@lyricsTimeVideosNoteTimed": {
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsTimeVideosNoteTimedFaster": "Timed to this video ({shift} s, {percent}% faster)",
+  "@lyricsTimeVideosNoteTimedFaster": {
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsTimeVideosNoteTimedSlower": "Timed to this video ({shift} s, {percent}% slower)",
+  "@lyricsTimeVideosNoteTimedSlower": {
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsTimeVideosNoteTiming": "Timing these lyrics to the video…",
   "lyricsTimeVideosTitle": "Time lyrics to music videos",
   "lyricsTranslate": "translate",
   "lyricsTranslateLyrics": "Translate lyrics",

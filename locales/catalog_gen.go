@@ -11556,6 +11556,52 @@ func (msgs Messages) LyricsTimeVideosDescription() string {
 	return Catalog.Format(msgs.locale, "lyricsTimeVideosDescription", nil)
 }
 
+// LyricsTimeVideosNoteTimed says "Timed to this video ({shift} s)"
+// in the language the app shows.
+func LyricsTimeVideosNoteTimed(shift string) string {
+	return In(i18n.Locale()).LyricsTimeVideosNoteTimed(shift)
+}
+
+// LyricsTimeVideosNoteTimed says "Timed to this video ({shift} s)"
+// in the language of msgs.
+func (msgs Messages) LyricsTimeVideosNoteTimed(shift string) string {
+	return Catalog.Format(msgs.locale, "lyricsTimeVideosNoteTimed", map[string]any{"shift": shift})
+}
+
+// LyricsTimeVideosNoteTimedFaster says "Timed to this video ({shift} s, {percent}% faster)"
+// in the language the app shows.
+func LyricsTimeVideosNoteTimedFaster(shift string, percent string) string {
+	return In(i18n.Locale()).LyricsTimeVideosNoteTimedFaster(shift, percent)
+}
+
+// LyricsTimeVideosNoteTimedFaster says "Timed to this video ({shift} s, {percent}% faster)"
+// in the language of msgs.
+func (msgs Messages) LyricsTimeVideosNoteTimedFaster(shift string, percent string) string {
+	return Catalog.Format(msgs.locale, "lyricsTimeVideosNoteTimedFaster", map[string]any{"shift": shift, "percent": percent})
+}
+
+// LyricsTimeVideosNoteTimedSlower says "Timed to this video ({shift} s, {percent}% slower)"
+// in the language the app shows.
+func LyricsTimeVideosNoteTimedSlower(shift string, percent string) string {
+	return In(i18n.Locale()).LyricsTimeVideosNoteTimedSlower(shift, percent)
+}
+
+// LyricsTimeVideosNoteTimedSlower says "Timed to this video ({shift} s, {percent}% slower)"
+// in the language of msgs.
+func (msgs Messages) LyricsTimeVideosNoteTimedSlower(shift string, percent string) string {
+	return Catalog.Format(msgs.locale, "lyricsTimeVideosNoteTimedSlower", map[string]any{"shift": shift, "percent": percent})
+}
+
+// LyricsTimeVideosNoteTiming says "Timing these lyrics to the video…"
+// in the language the app shows.
+func LyricsTimeVideosNoteTiming() string { return In(i18n.Locale()).LyricsTimeVideosNoteTiming() }
+
+// LyricsTimeVideosNoteTiming says "Timing these lyrics to the video…"
+// in the language of msgs.
+func (msgs Messages) LyricsTimeVideosNoteTiming() string {
+	return Catalog.Format(msgs.locale, "lyricsTimeVideosNoteTiming", nil)
+}
+
 // LyricsTimeVideosTitle says "Time lyrics to music videos"
 // in the language the app shows.
 func LyricsTimeVideosTitle() string { return In(i18n.Locale()).LyricsTimeVideosTitle() }

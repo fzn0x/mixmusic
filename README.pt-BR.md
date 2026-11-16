@@ -116,6 +116,9 @@ bibliotecas. O MixMusic reúne os dois serviços em um só player:
 - Links `mixmusic://`.
 - **Last.fm:** cada faixa que você ouve entra no seu perfil, e os scrobbles
   feitos offline são enviados assim que você volta a ficar online.
+- **ListenBrainz:** o mesmo, junto com o Last.fm ou sem ele, para o
+  ListenBrainz ou um servidor seu, como o Maloja. As curtidas podem ir para
+  qualquer um dos dois como loves.
 - **Discord:** seu perfil mostra o que está tocando, com a capa e o tempo
   restante.
 - **Atualizações:** o MixMusic procura uma nova versão ao iniciar e a cada
@@ -280,6 +283,9 @@ desktop.
   [last.fm/api/account/create](https://www.last.fm/api/account/create)
   (qualquer nome, sem URL de callback), cole a chave de API e o segredo
   compartilhado em Settings › Accounts e aprove o MixMusic no seu navegador.
+- **ListenBrainz:** cole o token de usuário das suas
+  [configurações do ListenBrainz](https://listenbrainz.org/settings/), ou do
+  seu próprio servidor, em Settings › Accounts.
 - **Discord:** enquanto o app do Discord roda, seu perfil mostra o que você
   ouve. Desative em Settings › Desktop (Configurações › Desktop).
 
@@ -499,6 +505,8 @@ Ele se comunica com:
   de letras em japonês, o dicionário das leituras dos kanji (11,7 MB). O
   romaji é feito no seu computador: as letras não são enviadas.
 - **Last.fm,** depois que você o conecta: o que você toca.
+- **ListenBrainz,** ou um servidor seu com a API dele, depois que você o
+  conecta: o que você toca.
 - **Discord,** a menos que você desative: o que está tocando, enviado ao app
   do Discord no seu computador, que o mostra no seu perfil.
 

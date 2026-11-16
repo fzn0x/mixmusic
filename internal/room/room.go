@@ -118,6 +118,8 @@ func errOf(reason string) error {
 		return ErrFull
 	case reasonDeclined:
 		return ErrDeclined
+	case reasonMoving:
+		return ErrRoomMoves
 	case reasonManyAsk:
 		return ErrManyAsk
 	case reasonGone:

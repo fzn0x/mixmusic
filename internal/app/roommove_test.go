@@ -71,6 +71,14 @@ func TestRoomMakeHost(t *testing.T) {
 	waitPlayer(t, dp, "the old host's queue back", func(s player.State) bool { return len(s.Queue) == 3 })
 }
 
+// TestRoomProblemMoving tells a computer that knocks as the room moves to
+// try again.
+func TestRoomProblemMoving(t *testing.T) {
+	if got := roomProblem("Desk", room.ErrRoomMoves); got != "Desk's room is moving to another computer: try again in a moment." {
+		t.Fatalf("problem %q", got)
+	}
+}
+
 // shut listens as a room does, and shuts each connection at once.
 type shut struct{ net.Listener }
 

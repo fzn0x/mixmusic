@@ -54,6 +54,9 @@ var (
 	ErrMoving = errors.New("the room moves to another guest already")
 	// ErrMoved: the room moved to another computer (Session.Moved).
 	ErrMoved = errors.New("the room moved to another computer")
+	// ErrRoomMoves: the room moves to another computer, or moved: it
+	// lets no one in meanwhile, as their places wouldn't move with it.
+	ErrRoomMoves = errors.New("the room is moving to another computer: try again in a moment")
 )
 
 // Seat is a place a room keeps, as the host that moves it tells: a key, in
@@ -282,6 +285,7 @@ func (s *Server) reached(mv *move, who *Member, ok bool) {
 		return
 	}
 	s.asks.move = nil
+	s.asks.moved = true
 	mv.timer.Stop()
 	var conns []*conn
 	for _, g := range s.guests {
@@ -305,6 +309,13 @@ func (s *Server) reached(mv *move, who *Member, ok bool) {
 		mv.done(done, nil)
 	}
 }
+
+// reasonMoving: the room moves, or moved, and lets no one in.
+const reasonMoving = "moving"
+
+// moves reports whether a move is under way, or the room moved. s.mu is
+// held.
+func (s *Server) moves() bool { return s.asks.move != nil || s.asks.moved }
 
 // errDropped: the host removed or blocked someone as the room moved, whose
 // place the room it moved to would keep.

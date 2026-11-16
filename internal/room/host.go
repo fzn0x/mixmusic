@@ -396,11 +396,14 @@ func (s *Server) removeConn(c *conn) {
 	}
 }
 
-// refusal is why the host refuses the key now, or "": blocked, or a
-// room full of other guests.
+// refusal is why the host refuses the key now, or "": blocked, a room
+// that moves or moved (move.go), or a room full of other guests.
 func (s *Server) refusal(key remote.Fingerprint) string {
 	if _, ok := s.blocked[key]; ok {
 		return reasonBlocked
+	}
+	if s.moves() {
+		return reasonMoving
 	}
 	if _, ok := s.guests[key]; !ok && len(s.guests) >= MaxGuests {
 		return reasonFull

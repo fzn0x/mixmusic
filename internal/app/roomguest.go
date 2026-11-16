@@ -575,6 +575,8 @@ func roomProblem(name string, err error) string {
 		return name + " removed you from the room."
 	case errors.Is(err, room.ErrDeclined):
 		return name + " didn't let you in."
+	case errors.Is(err, room.ErrRoomMoves):
+		return name + "'s room is moving to another computer: try again in a moment."
 	case errors.Is(err, room.ErrManyAsk):
 		return "So many wait to join " + name + "'s room that it takes no more for now: try again later."
 	case errors.Is(err, room.ErrFull):

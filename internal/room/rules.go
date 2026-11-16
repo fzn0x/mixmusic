@@ -60,6 +60,7 @@ type asks struct {
 	limits   map[remote.Fingerprint]*limits
 	sent     *Rules
 	move     *move
+	moved    bool
 }
 
 // rules are the host's rules now: with no Guests, guests add no songs,

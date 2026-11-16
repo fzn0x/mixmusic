@@ -132,8 +132,10 @@ few computers that proved nothing yet (`admit.go`).
   lock no code out on the network: past them, it checks no code of those
   until the minute is over. Its own networks are private, loopback and
   link-local addresses, the networks of its interfaces, of public
-  addresses too, and the providers' shared range, 100.64.0.0/10, while
-  one of its interfaces is in it, as a VPN's such as Tailscale's: each
+  addresses too, and the providers' shared range, 100.64.0.0/10, while a
+  VPN tunnel of its own is in it, as Tailscale's, an address of one alone
+  or a point-to-point interface: another interface in the range, as a
+  modem's of the provider's network, counts as its own prefix. Each
   connection is told one or the other as it comes, by its whole address,
   and the room of the network (below) and the knocks' label tell them
   alike.

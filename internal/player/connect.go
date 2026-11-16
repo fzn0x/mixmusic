@@ -151,9 +151,26 @@ type connectEngine struct {
 	// lost is set once the device plays something else: playing starts
 	// the track there again.
 	lost bool
+	// sounds is set from when the device is told to play until it is told
+	// to pause or hush: it may still sound what the player sent it, though
+	// the player no longer follows it.
+	sounds bool
 }
 
 func (c *connectEngine) active() bool { return c.track != nil }
+
+// own tells whether d is MixMusic's own Spotify device, whose sound comes
+// out of MixMusic itself.
+func (c *connectEngine) own(d Device) bool { return d != nil && d == c.p.here }
+
+// silencer silences what d plays at once: MixMusic's own device hushes,
+// which holds over a track it still loads, where a pause alone doesn't.
+func silencer(d Device) func(context.Context) error {
+	if h, ok := d.(husher); ok {
+		return h.Hush
+	}
+	return d.Pause
+}
 
 // asker is a device that tells how often to ask it what it plays: one at
 // hand answers at once.
@@ -166,6 +183,7 @@ func (c *connectEngine) use(d Device) {
 	}
 	c.stop(true)
 	c.device = d
+	c.sounds = false
 	c.askEvery = c.askDefault
 	if a, ok := d.(asker); ok {
 		c.askEvery = a.AskEvery()
@@ -184,14 +202,16 @@ func (c *connectEngine) duration() time.Duration { return ms(c.track.DurationMs)
 func (c *connectEngine) play(track media.Track, ahead []Item, position time.Duration, then func(error)) {
 	// Until the device plays it, its reports would end the track before.
 	c.stop(false)
-	ap, ok := c.device.(aheadPlayer)
+	d := c.device
+	ap, ok := d.(aheadPlayer)
 	if !ok {
 		ahead = nil
 	}
 	token := c.p.loadToken
+	c.sounds = true
 	await(c.p, func(ctx context.Context) (struct{}, error) {
 		if len(ahead) == 0 {
-			return struct{}{}, c.device.Play(ctx, track, position)
+			return struct{}{}, d.Play(ctx, track, position)
 		}
 		tracks := make([]media.Track, len(ahead))
 		for i, it := range ahead {
@@ -199,8 +219,18 @@ func (c *connectEngine) play(track media.Track, ahead []Item, position time.Dura
 		}
 		return struct{}{}, ap.PlayAhead(ctx, track, position, tracks)
 	}, func(_ struct{}, err error) {
+		if err != nil && c.own(d) && c.device == d {
+			// MixMusic's own device may have taken the track all the same, as
+			// when Spotify took the play but its answer failed: what plays in
+			// its place isn't to sound beside it.
+			c.sounds = false
+			c.send(silencer(d))
+		}
 		if err == nil && token != c.p.loadToken {
-			c.send(c.device.Pause)
+			if c.device == d {
+				c.sounds = false
+			}
+			c.send(d.Pause)
 			return
 		}
 		if err == nil {
@@ -248,6 +278,7 @@ func (c *connectEngine) pause() {
 		paused()
 		return
 	}
+	c.sounds = false
 	c.command(c.device.Pause, paused)
 }
 
@@ -259,6 +290,7 @@ func (c *connectEngine) resume() {
 		c.play(*c.track, c.p.aheadOnDevice(), c.progress, func(error) {})
 		return
 	}
+	c.sounds = true
 	c.command(c.device.Resume, func() {
 		c.sentAt = time.Now()
 		c.playing = true
@@ -295,13 +327,23 @@ func (c *connectEngine) setVolume(v float64) {
 
 // stop stops following the device, pausing it when asked. A move the
 // device made by itself that the player didn't make yet is dropped.
+// MixMusic's own device, left while it may still sound what the player
+// sent it, is silenced all the same: a track the player lost there, or
+// one it went on to by itself past the queue's, would sound beside what
+// plays next, out of MixMusic too. A Spotify Connect device that plays
+// something else is left to whoever plays it.
 func (c *connectEngine) stop(pause bool) {
 	if c.ticking != nil {
 		close(c.ticking)
 		c.ticking = nil
 	}
-	if pause && (c.track != nil && !c.lost || c.followed != nil) {
+	switch {
+	case pause && (c.track != nil && !c.lost || c.followed != nil):
+		c.sounds = false
 		c.send(c.device.Pause)
+	case pause && c.sounds && c.own(c.device):
+		c.sounds = false
+		c.send(silencer(c.device))
 	}
 	c.track = nil
 	c.ahead = nil
@@ -525,10 +567,7 @@ func (c *connectEngine) followOn(state *DeviceState) {
 	if ahead := c.p.aheadOnDevice(); len(ahead) == 0 || ahead[0].UID != next.UID {
 		// Once it is silent, unless the player moved on meanwhile.
 		c.stop(false)
-		silence := c.device.Pause
-		if h, ok := c.device.(husher); ok {
-			silence = h.Hush
-		}
+		silence := silencer(c.device)
 		token := c.p.loadToken
 		await(c.p, func(ctx context.Context) (struct{}, error) { return struct{}{}, silence(ctx) }, func(struct{}, error) {
 			if token == c.p.loadToken {

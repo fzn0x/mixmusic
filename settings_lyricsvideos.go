@@ -5,14 +5,18 @@ package main
 // starts in the video, which the app measures (internal/app's
 // lyricsvideo.go), and show in place as they're timed.
 
-import "github.com/egoist/mygo/ui"
+import (
+	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
+)
 
 func init() { addSettings(lyricsRows, 25, (*shell).timeVideosRow) }
 
 // timeVideosRow switches the timing of music videos' lyrics to them.
 func (s *shell) timeVideosRow(c *ui.Context) {
-	s.row(c, "Time lyrics to music videos", "When a music video's lyrics are its song's, MixMusic finds where the song starts in the video, comparing the audio of the two from YouTube on this computer, and moves the lines there. Off, they keep the song's times, and show without them when the video is longer or shorter than the song.", func() {
-		if s.switchOf(c.Key("lyrics-time-videos"), &s.set.LyricsTimeVideos).Label("Time lyrics to music videos").Changed() {
+	s.row(c, locales.LyricsTimeVideosTitle(), locales.LyricsTimeVideosDescription(), func() {
+		if s.switchOf(c.Key("lyrics-time-videos"), &s.set.LyricsTimeVideos).Label(locales.LyricsTimeVideosTitle()).Changed() {
 			s.save()
 			s.lyricsAgain()
 		}

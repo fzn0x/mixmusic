@@ -6,6 +6,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // refreshKeys are the keys of Refresh this page: F5, but ⇧⌘R on macOS,
@@ -85,7 +86,7 @@ func (s *shell) refreshFailed(err error) {
 		return
 	}
 	s.refreshTold = true
-	s.notes = append(s.notes, player.Notice{Message: "Couldn't refresh: " + err.Error(), Error: true})
+	s.notes = append(s.notes, player.Notice{Message: locales.RefreshFailed(err.Error()), Error: true})
 }
 
 // nothingToRefresh tells whether the page shows only what is always
@@ -107,7 +108,7 @@ func (s *shell) keepShown(c *ui.Context) {
 		return
 	}
 	if s.refreshAt == s.router.Location() && !s.refreshTold {
-		c.Announce("Page refreshed")
+		c.Announce(locales.RefreshPageRefreshed())
 	}
 	s.refreshAt = ""
 }
@@ -122,12 +123,12 @@ func (s *shell) refreshButton(c *ui.Context) {
 	s.refreshBusy, s.refreshOff = busy, off
 	// The tooltip names the keys, written again once they changed.
 	if keys := s.shortcutOf(command{id: "view.refresh", shortcut: refreshKeys}); keys != s.refreshTipOf || s.refreshTip == "" {
-		s.refreshTip, s.refreshTipOf = "Refresh this page", keys
+		s.refreshTip, s.refreshTipOf = locales.RefreshThisPage(), keys
 		if label := shortcutLabel(keys); label != "" {
-			s.refreshTip += " (" + label + ")"
+			s.refreshTip = locales.RefreshTipShortcut(label)
 		}
 	}
-	b := s.buttonBase(c.Key("refresh")).Size(32, 32).Radius(k.radiusSm).Label("Refresh this page").Tooltip(s.refreshTip).
+	b := s.buttonBase(c.Key("refresh")).Size(32, 32).Radius(k.radiusSm).Label(locales.RefreshThisPage()).Tooltip(s.refreshTip).
 		Cursor(ui.CursorPointer).Disabled(off)
 	ink := k.muted
 	switch {
@@ -144,7 +145,7 @@ func (s *shell) refreshButton(c *ui.Context) {
 	// The same button, either way: the keyboard's focus stays on it.
 	b.Children(func() {
 		if busy {
-			ui.Spinner(c).Size(16, 16).Label("Refreshing")
+			ui.Spinner(c).Size(16, 16).Label(locales.RefreshRefreshing())
 			return
 		}
 		ui.Icon(c, icon("refresh")).FontSize(18).TextColor(ink)

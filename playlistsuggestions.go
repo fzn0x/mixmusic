@@ -15,6 +15,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // suggestOnYouTube reads the songs YouTube Music suggests for a playlist
@@ -75,7 +76,7 @@ func (s *shell) askSuggestions(st *suggested, token string) {
 			st.asking = false
 			switch {
 			case err != nil && st.done && st.err == nil:
-				s.notes = append(s.notes, player.Notice{Message: "Couldn't refresh the suggestions: " + err.Error(), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.SuggestionsRefreshFailed(err.Error()), Error: true})
 			case err != nil:
 				st.err, st.done = err, true
 			default:
@@ -103,19 +104,19 @@ func (s *shell) playlistSuggestions(c *ui.Context, key string, p media.Playlist)
 	}
 	k := &s.lk
 	ui.Column(c.Key("suggestions")).Margin(48, 0, 0).Children(func() {
-		s.sectionHead(c, "Suggestions", func() {
+		s.sectionHead(c, locales.SuggestionsTitle(), func() {
 			switch {
 			case st.asking:
-				ui.Spinner(c).Size(16, 16).Label("Loading suggestions")
-			case st.err == nil && st.refresh != "" && s.linkOf(c.Key("suggestions-refresh"), k.sentence("refresh"), "").
-				FontSize(k.smallSize()).Label("Refresh the suggestions").Clicked():
+				ui.Spinner(c).Size(16, 16).Label(locales.SuggestionsLoading())
+			case st.err == nil && st.refresh != "" && s.linkOf(c.Key("suggestions-refresh"), k.sentence(locales.SuggestionsRefresh()), "").
+				FontSize(k.smallSize()).Label(locales.SuggestionsRefreshLabel()).Clicked():
 				s.askSuggestions(st, st.refresh)
 			}
 		})
 		if st.err != nil {
 			ui.Row(c).Gap(16).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, "Couldn't load the suggestions: "+st.err.Error()).FontSize(k.bodySize()).TextColor(k.muted).Shrink(1).MinWidth(0)
-				if !st.asking && s.link(c, "suggestions-retry", "try again") {
+				ui.Text(c, locales.SuggestionsLoadFailed(st.err.Error())).FontSize(k.bodySize()).TextColor(k.muted).Shrink(1).MinWidth(0)
+				if !st.asking && s.link(c, "suggestions-retry", locales.SuggestionsTryAgain()) {
 					s.askSuggestions(st, p.Suggest)
 				}
 			})
@@ -130,7 +131,7 @@ func (s *shell) playlistSuggestions(c *ui.Context, key string, p media.Playlist)
 				ui.Column(c).Grow(1).Basis(0).MinWidth(0).Children(func() {
 					s.trackList(c, "suggestion-"+count(i), []media.Track{t}, trackListOptions{art: true, album: true})
 				})
-				add := s.button(c, "suggestion-add-"+t.ID, "add", false).Label("Add " + t.Title + " to " + p.Title).
+				add := s.button(c, "suggestion-add-"+t.ID, locales.SuggestionsAdd(), false).Label(locales.SuggestionsAddLabel(t.Title, p.Title)).
 					AlignSelf(ui.Center).Disabled(st.adding[t.ID])
 				if add.Clicked() {
 					s.addSuggestion(key, st, p, t)
@@ -155,7 +156,7 @@ func (s *shell) addSuggestion(key string, st *suggested, p media.Playlist, t med
 				s.notes = append(s.notes, noticeOf(err))
 				return
 			}
-			s.notes = append(s.notes, notice("Added "+t.Title+" to "+p.Title))
+			s.notes = append(s.notes, notice(locales.SuggestionsAdded(t.Title, p.Title)))
 			if s.loads[st.key] == st {
 				st.tracks = slices.DeleteFunc(slices.Clone(st.tracks), func(x media.Track) bool { return x.ID == t.ID })
 				if len(st.tracks) == 0 && st.refresh != "" && !st.asking {

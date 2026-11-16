@@ -13,6 +13,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/remote"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // remoteView is what the window keeps of remote control from frame to
@@ -51,7 +52,7 @@ func (s *shell) remoteItems(m *ui.Menu) {
 	}
 	m.Separator()
 	for _, rc := range computers {
-		if m.Item(rc.Name + " · MixMusic").Chosen() {
+		if m.Item(locales.RemoteComputerItem(rc.Name)).Chosen() {
 			s.navigate(remotePath(rc.ID))
 		}
 	}

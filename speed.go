@@ -8,6 +8,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // speedSteps are the speeds the speed button's menu offers, which its
@@ -28,9 +29,9 @@ func (s *shell) playingSpeed() (speed *float64, podcasts bool) {
 // speedTitle names the speed of songs, or of podcasts.
 func speedTitle(podcasts bool) string {
 	if podcasts {
-		return "Speed of podcasts"
+		return locales.SpeedOfPodcasts()
 	}
-	return "Speed of songs"
+	return locales.SpeedOfSongs()
 }
 
 // setSpeed sets the speed of the kind of track that plays, which the
@@ -47,13 +48,13 @@ func (s *shell) setSpeed(v float64) {
 // broadcast. A Spotify track not on its device yet, as it loads, goes
 // there, unless Spotify tracks play from YouTube Music.
 func (s *shell) speedLocked() string {
-	const spotify = "Spotify plays this one at its own speed"
+	spotify := locales.SpeedMenuLockedSpotify()
 	src := s.st.Source
 	switch {
 	case src != nil && src.Mode != player.ModeStream:
 		return spotify
 	case s.st.Live:
-		return "this live stream plays at its own speed"
+		return locales.SpeedMenuLockedLive()
 	case src == nil && s.set.SpotifyPlayback != settings.SpotifyPlaybackMatch:
 		if cur, ok := s.st.Current(); ok && cur.Track.Source == media.SourceSpotify {
 			return spotify
@@ -70,12 +71,12 @@ func (s *shell) speedButton(c *ui.Context) {
 	k := &s.lk
 	speed, podcasts := s.playingSpeed()
 	why := s.speedLocked()
-	label := "Speed"
+	label := locales.SpeedTitle()
 	switch {
 	case why != "":
-		label += ": " + why
+		label = locales.SpeedMenuLabel(why)
 	case *speed != 1:
-		label += ": " + speedLabel(*speed)
+		label = locales.SpeedMenuLabel(speedLabel(*speed))
 	}
 	tip := ui.Box(c.Key("speed-tip")).Shrink(0)
 	open := ui.Local(tip, "open", func() bool { return false })
@@ -154,7 +155,7 @@ func (s *shell) speedMenu(c *ui.Context, anchor ui.Element, open *bool, speed *f
 					})
 					ui.Text(c, label).FontSize(k.bodySize()).FontFeatures("tnum").SingleLine()
 					if step == 1 {
-						ui.Text(c, k.sentence("normal")).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
+						ui.Text(c, k.sentence(locales.SpeedNormal())).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 					}
 				})
 			}
@@ -179,7 +180,7 @@ func (s *shell) speedMenu(c *ui.Context, anchor ui.Element, open *bool, speed *f
 // change, why.
 func (s *shell) speedItems(m *ui.Menu) {
 	if why := s.speedLocked(); why != "" {
-		m.Item("Speed: " + why).Disabled(true)
+		m.Item(locales.SpeedMenuLabel(why)).Disabled(true)
 		return
 	}
 	speed, podcasts := s.playingSpeed()

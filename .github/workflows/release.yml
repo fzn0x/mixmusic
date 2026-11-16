@@ -50,6 +50,13 @@ jobs:
             ls changelog.d/*/*.md >&2
             exit 1
           fi
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      # A pull request may add a message in English alone; a release ships
+      # none a language lacks.
+      - name: Every language translates every message
+        run: MIXMUSIC_RELEASE=1 go test ./locales -run TestEveryLanguageTranslatesEveryMessage
 
   build:
     needs: check

@@ -6,11 +6,10 @@ package main
 // remotehandover.go).
 
 import (
-	"fmt"
-
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // remoteHandOver shows what plays on this computer, on the page of the
@@ -26,16 +25,16 @@ func (s *shell) remoteHandOver(c *ui.Context, id string, v app.RemoteView) {
 	ui.Row(c).Gap(12).AlignItems(ui.Center).MaxWidth(640).Padding(12, 16).Radius(k.radiusSm).Background(k.surface).Children(func() {
 		s.cover(c, "remote-here-cover", t.Artwork, 40, false)
 		ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-			ui.Text(c, "On this computer").FontSize(k.captionSize()).TextColor(k.muted)
+			ui.Text(c, locales.HandoverOnComputer()).FontSize(k.captionSize()).TextColor(k.muted)
 			line := t.Title
 			if a := names(t.Artists); a != "" {
 				line += " · " + a
 			}
 			ui.Text(c, line).FontSize(k.smallSize()).SingleLine().MinWidth(0)
 		})
-		label := "move to " + name
+		label := locales.HandoverMove(name)
 		if s.remote.handing {
-			label = "moving to " + name + "…"
+			label = locales.HandoverMoving(name)
 		}
 		if s.button(c, "remote-hand-over", label, false).Disabled(s.remote.handing).Clicked() && !s.remote.handing {
 			s.handOver(id, name)
@@ -65,17 +64,9 @@ func (s *shell) handOver(id, name string) {
 func handedOverNote(name string, got app.HandedOver) string {
 	switch {
 	case got.Kept == 0:
-		return name + " has none of these tracks, files of this computer: they play on here"
+		return locales.HandoverNone(name)
 	case got.Left == 0:
-		return "Moved to " + name + ", and paused here"
+		return locales.HandoverMovedPaused(name)
 	}
-	tracks := "tracks"
-	if got.Left == 1 {
-		tracks = "track"
-	}
-	note := fmt.Sprintf("Moved to %s, and paused here, but for %d %s, files of this computer it doesn't have", name, got.Left, tracks)
-	if got.CurrentLeft {
-		note += ": it plays from the next one"
-	}
-	return note
+	return locales.HandoverLeft(name, got.Left, yesNo(got.CurrentLeft))
 }

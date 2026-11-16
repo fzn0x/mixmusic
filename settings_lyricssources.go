@@ -14,20 +14,23 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // lyricsSourceText tells the user of a source of lyrics, by its key: its
 // name, and what MixMusic sends it.
-var lyricsSourceText = map[string]struct{ name, sent string }{
-	settings.LyricsBetterLyrics: {"Better Lyrics", "Lyrics timed word by word. Gets the title, first artist, album and length of tracks that have an album."},
-	settings.LyricsUnison:       {"Unison", "Gets the video ID, or the title, artists, album and length."},
-	settings.LyricsLRCLIB:       {"LRCLIB", "Gets the title, artists, album and length; for a music video, its song's."},
-	settings.LyricsYouTubeMusic: {"YouTube Music", "Gets the video ID of the track, or of its recording there."},
-	settings.LyricsCaptions:     {"YouTube captions", "The captions of the video that plays, never those made from speech. Gets the video ID, signed out."},
+func lyricsSourceText() map[string]struct{ name, sent string } {
+	return map[string]struct{ name, sent string }{
+		settings.LyricsBetterLyrics: {"Better Lyrics", locales.LyricsSourceBetterLyricsSent()},
+		settings.LyricsUnison:       {"Unison", locales.LyricsSourceUnisonSent()},
+		settings.LyricsLRCLIB:       {"LRCLIB", locales.LyricsSourceLRCLIBSent()},
+		settings.LyricsYouTubeMusic: {"YouTube Music", locales.LyricsSourceYouTubeMusicSent()},
+		settings.LyricsCaptions:     {locales.LyricsSourceCaptionsName(), locales.LyricsSourceCaptionsSent()},
+	}
 }
 
 // lyricsSourcesAbout describes the list of the sources of lyrics.
-const lyricsSourcesAbout = "MixMusic asks the sources that are on, one at a time, from the top, until one has synced lyrics. Drag a source onto another to move it there, or press Alt+Up or Alt+Down on it."
+func lyricsSourcesAbout() string { return locales.LyricsSourcesAbout() }
 
 // lyricsSourceDrag is a source of lyrics dragged, by its key.
 type lyricsSourceDrag struct{ key string }
@@ -41,9 +44,9 @@ func (s *shell) lyricsSourcesRow(c *ui.Context) {
 	order := s.set.SourceOrder()
 	words := []string{"reset to default", "order", "move", "switch off"}
 	for _, src := range order {
-		words = append(words, lyricsSourceText[src.Key].name, lyricsSourceText[src.Key].sent)
+		words = append(words, lyricsSourceText()[src.Key].name, lyricsSourceText()[src.Key].sent)
 	}
-	if !s.findable("Lyrics sources", lyricsSourcesAbout, words...) {
+	if !s.findable(locales.LyricsSourcesTitle(), lyricsSourcesAbout(), words...) {
 		return
 	}
 	s.show(c, func() {
@@ -52,11 +55,11 @@ func (s *shell) lyricsSourcesRow(c *ui.Context) {
 		list.Children(func() {
 			ui.Row(c).Gap(24).Margin(0, 0, 8).Children(func() {
 				ui.Column(c).Grow(1).MinWidth(0).Gap(4).Children(func() {
-					ui.Text(c, "Lyrics sources").FontSize(k.bodySize())
-					ui.Text(c, lyricsSourcesAbout).FontSize(k.smallSize()).TextColor(k.muted)
+					ui.Text(c, locales.LyricsSourcesTitle()).FontSize(k.bodySize())
+					ui.Text(c, lyricsSourcesAbout()).FontSize(k.smallSize()).TextColor(k.muted)
 				})
 				ui.Row(c).Shrink(0).Children(func() {
-					if s.button(c, "lyrics-sources-reset", "reset to default", false).Disabled(defaultSources(order)).Clicked() {
+					if s.button(c, "lyrics-sources-reset", locales.LyricsSourcesReset(), false).Disabled(defaultSources(order)).Clicked() {
 						s.setLyricsSources(nil)
 					}
 				})
@@ -80,13 +83,13 @@ func (s *shell) lyricsSourcesRow(c *ui.Context) {
 func (s *shell) lyricsSourceRow(c *ui.Context, i int, order []settings.LyricsSource, on int, focus *string) {
 	k := &s.lk
 	src := order[i]
-	text := lyricsSourceText[src.Key]
-	state := "on"
+	text := lyricsSourceText()[src.Key]
+	state := locales.LyricsSourceOn()
 	if src.Off {
-		state = "off"
+		state = locales.LyricsSourceOff()
 	}
 	row := ui.Row(c.Key("lyrics-source-"+src.Key)).MinHeight(56).Padding(8, 8, 8, 16).Gap(12).Radius(k.radiusSm).
-		Background(k.surface2).Label(text.name + ", " + state).Focusable().Cursor(ui.CursorGrab)
+		Background(k.surface2).Label(locales.LyricsSourceRowLabel(text.name, state)).Focusable().Cursor(ui.CursorGrab)
 	if row.Hovered() {
 		row.Background(k.surface2.Mix(k.text, 0.06))
 	}
@@ -133,7 +136,7 @@ func (s *shell) lyricsSourceRow(c *ui.Context, i int, order []settings.LyricsSou
 		last := lit && on == 1
 		label := text.name
 		if last {
-			label += ", the last source on"
+			label = locales.LyricsSourceLastOn(text.name)
 		}
 		if s.switchOf(c.Key("lyrics-source-on-"+src.Key), &lit).Label(label).Disabled(last).Changed() && !last {
 			next := slices.Clone(order)
@@ -181,8 +184,8 @@ func init() { addSettings(lyricsRows, 20, (*shell).preferWordsRow) }
 
 // preferWordsRow has lyrics timed word by word come first.
 func (s *shell) preferWordsRow(c *ui.Context) {
-	s.row(c, "Prefer word-by-word lyrics", "Lyrics timed word by word from a source lower in the list show in place of lyrics timed line by line from one above it. It sends the track to more sources.", func() {
-		if s.switchOf(c.Key("lyrics-prefer-words"), &s.set.LyricsPreferWords).Label("Prefer word-by-word lyrics").Changed() {
+	s.row(c, locales.LyricsPreferWords(), locales.LyricsPreferWordsDescription(), func() {
+		if s.switchOf(c.Key("lyrics-prefer-words"), &s.set.LyricsPreferWords).Label(locales.LyricsPreferWords()).Changed() {
 			s.save()
 			s.lyricsAgain()
 		}
@@ -194,17 +197,17 @@ func init() { addSettings(lyricsRows, 30, (*shell).captionLanguageRow) }
 // captionLanguageRow chooses the language of the captions lyrics come
 // from: the video's own, or one Translate lyrics to offers.
 func (s *shell) captionLanguageRow(c *ui.Context) {
-	s.row(c, "Caption language", "Lyrics from YouTube captions come in this language when the video has captions in it, and in the video's own else.", func() {
+	s.row(c, locales.LyricsCaptionLanguage(), locales.LyricsCaptionLanguageDescription(), func() {
 		options := make([]string, 0, len(translateLanguages)+1)
-		options = append(options, "Original")
+		options = append(options, locales.LyricsCaptionLanguageOriginal())
 		chosen := options[0]
 		for _, l := range translateLanguages {
-			options = append(options, l.name)
+			options = append(options, l.name())
 			if l.code == s.set.LyricsCaptionLanguage {
-				chosen = l.name
+				chosen = l.name()
 			}
 		}
-		if s.selectOf(c.Key("caption-language"), &chosen, options).Width(220).Label("Caption language").Changed() {
+		if s.selectOf(c.Key("caption-language"), &chosen, options).Width(220).Label(locales.LyricsCaptionLanguage()).Changed() {
 			s.set.LyricsCaptionLanguage = ""
 			if i := slices.Index(options, chosen); i > 0 {
 				s.set.LyricsCaptionLanguage = translateLanguages[i-1].code

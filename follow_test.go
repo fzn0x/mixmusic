@@ -250,7 +250,7 @@ func TestNewReleasesShelf(t *testing.T) {
 		t.Errorf("the year Pier at Night came out: %q", tt.Texts())
 	}
 	s.homeFilter = slices.IndexFunc(homeFilters, func(f struct {
-		label  string
+		label  func() string
 		source media.Source
 	}) bool {
 		return f.source == media.SourceYouTube

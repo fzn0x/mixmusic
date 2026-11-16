@@ -212,13 +212,13 @@ func TestLyricBallMotionSettings(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 3000)
 	show(s, tt, "/settings/appearance")
-	if !tt.HasText("Ball between lines") || !tt.HasText(ballMotionOf(settings.LyricBallMix).about) {
+	if !tt.HasText("Ball between lines") || !tt.HasText(ballMotionOf(settings.LyricBallMix).about()) {
 		t.Fatalf("Settings doesn't offer the motion between lines: %q", tt.Texts())
 	}
 	s.set.LyricsBallMotion = settings.LyricBallBoomerang
 	s.drain()
 	tt.Frame()
-	if !tt.HasText(ballMotionOf(settings.LyricBallBoomerang).about) {
+	if !tt.HasText(ballMotionOf(settings.LyricBallBoomerang).about()) {
 		t.Errorf("Settings doesn't say what the boomerang does: %q", tt.Texts())
 	}
 	click(t, s, tt, "Motion between lines")

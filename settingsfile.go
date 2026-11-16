@@ -10,6 +10,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // openSettings opens settings.json, and showSettings shows it in its
@@ -75,18 +76,18 @@ func (s *shell) fileToast(c *ui.Context) {
 	t := ui.Toast{ID: "settings-file"}
 	switch n.Kind {
 	case app.NoticeProblem:
-		t.Type, t.Title, t.Timeout = "error", "settings.json has a mistake", 8*time.Second
-		t.Description = sentence(n.Problem) + " MixMusic keeps the settings it had until you fix it."
-		t.Action, t.OnAction = "open", s.openSettingsFile
+		t.Type, t.Title, t.Timeout = "error", locales.SettingsFileMistake(), 8*time.Second
+		t.Description = locales.SettingsFileKeeps(sentence(n.Problem))
+		t.Action, t.OnAction = locales.SettingsFileOpen(), s.openSettingsFile
 	case app.NoticeAside:
-		t.Type, t.Title, t.Timeout = "error", "settings.json didn't read", -1
-		t.Description = sentence(n.Problem) + " MixMusic started with the settings of a new install, and kept your file as settings.json.broken."
-		t.Action, t.OnAction = "show", s.showSettingsFile
+		t.Type, t.Title, t.Timeout = "error", locales.SettingsFileDidntRead(), -1
+		t.Description = locales.SettingsFileStarted(sentence(n.Problem))
+		t.Action, t.OnAction = locales.SettingsFileShow(), s.showSettingsFile
 	case app.NoticeStart:
-		t.Title = "settings.json isn't UTF-8"
+		t.Title = locales.SettingsFileNotUTF8Title()
 		t.Description = fileNotes(n.Report)
 	default:
-		t.Type, t.Title = "success", "Applied settings.json"
+		t.Type, t.Title = "success", locales.SettingsFileApplied()
 		t.Description = fileNotes(n.Report)
 	}
 	c.AddToast(t)
@@ -96,17 +97,13 @@ func (s *shell) fileToast(c *ui.Context) {
 func fileNotes(r settings.Report) string {
 	var notes []string
 	if r.NotUTF8 {
-		notes = append(notes, "It isn't UTF-8, so letters outside ASCII read as � in it: save it as UTF-8.")
+		notes = append(notes, locales.SettingsFileNotUTF8())
 	}
 	if len(r.Unknown) > 0 {
-		them := "it"
-		if len(r.Unknown) > 1 {
-			them = "them"
-		}
-		notes = append(notes, "MixMusic doesn't know "+and(r.Unknown)+": its next save drops "+them+".")
+		notes = append(notes, locales.SettingsFileUnknown(and(r.Unknown), len(r.Unknown)))
 	}
 	if len(r.Adjusted) > 0 {
-		notes = append(notes, "Put "+and(r.Adjusted)+" back in range.")
+		notes = append(notes, locales.SettingsFileAdjusted(and(r.Adjusted)))
 	}
 	return strings.Join(notes, " ")
 }
@@ -116,7 +113,7 @@ func and(words []string) string {
 	if len(words) < 2 {
 		return strings.Join(words, "")
 	}
-	return strings.Join(words[:len(words)-1], ", ") + " and " + words[len(words)-1]
+	return locales.SettingsFileAnd(strings.Join(words[:len(words)-1], locales.SettingsFileListSep()), words[len(words)-1])
 }
 
 // sentence is text as a sentence: its first letter up, and a full stop.
@@ -135,8 +132,8 @@ func (s *shell) settingsFileProblem(c *ui.Context) {
 	if p == "" {
 		return
 	}
-	s.alert(c, "settings.json has a mistake", sentence(p)+" MixMusic goes on with the settings it had, and saves what you change here once the file reads again.", func() {
-		if s.button(c, "settings-file-fix", "open settings.json", true).Clicked() {
+	s.alert(c, locales.SettingsFileMistake(), locales.SettingsFileGoesOn(sentence(p)), func() {
+		if s.button(c, "settings-file-fix", locales.SettingsFileOpenJSON(), true).Clicked() {
 			s.openSettingsFile()
 		}
 	}).Margin(0, 0, 32)

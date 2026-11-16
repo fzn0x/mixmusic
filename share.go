@@ -16,6 +16,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/sharecard"
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Share, in the menu of a song, an album, a playlist or a mix, gives what
@@ -44,9 +45,9 @@ type shareTarget struct {
 // songShare is the share of the song t: its link, and where MixMusic
 // matched it on YouTube Music, that one too.
 func (s *shell) songShare(t media.Track) shareTarget {
-	out := shareTarget{kind: "Song", title: t.Title, subtitle: names(t.Artists), art: t.Artwork}
+	out := shareTarget{kind: locales.ShareKindSong(), title: t.Title, subtitle: names(t.Artists), art: t.Artwork}
 	if t.IsEpisode() {
-		out.kind = "Episode"
+		out.kind = locales.ShareKindEpisode()
 	}
 	if t.URL != "" {
 		out.links = append(out.links, shareLink{sourceName(t.Source), t.URL})
@@ -76,12 +77,12 @@ func youtubeLink(t media.Track) string {
 
 // albumShare is the share of the album a.
 func albumShare(a media.Album) shareTarget {
-	kind := "Album"
+	kind := locales.ShareKindAlbum()
 	switch a.Kind {
 	case media.AlbumKindSingle:
-		kind = "Single"
+		kind = locales.ShareKindSingle()
 	case media.AlbumKindEP:
-		kind = "EP"
+		kind = locales.ShareKindEP()
 	}
 	sub := names(a.Artists)
 	if a.Year != "" && sub != "" {
@@ -96,9 +97,9 @@ func albumShare(a media.Album) shareTarget {
 
 // playlistShare is the share of the playlist or mix p.
 func playlistShare(p media.Playlist) shareTarget {
-	out := shareTarget{kind: "Playlist", title: p.Title, subtitle: p.Owner, art: p.Artwork}
+	out := shareTarget{kind: locales.ShareKindPlaylist(), title: p.Title, subtitle: p.Owner, art: p.Artwork}
 	if p.Source == media.SourceLocal {
-		out.kind, out.subtitle = "Mix", ""
+		out.kind, out.subtitle = locales.ShareKindMix(), ""
 	}
 	if p.URL != "" {
 		out.links = []shareLink{{sourceName(p.Source), p.URL}}
@@ -109,15 +110,15 @@ func playlistShare(p media.Playlist) shareTarget {
 // shareItem is Share, in a menu: its submenu copies the links of t and
 // saves its image.
 func (s *shell) shareItem(m *ui.Menu, t shareTarget) {
-	m.Submenu("Share", func(m *ui.Menu) {
+	m.Submenu(locales.ShareMenu(), func(m *ui.Menu) {
 		for _, l := range t.links {
-			label := "Copy link"
+			label := locales.ShareCopyLink()
 			if len(t.links) > 1 {
-				label = "Copy the link on " + l.service
+				label = locales.ShareCopyOn(l.service)
 			}
 			if m.Item(label).Chosen() {
 				copyText(l.url)
-				s.notes = append(s.notes, notice("Copied the link"))
+				s.notes = append(s.notes, notice(locales.ShareCopied()))
 			}
 		}
 		if t.onService != nil {
@@ -126,10 +127,10 @@ func (s *shell) shareItem(m *ui.Menu, t shareTarget) {
 		if len(t.links) > 0 || t.onService != nil {
 			m.Separator()
 		}
-		if m.Item("Save image…").Chosen() {
+		if m.Item(locales.ShareSaveImage()).Chosen() {
 			s.saveCard(t.title, t.art, sharecard.Square, s.titleCard(t))
 		}
-		if m.Item("Save image for a story…").Chosen() {
+		if m.Item(locales.ShareSaveStory()).Chosen() {
 			s.saveCard(t.title, t.art, sharecard.Story, s.titleCard(t))
 		}
 	})
@@ -222,8 +223,8 @@ func (s *shell) saveCard(name string, art []media.Image, size sharecard.Size, bu
 	win := s.win
 	fam := s.lk.cardFamily()
 	go func() {
-		path, err := saveFileDialog(mygo.SaveDialogOptions{Parent: win, Title: "Save the image", DefaultPath: cardFileName(name),
-			ButtonLabel: "Save", Filters: []mygo.FileFilter{{Name: "PNG image", Extensions: []string{"png"}}}, CreateDirectories: true})
+		path, err := saveFileDialog(mygo.SaveDialogOptions{Parent: win, Title: locales.ShareSaveTitle(), DefaultPath: cardFileName(name),
+			ButtonLabel: locales.ShareSaveButton(), Filters: []mygo.FileFilter{{Name: locales.SharePNGImage(), Extensions: []string{"png"}}}, CreateDirectories: true})
 		if err == nil && path == "" {
 			return
 		}
@@ -235,7 +236,7 @@ func (s *shell) saveCard(name string, art []media.Image, size sharecard.Size, bu
 				s.notes = append(s.notes, noticeOf(err))
 				return
 			}
-			s.notes = append(s.notes, notice("Saved the image as "+filepath.Base(path)))
+			s.notes = append(s.notes, notice(locales.ShareSaved(filepath.Base(path))))
 		})
 	}()
 }

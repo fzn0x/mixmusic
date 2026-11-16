@@ -9,6 +9,7 @@ import (
 	"io"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // controlRunning hands the flags of args over to the MixMusic that runs,
@@ -22,6 +23,6 @@ func controlRunning(args []string, handOver func() bool, errOut io.Writer) (bool
 	if handOver() {
 		return true, 0
 	}
-	fmt.Fprintln(errOut, "MixMusic isn't running")
+	fmt.Fprintln(errOut, locales.ControlNotRunning())
 	return true, 1
 }

@@ -149,6 +149,10 @@ jobs:
       - name: Community registry
         if: env.CHECKS == 'full'
         run: go run ./tools/registry -check
+      # MyGo's checks of the catalogs, and catalog_gen.go generated of them.
+      - name: Catalogs of the interface's words
+        if: env.CHECKS == 'full' && runner.os == 'Linux'
+        run: bash .github/scripts/catalogs.sh
       - name: Changelog fragments
         if: env.CHECKS != 'none'
         run: go run ./tools/changelog -check

@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
@@ -14,6 +13,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -183,11 +183,11 @@ func (s *shell) miniPanelButtons(c *ui.Context) {
 		}
 	}
 	ui.Row(c).Shrink(0).Children(func() {
-		button(settings.MiniQueue, "queue", "Queue")
+		button(settings.MiniQueue, "queue", locales.PlayerQueue())
 		button(settings.MiniLyrics, s.lyricsIcon(), s.lyricsTitle())
-		button(settings.MiniOutput, "speaker", "Output device")
+		button(settings.MiniOutput, "speaker", locales.OutputDevice())
 		if _, failed := s.miniFailure(); failed {
-			button(miniError, "alert", "Why it couldn't play")
+			button(miniError, "alert", locales.MiniPanelWhy())
 		}
 	})
 }
@@ -281,13 +281,13 @@ func (s *shell) miniPanel(c *ui.Context, w, room float32) {
 func (s *shell) miniTitle(p string) string {
 	switch p {
 	case settings.MiniQueue:
-		return "Up next"
+		return locales.RailUpNext()
 	case settings.MiniLyrics:
 		return s.lyricsTitle()
 	case settings.MiniOutput:
-		return "Output device"
+		return locales.OutputDevice()
 	}
-	return "Why it couldn't play"
+	return locales.MiniPanelWhy()
 }
 
 // miniHead is the head of the panel: its title, the queue's place in it,
@@ -314,18 +314,18 @@ func (s *shell) miniHead(c *ui.Context) {
 func miniCloseLabel(p string) string {
 	switch p {
 	case settings.MiniQueue:
-		return "Close the queue"
+		return locales.MiniPanelCloseQueue()
 	case settings.MiniLyrics:
-		return "Close the lyrics"
+		return locales.MiniPanelCloseLyrics()
 	case settings.MiniOutput:
-		return "Close the output devices"
+		return locales.MiniPanelCloseOutput()
 	}
-	return "Close the details of the error"
+	return locales.MiniPanelCloseError()
 }
 
 // queuePlace is the place of the entry at, of n, as the queue's panel
 // tells it: "3 of 24".
-func queuePlace(at, n int) string { return strconv.Itoa(at+1) + " of " + strconv.Itoa(n) }
+func queuePlace(at, n int) string { return locales.MiniPanelPlace(at+1, n) }
 
 // miniQueueRow is the height of an entry of the mini player's queue.
 const miniQueueRow = 44
@@ -337,7 +337,7 @@ func (s *shell) miniQueue(c *ui.Context) {
 	k := &s.lk
 	q, at := s.st.Queue, s.st.Index
 	if at < 0 || at >= len(q) {
-		ui.Text(c, "Play something and the queue shows here.").FontSize(k.smallSize()).TextColor(k.muted).Padding(8, 12)
+		ui.Text(c, locales.MiniPanelEmptyQueue()).FontSize(k.smallSize()).TextColor(k.muted).Padding(8, 12)
 		return
 	}
 	s.mini.queue.Key = func(row int) any {
@@ -348,7 +348,7 @@ func (s *shell) miniQueue(c *ui.Context) {
 	}
 	ui.List(c.Key("mini-queue"), &s.mini.queue, len(q)-at, func(row int) {
 		s.miniQueueEntry(c, at+row, q[at+row], row == 0)
-	}).Grow(1).MinHeight(0).Padding(0, 4, 6).Label("Up next")
+	}).Grow(1).MinHeight(0).Padding(0, 4, 6).Label(locales.RailUpNext())
 }
 
 // miniQueueEntry is the entry i of the queue, it, the current one flooded
@@ -356,9 +356,9 @@ func (s *shell) miniQueue(c *ui.Context) {
 func (s *shell) miniQueueEntry(c *ui.Context, i int, it player.Item, current bool) {
 	k := &s.lk
 	t := it.Track
-	label := "Play " + t.Title
+	label := locales.MiniPanelPlay(t.Title)
 	if current {
-		label = t.Title + ", playing"
+		label = locales.MiniPanelPlaying(t.Title)
 	}
 	row := s.buttonBase(c.Key("mq-"+it.UID)).Height(miniQueueRow).Padding(0, 8).Gap(10).Justify(ui.Start).
 		Radius(k.radiusSm).Label(label).Cursor(ui.CursorPointer)
@@ -407,7 +407,7 @@ func (s *shell) miniLyrics(c *ui.Context) {
 	k := &s.lk
 	cur, ok := s.st.Current()
 	if !ok {
-		s.miniNote(c, "Play a track to see its lyrics.")
+		s.miniNote(c, locales.MiniPanelLyricsEmpty())
 		return
 	}
 	t := cur.Track
@@ -418,21 +418,21 @@ func (s *shell) miniLyrics(c *ui.Context) {
 	l := fetch(s, "lyrics:"+t.ID, func(ctx context.Context) (lyrics.Lyrics, error) { return s.svc.Catalog.Lyrics(ctx, t) })
 	switch {
 	case !l.done:
-		s.miniNote(c, "Looking for the lyrics…")
+		s.miniNote(c, locales.MiniPanelLyricsLooking())
 		return
 	case l.err != nil:
 		s.miniNote(c, l.err.Error())
 		// A track without lyrics stays so; a failure may pass.
 		if !errors.Is(l.err, lyrics.ErrNotFound) {
 			ui.Row(c).Padding(0, 12).Children(func() {
-				if s.link(c, "mini-lyrics-retry", "try again") {
+				if s.link(c, "mini-lyrics-retry", locales.WidgetsTryAgain()) {
 					s.forget("lyrics:" + t.ID)
 				}
 			})
 		}
 		return
 	case l.value.Instrumental:
-		s.miniNote(c, "This track is instrumental.")
+		s.miniNote(c, locales.MiniPanelInstrumental())
 		return
 	}
 	ly := l.value
@@ -486,13 +486,13 @@ func (s *shell) miniChapters(c *ui.Context, t media.Track) {
 	key, l := s.episodeDetailsOf(t)
 	switch {
 	case !l.done:
-		s.miniNote(c, "Looking for the details…")
+		s.miniNote(c, locales.MiniPanelDetailsLooking())
 		return
 	case l.err != nil:
 		s.miniNote(c, l.err.Error())
 		if !errors.Is(l.err, app.ErrNoEpisodeDetails) {
 			ui.Row(c).Padding(0, 12).Children(func() {
-				if s.link(c, "mini-details-retry", "try again") {
+				if s.link(c, "mini-details-retry", locales.WidgetsTryAgain()) {
 					s.forget(key)
 				}
 			})
@@ -502,7 +502,7 @@ func (s *shell) miniChapters(c *ui.Context, t media.Track) {
 	chapters, limit := l.value.Chapters, s.seekLimit(t, l.value)
 	in := chapterAt(chapters, max(limit, 0), limit) + 1
 	if in == 0 {
-		s.miniNote(c, "No chapters.")
+		s.miniNote(c, locales.MiniPanelNoChapters())
 		return
 	}
 	at := max(chapterAt(chapters[:in], s.st.Position+lyricsLead(s.st.Speed), limit), 0)
@@ -533,7 +533,7 @@ func (s *shell) miniOutput(c *ui.Context) {
 			s.miniConnectDevices(c)
 		}
 		if !shown {
-			s.miniNote(c, "MixMusic plays on the system's default device.")
+			s.miniNote(c, locales.MiniPanelSystemDevice())
 		}
 	})
 }
@@ -588,7 +588,7 @@ func (s *shell) miniChoice(c *ui.Context, key, label, detail string, on, disable
 // doesn't.
 func (s *shell) miniOutputDevices(c *ui.Context) {
 	devices := s.outputDevices()
-	s.miniSection(c, "mini-output-devices", "On this computer", func() {
+	s.miniSection(c, "mini-output-devices", locales.MiniPanelOnComputer(), func() {
 		if aside := s.outputAside(); aside != "" {
 			s.miniNote(c, aside)
 		}
@@ -599,7 +599,7 @@ func (s *shell) miniOutputDevices(c *ui.Context) {
 		}
 		switch {
 		case !devices.done:
-			s.miniNote(c, "Looking for devices…")
+			s.miniNote(c, locales.PlayerLooking())
 		case devices.err != nil:
 			s.miniNote(c, devices.err.Error())
 		}
@@ -611,14 +611,14 @@ func (s *shell) miniOutputDevices(c *ui.Context) {
 func (s *shell) miniCastDevices(c *ui.Context) {
 	casting, on := s.svc.Player.CastingTo()
 	starting, connecting := s.svc.Player.CastStarting()
-	s.miniSection(c, "mini-cast", "Cast", func() {
-		if s.miniChoice(c, "mini-cast-here", "This computer", "", !on, connecting) && on {
+	s.miniSection(c, "mini-cast", locales.MiniPanelCast(), func() {
+		if s.miniChoice(c, "mini-cast-here", locales.CastThisComputer(), "", !on, connecting) && on {
 			go s.svc.Player.StopCasting()
 		}
 		for _, d := range s.svc.Player.CastDevices() {
 			detail := d.Model
 			if connecting && starting.ID == d.ID {
-				detail = strings.TrimPrefix(detail+" · connecting…", " · ")
+				detail = strings.TrimPrefix(detail+" · "+locales.CastConnecting(), " · ")
 			}
 			if s.miniChoice(c, "mini-cast-"+d.ID, d.Name, detail, on && casting.ID == d.ID, connecting) {
 				s.castTo(d)
@@ -633,21 +633,21 @@ func (s *shell) miniConnectDevices(c *ui.Context) {
 	chosen := s.set.SpotifyDevice
 	devices := fetch(s, "devices", s.svc.Player.Devices)
 	s.miniSection(c, "mini-connect", "Spotify Connect", func() {
-		if s.miniChoice(c, "mini-connect-active", "The active device", "", chosen == "", false) {
+		if s.miniChoice(c, "mini-connect-active", locales.PlayerDeviceDefault(), "", chosen == "", false) {
 			s.setDevice("")
 		}
 		switch {
 		case !devices.done:
-			s.miniNote(c, "Looking for devices…")
+			s.miniNote(c, locales.PlayerLooking())
 		case devices.err != nil:
 			s.miniNote(c, devices.err.Error())
 		case len(devices.value) == 0:
-			s.miniNote(c, "Open Spotify on a device to see it here")
+			s.miniNote(c, locales.PlayerNoDevices())
 		}
 		for _, d := range devices.value {
 			detail := ""
 			if d.Active {
-				detail = "active"
+				detail = locales.MiniPanelActive()
 			}
 			if s.miniChoice(c, "mini-connect-"+d.ID, d.Name, detail, chosen == d.ID, d.Restricted) {
 				s.setDevice(d.ID)
@@ -661,7 +661,7 @@ func (s *shell) miniConnectDevices(c *ui.Context) {
 func (s *shell) miniErrorPanel(c *ui.Context) {
 	f := s.p.Failures()
 	if len(f) == 0 {
-		s.miniNote(c, "No track failed to play since MixMusic started.")
+		s.miniNote(c, locales.MiniPanelNoFailure())
 		return
 	}
 	ui.Scroll(c).Grow(1).MinHeight(0).Padding(4, 12, 12).Children(func() { s.failureDetails(c, f[0]) })

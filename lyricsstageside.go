@@ -4,6 +4,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // What the full-screen lyrics (lyricsstage.go) show at their sides: at the
@@ -54,14 +55,14 @@ func (s *shell) stageButton(c *ui.Context, key, name, label string, size, glyph 
 func (s *shell) stageControls(c *ui.Context, cover float32) {
 	name, label := toggleOf(s.st)
 	ui.Column(c.Key("stage-controls")).Width(stageControlsW).Height(cover).Shrink(0).AlignItems(ui.Center).Justify(ui.Center).Gap(14).
-		Label("Player controls").Children(func() {
-		if s.stageButton(c, "stage-previous", "previous", "Previous track", 40, 18, false) {
+		Label(locales.LyricsStageControls()).Children(func() {
+		if s.stageButton(c, "stage-previous", "previous", locales.CmdPlayerPrevious(), 40, 18, false) {
 			s.p.Previous()
 		}
 		if s.stageButton(c, "stage-toggle", name, label, 52, 22, true) {
 			s.p.Toggle()
 		}
-		if s.stageButton(c, "stage-next", "next", "Next track", 40, 18, false) {
+		if s.stageButton(c, "stage-next", "next", locales.CmdPlayerNext(), 40, 18, false) {
 			s.p.Next()
 		}
 	})
@@ -76,7 +77,7 @@ func (s *shell) stageQueue(c *ui.Context, h float32) {
 	q, at := s.st.Queue, s.st.Index
 	room := min(max(int((h-2*80+gap)/(size+gap)), 0), stageQueueCovers)
 	ui.Column(c.Key("stage-queue")).Width(stageQueueW).Height(h).Shrink(0).AlignItems(ui.Center).Justify(ui.Center).Gap(gap).
-		Label("Up next").Children(func() {
+		Label(locales.PanelUpNext()).Children(func() {
 		for rank, i := 0, at+1; i < len(q) && rank < room; rank, i = rank+1, i+1 {
 			s.stageQueueCover(c, i, q[i], rank, size)
 		}
@@ -89,7 +90,7 @@ func (s *shell) stageQueue(c *ui.Context, h float32) {
 func (s *shell) stageQueueCover(c *ui.Context, i int, it player.Item, rank int, size float32) {
 	t := it.Track
 	b := s.buttonBase(c.Key("stage-q-"+it.UID)).Size(size, size).Shrink(0).Radius(10).Clip().
-		Label("Play " + t.Title).Tooltip(t.Title + " · " + names(t.Artists)).Cursor(ui.CursorPointer)
+		Label(locales.TracksPlay(t.Title)).Tooltip(t.Title + " · " + names(t.Artists)).Cursor(ui.CursorPointer)
 	op := max(1-0.09*float32(rank), 0.45)
 	if it.Skip != "" {
 		op = min(op, 0.35)

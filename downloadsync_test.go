@@ -245,7 +245,7 @@ func TestDownloadAddedSetting(t *testing.T) {
 	show(s, tt, "/settings/playback")
 	// The switch, not what holds its row too, as the page.
 	const label = "Download songs added later"
-	focused := func() bool { return tt.Focused(label) && !tt.Focused(downloadAddedAbout) }
+	focused := func() bool { return tt.Focused(label) && !tt.Focused(downloadAddedAbout()) }
 	for i := 0; i < 200 && !focused(); i++ {
 		tt.Key(0, ui.KeyTab)
 	}

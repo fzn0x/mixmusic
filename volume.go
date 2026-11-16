@@ -4,6 +4,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 const (
@@ -19,9 +20,9 @@ const (
 // muteOf is the icon and the label of the mute button: the speaker crossed
 // out while nothing sounds, muted or at no volume, and what a click does.
 func muteOf(st player.State) (name, label string) {
-	name, label = "volume", "Mute"
+	name, label = "volume", locales.VolumeMute()
 	if st.Muted {
-		label = "Unmute"
+		label = locales.VolumeUnmute()
 	}
 	if st.Muted || st.Volume == 0 {
 		name = "volumeMute"

@@ -5,11 +5,10 @@ package main
 // shows them, unless Settings › Playback › Downloads says not to.
 
 import (
-	"fmt"
-
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // syncMemo is the tracks of a page that its collection's download took
@@ -59,16 +58,11 @@ func (s *shell) syncDownload(d *downloadHead) {
 		return
 	}
 	if size, big := s.downloadSize(added); big {
-		were := "were"
-		if len(added) == 1 {
-			were = "was"
-		}
-		s.notes = append(s.notes, notice(fmt.Sprintf("%s %s added to %s since you downloaded it. They take about %s, so they download only once you ask.",
-			plural(len(added), "track"), were, d.c.Title, byteSize(size))))
+		s.notes = append(s.notes, notice(locales.DownloadSyncWaiting(len(added), d.c.Title, byteSize(size))))
 		return
 	}
 	if n := s.svc.Downloads.SyncCollection(d.c, tracks); n > 0 {
-		s.notes = append(s.notes, notice(fmt.Sprintf("Downloading %s added to %s", plural(n, "track"), d.c.Title)))
+		s.notes = append(s.notes, notice(locales.DownloadSyncStarted(n, d.c.Title)))
 	}
 }
 
@@ -77,13 +71,12 @@ func init() { addSettings(downloadRows, 10, (*shell).downloadAddedRow) }
 // downloadAddedRow chooses whether the tracks added to the collections
 // downloaded download on their own, in Settings › Playback › Downloads.
 func (s *shell) downloadAddedRow(c *ui.Context) {
-	s.row(c, "Download songs added later", downloadAddedAbout, func() {
-		if s.switchOf(c.Key("download-added"), &s.set.DownloadAdded).Label("Download songs added later").Changed() {
+	s.row(c, locales.DownloadAddedRowTitle(), downloadAddedAbout(), func() {
+		if s.switchOf(c.Key("download-added"), &s.set.DownloadAdded).Label(locales.DownloadAddedRowTitle()).Changed() {
 			s.save()
 		}
 	}, "sync", "new", "automatically")
 }
 
 // downloadAddedAbout is what the row of Download songs added later says.
-const downloadAddedAbout = "When a playlist, an album, a mix or the liked songs you downloaded gain songs, they download too as you open its page. " +
-	"Over a hundred at once, or a gigabyte, wait for you to ask. Off: its page offers them."
+func downloadAddedAbout() string { return locales.DownloadAddedAbout() }

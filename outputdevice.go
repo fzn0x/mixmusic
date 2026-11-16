@@ -14,6 +14,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // outputDevicesKey is the key the output devices load at.
@@ -47,7 +48,7 @@ func (o outputChoice) title() string {
 // by a number, and the device chosen, while it isn't among them. Until
 // the devices are listed, the device chosen stands for itself.
 func outputChoices(devices []app.OutputDevice, listed bool, chosen settings.OutputDevice) []outputChoice {
-	def := outputChoice{Label: "System default", Chosen: chosen.ID == ""}
+	def := outputChoice{Label: locales.OutputChoiceSystemDefault(), Chosen: chosen.ID == ""}
 	names := map[string]int{}
 	for _, d := range devices {
 		names[d.Name]++
@@ -71,10 +72,10 @@ func outputChoices(devices []app.OutputDevice, listed bool, chosen settings.Outp
 	if chosen.ID != "" && !found {
 		c := outputChoice{Device: chosen, Label: chosen.Name, Chosen: true}
 		if c.Label == "" {
-			c.Label = "The device chosen"
+			c.Label = locales.OutputChoiceChosen()
 		}
 		if listed {
-			c.Detail = "not connected"
+			c.Detail = locales.OutputChoiceNotConnected()
 		}
 		out = append(out, c)
 	}
@@ -100,13 +101,13 @@ func (s *shell) chooseOutput(d settings.OutputDevice) {
 // "" when it does: a cast device, or Spotify's own player, plays it.
 func (s *shell) outputAside() string {
 	if d, on := s.svc.Player.CastingTo(); on {
-		return "Playing on " + d.Name + ": the device is this computer's"
+		return locales.OutputChoiceAsideCast(d.Name)
 	}
 	if src := s.st.Source; src != nil && src.Mode != player.ModeStream {
 		if src.Mode == player.ModeConnect {
-			return "Spotify Connect plays this track on its own device"
+			return locales.OutputChoiceAsideConnect()
 		}
-		return "Spotify plays this track on the system's default device"
+		return locales.OutputChoiceAsideSystem()
 	}
 	return ""
 }
@@ -130,7 +131,7 @@ func (s *shell) outputMenu(m *ui.Menu) {
 	}
 	switch {
 	case !devices.done:
-		m.Item("Looking for devices…").Disabled(true)
+		m.Item(locales.OutputChoiceLooking()).Disabled(true)
 	case devices.err != nil:
 		m.Item(devices.err.Error()).Disabled(true)
 	}
@@ -143,11 +144,11 @@ func (s *shell) outputLabel() string {
 	d := s.set.OutputDevice
 	switch {
 	case d.ID == "":
-		return "Output device: System default"
+		return locales.OutputChoiceButton(locales.OutputChoiceSystemDefault())
 	case s.svc.Player.OutputFallback():
-		return "Output device: " + d.Name + ", not connected: the system's default plays"
+		return locales.OutputChoiceButtonFallback(d.Name)
 	}
-	return "Output device: " + d.Name
+	return locales.OutputChoiceButton(d.Name)
 }
 
 // roomOutput is the width the device button needs beside the others in

@@ -41,7 +41,7 @@ func TestKeepOnTopRow(t *testing.T) {
 	tt := testerOf(t, s, 1280, 2400)
 	show(s, tt, "/settings/desktop")
 	var above float32
-	for _, text := range []string{"Show what plays on Discord", keepOnTopTitle, keepOnTopDescription, "Start at login"} {
+	for _, text := range []string{"Show what plays on Discord", keepOnTopTitle(), keepOnTopDescription(), "Start at login"} {
 		r, ok := tt.Find(text)
 		if !ok || r.Y <= above {
 			t.Fatalf("Settings › Desktop shows %q out of place: %q", text, tt.Texts())
@@ -51,7 +51,7 @@ func TestKeepOnTopRow(t *testing.T) {
 	if s.svc.Preferences.Get().KeepOnTop || len(told()) > 0 {
 		t.Fatalf("on at first: told %v", told())
 	}
-	focused := func() bool { return tt.Focused(keepOnTopTitle) && !tt.Focused(keepOnTopDescription) }
+	focused := func() bool { return tt.Focused(keepOnTopTitle()) && !tt.Focused(keepOnTopDescription()) }
 	for i := 0; i < 200 && !focused(); i++ {
 		tt.Key(0, ui.KeyTab)
 	}
@@ -71,7 +71,7 @@ func TestKeepOnTopRow(t *testing.T) {
 	}
 	for _, q := range []string{"keep on top", "always on top", "float"} {
 		show(s, tt, settingsPath("", q))
-		if !tt.HasText(keepOnTopTitle) {
+		if !tt.HasText(keepOnTopTitle()) {
 			t.Errorf("searching %q doesn't find the row: %q", q, tt.Texts())
 		}
 	}

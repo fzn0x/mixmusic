@@ -14,6 +14,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -43,8 +44,8 @@ func (s *shell) transcriptRow(c *ui.Context, i int, tr lyrics.Lyrics, limit time
 	k := &s.lk
 	if i == 0 {
 		ui.Column(c).Padding(16, 24, 4).Children(func() {
-			ui.Text(c, "Transcript").FontSize(k.bodySize()).FontWeight(600)
-			ui.Text(c, "From the episode's captions on YouTube.").FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, locales.EpisodeTranscriptTitle()).FontSize(k.bodySize()).FontWeight(600)
+			ui.Text(c, locales.EpisodeTranscriptSource()).FontSize(k.smallSize()).TextColor(k.muted)
 		})
 		return
 	}
@@ -68,7 +69,7 @@ func (s *shell) transcriptRow(c *ui.Context, i int, tr lyrics.Lyrics, limit time
 	row := ui.Row(c.Key("transcript-"+strconv.Itoa(at))).Gap(12).Padding(2, 24)
 	seeks := tr.Synced && ms(line.TimeMs) < limit
 	if seeks {
-		row.Label("Play from " + when + ", " + line.Text).Cursor(ui.CursorPointer).Focusable()
+		row.Label(locales.EpisodePlayFrom(when + ", " + line.Text)).Cursor(ui.CursorPointer).Focusable()
 		if row.Clicked() && !s.st.Loading {
 			s.p.Seek(ms(line.TimeMs))
 		}

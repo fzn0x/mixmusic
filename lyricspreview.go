@@ -8,6 +8,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -20,7 +21,14 @@ import (
 // player's: a clock that goes on from line to line, as the ball's flight from
 // one line to the next needs.
 
+// previewLines are the made-up lines in English, which the tests count the
+// lines the preview shows by; the app sings previewLinesOf.
 var previewLines = []string{"Slow wind over the pier", "Lanterns drifting home", "Quiet as the harbour light", "Carry me back to shore"}
+
+// previewLinesOf are the made-up lines, in the app's language.
+func previewLinesOf() []string {
+	return []string{locales.LyricsPreviewLineOne(), locales.LyricsPreviewLineTwo(), locales.LyricsPreviewLineThree(), locales.LyricsPreviewLineFour()}
+}
 
 const (
 	// previewLineFor is how long a line of the preview is sung, and
@@ -37,30 +45,19 @@ const (
 	previewTick = 250 * time.Millisecond
 )
 
-// previewWords are the words of the made-up line i, sung one after another
-// over previewSung, from the line's start.
-var previewWords = func() [][]lyrics.Word {
-	out := make([][]lyrics.Word, len(previewLines))
-	for i, line := range previewLines {
-		fields := strings.Fields(line)
-		step := previewSung / time.Duration(len(fields))
-		for j, f := range fields {
-			start := time.Duration(j) * step
-			out[i] = append(out[i], lyrics.Word{Text: f, StartMs: int(start / time.Millisecond), EndMs: int((start + step*9/10) / time.Millisecond)})
-		}
-	}
-	return out
-}()
-
 // previewWordsOf returns the words of the made-up line of that place in the
 // song, which starts as the place's turn comes: line 0 starts at 0, line 1
 // previewLineFor after.
+// Its words are sung one after another over previewSung, from the line's start.
 func previewWordsOf(line int) []lyrics.Word {
+	lines := previewLinesOf()
 	base := int(time.Duration(line) * previewLineFor / time.Millisecond)
-	words := previewWords[line%len(previewLines)]
-	out := make([]lyrics.Word, len(words))
-	for i, w := range words {
-		out[i] = lyrics.Word{Text: w.Text, StartMs: w.StartMs + base, EndMs: w.EndMs + base}
+	fields := strings.Fields(lines[line%len(lines)])
+	step := previewSung / time.Duration(len(fields))
+	out := make([]lyrics.Word, len(fields))
+	for j, f := range fields {
+		start := time.Duration(j) * step
+		out[j] = lyrics.Word{Text: f, StartMs: int(start/time.Millisecond) + base, EndMs: int((start+step*9/10)/time.Millisecond) + base}
 	}
 	return out
 }
@@ -72,7 +69,7 @@ func previewWordsOf(line int) []lyrics.Word {
 func (s *shell) lyricPreview(c *ui.Context) {
 	k := &s.lk
 	style := lyricStyleOf(s.set.LyricsStyle)
-	box := ui.Box(c.Key("lyric-preview")).Height(previewHeight).MaxWidth(560).Margin(14, 0).Radius(14).Clip().Label("Preview of the full-screen lyrics")
+	box := ui.Box(c.Key("lyric-preview")).Height(previewHeight).MaxWidth(560).Margin(14, 0).Radius(14).Clip().Label(locales.LyricsPreviewLabel())
 	var b *ui.Bitmap
 	if cur, ok := s.st.Current(); ok && len(cur.Track.Artwork) > 0 {
 		b = s.art.get(c, artworkURL(cur.Track.Artwork, 64), 64)
@@ -91,7 +88,8 @@ func (s *shell) lyricPreview(c *ui.Context) {
 		// when the next is sung.
 		c.After(min(previewTick, previewLineFor-pos%previewLineFor))
 	}
-	n := len(previewLines)
+	lines := previewLinesOf()
+	n := len(lines)
 	active := int(pos / previewLineFor)
 	state := &player.State{Playing: true, Position: pos, Speed: 1}
 	box.Children(func() {
@@ -107,14 +105,14 @@ func (s *shell) lyricPreview(c *ui.Context) {
 					dist = -dist
 				}
 				v := stageLineView{
-					style: style, scale: previewScale, text: previewLines[line%n], key: "preview-" + strconv.Itoa(line%n),
+					style: style, scale: previewScale, text: lines[line%n], key: "preview-" + strconv.Itoa(line%n),
 					opacity: style.opacity(dist), blur: style.blurAt(dist), state: state, ball: s.set.LyricsBall,
 				}
 				if d == 0 {
 					v.words, v.active = previewWordsOf(line), true
 					v.rig, v.line, v.motion = &ls.previewBall, line, s.set.LyricsBallMotion
 					next := previewWordsOf(line + 1)
-					v.next = ballNext{ok: true, text: previewLines[(line+1)%n], word: next[0]}
+					v.next = ballNext{ok: true, text: lines[(line+1)%n], word: next[0]}
 				}
 				s.stageLineView(c, v)
 			}

@@ -18,6 +18,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // bothFailed is the error of a stream neither YouTube's player API nor
@@ -135,7 +136,7 @@ func TestRecentPlaybackErrors(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 2400)
 	show(s, tt, "/settings/about")
-	if !tt.HasText(noFailures) {
+	if !tt.HasText(locales.PlaybackErrorsNone()) {
 		t.Errorf("no word of no failures: %q", tt.Texts())
 	}
 
@@ -151,7 +152,7 @@ func TestRecentPlaybackErrors(t *testing.T) {
 		}
 		above = r.Y
 	}
-	if tt.HasText(noFailures) || !tt.HasText(" · this track is private") {
+	if tt.HasText(locales.PlaybackErrorsNone()) || !tt.HasText(" · this track is private") {
 		t.Errorf("the failure's row: %q", tt.Texts())
 	}
 	click(t, s, tt, "details of Broken Song, by The Band")

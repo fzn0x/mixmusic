@@ -8,23 +8,12 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The ListenBrainz group comes below Last.fm's, which the accounts' own
 // part holds (accounts.go, at 10).
 func init() { addSettings("accounts", 20, (*shell).listenbrainzSettings) }
-
-// The texts of the ListenBrainz group, and what the search of the settings
-// finds its form by.
-const (
-	listenbrainzHint   = "MixMusic keeps your token in your system's credential store, with the connection."
-	listenbrainzServer = "Leave it empty for ListenBrainz itself. A ListenBrainz of your own takes its address, and Maloja its address followed by /apis/listenbrainz."
-	// listenbrainzPlain warns of a server's plain http address.
-	listenbrainzPlain = "Plain http works only on your local network, and your token travels to the server unencrypted: anyone on the network can read it."
-	listenbrainzForm  = "Copy your user token from your ListenBrainz settings, or your own server's. Paste it here, and connect. " +
-		"User token. Server. " + listenbrainzServer + " Connect to ListenBrainz. Scrobble, scrobbling, listens. Self-hosted, Maloja. Sign in, log in. " + listenbrainzHint
-	listenbrainzLoves = "A like loves the song on ListenBrainz, and an unlike takes the love back."
-)
 
 // The keys of the drafts of the group's inputs.
 const (
@@ -53,41 +42,41 @@ func (s *shell) listenbrainzSettings(c *ui.Context) {
 			return
 		}
 		// The form shows whole, as its button needs its fields.
-		s.found(c, "Connect to ListenBrainz", listenbrainzForm, func() {
+		s.found(c, locales.ListenBrainzSettingsConnectTitle(), locales.ListenBrainzSettingsForm(), func() {
 			s.steps(c,
 				func() {
-					ui.Text(c, "Copy your user token from ")
-					s.linkOf(c, "your ListenBrainz settings", "https://listenbrainz.org/settings/")
-					ui.Text(c, ", or your own server's.")
+					ui.Text(c, locales.ListenBrainzSettingsStep1())
+					s.linkOf(c, locales.ListenBrainzSettingsTokenLink(), "https://listenbrainz.org/settings/")
+					ui.Text(c, locales.ListenBrainzSettingsStep1Tail())
 				},
-				func() { ui.Text(c, "Paste it here, and connect.") },
+				func() { ui.Text(c, locales.ListenBrainzSettingsStep2()) },
 			)
 			token, server := s.listenbrainzDraft(listenbrainzTokenKey), s.listenbrainzDraft(listenbrainzServerKey)
-			s.row(c, "User token", "", func() {
-				ui.TextInput(c.Key(listenbrainzTokenKey), &token.text).Password().Placeholder("36 letters, digits and dashes").Width(260).Label("User token")
+			s.row(c, locales.ListenBrainzSettingsUserToken(), "", func() {
+				ui.TextInput(c.Key(listenbrainzTokenKey), &token.text).Password().Placeholder(locales.ListenBrainzSettingsTokenPlaceholder()).Width(260).Label(locales.ListenBrainzSettingsUserToken())
 			})
-			s.row(c, "Server", listenbrainzServer, func() {
-				ui.TextInput(c.Key(listenbrainzServerKey), &server.text).Placeholder("https://api.listenbrainz.org").Width(260).Label("Server")
+			s.row(c, locales.ListenBrainzSettingsServerLabel(), locales.ListenBrainzSettingsServer(), func() {
+				ui.TextInput(c.Key(listenbrainzServerKey), &server.text).Placeholder("https://api.listenbrainz.org").Width(260).Label(locales.ListenBrainzSettingsServerLabel())
 			})
 			if plainHTTP(server.text) {
 				s.listenbrainzWarning(c)
 			}
 			busy := s.signingIn == "listenbrainz"
-			label := "connect to listenbrainz"
+			label := locales.ListenBrainzSettingsConnect()
 			if busy {
-				label = "checking the token…"
+				label = locales.ListenBrainzSettingsChecking()
 			}
 			ui.Row(c).Padding(12, 0).Children(func() {
 				tok, addr := strings.TrimSpace(token.text), strings.TrimSpace(server.text)
 				if s.button(c, "listenbrainz-in", label, true).Disabled(busy || tok == "").Clicked() {
 					token.text = "" // it stays no longer than this try
-					s.account("listenbrainz", "Connected to ListenBrainz", func(ctx context.Context) error {
+					s.account("listenbrainz", locales.ListenBrainzSettingsConnected(), func(ctx context.Context) error {
 						_, err := s.svc.Accounts.ListenBrainzLogin(ctx, tok, addr)
 						return err
 					})
 				}
 			})
-			s.hint(c, listenbrainzHint)
+			s.hint(c, locales.ListenBrainzSettingsHint())
 		})
 	})
 }
@@ -97,40 +86,40 @@ func (s *shell) listenbrainzSettings(c *ui.Context) {
 // came; the switches; and disconnect.
 func (s *shell) listenbrainzConnected(c *ui.Context, lb app.ListenBrainzAccount) {
 	if lb.Other != "" {
-		title, text := "Send the waiting listens to "+lb.Other+"?", listenbrainzOtherText(lb)
+		title, text := locales.ListenBrainzSettingsOtherTitle(lb.Other), listenbrainzOtherText(lb)
 		s.found(c, title, text, func() {
 			s.alert(c, title, text, func() {
-				if s.button(c, "listenbrainz-send", "send them", true).Clicked() {
-					s.account("", "Connected to ListenBrainz", func(ctx context.Context) error { return s.svc.Accounts.ListenBrainzResolve(ctx, true) })
+				if s.button(c, "listenbrainz-send", locales.ListenBrainzSettingsSendThem(), true).Clicked() {
+					s.account("", locales.ListenBrainzSettingsConnected(), func(ctx context.Context) error { return s.svc.Accounts.ListenBrainzResolve(ctx, true) })
 				}
-				if s.button(c, "listenbrainz-drop", "drop them", false).Clicked() {
-					s.account("", "Connected to ListenBrainz", func(ctx context.Context) error { return s.svc.Accounts.ListenBrainzResolve(ctx, false) })
+				if s.button(c, "listenbrainz-drop", locales.ListenBrainzSettingsDropThem(), false).Clicked() {
+					s.account("", locales.ListenBrainzSettingsConnected(), func(ctx context.Context) error { return s.svc.Accounts.ListenBrainzResolve(ctx, false) })
 				}
 			}).Margin(12, 0)
 		})
 	} else if lb.Expired {
-		title, text := listenbrainzName(lb)+" no longer accepts this token", listenbrainzExpiredText(lb)
+		title, text := locales.ListenBrainzSettingsNoLongerAccepts(listenbrainzName(lb)), listenbrainzExpiredText(lb)
 		s.found(c, title, text, func() {
 			s.alert(c, title, text, func() {
 				again := s.listenbrainzDraft(listenbrainzAgainKey)
-				ui.TextInput(c.Key(listenbrainzAgainKey), &again.text).Password().Placeholder("a new user token").Width(260).Label("New user token")
+				ui.TextInput(c.Key(listenbrainzAgainKey), &again.text).Password().Placeholder(locales.ListenBrainzSettingsNewTokenPlaceholder()).Width(260).Label(locales.ListenBrainzSettingsNewTokenLabel())
 				busy := s.signingIn == "listenbrainz"
-				label := "connect again"
+				label := locales.ListenBrainzSettingsConnectAgain()
 				if busy {
-					label = "checking the token…"
+					label = locales.ListenBrainzSettingsChecking()
 				}
 				tok := strings.TrimSpace(again.text)
 				if s.button(c, "listenbrainz-reconnect", label, true).Disabled(busy || tok == "").Clicked() {
 					again.text = ""
-					s.account("listenbrainz", "Connected to ListenBrainz", func(ctx context.Context) error {
+					s.account("listenbrainz", locales.ListenBrainzSettingsConnected(), func(ctx context.Context) error {
 						return s.svc.Accounts.ListenBrainzReconnect(ctx, tok)
 					})
 				}
 			}).Margin(12, 0)
 		})
 	}
-	s.row(c, "Scrobbling as "+lb.Name, listenbrainzAbout(lb), func() {
-		if s.switchOf(c.Key("listenbrainz-scrobbling"), &s.set.ListenBrainzScrobbling).Label("Scrobble to ListenBrainz").Changed() {
+	s.row(c, locales.AccountSettingsScrobblingAs(lb.Name), listenbrainzAbout(lb), func() {
+		if s.switchOf(c.Key("listenbrainz-scrobbling"), &s.set.ListenBrainzScrobbling).Label(locales.ListenBrainzSettingsScrobbleSwitch()).Changed() {
 			s.save()
 		}
 	})
@@ -140,15 +129,15 @@ func (s *shell) listenbrainzConnected(c *ui.Context, lb app.ListenBrainzAccount)
 	if lb.Plain {
 		s.listenbrainzWarning(c)
 	}
-	s.row(c, "Send likes as loves", listenbrainzLoves, func() {
-		if s.switchOf(c.Key("listenbrainz-loves"), &s.set.ListenBrainzLoves).Label("Send likes to ListenBrainz as loves").Changed() {
+	s.row(c, locales.ListenBrainzSettingsLovesTitle(), locales.ListenBrainzSettingsLoves(), func() {
+		if s.switchOf(c.Key("listenbrainz-loves"), &s.set.ListenBrainzLoves).Label(locales.ListenBrainzSettingsLovesSwitch()).Changed() {
 			s.save()
 		}
 	})
-	s.found(c, "disconnect", "sign out log out of ListenBrainz", func() {
+	s.found(c, locales.AccountSettingsDisconnect(), "sign out log out of ListenBrainz", func() {
 		ui.Row(c).Padding(12, 0).Children(func() {
-			if s.button(c, "listenbrainz-out", "disconnect", false).Clicked() {
-				s.ask("disconnect ListenBrainz", listenbrainzDisconnectText(lb), "disconnect", func() {
+			if s.button(c, "listenbrainz-out", locales.AccountSettingsDisconnect(), false).Clicked() {
+				s.ask(locales.ListenBrainzSettingsDisconnectAskTitle(), listenbrainzDisconnectText(lb), locales.AccountSettingsDisconnect(), func() {
 					s.account("", "", func(ctx context.Context) error { return s.svc.Accounts.ListenBrainzLogout(ctx) })
 				})
 			}
@@ -158,8 +147,8 @@ func (s *shell) listenbrainzConnected(c *ui.Context, lb app.ListenBrainzAccount)
 
 // listenbrainzWarning warns that the token travels unencrypted.
 func (s *shell) listenbrainzWarning(c *ui.Context) {
-	s.found(c, "", listenbrainzPlain, func() {
-		ui.Text(c, listenbrainzPlain).FontSize(s.lk.smallSize()).TextColor(s.lk.danger).Padding(8, 0).MaxWidth(720)
+	s.found(c, "", locales.ListenBrainzSettingsPlain(), func() {
+		ui.Text(c, locales.ListenBrainzSettingsPlain()).FontSize(s.lk.smallSize()).TextColor(s.lk.danger).Padding(8, 0).MaxWidth(720)
 	})
 }
 
@@ -178,43 +167,33 @@ func listenbrainzName(lb app.ListenBrainzAccount) string {
 	if u, err := url.Parse(lb.Server); err == nil && u.Host != "" {
 		return u.Host
 	}
-	return "Your server"
+	return locales.ListenBrainzSettingsYourServer()
 }
 
 // listenbrainzAbout says what scrobbling to the server does.
 func listenbrainzAbout(lb app.ListenBrainzAccount) string {
-	where := "your ListenBrainz listens"
 	if lb.Server != "" {
-		where = "your listens on " + listenbrainzName(lb)
+		return locales.ListenBrainzSettingsAboutServer(listenbrainzName(lb))
 	}
-	return "What you listen to joins " + where + ": a track counts once half of it played, or four minutes."
+	return locales.ListenBrainzSettingsAboutListenBrainz()
 }
 
 // listenbrainzExpiredText tells what to do when the server refuses the
 // token.
 func listenbrainzExpiredText(lb app.ListenBrainzAccount) string {
-	text := "Paste a new user token to go on scrobbling."
 	if lb.Server == "" {
-		text = "Paste a new user token from your ListenBrainz settings to go on scrobbling."
+		return locales.ListenBrainzSettingsExpiredListenBrainz(lb.Waiting)
 	}
-	if lb.Waiting > 0 {
-		text += " " + plural(lb.Waiting, "listen waits", "listens wait") + " to be sent."
-	}
-	return text
+	return locales.ListenBrainzSettingsExpiredServer(lb.Waiting)
 }
 
 // listenbrainzOtherText asks what becomes of the waiting listens when the
 // new token is another user's.
 func listenbrainzOtherText(lb app.ListenBrainzAccount) string {
-	return plural(lb.Waiting, "listen was", "listens were") + " heard as " + lb.Name + " and not sent yet. Send them to " +
-		lb.Other + "'s listens, or drop them."
+	return locales.ListenBrainzSettingsOtherText(lb.Waiting, lb.Name, lb.Other)
 }
 
 // listenbrainzDisconnectText is the question disconnecting asks.
 func listenbrainzDisconnectText(lb app.ListenBrainzAccount) string {
-	text := "MixMusic forgets your token; your listens stay on " + listenbrainzName(lb) + "."
-	if lb.Waiting > 0 {
-		text += " " + plural(lb.Waiting, "listen", "listens") + " not sent yet will be dropped."
-	}
-	return text
+	return locales.ListenBrainzSettingsDisconnectAskBody(listenbrainzName(lb), lb.Waiting)
 }

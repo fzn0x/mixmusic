@@ -1,16 +1,19 @@
 package main
 
-import "github.com/egoist/mygo/ui"
+import (
+	"github.com/egoist/mygo/ui"
+
+	"github.com/fzn0x/mixmusic/locales"
+)
 
 func init() { addSettings("playback", 42, (*shell).movingCoverSettings) }
 
 // movingCoverSettings play the covers that move, in Settings › Playback,
 // beside the picture of music videos (movingcover.go).
 func (s *shell) movingCoverSettings(c *ui.Context) {
-	s.group(c, "Moving covers", func() {
-		const desc = "A GIF cover, of a mix or of music on this computer, moves on the now playing page, pausing with the music, and on the mix's page. Elsewhere, and while the system asks for less motion, it stays still."
-		s.row(c, "Show moving covers", desc, func() {
-			if s.switchOf(c.Key("moving-covers"), &s.set.MovingCovers).Label("Show moving covers").Changed() {
+	s.group(c, locales.MovingCoversGroup(), func() {
+		s.row(c, locales.MovingCoversShow(), locales.MovingCoversDesc(), func() {
+			if s.switchOf(c.Key("moving-covers"), &s.set.MovingCovers).Label(locales.MovingCoversShow()).Changed() {
 				s.save()
 			}
 		}, "gif animated animation")

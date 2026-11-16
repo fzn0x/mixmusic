@@ -17,12 +17,12 @@ func TestAudioAsAccountRow(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 3200)
 	show(s, tt, "/settings/playback")
-	signedOut := audioAsAccountDescription + " Sign in to YouTube Music in accounts first."
+	signedOut := audioAsAccountDescription() + " Sign in to YouTube Music in accounts first."
 	if !tt.HasText(signedOut) {
 		t.Errorf("signed out, the row doesn't say what it risks and asks to sign in: %q", tt.Texts())
 	}
 	var above float32
-	for _, text := range []string{"Quality", audioAsAccountTitle, "Crossfade"} {
+	for _, text := range []string{"Quality", audioAsAccountTitle(), "Crossfade"} {
 		r, ok := tt.Find(text)
 		if !ok || r.Y <= above {
 			t.Fatalf("Settings › Playback shows %q out of place, at %v: %q", text, r, tt.Texts())
@@ -32,7 +32,7 @@ func TestAudioAsAccountRow(t *testing.T) {
 	if s.svc.Preferences.Get().AudioAsAccount {
 		t.Fatal("on at first")
 	}
-	focused := func() bool { return tt.Focused(audioAsAccountTitle) && !tt.Focused(signedOut) }
+	focused := func() bool { return tt.Focused(audioAsAccountTitle()) && !tt.Focused(signedOut) }
 	for i := 0; i < 200 && !focused(); i++ {
 		tt.Key(0, ui.KeyTab)
 	}
@@ -50,12 +50,12 @@ func TestAudioAsAccountRow(t *testing.T) {
 
 	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{YouTube: app.YouTubeAccount{SignedIn: true}}}
 	tt.Frame()
-	if !tt.HasText(audioAsAccountDescription) || tt.HasText(signedOut) {
+	if !tt.HasText(audioAsAccountDescription()) || tt.HasText(signedOut) {
 		t.Errorf("signed in, the row asks to sign in: %q", tt.Texts())
 	}
 	for _, q := range []string{"premium", "bitrate", "as your account"} {
 		show(s, tt, settingsPath("", q))
-		if !tt.HasText(audioAsAccountTitle) {
+		if !tt.HasText(audioAsAccountTitle()) {
 			t.Errorf("searching %q doesn't find the row: %q", q, tt.Texts())
 		}
 	}
@@ -79,7 +79,7 @@ func TestAudioAsAccountOffer(t *testing.T) {
 		s := premiumShell(t, true)
 		tt := tester(t, s)
 		tt.Frame()
-		if !tt.HasText(audioAsAccountOfferText) || !tt.HasText("play audio as your account") {
+		if !tt.HasText(audioAsAccountOfferText()) || !tt.HasText("play audio as your account") {
 			t.Fatalf("%s: no offer: %q", answer, tt.Texts())
 		}
 		if !tt.Focused("not now") {
@@ -100,14 +100,14 @@ func TestAudioAsAccountOffer(t *testing.T) {
 			t.Errorf("%s: audioAsAccount %v, offered %v", answer, set.AudioAsAccount, set.AudioAsAccountOffered)
 		}
 		tt.Frame()
-		if tt.HasText(audioAsAccountOfferText) {
+		if tt.HasText(audioAsAccountOfferText()) {
 			t.Errorf("%s: the offer shows again", answer)
 		}
 		// Turned off afterwards, it's not offered again.
 		s.set.AudioAsAccount = false
 		s.save()
 		tt.Frame()
-		if tt.HasText(audioAsAccountOfferText) {
+		if tt.HasText(audioAsAccountOfferText()) {
 			t.Errorf("%s: the offer shows again once the switch is off", answer)
 		}
 	}
@@ -120,7 +120,7 @@ func TestAudioAsAccountNotOffered(t *testing.T) {
 	s := premiumShell(t, false)
 	tt := tester(t, s)
 	tt.Frame()
-	if tt.HasText(audioAsAccountOfferText) {
+	if tt.HasText(audioAsAccountOfferText()) {
 		t.Error("offered without Premium")
 	}
 
@@ -129,7 +129,7 @@ func TestAudioAsAccountNotOffered(t *testing.T) {
 	s.save()
 	tt = tester(t, s)
 	tt.Frame()
-	if tt.HasText(audioAsAccountOfferText) {
+	if tt.HasText(audioAsAccountOfferText()) {
 		t.Error("offered while on")
 	}
 
@@ -138,12 +138,12 @@ func TestAudioAsAccountNotOffered(t *testing.T) {
 	s.ask("another question", "Something else first.", "ok", func() { asked = true })
 	tt = tester(t, s)
 	tt.Frame()
-	if tt.HasText(audioAsAccountOfferText) || !tt.HasText("Something else first.") {
+	if tt.HasText(audioAsAccountOfferText()) || !tt.HasText("Something else first.") {
 		t.Fatalf("the offer didn't wait for the other question: %q", tt.Texts())
 	}
 	click(t, s, tt, "ok")
 	tt.Frame()
-	if !asked || !tt.HasText(audioAsAccountOfferText) {
+	if !asked || !tt.HasText(audioAsAccountOfferText()) {
 		t.Errorf("the offer didn't come after the other question, answered %v: %q", asked, tt.Texts())
 	}
 }

@@ -3,18 +3,20 @@ package main
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 var statsRanges = []struct {
-	label string
+	label func() string
 	days  int
-}{{"This week", 7}, {"This month", 30}, {"All time", 0}}
+}{{locales.StatsThisWeek, 7}, {locales.StatsThisMonth, 30}, {locales.StatsAllTime, 0}}
 
 // statsPage shows what the user listened to: artists rank as circles on
 // one fixed size ramp, and each service's share shows as two rings.
@@ -22,56 +24,56 @@ func (s *shell) statsPage(c *ui.Context) {
 	k := &s.lk
 	labels := make([]string, len(statsRanges))
 	for i, r := range statsRanges {
-		labels[i] = r.label
+		labels[i] = r.label()
 	}
 	years := s.recapYears()
 	if len(years) > 0 {
-		labels = append(labels, recapLabel)
+		labels = append(labels, recapLabel())
 	}
 	if s.statsRange >= len(labels) {
 		s.statsRange = 0
 	}
 	s.pageScroll(c, func() {
-		s.pageHeader(c, "Stats", labels, &s.statsRange)
+		s.pageHeader(c, locales.StatsTitle(), labels, &s.statsRange)
 		if len(years) > 0 && s.statsRange == len(statsRanges) {
 			s.recapView(c, years)
 			return
 		}
 		st := s.svc.Collection.Stats(statsRanges[s.statsRange].days)
 		if st.Plays == 0 {
-			ui.Text(c, k.words("Nothing counted yet")).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
-			ui.Text(c, "Tracks count once they played for thirty seconds.").FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
+			ui.Text(c, k.words(locales.StatsNothingCounted())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
+			ui.Text(c, locales.StatsCountRule()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 			return
 		}
 		hours := st.Minutes / 60
-		spent := fmt.Sprintf("%d min", st.Minutes)
+		spent := locales.FormatMinutes(strconv.Itoa(st.Minutes))
 		if hours > 0 {
-			spent = fmt.Sprintf("%d hr %d min", hours, st.Minutes%60)
+			spent = locales.FormatHourMinutes(strconv.Itoa(hours), strconv.Itoa(st.Minutes%60))
 		}
 		size := k.subtitleSize()
 		ui.RichText(c,
-			ui.Span{Text: "You played ", Size: size, Weight: 300},
-			ui.Span{Text: plural(st.Plays, "track"), Size: size, Weight: 400},
-			ui.Span{Text: " for ", Size: size, Weight: 300},
+			ui.Span{Text: locales.StatsYouPlayed(), Size: size, Weight: 300},
+			ui.Span{Text: locales.StatsPlayedTracks(st.Plays), Size: size, Weight: 400},
+			ui.Span{Text: locales.StatsFor(), Size: size, Weight: 300},
 			ui.Span{Text: spent, Size: size, Weight: 400},
-			ui.Span{Text: ": ", Size: size, Weight: 300},
-			ui.Span{Text: fmt.Sprintf("%d from Spotify", st.Spotify), Size: size, Weight: 300, Color: k.spotify},
-			ui.Span{Text: " and ", Size: size, Weight: 300},
-			ui.Span{Text: fmt.Sprintf("%d from YouTube Music", st.YouTube), Size: size, Weight: 300, Color: k.youtube},
-			ui.Span{Text: ".", Size: size, Weight: 300},
+			ui.Span{Text: locales.StatsColon(), Size: size, Weight: 300},
+			ui.Span{Text: locales.StatsFromSpotify(strconv.Itoa(st.Spotify)), Size: size, Weight: 300, Color: k.spotify},
+			ui.Span{Text: locales.StatsAnd(), Size: size, Weight: 300},
+			ui.Span{Text: locales.StatsFromYouTube(strconv.Itoa(st.YouTube)), Size: size, Weight: 300, Color: k.youtube},
+			ui.Span{Text: locales.StatsEnd(), Size: size, Weight: 300},
 		).MaxWidth(760).Margin(0, 0, 48)
 		s.dayChart(c, st.Daily)
 		ui.Row(c).Gap(48).Wrap().AlignItems(ui.Start).Margin(0, 0, 48).Children(func() {
 			ui.Column(c).Width(320).Children(func() {
-				s.sectionTitle(c, "The mix")
+				s.sectionTitle(c, locales.StatsTheMix())
 				s.venn(c, st.Spotify, st.YouTube)
 			})
 			ui.Column(c).Grow(1).Basis(320).Children(func() {
-				s.sectionTitle(c, "Top artists")
+				s.sectionTitle(c, locales.StatsTopArtists())
 				s.artistCircles(c, st.TopArtists)
 			})
 		})
-		s.sectionTitle(c, "Top tracks")
+		s.sectionTitle(c, locales.StatsTopTracks())
 		tracks := make([]media.Track, len(st.TopTracks))
 		for i, t := range st.TopTracks {
 			tracks[i] = t.Track
@@ -113,12 +115,12 @@ func dayLabel(date string) string {
 	if err != nil {
 		return date
 	}
-	return t.Format("Mon 2 Jan")
+	return locales.FormatWeekdayDayMonth(weekdayName(t), strconv.Itoa(t.Day()), monthName(t))
 }
 
 // describeDay tells a day's minutes and plays.
 func describeDay(d library.DayPlays) string {
-	return fmt.Sprintf("%s: %d min, %s", dayLabel(d.Date), d.Minutes, plural(d.Plays, "play"))
+	return locales.StatsDayTip(dayLabel(d.Date), strconv.Itoa(d.Minutes), d.Plays)
 }
 
 // dayChart draws the minutes listened each day as columns in the accent. A
@@ -147,11 +149,11 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 	case n > 7:
 		every = 7
 	}
-	s.sectionTitle(c, "Day by day")
-	ui.Text(c, "Minutes listened each day.").FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 12)
-	ui.Text(c, fmt.Sprintf("%.0f min", top)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
+	s.sectionTitle(c, locales.StatsDayByDay())
+	ui.Text(c, locales.StatsMinutesEachDay()).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 12)
+	ui.Text(c, locales.FormatMinutes(fmt.Sprintf("%.0f", top))).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
 	plot := ui.Box(c).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).
-		Label("Minutes listened each day").Description("The arrow keys go from day to day.").Focusable().
+		Label(locales.StatsMinutesLabel()).Description(locales.StatsArrowKeys()).Focusable().
 		Draw(func(p *ui.Painter, r ui.Rect) {
 			w := r.W / float32(n)
 			for i, d := range days {
@@ -167,7 +169,7 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 					p.Fill(ui.Rect{X: r.X + float32(i)*w + max(1, w*0.15), Y: r.Y + r.H - h, W: max(1, w*0.7), H: h}, fill, 0)
 				}
 				if i == peak && d.Minutes > 0 {
-					p.Text(r.X+float32(i)*w, r.Y+r.H-h-16, fmt.Sprintf("%d min", d.Minutes), k.captionSize(), k.text)
+					p.Text(r.X+float32(i)*w, r.Y+r.H-h-16, locales.FormatMinutes(strconv.Itoa(d.Minutes)), k.captionSize(), k.text)
 				}
 			}
 		})
@@ -239,13 +241,13 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 			label := ""
 			switch {
 			case i == n-1:
-				label = "today"
+				label = locales.StatsToday()
 			case (n-1-i)%every == 0:
 				if t, err := time.ParseInLocation("2006-01-02", d.Date, time.Local); err == nil {
 					if n <= 7 {
-						label = t.Format("Mon")
+						label = weekdayName(t)
 					} else {
-						label = t.Format("2 Jan")
+						label = locales.FormatDayMonth(strconv.Itoa(t.Day()), monthName(t))
 					}
 				}
 			}
@@ -264,10 +266,10 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 		}
 		trigger.Children(func() {
 			disclosure(c, 90*table.Progress(), t.TextMuted)
-			ui.Text(c, k.words("Show as a table")).SingleLine()
+			ui.Text(c, k.words(locales.StatsShowTable())).SingleLine()
 		})
 		table.Panel(func() {
-			columns := []ui.TableColumn{{Title: "day"}, {Title: "minutes", Width: 110, Align: ui.End}, {Title: "plays", Width: 90, Align: ui.End}}
+			columns := []ui.TableColumn{{Title: locales.StatsColDay()}, {Title: locales.StatsColMinutes(), Width: 110, Align: ui.End}, {Title: locales.StatsColPlays(), Width: 90, Align: ui.End}}
 			// Ten rows show at once, under the header.
 			row := k.theme.Space(8)
 			ui.Table(c, &s.statsRows, columns, n, func(i, col int) {
@@ -307,7 +309,7 @@ func (s *shell) venn(c *ui.Context, spotify, youtube int) {
 	most := float64(max(spotify, youtube, 1))
 	rs := float32(20 + 70*math.Sqrt(float64(spotify)/most))
 	ry := float32(20 + 70*math.Sqrt(float64(youtube)/most))
-	ui.Box(c).Size(300, 200).Label(fmt.Sprintf("%d plays from Spotify, %d from YouTube Music", spotify, youtube)).
+	ui.Box(c).Size(300, 200).Label(locales.StatsVennLabel(strconv.Itoa(spotify), strconv.Itoa(youtube))).
 		Draw(func(p *ui.Painter, r ui.Rect) {
 			cy := r.Y + 100
 			sx, yx := r.X+150-rs*0.55, r.X+150+ry*0.55
@@ -338,7 +340,7 @@ func (s *shell) artistCircles(c *ui.Context, artists []library.ArtistPlays) {
 		for i, a := range artists {
 			r := float32(14 + 46*math.Sqrt(float64(a.Plays)/top))
 			b := s.buttonBase(c.Key("stat-artist-"+count(i))).Size(2*r, 2*r).Radius(r).Background(k.tile(i)).Column().Center().
-				Padding(4).Label(fmt.Sprintf("%s: %s", a.Artist.Name, plural(a.Plays, "play"))).Tooltip(a.Artist.Name).
+				Padding(4).Label(locales.StatsArtistPlays(a.Artist.Name, a.Plays)).Tooltip(a.Artist.Name).
 				Disabled(a.Artist.ID == "")
 			if a.Artist.ID != "" {
 				b.Cursor(ui.CursorPointer)

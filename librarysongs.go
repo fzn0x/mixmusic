@@ -7,6 +7,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // saveOnYouTube saves a song to the user's library on YouTube Music, or
@@ -70,9 +71,9 @@ func (s *shell) librarySongItem(m *ui.Menu, t media.Track) {
 		return
 	}
 	saved := s.songInLibrary(t.ID) || s.savedApart(t)
-	label := "Add to library"
+	label := locales.LibraryAddToLibrary()
 	if saved {
-		label = "Remove from library"
+		label = locales.LibraryRemoveFromLibrary()
 	}
 	if m.Item(label).Disabled(s.keeping["song:"+t.ID]).Chosen() {
 		s.saveSong(t, !saved)
@@ -98,9 +99,9 @@ func (s *shell) saveSong(t media.Track, on bool) {
 				s.listSong(t, !on)
 				s.notes = append(s.notes, noticeOf(err))
 			case on:
-				s.notes = append(s.notes, notice("Added "+t.Title+" to your library on YouTube Music"))
+				s.notes = append(s.notes, notice(locales.LibrarySongAdded(t.Title)))
 			default:
-				s.notes = append(s.notes, notice("Removed "+t.Title+" from your library on YouTube Music"))
+				s.notes = append(s.notes, notice(locales.LibrarySongRemoved(t.Title)))
 			}
 		})
 	}()
@@ -130,7 +131,7 @@ func (s *shell) listSong(t media.Track, on bool) {
 // youtubeSongsList lists the songs of the user's library on YouTube
 // Music, in Library › YouTube Music.
 func (s *shell) youtubeSongsList(c *ui.Context) {
-	s.sectionTitle(c, "Songs in your library")
+	s.sectionTitle(c, locales.LibrarySongsTitle())
 	songs := s.youtubeSongs()
 	switch {
 	case !songs.done:
@@ -145,5 +146,5 @@ func (s *shell) youtubeSongsList(c *ui.Context) {
 		}
 	}
 	s.trackList(c, "youtube-songs", songs.value, trackListOptions{art: true, album: true,
-		empty: "No songs in your library on YouTube Music. A song's Add to library keeps it here without liking it."})
+		empty: locales.LibrarySongsEmpty()})
 }

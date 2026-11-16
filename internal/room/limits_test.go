@@ -2,6 +2,7 @@ package room
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"testing"
 	"time"
@@ -10,7 +11,10 @@ import (
 // TestConnectionsOfASourceAreBounded joins 32 guests from one address, as
 // many as a source may hold: the next can't connect, until one leaves.
 func TestConnectionsOfASourceAreBounded(t *testing.T) {
-	r := newTestRoom(t)
+	// The guests open their connections faster than a source may.
+	r := newTestRoomWith(t, func(s *Server) {
+		s.caps = &caps{unproven: maxUnproven, unprovenFrom: maxUnprovenFrom, tries: Tries, roomTries: RoomTries}
+	})
 	var in []*Session
 	for range maxConnsFrom {
 		in = append(in, r.join(newGuest(t, "Guest")))
@@ -111,5 +115,62 @@ func TestFramesReadAtTheirRate(t *testing.T) {
 	// 50 at once, then 50 at 50 a second: a second at least.
 	if d := time.Since(start); d < 900*time.Millisecond {
 		t.Fatalf("%d messages read in %v, at %d a second", sent, d, rate)
+	}
+}
+
+// TestSourceOpensAFewASecond opens connections from one source faster
+// than it may: past the burst, they're closed as they come, before TLS,
+// and the source opens more a moment later; another source opens its own
+// meanwhile.
+func TestSourceOpensAFewASecond(t *testing.T) {
+	l := &limitListener{most: 100, all: 100, rate: acceptRate, from: map[string]int{}, buckets: map[string]*bucket{}}
+	now := time.Now()
+	opened := 0
+	for range 3 * acceptBurst {
+		if l.opens("203.0.113.7", now) {
+			opened++
+		}
+	}
+	if opened != acceptBurst {
+		t.Fatalf("%d opened at once, want %d", opened, acceptBurst)
+	}
+	if !l.opens("198.51.100.1", now) {
+		t.Fatal("another source can't open one")
+	}
+	if !l.opens("203.0.113.7", now.Add(time.Second)) {
+		t.Fatal("the source can't open one a second later")
+	}
+	n := 0
+	for later := now.Add(time.Second); n < 100 && l.opens("203.0.113.7", later); n++ {
+	}
+	if n > acceptRate {
+		t.Fatalf("%d more in the same second", n)
+	}
+	// The buckets stay bounded, those of sources long quiet going first.
+	for i := range maxBuckets + 10 {
+		l.opens(fmt.Sprintf("10.%d.%d.1", i/256, i%256), now.Add(time.Duration(i)*time.Millisecond))
+	}
+	if len(l.buckets) > maxBuckets {
+		t.Fatalf("%d buckets", len(l.buckets))
+	}
+}
+
+// TestRoomClosesAConnectionPastTheRate knocks at a room from one source
+// faster than it may open connections: those past the burst can't even
+// take TLS.
+func TestRoomClosesAConnectionPastTheRate(t *testing.T) {
+	r := newTestRoom(t)
+	g := newGuest(t, "Hasty")
+	failed := 0
+	for range acceptBurst + 4 {
+		s, err := g.Knock(context.Background(), r.addr, &r.key, r.server.Secret, true)
+		if err != nil {
+			failed++
+			continue
+		}
+		s.Close()
+	}
+	if failed < 2 {
+		t.Fatalf("%d of %d knocks at once failed", failed, acceptBurst+4)
 	}
 }

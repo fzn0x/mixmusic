@@ -71,11 +71,15 @@ type caps struct {
 	// rate bounds the messages read of a connection each second
 	// (limits.go): maxRate when 0.
 	rate int
+	// accepts bounds the connections a source opens each second, after a
+	// burst of acceptBurst (limits.go): none when 0, as in tests of other
+	// bounds.
+	accepts int
 }
 
 func (c *caps) orDefault() caps {
 	if c == nil {
-		return caps{unproven: maxUnproven, unprovenFrom: maxUnprovenFrom, tries: Tries, roomTries: RoomTries}
+		return caps{unproven: maxUnproven, unprovenFrom: maxUnprovenFrom, tries: Tries, roomTries: RoomTries, accepts: acceptRate}
 	}
 	return *c
 }

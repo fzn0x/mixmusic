@@ -22,12 +22,27 @@ go to the services' pages, and cards are drawn on this computer.
   rows go from the end. The foot keeps its place at the bottom. The ground
   is the background, tinted by the accent at the top and plain from 60% of
   the way down, so the foot's corners are exactly the background.
-- **Scripts.** The bundled faces have Latin, Greek and Cyrillic letters.
-  A letter they lack comes from `Family.Fallback`, which the app fills
-  with `SystemFallback`: fonts the system has, looked up by name (Segoe
-  UI and Arial, the Yu Gothic, Microsoft YaHei and Malgun Gothic of
-  Windows; Arial Unicode, Geeza Pro and PingFang on macOS; DejaVu and Noto
-  on Linux), read once. Where none has the letter, it stays blank.
+- **Scripts.** The bundled faces have Latin letters; Selawik, the
+  default, has no Greek or Cyrillic ones. A letter they lack comes from
+  `Family.Fallback`, which the app fills with `SystemFallback`: fonts the
+  system has, read once, in the order a letter is looked up in them. On
+  Windows they are Segoe UI and Arial, then Nirmala UI (the scripts of
+  India), Leelawadee UI (Thai, Lao, Khmer), Ebrima and Gadugi (Ethiopic
+  and more), Himalaya, Javanese Text, Myanmar Text, Sylfaen, then the Yu
+  Gothic, Microsoft YaHei and Malgun Gothic faces, then Segoe UI Symbol.
+  On macOS they are looked up by name in the system, Supplemental,
+  `/Library` and `~/Library` font folders (Arial Unicode, Geeza Pro, the
+  Kohinoor and Sangam MN faces, Thonburi, Kefa, PingFang, Hiragino Sans
+  GB). On Linux, files named like Noto Sans's (`-Regular`, `-VF`, the
+  axes in brackets, `UI`, the CJK collection) are found under
+  `~/.local/share/fonts`, `~/.fonts`, `$XDG_DATA_DIRS/fonts` and
+  `/usr/share/fonts`, and `fc-match` is asked for the font of each
+  language, so a font the user set counts whatever its file is called. A
+  font whose outlines `golang.org/x/image` can't read (CFF2, as in a
+  variable CJK font) is skipped, and a collection gives its first face.
+  Where none has the letter, it stays blank. Letters are not shaped:
+  Devanagari conjuncts and Thai marks sit as the font's own advances
+  place them, and colour emoji are not drawn.
   Hebrew and Arabic read right to left: rows are reordered with
   `golang.org/x/text/unicode/bidi` and start at the right, and Arabic
   letters take their joined shapes from the presentation forms (`arabic.go`).

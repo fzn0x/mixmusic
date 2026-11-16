@@ -189,11 +189,12 @@ const MaxGuests = 200
 const MaxName = 50
 
 // CleanName is a name in rooms as a computer told it: without control
-// characters or the spaces around it, at most MaxName characters, or
+// characters, the marks that turn the way text runs, which would show it
+// as another name, or the spaces around it, at most MaxName characters, or
 // "Someone" when it told none.
 func CleanName(s string) string {
 	s = strings.Map(func(r rune) rune {
-		if unicode.IsControl(r) || r == unicode.ReplacementChar {
+		if unicode.IsControl(r) || unicode.Is(unicode.Bidi_Control, r) || r == unicode.ReplacementChar {
 			return -1
 		}
 		return r

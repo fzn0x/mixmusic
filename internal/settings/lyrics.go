@@ -99,6 +99,11 @@ type Lyrics struct {
 	// LyricsPreferWords has lyrics timed word by word from a later source
 	// win over lyrics timed line by line from an earlier one.
 	LyricsPreferWords bool `json:"lyricsPreferWords"`
+	// LyricsTimeVideos times a music video's lyrics that are its song's,
+	// as LRCLIB has them, to the video: MixMusic finds where the song
+	// starts in it, comparing the two recordings' audio, and moves each
+	// line by that much (#565). Off, they keep the song's times.
+	LyricsTimeVideos bool `json:"lyricsTimeVideos"`
 	// LyricsCaptionLanguage is the language of the captions lyrics come
 	// from, a code of ISO 639-1 as "ja", when the video has captions in
 	// it; "" is the video's own.
@@ -129,6 +134,7 @@ type Lyrics struct {
 func defaultLyrics() Lyrics {
 	var l Lyrics
 	l.LyricsSources = []LyricsSource{}
+	l.LyricsTimeVideos = true
 	l.LyricsStyle = LyricStyles[0]
 	l.LyricsSize = 1
 	l.LyricsBall = true

@@ -15,6 +15,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"net/netip"
 	"slices"
 	"strings"
 	"sync"
@@ -24,6 +25,7 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/portmap"
 	"github.com/fzn0x/mixmusic/internal/room"
 )
 
@@ -35,6 +37,11 @@ type RoomOptions struct {
 	// Listen listens for the guests' connections in place of every
 	// network.
 	Listen func() (net.Listener, error)
+	// Router asks the routers for the forward of the room's port, in place
+	// of the network's, and IPv6 tells this computer's public IPv6
+	// addresses (roomreach.go): without Router, nothing is asked.
+	Router *portmap.Client
+	IPv6   func() []netip.Addr
 	// Timing is the protocol's.
 	Timing room.Timing
 	// Heard tells where the player's track is heard now, in place of the
@@ -61,6 +68,9 @@ type roomState struct {
 	browsed  time.Time
 	shown    atomic.Pointer[[]FoundRoom]
 	watchers []*func(string)
+	// far is what rooms keep of friends outside the network (roomreach.go,
+	// roomfar.go).
+	far roomFar
 	// held is the start of the host's track that waits for its guests
 	// (roomhost.go), and following is set while the player follows a host
 	// (roomfollow.go).
@@ -85,10 +95,12 @@ func (a *App) roomOptions() RoomOptions {
 		o.Discovery = room.MDNS{}
 	}
 	if o.Listen == nil {
-		// Every network of the computer, at a port the system picks: the
-		// guests learn it from the announcement.
-		o.Listen = func() (net.Listener, error) { return net.Listen("tcp", ":0") }
+		// Every network of the computer, at the port kept for rooms: the
+		// guests on the network learn it from the announcement, those
+		// outside from the invite link.
+		o.Listen = a.listenRoom
 	}
+	o.Listen = a.reachable(o.Listen)
 	return o
 }
 

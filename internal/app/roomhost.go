@@ -165,6 +165,8 @@ func (rs *Rooms) Hosted() (HostedRoom, bool) {
 	h.codeMu.Lock()
 	code, link := h.code, h.link
 	h.codeMu.Unlock()
+	// With the addresses that reach it from outside (roomreach.go).
+	link = rs.a.reachLink(link)
 	return HostedRoom{Code: code, Link: link, Guests: membersOf(h.server.Members()), Blocked: membersOf(h.server.Blocked()),
 		Activity: h.server.Activity(), Waiting: h.server.Waiting()}, true
 }

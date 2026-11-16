@@ -99,13 +99,16 @@ func sin6(a netip.Addr) []byte {
 
 // TestRouteDump reads a dump of macOS's routing table: its default routes,
 // of IPv4 and IPv6, whose link-local gateway carries its interface, but a
-// route of a network, and half the internet, as a VPN takes.
+// route of a network, half the internet, as a VPN takes, and the default
+// route of one tunnel alone, as each of a VPN's has.
 func TestRouteDump(t *testing.T) {
 	var dump []byte
 	dump = append(dump, routeMsg(rtfUp|rtfGateway, 4, sin(0, 0, 0, 0), sin(192, 168, 1, 1), nil)...)
 	dump = append(dump, routeMsg(rtfUp, 4, sin(192, 168, 1, 0), append([]byte{20, 18, 4, 0}, make([]byte, 16)...), []byte{7, 0, 0, 0, 255, 255, 255})...)
 	dump = append(dump, routeMsg(rtfUp|rtfGateway, 9, sin(0, 0, 0, 0), sin(10, 8, 0, 1), []byte{5, 0, 0, 0, 128})...)
 	dump = append(dump, routeMsg(rtfUp|rtfGateway, 4, sin6(netip.IPv6Unspecified()), sin6(netip.MustParseAddr("fe80:4::1")), nil)...)
+	dump = append(dump, routeMsg(rtfUp|rtfGateway|rtfIfscope, 12, sin6(netip.IPv6Unspecified()), sin6(netip.MustParseAddr("fe80:c::")), nil)...)
+	dump = append(dump, routeMsg(rtfUp|rtfGateway|rtfIfscope, 4, sin(0, 0, 0, 0), sin(192, 168, 1, 1), nil)...)
 	got := gatewaysOf(routeDump(dump))
 	want := []netip.Addr{netip.MustParseAddr("192.168.1.1"), netip.MustParseAddr("fe80::1%4")}
 	if !slices.Equal(got, want) {

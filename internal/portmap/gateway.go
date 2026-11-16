@@ -164,6 +164,9 @@ const (
 	rtaGateway    = 0x2
 	rtaNetmask    = 0x4
 	darwinInet6   = 30
+	// rtfIfscope marks a route of one interface alone, as each tunnel
+	// of a VPN has a default one: the system's own is the one without.
+	rtfIfscope = 0x1000000
 )
 
 // routeDump reads the default routes of a dump of macOS's routing table,
@@ -183,7 +186,7 @@ func routeDump(b []byte) []route {
 		}
 		flags := le.Uint32(msg[8:])
 		addrs := le.Uint32(msg[12:])
-		if flags&(rtfUp|rtfGateway) != rtfUp|rtfGateway || addrs&(rtaDst|rtaGateway) != rtaDst|rtaGateway {
+		if flags&(rtfUp|rtfGateway) != rtfUp|rtfGateway || flags&rtfIfscope != 0 || addrs&(rtaDst|rtaGateway) != rtaDst|rtaGateway {
 			continue
 		}
 		var dst, gw, mask []byte

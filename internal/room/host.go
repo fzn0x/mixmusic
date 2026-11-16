@@ -75,6 +75,9 @@ type Server struct {
 	// Clock is the host's: the positions of its states are at its times.
 	Clock  Clock
 	Timing Timing
+	// Nearby tells the connections of this computer's own networks from
+	// the internet's (nearby.go): by its interfaces when nil.
+	Nearby *Nearby
 	// Changed, when set, is told, without waiting on it, as guests join,
 	// leave, drop off and come back, or are removed.
 	Changed func()
@@ -100,8 +103,11 @@ type Server struct {
 	blocked map[remote.Fingerprint]string
 	// adm counts the codes tried, and the connections that proved nothing
 	// yet (admit.go); caps, for tests, are its bounds.
-	adm      admission
-	caps     *caps
+	adm  admission
+	caps *caps
+	// nearOf, for tests, tells the connections of this computer's own
+	// networks in place of Nearby.
+	nearOf   func(addr string) bool
 	activity []Activity
 	// gen counts the codes the room had (SetCode), and previews are the
 	// connections that proved one and wait to join, by its count. toldLock
@@ -135,12 +141,14 @@ type guest struct {
 }
 
 // conn is a connection the server has: the key and the source of its
-// other end (sourceOf), and the messages that wait to go to it.
+// other end (sourceOf), whether that is of this computer's own networks
+// (near), and the messages that wait to go to it.
 type conn struct {
 	raw  net.Conn
 	f    *frames
 	key  remote.Fingerprint
 	src  string
+	near bool
 	held time.Time // when it proved the code or the link, while it waits to join (previews.go)
 	out  chan message
 	once sync.Once
@@ -315,7 +323,8 @@ func (s *Server) handle(raw net.Conn, u *unproven) {
 	if s.keeps(key) {
 		proven()
 	}
-	c := &conn{raw: tc, f: newFrames(tc, s.adm.caps.messageRate()), key: key, src: u.src, out: make(chan message, outQueue), gone: make(chan struct{})}
+	c := &conn{raw: tc, f: newFrames(tc, s.adm.caps.messageRate()), key: key, src: u.src, near: s.near(raw.RemoteAddr().String()),
+		out: make(chan message, outQueue), gone: make(chan struct{})}
 	c.f.Limit(handshakeMessage)
 	if !s.add(c) {
 		return
@@ -359,6 +368,18 @@ func (s *Server) handle(raw net.Conn, u *unproven) {
 	}
 	go c.write(t.silence())
 	s.stay(c)
+}
+
+// near reports whether addr, the other end of a connection, is of this
+// computer's own networks (nearby.go).
+func (s *Server) near(addr string) bool {
+	switch {
+	case s.nearOf != nil:
+		return s.nearOf(addr)
+	case s.Nearby != nil:
+		return s.Nearby.Of(addr)
+	}
+	return interfaces.Of(addr)
 }
 
 // until is how long until by, a moment at least.
@@ -442,7 +463,7 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 	// A try of a code counts before it runs, so that tries at once count.
 	tried := false
 	if reason == "" && byCode {
-		switch s.adm.tryCode(c.src, time.Now(), t.wait()) {
+		switch s.adm.tryCode(c.src, c.near, time.Now(), t.wait()) {
 		case tryRuns:
 			tried = true
 		case tryWaits:
@@ -464,7 +485,7 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 		}
 		ended = true
 		s.mu.Lock()
-		s.adm.endTry(c.src, wrong, time.Now(), t.wait())
+		s.adm.endTry(c.src, c.near, wrong, time.Now(), t.wait())
 		s.mu.Unlock()
 		s.tellLock()
 	}

@@ -6,9 +6,9 @@ package room
 // room counts. Each source, an IPv4 address or the /56 of an IPv6 one,
 // which one home changes within as it likes, tries Tries codes, then
 // waits; the whole room takes RoomTries wrong ones each Wait, then takes no
-// code until the wait is over: as many from its own network apart, so that
-// wrong codes from the internet lock no code out on the network (#562),
-// nor the other way. A try counts as it starts, before SPAKE2
+// code until the wait is over: as many from this computer's own networks
+// apart (nearby.go), so that wrong codes from the internet lock no code out
+// on the network (#562), nor the other way. A try counts as it starts, before SPAKE2
 // runs, so that tries at once count too. Links, of a secret too long to
 // guess, and guests that come back by their keys, aren't counted.
 //
@@ -119,7 +119,7 @@ type admission struct {
 	caps     caps
 	sources  map[string]*tries
 	room     tries
-	local    tries // of the room's own network, apart (localSource)
+	local    tries // of this computer's own networks, apart (nearby.go)
 	unproven []*unproven
 }
 
@@ -215,11 +215,12 @@ func (t *tries) check(limit int, now time.Time, wait time.Duration) try {
 	return tryRuns
 }
 
-// tryCode starts a try of a code from src, at now, before it runs, unless
-// src, or the room, waits after too many wrong ones, or so many run that,
-// all wrong, they would be. endTry ends it.
-func (a *admission) tryCode(src string, now time.Time, wait time.Duration) try {
-	room := a.roomOf(src)
+// tryCode starts a try of a code from src, of this computer's own networks
+// when near, at now, before it runs, unless src, or the room, waits after
+// too many wrong ones, or so many run that, all wrong, they would be.
+// endTry ends it, of the same near.
+func (a *admission) tryCode(src string, near bool, now time.Time, wait time.Duration) try {
+	room := a.roomOf(near)
 	switch room.check(a.caps.roomTries, now, wait) {
 	case tryWaits:
 		return tryLocked
@@ -264,10 +265,11 @@ func (t *tries) end(wrong bool, limit int, now time.Time, wait time.Duration) {
 	}
 }
 
-// endTry ends the try of a code from src that tryCode started: wrong, or
-// the code, or none at all, as one that ended before it was checked.
-func (a *admission) endTry(src string, wrong bool, now time.Time, wait time.Duration) {
-	a.roomOf(src).end(wrong, a.caps.roomTries, now, wait)
+// endTry ends the try of a code from src, near or not, that tryCode
+// started: wrong, or the code, or none at all, as one that ended before it
+// was checked.
+func (a *admission) endTry(src string, near, wrong bool, now time.Time, wait time.Duration) {
+	a.roomOf(near).end(wrong, a.caps.roomTries, now, wait)
 	if t := a.sources[src]; t != nil {
 		t.end(wrong, a.caps.tries, now, wait)
 	}

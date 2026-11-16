@@ -93,22 +93,22 @@ func TestRoomWideTriesHoldAcrossSources(t *testing.T) {
 	checked := 0
 	for i := range 200 {
 		src := fmt.Sprintf("10.0.%d.%d", i/250, i%250)
-		if a.tryCode(src, now, wait) != tryRuns {
+		if a.tryCode(src, true, now, wait) != tryRuns {
 			continue
 		}
 		checked++
-		a.endTry(src, true, now, wait)
+		a.endTry(src, true, true, now, wait)
 		now = now.Add(100 * time.Millisecond)
 	}
 	if checked != RoomTries {
 		t.Fatalf("the room checked %d codes in %v, from 200 sources", checked, 20*time.Second)
 	}
-	if v := a.tryCode("10.9.9.9", now, wait); v != tryLocked {
+	if v := a.tryCode("10.9.9.9", true, now, wait); v != tryLocked {
 		t.Fatalf("a new source, as the room waits: %v", v)
 	}
 	// The wait over, codes are checked again.
 	now = now.Add(wait)
-	if v := a.tryCode("10.9.9.9", now, wait); v != tryRuns {
+	if v := a.tryCode("10.9.9.9", true, now, wait); v != tryRuns {
 		t.Fatalf("after the wait: %v", v)
 	}
 }
@@ -121,17 +121,17 @@ func TestRightCodesAtOnceDontLockTheRoom(t *testing.T) {
 	now := time.Unix(1_000_000, 0)
 	const wait = time.Minute
 	for i := range RoomTries {
-		if v := a.tryCode(fmt.Sprintf("10.0.0.%d", i), now, wait); v != tryRuns {
+		if v := a.tryCode(fmt.Sprintf("10.0.0.%d", i), true, now, wait); v != tryRuns {
 			t.Fatalf("try %d: %v", i, v)
 		}
 	}
-	if v := a.tryCode("10.0.1.1", now, wait); v != tryBusy {
+	if v := a.tryCode("10.0.1.1", true, now, wait); v != tryBusy {
 		t.Fatalf("one more at once: %v", v)
 	}
 	for i := range RoomTries {
-		a.endTry(fmt.Sprintf("10.0.0.%d", i), false, now, wait)
+		a.endTry(fmt.Sprintf("10.0.0.%d", i), true, false, now, wait)
 	}
-	if v := a.tryCode("10.0.1.1", now, wait); v != tryRuns {
+	if v := a.tryCode("10.0.1.1", true, now, wait); v != tryRuns {
 		t.Fatalf("after the right codes: %v", v)
 	}
 }
@@ -146,8 +146,8 @@ func TestSourcesStayBounded(t *testing.T) {
 	const wait = time.Minute
 	for i := range 3 * maxSources {
 		src := fmt.Sprintf("[2001:db8:%x::1]:4000", i)
-		if a.tryCode(sourceOf(src), now, wait) == tryRuns {
-			a.endTry(sourceOf(src), true, now, wait)
+		if a.tryCode(sourceOf(src), false, now, wait) == tryRuns {
+			a.endTry(sourceOf(src), false, true, now, wait)
 		}
 		if len(a.sources) > maxSources {
 			t.Fatalf("%d sources counted", len(a.sources))
@@ -291,22 +291,22 @@ func TestRoomWindowRollsWithATryUnderWay(t *testing.T) {
 	a := newAdmission()
 	now := time.Unix(1_000_000, 0)
 	const wait = time.Minute
-	if a.tryCode("10.0.0.1", now, wait) != tryRuns {
+	if a.tryCode("10.0.0.1", true, now, wait) != tryRuns {
 		t.Fatal("the first try")
 	}
 	for i := range RoomTries - 1 {
 		src := fmt.Sprintf("10.0.1.%d", i)
-		if a.tryCode(src, now, wait) != tryRuns {
+		if a.tryCode(src, true, now, wait) != tryRuns {
 			t.Fatalf("try %d", i)
 		}
-		a.endTry(src, true, now, wait)
+		a.endTry(src, true, true, now, wait)
 	}
-	if v := a.tryCode("10.0.2.1", now, wait); v != tryBusy {
+	if v := a.tryCode("10.0.2.1", true, now, wait); v != tryBusy {
 		t.Fatalf("one more, with 29 wrong and one under way: %v", v)
 	}
 	// A minute on, the first try still under way, the minute rolled.
 	now = now.Add(wait + time.Second)
-	if v := a.tryCode("10.0.2.1", now, wait); v != tryRuns {
+	if v := a.tryCode("10.0.2.1", true, now, wait); v != tryRuns {
 		t.Fatalf("a minute on: %v", v)
 	}
 	// The sources are of the network: its count is the room's.

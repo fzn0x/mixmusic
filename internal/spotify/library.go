@@ -2,6 +2,8 @@ package spotify
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 )
@@ -31,11 +33,43 @@ func (c *Client) AddToPlaylist(ctx context.Context, playlistID string, uris ...s
 }
 
 // FollowPlaylist follows a playlist, which saves it to the user's library,
-// or unfollows it.
+// or unfollows it. It goes through /me/library as Save and Remove do, which
+// every Client ID has, and falls back to the route Spotify removed in
+// February 2026, which a Client ID made before then still answers, when
+// the new one answers 403 or 404.
 func (c *Client) FollowPlaylist(ctx context.Context, playlistID string, on bool) error {
+	_, err := c.followPlaylist(ctx, playlistID, on)
+	return err
+}
+
+// The routes FollowPlaylist tries, named for the live test.
+const (
+	followViaLibrary   = "/me/library"
+	followViaFollowers = "/playlists/{id}/followers"
+)
+
+// followPlaylist is FollowPlaylist, and says which route answered.
+func (c *Client) followPlaylist(ctx context.Context, playlistID string, on bool) (route string, err error) {
 	method := http.MethodDelete
 	if on {
 		method = http.MethodPut
 	}
-	return c.do(ctx, method, "/playlists/"+url.PathEscape(playlistID)+"/followers", nil, nil, nil)
+	uri := URI("playlist", playlistID)
+	err = c.do(ctx, method, "/me/library", url.Values{"uris": {uri}}, nil, nil)
+	if !refusedRoute(err) {
+		return followViaLibrary, err
+	}
+	old := c.do(ctx, method, "/playlists/"+url.PathEscape(playlistID)+"/followers", nil, nil, nil)
+	if old == nil {
+		return followViaFollowers, nil
+	}
+	return "", fmt.Errorf("spotify: the playlist was not %s: %s answered %w, and %s answered %w",
+		map[bool]string{true: "saved", false: "removed"}[on], followViaLibrary, err, followViaFollowers, old)
+}
+
+// refusedRoute reports whether err is Spotify answering 403 or 404 to a
+// route, as it does one a Client ID has no access to.
+func refusedRoute(err error) bool {
+	var api *APIError
+	return errors.As(err, &api) && (api.Status == http.StatusForbidden || api.Status == http.StatusNotFound)
 }

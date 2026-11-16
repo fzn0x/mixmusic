@@ -3,6 +3,7 @@ package spotify
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"os"
 	"testing"
 	"time"
@@ -46,11 +47,22 @@ func TestLiveCollaboration(t *testing.T) {
 	t.Logf("made %s", made.ID)
 	t.Cleanup(func() {
 		ctx := context.Background()
-		err := c.FollowPlaylist(ctx, made.ID, false)
-		t.Logf("taking it out of the library with DELETE /playlists/{id}/followers: %v", err)
+		// Each route on its own, then FollowPlaylist, which tries the
+		// new one first: the log says which one answered.
+		err := c.do(ctx, http.MethodDelete, "/me/library", url.Values{"uris": {"spotify:playlist:" + made.ID}}, nil, nil)
+		t.Logf("taking it out of the library with DELETE /me/library: %v", err)
 		if err != nil {
-			err = c.Remove(ctx, "spotify:playlist:"+made.ID)
-			t.Logf("with DELETE /me/library: %v", err)
+			err = c.do(ctx, http.MethodDelete, "/playlists/"+made.ID+"/followers", nil, nil, nil)
+			t.Logf("with DELETE /playlists/{id}/followers: %v", err)
+		}
+		if err == nil {
+			// Put it back and take it out through FollowPlaylist.
+			if err := c.FollowPlaylist(ctx, made.ID, true); err != nil {
+				t.Logf("saving it again with FollowPlaylist: %v", err)
+			}
+			route, err2 := c.followPlaylist(ctx, made.ID, false)
+			t.Logf("FollowPlaylist took it out by %s: %v", route, err2)
+			err = err2
 		}
 		if err != nil {
 			t.Errorf("the playlist %s is left on the account", made.ID)

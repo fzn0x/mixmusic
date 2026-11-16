@@ -95,6 +95,7 @@ func (s *shell) roomsLanding(c *ui.Context) {
 			}
 		}
 	})
+	s.joinAtAddress(c)
 	found := rs.Found()
 	if len(found) == 0 {
 		ui.Text(c, "No room is on the network now. Rooms show here, and in the player bar's devices menu, while MixMusic hosts one on this network.").
@@ -125,6 +126,7 @@ func (s *shell) hostedRoom(c *ui.Context, h app.HostedRoom) {
 	ui.Row(c).Gap(8).Children(func() {
 		if s.button(c, "room-copy-link", "copy invite link", true).Clicked() {
 			copyText(h.Link)
+			rs.LinkCopied()
 			s.notes = append(s.notes, notice("Copied the invite link"))
 		}
 		if s.button(c, "room-new-code", "new code", false).Clicked() {
@@ -134,6 +136,8 @@ func (s *shell) hostedRoom(c *ui.Context, h app.HostedRoom) {
 			rs.End()
 		}
 	})
+	// Friends outside this network (rooms_anywhere.go).
+	s.roomReach(c, h)
 	ui.Text(c, "Removed and blocked guests can't come back with the code or the link they have under a new name: a new code, and a new link, shut them out, and your guests stay.").
 		FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 	if h.Waiting {

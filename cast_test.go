@@ -50,7 +50,7 @@ func TestCastButton(t *testing.T) {
 	if err := tt.Click("Cast to a device"); err != nil {
 		t.Fatal(err)
 	}
-	want := []string{"This computer", "Kitchen · Google Nest Mini", "Living Room TV · Chromecast"}
+	want := []string{"This computer", "Kitchen · Google Nest Mini", "Living Room TV · Chromecast", "-", "Join a room…"}
 	if got := tt.Menu(); !slices.Equal(got, want) {
 		t.Errorf("menu %q, want %q", got, want)
 	}

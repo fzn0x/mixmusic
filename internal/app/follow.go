@@ -26,9 +26,28 @@ func (c *Collection) YouTubeLiked(ctx context.Context) (media.Playlist, error) {
 // Music. Those the user made are Editable, for tracks to go into them: the
 // ones YouTube offers to delete, and the others of the account's name.
 // Those of others the user collaborates on are Editable and Collaborative.
+//
+// A reader that asked (media.WithPartial) gets the playlists read so far
+// after each page, with those the user made marked, but not yet the
+// collaborations, which need the whole list (markCollaborations).
 func (c *Collection) YouTubePlaylists(ctx context.Context) ([]media.Playlist, error) {
+	if take := media.Partial[[]media.Playlist](ctx); take != nil {
+		own := ""
+		ctx = media.WithPartial(ctx, func(read []media.Playlist) {
+			read = slices.Clone(read)
+			if own == "" {
+				if me := c.a.youtubeAccount(ctx).Account; me != nil {
+					own = me.Name
+				}
+			}
+			markOwn(read, own)
+			take(read)
+		})
+	}
 	playlists, err := c.a.youtube.LibraryPlaylists(ctx)
 	if len(playlists) > 0 {
+		// The partial lists share these playlists: mark a copy.
+		playlists = slices.Clone(playlists)
 		if me := c.a.youtubeAccount(ctx).Account; me != nil {
 			markOwn(playlists, me.Name)
 		}

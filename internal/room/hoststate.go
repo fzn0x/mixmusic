@@ -26,6 +26,7 @@ func (s *Server) run(wake, stop <-chan struct{}) {
 		case <-tick.C:
 			s.expire()
 			s.tell(false)
+			s.RulesChanged()
 		case <-wake:
 			s.tell(true)
 			// What changes at once, as a seek and the play that follows,

@@ -43,6 +43,8 @@ type Activity struct {
 	At   time.Time
 	Name string
 	What string
+	// Song is the title of the song a guest added, or asked to.
+	Song string
 }
 
 // maxActivity bounds the activity a room keeps.
@@ -80,6 +82,10 @@ type Server struct {
 	// the room takes no code for a while, as too many wrong ones came:
 	// someone guesses the code.
 	Guessing func()
+	// Guests, when set, are the host's rules for its guests, and what its
+	// app does as they ask (rules.go): without, guests add no songs,
+	// control nothing, and join without asking.
+	Guests *Guests
 
 	mu      sync.Mutex
 	ln      net.Listener
@@ -99,6 +105,9 @@ type Server struct {
 	gen      int
 	previews map[*conn]int
 	toldLock time.Time
+	// asks are what the guests asked and what waits for the host's user,
+	// and a move (rules.go).
+	asks asks
 	// seq counts the track changes, and gate is the one that waits for
 	// the guests; starting is the state of its start, which the guests
 	// are told until the host's track plays.
@@ -583,6 +592,7 @@ func (s *Server) admit(c *conn, name string, st State) {
 	}
 	st = s.stateOf(st)
 	c.send(message{Type: "state", State: &st})
+	s.tellRules(c)
 }
 
 // note keeps an activity. s.mu is held.
@@ -595,7 +605,7 @@ func (s *Server) note(name, what string) {
 
 // stay runs a guest's stay in the room: it answers its pings, takes in
 // that it has a track ready, and lets it leave, until either side goes
-// quiet.
+// quiet; and takes in what it asks (fromGuest).
 func (s *Server) stay(c *conn) {
 	for m := range c.messages(s.Timing.silence()) {
 		switch m.Type {
@@ -613,6 +623,8 @@ func (s *Server) stay(c *conn) {
 			s.mu.Unlock()
 			s.changed(true)
 			return
+		default:
+			s.fromGuest(c, m)
 		}
 	}
 }

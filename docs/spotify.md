@@ -115,7 +115,7 @@ the tracks of each release, three at a time. Sound starts with the first
 release, and the others join the end of the queue as they are read. A
 song on a single and on its album plays once. A release that can't be
 read is passed over, and a toast says how many came; when none can, their
-top songs play instead.
+top songs play instead. Shuffle plays them shuffled, with the later releases scattered among the songs still to play. An artist's tile and its menu play them too.
 
 ## What Spotify allows apps
 

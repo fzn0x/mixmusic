@@ -29,6 +29,9 @@
   the list. A read that came in part tells how many songs came. An
   artist without a list, or whose list's first page failed, plays their
   top songs: for an artist of the music on this computer, all of theirs.
+  An artist's tile and its menu read the artist first (`Catalog.PlayArtistID`),
+  then play as the page does; the assistants' `play_result` reads the songs
+  whole (`Catalog.AllSongs`) and plays or queues them like an album.
 - **`internal/youtube`** reads YouTube Music through the API its website uses:
   search, suggestions (searches, then songs, albums, artists and
   playlists), the home and explore pages, charts, moods and genres, albums,
@@ -116,8 +119,10 @@
   song on two releases once by title, artists and length in seconds, and
   `each` given the new songs of each release in order. A release that
   fails leaves a `media.ShortList` of releases. `app.Catalog.ArtistSongs`
-  routes by service; the artist page's Play (`artistsongs.go`) plays the
-  first batch and enqueues the rest. The lists of the
+  routes by service, YouTube Music's artists to `YouTubeArtistSongs`. The
+  artist's Play and Shuffle (`internal/app/artistplay.go`) play it as they
+  do YouTube Music's: the first release plays at once and the later ones
+  join the queue. The lists of the
   user's library are read whole (`librarylists.go`): their playlists,
   saved albums and shows by offset, the first page, then the pages its
   count tells of, 3 at a time, as a 429 is waited out once, and on while

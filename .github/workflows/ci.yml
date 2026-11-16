@@ -369,11 +369,12 @@ jobs:
       # directory of a lower layer unless it redirects directories: some
       # ubuntu-latest runners don't, and the build stopped there on
       # "Invalid cross-device link". A copy of the installation on the
-      # runner's disk, mounted in its place, renames as any disk does.
+      # runner's disk renames as any disk does: FLATPAK_SYSTEM_DIR points
+      # flatpak and flatpak-builder at it, as the image has no mount(8).
       - name: The runtimes on the runner's disk
         run: |
           cp -a /var/lib/flatpak "$RUNNER_TEMP/flatpak"
-          mount --bind "$RUNNER_TEMP/flatpak" /var/lib/flatpak
+          echo "FLATPAK_SYSTEM_DIR=$RUNNER_TEMP/flatpak" >> "$GITHUB_ENV"
       - uses: actions/checkout@v7
         with:
           submodules: true # Flathub's shared modules

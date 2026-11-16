@@ -327,7 +327,7 @@ jobs:
       - name: The runtimes on the runner's disk
         run: |
           cp -a /var/lib/flatpak "$RUNNER_TEMP/flatpak"
-          mount --bind "$RUNNER_TEMP/flatpak" /var/lib/flatpak
+          echo "FLATPAK_SYSTEM_DIR=$RUNNER_TEMP/flatpak" >> "$GITHUB_ENV"
       - uses: actions/checkout@v7
         with:
           ref: ${{ env.TAG }}

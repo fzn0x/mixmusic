@@ -22,10 +22,10 @@ import (
 // TestLiveLyricsTiming finds where the songs of a few music videos start
 // in them, from their audio on YouTube, signed out, as the app does: the
 // video YouTube Music finds first for each search, its song as the
-// matcher finds it. It logs each shift and how each window matched,
-// rather than expecting shifts YouTube's copies may change. It runs with
-// MIXMUSIC_LIVE=1, more videos with MIXMUSIC_LIVE_VIDEOS naming searches
-// apart by commas:
+// matcher finds it. It logs each shift and speed, the note the lyrics
+// show with, and how each window matched, rather than expecting shifts
+// YouTube's copies may change. It runs with MIXMUSIC_LIVE=1, more videos
+// with MIXMUSIC_LIVE_VIDEOS naming searches apart by commas:
 //
 //	MIXMUSIC_LIVE=1 go test ./internal/app -run LiveLyricsTiming -v
 func TestLiveLyricsTiming(t *testing.T) {
@@ -73,7 +73,7 @@ func TestLiveLyricsTiming(t *testing.T) {
 		switch {
 		case err == nil:
 			matched++
-			t.Logf("%s (%s), song %s: %+.3fs, in %v: %s", video.Title, videoID, songID, res.Shift.Seconds(), took, res.Windows)
+			t.Logf("%s (%s), song %s: %+.3fs, at %.6f, %q, in %v: %s", video.Title, videoID, songID, res.Shift.Seconds(), res.Speed, timedNote(res.Shift, res.Speed), took, res.Windows)
 		case errors.Is(err, align.ErrNoMatch):
 			t.Logf("%s (%s), song %s: no clear match, in %v: %v", video.Title, videoID, songID, took, err)
 		default:

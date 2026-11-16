@@ -378,7 +378,7 @@ func (n *notch) body(c *ui.Context, t media.Track) {
 			})
 		})
 		n.progress(c, t)
-		ui.Row(c).Gap(14).Justify(ui.Center).AlignItems(ui.Center).Children(func() {
+		ui.Row(c).Direction(ui.LeftToRight).Gap(14).Justify(ui.Center).AlignItems(ui.Center).Children(func() {
 			if n.transport(c, "notch-previous", "previous", locales.PlayerPrevious(), false, false).Clicked() {
 				s.p.Previous()
 			}
@@ -456,7 +456,7 @@ func (n *notch) progress(c *ui.Context, t media.Track) {
 	if !n.seeking {
 		n.seekTo = s.st.Position.Seconds()
 	}
-	ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).Gap(8).AlignItems(ui.Center).Children(func() {
 		caption := func(text string) {
 			ui.Text(c, text).FontSize(11).TextColor(notchMuted).FontFeatures("tnum").Width(34).TextAlign(ui.Center).Shrink(0)
 		}

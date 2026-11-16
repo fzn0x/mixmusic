@@ -116,7 +116,9 @@ func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 		})
 	}
 	s.remoteProgress(c, id, v)
-	ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
+	// The controls read left to right in every language, at the start of the
+	// page.
+	ui.Row(c).Direction(ui.LeftToRight).AlignSelf(ui.Start).Gap(12).AlignItems(ui.Center).Children(func() {
 		has := st.Track != nil
 		if s.roundButton(c, "remote-previous", "previous", locales.PlayerPrevious(), false, !has).Clicked() {
 			s.remoteDo(id, remote.Command{Op: remote.OpPrevious})
@@ -172,7 +174,7 @@ func (s *shell) remoteProgress(c *ui.Context, id string, v app.RemoteView) {
 		// The next whole second of the track.
 		c.After(time.Second - time.Duration(r.seekTo*float64(time.Second))%time.Second)
 	}
-	ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).Gap(8).FillWidth().MaxWidth(640).Children(func() {
 		ui.Text(c, clock(time.Duration(r.seekTo*float64(time.Second)))).FontSize(k.captionSize()).TextColor(k.muted).
 			FontFeatures("tnum").Width(44).TextAlign(ui.End)
 		label := locales.PlayerSeek()

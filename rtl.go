@@ -4,7 +4,10 @@ package main
 // window out from the right, as the window's direction says, so the rail is
 // on the right, rows start at the right and the side panel is on the left.
 // MyGo mirrors neither physical edges nor what the app draws: the views use
-// the start and end forms of edges, and what follows here.
+// the start and end forms of edges, and what follows here. The media
+// controls stay left to right in every language (Direction(ui.LeftToRight)
+// where they are built), as playback runs one way: the seek bars and their
+// times, previous, play and next, the volume and the equalizer's bands.
 
 import "github.com/egoist/mygo/ui"
 

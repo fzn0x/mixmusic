@@ -223,7 +223,7 @@ func (s *shell) setDisliked(t media.Track, on bool) {
 func (s *shell) transport(c *ui.Context) {
 	k := &s.lk
 	_, hasTrack := s.st.Current()
-	ui.Row(c).Gap(12).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).Gap(12).Children(func() {
 		if s.iconButton(c, "shuffle", "shuffle", locales.PlayerShuffle(), s.st.Shuffle, 18).Clicked() {
 			s.p.ToggleShuffle()
 		}
@@ -283,7 +283,7 @@ func (s *shell) progress(c *ui.Context) {
 	k := &s.lk
 	if s.st.Live {
 		s.seeking = false
-		ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
+		ui.Row(c).Direction(ui.LeftToRight).Gap(8).FillWidth().MaxWidth(640).Children(func() {
 			ui.Text(c, k.sentence(locales.PlayerLive())).FontSize(k.captionSize()).TextColor(k.accent).Width(44).TextAlign(ui.End)
 			edge := 1.0
 			ui.Slider(c.Key("seek"), &edge, 0, 1).Grow(1).MinWidth(0).Label(locales.PlayerNoSeeking()).Disabled(true)
@@ -299,7 +299,7 @@ func (s *shell) progress(c *ui.Context) {
 	if !s.seeking {
 		s.seekTo = s.st.Position.Seconds()
 	}
-	ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).Gap(8).FillWidth().MaxWidth(640).Children(func() {
 		ui.Text(c, clock(time.Duration(s.seekTo*float64(time.Second)))).FontSize(k.captionSize()).TextColor(k.muted).
 			FontFeatures("tnum").Width(44).TextAlign(ui.End)
 		seek := s.seekSlider(c, &s.seekTo, max(dur.Seconds(), 1)).Grow(1).MinWidth(0).KeepFocus().
@@ -402,7 +402,7 @@ func (s *shell) volumeControl(c *ui.Context) {
 	if s.st.Muted {
 		v = 0
 	}
-	s.wheelVolume(ui.Row(c).Gap(4).Width(140).MinWidth(80)).Children(func() {
+	s.wheelVolume(ui.Row(c).Direction(ui.LeftToRight).Gap(4).Width(140).MinWidth(80)).Children(func() {
 		name, label := muteOf(s.st)
 		if s.iconButton(c, "mute", name, label, false, 18).Clicked() {
 			s.p.ToggleMute()

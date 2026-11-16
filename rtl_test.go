@@ -11,6 +11,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/internal/remote/remotetest"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
@@ -161,4 +162,83 @@ func TestLineIconTurns(t *testing.T) {
 			}
 		}
 	}
+}
+
+// TestRightToLeftMediaControls keeps the media controls left to right in a
+// window laid out right to left, as playback runs one way in every
+// language (#564): the transport, the seek bar and its times, the volume,
+// the mini player's and the now playing page's, and the equalizer's bands.
+// The bars fill from the left: a click a quarter along seeks a quarter in.
+func TestRightToLeftMediaControls(t *testing.T) {
+	s := rtlShell(t, settings.LayoutTiles)
+	s.panel = ""
+	tt := rtlTester(s, 1280, 820, ui.RightToLeft)
+	show(s, tt, "/")
+	inOrder(t, tt, "the player bar", locales.PlayerShuffle(), locales.PlayerPrevious(), locales.PlayerPause(), locales.PlayerNext(),
+		locales.PlayerRepeatOff())
+	inOrder(t, tt, "the seek bar", "1:00", locales.PlayerSeek())
+	inOrder(t, tt, "the volume", locales.VolumeMute(), locales.PlayerVolume())
+	seek := placeOf(t, tt, locales.PlayerSeek())
+	tt.ClickAt(seek.X+seek.W/4, seek.Y+seek.H/2)
+	s.settle(t, func(st player.State) bool { return st.Position > 40*time.Second && st.Position < 60*time.Second })
+	volume := placeOf(t, tt, locales.PlayerVolume())
+	tt.ClickAt(volume.X+volume.W/4, volume.Y+volume.H/2)
+	s.settle(t, func(st player.State) bool { return st.Volume > 0.1 && st.Volume < 0.4 })
+
+	show(s, tt, "/now-playing")
+	inOrder(t, tt, "the now playing page", locales.PlayerPause(), locales.PlayerNext())
+
+	mini := ui.NewTester(s.miniView, 420, 132)
+	mini.SetDirection(ui.RightToLeft)
+	inOrder(t, mini, "the mini player", locales.PlayerShuffle(), locales.PlayerPrevious(), locales.PlayerPause(), locales.PlayerNext())
+	if title := placeOf(t, mini, testTracks[1].Title); title.X+title.W > 420-100 {
+		t.Errorf("the mini player's title is at %+v, over its artwork, which is at the right", title)
+	}
+	at := s.p.State().Position
+	if want := clock(at) + " / " + clockLength(211*time.Second); !mini.HasText(want) {
+		t.Errorf("the mini player doesn't show %q: %q", want, mini.Texts())
+	}
+	bar := placeOf(t, mini, locales.PlayerSeek())
+	mini.ClickAt(bar.X+bar.W*3/4, bar.Y+bar.H/2)
+	s.settle(t, func(st player.State) bool { return st.Position > 150*time.Second && st.Position < 170*time.Second })
+
+	eq := rtlTester(s, 1280, 3600, ui.RightToLeft)
+	show(s, eq, "/settings/playback")
+	inOrder(t, eq, "the equalizer", locales.EqualizerBandDB(locales.EqualizerPreamp()), locales.EqualizerBandDB("32"),
+		locales.EqualizerBandDB("1k"), locales.EqualizerBandDB("16k"))
+}
+
+// TestRightToLeftRemote keeps the controls of another computer left to
+// right on its page, as the player bar's: its transport, its volume, and
+// its seek bar, which a click a quarter along moves a quarter in.
+func TestRightToLeftRemote(t *testing.T) {
+	n := remotetest.New()
+	desk := newRemoteShell(t, n, "Desktop")
+	lap := newRemoteShell(t, n, "Laptop")
+	dt, lt := tester(t, desk), tester(t, lap)
+	if err := desk.a.Remote().SetOn(true); err != nil {
+		t.Fatal(err)
+	}
+	desk.p.PlayTracks(testTracks, 0)
+	desk.settle(t, func(st player.State) bool { return st.Playing })
+	pc := found(t, lap, "Desktop")
+	show(lap, lt, remotePath(pc.ID))
+	click(t, lap, lt, "pair")
+	var code string
+	untilBoth(t, desk, dt, lap, lt, "the code", func() bool {
+		c, ok := desk.a.Remote().Code()
+		code = c.Code
+		return ok
+	})
+	lt.Type(code)
+	lap.drain()
+	lt.Frame()
+	click(t, lap, lt, "pair")
+	lt.SetDirection(ui.RightToLeft)
+	untilBoth(t, desk, dt, lap, lt, "what plays there", func() bool { return lt.HasText("Midnight City") })
+	inOrder(t, lt, "the remote", locales.PlayerPrevious(), locales.PlayerPause(), locales.PlayerNext(), locales.PlayerVolume())
+	seek := placeOf(t, lt, locales.PlayerSeek())
+	lt.ClickAt(seek.X+seek.W/4, seek.Y+seek.H/2)
+	lap.drain()
+	desk.settle(t, func(st player.State) bool { return st.Position > 40*time.Second && st.Position < 65*time.Second })
 }

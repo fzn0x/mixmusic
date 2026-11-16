@@ -64,19 +64,23 @@ func (s *shell) miniVolume(c *ui.Context) {
 			Background(k.raised).Border(1, k.border).Shadow(0, 8, 24, -8, ui.RGBA(0, 0, 0, 0.45))
 		s.wheelVolume(panel)
 		panel.Children(func() {
-			v := s.st.Volume
-			if s.st.Muted {
-				v = 0
-			}
-			// A click leaves the focus where it was, as the player bar's
-			// does: the slider closes once the pointer leaves it.
-			slider := ui.Slider(c.Key("mini-volume"), &v, 0, 1).Width(112).KeepFocus().Label(locales.VolumeCurveGroup())
-			if slider.Changed() {
-				s.p.SetVolume(v)
-			}
-			_, _, held := slider.Dragged()
-			focused = slider.Focused()
-			st.inSlider = panel.Hovered() || held || slider.FocusVisible()
+			// The slider fills from the left in every language; the panel
+			// opens at the button's end all the same.
+			ui.Row(c).Direction(ui.LeftToRight).Children(func() {
+				v := s.st.Volume
+				if s.st.Muted {
+					v = 0
+				}
+				// A click leaves the focus where it was, as the player bar's
+				// does: the slider closes once the pointer leaves it.
+				slider := ui.Slider(c.Key("mini-volume"), &v, 0, 1).Width(112).KeepFocus().Label(locales.VolumeCurveGroup())
+				if slider.Changed() {
+					s.p.SetVolume(v)
+				}
+				_, _, held := slider.Dragged()
+				focused = slider.Focused()
+				st.inSlider = panel.Hovered() || held || slider.FocusVisible()
+			})
 		})
 	})
 	if open && !st.open {

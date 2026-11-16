@@ -321,7 +321,7 @@ func (s *Server) handle(raw net.Conn, u *unproven) {
 			return
 		}
 		proven()
-		c.f.Limit(0)
+		c.f.Limit(guestMessage)
 	case wantJoin:
 		if !s.join(c, hello, name, refuse, proven, proveBy) {
 			return
@@ -475,7 +475,7 @@ func (s *Server) join(c *conn, hello message, name string, refuse func(string), 
 	// Proven: its place among the unproven goes to another, and its
 	// messages are a guest's; until it joins, a new code ends it.
 	proven()
-	c.f.Limit(0)
+	c.f.Limit(guestMessage)
 	s.mu.Lock()
 	newCode := s.gen != gen
 	if !newCode {

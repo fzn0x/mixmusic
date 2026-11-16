@@ -183,6 +183,19 @@ func sameSet(a, b []string) bool {
 // locales.In(tag).Title().
 var called = regexp.MustCompile(`\blocales\.(?:In\([^()]*\)\.)?([A-Z][A-Za-z0-9_]*)\b`)
 
+// TestKeysAreSorted keeps each catalog's keys in order, so a key is found,
+// and added, in one place.
+func TestKeysAreSorted(t *testing.T) {
+	for _, tag := range append([]string{"en"}, translations(t)...) {
+		keys := readCatalog(t, tag).keys
+		for i := 1; i < len(keys); i++ {
+			if keys[i] < keys[i-1] {
+				t.Errorf("%s.json: %s comes after %s", tag, keys[i], keys[i-1])
+			}
+		}
+	}
+}
+
 // TestEveryMessageIsSaid finds, for each message of en.json, the app's Go
 // code that says it: a message nothing says is left for translators for
 // nothing.

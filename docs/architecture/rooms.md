@@ -167,17 +167,18 @@ few computers that proved nothing yet (`admit.go`).
   The room holds 4 of a source and 32 in all: a new one takes the place
   of the oldest of its source, or of the source that holds the most, and
   each waits 5 minutes at most (`Preview`), then is told the preview
-  ended. Guests, and those that come back by their keys, take no
-  preview's place.
+  ended. One that waits for the host's user to let it in
+  ([Asking before a join](#asking-before-a-join)) is a preview too.
+  Guests, and those that come back by their keys, take no preview's
+  place.
 - **The unproven.** A connection holds one of 32 places in the room, 4 of a
   source, from its accepting until it proved the code, the link or its
   key, or ended, 5 s at most in all (`Prove`), not a Silence for each
   step. A new one takes the place of the oldest of its source, when the
   source holds 4, and of the oldest of the source that holds the most,
   when the room holds 32: held open, connections keep no one out, and a
-  flood of many sources takes its own places, not a far guest's; it
-  must open them
-  faster than a proof takes. A guest the room keeps, which comes back by
+  flood of many sources takes its own places, not a far guest's; it must
+  open them faster than a proof takes. A guest the room keeps, which comes back by
   its key, gives its place back as soon as TLS tells its key. Until it
   proved something, a connection's messages are of 4 KiB at most, refused
   from their length before any of them is read (`Frames.Limit`); a hello

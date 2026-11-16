@@ -608,7 +608,12 @@ func roomProblem(name string, err error) string {
 	case errors.Is(err, room.ErrBusy):
 		return name + "'s room checks other codes: try again in a moment."
 	case errors.Is(err, room.ErrBlocked):
-		return name + " blocked this computer from the room."
+		if name == "" || name == "The room" {
+			// A room known by its address alone, whose host's name the
+			// knock never learned.
+			return "This room blocked this computer."
+		}
+		return name + " blocked this computer."
 	case errors.Is(err, room.ErrRemoved):
 		return name + " removed you from the room."
 	case errors.Is(err, room.ErrDeclined):

@@ -72,3 +72,38 @@ func TestNoShiftOfATakeJustPastMaxSpeed(t *testing.T) {
 		t.Errorf("a take 0.95%% faster: speed %.6f, want %.6f, %v: %s", r.Speed, want, err, r.Windows)
 	}
 }
+
+// overScene returns pcm with its stretch from from to to, at rate, a scene
+// instead: a video that leaves the song for a scene there, and comes back
+// to it in time.
+func overScene(pcm []float32, from, to time.Duration, seed uint64) []float32 {
+	a := int(int64(from) * rate / int64(time.Second))
+	b := int(int64(to) * rate / int64(time.Second))
+	return aligntest.Join(pcm[:a], aligntest.Scene(seed, to-from+time.Second, rate)[:b-a], pcm[b:])
+}
+
+// TestShiftOfTwoWindows finds the song at its own speed when only two
+// windows match clearly, as a line fits any two: the video leaves the song
+// for a scene over its third.
+func TestShiftOfTwoWindows(t *testing.T) {
+	video := overScene(offSpeed(131, 1, 8400*time.Millisecond), 141*time.Second, 165*time.Second, 134)
+	r, err := measure(t, song(131), video, rate)
+	if err != nil {
+		t.Fatalf("shift: %v", err)
+	}
+	if d := r.Shift - 8400*time.Millisecond; d < -10*time.Millisecond || d > 10*time.Millisecond || r.Speed != 1 {
+		t.Errorf("shift %v, speed %v, want 8.4s at 1: %s", r.Shift, r.Speed, r.Windows)
+	}
+	t.Logf("shift %v, speed %v: %s", r.Shift, r.Speed, r.Windows)
+}
+
+// TestNoShiftOfTwoWindowsOffSpeed finds no shift of a take 0.26% faster
+// when only two windows match clearly, 140 ms apart: a speed fits any two,
+// so it is taken only from all three. With the third, it is found.
+func TestNoShiftOfTwoWindowsOffSpeed(t *testing.T) {
+	whole := offSpeed(141, 1.0026, 2900*time.Millisecond)
+	if _, err := measure(t, song(141), whole, rate); err != nil {
+		t.Fatalf("the whole take: %v", err)
+	}
+	noMatch(t, song(141), overScene(whole, 136*time.Second, 160*time.Second, 144))
+}

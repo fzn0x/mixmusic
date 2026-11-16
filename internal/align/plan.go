@@ -23,12 +23,13 @@ const (
 	// further clear. The same recording matches itself at 0.95 or more,
 	// and a song of one loop each bar of it at nearly as much.
 	Clearance = 0.04
-	// Agree is how far each window that matches lands at most from the
-	// line they fit: of where the song starts in the video, and how fast
-	// it plays there (#748).
+	// Agree is how far each window lands at most from the line all of
+	// them fit, when all match: of where the song starts in the video, and
+	// how fast it plays there (#748). When only two match, their shifts
+	// lie that far apart at most.
 	Agree = 100 * time.Millisecond
 	// MaxSpeed is how much faster or slower the song plays in the video at
-	// most, as the line the windows fit tells.
+	// most, as the windows that match tell.
 	MaxSpeed = 0.01
 	// MinOverlap is how long a window is at least: the song's and the
 	// video's audio overlap that much at each shift searched.
@@ -117,8 +118,11 @@ type Result struct {
 // its Video, as Levels made them from where each was read. It is
 // ErrNoMatch unless two windows or more match clearly: their best match
 // reaches MinScore, stands clear of the next best and isn't at the edge
-// of the shifts searched; and each of those that do lands within Agree of
-// the line they fit, whose speed is within MaxSpeed of 1.
+// of the shifts searched. When all of them do, each lands within Agree of
+// the line they fit, whose speed is within MaxSpeed of 1. When two do,
+// as a line fits any two, the speed is 1: their shifts agree within
+// Agree, and tell the song plays at a speed within MaxSpeed of its own,
+// and the shift is the mean of theirs (#565).
 func (p Plan) Shift(windows []Envelope, video Envelope) (Result, error) {
 	if video.At > 0 {
 		video = video.From(video.At + settle)
@@ -159,11 +163,28 @@ func (p Plan) Shift(windows []Envelope, video Envelope) (Result, error) {
 	if len(clear) < 2 {
 		return r, why("too few windows match clearly")
 	}
-	// The line of the windows' shifts by the song's times of their
-	// middles, by least squares: its slope is the speed less 1, and where
-	// it meets the song's 0:00 the shift. A window the video plays at
-	// another speed matches best with its middle on the video's, so its
-	// middle, not its start, lies on the line.
+	if len(clear) < len(p.starts) {
+		// Not all the windows match, and a line fits any two: the song
+		// plays at its own speed.
+		least, most, sum := clear[0].shift, clear[0].shift, time.Duration(0)
+		for _, m := range clear {
+			least, most, sum = min(least, m.shift), max(most, m.shift), sum+m.shift
+		}
+		if most-least > Agree {
+			return r, why("the windows disagree")
+		}
+		first, last := clear[0], clear[len(clear)-1]
+		if speed := float64(last.shift-first.shift) / float64(last.start-first.start); speed <= -MaxSpeed || speed >= MaxSpeed {
+			return r, why("the speeds differ")
+		}
+		r.Shift, r.Speed = (sum / time.Duration(len(clear))).Round(time.Millisecond), 1
+		return r, nil
+	}
+	// All the windows match: the line of their shifts by the song's times
+	// of their middles, by least squares. Its slope is the speed less 1,
+	// and where it meets the song's 0:00 the shift. A window the video
+	// plays at another speed matches best with its middle on the video's,
+	// so its middle, not its start, lies on the line.
 	middle := func(m matched) float64 { return (m.start + p.length/2).Seconds() }
 	var at, by float64 // the means of the middles and of the shifts
 	for _, m := range clear {

@@ -38,6 +38,8 @@ type message struct {
 	// tell a song a guest adds, in Track, by its number, in Seq, and what
 	// became of it, in Reason (songs.go).
 	Rules *Rules `json:"rules,omitempty"`
+	// control: what a guest asks the host's player to do (control.go).
+	Do string `json:"do,omitempty"`
 	// prepare and ready: a track change, which the host starts once its
 	// guests have it ready.
 	Seq   int64              `json:"seq,omitempty"`

@@ -1,8 +1,9 @@
 package room
 
 // The host's rules for its guests (#734): what becomes of the songs they
-// add (songs.go). The host checks each ask of a guest as it comes, by the
-// rules of that moment: whose it is, how often it asks, and how much.
+// add (songs.go), and whether they may control its player (control.go).
+// The host checks each ask of a guest as it comes, by the rules of that
+// moment: whose it is, how often it asks, and how much.
 
 import (
 	"time"
@@ -15,6 +16,9 @@ type Rules struct {
 	// Songs is what becomes of the songs guests add: SongsAdd, SongsAsk,
 	// or SongsOff, as anything else is.
 	Songs string `json:"songs,omitempty"`
+	// Control lets the guests play, pause, and move to the next or the
+	// last track of the host's queue.
+	Control bool `json:"control,omitempty"`
 }
 
 func (r Rules) clean() Rules {
@@ -34,6 +38,9 @@ type Guests struct {
 	Playable func(t remote.QueueTrack) bool
 	// Add adds t, which from added, to the host's queue.
 	Add func(from Member, t remote.QueueTrack) error
+	// Control has the host's player do what from asks: Play, Pause, Next
+	// or Previous.
+	Control func(from Member, do string) error
 	// Asks tells the host's user of what waits for their answer, in
 	// note's words.
 	Asks func(note string)
@@ -143,7 +150,7 @@ func (s *Session) Rules() (Rules, bool) {
 
 // limits are what a guest may still ask.
 type limits struct {
-	songs bucket
+	songs, controls bucket
 }
 
 // bucket lets size asks through at once, then one every every.

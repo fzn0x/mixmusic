@@ -155,21 +155,18 @@ func TestMapByUPnP(t *testing.T) {
 	}
 }
 
-// TestUPnPForGood asks a router whose UPnP takes forwards for good alone:
-// the forward has no lifetime, and Delete removes it.
-func TestUPnPForGood(t *testing.T) {
+// TestUPnPForGoodIsRefused asks a router whose UPnP takes forwards for
+// good alone: it is asked for none, as one left behind would stay.
+func TestUPnPForGoodIsRefused(t *testing.T) {
 	r := newRouter(t, "192.0.2.44")
 	r.Set(func(r *portmaptest.Router) { r.PCP, r.NATPMP, r.Permanent = false, false, true })
-	c := clientOf(r)
-	m, err := c.Map(context.Background(), 41234, 30*time.Minute)
-	if err != nil {
-		t.Fatal(err)
+	_, err := clientOf(r).Map(context.Background(), 41234, 30*time.Minute)
+	var re *RefusedError
+	if !errors.As(err, &re) || re.Code != 725 || re.Method != UPnP {
+		t.Fatalf("Map: %v", err)
 	}
-	if m.Lifetime != 0 || forwardOf(t, r, 41234).Lifetime != 0 {
-		t.Fatalf("mapped %+v; the router keeps %+v", m, r.Forwards())
-	}
-	if err := c.Delete(context.Background(), m); err != nil || len(r.Forwards()) != 0 {
-		t.Fatalf("Delete: %v; the router keeps %+v", err, r.Forwards())
+	if len(r.Forwards()) != 0 || asked(r, "AddPortMapping") != 1 {
+		t.Fatalf("the router keeps %+v, and was asked %v", r.Forwards(), r.Asked())
 	}
 }
 

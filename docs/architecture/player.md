@@ -44,7 +44,13 @@
   to its start, plays another track, or tells it plays on well past the
   track's end: MixMusic's own device, given a track with nothing after it,
   may stay on it once it ended, its position counting on (#373). The time
-  shown never passes the track's end.
+  shown never passes the track's end. Leaving the device, the player
+  pauses the track it follows there. A Spotify Connect device that plays
+  something else is left to whoever plays it. MixMusic's own device,
+  whose sound comes out of MixMusic, is hushed instead once the player sent
+  it a play (`sounds`), whatever it plays: a track lost there, one whose
+  play failed after it took it, or one it went on to by itself past the
+  queue's (#745). A device MixMusic sent nothing to is told nothing.
 - **Lists that play while they're read** (`queue_list.go`, #543):
   `PlayList` plays the first part of a list as `PlayAll` does, and
   returns a `List`, whose `Add` adds each part after it as it comes: in

@@ -114,7 +114,8 @@ func TestLinuxFontFolders(t *testing.T) {
 	}
 	want := []string{
 		"NotoSans-Regular.ttf", "NotoSansDevanagari[wdth,wght].ttf", "NotoSansBengaliUI-Regular.ttf",
-		"NotoSansThai-Regular.ttf", "NotoSansCJK-VF.ttc", "NotoSansCJKjp-Regular.otf", "DejaVuSans.ttf",
+		"NotoSansThai-Regular.ttf", "NotoSansCJK-VF.ttc", "NotoSansCJKjp-Regular.otf", "NotoColorEmoji.ttf",
+		"DejaVuSans.ttf",
 	}
 	if strings.Join(got, "\n") != strings.Join(want, "\n") {
 		t.Errorf("found\n%s\nwant\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))

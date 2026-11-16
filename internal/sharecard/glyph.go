@@ -15,8 +15,12 @@ import (
 const maxGlyphArea = 4096 * 4096
 
 // drawGlyph draws glyph gid of d, through fc, scale pixels to the font's
-// unit, its origin at x and y, in ink.
+// unit, its origin at x and y: in colour when the font has it in colour,
+// else its outline in ink.
 func (s *shaper) drawGlyph(img *image.NRGBA, d *fontData, fc *face, gid gotext.GID, scale, x, y float64, ink color.NRGBA) {
+	if s.drawColour(img, d, fc, gid, scale, x, y, ink) {
+		return
+	}
 	out, ok := fc.GlyphDataOutline(gid)
 	if !ok {
 		return

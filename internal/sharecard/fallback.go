@@ -31,7 +31,8 @@ var systemFonts = map[string][]string{
 		`Nirmala.ttf`, `LeelawUI.ttf`, `ebrima.ttf`, `gadugi.ttf`, `himalaya.ttf`, `javatext.ttf`, `mmrtext.ttf`,
 		`sylfaen.ttf`, `mvboli.ttf`,
 		`YuGothR.ttc`, `msyh.ttc`, `malgun.ttf`, `meiryo.ttc`, `msjh.ttc`, `simsun.ttc`,
-		`seguisym.ttf`,
+		// Emoji in colour, before the symbols' outlines.
+		`seguiemj.ttf`, `seguisym.ttf`,
 	},
 	"darwin": {
 		`Arial Unicode.ttf`, `ArialHB.ttc`, `GeezaPro.ttc`,
@@ -42,7 +43,7 @@ var systemFonts = map[string][]string{
 		`Myanmar Sangam MN.ttc`, `Khmer Sangam MN.ttf`, `Lao Sangam MN.ttf`, `ThonburiUI.ttc`, `Thonburi.ttc`,
 		`KefaIII.ttf`, `NotoSansArmenian.ttc`, `SFArmenian.ttf`, `SFGeorgian.ttf`, `SFHebrew.ttf`,
 		`PingFang.ttc`, `Hiragino Sans GB.ttc`, `AppleSDGothicNeo.ttc`, `STHeiti Light.ttc`,
-		`Arial.ttf`, `Apple Symbols.ttf`,
+		`Arial.ttf`, `Apple Color Emoji.ttc`, `Apple Symbols.ttf`,
 	},
 }
 
@@ -93,13 +94,14 @@ func fontFolders(goos string) []string {
 
 // linuxScripts are the scripts of Noto Sans, in the order a letter is
 // looked up in them, as the pattern of the part of a file's name after
-// "NotoSans". Distributions name the files differently: with -Regular,
-// with -VF for a variable font, with the axes in brackets, with UI after
-// the script, and the CJK fonts as a collection or a font by language.
+// "NotoSans", or after "Noto" for Noto Color Emoji. Distributions name the
+// files differently: with -Regular, with -VF for a variable font, with the
+// axes in brackets, with UI after the script, and the CJK fonts as a
+// collection or a font by language.
 var linuxScripts = []string{
 	"", "Devanagari", "Bengali", "Thai", "Ethiopic", "Tamil", "Telugu", "Kannada", "Malayalam", "Gujarati",
 	"Gurmukhi", "Sinhala", "Khmer", "Lao", "Myanmar", "Tibetan", "Armenian", "Georgian", "Hebrew", "Arabic",
-	"Oriya", "Thaana", "Javanese", "Cherokee", "CJK(jp|kr|sc|tc|hk)?", "Symbols", "Symbols2",
+	"Oriya", "Thaana", "Javanese", "Cherokee", "CJK(jp|kr|sc|tc|hk)?", "ColorEmoji", "Symbols", "Symbols2",
 }
 
 // linuxFonts are the other fonts to find, by name, after the ones of
@@ -113,7 +115,7 @@ var linuxFonts = []string{
 var linuxNoto = func() []*regexp.Regexp {
 	var out []*regexp.Regexp
 	for _, s := range linuxScripts {
-		out = append(out, regexp.MustCompile(`^(?i)notosans`+s+`(ui)?(-regular|-vf|\[[^\]]*\])?\.(ttf|otf|ttc)$`))
+		out = append(out, regexp.MustCompile(`^(?i)noto(sans)?`+s+`(ui)?(-regular|-vf|\[[^\]]*\])?\.(ttf|otf|ttc)$`))
 	}
 	return out
 }()

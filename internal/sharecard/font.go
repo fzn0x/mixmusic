@@ -3,6 +3,8 @@ package sharecard
 import (
 	"bytes"
 	"errors"
+	"image/color"
+	"io"
 	"os"
 	"sync"
 	"weak"
@@ -21,6 +23,8 @@ import (
 // reads it again, so a font a card used once doesn't stay in memory.
 type Font struct {
 	cmap gotext.Cmap
+	// colour is set when the font has glyphs in colour.
+	colour bool
 	// read reads the rest of a system font; it is nil for a parsed one.
 	read func() (*fontData, error)
 	// data is a parsed font's.
@@ -38,19 +42,37 @@ type fontData struct {
 	// variable is set when the font has axes, as a weight's, so that a
 	// face is set to the weight of the line it draws.
 	variable bool
+	// layers and palette are the glyphs of the first version of a COLR
+	// table, layers of outlines in colours; sbix has the bitmaps of an
+	// sbix table, and cbdt is set when go-text has bitmaps of a CBDT one.
+	layers  *colrLayers
+	palette []color.NRGBA
+	sbix    *sbix
+	cbdt    bool
 }
 
-// errNoUnits is the error of a font that sets no units per em.
-var errNoUnits = errors.New("sharecard: the font has no units per em")
+// The tables go-text isn't given: a card reads the layers of COLR's first
+// version itself, as the second version of Segoe UI Emoji's is gradients
+// it doesn't draw; it reads an sbix bitmap when a glyph needs it, as the
+// sbix table is most of Apple Color Emoji's 180 MB; and it doesn't draw
+// SVG glyphs.
+var (
+	colrTag = ot.MustNewTag("COLR")
+	sbixTag = ot.MustNewTag("sbix")
+	svgTag  = ot.MustNewTag("SVG ")
+)
+
+// opener opens a font's bytes again, to read its bitmaps when it draws.
+type opener func() (io.ReaderAt, io.Closer, error)
+
+// The errors of reading a font.
+var (
+	errNoUnits = errors.New("sharecard: the font has no units per em")
+	errNoFont  = errors.New("sharecard: the collection has no such font")
+)
 
 // ParseFont reads a TrueType or OpenType font.
-func ParseFont(data []byte) (*Font, error) {
-	ld, err := ot.NewLoader(bytes.NewReader(data))
-	if err != nil {
-		return nil, err
-	}
-	return parsedFont(ld)
-}
+func ParseFont(data []byte) (*Font, error) { return parsedFont(data, 0) }
 
 // ParseCollectionFonts reads the fonts of a TrueType collection, a .ttc.
 func ParseCollectionFonts(data []byte) ([]*Font, error) {
@@ -59,8 +81,8 @@ func ParseCollectionFonts(data []byte) ([]*Font, error) {
 		return nil, err
 	}
 	var out []*Font
-	for _, ld := range lds {
-		f, err := parsedFont(ld)
+	for i := range lds {
+		f, err := parsedFont(data, i)
 		if err != nil {
 			return nil, err
 		}
@@ -69,25 +91,55 @@ func ParseCollectionFonts(data []byte) ([]*Font, error) {
 	return out, nil
 }
 
-// parsedFont reads the whole font of ld.
-func parsedFont(ld *ot.Loader) (*Font, error) {
-	d, err := readFont(ld)
+// parsedFont reads the whole of the index-th font of data.
+func parsedFont(data []byte, index int) (*Font, error) {
+	d, err := readFont(bytes.NewReader(data), index, func() (io.ReaderAt, io.Closer, error) {
+		return bytes.NewReader(data), nil, nil
+	})
 	if err != nil {
 		return nil, err
 	}
-	return &Font{cmap: d.font.Cmap, data: d}, nil
+	return &Font{cmap: d.font.Cmap, colour: d.layers != nil || d.sbix != nil || d.cbdt, data: d}, nil
 }
 
-// readFont reads the tables of the font of ld that a card draws with.
-func readFont(ld *ot.Loader) (*fontData, error) {
-	f, err := gotext.NewFont(ld)
+// readFont reads the tables a card draws with of the index-th font of r,
+// a font or a collection, which open opens again.
+func readFont(r ot.Resource, index int, open opener) (*fontData, error) {
+	lds, err := ot.NewLoaders(r)
+	if err != nil {
+		return nil, err
+	}
+	if index >= len(lds) {
+		return nil, errNoFont
+	}
+	ld, use := lds[index], lds[index]
+	if ld.HasTable(colrTag) || ld.HasTable(sbixTag) || ld.HasTable(svgTag) {
+		var ts []ot.Table
+		for _, tag := range ld.Tables() {
+			if tag == colrTag || tag == sbixTag || tag == svgTag {
+				continue
+			}
+			raw, err := ld.RawTable(tag)
+			if err != nil {
+				return nil, err
+			}
+			ts = append(ts, ot.Table{Tag: tag, Content: raw})
+		}
+		if use, err = ot.NewLoader(bytes.NewReader(ot.WriteTTF(ts))); err != nil {
+			return nil, err
+		}
+	}
+	f, err := gotext.NewFont(use)
 	if err != nil {
 		return nil, err
 	}
 	if f.Upem() == 0 {
 		return nil, errNoUnits
 	}
-	return &fontData{font: f, upem: float64(f.Upem()), variable: ld.HasTable(ot.MustNewTag("fvar"))}, nil
+	d := &fontData{font: f, upem: float64(f.Upem()), variable: ld.HasTable(ot.MustNewTag("fvar")),
+		cbdt: ld.HasTable(ot.MustNewTag("CBDT"))}
+	readColour(d, ld, r, index, open)
+	return d, nil
 }
 
 // openFont reads which letters the font of file has, the first font of a
@@ -99,40 +151,58 @@ func openFont(file string) *Font {
 		return nil
 	}
 	defer fh.Close()
-	if st, err := fh.Stat(); err != nil || st.Size() > 64<<20 {
-		return nil
-	}
 	lds, err := ot.NewLoaders(fh)
-	if err != nil || len(lds) == 0 || !drawable(lds[0]) {
+	if err != nil || len(lds) == 0 || !drawable(lds[0]) || tooBig(fh) {
 		return nil
 	}
 	cmap, err := readCmap(lds[0])
 	if err != nil {
 		return nil
 	}
-	return &Font{cmap: cmap, read: func() (*fontData, error) {
+	open := func() (io.ReaderAt, io.Closer, error) {
+		fh, err := os.Open(file)
+		return fh, fh, err
+	}
+	return &Font{cmap: cmap, colour: colourful(lds[0]), read: func() (*fontData, error) {
 		fh, err := os.Open(file)
 		if err != nil {
 			return nil, err
 		}
 		defer fh.Close()
-		lds, err := ot.NewLoaders(fh)
-		if err != nil {
-			return nil, err
-		}
-		return readFont(lds[0])
+		return readFont(fh, 0, open)
 	}}
 }
 
-// drawable reports whether the font of ld has outlines a card can draw:
-// TrueType, CFF or CFF2 ones.
+// tooBig reports whether the tables of the first font of r that a card
+// reads at once, all but its sbix bitmaps, take more than 64 MB.
+func tooBig(r io.ReaderAt) bool {
+	ranges, err := tableRanges(r, 0)
+	if err != nil {
+		return true
+	}
+	var n int64
+	for tag, rg := range ranges {
+		if tag != sbixTag {
+			n += int64(rg.length)
+		}
+	}
+	return n > 64<<20
+}
+
+// drawable reports whether the font of ld has glyphs a card can draw:
+// TrueType, CFF or CFF2 outlines, or bitmaps in colour.
 func drawable(ld *ot.Loader) bool {
-	for _, tag := range []string{"glyf", "CFF ", "CFF2"} {
+	for _, tag := range []string{"glyf", "CFF ", "CFF2", "sbix", "CBDT"} {
 		if ld.HasTable(ot.MustNewTag(tag)) {
 			return true
 		}
 	}
 	return false
+}
+
+// colourful reports whether the font of ld has glyphs in colour.
+func colourful(ld *ot.Loader) bool {
+	return ld.HasTable(colrTag) || ld.HasTable(sbixTag) || ld.HasTable(ot.MustNewTag("CBDT"))
 }
 
 // readCmap reads which glyph draws each letter of the font of ld.

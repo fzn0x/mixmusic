@@ -1,6 +1,7 @@
 package sharecard
 
 import (
+	"image"
 	"slices"
 	"unicode"
 
@@ -22,12 +23,13 @@ import (
 // shaper is what a card shapes and draws its text with. Its caches and
 // faces aren't safe to share, so each card makes its own.
 type shaper struct {
-	hb     shaping.HarfbuzzShaper
-	seg    shaping.Segmenter
-	para   bidi.Paragraph
-	faces  map[*fontData]*face
-	raster vector.Rasterizer
-	mask   []byte
+	hb      shaping.HarfbuzzShaper
+	seg     shaping.Segmenter
+	para    bidi.Paragraph
+	faces   map[*fontData]*face
+	raster  vector.Rasterizer
+	mask    []byte
+	bitmaps map[bitmapKey]image.Image
 }
 
 // face is a font's face, set to a weight when the font is variable.
@@ -194,8 +196,10 @@ func reorder(runs []run) {
 // fontFor is the font that draws rs[i], after a rune drawn in prev. A mark,
 // a joiner, a variation selector, a skin tone or a space stays in the font
 // of the letter before it when that font has it, so that what joins is
-// shaped together. Any other letter comes from the primary font, or the
-// first fallback that has it, in the order of the fallbacks.
+// shaped together. A letter that asks to show as an emoji, followed by
+// U+FE0F, comes from the first font that has it in colour. Any other
+// letter comes from the primary font, or the first fallback that has it,
+// in the order of the fallbacks.
 func (t *typesetter) fontFor(prim *Font, rs []rune, i int, prev *Font) *Font {
 	r := rs[i]
 	if r < 0x20 {
@@ -203,6 +207,16 @@ func (t *typesetter) fontFor(prim *Font, rs []rune, i int, prev *Font) *Font {
 	}
 	if prev != nil && (ignorable(r) || sticks(r) && t.has(prev, r)) {
 		return prev
+	}
+	if i+1 < len(rs) && rs[i+1] == 0xFE0F {
+		if prim.colour && t.has(prim, r) {
+			return prim
+		}
+		for _, f := range t.fam.Fallback {
+			if f.colour && t.has(f, r) {
+				return f
+			}
+		}
 	}
 	if t.has(prim, r) {
 		return prim

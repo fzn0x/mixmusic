@@ -1,6 +1,9 @@
 The fonts of this folder are subsets of the fonts below, cut with the
 subsetter of fontTools to the few letters the tests of internal/sharecard
-draw, so that the tests draw the same on every system.
+draw, so that the tests draw the same on every system. In
+NotoColorEmoji-sbix.ttc, the bitmap of the CBDT subset is in an sbix
+table instead, and the font is twice in a collection, as Apple Color
+Emoji's is.
 
 NotoSansDevanagari-subset.ttf, from Noto Sans Devanagari:
 Copyright 2022 The Noto Project Authors (https://github.com/notofonts/devanagari)
@@ -13,6 +16,13 @@ Copyright 2015-2020 Google LLC. All Rights Reserved.
 
 NotoSansCJKjp-VF-subset.otf, from the variable Noto Sans CJK JP:
 © 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+
+NotoColorEmoji-CBDT-subset.ttf and NotoColorEmoji-sbix.ttc, from Noto Color
+Emoji:
+Copyright 2013 Google Inc.
+
+CoralPixels-subset.ttf, from Coral Pixels:
+Copyright 2024 The Coral Pixels Project Authors (https://github.com/tanukifont/Coral-Pixels)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

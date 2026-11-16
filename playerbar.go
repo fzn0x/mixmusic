@@ -17,13 +17,13 @@ import (
 // runs across the window's foot, or floats over it as a raised card.
 func (s *shell) playerBar(c *ui.Context) {
 	k := &s.lk
-	bar := ui.Row(c).Height(k.player).Shrink(0).Padding(0, 24, 0, 16).Gap(24)
+	bar := ui.Row(c).Height(k.player).Shrink(0).PaddingStart(16).PaddingEnd(24).Gap(24)
 	if k.floating {
 		shade := 0.16
 		if k.dark {
 			shade = 0.4
 		}
-		bar.Margin(0, floatMargin, floatMargin).Padding(0, 20, 0, 9).Radius(k.radius).Background(col(over(nrgba(k.surface2), nrgba(k.bg)))).
+		bar.Margin(0, floatMargin, floatMargin).PaddingStart(9).PaddingEnd(20).Radius(k.radius).Background(col(over(nrgba(k.surface2), nrgba(k.bg)))).
 			Shadow(0, 6, 20, -6, ui.RGBA(0, 0, 0, float32(shade)))
 	} else {
 		bar.Background(k.surface).BorderWidth(1, 0, 0, 0).BorderColor(k.border)

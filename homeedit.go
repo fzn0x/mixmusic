@@ -152,7 +152,7 @@ func (s *shell) homeEditor(c *ui.Context) {
 func (s *shell) homeEditRow(c *ui.Context, i int, e settings.HomeShelf, shown, full []settings.HomeShelf) {
 	k := &s.lk
 	from := homeSourceLabel(keySource(e.Key))
-	row := ui.Row(c.Key("home-row-"+e.Key)).Height(56).Padding(0, 8, 0, 16).Gap(12).Radius(k.radiusSm).
+	row := ui.Row(c.Key("home-row-" + e.Key)).Height(56).PaddingStart(16).PaddingEnd(8).Gap(12).Radius(k.radiusSm).
 		Background(k.surface2).Label(locales.HomeEditRowLabel(e.Title, from)).Focusable().Cursor(ui.CursorGrab)
 	if row.Hovered() {
 		row.Background(k.surface2.Mix(k.text, 0.06))
@@ -205,7 +205,7 @@ func (s *shell) homeEditRow(c *ui.Context, i int, e settings.HomeShelf, shown, f
 // back where it was.
 func (s *shell) homeHiddenRow(c *ui.Context, e settings.HomeShelf, full []settings.HomeShelf) {
 	k := &s.lk
-	ui.Row(c.Key("home-hidden-"+e.Key)).Height(56).Padding(0, 8, 0, 16).Gap(12).Children(func() {
+	ui.Row(c.Key("home-hidden-" + e.Key)).Height(56).PaddingStart(16).PaddingEnd(8).Gap(12).Children(func() {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 			ui.Text(c, e.Title).FontSize(k.bodySize()).TextColor(k.muted).SingleLine().MinWidth(0)
 			ui.Text(c, homeSourceLabel(keySource(e.Key))).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()

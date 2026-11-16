@@ -14,15 +14,15 @@ import (
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
-// sidePanel is the panel at the right of the main pane: the queue, or the
-// lyrics.
+// sidePanel is the panel at the end of the main pane, its right or, right to
+// left, its left: the queue, or the lyrics.
 func (s *shell) sidePanel(c *ui.Context) {
 	k := &s.lk
 	panel := ui.Column(c).Width(s.panelWidth(c)).Shrink(0).Background(k.surface)
 	if k.floating {
-		panel.Margin(0, floatMargin, floatMargin, 0).Radius(k.radius).Clip()
+		panel.Margin(0, 0, floatMargin).MarginEnd(floatMargin).Radius(k.radius).Clip()
 	} else {
-		panel.BorderWidth(0, 0, 0, 1).BorderColor(k.border)
+		panel.BorderStartWidth(1).BorderColor(k.border)
 	}
 	panel.Children(func() {
 		if s.panel == "queue" {
@@ -41,7 +41,7 @@ func (s *shell) panelHead(c *ui.Context, title string, actions func()) {
 	if k.headings != headingsLight {
 		size = 22 * k.scale
 	}
-	ui.Row(c).Padding(16, 16, 12, 24).Gap(8).Shrink(0).Children(func() {
+	ui.Row(c).Padding(16, 16, 12).PaddingStart(24).Gap(8).Shrink(0).Children(func() {
 		ui.Text(c, title).FontSize(size).FontWeight(k.titleWeight()).Font(k.display).LetterSpacing(k.tracking(-0.02, size)).
 			SingleLine().Grow(1).MinWidth(0)
 		if actions != nil {

@@ -207,7 +207,7 @@ func (s *shell) artTileWith(c *ui.Context, key string, art []media.Image, title,
 				ui.Box(c).Absolute().Top(0).Left(0).Size(size, size).InsetShadow(0, 0, 0, 3, k.accent).Radius(k.radiusSm)
 			}
 			if playable && rise > 0.01 {
-				p := s.buttonBase(c.Key(key+"-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().Right(8).Bottom(8).
+				p := s.buttonBase(c.Key(key+"-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().End(8).Bottom(8).
 					Label(circleLabel).Cursor(ui.CursorPointer)
 				if rise < 1 {
 					p.Translate(0, 12*(1-rise)).Opacity(min(1, rise))

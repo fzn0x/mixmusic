@@ -288,7 +288,7 @@ func (s *shell) tagDialog(c *ui.Context) {
 			}
 			field("album", locales.LocalTagsAlbum(), &e.form.album, 360, e.album)
 			field("album-artists", locales.LocalTagsAlbumArtist(), &e.form.albumArtists, 360, false)
-			ui.Text(c, locales.LocalTagsSeparate()).FontSize(k.captionSize()).TextColor(k.muted).Margin(0, 0, 0, 128)
+			ui.Text(c, locales.LocalTagsSeparate()).FontSize(k.captionSize()).TextColor(k.muted).MarginStart(128)
 			if !e.album {
 				field("track", locales.LocalTagsTrack(), &e.form.track, 96, false)
 				field("disc", locales.LocalTagsDisc(), &e.form.disc, 96, false)

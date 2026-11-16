@@ -338,7 +338,7 @@ func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, c
 							LetterSpacing(-0.02 * k.pivotSize()).TextColor(ink).SingleLine()
 						if i < len(counts) && counts[i] >= 0 {
 							ui.Text(c, count(counts[i])).FontSize(k.captionSize()).TextColor(ink).FontFeatures("tnum").
-								AlignSelf(ui.Start).Margin(6, 0, 0, 3)
+								AlignSelf(ui.Start).Margin(6, 0, 0).MarginStart(3)
 						}
 					})
 				}

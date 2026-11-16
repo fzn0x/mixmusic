@@ -18350,6 +18350,26 @@ func (msgs Messages) SkipPartsCreditBetween() string {
 	return Catalog.Format(msgs.locale, "skipPartsCreditBetween", nil)
 }
 
+// SkipPartsExportsAbout says "Copies Export… writes leave out the parts skipped above. Copies in M4A keep them: MixMusic can't cut those yet."
+// in the language the app shows.
+func SkipPartsExportsAbout() string { return In(i18n.Locale()).SkipPartsExportsAbout() }
+
+// SkipPartsExportsAbout says "Copies Export… writes leave out the parts skipped above. Copies in M4A keep them: MixMusic can't cut those yet."
+// in the language of msgs.
+func (msgs Messages) SkipPartsExportsAbout() string {
+	return Catalog.Format(msgs.locale, "skipPartsExportsAbout", nil)
+}
+
+// SkipPartsExportsTitle says "Leave marked parts out of exports"
+// in the language the app shows.
+func SkipPartsExportsTitle() string { return In(i18n.Locale()).SkipPartsExportsTitle() }
+
+// SkipPartsExportsTitle says "Leave marked parts out of exports"
+// in the language of msgs.
+func (msgs Messages) SkipPartsExportsTitle() string {
+	return Catalog.Format(msgs.locale, "skipPartsExportsTitle", nil)
+}
+
 // SkipPartsGroup says "Skip parts of videos"
 // in the language the app shows.
 func SkipPartsGroup() string { return In(i18n.Locale()).SkipPartsGroup() }

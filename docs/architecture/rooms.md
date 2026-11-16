@@ -73,7 +73,10 @@ on each, which the guest keeps, its own network's first
 ([Finding the computers](remote.md#finding-the-computers)), and tries
 in turn, the next as one turns it away, by the code too, as discovery
 found the room at each: a room of the network turns away, before TLS,
-an address it takes for the internet's, as of a VPN it isn't on.
+an address it takes for the internet's, as of a VPN it isn't on. As
+anyone on the network may answer for a host, with as many addresses as
+it likes, a browse keeps 8 of a host at most, and the guest those of its
+own networks alone, 5 at most: none rightly names one of the internet.
 
 ## Joining
 
@@ -426,8 +429,14 @@ no relay: guests reach the host's computer directly.
   back: a guest on the host's network gets there, with no hairpin
   through the router, and an address gone stale, or another's, that
   answers first wins nothing. By a code alone, it connects where it was
-  told. The addresses are those of the knock that started, which proves
-  the link: a link of the host's of the same secret, which a guest that
+  told. An address a link or a host told, as where a room moved, it never
+  connects to on this computer itself, nor to one of no one, link-local,
+  multicast, broadcast or unspecified, checked on the address its name
+  resolved to as each connection starts (`FarDialer`), so that a name
+  that resolves there next time gets nowhere either; names stay, for
+  DDNS and VPNs' names. What discovery found, and what the user typed,
+  it dials as they are. The addresses are those of the knock that
+  started, which proves the link: a link of the host's of the same secret, which a guest that
   dropped off opens, brings it back at once to the new address, and one
   of another secret, or of none, leaves them. Join a room takes an
   address and a code, which the guest proves as on the network. One that

@@ -29,6 +29,12 @@ declare -A runtime_sha256=(
 	[aarch64]="00cbdfcf917cc6c0ff6d3347d59e0ca1f7f45a6df1a428a0d6d8a78664d87444"
 )
 
+# The font the .deb and the .rpm recommend for Chinese, Japanese and Korean
+# letters. Fedora's variable and static Noto Sans CJK packages both provide
+# font(notosanscjkjp), so a Fedora with either gets no second copy.
+cjk_font_deb="fonts-noto-cjk"
+cjk_font_rpm="font(notosanscjkjp)"
+
 # fetch downloads url to dest and checks its SHA-256. GitHub can answer a
 # release download with a 504 or break it off for a while: curl tries
 # again on any error, a second after, then twice as long after each, for
@@ -68,6 +74,17 @@ for dir in "${linux[@]}"; do
 	fi
 	deb="$(cd "$(dirname "${debs[0]}")" && pwd)/$(basename "${debs[0]}")"
 
+	# The .deb recommends a font for Chinese, Japanese and Korean letters,
+	# which MixMusic bundles none of and MyGo writes no Recommends for
+	# (#558). apt installs it unless told not to; the check fails the
+	# release if the line is gone.
+	bash "$(dirname "$0")/deb-recommends.sh" "$deb" "$cjk_font_deb"
+	(cd "$work" && rm -rf deb-check && mkdir deb-check && cd deb-check && ar x "$deb" && tar --force-local -xf control.tar.* -O ./control |
+		grep -q "^Recommends:.*$cjk_font_deb") || {
+		echo "package.sh: $(basename "$deb") does not recommend $cjk_font_deb" >&2
+		exit 1
+	}
+
 	# The files the .deb installs.
 	root="$work/root-$arch"
 	mkdir -p "$root" "$work/deb-$arch"
@@ -89,7 +106,7 @@ for dir in "${linux[@]}"; do
 		echo "homepage: https://github.com/fzn0x/mixmusic"
 		echo "license: MIT"
 		echo "depends: [gtk3, webkit2gtk4.1, '(pulseaudio-libs or alsa-lib)']"
-		echo "recommends: [libayatana-appindicator-gtk3, libsecret]"
+		echo "recommends: [libayatana-appindicator-gtk3, libsecret, '$cjk_font_rpm']"
 		echo "rpm: {compression: xz}"
 		echo "contents:"
 		echo "  - dst: /opt/mixmusic"
@@ -109,6 +126,11 @@ for dir in "${linux[@]}"; do
 	} >"$config"
 	cat "$config"
 	"$work/nfpm" package --config "$config" --packager rpm --target "$out/mixmusic-$v-linux-$arch.rpm"
+	# The header of an RPM keeps its dependencies as plain text.
+	grep -aqF "$cjk_font_rpm" "$out/mixmusic-$v-linux-$arch.rpm" || {
+		echo "package.sh: mixmusic-$v-linux-$arch.rpm does not recommend $cjk_font_rpm" >&2
+		exit 1
+	}
 	echo "made mixmusic-$v-linux-$arch.rpm"
 
 	# AppImage: the app and the files beside it in usr/bin, and its entry

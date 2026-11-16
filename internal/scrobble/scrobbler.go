@@ -140,6 +140,13 @@ func (s *Scrobbler) Queue() []Play {
 	return slices.Clone(s.queue)
 }
 
+// Waiting returns how many scrobbles wait to be sent.
+func (s *Scrobbler) Waiting() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return len(s.queue)
+}
+
 // SetQueue replaces the scrobbles waiting to be sent, such as with the ones
 // the last run saved. The next Send tries them.
 func (s *Scrobbler) SetQueue(plays []Play) {

@@ -53,12 +53,10 @@ type LastfmAccount struct {
 	Other string `json:"other,omitempty"`
 }
 
-// scrobbles is a scrobbler and where its queue of plays to send is kept.
+// scrobbles is the Last.fm connection: its client and its scrobbler.
 type scrobbles struct {
-	client    *lastfm.Client
-	scrobbler *scrobble.Scrobbler
-	name      string
-	expired   bool
+	scrobbling
+	client *lastfm.Client
 	// other is the connection another user approved, which waits for the
 	// user to say what becomes of the waiting scrobbles.
 	other *lastfmCredentials
@@ -87,8 +85,12 @@ func (a *App) startScrobbling(c lastfmCredentials) {
 	}
 	s.OnQueue = a.lastfmQueueSaver(queue)
 	a.mu.Lock()
-	a.lastfm = &scrobbles{client: client, scrobbler: s, name: c.Session.Name}
+	old := a.lastfm
+	a.lastfm = &scrobbles{scrobbling: scrobbling{scrobbler: s, name: c.Session.Name, service: "Last.fm"}, client: client}
 	a.mu.Unlock()
+	if old != nil {
+		old.sends.stop()
+	}
 }
 
 // lastfmQueueSaver returns what keeps the scrobbles waiting in the file.
@@ -117,7 +119,8 @@ func (a *App) lastfmAccount() LastfmAccount {
 	return acc
 }
 
-// scrobble feeds what plays to the scrobbler, and sends what it has to.
+// scrobble feeds what plays to the scrobbler, which sends what it has to
+// beside the app.
 func (a *App) scrobble(np NowPlaying) {
 	a.mu.Lock()
 	l := a.lastfm
@@ -126,23 +129,9 @@ func (a *App) scrobble(np NowPlaying) {
 		return
 	}
 	id, t := lastfmTrack(np)
-	if !l.scrobbler.Observe(time.Now(), id, t, np.Playing, time.Duration(np.PositionMs)*time.Millisecond, np.Speed) {
-		return
-	}
-	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
-		err := l.scrobbler.Send(ctx)
-		switch {
-		case errors.Is(err, lastfm.ErrSessionExpired):
-			a.mu.Lock()
-			l.expired = true
-			a.mu.Unlock()
-			notify()
-		case err != nil && !lastfm.IsTemporary(err):
-			log.Printf("mixmusic: scrobbling: %v", err)
-		}
-	}()
+	l.scrobbler.Observe(time.Now(), id, t, np.Playing, time.Duration(np.PositionMs)*time.Millisecond, np.Speed)
+	a.sendScrobbles(&l.scrobbling)
+	a.tellWaiting(&l.scrobbling)
 }
 
 // lastfmTrack is what plays as the scrobbler knows it, and its ID, "" when
@@ -312,8 +301,12 @@ func (s *Accounts) LastfmResolve(ctx context.Context, send bool) error {
 // that wait to be sent.
 func (s *Accounts) LastfmLogout(ctx context.Context) error {
 	s.a.mu.Lock()
+	l := s.a.lastfm
 	s.a.lastfm = nil
 	s.a.mu.Unlock()
+	if l != nil {
+		l.sends.stop() // before the queue's file goes
+	}
 	err := s.a.lastfmStore.Clear()
 	if rmErr := os.Remove(filepath.Join(s.a.opts.DataDir, "lastfm-queue.json")); rmErr != nil && !errors.Is(rmErr, os.ErrNotExist) {
 		err = errors.Join(err, rmErr)

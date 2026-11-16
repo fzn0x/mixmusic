@@ -6,7 +6,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     {%- for sitemap_entry in entries %}
     {#- The page that opens invite links is of no use to search engines. #}
-    {%- if sitemap_entry.permalink is not ending_with("/join/") %}
+    {%- if sitemap_entry.permalink is not ending_with(pat="/join/") %}
     <url>
         <loc>{{ sitemap_entry.permalink | replace(from=from, to=to) | escape_xml | safe }}</loc>
         {%- if sitemap_entry.updated %}

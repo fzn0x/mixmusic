@@ -28,12 +28,15 @@ func previewsHeld(r *testRoom) int {
 	return len(r.server.previews)
 }
 
-// TestPreviewsOfASourceAreBounded knocks 6 times with the link from one
-// address, and joins none: the room holds 4, the two oldest are told the
-// preview ended, and a guest that dropped off still comes back.
+// TestPreviewsOfASourceAreBounded knocks twice more than a source's
+// previews with the link from one address, and joins none: the room holds
+// as many as it takes, the two oldest are told the preview ended, and a
+// guest that dropped off, whose place the room keeps a minute, still comes
+// back.
 func TestPreviewsOfASourceAreBounded(t *testing.T) {
 	r := newTestRoomWith(t, func(s *Server) {
 		s.caps = &caps{unproven: maxUnproven, unprovenFrom: maxUnprovenFrom, tries: Tries, roomTries: RoomTries}
+		s.Timing.Keep = time.Minute
 	})
 	back := newGuest(t, "Back")
 	r.join(back).Close()

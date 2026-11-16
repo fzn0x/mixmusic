@@ -258,29 +258,34 @@ func (g *reachGate) take(now time.Time) bool {
 }
 
 // reach tells the host, with answer, whether this computer reaches the
-// room of key it moves to: where discovery finds it, or at addr. A no
-// comes reachFailsAfter after the ask.
+// room of key it moves to: where discovery finds it, or at addr. Its tries
+// all end by reachFailsAfter after the ask, as a no comes then, whether
+// nothing listened there or nothing answered.
 func (a *App) reach(answer func(bool) error, key remote.Fingerprint, addr string) {
-	asked := time.Now()
-	ok := a.reaches(key, addr)
-	if !ok {
-		<-time.After(time.Until(asked.Add(reachFailsAfter)))
+	ctx, cancel := context.WithTimeout(context.Background(), reachFailsAfter)
+	defer cancel()
+	got := make(chan bool, 1)
+	go func() { got <- a.reaches(ctx, key, addr) }()
+	select {
+	case ok := <-got:
+		if ok {
+			_ = answer(true)
+			return
+		}
+		<-ctx.Done()
+	case <-ctx.Done():
 	}
-	_ = answer(ok)
+	_ = answer(false)
 }
 
-// reaches reports whether this computer reaches the room of key: where
-// discovery finds it, or at addr.
-func (a *App) reaches(key remote.Fingerprint, addr string) bool {
+// reaches reports whether this computer reaches the room of key, by ctx:
+// where discovery finds it, or at addr.
+func (a *App) reaches(ctx context.Context, key remote.Fingerprint, addr string) bool {
 	id, err := a.identity(true)
 	if err != nil {
 		return false
 	}
-	try := func(at string) bool {
-		ctx, cancel := context.WithTimeout(context.Background(), room.MoveFor/3)
-		defer cancel()
-		return a.roomGuest(id).Reach(ctx, at, key) == nil
-	}
+	try := func(at string) bool { return ctx.Err() == nil && a.roomGuest(id).Reach(ctx, at, key) == nil }
 	ok := false
 	if f, found := a.foundRoom(key.ID(), true); found {
 		ok = try(f.Addr)

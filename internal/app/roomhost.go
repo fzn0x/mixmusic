@@ -60,9 +60,17 @@ type RoomMember struct {
 func membersOf(ms []room.Member) []RoomMember {
 	out := make([]RoomMember, len(ms))
 	for i, m := range ms {
-		out[i] = RoomMember{Key: m.Key.String(), Name: m.Name, Here: m.Here}
+		out[i] = RoomMember{Key: m.Key.String(), Name: shownName(m.Name), Here: m.Here}
 	}
 	return out
+}
+
+// shownActivity is acts with their names as the windows show them.
+func shownActivity(acts []room.Activity) []room.Activity {
+	for i := range acts {
+		acts[i].Name = shownName(acts[i].Name)
+	}
+	return acts
 }
 
 // roomGuessed is what the host is told as its room takes no code for a
@@ -169,7 +177,7 @@ func (rs *Rooms) Hosted() (HostedRoom, bool) {
 	// With the addresses that reach it from outside (roomreach.go).
 	link = rs.a.reachLink(link)
 	return HostedRoom{Code: code, Link: link, Guests: membersOf(h.server.Members()), Blocked: membersOf(h.server.Blocked()),
-		Activity: h.server.Activity(), Waiting: h.server.Waiting()}, true
+		Activity: shownActivity(h.server.Activity()), Waiting: h.server.Waiting()}, true
 }
 
 // NewCode gives the room this computer hosts a new code and invite link:

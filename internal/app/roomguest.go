@@ -15,6 +15,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/room"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // These times are the guest's; tests shorten them.
@@ -107,13 +108,16 @@ func (rs *Rooms) Guest() (GuestView, bool) {
 		r.mu.Unlock()
 		return GuestView{}, false
 	}
-	v := GuestView{ID: g.id, Host: g.name, Step: g.step, Problem: g.problem}
+	v := GuestView{ID: g.id, Host: shownName(g.name), Step: g.step, Problem: g.problem}
 	s, f := g.session, g.follow
 	r.mu.Unlock()
 	if s != nil {
 		v.Preview = s.Preview()
 		v.State, v.HasState = s.State()
 		v.Queue, v.Members = s.Queue(), s.Members()
+		for i, m := range v.Members {
+			v.Members[i] = shownName(m)
+		}
 	}
 	if f != nil {
 		v.Note = f.noteNow()
@@ -602,64 +606,65 @@ func (rs *Rooms) Dismiss() {
 // roomProblem tells why a stay in the room of the host named name ended,
 // or didn't start, in the interface's words.
 func roomProblem(name string, err error) string {
+	name = shownName(name)
 	switch {
 	case errors.Is(err, room.ErrWrongCode):
-		return "That isn't the code of " + name + "'s room."
+		return locales.RoomProblemWrongCode(name)
 	case errors.Is(err, room.ErrWait):
-		return "Too many wrong codes from this computer: try again in a minute."
+		return locales.RoomProblemWait()
 	case errors.Is(err, room.ErrLocked):
-		return name + "'s room isn't taking codes for a minute: ask " + name + " for the invite link."
+		return locales.RoomProblemLocked(name)
 	case errors.Is(err, room.ErrNewCode):
-		return name + "'s room has a new code: ask " + name + " for it, or for the new invite link."
+		return locales.RoomProblemNewCode(name)
 	case errors.Is(err, room.ErrPreviewEnded):
-		return "You waited long to join " + name + "'s room, or many others knocked at once: open its link, or type its code, again."
+		return locales.RoomProblemPreviewEnded(name)
 	case errors.Is(err, room.ErrBusy):
-		return name + "'s room checks other codes: try again in a moment."
+		return locales.RoomProblemBusy(name)
 	case errors.Is(err, room.ErrBlocked):
 		if name == "" || name == "The room" {
 			// A room known by its address alone, whose host's name the
 			// knock never learned.
-			return "This room blocked this computer."
+			return locales.RoomProblemBlockedUnnamed()
 		}
-		return name + " blocked this computer."
+		return locales.RoomProblemBlocked(name)
 	case errors.Is(err, room.ErrRemoved):
-		return name + " removed you from the room."
+		return locales.RoomProblemRemoved(name)
 	case errors.Is(err, room.ErrDeclined):
-		return name + " didn't let you in."
+		return locales.RoomProblemDeclined(name)
 	case errors.Is(err, room.ErrRoomMoves):
-		return name + "'s room is moving to another computer: try again in a moment."
+		return locales.RoomProblemMoves(name)
 	case errors.Is(err, room.ErrManyAsk):
-		return "So many wait to join " + name + "'s room that it takes no more for now: try again later."
+		return locales.RoomProblemManyAsk(name)
 	case errors.Is(err, room.ErrFull):
-		return name + "'s room is full."
+		return locales.RoomProblemFull(name)
 	case errors.Is(err, room.ErrNotGuest):
-		return name + "'s room no longer keeps your place: join again with its code."
+		return locales.RoomProblemNotGuest(name)
 	case errors.Is(err, room.ErrEnded):
-		return "The room ended."
+		return locales.RoomProblemEnded()
 	case errors.Is(err, room.ErrVersion):
-		return room.ErrVersion.Error() + "."
+		return locales.RoomProblemVersion()
 	case errors.Is(err, room.ErrNotSame):
-		return "Another computer answered in place of " + name + ": the link isn't of its room."
+		return locales.RoomProblemNotSame(name)
 	case errors.Is(err, errRoomAway):
-		return name + "'s room isn't on the network now."
+		return locales.RoomProblemAway(name)
 	case farUnreachable(err):
 		return farProblem(name)
 	case errors.Is(err, room.ErrFarAddr):
-		return roomFarProblem
+		return roomFarProblem()
 	case errors.Is(err, room.ErrNotLink):
-		return "That isn't a link to a room."
+		return locales.RoomProblemNotLink()
 	case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):
-		return "Joining took too long: try again."
+		return locales.RoomProblemTooLong()
 	}
 	if err != nil && !errors.Is(err, room.ErrLost) && !isNetErr(err) {
 		return err.Error()
 	}
-	return "Couldn't reach " + name + ": it may be asleep, or a firewall may turn MixMusic away."
+	return locales.RoomProblemUnreachable(name)
 }
 
 // roomFarProblem is what a guest is told of a link, or a host, that named
 // this computer, or an address of no one (room.FarDialer).
-const roomFarProblem = "The link names an address of this computer, or of no one: ask its host for the link again."
+func roomFarProblem() string { return locales.RoomProblemFarAddr() }
 
 // isNetErr reports whether err is the network's.
 func isNetErr(err error) bool {

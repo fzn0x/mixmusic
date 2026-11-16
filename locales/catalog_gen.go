@@ -16444,6 +16444,250 @@ func (msgs Messages) RoomPageWaitingGuests() string {
 	return Catalog.Format(msgs.locale, "roomPageWaitingGuests", nil)
 }
 
+// RoomProblemAway says "{name}'s room isn't on the network now."
+// in the language the app shows.
+func RoomProblemAway(name string) string { return In(i18n.Locale()).RoomProblemAway(name) }
+
+// RoomProblemAway says "{name}'s room isn't on the network now."
+// in the language of msgs.
+func (msgs Messages) RoomProblemAway(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemAway", map[string]any{"name": name})
+}
+
+// RoomProblemBlocked says "{name} blocked this computer."
+// in the language the app shows.
+func RoomProblemBlocked(name string) string { return In(i18n.Locale()).RoomProblemBlocked(name) }
+
+// RoomProblemBlocked says "{name} blocked this computer."
+// in the language of msgs.
+func (msgs Messages) RoomProblemBlocked(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemBlocked", map[string]any{"name": name})
+}
+
+// RoomProblemBlockedUnnamed says "This room blocked this computer."
+// in the language the app shows.
+func RoomProblemBlockedUnnamed() string { return In(i18n.Locale()).RoomProblemBlockedUnnamed() }
+
+// RoomProblemBlockedUnnamed says "This room blocked this computer."
+// in the language of msgs.
+func (msgs Messages) RoomProblemBlockedUnnamed() string {
+	return Catalog.Format(msgs.locale, "roomProblemBlockedUnnamed", nil)
+}
+
+// RoomProblemBusy says "{name}'s room checks other codes: try again in a moment."
+// in the language the app shows.
+func RoomProblemBusy(name string) string { return In(i18n.Locale()).RoomProblemBusy(name) }
+
+// RoomProblemBusy says "{name}'s room checks other codes: try again in a moment."
+// in the language of msgs.
+func (msgs Messages) RoomProblemBusy(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemBusy", map[string]any{"name": name})
+}
+
+// RoomProblemDeclined says "{name} didn't let you in."
+// in the language the app shows.
+func RoomProblemDeclined(name string) string { return In(i18n.Locale()).RoomProblemDeclined(name) }
+
+// RoomProblemDeclined says "{name} didn't let you in."
+// in the language of msgs.
+func (msgs Messages) RoomProblemDeclined(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemDeclined", map[string]any{"name": name})
+}
+
+// RoomProblemEnded says "The room ended."
+// in the language the app shows.
+func RoomProblemEnded() string { return In(i18n.Locale()).RoomProblemEnded() }
+
+// RoomProblemEnded says "The room ended."
+// in the language of msgs.
+func (msgs Messages) RoomProblemEnded() string {
+	return Catalog.Format(msgs.locale, "roomProblemEnded", nil)
+}
+
+// RoomProblemFar says "Couldn't reach {name} over the internet: their router may not forward the room's port, a firewall may turn MixMusic a…"
+// in the language the app shows.
+func RoomProblemFar(name string) string { return In(i18n.Locale()).RoomProblemFar(name) }
+
+// RoomProblemFar says "Couldn't reach {name} over the internet: their router may not forward the room's port, a firewall may turn MixMusic a…"
+// in the language of msgs.
+func (msgs Messages) RoomProblemFar(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemFar", map[string]any{"name": name})
+}
+
+// RoomProblemFarAddr says "The link names an address of this computer, or of no one: ask its host for the link again."
+// in the language the app shows.
+func RoomProblemFarAddr() string { return In(i18n.Locale()).RoomProblemFarAddr() }
+
+// RoomProblemFarAddr says "The link names an address of this computer, or of no one: ask its host for the link again."
+// in the language of msgs.
+func (msgs Messages) RoomProblemFarAddr() string {
+	return Catalog.Format(msgs.locale, "roomProblemFarAddr", nil)
+}
+
+// RoomProblemFarUnnamed says "Couldn't reach the room's host over the internet: their router may not forward the room's port, a firewall may turn M…"
+// in the language the app shows.
+func RoomProblemFarUnnamed() string { return In(i18n.Locale()).RoomProblemFarUnnamed() }
+
+// RoomProblemFarUnnamed says "Couldn't reach the room's host over the internet: their router may not forward the room's port, a firewall may turn M…"
+// in the language of msgs.
+func (msgs Messages) RoomProblemFarUnnamed() string {
+	return Catalog.Format(msgs.locale, "roomProblemFarUnnamed", nil)
+}
+
+// RoomProblemFull says "{name}'s room is full."
+// in the language the app shows.
+func RoomProblemFull(name string) string { return In(i18n.Locale()).RoomProblemFull(name) }
+
+// RoomProblemFull says "{name}'s room is full."
+// in the language of msgs.
+func (msgs Messages) RoomProblemFull(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemFull", map[string]any{"name": name})
+}
+
+// RoomProblemLocked says "{name}'s room isn't taking codes for a minute: ask {name} for the invite link."
+// in the language the app shows.
+func RoomProblemLocked(name string) string { return In(i18n.Locale()).RoomProblemLocked(name) }
+
+// RoomProblemLocked says "{name}'s room isn't taking codes for a minute: ask {name} for the invite link."
+// in the language of msgs.
+func (msgs Messages) RoomProblemLocked(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemLocked", map[string]any{"name": name})
+}
+
+// RoomProblemManyAsk says "So many wait to join {name}'s room that it takes no more for now: try again later."
+// in the language the app shows.
+func RoomProblemManyAsk(name string) string { return In(i18n.Locale()).RoomProblemManyAsk(name) }
+
+// RoomProblemManyAsk says "So many wait to join {name}'s room that it takes no more for now: try again later."
+// in the language of msgs.
+func (msgs Messages) RoomProblemManyAsk(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemManyAsk", map[string]any{"name": name})
+}
+
+// RoomProblemMoves says "{name}'s room is moving to another computer: try again in a moment."
+// in the language the app shows.
+func RoomProblemMoves(name string) string { return In(i18n.Locale()).RoomProblemMoves(name) }
+
+// RoomProblemMoves says "{name}'s room is moving to another computer: try again in a moment."
+// in the language of msgs.
+func (msgs Messages) RoomProblemMoves(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemMoves", map[string]any{"name": name})
+}
+
+// RoomProblemNewCode says "{name}'s room has a new code: ask {name} for it, or for the new invite link."
+// in the language the app shows.
+func RoomProblemNewCode(name string) string { return In(i18n.Locale()).RoomProblemNewCode(name) }
+
+// RoomProblemNewCode says "{name}'s room has a new code: ask {name} for it, or for the new invite link."
+// in the language of msgs.
+func (msgs Messages) RoomProblemNewCode(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemNewCode", map[string]any{"name": name})
+}
+
+// RoomProblemNotGuest says "{name}'s room no longer keeps your place: join again with its code."
+// in the language the app shows.
+func RoomProblemNotGuest(name string) string { return In(i18n.Locale()).RoomProblemNotGuest(name) }
+
+// RoomProblemNotGuest says "{name}'s room no longer keeps your place: join again with its code."
+// in the language of msgs.
+func (msgs Messages) RoomProblemNotGuest(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemNotGuest", map[string]any{"name": name})
+}
+
+// RoomProblemNotLink says "That isn't a link to a room."
+// in the language the app shows.
+func RoomProblemNotLink() string { return In(i18n.Locale()).RoomProblemNotLink() }
+
+// RoomProblemNotLink says "That isn't a link to a room."
+// in the language of msgs.
+func (msgs Messages) RoomProblemNotLink() string {
+	return Catalog.Format(msgs.locale, "roomProblemNotLink", nil)
+}
+
+// RoomProblemNotSame says "Another computer answered in place of {name}: the link isn't of its room."
+// in the language the app shows.
+func RoomProblemNotSame(name string) string { return In(i18n.Locale()).RoomProblemNotSame(name) }
+
+// RoomProblemNotSame says "Another computer answered in place of {name}: the link isn't of its room."
+// in the language of msgs.
+func (msgs Messages) RoomProblemNotSame(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemNotSame", map[string]any{"name": name})
+}
+
+// RoomProblemPreviewEnded says "You waited long to join {name}'s room, or many others knocked at once: open its link, or type its code, again."
+// in the language the app shows.
+func RoomProblemPreviewEnded(name string) string {
+	return In(i18n.Locale()).RoomProblemPreviewEnded(name)
+}
+
+// RoomProblemPreviewEnded says "You waited long to join {name}'s room, or many others knocked at once: open its link, or type its code, again."
+// in the language of msgs.
+func (msgs Messages) RoomProblemPreviewEnded(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemPreviewEnded", map[string]any{"name": name})
+}
+
+// RoomProblemRemoved says "{name} removed you from the room."
+// in the language the app shows.
+func RoomProblemRemoved(name string) string { return In(i18n.Locale()).RoomProblemRemoved(name) }
+
+// RoomProblemRemoved says "{name} removed you from the room."
+// in the language of msgs.
+func (msgs Messages) RoomProblemRemoved(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemRemoved", map[string]any{"name": name})
+}
+
+// RoomProblemTooLong says "Joining took too long: try again."
+// in the language the app shows.
+func RoomProblemTooLong() string { return In(i18n.Locale()).RoomProblemTooLong() }
+
+// RoomProblemTooLong says "Joining took too long: try again."
+// in the language of msgs.
+func (msgs Messages) RoomProblemTooLong() string {
+	return Catalog.Format(msgs.locale, "roomProblemTooLong", nil)
+}
+
+// RoomProblemUnreachable says "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away."
+// in the language the app shows.
+func RoomProblemUnreachable(name string) string {
+	return In(i18n.Locale()).RoomProblemUnreachable(name)
+}
+
+// RoomProblemUnreachable says "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away."
+// in the language of msgs.
+func (msgs Messages) RoomProblemUnreachable(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemUnreachable", map[string]any{"name": name})
+}
+
+// RoomProblemVersion says "That computer's MixMusic is of another version: update both."
+// in the language the app shows.
+func RoomProblemVersion() string { return In(i18n.Locale()).RoomProblemVersion() }
+
+// RoomProblemVersion says "That computer's MixMusic is of another version: update both."
+// in the language of msgs.
+func (msgs Messages) RoomProblemVersion() string {
+	return Catalog.Format(msgs.locale, "roomProblemVersion", nil)
+}
+
+// RoomProblemWait says "Too many wrong codes from this computer: try again in a minute."
+// in the language the app shows.
+func RoomProblemWait() string { return In(i18n.Locale()).RoomProblemWait() }
+
+// RoomProblemWait says "Too many wrong codes from this computer: try again in a minute."
+// in the language of msgs.
+func (msgs Messages) RoomProblemWait() string {
+	return Catalog.Format(msgs.locale, "roomProblemWait", nil)
+}
+
+// RoomProblemWrongCode says "That isn't the code of {name}'s room."
+// in the language the app shows.
+func RoomProblemWrongCode(name string) string { return In(i18n.Locale()).RoomProblemWrongCode(name) }
+
+// RoomProblemWrongCode says "That isn't the code of {name}'s room."
+// in the language of msgs.
+func (msgs Messages) RoomProblemWrongCode(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemWrongCode", map[string]any{"name": name})
+}
+
 // RoomReachAddressIntro says "Or join a room at an address, with its code: its host's address on a VPN you both run, or its router's, with the port."
 // in the language the app shows.
 func RoomReachAddressIntro() string { return In(i18n.Locale()).RoomReachAddressIntro() }
@@ -17206,6 +17450,16 @@ func RoomSettingsYourRoomOpen() string { return In(i18n.Locale()).RoomSettingsYo
 // in the language of msgs.
 func (msgs Messages) RoomSettingsYourRoomOpen() string {
 	return Catalog.Format(msgs.locale, "roomSettingsYourRoomOpen", nil)
+}
+
+// RoomSomeone says "Someone"
+// in the language the app shows.
+func RoomSomeone() string { return In(i18n.Locale()).RoomSomeone() }
+
+// RoomSomeone says "Someone"
+// in the language of msgs.
+func (msgs Messages) RoomSomeone() string {
+	return Catalog.Format(msgs.locale, "roomSomeone", nil)
 }
 
 // SearchAlbums says "Albums"

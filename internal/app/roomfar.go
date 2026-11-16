@@ -17,6 +17,7 @@ import (
 	"strings"
 
 	"github.com/fzn0x/mixmusic/internal/room"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // farLink is where the room of the host id is reached from outside the
@@ -188,7 +189,7 @@ func farUnreachable(err error) bool {
 // host named name.
 func farProblem(name string) string {
 	if name == "" || name == "The room" {
-		name = "the room's host"
+		return locales.RoomProblemFarUnnamed()
 	}
-	return "Couldn't reach " + name + " over the internet: their router may not forward the room's port, a firewall may turn MixMusic away, or the room ended. A VPN both of you run, such as Tailscale, reaches it where the router doesn't."
+	return locales.RoomProblemFar(name)
 }

@@ -4874,6 +4874,142 @@
     }
   },
   "roomPageWaitingGuests": "The next track waits for your guests to have it ready.",
+  "roomProblemAway": "{name}'s room isn't on the network now.",
+  "@roomProblemAway": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemBlocked": "{name} blocked this computer.",
+  "@roomProblemBlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemBlockedUnnamed": "This room blocked this computer.",
+  "roomProblemBusy": "{name}'s room checks other codes: try again in a moment.",
+  "@roomProblemBusy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemDeclined": "{name} didn't let you in.",
+  "@roomProblemDeclined": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemEnded": "The room ended.",
+  "roomProblemFar": "Couldn't reach {name} over the internet: their router may not forward the room's port, a firewall may turn MixMusic away, or the room ended. A VPN both of you run, such as Tailscale, reaches it where the router doesn't.",
+  "@roomProblemFar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemFarAddr": "The link names an address of this computer, or of no one: ask its host for the link again.",
+  "roomProblemFarUnnamed": "Couldn't reach the room's host over the internet: their router may not forward the room's port, a firewall may turn MixMusic away, or the room ended. A VPN both of you run, such as Tailscale, reaches it where the router doesn't.",
+  "roomProblemFull": "{name}'s room is full.",
+  "@roomProblemFull": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemLocked": "{name}'s room isn't taking codes for a minute: ask {name} for the invite link.",
+  "@roomProblemLocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemManyAsk": "So many wait to join {name}'s room that it takes no more for now: try again later.",
+  "@roomProblemManyAsk": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemMoves": "{name}'s room is moving to another computer: try again in a moment.",
+  "@roomProblemMoves": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemNewCode": "{name}'s room has a new code: ask {name} for it, or for the new invite link.",
+  "@roomProblemNewCode": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemNotGuest": "{name}'s room no longer keeps your place: join again with its code.",
+  "@roomProblemNotGuest": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemNotLink": "That isn't a link to a room.",
+  "roomProblemNotSame": "Another computer answered in place of {name}: the link isn't of its room.",
+  "@roomProblemNotSame": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemPreviewEnded": "You waited long to join {name}'s room, or many others knocked at once: open its link, or type its code, again.",
+  "@roomProblemPreviewEnded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemRemoved": "{name} removed you from the room.",
+  "@roomProblemRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemTooLong": "Joining took too long: try again.",
+  "roomProblemUnreachable": "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away.",
+  "@roomProblemUnreachable": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemVersion": "That computer's MixMusic is of another version: update both.",
+  "roomProblemWait": "Too many wrong codes from this computer: try again in a minute.",
+  "roomProblemWrongCode": "That isn't the code of {name}'s room.",
+  "@roomProblemWrongCode": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "roomReachAddressIntro": "Or join a room at an address, with its code: its host's address on a VPN you both run, or its router's, with the port.",
   "roomReachAddressLabel": "Room's address",
   "roomReachAsking": "Asking your router to forward the room's port…",
@@ -5048,6 +5184,7 @@
   "roomSettingsStartRoom": "Start a room",
   "roomSettingsYourName": "Your name in rooms",
   "roomSettingsYourRoomOpen": "Your room is open",
+  "roomSomeone": "Someone",
   "searchAlbums": "Albums",
   "searchArtists": "Artists",
   "searchClear": "clear",

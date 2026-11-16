@@ -167,9 +167,9 @@ func (a *App) assistantTools() []mcp.Tool {
 			Input: json.RawMessage(`{"type":"object","properties":{` +
 				`"id":{"type":"string","description":"The id of a result of search, or of a playlist of list_playlists."},` +
 				`"when":{"type":"string","enum":["now","next","last"],"description":"now, the default, plays it at once, in place of the queue; next puts it after the current track; last adds it at the end of the queue."},` +
-				`"shuffle":{"type":"boolean","description":"Plays an album, an artist's top tracks or a playlist shuffled, when now."}},` +
+				`"shuffle":{"type":"boolean","description":"Plays an album, all of an artist's songs or a playlist shuffled, when now."}},` +
 				`"required":["id"],"additionalProperties":false}`),
-			Description: "Plays a song, a video, an album, an artist's top tracks or a playlist that search or " +
+			Description: "Plays a song, a video, an album, all of an artist's songs or a playlist that search or " +
 				"list_playlists found, or puts it in the queue. A song played now is followed by songs like it, " +
 				"when the user's autoplay is on.",
 			Call: a.toolPlayResult},

@@ -6,8 +6,9 @@ package room
 // room of its own, which keeps them, and says where (hosting). The host
 // asks each other guest whether it reaches that room (reach), and tries it
 // itself; once all did, it tells them all the room moved (moved), and they
-// come back to the new host by their keys, as after a drop. One that can't
-// reach it, or no answer in MoveFor, keeps the room where it is.
+// come back to the new host by their keys, as after a drop. The guest's
+// user is asked first, AnswerFor at most; one that can't reach the room,
+// or no answer in MoveFor, keeps the room where it is.
 
 import (
 	"context"
@@ -41,11 +42,15 @@ func init() {
 // featureMove: the guest can host the room it is in (MakeHost).
 const featureMove = "move"
 
-// MoveFor bounds a move: the guest opening its room, and the others
-// reaching it. Tests shorten moveFor.
-const MoveFor = 10 * time.Second
+// AnswerFor bounds the wait for the guest asked to host, whose user says
+// whether it does, and MoveFor the others reaching its room then. Tests
+// shorten answerFor and moveFor.
+const (
+	AnswerFor = time.Minute
+	MoveFor   = 10 * time.Second
+)
 
-var moveFor = MoveFor
+var answerFor, moveFor = AnswerFor, MoveFor
 
 var (
 	// ErrCantHost: the guest is away, or its MixMusic can't host the room.
@@ -189,7 +194,7 @@ func (s *Server) MakeHost(key remote.Fingerprint, done func(Move, error)) error 
 	slices.SortFunc(blocked, func(a, b Member) int { return compareKeys(a.Key, b.Key) })
 	blocked = blocked[:min(len(blocked), maxBlocked)]
 	mv := &move{to: key, name: g.Name, conn: g.conn, done: done}
-	mv.timer = time.AfterFunc(moveFor, func() { s.notMoved(mv, fmt.Errorf("%s's computer didn't open the room in time", mv.name)) })
+	mv.timer = time.AfterFunc(answerFor, func() { s.notMoved(mv, fmt.Errorf("%s didn't answer in time", mv.name)) })
 	s.asks.move = mv
 	g.conn.send(message{Type: "host", Seats: seatsOf(seats), Blocked: seatsOf(blocked)})
 	return nil
@@ -234,6 +239,8 @@ func (s *Server) hosting(c *conn, m message) {
 	}
 	mv.addr = net.JoinHostPort(host, strconv.Itoa(m.Port))
 	mv.waiting, mv.self = map[remote.Fingerprint]bool{}, true
+	mv.timer.Stop()
+	mv.timer = time.AfterFunc(moveFor, func() { s.notMoved(mv, fmt.Errorf("not everyone reached %s's computer in time", mv.name)) })
 	for k, g := range s.guests {
 		if k != mv.to && g.conn != nil {
 			mv.waiting[k] = true

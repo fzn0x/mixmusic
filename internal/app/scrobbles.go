@@ -5,11 +5,17 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
+	"net/url"
+	"os"
 	"sync"
+	"time"
 
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/scrobble"
+	"github.com/fzn0x/mixmusic/internal/store"
 )
 
 // scrobbling is a scrobbling service's connection: its scrobbler, the
@@ -23,6 +29,88 @@ type scrobbling struct {
 	service string
 	sends   sendLoop
 	waits   waitingTold
+}
+
+// scrobble feeds what plays to the scrobbler of each scrobbling service
+// that is connected and on, which sends what it has to beside the app.
+func (a *App) scrobble(np NowPlaying) {
+	a.mu.Lock()
+	lf, lb := a.lastfm, a.listenbrainz.conn
+	a.mu.Unlock()
+	if lf == nil && lb == nil {
+		return
+	}
+	s := a.settings.Get()
+	id, t := scrobbleTrack(np)
+	if lf != nil && s.Scrobbling {
+		a.feed(&lf.scrobbling, np, id, t)
+	}
+	if lb != nil && s.ListenBrainzScrobbling {
+		a.feed(&lb.scrobbling, np, id, t)
+	}
+}
+
+// feed tells sc's scrobbler what plays: the track of id, t.
+func (a *App) feed(sc *scrobbling, np NowPlaying, id string, t scrobble.Track) {
+	sc.scrobbler.Observe(time.Now(), id, t, np.Playing, time.Duration(np.PositionMs)*time.Millisecond, np.Speed)
+	a.sendScrobbles(sc)
+	a.tellWaiting(sc)
+}
+
+// The domains of the services tracks play from, as ListenBrainz hears
+// them.
+const (
+	youtubeMusicService = "music.youtube.com"
+	spotifyService      = "spotify.com"
+)
+
+// scrobbleTrack is what plays as every scrobbling service knows it, and
+// its ID, "" when nothing counts: what lastfmTrack's rules say, with where
+// it plays from.
+func scrobbleTrack(np NowPlaying) (string, scrobble.Track) {
+	id, t := lastfmTrack(np)
+	if id == "" {
+		return id, t
+	}
+	t.ID, t.ISRC = id, np.Track.ISRC
+	source, native, err := media.ParseID(id)
+	switch {
+	case err != nil:
+	case source == media.SourceYouTube:
+		t.Service, t.URL = youtubeMusicService, "https://music.youtube.com/watch?v="+url.QueryEscape(native)
+	case source == media.SourceSpotify:
+		t.Service, t.URL = spotifyService, "https://open.spotify.com/track/"+url.PathEscape(native)
+		t.SpotifyURL = t.URL
+	}
+	return id, t
+}
+
+// loadQueue reads the plays a scrobbler's queue kept in file, nil when it
+// kept none.
+func loadQueue(file string) []scrobble.Play {
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return nil
+	}
+	var plays []scrobble.Play
+	if json.Unmarshal(data, &plays) != nil {
+		return nil
+	}
+	return plays
+}
+
+// queueSaver returns what keeps a scrobbler's queue of plays to send in
+// file.
+func queueSaver(file string) func([]scrobble.Play) {
+	return func(plays []scrobble.Play) {
+		data, err := json.Marshal(plays)
+		if err == nil {
+			err = store.WriteFile(file, data)
+		}
+		if err != nil {
+			log.Printf("mixmusic: keeping the scrobbles to send: %v", err)
+		}
+	}
 }
 
 // sendLoop runs a scrobbler's Run beside the app, from the first play the
@@ -146,9 +234,12 @@ func (a *App) userAgent() string {
 // stopScrobbling stops the scrobblers' sends, as the app closes.
 func (a *App) stopScrobbling() {
 	a.mu.Lock()
-	l := a.lastfm
+	lf, lb := a.lastfm, a.listenbrainz.conn
 	a.mu.Unlock()
-	if l != nil {
-		l.sends.stop()
+	if lf != nil {
+		lf.sends.stop()
+	}
+	if lb != nil {
+		lb.sends.stop()
 	}
 }

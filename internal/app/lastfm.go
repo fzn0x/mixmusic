@@ -2,9 +2,7 @@ package app
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,7 +13,6 @@ import (
 	"github.com/fzn0x/mixmusic/internal/lastfm"
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/scrobble"
-	"github.com/fzn0x/mixmusic/internal/store"
 )
 
 // lastfmSecret is the key, in the system's credential store, of what
@@ -78,13 +75,10 @@ func (a *App) startScrobbling(c lastfmCredentials) {
 	client.UserAgent = a.userAgent()
 	s := scrobble.New(client, c.Session.Key, scrobble.Options{})
 	queue := filepath.Join(a.opts.DataDir, "lastfm-queue.json")
-	if data, err := os.ReadFile(queue); err == nil {
-		var plays []lastfm.Play
-		if json.Unmarshal(data, &plays) == nil {
-			s.SetQueue(plays)
-		}
+	if plays := loadQueue(queue); plays != nil {
+		s.SetQueue(plays)
 	}
-	s.OnQueue = a.lastfmQueueSaver(queue)
+	s.OnQueue = queueSaver(queue)
 	a.mu.Lock()
 	old := a.lastfm
 	a.lastfm = &scrobbles{scrobbling: scrobbling{scrobbler: s, name: c.Session.Name, service: "Last.fm"}, client: client}
@@ -95,17 +89,7 @@ func (a *App) startScrobbling(c lastfmCredentials) {
 }
 
 // lastfmQueueSaver returns what keeps the scrobbles waiting in the file.
-func (a *App) lastfmQueueSaver(file string) func([]lastfm.Play) {
-	return func(plays []lastfm.Play) {
-		data, err := json.Marshal(plays)
-		if err == nil {
-			err = store.WriteFile(file, data)
-		}
-		if err != nil {
-			log.Printf("mixmusic: keeping the scrobbles to send: %v", err)
-		}
-	}
-}
+func (a *App) lastfmQueueSaver(file string) func([]lastfm.Play) { return queueSaver(file) }
 
 func (a *App) lastfmAccount() LastfmAccount {
 	a.mu.Lock()
@@ -120,23 +104,9 @@ func (a *App) lastfmAccount() LastfmAccount {
 	return acc
 }
 
-// scrobble feeds what plays to the scrobbler, which sends what it has to
-// beside the app.
-func (a *App) scrobble(np NowPlaying) {
-	a.mu.Lock()
-	l := a.lastfm
-	a.mu.Unlock()
-	if l == nil || !a.settings.Get().Scrobbling {
-		return
-	}
-	id, t := lastfmTrack(np)
-	l.scrobbler.Observe(time.Now(), id, t, np.Playing, time.Duration(np.PositionMs)*time.Millisecond, np.Speed)
-	a.sendScrobbles(&l.scrobbling)
-	a.tellWaiting(&l.scrobbling)
-}
-
-// lastfmTrack is what plays as the scrobbler knows it, and its ID, "" when
-// nothing does. A live stream has no length, which the scrobbler never
+// lastfmTrack is what plays as Last.fm knows it, and its ID, "" when
+// nothing does: by Last.fm's rules of what counts, which every scrobbling
+// service follows (scrobbleTrack). A live stream has no length, which the scrobbler never
 // scrobbles: Last.fm hears only that it plays.
 func lastfmTrack(np NowPlaying) (string, lastfm.Track) {
 	// Last.fm keeps music: a podcast's episode is none.

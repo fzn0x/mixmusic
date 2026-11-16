@@ -254,6 +254,8 @@ type App struct {
 	youtubeMe  *youtube.Account
 	spotifyMe  *spotify.Profile
 	nowPlaying NowPlaying
+	// listenbrainz is the ListenBrainz connection, beside Last.fm's.
+	listenbrainz listenbrainzState
 	// started is the ID of the track whose start the reports told last
 	// (startOf).
 	started    string
@@ -339,6 +341,8 @@ func New(opts Options) (*App, error) {
 	}
 	a.lastfmStore = lastfmStore{newSecretStore(opts.DataDir, lastfmSecret, "lastfm.json", "lastfm.dpapi")}
 	a.openLastfm()
+	a.listenbrainz.store = listenbrainzStore{newSecretStore(opts.DataDir, listenbrainzSecret, "listenbrainz.json", "listenbrainz.dpapi")}
+	a.openListenBrainz()
 	a.tools = tools.New(filepath.Join(opts.DataDir, "bin"))
 	a.tools.Bundled = bundledYTDLP()
 	a.resolver = stream.NewResolver(a.tools, filepath.Join(opts.CacheDir, "yt-dlp"))

@@ -83,16 +83,21 @@ type Invite struct {
 	Code   string
 	Host   remote.Fingerprint
 	Secret []byte
+	// Addrs are where friends outside the host's network reach it, each
+	// a host and a port, when the host lets them join (#562): none for a
+	// room of the network alone.
+	Addrs []string
 }
 
 // linkPrefix is how an invite link starts.
 const linkPrefix = "mixmusic://join/"
 
 // Link is the invite link: mixmusic://join/<code>#<key>.<secret>, the key
-// in hex and the secret in base64url. What follows # stays in the app
-// that opens it: a browser never sends it.
+// in hex and the secret in base64url, then @ and the addresses, when it
+// has some (weblink.go). What follows # stays in the app that opens it: a
+// browser never sends it.
 func (in Invite) Link() string {
-	return linkPrefix + in.Code + "#" + in.Host.String() + "." + base64.RawURLEncoding.EncodeToString(in.Secret)
+	return linkPrefix + in.Code + "#" + in.Host.String() + "." + base64.RawURLEncoding.EncodeToString(in.Secret) + addrsPart(in.Addrs)
 }
 
 // ErrNotLink: what was given isn't an invite link.
@@ -101,6 +106,9 @@ var ErrNotLink = errors.New("that isn't a link to a room")
 // ParseLink reads an invite link.
 func ParseLink(link string) (Invite, error) {
 	u, err := url.Parse(strings.TrimSpace(link))
+	if err == nil && u.Scheme == "https" {
+		return parseWebLink(u)
+	}
 	if err != nil || u.Scheme != "mixmusic" || u.Host != "join" {
 		return Invite{}, ErrNotLink
 	}
@@ -110,8 +118,10 @@ func ParseLink(link string) (Invite, error) {
 // InviteOf reads an invite link's code and what follows its #.
 func InviteOf(code, fragment string) (Invite, error) {
 	code, ok := ParseCode(code)
+	fragment, at, _ := strings.Cut(fragment, "@")
+	addrs, aok := parseAddrs(at)
 	key, secret, cut := strings.Cut(fragment, ".")
-	if !ok || !cut {
+	if !ok || !cut || !aok {
 		return Invite{}, ErrNotLink
 	}
 	fp, err := remote.ParseFingerprint(key)
@@ -122,5 +132,5 @@ func InviteOf(code, fragment string) (Invite, error) {
 	if err != nil || len(s) != secretSize {
 		return Invite{}, ErrNotLink
 	}
-	return Invite{Code: code, Host: fp, Secret: s}, nil
+	return Invite{Code: code, Host: fp, Secret: s, Addrs: addrs}, nil
 }

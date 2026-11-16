@@ -174,3 +174,44 @@ func TestRoomClosesAConnectionPastTheRate(t *testing.T) {
 		t.Fatalf("%d of %d knocks at once failed", failed, acceptBurst+4)
 	}
 }
+
+// TestWrongCodesFromOutsideLockNoCodeOnTheNetwork has six sources of the
+// internet try 5 wrong codes each, as many as the room takes a minute: the
+// room takes no more codes from the internet, but still from its own
+// network, and the other way round.
+func TestWrongCodesFromOutsideLockNoCodeOnTheNetwork(t *testing.T) {
+	a := newAdmission()
+	now := time.Now()
+	for i := range RoomTries / Tries {
+		src := fmt.Sprintf("203.0.113.%d", i)
+		for range Tries {
+			if got := a.tryCode(src, now, time.Minute); got != tryRuns {
+				t.Fatalf("%s: %v", src, got)
+			}
+			a.endTry(src, true, now, time.Minute)
+		}
+	}
+	if got := a.tryCode("198.51.100.9", now, time.Minute); got != tryLocked {
+		t.Fatalf("another source of the internet: %v, want locked", got)
+	}
+	for _, src := range []string{"192.168.1.20", "fd00:1:2:300::/56", "fe80::/56", "127.0.0.1"} {
+		if got := a.tryCode(src, now, time.Minute); got != tryRuns {
+			t.Fatalf("%s of the network: %v, want it to run", src, got)
+		}
+		a.endTry(src, false, now, time.Minute)
+	}
+}
+
+// TestLocalSource tells the sources of the room's own network from those
+// of the internet, VPNs' shared range among them.
+func TestLocalSource(t *testing.T) {
+	for src, want := range map[string]bool{
+		"192.168.1.20": true, "10.1.2.3": true, "172.16.5.4": true, "127.0.0.1": true, "169.254.3.4": true,
+		"fd00:1:2:300::/56": true, "fe80::/56": true,
+		"203.0.113.7": false, "100.101.102.103": false, "2001:db8:1:200::/56": false, "not an address": false,
+	} {
+		if got := localSource(src); got != want {
+			t.Errorf("localSource(%q) = %v", src, got)
+		}
+	}
+}

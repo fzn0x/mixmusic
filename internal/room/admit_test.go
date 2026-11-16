@@ -309,8 +309,9 @@ func TestRoomWindowRollsWithATryUnderWay(t *testing.T) {
 	if v := a.tryCode("10.0.2.1", now, wait); v != tryRuns {
 		t.Fatalf("a minute on: %v", v)
 	}
-	if a.room.running != 2 || a.room.wrong != 0 {
-		t.Fatalf("the room counts %d under way and %d wrong", a.room.running, a.room.wrong)
+	// The sources are of the network: its count is the room's.
+	if a.local.running != 2 || a.local.wrong != 0 {
+		t.Fatalf("the room counts %d under way and %d wrong", a.local.running, a.local.wrong)
 	}
 }
 

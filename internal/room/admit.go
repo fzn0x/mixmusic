@@ -6,12 +6,15 @@ package room
 // room counts. Each source, an IPv4 address or the /56 of an IPv6 one,
 // which one home changes within as it likes, tries Tries codes, then
 // waits; the whole room takes RoomTries wrong ones each Wait, then takes no
-// code until the wait is over. A try counts as it starts, before SPAKE2
+// code until the wait is over: as many from its own network apart, so that
+// wrong codes from the internet lock no code out on the network (#562),
+// nor the other way. A try counts as it starts, before SPAKE2
 // runs, so that tries at once count too. Links, of a secret too long to
 // guess, and guests that come back by their keys, aren't counted.
 //
 // At 30 codes a minute, the room tries 43,200 a day: the 1.29 billion
-// codes would take 82 years, half of them 41. A room lasts an evening.
+// codes would take 82 years, half of them 41, or 41 and 20 with the
+// network's 30 beside the internet's. A room lasts an evening.
 //
 // Before they prove anything, the room holds a few connections at once,
 // from all and from each source, a few seconds in all, and takes messages
@@ -115,6 +118,7 @@ type admission struct {
 	caps     caps
 	sources  map[string]*tries
 	room     tries
+	local    tries // of the room's own network, apart (localSource)
 	unproven []*unproven
 }
 
@@ -214,7 +218,8 @@ func (t *tries) check(limit int, now time.Time, wait time.Duration) try {
 // src, or the room, waits after too many wrong ones, or so many run that,
 // all wrong, they would be. endTry ends it.
 func (a *admission) tryCode(src string, now time.Time, wait time.Duration) try {
-	switch a.room.check(a.caps.roomTries, now, wait) {
+	room := a.roomOf(src)
+	switch room.check(a.caps.roomTries, now, wait) {
 	case tryWaits:
 		return tryLocked
 	case tryBusy:
@@ -241,7 +246,7 @@ func (a *admission) tryCode(src string, now time.Time, wait time.Duration) try {
 	}
 	t.running++
 	t.last = now
-	a.room.running++
+	room.running++
 	return tryRuns
 }
 
@@ -261,7 +266,7 @@ func (t *tries) end(wrong bool, limit int, now time.Time, wait time.Duration) {
 // endTry ends the try of a code from src that tryCode started: wrong, or
 // the code, or none at all, as one that ended before it was checked.
 func (a *admission) endTry(src string, wrong bool, now time.Time, wait time.Duration) {
-	a.room.end(wrong, a.caps.roomTries, now, wait)
+	a.roomOf(src).end(wrong, a.caps.roomTries, now, wait)
 	if t := a.sources[src]; t != nil {
 		t.end(wrong, a.caps.tries, now, wait)
 	}
@@ -270,8 +275,10 @@ func (a *admission) endTry(src string, wrong bool, now time.Time, wait time.Dura
 // locked returns until when the room takes no code, after too many wrong
 // ones, or the zero time.
 func (a *admission) locked(now time.Time) time.Time {
-	if now.Before(a.room.until) {
-		return a.room.until
+	for _, t := range []*tries{&a.room, &a.local} {
+		if now.Before(t.until) {
+			return t.until
+		}
 	}
 	return time.Time{}
 }

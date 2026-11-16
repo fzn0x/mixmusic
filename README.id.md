@@ -501,6 +501,10 @@ MixMusic berkomunikasi dengan:
   diterjemahkan lewat Google.
 - **LRCLIB:** judul, artis, album, dan durasi lagu yang sedang diputar,
   untuk mencari liriknya.
+- **SponsorBlock:** hanya saat Anda menyalakan Skip the parts SponsorBlock
+  marks (Lewati bagian yang ditandai SponsorBlock): 4 karakter pertama
+  dari hash ID setiap video, tidak pernah ID-nya, untuk mencari bagian
+  yang ditandainya.
 - **GitHub:** pemeriksaan versi baru saat aplikasi dibuka dan setiap
   beberapa jam, yang bisa Anda matikan di Settings › About (Pengaturan ›
   Tentang); registry komunitas saat Anda membuka marketplace; unduhan

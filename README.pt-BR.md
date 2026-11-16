@@ -488,6 +488,10 @@ Ele se comunica com:
   manda o Google traduzir.
 - **LRCLIB:** o título, os artistas, o álbum e a duração da faixa que está
   tocando, para encontrar a letra.
+- **SponsorBlock:** somente enquanto você deixar ligado Skip the parts
+  SponsorBlock marks (Pular as partes que o SponsorBlock marca), os 4
+  primeiros caracteres do hash do ID de cada vídeo, nunca o ID, para
+  encontrar as partes que ele marca.
 - **GitHub:** uma verificação de nova versão ao iniciar e a cada poucas
   horas, que você pode desativar em Settings › About (Configurações ›
   Sobre); o registro da comunidade quando você abre o marketplace; os

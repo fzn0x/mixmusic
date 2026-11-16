@@ -319,6 +319,7 @@ MixMusic 没有自己的账号体系、服务器、统计分析或遥测。它�
 - **Spotify**（登录之后）：你的音乐库、你的 Spotify Connect 设备；在 MixMusic 内播放 Spotify 时，还有从 `sdk.scdn.co` 加载的 Spotify 播放器。
 - **Unison**：正在播放的歌曲的视频 ID，没有视频 ID 时则是它的标题、艺人、专辑和时长，用来查找歌词。只有在你于歌词旁打开翻译或罗马音时，才会发送正在播放的歌曲的歌词和它的视频 ID，由 Unison 交给 Google 翻译。
 - **LRCLIB**：正在播放的歌曲的标题、艺人、专辑和时长，用来查找歌词。
+- **SponsorBlock**：只有在你打开 Skip the parts SponsorBlock marks（跳过 SponsorBlock 标记的片段）时，才会发送每个视频 ID 的哈希值的前 4 个字符，从不发送 ID 本身，用来查找它标记的片段。
 - **GitHub**：启动时以及之后每隔几小时检查一次新版本，可以在 Settings › About（设置 › 关于）中关闭；打开市场时获取社区注册表；下载 yt-dlp；以及第一次在日文歌词旁打开罗马音时，下载汉字读音词典（11.7 MB）。罗马音在你的电脑上生成：歌词不会被发送出去。
 - **Last.fm**（连接之后）：你播放的内容。
 - **Discord**（除非你关闭）：正在播放的内容，发送给你电脑上的 Discord 应用，由它显示在你的个人资料上。

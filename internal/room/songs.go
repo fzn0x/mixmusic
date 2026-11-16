@@ -3,9 +3,13 @@ package room
 // Songs from guests (#734): a guest adds a song, which the host adds to
 // its queue at once, or once its user accepts it, or takes none of, as its
 // rules say. A guest adds songsPerMinute at most, and has MaxWaiting wait
-// for the host's user at most.
+// for the host's user at most. The host finds each by its ID, as its
+// service or its own files tell it (Guests.Look), on a goroutine of its
+// own, maxLooks at once in the room, rather than take the guest's word on
+// what it is.
 
 import (
+	"context"
 	"slices"
 	"time"
 
@@ -36,6 +40,10 @@ const (
 	// songsPerMinute bounds the songs a guest adds, taken or not: ten at
 	// once, then one each six seconds.
 	songsPerMinute = 10
+	// maxLooks bounds the songs the host finds at once, of all its guests,
+	// and lookFor how long it finds one.
+	maxLooks = 16
+	lookFor  = 10 * time.Second
 )
 
 // What the activity of a room tells of a guest that added a song, whose
@@ -63,19 +71,22 @@ type Request struct {
 	From  Member
 	Track remote.QueueTrack
 	At    time.Time
-	// seq is the guest's number of it, which the answer tells.
-	seq int64
+	// seq is the guest's number of it, which the answer tells; look is set
+	// while the host found it not yet, as a file of the guest's, which the
+	// host finds once its user accepts it.
+	seq  int64
+	look bool
 }
 
 // addSong takes in a song the guest of c adds: the host adds it, or asks
-// its user first, or takes none, as its rules say.
+// its user first, or takes none, as its rules say, once it found it.
 func (s *Server) addSong(c *conn, m message) {
 	if m.Track == nil {
 		return
 	}
 	t := m.Track.Clean()
-	rules := s.rules()
 	answer := func(reason string) { c.send(message{Type: "added", Seq: m.Seq, Reason: reason}) }
+	rules := s.rules()
 	s.mu.Lock()
 	g := s.guestOf(c)
 	if g == nil {
@@ -83,7 +94,7 @@ func (s *Server) addSong(c *conn, m message) {
 		return
 	}
 	from := g.Member
-	waiting := 0
+	waiting := s.asks.looking[c.key]
 	for _, r := range s.asks.requests {
 		if r.From.Key == c.key {
 			waiting++
@@ -92,42 +103,101 @@ func (s *Server) addSong(c *conn, m message) {
 	gs := s.Guests
 	reason := ""
 	switch {
-	case rules.Songs == SongsOff || gs == nil || gs.Add == nil:
+	case rules.Songs == SongsOff || gs == nil || gs.Add == nil || gs.Look == nil:
 		reason = SongsAreOff
-	case rules.Songs == SongsAsk && waiting >= MaxWaiting:
+	case rules.Songs == SongsAsk && waiting >= MaxWaiting, s.asks.looks >= maxLooks:
 		reason = TooMany
 	case !s.limitsOf(c.key).songs.take(time.Now(), songsPerMinute, time.Minute/songsPerMinute):
 		reason = TooMany
 	}
+	file := t.Source == "file" && rules.Songs == SongsAsk
+	if reason == "" && !file {
+		s.looking(c.key, 1)
+	}
 	s.mu.Unlock()
-	if reason == "" && (t.Title == "" || gs.Playable != nil && !gs.Playable(t)) {
+	if reason == "" && t.Title == "" {
 		reason = CantPlay
 	}
-	if reason != "" {
+	switch {
+	case reason != "":
 		answer(reason)
-		return
+	case file:
+		// A file of the guest's names none of the host's: which it is, and
+		// whether the host plays it, waits for its user's answer, so that
+		// the guest learns nothing of the host's files meanwhile.
+		s.ask(from, t, m.Seq, true)
+	default:
+		go s.lookUp(c, from, t, m.Seq)
 	}
-	if rules.Songs == SongsAsk {
-		s.mu.Lock()
-		s.asks.next++
-		s.asks.requests = append(s.asks.requests, &Request{ID: s.asks.next, From: from, Track: t, At: time.Now(), seq: m.Seq})
-		s.noteSong(from.Name, AskedToAdd, t.Title)
-		s.mu.Unlock()
-		answer(SongWaits)
-		if gs.Asks != nil {
-			gs.Asks(from.Name + " asks to add " + t.Title)
-		}
-		s.changed(false)
-		return
+}
+
+// looking counts n more songs the host finds of the guest of key. s.mu is
+// held.
+func (s *Server) looking(key remote.Fingerprint, n int) {
+	if s.asks.looking == nil {
+		s.asks.looking = map[remote.Fingerprint]int{}
 	}
-	if err := gs.Add(from, t); err != nil {
-		answer(CantPlay)
-		return
+	s.asks.looking[key] += n
+	s.asks.looks += n
+	if s.asks.looking[key] <= 0 {
+		delete(s.asks.looking, key)
 	}
+}
+
+// lookUp finds the song t that the guest of c, from, added as its number
+// seq, and has the host add it, or ask its user first, as its rules say
+// now.
+func (s *Server) lookUp(c *conn, from Member, t remote.QueueTrack, seq int64) {
+	answer := func(reason string) { c.send(message{Type: "added", Seq: seq, Reason: reason}) }
+	ctx, cancel := context.WithTimeout(context.Background(), lookFor)
+	found, err := s.Guests.Look(ctx, t)
+	cancel()
+	rules := s.rules()
 	s.mu.Lock()
-	s.noteSong(from.Name, Added, t.Title)
+	s.looking(c.key, -1)
+	gone := s.guestOf(c) == nil
 	s.mu.Unlock()
-	answer("")
+	switch {
+	case gone:
+	case err != nil:
+		answer(CantPlay)
+	case rules.Songs == SongsOff:
+		answer(SongsAreOff)
+	case rules.Songs == SongsAsk:
+		s.ask(from, found.Clean(), seq, false)
+	default:
+		found = found.Clean()
+		if s.Guests.Add(from, found) != nil {
+			answer(CantPlay)
+			return
+		}
+		s.mu.Lock()
+		s.noteSong(from.Name, Added, found.Title)
+		s.mu.Unlock()
+		answer("")
+		s.changed(false)
+	}
+}
+
+// ask keeps the song t, which from added as its number seq, until the
+// host's user accepts it, and tells them, and the guest; look is set when
+// the host found it not yet.
+func (s *Server) ask(from Member, t remote.QueueTrack, seq int64, look bool) {
+	s.mu.Lock()
+	s.asks.next++
+	s.asks.requests = append(s.asks.requests, &Request{ID: s.asks.next, From: from, Track: t, At: time.Now(), seq: seq, look: look})
+	s.noteSong(from.Name, AskedToAdd, t.Title)
+	var c *conn
+	if g := s.guests[from.Key]; g != nil {
+		c = g.conn
+	}
+	s.mu.Unlock()
+	if c != nil {
+		c.send(message{Type: "added", Seq: seq, Reason: SongWaits})
+	}
+	if fn := s.Guests.Asks; fn != nil {
+		fn(from.Name + " asks to add " + t.Title)
+	}
 	s.changed(false)
 }
 
@@ -152,7 +222,8 @@ func (s *Server) Requests() []Request {
 }
 
 // answerRequest takes the request id off those that wait, and returns it
-// and the connection its guest has now, if any.
+// and the connection its guest has now, if any: none of a guest the room
+// no longer keeps, or blocked, since it asked.
 func (s *Server) answerRequest(id int64) (*Request, *conn) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -162,6 +233,9 @@ func (s *Server) answerRequest(id int64) (*Request, *conn) {
 	}
 	r := s.asks.requests[i]
 	s.asks.requests = slices.Delete(s.asks.requests, i, i+1)
+	if _, blocked := s.blocked[r.From.Key]; blocked || s.guests[r.From.Key] == nil {
+		return nil, nil
+	}
 	var c *conn
 	if g := s.guests[r.From.Key]; g != nil {
 		c = g.conn
@@ -170,19 +244,29 @@ func (s *Server) answerRequest(id int64) (*Request, *conn) {
 }
 
 // Accept adds the song of the request id to the host's queue, and tells
-// its guest.
+// its guest: a file of the guest's, the host finds first. It may ask the
+// network.
 func (s *Server) Accept(id int64) error {
 	r, c := s.answerRequest(id)
-	if r == nil || s.Guests == nil || s.Guests.Add == nil {
+	if r == nil || s.Guests == nil || s.Guests.Add == nil || s.Guests.Look == nil {
 		return nil
 	}
-	err := s.Guests.Add(r.From, r.Track)
+	t, err := r.Track, error(nil)
+	if r.look {
+		ctx, cancel := context.WithTimeout(context.Background(), lookFor)
+		t, err = s.Guests.Look(ctx, r.Track)
+		cancel()
+		t = t.Clean()
+	}
+	if err == nil {
+		err = s.Guests.Add(r.From, t)
+	}
 	reason := ""
 	if err != nil {
 		reason = CantPlay
 	} else {
 		s.mu.Lock()
-		s.noteSong(r.From.Name, Added, r.Track.Title)
+		s.noteSong(r.From.Name, Added, t.Title)
 		s.mu.Unlock()
 	}
 	if c != nil {

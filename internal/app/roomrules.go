@@ -9,11 +9,15 @@ package app
 // page while MixMusic is in the background.
 
 import (
+	"context"
 	"errors"
 	"log"
+	"net/url"
+	"slices"
 
 	"github.com/egoist/mygo"
 
+	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/room"
@@ -22,7 +26,7 @@ import (
 
 // roomGuests is what the room this computer hosts does as its guests ask.
 func (a *App) roomGuests() *room.Guests {
-	return &room.Guests{Rules: a.roomRules, Playable: a.guestSongPlays, Add: a.addGuestSong, Control: a.guestControl, Asks: a.roomAsks}
+	return &room.Guests{Rules: a.roomRules, Look: a.lookGuestSong, Add: a.addGuestSong, Control: a.guestControl, Asks: a.roomAsks}
 }
 
 // roomRules are the host's rules, as the settings choose them now.
@@ -51,13 +55,58 @@ func (a *App) guestSong(t remote.QueueTrack) (media.Track, error) {
 	return mt, nil
 }
 
-func (a *App) guestSongPlays(t remote.QueueTrack) bool {
-	_, err := a.guestSong(t)
-	return err == nil
+// lookGuestSong finds the song t a guest adds by its ID: on its service,
+// or, of a file of the guest's, among this computer's own files, as a
+// hand-over finds one. What the guest says of it, its title, artists,
+// covers and whether it's explicit, is taken for nothing, as the host
+// shows it, plays it and tells Discord and the scrobblers of it.
+func (a *App) lookGuestSong(ctx context.Context, t remote.QueueTrack) (remote.QueueTrack, error) {
+	mt, ok := a.roomTrack(t)
+	if !ok {
+		return remote.QueueTrack{}, errCantPlaySong
+	}
+	if mt.Source != media.SourceFile {
+		var err error
+		if mt, err = a.findSong(ctx, mt); err != nil {
+			log.Printf("mixmusic: room: finding a guest's song: %v", err)
+			return remote.QueueTrack{}, errCantPlaySong
+		}
+	}
+	return queueTrackOf(mt), nil
 }
 
-// addGuestSong adds the song t, which the guest from added, to the end of
-// the queue.
+// findSong finds t, a track of a service, by its ID, as its service tells
+// it. Spotify's tells it only while the user is signed in to it: until
+// then, t is taken as it is, but for its covers, but those of the
+// services' own hosts, and none at all while the settings hide explicit
+// content, as nothing tells whether it is.
+func (a *App) findSong(ctx context.Context, t media.Track) (media.Track, error) {
+	if o := a.opts.Room; o != nil && o.Song != nil {
+		return o.Song(ctx, t)
+	}
+	_, native, err := media.ParseID(t.ID)
+	if err != nil {
+		return media.Track{}, err
+	}
+	switch {
+	case t.Source == media.SourceYouTube:
+		return a.youtube.Song(ctx, native)
+	case t.Source == media.SourceSpotify && a.spotify.SignedIn():
+		return a.spotify.Track(ctx, native)
+	}
+	if a.settings.Get().HideExplicit {
+		return media.Track{}, errCantPlaySong
+	}
+	t.Artwork = slices.DeleteFunc(slices.Clone(t.Artwork), func(img media.Image) bool {
+		u, err := url.Parse(img.URL)
+		return err != nil || !artwork.CoverHost(u.Hostname())
+	})
+	return t, nil
+}
+
+// addGuestSong adds the song t, which the guest from added, as
+// lookGuestSong found it, to the end of the queue, unless the settings
+// hide it.
 func (a *App) addGuestSong(from room.Member, t remote.QueueTrack) error {
 	mt, err := a.guestSong(t)
 	if err != nil {

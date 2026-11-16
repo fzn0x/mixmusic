@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"slices"
 	"strings"
 	"testing"
@@ -9,9 +10,25 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/remote/remotetest"
 	"github.com/fzn0x/mixmusic/internal/room/roomtest"
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
+
+// newSongRoomShell is newRoomShell, whose rooms find their guests' songs
+// as they are, in place of the services.
+func newSongRoomShell(t *testing.T, n *roomtest.Network, name string) *shell {
+	t.Helper()
+	s := newRemoteShellOf(t, remotetest.New(), name, func(o *app.Options) {
+		o.Room = &app.RoomOptions{Discovery: n, Listen: roomtest.Listen, Timing: roomTiming,
+			Song: func(_ context.Context, t media.Track) (media.Track, error) { return t, nil }}
+	})
+	t.Cleanup(func() {
+		s.a.Rooms().End()
+		s.a.Rooms().Leave()
+	})
+	return s
+}
 
 // quietRooms has s show no notifications, which the tests' windows can't.
 func quietRooms(t *testing.T, s *shell) {
@@ -68,7 +85,7 @@ func TestRoomRuleRows(t *testing.T) {
 // guest is told.
 func TestRoomSongFromTheMenu(t *testing.T) {
 	n := roomtest.New()
-	desk := newRoomShell(t, n, "Desk")
+	desk := newSongRoomShell(t, n, "Desk")
 	lap := newRoomShell(t, n, "Lap")
 	dt, lt := tester(t, desk), tester(t, lap)
 	quietRooms(t, desk)

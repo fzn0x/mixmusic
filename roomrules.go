@@ -105,12 +105,17 @@ func (s *shell) hostRules(c *ui.Context) {
 	s.roomRuleRows(c)
 }
 
-// acceptSong adds the song of the request id to the queue, and tells why
-// it can't.
+// acceptSong adds the song of the request id to the queue beside the main
+// thread, as it may find it first, and tells why it can't.
 func (s *shell) acceptSong(id int64) {
-	if err := s.a.Rooms().Accept(id); err != nil {
-		s.notes = append(s.notes, noticeOf(err))
-	}
+	go func() {
+		err := s.a.Rooms().Accept(id)
+		s.update(func() {
+			if err != nil {
+				s.notes = append(s.notes, noticeOf(err))
+			}
+		})
+	}()
 }
 
 // makeHostButton moves the room to the guest g, once its MixMusic can

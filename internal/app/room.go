@@ -24,6 +24,7 @@ import (
 
 	"github.com/egoist/mygo"
 
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/portmap"
 	"github.com/fzn0x/mixmusic/internal/room"
@@ -44,6 +45,9 @@ type RoomOptions struct {
 	IPv6   func() []netip.Addr
 	// Timing is the protocol's.
 	Timing room.Timing
+	// Song finds a song a guest adds by its ID, in place of its service
+	// (roomrules.go).
+	Song func(ctx context.Context, t media.Track) (media.Track, error)
 	// Heard tells where the player's track is heard now, in place of the
 	// engine; SetSpeed plays it faster or slower in place of the engine.
 	Heard    func(player.State) time.Duration

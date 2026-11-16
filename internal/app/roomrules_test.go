@@ -1,10 +1,13 @@
 package app
 
 import (
+	"context"
+	"errors"
 	"slices"
 	"sync"
 	"testing"
 
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/room"
 	"github.com/fzn0x/mixmusic/internal/room/roomtest"
@@ -35,6 +38,21 @@ func toldNote(t *testing.T, notes func() []string, note string) {
 	until(t, "the note "+note, func() bool { return slices.Contains(notes(), note) })
 }
 
+// findSongs has the host ra find the songs its guests add on a service
+// of its own, in place of YouTube Music's: the song of the letter x is
+// "Song x" by Band, explicit if its ID is among explicit.
+func findSongs(ra *roomApp, explicit ...string) {
+	ra.opts.Room.Song = func(_ context.Context, t media.Track) (media.Track, error) {
+		_, native, err := media.ParseID(t.ID)
+		if err != nil || native == "" {
+			return media.Track{}, errors.New("not found")
+		}
+		found := tracksOf(native[:1])[0]
+		found.Explicit = slices.Contains(explicit, t.ID)
+		return found, nil
+	}
+}
+
 // setRules sets the room's rules in the settings of a.
 func setRules(t *testing.T, a *App, set func(*settings.Settings)) {
 	t.Helper()
@@ -51,6 +69,7 @@ func setRules(t *testing.T, a *App, set func(*settings.Settings)) {
 func TestRoomSongsAskFirst(t *testing.T) {
 	n := roomtest.New()
 	desk := newRoomApp(t, n, "Desk")
+	findSongs(desk)
 	lap := newRoomApp(t, n, "Lap")
 	deskNotes, lapNotes := roomNotes(t, desk.App), roomNotes(t, lap.App)
 	dp := desk.GoPlayer()
@@ -100,6 +119,7 @@ func TestRoomSongsAskFirst(t *testing.T) {
 func TestRoomSongsAddedAtOnce(t *testing.T) {
 	n := roomtest.New()
 	desk := newRoomApp(t, n, "Desk")
+	findSongs(desk, vid("e"))
 	lap := newRoomApp(t, n, "Lap")
 	deskNotes, lapNotes := roomNotes(t, desk.App), roomNotes(t, lap.App)
 	setRules(t, desk.App, func(s *settings.Settings) { s.RoomSongs, s.HideExplicit = settings.RoomSongsAdd, true })
@@ -113,9 +133,8 @@ func TestRoomSongsAddedAtOnce(t *testing.T) {
 	toldNote(t, lapNotes, "Desk added Song s to the room")
 	toldNote(t, deskNotes, "Lap added Song s")
 	waitPlayer(t, dp, "the song added", func(s player.State) bool { return len(s.Queue) == 2 && s.Queue[1].Track.ID == vid("s") })
-	explicit := tracksOf("e")[0]
-	explicit.Explicit = true
-	lap.Rooms().AddSong(explicit)
+	// The service says it's explicit, whatever the guest says.
+	lap.Rooms().AddSong(tracksOf("e")[0])
 	toldNote(t, lapNotes, "Desk can't play Song e")
 	h, _ := desk.Rooms().Hosted()
 	if last := h.Activity[len(h.Activity)-1]; last.What != room.Added || last.Song != "Song s" {

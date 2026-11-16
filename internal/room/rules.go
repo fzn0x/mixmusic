@@ -7,6 +7,7 @@ package room
 // whose it is, how often it asks, and how much.
 
 import (
+	"context"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/remote"
@@ -39,9 +40,13 @@ func (r Rules) clean() Rules {
 type Guests struct {
 	// Rules are the host's rules now, which each ask is checked against.
 	Rules func() Rules
-	// Playable reports whether the host can play t, a song a guest adds.
-	Playable func(t remote.QueueTrack) bool
-	// Add adds t, which from added, to the host's queue.
+	// Look is the song t a guest adds as the host finds it, by its ID and
+	// its kind alone, on its service or among its own files, or why it
+	// finds none: the guest's word on its title, artists, covers and
+	// whether it's explicit is taken for nothing. It may ask the network.
+	Look func(ctx context.Context, t remote.QueueTrack) (remote.QueueTrack, error)
+	// Add adds t, as Look found it, which from added, to the host's queue,
+	// or tells why it doesn't, as its settings hide it.
 	Add func(from Member, t remote.QueueTrack) error
 	// Control has the host's player do what from asks: Play, Pause, Next
 	// or Previous.
@@ -58,6 +63,8 @@ type asks struct {
 	requests []*Request
 	knocks   []*Knock
 	limits   map[remote.Fingerprint]*limits
+	looking  map[remote.Fingerprint]int
+	looks    int
 	sent     *Rules
 	move     *move
 	moved    bool

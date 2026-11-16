@@ -240,12 +240,28 @@ func (c *Client) Delete(ctx context.Context, m *Mapping) error {
 
 // Shared reports whether addr, a router's internet address, can't be
 // reached from the internet: one of 100.64.0.0/10, which providers share
-// among their customers (RFC 6598), or of a private range. Such a router
-// sits behind another, most often the provider's.
+// among their customers (RFC 6598), or of a private range, as a router
+// behind another has, most often the provider's; or no unicast address of
+// the internet at all (Unicast).
 func Shared(addr netip.Addr) bool {
 	addr = addr.Unmap()
-	return !addr.IsValid() || addr.IsUnspecified() || addr.IsPrivate() || addr.IsLoopback() || addr.IsLinkLocalUnicast() ||
-		netip.MustParsePrefix("100.64.0.0/10").Contains(addr)
+	return !Unicast(addr) || addr.IsPrivate() || netip.MustParsePrefix("100.64.0.0/10").Contains(addr)
+}
+
+// Unicast reports whether addr is an address of one computer that the
+// internet may route to: not multicast, broadcast, loopback, link-local,
+// of "this network" (0.0.0.0/8) or of the reserved 240.0.0.0/4.
+func Unicast(addr netip.Addr) bool {
+	addr = addr.Unmap()
+	if !addr.IsValid() || !addr.IsGlobalUnicast() {
+		return false
+	}
+	for _, p := range []string{"0.0.0.0/8", "240.0.0.0/4"} {
+		if netip.MustParsePrefix(p).Contains(addr) {
+			return false
+		}
+	}
+	return true
 }
 
 // ask sends req to server from local, when valid, or the address the

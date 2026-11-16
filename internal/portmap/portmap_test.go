@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/netip"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -254,7 +255,8 @@ func TestOpenIPv6(t *testing.T) {
 // TestShared tells the internet addresses of routers behind another: the
 // providers' shared range and the private ones.
 func TestShared(t *testing.T) {
-	for _, a := range []string{"100.64.0.1", "100.127.255.254", "10.1.2.3", "172.16.0.9", "192.168.1.1", "0.0.0.0", "::ffff:100.70.1.1"} {
+	for _, a := range []string{"100.64.0.1", "100.127.255.254", "10.1.2.3", "172.16.0.9", "192.168.1.1", "0.0.0.0", "::ffff:100.70.1.1",
+		"224.0.0.5", "239.255.255.250", "255.255.255.255", "240.1.2.3", "0.1.2.3", "127.0.0.1", "169.254.1.1"} {
 		if !Shared(netip.MustParseAddr(a)) {
 			t.Errorf("%s isn't shared", a)
 		}
@@ -293,5 +295,40 @@ func TestMethodsAskedInOrder(t *testing.T) {
 	}
 	if got := r.Asked(); !slices.Equal(got, []string{"PCP map"}) {
 		t.Fatalf("asked %v", got)
+	}
+}
+
+// TestUPnPOfTheGatewayAlone has a device that isn't the default gateway
+// answer UPnP's search: it isn't asked to forward anything.
+func TestUPnPOfTheGatewayAlone(t *testing.T) {
+	r := newRouter(t, "192.0.2.44")
+	r.Set(func(r *portmaptest.Router) { r.PCP, r.NATPMP = false, false })
+	c := clientOf(r)
+	// The gateway is another address of the loopback, which answers
+	// nothing.
+	c.Gateways = func() ([]netip.Addr, error) { return []netip.Addr{netip.MustParseAddr("127.0.0.2")}, nil }
+	if _, err := c.Map(context.Background(), 41234, time.Hour); !errors.Is(err, ErrNoRouter) {
+		t.Fatalf("Map: %v", err)
+	}
+	if asked(r, "AddPortMapping") != 0 || len(r.Forwards()) != 0 {
+		t.Fatalf("the device was asked %v", r.Asked())
+	}
+}
+
+// TestKeeperRefusesAnAddressThatIsntOne keeps a port where the router
+// tells a multicast address as its own: it tells so, and leaves no
+// forward.
+func TestKeeperRefusesAnAddressThatIsntOne(t *testing.T) {
+	r := newRouter(t, "224.0.0.5")
+	k, _ := newKeeper(r)
+	k.Start()
+	defer k.Stop()
+	got := waitReach(t, k, "the answer", func(r Reach) bool { return !r.Asking })
+	var re *RefusedError
+	if !errors.As(got.Err, &re) || got.Forward.IsValid() || !strings.Contains(re.Reason, "224.0.0.5") {
+		t.Fatalf("reach %+v", got)
+	}
+	if len(r.Forwards()) != 0 {
+		t.Fatalf("the router keeps %+v", r.Forwards())
 	}
 }

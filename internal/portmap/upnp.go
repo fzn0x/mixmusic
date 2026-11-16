@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/netip"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -201,8 +202,15 @@ func (c *Client) mapUPnP(ctx context.Context, port uint16, lifetime time.Duratio
 	if err != nil {
 		return nil, err
 	}
+	// Only a router this computer sends through: any other device of the
+	// network may answer the search, and would tell an address of its
+	// choice for the links.
+	gateways, _ := c.gateways()
 	err = errSilent
 	for i, loc := range locations {
+		if !slices.Contains(gateways, hosts[i]) {
+			continue
+		}
 		gw, gerr := c.gatewayAt(ctx, hosts[i], loc)
 		if gerr != nil {
 			err = gerr

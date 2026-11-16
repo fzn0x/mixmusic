@@ -17,12 +17,13 @@ import (
 // the address its link carries, the one its host typed for invites; drops
 // off, and comes back there.
 func TestGuestJoinsAtTheLinksAddress(t *testing.T) {
-	desk := newRoomApp(t, roomtest.New(), "Desk")
-	// Another network: the guest finds no room on it.
-	lap := newRoomApp(t, roomtest.New(), "Lap")
+	// Set before the apps, so that it is put back once they closed.
 	was := roomRetry
 	roomRetry = 20 * time.Millisecond
 	t.Cleanup(func() { roomRetry = was })
+	desk := newRoomApp(t, roomtest.New(), "Desk")
+	// Another network: the guest finds no room on it.
+	lap := newRoomApp(t, roomtest.New(), "Lap")
 	if err := desk.Rooms().Start(); err != nil {
 		t.Fatal(err)
 	}
@@ -66,11 +67,12 @@ func TestKnockAtAnAddress(t *testing.T) {
 // TestNewLinkBringsAGuestBack has a guest drop off where its host's
 // address is no longer: the host's new link brings it back at once.
 func TestNewLinkBringsAGuestBack(t *testing.T) {
-	desk := newRoomApp(t, roomtest.New(), "Desk")
-	lap := newRoomApp(t, roomtest.New(), "Lap")
+	// Set before the apps, so that it is put back once they closed.
 	was := roomRetry
 	roomRetry = 20 * time.Millisecond
 	t.Cleanup(func() { roomRetry = was })
+	desk := newRoomApp(t, roomtest.New(), "Desk")
+	lap := newRoomApp(t, roomtest.New(), "Lap")
 	if err := desk.Rooms().Start(); err != nil {
 		t.Fatal(err)
 	}
@@ -130,11 +132,12 @@ func TestPreviewEndedProblem(t *testing.T) {
 // stay, and it comes back there. Another host's link changes nothing
 // either, as the guest stays in its room.
 func TestMadeUpLinkMovesNoGuest(t *testing.T) {
-	desk := newRoomApp(t, roomtest.New(), "Desk")
-	lap := newRoomApp(t, roomtest.New(), "Lap")
+	// Set before the apps, so that it is put back once they closed.
 	was := roomRetry
 	roomRetry = 20 * time.Millisecond
 	t.Cleanup(func() { roomRetry = was })
+	desk := newRoomApp(t, roomtest.New(), "Desk")
+	lap := newRoomApp(t, roomtest.New(), "Lap")
 	if err := desk.Rooms().Start(); err != nil {
 		t.Fatal(err)
 	}

@@ -33,6 +33,17 @@ func TestKnocksBounded(t *testing.T) {
 	if k, _ := s.knock(key(), "198.51.100.1", "One more", now); k != nil {
 		t.Fatal("a knock past maxKnocks kept")
 	}
+	// This computer's own knocks aren't counted by source, but by the
+	// room's maxKnocks.
+	s.asks.knocks = nil
+	for range maxKnocks {
+		if k, _ := s.knock(key(), "127.0.0.1", "Here", now); k == nil {
+			t.Fatal("a knock of this computer refused")
+		}
+	}
+	if k, _ := s.knock(key(), "127.0.0.1", "Here", now); k != nil {
+		t.Fatal("a knock of this computer past maxKnocks kept")
+	}
 	// Once its knocks went, the source told a minute ago isn't told of
 	// again; a minute later, it is.
 	s.asks.knocks = nil
@@ -45,12 +56,16 @@ func TestKnocksBounded(t *testing.T) {
 	}
 }
 
-// TestLocalSources tells the host's own networks from the internet.
-func TestLocalSources(t *testing.T) {
-	for src, want := range map[string]bool{"192.168.1.2": true, "10.0.0.1": true, "127.0.0.1": true, "100.100.1.1": true,
+// TestKnocksNearby tells the networks of the host's own kind from the
+// internet's, the providers' shared range too.
+func TestKnocksNearby(t *testing.T) {
+	for src, want := range map[string]bool{"192.168.1.2": true, "10.0.0.1": true, "127.0.0.1": true, "100.100.1.1": false,
 		"fd00:1:2:3::/64": true, "fe80::/64": true, "203.0.113.7": false, "2001:db8:1:2::/64": false, "nonsense": false} {
-		if got := localSource(src); got != want {
-			t.Errorf("localSource(%q) = %v", src, got)
+		if got := knocksNearby(src); got != want {
+			t.Errorf("knocksNearby(%q) = %v", src, got)
 		}
+	}
+	if !knocksHere("127.0.0.1") || !knocksHere("::1") || knocksHere("192.168.1.2") {
+		t.Error("this computer's own sources")
 	}
 }

@@ -36,23 +36,36 @@ const (
 	knockTellEvery = time.Minute
 )
 
-// localSource reports whether the source src (sourceOf) is of the host's
-// own networks: a private, loopback or link-local address, or of the
-// shared space of carrier-grade NAT and VPNs.
-func localSource(src string) bool {
+// knockAddr is the address of the source src (sourceOf), and whether it's
+// one.
+func knockAddr(src string) (netip.Addr, bool) {
 	ip, err := netip.ParseAddr(src)
 	if err != nil {
 		p, err := netip.ParsePrefix(src)
 		if err != nil {
-			return false
+			return netip.Addr{}, false
 		}
 		ip = p.Addr()
 	}
-	return ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() || sharedSpace.Contains(ip)
+	return ip, true
 }
 
-// sharedSpace is 100.64.0.0/10 (RFC 6598).
-var sharedSpace = netip.MustParsePrefix("100.64.0.0/10")
+// knocksNearby reports whether the source src (sourceOf) is of a network
+// of the host's own kind: a private, loopback or link-local address, as
+// the internet's never are. The providers' shared range, 100.64.0.0/10,
+// which VPNs give their computers too, isn't.
+func knocksNearby(src string) bool {
+	ip, ok := knockAddr(src)
+	return ok && (ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast())
+}
+
+// knocksHere reports whether the source src is this computer itself, of
+// a loopback address: its own user, whose knocks aren't counted by
+// source.
+func knocksHere(src string) bool {
+	ip, ok := knockAddr(src)
+	return ok && ip.IsLoopback()
+}
 
 // Why the host turns a computer away that asks to join: reasonLeft is
 // that it went meanwhile.
@@ -201,8 +214,8 @@ func (s *Session) letIn() (*Session, error) {
 // knock keeps the knock of the computer of key, named name, from the source
 // src, at now, and reports whether to tell the host's user of it: of a
 // source's first knock, and of none of it again for a while, however it
-// knocks. It keeps none past maxKnocks, or maxKnocksFrom of src. s.mu is
-// held.
+// knocks. It keeps none past maxKnocks, or maxKnocksFrom of src, unless
+// src is this computer itself. s.mu is held.
 func (s *Server) knock(key remote.Fingerprint, src, name string, now time.Time) (*Knock, bool) {
 	from := 0
 	for _, o := range s.asks.knocks {
@@ -210,11 +223,11 @@ func (s *Server) knock(key remote.Fingerprint, src, name string, now time.Time) 
 			from++
 		}
 	}
-	if len(s.asks.knocks) >= maxKnocks || from >= maxKnocksFrom {
+	if len(s.asks.knocks) >= maxKnocks || from >= maxKnocksFrom && !knocksHere(src) {
 		return nil, false
 	}
 	s.asks.next++
-	k := &Knock{ID: s.asks.next, Name: name, At: now, Key: key.ID()[:8], Local: localSource(src), answer: make(chan bool, 1), src: src}
+	k := &Knock{ID: s.asks.next, Name: name, At: now, Key: key.ID()[:8], Local: knocksNearby(src), answer: make(chan bool, 1), src: src}
 	s.asks.knocks = append(s.asks.knocks, k)
 	tell := from == 0 && now.Sub(s.asks.knockTold[src]) >= knockTellEvery
 	if tell {

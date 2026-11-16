@@ -168,7 +168,7 @@ func (c *Catalog) videoLyrics(ctx context.Context, video, song media.Track, l ly
 	if c.a.settings.Get().LyricsTimeVideos {
 		switch shift, state := c.a.videoTiming(video, song); state {
 		case timingFound:
-			l = l.Shifted(shift)
+			l = l.Shifted(shift, 1)
 			l.Note = timedNote(shift)
 			return l
 		case timingUnderWay:

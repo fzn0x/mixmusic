@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/lastfm"
+	"github.com/fzn0x/mixmusic/internal/scrobble"
 )
 
 // fakeScrobbleAPI is a Last.fm that takes or refuses what it is sent.
@@ -45,7 +46,7 @@ func connectedWithRefused(t *testing.T) (*App, *Accounts, *fakeScrobbleAPI) {
 	a.startScrobbling(c)
 	api := &fakeScrobbleAPI{refuse: true, got: map[string]int{}}
 	l := a.lastfm
-	l.scrobbler = lastfm.NewScrobbler(api, "old")
+	l.scrobbler = scrobble.New(api, "old", scrobble.Options{})
 	l.scrobbler.OnQueue = a.lastfmQueueSaver(filepath.Join(dir, "lastfm-queue.json"))
 	l.scrobbler.SetQueue([]lastfm.Play{
 		{Track: lastfm.Track{Artist: "A", Title: "One", Duration: time.Minute}, Start: time.Unix(1, 0)},

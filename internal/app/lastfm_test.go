@@ -6,6 +6,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/lastfm"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/scrobble"
 )
 
 // TestLastfmTrack tells the scrobbler what plays: with the player's
@@ -34,7 +35,7 @@ func TestLastfmTrack(t *testing.T) {
 	// A live stream that played long is never scrobbled, where a track
 	// is.
 	for _, live := range []bool{false, true} {
-		s := lastfm.NewScrobbler(nil, "a session")
+		s := scrobble.New(nil, "a session", scrobble.Options{})
 		id, t2 := lastfmTrack(NowPlaying{Track: track, Live: live})
 		now := time.Now()
 		for i := range 100 {

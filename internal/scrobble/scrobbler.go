@@ -1,4 +1,8 @@
-package lastfm
+// Package scrobble decides which plays count as scrobbles, by the rules
+// of Last.fm that every scrobbling service of MixMusic follows, and sends
+// them to a service with its now-playing updates, keeping those it has
+// not taken yet in a queue.
+package scrobble
 
 import (
 	"context"
@@ -9,14 +13,19 @@ import (
 	"time"
 )
 
-// API is the part of the Last.fm API a Scrobbler calls. *Client implements
-// it; tests use a fake.
-type API interface {
-	NowPlaying(ctx context.Context, sessionKey string, t Track) error
-	Scrobble(ctx context.Context, sessionKey string, plays []Play) error
+// Service is the part of a scrobbling service's API a Scrobbler calls,
+// with the key of the user's session or token. Its errors tell what
+// becomes of the plays: ErrKeyRefused, IsRejected or neither.
+type Service interface {
+	NowPlaying(ctx context.Context, key string, t Track) error
+	Scrobble(ctx context.Context, key string, plays []Play) error
 }
 
-var _ API = (*Client)(nil)
+// Options are what tells services apart. The zero value is Last.fm's.
+type Options struct {
+	// Batch is the most plays one Scrobble call takes; 0 is 50.
+	Batch int
+}
 
 const (
 	// minLength is the length a track must exceed to be scrobbled.
@@ -34,17 +43,20 @@ const (
 	// first, so that a refused session cannot grow the saved queue
 	// without end.
 	maxQueue = 5000
+	// defaultBatch is the most plays a Scrobble call takes, unless the
+	// Options say otherwise: Last.fm's.
+	defaultBatch = 50
 )
 
 // Scrobbler decides, from what the player reports, which plays count as
-// scrobbles, and sends them to Last.fm with now-playing updates. A track
+// scrobbles, and sends them to a service with now-playing updates. A track
 // longer than 30 seconds counts once it has been listened to for half its
 // duration or for four minutes, whichever comes first, and each play of it
 // counts once.
 //
 // The app calls Observe about once a second and on every change of the
 // player, and Send when Observe reports something to send. Scrobbles wait in
-// a queue until Last.fm accepts them; the app saves the queue with OnQueue
+// a queue until the service accepts them; the app saves the queue with OnQueue
 // and restores it with SetQueue. The methods of a Scrobbler are safe for
 // concurrent use.
 type Scrobbler struct {
@@ -53,7 +65,8 @@ type Scrobbler struct {
 	// Scrobbler is locked, so it must not call the Scrobbler.
 	OnQueue func([]Play)
 
-	api API
+	api   Service
+	batch int
 
 	mu         sync.Mutex
 	session    string
@@ -65,7 +78,8 @@ type Scrobbler struct {
 	// that was replaced while it sent the head of the former one.
 	gen int
 	// tryQueue is set when Send should send the queue: a scrobble joined
-	// it, or Last.fm answered. A temporary error clears it.
+	// it, or the service answered. An error that keeps the plays clears
+	// it.
 	tryQueue bool
 	sending  bool
 }
@@ -88,11 +102,15 @@ type listen struct {
 	scrobbled bool
 }
 
-// NewScrobbler returns a Scrobbler that calls api for the user of
-// sessionKey. With an empty key it scrobbles nothing until SetSession sets
-// one.
-func NewScrobbler(api API, sessionKey string) *Scrobbler {
-	return &Scrobbler{api: api, session: sessionKey, tryQueue: sessionKey != ""}
+// New returns a Scrobbler that calls api for the user of key, the
+// service's session key or token. With an empty key it scrobbles nothing
+// until SetSession sets one.
+func New(api Service, key string, o Options) *Scrobbler {
+	batch := o.Batch
+	if batch <= 0 {
+		batch = defaultBatch
+	}
+	return &Scrobbler{api: api, batch: batch, session: key, tryQueue: key != ""}
 }
 
 // SetSession changes the session key calls are made with, such as after the
@@ -207,17 +225,18 @@ func (s *Scrobbler) count() {
 }
 
 // Send makes the calls the Scrobbler has waiting: the now-playing update of
-// the track that started last, then the queue, oldest first and up to 50
-// scrobbles per call, until Last.fm has them all or a call fails.
+// the track that started last, then the queue, oldest first and up to the
+// Options' Batch of scrobbles per call, until the service has them all or a
+// call fails.
 //
-// A failed now-playing update is not made again. Scrobbles that fail with a
-// temporary error, as IsTemporary tells, stay in the queue and are sent
-// again after the next call Last.fm answers: a now-playing update, or the
-// scrobble of a new play, which joins the queue behind them. Scrobbles that
-// Last.fm rejects for another reason are dropped. When Last.fm rejects the
-// session key, Send returns ErrSessionExpired, once, and the Scrobbler
-// does not send anything until SetSession gives it a new key; plays go on
-// joining the queue meanwhile.
+// A failed now-playing update is not made again. Scrobbles that fail with
+// an error that keeps them, as the network's, stay in the queue and are
+// sent again after the next call the service answers: a now-playing
+// update, or the scrobble of a new play, which joins the queue behind
+// them. Scrobbles that the service rejects, as IsRejected tells, are
+// dropped. When the service refuses the key, Send returns an error that is
+// ErrKeyRefused, once, and the Scrobbler does not send anything until
+// SetSession gives it a new key; plays go on joining the queue meanwhile.
 //
 // Send returns at once while another Send runs.
 func (s *Scrobbler) Send(ctx context.Context) error {
@@ -242,10 +261,10 @@ func (s *Scrobbler) Send(ctx context.Context) error {
 			s.tryQueue = false
 			return nil
 		}
-		batch := slices.Clone(s.queue[:min(len(s.queue), maxBatch)])
+		batch := slices.Clone(s.queue[:min(len(s.queue), s.batch)])
 		gen := s.gen
 		err := s.unlocked(func() error { return s.api.Scrobble(ctx, key, batch) })
-		if errors.Is(err, ErrSessionExpired) || IsTemporary(err) {
+		if err != nil && !IsRejected(err) {
 			return s.failed(key, err)
 		}
 		if gen == s.gen {
@@ -271,19 +290,19 @@ func (s *Scrobbler) unlocked(f func() error) error {
 // Send returns.
 func (s *Scrobbler) failed(key string, err error) error {
 	switch {
-	case errors.Is(err, ErrSessionExpired):
+	case errors.Is(err, ErrKeyRefused):
 		if key != s.session {
 			return nil // the key changed during the call: the next Send tries the new one
 		}
 		s.expired = true
 		s.nowPlaying = nil
-	case IsTemporary(err):
+	case !IsRejected(err):
 		s.tryQueue = false
 	}
 	return err
 }
 
-// active reports whether the Scrobbler has a session key Last.fm accepts.
+// active reports whether the Scrobbler has a key the service accepts.
 func (s *Scrobbler) active() bool {
 	return s.session != "" && !s.expired
 }

@@ -14,6 +14,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/lastfm"
 	"github.com/fzn0x/mixmusic/internal/localfiles"
+	"github.com/fzn0x/mixmusic/internal/scrobble"
 	"github.com/fzn0x/mixmusic/internal/store"
 )
 
@@ -55,7 +56,7 @@ type LastfmAccount struct {
 // scrobbles is a scrobbler and where its queue of plays to send is kept.
 type scrobbles struct {
 	client    *lastfm.Client
-	scrobbler *lastfm.Scrobbler
+	scrobbler *scrobble.Scrobbler
 	name      string
 	expired   bool
 	// other is the connection another user approved, which waits for the
@@ -76,7 +77,7 @@ func (a *App) openLastfm() {
 // of plays not sent yet.
 func (a *App) startScrobbling(c lastfmCredentials) {
 	client := lastfm.NewClient(c.APIKey, c.Secret)
-	s := lastfm.NewScrobbler(client, c.Session.Key)
+	s := scrobble.New(client, c.Session.Key, scrobble.Options{})
 	queue := filepath.Join(a.opts.DataDir, "lastfm-queue.json")
 	if data, err := os.ReadFile(queue); err == nil {
 		var plays []lastfm.Play

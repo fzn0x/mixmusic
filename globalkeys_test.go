@@ -96,7 +96,7 @@ func TestGlobalShortcutRecorder(t *testing.T) {
 		t.Fatalf("no group of global shortcuts: %q", tt.Texts())
 	}
 	click(t, s, tt, "set the global shortcut of Play or pause")
-	if s.recording != globalRecording+"player.toggle" || !tt.Focused("cancel the global shortcut of Play or pause") ||
+	if s.recording != globalRecording+"player.toggle" || !tt.Focused("stop changing the global shortcut of Play or pause") ||
 		!tt.HasText("If nothing happens, these keys are in use elsewhere.") {
 		t.Fatalf("set doesn't record the keys: recording %q", s.recording)
 	}

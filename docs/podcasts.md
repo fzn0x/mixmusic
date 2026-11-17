@@ -23,7 +23,7 @@ YouTube Music's podcasts play with no account. Spotify's play [from Spotify itse
 
 ![The page of the Lex Fridman Podcast, a YouTube Music show: its cover, its authors and description, the Play and Following buttons and the More button, then its episodes, newest first, each with the day it came out and its length](shots/show.webp)
 
-A Spotify show's page says so when Spotify tracks play from YouTube Music: Spotify's podcasts play only from Spotify, so choose In MixMusic, from Spotify or On Spotify Connect in [Settings › Playback](playing-music.md#how-spotify-tracks-play).
+A Spotify show's page says so when Spotify tracks play from YouTube Music: Spotify's podcasts play only from Spotify, so choose “In MixMusic, from Spotify” or “On Spotify Connect” in [Settings › Playback](playing-music.md#how-spotify-tracks-play).
 
 ## An episode's menu
 

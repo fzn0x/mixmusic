@@ -20,7 +20,7 @@ import (
 
 // errSpotifyEpisode is why a Spotify episode doesn't play from YouTube
 // Music: no recording of it is there.
-var errSpotifyEpisode = errors.New("Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in Settings › Playback")
+var errSpotifyEpisode = errors.New("Spotify's podcasts play only from Spotify: choose “In MixMusic, from Spotify” or “On Spotify Connect” in Settings › Playback")
 
 // errSpotifyShows is why Spotify's podcasts don't show signed out.
 var errSpotifyShows = errors.New("sign in to Spotify in Settings › Accounts to open its podcasts")

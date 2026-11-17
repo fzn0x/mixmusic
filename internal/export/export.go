@@ -6,9 +6,9 @@
 // A download's audio keeps its format: an M4A file gets its tags as
 // internal/tagwrite writes them, and Opus in WebM, which carries no tags
 // other players read, becomes Ogg Opus, packet for packet
-// (tagwrite.RemuxWebM). A file on this computer goes as it is, with its
-// own tags and cover, as internal/tagwrite writes them when the user
-// edits them.
+// (tagwrite.RemuxWebM), but for the stretches Track.Leave leaves out. A
+// file on this computer goes as it is, with its own tags and cover, as
+// internal/tagwrite writes them when the user edits them.
 package export
 
 import (
@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	_ "golang.org/x/image/webp"
 
@@ -45,6 +46,11 @@ type Track struct {
 	// AsIs copies the file as it is, its tags too: a file on this
 	// computer, whose tags are the user's.
 	AsIs bool
+	// Leave, when set, returns the stretches of the audio of a download
+	// of Opus in WebM that the copy leaves out, of the length of its audio
+	// (tagwrite.Remux): M4A copies keep theirs, as their sample tables
+	// aren't written anew.
+	Leave func(length time.Duration) []tagwrite.Cut
 }
 
 // Write writes a copy of t to dir, named as Name names it, and numbered
@@ -94,7 +100,7 @@ func how(src io.ReadSeeker, t Track) (string, func(w io.Writer, src io.ReadSeeke
 	}
 	if tagwrite.IsWebM(src) {
 		return ".opus", func(w io.Writer, src io.ReadSeeker) error {
-			return tagwrite.RemuxWebM(w, src, t.Tags, tagwrite.All)
+			return tagwrite.RemuxWebMWith(w, src, t.Tags, tagwrite.All, tagwrite.Remux{Leave: t.Leave})
 		}, nil
 	}
 	kind, err := tagwrite.KindOf(src)

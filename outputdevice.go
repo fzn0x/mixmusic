@@ -160,7 +160,7 @@ const roomOutput = 36
 // at its full size, which a box that grows into it measures, as the first
 // of the side.
 func (s *shell) outputRoom(c *ui.Context) *outputSlot {
-	room := ui.Box(c.Key("output-room")).Grow(1).Basis(0).MinWidth(0).Margin(0, -4, 0, 0)
+	room := ui.Box(c.Key("output-room")).Grow(1).Basis(0).MinWidth(0).MarginEnd(-4)
 	slot := ui.Local(room, "slot", func() outputSlot { return outputSlot{} })
 	slot.free = room.Bounds().W
 	return slot
@@ -205,7 +205,7 @@ func (s *shell) outputButton(c *ui.Context, room *outputSlot) {
 	slot := ui.Row(c.Key("output-slot")).Shrink(0)
 	if !room.shown {
 		// Without the gap before it.
-		slot.Margin(0, -4, 0, 0)
+		slot.MarginEnd(-4)
 		return
 	}
 	slot.Children(func() {

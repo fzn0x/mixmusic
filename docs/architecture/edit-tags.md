@@ -37,7 +37,7 @@ on this computer (#339). MixMusic changes a file only then.
     key finds them.
   - `webm.go`: `RemuxWebM` writes the Opus of a WebM file, which other
     players read no tags of, as Ogg Opus with its tags, for an export
-    (export.md).
+    (export.md); `RemuxWebMWith` leaves stretches of it out (`cut.go`).
 - **Safe writes** go through `store.Replace`: the new file is written
   beside the old, read back (`tags.Read`, which must give what was
   written) and opened as the engine opens files (`audio.Probe`), put on

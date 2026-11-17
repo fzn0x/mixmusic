@@ -8,15 +8,14 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
-
-	"golang.org/x/image/font"
 )
 
 // family is Selawik, as the app sets its cards in it, read from the
 // fonts the app bundles.
-func family(t *testing.T) Family {
+func family(t testing.TB) Family {
 	t.Helper()
 	var fam Family
 	for _, f := range []struct {
@@ -89,15 +88,13 @@ func song(size Size, colors Colors, title, artist string, withCover bool) Card {
 // fallbackFor reports whether the family has a glyph for every letter of
 // text.
 func fallbackFor(fam Family, text string) bool {
-	ts := &typesetter{fam: fam}
+	ts := newTypesetter(fam)
 	for _, r := range text {
-		if r == ' ' || r == '🎉' {
+		if r == ' ' || r == '🎉' || ts.has(fam.Faces[0].Font, r) {
 			continue
 		}
-		if ts.fontFor(fam.Faces[0].Font, r) == fam.Faces[0].Font {
-			if i, err := fam.Faces[0].Font.GlyphIndex(&ts.buf, r); err != nil || i == 0 {
-				return false
-			}
+		if !slices.ContainsFunc(fam.Fallback, func(f *Font) bool { return ts.has(f, r) }) {
+			return false
 		}
 	}
 	return true
@@ -371,9 +368,7 @@ func TestMark(t *testing.T) {
 		if p, bad := inkOutside(t, img, g, margin-2); bad {
 			t.Errorf("%s: ink at %v is outside the margin", name, p)
 		}
-		ts := &typesetter{fam: fam, faces: map[faceKey]font.Face{}}
-		set := ts.setMark(c, float64(size.W)/design, float64(size.W-2*margin))
-		ts.close()
+		set := newTypesetter(fam).setMark(c, float64(size.W)/design, float64(size.W-2*margin))
 		if set.width <= set.logoW || set.logoW <= 0 {
 			t.Fatalf("%s: the mark is set as %+v", name, set)
 		}
@@ -451,40 +446,10 @@ func TestPNG(t *testing.T) {
 	}
 }
 
-// TestVisual reorders what reads right to left, and leaves the rest.
-func TestVisual(t *testing.T) {
-	for _, tc := range []struct{ in, want string }{
-		{"Glass Harbor", "Glass Harbor"},
-		{"שלום", "םולש"},
-		{"abc שלום def", "abc םולש def"},
-		{"", ""},
-	} {
-		if got := visual(tc.in); got != tc.want {
-			t.Errorf("visual(%q) = %q, want %q", tc.in, got, tc.want)
-		}
-	}
+// TestIsRTL finds where a line starts from its first letter.
+func TestIsRTL(t *testing.T) {
 	if !isRTL("\"שלום") || isRTL("Hello שלום") || isRTL("123") || !isRTL("مرحبا") {
 		t.Error("isRTL misjudges where a line starts")
-	}
-}
-
-// TestShapeArabic puts the letters of a word in the shapes they take.
-func TestShapeArabic(t *testing.T) {
-	for _, tc := range []struct{ in, want string }{
-		// Initial, medial and final: ba, ba, ba.
-		{"ببب", "ﺑﺒﺐ"},
-		// A right-joining letter ends the join: ba, alef, ba.
-		{"باب", "ﺑﺎﺏ"},
-		// Lam and alef make one letter.
-		{"لا", "ﻻ"},
-		{"بلا", "ﺑﻼ"},
-		// Hello, and text that isn't Arabic stays.
-		{"abc", "abc"},
-		{"ب a", "ﺏ a"},
-	} {
-		if got := shapeArabic(tc.in); got != tc.want {
-			t.Errorf("shapeArabic(%q) = %q, want %q", tc.in, got, tc.want)
-		}
 	}
 }
 
@@ -492,11 +457,10 @@ func TestShapeArabic(t *testing.T) {
 // word too long for a row where the row ends, within the width.
 func TestWrapUnspaced(t *testing.T) {
 	fam := family(t)
-	ts := &typesetter{fam: fam, faces: map[faceKey]font.Face{}}
-	defer ts.close()
+	ts := newTypesetter(fam)
 	prim := fam.Faces[1].Font
 	for _, text := range []string{strings.Repeat("星空の下で歌う", 30), strings.Repeat("W", 80), strings.Repeat("word ", 60)} {
-		rows := ts.wrap(prim, 40, text, 600, 50)
+		rows := ts.wrap(prim, 400, 40, text, false, 600, 50)
 		if len(rows) < 2 {
 			t.Errorf("%.12q... fits one row of 600 pixels", text)
 		}

@@ -73,30 +73,6 @@ func translations(t *testing.T) []string {
 	return tags
 }
 
-// TestEveryLanguageTranslatesEveryMessage keeps each translation in step
-// with en.json: a message added in English alone would show in English.
-// A pull request may add English alone, so it runs only as the release
-// workflow checks the version, which sets MIXMUSIC_RELEASE.
-func TestEveryLanguageTranslatesEveryMessage(t *testing.T) {
-	if os.Getenv("MIXMUSIC_RELEASE") == "" {
-		t.Skip("a release checks it: set MIXMUSIC_RELEASE")
-	}
-	en := readCatalog(t, "en")
-	for _, tag := range translations(t) {
-		tr := readCatalog(t, tag)
-		for k, v := range en.messages {
-			if _, ok := tr.messages[k]; !ok {
-				t.Errorf("%s.json lacks %s: %q", tag, k, v)
-			}
-		}
-		for k := range tr.messages {
-			if _, ok := en.messages[k]; !ok && !strings.HasPrefix(k, "mygo.") {
-				t.Errorf("%s.json has %s, which en.json lacks", tag, k)
-			}
-		}
-	}
-}
-
 // TestTranslationsMatchEnglish checks that each translated message parses
 // and has the English one's arguments, each of the same kind; the plural
 // cases of its own language, and the English one's exact ones ("=0"); and

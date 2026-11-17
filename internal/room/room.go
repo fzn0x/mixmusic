@@ -194,10 +194,15 @@ const MaxGuests = 200
 // MaxName bounds a name in rooms, in characters.
 const MaxName = 50
 
+// Unnamed is the name in rooms of a computer that told none. It stays the
+// same in every language, as a move passes names on to the next host;
+// the interface shows it in its own words (internal/app's shownName).
+const Unnamed = "Someone"
+
 // CleanName is a name in rooms as a computer told it: without control
 // characters, the marks that turn the way text runs, which would show it
 // as another name, or the spaces around it, at most MaxName characters, or
-// "Someone" when it told none.
+// Unnamed when it told none.
 func CleanName(s string) string {
 	s = strings.Map(func(r rune) rune {
 		if unicode.IsControl(r) || unicode.Is(unicode.Bidi_Control, r) || r == unicode.ReplacementChar {
@@ -210,7 +215,7 @@ func CleanName(s string) string {
 		s = strings.TrimSpace(string(r[:MaxName]))
 	}
 	if s == "" {
-		return "Someone"
+		return Unnamed
 	}
 	return s
 }

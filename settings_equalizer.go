@@ -86,7 +86,9 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 			}
 		}, labels...)
 		s.found(c, locales.EqualizerBands(), locales.EqualizerBandsDesc(), func() {
-			ui.Row(c).Gap(12).Padding(16, 0).Children(func() {
+			// The bands go from the low notes up, left to right, in every
+			// language.
+			ui.Row(c).Direction(ui.LeftToRight).Gap(12).Padding(16, 0).Children(func() {
 				band := func(key, label string, v *float64) {
 					ui.Column(c).Gap(6).AlignItems(ui.Center).Children(func() {
 						ui.Text(c, eqGainLabel(*v)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")

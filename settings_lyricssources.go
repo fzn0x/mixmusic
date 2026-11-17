@@ -88,7 +88,7 @@ func (s *shell) lyricsSourceRow(c *ui.Context, i int, order []settings.LyricsSou
 	if src.Off {
 		state = locales.LyricsSourceOff()
 	}
-	row := ui.Row(c.Key("lyrics-source-"+src.Key)).MinHeight(56).Padding(8, 8, 8, 16).Gap(12).Radius(k.radiusSm).
+	row := ui.Row(c.Key("lyrics-source-" + src.Key)).MinHeight(56).Padding(8).PaddingStart(16).Gap(12).Radius(k.radiusSm).
 		Background(k.surface2).Label(locales.LyricsSourceRowLabel(text.name, state)).Focusable().Cursor(ui.CursorGrab)
 	if row.Hovered() {
 		row.Background(k.surface2.Mix(k.text, 0.06))

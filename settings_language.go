@@ -14,15 +14,15 @@ import (
 func init() { addSettings("appearance", 5, (*shell).languageSettings) }
 
 // languageSettings choose the language MixMusic shows: System, which
-// follows the computer's languages, or one of its catalogs' (locales/),
-// each named in itself. MyGo keeps the choice.
+// follows the computer's languages, or one of its catalogs' (locales/ and
+// locales/more), each named in itself. MyGo keeps the choice.
 func (s *shell) languageSettings(c *ui.Context) {
 	s.group(c, locales.LanguageTitle(), func() {
 		s.row(c, locales.LanguageTitle(), locales.LanguageDescription(), func() {
 			tags := append([]string{""}, mygo.App.Languages()...)
 			names := []string{locales.LanguageSystem()}
 			for _, t := range tags[1:] {
-				names = append(names, i18n.Autonym(t))
+				names = append(names, languageName(t))
 			}
 			// shortcut: MyGo doesn't say whether a language was chosen, so one
 			// chosen that the computer's languages would pick shows as System;
@@ -39,4 +39,17 @@ func (s *shell) languageSettings(c *ui.Context) {
 			}
 		}, "language", "english", "chinese", "语言", "中文", "简体中文")
 	})
+}
+
+// languageName is the name of the language of tag, written in it: CLDR's,
+// else the one its catalog gives, for a language CLDR has no name of,
+// else its tag.
+func languageName(tag string) string {
+	if name := i18n.Autonym(tag); name != "" {
+		return name
+	}
+	if _, lang, _ := locales.Catalog.Message(tag, "languageName"); lang == tag {
+		return locales.In(tag).LanguageName()
+	}
+	return tag
 }

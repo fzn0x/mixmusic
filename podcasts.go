@@ -554,7 +554,7 @@ func (s *shell) podcastLibrary(c *ui.Context) {
 // part shows what came, and says how much, with Try again.
 func (s *shell) savedPodcasts(c *ui.Context, key, title string, saved *loaded[[]media.Podcast]) {
 	switch {
-	case !saved.done:
+	case saved.waiting():
 		return
 	case saved.err != nil:
 		if !s.shortListLine(c, key+"-podcasts", "podcasts", media.Source(key), saved.err, func() { s.refetch(key + ":podcasts") }) {
@@ -562,21 +562,28 @@ func (s *shell) savedPodcasts(c *ui.Context, key, title string, saved *loaded[[]
 			return
 		}
 	}
+	list := saved.shown()
 	var shown []int
-	for i, p := range saved.value {
+	for i, p := range list {
 		if !s.svc.Collection.Follows(p.ID) {
 			shown = append(shown, i)
 		}
 	}
 	if len(shown) == 0 {
+		if saved.growing() {
+			s.moreComing(c, key+"-podcasts")
+		}
 		return
 	}
 	s.shelf(c, key+"-podcasts", title, func() {
 		s.nearShelfTiles(c, key+"-podcasts", len(shown), func(j int) {
 			i := shown[j]
-			s.podcastTile(c, key+"-podcast-"+count(i), saved.value[i])
+			s.podcastTile(c, key+"-podcast-"+count(i), list[i])
 		})
 	})
+	if saved.growing() {
+		s.moreComing(c, key+"-podcasts")
+	}
 }
 
 // listening returns the episodes in progress, the latest first, read again

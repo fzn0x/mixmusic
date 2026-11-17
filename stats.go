@@ -147,7 +147,9 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 	s.sectionTitle(c, locales.StatsDayByDay())
 	ui.Text(c, locales.StatsMinutesEachDay()).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 12)
 	ui.Text(c, locales.FormatMinutes(int(math.Round(top)))).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
-	plot := ui.Box(c).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).
+	// The chart reads left to right in every language, as it draws, and
+	// so do its days under it.
+	plot := ui.Box(c).Direction(ui.LeftToRight).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).
 		Label(locales.StatsMinutesLabel()).Description(locales.StatsArrowKeys()).Focusable().
 		Draw(func(p *ui.Painter, r ui.Rect) {
 			w := r.W / float32(n)
@@ -231,7 +233,7 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 			})
 		})
 	}
-	ui.Row(c).FillWidth().Margin(4, 0, 12).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).FillWidth().Margin(4, 0, 12).Children(func() {
 		for i, d := range days {
 			label := ""
 			switch {
@@ -283,13 +285,18 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 }
 
 // disclosure draws the arrow of a disclosure as MyGo's Collapsible draws
-// its own: pointing right, turned by deg degrees clockwise.
+// its own: pointing right, turned by deg degrees clockwise, or right to
+// left mirrored, pointing left.
 func disclosure(c *ui.Context, deg float32, ink ui.Color) {
+	mirror := float32(1)
+	if c.Direction() == ui.RightToLeft {
+		mirror = -1
+	}
 	ui.Box(c).Size(16, 16).Shrink(0).Draw(func(p *ui.Painter, r ui.Rect) {
 		cx, cy, d := r.X+r.W/2, r.Y+r.H/2, r.W/8
 		sin, cos := math.Sincos(float64(deg) * math.Pi / 180)
 		at := func(x, y float32) (float32, float32) {
-			return cx + x*float32(cos) - y*float32(sin), cy + x*float32(sin) + y*float32(cos)
+			return cx + mirror*(x*float32(cos)-y*float32(sin)), cy + x*float32(sin) + y*float32(cos)
 		}
 		var path ui.Path
 		path.MoveTo(at(-d, -2*d)).LineTo(at(d, 0)).LineTo(at(-d, 2*d))

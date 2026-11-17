@@ -56,13 +56,16 @@ func (s *shell) nowPlayingPage(c *ui.Context) {
 				})
 				s.progress(c)
 				ui.Row(c).Gap(12).Children(func() {
-					name, label := toggleOf(s.st)
-					if s.roundButton(c, "now-toggle", name, label, true, s.st.Loading).Clicked() {
-						s.p.Toggle()
-					}
-					if s.roundButton(c, "now-next", "next", locales.PlayerNext(), false, false).Clicked() {
-						s.p.Next()
-					}
+					// Play and next read left to right in every language.
+					ui.Row(c).Direction(ui.LeftToRight).Gap(12).Children(func() {
+						name, label := toggleOf(s.st)
+						if s.roundButton(c, "now-toggle", name, label, true, s.st.Loading).Clicked() {
+							s.p.Toggle()
+						}
+						if s.roundButton(c, "now-next", "next", locales.PlayerNext(), false, false).Clicked() {
+							s.p.Next()
+						}
+					})
 					ui.Row(c).Children(func() {
 						s.likeButton(c, "now-like", t, 18)
 						s.dislikeButton(c, "now-dislike", t, 18)

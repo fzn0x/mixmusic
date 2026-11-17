@@ -391,8 +391,9 @@ Every word of the interface is a message of
 `locales`, generated of the catalogs as `locales/catalog_gen.go`. A pull
 request that adds or changes a text adds or changes its English message
 alone, and runs `bunx mygo generate`; translators fill in the other
-languages, and the release workflow fails while a shipped language lacks a
-message. Keys start with their feature, as `accountSettingsSignOut`, and
+languages. A message a language lacks shows in English:
+`go run ./tools/translations` lists them, and the release workflow says
+them in its warnings. Keys start with their feature, as `accountSettingsSignOut`, and
 stay in sorted order. A sentence is one message, with named placeholders
 for what goes in it, as `Couldn't invite collaborators to {title}: {error}`,
 and a count is a plural, as `{count, plural, one {# song} other {# songs}}`,
@@ -406,6 +407,42 @@ a stale `catalog_gen.go`. `go test -run TestPseudoLocale .` shows the pages
 in MyGo's pseudo-language, `en-XA`, and fails on English written in the
 code or a sentence joined from pieces; with `MIXMUSIC_RENDER=<folder>` it
 saves each page, a third longer, to look for cut words.
+
+## Adding or fixing a language
+
+MixMusic's languages are translated by a machine first, then fixed by the
+people who speak them.
+
+- **One file.** A language is `locales/more/<tag>.json`, named after its
+  BCP 47 tag in its canonical form, as `hi.json`, `pt-BR.json` or
+  `zh-Hant.json`. MixMusic adds it as it starts: the Language setting lists
+  it, named in itself, and the computer's language picks it. Adding one
+  changes no other file, so pull requests that each add a language merge in
+  any order. [locales/more/README.md](locales/more/README.md) shows a file,
+  and tells how a language moves to `locales/` itself, for the Windows
+  installer to be in it.
+- **Its messages.** `"@@locale"` comes first, then the keys of en.json it
+  translates, in en.json's order. Each keeps English's placeholders, as
+  `{title}`, and select cases, and has its language's plural cases, as
+  `one`, `few`, `many` and `other` in Russian, with English's exact ones, as
+  `=0`. The descriptions in en.json say where a message shows. A message
+  the file lacks shows in English.
+- **MyGo's words.** The words of the controls and menus, as Copy, Undo and
+  Next month, are MyGo's: a language gives them as `mygo.<key>` messages,
+  with the keys of MyGo's catalog, `internal/l10n/en.json` in the MyGo
+  module that go.mod names. Japanese and Chinese take MyGo's own
+  translations, `locales/<tag>/<tag>.json` in that module.
+- **Translated by a machine.** A machine's translation says
+  `"@@x-machine-translated": true` after `@@locale`, and Settings › About
+  then says, in the language, that a machine translated it, with a link
+  here. A speaker who has read the whole file and fixed what was wrong
+  removes the line, in the pull request of the fixes.
+- **Check it.** `bash .github/scripts/catalogs.sh` runs MyGo's checks of
+  each catalog, and `go test ./locales` MixMusic's: the name, `@@locale`,
+  messages that parse, keys en.json has, in order, the placeholders and
+  the cases. `bunx mygo dev -lang <tag>` runs the app in the language.
+- **The pull request.** One that adds or fixes a translation changes its
+  file alone, with no entry in changelog.d.
 
 ## Translations of the README
 

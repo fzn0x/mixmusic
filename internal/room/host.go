@@ -803,7 +803,7 @@ func (s *Server) tellLock() {
 	tell := !lock.IsZero() && !lock.Equal(s.toldLock)
 	if tell {
 		s.toldLock = lock
-		s.note("Someone", Guessed)
+		s.note(Unnamed, Guessed)
 	}
 	s.mu.Unlock()
 	if tell {
@@ -839,7 +839,7 @@ func (s *Server) drop(key remote.Fingerprint, reason, what string, block bool) {
 		if s.blocked == nil {
 			s.blocked = map[remote.Fingerprint]string{}
 		}
-		name := "Someone"
+		name := Unnamed
 		if g != nil {
 			name = g.Name
 		}

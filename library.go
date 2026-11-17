@@ -230,7 +230,7 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 	s.shortListLine(c, key+"-playlists", "playlists", source, playlists.err, func() { s.refetch(key + ":playlists") })
 	s.shortListLine(c, key+"-albums", "albums", source, albums.err, func() { s.refetch(key + ":albums") })
 	s.shortListLine(c, key+"-artists", "artists", source, artists.err, func() { s.refetch(key + ":artists") })
-	if !playlists.done || !albums.done || !artists.done {
+	if playlists.waiting() || albums.waiting() || artists.waiting() {
 		s.loading(c)
 	}
 	// The user makes playlists on YouTube Music: theirs show, if none yet,
@@ -255,8 +255,10 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 	// The playlists of others the user collaborates on have a shelf of
 	// their own. Each shelf builds the tiles near the view alone, for a
 	// library of hundreds.
+	// Lists that are still coming show what they have read so far.
+	playlistList, albumList, artistList := playlists.shown(), albums.shown(), artists.shown()
 	var own []int
-	for i, p := range playlists.value {
+	for i, p := range playlistList {
 		if !collaboration(p) {
 			own = append(own, i)
 		}
@@ -265,25 +267,34 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 		s.shelfWith(c, key+"-playlists", locales.LibraryPlaylists(), links, func() {
 			s.nearShelfTiles(c, key+"-playlists", len(own), func(j int) {
 				i := own[j]
-				s.playlistTileWith(c, key+"-playlist-"+count(i), playlists.value[i], more)
+				s.playlistTileWith(c, key+"-playlist-"+count(i), playlistList[i], more)
 			})
 		})
 	}
-	s.collaborationsShelf(c, key, playlists.value, more)
-	if len(albums.value) > 0 {
+	s.collaborationsShelf(c, key, playlistList, more)
+	if playlists.growing() {
+		s.moreComing(c, key+"-playlists")
+	}
+	if len(albumList) > 0 {
 		s.shelf(c, key+"-albums", locales.LibraryAlbums(), func() {
-			groups := s.albumGroups(key+"-album", albums.value)
+			groups := s.albumGroups(key+"-album", albumList)
 			s.nearShelfTiles(c, key+"-albums", len(groups), func(i int) {
 				s.albumTile(c, key+"-album-"+count(i), s.preferredVersion(groups[i]))
 			})
 		})
 	}
-	if len(artists.value) > 0 {
+	if albums.growing() {
+		s.moreComing(c, key+"-albums")
+	}
+	if len(artistList) > 0 {
 		s.shelf(c, key+"-artists", locales.LibraryArtistsFollowed(), func() {
-			s.nearShelfTiles(c, key+"-artists", len(artists.value), func(i int) {
-				s.artistTile(c, key+"-artist-"+count(i), artists.value[i])
+			s.nearShelfTiles(c, key+"-artists", len(artistList), func(i int) {
+				s.artistTile(c, key+"-artist-"+count(i), artistList[i])
 			})
 		})
+	}
+	if artists.growing() {
+		s.moreComing(c, key+"-artists")
 	}
 	liked(c)
 }

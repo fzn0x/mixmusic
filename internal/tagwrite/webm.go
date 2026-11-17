@@ -11,7 +11,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/fzn0x/mixmusic/opus"
 	"github.com/fzn0x/mixmusic/webm"
 )
 
@@ -52,6 +51,12 @@ func IsWebM(r io.ReadSeeker) bool {
 // ErrFormat. A cover must be a JPEG or PNG image of at most MaxCover
 // bytes.
 func RemuxWebM(w io.Writer, src io.ReadSeeker, t Tags, fields Fields) error {
+	return RemuxWebMWith(w, src, t, fields, Remux{})
+}
+
+// RemuxWebMWith is RemuxWebM, doing what o tells besides: leaving
+// stretches of the audio out (cut.go).
+func RemuxWebMWith(w io.Writer, src io.ReadSeeker, t Tags, fields Fields, o Remux) error {
 	if fields&Cover != 0 && t.Cover != nil {
 		mime, err := checkCover(t.Cover)
 		if err != nil {
@@ -81,6 +86,11 @@ func RemuxWebM(w io.Writer, src io.ReadSeeker, t Tags, fields Fields) error {
 	if err != nil {
 		return err
 	}
+	kept := &keptPackets{src: &packetSource{r: r},
+		plan: o.plan(r.Duration(), int64(binary.LittleEndian.Uint16(head[10:])))}
+	if head, err = kept.skipStart(head); err != nil {
+		return err
+	}
 	serial := crc32.ChecksumIEEE(head) ^ uint32(r.Duration()/time.Millisecond)
 	bw := bufio.NewWriterSize(w, 256<<10)
 	ow := &oggWriter{w: bw, serial: serial}
@@ -98,7 +108,7 @@ func RemuxWebM(w io.Writer, src io.ReadSeeker, t Tags, fields Fields) error {
 			return err
 		}
 	}
-	if err := ow.audio(r); err != nil {
+	if err := ow.audio(kept); err != nil {
 		return err
 	}
 	return bw.Flush()
@@ -141,24 +151,17 @@ func (o *oggWriter) page(p oggPage) error {
 	return err
 }
 
-// audio writes the packets of r as the pages of the audio, the last of
+// audio writes the packets k keeps as the pages of the audio, the last of
 // them flagged as the stream's last.
-func (o *oggWriter) audio(r *webm.Reader) error {
-	read := func() (webm.Packet, bool, error) {
-		p, err := r.ReadPacket()
-		switch {
-		case err == io.EOF:
-			return p, false, nil
-		case err != nil:
-			return p, false, fmt.Errorf("%w: %v", ErrFormat, err)
-		}
-		return p, true, nil
-	}
-	next, more, err := read()
+func (o *oggWriter) audio(k *keptPackets) error {
+	next, more, err := k.next()
 	if err != nil {
 		return err
 	}
 	if !more {
+		if k.plan.start != 0 || len(k.plan.mids) > 0 || k.plan.tail >= 0 {
+			return errAllCut
+		}
 		return fmt.Errorf("%w: it holds no audio", ErrFormat)
 	}
 	var (
@@ -184,19 +187,16 @@ func (o *oggWriter) audio(r *webm.Reader) error {
 	}
 	for more {
 		p := next
-		n, err := opus.PacketSamples(p.Data, opusRate)
-		if err != nil {
-			return fmt.Errorf("%w: an Opus packet at %v is broken", ErrFormat, p.Time)
-		}
-		if next, more, err = read(); err != nil {
+		if next, more, err = k.next(); err != nil {
 			return err
 		}
-		total += int64(n)
+		total += p.n
 		end := total
-		if !more && p.DiscardPadding > 0 {
-			// The end the WebM trimmed, which the last page's granule
-			// position trims: never before the page written last.
-			end = max(total-samplesOf(p.DiscardPadding), last)
+		if !more {
+			// The end the WebM trimmed, or a stretch left out of the end,
+			// which the last page's granule position trims: never before
+			// the page written last.
+			end = max(k.end(p, total), last)
 		}
 		for at := 0; ; {
 			if len(cur.segs) == 255 {

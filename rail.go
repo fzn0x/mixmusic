@@ -156,15 +156,17 @@ func mustSVG(data []byte) *ui.SVG {
 // where it fits, and the mark and name go under it. It tells its height.
 func (s *shell) brand(c *ui.Context, collapsed bool, inner float32) float32 {
 	bar := c.TitleBar()
+	// Right to left, the rail is at the window's right.
+	start, _ := barInsets(c)
 	tall := max(bar.Height, 48)
 	band := func(children func()) {
-		row := ui.Row(c).Height(tall).Shrink(0).Padding(0, 0, 0, bar.Left).Gap(12)
+		row := ui.Row(c).Height(tall).Shrink(0).PaddingStart(start).Gap(12)
 		if bar.Height > 0 {
 			row.DragWindow()
 		}
 		row.Children(children)
 	}
-	if bar.Left == 0 {
+	if start == 0 {
 		band(func() {
 			if !collapsed {
 				// The mark, the two gaps and the button leave the name the
@@ -175,7 +177,7 @@ func (s *shell) brand(c *ui.Context, collapsed bool, inner float32) float32 {
 		})
 		return tall
 	}
-	beside := inner-bar.Left >= 12+32
+	beside := inner-start >= 12+32
 	ui.Column(c).Shrink(0).Children(func() {
 		band(func() {
 			if beside {
@@ -526,7 +528,7 @@ func (s *shell) liveCard(c *ui.Context, t, next media.Track, size float32) {
 // the square.
 func (s *shell) liveFace(c *ui.Context, art []media.Image, size float32) {
 	k := &s.lk
-	if b := s.art.get(c, artworkURL(art, int(size*s.zoomOf())), s.artPixels(size)); b != nil {
+	if b := s.art.get(c, s.artAt(art, size), s.artPixels(size)); b != nil {
 		ui.Image(c, b).Size(size, size).Fit(ui.Cover).Radius(k.radiusSm)
 		return
 	}

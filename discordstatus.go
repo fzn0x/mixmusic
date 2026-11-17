@@ -279,7 +279,7 @@ func (s *shell) discordTimes(c *ui.Context, a *discord.Activity, now time.Time) 
 	if length > 0 {
 		f = float32(max(0, min(1, played.Seconds()/length.Seconds())))
 	}
-	ui.Row(c).Gap(8).AlignItems(ui.Center).Margin(4, 0, 0).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).Gap(8).AlignItems(ui.Center).Margin(4, 0, 0).Children(func() {
 		ui.Text(c, clock(played)).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
 		ui.Box(c).Grow(1).Height(4).Label(locales.DiscordTimeBarLabel()).Draw(func(p *ui.Painter, r ui.Rect) {
 			p.Fill(r, k.border, r.H/2)

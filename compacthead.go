@@ -212,7 +212,7 @@ func (s *shell) topBarHead(c *ui.Context) {
 			s.cover(c, "bar-cover", h.art, 32, h.round)
 		}
 		name := ui.Text(c, k.words(h.title)).FontSize(k.bodySize()).Font(k.display).SingleLine().MinWidth(0).
-			Margin(0, 8, 0, 6)
+			MarginStart(6).MarginEnd(8)
 		k.labelWeight(name)
 		if h.play != nil && s.round(c, "bar-play", "play", locales.CompactHeadPlay(h.title), true, false, 32, 16).Shrink(0).Clicked() {
 			h.play()

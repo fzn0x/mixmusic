@@ -223,6 +223,54 @@ func (msgs Messages) AboutSourceCode() string {
 	return Catalog.Format(msgs.locale, "aboutSourceCode", nil)
 }
 
+// AboutTranslation says "Translation"
+// in the language the app shows.
+//
+// The group of Settings › About, and its row, that shows only in a
+// language a machine translated.
+func AboutTranslation() string { return In(i18n.Locale()).AboutTranslation() }
+
+// AboutTranslation says "Translation"
+// in the language of msgs.
+//
+// The group of Settings › About, and its row, that shows only in a
+// language a machine translated.
+func (msgs Messages) AboutTranslation() string {
+	return Catalog.Format(msgs.locale, "aboutTranslation", nil)
+}
+
+// AboutTranslationFix says "fix the translation"
+// in the language the app shows.
+//
+// A link to how to send fixes of a translation, on GitHub. Lowercase, as
+// the buttons of About are.
+func AboutTranslationFix() string { return In(i18n.Locale()).AboutTranslationFix() }
+
+// AboutTranslationFix says "fix the translation"
+// in the language of msgs.
+//
+// A link to how to send fixes of a translation, on GitHub. Lowercase, as
+// the buttons of About are.
+func (msgs Messages) AboutTranslationFix() string {
+	return Catalog.Format(msgs.locale, "aboutTranslationFix", nil)
+}
+
+// AboutTranslationMachine says "MixMusic was translated into this language by a machine, so some of its words may be wrong. If it's your language, yo…"
+// in the language the app shows.
+//
+// Shows only in a language a machine translated, in that language: this
+// language is the one the sentence is in.
+func AboutTranslationMachine() string { return In(i18n.Locale()).AboutTranslationMachine() }
+
+// AboutTranslationMachine says "MixMusic was translated into this language by a machine, so some of its words may be wrong. If it's your language, yo…"
+// in the language of msgs.
+//
+// Shows only in a language a machine translated, in that language: this
+// language is the one the sentence is in.
+func (msgs Messages) AboutTranslationMachine() string {
+	return Catalog.Format(msgs.locale, "aboutTranslationMachine", nil)
+}
+
 // AboutVersion says "Version"
 // in the language the app shows.
 func AboutVersion() string { return In(i18n.Locale()).AboutVersion() }
@@ -8861,6 +8909,24 @@ func (msgs Messages) LanguageDescription() string {
 	return Catalog.Format(msgs.locale, "languageDescription", nil)
 }
 
+// LanguageName says "English"
+// in the language the app shows.
+//
+// The name of this language, as its speakers write it, as Deutsch or
+// 日本語. The Language setting names the language so where the computer
+// has no name of it.
+func LanguageName() string { return In(i18n.Locale()).LanguageName() }
+
+// LanguageName says "English"
+// in the language of msgs.
+//
+// The name of this language, as its speakers write it, as Deutsch or
+// 日本語. The Language setting names the language so where the computer
+// has no name of it.
+func (msgs Messages) LanguageName() string {
+	return Catalog.Format(msgs.locale, "languageName", nil)
+}
+
 // LanguageSystem says "System"
 // in the language the app shows.
 func LanguageSystem() string { return In(i18n.Locale()).LanguageSystem() }
@@ -9169,6 +9235,26 @@ func LibraryLoadMore(loaded int, total int) string {
 // Button that loads more of the liked songs. Lowercase.
 func (msgs Messages) LibraryLoadMore(loaded int, total int) string {
 	return Catalog.Format(msgs.locale, "libraryLoadMore", map[string]any{"loaded": loaded, "total": total})
+}
+
+// LibraryLoadingMore says "Loading more…"
+// in the language the app shows.
+//
+// Foot of a list of the user's YouTube Music library that shows what it has
+// read so far, and reads on: playlists, albums, artists, songs, podcasts.
+// Also the last item of the menu that adds a track to a YouTube Music
+// playlist.
+func LibraryLoadingMore() string { return In(i18n.Locale()).LibraryLoadingMore() }
+
+// LibraryLoadingMore says "Loading more…"
+// in the language of msgs.
+//
+// Foot of a list of the user's YouTube Music library that shows what it has
+// read so far, and reads on: playlists, albums, artists, songs, podcasts.
+// Also the last item of the menu that adds a track to a YouTube Music
+// playlist.
+func (msgs Messages) LibraryLoadingMore() string {
+	return Catalog.Format(msgs.locale, "libraryLoadingMore", nil)
 }
 
 // LibraryMixes says "Mixes"
@@ -12131,6 +12217,52 @@ func LyricsTimeVideosDescription() string { return In(i18n.Locale()).LyricsTimeV
 // in the language of msgs.
 func (msgs Messages) LyricsTimeVideosDescription() string {
 	return Catalog.Format(msgs.locale, "lyricsTimeVideosDescription", nil)
+}
+
+// LyricsTimeVideosNoteTimed says "Timed to this video ({shift} s)"
+// in the language the app shows.
+func LyricsTimeVideosNoteTimed(shift string) string {
+	return In(i18n.Locale()).LyricsTimeVideosNoteTimed(shift)
+}
+
+// LyricsTimeVideosNoteTimed says "Timed to this video ({shift} s)"
+// in the language of msgs.
+func (msgs Messages) LyricsTimeVideosNoteTimed(shift string) string {
+	return Catalog.Format(msgs.locale, "lyricsTimeVideosNoteTimed", map[string]any{"shift": shift})
+}
+
+// LyricsTimeVideosNoteTimedFaster says "Timed to this video ({shift} s, {percent}% faster)"
+// in the language the app shows.
+func LyricsTimeVideosNoteTimedFaster(shift string, percent string) string {
+	return In(i18n.Locale()).LyricsTimeVideosNoteTimedFaster(shift, percent)
+}
+
+// LyricsTimeVideosNoteTimedFaster says "Timed to this video ({shift} s, {percent}% faster)"
+// in the language of msgs.
+func (msgs Messages) LyricsTimeVideosNoteTimedFaster(shift string, percent string) string {
+	return Catalog.Format(msgs.locale, "lyricsTimeVideosNoteTimedFaster", map[string]any{"shift": shift, "percent": percent})
+}
+
+// LyricsTimeVideosNoteTimedSlower says "Timed to this video ({shift} s, {percent}% slower)"
+// in the language the app shows.
+func LyricsTimeVideosNoteTimedSlower(shift string, percent string) string {
+	return In(i18n.Locale()).LyricsTimeVideosNoteTimedSlower(shift, percent)
+}
+
+// LyricsTimeVideosNoteTimedSlower says "Timed to this video ({shift} s, {percent}% slower)"
+// in the language of msgs.
+func (msgs Messages) LyricsTimeVideosNoteTimedSlower(shift string, percent string) string {
+	return Catalog.Format(msgs.locale, "lyricsTimeVideosNoteTimedSlower", map[string]any{"shift": shift, "percent": percent})
+}
+
+// LyricsTimeVideosNoteTiming says "Timing these lyrics to the video…"
+// in the language the app shows.
+func LyricsTimeVideosNoteTiming() string { return In(i18n.Locale()).LyricsTimeVideosNoteTiming() }
+
+// LyricsTimeVideosNoteTiming says "Timing these lyrics to the video…"
+// in the language of msgs.
+func (msgs Messages) LyricsTimeVideosNoteTiming() string {
+	return Catalog.Format(msgs.locale, "lyricsTimeVideosNoteTiming", nil)
 }
 
 // LyricsTimeVideosTitle says "Time lyrics to music videos"
@@ -17531,6 +17663,250 @@ func (msgs Messages) RoomPageWaitingGuests() string {
 	return Catalog.Format(msgs.locale, "roomPageWaitingGuests", nil)
 }
 
+// RoomProblemAway says "{name}'s room isn't on the network now."
+// in the language the app shows.
+func RoomProblemAway(name string) string { return In(i18n.Locale()).RoomProblemAway(name) }
+
+// RoomProblemAway says "{name}'s room isn't on the network now."
+// in the language of msgs.
+func (msgs Messages) RoomProblemAway(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemAway", map[string]any{"name": name})
+}
+
+// RoomProblemBlocked says "{name} blocked this computer."
+// in the language the app shows.
+func RoomProblemBlocked(name string) string { return In(i18n.Locale()).RoomProblemBlocked(name) }
+
+// RoomProblemBlocked says "{name} blocked this computer."
+// in the language of msgs.
+func (msgs Messages) RoomProblemBlocked(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemBlocked", map[string]any{"name": name})
+}
+
+// RoomProblemBlockedUnnamed says "This room blocked this computer."
+// in the language the app shows.
+func RoomProblemBlockedUnnamed() string { return In(i18n.Locale()).RoomProblemBlockedUnnamed() }
+
+// RoomProblemBlockedUnnamed says "This room blocked this computer."
+// in the language of msgs.
+func (msgs Messages) RoomProblemBlockedUnnamed() string {
+	return Catalog.Format(msgs.locale, "roomProblemBlockedUnnamed", nil)
+}
+
+// RoomProblemBusy says "{name}'s room checks other codes: try again in a moment."
+// in the language the app shows.
+func RoomProblemBusy(name string) string { return In(i18n.Locale()).RoomProblemBusy(name) }
+
+// RoomProblemBusy says "{name}'s room checks other codes: try again in a moment."
+// in the language of msgs.
+func (msgs Messages) RoomProblemBusy(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemBusy", map[string]any{"name": name})
+}
+
+// RoomProblemDeclined says "{name} didn't let you in."
+// in the language the app shows.
+func RoomProblemDeclined(name string) string { return In(i18n.Locale()).RoomProblemDeclined(name) }
+
+// RoomProblemDeclined says "{name} didn't let you in."
+// in the language of msgs.
+func (msgs Messages) RoomProblemDeclined(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemDeclined", map[string]any{"name": name})
+}
+
+// RoomProblemEnded says "The room ended."
+// in the language the app shows.
+func RoomProblemEnded() string { return In(i18n.Locale()).RoomProblemEnded() }
+
+// RoomProblemEnded says "The room ended."
+// in the language of msgs.
+func (msgs Messages) RoomProblemEnded() string {
+	return Catalog.Format(msgs.locale, "roomProblemEnded", nil)
+}
+
+// RoomProblemFar says "Couldn't reach {name} over the internet: their router may not forward the room's port, a firewall may turn MixMusic a…"
+// in the language the app shows.
+func RoomProblemFar(name string) string { return In(i18n.Locale()).RoomProblemFar(name) }
+
+// RoomProblemFar says "Couldn't reach {name} over the internet: their router may not forward the room's port, a firewall may turn MixMusic a…"
+// in the language of msgs.
+func (msgs Messages) RoomProblemFar(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemFar", map[string]any{"name": name})
+}
+
+// RoomProblemFarAddr says "The link names an address of this computer, or of no one: ask its host for the link again."
+// in the language the app shows.
+func RoomProblemFarAddr() string { return In(i18n.Locale()).RoomProblemFarAddr() }
+
+// RoomProblemFarAddr says "The link names an address of this computer, or of no one: ask its host for the link again."
+// in the language of msgs.
+func (msgs Messages) RoomProblemFarAddr() string {
+	return Catalog.Format(msgs.locale, "roomProblemFarAddr", nil)
+}
+
+// RoomProblemFarUnnamed says "Couldn't reach the room's host over the internet: their router may not forward the room's port, a firewall may turn M…"
+// in the language the app shows.
+func RoomProblemFarUnnamed() string { return In(i18n.Locale()).RoomProblemFarUnnamed() }
+
+// RoomProblemFarUnnamed says "Couldn't reach the room's host over the internet: their router may not forward the room's port, a firewall may turn M…"
+// in the language of msgs.
+func (msgs Messages) RoomProblemFarUnnamed() string {
+	return Catalog.Format(msgs.locale, "roomProblemFarUnnamed", nil)
+}
+
+// RoomProblemFull says "{name}'s room is full."
+// in the language the app shows.
+func RoomProblemFull(name string) string { return In(i18n.Locale()).RoomProblemFull(name) }
+
+// RoomProblemFull says "{name}'s room is full."
+// in the language of msgs.
+func (msgs Messages) RoomProblemFull(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemFull", map[string]any{"name": name})
+}
+
+// RoomProblemLocked says "{name}'s room isn't taking codes for a minute: ask {name} for the invite link."
+// in the language the app shows.
+func RoomProblemLocked(name string) string { return In(i18n.Locale()).RoomProblemLocked(name) }
+
+// RoomProblemLocked says "{name}'s room isn't taking codes for a minute: ask {name} for the invite link."
+// in the language of msgs.
+func (msgs Messages) RoomProblemLocked(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemLocked", map[string]any{"name": name})
+}
+
+// RoomProblemManyAsk says "So many wait to join {name}'s room that it takes no more for now: try again later."
+// in the language the app shows.
+func RoomProblemManyAsk(name string) string { return In(i18n.Locale()).RoomProblemManyAsk(name) }
+
+// RoomProblemManyAsk says "So many wait to join {name}'s room that it takes no more for now: try again later."
+// in the language of msgs.
+func (msgs Messages) RoomProblemManyAsk(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemManyAsk", map[string]any{"name": name})
+}
+
+// RoomProblemMoves says "{name}'s room is moving to another computer: try again in a moment."
+// in the language the app shows.
+func RoomProblemMoves(name string) string { return In(i18n.Locale()).RoomProblemMoves(name) }
+
+// RoomProblemMoves says "{name}'s room is moving to another computer: try again in a moment."
+// in the language of msgs.
+func (msgs Messages) RoomProblemMoves(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemMoves", map[string]any{"name": name})
+}
+
+// RoomProblemNewCode says "{name}'s room has a new code: ask {name} for it, or for the new invite link."
+// in the language the app shows.
+func RoomProblemNewCode(name string) string { return In(i18n.Locale()).RoomProblemNewCode(name) }
+
+// RoomProblemNewCode says "{name}'s room has a new code: ask {name} for it, or for the new invite link."
+// in the language of msgs.
+func (msgs Messages) RoomProblemNewCode(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemNewCode", map[string]any{"name": name})
+}
+
+// RoomProblemNotGuest says "{name}'s room no longer keeps your place: join again with its code."
+// in the language the app shows.
+func RoomProblemNotGuest(name string) string { return In(i18n.Locale()).RoomProblemNotGuest(name) }
+
+// RoomProblemNotGuest says "{name}'s room no longer keeps your place: join again with its code."
+// in the language of msgs.
+func (msgs Messages) RoomProblemNotGuest(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemNotGuest", map[string]any{"name": name})
+}
+
+// RoomProblemNotLink says "That isn't a link to a room."
+// in the language the app shows.
+func RoomProblemNotLink() string { return In(i18n.Locale()).RoomProblemNotLink() }
+
+// RoomProblemNotLink says "That isn't a link to a room."
+// in the language of msgs.
+func (msgs Messages) RoomProblemNotLink() string {
+	return Catalog.Format(msgs.locale, "roomProblemNotLink", nil)
+}
+
+// RoomProblemNotSame says "Another computer answered in place of {name}: the link isn't of its room."
+// in the language the app shows.
+func RoomProblemNotSame(name string) string { return In(i18n.Locale()).RoomProblemNotSame(name) }
+
+// RoomProblemNotSame says "Another computer answered in place of {name}: the link isn't of its room."
+// in the language of msgs.
+func (msgs Messages) RoomProblemNotSame(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemNotSame", map[string]any{"name": name})
+}
+
+// RoomProblemPreviewEnded says "You waited long to join {name}'s room, or many others knocked at once: open its link, or type its code, again."
+// in the language the app shows.
+func RoomProblemPreviewEnded(name string) string {
+	return In(i18n.Locale()).RoomProblemPreviewEnded(name)
+}
+
+// RoomProblemPreviewEnded says "You waited long to join {name}'s room, or many others knocked at once: open its link, or type its code, again."
+// in the language of msgs.
+func (msgs Messages) RoomProblemPreviewEnded(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemPreviewEnded", map[string]any{"name": name})
+}
+
+// RoomProblemRemoved says "{name} removed you from the room."
+// in the language the app shows.
+func RoomProblemRemoved(name string) string { return In(i18n.Locale()).RoomProblemRemoved(name) }
+
+// RoomProblemRemoved says "{name} removed you from the room."
+// in the language of msgs.
+func (msgs Messages) RoomProblemRemoved(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemRemoved", map[string]any{"name": name})
+}
+
+// RoomProblemTooLong says "Joining took too long: try again."
+// in the language the app shows.
+func RoomProblemTooLong() string { return In(i18n.Locale()).RoomProblemTooLong() }
+
+// RoomProblemTooLong says "Joining took too long: try again."
+// in the language of msgs.
+func (msgs Messages) RoomProblemTooLong() string {
+	return Catalog.Format(msgs.locale, "roomProblemTooLong", nil)
+}
+
+// RoomProblemUnreachable says "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away."
+// in the language the app shows.
+func RoomProblemUnreachable(name string) string {
+	return In(i18n.Locale()).RoomProblemUnreachable(name)
+}
+
+// RoomProblemUnreachable says "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away."
+// in the language of msgs.
+func (msgs Messages) RoomProblemUnreachable(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemUnreachable", map[string]any{"name": name})
+}
+
+// RoomProblemVersion says "That computer's MixMusic is of another version: update both."
+// in the language the app shows.
+func RoomProblemVersion() string { return In(i18n.Locale()).RoomProblemVersion() }
+
+// RoomProblemVersion says "That computer's MixMusic is of another version: update both."
+// in the language of msgs.
+func (msgs Messages) RoomProblemVersion() string {
+	return Catalog.Format(msgs.locale, "roomProblemVersion", nil)
+}
+
+// RoomProblemWait says "Too many wrong codes from this computer: try again in a minute."
+// in the language the app shows.
+func RoomProblemWait() string { return In(i18n.Locale()).RoomProblemWait() }
+
+// RoomProblemWait says "Too many wrong codes from this computer: try again in a minute."
+// in the language of msgs.
+func (msgs Messages) RoomProblemWait() string {
+	return Catalog.Format(msgs.locale, "roomProblemWait", nil)
+}
+
+// RoomProblemWrongCode says "That isn't the code of {name}'s room."
+// in the language the app shows.
+func RoomProblemWrongCode(name string) string { return In(i18n.Locale()).RoomProblemWrongCode(name) }
+
+// RoomProblemWrongCode says "That isn't the code of {name}'s room."
+// in the language of msgs.
+func (msgs Messages) RoomProblemWrongCode(name string) string {
+	return Catalog.Format(msgs.locale, "roomProblemWrongCode", map[string]any{"name": name})
+}
+
 // RoomReachAddressIntro says "Or join a room at an address, with its code: its host's address on a VPN you both run, or its router's, with the port."
 // in the language the app shows.
 func RoomReachAddressIntro() string { return In(i18n.Locale()).RoomReachAddressIntro() }
@@ -17649,6 +18025,46 @@ func RoomReachMoved() string { return In(i18n.Locale()).RoomReachMoved() }
 // in the language of msgs.
 func (msgs Messages) RoomReachMoved() string {
 	return Catalog.Format(msgs.locale, "roomReachMoved", nil)
+}
+
+// RoomReachSuggestAsk says "Turn on Ask me before someone joins, and whoever comes with the link or the code waits until you let them in."
+// in the language the app shows.
+func RoomReachSuggestAsk() string { return In(i18n.Locale()).RoomReachSuggestAsk() }
+
+// RoomReachSuggestAsk says "Turn on Ask me before someone joins, and whoever comes with the link or the code waits until you let them in."
+// in the language of msgs.
+func (msgs Messages) RoomReachSuggestAsk() string {
+	return Catalog.Format(msgs.locale, "roomReachSuggestAsk", nil)
+}
+
+// RoomReachSuggestAskLabel says "Turn on Ask me before someone joins"
+// in the language the app shows.
+func RoomReachSuggestAskLabel() string { return In(i18n.Locale()).RoomReachSuggestAskLabel() }
+
+// RoomReachSuggestAskLabel says "Turn on Ask me before someone joins"
+// in the language of msgs.
+func (msgs Messages) RoomReachSuggestAskLabel() string {
+	return Catalog.Format(msgs.locale, "roomReachSuggestAskLabel", nil)
+}
+
+// RoomReachSuggestAskNo says "not now"
+// in the language the app shows.
+func RoomReachSuggestAskNo() string { return In(i18n.Locale()).RoomReachSuggestAskNo() }
+
+// RoomReachSuggestAskNo says "not now"
+// in the language of msgs.
+func (msgs Messages) RoomReachSuggestAskNo() string {
+	return Catalog.Format(msgs.locale, "roomReachSuggestAskNo", nil)
+}
+
+// RoomReachSuggestAskYes says "turn it on"
+// in the language the app shows.
+func RoomReachSuggestAskYes() string { return In(i18n.Locale()).RoomReachSuggestAskYes() }
+
+// RoomReachSuggestAskYes says "turn it on"
+// in the language of msgs.
+func (msgs Messages) RoomReachSuggestAskYes() string {
+	return Catalog.Format(msgs.locale, "roomReachSuggestAskYes", nil)
 }
 
 // RoomReachTestNote says "MixMusic can't test the port from outside: ask a friend to open the link. A friend who can't connect is told the like…"
@@ -18295,6 +18711,16 @@ func (msgs Messages) RoomSettingsYourRoomOpen() string {
 	return Catalog.Format(msgs.locale, "roomSettingsYourRoomOpen", nil)
 }
 
+// RoomSomeone says "Someone"
+// in the language the app shows.
+func RoomSomeone() string { return In(i18n.Locale()).RoomSomeone() }
+
+// RoomSomeone says "Someone"
+// in the language of msgs.
+func (msgs Messages) RoomSomeone() string {
+	return Catalog.Format(msgs.locale, "roomSomeone", nil)
+}
+
 // SearchAlbums says "Albums"
 // in the language the app shows.
 func SearchAlbums() string { return In(i18n.Locale()).SearchAlbums() }
@@ -18475,14 +18901,14 @@ func (msgs Messages) SearchRecent() string {
 	return Catalog.Format(msgs.locale, "searchRecent", nil)
 }
 
-// SearchScopeBoth says "both"
+// SearchScopeAllMusic says "all music"
 // in the language the app shows.
-func SearchScopeBoth() string { return In(i18n.Locale()).SearchScopeBoth() }
+func SearchScopeAllMusic() string { return In(i18n.Locale()).SearchScopeAllMusic() }
 
-// SearchScopeBoth says "both"
+// SearchScopeAllMusic says "all music"
 // in the language of msgs.
-func (msgs Messages) SearchScopeBoth() string {
-	return Catalog.Format(msgs.locale, "searchScopeBoth", nil)
+func (msgs Messages) SearchScopeAllMusic() string {
+	return Catalog.Format(msgs.locale, "searchScopeAllMusic", nil)
 }
 
 // SearchServices says "Services"
@@ -19475,6 +19901,26 @@ func SkipPartsCredit(license string, link string) string {
 // {link} SponsorBlock's address, each a link.
 func (msgs Messages) SkipPartsCredit(license string, link string) string {
 	return Catalog.Format(msgs.locale, "skipPartsCredit", map[string]any{"license": license, "link": link})
+}
+
+// SkipPartsExportsAbout says "Copies Export… writes leave out the parts skipped above. Copies in M4A keep them: MixMusic can't cut those yet."
+// in the language the app shows.
+func SkipPartsExportsAbout() string { return In(i18n.Locale()).SkipPartsExportsAbout() }
+
+// SkipPartsExportsAbout says "Copies Export… writes leave out the parts skipped above. Copies in M4A keep them: MixMusic can't cut those yet."
+// in the language of msgs.
+func (msgs Messages) SkipPartsExportsAbout() string {
+	return Catalog.Format(msgs.locale, "skipPartsExportsAbout", nil)
+}
+
+// SkipPartsExportsTitle says "Leave marked parts out of exports"
+// in the language the app shows.
+func SkipPartsExportsTitle() string { return In(i18n.Locale()).SkipPartsExportsTitle() }
+
+// SkipPartsExportsTitle says "Leave marked parts out of exports"
+// in the language of msgs.
+func (msgs Messages) SkipPartsExportsTitle() string {
+	return Catalog.Format(msgs.locale, "skipPartsExportsTitle", nil)
 }
 
 // SkipPartsGroup says "Skip parts of videos"

@@ -86,7 +86,7 @@ func (s *shell) miniView(c *ui.Context) {
 	_, ok := s.st.Current()
 	// A click in it leaves the focus where it was: the mini player runs no
 	// shortcuts (#38), and Space would press the button clicked last again.
-	root := ui.Column(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body).DragWindow().KeepFocus()
+	root := ui.Column(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body).DragWindow().KeepFocus().DrawOver(s.notePixels)
 	// The panel above the player comes after it, for Tab, as below it.
 	if !s.mini.below {
 		root.Reverse()
@@ -100,7 +100,9 @@ func (s *shell) miniView(c *ui.Context) {
 			s.miniArtwork(c, side, part)
 			s.miniBody(c, w-side)
 			if ok && !s.st.Live {
-				s.miniSeek(c, w)
+				// The progress reads left to right in every language: built in a
+				// box over the player that the pointer passes through.
+				ui.Box(c.Key("mini-seek-line")).Direction(ui.LeftToRight).Absolute().Fill().PassThrough().Children(func() { s.miniSeek(c, w) })
 			}
 		})
 		if room > 0 {
@@ -126,7 +128,7 @@ func (s *shell) miniArtwork(c *ui.Context, side, h float32) {
 	art := ui.Box(c.Key("mini-art")).Size(side, h).Shrink(0).Clip()
 	var b *ui.Bitmap
 	if cur, ok := s.st.Current(); ok {
-		b = s.art.get(c, artworkURL(cur.Track.Artwork, int(miniArt*s.zoomOf())), s.artPixels(miniArt))
+		b = s.art.get(c, s.artAt(cur.Track.Artwork, miniArt), s.artPixels(miniArt))
 	}
 	if b == nil {
 		art.Background(s.lk.surface3)
@@ -176,7 +178,7 @@ func (s *shell) miniBody(c *ui.Context, w float32) {
 				case ok && s.st.Live:
 					ui.Text(c, k.sentence(locales.PlayerLive())).FontSize(k.captionSize()).TextColor(k.accent).Shrink(0).SingleLine()
 				case ok:
-					ui.Text(c, clock(s.st.Position)+" / "+clockLength(s.miniDuration())).FontSize(k.captionSize()).
+					ui.Text(c, clock(s.st.Position)+" / "+clockLength(s.miniDuration())).Direction(ui.LeftToRight).FontSize(k.captionSize()).
 						TextColor(k.muted).FontFeatures("tnum").Shrink(0).SingleLine()
 				}
 				s.miniPanelButtons(c)
@@ -195,7 +197,7 @@ func (s *shell) miniControls(c *ui.Context, w float32) {
 	r := miniRowOf(w, ok)
 	s.mini.hidden = r.hidden
 	ui.Row(c).Gap(r.groupGap).AlignItems(ui.Center).Children(func() {
-		ui.Row(c).Gap(r.gap).AlignItems(ui.Center).Children(func() {
+		ui.Row(c).Direction(ui.LeftToRight).Gap(r.gap).AlignItems(ui.Center).Children(func() {
 			if r.shows(miniShuffle) {
 				shuffle := s.miniButton(c, "mini-shuffle", "shuffle", locales.PlayerShuffle(), s.st.Shuffle, 28, 16)
 				if shuffle.Role(ui.RoleToggleButton).Checked(s.st.Shuffle).Size(28, 32).Clicked() {

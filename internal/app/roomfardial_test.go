@@ -27,7 +27,7 @@ func TestRoomLinkToThisComputerIsRefused(t *testing.T) {
 		t.Fatal(err)
 	}
 	v := untilGuest(t, lap.App, "the link refused", func(v GuestView) bool { return v.Step == RoomEnded })
-	if v.Problem != roomFarProblem {
+	if v.Problem != roomFarProblem() {
 		t.Fatalf("the guest shows %q", v.Problem)
 	}
 	if h, _ := desk.Rooms().Hosted(); len(h.Guests) != 0 {

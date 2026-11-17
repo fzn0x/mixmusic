@@ -89,9 +89,9 @@ func (s *shell) remoteCodeEntry(c *ui.Context, id, name string) {
 
 // remotePlayer shows what plays on the computer id, as v's state tells,
 // with its controls: the cover, the title and the artists, where the track
-// is, which moves on as it plays, the transport, the volume, what plays
-// here, to move there (remotehandover.go), and the tracks after it
-// (remotequeue.go).
+// is, which moves on as it plays, with the parts it passes over marked
+// (remotemarks.go), the transport, the volume, what plays here, to move
+// there (remotehandover.go), and the tracks after it (remotequeue.go).
 func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 	k := &s.lk
 	st := v.State
@@ -116,7 +116,9 @@ func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 		})
 	}
 	s.remoteProgress(c, id, v)
-	ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
+	// The controls read left to right in every language, at the start of the
+	// page.
+	ui.Row(c).Direction(ui.LeftToRight).AlignSelf(ui.Start).Gap(12).AlignItems(ui.Center).Children(func() {
 		has := st.Track != nil
 		if s.roundButton(c, "remote-previous", "previous", locales.PlayerPrevious(), false, !has).Clicked() {
 			s.remoteDo(id, remote.Command{Op: remote.OpPrevious})
@@ -131,6 +133,7 @@ func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 		if s.roundButton(c, "remote-next", "next", locales.PlayerNext(), false, !has).Clicked() {
 			s.remoteDo(id, remote.Command{Op: remote.OpNext})
 		}
+		s.remoteHighlight(c, id, st)
 		ui.Box(c).Width(24)
 		s.remoteVolume(c, id, st)
 	})
@@ -172,14 +175,14 @@ func (s *shell) remoteProgress(c *ui.Context, id string, v app.RemoteView) {
 		// The next whole second of the track.
 		c.After(time.Second - time.Duration(r.seekTo*float64(time.Second))%time.Second)
 	}
-	ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).Gap(8).FillWidth().MaxWidth(640).Children(func() {
 		ui.Text(c, clock(time.Duration(r.seekTo*float64(time.Second)))).FontSize(k.captionSize()).TextColor(k.muted).
 			FontFeatures("tnum").Width(44).TextAlign(ui.End)
 		label := locales.PlayerSeek()
 		if st.Live {
 			label = locales.PlayerNoSeeking()
 		}
-		seek := ui.Slider(c.Key("remote-seek"), &r.seekTo, 0, max(dur.Seconds(), 1)).Grow(1).MinWidth(0).KeepFocus().
+		seek := s.remoteSeekSlider(c, &r.seekTo, max(dur.Seconds(), 1), remoteMarks(st)).Grow(1).MinWidth(0).KeepFocus().
 			Label(label).Disabled(st.Track == nil || st.Live || dur <= 0)
 		_, _, held := seek.Dragged()
 		if st.Track != nil && !held && (r.seeking || seek.Changed()) {

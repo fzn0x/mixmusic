@@ -162,13 +162,12 @@ func (s *shell) lyricStage(c *ui.Context) {
 	})
 }
 
-// stageGround paints the ground of the stage on its panel, from the track's
-// cover, small, which the GPU blends between the pixels of as it stretches
-// it (as the grounds of Aurora and Glasshouse are: groundLights).
+// stageGround paints the ground of the stage on its panel: the track's cover,
+// blurred once as it loads to a wash of its colours, and stretched over it.
 func (s *shell) stageGround(c *ui.Context, panel ui.Element, t media.Track, st lyricStyle) {
 	var b *ui.Bitmap
 	if len(t.Artwork) > 0 {
-		b = s.art.get(c, artworkURL(t.Artwork, 64), 64)
+		b = s.art.blurred(c, artworkURL(t.Artwork, 96), 96)
 	}
 	accent := s.lk.accent
 	panel.Background(ui.Color{A: 255}).Draw(func(p *ui.Painter, r ui.Rect) { paintStageGround(p, r, b, accent, st.scrim) })
@@ -193,7 +192,7 @@ func (s *shell) stageCover(c *ui.Context, t media.Track, size float32, st lyricS
 	frame := ui.Box(c.Key("stage-cover")).Size(size, size).Shrink(0).Radius(st.cover).Clip().Shadow(0, 14, 44, 0, ui.Color{A: 140})
 	var b *ui.Bitmap
 	if len(t.Artwork) > 0 {
-		b = s.art.get(c, artworkURL(t.Artwork, int(size*s.zoomOf())), s.artPixels(size))
+		b = s.art.get(c, s.artAt(t.Artwork, size), s.artPixels(size))
 	}
 	if b == nil {
 		frame.Background(stageInk.Alpha(0.12))
@@ -205,9 +204,9 @@ func (s *shell) stageCover(c *ui.Context, t media.Track, size float32, st lyricS
 	})
 }
 
-// stageClose is the button that closes the stage, at its top right.
+// stageClose is the button that closes the stage, at its top end.
 func (s *shell) stageClose(c *ui.Context) {
-	b := s.buttonBase(c.Key("stage-close")).Absolute().Top(20).Right(20).Size(40, 40).Radius(20).Label(locales.LyricsStageClose()).Cursor(ui.CursorPointer).Tooltip(locales.LyricsStageCloseTip())
+	b := s.buttonBase(c.Key("stage-close")).Absolute().Top(20).End(20).Size(40, 40).Radius(20).Label(locales.LyricsStageClose()).Cursor(ui.CursorPointer).Tooltip(locales.LyricsStageCloseTip())
 	if b.Hovered() {
 		b.Background(stageInk.Alpha(0.16))
 	}

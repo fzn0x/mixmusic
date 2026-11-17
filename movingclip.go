@@ -61,7 +61,7 @@ func (s *shell) clipSleeve(c *ui.Context, t media.Track, size float32) bool {
 		switch {
 		case !asked:
 			b := s.buttonBase(c.Key("sleeve-clip-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().
-				Right(8).Bottom(8).Label(locales.MovingClipPlay()).Tooltip(locales.MovingClipPlay()).Cursor(ui.CursorPointer)
+				End(8).Bottom(8).Label(locales.MovingClipPlay()).Tooltip(locales.MovingClipPlay()).Cursor(ui.CursorPointer)
 			if b.Clicked() {
 				if m.played == nil {
 					m.played = map[string]bool{}

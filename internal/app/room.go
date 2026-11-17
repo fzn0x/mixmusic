@@ -28,6 +28,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/portmap"
 	"github.com/fzn0x/mixmusic/internal/room"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // RoomOptions configure rooms in place of the network and the engine:
@@ -267,6 +268,15 @@ func (a *App) nearFound(found []room.Found) []room.Found {
 	return out
 }
 
+// shownName is a name in rooms as the windows show it: room.Unnamed, the
+// name of a computer that told none, in the language the app shows.
+func shownName(name string) string {
+	if name == room.Unnamed {
+		return locales.RoomSomeone()
+	}
+	return name
+}
+
 // relistRooms makes the list the windows show of the rooms found, and
 // reports whether it changed.
 func (a *App) relistRooms() bool {
@@ -280,7 +290,7 @@ func (a *App) relistRooms() bool {
 	shown := make([]FoundRoom, 0, len(r.found))
 	for id, f := range r.found {
 		if id != self {
-			shown = append(shown, FoundRoom{ID: id, Name: f.found.Name})
+			shown = append(shown, FoundRoom{ID: id, Name: shownName(f.found.Name)})
 		}
 	}
 	slices.SortFunc(shown, func(x, y FoundRoom) int {

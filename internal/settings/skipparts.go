@@ -21,6 +21,9 @@ type SkipParts struct {
 	// Highlight marks the highlight SponsorBlock tells of a video, on the
 	// seek bar, for Jump to the highlight.
 	Highlight bool `json:"highlight"`
+	// Exports leaves the parts skipped out of the copies Export… writes of
+	// downloads of Opus, which M4A copies keep (#735). It is off at first.
+	Exports bool `json:"exports"`
 	// Server is the https address of a mirror of SponsorBlock to ask in
 	// its place: "" for SponsorBlock's own.
 	Server string `json:"server"`

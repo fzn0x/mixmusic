@@ -175,7 +175,7 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 		}
 		own := s.youtubePlaylists()
 		switch {
-		case !own.done:
+		case own.waiting():
 			// Only until the answer the window asked for ahead comes.
 			m.Item(locales.ExploreLoadingPlaylists()).Disabled(true)
 			return
@@ -186,7 +186,7 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 			m.Item(locales.ExploreLoadPlaylistsFailed()).Disabled(true)
 			return
 		}
-		editable := slices.DeleteFunc(slices.Clone(own.value), func(p media.Playlist) bool { return !p.Editable })
+		editable := slices.DeleteFunc(slices.Clone(own.shown()), func(p media.Playlist) bool { return !p.Editable })
 		if len(editable) > 0 {
 			m.Separator()
 		}
@@ -200,11 +200,16 @@ func (s *shell) addToMenus(m *ui.Menu, tracks []media.Track) {
 				s.addToYouTubePlaylist(p, t)
 			}
 		}
-		if len(editable) == 0 {
+		if len(editable) == 0 && !own.growing() {
 			m.Item(locales.ExploreNoPlaylists()).Disabled(true)
 		}
 		// Of a list that came in part, those that came, and how many.
 		s.shortListItem(m, "youtube:playlists", "playlists", media.SourceYouTube, own.err)
+		// Of one that still comes, those read so far, and that it goes on.
+		if own.growing() {
+			m.Separator()
+			m.Item(locales.LibraryLoadingMore()).Disabled(true)
+		}
 	})
 }
 

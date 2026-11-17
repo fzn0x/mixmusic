@@ -40,6 +40,24 @@ stay as they are.
   the last packet that ends on it, the pre-skip among them, and the last
   page's leaves out what the last block's DiscardPadding drops, so that
   the copy decodes to the same samples as the download.
+- **Leaving out the parts SponsorBlock marks** (#735,
+  `internal/app/exportparts.go`, `internal/tagwrite/cut.go`). While
+  `SkipParts.On` and `SkipParts.Exports` are set, a download's copy gets
+  `export.Track.Leave`, which the remux calls with the length the WebM
+  tells (`tagwrite.Remux`): it looks up the video's parts in the parts
+  cache, asking SponsorBlock as the player does (offline, the parts kept
+  count however old; once two lookups in a row failed, the export asks no
+  more), and returns the parts the engine passes over, of the kinds
+  ticked, which fit the audio (`audio.Spans`), one that ends the track to
+  its end; none when less than a second would be left. The remux drops
+  whole Opus packets, decoding none: a stretch from the start goes by the
+  OpusHead's pre-skip, the copy starting 200 ms before the stretch's end
+  for the decoder to settle (within 0.3 % of the sound, where RFC 7845's
+  80 ms leave it a few percent off); one to the end by the last page's
+  granule position; one between by the packets whose middle is in it. The
+  granule positions count the samples kept, and the pages are numbered and
+  checksummed in turn. M4A copies keep their parts, as MixMusic doesn't
+  rewrite an MP4 sample table, and nothing is asked for them.
 - **The windows** (`export.go`): Export… in the menu of a track that
   exports, beside its other local items, and export in the bar of the
   tracks selected, registered with `addPickAction`. The system's dialog

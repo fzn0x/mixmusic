@@ -3,7 +3,10 @@ package main
 import (
 	"testing"
 
+	"github.com/egoist/mygo/i18n"
+
 	"github.com/fzn0x/mixmusic/internal/room/roomtest"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // askSuggestion is what the room's page suggests as friends outside this
@@ -65,4 +68,31 @@ func TestRoomOutsideSuggestionNotNow(t *testing.T) {
 	until(t, s, tt, "the switch off", func() bool { return !tt.HasText("copy web link") })
 	toggle(t, s, tt, "Let friends outside this network join", anywhereAbout)
 	until(t, s, tt, "the suggestion again", func() bool { return tt.HasText(askSuggestion) })
+}
+
+// TestRoomOutsideSuggestionTranslated shows the suggestion in the pseudo
+// locale, en-XA, which brackets every message of the catalogs: its words
+// come from them, not the code.
+func TestRoomOutsideSuggestionTranslated(t *testing.T) {
+	was := i18n.Locale()
+	i18n.SetLocaleFunc(func() string { return "en-XA" })
+	t.Cleanup(func() { i18n.SetLocaleFunc(func() string { return was }) })
+	xa := locales.In("en-XA")
+	s, _, _ := newFarRoomShell(t, roomtest.New(), "Desk", "203.0.113.7")
+	tt := tester(t, s)
+	tt.SetLocale("en-XA")
+	if err := s.a.Rooms().Start(); err != nil {
+		t.Fatal(err)
+	}
+	show(s, tt, roomsPath)
+	until(t, s, tt, "the switch", func() bool { return tt.HasText(xa.RoomReachTitle()) })
+	toggle(t, s, tt, xa.RoomReachTitle(), xa.RoomReachDesc())
+	until(t, s, tt, "the suggestion", func() bool { return tt.HasText(xa.RoomReachSuggestAsk()) })
+	if !tt.HasText(xa.RoomReachSuggestAskYes()) || !tt.HasText(xa.RoomReachSuggestAskNo()) || tt.HasText(askSuggestion) {
+		t.Errorf("the suggestion shows %q", tt.Texts())
+	}
+	click(t, s, tt, xa.RoomReachSuggestAskLabel())
+	if !s.set.RoomAskJoin {
+		t.Error("its button, by the label of the catalog, didn't turn on Ask me before someone joins")
+	}
 }

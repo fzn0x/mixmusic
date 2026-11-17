@@ -41,12 +41,13 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
 // timingNote is the note of a music video's lyrics while they're timed to
 // it.
-const timingNote = "Timing these lyrics to the video…"
+func timingNote() string { return locales.LyricsTimeVideosNoteTiming() }
 
 // timedNote is the note of lyrics timed to a music video the song starts
 // shift into, at speed, as align.Result has it: the note names how much
@@ -58,14 +59,15 @@ func timedNote(shift time.Duration, speed float64) string {
 		s = 0 // not -0
 	}
 	off := math.Round(math.Abs(speed-1)*1e4) / 100
+	at := fmt.Sprintf("%+.1f", s)
 	if off == 0 {
-		return fmt.Sprintf("Timed to this video (%+.1f s)", s)
+		return locales.LyricsTimeVideosNoteTimed(at)
 	}
-	pace := "slower"
+	percent := strconv.FormatFloat(off, 'f', -1, 64)
 	if speed < 1 {
-		pace = "faster"
+		return locales.LyricsTimeVideosNoteTimedFaster(at, percent)
 	}
-	return fmt.Sprintf("Timed to this video (%+.1f s, %s%% %s)", s, strconv.FormatFloat(off, 'f', -1, 64), pace)
+	return locales.LyricsTimeVideosNoteTimedSlower(at, percent)
 }
 
 // These are the times of the timing of lyrics; tests shorten some.
@@ -200,7 +202,7 @@ func (c *Catalog) videoLyrics(ctx context.Context, video, song media.Track, l ly
 			if !c.keepsTime(ctx, video, song) {
 				l = l.Untimed()
 			}
-			l.Note = timingNote
+			l.Note = timingNote()
 			return l
 		}
 	}

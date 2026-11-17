@@ -26,6 +26,18 @@
   "aboutReport": "report a problem",
   "aboutShow": "show",
   "aboutSourceCode": "source code",
+  "aboutTranslation": "Translation",
+  "@aboutTranslation": {
+    "description": "The group of Settings › About, and its row, that shows only in a language a machine translated."
+  },
+  "aboutTranslationFix": "fix the translation",
+  "@aboutTranslationFix": {
+    "description": "A link to how to send fixes of a translation, on GitHub. Lowercase, as the buttons of About are."
+  },
+  "aboutTranslationMachine": "MixMusic was translated into this language by a machine, so some of its words may be wrong. If it's your language, you can help fix them.",
+  "@aboutTranslationMachine": {
+    "description": "Shows only in a language a machine translated, in that language: this language is the one the sentence is in."
+  },
   "aboutVersion": "Version",
   "accountSettingsAPIKey": "API key",
   "accountSettingsApproveLastfm": "Approve MixMusic on Last.fm, in your browser",
@@ -2622,6 +2634,10 @@
   },
   "keepOnTopTitle": "Keep on top",
   "languageDescription": "The language MixMusic shows its words in. System takes the first of the computer's languages MixMusic has, else English.",
+  "languageName": "English",
+  "@languageName": {
+    "description": "The name of this language, as its speakers write it, as Deutsch or 日本語. The Language setting names the language so where the computer has no name of it."
+  },
   "languageSystem": "System",
   "languageTitle": "Language",
   "libraryAddToLibrary": "Add to library",
@@ -2724,6 +2740,10 @@
         "type": "int"
       }
     }
+  },
+  "libraryLoadingMore": "Loading more…",
+  "@libraryLoadingMore": {
+    "description": "Foot of a list of the user's YouTube Music library that shows what it has read so far, and reads on: playlists, albums, artists, songs, podcasts. Also the last item of the menu that adds a track to a YouTube Music playlist."
   },
   "libraryMixes": "Mixes",
   "@libraryMixes": {
@@ -3454,6 +3474,37 @@
   "lyricsStyleSpotlightAbout": "Very big letters. Only the line sung is sharp: the others blur.",
   "lyricsSynced": "synced",
   "lyricsTimeVideosDescription": "When a music video's lyrics are its song's, MixMusic finds where the song starts in the video, comparing the audio of the two from YouTube on this computer, and moves the lines there. Off, they keep the song's times, and show without them when the video is longer or shorter than the song.",
+  "lyricsTimeVideosNoteTimed": "Timed to this video ({shift} s)",
+  "@lyricsTimeVideosNoteTimed": {
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsTimeVideosNoteTimedFaster": "Timed to this video ({shift} s, {percent}% faster)",
+  "@lyricsTimeVideosNoteTimedFaster": {
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsTimeVideosNoteTimedSlower": "Timed to this video ({shift} s, {percent}% slower)",
+  "@lyricsTimeVideosNoteTimedSlower": {
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsTimeVideosNoteTiming": "Timing these lyrics to the video…",
   "lyricsTimeVideosTitle": "Time lyrics to music videos",
   "lyricsTranslate": "translate",
   "lyricsTranslateLyrics": "Translate lyrics",
@@ -5451,6 +5502,142 @@
     }
   },
   "roomPageWaitingGuests": "The next track waits for your guests to have it ready.",
+  "roomProblemAway": "{name}'s room isn't on the network now.",
+  "@roomProblemAway": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemBlocked": "{name} blocked this computer.",
+  "@roomProblemBlocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemBlockedUnnamed": "This room blocked this computer.",
+  "roomProblemBusy": "{name}'s room checks other codes: try again in a moment.",
+  "@roomProblemBusy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemDeclined": "{name} didn't let you in.",
+  "@roomProblemDeclined": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemEnded": "The room ended.",
+  "roomProblemFar": "Couldn't reach {name} over the internet: their router may not forward the room's port, a firewall may turn MixMusic away, or the room ended. A VPN both of you run, such as Tailscale, reaches it where the router doesn't.",
+  "@roomProblemFar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemFarAddr": "The link names an address of this computer, or of no one: ask its host for the link again.",
+  "roomProblemFarUnnamed": "Couldn't reach the room's host over the internet: their router may not forward the room's port, a firewall may turn MixMusic away, or the room ended. A VPN both of you run, such as Tailscale, reaches it where the router doesn't.",
+  "roomProblemFull": "{name}'s room is full.",
+  "@roomProblemFull": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemLocked": "{name}'s room isn't taking codes for a minute: ask {name} for the invite link.",
+  "@roomProblemLocked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemManyAsk": "So many wait to join {name}'s room that it takes no more for now: try again later.",
+  "@roomProblemManyAsk": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemMoves": "{name}'s room is moving to another computer: try again in a moment.",
+  "@roomProblemMoves": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemNewCode": "{name}'s room has a new code: ask {name} for it, or for the new invite link.",
+  "@roomProblemNewCode": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemNotGuest": "{name}'s room no longer keeps your place: join again with its code.",
+  "@roomProblemNotGuest": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemNotLink": "That isn't a link to a room.",
+  "roomProblemNotSame": "Another computer answered in place of {name}: the link isn't of its room.",
+  "@roomProblemNotSame": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemPreviewEnded": "You waited long to join {name}'s room, or many others knocked at once: open its link, or type its code, again.",
+  "@roomProblemPreviewEnded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemRemoved": "{name} removed you from the room.",
+  "@roomProblemRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemTooLong": "Joining took too long: try again.",
+  "roomProblemUnreachable": "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away.",
+  "@roomProblemUnreachable": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomProblemVersion": "That computer's MixMusic is of another version: update both.",
+  "roomProblemWait": "Too many wrong codes from this computer: try again in a minute.",
+  "roomProblemWrongCode": "That isn't the code of {name}'s room.",
+  "@roomProblemWrongCode": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "roomReachAddressIntro": "Or join a room at an address, with its code: its host's address on a VPN you both run, or its router's, with the port.",
   "roomReachAddressLabel": "Room's address",
   "roomReachAsking": "Asking your router to forward the room's port…",
@@ -5463,6 +5650,10 @@
   "roomReachJoinButton": "join",
   "roomReachJoinMenu": "Join a room…",
   "roomReachMoved": "The room's internet address changed since you copied its link: friends outside need the new one.",
+  "roomReachSuggestAsk": "Turn on Ask me before someone joins, and whoever comes with the link or the code waits until you let them in.",
+  "roomReachSuggestAskLabel": "Turn on Ask me before someone joins",
+  "roomReachSuggestAskNo": "not now",
+  "roomReachSuggestAskYes": "turn it on",
   "roomReachTestNote": "MixMusic can't test the port from outside: ask a friend to open the link. A friend who can't connect is told the likely causes.",
   "roomReachTitle": "Let friends outside this network join",
   "roomRulesAccept": "accept",
@@ -5625,6 +5816,7 @@
   "roomSettingsStartRoom": "Start a room",
   "roomSettingsYourName": "Your name in rooms",
   "roomSettingsYourRoomOpen": "Your room is open",
+  "roomSomeone": "Someone",
   "searchAlbums": "Albums",
   "searchArtists": "Artists",
   "searchClear": "clear",
@@ -5643,7 +5835,7 @@
   "searchPivotVideos": "videos",
   "searchPlaylists": "Playlists",
   "searchRecent": "Recent",
-  "searchScopeBoth": "both",
+  "searchScopeAllMusic": "all music",
   "searchServices": "Services",
   "searchSignInSpotify": "Sign in to Spotify",
   "searchSongs": "Songs",
@@ -5994,6 +6186,8 @@
       }
     }
   },
+  "skipPartsExportsAbout": "Copies Export… writes leave out the parts skipped above. Copies in M4A keep them: MixMusic can't cut those yet.",
+  "skipPartsExportsTitle": "Leave marked parts out of exports",
   "skipPartsGroup": "Skip parts of videos",
   "skipPartsHighlightAbout": "Marks the moment SponsorBlock's community calls a video's best with a dot on the seek bar. Jump to the highlight, on the now playing page and in the command palette, plays from there.",
   "skipPartsHighlightMark": "Mark the highlight",

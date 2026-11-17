@@ -166,7 +166,7 @@ func (rs *Rooms) Requests() []RoomRequest {
 	}
 	var out []RoomRequest
 	for _, r := range h.server.Requests() {
-		out = append(out, RoomRequest{ID: r.ID, From: r.From.Name, Title: r.Track.Title, Artist: roomArtist(r.Track)})
+		out = append(out, RoomRequest{ID: r.ID, From: shownName(r.From.Name), Title: r.Track.Title, Artist: roomArtist(r.Track)})
 	}
 	return out
 }
@@ -214,7 +214,7 @@ func (rs *Rooms) Knocks() []RoomKnock {
 	}
 	var out []RoomKnock
 	for _, k := range h.server.Knocks() {
-		out = append(out, RoomKnock{ID: k.ID, Name: k.Name, Key: k.Key, Local: k.Local})
+		out = append(out, RoomKnock{ID: k.ID, Name: shownName(k.Name), Key: k.Key, Local: k.Local})
 	}
 	return out
 }

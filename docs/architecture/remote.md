@@ -120,7 +120,31 @@ refused. Go's TLS sends no early data (0-RTT), which could be repeated.
 
 The messages are JSON objects, each after its length in 4 bytes, of at
 most 1 MiB. The first is the connecting computer's `hello`, which asks to
-pair or to control.
+pair or to control. A message's bytes are kept as they come, in room
+that grows with them (`Frames`): a length alone, with nothing after it,
+holds no room for the message it tells.
+
+A computer that isn't paired may pair, or is refused; so it is held to
+little, however many connections it opens (#736):
+
+- **Its messages.** Its key is known once TLS ends. Until `Host.Allowed`
+  says it is paired, its messages are of 4 KiB at most, refused from
+  their length, which ends the connection (`Frames.Limit`): a hello, a
+  pairing's commit and open, and a confirm are a few hundred bytes. A
+  paired computer's are of 1 MiB at most, as a hand-over may be.
+- **Its connections** (`admit.go`). A connection holds one of 32 places
+  in the server, 4 of a source (an IPv4 address, or the /64 of an IPv6
+  one, a network's), from its accepting until its key is known as
+  paired, or it ends: TLS handshakes, and computers not paired, share
+  them. A new one takes the place of the oldest of its source, when the
+  source holds 4, and of the oldest of the source that holds the most,
+  when the server holds 32, as a room's unproven do
+  ([rooms.md](rooms.md)): a computer that floods the server ends its own
+  connections, not those of a paired computer on its way in. The one
+  pairing that runs gives its place back, so no flood ends it; the
+  others that ask to pair meanwhile are refused as busy. The rooms'
+  admission is copied, not shared: `internal/room` imports this package,
+  and its admission counts a room's codes and the internet's sources too.
 
 ## Pairing
 
@@ -194,6 +218,14 @@ anew, as a computer that started again listens at another port. The page
 moves the position on between two states as the track plays, and the
 session ends 30 s after the page closes.
 
+A state also tells the parts of the track that the player passes over, as
+SponsorBlock marks them, and its highlight (`parts`, #735), as the seek
+bars of that computer mark them: the page marks them on its seek bar
+with the same helper (`seekparts.go`), and its Jump to the highlight
+sends `seek` there, which every version takes. The computer that gets
+them cleans them as the rest of a state: the kinds this MixMusic knows,
+within the track, 64 at most, one highlight, with no length.
+
 ## What each version can do
 
 The version, 1, which `hello`, discovery's TXT record and TLS's ALPN tell,
@@ -209,7 +241,8 @@ and runs no command it doesn't know. So:
 - a newer computer that controls an older one shows what plays there and
   controls it as before; it sends neither the commands on the queue nor a
   hand-over, as the older one's `welcome` tells no features, and its page
-  says to update MixMusic there;
+  says to update MixMusic there; the older one's states tell no `parts`,
+  so the page's seek bar marks none;
 - a newer computer that pairs with an older one waits 30 s more for
   `paired`, which the older one sends once it kept the pairing, however
   long that took: the two disagree only past those 30 s, not past a
@@ -220,8 +253,9 @@ and runs no command it doesn't know. So:
   messages on the way, and drops it when slower, which the older one
   shows as "Couldn't reach …" or "… stopped answering";
 - an older computer that controls a newer one gets states whose tracks
-  name their entries (`entry`), a field it ignores, and the `features` of
-  `welcome`, which it ignores too.
+  name their entries (`entry`), and that tell the parts the player passes
+  over (`parts`), fields it ignores, and the `features` of `welcome`,
+  which it ignores too.
 
 ## The queue
 

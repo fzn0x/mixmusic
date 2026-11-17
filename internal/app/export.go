@@ -109,19 +109,22 @@ func dirExists(path string) bool {
 // Title", numbered when its name is taken. A download gets the title,
 // artists and album of its track, the cover the downloads keep, and, of
 // the page of its album, which o.Album gives, the year, the album's
-// artists and its number there, and its ISRC where its service gave one.
-// A song on this computer goes as it is, its best copy of a song with
-// copies. The tracks are exported in turn, until ctx ends.
+// artists and its number there, and its ISRC where its service gave one;
+// while the settings ask, a download of Opus leaves out the parts
+// SponsorBlock marks (exportparts.go). A song on this computer goes as it
+// is, its best copy of a song with copies. The tracks are exported in
+// turn, until ctx ends.
 func (d *Downloads) Export(ctx context.Context, tracks []media.Track, dir string, o ExportOptions) ExportResult {
 	a := d.a
 	var res ExportResult
 	albums := albumPages{get: o.Album}
+	var parts partLookups
 	for i, t := range tracks {
 		if ctx.Err() != nil {
 			res.Failed = append(res.Failed, ExportFailure{t, ctx.Err()})
 			continue
 		}
-		path, err := a.exportOne(ctx, t, dir, &albums)
+		path, err := a.exportOne(ctx, t, dir, &albums, &parts)
 		if err != nil {
 			res.Failed = append(res.Failed, ExportFailure{t, err})
 		} else {
@@ -135,7 +138,7 @@ func (d *Downloads) Export(ctx context.Context, tracks []media.Track, dir string
 }
 
 // exportOne writes the copy of t to dir.
-func (a *App) exportOne(ctx context.Context, t media.Track, dir string, albums *albumPages) (string, error) {
+func (a *App) exportOne(ctx context.Context, t media.Track, dir string, albums *albumPages, parts *partLookups) (string, error) {
 	path, own := a.exportFile(t)
 	if path == "" {
 		return "", errors.New("it isn't downloaded, nor on this computer")
@@ -152,6 +155,7 @@ func (a *App) exportOne(ctx context.Context, t media.Track, dir string, albums *
 			albums.fill(ctx, t, &tr.Tags)
 		}
 		tr.Tags.Cover = a.exportCover(t)
+		tr.Leave = a.exportLeave(ctx, t, parts)
 	}
 	return export.Write(dir, tr)
 }

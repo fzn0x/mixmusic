@@ -8314,6 +8314,34 @@ func (msgs Messages) HomeSearchMusic() string {
 	return Catalog.Format(msgs.locale, "homeSearchMusic", nil)
 }
 
+// HomeShelfRecent says "Recently played"
+// in the language the app shows.
+//
+// The title of Home's own shelf of the tracks played last.
+func HomeShelfRecent() string { return In(i18n.Locale()).HomeShelfRecent() }
+
+// HomeShelfRecent says "Recently played"
+// in the language of msgs.
+//
+// The title of Home's own shelf of the tracks played last.
+func (msgs Messages) HomeShelfRecent() string {
+	return Catalog.Format(msgs.locale, "homeShelfRecent", nil)
+}
+
+// HomeShelfYourMixes says "Your mixes"
+// in the language the app shows.
+//
+// The title of Home's own shelf of the mixes the user made in MixMusic.
+func HomeShelfYourMixes() string { return In(i18n.Locale()).HomeShelfYourMixes() }
+
+// HomeShelfYourMixes says "Your mixes"
+// in the language of msgs.
+//
+// The title of Home's own shelf of the mixes the user made in MixMusic.
+func (msgs Messages) HomeShelfYourMixes() string {
+	return Catalog.Format(msgs.locale, "homeShelfYourMixes", nil)
+}
+
 // HomeSpotifyEmpty says "Sign in to Spotify in Settings › Accounts to see your playlists and recent tracks here."
 // in the language the app shows.
 func HomeSpotifyEmpty() string { return In(i18n.Locale()).HomeSpotifyEmpty() }

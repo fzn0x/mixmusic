@@ -16,6 +16,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -128,8 +129,8 @@ func (c *Catalog) YouTubeHome(ctx context.Context) ([]media.Shelf, error) {
 }
 
 // LocalShelves returns the shelves of what the user played and made, as
-// the library has them now: the home page shows them first. Their keys
-// are "recent" and "mixes".
+// the library has them now, titled in the language the app shows: the
+// home page shows them first. Their keys are "recent" and "mixes".
 func (c *Catalog) LocalShelves() []media.Shelf {
 	var shelves []media.Shelf
 	if recent := c.a.library.RecentTracks(16); len(recent) > 0 {
@@ -137,14 +138,14 @@ func (c *Catalog) LocalShelves() []media.Shelf {
 		for i := range recent {
 			items[i] = media.Item{Kind: media.ItemTrack, Track: &recent[i]}
 		}
-		shelves = append(shelves, media.Shelf{Title: "Recently played", Source: media.SourceLocal, Items: items, Key: "recent"})
+		shelves = append(shelves, media.Shelf{Title: locales.HomeShelfRecent(), Source: media.SourceLocal, Items: items, Key: "recent"})
 	}
 	if playlists := c.a.library.Playlists(); len(playlists) > 0 {
 		items := make([]media.Item, len(playlists))
 		for i := range playlists {
 			items[i] = media.Item{Kind: media.ItemPlaylist, Playlist: &playlists[i]}
 		}
-		shelves = append(shelves, media.Shelf{Title: "Your mixes", Source: media.SourceLocal, Items: items, Key: "mixes"})
+		shelves = append(shelves, media.Shelf{Title: locales.HomeShelfYourMixes(), Source: media.SourceLocal, Items: items, Key: "mixes"})
 	}
 	return shelves
 }

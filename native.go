@@ -205,10 +205,12 @@ type shell struct {
 	// home is Home's own state, as the user arranges it (homeedit.go).
 	home homeArrange
 	// The pages' own state. local are the home page's own shelves, of the
-	// library at localVersion once localBuilt.
+	// library at localVersion, in the language localLocale, once
+	// localBuilt.
 	homeFilter   int
 	local        []media.Shelf
 	localVersion uint64
+	localLocale  string
 	localBuilt   bool
 	searchPivot  int
 	// shelfScroll is where the shelves scrolled, by page and shelf.

@@ -2379,6 +2379,14 @@
     }
   },
   "homeSearchMusic": "Search for music",
+  "homeShelfRecent": "Recently played",
+  "@homeShelfRecent": {
+    "description": "The title of Home's own shelf of the tracks played last."
+  },
+  "homeShelfYourMixes": "Your mixes",
+  "@homeShelfYourMixes": {
+    "description": "The title of Home's own shelf of the mixes the user made in MixMusic."
+  },
   "homeSpotifyEmpty": "Sign in to Spotify in Settings › Accounts to see your playlists and recent tracks here.",
   "homeStartCaption": "Search for something to play",
   "homeStartHere": "Start here",

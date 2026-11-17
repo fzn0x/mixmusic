@@ -133,15 +133,17 @@ func (s *shell) recapList(c *ui.Context, title string, rows []recapRow) {
 func recapFacts(r library.Recap) []string {
 	var out []string
 	if r.BusiestMonth > 0 {
-		out = append(out, locales.RecapBusiest(r.BusiestMonth.String(), r.BusiestMinutes))
+		month := time.Date(r.Year, r.BusiestMonth, 1, 12, 0, 0, 0, recapClock().Location())
+		out = append(out, locales.RecapBusiest(month, r.BusiestMinutes))
 	}
 	if r.First != nil {
 		out = append(out, locales.RecapBegan(quoted(r.First.Track.Title, names(r.First.Track.Artists)),
-			r.First.PlayedAt.In(recapClock().Location()).Format("2 January")))
+			r.First.PlayedAt.In(recapClock().Location())))
 	}
-	if r.Repeated != nil {
-		out = append(out, locales.RecapRepeated(quoted(r.Repeated.Track.Title, names(r.Repeated.Track.Artists)),
-			r.Repeated.Plays, recapDay(r.Repeated.Date)))
+	if rp := r.Repeated; rp != nil {
+		if day, err := time.ParseInLocation(time.DateOnly, rp.Date, recapClock().Location()); err == nil {
+			out = append(out, locales.RecapRepeated(quoted(rp.Track.Title, names(rp.Track.Artists)), rp.Plays, day))
+		}
 	}
 	if r.NewKnown {
 		out = append(out, locales.RecapFound(r.NewArtists))
@@ -155,15 +157,6 @@ func quoted(title, artist string) string {
 		return "\u201c" + title + "\u201d"
 	}
 	return locales.RecapSongBy(title, artist)
-}
-
-// recapDay writes a day of the recap as "5 March".
-func recapDay(date string) string {
-	t, err := time.Parse(time.DateOnly, date)
-	if err != nil {
-		return date
-	}
-	return t.Format("2 January")
 }
 
 // recapFileName is what the card of r in size is called at first: the
@@ -187,7 +180,7 @@ func recapCardOf(r library.Recap, colors sharecard.Colors) cardBuilder {
 			Size: size, Colors: colors,
 			Lines: []sharecard.Line{
 				{Text: locales.RecapCardHeading(r.Year), Size: 34, Weight: 600, Ink: colors.Accent},
-				{Text: thousands(r.Minutes), Size: 170, Weight: 700, Gap: 10},
+				{Text: numeral(r.Minutes), Size: 170, Weight: 700, Gap: 10},
 				{Text: locales.RecapCardMinutes(r.Plays), Size: 42, Weight: 400, Ink: colors.Muted, MaxLines: 2},
 			},
 			Foot: []sharecard.Line{{Text: "MixMusic", Size: 34, Weight: 600, Ink: colors.Accent}},

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"runtime"
@@ -10,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/egoist/mygo"
+	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
@@ -54,7 +54,9 @@ func shownZoom(chosen, room float64) float64 {
 }
 
 // percent writes a zoom as a percentage, rounded down, as "139%".
-func percent(z float64) string { return fmt.Sprintf("%d%%", int(math.Floor(z*100+1e-6))) }
+func percent(z float64) string {
+	return i18n.FormatNumber(i18n.Locale(), math.Floor(z*100+1e-6)/100, i18n.NumberOptions{Percent: true})
+}
 
 // applyZoom zooms the main window by the zoom chosen, as far as it has
 // room for, and shows the toast of a change. It runs first in the frame,

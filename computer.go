@@ -218,7 +218,7 @@ func (s *shell) computerSettings(c *ui.Context) {
 				default:
 					line := locales.ComputerSettingsTracks(f.Tracks)
 					if f.Skipped > 0 {
-						line = locales.ComputerSettingsTracksSkipped(f.Tracks, count(f.Skipped))
+						line = locales.ComputerSettingsTracksSkipped(f.Tracks, f.Skipped)
 					}
 					ui.Text(c, line)
 					if len(f.Unread) > 0 {

@@ -370,16 +370,16 @@ func (s *shell) episodeLine(t media.Track, show bool, now time.Time) string {
 
 // releasedLabel writes the day an episode came out, as Oct 26, with its
 // year when it isn't now's, or its month or year alone when that is all
-// its service tells.
+// its service tells, in the language's way.
 func releasedLabel(day string, now time.Time) string {
 	if t, err := time.Parse(time.DateOnly, day); err == nil {
 		if t.Year() == now.Year() {
-			return t.Format("Jan 2")
+			return dateIn(t, "MMMd")
 		}
-		return t.Format("Jan 2, 2006")
+		return dateIn(t, "yMMMd")
 	}
 	if t, err := time.Parse("2006-01", day); err == nil {
-		return t.Format("Jan 2006")
+		return dateIn(t, "yMMM")
 	}
 	return day
 }

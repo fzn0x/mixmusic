@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"math"
-	"strconv"
 	"time"
 
 	"github.com/egoist/mygo/ui"
@@ -46,9 +44,9 @@ func (s *shell) statsPage(c *ui.Context) {
 			return
 		}
 		hours := st.Minutes / 60
-		spent := locales.FormatMinutes(strconv.Itoa(st.Minutes))
+		spent := locales.FormatMinutes(st.Minutes)
 		if hours > 0 {
-			spent = locales.FormatHourMinutes(strconv.Itoa(hours), strconv.Itoa(st.Minutes%60))
+			spent = locales.FormatHourMinutes(hours, st.Minutes%60)
 		}
 		// One message, whose bold and coloured parts are its placeholders.
 		size := k.subtitleSize()
@@ -105,18 +103,19 @@ type dayTip struct {
 	focused, told bool
 }
 
-// dayLabel writes a date of the stats as "Tue 20 Oct".
+// dayLabel writes a date of the stats as "Tue, Oct 20", in the language's
+// way.
 func dayLabel(date string) string {
 	t, err := time.ParseInLocation(time.DateOnly, date, time.Local)
 	if err != nil {
 		return date
 	}
-	return locales.FormatWeekdayDayMonth(weekdayName(t), strconv.Itoa(t.Day()), monthName(t))
+	return locales.FormatWeekdayDayMonth(t)
 }
 
 // describeDay tells a day's minutes and plays.
 func describeDay(d library.DayPlays) string {
-	return locales.StatsDayTip(dayLabel(d.Date), strconv.Itoa(d.Minutes), d.Plays)
+	return locales.StatsDayTip(dayLabel(d.Date), d.Minutes, d.Plays)
 }
 
 // dayChart draws the minutes listened each day as columns in the accent. A
@@ -147,7 +146,7 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 	}
 	s.sectionTitle(c, locales.StatsDayByDay())
 	ui.Text(c, locales.StatsMinutesEachDay()).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 12)
-	ui.Text(c, locales.FormatMinutes(fmt.Sprintf("%.0f", top))).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
+	ui.Text(c, locales.FormatMinutes(int(math.Round(top)))).FontSize(k.captionSize()).TextColor(k.muted).FontFeatures("tnum")
 	plot := ui.Box(c).Height(160).FillWidth().Margin(4, 0, 0).BorderWidth(0, 0, 1, 0).BorderColor(k.border).
 		Label(locales.StatsMinutesLabel()).Description(locales.StatsArrowKeys()).Focusable().
 		Draw(func(p *ui.Painter, r ui.Rect) {
@@ -165,7 +164,7 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 					p.Fill(ui.Rect{X: r.X + float32(i)*w + max(1, w*0.15), Y: r.Y + r.H - h, W: max(1, w*0.7), H: h}, fill, 0)
 				}
 				if i == peak && d.Minutes > 0 {
-					p.Text(r.X+float32(i)*w, r.Y+r.H-h-16, locales.FormatMinutes(strconv.Itoa(d.Minutes)), k.captionSize(), k.text)
+					p.Text(r.X+float32(i)*w, r.Y+r.H-h-16, locales.FormatMinutes(d.Minutes), k.captionSize(), k.text)
 				}
 			}
 		})
@@ -243,7 +242,7 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 					if n <= 7 {
 						label = weekdayName(t)
 					} else {
-						label = locales.FormatDayMonth(strconv.Itoa(t.Day()), monthName(t))
+						label = locales.FormatDayMonth(t)
 					}
 				}
 			}
@@ -274,9 +273,9 @@ func (s *shell) dayChart(c *ui.Context, days []library.DayPlays) {
 				case 0:
 					ui.Text(c, dayLabel(d.Date)).SingleLine()
 				case 1:
-					ui.Text(c, fmt.Sprint(d.Minutes)).FontFeatures("tnum")
+					ui.Text(c, numeral(d.Minutes)).FontFeatures("tnum")
 				case 2:
-					ui.Text(c, fmt.Sprint(d.Plays)).FontFeatures("tnum")
+					ui.Text(c, numeral(d.Plays)).FontFeatures("tnum")
 				}
 			}).Height(row*float32(min(n, 10)+1)+1).MaxWidth(520).Margin(8, 0, 0)
 		}).Padding(t.Space(1), 0).PaddingStart(t.Space(5.5)).Gap(t.Space(2))
@@ -305,7 +304,7 @@ func (s *shell) venn(c *ui.Context, spotify, youtube int) {
 	most := float64(max(spotify, youtube, 1))
 	rs := float32(20 + 70*math.Sqrt(float64(spotify)/most))
 	ry := float32(20 + 70*math.Sqrt(float64(youtube)/most))
-	ui.Box(c).Size(300, 200).Label(locales.StatsVennLabel(strconv.Itoa(spotify), strconv.Itoa(youtube))).
+	ui.Box(c).Size(300, 200).Label(locales.StatsVennLabel(spotify, youtube)).
 		Draw(func(p *ui.Painter, r ui.Rect) {
 			cy := r.Y + 100
 			sx, yx := r.X+150-rs*0.55, r.X+150+ry*0.55
@@ -315,7 +314,7 @@ func (s *shell) venn(c *ui.Context, spotify, youtube int) {
 			p.StrokePath(&a, 2, k.spotify)
 			p.StrokePath(&b, 2, k.youtube)
 			label := func(x float32, n int) {
-				t := fmt.Sprint(n)
+				t := numeral(n)
 				w, h := p.MeasureText(0, ui.Span{Text: t, Size: k.subtitleSize(), Weight: 300})
 				p.Text(x-w/2, cy-h/2, t, k.subtitleSize(), k.text)
 			}
@@ -348,7 +347,7 @@ func (s *shell) artistCircles(c *ui.Context, artists []library.ArtistPlays) {
 				if r >= 30 {
 					ui.Text(c, a.Artist.Name).FontSize(k.captionSize()).TextColor(k.tileText).SingleLine().MaxWidth(2*r - 12)
 				}
-				ui.Text(c, fmt.Sprint(a.Plays)).FontSize(k.captionSize()).TextColor(k.tileText).FontFeatures("tnum")
+				ui.Text(c, numeral(a.Plays)).FontSize(k.captionSize()).TextColor(k.tileText).FontFeatures("tnum")
 			})
 		}
 	})

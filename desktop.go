@@ -221,7 +221,7 @@ func (s *shell) updateSettings(c *ui.Context) {
 		asks := newVersionDoes(u)
 		last := ""
 		if t, err := time.Parse(time.RFC3339, u.LastCheck); err == nil {
-			last = locales.UpdatesLastChecked(t.Local().Format("2 Jan 2006, 15:04"))
+			last = locales.UpdatesLastChecked(t.Local())
 		}
 		checks, downloads := u.AutomaticChecks, u.AutomaticChecks && u.AutomaticDownloads
 		set := func(checks, downloads bool) {
@@ -319,16 +319,14 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 	case r.err != nil:
 		s.row(c, locales.UpdatesCouldntLook(), r.err.Error(), again, words)
 	case rel.Newer:
-		var date string
-		if t, err := time.Parse(time.RFC3339, rel.Date); err == nil {
-			date = t.Local().Format("2 Jan 2006")
-		}
+		date, err := time.Parse(time.RFC3339, rel.Date)
+		dated := err == nil
 		var describe string
 		switch {
-		case date != "" && !u.Enabled:
-			describe = locales.UpdatesOutSinceHow(date, replacing(u.Kind, rel.File))
-		case date != "":
-			describe = locales.UpdatesOutSince(date)
+		case dated && !u.Enabled:
+			describe = locales.UpdatesOutSinceHow(date.Local(), replacing(u.Kind, rel.File))
+		case dated:
+			describe = locales.UpdatesOutSince(date.Local())
 		case !u.Enabled:
 			describe = replacing(u.Kind, rel.File)
 		}

@@ -314,7 +314,7 @@ func (s *shell) spotifyLibrary(c *ui.Context) {
 			tracks := s.spotifyLiked
 			s.trackList(c, "spotify-liked", tracks, trackListOptions{art: true, album: true, empty: locales.LibraryNoSpotifyLiked()})
 			if len(tracks) < first.value.Total {
-				label := locales.LibraryLoadMore(count(len(tracks)), count(first.value.Total))
+				label := locales.LibraryLoadMore(len(tracks), first.value.Total)
 				if s.button(c, "spotify-more", label, false).Disabled(s.loadingMore).Clicked() {
 					s.loadingMore = true
 					go func(at, offset int) {

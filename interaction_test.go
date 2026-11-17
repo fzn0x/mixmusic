@@ -1660,7 +1660,7 @@ func TestAboutRelease(t *testing.T) {
 	if u.Enabled {
 		act = "install 9.9.9"
 	}
-	for _, text := range []string{"MixMusic 9.9.9 is out", "Out since 12 Oct 2026.", "what's new", "check again", act, "contribute"} {
+	for _, text := range []string{"MixMusic 9.9.9 is out", "Out since Oct 12, 2026.", "what's new", "check again", act, "contribute"} {
 		if !tt.HasText(text) {
 			t.Errorf("About doesn't show %q: %q", text, tt.Texts())
 		}

@@ -154,38 +154,38 @@ func (s *shell) readLine(c *ui.Context, r *playlistRead, noun string) {
 		var text string
 		switch {
 		case r.waiting && count > n && r.then != nil:
-			text = locales.PlaylistReadWaitingOfThen(thousands(n), thousands(count), r.does)
+			text = locales.PlaylistReadWaitingOfThen(n, count, r.does)
 		case r.waiting && count > n:
-			text = locales.PlaylistReadWaitingOf(thousands(n), thousands(count))
+			text = locales.PlaylistReadWaitingOf(n, count)
 		case r.waiting && r.then != nil:
-			text = locales.PlaylistReadWaitingThen(thousands(n), r.does)
+			text = locales.PlaylistReadWaitingThen(n, r.does)
 		case r.waiting:
-			text = locales.PlaylistReadWaiting(thousands(n))
+			text = locales.PlaylistReadWaiting(n)
 		case count > n && r.then != nil:
-			text = locales.PlaylistReadLoadingOfThen(thousands(n), thousands(count), r.does)
+			text = locales.PlaylistReadLoadingOfThen(n, count, r.does)
 		case count > n:
-			text = locales.PlaylistReadLoadingOf(thousands(n), thousands(count))
+			text = locales.PlaylistReadLoadingOf(n, count)
 		case r.then != nil:
-			text = locales.PlaylistReadLoadingThen(thousands(n), r.does)
+			text = locales.PlaylistReadLoadingThen(n, r.does)
 		default:
-			text = locales.PlaylistReadLoading(thousands(n))
+			text = locales.PlaylistReadLoading(n)
 		}
 		ui.Row(c).Gap(8).Margin(0, 0, 16).Children(func() {
 			ui.Spinner(c).Size(16, 16).Label(locales.PlaylistReadLoadingLabel())
 			ui.Text(c, text).FontSize(k.smallSize()).TextColor(k.muted).FontFeatures("tnum")
 		})
 	case r.err != nil:
-		msg := locales.PlaylistReadPartialFirst(thousands(n), noun, r.err.Error())
+		msg := locales.PlaylistReadPartialFirst(n, noun, r.err.Error())
 		if count > n {
-			msg = locales.PlaylistReadPartialOf(thousands(n), noun, thousands(count), r.err.Error())
+			msg = locales.PlaylistReadPartialOf(n, noun, count, r.err.Error())
 		}
 		ui.Column(c).Margin(0, 0, 16).Children(func() {
 			s.problem(c, errors.New(msg), func() { s.readRest(r) })
 		})
 	case r.p.Cut:
-		text := locales.PlaylistReadCut(thousands(media.MaxTracks), noun)
+		text := locales.PlaylistReadCut(media.MaxTracks, noun)
 		if count > n {
-			text = locales.PlaylistReadCutOf(noun, thousands(count), thousands(n))
+			text = locales.PlaylistReadCutOf(noun, count, n)
 		}
 		ui.Text(c, text).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).MaxWidth(640)
 	case readShort(r.p):

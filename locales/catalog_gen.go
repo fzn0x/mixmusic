@@ -4281,13 +4281,13 @@ func (msgs Messages) ComputerSettingsTracks(count int) string {
 
 // ComputerSettingsTracksSkipped says "{count, plural, one {# track} other {# tracks}} · {skipped} skipped, of kinds MixMusic can't play or broken"
 // in the language the app shows.
-func ComputerSettingsTracksSkipped(count int, skipped string) string {
+func ComputerSettingsTracksSkipped(count int, skipped int) string {
 	return In(i18n.Locale()).ComputerSettingsTracksSkipped(count, skipped)
 }
 
 // ComputerSettingsTracksSkipped says "{count, plural, one {# track} other {# tracks}} · {skipped} skipped, of kinds MixMusic can't play or broken"
 // in the language of msgs.
-func (msgs Messages) ComputerSettingsTracksSkipped(count int, skipped string) string {
+func (msgs Messages) ComputerSettingsTracksSkipped(count int, skipped int) string {
 	return Catalog.Format(msgs.locale, "computerSettingsTracksSkipped", map[string]any{"count": count, "skipped": skipped})
 }
 
@@ -7617,37 +7617,41 @@ func (msgs Messages) FontNoticeWalnut() string {
 	return Catalog.Format(msgs.locale, "fontNoticeWalnut", nil)
 }
 
-// FormatDayMonth says "{day} {month}"
+// FormatDayMonth says "{date, date, ::MMMd}"
 // in the language the app shows.
-func FormatDayMonth(day string, month string) string {
-	return In(i18n.Locale()).FormatDayMonth(day, month)
-}
+//
+// A day of Stats' chart, under its column: its month and day, in the
+// language's order.
+func FormatDayMonth(date time.Time) string { return In(i18n.Locale()).FormatDayMonth(date) }
 
-// FormatDayMonth says "{day} {month}"
+// FormatDayMonth says "{date, date, ::MMMd}"
 // in the language of msgs.
-func (msgs Messages) FormatDayMonth(day string, month string) string {
-	return Catalog.Format(msgs.locale, "formatDayMonth", map[string]any{"day": day, "month": month})
+//
+// A day of Stats' chart, under its column: its month and day, in the
+// language's order.
+func (msgs Messages) FormatDayMonth(date time.Time) string {
+	return Catalog.Format(msgs.locale, "formatDayMonth", map[string]any{"date": date})
 }
 
 // FormatHourMinutes says "{hours} hr {minutes} min"
 // in the language the app shows.
-func FormatHourMinutes(hours string, minutes string) string {
+func FormatHourMinutes(hours int, minutes int) string {
 	return In(i18n.Locale()).FormatHourMinutes(hours, minutes)
 }
 
 // FormatHourMinutes says "{hours} hr {minutes} min"
 // in the language of msgs.
-func (msgs Messages) FormatHourMinutes(hours string, minutes string) string {
+func (msgs Messages) FormatHourMinutes(hours int, minutes int) string {
 	return Catalog.Format(msgs.locale, "formatHourMinutes", map[string]any{"hours": hours, "minutes": minutes})
 }
 
 // FormatMinutes says "{count} min"
 // in the language the app shows.
-func FormatMinutes(count string) string { return In(i18n.Locale()).FormatMinutes(count) }
+func FormatMinutes(count int) string { return In(i18n.Locale()).FormatMinutes(count) }
 
 // FormatMinutes says "{count} min"
 // in the language of msgs.
-func (msgs Messages) FormatMinutes(count string) string {
+func (msgs Messages) FormatMinutes(count int) string {
 	return Catalog.Format(msgs.locale, "formatMinutes", map[string]any{"count": count})
 }
 
@@ -7685,16 +7689,22 @@ func (msgs Messages) FormatViews(n int, count string) string {
 	return Catalog.Format(msgs.locale, "formatViews", map[string]any{"n": n, "count": count})
 }
 
-// FormatWeekdayDayMonth says "{weekday} {day} {month}"
+// FormatWeekdayDayMonth says "{date, date, ::MMMEd}"
 // in the language the app shows.
-func FormatWeekdayDayMonth(weekday string, day string, month string) string {
-	return In(i18n.Locale()).FormatWeekdayDayMonth(weekday, day, month)
+//
+// A day of Stats' table and of the chart's tip: its weekday, month and day,
+// in the language's order.
+func FormatWeekdayDayMonth(date time.Time) string {
+	return In(i18n.Locale()).FormatWeekdayDayMonth(date)
 }
 
-// FormatWeekdayDayMonth says "{weekday} {day} {month}"
+// FormatWeekdayDayMonth says "{date, date, ::MMMEd}"
 // in the language of msgs.
-func (msgs Messages) FormatWeekdayDayMonth(weekday string, day string, month string) string {
-	return Catalog.Format(msgs.locale, "formatWeekdayDayMonth", map[string]any{"weekday": weekday, "day": day, "month": month})
+//
+// A day of Stats' table and of the chart's tip: its weekday, month and day,
+// in the language's order.
+func (msgs Messages) FormatWeekdayDayMonth(date time.Time) string {
+	return Catalog.Format(msgs.locale, "formatWeekdayDayMonth", map[string]any{"date": date})
 }
 
 // GlobalKeysAnnounce says "Press the keys of the global shortcut of {title}. Escape cancels, Backspace removes it."
@@ -8713,7 +8723,7 @@ func (msgs Messages) LibraryLikedOnYouTube() string {
 // in the language the app shows.
 //
 // Button that loads more of the liked songs. Lowercase.
-func LibraryLoadMore(loaded string, total string) string {
+func LibraryLoadMore(loaded int, total int) string {
 	return In(i18n.Locale()).LibraryLoadMore(loaded, total)
 }
 
@@ -8721,7 +8731,7 @@ func LibraryLoadMore(loaded string, total string) string {
 // in the language of msgs.
 //
 // Button that loads more of the liked songs. Lowercase.
-func (msgs Messages) LibraryLoadMore(loaded string, total string) string {
+func (msgs Messages) LibraryLoadMore(loaded int, total int) string {
 	return Catalog.Format(msgs.locale, "libraryLoadMore", map[string]any{"loaded": loaded, "total": total})
 }
 
@@ -14297,15 +14307,15 @@ func (msgs Messages) PlayerWaiting(line string) string {
 	return Catalog.Format(msgs.locale, "playerWaiting", map[string]any{"line": line})
 }
 
-// PlaylistGapCantPlay says "{n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds}."
+// PlaylistGapCantPlay says "{n, plural, one {# of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds…"
 // in the language the app shows.
-func PlaylistGapCantPlay(n string, noun string, kinds string) string {
+func PlaylistGapCantPlay(n int, noun string, kinds string) string {
 	return In(i18n.Locale()).PlaylistGapCantPlay(n, noun, kinds)
 }
 
-// PlaylistGapCantPlay says "{n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds}."
+// PlaylistGapCantPlay says "{n, plural, one {# of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds…"
 // in the language of msgs.
-func (msgs Messages) PlaylistGapCantPlay(n string, noun string, kinds string) string {
+func (msgs Messages) PlaylistGapCantPlay(n int, noun string, kinds string) string {
 	return Catalog.Format(msgs.locale, "playlistGapCantPlay", map[string]any{"n": n, "noun": noun, "kinds": kinds})
 }
 
@@ -14349,49 +14359,49 @@ func (msgs Messages) PlaylistGapLocalFiles(count int) string {
 	return Catalog.Format(msgs.locale, "playlistGapLocalFiles", map[string]any{"count": count})
 }
 
-// PlaylistGapShort says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count} tracks came from YouTube Music."
+// PlaylistGapShort says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count, plural, one {# track} other {# …"
 // in the language the app shows.
-func PlaylistGapShort(n string, noun string, count string) string {
+func PlaylistGapShort(n int, noun string, count int) string {
 	return In(i18n.Locale()).PlaylistGapShort(n, noun, count)
 }
 
-// PlaylistGapShort says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count} tracks came from YouTube Music."
+// PlaylistGapShort says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count, plural, one {# track} other {# …"
 // in the language of msgs.
-func (msgs Messages) PlaylistGapShort(n string, noun string, count string) string {
+func (msgs Messages) PlaylistGapShort(n int, noun string, count int) string {
 	return Catalog.Format(msgs.locale, "playlistGapShort", map[string]any{"n": n, "noun": noun, "count": count})
 }
 
-// PlaylistReadCut says "MixMusic shows and plays the first {max} tracks of a {noun, select, mix {mix} playlist {playlist} other {list}}: this…"
+// PlaylistReadCut says "MixMusic shows and plays the first {max, plural, one {# track} other {# tracks}} of a {noun, select, mix {mix} playli…"
 // in the language the app shows.
-func PlaylistReadCut(max string, noun string) string {
+func PlaylistReadCut(max int, noun string) string {
 	return In(i18n.Locale()).PlaylistReadCut(max, noun)
 }
 
-// PlaylistReadCut says "MixMusic shows and plays the first {max} tracks of a {noun, select, mix {mix} playlist {playlist} other {list}}: this…"
+// PlaylistReadCut says "MixMusic shows and plays the first {max, plural, one {# track} other {# tracks}} of a {noun, select, mix {mix} playli…"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadCut(max string, noun string) string {
+func (msgs Messages) PlaylistReadCut(max int, noun string) string {
 	return Catalog.Format(msgs.locale, "playlistReadCut", map[string]any{"max": max, "noun": noun})
 }
 
-// PlaylistReadCutOf says "This {noun, select, mix {mix} playlist {playlist} other {list}} has {count} tracks: MixMusic shows and plays its firs…"
+// PlaylistReadCutOf says "This {noun, select, mix {mix} playlist {playlist} other {list}} has {count, plural, one {# track} other {# tracks}}: …"
 // in the language the app shows.
-func PlaylistReadCutOf(noun string, count string, n string) string {
+func PlaylistReadCutOf(noun string, count int, n int) string {
 	return In(i18n.Locale()).PlaylistReadCutOf(noun, count, n)
 }
 
-// PlaylistReadCutOf says "This {noun, select, mix {mix} playlist {playlist} other {list}} has {count} tracks: MixMusic shows and plays its firs…"
+// PlaylistReadCutOf says "This {noun, select, mix {mix} playlist {playlist} other {list}} has {count, plural, one {# track} other {# tracks}}: …"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadCutOf(noun string, count string, n string) string {
+func (msgs Messages) PlaylistReadCutOf(noun string, count int, n int) string {
 	return Catalog.Format(msgs.locale, "playlistReadCutOf", map[string]any{"noun": noun, "count": count, "n": n})
 }
 
 // PlaylistReadLoading says "Loading tracks · {n}"
 // in the language the app shows.
-func PlaylistReadLoading(n string) string { return In(i18n.Locale()).PlaylistReadLoading(n) }
+func PlaylistReadLoading(n int) string { return In(i18n.Locale()).PlaylistReadLoading(n) }
 
 // PlaylistReadLoading says "Loading tracks · {n}"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadLoading(n string) string {
+func (msgs Messages) PlaylistReadLoading(n int) string {
 	return Catalog.Format(msgs.locale, "playlistReadLoading", map[string]any{"n": n})
 }
 
@@ -14407,107 +14417,107 @@ func (msgs Messages) PlaylistReadLoadingLabel() string {
 
 // PlaylistReadLoadingOf says "Loading tracks · {n} of {count}"
 // in the language the app shows.
-func PlaylistReadLoadingOf(n string, count string) string {
+func PlaylistReadLoadingOf(n int, count int) string {
 	return In(i18n.Locale()).PlaylistReadLoadingOf(n, count)
 }
 
 // PlaylistReadLoadingOf says "Loading tracks · {n} of {count}"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadLoadingOf(n string, count string) string {
+func (msgs Messages) PlaylistReadLoadingOf(n int, count int) string {
 	return Catalog.Format(msgs.locale, "playlistReadLoadingOf", map[string]any{"n": n, "count": count})
 }
 
 // PlaylistReadLoadingOfThen says "Loading tracks · {n} of {count} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all…"
 // in the language the app shows.
-func PlaylistReadLoadingOfThen(n string, count string, does string) string {
+func PlaylistReadLoadingOfThen(n int, count int, does string) string {
 	return In(i18n.Locale()).PlaylistReadLoadingOfThen(n, count, does)
 }
 
 // PlaylistReadLoadingOfThen says "Loading tracks · {n} of {count} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all…"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadLoadingOfThen(n string, count string, does string) string {
+func (msgs Messages) PlaylistReadLoadingOfThen(n int, count int, does string) string {
 	return Catalog.Format(msgs.locale, "playlistReadLoadingOfThen", map[string]any{"n": n, "count": count, "does": does})
 }
 
 // PlaylistReadLoadingThen says "Loading tracks · {n} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all here"
 // in the language the app shows.
-func PlaylistReadLoadingThen(n string, does string) string {
+func PlaylistReadLoadingThen(n int, does string) string {
 	return In(i18n.Locale()).PlaylistReadLoadingThen(n, does)
 }
 
 // PlaylistReadLoadingThen says "Loading tracks · {n} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they're all here"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadLoadingThen(n string, does string) string {
+func (msgs Messages) PlaylistReadLoadingThen(n int, does string) string {
 	return Catalog.Format(msgs.locale, "playlistReadLoadingThen", map[string]any{"n": n, "does": does})
 }
 
-// PlaylistReadPartialFirst says "Only the first {n} tracks of this {noun, select, mix {mix} playlist {playlist} other {list}} could be loaded: {error}"
+// PlaylistReadPartialFirst says "Only the first {n, plural, one {# track} other {# tracks}} of this {noun, select, mix {mix} playlist {playlist} other…"
 // in the language the app shows.
-func PlaylistReadPartialFirst(n string, noun string, error string) string {
+func PlaylistReadPartialFirst(n int, noun string, error string) string {
 	return In(i18n.Locale()).PlaylistReadPartialFirst(n, noun, error)
 }
 
-// PlaylistReadPartialFirst says "Only the first {n} tracks of this {noun, select, mix {mix} playlist {playlist} other {list}} could be loaded: {error}"
+// PlaylistReadPartialFirst says "Only the first {n, plural, one {# track} other {# tracks}} of this {noun, select, mix {mix} playlist {playlist} other…"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadPartialFirst(n string, noun string, error string) string {
+func (msgs Messages) PlaylistReadPartialFirst(n int, noun string, error string) string {
 	return Catalog.Format(msgs.locale, "playlistReadPartialFirst", map[string]any{"n": n, "noun": noun, "error": error})
 }
 
-// PlaylistReadPartialOf says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count} tracks could be loaded: {error}"
+// PlaylistReadPartialOf says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count, plural, one {# track} other {# …"
 // in the language the app shows.
-func PlaylistReadPartialOf(n string, noun string, count string, error string) string {
+func PlaylistReadPartialOf(n int, noun string, count int, error string) string {
 	return In(i18n.Locale()).PlaylistReadPartialOf(n, noun, count, error)
 }
 
-// PlaylistReadPartialOf says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count} tracks could be loaded: {error}"
+// PlaylistReadPartialOf says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count, plural, one {# track} other {# …"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadPartialOf(n string, noun string, count string, error string) string {
+func (msgs Messages) PlaylistReadPartialOf(n int, noun string, count int, error string) string {
 	return Catalog.Format(msgs.locale, "playlistReadPartialOf", map[string]any{"n": n, "noun": noun, "count": count, "error": error})
 }
 
 // PlaylistReadWaiting says "Spotify asked MixMusic to wait · {n}"
 // in the language the app shows.
-func PlaylistReadWaiting(n string) string { return In(i18n.Locale()).PlaylistReadWaiting(n) }
+func PlaylistReadWaiting(n int) string { return In(i18n.Locale()).PlaylistReadWaiting(n) }
 
 // PlaylistReadWaiting says "Spotify asked MixMusic to wait · {n}"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadWaiting(n string) string {
+func (msgs Messages) PlaylistReadWaiting(n int) string {
 	return Catalog.Format(msgs.locale, "playlistReadWaiting", map[string]any{"n": n})
 }
 
 // PlaylistReadWaitingOf says "Spotify asked MixMusic to wait · {n} of {count}"
 // in the language the app shows.
-func PlaylistReadWaitingOf(n string, count string) string {
+func PlaylistReadWaitingOf(n int, count int) string {
 	return In(i18n.Locale()).PlaylistReadWaitingOf(n, count)
 }
 
 // PlaylistReadWaitingOf says "Spotify asked MixMusic to wait · {n} of {count}"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadWaitingOf(n string, count string) string {
+func (msgs Messages) PlaylistReadWaitingOf(n int, count int) string {
 	return Catalog.Format(msgs.locale, "playlistReadWaitingOf", map[string]any{"n": n, "count": count})
 }
 
 // PlaylistReadWaitingOfThen says "Spotify asked MixMusic to wait · {n} of {count} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} …"
 // in the language the app shows.
-func PlaylistReadWaitingOfThen(n string, count string, does string) string {
+func PlaylistReadWaitingOfThen(n int, count int, does string) string {
 	return In(i18n.Locale()).PlaylistReadWaitingOfThen(n, count, does)
 }
 
 // PlaylistReadWaitingOfThen says "Spotify asked MixMusic to wait · {n} of {count} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} …"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadWaitingOfThen(n string, count string, does string) string {
+func (msgs Messages) PlaylistReadWaitingOfThen(n int, count int, does string) string {
 	return Catalog.Format(msgs.locale, "playlistReadWaitingOfThen", map[string]any{"n": n, "count": count, "does": does})
 }
 
 // PlaylistReadWaitingThen says "Spotify asked MixMusic to wait · {n} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they'r…"
 // in the language the app shows.
-func PlaylistReadWaitingThen(n string, does string) string {
+func PlaylistReadWaitingThen(n int, does string) string {
 	return In(i18n.Locale()).PlaylistReadWaitingThen(n, does)
 }
 
 // PlaylistReadWaitingThen says "Spotify asked MixMusic to wait · {n} · {does, select, plays {plays} shuffles {shuffles} other {{does}}} once they'r…"
 // in the language of msgs.
-func (msgs Messages) PlaylistReadWaitingThen(n string, does string) string {
+func (msgs Messages) PlaylistReadWaitingThen(n int, does string) string {
 	return Catalog.Format(msgs.locale, "playlistReadWaitingThen", map[string]any{"n": n, "does": does})
 }
 
@@ -15221,25 +15231,37 @@ func (msgs Messages) RailYourMixes() string {
 	return Catalog.Format(msgs.locale, "railYourMixes", nil)
 }
 
-// RecapBegan says "The year began with {song}, on {day}."
+// RecapBegan says "The year began with {song}, on {day, date, ::MMMMd}."
 // in the language the app shows.
-func RecapBegan(song string, day string) string { return In(i18n.Locale()).RecapBegan(song, day) }
+//
+// A moment of Your year. {song} is recapSongBy, or the song's title in
+// quotes.
+func RecapBegan(song string, day time.Time) string { return In(i18n.Locale()).RecapBegan(song, day) }
 
-// RecapBegan says "The year began with {song}, on {day}."
+// RecapBegan says "The year began with {song}, on {day, date, ::MMMMd}."
 // in the language of msgs.
-func (msgs Messages) RecapBegan(song string, day string) string {
+//
+// A moment of Your year. {song} is recapSongBy, or the song's title in
+// quotes.
+func (msgs Messages) RecapBegan(song string, day time.Time) string {
 	return Catalog.Format(msgs.locale, "recapBegan", map[string]any{"song": song, "day": day})
 }
 
-// RecapBusiest says "You listened most in {month}: {minutes, plural, one {# minute} other {# minutes}}."
+// RecapBusiest says "You listened most in {month, date, ::MMMM}: {minutes, plural, one {# minute} other {# minutes}}."
 // in the language the app shows.
-func RecapBusiest(month string, minutes int) string {
+//
+// A moment of Your year. {month} is the month, as a date of its first day:
+// write the month's name in the form your sentence needs.
+func RecapBusiest(month time.Time, minutes int) string {
 	return In(i18n.Locale()).RecapBusiest(month, minutes)
 }
 
-// RecapBusiest says "You listened most in {month}: {minutes, plural, one {# minute} other {# minutes}}."
+// RecapBusiest says "You listened most in {month, date, ::MMMM}: {minutes, plural, one {# minute} other {# minutes}}."
 // in the language of msgs.
-func (msgs Messages) RecapBusiest(month string, minutes int) string {
+//
+// A moment of Your year. {month} is the month, as a date of its first day:
+// write the month's name in the form your sentence needs.
+func (msgs Messages) RecapBusiest(month time.Time, minutes int) string {
 	return Catalog.Format(msgs.locale, "recapBusiest", map[string]any{"month": month, "minutes": minutes})
 }
 
@@ -15373,15 +15395,21 @@ func (msgs Messages) RecapPlays(plays int) string {
 	return Catalog.Format(msgs.locale, "recapPlays", map[string]any{"plays": plays})
 }
 
-// RecapRepeated says "You played {song} {times, plural, one {# time} other {# times}} on {day}."
+// RecapRepeated says "You played {song} {times, plural, one {# time} other {# times}} on {day, date, ::MMMMd}."
 // in the language the app shows.
-func RecapRepeated(song string, times int, day string) string {
+//
+// A moment of Your year. {song} is recapSongBy, or the song's title in
+// quotes.
+func RecapRepeated(song string, times int, day time.Time) string {
 	return In(i18n.Locale()).RecapRepeated(song, times, day)
 }
 
-// RecapRepeated says "You played {song} {times, plural, one {# time} other {# times}} on {day}."
+// RecapRepeated says "You played {song} {times, plural, one {# time} other {# times}} on {day, date, ::MMMMd}."
 // in the language of msgs.
-func (msgs Messages) RecapRepeated(song string, times int, day string) string {
+//
+// A moment of Your year. {song} is recapSongBy, or the song's title in
+// quotes.
+func (msgs Messages) RecapRepeated(song string, times int, day time.Time) string {
 	return Catalog.Format(msgs.locale, "recapRepeated", map[string]any{"song": song, "times": times, "day": day})
 }
 
@@ -15739,15 +15767,21 @@ func (msgs Messages) RemotePageTypeCode(name string) string {
 	return Catalog.Format(msgs.locale, "remotePageTypeCode", map[string]any{"name": name})
 }
 
-// RemotePaired says "{about}. Paired {date}."
+// RemotePaired says "{about}. Paired {date, date, long}."
 // in the language the app shows.
-func RemotePaired(about string, date string) string {
+//
+// Under a computer of remote control. {about} is how the two control each
+// other, as remoteBothWays.
+func RemotePaired(about string, date time.Time) string {
 	return In(i18n.Locale()).RemotePaired(about, date)
 }
 
-// RemotePaired says "{about}. Paired {date}."
+// RemotePaired says "{about}. Paired {date, date, long}."
 // in the language of msgs.
-func (msgs Messages) RemotePaired(about string, date string) string {
+//
+// Under a computer of remote control. {about} is how the two control each
+// other, as remoteBothWays.
+func (msgs Messages) RemotePaired(about string, date time.Time) string {
 	return Catalog.Format(msgs.locale, "remotePaired", map[string]any{"about": about, "date": date})
 }
 
@@ -18827,13 +18861,17 @@ func (msgs Messages) StatsDayByDay() string {
 
 // StatsDayTip says "{day}: {minutes} min, {plays, plural, one {# play} other {# plays}}"
 // in the language the app shows.
-func StatsDayTip(day string, minutes string, plays int) string {
+//
+// The tip of a day of Stats' chart. {day} is formatWeekdayDayMonth.
+func StatsDayTip(day string, minutes int, plays int) string {
 	return In(i18n.Locale()).StatsDayTip(day, minutes, plays)
 }
 
 // StatsDayTip says "{day}: {minutes} min, {plays, plural, one {# play} other {# plays}}"
 // in the language of msgs.
-func (msgs Messages) StatsDayTip(day string, minutes string, plays int) string {
+//
+// The tip of a day of Stats' chart. {day} is formatWeekdayDayMonth.
+func (msgs Messages) StatsDayTip(day string, minutes int, plays int) string {
 	return Catalog.Format(msgs.locale, "statsDayTip", map[string]any{"day": day, "minutes": minutes, "plays": plays})
 }
 
@@ -19013,15 +19051,19 @@ func (msgs Messages) StatsTopTracks() string {
 	return Catalog.Format(msgs.locale, "statsTopTracks", nil)
 }
 
-// StatsVennLabel says "{spotify} plays from Spotify, {youtube} from YouTube Music"
+// StatsVennLabel says "{spotify, plural, one {# play} other {# plays}} from Spotify, {youtube} from YouTube Music"
 // in the language the app shows.
-func StatsVennLabel(spotify string, youtube string) string {
+//
+// What the two rings of The mix, on Stats, tell a screen reader.
+func StatsVennLabel(spotify int, youtube int) string {
 	return In(i18n.Locale()).StatsVennLabel(spotify, youtube)
 }
 
-// StatsVennLabel says "{spotify} plays from Spotify, {youtube} from YouTube Music"
+// StatsVennLabel says "{spotify, plural, one {# play} other {# plays}} from Spotify, {youtube} from YouTube Music"
 // in the language of msgs.
-func (msgs Messages) StatsVennLabel(spotify string, youtube string) string {
+//
+// What the two rings of The mix, on Stats, tell a screen reader.
+func (msgs Messages) StatsVennLabel(spotify int, youtube int) string {
 	return Catalog.Format(msgs.locale, "statsVennLabel", map[string]any{"spotify": spotify, "youtube": youtube})
 }
 
@@ -21331,13 +21373,19 @@ func (msgs Messages) UpdatesInstalledTitle(version string) string {
 	return Catalog.Format(msgs.locale, "updatesInstalledTitle", map[string]any{"version": version})
 }
 
-// UpdatesLastChecked says " Last checked {time}."
+// UpdatesLastChecked says " Last checked {time, date, ::yMMMdjm}."
 // in the language the app shows.
-func UpdatesLastChecked(time_ string) string { return In(i18n.Locale()).UpdatesLastChecked(time_) }
+//
+// Ends updatesCheckAbout, with the space before it: when MixMusic last
+// looked for a newer version.
+func UpdatesLastChecked(time_ time.Time) string { return In(i18n.Locale()).UpdatesLastChecked(time_) }
 
-// UpdatesLastChecked says " Last checked {time}."
+// UpdatesLastChecked says " Last checked {time, date, ::yMMMdjm}."
 // in the language of msgs.
-func (msgs Messages) UpdatesLastChecked(time_ string) string {
+//
+// Ends updatesCheckAbout, with the space before it: when MixMusic last
+// looked for a newer version.
+func (msgs Messages) UpdatesLastChecked(time_ time.Time) string {
 	return Catalog.Format(msgs.locale, "updatesLastChecked", map[string]any{"time": time_})
 }
 
@@ -21381,25 +21429,35 @@ func (msgs Messages) UpdatesOut(version string) string {
 	return Catalog.Format(msgs.locale, "updatesOut", map[string]any{"version": version})
 }
 
-// UpdatesOutSince says "Out since {date}."
+// UpdatesOutSince says "Out since {date, date, medium}."
 // in the language the app shows.
-func UpdatesOutSince(date string) string { return In(i18n.Locale()).UpdatesOutSince(date) }
+//
+// Under a newer version: the day it was released.
+func UpdatesOutSince(date time.Time) string { return In(i18n.Locale()).UpdatesOutSince(date) }
 
-// UpdatesOutSince says "Out since {date}."
+// UpdatesOutSince says "Out since {date, date, medium}."
 // in the language of msgs.
-func (msgs Messages) UpdatesOutSince(date string) string {
+//
+// Under a newer version: the day it was released.
+func (msgs Messages) UpdatesOutSince(date time.Time) string {
 	return Catalog.Format(msgs.locale, "updatesOutSince", map[string]any{"date": date})
 }
 
-// UpdatesOutSinceHow says "Out since {date}. {how}"
+// UpdatesOutSinceHow says "Out since {date, date, medium}. {how}"
 // in the language the app shows.
-func UpdatesOutSinceHow(date string, how string) string {
+//
+// Under a newer version: the day it was released, and how to install it, as
+// updatesReplaceDeb.
+func UpdatesOutSinceHow(date time.Time, how string) string {
 	return In(i18n.Locale()).UpdatesOutSinceHow(date, how)
 }
 
-// UpdatesOutSinceHow says "Out since {date}. {how}"
+// UpdatesOutSinceHow says "Out since {date, date, medium}. {how}"
 // in the language of msgs.
-func (msgs Messages) UpdatesOutSinceHow(date string, how string) string {
+//
+// Under a newer version: the day it was released, and how to install it, as
+// updatesReplaceDeb.
+func (msgs Messages) UpdatesOutSinceHow(date time.Time, how string) string {
 	return Catalog.Format(msgs.locale, "updatesOutSinceHow", map[string]any{"date": date, "how": how})
 }
 

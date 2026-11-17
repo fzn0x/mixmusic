@@ -429,7 +429,8 @@ people who speak them.
 - **MyGo's words.** The words of the controls and menus, as Copy, Undo and
   Next month, are MyGo's: a language gives them as `mygo.<key>` messages,
   with the keys of MyGo's catalog, `internal/l10n/en.json` in the MyGo
-  module that go.mod names. Japanese and Chinese have MyGo's own already.
+  module that go.mod names. Japanese and Chinese take MyGo's own
+  translations, `locales/<tag>/<tag>.json` in that module.
 - **Translated by a machine.** A machine's translation says
   `"@@x-machine-translated": true` after `@@locale`, and Settings › About
   then says, in the language, that a machine translated it, with a link

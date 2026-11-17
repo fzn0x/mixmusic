@@ -50,8 +50,11 @@ en.json's layout:
   exact ones (`=0`). A message the file lacks shows in English.
 - `mygo.<key>` messages say MyGo's own words, those of its controls and
   menus, with the keys of MyGo's catalog (`internal/l10n/en.json` in the
-  MyGo module of go.mod). MyGo has them in Japanese and Chinese already, so
-  `ja`, `zh-Hans` and `zh-Hant` need none.
+  MyGo module of go.mod). For `ja`, `zh-Hans` and `zh-Hant`, take MyGo's
+  own translations (`locales/<tag>/<tag>.json` in that module) rather than
+  a machine's. The app links MyGo's packages of those only for the
+  languages at the root of `locales/`, so here, MyGo's words a catalog
+  lacks show in English.
 
 `bash .github/scripts/catalogs.sh` runs MyGo's checks of each file beside
 en.json, and `go test ./locales` MixMusic's.
@@ -68,7 +71,9 @@ MixMusic in them:
    `resources/darwin/<tag>.lproj/InfoPlist.strings` with the reasons of
    `mygo.config.ts`'s `infoPlist`: `go test ./locales` asks for both.
 3. Generate `locales/catalog_gen.go` again, as `.github/scripts/catalogs.sh`
-   runs MyGo, or with `bunx mygo generate`.
+   runs MyGo, or with `bunx mygo generate`. For `ja`, `zh-Hans` or
+   `zh-Hant`, it imports MyGo's own translation, which changes
+   `vendorHash` in `nix/package.nix`: `nix build` tells the new one.
 4. Run `bash .github/scripts/catalogs.sh` and `go test ./locales`.
 
 Nothing else changes: the app reads both, and `@@x-machine-translated`

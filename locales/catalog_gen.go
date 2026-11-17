@@ -2025,6 +2025,56 @@ func (msgs Messages) AssistantsHowTo() string {
 	return Catalog.Format(msgs.locale, "assistantsHowTo", nil)
 }
 
+// AssistantsNameAlbum says "the album “{title}”"
+// in the language the app shows.
+//
+// An album as the toasts of an AI assistant name it: it goes in the {what}
+// of the assistantsToast messages.
+func AssistantsNameAlbum(title string) string { return In(i18n.Locale()).AssistantsNameAlbum(title) }
+
+// AssistantsNameAlbum says "the album “{title}”"
+// in the language of msgs.
+//
+// An album as the toasts of an AI assistant name it: it goes in the {what}
+// of the assistantsToast messages.
+func (msgs Messages) AssistantsNameAlbum(title string) string {
+	return Catalog.Format(msgs.locale, "assistantsNameAlbum", map[string]any{"title": title})
+}
+
+// AssistantsNameArtistSongs says "all the songs of {name}"
+// in the language the app shows.
+//
+// All of an artist's songs, as the toasts of an AI assistant name them: it
+// goes in the {what} of the assistantsToast messages. {name} is the artist.
+func AssistantsNameArtistSongs(name string) string {
+	return In(i18n.Locale()).AssistantsNameArtistSongs(name)
+}
+
+// AssistantsNameArtistSongs says "all the songs of {name}"
+// in the language of msgs.
+//
+// All of an artist's songs, as the toasts of an AI assistant name them: it
+// goes in the {what} of the assistantsToast messages. {name} is the artist.
+func (msgs Messages) AssistantsNameArtistSongs(name string) string {
+	return Catalog.Format(msgs.locale, "assistantsNameArtistSongs", map[string]any{"name": name})
+}
+
+// AssistantsNameLiked says "your liked songs"
+// in the language the app shows.
+//
+// The liked songs, as the toasts of an AI assistant name them: it goes in
+// the {what} of the assistantsToast messages.
+func AssistantsNameLiked() string { return In(i18n.Locale()).AssistantsNameLiked() }
+
+// AssistantsNameLiked says "your liked songs"
+// in the language of msgs.
+//
+// The liked songs, as the toasts of an AI assistant name them: it goes in
+// the {what} of the assistantsToast messages.
+func (msgs Messages) AssistantsNameLiked() string {
+	return Catalog.Format(msgs.locale, "assistantsNameLiked", nil)
+}
+
 // AssistantsNameSeparator says ", "
 // in the language the app shows.
 func AssistantsNameSeparator() string { return In(i18n.Locale()).AssistantsNameSeparator() }
@@ -2033,6 +2083,40 @@ func AssistantsNameSeparator() string { return In(i18n.Locale()).AssistantsNameS
 // in the language of msgs.
 func (msgs Messages) AssistantsNameSeparator() string {
 	return Catalog.Format(msgs.locale, "assistantsNameSeparator", nil)
+}
+
+// AssistantsNameTitle says "“{title}”"
+// in the language the app shows.
+//
+// A track of no artists known, or a playlist, as the toasts of an AI
+// assistant name it: it goes in the {what} of the assistantsToast messages.
+func AssistantsNameTitle(title string) string { return In(i18n.Locale()).AssistantsNameTitle(title) }
+
+// AssistantsNameTitle says "“{title}”"
+// in the language of msgs.
+//
+// A track of no artists known, or a playlist, as the toasts of an AI
+// assistant name it: it goes in the {what} of the assistantsToast messages.
+func (msgs Messages) AssistantsNameTitle(title string) string {
+	return Catalog.Format(msgs.locale, "assistantsNameTitle", map[string]any{"title": title})
+}
+
+// AssistantsNameTrackBy says "“{title}” by {artists}"
+// in the language the app shows.
+//
+// A track as the toasts of an AI assistant name it: it goes in the {what}
+// of the assistantsToast messages.
+func AssistantsNameTrackBy(title string, artists string) string {
+	return In(i18n.Locale()).AssistantsNameTrackBy(title, artists)
+}
+
+// AssistantsNameTrackBy says "“{title}” by {artists}"
+// in the language of msgs.
+//
+// A track as the toasts of an AI assistant name it: it goes in the {what}
+// of the assistantsToast messages.
+func (msgs Messages) AssistantsNameTrackBy(title string, artists string) string {
+	return Catalog.Format(msgs.locale, "assistantsNameTrackBy", map[string]any{"title": title, "artists": artists})
 }
 
 // AssistantsNone says "None now. Turning this off ends every session at once."
@@ -2083,6 +2167,172 @@ func AssistantsTitle() string { return In(i18n.Locale()).AssistantsTitle() }
 // in the language of msgs.
 func (msgs Messages) AssistantsTitle() string {
 	return Catalog.Format(msgs.locale, "assistantsTitle", nil)
+}
+
+// AssistantsToastAdded says "An AI assistant added {what} to the queue"
+// in the language the app shows.
+//
+// Toast when an AI assistant added something to the end of the queue.
+// {what} is one of the assistantsName messages.
+func AssistantsToastAdded(what string) string { return In(i18n.Locale()).AssistantsToastAdded(what) }
+
+// AssistantsToastAdded says "An AI assistant added {what} to the queue"
+// in the language of msgs.
+//
+// Toast when an AI assistant added something to the end of the queue.
+// {what} is one of the assistantsName messages.
+func (msgs Messages) AssistantsToastAdded(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastAdded", map[string]any{"what": what})
+}
+
+// AssistantsToastMoved says "An AI assistant moved {what} to {time}"
+// in the language the app shows.
+//
+// Toast when an AI assistant moved the track to a place in it. {what} is
+// one of the assistantsName messages; {time} is a place in the track, as
+// 2:05.
+func AssistantsToastMoved(what string, time_ string) string {
+	return In(i18n.Locale()).AssistantsToastMoved(what, time_)
+}
+
+// AssistantsToastMoved says "An AI assistant moved {what} to {time}"
+// in the language of msgs.
+//
+// Toast when an AI assistant moved the track to a place in it. {what} is
+// one of the assistantsName messages; {time} is a place in the track, as
+// 2:05.
+func (msgs Messages) AssistantsToastMoved(what string, time_ string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastMoved", map[string]any{"what": what, "time": time_})
+}
+
+// AssistantsToastPaused says "An AI assistant paused {what}"
+// in the language the app shows.
+//
+// Toast when an AI assistant paused the track. {what} is one of the
+// assistantsName messages.
+func AssistantsToastPaused(what string) string { return In(i18n.Locale()).AssistantsToastPaused(what) }
+
+// AssistantsToastPaused says "An AI assistant paused {what}"
+// in the language of msgs.
+//
+// Toast when an AI assistant paused the track. {what} is one of the
+// assistantsName messages.
+func (msgs Messages) AssistantsToastPaused(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastPaused", map[string]any{"what": what})
+}
+
+// AssistantsToastPlayed says "An AI assistant played {what}"
+// in the language the app shows.
+//
+// Toast when an AI assistant, as one that speaks MCP, played something.
+// {what} is one of the assistantsName messages.
+func AssistantsToastPlayed(what string) string { return In(i18n.Locale()).AssistantsToastPlayed(what) }
+
+// AssistantsToastPlayed says "An AI assistant played {what}"
+// in the language of msgs.
+//
+// Toast when an AI assistant, as one that speaks MCP, played something.
+// {what} is one of the assistantsName messages.
+func (msgs Messages) AssistantsToastPlayed(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastPlayed", map[string]any{"what": what})
+}
+
+// AssistantsToastPutNext says "An AI assistant put {what} next"
+// in the language the app shows.
+//
+// Toast when an AI assistant put something to play next. {what} is one of
+// the assistantsName messages.
+func AssistantsToastPutNext(what string) string {
+	return In(i18n.Locale()).AssistantsToastPutNext(what)
+}
+
+// AssistantsToastPutNext says "An AI assistant put {what} next"
+// in the language of msgs.
+//
+// Toast when an AI assistant put something to play next. {what} is one of
+// the assistantsName messages.
+func (msgs Messages) AssistantsToastPutNext(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastPutNext", map[string]any{"what": what})
+}
+
+// AssistantsToastShuffled says "An AI assistant shuffled {what}"
+// in the language the app shows.
+//
+// Toast when an AI assistant played something shuffled. {what} is one of
+// the assistantsName messages.
+func AssistantsToastShuffled(what string) string {
+	return In(i18n.Locale()).AssistantsToastShuffled(what)
+}
+
+// AssistantsToastShuffled says "An AI assistant shuffled {what}"
+// in the language of msgs.
+//
+// Toast when an AI assistant played something shuffled. {what} is one of
+// the assistantsName messages.
+func (msgs Messages) AssistantsToastShuffled(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastShuffled", map[string]any{"what": what})
+}
+
+// AssistantsToastSkipped says "An AI assistant skipped to the next track"
+// in the language the app shows.
+//
+// Toast when an AI assistant skipped to the next track.
+func AssistantsToastSkipped() string { return In(i18n.Locale()).AssistantsToastSkipped() }
+
+// AssistantsToastSkipped says "An AI assistant skipped to the next track"
+// in the language of msgs.
+//
+// Toast when an AI assistant skipped to the next track.
+func (msgs Messages) AssistantsToastSkipped() string {
+	return Catalog.Format(msgs.locale, "assistantsToastSkipped", nil)
+}
+
+// AssistantsToastSkippedTo says "An AI assistant skipped ahead to {what}"
+// in the language the app shows.
+//
+// Toast when an AI assistant skipped past several tracks. {what} is one of
+// the assistantsName messages.
+func AssistantsToastSkippedTo(what string) string {
+	return In(i18n.Locale()).AssistantsToastSkippedTo(what)
+}
+
+// AssistantsToastSkippedTo says "An AI assistant skipped ahead to {what}"
+// in the language of msgs.
+//
+// Toast when an AI assistant skipped past several tracks. {what} is one of
+// the assistantsName messages.
+func (msgs Messages) AssistantsToastSkippedTo(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastSkippedTo", map[string]any{"what": what})
+}
+
+// AssistantsToastVolume says "An AI assistant set the volume to {percent}%"
+// in the language the app shows.
+//
+// Toast when an AI assistant set the volume, from 0 to 100.
+func AssistantsToastVolume(percent int) string {
+	return In(i18n.Locale()).AssistantsToastVolume(percent)
+}
+
+// AssistantsToastVolume says "An AI assistant set the volume to {percent}%"
+// in the language of msgs.
+//
+// Toast when an AI assistant set the volume, from 0 to 100.
+func (msgs Messages) AssistantsToastVolume(percent int) string {
+	return Catalog.Format(msgs.locale, "assistantsToastVolume", map[string]any{"percent": percent})
+}
+
+// AssistantsToastWentBack says "An AI assistant went back"
+// in the language the app shows.
+//
+// Toast when an AI assistant went back, as the previous button does.
+func AssistantsToastWentBack() string { return In(i18n.Locale()).AssistantsToastWentBack() }
+
+// AssistantsToastWentBack says "An AI assistant went back"
+// in the language of msgs.
+//
+// Toast when an AI assistant went back, as the previous button does.
+func (msgs Messages) AssistantsToastWentBack() string {
+	return Catalog.Format(msgs.locale, "assistantsToastWentBack", nil)
 }
 
 // AudioAccount2Change says "You can change this in Settings › Playback › Sound."

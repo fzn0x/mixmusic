@@ -403,7 +403,50 @@
   "assistantsCopyCommand": "Copy the command",
   "assistantsCopyConfig": "Copy the configuration",
   "assistantsHowTo": "How to add MixMusic to an assistant",
+  "assistantsNameAlbum": "the album “{title}”",
+  "@assistantsNameAlbum": {
+    "description": "An album as the toasts of an AI assistant name it: it goes in the {what} of the assistantsToast messages.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsNameArtistSongs": "all the songs of {name}",
+  "@assistantsNameArtistSongs": {
+    "description": "All of an artist's songs, as the toasts of an AI assistant name them: it goes in the {what} of the assistantsToast messages. {name} is the artist.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsNameLiked": "your liked songs",
+  "@assistantsNameLiked": {
+    "description": "The liked songs, as the toasts of an AI assistant name them: it goes in the {what} of the assistantsToast messages."
+  },
   "assistantsNameSeparator": ", ",
+  "assistantsNameTitle": "“{title}”",
+  "@assistantsNameTitle": {
+    "description": "A track of no artists known, or a playlist, as the toasts of an AI assistant name it: it goes in the {what} of the assistantsToast messages.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsNameTrackBy": "“{title}” by {artists}",
+  "@assistantsNameTrackBy": {
+    "description": "A track as the toasts of an AI assistant name it: it goes in the {what} of the assistantsToast messages.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
   "assistantsNone": "None now. Turning this off ends every session at once.",
   "assistantsProblem": "{problem}.",
   "@assistantsProblem": {
@@ -416,6 +459,89 @@
   "assistantsProblemTitle": "AI assistants can't connect",
   "assistantsSwitch": "Let AI assistants control MixMusic",
   "assistantsTitle": "AI assistants",
+  "assistantsToastAdded": "An AI assistant added {what} to the queue",
+  "@assistantsToastAdded": {
+    "description": "Toast when an AI assistant added something to the end of the queue. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastMoved": "An AI assistant moved {what} to {time}",
+  "@assistantsToastMoved": {
+    "description": "Toast when an AI assistant moved the track to a place in it. {what} is one of the assistantsName messages; {time} is a place in the track, as 2:05.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastPaused": "An AI assistant paused {what}",
+  "@assistantsToastPaused": {
+    "description": "Toast when an AI assistant paused the track. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastPlayed": "An AI assistant played {what}",
+  "@assistantsToastPlayed": {
+    "description": "Toast when an AI assistant, as one that speaks MCP, played something. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastPutNext": "An AI assistant put {what} next",
+  "@assistantsToastPutNext": {
+    "description": "Toast when an AI assistant put something to play next. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastShuffled": "An AI assistant shuffled {what}",
+  "@assistantsToastShuffled": {
+    "description": "Toast when an AI assistant played something shuffled. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastSkipped": "An AI assistant skipped to the next track",
+  "@assistantsToastSkipped": {
+    "description": "Toast when an AI assistant skipped to the next track."
+  },
+  "assistantsToastSkippedTo": "An AI assistant skipped ahead to {what}",
+  "@assistantsToastSkippedTo": {
+    "description": "Toast when an AI assistant skipped past several tracks. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastVolume": "An AI assistant set the volume to {percent}%",
+  "@assistantsToastVolume": {
+    "description": "Toast when an AI assistant set the volume, from 0 to 100.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "assistantsToastWentBack": "An AI assistant went back",
+  "@assistantsToastWentBack": {
+    "description": "Toast when an AI assistant went back, as the previous button does."
+  },
   "audioAccount2Change": "You can change this in Settings › Playback › Sound.",
   "audioAccount2NotNow": "not now",
   "audioAccount2Offer": "Your YouTube Music account has Premium, whose audio has a higher bitrate. MixMusic can ask for each track's audio as your account to play it. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",

@@ -234,16 +234,33 @@ func (s *shell) zoomRow(c *ui.Context) {
 // and Force Reload, which do nothing in a window of native interface and
 // took ⌘R from Repeat and ⇧⌘R from Refresh this page. The items have no
 // keys of their own, so that the keys reach the window, where the user
-// may change them, as elsewhere: but Zoom In's ⌘+ (zoomInKey).
+// may change them, as elsewhere: but Zoom In's ⌘+ (zoomInKey). The menus
+// are made again in the new language as the Language setting, or the
+// computer's, changes (#775).
 func (s *shell) useMenuBar() {
 	if runtime.GOOS != "darwin" {
 		return
 	}
+	s.setMenuBar()
+	s.stop = append(s.stop, mygo.App.OnLocaleChanged(func(string) { s.update(s.setMenuBar) }))
+}
+
+// setMenuBar gives macOS's menu bar menuBar, in the app's language.
+func (s *shell) setMenuBar() {
+	mygo.App.SetMenu(mygo.NewMenu(s.menuBar()))
+	// The new Zoom In takes its key again.
+	s.zoomInAccelerator = ""
+	s.zoomInKey()
+}
+
+// menuBar is the items of macOS's menu bar, as useMenuBar says, labelled in
+// the app's language.
+func (s *shell) menuBar() []*mygo.MenuItem {
 	run := func(fn func()) func(*mygo.MenuItem, *mygo.Window) {
 		return func(*mygo.MenuItem, *mygo.Window) { s.update(fn) }
 	}
 	s.zoomIn = &mygo.MenuItem{Label: locales.MenuZoomIn(), Click: run(func() { s.zoomBy(1) })}
-	mygo.App.SetMenu(mygo.NewMenu([]*mygo.MenuItem{
+	return []*mygo.MenuItem{
 		{Role: mygo.RoleAppMenu},
 		{Role: mygo.RoleFileMenu},
 		{Role: mygo.RoleEditMenu},
@@ -258,8 +275,7 @@ func (s *shell) useMenuBar() {
 			{Role: mygo.RoleToggleFullScreen},
 		}},
 		s.windowMenu(),
-	}))
-	s.zoomInKey()
+	}
 }
 
 // plusKeys tells whether Zoom in has the keys of +, Mod+Shift+= (alsoKeys):

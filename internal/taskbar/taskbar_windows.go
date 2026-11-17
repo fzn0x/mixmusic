@@ -251,11 +251,12 @@ func barProc(hwnd, msg, wp, lp uintptr) uintptr {
 	return r
 }
 
-// show has the window's thread show st.
-func (b *bar) show(st state) {
+// update has the window's thread show what change makes of the state.
+func (b *bar) update(change func(st *state)) {
 	b.mu.Lock()
-	changed := b.want != st
-	b.want = st
+	was := b.want
+	change(&b.want)
+	changed := b.want != was
 	b.mu.Unlock()
 	if changed {
 		syscall.SyscallN(procPostMessageW.Addr(), b.hwnd, uintptr(msgShow()), 0, 0)
@@ -293,14 +294,14 @@ func (b *bar) buttons(st state) [len(ids)]thumbButton {
 	if !st.track {
 		flags = thbfDisabled
 	}
-	toggle, tip := b.icons[iconPlay], "Play"
+	toggle, toggleTip := b.icons[iconPlay], tip(st.tips.Play, "Play")
 	if st.playing {
-		toggle, tip = b.icons[iconPause], "Pause"
+		toggle, toggleTip = b.icons[iconPause], tip(st.tips.Pause, "Pause")
 	}
 	return [len(ids)]thumbButton{
-		Previous:  newButton(ids[Previous], b.icons[iconPrevious], "Previous", flags),
-		PlayPause: newButton(ids[PlayPause], toggle, tip, flags),
-		Next:      newButton(ids[Next], b.icons[iconNext], "Next", flags),
+		Previous:  newButton(ids[Previous], b.icons[iconPrevious], tip(st.tips.Previous, "Previous"), flags),
+		PlayPause: newButton(ids[PlayPause], toggle, toggleTip, flags),
+		Next:      newButton(ids[Next], b.icons[iconNext], tip(st.tips.Next, "Next"), flags),
 	}
 }
 

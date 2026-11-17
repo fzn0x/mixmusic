@@ -16,6 +16,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -128,8 +129,8 @@ func (c *Catalog) YouTubeHome(ctx context.Context) ([]media.Shelf, error) {
 }
 
 // LocalShelves returns the shelves of what the user played and made, as
-// the library has them now: the home page shows them first. Their keys
-// are "recent" and "mixes".
+// the library has them now, titled in the language the app shows: the
+// home page shows them first. Their keys are "recent" and "mixes".
 func (c *Catalog) LocalShelves() []media.Shelf {
 	var shelves []media.Shelf
 	if recent := c.a.library.RecentTracks(16); len(recent) > 0 {
@@ -137,14 +138,14 @@ func (c *Catalog) LocalShelves() []media.Shelf {
 		for i := range recent {
 			items[i] = media.Item{Kind: media.ItemTrack, Track: &recent[i]}
 		}
-		shelves = append(shelves, media.Shelf{Title: "Recently played", Source: media.SourceLocal, Items: items, Key: "recent"})
+		shelves = append(shelves, media.Shelf{Title: locales.HomeShelfRecent(), Source: media.SourceLocal, Items: items, Key: "recent"})
 	}
 	if playlists := c.a.library.Playlists(); len(playlists) > 0 {
 		items := make([]media.Item, len(playlists))
 		for i := range playlists {
 			items[i] = media.Item{Kind: media.ItemPlaylist, Playlist: &playlists[i]}
 		}
-		shelves = append(shelves, media.Shelf{Title: "Your mixes", Source: media.SourceLocal, Items: items, Key: "mixes"})
+		shelves = append(shelves, media.Shelf{Title: locales.HomeShelfYourMixes(), Source: media.SourceLocal, Items: items, Key: "mixes"})
 	}
 	return shelves
 }
@@ -168,7 +169,7 @@ func (c *Catalog) Album(ctx context.Context, id string) (media.Album, error) {
 		if a, ok := c.a.localFiles.Album(id); ok {
 			return a, nil
 		}
-		return media.Album{}, errors.New("this album is no longer on this computer")
+		return media.Album{}, errors.New(locales.LocalAlbumGone())
 	}
 	return media.Album{}, fmt.Errorf("no album %s", id)
 }
@@ -192,7 +193,7 @@ func (c *Catalog) Artist(ctx context.Context, id string) (media.Artist, error) {
 		if a, ok := c.a.localFiles.Artist(id); ok {
 			return a, nil
 		}
-		return media.Artist{}, errors.New("this artist's music is no longer on this computer")
+		return media.Artist{}, errors.New(locales.LocalArtistGone())
 	}
 	return media.Artist{}, fmt.Errorf("no artist %s", id)
 }
@@ -390,7 +391,7 @@ func isSong(t media.Track) bool { return !t.Video }
 
 // videoNote is the note of the lyrics of a music video its song's
 // synchronized lyrics don't keep time with, whichever lyrics show.
-const videoNote = "Not synced: the song's synced lyrics don't match this video."
+func videoNote() string { return locales.LyricsVideoNotSynced() }
 
 // timeSlack is how much longer or shorter than its song a music video may
 // be for the song's synchronized lyrics to keep time with it: YouTube
@@ -450,7 +451,7 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 	}
 	// A file of no artist, as a voice memo, is looked for nowhere.
 	if localfiles.NoArtist(track) {
-		return lyrics.Lyrics{}, lyricsError{"No lyrics found for this track.", lyrics.ErrNotFound}
+		return lyrics.Lyrics{}, lyricsError{locales.LyricsNotFound(), lyrics.ErrNotFound}
 	}
 	q := lyricsQuery(track)
 	q.VideoID = c.videoID(track)
@@ -461,10 +462,10 @@ func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics,
 		// source out of reach may have, reads the same, but the lyrics
 		// panel offers to try again.
 		if errors.Is(err, lyrics.ErrNotFound) || errors.Is(err, lyrics.ErrNotFoundYet) {
-			return lyrics.Lyrics{}, lyricsError{"No lyrics found for this track.", err}
+			return lyrics.Lyrics{}, lyricsError{locales.LyricsNotFound(), err}
 		}
 		log.Printf("mixmusic: the lyrics of %s: %v", track.ID, err)
-		return lyrics.Lyrics{}, lyricsError{"Lyrics can't be loaded right now. Check your connection, or try again in a moment.", err}
+		return lyrics.Lyrics{}, lyricsError{locales.LyricsCantLoad(), err}
 	}
 	if l.Language == "" {
 		l.Language = lyrics.GuessLanguage(l.Lines)

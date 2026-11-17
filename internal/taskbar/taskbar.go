@@ -40,11 +40,32 @@ func Attach(hwnd uintptr, click func(Button)) (*Bar, error) {
 // Show shows whether the player plays, and whether it has a track: without
 // one, the buttons are off. It returns at once, from any goroutine; the
 // buttons go with their window.
-func (b *Bar) Show(playing, track bool) { b.b.show(state{playing, track}) }
+func (b *Bar) Show(playing, track bool) {
+	b.b.update(func(st *state) { st.playing, st.track = playing, track })
+}
+
+// Tips are the tooltips of the buttons, in the app's language. An empty
+// one says its English.
+type Tips struct{ Play, Pause, Previous, Next string }
+
+// SetTips has the buttons show tips from now on, as the app's language
+// changes. It returns at once, from any goroutine.
+func (b *Bar) SetTips(tips Tips) { b.b.update(func(st *state) { st.tips = tips }) }
+
+// tip is the tooltip of tips said, or its English.
+func tip(said, english string) string {
+	if said == "" {
+		return english
+	}
+	return said
+}
 
 // state is what the buttons show: whether the player plays, and whether it
-// has a track, without which they're off.
-type state struct{ playing, track bool }
+// has a track, without which they're off; and their tooltips.
+type state struct {
+	playing, track bool
+	tips           Tips
+}
 
 // point is a point of a glyph, in a square of side 1, y down.
 type point struct{ x, y float64 }

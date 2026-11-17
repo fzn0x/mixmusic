@@ -9,6 +9,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/discord"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // The Discord status shows what plays as Settings › Desktop chooses (#352):
@@ -91,7 +92,7 @@ func DiscordActivity(d settings.Desktop, np NowPlaying, now time.Time) *discord.
 	}
 	switch badge := discordServiceBadge(t); {
 	case !playing:
-		a.SmallImage, a.SmallText = discordBadgeImage(BadgePaused), "Paused"
+		a.SmallImage, a.SmallText = discordBadgeImage(BadgePaused), locales.DiscordBadgePaused()
 	case d.DiscordServiceBadge && badge != "":
 		a.SmallImage, a.SmallText = discordBadgeImage(badge), discordBadgeText(t)
 	}
@@ -221,7 +222,7 @@ func discordServiceName(t media.Track) string {
 	case media.SourceSpotify:
 		return "Spotify"
 	case media.SourceFile:
-		return "my computer"
+		return locales.DiscordMyComputer()
 	}
 	return "MixMusic"
 }
@@ -230,7 +231,7 @@ func discordServiceName(t media.Track) string {
 // hovered.
 func discordBadgeText(t media.Track) string {
 	if discordSource(t) == media.SourceFile {
-		return "A file on my computer"
+		return locales.DiscordBadgeFile()
 	}
 	return discordServiceName(t)
 }
@@ -255,7 +256,7 @@ func discordListen(t media.Track) (label, link string) {
 	source := discordSource(t)
 	switch source {
 	case media.SourceYouTube, media.SourceSpotify:
-		label = "Listen on " + discordServiceName(t)
+		label = locales.DiscordListenOn(discordServiceName(t))
 	default:
 		return "", ""
 	}

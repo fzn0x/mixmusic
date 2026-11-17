@@ -41,9 +41,9 @@ func (s *shell) marketplacePage(c *ui.Context, tab string) {
 			kind = addons.KindPlugin
 		}
 		ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 24).Children(func() {
-			ui.Text(c, locales.MarketplaceCommunity())
-			s.linkOf(c, locales.MarketplaceShareYours(), "https://github.com/fzn0x/mixmusic/blob/main/community/README.md")
-			ui.Text(c, locales.MarketplaceShareEnd())
+			inlineMessage(c, locales.MarketplaceCommunity(mark(0, locales.MarketplaceShareYours())), func(text string) {
+				s.linkOf(c, text, "https://github.com/fzn0x/mixmusic/blob/main/community/README.md")
+			})
 		})
 		switch {
 		case !reg.done:

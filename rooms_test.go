@@ -10,6 +10,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/remote/remotetest"
 	"github.com/fzn0x/mixmusic/internal/room"
 	"github.com/fzn0x/mixmusic/internal/room/roomtest"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // roomTiming is the rooms' timing in these tests.
@@ -92,7 +93,7 @@ func TestRoomJoinFromDevicesMenu(t *testing.T) {
 	// The host's page shows the code, and lists the guest.
 	show(desk, dt, roomsPath)
 	untilBoth(t, desk, dt, lap, lt, "the guest", func() bool {
-		return dt.HasText(room.ShowCode(hosted.Code)) && dt.HasText("Lap") && dt.HasText("Lap joined · "+time.Now().Format("15:04"))
+		return dt.HasText(room.ShowCode(hosted.Code)) && dt.HasText("Lap") && dt.HasText(locales.RoomPageActivityLine(roomActivityWhat(room.Joined), "Lap", "", time.Now()))
 	})
 	click(t, desk, dt, "Remove Lap")
 	untilBoth(t, desk, dt, lap, lt, "removed", func() bool { return lt.HasText("Desk removed you from the room.") })

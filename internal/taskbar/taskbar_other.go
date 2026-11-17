@@ -8,4 +8,4 @@ type bar struct{}
 
 func attach(uintptr, func(Button)) (*bar, error) { return nil, ErrUnsupported }
 
-func (*bar) show(state) {}
+func (*bar) update(func(*state)) {}

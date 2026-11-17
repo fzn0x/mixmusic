@@ -40,9 +40,9 @@ func clockLength(d time.Duration) string {
 func longDuration(d time.Duration) string {
 	min := int((d + 30*time.Second) / time.Minute)
 	if min < 60 {
-		return locales.FormatMinutes(strconv.Itoa(min))
+		return locales.FormatMinutes(min)
 	}
-	return locales.FormatHourMinutes(strconv.Itoa(min/60), strconv.Itoa(min%60))
+	return locales.FormatHourMinutes(min/60, min%60)
 }
 
 // plural writes a count with its noun: "1 track", "12 tracks".
@@ -71,14 +71,19 @@ func thousands(n int) string {
 	return s
 }
 
+// numeral writes n in the app's language, its digits grouped as the
+// language groups them: 12,345, 12.345 or 12,34,567.
+func numeral(n int) string { return i18n.FormatNumber(i18n.Locale(), float64(n), i18n.NumberOptions{}) }
+
 // weekdayName writes the weekday of t in the app's language: "Tue".
 func weekdayName(t time.Time) string {
 	return i18n.FormatDate(i18n.Locale(), t, i18n.DateOptions{Skeleton: "E"})
 }
 
-// monthName writes the month of t in the app's language: "Oct".
-func monthName(t time.Time) string {
-	return i18n.FormatDate(i18n.Locale(), t, i18n.DateOptions{Skeleton: "MMM"})
+// dateIn writes t in the app's language with the fields of a skeleton of
+// CLDR, in the language's order, as "yMMMd" writes Oct 26, 2025.
+func dateIn(t time.Time, skeleton string) string {
+	return i18n.FormatDate(i18n.Locale(), t, i18n.DateOptions{Skeleton: skeleton})
 }
 
 // names joins the names of artists.

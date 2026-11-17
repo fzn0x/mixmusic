@@ -31,7 +31,7 @@ func gapText(noun string, left media.Unplayable, hidden int) string {
 		if left.Gone > 0 {
 			kinds = append(kinds, locales.PlaylistGapGone(left.Gone))
 		}
-		parts = append(parts, locales.PlaylistGapCantPlay(thousands(n), noun, and(kinds)))
+		parts = append(parts, locales.PlaylistGapCantPlay(n, noun, and(kinds)))
 	}
 	if hidden > 0 {
 		parts = append(parts, locales.PlaylistGapHidden(hidden))
@@ -78,7 +78,7 @@ func readShort(p media.Playlist) bool {
 // is left to read on from.
 func (s *shell) shortLine(c *ui.Context, r *playlistRead, noun string) {
 	k := &s.lk
-	text := locales.PlaylistGapShort(thousands(len(r.p.Tracks)), noun, thousands(r.p.TrackCount))
+	text := locales.PlaylistGapShort(len(r.p.Tracks), noun, r.p.TrackCount)
 	ui.Row(c).Gap(12).Margin(0, 0, 16).Children(func() {
 		ui.Text(c, text).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(640)
 		if s.button(c, "retry", locales.WidgetsTryAgain(), false).Clicked() {

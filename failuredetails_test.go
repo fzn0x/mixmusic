@@ -219,10 +219,10 @@ func TestFailureReport(t *testing.T) {
 	if got := failureReport(file, app.Info{}, pr); !strings.Contains(got, "- From: a file on this computer, "+inHome+"\n") || strings.Contains(got, "file:") {
 		t.Errorf("a file's report:\n%s", got)
 	}
-	if got := failureWhen(at, at.Add(time.Hour)); got != "14:03:12" {
+	if got := failureWhen(at, at.Add(time.Hour)); got != "2:03:12 PM" {
 		t.Errorf("today: %q", got)
 	}
-	if got := failureWhen(at, at.Add(24*time.Hour)); got != "8 Nov 2026, 14:03:12" {
+	if got := failureWhen(at, at.Add(24*time.Hour)); got != "Nov 8, 2026, 2:03:12 PM" {
 		t.Errorf("yesterday: %q", got)
 	}
 	if names := pr.names; !slices.Contains(names, "robinmusic") || slices.Contains(names, "") {

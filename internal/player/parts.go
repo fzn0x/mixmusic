@@ -20,6 +20,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/sponsorblock"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Marked is what the player asks of the app of the parts of the
@@ -311,7 +312,7 @@ func (p *Player) onSkipped(url string, from, to time.Duration) {
 	if !ok || url != p.parts.url || p.parts.url == "" || p.paused {
 		return
 	}
-	n := Notice{Message: "Skipped " + p.partWords(from, to)}
+	n := Notice{Message: p.skippedParts(from, to)}
 	if !(audio.Skip{From: from, To: to}).Ends(p.s.Duration) {
 		uid := cur.UID
 		n.Undo = func() { p.UndoSkip(uid, from) }
@@ -319,32 +320,40 @@ func (p *Player) onSkipped(url string, from, to time.Duration) {
 	p.notify(n)
 }
 
-// partWords names what the parts of the current entry from from to to
-// are: "the intro", "the intro and a sponsor read", or how many.
-func (p *Player) partWords(from, to time.Duration) string {
+// skippedParts tells which parts of the current entry, from from to to,
+// were skipped: "Skipped the intro", "Skipped the intro and a sponsor
+// read", or of how many kinds.
+func (p *Player) skippedParts(from, to time.Duration) string {
 	var kinds []sponsorblock.Kind
 	for _, s := range p.s.Parts {
 		if s.From < to && s.To > from && !slices.Contains(kinds, s.Kind) {
 			kinds = append(kinds, s.Kind)
 		}
 	}
-	switch len(kinds) {
-	case 0:
-		return "a part"
-	case 1:
-		return kinds[0].Part()
-	case 2:
-		return kinds[0].Part() + " and " + kinds[1].Part()
+	var first, second string
+	if len(kinds) > 0 {
+		first = partOf(kinds[0])
 	}
-	return "parts of " + inWords(len(kinds)) + " kinds"
+	if len(kinds) > 1 {
+		second = partOf(kinds[1])
+	}
+	return locales.PlayerSkippedParts(len(kinds), first, second)
 }
 
-// inWords is n in words, for a notice.
-func inWords(n int) string {
-	if n < 10 {
-		return [...]string{"no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}[n]
+// partKinds are the cases of playerPart, by the kind of a part.
+var partKinds = map[sponsorblock.Kind]string{
+	sponsorblock.NonMusic: "nonmusic", sponsorblock.Sponsor: "sponsor", sponsorblock.SelfPromo: "selfpromo",
+	sponsorblock.Interaction: "interaction", sponsorblock.Intro: "intro", sponsorblock.Outro: "outro",
+	sponsorblock.Preview: "preview", sponsorblock.Hook: "hook", sponsorblock.Filler: "filler", sponsorblock.Highlight: "highlight",
+}
+
+// partOf names a part of the kind k, for a notice: "the intro".
+func partOf(k sponsorblock.Kind) string {
+	c, ok := partKinds[k]
+	if !ok {
+		c = "other"
 	}
-	return "many"
+	return locales.PlayerPart(c)
 }
 
 // UndoSkip goes back to at of the entry uid, where a part it passed over

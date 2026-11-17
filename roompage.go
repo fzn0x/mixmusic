@@ -180,7 +180,7 @@ func (s *shell) hostedRoom(c *ui.Context, h app.HostedRoom) {
 		ui.Text(c, locales.RoomPageActivity()).FontSize(k.subtitleSize()).FontWeight(k.leadWeight())
 		for i := len(h.Activity) - 1; i >= 0 && i >= len(h.Activity)-20; i-- {
 			act := h.Activity[i]
-			ui.Text(c, locales.RoomPageActivityLine(act.Name, roomActivityWhat(act.What), activitySong(act), act.At.Local().Format("15:04"))).FontSize(k.smallSize()).TextColor(k.muted)
+			ui.Text(c, locales.RoomPageActivityLine(roomActivityWhat(act.What), act.Name, act.Song, act.At.Local())).FontSize(k.smallSize()).TextColor(k.muted)
 		}
 	}
 	s.hostRules(c)
@@ -290,19 +290,20 @@ func roomArtists(t remote.QueueTrack) string {
 	return strings.Join(names, ", ")
 }
 
-// roomActivityWhat names what a guest did in the room, as the room's activity tells it.
+// roomActivities are the cases of roomPageActivityLine, by what the
+// room's activity tells a guest did.
+var roomActivities = map[string]string{
+	room.Joined: "joined", room.Left: "left", room.Removed: "removed", room.Blocked: "blocked", room.Guessed: "guessed",
+	room.Played: "played", room.Paused: "paused", room.Skipped: "skipped", room.WentBack: "back",
+	room.Added: "added", room.AskedToAdd: "asked",
+}
+
+// roomActivityWhat is the case of roomPageActivityLine of what a guest
+// did in the room, as the room's activity tells it: the line names the
+// guest alone where it doesn't know.
 func roomActivityWhat(what string) string {
-	switch what {
-	case room.Joined:
-		return locales.RoomPageJoinedActivity()
-	case room.Left:
-		return locales.RoomPageLeftActivity()
-	case room.Removed:
-		return locales.RoomPageRemovedActivity()
-	case room.Blocked:
-		return locales.RoomPageBlockedActivity()
-	case room.Guessed:
-		return locales.RoomPageGuessedActivity()
+	if c, ok := roomActivities[what]; ok {
+		return c
 	}
-	return what
+	return "other"
 }

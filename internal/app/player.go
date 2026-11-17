@@ -17,6 +17,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/stream"
 	"github.com/fzn0x/mixmusic/internal/volume"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // PlaybackMode is how a track plays.
@@ -341,7 +342,7 @@ func playingLine(np NowPlaying) string {
 		line += " - " + artists
 	}
 	if !np.plays() {
-		line = "Paused: " + line
+		line = locales.TrayPaused(line)
 	}
 	return line
 }
@@ -424,9 +425,9 @@ func (a *App) notifyRated(id, title, body string) {
 // likedNote is what the notification of a track liked, or no longer,
 // says.
 func likedNote(t media.Track, liked bool) (title, body string) {
-	title = "Removed from liked songs"
+	title = locales.NotifyUnliked()
 	if liked {
-		title = "Added to liked songs"
+		title = locales.NotifyLiked()
 	}
 	return title, noteBody(t)
 }
@@ -434,9 +435,9 @@ func likedNote(t media.Track, liked bool) (title, body string) {
 // dislikedNote is what the notification of a track disliked, or no
 // longer, says.
 func dislikedNote(t media.Track, disliked bool) (title, body string) {
-	title = "Removed the dislike"
+	title = locales.NotifyUndisliked()
 	if disliked {
-		title = "Disliked"
+		title = locales.NotifyDisliked()
 	}
 	return title, noteBody(t)
 }

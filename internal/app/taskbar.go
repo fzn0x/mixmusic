@@ -10,6 +10,7 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/taskbar"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // taskbarCommands are the player's commands for the thumbnail's buttons.
@@ -39,5 +40,12 @@ func (a *App) attachTaskbar(win *mygo.Window) {
 	a.taskbar = bar
 	np := a.nowPlaying
 	a.mu.Unlock()
+	bar.SetTips(taskbarTips())
 	bar.Show(np.plays(), np.Track != nil)
+}
+
+// taskbarTips are the tooltips of the thumbnail's buttons, in the app's
+// language.
+func taskbarTips() taskbar.Tips {
+	return taskbar.Tips{Play: locales.TaskbarPlay(), Pause: locales.TaskbarPause(), Previous: locales.TaskbarPrevious(), Next: locales.TaskbarNext()}
 }

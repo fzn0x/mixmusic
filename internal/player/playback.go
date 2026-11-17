@@ -3,7 +3,6 @@ package player
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"math"
 	"slices"
@@ -13,6 +12,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/volume"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // toggleDebounce is how soon a second toggle is taken as the same press:
@@ -41,7 +41,7 @@ func (p *Player) PlayID(id string) {
 				return
 			}
 		}
-		p.notify(Notice{Message: "Open the track's album or playlist to play it"})
+		p.notify(Notice{Message: locales.PlayerOpenAlbum()})
 	})
 }
 
@@ -521,7 +521,7 @@ func (p *Player) fellBack(why string) {
 	}
 	p.warned[why] = true
 	p.notify(Notice{
-		Message:  strings.TrimSuffix(why, ".") + " - playing it from YouTube Music instead",
+		Message:  locales.PlayerFromYouTubeInstead(strings.TrimSuffix(why, ".")),
 		Error:    true,
 		Settings: true,
 	})
@@ -545,10 +545,13 @@ func (p *Player) fail(message string) {
 	stop := p.failures >= maxFailures
 	why := message
 	if stop {
-		why = fmt.Sprintf("%s. Stopped, as %d tracks in a row couldn't play", strings.TrimSuffix(message, "."), maxFailures)
+		why = locales.PlayerStopped(strings.TrimSuffix(message, "."), maxFailures)
 	}
 	if ok {
-		why = fmt.Sprintf("Couldn't play %s: %s", cur.Track.Title, why)
+		why = locales.PlayerCouldntPlay(cur.Track.Title, message)
+		if stop {
+			why = locales.PlayerCouldntPlayStopped(cur.Track.Title, strings.TrimSuffix(message, "."), maxFailures)
+		}
 		// The log keeps it too, for a report of the problem: the notice
 		// goes, and the details last until MixMusic closes.
 		log.Printf("mixmusic: couldn't play %s: %s", cur.Track.ID, message)

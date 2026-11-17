@@ -201,6 +201,16 @@
 - **`lyrics`** finds synced lyrics on Better Lyrics, Unison and LRCLIB,
   reads TTML and LRC, and LRCLIB's Lyricsfile, the YAML whose words are
   timed (`readLyricsfile`), and translates and romanizes lyrics on Unison.
+  `FromText` reads lyrics kept as text, as a file's tags and a .lrc file
+  hold them: LRC, its words timed by enhanced LRC's `<mm:ss.xx>` stamps
+  (`parseLRC`, which `ParseLRC` reads without them), else TTML, else plain
+  text; `DecodeText` decodes a .lrc of UTF-8, UTF-16 or ISO-8859-1. The
+  lyrics of a track of this computer are read first, at each lookup
+  (`internal/app/lyricslocal.go`, #554), of the copy that plays it, then
+  its song's others: the .lrc of its name beside it, the synced lyrics
+  `internal/tags` reads (SYLT written as LRC, SYNCEDLYRICS), its plain
+  lyrics (USLT, LYRICS, MP4's ©lyr). Synced, they are final; plain, they
+  yield only to the sources' synced lyrics (`onlineLyrics`).
   `Catalog.Lyrics` (`internal/app/lyricssources.go`) asks the sources one
   at a time, in the order of `settings.Lyrics.SourceOrder`, those on, and
   keeps the best answer: synced over plain, word by word over line by

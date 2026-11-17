@@ -258,7 +258,9 @@ what plays, as their settings say:
   title and artists, or [the lines you chose](desktop.md#what-your-discord-status-shows),
   without a cover or a Listen button: with the service's badge on, a
   record's badge takes the cover's place.
-- **[Lyrics](lyrics.md)**, when you show them, are looked for on the
+- **[Lyrics](lyrics.md)**, when you show them, are first those
+  [its file holds](lyrics.md#songs-on-this-computer), or a .lrc file
+  beside it. Unless those are synced, they are looked for on the
   [sources](lyrics.md#choose-and-order-the-sources) that are on, by its
   title, artists, album and length, but never in YouTube's captions.
 

@@ -51,18 +51,19 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 			}
 			s.steps(c,
 				func() {
-					ui.Text(c, locales.AccountSettingsSpotifyStep1())
-					s.linkOf(c, locales.AccountSettingsSpotifyDashboard(), "https://developer.spotify.com/dashboard")
-					ui.Text(c, locales.AccountSettingsSpotifyStep1Tail())
+					inlineMessage(c, locales.AccountSettingsSpotifyStep1(mark(0, locales.AccountSettingsSpotifyDashboard())), func(text string) {
+						s.linkOf(c, text, "https://developer.spotify.com/dashboard")
+					})
 				},
 				func() {
-					ui.Text(c, locales.AccountSettingsSpotifyRedirect())
-					ui.Text(c, sp.RedirectURI).Font(monospace())
-					ui.Text(c, " ")
-					if s.linkOf(c, locales.AccountSettingsCopy(), "").Clicked() {
-						c.WriteClipboard(sp.RedirectURI)
-						s.notes = append(s.notes, notice(locales.AccountSettingsCopiedRedirect()))
-					}
+					inlineMessage(c, locales.AccountSettingsSpotifyRedirect(mark(0, sp.RedirectURI), mark(1, locales.AccountSettingsCopy())),
+						func(text string) { ui.Text(c, text).Font(monospace()) },
+						func(text string) {
+							if s.linkOf(c, text, "").Clicked() {
+								c.WriteClipboard(sp.RedirectURI)
+								s.notes = append(s.notes, notice(locales.AccountSettingsCopiedRedirect()))
+							}
+						})
 				},
 				func() {
 					ui.Text(c, locales.AccountSettingsSpotifyUsers())
@@ -429,9 +430,9 @@ func (s *shell) lastfmAccount(c *ui.Context, lf app.LastfmAccount) {
 		s.found(c, locales.AccountSettingsConnectLastfm(), locales.AccountSettingsLastfmForm(), func() {
 			s.steps(c,
 				func() {
-					ui.Text(c, locales.AccountSettingsLastfmStep1A())
-					s.linkOf(c, "Last.fm", "https://www.last.fm/api/account/create")
-					ui.Text(c, locales.AccountSettingsLastfmStep1B())
+					inlineMessage(c, locales.AccountSettingsLastfmStep1(mark(0, "Last.fm")), func(text string) {
+						s.linkOf(c, text, "https://www.last.fm/api/account/create")
+					})
 				},
 				func() { ui.Text(c, locales.AccountSettingsLastfmStep2()) },
 				func() { ui.Text(c, locales.AccountSettingsLastfmStep3()) },

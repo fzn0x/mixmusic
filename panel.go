@@ -486,20 +486,22 @@ func (s *shell) lyricsCredit(c *ui.Context, ly lyrics.Lyrics) {
 // <name>".
 func (s *shell) creditParts(c *ui.Context, ly lyrics.Lyrics) {
 	k := &s.lk
-	if ly.SourceURL == "" {
-		ui.Text(c, k.sentence(locales.LyricsCreditFrom(ly.Source)))
-	} else {
-		ui.Text(c, k.sentence(locales.LyricsCreditFromLink()))
-		s.linkOf(c, ly.Source, ly.SourceURL)
+	credit := locales.LyricsCreditFrom(mark(0, ly.Source))
+	if ly.By != "" {
+		credit = locales.LyricsCreditFromBy(mark(0, ly.Source), mark(1, ly.By))
 	}
-	switch {
-	case ly.By == "":
-	case ly.ByURL == "":
-		ui.Text(c, locales.LyricsCreditBy(ly.By))
-	default:
-		ui.Text(c, locales.LyricsCreditByLink())
-		s.linkOf(c, ly.By, ly.ByURL)
+	// The source and the one who gave them link to their pages, where the
+	// source asks for it.
+	linked := func(url string) func(text string) {
+		return func(text string) {
+			if url == "" {
+				ui.Text(c, text)
+			} else {
+				s.linkOf(c, text, url)
+			}
+		}
 	}
+	inlineMessage(c, k.sentence(credit), linked(ly.SourceURL), linked(ly.ByURL))
 }
 
 func (s *shell) emptyIn(c *ui.Context, text string) {

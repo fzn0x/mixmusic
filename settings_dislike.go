@@ -20,16 +20,15 @@ func (s *shell) skipDislikedRow(c *ui.Context) {
 	// Where dislikes go, and, once there are any, a link to them.
 	note, see := dislikesNote(), len(s.svc.Collection.Disliked()) > 0
 	if see {
-		note = locales.DislikeNoteSee()
+		note = locales.DislikeNoteSee(locales.DislikeSee())
 	}
 	s.found(c, "", note, func() {
 		ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
-			ui.Text(c, dislikesNote())
-			if see {
-				ui.Text(c, " ")
-				s.linkOf(c, locales.DislikeSee(), "/library/disliked")
-				ui.Text(c, locales.DislikeSeeEnd())
+			if !see {
+				ui.Text(c, dislikesNote())
+				return
 			}
+			inlineMessage(c, locales.DislikeNoteSee(mark(0, locales.DislikeSee())), func(text string) { s.linkOf(c, text, "/library/disliked") })
 		})
 	})
 }

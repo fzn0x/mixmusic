@@ -33,9 +33,9 @@ func (s *shell) desktopSettings(c *ui.Context) {
 		toggle("discord", locales.DesktopSettingsDiscordTitle(), locales.DesktopSettingsDiscordAbout(), &s.set.DiscordPresence)
 		if s.set.DiscordPresence {
 			describe := func() {
-				ui.Text(c, locales.DesktopSettingsDiscordBefore())
-				s.linkOf(c, locales.DesktopSettingsDiscordPortal(), "https://discord.com/developers/applications")
-				ui.Text(c, locales.DesktopSettingsDiscordAfter())
+				inlineMessage(c, locales.DesktopSettingsDiscordAppIDAbout(mark(0, locales.DesktopSettingsDiscordPortal())), func(text string) {
+					s.linkOf(c, text, "https://discord.com/developers/applications")
+				})
 			}
 			s.rowWith(c, locales.DesktopSettingsDiscordAppID(), describe, func() {
 				in, _ := s.settingInput(c, "discord-app", s.set.DiscordAppID, func(id string) {
@@ -43,7 +43,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 					s.save()
 				})
 				in.Placeholder(locales.DesktopSettingsDiscordPlaceholder()).Width(260).Label(locales.DesktopSettingsDiscordAppID())
-			}, "Discord shows the name of MixMusic's application. To show another, create one in the developer portal and paste its application ID.")
+			}, locales.DesktopSettingsDiscordAppIDAbout(locales.DesktopSettingsDiscordPortal()))
 		}
 		s.settingsOf(c, desktopRows)
 		s.row(c, locales.DesktopSettingsLogin(), "", func() {

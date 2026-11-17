@@ -140,9 +140,9 @@ func (s *shell) podcastPage(c *ui.Context, id string) {
 		s.collectionHead(c, h)
 		if p.Source == media.SourceSpotify && !s.svc.Catalog.SpotifyEpisodesPlay() {
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).Children(func() {
-				ui.Text(c, locales.PodcastsSpotifyOnlyLead())
-				s.linkOf(c, locales.PodcastsSettingsPlayback(), "/settings/playback")
-				ui.Text(c, locales.PodcastsSpotifyOnlyTail())
+				inlineMessage(c, locales.PodcastsSpotifyOnly(mark(0, locales.PodcastsSettingsPlayback())), func(text string) {
+					s.linkOf(c, text, "/settings/playback")
+				})
 			})
 		}
 		s.episodeList(c, "episodes", episodes, episodeListOptions{empty: locales.PodcastsNoEpisodes()})

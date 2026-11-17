@@ -166,22 +166,24 @@ func (s *shell) zoomKeys() string {
 		}
 	}
 	in, out, reset := keys["view.zoomIn"], keys["view.zoomOut"], keys["view.zoomReset"]
-	var parts []string
+	// A sentence for each of the shortcuts there are.
 	switch {
+	case in != "" && out != "" && reset != "":
+		return locales.MenuZoomKeysBothReset(in, out, reset)
 	case in != "" && out != "":
-		parts = append(parts, locales.MenuZoomKeysBoth(in, out))
+		return locales.MenuZoomKeysBoth(in, out)
+	case in != "" && reset != "":
+		return locales.MenuZoomKeysInReset(in, reset)
 	case in != "":
-		parts = append(parts, locales.MenuZoomKeysIn(in))
+		return locales.MenuZoomKeysIn(in)
+	case out != "" && reset != "":
+		return locales.MenuZoomKeysOutReset(out, reset)
 	case out != "":
-		parts = append(parts, locales.MenuZoomKeysOut(out))
+		return locales.MenuZoomKeysOut(out)
+	case reset != "":
+		return locales.MenuZoomKeysReset(reset)
 	}
-	if reset != "" {
-		parts = append(parts, locales.MenuZoomKeysReset(reset))
-	}
-	if len(parts) == 0 {
-		return ""
-	}
-	return strings.Join(parts, locales.MenuZoomKeysSep()) + locales.MenuZoomKeysEnd()
+	return ""
 }
 
 // wordJoiner joins the characters on either side of it into one word,

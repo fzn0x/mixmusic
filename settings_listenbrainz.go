@@ -45,9 +45,9 @@ func (s *shell) listenbrainzSettings(c *ui.Context) {
 		s.found(c, locales.ListenBrainzSettingsConnectTitle(), locales.ListenBrainzSettingsForm(), func() {
 			s.steps(c,
 				func() {
-					ui.Text(c, locales.ListenBrainzSettingsStep1())
-					s.linkOf(c, locales.ListenBrainzSettingsTokenLink(), "https://listenbrainz.org/settings/")
-					ui.Text(c, locales.ListenBrainzSettingsStep1Tail())
+					inlineMessage(c, locales.ListenBrainzSettingsStep1(mark(0, locales.ListenBrainzSettingsTokenLink())), func(text string) {
+						s.linkOf(c, text, "https://listenbrainz.org/settings/")
+					})
 				},
 				func() { ui.Text(c, locales.ListenBrainzSettingsStep2()) },
 			)

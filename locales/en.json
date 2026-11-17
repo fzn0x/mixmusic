@@ -79,8 +79,16 @@
       }
     }
   },
-  "accountSettingsLastfmStep1A": "Create an API account on ",
-  "accountSettingsLastfmStep1B": "; any name and description will do, and the callback URL can stay empty.",
+  "accountSettingsLastfmStep1": "Create an API account on {link}; any name and description will do, and the callback URL can stay empty.",
+  "@accountSettingsLastfmStep1": {
+    "description": "The first step of connecting to Last.fm. {link} is Last.fm's name, a link to its page that makes an API account.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Last.fm"
+      }
+    }
+  },
   "accountSettingsLastfmStep2": "Paste its API key and shared secret here, and connect.",
   "accountSettingsLastfmStep3": "Approve MixMusic on the page that opens in your browser.",
   "accountSettingsLastfmWaiting": "{count, plural, one {# scrobble waits} other {# scrobbles wait}} to be sent.",
@@ -119,13 +127,34 @@
   "accountSettingsSpotifyForm": "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium. Add this redirect URI to it. In its settings, under Users Management, add your name and the email of the Spotify account you sign in with. Paste the app's Client ID here, and sign in to Spotify. Log in. Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
   "accountSettingsSpotifyHint": "Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
   "accountSettingsSpotifyPaste": "Paste the app's Client ID here, and sign in.",
-  "accountSettingsSpotifyRedirect": "Add this redirect URI to it: ",
+  "accountSettingsSpotifyRedirect": "Add this redirect URI to it: {uri} {copy}",
+  "@accountSettingsSpotifyRedirect": {
+    "description": "The second step of signing in to Spotify. {uri} is the address, in a monospace face, and {copy} accountSettingsCopy, a link that copies it.",
+    "placeholders": {
+      "uri": {
+        "type": "String",
+        "example": "http://127.0.0.1:43821/callback"
+      },
+      "copy": {
+        "type": "String",
+        "example": "copy"
+      }
+    }
+  },
   "accountSettingsSpotifyRefused": "Spotify refused the sign-in",
   "accountSettingsSpotifySignIn": "Sign in to Spotify",
   "accountSettingsSpotifySignOutBody": "MixMusic forgets your Spotify sign-in.",
   "accountSettingsSpotifySignOutTitle": "sign out of Spotify",
-  "accountSettingsSpotifyStep1": "Create an app in the ",
-  "accountSettingsSpotifyStep1Tail": ", with the Web API, signed in with a Spotify account that has Premium.",
+  "accountSettingsSpotifyStep1": "Create an app in the {link}, with the Web API, signed in with a Spotify account that has Premium.",
+  "@accountSettingsSpotifyStep1": {
+    "description": "The first step of signing in to Spotify. {link} is accountSettingsSpotifyDashboard, a link to Spotify's page.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Spotify developer dashboard"
+      }
+    }
+  },
   "accountSettingsSpotifyUsers": "In its settings, under Users Management, add your name and the email of the Spotify account you sign in with.",
   "accountSettingsWaitingBrowser": "waiting for the browser…",
   "accountSettingsWaitingLastfm": "waiting for Last.fm…",
@@ -1222,9 +1251,17 @@
   },
   "crossfadeTitle": "Crossfade",
   "desktopSettingsDiscordAbout": "While Discord runs, your profile says what you listen to: you choose its lines, cover, time and button.",
-  "desktopSettingsDiscordAfter": " and paste its application ID.",
   "desktopSettingsDiscordAppID": "Discord application ID",
-  "desktopSettingsDiscordBefore": "Discord shows the name of MixMusic's application. To show another, create one in the ",
+  "desktopSettingsDiscordAppIDAbout": "Discord shows the name of MixMusic's application. To show another, create one in the {link} and paste its application ID.",
+  "@desktopSettingsDiscordAppIDAbout": {
+    "description": "Under Settings › Desktop › Discord's application ID. {link} is desktopSettingsDiscordPortal, a link to Discord's page.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "developer portal"
+      }
+    }
+  },
   "desktopSettingsDiscordPlaceholder": "MixMusic's",
   "desktopSettingsDiscordPortal": "developer portal",
   "desktopSettingsDiscordTitle": "Show what plays on Discord",
@@ -1292,8 +1329,16 @@
     }
   },
   "discordNothingPlays": "Nothing plays: this is how a song would show.",
-  "discordPlaceholdersEmpty": ". Empty, the line shows nothing.",
-  "discordPlaceholdersLabel": "Placeholders: ",
+  "discordPlaceholdersLabel": "Placeholders: {placeholders}. Empty, the line shows nothing.",
+  "@discordPlaceholdersLabel": {
+    "description": "Under a line of the Discord status. {placeholders} lists the placeholders the line may hold, as they are typed.",
+    "placeholders": {
+      "placeholders": {
+        "type": "String",
+        "example": "{title}, {artist}, {album}"
+      }
+    }
+  },
   "discordPreview": "Preview",
   "discordPreviewCardLabel": "Preview of the Discord status",
   "discordPreviewPausedNote": "While paused, your profile shows nothing: this shows once the track plays again.",
@@ -1321,9 +1366,17 @@
   },
   "discordYourApplication": "your application",
   "dislikeNote": "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic.",
-  "dislikeNoteSee": "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic. See the songs you dislike.",
+  "dislikeNoteSee": "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic. {link}.",
+  "@dislikeNoteSee": {
+    "description": "Under Skip songs you dislike, once there are some. {link} is dislikeSee, a link to the list of them.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "See the songs you dislike"
+      }
+    }
+  },
   "dislikeSee": "See the songs you dislike",
-  "dislikeSeeEnd": ".",
   "dislikeSkip": "Skip songs you dislike",
   "dislikeSkipDesc": "Songs you dislike don't play when the queue moves on, and radios leave them out.",
   "downloadAddedAbout": "When a playlist, an album, a mix or the liked songs you downloaded gain songs, they download too as you open its page. Over a hundred at once, or a gigabyte, wait for you to ask. Off: its page offers them.",
@@ -1867,10 +1920,17 @@
   "equalizerPresetRock": "Rock",
   "equalizerPresetTreble": "Treble boost",
   "equalizerPresetVocal": "Vocal",
-  "equalizerSpotifyLead": "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: ",
-  "equalizerSpotifyNote": "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: Spotify notes that its audio settings can't change while another device plays it.",
+  "equalizerSpotifyNote": "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: {link} that its audio settings can't change while another device plays it.",
+  "@equalizerSpotifyNote": {
+    "description": "Under the equalizer. {link} is equalizerSpotifyNotes, a link to Spotify's page that says so.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Spotify notes"
+      }
+    }
+  },
   "equalizerSpotifyNotes": "Spotify notes",
-  "equalizerSpotifyTail": " that its audio settings can't change while another device plays it.",
   "equalizerTitle": "Equalizer",
   "explicitHideDesc": "Songs, albums and videos marked explicit don't show in the search, on Home, on artists' pages or in radios, and never play. Your playlists, liked songs, library and queue list them dimmed.",
   "explicitHideTitle": "Hide explicit content",
@@ -2741,8 +2801,16 @@
   "listenBrainzSettingsSendThem": "send them",
   "listenBrainzSettingsServer": "Leave it empty for ListenBrainz itself. A ListenBrainz of your own takes its address, and Maloja its address followed by /apis/listenbrainz.",
   "listenBrainzSettingsServerLabel": "Server",
-  "listenBrainzSettingsStep1": "Copy your user token from ",
-  "listenBrainzSettingsStep1Tail": ", or your own server's.",
+  "listenBrainzSettingsStep1": "Copy your user token from {link}, or your own server's.",
+  "@listenBrainzSettingsStep1": {
+    "description": "The first step of connecting to ListenBrainz. {link} is listenBrainzSettingsTokenLink, a link to the page of the token.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "your ListenBrainz settings"
+      }
+    }
+  },
   "listenBrainzSettingsStep2": "Paste it here, and connect.",
   "listenBrainzSettingsTokenLink": "your ListenBrainz settings",
   "listenBrainzSettingsTokenPlaceholder": "36 letters, digits and dashes",
@@ -2997,24 +3065,30 @@
   "lyricsCaptionLanguage": "Caption language",
   "lyricsCaptionLanguageDescription": "Lyrics from YouTube captions come in this language when the video has captions in it, and in the video's own else.",
   "lyricsCaptionLanguageOriginal": "Original",
-  "lyricsCreditBy": " · submitted by {by}",
-  "@lyricsCreditBy": {
-    "placeholders": {
-      "by": {
-        "type": "String"
-      }
-    }
-  },
-  "lyricsCreditByLink": " · submitted by ",
   "lyricsCreditFrom": "lyrics from {source}",
   "@lyricsCreditFrom": {
+    "description": "Under the lyrics: where they come from. {source} is the name of the lyrics' source, a link to it where its licence asks for one.",
     "placeholders": {
       "source": {
-        "type": "String"
+        "type": "String",
+        "example": "LRCLIB"
       }
     }
   },
-  "lyricsCreditFromLink": "lyrics from ",
+  "lyricsCreditFromBy": "lyrics from {source} · submitted by {by}",
+  "@lyricsCreditFromBy": {
+    "description": "Under the lyrics: where they come from, and who gave them to it. {source} is the name of the source and {by} the name of the person, each a link to its page where the source asks for one.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Unison"
+      },
+      "by": {
+        "type": "String",
+        "example": "ana"
+      }
+    }
+  },
   "lyricsFullScreen": "Full-screen lyrics",
   "lyricsInstrumental": "This track is instrumental.",
   "lyricsKanjiDownloading": "The readings of kanji are downloading: kanji show as they are until then.",
@@ -3216,7 +3290,16 @@
       }
     }
   },
-  "marketplaceCommunity": "Made by the community, reviewed in the open. ",
+  "marketplaceCommunity": "Made by the community, reviewed in the open. {link}.",
+  "@marketplaceCommunity": {
+    "description": "Above the Marketplace's themes and plugins. {link} is marketplaceShareYours, a link to how to share one.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Share yours"
+      }
+    }
+  },
   "marketplaceEnable": "enable",
   "marketplaceInstall": "install",
   "marketplaceInstallTitle": "install {name}",
@@ -3248,7 +3331,6 @@
       }
     }
   },
-  "marketplaceShareEnd": ".",
   "marketplaceShareYours": "Share yours",
   "marketplaceThemes": "themes",
   "marketplaceTitle": "Marketplace",
@@ -3306,43 +3388,96 @@
   "menuView": "View",
   "menuZoomDescription": "Makes everything larger or smaller: text, buttons and artwork.",
   "menuZoomIn": "Zoom In",
-  "menuZoomKeysBoth": "{zoomIn} and {zoomOut} change it",
+  "menuZoomKeysBoth": "{zoomIn} and {zoomOut} change it.",
   "@menuZoomKeysBoth": {
+    "description": "Under Zoom, after menuZoomDescription. {zoomIn} and {zoomOut} are the shortcuts' keys.",
     "placeholders": {
       "zoomIn": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+="
       },
       "zoomOut": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+-"
       }
     }
   },
-  "menuZoomKeysEnd": ".",
-  "menuZoomKeysIn": "{zoomIn} zooms in",
-  "@menuZoomKeysIn": {
+  "menuZoomKeysBothReset": "{zoomIn} and {zoomOut} change it, {reset} resets it.",
+  "@menuZoomKeysBothReset": {
+    "description": "Under Zoom, after menuZoomDescription. {zoomIn}, {zoomOut} and {reset} are the shortcuts' keys.",
     "placeholders": {
       "zoomIn": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+="
+      },
+      "zoomOut": {
+        "type": "String",
+        "example": "Ctrl+-"
+      },
+      "reset": {
+        "type": "String",
+        "example": "Ctrl+0"
       }
     }
   },
-  "menuZoomKeysOut": "{zoomOut} zooms out",
+  "menuZoomKeysIn": "{zoomIn} zooms in.",
+  "@menuZoomKeysIn": {
+    "description": "Under Zoom, after menuZoomDescription, while only Zoom in has keys. {zoomIn} is the shortcut's keys.",
+    "placeholders": {
+      "zoomIn": {
+        "type": "String",
+        "example": "Ctrl+="
+      }
+    }
+  },
+  "menuZoomKeysInReset": "{zoomIn} zooms in, {reset} resets it.",
+  "@menuZoomKeysInReset": {
+    "description": "Under Zoom, after menuZoomDescription, while Zoom out has no keys. {zoomIn} and {reset} are the shortcuts' keys.",
+    "placeholders": {
+      "zoomIn": {
+        "type": "String",
+        "example": "Ctrl+="
+      },
+      "reset": {
+        "type": "String",
+        "example": "Ctrl+0"
+      }
+    }
+  },
+  "menuZoomKeysOut": "{zoomOut} zooms out.",
   "@menuZoomKeysOut": {
+    "description": "Under Zoom, after menuZoomDescription, while only Zoom out has keys. {zoomOut} is the shortcut's keys.",
     "placeholders": {
       "zoomOut": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+-"
       }
     }
   },
-  "menuZoomKeysReset": "{reset} resets it",
+  "menuZoomKeysOutReset": "{zoomOut} zooms out, {reset} resets it.",
+  "@menuZoomKeysOutReset": {
+    "description": "Under Zoom, after menuZoomDescription, while Zoom in has no keys. {zoomOut} and {reset} are the shortcuts' keys.",
+    "placeholders": {
+      "zoomOut": {
+        "type": "String",
+        "example": "Ctrl+-"
+      },
+      "reset": {
+        "type": "String",
+        "example": "Ctrl+0"
+      }
+    }
+  },
+  "menuZoomKeysReset": "{reset} resets it.",
   "@menuZoomKeysReset": {
+    "description": "Under Zoom, after menuZoomDescription, while only Actual size has keys. {reset} is the shortcut's keys.",
     "placeholders": {
       "reset": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+0"
       }
     }
   },
-  "menuZoomKeysSep": ", ",
   "menuZoomLabel": "Zoom",
   "menuZoomOut": "Zoom Out",
   "menuZoomRoom": "This window has room for {percent}.",
@@ -3786,9 +3921,16 @@
   "playbackSignInAgain": "sign in again",
   "playbackSignInAgainBody": "You signed in before MixMusic played Spotify itself, which your sign-in doesn't allow yet. Until you sign in again, Spotify tracks play from YouTube Music.",
   "playbackSignInAgainTitle": "Sign in to Spotify again",
-  "playbackSignInSpotify": "Sign in to Spotify in accounts to play your Spotify library.",
-  "playbackSignInSpotifyLead": "Sign in to Spotify in ",
-  "playbackSignInSpotifyTail": " to play your Spotify library.",
+  "playbackSignInSpotify": "Sign in to Spotify in {link} to play your Spotify library.",
+  "@playbackSignInSpotify": {
+    "description": "In Settings › Playback, while Spotify isn't signed in to. {link} is settingsTabAccounts, a link to that tab of Settings.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "accounts"
+      }
+    }
+  },
   "playbackSignedInSpotify": "Signed in to Spotify",
   "playbackSound": "Sound",
   "playbackSpotifyHere": "MixMusic plays them itself, at Spotify's own quality, and shows among your Spotify devices. Needs Spotify Premium, and no Spotify app.",
@@ -4244,8 +4386,16 @@
     }
   },
   "podcastsSettingsPlayback": "Settings › Playback",
-  "podcastsSpotifyOnlyLead": "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in ",
-  "podcastsSpotifyOnlyTail": ".",
+  "podcastsSpotifyOnly": "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in {link}.",
+  "@podcastsSpotifyOnly": {
+    "description": "On a Spotify podcast's page, where Spotify's episodes don't play in MixMusic. {link} is podcastsSettingsPlayback, a link to that tab of Settings.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Settings › Playback"
+      }
+    }
+  },
   "podcastsUnfollowed": "{title}: no longer following",
   "@podcastsUnfollowed": {
     "placeholders": {
@@ -5052,7 +5202,6 @@
   "searchScopeBoth": "both",
   "searchServices": "Services",
   "searchSignInSpotify": "Sign in to Spotify",
-  "searchSignInTail": " to search it too.",
   "searchSongs": "Songs",
   "searchSortBestMatch": "Best match",
   "searchSortMostPlayed": "Most played",
@@ -5062,7 +5211,16 @@
   "searchStartTyping": "start typing",
   "searchTitle": "Search",
   "searchVideos": "Videos",
-  "searchYouTubeOnly": "Searching YouTube Music only. ",
+  "searchYouTubeOnly": "Searching YouTube Music only. {link} to search it too.",
+  "@searchYouTubeOnly": {
+    "description": "Above the results of a search, while Spotify isn't signed in to. {link} is searchSignInSpotify, a link to Settings › Accounts.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Sign in to Spotify"
+      }
+    }
+  },
   "seekHighlightTip": "{kind}, {time}",
   "@seekHighlightTip": {
     "placeholders": {
@@ -5377,9 +5535,20 @@
   "skipAIDesc": "Skips the tracks YouTube labels as made with AI. YouTube labels only some of them, so others still play.",
   "skipAITitle": "Skip songs made with AI",
   "skipPartsAbout": "Passes over the parts of music videos, uploads and episodes that SponsorBlock's community marks, and shows them on the seek bar. While it's on, MixMusic asks SponsorBlock of each video it plays from YouTube Music, sending the first 4 characters of a hash of its ID, never the ID.",
-  "skipPartsCreditAfter": ". Skipped parts count for nothing in plays and Last.fm scrobbles; each is skipped once a play, so seeking back into one plays it.",
-  "skipPartsCreditBefore": "Uses SponsorBlock data licensed under ",
-  "skipPartsCreditBetween": " from ",
+  "skipPartsCredit": "Uses SponsorBlock data licensed under {license} from {link}. Skipped parts count for nothing in plays and Last.fm scrobbles; each is skipped once a play, so seeking back into one plays it.",
+  "@skipPartsCredit": {
+    "description": "Under the parts MixMusic skips. {license} is the licence's name and {link} SponsorBlock's address, each a link.",
+    "placeholders": {
+      "license": {
+        "type": "String",
+        "example": "CC BY-NC-SA 4.0"
+      },
+      "link": {
+        "type": "String",
+        "example": "https://sponsor.ajay.app/"
+      }
+    }
+  },
   "skipPartsGroup": "Skip parts of videos",
   "skipPartsHighlightAbout": "Marks the moment SponsorBlock's community calls a video's best with a dot on the seek bar. Jump to the highlight, on the now playing page and in the command palette, plays from there.",
   "skipPartsHighlightMark": "Mark the highlight",

@@ -48,11 +48,9 @@ func usePseudoLocale(t *testing.T) {
 func checkPseudo(t *testing.T, where string, texts []string, names ...string) {
 	t.Helper()
 	xa := locales.In("en-XA")
-	// shortcut: these sentences put a link or a shortcut between their
-	// pieces, which one message can't hold yet; drop each when it's one.
-	pieced := []string{xa.MarketplaceCommunity(), xa.MenuZoomDescription(), xa.PlaybackSignInSpotifyLead(), xa.EqualizerSpotifyLead(),
-		xa.AccountSettingsSpotifyStep1(), xa.AccountSettingsSpotifyRedirect(), xa.AccountSettingsLastfmStep1A(), xa.DesktopSettingsDiscordBefore(),
-		xa.ListenBrainzSettingsStep1(), xa.DiscordPlaceholdersLabel(), xa.SkipPartsCreditBefore()}
+	// Zoom's description puts whole sentences side by side: what zoom
+	// does, its keys and its bounds, each there or not.
+	pieced := []string{xa.MenuZoomDescription()}
 	for _, txt := range texts {
 		words := txt
 		for _, n := range names {

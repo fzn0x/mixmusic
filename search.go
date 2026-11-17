@@ -124,9 +124,9 @@ func (s *shell) searchPage(c *ui.Context, q string) {
 		}
 		if !res.value.SpotifySignedIn && s.searchScope != 2 && s.searchScope != youtubeScope {
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 16).Children(func() {
-				ui.Text(c, locales.SearchYouTubeOnly())
-				s.linkOf(c, locales.SearchSignInSpotify(), "/settings/accounts")
-				ui.Text(c, locales.SearchSignInTail())
+				inlineMessage(c, locales.SearchYouTubeOnly(mark(0, locales.SearchSignInSpotify())), func(text string) {
+					s.linkOf(c, text, "/settings/accounts")
+				})
 			})
 		}
 		if len(res.value.Errors) > 0 {

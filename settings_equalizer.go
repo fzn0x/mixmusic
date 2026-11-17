@@ -112,11 +112,11 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 		})
 		// Spotify's audio plays in Spotify's own player, which no app may
 		// change: only the system's equalizer reaches it.
-		s.found(c, "", locales.EqualizerSpotifyNote(), func() {
+		s.found(c, "", locales.EqualizerSpotifyNote(locales.EqualizerSpotifyNotes()), func() {
 			ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
-				ui.Text(c, locales.EqualizerSpotifyLead())
-				s.linkOf(c, locales.EqualizerSpotifyNotes(), spotifyEqualizer)
-				ui.Text(c, locales.EqualizerSpotifyTail())
+				inlineMessage(c, locales.EqualizerSpotifyNote(mark(0, locales.EqualizerSpotifyNotes())), func(text string) {
+					s.linkOf(c, text, spotifyEqualizer)
+				})
 			})
 		})
 	})

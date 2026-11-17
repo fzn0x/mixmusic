@@ -1,6 +1,9 @@
 package locales
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
@@ -109,4 +112,137 @@ func sampleArgs(m *i18n.Message) map[string]any {
 		}
 	}
 	return args
+}
+
+// TestAddedCatalogsAreWellFormed holds each catalog of more/, and the
+// fixture, to what MyGo's check and the tests of locales/ ask of the
+// catalogs there: a file named after its language's tag in its canonical
+// form, which locales/ has no catalog of; "@@locale" first, saying the
+// tag; "@@x-machine-translated" true, or not there; keys of en.json or of
+// MyGo's own strings (mygo.<key>), each once, in order; and messages that
+// parse, with en.json's arguments of the same kinds, its select cases,
+// and the plural cases of their language with en.json's exact ones.
+func TestAddedCatalogsAreWellFormed(t *testing.T) {
+	source := map[string]*i18n.Message{}
+	for k, v := range readCatalog(t, "en").messages {
+		if m, err := i18n.ParseMessage(v); err == nil {
+			source[k] = m
+		}
+	}
+	for _, path := range addedCatalogs(t) {
+		tag := strings.TrimSuffix(filepath.Base(path), ".json")
+		if i18n.Normalize(tag) != tag || i18n.IsPseudo(tag) {
+			t.Errorf("%s: name it after its language's BCP 47 tag in its canonical form, as hi.json or pt-BR.json", path)
+			continue
+		}
+		if _, err := os.Stat(tag + ".json"); err == nil {
+			t.Errorf("%s: locales/%s.json is the catalog of %s already", path, tag, tag)
+		}
+		b, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		dec := json.NewDecoder(bytes.NewReader(b))
+		if tok, err := dec.Token(); err != nil || tok != json.Delim('{') {
+			t.Errorf("%s: not a JSON object of messages", path)
+			continue
+		}
+		var keys []string
+		seen := map[string]bool{}
+		for dec.More() {
+			tok, err := dec.Token()
+			if err != nil {
+				t.Errorf("%s: %v", path, err)
+				break
+			}
+			key := tok.(string)
+			var raw json.RawMessage
+			if err := dec.Decode(&raw); err != nil {
+				t.Errorf("%s: %s: %v", path, key, err)
+				break
+			}
+			first := len(seen) == 0
+			if seen[key] {
+				t.Errorf("%s: %s comes twice", path, key)
+			}
+			seen[key] = true
+			switch {
+			case key == "@@locale":
+				var locale string
+				if !first || json.Unmarshal(raw, &locale) != nil || locale != tag {
+					t.Errorf(`%s: "@@locale" comes first, and says %q`, path, tag)
+				}
+				continue
+			case key == "@@x-machine-translated":
+				if string(raw) != "true" {
+					t.Errorf(`%s: "@@x-machine-translated" is true, or isn't there`, path)
+				}
+				continue
+			case strings.HasPrefix(key, "@"):
+				continue // ARB's other attributes and descriptions, which MyGo reads past
+			}
+			var msg string
+			if json.Unmarshal(raw, &msg) != nil {
+				t.Errorf("%s: %s is not a string", path, key)
+				continue
+			}
+			keys = append(keys, key)
+			got, err := i18n.ParseMessage(msg)
+			if err != nil {
+				t.Errorf("%s: %s: %v", path, key, err)
+				continue
+			}
+			if ns, name, ok := strings.Cut(key, "."); ok {
+				// MyGo's check, which catalogs.sh runs, knows MyGo's keys.
+				if ns != "mygo" || name == "" {
+					t.Errorf("%s: %s is a key of neither en.json nor MyGo (mygo.<key>)", path, key)
+				}
+				continue
+			}
+			want, ok := source[key]
+			if !ok {
+				t.Errorf("%s: %s is not a key of en.json", path, key)
+				continue
+			}
+			if problem := unlikeEnglish(tag, want, got); problem != "" {
+				t.Errorf("%s: %s %s", path, key, problem)
+			}
+		}
+		if !seen["@@locale"] {
+			t.Errorf(`%s: "@@locale": %q comes first`, path, tag)
+		}
+		for i := 1; i < len(keys); i++ {
+			if keys[i] < keys[i-1] {
+				t.Errorf("%s: %s comes after %s", path, keys[i], keys[i-1])
+			}
+		}
+	}
+}
+
+// unlikeEnglish says how got, a message of the language tag, takes other
+// arguments or cases than want, en.json's, as TestTranslationsMatchEnglish
+// checks them, or "" when it doesn't.
+func unlikeEnglish(tag string, want, got *i18n.Message) string {
+	if a, b := argList(want), argList(got); !slices.Equal(a, b) {
+		return fmt.Sprintf("has the arguments %v, en.json's %v", b, a)
+	}
+	var categories []string
+	for _, p := range i18n.PluralCategories(tag) {
+		categories = append(categories, p.String())
+	}
+	for _, a := range want.Args() {
+		switch a.Kind {
+		case "select":
+			if !sameSet(want.Cases(a.Name), got.Cases(a.Name)) {
+				return fmt.Sprintf("selects %s by %v, en.json's by %v", a.Name, got.Cases(a.Name), want.Cases(a.Name))
+			}
+		case "plural":
+			exactW, _ := splitCases(want.Cases(a.Name))
+			exactG, cats := splitCases(got.Cases(a.Name))
+			if !sameSet(exactW, exactG) || !sameSet(cats, categories) {
+				return fmt.Sprintf("counts %s by %v; %s has the cases %v, and en.json the exact ones %v", a.Name, got.Cases(a.Name), tag, categories, exactW)
+			}
+		}
+	}
+	return ""
 }

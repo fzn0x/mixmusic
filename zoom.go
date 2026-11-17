@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"runtime"
@@ -10,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/egoist/mygo"
+	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
@@ -54,7 +54,9 @@ func shownZoom(chosen, room float64) float64 {
 }
 
 // percent writes a zoom as a percentage, rounded down, as "139%".
-func percent(z float64) string { return fmt.Sprintf("%d%%", int(math.Floor(z*100+1e-6))) }
+func percent(z float64) string {
+	return i18n.FormatNumber(i18n.Locale(), math.Floor(z*100+1e-6)/100, i18n.NumberOptions{Percent: true})
+}
 
 // applyZoom zooms the main window by the zoom chosen, as far as it has
 // room for, and shows the toast of a change. It runs first in the frame,
@@ -166,22 +168,24 @@ func (s *shell) zoomKeys() string {
 		}
 	}
 	in, out, reset := keys["view.zoomIn"], keys["view.zoomOut"], keys["view.zoomReset"]
-	var parts []string
+	// A sentence for each of the shortcuts there are.
 	switch {
+	case in != "" && out != "" && reset != "":
+		return locales.MenuZoomKeysBothReset(in, out, reset)
 	case in != "" && out != "":
-		parts = append(parts, locales.MenuZoomKeysBoth(in, out))
+		return locales.MenuZoomKeysBoth(in, out)
+	case in != "" && reset != "":
+		return locales.MenuZoomKeysInReset(in, reset)
 	case in != "":
-		parts = append(parts, locales.MenuZoomKeysIn(in))
+		return locales.MenuZoomKeysIn(in)
+	case out != "" && reset != "":
+		return locales.MenuZoomKeysOutReset(out, reset)
 	case out != "":
-		parts = append(parts, locales.MenuZoomKeysOut(out))
+		return locales.MenuZoomKeysOut(out)
+	case reset != "":
+		return locales.MenuZoomKeysReset(reset)
 	}
-	if reset != "" {
-		parts = append(parts, locales.MenuZoomKeysReset(reset))
-	}
-	if len(parts) == 0 {
-		return ""
-	}
-	return strings.Join(parts, locales.MenuZoomKeysSep()) + locales.MenuZoomKeysEnd()
+	return ""
 }
 
 // wordJoiner joins the characters on either side of it into one word,
@@ -230,16 +234,33 @@ func (s *shell) zoomRow(c *ui.Context) {
 // and Force Reload, which do nothing in a window of native interface and
 // took ⌘R from Repeat and ⇧⌘R from Refresh this page. The items have no
 // keys of their own, so that the keys reach the window, where the user
-// may change them, as elsewhere: but Zoom In's ⌘+ (zoomInKey).
+// may change them, as elsewhere: but Zoom In's ⌘+ (zoomInKey). The menus
+// are made again in the new language as the Language setting, or the
+// computer's, changes (#775).
 func (s *shell) useMenuBar() {
 	if runtime.GOOS != "darwin" {
 		return
 	}
+	s.setMenuBar()
+	s.stop = append(s.stop, mygo.App.OnLocaleChanged(func(string) { s.update(s.setMenuBar) }))
+}
+
+// setMenuBar gives macOS's menu bar menuBar, in the app's language.
+func (s *shell) setMenuBar() {
+	mygo.App.SetMenu(mygo.NewMenu(s.menuBar()))
+	// The new Zoom In takes its key again.
+	s.zoomInAccelerator = ""
+	s.zoomInKey()
+}
+
+// menuBar is the items of macOS's menu bar, as useMenuBar says, labelled in
+// the app's language.
+func (s *shell) menuBar() []*mygo.MenuItem {
 	run := func(fn func()) func(*mygo.MenuItem, *mygo.Window) {
 		return func(*mygo.MenuItem, *mygo.Window) { s.update(fn) }
 	}
 	s.zoomIn = &mygo.MenuItem{Label: locales.MenuZoomIn(), Click: run(func() { s.zoomBy(1) })}
-	mygo.App.SetMenu(mygo.NewMenu([]*mygo.MenuItem{
+	return []*mygo.MenuItem{
 		{Role: mygo.RoleAppMenu},
 		{Role: mygo.RoleFileMenu},
 		{Role: mygo.RoleEditMenu},
@@ -254,8 +275,7 @@ func (s *shell) useMenuBar() {
 			{Role: mygo.RoleToggleFullScreen},
 		}},
 		s.windowMenu(),
-	}))
-	s.zoomInKey()
+	}
 }
 
 // plusKeys tells whether Zoom in has the keys of +, Mod+Shift+= (alsoKeys):

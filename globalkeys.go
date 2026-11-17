@@ -108,15 +108,15 @@ func (s *shell) globalShortcutRowOf(c *ui.Context, gc app.GlobalCommand, keys, p
 			}
 		})
 		ui.Row(c).Shrink(0).Gap(8).Children(func() {
-			label, ink, action := shortcutLabel(keys), k.muted, locales.ShortcutsChange()
+			label, ink, action, edit := shortcutLabel(keys), k.muted, locales.ShortcutsChange(), "change"
 			switch {
 			case recording:
-				label, ink, action = locales.GlobalKeysRecording(), k.accent, locales.ShortcutsCancel()
+				label, ink, action, edit = locales.GlobalKeysRecording(), k.accent, locales.ShortcutsCancel(), "cancel"
 			case label == "":
-				label, action = locales.ShortcutsNone(), locales.ShortcutsSet()
+				label, action, edit = locales.ShortcutsNone(), locales.ShortcutsSet(), "set"
 			}
 			ui.Text(c, label).FontSize(k.smallSize()).TextColor(ink).MinWidth(120).TextAlign(ui.End).AlignSelf(ui.Center)
-			b := s.button(c, "global-edit-"+gc.ID, action, false).Label(locales.GlobalKeysEditLabel(action, globalCommandTitle(gc)))
+			b := s.button(c, "global-edit-"+gc.ID, action, false).Label(locales.GlobalKeysEditLabel(edit, globalCommandTitle(gc)))
 			if recording {
 				// The keys pressed name the shortcut, until the button
 				// loses the focus, as the window does.

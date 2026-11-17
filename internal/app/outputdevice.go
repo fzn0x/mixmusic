@@ -13,6 +13,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/audio/output"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // OutputDevice is an audio output device of this computer.
@@ -39,7 +40,7 @@ type outputState struct {
 
 // errNoOutputs is why no output device can be listed: the system has no
 // audio output MixMusic can play on.
-var errNoOutputs = errors.New("MixMusic can't play sound on this system")
+func errNoOutputs() error { return errors.New(locales.OutputNoOutputs()) }
 
 // OutputDevices lists this computer's audio output devices, sorted by
 // name, the default one marked.
@@ -57,7 +58,7 @@ func systemOutputs() ([]OutputDevice, error) {
 	case errors.Is(err, output.ErrNoDevice):
 		return nil, nil
 	case errors.Is(err, output.ErrUnsupported):
-		return nil, errNoOutputs
+		return nil, errNoOutputs()
 	case err != nil:
 		return nil, err
 	}
@@ -145,11 +146,13 @@ func (a *App) outputMoved(chosen settings.OutputDevice, fallback bool) {
 // outputNote tells the user that the device of the name went away, and the
 // system's default device plays, or that it plays again.
 func outputNote(name string, fallback bool) string {
-	if name == "" {
-		name = "The output device chosen"
+	switch {
+	case fallback && name == "":
+		return locales.OutputGoneUnnamed()
+	case fallback:
+		return locales.OutputGone(name)
+	case name == "":
+		return locales.OutputBackUnnamed()
 	}
-	if fallback {
-		return name + " isn't available: playing on the system's default device until it's back"
-	}
-	return "Playing on " + name + " again"
+	return locales.OutputBack(name)
 }

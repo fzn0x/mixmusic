@@ -8,7 +8,6 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"net"
 	"slices"
@@ -20,6 +19,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/cast"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // These times are casting's; tests shorten them.
@@ -256,13 +256,13 @@ func (a *App) castTo(ctx context.Context, id string) error {
 	switch {
 	case !ok:
 		c.mu.Unlock()
-		return errors.New("That cast device is no longer on the network")
+		return errors.New(locales.CastDeviceGone())
 	case c.active != nil && c.active.device.ID == id:
 		c.mu.Unlock()
 		return nil
 	case c.starting != nil:
 		c.mu.Unlock()
-		return errors.New("MixMusic is connecting to a cast device already")
+		return errors.New(locales.CastAlreadyConnecting())
 	}
 	d := castDeviceOf(f.device)
 	c.starting = &d
@@ -292,14 +292,14 @@ func (a *App) castTo(ctx context.Context, id string) error {
 		log.Printf("mixmusic: connecting to a cast device: %v", err)
 		var ne net.Error
 		if errors.As(err, &ne) || errors.Is(err, context.DeadlineExceeded) {
-			return fmt.Errorf("Couldn't connect to %s: check that it's on, on this computer's network", d.Name)
+			return errors.New(locales.CastCouldntConnect(d.Name))
 		}
-		return fmt.Errorf("Couldn't cast to %s: %v", d.Name, err)
+		return errors.New(locales.CastCouldntCast(d.Name, err.Error()))
 	}
 	server, err := serveToCast(localIP(session.LocalAddr()), session.RemoteIP(), a.proxy)
 	if err != nil {
 		session.Close(true)
-		return fmt.Errorf("Couldn't serve %s the audio: %v", d.Name, err)
+		return errors.New(locales.CastCouldntServe(d.Name, err.Error()))
 	}
 	out.served, out.fetched, out.contentType, out.native = server.url, server.fetched.Load, a.castContentType, a.setNative
 	out.start(session)
@@ -360,15 +360,15 @@ func (a *App) castEnded(out *castOut, err error) {
 		gp.SetOutput(player.Output{Paused: true})
 	}
 	cur.end(false)
-	why := "the connection was lost"
+	note := locales.CastStoppedLost(cur.device.Name)
 	switch {
 	case errors.Is(err, cast.ErrStopped):
-		why = "it stopped playing from MixMusic"
+		note = locales.CastStoppedElsewhere(cur.device.Name)
 	case err != nil && strings.HasSuffix(err.Error(), "plays on the cast device now"):
-		why = err.Error()
+		note = locales.CastStoppedTaken(cur.device.Name, err.Error())
 	}
 	log.Printf("mixmusic: casting stopped: %v", err)
-	a.notifyCast(fmt.Sprintf("Casting to %s stopped: %s", cur.device.Name, why))
+	a.notifyCast(note)
 }
 
 // quitCasting stops the cast device's receiver as MixMusic quits: it could

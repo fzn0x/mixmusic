@@ -11,13 +11,13 @@ package player
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/audio"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Surrounds are what the player asks of the app of the 5.1 surround audio
@@ -179,5 +179,5 @@ func (p *Player) stereoFor(why string) {
 	cur, _ := p.s.Current()
 	p.tried("its 5.1 surround audio", why)
 	p.stereoOnly = true
-	p.notify(Notice{Message: fmt.Sprintf("The 5.1 surround audio of %s couldn't play (%s), so it plays in stereo", cur.Track.Title, strings.TrimSuffix(why, "."))})
+	p.notify(Notice{Message: locales.PlayerSurroundStereo(cur.Track.Title, strings.TrimSuffix(why, "."))})
 }

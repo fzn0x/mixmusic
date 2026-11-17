@@ -19,6 +19,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/store"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // LocalFiles is the music on the user's computer, as the windows show it:
@@ -180,8 +181,8 @@ func (a *App) coverBytes(ctx context.Context, rawURL string) ([]byte, error) {
 
 // ChooseFolder asks for a folder of music to add to the library.
 func (l *LocalFiles) ChooseFolder(parent *mygo.Window) (string, error) {
-	paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: "Add a folder of music",
-		Directory: true, ButtonLabel: "Add"})
+	paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: locales.LocalFolderDialog(),
+		Directory: true, ButtonLabel: locales.LocalFolderDialogAdd()})
 	if err != nil || len(paths) == 0 {
 		return "", err
 	}
@@ -191,8 +192,8 @@ func (l *LocalFiles) ChooseFolder(parent *mygo.Window) (string, error) {
 // ChooseFiles asks for music files to play.
 func (l *LocalFiles) ChooseFiles(parent *mygo.Window) ([]string, error) {
 	exts := []string{"mp3", "flac", "ogg", "oga", "opus", "m4a", "mp4", "wav", "wave"}
-	return mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: "Open music files", Multiple: true,
-		Filters: []mygo.FileFilter{{Name: "Music", Extensions: exts}}})
+	return mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: locales.LocalFilesDialog(), Multiple: true,
+		Filters: []mygo.FileFilter{{Name: locales.LocalFilesDialogFilter(), Extensions: exts}}})
 }
 
 // maxOpened bounds the files opened at once, of folders dropped whole.

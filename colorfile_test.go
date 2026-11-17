@@ -412,11 +412,11 @@ func TestColorFileNote(t *testing.T) {
 	now := time.Date(2026, 11, 2, 14, 30, 0, 0, time.Local)
 	set := settings.Settings{Appearance: settings.Appearance{ColorSource: settings.ColorsPywal}}
 	read := app.ColorFileStatus{Source: settings.ColorsPywal, Path: "/x", Colors: testColors(t, "pywal-3.8.json"), ReadAt: now.Add(-time.Hour)}
-	if got, bad := colorFileNote(read, set, now); got != "Read at 13:30, and followed as it changes." || bad {
+	if got, bad := colorFileNote(read, set, now); got != "Read at 1:30 PM, and followed as it changes." || bad {
 		t.Errorf("%q, %v", got, bad)
 	}
 	read.ReadAt, read.Err = now.AddDate(0, 0, -1), "it's empty"
-	if got, bad := colorFileNote(read, set, now); got != "It can't be read: it's empty. MixMusic keeps the colours it read at 1 Nov 14:30." || !bad {
+	if got, bad := colorFileNote(read, set, now); got != "It can't be read: it's empty. MixMusic keeps the colours it read at Nov 1, 2:30 PM." || !bad {
 		t.Errorf("%q, %v", got, bad)
 	}
 	if got, _ := colorFileNote(app.ColorFileStatus{Source: settings.ColorsMatugen}, set, now); got != "Reading it…" {

@@ -62,7 +62,7 @@ func pairedAbout(p app.PairedComputer) string {
 		about = locales.RemoteControlled()
 	}
 	if !p.Paired.IsZero() {
-		about = locales.RemotePaired(about, p.Paired.Local().Format("2 January 2006"))
+		about = locales.RemotePaired(about, p.Paired.Local())
 	}
 	return about
 }

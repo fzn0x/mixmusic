@@ -33,9 +33,9 @@ func (s *shell) desktopSettings(c *ui.Context) {
 		toggle("discord", locales.DesktopSettingsDiscordTitle(), locales.DesktopSettingsDiscordAbout(), &s.set.DiscordPresence)
 		if s.set.DiscordPresence {
 			describe := func() {
-				ui.Text(c, locales.DesktopSettingsDiscordBefore())
-				s.linkOf(c, locales.DesktopSettingsDiscordPortal(), "https://discord.com/developers/applications")
-				ui.Text(c, locales.DesktopSettingsDiscordAfter())
+				inlineMessage(c, locales.DesktopSettingsDiscordAppIDAbout(mark(0, locales.DesktopSettingsDiscordPortal())), func(text string) {
+					s.linkOf(c, text, "https://discord.com/developers/applications")
+				})
 			}
 			s.rowWith(c, locales.DesktopSettingsDiscordAppID(), describe, func() {
 				in, _ := s.settingInput(c, "discord-app", s.set.DiscordAppID, func(id string) {
@@ -43,7 +43,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 					s.save()
 				})
 				in.Placeholder(locales.DesktopSettingsDiscordPlaceholder()).Width(260).Label(locales.DesktopSettingsDiscordAppID())
-			}, "Discord shows the name of MixMusic's application. To show another, create one in the developer portal and paste its application ID.")
+			}, locales.DesktopSettingsDiscordAppIDAbout(locales.DesktopSettingsDiscordPortal()))
 		}
 		s.settingsOf(c, desktopRows)
 		s.row(c, locales.DesktopSettingsLogin(), "", func() {
@@ -127,15 +127,15 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 					keys = []string{shortcutWords(current)}
 				}
 				s.row(c, cmd.title, "", func() {
-					label, ink, action := shortcutLabel(current), k.muted, locales.ShortcutsChange()
+					label, ink, action, edit := shortcutLabel(current), k.muted, locales.ShortcutsChange(), "change"
 					switch {
 					case recording:
-						label, ink, action = locales.ShortcutsRecording(), k.accent, locales.ShortcutsCancel()
+						label, ink, action, edit = locales.ShortcutsRecording(), k.accent, locales.ShortcutsCancel(), "cancel"
 					case label == "":
-						label, action = locales.ShortcutsNone(), locales.ShortcutsSet()
+						label, action, edit = locales.ShortcutsNone(), locales.ShortcutsSet(), "set"
 					}
 					ui.Text(c, label).FontSize(k.smallSize()).TextColor(ink).MinWidth(120).TextAlign(ui.End).AlignSelf(ui.Center)
-					b := s.button(c, "shortcut-edit-"+cmd.id, action, false).Label(locales.ShortcutsEditLabel(action, cmd.title))
+					b := s.button(c, "shortcut-edit-"+cmd.id, action, false).Label(locales.ShortcutsEditLabel(edit, cmd.title))
 					if recording {
 						// The keys pressed name the shortcut rather than run
 						// commands, until the button loses the focus.
@@ -221,7 +221,7 @@ func (s *shell) updateSettings(c *ui.Context) {
 		asks := newVersionDoes(u)
 		last := ""
 		if t, err := time.Parse(time.RFC3339, u.LastCheck); err == nil {
-			last = locales.UpdatesLastChecked(t.Local().Format("2 Jan 2006, 15:04"))
+			last = locales.UpdatesLastChecked(t.Local())
 		}
 		checks, downloads := u.AutomaticChecks, u.AutomaticChecks && u.AutomaticDownloads
 		set := func(checks, downloads bool) {
@@ -319,16 +319,14 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 	case r.err != nil:
 		s.row(c, locales.UpdatesCouldntLook(), r.err.Error(), again, words)
 	case rel.Newer:
-		var date string
-		if t, err := time.Parse(time.RFC3339, rel.Date); err == nil {
-			date = t.Local().Format("2 Jan 2006")
-		}
+		date, err := time.Parse(time.RFC3339, rel.Date)
+		dated := err == nil
 		var describe string
 		switch {
-		case date != "" && !u.Enabled:
-			describe = locales.UpdatesOutSinceHow(date, replacing(u.Kind, rel.File))
-		case date != "":
-			describe = locales.UpdatesOutSince(date)
+		case dated && !u.Enabled:
+			describe = locales.UpdatesOutSinceHow(date.Local(), replacing(u.Kind, rel.File))
+		case dated:
+			describe = locales.UpdatesOutSince(date.Local())
 		case !u.Enabled:
 			describe = replacing(u.Kind, rel.File)
 		}

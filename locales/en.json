@@ -63,6 +63,9 @@
     }
   },
   "accountSettingsLastfmForm": "Create an API account on Last.fm; any name and description will do, and the callback URL can stay empty. Paste its API key and shared secret here, and connect. Approve MixMusic on the page that opens in your browser. Connect to Last.fm. Scrobble, scrobbling. Sign in, log in. MixMusic keeps them in your system's credential store, with the connection.",
+  "@accountSettingsLastfmForm": {
+    "description": "Never shown: what Settings' search finds the Last.fm form by, its steps and labels, then words people search for, as \"Scrobble, scrobbling. Sign in, log in.\". Translate it, and give the words and synonyms people search for in your language."
+  },
   "accountSettingsLastfmGone": "Last.fm no longer accepts this connection",
   "accountSettingsLastfmHint": "MixMusic keeps them in your system's credential store, with the connection.",
   "accountSettingsLastfmLoves": "Send likes as loves",
@@ -91,8 +94,16 @@
       }
     }
   },
-  "accountSettingsLastfmStep1A": "Create an API account on ",
-  "accountSettingsLastfmStep1B": "; any name and description will do, and the callback URL can stay empty.",
+  "accountSettingsLastfmStep1": "Create an API account on {link}; any name and description will do, and the callback URL can stay empty.",
+  "@accountSettingsLastfmStep1": {
+    "description": "The first step of connecting to Last.fm. {link} is Last.fm's name, a link to its page that makes an API account.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Last.fm"
+      }
+    }
+  },
   "accountSettingsLastfmStep2": "Paste its API key and shared secret here, and connect.",
   "accountSettingsLastfmStep3": "Approve MixMusic on the page that opens in your browser.",
   "accountSettingsLastfmWaiting": "{count, plural, one {# scrobble waits} other {# scrobbles wait}} to be sent.",
@@ -129,15 +140,39 @@
   "accountSettingsSpotifyDashboard": "Spotify developer dashboard",
   "accountSettingsSpotifyDesc": "Search, your library and playback of Spotify.",
   "accountSettingsSpotifyForm": "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium. Add this redirect URI to it. In its settings, under Users Management, add your name and the email of the Spotify account you sign in with. Paste the app's Client ID here, and sign in to Spotify. Log in. Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
+  "@accountSettingsSpotifyForm": {
+    "description": "Never shown: what Settings' search finds the Spotify sign-in form by, its steps and labels, then words people search for, as \"Sign in, log in.\". Translate it, and give the words and synonyms people search for in your language."
+  },
   "accountSettingsSpotifyHint": "Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
   "accountSettingsSpotifyPaste": "Paste the app's Client ID here, and sign in.",
-  "accountSettingsSpotifyRedirect": "Add this redirect URI to it: ",
+  "accountSettingsSpotifyRedirect": "Add this redirect URI to it: {uri} {copy}",
+  "@accountSettingsSpotifyRedirect": {
+    "description": "The second step of signing in to Spotify. {uri} is the address, in a monospace face, and {copy} accountSettingsCopy, a link that copies it.",
+    "placeholders": {
+      "uri": {
+        "type": "String",
+        "example": "http://127.0.0.1:43821/callback"
+      },
+      "copy": {
+        "type": "String",
+        "example": "copy"
+      }
+    }
+  },
   "accountSettingsSpotifyRefused": "Spotify refused the sign-in",
   "accountSettingsSpotifySignIn": "Sign in to Spotify",
   "accountSettingsSpotifySignOutBody": "MixMusic forgets your Spotify sign-in.",
   "accountSettingsSpotifySignOutTitle": "sign out of Spotify",
-  "accountSettingsSpotifyStep1": "Create an app in the ",
-  "accountSettingsSpotifyStep1Tail": ", with the Web API, signed in with a Spotify account that has Premium.",
+  "accountSettingsSpotifyStep1": "Create an app in the {link}, with the Web API, signed in with a Spotify account that has Premium.",
+  "@accountSettingsSpotifyStep1": {
+    "description": "The first step of signing in to Spotify. {link} is accountSettingsSpotifyDashboard, a link to Spotify's page.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Spotify developer dashboard"
+      }
+    }
+  },
   "accountSettingsSpotifyUsers": "In its settings, under Users Management, add your name and the email of the Spotify account you sign in with.",
   "accountSettingsWaitingBrowser": "waiting for the browser…",
   "accountSettingsWaitingLastfm": "waiting for Last.fm…",
@@ -178,10 +213,16 @@
   "accountSettingsYouTubeChannelAbout": "Brand channels of your account have their own home feed, library and likes.",
   "accountSettingsYouTubeChannelTitle": "Channel",
   "accountSettingsYouTubeCookieForm": "Import from a browser. Sign in with the session of a browser you signed in to YouTube Music with. Browser. Profile. Another profile than the browser's own, by its name or its folder. MixMusic finds those of Zen, Helium and the browsers installed as Flatpaks in their folders. Import. MixMusic reads the browser's cookies with yt-dlp, keeps YouTube's alone, encrypted on this computer, and deletes the rest at once. Close the browser first: while it's open, it may hold its cookies, or not have saved a new sign-in yet. Recent Chrome on Windows seals its cookies against other programs: use Firefox there, or paste a cookie header. Paste a cookie header. In a tab signed in to music.youtube.com, open the developer tools, and copy the Cookie header of a request to music.youtube.com from the Network panel. The text of a cookies.txt file will do too. Sign in with it. Log in. A cookie header is as good as your password: paste it here alone. YouTube may end a session that goes on in the browser; one from a private window you then close lasts longest.",
+  "@accountSettingsYouTubeCookieForm": {
+    "description": "Never shown: what Settings' search finds the form that imports a browser's YouTube Music session by, its steps and labels, then words people search for. Translate it, and give the words and synonyms people search for in your language."
+  },
   "accountSettingsYouTubeCookieLabel": "Cookie header",
   "accountSettingsYouTubeCookieTitle": "Sign in to YouTube Music with a browser's cookies",
   "accountSettingsYouTubeDidntSignIn": "MixMusic didn't sign in to YouTube Music",
   "accountSettingsYouTubeForm": "Sign in to YouTube Music. Log in. Google account. YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out, unless Play audio as your account is on: then yt-dlp asks as your account first. You sign in on Google's own page, in a window of MixMusic: MixMusic never sees your password, and keeps the session encrypted on this computer. YouTube Music does not offer this to apps officially, so it may stop working when YouTube changes.",
+  "@accountSettingsYouTubeForm": {
+    "description": "Never shown: what Settings' search finds the YouTube Music sign-in by, its steps and labels, then words people search for, as \"Log in. Google account.\". Translate it, and give the words and synonyms people search for in your language."
+  },
   "accountSettingsYouTubeHint": "YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out, unless Play audio as your account is on: then yt-dlp asks as your account first.",
   "accountSettingsYouTubeHistoryDesc": "YouTube Music makes its home and its radios of your history. Tracks join it once they played a while, as they do on Last.fm, and episodes keep where you left them, for YouTube Music to go on from there on your other devices.",
   "accountSettingsYouTubeHistoryLabel": "Add what you play to your YouTube Music history",
@@ -442,11 +483,88 @@
       }
     }
   },
+  "castAlreadyConnecting": "MixMusic is connecting to a cast device already",
+  "@castAlreadyConnecting": {
+    "description": "A notice, as casting starts while another starts."
+  },
   "castConnecting": "connecting…",
+  "castCouldntCast": "Couldn't cast to {device}: {error}",
+  "@castCouldntCast": {
+    "description": "A notice, as casting to a device starts. {error} says why, as the device or the system says it.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "castCouldntConnect": "Couldn't connect to {device}: check that it's on, on this computer's network",
+  "@castCouldntConnect": {
+    "description": "A notice, as casting to a device starts.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      }
+    }
+  },
+  "castCouldntServe": "Couldn't serve {device} the audio: {error}",
+  "@castCouldntServe": {
+    "description": "A notice, as casting to a device starts. {error} says why, as the system says it.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "castDeviceGone": "That cast device is no longer on the network",
+  "@castDeviceGone": {
+    "description": "A notice, as casting to a device that went starts."
+  },
   "castPlayingOn": "Playing on {name}",
   "@castPlayingOn": {
     "placeholders": {
       "name": {
+        "type": "String"
+      }
+    }
+  },
+  "castStoppedElsewhere": "Casting to {device} stopped: it stopped playing from MixMusic",
+  "@castStoppedElsewhere": {
+    "description": "A notice, as the device plays something else, or stops, by itself or from another app.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      }
+    }
+  },
+  "castStoppedLost": "Casting to {device} stopped: the connection was lost",
+  "@castStoppedLost": {
+    "description": "A notice.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      }
+    }
+  },
+  "castStoppedTaken": "Casting to {device} stopped: {why}",
+  "@castStoppedTaken": {
+    "description": "A notice, as another app took the device. {why} says which, as the device says it.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      },
+      "why": {
         "type": "String"
       }
     }
@@ -1099,7 +1217,7 @@
         "type": "int"
       },
       "skipped": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
@@ -1234,9 +1352,17 @@
   },
   "crossfadeTitle": "Crossfade",
   "desktopSettingsDiscordAbout": "While Discord runs, your profile says what you listen to: you choose its lines, cover, time and button.",
-  "desktopSettingsDiscordAfter": " and paste its application ID.",
   "desktopSettingsDiscordAppID": "Discord application ID",
-  "desktopSettingsDiscordBefore": "Discord shows the name of MixMusic's application. To show another, create one in the ",
+  "desktopSettingsDiscordAppIDAbout": "Discord shows the name of MixMusic's application. To show another, create one in the {link} and paste its application ID.",
+  "@desktopSettingsDiscordAppIDAbout": {
+    "description": "Under Settings › Desktop › Discord's application ID. {link} is desktopSettingsDiscordPortal, a link to Discord's page.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "developer portal"
+      }
+    }
+  },
   "desktopSettingsDiscordPlaceholder": "MixMusic's",
   "desktopSettingsDiscordPortal": "developer portal",
   "desktopSettingsDiscordTitle": "Show what plays on Discord",
@@ -1267,6 +1393,14 @@
       }
     }
   },
+  "discordBadgeFile": "A file on my computer",
+  "@discordBadgeFile": {
+    "description": "What the small mark on the cover of the Discord status says as it is hovered, for a file on the listener's computer. Others read it on the listener's profile."
+  },
+  "discordBadgePaused": "Paused",
+  "@discordBadgePaused": {
+    "description": "What the small mark on the cover of the Discord status says as it is hovered, while the track is paused."
+  },
   "discordCover": "Cover",
   "discordCoverDescription": "Discord shows the cover of what plays, where its service has one online: a file on your computer shows none.",
   "discordCoverLabel": "Show the cover on Discord",
@@ -1295,6 +1429,16 @@
   "discordListenButton": "Listen button",
   "discordListenButtonDescription": "A button that opens the track on YouTube Music or Spotify, which the others who see your profile can click. A file on your computer has none.",
   "discordListenButtonLabel": "Show a Listen button on Discord",
+  "discordListenOn": "Listen on {service}",
+  "@discordListenOn": {
+    "description": "The button of the Discord status that opens the track on its service, which others click on the listener's profile. Discord cuts it after 32 characters.",
+    "placeholders": {
+      "service": {
+        "type": "String",
+        "example": "YouTube Music"
+      }
+    }
+  },
   "discordListeningTo": "Listening to {name}",
   "@discordListeningTo": {
     "placeholders": {
@@ -1303,9 +1447,21 @@
       }
     }
   },
+  "discordMyComputer": "my computer",
+  "@discordMyComputer": {
+    "description": "The service of a file on the listener's computer, as {service} of a line of the Discord status says it, as in \"on my computer\". Others read it on the listener's profile."
+  },
   "discordNothingPlays": "Nothing plays: this is how a song would show.",
-  "discordPlaceholdersEmpty": ". Empty, the line shows nothing.",
-  "discordPlaceholdersLabel": "Placeholders: ",
+  "discordPlaceholdersLabel": "Placeholders: {placeholders}. Empty, the line shows nothing.",
+  "@discordPlaceholdersLabel": {
+    "description": "Under a line of the Discord status. {placeholders} lists the placeholders the line may hold, as they are typed.",
+    "placeholders": {
+      "placeholders": {
+        "type": "String",
+        "example": "{title}, {artist}, {album}"
+      }
+    }
+  },
   "discordPreview": "Preview",
   "discordPreviewCardLabel": "Preview of the Discord status",
   "discordPreviewPausedNote": "While paused, your profile shows nothing: this shows once the track plays again.",
@@ -1333,9 +1489,17 @@
   },
   "discordYourApplication": "your application",
   "dislikeNote": "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic.",
-  "dislikeNoteSee": "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic. See the songs you dislike.",
+  "dislikeNoteSee": "Signed in to YouTube Music, your dislikes of its songs go there too. Spotify takes no dislikes from apps: those of its tracks stay in MixMusic. {link}.",
+  "@dislikeNoteSee": {
+    "description": "Under Skip songs you dislike, once there are some. {link} is dislikeSee, a link to the list of them.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "See the songs you dislike"
+      }
+    }
+  },
   "dislikeSee": "See the songs you dislike",
-  "dislikeSeeEnd": ".",
   "dislikeSkip": "Skip songs you dislike",
   "dislikeSkipDesc": "Songs you dislike don't play when the queue moves on, and radios leave them out.",
   "downloadAddedAbout": "When a playlist, an album, a mix or the liked songs you downloaded gain songs, they download too as you open its page. Over a hundred at once, or a gigabyte, wait for you to ask. Off: its page offers them.",
@@ -1521,6 +1685,10 @@
   "@downloadsEmptyTitle": {
     "description": "Empty state of the downloads. Lowercase when shown as a word."
   },
+  "downloadsFolderDialog": "Choose where MixMusic keeps downloads",
+  "@downloadsFolderDialog": {
+    "description": "The title of the dialog that chooses the downloads' folder."
+  },
   "downloadsFolderLine": "{count, plural, one {# track} other {# tracks}} · {size} · in {folder}",
   "@downloadsFolderLine": {
     "description": "The downloads' size and folder.",
@@ -1535,6 +1703,10 @@
         "type": "String"
       }
     }
+  },
+  "downloadsLikedSongs": "Liked songs",
+  "@downloadsLikedSongs": {
+    "description": "The title of the download of the liked songs, on the downloads page and in its notices."
   },
   "downloadsMarkDone": "Downloaded",
   "@downloadsMarkDone": {
@@ -1879,10 +2051,17 @@
   "equalizerPresetRock": "Rock",
   "equalizerPresetTreble": "Treble boost",
   "equalizerPresetVocal": "Vocal",
-  "equalizerSpotifyLead": "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: ",
-  "equalizerSpotifyNote": "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: Spotify notes that its audio settings can't change while another device plays it.",
+  "equalizerSpotifyNote": "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: {link} that its audio settings can't change while another device plays it.",
+  "@equalizerSpotifyNote": {
+    "description": "Under the equalizer. {link} is equalizerSpotifyNotes, a link to Spotify's page that says so.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Spotify notes"
+      }
+    }
+  },
   "equalizerSpotifyNotes": "Spotify notes",
-  "equalizerSpotifyTail": " that its audio settings can't change while another device plays it.",
   "equalizerTitle": "Equalizer",
   "explicitHideDesc": "Songs, albums and videos marked explicit don't show in the search, on Home, on artists' pages or in radios, and never play. Your playlists, liked songs, library and queue list them dimmed.",
   "explicitHideTitle": "Hide explicit content",
@@ -1969,6 +2148,10 @@
         "type": "String"
       }
     }
+  },
+  "exportFolderDialog": "Choose where to export the tracks",
+  "@exportFolderDialog": {
+    "description": "The title of the dialog that chooses the folder tracks are exported to."
   },
   "exportMenu": "Export…",
   "exportOnlyDownloaded": "Only tracks downloaded or on this computer export",
@@ -2128,14 +2311,12 @@
   "fontNoticeMaterial": "Roboto Flex, the Material themes' face",
   "fontNoticeMochi": "Quicksand, Mochi's face",
   "fontNoticeWalnut": "Archivo, the Walnut themes' headings' face",
-  "formatDayMonth": "{day} {month}",
+  "formatDayMonth": "{date, date, ::MMMd}",
   "@formatDayMonth": {
+    "description": "A day of Stats' chart, under its column: its month and day, in the language's order.",
     "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "month": {
-        "type": "String"
+      "date": {
+        "type": "DateTime"
       }
     }
   },
@@ -2143,10 +2324,12 @@
   "@formatHourMinutes": {
     "placeholders": {
       "hours": {
-        "type": "String"
+        "type": "int",
+        "example": "8"
       },
       "minutes": {
-        "type": "String"
+        "type": "int",
+        "example": "5"
       }
     }
   },
@@ -2154,7 +2337,8 @@
   "@formatMinutes": {
     "placeholders": {
       "count": {
-        "type": "String"
+        "type": "int",
+        "example": "42"
       }
     }
   },
@@ -2184,17 +2368,12 @@
       }
     }
   },
-  "formatWeekdayDayMonth": "{weekday} {day} {month}",
+  "formatWeekdayDayMonth": "{date, date, ::MMMEd}",
   "@formatWeekdayDayMonth": {
+    "description": "A day of Stats' table and of the chart's tip: its weekday, month and day, in the language's order.",
     "placeholders": {
-      "weekday": {
-        "type": "String"
-      },
-      "day": {
-        "type": "String"
-      },
-      "month": {
-        "type": "String"
+      "date": {
+        "type": "DateTime"
       }
     }
   },
@@ -2206,8 +2385,9 @@
       }
     }
   },
-  "globalKeysEditLabel": "{action} the global shortcut of {title}",
+  "globalKeysEditLabel": "{action, select, set {set the global shortcut of {title}} cancel {cancel the global shortcut of {title}} other {change the global shortcut of {title}}}",
   "@globalKeysEditLabel": {
+    "description": "What screen readers say of the button beside a command in Settings › Shortcuts › From any app. {action} is set while the command has no shortcut, cancel while its new keys are being pressed, and change otherwise; {title} is the command, as Play or pause.",
     "placeholders": {
       "action": {
         "type": "String"
@@ -2229,6 +2409,42 @@
         "type": "String"
       }
     }
+  },
+  "globalKeysProblemCantBe": "These keys can't be a global shortcut",
+  "@globalKeysProblemCantBe": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, as its keys are typed."
+  },
+  "globalKeysProblemDesktopEntry": "Global shortcuts need MixMusic installed with its desktop entry",
+  "@globalKeysProblemDesktopEntry": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, why it does nothing, on Linux."
+  },
+  "globalKeysProblemF12": "Windows keeps F12 for itself",
+  "@globalKeysProblemF12": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, as F12 alone is typed for it."
+  },
+  "globalKeysProblemInUse": "These keys are already in use: pick others, or try again once they're free",
+  "@globalKeysProblemInUse": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app: the system refused its keys."
+  },
+  "globalKeysProblemNeedsMac": "A global shortcut needs ⌘ or ⌃",
+  "@globalKeysProblemNeedsMac": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, on macOS."
+  },
+  "globalKeysProblemNeedsSuper": "A global shortcut needs Ctrl, Alt or Super",
+  "@globalKeysProblemNeedsSuper": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, on Linux."
+  },
+  "globalKeysProblemNeedsWindows": "A global shortcut needs Ctrl, Alt or the Windows key",
+  "@globalKeysProblemNeedsWindows": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, on Windows."
+  },
+  "globalKeysProblemNoPortal": "Your desktop doesn't offer global shortcuts",
+  "@globalKeysProblemNoPortal": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, why it does nothing: the desktop, on Linux, has no way for apps to have them."
+  },
+  "globalKeysProblemTaken": "Another command has these keys",
+  "@globalKeysProblemTaken": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, why it does nothing."
   },
   "globalKeysRecording": "press the keys · esc cancels · backspace removes",
   "globalKeysRemoveLabel": "remove the global shortcut of {title}",
@@ -2391,6 +2607,14 @@
     }
   },
   "homeSearchMusic": "Search for music",
+  "homeShelfRecent": "Recently played",
+  "@homeShelfRecent": {
+    "description": "The title of Home's own shelf of the tracks played last."
+  },
+  "homeShelfYourMixes": "Your mixes",
+  "@homeShelfYourMixes": {
+    "description": "The title of Home's own shelf of the mixes the user made in MixMusic."
+  },
   "homeSpotifyEmpty": "Sign in to Spotify in Settings › Accounts to see your playlists and recent tracks here.",
   "homeStartCaption": "Search for something to play",
   "homeStartHere": "Start here",
@@ -2510,10 +2734,10 @@
     "description": "Button that loads more of the liked songs. Lowercase.",
     "placeholders": {
       "loaded": {
-        "type": "String"
+        "type": "int"
       },
       "total": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
@@ -2712,6 +2936,9 @@
     }
   },
   "listenBrainzSettingsForm": "Copy your user token from your ListenBrainz settings, or your own server's. Paste it here, and connect. User token. Server. Leave it empty for ListenBrainz itself. A ListenBrainz of your own takes its address, and Maloja its address followed by /apis/listenbrainz. Connect to ListenBrainz. Scrobble, scrobbling, listens. Self-hosted, Maloja. Sign in, log in. MixMusic keeps your token in your system's credential store, with the connection.",
+  "@listenBrainzSettingsForm": {
+    "description": "Never shown: what Settings' search finds the ListenBrainz form by, its steps and labels, then words people search for. Translate it, and give the words and synonyms people search for in your language."
+  },
   "listenBrainzSettingsHint": "MixMusic keeps your token in your system's credential store, with the connection.",
   "listenBrainzSettingsLoves": "A like loves the song on ListenBrainz, and an unlike takes the love back.",
   "listenBrainzSettingsLovesSwitch": "Send likes to ListenBrainz as loves",
@@ -2753,13 +2980,45 @@
   "listenBrainzSettingsSendThem": "send them",
   "listenBrainzSettingsServer": "Leave it empty for ListenBrainz itself. A ListenBrainz of your own takes its address, and Maloja its address followed by /apis/listenbrainz.",
   "listenBrainzSettingsServerLabel": "Server",
-  "listenBrainzSettingsStep1": "Copy your user token from ",
-  "listenBrainzSettingsStep1Tail": ", or your own server's.",
+  "listenBrainzSettingsStep1": "Copy your user token from {link}, or your own server's.",
+  "@listenBrainzSettingsStep1": {
+    "description": "The first step of connecting to ListenBrainz. {link} is listenBrainzSettingsTokenLink, a link to the page of the token.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "your ListenBrainz settings"
+      }
+    }
+  },
   "listenBrainzSettingsStep2": "Paste it here, and connect.",
   "listenBrainzSettingsTokenLink": "your ListenBrainz settings",
   "listenBrainzSettingsTokenPlaceholder": "36 letters, digits and dashes",
   "listenBrainzSettingsUserToken": "User token",
   "listenBrainzSettingsYourServer": "Your server",
+  "localAlbumGone": "this album is no longer on this computer",
+  "@localAlbumGone": {
+    "description": "Why an album of the music on this computer doesn't open: its files went. Shown as a sentence, its first letter capitalized."
+  },
+  "localArtistGone": "this artist's music is no longer on this computer",
+  "@localArtistGone": {
+    "description": "Why an artist of the music on this computer doesn't open: their files went. Shown as a sentence, its first letter capitalized."
+  },
+  "localFilesDialog": "Open music files",
+  "@localFilesDialog": {
+    "description": "The title of the dialog that opens music files on this computer, to play them."
+  },
+  "localFilesDialogFilter": "Music",
+  "@localFilesDialogFilter": {
+    "description": "The name of the dialog's filter of music files, as \"Music (*.mp3, *.flac…)\"."
+  },
+  "localFolderDialog": "Add a folder of music",
+  "@localFolderDialog": {
+    "description": "The title of the dialog that adds a folder of music on this computer to the library."
+  },
+  "localFolderDialogAdd": "Add",
+  "@localFolderDialogAdd": {
+    "description": "The button of the dialog of localFolderDialog."
+  },
   "localTagsAboutAlbum": "What the {count, plural, one {# song} other {# songs}} of {name} share, which MixMusic writes into their files.",
   "@localTagsAboutAlbum": {
     "placeholders": {
@@ -3006,27 +3265,37 @@
   },
   "lyricStyleSettingsStageDesc": "Cover the window with the lyrics of what plays, over its blurred cover.",
   "lyricStyleSettingsStageShow": "show",
+  "lyricsCantLoad": "Lyrics can't be loaded right now. Check your connection, or try again in a moment.",
+  "@lyricsCantLoad": {
+    "description": "In the lyrics' place, where the sources can't be reached."
+  },
   "lyricsCaptionLanguage": "Caption language",
   "lyricsCaptionLanguageDescription": "Lyrics from YouTube captions come in this language when the video has captions in it, and in the video's own else.",
   "lyricsCaptionLanguageOriginal": "Original",
-  "lyricsCreditBy": " · submitted by {by}",
-  "@lyricsCreditBy": {
-    "placeholders": {
-      "by": {
-        "type": "String"
-      }
-    }
-  },
-  "lyricsCreditByLink": " · submitted by ",
   "lyricsCreditFrom": "lyrics from {source}",
   "@lyricsCreditFrom": {
+    "description": "Under the lyrics: where they come from. {source} is the name of the lyrics' source, a link to it where its licence asks for one.",
     "placeholders": {
       "source": {
-        "type": "String"
+        "type": "String",
+        "example": "LRCLIB"
       }
     }
   },
-  "lyricsCreditFromLink": "lyrics from ",
+  "lyricsCreditFromBy": "lyrics from {source} · submitted by {by}",
+  "@lyricsCreditFromBy": {
+    "description": "Under the lyrics: where they come from, and who gave them to it. {source} is the name of the source and {by} the name of the person, each a link to its page where the source asks for one.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Unison"
+      },
+      "by": {
+        "type": "String",
+        "example": "ana"
+      }
+    }
+  },
   "lyricsFullScreen": "Full-screen lyrics",
   "lyricsInstrumental": "This track is instrumental.",
   "lyricsKanjiDownloading": "The readings of kanji are downloading: kanji show as they are until then.",
@@ -3080,6 +3349,10 @@
   "lyricsLangVietnamese": "Vietnamese",
   "lyricsLocalTip": "Shows the lyrics in Latin letters too, made on this computer: nothing is sent.",
   "lyricsLooking": "Looking for the lyrics…",
+  "lyricsNotFound": "No lyrics found for this track.",
+  "@lyricsNotFound": {
+    "description": "In the lyrics' place, where no source has lyrics of the track."
+  },
   "lyricsPlainText": "plain text",
   "lyricsPlayToSee": "Play a track to see its lyrics.",
   "lyricsPreferWords": "Prefer word-by-word lyrics",
@@ -3239,6 +3512,10 @@
   "lyricsTranslationFailed": "Translation isn't available right now.",
   "lyricsTranslationWaiting": "Translation is on its way…",
   "lyricsUnisonFirstTip": "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google romanize them with the vowels their script leaves out; until they come, or when they can't, they're made on this computer.",
+  "lyricsVideoNotSynced": "Not synced: the song's synced lyrics don't match this video.",
+  "@lyricsVideoNotSynced": {
+    "description": "Above the lyrics of a music video, which its song's synced lyrics don't keep time with."
+  },
   "marketplaceAsksForList": "asks for {permissions}",
   "@marketplaceAsksForList": {
     "placeholders": {
@@ -3259,7 +3536,16 @@
       }
     }
   },
-  "marketplaceCommunity": "Made by the community, reviewed in the open. ",
+  "marketplaceCommunity": "Made by the community, reviewed in the open. {link}.",
+  "@marketplaceCommunity": {
+    "description": "Above the Marketplace's themes and plugins. {link} is marketplaceShareYours, a link to how to share one.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Share yours"
+      }
+    }
+  },
   "marketplaceEnable": "enable",
   "marketplaceInstall": "install",
   "marketplaceInstallTitle": "install {name}",
@@ -3291,7 +3577,6 @@
       }
     }
   },
-  "marketplaceShareEnd": ".",
   "marketplaceShareYours": "Share yours",
   "marketplaceThemes": "themes",
   "marketplaceTitle": "Marketplace",
@@ -3349,43 +3634,96 @@
   "menuView": "View",
   "menuZoomDescription": "Makes everything larger or smaller: text, buttons and artwork.",
   "menuZoomIn": "Zoom In",
-  "menuZoomKeysBoth": "{zoomIn} and {zoomOut} change it",
+  "menuZoomKeysBoth": "{zoomIn} and {zoomOut} change it.",
   "@menuZoomKeysBoth": {
+    "description": "Under Zoom, after menuZoomDescription. {zoomIn} and {zoomOut} are the shortcuts' keys.",
     "placeholders": {
       "zoomIn": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+="
       },
       "zoomOut": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+-"
       }
     }
   },
-  "menuZoomKeysEnd": ".",
-  "menuZoomKeysIn": "{zoomIn} zooms in",
-  "@menuZoomKeysIn": {
+  "menuZoomKeysBothReset": "{zoomIn} and {zoomOut} change it, {reset} resets it.",
+  "@menuZoomKeysBothReset": {
+    "description": "Under Zoom, after menuZoomDescription. {zoomIn}, {zoomOut} and {reset} are the shortcuts' keys.",
     "placeholders": {
       "zoomIn": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+="
+      },
+      "zoomOut": {
+        "type": "String",
+        "example": "Ctrl+-"
+      },
+      "reset": {
+        "type": "String",
+        "example": "Ctrl+0"
       }
     }
   },
-  "menuZoomKeysOut": "{zoomOut} zooms out",
+  "menuZoomKeysIn": "{zoomIn} zooms in.",
+  "@menuZoomKeysIn": {
+    "description": "Under Zoom, after menuZoomDescription, while only Zoom in has keys. {zoomIn} is the shortcut's keys.",
+    "placeholders": {
+      "zoomIn": {
+        "type": "String",
+        "example": "Ctrl+="
+      }
+    }
+  },
+  "menuZoomKeysInReset": "{zoomIn} zooms in, {reset} resets it.",
+  "@menuZoomKeysInReset": {
+    "description": "Under Zoom, after menuZoomDescription, while Zoom out has no keys. {zoomIn} and {reset} are the shortcuts' keys.",
+    "placeholders": {
+      "zoomIn": {
+        "type": "String",
+        "example": "Ctrl+="
+      },
+      "reset": {
+        "type": "String",
+        "example": "Ctrl+0"
+      }
+    }
+  },
+  "menuZoomKeysOut": "{zoomOut} zooms out.",
   "@menuZoomKeysOut": {
+    "description": "Under Zoom, after menuZoomDescription, while only Zoom out has keys. {zoomOut} is the shortcut's keys.",
     "placeholders": {
       "zoomOut": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+-"
       }
     }
   },
-  "menuZoomKeysReset": "{reset} resets it",
+  "menuZoomKeysOutReset": "{zoomOut} zooms out, {reset} resets it.",
+  "@menuZoomKeysOutReset": {
+    "description": "Under Zoom, after menuZoomDescription, while Zoom in has no keys. {zoomOut} and {reset} are the shortcuts' keys.",
+    "placeholders": {
+      "zoomOut": {
+        "type": "String",
+        "example": "Ctrl+-"
+      },
+      "reset": {
+        "type": "String",
+        "example": "Ctrl+0"
+      }
+    }
+  },
+  "menuZoomKeysReset": "{reset} resets it.",
   "@menuZoomKeysReset": {
+    "description": "Under Zoom, after menuZoomDescription, while only Actual size has keys. {reset} is the shortcut's keys.",
     "placeholders": {
       "reset": {
-        "type": "String"
+        "type": "String",
+        "example": "Ctrl+0"
       }
     }
   },
-  "menuZoomKeysSep": ", ",
   "menuZoomLabel": "Zoom",
   "menuZoomOut": "Zoom Out",
   "menuZoomRoom": "This window has room for {percent}.",
@@ -3590,6 +3928,22 @@
   "notchPanelShowPlays": "Show what plays in MixMusic",
   "notchPanelWindowTitle": "MixMusic around the notch",
   "notchTitle": "Player around the notch",
+  "notifyDisliked": "Disliked",
+  "@notifyDisliked": {
+    "description": "The title of a notification, as a track is disliked from outside MixMusic's windows; its body names the track."
+  },
+  "notifyLiked": "Added to liked songs",
+  "@notifyLiked": {
+    "description": "The title of a notification, as a track is liked from outside MixMusic's windows; its body names the track."
+  },
+  "notifyUndisliked": "Removed the dislike",
+  "@notifyUndisliked": {
+    "description": "The title of a notification, as a track is no longer disliked, from outside MixMusic's windows; its body names the track."
+  },
+  "notifyUnliked": "Removed from liked songs",
+  "@notifyUnliked": {
+    "description": "The title of a notification, as a track is no longer liked, from outside MixMusic's windows; its body names the track."
+  },
   "nowPlayingEmpty": "Play a track and it fills this page, with its lyrics.",
   "nowPlayingNothing": "Nothing playing",
   "nowPlayingTitle": "Now playing",
@@ -3597,6 +3951,20 @@
   "nowPlayingWaiting": "waiting for the network",
   "onTopNoLonger": "MixMusic no longer stays on top",
   "onTopStays": "MixMusic stays on top of other windows",
+  "outputBack": "Playing on {name} again",
+  "@outputBack": {
+    "description": "A notice, as the output device chosen comes back.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Speakers (Realtek Audio)"
+      }
+    }
+  },
+  "outputBackUnnamed": "Playing on the output device chosen again",
+  "@outputBackUnnamed": {
+    "description": "A notice, as the output device chosen, whose name MixMusic doesn't know, comes back."
+  },
   "outputChoiceAsideCast": "Playing on {device}: the device is this computer's",
   "@outputChoiceAsideCast": {
     "description": "Why the output device can't play: a cast device is playing.",
@@ -3658,7 +4026,25 @@
     }
   },
   "outputDevice": "Output device",
+  "outputGone": "{name} isn't available: playing on the system's default device until it's back",
+  "@outputGone": {
+    "description": "A notice, as the output device chosen goes away.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Speakers (Realtek Audio)"
+      }
+    }
+  },
+  "outputGoneUnnamed": "The output device chosen isn't available: playing on the system's default device until it's back",
+  "@outputGoneUnnamed": {
+    "description": "A notice, as the output device chosen, whose name MixMusic doesn't know, goes away."
+  },
   "outputLookAgain": "Look for devices again",
+  "outputNoOutputs": "MixMusic can't play sound on this system",
+  "@outputNoOutputs": {
+    "description": "In the menu of output devices, where the system has none MixMusic can play on."
+  },
   "overlayAbout": "Tells what plays, as a page for the browser source of OBS or another streaming program, and as data for an overlay of your own. It listens on this computer only, and takes no commands.",
   "overlayAddressProblem": "{error} Choose another port above.",
   "@overlayAddressProblem": {
@@ -3829,15 +4215,83 @@
   "playbackSignInAgain": "sign in again",
   "playbackSignInAgainBody": "You signed in before MixMusic played Spotify itself, which your sign-in doesn't allow yet. Until you sign in again, Spotify tracks play from YouTube Music.",
   "playbackSignInAgainTitle": "Sign in to Spotify again",
-  "playbackSignInSpotify": "Sign in to Spotify in accounts to play your Spotify library.",
-  "playbackSignInSpotifyLead": "Sign in to Spotify in ",
-  "playbackSignInSpotifyTail": " to play your Spotify library.",
+  "playbackSignInSpotify": "Sign in to Spotify in {link} to play your Spotify library.",
+  "@playbackSignInSpotify": {
+    "description": "In Settings › Playback, while Spotify isn't signed in to. {link} is settingsTabAccounts, a link to that tab of Settings.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "accounts"
+      }
+    }
+  },
   "playbackSignedInSpotify": "Signed in to Spotify",
   "playbackSound": "Sound",
   "playbackSpotifyHere": "MixMusic plays them itself, at Spotify's own quality, and shows among your Spotify devices. Needs Spotify Premium, and no Spotify app.",
   "playbackSpotifyNoWebKit": "This computer's webview, WebKitGTK, can't play Spotify's protected audio, so MixMusic can't play Spotify itself.",
   "playbackSpotifyTracks": "Spotify tracks",
   "playbackWaitingBrowser": "waiting for the browser…",
+  "playerAllDisliked": "You dislike every song here",
+  "@playerAllDisliked": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerAllDislikedOrAI": "Every song here is one you dislike or YouTube labels as made with AI",
+  "@playerAllDislikedOrAI": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerAllMadeWithAI": "YouTube labels every song here as made with AI",
+  "@playerAllMadeWithAI": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerAutoplayNothingNew": "{what, select, disliked {Autoplay stopped: the radio held nothing new but songs you dislike or YouTube labels as made with AI} other {Autoplay stopped: the radio held nothing new but songs YouTube labels as made with AI}}",
+  "@playerAutoplayNothingNew": {
+    "description": "A notice. {what} is disliked where some of the songs are ones the listener dislikes.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "playerAutoplayRadios": "{what, select, disliked {Autoplay stopped: three radios in a row held only songs you dislike or YouTube labels as made with AI} other {Autoplay stopped: three radios in a row held only songs YouTube labels as made with AI}}",
+  "@playerAutoplayRadios": {
+    "description": "A notice. {what} is disliked where some of the songs are ones the listener dislikes.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "playerCantPlayHere": "MixMusic can't play on this computer",
+  "@playerCantPlayHere": {
+    "description": "A dialog as MixMusic starts, where it can't play: its details say why, then it quits."
+  },
+  "playerCouldntPlay": "Couldn't play {title}: {error}",
+  "@playerCouldntPlay": {
+    "description": "A notice, as a track can't play. {error} says why, as the service or the system says it.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playerCouldntPlayStopped": "Couldn't play {title}: {error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play",
+  "@playerCouldntPlayStopped": {
+    "description": "A notice, as a track can't play, nor the ones just before it. {error} says why, as the service or the system says it.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "playerDeviceActive": "{name} · active",
   "@playerDeviceActive": {
     "placeholders": {
@@ -3857,7 +4311,37 @@
       }
     }
   },
+  "playerExplicitAll": "Every song here is explicit, and your settings hide explicit content",
+  "@playerExplicitAll": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerExplicitOrSkipped": "Every song here is explicit, which your settings hide, or one they skip",
+  "@playerExplicitOrSkipped": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerExplicitRefused": "{title} is explicit, and your settings hide explicit content",
+  "@playerExplicitRefused": {
+    "description": "A notice, as a song chosen to play doesn't, with a button to the settings.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playerFromYouTubeInstead": "{why} - playing it from YouTube Music instead",
+  "@playerFromYouTubeInstead": {
+    "description": "A notice, as a Spotify track plays from YouTube Music. {why} is why it can't play from Spotify, as Spotify says it.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
   "playerJumpToHighlight": "Jump to the highlight",
+  "playerLabelsPaused": "YouTube isn't answering MixMusic's checks for AI labels, so tracks play unchecked for now",
+  "@playerLabelsPaused": {
+    "description": "A notice, with a button to the settings."
+  },
   "playerLike": "Like",
   "playerLive": "live",
   "playerLoading": "Loading",
@@ -3867,6 +4351,10 @@
   "playerNoDevices": "Open Spotify on a device to see it here",
   "playerNoHighlight": "This track has no highlight",
   "playerNoSeeking": "Live: no seeking",
+  "playerOffline": "No network. MixMusic plays on from here once it's back",
+  "@playerOffline": {
+    "description": "A notice, as the network goes while MixMusic plays."
+  },
   "playerOnSpotify": "{line} · on Spotify",
   "@playerOnSpotify": {
     "placeholders": {
@@ -3875,7 +4363,20 @@
       }
     }
   },
+  "playerOpenAlbum": "Open the track's album or playlist to play it",
+  "@playerOpenAlbum": {
+    "description": "A notice, as a track asked to play from outside isn't in the queue."
+  },
   "playerOpenNowPlaying": "Open now playing",
+  "playerPart": "{kind, select, nonmusic {a part without music} sponsor {a sponsor read} selfpromo {self-promotion} interaction {a reminder to like or subscribe} intro {the intro} outro {the outro} preview {a preview or recap} hook {a hook or greeting} filler {filler} highlight {the highlight} other {a part}}",
+  "@playerPart": {
+    "description": "A part of a video SponsorBlock marks, as playerSkippedParts names it. {kind} is its kind.",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
   "playerPause": "Pause",
   "playerPauseWaiting": "Pause, waiting for the network",
   "playerPickSomething": "Pick something to play",
@@ -3886,8 +4387,70 @@
   "playerRepeatAll": "Repeat: all",
   "playerRepeatOff": "Repeat: off",
   "playerRepeatOne": "Repeat: one",
+  "playerRestPassedOver": "{what, select, disliked {The rest of the queue is songs you dislike or YouTube labels as made with AI} other {The rest of the queue is songs YouTube labels as made with AI}}",
+  "@playerRestPassedOver": {
+    "description": "A notice, as the queue passes over all it has left. {what} is disliked where some of them are songs the listener dislikes.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
   "playerSeek": "Seek",
   "playerShuffle": "Shuffle",
+  "playerSkippedMadeWithAI": "Skipped {title}, which YouTube labels as made with AI",
+  "@playerSkippedMadeWithAI": {
+    "description": "A notice, with a button to the settings.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playerSkippedMadeWithAISpotify": "Skipped {title}, whose recording on YouTube Music YouTube labels as made with AI",
+  "@playerSkippedMadeWithAISpotify": {
+    "description": "A notice, with a button to the settings, of a Spotify track played from YouTube Music.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playerSkippedParts": "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} one {Skipped {first}} other {Skipped parts of # kinds}}",
+  "@playerSkippedParts": {
+    "description": "A notice, with Undo, as MixMusic passes over parts of a video SponsorBlock marks. {count} is how many kinds the parts are of, {first} and {second} the first two, as playerPart names them.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "first": {
+        "type": "String",
+        "example": "the intro"
+      },
+      "second": {
+        "type": "String",
+        "example": "a sponsor read"
+      }
+    }
+  },
+  "playerSkippedSongsAI": "{count, plural, one {Skipped # song YouTube labels as made with AI} other {Skipped # songs YouTube labels as made with AI}}",
+  "@playerSkippedSongsAI": {
+    "description": "A notice, with a button to the settings.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playerSkippedSongsDislikedOrAI": "{count, plural, one {Skipped # song you dislike or YouTube labels as made with AI} other {Skipped # songs you dislike or YouTube labels as made with AI}}",
+  "@playerSkippedSongsDislikedOrAI": {
+    "description": "A notice, with a button to the settings.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "playerSpeed": "{line} · {speed}",
   "@playerSpeed": {
     "placeholders": {
@@ -3899,8 +4462,32 @@
       }
     }
   },
+  "playerStopped": "{error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play",
+  "@playerStopped": {
+    "description": "A notice, as tracks in a row can't play. {error} says why the last couldn't, as the service or the system says it.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "playerSurroundOff": "5.1 surround: off",
   "playerSurroundOn": "5.1 surround: on",
+  "playerSurroundStereo": "The 5.1 surround audio of {title} couldn't play ({why}), so it plays in stereo",
+  "@playerSurroundStereo": {
+    "description": "A notice. {why} is why, as the system says it.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
   "playerUndislike": "Remove the dislike",
   "playerUndo": "undo",
   "playerUnlike": "Remove from liked songs",
@@ -3932,11 +4519,11 @@
       }
     }
   },
-  "playlistGapCantPlay": "{n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds}.",
+  "playlistGapCantPlay": "{n, plural, one {# of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds}.} other {# of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds}.}}",
   "@playlistGapCantPlay": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "noun": {
         "type": "String"
@@ -3978,42 +4565,42 @@
       }
     }
   },
-  "playlistGapShort": "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count} tracks came from YouTube Music.",
+  "playlistGapShort": "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count, plural, one {# track} other {# tracks}} came from YouTube Music.",
   "@playlistGapShort": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "noun": {
         "type": "String"
       },
       "count": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
-  "playlistReadCut": "MixMusic shows and plays the first {max} tracks of a {noun, select, mix {mix} playlist {playlist} other {list}}: this one has more.",
+  "playlistReadCut": "MixMusic shows and plays the first {max, plural, one {# track} other {# tracks}} of a {noun, select, mix {mix} playlist {playlist} other {list}}: this one has more.",
   "@playlistReadCut": {
     "placeholders": {
       "max": {
-        "type": "String"
+        "type": "int"
       },
       "noun": {
         "type": "String"
       }
     }
   },
-  "playlistReadCutOf": "This {noun, select, mix {mix} playlist {playlist} other {list}} has {count} tracks: MixMusic shows and plays its first {n}.",
+  "playlistReadCutOf": "This {noun, select, mix {mix} playlist {playlist} other {list}} has {count, plural, one {# track} other {# tracks}}: MixMusic shows and plays its first {n}.",
   "@playlistReadCutOf": {
     "placeholders": {
       "noun": {
         "type": "String"
       },
       "count": {
-        "type": "String"
+        "type": "int"
       },
       "n": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
@@ -4021,7 +4608,7 @@
   "@playlistReadLoading": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
@@ -4030,10 +4617,10 @@
   "@playlistReadLoadingOf": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "count": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
@@ -4041,10 +4628,10 @@
   "@playlistReadLoadingOfThen": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "count": {
-        "type": "String"
+        "type": "int"
       },
       "does": {
         "type": "String"
@@ -4055,18 +4642,18 @@
   "@playlistReadLoadingThen": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "does": {
         "type": "String"
       }
     }
   },
-  "playlistReadPartialFirst": "Only the first {n} tracks of this {noun, select, mix {mix} playlist {playlist} other {list}} could be loaded: {error}",
+  "playlistReadPartialFirst": "Only the first {n, plural, one {# track} other {# tracks}} of this {noun, select, mix {mix} playlist {playlist} other {list}} could be loaded: {error}",
   "@playlistReadPartialFirst": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "noun": {
         "type": "String"
@@ -4076,17 +4663,17 @@
       }
     }
   },
-  "playlistReadPartialOf": "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count} tracks could be loaded: {error}",
+  "playlistReadPartialOf": "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count, plural, one {# track} other {# tracks}} could be loaded: {error}",
   "@playlistReadPartialOf": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "noun": {
         "type": "String"
       },
       "count": {
-        "type": "String"
+        "type": "int"
       },
       "error": {
         "type": "String"
@@ -4097,7 +4684,7 @@
   "@playlistReadWaiting": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
@@ -4105,10 +4692,10 @@
   "@playlistReadWaitingOf": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "count": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
@@ -4116,10 +4703,10 @@
   "@playlistReadWaitingOfThen": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "count": {
-        "type": "String"
+        "type": "int"
       },
       "does": {
         "type": "String"
@@ -4130,7 +4717,7 @@
   "@playlistReadWaitingThen": {
     "placeholders": {
       "n": {
-        "type": "String"
+        "type": "int"
       },
       "does": {
         "type": "String"
@@ -4287,8 +4874,16 @@
     }
   },
   "podcastsSettingsPlayback": "Settings › Playback",
-  "podcastsSpotifyOnlyLead": "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in ",
-  "podcastsSpotifyOnlyTail": ".",
+  "podcastsSpotifyOnly": "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in {link}.",
+  "@podcastsSpotifyOnly": {
+    "description": "On a Spotify podcast's page, where Spotify's episodes don't play in MixMusic. {link} is podcastsSettingsPlayback, a link to that tab of Settings.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Settings › Playback"
+      }
+    }
+  },
   "podcastsUnfollowed": "{title}: no longer following",
   "@podcastsUnfollowed": {
     "placeholders": {
@@ -4325,22 +4920,24 @@
   "railStats": "Stats",
   "railUpNext": "Up next",
   "railYourMixes": "Your mixes",
-  "recapBegan": "The year began with {song}, on {day}.",
+  "recapBegan": "The year began with {song}, on {day, date, ::MMMMd}.",
   "@recapBegan": {
+    "description": "A moment of Your year. {song} is recapSongBy, or the song's title in quotes.",
     "placeholders": {
       "song": {
         "type": "String"
       },
       "day": {
-        "type": "String"
+        "type": "DateTime"
       }
     }
   },
-  "recapBusiest": "You listened most in {month}: {minutes, plural, one {# minute} other {# minutes}}.",
+  "recapBusiest": "You listened most in {month, date, ::MMMM}: {minutes, plural, one {# minute} other {# minutes}}.",
   "@recapBusiest": {
+    "description": "A moment of Your year. {month} is the month, as a date of its first day: write the month's name in the form your sentence needs.",
     "placeholders": {
       "month": {
-        "type": "String"
+        "type": "DateTime"
       },
       "minutes": {
         "type": "int"
@@ -4390,12 +4987,29 @@
       }
     }
   },
-  "recapFor": " for ",
   "recapFound": "You found {count, plural, one {# new artist} other {# new artists}}.",
   "@recapFound": {
     "placeholders": {
       "count": {
         "type": "int"
+      }
+    }
+  },
+  "recapHeadline": "In {year, number, ::group-off} you played {tracks} for {minutes}.",
+  "@recapHeadline": {
+    "description": "The headline of Your year, a tab of Stats. {tracks} is recapTracksPlayed and {minutes} recapMinutes, which the page shows a little bolder.",
+    "placeholders": {
+      "year": {
+        "type": "int",
+        "example": "2026"
+      },
+      "tracks": {
+        "type": "String",
+        "example": "1,204 tracks"
+      },
+      "minutes": {
+        "type": "String",
+        "example": "5,310 minutes"
       }
     }
   },
@@ -4410,7 +5024,6 @@
   },
   "recapMoments": "Moments",
   "recapNothingToRank": "Nothing to rank",
-  "recapPeriod": ".",
   "recapPlays": "{plays, plural, one {# play} other {# plays}}",
   "@recapPlays": {
     "placeholders": {
@@ -4419,8 +5032,9 @@
       }
     }
   },
-  "recapRepeated": "You played {song} {times, plural, one {# time} other {# times}} on {day}.",
+  "recapRepeated": "You played {song} {times, plural, one {# time} other {# times}} on {day, date, ::MMMMd}.",
   "@recapRepeated": {
+    "description": "A moment of Your year. {song} is recapSongBy, or the song's title in quotes.",
     "placeholders": {
       "song": {
         "type": "String"
@@ -4429,7 +5043,7 @@
         "type": "int"
       },
       "day": {
-        "type": "String"
+        "type": "DateTime"
       }
     }
   },
@@ -4454,14 +5068,6 @@
   "@recapTracksPlayed": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "recapYouPlayed": "In {year, number, ::group-off} you played ",
-  "@recapYouPlayed": {
-    "placeholders": {
-      "year": {
         "type": "int"
       }
     }
@@ -4601,14 +5207,15 @@
       }
     }
   },
-  "remotePaired": "{about}. Paired {date}.",
+  "remotePaired": "{about}. Paired {date, date, long}.",
   "@remotePaired": {
+    "description": "Under a computer of remote control. {about} is how the two control each other, as remoteBothWays.",
     "placeholders": {
       "about": {
         "type": "String"
       },
       "date": {
-        "type": "String"
+        "type": "DateTime"
       }
     }
   },
@@ -4701,20 +5308,23 @@
   "roomMenuNewCode": "The room has a new code: the old code and link no longer let anyone in",
   "roomMenuYourRoom": "Your room",
   "roomPageActivity": "Activity",
-  "roomPageActivityLine": "{name} {what}{song} · {clock}",
+  "roomPageActivityLine": "{what, select, joined {{name} joined} left {{name} left} removed {{name} removed} blocked {{name} blocked} guessed {{name} tried too many wrong codes} played {{name} played} paused {{name} paused} skipped {{name} skipped to the next track} back {{name} went back a track} added {{name} added {song}} asked {{name} asked to add {song}} other {{name}}} · {time, time, short}",
   "@roomPageActivityLine": {
+    "description": "A line of the activity of the room this computer hosts: who did what, and when. {what} is what the guest {name} did: joined, left, was removed or blocked by the host, tried too many wrong codes, had the host's player play, pause, skip or go back, or added a song, or asked to add one, whose title is {song}.",
     "placeholders": {
-      "name": {
-        "type": "String"
-      },
       "what": {
         "type": "String"
       },
-      "song": {
-        "type": "String"
+      "name": {
+        "type": "String",
+        "example": "Ana's laptop"
       },
-      "clock": {
-        "type": "String"
+      "song": {
+        "type": "String",
+        "example": "Midnight City"
+      },
+      "time": {
+        "type": "DateTime"
       }
     }
   },
@@ -4736,7 +5346,6 @@
     }
   },
   "roomPageBlocked": "Blocked",
-  "roomPageBlockedActivity": "blocked",
   "roomPageChecking": "Checking the code with {host}…",
   "@roomPageChecking": {
     "placeholders": {
@@ -4756,7 +5365,6 @@
   "roomPageCopiedLink": "Copied the invite link",
   "roomPageCopyLink": "copy invite link",
   "roomPageEndRoom": "end room",
-  "roomPageGuessedActivity": "tried too many wrong codes",
   "roomPageGuests": "Guests",
   "roomPageHosts": "{host} hosts this room.",
   "@roomPageHosts": {
@@ -4797,9 +5405,7 @@
       }
     }
   },
-  "roomPageJoinedActivity": "joined",
   "roomPageLeaveRoom": "leave room",
-  "roomPageLeftActivity": "left",
   "roomPageListening": "Listening: {members}",
   "@roomPageListening": {
     "placeholders": {
@@ -4850,8 +5456,10 @@
       }
     }
   },
-  "roomPageRemovedActivity": "removed",
-  "roomPageRemovedNote": "Removed and blocked guests can't come back with the code or the link they have under a new name: a new code, and a new link, shut them out, and your guests stay.",
+  "roomPageRemovedNote": "A removed guest can join again with the code or the link it has, and a blocked one too, once it comes back as another computer. A new code, and a new link, shut them out; your other guests stay.",
+  "@roomPageRemovedNote": {
+    "description": "On the page of the room this computer hosts, under its guests."
+  },
   "roomPageRoomCode": "Room code",
   "roomPageRoomsOnNetwork": "Rooms on the network",
   "roomPageStartRoom": "start a room",
@@ -5230,7 +5838,6 @@
   "searchScopeAllMusic": "all music",
   "searchServices": "Services",
   "searchSignInSpotify": "Sign in to Spotify",
-  "searchSignInTail": " to search it too.",
   "searchSongs": "Songs",
   "searchSortBestMatch": "Best match",
   "searchSortMostPlayed": "Most played",
@@ -5240,7 +5847,16 @@
   "searchStartTyping": "start typing",
   "searchTitle": "Search",
   "searchVideos": "Videos",
-  "searchYouTubeOnly": "Searching YouTube Music only. ",
+  "searchYouTubeOnly": "Searching YouTube Music only. {link} to search it too.",
+  "@searchYouTubeOnly": {
+    "description": "Above the results of a search, while Spotify isn't signed in to. {link} is searchSignInSpotify, a link to Settings › Accounts.",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "example": "Sign in to Spotify"
+      }
+    }
+  },
   "seekHighlightTip": "{kind}, {time}",
   "@seekHighlightTip": {
     "placeholders": {
@@ -5520,8 +6136,9 @@
       }
     }
   },
-  "shortcutsEditLabel": "{action} the shortcut of {title}",
+  "shortcutsEditLabel": "{action, select, set {set the shortcut of {title}} cancel {cancel the shortcut of {title}} other {change the shortcut of {title}}}",
   "@shortcutsEditLabel": {
+    "description": "What screen readers say of the button beside a command in Settings › Shortcuts. {action} is set while the command has no shortcut, cancel while its new keys are being pressed, and change otherwise; {title} is the command, as Play or pause.",
     "placeholders": {
       "action": {
         "type": "String"
@@ -5555,9 +6172,20 @@
   "skipAIDesc": "Skips the tracks YouTube labels as made with AI. YouTube labels only some of them, so others still play.",
   "skipAITitle": "Skip songs made with AI",
   "skipPartsAbout": "Passes over the parts of music videos, uploads and episodes that SponsorBlock's community marks, and shows them on the seek bar. While it's on, MixMusic asks SponsorBlock of each video it plays from YouTube Music, sending the first 4 characters of a hash of its ID, never the ID.",
-  "skipPartsCreditAfter": ". Skipped parts count for nothing in plays and Last.fm scrobbles; each is skipped once a play, so seeking back into one plays it.",
-  "skipPartsCreditBefore": "Uses SponsorBlock data licensed under ",
-  "skipPartsCreditBetween": " from ",
+  "skipPartsCredit": "Uses SponsorBlock data licensed under {license} from {link}. Skipped parts count for nothing in plays and Last.fm scrobbles; each is skipped once a play, so seeking back into one plays it.",
+  "@skipPartsCredit": {
+    "description": "Under the parts MixMusic skips. {license} is the licence's name and {link} SponsorBlock's address, each a link.",
+    "placeholders": {
+      "license": {
+        "type": "String",
+        "example": "CC BY-NC-SA 4.0"
+      },
+      "link": {
+        "type": "String",
+        "example": "https://sponsor.ajay.app/"
+      }
+    }
+  },
   "skipPartsExportsAbout": "Copies Export… writes leave out the parts skipped above. Copies in M4A keep them: MixMusic can't cut those yet.",
   "skipPartsExportsTitle": "Leave marked parts out of exports",
   "skipPartsGroup": "Skip parts of videos",
@@ -5631,7 +6259,6 @@
   "speedSongs": "Songs",
   "speedTitle": "Speed",
   "statsAllTime": "All time",
-  "statsAnd": " and ",
   "statsArrowKeys": "The arrow keys go from day to day.",
   "statsArtistPlays": "{artist}: {plays, plural, one {# play} other {# plays}}",
   "@statsArtistPlays": {
@@ -5647,38 +6274,64 @@
   "statsColDay": "day",
   "statsColMinutes": "minutes",
   "statsColPlays": "plays",
-  "statsColon": ": ",
   "statsCountRule": "Tracks count once they played for thirty seconds.",
   "statsDayByDay": "Day by day",
   "statsDayTip": "{day}: {minutes} min, {plays, plural, one {# play} other {# plays}}",
   "@statsDayTip": {
+    "description": "The tip of a day of Stats' chart. {day} is formatWeekdayDayMonth.",
     "placeholders": {
       "day": {
-        "type": "String"
+        "type": "String",
+        "example": "Tue, Nov 17"
       },
       "minutes": {
-        "type": "String"
+        "type": "int",
+        "example": "34"
       },
       "plays": {
         "type": "int"
       }
     }
   },
-  "statsEnd": ".",
-  "statsFor": " for ",
   "statsFromSpotify": "{count} from Spotify",
   "@statsFromSpotify": {
+    "description": "The tracks of statsHeadline that played from Spotify, in Spotify's colour.",
     "placeholders": {
       "count": {
-        "type": "String"
+        "type": "int",
+        "example": "80"
       }
     }
   },
   "statsFromYouTube": "{count} from YouTube Music",
   "@statsFromYouTube": {
+    "description": "The tracks of statsHeadline that played from YouTube Music, in its colour.",
     "placeholders": {
       "count": {
-        "type": "String"
+        "type": "int",
+        "example": "40"
+      }
+    }
+  },
+  "statsHeadline": "You played {tracks} for {time}: {spotify} and {youtube}.",
+  "@statsHeadline": {
+    "description": "The headline of Stats, over the chart. {tracks} is statsPlayedTracks, {time} how long they played (formatMinutes or formatHourMinutes), {spotify} statsFromSpotify and {youtube} statsFromYouTube: the page shows {tracks} and {time} a little bolder, and each service's part in its colour.",
+    "placeholders": {
+      "tracks": {
+        "type": "String",
+        "example": "120 tracks"
+      },
+      "time": {
+        "type": "String",
+        "example": "8 hr 5 min"
+      },
+      "spotify": {
+        "type": "String",
+        "example": "80 from Spotify"
+      },
+      "youtube": {
+        "type": "String",
+        "example": "40 from YouTube Music"
       }
     }
   },
@@ -5701,18 +6354,20 @@
   "statsToday": "today",
   "statsTopArtists": "Top artists",
   "statsTopTracks": "Top tracks",
-  "statsVennLabel": "{spotify} plays from Spotify, {youtube} from YouTube Music",
+  "statsVennLabel": "{spotify, plural, one {# play} other {# plays}} from Spotify, {youtube} from YouTube Music",
   "@statsVennLabel": {
+    "description": "What the two rings of The mix, on Stats, tell a screen reader.",
     "placeholders": {
       "spotify": {
-        "type": "String"
+        "type": "int",
+        "example": "80"
       },
       "youtube": {
-        "type": "String"
+        "type": "int",
+        "example": "40"
       }
     }
   },
-  "statsYouPlayed": "You played ",
   "suggestionsAdd": "add",
   "suggestionsAddLabel": "Add {title} to {playlist}",
   "@suggestionsAddLabel": {
@@ -5759,6 +6414,22 @@
   "suggestionsTryAgain": "try again",
   "surroundDescription": "Some tracks have a 5.1 surround mix beside their stereo one. It plays on six speakers where your output has them, else mixed down to stereo. The 5.1 button by the player turns it on and off too.",
   "surroundTitle": "Play 5.1 surround when a track has it",
+  "taskbarNext": "Next",
+  "@taskbarNext": {
+    "description": "The tooltip of a button on the main window's thumbnail in Windows' taskbar: the next track."
+  },
+  "taskbarPause": "Pause",
+  "@taskbarPause": {
+    "description": "The tooltip of a button on the main window's thumbnail in Windows' taskbar."
+  },
+  "taskbarPlay": "Play",
+  "@taskbarPlay": {
+    "description": "The tooltip of a button on the main window's thumbnail in Windows' taskbar."
+  },
+  "taskbarPrevious": "Previous",
+  "@taskbarPrevious": {
+    "description": "The tooltip of a button on the main window's thumbnail in Windows' taskbar: the previous track."
+  },
   "themeOptionAnimeScreentone": "Screentone",
   "themeOptionAnimeSpeedlines": "Speed lines",
   "themeOptionAuroraBlur": "Glass blur",
@@ -6165,6 +6836,9 @@
   "trackSelectAll": "select all",
   "trackSelectBar": "Selected tracks",
   "trackSelectClear": "Clear the selection",
+  "@trackSelectClear": {
+    "description": "The tooltip, and what screen readers say, of the close button beside the count of selected tracks: it deselects them all."
+  },
   "trackSelectCount": "{count} selected",
   "@trackSelectCount": {
     "placeholders": {
@@ -6174,6 +6848,9 @@
     }
   },
   "trackSelectDeselect": "Deselect",
+  "@trackSelectDeselect": {
+    "description": "An item of a track's menu while tracks are selected: it takes this track out of the selection."
+  },
   "trackSelectDownload": "download",
   "trackSelectDownloadLabel": "Download the selected tracks",
   "trackSelectItem": "Select",
@@ -6230,6 +6907,9 @@
   },
   "trackToolsSortArtist": "Artist",
   "trackToolsSortBy": "Sort by",
+  "@trackToolsSortBy": {
+    "description": "What screen readers call the menu that sorts the tracks of a list, or the results of a search, beside them; its choices are the orders, as Length."
+  },
   "trackToolsSortLength": "Length",
   "trackToolsSortPlays": "Plays",
   "trackToolsSortTitle": "Title",
@@ -6258,6 +6938,36 @@
         "type": "String"
       }
     }
+  },
+  "trayMiniPlayer": "Mini player",
+  "@trayMiniPlayer": {
+    "description": "An item of the tray icon's menu, which shows the mini player."
+  },
+  "trayNext": "Next",
+  "@trayNext": {
+    "description": "An item of the tray icon's menu: the next track."
+  },
+  "trayPaused": "Paused: {playing}",
+  "@trayPaused": {
+    "description": "The tray icon's tooltip, and the main window's title, while what plays is paused. {playing} is the track and its artists.",
+    "placeholders": {
+      "playing": {
+        "type": "String",
+        "example": "One More Time - Daft Punk"
+      }
+    }
+  },
+  "trayPlayPause": "Play / Pause",
+  "@trayPlayPause": {
+    "description": "An item of the tray icon's menu."
+  },
+  "trayPrevious": "Previous",
+  "@trayPrevious": {
+    "description": "An item of the tray icon's menu: the previous track."
+  },
+  "trayShowMixMusic": "Show MixMusic",
+  "@trayShowMixMusic": {
+    "description": "An item of the tray icon's menu, which shows the main window."
   },
   "updateOfferDownloading": "Downloading…",
   "updateOfferHave": "You have {version}. {how}",
@@ -6369,11 +7079,12 @@
       }
     }
   },
-  "updatesLastChecked": " Last checked {time}.",
+  "updatesLastChecked": " Last checked {time, date, ::yMMMdjm}.",
   "@updatesLastChecked": {
+    "description": "Ends updatesCheckAbout, with the space before it: when MixMusic last looked for a newer version.",
     "placeholders": {
       "time": {
-        "type": "String"
+        "type": "DateTime"
       }
     }
   },
@@ -6388,19 +7099,21 @@
       }
     }
   },
-  "updatesOutSince": "Out since {date}.",
+  "updatesOutSince": "Out since {date, date, medium}.",
   "@updatesOutSince": {
+    "description": "Under a newer version: the day it was released.",
     "placeholders": {
       "date": {
-        "type": "String"
+        "type": "DateTime"
       }
     }
   },
-  "updatesOutSinceHow": "Out since {date}. {how}",
+  "updatesOutSinceHow": "Out since {date, date, medium}. {how}",
   "@updatesOutSinceHow": {
+    "description": "Under a newer version: the day it was released, and how to install it, as updatesReplaceDeb.",
     "placeholders": {
       "date": {
-        "type": "String"
+        "type": "DateTime"
       },
       "how": {
         "type": "String"
@@ -6492,6 +7205,9 @@
   "youtubeBrowserChoose": "Browser to sign in with",
   "youtubeBrowserDidntSignIn": "MixMusic didn't sign in to YouTube Music",
   "youtubeBrowserForm": "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any browser: MixMusic then takes the session, closes the browser and deletes the profile. Your own profiles stay as they are. MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others made from Chromium when MixMusic opens them. Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone, never yours, and keeps the session encrypted on this computer. Sign in with. Log in. Temporary profile. Google refuses.",
+  "@youtubeBrowserForm": {
+    "description": "Never shown: what Settings' search finds the browser sign-in to YouTube Music by, its steps and labels, then words people search for. Translate it, and give the words and synonyms people search for in your language."
+  },
   "youtubeBrowserHint": "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone, never yours, and keeps the session encrypted on this computer.",
   "youtubeBrowserNone": "MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others made from Chromium when MixMusic opens them.",
   "youtubeBrowserSignInNotice": "Sign in to YouTube Music in {browser}",

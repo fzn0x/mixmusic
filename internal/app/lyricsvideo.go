@@ -208,7 +208,7 @@ func (c *Catalog) videoLyrics(ctx context.Context, video, song media.Track, l ly
 	}
 	if !c.keepsTime(ctx, video, song) {
 		l = l.Untimed()
-		l.Note = videoNote
+		l.Note = videoNote()
 	}
 	return l
 }

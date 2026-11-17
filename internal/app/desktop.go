@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/egoist/mygo"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // URLScheme is the scheme of MixMusic's deep links, such as
@@ -64,6 +66,7 @@ func (a *App) Start() {
 	go a.watchSettings(ctx)
 	a.tellStart()
 	a.setupTray()
+	a.followLanguage()
 	if a.settings.Get().CloseToTray {
 		runInBackground()
 	}
@@ -112,7 +115,7 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 	if _, err := a.startGoPlayer(); err != nil {
 		log.Printf("mixmusic: can't play: %v", err)
 		_, _ = mygo.Dialog.Message(mygo.MessageOptions{Type: mygo.MessageError, Title: "MixMusic",
-			Message: "MixMusic can't play on this computer", Detail: err.Error()})
+			Message: locales.PlayerCantPlayHere(), Detail: err.Error()})
 		mygo.App.Quit()
 		return nil
 	}
@@ -238,27 +241,34 @@ func (a *App) showMini() {
 	a.mu.Unlock()
 }
 
+// trayMenu is the menu of the tray icon, which controls the player, in
+// the app's language.
+func (a *App) trayMenu() []*mygo.MenuItem {
+	cmd := func(c Command) func(*mygo.MenuItem, *mygo.Window) {
+		return func(*mygo.MenuItem, *mygo.Window) { a.command(PlayerCommand{Command: c}) }
+	}
+	return []*mygo.MenuItem{
+		{Label: locales.TrayPlayPause(), Click: cmd(CommandToggle)},
+		{Label: locales.TrayNext(), Click: cmd(CommandNext)},
+		{Label: locales.TrayPrevious(), Click: cmd(CommandPrevious)},
+		mygo.Separator(),
+		{Label: locales.TrayShowMixMusic(), Click: func(*mygo.MenuItem, *mygo.Window) { a.showMain() }},
+		{Label: locales.TrayMiniPlayer(), Click: func(*mygo.MenuItem, *mygo.Window) { a.showMini() }},
+		mygo.Separator(),
+		{Role: mygo.RoleQuit},
+	}
+}
+
 // setupTray adds the tray icon, whose menu controls the player.
 func (a *App) setupTray() {
 	if len(a.opts.TrayIcon) == 0 {
 		return
 	}
-	cmd := func(c Command) func(*mygo.MenuItem, *mygo.Window) {
-		return func(*mygo.MenuItem, *mygo.Window) { a.command(PlayerCommand{Command: c}) }
-	}
-	menu := mygo.NewMenu([]*mygo.MenuItem{
-		{Label: "Play / Pause", Click: cmd(CommandToggle)},
-		{Label: "Next", Click: cmd(CommandNext)},
-		{Label: "Previous", Click: cmd(CommandPrevious)},
-		mygo.Separator(),
-		{Label: "Show MixMusic", Click: func(*mygo.MenuItem, *mygo.Window) { a.showMain() }},
-		{Label: "Mini player", Click: func(*mygo.MenuItem, *mygo.Window) { a.showMini() }},
-		mygo.Separator(),
-		{Role: mygo.RoleQuit},
-	})
 	opts := mygo.TrayOptions{Icon: a.opts.TrayIcon, ToolTip: "MixMusic"}
 	if runtime.GOOS == "linux" {
-		opts.Menu = menu // AppIndicator reports no clicks: it shows the menu
+		// AppIndicator reports no clicks: it shows the menu, made again as
+		// the language changes (followLanguage).
+		opts.Menu = mygo.NewMenu(a.trayMenu())
 	}
 	tray, err := mygo.NewTray(opts)
 	if err != nil {
@@ -269,7 +279,7 @@ func (a *App) setupTray() {
 		// A click shows the window; a right click, the menu.
 		tray.OnClick(a.showMain)
 		tray.OnRightClick(func() {
-			tray.SetMenu(menu)
+			tray.SetMenu(mygo.NewMenu(a.trayMenu()))
 			tray.PopUpMenu()
 			tray.SetMenu(nil)
 		})

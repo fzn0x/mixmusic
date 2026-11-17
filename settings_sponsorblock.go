@@ -129,13 +129,12 @@ func init() { addSettings(partRows, 50, (*shell).partCredit) }
 // partCredit credits SponsorBlock's data, as its license asks.
 func (s *shell) partCredit(c *ui.Context) {
 	k := &s.lk
-	s.found(c, "", sponsorblock.Credit, func() {
+	const license, site = "CC BY-NC-SA 4.0", "https://sponsor.ajay.app/"
+	s.found(c, "", locales.SkipPartsCredit(license, site), func() {
 		ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).MaxWidth(720).Children(func() {
-			ui.Text(c, locales.SkipPartsCreditBefore())
-			s.linkOf(c, "CC BY-NC-SA 4.0", "https://creativecommons.org/licenses/by-nc-sa/4.0/")
-			ui.Text(c, locales.SkipPartsCreditBetween())
-			s.linkOf(c, "https://sponsor.ajay.app/", "https://sponsor.ajay.app/")
-			ui.Text(c, locales.SkipPartsCreditAfter())
+			inlineMessage(c, locales.SkipPartsCredit(mark(0, license), mark(1, site)),
+				func(text string) { s.linkOf(c, text, "https://creativecommons.org/licenses/by-nc-sa/4.0/") },
+				func(text string) { s.linkOf(c, text, site) })
 		})
 	})
 }

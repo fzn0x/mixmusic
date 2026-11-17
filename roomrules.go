@@ -221,11 +221,3 @@ func (s *shell) joiningLine(host string) string {
 	}
 	return locales.RoomRulesJoining(host)
 }
-
-// activitySong names the song an activity tells of, if any.
-func activitySong(act room.Activity) string {
-	if act.Song == "" {
-		return ""
-	}
-	return " " + act.Song
-}

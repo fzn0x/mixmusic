@@ -42,11 +42,11 @@ func (s *shell) spotifyTrackSettings(c *ui.Context) {
 		}
 		switch {
 		case !signedIn:
-			s.found(c, "", locales.PlaybackSignInSpotify(), func() {
+			s.found(c, "", locales.PlaybackSignInSpotify(locales.SettingsTabAccounts()), func() {
 				ui.RichText(c).FontSize(k.smallSize()).TextColor(k.muted).Padding(12, 0).Children(func() {
-					ui.Text(c, locales.PlaybackSignInSpotifyLead())
-					s.linkOf(c, locales.SettingsTabAccounts(), "/settings/accounts")
-					ui.Text(c, locales.PlaybackSignInSpotifyTail())
+					inlineMessage(c, locales.PlaybackSignInSpotify(mark(0, locales.SettingsTabAccounts())), func(text string) {
+						s.linkOf(c, text, "/settings/accounts")
+					})
 				})
 			})
 		case s.set.SpotifyPlayback == settings.SpotifyPlaybackHere && spotifyPlaysHere && !sp.Streaming:

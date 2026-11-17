@@ -80,14 +80,12 @@ func (s *shell) discordLineRow(c *ui.Context, key, title string, line *string, d
 		text = dr.text
 	}
 	describe := func() {
-		ui.Text(c, locales.DiscordPlaceholdersLabel())
+		// Each placeholder shows in the text's ink.
+		listed := make([]string, len(app.DiscordPlaceholders))
 		for i, name := range app.DiscordPlaceholders {
-			if i > 0 {
-				ui.Text(c, ", ")
-			}
-			ui.Text(c, "{"+name+"}").TextColor(k.text)
+			listed[i] = mark(0, "{"+name+"}")
 		}
-		ui.Text(c, locales.DiscordPlaceholdersEmpty())
+		inlineMessage(c, locales.DiscordPlaceholdersLabel(strings.Join(listed, ", ")), func(text string) { ui.Text(c, text).TextColor(k.text) })
 		if unknown := app.UnknownDiscordPlaceholders(text); len(unknown) > 0 {
 			ui.Text(c, " "+discordUnknownNote(unknown)).TextColor(k.danger)
 		}

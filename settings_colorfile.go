@@ -145,12 +145,13 @@ func colorFileNote(st app.ColorFileStatus, set settings.Settings, now time.Time)
 	return locales.ColorFileRead(clockOf(st.ReadAt, now)), false
 }
 
-// clockOf is the time of t, with its day unless it is now's.
+// clockOf is the time of t, with its day unless it is now's, in the
+// language's way.
 func clockOf(t, now time.Time) string {
 	if y, m, d := t.Date(); y == now.Year() && m == now.Month() && d == now.Day() {
-		return t.Format("15:04")
+		return dateIn(t, "jm")
 	}
-	return t.Format("2 Jan 15:04")
+	return dateIn(t, "MMMdjm")
 }
 
 // openFileDialog asks the user for files, as MyGo's dialog does; tests

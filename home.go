@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 
+	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
@@ -144,10 +145,10 @@ func (s *shell) showHomeShelf(c *ui.Context, sh *homeShelf, source media.Source)
 }
 
 // localShelves are the home page's shelves of what the user played and
-// made, built again only once the library changed.
+// made, built again only once the library, or the language, changed.
 func (s *shell) localShelves() []media.Shelf {
-	if v := s.svc.Collection.Version(); !s.localBuilt || v != s.localVersion {
-		s.local, s.localVersion, s.localBuilt = s.svc.Catalog.LocalShelves(), v, true
+	if v, l := s.svc.Collection.Version(), i18n.Locale(); !s.localBuilt || v != s.localVersion || l != s.localLocale {
+		s.local, s.localVersion, s.localLocale, s.localBuilt = s.svc.Catalog.LocalShelves(), v, l, true
 	}
 	return s.local
 }

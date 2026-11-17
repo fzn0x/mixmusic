@@ -13,10 +13,10 @@ package player
 
 import (
 	"errors"
-	"fmt"
 	"slices"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // maxEmptyRadios stops autoplay once that many radios in a row added
@@ -168,13 +168,13 @@ func (p *Player) pastEnd(m *move) {
 	switch {
 	case p.s.Repeat == RepeatAll:
 		// Round the whole queue, nothing played.
-		p.stopMove(m, "The rest of the queue is "+m.what())
+		p.stopMove(m, locales.PlayerRestPassedOver(m.what()))
 		return
 	case !p.svc.Settings().Autoplay:
-		p.stopMove(m, "The rest of the queue is "+m.what())
+		p.stopMove(m, locales.PlayerRestPassedOver(m.what()))
 		return
 	case p.passing.radios >= maxEmptyRadios:
-		p.stopMove(m, "Autoplay stopped: three radios in a row held only "+m.what())
+		p.stopMove(m, locales.PlayerAutoplayRadios(m.what()))
 		return
 	}
 	seed, ok := p.radioSeed()
@@ -200,9 +200,9 @@ func (p *Player) pastEnd(m *move) {
 			p.waitRadio()
 		case errors.Is(err, errOnlyLabeled):
 			m.ai++
-			p.stopMove(m, "Autoplay stopped: the radio held nothing new but "+m.what())
+			p.stopMove(m, locales.PlayerAutoplayNothingNew(m.what()))
 		default:
-			p.stopMove(m, "Autoplay stopped: the radio held nothing new but "+m.what())
+			p.stopMove(m, locales.PlayerAutoplayNothingNew(m.what()))
 		}
 	})
 }
@@ -271,14 +271,14 @@ func (p *Player) passOver(m *move, it Item, why string) {
 		spotify: it.Track.Source == media.SourceSpotify})
 }
 
-// what names what the move m passed over, for its notices: the songs
-// YouTube labels as made with AI, with those the user dislikes when it
-// passed over those too.
+// what is the case of its notices of what the move m passed over: the
+// songs YouTube labels as made with AI, with those the user dislikes
+// ("disliked") when it passed over those too.
 func (m *move) what() string {
 	if m.passed > m.ai {
-		return "songs you dislike or YouTube labels as made with AI"
+		return "disliked"
 	}
-	return "songs YouTube labels as made with AI"
+	return "ai"
 }
 
 // stopMove ends the move m, which found nothing to play past the entries
@@ -350,13 +350,13 @@ func (p *Player) tellSkipped() {
 	var msg string
 	switch {
 	case len(s) == 1 && s[0].spotify:
-		msg = "Skipped " + s[0].title + ", whose recording on YouTube Music YouTube labels as made with AI"
+		msg = locales.PlayerSkippedMadeWithAISpotify(s[0].title)
 	case len(s) == 1:
-		msg = "Skipped " + s[0].title + ", which YouTube labels as made with AI"
+		msg = locales.PlayerSkippedMadeWithAI(s[0].title)
 	case ai < len(s):
-		msg = fmt.Sprintf("Skipped %d songs you dislike or YouTube labels as made with AI", len(s))
+		msg = locales.PlayerSkippedSongsDislikedOrAI(len(s))
 	default:
-		msg = fmt.Sprintf("Skipped %d songs YouTube labels as made with AI", len(s))
+		msg = locales.PlayerSkippedSongsAI(len(s))
 	}
 	p.notify(Notice{Message: msg, Settings: true})
 }
@@ -375,11 +375,11 @@ func allPassedOver(items []Item) string {
 	}
 	switch {
 	case ai == 0:
-		return "You dislike every song here"
+		return locales.PlayerAllDisliked()
 	case ai == len(items):
-		return "YouTube labels every song here as made with AI"
+		return locales.PlayerAllMadeWithAI()
 	}
-	return "Every song here is one you dislike or YouTube labels as made with AI"
+	return locales.PlayerAllDislikedOrAI()
 }
 
 // leave moves on from the current entry, which the queue now passes over,

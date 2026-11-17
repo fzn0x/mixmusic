@@ -129,12 +129,13 @@ func failureStep(st player.Step, pr privacy) string {
 const failureStopped = "MixMusic stopped playing after it, as the tracks just before it couldn't play either."
 
 // failureWhen is the time of a failure, as the details show it: its
-// time of day, and its day too when it isn't today.
+// time of day, and its day too when it isn't today, in the language's
+// way.
 func failureWhen(at, now time.Time) string {
 	if y, m, d := at.Date(); y == now.Year() && m == now.Month() && d == now.Day() {
-		return at.Format("15:04:05")
+		return dateIn(at, "jms")
 	}
-	return at.Format("2 Jan 2006, 15:04:05")
+	return dateIn(at, "yMMMdjms")
 }
 
 // failureReport is the details of a failure as text for an issue: the

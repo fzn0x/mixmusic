@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/egoist/mygo"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Hotkeys registers global shortcuts, as mygo.GlobalShortcut does: fn runs
@@ -171,7 +173,7 @@ func (a *App) globalPass(hk Hotkeys, retry bool) bool {
 		}
 		acc, _ := globalAccelerator(keys, runtime.GOOS)
 		if taken[acc] {
-			problems[gc.ID] = "Another command has these keys"
+			problems[gc.ID] = locales.GlobalKeysProblemTaken()
 			continue
 		}
 		accs[gc.ID], taken[acc] = acc, true
@@ -207,13 +209,13 @@ func globalShortcutError(err error, goos string) string {
 	switch {
 	case errors.Is(err, errors.ErrUnsupported):
 		// Wayland, where the desktop has no GlobalShortcuts portal.
-		return "Your desktop doesn't offer global shortcuts"
+		return locales.GlobalKeysProblemNoPortal()
 	case goos == "linux" && strings.Contains(err.Error(), "desktop entry"):
 		// The portal answers NotAllowed to an app it can't name.
-		return "Global shortcuts need MixMusic installed with its desktop entry"
+		return locales.GlobalKeysProblemDesktopEntry()
 	}
 	// MyGo tells no more than that the system refused them.
-	return "These keys are already in use: pick others, or try again once they're free"
+	return locales.GlobalKeysProblemInUse()
 }
 
 // globalPressed runs the command of the global shortcut of id, pressed, on
@@ -405,20 +407,20 @@ func GlobalKeysProblem(keys, goos string) string {
 	k, ok := parseGlobalKeys(keys, goos)
 	switch {
 	case !ok, k.key == "Escape", k.key == "Tab", k.key == "Backspace", k.key == "Delete":
-		return "These keys can't be a global shortcut"
+		return locales.GlobalKeysProblemCantBe()
 	case len(k.key) > 1 && k.key[0] == 'F':
 		if goos == "windows" && k.key == "F12" && !k.super && !k.ctrl && !k.alt && !k.shift {
-			return "Windows keeps F12 for itself"
+			return locales.GlobalKeysProblemF12()
 		}
 	case goos == "darwin":
 		if !k.super && !k.ctrl {
-			return "A global shortcut needs ⌘ or ⌃"
+			return locales.GlobalKeysProblemNeedsMac()
 		}
 	case !k.super && !k.ctrl && !k.alt:
 		if goos == "windows" {
-			return "A global shortcut needs Ctrl, Alt or the Windows key"
+			return locales.GlobalKeysProblemNeedsWindows()
 		}
-		return "A global shortcut needs Ctrl, Alt or Super"
+		return locales.GlobalKeysProblemNeedsSuper()
 	}
 	return ""
 }

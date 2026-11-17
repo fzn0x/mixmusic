@@ -149,7 +149,7 @@ func TestLyricsTimedToAVideo(t *testing.T) {
 	cache := t.TempDir()
 	tv := newTimedVideo(t, 12500*time.Millisecond, cache)
 	l, err := tv.c.Lyrics(t.Context(), instantCrushVideo)
-	if err != nil || !l.Synced || l.Note != timingNote || !near(l, 0) {
+	if err != nil || !l.Synced || l.Note != timingNote() || !near(l, 0) {
 		t.Fatalf("while timing: %+v, %v", l, err)
 	}
 	tv.waitTold(t, instantCrushVideo.ID)
@@ -165,7 +165,7 @@ func TestLyricsTimedToAVideo(t *testing.T) {
 	}
 
 	again := newTimedVideo(t, 12500*time.Millisecond, cache)
-	if l, err := again.c.Lyrics(t.Context(), instantCrushVideo); err != nil || !near(l, 12500*time.Millisecond) || l.Note == timingNote {
+	if l, err := again.c.Lyrics(t.Context(), instantCrushVideo); err != nil || !near(l, 12500*time.Millisecond) || l.Note == timingNote() {
 		t.Errorf("the next run: %+v, %v", l, err)
 	}
 	if len(again.opened) != 0 {
@@ -180,7 +180,7 @@ func TestLyricsTimedToALongerVideo(t *testing.T) {
 	video := instantCrushVideo
 	video.DurationMs = (5*60 + 38 + 29) * 1000
 	l, err := tv.c.Lyrics(t.Context(), video)
-	if err != nil || l.Synced || l.Note != timingNote {
+	if err != nil || l.Synced || l.Note != timingNote() {
 		t.Fatalf("while timing: %+v, %v", l, err)
 	}
 	tv.waitTold(t, video.ID)
@@ -233,7 +233,7 @@ func TestLyricsTimingThatFails(t *testing.T) {
 	cache := t.TempDir()
 	tv := newTimedVideo(t, 12500*time.Millisecond, cache)
 	tv.fail = errors.New("YouTube refused to send its audio")
-	if l, err := tv.c.Lyrics(t.Context(), instantCrushVideo); err != nil || l.Note != timingNote {
+	if l, err := tv.c.Lyrics(t.Context(), instantCrushVideo); err != nil || l.Note != timingNote() {
 		t.Fatalf("while timing: %+v, %v", l, err)
 	}
 	tv.waitTold(t, instantCrushVideo.ID)

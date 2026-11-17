@@ -70,6 +70,23 @@ func TestAddTranslations(t *testing.T) {
 	}
 }
 
+// TestTranslatedByMachine reads the mark of a catalog a machine
+// translated, which a speaker's review removes.
+func TestTranslatedByMachine(t *testing.T) {
+	if err := addFixture(); err != nil {
+		t.Fatal(err)
+	}
+	read := fstest.MapFS{"qac.json": {Data: []byte(`{"@@locale": "qac", "aboutContribute": "qac: contribute"}`)}}
+	if err := AddTranslations(read); err != nil {
+		t.Fatal(err)
+	}
+	for tag, want := range map[string]bool{"qaa": true, "qac": false, "en": false, "en-XA": false, "de": false} {
+		if got := TranslatedByMachine(tag); got != want {
+			t.Errorf("%s translated by machine: %v", tag, got)
+		}
+	}
+}
+
 // TestAddedCatalogsLoad finds each language of more/ among the app's, and
 // each message of its catalog said in it: one that doesn't parse would say
 // English's.

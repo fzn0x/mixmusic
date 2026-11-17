@@ -1,5 +1,6 @@
 {
   "@@locale": "qaa",
+  "@@x-machine-translated": true,
   "aboutContribute": "qaa: contribute",
   "alreadyInTracks": "{count, plural, other {qaa: # tracks}}",
   "listenBrainzSettingsExpiredServer": "qaa: paste a new user token.{waiting, plural, =0 {} other { qaa: # listens wait.}}",

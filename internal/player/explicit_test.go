@@ -154,7 +154,7 @@ func TestHideExplicitOnlyExplicit(t *testing.T) {
 	h = newHarness(t, Saved{}, hidingExplicit, disliking("a"))
 	h.p.PlayAll(explicitTracks("a", "x1"), false)
 	h.on(func(*Player) {})
-	if notes := h.notices(); len(notes) != 1 || !strings.HasPrefix(notes[0].Message, "Every song here is explicit, which your settings hide, or") {
+	if notes := h.notices(); len(notes) != 1 || !strings.HasPrefix(notes[0].Message, "Nothing here can play: some songs are explicit, which your settings hide, and") {
 		t.Errorf("told %+v", notes)
 	}
 }

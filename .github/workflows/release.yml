@@ -53,10 +53,10 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
-      # A pull request may add a message in English alone; a release ships
-      # none a language lacks.
-      - name: Every language translates every message
-        run: MIXMUSIC_RELEASE=1 go test ./locales -run TestEveryLanguageTranslatesEveryMessage
+      # A message a language lacks shows in English: the release ships, and
+      # its warnings say what is left to translate.
+      - name: The messages each language lacks
+        run: go run ./tools/translations
 
   build:
     needs: check

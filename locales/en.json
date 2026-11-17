@@ -4365,7 +4365,7 @@
       }
     }
   },
-  "playerSkippedParts": "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} other {Skipped parts of # kinds}}",
+  "playerSkippedParts": "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} one {Skipped {first}} other {Skipped parts of # kinds}}",
   "@playerSkippedParts": {
     "description": "A notice, with Undo, as MixMusic passes over parts of a video SponsorBlock marks. {count} is how many kinds the parts are of, {first} and {second} the first two, as playerPart names them.",
     "placeholders": {

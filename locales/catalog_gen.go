@@ -15227,7 +15227,7 @@ func (msgs Messages) PlayerSkippedMadeWithAISpotify(title string) string {
 	return Catalog.Format(msgs.locale, "playerSkippedMadeWithAISpotify", map[string]any{"title": title})
 }
 
-// PlayerSkippedParts says "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} other {Skipped parts of # …"
+// PlayerSkippedParts says "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} one {Skipped {first}} othe…"
 // in the language the app shows.
 //
 // A notice, with Undo, as MixMusic passes over parts of a video
@@ -15237,7 +15237,7 @@ func PlayerSkippedParts(count int, first string, second string) string {
 	return In(i18n.Locale()).PlayerSkippedParts(count, first, second)
 }
 
-// PlayerSkippedParts says "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} other {Skipped parts of # …"
+// PlayerSkippedParts says "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} one {Skipped {first}} othe…"
 // in the language of msgs.
 //
 // A notice, with Undo, as MixMusic passes over parts of a video

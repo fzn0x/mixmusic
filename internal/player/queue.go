@@ -43,6 +43,22 @@ func (p *Player) PlayWithRadio(t media.Track) {
 	})
 }
 
+// PlayRadio replaces the queue with t, which the user chose, and plays it
+// at once, with found, the radio of t, after it as the radio's entries: so
+// what the user adds afterwards goes before them, as after autoplay's.
+func (p *Player) PlayRadio(t media.Track, found []media.Track) {
+	found = slices.Clone(found)
+	p.do(func() {
+		if p.refuses(t) {
+			return
+		}
+		p.playTracks([]media.Track{t}, 0)
+		if len(p.s.Queue) > 0 {
+			p.addRadio(found)
+		}
+	})
+}
+
 // PlayAll replaces the queue with tracks, and plays them from the first
 // the queue doesn't pass over, as a collection's play button does;
 // shuffled, from one of those at random, shuffle on. When it would pass

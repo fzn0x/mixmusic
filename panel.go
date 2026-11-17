@@ -642,7 +642,7 @@ func (s *shell) startRadio(t media.Track) {
 				s.notes = append(s.notes, noticeOf(err))
 				return
 			}
-			s.p.PlayTracks(append([]media.Track{t}, player.RadioTracks(found, []media.Track{t})...), 0)
+			s.p.PlayRadio(t, found)
 		})
 	}()
 }

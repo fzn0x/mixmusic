@@ -4,6 +4,7 @@ package locales
 
 import (
 	"embed"
+	"time"
 
 	"github.com/egoist/mygo/i18n"
 )
@@ -15916,16 +15917,28 @@ func (msgs Messages) RoomPageActivity() string {
 	return Catalog.Format(msgs.locale, "roomPageActivity", nil)
 }
 
-// RoomPageActivityLine says "{name} {what}{song} · {clock}"
+// RoomPageActivityLine says "{what, select, joined {{name} joined} left {{name} left} removed {{name} removed} blocked {{name} blocked} guessed {{…"
 // in the language the app shows.
-func RoomPageActivityLine(name string, what string, song string, clock string) string {
-	return In(i18n.Locale()).RoomPageActivityLine(name, what, song, clock)
+//
+// A line of the activity of the room this computer hosts: who did what, and
+// when. {what} is what the guest {name} did: joined, left, was removed or
+// blocked by the host, tried too many wrong codes, had the host's player
+// play, pause, skip or go back, or added a song, or asked to add one, whose
+// title is {song}.
+func RoomPageActivityLine(what string, name string, song string, time_ time.Time) string {
+	return In(i18n.Locale()).RoomPageActivityLine(what, name, song, time_)
 }
 
-// RoomPageActivityLine says "{name} {what}{song} · {clock}"
+// RoomPageActivityLine says "{what, select, joined {{name} joined} left {{name} left} removed {{name} removed} blocked {{name} blocked} guessed {{…"
 // in the language of msgs.
-func (msgs Messages) RoomPageActivityLine(name string, what string, song string, clock string) string {
-	return Catalog.Format(msgs.locale, "roomPageActivityLine", map[string]any{"name": name, "what": what, "song": song, "clock": clock})
+//
+// A line of the activity of the room this computer hosts: who did what, and
+// when. {what} is what the guest {name} did: joined, left, was removed or
+// blocked by the host, tried too many wrong codes, had the host's player
+// play, pause, skip or go back, or added a song, or asked to add one, whose
+// title is {song}.
+func (msgs Messages) RoomPageActivityLine(what string, name string, song string, time_ time.Time) string {
+	return Catalog.Format(msgs.locale, "roomPageActivityLine", map[string]any{"what": what, "name": name, "song": song, "time": time_})
 }
 
 // RoomPageAway says "{name} · away"
@@ -15966,16 +15979,6 @@ func RoomPageBlocked() string { return In(i18n.Locale()).RoomPageBlocked() }
 // in the language of msgs.
 func (msgs Messages) RoomPageBlocked() string {
 	return Catalog.Format(msgs.locale, "roomPageBlocked", nil)
-}
-
-// RoomPageBlockedActivity says "blocked"
-// in the language the app shows.
-func RoomPageBlockedActivity() string { return In(i18n.Locale()).RoomPageBlockedActivity() }
-
-// RoomPageBlockedActivity says "blocked"
-// in the language of msgs.
-func (msgs Messages) RoomPageBlockedActivity() string {
-	return Catalog.Format(msgs.locale, "roomPageBlockedActivity", nil)
 }
 
 // RoomPageChecking says "Checking the code with {host}…"
@@ -16026,16 +16029,6 @@ func RoomPageEndRoom() string { return In(i18n.Locale()).RoomPageEndRoom() }
 // in the language of msgs.
 func (msgs Messages) RoomPageEndRoom() string {
 	return Catalog.Format(msgs.locale, "roomPageEndRoom", nil)
-}
-
-// RoomPageGuessedActivity says "tried too many wrong codes"
-// in the language the app shows.
-func RoomPageGuessedActivity() string { return In(i18n.Locale()).RoomPageGuessedActivity() }
-
-// RoomPageGuessedActivity says "tried too many wrong codes"
-// in the language of msgs.
-func (msgs Messages) RoomPageGuessedActivity() string {
-	return Catalog.Format(msgs.locale, "roomPageGuessedActivity", nil)
 }
 
 // RoomPageGuests says "Guests"
@@ -16130,16 +16123,6 @@ func (msgs Messages) RoomPageJoinRoom(name string) string {
 	return Catalog.Format(msgs.locale, "roomPageJoinRoom", map[string]any{"name": name})
 }
 
-// RoomPageJoinedActivity says "joined"
-// in the language the app shows.
-func RoomPageJoinedActivity() string { return In(i18n.Locale()).RoomPageJoinedActivity() }
-
-// RoomPageJoinedActivity says "joined"
-// in the language of msgs.
-func (msgs Messages) RoomPageJoinedActivity() string {
-	return Catalog.Format(msgs.locale, "roomPageJoinedActivity", nil)
-}
-
 // RoomPageLeaveRoom says "leave room"
 // in the language the app shows.
 func RoomPageLeaveRoom() string { return In(i18n.Locale()).RoomPageLeaveRoom() }
@@ -16148,16 +16131,6 @@ func RoomPageLeaveRoom() string { return In(i18n.Locale()).RoomPageLeaveRoom() }
 // in the language of msgs.
 func (msgs Messages) RoomPageLeaveRoom() string {
 	return Catalog.Format(msgs.locale, "roomPageLeaveRoom", nil)
-}
-
-// RoomPageLeftActivity says "left"
-// in the language the app shows.
-func RoomPageLeftActivity() string { return In(i18n.Locale()).RoomPageLeftActivity() }
-
-// RoomPageLeftActivity says "left"
-// in the language of msgs.
-func (msgs Messages) RoomPageLeftActivity() string {
-	return Catalog.Format(msgs.locale, "roomPageLeftActivity", nil)
 }
 
 // RoomPageListening says "Listening: {members}"
@@ -16280,16 +16253,6 @@ func RoomPageRemoveGuest(name string) string { return In(i18n.Locale()).RoomPage
 // in the language of msgs.
 func (msgs Messages) RoomPageRemoveGuest(name string) string {
 	return Catalog.Format(msgs.locale, "roomPageRemoveGuest", map[string]any{"name": name})
-}
-
-// RoomPageRemovedActivity says "removed"
-// in the language the app shows.
-func RoomPageRemovedActivity() string { return In(i18n.Locale()).RoomPageRemovedActivity() }
-
-// RoomPageRemovedActivity says "removed"
-// in the language of msgs.
-func (msgs Messages) RoomPageRemovedActivity() string {
-	return Catalog.Format(msgs.locale, "roomPageRemovedActivity", nil)
 }
 
 // RoomPageRemovedNote says "Removed and blocked guests can't come back with the code or the link they have under a new name: a new code, and a ne…"

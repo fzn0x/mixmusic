@@ -4666,20 +4666,23 @@
   "roomMenuNewCode": "The room has a new code: the old code and link no longer let anyone in",
   "roomMenuYourRoom": "Your room",
   "roomPageActivity": "Activity",
-  "roomPageActivityLine": "{name} {what}{song} · {clock}",
+  "roomPageActivityLine": "{what, select, joined {{name} joined} left {{name} left} removed {{name} removed} blocked {{name} blocked} guessed {{name} tried too many wrong codes} played {{name} played} paused {{name} paused} skipped {{name} skipped to the next track} back {{name} went back a track} added {{name} added {song}} asked {{name} asked to add {song}} other {{name}}} · {time, time, short}",
   "@roomPageActivityLine": {
+    "description": "A line of the activity of the room this computer hosts: who did what, and when. {what} is what the guest {name} did: joined, left, was removed or blocked by the host, tried too many wrong codes, had the host's player play, pause, skip or go back, or added a song, or asked to add one, whose title is {song}.",
     "placeholders": {
-      "name": {
-        "type": "String"
-      },
       "what": {
         "type": "String"
       },
-      "song": {
-        "type": "String"
+      "name": {
+        "type": "String",
+        "example": "Ana's laptop"
       },
-      "clock": {
-        "type": "String"
+      "song": {
+        "type": "String",
+        "example": "Midnight City"
+      },
+      "time": {
+        "type": "DateTime"
       }
     }
   },
@@ -4701,7 +4704,6 @@
     }
   },
   "roomPageBlocked": "Blocked",
-  "roomPageBlockedActivity": "blocked",
   "roomPageChecking": "Checking the code with {host}…",
   "@roomPageChecking": {
     "placeholders": {
@@ -4721,7 +4723,6 @@
   "roomPageCopiedLink": "Copied the invite link",
   "roomPageCopyLink": "copy invite link",
   "roomPageEndRoom": "end room",
-  "roomPageGuessedActivity": "tried too many wrong codes",
   "roomPageGuests": "Guests",
   "roomPageHosts": "{host} hosts this room.",
   "@roomPageHosts": {
@@ -4762,9 +4763,7 @@
       }
     }
   },
-  "roomPageJoinedActivity": "joined",
   "roomPageLeaveRoom": "leave room",
-  "roomPageLeftActivity": "left",
   "roomPageListening": "Listening: {members}",
   "@roomPageListening": {
     "placeholders": {
@@ -4815,7 +4814,6 @@
       }
     }
   },
-  "roomPageRemovedActivity": "removed",
   "roomPageRemovedNote": "Removed and blocked guests can't come back with the code or the link they have under a new name: a new code, and a new link, shut them out, and your guests stay.",
   "roomPageRoomCode": "Room code",
   "roomPageRoomsOnNetwork": "Rooms on the network",

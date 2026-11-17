@@ -407,10 +407,20 @@ func (msgs Messages) AccountSettingsLastfmDropped(count int) string {
 
 // AccountSettingsLastfmForm says "Create an API account on Last.fm; any name and description will do, and the callback URL can stay empty. Paste its AP…"
 // in the language the app shows.
+//
+// Never shown: what Settings' search finds the Last.fm form by, its steps
+// and labels, then words people search for, as "Scrobble, scrobbling. Sign
+// in, log in.". Translate it, and give the words and synonyms people search
+// for in your language.
 func AccountSettingsLastfmForm() string { return In(i18n.Locale()).AccountSettingsLastfmForm() }
 
 // AccountSettingsLastfmForm says "Create an API account on Last.fm; any name and description will do, and the callback URL can stay empty. Paste its AP…"
 // in the language of msgs.
+//
+// Never shown: what Settings' search finds the Last.fm form by, its steps
+// and labels, then words people search for, as "Scrobble, scrobbling. Sign
+// in, log in.". Translate it, and give the words and synonyms people search
+// for in your language.
 func (msgs Messages) AccountSettingsLastfmForm() string {
 	return Catalog.Format(msgs.locale, "accountSettingsLastfmForm", nil)
 }
@@ -673,10 +683,20 @@ func (msgs Messages) AccountSettingsSpotifyDesc() string {
 
 // AccountSettingsSpotifyForm says "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium…"
 // in the language the app shows.
+//
+// Never shown: what Settings' search finds the Spotify sign-in form by, its
+// steps and labels, then words people search for, as "Sign in, log in.".
+// Translate it, and give the words and synonyms people search for in your
+// language.
 func AccountSettingsSpotifyForm() string { return In(i18n.Locale()).AccountSettingsSpotifyForm() }
 
 // AccountSettingsSpotifyForm says "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium…"
 // in the language of msgs.
+//
+// Never shown: what Settings' search finds the Spotify sign-in form by, its
+// steps and labels, then words people search for, as "Sign in, log in.".
+// Translate it, and give the words and synonyms people search for in your
+// language.
 func (msgs Messages) AccountSettingsSpotifyForm() string {
 	return Catalog.Format(msgs.locale, "accountSettingsSpotifyForm", nil)
 }
@@ -917,12 +937,22 @@ func (msgs Messages) AccountSettingsYouTubeChannelTitle() string {
 
 // AccountSettingsYouTubeCookieForm says "Import from a browser. Sign in with the session of a browser you signed in to YouTube Music with. Browser. Profile. A…"
 // in the language the app shows.
+//
+// Never shown: what Settings' search finds the form that imports a
+// browser's YouTube Music session by, its steps and labels, then words
+// people search for. Translate it, and give the words and synonyms people
+// search for in your language.
 func AccountSettingsYouTubeCookieForm() string {
 	return In(i18n.Locale()).AccountSettingsYouTubeCookieForm()
 }
 
 // AccountSettingsYouTubeCookieForm says "Import from a browser. Sign in with the session of a browser you signed in to YouTube Music with. Browser. Profile. A…"
 // in the language of msgs.
+//
+// Never shown: what Settings' search finds the form that imports a
+// browser's YouTube Music session by, its steps and labels, then words
+// people search for. Translate it, and give the words and synonyms people
+// search for in your language.
 func (msgs Messages) AccountSettingsYouTubeCookieForm() string {
 	return Catalog.Format(msgs.locale, "accountSettingsYouTubeCookieForm", nil)
 }
@@ -965,10 +995,20 @@ func (msgs Messages) AccountSettingsYouTubeDidntSignIn() string {
 
 // AccountSettingsYouTubeForm says "Sign in to YouTube Music. Log in. Google account. YouTube Music needs no account: search, artists, albums, playlists …"
 // in the language the app shows.
+//
+// Never shown: what Settings' search finds the YouTube Music sign-in by,
+// its steps and labels, then words people search for, as "Log in. Google
+// account.". Translate it, and give the words and synonyms people search
+// for in your language.
 func AccountSettingsYouTubeForm() string { return In(i18n.Locale()).AccountSettingsYouTubeForm() }
 
 // AccountSettingsYouTubeForm says "Sign in to YouTube Music. Log in. Google account. YouTube Music needs no account: search, artists, albums, playlists …"
 // in the language of msgs.
+//
+// Never shown: what Settings' search finds the YouTube Music sign-in by,
+// its steps and labels, then words people search for, as "Log in. Google
+// account.". Translate it, and give the words and synonyms people search
+// for in your language.
 func (msgs Messages) AccountSettingsYouTubeForm() string {
 	return Catalog.Format(msgs.locale, "accountSettingsYouTubeForm", nil)
 }
@@ -9289,10 +9329,18 @@ func (msgs Messages) ListenBrainzSettingsExpiredServer(waiting int) string {
 
 // ListenBrainzSettingsForm says "Copy your user token from your ListenBrainz settings, or your own server's. Paste it here, and connect. User token. S…"
 // in the language the app shows.
+//
+// Never shown: what Settings' search finds the ListenBrainz form by, its
+// steps and labels, then words people search for. Translate it, and give
+// the words and synonyms people search for in your language.
 func ListenBrainzSettingsForm() string { return In(i18n.Locale()).ListenBrainzSettingsForm() }
 
 // ListenBrainzSettingsForm says "Copy your user token from your ListenBrainz settings, or your own server's. Paste it here, and connect. User token. S…"
 // in the language of msgs.
+//
+// Never shown: what Settings' search finds the ListenBrainz form by, its
+// steps and labels, then words people search for. Translate it, and give
+// the words and synonyms people search for in your language.
 func (msgs Messages) ListenBrainzSettingsForm() string {
 	return Catalog.Format(msgs.locale, "listenBrainzSettingsForm", nil)
 }
@@ -16309,12 +16357,16 @@ func (msgs Messages) RoomPageRemoveGuest(name string) string {
 	return Catalog.Format(msgs.locale, "roomPageRemoveGuest", map[string]any{"name": name})
 }
 
-// RoomPageRemovedNote says "Removed and blocked guests can't come back with the code or the link they have under a new name: a new code, and a ne…"
+// RoomPageRemovedNote says "A removed guest can join again with the code or the link it has, and a blocked one too, once it comes back as another…"
 // in the language the app shows.
+//
+// On the page of the room this computer hosts, under its guests.
 func RoomPageRemovedNote() string { return In(i18n.Locale()).RoomPageRemovedNote() }
 
-// RoomPageRemovedNote says "Removed and blocked guests can't come back with the code or the link they have under a new name: a new code, and a ne…"
+// RoomPageRemovedNote says "A removed guest can join again with the code or the link it has, and a blocked one too, once it comes back as another…"
 // in the language of msgs.
+//
+// On the page of the room this computer hosts, under its guests.
 func (msgs Messages) RoomPageRemovedNote() string {
 	return Catalog.Format(msgs.locale, "roomPageRemovedNote", nil)
 }
@@ -20747,10 +20799,16 @@ func (msgs Messages) TrackSelectBar() string {
 
 // TrackSelectClear says "Clear the selection"
 // in the language the app shows.
+//
+// The tooltip, and what screen readers say, of the close button beside the
+// count of selected tracks: it deselects them all.
 func TrackSelectClear() string { return In(i18n.Locale()).TrackSelectClear() }
 
 // TrackSelectClear says "Clear the selection"
 // in the language of msgs.
+//
+// The tooltip, and what screen readers say, of the close button beside the
+// count of selected tracks: it deselects them all.
 func (msgs Messages) TrackSelectClear() string {
 	return Catalog.Format(msgs.locale, "trackSelectClear", nil)
 }
@@ -20767,10 +20825,16 @@ func (msgs Messages) TrackSelectCount(count int) string {
 
 // TrackSelectDeselect says "Deselect"
 // in the language the app shows.
+//
+// An item of a track's menu while tracks are selected: it takes this track
+// out of the selection.
 func TrackSelectDeselect() string { return In(i18n.Locale()).TrackSelectDeselect() }
 
 // TrackSelectDeselect says "Deselect"
 // in the language of msgs.
+//
+// An item of a track's menu while tracks are selected: it takes this track
+// out of the selection.
 func (msgs Messages) TrackSelectDeselect() string {
 	return Catalog.Format(msgs.locale, "trackSelectDeselect", nil)
 }
@@ -20881,10 +20945,16 @@ func (msgs Messages) TrackToolsSortArtist() string {
 
 // TrackToolsSortBy says "Sort by"
 // in the language the app shows.
+//
+// What screen readers call the menu that sorts the tracks of a list, or the
+// results of a search, beside them; its choices are the orders, as Length.
 func TrackToolsSortBy() string { return In(i18n.Locale()).TrackToolsSortBy() }
 
 // TrackToolsSortBy says "Sort by"
 // in the language of msgs.
+//
+// What screen readers call the menu that sorts the tracks of a list, or the
+// results of a search, beside them; its choices are the orders, as Length.
 func (msgs Messages) TrackToolsSortBy() string {
 	return Catalog.Format(msgs.locale, "trackToolsSortBy", nil)
 }
@@ -21835,10 +21905,18 @@ func (msgs Messages) YoutubeBrowserDidntSignIn() string {
 
 // YoutubeBrowserForm says "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any …"
 // in the language the app shows.
+//
+// Never shown: what Settings' search finds the browser sign-in to YouTube
+// Music by, its steps and labels, then words people search for. Translate
+// it, and give the words and synonyms people search for in your language.
 func YoutubeBrowserForm() string { return In(i18n.Locale()).YoutubeBrowserForm() }
 
 // YoutubeBrowserForm says "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any …"
 // in the language of msgs.
+//
+// Never shown: what Settings' search finds the browser sign-in to YouTube
+// Music by, its steps and labels, then words people search for. Translate
+// it, and give the words and synonyms people search for in your language.
 func (msgs Messages) YoutubeBrowserForm() string {
 	return Catalog.Format(msgs.locale, "youtubeBrowserForm", nil)
 }

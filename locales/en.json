@@ -51,6 +51,9 @@
     }
   },
   "accountSettingsLastfmForm": "Create an API account on Last.fm; any name and description will do, and the callback URL can stay empty. Paste its API key and shared secret here, and connect. Approve MixMusic on the page that opens in your browser. Connect to Last.fm. Scrobble, scrobbling. Sign in, log in. MixMusic keeps them in your system's credential store, with the connection.",
+  "@accountSettingsLastfmForm": {
+    "description": "Never shown: what Settings' search finds the Last.fm form by, its steps and labels, then words people search for, as \"Scrobble, scrobbling. Sign in, log in.\". Translate it, and give the words and synonyms people search for in your language."
+  },
   "accountSettingsLastfmGone": "Last.fm no longer accepts this connection",
   "accountSettingsLastfmHint": "MixMusic keeps them in your system's credential store, with the connection.",
   "accountSettingsLastfmLoves": "Send likes as loves",
@@ -125,6 +128,9 @@
   "accountSettingsSpotifyDashboard": "Spotify developer dashboard",
   "accountSettingsSpotifyDesc": "Search, your library and playback of Spotify.",
   "accountSettingsSpotifyForm": "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium. Add this redirect URI to it. In its settings, under Users Management, add your name and the email of the Spotify account you sign in with. Paste the app's Client ID here, and sign in to Spotify. Log in. Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
+  "@accountSettingsSpotifyForm": {
+    "description": "Never shown: what Settings' search finds the Spotify sign-in form by, its steps and labels, then words people search for, as \"Sign in, log in.\". Translate it, and give the words and synonyms people search for in your language."
+  },
   "accountSettingsSpotifyHint": "Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
   "accountSettingsSpotifyPaste": "Paste the app's Client ID here, and sign in.",
   "accountSettingsSpotifyRedirect": "Add this redirect URI to it: {uri} {copy}",
@@ -195,10 +201,16 @@
   "accountSettingsYouTubeChannelAbout": "Brand channels of your account have their own home feed, library and likes.",
   "accountSettingsYouTubeChannelTitle": "Channel",
   "accountSettingsYouTubeCookieForm": "Import from a browser. Sign in with the session of a browser you signed in to YouTube Music with. Browser. Profile. Another profile than the browser's own, by its name or its folder. MixMusic finds those of Zen, Helium and the browsers installed as Flatpaks in their folders. Import. MixMusic reads the browser's cookies with yt-dlp, keeps YouTube's alone, encrypted on this computer, and deletes the rest at once. Close the browser first: while it's open, it may hold its cookies, or not have saved a new sign-in yet. Recent Chrome on Windows seals its cookies against other programs: use Firefox there, or paste a cookie header. Paste a cookie header. In a tab signed in to music.youtube.com, open the developer tools, and copy the Cookie header of a request to music.youtube.com from the Network panel. The text of a cookies.txt file will do too. Sign in with it. Log in. A cookie header is as good as your password: paste it here alone. YouTube may end a session that goes on in the browser; one from a private window you then close lasts longest.",
+  "@accountSettingsYouTubeCookieForm": {
+    "description": "Never shown: what Settings' search finds the form that imports a browser's YouTube Music session by, its steps and labels, then words people search for. Translate it, and give the words and synonyms people search for in your language."
+  },
   "accountSettingsYouTubeCookieLabel": "Cookie header",
   "accountSettingsYouTubeCookieTitle": "Sign in to YouTube Music with a browser's cookies",
   "accountSettingsYouTubeDidntSignIn": "MixMusic didn't sign in to YouTube Music",
   "accountSettingsYouTubeForm": "Sign in to YouTube Music. Log in. Google account. YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out, unless Play audio as your account is on: then yt-dlp asks as your account first. You sign in on Google's own page, in a window of MixMusic: MixMusic never sees your password, and keeps the session encrypted on this computer. YouTube Music does not offer this to apps officially, so it may stop working when YouTube changes.",
+  "@accountSettingsYouTubeForm": {
+    "description": "Never shown: what Settings' search finds the YouTube Music sign-in by, its steps and labels, then words people search for, as \"Log in. Google account.\". Translate it, and give the words and synonyms people search for in your language."
+  },
   "accountSettingsYouTubeHint": "YouTube Music needs no account: search, artists, albums, playlists and radios work signed out. Signed in, MixMusic shows your own home feed and library, and saves what you like and follow to YouTube Music. Tracks play as they do signed out, unless Play audio as your account is on: then yt-dlp asks as your account first.",
   "accountSettingsYouTubeHistoryDesc": "YouTube Music makes its home and its radios of your history. Tracks join it once they played a while, as they do on Last.fm, and episodes keep where you left them, for YouTube Music to go on from there on your other devices.",
   "accountSettingsYouTubeHistoryLabel": "Add what you play to your YouTube Music history",
@@ -2757,6 +2769,9 @@
     }
   },
   "listenBrainzSettingsForm": "Copy your user token from your ListenBrainz settings, or your own server's. Paste it here, and connect. User token. Server. Leave it empty for ListenBrainz itself. A ListenBrainz of your own takes its address, and Maloja its address followed by /apis/listenbrainz. Connect to ListenBrainz. Scrobble, scrobbling, listens. Self-hosted, Maloja. Sign in, log in. MixMusic keeps your token in your system's credential store, with the connection.",
+  "@listenBrainzSettingsForm": {
+    "description": "Never shown: what Settings' search finds the ListenBrainz form by, its steps and labels, then words people search for. Translate it, and give the words and synonyms people search for in your language."
+  },
   "listenBrainzSettingsHint": "MixMusic keeps your token in your system's credential store, with the connection.",
   "listenBrainzSettingsLoves": "A like loves the song on ListenBrainz, and an unlike takes the love back.",
   "listenBrainzSettingsLovesSwitch": "Send likes to ListenBrainz as loves",
@@ -4965,7 +4980,10 @@
       }
     }
   },
-  "roomPageRemovedNote": "Removed and blocked guests can't come back with the code or the link they have under a new name: a new code, and a new link, shut them out, and your guests stay.",
+  "roomPageRemovedNote": "A removed guest can join again with the code or the link it has, and a blocked one too, once it comes back as another computer. A new code, and a new link, shut them out; your other guests stay.",
+  "@roomPageRemovedNote": {
+    "description": "On the page of the room this computer hosts, under its guests."
+  },
   "roomPageRoomCode": "Room code",
   "roomPageRoomsOnNetwork": "Rooms on the network",
   "roomPageStartRoom": "start a room",
@@ -6183,6 +6201,9 @@
   "trackSelectAll": "select all",
   "trackSelectBar": "Selected tracks",
   "trackSelectClear": "Clear the selection",
+  "@trackSelectClear": {
+    "description": "The tooltip, and what screen readers say, of the close button beside the count of selected tracks: it deselects them all."
+  },
   "trackSelectCount": "{count} selected",
   "@trackSelectCount": {
     "placeholders": {
@@ -6192,6 +6213,9 @@
     }
   },
   "trackSelectDeselect": "Deselect",
+  "@trackSelectDeselect": {
+    "description": "An item of a track's menu while tracks are selected: it takes this track out of the selection."
+  },
   "trackSelectDownload": "download",
   "trackSelectDownloadLabel": "Download the selected tracks",
   "trackSelectItem": "Select",
@@ -6248,6 +6272,9 @@
   },
   "trackToolsSortArtist": "Artist",
   "trackToolsSortBy": "Sort by",
+  "@trackToolsSortBy": {
+    "description": "What screen readers call the menu that sorts the tracks of a list, or the results of a search, beside them; its choices are the orders, as Length."
+  },
   "trackToolsSortLength": "Length",
   "trackToolsSortPlays": "Plays",
   "trackToolsSortTitle": "Title",
@@ -6513,6 +6540,9 @@
   "youtubeBrowserChoose": "Browser to sign in with",
   "youtubeBrowserDidntSignIn": "MixMusic didn't sign in to YouTube Music",
   "youtubeBrowserForm": "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any browser: MixMusic then takes the session, closes the browser and deletes the profile. Your own profiles stay as they are. MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others made from Chromium when MixMusic opens them. Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone, never yours, and keeps the session encrypted on this computer. Sign in with. Log in. Temporary profile. Google refuses.",
+  "@youtubeBrowserForm": {
+    "description": "Never shown: what Settings' search finds the browser sign-in to YouTube Music by, its steps and labels, then words people search for. Translate it, and give the words and synonyms people search for in your language."
+  },
   "youtubeBrowserHint": "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone, never yours, and keeps the session encrypted on this computer.",
   "youtubeBrowserNone": "MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others made from Chromium when MixMusic opens them.",
   "youtubeBrowserSignInNotice": "Sign in to YouTube Music in {browser}",

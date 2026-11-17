@@ -124,5 +124,8 @@ func (a *App) useYouTubeAccount(authUser int, pageID string) error {
 	a.mu.Lock()
 	a.youtubeMe, a.profileErrs.youtube = nil, ""
 	a.mu.Unlock()
+	// The tracks whose audio found as the account YouTube refused are
+	// asked for as it again at once, as of a session of its own (#578).
+	a.resolver.ForgetRefusals()
 	return nil
 }

@@ -25,10 +25,20 @@ func (c *Client) Related(ctx context.Context, videoID string) ([]media.Shelf, er
 	return sectionShelves(page.get("contents", "sectionListRenderer", "contents")), nil
 }
 
-// relatedBrowseID returns the browse ID of a track's related tab.
+// relatedBrowseID returns the browse ID of a track's or an episode's related
+// tab. The tab is found by its page type, since an episode's ID does not
+// start with MPTRt; that prefix still finds a tab that names no page type.
 func relatedBrowseID(n node) string {
 	for _, tab := range watchNextTabs(n) {
-		if id := tab.get("tabRenderer", "endpoint", "browseEndpoint", "browseId").str(); strings.HasPrefix(id, "MPTRt") {
+		e := tab.get("tabRenderer", "endpoint")
+		id := e.get("browseEndpoint", "browseId").str()
+		switch pageType(e) {
+		case "MUSIC_PAGE_TYPE_TRACK_RELATED", "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_RELATED":
+			if id != "" {
+				return id
+			}
+		}
+		if strings.HasPrefix(id, "MPTRt") {
 			return id
 		}
 	}

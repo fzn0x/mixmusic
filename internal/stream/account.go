@@ -35,6 +35,12 @@ var accountTimeout = 30 * time.Second
 // those whose stream found as the account YouTube refused.
 const maxRefusedAsAccount = 500
 
+// refusalMark is how long a video is found signed out once YouTube
+// refused its stream found as the account (refused): YouTube may refuse
+// it for a while, or only on the network it was found on, before a move
+// to another or to a VPN, after which the account finds one that plays.
+const refusalMark = 10 * time.Minute
+
 // SetAsAccount has the resolver ask for streams as the user's YouTube Music
 // account from now on, while Session gives a session, or signed out:
 // streams found before are found again.
@@ -84,10 +90,11 @@ func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Qu
 // or nil to ask signed out: while the user asks for it (SetAsAccount) and
 // Session gives one yt-dlp takes for a signed-in one, of the best quality,
 // which alone gains from Premium, with a JavaScript runtime, unless
-// YouTube refused the stream of the video found as the account before.
+// YouTube refused the stream of the video found as the account less than
+// refusalMark ago.
 func (r *Resolver) accountSession(videoID string, quality Quality) []*http.Cookie {
 	r.mu.Lock()
-	on, refused := r.asAccount, r.refusedAsAccount[videoID]
+	on, refused := r.asAccount, r.marked(videoID)
 	r.mu.Unlock()
 	// The clients yt-dlp asks as for an account need a challenge solved,
 	// which takes a runtime, as the 5.1 audio does.
@@ -208,14 +215,26 @@ func writeSession(cookies []*http.Cookie, now time.Time) (string, error) {
 
 // refused remembers that YouTube refused the stream of a video found as
 // the account, when res, which the resolver drops, holds one: it is found
-// signed out from then on, while MixMusic runs. It runs under the
-// resolver's mutex.
+// signed out for refusalMark from then on. It runs under the resolver's
+// mutex.
 func (r *Resolver) refused(videoID string, res *resolution) {
 	if res.err != nil || !res.stream.AsAccount {
 		return
 	}
 	if r.refusedAsAccount == nil || len(r.refusedAsAccount) >= maxRefusedAsAccount {
-		r.refusedAsAccount = map[string]bool{}
+		r.refusedAsAccount = map[string]time.Time{}
 	}
-	r.refusedAsAccount[videoID] = true
+	r.refusedAsAccount[videoID] = time.Now()
+}
+
+// marked reports whether YouTube refused the stream of a video found as
+// the account less than refusalMark ago, forgetting a mark older than
+// that. It runs under the resolver's mutex.
+func (r *Resolver) marked(videoID string) bool {
+	at, ok := r.refusedAsAccount[videoID]
+	if ok && time.Since(at) >= refusalMark {
+		delete(r.refusedAsAccount, videoID)
+		return false
+	}
+	return ok
 }

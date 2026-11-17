@@ -209,10 +209,11 @@ type Resolver struct {
 	mu      sync.Mutex
 	quality Quality
 	// asAccount is set while the user asks for streams as their account,
-	// and refusedAsAccount holds the videos whose stream found so YouTube
-	// refused, which are found signed out (account.go).
+	// and refusedAsAccount holds when YouTube refused the stream of a
+	// video found so: the video is found signed out for refusalMark
+	// (account.go).
 	asAccount        bool
-	refusedAsAccount map[string]bool
+	refusedAsAccount map[string]time.Time
 	// noLogin tells the log once of a session yt-dlp can't ask as.
 	noLogin sync.Once
 	calls   map[string]*resolution

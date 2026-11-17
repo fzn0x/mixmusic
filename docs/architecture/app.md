@@ -4,6 +4,21 @@
   them when the settings, the accounts, the add-ons or the updates change
   (`App.Watch`), makes the player, and puts MixMusic on the desktop: the
   tray, media keys, global shortcuts, deep links, notifications, updates.
+- **Regional formats** (`internal/app/region.go`, `locales/region.go`):
+  MyGo says the messages in the language of the catalog it shows, which
+  alone would write English's dates the United States' way everywhere.
+  Once the app is ready, `followRegion` makes `i18n.Locale`, which the
+  messages and the windows' dates and numbers read, that language with
+  the computer's formats (`mygo.App.Region`), as `en-GB-u-fw-mon-hc-h23`:
+  the catalog's words, the region's dates, times, numbers and clock
+  (#801). `locales.FormatLocale` picks it: the region's formats for the
+  language System shows and for a chosen one the region speaks, else the
+  first of the computer's languages that is the same language, else the
+  language's own; never a tag that would pick another catalog's words,
+  as `pt-AO` picks `pt-PT`'s where `pt-BR` shows. The pseudo-languages
+  stay as they are. The Language row and the direction read the language
+  itself (`Context.Locale`, `mygo.App.Locale`), and MyGo's controls
+  follow the region by themselves.
 - **Control links and flags** (`internal/app/controlcommands.go`,
   `controlcommand.go`): `mixmusic://next` and `--next`, and the others of
   `namedCommands`, run their command through `App.command`, as the media

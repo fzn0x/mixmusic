@@ -168,11 +168,11 @@ func TestLyricsMPEGFrames(t *testing.T) {
 
 // TestLyricsVorbis reads the lyrics of Vorbis comments, of keys in any
 // case, of a FLAC file and an Opus file: synced lyrics of LRC, of a
-// SYNCEDLYRICS or SYNCLYRICS comment, and plain lyrics, of the first of
+// SYNCEDLYRICS or SYNCLYRICS comment, and plain lyrics, of the best of
 // LYRICS, UNSYNCEDLYRICS and UNSYNCED LYRICS, their line breaks kept.
 func TestLyricsVorbis(t *testing.T) {
-	flac := flacFile([]byte{4}, vcomments("TITLE=Glass Rivers", "unsynced lyrics=Glass rivers\r\nRun clear",
-		"lyrics=A second text", "SyncedLyrics=[00:01.00]Glass rivers\n[00:03.50]Run clear"))
+	flac := flacFile([]byte{4}, vcomments("TITLE=Glass Rivers", "unsynced lyrics=A second text",
+		"lyrics=Glass rivers\r\nRun clear", "SyncedLyrics=[00:01.00]Glass rivers\n[00:03.50]Run clear"))
 	checkLyrics(t, read(t, flac), "Glass rivers\nRun clear", "[00:01.00]Glass rivers\n[00:03.50]Run clear")
 	flac = flacFile([]byte{4}, vcomments("LYRICS=Glass rivers\r\nRun clear", "SYNCLYRICS=[00:01.00]Glass"))
 	checkLyrics(t, read(t, flac), "Glass rivers\nRun clear", "[00:01.00]Glass")

@@ -152,7 +152,11 @@ func ilst(meta []byte, t *Tags) {
 			case key != "":
 				t.set(key, texts...)
 			case item == "\xa9lyr":
-				t.setLyrics("LYRICS", texts...)
+				for _, v := range texts {
+					if t.keepLyrics(false, rankStandard, v) {
+						break
+					}
+				}
 			case item == "----" && name == "ISRC":
 				t.set("isrc", texts...)
 			case item == "----":

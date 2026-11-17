@@ -226,15 +226,17 @@ func (msgs Messages) AboutSourceCode() string {
 // AboutTranslation says "Translation"
 // in the language the app shows.
 //
-// The group of Settings › About, and its row, that shows only in a
-// language a machine translated.
+// The group of Settings › About that shows only in a language a machine
+// translated, or whose translators are named; and its row that says a
+// machine translated it.
 func AboutTranslation() string { return In(i18n.Locale()).AboutTranslation() }
 
 // AboutTranslation says "Translation"
 // in the language of msgs.
 //
-// The group of Settings › About, and its row, that shows only in a
-// language a machine translated.
+// The group of Settings › About that shows only in a language a machine
+// translated, or whose translators are named; and its row that says a
+// machine translated it.
 func (msgs Messages) AboutTranslation() string {
 	return Catalog.Format(msgs.locale, "aboutTranslation", nil)
 }
@@ -269,6 +271,60 @@ func AboutTranslationMachine() string { return In(i18n.Locale()).AboutTranslatio
 // language is the one the sentence is in.
 func (msgs Messages) AboutTranslationMachine() string {
 	return Catalog.Format(msgs.locale, "aboutTranslationMachine", nil)
+}
+
+// AboutTranslators says "Translators"
+// in the language the app shows.
+//
+// The row of Settings › About that names the people who translated
+// MixMusic into the language it shows, or fixed its translation. Shows only
+// in a language whose translators are named.
+func AboutTranslators() string { return In(i18n.Locale()).AboutTranslators() }
+
+// AboutTranslators says "Translators"
+// in the language of msgs.
+//
+// The row of Settings › About that names the people who translated
+// MixMusic into the language it shows, or fixed its translation. Shows only
+// in a language whose translators are named.
+func (msgs Messages) AboutTranslators() string {
+	return Catalog.Format(msgs.locale, "aboutTranslators", nil)
+}
+
+// AboutTranslatorsNames says "Translated into this language by {names}."
+// in the language the app shows.
+//
+// Under Translators in Settings › About: this language is the one the
+// sentence is in. {names} are the translators' names, as they chose them,
+// joined by aboutTranslatorsSeparator.
+func AboutTranslatorsNames(names string) string {
+	return In(i18n.Locale()).AboutTranslatorsNames(names)
+}
+
+// AboutTranslatorsNames says "Translated into this language by {names}."
+// in the language of msgs.
+//
+// Under Translators in Settings › About: this language is the one the
+// sentence is in. {names} are the translators' names, as they chose them,
+// joined by aboutTranslatorsSeparator.
+func (msgs Messages) AboutTranslatorsNames(names string) string {
+	return Catalog.Format(msgs.locale, "aboutTranslatorsNames", map[string]any{"names": names})
+}
+
+// AboutTranslatorsSeparator says ", "
+// in the language the app shows.
+//
+// What goes between two translators' names in aboutTranslatorsNames'
+// {names}, as a comma and a space.
+func AboutTranslatorsSeparator() string { return In(i18n.Locale()).AboutTranslatorsSeparator() }
+
+// AboutTranslatorsSeparator says ", "
+// in the language of msgs.
+//
+// What goes between two translators' names in aboutTranslatorsNames'
+// {names}, as a comma and a space.
+func (msgs Messages) AboutTranslatorsSeparator() string {
+	return Catalog.Format(msgs.locale, "aboutTranslatorsSeparator", nil)
 }
 
 // AboutVersion says "Version"

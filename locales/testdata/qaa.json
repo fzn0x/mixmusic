@@ -1,10 +1,17 @@
 {
   "@@locale": "qaa",
   "@@x-machine-translated": true,
+  "@@x-translators": [
+    "Ada Lovelace",
+    "Grace Hopper"
+  ],
   "aboutContribute": "qaa: contribute",
   "aboutTranslation": "qaa: Translation",
   "aboutTranslationFix": "qaa: fix the translation",
   "aboutTranslationMachine": "qaa: translated by a machine.",
+  "aboutTranslators": "qaa: Translators",
+  "aboutTranslatorsNames": "qaa: translated by {names}.",
+  "aboutTranslatorsSeparator": " & ",
   "alreadyInTracks": "{count, plural, other {qaa: # tracks}}",
   "languageName": "qaa: Qaa",
   "listenBrainzSettingsExpiredServer": "qaa: paste a new user token.{waiting, plural, =0 {} other { qaa: # listens wait.}}",

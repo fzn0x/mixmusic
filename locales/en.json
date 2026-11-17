@@ -2410,6 +2410,10 @@
   },
   "keepOnTopTitle": "Keep on top",
   "languageDescription": "The language MixMusic shows its words in. System takes the first of the computer's languages MixMusic has, else English.",
+  "languageName": "English",
+  "@languageName": {
+    "description": "The name of this language, as its speakers write it, as Deutsch or 日本語. The Language setting names the language so where the computer has no name of it."
+  },
   "languageSystem": "System",
   "languageTitle": "Language",
   "libraryAddToLibrary": "Add to library",

@@ -8456,6 +8456,24 @@ func (msgs Messages) LanguageDescription() string {
 	return Catalog.Format(msgs.locale, "languageDescription", nil)
 }
 
+// LanguageName says "English"
+// in the language the app shows.
+//
+// The name of this language, as its speakers write it, as Deutsch or
+// 日本語. The Language setting names the language so where the computer
+// has no name of it.
+func LanguageName() string { return In(i18n.Locale()).LanguageName() }
+
+// LanguageName says "English"
+// in the language of msgs.
+//
+// The name of this language, as its speakers write it, as Deutsch or
+// 日本語. The Language setting names the language so where the computer
+// has no name of it.
+func (msgs Messages) LanguageName() string {
+	return Catalog.Format(msgs.locale, "languageName", nil)
+}
+
 // LanguageSystem says "System"
 // in the language the app shows.
 func LanguageSystem() string { return In(i18n.Locale()).LanguageSystem() }

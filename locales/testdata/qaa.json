@@ -6,6 +6,7 @@
   "aboutTranslationFix": "qaa: fix the translation",
   "aboutTranslationMachine": "qaa: translated by a machine.",
   "alreadyInTracks": "{count, plural, other {qaa: # tracks}}",
+  "languageName": "qaa: Qaa",
   "listenBrainzSettingsExpiredServer": "qaa: paste a new user token.{waiting, plural, =0 {} other { qaa: # listens wait.}}",
   "mygo.copy": "qaa: Copy",
   "settingsTabAbout": "qaa: about"

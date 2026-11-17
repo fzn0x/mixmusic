@@ -15284,16 +15284,6 @@ func (msgs Messages) RecapFileNameStory(year int) string {
 	return Catalog.Format(msgs.locale, "recapFileNameStory", map[string]any{"year": year})
 }
 
-// RecapFor says " for "
-// in the language the app shows.
-func RecapFor() string { return In(i18n.Locale()).RecapFor() }
-
-// RecapFor says " for "
-// in the language of msgs.
-func (msgs Messages) RecapFor() string {
-	return Catalog.Format(msgs.locale, "recapFor", nil)
-}
-
 // RecapFound says "You found {count, plural, one {# new artist} other {# new artists}}."
 // in the language the app shows.
 func RecapFound(count int) string { return In(i18n.Locale()).RecapFound(count) }
@@ -15302,6 +15292,24 @@ func RecapFound(count int) string { return In(i18n.Locale()).RecapFound(count) }
 // in the language of msgs.
 func (msgs Messages) RecapFound(count int) string {
 	return Catalog.Format(msgs.locale, "recapFound", map[string]any{"count": count})
+}
+
+// RecapHeadline says "In {year, number, ::group-off} you played {tracks} for {minutes}."
+// in the language the app shows.
+//
+// The headline of Your year, a tab of Stats. {tracks} is recapTracksPlayed
+// and {minutes} recapMinutes, which the page shows a little bolder.
+func RecapHeadline(year int, tracks string, minutes string) string {
+	return In(i18n.Locale()).RecapHeadline(year, tracks, minutes)
+}
+
+// RecapHeadline says "In {year, number, ::group-off} you played {tracks} for {minutes}."
+// in the language of msgs.
+//
+// The headline of Your year, a tab of Stats. {tracks} is recapTracksPlayed
+// and {minutes} recapMinutes, which the page shows a little bolder.
+func (msgs Messages) RecapHeadline(year int, tracks string, minutes string) string {
+	return Catalog.Format(msgs.locale, "recapHeadline", map[string]any{"year": year, "tracks": tracks, "minutes": minutes})
 }
 
 // RecapLabel says "Your year"
@@ -15342,16 +15350,6 @@ func RecapNothingToRank() string { return In(i18n.Locale()).RecapNothingToRank()
 // in the language of msgs.
 func (msgs Messages) RecapNothingToRank() string {
 	return Catalog.Format(msgs.locale, "recapNothingToRank", nil)
-}
-
-// RecapPeriod says "."
-// in the language the app shows.
-func RecapPeriod() string { return In(i18n.Locale()).RecapPeriod() }
-
-// RecapPeriod says "."
-// in the language of msgs.
-func (msgs Messages) RecapPeriod() string {
-	return Catalog.Format(msgs.locale, "recapPeriod", nil)
 }
 
 // RecapPlays says "{plays, plural, one {# play} other {# plays}}"
@@ -15456,16 +15454,6 @@ func RecapTracksPlayed(count int) string { return In(i18n.Locale()).RecapTracksP
 // in the language of msgs.
 func (msgs Messages) RecapTracksPlayed(count int) string {
 	return Catalog.Format(msgs.locale, "recapTracksPlayed", map[string]any{"count": count})
-}
-
-// RecapYouPlayed says "In {year, number, ::group-off} you played "
-// in the language the app shows.
-func RecapYouPlayed(year int) string { return In(i18n.Locale()).RecapYouPlayed(year) }
-
-// RecapYouPlayed says "In {year, number, ::group-off} you played "
-// in the language of msgs.
-func (msgs Messages) RecapYouPlayed(year int) string {
-	return Catalog.Format(msgs.locale, "recapYouPlayed", map[string]any{"year": year})
 }
 
 // RefreshFailed says "Couldn't refresh: {error}"
@@ -18808,16 +18796,6 @@ func (msgs Messages) StatsAllTime() string {
 	return Catalog.Format(msgs.locale, "statsAllTime", nil)
 }
 
-// StatsAnd says " and "
-// in the language the app shows.
-func StatsAnd() string { return In(i18n.Locale()).StatsAnd() }
-
-// StatsAnd says " and "
-// in the language of msgs.
-func (msgs Messages) StatsAnd() string {
-	return Catalog.Format(msgs.locale, "statsAnd", nil)
-}
-
 // StatsArrowKeys says "The arrow keys go from day to day."
 // in the language the app shows.
 func StatsArrowKeys() string { return In(i18n.Locale()).StatsArrowKeys() }
@@ -18870,16 +18848,6 @@ func (msgs Messages) StatsColPlays() string {
 	return Catalog.Format(msgs.locale, "statsColPlays", nil)
 }
 
-// StatsColon says ": "
-// in the language the app shows.
-func StatsColon() string { return In(i18n.Locale()).StatsColon() }
-
-// StatsColon says ": "
-// in the language of msgs.
-func (msgs Messages) StatsColon() string {
-	return Catalog.Format(msgs.locale, "statsColon", nil)
-}
-
 // StatsCountRule says "Tracks count once they played for thirty seconds."
 // in the language the app shows.
 func StatsCountRule() string { return In(i18n.Locale()).StatsCountRule() }
@@ -18912,44 +18880,60 @@ func (msgs Messages) StatsDayTip(day string, minutes string, plays int) string {
 	return Catalog.Format(msgs.locale, "statsDayTip", map[string]any{"day": day, "minutes": minutes, "plays": plays})
 }
 
-// StatsEnd says "."
-// in the language the app shows.
-func StatsEnd() string { return In(i18n.Locale()).StatsEnd() }
-
-// StatsEnd says "."
-// in the language of msgs.
-func (msgs Messages) StatsEnd() string {
-	return Catalog.Format(msgs.locale, "statsEnd", nil)
-}
-
-// StatsFor says " for "
-// in the language the app shows.
-func StatsFor() string { return In(i18n.Locale()).StatsFor() }
-
-// StatsFor says " for "
-// in the language of msgs.
-func (msgs Messages) StatsFor() string {
-	return Catalog.Format(msgs.locale, "statsFor", nil)
-}
-
 // StatsFromSpotify says "{count} from Spotify"
 // in the language the app shows.
-func StatsFromSpotify(count string) string { return In(i18n.Locale()).StatsFromSpotify(count) }
+//
+// The tracks of statsHeadline that played from Spotify, in Spotify's
+// colour.
+func StatsFromSpotify(count int) string { return In(i18n.Locale()).StatsFromSpotify(count) }
 
 // StatsFromSpotify says "{count} from Spotify"
 // in the language of msgs.
-func (msgs Messages) StatsFromSpotify(count string) string {
+//
+// The tracks of statsHeadline that played from Spotify, in Spotify's
+// colour.
+func (msgs Messages) StatsFromSpotify(count int) string {
 	return Catalog.Format(msgs.locale, "statsFromSpotify", map[string]any{"count": count})
 }
 
 // StatsFromYouTube says "{count} from YouTube Music"
 // in the language the app shows.
-func StatsFromYouTube(count string) string { return In(i18n.Locale()).StatsFromYouTube(count) }
+//
+// The tracks of statsHeadline that played from YouTube Music, in its
+// colour.
+func StatsFromYouTube(count int) string { return In(i18n.Locale()).StatsFromYouTube(count) }
 
 // StatsFromYouTube says "{count} from YouTube Music"
 // in the language of msgs.
-func (msgs Messages) StatsFromYouTube(count string) string {
+//
+// The tracks of statsHeadline that played from YouTube Music, in its
+// colour.
+func (msgs Messages) StatsFromYouTube(count int) string {
 	return Catalog.Format(msgs.locale, "statsFromYouTube", map[string]any{"count": count})
+}
+
+// StatsHeadline says "You played {tracks} for {time}: {spotify} and {youtube}."
+// in the language the app shows.
+//
+// The headline of Stats, over the chart. {tracks} is statsPlayedTracks,
+// {time} how long they played (formatMinutes or formatHourMinutes),
+// {spotify} statsFromSpotify and {youtube} statsFromYouTube: the page shows
+// {tracks} and {time} a little bolder, and each service's part in its
+// colour.
+func StatsHeadline(tracks string, time_ string, spotify string, youtube string) string {
+	return In(i18n.Locale()).StatsHeadline(tracks, time_, spotify, youtube)
+}
+
+// StatsHeadline says "You played {tracks} for {time}: {spotify} and {youtube}."
+// in the language of msgs.
+//
+// The headline of Stats, over the chart. {tracks} is statsPlayedTracks,
+// {time} how long they played (formatMinutes or formatHourMinutes),
+// {spotify} statsFromSpotify and {youtube} statsFromYouTube: the page shows
+// {tracks} and {time} a little bolder, and each service's part in its
+// colour.
+func (msgs Messages) StatsHeadline(tracks string, time_ string, spotify string, youtube string) string {
+	return Catalog.Format(msgs.locale, "statsHeadline", map[string]any{"tracks": tracks, "time": time_, "spotify": spotify, "youtube": youtube})
 }
 
 // StatsMinutesEachDay says "Minutes listened each day."
@@ -19082,16 +19066,6 @@ func StatsVennLabel(spotify string, youtube string) string {
 // in the language of msgs.
 func (msgs Messages) StatsVennLabel(spotify string, youtube string) string {
 	return Catalog.Format(msgs.locale, "statsVennLabel", map[string]any{"spotify": spotify, "youtube": youtube})
-}
-
-// StatsYouPlayed says "You played "
-// in the language the app shows.
-func StatsYouPlayed() string { return In(i18n.Locale()).StatsYouPlayed() }
-
-// StatsYouPlayed says "You played "
-// in the language of msgs.
-func (msgs Messages) StatsYouPlayed() string {
-	return Catalog.Format(msgs.locale, "statsYouPlayed", nil)
 }
 
 // SuggestionsAdd says "add"

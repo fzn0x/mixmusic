@@ -4347,12 +4347,29 @@
       }
     }
   },
-  "recapFor": " for ",
   "recapFound": "You found {count, plural, one {# new artist} other {# new artists}}.",
   "@recapFound": {
     "placeholders": {
       "count": {
         "type": "int"
+      }
+    }
+  },
+  "recapHeadline": "In {year, number, ::group-off} you played {tracks} for {minutes}.",
+  "@recapHeadline": {
+    "description": "The headline of Your year, a tab of Stats. {tracks} is recapTracksPlayed and {minutes} recapMinutes, which the page shows a little bolder.",
+    "placeholders": {
+      "year": {
+        "type": "int",
+        "example": "2026"
+      },
+      "tracks": {
+        "type": "String",
+        "example": "1,204 tracks"
+      },
+      "minutes": {
+        "type": "String",
+        "example": "5,310 minutes"
       }
     }
   },
@@ -4367,7 +4384,6 @@
   },
   "recapMoments": "Moments",
   "recapNothingToRank": "Nothing to rank",
-  "recapPeriod": ".",
   "recapPlays": "{plays, plural, one {# play} other {# plays}}",
   "@recapPlays": {
     "placeholders": {
@@ -4411,14 +4427,6 @@
   "@recapTracksPlayed": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "recapYouPlayed": "In {year, number, ::group-off} you played ",
-  "@recapYouPlayed": {
-    "placeholders": {
-      "year": {
         "type": "int"
       }
     }
@@ -5445,7 +5453,6 @@
   "speedSongs": "Songs",
   "speedTitle": "Speed",
   "statsAllTime": "All time",
-  "statsAnd": " and ",
   "statsArrowKeys": "The arrow keys go from day to day.",
   "statsArtistPlays": "{artist}: {plays, plural, one {# play} other {# plays}}",
   "@statsArtistPlays": {
@@ -5461,7 +5468,6 @@
   "statsColDay": "day",
   "statsColMinutes": "minutes",
   "statsColPlays": "plays",
-  "statsColon": ": ",
   "statsCountRule": "Tracks count once they played for thirty seconds.",
   "statsDayByDay": "Day by day",
   "statsDayTip": "{day}: {minutes} min, {plays, plural, one {# play} other {# plays}}",
@@ -5478,21 +5484,45 @@
       }
     }
   },
-  "statsEnd": ".",
-  "statsFor": " for ",
   "statsFromSpotify": "{count} from Spotify",
   "@statsFromSpotify": {
+    "description": "The tracks of statsHeadline that played from Spotify, in Spotify's colour.",
     "placeholders": {
       "count": {
-        "type": "String"
+        "type": "int",
+        "example": "80"
       }
     }
   },
   "statsFromYouTube": "{count} from YouTube Music",
   "@statsFromYouTube": {
+    "description": "The tracks of statsHeadline that played from YouTube Music, in its colour.",
     "placeholders": {
       "count": {
-        "type": "String"
+        "type": "int",
+        "example": "40"
+      }
+    }
+  },
+  "statsHeadline": "You played {tracks} for {time}: {spotify} and {youtube}.",
+  "@statsHeadline": {
+    "description": "The headline of Stats, over the chart. {tracks} is statsPlayedTracks, {time} how long they played (formatMinutes or formatHourMinutes), {spotify} statsFromSpotify and {youtube} statsFromYouTube: the page shows {tracks} and {time} a little bolder, and each service's part in its colour.",
+    "placeholders": {
+      "tracks": {
+        "type": "String",
+        "example": "120 tracks"
+      },
+      "time": {
+        "type": "String",
+        "example": "8 hr 5 min"
+      },
+      "spotify": {
+        "type": "String",
+        "example": "80 from Spotify"
+      },
+      "youtube": {
+        "type": "String",
+        "example": "40 from YouTube Music"
       }
     }
   },
@@ -5526,7 +5556,6 @@
       }
     }
   },
-  "statsYouPlayed": "You played ",
   "suggestionsAdd": "add",
   "suggestionsAddLabel": "Add {title} to {playlist}",
   "@suggestionsAddLabel": {

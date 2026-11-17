@@ -50,17 +50,13 @@ func (s *shell) statsPage(c *ui.Context) {
 		if hours > 0 {
 			spent = locales.FormatHourMinutes(strconv.Itoa(hours), strconv.Itoa(st.Minutes%60))
 		}
+		// One message, whose bold and coloured parts are its placeholders.
 		size := k.subtitleSize()
-		ui.RichText(c,
-			ui.Span{Text: locales.StatsYouPlayed(), Size: size, Weight: 300},
-			ui.Span{Text: locales.StatsPlayedTracks(st.Plays), Size: size, Weight: 400},
-			ui.Span{Text: locales.StatsFor(), Size: size, Weight: 300},
-			ui.Span{Text: spent, Size: size, Weight: 400},
-			ui.Span{Text: locales.StatsColon(), Size: size, Weight: 300},
-			ui.Span{Text: locales.StatsFromSpotify(strconv.Itoa(st.Spotify)), Size: size, Weight: 300, Color: k.spotify},
-			ui.Span{Text: locales.StatsAnd(), Size: size, Weight: 300},
-			ui.Span{Text: locales.StatsFromYouTube(strconv.Itoa(st.YouTube)), Size: size, Weight: 300, Color: k.youtube},
-			ui.Span{Text: locales.StatsEnd(), Size: size, Weight: 300},
+		bold := ui.Span{Size: size, Weight: 400}
+		headline := locales.StatsHeadline(mark(0, locales.StatsPlayedTracks(st.Plays)), mark(1, spent),
+			mark(2, locales.StatsFromSpotify(st.Spotify)), mark(3, locales.StatsFromYouTube(st.YouTube)))
+		ui.RichText(c, spansOf(headline, ui.Span{Size: size, Weight: 300}, bold, bold,
+			ui.Span{Size: size, Weight: 300, Color: k.spotify}, ui.Span{Size: size, Weight: 300, Color: k.youtube})...,
 		).MaxWidth(760).Margin(0, 0, 48)
 		s.dayChart(c, st.Daily)
 		ui.Row(c).Gap(48).Wrap().AlignItems(ui.Start).Margin(0, 0, 48).Children(func() {

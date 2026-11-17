@@ -53,14 +53,11 @@ func (s *shell) recapView(c *ui.Context, years []int) {
 		ui.Box(c).Margin(0, 0, 24).Children(func() { s.chips(c, labels, nil, &s.recapPick) })
 	}
 	r := s.svc.Collection.Recap(years[s.recapPick])
+	// One message, whose bold parts are its placeholders.
 	size := k.subtitleSize()
-	ui.RichText(c,
-		ui.Span{Text: locales.RecapYouPlayed(r.Year), Size: size, Weight: 300},
-		ui.Span{Text: locales.RecapTracksPlayed(r.Plays), Size: size, Weight: 400},
-		ui.Span{Text: locales.RecapFor(), Size: size, Weight: 300},
-		ui.Span{Text: locales.RecapMinutes(r.Minutes), Size: size, Weight: 400},
-		ui.Span{Text: locales.RecapPeriod(), Size: size, Weight: 300},
-	).MaxWidth(760).Margin(0, 0, 32)
+	bold := ui.Span{Size: size, Weight: 400}
+	headline := locales.RecapHeadline(r.Year, mark(0, locales.RecapTracksPlayed(r.Plays)), mark(1, locales.RecapMinutes(r.Minutes)))
+	ui.RichText(c, spansOf(headline, ui.Span{Size: size, Weight: 300}, bold, bold)...).MaxWidth(760).Margin(0, 0, 32)
 
 	ui.Row(c).Gap(24).Wrap().AlignItems(ui.Start).Margin(0, 0, 40).Children(func() {
 		songs := make([]recapRow, len(r.TopTracks))

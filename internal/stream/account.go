@@ -43,13 +43,15 @@ const refusalMark = 10 * time.Minute
 
 // SetAsAccount has the resolver ask for streams as the user's YouTube Music
 // account from now on, while Session gives a session, or signed out:
-// streams found before are found again.
+// streams found before are found again, and the videos YouTube refused
+// the stream of found as the account are asked for as it again.
 func (r *Resolver) SetAsAccount(on bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.asAccount != on {
 		r.asAccount = on
 		r.calls = map[string]*resolution{}
+		r.refusedAsAccount = nil
 	}
 }
 

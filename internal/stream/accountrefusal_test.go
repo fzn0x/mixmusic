@@ -31,6 +31,38 @@ func backdate(t *testing.T, r *Resolver, videoID string, age time.Duration) {
 	r.refusedAsAccount[videoID] = time.Now().Add(-age)
 }
 
+// signInRequired is what yt-dlp prints, signed out, of a video YouTube
+// plays only to signed-in viewers, as #511 quotes it, turned into the
+// error runYTDLP returns.
+func signInRequired() error {
+	return ytdlpFailure("ERROR: [youtube] " + testID + ": Please sign in. This helps protect our community. " +
+		"Use --cookies-from-browser or --cookies for the authentication. See https://github.com/yt-dlp/yt-dlp/wiki/FAQ\n")
+}
+
+// TestSetAsAccountClearsRefusals asks as the account again for a video
+// YouTube refused the stream of found so, once the switch was turned off
+// and on: a track it plays only to signed-in viewers plays again (#578).
+func TestSetAsAccountClearsRefusals(t *testing.T) {
+	y := &accountYTDLP{
+		asAccount: func(context.Context) ([]byte, error) { return premiumAnswer(t), nil },
+		signedOut: func(context.Context) ([]byte, error) { return nil, signInRequired() },
+	}
+	r := accountResolver(t, y)
+	if s, err := r.Resolve(context.Background(), testID); err != nil || !s.AsAccount {
+		t.Fatalf("first: %+v, %v", s, err)
+	}
+	r.Forget(testID) // as after YouTube refused its URL
+	r.SetAsAccount(false)
+	r.SetAsAccount(true)
+	s, err := r.Resolve(context.Background(), testID)
+	if err != nil || !s.AsAccount {
+		t.Errorf("after a refusal and a toggle: %+v, %v", s, err)
+	}
+	if n, all := asAccountRuns(y), len(y.runs()); n != 2 || all != 2 {
+		t.Errorf("yt-dlp ran %d times, %d of them as the account; want 2, both as the account", all, n)
+	}
+}
+
 // TestAccountRefusalLastsTenMinutes finds a video signed out for 10
 // minutes once YouTube refused its stream found as the account, and as
 // the account again after that.

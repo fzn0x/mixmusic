@@ -2231,10 +2231,6 @@
   "@errorStreamUnavailable": {
     "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
   },
-  "errorStreamUnreachable": "MixMusic could not reach YouTube's audio servers, which a firewall, a VPN or a DNS filter may block",
-  "@errorStreamUnreachable": {
-    "description": "Why a track's audio failed, as a toast or inside a message that leads it."
-  },
   "errorTagsCover": "the cover must be a JPEG or PNG image of at most 10 MB",
   "@errorTagsCover": {
     "description": "Why a file's cover didn't change, as a toast or inside a message that leads it."

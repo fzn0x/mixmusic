@@ -1,8 +1,9 @@
 package main
 
 import (
-	"errors"
+	"iter"
 	"net/http"
+	"strings"
 
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/app"
@@ -26,73 +27,114 @@ import (
 // message keeps its own words: the service's or the system's, which the
 // message around it, where there is one, leads.
 
-// errorText is err as the windows show it.
+// errorText is err as the windows show it: the error it wraps that the
+// windows know, the first of its chain, as its message, in the words
+// around it, which MixMusic or the service added; or err's own words.
 func errorText(err error) string {
 	if err == nil {
 		return ""
 	}
-	if txt, ok := serviceErrorText(err); ok {
-		return txt
-	}
-	if txt, ok := systemErrorText(err); ok {
-		return txt
+	for e := range errorChain(err) {
+		said, ok := serviceErrorText(e)
+		if !ok {
+			said, ok = systemErrorText(e)
+		}
+		if !ok {
+			continue
+		}
+		whole, part := err.Error(), e.Error()
+		if i := strings.Index(whole, part); i >= 0 && whole != part {
+			return whole[:i] + said + whole[i+len(part):]
+		}
+		return said
 	}
 	return err.Error()
 }
 
-// serviceErrorText is err, of a service, as the windows show it, when
-// they know it.
+// errorChain yields err, then the errors it wraps, in turn, the
+// shallowest first.
+func errorChain(err error) iter.Seq[error] {
+	return func(yield func(error) bool) {
+		queue := []error{err}
+		for len(queue) > 0 {
+			e := queue[0]
+			queue = queue[1:]
+			if e == nil {
+				continue
+			}
+			if !yield(e) {
+				return
+			}
+			switch u := e.(type) {
+			case interface{ Unwrap() error }:
+				queue = append(queue, u.Unwrap())
+			case interface{ Unwrap() []error }:
+				queue = append(queue, u.Unwrap()...)
+			}
+		}
+	}
+}
+
+// asSpotify tells whether err is an error of Spotify's API, itself.
+func asSpotify(err error, sp **spotify.APIError) bool {
+	e, ok := err.(*spotify.APIError)
+	*sp = e
+	return ok
+}
+
+// serviceErrorText is err itself, of a service, not the errors it wraps,
+// as the windows show it, when they know it.
 func serviceErrorText(err error) (string, bool) {
 	var sp *spotify.APIError
 	switch {
-	case errors.Is(err, spotify.ErrNoClientID):
+	case err == spotify.ErrNoClientID:
 		return locales.ErrorSpotifyNoClientID(), true
-	case errors.Is(err, spotify.ErrSignInExpired):
+	case err == spotify.ErrSignInExpired:
 		return locales.ErrorSpotifySignInAgain(), true
-	case errors.Is(err, spotify.ErrNotSignedIn):
+	case err == spotify.ErrNotSignedIn:
 		return locales.ErrorSpotifyNotSignedIn(), true
-	case errors.Is(err, spotify.ErrPlaylistUnavailable):
+	case err == spotify.ErrPlaylistUnavailable:
 		return locales.ErrorSpotifyPlaylistUnavailable(), true
-	case errors.Is(err, spotify.ErrPlaylistNotShown):
+	case err == spotify.ErrPlaylistNotShown:
 		return locales.ErrorSpotifyPlaylistNotShown(), true
-	case errors.Is(err, spotify.ErrPlaylistRefused):
+	case err == spotify.ErrPlaylistRefused:
 		return locales.ErrorSpotifyPlaylistRefused(), true
-	case errors.As(err, &sp) && sp.Reason == "PREMIUM_REQUIRED":
+	case asSpotify(err, &sp) && sp.Reason == "PREMIUM_REQUIRED":
 		return locales.ErrorSpotifyPremium(), true
-	case errors.As(err, &sp) && sp.Status == http.StatusTooManyRequests:
+	case asSpotify(err, &sp) && sp.Status == http.StatusTooManyRequests:
 		return locales.ErrorSpotifyTooMany(), true
-	case errors.Is(err, youtube.ErrSignedOut):
+	case err == youtube.ErrSignedOut:
 		return locales.ErrorYouTubeSignedOut(), true
-	case errors.Is(err, youtube.ErrSessionRejected):
+	case err == youtube.ErrSessionRejected:
 		return locales.ErrorYouTubeSessionRejected(), true
-	case errors.Is(err, youtube.ErrNotFound):
+	case err == youtube.ErrNotFound:
 		return locales.ErrorYouTubeNotFound(), true
-	case errors.Is(err, youtube.ErrAlreadyInPlaylist):
+	case err == youtube.ErrAlreadyInPlaylist:
 		return locales.ErrorYouTubeAlreadyInPlaylist(), true
-	case errors.Is(err, youtube.ErrNoSongList):
+	case err == youtube.ErrNoSongList:
 		return locales.ErrorYouTubeNoSongList(), true
-	case errors.Is(err, lastfm.ErrNotAuthorized):
+	case err == lastfm.ErrNotAuthorized:
 		return locales.ErrorLastfmNotAuthorized(), true
-	case errors.Is(err, listenbrainz.ErrNotServer):
+	case err == listenbrainz.ErrNotServer:
 		return locales.ErrorListenBrainzNotServer(), true
 	}
 	if txt, ok := streamReasonText(stream.Reason(err)); ok {
 		return txt, true
 	}
 	switch {
-	case errors.Is(err, stream.ErrThrottled):
+	case err == stream.ErrThrottled:
 		return locales.ErrorStreamThrottled(), true
-	case errors.Is(err, stream.ErrNoAudio):
+	case err == stream.ErrNoAudio:
 		return locales.ErrorStreamNoAudio(), true
-	case errors.Is(err, stream.ErrLive):
+	case err == stream.ErrLive:
 		return locales.ErrorStreamLive(), true
-	case errors.Is(err, stream.ErrNoCaptions):
+	case err == stream.ErrNoCaptions:
 		return locales.ErrorStreamNoCaptions(), true
-	case errors.Is(err, stream.ErrBadVideoID):
+	case err == stream.ErrBadVideoID:
 		return locales.ErrorStreamBadVideoID(), true
-	case errors.Is(err, stream.ErrUnavailable):
+	case err == stream.ErrUnavailable:
 		return locales.ErrorStreamUnavailable(), true
-	case errors.Is(err, stream.ErrNetwork):
+	case err == stream.ErrNetwork:
 		return locales.ErrorStreamNetwork(), true
 	}
 	return "", false
@@ -125,63 +167,62 @@ func streamReasonText(reason string) (string, bool) {
 		return locales.ErrorStreamRefused(), true
 	case stream.ReasonStalled:
 		return locales.ErrorStreamStalled(), true
-	case stream.ReasonUnreachable:
-		return locales.ErrorStreamUnreachable(), true
 	}
 	return "", false
 }
 
-// systemErrorText is err, of the system or of MixMusic's tools and files,
-// as the windows show it, when they know it.
+// systemErrorText is err itself, of the system or of MixMusic's tools and
+// files, not the errors it wraps, as the windows show it, when they know
+// it.
 func systemErrorText(err error) (string, bool) {
 	switch {
-	case errors.Is(err, tools.ErrNoYTDLP):
+	case err == tools.ErrNoYTDLP:
 		return locales.ErrorToolsNoYTDLP(), true
-	case errors.Is(err, tools.ErrBrowserOpen):
+	case err == tools.ErrBrowserOpen:
 		return locales.ErrorToolsBrowserOpen(), true
-	case errors.Is(err, tools.ErrCookiesSealed):
+	case err == tools.ErrCookiesSealed:
 		return locales.ErrorToolsCookiesSealed(), true
-	case errors.Is(err, tools.ErrNoBrowserCookies):
+	case err == tools.ErrNoBrowserCookies:
 		return locales.ErrorToolsNoBrowserCookies(), true
-	case errors.Is(err, tools.ErrCookiesDenied):
+	case err == tools.ErrCookiesDenied:
 		return locales.ErrorToolsCookiesDenied(), true
-	case errors.Is(err, audio.ErrNoOutput):
+	case err == audio.ErrNoOutput:
 		return locales.ErrorAudioNoOutput(), true
-	case errors.Is(err, audio.ErrCantPlay):
+	case err == audio.ErrCantPlay:
 		return locales.ErrorAudioCantPlay(), true
-	case errors.Is(err, firewall.ErrUnsupported):
+	case err == firewall.ErrUnsupported:
 		return locales.ErrorFirewallUnsupported(), true
-	case errors.Is(err, firewall.ErrDeclined):
+	case err == firewall.ErrDeclined:
 		return locales.ErrorFirewallDeclined(), true
-	case errors.Is(err, colorfile.ErrEmpty):
+	case err == colorfile.ErrEmpty:
 		return locales.ErrorColorFileEmpty(), true
-	case errors.Is(err, colorfile.ErrPartial):
+	case err == colorfile.ErrPartial:
 		return locales.ErrorColorFilePartial(), true
-	case errors.Is(err, colorfile.ErrUnknown):
+	case err == colorfile.ErrUnknown:
 		return locales.ErrorColorFileUnknown(), true
-	case errors.Is(err, colorfile.ErrFolder):
+	case err == colorfile.ErrFolder:
 		return locales.ErrorColorFileFolder(), true
-	case errors.Is(err, colorfile.ErrTooBig):
+	case err == colorfile.ErrTooBig:
 		return locales.ErrorColorFileTooBig(), true
-	case errors.Is(err, localfiles.ErrNetworkDrive):
+	case err == localfiles.ErrNetworkDrive:
 		return locales.ErrorLocalFilesNetworkDrive(), true
-	case errors.Is(err, localfiles.ErrRemovableDrive):
+	case err == localfiles.ErrRemovableDrive:
 		return locales.ErrorLocalFilesRemovableDrive(), true
-	case errors.Is(err, localfiles.ErrWatchLimit):
+	case err == localfiles.ErrWatchLimit:
 		return locales.ErrorLocalFilesWatchLimit(), true
-	case errors.Is(err, localfiles.ErrCantWatch):
+	case err == localfiles.ErrCantWatch:
 		return locales.ErrorLocalFilesCantWatch(), true
-	case errors.Is(err, tagwrite.ErrUnsupported):
+	case err == tagwrite.ErrUnsupported:
 		return locales.ErrorTagsUnsupported(), true
-	case errors.Is(err, tagwrite.ErrFormat):
+	case err == tagwrite.ErrFormat:
 		return locales.ErrorTagsFormat(), true
-	case errors.Is(err, tagwrite.ErrReadOnly):
+	case err == tagwrite.ErrReadOnly:
 		return locales.ErrorTagsReadOnly(), true
-	case errors.Is(err, tagwrite.ErrFolderReadOnly):
+	case err == tagwrite.ErrFolderReadOnly:
 		return locales.ErrorTagsFolderReadOnly(), true
-	case errors.Is(err, tagwrite.ErrCover):
+	case err == tagwrite.ErrCover:
 		return locales.ErrorTagsCover(), true
-	case errors.Is(err, addons.ErrBuiltin):
+	case err == addons.ErrBuiltin:
 		return locales.ErrorAddonsBuiltin(), true
 	}
 	return "", false

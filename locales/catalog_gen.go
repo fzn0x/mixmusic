@@ -7791,20 +7791,6 @@ func (msgs Messages) ErrorStreamUnavailable() string {
 	return Catalog.Format(msgs.locale, "errorStreamUnavailable", nil)
 }
 
-// ErrorStreamUnreachable says "MixMusic could not reach YouTube's audio servers, which a firewall, a VPN or a DNS filter may block"
-// in the language the app shows.
-//
-// Why a track's audio failed, as a toast or inside a message that leads it.
-func ErrorStreamUnreachable() string { return In(i18n.Locale()).ErrorStreamUnreachable() }
-
-// ErrorStreamUnreachable says "MixMusic could not reach YouTube's audio servers, which a firewall, a VPN or a DNS filter may block"
-// in the language of msgs.
-//
-// Why a track's audio failed, as a toast or inside a message that leads it.
-func (msgs Messages) ErrorStreamUnreachable() string {
-	return Catalog.Format(msgs.locale, "errorStreamUnreachable", nil)
-}
-
 // ErrorTagsCover says "the cover must be a JPEG or PNG image of at most 10 MB"
 // in the language the app shows.
 //

@@ -559,6 +559,13 @@ func (n *notch) lyrics(c *ui.Context, t media.Track) {
 	if at+1 < len(lines) {
 		ui.Text(c, line(at+1)).FontSize(12).TextColor(notchMuted).SingleLine().MinWidth(0)
 	}
+	// Where the lyrics come from, and who gave them to it, as the lyrics
+	// panel says: some licences ask for it wherever the lyrics show.
+	if src := l.value; src.Source != "" {
+		ui.RichText(c).FontSize(11).TextColor(notchMuted).MaxLines(1).MinWidth(0).Padding(4, 0, 0).Children(func() {
+			s.creditParts(c, src)
+		})
+	}
 }
 
 // lerp is the value t of the way from a to b.

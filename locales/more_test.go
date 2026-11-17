@@ -80,7 +80,9 @@ func TestTranslatedByMachine(t *testing.T) {
 	if err := AddTranslations(read); err != nil {
 		t.Fatal(err)
 	}
-	for tag, want := range map[string]bool{"qaa": true, "qac": false, "en": false, "en-XA": false, "de": false} {
+	// qtz, a private-use tag, stands for a language without a catalog: a
+	// real one, as de, gets a machine's file in more/ sooner or later.
+	for tag, want := range map[string]bool{"qaa": true, "qac": false, "en": false, "en-XA": false, "qtz": false} {
 		if got := TranslatedByMachine(tag); got != want {
 			t.Errorf("%s translated by machine: %v", tag, got)
 		}

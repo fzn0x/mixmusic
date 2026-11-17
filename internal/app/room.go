@@ -271,11 +271,15 @@ func (a *App) nearFound(found []room.Found) []room.Found {
 // shownName is a name in rooms as the windows show it: room.Unnamed, the
 // name of a computer that told none, in the language the app shows.
 func shownName(name string) string {
-	if name == room.Unnamed {
+	if name == room.Unnamed || name == roomByAddr {
 		return locales.RoomSomeone()
 	}
 	return name
 }
+
+// roomByAddr names the host of a room known by its address alone, until
+// the room tells its name.
+const roomByAddr = "The room"
 
 // relistRooms makes the list the windows show of the rooms found, and
 // reports whether it changed.

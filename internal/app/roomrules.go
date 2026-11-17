@@ -19,11 +19,12 @@ import (
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/room"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // roomGuests is what the room this computer hosts does as its guests ask.
 func (a *App) roomGuests() *room.Guests {
-	return &room.Guests{Rules: a.roomRules, Look: a.lookGuestSong, Add: a.addGuestSong, Control: a.guestControl, Asks: a.roomAsks}
+	return &room.Guests{Rules: a.roomRules, Look: a.lookGuestSong, Add: a.addGuestSong, Control: a.guestControl, Asks: a.guestAsks}
 }
 
 // roomRules are the host's rules, as the settings choose them now.
@@ -129,6 +130,15 @@ func (a *App) guestControl(from room.Member, do string) error {
 	return nil
 }
 
+// guestAsks tells the user what a guest asks of their room.
+func (a *App) guestAsks(ask room.Ask) {
+	if ask.Title != "" {
+		a.roomAsks(locales.RoomNoteAskAdd(shownName(ask.Name), ask.Title))
+		return
+	}
+	a.roomAsks(locales.RoomNoteAskJoin(shownName(ask.Name)))
+}
+
 // roomAsks tells the user of what waits for their answer in their room:
 // in the windows, and in a notification, which opens the room's page, while
 // MixMusic is in the background. The room waits on neither.
@@ -137,7 +147,7 @@ func (a *App) roomAsks(note string) {
 	if !a.settings.Get().Notifications || a.inFront() {
 		return
 	}
-	n := mygo.NewNotification(mygo.NotificationOptions{ID: "room", Title: "Listen with friends", Body: note})
+	n := mygo.NewNotification(mygo.NotificationOptions{ID: "room", Title: locales.RoomPageTitle(), Body: note})
 	n.OnClick(func() {
 		a.showMain()
 		a.navigateTo(RoomPage)

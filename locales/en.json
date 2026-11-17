@@ -5351,6 +5351,10 @@
       }
     }
   },
+  "remoteAnotherComputer": "Another computer",
+  "@remoteAnotherComputer": {
+    "description": "The name of a computer paired for remote control that MixMusic no longer knows by name."
+  },
   "remoteBothWays": "Can control this computer; You control it from here",
   "remoteCanControl": "Can control this computer",
   "remoteCodeAsks": "{name} asks to control MixMusic on this computer. To let it, type this code there:",
@@ -5398,8 +5402,113 @@
     }
   },
   "remoteControlled": "You control it from here",
+  "remoteErrorHandOverLate": "{name} didn't answer in time: what plays here plays on",
+  "@remoteErrorHandOverLate": {
+    "description": "Toast when what plays on this computer didn't move to the computer named {name}.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteErrorKeyBusy": "This computer's key is being read: try again in a moment",
+  "@remoteErrorKeyBusy": {
+    "description": "Toast when remote control waits for the key that tells this computer apart."
+  },
+  "remoteErrorListen": "Remote control can't listen on the network: {error}",
+  "@remoteErrorListen": {
+    "description": "Toast when remote control couldn't start. {error} is the system's own words, often in English.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteErrorNotConnected": "Not connected to that computer",
+  "@remoteErrorNotConnected": {
+    "description": "Toast when the computer whose page shows isn't connected."
+  },
+  "remoteErrorNothingPlays": "Nothing plays on this computer",
+  "@remoteErrorNothingPlays": {
+    "description": "Toast when there is nothing to move to another computer."
+  },
   "remoteFirewallHint": "Windows Firewall keeps the other computers from reaching this one. Windows Firewall, below, tells why, and how to let them in.",
   "remoteNoPaired": "No computer is paired yet. To control another computer, choose it in the player bar's devices menu, the cast button's.",
+  "remoteNoteHandedOver": "{name} moved what it played to this computer",
+  "@remoteNoteHandedOver": {
+    "description": "Toast when the computer named {name} moved its queue and the track it played to this one.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteNotKept": "Couldn't keep {name} as paired: {error}",
+  "@remoteNoteNotKept": {
+    "description": "Toast when this computer couldn't keep the pairing with the computer named {name}. {error} is the system's own words, often in English.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNotePaired": "Paired with {name}",
+  "@remoteNotePaired": {
+    "description": "Toast when this computer paired with the computer named {name}, which it now controls.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNotePairedHere": "Paired with {name}: it can control MixMusic on this computer",
+  "@remoteNotePairedHere": {
+    "description": "Toast when the computer named {name} paired with this one.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteStopped": "Didn't pair with {name}: it stopped answering",
+  "@remoteNoteStopped": {
+    "description": "Toast when the computer named {name} stopped answering as it paired with this one.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteUnfinished": "Didn't pair with {name}: the pairing didn't finish, as it stopped answering",
+  "@remoteNoteUnfinished": {
+    "description": "Toast when the pairing with the computer named {name} didn't finish.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteUnfinishedSlow": "Didn't pair with {name}: the pairing didn't finish, as keeping it took longer than {name} waits",
+  "@remoteNoteUnfinishedSlow": {
+    "description": "Toast when the pairing with the computer named {name} didn't finish, as this computer took too long to keep it.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteWrongCode": "Didn't pair with {name}: the code typed there wasn't the one shown",
+  "@remoteNoteWrongCode": {
+    "description": "Toast when the computer named {name} typed another code than the one this computer showed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "remotePageAskPair": "Pair with {name} to see what plays there and control it from here. {name} shows a code of 6 digits, which you type here.",
   "@remotePageAskPair": {
     "placeholders": {
@@ -5467,6 +5576,104 @@
       },
       "date": {
         "type": "DateTime"
+      }
+    }
+  },
+  "remoteProblemBusy": "{name} is pairing with another computer: try again in a moment.",
+  "@remoteProblemBusy": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemCanceled": "The pairing was canceled on {name}.",
+  "@remoteProblemCanceled": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemLost": "{name} stopped answering: connecting again…",
+  "@remoteProblemLost": {
+    "description": "Why remote control with the computer named {name} stopped, while it connects again.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemNotKept": "{name} couldn't keep the pairing, and tells why there. Pair again.",
+  "@remoteProblemNotKept": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemNotPaired": "{name} removed this computer: pair again to control it.",
+  "@remoteProblemNotPaired": {
+    "description": "Why remote control with the computer named {name} failed: it no longer keeps this computer as paired.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemNotSame": "Another computer answered in place of {name}: it isn't the one paired.",
+  "@remoteProblemNotSame": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemOff": "Remote control is off on {name}.",
+  "@remoteProblemOff": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemOlder": "MixMusic on {name} is older, and can't do that: update it there.",
+  "@remoteProblemOlder": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemTooLong": "The pairing took too long. Pair again for a new code.",
+  "@remoteProblemTooLong": {
+    "description": "Why the pairing for remote control failed."
+  },
+  "remoteProblemUnreachable": "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away.",
+  "@remoteProblemUnreachable": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemVersion": "That computer's MixMusic is of another version: update both.",
+  "@remoteProblemVersion": {
+    "description": "Why remote control with another computer failed."
+  },
+  "remoteProblemWrongCode": "That isn't the code {name} showed. Pair again for a new code.",
+  "@remoteProblemWrongCode": {
+    "description": "Why the pairing with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
       }
     }
   },
@@ -5547,7 +5754,87 @@
     }
   },
   "remoteSwitch": "Allow remote control",
+  "remoteThatComputer": "That computer",
+  "@remoteThatComputer": {
+    "description": "The name of a computer of remote control that told none."
+  },
   "remoteTitle": "Remote control",
+  "roomControlRefused": "{host} doesn't let guests control playback",
+  "@roomControlRefused": {
+    "description": "Toast when a guest pressed play, pause or skip in the room of {host}, who doesn't let guests control it.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "roomControlTooMany": "Too many at once: try again in a moment",
+  "@roomControlTooMany": {
+    "description": "Toast when a guest pressed play, pause or skip too many times at once."
+  },
+  "roomErrorAnnounce": "The room can't be announced on the network: {error}",
+  "@roomErrorAnnounce": {
+    "description": "Toast when the room couldn't open. {error} is the system's own words, often in English.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "roomErrorCantHost": "That guest can't host the room now: they may be away, or their MixMusic older",
+  "@roomErrorCantHost": {
+    "description": "Toast when the host chose Make host for a guest that can't host."
+  },
+  "roomErrorCantPlaySong": "This computer can't play that song",
+  "@roomErrorCantPlaySong": {
+    "description": "Toast when the host accepted a guest's song that this computer can't play, or whose explicit content the settings hide."
+  },
+  "roomErrorDropped": "you removed or blocked someone while it moved",
+  "@roomErrorDropped": {
+    "description": "Why the room didn't move to another computer: it goes in the {error} of roomNoteStays."
+  },
+  "roomErrorInRoom": "Leave the room you're in to start one",
+  "@roomErrorInRoom": {
+    "description": "Toast when the user starts a room while a guest of another."
+  },
+  "roomErrorLeft": "someone left while it moved",
+  "@roomErrorLeft": {
+    "description": "Why the room didn't move to another computer: it goes in the {error} of roomNoteStays."
+  },
+  "roomErrorListen": "The room can't listen on the network: {error}",
+  "@roomErrorListen": {
+    "description": "Toast when the room couldn't open. {error} is the system's own words, often in English.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "roomErrorMoved": "The room moved to another computer",
+  "@roomErrorMoved": {
+    "description": "Toast or reason when the room had moved to another computer already."
+  },
+  "roomErrorMoving": "The room moves to another guest already",
+  "@roomErrorMoving": {
+    "description": "Toast when the host chose Make host while the room moves already."
+  },
+  "roomErrorNotInRoom": "You're in no room now",
+  "@roomErrorNotInRoom": {
+    "description": "Toast when the user adds a song to a room, or controls it, but is in none."
+  },
+  "roomFollowCantPlay": "Can't play here",
+  "@roomFollowCantPlay": {
+    "description": "What a guest shows of the room's track when it has no way to play it, as a file of the host's computer."
+  },
+  "roomFollowExplicit": "{title} is explicit, and your settings hide explicit content: it stays silent here",
+  "@roomFollowExplicit": {
+    "description": "What a guest shows of the room's track when the settings hide explicit content. {title} is the track's title.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "roomMenuListening": "{count, plural, one {# listening} other {# listening}}",
   "@roomMenuListening": {
     "placeholders": {
@@ -5558,6 +5845,122 @@
   },
   "roomMenuNewCode": "The room has a new code: the old code and link no longer let anyone in",
   "roomMenuYourRoom": "Your room",
+  "roomNoteAddressChanged": "Your room's internet address changed: send friends outside your network the new invite link.",
+  "@roomNoteAddressChanged": {
+    "description": "Toast for the host when the room's internet address changed."
+  },
+  "roomNoteAskAdd": "{name} asks to add {title}",
+  "@roomNoteAskAdd": {
+    "description": "Toast and notification for the host when the guest named {name} asks to add the song {title} to the room.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteAskHost": "{name} asks you to host the room",
+  "@roomNoteAskHost": {
+    "description": "Toast and notification for a guest when the host, {name}, asks them to host the room.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteAskJoin": "{name} asks to join your room",
+  "@roomNoteAskJoin": {
+    "description": "Toast and notification for the host when the computer named {name} asks to join.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteEndToJoin": "End the room you host to join another",
+  "@roomNoteEndToJoin": {
+    "description": "Toast when the user joins a room while hosting one."
+  },
+  "roomNoteGuessed": "Someone on the network is guessing your room's code. Friends can still join with the invite link, or give the room a new code.",
+  "@roomNoteGuessed": {
+    "description": "Toast for the host when the room takes no code for a while, as someone typed many wrong ones."
+  },
+  "roomNoteGuestAdded": "{name} added {title}",
+  "@roomNoteGuestAdded": {
+    "description": "Toast for the host when the guest named {name} added the song {title} to the room.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteGuestJoined": "{name} joined the room",
+  "@roomNoteGuestJoined": {
+    "description": "Toast for the host when the guest named {name} joined.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteGuestLeft": "{name} left the room",
+  "@roomNoteGuestLeft": {
+    "description": "Toast for the host when the guest named {name} left.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteJoined": "You joined {host}'s room",
+  "@roomNoteJoined": {
+    "description": "Toast when the user joined the room of {host}.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteLeaveToJoin": "Leave the room you're in to join another",
+  "@roomNoteLeaveToJoin": {
+    "description": "Toast when the user joins a room while a guest of another."
+  },
+  "roomNoteMoved": "The room moved to {name}'s computer",
+  "@roomNoteMoved": {
+    "description": "Toast for a guest when the room moved to the computer of the guest named {name}.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteMovedAway": "The room moved to {name}'s computer: you're a guest in it now",
+  "@roomNoteMovedAway": {
+    "description": "Toast for the host when the room moved to the computer of the guest named {name}.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteStays": "The room stays here: {error}",
+  "@roomNoteStays": {
+    "description": "Toast for the host when the room didn't move to the guest they chose. {error} is why, as a message of roomError, or the error's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteYouHost": "You host the room now",
+  "@roomNoteYouHost": {
+    "description": "Toast when the room moved to this computer."
+  },
   "roomPageActivity": "Activity",
   "roomPageActivityLine": "{what, select, joined {{name} joined} left {{name} left} removed {{name} removed} blocked {{name} blocked} guessed {{name} tried too many wrong codes} played {{name} played} paused {{name} paused} skipped {{name} skipped to the next track} back {{name} went back a track} added {{name} added {song}} asked {{name} asked to add {song}} other {{name}}} · {time, time, short}",
   "@roomPageActivityLine": {
@@ -5753,6 +6156,10 @@
     }
   },
   "roomPageWaitingGuests": "The next track waits for your guests to have it ready.",
+  "roomProblemAddrNoPort": "A room's address has its port, as 203.0.113.7:41234.",
+  "@roomProblemAddrNoPort": {
+    "description": "Why joining a room at an address typed didn't start. Keep the example address as it is."
+  },
   "roomProblemAway": "{name}'s room isn't on the network now.",
   "@roomProblemAway": {
     "placeholders": {
@@ -5777,6 +6184,10 @@
         "type": "String"
       }
     }
+  },
+  "roomProblemCodeShape": "A room's code is 6 letters and digits.",
+  "@roomProblemCodeShape": {
+    "description": "Why joining a room with a code typed didn't start."
   },
   "roomProblemDeclined": "{name} didn't let you in.",
   "@roomProblemDeclined": {
@@ -5897,16 +6308,119 @@
   "roomReachCopyNewWebLink": "copy the new web link",
   "roomReachCopyWebLink": "copy web link",
   "roomReachDesc": "MixMusic asks your router to forward the room's port, and the invite link carries where friends reach this computer. Anyone with the link or the code may knock: Remove and Block keep them out.",
+  "roomReachForwarded": "Your router forwards port {port} of its internet address, {address}, to this computer ({method}).",
+  "@roomReachForwarded": {
+    "description": "How friends outside the network reach the room, on its page. {port} is a number, {address} an IP address, {method} the router's protocol, as UPnP.",
+    "placeholders": {
+      "port": {
+        "type": "String"
+      },
+      "address": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachIPv6Maybe": "Friends with IPv6 may reach this computer at {address}, if your router lets port {port} in.",
+  "@roomReachIPv6Maybe": {
+    "description": "How friends outside the network reach the room, on its page. {address} is an IPv6 address, {port} a number.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      },
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachIPv6Open": "Friends with IPv6 reach this computer at {address}, where your router lets the port in (PCP).",
+  "@roomReachIPv6Open": {
+    "description": "How friends outside the network reach the room, on its page. {address} is an IPv6 address.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
   "roomReachJoinAtAddress": "Join at the address",
   "roomReachJoinButton": "join",
   "roomReachJoinMenu": "Join a room…",
   "roomReachMoved": "The room's internet address changed since you copied its link: friends outside need the new one.",
+  "roomReachNoAnswer": "Your router didn't answer: it may not take forwards from computers, or have UPnP, NAT-PMP and PCP off. Turn one on in its settings, or forward port {port} to this computer by hand. A VPN both of you run, such as Tailscale, reaches the room anyway: put this computer's address on it in Address for invites, in Settings › Desktop › Listen with friends.",
+  "@roomReachNoAnswer": {
+    "description": "Why friends outside the network can't reach the room, on its page. {port} is a number.",
+    "placeholders": {
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachNoRouter": "MixMusic asks no router here.",
+  "@roomReachNoRouter": {
+    "description": "Why friends outside the network can't reach the room, on its page."
+  },
+  "roomReachPortTaken": "Port {kept}, kept for rooms, is taken by another program: the room listens at port {port} instead, which a port forwarded by hand doesn't reach.",
+  "@roomReachPortTaken": {
+    "description": "How friends outside the network reach the room, on its page. {kept} and {port} are numbers.",
+    "placeholders": {
+      "kept": {
+        "type": "String"
+      },
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachRefused": "Your router refused to forward port {port}: {reason}. Forward the port to this computer by hand in the router's settings, or turn on UPnP there. A VPN both of you run, such as Tailscale, reaches the room anyway: put this computer's address on it in Address for invites, in Settings › Desktop › Listen with friends.",
+  "@roomReachRefused": {
+    "description": "Why friends outside the network can't reach the room, on its page. {port} is a number; {reason} is the router's own words, often in English.",
+    "placeholders": {
+      "port": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachShared": "Your router's internet address, {address}, is shared with your provider's other customers, or private: the router sits behind another, most often the provider's, out of reach from outside. A VPN both of you run, such as Tailscale, reaches the room anyway: put this computer's address on it in Address for invites, in Settings › Desktop › Listen with friends.",
+  "@roomReachShared": {
+    "description": "Why friends outside the network can't reach the room, on its page. {address} is an IP address.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
   "roomReachSuggestAsk": "Turn on Ask me before someone joins, and whoever comes with the link or the code waits until you let them in.",
   "roomReachSuggestAskLabel": "Turn on Ask me before someone joins",
   "roomReachSuggestAskNo": "not now",
   "roomReachSuggestAskYes": "turn it on",
   "roomReachTestNote": "MixMusic can't test the port from outside: ask a friend to open the link. A friend who can't connect is told the likely causes.",
   "roomReachTitle": "Let friends outside this network join",
+  "roomReachTyped": "Invites carry the address you typed for them, {address}. It must reach this computer's port {port}.",
+  "@roomReachTyped": {
+    "description": "How friends outside the network reach the room, on its page. {address} is what the user typed in Address for invites; {port} is a number.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      },
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachTypedInvalid": "The address for invites, {address}, isn't an address: change it in Settings › Desktop › Listen with friends.",
+  "@roomReachTypedInvalid": {
+    "description": "Why friends outside the network can't reach the room, on its page. {address} is what the user typed.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
   "roomRulesAccept": "accept",
   "roomRulesAcceptName": "Accept {title}",
   "@roomRulesAcceptName": {
@@ -6068,6 +6582,72 @@
   "roomSettingsYourName": "Your name in rooms",
   "roomSettingsYourRoomOpen": "Your room is open",
   "roomSomeone": "Someone",
+  "roomSongAdded": "{host} added {title} to the room",
+  "@roomSongAdded": {
+    "description": "Toast for a guest when the host, {host}, added the song {title} the guest gave.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongCantPlay": "{host} can't play {title}",
+  "@roomSongCantPlay": {
+    "description": "Toast for a guest when the host's computer can't play the song {title} the guest gave.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongDeclined": "{host} declined {title}",
+  "@roomSongDeclined": {
+    "description": "Toast for a guest when the host declined the song {title} the guest gave.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongWaits": "{title} waits for {host} to accept it",
+  "@roomSongWaits": {
+    "description": "Toast for a guest when the song {title} they gave waits for the host's answer.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongsOff": "{host} takes no songs from guests",
+  "@roomSongsOff": {
+    "description": "Toast for a guest when the host takes no songs.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongsTooMany": "You added many songs: wait a moment, or for {host} to answer those waiting",
+  "@roomSongsTooMany": {
+    "description": "Toast for a guest who gave too many songs at once.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
   "searchAlbums": "Albums",
   "searchArtists": "Artists",
   "searchClear": "clear",

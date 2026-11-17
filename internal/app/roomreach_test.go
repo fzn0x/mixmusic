@@ -14,6 +14,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/room"
 	"github.com/fzn0x/mixmusic/internal/room/roomtest"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // fakeRouter starts a fake router of the internet address external, on
@@ -133,7 +134,7 @@ func TestRoomTellsWhenItsAddressMoves(t *testing.T) {
 	router := fakeRouter(t, desk, "203.0.113.7")
 	var moved atomic.Int32
 	t.Cleanup(desk.OnRooms(func(note string) {
-		if note == roomMoved {
+		if note == locales.RoomNoteAddressChanged() {
 			moved.Add(1)
 		}
 	}))

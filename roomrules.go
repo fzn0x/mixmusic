@@ -120,7 +120,7 @@ func (s *shell) acceptSong(id int64) {
 		err := s.a.Rooms().Accept(id)
 		s.update(func() {
 			if err != nil {
-				s.notes = append(s.notes, noticeOf(err))
+				s.notes = append(s.notes, roomNotice(err))
 			}
 		})
 	}()
@@ -139,7 +139,7 @@ func (s *shell) makeHostButton(c *ui.Context, g app.RoomMember) {
 			err := s.a.Rooms().MakeHost(key)
 			s.update(func() {
 				if err != nil {
-					s.notes = append(s.notes, noticeOf(err))
+					s.notes = append(s.notes, roomNotice(err))
 				}
 			})
 		}()
@@ -180,7 +180,7 @@ func (s *shell) roomGuestRows(c *ui.Context, g app.GuestView) {
 	control := func(key, label, do string) {
 		if s.button(c, key, label, false).Clicked() {
 			if err := rs.Control(do); err != nil {
-				s.notes = append(s.notes, noticeOf(err))
+				s.notes = append(s.notes, roomNotice(err))
 			}
 		}
 	}
@@ -208,7 +208,7 @@ func (s *shell) roomSongItem(m *ui.Menu, t media.Track) {
 	}
 	if m.Item(label).Chosen() {
 		if err := s.a.Rooms().AddSong(t); err != nil {
-			s.notes = append(s.notes, noticeOf(err))
+			s.notes = append(s.notes, roomNotice(err))
 		}
 	}
 }

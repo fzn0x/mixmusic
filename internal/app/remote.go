@@ -182,6 +182,9 @@ func (a *App) remoteKept() remoteFile {
 // the key.
 var errKeyBusy = errors.New("this computer's key is being read: try again in a moment")
 
+// errRemoteListen: remote control can't listen on the network.
+var errRemoteListen = errors.New("remote control can't listen on the network")
+
 // identity returns the computer's key, made and kept at its first use.
 //
 // r.mu must not be held, nor any lock a frame takes: on the main thread,
@@ -407,7 +410,7 @@ func (a *App) startRemote() error {
 	o := a.remoteOptions()
 	ln, err := o.Listen()
 	if err != nil {
-		return fmt.Errorf("remote control can't listen on the network: %w", err)
+		return fmt.Errorf("%w: %w", errRemoteListen, err)
 	}
 	srv := &remote.Server{Identity: id, Name: o.Name, Host: remoteHost{a}, Timing: o.Timing}
 	go func() {

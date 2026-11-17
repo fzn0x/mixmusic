@@ -9,6 +9,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/room"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // errNotInRoom: this computer is in no room it could add to, or control.
@@ -93,23 +94,23 @@ func (a *App) watchRoomAsks(s *room.Session, host string) {
 func songAnswer(host, title, reason string) string {
 	switch reason {
 	case "":
-		return host + " added " + title + " to the room"
+		return locales.RoomSongAdded(host, title)
 	case room.SongWaits:
-		return title + " waits for " + host + " to accept it"
+		return locales.RoomSongWaits(host, title)
 	case room.SongDeclined:
-		return host + " declined " + title
+		return locales.RoomSongDeclined(host, title)
 	case room.SongsAreOff:
-		return host + " takes no songs from guests"
+		return locales.RoomSongsOff(host)
 	case room.TooMany:
-		return "You added many songs: wait a moment, or for " + host + " to answer those waiting"
+		return locales.RoomSongsTooMany(host)
 	}
-	return host + " can't play " + title
+	return locales.RoomSongCantPlay(host, title)
 }
 
 // controlRefusal tells why the host refused a control.
 func controlRefusal(host, reason string) string {
 	if reason == room.TooMany {
-		return "Too many at once: try again in a moment"
+		return locales.RoomControlTooMany()
 	}
-	return host + " doesn't let guests control playback"
+	return locales.RoomControlRefused(host)
 }

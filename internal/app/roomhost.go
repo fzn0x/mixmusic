@@ -17,6 +17,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/room"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // hostedRoom is the room this computer hosts: its server, its code, its
@@ -73,12 +74,15 @@ func shownActivity(acts []room.Activity) []room.Activity {
 	return acts
 }
 
-// roomGuessed is what the host is told as its room takes no code for a
-// while, after too many wrong ones.
-const roomGuessed = "Someone on the network is guessing your room's code. Friends can still join with the invite link, or give the room a new code."
-
 // errInRoom: this computer is a guest of a room, and hosts none meanwhile.
 var errInRoom = errors.New("Leave the room you're in to start one")
+
+// Why the room can't open: it can't listen on the network, or be
+// announced there.
+var (
+	errRoomListen   = errors.New("The room can't listen on the network")
+	errRoomAnnounce = errors.New("The room can't be announced on the network")
+)
 
 // Start opens a room on the network, of a new code and invite link, unless
 // one is open.
@@ -111,11 +115,11 @@ func (rs *Rooms) Start() error {
 	o := a.roomOptions()
 	ln, err := o.Listen()
 	if err != nil {
-		return fmt.Errorf("The room can't listen on the network: %w", err)
+		return fmt.Errorf("%w: %w", errRoomListen, err)
 	}
 	h := &hostedRoom{key: id.Fingerprint(), code: code, link: room.Invite{Code: code, Host: id.Fingerprint(), Secret: secret}.Link(), told: time.Now()}
 	srv := &room.Server{Identity: id, Name: a.roomName(), Code: code, Secret: secret, Host: roomHostPlayer{a}, Clock: a.roomClock(),
-		Timing: o.Timing, Nearby: &a.room.far.near, Changed: func() { a.roomChanged(h) }, Guessing: func() { a.notifyRooms(roomGuessed) }}
+		Timing: o.Timing, Nearby: &a.room.far.near, Changed: func() { a.roomChanged(h) }, Guessing: func() { a.notifyRooms(locales.RoomNoteGuessed()) }}
 	h.server = srv
 	srv.Guests = a.roomGuests()
 	go func() {
@@ -130,7 +134,7 @@ func (rs *Rooms) Start() error {
 	stop, err := o.Discovery.Announce(room.Announcement{ID: id.Fingerprint().ID(), Name: srv.Name, Port: port})
 	if err != nil {
 		srv.Close()
-		return fmt.Errorf("The room can't be announced on the network: %w", err)
+		return fmt.Errorf("%w: %w", errRoomAnnounce, err)
 	}
 	h.unannounce = stop
 	r.mu.Lock()
@@ -254,11 +258,11 @@ func (a *App) roomChanged(h *hostedRoom) {
 		h.told = act.At
 		switch act.What {
 		case room.Joined:
-			notes = append(notes, act.Name+" joined the room")
+			notes = append(notes, locales.RoomNoteGuestJoined(shownName(act.Name)))
 		case room.Left:
-			notes = append(notes, act.Name+" left the room")
+			notes = append(notes, locales.RoomNoteGuestLeft(shownName(act.Name)))
 		case room.Added:
-			notes = append(notes, act.Name+" added "+act.Song)
+			notes = append(notes, locales.RoomNoteGuestAdded(shownName(act.Name), act.Song))
 		}
 	}
 	h.toldMu.Unlock()

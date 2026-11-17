@@ -13,7 +13,6 @@ package main
 import (
 	"path/filepath"
 	"slices"
-	"strconv"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
@@ -89,10 +88,10 @@ func (s *shell) openCopies(t media.Track) {
 func copyFormat(cp localfiles.Copy) string {
 	parts := []string{codecLabel(cp.Codec)}
 	if cp.Lossless() && cp.BitDepth > 0 {
-		parts = append(parts, strconv.Itoa(cp.BitDepth)+"-bit")
+		parts = append(parts, locales.FormatBitDepth(cp.BitDepth))
 	}
 	if !cp.Lossless() && cp.Bitrate > 0 {
-		parts = append(parts, strconv.Itoa(cp.Bitrate)+" kbit/s")
+		parts = append(parts, locales.FormatBitrate(cp.Bitrate))
 	}
 	if cp.SampleRate > 0 {
 		parts = append(parts, kilohertz(cp.SampleRate))

@@ -129,8 +129,8 @@ func (a *App) handleVideo() {
 // WebViewProblem tells why music videos can't show their picture here, in
 // plain words, or "" when they can: their page needs the system's web view.
 func (s *System) WebViewProblem() string {
-	if err := needWebView("Showing music videos"); err != nil {
-		return err.Error()
+	if err := needWebView(webViewVideos); err != nil {
+		return ErrorWords(err)
 	}
 	return ""
 }

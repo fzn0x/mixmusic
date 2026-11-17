@@ -22,6 +22,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 const (
@@ -264,9 +266,11 @@ func randomString(n int) string {
 
 // writeCallbackPage tells the user, in the browser, how signing in went.
 func writeCallbackPage(w http.ResponseWriter, err error) {
-	title, msg := "Signed in to Spotify", "You can close this tab and go back to MixMusic."
+	// The browser shows it in the interface's language; Spotify's own
+	// words stay as they are.
+	title, msg := locales.SpotifyPageSignedIn(), locales.SpotifyPageClose()
 	if err != nil {
-		title, msg = "Could not sign in", err.Error()
+		title, msg = locales.SpotifyPageFailed(), err.Error()
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprintf(w, `<!doctype html><meta charset="utf-8"><title>MixMusic</title>

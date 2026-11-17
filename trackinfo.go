@@ -305,7 +305,7 @@ func formatName(codec, container string) string {
 
 // kilohertz writes a sample rate as "44.1 kHz".
 func kilohertz(hz int) string {
-	return strconv.FormatFloat(float64(hz)/1000, 'f', -1, 64) + " kHz"
+	return locales.FormatKilohertz(strconv.FormatFloat(float64(hz)/1000, 'f', -1, 64))
 }
 
 // channelsName names a count of channels: "Mono", "Stereo", "5.1

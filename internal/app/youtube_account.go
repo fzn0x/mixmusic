@@ -23,6 +23,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/store"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // youtubeKeySecret is the key, in the system's credential store, of the
@@ -311,7 +312,7 @@ func (a *App) youtubeAccount(ctx context.Context) YouTubeAccount {
 // YouTube Music. Nothing the user types passes through MixMusic: it reads
 // the cookies of the session the window ends with.
 func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
-	if err := needWebView("signing in to YouTube Music"); err != nil {
+	if err := needWebView(webViewSignIn); err != nil {
 		return AccountsStatus{}, err
 	}
 	ctx, cancel := context.WithTimeout(ctx, loginTimeout)
@@ -319,7 +320,7 @@ func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
 	done := make(chan []*http.Cookie, 1)
 	closed := make(chan struct{})
 	win := mygo.NewWindow(mygo.WindowOptions{
-		Title:  "Sign in to YouTube Music",
+		Title:  locales.AccountSettingsYouTubeWindowTitle(),
 		Width:  480,
 		Height: 720,
 		URL:    youtubeSignInURL,
@@ -349,9 +350,9 @@ func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
 	select {
 	case cookies = <-done:
 	case <-closed:
-		return AccountsStatus{}, errors.New("the sign-in window closed before signing in")
+		return AccountsStatus{}, worded("the sign-in window closed before signing in", locales.AccountSettingsYouTubeWindowClosed(), nil)
 	case <-ctx.Done():
-		return AccountsStatus{}, errors.New("signing in to YouTube Music took too long; try again")
+		return AccountsStatus{}, worded("signing in to YouTube Music took too long; try again", locales.AccountSettingsYouTubeTooLong(), nil)
 	}
 	return s.a.youtubeSignIn(ctx, cookies)
 }
@@ -373,7 +374,8 @@ func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (Accoun
 	if err != nil {
 		a.youtube.SetCookies(nil)
 		if errors.Is(err, youtube.ErrSessionRejected) {
-			return AccountsStatus{}, worded("YouTube Music did not accept the session: it may have ended, as when you sign out of Google. Sign in to YouTube Music again, then try again", err)
+			return AccountsStatus{}, worded("YouTube Music did not accept the session: it may have ended, as when you sign out of Google. Sign in to YouTube Music again, then try again",
+				locales.AccountSettingsYouTubeSessionEnded(), err)
 		}
 		return AccountsStatus{}, fmt.Errorf("YouTube Music did not accept the sign-in: %w", err)
 	}
@@ -395,17 +397,6 @@ func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (Accoun
 	notify()
 	return status, nil
 }
-
-// wordedError is an error in the words of the interface, wrapping the
-// error it tells of.
-type wordedError struct {
-	text string
-	err  error
-}
-
-func worded(text string, err error) error { return &wordedError{text, err} }
-func (e *wordedError) Error() string      { return e.text }
-func (e *wordedError) Unwrap() error      { return e.err }
 
 // windowSession returns the cookies of the sign-in window that a request to
 // YouTube Music sends, when they hold a signed-in session.

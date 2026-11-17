@@ -56,7 +56,7 @@ func (s *shell) desktopSettings(c *ui.Context) {
 					err := s.svc.Preferences.SetOpenAtLogin(on)
 					s.update(func() {
 						if err != nil {
-							s.notes = append(s.notes, noticeOf(err))
+							s.notes = append(s.notes, wordsNotice(err))
 						}
 						s.forget("openAtLogin")
 					})

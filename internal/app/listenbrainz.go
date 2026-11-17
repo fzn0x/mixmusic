@@ -10,6 +10,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/listenbrainz"
 	"github.com/fzn0x/mixmusic/internal/scrobble"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // listenbrainzSecret is the key, in the system's credential store, of the
@@ -207,7 +208,7 @@ func (s *Accounts) ListenBrainzReconnect(ctx context.Context, token string) erro
 	l := s.a.listenbrainz.conn
 	s.a.mu.Unlock()
 	if l == nil {
-		return errors.New("connect to ListenBrainz first")
+		return worded("connect to ListenBrainz first", locales.ListenBrainzSettingsConnectFirst(), nil)
 	}
 	c, err := s.a.listenbrainzCheck(ctx, token, l.creds.server())
 	if err != nil {

@@ -41,10 +41,77 @@
   "aboutVersion": "Version",
   "accountSettingsAPIKey": "API key",
   "accountSettingsApproveLastfm": "Approve MixMusic on Last.fm, in your browser",
+  "accountSettingsBrowserClosed": "{browser} closed before you signed in to YouTube Music",
+  "@accountSettingsBrowserClosed": {
+    "description": "Why signing in to YouTube Music in a browser failed, in Settings › Accounts. {browser} is the browser's name, as Firefox.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
   "accountSettingsCharsPlaceholder": "32 letters and digits",
   "accountSettingsConnectButton": "connect to last.fm",
   "accountSettingsConnectLastfm": "Connect to Last.fm",
   "accountSettingsConnectedLastfm": "Connected to Last.fm",
+  "accountSettingsCookiesDenied": "the system keeps the cookies of {browser} from MixMusic",
+  "@accountSettingsCookiesDenied": {
+    "description": "Why importing the YouTube Music sign-in from a browser failed, in Settings › Accounts. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsCookiesNone": "MixMusic found no cookies of {browser}: is it installed? For a profile kept elsewhere, give its folder",
+  "@accountSettingsCookiesNone": {
+    "description": "Why importing the YouTube Music sign-in from a browser failed, in Settings › Accounts. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsCookiesNoneInFolder": "MixMusic found no cookies of {browser} in that folder: give the folder of one of its profiles",
+  "@accountSettingsCookiesNoneInFolder": {
+    "description": "Why importing the YouTube Music sign-in from a browser's folder the user gave failed, in Settings › Accounts. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsCookiesNoneInItsFolder": "MixMusic found no cookies of {browser} in its folder: give the folder of one of its profiles",
+  "@accountSettingsCookiesNoneInItsFolder": {
+    "description": "Why importing the YouTube Music sign-in from a browser failed, in Settings › Accounts. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsCookiesOpen": "{browser} is open, and keeps its cookies to itself while it is: close it, then import again",
+  "@accountSettingsCookiesOpen": {
+    "description": "Why importing the YouTube Music sign-in from a browser failed, in Settings › Accounts. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsCookiesSafari": "macOS keeps Safari's cookies from MixMusic: allow MixMusic Full Disk Access in System Settings › Privacy & Security, then import again",
+  "@accountSettingsCookiesSafari": {
+    "description": "Why importing the YouTube Music sign-in from Safari failed, in Settings › Accounts. Use the names macOS gives these settings in the language."
+  },
+  "accountSettingsCookiesSealed": "{browser} seals its cookies so that other programs can't read them, as recent Chrome does on Windows: import from Firefox, or paste a cookie header",
+  "@accountSettingsCookiesSealed": {
+    "description": "Why importing the YouTube Music sign-in from a browser failed, in Settings › Accounts. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
   "accountSettingsCopiedRedirect": "Copied the redirect URI",
   "accountSettingsCopy": "copy",
   "accountSettingsDisconnect": "disconnect",
@@ -53,6 +120,10 @@
   "accountSettingsFinishSpotify": "Finish signing in in your browser",
   "accountSettingsLastfmAgain": "Connect again to go on scrobbling.",
   "accountSettingsLastfmConnectAgain": "connect again",
+  "accountSettingsLastfmConnectFirst": "connect to Last.fm first",
+  "@accountSettingsLastfmConnectFirst": {
+    "description": "Why something of Last.fm can't be done, as a toast."
+  },
   "accountSettingsLastfmDrop": "drop them",
   "accountSettingsLastfmDropped": "{count, plural, one {# scrobble} other {# scrobbles}} not sent yet will be dropped.",
   "@accountSettingsLastfmDropped": {
@@ -85,6 +156,10 @@
       }
     }
   },
+  "accountSettingsLastfmPasteKeys": "paste the API key and the shared secret of your Last.fm API account",
+  "@accountSettingsLastfmPasteKeys": {
+    "description": "Why connecting to Last.fm didn't start, as a toast."
+  },
   "accountSettingsLastfmSend": "send them",
   "accountSettingsLastfmSendTitle": "Send the waiting scrobbles to {other}?",
   "@accountSettingsLastfmSendTitle": {
@@ -106,6 +181,10 @@
   },
   "accountSettingsLastfmStep2": "Paste its API key and shared secret here, and connect.",
   "accountSettingsLastfmStep3": "Approve MixMusic on the page that opens in your browser.",
+  "accountSettingsLastfmTooLong": "Last.fm did not hear from you in time: approve MixMusic in the browser, then connect again",
+  "@accountSettingsLastfmTooLong": {
+    "description": "Why connecting to Last.fm failed, as a toast."
+  },
   "accountSettingsLastfmWaiting": "{count, plural, one {# scrobble waits} other {# scrobbles wait}} to be sent.",
   "@accountSettingsLastfmWaiting": {
     "placeholders": {
@@ -243,6 +322,10 @@
   "accountSettingsYouTubeProfileTitle": "Profile",
   "accountSettingsYouTubeRefused": "YouTube Music refused the sign-in",
   "accountSettingsYouTubeSession": "You sign in on Google's own page, in a window of MixMusic: MixMusic never sees your password, and keeps the session encrypted on this computer. YouTube Music does not offer this to apps officially, so it may stop working when YouTube changes.",
+  "accountSettingsYouTubeSessionEnded": "YouTube Music did not accept the session: it may have ended, as when you sign out of Google. Sign in to YouTube Music again, then try again",
+  "@accountSettingsYouTubeSessionEnded": {
+    "description": "Why signing in to YouTube Music failed, in Settings › Accounts."
+  },
   "accountSettingsYouTubeSignInButton": "sign in to youtube music",
   "accountSettingsYouTubeSignInTitle": "Sign in to YouTube Music",
   "accountSettingsYouTubeSignOutBody": "MixMusic forgets your YouTube Music session; your library stays on YouTube Music.",
@@ -258,6 +341,10 @@
       }
     }
   },
+  "accountSettingsYouTubeTooLong": "signing in to YouTube Music took too long; try again",
+  "@accountSettingsYouTubeTooLong": {
+    "description": "Why signing in to YouTube Music failed, in Settings › Accounts. MixMusic makes its first letter a capital."
+  },
   "accountSettingsYouTubeUnswitchable": "YouTube doesn't let MixMusic switch to this channel",
   "accountSettingsYouTubeUsingAs": "Using YouTube Music as {name}",
   "@accountSettingsYouTubeUsingAs": {
@@ -266,6 +353,14 @@
         "type": "String"
       }
     }
+  },
+  "accountSettingsYouTubeWindowClosed": "the sign-in window closed before signing in",
+  "@accountSettingsYouTubeWindowClosed": {
+    "description": "Why signing in to YouTube Music failed, in Settings › Accounts. MixMusic makes its first letter a capital."
+  },
+  "accountSettingsYouTubeWindowTitle": "Sign in to YouTube Music",
+  "@accountSettingsYouTubeWindowTitle": {
+    "description": "The title of the window in which the user signs in to YouTube Music."
   },
   "accountsClientID": "Client ID",
   "alreadyInAddAnyway": "add anyway",
@@ -385,6 +480,87 @@
   "appearanceThemeTitle": "Theme",
   "appearanceUseFile": "use the file's",
   "appearanceUseTheme": "use the theme's",
+  "artistPlayFailed": "{artist}'s songs couldn't be loaded: {error}",
+  "@artistPlayFailed": {
+    "description": "Toast when an artist's songs didn't load to play. {error} is why, often in the service's own words.",
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "artistPlayFirst": "Only the first {count} of {artist}'s {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}",
+  "@artistPlayFirst": {
+    "description": "Toast when playing all of an artist's songs read only some. {unit} is releases for Spotify's artists, read an album or single at a time, and songs otherwise. {error} is why, often in the service's own words.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "artist": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "artistPlayNoSongs": "No songs listed for {artist}",
+  "@artistPlayNoSongs": {
+    "description": "Toast when an artist has no songs to play.",
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "artistPlaySome": "Only {count} of {artist}'s {total} {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}",
+  "@artistPlaySome": {
+    "description": "Toast when playing all of an artist's songs read only some of those the service counts. {unit} is releases for Spotify's artists and songs otherwise. {error} is why, often in the service's own words.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "artist": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "artistPlayTopFailed": "{artist}'s top songs play, as the list of all their songs couldn't be loaded: {error}",
+  "@artistPlayTopFailed": {
+    "description": "Toast when playing all of an artist's songs plays their top songs instead. {error} is why, often in the service's own words.",
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "artistPlayTopOnly": "{artist}'s top songs play: YouTube Music lists no more of their songs",
+  "@artistPlayTopOnly": {
+    "description": "Toast when playing all of an artist's songs plays their top songs, which is all YouTube Music lists.",
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
   "assistantsAbout": "AI assistants on this computer that speak MCP, the Model Context Protocol, can tell what plays, play, pause, skip, search, and play your playlists. Each thing one does shows here. Nothing on the network can reach it.",
   "assistantsCommand": "Command",
   "assistantsCommandNote": ". An assistant starts it, as a server of MCP that runs a command (stdio), to reach MixMusic while it runs.",
@@ -1351,6 +1527,22 @@
     }
   },
   "crossfadeTitle": "Crossfade",
+  "desktopSettingsAutostartReason": "MixMusic starts when you log in, as you chose in its settings",
+  "@desktopSettingsAutostartReason": {
+    "description": "Why MixMusic asks to start at login, which the Linux desktop shows as it asks the user."
+  },
+  "desktopSettingsAutostartRefused": "the desktop didn't let MixMusic start at login: allow it to run in the background in your system's settings for apps, then turn this on again",
+  "@desktopSettingsAutostartRefused": {
+    "description": "Why Open at login didn't turn on, as a toast."
+  },
+  "desktopSettingsAutostartStays": "the desktop still starts MixMusic at login",
+  "@desktopSettingsAutostartStays": {
+    "description": "Why Open at login didn't turn off, as a toast."
+  },
+  "desktopSettingsBackgroundReason": "MixMusic plays on in the tray when you close its window",
+  "@desktopSettingsBackgroundReason": {
+    "description": "Why MixMusic asks to run in the background, which the Linux desktop shows as it asks the user."
+  },
   "desktopSettingsDiscordAbout": "While Discord runs, your profile says what you listen to: you choose its lines, cover, time and button.",
   "desktopSettingsDiscordAppID": "Discord application ID",
   "desktopSettingsDiscordAppIDAbout": "Discord shows the name of MixMusic's application. To show another, create one in the {link} and paste its application ID.",
@@ -1370,6 +1562,10 @@
   "desktopSettingsLogin": "Start at login",
   "desktopSettingsMediaKeysAbout": "The keyboard's play, next and previous keys control MixMusic. Keys of your own that work everywhere are in Settings › Shortcuts.",
   "desktopSettingsMediaKeysTitle": "Media keys",
+  "desktopSettingsNoBackgroundPortal": "this desktop has no Background portal, which starts MixMusic at login from its Flatpak: add MixMusic to the apps your desktop starts at login instead",
+  "@desktopSettingsNoBackgroundPortal": {
+    "description": "Why Open at login didn't turn on, as a toast. The Background portal is a part of Linux desktops."
+  },
   "desktopSettingsNotificationsAbout": "Tell what starts playing while MixMusic is in the background.",
   "desktopSettingsNotificationsTitle": "Notifications",
   "desktopSettingsOpen": "open",
@@ -2063,6 +2259,10 @@
   },
   "equalizerSpotifyNotes": "Spotify notes",
   "equalizerTitle": "Equalizer",
+  "explicitBadge": "e",
+  "@explicitBadge": {
+    "description": "The badge of an explicit track: a letter in a small box beside its title, as E in English. Keep it one or two characters."
+  },
   "explicitHideDesc": "Songs, albums and videos marked explicit don't show in the search, on Home, on artists' pages or in radios, and never play. Your playlists, liked songs, library and queue list them dimmed.",
   "explicitHideTitle": "Hide explicit content",
   "explicitTagHidden": "hidden by your settings",
@@ -2311,6 +2511,36 @@
   "fontNoticeMaterial": "Roboto Flex, the Material themes' face",
   "fontNoticeMochi": "Quicksand, Mochi's face",
   "fontNoticeWalnut": "Archivo, the Walnut themes' headings' face",
+  "formatBitDepth": "{bits}-bit",
+  "@formatBitDepth": {
+    "description": "A file's bit depth, as 24-bit, in the line of a copy's audio, as FLAC · 24-bit · 96 kHz.",
+    "placeholders": {
+      "bits": {
+        "type": "int"
+      }
+    }
+  },
+  "formatBitrate": "{rate} kbit/s",
+  "@formatBitrate": {
+    "description": "A file's bitrate, as 320 kbit/s, in the line of a copy's audio, as MP3 · 320 kbit/s · 44.1 kHz.",
+    "placeholders": {
+      "rate": {
+        "type": "int"
+      }
+    }
+  },
+  "formatBytes": "{size} {unit, select, KB {KB} MB {MB} GB {GB} TB {TB} other {B}}",
+  "@formatBytes": {
+    "description": "A size, as 512 MB. {size} is the number, already written; {unit} picks the unit: B for bytes, KB, MB, GB or TB.",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "formatDayMonth": "{date, date, ::MMMd}",
   "@formatDayMonth": {
     "description": "A day of Stats' chart, under its column: its month and day, in the language's order.",
@@ -2330,6 +2560,15 @@
       "minutes": {
         "type": "int",
         "example": "5"
+      }
+    }
+  },
+  "formatKilohertz": "{rate} kHz",
+  "@formatKilohertz": {
+    "description": "A sample rate in kilohertz, as 44.1 kHz. {rate} is the number, already written.",
+    "placeholders": {
+      "rate": {
+        "type": "String"
       }
     }
   },
@@ -2904,6 +3143,10 @@
   "listenBrainzSettingsChecking": "checking the token…",
   "listenBrainzSettingsConnect": "connect to listenbrainz",
   "listenBrainzSettingsConnectAgain": "connect again",
+  "listenBrainzSettingsConnectFirst": "connect to ListenBrainz first",
+  "@listenBrainzSettingsConnectFirst": {
+    "description": "Why something of ListenBrainz can't be done, as a toast."
+  },
   "listenBrainzSettingsConnectTitle": "Connect to ListenBrainz",
   "listenBrainzSettingsConnected": "Connected to ListenBrainz",
   "listenBrainzSettingsDisconnectAskBody": "MixMusic forgets your token; your listens stay on {server}.{waiting, plural, =0 {} one { # listen not sent yet will be dropped.} other { # listens not sent yet will be dropped.}}",
@@ -2976,6 +3219,10 @@
     }
   },
   "listenBrainzSettingsPlain": "Plain http works only on your local network, and your token travels to the server unencrypted: anyone on the network can read it.",
+  "listenBrainzSettingsPlainRemote": "plain http is for a server on your local network alone, as the token would travel unencrypted: use the server's https address",
+  "@listenBrainzSettingsPlainRemote": {
+    "description": "Why connecting to a ListenBrainz server failed, as a toast."
+  },
   "listenBrainzSettingsScrobbleSwitch": "Scrobble to ListenBrainz",
   "listenBrainzSettingsSendThem": "send them",
   "listenBrainzSettingsServer": "Leave it empty for ListenBrainz itself. A ListenBrainz of your own takes its address, and Maloja its address followed by /apis/listenbrainz.",
@@ -2993,6 +3240,10 @@
   "listenBrainzSettingsStep2": "Paste it here, and connect.",
   "listenBrainzSettingsTokenLink": "your ListenBrainz settings",
   "listenBrainzSettingsTokenPlaceholder": "36 letters, digits and dashes",
+  "listenBrainzSettingsTokenRefused": "ListenBrainz doesn't accept this token",
+  "@listenBrainzSettingsTokenRefused": {
+    "description": "Why connecting to ListenBrainz failed, as a toast."
+  },
   "listenBrainzSettingsUserToken": "User token",
   "listenBrainzSettingsYourServer": "Your server",
   "localAlbumGone": "this album is no longer on this computer",
@@ -6258,6 +6509,18 @@
   "speedPodcasts": "Podcasts",
   "speedSongs": "Songs",
   "speedTitle": "Speed",
+  "spotifyPageClose": "You can close this tab and go back to MixMusic.",
+  "@spotifyPageClose": {
+    "description": "The page the browser shows once the user signed in to Spotify for MixMusic."
+  },
+  "spotifyPageFailed": "Could not sign in",
+  "@spotifyPageFailed": {
+    "description": "The title of the page the browser shows when signing in to Spotify for MixMusic failed. Spotify's own words follow it."
+  },
+  "spotifyPageSignedIn": "Signed in to Spotify",
+  "@spotifyPageSignedIn": {
+    "description": "The title of the page the browser shows once the user signed in to Spotify for MixMusic."
+  },
   "statsAllTime": "All time",
   "statsArrowKeys": "The arrow keys go from day to day.",
   "statsArtistPlays": "{artist}: {plays, plural, one {# play} other {# plays}}",
@@ -6656,6 +6919,14 @@
       }
     }
   },
+  "trackInfoCantPlay": "MixMusic can't play this file",
+  "@trackInfoCantPlay": {
+    "description": "A problem of a track's file, in Track info."
+  },
+  "trackInfoCantRead": "Can't read the file",
+  "@trackInfoCantRead": {
+    "description": "A problem of a track's file, in Track info."
+  },
   "trackInfoChannels": "{count} channels",
   "@trackInfoChannels": {
     "placeholders": {
@@ -6723,6 +6994,10 @@
   },
   "trackInfoFile": "File",
   "trackInfoFileLoudness": "It plays at its own level: Even loudness turns tracks down from YouTube's measure of each, which a file on this computer hasn't.",
+  "trackInfoFileNotFound": "File not found",
+  "@trackInfoFileNotFound": {
+    "description": "A problem of a track's file, in Track info."
+  },
   "trackInfoFileProblem": "{path} · {problem}",
   "@trackInfoFileProblem": {
     "placeholders": {
@@ -7199,6 +7474,33 @@
   "volumeUnmute": "Unmute",
   "wavyProgressDescription": "The played part of the seek bar is a gentle wave that moves while music plays and lies flat while it's paused. It holds still while your system asks for less motion.",
   "wavyProgressTitle": "Wavy progress bar",
+  "webViewMissing": "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music videos} other {This}} needs the system's webview, which this computer doesn't have",
+  "@webViewMissing": {
+    "description": "Why a feature can't work. {feature} picks the sentence's start by the feature: signIn, spotify or videos.",
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "webViewMissingLinux": "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music videos} other {This}} needs WebKitGTK, which this computer doesn't have: install libwebkit2gtk-4.1-0 on Debian and Ubuntu, webkit2gtk4.1 on Fedora",
+  "@webViewMissingLinux": {
+    "description": "Why a feature can't work on Linux. {feature} picks the sentence's start by the feature: signIn, spotify or videos. Keep the packages' names as they are.",
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "webViewMissingWindows": "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music videos} other {This}} needs Microsoft's WebView2 Runtime, which this computer doesn't have: get it from https://go.microsoft.com/fwlink/p/?LinkId=2124703",
+  "@webViewMissingWindows": {
+    "description": "Why a feature can't work on Windows. {feature} picks the sentence's start by the feature: signIn, spotify or videos. Keep the address as it is.",
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
   "widgetsLoading": "Loading",
   "widgetsTryAgain": "try again",
   "youtubeBrowserAbout": "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any browser: MixMusic then takes the session, closes the browser and deletes the profile. Your own profiles stay as they are.",

@@ -2301,6 +2301,20 @@ func (msgs Messages) CacheSizeMB(mb int) string {
 	return Catalog.Format(msgs.locale, "cacheSizeMB", map[string]any{"mb": mb})
 }
 
+// CastAlreadyConnecting says "MixMusic is connecting to a cast device already"
+// in the language the app shows.
+//
+// A notice, as casting starts while another starts.
+func CastAlreadyConnecting() string { return In(i18n.Locale()).CastAlreadyConnecting() }
+
+// CastAlreadyConnecting says "MixMusic is connecting to a cast device already"
+// in the language of msgs.
+//
+// A notice, as casting starts while another starts.
+func (msgs Messages) CastAlreadyConnecting() string {
+	return Catalog.Format(msgs.locale, "castAlreadyConnecting", nil)
+}
+
 // CastConnecting says "connecting…"
 // in the language the app shows.
 func CastConnecting() string { return In(i18n.Locale()).CastConnecting() }
@@ -2311,6 +2325,70 @@ func (msgs Messages) CastConnecting() string {
 	return Catalog.Format(msgs.locale, "castConnecting", nil)
 }
 
+// CastCouldntCast says "Couldn't cast to {device}: {error}"
+// in the language the app shows.
+//
+// A notice, as casting to a device starts. {error} says why, as the device
+// or the system says it.
+func CastCouldntCast(device string, error string) string {
+	return In(i18n.Locale()).CastCouldntCast(device, error)
+}
+
+// CastCouldntCast says "Couldn't cast to {device}: {error}"
+// in the language of msgs.
+//
+// A notice, as casting to a device starts. {error} says why, as the device
+// or the system says it.
+func (msgs Messages) CastCouldntCast(device string, error string) string {
+	return Catalog.Format(msgs.locale, "castCouldntCast", map[string]any{"device": device, "error": error})
+}
+
+// CastCouldntConnect says "Couldn't connect to {device}: check that it's on, on this computer's network"
+// in the language the app shows.
+//
+// A notice, as casting to a device starts.
+func CastCouldntConnect(device string) string { return In(i18n.Locale()).CastCouldntConnect(device) }
+
+// CastCouldntConnect says "Couldn't connect to {device}: check that it's on, on this computer's network"
+// in the language of msgs.
+//
+// A notice, as casting to a device starts.
+func (msgs Messages) CastCouldntConnect(device string) string {
+	return Catalog.Format(msgs.locale, "castCouldntConnect", map[string]any{"device": device})
+}
+
+// CastCouldntServe says "Couldn't serve {device} the audio: {error}"
+// in the language the app shows.
+//
+// A notice, as casting to a device starts. {error} says why, as the system
+// says it.
+func CastCouldntServe(device string, error string) string {
+	return In(i18n.Locale()).CastCouldntServe(device, error)
+}
+
+// CastCouldntServe says "Couldn't serve {device} the audio: {error}"
+// in the language of msgs.
+//
+// A notice, as casting to a device starts. {error} says why, as the system
+// says it.
+func (msgs Messages) CastCouldntServe(device string, error string) string {
+	return Catalog.Format(msgs.locale, "castCouldntServe", map[string]any{"device": device, "error": error})
+}
+
+// CastDeviceGone says "That cast device is no longer on the network"
+// in the language the app shows.
+//
+// A notice, as casting to a device that went starts.
+func CastDeviceGone() string { return In(i18n.Locale()).CastDeviceGone() }
+
+// CastDeviceGone says "That cast device is no longer on the network"
+// in the language of msgs.
+//
+// A notice, as casting to a device that went starts.
+func (msgs Messages) CastDeviceGone() string {
+	return Catalog.Format(msgs.locale, "castDeviceGone", nil)
+}
+
 // CastPlayingOn says "Playing on {name}"
 // in the language the app shows.
 func CastPlayingOn(name string) string { return In(i18n.Locale()).CastPlayingOn(name) }
@@ -2319,6 +2397,56 @@ func CastPlayingOn(name string) string { return In(i18n.Locale()).CastPlayingOn(
 // in the language of msgs.
 func (msgs Messages) CastPlayingOn(name string) string {
 	return Catalog.Format(msgs.locale, "castPlayingOn", map[string]any{"name": name})
+}
+
+// CastStoppedElsewhere says "Casting to {device} stopped: it stopped playing from MixMusic"
+// in the language the app shows.
+//
+// A notice, as the device plays something else, or stops, by itself or from
+// another app.
+func CastStoppedElsewhere(device string) string {
+	return In(i18n.Locale()).CastStoppedElsewhere(device)
+}
+
+// CastStoppedElsewhere says "Casting to {device} stopped: it stopped playing from MixMusic"
+// in the language of msgs.
+//
+// A notice, as the device plays something else, or stops, by itself or from
+// another app.
+func (msgs Messages) CastStoppedElsewhere(device string) string {
+	return Catalog.Format(msgs.locale, "castStoppedElsewhere", map[string]any{"device": device})
+}
+
+// CastStoppedLost says "Casting to {device} stopped: the connection was lost"
+// in the language the app shows.
+//
+// A notice.
+func CastStoppedLost(device string) string { return In(i18n.Locale()).CastStoppedLost(device) }
+
+// CastStoppedLost says "Casting to {device} stopped: the connection was lost"
+// in the language of msgs.
+//
+// A notice.
+func (msgs Messages) CastStoppedLost(device string) string {
+	return Catalog.Format(msgs.locale, "castStoppedLost", map[string]any{"device": device})
+}
+
+// CastStoppedTaken says "Casting to {device} stopped: {why}"
+// in the language the app shows.
+//
+// A notice, as another app took the device. {why} says which, as the device
+// says it.
+func CastStoppedTaken(device string, why string) string {
+	return In(i18n.Locale()).CastStoppedTaken(device, why)
+}
+
+// CastStoppedTaken says "Casting to {device} stopped: {why}"
+// in the language of msgs.
+//
+// A notice, as another app took the device. {why} says which, as the device
+// says it.
+func (msgs Messages) CastStoppedTaken(device string, why string) string {
+	return Catalog.Format(msgs.locale, "castStoppedTaken", map[string]any{"device": device, "why": why})
 }
 
 // CastThisComputer says "This computer"
@@ -7951,6 +8079,150 @@ func GlobalKeysNoGlobal(title string) string { return In(i18n.Locale()).GlobalKe
 // in the language of msgs.
 func (msgs Messages) GlobalKeysNoGlobal(title string) string {
 	return Catalog.Format(msgs.locale, "globalKeysNoGlobal", map[string]any{"title": title})
+}
+
+// GlobalKeysProblemCantBe says "These keys can't be a global shortcut"
+// in the language the app shows.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, as
+// its keys are typed.
+func GlobalKeysProblemCantBe() string { return In(i18n.Locale()).GlobalKeysProblemCantBe() }
+
+// GlobalKeysProblemCantBe says "These keys can't be a global shortcut"
+// in the language of msgs.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, as
+// its keys are typed.
+func (msgs Messages) GlobalKeysProblemCantBe() string {
+	return Catalog.Format(msgs.locale, "globalKeysProblemCantBe", nil)
+}
+
+// GlobalKeysProblemDesktopEntry says "Global shortcuts need MixMusic installed with its desktop entry"
+// in the language the app shows.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, why
+// it does nothing, on Linux.
+func GlobalKeysProblemDesktopEntry() string { return In(i18n.Locale()).GlobalKeysProblemDesktopEntry() }
+
+// GlobalKeysProblemDesktopEntry says "Global shortcuts need MixMusic installed with its desktop entry"
+// in the language of msgs.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, why
+// it does nothing, on Linux.
+func (msgs Messages) GlobalKeysProblemDesktopEntry() string {
+	return Catalog.Format(msgs.locale, "globalKeysProblemDesktopEntry", nil)
+}
+
+// GlobalKeysProblemF12 says "Windows keeps F12 for itself"
+// in the language the app shows.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, as
+// F12 alone is typed for it.
+func GlobalKeysProblemF12() string { return In(i18n.Locale()).GlobalKeysProblemF12() }
+
+// GlobalKeysProblemF12 says "Windows keeps F12 for itself"
+// in the language of msgs.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, as
+// F12 alone is typed for it.
+func (msgs Messages) GlobalKeysProblemF12() string {
+	return Catalog.Format(msgs.locale, "globalKeysProblemF12", nil)
+}
+
+// GlobalKeysProblemInUse says "These keys are already in use: pick others, or try again once they're free"
+// in the language the app shows.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app: the
+// system refused its keys.
+func GlobalKeysProblemInUse() string { return In(i18n.Locale()).GlobalKeysProblemInUse() }
+
+// GlobalKeysProblemInUse says "These keys are already in use: pick others, or try again once they're free"
+// in the language of msgs.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app: the
+// system refused its keys.
+func (msgs Messages) GlobalKeysProblemInUse() string {
+	return Catalog.Format(msgs.locale, "globalKeysProblemInUse", nil)
+}
+
+// GlobalKeysProblemNeedsMac says "A global shortcut needs ⌘ or ⌃"
+// in the language the app shows.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, on
+// macOS.
+func GlobalKeysProblemNeedsMac() string { return In(i18n.Locale()).GlobalKeysProblemNeedsMac() }
+
+// GlobalKeysProblemNeedsMac says "A global shortcut needs ⌘ or ⌃"
+// in the language of msgs.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, on
+// macOS.
+func (msgs Messages) GlobalKeysProblemNeedsMac() string {
+	return Catalog.Format(msgs.locale, "globalKeysProblemNeedsMac", nil)
+}
+
+// GlobalKeysProblemNeedsSuper says "A global shortcut needs Ctrl, Alt or Super"
+// in the language the app shows.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, on
+// Linux.
+func GlobalKeysProblemNeedsSuper() string { return In(i18n.Locale()).GlobalKeysProblemNeedsSuper() }
+
+// GlobalKeysProblemNeedsSuper says "A global shortcut needs Ctrl, Alt or Super"
+// in the language of msgs.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, on
+// Linux.
+func (msgs Messages) GlobalKeysProblemNeedsSuper() string {
+	return Catalog.Format(msgs.locale, "globalKeysProblemNeedsSuper", nil)
+}
+
+// GlobalKeysProblemNeedsWindows says "A global shortcut needs Ctrl, Alt or the Windows key"
+// in the language the app shows.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, on
+// Windows.
+func GlobalKeysProblemNeedsWindows() string { return In(i18n.Locale()).GlobalKeysProblemNeedsWindows() }
+
+// GlobalKeysProblemNeedsWindows says "A global shortcut needs Ctrl, Alt or the Windows key"
+// in the language of msgs.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, on
+// Windows.
+func (msgs Messages) GlobalKeysProblemNeedsWindows() string {
+	return Catalog.Format(msgs.locale, "globalKeysProblemNeedsWindows", nil)
+}
+
+// GlobalKeysProblemNoPortal says "Your desktop doesn't offer global shortcuts"
+// in the language the app shows.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, why
+// it does nothing: the desktop, on Linux, has no way for apps to have them.
+func GlobalKeysProblemNoPortal() string { return In(i18n.Locale()).GlobalKeysProblemNoPortal() }
+
+// GlobalKeysProblemNoPortal says "Your desktop doesn't offer global shortcuts"
+// in the language of msgs.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, why
+// it does nothing: the desktop, on Linux, has no way for apps to have them.
+func (msgs Messages) GlobalKeysProblemNoPortal() string {
+	return Catalog.Format(msgs.locale, "globalKeysProblemNoPortal", nil)
+}
+
+// GlobalKeysProblemTaken says "Another command has these keys"
+// in the language the app shows.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, why
+// it does nothing.
+func GlobalKeysProblemTaken() string { return In(i18n.Locale()).GlobalKeysProblemTaken() }
+
+// GlobalKeysProblemTaken says "Another command has these keys"
+// in the language of msgs.
+//
+// Under a global shortcut in Settings › Shortcuts › From any app, why
+// it does nothing.
+func (msgs Messages) GlobalKeysProblemTaken() string {
+	return Catalog.Format(msgs.locale, "globalKeysProblemTaken", nil)
 }
 
 // GlobalKeysRecording says "press the keys · esc cancels · backspace removes"

@@ -471,11 +471,88 @@
       }
     }
   },
+  "castAlreadyConnecting": "MixMusic is connecting to a cast device already",
+  "@castAlreadyConnecting": {
+    "description": "A notice, as casting starts while another starts."
+  },
   "castConnecting": "connecting…",
+  "castCouldntCast": "Couldn't cast to {device}: {error}",
+  "@castCouldntCast": {
+    "description": "A notice, as casting to a device starts. {error} says why, as the device or the system says it.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "castCouldntConnect": "Couldn't connect to {device}: check that it's on, on this computer's network",
+  "@castCouldntConnect": {
+    "description": "A notice, as casting to a device starts.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      }
+    }
+  },
+  "castCouldntServe": "Couldn't serve {device} the audio: {error}",
+  "@castCouldntServe": {
+    "description": "A notice, as casting to a device starts. {error} says why, as the system says it.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "castDeviceGone": "That cast device is no longer on the network",
+  "@castDeviceGone": {
+    "description": "A notice, as casting to a device that went starts."
+  },
   "castPlayingOn": "Playing on {name}",
   "@castPlayingOn": {
     "placeholders": {
       "name": {
+        "type": "String"
+      }
+    }
+  },
+  "castStoppedElsewhere": "Casting to {device} stopped: it stopped playing from MixMusic",
+  "@castStoppedElsewhere": {
+    "description": "A notice, as the device plays something else, or stops, by itself or from another app.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      }
+    }
+  },
+  "castStoppedLost": "Casting to {device} stopped: the connection was lost",
+  "@castStoppedLost": {
+    "description": "A notice.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      }
+    }
+  },
+  "castStoppedTaken": "Casting to {device} stopped: {why}",
+  "@castStoppedTaken": {
+    "description": "A notice, as another app took the device. {why} says which, as the device says it.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room speaker"
+      },
+      "why": {
         "type": "String"
       }
     }
@@ -2320,6 +2397,42 @@
         "type": "String"
       }
     }
+  },
+  "globalKeysProblemCantBe": "These keys can't be a global shortcut",
+  "@globalKeysProblemCantBe": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, as its keys are typed."
+  },
+  "globalKeysProblemDesktopEntry": "Global shortcuts need MixMusic installed with its desktop entry",
+  "@globalKeysProblemDesktopEntry": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, why it does nothing, on Linux."
+  },
+  "globalKeysProblemF12": "Windows keeps F12 for itself",
+  "@globalKeysProblemF12": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, as F12 alone is typed for it."
+  },
+  "globalKeysProblemInUse": "These keys are already in use: pick others, or try again once they're free",
+  "@globalKeysProblemInUse": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app: the system refused its keys."
+  },
+  "globalKeysProblemNeedsMac": "A global shortcut needs ⌘ or ⌃",
+  "@globalKeysProblemNeedsMac": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, on macOS."
+  },
+  "globalKeysProblemNeedsSuper": "A global shortcut needs Ctrl, Alt or Super",
+  "@globalKeysProblemNeedsSuper": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, on Linux."
+  },
+  "globalKeysProblemNeedsWindows": "A global shortcut needs Ctrl, Alt or the Windows key",
+  "@globalKeysProblemNeedsWindows": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, on Windows."
+  },
+  "globalKeysProblemNoPortal": "Your desktop doesn't offer global shortcuts",
+  "@globalKeysProblemNoPortal": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, why it does nothing: the desktop, on Linux, has no way for apps to have them."
+  },
+  "globalKeysProblemTaken": "Another command has these keys",
+  "@globalKeysProblemTaken": {
+    "description": "Under a global shortcut in Settings › Shortcuts › From any app, why it does nothing."
   },
   "globalKeysRecording": "press the keys · esc cancels · backspace removes",
   "globalKeysRemoveLabel": "remove the global shortcut of {title}",

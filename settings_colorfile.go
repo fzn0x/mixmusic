@@ -138,9 +138,9 @@ func colorFileNote(st app.ColorFileStatus, set settings.Settings, now time.Time)
 	case st.Missing:
 		return locales.ColorFileMissing(), true
 	case st.Err != "" && !st.Colors.Empty():
-		return locales.ColorFileUnreadKept(strings.TrimSuffix(st.Err, "."), clockOf(st.ReadAt, now)), true
+		return locales.ColorFileUnreadKept(strings.TrimSuffix(colorFileFault(st), "."), clockOf(st.ReadAt, now)), true
 	case st.Err != "":
-		return locales.ColorFileUnread(strings.TrimSuffix(st.Err, ".")), true
+		return locales.ColorFileUnread(strings.TrimSuffix(colorFileFault(st), ".")), true
 	}
 	return locales.ColorFileRead(clockOf(st.ReadAt, now)), false
 }

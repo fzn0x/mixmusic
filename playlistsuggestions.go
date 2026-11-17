@@ -76,7 +76,7 @@ func (s *shell) askSuggestions(st *suggested, token string) {
 			st.asking = false
 			switch {
 			case err != nil && st.done && st.err == nil:
-				s.notes = append(s.notes, player.Notice{Message: locales.SuggestionsRefreshFailed(err.Error()), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.SuggestionsRefreshFailed(errorText(err)), Error: true})
 			case err != nil:
 				st.err, st.done = err, true
 			default:
@@ -115,7 +115,7 @@ func (s *shell) playlistSuggestions(c *ui.Context, key string, p media.Playlist)
 		})
 		if st.err != nil {
 			ui.Row(c).Gap(16).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, locales.SuggestionsLoadFailed(st.err.Error())).FontSize(k.bodySize()).TextColor(k.muted).Shrink(1).MinWidth(0)
+				ui.Text(c, locales.SuggestionsLoadFailed(errorText(st.err))).FontSize(k.bodySize()).TextColor(k.muted).Shrink(1).MinWidth(0)
 				if !st.asking && s.link(c, "suggestions-retry", locales.SuggestionsTryAgain()) {
 					s.askSuggestions(st, p.Suggest)
 				}

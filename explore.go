@@ -251,7 +251,7 @@ func (s *shell) createYouTubePlaylist(title string, tracks []media.Track, done f
 		p, err := s.svc.Collection.CreateYouTubePlaylist(ctx, title, tracks)
 		s.update(func() {
 			if err != nil {
-				s.notes = append(s.notes, player.Notice{Message: locales.ExploreCouldntCreate(title, err.Error()), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.ExploreCouldntCreate(title, errorText(err)), Error: true})
 				return
 			}
 			s.keepPlaylist("youtube:playlists", p)

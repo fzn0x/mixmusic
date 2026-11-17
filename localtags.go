@@ -363,7 +363,7 @@ func (s *shell) chooseTagCover(seq int) {
 				return
 			}
 			if err != nil {
-				e.problem = locales.LocalTagsBadImage(err.Error())
+				e.problem = locales.LocalTagsBadImage(errorText(err))
 				return
 			}
 			e.cover, e.coverURL, e.coverSet, e.problem = &pic, url, true, ""
@@ -377,7 +377,7 @@ func (s *shell) saveTags() {
 	e := &s.tagDialogs.edit
 	t, fields, err := e.form.tags(e.was)
 	if err != nil {
-		e.problem = err.Error()
+		e.problem = errorText(err)
 		return
 	}
 	if e.coverSet {
@@ -408,7 +408,7 @@ func (s *shell) saveTags() {
 			}
 			switch {
 			case err != nil && mine:
-				e.problem = sentenceOf(err.Error())
+				e.problem = sentenceOf(errorText(err))
 				if n > 0 {
 					e.problem = locales.LocalTagsSavedSome(n, len(ids), e.problem)
 				}
@@ -619,7 +619,7 @@ func (s *shell) moveSong() {
 			}
 			switch {
 			case err != nil && mine:
-				mv.problem = sentenceOf(err.Error())
+				mv.problem = sentenceOf(errorText(err))
 			case err != nil:
 				s.notes = append(s.notes, noticeOf(err))
 			default:

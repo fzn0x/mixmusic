@@ -133,7 +133,7 @@ func (s *shell) outputMenu(m *ui.Menu) {
 	case !devices.done:
 		m.Item(locales.OutputChoiceLooking()).Disabled(true)
 	case devices.err != nil:
-		m.Item(devices.err.Error()).Disabled(true)
+		m.Item(errorText(devices.err)).Disabled(true)
 	}
 }
 

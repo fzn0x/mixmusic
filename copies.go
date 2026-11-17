@@ -286,7 +286,7 @@ func (s *shell) copyChange(change func() error, done string) {
 			v := &s.copies
 			v.busy = false
 			if err != nil {
-				v.problem = sentenceOf(err.Error())
+				v.problem = sentenceOf(errorText(err))
 				return
 			}
 			v.query, v.found = "", nil

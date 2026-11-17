@@ -420,6 +420,8 @@ func newShell(a *app.App, p *player.Player) *shell {
 		dialogScrolls: map[string]*dialogScroll{}, shown: map[string]bool{}, showing: map[string]bool{}, missingMemos: map[string]missingMemo{}}
 	s.queueList.Selected = new(int)
 	*s.queueList.Selected = -1
+	// The player's notices say the errors they know in the language.
+	p.SetErrorWords(errorText)
 	// The covers the downloads keep show without the network, as those of
 	// the music on this computer do.
 	s.art = newArtworks(s.update, keptArt{s.localArt, s.svc.System.Artwork()})

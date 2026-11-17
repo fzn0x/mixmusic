@@ -175,9 +175,9 @@ func (s *shell) readLine(c *ui.Context, r *playlistRead, noun string) {
 			ui.Text(c, text).FontSize(k.smallSize()).TextColor(k.muted).FontFeatures("tnum")
 		})
 	case r.err != nil:
-		msg := locales.PlaylistReadPartialFirst(n, noun, r.err.Error())
+		msg := locales.PlaylistReadPartialFirst(n, noun, errorText(r.err))
 		if count > n {
-			msg = locales.PlaylistReadPartialOf(n, noun, count, r.err.Error())
+			msg = locales.PlaylistReadPartialOf(n, noun, count, errorText(r.err))
 		}
 		ui.Column(c).Margin(0, 0, 16).Children(func() {
 			s.problem(c, errors.New(msg), func() { s.readRest(r) })

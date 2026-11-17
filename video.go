@@ -397,7 +397,7 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 			return
 		case src == nil:
 			if res != nil && res.done {
-				s.videoFailed(rec, res.err.Error())
+				s.videoFailed(rec, errorText(res.err))
 			}
 			return
 		}

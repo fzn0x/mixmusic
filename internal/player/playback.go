@@ -387,7 +387,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 				return
 			}
 			if !p.offline(err, start, autoplay) {
-				p.fail(err.Error())
+				p.failWith(err)
 			}
 			return
 		}
@@ -465,7 +465,7 @@ func (p *Player) streamInstead(token int, entry Item, start time.Duration, autop
 					return
 				}
 				if !p.offline(err, start, autoplay) {
-					p.fail(err.Error())
+					p.failWith(err)
 				}
 				return
 			}
@@ -530,7 +530,14 @@ func (p *Player) fellBack(why string) {
 // fail tells that a track can't play, and moves on after a moment: to the
 // next track, or to a radio when it was the last. After maxFailures in a
 // row it stops, as nothing seems to play.
-func (p *Player) fail(message string) {
+func (p *Player) fail(message string) { p.failSaid(message, message) }
+
+// failWith fails for err, whose notice says it as the windows do, in
+// their words: its log and its details keep its English.
+func (p *Player) failWith(err error) { p.failSaid(err.Error(), p.errorWords.say(err)) }
+
+// failSaid fails for message, which the notice says as said.
+func (p *Player) failSaid(message, said string) {
 	cur, ok := p.s.Current()
 	p.askedAt = time.Time{}
 	p.unsounded = false
@@ -543,14 +550,14 @@ func (p *Player) fail(message string) {
 	p.emit(StateChange)
 	p.failures++
 	stop := p.failures >= maxFailures
-	why := message
+	why := said
 	if stop {
-		why = locales.PlayerStopped(strings.TrimSuffix(message, "."), maxFailures)
+		why = locales.PlayerStopped(strings.TrimSuffix(said, "."), maxFailures)
 	}
 	if ok {
-		why = locales.PlayerCouldntPlay(cur.Track.Title, message)
+		why = locales.PlayerCouldntPlay(cur.Track.Title, said)
 		if stop {
-			why = locales.PlayerCouldntPlayStopped(cur.Track.Title, strings.TrimSuffix(message, "."), maxFailures)
+			why = locales.PlayerCouldntPlayStopped(cur.Track.Title, strings.TrimSuffix(said, "."), maxFailures)
 		}
 		// The log keeps it too, for a report of the problem: the notice
 		// goes, and the details last until MixMusic closes.

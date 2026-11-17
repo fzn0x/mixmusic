@@ -7793,6 +7793,882 @@ func (msgs Messages) EqualizerTitle() string {
 	return Catalog.Format(msgs.locale, "equalizerTitle", nil)
 }
 
+// ErrorAddonsBuiltin says "add-ons MixMusic ships with cannot be removed"
+// in the language the app shows.
+//
+// Why a theme or plugin wasn't removed, as a toast.
+func ErrorAddonsBuiltin() string { return In(i18n.Locale()).ErrorAddonsBuiltin() }
+
+// ErrorAddonsBuiltin says "add-ons MixMusic ships with cannot be removed"
+// in the language of msgs.
+//
+// Why a theme or plugin wasn't removed, as a toast.
+func (msgs Messages) ErrorAddonsBuiltin() string {
+	return Catalog.Format(msgs.locale, "errorAddonsBuiltin", nil)
+}
+
+// ErrorAudioCantPlay says "the file can't be played"
+// in the language the app shows.
+//
+// An error of a file, as a toast or inside a message that leads it.
+func ErrorAudioCantPlay() string { return In(i18n.Locale()).ErrorAudioCantPlay() }
+
+// ErrorAudioCantPlay says "the file can't be played"
+// in the language of msgs.
+//
+// An error of a file, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorAudioCantPlay() string {
+	return Catalog.Format(msgs.locale, "errorAudioCantPlay", nil)
+}
+
+// ErrorAudioNoOutput says "no audio output device"
+// in the language the app shows.
+//
+// An error of the sound, as a toast or inside a message that leads it: the
+// computer has no speakers or headphones MixMusic can play on.
+func ErrorAudioNoOutput() string { return In(i18n.Locale()).ErrorAudioNoOutput() }
+
+// ErrorAudioNoOutput says "no audio output device"
+// in the language of msgs.
+//
+// An error of the sound, as a toast or inside a message that leads it: the
+// computer has no speakers or headphones MixMusic can play on.
+func (msgs Messages) ErrorAudioNoOutput() string {
+	return Catalog.Format(msgs.locale, "errorAudioNoOutput", nil)
+}
+
+// ErrorColorFileEmpty says "it's empty"
+// in the language the app shows.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+func ErrorColorFileEmpty() string { return In(i18n.Locale()).ErrorColorFileEmpty() }
+
+// ErrorColorFileEmpty says "it's empty"
+// in the language of msgs.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+func (msgs Messages) ErrorColorFileEmpty() string {
+	return Catalog.Format(msgs.locale, "errorColorFileEmpty", nil)
+}
+
+// ErrorColorFileFolder says "it's a folder"
+// in the language the app shows.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+func ErrorColorFileFolder() string { return In(i18n.Locale()).ErrorColorFileFolder() }
+
+// ErrorColorFileFolder says "it's a folder"
+// in the language of msgs.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+func (msgs Messages) ErrorColorFileFolder() string {
+	return Catalog.Format(msgs.locale, "errorColorFileFolder", nil)
+}
+
+// ErrorColorFilePartial says "it ends partway through"
+// in the language the app shows.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+func ErrorColorFilePartial() string { return In(i18n.Locale()).ErrorColorFilePartial() }
+
+// ErrorColorFilePartial says "it ends partway through"
+// in the language of msgs.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+func (msgs Messages) ErrorColorFilePartial() string {
+	return Catalog.Format(msgs.locale, "errorColorFilePartial", nil)
+}
+
+// ErrorColorFileTooBig says "it's over 1 MB"
+// in the language the app shows.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+func ErrorColorFileTooBig() string { return In(i18n.Locale()).ErrorColorFileTooBig() }
+
+// ErrorColorFileTooBig says "it's over 1 MB"
+// in the language of msgs.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+func (msgs Messages) ErrorColorFileTooBig() string {
+	return Catalog.Format(msgs.locale, "errorColorFileTooBig", nil)
+}
+
+// ErrorColorFileUnknown says "it holds no colours MixMusic knows. MixMusic reads pywal's colors.json, matugen's JSON, what MixMusic's matugen templ…"
+// in the language the app shows.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+// pywal, matugen, Base16 and Base24 are names.
+func ErrorColorFileUnknown() string { return In(i18n.Locale()).ErrorColorFileUnknown() }
+
+// ErrorColorFileUnknown says "it holds no colours MixMusic knows. MixMusic reads pywal's colors.json, matugen's JSON, what MixMusic's matugen templ…"
+// in the language of msgs.
+//
+// Why the colour file couldn't be read, inside a message that leads it.
+// pywal, matugen, Base16 and Base24 are names.
+func (msgs Messages) ErrorColorFileUnknown() string {
+	return Catalog.Format(msgs.locale, "errorColorFileUnknown", nil)
+}
+
+// ErrorFirewallDeclined says "the administrator's approval wasn't given"
+// in the language the app shows.
+//
+// Why the firewall's rules didn't change, inside a message that leads it.
+func ErrorFirewallDeclined() string { return In(i18n.Locale()).ErrorFirewallDeclined() }
+
+// ErrorFirewallDeclined says "the administrator's approval wasn't given"
+// in the language of msgs.
+//
+// Why the firewall's rules didn't change, inside a message that leads it.
+func (msgs Messages) ErrorFirewallDeclined() string {
+	return Catalog.Format(msgs.locale, "errorFirewallDeclined", nil)
+}
+
+// ErrorFirewallUnsupported says "only Windows' firewall is read"
+// in the language the app shows.
+//
+// An error of Settings › Desktop › Windows Firewall, inside a message
+// that leads it.
+func ErrorFirewallUnsupported() string { return In(i18n.Locale()).ErrorFirewallUnsupported() }
+
+// ErrorFirewallUnsupported says "only Windows' firewall is read"
+// in the language of msgs.
+//
+// An error of Settings › Desktop › Windows Firewall, inside a message
+// that leads it.
+func (msgs Messages) ErrorFirewallUnsupported() string {
+	return Catalog.Format(msgs.locale, "errorFirewallUnsupported", nil)
+}
+
+// ErrorLastfmNotAuthorized says "Last.fm hasn't approved the sign-in yet"
+// in the language the app shows.
+//
+// An error of Last.fm, as a toast or inside a message that leads it: the
+// user didn't allow MixMusic on Last.fm's page yet.
+func ErrorLastfmNotAuthorized() string { return In(i18n.Locale()).ErrorLastfmNotAuthorized() }
+
+// ErrorLastfmNotAuthorized says "Last.fm hasn't approved the sign-in yet"
+// in the language of msgs.
+//
+// An error of Last.fm, as a toast or inside a message that leads it: the
+// user didn't allow MixMusic on Last.fm's page yet.
+func (msgs Messages) ErrorLastfmNotAuthorized() string {
+	return Catalog.Format(msgs.locale, "errorLastfmNotAuthorized", nil)
+}
+
+// ErrorListenBrainzNotServer says "this isn't the address of a server: write it as https://listenbrainz.example.com"
+// in the language the app shows.
+//
+// An error of ListenBrainz, as a toast or inside a message that leads it.
+// Keep the example address as it is.
+func ErrorListenBrainzNotServer() string { return In(i18n.Locale()).ErrorListenBrainzNotServer() }
+
+// ErrorListenBrainzNotServer says "this isn't the address of a server: write it as https://listenbrainz.example.com"
+// in the language of msgs.
+//
+// An error of ListenBrainz, as a toast or inside a message that leads it.
+// Keep the example address as it is.
+func (msgs Messages) ErrorListenBrainzNotServer() string {
+	return Catalog.Format(msgs.locale, "errorListenBrainzNotServer", nil)
+}
+
+// ErrorLocalFilesCantWatch says "this system doesn't tell of changes to folders"
+// in the language the app shows.
+//
+// Why a folder of music isn't watched for changes, inside a message that
+// leads it.
+func ErrorLocalFilesCantWatch() string { return In(i18n.Locale()).ErrorLocalFilesCantWatch() }
+
+// ErrorLocalFilesCantWatch says "this system doesn't tell of changes to folders"
+// in the language of msgs.
+//
+// Why a folder of music isn't watched for changes, inside a message that
+// leads it.
+func (msgs Messages) ErrorLocalFilesCantWatch() string {
+	return Catalog.Format(msgs.locale, "errorLocalFilesCantWatch", nil)
+}
+
+// ErrorLocalFilesNetworkDrive says "it's on a network drive"
+// in the language the app shows.
+//
+// Why a folder of music isn't watched for changes, inside a message that
+// leads it.
+func ErrorLocalFilesNetworkDrive() string { return In(i18n.Locale()).ErrorLocalFilesNetworkDrive() }
+
+// ErrorLocalFilesNetworkDrive says "it's on a network drive"
+// in the language of msgs.
+//
+// Why a folder of music isn't watched for changes, inside a message that
+// leads it.
+func (msgs Messages) ErrorLocalFilesNetworkDrive() string {
+	return Catalog.Format(msgs.locale, "errorLocalFilesNetworkDrive", nil)
+}
+
+// ErrorLocalFilesRemovableDrive says "it's on a removable drive, which a watch would keep from being ejected"
+// in the language the app shows.
+//
+// Why a folder of music isn't watched for changes, inside a message that
+// leads it.
+func ErrorLocalFilesRemovableDrive() string { return In(i18n.Locale()).ErrorLocalFilesRemovableDrive() }
+
+// ErrorLocalFilesRemovableDrive says "it's on a removable drive, which a watch would keep from being ejected"
+// in the language of msgs.
+//
+// Why a folder of music isn't watched for changes, inside a message that
+// leads it.
+func (msgs Messages) ErrorLocalFilesRemovableDrive() string {
+	return Catalog.Format(msgs.locale, "errorLocalFilesRemovableDrive", nil)
+}
+
+// ErrorLocalFilesWatchLimit says "the system's limit on watched folders is reached"
+// in the language the app shows.
+//
+// Why a folder of music isn't watched for changes, inside a message that
+// leads it.
+func ErrorLocalFilesWatchLimit() string { return In(i18n.Locale()).ErrorLocalFilesWatchLimit() }
+
+// ErrorLocalFilesWatchLimit says "the system's limit on watched folders is reached"
+// in the language of msgs.
+//
+// Why a folder of music isn't watched for changes, inside a message that
+// leads it.
+func (msgs Messages) ErrorLocalFilesWatchLimit() string {
+	return Catalog.Format(msgs.locale, "errorLocalFilesWatchLimit", nil)
+}
+
+// ErrorSpotifyNoClientID says "Set your Client ID in Settings › Accounts first"
+// in the language the app shows.
+//
+// An error of Spotify, as a toast or inside a message that leads it:
+// MixMusic needs the Client ID of the user's Spotify app.
+func ErrorSpotifyNoClientID() string { return In(i18n.Locale()).ErrorSpotifyNoClientID() }
+
+// ErrorSpotifyNoClientID says "Set your Client ID in Settings › Accounts first"
+// in the language of msgs.
+//
+// An error of Spotify, as a toast or inside a message that leads it:
+// MixMusic needs the Client ID of the user's Spotify app.
+func (msgs Messages) ErrorSpotifyNoClientID() string {
+	return Catalog.Format(msgs.locale, "errorSpotifyNoClientID", nil)
+}
+
+// ErrorSpotifyNotSignedIn says "not signed in to Spotify"
+// in the language the app shows.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func ErrorSpotifyNotSignedIn() string { return In(i18n.Locale()).ErrorSpotifyNotSignedIn() }
+
+// ErrorSpotifyNotSignedIn says "not signed in to Spotify"
+// in the language of msgs.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorSpotifyNotSignedIn() string {
+	return Catalog.Format(msgs.locale, "errorSpotifyNotSignedIn", nil)
+}
+
+// ErrorSpotifyPlaylistNotShown says "Spotify shows apps neither its own playlists nor those deleted or made private"
+// in the language the app shows.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func ErrorSpotifyPlaylistNotShown() string { return In(i18n.Locale()).ErrorSpotifyPlaylistNotShown() }
+
+// ErrorSpotifyPlaylistNotShown says "Spotify shows apps neither its own playlists nor those deleted or made private"
+// in the language of msgs.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorSpotifyPlaylistNotShown() string {
+	return Catalog.Format(msgs.locale, "errorSpotifyPlaylistNotShown", nil)
+}
+
+// ErrorSpotifyPlaylistRefused says "Spotify refused to change the playlist"
+// in the language the app shows.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func ErrorSpotifyPlaylistRefused() string { return In(i18n.Locale()).ErrorSpotifyPlaylistRefused() }
+
+// ErrorSpotifyPlaylistRefused says "Spotify refused to change the playlist"
+// in the language of msgs.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorSpotifyPlaylistRefused() string {
+	return Catalog.Format(msgs.locale, "errorSpotifyPlaylistRefused", nil)
+}
+
+// ErrorSpotifyPlaylistUnavailable says "Spotify only lets apps read the tracks of playlists you own or collaborate on"
+// in the language the app shows.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func ErrorSpotifyPlaylistUnavailable() string {
+	return In(i18n.Locale()).ErrorSpotifyPlaylistUnavailable()
+}
+
+// ErrorSpotifyPlaylistUnavailable says "Spotify only lets apps read the tracks of playlists you own or collaborate on"
+// in the language of msgs.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorSpotifyPlaylistUnavailable() string {
+	return Catalog.Format(msgs.locale, "errorSpotifyPlaylistUnavailable", nil)
+}
+
+// ErrorSpotifyPremium says "playback control needs Spotify Premium"
+// in the language the app shows.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func ErrorSpotifyPremium() string { return In(i18n.Locale()).ErrorSpotifyPremium() }
+
+// ErrorSpotifyPremium says "playback control needs Spotify Premium"
+// in the language of msgs.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorSpotifyPremium() string {
+	return Catalog.Format(msgs.locale, "errorSpotifyPremium", nil)
+}
+
+// ErrorSpotifySignInAgain says "sign in to Spotify again"
+// in the language the app shows.
+//
+// An error of Spotify, as a toast or inside a message that leads it: the
+// sign-in expired.
+func ErrorSpotifySignInAgain() string { return In(i18n.Locale()).ErrorSpotifySignInAgain() }
+
+// ErrorSpotifySignInAgain says "sign in to Spotify again"
+// in the language of msgs.
+//
+// An error of Spotify, as a toast or inside a message that leads it: the
+// sign-in expired.
+func (msgs Messages) ErrorSpotifySignInAgain() string {
+	return Catalog.Format(msgs.locale, "errorSpotifySignInAgain", nil)
+}
+
+// ErrorSpotifyTooMany says "Spotify had too many requests: try again in a moment"
+// in the language the app shows.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func ErrorSpotifyTooMany() string { return In(i18n.Locale()).ErrorSpotifyTooMany() }
+
+// ErrorSpotifyTooMany says "Spotify had too many requests: try again in a moment"
+// in the language of msgs.
+//
+// An error of Spotify, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorSpotifyTooMany() string {
+	return Catalog.Format(msgs.locale, "errorSpotifyTooMany", nil)
+}
+
+// ErrorStreamAdults says "YouTube plays this track only to signed-in adults, on its own website"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamAdults() string { return In(i18n.Locale()).ErrorStreamAdults() }
+
+// ErrorStreamAdults says "YouTube plays this track only to signed-in adults, on its own website"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamAdults() string {
+	return Catalog.Format(msgs.locale, "errorStreamAdults", nil)
+}
+
+// ErrorStreamBadVideoID says "that isn't a YouTube video"
+// in the language the app shows.
+//
+// An error, as a toast or inside a message that leads it: what was given
+// isn't the ID of a YouTube video.
+func ErrorStreamBadVideoID() string { return In(i18n.Locale()).ErrorStreamBadVideoID() }
+
+// ErrorStreamBadVideoID says "that isn't a YouTube video"
+// in the language of msgs.
+//
+// An error, as a toast or inside a message that leads it: what was given
+// isn't the ID of a YouTube video.
+func (msgs Messages) ErrorStreamBadVideoID() string {
+	return Catalog.Format(msgs.locale, "errorStreamBadVideoID", nil)
+}
+
+// ErrorStreamBot says "YouTube asks to confirm this is not a bot; try again in a while"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay.
+func ErrorStreamBot() string { return In(i18n.Locale()).ErrorStreamBot() }
+
+// ErrorStreamBot says "YouTube asks to confirm this is not a bot; try again in a while"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay.
+func (msgs Messages) ErrorStreamBot() string {
+	return Catalog.Format(msgs.locale, "errorStreamBot", nil)
+}
+
+// ErrorStreamCountry says "this track is not available in your country"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamCountry() string { return In(i18n.Locale()).ErrorStreamCountry() }
+
+// ErrorStreamCountry says "this track is not available in your country"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamCountry() string {
+	return Catalog.Format(msgs.locale, "errorStreamCountry", nil)
+}
+
+// ErrorStreamGone says "this track is no longer on YouTube Music"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamGone() string { return In(i18n.Locale()).ErrorStreamGone() }
+
+// ErrorStreamGone says "this track is no longer on YouTube Music"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamGone() string {
+	return Catalog.Format(msgs.locale, "errorStreamGone", nil)
+}
+
+// ErrorStreamLive says "it's a live stream, which doesn't download"
+// in the language the app shows.
+//
+// Why a video doesn't download, as a toast or inside a message that leads
+// it.
+func ErrorStreamLive() string { return In(i18n.Locale()).ErrorStreamLive() }
+
+// ErrorStreamLive says "it's a live stream, which doesn't download"
+// in the language of msgs.
+//
+// Why a video doesn't download, as a toast or inside a message that leads
+// it.
+func (msgs Messages) ErrorStreamLive() string {
+	return Catalog.Format(msgs.locale, "errorStreamLive", nil)
+}
+
+// ErrorStreamMembers says "only the members of its channel can play this track"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamMembers() string { return In(i18n.Locale()).ErrorStreamMembers() }
+
+// ErrorStreamMembers says "only the members of its channel can play this track"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamMembers() string {
+	return Catalog.Format(msgs.locale, "errorStreamMembers", nil)
+}
+
+// ErrorStreamNetwork says "the network failed"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamNetwork() string { return In(i18n.Locale()).ErrorStreamNetwork() }
+
+// ErrorStreamNetwork says "the network failed"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamNetwork() string {
+	return Catalog.Format(msgs.locale, "errorStreamNetwork", nil)
+}
+
+// ErrorStreamNoAudio says "YouTube has no audio of this track that MixMusic plays"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamNoAudio() string { return In(i18n.Locale()).ErrorStreamNoAudio() }
+
+// ErrorStreamNoAudio says "YouTube has no audio of this track that MixMusic plays"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamNoAudio() string {
+	return Catalog.Format(msgs.locale, "errorStreamNoAudio", nil)
+}
+
+// ErrorStreamNoCaptions says "YouTube tells of no captions of this video"
+// in the language the app shows.
+//
+// Why a video has no lyrics from its captions, as a toast or inside a
+// message that leads it.
+func ErrorStreamNoCaptions() string { return In(i18n.Locale()).ErrorStreamNoCaptions() }
+
+// ErrorStreamNoCaptions says "YouTube tells of no captions of this video"
+// in the language of msgs.
+//
+// Why a video has no lyrics from its captions, as a toast or inside a
+// message that leads it.
+func (msgs Messages) ErrorStreamNoCaptions() string {
+	return Catalog.Format(msgs.locale, "errorStreamNoCaptions", nil)
+}
+
+// ErrorStreamNoFormat says "YouTube gave no audio for this track; updating yt-dlp in Settings › Playback often fixes it"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamNoFormat() string { return In(i18n.Locale()).ErrorStreamNoFormat() }
+
+// ErrorStreamNoFormat says "YouTube gave no audio for this track; updating yt-dlp in Settings › Playback often fixes it"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamNoFormat() string {
+	return Catalog.Format(msgs.locale, "errorStreamNoFormat", nil)
+}
+
+// ErrorStreamPremium says "only YouTube Music Premium members can play this track"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamPremium() string { return In(i18n.Locale()).ErrorStreamPremium() }
+
+// ErrorStreamPremium says "only YouTube Music Premium members can play this track"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamPremium() string {
+	return Catalog.Format(msgs.locale, "errorStreamPremium", nil)
+}
+
+// ErrorStreamPrivate says "this track is private"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamPrivate() string { return In(i18n.Locale()).ErrorStreamPrivate() }
+
+// ErrorStreamPrivate says "this track is private"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamPrivate() string {
+	return Catalog.Format(msgs.locale, "errorStreamPrivate", nil)
+}
+
+// ErrorStreamRefused says "YouTube refused to send its audio; updating yt-dlp in Settings › Playback often fixes it"
+// in the language the app shows.
+//
+// Why a track's audio failed, as a toast or inside a message that leads it.
+func ErrorStreamRefused() string { return In(i18n.Locale()).ErrorStreamRefused() }
+
+// ErrorStreamRefused says "YouTube refused to send its audio; updating yt-dlp in Settings › Playback often fixes it"
+// in the language of msgs.
+//
+// Why a track's audio failed, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorStreamRefused() string {
+	return Catalog.Format(msgs.locale, "errorStreamRefused", nil)
+}
+
+// ErrorStreamSignedIn says "YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamSignedIn() string { return In(i18n.Locale()).ErrorStreamSignedIn() }
+
+// ErrorStreamSignedIn says "YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamSignedIn() string {
+	return Catalog.Format(msgs.locale, "errorStreamSignedIn", nil)
+}
+
+// ErrorStreamStalled says "YouTube stopped sending the audio, as happens when the connection drops; check the connection and play the track again"
+// in the language the app shows.
+//
+// Why a track's audio failed, as a toast or inside a message that leads it.
+func ErrorStreamStalled() string { return In(i18n.Locale()).ErrorStreamStalled() }
+
+// ErrorStreamStalled says "YouTube stopped sending the audio, as happens when the connection drops; check the connection and play the track again"
+// in the language of msgs.
+//
+// Why a track's audio failed, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorStreamStalled() string {
+	return Catalog.Format(msgs.locale, "errorStreamStalled", nil)
+}
+
+// ErrorStreamThrottled says "YouTube is turning down requests from this network for now; try again in a while"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamThrottled() string { return In(i18n.Locale()).ErrorStreamThrottled() }
+
+// ErrorStreamThrottled says "YouTube is turning down requests from this network for now; try again in a while"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamThrottled() string {
+	return Catalog.Format(msgs.locale, "errorStreamThrottled", nil)
+}
+
+// ErrorStreamUnavailable says "YouTube won't send this track"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func ErrorStreamUnavailable() string { return In(i18n.Locale()).ErrorStreamUnavailable() }
+
+// ErrorStreamUnavailable says "YouTube won't send this track"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorStreamUnavailable() string {
+	return Catalog.Format(msgs.locale, "errorStreamUnavailable", nil)
+}
+
+// ErrorTagsCover says "the cover must be a JPEG or PNG image of at most 10 MB"
+// in the language the app shows.
+//
+// Why a file's cover didn't change, as a toast or inside a message that
+// leads it.
+func ErrorTagsCover() string { return In(i18n.Locale()).ErrorTagsCover() }
+
+// ErrorTagsCover says "the cover must be a JPEG or PNG image of at most 10 MB"
+// in the language of msgs.
+//
+// Why a file's cover didn't change, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorTagsCover() string {
+	return Catalog.Format(msgs.locale, "errorTagsCover", nil)
+}
+
+// ErrorTagsFolderReadOnly says "MixMusic can't write in its folder"
+// in the language the app shows.
+//
+// Why a file's tags didn't change, as a toast or inside a message that
+// leads it.
+func ErrorTagsFolderReadOnly() string { return In(i18n.Locale()).ErrorTagsFolderReadOnly() }
+
+// ErrorTagsFolderReadOnly says "MixMusic can't write in its folder"
+// in the language of msgs.
+//
+// Why a file's tags didn't change, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorTagsFolderReadOnly() string {
+	return Catalog.Format(msgs.locale, "errorTagsFolderReadOnly", nil)
+}
+
+// ErrorTagsFormat says "its layout isn't one MixMusic can change safely"
+// in the language the app shows.
+//
+// Why a file's tags didn't change, as a toast or inside a message that
+// leads it.
+func ErrorTagsFormat() string { return In(i18n.Locale()).ErrorTagsFormat() }
+
+// ErrorTagsFormat says "its layout isn't one MixMusic can change safely"
+// in the language of msgs.
+//
+// Why a file's tags didn't change, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorTagsFormat() string {
+	return Catalog.Format(msgs.locale, "errorTagsFormat", nil)
+}
+
+// ErrorTagsReadOnly says "the file is read-only"
+// in the language the app shows.
+//
+// Why a file's tags didn't change, as a toast or inside a message that
+// leads it.
+func ErrorTagsReadOnly() string { return In(i18n.Locale()).ErrorTagsReadOnly() }
+
+// ErrorTagsReadOnly says "the file is read-only"
+// in the language of msgs.
+//
+// Why a file's tags didn't change, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorTagsReadOnly() string {
+	return Catalog.Format(msgs.locale, "errorTagsReadOnly", nil)
+}
+
+// ErrorTagsUnsupported says "MixMusic doesn't change the tags of this kind of file"
+// in the language the app shows.
+//
+// Why a file's tags didn't change, as a toast or inside a message that
+// leads it.
+func ErrorTagsUnsupported() string { return In(i18n.Locale()).ErrorTagsUnsupported() }
+
+// ErrorTagsUnsupported says "MixMusic doesn't change the tags of this kind of file"
+// in the language of msgs.
+//
+// Why a file's tags didn't change, as a toast or inside a message that
+// leads it.
+func (msgs Messages) ErrorTagsUnsupported() string {
+	return Catalog.Format(msgs.locale, "errorTagsUnsupported", nil)
+}
+
+// ErrorToolsBrowserOpen says "the browser is open and holds its cookies: close it, then try again"
+// in the language the app shows.
+//
+// Why the sign-in from a browser failed, as a toast or inside a message
+// that leads it.
+func ErrorToolsBrowserOpen() string { return In(i18n.Locale()).ErrorToolsBrowserOpen() }
+
+// ErrorToolsBrowserOpen says "the browser is open and holds its cookies: close it, then try again"
+// in the language of msgs.
+//
+// Why the sign-in from a browser failed, as a toast or inside a message
+// that leads it.
+func (msgs Messages) ErrorToolsBrowserOpen() string {
+	return Catalog.Format(msgs.locale, "errorToolsBrowserOpen", nil)
+}
+
+// ErrorToolsCookiesDenied says "the system keeps the browser's cookies from MixMusic"
+// in the language the app shows.
+//
+// Why the sign-in from a browser failed, as a toast or inside a message
+// that leads it.
+func ErrorToolsCookiesDenied() string { return In(i18n.Locale()).ErrorToolsCookiesDenied() }
+
+// ErrorToolsCookiesDenied says "the system keeps the browser's cookies from MixMusic"
+// in the language of msgs.
+//
+// Why the sign-in from a browser failed, as a toast or inside a message
+// that leads it.
+func (msgs Messages) ErrorToolsCookiesDenied() string {
+	return Catalog.Format(msgs.locale, "errorToolsCookiesDenied", nil)
+}
+
+// ErrorToolsCookiesSealed says "the browser seals its cookies so that other programs can't read them"
+// in the language the app shows.
+//
+// Why the sign-in from a browser failed, as a toast or inside a message
+// that leads it.
+func ErrorToolsCookiesSealed() string { return In(i18n.Locale()).ErrorToolsCookiesSealed() }
+
+// ErrorToolsCookiesSealed says "the browser seals its cookies so that other programs can't read them"
+// in the language of msgs.
+//
+// Why the sign-in from a browser failed, as a toast or inside a message
+// that leads it.
+func (msgs Messages) ErrorToolsCookiesSealed() string {
+	return Catalog.Format(msgs.locale, "errorToolsCookiesSealed", nil)
+}
+
+// ErrorToolsNoBrowserCookies says "no cookies of the browser were found"
+// in the language the app shows.
+//
+// Why the sign-in from a browser failed, as a toast or inside a message
+// that leads it.
+func ErrorToolsNoBrowserCookies() string { return In(i18n.Locale()).ErrorToolsNoBrowserCookies() }
+
+// ErrorToolsNoBrowserCookies says "no cookies of the browser were found"
+// in the language of msgs.
+//
+// Why the sign-in from a browser failed, as a toast or inside a message
+// that leads it.
+func (msgs Messages) ErrorToolsNoBrowserCookies() string {
+	return Catalog.Format(msgs.locale, "errorToolsNoBrowserCookies", nil)
+}
+
+// ErrorToolsNoYTDLP says "yt-dlp is not installed: install it from Settings › Playback"
+// in the language the app shows.
+//
+// An error, as a toast or inside a message that leads it. yt-dlp is a
+// program's name.
+func ErrorToolsNoYTDLP() string { return In(i18n.Locale()).ErrorToolsNoYTDLP() }
+
+// ErrorToolsNoYTDLP says "yt-dlp is not installed: install it from Settings › Playback"
+// in the language of msgs.
+//
+// An error, as a toast or inside a message that leads it. yt-dlp is a
+// program's name.
+func (msgs Messages) ErrorToolsNoYTDLP() string {
+	return Catalog.Format(msgs.locale, "errorToolsNoYTDLP", nil)
+}
+
+// ErrorYouTubeAlreadyInPlaylist says "YouTube Music did not add it: it's in that playlist already"
+// in the language the app shows.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it.
+func ErrorYouTubeAlreadyInPlaylist() string { return In(i18n.Locale()).ErrorYouTubeAlreadyInPlaylist() }
+
+// ErrorYouTubeAlreadyInPlaylist says "YouTube Music did not add it: it's in that playlist already"
+// in the language of msgs.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorYouTubeAlreadyInPlaylist() string {
+	return Catalog.Format(msgs.locale, "errorYouTubeAlreadyInPlaylist", nil)
+}
+
+// ErrorYouTubeNoSongList says "YouTube Music lists no more than the top songs of this artist"
+// in the language the app shows.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it.
+func ErrorYouTubeNoSongList() string { return In(i18n.Locale()).ErrorYouTubeNoSongList() }
+
+// ErrorYouTubeNoSongList says "YouTube Music lists no more than the top songs of this artist"
+// in the language of msgs.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorYouTubeNoSongList() string {
+	return Catalog.Format(msgs.locale, "errorYouTubeNoSongList", nil)
+}
+
+// ErrorYouTubeNotFound says "YouTube Music didn't find it"
+// in the language the app shows.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it:
+// what was asked for isn't there.
+func ErrorYouTubeNotFound() string { return In(i18n.Locale()).ErrorYouTubeNotFound() }
+
+// ErrorYouTubeNotFound says "YouTube Music didn't find it"
+// in the language of msgs.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it:
+// what was asked for isn't there.
+func (msgs Messages) ErrorYouTubeNotFound() string {
+	return Catalog.Format(msgs.locale, "errorYouTubeNotFound", nil)
+}
+
+// ErrorYouTubeSessionRejected says "YouTube Music no longer accepts this sign-in"
+// in the language the app shows.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it.
+func ErrorYouTubeSessionRejected() string { return In(i18n.Locale()).ErrorYouTubeSessionRejected() }
+
+// ErrorYouTubeSessionRejected says "YouTube Music no longer accepts this sign-in"
+// in the language of msgs.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorYouTubeSessionRejected() string {
+	return Catalog.Format(msgs.locale, "errorYouTubeSessionRejected", nil)
+}
+
+// ErrorYouTubeSignedOut says "sign in to YouTube Music first"
+// in the language the app shows.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it.
+func ErrorYouTubeSignedOut() string { return In(i18n.Locale()).ErrorYouTubeSignedOut() }
+
+// ErrorYouTubeSignedOut says "sign in to YouTube Music first"
+// in the language of msgs.
+//
+// An error of YouTube Music, as a toast or inside a message that leads it.
+func (msgs Messages) ErrorYouTubeSignedOut() string {
+	return Catalog.Format(msgs.locale, "errorYouTubeSignedOut", nil)
+}
+
 // ExplicitHideDesc says "Songs, albums and videos marked explicit don't show in the search, on Home, on artists' pages or in radios, and never…"
 // in the language the app shows.
 func ExplicitHideDesc() string { return In(i18n.Locale()).ExplicitHideDesc() }
@@ -23375,6 +24251,22 @@ func ToolsHowWithCommand(command string) string {
 // How to update yt-dlp: the command that updates it. Lowercase.
 func (msgs Messages) ToolsHowWithCommand(command string) string {
 	return Catalog.Format(msgs.locale, "toolsHowWithCommand", map[string]any{"command": command})
+}
+
+// ToolsInstallFailed says "couldn't install yt-dlp: {error}"
+// in the language the app shows.
+//
+// Toast when yt-dlp didn't install. {error} is why, as a message of the
+// catalog or in the system's own words, often English.
+func ToolsInstallFailed(error string) string { return In(i18n.Locale()).ToolsInstallFailed(error) }
+
+// ToolsInstallFailed says "couldn't install yt-dlp: {error}"
+// in the language of msgs.
+//
+// Toast when yt-dlp didn't install. {error} is why, as a message of the
+// catalog or in the system's own words, often English.
+func (msgs Messages) ToolsInstallFailed(error string) string {
+	return Catalog.Format(msgs.locale, "toolsInstallFailed", map[string]any{"error": error})
 }
 
 // ToolsInstalling says "installing yt-dlp…"

@@ -126,9 +126,9 @@ func (s *shell) exported(tracks []media.Track, dir string, res app.ExportResult)
 	switch n := len(res.Failed); {
 	case n == 1:
 		f := res.Failed[0]
-		s.notes = append(s.notes, player.Notice{Message: locales.ExportFailed(f.Track.Title, f.Err.Error()), Error: true})
+		s.notes = append(s.notes, player.Notice{Message: locales.ExportFailed(f.Track.Title, errorText(f.Err)), Error: true})
 	case n > 1:
 		f := res.Failed[0]
-		s.notes = append(s.notes, player.Notice{Message: locales.ExportFailedSeveral(n, f.Track.Title, f.Err.Error()), Error: true})
+		s.notes = append(s.notes, player.Notice{Message: locales.ExportFailedSeveral(n, f.Track.Title, errorText(f.Err)), Error: true})
 	}
 }

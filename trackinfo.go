@@ -143,7 +143,7 @@ func (s *shell) trackInfoBody(c *ui.Context, t media.Track, l *loaded[app.TrackI
 		ui.Text(c, locales.TrackInfoReading()).FontSize(k.smallSize()).TextColor(k.muted)
 		return
 	case l.err != nil:
-		ui.Text(c, l.err.Error()).FontSize(k.smallSize()).TextColor(k.danger)
+		ui.Text(c, errorText(l.err)).FontSize(k.smallSize()).TextColor(k.danger)
 		return
 	}
 	s.infoRows(c, trackFacts(t, l.value))

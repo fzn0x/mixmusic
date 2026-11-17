@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"slices"
 	"time"
 
@@ -48,7 +48,7 @@ func (s *shell) installButton(c *ui.Context, key, label string) {
 				s.installing = false
 				s.forget("tools")
 				if err != nil {
-					s.notes = append(s.notes, noticeOf(fmt.Errorf("couldn't install yt-dlp: %w", err)))
+					s.notes = append(s.notes, noticeOf(errors.New(locales.ToolsInstallFailed(errorText(err)))))
 					return
 				}
 				if s.set.YTDLPPath != "" {

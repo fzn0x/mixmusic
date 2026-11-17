@@ -421,7 +421,7 @@ func (s *shell) miniLyrics(c *ui.Context) {
 		s.miniNote(c, locales.MiniPanelLyricsLooking())
 		return
 	case l.err != nil:
-		s.miniNote(c, l.err.Error())
+		s.miniNote(c, errorText(l.err))
 		// A track without lyrics stays so; a failure may pass.
 		if !errors.Is(l.err, lyrics.ErrNotFound) {
 			ui.Row(c).Padding(0, 12).Children(func() {
@@ -489,7 +489,7 @@ func (s *shell) miniChapters(c *ui.Context, t media.Track) {
 		s.miniNote(c, locales.MiniPanelDetailsLooking())
 		return
 	case l.err != nil:
-		s.miniNote(c, l.err.Error())
+		s.miniNote(c, errorText(l.err))
 		if !errors.Is(l.err, app.ErrNoEpisodeDetails) {
 			ui.Row(c).Padding(0, 12).Children(func() {
 				if s.link(c, "mini-details-retry", locales.WidgetsTryAgain()) {
@@ -601,7 +601,7 @@ func (s *shell) miniOutputDevices(c *ui.Context) {
 		case !devices.done:
 			s.miniNote(c, locales.PlayerLooking())
 		case devices.err != nil:
-			s.miniNote(c, devices.err.Error())
+			s.miniNote(c, errorText(devices.err))
 		}
 	})
 }
@@ -640,7 +640,7 @@ func (s *shell) miniConnectDevices(c *ui.Context) {
 		case !devices.done:
 			s.miniNote(c, locales.PlayerLooking())
 		case devices.err != nil:
-			s.miniNote(c, devices.err.Error())
+			s.miniNote(c, errorText(devices.err))
 		case len(devices.value) == 0:
 			s.miniNote(c, locales.PlayerNoDevices())
 		}

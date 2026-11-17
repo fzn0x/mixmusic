@@ -2316,6 +2316,234 @@
   },
   "equalizerSpotifyNotes": "Spotify notes",
   "equalizerTitle": "Equalizer",
+  "errorAddonsBuiltin": "add-ons MixMusic ships with cannot be removed",
+  "@errorAddonsBuiltin": {
+    "description": "Why a theme or plugin wasn't removed, as a toast."
+  },
+  "errorAudioCantPlay": "the file can't be played",
+  "@errorAudioCantPlay": {
+    "description": "An error of a file, as a toast or inside a message that leads it."
+  },
+  "errorAudioNoOutput": "no audio output device",
+  "@errorAudioNoOutput": {
+    "description": "An error of the sound, as a toast or inside a message that leads it: the computer has no speakers or headphones MixMusic can play on."
+  },
+  "errorColorFileEmpty": "it's empty",
+  "@errorColorFileEmpty": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it."
+  },
+  "errorColorFileFolder": "it's a folder",
+  "@errorColorFileFolder": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it."
+  },
+  "errorColorFilePartial": "it ends partway through",
+  "@errorColorFilePartial": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it."
+  },
+  "errorColorFileTooBig": "it's over 1 MB",
+  "@errorColorFileTooBig": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it."
+  },
+  "errorColorFileUnknown": "it holds no colours MixMusic knows. MixMusic reads pywal's colors.json, matugen's JSON, what MixMusic's matugen template writes, and the colors of a Base16 or Base24 scheme in YAML or JSON",
+  "@errorColorFileUnknown": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it. pywal, matugen, Base16 and Base24 are names."
+  },
+  "errorFirewallDeclined": "the administrator's approval wasn't given",
+  "@errorFirewallDeclined": {
+    "description": "Why the firewall's rules didn't change, inside a message that leads it."
+  },
+  "errorFirewallUnsupported": "only Windows' firewall is read",
+  "@errorFirewallUnsupported": {
+    "description": "An error of Settings › Desktop › Windows Firewall, inside a message that leads it."
+  },
+  "errorLastfmNotAuthorized": "Last.fm hasn't approved the sign-in yet",
+  "@errorLastfmNotAuthorized": {
+    "description": "An error of Last.fm, as a toast or inside a message that leads it: the user didn't allow MixMusic on Last.fm's page yet."
+  },
+  "errorListenBrainzNotServer": "this isn't the address of a server: write it as https://listenbrainz.example.com",
+  "@errorListenBrainzNotServer": {
+    "description": "An error of ListenBrainz, as a toast or inside a message that leads it. Keep the example address as it is."
+  },
+  "errorLocalFilesCantWatch": "this system doesn't tell of changes to folders",
+  "@errorLocalFilesCantWatch": {
+    "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorLocalFilesNetworkDrive": "it's on a network drive",
+  "@errorLocalFilesNetworkDrive": {
+    "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorLocalFilesRemovableDrive": "it's on a removable drive, which a watch would keep from being ejected",
+  "@errorLocalFilesRemovableDrive": {
+    "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorLocalFilesWatchLimit": "the system's limit on watched folders is reached",
+  "@errorLocalFilesWatchLimit": {
+    "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorSpotifyNoClientID": "Set your Client ID in Settings › Accounts first",
+  "@errorSpotifyNoClientID": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it: MixMusic needs the Client ID of the user's Spotify app."
+  },
+  "errorSpotifyNotSignedIn": "not signed in to Spotify",
+  "@errorSpotifyNotSignedIn": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifyPlaylistNotShown": "Spotify shows apps neither its own playlists nor those deleted or made private",
+  "@errorSpotifyPlaylistNotShown": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifyPlaylistRefused": "Spotify refused to change the playlist",
+  "@errorSpotifyPlaylistRefused": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifyPlaylistUnavailable": "Spotify only lets apps read the tracks of playlists you own or collaborate on",
+  "@errorSpotifyPlaylistUnavailable": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifyPremium": "playback control needs Spotify Premium",
+  "@errorSpotifyPremium": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifySignInAgain": "sign in to Spotify again",
+  "@errorSpotifySignInAgain": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it: the sign-in expired."
+  },
+  "errorSpotifyTooMany": "Spotify had too many requests: try again in a moment",
+  "@errorSpotifyTooMany": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorStreamAdults": "YouTube plays this track only to signed-in adults, on its own website",
+  "@errorStreamAdults": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamBadVideoID": "that isn't a YouTube video",
+  "@errorStreamBadVideoID": {
+    "description": "An error, as a toast or inside a message that leads it: what was given isn't the ID of a YouTube video."
+  },
+  "errorStreamBot": "YouTube asks to confirm this is not a bot; try again in a while",
+  "@errorStreamBot": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay."
+  },
+  "errorStreamCountry": "this track is not available in your country",
+  "@errorStreamCountry": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamGone": "this track is no longer on YouTube Music",
+  "@errorStreamGone": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamLive": "it's a live stream, which doesn't download",
+  "@errorStreamLive": {
+    "description": "Why a video doesn't download, as a toast or inside a message that leads it."
+  },
+  "errorStreamMembers": "only the members of its channel can play this track",
+  "@errorStreamMembers": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamNetwork": "the network failed",
+  "@errorStreamNetwork": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamNoAudio": "YouTube has no audio of this track that MixMusic plays",
+  "@errorStreamNoAudio": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamNoCaptions": "YouTube tells of no captions of this video",
+  "@errorStreamNoCaptions": {
+    "description": "Why a video has no lyrics from its captions, as a toast or inside a message that leads it."
+  },
+  "errorStreamNoFormat": "YouTube gave no audio for this track; updating yt-dlp in Settings › Playback often fixes it",
+  "@errorStreamNoFormat": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamPremium": "only YouTube Music Premium members can play this track",
+  "@errorStreamPremium": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamPrivate": "this track is private",
+  "@errorStreamPrivate": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamRefused": "YouTube refused to send its audio; updating yt-dlp in Settings › Playback often fixes it",
+  "@errorStreamRefused": {
+    "description": "Why a track's audio failed, as a toast or inside a message that leads it."
+  },
+  "errorStreamSignedIn": "YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it",
+  "@errorStreamSignedIn": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamStalled": "YouTube stopped sending the audio, as happens when the connection drops; check the connection and play the track again",
+  "@errorStreamStalled": {
+    "description": "Why a track's audio failed, as a toast or inside a message that leads it."
+  },
+  "errorStreamThrottled": "YouTube is turning down requests from this network for now; try again in a while",
+  "@errorStreamThrottled": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamUnavailable": "YouTube won't send this track",
+  "@errorStreamUnavailable": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorTagsCover": "the cover must be a JPEG or PNG image of at most 10 MB",
+  "@errorTagsCover": {
+    "description": "Why a file's cover didn't change, as a toast or inside a message that leads it."
+  },
+  "errorTagsFolderReadOnly": "MixMusic can't write in its folder",
+  "@errorTagsFolderReadOnly": {
+    "description": "Why a file's tags didn't change, as a toast or inside a message that leads it."
+  },
+  "errorTagsFormat": "its layout isn't one MixMusic can change safely",
+  "@errorTagsFormat": {
+    "description": "Why a file's tags didn't change, as a toast or inside a message that leads it."
+  },
+  "errorTagsReadOnly": "the file is read-only",
+  "@errorTagsReadOnly": {
+    "description": "Why a file's tags didn't change, as a toast or inside a message that leads it."
+  },
+  "errorTagsUnsupported": "MixMusic doesn't change the tags of this kind of file",
+  "@errorTagsUnsupported": {
+    "description": "Why a file's tags didn't change, as a toast or inside a message that leads it."
+  },
+  "errorToolsBrowserOpen": "the browser is open and holds its cookies: close it, then try again",
+  "@errorToolsBrowserOpen": {
+    "description": "Why the sign-in from a browser failed, as a toast or inside a message that leads it."
+  },
+  "errorToolsCookiesDenied": "the system keeps the browser's cookies from MixMusic",
+  "@errorToolsCookiesDenied": {
+    "description": "Why the sign-in from a browser failed, as a toast or inside a message that leads it."
+  },
+  "errorToolsCookiesSealed": "the browser seals its cookies so that other programs can't read them",
+  "@errorToolsCookiesSealed": {
+    "description": "Why the sign-in from a browser failed, as a toast or inside a message that leads it."
+  },
+  "errorToolsNoBrowserCookies": "no cookies of the browser were found",
+  "@errorToolsNoBrowserCookies": {
+    "description": "Why the sign-in from a browser failed, as a toast or inside a message that leads it."
+  },
+  "errorToolsNoYTDLP": "yt-dlp is not installed: install it from Settings › Playback",
+  "@errorToolsNoYTDLP": {
+    "description": "An error, as a toast or inside a message that leads it. yt-dlp is a program's name."
+  },
+  "errorYouTubeAlreadyInPlaylist": "YouTube Music did not add it: it's in that playlist already",
+  "@errorYouTubeAlreadyInPlaylist": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it."
+  },
+  "errorYouTubeNoSongList": "YouTube Music lists no more than the top songs of this artist",
+  "@errorYouTubeNoSongList": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it."
+  },
+  "errorYouTubeNotFound": "YouTube Music didn't find it",
+  "@errorYouTubeNotFound": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it: what was asked for isn't there."
+  },
+  "errorYouTubeSessionRejected": "YouTube Music no longer accepts this sign-in",
+  "@errorYouTubeSessionRejected": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it."
+  },
+  "errorYouTubeSignedOut": "sign in to YouTube Music first",
+  "@errorYouTubeSignedOut": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it."
+  },
   "explicitHideDesc": "Songs, albums and videos marked explicit don't show in the search, on Home, on artists' pages or in radios, and never play. Your playlists, liked songs, library and queue list them dimmed.",
   "explicitHideTitle": "Hide explicit content",
   "explicitTagHidden": "hidden by your settings",
@@ -7511,6 +7739,15 @@
     "description": "How to update yt-dlp: the command that updates it. Lowercase.",
     "placeholders": {
       "command": {
+        "type": "String"
+      }
+    }
+  },
+  "toolsInstallFailed": "couldn't install yt-dlp: {error}",
+  "@toolsInstallFailed": {
+    "description": "Toast when yt-dlp didn't install. {error} is why, as a message of the catalog or in the system's own words, often English.",
+    "placeholders": {
+      "error": {
         "type": "String"
       }
     }

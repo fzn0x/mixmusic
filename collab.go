@@ -137,7 +137,7 @@ func (s *shell) invite(p *media.Playlist, unlist bool) {
 		return err
 	}, func(err error) {
 		if err != nil {
-			s.notes = append(s.notes, player.Notice{Message: locales.CollabInviteFailed(title, err.Error()), Error: true})
+			s.notes = append(s.notes, player.Notice{Message: locales.CollabInviteFailed(title, errorText(err)), Error: true})
 			if unlist {
 				// It may be unlisted now: its page tells.
 				s.refetch("playlist:" + id)
@@ -166,7 +166,7 @@ func (s *shell) stopNow(p *media.Playlist) {
 	id, title := p.ID, p.Title
 	s.changeCollab(p, func(ctx context.Context) error { return stopOnYouTube(s, ctx, id) }, func(err error) {
 		if err != nil {
-			s.notes = append(s.notes, player.Notice{Message: locales.CollabStopFailed(title, err.Error()), Error: true})
+			s.notes = append(s.notes, player.Notice{Message: locales.CollabStopFailed(title, errorText(err)), Error: true})
 			return
 		}
 		p.Collaborative = false
@@ -184,10 +184,10 @@ func (s *shell) setCollaborative(p *media.Playlist, on bool) {
 		s.changeCollab(p, func(ctx context.Context) error { return collaborativeOnSpotify(s, ctx, id, on) }, func(err error) {
 			switch {
 			case err != nil && on:
-				s.notes = append(s.notes, player.Notice{Message: locales.CollabMakeFailed(title, err.Error()), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.CollabMakeFailed(title, errorText(err)), Error: true})
 				return
 			case err != nil:
-				s.notes = append(s.notes, player.Notice{Message: locales.CollabStopFailed(title, err.Error()), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.CollabStopFailed(title, errorText(err)), Error: true})
 				return
 			}
 			p.Collaborative = on
@@ -379,7 +379,7 @@ func (s *shell) shareMixOnYouTube(title string, tracks []media.Track) {
 		p, err := shareOnYouTube(s, ctx, title, tracks)
 		s.update(func() {
 			if err != nil {
-				s.notes = append(s.notes, player.Notice{Message: locales.CollabShareFailed(title, err.Error()), Error: true})
+				s.notes = append(s.notes, player.Notice{Message: locales.CollabShareFailed(title, errorText(err)), Error: true})
 				return
 			}
 			s.keepPlaylist("youtube:playlists", p)

@@ -14,6 +14,7 @@ import (
 	"net"
 	"os"
 	"sync"
+	"testing"
 	"time"
 )
 
@@ -69,8 +70,22 @@ type Client struct {
 // New returns a client that shows presence as the Discord application whose
 // ID, as the Discord Developer Portal shows it, is appID. Discord names the
 // application in the presence, as in "Listening to MixMusic".
+//
+// In a test binary the client never reaches the Discord app running on the
+// computer: the status it would set is the person's own, and a test's track
+// would show on their profile. Tests that talk to Discord replace dial.
 func New(appID string) *Client {
-	return &Client{dial: dial, busy: make(chan struct{}, 1), appID: appID}
+	d := dial
+	if testing.Testing() {
+		d = notRunning
+	}
+	return &Client{dial: d, busy: make(chan struct{}, 1), appID: appID}
+}
+
+// notRunning is the dial of a client in a test binary: as if Discord were
+// not running.
+func notRunning(context.Context) (io.ReadWriteCloser, error) {
+	return nil, ErrNotRunning
 }
 
 // SetActivity shows a on the user's Discord profile. It sends nothing when

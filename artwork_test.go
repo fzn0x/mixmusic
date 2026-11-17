@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"image"
+	"image/color"
 	"sync"
 	"testing"
 	"time"
@@ -66,7 +67,9 @@ func (t *testArt) settle(tb testing.TB) {
 	}
 }
 
-func (t *testArt) entry(rawURL string) *artEntry { return t.m[artKey{rawURL, bucket(64), false}] }
+func (t *testArt) entry(rawURL string) *artEntry {
+	return t.m[artKey{rawURL, bucket(64), false, false}]
+}
 
 var errOffline = &artwork.Error{Host: "i.ytimg.com", Temporary: true, Err: errors.New("dial tcp: i/o timeout")}
 
@@ -210,6 +213,36 @@ func TestScaleDown(t *testing.T) {
 		got := scaleDown(image.NewRGBA(image.Rect(0, 0, c.w, c.h)), c.px).Bounds()
 		if got.Dx() != c.ww || got.Dy() != c.wh {
 			t.Errorf("%dx%d at %d: %dx%d", c.w, c.h, c.px, got.Dx(), got.Dy())
+		}
+	}
+}
+
+// TestBlurKeepsItsEdges finds a blurred cover of one colour unchanged to its
+// rim, and a black and white one's edge softened from one to the other.
+func TestBlurKeepsItsEdges(t *testing.T) {
+	src := image.NewRGBA(image.Rect(0, 0, 32, 32))
+	for i := range src.Pix {
+		src.Pix[i] = 200
+	}
+	got := blur(src, artBlur)
+	for i, v := range got.Pix {
+		if v != 200 {
+			t.Fatalf("a cover of one colour blurred has %d at %d, not 200", v, i)
+		}
+	}
+	for y := range 32 {
+		for x := range 16 {
+			src.SetRGBA(x, y, color.RGBA{A: 255})
+		}
+	}
+	got = blur(src, artBlur)
+	row := func(x int) uint8 { return got.RGBAAt(x, 16).R }
+	if row(0) > 10 || row(31) < 190 || row(15) < 60 || row(15) > 140 {
+		t.Errorf("the edge blurred reads %d, %d, %d across, not dark, mid, light", row(0), row(15), row(31))
+	}
+	for x := 1; x < 32; x++ {
+		if row(x) < row(x-1) {
+			t.Fatalf("the edge blurred darkens at %d", x)
 		}
 	}
 }

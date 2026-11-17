@@ -75,7 +75,7 @@ func (s *shell) lyricPreview(c *ui.Context) {
 	box := ui.Box(c.Key("lyric-preview")).Height(previewHeight).MaxWidth(560).Margin(14, 0).Radius(14).Clip().Label("Preview of the full-screen lyrics")
 	var b *ui.Bitmap
 	if cur, ok := s.st.Current(); ok && len(cur.Track.Artwork) > 0 {
-		b = s.art.get(c, artworkURL(cur.Track.Artwork, 64), 64)
+		b = s.art.blurred(c, artworkURL(cur.Track.Artwork, 96), 96)
 	}
 	accent := k.accent
 	box.Background(ui.Color{A: 255}).Draw(func(p *ui.Painter, r ui.Rect) { paintStageGround(p, r, b, accent, style.scrim) })

@@ -1,5 +1,8 @@
 {
   "@@locale": "zh-Hans",
+  "@@x-translators": [
+    "Shizuku11451"
+  ],
   "aboutContribute": "参与贡献",
   "aboutDescription": "在一个播放器中使用 Spotify 和 YouTube Music，采用 MIT 许可证或 GNU GPL 第 3 版开源。你的数据保存在 {dir}。",
   "aboutHide": "隐藏",

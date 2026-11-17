@@ -369,6 +369,8 @@ func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (Accoun
 	a.mu.Lock()
 	a.youtubeMe, a.profileErrs.youtube = nil, ""
 	a.mu.Unlock()
+	// Nor the refusals of the audio found as the account before (#578).
+	a.resolver.ForgetRefusals()
 	me, err := a.youtube.Account(ctx)
 	if err != nil {
 		a.youtube.SetCookies(nil)

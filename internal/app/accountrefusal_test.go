@@ -73,3 +73,31 @@ func TestYouTubeAccountSwitchForgetsRefusals(t *testing.T) {
 		t.Error("as another Google account and back: not asked for as the account again")
 	}
 }
+
+// TestYouTubeSignInForgetsRefusals asks as the account again at once for a
+// track whose audio found so YouTube refused, once MixMusic signs in to
+// YouTube Music again: also with the same session, as from a browser it
+// was imported from before, which the resolver can't tell from the one
+// before (#578).
+func TestYouTubeSignInForgetsRefusals(t *testing.T) {
+	a, _ := cookieApp(t, premiumMenu(true))
+	s := &Accounts{a}
+	const session = "SAPISID=madeup-sapisid; LOGIN_INFO=madeup-login; SID=madeup-sid"
+	if _, err := s.YouTubePasteCookies(context.Background(), session); err != nil {
+		t.Fatal(err)
+	}
+	asAccountOn(t, a)
+	const video = "bbbbbbbbbbb"
+	if !refusedAsAccount(t, a, video) {
+		t.Fatal("first: not as the account")
+	}
+	if refusedAsAccount(t, a, video) {
+		t.Fatal("after the refusal, as the same session: as the account")
+	}
+	if _, err := s.YouTubePasteCookies(context.Background(), session); err != nil {
+		t.Fatal(err)
+	}
+	if !refusedAsAccount(t, a, video) {
+		t.Error("signed in again: not asked for as the account again")
+	}
+}

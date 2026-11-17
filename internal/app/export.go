@@ -19,6 +19,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/export"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/tagwrite"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // albumWait bounds how long an export waits for the page of an album, for
@@ -91,7 +92,7 @@ func (d *Downloads) ChooseExportFolder(parent *mygo.Window) (string, error) {
 			start = music
 		}
 	}
-	paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: "Choose where to export the tracks",
+	paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: locales.ExportFolderDialog(),
 		Directory: true, CreateDirectories: true, DefaultPath: start})
 	if err != nil || len(paths) == 0 {
 		return "", err

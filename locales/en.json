@@ -1574,6 +1574,10 @@
   "@downloadsEmptyTitle": {
     "description": "Empty state of the downloads. Lowercase when shown as a word."
   },
+  "downloadsFolderDialog": "Choose where MixMusic keeps downloads",
+  "@downloadsFolderDialog": {
+    "description": "The title of the dialog that chooses the downloads' folder."
+  },
   "downloadsFolderLine": "{count, plural, one {# track} other {# tracks}} · {size} · in {folder}",
   "@downloadsFolderLine": {
     "description": "The downloads' size and folder.",
@@ -2029,6 +2033,10 @@
         "type": "String"
       }
     }
+  },
+  "exportFolderDialog": "Choose where to export the tracks",
+  "@exportFolderDialog": {
+    "description": "The title of the dialog that chooses the folder tracks are exported to."
   },
   "exportMenu": "Export…",
   "exportOnlyDownloaded": "Only tracks downloaded or on this computer export",
@@ -2828,6 +2836,22 @@
   "listenBrainzSettingsTokenPlaceholder": "36 letters, digits and dashes",
   "listenBrainzSettingsUserToken": "User token",
   "listenBrainzSettingsYourServer": "Your server",
+  "localFilesDialog": "Open music files",
+  "@localFilesDialog": {
+    "description": "The title of the dialog that opens music files on this computer, to play them."
+  },
+  "localFilesDialogFilter": "Music",
+  "@localFilesDialogFilter": {
+    "description": "The name of the dialog's filter of music files, as \"Music (*.mp3, *.flac…)\"."
+  },
+  "localFolderDialog": "Add a folder of music",
+  "@localFolderDialog": {
+    "description": "The title of the dialog that adds a folder of music on this computer to the library."
+  },
+  "localFolderDialogAdd": "Add",
+  "@localFolderDialogAdd": {
+    "description": "The button of the dialog of localFolderDialog."
+  },
   "localTagsAboutAlbum": "What the {count, plural, one {# song} other {# songs}} of {name} share, which MixMusic writes into their files.",
   "@localTagsAboutAlbum": {
     "placeholders": {
@@ -3694,6 +3718,22 @@
   "notchPanelShowPlays": "Show what plays in MixMusic",
   "notchPanelWindowTitle": "MixMusic around the notch",
   "notchTitle": "Player around the notch",
+  "notifyDisliked": "Disliked",
+  "@notifyDisliked": {
+    "description": "The title of a notification, as a track is disliked from outside MixMusic's windows; its body names the track."
+  },
+  "notifyLiked": "Added to liked songs",
+  "@notifyLiked": {
+    "description": "The title of a notification, as a track is liked from outside MixMusic's windows; its body names the track."
+  },
+  "notifyUndisliked": "Removed the dislike",
+  "@notifyUndisliked": {
+    "description": "The title of a notification, as a track is no longer disliked, from outside MixMusic's windows; its body names the track."
+  },
+  "notifyUnliked": "Removed from liked songs",
+  "@notifyUnliked": {
+    "description": "The title of a notification, as a track is no longer liked, from outside MixMusic's windows; its body names the track."
+  },
   "nowPlayingEmpty": "Play a track and it fills this page, with its lyrics.",
   "nowPlayingNothing": "Nothing playing",
   "nowPlayingTitle": "Now playing",
@@ -3949,6 +3989,10 @@
   "playbackSpotifyNoWebKit": "This computer's webview, WebKitGTK, can't play Spotify's protected audio, so MixMusic can't play Spotify itself.",
   "playbackSpotifyTracks": "Spotify tracks",
   "playbackWaitingBrowser": "waiting for the browser…",
+  "playerCantPlayHere": "MixMusic can't play on this computer",
+  "@playerCantPlayHere": {
+    "description": "A dialog as MixMusic starts, where it can't play: its details say why, then it quits."
+  },
   "playerDeviceActive": "{name} · active",
   "@playerDeviceActive": {
     "placeholders": {
@@ -5795,6 +5839,22 @@
   "suggestionsTryAgain": "try again",
   "surroundDescription": "Some tracks have a 5.1 surround mix beside their stereo one. It plays on six speakers where your output has them, else mixed down to stereo. The 5.1 button by the player turns it on and off too.",
   "surroundTitle": "Play 5.1 surround when a track has it",
+  "taskbarNext": "Next",
+  "@taskbarNext": {
+    "description": "The tooltip of a button on the main window's thumbnail in Windows' taskbar: the next track."
+  },
+  "taskbarPause": "Pause",
+  "@taskbarPause": {
+    "description": "The tooltip of a button on the main window's thumbnail in Windows' taskbar."
+  },
+  "taskbarPlay": "Play",
+  "@taskbarPlay": {
+    "description": "The tooltip of a button on the main window's thumbnail in Windows' taskbar."
+  },
+  "taskbarPrevious": "Previous",
+  "@taskbarPrevious": {
+    "description": "The tooltip of a button on the main window's thumbnail in Windows' taskbar: the previous track."
+  },
   "themeOptionAnimeScreentone": "Screentone",
   "themeOptionAnimeSpeedlines": "Speed lines",
   "themeOptionAuroraBlur": "Glass blur",
@@ -6303,6 +6363,36 @@
         "type": "String"
       }
     }
+  },
+  "trayMiniPlayer": "Mini player",
+  "@trayMiniPlayer": {
+    "description": "An item of the tray icon's menu, which shows the mini player."
+  },
+  "trayNext": "Next",
+  "@trayNext": {
+    "description": "An item of the tray icon's menu: the next track."
+  },
+  "trayPaused": "Paused: {playing}",
+  "@trayPaused": {
+    "description": "The tray icon's tooltip, and the main window's title, while what plays is paused. {playing} is the track and its artists.",
+    "placeholders": {
+      "playing": {
+        "type": "String",
+        "example": "One More Time - Daft Punk"
+      }
+    }
+  },
+  "trayPlayPause": "Play / Pause",
+  "@trayPlayPause": {
+    "description": "An item of the tray icon's menu."
+  },
+  "trayPrevious": "Previous",
+  "@trayPrevious": {
+    "description": "An item of the tray icon's menu: the previous track."
+  },
+  "trayShowMixMusic": "Show MixMusic",
+  "@trayShowMixMusic": {
+    "description": "An item of the tray icon's menu, which shows the main window."
   },
   "updateOfferDownloading": "Downloading…",
   "updateOfferHave": "You have {version}. {how}",

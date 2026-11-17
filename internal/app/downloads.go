@@ -11,6 +11,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/downloads"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Downloads keeps the tracks the user chose to play without the network,
@@ -123,7 +124,7 @@ func (d *Downloads) OpenFolder() error {
 // ChooseFolder asks the user for a folder to move the downloads to, over
 // parent: "" when they chose none. It waits for their answer.
 func (d *Downloads) ChooseFolder(parent *mygo.Window) (string, error) {
-	paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: "Choose where MixMusic keeps downloads",
+	paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: parent, Title: locales.DownloadsFolderDialog(),
 		Directory: true, CreateDirectories: true, DefaultPath: d.Folder()})
 	if err != nil || len(paths) == 0 {
 		return "", err

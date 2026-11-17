@@ -5891,6 +5891,20 @@ func (msgs Messages) DownloadsEmptyTitle() string {
 	return Catalog.Format(msgs.locale, "downloadsEmptyTitle", nil)
 }
 
+// DownloadsFolderDialog says "Choose where MixMusic keeps downloads"
+// in the language the app shows.
+//
+// The title of the dialog that chooses the downloads' folder.
+func DownloadsFolderDialog() string { return In(i18n.Locale()).DownloadsFolderDialog() }
+
+// DownloadsFolderDialog says "Choose where MixMusic keeps downloads"
+// in the language of msgs.
+//
+// The title of the dialog that chooses the downloads' folder.
+func (msgs Messages) DownloadsFolderDialog() string {
+	return Catalog.Format(msgs.locale, "downloadsFolderDialog", nil)
+}
+
 // DownloadsFolderLine says "{count, plural, one {# track} other {# tracks}} · {size} · in {folder}"
 // in the language the app shows.
 //
@@ -7145,6 +7159,20 @@ func ExportFailedSeveral(n int, title string, error string) string {
 // in the language of msgs.
 func (msgs Messages) ExportFailedSeveral(n int, title string, error string) string {
 	return Catalog.Format(msgs.locale, "exportFailedSeveral", map[string]any{"n": n, "title": title, "error": error})
+}
+
+// ExportFolderDialog says "Choose where to export the tracks"
+// in the language the app shows.
+//
+// The title of the dialog that chooses the folder tracks are exported to.
+func ExportFolderDialog() string { return In(i18n.Locale()).ExportFolderDialog() }
+
+// ExportFolderDialog says "Choose where to export the tracks"
+// in the language of msgs.
+//
+// The title of the dialog that chooses the folder tracks are exported to.
+func (msgs Messages) ExportFolderDialog() string {
+	return Catalog.Format(msgs.locale, "exportFolderDialog", nil)
 }
 
 // ExportMenu says "Export…"
@@ -9573,6 +9601,68 @@ func ListenBrainzSettingsYourServer() string {
 // in the language of msgs.
 func (msgs Messages) ListenBrainzSettingsYourServer() string {
 	return Catalog.Format(msgs.locale, "listenBrainzSettingsYourServer", nil)
+}
+
+// LocalFilesDialog says "Open music files"
+// in the language the app shows.
+//
+// The title of the dialog that opens music files on this computer, to play
+// them.
+func LocalFilesDialog() string { return In(i18n.Locale()).LocalFilesDialog() }
+
+// LocalFilesDialog says "Open music files"
+// in the language of msgs.
+//
+// The title of the dialog that opens music files on this computer, to play
+// them.
+func (msgs Messages) LocalFilesDialog() string {
+	return Catalog.Format(msgs.locale, "localFilesDialog", nil)
+}
+
+// LocalFilesDialogFilter says "Music"
+// in the language the app shows.
+//
+// The name of the dialog's filter of music files, as "Music (*.mp3,
+// *.flac…)".
+func LocalFilesDialogFilter() string { return In(i18n.Locale()).LocalFilesDialogFilter() }
+
+// LocalFilesDialogFilter says "Music"
+// in the language of msgs.
+//
+// The name of the dialog's filter of music files, as "Music (*.mp3,
+// *.flac…)".
+func (msgs Messages) LocalFilesDialogFilter() string {
+	return Catalog.Format(msgs.locale, "localFilesDialogFilter", nil)
+}
+
+// LocalFolderDialog says "Add a folder of music"
+// in the language the app shows.
+//
+// The title of the dialog that adds a folder of music on this computer to
+// the library.
+func LocalFolderDialog() string { return In(i18n.Locale()).LocalFolderDialog() }
+
+// LocalFolderDialog says "Add a folder of music"
+// in the language of msgs.
+//
+// The title of the dialog that adds a folder of music on this computer to
+// the library.
+func (msgs Messages) LocalFolderDialog() string {
+	return Catalog.Format(msgs.locale, "localFolderDialog", nil)
+}
+
+// LocalFolderDialogAdd says "Add"
+// in the language the app shows.
+//
+// The button of the dialog of localFolderDialog.
+func LocalFolderDialogAdd() string { return In(i18n.Locale()).LocalFolderDialogAdd() }
+
+// LocalFolderDialogAdd says "Add"
+// in the language of msgs.
+//
+// The button of the dialog of localFolderDialog.
+func (msgs Messages) LocalFolderDialogAdd() string {
+	return Catalog.Format(msgs.locale, "localFolderDialogAdd", nil)
 }
 
 // LocalTagsAboutAlbum says "What the {count, plural, one {# song} other {# songs}} of {name} share, which MixMusic writes into their files."
@@ -12927,6 +13017,70 @@ func (msgs Messages) NotchTitle() string {
 	return Catalog.Format(msgs.locale, "notchTitle", nil)
 }
 
+// NotifyDisliked says "Disliked"
+// in the language the app shows.
+//
+// The title of a notification, as a track is disliked from outside
+// MixMusic's windows; its body names the track.
+func NotifyDisliked() string { return In(i18n.Locale()).NotifyDisliked() }
+
+// NotifyDisliked says "Disliked"
+// in the language of msgs.
+//
+// The title of a notification, as a track is disliked from outside
+// MixMusic's windows; its body names the track.
+func (msgs Messages) NotifyDisliked() string {
+	return Catalog.Format(msgs.locale, "notifyDisliked", nil)
+}
+
+// NotifyLiked says "Added to liked songs"
+// in the language the app shows.
+//
+// The title of a notification, as a track is liked from outside MixMusic's
+// windows; its body names the track.
+func NotifyLiked() string { return In(i18n.Locale()).NotifyLiked() }
+
+// NotifyLiked says "Added to liked songs"
+// in the language of msgs.
+//
+// The title of a notification, as a track is liked from outside MixMusic's
+// windows; its body names the track.
+func (msgs Messages) NotifyLiked() string {
+	return Catalog.Format(msgs.locale, "notifyLiked", nil)
+}
+
+// NotifyUndisliked says "Removed the dislike"
+// in the language the app shows.
+//
+// The title of a notification, as a track is no longer disliked, from
+// outside MixMusic's windows; its body names the track.
+func NotifyUndisliked() string { return In(i18n.Locale()).NotifyUndisliked() }
+
+// NotifyUndisliked says "Removed the dislike"
+// in the language of msgs.
+//
+// The title of a notification, as a track is no longer disliked, from
+// outside MixMusic's windows; its body names the track.
+func (msgs Messages) NotifyUndisliked() string {
+	return Catalog.Format(msgs.locale, "notifyUndisliked", nil)
+}
+
+// NotifyUnliked says "Removed from liked songs"
+// in the language the app shows.
+//
+// The title of a notification, as a track is no longer liked, from outside
+// MixMusic's windows; its body names the track.
+func NotifyUnliked() string { return In(i18n.Locale()).NotifyUnliked() }
+
+// NotifyUnliked says "Removed from liked songs"
+// in the language of msgs.
+//
+// The title of a notification, as a track is no longer liked, from outside
+// MixMusic's windows; its body names the track.
+func (msgs Messages) NotifyUnliked() string {
+	return Catalog.Format(msgs.locale, "notifyUnliked", nil)
+}
+
 // NowPlayingEmpty says "Play a track and it fills this page, with its lyrics."
 // in the language the app shows.
 func NowPlayingEmpty() string { return In(i18n.Locale()).NowPlayingEmpty() }
@@ -13971,6 +14125,22 @@ func PlaybackWaitingBrowser() string { return In(i18n.Locale()).PlaybackWaitingB
 // in the language of msgs.
 func (msgs Messages) PlaybackWaitingBrowser() string {
 	return Catalog.Format(msgs.locale, "playbackWaitingBrowser", nil)
+}
+
+// PlayerCantPlayHere says "MixMusic can't play on this computer"
+// in the language the app shows.
+//
+// A dialog as MixMusic starts, where it can't play: its details say why,
+// then it quits.
+func PlayerCantPlayHere() string { return In(i18n.Locale()).PlayerCantPlayHere() }
+
+// PlayerCantPlayHere says "MixMusic can't play on this computer"
+// in the language of msgs.
+//
+// A dialog as MixMusic starts, where it can't play: its details say why,
+// then it quits.
+func (msgs Messages) PlayerCantPlayHere() string {
+	return Catalog.Format(msgs.locale, "playerCantPlayHere", nil)
 }
 
 // PlayerDeviceActive says "{name} · active"
@@ -19267,6 +19437,70 @@ func (msgs Messages) SurroundTitle() string {
 	return Catalog.Format(msgs.locale, "surroundTitle", nil)
 }
 
+// TaskbarNext says "Next"
+// in the language the app shows.
+//
+// The tooltip of a button on the main window's thumbnail in Windows'
+// taskbar: the next track.
+func TaskbarNext() string { return In(i18n.Locale()).TaskbarNext() }
+
+// TaskbarNext says "Next"
+// in the language of msgs.
+//
+// The tooltip of a button on the main window's thumbnail in Windows'
+// taskbar: the next track.
+func (msgs Messages) TaskbarNext() string {
+	return Catalog.Format(msgs.locale, "taskbarNext", nil)
+}
+
+// TaskbarPause says "Pause"
+// in the language the app shows.
+//
+// The tooltip of a button on the main window's thumbnail in Windows'
+// taskbar.
+func TaskbarPause() string { return In(i18n.Locale()).TaskbarPause() }
+
+// TaskbarPause says "Pause"
+// in the language of msgs.
+//
+// The tooltip of a button on the main window's thumbnail in Windows'
+// taskbar.
+func (msgs Messages) TaskbarPause() string {
+	return Catalog.Format(msgs.locale, "taskbarPause", nil)
+}
+
+// TaskbarPlay says "Play"
+// in the language the app shows.
+//
+// The tooltip of a button on the main window's thumbnail in Windows'
+// taskbar.
+func TaskbarPlay() string { return In(i18n.Locale()).TaskbarPlay() }
+
+// TaskbarPlay says "Play"
+// in the language of msgs.
+//
+// The tooltip of a button on the main window's thumbnail in Windows'
+// taskbar.
+func (msgs Messages) TaskbarPlay() string {
+	return Catalog.Format(msgs.locale, "taskbarPlay", nil)
+}
+
+// TaskbarPrevious says "Previous"
+// in the language the app shows.
+//
+// The tooltip of a button on the main window's thumbnail in Windows'
+// taskbar: the previous track.
+func TaskbarPrevious() string { return In(i18n.Locale()).TaskbarPrevious() }
+
+// TaskbarPrevious says "Previous"
+// in the language of msgs.
+//
+// The tooltip of a button on the main window's thumbnail in Windows'
+// taskbar: the previous track.
+func (msgs Messages) TaskbarPrevious() string {
+	return Catalog.Format(msgs.locale, "taskbarPrevious", nil)
+}
+
 // ThemeOptionAnimeScreentone says "Screentone"
 // in the language the app shows.
 func ThemeOptionAnimeScreentone() string { return In(i18n.Locale()).ThemeOptionAnimeScreentone() }
@@ -21037,6 +21271,92 @@ func TracksPlay(title string) string { return In(i18n.Locale()).TracksPlay(title
 // in the language of msgs.
 func (msgs Messages) TracksPlay(title string) string {
 	return Catalog.Format(msgs.locale, "tracksPlay", map[string]any{"title": title})
+}
+
+// TrayMiniPlayer says "Mini player"
+// in the language the app shows.
+//
+// An item of the tray icon's menu, which shows the mini player.
+func TrayMiniPlayer() string { return In(i18n.Locale()).TrayMiniPlayer() }
+
+// TrayMiniPlayer says "Mini player"
+// in the language of msgs.
+//
+// An item of the tray icon's menu, which shows the mini player.
+func (msgs Messages) TrayMiniPlayer() string {
+	return Catalog.Format(msgs.locale, "trayMiniPlayer", nil)
+}
+
+// TrayNext says "Next"
+// in the language the app shows.
+//
+// An item of the tray icon's menu: the next track.
+func TrayNext() string { return In(i18n.Locale()).TrayNext() }
+
+// TrayNext says "Next"
+// in the language of msgs.
+//
+// An item of the tray icon's menu: the next track.
+func (msgs Messages) TrayNext() string {
+	return Catalog.Format(msgs.locale, "trayNext", nil)
+}
+
+// TrayPaused says "Paused: {playing}"
+// in the language the app shows.
+//
+// The tray icon's tooltip, and the main window's title, while what plays is
+// paused. {playing} is the track and its artists.
+func TrayPaused(playing string) string { return In(i18n.Locale()).TrayPaused(playing) }
+
+// TrayPaused says "Paused: {playing}"
+// in the language of msgs.
+//
+// The tray icon's tooltip, and the main window's title, while what plays is
+// paused. {playing} is the track and its artists.
+func (msgs Messages) TrayPaused(playing string) string {
+	return Catalog.Format(msgs.locale, "trayPaused", map[string]any{"playing": playing})
+}
+
+// TrayPlayPause says "Play / Pause"
+// in the language the app shows.
+//
+// An item of the tray icon's menu.
+func TrayPlayPause() string { return In(i18n.Locale()).TrayPlayPause() }
+
+// TrayPlayPause says "Play / Pause"
+// in the language of msgs.
+//
+// An item of the tray icon's menu.
+func (msgs Messages) TrayPlayPause() string {
+	return Catalog.Format(msgs.locale, "trayPlayPause", nil)
+}
+
+// TrayPrevious says "Previous"
+// in the language the app shows.
+//
+// An item of the tray icon's menu: the previous track.
+func TrayPrevious() string { return In(i18n.Locale()).TrayPrevious() }
+
+// TrayPrevious says "Previous"
+// in the language of msgs.
+//
+// An item of the tray icon's menu: the previous track.
+func (msgs Messages) TrayPrevious() string {
+	return Catalog.Format(msgs.locale, "trayPrevious", nil)
+}
+
+// TrayShowMixMusic says "Show MixMusic"
+// in the language the app shows.
+//
+// An item of the tray icon's menu, which shows the main window.
+func TrayShowMixMusic() string { return In(i18n.Locale()).TrayShowMixMusic() }
+
+// TrayShowMixMusic says "Show MixMusic"
+// in the language of msgs.
+//
+// An item of the tray icon's menu, which shows the main window.
+func (msgs Messages) TrayShowMixMusic() string {
+	return Catalog.Format(msgs.locale, "trayShowMixMusic", nil)
 }
 
 // UpdateOfferDownloading says "Downloading…"

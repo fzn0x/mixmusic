@@ -10,8 +10,9 @@ import (
 )
 
 // TestSaidOutsideTheWindows says the tray's menu and tooltip, the
-// taskbar's buttons, the main window's title, the notifications of likes
-// and the lyrics' notes in the app's language: under the pseudo locale, en-XA, each is a
+// taskbar's buttons, the main window's title, the notifications of likes,
+// the lyrics' notes, the output device's notices and the Discord status
+// in the app's language: under the pseudo locale, en-XA, each is a
 // message of the catalog, in brackets (#775).
 func TestSaidOutsideTheWindows(t *testing.T) {
 	was := i18n.Locale()
@@ -31,7 +32,8 @@ func TestSaidOutsideTheWindows(t *testing.T) {
 	undisliked, _ := dislikedNote(media.Track{Title: "Teardrop"}, false)
 	said = append(said, liked, unliked, disliked, undisliked)
 	paused := playingLine(NowPlaying{Track: &media.Track{Title: "Teardrop", Artists: []media.Ref{{Name: "Massive Attack"}}}})
-	said = append(said, paused, videoNote(), translationError{}.Error())
+	said = append(said, paused, videoNote(), translationError{}.Error(), outputNote("", true), outputNote("Speakers", false),
+		discordBadgeText(media.Track{ID: "file:/a.mp3", Source: media.SourceFile}), errNoOutputs().Error())
 	for _, s := range said {
 		if !strings.HasPrefix(s, "[") || !strings.HasSuffix(s, "]") {
 			t.Errorf("%q isn't a message of the catalog", s)

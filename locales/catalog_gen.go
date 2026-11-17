@@ -5039,6 +5039,40 @@ func (msgs Messages) DialogMoreOf(title string) string {
 	return Catalog.Format(msgs.locale, "dialogMoreOf", map[string]any{"title": title})
 }
 
+// DiscordBadgeFile says "A file on my computer"
+// in the language the app shows.
+//
+// What the small mark on the cover of the Discord status says as it is
+// hovered, for a file on the listener's computer. Others read it on the
+// listener's profile.
+func DiscordBadgeFile() string { return In(i18n.Locale()).DiscordBadgeFile() }
+
+// DiscordBadgeFile says "A file on my computer"
+// in the language of msgs.
+//
+// What the small mark on the cover of the Discord status says as it is
+// hovered, for a file on the listener's computer. Others read it on the
+// listener's profile.
+func (msgs Messages) DiscordBadgeFile() string {
+	return Catalog.Format(msgs.locale, "discordBadgeFile", nil)
+}
+
+// DiscordBadgePaused says "Paused"
+// in the language the app shows.
+//
+// What the small mark on the cover of the Discord status says as it is
+// hovered, while the track is paused.
+func DiscordBadgePaused() string { return In(i18n.Locale()).DiscordBadgePaused() }
+
+// DiscordBadgePaused says "Paused"
+// in the language of msgs.
+//
+// What the small mark on the cover of the Discord status says as it is
+// hovered, while the track is paused.
+func (msgs Messages) DiscordBadgePaused() string {
+	return Catalog.Format(msgs.locale, "discordBadgePaused", nil)
+}
+
 // DiscordCover says "Cover"
 // in the language the app shows.
 func DiscordCover() string { return In(i18n.Locale()).DiscordCover() }
@@ -5183,6 +5217,24 @@ func (msgs Messages) DiscordListenButtonLabel() string {
 	return Catalog.Format(msgs.locale, "discordListenButtonLabel", nil)
 }
 
+// DiscordListenOn says "Listen on {service}"
+// in the language the app shows.
+//
+// The button of the Discord status that opens the track on its service,
+// which others click on the listener's profile. Discord cuts it after 32
+// characters.
+func DiscordListenOn(service string) string { return In(i18n.Locale()).DiscordListenOn(service) }
+
+// DiscordListenOn says "Listen on {service}"
+// in the language of msgs.
+//
+// The button of the Discord status that opens the track on its service,
+// which others click on the listener's profile. Discord cuts it after 32
+// characters.
+func (msgs Messages) DiscordListenOn(service string) string {
+	return Catalog.Format(msgs.locale, "discordListenOn", map[string]any{"service": service})
+}
+
 // DiscordListeningTo says "Listening to {name}"
 // in the language the app shows.
 func DiscordListeningTo(name string) string { return In(i18n.Locale()).DiscordListeningTo(name) }
@@ -5191,6 +5243,24 @@ func DiscordListeningTo(name string) string { return In(i18n.Locale()).DiscordLi
 // in the language of msgs.
 func (msgs Messages) DiscordListeningTo(name string) string {
 	return Catalog.Format(msgs.locale, "discordListeningTo", map[string]any{"name": name})
+}
+
+// DiscordMyComputer says "my computer"
+// in the language the app shows.
+//
+// The service of a file on the listener's computer, as {service} of a line
+// of the Discord status says it, as in "on my computer". Others read it on
+// the listener's profile.
+func DiscordMyComputer() string { return In(i18n.Locale()).DiscordMyComputer() }
+
+// DiscordMyComputer says "my computer"
+// in the language of msgs.
+//
+// The service of a file on the listener's computer, as {service} of a line
+// of the Discord status says it, as in "on my computer". Others read it on
+// the listener's profile.
+func (msgs Messages) DiscordMyComputer() string {
+	return Catalog.Format(msgs.locale, "discordMyComputer", nil)
 }
 
 // DiscordNothingPlays says "Nothing plays: this is how a song would show."
@@ -13243,6 +13313,36 @@ func (msgs Messages) OnTopStays() string {
 	return Catalog.Format(msgs.locale, "onTopStays", nil)
 }
 
+// OutputBack says "Playing on {name} again"
+// in the language the app shows.
+//
+// A notice, as the output device chosen comes back.
+func OutputBack(name string) string { return In(i18n.Locale()).OutputBack(name) }
+
+// OutputBack says "Playing on {name} again"
+// in the language of msgs.
+//
+// A notice, as the output device chosen comes back.
+func (msgs Messages) OutputBack(name string) string {
+	return Catalog.Format(msgs.locale, "outputBack", map[string]any{"name": name})
+}
+
+// OutputBackUnnamed says "Playing on the output device chosen again"
+// in the language the app shows.
+//
+// A notice, as the output device chosen, whose name MixMusic doesn't know,
+// comes back.
+func OutputBackUnnamed() string { return In(i18n.Locale()).OutputBackUnnamed() }
+
+// OutputBackUnnamed says "Playing on the output device chosen again"
+// in the language of msgs.
+//
+// A notice, as the output device chosen, whose name MixMusic doesn't know,
+// comes back.
+func (msgs Messages) OutputBackUnnamed() string {
+	return Catalog.Format(msgs.locale, "outputBackUnnamed", nil)
+}
+
 // OutputChoiceAsideCast says "Playing on {device}: the device is this computer's"
 // in the language the app shows.
 //
@@ -13409,6 +13509,36 @@ func (msgs Messages) OutputDevice() string {
 	return Catalog.Format(msgs.locale, "outputDevice", nil)
 }
 
+// OutputGone says "{name} isn't available: playing on the system's default device until it's back"
+// in the language the app shows.
+//
+// A notice, as the output device chosen goes away.
+func OutputGone(name string) string { return In(i18n.Locale()).OutputGone(name) }
+
+// OutputGone says "{name} isn't available: playing on the system's default device until it's back"
+// in the language of msgs.
+//
+// A notice, as the output device chosen goes away.
+func (msgs Messages) OutputGone(name string) string {
+	return Catalog.Format(msgs.locale, "outputGone", map[string]any{"name": name})
+}
+
+// OutputGoneUnnamed says "The output device chosen isn't available: playing on the system's default device until it's back"
+// in the language the app shows.
+//
+// A notice, as the output device chosen, whose name MixMusic doesn't know,
+// goes away.
+func OutputGoneUnnamed() string { return In(i18n.Locale()).OutputGoneUnnamed() }
+
+// OutputGoneUnnamed says "The output device chosen isn't available: playing on the system's default device until it's back"
+// in the language of msgs.
+//
+// A notice, as the output device chosen, whose name MixMusic doesn't know,
+// goes away.
+func (msgs Messages) OutputGoneUnnamed() string {
+	return Catalog.Format(msgs.locale, "outputGoneUnnamed", nil)
+}
+
 // OutputLookAgain says "Look for devices again"
 // in the language the app shows.
 func OutputLookAgain() string { return In(i18n.Locale()).OutputLookAgain() }
@@ -13417,6 +13547,22 @@ func OutputLookAgain() string { return In(i18n.Locale()).OutputLookAgain() }
 // in the language of msgs.
 func (msgs Messages) OutputLookAgain() string {
 	return Catalog.Format(msgs.locale, "outputLookAgain", nil)
+}
+
+// OutputNoOutputs says "MixMusic can't play sound on this system"
+// in the language the app shows.
+//
+// In the menu of output devices, where the system has none MixMusic can
+// play on.
+func OutputNoOutputs() string { return In(i18n.Locale()).OutputNoOutputs() }
+
+// OutputNoOutputs says "MixMusic can't play sound on this system"
+// in the language of msgs.
+//
+// In the menu of output devices, where the system has none MixMusic can
+// play on.
+func (msgs Messages) OutputNoOutputs() string {
+	return Catalog.Format(msgs.locale, "outputNoOutputs", nil)
 }
 
 // OverlayAbout says "Tells what plays, as a page for the browser source of OBS or another streaming program, and as data for an overlay of…"

@@ -1304,6 +1304,14 @@
       }
     }
   },
+  "discordBadgeFile": "A file on my computer",
+  "@discordBadgeFile": {
+    "description": "What the small mark on the cover of the Discord status says as it is hovered, for a file on the listener's computer. Others read it on the listener's profile."
+  },
+  "discordBadgePaused": "Paused",
+  "@discordBadgePaused": {
+    "description": "What the small mark on the cover of the Discord status says as it is hovered, while the track is paused."
+  },
   "discordCover": "Cover",
   "discordCoverDescription": "Discord shows the cover of what plays, where its service has one online: a file on your computer shows none.",
   "discordCoverLabel": "Show the cover on Discord",
@@ -1332,6 +1340,16 @@
   "discordListenButton": "Listen button",
   "discordListenButtonDescription": "A button that opens the track on YouTube Music or Spotify, which the others who see your profile can click. A file on your computer has none.",
   "discordListenButtonLabel": "Show a Listen button on Discord",
+  "discordListenOn": "Listen on {service}",
+  "@discordListenOn": {
+    "description": "The button of the Discord status that opens the track on its service, which others click on the listener's profile. Discord cuts it after 32 characters.",
+    "placeholders": {
+      "service": {
+        "type": "String",
+        "example": "YouTube Music"
+      }
+    }
+  },
   "discordListeningTo": "Listening to {name}",
   "@discordListeningTo": {
     "placeholders": {
@@ -1339,6 +1357,10 @@
         "type": "String"
       }
     }
+  },
+  "discordMyComputer": "my computer",
+  "@discordMyComputer": {
+    "description": "The service of a file on the listener's computer, as {service} of a line of the Discord status says it, as in \"on my computer\". Others read it on the listener's profile."
   },
   "discordNothingPlays": "Nothing plays: this is how a song would show.",
   "discordPlaceholdersLabel": "Placeholders: {placeholders}. Empty, the line shows nothing.",
@@ -3765,6 +3787,20 @@
   "nowPlayingWaiting": "waiting for the network",
   "onTopNoLonger": "MixMusic no longer stays on top",
   "onTopStays": "MixMusic stays on top of other windows",
+  "outputBack": "Playing on {name} again",
+  "@outputBack": {
+    "description": "A notice, as the output device chosen comes back.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Speakers (Realtek Audio)"
+      }
+    }
+  },
+  "outputBackUnnamed": "Playing on the output device chosen again",
+  "@outputBackUnnamed": {
+    "description": "A notice, as the output device chosen, whose name MixMusic doesn't know, comes back."
+  },
   "outputChoiceAsideCast": "Playing on {device}: the device is this computer's",
   "@outputChoiceAsideCast": {
     "description": "Why the output device can't play: a cast device is playing.",
@@ -3826,7 +3862,25 @@
     }
   },
   "outputDevice": "Output device",
+  "outputGone": "{name} isn't available: playing on the system's default device until it's back",
+  "@outputGone": {
+    "description": "A notice, as the output device chosen goes away.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Speakers (Realtek Audio)"
+      }
+    }
+  },
+  "outputGoneUnnamed": "The output device chosen isn't available: playing on the system's default device until it's back",
+  "@outputGoneUnnamed": {
+    "description": "A notice, as the output device chosen, whose name MixMusic doesn't know, goes away."
+  },
   "outputLookAgain": "Look for devices again",
+  "outputNoOutputs": "MixMusic can't play sound on this system",
+  "@outputNoOutputs": {
+    "description": "In the menu of output devices, where the system has none MixMusic can play on."
+  },
   "overlayAbout": "Tells what plays, as a page for the browser source of OBS or another streaming program, and as data for an overlay of your own. It listens on this computer only, and takes no commands.",
   "overlayAddressProblem": "{error} Choose another port above.",
   "@overlayAddressProblem": {

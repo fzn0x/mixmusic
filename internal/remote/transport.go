@@ -79,14 +79,50 @@ func (f *Frames) Read(v any) error {
 	if n > maxMessage || f.limit > 0 && n > f.limit {
 		return fmt.Errorf("remote: a message of %d bytes", n)
 	}
-	data := make([]byte, n)
-	if _, err := io.ReadFull(f.r, data); err != nil {
+	data, err := f.body(int(n))
+	if err != nil {
 		return quiet(err)
 	}
 	if err := json.Unmarshal(data, v); err != nil {
 		return fmt.Errorf("remote: a message that isn't JSON: %w", err)
 	}
 	return nil
+}
+
+// minRoom is the least room body makes for a message's bytes at a time.
+const minRoom = 512
+
+// body reads the n bytes of a message after its length. It makes room for
+// them as they come, never more than twice what came, so that a length
+// alone, with nothing after it, holds no room for the message it tells
+// (#736).
+func (f *Frames) body(n int) ([]byte, error) {
+	var data []byte
+	for len(data) < n {
+		if len(data) == cap(data) {
+			// Bytes come before the room for them.
+			if _, err := f.r.Peek(1); err != nil {
+				return nil, unexpected(err)
+			}
+			room := min(n, len(data)+max(minRoom, f.r.Buffered(), len(data)))
+			data = append(make([]byte, 0, room), data...)
+		}
+		k, err := f.r.Read(data[len(data):cap(data)])
+		data = data[:len(data)+k]
+		if err != nil && len(data) < n {
+			return nil, unexpected(err)
+		}
+	}
+	return data, nil
+}
+
+// unexpected is io.ErrUnexpectedEOF for a message that ended before its
+// length, as io.ReadFull tells it.
+func unexpected(err error) error {
+	if err == io.EOF {
+		return io.ErrUnexpectedEOF
+	}
+	return err
 }
 
 // Certificate is the self-signed certificate of the key, which TLS

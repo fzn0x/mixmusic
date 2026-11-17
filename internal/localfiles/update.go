@@ -167,7 +167,7 @@ func (x *Index) update(ctx context.Context, changed map[string]bool) (rescan boo
 // read, whose entries stay as they were: those gone as it came to them
 // hold nothing.
 func walkDir(ctx context.Context, dir string) (files []found, unread []string) {
-	_ = filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+	_ = WalkRoot(dir, func(path string, d fs.DirEntry, err error) error {
 		if ctx.Err() != nil {
 			return ctx.Err()
 		}

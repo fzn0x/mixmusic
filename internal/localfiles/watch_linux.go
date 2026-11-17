@@ -91,7 +91,7 @@ func watchFolder(root string, tell Changes) (func(), error) {
 // it that can't be watched, as one it isn't allowed to read, is passed
 // over; dir itself, and the system's limit, fail.
 func (w *folderWatch) addTree(dir string) error {
-	return filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+	return WalkRoot(dir, func(path string, d fs.DirEntry, err error) error {
 		switch {
 		case err != nil && path == dir:
 			return err
@@ -119,7 +119,15 @@ func (w *folderWatch) addTree(dir string) error {
 func (w *folderWatch) add(path string) error {
 	var wd int
 	var err error
-	if cerr := w.raw.Control(func(fd uintptr) { wd, err = syscall.InotifyAddWatch(int(fd), path, watchMask) }); cerr != nil {
+	// IN_DONT_FOLLOW refuses a link, so the folder of music that is one
+	// is watched by the folder it points to, and told by its own path.
+	target := path
+	if path == w.root {
+		if real, rerr := filepath.EvalSymlinks(path); rerr == nil {
+			target = real
+		}
+	}
+	if cerr := w.raw.Control(func(fd uintptr) { wd, err = syscall.InotifyAddWatch(int(fd), target, watchMask) }); cerr != nil {
 		return cerr
 	}
 	if err == nil {

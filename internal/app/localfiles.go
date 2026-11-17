@@ -219,7 +219,7 @@ func (l *LocalFiles) Open(paths []string) Opened {
 			continue
 		case info.IsDir():
 			var in []string
-			_ = filepath.WalkDir(p, func(path string, d fs.DirEntry, err error) error {
+			_ = localfiles.WalkRoot(p, func(path string, d fs.DirEntry, err error) error {
 				if err != nil || len(files)+len(in) >= maxOpened {
 					return nil
 				}

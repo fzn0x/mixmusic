@@ -127,15 +127,15 @@ func (s *shell) shortcutSettings(c *ui.Context) {
 					keys = []string{shortcutWords(current)}
 				}
 				s.row(c, cmd.title, "", func() {
-					label, ink, action := shortcutLabel(current), k.muted, locales.ShortcutsChange()
+					label, ink, action, edit := shortcutLabel(current), k.muted, locales.ShortcutsChange(), "change"
 					switch {
 					case recording:
-						label, ink, action = locales.ShortcutsRecording(), k.accent, locales.ShortcutsCancel()
+						label, ink, action, edit = locales.ShortcutsRecording(), k.accent, locales.ShortcutsCancel(), "cancel"
 					case label == "":
-						label, action = locales.ShortcutsNone(), locales.ShortcutsSet()
+						label, action, edit = locales.ShortcutsNone(), locales.ShortcutsSet(), "set"
 					}
 					ui.Text(c, label).FontSize(k.smallSize()).TextColor(ink).MinWidth(120).TextAlign(ui.End).AlignSelf(ui.Center)
-					b := s.button(c, "shortcut-edit-"+cmd.id, action, false).Label(locales.ShortcutsEditLabel(action, cmd.title))
+					b := s.button(c, "shortcut-edit-"+cmd.id, action, false).Label(locales.ShortcutsEditLabel(edit, cmd.title))
 					if recording {
 						// The keys pressed name the shortcut rather than run
 						// commands, until the button loses the focus.

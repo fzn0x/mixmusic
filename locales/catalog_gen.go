@@ -7717,14 +7717,24 @@ func (msgs Messages) GlobalKeysAnnounce(title string) string {
 	return Catalog.Format(msgs.locale, "globalKeysAnnounce", map[string]any{"title": title})
 }
 
-// GlobalKeysEditLabel says "{action} the global shortcut of {title}"
+// GlobalKeysEditLabel says "{action, select, set {set the global shortcut of {title}} cancel {cancel the global shortcut of {title}} other {chang…"
 // in the language the app shows.
+//
+// What screen readers say of the button beside a command in Settings ›
+// Shortcuts › From any app. {action} is set while the command has no
+// shortcut, cancel while its new keys are being pressed, and change
+// otherwise; {title} is the command, as Play or pause.
 func GlobalKeysEditLabel(action string, title string) string {
 	return In(i18n.Locale()).GlobalKeysEditLabel(action, title)
 }
 
-// GlobalKeysEditLabel says "{action} the global shortcut of {title}"
+// GlobalKeysEditLabel says "{action, select, set {set the global shortcut of {title}} cancel {cancel the global shortcut of {title}} other {chang…"
 // in the language of msgs.
+//
+// What screen readers say of the button beside a command in Settings ›
+// Shortcuts › From any app. {action} is set while the command has no
+// shortcut, cancel while its new keys are being pressed, and change
+// otherwise; {title} is the command, as Play or pause.
 func (msgs Messages) GlobalKeysEditLabel(action string, title string) string {
 	return Catalog.Format(msgs.locale, "globalKeysEditLabel", map[string]any{"action": action, "title": title})
 }
@@ -18227,14 +18237,24 @@ func (msgs Messages) ShortcutsDisplaced(title string) string {
 	return Catalog.Format(msgs.locale, "shortcutsDisplaced", map[string]any{"title": title})
 }
 
-// ShortcutsEditLabel says "{action} the shortcut of {title}"
+// ShortcutsEditLabel says "{action, select, set {set the shortcut of {title}} cancel {cancel the shortcut of {title}} other {change the shortcut…"
 // in the language the app shows.
+//
+// What screen readers say of the button beside a command in Settings ›
+// Shortcuts. {action} is set while the command has no shortcut, cancel
+// while its new keys are being pressed, and change otherwise; {title} is
+// the command, as Play or pause.
 func ShortcutsEditLabel(action string, title string) string {
 	return In(i18n.Locale()).ShortcutsEditLabel(action, title)
 }
 
-// ShortcutsEditLabel says "{action} the shortcut of {title}"
+// ShortcutsEditLabel says "{action, select, set {set the shortcut of {title}} cancel {cancel the shortcut of {title}} other {change the shortcut…"
 // in the language of msgs.
+//
+// What screen readers say of the button beside a command in Settings ›
+// Shortcuts. {action} is set while the command has no shortcut, cancel
+// while its new keys are being pressed, and change otherwise; {title} is
+// the command, as Play or pause.
 func (msgs Messages) ShortcutsEditLabel(action string, title string) string {
 	return Catalog.Format(msgs.locale, "shortcutsEditLabel", map[string]any{"action": action, "title": title})
 }

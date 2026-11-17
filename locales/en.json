@@ -2250,8 +2250,9 @@
       }
     }
   },
-  "globalKeysEditLabel": "{action} the global shortcut of {title}",
+  "globalKeysEditLabel": "{action, select, set {set the global shortcut of {title}} cancel {cancel the global shortcut of {title}} other {change the global shortcut of {title}}}",
   "@globalKeysEditLabel": {
+    "description": "What screen readers say of the button beside a command in Settings › Shortcuts › From any app. {action} is set while the command has no shortcut, cancel while its new keys are being pressed, and change otherwise; {title} is the command, as Play or pause.",
     "placeholders": {
       "action": {
         "type": "String"
@@ -5500,8 +5501,9 @@
       }
     }
   },
-  "shortcutsEditLabel": "{action} the shortcut of {title}",
+  "shortcutsEditLabel": "{action, select, set {set the shortcut of {title}} cancel {cancel the shortcut of {title}} other {change the shortcut of {title}}}",
   "@shortcutsEditLabel": {
+    "description": "What screen readers say of the button beside a command in Settings › Shortcuts. {action} is set while the command has no shortcut, cancel while its new keys are being pressed, and change otherwise; {title} is the command, as Play or pause.",
     "placeholders": {
       "action": {
         "type": "String"

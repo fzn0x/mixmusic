@@ -190,6 +190,8 @@ settings, Animation effects turned off in Windows' accessibility settings,
 or animations turned off on a Linux desktop), MixMusic moves less:
 
 - Aurora's lights, Anime's speed lines and Mochi's sparkles hold still.
+- The visualizer over the cover on the now playing page isn't drawn, and
+  the cover shows whole.
 - The [wavy progress bar](#density-text-size-and-zoom) holds still, and
   goes flat at once when you pause.
 - Lyrics timed [word by word](lyrics.md#word-by-word) light each word

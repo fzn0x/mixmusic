@@ -21,9 +21,9 @@ func TestReasons(t *testing.T) {
 		}
 	}
 	for err, want := range map[error]string{
-		errExpired: ReasonRefused, statusError(http.StatusTooManyRequests): ReasonThrottled, errStalled: ReasonStalled,
-		&url.Error{Op: "Get", URL: "https://example.com", Err: errors.New("refused")}: ReasonUnreachable,
-		statusError(http.StatusInternalServerError):                                   "", failure{"yt-dlp: something new", nil}: "", errors.New("other"): "",
+		errExpired: ReasonRefused, errStalled: ReasonStalled, statusError(http.StatusTooManyRequests): "",
+		&url.Error{Op: "Get", URL: "https://example.com", Err: errors.New("refused")}: "",
+		failure{"yt-dlp: something new", nil}:                                         "", errors.New("other"): "",
 	} {
 		if got := Reason(err); got != want {
 			t.Errorf("Reason(%v) = %q, want %q", err, got, want)

@@ -1,10 +1,6 @@
 package stream
 
-import (
-	"errors"
-	"net/http"
-	"net/url"
-)
+import "errors"
 
 // The reasons a stream wasn't found or failed that the windows tell in
 // their language (#800), as Reason names them. The errors keep their
@@ -34,8 +30,6 @@ const (
 	ReasonRefused = "refused"
 	// ReasonStalled: YouTube stopped sending the audio.
 	ReasonStalled = "stalled"
-	// ReasonUnreachable: YouTube's audio servers couldn't be reached.
-	ReasonUnreachable = "unreachable"
 )
 
 // plainReasons are the reasons of plainErrors, by their plain words.
@@ -54,22 +48,17 @@ var plainReasons = map[string]string{
 
 // Reason names why err, of finding or fetching a stream, failed, when the
 // windows tell it in their language: one of the Reason constants, or ""
-// for an error whose own words tell it.
+// for an error whose own words tell it. HTTP's errors aren't the stream's
+// alone, so they have none.
 func Reason(err error) string {
 	var f failure
-	var status statusError
-	var ue *url.Error
 	switch {
 	case errors.As(err, &f):
 		return plainReasons[f.msg]
 	case errors.Is(err, errExpired):
 		return ReasonRefused
-	case errors.As(err, &status) && status == http.StatusTooManyRequests:
-		return ReasonThrottled
 	case errors.Is(err, errStalled):
 		return ReasonStalled
-	case errors.As(err, &ue):
-		return ReasonUnreachable
 	}
 	return ""
 }

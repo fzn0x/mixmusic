@@ -6,12 +6,44 @@ type Palettes struct {
 	Primary, Secondary, Tertiary, Neutral, NeutralVariant, Error Palette
 }
 
+// greySeed and calmSeed are the HCT chromas under which a seed counts as
+// grey (the scheme is grey) and as near-grey (a calm primary of calmSeed).
+const (
+	greySeed = 5
+	calmSeed = 12
+)
+
 // Core is the palettes Material's core palette makes of a seed colour
 // (CorePalette.of): the primary of its hue and chroma, 48 at least, so
 // that a dull seed still makes a colourful scheme; a calmer secondary; a
-// tertiary of the hue turned 60°; and neutrals barely tinted with it.
+// tertiary of the hue turned 60°; and neutrals barely tinted with it. A seed under chroma 5 makes a grey
+// scheme, and one under 12 a calm primary of chroma 12 (#573).
 func Core(seed ARGB) Palettes {
 	c := FromARGB(seed)
+	switch {
+	case c.Chroma < greySeed:
+		// A black, white or grey seed has no hue to give: the scheme is
+		// grey, whatever hue the rounding left it.
+		return Palettes{
+			Primary:        Palette{c.Hue, 0},
+			Secondary:      Palette{c.Hue, 0},
+			Tertiary:       Palette{sanitizeDegrees(c.Hue + 60), 0},
+			Neutral:        Palette{c.Hue, 0},
+			NeutralVariant: Palette{c.Hue, 0},
+			Error:          Palette{25, 84},
+		}
+	case c.Chroma < calmSeed:
+		// A near-grey seed keeps its hue with a calm primary, not the
+		// strong one a dull seed gets.
+		return Palettes{
+			Primary:        Palette{c.Hue, calmSeed},
+			Secondary:      Palette{c.Hue, 16},
+			Tertiary:       Palette{sanitizeDegrees(c.Hue + 60), 24},
+			Neutral:        Palette{c.Hue, 4},
+			NeutralVariant: Palette{c.Hue, 8},
+			Error:          Palette{25, 84},
+		}
+	}
 	return Palettes{
 		Primary:        Palette{c.Hue, max(48, c.Chroma)},
 		Secondary:      Palette{c.Hue, 16},

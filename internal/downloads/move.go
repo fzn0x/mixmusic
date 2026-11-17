@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"io/fs"
 	"log"
@@ -22,6 +21,32 @@ var rename = os.Rename
 // holds other files.
 const moveFolder = "MixMusic downloads"
 
+// Why a move of the downloads can't start, which the windows tell in their
+// language.
+var (
+	// ErrNoDownloads: there are no downloads to move.
+	ErrNoDownloads = errors.New("MixMusic keeps no downloads here")
+	// ErrMoving: they move already.
+	ErrMoving = errors.New("the downloads are moving already")
+	// ErrSameFolder: they are in that folder already.
+	ErrSameFolder = errors.New("the downloads are in that folder already")
+	// ErrIntoTheirs: the folder is inside theirs.
+	ErrIntoTheirs = errors.New("the downloads can't move into a folder of their own")
+	// ErrCacheFolder: the folder is the cache's, or holds it, or is in it.
+	ErrCacheFolder = errors.New("the downloads can't share a folder with MixMusic's cache")
+)
+
+// A WriteError is why the downloads can't move to Folder: it can't be
+// written to, for Err.
+type WriteError struct {
+	Folder string
+	Err    error
+}
+
+func (e *WriteError) Error() string { return "MixMusic can't write to " + e.Folder + ": " + e.Err.Error() }
+
+func (e *WriteError) Unwrap() error { return e.Err }
+
 // Move moves the downloads to the folder dir, telling progress how many of
 // their bytes moved, and returns the folder they are in then: dir itself
 // when it's empty, or holds MixMusic's downloads, as on a drive used
@@ -31,7 +56,7 @@ const moveFolder = "MixMusic downloads"
 // them where they were.
 func (m *Manager) Move(ctx context.Context, dir string, exact bool, progress func(done, total int64)) (string, error) {
 	if m == nil {
-		return "", errors.New("MixMusic keeps no downloads here")
+		return "", ErrNoDownloads
 	}
 	dir, err := filepath.Abs(dir)
 	if err != nil {
@@ -46,21 +71,21 @@ func (m *Manager) Move(ctx context.Context, dir string, exact bool, progress fun
 	switch {
 	case m.holds[holdMoving].why != "":
 		m.mu.Unlock()
-		return "", errors.New("the downloads are moving already")
+		return "", ErrMoving
 	case same(target, cur):
 		m.mu.Unlock()
-		return "", errors.New("the downloads are in that folder already")
+		return "", ErrSameFolder
 	case inside(target, cur):
 		m.mu.Unlock()
-		return "", errors.New("the downloads can't move into a folder of their own")
+		return "", ErrIntoTheirs
 	}
 	for _, avoid := range m.opts.Avoid {
 		if same(target, avoid) || inside(target, avoid) || inside(avoid, target) {
 			m.mu.Unlock()
-			return "", errors.New("the downloads can't share a folder with MixMusic's cache")
+			return "", ErrCacheFolder
 		}
 	}
-	m.setHold(holdMoving, true, "Moving to "+target, time.Time{})
+	m.setHold(holdMoving, true, "Moving to "+target, time.Time{}, target)
 	m.publish()
 	m.mu.Unlock()
 	release := func() {
@@ -75,7 +100,7 @@ func (m *Manager) Move(ctx context.Context, dir string, exact bool, progress fun
 	}
 	if err := writable(target); err != nil {
 		release()
-		return "", fmt.Errorf("MixMusic can't write to %s: %w", target, err)
+		return "", &WriteError{Folder: target, Err: err}
 	}
 	theirs, _, err := readIndex(target)
 	if err != nil {

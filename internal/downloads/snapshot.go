@@ -33,8 +33,10 @@ type TrackState struct {
 	// Progress is how far a download under way came, from 0 to 1, or -1
 	// before its size is known.
 	Progress float64
-	// Why is why it failed, in plain words.
-	Why string
+	// Why is why it failed, in plain words, and Reason the reason, one of
+	// the Reason constants, when the windows tell it in their language,
+	// or "".
+	Why, Reason string
 }
 
 // Kept is a track downloaded: the video whose audio plays for it, the
@@ -52,9 +54,13 @@ type Job struct {
 	Track media.Track
 	State TrackState
 	// Phase tells what a download under way does, when it isn't fetching
-	// the audio: "finding its recording on YouTube Music".
+	// the audio: PhaseFinding, or "".
 	Phase string
 }
+
+// PhaseFinding is the Phase of a Spotify track's download that finds its
+// recording on YouTube Music.
+const PhaseFinding = "finding its recording on YouTube Music"
 
 // CollectionView is a collection downloaded, and how many of its tracks
 // play without the network.
@@ -76,8 +82,13 @@ type Status struct {
 	// nothing to do: "12 of 57", of BatchDone+Waiting.
 	BatchDone int
 	Paused    bool
-	// Hold is why the downloads wait, or "" when they don't.
+	// Hold is why the downloads wait, in English, or "" when they don't.
 	Hold string
+	// HoldKind is the hold that keeps them waiting, one of the Hold
+	// constants, or "", and HoldArgs what it tells, for the windows to
+	// say it in their language.
+	HoldKind string
+	HoldArgs []string
 	// Folder is the folder the downloads are in, and Problem why it can't
 	// be used, or "".
 	Folder, Problem string
@@ -282,6 +293,9 @@ func (m *Manager) publish() {
 		st.Problem, _ = m.held()
 	}
 	st.Hold, _ = m.held()
+	var h hold
+	st.HoldKind, h = m.holding()
+	st.HoldArgs = h.args
 	type queued struct {
 		seq int64
 		job Job
@@ -306,7 +320,7 @@ func (m *Manager) publish() {
 			st.Tracks++
 			done = append(done, e)
 		case e.Failed != "":
-			s.states[id] = TrackState{Kind: Failed, Why: e.Failed}
+			s.states[id] = TrackState{Kind: Failed, Why: e.Failed, Reason: e.Reason}
 			st.Failed++
 			failed = append(failed, queued{e.Seq, Job{Track: e.Track, State: s.states[id]}})
 		default:

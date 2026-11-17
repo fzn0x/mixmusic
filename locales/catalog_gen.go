@@ -7945,6 +7945,42 @@ func (msgs Messages) FailureCopyLabel() string {
 	return Catalog.Format(msgs.locale, "failureCopyLabel", nil)
 }
 
+// FailureFromFile says "a file on this computer"
+// in the language the app shows.
+//
+// Where a track of a failure comes from, in its details: it goes in the
+// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
+// and of failurePlayedAs.
+func FailureFromFile() string { return In(i18n.Locale()).FailureFromFile() }
+
+// FailureFromFile says "a file on this computer"
+// in the language of msgs.
+//
+// Where a track of a failure comes from, in its details: it goes in the
+// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
+// and of failurePlayedAs.
+func (msgs Messages) FailureFromFile() string {
+	return Catalog.Format(msgs.locale, "failureFromFile", nil)
+}
+
+// FailureFromFileAt says "a file on this computer, {path}"
+// in the language the app shows.
+//
+// Where a track of a failure comes from, in its details: it goes in the
+// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
+// and of failurePlayedAs. {path} is the file's path.
+func FailureFromFileAt(path string) string { return In(i18n.Locale()).FailureFromFileAt(path) }
+
+// FailureFromFileAt says "a file on this computer, {path}"
+// in the language of msgs.
+//
+// Where a track of a failure comes from, in its details: it goes in the
+// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
+// and of failurePlayedAs. {path} is the file's path.
+func (msgs Messages) FailureFromFileAt(path string) string {
+	return Catalog.Format(msgs.locale, "failureFromFileAt", map[string]any{"path": path})
+}
+
 // FailureFromWhen says "{from} · {when}"
 // in the language the app shows.
 func FailureFromWhen(from string, when string) string {
@@ -7969,6 +8005,24 @@ func (msgs Messages) FailurePlayedAs(track string, from string) string {
 	return Catalog.Format(msgs.locale, "failurePlayedAs", map[string]any{"track": track, "from": from})
 }
 
+// FailureStep says "{way}: {why}"
+// in the language the app shows.
+//
+// A line of what was tried, in the failure details of a track that couldn't
+// play. {way} is one of the failureWay messages; {why} is why it failed, in
+// the words of the error, often English.
+func FailureStep(way string, why string) string { return In(i18n.Locale()).FailureStep(way, why) }
+
+// FailureStep says "{way}: {why}"
+// in the language of msgs.
+//
+// A line of what was tried, in the failure details of a track that couldn't
+// play. {way} is one of the failureWay messages; {why} is why it failed, in
+// the words of the error, often English.
+func (msgs Messages) FailureStep(way string, why string) string {
+	return Catalog.Format(msgs.locale, "failureStep", map[string]any{"way": way, "why": why})
+}
+
 // FailureStepNumbered says "{n}. {step}"
 // in the language the app shows.
 func FailureStepNumbered(n int, step string) string {
@@ -7979,6 +8033,28 @@ func FailureStepNumbered(n int, step string) string {
 // in the language of msgs.
 func (msgs Messages) FailureStepNumbered(n int, step string) string {
 	return Catalog.Format(msgs.locale, "failureStepNumbered", map[string]any{"n": n, "step": step})
+}
+
+// FailureStepTimes says "{way}, {times, plural, one {# time} other {# times}}: {why}"
+// in the language the app shows.
+//
+// A line of what was tried, in the failure details of a track that couldn't
+// play, when it failed so several times in a row. {way} is one of the
+// failureWay messages; {why} is why it failed, in the words of the error,
+// often English.
+func FailureStepTimes(way string, times int, why string) string {
+	return In(i18n.Locale()).FailureStepTimes(way, times, why)
+}
+
+// FailureStepTimes says "{way}, {times, plural, one {# time} other {# times}}: {why}"
+// in the language of msgs.
+//
+// A line of what was tried, in the failure details of a track that couldn't
+// play, when it failed so several times in a row. {way} is one of the
+// failureWay messages; {why} is why it failed, in the words of the error,
+// often English.
+func (msgs Messages) FailureStepTimes(way string, times int, why string) string {
+	return Catalog.Format(msgs.locale, "failureStepTimes", map[string]any{"way": way, "times": times, "why": why})
 }
 
 // FailureStopped says "MixMusic stopped playing after it, as the tracks just before it couldn't play either."
@@ -8001,6 +8077,60 @@ func (msgs Messages) FailureTitle() string {
 	return Catalog.Format(msgs.locale, "failureTitle", nil)
 }
 
+// FailureTrackBy says "{title}, by {artists}"
+// in the language the app shows.
+//
+// The track of a failure, in its details and in Settings › About ›
+// Recent playback errors.
+func FailureTrackBy(title string, artists string) string {
+	return In(i18n.Locale()).FailureTrackBy(title, artists)
+}
+
+// FailureTrackBy says "{title}, by {artists}"
+// in the language of msgs.
+//
+// The track of a failure, in its details and in Settings › About ›
+// Recent playback errors.
+func (msgs Messages) FailureTrackBy(title string, artists string) string {
+	return Catalog.Format(msgs.locale, "failureTrackBy", map[string]any{"title": title, "artists": artists})
+}
+
+// FailureTrackByOn says "{title}, by {artists}, on {album}"
+// in the language the app shows.
+//
+// The track of a failure, in its details and in Settings › About ›
+// Recent playback errors.
+func FailureTrackByOn(title string, artists string, album string) string {
+	return In(i18n.Locale()).FailureTrackByOn(title, artists, album)
+}
+
+// FailureTrackByOn says "{title}, by {artists}, on {album}"
+// in the language of msgs.
+//
+// The track of a failure, in its details and in Settings › About ›
+// Recent playback errors.
+func (msgs Messages) FailureTrackByOn(title string, artists string, album string) string {
+	return Catalog.Format(msgs.locale, "failureTrackByOn", map[string]any{"title": title, "artists": artists, "album": album})
+}
+
+// FailureTrackOn says "{title}, on {album}"
+// in the language the app shows.
+//
+// The track of a failure, of no artists known, in its details and in
+// Settings › About › Recent playback errors.
+func FailureTrackOn(title string, album string) string {
+	return In(i18n.Locale()).FailureTrackOn(title, album)
+}
+
+// FailureTrackOn says "{title}, on {album}"
+// in the language of msgs.
+//
+// The track of a failure, of no artists known, in its details and in
+// Settings › About › Recent playback errors.
+func (msgs Messages) FailureTrackOn(title string, album string) string {
+	return Catalog.Format(msgs.locale, "failureTrackOn", map[string]any{"title": title, "album": album})
+}
+
 // FailureTried says "What was tried"
 // in the language the app shows.
 func FailureTried() string { return In(i18n.Locale()).FailureTried() }
@@ -8009,6 +8139,180 @@ func FailureTried() string { return In(i18n.Locale()).FailureTried() }
 // in the language of msgs.
 func (msgs Messages) FailureTried() string {
 	return Catalog.Format(msgs.locale, "failureTried", nil)
+}
+
+// FailureWayAgain says "{way}, tried again"
+// in the language the app shows.
+//
+// A way MixMusic tried once more to play a track, in the failure details.
+// {way} is one of the failureWay messages.
+func FailureWayAgain(way string) string { return In(i18n.Locale()).FailureWayAgain(way) }
+
+// FailureWayAgain says "{way}, tried again"
+// in the language of msgs.
+//
+// A way MixMusic tried once more to play a track, in the failure details.
+// {way} is one of the failureWay messages.
+func (msgs Messages) FailureWayAgain(way string) string {
+	return Catalog.Format(msgs.locale, "failureWayAgain", map[string]any{"way": way})
+}
+
+// FailureWayFile says "The file"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: the track's file on this computer. It starts a line of what was
+// tried, before why it failed.
+func FailureWayFile() string { return In(i18n.Locale()).FailureWayFile() }
+
+// FailureWayFile says "The file"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: the track's file on this computer. It starts a line of what was
+// tried, before why it failed.
+func (msgs Messages) FailureWayFile() string {
+	return Catalog.Format(msgs.locale, "failureWayFile", nil)
+}
+
+// FailureWayFindingRecording says "Finding it on YouTube Music"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a Spotify track that couldn't play, in the
+// failure details: finding its recording on YouTube Music, which plays in
+// its place. It starts a line of what was tried.
+func FailureWayFindingRecording() string { return In(i18n.Locale()).FailureWayFindingRecording() }
+
+// FailureWayFindingRecording says "Finding it on YouTube Music"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a Spotify track that couldn't play, in the
+// failure details: finding its recording on YouTube Music, which plays in
+// its place. It starts a line of what was tried.
+func (msgs Messages) FailureWayFindingRecording() string {
+	return Catalog.Format(msgs.locale, "failureWayFindingRecording", nil)
+}
+
+// FailureWayFindingStream says "Finding its stream"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: finding the address of its audio. It starts a line of what was
+// tried.
+func FailureWayFindingStream() string { return In(i18n.Locale()).FailureWayFindingStream() }
+
+// FailureWayFindingStream says "Finding its stream"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: finding the address of its audio. It starts a line of what was
+// tried.
+func (msgs Messages) FailureWayFindingStream() string {
+	return Catalog.Format(msgs.locale, "failureWayFindingStream", nil)
+}
+
+// FailureWayLive says "The live stream"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: a broadcast that goes on now. It starts a line of what was
+// tried.
+func FailureWayLive() string { return In(i18n.Locale()).FailureWayLive() }
+
+// FailureWayLive says "The live stream"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: a broadcast that goes on now. It starts a line of what was
+// tried.
+func (msgs Messages) FailureWayLive() string {
+	return Catalog.Format(msgs.locale, "failureWayLive", nil)
+}
+
+// FailureWayOffline says "The download, or the offline cache"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: its audio kept on this computer. It starts a line of what was
+// tried.
+func FailureWayOffline() string { return In(i18n.Locale()).FailureWayOffline() }
+
+// FailureWayOffline says "The download, or the offline cache"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: its audio kept on this computer. It starts a line of what was
+// tried.
+func (msgs Messages) FailureWayOffline() string {
+	return Catalog.Format(msgs.locale, "failureWayOffline", nil)
+}
+
+// FailureWayPlayerAPI says "YouTube's player API"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: the service of YouTube that gives a video's streams. It starts a
+// line of what was tried.
+func FailureWayPlayerAPI() string { return In(i18n.Locale()).FailureWayPlayerAPI() }
+
+// FailureWayPlayerAPI says "YouTube's player API"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: the service of YouTube that gives a video's streams. It starts a
+// line of what was tried.
+func (msgs Messages) FailureWayPlayerAPI() string {
+	return Catalog.Format(msgs.locale, "failureWayPlayerAPI", nil)
+}
+
+// FailureWaySpotifyHere says "Spotify in MixMusic"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: Spotify's own player inside MixMusic, as Settings › Playback
+// calls it. It starts a line of what was tried.
+func FailureWaySpotifyHere() string { return In(i18n.Locale()).FailureWaySpotifyHere() }
+
+// FailureWaySpotifyHere says "Spotify in MixMusic"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: Spotify's own player inside MixMusic, as Settings › Playback
+// calls it. It starts a line of what was tried.
+func (msgs Messages) FailureWaySpotifyHere() string {
+	return Catalog.Format(msgs.locale, "failureWaySpotifyHere", nil)
+}
+
+// FailureWayStream says "The stream"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: its audio from YouTube. It starts a line of what was tried.
+func FailureWayStream() string { return In(i18n.Locale()).FailureWayStream() }
+
+// FailureWayStream says "The stream"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: its audio from YouTube. It starts a line of what was tried.
+func (msgs Messages) FailureWayStream() string {
+	return Catalog.Format(msgs.locale, "failureWayStream", nil)
+}
+
+// FailureWaySurround says "Its 5.1 surround audio"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details. It starts a line of what was tried.
+func FailureWaySurround() string { return In(i18n.Locale()).FailureWaySurround() }
+
+// FailureWaySurround says "Its 5.1 surround audio"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details. It starts a line of what was tried.
+func (msgs Messages) FailureWaySurround() string {
+	return Catalog.Format(msgs.locale, "failureWaySurround", nil)
 }
 
 // FirewallAllow says "allow"

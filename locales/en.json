@@ -2331,6 +2331,19 @@
   "failureClose": "close",
   "failureCopied": "Copied the details, without your accounts' names",
   "failureCopyLabel": "copy the details",
+  "failureFromFile": "a file on this computer",
+  "@failureFromFile": {
+    "description": "Where a track of a failure comes from, in its details: it goes in the {from} of failureFromWhen, whose first letter MixMusic makes a capital, and of failurePlayedAs."
+  },
+  "failureFromFileAt": "a file on this computer, {path}",
+  "@failureFromFileAt": {
+    "description": "Where a track of a failure comes from, in its details: it goes in the {from} of failureFromWhen, whose first letter MixMusic makes a capital, and of failurePlayedAs. {path} is the file's path.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
   "failureFromWhen": "{from} · {when}",
   "@failureFromWhen": {
     "placeholders": {
@@ -2353,6 +2366,18 @@
       }
     }
   },
+  "failureStep": "{way}: {why}",
+  "@failureStep": {
+    "description": "A line of what was tried, in the failure details of a track that couldn't play. {way} is one of the failureWay messages; {why} is why it failed, in the words of the error, often English.",
+    "placeholders": {
+      "way": {
+        "type": "String"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
   "failureStepNumbered": "{n}. {step}",
   "@failureStepNumbered": {
     "placeholders": {
@@ -2364,9 +2389,108 @@
       }
     }
   },
+  "failureStepTimes": "{way}, {times, plural, one {# time} other {# times}}: {why}",
+  "@failureStepTimes": {
+    "description": "A line of what was tried, in the failure details of a track that couldn't play, when it failed so several times in a row. {way} is one of the failureWay messages; {why} is why it failed, in the words of the error, often English.",
+    "placeholders": {
+      "way": {
+        "type": "String"
+      },
+      "times": {
+        "type": "int"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
   "failureStopped": "MixMusic stopped playing after it, as the tracks just before it couldn't play either.",
   "failureTitle": "Why it couldn't play",
+  "failureTrackBy": "{title}, by {artists}",
+  "@failureTrackBy": {
+    "description": "The track of a failure, in its details and in Settings › About › Recent playback errors.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTrackByOn": "{title}, by {artists}, on {album}",
+  "@failureTrackByOn": {
+    "description": "The track of a failure, in its details and in Settings › About › Recent playback errors.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      },
+      "album": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTrackOn": "{title}, on {album}",
+  "@failureTrackOn": {
+    "description": "The track of a failure, of no artists known, in its details and in Settings › About › Recent playback errors.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "album": {
+        "type": "String"
+      }
+    }
+  },
   "failureTried": "What was tried",
+  "failureWayAgain": "{way}, tried again",
+  "@failureWayAgain": {
+    "description": "A way MixMusic tried once more to play a track, in the failure details. {way} is one of the failureWay messages.",
+    "placeholders": {
+      "way": {
+        "type": "String"
+      }
+    }
+  },
+  "failureWayFile": "The file",
+  "@failureWayFile": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: the track's file on this computer. It starts a line of what was tried, before why it failed."
+  },
+  "failureWayFindingRecording": "Finding it on YouTube Music",
+  "@failureWayFindingRecording": {
+    "description": "A way MixMusic tried to play a Spotify track that couldn't play, in the failure details: finding its recording on YouTube Music, which plays in its place. It starts a line of what was tried."
+  },
+  "failureWayFindingStream": "Finding its stream",
+  "@failureWayFindingStream": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: finding the address of its audio. It starts a line of what was tried."
+  },
+  "failureWayLive": "The live stream",
+  "@failureWayLive": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: a broadcast that goes on now. It starts a line of what was tried."
+  },
+  "failureWayOffline": "The download, or the offline cache",
+  "@failureWayOffline": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: its audio kept on this computer. It starts a line of what was tried."
+  },
+  "failureWayPlayerAPI": "YouTube's player API",
+  "@failureWayPlayerAPI": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: the service of YouTube that gives a video's streams. It starts a line of what was tried."
+  },
+  "failureWaySpotifyHere": "Spotify in MixMusic",
+  "@failureWaySpotifyHere": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: Spotify's own player inside MixMusic, as Settings › Playback calls it. It starts a line of what was tried."
+  },
+  "failureWayStream": "The stream",
+  "@failureWayStream": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: its audio from YouTube. It starts a line of what was tried."
+  },
+  "failureWaySurround": "Its 5.1 surround audio",
+  "@failureWaySurround": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details. It starts a line of what was tried."
+  },
   "firewallAllow": "allow",
   "firewallAllowLabel": "Allow MixMusic in Windows Firewall",
   "firewallAllowed": "Windows Firewall lets MixMusic in on private networks",

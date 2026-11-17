@@ -388,11 +388,13 @@ func (r *Resolver) Forget(videoID string) {
 
 // resolve finds the stream of a video through the direct route, when the
 // resolver has it, else with yt-dlp, quickly first (findWithYTDLP); as
-// the user's account first, while they ask for that (accountStream). The
-// log tells when it took a while, and why and how yt-dlp found it, never
-// the stream's URL, which carries the user's IP address.
+// the user's account first, while they ask for that (accountStream), and
+// once more after YouTube's sign-in wall, for a video whose stream found
+// so it refused (againAsAccount). The log tells when it took a while, and
+// why and how yt-dlp found it, never the stream's URL, which carries the
+// user's IP address.
 func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality) (Stream, error) {
-	if s, ok := r.accountStream(ctx, videoID, quality); ok {
+	if s, ok := r.accountStream(ctx, videoID, quality, false); ok {
 		return s, nil
 	}
 	start := time.Now()
@@ -416,6 +418,9 @@ func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality)
 	}
 	s, run, err := r.findWithYTDLP(ctx, videoID, quality, direct)
 	if err != nil {
+		if s, ok := r.againAsAccount(ctx, videoID, quality, err); ok {
+			return s, nil
+		}
 		// Without yt-dlp, why YouTube gave the direct route no stream is
 		// the better answer, when it is a plain one.
 		var refused playabilityError

@@ -43,7 +43,9 @@ type WriteError struct {
 	Err    error
 }
 
-func (e *WriteError) Error() string { return "MixMusic can't write to " + e.Folder + ": " + e.Err.Error() }
+func (e *WriteError) Error() string {
+	return "MixMusic can't write to " + e.Folder + ": " + e.Err.Error()
+}
 
 func (e *WriteError) Unwrap() error { return e.Err }
 

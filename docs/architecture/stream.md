@@ -77,8 +77,16 @@
   holding LOGIN_INFO and SAPISID, without which yt-dlp asks signed out.
   The run gets `accountTimeout`, 30 s; one that fails, finds nothing the
   engine plays, or a live stream, falls back to the ways above, and a
-  stream found so that YouTube refuses (`Forget`) is found signed out
-  from then on (`refusedAsAccount`). `Stream.AsAccount` tells which way a
+  stream found so that YouTube refuses (`Forget`) marks its video, found
+  signed out for `refusalMark`, 10 minutes (`refusedAsAccount`, #578).
+  `SetAsAccount` clears the marks, and so does another session, told by
+  a hash of its LOGIN_INFO and SAPISID cookies (`sessionKey`, `marked`):
+  the app gives none signed out, after YouTube ended it, or as another
+  Google account. A marked video whose signed-out ways meet YouTube's
+  sign-in wall (`signInWall`: "Please sign in", the check of age, a
+  channel's members only) is asked for as the account once more, once a
+  resolve (`againAsAccount`), never with data saver.
+  `Stream.AsAccount` tells which way a
   stream was found. `Stream.Route` tells which route found it, and
   `Stream.Args` the arguments of the run of yt-dlp that did (#475): Track
   info shows them through `ShownArgs`, which hides the session file, tokens

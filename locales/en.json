@@ -26,6 +26,18 @@
   "aboutReport": "report a problem",
   "aboutShow": "show",
   "aboutSourceCode": "source code",
+  "aboutTranslation": "Translation",
+  "@aboutTranslation": {
+    "description": "The group of Settings › About, and its row, that shows only in a language a machine translated."
+  },
+  "aboutTranslationFix": "fix the translation",
+  "@aboutTranslationFix": {
+    "description": "A link to how to send fixes of a translation, on GitHub. Lowercase, as the buttons of About are."
+  },
+  "aboutTranslationMachine": "MixMusic was translated into this language by a machine, so some of its words may be wrong. If it's your language, you can help fix them.",
+  "@aboutTranslationMachine": {
+    "description": "Shows only in a language a machine translated, in that language: this language is the one the sentence is in."
+  },
   "aboutVersion": "Version",
   "accountSettingsAPIKey": "API key",
   "accountSettingsApproveLastfm": "Approve MixMusic on Last.fm, in your browser",

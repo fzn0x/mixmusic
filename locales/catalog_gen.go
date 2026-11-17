@@ -222,6 +222,54 @@ func (msgs Messages) AboutSourceCode() string {
 	return Catalog.Format(msgs.locale, "aboutSourceCode", nil)
 }
 
+// AboutTranslation says "Translation"
+// in the language the app shows.
+//
+// The group of Settings › About, and its row, that shows only in a
+// language a machine translated.
+func AboutTranslation() string { return In(i18n.Locale()).AboutTranslation() }
+
+// AboutTranslation says "Translation"
+// in the language of msgs.
+//
+// The group of Settings › About, and its row, that shows only in a
+// language a machine translated.
+func (msgs Messages) AboutTranslation() string {
+	return Catalog.Format(msgs.locale, "aboutTranslation", nil)
+}
+
+// AboutTranslationFix says "fix the translation"
+// in the language the app shows.
+//
+// A link to how to send fixes of a translation, on GitHub. Lowercase, as
+// the buttons of About are.
+func AboutTranslationFix() string { return In(i18n.Locale()).AboutTranslationFix() }
+
+// AboutTranslationFix says "fix the translation"
+// in the language of msgs.
+//
+// A link to how to send fixes of a translation, on GitHub. Lowercase, as
+// the buttons of About are.
+func (msgs Messages) AboutTranslationFix() string {
+	return Catalog.Format(msgs.locale, "aboutTranslationFix", nil)
+}
+
+// AboutTranslationMachine says "MixMusic was translated into this language by a machine, so some of its words may be wrong. If it's your language, yo…"
+// in the language the app shows.
+//
+// Shows only in a language a machine translated, in that language: this
+// language is the one the sentence is in.
+func AboutTranslationMachine() string { return In(i18n.Locale()).AboutTranslationMachine() }
+
+// AboutTranslationMachine says "MixMusic was translated into this language by a machine, so some of its words may be wrong. If it's your language, yo…"
+// in the language of msgs.
+//
+// Shows only in a language a machine translated, in that language: this
+// language is the one the sentence is in.
+func (msgs Messages) AboutTranslationMachine() string {
+	return Catalog.Format(msgs.locale, "aboutTranslationMachine", nil)
+}
+
 // AboutVersion says "Version"
 // in the language the app shows.
 func AboutVersion() string { return In(i18n.Locale()).AboutVersion() }

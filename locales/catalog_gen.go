@@ -8718,6 +8718,26 @@ func (msgs Messages) LibraryLoadMore(loaded string, total string) string {
 	return Catalog.Format(msgs.locale, "libraryLoadMore", map[string]any{"loaded": loaded, "total": total})
 }
 
+// LibraryLoadingMore says "Loading more…"
+// in the language the app shows.
+//
+// Foot of a list of the user's YouTube Music library that shows what it has
+// read so far, and reads on: playlists, albums, artists, songs, podcasts.
+// Also the last item of the menu that adds a track to a YouTube Music
+// playlist.
+func LibraryLoadingMore() string { return In(i18n.Locale()).LibraryLoadingMore() }
+
+// LibraryLoadingMore says "Loading more…"
+// in the language of msgs.
+//
+// Foot of a list of the user's YouTube Music library that shows what it has
+// read so far, and reads on: playlists, albums, artists, songs, podcasts.
+// Also the last item of the menu that adds a track to a YouTube Music
+// playlist.
+func (msgs Messages) LibraryLoadingMore() string {
+	return Catalog.Format(msgs.locale, "libraryLoadingMore", nil)
+}
+
 // LibraryMixes says "Mixes"
 // in the language the app shows.
 //

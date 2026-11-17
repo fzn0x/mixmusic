@@ -785,6 +785,11 @@ type loaded[T any] struct {
 	answers int
 	// refreshing is set from the user's refresh until its answer comes.
 	refreshing bool
+	// part is what a list that streams (streamed) has read so far, while
+	// it comes: its first answer isn't done, and coming is set. A page
+	// that wants the whole list waits for done, as it did.
+	part   T
+	coming bool
 }
 
 // fetch returns what get gives for key, which it asks for once, beside the
@@ -792,6 +797,13 @@ type loaded[T any] struct {
 // by refetch or a refresh, it keeps what it got until the new answer
 // comes, and a refresh that fails keeps it after.
 func fetch[T any](s *shell, key string, get func(ctx context.Context) (T, error)) *loaded[T] {
+	return fetchAs(s, key, get, false)
+}
+
+// fetchAs is fetch, which for a list that streams hands what get reads of
+// it, page after page, to the page as it comes (media.WithPartial), for
+// the first answer only: a refresh keeps what it shows until the answer.
+func fetchAs[T any](s *shell, key string, get func(ctx context.Context) (T, error), streams bool) *loaded[T] {
 	// What the page shown fetches, a refresh asks again for. The accounts
 	// follow the app's changes (refresh): no page refreshes them.
 	if s.collecting && key != "accounts" {
@@ -811,12 +823,23 @@ func fetch[T any](s *shell, key string, get func(ctx context.Context) (T, error)
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
+		if streams {
+			ctx = media.WithPartial(ctx, func(read T) {
+				s.update(func() {
+					if l.asks == ask && !l.done {
+						l.part, l.coming = read, true
+					}
+				})
+			})
+		}
 		v, err := get(ctx)
 		s.update(func() {
 			// An answer to an older ask that comes last is older too.
 			if l.asks != ask {
 				return
 			}
+			var none T
+			l.part, l.coming = none, false
 			l.refreshing = false
 			if refreshing && err != nil && l.done && l.err == nil {
 				// Unless the page forgot it meanwhile, as after signing in.

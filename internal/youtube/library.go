@@ -145,9 +145,18 @@ func libraryList[T any](ctx context.Context, c *Client, browseID string, pick fu
 			out = append(out, v)
 		}
 	}
+	// What came so far goes to a reader that asked (media.WithPartial),
+	// after each page. out only grows past what was handed over, so a
+	// reader may keep what it got.
+	handOver := func() {
+		if partial := media.Partial[[]T](ctx); partial != nil && len(out) > 0 {
+			partial(out[:len(out):len(out)])
+		}
+	}
 	for _, s := range parseShelves(n) {
 		take(s.Items)
 	}
+	handOver()
 	token, asked := listToken(n), map[string]bool{}
 	var end error
 	for pages := 1; token != ""; pages++ {
@@ -177,7 +186,11 @@ func libraryList[T any](ctx context.Context, c *Client, browseID string, pick fu
 		if end != nil {
 			break
 		}
+		before := len(out)
 		take(parseItems(contents))
+		if len(out) > before {
+			handOver()
+		}
 		token = next
 	}
 	if end == nil {

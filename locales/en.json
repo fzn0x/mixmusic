@@ -2501,6 +2501,10 @@
       }
     }
   },
+  "libraryLoadingMore": "Loading more…",
+  "@libraryLoadingMore": {
+    "description": "Foot of a list of the user's YouTube Music library that shows what it has read so far, and reads on: playlists, albums, artists, songs, podcasts. Also the last item of the menu that adds a track to a YouTube Music playlist."
+  },
   "libraryMixes": "Mixes",
   "@libraryMixes": {
     "description": "Library pivot: the user's mixes."

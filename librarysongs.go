@@ -134,7 +134,7 @@ func (s *shell) youtubeSongsList(c *ui.Context) {
 	s.sectionTitle(c, locales.LibrarySongsTitle())
 	songs := s.youtubeSongs()
 	switch {
-	case !songs.done:
+	case songs.waiting():
 		s.loading(c)
 		return
 	case songs.err != nil:
@@ -145,6 +145,9 @@ func (s *shell) youtubeSongsList(c *ui.Context) {
 			return
 		}
 	}
-	s.trackList(c, "youtube-songs", songs.value, trackListOptions{art: true, album: true,
+	s.trackList(c, "youtube-songs", songs.shown(), trackListOptions{art: true, album: true,
 		empty: locales.LibrarySongsEmpty()})
+	if songs.growing() {
+		s.moreComing(c, "youtube-songs")
+	}
 }

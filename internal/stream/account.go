@@ -70,7 +70,7 @@ func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Qu
 	}
 	more, then := "", "it's found signed out"
 	if again {
-		more, then = " once more", "nor is it signed out, where YouTube asks to sign in"
+		more, then = " once more", "nor is it signed out, where YouTube plays it only to some signed-in viewers"
 	}
 	start := time.Now()
 	actx, cancel := context.WithTimeout(ctx, accountTimeout)
@@ -110,9 +110,10 @@ func (r *Resolver) againAsAccount(ctx context.Context, videoID string, quality Q
 
 // signInWalls are parts of yt-dlp's errors, as plainErrors has them, of a
 // video YouTube plays only to signed-in viewers: its "Please sign in", its
-// check of age, and a channel's members only. Its check of bots is not
-// one: it is of the network, not the viewer.
-var signInWalls = []string{"please sign in", "confirm your age", "members-only"}
+// check of age, a channel's members only, and YouTube Music Premium's
+// members only, which an account with Premium passes. Its check of bots
+// is not one: it is of the network, not the viewer.
+var signInWalls = []string{"please sign in", "confirm your age", "members-only", "premium"}
 
 // signInWall reports whether err, why the signed-out ways found no stream,
 // is YouTube's wall before a video it plays only to signed-in viewers, in

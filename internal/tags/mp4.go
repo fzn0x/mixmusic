@@ -144,17 +144,20 @@ func ilst(meta []byte, t *Tags) {
 					}
 				case item == "rtng":
 					rtng(value, t)
-				case (key != "" || item == "----") && typ == 1:
+				case (key != "" || item == "----" || item == "\xa9lyr") && typ == 1:
 					texts = append(texts, string(value))
 				}
 			})
 			switch key := mp4Items[item]; {
 			case key != "":
 				t.set(key, texts...)
+			case item == "\xa9lyr":
+				t.setLyrics("LYRICS", texts...)
 			case item == "----" && name == "ISRC":
 				t.set("isrc", texts...)
 			case item == "----":
 				t.setAdvisory(name, texts...)
+				t.setLyrics(name, texts...)
 			}
 		})
 	})

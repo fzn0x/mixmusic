@@ -1,6 +1,6 @@
 // Package tags reads the tags of music files kept on a computer: the
 // title, artists, album, album artists, track and disc numbers, year,
-// genre, ISRC and cover a file tells of itself. It reads ID3v2 and ID3v1 tags, as MP3
+// genre, ISRC, lyrics and cover a file tells of itself. It reads ID3v2 and ID3v1 tags, as MP3
 // files have them, and WAV files in a chunk, the items of an MP4 file's
 // ilst, Vorbis comments and pictures, as FLAC, Opus and Vorbis files have
 // them, and the INFO list of a WAV file.
@@ -53,6 +53,14 @@ type Tags struct {
 	// Explicit is set for a track its content advisory marks explicit
 	// (advisory.go).
 	Explicit bool
+	// Lyrics are the lyrics the file holds as text, where taggers write
+	// plain lyrics (lyrics.go): plain text, or LRC, which some write
+	// there. Their lines end in "\n"; "" when it holds none.
+	Lyrics string
+	// SyncedLyrics are the lyrics the file holds with their times, in LRC:
+	// a SYNCEDLYRICS comment's as it is, a SYLT frame's written as LRC.
+	// "" when it holds none.
+	SyncedLyrics string
 	// Picture is the cover, the front cover when the file tells which.
 	Picture *Picture
 }

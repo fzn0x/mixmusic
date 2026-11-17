@@ -60,7 +60,7 @@ func (f *file) id3v2(at int64, t *Tags) (int64, error) {
 		}
 		b = b[n:]
 	}
-	readFrames(b, version, flags&0x80 != 0, t)
+	readFrames(b, version, flags&0x80 != 0, t, f.mpegFrameMs(end))
 	return end, nil
 }
 
@@ -84,8 +84,9 @@ func resync(b []byte) []byte {
 	return out
 }
 
-// readFrames reads the frames of a tag's body into t.
-func readFrames(b []byte, version byte, unsynced bool, t *Tags) {
+// readFrames reads the frames of a tag's body into t; the audio after it
+// is of MPEG frames that last frameMs each, 0 when it isn't MPEG.
+func readFrames(b []byte, version byte, unsynced bool, t *Tags, frameMs float64) {
 	idLen, headLen := 4, 10
 	if version == 2 {
 		idLen, headLen = 3, 6
@@ -124,6 +125,10 @@ func readFrames(b []byte, version byte, unsynced bool, t *Tags) {
 			t.setPicture(pic(data))
 		case id == "TXXX" || id == "TXX":
 			txxx(data, t)
+		case id == "USLT" || id == "ULT":
+			keepLyrics(&t.Lyrics, uslt(data))
+		case id == "SYLT" || id == "SLT":
+			keepLyrics(&t.SyncedLyrics, sylt(data, frameMs))
 		case id3Frames[id] == "genre":
 			values := textFrame(data, version)
 			for i, v := range values {

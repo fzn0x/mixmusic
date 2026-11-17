@@ -303,7 +303,11 @@ var (
 
 // ParseLRC reads lyrics in the LRC format: lines of "[mm:ss.xx]text", a
 // line possibly having several times. Lines without times are left out.
-func ParseLRC(lrc string) []Line {
+func ParseLRC(lrc string) []Line { return parseLRC(lrc, false) }
+
+// parseLRC reads LRC as ParseLRC does, and, with words, enhanced LRC too:
+// the words of a line timed by the stamps in its text (enhancedWords).
+func parseLRC(lrc string, words bool) []Line {
 	lines := []Line{}
 	offset := 0
 	for raw := range strings.SplitSeq(strings.ReplaceAll(lrc, "\r\n", "\n"), "\n") {
@@ -326,9 +330,13 @@ func ParseLRC(lrc string) []Line {
 			times = append(times, tagTime(raw, tag))
 		}
 		text := strings.TrimSpace(raw[end:])
+		var timed []Word
+		if words {
+			text, timed = enhancedWords(text, offset)
+		}
 		for _, ms := range times {
 			// A positive offset makes the lyrics come earlier.
-			lines = append(lines, Line{TimeMs: max(ms-offset, 0), Text: text})
+			lines = append(lines, Line{TimeMs: max(ms-offset, 0), Text: text, Words: shiftWords(timed, ms-times[0])})
 		}
 	}
 	slices.SortStableFunc(lines, func(a, b Line) int { return a.TimeMs - b.TimeMs })

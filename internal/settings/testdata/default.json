@@ -54,6 +54,7 @@
       "selfpromo"
     ],
     "highlight": true,
+    "exports": false,
     "server": ""
   },
   "cleanVersions": false,

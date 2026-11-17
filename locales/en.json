@@ -5538,6 +5538,8 @@
   "skipPartsCreditAfter": ". Skipped parts count for nothing in plays and Last.fm scrobbles; each is skipped once a play, so seeking back into one plays it.",
   "skipPartsCreditBefore": "Uses SponsorBlock data licensed under ",
   "skipPartsCreditBetween": " from ",
+  "skipPartsExportsAbout": "Copies Export… writes leave out the parts skipped above. Copies in M4A keep them: MixMusic can't cut those yet.",
+  "skipPartsExportsTitle": "Leave marked parts out of exports",
   "skipPartsGroup": "Skip parts of videos",
   "skipPartsHighlightAbout": "Marks the moment SponsorBlock's community calls a video's best with a dot on the seek bar. Jump to the highlight, on the now playing page and in the command palette, plays from there.",
   "skipPartsHighlightMark": "Mark the highlight",

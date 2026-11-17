@@ -694,7 +694,13 @@ func (p *Player) onProgress() {
 	}
 	if p.counted != entry.UID && heard >= count {
 		p.counted = entry.UID
-		go p.svc.RecordPlay(entry.Track)
+		track := entry.Track
+		if track.DurationMs == 0 && !p.s.Live && p.s.Duration > 0 {
+			// The list gave no length, and minutes are the lengths of the
+			// plays: record the length the stream told.
+			track.DurationMs = int(p.s.Duration / time.Millisecond)
+		}
+		go p.svc.RecordPlay(track)
 	}
 	next, hasNext := p.s.UpNext()
 	if hasNext && next.UID != entry.UID && p.prepared != next.UID && pos > prepareAfter {

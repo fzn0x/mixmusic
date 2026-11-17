@@ -9,6 +9,10 @@
 # It runs MyGo's CLI by Go, from the module's cache, and on a copy of the
 # catalogs beside a mygo.json of only them: mygo.config.ts would need Bun,
 # and its bindings would build and start the app.
+#
+# MyGo reads the catalogs at the root of locales/ alone. Those of
+# locales/more, which the app adds as it starts, get MyGo's check too, each
+# beside en.json as if it were at the root.
 set -euo pipefail
 
 work=$(mktemp -d)
@@ -25,4 +29,18 @@ if ! diff -u locales/catalog_gen.go "$work/locales/catalog_gen.go" >"$work/diff"
   echo "locales/catalog_gen.go is stale: run \`bunx mygo generate\` and commit it." >&2
   exit 1
 fi
-echo "The catalogs check, and locales/catalog_gen.go is up to date."
+
+more="$work/more"
+mkdir -p "$more/locales"
+cp locales/en.json "$more/locales/"
+for f in locales/more/*.json; do
+  [ -e "$f" ] || continue
+  if [ -e "locales/$(basename "$f")" ]; then
+    echo "$f: locales/$(basename "$f") is that language already: keep one of them." >&2
+    exit 1
+  fi
+  cp "$f" "$more/locales/"
+done
+cp "$work/mygo.json" "$more/"
+go run github.com/egoist/mygo/cmd/mygo i18n check "$more"
+echo "The catalogs check, locales/more's too, and locales/catalog_gen.go is up to date."

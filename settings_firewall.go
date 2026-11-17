@@ -110,7 +110,7 @@ func firewallAbout(v *firewallView) string {
 	case v.read.IsZero():
 		return locales.FirewallReading()
 	case v.err != nil:
-		return locales.FirewallError(v.err.Error())
+		return locales.FirewallError(errorText(v.err))
 	case !st.On:
 		return locales.FirewallOff()
 	case st.LetsIn():
@@ -149,7 +149,7 @@ func (s *shell) allowFirewall(fw *app.Firewall) {
 			case err == nil:
 				s.notes = append(s.notes, notice(locales.FirewallAllowed()))
 			case errors.Is(err, firewall.ErrDeclined):
-				s.notes = append(s.notes, notice(locales.FirewallNotChanged(firewall.ErrDeclined.Error())))
+				s.notes = append(s.notes, notice(locales.FirewallNotChanged(errorText(firewall.ErrDeclined))))
 			default:
 				s.notes = append(s.notes, noticeOf(err))
 			}

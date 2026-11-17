@@ -12,6 +12,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/remote"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // RemoteCode is the code this computer shows while another pairs with it:
@@ -113,27 +114,26 @@ func (h remoteHost) Pairing(req remote.PairRequest) (remote.PairEnd, error) {
 			switch {
 			case err == nil:
 				log.Printf("mixmusic: remote control: paired with %s, which may control this computer", req.Name)
-				note = "Paired with " + req.Name + ": it can control MixMusic on this computer"
+				note = locales.RemoteNotePairedHere(req.Name)
 			case keepErr != nil:
 				log.Printf("mixmusic: remote control: keeping %s: %v", req.Name, keepErr)
-				note = "Couldn't keep " + req.Name + " as paired: " + keepErr.Error()
+				note = locales.RemoteNoteNotKept(req.Name, keepErr.Error())
 			case unkeep != nil:
 				// Kept, but the other computer didn't hear it, and keeps
 				// nothing: neither does this one.
 				unkeep()
 				log.Printf("mixmusic: remote control: the pairing with %s didn't finish: %v", req.Name, err)
-				why := "it stopped answering"
+				note = locales.RemoteNoteUnfinished(req.Name)
 				if errors.Is(err, remote.ErrNotKept) {
-					why = "keeping it took longer than " + req.Name + " waits"
+					note = locales.RemoteNoteUnfinishedSlow(req.Name)
 				}
-				note = "Didn't pair with " + req.Name + ": the pairing didn't finish, as " + why
 			case errors.Is(err, remote.ErrCanceled):
 			case errors.Is(err, remote.ErrWrongCode):
 				log.Printf("mixmusic: remote control: %s typed another code", req.Name)
-				note = "Didn't pair with " + req.Name + ": the code typed there wasn't the one shown"
+				note = locales.RemoteNoteWrongCode(req.Name)
 			default:
 				log.Printf("mixmusic: remote control: pairing with %s: %v", req.Name, err)
-				note = "Didn't pair with " + req.Name + ": it stopped answering"
+				note = locales.RemoteNoteStopped(req.Name)
 			}
 			a.relistRemote()
 			a.notifyRemote(note)

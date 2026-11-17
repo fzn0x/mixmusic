@@ -212,7 +212,7 @@ func (s *Server) ask(from Member, t remote.QueueTrack, seq int64, look bool) {
 		c.send(message{Type: "added", Seq: seq, Reason: SongWaits})
 	}
 	if fn := s.Guests.Asks; fn != nil {
-		fn(from.Name + " asks to add " + t.Title)
+		fn(Ask{Name: from.Name, Title: t.Title})
 	}
 	s.changed(false)
 }

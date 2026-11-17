@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/remote"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // These times are remote control's; tests shorten them.
@@ -245,7 +246,7 @@ func (rc *Remote) View(id string) RemoteView {
 		v.Computer.Name = kept.Name
 	}
 	if v.Computer.Name == "" {
-		v.Computer.Name = "That computer"
+		v.Computer.Name = locales.RemoteThatComputer()
 	}
 	if p := r.pairing; p != nil && p.id == id {
 		v.Step, v.Problem = p.step, p.problem
@@ -353,7 +354,7 @@ func (a *App) connectRemote(ctl *remoteControl, addr string, kept PairedComputer
 				a.dropControlled(key)
 			}
 			a.relistRemote()
-			a.notifyRemote(kept.Name + " removed this computer: pair again to control it")
+			a.notifyRemote(locales.RemoteProblemNotPaired(kept.Name))
 			return
 		}
 		// The computer may listen elsewhere since it started again: it is
@@ -412,7 +413,10 @@ func (rc *Remote) Do(id string, c remote.Command) error {
 	if err != nil {
 		return err
 	}
-	return s.Do(c)
+	if err := s.Do(c); err != nil {
+		return &peerError{name: s.Name(), err: err}
+	}
+	return nil
 }
 
 // Pair starts pairing with the computer id: once it shows its code,
@@ -492,7 +496,7 @@ func (a *App) pair(ctx context.Context, d *remote.Dialer, p *remotePairing, f re
 	// a new one, at once.
 	a.endControl(f.ID)
 	a.relistRemote()
-	a.notifyRemote("Paired with " + peer.Name)
+	a.notifyRemote(locales.RemoteNotePaired(peer.Name))
 }
 
 // EnterCode gives the pairing with the computer id the code the user
@@ -532,27 +536,27 @@ func (rc *Remote) CancelPairing(id string) {
 func remoteProblem(name string, err error) string {
 	switch {
 	case errors.Is(err, remote.ErrWrongCode):
-		return "That isn't the code " + name + " showed. Pair again for a new code."
+		return locales.RemoteProblemWrongCode(name)
 	case errors.Is(err, remote.ErrOff):
-		return "Remote control is off on " + name + "."
+		return locales.RemoteProblemOff(name)
 	case errors.Is(err, remote.ErrBusy):
-		return name + " is pairing with another computer: try again in a moment."
+		return locales.RemoteProblemBusy(name)
 	case errors.Is(err, remote.ErrCanceled):
-		return "The pairing was canceled on " + name + "."
+		return locales.RemoteProblemCanceled(name)
 	case errors.Is(err, remote.ErrNotKept):
-		return name + " couldn't keep the pairing, and tells why there. Pair again."
+		return locales.RemoteProblemNotKept(name)
 	case errors.Is(err, remote.ErrNotPaired):
-		return name + " removed this computer: pair again to control it."
+		return locales.RemoteProblemNotPaired(name)
 	case errors.Is(err, remote.ErrNotSame):
-		return "Another computer answered in place of " + name + ": it isn't the one paired."
+		return locales.RemoteProblemNotSame(name)
 	case errors.Is(err, remote.ErrVersion):
-		return remote.ErrVersion.Error() + "."
+		return locales.RemoteProblemVersion()
 	case errors.Is(err, remote.ErrOlder):
-		return "MixMusic on " + name + " is older, and can't do that: update it there."
+		return locales.RemoteProblemOlder(name)
 	case errors.Is(err, remote.ErrLost):
-		return name + " stopped answering: connecting again…"
+		return locales.RemoteProblemLost(name)
 	case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):
-		return "The pairing took too long. Pair again for a new code."
+		return locales.RemoteProblemTooLong()
 	}
-	return "Couldn't reach " + name + ": it may be asleep, or a firewall may turn MixMusic away."
+	return locales.RemoteProblemUnreachable(name)
 }

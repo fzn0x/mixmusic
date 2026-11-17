@@ -79,12 +79,21 @@
   engine plays, or a live stream, falls back to the ways above, and a
   stream found so that YouTube refuses (`Forget`) marks its video, found
   signed out for `refusalMark`, 10 minutes (`refusedAsAccount`, #578).
-  `SetAsAccount` clears the marks, and so does another session, told by
-  a hash of its LOGIN_INFO and SAPISID cookies (`sessionKey`, `marked`):
-  the app gives none signed out, after YouTube ended it, or as another
+  `SetAsAccount` clears the marks, and so does `ForgetRefusals`, which
+  the app calls as it signs in (`youtubeSignIn`) and as it switches
+  Google account or channel (`useYouTubeAccount`), at once. It also drops
+  the streams kept in `calls` that the signed-out ways found only because
+  a mark sent their video past the account (`Stream.pastMark`), so the
+  next play asks as the account; every other stream kept stays, and a
+  mark that ends after `refusalMark` drops none. Another
+  session, told by a hash of its LOGIN_INFO and SAPISID cookies
+  (`sessionKey`, `marked`), clears them too as the next video is asked
+  for, the backstop for the changes the app doesn't call it for: the app
+  gives no session signed out, after YouTube ended it, or as another
   Google account. A marked video whose signed-out ways meet YouTube's
   sign-in wall (`signInWall`: "Please sign in", the check of age, a
-  channel's members only) is asked for as the account once more, once a
+  channel's members only, YouTube Music Premium's members only, never
+  the check of bots) is asked for as the account once more, once a
   resolve (`againAsAccount`), never with data saver.
   `Stream.AsAccount` tells which way a
   stream was found. `Stream.Route` tells which route found it, and

@@ -152,7 +152,7 @@ func (s *shell) useSongsCovers(cv mixCovering) {
 func (s *shell) coverChanged(cv mixCovering, err error) {
 	s.update(func() {
 		if err != nil {
-			s.notes = append(s.notes, player.Notice{Message: locales.MixCoverFailed(cv.title, err.Error()), Error: true})
+			s.notes = append(s.notes, player.Notice{Message: locales.MixCoverFailed(cv.title, errorText(err)), Error: true})
 			return
 		}
 		s.refetch("playlist:" + cv.id)

@@ -111,13 +111,39 @@ const (
 // that holds.
 var holdOrder = []string{holdFolder, holdMoving, holdPaused, holdOffline, holdMetered, holdDisk, holdThrottled, holdFailing}
 
+// The holds as Status.HoldKind tells them, for the windows to say why
+// the downloads wait in their language, with Status.HoldArgs.
+const (
+	// HoldPaused: the user paused them.
+	HoldPaused = holdPaused
+	// HoldOffline: they wait for the network.
+	HoldOffline = holdOffline
+	// HoldMetered: they wait for a connection that isn't metered.
+	HoldMetered = holdMetered
+	// HoldThrottled: YouTube turns requests down for a while.
+	HoldThrottled = holdThrottled
+	// HoldDisk: the disk is full.
+	HoldDisk = holdDisk
+	// HoldFolder: the folder can't be reached, of HoldArgs' first; with a
+	// second, the error why its index can't be read.
+	HoldFolder = holdFolder
+	// HoldFailing: downloads kept failing, for the Reason of HoldArgs'
+	// first, and the words of its second.
+	HoldFailing = holdFailing
+	// HoldMoving: they move to the folder of HoldArgs' first.
+	HoldMoving = holdMoving
+)
+
 func holdCancels(kind string) bool {
 	return kind == holdPaused || kind == holdOffline || kind == holdFolder || kind == holdMoving || kind == holdMetered
 }
 
-// hold keeps downloads from starting, until until, if set.
+// hold keeps downloads from starting, until until, if set: why tells it
+// in English, for the logs and the tests, and args are what the windows
+// need to tell it in their language, as Status.HoldArgs.
 type hold struct {
 	why   string
+	args  []string
 	until time.Time
 }
 
@@ -187,10 +213,10 @@ func Open(dir string, opts Options) *Manager {
 	}
 	if err != nil {
 		m.err = err
-		m.holds[holdFolder] = hold{why: "The folder of your downloads can't be reached: " + dir}
+		m.holds[holdFolder] = hold{why: "The folder of your downloads can't be reached: " + dir, args: []string{dir}}
 	} else if idx, _, err := readIndex(dir); err != nil {
 		m.err = err
-		m.holds[holdFolder] = hold{why: "The downloads in " + dir + " can't be read: " + err.Error()}
+		m.holds[holdFolder] = hold{why: "The downloads in " + dir + " can't be read: " + err.Error(), args: []string{dir, err.Error()}}
 	} else {
 		m.idx = idx
 		if idx.Paused {
@@ -442,7 +468,7 @@ func (m *Manager) pin(t media.Track, pin, quality string) bool {
 			e.Pins = append(e.Pins, pin)
 		}
 		if e.Failed != "" {
-			e.Failed = ""
+			e.Failed, e.Reason = "", ""
 			delete(m.tries, t.ID)
 			delete(m.nextAt, t.ID)
 		}
@@ -692,7 +718,7 @@ func (m *Manager) Retry(id string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if e, ok := m.idx.Tracks[id]; ok {
-		e.Failed = ""
+		e.Failed, e.Reason = "", ""
 		delete(m.tries, id)
 		delete(m.nextAt, id)
 	}
@@ -710,7 +736,7 @@ func (m *Manager) RetryFailed() {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	for id, e := range m.idx.Tracks {
-		e.Failed = ""
+		e.Failed, e.Reason = "", ""
 		delete(m.tries, id)
 		delete(m.nextAt, id)
 	}
@@ -736,7 +762,7 @@ func (m *Manager) Rematch(id string) {
 		return
 	}
 	video := e.video()
-	e.Recording, e.Failed = nil, ""
+	e.Recording, e.Failed, e.Reason = nil, "", ""
 	if j := m.jobs[id]; j != nil {
 		j.cancel(errHeld)
 	}
@@ -817,9 +843,9 @@ func (m *Manager) SetMetered(metered, allowed bool) {
 }
 
 // setHold holds or releases the downloads for kind, until until when it's
-// set; a hold that stops downloads under way stops them. Its caller holds
-// mu, and publishes.
-func (m *Manager) setHold(kind string, on bool, why string, until time.Time) {
+// set, for why with args; a hold that stops downloads under way stops
+// them. Its caller holds mu, and publishes.
+func (m *Manager) setHold(kind string, on bool, why string, until time.Time, args ...string) {
 	if !on {
 		if _, ok := m.holds[kind]; ok {
 			delete(m.holds, kind)
@@ -827,7 +853,7 @@ func (m *Manager) setHold(kind string, on bool, why string, until time.Time) {
 		}
 		return
 	}
-	m.holds[kind] = hold{why: why, until: until}
+	m.holds[kind] = hold{why: why, args: args, until: until}
 	if holdCancels(kind) {
 		for _, j := range m.jobs {
 			j.cancel(errHeld)
@@ -838,6 +864,13 @@ func (m *Manager) setHold(kind string, on bool, why string, until time.Time) {
 // held returns why the downloads wait, or "" when they don't, and until
 // when, if known; holds that ran out go. Its caller holds mu.
 func (m *Manager) held() (string, time.Time) {
+	_, h := m.holding()
+	return h.why, h.until
+}
+
+// holding returns the hold that keeps the downloads waiting, and its
+// kind, or "" when none does; holds that ran out go. Its caller holds mu.
+func (m *Manager) holding() (string, hold) {
 	now := time.Now()
 	for _, kind := range holdOrder {
 		h, ok := m.holds[kind]
@@ -851,9 +884,9 @@ func (m *Manager) held() (string, time.Time) {
 			}
 			continue
 		}
-		return h.why, h.until
+		return kind, h
 	}
-	return "", time.Time{}
+	return "", hold{}
 }
 
 // done reports whether the audio of e is downloaded. Its caller holds mu.

@@ -536,7 +536,7 @@ func (s *shell) liveFace(c *ui.Context, art []media.Image, size float32) {
 }
 
 // noticeOf tells an error as a notice.
-func noticeOf(err error) player.Notice { return player.Notice{Message: err.Error(), Error: true} }
+func noticeOf(err error) player.Notice { return player.Notice{Message: errorText(err), Error: true} }
 
 // notice tells something that went well.
 func notice(message string) player.Notice { return player.Notice{Message: message} }

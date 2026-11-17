@@ -15,6 +15,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/mcp"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // assistantCatalog is where the tools find music: the services, and the
@@ -310,14 +311,15 @@ func (a *App) playFound(ctx context.Context, id string, f assistantFound, when s
 		return mcp.Result{}, fmt.Errorf("%s has no tracks", what)
 	}
 	song := f.Kind == kindSong || f.Kind == kindVideo
+	said := foundSaid(id, f)
 	switch {
 	case when == "next":
 		p.PlayNext(tracks)
-		assistantDid(p, "put "+what+" next")
+		assistantDid(p, "put "+what+" next", locales.AssistantsToastPutNext(said))
 		return mcp.Result{Text: "Put " + what + " next."}, nil
 	case when == "last":
 		p.Enqueue(tracks)
-		assistantDid(p, "added "+what+" to the queue")
+		assistantDid(p, "added "+what+" to the queue", locales.AssistantsToastAdded(said))
 		return mcp.Result{Text: "Added " + what + " to the queue."}, nil
 	case song:
 		// As a song played from the search of the windows: its radio
@@ -327,10 +329,10 @@ func (a *App) playFound(ctx context.Context, id string, f assistantFound, when s
 		p.PlayAll(tracks, shuffle)
 	}
 	if shuffle {
-		assistantDid(p, "shuffled "+what)
+		assistantDid(p, "shuffled "+what, locales.AssistantsToastShuffled(said))
 		return mcp.Result{Text: "Shuffling " + what + "."}, nil
 	}
-	assistantDid(p, "played "+what)
+	assistantDid(p, "played "+what, locales.AssistantsToastPlayed(said))
 	return mcp.Result{Text: "Playing " + what + "."}, nil
 }
 

@@ -317,7 +317,7 @@ func (s *shell) releaseRow(c *ui.Context, u app.UpdateStatus) {
 	case !r.done:
 		s.row(c, locales.UpdatesLooking(), "", func() {}, words)
 	case r.err != nil:
-		s.row(c, locales.UpdatesCouldntLook(), r.err.Error(), again, words)
+		s.row(c, locales.UpdatesCouldntLook(), errorText(r.err), again, words)
 	case rel.Newer:
 		date, err := time.Parse(time.RFC3339, rel.Date)
 		dated := err == nil

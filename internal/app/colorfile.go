@@ -36,6 +36,9 @@ type ColorFileStatus struct {
 	// Err tells why the file couldn't be read the last time, "" if it
 	// could.
 	Err string
+	// Fault is the error Err tells, for the windows to say it in their
+	// language, or nil.
+	Fault error
 	// Missing is set while the file isn't there: the theme's colours show.
 	Missing bool
 }
@@ -222,17 +225,17 @@ func (a *App) readColorFile(ctx context.Context, gen int, path string, retry boo
 	st.Path = path
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
-		st.Colors, st.ReadAt, st.Err, st.Missing = colorfile.Colors{}, time.Time{}, "", true
+		st.Colors, st.ReadAt, st.Err, st.Fault, st.Missing = colorfile.Colors{}, time.Time{}, "", nil, true
 		f.raw = nil
 	case err != nil:
-		st.Err, st.Missing = err.Error(), false
+		st.Err, st.Fault, st.Missing = err.Error(), err, false
 	case bytes.Equal(raw, f.raw) && prev.Err == "" && !prev.Missing:
 		return false
 	default:
 		// New colours, or the same after an error: a change, though
 		// the clock, which on Windows moves in steps of up to 16 ms,
 		// may tell the same time as the read before.
-		st.Colors, st.ReadAt, st.Err, st.Missing = colors, time.Now(), "", false
+		st.Colors, st.ReadAt, st.Err, st.Fault, st.Missing = colors, time.Now(), "", nil, false
 		f.raw = raw
 		f.st = st
 		return true
@@ -250,7 +253,7 @@ func (a *App) colorFileFailed(gen int, path string, err error) bool {
 	if f.gen != gen || f.st.Err == err.Error() && f.st.Path == path {
 		return false
 	}
-	f.st.Path, f.st.Err = path, err.Error()
+	f.st.Path, f.st.Err, f.st.Fault = path, err.Error(), err
 	return true
 }
 

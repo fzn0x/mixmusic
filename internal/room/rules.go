@@ -51,9 +51,22 @@ type Guests struct {
 	// Control has the host's player do what from asks: Play, Pause, Next
 	// or Previous.
 	Control func(from Member, do string) error
-	// Asks tells the host's user of what waits for their answer, in
-	// note's words.
-	Asks func(note string)
+	// Asks tells the host's user of what waits for their answer.
+	Asks func(ask Ask)
+}
+
+// An Ask is what waits for the answer of the host's user: the guest
+// named Name asks to join, or to add the song Title when it is set.
+type Ask struct {
+	Name, Title string
+}
+
+// String tells the ask in English, for the logs.
+func (a Ask) String() string {
+	if a.Title != "" {
+		return a.Name + " asks to add " + a.Title
+	}
+	return a.Name + " asks to join your room"
 }
 
 // asks are what the guests asked and what waits for the host's user, as

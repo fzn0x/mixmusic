@@ -23,7 +23,7 @@ How MixMusic looks; [Look and feel](look-and-feel.md) tells all of it.
 
 | Group | What's there |
 |---|---|
-| Language | **System**, the default, takes the first of the computer's preferred languages MixMusic has, or else English; each of its languages follows, named in itself. A choice applies at once. |
+| Language | **System**, the default, takes the first of the computer's preferred languages MixMusic has, or else English; each of its languages follows, named in itself. A choice applies at once. Dates, times and numbers follow the computer's region format, its 12- or 24-hour clock too: English with British formats writes 17 Nov and 15:04. A language chosen here that the region doesn't speak writes them its own way. |
 | [Layout](look-and-feel.md#layouts) | Blend, Expressive, Crate or Tiles. |
 | [Theme](look-and-feel.md#themes) | **Follow the computer**, with **In light mode** and **In dark mode**; a card for each theme; **get more themes**, which opens the marketplace, and **open themes folder**. Themes that didn't load are listed with the reason. |
 | [*Theme* options](look-and-feel.md#theme-options) | The options of a built-in theme that has some, as Aurora's drifting lights and glass blur. |

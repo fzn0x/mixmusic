@@ -18,11 +18,8 @@ import (
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/room"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
-
-// cantPlayHere is what a guest shows of a track of the host it has no way
-// to play: a file of the host's it has none of.
-const cantPlayHere = "Can't play here"
 
 // follower follows the host of a room in the guest's player.
 type follower struct {
@@ -207,9 +204,10 @@ func (f *follower) take(p *player.Player, entry string, q remote.QueueTrack, at 
 	f.keep.Reset()
 	switch {
 	case !ok:
-		f.note = cantPlayHere
+		// A file of the host's it has none of.
+		f.note = locales.RoomFollowCantPlay()
 	case a.settings.Get().HideExplicit && t.ExplicitSong():
-		f.note = t.Title + " is explicit, and your settings hide explicit content: it stays silent here"
+		f.note = locales.RoomFollowExplicit(t.Title)
 	}
 	if f.note != "" {
 		p.Pause()

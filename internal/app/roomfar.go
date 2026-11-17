@@ -62,7 +62,7 @@ func (a *App) linkRoom(id string) (room.Found, bool) {
 	if len(addrs) == 0 {
 		return room.Found{}, false
 	}
-	return room.Found{ID: id, Name: "The room", Addr: addrs[0]}, true
+	return room.Found{ID: id, Name: roomByAddr, Addr: addrs[0]}, true
 }
 
 // roomElsewhere tells where else the room this computer knocks at, or
@@ -120,18 +120,25 @@ func (a *App) asIs(addr string) bool {
 	return false
 }
 
+// Why a knock typed can't start: the address has no port, or the code
+// isn't one.
+var (
+	errAddrNoPort = errors.New("A room's address has its port, as 203.0.113.7:41234.")
+	errCodeShape  = errors.New("A room's code is 6 letters and digits.")
+)
+
 // KnockAt knocks at the room at addr, an address typed with its port, as
 // a VPN's or the host's router's, with the code the user typed.
 func (rs *Rooms) KnockAt(addr, code string) {
 	a := rs.a
 	at, ok := room.InviteAddr(addr, 0)
 	if !ok {
-		a.startKnock(strings.TrimSpace(addr), nil, knockBy{}, errors.New("A room's address has its port, as 203.0.113.7:41234."))
+		a.startKnock(strings.TrimSpace(addr), nil, knockBy{}, errAddrNoPort)
 		return
 	}
 	parsed, ok := room.ParseCode(code)
 	if !ok {
-		a.startKnock(at, nil, knockBy{}, errors.New("A room's code is 6 letters and digits."))
+		a.startKnock(at, nil, knockBy{}, errCodeShape)
 		return
 	}
 	a.startKnock(at, nil, knockBy{password: []byte(parsed), addrs: []string{at}, typed: true}, nil)
@@ -188,7 +195,7 @@ func farUnreachable(err error) bool {
 // farProblem tells why a room outside the network didn't answer, of the
 // host named name.
 func farProblem(name string) string {
-	if name == "" || name == "The room" {
+	if name == "" || name == roomByAddr {
 		return locales.RoomProblemFarUnnamed()
 	}
 	return locales.RoomProblemFar(name)

@@ -27,6 +27,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/portmap"
 	"github.com/fzn0x/mixmusic/internal/room"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // roomFar is what rooms keep of friends outside the network, on both
@@ -307,14 +308,11 @@ func (r *roomReach) changed() {
 	r.mu.Unlock()
 	if tell {
 		log.Printf("mixmusic: room: reached at %v now", addrs)
-		r.a.notifyRooms(roomMoved)
+		r.a.notifyRooms(locales.RoomNoteAddressChanged())
 		return
 	}
 	r.a.notifyRooms("")
 }
-
-// roomMoved is what the host is told as the room's addresses change.
-const roomMoved = "Your room's internet address changed: send friends outside your network the new invite link."
 
 // copied takes in that the user copied the room's link, of the room's
 // addresses now.
@@ -367,19 +365,18 @@ func (r *roomReach) view() RoomReach {
 		return v
 	}
 	if r.kept != 0 && r.port != r.kept {
-		v.Done = append(v.Done, "Port "+strconv.Itoa(r.kept)+", kept for rooms, is taken by another program: the room listens at port "+
-			strconv.Itoa(r.port)+" instead, which a port forwarded by hand doesn't reach.")
+		v.Done = append(v.Done, locales.RoomReachPortTaken(strconv.Itoa(r.kept), strconv.Itoa(r.port)))
 	}
 	if t := r.typed(); t != "" {
 		if len(addrs) == 0 {
-			v.Problem = "The address for invites, " + t + ", isn't an address: change it in Settings › Desktop › Listen with friends."
+			v.Problem = locales.RoomReachTypedInvalid(t)
 		} else {
-			v.Done = append(v.Done, "Invites carry the address you typed for them, "+addrs[0]+". It must reach this computer's port "+strconv.Itoa(r.port)+".")
+			v.Done = append(v.Done, locales.RoomReachTyped(addrs[0], strconv.Itoa(r.port)))
 		}
 		return v
 	}
 	if k == nil {
-		v.Problem = "MixMusic asks no router here."
+		v.Problem = locales.RoomReachNoRouter()
 		return v
 	}
 	reach := k.Reach()
@@ -388,14 +385,13 @@ func (r *roomReach) view() RoomReach {
 		return v
 	}
 	if reach.Forward.IsValid() {
-		v.Done = append(v.Done, "Your router forwards port "+strconv.Itoa(int(reach.Forward.Port()))+" of its internet address, "+
-			reach.Forward.Addr().String()+", to this computer ("+string(reach.Method)+").")
+		v.Done = append(v.Done, locales.RoomReachForwarded(strconv.Itoa(int(reach.Forward.Port())), reach.Forward.Addr().String(), string(reach.Method)))
 	}
 	if reach.IPv6.IsValid() {
 		if reach.Opened {
-			v.Done = append(v.Done, "Friends with IPv6 reach this computer at "+reach.IPv6.String()+", where your router lets the port in (PCP).")
+			v.Done = append(v.Done, locales.RoomReachIPv6Open(reach.IPv6.String()))
 		} else {
-			v.Done = append(v.Done, "Friends with IPv6 may reach this computer at "+reach.IPv6.String()+", if your router lets port "+strconv.Itoa(r.port)+" in.")
+			v.Done = append(v.Done, locales.RoomReachIPv6Maybe(reach.IPv6.String(), strconv.Itoa(r.port)))
 		}
 	}
 	if reach.Err != nil {
@@ -407,17 +403,15 @@ func (r *roomReach) view() RoomReach {
 // reachProblem tells why the router of IPv4 forwards no port, for the
 // room's port, in the interface's words.
 func reachProblem(err error, port int) string {
-	p := strconv.Itoa(port)
-	vpn := " A VPN both of you run, such as Tailscale, reaches the room anyway: put this computer's address on it in Address for invites, in Settings › Desktop › Listen with friends."
 	var shared *portmap.SharedError
 	var refused *portmap.RefusedError
 	switch {
 	case errors.As(err, &shared):
-		return "Your router's internet address, " + shared.Addr.String() + ", is shared with your provider's other customers, or private: the router sits behind another, most often the provider's, out of reach from outside." + vpn
+		return locales.RoomReachShared(shared.Addr.String())
 	case errors.As(err, &refused):
-		return "Your router refused to forward port " + p + ": " + refused.Reason + ". Forward the port to this computer by hand in the router's settings, or turn on UPnP there." + vpn
+		return locales.RoomReachRefused(strconv.Itoa(port), refused.Reason)
 	}
-	return "Your router didn't answer: it may not take forwards from computers, or have UPnP, NAT-PMP and PCP off. Turn one on in its settings, or forward port " + p + " to this computer by hand." + vpn
+	return locales.RoomReachNoAnswer(strconv.Itoa(port))
 }
 
 // SetAnywhere lets friends outside this network join the rooms this

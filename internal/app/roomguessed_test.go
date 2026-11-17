@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/fzn0x/mixmusic/internal/room/roomtest"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // TestRoomGuessedTellsTheHost has the room tell its host that someone
@@ -25,7 +26,7 @@ func TestRoomGuessedTellsTheHost(t *testing.T) {
 	mu.Lock()
 	defer mu.Unlock()
 	for _, n := range notes {
-		if n == roomGuessed {
+		if n == locales.RoomNoteGuessed() {
 			return
 		}
 	}

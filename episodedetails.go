@@ -63,7 +63,7 @@ func (s *shell) episodeDetails(c *ui.Context, t media.Track, large bool) {
 			s.emptyIn(c, locales.EpisodeLooking())
 			return
 		}
-		s.emptyIn(c, l.err.Error())
+		s.emptyIn(c, errorText(l.err))
 		// An episode without details stays so; a failure may pass.
 		if !errors.Is(l.err, app.ErrNoEpisodeDetails) {
 			ui.Row(c).Padding(0, 24, 8).Children(func() {
@@ -230,7 +230,7 @@ func (n *notch) chapters(c *ui.Context, t media.Track) {
 		note(locales.EpisodeLooking())
 		return
 	case l.err != nil:
-		note(l.err.Error())
+		note(errorText(l.err))
 		if !errors.Is(l.err, app.ErrNoEpisodeDetails) {
 			again := s.buttonBase(c.Key("notch-details-retry")).Padding(4, 10).Radius(12).Border(1, notchMuted).
 				AlignSelf(ui.Start).Label(locales.EpisodeTryAgain()).Cursor(ui.CursorPointer)

@@ -104,7 +104,7 @@ func (s *shell) startRoom() {
 		s.update(func() {
 			s.rooms.starting = false
 			if err != nil {
-				s.notes = append(s.notes, noticeOf(err))
+				s.notes = append(s.notes, roomNotice(err))
 				return
 			}
 			// Listening, MixMusic may have been let in or kept out, by
@@ -122,7 +122,7 @@ func (s *shell) newRoomCode() {
 		err := s.a.Rooms().NewCode()
 		s.update(func() {
 			if err != nil {
-				s.notes = append(s.notes, noticeOf(err))
+				s.notes = append(s.notes, roomNotice(err))
 				return
 			}
 			s.notes = append(s.notes, notice(locales.RoomMenuNewCode()))

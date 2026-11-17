@@ -24,10 +24,43 @@ const (
 
 // lyricsKeys are the names of the tags of lyrics, as Vorbis comments, the
 // TXXX frames of ID3v2 and the items of iTunes in MP4 files have them, in
-// upper case: true for those of synced lyrics, in LRC.
-var lyricsKeys = map[string]bool{
-	"SYNCEDLYRICS": true, "SYNCLYRICS": true,
-	"LYRICS": false, "UNSYNCEDLYRICS": false, "UNSYNCED LYRICS": false,
+// upper case, each with whether it holds synced lyrics, in LRC, and how it
+// ranks among the places of its kind in a file that holds several: the
+// lower, the better.
+var lyricsKeys = map[string]lyricsKey{
+	"SYNCEDLYRICS": {true, rankSynced}, "SYNCLYRICS": {true, rankSynced + 1},
+	"LYRICS": {false, rankPlain}, "UNSYNCEDLYRICS": {false, rankPlain + 1}, "UNSYNCED LYRICS": {false, rankPlain + 2},
+}
+
+// lyricsKey is what a tag's name says of its lyrics.
+type lyricsKey struct {
+	synced bool
+	rank   int
+}
+
+// The ranks of the places that hold lyrics. A format's standard place
+// ranks first: a USLT frame, an MP4 file's (c)lyr item. The plain tags
+// follow, as lyricsKeys orders them. Synced ranks count apart: a SYLT
+// frame's is syltRank's, below rankSynced, then the tags'.
+const (
+	rankStandard = 0
+	rankPlain    = 1
+	rankSynced   = 3
+)
+
+// syltRank is the rank of a SYLT frame of content type content: 1 is
+// lyrics, 2 a transcription and 0 other text. The others, as events,
+// chords and links, are not lyrics: ok is false.
+func syltRank(content byte) (rank int, ok bool) {
+	switch content {
+	case 1:
+		return 0, true
+	case 2:
+		return 1, true
+	case 0:
+		return 2, true
+	}
+	return 0, false
 }
 
 // isLyricsKey reports whether a tag's name, in upper case, is that of
@@ -38,27 +71,36 @@ func isLyricsKey(key string) bool {
 }
 
 // setLyrics keeps the first of values that holds lyrics as those of the
-// tag key, of any case, unless the file gave them before: synced or
+// tag key, of any case, unless the file gave better ones: synced or
 // plain, as lyricsKeys says. A key that names no lyrics changes nothing.
 func (t *Tags) setLyrics(key string, values ...string) {
-	synced, ok := lyricsKeys[strings.ToUpper(text(key))]
+	k, ok := lyricsKeys[strings.ToUpper(text(key))]
 	if !ok {
 		return
 	}
-	field := &t.Lyrics
-	if synced {
-		field = &t.SyncedLyrics
-	}
 	for _, v := range values {
-		keepLyrics(field, v)
+		if t.keepLyrics(k.synced, k.rank, v) {
+			return
+		}
 	}
 }
 
-// keepLyrics sets *field to the lyrics s, unless it holds some already.
-func keepLyrics(field *string, s string) {
-	if *field == "" {
-		*field = lyricsText(s)
+// keepLyrics keeps the lyrics s, synced or plain, when the tag holds none
+// of that kind or a worse rank, so that the place a file keeps them in,
+// not their order in it, decides. It reports whether s holds lyrics.
+func (t *Tags) keepLyrics(synced bool, rank int, s string) bool {
+	s = lyricsText(s)
+	if s == "" {
+		return false
 	}
+	field, held := &t.Lyrics, &t.lyricsRank
+	if synced {
+		field, held = &t.SyncedLyrics, &t.syncedRank
+	}
+	if *field == "" || rank < *held {
+		*field, *held = s, rank
+	}
+	return true
 }
 
 // lyricsText is s as lyrics: valid UTF-8, cut at maxLyrics bytes, its
@@ -109,15 +151,16 @@ type syncedText struct {
 // which last frameMs each. It is "" for times in frames when frameMs is
 // 0, as in a WAV file, and for content that isn't sung, as chords or
 // events.
-func sylt(data []byte, frameMs float64) string {
+func sylt(data []byte, frameMs float64) (lrc string, rank int) {
 	if len(data) < 6 {
-		return ""
+		return "", 0
 	}
 	enc, unit, content := data[0], data[4], data[5]
-	// 0 is other text, 1 lyrics and 2 a transcription; the others are
-	// movements, events, chords, trivia and links.
-	if content > 2 {
-		return ""
+	// Only 0, 1 and 2 are lyrics; the others are movements, events,
+	// chords, trivia and links.
+	rank, ok := syltRank(content)
+	if !ok {
+		return "", 0
 	}
 	scale := 1.0
 	switch unit {
@@ -125,10 +168,10 @@ func sylt(data []byte, frameMs float64) string {
 		scale = frameMs
 	case 2:
 	default:
-		return ""
+		return "", 0
 	}
 	if scale <= 0 {
-		return ""
+		return "", 0
 	}
 	_, b := cut(enc, data[6:])
 	var pieces []syncedText
@@ -145,7 +188,7 @@ func sylt(data []byte, frameMs float64) string {
 		}
 		pieces = append(pieces, syncedText{s, int(ms)})
 	}
-	return lrcOf(pieces)
+	return lrcOf(pieces), rank
 }
 
 // lrcOf writes timed pieces of text as LRC, a line of each. Where some

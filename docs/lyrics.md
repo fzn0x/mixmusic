@@ -44,8 +44,8 @@ A Spotify track is looked up by the video ID of its [recording on YouTube Music]
 A song of [the music on this computer](local-music.md) shows the lyrics its file holds at once, offline too, and when its file names no artist. MixMusic looks, in this order:
 
 1. **A .lrc file beside it,** of its name, as `Quiet Field.lrc` beside `Quiet Field.flac`, in any case: LRC, with its offset and lines of several times, or plain text, in UTF-8, UTF-16 or ISO-8859-1, up to 1 MB. Where enhanced LRC times the words of a line, as `<00:12.50>`, they light one by one.
-2. **The synced lyrics of its tags:** an MP3's or WAV's SYLT frame, its syllables joined into lines and lit one by one, or a SYNCEDLYRICS tag.
-3. **The plain lyrics of its tags:** an MP3's or WAV's USLT frame or LYRICS tag, the LYRICS, UNSYNCEDLYRICS or UNSYNCED LYRICS comment of a FLAC, Ogg or Opus file, or an M4A's lyrics. Timed LRC or TTML written there counts as synced.
+2. **The synced lyrics of its tags:** an MP3's or WAV's SYLT frame, its syllables joined into lines and lit one by one, or a SYNCEDLYRICS or SYNCLYRICS tag. A file with several SYLT frames shows the one of lyrics, else of a transcription, else of other text; frames of chords, events or links are never lyrics.
+3. **The plain lyrics of its tags:** an MP3's or WAV's USLT frame or LYRICS tag, the LYRICS, UNSYNCEDLYRICS or UNSYNCED LYRICS comment of a FLAC, Ogg or Opus file, or an M4A's lyrics. A file with several keeps to the format's own place first (USLT, the LYRICS comment, the M4A's lyrics item), then the tags in the order named here, not the order in the file. Timed LRC or TTML written there counts as synced.
 
 The first synced lyrics found show, else the first plain ones. Of a song with [copies](local-music.md#copies-of-one-song), the copy that plays comes first, then the others.
 

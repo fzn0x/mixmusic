@@ -158,7 +158,7 @@ func (m *Manager) fetch(j *job) error {
 		if m.opts.Matcher == nil {
 			return errNoMatcher
 		}
-		m.setPhase(j, "finding its recording on YouTube Music")
+		m.setPhase(j, PhaseFinding)
 		found, err := m.opts.Matcher.Match(j.ctx, j.track)
 		if err != nil {
 			return err
@@ -389,7 +389,7 @@ func (m *Manager) waiting() bool {
 // every download, fails for good when it can't download, else tries again
 // later. Its caller holds mu.
 func (m *Manager) failed(id string, e *entry, err error) {
-	why := plain(err)
+	why, reason := plain(err), reasonOf(err)
 	now := time.Now()
 	log.Printf("mixmusic: downloading %s: %s", id, why)
 	switch {
@@ -398,26 +398,71 @@ func (m *Manager) failed(id string, e *entry, err error) {
 	case diskFull(err):
 		m.setHold(holdDisk, true, "The disk of your downloads is full: they go on once it has room", now.Add(diskFullFor))
 	case errors.Is(err, tools.ErrNoYTDLP):
-		e.Failed = "it needs yt-dlp, which Settings › Playback installs"
+		e.Failed, e.Reason = "it needs yt-dlp, which Settings › Playback installs", reason
 	case errors.Is(err, stream.ErrUnavailable), errors.Is(err, stream.ErrNoAudio), errors.Is(err, match.ErrNoMatch),
 		errors.Is(err, errBadAudio), errors.Is(err, errNotYouTube), errors.Is(err, errNoMatcher):
-		e.Failed = why
+		e.Failed, e.Reason = why, reason
 	case stream.IsNetwork(err) && m.opts.Network != nil:
 		// Gone with the network, it waits for it, without spending a try.
 		m.nextAt[id] = now.Add(busyWait)
-		go m.checkNetwork(id, why)
+		go m.checkNetwork(id, why, reason)
 	default:
-		m.retryLater(id, e, why)
+		m.retryLater(id, e, why, reason)
 	}
 }
 
-// retryLater has a download that failed for why try again after the next
-// of retryWaits, or fail once they ran out. Failures in a row, of any
-// track, hold every download a while. Its caller holds mu.
-func (m *Manager) retryLater(id string, e *entry, why string) {
+// The reasons a download failed that the windows tell in their language,
+// as TrackState.Reason has them. Another failure's reason is "", and its
+// TrackState.Why tells it in the error's own words.
+const (
+	// ReasonNeedsYTDLP: yt-dlp isn't installed.
+	ReasonNeedsYTDLP = "needsYTDLP"
+	// ReasonNoAudio: the video has no audio to download.
+	ReasonNoAudio = "noAudio"
+	// ReasonNoMatch: a Spotify track's recording wasn't found.
+	ReasonNoMatch = "noMatch"
+	// ReasonBadAudio: the audio that came can't play.
+	ReasonBadAudio = "badAudio"
+	// ReasonNotYouTube: the track is of no service that downloads.
+	ReasonNotYouTube = "notYouTube"
+	// ReasonNoMatcher: nothing finds Spotify tracks' recordings.
+	ReasonNoMatcher = "noMatcher"
+	// ReasonNetwork: the network went.
+	ReasonNetwork = "network"
+	// ReasonDiskFull: the disk is full.
+	ReasonDiskFull = "diskFull"
+)
+
+// reasonOf is the reason of err, a failure, or "" for another.
+func reasonOf(err error) string {
+	switch {
+	case errors.Is(err, tools.ErrNoYTDLP):
+		return ReasonNeedsYTDLP
+	case errors.Is(err, stream.ErrNoAudio):
+		return ReasonNoAudio
+	case errors.Is(err, match.ErrNoMatch):
+		return ReasonNoMatch
+	case errors.Is(err, errBadAudio):
+		return ReasonBadAudio
+	case errors.Is(err, errNotYouTube):
+		return ReasonNotYouTube
+	case errors.Is(err, errNoMatcher):
+		return ReasonNoMatcher
+	case diskFull(err):
+		return ReasonDiskFull
+	case stream.IsNetwork(err):
+		return ReasonNetwork
+	}
+	return ""
+}
+
+// retryLater has a download that failed for why, of reason, try again
+// after the next of retryWaits, or fail once they ran out. Failures in a
+// row, of any track, hold every download a while. Its caller holds mu.
+func (m *Manager) retryLater(id string, e *entry, why, reason string) {
 	n := m.tries[id]
 	if n >= len(retryWaits) {
-		e.Failed = why
+		e.Failed, e.Reason = why, reason
 		delete(m.tries, id)
 		delete(m.nextAt, id)
 	} else {
@@ -426,18 +471,18 @@ func (m *Manager) retryLater(id string, e *entry, why string) {
 	}
 	m.failing++
 	if m.failing >= failingAfter {
-		m.setHold(holdFailing, true, "Downloads keep failing ("+why+"); they go on in a while", time.Now().Add(failingFor))
+		m.setHold(holdFailing, true, "Downloads keep failing ("+why+"); they go on in a while", time.Now().Add(failingFor), reason, why)
 	}
 }
 
 // checkNetwork asks whether the network answers, after a download failed
 // as when it went: while it doesn't, every download waits for it.
-func (m *Manager) checkNetwork(id, why string) {
+func (m *Manager) checkNetwork(id, why, reason string) {
 	if m.opts.Network.Check(m.ctx) {
 		m.mu.Lock()
 		defer m.mu.Unlock()
 		if e := m.idx.Tracks[id]; e != nil && m.ctx.Err() == nil {
-			m.retryLater(id, e, why)
+			m.retryLater(id, e, why, reason)
 			m.changed()
 		}
 		return

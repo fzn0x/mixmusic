@@ -86,7 +86,7 @@ func (s *shell) refreshFailed(err error) {
 		return
 	}
 	s.refreshTold = true
-	s.notes = append(s.notes, player.Notice{Message: locales.RefreshFailed(err.Error()), Error: true})
+	s.notes = append(s.notes, player.Notice{Message: locales.RefreshFailed(errorText(err)), Error: true})
 }
 
 // nothingToRefresh tells whether the page shows only what is always

@@ -670,7 +670,7 @@ func TestSkipAIFallback(t *testing.T) {
 	if h.stream.has("load url:spotify:2 0s true") {
 		t.Error("2 played")
 	}
-	h.noticed("Skipped Spotify 2, whose recording on YouTube Music YouTube labels as made with AI")
+	h.noticed("Skipped Spotify 2: YouTube labels its recording on YouTube Music as made with AI")
 }
 
 // liveLabeled is the fake app knowing YouTube's labels, whose tracks of

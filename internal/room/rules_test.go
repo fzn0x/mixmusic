@@ -59,9 +59,9 @@ func (f *fakeGuests) guests() *Guests {
 			f.mu.Unlock()
 			return nil
 		},
-		Asks: func(note string) {
+		Asks: func(ask Ask) {
 			f.mu.Lock()
-			f.notes = append(f.notes, note)
+			f.notes = append(f.notes, ask.String())
 			f.mu.Unlock()
 		},
 	}

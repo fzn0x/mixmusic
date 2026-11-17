@@ -579,7 +579,50 @@
   "assistantsCopyCommand": "Copy the command",
   "assistantsCopyConfig": "Copy the configuration",
   "assistantsHowTo": "How to add MixMusic to an assistant",
+  "assistantsNameAlbum": "the album “{title}”",
+  "@assistantsNameAlbum": {
+    "description": "An album as the toasts of an AI assistant name it: it goes in the {what} of the assistantsToast messages.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsNameArtistSongs": "all the songs of {name}",
+  "@assistantsNameArtistSongs": {
+    "description": "All of an artist's songs, as the toasts of an AI assistant name them: it goes in the {what} of the assistantsToast messages. {name} is the artist.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsNameLiked": "your liked songs",
+  "@assistantsNameLiked": {
+    "description": "The liked songs, as the toasts of an AI assistant name them: it goes in the {what} of the assistantsToast messages."
+  },
   "assistantsNameSeparator": ", ",
+  "assistantsNameTitle": "“{title}”",
+  "@assistantsNameTitle": {
+    "description": "A track of no artists known, or a playlist, as the toasts of an AI assistant name it: it goes in the {what} of the assistantsToast messages.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsNameTrackBy": "“{title}” by {artists}",
+  "@assistantsNameTrackBy": {
+    "description": "A track as the toasts of an AI assistant name it: it goes in the {what} of the assistantsToast messages.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
   "assistantsNone": "None now. Turning this off ends every session at once.",
   "assistantsProblem": "{problem}.",
   "@assistantsProblem": {
@@ -592,6 +635,89 @@
   "assistantsProblemTitle": "AI assistants can't connect",
   "assistantsSwitch": "Let AI assistants control MixMusic",
   "assistantsTitle": "AI assistants",
+  "assistantsToastAdded": "An AI assistant added {what} to the queue",
+  "@assistantsToastAdded": {
+    "description": "Toast when an AI assistant added something to the end of the queue. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastMoved": "An AI assistant moved {what} to {time}",
+  "@assistantsToastMoved": {
+    "description": "Toast when an AI assistant moved the track to a place in it. {what} is one of the assistantsName messages; {time} is a place in the track, as 2:05.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastPaused": "An AI assistant paused {what}",
+  "@assistantsToastPaused": {
+    "description": "Toast when an AI assistant paused the track. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastPlayed": "An AI assistant played {what}",
+  "@assistantsToastPlayed": {
+    "description": "Toast when an AI assistant, as one that speaks MCP, played something. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastPutNext": "An AI assistant put {what} next",
+  "@assistantsToastPutNext": {
+    "description": "Toast when an AI assistant put something to play next. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastShuffled": "An AI assistant shuffled {what}",
+  "@assistantsToastShuffled": {
+    "description": "Toast when an AI assistant played something shuffled. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastSkipped": "An AI assistant skipped to the next track",
+  "@assistantsToastSkipped": {
+    "description": "Toast when an AI assistant skipped to the next track."
+  },
+  "assistantsToastSkippedTo": "An AI assistant skipped ahead to {what}",
+  "@assistantsToastSkippedTo": {
+    "description": "Toast when an AI assistant skipped past several tracks. {what} is one of the assistantsName messages.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastVolume": "An AI assistant set the volume to {percent}%",
+  "@assistantsToastVolume": {
+    "description": "Toast when an AI assistant set the volume, from 0 to 100.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "assistantsToastWentBack": "An AI assistant went back",
+  "@assistantsToastWentBack": {
+    "description": "Toast when an AI assistant went back, as the previous button does."
+  },
   "audioAccount2Change": "You can change this in Settings › Playback › Sound.",
   "audioAccount2NotNow": "not now",
   "audioAccount2Offer": "Your YouTube Music account has Premium, whose audio has a higher bitrate. MixMusic can ask for each track's audio as your account to play it. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
@@ -702,7 +828,7 @@
   },
   "castDeviceGone": "That cast device is no longer on the network",
   "@castDeviceGone": {
-    "description": "A notice, as casting to a device that went starts."
+    "description": "A notice, as casting starts to a device that has left the network."
   },
   "castPlayingOn": "Playing on {name}",
   "@castPlayingOn": {
@@ -1900,6 +2026,65 @@
       }
     }
   },
+  "downloadsHoldDisk": "The disk of your downloads is full: they go on once it has room",
+  "@downloadsHoldDisk": {
+    "description": "Why the downloads wait, on the downloads page."
+  },
+  "downloadsHoldFailing": "Downloads keep failing ({reason}); they go on in a while",
+  "@downloadsHoldFailing": {
+    "description": "Why the downloads wait, on the downloads page. {reason} is why the last one failed, as a message of downloadsReason, or the error's own words.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsHoldMetered": "Waiting for a connection that isn't metered, as Settings › Playback asks",
+  "@downloadsHoldMetered": {
+    "description": "Why the downloads wait, on the downloads page: the connection is metered, as a phone's hotspot."
+  },
+  "downloadsHoldMoving": "Moving to {folder}",
+  "@downloadsHoldMoving": {
+    "description": "Why the downloads wait, on the downloads page: they move to the folder {folder}, a path.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsHoldOffline": "Waiting for the network",
+  "@downloadsHoldOffline": {
+    "description": "Why the downloads wait, on the downloads page."
+  },
+  "downloadsHoldPaused": "Paused",
+  "@downloadsHoldPaused": {
+    "description": "Why the downloads wait, on the downloads page: the user paused them."
+  },
+  "downloadsHoldThrottled": "YouTube is turning down requests from this network for now; downloads go on in a while",
+  "@downloadsHoldThrottled": {
+    "description": "Why the downloads wait, on the downloads page."
+  },
+  "downloadsHoldUnreachable": "The folder of your downloads can't be reached: {folder}",
+  "@downloadsHoldUnreachable": {
+    "description": "Why the downloads wait, as the downloads page and Settings tell it. {folder} is the folder's path.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsHoldUnreadable": "The downloads in {folder} can't be read: {error}",
+  "@downloadsHoldUnreadable": {
+    "description": "Why the downloads wait, as the downloads page and Settings tell it. {folder} is the folder's path; {error} is the system's own words, often in English.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "downloadsLikedSongs": "Liked songs",
   "@downloadsLikedSongs": {
     "description": "The title of the download of the liked songs, on the downloads page and in its notices."
@@ -1963,6 +2148,22 @@
   "@downloadsMove": {
     "description": "Confirm button of moving the downloads. Lowercase."
   },
+  "downloadsMoveCacheFolder": "the downloads can't share a folder with MixMusic's cache",
+  "@downloadsMoveCacheFolder": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed."
+  },
+  "downloadsMoveCantWrite": "MixMusic can't write to {folder}: {error}",
+  "@downloadsMoveCantWrite": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed. {folder} is a path; {error} is the system's own words, often in English.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "downloadsMoveFailed": "couldn't move the downloads: {error}",
   "@downloadsMoveFailed": {
     "placeholders": {
@@ -1970,6 +2171,18 @@
         "type": "String"
       }
     }
+  },
+  "downloadsMoveIntoTheirs": "the downloads can't move into a folder of their own",
+  "@downloadsMoveIntoTheirs": {
+    "description": "Why the downloads didn't move: the folder chosen is inside theirs. It goes in the {error} of downloadsMoveFailed."
+  },
+  "downloadsMoveMovingAlready": "the downloads are moving already",
+  "@downloadsMoveMovingAlready": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed."
+  },
+  "downloadsMoveNoDownloads": "MixMusic keeps no downloads here",
+  "@downloadsMoveNoDownloads": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed."
   },
   "downloadsMoveQuestion": "Move {count, plural, one {# download} other {# downloads}}, {size}, to {folder}? They wait meanwhile.",
   "@downloadsMoveQuestion": {
@@ -1984,6 +2197,10 @@
         "type": "String"
       }
     }
+  },
+  "downloadsMoveSameFolder": "the downloads are in that folder already",
+  "@downloadsMoveSameFolder": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed."
   },
   "downloadsMoveTitle": "move downloads",
   "@downloadsMoveTitle": {
@@ -2026,6 +2243,10 @@
   "@downloadsPause": {
     "description": "Link that pauses the downloads. Lowercase."
   },
+  "downloadsPhaseFinding": "finding its recording on YouTube Music",
+  "@downloadsPhaseFinding": {
+    "description": "What the download of a Spotify track does, on its row of the downloads page: it looks for the track's recording on YouTube Music, which downloads in its place."
+  },
   "downloadsProblemMessage": "{problem}. Tracks stream as before meanwhile.",
   "@downloadsProblemMessage": {
     "placeholders": {
@@ -2041,6 +2262,38 @@
   "downloadsProgressLabel": "Downloads",
   "@downloadsProgressLabel": {
     "description": "Label of the progress bar of the downloads."
+  },
+  "downloadsReasonBadAudio": "the audio that came can't play",
+  "@downloadsReasonBadAudio": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonDiskFull": "the disk is full",
+  "@downloadsReasonDiskFull": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNeedsYTDLP": "it needs yt-dlp, which Settings › Playback installs",
+  "@downloadsReasonNeedsYTDLP": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing, so it starts in lowercase where the language has cases."
+  },
+  "downloadsReasonNetwork": "the network went",
+  "@downloadsReasonNetwork": {
+    "description": "Why a track couldn't download: the connection dropped. It goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNoAudio": "YouTube has no audio of this track that MixMusic plays",
+  "@downloadsReasonNoAudio": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNoMatch": "no matching recording found on YouTube Music",
+  "@downloadsReasonNoMatch": {
+    "description": "Why a Spotify track couldn't download: its recording on YouTube Music, which downloads in its place, wasn't found. It goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNoMatcher": "nothing here finds the recordings of Spotify tracks",
+  "@downloadsReasonNoMatcher": {
+    "description": "Why a Spotify track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNotYouTube": "only tracks of YouTube Music, and Spotify tracks through their recording there, download",
+  "@downloadsReasonNotYouTube": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
   },
   "downloadsRemoveAll": "remove all downloads",
   "@downloadsRemoveAll": {
@@ -2259,6 +2512,234 @@
   },
   "equalizerSpotifyNotes": "Spotify notes",
   "equalizerTitle": "Equalizer",
+  "errorAddonsBuiltin": "add-ons MixMusic ships with cannot be removed",
+  "@errorAddonsBuiltin": {
+    "description": "Why a theme or plugin wasn't removed, as a toast."
+  },
+  "errorAudioCantPlay": "the file can't be played",
+  "@errorAudioCantPlay": {
+    "description": "An error of a file, as a toast or inside a message that leads it."
+  },
+  "errorAudioNoOutput": "no audio output device",
+  "@errorAudioNoOutput": {
+    "description": "An error of the sound, as a toast or inside a message that leads it: the computer has no speakers or headphones MixMusic can play on."
+  },
+  "errorColorFileEmpty": "it's empty",
+  "@errorColorFileEmpty": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it."
+  },
+  "errorColorFileFolder": "it's a folder",
+  "@errorColorFileFolder": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it."
+  },
+  "errorColorFilePartial": "it ends partway through",
+  "@errorColorFilePartial": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it."
+  },
+  "errorColorFileTooBig": "it's over 1 MB",
+  "@errorColorFileTooBig": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it."
+  },
+  "errorColorFileUnknown": "it holds no colours MixMusic knows. MixMusic reads pywal's colors.json, matugen's JSON, what MixMusic's matugen template writes, and the colors of a Base16 or Base24 scheme in YAML or JSON",
+  "@errorColorFileUnknown": {
+    "description": "Why the colour file couldn't be read, inside a message that leads it. pywal, matugen, Base16 and Base24 are names."
+  },
+  "errorFirewallDeclined": "the administrator's approval wasn't given",
+  "@errorFirewallDeclined": {
+    "description": "Why the firewall's rules didn't change, inside a message that leads it."
+  },
+  "errorFirewallUnsupported": "only Windows' firewall is read",
+  "@errorFirewallUnsupported": {
+    "description": "An error of Settings › Desktop › Windows Firewall, inside a message that leads it."
+  },
+  "errorLastfmNotAuthorized": "Last.fm hasn't approved the sign-in yet",
+  "@errorLastfmNotAuthorized": {
+    "description": "An error of Last.fm, as a toast or inside a message that leads it: the user didn't allow MixMusic on Last.fm's page yet."
+  },
+  "errorListenBrainzNotServer": "this isn't the address of a server: write it as https://listenbrainz.example.com",
+  "@errorListenBrainzNotServer": {
+    "description": "An error of ListenBrainz, as a toast or inside a message that leads it. Keep the example address as it is."
+  },
+  "errorLocalFilesCantWatch": "this system doesn't tell of changes to folders",
+  "@errorLocalFilesCantWatch": {
+    "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorLocalFilesNetworkDrive": "it's on a network drive",
+  "@errorLocalFilesNetworkDrive": {
+    "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorLocalFilesRemovableDrive": "it's on a removable drive, which a watch would keep from being ejected",
+  "@errorLocalFilesRemovableDrive": {
+    "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorLocalFilesWatchLimit": "the system's limit on watched folders is reached",
+  "@errorLocalFilesWatchLimit": {
+    "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorSpotifyNoClientID": "Set your Client ID in Settings › Accounts first",
+  "@errorSpotifyNoClientID": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it: MixMusic needs the Client ID of the user's Spotify app."
+  },
+  "errorSpotifyNotSignedIn": "not signed in to Spotify",
+  "@errorSpotifyNotSignedIn": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifyPlaylistNotShown": "Spotify shows apps neither its own playlists nor those deleted or made private",
+  "@errorSpotifyPlaylistNotShown": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifyPlaylistRefused": "Spotify refused to change the playlist",
+  "@errorSpotifyPlaylistRefused": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifyPlaylistUnavailable": "Spotify only lets apps read the tracks of playlists you own or collaborate on",
+  "@errorSpotifyPlaylistUnavailable": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifyPremium": "playback control needs Spotify Premium",
+  "@errorSpotifyPremium": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorSpotifySignInAgain": "sign in to Spotify again",
+  "@errorSpotifySignInAgain": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it: the sign-in expired."
+  },
+  "errorSpotifyTooMany": "Spotify had too many requests: try again in a moment",
+  "@errorSpotifyTooMany": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it."
+  },
+  "errorStreamAdults": "YouTube plays this track only to signed-in adults, on its own website",
+  "@errorStreamAdults": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamBadVideoID": "that isn't a YouTube video",
+  "@errorStreamBadVideoID": {
+    "description": "An error, as a toast or inside a message that leads it: what was given isn't the ID of a YouTube video."
+  },
+  "errorStreamBot": "YouTube asks to confirm this is not a bot; try again in a while",
+  "@errorStreamBot": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay."
+  },
+  "errorStreamCountry": "this track is not available in your country",
+  "@errorStreamCountry": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamGone": "this track is no longer on YouTube Music",
+  "@errorStreamGone": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamLive": "it's a live stream, which doesn't download",
+  "@errorStreamLive": {
+    "description": "Why a video doesn't download, as a toast or inside a message that leads it."
+  },
+  "errorStreamMembers": "only the members of its channel can play this track",
+  "@errorStreamMembers": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamNetwork": "the network failed",
+  "@errorStreamNetwork": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamNoAudio": "YouTube has no audio of this track that MixMusic plays",
+  "@errorStreamNoAudio": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamNoCaptions": "YouTube tells of no captions of this video",
+  "@errorStreamNoCaptions": {
+    "description": "Why a video has no lyrics from its captions, as a toast or inside a message that leads it."
+  },
+  "errorStreamNoFormat": "YouTube gave no audio for this track; updating yt-dlp in Settings › Playback often fixes it",
+  "@errorStreamNoFormat": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamPremium": "only YouTube Music Premium members can play this track",
+  "@errorStreamPremium": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamPrivate": "this track is private",
+  "@errorStreamPrivate": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamRefused": "YouTube refused to send its audio; updating yt-dlp in Settings › Playback often fixes it",
+  "@errorStreamRefused": {
+    "description": "Why a track's audio failed, as a toast or inside a message that leads it."
+  },
+  "errorStreamSignedIn": "YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it",
+  "@errorStreamSignedIn": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamStalled": "YouTube stopped sending the audio, as happens when the connection drops; check the connection and play the track again",
+  "@errorStreamStalled": {
+    "description": "Why a track's audio failed, as a toast or inside a message that leads it."
+  },
+  "errorStreamThrottled": "YouTube is turning down requests from this network for now; try again in a while",
+  "@errorStreamThrottled": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamUnavailable": "YouTube won't send this track",
+  "@errorStreamUnavailable": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorTagsCover": "the cover must be a JPEG or PNG image of at most 10 MB",
+  "@errorTagsCover": {
+    "description": "Why a file's cover didn't change, as a toast or inside a message that leads it."
+  },
+  "errorTagsFolderReadOnly": "MixMusic can't write in its folder",
+  "@errorTagsFolderReadOnly": {
+    "description": "Why a file's tags didn't change, as a toast or inside a message that leads it."
+  },
+  "errorTagsFormat": "its layout isn't one MixMusic can change safely",
+  "@errorTagsFormat": {
+    "description": "Why a file's tags didn't change, as a toast or inside a message that leads it."
+  },
+  "errorTagsReadOnly": "the file is read-only",
+  "@errorTagsReadOnly": {
+    "description": "Why a file's tags didn't change, as a toast or inside a message that leads it."
+  },
+  "errorTagsUnsupported": "MixMusic doesn't change the tags of this kind of file",
+  "@errorTagsUnsupported": {
+    "description": "Why a file's tags didn't change, as a toast or inside a message that leads it."
+  },
+  "errorToolsBrowserOpen": "the browser is open and holds its cookies: close it, then try again",
+  "@errorToolsBrowserOpen": {
+    "description": "Why the sign-in from a browser failed, as a toast or inside a message that leads it."
+  },
+  "errorToolsCookiesDenied": "the system keeps the browser's cookies from MixMusic",
+  "@errorToolsCookiesDenied": {
+    "description": "Why the sign-in from a browser failed, as a toast or inside a message that leads it."
+  },
+  "errorToolsCookiesSealed": "the browser seals its cookies so that other programs can't read them",
+  "@errorToolsCookiesSealed": {
+    "description": "Why the sign-in from a browser failed, as a toast or inside a message that leads it."
+  },
+  "errorToolsNoBrowserCookies": "no cookies of the browser were found",
+  "@errorToolsNoBrowserCookies": {
+    "description": "Why the sign-in from a browser failed, as a toast or inside a message that leads it."
+  },
+  "errorToolsNoYTDLP": "yt-dlp is not installed: install it from Settings › Playback",
+  "@errorToolsNoYTDLP": {
+    "description": "An error, as a toast or inside a message that leads it. yt-dlp is a program's name."
+  },
+  "errorYouTubeAlreadyInPlaylist": "YouTube Music did not add it: it's in that playlist already",
+  "@errorYouTubeAlreadyInPlaylist": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it."
+  },
+  "errorYouTubeNoSongList": "YouTube Music lists no more than the top songs of this artist",
+  "@errorYouTubeNoSongList": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it."
+  },
+  "errorYouTubeNotFound": "YouTube Music didn't find it",
+  "@errorYouTubeNotFound": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it: what was asked for isn't there."
+  },
+  "errorYouTubeSessionRejected": "YouTube Music no longer accepts this sign-in",
+  "@errorYouTubeSessionRejected": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it."
+  },
+  "errorYouTubeSignedOut": "sign in to YouTube Music first",
+  "@errorYouTubeSignedOut": {
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it."
+  },
   "explicitBadge": "e",
   "@explicitBadge": {
     "description": "The badge of an explicit track: a letter in a small box beside its title, as E in English. Keep it one or two characters."
@@ -2404,6 +2885,19 @@
   "failureClose": "close",
   "failureCopied": "Copied the details, without your accounts' names",
   "failureCopyLabel": "copy the details",
+  "failureFromFile": "a file on this computer",
+  "@failureFromFile": {
+    "description": "Where a track of a failure comes from, in its details: it goes in the {from} of failureFromWhen, whose first letter MixMusic makes a capital, and of failurePlayedAs."
+  },
+  "failureFromFileAt": "a file on this computer, {path}",
+  "@failureFromFileAt": {
+    "description": "Where a track of a failure comes from, in its details: it goes in the {from} of failureFromWhen, whose first letter MixMusic makes a capital, and of failurePlayedAs. {path} is the file's path.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
   "failureFromWhen": "{from} · {when}",
   "@failureFromWhen": {
     "placeholders": {
@@ -2426,6 +2920,18 @@
       }
     }
   },
+  "failureStep": "{way}: {why}",
+  "@failureStep": {
+    "description": "A line of what was tried, in the failure details of a track that couldn't play. {way} is one of the failureWay messages; {why} is why it failed, in the words of the error, often English.",
+    "placeholders": {
+      "way": {
+        "type": "String"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
   "failureStepNumbered": "{n}. {step}",
   "@failureStepNumbered": {
     "placeholders": {
@@ -2437,9 +2943,108 @@
       }
     }
   },
+  "failureStepTimes": "{way}, {times, plural, one {# time} other {# times}}: {why}",
+  "@failureStepTimes": {
+    "description": "A line of what was tried, in the failure details of a track that couldn't play, when it failed so several times in a row. {way} is one of the failureWay messages; {why} is why it failed, in the words of the error, often English.",
+    "placeholders": {
+      "way": {
+        "type": "String"
+      },
+      "times": {
+        "type": "int"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
   "failureStopped": "MixMusic stopped playing after it, as the tracks just before it couldn't play either.",
   "failureTitle": "Why it couldn't play",
+  "failureTrackBy": "{title}, by {artists}",
+  "@failureTrackBy": {
+    "description": "The track of a failure, in its details and in Settings › About › Recent playback errors.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTrackByOn": "{title}, by {artists}, on {album}",
+  "@failureTrackByOn": {
+    "description": "The track of a failure, in its details and in Settings › About › Recent playback errors.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artists": {
+        "type": "String"
+      },
+      "album": {
+        "type": "String"
+      }
+    }
+  },
+  "failureTrackOn": "{title}, on {album}",
+  "@failureTrackOn": {
+    "description": "The track of a failure, of no artists known, in its details and in Settings › About › Recent playback errors.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "album": {
+        "type": "String"
+      }
+    }
+  },
   "failureTried": "What was tried",
+  "failureWayAgain": "{way}, tried again",
+  "@failureWayAgain": {
+    "description": "A way MixMusic tried once more to play a track, in the failure details. {way} is one of the failureWay messages.",
+    "placeholders": {
+      "way": {
+        "type": "String"
+      }
+    }
+  },
+  "failureWayFile": "The file",
+  "@failureWayFile": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: the track's file on this computer. It starts a line of what was tried, before why it failed."
+  },
+  "failureWayFindingRecording": "Finding it on YouTube Music",
+  "@failureWayFindingRecording": {
+    "description": "A way MixMusic tried to play a Spotify track that couldn't play, in the failure details: finding its recording on YouTube Music, which plays in its place. It starts a line of what was tried."
+  },
+  "failureWayFindingStream": "Finding its stream",
+  "@failureWayFindingStream": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: finding the address of its audio. It starts a line of what was tried."
+  },
+  "failureWayLive": "The live stream",
+  "@failureWayLive": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: a broadcast that goes on now. It starts a line of what was tried."
+  },
+  "failureWayOffline": "The download, or the offline cache",
+  "@failureWayOffline": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: its audio kept on this computer. It starts a line of what was tried."
+  },
+  "failureWayPlayerAPI": "YouTube's player API",
+  "@failureWayPlayerAPI": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: the service of YouTube that gives a video's streams. It starts a line of what was tried."
+  },
+  "failureWaySpotifyHere": "Spotify in MixMusic",
+  "@failureWaySpotifyHere": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: Spotify's own player inside MixMusic, as Settings › Playback calls it. It starts a line of what was tried."
+  },
+  "failureWayStream": "The stream",
+  "@failureWayStream": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: its audio from YouTube. It starts a line of what was tried."
+  },
+  "failureWaySurround": "Its 5.1 surround audio",
+  "@failureWaySurround": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details. It starts a line of what was tried."
+  },
   "firewallAllow": "allow",
   "firewallAllowLabel": "Allow MixMusic in Windows Firewall",
   "firewallAllowed": "Windows Firewall lets MixMusic in on private networks",
@@ -2624,7 +3229,7 @@
       }
     }
   },
-  "globalKeysEditLabel": "{action, select, set {set the global shortcut of {title}} cancel {cancel the global shortcut of {title}} other {change the global shortcut of {title}}}",
+  "globalKeysEditLabel": "{action, select, set {set the global shortcut of {title}} cancel {stop changing the global shortcut of {title}} other {change the global shortcut of {title}}}",
   "@globalKeysEditLabel": {
     "description": "What screen readers say of the button beside a command in Settings › Shortcuts › From any app. {action} is set while the command has no shortcut, cancel while its new keys are being pressed, and change otherwise; {title} is the command, as Play or pause.",
     "placeholders": {
@@ -4566,7 +5171,7 @@
   "@playerExplicitAll": {
     "description": "A notice, as a list played has nothing the settings let play."
   },
-  "playerExplicitOrSkipped": "Every song here is explicit, which your settings hide, or one they skip",
+  "playerExplicitOrSkipped": "Nothing here can play: some songs are explicit, which your settings hide, and your settings skip the rest",
   "@playerExplicitOrSkipped": {
     "description": "A notice, as a list played has nothing the settings let play."
   },
@@ -4658,7 +5263,7 @@
       }
     }
   },
-  "playerSkippedMadeWithAISpotify": "Skipped {title}, whose recording on YouTube Music YouTube labels as made with AI",
+  "playerSkippedMadeWithAISpotify": "Skipped {title}: YouTube labels its recording on YouTube Music as made with AI",
   "@playerSkippedMadeWithAISpotify": {
     "description": "A notice, with a button to the settings, of a Spotify track played from YouTube Music.",
     "placeholders": {
@@ -5125,7 +5730,7 @@
     }
   },
   "podcastsSettingsPlayback": "Settings › Playback",
-  "podcastsSpotifyOnly": "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in {link}.",
+  "podcastsSpotifyOnly": "Spotify's podcasts play only from Spotify: choose “In MixMusic, from Spotify” or “On Spotify Connect” in {link}.",
   "@podcastsSpotifyOnly": {
     "description": "On a Spotify podcast's page, where Spotify's episodes don't play in MixMusic. {link} is podcastsSettingsPlayback, a link to that tab of Settings.",
     "placeholders": {
@@ -5351,6 +5956,10 @@
       }
     }
   },
+  "remoteAnotherComputer": "Another computer",
+  "@remoteAnotherComputer": {
+    "description": "The name of a computer paired for remote control that MixMusic no longer knows by name."
+  },
   "remoteBothWays": "Can control this computer; You control it from here",
   "remoteCanControl": "Can control this computer",
   "remoteCodeAsks": "{name} asks to control MixMusic on this computer. To let it, type this code there:",
@@ -5398,8 +6007,113 @@
     }
   },
   "remoteControlled": "You control it from here",
+  "remoteErrorHandOverLate": "{name} didn't answer in time: what plays here plays on",
+  "@remoteErrorHandOverLate": {
+    "description": "Toast when what plays on this computer didn't move to the computer named {name}.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteErrorKeyBusy": "This computer's key is being read: try again in a moment",
+  "@remoteErrorKeyBusy": {
+    "description": "Toast when remote control waits for the key that tells this computer apart."
+  },
+  "remoteErrorListen": "Remote control can't listen on the network: {error}",
+  "@remoteErrorListen": {
+    "description": "Toast when remote control couldn't start. {error} is the system's own words, often in English.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteErrorNotConnected": "Not connected to that computer",
+  "@remoteErrorNotConnected": {
+    "description": "Toast when the computer whose page shows isn't connected."
+  },
+  "remoteErrorNothingPlays": "Nothing plays on this computer",
+  "@remoteErrorNothingPlays": {
+    "description": "Toast when there is nothing to move to another computer."
+  },
   "remoteFirewallHint": "Windows Firewall keeps the other computers from reaching this one. Windows Firewall, below, tells why, and how to let them in.",
   "remoteNoPaired": "No computer is paired yet. To control another computer, choose it in the player bar's devices menu, the cast button's.",
+  "remoteNoteHandedOver": "{name} moved what it played to this computer",
+  "@remoteNoteHandedOver": {
+    "description": "Toast when the computer named {name} moved its queue and the track it played to this one.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteNotKept": "Couldn't keep {name} as paired: {error}",
+  "@remoteNoteNotKept": {
+    "description": "Toast when this computer couldn't keep the pairing with the computer named {name}. {error} is the system's own words, often in English.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNotePaired": "Paired with {name}",
+  "@remoteNotePaired": {
+    "description": "Toast when this computer paired with the computer named {name}, which it now controls.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNotePairedHere": "Paired with {name}: it can control MixMusic on this computer",
+  "@remoteNotePairedHere": {
+    "description": "Toast when the computer named {name} paired with this one.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteStopped": "Didn't pair with {name}: it stopped answering",
+  "@remoteNoteStopped": {
+    "description": "Toast when the computer named {name} stopped answering as it paired with this one.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteUnfinished": "Didn't pair with {name}: the pairing didn't finish, as it stopped answering",
+  "@remoteNoteUnfinished": {
+    "description": "Toast when the pairing with the computer named {name} didn't finish.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteUnfinishedSlow": "Didn't pair with {name}: the pairing didn't finish, as keeping it took longer than {name} waits",
+  "@remoteNoteUnfinishedSlow": {
+    "description": "Toast when the pairing with the computer named {name} didn't finish, as this computer took too long to keep it.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteNoteWrongCode": "Didn't pair with {name}: the code typed there wasn't the one shown",
+  "@remoteNoteWrongCode": {
+    "description": "Toast when the computer named {name} typed another code than the one this computer showed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "remotePageAskPair": "Pair with {name} to see what plays there and control it from here. {name} shows a code of 6 digits, which you type here.",
   "@remotePageAskPair": {
     "placeholders": {
@@ -5467,6 +6181,104 @@
       },
       "date": {
         "type": "DateTime"
+      }
+    }
+  },
+  "remoteProblemBusy": "{name} is pairing with another computer: try again in a moment.",
+  "@remoteProblemBusy": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemCanceled": "The pairing was canceled on {name}.",
+  "@remoteProblemCanceled": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemLost": "{name} stopped answering: connecting again…",
+  "@remoteProblemLost": {
+    "description": "Why remote control with the computer named {name} stopped, while it connects again.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemNotKept": "{name} couldn't keep the pairing, and tells why there. Pair again.",
+  "@remoteProblemNotKept": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemNotPaired": "{name} removed this computer: pair again to control it.",
+  "@remoteProblemNotPaired": {
+    "description": "Why remote control with the computer named {name} failed: it no longer keeps this computer as paired.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemNotSame": "Another computer answered in place of {name}: it isn't the one paired.",
+  "@remoteProblemNotSame": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemOff": "Remote control is off on {name}.",
+  "@remoteProblemOff": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemOlder": "MixMusic on {name} is older, and can't do that: update it there.",
+  "@remoteProblemOlder": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemTooLong": "The pairing took too long. Pair again for a new code.",
+  "@remoteProblemTooLong": {
+    "description": "Why the pairing for remote control failed."
+  },
+  "remoteProblemUnreachable": "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away.",
+  "@remoteProblemUnreachable": {
+    "description": "Why remote control with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteProblemVersion": "That computer's MixMusic is of another version: update both.",
+  "@remoteProblemVersion": {
+    "description": "Why remote control with another computer failed."
+  },
+  "remoteProblemWrongCode": "That isn't the code {name} showed. Pair again for a new code.",
+  "@remoteProblemWrongCode": {
+    "description": "Why the pairing with the computer named {name} failed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
       }
     }
   },
@@ -5547,7 +6359,87 @@
     }
   },
   "remoteSwitch": "Allow remote control",
+  "remoteThatComputer": "That computer",
+  "@remoteThatComputer": {
+    "description": "The name of a computer of remote control that told none."
+  },
   "remoteTitle": "Remote control",
+  "roomControlRefused": "{host} doesn't let guests control playback",
+  "@roomControlRefused": {
+    "description": "Toast when a guest pressed play, pause or skip in the room of {host}, who doesn't let guests control it.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "roomControlTooMany": "Too many at once: try again in a moment",
+  "@roomControlTooMany": {
+    "description": "Toast when a guest pressed play, pause or skip too many times at once."
+  },
+  "roomErrorAnnounce": "The room can't be announced on the network: {error}",
+  "@roomErrorAnnounce": {
+    "description": "Toast when the room couldn't open. {error} is the system's own words, often in English.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "roomErrorCantHost": "That guest can't host the room now: they may be away, or their MixMusic older",
+  "@roomErrorCantHost": {
+    "description": "Toast when the host chose Make host for a guest that can't host."
+  },
+  "roomErrorCantPlaySong": "This computer can't play that song",
+  "@roomErrorCantPlaySong": {
+    "description": "Toast when the host accepted a guest's song that this computer can't play, or whose explicit content the settings hide."
+  },
+  "roomErrorDropped": "you removed or blocked someone while it moved",
+  "@roomErrorDropped": {
+    "description": "Why the room didn't move to another computer: it goes in the {error} of roomNoteStays."
+  },
+  "roomErrorInRoom": "Leave the room you're in to start one",
+  "@roomErrorInRoom": {
+    "description": "Toast when the user starts a room while a guest of another."
+  },
+  "roomErrorLeft": "someone left while it moved",
+  "@roomErrorLeft": {
+    "description": "Why the room didn't move to another computer: it goes in the {error} of roomNoteStays."
+  },
+  "roomErrorListen": "The room can't listen on the network: {error}",
+  "@roomErrorListen": {
+    "description": "Toast when the room couldn't open. {error} is the system's own words, often in English.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "roomErrorMoved": "The room moved to another computer",
+  "@roomErrorMoved": {
+    "description": "Toast or reason when the room had moved to another computer already."
+  },
+  "roomErrorMoving": "The room moves to another guest already",
+  "@roomErrorMoving": {
+    "description": "Toast when the host chose Make host while the room moves already."
+  },
+  "roomErrorNotInRoom": "You're in no room now",
+  "@roomErrorNotInRoom": {
+    "description": "Toast when the user adds a song to a room, or controls it, but is in none."
+  },
+  "roomFollowCantPlay": "Can't play here",
+  "@roomFollowCantPlay": {
+    "description": "What a guest shows of the room's track when it has no way to play it, as a file of the host's computer."
+  },
+  "roomFollowExplicit": "{title} is explicit, and your settings hide explicit content: it stays silent here",
+  "@roomFollowExplicit": {
+    "description": "What a guest shows of the room's track when the settings hide explicit content. {title} is the track's title.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "roomMenuListening": "{count, plural, one {# listening} other {# listening}}",
   "@roomMenuListening": {
     "placeholders": {
@@ -5558,6 +6450,122 @@
   },
   "roomMenuNewCode": "The room has a new code: the old code and link no longer let anyone in",
   "roomMenuYourRoom": "Your room",
+  "roomNoteAddressChanged": "Your room's internet address changed: send friends outside your network the new invite link.",
+  "@roomNoteAddressChanged": {
+    "description": "Toast for the host when the room's internet address changed."
+  },
+  "roomNoteAskAdd": "{name} asks to add {title}",
+  "@roomNoteAskAdd": {
+    "description": "Toast and notification for the host when the guest named {name} asks to add the song {title} to the room.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteAskHost": "{name} asks you to host the room",
+  "@roomNoteAskHost": {
+    "description": "Toast and notification for a guest when the host, {name}, asks them to host the room.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteAskJoin": "{name} asks to join your room",
+  "@roomNoteAskJoin": {
+    "description": "Toast and notification for the host when the computer named {name} asks to join.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteEndToJoin": "End the room you host to join another",
+  "@roomNoteEndToJoin": {
+    "description": "Toast when the user joins a room while hosting one."
+  },
+  "roomNoteGuessed": "Someone on the network is guessing your room's code. Friends can still join with the invite link, or give the room a new code.",
+  "@roomNoteGuessed": {
+    "description": "Toast for the host when the room takes no code for a while, as someone typed many wrong ones."
+  },
+  "roomNoteGuestAdded": "{name} added {title}",
+  "@roomNoteGuestAdded": {
+    "description": "Toast for the host when the guest named {name} added the song {title} to the room.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteGuestJoined": "{name} joined the room",
+  "@roomNoteGuestJoined": {
+    "description": "Toast for the host when the guest named {name} joined.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteGuestLeft": "{name} left the room",
+  "@roomNoteGuestLeft": {
+    "description": "Toast for the host when the guest named {name} left.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteJoined": "You joined {host}'s room",
+  "@roomNoteJoined": {
+    "description": "Toast when the user joined the room of {host}.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteLeaveToJoin": "Leave the room you're in to join another",
+  "@roomNoteLeaveToJoin": {
+    "description": "Toast when the user joins a room while a guest of another."
+  },
+  "roomNoteMoved": "The room moved to {name}'s computer",
+  "@roomNoteMoved": {
+    "description": "Toast for a guest when the room moved to the computer of the guest named {name}.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteMovedAway": "The room moved to {name}'s computer: you're a guest in it now",
+  "@roomNoteMovedAway": {
+    "description": "Toast for the host when the room moved to the computer of the guest named {name}.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteStays": "The room stays here: {error}",
+  "@roomNoteStays": {
+    "description": "Toast for the host when the room didn't move to the guest they chose. {error} is why, as a message of roomError, or the error's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "roomNoteYouHost": "You host the room now",
+  "@roomNoteYouHost": {
+    "description": "Toast when the room moved to this computer."
+  },
   "roomPageActivity": "Activity",
   "roomPageActivityLine": "{what, select, joined {{name} joined} left {{name} left} removed {{name} removed} blocked {{name} blocked} guessed {{name} tried too many wrong codes} played {{name} played} paused {{name} paused} skipped {{name} skipped to the next track} back {{name} went back a track} added {{name} added {song}} asked {{name} asked to add {song}} other {{name}}} · {time, time, short}",
   "@roomPageActivityLine": {
@@ -5707,7 +6715,7 @@
       }
     }
   },
-  "roomPageRemovedNote": "A removed guest can join again with the code or the link it has, and a blocked one too, once it comes back as another computer. A new code, and a new link, shut them out; your other guests stay.",
+  "roomPageRemovedNote": "A removed guest can join again with the code or the link it has, and so can a blocked guest that comes back from another computer. A new code and a new link shut them out; your other guests stay.",
   "@roomPageRemovedNote": {
     "description": "On the page of the room this computer hosts, under its guests."
   },
@@ -5753,6 +6761,10 @@
     }
   },
   "roomPageWaitingGuests": "The next track waits for your guests to have it ready.",
+  "roomProblemAddrNoPort": "A room's address has its port, as 203.0.113.7:41234.",
+  "@roomProblemAddrNoPort": {
+    "description": "Why joining a room at an address typed didn't start. Keep the example address as it is."
+  },
   "roomProblemAway": "{name}'s room isn't on the network now.",
   "@roomProblemAway": {
     "placeholders": {
@@ -5777,6 +6789,10 @@
         "type": "String"
       }
     }
+  },
+  "roomProblemCodeShape": "A room's code is 6 letters and digits.",
+  "@roomProblemCodeShape": {
+    "description": "Why joining a room with a code typed didn't start."
   },
   "roomProblemDeclined": "{name} didn't let you in.",
   "@roomProblemDeclined": {
@@ -5897,16 +6913,119 @@
   "roomReachCopyNewWebLink": "copy the new web link",
   "roomReachCopyWebLink": "copy web link",
   "roomReachDesc": "MixMusic asks your router to forward the room's port, and the invite link carries where friends reach this computer. Anyone with the link or the code may knock: Remove and Block keep them out.",
+  "roomReachForwarded": "Your router forwards port {port} of its internet address, {address}, to this computer ({method}).",
+  "@roomReachForwarded": {
+    "description": "How friends outside the network reach the room, on its page. {port} is a number, {address} an IP address, {method} the router's protocol, as UPnP.",
+    "placeholders": {
+      "port": {
+        "type": "String"
+      },
+      "address": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachIPv6Maybe": "Friends with IPv6 may reach this computer at {address}, if your router lets port {port} in.",
+  "@roomReachIPv6Maybe": {
+    "description": "How friends outside the network reach the room, on its page. {address} is an IPv6 address, {port} a number.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      },
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachIPv6Open": "Friends with IPv6 reach this computer at {address}, where your router lets the port in (PCP).",
+  "@roomReachIPv6Open": {
+    "description": "How friends outside the network reach the room, on its page. {address} is an IPv6 address.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
   "roomReachJoinAtAddress": "Join at the address",
   "roomReachJoinButton": "join",
   "roomReachJoinMenu": "Join a room…",
   "roomReachMoved": "The room's internet address changed since you copied its link: friends outside need the new one.",
+  "roomReachNoAnswer": "Your router didn't answer: it may not take forwards from computers, or have UPnP, NAT-PMP and PCP off. Turn one on in its settings, or forward port {port} to this computer by hand. A VPN both of you run, such as Tailscale, reaches the room anyway: put this computer's address on it in Address for invites, in Settings › Desktop › Listen with friends.",
+  "@roomReachNoAnswer": {
+    "description": "Why friends outside the network can't reach the room, on its page. {port} is a number.",
+    "placeholders": {
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachNoRouter": "MixMusic asks no router here.",
+  "@roomReachNoRouter": {
+    "description": "Why friends outside the network can't reach the room, on its page."
+  },
+  "roomReachPortTaken": "Port {kept}, kept for rooms, is taken by another program: the room listens at port {port} instead, which a port forwarded by hand doesn't reach.",
+  "@roomReachPortTaken": {
+    "description": "How friends outside the network reach the room, on its page. {kept} and {port} are numbers.",
+    "placeholders": {
+      "kept": {
+        "type": "String"
+      },
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachRefused": "Your router refused to forward port {port}: {reason}. Forward the port to this computer by hand in the router's settings, or turn on UPnP there. A VPN both of you run, such as Tailscale, reaches the room anyway: put this computer's address on it in Address for invites, in Settings › Desktop › Listen with friends.",
+  "@roomReachRefused": {
+    "description": "Why friends outside the network can't reach the room, on its page. {port} is a number; {reason} is the router's own words, often in English.",
+    "placeholders": {
+      "port": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachShared": "Your router's internet address, {address}, is shared with your provider's other customers, or private: the router sits behind another, most often the provider's, out of reach from outside. A VPN both of you run, such as Tailscale, reaches the room anyway: put this computer's address on it in Address for invites, in Settings › Desktop › Listen with friends.",
+  "@roomReachShared": {
+    "description": "Why friends outside the network can't reach the room, on its page. {address} is an IP address.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
   "roomReachSuggestAsk": "Turn on Ask me before someone joins, and whoever comes with the link or the code waits until you let them in.",
   "roomReachSuggestAskLabel": "Turn on Ask me before someone joins",
   "roomReachSuggestAskNo": "not now",
   "roomReachSuggestAskYes": "turn it on",
   "roomReachTestNote": "MixMusic can't test the port from outside: ask a friend to open the link. A friend who can't connect is told the likely causes.",
   "roomReachTitle": "Let friends outside this network join",
+  "roomReachTyped": "Invites carry the address you typed for them, {address}. It must reach this computer's port {port}.",
+  "@roomReachTyped": {
+    "description": "How friends outside the network reach the room, on its page. {address} is what the user typed in Address for invites; {port} is a number.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      },
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "roomReachTypedInvalid": "The address for invites, {address}, isn't an address: change it in Settings › Desktop › Listen with friends.",
+  "@roomReachTypedInvalid": {
+    "description": "Why friends outside the network can't reach the room, on its page. {address} is what the user typed.",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
   "roomRulesAccept": "accept",
   "roomRulesAcceptName": "Accept {title}",
   "@roomRulesAcceptName": {
@@ -6068,6 +7187,72 @@
   "roomSettingsYourName": "Your name in rooms",
   "roomSettingsYourRoomOpen": "Your room is open",
   "roomSomeone": "Someone",
+  "roomSongAdded": "{host} added {title} to the room",
+  "@roomSongAdded": {
+    "description": "Toast for a guest when the host, {host}, added the song {title} the guest gave.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongCantPlay": "{host} can't play {title}",
+  "@roomSongCantPlay": {
+    "description": "Toast for a guest when the host's computer can't play the song {title} the guest gave.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongDeclined": "{host} declined {title}",
+  "@roomSongDeclined": {
+    "description": "Toast for a guest when the host declined the song {title} the guest gave.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongWaits": "{title} waits for {host} to accept it",
+  "@roomSongWaits": {
+    "description": "Toast for a guest when the song {title} they gave waits for the host's answer.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongsOff": "{host} takes no songs from guests",
+  "@roomSongsOff": {
+    "description": "Toast for a guest when the host takes no songs.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "roomSongsTooMany": "You added many songs: wait a moment, or for {host} to answer those waiting",
+  "@roomSongsTooMany": {
+    "description": "Toast for a guest who gave too many songs at once.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
   "searchAlbums": "Albums",
   "searchArtists": "Artists",
   "searchClear": "clear",
@@ -6387,7 +7572,7 @@
       }
     }
   },
-  "shortcutsEditLabel": "{action, select, set {set the shortcut of {title}} cancel {cancel the shortcut of {title}} other {change the shortcut of {title}}}",
+  "shortcutsEditLabel": "{action, select, set {set the shortcut of {title}} cancel {stop changing the shortcut of {title}} other {change the shortcut of {title}}}",
   "@shortcutsEditLabel": {
     "description": "What screen readers say of the button beside a command in Settings › Shortcuts. {action} is set while the command has no shortcut, cancel while its new keys are being pressed, and change otherwise; {title} is the command, as Play or pause.",
     "placeholders": {
@@ -6817,6 +8002,15 @@
     "description": "How to update yt-dlp: the command that updates it. Lowercase.",
     "placeholders": {
       "command": {
+        "type": "String"
+      }
+    }
+  },
+  "toolsInstallFailed": "couldn't install yt-dlp: {error}",
+  "@toolsInstallFailed": {
+    "description": "Toast when yt-dlp didn't install. {error} is why, as a message of the catalog or in the system's own words, often English.",
+    "placeholders": {
+      "error": {
         "type": "String"
       }
     }

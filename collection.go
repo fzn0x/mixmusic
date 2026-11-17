@@ -507,7 +507,7 @@ func (s *shell) deleteYouTubePlaylist(p media.Playlist) {
 			s.update(func() {
 				delete(s.keeping, key)
 				if err != nil {
-					s.notes = append(s.notes, player.Notice{Message: locales.CollectionDeleteFailed(p.Title, err.Error()), Error: true})
+					s.notes = append(s.notes, player.Notice{Message: locales.CollectionDeleteFailed(p.Title, errorText(err)), Error: true})
 					s.refetch("youtube:playlists")
 					return
 				}

@@ -523,7 +523,7 @@ func (n *notch) lyrics(c *ui.Context, t media.Track) {
 		note(locales.NotchPanelLyricsLooking())
 		return
 	case l.err != nil:
-		note(l.err.Error())
+		note(errorText(l.err))
 		// A track without lyrics stays so; a failure may pass.
 		if !errors.Is(l.err, lyrics.ErrNotFound) {
 			again := n.s.buttonBase(c.Key("notch-lyrics-retry")).Padding(4, 10).Radius(12).Border(1, notchMuted).

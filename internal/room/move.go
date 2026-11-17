@@ -387,13 +387,13 @@ func (s *Server) Open() {
 	s.mu.Unlock()
 }
 
-// errDropped: the host removed or blocked someone as the room moved, whose
+// ErrDropped: the host removed or blocked someone as the room moved, whose
 // place the room it moved to would keep.
-var errDropped = errors.New("you removed or blocked someone while it moved")
+var ErrDropped = errors.New("you removed or blocked someone while it moved")
 
-// errLeft: a guest left as the room moved, whose place the room it moved
+// ErrLeft: a guest left as the room moved, whose place the room it moved
 // to would keep.
-var errLeft = errors.New("someone left while it moved")
+var ErrLeft = errors.New("someone left while it moved")
 
 // stopMove ends the move under way, if any, for why.
 func (s *Server) stopMove(why error) {

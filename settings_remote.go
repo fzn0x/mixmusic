@@ -79,7 +79,7 @@ func (s *shell) setRemote(on bool) {
 			// Windows Firewall's question: it's read again.
 			s.firewall.reread()
 			if err != nil {
-				s.notes = append(s.notes, noticeOf(err))
+				s.notes = append(s.notes, remoteNotice(err))
 			}
 		})
 	}()
@@ -92,7 +92,7 @@ func (s *shell) forgetPaired(p app.PairedComputer) {
 		err := s.a.Remote().Forget(p.ID)
 		s.update(func() {
 			if err != nil {
-				s.notes = append(s.notes, noticeOf(err))
+				s.notes = append(s.notes, remoteNotice(err))
 				return
 			}
 			s.notes = append(s.notes, notice(locales.RemoteRemoved(p.Name)))

@@ -62,6 +62,9 @@ type entry struct {
 	// Failed is why the download failed for good, in plain words, until
 	// it is tried again.
 	Failed string `json:"failed,omitempty"`
+	// Reason is the reason of the failure, when the windows tell it in
+	// their language, as TrackState.Reason.
+	Reason string `json:"reason,omitempty"`
 	// Art is the cover kept, relative to the folder.
 	Art string `json:"art,omitempty"`
 }

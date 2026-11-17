@@ -428,7 +428,7 @@ func (s *shell) devicesButton(c *ui.Context) {
 		case !devices.done:
 			m.Item(locales.PlayerLooking()).Disabled(true)
 		case devices.err != nil:
-			m.Item(devices.err.Error()).Disabled(true)
+			m.Item(errorText(devices.err)).Disabled(true)
 		case len(devices.value) == 0:
 			m.Item(locales.PlayerNoDevices()).Disabled(true)
 		}

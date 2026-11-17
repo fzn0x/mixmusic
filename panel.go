@@ -301,7 +301,7 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 		s.lyricsEmpty(c, o, locales.LyricsLooking())
 		return
 	case l.err != nil:
-		s.lyricsEmpty(c, o, l.err.Error())
+		s.lyricsEmpty(c, o, errorText(l.err))
 		// A track without lyrics stays so; a failure may pass. The
 		// full-screen lyrics refresh with the page (F5) instead.
 		if !errors.Is(l.err, lyrics.ErrNotFound) && o.stage == nil {

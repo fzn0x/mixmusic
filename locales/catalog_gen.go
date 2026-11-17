@@ -6167,6 +6167,150 @@ func (msgs Messages) DownloadsFolderLine(count int, size string, folder string) 
 	return Catalog.Format(msgs.locale, "downloadsFolderLine", map[string]any{"count": count, "size": size, "folder": folder})
 }
 
+// DownloadsHoldDisk says "The disk of your downloads is full: they go on once it has room"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page.
+func DownloadsHoldDisk() string { return In(i18n.Locale()).DownloadsHoldDisk() }
+
+// DownloadsHoldDisk says "The disk of your downloads is full: they go on once it has room"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page.
+func (msgs Messages) DownloadsHoldDisk() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldDisk", nil)
+}
+
+// DownloadsHoldFailing says "Downloads keep failing ({reason}); they go on in a while"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page. {reason} is why the last
+// one failed, as a message of downloadsReason, or the error's own words.
+func DownloadsHoldFailing(reason string) string {
+	return In(i18n.Locale()).DownloadsHoldFailing(reason)
+}
+
+// DownloadsHoldFailing says "Downloads keep failing ({reason}); they go on in a while"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page. {reason} is why the last
+// one failed, as a message of downloadsReason, or the error's own words.
+func (msgs Messages) DownloadsHoldFailing(reason string) string {
+	return Catalog.Format(msgs.locale, "downloadsHoldFailing", map[string]any{"reason": reason})
+}
+
+// DownloadsHoldMetered says "Waiting for a connection that isn't metered, as Settings › Playback asks"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page: the connection is metered,
+// as a phone's hotspot.
+func DownloadsHoldMetered() string { return In(i18n.Locale()).DownloadsHoldMetered() }
+
+// DownloadsHoldMetered says "Waiting for a connection that isn't metered, as Settings › Playback asks"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page: the connection is metered,
+// as a phone's hotspot.
+func (msgs Messages) DownloadsHoldMetered() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldMetered", nil)
+}
+
+// DownloadsHoldMoving says "Moving to {folder}"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page: they move to the folder
+// {folder}, a path.
+func DownloadsHoldMoving(folder string) string { return In(i18n.Locale()).DownloadsHoldMoving(folder) }
+
+// DownloadsHoldMoving says "Moving to {folder}"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page: they move to the folder
+// {folder}, a path.
+func (msgs Messages) DownloadsHoldMoving(folder string) string {
+	return Catalog.Format(msgs.locale, "downloadsHoldMoving", map[string]any{"folder": folder})
+}
+
+// DownloadsHoldOffline says "Waiting for the network"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page.
+func DownloadsHoldOffline() string { return In(i18n.Locale()).DownloadsHoldOffline() }
+
+// DownloadsHoldOffline says "Waiting for the network"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page.
+func (msgs Messages) DownloadsHoldOffline() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldOffline", nil)
+}
+
+// DownloadsHoldPaused says "Paused"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page: the user paused them.
+func DownloadsHoldPaused() string { return In(i18n.Locale()).DownloadsHoldPaused() }
+
+// DownloadsHoldPaused says "Paused"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page: the user paused them.
+func (msgs Messages) DownloadsHoldPaused() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldPaused", nil)
+}
+
+// DownloadsHoldThrottled says "YouTube is turning down requests from this network for now; downloads go on in a while"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page.
+func DownloadsHoldThrottled() string { return In(i18n.Locale()).DownloadsHoldThrottled() }
+
+// DownloadsHoldThrottled says "YouTube is turning down requests from this network for now; downloads go on in a while"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page.
+func (msgs Messages) DownloadsHoldThrottled() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldThrottled", nil)
+}
+
+// DownloadsHoldUnreachable says "The folder of your downloads can't be reached: {folder}"
+// in the language the app shows.
+//
+// Why the downloads wait, as the downloads page and Settings tell it.
+// {folder} is the folder's path.
+func DownloadsHoldUnreachable(folder string) string {
+	return In(i18n.Locale()).DownloadsHoldUnreachable(folder)
+}
+
+// DownloadsHoldUnreachable says "The folder of your downloads can't be reached: {folder}"
+// in the language of msgs.
+//
+// Why the downloads wait, as the downloads page and Settings tell it.
+// {folder} is the folder's path.
+func (msgs Messages) DownloadsHoldUnreachable(folder string) string {
+	return Catalog.Format(msgs.locale, "downloadsHoldUnreachable", map[string]any{"folder": folder})
+}
+
+// DownloadsHoldUnreadable says "The downloads in {folder} can't be read: {error}"
+// in the language the app shows.
+//
+// Why the downloads wait, as the downloads page and Settings tell it.
+// {folder} is the folder's path; {error} is the system's own words, often
+// in English.
+func DownloadsHoldUnreadable(folder string, error string) string {
+	return In(i18n.Locale()).DownloadsHoldUnreadable(folder, error)
+}
+
+// DownloadsHoldUnreadable says "The downloads in {folder} can't be read: {error}"
+// in the language of msgs.
+//
+// Why the downloads wait, as the downloads page and Settings tell it.
+// {folder} is the folder's path; {error} is the system's own words, often
+// in English.
+func (msgs Messages) DownloadsHoldUnreadable(folder string, error string) string {
+	return Catalog.Format(msgs.locale, "downloadsHoldUnreadable", map[string]any{"folder": folder, "error": error})
+}
+
 // DownloadsLikedSongs says "Liked songs"
 // in the language the app shows.
 //
@@ -6339,6 +6483,42 @@ func (msgs Messages) DownloadsMove() string {
 	return Catalog.Format(msgs.locale, "downloadsMove", nil)
 }
 
+// DownloadsMoveCacheFolder says "the downloads can't share a folder with MixMusic's cache"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func DownloadsMoveCacheFolder() string { return In(i18n.Locale()).DownloadsMoveCacheFolder() }
+
+// DownloadsMoveCacheFolder says "the downloads can't share a folder with MixMusic's cache"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveCacheFolder() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveCacheFolder", nil)
+}
+
+// DownloadsMoveCantWrite says "MixMusic can't write to {folder}: {error}"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed. {folder} is a path; {error} is the system's own
+// words, often in English.
+func DownloadsMoveCantWrite(folder string, error string) string {
+	return In(i18n.Locale()).DownloadsMoveCantWrite(folder, error)
+}
+
+// DownloadsMoveCantWrite says "MixMusic can't write to {folder}: {error}"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed. {folder} is a path; {error} is the system's own
+// words, often in English.
+func (msgs Messages) DownloadsMoveCantWrite(folder string, error string) string {
+	return Catalog.Format(msgs.locale, "downloadsMoveCantWrite", map[string]any{"folder": folder, "error": error})
+}
+
 // DownloadsMoveFailed says "couldn't move the downloads: {error}"
 // in the language the app shows.
 func DownloadsMoveFailed(error string) string { return In(i18n.Locale()).DownloadsMoveFailed(error) }
@@ -6347,6 +6527,54 @@ func DownloadsMoveFailed(error string) string { return In(i18n.Locale()).Downloa
 // in the language of msgs.
 func (msgs Messages) DownloadsMoveFailed(error string) string {
 	return Catalog.Format(msgs.locale, "downloadsMoveFailed", map[string]any{"error": error})
+}
+
+// DownloadsMoveIntoTheirs says "the downloads can't move into a folder of their own"
+// in the language the app shows.
+//
+// Why the downloads didn't move: the folder chosen is inside theirs. It
+// goes in the {error} of downloadsMoveFailed.
+func DownloadsMoveIntoTheirs() string { return In(i18n.Locale()).DownloadsMoveIntoTheirs() }
+
+// DownloadsMoveIntoTheirs says "the downloads can't move into a folder of their own"
+// in the language of msgs.
+//
+// Why the downloads didn't move: the folder chosen is inside theirs. It
+// goes in the {error} of downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveIntoTheirs() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveIntoTheirs", nil)
+}
+
+// DownloadsMoveMovingAlready says "the downloads are moving already"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func DownloadsMoveMovingAlready() string { return In(i18n.Locale()).DownloadsMoveMovingAlready() }
+
+// DownloadsMoveMovingAlready says "the downloads are moving already"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveMovingAlready() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveMovingAlready", nil)
+}
+
+// DownloadsMoveNoDownloads says "MixMusic keeps no downloads here"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func DownloadsMoveNoDownloads() string { return In(i18n.Locale()).DownloadsMoveNoDownloads() }
+
+// DownloadsMoveNoDownloads says "MixMusic keeps no downloads here"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveNoDownloads() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveNoDownloads", nil)
 }
 
 // DownloadsMoveQuestion says "Move {count, plural, one {# download} other {# downloads}}, {size}, to {folder}? They wait meanwhile."
@@ -6359,6 +6587,22 @@ func DownloadsMoveQuestion(count int, size string, folder string) string {
 // in the language of msgs.
 func (msgs Messages) DownloadsMoveQuestion(count int, size string, folder string) string {
 	return Catalog.Format(msgs.locale, "downloadsMoveQuestion", map[string]any{"count": count, "size": size, "folder": folder})
+}
+
+// DownloadsMoveSameFolder says "the downloads are in that folder already"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func DownloadsMoveSameFolder() string { return In(i18n.Locale()).DownloadsMoveSameFolder() }
+
+// DownloadsMoveSameFolder says "the downloads are in that folder already"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveSameFolder() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveSameFolder", nil)
 }
 
 // DownloadsMoveTitle says "move downloads"
@@ -6475,6 +6719,24 @@ func (msgs Messages) DownloadsPause() string {
 	return Catalog.Format(msgs.locale, "downloadsPause", nil)
 }
 
+// DownloadsPhaseFinding says "finding its recording on YouTube Music"
+// in the language the app shows.
+//
+// What the download of a Spotify track does, on its row of the downloads
+// page: it looks for the track's recording on YouTube Music, which
+// downloads in its place.
+func DownloadsPhaseFinding() string { return In(i18n.Locale()).DownloadsPhaseFinding() }
+
+// DownloadsPhaseFinding says "finding its recording on YouTube Music"
+// in the language of msgs.
+//
+// What the download of a Spotify track does, on its row of the downloads
+// page: it looks for the track's recording on YouTube Music, which
+// downloads in its place.
+func (msgs Messages) DownloadsPhaseFinding() string {
+	return Catalog.Format(msgs.locale, "downloadsPhaseFinding", nil)
+}
+
 // DownloadsProblemMessage says "{problem}. Tracks stream as before meanwhile."
 // in the language the app shows.
 func DownloadsProblemMessage(problem string) string {
@@ -6513,6 +6775,140 @@ func DownloadsProgressLabel() string { return In(i18n.Locale()).DownloadsProgres
 // Label of the progress bar of the downloads.
 func (msgs Messages) DownloadsProgressLabel() string {
 	return Catalog.Format(msgs.locale, "downloadsProgressLabel", nil)
+}
+
+// DownloadsReasonBadAudio says "the audio that came can't play"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonBadAudio() string { return In(i18n.Locale()).DownloadsReasonBadAudio() }
+
+// DownloadsReasonBadAudio says "the audio that came can't play"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonBadAudio() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonBadAudio", nil)
+}
+
+// DownloadsReasonDiskFull says "the disk is full"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonDiskFull() string { return In(i18n.Locale()).DownloadsReasonDiskFull() }
+
+// DownloadsReasonDiskFull says "the disk is full"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonDiskFull() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonDiskFull", nil)
+}
+
+// DownloadsReasonNeedsYTDLP says "it needs yt-dlp, which Settings › Playback installs"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing, so
+// it starts in lowercase where the language has cases.
+func DownloadsReasonNeedsYTDLP() string { return In(i18n.Locale()).DownloadsReasonNeedsYTDLP() }
+
+// DownloadsReasonNeedsYTDLP says "it needs yt-dlp, which Settings › Playback installs"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing, so
+// it starts in lowercase where the language has cases.
+func (msgs Messages) DownloadsReasonNeedsYTDLP() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNeedsYTDLP", nil)
+}
+
+// DownloadsReasonNetwork says "the network went"
+// in the language the app shows.
+//
+// Why a track couldn't download: the connection dropped. It goes in the
+// {reason} of downloadsMarkFailed, downloadsStatusFailed and
+// downloadsHoldFailing.
+func DownloadsReasonNetwork() string { return In(i18n.Locale()).DownloadsReasonNetwork() }
+
+// DownloadsReasonNetwork says "the network went"
+// in the language of msgs.
+//
+// Why a track couldn't download: the connection dropped. It goes in the
+// {reason} of downloadsMarkFailed, downloadsStatusFailed and
+// downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNetwork() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNetwork", nil)
+}
+
+// DownloadsReasonNoAudio says "YouTube has no audio of this track that MixMusic plays"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonNoAudio() string { return In(i18n.Locale()).DownloadsReasonNoAudio() }
+
+// DownloadsReasonNoAudio says "YouTube has no audio of this track that MixMusic plays"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNoAudio() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNoAudio", nil)
+}
+
+// DownloadsReasonNoMatch says "no matching recording found on YouTube Music"
+// in the language the app shows.
+//
+// Why a Spotify track couldn't download: its recording on YouTube Music,
+// which downloads in its place, wasn't found. It goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonNoMatch() string { return In(i18n.Locale()).DownloadsReasonNoMatch() }
+
+// DownloadsReasonNoMatch says "no matching recording found on YouTube Music"
+// in the language of msgs.
+//
+// Why a Spotify track couldn't download: its recording on YouTube Music,
+// which downloads in its place, wasn't found. It goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNoMatch() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNoMatch", nil)
+}
+
+// DownloadsReasonNoMatcher says "nothing here finds the recordings of Spotify tracks"
+// in the language the app shows.
+//
+// Why a Spotify track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonNoMatcher() string { return In(i18n.Locale()).DownloadsReasonNoMatcher() }
+
+// DownloadsReasonNoMatcher says "nothing here finds the recordings of Spotify tracks"
+// in the language of msgs.
+//
+// Why a Spotify track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNoMatcher() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNoMatcher", nil)
+}
+
+// DownloadsReasonNotYouTube says "only tracks of YouTube Music, and Spotify tracks through their recording there, download"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonNotYouTube() string { return In(i18n.Locale()).DownloadsReasonNotYouTube() }
+
+// DownloadsReasonNotYouTube says "only tracks of YouTube Music, and Spotify tracks through their recording there, download"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNotYouTube() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNotYouTube", nil)
 }
 
 // DownloadsRemoveAll says "remove all downloads"

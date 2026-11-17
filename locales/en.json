@@ -1704,6 +1704,65 @@
       }
     }
   },
+  "downloadsHoldDisk": "The disk of your downloads is full: they go on once it has room",
+  "@downloadsHoldDisk": {
+    "description": "Why the downloads wait, on the downloads page."
+  },
+  "downloadsHoldFailing": "Downloads keep failing ({reason}); they go on in a while",
+  "@downloadsHoldFailing": {
+    "description": "Why the downloads wait, on the downloads page. {reason} is why the last one failed, as a message of downloadsReason, or the error's own words.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsHoldMetered": "Waiting for a connection that isn't metered, as Settings › Playback asks",
+  "@downloadsHoldMetered": {
+    "description": "Why the downloads wait, on the downloads page: the connection is metered, as a phone's hotspot."
+  },
+  "downloadsHoldMoving": "Moving to {folder}",
+  "@downloadsHoldMoving": {
+    "description": "Why the downloads wait, on the downloads page: they move to the folder {folder}, a path.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsHoldOffline": "Waiting for the network",
+  "@downloadsHoldOffline": {
+    "description": "Why the downloads wait, on the downloads page."
+  },
+  "downloadsHoldPaused": "Paused",
+  "@downloadsHoldPaused": {
+    "description": "Why the downloads wait, on the downloads page: the user paused them."
+  },
+  "downloadsHoldThrottled": "YouTube is turning down requests from this network for now; downloads go on in a while",
+  "@downloadsHoldThrottled": {
+    "description": "Why the downloads wait, on the downloads page."
+  },
+  "downloadsHoldUnreachable": "The folder of your downloads can't be reached: {folder}",
+  "@downloadsHoldUnreachable": {
+    "description": "Why the downloads wait, as the downloads page and Settings tell it. {folder} is the folder's path.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsHoldUnreadable": "The downloads in {folder} can't be read: {error}",
+  "@downloadsHoldUnreadable": {
+    "description": "Why the downloads wait, as the downloads page and Settings tell it. {folder} is the folder's path; {error} is the system's own words, often in English.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "downloadsLikedSongs": "Liked songs",
   "@downloadsLikedSongs": {
     "description": "The title of the download of the liked songs, on the downloads page and in its notices."
@@ -1767,6 +1826,22 @@
   "@downloadsMove": {
     "description": "Confirm button of moving the downloads. Lowercase."
   },
+  "downloadsMoveCacheFolder": "the downloads can't share a folder with MixMusic's cache",
+  "@downloadsMoveCacheFolder": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed."
+  },
+  "downloadsMoveCantWrite": "MixMusic can't write to {folder}: {error}",
+  "@downloadsMoveCantWrite": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed. {folder} is a path; {error} is the system's own words, often in English.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "downloadsMoveFailed": "couldn't move the downloads: {error}",
   "@downloadsMoveFailed": {
     "placeholders": {
@@ -1774,6 +1849,18 @@
         "type": "String"
       }
     }
+  },
+  "downloadsMoveIntoTheirs": "the downloads can't move into a folder of their own",
+  "@downloadsMoveIntoTheirs": {
+    "description": "Why the downloads didn't move: the folder chosen is inside theirs. It goes in the {error} of downloadsMoveFailed."
+  },
+  "downloadsMoveMovingAlready": "the downloads are moving already",
+  "@downloadsMoveMovingAlready": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed."
+  },
+  "downloadsMoveNoDownloads": "MixMusic keeps no downloads here",
+  "@downloadsMoveNoDownloads": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed."
   },
   "downloadsMoveQuestion": "Move {count, plural, one {# download} other {# downloads}}, {size}, to {folder}? They wait meanwhile.",
   "@downloadsMoveQuestion": {
@@ -1788,6 +1875,10 @@
         "type": "String"
       }
     }
+  },
+  "downloadsMoveSameFolder": "the downloads are in that folder already",
+  "@downloadsMoveSameFolder": {
+    "description": "Why the downloads didn't move: it goes in the {error} of downloadsMoveFailed."
   },
   "downloadsMoveTitle": "move downloads",
   "@downloadsMoveTitle": {
@@ -1830,6 +1921,10 @@
   "@downloadsPause": {
     "description": "Link that pauses the downloads. Lowercase."
   },
+  "downloadsPhaseFinding": "finding its recording on YouTube Music",
+  "@downloadsPhaseFinding": {
+    "description": "What the download of a Spotify track does, on its row of the downloads page: it looks for the track's recording on YouTube Music, which downloads in its place."
+  },
   "downloadsProblemMessage": "{problem}. Tracks stream as before meanwhile.",
   "@downloadsProblemMessage": {
     "placeholders": {
@@ -1845,6 +1940,38 @@
   "downloadsProgressLabel": "Downloads",
   "@downloadsProgressLabel": {
     "description": "Label of the progress bar of the downloads."
+  },
+  "downloadsReasonBadAudio": "the audio that came can't play",
+  "@downloadsReasonBadAudio": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonDiskFull": "the disk is full",
+  "@downloadsReasonDiskFull": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNeedsYTDLP": "it needs yt-dlp, which Settings › Playback installs",
+  "@downloadsReasonNeedsYTDLP": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing, so it starts in lowercase where the language has cases."
+  },
+  "downloadsReasonNetwork": "the network went",
+  "@downloadsReasonNetwork": {
+    "description": "Why a track couldn't download: the connection dropped. It goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNoAudio": "YouTube has no audio of this track that MixMusic plays",
+  "@downloadsReasonNoAudio": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNoMatch": "no matching recording found on YouTube Music",
+  "@downloadsReasonNoMatch": {
+    "description": "Why a Spotify track couldn't download: its recording on YouTube Music, which downloads in its place, wasn't found. It goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNoMatcher": "nothing here finds the recordings of Spotify tracks",
+  "@downloadsReasonNoMatcher": {
+    "description": "Why a Spotify track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+  },
+  "downloadsReasonNotYouTube": "only tracks of YouTube Music, and Spotify tracks through their recording there, download",
+  "@downloadsReasonNotYouTube": {
+    "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
   },
   "downloadsRemoveAll": "remove all downloads",
   "@downloadsRemoveAll": {

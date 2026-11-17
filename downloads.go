@@ -355,7 +355,7 @@ func (s *shell) downloadMark(c *ui.Context, key string, t media.Track, on bool) 
 			p.StrokePath(&arc, 1.5, accent)
 		})
 	case downloads.Failed:
-		label := locales.DownloadsMarkFailed(st.Why)
+		label := locales.DownloadsMarkFailed(downloadReason(st.Reason, st.Why))
 		box.Label(label).Tooltip(label).Children(func() {
 			ui.Icon(c, icon("alert")).FontSize(13).TextColor(danger)
 		})
@@ -415,7 +415,7 @@ func (s *shell) downloadsLibrary(c *ui.Context) {
 	}
 	problem := func() {
 		if st.Problem != "" {
-			s.alert(c, locales.DownloadsProblemTitle(), locales.DownloadsProblemMessage(st.Problem), nil).Margin(0, 0, 32)
+			s.alert(c, locales.DownloadsProblemTitle(), locales.DownloadsProblemMessage(downloadHold(st)), nil).Margin(0, 0, 32)
 		}
 	}
 	if st.Tracks == 0 && st.Waiting == 0 && st.Failed == 0 {
@@ -545,7 +545,7 @@ func (s *shell) downloadQueue(c *ui.Context, st downloads.Status) {
 			})
 		}
 		if st.Hold != "" {
-			ui.Text(c, st.Hold).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 12).MaxWidth(720)
+			ui.Text(c, downloadHold(st)).FontSize(k.smallSize()).TextColor(k.muted).Margin(0, 0, 12).MaxWidth(720)
 		}
 		for _, j := range st.Jobs {
 			s.jobRow(c, j)
@@ -575,12 +575,12 @@ func (s *shell) jobRow(c *ui.Context, j downloads.Job) {
 		case downloads.Downloading:
 			status = locales.DownloadsStatusDownloading()
 			if j.Phase != "" {
-				status = j.Phase
+				status = downloadPhase(j.Phase)
 			} else if st.Progress >= 0 {
 				status = fmt.Sprintf("%d%%", int(math.Round(st.Progress*100)))
 			}
 		case downloads.Failed:
-			status, ink = locales.DownloadsStatusFailed(st.Why), k.danger
+			status, ink = locales.DownloadsStatusFailed(downloadReason(st.Reason, st.Why)), k.danger
 		}
 		ui.Text(c, k.sentence(status)).FontSize(k.smallSize()).TextColor(ink).MaxWidth(360).MaxLines(2).Shrink(1)
 		if st.Kind == downloads.Failed && s.link(c, "job-retry-"+t.ID, locales.DownloadsRetry()) {
@@ -651,7 +651,7 @@ func (s *shell) downloadSettings(c *ui.Context) {
 		s.rowWith(c, locales.DownloadSettingsFolder(), func() {
 			ui.Text(c, folder)
 			if st.Problem != "" {
-				ui.Text(c, locales.DownloadSettingsProblem(st.Problem))
+				ui.Text(c, locales.DownloadSettingsProblem(downloadHold(st)))
 			}
 		}, func() {
 			if s.movingDownloads {
@@ -734,7 +734,7 @@ func (s *shell) moveDownloads(dir string) {
 		s.update(func() {
 			s.movingDownloads = false
 			if err != nil {
-				s.notes = append(s.notes, noticeOf(errors.New(locales.DownloadsMoveFailed(err.Error()))))
+				s.notes = append(s.notes, noticeOf(errors.New(locales.DownloadsMoveFailed(downloadMoveError(err)))))
 				return
 			}
 			s.set.DownloadsFolder = got

@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Zobrazovat pohyblivé obaly",
   "mygo.alreadyExists": "Položka s názvem „{name}“ už na tomto místě existuje. Chcete ji nahradit?",
   "mygo.alreadyExistsDetail": "Nahrazením se přepíše její současný obsah.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Zrušit",
   "mygo.changedOnDisk": "Soubor „{name}“ byl změněn jinou aplikací.",

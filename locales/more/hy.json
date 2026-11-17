@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Ցույց տալ շարժվող շապիկները",
   "mygo.alreadyExists": "«{name}» անունով տարր արդեն գոյություն ունի այս վայրում։ Ցանկանո՞ւմ եք փոխարինել այն։",
   "mygo.alreadyExistsDetail": "Փոխարինելը կվերագրի դրա ներկայիս բովանդակությունը։",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Չեղարկել",
   "mygo.changedOnDisk": "«{name}» ֆայլը փոխվել է մեկ այլ հավելվածի կողմից։",

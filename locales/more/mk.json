@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Прикажи подвижни насловни слики",
   "mygo.alreadyExists": "Ставка со име „{name}“ веќе постои на оваа локација. Дали сакате да ја замените?",
   "mygo.alreadyExistsDetail": "Заменувањето ја пребришува нејзината сегашна содржина.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Откажи",
   "mygo.changedOnDisk": "Датотеката „{name}“ е променета од друга апликација.",

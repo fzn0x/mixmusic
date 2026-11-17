@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Mostrar capas animadas",
   "mygo.alreadyExists": "Já existe um item com o nome “{name}” neste local. Pretende substituí-lo?",
   "mygo.alreadyExistsDetail": "Substituí-lo apaga o conteúdo atual.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Cancelar",
   "mygo.changedOnDisk": "O ficheiro “{name}” foi alterado por outra aplicação.",

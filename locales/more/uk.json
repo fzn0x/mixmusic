@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Показувати рухомі обкладинки",
   "mygo.alreadyExists": "Елемент з іменем «{name}» уже існує в цьому розташуванні. Замінити його?",
   "mygo.alreadyExistsDetail": "Заміна перезапише його поточний вміст.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Скасувати",
   "mygo.changedOnDisk": "Файл «{name}» змінила інша програма.",

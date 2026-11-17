@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Vis bevægelige covers",
   "mygo.alreadyExists": "Der findes allerede et element med navnet “{name}” på denne placering. Vil du erstatte det?",
   "mygo.alreadyExistsDetail": "Hvis du erstatter det, overskrives dets nuværende indhold.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Annuller",
   "mygo.changedOnDisk": "Filen “{name}” er blevet ændret af et andet program.",

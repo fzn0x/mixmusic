@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Hareketli kapakları göster",
   "mygo.alreadyExists": "Bu konumda “{name}” adlı bir öğe zaten var. Değiştirmek istiyor musunuz?",
   "mygo.alreadyExistsDetail": "Değiştirmek mevcut içeriğinin üzerine yazar.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "İptal",
   "mygo.changedOnDisk": "“{name}” dosyası başka bir uygulama tarafından değiştirildi.",

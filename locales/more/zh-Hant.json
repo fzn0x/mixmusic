@@ -1203,6 +1203,7 @@
   "movingCoversShow": "顯示動態封面",
   "mygo.alreadyExists": "此位置已有名為「{name}」的項目。要取代它嗎？",
   "mygo.alreadyExistsDetail": "取代會覆寫它目前的內容。",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "轉為小駝峰命名",
   "mygo.cancel": "取消",
   "mygo.changedOnDisk": "檔案「{name}」已被另一個應用程式更改。",

@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Pokaži premikajoče se naslovnice",
   "mygo.alreadyExists": "Element z imenom »{name}« že obstaja na tej lokaciji. Ali ga želite zamenjati?",
   "mygo.alreadyExistsDetail": "Z zamenjavo se prepiše njegova trenutna vsebina.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Prekliči",
   "mygo.changedOnDisk": "Datoteko »{name}« je spremenila druga aplikacija.",

@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Прикажи покретне омоте",
   "mygo.alreadyExists": "У овој локацији већ постоји ставка под именом „{name}”. Желите ли да је замените?",
   "mygo.alreadyExistsDetail": "Замена пребрисује њен тренутни садржај.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Откажи",
   "mygo.changedOnDisk": "Датотеку „{name}” променила је друга апликација.",

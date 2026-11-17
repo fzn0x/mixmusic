@@ -1203,6 +1203,7 @@
   "movingCoversShow": "움직이는 커버 표시",
   "mygo.alreadyExists": "이 위치에 “{name}” 항목이 이미 있습니다. 바꾸시겠습니까?",
   "mygo.alreadyExistsDetail": "바꾸면 현재 내용을 덮어씁니다.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "카멜 케이스",
   "mygo.cancel": "취소",
   "mygo.changedOnDisk": "다른 응용 프로그램에서 “{name}” 파일을 변경했습니다.",

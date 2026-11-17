@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Rādīt kustīgos vāciņus",
   "mygo.alreadyExists": "Šajā vietā jau ir vienums ar nosaukumu „{name}”. Vai vēlies to aizstāt?",
   "mygo.alreadyExistsDetail": "Aizstāšana pārraksta tā pašreizējo saturu.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Atcelt",
   "mygo.changedOnDisk": "Failu „{name}” ir mainījusi cita lietojumprogramma.",

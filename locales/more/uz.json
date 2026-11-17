@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Harakatlanuvchi muqovalarni koʻrsatish",
   "mygo.alreadyExists": "Bu joyda “{name}” nomli element allaqachon mavjud. Uni almashtirmoqchimisiz?",
   "mygo.alreadyExistsDetail": "Almashtirish uning joriy mazmunini ustidan yozadi.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Bekor qilish",
   "mygo.changedOnDisk": "“{name}” faylini boshqa ilova oʻzgartirdi.",

@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Visa rörliga omslag",
   "mygo.alreadyExists": "Ett objekt med namnet ”{name}” finns redan på den här platsen. Vill du ersätta det?",
   "mygo.alreadyExistsDetail": "Om du ersätter det skrivs dess nuvarande innehåll över.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Avbryt",
   "mygo.changedOnDisk": "Filen ”{name}” har ändrats av ett annat program.",

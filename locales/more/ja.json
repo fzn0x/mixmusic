@@ -1203,6 +1203,7 @@
   "movingCoversShow": "動くカバーを表示",
   "mygo.alreadyExists": "“{name}”という名前の項目はこの場所にすでに存在します。置き換えますか？",
   "mygo.alreadyExistsDetail": "置き換えると、現在の内容は上書きされます。",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "キャメルケースに変換",
   "mygo.cancel": "キャンセル",
   "mygo.changedOnDisk": "ファイル“{name}”はほかのアプリケーションによって変更されています。",

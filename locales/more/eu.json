@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Erakutsi azal mugikorrak",
   "mygo.alreadyExists": "“{name}” izeneko elementu bat badago jada kokaleku honetan. Ordezkatu nahi duzu?",
   "mygo.alreadyExistsDetail": "Ordezkatzeak bere edukia gainidazten du.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Utzi",
   "mygo.changedOnDisk": "“{name}” fitxategia beste aplikazio batek aldatu du.",

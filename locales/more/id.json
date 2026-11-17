@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Tampilkan sampul bergerak",
   "mygo.alreadyExists": "Item bernama “{name}” sudah ada di lokasi ini. Apakah Anda ingin menggantinya?",
   "mygo.alreadyExistsDetail": "Menggantinya menimpa isinya saat ini.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Batal",
   "mygo.changedOnDisk": "File “{name}” telah diubah oleh aplikasi lain.",

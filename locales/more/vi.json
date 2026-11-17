@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Hiện ảnh bìa chuyển động",
   "mygo.alreadyExists": "Một mục tên “{name}” đã tồn tại ở vị trí này. Bạn có muốn thay thế nó không?",
   "mygo.alreadyExistsDetail": "Thay thế sẽ ghi đè nội dung hiện tại của nó.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Hủy",
   "mygo.changedOnDisk": "Tệp “{name}” đã bị một ứng dụng khác thay đổi.",

@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Näytä liikkuvat kannet",
   "mygo.alreadyExists": "Tässä sijainnissa on jo kohde nimeltä ”{name}”. Haluatko korvata sen?",
   "mygo.alreadyExistsDetail": "Korvaaminen ylikirjoittaa sen nykyisen sisällön.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Peruuta",
   "mygo.changedOnDisk": "Toinen sovellus on muuttanut tiedostoa ”{name}”.",

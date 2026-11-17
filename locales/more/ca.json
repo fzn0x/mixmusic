@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Mostra les portades en moviment",
   "mygo.alreadyExists": "Ja hi ha un element anomenat «{name}» en aquesta ubicació. Vols substituir-lo?",
   "mygo.alreadyExistsDetail": "Si el substitueixes, se sobreescriu el seu contingut actual.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Cancel·la",
   "mygo.changedOnDisk": "El fitxer «{name}» ha estat canviat per una altra aplicació.",

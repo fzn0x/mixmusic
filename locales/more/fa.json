@@ -1203,6 +1203,7 @@
   "movingCoversShow": "نمایش جلدهای متحرک",
   "mygo.alreadyExists": "موردی با نام «{name}» از قبل در این مکان هست. می‌خواهید جایگزین شود؟",
   "mygo.alreadyExistsDetail": "جایگزینی محتوای فعلی آن را بازنویسی می‌کند.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "لغو",
   "mygo.changedOnDisk": "فایل «{name}» را برنامهٔ دیگری تغییر داده است.",

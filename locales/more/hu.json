@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Mozgó borítók megjelenítése",
   "mygo.alreadyExists": "Ezen a helyen már létezik „{name}” nevű elem. Le szeretné cserélni?",
   "mygo.alreadyExistsDetail": "A lecserélése felülírja a jelenlegi tartalmát.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Mégse",
   "mygo.changedOnDisk": "A(z) „{name}” fájlt egy másik alkalmazás módosította.",

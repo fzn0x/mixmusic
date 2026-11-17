@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Arată copertele animate",
   "mygo.alreadyExists": "Un element numit „{name}” există deja în această locație. Vrei să îl înlocuiești?",
   "mygo.alreadyExistsDetail": "Înlocuirea îi suprascrie conținutul actual.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Anulează",
   "mygo.changedOnDisk": "Fișierul „{name}” a fost modificat de altă aplicație.",

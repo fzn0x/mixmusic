@@ -1203,6 +1203,7 @@
   "movingCoversShow": "הצגת עטיפות נעות",
   "mygo.alreadyExists": "פריט בשם \"{name}\" כבר קיים במיקום הזה. האם להחליף אותו?",
   "mygo.alreadyExistsDetail": "החלפה תדרוס את התוכן הנוכחי שלו.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "ביטול",
   "mygo.changedOnDisk": "הקובץ \"{name}\" שונה על ידי אפליקציה אחרת.",

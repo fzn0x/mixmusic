@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Näita liikuvaid kaanepilte",
   "mygo.alreadyExists": "Nimega „{name}” üksus on selles asukohas juba olemas. Kas soovid selle asendada?",
   "mygo.alreadyExistsDetail": "Asendamine kirjutab selle praeguse sisu üle.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Tühista",
   "mygo.changedOnDisk": "Faili „{name}” on muutnud mõni teine rakendus.",

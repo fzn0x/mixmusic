@@ -1203,6 +1203,7 @@
   "movingCoversShow": "მოძრავი გარეკნების ჩვენება",
   "mygo.alreadyExists": "ამ ადგილას უკვე არის ელემენტი სახელით „{name}“. გსურთ მისი ჩანაცვლება?",
   "mygo.alreadyExistsDetail": "ჩანაცვლება მის ამჟამინდელ შიგთავსს გადაწერს.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "გაუქმება",
   "mygo.changedOnDisk": "ფაილი „{name}“ სხვა აპლიკაციამ შეცვალა.",

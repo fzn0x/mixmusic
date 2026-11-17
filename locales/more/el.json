@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Εμφάνιση κινούμενων εξωφύλλων",
   "mygo.alreadyExists": "Υπάρχει ήδη ένα στοιχείο με το όνομα «{name}» σε αυτήν τη θέση. Θέλετε να το αντικαταστήσετε;",
   "mygo.alreadyExistsDetail": "Η αντικατάστασή του θα αντικαταστήσει τα τρέχοντα περιεχόμενά του.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Ακύρωση",
   "mygo.changedOnDisk": "Το αρχείο «{name}» έχει αλλάξει από άλλη εφαρμογή.",

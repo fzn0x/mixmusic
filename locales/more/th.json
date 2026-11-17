@@ -1203,6 +1203,7 @@
   "movingCoversShow": "แสดงปกที่เคลื่อนไหว",
   "mygo.alreadyExists": "มีรายการชื่อ “{name}” อยู่แล้วในตำแหน่งนี้ ต้องการแทนที่หรือไม่",
   "mygo.alreadyExistsDetail": "การแทนที่จะเขียนทับเนื้อหาปัจจุบัน",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "ยกเลิก",
   "mygo.changedOnDisk": "แอปพลิเคชันอื่นได้เปลี่ยนไฟล์ “{name}”",

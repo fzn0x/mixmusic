@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Afficher les pochettes animées",
   "mygo.alreadyExists": "Un élément nommé « {name} » existe déjà à cet emplacement. Voulez-vous le remplacer ?",
   "mygo.alreadyExistsDetail": "Le remplacer écrase son contenu actuel.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Annuler",
   "mygo.changedOnDisk": "Le fichier « {name} » a été modifié par une autre application.",

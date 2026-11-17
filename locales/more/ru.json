@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Показывать движущиеся обложки",
   "mygo.alreadyExists": "Элемент с именем «{name}» уже существует в этом расположении. Заменить его?",
   "mygo.alreadyExistsDetail": "Замена перезапишет его текущее содержимое.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "camelCase",
   "mygo.cancel": "Отмена",
   "mygo.changedOnDisk": "Файл «{name}» был изменён другим приложением.",

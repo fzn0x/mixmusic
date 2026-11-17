@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Shfaq kopertinat në lëvizje",
   "mygo.alreadyExists": "Një artikull me emrin “{name}” ekziston tashmë në këtë vend. Dëshironi ta zëvendësoni?",
   "mygo.alreadyExistsDetail": "Zëvendësimi shkruan sipër përmbajtjes së tij aktuale.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Anulo",
   "mygo.changedOnDisk": "Skedari “{name}” është ndryshuar nga një aplikacion tjetër.",

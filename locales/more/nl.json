@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Bewegende hoezen tonen",
   "mygo.alreadyExists": "Er bestaat al een item met de naam “{name}” op deze locatie. Wil je het vervangen?",
   "mygo.alreadyExistsDetail": "Vervangen overschrijft de huidige inhoud.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Annuleren",
   "mygo.changedOnDisk": "Het bestand “{name}” is gewijzigd door een andere app.",

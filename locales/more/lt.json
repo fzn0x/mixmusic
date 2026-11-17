@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Rodyti judančius viršelius",
   "mygo.alreadyExists": "Šioje vietoje jau yra elementas, pavadintas „{name}“. Ar norite jį pakeisti?",
   "mygo.alreadyExistsDetail": "Pakeitimas perrašo dabartinį jo turinį.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Atšaukti",
   "mygo.changedOnDisk": "Failą „{name}“ pakeitė kita programa.",

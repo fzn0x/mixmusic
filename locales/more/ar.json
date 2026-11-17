@@ -1203,6 +1203,7 @@
   "movingCoversShow": "إظهار الأغلفة المتحركة",
   "mygo.alreadyExists": "يوجد بالفعل عنصر باسم «{name}» في هذا الموقع. هل تريد استبداله؟",
   "mygo.alreadyExistsDetail": "الاستبدال يكتب فوق محتواه الحالي.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "إلغاء",
   "mygo.changedOnDisk": "تم تغيير الملف «{name}» بواسطة تطبيق آخر.",

@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Pokazuj ruchome okładki",
   "mygo.alreadyExists": "Element o nazwie „{name}” już istnieje w tym miejscu. Czy chcesz go zastąpić?",
   "mygo.alreadyExistsDetail": "Zastąpienie nadpisze jego obecną zawartość.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Anuluj",
   "mygo.changedOnDisk": "Plik „{name}” został zmieniony przez inną aplikację.",

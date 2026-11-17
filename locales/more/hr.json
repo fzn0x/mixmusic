@@ -1203,6 +1203,7 @@
   "movingCoversShow": "Prikaži pokretne naslovnice",
   "mygo.alreadyExists": "Stavka s nazivom „{name}” već postoji na ovoj lokaciji. Želite li je zamijeniti?",
   "mygo.alreadyExistsDetail": "Zamjena prepisuje njezin trenutačni sadržaj.",
+  "mygo.appName": "MixMusic",
   "mygo.camelCase": "Camel Case",
   "mygo.cancel": "Odustani",
   "mygo.changedOnDisk": "Datoteku „{name}” promijenila je druga aplikacija.",

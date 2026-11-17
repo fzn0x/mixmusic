@@ -117,8 +117,14 @@ does, and what it risks.
   fails, finds no audio the engine plays, or finds a live stream, whose
   audio is the same either way, is followed by the signed-out ways, as
   without the switch: YouTube's player API, then yt-dlp signed out. A
-  stream found as your account that YouTube refuses is found signed out,
-  for that track, until MixMusic restarts.
+  stream found as your account that YouTube refuses, as after a move to
+  another network or a VPN, is found signed out for that track for 10
+  minutes at most: turning the switch off or on, or a change of your
+  YouTube Music session (signing in or out, or another Google account),
+  ends that sooner. When YouTube plays the track only to signed-in
+  viewers meanwhile, so that the signed-out ways meet its "Please sign
+  in", its check of age or a channel's members only, yt-dlp asks as your
+  account once more, once a play. Data saver never asks as your account.
 - **The log** says when a stream was found as your account, in how long,
   and its codec and bitrate, or why it wasn't. It never names the session.
 

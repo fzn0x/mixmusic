@@ -2,6 +2,7 @@ package stream
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"log"
@@ -35,15 +36,23 @@ var accountTimeout = 30 * time.Second
 // those whose stream found as the account YouTube refused.
 const maxRefusedAsAccount = 500
 
+// refusalMark is how long a video is found signed out once YouTube
+// refused its stream found as the account (refused): YouTube may refuse
+// it for a while, or only on the network it was found on, before a move
+// to another or to a VPN, after which the account finds one that plays.
+const refusalMark = 10 * time.Minute
+
 // SetAsAccount has the resolver ask for streams as the user's YouTube Music
 // account from now on, while Session gives a session, or signed out:
-// streams found before are found again.
+// streams found before are found again, and the videos YouTube refused
+// the stream of found as the account are asked for as it again.
 func (r *Resolver) SetAsAccount(on bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.asAccount != on {
 		r.asAccount = on
 		r.calls = map[string]*resolution{}
+		r.refusedAsAccount = nil
 	}
 }
 
@@ -51,12 +60,17 @@ func (r *Resolver) SetAsAccount(on bool) {
 // Music account, for Premium's higher bitrate, when accountSession gives
 // a session to ask as. It reports false when it didn't ask, or found no
 // stream the engine plays: the stream is found signed out then, as
-// without the switch, so a track never fails for it. The log tells how
-// it went, never the session nor the stream's URL.
-func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Quality) (Stream, bool) {
-	cookies := r.accountSession(videoID, quality)
+// without the switch, so a track never fails for it. again asks once
+// more, after the signed-out ways (againAsAccount). The log tells how it
+// went, never the session nor the stream's URL.
+func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Quality, again bool) (Stream, bool) {
+	cookies := r.accountSession(videoID, quality, again)
 	if cookies == nil {
 		return Stream{}, false
+	}
+	more, then := "", "it's found signed out"
+	if again {
+		more, then = " once more", "nor is it signed out, where YouTube asks to sign in"
 	}
 	start := time.Now()
 	actx, cancel := context.WithTimeout(ctx, accountTimeout)
@@ -67,35 +81,76 @@ func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Qu
 	}
 	took := time.Since(start).Round(10 * time.Millisecond)
 	if err != nil {
-		log.Printf("mixmusic: yt-dlp found no stream of %s as your YouTube Music account in %s (%s); it's found signed out",
-			videoID, took, strings.TrimPrefix(err.Error(), "stream: "))
+		log.Printf("mixmusic: yt-dlp found no stream of %s as your YouTube Music account%s in %s (%s); %s",
+			videoID, more, took, strings.TrimPrefix(err.Error(), "stream: "), then)
 		return Stream{}, false
 	}
 	s.AsAccount = true
 	if s.Surround != nil {
 		s.Surround.AsAccount = true
 	}
-	log.Printf("mixmusic: found the stream of %s as your YouTube Music account in %s with yt-dlp: %s at %.0f kbit/s",
-		videoID, took, s.Codec, s.Bitrate)
+	log.Printf("mixmusic: found the stream of %s as your YouTube Music account%s in %s with yt-dlp: %s at %.0f kbit/s",
+		videoID, more, took, s.Codec, s.Bitrate)
 	return s, true
+}
+
+// againAsAccount has yt-dlp find the stream of a video as the account once
+// more, after err, why the signed-out ways found none, which is YouTube's
+// sign-in wall (signInWall), when YouTube refused the stream of the video
+// found as the account less than refusalMark ago: the account may pass
+// the wall with a stream that plays, as after a move to another network.
+// It asks once a resolve, so a track whose stream YouTube refuses again
+// fails rather than asks on.
+func (r *Resolver) againAsAccount(ctx context.Context, videoID string, quality Quality, err error) (Stream, bool) {
+	if ctx.Err() != nil || !signInWall(err) {
+		return Stream{}, false
+	}
+	return r.accountStream(ctx, videoID, quality, true)
+}
+
+// signInWalls are parts of yt-dlp's errors, as plainErrors has them, of a
+// video YouTube plays only to signed-in viewers: its "Please sign in", its
+// check of age, and a channel's members only. Its check of bots is not
+// one: it is of the network, not the viewer.
+var signInWalls = []string{"please sign in", "confirm your age", "members-only"}
+
+// signInWall reports whether err, why the signed-out ways found no stream,
+// is YouTube's wall before a video it plays only to signed-in viewers, in
+// the plain words of one of signInWalls.
+func signInWall(err error) bool {
+	var f failure
+	if !errors.As(err, &f) {
+		return false
+	}
+	for _, match := range signInWalls {
+		if plain, _ := plainError(match); plain == f.msg {
+			return true
+		}
+	}
+	return false
 }
 
 // accountSession returns the session to ask for the stream of a video as,
 // or nil to ask signed out: while the user asks for it (SetAsAccount) and
 // Session gives one yt-dlp takes for a signed-in one, of the best quality,
 // which alone gains from Premium, with a JavaScript runtime, unless
-// YouTube refused the stream of the video found as the account before.
-func (r *Resolver) accountSession(videoID string, quality Quality) []*http.Cookie {
+// YouTube refused the stream of the video found as the account less than
+// refusalMark ago, as the same session. again asks for such a video
+// alone: once more, after the signed-out ways (againAsAccount).
+func (r *Resolver) accountSession(videoID string, quality Quality, again bool) []*http.Cookie {
 	r.mu.Lock()
-	on, refused := r.asAccount, r.refusedAsAccount[videoID]
+	on := r.asAccount
 	r.mu.Unlock()
 	// The clients yt-dlp asks as for an account need a challenge solved,
 	// which takes a runtime, as the 5.1 audio does.
-	if !on || r.Session == nil || quality != QualityBest || refused || !r.findsSurround() {
+	if !on || r.Session == nil || quality != QualityBest || !r.findsSurround() {
 		return nil
 	}
 	cookies := r.Session()
-	if len(cookies) == 0 {
+	r.mu.Lock()
+	refused := r.marked(videoID, sessionKey(cookies))
+	r.mu.Unlock()
+	if refused != again || len(cookies) == 0 {
 		return nil
 	}
 	if !signedInFor(cookies) {
@@ -125,6 +180,30 @@ func signedInFor(cookies []*http.Cookie) bool {
 		}
 	}
 	return login && signs
+}
+
+// sessionKey tells sessions apart by the cookies that sign the user in,
+// LOGIN_INFO and SAPISID's, which YouTube sets as they sign in and keeps
+// while the session lasts, unlike those it refreshes as it goes: a hash
+// of them, so that the resolver keeps no copy of the session, or "" for
+// none.
+func sessionKey(cookies []*http.Cookie) string {
+	h := sha256.New()
+	signs := false
+	for _, c := range cookies {
+		if c == nil || c.Value == "" {
+			continue
+		}
+		switch c.Name {
+		case "LOGIN_INFO", "SAPISID", "__Secure-1PAPISID", "__Secure-3PAPISID":
+			fmt.Fprintf(h, "%s=%s\n", c.Name, c.Value)
+			signs = true
+		}
+	}
+	if !signs {
+		return ""
+	}
+	return string(h.Sum(nil))
 }
 
 // takenAsAccount tells why s, the stream yt-dlp found as the account, isn't
@@ -208,14 +287,32 @@ func writeSession(cookies []*http.Cookie, now time.Time) (string, error) {
 
 // refused remembers that YouTube refused the stream of a video found as
 // the account, when res, which the resolver drops, holds one: it is found
-// signed out from then on, while MixMusic runs. It runs under the
-// resolver's mutex.
+// signed out for refusalMark from then on. It runs under the resolver's
+// mutex.
 func (r *Resolver) refused(videoID string, res *resolution) {
 	if res.err != nil || !res.stream.AsAccount {
 		return
 	}
 	if r.refusedAsAccount == nil || len(r.refusedAsAccount) >= maxRefusedAsAccount {
-		r.refusedAsAccount = map[string]bool{}
+		r.refusedAsAccount = map[string]time.Time{}
 	}
-	r.refusedAsAccount[videoID] = true
+	r.refusedAsAccount[videoID] = time.Now()
+}
+
+// marked reports whether YouTube refused the stream of a video found as
+// the account less than refusalMark ago, forgetting a mark older than
+// that, as the session of key (sessionKey): every mark goes once Session
+// gives another, as signing in or out, YouTube ending the session, or
+// another Google account of it do. It runs under the resolver's mutex.
+func (r *Resolver) marked(videoID, key string) bool {
+	if key != r.markedSession {
+		r.refusedAsAccount, r.markedSession = nil, key
+		return false
+	}
+	at, ok := r.refusedAsAccount[videoID]
+	if ok && time.Since(at) >= refusalMark {
+		delete(r.refusedAsAccount, videoID)
+		return false
+	}
+	return ok
 }

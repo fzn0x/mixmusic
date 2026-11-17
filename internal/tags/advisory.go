@@ -38,7 +38,7 @@ func (t *Tags) setAdvisory(key string, values ...string) {
 
 // txxx reads a frame of user text of ID3v2, TXXX or 2.2's TXX: its
 // description, then its values, of the encoding its first byte names.
-// Only the advisory's is taken.
+// Only the advisory's and the lyrics' are taken.
 func txxx(data []byte, t *Tags) {
 	if len(data) < 2 {
 		return
@@ -47,6 +47,7 @@ func txxx(data []byte, t *Tags) {
 	key, rest := cut(enc, data[1:])
 	values := strings.Split(strings.TrimRight(decode(enc, rest), "\x00"), "\x00")
 	t.setAdvisory(key, values...)
+	t.setLyrics(key, values...)
 }
 
 // rtng reads the value of an MP4 file's rtng item, a number of one to

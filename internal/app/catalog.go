@@ -441,9 +441,9 @@ func (c *Catalog) videoLength(ctx context.Context, video media.Track) time.Durat
 	return time.Duration(tracks[0].DurationMs) * time.Millisecond
 }
 
-// Lyrics returns the lyrics of a track, from the sources of lyrics that
-// are on, in the user's order (askLyrics).
-func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, error) {
+// onlineLyrics returns the lyrics of a track from the sources of lyrics
+// that are on, in the user's order (askLyrics), as Lyrics asks them.
+func (c *Catalog) onlineLyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, error) {
 	set := c.a.settings.Get().Lyrics
 	kept := track.ID + " " + lyricsSetup(set)
 	if l, ok := c.a.lyricsMemo.get(kept); ok {

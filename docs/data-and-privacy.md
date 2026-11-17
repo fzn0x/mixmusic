@@ -186,7 +186,7 @@ Where the credential store can't keep a secret:
 | [Lyrics timed to a music video](lyrics.md#music-videos), while "Time lyrics to music videos" is on | YouTube's player API (`www.youtube.com`) and media servers, signed out | the video IDs of the music video and of its song, once a video, for stretches of their audio: of the song, only those compared. No play is reported |
 | Lyrics, the same way | YouTube Music | the video ID of the track that plays, or of its recording there |
 | Lyrics, the same way, and the transcript of a podcast episode | YouTube (`www.youtube.com`), signed out | the video ID of the track that plays, or of its recording there, for its captions |
-| Lyrics of a track on this computer | the sources on, but YouTube captions | its title, artists, album and length, as its tags tell, unless they name no artist; never its file |
+| Lyrics of a track on this computer | the sources on, but YouTube captions | its title, artists, album and length, as its tags tell, unless they name no artist or [its file holds synced lyrics](lyrics.md#songs-on-this-computer); never its file, nor the lyrics it holds |
 | Translate, or romanized Arabic, while it's on beside the lyrics | Unison, which has Google translate them | the lyrics of the track that plays, with its video ID |
 | Romaji, the first time you turn it on | GitHub | a download of the dictionary of kanji readings; the lyrics stay on your computer |
 | Last.fm, once you connect it | Last.fm | the title, artists, album and length of what you play, and when; with Send likes as loves on, the songs you like and unlike |

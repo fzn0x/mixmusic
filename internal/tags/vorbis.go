@@ -117,6 +117,8 @@ func comments(b []byte, t *Tags) {
 			t.set(vorbisKeys[key], values[key]...)
 		case advisoryKeys[key]:
 			t.setAdvisory(key, values[key]...)
+		case isLyricsKey(key):
+			t.setLyrics(key, values[key]...)
 		case key == "METADATA_BLOCK_PICTURE":
 			for _, v := range values[key] {
 				if raw, err := base64.StdEncoding.DecodeString(strings.TrimSpace(v)); err == nil {

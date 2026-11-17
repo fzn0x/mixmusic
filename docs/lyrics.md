@@ -3,7 +3,7 @@
 
 MixMusic shows synced and word-by-word lyrics for Spotify and YouTube Music tracks, and can translate them or show them in Latin letters.
 
-Lyrics come from Better Lyrics, Unison, LRCLIB, YouTube Music and the video's captions on YouTube, for the track that plays, whichever service it's from. Nothing needs setting up, and Settings › Playback › Lyrics chooses and orders the sources. The lyrics themselves go to Unison, for their translation or for the romanization of Arabic, only while you turn those on.
+Lyrics come from Better Lyrics, Unison, LRCLIB, YouTube Music and the video's captions on YouTube, for the track that plays, whichever service it's from, and from [the file of a song on this computer](#songs-on-this-computer) or a .lrc file beside it. Nothing needs setting up, and Settings › Playback › Lyrics chooses and orders the sources. The lyrics themselves go to Unison, for their translation or for the romanization of Arabic, only while you turn those on.
 
 ## Where lyrics show
 
@@ -38,6 +38,22 @@ MixMusic asks the sources one at a time, in this order unless you [change it](#c
 Synced lyrics beat plain ones, whichever source has them. Of two sources with plain lyrics, the longer lyrics win, and the source higher in the list wins otherwise. Lyrics of one timed line count as plain.
 
 A Spotify track is looked up by the video ID of its [recording on YouTube Music](playing-music.md#how-spotify-tracks-play) once MixMusic has matched one, and by its title, artists, album and length before. The line at the end of the lyrics names where they came from: "lyrics from Better Lyrics", "lyrics from Unison", "lyrics from YouTube captions" and so on, with the address of Better Lyrics and Unison.
+
+### Songs on this computer
+
+A song of [the music on this computer](local-music.md) shows the lyrics its file holds at once, offline too, and when its file names no artist. MixMusic looks, in this order:
+
+1. **A .lrc file beside it,** of its name, as `Quiet Field.lrc` beside `Quiet Field.flac`, in any case: LRC, with its offset and lines of several times, or plain text, in UTF-8, UTF-16 or ISO-8859-1, up to 1 MB. Where enhanced LRC times the words of a line, as `<00:12.50>`, they light one by one.
+2. **The synced lyrics of its tags:** an MP3's or WAV's SYLT frame, its syllables joined into lines and lit one by one, or a SYNCEDLYRICS tag.
+3. **The plain lyrics of its tags:** an MP3's or WAV's USLT frame or LYRICS tag, the LYRICS, UNSYNCEDLYRICS or UNSYNCED LYRICS comment of a FLAC, Ogg or Opus file, or an M4A's lyrics. Timed LRC or TTML written there counts as synced.
+
+The first synced lyrics found show, else the first plain ones. Of a song with [copies](local-music.md#copies-of-one-song), the copy that plays comes first, then the others.
+
+- **Synced lyrics of the file** are final: no source is asked.
+- **Plain lyrics of the file** give way only to synced lyrics from the sources, which are asked as for any track. They stay when the sources have none, or only plain ones, or can't be reached.
+- **The line at the end** names the file: "lyrics from Quiet Field.lrc".
+- **A .lrc added, or tags changed,** show the next time the lyrics are looked up, as when you refresh the page (F5, or ⇧⌘R on macOS).
+- **Lyrics from a file go nowhere,** but to Unison while you turn on Translate, or Romanize for Arabic, as any lyrics do.
 
 ### Choose and order the sources
 

@@ -119,12 +119,16 @@ does, and what it risks.
   without the switch: YouTube's player API, then yt-dlp signed out. A
   stream found as your account that YouTube refuses, as after a move to
   another network or a VPN, is found signed out for that track for 10
-  minutes at most: turning the switch off or on, or a change of your
-  YouTube Music session (signing in or out, or another Google account),
-  ends that sooner. When YouTube plays the track only to signed-in
-  viewers meanwhile, so that the signed-out ways meet its "Please sign
-  in", its check of age or a channel's members only, yt-dlp asks as your
-  account once more, once a play. Data saver never asks as your account.
+  minutes at most. Turning the switch off or on, signing in, or choosing
+  another Google account or channel in Settings › Accounts ends that at
+  once, and any other change of your YouTube Music session as the next
+  track is found. When YouTube plays the track only to signed-in viewers
+  meanwhile, so that the signed-out ways meet its "Please sign in", its
+  check of age, a channel's members only or YouTube Music Premium's
+  members only, yt-dlp asks as your account once more, once a play: with
+  Premium, a Premium-only track plays; without it, the track fails as it
+  does signed out. Its check of bots never asks again. Data saver never
+  asks as your account.
 - **The log** says when a stream was found as your account, in how long,
   and its codec and bitrate, or why it wasn't. It never names the session.
 

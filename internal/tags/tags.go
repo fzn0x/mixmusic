@@ -61,6 +61,9 @@ type Tags struct {
 	// a SYNCEDLYRICS comment's as it is, a SYLT frame's written as LRC.
 	// "" when it holds none.
 	SyncedLyrics string
+	// lyricsRank and syncedRank rank the place the lyrics above were found
+	// in (lyrics.go), so that a better place replaces them.
+	lyricsRank, syncedRank int
 	// Picture is the cover, the front cover when the file tells which.
 	Picture *Picture
 }

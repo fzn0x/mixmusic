@@ -209,7 +209,10 @@
   (`internal/app/lyricslocal.go`, #554), of the copy that plays it, then
   its song's others: the .lrc of its name beside it, the synced lyrics
   `internal/tags` reads (SYLT written as LRC, SYNCEDLYRICS), its plain
-  lyrics (USLT, LYRICS, MP4's ©lyr). Synced, they are final; plain, they
+  lyrics (USLT, LYRICS, MP4's ©lyr). Of several in one file the
+  place ranks, not the file order (`lyricsKeys`, `syltRank`: SYLT of
+  lyrics, then of a transcription, then of other text; USLT then the
+  LYRICS tags in a fixed order). Synced, they are final; plain, they
   yield only to the sources' synced lyrics (`onlineLyrics`).
   `Catalog.Lyrics` (`internal/app/lyricssources.go`) asks the sources one
   at a time, in the order of `settings.Lyrics.SourceOrder`, those on, and

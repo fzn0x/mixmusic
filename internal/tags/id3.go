@@ -126,9 +126,10 @@ func readFrames(b []byte, version byte, unsynced bool, t *Tags, frameMs float64)
 		case id == "TXXX" || id == "TXX":
 			txxx(data, t)
 		case id == "USLT" || id == "ULT":
-			keepLyrics(&t.Lyrics, uslt(data))
+			t.keepLyrics(false, rankStandard, uslt(data))
 		case id == "SYLT" || id == "SLT":
-			keepLyrics(&t.SyncedLyrics, sylt(data, frameMs))
+			lrc, rank := sylt(data, frameMs)
+			t.keepLyrics(true, rank, lrc)
 		case id3Frames[id] == "genre":
 			values := textFrame(data, version)
 			for i, v := range values {

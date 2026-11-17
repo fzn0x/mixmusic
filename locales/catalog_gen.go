@@ -2426,13 +2426,13 @@ func (msgs Messages) CastCouldntServe(device string, error string) string {
 // CastDeviceGone says "That cast device is no longer on the network"
 // in the language the app shows.
 //
-// A notice, as casting to a device that went starts.
+// A notice, as casting starts to a device that has left the network.
 func CastDeviceGone() string { return In(i18n.Locale()).CastDeviceGone() }
 
 // CastDeviceGone says "That cast device is no longer on the network"
 // in the language of msgs.
 //
-// A notice, as casting to a device that went starts.
+// A notice, as casting starts to a device that has left the network.
 func (msgs Messages) CastDeviceGone() string {
 	return Catalog.Format(msgs.locale, "castDeviceGone", nil)
 }
@@ -8047,7 +8047,7 @@ func (msgs Messages) GlobalKeysAnnounce(title string) string {
 	return Catalog.Format(msgs.locale, "globalKeysAnnounce", map[string]any{"title": title})
 }
 
-// GlobalKeysEditLabel says "{action, select, set {set the global shortcut of {title}} cancel {cancel the global shortcut of {title}} other {chang…"
+// GlobalKeysEditLabel says "{action, select, set {set the global shortcut of {title}} cancel {stop changing the global shortcut of {title}} other…"
 // in the language the app shows.
 //
 // What screen readers say of the button beside a command in Settings ›
@@ -8058,7 +8058,7 @@ func GlobalKeysEditLabel(action string, title string) string {
 	return In(i18n.Locale()).GlobalKeysEditLabel(action, title)
 }
 
-// GlobalKeysEditLabel says "{action, select, set {set the global shortcut of {title}} cancel {cancel the global shortcut of {title}} other {chang…"
+// GlobalKeysEditLabel says "{action, select, set {set the global shortcut of {title}} cancel {stop changing the global shortcut of {title}} other…"
 // in the language of msgs.
 //
 // What screen readers say of the button beside a command in Settings ›
@@ -14961,13 +14961,13 @@ func (msgs Messages) PlayerExplicitAll() string {
 	return Catalog.Format(msgs.locale, "playerExplicitAll", nil)
 }
 
-// PlayerExplicitOrSkipped says "Every song here is explicit, which your settings hide, or one they skip"
+// PlayerExplicitOrSkipped says "Nothing here can play: some songs are explicit, which your settings hide, and your settings skip the rest"
 // in the language the app shows.
 //
 // A notice, as a list played has nothing the settings let play.
 func PlayerExplicitOrSkipped() string { return In(i18n.Locale()).PlayerExplicitOrSkipped() }
 
-// PlayerExplicitOrSkipped says "Every song here is explicit, which your settings hide, or one they skip"
+// PlayerExplicitOrSkipped says "Nothing here can play: some songs are explicit, which your settings hide, and your settings skip the rest"
 // in the language of msgs.
 //
 // A notice, as a list played has nothing the settings let play.
@@ -15341,7 +15341,7 @@ func (msgs Messages) PlayerSkippedMadeWithAI(title string) string {
 	return Catalog.Format(msgs.locale, "playerSkippedMadeWithAI", map[string]any{"title": title})
 }
 
-// PlayerSkippedMadeWithAISpotify says "Skipped {title}, whose recording on YouTube Music YouTube labels as made with AI"
+// PlayerSkippedMadeWithAISpotify says "Skipped {title}: YouTube labels its recording on YouTube Music as made with AI"
 // in the language the app shows.
 //
 // A notice, with a button to the settings, of a Spotify track played from
@@ -15350,7 +15350,7 @@ func PlayerSkippedMadeWithAISpotify(title string) string {
 	return In(i18n.Locale()).PlayerSkippedMadeWithAISpotify(title)
 }
 
-// PlayerSkippedMadeWithAISpotify says "Skipped {title}, whose recording on YouTube Music YouTube labels as made with AI"
+// PlayerSkippedMadeWithAISpotify says "Skipped {title}: YouTube labels its recording on YouTube Music as made with AI"
 // in the language of msgs.
 //
 // A notice, with a button to the settings, of a Spotify track played from
@@ -16231,7 +16231,7 @@ func (msgs Messages) PodcastsSettingsPlayback() string {
 	return Catalog.Format(msgs.locale, "podcastsSettingsPlayback", nil)
 }
 
-// PodcastsSpotifyOnly says "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in {link}."
+// PodcastsSpotifyOnly says "Spotify's podcasts play only from Spotify: choose “In MixMusic, from Spotify” or “On Spotify Connect” in {link}."
 // in the language the app shows.
 //
 // On a Spotify podcast's page, where Spotify's episodes don't play in
@@ -16239,7 +16239,7 @@ func (msgs Messages) PodcastsSettingsPlayback() string {
 // Settings.
 func PodcastsSpotifyOnly(link string) string { return In(i18n.Locale()).PodcastsSpotifyOnly(link) }
 
-// PodcastsSpotifyOnly says "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in {link}."
+// PodcastsSpotifyOnly says "Spotify's podcasts play only from Spotify: choose “In MixMusic, from Spotify” or “On Spotify Connect” in {link}."
 // in the language of msgs.
 //
 // On a Spotify podcast's page, where Spotify's episodes don't play in
@@ -17537,13 +17537,13 @@ func (msgs Messages) RoomPageRemoveGuest(name string) string {
 	return Catalog.Format(msgs.locale, "roomPageRemoveGuest", map[string]any{"name": name})
 }
 
-// RoomPageRemovedNote says "A removed guest can join again with the code or the link it has, and a blocked one too, once it comes back as another…"
+// RoomPageRemovedNote says "A removed guest can join again with the code or the link it has, and so can a blocked guest that comes back from anot…"
 // in the language the app shows.
 //
 // On the page of the room this computer hosts, under its guests.
 func RoomPageRemovedNote() string { return In(i18n.Locale()).RoomPageRemovedNote() }
 
-// RoomPageRemovedNote says "A removed guest can join again with the code or the link it has, and a blocked one too, once it comes back as another…"
+// RoomPageRemovedNote says "A removed guest can join again with the code or the link it has, and so can a blocked guest that comes back from anot…"
 // in the language of msgs.
 //
 // On the page of the room this computer hosts, under its guests.
@@ -19763,7 +19763,7 @@ func (msgs Messages) ShortcutsDisplaced(title string) string {
 	return Catalog.Format(msgs.locale, "shortcutsDisplaced", map[string]any{"title": title})
 }
 
-// ShortcutsEditLabel says "{action, select, set {set the shortcut of {title}} cancel {cancel the shortcut of {title}} other {change the shortcut…"
+// ShortcutsEditLabel says "{action, select, set {set the shortcut of {title}} cancel {stop changing the shortcut of {title}} other {change the s…"
 // in the language the app shows.
 //
 // What screen readers say of the button beside a command in Settings ›
@@ -19774,7 +19774,7 @@ func ShortcutsEditLabel(action string, title string) string {
 	return In(i18n.Locale()).ShortcutsEditLabel(action, title)
 }
 
-// ShortcutsEditLabel says "{action, select, set {set the shortcut of {title}} cancel {cancel the shortcut of {title}} other {change the shortcut…"
+// ShortcutsEditLabel says "{action, select, set {set the shortcut of {title}} cancel {stop changing the shortcut of {title}} other {change the s…"
 // in the language of msgs.
 //
 // What screen readers say of the button beside a command in Settings ›

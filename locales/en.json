@@ -526,7 +526,7 @@
   },
   "castDeviceGone": "That cast device is no longer on the network",
   "@castDeviceGone": {
-    "description": "A notice, as casting to a device that went starts."
+    "description": "A notice, as casting starts to a device that has left the network."
   },
   "castPlayingOn": "Playing on {name}",
   "@castPlayingOn": {
@@ -2385,7 +2385,7 @@
       }
     }
   },
-  "globalKeysEditLabel": "{action, select, set {set the global shortcut of {title}} cancel {cancel the global shortcut of {title}} other {change the global shortcut of {title}}}",
+  "globalKeysEditLabel": "{action, select, set {set the global shortcut of {title}} cancel {stop changing the global shortcut of {title}} other {change the global shortcut of {title}}}",
   "@globalKeysEditLabel": {
     "description": "What screen readers say of the button beside a command in Settings › Shortcuts › From any app. {action} is set while the command has no shortcut, cancel while its new keys are being pressed, and change otherwise; {title} is the command, as Play or pause.",
     "placeholders": {
@@ -4315,7 +4315,7 @@
   "@playerExplicitAll": {
     "description": "A notice, as a list played has nothing the settings let play."
   },
-  "playerExplicitOrSkipped": "Every song here is explicit, which your settings hide, or one they skip",
+  "playerExplicitOrSkipped": "Nothing here can play: some songs are explicit, which your settings hide, and your settings skip the rest",
   "@playerExplicitOrSkipped": {
     "description": "A notice, as a list played has nothing the settings let play."
   },
@@ -4407,7 +4407,7 @@
       }
     }
   },
-  "playerSkippedMadeWithAISpotify": "Skipped {title}, whose recording on YouTube Music YouTube labels as made with AI",
+  "playerSkippedMadeWithAISpotify": "Skipped {title}: YouTube labels its recording on YouTube Music as made with AI",
   "@playerSkippedMadeWithAISpotify": {
     "description": "A notice, with a button to the settings, of a Spotify track played from YouTube Music.",
     "placeholders": {
@@ -4874,7 +4874,7 @@
     }
   },
   "podcastsSettingsPlayback": "Settings › Playback",
-  "podcastsSpotifyOnly": "Spotify's podcasts play only from Spotify: choose In MixMusic, from Spotify or On Spotify Connect in {link}.",
+  "podcastsSpotifyOnly": "Spotify's podcasts play only from Spotify: choose “In MixMusic, from Spotify” or “On Spotify Connect” in {link}.",
   "@podcastsSpotifyOnly": {
     "description": "On a Spotify podcast's page, where Spotify's episodes don't play in MixMusic. {link} is podcastsSettingsPlayback, a link to that tab of Settings.",
     "placeholders": {
@@ -5456,7 +5456,7 @@
       }
     }
   },
-  "roomPageRemovedNote": "A removed guest can join again with the code or the link it has, and a blocked one too, once it comes back as another computer. A new code, and a new link, shut them out; your other guests stay.",
+  "roomPageRemovedNote": "A removed guest can join again with the code or the link it has, and so can a blocked guest that comes back from another computer. A new code and a new link shut them out; your other guests stay.",
   "@roomPageRemovedNote": {
     "description": "On the page of the room this computer hosts, under its guests."
   },
@@ -6136,7 +6136,7 @@
       }
     }
   },
-  "shortcutsEditLabel": "{action, select, set {set the shortcut of {title}} cancel {cancel the shortcut of {title}} other {change the shortcut of {title}}}",
+  "shortcutsEditLabel": "{action, select, set {set the shortcut of {title}} cancel {stop changing the shortcut of {title}} other {change the shortcut of {title}}}",
   "@shortcutsEditLabel": {
     "description": "What screen readers say of the button beside a command in Settings › Shortcuts. {action} is set while the command has no shortcut, cancel while its new keys are being pressed, and change otherwise; {title} is the command, as Play or pause.",
     "placeholders": {

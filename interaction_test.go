@@ -1564,7 +1564,7 @@ func TestShortcutRecorder(t *testing.T) {
 	tt := testerOf(t, s, 1280, 4000)
 	show(s, tt, "/settings/shortcuts")
 	tt.Click("change the shortcut of Mute")
-	if s.recording != "player.mute" || !tt.Focused("cancel the shortcut of Mute") {
+	if s.recording != "player.mute" || !tt.Focused("stop changing the shortcut of Mute") {
 		t.Fatalf("change doesn't record the keys: recording %q", s.recording)
 	}
 	// The palette's keys name the shortcut, rather than open it.

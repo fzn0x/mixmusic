@@ -63,7 +63,7 @@ func (s *shell) remoteItems(m *ui.Menu) {
 func (s *shell) remoteDo(id string, cmd remote.Command) {
 	go func() {
 		if err := s.a.Remote().Do(id, cmd); err != nil {
-			s.update(func() { s.notes = append(s.notes, noticeOf(err)) })
+			s.update(func() { s.notes = append(s.notes, remoteNotice(err)) })
 		}
 	}()
 }

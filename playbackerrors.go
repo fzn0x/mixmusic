@@ -69,18 +69,18 @@ func (s *shell) failureDetails(c *ui.Context, f player.Failure) ui.Element {
 	var copied ui.Element
 	ui.Column(c.Key("failure-view-" + strconv.Itoa(f.ID))).Gap(16).MaxWidth(720).Children(func() {
 		ui.Column(c).Gap(4).Children(func() {
-			ui.Text(c, pr.clean(failureTrack(f.Track))).FontSize(k.bodySize()).FontWeight(k.leadWeight()).Selectable()
-			ui.Text(c, locales.FailureFromWhen(sentenceStart(failureFrom(f.Track, pr)), failureWhen(f.At, c.Now()))).
+			ui.Text(c, pr.clean(failureTrackSaid(f.Track))).FontSize(k.bodySize()).FontWeight(k.leadWeight()).Selectable()
+			ui.Text(c, locales.FailureFromWhen(sentenceStart(failureFromSaid(f.Track, pr)), failureWhen(f.At, c.Now()))).
 				FontSize(k.smallSize()).TextColor(k.muted).Selectable()
 			if r := f.Recording; r.ID != "" {
-				ui.Text(c, locales.FailurePlayedAs(pr.clean(failureTrack(r)), failureFrom(r, pr))).
+				ui.Text(c, locales.FailurePlayedAs(pr.clean(failureTrackSaid(r)), failureFromSaid(r, pr))).
 					FontSize(k.smallSize()).TextColor(k.muted).Selectable()
 			}
 		})
 		ui.Column(c).Gap(6).Children(func() {
 			ui.Text(c, locales.FailureTried()).FontSize(k.smallSize()).FontWeight(k.leadWeight())
 			for i, st := range f.Steps {
-				ui.Text(c, locales.FailureStepNumbered(i+1, failureStep(st, pr))).FontSize(k.smallSize()).Selectable()
+				ui.Text(c, locales.FailureStepNumbered(i+1, failureStepSaid(st, pr))).FontSize(k.smallSize()).Selectable()
 			}
 			if f.Stopped {
 				ui.Text(c, locales.FailureStopped()).FontSize(k.smallSize()).TextColor(k.muted)
@@ -116,7 +116,7 @@ func (s *shell) playbackErrorSettings(c *ui.Context) {
 		}
 		pr := s.privacy()
 		for _, f := range failures {
-			title := pr.clean(failureTrack(f.Track))
+			title := pr.clean(failureTrackSaid(f.Track))
 			line := failureWhen(f.At, c.Now())
 			if n := len(f.Steps); n > 0 {
 				line += " · " + pr.clean(f.Steps[n-1].Why)

@@ -20,6 +20,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/room"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // CanHost reports whether the guest of key can host the room this
@@ -49,7 +50,7 @@ func (rs *Rooms) MakeHost(key string) error {
 	err := h.server.MakeHost(fp, func(m room.Move, err error) {
 		if err != nil {
 			log.Printf("mixmusic: room: not moved: %v", err)
-			a.notifyRooms("The room stays here: " + err.Error())
+			a.notifyRooms(locales.RoomNoteStays(RoomErrorText(err)))
 			return
 		}
 		go a.movedTo(h, m)
@@ -90,7 +91,7 @@ func (a *App) movedTo(h *hostedRoom, m room.Move) {
 	r.guest = g
 	r.mu.Unlock()
 	log.Printf("mixmusic: room: moved to %s", m.Name)
-	a.notifyRooms("The room moved to " + m.Name + "'s computer: you're a guest in it now")
+	a.notifyRooms(locales.RoomNoteMovedAway(shownName(m.Name)))
 	go a.comeBack(g)
 }
 
@@ -136,7 +137,7 @@ func (a *App) askToHost(g *guestRoom, s *room.Session, seats room.Seats) {
 		return
 	}
 	log.Printf("mixmusic: room: %s asks this computer to host the room", name)
-	a.roomAsks(name + " asks you to host the room")
+	a.roomAsks(locales.RoomNoteAskHost(shownName(name)))
 }
 
 // answerHost answers the host's ask, opening a room for the room of g to
@@ -359,7 +360,7 @@ func (a *App) moved(g *guestRoom, s *room.Session, m room.Move) {
 		g.declined, g.askedAt = 0, time.Time{} // of another host
 		g.step, g.session, g.tries = RoomAway, nil, 0
 	}) {
-		a.notifyRooms("The room moved to " + m.Name + "'s computer")
+		a.notifyRooms(locales.RoomNoteMoved(shownName(m.Name)))
 		go a.comeBack(g)
 	}
 }
@@ -395,7 +396,7 @@ func (a *App) hostMoved(g *guestRoom, s *room.Session) {
 	// The others come back to it from now on.
 	h.server.Open()
 	log.Print("mixmusic: room: hosting the room that moved here")
-	a.notifyRooms("You host the room now")
+	a.notifyRooms(locales.RoomNoteYouHost())
 }
 
 // takeRoom has the player take the queue of the room of s, where its host
@@ -455,11 +456,11 @@ func (a *App) openRoom(seats *room.Seats) (*hostedRoom, int, error) {
 	o := a.roomOptions()
 	ln, err := o.Listen()
 	if err != nil {
-		return nil, 0, fmt.Errorf("The room can't listen on the network: %w", err)
+		return nil, 0, fmt.Errorf("%w: %w", errRoomListen, err)
 	}
 	h := &hostedRoom{key: id.Fingerprint(), code: code, link: room.Invite{Code: code, Host: id.Fingerprint(), Secret: secret}.Link(), told: time.Now()}
 	srv := &room.Server{Identity: id, Name: a.roomName(), Code: code, Secret: secret, Host: roomHostPlayer{a}, Clock: a.roomClock(),
-		Timing: o.Timing, Nearby: &a.room.far.near, Changed: func() { a.roomChanged(h) }, Guessing: func() { a.notifyRooms(roomGuessed) }, Guests: a.roomGuests(), Seats: seats}
+		Timing: o.Timing, Nearby: &a.room.far.near, Changed: func() { a.roomChanged(h) }, Guessing: func() { a.notifyRooms(locales.RoomNoteGuessed()) }, Guests: a.roomGuests(), Seats: seats}
 	h.server = srv
 	go func() {
 		if err := srv.Serve(ln); err != nil {
@@ -473,7 +474,7 @@ func (a *App) openRoom(seats *room.Seats) (*hostedRoom, int, error) {
 	stop, err := o.Discovery.Announce(room.Announcement{ID: id.Fingerprint().ID(), Name: srv.Name, Port: port})
 	if err != nil {
 		srv.Close()
-		return nil, 0, fmt.Errorf("The room can't be announced on the network: %w", err)
+		return nil, 0, fmt.Errorf("%w: %w", errRoomAnnounce, err)
 	}
 	h.unannounce = stop
 	return h, port, nil

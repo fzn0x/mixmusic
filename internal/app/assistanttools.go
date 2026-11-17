@@ -22,6 +22,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/remote"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // errNoPlayer is why a tool can't reach the player.
@@ -35,10 +36,11 @@ func (a *App) assistantPlayer() (*player.Player, error) {
 	return nil, errNoPlayer
 }
 
-// assistantDid shows the user what an assistant did, as a toast, and logs it.
-func assistantDid(p *player.Player, what string) {
+// assistantDid shows the user what an assistant did, as the toast says
+// it, and logs it, in what's English words.
+func assistantDid(p *player.Player, what, toast string) {
 	log.Printf("mixmusic: AI assistants: %s", what)
-	p.Tell(player.Notice{Message: "An AI assistant " + what})
+	p.Tell(player.Notice{Message: toast})
 }
 
 // assistantTrack is a track as the tools tell it.
@@ -266,7 +268,7 @@ func (a *App) toolPlay(context.Context, json.RawMessage) (mcp.Result, error) {
 		return mcp.Result{Text: "It plays already."}, nil
 	}
 	remoteHost{a}.Do(remote.Command{Op: remote.OpPlay})
-	assistantDid(p, "played "+named(cur.Track))
+	assistantDid(p, "played "+named(cur.Track), locales.AssistantsToastPlayed(namedSaid(cur.Track)))
 	return mcp.Result{Text: "Playing " + named(cur.Track) + "."}, nil
 }
 
@@ -281,7 +283,7 @@ func (a *App) toolPause(context.Context, json.RawMessage) (mcp.Result, error) {
 		return mcp.Result{Text: "Nothing plays: it was paused already."}, nil
 	}
 	remoteHost{a}.Do(remote.Command{Op: remote.OpPause})
-	assistantDid(p, "paused "+named(cur.Track))
+	assistantDid(p, "paused "+named(cur.Track), locales.AssistantsToastPaused(namedSaid(cur.Track)))
 	return mcp.Result{Text: "Paused."}, nil
 }
 
@@ -309,7 +311,7 @@ func (a *App) toolNext(_ context.Context, args json.RawMessage) (mcp.Result, err
 	}
 	if count == 1 {
 		remoteHost{a}.Do(remote.Command{Op: remote.OpNext})
-		assistantDid(p, "skipped to the next track")
+		assistantDid(p, "skipped to the next track", locales.AssistantsToastSkipped())
 		return mcp.Result{Text: "Skipped to the next track."}, nil
 	}
 	next := remoteStateOf(st).Next
@@ -321,7 +323,7 @@ func (a *App) toolNext(_ context.Context, args json.RawMessage) (mcp.Result, err
 		return mcp.Result{}, errors.New("the queue changed: try again")
 	}
 	remoteHost{a}.Do(remote.Command{Op: remote.OpPlayEntry, Entry: next[count-1].Entry})
-	assistantDid(p, "skipped ahead to "+named(st.Queue[i].Track))
+	assistantDid(p, "skipped ahead to "+named(st.Queue[i].Track), locales.AssistantsToastSkippedTo(namedSaid(st.Queue[i].Track)))
 	return mcp.Result{Text: "Skipped ahead: " + named(st.Queue[i].Track) + " plays."}, nil
 }
 
@@ -334,7 +336,7 @@ func (a *App) toolPrevious(context.Context, json.RawMessage) (mcp.Result, error)
 		return mcp.Result{}, errors.New("nothing is in the queue")
 	}
 	remoteHost{a}.Do(remote.Command{Op: remote.OpPrevious})
-	assistantDid(p, "went back")
+	assistantDid(p, "went back", locales.AssistantsToastWentBack())
 	return mcp.Result{Text: "Went back."}, nil
 }
 
@@ -379,7 +381,7 @@ func (a *App) toolSeek(_ context.Context, args json.RawMessage) (mcp.Result, err
 	}
 	ms := int64(to)
 	remoteHost{a}.Do(remote.Command{Op: remote.OpSeek, PositionMs: ms})
-	assistantDid(p, "moved "+named(cur.Track)+" to "+minutesOf(ms))
+	assistantDid(p, "moved "+named(cur.Track)+" to "+minutesOf(ms), locales.AssistantsToastMoved(namedSaid(cur.Track), minutesOf(ms)))
 	return mcp.Result{Text: "Moved to " + minutesOf(ms) + "."}, nil
 }
 
@@ -406,6 +408,6 @@ func (a *App) toolVolume(_ context.Context, args json.RawMessage) (mcp.Result, e
 	}
 	to = min(max(to, 0), 100)
 	remoteHost{a}.Do(remote.Command{Op: remote.OpVolume, Volume: float64(to) / 100})
-	assistantDid(p, fmt.Sprintf("set the volume to %d%%", to))
+	assistantDid(p, fmt.Sprintf("set the volume to %d%%", to), locales.AssistantsToastVolume(to))
 	return mcp.Result{Text: fmt.Sprintf("The volume is %d%%.", to)}, nil
 }

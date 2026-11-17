@@ -105,7 +105,7 @@ func (s *Server) letIn(c *conn, name string, msgs <-chan message) string {
 		return reasonDeclined
 	}
 	if gs := s.Guests; tell && gs != nil && gs.Asks != nil {
-		gs.Asks(name + " asks to join your room")
+		gs.Asks(Ask{Name: name})
 	}
 	s.changed(false)
 	wait := time.NewTimer(AskFor)

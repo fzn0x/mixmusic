@@ -51,7 +51,7 @@ func (s *shell) handOver(id, name string) {
 		s.update(func() {
 			s.remote.handing = false
 			if err != nil {
-				s.notes = append(s.notes, noticeOf(err))
+				s.notes = append(s.notes, remoteNotice(err))
 				return
 			}
 			s.notes = append(s.notes, notice(handedOverNote(name, got)))

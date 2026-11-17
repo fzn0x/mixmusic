@@ -144,7 +144,7 @@ func (a *App) roomGuest(id *remote.Identity) *room.Guest {
 func (rs *Rooms) Knock(id, code string) {
 	parsed, ok := room.ParseCode(code)
 	if !ok {
-		rs.a.startKnock(id, nil, knockBy{}, errors.New("A room's code is 6 letters and digits."))
+		rs.a.startKnock(id, nil, knockBy{}, errCodeShape)
 		return
 	}
 	rs.a.startKnock(id, nil, knockBy{password: []byte(parsed)}, nil)
@@ -190,26 +190,26 @@ func (a *App) startKnock(id string, key *remote.Fingerprint, by knockBy, failed 
 	r.mu.Lock()
 	if g := r.guest; g != nil && g.step != RoomEnded && g.step != RoomPreview && g.step != RoomKnocking {
 		r.mu.Unlock()
-		a.notifyRooms("Leave the room you're in to join another")
+		a.notifyRooms(locales.RoomNoteLeaveToJoin())
 		return
 	}
 	if r.hosted != nil {
 		r.mu.Unlock()
-		a.notifyRooms("End the room you host to join another")
+		a.notifyRooms(locales.RoomNoteEndToJoin())
 		return
 	}
 	old := r.guest
 	f, found := r.found[id]
 	name := f.found.Name
 	if name == "" {
-		name = "The room"
+		name = roomByAddr
 	}
 	g := &guestRoom{id: id, name: name, step: RoomKnocking}
 	if key != nil {
 		g.key, g.hasKey = *key, true
 	}
 	if failed != nil {
-		g.step, g.problem = RoomEnded, failed.Error()
+		g.step, g.problem = RoomEnded, roomProblem(name, failed)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), roomKnockFor)
 	g.cancel = cancel
@@ -246,7 +246,7 @@ func (a *App) knock(ctx context.Context, g *guestRoom, wasFound bool, by knockBy
 		return
 	}
 	a.setGuest(g, func() {
-		if g.name == "The room" {
+		if g.name == roomByAddr {
 			g.name = f.Name
 		}
 	})
@@ -374,7 +374,7 @@ func (a *App) entered(g *guestRoom, s *room.Session, own bool) {
 	}
 	log.Printf("mixmusic: room: in %s's room", g.name)
 	if own {
-		a.notifyRooms("You joined " + g.name + "'s room")
+		a.notifyRooms(locales.RoomNoteJoined(shownName(g.name)))
 	}
 	f.follow(s)
 	a.watchRoomAsks(s, g.name)
@@ -606,6 +606,9 @@ func (rs *Rooms) Dismiss() {
 // roomProblem tells why a stay in the room of the host named name ended,
 // or didn't start, in the interface's words.
 func roomProblem(name string, err error) string {
+	// A room known by its address alone: the knock never learned its
+	// host's name.
+	byAddr := name == "" || name == roomByAddr
 	name = shownName(name)
 	switch {
 	case errors.Is(err, room.ErrWrongCode):
@@ -621,9 +624,7 @@ func roomProblem(name string, err error) string {
 	case errors.Is(err, room.ErrBusy):
 		return locales.RoomProblemBusy(name)
 	case errors.Is(err, room.ErrBlocked):
-		if name == "" || name == "The room" {
-			// A room known by its address alone, whose host's name the
-			// knock never learned.
+		if byAddr {
 			return locales.RoomProblemBlockedUnnamed()
 		}
 		return locales.RoomProblemBlocked(name)
@@ -648,6 +649,9 @@ func roomProblem(name string, err error) string {
 	case errors.Is(err, errRoomAway):
 		return locales.RoomProblemAway(name)
 	case farUnreachable(err):
+		if byAddr {
+			return farProblem("")
+		}
 		return farProblem(name)
 	case errors.Is(err, room.ErrFarAddr):
 		return roomFarProblem()
@@ -655,6 +659,10 @@ func roomProblem(name string, err error) string {
 		return locales.RoomProblemNotLink()
 	case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):
 		return locales.RoomProblemTooLong()
+	case errors.Is(err, errAddrNoPort):
+		return locales.RoomProblemAddrNoPort()
+	case errors.Is(err, errCodeShape):
+		return locales.RoomProblemCodeShape()
 	}
 	if err != nil && !errors.Is(err, room.ErrLost) && !isNetErr(err) {
 		return err.Error()

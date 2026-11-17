@@ -2025,6 +2025,56 @@ func (msgs Messages) AssistantsHowTo() string {
 	return Catalog.Format(msgs.locale, "assistantsHowTo", nil)
 }
 
+// AssistantsNameAlbum says "the album “{title}”"
+// in the language the app shows.
+//
+// An album as the toasts of an AI assistant name it: it goes in the {what}
+// of the assistantsToast messages.
+func AssistantsNameAlbum(title string) string { return In(i18n.Locale()).AssistantsNameAlbum(title) }
+
+// AssistantsNameAlbum says "the album “{title}”"
+// in the language of msgs.
+//
+// An album as the toasts of an AI assistant name it: it goes in the {what}
+// of the assistantsToast messages.
+func (msgs Messages) AssistantsNameAlbum(title string) string {
+	return Catalog.Format(msgs.locale, "assistantsNameAlbum", map[string]any{"title": title})
+}
+
+// AssistantsNameArtistSongs says "all the songs of {name}"
+// in the language the app shows.
+//
+// All of an artist's songs, as the toasts of an AI assistant name them: it
+// goes in the {what} of the assistantsToast messages. {name} is the artist.
+func AssistantsNameArtistSongs(name string) string {
+	return In(i18n.Locale()).AssistantsNameArtistSongs(name)
+}
+
+// AssistantsNameArtistSongs says "all the songs of {name}"
+// in the language of msgs.
+//
+// All of an artist's songs, as the toasts of an AI assistant name them: it
+// goes in the {what} of the assistantsToast messages. {name} is the artist.
+func (msgs Messages) AssistantsNameArtistSongs(name string) string {
+	return Catalog.Format(msgs.locale, "assistantsNameArtistSongs", map[string]any{"name": name})
+}
+
+// AssistantsNameLiked says "your liked songs"
+// in the language the app shows.
+//
+// The liked songs, as the toasts of an AI assistant name them: it goes in
+// the {what} of the assistantsToast messages.
+func AssistantsNameLiked() string { return In(i18n.Locale()).AssistantsNameLiked() }
+
+// AssistantsNameLiked says "your liked songs"
+// in the language of msgs.
+//
+// The liked songs, as the toasts of an AI assistant name them: it goes in
+// the {what} of the assistantsToast messages.
+func (msgs Messages) AssistantsNameLiked() string {
+	return Catalog.Format(msgs.locale, "assistantsNameLiked", nil)
+}
+
 // AssistantsNameSeparator says ", "
 // in the language the app shows.
 func AssistantsNameSeparator() string { return In(i18n.Locale()).AssistantsNameSeparator() }
@@ -2033,6 +2083,40 @@ func AssistantsNameSeparator() string { return In(i18n.Locale()).AssistantsNameS
 // in the language of msgs.
 func (msgs Messages) AssistantsNameSeparator() string {
 	return Catalog.Format(msgs.locale, "assistantsNameSeparator", nil)
+}
+
+// AssistantsNameTitle says "“{title}”"
+// in the language the app shows.
+//
+// A track of no artists known, or a playlist, as the toasts of an AI
+// assistant name it: it goes in the {what} of the assistantsToast messages.
+func AssistantsNameTitle(title string) string { return In(i18n.Locale()).AssistantsNameTitle(title) }
+
+// AssistantsNameTitle says "“{title}”"
+// in the language of msgs.
+//
+// A track of no artists known, or a playlist, as the toasts of an AI
+// assistant name it: it goes in the {what} of the assistantsToast messages.
+func (msgs Messages) AssistantsNameTitle(title string) string {
+	return Catalog.Format(msgs.locale, "assistantsNameTitle", map[string]any{"title": title})
+}
+
+// AssistantsNameTrackBy says "“{title}” by {artists}"
+// in the language the app shows.
+//
+// A track as the toasts of an AI assistant name it: it goes in the {what}
+// of the assistantsToast messages.
+func AssistantsNameTrackBy(title string, artists string) string {
+	return In(i18n.Locale()).AssistantsNameTrackBy(title, artists)
+}
+
+// AssistantsNameTrackBy says "“{title}” by {artists}"
+// in the language of msgs.
+//
+// A track as the toasts of an AI assistant name it: it goes in the {what}
+// of the assistantsToast messages.
+func (msgs Messages) AssistantsNameTrackBy(title string, artists string) string {
+	return Catalog.Format(msgs.locale, "assistantsNameTrackBy", map[string]any{"title": title, "artists": artists})
 }
 
 // AssistantsNone says "None now. Turning this off ends every session at once."
@@ -2083,6 +2167,172 @@ func AssistantsTitle() string { return In(i18n.Locale()).AssistantsTitle() }
 // in the language of msgs.
 func (msgs Messages) AssistantsTitle() string {
 	return Catalog.Format(msgs.locale, "assistantsTitle", nil)
+}
+
+// AssistantsToastAdded says "An AI assistant added {what} to the queue"
+// in the language the app shows.
+//
+// Toast when an AI assistant added something to the end of the queue.
+// {what} is one of the assistantsName messages.
+func AssistantsToastAdded(what string) string { return In(i18n.Locale()).AssistantsToastAdded(what) }
+
+// AssistantsToastAdded says "An AI assistant added {what} to the queue"
+// in the language of msgs.
+//
+// Toast when an AI assistant added something to the end of the queue.
+// {what} is one of the assistantsName messages.
+func (msgs Messages) AssistantsToastAdded(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastAdded", map[string]any{"what": what})
+}
+
+// AssistantsToastMoved says "An AI assistant moved {what} to {time}"
+// in the language the app shows.
+//
+// Toast when an AI assistant moved the track to a place in it. {what} is
+// one of the assistantsName messages; {time} is a place in the track, as
+// 2:05.
+func AssistantsToastMoved(what string, time_ string) string {
+	return In(i18n.Locale()).AssistantsToastMoved(what, time_)
+}
+
+// AssistantsToastMoved says "An AI assistant moved {what} to {time}"
+// in the language of msgs.
+//
+// Toast when an AI assistant moved the track to a place in it. {what} is
+// one of the assistantsName messages; {time} is a place in the track, as
+// 2:05.
+func (msgs Messages) AssistantsToastMoved(what string, time_ string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastMoved", map[string]any{"what": what, "time": time_})
+}
+
+// AssistantsToastPaused says "An AI assistant paused {what}"
+// in the language the app shows.
+//
+// Toast when an AI assistant paused the track. {what} is one of the
+// assistantsName messages.
+func AssistantsToastPaused(what string) string { return In(i18n.Locale()).AssistantsToastPaused(what) }
+
+// AssistantsToastPaused says "An AI assistant paused {what}"
+// in the language of msgs.
+//
+// Toast when an AI assistant paused the track. {what} is one of the
+// assistantsName messages.
+func (msgs Messages) AssistantsToastPaused(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastPaused", map[string]any{"what": what})
+}
+
+// AssistantsToastPlayed says "An AI assistant played {what}"
+// in the language the app shows.
+//
+// Toast when an AI assistant, as one that speaks MCP, played something.
+// {what} is one of the assistantsName messages.
+func AssistantsToastPlayed(what string) string { return In(i18n.Locale()).AssistantsToastPlayed(what) }
+
+// AssistantsToastPlayed says "An AI assistant played {what}"
+// in the language of msgs.
+//
+// Toast when an AI assistant, as one that speaks MCP, played something.
+// {what} is one of the assistantsName messages.
+func (msgs Messages) AssistantsToastPlayed(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastPlayed", map[string]any{"what": what})
+}
+
+// AssistantsToastPutNext says "An AI assistant put {what} next"
+// in the language the app shows.
+//
+// Toast when an AI assistant put something to play next. {what} is one of
+// the assistantsName messages.
+func AssistantsToastPutNext(what string) string {
+	return In(i18n.Locale()).AssistantsToastPutNext(what)
+}
+
+// AssistantsToastPutNext says "An AI assistant put {what} next"
+// in the language of msgs.
+//
+// Toast when an AI assistant put something to play next. {what} is one of
+// the assistantsName messages.
+func (msgs Messages) AssistantsToastPutNext(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastPutNext", map[string]any{"what": what})
+}
+
+// AssistantsToastShuffled says "An AI assistant shuffled {what}"
+// in the language the app shows.
+//
+// Toast when an AI assistant played something shuffled. {what} is one of
+// the assistantsName messages.
+func AssistantsToastShuffled(what string) string {
+	return In(i18n.Locale()).AssistantsToastShuffled(what)
+}
+
+// AssistantsToastShuffled says "An AI assistant shuffled {what}"
+// in the language of msgs.
+//
+// Toast when an AI assistant played something shuffled. {what} is one of
+// the assistantsName messages.
+func (msgs Messages) AssistantsToastShuffled(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastShuffled", map[string]any{"what": what})
+}
+
+// AssistantsToastSkipped says "An AI assistant skipped to the next track"
+// in the language the app shows.
+//
+// Toast when an AI assistant skipped to the next track.
+func AssistantsToastSkipped() string { return In(i18n.Locale()).AssistantsToastSkipped() }
+
+// AssistantsToastSkipped says "An AI assistant skipped to the next track"
+// in the language of msgs.
+//
+// Toast when an AI assistant skipped to the next track.
+func (msgs Messages) AssistantsToastSkipped() string {
+	return Catalog.Format(msgs.locale, "assistantsToastSkipped", nil)
+}
+
+// AssistantsToastSkippedTo says "An AI assistant skipped ahead to {what}"
+// in the language the app shows.
+//
+// Toast when an AI assistant skipped past several tracks. {what} is one of
+// the assistantsName messages.
+func AssistantsToastSkippedTo(what string) string {
+	return In(i18n.Locale()).AssistantsToastSkippedTo(what)
+}
+
+// AssistantsToastSkippedTo says "An AI assistant skipped ahead to {what}"
+// in the language of msgs.
+//
+// Toast when an AI assistant skipped past several tracks. {what} is one of
+// the assistantsName messages.
+func (msgs Messages) AssistantsToastSkippedTo(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastSkippedTo", map[string]any{"what": what})
+}
+
+// AssistantsToastVolume says "An AI assistant set the volume to {percent}%"
+// in the language the app shows.
+//
+// Toast when an AI assistant set the volume, from 0 to 100.
+func AssistantsToastVolume(percent int) string {
+	return In(i18n.Locale()).AssistantsToastVolume(percent)
+}
+
+// AssistantsToastVolume says "An AI assistant set the volume to {percent}%"
+// in the language of msgs.
+//
+// Toast when an AI assistant set the volume, from 0 to 100.
+func (msgs Messages) AssistantsToastVolume(percent int) string {
+	return Catalog.Format(msgs.locale, "assistantsToastVolume", map[string]any{"percent": percent})
+}
+
+// AssistantsToastWentBack says "An AI assistant went back"
+// in the language the app shows.
+//
+// Toast when an AI assistant went back, as the previous button does.
+func AssistantsToastWentBack() string { return In(i18n.Locale()).AssistantsToastWentBack() }
+
+// AssistantsToastWentBack says "An AI assistant went back"
+// in the language of msgs.
+//
+// Toast when an AI assistant went back, as the previous button does.
+func (msgs Messages) AssistantsToastWentBack() string {
+	return Catalog.Format(msgs.locale, "assistantsToastWentBack", nil)
 }
 
 // AudioAccount2Change says "You can change this in Settings › Playback › Sound."
@@ -6167,6 +6417,150 @@ func (msgs Messages) DownloadsFolderLine(count int, size string, folder string) 
 	return Catalog.Format(msgs.locale, "downloadsFolderLine", map[string]any{"count": count, "size": size, "folder": folder})
 }
 
+// DownloadsHoldDisk says "The disk of your downloads is full: they go on once it has room"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page.
+func DownloadsHoldDisk() string { return In(i18n.Locale()).DownloadsHoldDisk() }
+
+// DownloadsHoldDisk says "The disk of your downloads is full: they go on once it has room"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page.
+func (msgs Messages) DownloadsHoldDisk() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldDisk", nil)
+}
+
+// DownloadsHoldFailing says "Downloads keep failing ({reason}); they go on in a while"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page. {reason} is why the last
+// one failed, as a message of downloadsReason, or the error's own words.
+func DownloadsHoldFailing(reason string) string {
+	return In(i18n.Locale()).DownloadsHoldFailing(reason)
+}
+
+// DownloadsHoldFailing says "Downloads keep failing ({reason}); they go on in a while"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page. {reason} is why the last
+// one failed, as a message of downloadsReason, or the error's own words.
+func (msgs Messages) DownloadsHoldFailing(reason string) string {
+	return Catalog.Format(msgs.locale, "downloadsHoldFailing", map[string]any{"reason": reason})
+}
+
+// DownloadsHoldMetered says "Waiting for a connection that isn't metered, as Settings › Playback asks"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page: the connection is metered,
+// as a phone's hotspot.
+func DownloadsHoldMetered() string { return In(i18n.Locale()).DownloadsHoldMetered() }
+
+// DownloadsHoldMetered says "Waiting for a connection that isn't metered, as Settings › Playback asks"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page: the connection is metered,
+// as a phone's hotspot.
+func (msgs Messages) DownloadsHoldMetered() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldMetered", nil)
+}
+
+// DownloadsHoldMoving says "Moving to {folder}"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page: they move to the folder
+// {folder}, a path.
+func DownloadsHoldMoving(folder string) string { return In(i18n.Locale()).DownloadsHoldMoving(folder) }
+
+// DownloadsHoldMoving says "Moving to {folder}"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page: they move to the folder
+// {folder}, a path.
+func (msgs Messages) DownloadsHoldMoving(folder string) string {
+	return Catalog.Format(msgs.locale, "downloadsHoldMoving", map[string]any{"folder": folder})
+}
+
+// DownloadsHoldOffline says "Waiting for the network"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page.
+func DownloadsHoldOffline() string { return In(i18n.Locale()).DownloadsHoldOffline() }
+
+// DownloadsHoldOffline says "Waiting for the network"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page.
+func (msgs Messages) DownloadsHoldOffline() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldOffline", nil)
+}
+
+// DownloadsHoldPaused says "Paused"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page: the user paused them.
+func DownloadsHoldPaused() string { return In(i18n.Locale()).DownloadsHoldPaused() }
+
+// DownloadsHoldPaused says "Paused"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page: the user paused them.
+func (msgs Messages) DownloadsHoldPaused() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldPaused", nil)
+}
+
+// DownloadsHoldThrottled says "YouTube is turning down requests from this network for now; downloads go on in a while"
+// in the language the app shows.
+//
+// Why the downloads wait, on the downloads page.
+func DownloadsHoldThrottled() string { return In(i18n.Locale()).DownloadsHoldThrottled() }
+
+// DownloadsHoldThrottled says "YouTube is turning down requests from this network for now; downloads go on in a while"
+// in the language of msgs.
+//
+// Why the downloads wait, on the downloads page.
+func (msgs Messages) DownloadsHoldThrottled() string {
+	return Catalog.Format(msgs.locale, "downloadsHoldThrottled", nil)
+}
+
+// DownloadsHoldUnreachable says "The folder of your downloads can't be reached: {folder}"
+// in the language the app shows.
+//
+// Why the downloads wait, as the downloads page and Settings tell it.
+// {folder} is the folder's path.
+func DownloadsHoldUnreachable(folder string) string {
+	return In(i18n.Locale()).DownloadsHoldUnreachable(folder)
+}
+
+// DownloadsHoldUnreachable says "The folder of your downloads can't be reached: {folder}"
+// in the language of msgs.
+//
+// Why the downloads wait, as the downloads page and Settings tell it.
+// {folder} is the folder's path.
+func (msgs Messages) DownloadsHoldUnreachable(folder string) string {
+	return Catalog.Format(msgs.locale, "downloadsHoldUnreachable", map[string]any{"folder": folder})
+}
+
+// DownloadsHoldUnreadable says "The downloads in {folder} can't be read: {error}"
+// in the language the app shows.
+//
+// Why the downloads wait, as the downloads page and Settings tell it.
+// {folder} is the folder's path; {error} is the system's own words, often
+// in English.
+func DownloadsHoldUnreadable(folder string, error string) string {
+	return In(i18n.Locale()).DownloadsHoldUnreadable(folder, error)
+}
+
+// DownloadsHoldUnreadable says "The downloads in {folder} can't be read: {error}"
+// in the language of msgs.
+//
+// Why the downloads wait, as the downloads page and Settings tell it.
+// {folder} is the folder's path; {error} is the system's own words, often
+// in English.
+func (msgs Messages) DownloadsHoldUnreadable(folder string, error string) string {
+	return Catalog.Format(msgs.locale, "downloadsHoldUnreadable", map[string]any{"folder": folder, "error": error})
+}
+
 // DownloadsLikedSongs says "Liked songs"
 // in the language the app shows.
 //
@@ -6339,6 +6733,42 @@ func (msgs Messages) DownloadsMove() string {
 	return Catalog.Format(msgs.locale, "downloadsMove", nil)
 }
 
+// DownloadsMoveCacheFolder says "the downloads can't share a folder with MixMusic's cache"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func DownloadsMoveCacheFolder() string { return In(i18n.Locale()).DownloadsMoveCacheFolder() }
+
+// DownloadsMoveCacheFolder says "the downloads can't share a folder with MixMusic's cache"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveCacheFolder() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveCacheFolder", nil)
+}
+
+// DownloadsMoveCantWrite says "MixMusic can't write to {folder}: {error}"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed. {folder} is a path; {error} is the system's own
+// words, often in English.
+func DownloadsMoveCantWrite(folder string, error string) string {
+	return In(i18n.Locale()).DownloadsMoveCantWrite(folder, error)
+}
+
+// DownloadsMoveCantWrite says "MixMusic can't write to {folder}: {error}"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed. {folder} is a path; {error} is the system's own
+// words, often in English.
+func (msgs Messages) DownloadsMoveCantWrite(folder string, error string) string {
+	return Catalog.Format(msgs.locale, "downloadsMoveCantWrite", map[string]any{"folder": folder, "error": error})
+}
+
 // DownloadsMoveFailed says "couldn't move the downloads: {error}"
 // in the language the app shows.
 func DownloadsMoveFailed(error string) string { return In(i18n.Locale()).DownloadsMoveFailed(error) }
@@ -6347,6 +6777,54 @@ func DownloadsMoveFailed(error string) string { return In(i18n.Locale()).Downloa
 // in the language of msgs.
 func (msgs Messages) DownloadsMoveFailed(error string) string {
 	return Catalog.Format(msgs.locale, "downloadsMoveFailed", map[string]any{"error": error})
+}
+
+// DownloadsMoveIntoTheirs says "the downloads can't move into a folder of their own"
+// in the language the app shows.
+//
+// Why the downloads didn't move: the folder chosen is inside theirs. It
+// goes in the {error} of downloadsMoveFailed.
+func DownloadsMoveIntoTheirs() string { return In(i18n.Locale()).DownloadsMoveIntoTheirs() }
+
+// DownloadsMoveIntoTheirs says "the downloads can't move into a folder of their own"
+// in the language of msgs.
+//
+// Why the downloads didn't move: the folder chosen is inside theirs. It
+// goes in the {error} of downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveIntoTheirs() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveIntoTheirs", nil)
+}
+
+// DownloadsMoveMovingAlready says "the downloads are moving already"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func DownloadsMoveMovingAlready() string { return In(i18n.Locale()).DownloadsMoveMovingAlready() }
+
+// DownloadsMoveMovingAlready says "the downloads are moving already"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveMovingAlready() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveMovingAlready", nil)
+}
+
+// DownloadsMoveNoDownloads says "MixMusic keeps no downloads here"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func DownloadsMoveNoDownloads() string { return In(i18n.Locale()).DownloadsMoveNoDownloads() }
+
+// DownloadsMoveNoDownloads says "MixMusic keeps no downloads here"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveNoDownloads() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveNoDownloads", nil)
 }
 
 // DownloadsMoveQuestion says "Move {count, plural, one {# download} other {# downloads}}, {size}, to {folder}? They wait meanwhile."
@@ -6359,6 +6837,22 @@ func DownloadsMoveQuestion(count int, size string, folder string) string {
 // in the language of msgs.
 func (msgs Messages) DownloadsMoveQuestion(count int, size string, folder string) string {
 	return Catalog.Format(msgs.locale, "downloadsMoveQuestion", map[string]any{"count": count, "size": size, "folder": folder})
+}
+
+// DownloadsMoveSameFolder says "the downloads are in that folder already"
+// in the language the app shows.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func DownloadsMoveSameFolder() string { return In(i18n.Locale()).DownloadsMoveSameFolder() }
+
+// DownloadsMoveSameFolder says "the downloads are in that folder already"
+// in the language of msgs.
+//
+// Why the downloads didn't move: it goes in the {error} of
+// downloadsMoveFailed.
+func (msgs Messages) DownloadsMoveSameFolder() string {
+	return Catalog.Format(msgs.locale, "downloadsMoveSameFolder", nil)
 }
 
 // DownloadsMoveTitle says "move downloads"
@@ -6475,6 +6969,24 @@ func (msgs Messages) DownloadsPause() string {
 	return Catalog.Format(msgs.locale, "downloadsPause", nil)
 }
 
+// DownloadsPhaseFinding says "finding its recording on YouTube Music"
+// in the language the app shows.
+//
+// What the download of a Spotify track does, on its row of the downloads
+// page: it looks for the track's recording on YouTube Music, which
+// downloads in its place.
+func DownloadsPhaseFinding() string { return In(i18n.Locale()).DownloadsPhaseFinding() }
+
+// DownloadsPhaseFinding says "finding its recording on YouTube Music"
+// in the language of msgs.
+//
+// What the download of a Spotify track does, on its row of the downloads
+// page: it looks for the track's recording on YouTube Music, which
+// downloads in its place.
+func (msgs Messages) DownloadsPhaseFinding() string {
+	return Catalog.Format(msgs.locale, "downloadsPhaseFinding", nil)
+}
+
 // DownloadsProblemMessage says "{problem}. Tracks stream as before meanwhile."
 // in the language the app shows.
 func DownloadsProblemMessage(problem string) string {
@@ -6513,6 +7025,140 @@ func DownloadsProgressLabel() string { return In(i18n.Locale()).DownloadsProgres
 // Label of the progress bar of the downloads.
 func (msgs Messages) DownloadsProgressLabel() string {
 	return Catalog.Format(msgs.locale, "downloadsProgressLabel", nil)
+}
+
+// DownloadsReasonBadAudio says "the audio that came can't play"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonBadAudio() string { return In(i18n.Locale()).DownloadsReasonBadAudio() }
+
+// DownloadsReasonBadAudio says "the audio that came can't play"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonBadAudio() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonBadAudio", nil)
+}
+
+// DownloadsReasonDiskFull says "the disk is full"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonDiskFull() string { return In(i18n.Locale()).DownloadsReasonDiskFull() }
+
+// DownloadsReasonDiskFull says "the disk is full"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonDiskFull() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonDiskFull", nil)
+}
+
+// DownloadsReasonNeedsYTDLP says "it needs yt-dlp, which Settings › Playback installs"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing, so
+// it starts in lowercase where the language has cases.
+func DownloadsReasonNeedsYTDLP() string { return In(i18n.Locale()).DownloadsReasonNeedsYTDLP() }
+
+// DownloadsReasonNeedsYTDLP says "it needs yt-dlp, which Settings › Playback installs"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing, so
+// it starts in lowercase where the language has cases.
+func (msgs Messages) DownloadsReasonNeedsYTDLP() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNeedsYTDLP", nil)
+}
+
+// DownloadsReasonNetwork says "the network went"
+// in the language the app shows.
+//
+// Why a track couldn't download: the connection dropped. It goes in the
+// {reason} of downloadsMarkFailed, downloadsStatusFailed and
+// downloadsHoldFailing.
+func DownloadsReasonNetwork() string { return In(i18n.Locale()).DownloadsReasonNetwork() }
+
+// DownloadsReasonNetwork says "the network went"
+// in the language of msgs.
+//
+// Why a track couldn't download: the connection dropped. It goes in the
+// {reason} of downloadsMarkFailed, downloadsStatusFailed and
+// downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNetwork() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNetwork", nil)
+}
+
+// DownloadsReasonNoAudio says "YouTube has no audio of this track that MixMusic plays"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonNoAudio() string { return In(i18n.Locale()).DownloadsReasonNoAudio() }
+
+// DownloadsReasonNoAudio says "YouTube has no audio of this track that MixMusic plays"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNoAudio() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNoAudio", nil)
+}
+
+// DownloadsReasonNoMatch says "no matching recording found on YouTube Music"
+// in the language the app shows.
+//
+// Why a Spotify track couldn't download: its recording on YouTube Music,
+// which downloads in its place, wasn't found. It goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonNoMatch() string { return In(i18n.Locale()).DownloadsReasonNoMatch() }
+
+// DownloadsReasonNoMatch says "no matching recording found on YouTube Music"
+// in the language of msgs.
+//
+// Why a Spotify track couldn't download: its recording on YouTube Music,
+// which downloads in its place, wasn't found. It goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNoMatch() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNoMatch", nil)
+}
+
+// DownloadsReasonNoMatcher says "nothing here finds the recordings of Spotify tracks"
+// in the language the app shows.
+//
+// Why a Spotify track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonNoMatcher() string { return In(i18n.Locale()).DownloadsReasonNoMatcher() }
+
+// DownloadsReasonNoMatcher says "nothing here finds the recordings of Spotify tracks"
+// in the language of msgs.
+//
+// Why a Spotify track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNoMatcher() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNoMatcher", nil)
+}
+
+// DownloadsReasonNotYouTube says "only tracks of YouTube Music, and Spotify tracks through their recording there, download"
+// in the language the app shows.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func DownloadsReasonNotYouTube() string { return In(i18n.Locale()).DownloadsReasonNotYouTube() }
+
+// DownloadsReasonNotYouTube says "only tracks of YouTube Music, and Spotify tracks through their recording there, download"
+// in the language of msgs.
+//
+// Why a track couldn't download: it goes in the {reason} of
+// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+func (msgs Messages) DownloadsReasonNotYouTube() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonNotYouTube", nil)
 }
 
 // DownloadsRemoveAll says "remove all downloads"
@@ -7549,6 +8195,42 @@ func (msgs Messages) FailureCopyLabel() string {
 	return Catalog.Format(msgs.locale, "failureCopyLabel", nil)
 }
 
+// FailureFromFile says "a file on this computer"
+// in the language the app shows.
+//
+// Where a track of a failure comes from, in its details: it goes in the
+// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
+// and of failurePlayedAs.
+func FailureFromFile() string { return In(i18n.Locale()).FailureFromFile() }
+
+// FailureFromFile says "a file on this computer"
+// in the language of msgs.
+//
+// Where a track of a failure comes from, in its details: it goes in the
+// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
+// and of failurePlayedAs.
+func (msgs Messages) FailureFromFile() string {
+	return Catalog.Format(msgs.locale, "failureFromFile", nil)
+}
+
+// FailureFromFileAt says "a file on this computer, {path}"
+// in the language the app shows.
+//
+// Where a track of a failure comes from, in its details: it goes in the
+// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
+// and of failurePlayedAs. {path} is the file's path.
+func FailureFromFileAt(path string) string { return In(i18n.Locale()).FailureFromFileAt(path) }
+
+// FailureFromFileAt says "a file on this computer, {path}"
+// in the language of msgs.
+//
+// Where a track of a failure comes from, in its details: it goes in the
+// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
+// and of failurePlayedAs. {path} is the file's path.
+func (msgs Messages) FailureFromFileAt(path string) string {
+	return Catalog.Format(msgs.locale, "failureFromFileAt", map[string]any{"path": path})
+}
+
 // FailureFromWhen says "{from} · {when}"
 // in the language the app shows.
 func FailureFromWhen(from string, when string) string {
@@ -7573,6 +8255,24 @@ func (msgs Messages) FailurePlayedAs(track string, from string) string {
 	return Catalog.Format(msgs.locale, "failurePlayedAs", map[string]any{"track": track, "from": from})
 }
 
+// FailureStep says "{way}: {why}"
+// in the language the app shows.
+//
+// A line of what was tried, in the failure details of a track that couldn't
+// play. {way} is one of the failureWay messages; {why} is why it failed, in
+// the words of the error, often English.
+func FailureStep(way string, why string) string { return In(i18n.Locale()).FailureStep(way, why) }
+
+// FailureStep says "{way}: {why}"
+// in the language of msgs.
+//
+// A line of what was tried, in the failure details of a track that couldn't
+// play. {way} is one of the failureWay messages; {why} is why it failed, in
+// the words of the error, often English.
+func (msgs Messages) FailureStep(way string, why string) string {
+	return Catalog.Format(msgs.locale, "failureStep", map[string]any{"way": way, "why": why})
+}
+
 // FailureStepNumbered says "{n}. {step}"
 // in the language the app shows.
 func FailureStepNumbered(n int, step string) string {
@@ -7583,6 +8283,28 @@ func FailureStepNumbered(n int, step string) string {
 // in the language of msgs.
 func (msgs Messages) FailureStepNumbered(n int, step string) string {
 	return Catalog.Format(msgs.locale, "failureStepNumbered", map[string]any{"n": n, "step": step})
+}
+
+// FailureStepTimes says "{way}, {times, plural, one {# time} other {# times}}: {why}"
+// in the language the app shows.
+//
+// A line of what was tried, in the failure details of a track that couldn't
+// play, when it failed so several times in a row. {way} is one of the
+// failureWay messages; {why} is why it failed, in the words of the error,
+// often English.
+func FailureStepTimes(way string, times int, why string) string {
+	return In(i18n.Locale()).FailureStepTimes(way, times, why)
+}
+
+// FailureStepTimes says "{way}, {times, plural, one {# time} other {# times}}: {why}"
+// in the language of msgs.
+//
+// A line of what was tried, in the failure details of a track that couldn't
+// play, when it failed so several times in a row. {way} is one of the
+// failureWay messages; {why} is why it failed, in the words of the error,
+// often English.
+func (msgs Messages) FailureStepTimes(way string, times int, why string) string {
+	return Catalog.Format(msgs.locale, "failureStepTimes", map[string]any{"way": way, "times": times, "why": why})
 }
 
 // FailureStopped says "MixMusic stopped playing after it, as the tracks just before it couldn't play either."
@@ -7605,6 +8327,60 @@ func (msgs Messages) FailureTitle() string {
 	return Catalog.Format(msgs.locale, "failureTitle", nil)
 }
 
+// FailureTrackBy says "{title}, by {artists}"
+// in the language the app shows.
+//
+// The track of a failure, in its details and in Settings › About ›
+// Recent playback errors.
+func FailureTrackBy(title string, artists string) string {
+	return In(i18n.Locale()).FailureTrackBy(title, artists)
+}
+
+// FailureTrackBy says "{title}, by {artists}"
+// in the language of msgs.
+//
+// The track of a failure, in its details and in Settings › About ›
+// Recent playback errors.
+func (msgs Messages) FailureTrackBy(title string, artists string) string {
+	return Catalog.Format(msgs.locale, "failureTrackBy", map[string]any{"title": title, "artists": artists})
+}
+
+// FailureTrackByOn says "{title}, by {artists}, on {album}"
+// in the language the app shows.
+//
+// The track of a failure, in its details and in Settings › About ›
+// Recent playback errors.
+func FailureTrackByOn(title string, artists string, album string) string {
+	return In(i18n.Locale()).FailureTrackByOn(title, artists, album)
+}
+
+// FailureTrackByOn says "{title}, by {artists}, on {album}"
+// in the language of msgs.
+//
+// The track of a failure, in its details and in Settings › About ›
+// Recent playback errors.
+func (msgs Messages) FailureTrackByOn(title string, artists string, album string) string {
+	return Catalog.Format(msgs.locale, "failureTrackByOn", map[string]any{"title": title, "artists": artists, "album": album})
+}
+
+// FailureTrackOn says "{title}, on {album}"
+// in the language the app shows.
+//
+// The track of a failure, of no artists known, in its details and in
+// Settings › About › Recent playback errors.
+func FailureTrackOn(title string, album string) string {
+	return In(i18n.Locale()).FailureTrackOn(title, album)
+}
+
+// FailureTrackOn says "{title}, on {album}"
+// in the language of msgs.
+//
+// The track of a failure, of no artists known, in its details and in
+// Settings › About › Recent playback errors.
+func (msgs Messages) FailureTrackOn(title string, album string) string {
+	return Catalog.Format(msgs.locale, "failureTrackOn", map[string]any{"title": title, "album": album})
+}
+
 // FailureTried says "What was tried"
 // in the language the app shows.
 func FailureTried() string { return In(i18n.Locale()).FailureTried() }
@@ -7613,6 +8389,180 @@ func FailureTried() string { return In(i18n.Locale()).FailureTried() }
 // in the language of msgs.
 func (msgs Messages) FailureTried() string {
 	return Catalog.Format(msgs.locale, "failureTried", nil)
+}
+
+// FailureWayAgain says "{way}, tried again"
+// in the language the app shows.
+//
+// A way MixMusic tried once more to play a track, in the failure details.
+// {way} is one of the failureWay messages.
+func FailureWayAgain(way string) string { return In(i18n.Locale()).FailureWayAgain(way) }
+
+// FailureWayAgain says "{way}, tried again"
+// in the language of msgs.
+//
+// A way MixMusic tried once more to play a track, in the failure details.
+// {way} is one of the failureWay messages.
+func (msgs Messages) FailureWayAgain(way string) string {
+	return Catalog.Format(msgs.locale, "failureWayAgain", map[string]any{"way": way})
+}
+
+// FailureWayFile says "The file"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: the track's file on this computer. It starts a line of what was
+// tried, before why it failed.
+func FailureWayFile() string { return In(i18n.Locale()).FailureWayFile() }
+
+// FailureWayFile says "The file"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: the track's file on this computer. It starts a line of what was
+// tried, before why it failed.
+func (msgs Messages) FailureWayFile() string {
+	return Catalog.Format(msgs.locale, "failureWayFile", nil)
+}
+
+// FailureWayFindingRecording says "Finding it on YouTube Music"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a Spotify track that couldn't play, in the
+// failure details: finding its recording on YouTube Music, which plays in
+// its place. It starts a line of what was tried.
+func FailureWayFindingRecording() string { return In(i18n.Locale()).FailureWayFindingRecording() }
+
+// FailureWayFindingRecording says "Finding it on YouTube Music"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a Spotify track that couldn't play, in the
+// failure details: finding its recording on YouTube Music, which plays in
+// its place. It starts a line of what was tried.
+func (msgs Messages) FailureWayFindingRecording() string {
+	return Catalog.Format(msgs.locale, "failureWayFindingRecording", nil)
+}
+
+// FailureWayFindingStream says "Finding its stream"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: finding the address of its audio. It starts a line of what was
+// tried.
+func FailureWayFindingStream() string { return In(i18n.Locale()).FailureWayFindingStream() }
+
+// FailureWayFindingStream says "Finding its stream"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: finding the address of its audio. It starts a line of what was
+// tried.
+func (msgs Messages) FailureWayFindingStream() string {
+	return Catalog.Format(msgs.locale, "failureWayFindingStream", nil)
+}
+
+// FailureWayLive says "The live stream"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: a broadcast that goes on now. It starts a line of what was
+// tried.
+func FailureWayLive() string { return In(i18n.Locale()).FailureWayLive() }
+
+// FailureWayLive says "The live stream"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: a broadcast that goes on now. It starts a line of what was
+// tried.
+func (msgs Messages) FailureWayLive() string {
+	return Catalog.Format(msgs.locale, "failureWayLive", nil)
+}
+
+// FailureWayOffline says "The download, or the offline cache"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: its audio kept on this computer. It starts a line of what was
+// tried.
+func FailureWayOffline() string { return In(i18n.Locale()).FailureWayOffline() }
+
+// FailureWayOffline says "The download, or the offline cache"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: its audio kept on this computer. It starts a line of what was
+// tried.
+func (msgs Messages) FailureWayOffline() string {
+	return Catalog.Format(msgs.locale, "failureWayOffline", nil)
+}
+
+// FailureWayPlayerAPI says "YouTube's player API"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: the service of YouTube that gives a video's streams. It starts a
+// line of what was tried.
+func FailureWayPlayerAPI() string { return In(i18n.Locale()).FailureWayPlayerAPI() }
+
+// FailureWayPlayerAPI says "YouTube's player API"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: the service of YouTube that gives a video's streams. It starts a
+// line of what was tried.
+func (msgs Messages) FailureWayPlayerAPI() string {
+	return Catalog.Format(msgs.locale, "failureWayPlayerAPI", nil)
+}
+
+// FailureWaySpotifyHere says "Spotify in MixMusic"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: Spotify's own player inside MixMusic, as Settings › Playback
+// calls it. It starts a line of what was tried.
+func FailureWaySpotifyHere() string { return In(i18n.Locale()).FailureWaySpotifyHere() }
+
+// FailureWaySpotifyHere says "Spotify in MixMusic"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: Spotify's own player inside MixMusic, as Settings › Playback
+// calls it. It starts a line of what was tried.
+func (msgs Messages) FailureWaySpotifyHere() string {
+	return Catalog.Format(msgs.locale, "failureWaySpotifyHere", nil)
+}
+
+// FailureWayStream says "The stream"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: its audio from YouTube. It starts a line of what was tried.
+func FailureWayStream() string { return In(i18n.Locale()).FailureWayStream() }
+
+// FailureWayStream says "The stream"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: its audio from YouTube. It starts a line of what was tried.
+func (msgs Messages) FailureWayStream() string {
+	return Catalog.Format(msgs.locale, "failureWayStream", nil)
+}
+
+// FailureWaySurround says "Its 5.1 surround audio"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details. It starts a line of what was tried.
+func FailureWaySurround() string { return In(i18n.Locale()).FailureWaySurround() }
+
+// FailureWaySurround says "Its 5.1 surround audio"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details. It starts a line of what was tried.
+func (msgs Messages) FailureWaySurround() string {
+	return Catalog.Format(msgs.locale, "failureWaySurround", nil)
 }
 
 // FirewallAllow says "allow"
@@ -16803,6 +17753,22 @@ func (msgs Messages) RemoteAbout(name string) string {
 	return Catalog.Format(msgs.locale, "remoteAbout", map[string]any{"name": name})
 }
 
+// RemoteAnotherComputer says "Another computer"
+// in the language the app shows.
+//
+// The name of a computer paired for remote control that MixMusic no longer
+// knows by name.
+func RemoteAnotherComputer() string { return In(i18n.Locale()).RemoteAnotherComputer() }
+
+// RemoteAnotherComputer says "Another computer"
+// in the language of msgs.
+//
+// The name of a computer paired for remote control that MixMusic no longer
+// knows by name.
+func (msgs Messages) RemoteAnotherComputer() string {
+	return Catalog.Format(msgs.locale, "remoteAnotherComputer", nil)
+}
+
 // RemoteBothWays says "Can control this computer; You control it from here"
 // in the language the app shows.
 func RemoteBothWays() string { return In(i18n.Locale()).RemoteBothWays() }
@@ -16895,6 +17861,84 @@ func (msgs Messages) RemoteControlled() string {
 	return Catalog.Format(msgs.locale, "remoteControlled", nil)
 }
 
+// RemoteErrorHandOverLate says "{name} didn't answer in time: what plays here plays on"
+// in the language the app shows.
+//
+// Toast when what plays on this computer didn't move to the computer named
+// {name}.
+func RemoteErrorHandOverLate(name string) string {
+	return In(i18n.Locale()).RemoteErrorHandOverLate(name)
+}
+
+// RemoteErrorHandOverLate says "{name} didn't answer in time: what plays here plays on"
+// in the language of msgs.
+//
+// Toast when what plays on this computer didn't move to the computer named
+// {name}.
+func (msgs Messages) RemoteErrorHandOverLate(name string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorHandOverLate", map[string]any{"name": name})
+}
+
+// RemoteErrorKeyBusy says "This computer's key is being read: try again in a moment"
+// in the language the app shows.
+//
+// Toast when remote control waits for the key that tells this computer
+// apart.
+func RemoteErrorKeyBusy() string { return In(i18n.Locale()).RemoteErrorKeyBusy() }
+
+// RemoteErrorKeyBusy says "This computer's key is being read: try again in a moment"
+// in the language of msgs.
+//
+// Toast when remote control waits for the key that tells this computer
+// apart.
+func (msgs Messages) RemoteErrorKeyBusy() string {
+	return Catalog.Format(msgs.locale, "remoteErrorKeyBusy", nil)
+}
+
+// RemoteErrorListen says "Remote control can't listen on the network: {error}"
+// in the language the app shows.
+//
+// Toast when remote control couldn't start. {error} is the system's own
+// words, often in English.
+func RemoteErrorListen(error string) string { return In(i18n.Locale()).RemoteErrorListen(error) }
+
+// RemoteErrorListen says "Remote control can't listen on the network: {error}"
+// in the language of msgs.
+//
+// Toast when remote control couldn't start. {error} is the system's own
+// words, often in English.
+func (msgs Messages) RemoteErrorListen(error string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorListen", map[string]any{"error": error})
+}
+
+// RemoteErrorNotConnected says "Not connected to that computer"
+// in the language the app shows.
+//
+// Toast when the computer whose page shows isn't connected.
+func RemoteErrorNotConnected() string { return In(i18n.Locale()).RemoteErrorNotConnected() }
+
+// RemoteErrorNotConnected says "Not connected to that computer"
+// in the language of msgs.
+//
+// Toast when the computer whose page shows isn't connected.
+func (msgs Messages) RemoteErrorNotConnected() string {
+	return Catalog.Format(msgs.locale, "remoteErrorNotConnected", nil)
+}
+
+// RemoteErrorNothingPlays says "Nothing plays on this computer"
+// in the language the app shows.
+//
+// Toast when there is nothing to move to another computer.
+func RemoteErrorNothingPlays() string { return In(i18n.Locale()).RemoteErrorNothingPlays() }
+
+// RemoteErrorNothingPlays says "Nothing plays on this computer"
+// in the language of msgs.
+//
+// Toast when there is nothing to move to another computer.
+func (msgs Messages) RemoteErrorNothingPlays() string {
+	return Catalog.Format(msgs.locale, "remoteErrorNothingPlays", nil)
+}
+
 // RemoteFirewallHint says "Windows Firewall keeps the other computers from reaching this one. Windows Firewall, below, tells why, and how to let…"
 // in the language the app shows.
 func RemoteFirewallHint() string { return In(i18n.Locale()).RemoteFirewallHint() }
@@ -16913,6 +17957,134 @@ func RemoteNoPaired() string { return In(i18n.Locale()).RemoteNoPaired() }
 // in the language of msgs.
 func (msgs Messages) RemoteNoPaired() string {
 	return Catalog.Format(msgs.locale, "remoteNoPaired", nil)
+}
+
+// RemoteNoteHandedOver says "{name} moved what it played to this computer"
+// in the language the app shows.
+//
+// Toast when the computer named {name} moved its queue and the track it
+// played to this one.
+func RemoteNoteHandedOver(name string) string { return In(i18n.Locale()).RemoteNoteHandedOver(name) }
+
+// RemoteNoteHandedOver says "{name} moved what it played to this computer"
+// in the language of msgs.
+//
+// Toast when the computer named {name} moved its queue and the track it
+// played to this one.
+func (msgs Messages) RemoteNoteHandedOver(name string) string {
+	return Catalog.Format(msgs.locale, "remoteNoteHandedOver", map[string]any{"name": name})
+}
+
+// RemoteNoteNotKept says "Couldn't keep {name} as paired: {error}"
+// in the language the app shows.
+//
+// Toast when this computer couldn't keep the pairing with the computer
+// named {name}. {error} is the system's own words, often in English.
+func RemoteNoteNotKept(name string, error string) string {
+	return In(i18n.Locale()).RemoteNoteNotKept(name, error)
+}
+
+// RemoteNoteNotKept says "Couldn't keep {name} as paired: {error}"
+// in the language of msgs.
+//
+// Toast when this computer couldn't keep the pairing with the computer
+// named {name}. {error} is the system's own words, often in English.
+func (msgs Messages) RemoteNoteNotKept(name string, error string) string {
+	return Catalog.Format(msgs.locale, "remoteNoteNotKept", map[string]any{"name": name, "error": error})
+}
+
+// RemoteNotePaired says "Paired with {name}"
+// in the language the app shows.
+//
+// Toast when this computer paired with the computer named {name}, which it
+// now controls.
+func RemoteNotePaired(name string) string { return In(i18n.Locale()).RemoteNotePaired(name) }
+
+// RemoteNotePaired says "Paired with {name}"
+// in the language of msgs.
+//
+// Toast when this computer paired with the computer named {name}, which it
+// now controls.
+func (msgs Messages) RemoteNotePaired(name string) string {
+	return Catalog.Format(msgs.locale, "remoteNotePaired", map[string]any{"name": name})
+}
+
+// RemoteNotePairedHere says "Paired with {name}: it can control MixMusic on this computer"
+// in the language the app shows.
+//
+// Toast when the computer named {name} paired with this one.
+func RemoteNotePairedHere(name string) string { return In(i18n.Locale()).RemoteNotePairedHere(name) }
+
+// RemoteNotePairedHere says "Paired with {name}: it can control MixMusic on this computer"
+// in the language of msgs.
+//
+// Toast when the computer named {name} paired with this one.
+func (msgs Messages) RemoteNotePairedHere(name string) string {
+	return Catalog.Format(msgs.locale, "remoteNotePairedHere", map[string]any{"name": name})
+}
+
+// RemoteNoteStopped says "Didn't pair with {name}: it stopped answering"
+// in the language the app shows.
+//
+// Toast when the computer named {name} stopped answering as it paired with
+// this one.
+func RemoteNoteStopped(name string) string { return In(i18n.Locale()).RemoteNoteStopped(name) }
+
+// RemoteNoteStopped says "Didn't pair with {name}: it stopped answering"
+// in the language of msgs.
+//
+// Toast when the computer named {name} stopped answering as it paired with
+// this one.
+func (msgs Messages) RemoteNoteStopped(name string) string {
+	return Catalog.Format(msgs.locale, "remoteNoteStopped", map[string]any{"name": name})
+}
+
+// RemoteNoteUnfinished says "Didn't pair with {name}: the pairing didn't finish, as it stopped answering"
+// in the language the app shows.
+//
+// Toast when the pairing with the computer named {name} didn't finish.
+func RemoteNoteUnfinished(name string) string { return In(i18n.Locale()).RemoteNoteUnfinished(name) }
+
+// RemoteNoteUnfinished says "Didn't pair with {name}: the pairing didn't finish, as it stopped answering"
+// in the language of msgs.
+//
+// Toast when the pairing with the computer named {name} didn't finish.
+func (msgs Messages) RemoteNoteUnfinished(name string) string {
+	return Catalog.Format(msgs.locale, "remoteNoteUnfinished", map[string]any{"name": name})
+}
+
+// RemoteNoteUnfinishedSlow says "Didn't pair with {name}: the pairing didn't finish, as keeping it took longer than {name} waits"
+// in the language the app shows.
+//
+// Toast when the pairing with the computer named {name} didn't finish, as
+// this computer took too long to keep it.
+func RemoteNoteUnfinishedSlow(name string) string {
+	return In(i18n.Locale()).RemoteNoteUnfinishedSlow(name)
+}
+
+// RemoteNoteUnfinishedSlow says "Didn't pair with {name}: the pairing didn't finish, as keeping it took longer than {name} waits"
+// in the language of msgs.
+//
+// Toast when the pairing with the computer named {name} didn't finish, as
+// this computer took too long to keep it.
+func (msgs Messages) RemoteNoteUnfinishedSlow(name string) string {
+	return Catalog.Format(msgs.locale, "remoteNoteUnfinishedSlow", map[string]any{"name": name})
+}
+
+// RemoteNoteWrongCode says "Didn't pair with {name}: the code typed there wasn't the one shown"
+// in the language the app shows.
+//
+// Toast when the computer named {name} typed another code than the one this
+// computer showed.
+func RemoteNoteWrongCode(name string) string { return In(i18n.Locale()).RemoteNoteWrongCode(name) }
+
+// RemoteNoteWrongCode says "Didn't pair with {name}: the code typed there wasn't the one shown"
+// in the language of msgs.
+//
+// Toast when the computer named {name} typed another code than the one this
+// computer showed.
+func (msgs Messages) RemoteNoteWrongCode(name string) string {
+	return Catalog.Format(msgs.locale, "remoteNoteWrongCode", map[string]any{"name": name})
 }
 
 // RemotePageAskPair says "Pair with {name} to see what plays there and control it from here. {name} shows a code of 6 digits, which you type here."
@@ -17021,6 +18193,184 @@ func RemotePaired(about string, date time.Time) string {
 // other, as remoteBothWays.
 func (msgs Messages) RemotePaired(about string, date time.Time) string {
 	return Catalog.Format(msgs.locale, "remotePaired", map[string]any{"about": about, "date": date})
+}
+
+// RemoteProblemBusy says "{name} is pairing with another computer: try again in a moment."
+// in the language the app shows.
+//
+// Why remote control with the computer named {name} failed.
+func RemoteProblemBusy(name string) string { return In(i18n.Locale()).RemoteProblemBusy(name) }
+
+// RemoteProblemBusy says "{name} is pairing with another computer: try again in a moment."
+// in the language of msgs.
+//
+// Why remote control with the computer named {name} failed.
+func (msgs Messages) RemoteProblemBusy(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemBusy", map[string]any{"name": name})
+}
+
+// RemoteProblemCanceled says "The pairing was canceled on {name}."
+// in the language the app shows.
+//
+// Why remote control with the computer named {name} failed.
+func RemoteProblemCanceled(name string) string { return In(i18n.Locale()).RemoteProblemCanceled(name) }
+
+// RemoteProblemCanceled says "The pairing was canceled on {name}."
+// in the language of msgs.
+//
+// Why remote control with the computer named {name} failed.
+func (msgs Messages) RemoteProblemCanceled(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemCanceled", map[string]any{"name": name})
+}
+
+// RemoteProblemLost says "{name} stopped answering: connecting again…"
+// in the language the app shows.
+//
+// Why remote control with the computer named {name} stopped, while it
+// connects again.
+func RemoteProblemLost(name string) string { return In(i18n.Locale()).RemoteProblemLost(name) }
+
+// RemoteProblemLost says "{name} stopped answering: connecting again…"
+// in the language of msgs.
+//
+// Why remote control with the computer named {name} stopped, while it
+// connects again.
+func (msgs Messages) RemoteProblemLost(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemLost", map[string]any{"name": name})
+}
+
+// RemoteProblemNotKept says "{name} couldn't keep the pairing, and tells why there. Pair again."
+// in the language the app shows.
+//
+// Why remote control with the computer named {name} failed.
+func RemoteProblemNotKept(name string) string { return In(i18n.Locale()).RemoteProblemNotKept(name) }
+
+// RemoteProblemNotKept says "{name} couldn't keep the pairing, and tells why there. Pair again."
+// in the language of msgs.
+//
+// Why remote control with the computer named {name} failed.
+func (msgs Messages) RemoteProblemNotKept(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemNotKept", map[string]any{"name": name})
+}
+
+// RemoteProblemNotPaired says "{name} removed this computer: pair again to control it."
+// in the language the app shows.
+//
+// Why remote control with the computer named {name} failed: it no longer
+// keeps this computer as paired.
+func RemoteProblemNotPaired(name string) string {
+	return In(i18n.Locale()).RemoteProblemNotPaired(name)
+}
+
+// RemoteProblemNotPaired says "{name} removed this computer: pair again to control it."
+// in the language of msgs.
+//
+// Why remote control with the computer named {name} failed: it no longer
+// keeps this computer as paired.
+func (msgs Messages) RemoteProblemNotPaired(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemNotPaired", map[string]any{"name": name})
+}
+
+// RemoteProblemNotSame says "Another computer answered in place of {name}: it isn't the one paired."
+// in the language the app shows.
+//
+// Why remote control with the computer named {name} failed.
+func RemoteProblemNotSame(name string) string { return In(i18n.Locale()).RemoteProblemNotSame(name) }
+
+// RemoteProblemNotSame says "Another computer answered in place of {name}: it isn't the one paired."
+// in the language of msgs.
+//
+// Why remote control with the computer named {name} failed.
+func (msgs Messages) RemoteProblemNotSame(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemNotSame", map[string]any{"name": name})
+}
+
+// RemoteProblemOff says "Remote control is off on {name}."
+// in the language the app shows.
+//
+// Why remote control with the computer named {name} failed.
+func RemoteProblemOff(name string) string { return In(i18n.Locale()).RemoteProblemOff(name) }
+
+// RemoteProblemOff says "Remote control is off on {name}."
+// in the language of msgs.
+//
+// Why remote control with the computer named {name} failed.
+func (msgs Messages) RemoteProblemOff(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemOff", map[string]any{"name": name})
+}
+
+// RemoteProblemOlder says "MixMusic on {name} is older, and can't do that: update it there."
+// in the language the app shows.
+//
+// Why remote control with the computer named {name} failed.
+func RemoteProblemOlder(name string) string { return In(i18n.Locale()).RemoteProblemOlder(name) }
+
+// RemoteProblemOlder says "MixMusic on {name} is older, and can't do that: update it there."
+// in the language of msgs.
+//
+// Why remote control with the computer named {name} failed.
+func (msgs Messages) RemoteProblemOlder(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemOlder", map[string]any{"name": name})
+}
+
+// RemoteProblemTooLong says "The pairing took too long. Pair again for a new code."
+// in the language the app shows.
+//
+// Why the pairing for remote control failed.
+func RemoteProblemTooLong() string { return In(i18n.Locale()).RemoteProblemTooLong() }
+
+// RemoteProblemTooLong says "The pairing took too long. Pair again for a new code."
+// in the language of msgs.
+//
+// Why the pairing for remote control failed.
+func (msgs Messages) RemoteProblemTooLong() string {
+	return Catalog.Format(msgs.locale, "remoteProblemTooLong", nil)
+}
+
+// RemoteProblemUnreachable says "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away."
+// in the language the app shows.
+//
+// Why remote control with the computer named {name} failed.
+func RemoteProblemUnreachable(name string) string {
+	return In(i18n.Locale()).RemoteProblemUnreachable(name)
+}
+
+// RemoteProblemUnreachable says "Couldn't reach {name}: it may be asleep, or a firewall may turn MixMusic away."
+// in the language of msgs.
+//
+// Why remote control with the computer named {name} failed.
+func (msgs Messages) RemoteProblemUnreachable(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemUnreachable", map[string]any{"name": name})
+}
+
+// RemoteProblemVersion says "That computer's MixMusic is of another version: update both."
+// in the language the app shows.
+//
+// Why remote control with another computer failed.
+func RemoteProblemVersion() string { return In(i18n.Locale()).RemoteProblemVersion() }
+
+// RemoteProblemVersion says "That computer's MixMusic is of another version: update both."
+// in the language of msgs.
+//
+// Why remote control with another computer failed.
+func (msgs Messages) RemoteProblemVersion() string {
+	return Catalog.Format(msgs.locale, "remoteProblemVersion", nil)
+}
+
+// RemoteProblemWrongCode says "That isn't the code {name} showed. Pair again for a new code."
+// in the language the app shows.
+//
+// Why the pairing with the computer named {name} failed.
+func RemoteProblemWrongCode(name string) string {
+	return In(i18n.Locale()).RemoteProblemWrongCode(name)
+}
+
+// RemoteProblemWrongCode says "That isn't the code {name} showed. Pair again for a new code."
+// in the language of msgs.
+//
+// Why the pairing with the computer named {name} failed.
+func (msgs Messages) RemoteProblemWrongCode(name string) string {
+	return Catalog.Format(msgs.locale, "remoteProblemWrongCode", map[string]any{"name": name})
 }
 
 // RemoteQueueClear says "Clear"
@@ -17149,6 +18499,20 @@ func (msgs Messages) RemoteSwitch() string {
 	return Catalog.Format(msgs.locale, "remoteSwitch", nil)
 }
 
+// RemoteThatComputer says "That computer"
+// in the language the app shows.
+//
+// The name of a computer of remote control that told none.
+func RemoteThatComputer() string { return In(i18n.Locale()).RemoteThatComputer() }
+
+// RemoteThatComputer says "That computer"
+// in the language of msgs.
+//
+// The name of a computer of remote control that told none.
+func (msgs Messages) RemoteThatComputer() string {
+	return Catalog.Format(msgs.locale, "remoteThatComputer", nil)
+}
+
 // RemoteTitle says "Remote control"
 // in the language the app shows.
 func RemoteTitle() string { return In(i18n.Locale()).RemoteTitle() }
@@ -17157,6 +18521,220 @@ func RemoteTitle() string { return In(i18n.Locale()).RemoteTitle() }
 // in the language of msgs.
 func (msgs Messages) RemoteTitle() string {
 	return Catalog.Format(msgs.locale, "remoteTitle", nil)
+}
+
+// RoomControlRefused says "{host} doesn't let guests control playback"
+// in the language the app shows.
+//
+// Toast when a guest pressed play, pause or skip in the room of {host}, who
+// doesn't let guests control it.
+func RoomControlRefused(host string) string { return In(i18n.Locale()).RoomControlRefused(host) }
+
+// RoomControlRefused says "{host} doesn't let guests control playback"
+// in the language of msgs.
+//
+// Toast when a guest pressed play, pause or skip in the room of {host}, who
+// doesn't let guests control it.
+func (msgs Messages) RoomControlRefused(host string) string {
+	return Catalog.Format(msgs.locale, "roomControlRefused", map[string]any{"host": host})
+}
+
+// RoomControlTooMany says "Too many at once: try again in a moment"
+// in the language the app shows.
+//
+// Toast when a guest pressed play, pause or skip too many times at once.
+func RoomControlTooMany() string { return In(i18n.Locale()).RoomControlTooMany() }
+
+// RoomControlTooMany says "Too many at once: try again in a moment"
+// in the language of msgs.
+//
+// Toast when a guest pressed play, pause or skip too many times at once.
+func (msgs Messages) RoomControlTooMany() string {
+	return Catalog.Format(msgs.locale, "roomControlTooMany", nil)
+}
+
+// RoomErrorAnnounce says "The room can't be announced on the network: {error}"
+// in the language the app shows.
+//
+// Toast when the room couldn't open. {error} is the system's own words,
+// often in English.
+func RoomErrorAnnounce(error string) string { return In(i18n.Locale()).RoomErrorAnnounce(error) }
+
+// RoomErrorAnnounce says "The room can't be announced on the network: {error}"
+// in the language of msgs.
+//
+// Toast when the room couldn't open. {error} is the system's own words,
+// often in English.
+func (msgs Messages) RoomErrorAnnounce(error string) string {
+	return Catalog.Format(msgs.locale, "roomErrorAnnounce", map[string]any{"error": error})
+}
+
+// RoomErrorCantHost says "That guest can't host the room now: they may be away, or their MixMusic older"
+// in the language the app shows.
+//
+// Toast when the host chose Make host for a guest that can't host.
+func RoomErrorCantHost() string { return In(i18n.Locale()).RoomErrorCantHost() }
+
+// RoomErrorCantHost says "That guest can't host the room now: they may be away, or their MixMusic older"
+// in the language of msgs.
+//
+// Toast when the host chose Make host for a guest that can't host.
+func (msgs Messages) RoomErrorCantHost() string {
+	return Catalog.Format(msgs.locale, "roomErrorCantHost", nil)
+}
+
+// RoomErrorCantPlaySong says "This computer can't play that song"
+// in the language the app shows.
+//
+// Toast when the host accepted a guest's song that this computer can't
+// play, or whose explicit content the settings hide.
+func RoomErrorCantPlaySong() string { return In(i18n.Locale()).RoomErrorCantPlaySong() }
+
+// RoomErrorCantPlaySong says "This computer can't play that song"
+// in the language of msgs.
+//
+// Toast when the host accepted a guest's song that this computer can't
+// play, or whose explicit content the settings hide.
+func (msgs Messages) RoomErrorCantPlaySong() string {
+	return Catalog.Format(msgs.locale, "roomErrorCantPlaySong", nil)
+}
+
+// RoomErrorDropped says "you removed or blocked someone while it moved"
+// in the language the app shows.
+//
+// Why the room didn't move to another computer: it goes in the {error} of
+// roomNoteStays.
+func RoomErrorDropped() string { return In(i18n.Locale()).RoomErrorDropped() }
+
+// RoomErrorDropped says "you removed or blocked someone while it moved"
+// in the language of msgs.
+//
+// Why the room didn't move to another computer: it goes in the {error} of
+// roomNoteStays.
+func (msgs Messages) RoomErrorDropped() string {
+	return Catalog.Format(msgs.locale, "roomErrorDropped", nil)
+}
+
+// RoomErrorInRoom says "Leave the room you're in to start one"
+// in the language the app shows.
+//
+// Toast when the user starts a room while a guest of another.
+func RoomErrorInRoom() string { return In(i18n.Locale()).RoomErrorInRoom() }
+
+// RoomErrorInRoom says "Leave the room you're in to start one"
+// in the language of msgs.
+//
+// Toast when the user starts a room while a guest of another.
+func (msgs Messages) RoomErrorInRoom() string {
+	return Catalog.Format(msgs.locale, "roomErrorInRoom", nil)
+}
+
+// RoomErrorLeft says "someone left while it moved"
+// in the language the app shows.
+//
+// Why the room didn't move to another computer: it goes in the {error} of
+// roomNoteStays.
+func RoomErrorLeft() string { return In(i18n.Locale()).RoomErrorLeft() }
+
+// RoomErrorLeft says "someone left while it moved"
+// in the language of msgs.
+//
+// Why the room didn't move to another computer: it goes in the {error} of
+// roomNoteStays.
+func (msgs Messages) RoomErrorLeft() string {
+	return Catalog.Format(msgs.locale, "roomErrorLeft", nil)
+}
+
+// RoomErrorListen says "The room can't listen on the network: {error}"
+// in the language the app shows.
+//
+// Toast when the room couldn't open. {error} is the system's own words,
+// often in English.
+func RoomErrorListen(error string) string { return In(i18n.Locale()).RoomErrorListen(error) }
+
+// RoomErrorListen says "The room can't listen on the network: {error}"
+// in the language of msgs.
+//
+// Toast when the room couldn't open. {error} is the system's own words,
+// often in English.
+func (msgs Messages) RoomErrorListen(error string) string {
+	return Catalog.Format(msgs.locale, "roomErrorListen", map[string]any{"error": error})
+}
+
+// RoomErrorMoved says "The room moved to another computer"
+// in the language the app shows.
+//
+// Toast or reason when the room had moved to another computer already.
+func RoomErrorMoved() string { return In(i18n.Locale()).RoomErrorMoved() }
+
+// RoomErrorMoved says "The room moved to another computer"
+// in the language of msgs.
+//
+// Toast or reason when the room had moved to another computer already.
+func (msgs Messages) RoomErrorMoved() string {
+	return Catalog.Format(msgs.locale, "roomErrorMoved", nil)
+}
+
+// RoomErrorMoving says "The room moves to another guest already"
+// in the language the app shows.
+//
+// Toast when the host chose Make host while the room moves already.
+func RoomErrorMoving() string { return In(i18n.Locale()).RoomErrorMoving() }
+
+// RoomErrorMoving says "The room moves to another guest already"
+// in the language of msgs.
+//
+// Toast when the host chose Make host while the room moves already.
+func (msgs Messages) RoomErrorMoving() string {
+	return Catalog.Format(msgs.locale, "roomErrorMoving", nil)
+}
+
+// RoomErrorNotInRoom says "You're in no room now"
+// in the language the app shows.
+//
+// Toast when the user adds a song to a room, or controls it, but is in
+// none.
+func RoomErrorNotInRoom() string { return In(i18n.Locale()).RoomErrorNotInRoom() }
+
+// RoomErrorNotInRoom says "You're in no room now"
+// in the language of msgs.
+//
+// Toast when the user adds a song to a room, or controls it, but is in
+// none.
+func (msgs Messages) RoomErrorNotInRoom() string {
+	return Catalog.Format(msgs.locale, "roomErrorNotInRoom", nil)
+}
+
+// RoomFollowCantPlay says "Can't play here"
+// in the language the app shows.
+//
+// What a guest shows of the room's track when it has no way to play it, as
+// a file of the host's computer.
+func RoomFollowCantPlay() string { return In(i18n.Locale()).RoomFollowCantPlay() }
+
+// RoomFollowCantPlay says "Can't play here"
+// in the language of msgs.
+//
+// What a guest shows of the room's track when it has no way to play it, as
+// a file of the host's computer.
+func (msgs Messages) RoomFollowCantPlay() string {
+	return Catalog.Format(msgs.locale, "roomFollowCantPlay", nil)
+}
+
+// RoomFollowExplicit says "{title} is explicit, and your settings hide explicit content: it stays silent here"
+// in the language the app shows.
+//
+// What a guest shows of the room's track when the settings hide explicit
+// content. {title} is the track's title.
+func RoomFollowExplicit(title string) string { return In(i18n.Locale()).RoomFollowExplicit(title) }
+
+// RoomFollowExplicit says "{title} is explicit, and your settings hide explicit content: it stays silent here"
+// in the language of msgs.
+//
+// What a guest shows of the room's track when the settings hide explicit
+// content. {title} is the track's title.
+func (msgs Messages) RoomFollowExplicit(title string) string {
+	return Catalog.Format(msgs.locale, "roomFollowExplicit", map[string]any{"title": title})
 }
 
 // RoomMenuListening says "{count, plural, one {# listening} other {# listening}}"
@@ -17187,6 +18765,236 @@ func RoomMenuYourRoom() string { return In(i18n.Locale()).RoomMenuYourRoom() }
 // in the language of msgs.
 func (msgs Messages) RoomMenuYourRoom() string {
 	return Catalog.Format(msgs.locale, "roomMenuYourRoom", nil)
+}
+
+// RoomNoteAddressChanged says "Your room's internet address changed: send friends outside your network the new invite link."
+// in the language the app shows.
+//
+// Toast for the host when the room's internet address changed.
+func RoomNoteAddressChanged() string { return In(i18n.Locale()).RoomNoteAddressChanged() }
+
+// RoomNoteAddressChanged says "Your room's internet address changed: send friends outside your network the new invite link."
+// in the language of msgs.
+//
+// Toast for the host when the room's internet address changed.
+func (msgs Messages) RoomNoteAddressChanged() string {
+	return Catalog.Format(msgs.locale, "roomNoteAddressChanged", nil)
+}
+
+// RoomNoteAskAdd says "{name} asks to add {title}"
+// in the language the app shows.
+//
+// Toast and notification for the host when the guest named {name} asks to
+// add the song {title} to the room.
+func RoomNoteAskAdd(name string, title string) string {
+	return In(i18n.Locale()).RoomNoteAskAdd(name, title)
+}
+
+// RoomNoteAskAdd says "{name} asks to add {title}"
+// in the language of msgs.
+//
+// Toast and notification for the host when the guest named {name} asks to
+// add the song {title} to the room.
+func (msgs Messages) RoomNoteAskAdd(name string, title string) string {
+	return Catalog.Format(msgs.locale, "roomNoteAskAdd", map[string]any{"name": name, "title": title})
+}
+
+// RoomNoteAskHost says "{name} asks you to host the room"
+// in the language the app shows.
+//
+// Toast and notification for a guest when the host, {name}, asks them to
+// host the room.
+func RoomNoteAskHost(name string) string { return In(i18n.Locale()).RoomNoteAskHost(name) }
+
+// RoomNoteAskHost says "{name} asks you to host the room"
+// in the language of msgs.
+//
+// Toast and notification for a guest when the host, {name}, asks them to
+// host the room.
+func (msgs Messages) RoomNoteAskHost(name string) string {
+	return Catalog.Format(msgs.locale, "roomNoteAskHost", map[string]any{"name": name})
+}
+
+// RoomNoteAskJoin says "{name} asks to join your room"
+// in the language the app shows.
+//
+// Toast and notification for the host when the computer named {name} asks
+// to join.
+func RoomNoteAskJoin(name string) string { return In(i18n.Locale()).RoomNoteAskJoin(name) }
+
+// RoomNoteAskJoin says "{name} asks to join your room"
+// in the language of msgs.
+//
+// Toast and notification for the host when the computer named {name} asks
+// to join.
+func (msgs Messages) RoomNoteAskJoin(name string) string {
+	return Catalog.Format(msgs.locale, "roomNoteAskJoin", map[string]any{"name": name})
+}
+
+// RoomNoteEndToJoin says "End the room you host to join another"
+// in the language the app shows.
+//
+// Toast when the user joins a room while hosting one.
+func RoomNoteEndToJoin() string { return In(i18n.Locale()).RoomNoteEndToJoin() }
+
+// RoomNoteEndToJoin says "End the room you host to join another"
+// in the language of msgs.
+//
+// Toast when the user joins a room while hosting one.
+func (msgs Messages) RoomNoteEndToJoin() string {
+	return Catalog.Format(msgs.locale, "roomNoteEndToJoin", nil)
+}
+
+// RoomNoteGuessed says "Someone on the network is guessing your room's code. Friends can still join with the invite link, or give the room a …"
+// in the language the app shows.
+//
+// Toast for the host when the room takes no code for a while, as someone
+// typed many wrong ones.
+func RoomNoteGuessed() string { return In(i18n.Locale()).RoomNoteGuessed() }
+
+// RoomNoteGuessed says "Someone on the network is guessing your room's code. Friends can still join with the invite link, or give the room a …"
+// in the language of msgs.
+//
+// Toast for the host when the room takes no code for a while, as someone
+// typed many wrong ones.
+func (msgs Messages) RoomNoteGuessed() string {
+	return Catalog.Format(msgs.locale, "roomNoteGuessed", nil)
+}
+
+// RoomNoteGuestAdded says "{name} added {title}"
+// in the language the app shows.
+//
+// Toast for the host when the guest named {name} added the song {title} to
+// the room.
+func RoomNoteGuestAdded(name string, title string) string {
+	return In(i18n.Locale()).RoomNoteGuestAdded(name, title)
+}
+
+// RoomNoteGuestAdded says "{name} added {title}"
+// in the language of msgs.
+//
+// Toast for the host when the guest named {name} added the song {title} to
+// the room.
+func (msgs Messages) RoomNoteGuestAdded(name string, title string) string {
+	return Catalog.Format(msgs.locale, "roomNoteGuestAdded", map[string]any{"name": name, "title": title})
+}
+
+// RoomNoteGuestJoined says "{name} joined the room"
+// in the language the app shows.
+//
+// Toast for the host when the guest named {name} joined.
+func RoomNoteGuestJoined(name string) string { return In(i18n.Locale()).RoomNoteGuestJoined(name) }
+
+// RoomNoteGuestJoined says "{name} joined the room"
+// in the language of msgs.
+//
+// Toast for the host when the guest named {name} joined.
+func (msgs Messages) RoomNoteGuestJoined(name string) string {
+	return Catalog.Format(msgs.locale, "roomNoteGuestJoined", map[string]any{"name": name})
+}
+
+// RoomNoteGuestLeft says "{name} left the room"
+// in the language the app shows.
+//
+// Toast for the host when the guest named {name} left.
+func RoomNoteGuestLeft(name string) string { return In(i18n.Locale()).RoomNoteGuestLeft(name) }
+
+// RoomNoteGuestLeft says "{name} left the room"
+// in the language of msgs.
+//
+// Toast for the host when the guest named {name} left.
+func (msgs Messages) RoomNoteGuestLeft(name string) string {
+	return Catalog.Format(msgs.locale, "roomNoteGuestLeft", map[string]any{"name": name})
+}
+
+// RoomNoteJoined says "You joined {host}'s room"
+// in the language the app shows.
+//
+// Toast when the user joined the room of {host}.
+func RoomNoteJoined(host string) string { return In(i18n.Locale()).RoomNoteJoined(host) }
+
+// RoomNoteJoined says "You joined {host}'s room"
+// in the language of msgs.
+//
+// Toast when the user joined the room of {host}.
+func (msgs Messages) RoomNoteJoined(host string) string {
+	return Catalog.Format(msgs.locale, "roomNoteJoined", map[string]any{"host": host})
+}
+
+// RoomNoteLeaveToJoin says "Leave the room you're in to join another"
+// in the language the app shows.
+//
+// Toast when the user joins a room while a guest of another.
+func RoomNoteLeaveToJoin() string { return In(i18n.Locale()).RoomNoteLeaveToJoin() }
+
+// RoomNoteLeaveToJoin says "Leave the room you're in to join another"
+// in the language of msgs.
+//
+// Toast when the user joins a room while a guest of another.
+func (msgs Messages) RoomNoteLeaveToJoin() string {
+	return Catalog.Format(msgs.locale, "roomNoteLeaveToJoin", nil)
+}
+
+// RoomNoteMoved says "The room moved to {name}'s computer"
+// in the language the app shows.
+//
+// Toast for a guest when the room moved to the computer of the guest named
+// {name}.
+func RoomNoteMoved(name string) string { return In(i18n.Locale()).RoomNoteMoved(name) }
+
+// RoomNoteMoved says "The room moved to {name}'s computer"
+// in the language of msgs.
+//
+// Toast for a guest when the room moved to the computer of the guest named
+// {name}.
+func (msgs Messages) RoomNoteMoved(name string) string {
+	return Catalog.Format(msgs.locale, "roomNoteMoved", map[string]any{"name": name})
+}
+
+// RoomNoteMovedAway says "The room moved to {name}'s computer: you're a guest in it now"
+// in the language the app shows.
+//
+// Toast for the host when the room moved to the computer of the guest named
+// {name}.
+func RoomNoteMovedAway(name string) string { return In(i18n.Locale()).RoomNoteMovedAway(name) }
+
+// RoomNoteMovedAway says "The room moved to {name}'s computer: you're a guest in it now"
+// in the language of msgs.
+//
+// Toast for the host when the room moved to the computer of the guest named
+// {name}.
+func (msgs Messages) RoomNoteMovedAway(name string) string {
+	return Catalog.Format(msgs.locale, "roomNoteMovedAway", map[string]any{"name": name})
+}
+
+// RoomNoteStays says "The room stays here: {error}"
+// in the language the app shows.
+//
+// Toast for the host when the room didn't move to the guest they chose.
+// {error} is why, as a message of roomError, or the error's own words.
+func RoomNoteStays(error string) string { return In(i18n.Locale()).RoomNoteStays(error) }
+
+// RoomNoteStays says "The room stays here: {error}"
+// in the language of msgs.
+//
+// Toast for the host when the room didn't move to the guest they chose.
+// {error} is why, as a message of roomError, or the error's own words.
+func (msgs Messages) RoomNoteStays(error string) string {
+	return Catalog.Format(msgs.locale, "roomNoteStays", map[string]any{"error": error})
+}
+
+// RoomNoteYouHost says "You host the room now"
+// in the language the app shows.
+//
+// Toast when the room moved to this computer.
+func RoomNoteYouHost() string { return In(i18n.Locale()).RoomNoteYouHost() }
+
+// RoomNoteYouHost says "You host the room now"
+// in the language of msgs.
+//
+// Toast when the room moved to this computer.
+func (msgs Messages) RoomNoteYouHost() string {
+	return Catalog.Format(msgs.locale, "roomNoteYouHost", nil)
 }
 
 // RoomPageActivity says "Activity"
@@ -17663,6 +19471,22 @@ func (msgs Messages) RoomPageWaitingGuests() string {
 	return Catalog.Format(msgs.locale, "roomPageWaitingGuests", nil)
 }
 
+// RoomProblemAddrNoPort says "A room's address has its port, as 203.0.113.7:41234."
+// in the language the app shows.
+//
+// Why joining a room at an address typed didn't start. Keep the example
+// address as it is.
+func RoomProblemAddrNoPort() string { return In(i18n.Locale()).RoomProblemAddrNoPort() }
+
+// RoomProblemAddrNoPort says "A room's address has its port, as 203.0.113.7:41234."
+// in the language of msgs.
+//
+// Why joining a room at an address typed didn't start. Keep the example
+// address as it is.
+func (msgs Messages) RoomProblemAddrNoPort() string {
+	return Catalog.Format(msgs.locale, "roomProblemAddrNoPort", nil)
+}
+
 // RoomProblemAway says "{name}'s room isn't on the network now."
 // in the language the app shows.
 func RoomProblemAway(name string) string { return In(i18n.Locale()).RoomProblemAway(name) }
@@ -17701,6 +19525,20 @@ func RoomProblemBusy(name string) string { return In(i18n.Locale()).RoomProblemB
 // in the language of msgs.
 func (msgs Messages) RoomProblemBusy(name string) string {
 	return Catalog.Format(msgs.locale, "roomProblemBusy", map[string]any{"name": name})
+}
+
+// RoomProblemCodeShape says "A room's code is 6 letters and digits."
+// in the language the app shows.
+//
+// Why joining a room with a code typed didn't start.
+func RoomProblemCodeShape() string { return In(i18n.Locale()).RoomProblemCodeShape() }
+
+// RoomProblemCodeShape says "A room's code is 6 letters and digits."
+// in the language of msgs.
+//
+// Why joining a room with a code typed didn't start.
+func (msgs Messages) RoomProblemCodeShape() string {
+	return Catalog.Format(msgs.locale, "roomProblemCodeShape", nil)
 }
 
 // RoomProblemDeclined says "{name} didn't let you in."
@@ -17987,6 +19825,58 @@ func (msgs Messages) RoomReachDesc() string {
 	return Catalog.Format(msgs.locale, "roomReachDesc", nil)
 }
 
+// RoomReachForwarded says "Your router forwards port {port} of its internet address, {address}, to this computer ({method})."
+// in the language the app shows.
+//
+// How friends outside the network reach the room, on its page. {port} is a
+// number, {address} an IP address, {method} the router's protocol, as UPnP.
+func RoomReachForwarded(port string, address string, method string) string {
+	return In(i18n.Locale()).RoomReachForwarded(port, address, method)
+}
+
+// RoomReachForwarded says "Your router forwards port {port} of its internet address, {address}, to this computer ({method})."
+// in the language of msgs.
+//
+// How friends outside the network reach the room, on its page. {port} is a
+// number, {address} an IP address, {method} the router's protocol, as UPnP.
+func (msgs Messages) RoomReachForwarded(port string, address string, method string) string {
+	return Catalog.Format(msgs.locale, "roomReachForwarded", map[string]any{"port": port, "address": address, "method": method})
+}
+
+// RoomReachIPv6Maybe says "Friends with IPv6 may reach this computer at {address}, if your router lets port {port} in."
+// in the language the app shows.
+//
+// How friends outside the network reach the room, on its page. {address} is
+// an IPv6 address, {port} a number.
+func RoomReachIPv6Maybe(address string, port string) string {
+	return In(i18n.Locale()).RoomReachIPv6Maybe(address, port)
+}
+
+// RoomReachIPv6Maybe says "Friends with IPv6 may reach this computer at {address}, if your router lets port {port} in."
+// in the language of msgs.
+//
+// How friends outside the network reach the room, on its page. {address} is
+// an IPv6 address, {port} a number.
+func (msgs Messages) RoomReachIPv6Maybe(address string, port string) string {
+	return Catalog.Format(msgs.locale, "roomReachIPv6Maybe", map[string]any{"address": address, "port": port})
+}
+
+// RoomReachIPv6Open says "Friends with IPv6 reach this computer at {address}, where your router lets the port in (PCP)."
+// in the language the app shows.
+//
+// How friends outside the network reach the room, on its page. {address} is
+// an IPv6 address.
+func RoomReachIPv6Open(address string) string { return In(i18n.Locale()).RoomReachIPv6Open(address) }
+
+// RoomReachIPv6Open says "Friends with IPv6 reach this computer at {address}, where your router lets the port in (PCP)."
+// in the language of msgs.
+//
+// How friends outside the network reach the room, on its page. {address} is
+// an IPv6 address.
+func (msgs Messages) RoomReachIPv6Open(address string) string {
+	return Catalog.Format(msgs.locale, "roomReachIPv6Open", map[string]any{"address": address})
+}
+
 // RoomReachJoinAtAddress says "Join at the address"
 // in the language the app shows.
 func RoomReachJoinAtAddress() string { return In(i18n.Locale()).RoomReachJoinAtAddress() }
@@ -18025,6 +19915,88 @@ func RoomReachMoved() string { return In(i18n.Locale()).RoomReachMoved() }
 // in the language of msgs.
 func (msgs Messages) RoomReachMoved() string {
 	return Catalog.Format(msgs.locale, "roomReachMoved", nil)
+}
+
+// RoomReachNoAnswer says "Your router didn't answer: it may not take forwards from computers, or have UPnP, NAT-PMP and PCP off. Turn one on in…"
+// in the language the app shows.
+//
+// Why friends outside the network can't reach the room, on its page. {port}
+// is a number.
+func RoomReachNoAnswer(port string) string { return In(i18n.Locale()).RoomReachNoAnswer(port) }
+
+// RoomReachNoAnswer says "Your router didn't answer: it may not take forwards from computers, or have UPnP, NAT-PMP and PCP off. Turn one on in…"
+// in the language of msgs.
+//
+// Why friends outside the network can't reach the room, on its page. {port}
+// is a number.
+func (msgs Messages) RoomReachNoAnswer(port string) string {
+	return Catalog.Format(msgs.locale, "roomReachNoAnswer", map[string]any{"port": port})
+}
+
+// RoomReachNoRouter says "MixMusic asks no router here."
+// in the language the app shows.
+//
+// Why friends outside the network can't reach the room, on its page.
+func RoomReachNoRouter() string { return In(i18n.Locale()).RoomReachNoRouter() }
+
+// RoomReachNoRouter says "MixMusic asks no router here."
+// in the language of msgs.
+//
+// Why friends outside the network can't reach the room, on its page.
+func (msgs Messages) RoomReachNoRouter() string {
+	return Catalog.Format(msgs.locale, "roomReachNoRouter", nil)
+}
+
+// RoomReachPortTaken says "Port {kept}, kept for rooms, is taken by another program: the room listens at port {port} instead, which a port forwa…"
+// in the language the app shows.
+//
+// How friends outside the network reach the room, on its page. {kept} and
+// {port} are numbers.
+func RoomReachPortTaken(kept string, port string) string {
+	return In(i18n.Locale()).RoomReachPortTaken(kept, port)
+}
+
+// RoomReachPortTaken says "Port {kept}, kept for rooms, is taken by another program: the room listens at port {port} instead, which a port forwa…"
+// in the language of msgs.
+//
+// How friends outside the network reach the room, on its page. {kept} and
+// {port} are numbers.
+func (msgs Messages) RoomReachPortTaken(kept string, port string) string {
+	return Catalog.Format(msgs.locale, "roomReachPortTaken", map[string]any{"kept": kept, "port": port})
+}
+
+// RoomReachRefused says "Your router refused to forward port {port}: {reason}. Forward the port to this computer by hand in the router's setti…"
+// in the language the app shows.
+//
+// Why friends outside the network can't reach the room, on its page. {port}
+// is a number; {reason} is the router's own words, often in English.
+func RoomReachRefused(port string, reason string) string {
+	return In(i18n.Locale()).RoomReachRefused(port, reason)
+}
+
+// RoomReachRefused says "Your router refused to forward port {port}: {reason}. Forward the port to this computer by hand in the router's setti…"
+// in the language of msgs.
+//
+// Why friends outside the network can't reach the room, on its page. {port}
+// is a number; {reason} is the router's own words, often in English.
+func (msgs Messages) RoomReachRefused(port string, reason string) string {
+	return Catalog.Format(msgs.locale, "roomReachRefused", map[string]any{"port": port, "reason": reason})
+}
+
+// RoomReachShared says "Your router's internet address, {address}, is shared with your provider's other customers, or private: the router sit…"
+// in the language the app shows.
+//
+// Why friends outside the network can't reach the room, on its page.
+// {address} is an IP address.
+func RoomReachShared(address string) string { return In(i18n.Locale()).RoomReachShared(address) }
+
+// RoomReachShared says "Your router's internet address, {address}, is shared with your provider's other customers, or private: the router sit…"
+// in the language of msgs.
+//
+// Why friends outside the network can't reach the room, on its page.
+// {address} is an IP address.
+func (msgs Messages) RoomReachShared(address string) string {
+	return Catalog.Format(msgs.locale, "roomReachShared", map[string]any{"address": address})
 }
 
 // RoomReachSuggestAsk says "Turn on Ask me before someone joins, and whoever comes with the link or the code waits until you let them in."
@@ -18085,6 +20057,42 @@ func RoomReachTitle() string { return In(i18n.Locale()).RoomReachTitle() }
 // in the language of msgs.
 func (msgs Messages) RoomReachTitle() string {
 	return Catalog.Format(msgs.locale, "roomReachTitle", nil)
+}
+
+// RoomReachTyped says "Invites carry the address you typed for them, {address}. It must reach this computer's port {port}."
+// in the language the app shows.
+//
+// How friends outside the network reach the room, on its page. {address} is
+// what the user typed in Address for invites; {port} is a number.
+func RoomReachTyped(address string, port string) string {
+	return In(i18n.Locale()).RoomReachTyped(address, port)
+}
+
+// RoomReachTyped says "Invites carry the address you typed for them, {address}. It must reach this computer's port {port}."
+// in the language of msgs.
+//
+// How friends outside the network reach the room, on its page. {address} is
+// what the user typed in Address for invites; {port} is a number.
+func (msgs Messages) RoomReachTyped(address string, port string) string {
+	return Catalog.Format(msgs.locale, "roomReachTyped", map[string]any{"address": address, "port": port})
+}
+
+// RoomReachTypedInvalid says "The address for invites, {address}, isn't an address: change it in Settings › Desktop › Listen with friends."
+// in the language the app shows.
+//
+// Why friends outside the network can't reach the room, on its page.
+// {address} is what the user typed.
+func RoomReachTypedInvalid(address string) string {
+	return In(i18n.Locale()).RoomReachTypedInvalid(address)
+}
+
+// RoomReachTypedInvalid says "The address for invites, {address}, isn't an address: change it in Settings › Desktop › Listen with friends."
+// in the language of msgs.
+//
+// Why friends outside the network can't reach the room, on its page.
+// {address} is what the user typed.
+func (msgs Messages) RoomReachTypedInvalid(address string) string {
+	return Catalog.Format(msgs.locale, "roomReachTypedInvalid", map[string]any{"address": address})
 }
 
 // RoomRulesAccept says "accept"
@@ -18719,6 +20727,104 @@ func RoomSomeone() string { return In(i18n.Locale()).RoomSomeone() }
 // in the language of msgs.
 func (msgs Messages) RoomSomeone() string {
 	return Catalog.Format(msgs.locale, "roomSomeone", nil)
+}
+
+// RoomSongAdded says "{host} added {title} to the room"
+// in the language the app shows.
+//
+// Toast for a guest when the host, {host}, added the song {title} the guest
+// gave.
+func RoomSongAdded(host string, title string) string {
+	return In(i18n.Locale()).RoomSongAdded(host, title)
+}
+
+// RoomSongAdded says "{host} added {title} to the room"
+// in the language of msgs.
+//
+// Toast for a guest when the host, {host}, added the song {title} the guest
+// gave.
+func (msgs Messages) RoomSongAdded(host string, title string) string {
+	return Catalog.Format(msgs.locale, "roomSongAdded", map[string]any{"host": host, "title": title})
+}
+
+// RoomSongCantPlay says "{host} can't play {title}"
+// in the language the app shows.
+//
+// Toast for a guest when the host's computer can't play the song {title}
+// the guest gave.
+func RoomSongCantPlay(host string, title string) string {
+	return In(i18n.Locale()).RoomSongCantPlay(host, title)
+}
+
+// RoomSongCantPlay says "{host} can't play {title}"
+// in the language of msgs.
+//
+// Toast for a guest when the host's computer can't play the song {title}
+// the guest gave.
+func (msgs Messages) RoomSongCantPlay(host string, title string) string {
+	return Catalog.Format(msgs.locale, "roomSongCantPlay", map[string]any{"host": host, "title": title})
+}
+
+// RoomSongDeclined says "{host} declined {title}"
+// in the language the app shows.
+//
+// Toast for a guest when the host declined the song {title} the guest gave.
+func RoomSongDeclined(host string, title string) string {
+	return In(i18n.Locale()).RoomSongDeclined(host, title)
+}
+
+// RoomSongDeclined says "{host} declined {title}"
+// in the language of msgs.
+//
+// Toast for a guest when the host declined the song {title} the guest gave.
+func (msgs Messages) RoomSongDeclined(host string, title string) string {
+	return Catalog.Format(msgs.locale, "roomSongDeclined", map[string]any{"host": host, "title": title})
+}
+
+// RoomSongWaits says "{title} waits for {host} to accept it"
+// in the language the app shows.
+//
+// Toast for a guest when the song {title} they gave waits for the host's
+// answer.
+func RoomSongWaits(host string, title string) string {
+	return In(i18n.Locale()).RoomSongWaits(host, title)
+}
+
+// RoomSongWaits says "{title} waits for {host} to accept it"
+// in the language of msgs.
+//
+// Toast for a guest when the song {title} they gave waits for the host's
+// answer.
+func (msgs Messages) RoomSongWaits(host string, title string) string {
+	return Catalog.Format(msgs.locale, "roomSongWaits", map[string]any{"host": host, "title": title})
+}
+
+// RoomSongsOff says "{host} takes no songs from guests"
+// in the language the app shows.
+//
+// Toast for a guest when the host takes no songs.
+func RoomSongsOff(host string) string { return In(i18n.Locale()).RoomSongsOff(host) }
+
+// RoomSongsOff says "{host} takes no songs from guests"
+// in the language of msgs.
+//
+// Toast for a guest when the host takes no songs.
+func (msgs Messages) RoomSongsOff(host string) string {
+	return Catalog.Format(msgs.locale, "roomSongsOff", map[string]any{"host": host})
+}
+
+// RoomSongsTooMany says "You added many songs: wait a moment, or for {host} to answer those waiting"
+// in the language the app shows.
+//
+// Toast for a guest who gave too many songs at once.
+func RoomSongsTooMany(host string) string { return In(i18n.Locale()).RoomSongsTooMany(host) }
+
+// RoomSongsTooMany says "You added many songs: wait a moment, or for {host} to answer those waiting"
+// in the language of msgs.
+//
+// Toast for a guest who gave too many songs at once.
+func (msgs Messages) RoomSongsTooMany(host string) string {
+	return Catalog.Format(msgs.locale, "roomSongsTooMany", map[string]any{"host": host})
 }
 
 // SearchAlbums says "Albums"

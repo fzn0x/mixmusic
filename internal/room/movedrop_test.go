@@ -83,7 +83,7 @@ func TestBlockStopsAMove(t *testing.T) {
 	})
 	r.server.Block(ana.Identity.Fingerprint())
 	close(later)
-	if err := <-done; !errors.Is(err, errDropped) {
+	if err := <-done; !errors.Is(err, ErrDropped) {
 		t.Fatalf("moved: %v", err)
 	}
 	// The move ended before it told anyone, as it tells only once it
@@ -113,7 +113,7 @@ func TestRemoveStopsAMove(t *testing.T) {
 		t.Fatal(err)
 	}
 	r.server.Remove(bo.Identity.Fingerprint())
-	if err := <-done; !errors.Is(err, errDropped) {
+	if err := <-done; !errors.Is(err, ErrDropped) {
 		t.Fatalf("moved: %v", err)
 	}
 	close(release)
@@ -156,7 +156,7 @@ func TestLeaveStopsAMove(t *testing.T) {
 		t.Fatal(err)
 	}
 	sb.Leave()
-	if err := <-done; !errors.Is(err, errLeft) {
+	if err := <-done; !errors.Is(err, ErrLeft) {
 		t.Fatalf("moved: %v", err)
 	}
 }

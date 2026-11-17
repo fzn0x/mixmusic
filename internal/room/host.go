@@ -674,7 +674,7 @@ func (s *Server) stay(c *conn) {
 			s.mu.Unlock()
 			if left {
 				// Its seat in the room a move goes to would stay (move.go).
-				s.stopMove(errLeft)
+				s.stopMove(ErrLeft)
 			}
 			s.changed(true)
 			return
@@ -851,7 +851,7 @@ func (s *Server) drop(key remote.Fingerprint, reason, what string, block bool) {
 	mv := s.takeMove()
 	if g == nil {
 		s.mu.Unlock()
-		s.moveEnded(mv, errDropped)
+		s.moveEnded(mv, ErrDropped)
 		s.changed(false)
 		return
 	}
@@ -860,7 +860,7 @@ func (s *Server) drop(key remote.Fingerprint, reason, what string, block bool) {
 	c := g.conn
 	gate := s.gate
 	s.mu.Unlock()
-	s.moveEnded(mv, errDropped)
+	s.moveEnded(mv, ErrDropped)
 	if c != nil {
 		go func() {
 			_ = c.f.Send(message{Type: "ended", Reason: reason}, time.Second)

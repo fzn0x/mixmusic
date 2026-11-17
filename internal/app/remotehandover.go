@@ -25,6 +25,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // handOverFor bounds a hand-over, from sending it to the other computer's
@@ -43,6 +44,10 @@ type HandedOver struct {
 // errNothingPlays: there is nothing to hand over.
 var errNothingPlays = errors.New("Nothing plays on this computer")
 
+// errNotConnected: this computer isn't connected to the one whose page
+// shows.
+var errNotConnected = errors.New("Not connected to that computer")
+
 // session is the session with the computer id, whose page shows.
 func (rc *Remote) session(id string) (*remote.Session, error) {
 	r := &rc.a.remote
@@ -50,13 +55,13 @@ func (rc *Remote) session(id string) (*remote.Session, error) {
 	ctl := r.control
 	r.mu.Unlock()
 	if ctl == nil || ctl.id != id {
-		return nil, errors.New("Not connected to that computer")
+		return nil, errNotConnected
 	}
 	ctl.mu.Lock()
 	s := ctl.session
 	ctl.mu.Unlock()
 	if s == nil {
-		return nil, errors.New("Not connected to that computer")
+		return nil, errNotConnected
 	}
 	return s, nil
 }
@@ -85,9 +90,9 @@ func (rc *Remote) HandOver(id string) (HandedOver, error) {
 	if err != nil {
 		log.Printf("mixmusic: remote control: handing over to %s: %v", s.Name(), err)
 		if errors.Is(err, context.DeadlineExceeded) {
-			return HandedOver{}, errors.New(s.Name() + " didn't answer in time: what plays here plays on")
+			return HandedOver{}, &peerError{name: s.Name(), err: errHandOverLate}
 		}
-		return HandedOver{}, errors.New(strings.TrimSuffix(remoteProblem(s.Name(), err), "."))
+		return HandedOver{}, &peerError{name: s.Name(), err: err}
 	}
 	if taken.Kept > 0 {
 		p.Pause()
@@ -209,7 +214,7 @@ func (h remoteHost) TakeOver(fp remote.Fingerprint, ho remote.HandOver) remote.T
 	taken.Kept, taken.Left = len(tracks), len(ho.Queue)-len(tracks)
 	name := a.pairedName(fp)
 	log.Printf("mixmusic: remote control: %s handed %d tracks over, of which %d were left out", name, len(ho.Queue), taken.Left)
-	a.notifyRemote(name + " moved what it played to this computer")
+	a.notifyRemote(locales.RemoteNoteHandedOver(name))
 	return taken
 }
 
@@ -220,7 +225,7 @@ func (a *App) pairedName(fp remote.Fingerprint) string {
 			return c.Name
 		}
 	}
-	return "Another computer"
+	return locales.RemoteAnotherComputer()
 }
 
 // spotifyIDRe matches the ID of a Spotify track or episode, and refIDRe

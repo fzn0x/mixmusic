@@ -54,6 +54,9 @@ func (a *App) Start() {
 			log.Printf("mixmusic: registering %s links: %v", URLScheme, err)
 		}
 	}
+	// Dates, times and numbers in the computer's formats, from the main
+	// window's first frame.
+	followRegion()
 	if a.openMain(mygo.App.WasOpenedAtLogin()) == nil {
 		return
 	}

@@ -64,6 +64,35 @@ func TestWarningsInActions(t *testing.T) {
 	}
 }
 
+// TestTheMoreFolder reads the translations of locales/more, which the app
+// adds as it starts, beside those of locales itself.
+func TestTheMoreFolder(t *testing.T) {
+	dir := catalogs(t, map[string]string{"en.json": en, "fr.json": `{"playButton": "Lire"}`})
+	if err := os.Mkdir(filepath.Join(dir, "more"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	de := `{"@@locale": "de", "@@x-machine-translated": true, "playButton": "Abspielen", "queueTitle": "Warteschlange"}`
+	if err := os.WriteFile(filepath.Join(dir, "more", "de.json"), []byte(de), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got := output(t, dir, false)
+	for _, want := range []string{
+		"fr.json lacks 2 of en.json's 3 messages",
+		"more/de.json lacks 1 of en.json's 3 messages, which show in English: songsCount\n",
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("the output lacks %q:\n%s", want, got)
+		}
+	}
+	if strings.Contains(got, "@@x-machine-translated") {
+		t.Errorf("a catalog's marks are no messages:\n%s", got)
+	}
+	got = output(t, dir, true)
+	if !strings.Contains(got, "::warning file="+filepath.ToSlash(filepath.Join(dir, "more", "de.json"))+",title=Translations::more/de.json lacks") {
+		t.Errorf("more/de.json's warning: %q", got)
+	}
+}
+
 func TestEnglishAlone(t *testing.T) {
 	if got := output(t, catalogs(t, map[string]string{"en.json": en}), true); got != "No translations yet: en.json alone\n" {
 		t.Errorf("got %q", got)

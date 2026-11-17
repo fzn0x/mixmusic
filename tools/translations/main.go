@@ -1,7 +1,8 @@
 // Command translations says which messages of locales/en.json each
-// translation lacks. The app shows those in English, so a release ships
-// with them: the release workflow runs it, and its warnings tell what is
-// left to translate. It fails only on a catalog it can't read.
+// translation lacks, those beside it and those of locales/more, which the
+// app adds as it starts (#776). The app shows those in English, so a
+// release ships with them: the release workflow runs it, and its warnings
+// tell what is left to translate. It fails only on a catalog it can't read.
 //
 //	go run ./tools/translations                 # the messages each language lacks
 //	go run ./tools/translations -dir locales    # the catalogs of another folder
@@ -31,9 +32,9 @@ func main() {
 	}
 }
 
-// run writes, for each catalog of dir other than en.json, the messages it
-// lacks and those en.json no longer has; as warnings of a GitHub Actions
-// run when actions is set.
+// run writes, for each catalog of dir and of dir/more other than en.json,
+// the messages it lacks and those en.json no longer has; as warnings of a
+// GitHub Actions run when actions is set.
 func run(w io.Writer, dir string, actions bool) error {
 	en, err := messages(filepath.Join(dir, "en.json"))
 	if err != nil {
@@ -43,13 +44,23 @@ func run(w io.Writer, dir string, actions bool) error {
 	if err != nil {
 		return err
 	}
+	more, err := filepath.Glob(filepath.Join(dir, "more", "*.json"))
+	if err != nil {
+		return err
+	}
 	slices.Sort(files)
+	slices.Sort(more)
 	translations := 0
-	for _, f := range files {
-		tag := strings.TrimSuffix(filepath.Base(f), ".json")
-		if tag == "en" {
+	for _, f := range append(files, more...) {
+		if f == filepath.Join(dir, "en.json") {
 			continue
 		}
+		// more/de.json, as it sits in the folder.
+		base, err := filepath.Rel(dir, f)
+		if err != nil {
+			return err
+		}
+		base = filepath.ToSlash(base)
 		translations++
 		tr, err := messages(f)
 		if err != nil {
@@ -72,14 +83,14 @@ func run(w io.Writer, dir string, actions bool) error {
 		name := filepath.ToSlash(f)
 		if len(lacks) > 0 {
 			say(w, actions, name, fmt.Sprintf("%s lacks %d of en.json's %d messages, which show in English: %s",
-				filepath.Base(f), len(lacks), len(en), strings.Join(lacks, ", ")))
+				base, len(lacks), len(en), strings.Join(lacks, ", ")))
 		}
 		if len(extra) > 0 {
 			say(w, actions, name, fmt.Sprintf("%s has %s en.json no longer has, which nothing shows: %s",
-				filepath.Base(f), count(len(extra), "message"), strings.Join(extra, ", ")))
+				base, count(len(extra), "message"), strings.Join(extra, ", ")))
 		}
 		if len(lacks) == 0 && len(extra) == 0 {
-			fmt.Fprintf(w, "%s translates every message\n", filepath.Base(f))
+			fmt.Fprintf(w, "%s translates every message\n", base)
 		}
 	}
 	if translations == 0 {

@@ -476,6 +476,8 @@ type Player struct {
 	// failed keeps the tracks that couldn't play, and what was tried of
 	// the current one (failures.go).
 	failed failing
+	// errorWords says the errors of the notices (errorwords.go).
+	errorWords errorWords
 	// unshuffled is the queue in its own order while it is shuffled, and
 	// played the entries that became current since the queue was filled,
 	// by UID. Neither is changed in place, as what is published shares

@@ -72,10 +72,17 @@ func (x *Index) scan(ctx context.Context, folders []string) error {
 	var files []found
 	status := make([]Folder, len(folders))
 	why := make([]error, len(folders))
+	// same is the earlier folder a folder is the same as, reached by
+	// another path: it isn't walked again, and counts what that one does.
+	same := map[int]int{}
 	for i, root := range folders {
 		status[i].Path = root
 		if _, err := os.Stat(root); err != nil {
 			status[i].Problem = problemOf(err)
+			continue
+		}
+		if j := slices.IndexFunc(folders[:i], func(o string) bool { return sameFolder(o, root) }); j >= 0 && status[j].Problem == "" {
+			same[i] = j
 			continue
 		}
 		w, err := x.walkFolder(ctx, i, root)
@@ -146,6 +153,9 @@ func (x *Index) scan(ctx context.Context, folders []string) error {
 		}
 	}
 	for i := range status {
+		if _, dup := same[i]; dup {
+			continue
+		}
 		for path, e := range next {
 			if within(path, status[i].Path) {
 				if e.Skipped == "" {
@@ -155,6 +165,9 @@ func (x *Index) scan(ctx context.Context, folders []string) error {
 				}
 			}
 		}
+	}
+	for i, j := range same {
+		status[i].Tracks, status[i].Skipped = status[j].Tracks, status[j].Skipped
 	}
 	x.mu.Lock()
 	x.entries, x.folders = next, status
@@ -185,7 +198,7 @@ type walked struct {
 func (x *Index) walkFolder(ctx context.Context, i int, root string) (w walked, err error) {
 	walk := x.walk
 	if walk == nil {
-		walk = filepath.WalkDir
+		walk = WalkRoot
 	}
 	unread := map[string]bool{}
 	failed := func(dir string, err error) {

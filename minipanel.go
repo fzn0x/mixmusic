@@ -296,7 +296,7 @@ func (s *shell) miniHead(c *ui.Context) {
 	k := &s.lk
 	m := &s.mini
 	title := s.miniTitle(m.shown)
-	ui.Row(c).Shrink(0).Padding(6, 6, 2, 12).Gap(8).AlignItems(ui.Center).Children(func() {
+	ui.Row(c).Shrink(0).Padding(6, 6, 2).PaddingStart(12).Gap(8).AlignItems(ui.Center).Children(func() {
 		ui.Text(c, k.words(title)).FontSize(k.bodySize()).FontWeight(k.titleWeight()).SingleLine().MinWidth(0).Shrink(1)
 		if m.shown == settings.MiniQueue && s.st.Index >= 0 && len(s.st.Queue) > 0 {
 			ui.Text(c, queuePlace(s.st.Index, len(s.st.Queue))).FontSize(k.smallSize()).TextColor(k.muted).

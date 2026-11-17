@@ -17,13 +17,13 @@ import (
 // runs across the window's foot, or floats over it as a raised card.
 func (s *shell) playerBar(c *ui.Context) {
 	k := &s.lk
-	bar := ui.Row(c).Height(k.player).Shrink(0).Padding(0, 24, 0, 16).Gap(24)
+	bar := ui.Row(c).Height(k.player).Shrink(0).PaddingStart(16).PaddingEnd(24).Gap(24)
 	if k.floating {
 		shade := 0.16
 		if k.dark {
 			shade = 0.4
 		}
-		bar.Margin(0, floatMargin, floatMargin).Padding(0, 20, 0, 9).Radius(k.radius).Background(col(over(nrgba(k.surface2), nrgba(k.bg)))).
+		bar.Margin(0, floatMargin, floatMargin).PaddingStart(9).PaddingEnd(20).Radius(k.radius).Background(col(over(nrgba(k.surface2), nrgba(k.bg)))).
 			Shadow(0, 6, 20, -6, ui.RGBA(0, 0, 0, float32(shade)))
 	} else {
 		bar.Background(k.surface).BorderWidth(1, 0, 0, 0).BorderColor(k.border)
@@ -223,7 +223,7 @@ func (s *shell) setDisliked(t media.Track, on bool) {
 func (s *shell) transport(c *ui.Context) {
 	k := &s.lk
 	_, hasTrack := s.st.Current()
-	ui.Row(c).Gap(12).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).Gap(12).Children(func() {
 		if s.iconButton(c, "shuffle", "shuffle", locales.PlayerShuffle(), s.st.Shuffle, 18).Clicked() {
 			s.p.ToggleShuffle()
 		}
@@ -283,7 +283,7 @@ func (s *shell) progress(c *ui.Context) {
 	k := &s.lk
 	if s.st.Live {
 		s.seeking = false
-		ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
+		ui.Row(c).Direction(ui.LeftToRight).Gap(8).FillWidth().MaxWidth(640).Children(func() {
 			ui.Text(c, k.sentence(locales.PlayerLive())).FontSize(k.captionSize()).TextColor(k.accent).Width(44).TextAlign(ui.End)
 			edge := 1.0
 			ui.Slider(c.Key("seek"), &edge, 0, 1).Grow(1).MinWidth(0).Label(locales.PlayerNoSeeking()).Disabled(true)
@@ -299,7 +299,7 @@ func (s *shell) progress(c *ui.Context) {
 	if !s.seeking {
 		s.seekTo = s.st.Position.Seconds()
 	}
-	ui.Row(c).Gap(8).FillWidth().MaxWidth(640).Children(func() {
+	ui.Row(c).Direction(ui.LeftToRight).Gap(8).FillWidth().MaxWidth(640).Children(func() {
 		ui.Text(c, clock(time.Duration(s.seekTo*float64(time.Second)))).FontSize(k.captionSize()).TextColor(k.muted).
 			FontFeatures("tnum").Width(44).TextAlign(ui.End)
 		seek := s.seekSlider(c, &s.seekTo, max(dur.Seconds(), 1)).Grow(1).MinWidth(0).KeepFocus().
@@ -402,7 +402,7 @@ func (s *shell) volumeControl(c *ui.Context) {
 	if s.st.Muted {
 		v = 0
 	}
-	s.wheelVolume(ui.Row(c).Gap(4).Width(140).MinWidth(80)).Children(func() {
+	s.wheelVolume(ui.Row(c).Direction(ui.LeftToRight).Gap(4).Width(140).MinWidth(80)).Children(func() {
 		name, label := muteOf(s.st)
 		if s.iconButton(c, "mute", name, label, false, 18).Clicked() {
 			s.p.ToggleMute()

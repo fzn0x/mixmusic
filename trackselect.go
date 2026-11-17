@@ -296,14 +296,14 @@ func (s *shell) picksBar(c *ui.Context) {
 			right += floatMargin
 		}
 	}
-	ui.Row(c.Key("picks")).Absolute().Left(s.railWidth()).Right(right).Bottom(k.barRoom()+pickGap).Padding(0, 16).
+	ui.Row(c.Key("picks")).Absolute().Start(s.railWidth()).End(right).Bottom(k.barRoom()+pickGap).Padding(0, 16).
 		Justify(ui.Center).PassThrough().Children(func() {
-		bar := ui.Row(c.Key("picks-bar")).MinHeight(pickBar).Padding(8, 8, 8, 20).Gap(8).Wrap().AlignItems(ui.Center).
+		bar := ui.Row(c.Key("picks-bar")).MinHeight(pickBar).Padding(8).PaddingStart(20).Gap(8).Wrap().AlignItems(ui.Center).
 			Justify(ui.Center).Radius(k.round(pickBar)).Background(k.raised).Border(1, k.border).
 			Shadow(0, 6, 20, -6, ui.RGBA(0, 0, 0, 0.3)).Shrink(1).MinWidth(0).Label(locales.TrackSelectBar())
 		bar.Children(func() {
 			ui.Text(c, k.sentence(locales.TrackSelectCount(len(tracks)))).FontSize(k.bodySize()).FontFeatures("tnum").
-				SingleLine().Shrink(0).Margin(0, 8, 0, 0)
+				SingleLine().Shrink(0).MarginEnd(8)
 			if p.inShown < len(p.shown) && s.link(c, "picks-all", locales.TrackSelectAll()) {
 				for _, t := range p.shown {
 					p.set(t, true)

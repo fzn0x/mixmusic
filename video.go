@@ -382,7 +382,7 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 		case !asked:
 			// No motion the user didn't ask for: a play button asks.
 			b := s.buttonBase(c.Key("sleeve-video-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().
-				Right(8).Bottom(8).Label(locales.VideoPlay()).Tooltip(locales.VideoPlay()).Cursor(ui.CursorPointer)
+				End(8).Bottom(8).Label(locales.VideoPlay()).Tooltip(locales.VideoPlay()).Cursor(ui.CursorPointer)
 			if b.Clicked() {
 				if v.played == nil {
 					v.played = map[string]bool{}

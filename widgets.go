@@ -35,7 +35,7 @@ func (s *shell) untippedIconButton(c *ui.Context, key, name, label string, on bo
 		b.Background(k.hover)
 	}
 	s.pressMotion(b, 0.9)
-	b.Children(func() { ui.Icon(c, icon(name)).FontSize(size).TextColor(ink) })
+	b.Children(func() { ui.Icon(c, lineIcon(c, name)).FontSize(size).TextColor(ink) })
 	return b
 }
 
@@ -338,7 +338,7 @@ func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, c
 							LetterSpacing(-0.02 * k.pivotSize()).TextColor(ink).SingleLine()
 						if i < len(counts) && counts[i] >= 0 {
 							ui.Text(c, count(counts[i])).FontSize(k.captionSize()).TextColor(ink).FontFeatures("tnum").
-								AlignSelf(ui.Start).Margin(6, 0, 0, 3)
+								AlignSelf(ui.Start).Margin(6, 0, 0).MarginStart(3)
 						}
 					})
 				}

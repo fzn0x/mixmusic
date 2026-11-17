@@ -18,7 +18,8 @@ import (
 func (s *shell) topBar(c *ui.Context) {
 	k := &s.lk
 	bar := c.TitleBar()
-	row := ui.Row(c).Height(max(bar.Height, 48)).Shrink(0).Padding(0, bar.Right+16, 0, k.gutter).Gap(16)
+	_, end := barInsets(c)
+	row := ui.Row(c).Height(max(bar.Height, 48)).Shrink(0).PaddingStart(k.gutter).PaddingEnd(end + 16).Gap(16)
 	if bar.Height > 0 {
 		row.DragWindow()
 	}

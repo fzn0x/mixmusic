@@ -204,9 +204,9 @@ func (s *shell) stageCover(c *ui.Context, t media.Track, size float32, st lyricS
 	})
 }
 
-// stageClose is the button that closes the stage, at its top right.
+// stageClose is the button that closes the stage, at its top end.
 func (s *shell) stageClose(c *ui.Context) {
-	b := s.buttonBase(c.Key("stage-close")).Absolute().Top(20).Right(20).Size(40, 40).Radius(20).Label(locales.LyricsStageClose()).Cursor(ui.CursorPointer).Tooltip(locales.LyricsStageCloseTip())
+	b := s.buttonBase(c.Key("stage-close")).Absolute().Top(20).End(20).Size(40, 40).Radius(20).Label(locales.LyricsStageClose()).Cursor(ui.CursorPointer).Tooltip(locales.LyricsStageCloseTip())
 	if b.Hovered() {
 		b.Background(stageInk.Alpha(0.16))
 	}

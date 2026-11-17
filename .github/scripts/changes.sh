@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # Tells ci.yml's jobs what a pull request changes, as the step outputs of
 # its "What changed" job, so that one that changes only the website, the
-# docs or the changelog's fragments runs the checks of those, and one that
-# changes only files nothing reads, as CONTRIBUTORS.md, runs none:
+# docs, the changelog's fragments or translations runs the checks of those,
+# and one that changes only files nothing reads, as CONTRIBUTORS.md, runs
+# none:
 #
 #   go        full: every Go check, as before. some: on Linux, the tests of
 #             `packages` alone, and the changelog's check. none: nothing.
 #   packages  the Go packages whose tests read what changed, for `some`.
+#   catalogs  true: translations changed, for `some`: the catalogs' check,
+#             and the tests of the packages that read the catalogs
+#             (.github/scripts/catalog-readers.sh lists them).
 #   site      true: the website builds (the Website job).
 #
 # Pushes to main and merge queues test everything, and so does a pull
@@ -30,6 +34,7 @@ all() {
 	echo "Everything runs: $1."
 	out go full
 	out packages ""
+	out catalogs false
 	out site true
 	exit 0
 }
@@ -44,9 +49,15 @@ files="$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" \
 # GitHub lists 3000 files of a pull request at most.
 [ "$(wc -l <<<"$files")" -lt 3000 ] || all "the pull request changes 3000 files or more"
 
-site=false docs=false changelog=false
+site=false docs=false changelog=false catalogs=false
 while IFS= read -r f; do
 	case "$f" in
+	# English is the source, which the code says, and catalog_gen.go is
+	# generated of it: everything runs.
+	locales/en.json) all "$f changed" ;;
+	# A translation, which the app reads as it starts: in locales/ or in
+	# locales/more/ (a case's * takes slashes too).
+	locales/*.json) catalogs=true ;;
 	# tools/sitefinish's tests read site/i18n.
 	site/* | tools/sitefinish/*) site=true ;;
 	# tools/sitedocs makes the docs' pages of these; internal/colorfile's
@@ -67,12 +78,15 @@ $site && packages+=" ./tools/sitefinish ./tools/sitedocs"
 $docs && packages+=" ./internal/colorfile"
 $changelog && packages+=" ./tools/changelog"
 packages="${packages# }"
-if [ -n "$packages" ]; then
-	echo "Only the tests of what changed run: $packages."
+if [ -n "$packages" ] || $catalogs; then
+	what="$packages"
+	$catalogs && what="${what:+$what, }the catalogs' check and their readers' tests"
+	echo "Only the tests of what changed run: $what."
 	out go some
 else
 	echo "Nothing that CI checks changed."
 	out go none
 fi
 out packages "$packages"
+out catalogs "$catalogs"
 out site "$site"

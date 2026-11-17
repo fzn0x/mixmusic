@@ -25,6 +25,7 @@ jobs:
     outputs:
       go: ${{ steps.changes.outputs.go }}
       packages: ${{ steps.changes.outputs.packages }}
+      catalogs: ${{ steps.changes.outputs.catalogs }}
       site: ${{ steps.changes.outputs.site }}
     steps:
       - uses: actions/checkout@v7
@@ -53,6 +54,9 @@ jobs:
       # fragments; none, nothing.
       CHECKS: ${{ (needs.changes.outputs.go || 'full') == 'full' && 'full' || (needs.changes.outputs.go == 'some' && matrix.os == 'ubuntu-latest' && 'some' || 'none') }}
       PACKAGES: ${{ needs.changes.outputs.packages }}
+      # Translations changed: with some, the catalogs' check and the tests
+      # of the packages that read the catalogs run too.
+      CATALOGS: ${{ needs.changes.outputs.go == 'some' && needs.changes.outputs.catalogs == 'true' && matrix.os == 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
         if: env.CHECKS != 'none'
@@ -93,12 +97,13 @@ jobs:
           echo "6b26a22f9ba87b2b836906a9bb7afec5f8e54d49553b1200382520ee6fedfa55  $RUNNER_TEMP/opus-vectors.tar.gz" | sha256sum -c -
           mkdir -p "$RUNNER_TEMP/opus-vectors"
           tar -xzf "$RUNNER_TEMP/opus-vectors.tar.gz" -C "$RUNNER_TEMP/opus-vectors"
-      # The community plugins' JavaScript, which tests run, and the
-      # registry check reads: main keeps their TypeScript only.
+      # The community plugins' JavaScript, which tests run (some of the
+      # catalogs' readers' too), and the registry check reads: main keeps
+      # their TypeScript only.
       - uses: oven-sh/setup-bun@v2
-        if: env.CHECKS == 'full'
+        if: env.CHECKS == 'full' || env.CATALOGS == 'true'
       - name: Compile the community plugins
-        if: env.CHECKS == 'full'
+        if: env.CHECKS == 'full' || env.CATALOGS == 'true'
         shell: bash
         run: |
           bash .github/scripts/retry.sh 45 bun install --frozen-lockfile
@@ -119,11 +124,16 @@ jobs:
           OPUS_TESTVECTORS: ${{ runner.os == 'Linux' && format('{0}/opus-vectors/opus_newvectors', runner.temp) || '' }}
       # The tests of the packages that read what changed: the website's
       # tools for site/ and the docs, internal/colorfile for docs/themes.md,
-      # tools/changelog for its fragments.
+      # tools/changelog for its fragments, and for translations, those that
+      # read the catalogs.
       - name: Test what changed
         if: env.CHECKS == 'some'
         shell: bash
-        run: go run ./tools/gotest $PACKAGES
+        run: |
+          if [ "$CATALOGS" = true ]; then
+            PACKAGES="$PACKAGES $(bash .github/scripts/catalog-readers.sh | tr '\n' ' ')"
+          fi
+          go run ./tools/gotest $PACKAGES
       # MixMusic takes keys MyGo has none for from its GTK window: these
       # press them in one, on a virtual display. A test that skips found no
       # display, GTK or xdotool: here, that fails.
@@ -151,7 +161,7 @@ jobs:
         run: go run ./tools/registry -check
       # MyGo's checks of the catalogs, and catalog_gen.go generated of them.
       - name: Catalogs of the interface's words
-        if: env.CHECKS == 'full' && runner.os == 'Linux'
+        if: (env.CHECKS == 'full' || env.CATALOGS == 'true') && runner.os == 'Linux'
         run: bash .github/scripts/catalogs.sh
       - name: Changelog fragments
         if: env.CHECKS != 'none'

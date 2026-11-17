@@ -1,0 +1,34 @@
+{
+  "id": "blue-galaxy",
+  "name": "Blue Galaxy",
+  "version": "1.0.0",
+  "author": "fraxzu",
+  "description": "A deep-space dark theme: starlight ink, cyan star accent and cobalt nebula tiles on midnight navy.",
+  "scheme": "dark",
+  "colors": {
+    "bg": "#040a2c",
+    "surface": "#09133d",
+    "surface-2": "#101c50",
+    "surface-3": "#192763",
+    "border": "rgba(160, 190, 255, 0.16)",
+    "text": "#eef2ff",
+    "text-muted": "#a3b2e0",
+    "accent": "#5ad1ff",
+    "accent-text": "#040a2c",
+    "danger": "#ff8a9a",
+    "success": "#7ee8b8",
+    "youtube": "#ff6b7a",
+    "spotify": "#1ed760",
+    "tile-1": "#5ad1ff",
+    "tile-2": "#5b82ff",
+    "tile-3": "#9d8cff",
+    "tile-4": "#dfe6ff",
+    "tile-text": "#040a2c"
+  },
+  "fonts": {
+    "body": "Selawik, 'Segoe UI', 'Noto Sans', system-ui, sans-serif",
+    "display": "Selawik, 'Segoe UI', 'Noto Sans', system-ui, sans-serif"
+  },
+  "radius": "8px",
+  "files": ["theme.json"]
+}

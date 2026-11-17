@@ -56,6 +56,17 @@ func (r *Resolver) SetAsAccount(on bool) {
 	}
 }
 
+// ForgetRefusals asks as the account again at once for the videos YouTube
+// refused the stream of found as it. The app calls it as MixMusic signs in
+// to YouTube Music, or uses it as another Google account or channel: the
+// marks go then, rather than as the next video asked for tells another
+// session (marked), which a switch away and back before it wouldn't.
+func (r *Resolver) ForgetRefusals() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.refusedAsAccount = nil
+}
+
 // accountStream has yt-dlp find the stream of a video as the user's YouTube
 // Music account, for Premium's higher bitrate, when accountSession gives
 // a session to ask as. It reports false when it didn't ask, or found no

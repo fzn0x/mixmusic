@@ -14143,6 +14143,82 @@ func (msgs Messages) PlaybackWaitingBrowser() string {
 	return Catalog.Format(msgs.locale, "playbackWaitingBrowser", nil)
 }
 
+// PlayerAllDisliked says "You dislike every song here"
+// in the language the app shows.
+//
+// A notice, as a list played has nothing the settings let play.
+func PlayerAllDisliked() string { return In(i18n.Locale()).PlayerAllDisliked() }
+
+// PlayerAllDisliked says "You dislike every song here"
+// in the language of msgs.
+//
+// A notice, as a list played has nothing the settings let play.
+func (msgs Messages) PlayerAllDisliked() string {
+	return Catalog.Format(msgs.locale, "playerAllDisliked", nil)
+}
+
+// PlayerAllDislikedOrAI says "Every song here is one you dislike or YouTube labels as made with AI"
+// in the language the app shows.
+//
+// A notice, as a list played has nothing the settings let play.
+func PlayerAllDislikedOrAI() string { return In(i18n.Locale()).PlayerAllDislikedOrAI() }
+
+// PlayerAllDislikedOrAI says "Every song here is one you dislike or YouTube labels as made with AI"
+// in the language of msgs.
+//
+// A notice, as a list played has nothing the settings let play.
+func (msgs Messages) PlayerAllDislikedOrAI() string {
+	return Catalog.Format(msgs.locale, "playerAllDislikedOrAI", nil)
+}
+
+// PlayerAllMadeWithAI says "YouTube labels every song here as made with AI"
+// in the language the app shows.
+//
+// A notice, as a list played has nothing the settings let play.
+func PlayerAllMadeWithAI() string { return In(i18n.Locale()).PlayerAllMadeWithAI() }
+
+// PlayerAllMadeWithAI says "YouTube labels every song here as made with AI"
+// in the language of msgs.
+//
+// A notice, as a list played has nothing the settings let play.
+func (msgs Messages) PlayerAllMadeWithAI() string {
+	return Catalog.Format(msgs.locale, "playerAllMadeWithAI", nil)
+}
+
+// PlayerAutoplayNothingNew says "{what, select, disliked {Autoplay stopped: the radio held nothing new but songs you dislike or YouTube labels as made…"
+// in the language the app shows.
+//
+// A notice. {what} is disliked where some of the songs are ones the
+// listener dislikes.
+func PlayerAutoplayNothingNew(what string) string {
+	return In(i18n.Locale()).PlayerAutoplayNothingNew(what)
+}
+
+// PlayerAutoplayNothingNew says "{what, select, disliked {Autoplay stopped: the radio held nothing new but songs you dislike or YouTube labels as made…"
+// in the language of msgs.
+//
+// A notice. {what} is disliked where some of the songs are ones the
+// listener dislikes.
+func (msgs Messages) PlayerAutoplayNothingNew(what string) string {
+	return Catalog.Format(msgs.locale, "playerAutoplayNothingNew", map[string]any{"what": what})
+}
+
+// PlayerAutoplayRadios says "{what, select, disliked {Autoplay stopped: three radios in a row held only songs you dislike or YouTube labels as mad…"
+// in the language the app shows.
+//
+// A notice. {what} is disliked where some of the songs are ones the
+// listener dislikes.
+func PlayerAutoplayRadios(what string) string { return In(i18n.Locale()).PlayerAutoplayRadios(what) }
+
+// PlayerAutoplayRadios says "{what, select, disliked {Autoplay stopped: three radios in a row held only songs you dislike or YouTube labels as mad…"
+// in the language of msgs.
+//
+// A notice. {what} is disliked where some of the songs are ones the
+// listener dislikes.
+func (msgs Messages) PlayerAutoplayRadios(what string) string {
+	return Catalog.Format(msgs.locale, "playerAutoplayRadios", map[string]any{"what": what})
+}
+
 // PlayerCantPlayHere says "MixMusic can't play on this computer"
 // in the language the app shows.
 //
@@ -14157,6 +14233,42 @@ func PlayerCantPlayHere() string { return In(i18n.Locale()).PlayerCantPlayHere()
 // then it quits.
 func (msgs Messages) PlayerCantPlayHere() string {
 	return Catalog.Format(msgs.locale, "playerCantPlayHere", nil)
+}
+
+// PlayerCouldntPlay says "Couldn't play {title}: {error}"
+// in the language the app shows.
+//
+// A notice, as a track can't play. {error} says why, as the service or the
+// system says it.
+func PlayerCouldntPlay(title string, error string) string {
+	return In(i18n.Locale()).PlayerCouldntPlay(title, error)
+}
+
+// PlayerCouldntPlay says "Couldn't play {title}: {error}"
+// in the language of msgs.
+//
+// A notice, as a track can't play. {error} says why, as the service or the
+// system says it.
+func (msgs Messages) PlayerCouldntPlay(title string, error string) string {
+	return Catalog.Format(msgs.locale, "playerCouldntPlay", map[string]any{"title": title, "error": error})
+}
+
+// PlayerCouldntPlayStopped says "Couldn't play {title}: {error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play"
+// in the language the app shows.
+//
+// A notice, as a track can't play, nor the ones just before it. {error}
+// says why, as the service or the system says it.
+func PlayerCouldntPlayStopped(title string, error string, count int) string {
+	return In(i18n.Locale()).PlayerCouldntPlayStopped(title, error, count)
+}
+
+// PlayerCouldntPlayStopped says "Couldn't play {title}: {error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play"
+// in the language of msgs.
+//
+// A notice, as a track can't play, nor the ones just before it. {error}
+// says why, as the service or the system says it.
+func (msgs Messages) PlayerCouldntPlayStopped(title string, error string, count int) string {
+	return Catalog.Format(msgs.locale, "playerCouldntPlayStopped", map[string]any{"title": title, "error": error, "count": count})
 }
 
 // PlayerDeviceActive says "{name} · active"
@@ -14209,6 +14321,70 @@ func (msgs Messages) PlayerDisliked(title string) string {
 	return Catalog.Format(msgs.locale, "playerDisliked", map[string]any{"title": title})
 }
 
+// PlayerExplicitAll says "Every song here is explicit, and your settings hide explicit content"
+// in the language the app shows.
+//
+// A notice, as a list played has nothing the settings let play.
+func PlayerExplicitAll() string { return In(i18n.Locale()).PlayerExplicitAll() }
+
+// PlayerExplicitAll says "Every song here is explicit, and your settings hide explicit content"
+// in the language of msgs.
+//
+// A notice, as a list played has nothing the settings let play.
+func (msgs Messages) PlayerExplicitAll() string {
+	return Catalog.Format(msgs.locale, "playerExplicitAll", nil)
+}
+
+// PlayerExplicitOrSkipped says "Every song here is explicit, which your settings hide, or one they skip"
+// in the language the app shows.
+//
+// A notice, as a list played has nothing the settings let play.
+func PlayerExplicitOrSkipped() string { return In(i18n.Locale()).PlayerExplicitOrSkipped() }
+
+// PlayerExplicitOrSkipped says "Every song here is explicit, which your settings hide, or one they skip"
+// in the language of msgs.
+//
+// A notice, as a list played has nothing the settings let play.
+func (msgs Messages) PlayerExplicitOrSkipped() string {
+	return Catalog.Format(msgs.locale, "playerExplicitOrSkipped", nil)
+}
+
+// PlayerExplicitRefused says "{title} is explicit, and your settings hide explicit content"
+// in the language the app shows.
+//
+// A notice, as a song chosen to play doesn't, with a button to the
+// settings.
+func PlayerExplicitRefused(title string) string {
+	return In(i18n.Locale()).PlayerExplicitRefused(title)
+}
+
+// PlayerExplicitRefused says "{title} is explicit, and your settings hide explicit content"
+// in the language of msgs.
+//
+// A notice, as a song chosen to play doesn't, with a button to the
+// settings.
+func (msgs Messages) PlayerExplicitRefused(title string) string {
+	return Catalog.Format(msgs.locale, "playerExplicitRefused", map[string]any{"title": title})
+}
+
+// PlayerFromYouTubeInstead says "{why} - playing it from YouTube Music instead"
+// in the language the app shows.
+//
+// A notice, as a Spotify track plays from YouTube Music. {why} is why it
+// can't play from Spotify, as Spotify says it.
+func PlayerFromYouTubeInstead(why string) string {
+	return In(i18n.Locale()).PlayerFromYouTubeInstead(why)
+}
+
+// PlayerFromYouTubeInstead says "{why} - playing it from YouTube Music instead"
+// in the language of msgs.
+//
+// A notice, as a Spotify track plays from YouTube Music. {why} is why it
+// can't play from Spotify, as Spotify says it.
+func (msgs Messages) PlayerFromYouTubeInstead(why string) string {
+	return Catalog.Format(msgs.locale, "playerFromYouTubeInstead", map[string]any{"why": why})
+}
+
 // PlayerJumpToHighlight says "Jump to the highlight"
 // in the language the app shows.
 func PlayerJumpToHighlight() string { return In(i18n.Locale()).PlayerJumpToHighlight() }
@@ -14217,6 +14393,20 @@ func PlayerJumpToHighlight() string { return In(i18n.Locale()).PlayerJumpToHighl
 // in the language of msgs.
 func (msgs Messages) PlayerJumpToHighlight() string {
 	return Catalog.Format(msgs.locale, "playerJumpToHighlight", nil)
+}
+
+// PlayerLabelsPaused says "YouTube isn't answering MixMusic's checks for AI labels, so tracks play unchecked for now"
+// in the language the app shows.
+//
+// A notice, with a button to the settings.
+func PlayerLabelsPaused() string { return In(i18n.Locale()).PlayerLabelsPaused() }
+
+// PlayerLabelsPaused says "YouTube isn't answering MixMusic's checks for AI labels, so tracks play unchecked for now"
+// in the language of msgs.
+//
+// A notice, with a button to the settings.
+func (msgs Messages) PlayerLabelsPaused() string {
+	return Catalog.Format(msgs.locale, "playerLabelsPaused", nil)
 }
 
 // PlayerLike says "Like"
@@ -14309,6 +14499,20 @@ func (msgs Messages) PlayerNoSeeking() string {
 	return Catalog.Format(msgs.locale, "playerNoSeeking", nil)
 }
 
+// PlayerOffline says "No network. MixMusic plays on from here once it's back"
+// in the language the app shows.
+//
+// A notice, as the network goes while MixMusic plays.
+func PlayerOffline() string { return In(i18n.Locale()).PlayerOffline() }
+
+// PlayerOffline says "No network. MixMusic plays on from here once it's back"
+// in the language of msgs.
+//
+// A notice, as the network goes while MixMusic plays.
+func (msgs Messages) PlayerOffline() string {
+	return Catalog.Format(msgs.locale, "playerOffline", nil)
+}
+
 // PlayerOnSpotify says "{line} · on Spotify"
 // in the language the app shows.
 func PlayerOnSpotify(line string) string { return In(i18n.Locale()).PlayerOnSpotify(line) }
@@ -14319,6 +14523,20 @@ func (msgs Messages) PlayerOnSpotify(line string) string {
 	return Catalog.Format(msgs.locale, "playerOnSpotify", map[string]any{"line": line})
 }
 
+// PlayerOpenAlbum says "Open the track's album or playlist to play it"
+// in the language the app shows.
+//
+// A notice, as a track asked to play from outside isn't in the queue.
+func PlayerOpenAlbum() string { return In(i18n.Locale()).PlayerOpenAlbum() }
+
+// PlayerOpenAlbum says "Open the track's album or playlist to play it"
+// in the language of msgs.
+//
+// A notice, as a track asked to play from outside isn't in the queue.
+func (msgs Messages) PlayerOpenAlbum() string {
+	return Catalog.Format(msgs.locale, "playerOpenAlbum", nil)
+}
+
 // PlayerOpenNowPlaying says "Open now playing"
 // in the language the app shows.
 func PlayerOpenNowPlaying() string { return In(i18n.Locale()).PlayerOpenNowPlaying() }
@@ -14327,6 +14545,22 @@ func PlayerOpenNowPlaying() string { return In(i18n.Locale()).PlayerOpenNowPlayi
 // in the language of msgs.
 func (msgs Messages) PlayerOpenNowPlaying() string {
 	return Catalog.Format(msgs.locale, "playerOpenNowPlaying", nil)
+}
+
+// PlayerPart says "{kind, select, nonmusic {a part without music} sponsor {a sponsor read} selfpromo {self-promotion} interaction {a rem…"
+// in the language the app shows.
+//
+// A part of a video SponsorBlock marks, as playerSkippedParts names it.
+// {kind} is its kind.
+func PlayerPart(kind string) string { return In(i18n.Locale()).PlayerPart(kind) }
+
+// PlayerPart says "{kind, select, nonmusic {a part without music} sponsor {a sponsor read} selfpromo {self-promotion} interaction {a rem…"
+// in the language of msgs.
+//
+// A part of a video SponsorBlock marks, as playerSkippedParts names it.
+// {kind} is its kind.
+func (msgs Messages) PlayerPart(kind string) string {
+	return Catalog.Format(msgs.locale, "playerPart", map[string]any{"kind": kind})
 }
 
 // PlayerPause says "Pause"
@@ -14429,6 +14663,22 @@ func (msgs Messages) PlayerRepeatOne() string {
 	return Catalog.Format(msgs.locale, "playerRepeatOne", nil)
 }
 
+// PlayerRestPassedOver says "{what, select, disliked {The rest of the queue is songs you dislike or YouTube labels as made with AI} other {The res…"
+// in the language the app shows.
+//
+// A notice, as the queue passes over all it has left. {what} is disliked
+// where some of them are songs the listener dislikes.
+func PlayerRestPassedOver(what string) string { return In(i18n.Locale()).PlayerRestPassedOver(what) }
+
+// PlayerRestPassedOver says "{what, select, disliked {The rest of the queue is songs you dislike or YouTube labels as made with AI} other {The res…"
+// in the language of msgs.
+//
+// A notice, as the queue passes over all it has left. {what} is disliked
+// where some of them are songs the listener dislikes.
+func (msgs Messages) PlayerRestPassedOver(what string) string {
+	return Catalog.Format(msgs.locale, "playerRestPassedOver", map[string]any{"what": what})
+}
+
 // PlayerSeek says "Seek"
 // in the language the app shows.
 func PlayerSeek() string { return In(i18n.Locale()).PlayerSeek() }
@@ -14449,6 +14699,90 @@ func (msgs Messages) PlayerShuffle() string {
 	return Catalog.Format(msgs.locale, "playerShuffle", nil)
 }
 
+// PlayerSkippedMadeWithAI says "Skipped {title}, which YouTube labels as made with AI"
+// in the language the app shows.
+//
+// A notice, with a button to the settings.
+func PlayerSkippedMadeWithAI(title string) string {
+	return In(i18n.Locale()).PlayerSkippedMadeWithAI(title)
+}
+
+// PlayerSkippedMadeWithAI says "Skipped {title}, which YouTube labels as made with AI"
+// in the language of msgs.
+//
+// A notice, with a button to the settings.
+func (msgs Messages) PlayerSkippedMadeWithAI(title string) string {
+	return Catalog.Format(msgs.locale, "playerSkippedMadeWithAI", map[string]any{"title": title})
+}
+
+// PlayerSkippedMadeWithAISpotify says "Skipped {title}, whose recording on YouTube Music YouTube labels as made with AI"
+// in the language the app shows.
+//
+// A notice, with a button to the settings, of a Spotify track played from
+// YouTube Music.
+func PlayerSkippedMadeWithAISpotify(title string) string {
+	return In(i18n.Locale()).PlayerSkippedMadeWithAISpotify(title)
+}
+
+// PlayerSkippedMadeWithAISpotify says "Skipped {title}, whose recording on YouTube Music YouTube labels as made with AI"
+// in the language of msgs.
+//
+// A notice, with a button to the settings, of a Spotify track played from
+// YouTube Music.
+func (msgs Messages) PlayerSkippedMadeWithAISpotify(title string) string {
+	return Catalog.Format(msgs.locale, "playerSkippedMadeWithAISpotify", map[string]any{"title": title})
+}
+
+// PlayerSkippedParts says "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} other {Skipped parts of # …"
+// in the language the app shows.
+//
+// A notice, with Undo, as MixMusic passes over parts of a video
+// SponsorBlock marks. {count} is how many kinds the parts are of, {first}
+// and {second} the first two, as playerPart names them.
+func PlayerSkippedParts(count int, first string, second string) string {
+	return In(i18n.Locale()).PlayerSkippedParts(count, first, second)
+}
+
+// PlayerSkippedParts says "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} other {Skipped parts of # …"
+// in the language of msgs.
+//
+// A notice, with Undo, as MixMusic passes over parts of a video
+// SponsorBlock marks. {count} is how many kinds the parts are of, {first}
+// and {second} the first two, as playerPart names them.
+func (msgs Messages) PlayerSkippedParts(count int, first string, second string) string {
+	return Catalog.Format(msgs.locale, "playerSkippedParts", map[string]any{"count": count, "first": first, "second": second})
+}
+
+// PlayerSkippedSongsAI says "{count, plural, one {Skipped # song YouTube labels as made with AI} other {Skipped # songs YouTube labels as made wit…"
+// in the language the app shows.
+//
+// A notice, with a button to the settings.
+func PlayerSkippedSongsAI(count int) string { return In(i18n.Locale()).PlayerSkippedSongsAI(count) }
+
+// PlayerSkippedSongsAI says "{count, plural, one {Skipped # song YouTube labels as made with AI} other {Skipped # songs YouTube labels as made wit…"
+// in the language of msgs.
+//
+// A notice, with a button to the settings.
+func (msgs Messages) PlayerSkippedSongsAI(count int) string {
+	return Catalog.Format(msgs.locale, "playerSkippedSongsAI", map[string]any{"count": count})
+}
+
+// PlayerSkippedSongsDislikedOrAI says "{count, plural, one {Skipped # song you dislike or YouTube labels as made with AI} other {Skipped # songs you dislike…"
+// in the language the app shows.
+//
+// A notice, with a button to the settings.
+func PlayerSkippedSongsDislikedOrAI(count int) string {
+	return In(i18n.Locale()).PlayerSkippedSongsDislikedOrAI(count)
+}
+
+// PlayerSkippedSongsDislikedOrAI says "{count, plural, one {Skipped # song you dislike or YouTube labels as made with AI} other {Skipped # songs you dislike…"
+// in the language of msgs.
+//
+// A notice, with a button to the settings.
+func (msgs Messages) PlayerSkippedSongsDislikedOrAI(count int) string {
+	return Catalog.Format(msgs.locale, "playerSkippedSongsDislikedOrAI", map[string]any{"count": count})
+}
+
 // PlayerSpeed says "{line} · {speed}"
 // in the language the app shows.
 func PlayerSpeed(line string, speed string) string { return In(i18n.Locale()).PlayerSpeed(line, speed) }
@@ -14457,6 +14791,24 @@ func PlayerSpeed(line string, speed string) string { return In(i18n.Locale()).Pl
 // in the language of msgs.
 func (msgs Messages) PlayerSpeed(line string, speed string) string {
 	return Catalog.Format(msgs.locale, "playerSpeed", map[string]any{"line": line, "speed": speed})
+}
+
+// PlayerStopped says "{error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play"
+// in the language the app shows.
+//
+// A notice, as tracks in a row can't play. {error} says why the last
+// couldn't, as the service or the system says it.
+func PlayerStopped(error string, count int) string {
+	return In(i18n.Locale()).PlayerStopped(error, count)
+}
+
+// PlayerStopped says "{error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play"
+// in the language of msgs.
+//
+// A notice, as tracks in a row can't play. {error} says why the last
+// couldn't, as the service or the system says it.
+func (msgs Messages) PlayerStopped(error string, count int) string {
+	return Catalog.Format(msgs.locale, "playerStopped", map[string]any{"error": error, "count": count})
 }
 
 // PlayerSurroundOff says "5.1 surround: off"
@@ -14477,6 +14829,22 @@ func PlayerSurroundOn() string { return In(i18n.Locale()).PlayerSurroundOn() }
 // in the language of msgs.
 func (msgs Messages) PlayerSurroundOn() string {
 	return Catalog.Format(msgs.locale, "playerSurroundOn", nil)
+}
+
+// PlayerSurroundStereo says "The 5.1 surround audio of {title} couldn't play ({why}), so it plays in stereo"
+// in the language the app shows.
+//
+// A notice. {why} is why, as the system says it.
+func PlayerSurroundStereo(title string, why string) string {
+	return In(i18n.Locale()).PlayerSurroundStereo(title, why)
+}
+
+// PlayerSurroundStereo says "The 5.1 surround audio of {title} couldn't play ({why}), so it plays in stereo"
+// in the language of msgs.
+//
+// A notice. {why} is why, as the system says it.
+func (msgs Messages) PlayerSurroundStereo(title string, why string) string {
+	return Catalog.Format(msgs.locale, "playerSurroundStereo", map[string]any{"title": title, "why": why})
 }
 
 // PlayerUndislike says "Remove the dislike"

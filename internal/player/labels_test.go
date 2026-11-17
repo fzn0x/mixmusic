@@ -567,7 +567,7 @@ func TestSkipAIPaused(t *testing.T) {
 	h.wait("c playing", playing("c"))
 	n := 0
 	for _, note := range h.notices() {
-		if note.Message == pausedChecks {
+		if note.Message == pausedChecks() {
 			n++
 		}
 	}

@@ -3993,9 +3993,66 @@
   "playbackSpotifyNoWebKit": "This computer's webview, WebKitGTK, can't play Spotify's protected audio, so MixMusic can't play Spotify itself.",
   "playbackSpotifyTracks": "Spotify tracks",
   "playbackWaitingBrowser": "waiting for the browser…",
+  "playerAllDisliked": "You dislike every song here",
+  "@playerAllDisliked": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerAllDislikedOrAI": "Every song here is one you dislike or YouTube labels as made with AI",
+  "@playerAllDislikedOrAI": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerAllMadeWithAI": "YouTube labels every song here as made with AI",
+  "@playerAllMadeWithAI": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerAutoplayNothingNew": "{what, select, disliked {Autoplay stopped: the radio held nothing new but songs you dislike or YouTube labels as made with AI} other {Autoplay stopped: the radio held nothing new but songs YouTube labels as made with AI}}",
+  "@playerAutoplayNothingNew": {
+    "description": "A notice. {what} is disliked where some of the songs are ones the listener dislikes.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "playerAutoplayRadios": "{what, select, disliked {Autoplay stopped: three radios in a row held only songs you dislike or YouTube labels as made with AI} other {Autoplay stopped: three radios in a row held only songs YouTube labels as made with AI}}",
+  "@playerAutoplayRadios": {
+    "description": "A notice. {what} is disliked where some of the songs are ones the listener dislikes.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
   "playerCantPlayHere": "MixMusic can't play on this computer",
   "@playerCantPlayHere": {
     "description": "A dialog as MixMusic starts, where it can't play: its details say why, then it quits."
+  },
+  "playerCouldntPlay": "Couldn't play {title}: {error}",
+  "@playerCouldntPlay": {
+    "description": "A notice, as a track can't play. {error} says why, as the service or the system says it.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playerCouldntPlayStopped": "Couldn't play {title}: {error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play",
+  "@playerCouldntPlayStopped": {
+    "description": "A notice, as a track can't play, nor the ones just before it. {error} says why, as the service or the system says it.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "playerDeviceActive": "{name} · active",
   "@playerDeviceActive": {
@@ -4016,7 +4073,37 @@
       }
     }
   },
+  "playerExplicitAll": "Every song here is explicit, and your settings hide explicit content",
+  "@playerExplicitAll": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerExplicitOrSkipped": "Every song here is explicit, which your settings hide, or one they skip",
+  "@playerExplicitOrSkipped": {
+    "description": "A notice, as a list played has nothing the settings let play."
+  },
+  "playerExplicitRefused": "{title} is explicit, and your settings hide explicit content",
+  "@playerExplicitRefused": {
+    "description": "A notice, as a song chosen to play doesn't, with a button to the settings.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playerFromYouTubeInstead": "{why} - playing it from YouTube Music instead",
+  "@playerFromYouTubeInstead": {
+    "description": "A notice, as a Spotify track plays from YouTube Music. {why} is why it can't play from Spotify, as Spotify says it.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
   "playerJumpToHighlight": "Jump to the highlight",
+  "playerLabelsPaused": "YouTube isn't answering MixMusic's checks for AI labels, so tracks play unchecked for now",
+  "@playerLabelsPaused": {
+    "description": "A notice, with a button to the settings."
+  },
   "playerLike": "Like",
   "playerLive": "live",
   "playerLoading": "Loading",
@@ -4026,6 +4113,10 @@
   "playerNoDevices": "Open Spotify on a device to see it here",
   "playerNoHighlight": "This track has no highlight",
   "playerNoSeeking": "Live: no seeking",
+  "playerOffline": "No network. MixMusic plays on from here once it's back",
+  "@playerOffline": {
+    "description": "A notice, as the network goes while MixMusic plays."
+  },
   "playerOnSpotify": "{line} · on Spotify",
   "@playerOnSpotify": {
     "placeholders": {
@@ -4034,7 +4125,20 @@
       }
     }
   },
+  "playerOpenAlbum": "Open the track's album or playlist to play it",
+  "@playerOpenAlbum": {
+    "description": "A notice, as a track asked to play from outside isn't in the queue."
+  },
   "playerOpenNowPlaying": "Open now playing",
+  "playerPart": "{kind, select, nonmusic {a part without music} sponsor {a sponsor read} selfpromo {self-promotion} interaction {a reminder to like or subscribe} intro {the intro} outro {the outro} preview {a preview or recap} hook {a hook or greeting} filler {filler} highlight {the highlight} other {a part}}",
+  "@playerPart": {
+    "description": "A part of a video SponsorBlock marks, as playerSkippedParts names it. {kind} is its kind.",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
   "playerPause": "Pause",
   "playerPauseWaiting": "Pause, waiting for the network",
   "playerPickSomething": "Pick something to play",
@@ -4045,8 +4149,70 @@
   "playerRepeatAll": "Repeat: all",
   "playerRepeatOff": "Repeat: off",
   "playerRepeatOne": "Repeat: one",
+  "playerRestPassedOver": "{what, select, disliked {The rest of the queue is songs you dislike or YouTube labels as made with AI} other {The rest of the queue is songs YouTube labels as made with AI}}",
+  "@playerRestPassedOver": {
+    "description": "A notice, as the queue passes over all it has left. {what} is disliked where some of them are songs the listener dislikes.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
   "playerSeek": "Seek",
   "playerShuffle": "Shuffle",
+  "playerSkippedMadeWithAI": "Skipped {title}, which YouTube labels as made with AI",
+  "@playerSkippedMadeWithAI": {
+    "description": "A notice, with a button to the settings.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playerSkippedMadeWithAISpotify": "Skipped {title}, whose recording on YouTube Music YouTube labels as made with AI",
+  "@playerSkippedMadeWithAISpotify": {
+    "description": "A notice, with a button to the settings, of a Spotify track played from YouTube Music.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playerSkippedParts": "{count, plural, =0 {Skipped a part} =1 {Skipped {first}} =2 {Skipped {first} and {second}} other {Skipped parts of # kinds}}",
+  "@playerSkippedParts": {
+    "description": "A notice, with Undo, as MixMusic passes over parts of a video SponsorBlock marks. {count} is how many kinds the parts are of, {first} and {second} the first two, as playerPart names them.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "first": {
+        "type": "String",
+        "example": "the intro"
+      },
+      "second": {
+        "type": "String",
+        "example": "a sponsor read"
+      }
+    }
+  },
+  "playerSkippedSongsAI": "{count, plural, one {Skipped # song YouTube labels as made with AI} other {Skipped # songs YouTube labels as made with AI}}",
+  "@playerSkippedSongsAI": {
+    "description": "A notice, with a button to the settings.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playerSkippedSongsDislikedOrAI": "{count, plural, one {Skipped # song you dislike or YouTube labels as made with AI} other {Skipped # songs you dislike or YouTube labels as made with AI}}",
+  "@playerSkippedSongsDislikedOrAI": {
+    "description": "A notice, with a button to the settings.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "playerSpeed": "{line} · {speed}",
   "@playerSpeed": {
     "placeholders": {
@@ -4058,8 +4224,32 @@
       }
     }
   },
+  "playerStopped": "{error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play",
+  "@playerStopped": {
+    "description": "A notice, as tracks in a row can't play. {error} says why the last couldn't, as the service or the system says it.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "playerSurroundOff": "5.1 surround: off",
   "playerSurroundOn": "5.1 surround: on",
+  "playerSurroundStereo": "The 5.1 surround audio of {title} couldn't play ({why}), so it plays in stereo",
+  "@playerSurroundStereo": {
+    "description": "A notice. {why} is why, as the system says it.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
   "playerUndislike": "Remove the dislike",
   "playerUndo": "undo",
   "playerUnlike": "Remove from liked songs",

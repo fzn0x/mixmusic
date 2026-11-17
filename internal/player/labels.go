@@ -17,6 +17,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Label is what the app knows of the label YouTube gives the recording of
@@ -59,7 +60,7 @@ var (
 const labelAhead = 5
 
 // pausedChecks tells that the checks of labels pause.
-const pausedChecks = "YouTube isn't answering MixMusic's checks for AI labels, so tracks play unchecked for now"
+func pausedChecks() string { return locales.PlayerLabelsPaused() }
 
 // errOnlyLabeled is why a radio added nothing: all it held that wasn't
 // queued is labeled as made with AI.
@@ -182,7 +183,7 @@ func (p *Player) learned(t media.Track, l Label) {
 func (p *Player) tellPaused() {
 	if !p.passing.toldPaused {
 		p.passing.toldPaused = true
-		p.notify(Notice{Message: pausedChecks, Settings: true})
+		p.notify(Notice{Message: pausedChecks(), Settings: true})
 	}
 }
 

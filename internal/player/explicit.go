@@ -14,6 +14,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // SkipExplicit is why the queue passes over an entry of an explicit song,
@@ -40,7 +41,7 @@ func (p *Player) refuses(t media.Track) bool {
 	if !p.hides(t) {
 		return false
 	}
-	p.notify(Notice{Message: t.Title + " is explicit, and your settings hide explicit content", Settings: true})
+	p.notify(Notice{Message: locales.PlayerExplicitRefused(t.Title), Settings: true})
 	return true
 }
 
@@ -58,9 +59,9 @@ func explicitPassedOver(items []Item) string {
 	case explicit == 0:
 		return ""
 	case explicit == len(items):
-		return "Every song here is explicit, and your settings hide explicit content"
+		return locales.PlayerExplicitAll()
 	}
-	return "Every song here is explicit, which your settings hide, or one they skip"
+	return locales.PlayerExplicitOrSkipped()
 }
 
 // hideChanged takes in the settings hiding explicit content, or no longer:

@@ -12,6 +12,8 @@ import (
 	"errors"
 	"log"
 	"time"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // network returns the app's Network, if its services have it.
@@ -113,7 +115,7 @@ func (p *Player) waitFor(willPlay, radio bool, resume func(play bool)) {
 	p.report()
 	if !p.toldOffline {
 		p.toldOffline = true
-		p.notify(Notice{Message: "No network. MixMusic plays on from here once it's back"})
+		p.notify(Notice{Message: locales.PlayerOffline()})
 		// Once the network answers, the next loss is told too, also when the
 		// user left this wait for a track that plays without the network.
 		await(p, func(ctx context.Context) (struct{}, error) { return struct{}{}, n.WaitOnline(ctx) }, func(_ struct{}, err error) {

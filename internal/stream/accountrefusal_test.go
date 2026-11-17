@@ -2,6 +2,7 @@ package stream
 
 import (
 	"context"
+	"net/http"
 	"slices"
 	"sync/atomic"
 	"testing"
@@ -61,6 +62,43 @@ func TestSetAsAccountClearsRefusals(t *testing.T) {
 	if n, all := asAccountRuns(y), len(y.runs()); n != 2 || all != 2 {
 		t.Errorf("yt-dlp ran %d times, %d of them as the account; want 2, both as the account", all, n)
 	}
+}
+
+// TestSessionChangeClearsRefusals asks as the account again for a video
+// YouTube refused the stream of found so, once the session changed:
+// signed in again, or signed out and in, as YouTube ending the session or
+// another Google account of it are to the resolver too. A cookie YouTube
+// refreshes as it goes keeps the mark.
+func TestSessionChangeClearsRefusals(t *testing.T) {
+	var runs atomic.Int32
+	signedOut := fakeYTDLP("https://example.com/audio", &runs)
+	y := &accountYTDLP{
+		asAccount: func(context.Context) ([]byte, error) { return premiumAnswer(t), nil },
+		signedOut: func(ctx context.Context) ([]byte, error) { return signedOut(ctx, "--") },
+	}
+	r := accountResolver(t, y)
+	var session atomic.Pointer[[]*http.Cookie]
+	use := func(cookies []*http.Cookie) { session.Store(&cookies) }
+	r.Session = func() []*http.Cookie { return *session.Load() }
+	resolve := func(step string, asAccount bool) {
+		t.Helper()
+		if s, err := r.Resolve(context.Background(), songID); err != nil || s.AsAccount != asAccount {
+			t.Errorf("%s: %+v, %v; want as the account %v", step, s, err, asAccount)
+		}
+		r.Forget(songID) // as after YouTube refused its URL
+	}
+	use(testSession())
+	resolve("first", true)
+	use(append(testSession(), &http.Cookie{Name: "__Secure-1PSIDTS", Value: "refreshed"}))
+	resolve("a cookie refreshed", false)
+	again := testSession()
+	again[0] = &http.Cookie{Name: "LOGIN_INFO", Value: "madeup-login-again"}
+	use(again)
+	resolve("signed in again", true)
+	use(nil)
+	resolve("signed out", false)
+	use(again)
+	resolve("signed in after", true)
 }
 
 // TestAccountRefusalLastsTenMinutes finds a video signed out for 10

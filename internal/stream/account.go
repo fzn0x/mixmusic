@@ -2,6 +2,7 @@ package stream
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"log"
@@ -93,18 +94,21 @@ func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Qu
 // Session gives one yt-dlp takes for a signed-in one, of the best quality,
 // which alone gains from Premium, with a JavaScript runtime, unless
 // YouTube refused the stream of the video found as the account less than
-// refusalMark ago.
+// refusalMark ago, as the same session.
 func (r *Resolver) accountSession(videoID string, quality Quality) []*http.Cookie {
 	r.mu.Lock()
-	on, refused := r.asAccount, r.marked(videoID)
+	on := r.asAccount
 	r.mu.Unlock()
 	// The clients yt-dlp asks as for an account need a challenge solved,
 	// which takes a runtime, as the 5.1 audio does.
-	if !on || r.Session == nil || quality != QualityBest || refused || !r.findsSurround() {
+	if !on || r.Session == nil || quality != QualityBest || !r.findsSurround() {
 		return nil
 	}
 	cookies := r.Session()
-	if len(cookies) == 0 {
+	r.mu.Lock()
+	refused := r.marked(videoID, sessionKey(cookies))
+	r.mu.Unlock()
+	if refused || len(cookies) == 0 {
 		return nil
 	}
 	if !signedInFor(cookies) {
@@ -134,6 +138,30 @@ func signedInFor(cookies []*http.Cookie) bool {
 		}
 	}
 	return login && signs
+}
+
+// sessionKey tells sessions apart by the cookies that sign the user in,
+// LOGIN_INFO and SAPISID's, which YouTube sets as they sign in and keeps
+// while the session lasts, unlike those it refreshes as it goes: a hash
+// of them, so that the resolver keeps no copy of the session, or "" for
+// none.
+func sessionKey(cookies []*http.Cookie) string {
+	h := sha256.New()
+	signs := false
+	for _, c := range cookies {
+		if c == nil || c.Value == "" {
+			continue
+		}
+		switch c.Name {
+		case "LOGIN_INFO", "SAPISID", "__Secure-1PAPISID", "__Secure-3PAPISID":
+			fmt.Fprintf(h, "%s=%s\n", c.Name, c.Value)
+			signs = true
+		}
+	}
+	if !signs {
+		return ""
+	}
+	return string(h.Sum(nil))
 }
 
 // takenAsAccount tells why s, the stream yt-dlp found as the account, isn't
@@ -231,8 +259,14 @@ func (r *Resolver) refused(videoID string, res *resolution) {
 
 // marked reports whether YouTube refused the stream of a video found as
 // the account less than refusalMark ago, forgetting a mark older than
-// that. It runs under the resolver's mutex.
-func (r *Resolver) marked(videoID string) bool {
+// that, as the session of key (sessionKey): every mark goes once Session
+// gives another, as signing in or out, YouTube ending the session, or
+// another Google account of it do. It runs under the resolver's mutex.
+func (r *Resolver) marked(videoID, key string) bool {
+	if key != r.markedSession {
+		r.refusedAsAccount, r.markedSession = nil, key
+		return false
+	}
 	at, ok := r.refusedAsAccount[videoID]
 	if ok && time.Since(at) >= refusalMark {
 		delete(r.refusedAsAccount, videoID)

@@ -58,9 +58,9 @@ en.json, and `go test ./locales` MixMusic's.
 
 ## Moving a language to locales/
 
-For a language the Windows installer can be in (MyGo's table:
-`nsisLanguages` in MyGo's `cmd/mygo/languages.go`), one pull request moves
-the files the root should have, so that the installer, macOS and Linux name
+The languages the Windows installer can be in (MyGo's table:
+`nsisLanguages` in MyGo's `cmd/mygo/languages.go`) move to the root
+together, in one pull request, so that the installer, macOS and Linux name
 MixMusic in them:
 
 1. `git mv locales/more/<tag>.json locales/<tag>.json` for each.

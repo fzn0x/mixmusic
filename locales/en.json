@@ -2840,6 +2840,14 @@
   "listenBrainzSettingsTokenPlaceholder": "36 letters, digits and dashes",
   "listenBrainzSettingsUserToken": "User token",
   "listenBrainzSettingsYourServer": "Your server",
+  "localAlbumGone": "this album is no longer on this computer",
+  "@localAlbumGone": {
+    "description": "Why an album of the music on this computer doesn't open: its files went. Shown as a sentence, its first letter capitalized."
+  },
+  "localArtistGone": "this artist's music is no longer on this computer",
+  "@localArtistGone": {
+    "description": "Why an artist of the music on this computer doesn't open: their files went. Shown as a sentence, its first letter capitalized."
+  },
   "localFilesDialog": "Open music files",
   "@localFilesDialog": {
     "description": "The title of the dialog that opens music files on this computer, to play them."
@@ -3102,6 +3110,10 @@
   },
   "lyricStyleSettingsStageDesc": "Cover the window with the lyrics of what plays, over its blurred cover.",
   "lyricStyleSettingsStageShow": "show",
+  "lyricsCantLoad": "Lyrics can't be loaded right now. Check your connection, or try again in a moment.",
+  "@lyricsCantLoad": {
+    "description": "In the lyrics' place, where the sources can't be reached."
+  },
   "lyricsCaptionLanguage": "Caption language",
   "lyricsCaptionLanguageDescription": "Lyrics from YouTube captions come in this language when the video has captions in it, and in the video's own else.",
   "lyricsCaptionLanguageOriginal": "Original",
@@ -3182,6 +3194,10 @@
   "lyricsLangVietnamese": "Vietnamese",
   "lyricsLocalTip": "Shows the lyrics in Latin letters too, made on this computer: nothing is sent.",
   "lyricsLooking": "Looking for the lyrics…",
+  "lyricsNotFound": "No lyrics found for this track.",
+  "@lyricsNotFound": {
+    "description": "In the lyrics' place, where no source has lyrics of the track."
+  },
   "lyricsPlainText": "plain text",
   "lyricsPlayToSee": "Play a track to see its lyrics.",
   "lyricsPreferWords": "Prefer word-by-word lyrics",
@@ -3310,6 +3326,10 @@
   "lyricsTranslationFailed": "Translation isn't available right now.",
   "lyricsTranslationWaiting": "Translation is on its way…",
   "lyricsUnisonFirstTip": "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google romanize them with the vowels their script leaves out; until they come, or when they can't, they're made on this computer.",
+  "lyricsVideoNotSynced": "Not synced: the song's synced lyrics don't match this video.",
+  "@lyricsVideoNotSynced": {
+    "description": "Above the lyrics of a music video, which its song's synced lyrics don't keep time with."
+  },
   "marketplaceAsksForList": "asks for {permissions}",
   "@marketplaceAsksForList": {
     "placeholders": {

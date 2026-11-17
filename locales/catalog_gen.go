@@ -9619,6 +9619,38 @@ func (msgs Messages) ListenBrainzSettingsYourServer() string {
 	return Catalog.Format(msgs.locale, "listenBrainzSettingsYourServer", nil)
 }
 
+// LocalAlbumGone says "this album is no longer on this computer"
+// in the language the app shows.
+//
+// Why an album of the music on this computer doesn't open: its files went.
+// Shown as a sentence, its first letter capitalized.
+func LocalAlbumGone() string { return In(i18n.Locale()).LocalAlbumGone() }
+
+// LocalAlbumGone says "this album is no longer on this computer"
+// in the language of msgs.
+//
+// Why an album of the music on this computer doesn't open: its files went.
+// Shown as a sentence, its first letter capitalized.
+func (msgs Messages) LocalAlbumGone() string {
+	return Catalog.Format(msgs.locale, "localAlbumGone", nil)
+}
+
+// LocalArtistGone says "this artist's music is no longer on this computer"
+// in the language the app shows.
+//
+// Why an artist of the music on this computer doesn't open: their files
+// went. Shown as a sentence, its first letter capitalized.
+func LocalArtistGone() string { return In(i18n.Locale()).LocalArtistGone() }
+
+// LocalArtistGone says "this artist's music is no longer on this computer"
+// in the language of msgs.
+//
+// Why an artist of the music on this computer doesn't open: their files
+// went. Shown as a sentence, its first letter capitalized.
+func (msgs Messages) LocalArtistGone() string {
+	return Catalog.Format(msgs.locale, "localArtistGone", nil)
+}
+
 // LocalFilesDialog says "Open music files"
 // in the language the app shows.
 //
@@ -10467,6 +10499,20 @@ func (msgs Messages) LyricStyleSettingsStageShow() string {
 	return Catalog.Format(msgs.locale, "lyricStyleSettingsStageShow", nil)
 }
 
+// LyricsCantLoad says "Lyrics can't be loaded right now. Check your connection, or try again in a moment."
+// in the language the app shows.
+//
+// In the lyrics' place, where the sources can't be reached.
+func LyricsCantLoad() string { return In(i18n.Locale()).LyricsCantLoad() }
+
+// LyricsCantLoad says "Lyrics can't be loaded right now. Check your connection, or try again in a moment."
+// in the language of msgs.
+//
+// In the lyrics' place, where the sources can't be reached.
+func (msgs Messages) LyricsCantLoad() string {
+	return Catalog.Format(msgs.locale, "lyricsCantLoad", nil)
+}
+
 // LyricsCaptionLanguage says "Caption language"
 // in the language the app shows.
 func LyricsCaptionLanguage() string { return In(i18n.Locale()).LyricsCaptionLanguage() }
@@ -11063,6 +11109,20 @@ func LyricsLooking() string { return In(i18n.Locale()).LyricsLooking() }
 // in the language of msgs.
 func (msgs Messages) LyricsLooking() string {
 	return Catalog.Format(msgs.locale, "lyricsLooking", nil)
+}
+
+// LyricsNotFound says "No lyrics found for this track."
+// in the language the app shows.
+//
+// In the lyrics' place, where no source has lyrics of the track.
+func LyricsNotFound() string { return In(i18n.Locale()).LyricsNotFound() }
+
+// LyricsNotFound says "No lyrics found for this track."
+// in the language of msgs.
+//
+// In the lyrics' place, where no source has lyrics of the track.
+func (msgs Messages) LyricsNotFound() string {
+	return Catalog.Format(msgs.locale, "lyricsNotFound", nil)
 }
 
 // LyricsPlainText says "plain text"
@@ -11799,6 +11859,22 @@ func LyricsUnisonFirstTip() string { return In(i18n.Locale()).LyricsUnisonFirstT
 // in the language of msgs.
 func (msgs Messages) LyricsUnisonFirstTip() string {
 	return Catalog.Format(msgs.locale, "lyricsUnisonFirstTip", nil)
+}
+
+// LyricsVideoNotSynced says "Not synced: the song's synced lyrics don't match this video."
+// in the language the app shows.
+//
+// Above the lyrics of a music video, which its song's synced lyrics don't
+// keep time with.
+func LyricsVideoNotSynced() string { return In(i18n.Locale()).LyricsVideoNotSynced() }
+
+// LyricsVideoNotSynced says "Not synced: the song's synced lyrics don't match this video."
+// in the language of msgs.
+//
+// Above the lyrics of a music video, which its song's synced lyrics don't
+// keep time with.
+func (msgs Messages) LyricsVideoNotSynced() string {
+	return Catalog.Format(msgs.locale, "lyricsVideoNotSynced", nil)
 }
 
 // MarketplaceAsksForList says "asks for {permissions}"

@@ -19,6 +19,7 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
 
@@ -204,7 +205,7 @@ func (c *Catalog) TranslateAgain() { c.a.translations.resume() }
 // lyrics show it with.
 type translationError struct{ err error }
 
-func (e translationError) Error() string { return "Translation isn't available right now." }
+func (e translationError) Error() string { return locales.LyricsTranslationFailed() }
 func (e translationError) Unwrap() error { return e.err }
 
 // Language returns the language the user reads, which lyrics translate to

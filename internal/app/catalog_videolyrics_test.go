@@ -55,7 +55,7 @@ func TestLyricsOfALongerVideoFromYouTubeMusic(t *testing.T) {
 	video := instantCrushVideo
 	video.DurationMs = (5*60 + 38 + 29) * 1000
 	l, err := v.c.Lyrics(t.Context(), video)
-	if err != nil || l.Synced || l.Source == "LRCLIB" || len(l.Lines) <= 2 || l.Note != videoNote {
+	if err != nil || l.Synced || l.Source == "LRCLIB" || len(l.Lines) <= 2 || l.Note != videoNote() {
 		t.Fatalf("lyrics = %+v, %v", l, err)
 	}
 }

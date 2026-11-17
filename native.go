@@ -188,7 +188,10 @@ type shell struct {
 	// zoom is the zoom the window shows, zoomRoom the largest it has room
 	// for, and zoomToast set when the next frame tells of a new zoom.
 	zoom, zoomRoom float64
-	zoomToast      bool
+	// pixelScale is how many device pixels a DIP of the window is, the
+	// zoom's and the display's, as its last frame painted (notePixels).
+	pixelScale float32
+	zoomToast  bool
 	// zoomIn is macOS's View › Zoom In, and zoomInAccelerator its key
 	// (zoomInKey).
 	zoomIn            *mygo.MenuItem

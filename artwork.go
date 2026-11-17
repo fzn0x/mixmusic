@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"image"
+	"math"
 	"math/rand/v2"
 	"net/url"
 	"time"
@@ -27,11 +28,13 @@ const (
 )
 
 // artKey names an image of artwork at a size, tinted as Terminal's
-// phosphor when phosphor is set.
+// phosphor when phosphor is set, and blurred to a wash of its colours when
+// blur is.
 type artKey struct {
 	url      string
 	px       int
 	phosphor bool
+	blur     bool
 }
 
 type artEntry struct {
@@ -92,15 +95,25 @@ func newArtworks(update func(func()), src artSource) *artworks {
 // while it loads, or when it can't. One that couldn't load asks c for a
 // frame when it tries again.
 func (a *artworks) get(c *ui.Context, rawURL string, px int) *ui.Bitmap {
-	if rawURL == "" {
+	return a.lookup(c, artKey{rawURL, bucket(px), a.phosphor, false})
+}
+
+// blurred is get's image blurred once as it loads, by artBlur of its pixels,
+// for a ground that stretches it over a window: the GPU then only stretches
+// it, as blurring it each frame at the window's pixels costs (#764).
+func (a *artworks) blurred(c *ui.Context, rawURL string, px int) *ui.Bitmap {
+	return a.lookup(c, artKey{rawURL, bucket(px), a.phosphor, true})
+}
+
+func (a *artworks) lookup(c *ui.Context, k artKey) *ui.Bitmap {
+	if k.url == "" {
 		return nil
 	}
-	k := artKey{rawURL, bucket(px), a.phosphor}
 	a.clock++
 	e, ok := a.m[k]
 	if !ok {
 		e = &artEntry{}
-		if u, err := url.Parse(rawURL); err == nil {
+		if u, err := url.Parse(k.url); err == nil {
 			e.host = u.Hostname()
 		}
 		a.m[k] = e
@@ -210,7 +223,61 @@ func (a *artworks) load(k artKey) (image.Image, error) {
 	if k.phosphor {
 		img = phosphorize(img)
 	}
+	if k.blur {
+		img = blur(img, artBlur)
+	}
 	return img, nil
+}
+
+// artBlur is the sigma, in pixels of a 96 px cover, that blurred covers are
+// blurred by: about the 60 points the stage once blurred its ground by on
+// GPU, on a window of 1100 by 680.
+const artBlur = 5
+
+// blur blurs img as a Gaussian of sigma pixels, its edges extended so that
+// its rim doesn't fade to transparent.
+func blur(img image.Image, sigma float64) *image.RGBA {
+	b := img.Bounds()
+	w, h := b.Dx(), b.Dy()
+	out := image.NewRGBA(image.Rect(0, 0, w, h))
+	draw.Draw(out, out.Bounds(), img, b.Min, draw.Src)
+	r := int(math.Ceil(3 * sigma))
+	k := make([]float64, 2*r+1)
+	var sum float64
+	for i := range k {
+		x := float64(i - r)
+		k[i] = math.Exp(-x * x / (2 * sigma * sigma))
+		sum += k[i]
+	}
+	for i := range k {
+		k[i] /= sum
+	}
+	// Across, into rows, then down, back into out; the pixels stay
+	// premultiplied, as a blur must take them.
+	rows := make([]float64, w*h*4)
+	for y := range h {
+		for x := range w {
+			for ch := range 4 {
+				var v float64
+				for i, kv := range k {
+					v += kv * float64(out.Pix[y*out.Stride+min(max(x+i-r, 0), w-1)*4+ch])
+				}
+				rows[(y*w+x)*4+ch] = v
+			}
+		}
+	}
+	for y := range h {
+		for x := range w {
+			for ch := range 4 {
+				var v float64
+				for i, kv := range k {
+					v += kv * rows[(min(max(y+i-r, 0), h-1)*w+x)*4+ch]
+				}
+				out.Pix[y*out.Stride+x*4+ch] = uint8(math.Round(v))
+			}
+		}
+	}
+	return out
 }
 
 // scaleDown scales img so that its longer side is at most px.

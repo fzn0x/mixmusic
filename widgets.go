@@ -518,7 +518,7 @@ func (s *shell) cover(c *ui.Context, key string, images []media.Image, size floa
 	frame := ui.Box(c.Key(key)).Size(size, size).Radius(r).Shrink(0).Clip()
 	var b *ui.Bitmap
 	if s.inView(c, frame) {
-		b = s.art.get(c, artworkURL(images, int(size*s.zoomOf())), s.artPixels(size))
+		b = s.art.get(c, s.artAt(images, size), s.artPixels(size))
 	}
 	if b == nil {
 		frame.Background(k.surface3)
@@ -593,7 +593,31 @@ func (s *shell) moved(c *ui.Context, key string, at float32) {
 
 // artPixels is how many pixels artwork of size DIPs takes, at the scale of
 // most displays and the window's zoom.
-func (s *shell) artPixels(size float32) int { return int(size * 1.5 * s.zoomOf()) }
+func (s *shell) artPixels(size float32) int { return int(size * s.pixelsOf()) }
+
+// artAt is the address of the image of images to show size DIPs across,
+// at the window's pixels.
+func (s *shell) artAt(images []media.Image, size float32) string {
+	return artworkURL(images, int(size*s.pixelsOf()))
+}
+
+// pixelsOf is how many device pixels a DIP of the window is: a Retina
+// display's 2 times the zoom. Before a frame painted, 1.5 times the zoom.
+func (s *shell) pixelsOf() float32 {
+	if s.pixelScale <= 0 {
+		return 1.5 * s.zoomOf()
+	}
+	return s.pixelScale
+}
+
+// notePixels keeps the device pixels of a DIP the window paints at, for
+// the sizes of its artwork, and builds again when they change, as the
+// window moves to a display of another scale.
+func (s *shell) notePixels(p *ui.Painter, _ ui.Rect) {
+	if sc := p.Scale(); sc != s.pixelScale {
+		s.update(func() { s.pixelScale = sc })
+	}
+}
 
 // zoomOf is the zoom the window shows, 1 before its first frame.
 func (s *shell) zoomOf() float32 {

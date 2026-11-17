@@ -237,12 +237,13 @@ func videoShell(t *testing.T, track media.Track) (*shell, *ui.Tester, *fakePage,
 	})
 	t.Cleanup(s.video.link.close)
 	src := &app.VideoSource{Src: "stream://localhost/video/x?itag=243", MimeType: `video/webm; codecs="vp9"`, Width: 640, Height: 360, Init: 220}
-	w, h := videoShape(videoAspect(track.Artwork, nil), videoFrame)
-	s.loads["video:"+track.ID+":"+itoa(s.artPixels(w))+"x"+itoa(s.artPixels(h))] = &loaded[app.VideoSource]{done: true, value: *src}
 	s.loads["related-"+track.ID] = &loaded[[]media.Shelf]{done: true}
 	s.p.PlayTracks([]media.Track{track}, 0)
 	s.settle(t, func(st player.State) bool { return st.Playing && st.Source != nil })
 	tt := testerOf(t, s, 1600, 1000)
+	s.drain() // the frame's pixels, which the video's size counts in
+	w, h := videoShape(videoAspect(track.Artwork, nil), videoFrame)
+	s.loads["video:"+track.ID+":"+itoa(s.artPixels(w))+"x"+itoa(s.artPixels(h))] = &loaded[app.VideoSource]{done: true, value: *src}
 	show(s, tt, "/now-playing")
 	return s, tt, page, src
 }

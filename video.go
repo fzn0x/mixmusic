@@ -446,7 +446,7 @@ func (s *shell) videoCover(c *ui.Context, images []media.Image, w, h float32) {
 	frame := ui.Box(c.Key("sleeve")).Size(w, h).Shrink(0)
 	var b *ui.Bitmap
 	if s.inView(c, frame) {
-		b = s.art.get(c, artworkURL(images, int(w*s.zoomOf())), s.artPixels(w))
+		b = s.art.get(c, s.artAt(images, w), s.artPixels(w))
 	}
 	if b == nil {
 		frame.Background(s.lk.surface3)

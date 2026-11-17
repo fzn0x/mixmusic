@@ -257,7 +257,7 @@ func (g *gifCover) next() {
 func (s *shell) movingCover(c *ui.Context, key string, images []media.Image, size float32, playing bool, label string) {
 	var g *gifCover
 	if s.movingOn(c) {
-		g = s.gifOf(artworkURL(images, int(size*s.zoomOf())))
+		g = s.gifOf(s.artAt(images, size))
 	}
 	if g == nil {
 		s.cover(c, key, images, size, false)

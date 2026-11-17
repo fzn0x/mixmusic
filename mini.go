@@ -86,7 +86,7 @@ func (s *shell) miniView(c *ui.Context) {
 	_, ok := s.st.Current()
 	// A click in it leaves the focus where it was: the mini player runs no
 	// shortcuts (#38), and Space would press the button clicked last again.
-	root := ui.Column(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body).DragWindow().KeepFocus()
+	root := ui.Column(c).Fill().Background(k.bg).TextColor(k.text).Font(k.body).DragWindow().KeepFocus().DrawOver(s.notePixels)
 	// The panel above the player comes after it, for Tab, as below it.
 	if !s.mini.below {
 		root.Reverse()
@@ -126,7 +126,7 @@ func (s *shell) miniArtwork(c *ui.Context, side, h float32) {
 	art := ui.Box(c.Key("mini-art")).Size(side, h).Shrink(0).Clip()
 	var b *ui.Bitmap
 	if cur, ok := s.st.Current(); ok {
-		b = s.art.get(c, artworkURL(cur.Track.Artwork, int(miniArt*s.zoomOf())), s.artPixels(miniArt))
+		b = s.art.get(c, s.artAt(cur.Track.Artwork, miniArt), s.artPixels(miniArt))
 	}
 	if b == nil {
 		art.Background(s.lk.surface3)

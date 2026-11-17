@@ -127,6 +127,11 @@ type Stream struct {
 	// Music account (Resolver.SetAsAccount), and false for one asked for
 	// signed out, as every stream was before.
 	AsAccount bool
+	// pastMark is set for a stream found signed out only because YouTube
+	// refused the stream of the video found as the account a while ago,
+	// which the account is asked for otherwise: it goes as the marks do
+	// (ForgetRefusals).
+	pastMark bool
 	// Route is how the stream was found, and Args, of a run of yt-dlp, the
 	// arguments it ran with: they may name the user's folders and the file
 	// of their session, so what shows them hides those (ShownArgs).
@@ -386,17 +391,28 @@ func (r *Resolver) Forget(videoID string) {
 	}
 }
 
-// resolve finds the stream of a video through the direct route, when the
-// resolver has it, else with yt-dlp, quickly first (findWithYTDLP); as
-// the user's account first, while they ask for that (accountStream), and
-// once more after YouTube's sign-in wall, for a video whose stream found
-// so it refused (againAsAccount). The log tells when it took a while, and
-// why and how yt-dlp found it, never the stream's URL, which carries the
-// user's IP address.
+// resolve finds the stream of a video as the user's account first, while
+// they ask for that (accountStream), else the signed-out ways
+// (signedOutWays). A stream those find only because a refusal mark sent
+// the video past the account is told so (pastMark).
 func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality) (Stream, error) {
-	if s, ok := r.accountStream(ctx, videoID, quality, false); ok {
+	s, ok, pastMark := r.accountStream(ctx, videoID, quality, false)
+	if ok {
 		return s, nil
 	}
+	s, err := r.signedOutWays(ctx, videoID, quality)
+	// Not one found as the account once more (againAsAccount).
+	s.pastMark = pastMark && err == nil && !s.AsAccount
+	return s, err
+}
+
+// signedOutWays finds the stream of a video through the direct route, when
+// the resolver has it, else with yt-dlp, quickly first (findWithYTDLP),
+// and as the user's account once more after YouTube's sign-in wall, for a
+// video whose stream found so it refused (againAsAccount). The log tells
+// when it took a while, and why and how yt-dlp found it, never the
+// stream's URL, which carries the user's IP address.
+func (r *Resolver) signedOutWays(ctx context.Context, videoID string, quality Quality) (Stream, error) {
 	start := time.Now()
 	var direct error
 	if r.Direct != nil {

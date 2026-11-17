@@ -81,7 +81,11 @@
   signed out for `refusalMark`, 10 minutes (`refusedAsAccount`, #578).
   `SetAsAccount` clears the marks, and so does `ForgetRefusals`, which
   the app calls as it signs in (`youtubeSignIn`) and as it switches
-  Google account or channel (`useYouTubeAccount`), at once. Another
+  Google account or channel (`useYouTubeAccount`), at once. It also drops
+  the streams kept in `calls` that the signed-out ways found only because
+  a mark sent their video past the account (`Stream.pastMark`), so the
+  next play asks as the account; every other stream kept stays, and a
+  mark that ends after `refusalMark` drops none. Another
   session, told by a hash of its LOGIN_INFO and SAPISID cookies
   (`sessionKey`, `marked`), clears them too as the next video is asked
   for, the backstop for the changes the app doesn't call it for: the app

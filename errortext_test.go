@@ -44,16 +44,21 @@ func TestErrorText(t *testing.T) {
 		tagwrite.ErrUnsupported, tagwrite.ErrFormat, tagwrite.ErrReadOnly, tagwrite.ErrFolderReadOnly, tagwrite.ErrCover,
 		addons.ErrBuiltin,
 	} {
-		if got := errorText(fmt.Errorf("doing it: %w", err)); !strings.HasPrefix(got, "[") {
+		if got := errorText(err); !strings.HasPrefix(got, "[") {
 			t.Errorf("%v says %q, which no catalog translates", err, got)
 		}
 	}
 	for _, reason := range []string{stream.ReasonBot, stream.ReasonThrottled, stream.ReasonAdults, stream.ReasonSignedIn,
 		stream.ReasonCountry, stream.ReasonPrivate, stream.ReasonMembers, stream.ReasonPremium, stream.ReasonNoFormat,
-		stream.ReasonGone, stream.ReasonRefused, stream.ReasonStalled, stream.ReasonUnreachable} {
+		stream.ReasonGone, stream.ReasonRefused, stream.ReasonStalled} {
 		if got, ok := streamReasonText(reason); !ok || !strings.HasPrefix(got, "[") {
 			t.Errorf("the reason %q says %q", reason, got)
 		}
+	}
+	// The words around an error the windows know stay, as they are.
+	wrapped := fmt.Errorf("MixMusic can't change memo.wav: %w", tagwrite.ErrUnsupported)
+	if got, want := errorText(wrapped), "MixMusic can't change memo.wav: "+locales.ErrorTagsUnsupported(); got != want {
+		t.Errorf("a wrapped error says %q, want %q", got, want)
 	}
 	if got := errorText(errors.New("spotify: HTTP 502")); got != "spotify: HTTP 502" {
 		t.Errorf("an error of no message says %q, not its own words", got)
@@ -69,7 +74,7 @@ func TestErrorText(t *testing.T) {
 type ytdlpMissingPlayer struct{ testPlayer }
 
 func (ytdlpMissingPlayer) Prepare(context.Context, media.Track) (player.Source, error) {
-	return player.Source{}, fmt.Errorf("resolving: %w", tools.ErrNoYTDLP)
+	return player.Source{}, tools.ErrNoYTDLP
 }
 
 // TestPseudoLocalePlaybackError shows the toast of a track that couldn't

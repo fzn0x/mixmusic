@@ -392,7 +392,8 @@ Every word of the interface is a message of
 request that adds or changes a text adds or changes its English message
 alone, and runs `bunx mygo generate`; translators fill in the other
 languages. A message a language lacks shows in English:
-`go run ./tools/translations` lists them, and the release workflow says
+`go run ./tools/translations` lists them, for the languages of
+`locales/more` too, and the release workflow says
 them in its warnings. Keys start with their feature, as `accountSettingsSignOut`, and
 stay in sorted order. A sentence is one message, with named placeholders
 for what goes in it, as `Couldn't invite collaborators to {title}: {error}`,

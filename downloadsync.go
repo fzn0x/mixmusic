@@ -58,11 +58,11 @@ func (s *shell) syncDownload(d *downloadHead) {
 		return
 	}
 	if size, big := s.downloadSize(added); big {
-		s.notes = append(s.notes, notice(locales.DownloadSyncWaiting(len(added), d.c.Title, byteSize(size))))
+		s.notes = append(s.notes, notice(locales.DownloadSyncWaiting(len(added), collectionTitle(d.c), byteSize(size))))
 		return
 	}
 	if n := s.svc.Downloads.SyncCollection(d.c, tracks); n > 0 {
-		s.notes = append(s.notes, notice(locales.DownloadSyncStarted(n, d.c.Title)))
+		s.notes = append(s.notes, notice(locales.DownloadSyncStarted(n, collectionTitle(d.c))))
 	}
 }
 

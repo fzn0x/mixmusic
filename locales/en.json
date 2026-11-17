@@ -1593,6 +1593,10 @@
       }
     }
   },
+  "downloadsLikedSongs": "Liked songs",
+  "@downloadsLikedSongs": {
+    "description": "The title of the download of the liked songs, on the downloads page and in its notices."
+  },
   "downloadsMarkDone": "Downloaded",
   "@downloadsMarkDone": {
     "description": "Mark on a track's row and its tooltip."

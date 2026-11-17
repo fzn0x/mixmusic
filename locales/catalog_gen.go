@@ -5921,6 +5921,22 @@ func (msgs Messages) DownloadsFolderLine(count int, size string, folder string) 
 	return Catalog.Format(msgs.locale, "downloadsFolderLine", map[string]any{"count": count, "size": size, "folder": folder})
 }
 
+// DownloadsLikedSongs says "Liked songs"
+// in the language the app shows.
+//
+// The title of the download of the liked songs, on the downloads page and
+// in its notices.
+func DownloadsLikedSongs() string { return In(i18n.Locale()).DownloadsLikedSongs() }
+
+// DownloadsLikedSongs says "Liked songs"
+// in the language of msgs.
+//
+// The title of the download of the liked songs, on the downloads page and
+// in its notices.
+func (msgs Messages) DownloadsLikedSongs() string {
+	return Catalog.Format(msgs.locale, "downloadsLikedSongs", nil)
+}
+
 // DownloadsMarkDone says "Downloaded"
 // in the language the app shows.
 //

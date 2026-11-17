@@ -334,7 +334,8 @@ func (s *shell) videoTrack() (media.Track, bool) {
 
 // sleeve is the now playing page's sleeve, size wide: the cover, which
 // moves while it plays when it's a GIF that moves (movingcover.go), with
-// the visualizer over its foot, the clip of its album that loops
+// the visualizer over its foot (not while the system asks for less
+// motion), the clip of its album that loops
 // (movingclip.go), or the picture of the music video that plays.
 func (s *shell) sleeve(c *ui.Context, t media.Track, size float32) {
 	if rec, ok := s.videoTrack(); ok {
@@ -346,7 +347,7 @@ func (s *shell) sleeve(c *ui.Context, t media.Track, size float32) {
 	}
 	ui.Box(c).Size(size, size).Shrink(0).Children(func() {
 		s.movingCover(c, "sleeve", t.Artwork, size, s.st.Playing && !s.st.Buffering, locales.CollectionMovingCover(t.Title))
-		if s.st.Playing {
+		if s.st.Playing && !c.Preferences().ReduceMotion {
 			s.visualizer(c, size)
 		}
 	})

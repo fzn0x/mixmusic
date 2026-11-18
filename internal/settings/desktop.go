@@ -103,6 +103,18 @@ type Desktop struct {
 	// MacBook's screen, and opens a player there (#46). It is on at
 	// first, and does nothing on other screens and systems.
 	NotchPlayer bool `json:"notchPlayer"`
+	// BackupEvery is how often MixMusic backs itself up (#592):
+	// BackupOff, as at first, BackupDaily, BackupWeekly, BackupMonthly or
+	// BackupAtQuit.
+	BackupEvery string `json:"backupEvery"`
+	// BackupFolder is the folder the automatic backups go to, an absolute
+	// path: "" is "MixMusic backups" in the Documents folder, but in the
+	// Flatpak, which asks for one.
+	BackupFolder string `json:"backupFolder"`
+	// BackupKeep is how many automatic backups the folder keeps: one of
+	// BackupKeeps, 5 at first, all of them for 0, and one file written
+	// over for 1.
+	BackupKeep int `json:"backupKeep"`
 }
 
 // defaultDesktop is how a new install fits in the desktop.
@@ -116,6 +128,7 @@ func defaultDesktop() Desktop {
 	d.DiscordFirstLine, d.DiscordSecondLine = DefaultDiscordFirstLine, DefaultDiscordSecondLine
 	d.DiscordCover, d.DiscordTimeLeft = true, true
 	d.NotchPlayer = true
+	d.BackupKeep = 5
 	return d
 }
 
@@ -132,6 +145,7 @@ func (d Desktop) clean() Desktop {
 		d.DiscordAppID = ""
 	}
 	d.DiscordFirstLine, d.DiscordSecondLine = cleanDiscordLine(d.DiscordFirstLine), cleanDiscordLine(d.DiscordSecondLine)
+	d.BackupEvery, d.BackupFolder, d.BackupKeep = cleanBackups(d.BackupEvery, d.BackupFolder, d.BackupKeep)
 	return d
 }
 

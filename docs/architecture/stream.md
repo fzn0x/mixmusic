@@ -101,6 +101,16 @@
   channel's members only, YouTube Music Premium's members only, never
   the check of bots) is asked for as the account once more, once a
   resolve (`againAsAccount`), never with data saver.
+  A resolve that fails tells how asking as the account went
+  (`needsaccount.go`, #577): `accountSession` says why it didn't ask
+  (the switch off, no session, and why, as `Resolver.NoSession` tells,
+  data saver, no runtime, a mark), or the run's error does. With the
+  switch on, or at a sign-in wall, the error is an `accountFailure`,
+  whose `Steps` start with "as your account", and whose words, at a
+  wall, say what to change, or that the account was asked too
+  (`Account`, which the app says in the language). One that names
+  something to change is an `ErrNeedsAccount`, whose toast offers the
+  playback settings (`Player.SetSettingsErrors`).
   `Stream.AsAccount` tells which way a
   stream was found. `Stream.Route` tells which route found it, and
   `Stream.Args` the arguments of the run of yt-dlp that did (#475): Track

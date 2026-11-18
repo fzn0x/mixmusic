@@ -10794,6 +10794,732 @@ func (msgs Messages) EqualizerExported(count int, file string) string {
 	return Catalog.Format(msgs.locale, "equalizerExported", map[string]any{"count": count, "file": file})
 }
 
+// EqualizerHeadphones says "Headphones"
+// in the language the app shows.
+//
+// The title of the row in Settings › Playback › Equalizer that corrects
+// the sound of the user's headphones with a profile of AutoEq's, an open
+// project that measures headphones, or a ParametricEQ.txt file; also the
+// title of the dialog that lists AutoEq's profiles, and the name of the
+// button that opens it, to assistive technology.
+func EqualizerHeadphones() string { return In(i18n.Locale()).EqualizerHeadphones() }
+
+// EqualizerHeadphones says "Headphones"
+// in the language of msgs.
+//
+// The title of the row in Settings › Playback › Equalizer that corrects
+// the sound of the user's headphones with a profile of AutoEq's, an open
+// project that measures headphones, or a ParametricEQ.txt file; also the
+// title of the dialog that lists AutoEq's profiles, and the name of the
+// button that opens it, to assistive technology.
+func (msgs Messages) EqualizerHeadphones() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphones", nil)
+}
+
+// EqualizerHeadphonesAutoEq says "AutoEq"
+// in the language the app shows.
+//
+// The name of the project AutoEq, in equalizerHeadphonesCredit, linked to
+// its page on GitHub: it stays as it is.
+func EqualizerHeadphonesAutoEq() string { return In(i18n.Locale()).EqualizerHeadphonesAutoEq() }
+
+// EqualizerHeadphonesAutoEq says "AutoEq"
+// in the language of msgs.
+//
+// The name of the project AutoEq, in equalizerHeadphonesCredit, linked to
+// its page on GitHub: it stays as it is.
+func (msgs Messages) EqualizerHeadphonesAutoEq() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesAutoEq", nil)
+}
+
+// EqualizerHeadphonesBy says "by {source}"
+// in the language the app shows.
+//
+// In the dialog of Headphones (equalizerHeadphones), on the row of a
+// profile, after the model's name: who measured the headphones, a person's
+// or a site's name, as "oratory1990".
+func EqualizerHeadphonesBy(source string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesBy(source)
+}
+
+// EqualizerHeadphonesBy says "by {source}"
+// in the language of msgs.
+//
+// In the dialog of Headphones (equalizerHeadphones), on the row of a
+// profile, after the model's name: who measured the headphones, a person's
+// or a site's name, as "oratory1990".
+func (msgs Messages) EqualizerHeadphonesBy(source string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesBy", map[string]any{"source": source})
+}
+
+// EqualizerHeadphonesByOn says "by {source} on {rig}"
+// in the language the app shows.
+//
+// In the dialog of Headphones (equalizerHeadphones), on the row of a
+// profile whose source names its rig: who measured the headphones, as
+// "crinacle", and on what measuring rig, as "GRAS 43AG-7".
+func EqualizerHeadphonesByOn(source string, rig string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesByOn(source, rig)
+}
+
+// EqualizerHeadphonesByOn says "by {source} on {rig}"
+// in the language of msgs.
+//
+// In the dialog of Headphones (equalizerHeadphones), on the row of a
+// profile whose source names its rig: who measured the headphones, as
+// "crinacle", and on what measuring rig, as "GRAS 43AG-7".
+func (msgs Messages) EqualizerHeadphonesByOn(source string, rig string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesByOn", map[string]any{"source": source, "rig": rig})
+}
+
+// EqualizerHeadphonesClose says "Close"
+// in the language the app shows.
+//
+// The button that closes the dialog of Headphones (equalizerHeadphones).
+func EqualizerHeadphonesClose() string { return In(i18n.Locale()).EqualizerHeadphonesClose() }
+
+// EqualizerHeadphonesClose says "Close"
+// in the language of msgs.
+//
+// The button that closes the dialog of Headphones (equalizerHeadphones).
+func (msgs Messages) EqualizerHeadphonesClose() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesClose", nil)
+}
+
+// EqualizerHeadphonesCredit says "Profiles from {autoeq} by Jaakko Pasanen, under the MIT license, each made from the measurements of the source it nam…"
+// in the language the app shows.
+//
+// At the foot of the dialog of Headphones (equalizerHeadphones), crediting
+// AutoEq. {autoeq} is equalizerHeadphonesAutoEq, a link to AutoEq's page on
+// GitHub. Jaakko Pasanen is a person's name.
+func EqualizerHeadphonesCredit(autoeq string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesCredit(autoeq)
+}
+
+// EqualizerHeadphonesCredit says "Profiles from {autoeq} by Jaakko Pasanen, under the MIT license, each made from the measurements of the source it nam…"
+// in the language of msgs.
+//
+// At the foot of the dialog of Headphones (equalizerHeadphones), crediting
+// AutoEq. {autoeq} is equalizerHeadphonesAutoEq, a link to AutoEq's page on
+// GitHub. Jaakko Pasanen is a person's name.
+func (msgs Messages) EqualizerHeadphonesCredit(autoeq string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesCredit", map[string]any{"autoeq": autoeq})
+}
+
+// EqualizerHeadphonesDesc says "Correct the sound of your headphones with AutoEq's profile of your model, or a ParametricEQ.txt file. It plays after …"
+// in the language the app shows.
+//
+// Under Headphones (equalizerHeadphones), in Settings › Playback ›
+// Equalizer, while no correction plays. AutoEq is a project's name, and
+// ParametricEQ.txt a file's: they stay as they are.
+func EqualizerHeadphonesDesc() string { return In(i18n.Locale()).EqualizerHeadphonesDesc() }
+
+// EqualizerHeadphonesDesc says "Correct the sound of your headphones with AutoEq's profile of your model, or a ParametricEQ.txt file. It plays after …"
+// in the language of msgs.
+//
+// Under Headphones (equalizerHeadphones), in Settings › Playback ›
+// Equalizer, while no correction plays. AutoEq is a project's name, and
+// ParametricEQ.txt a file's: they stay as they are.
+func (msgs Messages) EqualizerHeadphonesDesc() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesDesc", nil)
+}
+
+// EqualizerHeadphonesEmptyList says "the list GitHub gave holds no headphones"
+// in the language the app shows.
+//
+// Why AutoEq's list couldn't be read, in the {error} of
+// equalizerHeadphonesListFailed or equalizerHeadphonesOffline: what GitHub
+// gave isn't the list. A lowercase fragment.
+func EqualizerHeadphonesEmptyList() string { return In(i18n.Locale()).EqualizerHeadphonesEmptyList() }
+
+// EqualizerHeadphonesEmptyList says "the list GitHub gave holds no headphones"
+// in the language of msgs.
+//
+// Why AutoEq's list couldn't be read, in the {error} of
+// equalizerHeadphonesListFailed or equalizerHeadphonesOffline: what GitHub
+// gave isn't the list. A lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesEmptyList() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesEmptyList", nil)
+}
+
+// EqualizerHeadphonesFile says "The file {name} corrects the sound after the bands."
+// in the language the app shows.
+//
+// Under Headphones (equalizerHeadphones), while the correction of a
+// ParametricEQ.txt file the user imported plays. {name} is the file's name,
+// without its extension.
+func EqualizerHeadphonesFile(name string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesFile(name)
+}
+
+// EqualizerHeadphonesFile says "The file {name} corrects the sound after the bands."
+// in the language of msgs.
+//
+// Under Headphones (equalizerHeadphones), while the correction of a
+// ParametricEQ.txt file the user imported plays. {name} is the file's name,
+// without its extension.
+func (msgs Messages) EqualizerHeadphonesFile(name string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesFile", map[string]any{"name": name})
+}
+
+// EqualizerHeadphonesFilter says "ParametricEQ.txt files"
+// in the language the app shows.
+//
+// The name of the kind of file the system's dialog of Import file…
+// (equalizerHeadphonesImport) shows: text files in Equalizer APO's format,
+// as AutoEq writes them.
+func EqualizerHeadphonesFilter() string { return In(i18n.Locale()).EqualizerHeadphonesFilter() }
+
+// EqualizerHeadphonesFilter says "ParametricEQ.txt files"
+// in the language of msgs.
+//
+// The name of the kind of file the system's dialog of Import file…
+// (equalizerHeadphonesImport) shows: text files in Equalizer APO's format,
+// as AutoEq writes them.
+func (msgs Messages) EqualizerHeadphonesFilter() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesFilter", nil)
+}
+
+// EqualizerHeadphonesFound says "{count, plural, one {# profile} other {# profiles}}"
+// in the language the app shows.
+//
+// In the dialog of Headphones (equalizerHeadphones), above the list: how
+// many of AutoEq's profiles it shows, all of them or those the search
+// finds.
+func EqualizerHeadphonesFound(count int) string {
+	return In(i18n.Locale()).EqualizerHeadphonesFound(count)
+}
+
+// EqualizerHeadphonesFound says "{count, plural, one {# profile} other {# profiles}}"
+// in the language of msgs.
+//
+// In the dialog of Headphones (equalizerHeadphones), above the list: how
+// many of AutoEq's profiles it shows, all of them or those the search
+// finds.
+func (msgs Messages) EqualizerHeadphonesFound(count int) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesFound", map[string]any{"count": count})
+}
+
+// EqualizerHeadphonesGetting says "Downloading…"
+// in the language the app shows.
+//
+// In the dialog of Headphones (equalizerHeadphones), on the row of the
+// profile the user picked, while it downloads.
+func EqualizerHeadphonesGetting() string { return In(i18n.Locale()).EqualizerHeadphonesGetting() }
+
+// EqualizerHeadphonesGetting says "Downloading…"
+// in the language of msgs.
+//
+// In the dialog of Headphones (equalizerHeadphones), on the row of the
+// profile the user picked, while it downloads.
+func (msgs Messages) EqualizerHeadphonesGetting() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesGetting", nil)
+}
+
+// EqualizerHeadphonesGone says "AutoEq doesn't have this profile any more"
+// in the language the app shows.
+//
+// Why a profile of AutoEq's couldn't be downloaded, in the {error} of
+// equalizerHeadphonesPickFailed or equalizerHeadphonesListFailed: GitHub
+// answered that the file isn't there. A lowercase fragment.
+func EqualizerHeadphonesGone() string { return In(i18n.Locale()).EqualizerHeadphonesGone() }
+
+// EqualizerHeadphonesGone says "AutoEq doesn't have this profile any more"
+// in the language of msgs.
+//
+// Why a profile of AutoEq's couldn't be downloaded, in the {error} of
+// equalizerHeadphonesPickFailed or equalizerHeadphonesListFailed: GitHub
+// answered that the file isn't there. A lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesGone() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesGone", nil)
+}
+
+// EqualizerHeadphonesImport says "Import file…"
+// in the language the app shows.
+//
+// A link under Headphones (equalizerHeadphones): it opens the system's
+// dialog to choose a ParametricEQ.txt file, which then corrects the sound.
+func EqualizerHeadphonesImport() string { return In(i18n.Locale()).EqualizerHeadphonesImport() }
+
+// EqualizerHeadphonesImport says "Import file…"
+// in the language of msgs.
+//
+// A link under Headphones (equalizerHeadphones): it opens the system's
+// dialog to choose a ParametricEQ.txt file, which then corrects the sound.
+func (msgs Messages) EqualizerHeadphonesImport() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesImport", nil)
+}
+
+// EqualizerHeadphonesImportFailed says "Couldn't import the file: {error}. The correction stays as it was."
+// in the language the app shows.
+//
+// A toast, when the file of Import file… (equalizerHeadphonesImport)
+// couldn't be read. {error} says why, as a lowercase fragment: one of the
+// equalizerHeadphonesLine… messages, or one from the system.
+func EqualizerHeadphonesImportFailed(error string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesImportFailed(error)
+}
+
+// EqualizerHeadphonesImportFailed says "Couldn't import the file: {error}. The correction stays as it was."
+// in the language of msgs.
+//
+// A toast, when the file of Import file… (equalizerHeadphonesImport)
+// couldn't be read. {error} says why, as a lowercase fragment: one of the
+// equalizerHeadphonesLine… messages, or one from the system.
+func (msgs Messages) EqualizerHeadphonesImportFailed(error string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesImportFailed", map[string]any{"error": error})
+}
+
+// EqualizerHeadphonesImportTitle says "Import a ParametricEQ.txt file"
+// in the language the app shows.
+//
+// The title of the system's dialog that Import file…
+// (equalizerHeadphonesImport) opens. ParametricEQ.txt is a file's name: it
+// stays as it is.
+func EqualizerHeadphonesImportTitle() string {
+	return In(i18n.Locale()).EqualizerHeadphonesImportTitle()
+}
+
+// EqualizerHeadphonesImportTitle says "Import a ParametricEQ.txt file"
+// in the language of msgs.
+//
+// The title of the system's dialog that Import file…
+// (equalizerHeadphonesImport) opens. ParametricEQ.txt is a file's name: it
+// stays as it is.
+func (msgs Messages) EqualizerHeadphonesImportTitle() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesImportTitle", nil)
+}
+
+// EqualizerHeadphonesLineBandwidth says "line {line} gives a filter's width in octaves, and MixMusic reads it as a Q"
+// in the language the app shows.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter gives its bandwidth, BW Oct, where MixMusic reads only its Q. A
+// lowercase fragment.
+func EqualizerHeadphonesLineBandwidth(line int) string {
+	return In(i18n.Locale()).EqualizerHeadphonesLineBandwidth(line)
+}
+
+// EqualizerHeadphonesLineBandwidth says "line {line} gives a filter's width in octaves, and MixMusic reads it as a Q"
+// in the language of msgs.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter gives its bandwidth, BW Oct, where MixMusic reads only its Q. A
+// lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesLineBandwidth(line int) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesLineBandwidth", map[string]any{"line": line})
+}
+
+// EqualizerHeadphonesLineLeft says "line {line} has “{text}” after its filter, which MixMusic doesn't read"
+// in the language the app shows.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter's line goes on past what MixMusic reads. {text} is that part of
+// the line, as it is. A lowercase fragment.
+func EqualizerHeadphonesLineLeft(line int, text string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesLineLeft(line, text)
+}
+
+// EqualizerHeadphonesLineLeft says "line {line} has “{text}” after its filter, which MixMusic doesn't read"
+// in the language of msgs.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter's line goes on past what MixMusic reads. {text} is that part of
+// the line, as it is. A lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesLineLeft(line int, text string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesLineLeft", map[string]any{"line": line, "text": text})
+}
+
+// EqualizerHeadphonesLineMissing says "the filter on line {line} has no {parameter}"
+// in the language the app shows.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter lacks one of its parameters. {parameter} is Fc, its frequency,
+// Gain or Q, as the file names them, which stay as they are. A lowercase
+// fragment.
+func EqualizerHeadphonesLineMissing(line int, parameter string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesLineMissing(line, parameter)
+}
+
+// EqualizerHeadphonesLineMissing says "the filter on line {line} has no {parameter}"
+// in the language of msgs.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter lacks one of its parameters. {parameter} is Fc, its frequency,
+// Gain or Q, as the file names them, which stay as they are. A lowercase
+// fragment.
+func (msgs Messages) EqualizerHeadphonesLineMissing(line int, parameter string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesLineMissing", map[string]any{"line": line, "parameter": parameter})
+}
+
+// EqualizerHeadphonesLineNot says "line {line} is neither a preamp nor a filter"
+// in the language the app shows.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: the
+// line of that number is something else, as Equalizer APO's Channel:. A
+// lowercase fragment.
+func EqualizerHeadphonesLineNot(line int) string {
+	return In(i18n.Locale()).EqualizerHeadphonesLineNot(line)
+}
+
+// EqualizerHeadphonesLineNot says "line {line} is neither a preamp nor a filter"
+// in the language of msgs.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: the
+// line of that number is something else, as Equalizer APO's Channel:. A
+// lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesLineNot(line int) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesLineNot", map[string]any{"line": line})
+}
+
+// EqualizerHeadphonesLineRange says "line {line} has a {parameter} that isn't a number from {from} to {to}"
+// in the language the app shows.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a value
+// isn't a number, or is out of its range. {parameter} is Preamp, Fc, Gain
+// or Q, as the file names them; {from} and {to} the range's ends, with
+// their unit, as "1 Hz" and "22000 Hz". A lowercase fragment.
+func EqualizerHeadphonesLineRange(line int, parameter string, from string, to string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesLineRange(line, parameter, from, to)
+}
+
+// EqualizerHeadphonesLineRange says "line {line} has a {parameter} that isn't a number from {from} to {to}"
+// in the language of msgs.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a value
+// isn't a number, or is out of its range. {parameter} is Preamp, Fc, Gain
+// or Q, as the file names them; {from} and {to} the range's ends, with
+// their unit, as "1 Hz" and "22000 Hz". A lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesLineRange(line int, parameter string, from string, to string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesLineRange", map[string]any{"line": line, "parameter": parameter, "from": from, "to": to})
+}
+
+// EqualizerHeadphonesLineTwice says "line {line} gives {parameter} twice"
+// in the language the app shows.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter gives one of its parameters twice. {parameter} is Fc, Gain or Q,
+// as the file names them. A lowercase fragment.
+func EqualizerHeadphonesLineTwice(line int, parameter string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesLineTwice(line, parameter)
+}
+
+// EqualizerHeadphonesLineTwice says "line {line} gives {parameter} twice"
+// in the language of msgs.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter gives one of its parameters twice. {parameter} is Fc, Gain or Q,
+// as the file names them. A lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesLineTwice(line int, parameter string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesLineTwice", map[string]any{"line": line, "parameter": parameter})
+}
+
+// EqualizerHeadphonesLineType says "line {line} has a filter of the type {type}, which MixMusic doesn't play: it plays PK, LSC, HSC, LP and HP"
+// in the language the app shows.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter of a type MixMusic doesn't play. {type} and PK, LSC, HSC, LP and
+// HP are Equalizer APO's names of the types of filters, which stay as they
+// are. A lowercase fragment.
+func EqualizerHeadphonesLineType(line int, type_ string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesLineType(line, type_)
+}
+
+// EqualizerHeadphonesLineType says "line {line} has a filter of the type {type}, which MixMusic doesn't play: it plays PK, LSC, HSC, LP and HP"
+// in the language of msgs.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
+// filter of a type MixMusic doesn't play. {type} and PK, LSC, HSC, LP and
+// HP are Equalizer APO's names of the types of filters, which stay as they
+// are. A lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesLineType(line int, type_ string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesLineType", map[string]any{"line": line, "type": type_})
+}
+
+// EqualizerHeadphonesListFailed says "AutoEq's list of headphones didn't load: {error}"
+// in the language the app shows.
+//
+// In the dialog of Headphones (equalizerHeadphones), when the list of
+// AutoEq's profiles couldn't be downloaded and none was kept from before.
+// {error} says why, as a lowercase fragment. A button,
+// equalizerHeadphonesTryAgain, follows it.
+func EqualizerHeadphonesListFailed(error string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesListFailed(error)
+}
+
+// EqualizerHeadphonesListFailed says "AutoEq's list of headphones didn't load: {error}"
+// in the language of msgs.
+//
+// In the dialog of Headphones (equalizerHeadphones), when the list of
+// AutoEq's profiles couldn't be downloaded and none was kept from before.
+// {error} says why, as a lowercase fragment. A button,
+// equalizerHeadphonesTryAgain, follows it.
+func (msgs Messages) EqualizerHeadphonesListFailed(error string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesListFailed", map[string]any{"error": error})
+}
+
+// EqualizerHeadphonesLoading says "Loading AutoEq's list of headphones…"
+// in the language the app shows.
+//
+// In the dialog of Headphones (equalizerHeadphones), while the list of
+// AutoEq's profiles downloads, the first time it opens, and once a week
+// after.
+func EqualizerHeadphonesLoading() string { return In(i18n.Locale()).EqualizerHeadphonesLoading() }
+
+// EqualizerHeadphonesLoading says "Loading AutoEq's list of headphones…"
+// in the language of msgs.
+//
+// In the dialog of Headphones (equalizerHeadphones), while the list of
+// AutoEq's profiles downloads, the first time it opens, and once a week
+// after.
+func (msgs Messages) EqualizerHeadphonesLoading() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesLoading", nil)
+}
+
+// EqualizerHeadphonesNoFilters says "the file holds no filters"
+// in the language the app shows.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed: it holds no filter that is on. A
+// lowercase fragment.
+func EqualizerHeadphonesNoFilters() string { return In(i18n.Locale()).EqualizerHeadphonesNoFilters() }
+
+// EqualizerHeadphonesNoFilters says "the file holds no filters"
+// in the language of msgs.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed: it holds no filter that is on. A
+// lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesNoFilters() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesNoFilters", nil)
+}
+
+// EqualizerHeadphonesNoMatch says "No headphones match your search."
+// in the language the app shows.
+//
+// In the dialog of Headphones (equalizerHeadphones), when no model of
+// AutoEq's list holds every word typed in the search.
+func EqualizerHeadphonesNoMatch() string { return In(i18n.Locale()).EqualizerHeadphonesNoMatch() }
+
+// EqualizerHeadphonesNoMatch says "No headphones match your search."
+// in the language of msgs.
+//
+// In the dialog of Headphones (equalizerHeadphones), when no model of
+// AutoEq's list holds every word typed in the search.
+func (msgs Messages) EqualizerHeadphonesNoMatch() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesNoMatch", nil)
+}
+
+// EqualizerHeadphonesNone says "None"
+// in the language the app shows.
+//
+// On the button of Headphones (equalizerHeadphones) while no correction
+// plays, and the first row of the dialog of AutoEq's profiles, which turns
+// the correction off.
+func EqualizerHeadphonesNone() string { return In(i18n.Locale()).EqualizerHeadphonesNone() }
+
+// EqualizerHeadphonesNone says "None"
+// in the language of msgs.
+//
+// On the button of Headphones (equalizerHeadphones) while no correction
+// plays, and the first row of the dialog of AutoEq's profiles, which turns
+// the correction off.
+func (msgs Messages) EqualizerHeadphonesNone() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesNone", nil)
+}
+
+// EqualizerHeadphonesOffline says "AutoEq's list couldn't be checked for new profiles: {error}. It shows the list kept from before, and the profiles you…"
+// in the language the app shows.
+//
+// In the dialog of Headphones (equalizerHeadphones), above the list, when
+// the list kept from before couldn't be checked again, as without the
+// network. {error} says why, as a lowercase fragment.
+func EqualizerHeadphonesOffline(error string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesOffline(error)
+}
+
+// EqualizerHeadphonesOffline says "AutoEq's list couldn't be checked for new profiles: {error}. It shows the list kept from before, and the profiles you…"
+// in the language of msgs.
+//
+// In the dialog of Headphones (equalizerHeadphones), above the list, when
+// the list kept from before couldn't be checked again, as without the
+// network. {error} says why, as a lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesOffline(error string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesOffline", map[string]any{"error": error})
+}
+
+// EqualizerHeadphonesPickFailed says "Couldn't get the profile of {name}: {error}. The correction stays as it was."
+// in the language the app shows.
+//
+// A toast, when the profile of AutoEq's the user picked couldn't be
+// downloaded or read. {name} is the model of headphones; {error} says why,
+// as a lowercase fragment.
+func EqualizerHeadphonesPickFailed(name string, error string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesPickFailed(name, error)
+}
+
+// EqualizerHeadphonesPickFailed says "Couldn't get the profile of {name}: {error}. The correction stays as it was."
+// in the language of msgs.
+//
+// A toast, when the profile of AutoEq's the user picked couldn't be
+// downloaded or read. {name} is the model of headphones; {error} says why,
+// as a lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesPickFailed(name string, error string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesPickFailed", map[string]any{"name": name, "error": error})
+}
+
+// EqualizerHeadphonesProfile says "AutoEq's profile of {name}, from {source}'s measurements, corrects the sound after the bands."
+// in the language the app shows.
+//
+// Under Headphones (equalizerHeadphones), while a profile of AutoEq's
+// plays. {name} is the model of headphones, as "Sennheiser HD 600";
+// {source} who measured it, a person's or a site's name, as "oratory1990".
+func EqualizerHeadphonesProfile(name string, source string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesProfile(name, source)
+}
+
+// EqualizerHeadphonesProfile says "AutoEq's profile of {name}, from {source}'s measurements, corrects the sound after the bands."
+// in the language of msgs.
+//
+// Under Headphones (equalizerHeadphones), while a profile of AutoEq's
+// plays. {name} is the model of headphones, as "Sennheiser HD 600";
+// {source} who measured it, a person's or a site's name, as "oratory1990".
+func (msgs Messages) EqualizerHeadphonesProfile(name string, source string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesProfile", map[string]any{"name": name, "source": source})
+}
+
+// EqualizerHeadphonesProfileRig says "AutoEq's profile of {name}, from {source}'s measurements on {rig}, corrects the sound after the bands."
+// in the language the app shows.
+//
+// Under Headphones (equalizerHeadphones), while a profile of AutoEq's plays
+// whose source names the rig it measured on. {name} is the model of
+// headphones; {source} who measured it, as "crinacle"; {rig} the measuring
+// rig's name, as "GRAS 43AG-7".
+func EqualizerHeadphonesProfileRig(name string, source string, rig string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesProfileRig(name, source, rig)
+}
+
+// EqualizerHeadphonesProfileRig says "AutoEq's profile of {name}, from {source}'s measurements on {rig}, corrects the sound after the bands."
+// in the language of msgs.
+//
+// Under Headphones (equalizerHeadphones), while a profile of AutoEq's plays
+// whose source names the rig it measured on. {name} is the model of
+// headphones; {source} who measured it, as "crinacle"; {rig} the measuring
+// rig's name, as "GRAS 43AG-7".
+func (msgs Messages) EqualizerHeadphonesProfileRig(name string, source string, rig string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesProfileRig", map[string]any{"name": name, "source": source, "rig": rig})
+}
+
+// EqualizerHeadphonesSearch says "Search headphones"
+// in the language the app shows.
+//
+// The placeholder and the name to assistive technology of the field that
+// searches AutoEq's profiles, in the dialog of Headphones
+// (equalizerHeadphones).
+func EqualizerHeadphonesSearch() string { return In(i18n.Locale()).EqualizerHeadphonesSearch() }
+
+// EqualizerHeadphonesSearch says "Search headphones"
+// in the language of msgs.
+//
+// The placeholder and the name to assistive technology of the field that
+// searches AutoEq's profiles, in the dialog of Headphones
+// (equalizerHeadphones).
+func (msgs Messages) EqualizerHeadphonesSearch() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesSearch", nil)
+}
+
+// EqualizerHeadphonesServer says "GitHub, where AutoEq keeps its profiles, answered {code}"
+// in the language the app shows.
+//
+// Why AutoEq's list or a profile couldn't be downloaded, in the {error} of
+// equalizerHeadphonesPickFailed, equalizerHeadphonesListFailed or
+// equalizerHeadphonesOffline: GitHub's server answered with an error.
+// {code} is the HTTP status, as "503 Service Unavailable". A lowercase
+// fragment.
+func EqualizerHeadphonesServer(code string) string {
+	return In(i18n.Locale()).EqualizerHeadphonesServer(code)
+}
+
+// EqualizerHeadphonesServer says "GitHub, where AutoEq keeps its profiles, answered {code}"
+// in the language of msgs.
+//
+// Why AutoEq's list or a profile couldn't be downloaded, in the {error} of
+// equalizerHeadphonesPickFailed, equalizerHeadphonesListFailed or
+// equalizerHeadphonesOffline: GitHub's server answered with an error.
+// {code} is the HTTP status, as "503 Service Unavailable". A lowercase
+// fragment.
+func (msgs Messages) EqualizerHeadphonesServer(code string) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesServer", map[string]any{"code": code})
+}
+
+// EqualizerHeadphonesTooBig says "the file is too big to be a ParametricEQ.txt"
+// in the language the app shows.
+//
+// Why a file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed: it is far bigger than a ParametricEQ.txt
+// file is. A lowercase fragment.
+func EqualizerHeadphonesTooBig() string { return In(i18n.Locale()).EqualizerHeadphonesTooBig() }
+
+// EqualizerHeadphonesTooBig says "the file is too big to be a ParametricEQ.txt"
+// in the language of msgs.
+//
+// Why a file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed: it is far bigger than a ParametricEQ.txt
+// file is. A lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesTooBig() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesTooBig", nil)
+}
+
+// EqualizerHeadphonesTooMany says "the file holds {count} filters, and MixMusic plays up to {most}"
+// in the language the app shows.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed: it holds more filters than a correction
+// has. {most} is 20. A lowercase fragment.
+func EqualizerHeadphonesTooMany(count int, most int) string {
+	return In(i18n.Locale()).EqualizerHeadphonesTooMany(count, most)
+}
+
+// EqualizerHeadphonesTooMany says "the file holds {count} filters, and MixMusic plays up to {most}"
+// in the language of msgs.
+//
+// Why a ParametricEQ.txt file didn't import, in the {error} of
+// equalizerHeadphonesImportFailed: it holds more filters than a correction
+// has. {most} is 20. A lowercase fragment.
+func (msgs Messages) EqualizerHeadphonesTooMany(count int, most int) string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesTooMany", map[string]any{"count": count, "most": most})
+}
+
+// EqualizerHeadphonesTryAgain says "Try again"
+// in the language the app shows.
+//
+// A button in the dialog of Headphones (equalizerHeadphones), after
+// equalizerHeadphonesListFailed: it downloads the list again.
+func EqualizerHeadphonesTryAgain() string { return In(i18n.Locale()).EqualizerHeadphonesTryAgain() }
+
+// EqualizerHeadphonesTryAgain says "Try again"
+// in the language of msgs.
+//
+// A button in the dialog of Headphones (equalizerHeadphones), after
+// equalizerHeadphonesListFailed: it downloads the list again.
+func (msgs Messages) EqualizerHeadphonesTryAgain() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesTryAgain", nil)
+}
+
 // EqualizerImport says "Import…"
 // in the language the app shows.
 //

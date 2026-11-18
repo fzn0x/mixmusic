@@ -22,8 +22,8 @@ as there is in an Electron app, and no web page behind the windows.
 A web view of the system (WebView2 on Windows, WebKit on macOS, WebKitGTK
 on Linux) opens only for three things, and only while it's needed:
 
-- **Spotify's player**, on Windows, when Spotify tracks play in MixMusic
-  itself. It opens at the first Spotify track that plays there.
+- **Spotify's player**, on Windows and macOS, when Spotify tracks play in
+  MixMusic itself. It opens at the first Spotify track that plays there.
 - **Google's sign-in page**, when you sign in to YouTube Music.
 - **The picture of music videos**, when "Show the video of music videos"
   is on in Settings › Playback. It closes a minute after the last picture.
@@ -110,6 +110,10 @@ talks to:
   from GitHub the first time you turn romaji on (11.7 MB); the readings of
   Chinese are built in.
 - **Last.fm**, once you connect it: what you play, to scrobble.
+- **Libre.fm**, or another server that runs GNU FM, once you connect it:
+  what you play, to scrobble, and your likes while Send likes as loves is
+  on. Its address is `libre.fm/2.0/`, and `/2.0/` after the address of
+  another server.
 - **ListenBrainz**, or a server of yours that speaks its API, once you
   connect it: what you play, to scrobble.
 - **Discord**, through the Discord app on your computer, over its local
@@ -118,7 +122,8 @@ talks to:
   speakers, DLNA renderers and FCast receivers, which MixMusic finds and
   speaks to itself, in Go.
 - **GitHub**, for new versions of MixMusic, for yt-dlp, for the community
-  marketplace, and for the kanji dictionary.
+  marketplace, for the kanji dictionary, and for AutoEq's profiles of
+  headphones, from its repository's `results` folder.
 
 To tell whether the network answers, MixMusic asks YouTube's and Spotify's
 addresses over HTTPS. [Your data and privacy](data-and-privacy.md) lists
@@ -165,6 +170,15 @@ what each of these gets.
   before. Each is signed with MixMusic's key, whose public half is built
   into the app: a file whose signature doesn't match is never installed.
   The new version runs once MixMusic restarts.
+- **When GitHub's download address fails.** MixMusic first reads the
+  update's feed at GitHub's address of the latest release's files. When
+  that fails, as when GitHub answers a 504 Gateway Timeout, it asks
+  GitHub's API for the newest release, within 20 seconds, and reads the
+  update from the release's own address instead, then downloads the files
+  it names from there. The files go over HTTPS, through the proxy MixMusic
+  uses, and the signature is checked all the same. The log says "checking
+  for updates again, at the release's address". Only installing takes this
+  way: the check for a new version already asks GitHub's API.
 - **Copies that can't replace their own files**, the `.deb`, the `.rpm`,
   the AppImage and the Flatpak, still look for new versions, and offer the
   new version's file for you to install.
@@ -178,12 +192,28 @@ Tools shows both.
 - **MixMusic's own yt-dlp** is the one you install from Settings ›
   Playback or Home. MixMusic downloads it from yt-dlp's releases on
   GitHub, checks it against the checksums the release publishes, and
-  keeps it in the `bin` folder of its data folder. On macOS it installs
+  keeps it in the `bin` folder of its data folder. A download GitHub
+  fails, with a network error, a 5xx answer or a 429, is tried again: a
+  second later, then twice as long after each failure, for up to 2
+  minutes, and the progress starts again from zero each time. Any other
+  answer, a 404 for one, fails at once. The log says after how many tries
+  it downloaded, or gave up. On macOS it installs
   yt-dlp's unpacked build, which starts in 0.2 seconds rather than 8. A
   minute after each start, and then once a day, MixMusic replaces it when
   a newer release is out.
 - **A yt-dlp of your own**, from a package manager, pip, Homebrew or
-  winget, or the one you name under Own yt-dlp, is never changed.
+  winget, or the one you name under Own yt-dlp, is never changed. When
+  there are several, MixMusic runs the one you name under Own yt-dlp
+  first, and a file that is missing there is an error, not a reason to
+  take another. Then comes one that comes with MixMusic, as in the
+  Flathub build, then its own in the `bin` folder, then one on your
+  `PATH`, then the folders below, which an app opened from the Finder, the
+  Dock or a desktop menu needs, as its `PATH` is short: `~/.deno/bin` and
+  `~/.bun/bin` everywhere; on Windows `~/scoop/shims`,
+  `%LOCALAPPDATA%\Microsoft\WinGet\Links` and `%ProgramFiles%\nodejs`; on
+  macOS and Linux `~/.local/bin`, `~/bin`, `~/.volta/bin`,
+  `/opt/homebrew/bin`, `/usr/local/bin`, `/opt/local/bin`,
+  `/home/linuxbrew/.linuxbrew/bin` and `/snap/bin`.
   MixMusic asks GitHub for the latest release at most every 6 hours, and
   when yours is older, Home and Settings › Playback say so, with the
   command that updates it when its folder tells how you installed it.

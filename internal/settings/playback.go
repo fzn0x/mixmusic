@@ -103,6 +103,9 @@ type Playback struct {
 	// an album's clip once a source of them is chosen (#569). It is off
 	// at first, as MusicVideos is.
 	MovingCovers bool `json:"movingCovers"`
+	// SleepTimer is how the sleep timer stops the music, and when it
+	// starts by itself (#594).
+	SleepTimer SleepTimer `json:"sleepTimer"`
 	// Equalizer shapes the sound of MixMusic's own player.
 	Equalizer Equalizer `json:"equalizer"`
 	// VolumeCurve is how the positions of the volume slider sound, in
@@ -123,6 +126,7 @@ func defaultPlayback() Playback {
 	p.PodcastSpeed = 1
 	p.SkipDisliked = true
 	p.SkipParts = defaultSkipParts()
+	p.SleepTimer = defaultSleepTimer()
 	p.Equalizer = defaultEqualizer()
 	p.VolumeCurve = volume.Natural
 	p.Volume = 0.8
@@ -156,6 +160,7 @@ func (p Playback) clean(d Playback) Playback {
 	p.SongSpeed = CleanSpeed(p.SongSpeed)
 	p.PodcastSpeed = CleanSpeed(p.PodcastSpeed)
 	p.SkipParts = p.SkipParts.clean()
+	p.SleepTimer = p.SleepTimer.clean()
 	p.Volume = min(max(p.Volume, 0), 1)
 	p.VolumeCurve = cleanVolumeCurve(p.VolumeCurve, d.VolumeCurve)
 	p.Equalizer = p.Equalizer.clean()

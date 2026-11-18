@@ -61,6 +61,55 @@
   "hideExplicit": false,
   "musicVideos": false,
   "movingCovers": false,
+  "sleepTimer": {
+    "fade": 30,
+    "finish": false,
+    "minutes": 30,
+    "bedtime": false,
+    "byDay": false,
+    "every": {
+      "on": true,
+      "from": "22:00",
+      "to": "06:00"
+    },
+    "days": [
+      {
+        "on": true,
+        "from": "22:00",
+        "to": "06:00"
+      },
+      {
+        "on": true,
+        "from": "22:00",
+        "to": "06:00"
+      },
+      {
+        "on": true,
+        "from": "22:00",
+        "to": "06:00"
+      },
+      {
+        "on": true,
+        "from": "22:00",
+        "to": "06:00"
+      },
+      {
+        "on": true,
+        "from": "22:00",
+        "to": "06:00"
+      },
+      {
+        "on": true,
+        "from": "22:00",
+        "to": "06:00"
+      },
+      {
+        "on": true,
+        "from": "22:00",
+        "to": "06:00"
+      }
+    ]
+  },
   "equalizer": {
     "enabled": false,
     "preset": "flat",

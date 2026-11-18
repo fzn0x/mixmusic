@@ -3234,14 +3234,14 @@ func (msgs Messages) BackupButton() string {
 	return Catalog.Format(msgs.locale, "backupButton", nil)
 }
 
-// BackupDialogIntro says "Choose what the backup holds. A restore brings back what you tick then, of what it holds."
+// BackupDialogIntro says "Choose what the backup holds. When you restore it, you choose again which of those parts come back."
 // in the language the app shows.
 //
 // The text at the top of the Back up MixMusic dialog, which ticks what a
 // backup holds.
 func BackupDialogIntro() string { return In(i18n.Locale()).BackupDialogIntro() }
 
-// BackupDialogIntro says "Choose what the backup holds. A restore brings back what you tick then, of what it holds."
+// BackupDialogIntro says "Choose what the backup holds. When you restore it, you choose again which of those parts come back."
 // in the language of msgs.
 //
 // The text at the top of the Back up MixMusic dialog, which ticks what a
@@ -4166,14 +4166,14 @@ func (msgs Messages) BackupRestoreFrom(time_ time.Time, version string, system s
 // in the language the app shows.
 //
 // The button of the Restore a backup dialog, which previews a backup before
-// it's restored that restores what's ticked and restarts MixMusic.
+// it's restored: it restores the parts ticked and restarts MixMusic.
 func BackupRestoreGo() string { return In(i18n.Locale()).BackupRestoreGo() }
 
 // BackupRestoreGo says "Restore and restart"
 // in the language of msgs.
 //
 // The button of the Restore a backup dialog, which previews a backup before
-// it's restored that restores what's ticked and restarts MixMusic.
+// it's restored: it restores the parts ticked and restarts MixMusic.
 func (msgs Messages) BackupRestoreGo() string {
 	return Catalog.Format(msgs.locale, "backupRestoreGo", nil)
 }

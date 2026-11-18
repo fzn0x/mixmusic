@@ -889,7 +889,7 @@
   "@backupButton": {
     "description": "The button of the Back up row in Settings › Desktop › Backups, which opens the Back up MixMusic dialog, which ticks what a backup holds; and that dialog's button, which asks where to save the file."
   },
-  "backupDialogIntro": "Choose what the backup holds. A restore brings back what you tick then, of what it holds.",
+  "backupDialogIntro": "Choose what the backup holds. When you restore it, you choose again which of those parts come back.",
   "@backupDialogIntro": {
     "description": "The text at the top of the Back up MixMusic dialog, which ticks what a backup holds."
   },
@@ -1224,7 +1224,7 @@
   },
   "backupRestoreGo": "Restore and restart",
   "@backupRestoreGo": {
-    "description": "The button of the Restore a backup dialog, which previews a backup before it's restored that restores what's ticked and restarts MixMusic."
+    "description": "The button of the Restore a backup dialog, which previews a backup before it's restored: it restores the parts ticked and restarts MixMusic."
   },
   "backupRestoreLibraryHolds": "{liked, plural, one {# liked song} other {# liked songs}}, {disliked, plural, one {# dislike} other {# dislikes}}, {mixes, plural, one {# mix} other {# mixes}}, {plays, plural, one {# play} other {# plays}}, {artists, plural, one {# followed artist} other {# followed artists}} and {podcasts, plural, one {# followed podcast} other {# followed podcasts}}",
   "@backupRestoreLibraryHolds": {

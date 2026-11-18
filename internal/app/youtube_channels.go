@@ -8,6 +8,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // errUnswitchable refuses a brand channel the list of the session's
@@ -51,7 +52,7 @@ func (s *Accounts) SetYouTubeChannel(ctx context.Context, ch youtube.AccountChan
 	set := s.a.settings.Get()
 	set.YouTubeChannel = ch.PageID
 	if set = set.Clean(); set.YouTubeChannel != ch.PageID || ch.AuthUser < 0 {
-		return AccountsStatus{}, errors.New("that is not a channel of the account")
+		return AccountsStatus{}, wordedLater("that is not a channel of the account", locales.AccountSettingsYouTubeNotChannel, nil)
 	}
 	var itself *youtube.AccountChannel
 	if ch.PageID != "" {
@@ -70,7 +71,9 @@ func (s *Accounts) SetYouTubeChannel(ctx context.Context, ch youtube.AccountChan
 			log.Printf("mixmusic: going back to the YouTube Music account used before: %v", err)
 		}
 		notify()
-		return AccountsStatus{}, fmt.Errorf("YouTube Music answered as the account %s, not as its channel %s: MixMusic goes on as before", me.Name, ch.Name)
+		account, channel := me.Name, ch.Name
+		return AccountsStatus{}, wordedLater(fmt.Sprintf("YouTube Music answered as the account %s, not as its channel %s: MixMusic goes on as before", account, channel),
+			func() string { return locales.AccountSettingsYouTubeAnsweredAsAccount(account, channel) }, nil)
 	default:
 		log.Print("mixmusic: YouTube Music answers with another name than the account list gives the channel chosen")
 	}

@@ -8,7 +8,6 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -381,7 +380,8 @@ func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (Accoun
 			return AccountsStatus{}, worded("YouTube Music did not accept the session: it may have ended, as when you sign out of Google. Sign in to YouTube Music again, then try again",
 				locales.AccountSettingsYouTubeSessionEnded(), err)
 		}
-		return AccountsStatus{}, fmt.Errorf("YouTube Music did not accept the sign-in: %w", err)
+		return AccountsStatus{}, wordedLater("YouTube Music did not accept the sign-in: "+err.Error(),
+			func() string { return locales.AccountSettingsYouTubeNotAccepted(ErrorText(err)) }, err)
 	}
 	// As signing out does: over the settings as they are now, which an
 	// edit of settings.json may have changed since they were read.

@@ -124,9 +124,12 @@ func (s *shell) remoteQueueRow(c *ui.Context, id, name string, t remote.Track) {
 // remoteOlder tells what the computer of v can't do from here, as its
 // MixMusic is older.
 func (s *shell) remoteOlder(c *ui.Context, v app.RemoteView) {
-	if v.CanQueue && v.CanHandOver {
+	text := locales.RemoteQueueOlder(v.Computer.Name)
+	switch {
+	case v.CanQueue && v.CanHandOver && v.CanBring && v.CanModes && v.CanOutputs:
 		return
+	case v.CanQueue && v.CanHandOver:
+		text = locales.RemoteOlderModes(v.Computer.Name)
 	}
-	ui.Text(c, locales.RemoteQueueOlder(v.Computer.Name)).
-		FontSize(s.lk.smallSize()).TextColor(s.lk.muted).MaxWidth(640)
+	ui.Text(c, text).FontSize(s.lk.smallSize()).TextColor(s.lk.muted).MaxWidth(640)
 }

@@ -57,8 +57,9 @@ func findWords(s *shell, tt *ui.Tester, text string) {
 	tt.Frame()
 }
 
-// press presses key with mods in the box, then lets the window draw.
-func press(s *shell, tt *ui.Tester, mods ui.Modifiers, key ui.Key) {
+// pressFind presses key with mods in the find box, then lets the window
+// draw.
+func pressFind(s *shell, tt *ui.Tester, mods ui.Modifiers, key ui.Key) {
 	tt.Key(mods, key)
 	s.drain()
 	tt.Frame()
@@ -140,7 +141,7 @@ func TestLyricsFindSteps(t *testing.T) {
 		key  ui.Key
 		want string
 	}{{ui.KeyDown, "3 of 4"}, {ui.KeyDown, "4 of 4"}, {ui.KeyDown, "1 of 4"}, {ui.KeyUp, "4 of 4"}, {ui.KeyUp, "3 of 4"}} {
-		press(s, tt, 0, step.key)
+		pressFind(s, tt, 0, step.key)
 		if !tt.HasText(step.want) {
 			t.Errorf("after %v, the box doesn't say %q: %q", step.key, step.want, tt.Texts())
 		}
@@ -202,7 +203,7 @@ func TestLyricsFindPlays(t *testing.T) {
 	s.svc.Catalog.SetLyricsOffset(testTracks[0], shownLyrics(s), 2*time.Second)
 	openFind(t, s, tt, locales.LyricsFind())
 	findWords(s, tt, "slow")
-	press(s, tt, 0, ui.KeyEnter)
+	pressFind(s, tt, 0, ui.KeyEnter)
 	s.settle(t, func(st player.State) bool { return st.Position == 48*time.Second })
 	tt.Frame()
 	if !lineLit(t, s, tt, "A slow light rising") {
@@ -218,7 +219,7 @@ func TestLyricsFindPlays(t *testing.T) {
 	if !tt.HasText("2 of 2") {
 		t.Fatalf("the first line found after 0:48 isn't the seventh: %q", tt.Texts())
 	}
-	press(s, tt, 0, ui.KeyEnter)
+	pressFind(s, tt, 0, ui.KeyEnter)
 	s.settle(t, func(st player.State) bool { return st.Position == 58*time.Second })
 	if s.p.State().Playing {
 		t.Error("Enter played a song paused")
@@ -228,8 +229,8 @@ func TestLyricsFindPlays(t *testing.T) {
 	pressNamed(t, s, tt, 0, locales.LyricsFind())
 	openFind(t, s, tt, locales.LyricsFind())
 	findWords(s, tt, "gulls")
-	press(s, tt, 0, ui.KeyDown)
-	press(s, tt, 0, ui.KeyEnter)
+	pressFind(s, tt, 0, ui.KeyDown)
+	pressFind(s, tt, 0, ui.KeyEnter)
 	if got := s.lyricPick.chosen(); !slices.Equal(got, []string{"Ropes and gulls"}) {
 		t.Errorf("Enter chose %q while lines are chosen to share", got)
 	}
@@ -266,7 +267,7 @@ func TestLyricsFindHoldsTheLine(t *testing.T) {
 	if !inView(tt, "The lantern by the door") {
 		t.Error("the lyrics followed the song away from the line found")
 	}
-	press(s, tt, 0, ui.KeyEscape)
+	pressFind(s, tt, 0, ui.KeyEscape)
 	tt.Advance(time.Second)
 	if s.lyricsView.panel.find.query != "" || !s.lyricsView.panel.find.open {
 		t.Fatalf("Escape left %q in the box, open %v", s.lyricsView.panel.find.query, s.lyricsView.panel.find.open)
@@ -274,7 +275,7 @@ func TestLyricsFindHoldsTheLine(t *testing.T) {
 	if inView(tt, "The lantern by the door") || !inView(tt, "Wave number 58") {
 		t.Error("the lyrics don't follow the song again once the box is empty")
 	}
-	press(s, tt, 0, ui.KeyEscape)
+	pressFind(s, tt, 0, ui.KeyEscape)
 	if s.lyricsView.panel.find.open || s.panel != "lyrics" {
 		t.Errorf("a second Escape left the box open %v, the panel %q", s.lyricsView.panel.find.open, s.panel)
 	}
@@ -303,8 +304,8 @@ func TestLyricsFindPlain(t *testing.T) {
 	if !tt.HasText("1 of 4") || groundOf(t, s, tt, "Harbour light on the water") <= groundOf(t, s, tt, "A slow light rising") {
 		t.Fatalf("plain lyrics start at the first line found: %q", tt.Texts())
 	}
-	press(s, tt, 0, ui.KeyDown)
-	press(s, tt, 0, ui.KeyEnter)
+	pressFind(s, tt, 0, ui.KeyDown)
+	pressFind(s, tt, 0, ui.KeyEnter)
 	s.drain()
 	if got := s.p.State().Position; got != 35*time.Second {
 		t.Errorf("Enter moved a song of plain lyrics to %v", got)
@@ -315,7 +316,7 @@ func TestLyricsFindPlain(t *testing.T) {
 	tt.Frame()
 	openFind(t, s, tt, locales.LyricsFind())
 	findWords(s, tt, "light")
-	press(s, tt, 0, ui.KeyEnter)
+	pressFind(s, tt, 0, ui.KeyEnter)
 	s.drain()
 	if got := s.p.State().Position; got != 35*time.Second || !tt.HasText(locales.LyricsFindPlain()) {
 		t.Errorf("Enter moved synced lyrics shown as plain text to %v: %q", got, tt.Texts())
@@ -447,7 +448,7 @@ func TestLyricsFindRightToLeft(t *testing.T) {
 	if !tt.HasText("1 of 1") {
 		t.Fatalf("\"you are my light\" without its hamza isn't found: %q", tt.Texts())
 	}
-	press(s, tt, 0, ui.KeyEnter)
+	pressFind(s, tt, 0, ui.KeyEnter)
 	s.settle(t, func(st player.State) bool { return st.Position == 30*time.Second })
 }
 

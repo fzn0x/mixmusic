@@ -10,8 +10,9 @@ import (
 
 // applySound gives the engine the equalizer of the settings, its preamp
 // Auto headroom's while that's on, and the stages after it. Sound effects
-// off makes the equalizer flat, and crossfeed and width neutral, keeping
-// their settings; balance and mono still apply.
+// off makes the equalizer flat, turns the echo and the reverb off, and
+// crossfeed and width neutral, keeping their settings; balance and mono
+// still apply.
 func applySound(e *audio.Engine, q settings.Equalizer) {
 	gains := bandGains(q.Gains)
 	preamp := q.Preamp
@@ -19,6 +20,8 @@ func applySound(e *audio.Engine, q settings.Equalizer) {
 		preamp = audio.Headroom(gains)
 	}
 	e.SetEqualizer(q.Enabled && q.Effects, gains, preamp)
+	e.SetEcho(echoOf(q))
+	e.SetReverb(reverbOf(q))
 	e.SetSound(soundOf(q))
 	e.SetCorrection(correctionOf(q.Headphones))
 }

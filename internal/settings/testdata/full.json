@@ -247,6 +247,18 @@
           "q": 0.7071
         }
       ]
+    },
+    "reverb": {
+      "on": true,
+      "room": "plate",
+      "mix": 40
+    },
+    "echo": {
+      "on": true,
+      "preset": "custom",
+      "time": 330,
+      "feedback": 45,
+      "mix": 20
     }
   },
   "volumeCurve": "linear",

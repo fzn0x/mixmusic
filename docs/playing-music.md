@@ -161,7 +161,7 @@ Settings › Playback › Equalizer shapes the sound of what MixMusic plays itse
 
 ![Settings › Playback scrolled to the Equalizer group: the Equalizer switch turned on, the Preset menu set to Custom, and the sliders of the preamp and the ten bands from 32 Hz to 16 kHz, each with its gain above it](shots/equalizer.webp)
 
-- **Sound effects,** at the head of the group and on by default: off, the equalizer, crossfeed and stereo width stop at once and keep their settings, to hear a track as it is. Balance and mono still apply, as they serve how you hear.
+- **Sound effects,** at the head of the group and on by default: off, the equalizer, the [reverb and the echo](#reverb-and-echo), crossfeed and stereo width stop at once and keep their settings, to hear a track as it is. Balance and mono still apply, as they serve how you hear.
 - **Equalizer** turns the equalizer on and off.
 - **Preset:** 23 built-in presets, each written for these bands: Flat, Bass boost, Bass reducer, Treble boost, Treble reducer, Vocal, Spoken word, Acoustic, Classical, Dance, Electronic, Hip-hop, Jazz, Metal, Piano, Pop, R&B, Rock, Live, Late night, Lo-fi, Small speakers and Warm. Choosing one turns the equalizer on. Your own presets follow them.
 - **Presets of your own:** **Save as…**, beside the menu, keeps the bands, the preamp and Auto headroom, with balance, mono, crossfeed and stereo width, under a name of up to 48 characters; a built-in preset's name is taken. Saving under the name of one of yours, ignoring case, asks before it replaces that preset. Keep as many as you like. While one of yours plays, **Rename…**, **Delete** and **Export…** under the menu rename it, delete it, the sound staying as it is, or save it as a JSON file. **Export all…** saves all of yours in one file, and **Import…** adds those of a file, asking before it replaces presets of the same names. They're kept in `settings.json`, under `equalizer.presets`, and an edit of it shows at once.
@@ -188,6 +188,25 @@ Every model of headphones colours the sound in its own way. **Headphones**, in S
 - The correction plays after the ten bands, as its own step, so your bands and presets stay as they are. It plays whether the equalizer and Sound effects are on or not, as it corrects your headphones, and on every speaker of 5.1 too. Changing it fades from one to the other, without a click.
 - The list comes from AutoEq on GitHub, the first time you open it, and is checked for new profiles once a week at most. A profile is downloaded when you pick it. Both are kept in your data folder, and the correction chosen is kept in `settings.json`, so it plays without the network. Without it, the list says so, shows the one kept, and the profiles you picked before still play. A profile that doesn't download says why, and the correction stays as it was. No key or account is needed, and MixMusic sends nothing but the requests for those files.
 - AutoEq is by Jaakko Pasanen, under the MIT license, and each profile is made from the measurements of the source it names. Like the equalizer, the correction doesn't reach Spotify played by Spotify, or a cast device.
+
+### Reverb and echo
+
+**Reverb** and **Echo**, in Settings › Playback under the equalizer, play the music in a room, or repeat it a moment later. Both are off by default, and both play after the equalizer.
+
+- **Reverb:** its switch, a **Room**, and a **Mix**, from 0% to 100%, 25% at first: how much of the room plays against the music's own sound. At 100%, the room plays alone. Choosing a room turns the reverb on.
+  - **Small room:** close walls, a short, warm sound of about 0.6 seconds that keeps voices up front.
+  - **Hall,** the default: a concert hall, a full, smooth sound of about 2.4 seconds, after a short pause.
+  - **Plate:** a studio's metal plate, dense and bright, about 1.8 seconds, as on many voices.
+  - **Large space:** a vast space, as a cathedral, that rings for about 4 seconds.
+- **Echo:** its switch, three presets, and three sliders. Choosing a preset turns the echo on and sets the sliders; moving a slider makes it Custom.
+  - **Slapback,** the default: one quick repeat, 120 ms later.
+  - **Quarter note:** repeats every 500 ms, a quarter note at 120 beats a minute, fading after a few.
+  - **Long tail:** repeats every 750 ms, each feeding the next, for a long trail.
+  - **Time,** from 20 to 2,000 ms in steps of 10 ms: from the music to its first repeat, and from each repeat to the next. **Feedback,** from 0%, a single repeat, to 90%: how loud each repeat plays against the one before. **Mix,** from 0% to 100%, as the reverb's.
+- The echo plays first, so that its repeats sound in the room. Each change glides without a click, a new room fading in over the one before, and at a mix of 0%, or off, each does nothing at all. While Sound effects is off, they wait, as a note under them says.
+- Seeking, stopping, or a pause long enough for your system's output to close, clears what still rings, so that an old tail never plays when the music starts again. The next track lets it ring out.
+- With 5.1 surround on six speakers, the echo repeats every speaker on its own, and the room plays on the front and the surround speakers; the centre, where voices sit, and the subwoofer stay dry.
+- Like the equalizer, they shape only what MixMusic plays itself, not Spotify played by Spotify or a cast device. [The audio engine](audio-engine.md#reverb-and-echo) tells how they're made.
 
 ## Speed
 

@@ -3,11 +3,14 @@ package main
 import (
 	"testing"
 
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/volume"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // TestVolumeCurveRow chooses the volume's curve in Settings › Playback ›
-// Volume, between the equalizer and the lyrics (#383): Natural at first,
+// Volume, between the echo, after the equalizer, and the lyrics (#383,
+// #546): Natural at first,
 // saved as volumeCurve, which leaves the volume's slider where it was, and
 // found by a search for "decibel".
 func TestVolumeCurveRow(t *testing.T) {
@@ -22,7 +25,8 @@ func TestVolumeCurveRow(t *testing.T) {
 		t.Fatalf("the row doesn't come into view: %q", tt.Texts())
 	}
 	var above float32
-	for _, text := range []string{"Spotify notes", "Volume curve", volumeCurveDescription(), "Translate lyrics to"} {
+	echoMix := locales.EchoMixAt(settings.Default().Equalizer.Echo.Mix)
+	for _, text := range []string{echoMix, "Volume curve", volumeCurveDescription(), "Translate lyrics to"} {
 		r, ok := tt.Find(text)
 		if !ok || r.H <= 0 || r.Y <= above {
 			t.Fatalf("Settings › Playback shows %q out of place, at %v: %q", text, r, tt.Texts())

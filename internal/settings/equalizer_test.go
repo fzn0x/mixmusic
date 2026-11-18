@@ -184,3 +184,57 @@ func TestTone(t *testing.T) {
 		t.Errorf("bass up, treble down: %v and %v", b, tr)
 	}
 }
+
+// TestReverbAndEchoOfEarlierVersions reads the equalizer of a settings.json
+// from before #546: the reverb and the echo are off, at their defaults.
+func TestReverbAndEchoOfEarlierVersions(t *testing.T) {
+	s, err := Decode([]byte(`{"equalizer": {"enabled": true, "effects": true, "width": 100}}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r := s.Equalizer.Reverb; r != (Reverb{Room: RoomHall, Mix: 25}) {
+		t.Errorf("the reverb is %+v", r)
+	}
+	if e := s.Equalizer.Echo; e != (Echo{Preset: "slapback", Time: 120, Feedback: 0, Mix: 30}) {
+		t.Errorf("the echo is %+v", e)
+	}
+}
+
+// TestReverbAndEchoClean keeps each value of the reverb and the echo in
+// its range: a room it knows, the hall else; the echo's time a whole
+// number of 10 ms steps; and the echo's preset one whose values it has,
+// Custom else.
+func TestReverbAndEchoClean(t *testing.T) {
+	for _, c := range []struct{ in, want Reverb }{
+		{Reverb{On: true, Room: "cave", Mix: 140}, Reverb{On: true, Room: RoomHall, Mix: 100}},
+		{Reverb{Room: RoomPlate, Mix: -3}, Reverb{Room: RoomPlate, Mix: 0}},
+		{Reverb{Room: RoomLarge, Mix: 60}, Reverb{Room: RoomLarge, Mix: 60}},
+	} {
+		if got := c.in.clean(); got != c.want {
+			t.Errorf("%+v cleans to %+v, want %+v", c.in, got, c.want)
+		}
+	}
+	for _, c := range []struct{ in, want Echo }{
+		{Echo{Preset: "slapback", Time: 120, Feedback: 0, Mix: 30}, Echo{Preset: "slapback", Time: 120, Feedback: 0, Mix: 30}},
+		{Echo{Preset: "tail", Time: 750, Feedback: 60, Mix: 30}, Echo{Preset: "tail", Time: 750, Feedback: 60, Mix: 30}},
+		{Echo{Preset: "slapback", Time: 130, Feedback: 0, Mix: 30}, Echo{Preset: EchoCustom, Time: 130, Feedback: 0, Mix: 30}},
+		{Echo{On: true, Preset: "loud", Time: 5, Feedback: 99, Mix: 101}, Echo{On: true, Preset: EchoCustom, Time: 20, Feedback: 90, Mix: 100}},
+		{Echo{Preset: EchoCustom, Time: 9999, Feedback: -1, Mix: -1}, Echo{Preset: EchoCustom, Time: 2000, Feedback: 0, Mix: 0}},
+		{Echo{Preset: EchoCustom, Time: 494, Feedback: 30, Mix: 25}, Echo{Preset: EchoCustom, Time: 490, Feedback: 30, Mix: 25}},
+		{Echo{Preset: EchoCustom, Time: 495, Feedback: 30, Mix: 25}, Echo{Preset: EchoCustom, Time: 500, Feedback: 30, Mix: 25}},
+	} {
+		if got := c.in.clean(); got != c.want {
+			t.Errorf("%+v cleans to %+v, want %+v", c.in, got, c.want)
+		}
+	}
+	for _, p := range EchoPresets {
+		var e Echo
+		e.Apply(p)
+		if e.clean() != e || e.Preset != p.ID {
+			t.Errorf("the preset %s cleans to %+v", p.ID, e.clean())
+		}
+		if p.Time < MinEchoTime || p.Time > MaxEchoTime || p.Time%EchoTimeStep != 0 || p.Feedback > MaxEchoFeedback || p.Mix > MaxMix {
+			t.Errorf("the preset %s is out of range: %+v", p.ID, p)
+		}
+	}
+}

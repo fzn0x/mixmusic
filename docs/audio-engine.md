@@ -1,7 +1,7 @@
 # The audio engine
 <!-- docs: group=inside order=20 -->
 
-MixMusic plays YouTube Music through an audio engine of its own, written in Go. This page covers its decoders, loudness, equalizer, crossfade, speed and 5.1.
+MixMusic plays YouTube Music through an audio engine of its own, written in Go. This page covers its decoders, loudness, equalizer, reverb and echo, crossfade, speed and 5.1.
 
 The engine plays everything MixMusic plays itself: YouTube Music tracks
 and podcast episodes, live streams, and Spotify tracks played from their
@@ -81,15 +81,16 @@ In order:
 4. **The two decks are mixed**, which a crossfade moves from one to the
    other.
 5. **The preamp and the equalizer** shape the sound.
-6. **Stereo width and crossfeed**, on stereo, then **mono and balance**.
-7. **The correction of your headphones**, when one is chosen.
-8. **Volume levelling**, when it's on, squeezes loud and quiet moments
+6. **The echo**, then **the reverb**, when they're on.
+7. **Stereo width and crossfeed**, on stereo, then **mono and balance**.
+8. **The correction of your headphones**, when one is chosen.
+9. **Volume levelling**, when it's on, squeezes loud and quiet moments
    closer together.
-9. **The volume** of the slider.
-10. **The analyser** reads what you hear, for the visualizer and plugins.
-11. **The output** plays it on your device.
+10. **The volume** of the slider.
+11. **The analyser** reads what you hear, for the visualizer and plugins.
+12. **The output** plays it on your device.
 
-Steps 5 and 8 to 10 are ports of Chromium's Web Audio, the biquad filters,
+Steps 5 and 9 to 11 are ports of Chromium's Web Audio, the biquad filters,
 DynamicsCompressor and AnalyserNode of Blink, which MixMusic used while it
 ran in a web view, before 0.5.0. They match Chromium sample for sample, so
 MixMusic sounds as it did. Pausing and playing fade over 5 ms, so that
@@ -101,7 +102,9 @@ The engine plays 32-bit float audio at 48 kHz on the system's default
 output device, in stereo, or in 5.1 where the device has it, and follows
 the default device when you change it. It renders 10 ms of audio at a
 time, at most 40 ms ahead of the device. After a second of silence, as
-when you pause, it lets the device go, so that the computer can sleep.
+when you pause, it lets the device go, so that the computer can sleep;
+the tail of the reverb or the echo, while it sounds, isn't silence.
+[Reverb and echo](#reverb-and-echo) tells how long a tail sounds.
 
 [The output device](playing-music.md#the-output-device) of Settings ›
 Playback has it play on another device. It plays there while the device
@@ -317,6 +320,80 @@ A ParametricEQ.txt, AutoEq's or one of Import file…, is read strictly:
   IIR; a width in octaves, `BW Oct`, or a slope, as `LSC 12 dB`; more
   than 20 filters, or none: each stops the file, which changes nothing,
   and says which line, and why.
+
+## Reverb and echo
+
+**Reverb** and **Echo**, in Settings › Playback beside the equalizer
+(#546), play after the equalizer, the echo first, so that its repeats
+sound in the room. Each has a wet level, of the effect, and a dry level,
+of the sound as it came, kept apart: the **Mix** of Settings sets both,
+the wet at sin(πm/2) and the dry at cos(πm/2) of a mix m from 0 to 1, a
+crossfade of equal power, so that the two, mostly unlike, keep the
+loudness. At 100%, the effect plays alone.
+
+Each room is a feedback delay network, after Jot and Chaigne: sixteen
+delay lines, of prime lengths spread geometrically from 700 to 2,900
+samples, 15 to 60 ms, times the room's size, mixed each pass by a 16 by
+16 Hadamard matrix, so that the tail is dense within a few passes. The
+left comes into the even lines and the right into the odd ones, after
+the pre-delay and four all-pass filters of Schroeder's a side, at the
+delays of Dattorro's, which smear the sound before it enters. Each line
+has a low-pass of its own that sets how much a pass along it falls: by
+60 dB in the room's reverb time at the low notes, and in its share of it
+at 4 kHz, and more above, as walls and air take up the high notes. At a
+wet level of 1, a room plays white noise as loud as it came in, within
+half a decibel.
+
+| Room | Reverb time | At 4 kHz | Pre-delay | Size |
+|---|---|---|---|---|
+| Small room | 0.6 s | half of it | 5 ms | 0.32 |
+| Hall | 2.4 s | half of it | 25 ms | 1 |
+| Plate | 1.8 s | 0.85 of it | 10 ms | 0.5 |
+| Large space | 4 s | 0.4 of it | 40 ms | 1.5 |
+
+The reverb times are the 60 dB fall of the sound once it stops, measured
+at the middle notes; the tests measure each room's from its impulse
+response, by Schroeder's backward integration, within 10% of its own.
+
+**The echo** repeats each channel after its **Time**, from 20 ms to 2 s
+by 10 ms, and feeds each repeat back into its line at the **Feedback**'s
+share, from 0, a single repeat, to 90%, so that the repeats always fade.
+Its presets: **Slapback**, one repeat 120 ms later, at a mix of 30%;
+**Quarter note**, repeats every 500 ms, a quarter note at 120 beats a
+minute, fed back at 30%, at 25%; and **Long tail**, every 750 ms, fed
+back at 60%, at 30%. Moving a slider makes the echo Custom.
+
+- **No clicks.** The levels and the feedback glide as the volume does, at
+  20 ms of time constant. A new room fades in over the one before, both
+  playing for about a quarter of a second, and a new time of the echo
+  fades in over the one before, read from the same line, so that the
+  pitch never bends. A room, or the echo, that starts from silence takes
+  its input over 5 ms, so that a sound already playing doesn't start it
+  with a step.
+- **Off is off.** Off, at a mix of 0, or while Sound effects is off, the
+  levels glide to the dry sound alone, and the stage is then skipped: the
+  samples come out as they went in.
+- **Tails.** A seek fades the tails out over the next 2.7 ms and forgets
+  them, and so does playback stopping, or a pause long enough for the
+  output to stop, so that an old tail never sounds as play resumes. A
+  change of track lets them ring out, and the output stays on while a
+  tail sounds above -100 dBFS. What the effects keep is set to 0 below
+  10<sup>-20</sup>, so that a tail fading into silence never reaches the
+  subnormal numbers that slow a processor down.
+- **5.1.** The echo repeats each of the six channels on its own. The room
+  hears the five main channels mixed down to two, as the engine's
+  default downmix mixes them, the bass channel left out, and plays on the
+  front pair and the surround pair, each its own outputs of the network,
+  unlike each other; the centre and the bass channel take the dry level
+  alone, so that a voice in the centre stays clear.
+- **Cost.** With every effect on, a block of 128 frames, 2.7 ms, renders
+  in under 2% of its time on stereo and 3% on 5.1, on a recent desktop
+  processor, and allocates nothing: `go test ./internal/audio -bench
+  EveryEffect` shows it. The lines, about 390 KB for the four rooms and
+  2.3 MB for the echo, are made as each effect is first turned on.
+
+Like the equalizer, they shape only what the engine plays: they don't
+reach Spotify played by Spotify, or a cast device.
 
 ## Crossfade and the next track
 

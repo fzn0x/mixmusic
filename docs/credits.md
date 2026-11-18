@@ -70,6 +70,10 @@ of its own.
   have them.
 - **[FFmpeg](https://ffmpeg.org)**, which the tests of the decoders and of
   the resampler compare with.
+- **Jean-Marc Jot and Antoine Chaigne**, whose feedback delay network
+  plays the rooms of the reverb, its input smeared by the all-pass
+  filters of **Manfred Schroeder**, at the delays **Jon Dattorro** gave
+  those of his plate reverb.
 - **W. Verhelst and M. Roelands**, whose WSOLA, the waveform-similarity
   overlap-add of their paper at ICASSP 1993, plays tracks faster or
   slower at their own pitch.

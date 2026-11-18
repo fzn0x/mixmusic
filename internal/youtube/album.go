@@ -34,7 +34,15 @@ func parseAlbum(n node, browseID string) (media.Album, error) {
 		URL:        "https://music.youtube.com/browse/" + browseID,
 	}
 	_, shelf := secondaryShelf(n)
-	album.Tracks = tracksOf(parseItems(shelf.get("contents").list()))
+	// Each row's place is its number, from 1, the rows MixMusic leaves out
+	// counted.
+	album.Tracks = []media.Track{}
+	for i, row := range shelf.get("contents").list() {
+		for _, t := range tracksOf(parseItems([]node{row})) {
+			t.TrackNumber = i + 1
+			album.Tracks = append(album.Tracks, t)
+		}
+	}
 	for _, item := range shelf.get("contents").list() {
 		watch := flexRuns(item.get("musicResponsiveListItemRenderer"), 0)
 		if len(watch) > 0 {

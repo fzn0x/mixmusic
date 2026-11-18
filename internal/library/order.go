@@ -48,10 +48,11 @@ type Mark struct {
 }
 
 // markIndex is where each pin is among the pins, and what is hidden, by
-// their IDs.
+// their IDs; filed is the folder each playlist in one is in.
 type markIndex struct {
 	pinned map[string]int
 	hidden map[string]bool
+	filed  map[string]string
 }
 
 // indexMarks notes the IDs of what is pinned and hidden, as the file has
@@ -66,6 +67,12 @@ func (l *Library) indexMarks() {
 	}
 	for _, m := range d.Hidden {
 		ix.hidden[m.ID] = true
+	}
+	ix.filed = map[string]string{}
+	for _, f := range d.Folders {
+		for _, m := range f.Items {
+			ix.filed[m.ID] = f.ID
+		}
 	}
 	l.marks.Store(&ix)
 }
@@ -144,8 +151,8 @@ func (l *Library) IsHidden(id string) bool {
 	return false
 }
 
-// SetHidden hides an item of a service's library, which unpins it, or
-// shows it again.
+// SetHidden hides an item of a service's library, which unpins it and
+// takes it out of its folder, or shows it again.
 func (l *Library) SetHidden(m Mark, hidden bool) error {
 	err := l.file.Update(func(d *Data) error {
 		i := slices.IndexFunc(d.Hidden, func(x Mark) bool { return x.ID == m.ID })
@@ -159,6 +166,7 @@ func (l *Library) SetHidden(m Mark, hidden bool) error {
 		}
 		if hidden {
 			d.Pins = slices.DeleteFunc(d.Pins, func(x Mark) bool { return x.ID == m.ID })
+			d.Folders = unfiled(d.Folders, m.ID)
 		}
 		return nil
 	})
@@ -167,11 +175,12 @@ func (l *Library) SetHidden(m Mark, hidden bool) error {
 }
 
 // KeepListed takes a whole list of a service's library: its items of
-// kind, of source, as account lists them. The pins and hidden items of
-// that kind and source seen under account that it lacks go, unless keep
-// keeps them, as the artists the user follows in MixMusic; those it holds
-// take its titles, and account if they had none. A list that came in
-// part, or of another account, must not come here.
+// kind, of source, as account lists them. The pins, hidden items and
+// playlists in folders of that kind and source seen under account that
+// it lacks go, unless keep keeps them, as the artists the user follows in
+// MixMusic; those it holds take its titles, and account if they had none.
+// A folder left without a playlist goes. A list that came in part, or of
+// another account, must not come here.
 func (l *Library) KeepListed(source media.Source, kind, account string, listed []Mark, keep func(id string) bool) error {
 	if account == "" {
 		return nil
@@ -212,7 +221,8 @@ func (l *Library) KeepListed(source media.Source, kind, account string, listed [
 		return orEmpty(out)
 	}
 	d := l.file.Get()
-	if changed(d.Pins) == nil && changed(d.Hidden) == nil {
+	filedChange := slices.ContainsFunc(d.Folders, func(f Folder) bool { return changed(f.Items) != nil })
+	if changed(d.Pins) == nil && changed(d.Hidden) == nil && !filedChange {
 		return nil
 	}
 	err := l.file.Update(func(d *Data) error {
@@ -222,6 +232,12 @@ func (l *Library) KeepListed(source media.Source, kind, account string, listed [
 		if hidden := changed(d.Hidden); hidden != nil {
 			d.Hidden = hidden
 		}
+		for i := range d.Folders {
+			if items := changed(d.Folders[i].Items); items != nil {
+				d.Folders[i].Items = items
+			}
+		}
+		d.Folders = withoutEmpty(d.Folders)
 		return nil
 	})
 	l.indexMarks()

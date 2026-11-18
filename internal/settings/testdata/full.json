@@ -86,6 +86,9 @@
       "hidden": true
     }
   ],
+  "collapsedFolders": [
+    "4f1c2a9e7b3d5a60"
+  ],
   "spotifyPlayback": "match",
   "spotifyDevice": "device-1",
   "quality": "saver",

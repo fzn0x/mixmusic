@@ -37,6 +37,9 @@ type libraryOrder struct {
 	playlists map[string]*string
 	views     map[string]*playlistsMemo
 	focus     string
+	// folders is how the folders of the sidebar's Your mixes open
+	// (railfolders.go).
+	folders folderState
 }
 
 // playlistsMemo is the view made last of a service's playlists: of the
@@ -333,12 +336,13 @@ func (s *shell) moveMix(pins bool, from, onto string, among []string) {
 }
 
 // libraryItems end the menu of a tile of a service's library, of the
-// playlist p: Pin to top or Unpin, and Hide from library. Those of
-// YouTube Music's own follow.
+// playlist p: Pin to top or Unpin, Move to folder (railfolders.go), and
+// Hide from library. Those of YouTube Music's own follow.
 func (s *shell) libraryItems(key string) func(m *ui.Menu, p media.Playlist) {
 	return func(m *ui.Menu, p media.Playlist) {
 		m.Separator()
 		s.pinItem(m, playlistMark(p))
+		s.folderItems(m, playlistMark(p))
 		s.hideItem(m, playlistMark(p))
 		if key == "youtube" {
 			s.youtubeLibraryItems(m, p)

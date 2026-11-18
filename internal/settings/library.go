@@ -62,6 +62,10 @@ type Library struct {
 	// pins and mixes of the sidebar's Your mixes, and whether they do;
 	// none leaves them first.
 	SidebarPlaces []SidebarPlace `json:"sidebarPlaces"`
+	// CollapsedFolders are the folders of the sidebar's Your mixes the
+	// user closed, by the IDs library.json gives them: the others show
+	// what they hold.
+	CollapsedFolders []string `json:"collapsedFolders"`
 }
 
 // SidebarPlace is where an entry of the sidebar's Your mixes that isn't a
@@ -89,7 +93,8 @@ const (
 // user's own order, the playlists in their services', the tabs as they
 // come.
 func defaultLibrary() Library {
-	return Library{MixesSort: MixesByOrder, PlaylistsSort: PlaylistsByService, LibraryTabs: []Arranged{}, SidebarPlaces: []SidebarPlace{}}
+	return Library{MixesSort: MixesByOrder, PlaylistsSort: PlaylistsByService, LibraryTabs: []Arranged{}, SidebarPlaces: []SidebarPlace{},
+		CollapsedFolders: []string{}}
 }
 
 // clean is l with the sorts of d in place of those unknown, and the tabs
@@ -112,5 +117,6 @@ func (l Library) clean(d Library) Library {
 		places = append(places, p)
 	}
 	l.SidebarPlaces = places
+	l.CollapsedFolders = cleanFolderIDs(l.CollapsedFolders)
 	return l
 }

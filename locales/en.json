@@ -4435,6 +4435,82 @@
   "firewallRow": "Connections from your network",
   "firewallShielded": "Windows Firewall blocks every incoming connection on this network, those of the apps it allows too, so other computers and cast devices can't reach MixMusic. Windows Security turns that off, in Firewall & network protection.",
   "firewallTitle": "Windows Firewall",
+  "foldersGone": "the folder is gone",
+  "@foldersGone": {
+    "description": "Why a mix or a playlist didn't go in a folder of the sidebar's Your mixes, or a folder wasn't renamed or moved, as a toast: the folder went away meanwhile."
+  },
+  "foldersHeader": "{name}, folder, {count, plural, one {# item} other {# items}}",
+  "@foldersHeader": {
+    "description": "What screen readers call the header of a folder of the sidebar's Your mixes, which opens and closes it. {name} is the folder's name; {count} counts the mixes and playlists in it.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "foldersMoveTo": "Move to folder",
+  "@foldersMoveTo": {
+    "description": "Menu item that opens the list of the folders of the sidebar's Your mixes, to put a mix or a playlist in one: in the menu of its tile, of its page's More button and of its entry in the sidebar."
+  },
+  "foldersMoved": "Moved {title} to {folder}",
+  "@foldersMoved": {
+    "description": "Toast after the user put a mix or a playlist in a folder of the sidebar's Your mixes from its menu. {title} is its name; {folder} is the folder's.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "foldersNeedName": "a folder needs a name",
+  "@foldersNeedName": {
+    "description": "Why a folder of the sidebar's Your mixes wasn't made or renamed, as a toast: its name had nothing to show."
+  },
+  "foldersNewItem": "New folder…",
+  "@foldersNewItem": {
+    "description": "The last item of Move to folder (foldersMoveTo): asks for the name of a new folder of the sidebar's Your mixes, which the mix or playlist goes in."
+  },
+  "foldersNewTitle": "New folder",
+  "@foldersNewTitle": {
+    "description": "Title of the dialog that asks for the name of a new folder of the sidebar's Your mixes."
+  },
+  "foldersPlay": "Play folder",
+  "@foldersPlay": {
+    "description": "In the menu of a folder's header in the sidebar's Your mixes: plays all its mixes and playlists, one after another."
+  },
+  "foldersRemoveFrom": "Remove from folder",
+  "@foldersRemoveFrom": {
+    "description": "Menu item of a mix or a playlist in a folder of the sidebar's Your mixes: takes it out of the folder, and it stays in the sidebar and the library."
+  },
+  "foldersRenameItem": "Rename folder…",
+  "@foldersRenameItem": {
+    "description": "In the menu of a folder's header in the sidebar's Your mixes: asks for the folder's new name."
+  },
+  "foldersRenameTitle": "Rename folder",
+  "@foldersRenameTitle": {
+    "description": "Title of the dialog that asks for a new name of a folder of the sidebar's Your mixes."
+  },
+  "foldersSkipped": "{playlist} didn't load, so the folder plays without it: {error}",
+  "@foldersSkipped": {
+    "description": "Toast after Play folder (foldersPlay), for each mix or playlist of the folder that didn't load, whose tracks don't play. {playlist} is its name; {error} is why.",
+    "placeholders": {
+      "playlist": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "foldersUngroup": "Ungroup folder",
+  "@foldersUngroup": {
+    "description": "In the menu of a folder's header in the sidebar's Your mixes: takes the folder away, and keeps its mixes and playlists in the sidebar."
+  },
   "followEmpty": "Follow an artist from their page or their menu, and they wait here.",
   "followInMixMusic": "{name}: following in MixMusic",
   "@followInMixMusic": {

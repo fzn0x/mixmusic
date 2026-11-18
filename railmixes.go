@@ -2,7 +2,8 @@ package main
 
 // The sidebar's Your mixes (libraryorder.go's ways): Liked songs and
 // Downloads, what the user pinned, of their mixes and of the services'
-// libraries, then their mixes as the Library sorts them. Its search keeps
+// libraries, then the folders the user made (railfolders.go), then their
+// mixes as the Library sorts them, those in no folder. Its search keeps
 // those whose names hold its words. The user drags an entry onto another,
 // or moves the one with the focus with Alt+Up and Alt+Down: the pins move
 // among themselves, the mixes among themselves while they show in their
@@ -23,8 +24,9 @@ import (
 )
 
 // sideEntry is an entry of the sidebar's Your mixes: a place, as Liked
-// songs, a pin, or a mix. Its key is the place's, or "pin:" or "mix:" and
-// the ID of what it opens.
+// songs, a pin, a folder's header, a mix or a playlist in a folder, or a
+// mix. Its key is the place's, or "pin:", "folder:", "filed:" or "mix:"
+// and the ID of what it opens, or of the folder.
 type sideEntry struct {
 	key, title string
 	count      int // -1 for none
@@ -33,21 +35,31 @@ type sideEntry struct {
 	mark       library.Mark
 	pinned     bool
 	hidden     bool
+	// folder is the ID of the folder of a header, or of the folder an
+	// entry is in; filed are a header's entries (folderEntry).
+	folder string
+	filed  []sideEntry
 }
 
 // The kinds of the entries, by their keys' starts.
 const (
-	sidePin   = "pin:"
-	sideMix   = "mix:"
-	sidePlace = ""
+	sidePin    = "pin:"
+	sideFolder = "folder:"
+	sideFiled  = "filed:"
+	sideMix    = "mix:"
+	sidePlace  = ""
 )
 
-// sideKind is the kind of the entry of key: sidePin, sideMix or
-// sidePlace.
+// sideKind is the kind of the entry of key: sidePin, sideFolder,
+// sideFiled, sideMix or sidePlace.
 func sideKind(key string) string {
 	switch {
 	case strings.HasPrefix(key, sidePin):
 		return sidePin
+	case strings.HasPrefix(key, sideFolder):
+		return sideFolder
+	case strings.HasPrefix(key, sideFiled):
+		return sideFiled
 	case strings.HasPrefix(key, sideMix):
 		return sideMix
 	}
@@ -66,7 +78,7 @@ func (s *shell) sideEntries() []sideEntry {
 	var out []sideEntry
 	for _, m := range col.Pins() {
 		source, _, err := media.ParseID(m.ID)
-		if err != nil {
+		if err != nil || col.FolderOf(m.ID) != "" {
 			continue
 		}
 		if source == media.SourceLocal {
@@ -90,8 +102,11 @@ func (s *shell) sideEntries() []sideEntry {
 		}
 		out = append(out, e)
 	}
+	for _, f := range col.Folders() {
+		out = append(out, s.folderEntry(f, byID))
+	}
 	for _, p := range mixes {
-		if !s.pinned(p.ID) {
+		if !s.pinned(p.ID) && col.FolderOf(p.ID) == "" {
 			out = append(out, sideEntry{key: sideMix + p.ID, title: p.Title, count: p.TrackCount, to: playlistPath(p.ID),
 				source: media.SourceLocal, mark: playlistMark(p)})
 		}
@@ -158,10 +173,13 @@ func (s *shell) placed(entries []sideEntry) []sideEntry {
 
 // sideMovable reports whether the entry from may go onto the entry onto:
 // a pin among the pins, a mix among the mixes while they show in their
-// own order, and a place anywhere.
+// own order, a place anywhere, and the folders and what they hold as
+// folderMovable tells.
 func (s *shell) sideMovable(from, onto string) bool {
 	a, b := sideKind(from), sideKind(onto)
 	switch {
+	case a == sideFolder || b == sideFolder || a == sideFiled || b == sideFiled:
+		return s.folderMovable(from, onto)
 	case a == sidePlace || b == sidePlace:
 		return true
 	case a == sidePin && b == sidePin:
@@ -175,7 +193,8 @@ func (s *shell) sideMovable(from, onto string) bool {
 // sideMove moves the entry from onto the entry onto, of all the entries,
 // among those shown: a place moved, or a pin or a mix moved onto a place,
 // which takes the place the other way, is kept in settings.json, and the
-// others in the library.
+// others in the library, the folders and what they hold as folderMove
+// tells.
 func (s *shell) sideMove(all []sideEntry, shown []string, from, onto string) {
 	col := s.svc.Collection
 	among := func(kind string) []string {
@@ -189,6 +208,8 @@ func (s *shell) sideMove(all []sideEntry, shown []string, from, onto string) {
 	}
 	var err error
 	switch a, b := sideKind(from), sideKind(onto); {
+	case a == sideFolder || b == sideFolder || a == sideFiled || b == sideFiled:
+		err = s.folderMove(all, shown, from, onto)
 	case a == sidePlace || b == sidePlace:
 		if a != sidePlace {
 			from, onto = onto, from
@@ -252,18 +273,19 @@ func (s *shell) hidePlace(all []sideEntry, key string, hidden bool) {
 	s.keepPlaces(all, keys)
 }
 
-// mixes lists liked songs, the downloads, the pins and the user's mixes,
-// with their counts, as the package's comment tells.
+// mixes lists liked songs, the downloads, the pins, the folders and the
+// user's mixes, with their counts, as the package's comment tells.
 func (s *shell) mixes(c *ui.Context, path string) {
 	k := &s.lk
 	all := s.sideEntries()
 	query := strings.TrimSpace(s.order.side)
+	s.revealFolder(all, path)
 	var shown []sideEntry
 	var keys []string
 	searchable := false
 	for _, e := range all {
 		searchable = searchable || sideKind(e.key) != sidePlace
-		if !e.hidden && library.Matches(e.title, query) {
+		if !e.hidden && sideShows(e, query) {
 			shown = append(shown, e)
 			keys = append(keys, e.key)
 		}
@@ -296,8 +318,13 @@ func (s *shell) mixes(c *ui.Context, path string) {
 			s.sideSearch(c)
 		}
 		ui.Scroll(c).Grow(1).MinHeight(0).Children(func() {
+			v := s.folderViewOf(path, query, all, keys)
 			for _, e := range shown {
-				s.sideEntryLink(c, e, path, all, keys)
+				if sideKind(e.key) == sideFolder {
+					s.folderRows(c, e, v)
+					continue
+				}
+				s.sideEntryLink(c, e, path, all, keys, v.rows)
 			}
 			if query != "" && len(shown) == 0 {
 				ui.Text(c, locales.RailNothingMatches(query)).FontSize(k.smallSize()).TextColor(k.muted).PaddingY(7)
@@ -331,8 +358,9 @@ func (s *shell) sideSearch(c *ui.Context) {
 
 // sideEntryLink is the link of the entry e of Your mixes, which opens
 // what it names, and moves as the package's comment tells, among the
-// entries of keys shown, of all.
-func (s *shell) sideEntryLink(c *ui.Context, e sideEntry, path string, all []sideEntry, keys []string) {
+// entries of keys shown, of all: with Alt and the arrows, onto those of
+// rows, the entries beside it of its folder, or of none.
+func (s *shell) sideEntryLink(c *ui.Context, e sideEntry, path string, all []sideEntry, keys, rows []string) {
 	k := &s.lk
 	label := e.title
 	if e.pinned {
@@ -350,8 +378,11 @@ func (s *shell) sideEntryLink(c *ui.Context, e sideEntry, path string, all []sid
 			return
 		}
 		s.pinItem(m, e.mark)
+		if e.mark.Kind == library.MarkPlaylist {
+			s.folderItems(m, e.mark)
+		}
 	})
-	s.orderable(link, "side", e.key, keys, false, s.sideMovable, func(from, onto string) { s.sideMove(all, keys, from, onto) })
+	s.orderable(link, "side", e.key, rows, false, s.sideMovable, func(from, onto string) { s.sideMove(all, keys, from, onto) })
 	ink := k.text
 	if link.Hovered() || path == e.to {
 		ink = k.accent

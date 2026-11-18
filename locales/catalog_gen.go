@@ -26002,6 +26002,24 @@ func (msgs Messages) TopbarKindVideo() string {
 	return Catalog.Format(msgs.locale, "topbarKindVideo", nil)
 }
 
+// TopbarLinkSpotifySignIn says "Sign in to Spotify in Settings › Accounts to open its links."
+// in the language the app shows.
+//
+// Toast when a Spotify link is pasted in the search box or the command
+// palette while the user isn't signed in to Spotify. Its button opens
+// Settings › Accounts.
+func TopbarLinkSpotifySignIn() string { return In(i18n.Locale()).TopbarLinkSpotifySignIn() }
+
+// TopbarLinkSpotifySignIn says "Sign in to Spotify in Settings › Accounts to open its links."
+// in the language of msgs.
+//
+// Toast when a Spotify link is pasted in the search box or the command
+// palette while the user isn't signed in to Spotify. Its button opens
+// Settings › Accounts.
+func (msgs Messages) TopbarLinkSpotifySignIn() string {
+	return Catalog.Format(msgs.locale, "topbarLinkSpotifySignIn", nil)
+}
+
 // TopbarPalette says "Open the command palette"
 // in the language the app shows.
 func TopbarPalette() string { return In(i18n.Locale()).TopbarPalette() }

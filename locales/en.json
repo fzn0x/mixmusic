@@ -8417,6 +8417,10 @@
   "topbarKindSingle": "Single",
   "topbarKindSong": "Song",
   "topbarKindVideo": "Video",
+  "topbarLinkSpotifySignIn": "Sign in to Spotify in Settings › Accounts to open its links.",
+  "@topbarLinkSpotifySignIn": {
+    "description": "Toast when a Spotify link is pasted in the search box or the command palette while the user isn't signed in to Spotify. Its button opens Settings › Accounts."
+  },
   "topbarPalette": "Open the command palette",
   "topbarSearch": "Search",
   "topbarSearchPlaceholder": "Search Spotify and YouTube Music",

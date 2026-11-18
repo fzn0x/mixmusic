@@ -54,7 +54,7 @@ func ErrorWords(err error) string {
 
 // ownErrors are MixMusic's errors WordsOf has words for, besides the
 // worded ones.
-var ownErrors = []error{errListenBrainzToken, errPlainRemote, errSpotifyEpisode, errSpotifyShows, errNotCover, errNoLogs,
+var ownErrors = []error{errListenBrainzToken, errPlainRemote, errSpotifyEpisode, errSpotifyShows, errSpotifyLinks, errNotCover, errNoLogs,
 	errSignInToCollaborate, errNotSignedIn, ErrNoJSONApp}
 
 // WordsOf is err itself, not the errors it wraps, as the windows show it,
@@ -74,6 +74,8 @@ func WordsOf(err error) (string, bool) {
 		return locales.PodcastsSpotifyOnly(locales.PodcastsSettingsPlayback()), true
 	case errSpotifyShows:
 		return locales.PodcastsSpotifySignIn(), true
+	case errSpotifyLinks:
+		return locales.TopbarLinkSpotifySignIn(), true
 	case errNotCover:
 		return locales.MixCoverNotImage(), true
 	case errNoLogs:

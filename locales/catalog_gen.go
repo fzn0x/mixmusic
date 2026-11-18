@@ -19614,6 +19614,136 @@ func (msgs Messages) LyricsEditTitle() string {
 	return Catalog.Format(msgs.locale, "lyricsEditTitle", nil)
 }
 
+// LyricsFind says "Find in the lyrics"
+// in the language the app shows.
+//
+// The search button in the lyrics panel's head, beside Close, and beside
+// Share lines on the now playing page, as its tip and its name for screen
+// readers; the command palette's command that opens it; and the name for
+// screen readers of the box it opens, above the lyrics, which finds lines
+// by their words.
+func LyricsFind() string { return In(i18n.Locale()).LyricsFind() }
+
+// LyricsFind says "Find in the lyrics"
+// in the language of msgs.
+//
+// The search button in the lyrics panel's head, beside Close, and beside
+// Share lines on the now playing page, as its tip and its name for screen
+// readers; the command palette's command that opens it; and the name for
+// screen readers of the box it opens, above the lyrics, which finds lines
+// by their words.
+func (msgs Messages) LyricsFind() string {
+	return Catalog.Format(msgs.locale, "lyricsFind", nil)
+}
+
+// LyricsFindAt says "{at} of {total}: {line}"
+// in the language the app shows.
+//
+// For screen readers, as Up or Down in the box that finds lines of lyrics
+// goes to another line found: which of the lines found it is, of how many,
+// then the words of the line, as the lyrics show it.
+func LyricsFindAt(at int, total int, line string) string {
+	return In(i18n.Locale()).LyricsFindAt(at, total, line)
+}
+
+// LyricsFindAt says "{at} of {total}: {line}"
+// in the language of msgs.
+//
+// For screen readers, as Up or Down in the box that finds lines of lyrics
+// goes to another line found: which of the lines found it is, of how many,
+// then the words of the line, as the lyrics show it.
+func (msgs Messages) LyricsFindAt(at int, total int, line string) string {
+	return Catalog.Format(msgs.locale, "lyricsFindAt", map[string]any{"at": at, "total": total, "line": line})
+}
+
+// LyricsFindCount says "{at} of {total}"
+// in the language the app shows.
+//
+// Beside the box that finds lines of lyrics: which of the lines found is
+// the current one, tinted the most, and how many lines hold the words
+// typed, as "2 of 5".
+func LyricsFindCount(at int, total int) string { return In(i18n.Locale()).LyricsFindCount(at, total) }
+
+// LyricsFindCount says "{at} of {total}"
+// in the language of msgs.
+//
+// Beside the box that finds lines of lyrics: which of the lines found is
+// the current one, tinted the most, and how many lines hold the words
+// typed, as "2 of 5".
+func (msgs Messages) LyricsFindCount(at int, total int) string {
+	return Catalog.Format(msgs.locale, "lyricsFindCount", map[string]any{"at": at, "total": total})
+}
+
+// LyricsFindNone says "No line holds these words"
+// in the language the app shows.
+//
+// Beside the box that finds lines of lyrics, when no line holds the words
+// typed, as written, in Latin letters or translated; screen readers hear it
+// too, once typing pauses.
+func LyricsFindNone() string { return In(i18n.Locale()).LyricsFindNone() }
+
+// LyricsFindNone says "No line holds these words"
+// in the language of msgs.
+//
+// Beside the box that finds lines of lyrics, when no line holds the words
+// typed, as written, in Latin letters or translated; screen readers hear it
+// too, once typing pauses.
+func (msgs Messages) LyricsFindNone() string {
+	return Catalog.Format(msgs.locale, "lyricsFindNone", nil)
+}
+
+// LyricsFindPlaceholder says "find in the lyrics"
+// in the language the app shows.
+//
+// Placeholder of the box that finds lines of lyrics by their words, above
+// the lyrics in the lyrics panel and on the now playing page. Lowercase:
+// the Blend layout capitalises it.
+func LyricsFindPlaceholder() string { return In(i18n.Locale()).LyricsFindPlaceholder() }
+
+// LyricsFindPlaceholder says "find in the lyrics"
+// in the language of msgs.
+//
+// Placeholder of the box that finds lines of lyrics by their words, above
+// the lyrics in the lyrics panel and on the now playing page. Lowercase:
+// the Blend layout capitalises it.
+func (msgs Messages) LyricsFindPlaceholder() string {
+	return Catalog.Format(msgs.locale, "lyricsFindPlaceholder", nil)
+}
+
+// LyricsFindPlain says "These lyrics show without times, so Enter only scrolls to the line found."
+// in the language the app shows.
+//
+// Under the box that finds lines of lyrics, while the lyrics show as plain
+// text, without their times: why Enter doesn't play the song from the line
+// found, as it does for synced lyrics.
+func LyricsFindPlain() string { return In(i18n.Locale()).LyricsFindPlain() }
+
+// LyricsFindPlain says "These lyrics show without times, so Enter only scrolls to the line found."
+// in the language of msgs.
+//
+// Under the box that finds lines of lyrics, while the lyrics show as plain
+// text, without their times: why Enter doesn't play the song from the line
+// found, as it does for synced lyrics.
+func (msgs Messages) LyricsFindPlain() string {
+	return Catalog.Format(msgs.locale, "lyricsFindPlain", nil)
+}
+
+// LyricsFindSpoken says "{count, plural, one {# line holds these words} other {# lines hold these words}}"
+// in the language the app shows.
+//
+// For screen readers, once typing pauses in the box that finds lines of
+// lyrics: how many lines hold the words typed.
+func LyricsFindSpoken(count int) string { return In(i18n.Locale()).LyricsFindSpoken(count) }
+
+// LyricsFindSpoken says "{count, plural, one {# line holds these words} other {# lines hold these words}}"
+// in the language of msgs.
+//
+// For screen readers, once typing pauses in the box that finds lines of
+// lyrics: how many lines hold the words typed.
+func (msgs Messages) LyricsFindSpoken(count int) string {
+	return Catalog.Format(msgs.locale, "lyricsFindSpoken", map[string]any{"count": count})
+}
+
 // LyricsFullScreen says "Full-screen lyrics"
 // in the language the app shows.
 func LyricsFullScreen() string { return In(i18n.Locale()).LyricsFullScreen() }

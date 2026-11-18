@@ -347,6 +347,7 @@ while you're not typing in a text field. The ID is the command's name in
 | Show or hide the queue | <kbd>Ctrl</kbd> <kbd>J</kbd> | <kbd>⌘</kbd> <kbd>J</kbd> | `view.queue` |
 | Show or hide the lyrics | <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>L</kbd> | <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>L</kbd> | `view.lyrics` |
 | Show or hide the [full-screen lyrics](lyrics.md#full-screen-lyrics) | <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>F</kbd> | <kbd>⇧</kbd> <kbd>⌘</kbd> <kbd>F</kbd> | `view.lyricsStage` |
+| [Find in the lyrics](lyrics.md#find-in-the-lyrics) | none | none | `view.lyricsFind` |
 | Mini player | <kbd>Ctrl</kbd> <kbd>M</kbd> | <kbd>⌘</kbd> <kbd>M</kbd> | `view.mini` |
 | [Keep the window on top, or not](desktop.md#keep-the-window-on-top) | none | none | `view.keepOnTop` |
 | Collapse or expand the sidebar | <kbd>Ctrl</kbd> <kbd>B</kbd> | <kbd>⌘</kbd> <kbd>B</kbd> | `view.sidebar` |

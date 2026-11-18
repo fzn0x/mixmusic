@@ -216,6 +216,10 @@ func (s *shell) lyricsPanel(c *ui.Context) {
 			if s.iconButton(c, "lyrics-stage", "expand", locales.LyricsFullScreen(), false, 16).Clicked() {
 				s.toggleStage()
 			}
+			// Find in the lyrics, beside Close, once they came (lyricsfind.go).
+			if s.findableLyrics(cur.Track) {
+				s.lyricsFindButton(c, "panel", 16)
+			}
 		}
 	}
 	s.panelHead(c, s.lyricsTitle(), actions)
@@ -248,11 +252,13 @@ type lyricsState struct {
 }
 
 // lyricsScroll is where a lyrics view scrolled, the line it last scrolled
-// to, and when the user last scrolled it.
+// to, and when the user last scrolled it; and its box that finds lines,
+// which the full-screen lyrics have none of (lyricsfind.go).
 type lyricsScroll struct {
 	list     ui.ListState
 	scrolled int
 	userAt   time.Time
+	find     lyricsFind
 }
 
 // lyricsPause is how long lyrics the user scrolled don't follow the song.
@@ -349,6 +355,9 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 			}
 		}
 	}
+	// Find in the lyrics: its box, and the lines it found (lyricsfind.go).
+	f := &view.find
+	finding := o.stage == nil && s.lyricsFindOn(c, view, lyricsFindIn{where: where, t: t, ly: ly, x: x, synced: synced, active: active, shift: shift})
 	size, sub := k.bodySize(), k.smallSize()
 	if o.large {
 		size, sub = k.size(2), k.bodySize()
@@ -381,7 +390,8 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 		switch {
 		case synced && i == active:
 			ink = k.accent
-		case synced && i < active:
+		case synced && i < active && !finding:
+			// While words are found, no line dims.
 			ink = k.muted
 		}
 		// The line sung now lights word by word, when its words have times
@@ -433,8 +443,15 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 				}
 			})
 		}
+		// A line found shows the accent behind it, the current one more.
+		if finding {
+			if a := f.tint(i); a > 0 {
+				p.Background(k.accent.Alpha(a)).Radius(k.radiusSm)
+			}
+		}
 		// A line plays the song from there, once it plays: a song that
-		// loads isn't moved. While lines are chosen to share, it is chosen.
+		// loads isn't moved, and one paused stays paused. While lines are
+		// chosen to share, it is chosen.
 		if s.lyricPick.picking(t.ID) {
 			s.pickLine(p, i, text)
 		} else if synced && !s.st.Loading {
@@ -458,7 +475,9 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 		}
 		return s.scrollsInside(ev)
 	})
-	if synced && active >= 0 && active != view.scrolled && time.Since(view.userAt) > lyricsPause {
+	// While words are found, the lyrics hold the line found in view, and
+	// don't follow the song.
+	if synced && active >= 0 && active != view.scrolled && time.Since(view.userAt) > lyricsPause && !finding {
 		view.scrolled = active
 		// The line sung asked the full-screen lyrics to glide to it: they
 		// don't jump there too.
@@ -466,6 +485,7 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 			view.list.ScrollTo(active, ui.Center)
 		}
 	}
+	f.scroll(&view.list)
 	s.stage.glided = false
 }
 

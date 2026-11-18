@@ -70,6 +70,7 @@ func (s *shell) commands() []command {
 		{"view.queue", locales.CmdViewQueue(), "Mod+J", locales.CmdGroupView(), func() { s.togglePanel("queue") }},
 		{"view.lyrics", locales.CmdViewLyrics(), "Mod+Shift+L", locales.CmdGroupView(), func() { s.togglePanel("lyrics") }},
 		{"view.lyricsStage", locales.CmdViewLyricsStage(), "Mod+Shift+F", locales.CmdGroupView(), s.toggleStage},
+		{"view.lyricsFind", locales.LyricsFind(), "", locales.CmdGroupView(), s.findInLyrics},
 		{"view.palette", locales.CmdViewPalette(), "Mod+K", locales.CmdGroupView(), func() { s.paletteOpen = !s.paletteOpen }},
 		{"view.mini", locales.CmdViewMini(), "Mod+M", locales.CmdGroupView(), s.showMini},
 		{"view.keepOnTop", locales.CmdViewKeepOnTop(), "", locales.CmdGroupView(), s.toggleOnTop},

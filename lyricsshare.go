@@ -75,6 +75,11 @@ func (s *shell) lyricsShareBar(c *ui.Context, t media.Track, ly lyrics.Lyrics, w
 		*pick = lyricsPick{}
 	}
 	ui.Row(c.Key("lyrics-share-"+where)).Gap(8).AlignItems(ui.Center).Wrap().Padding(0, 24, 8).Children(func() {
+		// On the now playing page, Find in the lyrics is beside Share lines;
+		// the panel has it in its head (lyricsfind.go).
+		if where == "page" {
+			defer s.lyricsFindButton(c, where, 18)
+		}
 		if !pick.picking(t.ID) {
 			if s.button(c, "lyrics-share-start-"+where, locales.LyricsShareLines(), false).Clicked() {
 				*pick = lyricsPick{on: true, track: t.ID}

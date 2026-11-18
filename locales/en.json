@@ -6316,6 +6316,58 @@
   "@lyricsEditTitle": {
     "description": "The title of the dialog lyricsSourceEdit opens: the lyrics shown, as text to correct."
   },
+  "lyricsFind": "Find in the lyrics",
+  "@lyricsFind": {
+    "description": "The search button in the lyrics panel's head, beside Close, and beside Share lines on the now playing page, as its tip and its name for screen readers; the command palette's command that opens it; and the name for screen readers of the box it opens, above the lyrics, which finds lines by their words."
+  },
+  "lyricsFindAt": "{at} of {total}: {line}",
+  "@lyricsFindAt": {
+    "description": "For screen readers, as Up or Down in the box that finds lines of lyrics goes to another line found: which of the lines found it is, of how many, then the words of the line, as the lyrics show it.",
+    "placeholders": {
+      "at": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "lyricsFindCount": "{at} of {total}",
+  "@lyricsFindCount": {
+    "description": "Beside the box that finds lines of lyrics: which of the lines found is the current one, tinted the most, and how many lines hold the words typed, as \"2 of 5\".",
+    "placeholders": {
+      "at": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lyricsFindNone": "No line holds these words",
+  "@lyricsFindNone": {
+    "description": "Beside the box that finds lines of lyrics, when no line holds the words typed, as written, in Latin letters or translated; screen readers hear it too, once typing pauses."
+  },
+  "lyricsFindPlaceholder": "find in the lyrics",
+  "@lyricsFindPlaceholder": {
+    "description": "Placeholder of the box that finds lines of lyrics by their words, above the lyrics in the lyrics panel and on the now playing page. Lowercase: the Blend layout capitalises it."
+  },
+  "lyricsFindPlain": "These lyrics show without times, so Enter only scrolls to the line found.",
+  "@lyricsFindPlain": {
+    "description": "Under the box that finds lines of lyrics, while the lyrics show as plain text, without their times: why Enter doesn't play the song from the line found, as it does for synced lyrics."
+  },
+  "lyricsFindSpoken": "{count, plural, one {# line holds these words} other {# lines hold these words}}",
+  "@lyricsFindSpoken": {
+    "description": "For screen readers, once typing pauses in the box that finds lines of lyrics: how many lines hold the words typed.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "lyricsFullScreen": "Full-screen lyrics",
   "lyricsInstrumental": "This track is instrumental.",
   "lyricsKanjiDownloading": "The readings of kanji are downloading: kanji show as they are until then.",

@@ -424,6 +424,8 @@ func newShell(a *app.App, p *player.Player) *shell {
 	*s.queueList.Selected = -1
 	// The player's notices say the errors they know in the language.
 	p.SetErrorWords(errorText)
+	// The notice of a failure the playback settings change offers them.
+	p.SetSettingsErrors(settingsError)
 	// The covers the downloads keep show without the network, as those of
 	// the music on this computer do.
 	s.art = newArtworks(s.update, keptArt{s.localArt, s.svc.System.Artwork()})

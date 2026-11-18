@@ -157,12 +157,12 @@ func (s *shell) lost(c *ui.Context, why string) {
 func (s *shell) toasts(c *ui.Context) {
 	for _, n := range s.notes {
 		switch {
+		case n.Failure != 0:
+			s.failureToast(c, n)
 		case n.Settings:
 			c.ToastAction(n.Message, locales.ShellToastSettings(), func() { s.navigate("/settings/playback") })
 		case n.Undo != nil:
 			c.ToastAction(n.Message, locales.PlayerUndo(), n.Undo)
-		case n.Failure != 0:
-			s.failureToast(c, n)
 		case n.Error:
 			c.AddToast(ui.Toast{Title: n.Message, Type: "error"})
 		default:

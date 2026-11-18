@@ -97,7 +97,8 @@ type Fader interface {
 }
 
 // sleepKeeper is Services that keep the length of the timer of minutes
-// started last, as the settings' SleepTimer.Minutes.
+// started last, as the settings' SleepTimer.Minutes: on the player's goroutine,
+// as SaveVolume keeps the volume.
 type sleepKeeper interface {
 	KeepSleepMinutes(minutes int)
 }
@@ -206,7 +207,7 @@ func (p *Player) startSleep(t SleepTimer, bedtime bool) {
 		sl.Ends = time.Now().Add(time.Duration(n) * 60 * sleepSecond)
 		what = locales.SleepInMinutes(n)
 		if k, ok := p.svc.(sleepKeeper); ok && !bedtime && !t.Assistant {
-			go k.KeepSleepMinutes(n)
+			k.KeepSleepMinutes(n) // as SaveVolume keeps the volume, in turn
 		}
 	case SleepTracks:
 		sl.Tracks = min(max(t.N, 1), MaxSleepTracks)

@@ -69,6 +69,7 @@ func (s *shell) view(c *ui.Context) {
 	s.trackInfoDialog(c)
 	s.tagDialog(c)
 	s.moveDialog(c)
+	s.libraryTagDialogs(c)
 	s.copiesDialog(c)
 	s.lyricsPickDialogs(c)
 	s.promptDialog(c)

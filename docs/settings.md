@@ -28,7 +28,7 @@ How MixMusic looks; [Look and feel](look-and-feel.md) tells all of it.
 | [Theme](look-and-feel.md#themes) | **Follow the computer**, with **In light mode** and **In dark mode**; a card for each theme; **get more themes**, which opens the marketplace, and **open themes folder**. Themes that didn't load are listed with the reason. |
 | [*Theme* options](look-and-feel.md#theme-options) | The options of a built-in theme that has some, as Aurora's drifting lights and glass blur. |
 | [Lyrics style](lyrics.md#full-screen-lyrics) | The style of the full-screen lyrics: Spotlight (the default), Glow, Focus, Simple, Bold or Calm; the size of their text; the bouncing ball and how it goes from a line to the next; a small preview of them; and a button that shows the lyrics. |
-| Colour and type | **[Colours from a file](look-and-feel.md#colours-from-a-file)** (pywal, matugen or a file of your own) and its **Colour file**, **[Follow the artwork](look-and-feel.md#the-accent-and-the-artwork)**, **Accent colour**, **[Zoom](look-and-feel.md#density-text-size-and-zoom)**, **Text size**, **Density**, **Icons only in the sidebar** and **Wavy progress bar**. |
+| Colour and type | **[Colours from a file](look-and-feel.md#colours-from-a-file)** (pywal, matugen or a file of your own) and its **Colour file**, **[Follow the artwork](look-and-feel.md#the-accent-and-the-artwork)**, **Accent colour**, **[Zoom](look-and-feel.md#density-text-size-and-zoom)**, **Text size**, **Density**, **Icons only in the sidebar**, **[Show tag filters](library.md#tags)** and **Wavy progress bar**. |
 
 ### Playback
 

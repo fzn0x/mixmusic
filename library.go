@@ -21,21 +21,23 @@ type librarySection struct {
 
 // librarySections are the library's pivots, in their own order.
 var librarySections = []librarySection{
-	{"liked", locales.LibraryLiked}, {"mixes", locales.LibraryMixes}, {"podcasts", locales.LibraryPodcasts}, {"artists", locales.LibraryArtists}, {"downloads", locales.RailDownloads},
+	{"liked", locales.LibraryLiked}, {"mixes", locales.LibraryMixes}, {"tags", locales.LibraryTagsTab}, {"podcasts", locales.LibraryPodcasts}, {"artists", locales.LibraryArtists}, {"downloads", locales.RailDownloads},
 	{"computer", locales.LibraryOnThisComputer}, {"history", locales.LibraryHistory},
 	{"disliked", locales.LibraryDisliked}, {"spotify", func() string { return "Spotify" }}, {"youtube", func() string { return "YouTube Music" }},
 }
 
-// libraryPage shows liked songs, the user's mixes, the history, the songs
-// they dislike once there are any, and the libraries of the services the
-// user signed in to, in the tabs' order the user chose, without those
-// they hid but the one a link opened (librarytabs.go).
+// libraryPage shows liked songs, the user's mixes, what they tagged once
+// they made a tag, the history, the songs they dislike once there are
+// any, and the libraries of the services the user signed in to, in the
+// tabs' order the user chose, without those they hid but the one a link
+// opened (librarytabs.go).
 func (s *shell) libraryPage(c *ui.Context, tab string) {
 	accounts := s.accounts()
 	disliked := s.svc.Collection.Disliked()
+	tags := s.svc.Collection.Tags()
 	applies := func(id string) bool {
 		return (id != "spotify" || accounts.Spotify.SignedIn) && (id != "youtube" || accounts.YouTube.SignedIn) &&
-			(id != "disliked" || len(disliked) > 0)
+			(id != "disliked" || len(disliked) > 0) && (id != "tags" || len(tags) > 0)
 	}
 	if s.tabs.editing {
 		s.pageScroll(c, func() {
@@ -70,6 +72,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 				counts[i] = len(s.svc.Collection.Liked())
 			case "mixes":
 				counts[i] = len(s.svc.Collection.Playlists())
+			case "tags":
+				counts[i] = len(tags)
 			case "podcasts":
 				counts[i] = len(s.svc.Collection.Podcasts())
 			case "artists":
@@ -93,6 +97,8 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 			s.likedSongs(c)
 		case "mixes":
 			s.mixTiles(c)
+		case "tags":
+			s.tagsLibrary(c)
 		case "podcasts":
 			s.podcastLibrary(c)
 		case "artists":
@@ -256,8 +262,9 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 			}
 		}
 	}
-	// The tiles of the playlists and albums pin them, or hide them from
-	// MixMusic's library (libraryorder.go). Those of YouTube Music's
+	// The tiles of the playlists and albums pin them, tag them
+	// (librarytags.go), or hide them from MixMusic's library
+	// (libraryorder.go). Those of YouTube Music's
 	// playlists also delete those the user made, or take out of the
 	// library those they saved: of its shelves, only this one, which
 	// shows them gone at once.
@@ -302,11 +309,7 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 			groups := s.albumGroups(key+"-album", albumList)
 			s.nearShelfTiles(c, key+"-albums", len(groups), func(i int) {
 				a := s.preferredVersion(groups[i])
-				s.albumTileWith(c, key+"-album-"+count(i), a, func(m *ui.Menu) {
-					m.Separator()
-					s.pinItem(m, albumMark(a))
-					s.hideItem(m, albumMark(a))
-				})
+				s.albumTileWith(c, key+"-album-"+count(i), a, s.albumLibraryItems(a))
 			})
 		})
 	}

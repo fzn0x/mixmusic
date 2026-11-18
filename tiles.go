@@ -339,6 +339,11 @@ func (s *shell) albumTileWith(c *ui.Context, key string, a media.Album, more fun
 		s.editAlbumItem(m, a)
 		s.copyLinkItem(m, a.URL)
 		s.shareItem(m, albumShare(a))
+		// An album on this computer takes tags as a saved one does
+		// (librarytags.go).
+		if a.Source == media.SourceFile {
+			s.albumTagsItem(m, a)
+		}
 		if more != nil {
 			more(m)
 		}
@@ -363,8 +368,8 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 }
 
 // playlistTileOf is playlistTileWith, which moves lets the user move, if
-// set (tileExtras). A mix's menu pins it, or unpins it, and puts it in a
-// folder of the sidebar (railfolders.go).
+// set (tileExtras). A mix's menu pins it, or unpins it, puts it in a
+// folder of the sidebar (railfolders.go) and tags it (librarytags.go).
 func (s *shell) playlistTileOf(c *ui.Context, key string, p media.Playlist, more func(m *ui.Menu, p media.Playlist), moves func(tile ui.Element)) {
 	var parts []string
 	if p.Owner != "" {
@@ -390,6 +395,7 @@ func (s *shell) playlistTileOf(c *ui.Context, key string, p media.Playlist, more
 		if p.Source == media.SourceLocal {
 			s.pinItem(m, playlistMark(p))
 			s.folderItems(m, playlistMark(p))
+			s.playlistTagsItem(m, p)
 		}
 		if more != nil {
 			more(m, p)

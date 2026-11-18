@@ -17876,6 +17876,732 @@ func (msgs Messages) LibraryStartRadio() string {
 	return Catalog.Format(msgs.locale, "libraryStartRadio", nil)
 }
 
+// LibraryTagsAdd says "Add tag"
+// in the language the app shows.
+//
+// Button beside the field of a new tag (libraryTagsNewLabel): it makes the
+// tag and, in the Tags… dialog of an item, puts it on the item. A tag of
+// that name already is taken instead.
+func LibraryTagsAdd() string { return In(i18n.Locale()).LibraryTagsAdd() }
+
+// LibraryTagsAdd says "Add tag"
+// in the language of msgs.
+//
+// Button beside the field of a new tag (libraryTagsNewLabel): it makes the
+// tag and, in the Tags… dialog of an item, puts it on the item. A tag of
+// that name already is taken instead.
+func (msgs Messages) LibraryTagsAdd() string {
+	return Catalog.Format(msgs.locale, "libraryTagsAdd", nil)
+}
+
+// LibraryTagsAll says "All"
+// in the language the app shows.
+//
+// The first chip of the row of tags, chosen while no tag is: above Library
+// › Mixes it shows every mix, and in Library › Tags all that has a tag.
+func LibraryTagsAll() string { return In(i18n.Locale()).LibraryTagsAll() }
+
+// LibraryTagsAll says "All"
+// in the language of msgs.
+//
+// The first chip of the row of tags, chosen while no tag is: above Library
+// › Mixes it shows every mix, and in Library › Tags all that has a tag.
+func (msgs Messages) LibraryTagsAll() string {
+	return Catalog.Format(msgs.locale, "libraryTagsAll", nil)
+}
+
+// LibraryTagsBack says "Back"
+// in the language the app shows.
+//
+// Button of Manage tags while it shows one tag, or its Choose items: goes
+// back to the list of the tags, or to the tag.
+func LibraryTagsBack() string { return In(i18n.Locale()).LibraryTagsBack() }
+
+// LibraryTagsBack says "Back"
+// in the language of msgs.
+//
+// Button of Manage tags while it shows one tag, or its Choose items: goes
+// back to the list of the tags, or to the tag.
+func (msgs Messages) LibraryTagsBack() string {
+	return Catalog.Format(msgs.locale, "libraryTagsBack", nil)
+}
+
+// LibraryTagsChooseHint says "Check the mixes, playlists and albums to tag with {name}. Each one you check or clear changes at once."
+// in the language the app shows.
+//
+// Over the list of Choose items (libraryTagsChooseItems). {name} is the
+// tag's name.
+func LibraryTagsChooseHint(name string) string { return In(i18n.Locale()).LibraryTagsChooseHint(name) }
+
+// LibraryTagsChooseHint says "Check the mixes, playlists and albums to tag with {name}. Each one you check or clear changes at once."
+// in the language of msgs.
+//
+// Over the list of Choose items (libraryTagsChooseItems). {name} is the
+// tag's name.
+func (msgs Messages) LibraryTagsChooseHint(name string) string {
+	return Catalog.Format(msgs.locale, "libraryTagsChooseHint", map[string]any{"name": name})
+}
+
+// LibraryTagsChooseItems says "Choose items…"
+// in the language the app shows.
+//
+// Button of a tag in Manage tags: lists every mix, playlist and album of
+// the user's library with a check box, to put the tag on many or take it
+// off at once.
+func LibraryTagsChooseItems() string { return In(i18n.Locale()).LibraryTagsChooseItems() }
+
+// LibraryTagsChooseItems says "Choose items…"
+// in the language of msgs.
+//
+// Button of a tag in Manage tags: lists every mix, playlist and album of
+// the user's library with a check box, to put the tag on many or take it
+// off at once.
+func (msgs Messages) LibraryTagsChooseItems() string {
+	return Catalog.Format(msgs.locale, "libraryTagsChooseItems", nil)
+}
+
+// LibraryTagsChooseTitle says "Choose items for {name}"
+// in the language the app shows.
+//
+// Title of Manage tags while it lists the playlists and albums to tag
+// (libraryTagsChooseItems). {name} is the tag's name.
+func LibraryTagsChooseTitle(name string) string {
+	return In(i18n.Locale()).LibraryTagsChooseTitle(name)
+}
+
+// LibraryTagsChooseTitle says "Choose items for {name}"
+// in the language of msgs.
+//
+// Title of Manage tags while it lists the playlists and albums to tag
+// (libraryTagsChooseItems). {name} is the tag's name.
+func (msgs Messages) LibraryTagsChooseTitle(name string) string {
+	return Catalog.Format(msgs.locale, "libraryTagsChooseTitle", map[string]any{"name": name})
+}
+
+// LibraryTagsColour says "Colour"
+// in the language the app shows.
+//
+// Heading of the colours of a tag in Manage tags, of which the user chooses
+// one; also what screen readers call the group of them.
+func LibraryTagsColour() string { return In(i18n.Locale()).LibraryTagsColour() }
+
+// LibraryTagsColour says "Colour"
+// in the language of msgs.
+//
+// Heading of the colours of a tag in Manage tags, of which the user chooses
+// one; also what screen readers call the group of them.
+func (msgs Messages) LibraryTagsColour() string {
+	return Catalog.Format(msgs.locale, "libraryTagsColour", nil)
+}
+
+// LibraryTagsColourName says "{color, select, red {Red} coral {Coral} orange {Orange} amber {Amber} gold {Gold} yellow {Yellow} lime {Lime} olive {…"
+// in the language the app shows.
+//
+// The name of a colour a tag can have, which screen readers read for each
+// colour of Manage tags. Each reads on every theme, so the shade shown
+// changes a little between light and dark themes: name the hue.
+func LibraryTagsColourName(color string) string {
+	return In(i18n.Locale()).LibraryTagsColourName(color)
+}
+
+// LibraryTagsColourName says "{color, select, red {Red} coral {Coral} orange {Orange} amber {Amber} gold {Gold} yellow {Yellow} lime {Lime} olive {…"
+// in the language of msgs.
+//
+// The name of a colour a tag can have, which screen readers read for each
+// colour of Manage tags. Each reads on every theme, so the shade shown
+// changes a little between light and dark themes: name the hue.
+func (msgs Messages) LibraryTagsColourName(color string) string {
+	return Catalog.Format(msgs.locale, "libraryTagsColourName", map[string]any{"color": color})
+}
+
+// LibraryTagsDelete says "Delete tag"
+// in the language the app shows.
+//
+// Button of a tag in Manage tags: asks before deleting it
+// (libraryTagsDeleteTitle).
+func LibraryTagsDelete() string { return In(i18n.Locale()).LibraryTagsDelete() }
+
+// LibraryTagsDelete says "Delete tag"
+// in the language of msgs.
+//
+// Button of a tag in Manage tags: asks before deleting it
+// (libraryTagsDeleteTitle).
+func (msgs Messages) LibraryTagsDelete() string {
+	return Catalog.Format(msgs.locale, "libraryTagsDelete", nil)
+}
+
+// LibraryTagsDeleteBody says "{count, plural, =0 {It's on nothing.} one {It comes off the one item it's on. The item itself stays.} other {It comes…"
+// in the language the app shows.
+//
+// The question Delete tag asks (libraryTagsDeleteTitle). {count} counts the
+// mixes, playlists and albums the tag is on, which an item names.
+func LibraryTagsDeleteBody(count int) string { return In(i18n.Locale()).LibraryTagsDeleteBody(count) }
+
+// LibraryTagsDeleteBody says "{count, plural, =0 {It's on nothing.} one {It comes off the one item it's on. The item itself stays.} other {It comes…"
+// in the language of msgs.
+//
+// The question Delete tag asks (libraryTagsDeleteTitle). {count} counts the
+// mixes, playlists and albums the tag is on, which an item names.
+func (msgs Messages) LibraryTagsDeleteBody(count int) string {
+	return Catalog.Format(msgs.locale, "libraryTagsDeleteBody", map[string]any{"count": count})
+}
+
+// LibraryTagsDeleteButton says "Delete"
+// in the language the app shows.
+//
+// The button that deletes a tag, in the question of libraryTagsDeleteTitle.
+func LibraryTagsDeleteButton() string { return In(i18n.Locale()).LibraryTagsDeleteButton() }
+
+// LibraryTagsDeleteButton says "Delete"
+// in the language of msgs.
+//
+// The button that deletes a tag, in the question of libraryTagsDeleteTitle.
+func (msgs Messages) LibraryTagsDeleteButton() string {
+	return Catalog.Format(msgs.locale, "libraryTagsDeleteButton", nil)
+}
+
+// LibraryTagsDeleteTitle says "Delete {name}?"
+// in the language the app shows.
+//
+// Title of the question Delete tag (libraryTagsDelete) asks. {name} is the
+// tag's name.
+func LibraryTagsDeleteTitle(name string) string {
+	return In(i18n.Locale()).LibraryTagsDeleteTitle(name)
+}
+
+// LibraryTagsDeleteTitle says "Delete {name}?"
+// in the language of msgs.
+//
+// Title of the question Delete tag (libraryTagsDelete) asks. {name} is the
+// tag's name.
+func (msgs Messages) LibraryTagsDeleteTitle(name string) string {
+	return Catalog.Format(msgs.locale, "libraryTagsDeleteTitle", map[string]any{"name": name})
+}
+
+// LibraryTagsDone says "Done"
+// in the language the app shows.
+//
+// Button that closes the Tags… dialog of an item, and Manage tags.
+func LibraryTagsDone() string { return In(i18n.Locale()).LibraryTagsDone() }
+
+// LibraryTagsDone says "Done"
+// in the language of msgs.
+//
+// Button that closes the Tags… dialog of an item, and Manage tags.
+func (msgs Messages) LibraryTagsDone() string {
+	return Catalog.Format(msgs.locale, "libraryTagsDone", nil)
+}
+
+// LibraryTagsEditTitle says "Edit tag"
+// in the language the app shows.
+//
+// Title of Manage tags while it shows one tag: its name, its colour, Choose
+// items… and Delete tag.
+func LibraryTagsEditTitle() string { return In(i18n.Locale()).LibraryTagsEditTitle() }
+
+// LibraryTagsEditTitle says "Edit tag"
+// in the language of msgs.
+//
+// Title of Manage tags while it shows one tag: its name, its colour, Choose
+// items… and Delete tag.
+func (msgs Messages) LibraryTagsEditTitle() string {
+	return Catalog.Format(msgs.locale, "libraryTagsEditTitle", nil)
+}
+
+// LibraryTagsFilter says "Filter by tags"
+// in the language the app shows.
+//
+// What screen readers call the row of the tags' chips, above Library ›
+// Mixes and in Library › Tags.
+func LibraryTagsFilter() string { return In(i18n.Locale()).LibraryTagsFilter() }
+
+// LibraryTagsFilter says "Filter by tags"
+// in the language of msgs.
+//
+// What screen readers call the row of the tags' chips, above Library ›
+// Mixes and in Library › Tags.
+func (msgs Messages) LibraryTagsFilter() string {
+	return Catalog.Format(msgs.locale, "libraryTagsFilter", nil)
+}
+
+// LibraryTagsFull says "{count, plural, one {You have # tag, the most there can be. Delete it to make another.} other {You have # tags, the m…"
+// in the language the app shows.
+//
+// Under the field of a new tag, in the Tags… dialog and in Manage tags,
+// once the user has as many tags as MixMusic keeps. {count} is that number,
+// 200.
+func LibraryTagsFull(count int) string { return In(i18n.Locale()).LibraryTagsFull(count) }
+
+// LibraryTagsFull says "{count, plural, one {You have # tag, the most there can be. Delete it to make another.} other {You have # tags, the m…"
+// in the language of msgs.
+//
+// Under the field of a new tag, in the Tags… dialog and in Manage tags,
+// once the user has as many tags as MixMusic keeps. {count} is that number,
+// 200.
+func (msgs Messages) LibraryTagsFull(count int) string {
+	return Catalog.Format(msgs.locale, "libraryTagsFull", map[string]any{"count": count})
+}
+
+// LibraryTagsGone says "the tag is gone"
+// in the language the app shows.
+//
+// Why a tag wasn't put on an item, renamed, recoloured, moved or deleted,
+// as a toast: it was deleted meanwhile. Lowercase: it may follow other
+// words.
+func LibraryTagsGone() string { return In(i18n.Locale()).LibraryTagsGone() }
+
+// LibraryTagsGone says "the tag is gone"
+// in the language of msgs.
+//
+// Why a tag wasn't put on an item, renamed, recoloured, moved or deleted,
+// as a toast: it was deleted meanwhile. Lowercase: it may follow other
+// words.
+func (msgs Messages) LibraryTagsGone() string {
+	return Catalog.Format(msgs.locale, "libraryTagsGone", nil)
+}
+
+// LibraryTagsItem says "Tags…"
+// in the language the app shows.
+//
+// Menu item of a mix, of a playlist or an album of the user's library on
+// Spotify or YouTube Music, and of an album on this computer: on its tile
+// and in its page's More menu. It opens a dialog of the user's tags, to put
+// them on it or take them off.
+func LibraryTagsItem() string { return In(i18n.Locale()).LibraryTagsItem() }
+
+// LibraryTagsItem says "Tags…"
+// in the language of msgs.
+//
+// Menu item of a mix, of a playlist or an album of the user's library on
+// Spotify or YouTube Music, and of an album on this computer: on its tile
+// and in its page's More menu. It opens a dialog of the user's tags, to put
+// them on it or take them off.
+func (msgs Messages) LibraryTagsItem() string {
+	return Catalog.Format(msgs.locale, "libraryTagsItem", nil)
+}
+
+// LibraryTagsItemTitle says "Tags for {title}"
+// in the language the app shows.
+//
+// Title of the dialog Tags… (libraryTagsItem) opens. {title} is the name
+// of the mix, playlist or album.
+func LibraryTagsItemTitle(title string) string { return In(i18n.Locale()).LibraryTagsItemTitle(title) }
+
+// LibraryTagsItemTitle says "Tags for {title}"
+// in the language of msgs.
+//
+// Title of the dialog Tags… (libraryTagsItem) opens. {title} is the name
+// of the mix, playlist or album.
+func (msgs Messages) LibraryTagsItemTitle(title string) string {
+	return Catalog.Format(msgs.locale, "libraryTagsItemTitle", map[string]any{"title": title})
+}
+
+// LibraryTagsKindOf says "{kind, select, mix {Mix} playlist {Playlist · {service}} album {Album · {service}} other {{service}}}"
+// in the language the app shows.
+//
+// Under the name of an item in Choose items: what it is, and where it is.
+// {kind} is mix, playlist or album; {service} is Spotify, YouTube Music,
+// or, for an album of the music on this computer, On this computer
+// (libraryOnThisComputer).
+func LibraryTagsKindOf(kind string, service string) string {
+	return In(i18n.Locale()).LibraryTagsKindOf(kind, service)
+}
+
+// LibraryTagsKindOf says "{kind, select, mix {Mix} playlist {Playlist · {service}} album {Album · {service}} other {{service}}}"
+// in the language of msgs.
+//
+// Under the name of an item in Choose items: what it is, and where it is.
+// {kind} is mix, playlist or album; {service} is Spotify, YouTube Music,
+// or, for an album of the music on this computer, On this computer
+// (libraryOnThisComputer).
+func (msgs Messages) LibraryTagsKindOf(kind string, service string) string {
+	return Catalog.Format(msgs.locale, "libraryTagsKindOf", map[string]any{"kind": kind, "service": service})
+}
+
+// LibraryTagsManage says "Manage tags"
+// in the language the app shows.
+//
+// The last chip of the row of tags, above Library › Mixes and in Library
+// › Tags, which opens a dialog of the same title: it makes, renames,
+// recolours, orders and deletes the user's tags.
+func LibraryTagsManage() string { return In(i18n.Locale()).LibraryTagsManage() }
+
+// LibraryTagsManage says "Manage tags"
+// in the language of msgs.
+//
+// The last chip of the row of tags, above Library › Mixes and in Library
+// › Tags, which opens a dialog of the same title: it makes, renames,
+// recolours, orders and deletes the user's tags.
+func (msgs Messages) LibraryTagsManage() string {
+	return Catalog.Format(msgs.locale, "libraryTagsManage", nil)
+}
+
+// LibraryTagsManageHint says "Drag a tag onto another, or move it with Alt and the arrows, to change the order of the chips. Choose one to rename i…"
+// in the language the app shows.
+//
+// Under the title of Manage tags (libraryTagsManage), over the list of the
+// user's tags.
+func LibraryTagsManageHint() string { return In(i18n.Locale()).LibraryTagsManageHint() }
+
+// LibraryTagsManageHint says "Drag a tag onto another, or move it with Alt and the arrows, to change the order of the chips. Choose one to rename i…"
+// in the language of msgs.
+//
+// Under the title of Manage tags (libraryTagsManage), over the list of the
+// user's tags.
+func (msgs Messages) LibraryTagsManageHint() string {
+	return Catalog.Format(msgs.locale, "libraryTagsManageHint", nil)
+}
+
+// LibraryTagsManageItem says "Manage tags…"
+// in the language the app shows.
+//
+// Button of the Tags… dialog of an item: it opens Manage tags
+// (libraryTagsManage) in its place.
+func LibraryTagsManageItem() string { return In(i18n.Locale()).LibraryTagsManageItem() }
+
+// LibraryTagsManageItem says "Manage tags…"
+// in the language of msgs.
+//
+// Button of the Tags… dialog of an item: it opens Manage tags
+// (libraryTagsManage) in its place.
+func (msgs Messages) LibraryTagsManageItem() string {
+	return Catalog.Format(msgs.locale, "libraryTagsManageItem", nil)
+}
+
+// LibraryTagsMatchAll says "Match all"
+// in the language the app shows.
+//
+// Beside the row of tags: shows only what has every tag chosen.
+func LibraryTagsMatchAll() string { return In(i18n.Locale()).LibraryTagsMatchAll() }
+
+// LibraryTagsMatchAll says "Match all"
+// in the language of msgs.
+//
+// Beside the row of tags: shows only what has every tag chosen.
+func (msgs Messages) LibraryTagsMatchAll() string {
+	return Catalog.Format(msgs.locale, "libraryTagsMatchAll", nil)
+}
+
+// LibraryTagsMatchAny says "Match any"
+// in the language the app shows.
+//
+// Beside the row of tags: shows what has any of the tags chosen. The
+// default.
+func LibraryTagsMatchAny() string { return In(i18n.Locale()).LibraryTagsMatchAny() }
+
+// LibraryTagsMatchAny says "Match any"
+// in the language of msgs.
+//
+// Beside the row of tags: shows what has any of the tags chosen. The
+// default.
+func (msgs Messages) LibraryTagsMatchAny() string {
+	return Catalog.Format(msgs.locale, "libraryTagsMatchAny", nil)
+}
+
+// LibraryTagsMatchLabel says "How the tags chosen match"
+// in the language the app shows.
+//
+// What screen readers call the choice of Match any (libraryTagsMatchAny)
+// and Match all (libraryTagsMatchAll), beside the row of tags.
+func LibraryTagsMatchLabel() string { return In(i18n.Locale()).LibraryTagsMatchLabel() }
+
+// LibraryTagsMatchLabel says "How the tags chosen match"
+// in the language of msgs.
+//
+// What screen readers call the choice of Match any (libraryTagsMatchAny)
+// and Match all (libraryTagsMatchAll), beside the row of tags.
+func (msgs Messages) LibraryTagsMatchLabel() string {
+	return Catalog.Format(msgs.locale, "libraryTagsMatchLabel", nil)
+}
+
+// LibraryTagsName says "Name"
+// in the language the app shows.
+//
+// Label of the field of a tag's name in Manage tags: the tag takes the name
+// once the user presses Enter, or goes Back or Done.
+func LibraryTagsName() string { return In(i18n.Locale()).LibraryTagsName() }
+
+// LibraryTagsName says "Name"
+// in the language of msgs.
+//
+// Label of the field of a tag's name in Manage tags: the tag takes the name
+// once the user presses Enter, or goes Back or Done.
+func (msgs Messages) LibraryTagsName() string {
+	return Catalog.Format(msgs.locale, "libraryTagsName", nil)
+}
+
+// LibraryTagsNeedName says "a tag needs a name"
+// in the language the app shows.
+//
+// Why a tag wasn't made or renamed, as a toast: its name had nothing to
+// show. Lowercase: it may follow other words.
+func LibraryTagsNeedName() string { return In(i18n.Locale()).LibraryTagsNeedName() }
+
+// LibraryTagsNeedName says "a tag needs a name"
+// in the language of msgs.
+//
+// Why a tag wasn't made or renamed, as a toast: its name had nothing to
+// show. Lowercase: it may follow other words.
+func (msgs Messages) LibraryTagsNeedName() string {
+	return Catalog.Format(msgs.locale, "libraryTagsNeedName", nil)
+}
+
+// LibraryTagsNewLabel says "New tag"
+// in the language the app shows.
+//
+// Label and placeholder of the field that names a new tag, in the Tags…
+// dialog of an item and in Manage tags.
+func LibraryTagsNewLabel() string { return In(i18n.Locale()).LibraryTagsNewLabel() }
+
+// LibraryTagsNewLabel says "New tag"
+// in the language of msgs.
+//
+// Label and placeholder of the field that names a new tag, in the Tags…
+// dialog of an item and in Manage tags.
+func (msgs Messages) LibraryTagsNewLabel() string {
+	return Catalog.Format(msgs.locale, "libraryTagsNewLabel", nil)
+}
+
+// LibraryTagsNoItemMatch says "Nothing here has the tags chosen."
+// in the language the app shows.
+//
+// In Library › Tags, when the tags chosen in the row of chips show no
+// mix, playlist or album.
+func LibraryTagsNoItemMatch() string { return In(i18n.Locale()).LibraryTagsNoItemMatch() }
+
+// LibraryTagsNoItemMatch says "Nothing here has the tags chosen."
+// in the language of msgs.
+//
+// In Library › Tags, when the tags chosen in the row of chips show no
+// mix, playlist or album.
+func (msgs Messages) LibraryTagsNoItemMatch() string {
+	return Catalog.Format(msgs.locale, "libraryTagsNoItemMatch", nil)
+}
+
+// LibraryTagsNoMatch says "Nothing matches “{query}”."
+// in the language the app shows.
+//
+// In Choose items, when no mix, playlist or album's name holds what the
+// user searched. {query} is the search.
+func LibraryTagsNoMatch(query string) string { return In(i18n.Locale()).LibraryTagsNoMatch(query) }
+
+// LibraryTagsNoMatch says "Nothing matches “{query}”."
+// in the language of msgs.
+//
+// In Choose items, when no mix, playlist or album's name holds what the
+// user searched. {query} is the search.
+func (msgs Messages) LibraryTagsNoMatch(query string) string {
+	return Catalog.Format(msgs.locale, "libraryTagsNoMatch", map[string]any{"query": query})
+}
+
+// LibraryTagsNoMixMatch says "No mix has the tags chosen."
+// in the language the app shows.
+//
+// In Library › Mixes, when the tags chosen in the row of chips show none
+// of the mixes.
+func LibraryTagsNoMixMatch() string { return In(i18n.Locale()).LibraryTagsNoMixMatch() }
+
+// LibraryTagsNoMixMatch says "No mix has the tags chosen."
+// in the language of msgs.
+//
+// In Library › Mixes, when the tags chosen in the row of chips show none
+// of the mixes.
+func (msgs Messages) LibraryTagsNoMixMatch() string {
+	return Catalog.Format(msgs.locale, "libraryTagsNoMixMatch", nil)
+}
+
+// LibraryTagsNone says "No tags yet. Name one below to make it."
+// in the language the app shows.
+//
+// In the Tags… dialog of an item and in Manage tags, while the user has
+// no tags: the field under it (libraryTagsNewLabel) makes one.
+func LibraryTagsNone() string { return In(i18n.Locale()).LibraryTagsNone() }
+
+// LibraryTagsNone says "No tags yet. Name one below to make it."
+// in the language of msgs.
+//
+// In the Tags… dialog of an item and in Manage tags, while the user has
+// no tags: the field under it (libraryTagsNewLabel) makes one.
+func (msgs Messages) LibraryTagsNone() string {
+	return Catalog.Format(msgs.locale, "libraryTagsNone", nil)
+}
+
+// LibraryTagsNothingTagged says "Nothing has a tag yet. Choose Tags… in the menu of a mix, a playlist or an album, or Choose items… for a tag in M…"
+// in the language the app shows.
+//
+// In Library › Tags while no tag is chosen and nothing has a tag. Tags…
+// is libraryTagsItem, Choose items… libraryTagsChooseItems and Manage
+// tags libraryTagsManage.
+func LibraryTagsNothingTagged() string { return In(i18n.Locale()).LibraryTagsNothingTagged() }
+
+// LibraryTagsNothingTagged says "Nothing has a tag yet. Choose Tags… in the menu of a mix, a playlist or an album, or Choose items… for a tag in M…"
+// in the language of msgs.
+//
+// In Library › Tags while no tag is chosen and nothing has a tag. Tags…
+// is libraryTagsItem, Choose items… libraryTagsChooseItems and Manage
+// tags libraryTagsManage.
+func (msgs Messages) LibraryTagsNothingTagged() string {
+	return Catalog.Format(msgs.locale, "libraryTagsNothingTagged", nil)
+}
+
+// LibraryTagsOnCount says "{count, plural, =0 {On nothing yet.} one {On # item.} other {On # items.}}"
+// in the language the app shows.
+//
+// In Manage tags, under a tag's name: how many mixes, playlists and albums
+// the tag is on, which an item names.
+func LibraryTagsOnCount(count int) string { return In(i18n.Locale()).LibraryTagsOnCount(count) }
+
+// LibraryTagsOnCount says "{count, plural, =0 {On nothing yet.} one {On # item.} other {On # items.}}"
+// in the language of msgs.
+//
+// In Manage tags, under a tag's name: how many mixes, playlists and albums
+// the tag is on, which an item names.
+func (msgs Messages) LibraryTagsOnCount(count int) string {
+	return Catalog.Format(msgs.locale, "libraryTagsOnCount", map[string]any{"count": count})
+}
+
+// LibraryTagsRow says "{name}, {count, plural, one {on # item} other {on # items}}"
+// in the language the app shows.
+//
+// What screen readers call a tag's row in Manage tags, which opens the tag
+// to edit. {name} is the tag's name; {count} counts the mixes, playlists
+// and albums it's on.
+func LibraryTagsRow(name string, count int) string {
+	return In(i18n.Locale()).LibraryTagsRow(name, count)
+}
+
+// LibraryTagsRow says "{name}, {count, plural, one {on # item} other {on # items}}"
+// in the language of msgs.
+//
+// What screen readers call a tag's row in Manage tags, which opens the tag
+// to edit. {name} is the tag's name; {count} counts the mixes, playlists
+// and albums it's on.
+func (msgs Messages) LibraryTagsRow(name string, count int) string {
+	return Catalog.Format(msgs.locale, "libraryTagsRow", map[string]any{"name": name, "count": count})
+}
+
+// LibraryTagsSearchLabel says "Search your mixes, playlists and albums"
+// in the language the app shows.
+//
+// What screen readers call the box of Choose items (libraryTagsChooseItems)
+// that filters the list by name.
+func LibraryTagsSearchLabel() string { return In(i18n.Locale()).LibraryTagsSearchLabel() }
+
+// LibraryTagsSearchLabel says "Search your mixes, playlists and albums"
+// in the language of msgs.
+//
+// What screen readers call the box of Choose items (libraryTagsChooseItems)
+// that filters the list by name.
+func (msgs Messages) LibraryTagsSearchLabel() string {
+	return Catalog.Format(msgs.locale, "libraryTagsSearchLabel", nil)
+}
+
+// LibraryTagsSearchPlaceholder says "search your mixes, playlists and albums"
+// in the language the app shows.
+//
+// Placeholder of the box of Choose items (libraryTagsChooseItems) that
+// filters the list by name.
+func LibraryTagsSearchPlaceholder() string { return In(i18n.Locale()).LibraryTagsSearchPlaceholder() }
+
+// LibraryTagsSearchPlaceholder says "search your mixes, playlists and albums"
+// in the language of msgs.
+//
+// Placeholder of the box of Choose items (libraryTagsChooseItems) that
+// filters the list by name.
+func (msgs Messages) LibraryTagsSearchPlaceholder() string {
+	return Catalog.Format(msgs.locale, "libraryTagsSearchPlaceholder", nil)
+}
+
+// LibraryTagsShowFilters says "Show tag filters"
+// in the language the app shows.
+//
+// Switch of Settings › Appearance › Colour and type, on by default:
+// off, it hides the row of the tags' chips above Library › Mixes, which
+// shows all the mixes.
+func LibraryTagsShowFilters() string { return In(i18n.Locale()).LibraryTagsShowFilters() }
+
+// LibraryTagsShowFilters says "Show tag filters"
+// in the language of msgs.
+//
+// Switch of Settings › Appearance › Colour and type, on by default:
+// off, it hides the row of the tags' chips above Library › Mixes, which
+// shows all the mixes.
+func (msgs Messages) LibraryTagsShowFilters() string {
+	return Catalog.Format(msgs.locale, "libraryTagsShowFilters", nil)
+}
+
+// LibraryTagsShowFiltersDescription says "The row of your tags above Library › Mixes, which shows the mixes of the tags you choose. Library › Tags keeps it…"
+// in the language the app shows.
+//
+// Description of Show tag filters (libraryTagsShowFilters) in Settings ›
+// Appearance.
+func LibraryTagsShowFiltersDescription() string {
+	return In(i18n.Locale()).LibraryTagsShowFiltersDescription()
+}
+
+// LibraryTagsShowFiltersDescription says "The row of your tags above Library › Mixes, which shows the mixes of the tags you choose. Library › Tags keeps it…"
+// in the language of msgs.
+//
+// Description of Show tag filters (libraryTagsShowFilters) in Settings ›
+// Appearance.
+func (msgs Messages) LibraryTagsShowFiltersDescription() string {
+	return Catalog.Format(msgs.locale, "libraryTagsShowFiltersDescription", nil)
+}
+
+// LibraryTagsSomeShown says "Showing {shown} of {total}. Search to find the others."
+// in the language the app shows.
+//
+// Under the list of Choose items, when the library holds more playlists and
+// albums than it lists at once. {shown} and {total} count them.
+func LibraryTagsSomeShown(shown int, total int) string {
+	return In(i18n.Locale()).LibraryTagsSomeShown(shown, total)
+}
+
+// LibraryTagsSomeShown says "Showing {shown} of {total}. Search to find the others."
+// in the language of msgs.
+//
+// Under the list of Choose items, when the library holds more playlists and
+// albums than it lists at once. {shown} and {total} count them.
+func (msgs Messages) LibraryTagsSomeShown(shown int, total int) string {
+	return Catalog.Format(msgs.locale, "libraryTagsSomeShown", map[string]any{"shown": shown, "total": total})
+}
+
+// LibraryTagsTab says "Tags"
+// in the language the app shows.
+//
+// The Library's tab that shows the mixes, playlists and albums the user
+// tagged, together in one grid, under the row of their tags' chips; also
+// its name in Edit tabs.
+func LibraryTagsTab() string { return In(i18n.Locale()).LibraryTagsTab() }
+
+// LibraryTagsTab says "Tags"
+// in the language of msgs.
+//
+// The Library's tab that shows the mixes, playlists and albums the user
+// tagged, together in one grid, under the row of their tags' chips; also
+// its name in Edit tabs.
+func (msgs Messages) LibraryTagsTab() string {
+	return Catalog.Format(msgs.locale, "libraryTagsTab", nil)
+}
+
+// LibraryTagsTooMany says "{count, plural, one {there is # tag already, the most there can be} other {there are # tags already, the most there c…"
+// in the language the app shows.
+//
+// Why a new tag wasn't made, as a toast: the user has as many tags as
+// MixMusic keeps. {count} is that number, 200. Lowercase: it may follow
+// other words.
+func LibraryTagsTooMany(count int) string { return In(i18n.Locale()).LibraryTagsTooMany(count) }
+
+// LibraryTagsTooMany says "{count, plural, one {there is # tag already, the most there can be} other {there are # tags already, the most there c…"
+// in the language of msgs.
+//
+// Why a new tag wasn't made, as a toast: the user has as many tags as
+// MixMusic keeps. {count} is that number, 200. Lowercase: it may follow
+// other words.
+func (msgs Messages) LibraryTagsTooMany(count int) string {
+	return Catalog.Format(msgs.locale, "libraryTagsTooMany", map[string]any{"count": count})
+}
+
 // LibraryTrackCount says "{count, plural, one {# track} other {# tracks}}"
 // in the language the app shows.
 //

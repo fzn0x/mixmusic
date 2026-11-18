@@ -38,8 +38,10 @@ type libraryOrder struct {
 	views     map[string]*playlistsMemo
 	focus     string
 	// folders is how the folders of the sidebar's Your mixes open
-	// (railfolders.go).
+	// (railfolders.go), and tags how the user tags the library
+	// (librarytags.go).
 	folders folderState
+	tags    tagsView
 }
 
 // playlistsMemo is the view made last of a service's playlists: of the
@@ -270,15 +272,21 @@ func mixSortLabels() []string {
 		locales.LibrarySortTitle(), locales.LibrarySortTracks()}
 }
 
-// mixTiles is Library › Mixes: the search and the sort of the mixes, New
-// mix, then the mixes, the pinned ones first, as the package's comment
-// tells.
+// mixTiles is Library › Mixes: the row of tags (librarytags.go), the
+// search and the sort of the mixes, New mix, then the mixes, the pinned
+// ones first, as the package's comment tells.
 func (s *shell) mixTiles(c *ui.Context) {
-	all := s.svc.Collection.Playlists()
+	col := s.svc.Collection
+	all := col.Playlists()
 	query := strings.TrimSpace(s.order.mixes)
+	var chosen []string
+	if s.set.TagFilters {
+		s.tagChips(c, "mixes")
+		chosen = s.chosenTags(col.Tags())
+	}
 	var shown []media.Playlist
 	for _, p := range all {
-		if library.Matches(p.Title, query) {
+		if library.Matches(p.Title, query) && tagsMatch(col.TagsOf(p.ID), chosen, s.set.TagsMatchAll) {
 			shown = append(shown, p)
 		}
 	}
@@ -298,7 +306,7 @@ func (s *shell) mixTiles(c *ui.Context) {
 	}
 	own := s.set.MixesSort == settings.MixesByOrder
 	s.tileWrap(c, func() {
-		if query == "" && s.newMixTile(c) {
+		if query == "" && len(chosen) == 0 && s.newMixTile(c) {
 			s.newMix()
 		}
 		for _, p := range shown {
@@ -316,8 +324,11 @@ func (s *shell) mixTiles(c *ui.Context) {
 			})
 		}
 	})
-	if query != "" && len(shown) == 0 {
+	switch {
+	case query != "" && len(shown) == 0:
 		s.emptyLine(c, locales.LibraryNoMixMatch(query))
+	case len(chosen) > 0 && len(shown) == 0 && len(all) > 0:
+		s.emptyLine(c, locales.LibraryTagsNoMixMatch())
 	}
 }
 
@@ -336,13 +347,15 @@ func (s *shell) moveMix(pins bool, from, onto string, among []string) {
 }
 
 // libraryItems end the menu of a tile of a service's library, of the
-// playlist p: Pin to top or Unpin, Move to folder (railfolders.go), and
-// Hide from library. Those of YouTube Music's own follow.
+// playlist p: Pin to top or Unpin, Move to folder (railfolders.go), Tags…
+// (librarytags.go) and Hide from library. Those of YouTube Music's own
+// follow.
 func (s *shell) libraryItems(key string) func(m *ui.Menu, p media.Playlist) {
 	return func(m *ui.Menu, p media.Playlist) {
 		m.Separator()
 		s.pinItem(m, playlistMark(p))
 		s.folderItems(m, playlistMark(p))
+		s.playlistTagsItem(m, p)
 		s.hideItem(m, playlistMark(p))
 		if key == "youtube" {
 			s.youtubeLibraryItems(m, p)

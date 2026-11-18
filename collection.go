@@ -266,6 +266,11 @@ func (s *shell) albumPage(c *ui.Context, page string) {
 		if res.value.Saved || s.pinned(a.ID) {
 			h.menu = s.withPin(h.menu, albumMark(a))
 		}
+		// It takes tags too, as an album on this computer does
+		// (librarytags.go).
+		if ids := s.albumIDs(a); res.value.Saved || a.Source == media.SourceFile || len(s.tagsOn(ids)) > 0 {
+			h.menu = s.withTags(h.menu, albumMark(a), ids)
+		}
 		if s.signedIn(a.Source) {
 			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, locales.LibrarySave(), locales.LibrarySaved(), s.keeping[key]
 			h.onKeep = func(on bool) {
@@ -331,9 +336,13 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if local || p.Saved || p.Editable || p.Collaborative || s.pinned(p.ID) {
 			menu = s.withPin(menu, playlistMark(p))
 		}
-		// It goes in a folder of the sidebar too (railfolders.go).
+		// It goes in a folder of the sidebar too (railfolders.go), and
+		// takes tags (librarytags.go).
 		if local || p.Saved || p.Editable || p.Collaborative || s.svc.Collection.FolderOf(p.ID) != "" {
 			menu = s.withFolders(menu, playlistMark(p))
+		}
+		if local || p.Saved || p.Editable || p.Collaborative || len(s.svc.Collection.TagsOf(p.ID)) > 0 {
+			menu = s.withTags(menu, playlistMark(p), []string{p.ID})
 		}
 		if local {
 			base := menu

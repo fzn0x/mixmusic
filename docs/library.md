@@ -11,6 +11,7 @@ Library, in the sidebar or with Alt+2 (⌥2 on macOS), has these pivots, each wi
 
 - **Liked:** the songs you liked, of every service.
 - **Mixes:** the playlists you make in MixMusic.
+- **Tags:** your mixes, playlists and albums [by their tags](#tags), together, once you made a tag.
 - **Podcasts:** the episodes you're listening to and the shows you follow: see [Podcasts](podcasts.md#following-shows).
 - **Artists:** the new releases of the artists you follow, and the artists themselves: see [Artists you follow](#artists-you-follow).
 - **Downloads:** what plays without the network.
@@ -89,6 +90,20 @@ Group your mixes, and the playlists of Spotify and YouTube Music in your library
 - **The sidebar's search** finds a folder by its name, and shows all it holds, and by the names of its playlists, and shows those.
 
 MixMusic keeps your folders in `library.json`, by the playlists' IDs, and they never reach a service. Spotify's Web API neither gives apps playlist folders nor makes them ([Spotify's playlists guide](https://developer.spotify.com/documentation/web-api/concepts/playlists)), so folders made in Spotify's app don't show. A playlist of a service keeps its folder as it keeps its pin: until that service listed your whole library without it. Hiding a playlist, or deleting a mix, takes it out of its folder.
+
+### Tags
+
+Tag your mixes, the playlists and saved albums of Spotify and YouTube Music in your library, and the albums [on this computer](local-music.md), to find them by tag together: every "workout" playlist of both services and your mixes, or the albums of one mood from everywhere. An item takes as many tags as you like, and an album's tags hold for all the versions its tile groups.
+
+- **Tags…**, in the menu of its tile or in the More menu of its page, lists your tags with a check box each: a check puts the tag on, and clearing it takes the tag off, at once. The field under them names a new tag, which <kbd>Enter</kbd> or **Add tag** makes and puts on.
+- **Manage tags** lists your tags. Drag one onto another, or press <kbd>Alt</kbd> <kbd>↑</kbd> or <kbd>Alt</kbd> <kbd>↓</kbd> (<kbd>⌥</kbd> on macOS) on it, to put them in the order the chips show them. Choose a tag to rename it, which takes effect on <kbd>Enter</kbd>, Back or Done, to give it another colour, or to delete it, which asks first and takes it off all it's on: the items stay. **Choose items…** lists every playlist and album with a check box, and a search, to tag many at once.
+- **Colours:** 25, made to read on every theme, light and dark: each shows a little lighter on a dark theme and a little darker on a light one. A new tag takes a colour no tag has yet.
+- **Names** hold up to 64 characters. The spaces around a name go, and each run of spaces in it becomes one. Names that differ only in case or spacing are one tag: a new tag of a name taken is that tag, and a rename to it makes the two one. You can have up to 200 tags.
+- **The row of chips**, above Library › Mixes and in Library › Tags once a tag exists: **All**, each tag in your order, and **Manage tags**. Choose one tag or several: **Match any**, the default, shows what has any of them, and **Match all** only what has every one. `settings.json` keeps the choice as `tagFilter` and `tagsMatchAll`, by the tags' IDs; a tag you delete leaves the choice at once.
+- **Library › Tags** shows your mixes, both services' playlists and albums, and the albums on this computer, together in one grid: those with the tags chosen, or, with All, all that has a tag, the pinned ones first.
+- **Show tag filters**, in Settings › Appearance › Colour and type, on at first, hides the row above Library › Mixes when you turn it off, and the mixes all show; the choice waits for it to come back (`tagFilters`). Library › Tags keeps its row.
+
+MixMusic keeps your tags in `library.json`, by the items' IDs, and they never reach a service. A playlist or an album of a service keeps its tags as it keeps its pin: until that service listed your whole library without it, under the account or brand channel you tagged it under, never while the list loads, fails, comes in part or you're signed out. Hiding a playlist or an album, or deleting a mix, takes its tags off.
 
 ### A mix's cover
 

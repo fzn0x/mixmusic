@@ -162,3 +162,68 @@ func TestMatchFindsNothing(t *testing.T) {
 		t.Errorf("err = %v", err)
 	}
 }
+
+// marked is track, marked explicit when explicit is set.
+func marked(tr media.Track, explicit bool) media.Track {
+	tr.Explicit = explicit
+	tr.ID += map[bool]string{true: " (explicit)", false: " (clean)"}[explicit]
+	return tr
+}
+
+// TestBestPrefersTheSameMark takes, of two recordings alike, the one marked
+// explicit, or clean, as the track is, whichever YouTube Music lists first
+// (#583).
+func TestBestPrefersTheSameMark(t *testing.T) {
+	song := track("One More Time", "Daft Punk", 320000, false)
+	explicit, clean := marked(song, true), marked(song, false)
+	for _, tc := range []struct {
+		explicit bool
+		listed   []media.Track
+		want     string
+	}{
+		{false, []media.Track{explicit, clean}, clean.ID},
+		{false, []media.Track{clean, explicit}, clean.ID},
+		{true, []media.Track{clean, explicit}, explicit.ID},
+		{true, []media.Track{explicit, clean}, explicit.ID},
+	} {
+		sp := oneMoreTime
+		sp.Explicit = tc.explicit
+		if got, ok := Best(sp, items(tc.listed...)); !ok || got.ID != tc.want {
+			t.Errorf("explicit %v, of %s then %s: %s, %v", tc.explicit, tc.listed[0].ID, tc.listed[1].ID, got.ID, ok)
+		}
+	}
+	// The other mark alone still matches.
+	if got, ok := Best(oneMoreTime, items(explicit)); !ok || got.ID != explicit.ID {
+		t.Errorf("the explicit recording alone: %s, %v", got.ID, ok)
+	}
+	if s := Score(oneMoreTime, explicit); s >= Score(oneMoreTime, clean) || s < threshold {
+		t.Errorf("the explicit recording of a clean track scores %.2f", s)
+	}
+}
+
+// TestMatchCleanVideo matches a clean track whose song YouTube Music lists
+// explicit alone to a clean video of it, and to the explicit song when it
+// has none; an explicit track's search stops at its songs.
+func TestMatchCleanVideo(t *testing.T) {
+	song := marked(track("One More Time", "Daft Punk", 320000, false), true)
+	video := marked(track("Daft Punk - One More Time (Official Video)", "Daft Punk", 324000, true), false)
+	yt := &fakeSearch{songs: items(song), videos: items(video)}
+	got, err := New(yt, nil).Match(context.Background(), oneMoreTime)
+	if err != nil || got.ID != video.ID {
+		t.Errorf("with a clean video: %s, %v", got.ID, err)
+	}
+
+	yt = &fakeSearch{songs: items(song), videos: items(marked(video, true))}
+	got, err = New(yt, nil).Match(context.Background(), oneMoreTime)
+	if err != nil || got.ID != song.ID || yt.calls.Load() != 2 {
+		t.Errorf("without one: %s, %v, after %d searches", got.ID, err, yt.calls.Load())
+	}
+
+	sp := oneMoreTime
+	sp.Explicit = true
+	yt = &fakeSearch{songs: items(marked(song, false)), videos: items(marked(video, true))}
+	got, err = New(yt, nil).Match(context.Background(), sp)
+	if err != nil || got.Video || yt.calls.Load() != 1 {
+		t.Errorf("an explicit track: %s, %v, after %d searches", got.ID, err, yt.calls.Load())
+	}
+}

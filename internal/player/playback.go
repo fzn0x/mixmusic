@@ -194,9 +194,13 @@ func (p *Player) ToggleMute() {
 // its 5.1 surround audio or its stereo audio as they ask, the queue
 // passes over the tracks the user disliked, and those YouTube labels as
 // made with AI, or no longer, as they say, and the track playing takes
-// the speed of its kind.
+// the speed of its kind. With autoplay off, the radio found ahead leaves
+// the queue (radioahead.go).
 func (p *Player) SettingsChanged(s settings.Settings) {
 	p.do(func() {
+		if !s.Autoplay {
+			p.dropRadioAhead()
+		}
 		if s.Surround != p.surround {
 			p.switchAudio(s.Surround)
 		}

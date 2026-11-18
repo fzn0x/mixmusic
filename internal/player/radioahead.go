@@ -7,9 +7,14 @@ package player
 // stream and audio are then found ahead of time, and a crossfade fades
 // into it, as into any other track. A move past the end of the queue while
 // that radio is asked for waits for its answer, rather than ask again.
+//
+// A radio found ahead is dropped while none of it played, once the queue
+// no longer carries on into it: the queue was replaced, or autoplay turned
+// off, or the queue repeats.
 
 import (
 	"context"
+	"slices"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 )
@@ -95,4 +100,34 @@ func (p *Player) addAhead(a *radioAhead, found []media.Track) (bool, error) {
 		}
 	}
 	return added, err
+}
+
+// dropRadioAhead drops the radio found ahead, as the queue no longer
+// carries on into it: its answer still to come is let go, and its entries
+// leave the queue while none of them played. One a move past the end of
+// the queue waits for stays, as the radio that move asked for itself
+// would.
+func (p *Player) dropRadioAhead() {
+	a := p.radioAhead
+	if a == nil || a.then != nil {
+		return
+	}
+	p.radioAhead = nil
+	if slices.ContainsFunc(a.added, func(uid string) bool { return p.played[uid] }) {
+		return // the radio plays: it carries on, as autoplay's did
+	}
+	// An entry moved with Play next is the user's own since.
+	ahead := func(it Item) bool { return it.Radio && slices.Contains(a.added, it.UID) }
+	if !slices.ContainsFunc(p.s.Queue, ahead) {
+		return
+	}
+	cur, hasCur := p.s.Current()
+	p.s.Queue = slices.DeleteFunc(slices.Clone(p.s.Queue), ahead)
+	if p.unshuffled != nil {
+		p.unshuffled = slices.DeleteFunc(slices.Clone(p.unshuffled), ahead)
+	}
+	if hasCur {
+		p.s.Index = p.indexOf(cur.UID)
+	}
+	p.emit(QueueChange)
 }

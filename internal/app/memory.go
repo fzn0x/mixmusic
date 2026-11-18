@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/fzn0x/mixmusic/internal/diag"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // errNoLogs is returned where MixMusic keeps no log.
@@ -48,7 +49,7 @@ func (s *System) RecordMemory(on bool) error {
 	}
 	head := fmt.Sprintf("Recording, MixMusic %s on %s/%s", s.a.version(), runtime.GOOS, runtime.GOARCH)
 	if err := r.Start(head); err != nil {
-		return fmt.Errorf("can't record memory use: %w", err)
+		return wordedLater("can't record memory use: "+err.Error(), func() string { return locales.MemoryCantRecord(ErrorText(err)) }, err)
 	}
 	log.Print("mixmusic: recording memory use in memory.log")
 	return nil
@@ -69,7 +70,7 @@ func (s *System) SaveHeapProfile() (string, error) {
 	}
 	name, err := r.SaveProfile()
 	if err != nil {
-		return "", fmt.Errorf("can't save a heap profile: %w", err)
+		return "", wordedLater("can't save a heap profile: "+err.Error(), func() string { return locales.MemoryCantSaveProfile(ErrorText(err)) }, err)
 	}
 	log.Printf("mixmusic: saved a heap profile, %s", name)
 	return name, nil

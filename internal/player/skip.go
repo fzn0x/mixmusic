@@ -210,12 +210,20 @@ func (p *Player) pastEnd(m *move) {
 // goTo plays the entry at i, which the move m reached, unless its label,
 // known or checked first, has it passed over. An entry the user chose
 // plays. Going on while the network is gone, it plays the first entry
-// from i that plays without it (offlineFrom).
+// from i that plays without it (offlineFrom). One whose recording the app
+// found explicit since it was queued is passed over, while the settings
+// hide explicit content.
 func (p *Player) goTo(m *move, i int) {
 	if m.dir > 0 {
 		i = p.offlineFrom(i)
 	}
 	entry := p.s.Queue[i]
+	if p.hides(entry.Track) {
+		p.markExplicit(entry.Track.ID)
+		p.passOver(m, entry, SkipExplicit)
+		p.step(m, i+m.dir)
+		return
+	}
 	label := LabelNone
 	if !entry.Chosen && p.checks(entry.Track) {
 		label = p.knownLabel(entry.Track)

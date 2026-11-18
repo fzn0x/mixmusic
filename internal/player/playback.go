@@ -391,6 +391,10 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 			}
 			return
 		}
+		if p.hidesFound(entry.Track, src) {
+			p.leaveFound(entry)
+			return
+		}
 		switch {
 		case src.Mode == ModeConnect:
 			p.playOnDevice(token, entry, src, start, autoplay, p.remote)
@@ -453,7 +457,8 @@ func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Dura
 }
 
 // streamInstead plays a Spotify track from YouTube Music, once its
-// recording there is checked, when the player skips what YouTube labels.
+// recording there is checked, when the player skips what YouTube labels,
+// unless the settings hide that recording, as explicit.
 func (p *Player) streamInstead(token int, entry Item, start time.Duration, autoplay bool) {
 	p.checkFallback(token, entry, func() {
 		await(p, func(ctx context.Context) (Source, error) { return p.svc.PrepareStream(ctx, entry.Track) }, func(src Source, err error) {
@@ -467,6 +472,10 @@ func (p *Player) streamInstead(token int, entry Item, start time.Duration, autop
 				if !p.offline(err, start, autoplay) {
 					p.failWith(err)
 				}
+				return
+			}
+			if p.hidesFound(entry.Track, src) {
+				p.leaveFound(entry)
 				return
 			}
 			p.loadStream(src, start, autoplay)
@@ -719,7 +728,12 @@ func (p *Player) onProgress() {
 		// through a queue doesn't download every track.
 		p.prepared = next.UID
 		await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
-			if err == nil {
+			switch {
+			case err != nil:
+			case p.hidesFound(next.Track, src):
+				// Its recording is explicit: it's passed over in turn.
+				p.markExplicit(next.Track.ID)
+			default:
 				p.lookUp(src) // its parts, as its stream is found
 			}
 		})
@@ -747,6 +761,12 @@ func (p *Player) onProgress() {
 // track, so that it plays at once.
 func (p *Player) preload(next Item) {
 	await(p, func(ctx context.Context) (Source, error) { return p.svc.Prepare(ctx, next.Track) }, func(src Source, err error) {
+		if err == nil && p.hidesFound(next.Track, src) {
+			// Its recording is explicit: it's passed over in turn, and the
+			// entry after it is preloaded instead.
+			p.markExplicit(next.Track.ID)
+			return
+		}
 		// A live stream isn't: what the engine would hold of it would be
 		// behind its live edge by then. Nor is an episode, which the
 		// engine would hold whole beside the track that plays.
@@ -800,9 +820,12 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		if err != nil || token != p.loadToken || src.Mode != ModeStream || src.URL == "" {
 			return
 		}
+		if p.hidesFound(next.Track, src) {
+			p.markExplicit(next.Track.ID)
+		}
 		i := p.indexOf(next.UID)
 		if i < 0 || p.s.Queue[i].Skip != "" {
-			return // gone, or labeled meanwhile: it's passed over in turn
+			return // gone, labeled or found explicit meanwhile: it's passed over in turn
 		}
 		p.fadingInto(next)
 		p.loadToken++

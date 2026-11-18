@@ -19,7 +19,7 @@ The panel and the page show the same lyrics, with the same switches above them, 
 The panel says what it found:
 
 - "Looking for the lyrics…" while it looks;
-- "No lyrics found for this track." when none of the sources has any, with try again when some of them couldn't be reached;
+- "No lyrics found for this track." when none of the sources has any, with try again when some of them couldn't be reached, and the [source](#pick-another-source) to pick another;
 - "Lyrics can't be loaded right now. Check your connection, or try again in a moment.", with try again, when no source could be reached;
 - "This track is instrumental." for a track whose lyrics source says so.
 
@@ -67,6 +67,21 @@ Settings › Playback › Lyrics lists the sources under **Lyrics sources**, in 
 - **Time lyrics to music videos,** on by default: a music video's lyrics that are its song's move to where the song starts in the video, as [Music videos](#music-videos) tells. Off, they keep the song's times.
 - **Caption language:** the language of the lyrics from YouTube captions. **Original**, the default, is the video's own captions; any language [Translate lyrics to](#translate) offers takes the video's captions in it when it has them, and its own else.
 
+## Pick another source
+
+When the lyrics are wrong, belong to another version of the song, or are plain while another source has them timed, pick another. Above the lyrics, in the panel and on the now playing page, beside Synced and Plain text, **source** names where they come from, and opens a menu of every source that is on in [Lyrics sources](#choose-and-order-the-sources), in their order. It shows under "No lyrics found for this track." too.
+
+- **What each source answered** shows under its name: Showing, for the lyrics that show; Found, with how they're timed (word by word, by line, or not timed) and their number of lines; Not found; Can't be reached; or Not asked yet, for a source MixMusic didn't need, as one before it had synced lyrics.
+- **A video** lists each caption track its uploader wrote, by its language, in place of YouTube captions, once the captions were asked.
+- **Pick a source that found lyrics,** and they show at once. **Pick one not asked yet,** and MixMusic asks it then: no source gets the track unless the lookup or you ask it. One that couldn't be reached is asked again.
+- **The pick is kept** for the track in `lyrics-picks/`, in the [data folder](data-and-privacy.md#the-data-folder), for 10,000 tracks, the least used going past that. A source you switch off since shows MixMusic's own choice until you switch it on again.
+- **Automatic,** first in the menu, goes back to MixMusic's own choice.
+- **The mini player, the notch player, shared cards, translation and romanization** follow the pick.
+
+**Search by title and artist…,** in the same menu, opens a dialog with the track's title and artist, which you can change, and asks every source that is on for them at once. Each answer shows with its credit, as the lyrics panel writes it, how it's timed, its number of lines and its first lines; a source that fails says "Can't be reached", and the others still show. Show these shows an answer, and keeps its source, title and artist for the track, which are asked again the next time it plays. YouTube Music and YouTube captions look up the track that plays, not a title.
+
+**Edit lyrics…,** in the same menu, opens the lyrics shown as text, with their times as LRC has them: `[01:02.50]` before a line, and `<01:02.50>` before a word timed word by word. Correct a word or a line, and Save keeps your edit for the track, with the credit of the lyrics it started from. It shows before a file's lyrics and every source, and nothing is sent for it, until you pick another source or Automatic. An edit with no times shows as plain lyrics.
+
 ## Music videos
 
 A music video often opens with a scene before its song, or ends with one after it, so lyrics timed for the song would run early in the video. Unison may have lyrics of the video itself, by its video ID, timed for it. When the sources before LRCLIB have none, MixMusic looks for the video's song on YouTube Music, and asks LRCLIB for the song's lyrics, by its title, artists, album and length. Those are timed for the song, so MixMusic times them to the video:
@@ -89,7 +104,7 @@ Synced lyrics have a time for each line. The line sung now lights in the accent 
 - **When "synced" is offered:** only for lyrics whose lines can be followed in time. Lyrics of one timed line, or whose lines all have one time, count as plain, and another source's lyrics take their place when it has more of them.
 - **At another [speed](playing-music.md#speed),** synced lyrics keep the track's own time, so they still light as the words are sung.
 
-Plain lyrics show as they are, with no choice above them.
+Plain lyrics show as they are, with only their source above them.
 
 ## Word by word
 

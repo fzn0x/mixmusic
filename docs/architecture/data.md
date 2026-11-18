@@ -5,6 +5,8 @@ Windows, `~/Library/Application Support/MixMusic` on macOS,
 `~/.config/MixMusic` on Linux): `settings.json`, `library.json`,
 `plays.jsonl` (every play, for the stats, [library.md](library.md)),
 `mix-covers/` (the covers the user chose for mixes),
+`lyrics-picks/` (the lyrics source picked, searched or edited for a
+track, a file each, 10,000 at most),
 `queue.json`, `positions.json` (where the user left podcasts' episodes),
 `local-files.json` (the index of the music on the computer),
 `local-copies.json` (the copies of one song among its files, [copies.md](copies.md)),

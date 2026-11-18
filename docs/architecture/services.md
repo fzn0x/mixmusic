@@ -223,7 +223,14 @@
   `stream.Direct.Captions` (`lyricscaptions.go`), as does an episode's
   transcript (`Catalog.Transcript`). The lyrics kept of a track are kept
   by its sources' setup (`lyricsSetup`), so that a change looks it up
-  again. The music video's timing (`lrclibLyrics`, `keepsTime`) stays in
+  again. `lyricspick.go` (#598) keeps each source's answer of a track
+  (`lyricsAsked`, by the same setup) and the caption tracks of its video,
+  which `LyricsChoices` tells the lyrics panel without asking anything;
+  the listener's pick (`LyricsPick`: a source, a caption track, a search's
+  title and artist, or lyrics edited) is kept in `lyrics-picks/`, a file
+  each, and comes first in `Catalog.Lyrics` (`pickedLyrics`): a found
+  answer shows at once, and `OnLyricsPicked` tells every window to look
+  the track up again. The music video's timing (`lrclibLyrics`, `keepsTime`) stays in
   `catalog.go`, apart from the sources, and `videoLyrics`
   (`lyricsvideo.go`, #565) times a video's song's lyrics to the video:
   once `internal/align` found where the song starts in it and how fast it

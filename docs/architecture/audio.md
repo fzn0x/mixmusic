@@ -60,6 +60,16 @@
   settings say, Sound effects off making the equalizer flat and width
   and crossfeed neutral, and `internal/settings` keeps the user's
   presets (`Equalizer.Save`, `EncodePresets`).
+  Last, `correction.go` plays the correction of headphones of #616
+  (`SetCorrection`), the filters of a ParametricEQ.txt, fading from one
+  correction to the next, and skipped at none; `biquad.go` gives it
+  shelves of a Q of their own, and low-pass and high-pass filters, as the
+  Audio EQ Cookbook makes them. `internal/settings` reads the file
+  strictly (`ParseParametricEQ`) and keeps the correction chosen
+  (`Equalizer.Headphones`); `internal/autoeq` fetches AutoEq's index and
+  profiles, as the list opens and a profile is picked, and keeps them;
+  `internal/app/headphones.go` gives the engine the correction, and says
+  why a file doesn't read in the windows' words.
   `internal/audio/output` plays it on the system's output, without cgo:
   through WASAPI on Windows, an Audio Queue on macOS, and PulseAudio,
   which PipeWire serves too, or ALSA on Linux. `Devices` lists the

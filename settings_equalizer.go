@@ -133,6 +133,7 @@ func (s *shell) equalizerSettings(c *ui.Context) {
 			}
 		}, "clipping")
 		s.found(c, locales.EqualizerBands(), locales.EqualizerBandsDesc(), func() { s.eqSliders(c) })
+		s.headphonesRow(c)
 		// Spotify's audio plays in Spotify's own player, which no app may
 		// change: only the system's equalizer reaches it.
 		s.found(c, "", locales.EqualizerSpotifyNote(locales.EqualizerSpotifyNotes()), func() {

@@ -89,6 +89,7 @@ type Engine struct {
 	outChannels int
 	eq          *equalizer
 	sound       *sound // the stages after the equalizer (sound.go)
+	corr        *correction
 	comp        *compressor
 	master      smoother
 	// vol is the volume's position, from 0 to 1, and curve the curve it
@@ -131,6 +132,7 @@ func NewEngine(open Opener, start OutputStarter, events Events) *Engine {
 		paused: true,
 		eq:     newEqualizer(),
 		sound:  newSound(),
+		corr:   newCorrection(),
 		comp:   newCompressor(),
 		master: newSmoother(0.64, glide), // the gain of the volume 0.8 saved
 		vol:    volume.Of(0.8),
@@ -607,6 +609,7 @@ func (e *Engine) render(out []float32, channels int) {
 		e.pending = nil
 		e.eq.forget(min(e.bus, channels))
 		e.sound.forget()
+		e.corr.forget(min(e.bus, channels))
 		e.comp.forget(min(e.bus, channels))
 		e.bus = channels
 	}
@@ -709,6 +712,7 @@ func (e *Engine) renderQuantum() {
 	}
 	e.eq.process(buf, ch)
 	e.sound.process(buf, ch)
+	e.corr.process(buf, ch)
 	if e.normalize {
 		e.comp.process(buf, ch, levelThreshold, levelKnee, levelRatio, levelAttack, levelRelease)
 	}

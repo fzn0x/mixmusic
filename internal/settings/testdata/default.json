@@ -145,7 +145,15 @@
     "mono": false,
     "crossfeed": 0,
     "width": 100,
-    "presets": []
+    "presets": [],
+    "headphones": {
+      "id": "",
+      "name": "",
+      "source": "",
+      "rig": "",
+      "preamp": 0,
+      "filters": []
+    }
   },
   "volumeCurve": "natural",
   "volume": 0.8,

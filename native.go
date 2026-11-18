@@ -292,6 +292,9 @@ type shell struct {
 	deleteID, deleteTitle               string
 	// covering changes the cover of a mix (mixcover.go).
 	covering mixCovering
+	// headphones is the dialog of AutoEq's profiles of headphones
+	// (settings_headphones.go).
+	headphones headphonesPicker
 	// lyricPick is the lines of lyrics being chosen to share (lyricsshare.go).
 	lyricPick lyricsPick
 	// spotifyLiked are the liked songs on Spotify the library shows: the

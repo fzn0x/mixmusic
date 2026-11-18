@@ -3463,6 +3463,315 @@
       }
     }
   },
+  "equalizerHeadphones": "Headphones",
+  "@equalizerHeadphones": {
+    "description": "The title of the row in Settings › Playback › Equalizer that corrects the sound of the user's headphones with a profile of AutoEq's, an open project that measures headphones, or a ParametricEQ.txt file; also the title of the dialog that lists AutoEq's profiles, and the name of the button that opens it, to assistive technology."
+  },
+  "equalizerHeadphonesAutoEq": "AutoEq",
+  "@equalizerHeadphonesAutoEq": {
+    "description": "The name of the project AutoEq, in equalizerHeadphonesCredit, linked to its page on GitHub: it stays as it is."
+  },
+  "equalizerHeadphonesBy": "by {source}",
+  "@equalizerHeadphonesBy": {
+    "description": "In the dialog of Headphones (equalizerHeadphones), on the row of a profile, after the model's name: who measured the headphones, a person's or a site's name, as \"oratory1990\".",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "oratory1990"
+      }
+    }
+  },
+  "equalizerHeadphonesByOn": "by {source} on {rig}",
+  "@equalizerHeadphonesByOn": {
+    "description": "In the dialog of Headphones (equalizerHeadphones), on the row of a profile whose source names its rig: who measured the headphones, as \"crinacle\", and on what measuring rig, as \"GRAS 43AG-7\".",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "crinacle"
+      },
+      "rig": {
+        "type": "String",
+        "example": "GRAS 43AG-7"
+      }
+    }
+  },
+  "equalizerHeadphonesChoose": "Choose…",
+  "@equalizerHeadphonesChoose": {
+    "description": "The button of Headphones (equalizerHeadphones), in Settings › Playback › Equalizer: it opens the dialog of AutoEq's profiles of headphones, to choose the one that corrects the sound, or None."
+  },
+  "equalizerHeadphonesClose": "Close",
+  "@equalizerHeadphonesClose": {
+    "description": "The button that closes the dialog of Headphones (equalizerHeadphones)."
+  },
+  "equalizerHeadphonesCredit": "Profiles from {autoeq} by Jaakko Pasanen, under the MIT license, each made from the measurements of the source it names. Only the list and the profiles you pick are downloaded.",
+  "@equalizerHeadphonesCredit": {
+    "description": "At the foot of the dialog of Headphones (equalizerHeadphones), crediting AutoEq. {autoeq} is equalizerHeadphonesAutoEq, a link to AutoEq's page on GitHub. Jaakko Pasanen is a person's name.",
+    "placeholders": {
+      "autoeq": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerHeadphonesDesc": "Correct the sound of your headphones with AutoEq's profile of your model, or a ParametricEQ.txt file. It plays after the bands, whether the equalizer is on or not.",
+  "@equalizerHeadphonesDesc": {
+    "description": "Under Headphones (equalizerHeadphones), in Settings › Playback › Equalizer, while no correction plays. AutoEq is a project's name, and ParametricEQ.txt a file's: they stay as they are."
+  },
+  "equalizerHeadphonesEmptyList": "the list GitHub gave holds no headphones",
+  "@equalizerHeadphonesEmptyList": {
+    "description": "Why AutoEq's list couldn't be read, in the {error} of equalizerHeadphonesListFailed or equalizerHeadphonesOffline: what GitHub gave isn't the list. A lowercase fragment."
+  },
+  "equalizerHeadphonesFile": "The file {name} corrects the sound after the bands.",
+  "@equalizerHeadphonesFile": {
+    "description": "Under Headphones (equalizerHeadphones), while the correction of a ParametricEQ.txt file the user imported plays. {name} is the file's name, without its extension.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "My headphones ParametricEQ"
+      }
+    }
+  },
+  "equalizerHeadphonesFilter": "ParametricEQ.txt files",
+  "@equalizerHeadphonesFilter": {
+    "description": "The name of the kind of file the system's dialog of Import file… (equalizerHeadphonesImport) shows: text files in Equalizer APO's format, as AutoEq writes them."
+  },
+  "equalizerHeadphonesFound": "{count, plural, one {# profile} other {# profiles}}",
+  "@equalizerHeadphonesFound": {
+    "description": "In the dialog of Headphones (equalizerHeadphones), above the list: how many of AutoEq's profiles it shows, all of them or those the search finds.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equalizerHeadphonesGetting": "Downloading…",
+  "@equalizerHeadphonesGetting": {
+    "description": "In the dialog of Headphones (equalizerHeadphones), on the row of the profile the user picked, while it downloads."
+  },
+  "equalizerHeadphonesGone": "AutoEq doesn't have this profile any more",
+  "@equalizerHeadphonesGone": {
+    "description": "Why a profile of AutoEq's couldn't be downloaded, in the {error} of equalizerHeadphonesPickFailed or equalizerHeadphonesListFailed: GitHub answered that the file isn't there. A lowercase fragment."
+  },
+  "equalizerHeadphonesImport": "Import file…",
+  "@equalizerHeadphonesImport": {
+    "description": "A link under Headphones (equalizerHeadphones): it opens the system's dialog to choose a ParametricEQ.txt file, which then corrects the sound."
+  },
+  "equalizerHeadphonesImportFailed": "Couldn't import the file: {error}. The correction stays as it was.",
+  "@equalizerHeadphonesImportFailed": {
+    "description": "A toast, when the file of Import file… (equalizerHeadphonesImport) couldn't be read. {error} says why, as a lowercase fragment: one of the equalizerHeadphonesLine… messages, or one from the system.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerHeadphonesImportTitle": "Import a ParametricEQ.txt file",
+  "@equalizerHeadphonesImportTitle": {
+    "description": "The title of the system's dialog that Import file… (equalizerHeadphonesImport) opens. ParametricEQ.txt is a file's name: it stays as it is."
+  },
+  "equalizerHeadphonesLineBandwidth": "line {line} gives a filter's width in octaves, and MixMusic reads it as a Q",
+  "@equalizerHeadphonesLineBandwidth": {
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a filter gives its bandwidth, BW Oct, where MixMusic reads only its Q. A lowercase fragment.",
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "equalizerHeadphonesLineLeft": "line {line} has “{text}” after its filter, which MixMusic doesn't read",
+  "@equalizerHeadphonesLineLeft": {
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a filter's line goes on past what MixMusic reads. {text} is that part of the line, as it is. A lowercase fragment.",
+    "placeholders": {
+      "line": {
+        "type": "int"
+      },
+      "text": {
+        "type": "String",
+        "example": "T60 target 100 ms"
+      }
+    }
+  },
+  "equalizerHeadphonesLineMissing": "the filter on line {line} has no {parameter}",
+  "@equalizerHeadphonesLineMissing": {
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a filter lacks one of its parameters. {parameter} is Fc (the frequency), Gain or Q, as the file names them, which stay as they are. A lowercase fragment.",
+    "placeholders": {
+      "line": {
+        "type": "int"
+      },
+      "parameter": {
+        "type": "String",
+        "example": "Q"
+      }
+    }
+  },
+  "equalizerHeadphonesLineNot": "line {line} is neither a preamp nor a filter",
+  "@equalizerHeadphonesLineNot": {
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: the line of that number is something else, as Equalizer APO's Channel:. A lowercase fragment.",
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "equalizerHeadphonesLineRange": "line {line} has a {parameter} that isn't a number from {from} to {to}",
+  "@equalizerHeadphonesLineRange": {
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a value isn't a number, or is out of its range. {parameter} is Preamp, Fc, Gain or Q, as the file names them; {from} and {to} the range's ends, with their unit, as \"1 Hz\" and \"22000 Hz\". A lowercase fragment.",
+    "placeholders": {
+      "line": {
+        "type": "int"
+      },
+      "parameter": {
+        "type": "String",
+        "example": "Fc"
+      },
+      "from": {
+        "type": "String",
+        "example": "1 Hz"
+      },
+      "to": {
+        "type": "String",
+        "example": "22000 Hz"
+      }
+    }
+  },
+  "equalizerHeadphonesLineTwice": "line {line} gives {parameter} twice",
+  "@equalizerHeadphonesLineTwice": {
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a filter gives one of its parameters twice. {parameter} is Fc, Gain or Q, as the file names them. A lowercase fragment.",
+    "placeholders": {
+      "line": {
+        "type": "int"
+      },
+      "parameter": {
+        "type": "String",
+        "example": "Fc"
+      }
+    }
+  },
+  "equalizerHeadphonesLineType": "line {line} has a filter of the type {type}, which MixMusic doesn't play: it plays PK, LSC, HSC, LP and HP",
+  "@equalizerHeadphonesLineType": {
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a filter of a type MixMusic doesn't play. {type} and PK, LSC, HSC, LP and HP are Equalizer APO's names of the types of filters, which stay as they are. A lowercase fragment.",
+    "placeholders": {
+      "line": {
+        "type": "int"
+      },
+      "type": {
+        "type": "String",
+        "example": "BP"
+      }
+    }
+  },
+  "equalizerHeadphonesListFailed": "AutoEq's list of headphones didn't load: {error}",
+  "@equalizerHeadphonesListFailed": {
+    "description": "In the dialog of Headphones (equalizerHeadphones), when the list of AutoEq's profiles couldn't be downloaded and none was kept from before. {error} says why, as a lowercase fragment. A button, equalizerHeadphonesTryAgain, follows it.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerHeadphonesLoading": "Loading AutoEq's list of headphones…",
+  "@equalizerHeadphonesLoading": {
+    "description": "In the dialog of Headphones (equalizerHeadphones), while the list of AutoEq's profiles downloads, the first time it opens, and once a week after."
+  },
+  "equalizerHeadphonesNoFilters": "the file holds no filters",
+  "@equalizerHeadphonesNoFilters": {
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed: it holds no filter that is on. A lowercase fragment."
+  },
+  "equalizerHeadphonesNoMatch": "No headphones match your search.",
+  "@equalizerHeadphonesNoMatch": {
+    "description": "In the dialog of Headphones (equalizerHeadphones), when no model of AutoEq's list holds every word typed in the search."
+  },
+  "equalizerHeadphonesNone": "None",
+  "@equalizerHeadphonesNone": {
+    "description": "On the button of Headphones (equalizerHeadphones) while no correction plays, and the first row of the dialog of AutoEq's profiles, which turns the correction off."
+  },
+  "equalizerHeadphonesOffline": "AutoEq's list couldn't be checked for new profiles: {error}. It shows the list kept from before, and the profiles you picked before still play.",
+  "@equalizerHeadphonesOffline": {
+    "description": "In the dialog of Headphones (equalizerHeadphones), above the list, when the list kept from before couldn't be checked again, as without the network. {error} says why, as a lowercase fragment.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerHeadphonesPickFailed": "Couldn't get the profile of {name}: {error}. The correction stays as it was.",
+  "@equalizerHeadphonesPickFailed": {
+    "description": "A toast, when the profile of AutoEq's the user picked couldn't be downloaded or read. {name} is the model of headphones; {error} says why, as a lowercase fragment.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Sennheiser HD 600"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerHeadphonesProfile": "AutoEq's profile of {name}, from {source}'s measurements, corrects the sound after the bands.",
+  "@equalizerHeadphonesProfile": {
+    "description": "Under Headphones (equalizerHeadphones), while a profile of AutoEq's plays. {name} is the model of headphones, as \"Sennheiser HD 600\"; {source} who measured it, a person's or a site's name, as \"oratory1990\".",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Sennheiser HD 600"
+      },
+      "source": {
+        "type": "String",
+        "example": "oratory1990"
+      }
+    }
+  },
+  "equalizerHeadphonesProfileRig": "AutoEq's profile of {name}, from {source}'s measurements on {rig}, corrects the sound after the bands.",
+  "@equalizerHeadphonesProfileRig": {
+    "description": "Under Headphones (equalizerHeadphones), while a profile of AutoEq's plays whose source names the rig it measured on. {name} is the model of headphones; {source} who measured it, as \"crinacle\"; {rig} the measuring rig's name, as \"GRAS 43AG-7\".",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Sennheiser HD 600"
+      },
+      "source": {
+        "type": "String",
+        "example": "crinacle"
+      },
+      "rig": {
+        "type": "String",
+        "example": "GRAS 43AG-7"
+      }
+    }
+  },
+  "equalizerHeadphonesSearch": "Search headphones",
+  "@equalizerHeadphonesSearch": {
+    "description": "The placeholder and the name to assistive technology of the field that searches AutoEq's profiles, in the dialog of Headphones (equalizerHeadphones)."
+  },
+  "equalizerHeadphonesServer": "GitHub, where AutoEq keeps its profiles, answered {code}",
+  "@equalizerHeadphonesServer": {
+    "description": "Why AutoEq's list or a profile couldn't be downloaded, in the {error} of equalizerHeadphonesPickFailed, equalizerHeadphonesListFailed or equalizerHeadphonesOffline: GitHub's server answered with an error. {code} is the HTTP status, as \"503 Service Unavailable\". A lowercase fragment.",
+    "placeholders": {
+      "code": {
+        "type": "String",
+        "example": "503 Service Unavailable"
+      }
+    }
+  },
+  "equalizerHeadphonesTooBig": "the file is too big to be a ParametricEQ.txt",
+  "@equalizerHeadphonesTooBig": {
+    "description": "Why a file didn't import, in the {error} of equalizerHeadphonesImportFailed: it is far bigger than a ParametricEQ.txt file is. A lowercase fragment."
+  },
+  "equalizerHeadphonesTooMany": "the file holds {count, plural, one {# filter} other {# filters}}, and MixMusic plays up to {most}",
+  "@equalizerHeadphonesTooMany": {
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed: it holds more filters than a correction has. {most} is 20. A lowercase fragment.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "most": {
+        "type": "int"
+      }
+    }
+  },
+  "equalizerHeadphonesTryAgain": "Try again",
+  "@equalizerHeadphonesTryAgain": {
+    "description": "A button in the dialog of Headphones (equalizerHeadphones), after equalizerHeadphonesListFailed: it downloads the list again."
+  },
   "equalizerImport": "Import…",
   "@equalizerImport": {
     "description": "A link under Preset, in Settings › Playback › Equalizer: it adds the presets of a JSON file to the user's."

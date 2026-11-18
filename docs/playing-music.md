@@ -179,6 +179,16 @@ Settings › Playback › Sound has four more, under Play 5.1 surround:
 
 Each of these, like the equalizer, glides to a new setting without a click, and does nothing at all at its neutral setting. They work on YouTube Music, on Spotify tracks played from their recording there, and on the music on this computer. They don't reach a [cast device](casting.md), and Spotify's own player takes no equalizer from apps: for Spotify tracks that Spotify plays, use your system's equalizer. [The audio engine](audio-engine.md#the-equalizer) tells how the bands and the rest are made.
 
+### Headphones
+
+Every model of headphones colours the sound in its own way. **Headphones**, in Settings › Playback › Equalizer, corrects yours with a profile of [AutoEq](https://github.com/jaakkopasanen/AutoEq), which turns the response measured of your model toward a neutral target, or with a ParametricEQ.txt file of your own.
+
+- **Choose…** opens the list of AutoEq's profiles, over 8,800 of some 6,000 models. Type to find yours, by the model, or by who measured it. Each row tells who measured the model, and on what rig; the profiles of a model share its name, as do its variants, as with noise cancelling on and off. Pick one, and it plays. **None**, at the top and the default, turns the correction off.
+- **Import file…** reads a ParametricEQ.txt in Equalizer APO's format, as AutoEq writes them: its preamp, and up to 20 filters, peaking, low-shelf, high-shelf, low-pass and high-pass, each with its own frequency, gain and Q. A file that doesn't read, or holds more, says which line and why, and changes nothing. [The audio engine](audio-engine.md#headphones) tells what it reads.
+- The correction plays after the ten bands, as its own step, so your bands and presets stay as they are. It plays whether the equalizer and Sound effects are on or not, as it corrects your headphones, and on every speaker of 5.1 too. Changing it fades from one to the other, without a click.
+- The list comes from AutoEq on GitHub, the first time you open it, and is checked for new profiles once a week at most. A profile is downloaded when you pick it. Both are kept in your data folder, and the correction chosen is kept in `settings.json`, so it plays without the network. Without it, the list says so, shows the one kept, and the profiles you picked before still play. A profile that doesn't download says why, and the correction stays as it was. No key or account is needed, and MixMusic sends nothing but the requests for those files.
+- AutoEq is by Jaakko Pasanen, under the MIT license, and each profile is made from the measurements of the source it names. Like the equalizer, the correction doesn't reach Spotify played by Spotify, or a cast device.
+
 ## Speed
 
 MixMusic plays songs faster or slower, from half their speed to three times it, at their own pitch.

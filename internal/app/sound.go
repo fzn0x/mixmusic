@@ -20,6 +20,7 @@ func applySound(e *audio.Engine, q settings.Equalizer) {
 	}
 	e.SetEqualizer(q.Enabled && q.Effects, gains, preamp)
 	e.SetSound(soundOf(q))
+	e.SetCorrection(correctionOf(q.Headphones))
 }
 
 // bandGains are the gains of the bands, as the engine takes them.

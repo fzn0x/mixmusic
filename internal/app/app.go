@@ -20,6 +20,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
+	"github.com/fzn0x/mixmusic/internal/autoeq"
 	"github.com/fzn0x/mixmusic/internal/backup"
 	"github.com/fzn0x/mixmusic/internal/cast"
 	"github.com/fzn0x/mixmusic/internal/clips"
@@ -97,6 +98,10 @@ type Options struct {
 	// romaji downloads, comes from: romaji.DictionaryURL when empty. Tests
 	// give their own.
 	RomajiURL string
+	// AutoEqURL is where AutoEq's results, its index and its profiles of
+	// headphones, are fetched from: autoeq.ResultsURL when empty. Tests
+	// give their own.
+	AutoEqURL string
 	// Clips finds the clips of the albums' moving covers: none while it's
 	// nil, as until a source of them is chosen (#569).
 	Clips ClipSource
@@ -191,6 +196,7 @@ type App struct {
 	captions     *stream.Direct
 	translations *translations
 	romaji       *romaji.Dictionary
+	autoEq       *autoeq.Client // the corrections of headphones (headphones.go)
 	addons       *addons.Manager
 	storage      *addons.Storage
 	lyricsMemo   *memo[lyrics.Lyrics]
@@ -428,6 +434,7 @@ func New(opts Options) (*App, error) {
 	a.captions = direct
 	a.translations = newTranslations(filepath.Join(opts.CacheDir, "lyrics-translations"))
 	a.romaji = newRomaji(opts, userAgent)
+	a.autoEq = newAutoEq(opts, userAgent)
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
 	a.lyricsPicks = newLyricsPicks(filepath.Join(opts.DataDir, "lyrics-picks"))
 	a.lyricsAsked = newMemo[*lyricsAsked](200)

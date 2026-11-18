@@ -150,3 +150,19 @@ func gitRaw(t *testing.T, args ...string) {
 	cmd := exec.Command("git", args...)
 	cmd.Run()
 }
+
+// TestOverlapHeadIsTheCheckout names the pull request as CI does, HEAD:
+// the checkout's, not the worktree's, which starts at the base.
+func TestOverlapHeadIsTheCheckout(t *testing.T) {
+	dir := repo(t)
+	branch(t, dir, "this", 2, "this pull request's line")
+	branch(t, dir, "same", 2, "another line in its place")
+	run(t, dir, "checkout", "-q", "this")
+	r, err := check(dir, "main", "HEAD", []other{{"#1", "same"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.others) != 1 || r.others[0].name != "#1" {
+		t.Errorf("HEAD wasn't the pull request: %+v", r)
+	}
+}

@@ -30,12 +30,16 @@ import (
 // errorText is err as the windows show it: the error it wraps that the
 // windows know, the first of its chain, as its message, in the words
 // around it, which MixMusic or the service added; or err's own words.
+// MixMusic's own errors, worded in internal/app, count first.
 func errorText(err error) string {
 	if err == nil {
 		return ""
 	}
 	for e := range errorChain(err) {
-		said, ok := serviceErrorText(e)
+		said, ok := app.WordsOf(e)
+		if !ok {
+			said, ok = serviceErrorText(e)
+		}
 		if !ok {
 			said, ok = systemErrorText(e)
 		}

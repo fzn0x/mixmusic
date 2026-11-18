@@ -202,3 +202,12 @@ func (e *Engine) SetSound(s Sound) {
 	e.sound.set(s)
 	e.mu.Unlock()
 }
+
+// Sound returns what the stages after the equalizer glide to, as SetSound
+// set them.
+func (e *Engine) Sound() Sound {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	f := e.sound
+	return Sound{Balance: f.balance.target, Mono: f.mono.target == 1, Crossfeed: f.crossfeed.target, Width: f.width.target}
+}

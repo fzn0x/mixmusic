@@ -18,6 +18,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 )
 
@@ -63,6 +64,22 @@ func main() {
 
 // check merges head into base, then each of others into that.
 func check(repo, base, head string, others []other) (report, error) {
+	// The worktree has a HEAD of its own, at the base: CI's HEAD, the
+	// pull request, is the repository's. Name each commit as the
+	// repository does.
+	var err error
+	if base, err = commit(repo, base); err != nil {
+		return report{}, err
+	}
+	if head, err = commit(repo, head); err != nil {
+		return report{}, err
+	}
+	others = slices.Clone(others)
+	for i := range others {
+		if others[i].ref, err = commit(repo, others[i].ref); err != nil {
+			return report{}, err
+		}
+	}
 	dir, err := os.MkdirTemp("", "overlap")
 	if err != nil {
 		return report{}, err
@@ -97,6 +114,11 @@ func check(repo, base, head string, others []other) (report, error) {
 		}
 	}
 	return r, nil
+}
+
+// commit names the commit ref is, in repo.
+func commit(repo, ref string) (string, error) {
+	return git(repo, "rev-parse", "--verify", ref+"^{commit}")
 }
 
 // merge merges ref into the worktree at dir, committing it when commit is

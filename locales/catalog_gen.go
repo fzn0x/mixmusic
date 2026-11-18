@@ -13776,7 +13776,7 @@ func (msgs Messages) FoldersGone() string {
 	return Catalog.Format(msgs.locale, "foldersGone", nil)
 }
 
-// FoldersHeader says "{name}, folder, {count, plural, one {# playlist} other {# playlists}}"
+// FoldersHeader says "{name}, folder, {count, plural, one {# item} other {# items}}"
 // in the language the app shows.
 //
 // What screen readers call the header of a folder of the sidebar's Your
@@ -13786,7 +13786,7 @@ func FoldersHeader(name string, count int) string {
 	return In(i18n.Locale()).FoldersHeader(name, count)
 }
 
-// FoldersHeader says "{name}, folder, {count, plural, one {# playlist} other {# playlists}}"
+// FoldersHeader says "{name}, folder, {count, plural, one {# item} other {# items}}"
 // in the language of msgs.
 //
 // What screen readers call the header of a folder of the sidebar's Your
@@ -13946,7 +13946,7 @@ func (msgs Messages) FoldersRenameTitle() string {
 	return Catalog.Format(msgs.locale, "foldersRenameTitle", nil)
 }
 
-// FoldersSkipped says "Play folder skipped {playlist}, which didn't load: {error}"
+// FoldersSkipped says "{playlist} didn't load, so the folder plays without it: {error}"
 // in the language the app shows.
 //
 // Toast after Play folder (foldersPlay), for each mix or playlist of the
@@ -13956,7 +13956,7 @@ func FoldersSkipped(playlist string, error string) string {
 	return In(i18n.Locale()).FoldersSkipped(playlist, error)
 }
 
-// FoldersSkipped says "Play folder skipped {playlist}, which didn't load: {error}"
+// FoldersSkipped says "{playlist} didn't load, so the folder plays without it: {error}"
 // in the language of msgs.
 //
 // Toast after Play folder (foldersPlay), for each mix or playlist of the

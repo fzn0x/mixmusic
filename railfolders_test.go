@@ -89,7 +89,7 @@ func TestSidebarFolders(t *testing.T) {
 	chooseIn(t, s, tt, "Road trip, pinned", "Move to folder", "Road trips")
 	chooseIn(t, s, tt, "Bravo", "Move to folder", "New folder…")
 	nameIt(t, s, tt, "ROAD TRIPS")
-	head := "Road trips, folder, 3 playlists"
+	head := "Road trips, folder, 3 items"
 	labels := []string{liked, head, "Road trip, pinned", "Alpha", "Bravo", "Charlie"}
 	if got := sideOrder(tt, labels...); !slices.Equal(got, labels) {
 		t.Fatalf("the sidebar lists %q, want %q", got, labels)
@@ -114,12 +114,12 @@ func TestSidebarFolders(t *testing.T) {
 	tt.Frame()
 	nameIt(t, s, tt, "Autumn")
 	show(s, tt, "/settings/about")
-	labels = []string{liked, "Autumn, folder, 1 playlist", "Charlie", head}
+	labels = []string{liked, "Autumn, folder, 1 item", "Charlie", head}
 	if got := sideOrder(tt, labels...); !slices.Equal(got, labels) {
 		t.Errorf("with another folder, the sidebar lists %q, want %q", got, labels)
 	}
 	chooseIn(t, s, tt, "Charlie", "Remove from folder")
-	if _, ok := tt.Find("Autumn, folder, 1 playlist"); ok || len(s.svc.Collection.Folders()) != 1 {
+	if _, ok := tt.Find("Autumn, folder, 1 item"); ok || len(s.svc.Collection.Folders()) != 1 {
 		t.Errorf("the folder emptied stays: %q", folderList(s))
 	}
 	labels = []string{liked, head, "Charlie"}
@@ -136,7 +136,7 @@ func TestSidebarFolderRename(t *testing.T) {
 	fileMix(t, s, ids, "Alpha", "Autumn")
 	fileMix(t, s, ids, "Bravo", "Rain")
 	tt.Frame()
-	chooseIn(t, s, tt, "Autumn, folder, 1 playlist", "Rename folder…")
+	chooseIn(t, s, tt, "Autumn, folder, 1 item", "Rename folder…")
 	if s.naming == nil || s.naming.value != "Autumn" {
 		t.Fatalf("Rename asks %+v", s.naming)
 	}
@@ -144,12 +144,12 @@ func TestSidebarFolderRename(t *testing.T) {
 	if got, want := folderList(s), []string{"Rain: Bravo", "Winter: Alpha"}; !slices.Equal(got, want) {
 		t.Errorf("renamed, the folders are %q, want %q", got, want)
 	}
-	chooseIn(t, s, tt, "Winter, folder, 1 playlist", "Rename folder…")
+	chooseIn(t, s, tt, "Winter, folder, 1 item", "Rename folder…")
 	nameIt(t, s, tt, " rain ")
 	if got, want := folderList(s), []string{"rain: Bravo, Alpha"}; !slices.Equal(got, want) {
 		t.Errorf("renamed as the other, the folders are %q, want %q", got, want)
 	}
-	chooseIn(t, s, tt, "rain, folder, 2 playlists", "Ungroup folder")
+	chooseIn(t, s, tt, "rain, folder, 2 items", "Ungroup folder")
 	labels := []string{s.lk.words("Liked songs"), "Road trip, pinned", "Alpha", "Bravo"}
 	if got := sideOrder(tt, labels...); !slices.Equal(got, labels) || len(s.svc.Collection.Folders()) != 0 {
 		t.Errorf("ungrouped, the sidebar lists %q, want %q", got, labels)
@@ -166,13 +166,13 @@ func TestSidebarFolderDrag(t *testing.T) {
 	autumn := fileMix(t, s, ids, "Alpha", "Autumn")
 	fileMix(t, s, ids, "Bravo", "Winter")
 	tt.Frame()
-	dragSide(t, s, tt, "Charlie", "Autumn, folder, 1 playlist")
-	dragSide(t, s, tt, "Road trip, pinned", "Winter, folder, 1 playlist")
+	dragSide(t, s, tt, "Charlie", "Autumn, folder, 1 item")
+	dragSide(t, s, tt, "Road trip, pinned", "Winter, folder, 1 item")
 	if got, want := folderList(s), []string{"Autumn: Alpha, Charlie", "Winter: Bravo, Road trip"}; !slices.Equal(got, want) {
 		t.Fatalf("dragged onto the headers, the folders are %q, want %q", got, want)
 	}
 	// A pinned playlist leads its folder.
-	labels := []string{"Winter, folder, 2 playlists", "Road trip, pinned", "Bravo"}
+	labels := []string{"Winter, folder, 2 items", "Road trip, pinned", "Bravo"}
 	if got := sideOrder(tt, labels...); !slices.Equal(got, labels) {
 		t.Errorf("the sidebar lists %q, want %q", got, labels)
 	}
@@ -192,13 +192,13 @@ func TestSidebarFolderDrag(t *testing.T) {
 	if got, want := mixesKept(t, s), []string{"Bravo", "Charlie", "Delta", "Alpha"}; !slices.Equal(got, want) {
 		t.Errorf("dragged out onto a mix, the library keeps %q, want %q", got, want)
 	}
-	dragSide(t, s, tt, "Winter, folder, 2 playlists", "Autumn, folder, 1 playlist")
+	dragSide(t, s, tt, "Winter, folder, 2 items", "Autumn, folder, 1 item")
 	if got, want := folderList(s), []string{"Winter: Bravo, Road trip", "Autumn: Charlie"}; !slices.Equal(got, want) {
 		t.Errorf("a header dragged onto another, the folders are %q, want %q", got, want)
 	}
 	// Places don't go in folders.
 	liked := s.lk.words("Liked songs")
-	dragSide(t, s, tt, liked, "Autumn, folder, 1 playlist")
+	dragSide(t, s, tt, liked, "Autumn, folder, 1 item")
 	if got := s.svc.Preferences.Get().SidebarPlaces; len(got) != 0 {
 		t.Errorf("Liked songs dropped on a folder moved: %+v", got)
 	}
@@ -212,7 +212,7 @@ func TestSidebarFolderOpen(t *testing.T) {
 	weather := fileMix(t, s, ids, "Rain", "Weather")
 	fileMix(t, s, ids, "Sun", "Weather")
 	tt.Frame()
-	head := "Weather, folder, 2 playlists"
+	head := "Weather, folder, 2 items"
 	shows := func(label string) bool { _, ok := tt.Find(label); return ok }
 	click(t, s, tt, head)
 	if shows("Sun") || shows("Rain") || !shows("Storm") {
@@ -269,7 +269,7 @@ func TestSidebarFolderKeys(t *testing.T) {
 	fileMix(t, s, ids, "Bravo", "Autumn")
 	fileMix(t, s, ids, "Charlie", "Winter")
 	tt.Frame()
-	head := "Autumn, folder, 2 playlists"
+	head := "Autumn, folder, 2 items"
 	focusOn(t, tt, head)
 	tt.Key(0, ui.KeyEnter)
 	s.drain()
@@ -332,7 +332,7 @@ func TestServicePlaylistFolder(t *testing.T) {
 		t.Fatalf("library.json keeps %+v", fs)
 	}
 	show(s, tt, "/settings/about")
-	if got, want := sideOrder(tt, "Lo-fi, folder, 1 playlist", "Chill"), []string{"Lo-fi, folder, 1 playlist", "Chill"}; !slices.Equal(got, want) {
+	if got, want := sideOrder(tt, "Lo-fi, folder, 1 item", "Chill"), []string{"Lo-fi, folder, 1 item", "Chill"}; !slices.Equal(got, want) {
 		t.Errorf("the sidebar lists %q, want %q", got, want)
 	}
 }
@@ -354,7 +354,7 @@ func TestPlayFolder(t *testing.T) {
 		t.Fatal(err)
 	}
 	tt.Frame()
-	chooseIn(t, s, tt, "Both, folder, 3 playlists", "Play folder")
+	chooseIn(t, s, tt, "Both, folder, 3 items", "Play folder")
 	s.settle(t, func(st player.State) bool { return len(st.Queue) > 0 })
 	var got []string
 	for _, it := range s.p.State().Queue {
@@ -365,7 +365,7 @@ func TestPlayFolder(t *testing.T) {
 	}
 	tt.Frame()
 	if !slices.ContainsFunc(tt.Texts(), func(text string) bool {
-		return strings.HasPrefix(text, "Play folder skipped Gone, which didn't load: ")
+		return strings.HasPrefix(text, "Gone didn't load, so the folder plays without it: ")
 	}) {
 		t.Errorf("no toast names the playlist left out: %q", tt.Texts())
 	}

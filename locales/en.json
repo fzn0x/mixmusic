@@ -4319,7 +4319,7 @@
   "@foldersGone": {
     "description": "Why a mix or a playlist didn't go in a folder of the sidebar's Your mixes, or a folder wasn't renamed or moved, as a toast: the folder went away meanwhile."
   },
-  "foldersHeader": "{name}, folder, {count, plural, one {# playlist} other {# playlists}}",
+  "foldersHeader": "{name}, folder, {count, plural, one {# item} other {# items}}",
   "@foldersHeader": {
     "description": "What screen readers call the header of a folder of the sidebar's Your mixes, which opens and closes it. {name} is the folder's name; {count} counts the mixes and playlists in it.",
     "placeholders": {
@@ -4375,7 +4375,7 @@
   "@foldersRenameTitle": {
     "description": "Title of the dialog that asks for a new name of a folder of the sidebar's Your mixes."
   },
-  "foldersSkipped": "Play folder skipped {playlist}, which didn't load: {error}",
+  "foldersSkipped": "{playlist} didn't load, so the folder plays without it: {error}",
   "@foldersSkipped": {
     "description": "Toast after Play folder (foldersPlay), for each mix or playlist of the folder that didn't load, whose tracks don't play. {playlist} is its name; {error} is why.",
     "placeholders": {

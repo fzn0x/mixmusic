@@ -13,10 +13,12 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
-// errSpotifyLinks is why a Spotify link doesn't open signed out.
-var errSpotifyLinks = fmt.Errorf("sign in to Spotify in Settings › Accounts to open its links: %w", spotify.ErrNotSignedIn)
+// errSpotifyLinks is why a Spotify link doesn't open signed out; it says
+// itself in the window's words, as worded errors do.
+var errSpotifyLinks = wordedLater("sign in to Spotify in Settings › Accounts to open its links", locales.TopbarLinkSpotifySignIn, spotify.ErrNotSignedIn)
 
 // errNoShow is why a Spotify episode's link doesn't open: Spotify named no
 // show it is of.

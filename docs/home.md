@@ -14,6 +14,10 @@ A shelf of songs, on Home, Explore and the now playing page, has **Play** and **
 
 The pivots at the top keep Everything, only Yours, only Spotify's or only YouTube Music's.
 
+Jump back in, Recently played and Your mixes follow what you play and the mixes you make or delete, so they show the history as it is now, not as it was when Home first showed. Before there's any history, Jump back in is the track that's current.
+
+Your own shelves show at once. A service's shelves that are still coming show a spinner, and the shelves placed after them wait, so that none jumps when they arrive. When YouTube Music or Spotify can't load its shelves, Home says so once, where that service's shelves would be, in a box with the reason and **try again**, which asks again. A shelf you added that couldn't come shows its title and the same box, where you placed it. While you're offline and your downloads hold tracks, an **open downloads** button shows under the first box and opens [Library › Downloads](library.md#downloads).
+
 ## Arrange Home
 
 **Edit home**, at the top of Home, lists its shelves in the order Home shows them, and keeps each change at once. **Done** shows Home again.
@@ -37,3 +41,13 @@ The pivots at the top keep Everything, only Yours, only Spotify's or only YouTub
 - **A service's new shelves** come after the ones you placed, in the service's order.
 - **A shelf the service no longer has** shows nothing, and leaves your order the next time you edit Home. One you hid stays hidden, in case it comes back.
 - **It's kept in settings.json,** as `homeShelves`: each shelf's key, its title as you last arranged Home, and whether you hid it. It goes where your settings go, as when you [bring them to another copy](data-and-privacy.md#clear-move-or-reset).
+
+## Explore
+
+Explore is YouTube Music's own pages of what's new and what's popular. It's YouTube Music's alone, and it works without signing in. Open it from the sidebar, with Alt+5 (⌥5 on macOS), or with the link `mixmusic://explore`. Three pivots sit under its title. Back and Forward come back to the one you chose, and `mixmusic://explore/charts` or `mixmusic://explore/moods` opens on one; the sidebar, Alt+5 and `mixmusic://explore` open New:
+
+- **New:** the shelves of YouTube Music's explore page: new albums and singles, and trending songs.
+- **Charts:** the shelves of YouTube Music's charts.
+- **Moods & genres:** a grid of tiles, by YouTube Music's groups. A tile opens a page of that mood's or genre's playlists, headed with its name, in YouTube Music's own shelves.
+
+[Hide explicit content](playing-music.md#hiding-explicit-content) keeps explicit songs out of its shelves. When YouTube Music has nothing to show, the page says "YouTube Music shows nothing here right now." When it can't be reached, the page shows the reason with a way to try again, and Refresh this page (F5, ⇧⌘R on macOS) asks again.
